@@ -139,6 +139,14 @@ function endMode(){
   renderView();
 }
 function modeMinutesFor(dateStr, type){
+  if(RC){
+    const idx = memo('modeIdx', function(){
+      const m = {};
+      state.modes.history.forEach(function(h){ const d = m[h.date] || (m[h.date] = {'*':0}); d[h.type] = (d[h.type]||0) + (h.minutes||0); d['*'] += (h.minutes||0); });
+      return m;
+    });
+    const d = idx[dateStr]; return d ? (d[type||'*']||0) : 0;
+  }
   return state.modes.history.filter(function(m){ return m.date===dateStr && (!type || m.type===type); }).reduce(function(a,m){ return a+m.minutes; },0);
 }
 

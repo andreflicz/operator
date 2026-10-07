@@ -31,6 +31,9 @@ async function init(){
   startModeTicker();
   startAlarmChecker();
   startAppActivityPolling();
+  const idle = window.requestIdleCallback || function(fn){ return setTimeout(fn, 1200); };
+  idle(warmAudio);
+  setTimeout(function(){ idle(migrateInlineJournalPhotos); }, 2500);
 }
 init();
 

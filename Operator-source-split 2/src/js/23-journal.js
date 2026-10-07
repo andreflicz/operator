@@ -8,7 +8,7 @@ function journalEntryRow(e){
   const photos = arr(e.photos);
   return '<div class="journal-entry'+(isStarred?' journal-entry-starred':'')+'" style="'+(mood && !isStarred?'border-left:4px solid '+mood.color+';':'')+'">'+
     '<div class="row" style="justify-content:space-between;">'+
-      '<div class="kpi-sub">'+(mood?mood.emoji+' ':'')+new Date(e.timestamp).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})+'</div>'+
+      '<div class="kpi-sub">'+(mood?mood.emoji+' ':'')+fmtTimeShort(e.timestamp)+'</div>'+
       '<div class="row">'+
         '<button class="btn btn-ghost btn-sm" data-action="togglePinJournal" data-id="'+e.id+'">'+(e.pinned?'\u2605 Pinned':'\u2606 Pin')+'</button>'+
         '<button class="btn btn-ghost btn-sm" data-action="openJournalEditModal" data-id="'+e.id+'">Edit</button>'+
@@ -19,6 +19,24 @@ function journalEntryRow(e){
     (isLong ? '<button class="btn btn-ghost btn-sm" data-action="toggleJournalExpand" data-id="'+e.id+'">'+(expanded?'Show Less':'Read More')+'</button>' : '')+
     deleteBtn('journal', e.id)+
   '</div>';
+}
+// One-time cleanup: older journal photos were stored as giant text strings inside the journal
+// data, so every journal save re-wrote megabytes. Move each into the image store and keep a
+// small reference instead. A photo is only swapped once it's safely stored.
+async function migrateInlineJournalPhotos(){
+  let moved = 0;
+  for(const e of state.journal.entries){
+    const photos = arr(e.photos);
+    for(let i=0;i<photos.length;i++){
+      const src = photos[i];
+      if(typeof src!=='string' || src.indexOf('data:')!==0) continue;
+      try{
+        const ref = await blobStore(dataUrlToBlob(src));
+        if(isBlobRef(ref)){ photos[i] = ref; moved++; }
+      }catch(err){}
+    }
+  }
+  if(moved){ await persist('journal'); }
 }
 function openJournalPhotoView(entryId, idx){
   ui.viewingJournalPhoto = {entryId:entryId, idx:Number(idx)};
@@ -40,9 +58,15 @@ function renderJournalPhotoViewModal(){
     '</div>';
 }
 function renderJournalPhotoViewModalInto(){ const el=document.getElementById('journalPhotoViewContent'); if(el) morphInto(el, renderJournalPhotoViewModal(), {form:true}); }
+// Only the most recent entries are rendered (more on demand) — rendering the whole
+// history on every click was the slowest thing in the app once a year of entries piled up.
+const JOURNAL_PAGE = 40;
 function renderJournalHistory(entries){
   const pinned = entries.filter(function(e){return e.pinned;});
-  const rest = entries.filter(function(e){return !e.pinned;});
+  const allRest = entries.filter(function(e){return !e.pinned;});
+  const limit = ui.journalShowCount || JOURNAL_PAGE;
+  const rest = allRest.slice(0, limit);
+  const hidden = allRest.length - rest.length;
   const groups = {}; const order = [];
   rest.forEach(function(e){ if(!groups[e.date]){ groups[e.date]=[]; order.push(e.date); } groups[e.date].push(e); });
   let html = '';
@@ -51,8 +75,10 @@ function renderJournalHistory(entries){
     const label = d===todayStr() ? 'Today' : d===addDays(todayStr(),-1) ? 'Yesterday' : fmtDateShort(d);
     html += '<div class="kind-label">'+label+'</div>'+groups[d].map(journalEntryRow).join('');
   });
+  if(hidden>0) html += '<div class="row" style="justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="journalShowMore">Show '+Math.min(hidden, JOURNAL_PAGE)+' more &middot; '+hidden+' older</button></div>';
   return html || '<div class="empty">Nothing matches yet.</div>';
 }
+ACTIONS.journalShowMore = function(){ ui.journalShowCount = (ui.journalShowCount || JOURNAL_PAGE) + JOURNAL_PAGE; updateJournalHistoryDisplay(); };
 function filteredJournalEntries(){
   const allEntries = state.journal.entries.slice().sort(function(a,b){ return b.timestamp-a.timestamp; });
   const searchLower = (ui.journalSearchText||'').toLowerCase();
@@ -65,7 +91,7 @@ function filteredJournalEntries(){
 function updateJournalHistoryDisplay(){
   const el = document.getElementById('journalHistoryContainer');
   if(!el) return;
-  el.innerHTML = renderJournalHistory(filteredJournalEntries());
+  morphInto(el, renderJournalHistory(filteredJournalEntries()));
 }
 function setJournalMoodFilter(moodId){ ui.journalFilterMood = (ui.journalFilterMood===moodId) ? null : moodId; renderView(); }
 function clearJournalFilters(){ ui.journalFilterMood=null; ui.journalSearchText=''; ui.journalSearchOpen=false; renderView(); }

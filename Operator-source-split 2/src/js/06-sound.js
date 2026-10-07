@@ -9,6 +9,12 @@ function getAudioCtx(){
     return sharedAudioCtx;
   }catch(e){ return null; }
 }
+// Creating the AudioContext costs ~100ms; do it while idle after startup instead of on the
+// first click that plays a sound (it starts suspended and is resumed on that click).
+function warmAudio(){
+  if(sharedAudioCtx || !soundOn()) return;
+  try{ const Ctx = window.AudioContext||window.webkitAudioContext; if(Ctx) sharedAudioCtx = new Ctx(); }catch(e){}
+}
 function tone(freqs, dur, gainPeak){
   if(!soundOn()) return;
   try{

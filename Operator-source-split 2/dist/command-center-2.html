@@ -240,7 +240,7 @@
   .subtab{padding:6px 13px; border-radius:20px; border:1px solid var(--border); background:var(--panel-2); color:var(--text-dim); font-size:12.5px; cursor:pointer; font-weight:600; font-family:var(--font-display);}
   .subtab.active{background:var(--accent-dim); color:var(--text); border-color:var(--accent);}
   .chart-svg{width:100%; height:auto; display:block;}
-  .overlay{position:fixed; inset:0; background:rgba(6,7,12,.8); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; z-index:100; flex-direction:column; gap:18px; padding:20px; animation:overlayFadeIn .16s ease-out;}
+  .overlay{position:fixed; inset:0; background:rgba(6,7,12,.84); display:flex; align-items:center; justify-content:center; z-index:100; flex-direction:column; gap:18px; padding:20px; animation:overlayFadeIn .12s ease-out;}
   .overlay.overlay-instant{animation:none;}
   .overlay.overlay-instant > .card{animation:none !important;}
   @keyframes overlayFadeIn{ from{opacity:0;} to{opacity:1;} }
@@ -308,9 +308,9 @@
   .prep-list li::marker{ color:var(--accent); }
   .motiv-toward{color:var(--good); font-size:14.5px; font-weight:600; margin-bottom:6px; text-shadow:0 0 14px rgba(63,190,142,.45);}
   .motiv-away{color:var(--danger); font-size:14.5px; font-weight:600; margin-bottom:6px; text-shadow:0 0 14px rgba(232,99,107,.45);}
-  #preFocusContent, #stopFocusContent, #timesUpContent, #multiBreakContent, #finalStopContent, #upcomingContent, #quickJournalContent, #journalPhotoViewContent, #clientJournalContent{border:2px solid var(--accent); box-shadow:0 0 70px rgba(232,162,61,.28), 0 24px 70px rgba(0,0,0,.55); animation:modalPopIn .22s ease-out;}
+  #preFocusContent, #stopFocusContent, #timesUpContent, #multiBreakContent, #finalStopContent, #upcomingContent, #quickJournalContent, #journalPhotoViewContent, #clientJournalContent{border:2px solid var(--accent); box-shadow:0 0 70px rgba(232,162,61,.28), 0 24px 70px rgba(0,0,0,.55); animation:modalPopIn .14s ease-out;}
   #finalStopContent{border-color:var(--danger); box-shadow:0 0 70px rgba(232,99,107,.28), 0 24px 70px rgba(0,0,0,.55);}
-  @keyframes modalPopIn{ from{ transform:scale(.9); opacity:0; } to{ transform:scale(1); opacity:1; } }
+  @keyframes modalPopIn{ from{ transform:scale(.97); opacity:.6; } to{ transform:scale(1); opacity:1; } }
   .focus-active-glow{ animation: focusPulse 2.4s ease-in-out infinite; border-width:2px; border-color:var(--accent); }
   @keyframes focusPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(232,162,61,0);} 50%{ box-shadow:0 0 26px 5px rgba(232,162,61,.38);} }
   .focus-complete-pulse{ animation: focusCompleteFlash .6s ease-in-out 3; }
@@ -931,16 +931,32 @@ function ordinal(n){
 }
 function todayStr(d){ d=d||new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
 function nowHM(d){ d=d||new Date(); return pad2(d.getHours())+':'+pad2(d.getMinutes()); }
+// toLocaleDateString builds a new formatter on every call, which made each re-render spend
+// most of its time formatting dates. One shared formatter per format + a small memo instead.
+const FMT_MONTH_DAY = new Intl.DateTimeFormat(undefined,{month:'short', day:'numeric'});
+const FMT_WEEKDAY = new Intl.DateTimeFormat(undefined,{weekday:'short'});
+const FMT_TIME = new Intl.DateTimeFormat(undefined,{hour:'numeric', minute:'2-digit'});
+const fmtMemo = {md:{}, wd:{}};
 function fmtDateShort(s){
   if(!s) return '—';
+  if(fmtMemo.md[s]) return fmtMemo.md[s];
   const parts = s.split('-').map(Number);
-  const dt = new Date(parts[0], parts[1]-1, parts[2]);
-  return dt.toLocaleDateString(undefined,{month:'short', day:'numeric'});
+  return (fmtMemo.md[s] = FMT_MONTH_DAY.format(new Date(parts[0], parts[1]-1, parts[2])));
 }
 function weekdayShort(dateStr){
+  if(fmtMemo.wd[dateStr]) return fmtMemo.wd[dateStr];
   const parts = dateStr.split('-').map(Number);
-  const dt = new Date(parts[0], parts[1]-1, parts[2]);
-  return dt.toLocaleDateString(undefined,{weekday:'short'});
+  return (fmtMemo.wd[dateStr] = FMT_WEEKDAY.format(new Date(parts[0], parts[1]-1, parts[2])));
+}
+function fmtTimeShort(ts){ return FMT_TIME.format(new Date(ts)); }
+// Render-scoped cache: only active while renderView runs (state can't change mid-render),
+// so repeated stats lookups — streak, per-day standards, per-day minutes — are computed once
+// per render instead of re-scanning a year of sessions for every day they're asked about.
+let RC = null;
+function memo(key, fn){
+  if(!RC) return fn();
+  if(Object.prototype.hasOwnProperty.call(RC, key)) return RC[key];
+  return (RC[key] = fn());
 }
 function addDays(dateStr, n){
   const parts = dateStr.split('-').map(Number);
@@ -1966,6 +1982,12 @@ function getAudioCtx(){
     return sharedAudioCtx;
   }catch(e){ return null; }
 }
+// Creating the AudioContext costs ~100ms; do it while idle after startup instead of on the
+// first click that plays a sound (it starts suspended and is resumed on that click).
+function warmAudio(){
+  if(sharedAudioCtx || !soundOn()) return;
+  try{ const Ctx = window.AudioContext||window.webkitAudioContext; if(Ctx) sharedAudioCtx = new Ctx(); }catch(e){}
+}
 function tone(freqs, dur, gainPeak){
   if(!soundOn()) return;
   try{
@@ -2140,7 +2162,16 @@ function getStandardRec(dateStr){
 // categories) marked "doesn't count toward deep work" (e.g. Meta ads).
 function sessionType(s){ return s.type || 'deep'; }
 function rawSessionMinutesFor(dateStr, type){
-  return state.focus.sessions.filter(function(s){ return s.date===dateStr && sessionType(s)===(type||'deep'); }).reduce(function(a,s){ return a+(s.minutes||0); },0);
+  type = type||'deep';
+  if(RC){
+    const idx = memo('sessIdx', function(){
+      const m = {};
+      state.focus.sessions.forEach(function(s){ const d = m[s.date] || (m[s.date] = {}); const t = sessionType(s); d[t] = (d[t]||0) + (s.minutes||0); });
+      return m;
+    });
+    return (idx[dateStr] && idx[dateStr][type]) || 0;
+  }
+  return state.focus.sessions.filter(function(s){ return s.date===dateStr && sessionType(s)===type; }).reduce(function(a,s){ return a+(s.minutes||0); },0);
 }
 function deepWorkMinutesFor(dateStr){
   return Math.max(0, rawSessionMinutesFor(dateStr,'deep') - excludedTaskMinutesFor(dateStr));
@@ -2156,7 +2187,9 @@ function deepWorkMinutesTodayLive(){
   return Math.max(0, mins);
 }
 function taskCountsAsDeepWork(taskOrId){
-  const t = typeof taskOrId==='string' ? state.tasks.items.find(function(x){ return x.id===taskOrId; }) : taskOrId;
+  const t = typeof taskOrId!=='string' ? taskOrId : RC
+    ? memo('taskById', function(){ const m = {}; state.tasks.items.forEach(function(x){ m[x.id] = x; }); return m; })[taskOrId]
+    : state.tasks.items.find(function(x){ return x.id===taskOrId; });
   if(!t) return true;
   if(t.countsDeepWork===false) return false;
   const cat = t.categoryId ? taskCategoryById(t.categoryId) : null;
@@ -2164,6 +2197,14 @@ function taskCountsAsDeepWork(taskOrId){
   return true;
 }
 function excludedTaskMinutesFor(dateStr){
+  if(RC){
+    const idx = memo('exclIdx', function(){
+      const m = {};
+      arr(state.focus.taskSegments).forEach(function(sg){ if(sg.inSession===false || taskCountsAsDeepWork(sg.taskId)) return; m[sg.date] = (m[sg.date]||0) + Math.max(0, Math.round((sg.end-sg.start)/60000)); });
+      return m;
+    });
+    return idx[dateStr] || 0;
+  }
   return arr(state.focus.taskSegments).filter(function(sg){ return sg.date===dateStr && sg.inSession!==false && !taskCountsAsDeepWork(sg.taskId); })
     .reduce(function(a,sg){ return a+Math.max(0, Math.round((sg.end-sg.start)/60000)); },0);
 }
@@ -2193,6 +2234,10 @@ function ongoingStandardTasksDoneFor(dateStr){
   return tasks.every(function(t){ return arr(t.ongoingDoneDates).indexOf(dateStr)>=0; });
 }
 function dayStandardsComplete(dateStr){
+  if(RC) return memo('dsc:'+dateStr, function(){ return dayStandardsCompleteRaw(dateStr); });
+  return dayStandardsCompleteRaw(dateStr);
+}
+function dayStandardsCompleteRaw(dateStr){
   const target = state.standards.deepWorkTargetMinutes || 180;
   const ov = state.standards.dayOverrides && state.standards.dayOverrides[dateStr];
   if(ov==='done') return true;
@@ -2250,7 +2295,8 @@ function trailingWeekWorkingDays(dateStr){
   return count;
 }
 function trailingWeekQualifies(dateStr){ return trailingWeekWorkingDays(dateStr) >= requiredWorkingDays(); }
-function computeStreak(){
+function computeStreak(){ return memo('streak', computeStreakRaw); }
+function computeStreakRaw(){
   let count = 0;
   let d = new Date();
   if(!dayStandardsComplete(todayStr(d)) && !isDayOff(todayStr(d))){
@@ -2267,14 +2313,16 @@ function computeStreak(){
   }
   return count;
 }
-function firstEverWorkedDate(){
+function firstEverWorkedDate(){ return memo('firstWorked', firstEverWorkedDateRaw); }
+function firstEverWorkedDateRaw(){
   const dates = state.focus.sessions.map(function(s){return s.date;}).concat(
     state.standards.completions.filter(function(c){ return c.doneIds && c.doneIds.length>0; }).map(function(c){return c.date;})
   );
   if(!dates.length) return null;
   return dates.sort()[0];
 }
-function dayVisualStatus(dateStr){
+function dayVisualStatus(dateStr){ return memo('dvs:'+dateStr, function(){ return dayVisualStatusRaw(dateStr); }); }
+function dayVisualStatusRaw(dateStr){
   if(dateStr > todayStr()) return 'future';
   const startDate = firstEverWorkedDate();
   if(!startDate || dateStr < startDate) return 'neutral';
@@ -4377,8 +4425,8 @@ function renderTimeByTaskSection(){
   '</div></div>';
 }
 function timeBlockLabel(m){
-  const startT = new Date(m.startedAt).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
-  const endT = m.endedAt ? new Date(m.endedAt).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}) : null;
+  const startT = fmtTimeShort(m.startedAt);
+  const endT = m.endedAt ? fmtTimeShort(m.endedAt) : null;
   return endT ? (startT+' – '+endT) : startT;
 }
 function renderModeHistorySection(){
@@ -5253,6 +5301,14 @@ function endMode(){
   renderView();
 }
 function modeMinutesFor(dateStr, type){
+  if(RC){
+    const idx = memo('modeIdx', function(){
+      const m = {};
+      state.modes.history.forEach(function(h){ const d = m[h.date] || (m[h.date] = {'*':0}); d[h.type] = (d[h.type]||0) + (h.minutes||0); d['*'] += (h.minutes||0); });
+      return m;
+    });
+    const d = idx[dateStr]; return d ? (d[type||'*']||0) : 0;
+  }
   return state.modes.history.filter(function(m){ return m.date===dateStr && (!type || m.type===type); }).reduce(function(a,m){ return a+m.minutes; },0);
 }
 
@@ -5637,7 +5693,7 @@ function journalEntryRow(e){
   const photos = arr(e.photos);
   return '<div class="journal-entry'+(isStarred?' journal-entry-starred':'')+'" style="'+(mood && !isStarred?'border-left:4px solid '+mood.color+';':'')+'">'+
     '<div class="row" style="justify-content:space-between;">'+
-      '<div class="kpi-sub">'+(mood?mood.emoji+' ':'')+new Date(e.timestamp).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})+'</div>'+
+      '<div class="kpi-sub">'+(mood?mood.emoji+' ':'')+fmtTimeShort(e.timestamp)+'</div>'+
       '<div class="row">'+
         '<button class="btn btn-ghost btn-sm" data-action="togglePinJournal" data-id="'+e.id+'">'+(e.pinned?'\u2605 Pinned':'\u2606 Pin')+'</button>'+
         '<button class="btn btn-ghost btn-sm" data-action="openJournalEditModal" data-id="'+e.id+'">Edit</button>'+
@@ -5648,6 +5704,24 @@ function journalEntryRow(e){
     (isLong ? '<button class="btn btn-ghost btn-sm" data-action="toggleJournalExpand" data-id="'+e.id+'">'+(expanded?'Show Less':'Read More')+'</button>' : '')+
     deleteBtn('journal', e.id)+
   '</div>';
+}
+// One-time cleanup: older journal photos were stored as giant text strings inside the journal
+// data, so every journal save re-wrote megabytes. Move each into the image store and keep a
+// small reference instead. A photo is only swapped once it's safely stored.
+async function migrateInlineJournalPhotos(){
+  let moved = 0;
+  for(const e of state.journal.entries){
+    const photos = arr(e.photos);
+    for(let i=0;i<photos.length;i++){
+      const src = photos[i];
+      if(typeof src!=='string' || src.indexOf('data:')!==0) continue;
+      try{
+        const ref = await blobStore(dataUrlToBlob(src));
+        if(isBlobRef(ref)){ photos[i] = ref; moved++; }
+      }catch(err){}
+    }
+  }
+  if(moved){ await persist('journal'); }
 }
 function openJournalPhotoView(entryId, idx){
   ui.viewingJournalPhoto = {entryId:entryId, idx:Number(idx)};
@@ -5669,9 +5743,15 @@ function renderJournalPhotoViewModal(){
     '</div>';
 }
 function renderJournalPhotoViewModalInto(){ const el=document.getElementById('journalPhotoViewContent'); if(el) morphInto(el, renderJournalPhotoViewModal(), {form:true}); }
+// Only the most recent entries are rendered (more on demand) — rendering the whole
+// history on every click was the slowest thing in the app once a year of entries piled up.
+const JOURNAL_PAGE = 40;
 function renderJournalHistory(entries){
   const pinned = entries.filter(function(e){return e.pinned;});
-  const rest = entries.filter(function(e){return !e.pinned;});
+  const allRest = entries.filter(function(e){return !e.pinned;});
+  const limit = ui.journalShowCount || JOURNAL_PAGE;
+  const rest = allRest.slice(0, limit);
+  const hidden = allRest.length - rest.length;
   const groups = {}; const order = [];
   rest.forEach(function(e){ if(!groups[e.date]){ groups[e.date]=[]; order.push(e.date); } groups[e.date].push(e); });
   let html = '';
@@ -5680,8 +5760,10 @@ function renderJournalHistory(entries){
     const label = d===todayStr() ? 'Today' : d===addDays(todayStr(),-1) ? 'Yesterday' : fmtDateShort(d);
     html += '<div class="kind-label">'+label+'</div>'+groups[d].map(journalEntryRow).join('');
   });
+  if(hidden>0) html += '<div class="row" style="justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="journalShowMore">Show '+Math.min(hidden, JOURNAL_PAGE)+' more &middot; '+hidden+' older</button></div>';
   return html || '<div class="empty">Nothing matches yet.</div>';
 }
+ACTIONS.journalShowMore = function(){ ui.journalShowCount = (ui.journalShowCount || JOURNAL_PAGE) + JOURNAL_PAGE; updateJournalHistoryDisplay(); };
 function filteredJournalEntries(){
   const allEntries = state.journal.entries.slice().sort(function(a,b){ return b.timestamp-a.timestamp; });
   const searchLower = (ui.journalSearchText||'').toLowerCase();
@@ -5694,7 +5776,7 @@ function filteredJournalEntries(){
 function updateJournalHistoryDisplay(){
   const el = document.getElementById('journalHistoryContainer');
   if(!el) return;
-  el.innerHTML = renderJournalHistory(filteredJournalEntries());
+  morphInto(el, renderJournalHistory(filteredJournalEntries()));
 }
 function setJournalMoodFilter(moodId){ ui.journalFilterMood = (ui.journalFilterMood===moodId) ? null : moodId; renderView(); }
 function clearJournalFilters(){ ui.journalFilterMood=null; ui.journalSearchText=''; ui.journalSearchOpen=false; renderView(); }
@@ -9762,6 +9844,10 @@ function updateNavActive(){
 let lastRenderedView = null;
 let lastRenderedDay = null;
 function renderView(){
+  RC = {};
+  try{ renderViewInner(); } finally { RC = null; }
+}
+function renderViewInner(){
   if(ui.currentTaskId && (!state.focus.activeSession || state.focus.activeSession.onBreak)){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   const root = document.getElementById('viewRoot');
   let html = '';
@@ -10601,6 +10687,9 @@ async function init(){
   startModeTicker();
   startAlarmChecker();
   startAppActivityPolling();
+  const idle = window.requestIdleCallback || function(fn){ return setTimeout(fn, 1200); };
+  idle(warmAudio);
+  setTimeout(function(){ idle(migrateInlineJournalPhotos); }, 2500);
 }
 init();
 

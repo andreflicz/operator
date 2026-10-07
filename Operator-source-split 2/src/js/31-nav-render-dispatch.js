@@ -7,6 +7,10 @@ function updateNavActive(){
 let lastRenderedView = null;
 let lastRenderedDay = null;
 function renderView(){
+  RC = {};
+  try{ renderViewInner(); } finally { RC = null; }
+}
+function renderViewInner(){
   if(ui.currentTaskId && (!state.focus.activeSession || state.focus.activeSession.onBreak)){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   const root = document.getElementById('viewRoot');
   let html = '';

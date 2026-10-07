@@ -15,7 +15,16 @@ function getStandardRec(dateStr){
 // categories) marked "doesn't count toward deep work" (e.g. Meta ads).
 function sessionType(s){ return s.type || 'deep'; }
 function rawSessionMinutesFor(dateStr, type){
-  return state.focus.sessions.filter(function(s){ return s.date===dateStr && sessionType(s)===(type||'deep'); }).reduce(function(a,s){ return a+(s.minutes||0); },0);
+  type = type||'deep';
+  if(RC){
+    const idx = memo('sessIdx', function(){
+      const m = {};
+      state.focus.sessions.forEach(function(s){ const d = m[s.date] || (m[s.date] = {}); const t = sessionType(s); d[t] = (d[t]||0) + (s.minutes||0); });
+      return m;
+    });
+    return (idx[dateStr] && idx[dateStr][type]) || 0;
+  }
+  return state.focus.sessions.filter(function(s){ return s.date===dateStr && sessionType(s)===type; }).reduce(function(a,s){ return a+(s.minutes||0); },0);
 }
 function deepWorkMinutesFor(dateStr){
   return Math.max(0, rawSessionMinutesFor(dateStr,'deep') - excludedTaskMinutesFor(dateStr));
@@ -31,7 +40,9 @@ function deepWorkMinutesTodayLive(){
   return Math.max(0, mins);
 }
 function taskCountsAsDeepWork(taskOrId){
-  const t = typeof taskOrId==='string' ? state.tasks.items.find(function(x){ return x.id===taskOrId; }) : taskOrId;
+  const t = typeof taskOrId!=='string' ? taskOrId : RC
+    ? memo('taskById', function(){ const m = {}; state.tasks.items.forEach(function(x){ m[x.id] = x; }); return m; })[taskOrId]
+    : state.tasks.items.find(function(x){ return x.id===taskOrId; });
   if(!t) return true;
   if(t.countsDeepWork===false) return false;
   const cat = t.categoryId ? taskCategoryById(t.categoryId) : null;
@@ -39,6 +50,14 @@ function taskCountsAsDeepWork(taskOrId){
   return true;
 }
 function excludedTaskMinutesFor(dateStr){
+  if(RC){
+    const idx = memo('exclIdx', function(){
+      const m = {};
+      arr(state.focus.taskSegments).forEach(function(sg){ if(sg.inSession===false || taskCountsAsDeepWork(sg.taskId)) return; m[sg.date] = (m[sg.date]||0) + Math.max(0, Math.round((sg.end-sg.start)/60000)); });
+      return m;
+    });
+    return idx[dateStr] || 0;
+  }
   return arr(state.focus.taskSegments).filter(function(sg){ return sg.date===dateStr && sg.inSession!==false && !taskCountsAsDeepWork(sg.taskId); })
     .reduce(function(a,sg){ return a+Math.max(0, Math.round((sg.end-sg.start)/60000)); },0);
 }
@@ -68,6 +87,10 @@ function ongoingStandardTasksDoneFor(dateStr){
   return tasks.every(function(t){ return arr(t.ongoingDoneDates).indexOf(dateStr)>=0; });
 }
 function dayStandardsComplete(dateStr){
+  if(RC) return memo('dsc:'+dateStr, function(){ return dayStandardsCompleteRaw(dateStr); });
+  return dayStandardsCompleteRaw(dateStr);
+}
+function dayStandardsCompleteRaw(dateStr){
   const target = state.standards.deepWorkTargetMinutes || 180;
   const ov = state.standards.dayOverrides && state.standards.dayOverrides[dateStr];
   if(ov==='done') return true;
@@ -125,7 +148,8 @@ function trailingWeekWorkingDays(dateStr){
   return count;
 }
 function trailingWeekQualifies(dateStr){ return trailingWeekWorkingDays(dateStr) >= requiredWorkingDays(); }
-function computeStreak(){
+function computeStreak(){ return memo('streak', computeStreakRaw); }
+function computeStreakRaw(){
   let count = 0;
   let d = new Date();
   if(!dayStandardsComplete(todayStr(d)) && !isDayOff(todayStr(d))){
@@ -142,14 +166,16 @@ function computeStreak(){
   }
   return count;
 }
-function firstEverWorkedDate(){
+function firstEverWorkedDate(){ return memo('firstWorked', firstEverWorkedDateRaw); }
+function firstEverWorkedDateRaw(){
   const dates = state.focus.sessions.map(function(s){return s.date;}).concat(
     state.standards.completions.filter(function(c){ return c.doneIds && c.doneIds.length>0; }).map(function(c){return c.date;})
   );
   if(!dates.length) return null;
   return dates.sort()[0];
 }
-function dayVisualStatus(dateStr){
+function dayVisualStatus(dateStr){ return memo('dvs:'+dateStr, function(){ return dayVisualStatusRaw(dateStr); }); }
+function dayVisualStatusRaw(dateStr){
   if(dateStr > todayStr()) return 'future';
   const startDate = firstEverWorkedDate();
   if(!startDate || dateStr < startDate) return 'neutral';

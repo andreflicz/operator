@@ -353,8 +353,8 @@ function renderTimeByTaskSection(){
   '</div></div>';
 }
 function timeBlockLabel(m){
-  const startT = new Date(m.startedAt).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
-  const endT = m.endedAt ? new Date(m.endedAt).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}) : null;
+  const startT = fmtTimeShort(m.startedAt);
+  const endT = m.endedAt ? fmtTimeShort(m.endedAt) : null;
   return endT ? (startT+' – '+endT) : startT;
 }
 function renderModeHistorySection(){

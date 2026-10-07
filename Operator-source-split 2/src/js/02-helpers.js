@@ -8,16 +8,32 @@ function ordinal(n){
 }
 function todayStr(d){ d=d||new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
 function nowHM(d){ d=d||new Date(); return pad2(d.getHours())+':'+pad2(d.getMinutes()); }
+// toLocaleDateString builds a new formatter on every call, which made each re-render spend
+// most of its time formatting dates. One shared formatter per format + a small memo instead.
+const FMT_MONTH_DAY = new Intl.DateTimeFormat(undefined,{month:'short', day:'numeric'});
+const FMT_WEEKDAY = new Intl.DateTimeFormat(undefined,{weekday:'short'});
+const FMT_TIME = new Intl.DateTimeFormat(undefined,{hour:'numeric', minute:'2-digit'});
+const fmtMemo = {md:{}, wd:{}};
 function fmtDateShort(s){
   if(!s) return '—';
+  if(fmtMemo.md[s]) return fmtMemo.md[s];
   const parts = s.split('-').map(Number);
-  const dt = new Date(parts[0], parts[1]-1, parts[2]);
-  return dt.toLocaleDateString(undefined,{month:'short', day:'numeric'});
+  return (fmtMemo.md[s] = FMT_MONTH_DAY.format(new Date(parts[0], parts[1]-1, parts[2])));
 }
 function weekdayShort(dateStr){
+  if(fmtMemo.wd[dateStr]) return fmtMemo.wd[dateStr];
   const parts = dateStr.split('-').map(Number);
-  const dt = new Date(parts[0], parts[1]-1, parts[2]);
-  return dt.toLocaleDateString(undefined,{weekday:'short'});
+  return (fmtMemo.wd[dateStr] = FMT_WEEKDAY.format(new Date(parts[0], parts[1]-1, parts[2])));
+}
+function fmtTimeShort(ts){ return FMT_TIME.format(new Date(ts)); }
+// Render-scoped cache: only active while renderView runs (state can't change mid-render),
+// so repeated stats lookups — streak, per-day standards, per-day minutes — are computed once
+// per render instead of re-scanning a year of sessions for every day they're asked about.
+let RC = null;
+function memo(key, fn){
+  if(!RC) return fn();
+  if(Object.prototype.hasOwnProperty.call(RC, key)) return RC[key];
+  return (RC[key] = fn());
 }
 function addDays(dateStr, n){
   const parts = dateStr.split('-').map(Number);
