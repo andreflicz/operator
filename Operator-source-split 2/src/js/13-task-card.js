@@ -48,8 +48,8 @@ function taskCard(t){
       clientTagsHtml(t.clients)+
       (t.deadline ? deadlineTag(t) : '')+
     '</div>'+
-    (t.status==='backlog' ? '<button class="btn btn-primary btn-sm" style="margin-top:6px;" data-action="pullSpecificFromBacklog" data-id="'+t.id+'">+ Add to Today</button>' : '')+
-    (t.status==='today' ? '<button class="btn btn-ghost btn-sm" style="margin-top:6px;" data-action="moveTaskToBacklog" data-id="'+t.id+'">&rarr; Move to Backlog</button>' : '')+
+    (t.status==='backlog' ? '<div class="mini-move-row"><button class="mini-move mini-move-today" data-action="pullSpecificFromBacklog" data-id="'+t.id+'">+ Move to today</button></div>' : '')+
+    (t.status==='today' ? '<div class="mini-move-row"><button class="mini-move" data-action="moveTaskToBacklog" data-id="'+t.id+'">&larr; Move back to '+(t.isVideoIdea?'video ideas':'backlog')+'</button></div>' : '')+
     (t.ongoing ? '<div class="row" style="margin-top:8px;"><button class="btn btn-sm '+(doneToday?'btn-ghost':'btn-good')+'" data-action="'+(doneToday?'undoTask':'completeTask')+'" data-id="'+t.id+'" style="width:100%;">'+(doneToday?'Undo — done for today':'&#10003; Mark done for today')+'</button></div>' : '')+
   '</div>';
 }
@@ -134,10 +134,9 @@ function bulkMoveTasks(target){
   persist('tasks'); renderView();
 }
 function bulkRemoveTasks(){
-  const ids = new Set(ui.selectedTaskIds);
-  state.tasks.items = state.tasks.items.filter(function(t){ return !ids.has(t.id); });
+  const ids = Array.from(ui.selectedTaskIds);
   ui.selectedTaskIds.clear();
-  persist('tasks'); renderView();
+  deleteTasksUndoable(ids);
 }
 function openTaskEditModal(id){
   const t = state.tasks.items.find(function(x){return x.id===id;});
@@ -170,7 +169,7 @@ function renderTaskEditModal(){
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editIncludeStandard-'+t.id+'" '+(t.includeInStandard?'checked':'')+' style="margin-right:6px;">Include in Today\'s Standard</label>'+
     '</div>'+
     '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
-      deleteBtn('task', t.id)+
+      '<button class="btn btn-ghost btn-sm mini-move-danger" data-action="deleteTaskUndoable" data-id="'+t.id+'">Delete</button>'+
       '<div class="row">'+
         '<button class="btn btn-ghost" data-action="closeTaskEditModal">Cancel</button>'+
         '<button class="btn btn-primary" data-action="saveEditTask" data-id="'+t.id+'">Save</button>'+

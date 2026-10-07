@@ -31,7 +31,7 @@ function performDelete(scope, id){
   if(scope==='weight') state.health.weightLog = state.health.weightLog.filter(function(x){return x.id!==id;});
   if(scope==='calorie') state.health.calorieEntries = state.health.calorieEntries.filter(function(x){return x.id!==id;});
   if(scope==='meal') state.meals.library = state.meals.library.filter(function(x){return x.id!==id;});
-  if(scope==='journal'){ state.journal.entries = state.journal.entries.filter(function(x){return x.id!==id;}); if(ui.editingJournalId===id) closeJournalEditModal(); }
+  if(scope==='journal'){ const je = state.journal.entries.find(function(x){return x.id===id;}); if(je) arr(je.photos).forEach(blobRemove); state.journal.entries = state.journal.entries.filter(function(x){return x.id!==id;}); if(ui.editingJournalId===id) closeJournalEditModal(); }
   if(scope==='debt') state.finances.debts = state.finances.debts.filter(function(x){return x.id!==id;});
   if(scope==='income') state.finances.income = state.finances.income.filter(function(x){return x.id!==id;});
   if(scope==='invoice') state.finances.invoices = state.finances.invoices.filter(function(x){return x.id!==id;});

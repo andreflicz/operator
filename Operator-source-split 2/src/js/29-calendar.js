@@ -51,6 +51,7 @@ function renderCalendar(){
     '<div id="calendarBigClock" class="cal-big-clock"></div>'+
     '<div id="calendarBigClockDate" class="kpi-sub" style="margin-top:2px;"></div>'+
   '</div>'+
+  renderAllDeadlinesSection()+
   '<div class="card section" style="max-width:640px;margin:14px auto 0;">'+
     '<div class="row" style="justify-content:space-between;margin-bottom:12px;">'+
       '<button class="btn btn-ghost btn-sm" data-action="calPrevMonth">&larr;</button>'+

@@ -138,6 +138,32 @@ function isBreakDay(dateStr){
   if(dateStr > todayStr()) return false;
   return dayVisualStatus(dateStr)==='failed' && dayVisualStatus(addDays(dateStr,-1))!=='failed';
 }
+// Compact week strip for the streak card: one dot per day (3 back, today, 3 ahead).
+function renderStreakWeekDots(){
+  const today = todayStr();
+  const days = []; for(let i=-3;i<=3;i++) days.push(addDays(today,i));
+  return '<div class="streak-week">'+days.map(function(d){
+    const status = isBreakDay(d) ? 'broken' : dayVisualStatus(d);
+    const off = isDayOff(d) && status!=='worked';
+    const cls = 'streak-dot streak-dot-'+(off?'off':status)+(d===today?' is-today':'');
+    const title = weekdayShort(d)+' · '+(status==='worked'?'standard met':status==='broken'?'streak broke':off?'day off':status==='failed'?'missed':status==='future'?'upcoming':'—');
+    return '<div class="streak-day" title="'+escapeHtml(title)+'"><span class="'+cls+'">'+(status==='worked'?'&#10003;':status==='broken'?'&#10005;':'')+'</span><span class="streak-day-letter">'+weekdayShort(d).slice(0,1)+'</span></div>';
+  }).join('')+'</div>';
+}
+function renderStreakCard(streak, opts){
+  opts = opts || {};
+  const hot = streak>0;
+  return '<div class="streak-card'+(hot?' is-hot':'')+(opts.compact?' is-compact':'')+'">'+
+    '<div class="streak-main">'+
+      '<span class="streak-flame">&#128293;</span>'+
+      '<span class="streak-num'+(opts.ticked?' streak-tick-pop':'')+'">'+streak+'</span>'+
+      '<span class="streak-unit">day'+(streak===1?'':'s')+'<br>streak</span>'+
+    '</div>'+
+    renderStreakWeekDots()+
+    (opts.status ? '<div class="streak-status">'+opts.status+'</div>' : '')+
+    (opts.editable ? '<button class="streak-edit-btn" data-action="openStreakEdit" title="Edit streak days">Edit</button>' : '')+
+  '</div>';
+}
 function renderWeekGrid(){
   const today = todayStr();
   const days = []; for(let i=-3;i<=3;i++) days.push(addDays(today,i));

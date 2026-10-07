@@ -18,11 +18,7 @@ function renderPersonalStatsPanel(){
   lastRenderedStreak = streak;
 
   return '<div class="section">'+
-  '<div class="hero-card">'+
-    '<div class="hero-num'+(streakTicked?' streak-tick-pop':'')+'">'+streak+'</div>'+
-    '<div class="hero-label">day streak'+(streak===0?' — let\'s start one':'')+(allStandardsDone?' &middot; today\'s in the bag':' &middot; complete today\'s standard to keep it going')+'</div>'+
-    renderWeekGrid()+
-  '</div>'+
+  renderStreakCard(streak, {ticked:streakTicked, editable:true, status: streak===0 ? 'Complete today\'s standard to start one' : (allStandardsDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Complete today\'s standard to keep it going')})+
   '<div class="grid grid-3 stat-chip-row" style="margin-top:10px;">'+
     '<div class="stat-chip" id="statDeepWorkBox">'+deepWorkStatInnerHtml(todayFocusMin)+'</div>'+
     '<div class="stat-chip">'+
@@ -63,10 +59,10 @@ function renderBusinessPanel(){
     '<div class="card" style="text-align:center;"><div class="kpi-label">Total Potential MRR</div><div class="hero-num" style="color:#8fdcff;font-size:34px;">$'+(mrr+potentialValue).toLocaleString()+'</div></div>'+
   '</div>'+
   '<div class="grid grid-2 stat-chip-row" style="margin-top:10px;">'+
-    '<div class="stat-chip"><div class="stat-chip-label">Leads in Pipeline</div><div class="stat-chip-value">'+inPipeline.length+'</div>'+
+    '<div class="stat-chip"><div class="stat-chip-label row" style="justify-content:space-between;">Leads in Pipeline<span class="view-all-link" data-action="goToLeads">View all &rarr;</span></div><div class="stat-chip-value">'+inPipeline.length+'</div>'+
       (inPipeline.length ? '<div class="kpi-sub" style="margin-top:6px;">'+inPipeline.slice(0,3).map(function(pr){return escapeHtml(pr.company||pr.name);}).join(', ')+(inPipeline.length>3?'…':'')+'</div>' : '<div class="kpi-sub" style="margin-top:6px;">none right now</div>')+
     '</div>'+
-    '<div class="stat-chip"><div class="stat-chip-label">Upcoming Deadlines</div><div class="stat-chip-value">'+upcomingDeadlines.length+'</div>'+
+    '<div class="stat-chip"><div class="stat-chip-label row" style="justify-content:space-between;">Upcoming Deadlines<span class="view-all-link" data-action="goToDeadlines">View all &rarr;</span></div><div class="stat-chip-value">'+upcomingDeadlines.length+'</div>'+
       (upcomingDeadlines.length ? '<div class="kpi-sub" style="margin-top:6px;">'+upcomingDeadlines.slice(0,3).map(function(t){return escapeHtml(t.title)+' ('+fmtDateShort(t.deadline)+')';}).join(', ')+(upcomingDeadlines.length>3?'…':'')+'</div>' : '<div class="kpi-sub" style="margin-top:6px;">nothing due in 7 days</div>')+
     '</div>'+
   '</div></div>';
@@ -129,7 +125,7 @@ function renderTodayTasksPanel(){
       backlog.length ? '<div class="task-list">'+backlog.map(function(t){
         return '<div class="task-item-v2" data-action="pullSpecificFromBacklog" data-id="'+t.id+'" style="cursor:pointer;">'+
           '<div class="task-title-row">'+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span></div>'+
-          '<button class="btn btn-good btn-sm" data-action="pullSpecificFromBacklog" data-id="'+t.id+'" style="margin-left:auto;">Add to Today</button>'+
+          '<button class="mini-move mini-move-today" data-action="pullSpecificFromBacklog" data-id="'+t.id+'" style="margin-left:auto;">+ Today</button>'+
         '</div>';
       }).join('')+'</div>' : '<div class="empty">Backlog is empty — switch to New Task.</div>'
     ))+
@@ -173,7 +169,7 @@ function renderJournalPhotoAttachHtml(){
     '<button class="btn btn-ghost btn-sm" data-action="triggerJournalPhotoInput">&#128247; Add Photo</button>'+
     photos.map(function(src, idx){
       return '<span style="position:relative;display:inline-block;">'+
-        '<img src="'+src+'" class="journal-photo-thumb" style="width:36px;height:36px;">'+
+        '<img src="'+escapeHtml(blobUrl(src))+'" class="journal-photo-thumb" style="width:36px;height:36px;">'+
         '<button class="btn btn-ghost btn-sm" data-action="removeJournalDraftPhoto" data-idx="'+idx+'" title="Remove" style="position:absolute;top:-9px;right:-9px;padding:0 4px;border-radius:50%;background:var(--panel);line-height:16px;">&times;</button>'+
       '</span>';
     }).join('')+
@@ -181,25 +177,61 @@ function renderJournalPhotoAttachHtml(){
 }
 function triggerJournalPhotoInput(){ const el=document.getElementById('journalPhotoInput'); if(el) el.click(); }
 function removeJournalDraftPhoto(idx){ ui.journalDraftPhotos.splice(Number(idx),1); renderView(); }
-function handleJournalPhotoFiles(files){
-  Array.prototype.forEach.call(files, function(file){
-    if(!file || file.type.indexOf('image/')!==0) return;
-    const reader = new FileReader();
-    reader.onload = function(){
-      ui.journalDraftPhotos.push(reader.result);
-      renderView();
-    };
-    reader.readAsDataURL(file);
-  });
+// Photos attach to whichever journal composer/editor is open. They're stored in the blob
+// store (IndexedDB) and the entry keeps "idb:" references.
+async function handleJournalPhotoFiles(files){
+  const list = Array.prototype.filter.call(files||[], function(f){ return f && f.type && f.type.indexOf('image/')===0; });
+  for(const file of list){
+    const ref = await storeImageFile(file);
+    ui.journalDraftPhotos.push(ref);
+  }
+  if(list.length){ playTick(); renderView(); }
 }
+// Paste an image (e.g. a screenshot copied with Cmd+Ctrl+Shift+4) straight into any journal
+// text box. Plain-text pastes behave normally.
+const JOURNAL_TEXT_IDS = ['quickJournalText','journalPageText','quickJournalModalText','editJournalText'];
+document.addEventListener('paste', function(e){
+  const t = e.target;
+  if(!t || JOURNAL_TEXT_IDS.indexOf(t.id)<0) return;
+  const imgs = imageFilesFromTransfer(e.clipboardData);
+  if(!imgs.length) return;
+  e.preventDefault();
+  handleJournalPhotoFiles(imgs);
+});
+// Drag images (including macOS screenshots dragged off the desktop) onto a journal card.
+document.addEventListener('dragover', function(e){
+  if(!transferHasFiles(e.dataTransfer)) return;
+  // Never let a dropped file navigate the app window away from Operator.
+  e.preventDefault();
+  const zone = e.target.closest && e.target.closest('[data-photo-drop]');
+  document.querySelectorAll('.photo-drop-hover').forEach(function(z){ if(z!==zone) z.classList.remove('photo-drop-hover'); });
+  if(zone){ zone.classList.add('photo-drop-hover'); e.dataTransfer.dropEffect = 'copy'; }
+  else e.dataTransfer.dropEffect = 'none';
+});
+document.addEventListener('dragleave', function(e){
+  const zone = e.target.closest && e.target.closest('[data-photo-drop]');
+  if(zone && !zone.contains(e.relatedTarget)) zone.classList.remove('photo-drop-hover');
+});
+document.addEventListener('drop', function(e){
+  if(!transferHasFiles(e.dataTransfer)) return;
+  e.preventDefault();
+  document.querySelectorAll('.photo-drop-hover').forEach(function(z){ z.classList.remove('photo-drop-hover'); });
+  const zone = e.target.closest && e.target.closest('[data-photo-drop]');
+  if(!zone) return;
+  const kind = zone.getAttribute('data-photo-drop');
+  const files = Array.prototype.slice.call(e.dataTransfer.files||[]);
+  if(kind==='journal') handleJournalPhotoFiles(imageFilesFromTransfer(e.dataTransfer));
+  else if(typeof ACTIONS['drop:'+kind]==='function') ACTIONS['drop:'+kind](zone, files, e);
+});
 function renderJournalPanel(){
   const todaysJournalCount = state.journal.entries.filter(function(e){ return e.date===todayStr(); }).length;
-  return '<div class="section"><div class="card" style="text-align:center;">'+
-    '<div class="kpi-label" style="margin-bottom:8px;">Journal</div>'+
-    '<textarea class="input" id="quickJournalText" placeholder="Anything on your mind — a win, a worry, an idea…" style="width:100%;height:70px;flex-shrink:0;text-align:left;resize:none;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
-    renderMoodPicker()+
-    '<div class="row" style="justify-content:center;margin-top:10px;">'+
-      '<button class="btn btn-primary btn-sm" data-action="addJournal" data-target="quickJournalText">Save to Journal</button>'+
+  return '<div class="section"><div class="card journal-quick-card" data-photo-drop="journal" style="text-align:center;">'+
+    '<div class="kpi-label" style="margin-bottom:8px;">Quick Journal<span class="kpi-sub" style="margin-left:8px;">paste or drop images</span></div>'+
+    '<textarea class="input" id="quickJournalText" placeholder="Anything on your mind — a win, a worry, an idea…" style="width:100%;height:90px;flex-shrink:0;text-align:left;resize:none;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
+    renderJournalPhotoThumbsRow()+
+    '<div class="journal-compose-actions">'+
+      '<div class="row" style="gap:6px;">'+renderJournalMoodChipsInline()+'<button class="btn btn-ghost btn-sm" data-action="triggerJournalPhotoInput" title="Add photo">&#128247;</button></div>'+
+      '<button class="btn btn-primary" data-action="addJournal" data-target="quickJournalText">Save to Journal</button>'+
     '</div>'+
     (todaysJournalCount>0 ? '<div class="row" style="justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="nav" data-view="personal" data-tab="journal">'+todaysJournalCount+' entr'+(todaysJournalCount===1?'y':'ies')+' today</button></div>' : '')+
   '</div></div>';

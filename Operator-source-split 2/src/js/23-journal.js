@@ -15,7 +15,7 @@ function journalEntryRow(e){
       '</div>'+
     '</div>'+
     '<div class="journal-text">'+escapeHtml(shown)+'</div>'+
-    (photos.length ? '<div class="row" style="margin-bottom:8px;flex-wrap:wrap;">'+photos.map(function(src, idx){ return '<img src="'+src+'" class="journal-photo-thumb" data-action="viewJournalPhoto" data-id="'+e.id+'" data-idx="'+idx+'">'; }).join('')+'</div>' : '')+
+    (photos.length ? '<div class="row" style="margin-bottom:8px;flex-wrap:wrap;">'+photos.map(function(src, idx){ return '<img src="'+escapeHtml(blobUrl(src))+'" class="journal-photo-thumb" data-action="viewJournalPhoto" data-id="'+e.id+'" data-idx="'+idx+'">'; }).join('')+'</div>' : '')+
     (isLong ? '<button class="btn btn-ghost btn-sm" data-action="toggleJournalExpand" data-id="'+e.id+'">'+(expanded?'Show Less':'Read More')+'</button>' : '')+
     deleteBtn('journal', e.id)+
   '</div>';
@@ -34,7 +34,7 @@ function renderJournalPhotoViewModal(){
   const e = state.journal.entries.find(function(x){ return x.id===v.entryId; });
   const src = e && arr(e.photos)[v.idx];
   if(!src) return '<div class="empty">Photo not found.</div>';
-  return '<img src="'+src+'" style="max-width:100%;max-height:70vh;border-radius:8px;">'+
+  return '<img src="'+escapeHtml(blobUrl(src))+'" style="max-width:100%;max-height:70vh;border-radius:8px;">'+
     '<div class="row" style="margin-top:16px;justify-content:center;">'+
       '<button class="btn btn-primary" data-action="closeJournalPhotoView">Close</button>'+
     '</div>';
@@ -195,14 +195,17 @@ function renderJournalTab(){
     (!clientsView && !ui.journalSearchOpen && !hasFilters ? '<button class="btn btn-ghost btn-sm" data-action="toggleJournalSearch" title="Search Entries" style="position:absolute;right:0;top:50%;transform:translateY(-50%);padding:4px 8px;">&#128269;</button>' : '')+
   '</div>'+
   (clientsView ? renderClientJournalsAllTab() : (
-  '<div class="card" style="text-align:center;margin-bottom:14px;">'+
+  '<div class="card journal-compose-card" data-photo-drop="journal" style="text-align:center;margin-bottom:14px;">'+
     '<div style="position:relative;">'+
       '<textarea class="input" id="journalPageText" placeholder="Write something…" style="width:100%;min-height:230px;text-align:left;padding-right:44px;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
       '<button class="btn btn-ghost btn-sm" data-action="triggerJournalPhotoInput" title="Add Photo" style="position:absolute;top:8px;right:8px;padding:4px 7px;font-size:15px;line-height:1;">&#128247;</button>'+
     '</div>'+
     renderJournalPhotoThumbsRow()+
     renderJournalMoodChipsOnly()+
-    '<button class="btn btn-primary btn-sm" data-action="addJournal" data-target="journalPageText" style="margin-top:10px;">Save Entry</button>'+
+    '<div class="journal-compose-actions">'+
+      '<span class="kpi-sub">Paste or drop images into the box</span>'+
+      '<button class="btn btn-primary" data-action="addJournal" data-target="journalPageText">Save Entry</button>'+
+    '</div>'+
   '</div>'+
   (ui.journalSearchOpen || hasFilters ? (
     '<div class="card section"><div class="row">'+
@@ -223,13 +226,19 @@ function renderJournalMoodChipsOnly(){
     }).join('')+
   '</div>';
 }
+function renderJournalMoodChipsInline(){
+  return journalTypes().map(function(m){
+    const active = ui.selectedMood===m.id;
+    return '<span class="chip" data-action="selectMood" data-mood="'+m.id+'" style="'+(active?'background:'+m.color+';border-color:'+m.color+';color:#06231a;':'')+'">'+m.emoji+' '+m.label+'</span>';
+  }).join('');
+}
 function renderJournalPhotoThumbsRow(){
   const photos = arr(ui.journalDraftPhotos);
   if(!photos.length) return '';
   return '<div class="row" style="margin-top:8px;justify-content:center;flex-wrap:wrap;gap:8px;">'+
     photos.map(function(src, idx){
       return '<span style="position:relative;display:inline-block;">'+
-        '<img src="'+src+'" class="journal-photo-thumb" style="width:36px;height:36px;">'+
+        '<img src="'+escapeHtml(blobUrl(src))+'" class="journal-photo-thumb" style="width:36px;height:36px;">'+
         '<button class="btn btn-ghost btn-sm" data-action="removeJournalDraftPhoto" data-idx="'+idx+'" title="Remove" style="position:absolute;top:-9px;right:-9px;padding:0 4px;border-radius:50%;background:var(--panel);line-height:16px;">&times;</button>'+
       '</span>';
     }).join('')+
@@ -249,7 +258,7 @@ function closeJournalEditModal(){ ui.editingJournalId = null; ui.journalDraftPho
 function renderJournalEditModal(){
   const e = state.journal.entries.find(function(x){return x.id===ui.editingJournalId;});
   if(!e) return '';
-  return '<div class="section-title" style="margin-bottom:14px;">Edit Entry</div>'+
+  return '<div data-photo-drop="journal"><div class="section-title" style="margin-bottom:14px;">Edit Entry</div>'+
     '<textarea class="input" id="editJournalText" style="width:100%;min-height:120px;">'+escapeHtml(e.text)+'</textarea>'+
     '<div class="row" style="margin:12px 0;justify-content:center;">'+
       journalTypes().map(function(m){ const active = ui.editingJournalMood===m.id; return '<span class="chip" data-action="setEditingJournalMood" data-mood="'+m.id+'" style="'+(active?'background:'+m.color+';border-color:'+m.color+';color:#06231a;':'')+'">'+m.emoji+' '+m.label+'</span>'; }).join('')+
@@ -258,7 +267,7 @@ function renderJournalEditModal(){
     '<div class="row" style="justify-content:flex-end;margin-top:16px;">'+
       '<button class="btn btn-ghost" data-action="closeJournalEditModal">Cancel</button>'+
       '<button class="btn btn-primary" data-action="saveEditJournal" data-id="'+e.id+'">Save</button>'+
-    '</div>';
+    '</div></div>';
 }
 function renderJournalEditModalInto(){
   if(ui.editingJournalMood===undefined){
@@ -305,13 +314,13 @@ function openQuickJournalModal(){
 }
 function closeQuickJournalModal(){ const o=document.getElementById('quickJournalOverlay'); if(o) o.classList.add('hidden'); }
 function renderQuickJournalModal(){
-  return '<div class="section-title" style="justify-content:center;margin-bottom:8px;">Quick Journal</div>'+
+  return '<div data-photo-drop="journal"><div class="section-title" style="justify-content:center;margin-bottom:8px;">Quick Journal</div>'+
     '<textarea class="input" id="quickJournalModalText" placeholder="Anything on your mind — a win, a worry, an idea…" style="width:100%;min-height:90px;text-align:center;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
     renderMoodPicker()+
     '<div class="row" style="margin-top:16px;justify-content:center;">'+
       '<button class="btn btn-ghost" data-action="closeQuickJournalModal">Cancel</button>'+
       '<button class="btn btn-primary" data-action="saveQuickJournal">Save Entry</button>'+
-    '</div>';
+    '</div></div>';
 }
 function renderQuickJournalModalInto(){ const el=document.getElementById('quickJournalContent'); if(el) morphInto(el, renderQuickJournalModal(), {form:true}); }
 function saveQuickJournal(){

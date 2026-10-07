@@ -1,11 +1,9 @@
 // ============ TODAY ============
 function renderDayOffView(){
   const streak = computeStreak();
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Taking today off.</div><div class="view-sub" id="liveClock"></div></div></div>'+
+  return '<div class="view-header today-header"><div>'+businessNameTagHtml()+'<div class="view-title">Taking today off<span class="sleepy-dots" aria-hidden="true"></span></div><div class="view-sub" id="liveClock"></div></div></div>'+
   '<div class="day-off-wrap"><div class="card day-off-card" style="border-color:var(--accent); box-shadow:0 0 50px '+hexToRgba(state.profile.accentColor||'#E8A23D',0.16)+';">'+
-    '<div class="hero-num" style="color:var(--accent);">'+streak+'</div>'+
-    '<div class="hero-label">day streak — rest days still count</div>'+
-    '<div style="width:100%;display:flex;justify-content:center;margin:16px 0;">'+renderWeekGrid()+'</div>'+
+    '<div style="margin:4px 0 14px;">'+renderStreakCard(streak, {compact:true, status:'Rest days still count'})+'</div>'+
     '<div style="max-width:380px;margin:6px 0;font-size:14.5px;color:var(--text-dim);line-height:1.5;">Rest is part of the plan. Nothing else is tracked today — go live your life.</div>'+
     '<button class="btn" style="border-color:var(--accent);color:var(--accent);margin-top:10px;" data-action="toggleDayOff">Actually, I want to work today</button>'+
   '</div></div>';
@@ -13,7 +11,7 @@ function renderDayOffView(){
 function renderOffTimeView(){
   const active = state.modes.active;
   const elapsed = Date.now() - active.startedAt;
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Off the clock.</div><div class="view-sub" id="liveClock"></div></div></div>'+
+  return '<div class="view-header today-header"><div>'+businessNameTagHtml()+'<div class="view-title">Off the clock.</div><div class="view-sub" id="liveClock"></div></div></div>'+
   '<div class="day-off-wrap"><div class="card day-off-card offtime-card">'+
     '<div style="font-size:40px;">&#127937;</div>'+
     '<div class="hero-num" id="modeElapsed" style="color:#fff;">'+formatElapsed(elapsed)+'</div>'+
@@ -25,7 +23,7 @@ function renderOffTimeView(){
 function focusKnockOutRow(t){
   const isCurrent = ui.currentTaskId===t.id;
   const isPending = ui.pendingCurrentTaskId===t.id;
-  return '<div class="task-item-v2'+(isCurrent?' is-current-task':'')+(isPending?' is-pending-task':'')+'" draggable="true" data-task-id="'+t.id+'" title="'+(isCurrent?'This is your current task':(isPending?'Waiting to be confirmed in Next Task':'Click to queue as Next Task'))+'">'+
+  return '<div class="task-item-v2'+(isCurrent?' is-current-task':'')+(isPending?' is-pending-task':'')+(justCompletedTaskId===t.id?' just-completed':'')+'" draggable="true" data-task-id="'+t.id+'" title="'+(isCurrent?'This is your current task':(isPending?'Waiting to be confirmed in Next Task':'Click to queue as Next Task'))+'">'+
     '<div style="flex:1;min-width:140px;'+(isCurrent?'':'cursor:pointer;')+'" '+(isCurrent?'':'data-action="stagePendingCurrentTask" data-id="'+t.id+'"')+'>'+
       '<div class="task-title-row">'+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-ongoing" style="margin-left:6px;">&#128204;</span>':'')+'</div>'+
       (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
@@ -49,7 +47,7 @@ function confirmPendingCurrentTask(){
 }
 function focusModeBacklogRow(t){
   return '<div class="task-item-v2"><div style="flex:1;min-width:100px;"><div class="task-title-row">'+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span></div></div>'+
-    '<button class="icon-btn-sm" data-action="promoteTask" data-id="'+t.id+'" title="Move to Today">&#8594;</button>'+
+    '<button class="mini-move mini-move-today" data-action="promoteTask" data-id="'+t.id+'" title="Move to Today">+ Today</button>'+
   '</div>';
 }
 function renderMiniCalendarStrip(){
@@ -94,6 +92,7 @@ function renderTodayFocusMode(p){
       '<div id="liveClockBig" class="cal-big-clock" style="font-size:38px;margin-top:6px;"></div>'+
       renderMiniCalendarStrip()
     ) : '<div class="view-sub" id="liveClock"></div>')+
+    renderNowNextBar()+
   '</div>'+
   '<div class="grid grid-3 stat-chip-row section" style="max-width:800px;margin:0 auto 26px;">'+
     '<div class="stat-chip" style="text-align:center;"><div class="stat-chip-label">Day Streak</div><div class="stat-chip-value">'+computeStreak()+'</div><div class="kpi-sub">rest days still count</div></div>'+
@@ -143,7 +142,7 @@ function renderToday(){
     }
   }
   return renderFocusQuickLinks()+
-    '<div class="view-header"><div>'+
+    '<div class="view-header today-header"><div>'+
       businessNameTagHtml()+
       '<div class="view-title">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
       (state.profile.bigClockOnToday ? (

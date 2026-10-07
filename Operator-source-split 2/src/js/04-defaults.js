@@ -1,7 +1,7 @@
 // ============ DEFAULTS ============
 function defaultProfile(){
   return { name:'Operator', businessName:'', calorieTarget:2000, goalWeight:null, weeklyWorkoutTarget:5, revenueGoalMonthly:10000,
-    soundEnabled:true, focusNotePromptEnabled:true, notifyOnFocusEnd:true, accentColor:'#E8A23D', goalAccentColor:'#3FBE8E', alarmSound:'standard', linkBrowser:'default', sidebarCollapsed:false, bigClockOnToday:false };
+    soundEnabled:true, focusNotePromptEnabled:true, notifyOnFocusEnd:true, accentColor:'#E8A23D', goalAccentColor:'#3FBE8E', alarmSound:'standard', linkBrowser:'default', sidebarCollapsed:false, bigClockOnToday:false, crosshairCursor:true };
 }
 function defaultMeals(){
   return { library:[

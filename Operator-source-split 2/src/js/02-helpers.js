@@ -90,6 +90,7 @@ function applyTheme(){
     const color = state.profile.accentColor || '#E8A23D';
     document.documentElement.style.setProperty('--accent', color);
     document.documentElement.style.setProperty('--accent-dim', hexToRgba(color, 0.14));
+    applyCursorSetting();
   }catch(e){}
 }
 function applySidebarState(){
@@ -118,7 +119,7 @@ const PANEL_DEFS = [
   {id:'calendarMini', label:'Calendar'},
   {id:'tasks', label:"Today's Tasks"}
 ];
-const SMALL_PANELS = ['journal', 'focusMini', 'calendarMini'];
+const SMALL_PANELS = ['focusMini', 'calendarMini']; // journal is full-width now that it sits near the top
 const MOODS = [
   {id:'idea', emoji:'\uD83D\uDCA1', label:'Idea', color:'#8fdcff'},
   {id:'win', emoji:'\uD83C\uDF89', label:'Win', color:'#3FBE8E'},

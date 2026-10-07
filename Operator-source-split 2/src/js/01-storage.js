@@ -13,7 +13,16 @@ async function loadKey(key, fallback){
   if(!raw) return fallback;
   try{ const p = JSON.parse(raw); return p==null ? fallback : p; }catch(e){ return fallback; }
 }
-async function persist(key){ await storageSetRaw(key, JSON.stringify(state[key])); }
+let persistWarnedAt = 0;
+async function persist(key){
+  const ok = await storageSetRaw(key, JSON.stringify(state[key]));
+  // A failed write used to be silent — the change looked saved but vanished on reload.
+  if(!ok && Date.now()-persistWarnedAt > 15000 && typeof showToast==='function'){
+    persistWarnedAt = Date.now();
+    showToast("Couldn't save — browser storage is full. Export your data from Settings.", {icon:'&#9888;', duration:6000});
+  }
+  return ok;
+}
 const STATE_KEYS = ['profile','tasks','focus','health','meals','journal','finances','business','calendar','standards','daysOff','goals','dashboardPanels','modes','settings','appActivity'];
 // The native Operator wrapper script (if running as the packaged .app) polls the
 // frontmost macOS app in the background and serves recent samples over a local,

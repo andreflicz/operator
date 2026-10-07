@@ -179,10 +179,20 @@ const CLIENT_HEALTH_META = {
   red:{cls:'tag-danger', emoji:'&#128308;', label:'Needs attention'}
 };
 const CLIENT_STATUS_META = CLIENT_HEALTH_META;
+// Health is shown as a colored status pill: dot + label + the short reason behind it.
+function clientHealthReason(c, status){
+  if(status.level==='green') return status.hasDeliverables ? 'on pace' : 'in touch';
+  const rank = {good:0, warn:1, danger:2};
+  if(rank[status.careLevel] >= rank[status.paceLevel]) return clientCareTier(c).label.toLowerCase();
+  return 'behind on deliverables';
+}
 function clientHealthTagHtml(c){
   const status = clientHealthStatus(c);
   const m = CLIENT_HEALTH_META[status.level];
-  return '<span class="tag '+m.cls+'">'+m.emoji+' '+m.label+'</span>';
+  return '<span class="health-pill health-'+status.level+'" title="Client health — deliverable pace and time since last touch">'+
+    '<span class="health-dot"></span><span class="health-label">'+m.label+'</span>'+
+    '<span class="health-reason">'+escapeHtml(clientHealthReason(c, status))+'</span>'+
+  '</span>';
 }
 function clientStatusTagHtml(c){ return clientHealthTagHtml(c); }
 function clientTouchCountThisWeek(c){ return manualTouchesThisWeek(c) + deliverablesDoneThisWeek(c); }

@@ -109,7 +109,7 @@ function renderVideoIdeasTab(){
     '<div class="row" style="justify-content:flex-end;margin-bottom:16px;">'+
       '<button class="btn btn-primary" data-action="openAddVideoIdeaModal">+ Add Video Idea</button>'+
     '</div>'+
-    '<div class="task-card-grid">'+(videoIdeas.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">No video ideas yet — drop one above whenever inspiration hits.</div>')+'</div>'+
+    '<div class="video-idea-grid">'+(videoIdeas.map(videoIdeaCompactCard).join('') || '<div class="empty">No video ideas yet — drop one above whenever inspiration hits.</div>')+'</div>'+
   '</div>';
 }
 function openAddVideoIdeaModal(){
@@ -163,7 +163,7 @@ function renderVideoIdeaEditModal(){
     '<div class="field" style="margin-top:10px;"><label>Due (optional)</label><div class="row"><input class="input" type="date" id="editVideoDeadline-'+t.id+'" value="'+(t.deadline||'')+'"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editVideoDeadline-'+t.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="editVideoDeadline-'+t.id+'">Clear</button></div></div>'+
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="editVideoNotes-'+t.id+'" style="width:100%;min-height:90px;" placeholder="Hook, shots, references…">'+escapeHtml(t.notes||'')+'</textarea></div>'+
     '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
-      deleteBtn('task', t.id)+
+      '<button class="btn btn-ghost btn-sm mini-move-danger" data-action="deleteTaskUndoable" data-id="'+t.id+'">Delete</button>'+
       '<div class="row">'+
         '<button class="btn btn-ghost" data-action="closeVideoIdeaEditModal">Cancel</button>'+
         '<button class="btn btn-primary" data-action="saveVideoIdeaEdit" data-id="'+t.id+'">Save</button>'+
@@ -186,10 +186,11 @@ function saveVideoIdeaEdit(id){
 }
 function renderFocusTasksOverview(){
   const items = state.tasks.items;
+  const nowNext = state.focus.activeSession ? renderNowNextBar(true) : '';
   const today = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='today'; }));
   const backlogPreview = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; })).slice(0,8);
   const backlogTotal = items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; }).length;
-  return '<div style="max-width:440px;margin:0 auto 14px;">'+renderCurrentTaskCard()+'</div>'+
+  return nowNext+'<div style="max-width:440px;margin:0 auto 14px;">'+renderCurrentTaskCard()+'</div>'+
   renderTaskToolbar()+
   '<div class="section" style="margin-top:14px;margin-bottom:14px;">'+
     '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+' &middot; highest priority &amp; closest deadlines first</span><button class="btn btn-primary btn-sm" data-action="openAddTaskModal" style="margin-left:auto;">+ Add a Task</button></div>'+

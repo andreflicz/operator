@@ -96,6 +96,8 @@ function startFocusTicker(){
     if(ui.currentTaskId && ui.currentTaskStartedAt && (!as0 || !as0.onBreak)){
       const ctEl = document.getElementById('currentTaskElapsed');
       if(ctEl) ctEl.textContent = formatElapsed(Date.now()-ui.currentTaskStartedAt);
+      const ctBar = document.getElementById('currentTaskElapsedBar');
+      if(ctBar) ctBar.textContent = formatElapsed(Date.now()-ui.currentTaskStartedAt);
     }
     const as = state.focus.activeSession;
     if(as && !as.onBreak) tickLiveDeepWork();

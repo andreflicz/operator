@@ -35,6 +35,9 @@ function renderSettings(){
       '<div class="card section"><div class="section-title">Today Header Style</div>'+
         '<label class="row" style="font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="setBigClock" '+(p.bigClockOnToday?'checked':'')+' style="margin-right:8px;">Show a big clock + mini calendar instead of the plain date on the Today page</label>'+
       '</div>'+
+      '<div class="card section"><div class="section-title">Cursor</div>'+
+        '<label class="row" style="font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="setCrosshair" '+(p.crosshairCursor!==false?'checked':'')+' style="margin-right:8px;">Crosshair cursor (accent-colored, app-wide)</label>'+
+      '</div>'+
       '<div class="section"><div class="section-title">Goal Color<span class="kpi-sub">Glows brighter the closer a goal gets to done</span></div><div class="card">'+
         '<div class="row">'+SWATCHES.map(function(sw){ return '<span class="swatch '+(p.goalAccentColor===sw?'sel':'')+'" style="background:'+sw+';" data-action="pickGoalColor" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
       '</div></div>'+
@@ -356,8 +359,18 @@ function saveProfile(){
   if(atIdleEl) state.settings.appTracking.idleSeconds = clamp(Number(atIdleEl.value)||60, 15, 900);
   persist('profile'); persist('standards'); persist('settings'); renderView();
 }
-function exportData(){
-  const data = JSON.stringify(state, null, 2);
+async function exportData(){
+  // Images and files live in IndexedDB; bundle them into the export so it's complete.
+  const out = JSON.parse(JSON.stringify(state));
+  const refs = Array.from(collectBlobRefs(state));
+  if(refs.length){
+    out.__blobs = {};
+    for(const ref of refs){
+      const b = await blobFetch(ref);
+      if(b){ try{ out.__blobs[ref] = await readAsDataUrl(b); }catch(e){} }
+    }
+  }
+  const data = JSON.stringify(out, null, 2);
   try{
     const blob = new Blob([data], {type:'application/json'});
     const url = URL.createObjectURL(blob);
@@ -367,7 +380,7 @@ function exportData(){
     URL.revokeObjectURL(url);
   }catch(e){}
   const area = document.getElementById('exportArea');
-  area.style.display='block'; area.value = data;
+  if(area){ area.style.display='block'; area.value = data.length > 400000 ? data.slice(0,400000)+'\n… (truncated here — the downloaded file is complete)' : data; }
 }
 function normalizeAll(){
   state.profile = normalizeProfile(state.profile);
@@ -391,6 +404,12 @@ async function importDataFile(file){
   try{
     const text = await file.text();
     const parsed = JSON.parse(text);
+    if(parsed.__blobs && typeof parsed.__blobs==='object'){
+      for(const ref of Object.keys(parsed.__blobs)){
+        if(!isBlobRef(ref)) continue;
+        try{ await blobStore(dataUrlToBlob(parsed.__blobs[ref]), ref.slice(4)); }catch(e){}
+      }
+    }
     STATE_KEYS.forEach(function(k){ if(parsed[k]!=null) state[k]=parsed[k]; });
     normalizeAll();
     applyTheme();
@@ -411,7 +430,8 @@ function armReset(){
 }
 async function confirmReset(){
   armed.delete('reset:all');
-  state = { profile:defaultProfile(), tasks:{items:[]}, focus:defaultFocus(), health:{gymLog:[],weightLog:[],calorieEntries:[]}, meals:defaultMeals(), journal:{entries:[], types:defaultJournalTypes()}, finances:{debts:[],payments:[],income:[],invoices:[]}, business:{pipeline:[],clients:[]}, calendar:defaultCalendar(), standards:defaultStandards(), daysOff:defaultDaysOff(), goals:defaultGoals(), dashboardPanels:defaultDashboardPanels(), modes:defaultModes(), settings:defaultSettings() };
+  state = { profile:defaultProfile(), tasks:{items:[]}, focus:defaultFocus(), health:{gymLog:[],weightLog:[],calorieEntries:[]}, meals:defaultMeals(), journal:{entries:[], types:defaultJournalTypes()}, finances:{debts:[],payments:[],income:[],invoices:[]}, business:{pipeline:[],clients:[]}, calendar:defaultCalendar(), standards:defaultStandards(), daysOff:defaultDaysOff(), goals:defaultGoals(), dashboardPanels:defaultDashboardPanels(), modes:defaultModes(), settings:defaultSettings(), appActivity:defaultAppActivity() };
+  normalizeAll();
   applyTheme();
   for(const k of STATE_KEYS) await persist(k);
   renderView();

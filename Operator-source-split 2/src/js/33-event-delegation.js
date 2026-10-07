@@ -305,6 +305,7 @@ document.body.addEventListener('click', function(e){
     case 'saveVideoIdeaEdit': saveVideoIdeaEdit(id); break;
     case 'toggleTaskSelectMode': toggleTaskSelectMode(); break;
     case 'toggleSidebar': toggleSidebar(); break;
+    default: if(ACTIONS[a]) ACTIONS[a](el, e, id);
   }
 });
 document.body.addEventListener('keydown', function(e){
@@ -478,6 +479,10 @@ document.body.addEventListener('input', function(e){
 });
 document.body.addEventListener('change', function(e){
   const el = e.target;
+  if(el && el.id==='setCrosshair'){
+    state.profile.crosshairCursor = el.checked;
+    persist('profile'); applyCursorSetting();
+  }
   if(el && el.id==='setBigClock'){
     state.profile.bigClockOnToday = el.checked;
     persist('profile'); renderView();

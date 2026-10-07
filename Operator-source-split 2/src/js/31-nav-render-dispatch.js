@@ -86,7 +86,10 @@ function renderView(){
   if(quickJournalOverlay && !quickJournalOverlay.classList.contains('hidden')) renderQuickJournalModalInto();
   const journalPhotoViewOverlay = document.getElementById('journalPhotoViewOverlay');
   if(journalPhotoViewOverlay && !journalPhotoViewOverlay.classList.contains('hidden')) renderJournalPhotoViewModalInto();
+  MODAL_RENDERERS.forEach(function(m){ if(overlayOpen(m[0])) m[1](); });
+  document.body.dataset.view = ui.view;
   tickClocks();
   stretchLockedHeaderLine();
+  afterRenderHooks.forEach(function(fn){ try{ fn(); }catch(e){} });
 }
 

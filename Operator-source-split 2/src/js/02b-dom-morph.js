@@ -65,6 +65,8 @@ function morphNode(oldN, newN, opts){
     return;
   }
   if(oldN.nodeType!==1) return;
+  // Self-managed widgets (the board canvas) own their subtree; leave it untouched.
+  if(oldN.hasAttribute('data-morph-ignore') && newN.getAttribute && newN.getAttribute('data-morph-ignore')===oldN.getAttribute('data-morph-ignore')) return;
   const tag = oldN.nodeName;
   const isField = tag==='INPUT' || tag==='TEXTAREA' || tag==='SELECT';
   const snap = isField ? fieldSnapshot(oldN) : null;

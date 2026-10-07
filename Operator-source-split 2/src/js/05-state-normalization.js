@@ -329,6 +329,17 @@ function normalizeDashboardPanels(d){
   d.order = d.order.filter(function(pid){ return validIds.indexOf(pid)>=0; });
   defaults.order.forEach(function(pid){ if(d.order.indexOf(pid)<0) d.order.push(pid); });
   if(!d.enabled || typeof d.enabled!=='object') d.enabled = {};
+  // One-time move (Phase 2): Quick Journal sits right under the streak panel. Runs once so
+  // any order you set afterwards is respected.
+  if(!d.journalRaised){
+    const ji = d.order.indexOf('journal');
+    if(ji>=0){
+      d.order.splice(ji,1);
+      const si = d.order.indexOf('personalStats');
+      d.order.splice(si>=0 ? si+1 : 0, 0, 'journal');
+    }
+    d.journalRaised = true;
+  }
   return d;
 }
 function normalizeModes(m){
