@@ -122,7 +122,7 @@ function renderToday(){
   // left you staring at the "Taking today off" screen. The day stays marked as a rest day.
   if(state.focus.activeSession) return renderTodayFocusMode(p);
   if(isDayOff(todayStr())) return renderDayOffView();
-  if(state.modes.active && state.modes.active.type==='offtime') return renderOffTimeView();
+  if(state.modes.active && state.modes.active.type==='offtime') return state.modes.active.sleep ? renderSleepView() : renderOffTimeView();
   const hour = new Date().getHours();
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
   const order = arr(state.dashboardPanels.order);
@@ -150,8 +150,13 @@ function renderToday(){
         renderMiniCalendarStrip()
       ) : '<div class="view-sub" id="liveClock"></div>')+
       '</div>'+
-      '<button class="btn" style="border-color:var(--accent);color:var(--accent);" data-action="toggleDayOff">Take Today Off</button>'+
+      '<div class="row" style="gap:8px;justify-content:center;">'+
+        '<button class="btn" style="border-color:var(--accent);color:var(--accent);" data-action="toggleDayOff">Take Today Off</button>'+
+        '<button class="btn btn-ghost sleep-btn" data-action="startSleepMode" title="Off-time for the night: pauses auto lock-in, shows your alarm and tomorrow\'s plan">&#127769; Sleep</button>'+
+      '</div>'+
     '</div>'+
+    renderMorningPlanCard()+
+    renderEveningCard()+
     panelsHtml;
 }
 

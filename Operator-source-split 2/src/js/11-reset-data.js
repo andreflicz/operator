@@ -11,6 +11,8 @@ function resetPart(id){
   if(id==='standardsHistory'){ state.standards.completions=[]; persist('standards'); }
   if(id==='daysOff'){ state.daysOff={dates:[]}; persist('daysOff'); }
   if(id==='appActivity'){ state.appActivity=defaultAppActivity(); persist('appActivity'); }
+  if(id==='wishlist'){ state.personal.wishlist=[]; persist('personal'); }
+  if(id==='boards'){ state.boards=defaultBoards(); persist('boards'); }
   renderView();
 }
 function armResetPart(id){

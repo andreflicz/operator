@@ -15,7 +15,9 @@ let state = {
   dashboardPanels: defaultDashboardPanels(),
   modes: defaultModes(),
   settings: defaultSettings(),
-  appActivity: defaultAppActivity()
+  appActivity: defaultAppActivity(),
+  personal: defaultPersonal(),
+  boards: defaultBoards()
 };
 let ui = {
   view:'today', healthTab:'workouts', businessTab:'overview', personalTab:'goals', focusTab:'overview', settingsTab:'general',
@@ -199,7 +201,9 @@ function normalizeFocus(f){
       f.activeSession.completedTasks.forEach(function(t){ if(t.noteFinalized===undefined) t.noteFinalized=false; });
     }
   }
-  f.sessions = arr(f.sessions).map(function(s){ if(!Array.isArray(s.completedTasks)) s.completedTasks=[]; return s; });
+  f.sessions = arr(f.sessions).map(function(s){ if(!Array.isArray(s.completedTasks)) s.completedTasks=[]; if(!s.type) s.type='deep'; return s; });
+  f.taskSegments = arr(f.taskSegments);
+  if(f.nightPlan===undefined) f.nightPlan = null;
   f.alarms = arr(f.alarms);
   if(f.lastManualStopAt===undefined) f.lastManualStopAt = null;
   if(f.lastSessionEndedAt===undefined) f.lastSessionEndedAt = null;
@@ -307,6 +311,8 @@ function normalizeStandards(s){
   if(s.daysOffAllowedPerWeek===undefined || s.daysOffAllowedPerWeek===null) s.daysOffAllowedPerWeek=2;
   if(s.trainedEnabled===undefined) s.trainedEnabled=false;
   s.completions=arr(s.completions);
+  if(!s.dayOverrides || typeof s.dayOverrides!=='object') s.dayOverrides = {};
+  if(s.streakBase===undefined) s.streakBase = null;
   return s;
 }
 function normalizeDaysOff(d){ d=d||{}; d.dates=arr(d.dates); return d; }
@@ -369,11 +375,27 @@ function normalizeSettings(s){
   if(s.appTracking.idleSeconds==null || isNaN(Number(s.appTracking.idleSeconds))) s.appTracking.idleSeconds=60;
   return s;
 }
+function normalizePersonal(p){
+  p = p||{}; p.wishlist = arr(p.wishlist);
+  p.wishlist.forEach(function(w){ if(w.purchased===undefined) w.purchased=false; if(!w.priority) w.priority='med'; if(w.price===undefined) w.price=null; });
+  return p;
+}
+function normalizeBoards(b){
+  b = b||{}; b.boards = arr(b.boards);
+  b.boards.forEach(function(bd){
+    bd.elements = arr(bd.elements);
+    if(!bd.kind) bd.kind = 'vision';
+    if(bd.parentId===undefined) bd.parentId = null;
+    if(!bd.viewport || typeof bd.viewport!=='object') bd.viewport = {x:0, y:0, zoom:1};
+  });
+  return b;
+}
 function normalizeAppActivity(a){
   a=a||{};
   if(!a.days || typeof a.days!=='object') a.days={};
   if(a.todayDate===undefined) a.todayDate=null;
   a.todayIntervals=arr(a.todayIntervals);
+  if(!a.lockedDays || typeof a.lockedDays!=='object') a.lockedDays={};
   return a;
 }
 

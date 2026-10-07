@@ -266,24 +266,6 @@ function renderFocusFinishedTab(){
     '<div class="task-list">'+(doneEarlier.map(finishedTaskRow).join('') || '<div class="empty">Nothing else yet — it all starts today.</div>')+'</div>'+
   '</div>';
 }
-function renderFocusAnalyticsTab(){
-  const items = state.tasks.items;
-  const doneAll = items.filter(function(t){ return t.status==='done'; });
-  const last7=[]; for(let i=6;i>=0;i--) last7.push(addDays(todayStr(),-i));
-  const doneLast7 = doneAll.filter(function(t){ return last7.indexOf(t.completedAt)>=0; });
-  const byPriority = {high:0,med:0,low:0};
-  items.filter(function(t){return t.status!=='done';}).forEach(function(t){ byPriority[t.priority]=(byPriority[t.priority]||0)+1; });
-  const ongoingCount = items.filter(function(t){ return t.ongoing && t.status!=='done'; }).length;
-  return renderFocusAnalytics()+
-    '<div class="section"><div class="section-title">Task Stats</div><div class="grid grid-4">'+
-      '<div class="card" style="text-align:center;"><div class="kpi-label">Completed All-Time</div><div class="kpi-value">'+doneAll.length+'</div></div>'+
-      '<div class="card" style="text-align:center;"><div class="kpi-label">Completed Last 7 Days</div><div class="kpi-value">'+doneLast7.length+'</div></div>'+
-      '<div class="card" style="text-align:center;"><div class="kpi-label">Open High Priority</div><div class="kpi-value" style="color:var(--danger);">'+(byPriority.high||0)+'</div></div>'+
-      '<div class="card" style="text-align:center;"><div class="kpi-label">Ongoing Tasks</div><div class="kpi-value" style="color:#8fdcff;">'+ongoingCount+'</div></div>'+
-    '</div></div>'+
-    renderTimeByTaskSection()+
-    '<div class="section">'+renderManualLogForm()+'</div>';
-}
 function openAddTaskModal(){
   ui.newTaskClients = ['personal'];
   const o = document.getElementById('addTaskOverlay');
@@ -298,7 +280,7 @@ function renderAddTaskModal(){
     '<div class="field" style="margin-top:10px;"><label>Client(s) / Lead(s)</label>'+clientChipPickerHtml(ui.newTaskClients, 'toggleNewClientChip')+'</div>'+
     '<div class="field" style="margin-top:10px;"><label>Priority</label><select class="input" id="newTaskPriority"><option value="low">Low</option><option value="med" selected>Medium</option><option value="high">High</option></select></div>'+
     '<div class="field" style="margin-top:10px;"><label>Category (optional)</label><select class="input" id="newTaskCategory"><option value="">&mdash; None &mdash;</option>'+arr(state.tasks.categories).map(function(c){ return '<option value="'+c.id+'">'+escapeHtml(c.label)+'</option>'; }).join('')+'</select></div>'+
-    '<div class="field" style="margin-top:10px;"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="newTaskDeadline"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="newTaskDeadline">Today</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskDeadline" title="Remove deadline">Clear</button></div></div>'+
+    '<div class="field" style="margin-top:10px;"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="newTaskDeadline"><input class="input" type="time" id="newTaskDeadlineTime" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="newTaskDeadline">Today</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskDeadline" title="Remove deadline">Clear</button></div></div>'+
     '<div class="field" style="margin-top:10px;"><label>Notes (optional)</label><textarea class="input" id="newTaskNotes" placeholder="Any details worth remembering" style="width:100%;min-height:60px;"></textarea></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskOngoing" style="margin-right:6px;">&#128204; Ongoing (may take more than one day)</label>'+
     '<div id="newTaskOngoingExtra" style="display:none;">'+
@@ -319,6 +301,8 @@ function addTask(status){
   const clients = ui.newTaskClients.length ? ui.newTaskClients.slice() : ['personal'];
   const priority = document.getElementById('newTaskPriority').value;
   const deadline = document.getElementById('newTaskDeadline').value || null;
+  const dlTimeEl = document.getElementById('newTaskDeadlineTime');
+  const deadlineTime = (deadline && dlTimeEl && dlTimeEl.value) ? dlTimeEl.value : null;
   const notes = document.getElementById('newTaskNotes').value.trim();
   const ongoingEl = document.getElementById('newTaskOngoing');
   const ongoing = !!(ongoingEl && ongoingEl.checked);
@@ -330,7 +314,8 @@ function addTask(status){
   const includeInStandard = ongoing && !!(includeStandardEl && includeStandardEl.checked);
   const categoryEl = document.getElementById('newTaskCategory');
   const categoryId = categoryEl && categoryEl.value ? categoryEl.value : null;
-  state.tasks.items.push({id:uid(), title:title, client:clients[0], clients:clients, priority:priority, deadline:deadline, notes:notes, status:status, ongoing:ongoing, ongoingDeadline:ongoingDeadline, ongoingFrequency:ongoingFrequency, includeInStandard:includeInStandard, categoryId:categoryId, createdAt:todayStr(), completedAt:null});
+  state.tasks.items.push({id:uid(), title:title, client:clients[0], clients:clients, priority:priority, deadline:deadline, notes:notes, status:status, ongoing:ongoing, ongoingDeadline:ongoingDeadline, ongoingFrequency:ongoingFrequency, includeInStandard:includeInStandard, categoryId:categoryId, deadlineTime:deadlineTime, eventId:ui.newTaskEventId||null, createdAt:todayStr(), completedAt:null});
+  if(ui.newTaskEventId){ const ev = state.calendar.events.find(function(x){ return x.id===ui.newTaskEventId; }); if(ev){ ev.taskIds = arr(ev.taskIds).concat([state.tasks.items[state.tasks.items.length-1].id]); persist('calendar'); } ui.newTaskEventId = null; }
   closeAddTaskModal();
   playTaskAdded();
   persist('tasks'); renderView();
@@ -357,8 +342,17 @@ function accumulateCurrentTaskTime(taskId){
   if(ui.currentTaskId!==taskId || !ui.currentTaskStartedAt) return;
   const t=state.tasks.items.find(function(x){return x.id===taskId;});
   if(t){
-    const mins = Math.max(0, Math.round((Date.now()-ui.currentTaskStartedAt)/60000));
+    const now = Date.now();
+    const mins = Math.max(0, Math.round((now-ui.currentTaskStartedAt)/60000));
     t.trackedMinutes = (t.trackedMinutes||0) + mins;
+    // Timing log per task, so analytics can say what each session was spent on and
+    // deep-work exclusions can be subtracted from the right day.
+    if(now-ui.currentTaskStartedAt >= 30000){
+      if(!Array.isArray(state.focus.taskSegments)) state.focus.taskSegments = [];
+      const as = state.focus.activeSession;
+      state.focus.taskSegments.push({id:uid(), taskId:taskId, start:ui.currentTaskStartedAt, end:now, date:todayStr(new Date(ui.currentTaskStartedAt)), inSession:!!as, sessionType: as ? sessionType(as) : null});
+      persist('focus');
+    }
   }
   ui.currentTaskId = null;
   ui.currentTaskStartedAt = null;

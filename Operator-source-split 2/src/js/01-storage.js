@@ -23,7 +23,7 @@ async function persist(key){
   }
   return ok;
 }
-const STATE_KEYS = ['profile','tasks','focus','health','meals','journal','finances','business','calendar','standards','daysOff','goals','dashboardPanels','modes','settings','appActivity'];
+const STATE_KEYS = ['profile','tasks','focus','health','meals','journal','finances','business','calendar','standards','daysOff','goals','dashboardPanels','modes','settings','appActivity','personal','boards'];
 // The native Operator wrapper script (if running as the packaged .app) polls the
 // frontmost macOS app in the background and serves recent samples over a local,
 // loopback-only HTTP endpoint. When running as a plain file in a regular browser

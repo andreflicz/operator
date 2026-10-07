@@ -21,7 +21,7 @@ function computeTimeOfDayBuckets(){
   });
   return buckets;
 }
-function qualifyingSessions(){ return state.focus.sessions.filter(function(s){ return (s.minutes||0)>=5; }); }
+function qualifyingSessions(){ return state.focus.sessions.filter(function(s){ return (s.minutes||0)>=5 && sessionType(s)==='deep'; }); }
 function deepWorkMinutesForQualifying(dateStr){
   return qualifyingSessions().filter(function(s){ return s.date===dateStr; }).reduce(function(a,s){ return a+s.minutes; },0);
 }
@@ -234,11 +234,11 @@ function renderSessionHistory(){
   return '<div class="section"><div class="section-title">Session History</div><div class="task-list">'+
     (sessions.map(function(s){
       const titles = arr(s.completedTasks).map(function(t){return t.title;});
-      return '<div class="task-item-v2"><div style="width:70px;font-family:var(--font-display);font-weight:700;">'+fmtDateShort(s.date)+'</div>'+
+      return '<div class="task-item-v2 cal-item-clickable" data-action="editTimeBlock" data-kind="session" data-id="'+s.id+'"><div style="width:70px;font-family:var(--font-display);font-weight:700;">'+fmtDateShort(s.date)+'</div>'+
         '<div style="flex:1;min-width:160px;">'+
-        '<div class="task-title">'+fmtDurationLabel(s.minutes)+(s.manual?' &middot; manual':'')+'</div>'+
+        '<div class="task-title">'+fmtDurationLabel(s.minutes)+(sessionType(s)!=='deep'?' &middot; '+sessionType(s):'')+(s.manual?' &middot; manual':'')+'</div>'+
         (titles.length ? '<div class="task-notes">Finished: '+titles.map(escapeHtml).join(', ')+'</div>' : '')+
-        '</div>'+deleteBtn('session', s.id)+'</div>';
+        '</div><span class="kpi-sub">Edit</span></div>';
     }).join('') || '<div class="empty">No sessions logged yet — start one above.</div>')+
   '</div></div>';
 }
@@ -362,8 +362,8 @@ function renderModeHistorySection(){
   return '<div class="section"><div class="section-title">Break, Shooting &amp; Off-Time History<span class="kpi-sub">saved permanently for day/week/month analysis</span></div><div class="task-list">'+
     (history.map(function(m){
       const label = MODE_LABELS[m.type] || 'Mode';
-      const color = m.type==='break' ? 'var(--info)' : m.type==='shooting' ? 'var(--shoot)' : 'var(--text-dim)';
-      return '<div class="task-item-v2" data-action="openBreakDetail" data-id="'+m.id+'" style="cursor:pointer;">'+
+      const color = modeColor(m.type);
+      return '<div class="task-item-v2 cal-item-clickable" data-action="editTimeBlock" data-kind="mode" data-id="'+m.id+'">'+
         '<div style="width:70px;font-family:var(--font-display);font-weight:700;">'+fmtDateShort(m.date)+'</div>'+
         '<span class="tag" style="background:'+color+'22;color:'+color+';">'+modeIcon(m.type)+' '+label+'</span>'+
         '<div style="min-width:0;flex:1;">'+
@@ -425,6 +425,9 @@ function renderAlarmEditModal(){
       '<div class="field"><label>Time</label><input class="input" type="time" id="editAlarmTime-'+a.id+'" value="'+a.time+'"></div>'+
       '<div class="field"><label>Label</label><input class="input" id="editAlarmLabel-'+a.id+'" value="'+escapeHtml(a.label||'')+'"></div>'+
     '</div>'+
+    '<div class="field" style="margin-top:10px;"><label>Note to show when it goes off (optional)</label><textarea class="input" id="editAlarmNote-'+a.id+'" style="width:100%;min-height:60px;" placeholder="Written the night before — what matters today.">'+escapeHtml(a.wakeNote||'')+'</textarea></div>'+
+    '<div class="field" style="margin-top:10px;"><label>Song or YouTube link (optional)</label><input class="input" id="editAlarmMedia-'+a.id+'" value="'+escapeHtml(a.mediaUrl||'')+'" placeholder="https://…"></div>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editAlarmWake-'+a.id+'" '+(a.wake?'checked':'')+' style="margin-right:6px;">Wake-up alarm — also show last night\'s plan</label>'+
     '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
       deleteBtn('alarm', a.id)+
       '<div class="row">'+
@@ -438,6 +441,9 @@ function saveAlarmEdit(id){
   const a = state.focus.alarms.find(function(x){return x.id===id;}); if(!a) return;
   a.time = document.getElementById('editAlarmTime-'+id).value || a.time;
   a.label = document.getElementById('editAlarmLabel-'+id).value.trim();
+  const noteEl = document.getElementById('editAlarmNote-'+id); if(noteEl) a.wakeNote = noteEl.value.trim();
+  const mediaEl = document.getElementById('editAlarmMedia-'+id); if(mediaEl) a.mediaUrl = mediaEl.value.trim();
+  const wakeEl = document.getElementById('editAlarmWake-'+id); if(wakeEl) a.wake = wakeEl.checked;
   closeAlarmEditModal();
   persist('focus'); renderView();
 }
@@ -522,7 +528,9 @@ function reallyConfirmStopFocus(){
   if(!s) return;
   const endedAt = Date.now();
   const minutes = Math.max(1, Math.round((endedAt - s.startedAt)/60000));
-  state.focus.sessions.push({id:uid(), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endedAt, minutes:minutes, completedTasks: arr(s.completedTasks), note:''});
+  // Close out the current task's timing while the session still counts as active.
+  if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
+  state.focus.sessions.push({id:uid(), type:sessionType(s), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endedAt, minutes:minutes, completedTasks: arr(s.completedTasks), note:''});
   state.focus.activeSession = null;
   // Remember the manual lock-out so auto lock-in respects its cooldown.
   state.focus.lastManualStopAt = endedAt;
@@ -742,7 +750,9 @@ function addManualFocusLog(){
   const s = startT.split(':').map(Number), e = endT.split(':').map(Number);
   let mins = (e[0]*60+e[1]) - (s[0]*60+s[1]);
   if(mins<=0) mins += 24*60;
-  state.focus.sessions.push({id:uid(), date:date, startedAt:Date.now(), endedAt:Date.now(), minutes:mins, completedTasks:[], manual:true});
+  // Store the real start/end so the session shows (and can be edited) at the right time.
+  const startedAt = localTs(date, startT);
+  state.focus.sessions.push({id:uid(), type:'deep', date:date, startedAt:startedAt, endedAt:startedAt+mins*60000, minutes:mins, completedTasks:[], manual:true});
   playPositive();
   closeManualLogModal();
   persist('focus'); renderView();

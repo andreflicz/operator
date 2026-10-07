@@ -19,6 +19,7 @@
 <div id="alarmOverlay" class="overlay hidden">
   <div style="font-size:38px;">&#9200;</div>
   <div class="overlay-label" id="alarmLabel">Reminder</div>
+  <div id="alarmExtra" class="alarm-extra"></div>
   <div class="row">
     <button class="btn btn-primary" data-action="snoozeAlarm">Snooze 5 min</button>
     <button class="btn" data-action="dismissAlarm">Dismiss</button>
@@ -122,6 +123,33 @@
 </div>
 <div id="journalPhotoViewOverlay" class="overlay hidden">
   <div class="card" id="journalPhotoViewContent" style="max-width:640px; width:100%; max-height:85vh; overflow-y:auto; text-align:center;"></div>
+</div>
+<div id="streakEditOverlay" class="overlay hidden">
+  <div class="card" id="streakEditContent" style="max-width:460px; width:100%; max-height:88vh; overflow-y:auto;"></div>
+</div>
+<div id="sessionEditOverlay" class="overlay hidden">
+  <div class="card" id="sessionEditContent" style="max-width:440px; width:100%; max-height:88vh; overflow-y:auto;"></div>
+</div>
+<div id="nightPlanOverlay" class="overlay hidden">
+  <div class="card" id="nightPlanContent" style="max-width:520px; width:100%; max-height:88vh; overflow-y:auto;"></div>
+</div>
+<div id="wishItemOverlay" class="overlay hidden">
+  <div class="card" id="wishItemContent" style="max-width:460px; width:100%; max-height:88vh; overflow-y:auto;"></div>
+</div>
+<div id="lostReasonOverlay" class="overlay hidden">
+  <div class="card" id="lostReasonContent" style="max-width:400px; width:100%; max-height:88vh; overflow-y:auto;"></div>
+</div>
+<div id="contactOverlay" class="overlay hidden">
+  <div class="card" id="contactContent" style="max-width:640px; width:100%; max-height:88vh; overflow-y:auto;"></div>
+</div>
+<div id="newContactOverlay" class="overlay hidden">
+  <div class="card" id="newContactContent" style="max-width:480px; width:100%; max-height:88vh; overflow-y:auto;"></div>
+</div>
+<div id="filePreviewOverlay" class="overlay hidden">
+  <div class="card" id="filePreviewContent" style="max-width:900px; width:100%; max-height:88vh; overflow-y:auto;"></div>
+</div>
+<div id="boardPickerOverlay" class="overlay hidden">
+  <div class="card" id="boardPickerContent" style="max-width:420px; width:100%; max-height:88vh; overflow-y:auto;"></div>
 </div>
 <input type="file" id="journalPhotoInput" accept="image/*" multiple style="display:none;">
 <button class="btn quick-journal-fab" data-action="openQuickJournalModal" title="Quick Journal">&#128221;</button>

@@ -96,16 +96,19 @@ function renderLockInCard(){
   return '<div class="card" style="text-align:center;padding:28px 20px;width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:220px;">'+
     (meetingEvent ? '<button class="btn btn-good btn-sm" style="margin-bottom:12px;" data-action="joinCall" data-url="'+escapeHtml(meetingEvent.meetingLink)+'">&#128222; Join Call — '+escapeHtml(meetingEvent.title)+(meetingEvent.time?' at '+fmt12Hour(meetingEvent.time):'')+'</button>' : '')+
     '<button class="btn btn-good lock-in-btn" data-action="openLockInChooser">&#128274; LOCK IN</button>'+
-    '<button class="btn shooting-btn" style="margin-top:12px;" data-action="startMode" data-type="shooting">&#127916; SHOOTING MODE</button>'+
+    '<div class="mode-btn-row">'+
+      '<button class="btn shooting-btn" data-action="startMode" data-type="shooting">&#127916; SHOOTING</button>'+
+      '<button class="btn training-btn" data-action="startMode" data-type="training">&#128218; TRAINING</button>'+
+    '</div>'+
     '<button class="btn offtime-btn" style="margin-top:12px;" data-action="startMode" data-type="offtime">&#127937; OFF-TIME MODE</button>'+
   '</div>';
 }
-function modeIcon(type){ return type==='break' ? '☕' : type==='shooting' ? '\u{1F3AC}' : '\u{1F3C1}'; }
+function modeIcon(type){ return type==='break' ? '☕' : type==='shooting' ? '\u{1F3AC}' : type==='training' ? '\u{1F4DA}' : type==='offtime' && state.modes.active && state.modes.active.sleep ? '\u{1F319}' : '\u{1F3C1}'; }
 function renderActiveModeHero(){
   const active = state.modes.active;
   const elapsed = Date.now() - active.startedAt;
   const label = MODE_LABELS[active.type] || 'Mode';
-  const color = active.type==='break' ? 'var(--info)' : active.type==='shooting' ? 'var(--shoot)' : 'var(--text-dim)';
+  const color = modeColor(active.type);
   return '<div class="hero-card focus-active-glow" style="border-color:'+color+';box-shadow:none;">'+
     '<div class="kpi-label" style="color:'+color+';">'+modeIcon(active.type)+' '+label.toUpperCase()+'</div>'+
     '<div class="hero-num hero-num-lg" id="modeElapsed" style="color:'+color+';">'+formatElapsed(elapsed)+'</div>'+
@@ -113,9 +116,10 @@ function renderActiveModeHero(){
     '<button class="btn btn-primary" style="margin-top:12px;" data-action="endMode">End '+label+'</button>'+
   '</div>';
 }
-function startMode(type){
+function startMode(type, extra){
   if(state.focus.activeSession) return;
-  state.modes.active = {type:type, startedAt:Date.now()};
+  if(state.modes.active && !state.modes.active.linkedFocus) finishActiveMode(true);
+  state.modes.active = Object.assign({type:type, startedAt:Date.now()}, extra||{});
   playRestSound();
   persist('modes'); renderView();
 }
@@ -123,7 +127,7 @@ function finishActiveMode(silent){
   const active = state.modes.active; if(!active) return;
   const endedAt = Date.now();
   const minutes = Math.max(1, Math.round((endedAt-active.startedAt)/60000));
-  state.modes.history.push({id:uid(), type:active.type, date:todayStr(new Date(active.startedAt)), startedAt:active.startedAt, endedAt:endedAt, minutes:minutes});
+  state.modes.history.push({id:uid(), type:active.type, date:todayStr(new Date(active.startedAt)), startedAt:active.startedAt, endedAt:endedAt, minutes:minutes, note:active.note||'', sleep:!!active.sleep, eventId:active.eventId||null});
   state.modes.active = null;
   state.modes.lastEndedAt = endedAt;
   if(!silent) playStopSound();

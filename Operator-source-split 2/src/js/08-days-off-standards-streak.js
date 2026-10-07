@@ -11,17 +11,40 @@ function toggleDayOff(){
 function getStandardRec(dateStr){
   return state.standards.completions.find(function(c){ return c.date===dateStr; }) || {date:dateStr, doneIds:[]};
 }
+// Deep work = locked-in sessions of type "deep", minus time spent on tasks (or task
+// categories) marked "doesn't count toward deep work" (e.g. Meta ads).
+function sessionType(s){ return s.type || 'deep'; }
+function rawSessionMinutesFor(dateStr, type){
+  return state.focus.sessions.filter(function(s){ return s.date===dateStr && sessionType(s)===(type||'deep'); }).reduce(function(a,s){ return a+(s.minutes||0); },0);
+}
 function deepWorkMinutesFor(dateStr){
-  return state.focus.sessions.filter(function(s){ return s.date===dateStr; }).reduce(function(a,s){ return a+s.minutes; },0);
+  return Math.max(0, rawSessionMinutesFor(dateStr,'deep') - excludedTaskMinutesFor(dateStr));
 }
 function deepWorkMinutesTodayLive(){
   let mins = deepWorkMinutesFor(todayStr());
   const as = state.focus.activeSession;
-  if(as){
+  if(as && sessionType(as)==='deep'){
     if(as.onBreak) mins += Math.floor((as.frozenElapsedMs||0)/60000);
     else mins += Math.floor((Date.now()-as.startedAt)/60000);
+    if(ui.currentTaskId && ui.currentTaskStartedAt && !as.onBreak && !taskCountsAsDeepWork(ui.currentTaskId)) mins -= Math.floor((Date.now()-ui.currentTaskStartedAt)/60000);
   }
-  return mins;
+  return Math.max(0, mins);
+}
+function taskCountsAsDeepWork(taskOrId){
+  const t = typeof taskOrId==='string' ? state.tasks.items.find(function(x){ return x.id===taskOrId; }) : taskOrId;
+  if(!t) return true;
+  if(t.countsDeepWork===false) return false;
+  const cat = t.categoryId ? taskCategoryById(t.categoryId) : null;
+  if(cat && cat.countsDeepWork===false) return false;
+  return true;
+}
+function excludedTaskMinutesFor(dateStr){
+  return arr(state.focus.taskSegments).filter(function(sg){ return sg.date===dateStr && sg.inSession!==false && !taskCountsAsDeepWork(sg.taskId); })
+    .reduce(function(a,sg){ return a+Math.max(0, Math.round((sg.end-sg.start)/60000)); },0);
+}
+// Shooting time counts toward the daily standard target alongside deep work.
+function standardWorkMinutesFor(dateStr){
+  return deepWorkMinutesFor(dateStr) + rawSessionMinutesFor(dateStr,'shooting') + modeMinutesFor(dateStr,'shooting');
 }
 function fmtHours(mins){ return ((Number(mins)||0)/60).toFixed(1)+'h'; }
 function manualStandardsDoneFor(dateStr){
@@ -46,7 +69,10 @@ function ongoingStandardTasksDoneFor(dateStr){
 }
 function dayStandardsComplete(dateStr){
   const target = state.standards.deepWorkTargetMinutes || 180;
-  const deepWorkDone = deepWorkMinutesFor(dateStr) >= target;
+  const ov = state.standards.dayOverrides && state.standards.dayOverrides[dateStr];
+  if(ov==='done') return true;
+  if(ov==='missed') return false;
+  const deepWorkDone = standardWorkMinutesFor(dateStr) >= target;
   const trainedOk = trainedDoneFor(dateStr);
   return deepWorkDone && trainedOk && manualStandardsDoneFor(dateStr) && ongoingStandardTasksDoneFor(dateStr);
 }
@@ -72,7 +98,7 @@ function yesterdayStandardsFixup(){
   const y = addDays(todayStr(), -1);
   if(dayStandardsComplete(y) || isDayOff(y)) return null;
   const target = state.standards.deepWorkTargetMinutes || 180;
-  const deepWorkDone = deepWorkMinutesFor(y) >= target;
+  const deepWorkDone = standardWorkMinutesFor(y) >= target;
   const trainedOk = trainedDoneFor(y);
   const tasksOk = ongoingStandardTasksDoneFor(y);
   if(!(deepWorkDone && trainedOk && tasksOk)) return null;
@@ -105,8 +131,11 @@ function computeStreak(){
   if(!dayStandardsComplete(todayStr(d)) && !isDayOff(todayStr(d))){
     d.setDate(d.getDate()-1);
   }
+  const base = state.standards.streakBase;
   while(true){
     const ds = todayStr(d);
+    // A manually set count ("my streak was N as of this day") anchors the walk back.
+    if(base && base.date===ds){ count += Number(base.count)||0; break; }
     if(dayStandardsComplete(ds)){ count++; d.setDate(d.getDate()-1); continue; }
     if(isDayOff(ds)){ d.setDate(d.getDate()-1); continue; }
     break;

@@ -65,7 +65,7 @@ function splitActiveModeAtMidnight(){
     const start = new Date(active.startedAt);
     const midnight = new Date(start.getFullYear(), start.getMonth(), start.getDate()+1).getTime();
     const minutes = Math.max(1, Math.round((midnight-active.startedAt)/60000));
-    state.modes.history.push({id:uid(), type:active.type, date:todayStr(start), startedAt:active.startedAt, endedAt:midnight, minutes:minutes, note:active.note||'', splitAtMidnight:true});
+    state.modes.history.push({id:uid(), type:active.type, date:todayStr(start), startedAt:active.startedAt, endedAt:midnight, minutes:minutes, note:active.note||'', sleep:!!active.sleep, splitAtMidnight:true});
     active.startedAt = midnight;
     changed = true;
   }
@@ -144,6 +144,7 @@ let lastMinute = '';
 let ringInterval = null;
 function startAlarmChecker(){
   setInterval(function(){
+    checkReminders();
     const now = new Date();
     const hm = nowHM(now);
     const dateKey = todayStr(now);
@@ -164,8 +165,13 @@ function startAlarmChecker(){
     });
   }, 4000);
 }
+let lastFiredAlarm = null;
 function triggerAlarm(al){
+  lastFiredAlarm = al;
   document.getElementById('alarmLabel').textContent = (al && al.label) || 'Reminder';
+  const extra = document.getElementById('alarmExtra');
+  if(extra) extra.innerHTML = renderAlarmExtra(al);
+  onEventAlarm(al);
   document.getElementById('alarmOverlay').classList.remove('hidden');
   playBeep();
   clearInterval(ringInterval);
@@ -177,5 +183,5 @@ function triggerAlarm(al){
   }catch(e){}
 }
 function dismissAlarm(){ clearInterval(ringInterval); document.getElementById('alarmOverlay').classList.add('hidden'); }
-function snoozeAlarm(){ dismissAlarm(); setTimeout(function(){ triggerAlarm({label:'Snooze reminder'}); }, 5*60*1000); }
+function snoozeAlarm(){ const al = lastFiredAlarm; dismissAlarm(); setTimeout(function(){ triggerAlarm(Object.assign({}, al||{}, {label:((al&&al.label)||'Reminder')+' (snoozed)', eventId:null})); }, 5*60*1000); }
 

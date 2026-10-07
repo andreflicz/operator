@@ -59,6 +59,7 @@ function renderSettings(){
           '<div class="task-list">'+(arr(state.tasks.categories).map(function(c){ return '<div class="task-item-v2">'+
             '<span class="swatch" style="background:'+c.color+';width:18px;height:18px;cursor:pointer;" data-action="cycleTaskCategoryColor" data-id="'+c.id+'" title="Click to change color"></span>'+
             '<input class="input" data-task-cat-label="'+c.id+'" value="'+escapeHtml(c.label)+'" style="flex:1;max-width:220px;">'+
+            '<label class="row kpi-sub" style="gap:4px;cursor:pointer;" title="Time on tasks in this category counts toward deep work"><input type="checkbox" data-task-cat-deep="'+c.id+'" '+(c.countsDeepWork!==false?'checked':'')+'>Counts as deep work</label>'+
             deleteBtn('taskcat', c.id)+
           '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
         '</div>'+
@@ -399,6 +400,8 @@ function normalizeAll(){
   state.modes = normalizeModes(state.modes);
   state.settings = normalizeSettings(state.settings);
   state.appActivity = normalizeAppActivity(state.appActivity);
+  state.personal = normalizePersonal(state.personal);
+  state.boards = normalizeBoards(state.boards);
 }
 async function importDataFile(file){
   try{
@@ -430,7 +433,7 @@ function armReset(){
 }
 async function confirmReset(){
   armed.delete('reset:all');
-  state = { profile:defaultProfile(), tasks:{items:[]}, focus:defaultFocus(), health:{gymLog:[],weightLog:[],calorieEntries:[]}, meals:defaultMeals(), journal:{entries:[], types:defaultJournalTypes()}, finances:{debts:[],payments:[],income:[],invoices:[]}, business:{pipeline:[],clients:[]}, calendar:defaultCalendar(), standards:defaultStandards(), daysOff:defaultDaysOff(), goals:defaultGoals(), dashboardPanels:defaultDashboardPanels(), modes:defaultModes(), settings:defaultSettings(), appActivity:defaultAppActivity() };
+  state = { profile:defaultProfile(), tasks:{items:[]}, focus:defaultFocus(), health:{gymLog:[],weightLog:[],calorieEntries:[]}, meals:defaultMeals(), journal:{entries:[], types:defaultJournalTypes()}, finances:{debts:[],payments:[],income:[],invoices:[]}, business:{pipeline:[],clients:[]}, calendar:defaultCalendar(), standards:defaultStandards(), daysOff:defaultDaysOff(), goals:defaultGoals(), dashboardPanels:defaultDashboardPanels(), modes:defaultModes(), settings:defaultSettings(), appActivity:defaultAppActivity(), personal:defaultPersonal(), boards:defaultBoards() };
   normalizeAll();
   applyTheme();
   for(const k of STATE_KEYS) await persist(k);

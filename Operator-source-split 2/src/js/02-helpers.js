@@ -140,6 +140,8 @@ const RESET_TARGETS = [
   {id:'calendarEvents', label:'Calendar events'},
   {id:'standardsHistory', label:'Standard completions (streak history)'},
   {id:'daysOff', label:'Days off history'},
-  {id:'appActivity', label:'App activity history (most-used apps)'}
+  {id:'appActivity', label:'App activity history (most-used apps)'},
+  {id:'wishlist', label:'Wish list'},
+  {id:'boards', label:'Vision & journal boards'}
 ];
 

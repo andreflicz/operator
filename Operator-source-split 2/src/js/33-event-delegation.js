@@ -328,6 +328,7 @@ document.body.addEventListener('change', function(e){
   if(e.target && e.target.dataset){
     if(e.target.dataset.calCatLabel){ renameCalCategory(e.target.dataset.calCatLabel, e.target.value); }
     if(e.target.dataset.taskCatLabel){ renameTaskCategory(e.target.dataset.taskCatLabel, e.target.value); }
+    if(e.target.dataset.taskCatDeep){ const tc = taskCategoryById(e.target.dataset.taskCatDeep); if(tc){ tc.countsDeepWork = e.target.checked; persist('tasks'); } }
     if(e.target.dataset.videoTypeLabel){ renameVideoType(e.target.dataset.videoTypeLabel, e.target.value); }
     if(e.target.dataset.calCatAutoremind){
       const cat = categoryById(e.target.dataset.calCatAutoremind);
@@ -335,6 +336,10 @@ document.body.addEventListener('change', function(e){
     }
     if(e.target.dataset.journalTypeLabel){ renameJournalType(e.target.dataset.journalTypeLabel, e.target.value); }
     if(e.target.dataset.journalTypeEmoji){ renameJournalTypeEmoji(e.target.dataset.journalTypeEmoji, e.target.value); }
+  }
+  if(e.target && e.target.id==='calEventIsShoot'){
+    const ex = document.getElementById('calEventShootExtra');
+    if(ex) ex.style.display = e.target.checked ? 'block' : 'none';
   }
   if(e.target && e.target.id==='newTaskOngoing'){
     const extra = document.getElementById('newTaskOngoingExtra');

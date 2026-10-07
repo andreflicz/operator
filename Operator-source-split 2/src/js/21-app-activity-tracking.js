@@ -115,6 +115,9 @@ async function pollAppActivity(){
     // again. Keep the larger of stored vs. recomputed per app (idempotent) instead of adding,
     // which used to inflate past days by another copy every 15 seconds.
     state.appActivity.days[d] = maxAppMinutes(state.appActivity.days[d], intervalsToAppMinutes(ivs));
+    // Also keep the part that happened while locked in (Analytics shows that first).
+    if(!state.appActivity.lockedDays) state.appActivity.lockedDays = {};
+    state.appActivity.lockedDays[d] = maxAppMinutes(state.appActivity.lockedDays[d], clipIntervalsToWindows(ivs, sessionWindowsFor(d)));
   });
   const todaySamples = (byDate[today]||[]).sort(function(a,b){return a.ts-b.ts;});
   state.appActivity.todayIntervals = samplesToIntervals(todaySamples);
@@ -185,7 +188,8 @@ function autoEndFocusSession(){
   if(!s) return;
   const endedAt = Date.now();
   const minutes = Math.max(1, Math.round((endedAt-s.startedAt)/60000));
-  state.focus.sessions.push({id:uid(), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endedAt, minutes:minutes, completedTasks:arr(s.completedTasks), note:'', autoStopped:true});
+  if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
+  state.focus.sessions.push({id:uid(), type:sessionType(s), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endedAt, minutes:minutes, completedTasks:arr(s.completedTasks), note:'', autoStopped:true});
   state.focus.activeSession = null;
   state.focus.lastSessionEndedAt = endedAt;
   if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }

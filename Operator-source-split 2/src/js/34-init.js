@@ -16,6 +16,8 @@ async function init(){
   state.modes = normalizeModes(await loadKey('modes', defaultModes()));
   state.settings = normalizeSettings(await loadKey('settings', defaultSettings()));
   state.appActivity = normalizeAppActivity(await loadKey('appActivity', defaultAppActivity()));
+  state.personal = normalizePersonal(await loadKey('personal', defaultPersonal()));
+  state.boards = normalizeBoards(await loadKey('boards', defaultBoards()));
 
   splitActiveModeAtMidnight();
   applyTheme();
