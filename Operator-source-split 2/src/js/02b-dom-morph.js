@@ -139,6 +139,9 @@ function restoreField(el, snap, newDefault, opts, newN){
         } else if(!nowHidden && wasHidden){
           const chained = performance.now()-lastHiddenAt < 150;
           o.classList.toggle('overlay-instant', chained);
+          // A hidden pop-up keeps its old scroll offset; always open at the top.
+          const card = o.querySelector(':scope > [id$="Content"]');
+          if(card) card.scrollTop = 0;
         }
       });
     });

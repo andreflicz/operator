@@ -295,7 +295,7 @@ function crmToolbar(kind){
       '<button class="seg-tab'+(f.view==='board'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="board">Board</button>'+
       '<button class="seg-tab'+(f.view==='list'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="list">List</button>'+
     '</div>'+
-    (kind==='client' ? '<button class="btn btn-ghost btn-sm" data-action="openLifecycleEditor" title="Design the steps every client goes through">&#9881; Lifecycle</button>' : '')+
+    (kind==='client' ? '<div class="seg-tabs" style="margin:0;" title="Group the board by"><button class="seg-tab'+(f.group!=='cycle'?' active':'')+'" data-action="crmGroup" data-id="stage">By status</button><button class="seg-tab'+(f.group==='cycle'?' active':'')+'" data-action="crmGroup" data-id="cycle">By cycle step</button></div><button class="btn btn-ghost btn-sm" data-action="openLifecycleEditor" title="Design your client cycles: steps, calls, forms, videos">&#9881; Cycles</button>' : '')+
     '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="'+kind+'">+ Add '+(kind==='lead'?'lead':'client')+'</button>'+
   '</div>';
 }
@@ -384,7 +384,8 @@ function renderCrmTab(kind){
   const header = kind==='lead'
     ? '<div class="crm-stats"><span><b>'+tracked.length+'</b> open leads</span><span><b>$'+tracked.reduce(function(a,p){ return a+(Number(p.value)||0); },0).toLocaleString()+'</b> in pipeline</span><span class="'+(due?'crm-stat-due':'')+'"><b>'+due+'</b> to reach out to</span></div>'
     : '<div class="crm-stats"><span><b>'+tracked.length+'</b> active clients</span><span><b>$'+tracked.reduce(function(a,c){ return a+(Number(c.mrr)||0); },0).toLocaleString()+'</b> MRR</span><span class="'+(due?'crm-stat-due':'')+'"><b>'+due+'</b> to reach out to</span></div>';
-  return header+crmToolbar(kind)+'<div class="subtab-panel" data-key="crm-'+kind+'-'+f.view+'">'+(f.view==='list' ? renderCrmList(kind) : renderCrmBoard(kind))+'</div>';
+  const cycleMode = kind==='client' && f.group==='cycle';
+  return header+crmToolbar(kind)+(cycleMode ? cycleGroupBar() : '')+'<div class="subtab-panel" data-key="crm-'+kind+'-'+f.view+(cycleMode?'-cy':'')+'">'+(f.view==='list' ? renderCrmList(kind) : cycleMode ? renderCycleBoard() : renderCrmBoard(kind))+'</div>';
 }
 // ---- Reach out today (Focus page) ----
 function reachOutList(){
@@ -675,6 +676,7 @@ function renderNewContact(){
       '<div class="field"><label>'+(kind==='lead'?'Est. value ($)':'Monthly retainer ($)')+'</label><input class="input" type="number" id="ncValue"></div>'+
       '<div class="field"><label>Stage</label><select class="input" id="ncStage">'+stages.map(function(s){ return '<option value="'+s.id+'" '+(kind==='client'&&s.id==='onboarding'?'selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select></div>'+
     '</div>'+
+    (kind==='client' ? '<div class="field" style="margin-top:10px;"><label>Client cycle (the playbook they\'ll follow)</label><select class="input" id="ncCycle"><option value="">No cycle</option>'+cycles().map(function(x){ return '<option value="'+x.id+'" '+(crm().defaultCycleId===x.id?'selected':'')+'>'+escapeHtml(x.name)+' — '+x.steps.map(function(s){ return s.label; }).join(' → ')+'</option>'; }).join('')+'</select></div>' : '')+
     '<div class="field" style="margin-top:10px;"><label>Source</label><div class="row" style="gap:6px;">'+LEAD_SOURCES.map(function(s){ return '<span class="chip'+(ui.newContactSource===s.id?' active':'')+'" data-action="ncSource" data-id="'+s.id+'">'+s.emoji+' '+s.label+'</span>'; }).join('')+'</div></div>'+
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="ncNotes" style="width:100%;min-height:60px;"></textarea></div>'+
     '<div class="row" style="margin-top:18px;justify-content:flex-end;"><button class="btn btn-ghost" data-action="closeNewContact">Cancel</button><button class="btn btn-primary" data-action="saveNewContact">Add '+(kind==='lead'?'lead':'client')+'</button></div>';
@@ -692,8 +694,9 @@ ACTIONS.saveNewContact = function(){
   if(kind==='lead'){
     state.business.pipeline.push(Object.assign(base, {company:company, value:Number(g('ncValue'))||0, trade:'', nextFollowUp:null, stageHistory:[], convertedClientId:null}));
   } else {
-    const c = Object.assign(base, {business:company, mrr:Number(g('ncValue'))||0, billingDay:1, deliverables:[], journal:[], touches:[], packageId:null, startDate:todayStr(), lifecycle:{checks:{}, enteredAt:{}}});
-    c.lifecycle.enteredAt[c.stage] = Date.now();
+    const c = Object.assign(base, {business:company, mrr:Number(g('ncValue'))||0, billingDay:1, deliverables:[], journal:[], touches:[], packageId:null, startDate:todayStr(), lifecycle:{checks:{}, enteredAt:{}, events:{}, links:{}}, cycleId:null, cycleStepId:null, cycleDone:false});
+    const cyEl = document.getElementById('ncCycle');
+    if(cyEl && cyEl.value) assignCycle(c, cyEl.value);
     syncClientStatus(c);
     state.business.clients.push(c);
   }
@@ -735,7 +738,8 @@ function renderCrmSettings(){
       '<div class="field"><label>Daily "reach out" reminder</label><div class="row" style="gap:6px;"><input type="checkbox" id="setTouchReminder" '+(c.dailyReminder.enabled?'checked':'')+'><input class="input" type="time" id="setTouchReminderTime" value="'+c.dailyReminder.time+'" style="width:120px;"></div></div>'+
     '</div><div class="kpi-sub" style="margin-top:8px;">Client health turns amber once a touch is overdue and red when it\'s overdue by more than half the cadence.</div></div>'+
     '<div class="card section"><div class="section-title">Lead stages</div>'+stageEditor('lead')+'</div>'+
-    '<div class="card section"><div class="section-title">Client lifecycle<span class="kpi-sub">the steps every client goes through, each with its own checklist</span></div><button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">&#9881; Edit client lifecycle</button></div>';
+    '<div class="card section"><div class="section-title">Client cycles<span class="kpi-sub">your playbooks — steps with calls, forms, videos and to-dos</span></div><button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">&#9881; Edit client cycles</button></div>'+
+    '<div class="card section"><div class="section-title">Client statuses</div>'+stageEditor('client')+'</div>';
 }
 function saveCrmSettingsFields(){
   const c = crm();

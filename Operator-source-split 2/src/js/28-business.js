@@ -701,9 +701,13 @@ function convertProspectToClient(p){
   state.business.clients.push({id:clientId, name:p.name, business:p.company, phone:p.phone||'', email:p.email||'', leadSource:p.leadSource||null, mrr:p.value||0, billingDay:1, status:'active', stage:'onboarding', notes:p.notes||'', deliverables:[], journal:[],
     touchpoints:tps, touches:tps.map(function(t){ return t.date; }), files:arr(p.files).map(function(f){ return Object.assign({}, f); }),
     timeline:arr(p.timeline).map(function(t){ return Object.assign({}, t); }).concat([{id:uid(), ts:Date.now(), type:'stage', text:'Won — converted from lead'}]),
-    lifecycle:{checks:{}, enteredAt:{onboarding:Date.now()}},
+    lifecycle:{checks:{}, enteredAt:{}, events:{}, links:{}},
     cadenceDays:null, fromLeadId:p.id, startDate:todayStr(), createdAt:todayStr()});
   p.convertedClientId = clientId;
+  // won clients start the default cycle straight away
+  const nc = state.business.clients[state.business.clients.length-1];
+  nc.cycleId = null; nc.cycleDone = false;
+  if(crm().defaultCycleId) assignCycle(nc, crm().defaultCycleId);
   return clientId;
 }
 function advanceStageQuiet(id){

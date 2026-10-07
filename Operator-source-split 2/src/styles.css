@@ -749,3 +749,27 @@
   .lc-editor-item{ display:flex; align-items:center; gap:6px; }
   .lc-editor-item .input{ flex:1; }
   .lc-editor-bullet{ color:var(--text-faint); width:16px; text-align:center; }
+  /* ---- Client cycles ---- */
+  .lc-card{ border-left:3px solid var(--cy, var(--border)); }
+  .lc-cycle-select{ max-width:200px; }
+  .lc-item{ display:flex; align-items:center; gap:8px; padding:5px 6px; border-radius:6px; font-size:13.5px; transition:background .12s; flex-wrap:wrap; }
+  .lc-type{ width:18px; text-align:center; flex-shrink:0; font-size:13px; }
+  .lc-text{ flex:1; min-width:120px; }
+  .lc-item.is-done .lc-text{ color:var(--text-faint); text-decoration:line-through; }
+  .lc-item.is-done .lc-type{ opacity:.45; }
+  .lc-actions{ display:inline-flex; align-items:center; gap:6px; flex-shrink:0; }
+  .lc-meta{ font-size:11.5px; color:var(--info); white-space:nowrap; }
+  .lc-step.is-done-all{ background:var(--good-dim); border-color:var(--good); color:var(--good); cursor:default; }
+  .lc-start-btn{ border-color:var(--lc); color:var(--lc); background:transparent; }
+  .lc-start-btn:hover{ background:var(--panel-2); border-color:var(--lc); }
+  .lc-badge-step{ font-size:11.5px; font-weight:700; white-space:nowrap; }
+  .cy-tabs{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+  .cy-tab{ display:inline-flex; align-items:center; gap:7px; padding:6px 12px; border-radius:20px; border:1px solid var(--border); background:var(--panel-2); color:var(--text-dim); font-family:var(--font-body); font-size:12.5px; font-weight:600; cursor:pointer; }
+  .cy-tab.active{ border-color:var(--cy); color:var(--text); box-shadow:0 0 0 1px var(--cy) inset; }
+  .cy-tab-add{ border-style:dashed; }
+  .cy-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+  .cy-name{ font-family:var(--font-display); font-weight:700; font-size:16px; min-width:180px; flex:1; max-width:320px; }
+  .lc-step-num{ width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:800; color:#0b0d12; flex-shrink:0; }
+  .lc-type-select{ width:126px; flex-shrink:0; }
+  .lc-editor-item{ flex-wrap:wrap; }
+  .lc-editor-item .input{ min-width:140px; }

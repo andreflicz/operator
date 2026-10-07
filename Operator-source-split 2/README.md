@@ -53,6 +53,7 @@ src/
     27-finances.js
     28-business.js
     28b-crm.js              leads → clients lifecycle, touchpoints, cadence, files
+    28c-lifecycle.js        client cycles: playbooks of steps with calls, forms, videos, to-dos
     29-calendar.js
     29b-events-alarms.js    event prep alarms, reminders, night-before plan, sleep mode
     30-settings.js
@@ -64,7 +65,8 @@ src/
 scripts/
   build.py                reassembles src/ -> dist/command-center-2.html
   smoke-test.js            headless-Chromium check: app loads, all 6 nav views render, no JS errors
-  e2e/                     Playwright suites per phase — `bash scripts/e2e/run-all.sh`
+  e2e/                     Playwright suites per phase — `bash scripts/e2e/run-all.sh`;
+                           click-latency benchmark — `node scripts/e2e/perf.js dist/command-center-2.html`
 dist/
   command-center-2.html    the built file — copy this into the .app bundle
 packaged/

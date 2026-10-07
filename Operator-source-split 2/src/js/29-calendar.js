@@ -90,7 +90,7 @@ function openCalEventModal(id){
   o.classList.remove('hidden');
   renderCalEventModalInto();
 }
-function closeCalEventModal(){ ui.editingCalEventId = null; const o=document.getElementById('calEventOverlay'); if(o) o.classList.add('hidden'); }
+function closeCalEventModal(){ ui.editingCalEventId = null; ui.lcScheduleRef = null; const o=document.getElementById('calEventOverlay'); if(o) o.classList.add('hidden'); }
 function renderCalEventModal(){
   const categories = arr(state.calendar.categories);
   const editing = ui.editingCalEventId ? state.calendar.events.find(function(x){return x.id===ui.editingCalEventId;}) : null;
@@ -152,13 +152,14 @@ function saveCalEvent(){
   const wantsAlarm = document.getElementById('calEventSetAlarm').checked;
   if(ui.editingCalEventId){
     const ev = state.calendar.events.find(function(x){return x.id===ui.editingCalEventId;});
-    if(ev){ ev.date=date; ev.time=time; ev.title=title; ev.categoryId=categoryId; ev.meetingLink=meetingLink; ev.linkedClient=linkedClient; readEventExtras(ev); syncCalEventAlarm(ev, wantsAlarm); syncEventExtraAlarms(ev); }
+    if(ev){ ev.date=date; ev.time=time; ev.title=title; ev.categoryId=categoryId; ev.meetingLink=meetingLink; ev.linkedClient=linkedClient; readEventExtras(ev); syncCalEventAlarm(ev, wantsAlarm); syncEventExtraAlarms(ev); onCalEventSaved(ev); }
   } else {
     const ev = {id:uid(), date:date, time:time, title:title, categoryId:categoryId, meetingLink:meetingLink, linkedClient:linkedClient, alarmId:null};
     readEventExtras(ev);
     syncCalEventAlarm(ev, wantsAlarm);
     syncEventExtraAlarms(ev);
     state.calendar.events.push(ev);
+    onCalEventSaved(ev);
   }
   persist('tasks');
   ui.calendarSelectedDate = date;
