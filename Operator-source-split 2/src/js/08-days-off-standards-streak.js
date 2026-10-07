@@ -1,0 +1,156 @@
+// ============ DAYS OFF / STANDARD / STREAK ============
+function isDayOff(dateStr){ return state.daysOff.dates.indexOf(dateStr)>=0; }
+function toggleDayOff(){
+  const d = todayStr();
+  const idx = state.daysOff.dates.indexOf(d);
+  const wasOff = idx>=0;
+  if(wasOff) state.daysOff.dates.splice(idx,1); else state.daysOff.dates.push(d);
+  if(wasOff) playStartChime(); else playRestSound();
+  persist('daysOff'); renderView();
+}
+function getStandardRec(dateStr){
+  return state.standards.completions.find(function(c){ return c.date===dateStr; }) || {date:dateStr, doneIds:[]};
+}
+function deepWorkMinutesFor(dateStr){
+  return state.focus.sessions.filter(function(s){ return s.date===dateStr; }).reduce(function(a,s){ return a+s.minutes; },0);
+}
+function deepWorkMinutesTodayLive(){
+  let mins = deepWorkMinutesFor(todayStr());
+  const as = state.focus.activeSession;
+  if(as){
+    if(as.onBreak) mins += Math.floor((as.frozenElapsedMs||0)/60000);
+    else mins += Math.floor((Date.now()-as.startedAt)/60000);
+  }
+  return mins;
+}
+function fmtHours(mins){ return ((Number(mins)||0)/60).toFixed(1)+'h'; }
+function manualStandardsDoneFor(dateStr){
+  const items = arr(state.standards.items).filter(function(it){ return !it.createdAt || it.createdAt<=dateStr; });
+  if(!items.length) return true;
+  const rec = state.standards.completions.find(function(c){ return c.date===dateStr; });
+  if(!rec) return false;
+  return items.every(function(it){ return rec.doneIds.indexOf(it.id)>=0; });
+}
+function trainedDoneFor(dateStr){
+  return arr(state.health.gymLog).some(function(g){ return g.date===dateStr; });
+}
+function ongoingStandardTasksDoneFor(dateStr){
+  // Only count tasks that already existed (and were still active) on that date — a task
+  // added later can't retroactively require a check-off on days before it existed, or
+  // every day before its creation would wrongly show as an incomplete standard forever.
+  const tasks = arr(state.tasks.items).filter(function(t){
+    return t.ongoing && t.includeInStandard && t.status!=='done' && (t.createdAt||dateStr)<=dateStr;
+  });
+  if(!tasks.length) return true;
+  return tasks.every(function(t){ return arr(t.ongoingDoneDates).indexOf(dateStr)>=0; });
+}
+function dayStandardsComplete(dateStr){
+  const target = state.standards.deepWorkTargetMinutes || 180;
+  const deepWorkDone = deepWorkMinutesFor(dateStr) >= target;
+  const trainedOk = trainedDoneFor(dateStr);
+  return deepWorkDone && trainedOk && manualStandardsDoneFor(dateStr) && ongoingStandardTasksDoneFor(dateStr);
+}
+function toggleStandard(id, dateStr){
+  const d = dateStr || todayStr();
+  let rec = state.standards.completions.find(function(c){ return c.date===d; });
+  if(!rec){ rec = {date:d, doneIds:[]}; state.standards.completions.push(rec); }
+  const wasAllDone = dayStandardsComplete(d);
+  const idx = rec.doneIds.indexOf(id);
+  if(idx>=0) rec.doneIds.splice(idx,1); else rec.doneIds.push(id);
+  const nowAllDone = dayStandardsComplete(d);
+  if(!wasAllDone && nowAllDone) playSessionComplete(); else playTick();
+  persist('standards'); renderView();
+}
+// A day can look "incomplete" purely because the manual standards checklist (e.g. "Stayed within
+// calorie target") was never tapped before midnight — even though deep work, training, and ongoing
+// tasks were all genuinely done. Since that checklist can only ever be toggled for the day it applies
+// to, once the date rolls over there was previously no way to go back and correct a simple missed tap,
+// which silently and permanently broke the streak. This surfaces a small fixup prompt for exactly that
+// case — yesterday only, and only when the real work was actually done — so it can't be used to fudge
+// a day that was genuinely incomplete.
+function yesterdayStandardsFixup(){
+  const y = addDays(todayStr(), -1);
+  if(dayStandardsComplete(y) || isDayOff(y)) return null;
+  const target = state.standards.deepWorkTargetMinutes || 180;
+  const deepWorkDone = deepWorkMinutesFor(y) >= target;
+  const trainedOk = trainedDoneFor(y);
+  const tasksOk = ongoingStandardTasksDoneFor(y);
+  if(!(deepWorkDone && trainedOk && tasksOk)) return null;
+  const rec = getStandardRec(y);
+  const missing = arr(state.standards.items).filter(function(it){ return rec.doneIds.indexOf(it.id)<0; });
+  if(!missing.length) return null;
+  return { date:y, rec:rec, missing:missing };
+}
+function yesterdayStandardsFixupHtml(){
+  const fix = yesterdayStandardsFixup();
+  if(!fix) return '';
+  return '<div class="card" style="text-align:center;border-color:var(--accent);margin-top:10px;">'+
+    '<div class="kpi-label" style="margin-bottom:6px;">Looks like you did the work yesterday — just missing this:</div>'+
+    '<div class="row" style="justify-content:center;">'+
+      fix.missing.map(function(it){ return '<span class="chip" data-action="toggleStandard" data-id="'+it.id+'" data-date="'+fix.date+'">'+escapeHtml(it.label)+'</span>'; }).join('')+
+    '</div>'+
+    '<div class="kpi-sub" style="margin-top:8px;">Tap to confirm and restore yesterday to your streak.</div>'+
+  '</div>';
+}
+function requiredWorkingDays(){ return 7 - (state.standards.daysOffAllowedPerWeek!=null ? state.standards.daysOffAllowedPerWeek : 2); }
+function trailingWeekWorkingDays(dateStr){
+  let count = 0;
+  for(let i=0;i<7;i++){ if(dayStandardsComplete(addDays(dateStr,-i))) count++; }
+  return count;
+}
+function trailingWeekQualifies(dateStr){ return trailingWeekWorkingDays(dateStr) >= requiredWorkingDays(); }
+function computeStreak(){
+  let count = 0;
+  let d = new Date();
+  if(!dayStandardsComplete(todayStr(d)) && !isDayOff(todayStr(d))){
+    d.setDate(d.getDate()-1);
+  }
+  while(true){
+    const ds = todayStr(d);
+    if(dayStandardsComplete(ds)){ count++; d.setDate(d.getDate()-1); continue; }
+    if(isDayOff(ds)){ d.setDate(d.getDate()-1); continue; }
+    break;
+  }
+  return count;
+}
+function firstEverWorkedDate(){
+  const dates = state.focus.sessions.map(function(s){return s.date;}).concat(
+    state.standards.completions.filter(function(c){ return c.doneIds && c.doneIds.length>0; }).map(function(c){return c.date;})
+  );
+  if(!dates.length) return null;
+  return dates.sort()[0];
+}
+function dayVisualStatus(dateStr){
+  if(dateStr > todayStr()) return 'future';
+  const startDate = firstEverWorkedDate();
+  if(!startDate || dateStr < startDate) return 'neutral';
+  if(dayStandardsComplete(dateStr)) return 'worked';
+  let notWorkedCount = 0;
+  for(let i=0;i<7;i++){
+    const d = addDays(dateStr,-i);
+    if(d < startDate) continue;
+    if(!dayStandardsComplete(d)) notWorkedCount++;
+  }
+  const maxOff = state.standards.daysOffAllowedPerWeek!=null ? state.standards.daysOffAllowedPerWeek : 2;
+  return notWorkedCount > maxOff ? 'failed' : 'neutral';
+}
+function isBreakDay(dateStr){
+  if(dateStr > todayStr()) return false;
+  return dayVisualStatus(dateStr)==='failed' && dayVisualStatus(addDays(dateStr,-1))!=='failed';
+}
+function renderWeekGrid(){
+  const today = todayStr();
+  const days = []; for(let i=-3;i<=3;i++) days.push(addDays(today,i));
+  return '<div class="row" style="justify-content:center;">'+days.map(function(d){
+    const isToday = d===today;
+    const broken = isBreakDay(d);
+    const status = dayVisualStatus(d);
+    if(broken){
+      return '<div class="week-chip week-chip-broken" title="Streak broke here">'+weekdayShort(d).toUpperCase()+'<span class="week-chip-x">&#10005;</span></div>';
+    }
+    const border = status==='worked' ? '#3FBE8E' : status==='failed' ? '#E8636B' : '#262B38';
+    const bg = status==='worked' ? 'rgba(63,190,142,.14)' : status==='failed' ? 'rgba(232,99,107,.14)' : '#191D27';
+    return '<div class="week-chip'+(isToday?' week-chip-today':'')+'" style="border:2px solid '+border+';background:'+bg+';color:var(--text);">'+weekdayShort(d).toUpperCase()+'</div>';
+  }).join('')+'</div>';
+}
+

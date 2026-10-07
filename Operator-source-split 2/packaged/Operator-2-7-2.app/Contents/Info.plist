@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>Operator</string>
+    <key>CFBundleDisplayName</key>
+    <string>Operator</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.local.operator</string>
+    <key>CFBundleVersion</key>
+    <string>1.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleExecutable</key>
+    <string>Operator</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>10.13</string>
+    <key>LSUIElement</key>
+    <false/>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>Operator checks which app is currently in the foreground so it can show your most-used apps and auto lock-in when you've been steady on one app for a while. This stays entirely on your Mac.</string>
+</dict>
+</plist>

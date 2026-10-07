@@ -1,0 +1,161 @@
+// ============ GOALS ============
+function renderGoalsTab(){
+  const items = state.goals.items;
+  const done = items.filter(function(g){ return g.done; });
+  const mrr = arr(state.business.clients).filter(function(c){return c.status==='active';}).reduce(function(a,c){return a+Number(c.mrr||0);},0);
+  const mrrGoal = state.profile.revenueGoalMonthly||1;
+  const mrrPct = clamp(mrr/mrrGoal*100,0,100);
+  const weightLog = state.health.weightLog.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
+  const latestWeight = weightLog.length?weightLog[weightLog.length-1].weight:null;
+  const startWeight = weightLog.length?weightLog[0].weight:null;
+  const goalWeight = state.profile.goalWeight;
+  let weightPct = 0;
+  if(latestWeight!=null && goalWeight!=null && startWeight!=null && startWeight!==goalWeight){
+    weightPct = clamp(Math.round(((startWeight-latestWeight)/(startWeight-goalWeight))*100),0,100);
+  }
+  const last7=[]; for(let i=0;i<7;i++) last7.push(addDays(todayStr(),-i));
+  const trained7 = last7.filter(function(d){ return state.health.gymLog.some(function(g){return g.date===d;}); }).length;
+  const workoutPct = clamp(trained7/(state.profile.weeklyWorkoutTarget||1)*100,0,100);
+  const achievedPct = items.length?Math.round(done.length/items.length*100):0;
+
+  return '<div class="card section"><div style="text-align:center;margin-bottom:16px;"><div class="section-title" style="justify-content:center;margin-bottom:2px;">Snapshot</div><div class="kpi-sub">how the big-picture numbers are trending</div></div><div class="row" style="justify-content:space-around;flex-wrap:wrap;gap:18px;">'+
+      '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Revenue</div><div class="ring-wrap" style="'+goalGlowFilter(mrrPct)+'">'+svgRing(mrrPct,130,goalColor(),'$'+mrr.toLocaleString(),'of $'+mrrGoal.toLocaleString()+' MRR')+'</div></div>'+
+      (goalWeight!=null ? '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Weight</div><div class="ring-wrap" style="'+goalGlowFilter(weightPct)+'">'+svgRing(weightPct,130,goalColor(),(latestWeight!=null?latestWeight:'—'),'toward '+goalWeight+' goal')+'</div></div>' : '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Weight</div><div class="ring-wrap"><div class="empty" style="width:130px;">Set a goal weight in Settings</div></div></div>')+
+      '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Workouts</div><div class="ring-wrap" style="'+goalGlowFilter(workoutPct)+'">'+svgRing(workoutPct,130,goalColor(),trained7+'/'+state.profile.weeklyWorkoutTarget,'this week')+'</div></div>'+
+      '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Goals Achieved</div><div class="ring-wrap" style="'+goalGlowFilter(achievedPct)+'">'+svgRing(achievedPct,130,goalColor(),done.length+'/'+items.length,items.length?'of your goals':'none set yet')+'</div></div>'+
+    '</div></div>'+
+  '<div class="card section">'+
+    '<div class="kpi-sub" style="margin-bottom:14px;text-align:center;">Add a goal, and optionally pair it with your own tracker.</div>'+
+    '<div class="grid grid-3">'+
+      '<div class="field"><label>Goal</label><input class="input" id="newGoalLabel" placeholder="e.g. First sponsor deal" style="width:100%;"></div>'+
+      '<div class="field"><label>Target (optional)</label><input class="input" type="number" id="newGoalTarget" placeholder="e.g. 90" style="width:100%;"></div>'+
+      '<div class="field"><label>Unit (optional)</label><input class="input" id="newGoalUnit" placeholder="e.g. lbs, $/mo, days" style="width:100%;"></div>'+
+    '</div>'+
+    '<div class="grid grid-2" style="margin-top:12px;">'+
+      '<div class="field"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="newGoalDeadline" style="flex:1;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newGoalDeadline">&#128197;</button></div></div>'+
+      '<div class="field"><label>Tracking</label><select class="input" id="newGoalTrackMode" style="width:100%;"><option value="manual">I\'ll update progress myself</option><option value="streak">Auto-track from my streak</option></select></div>'+
+    '</div>'+
+    '<div class="row" style="justify-content:center;margin-top:18px;">'+
+      '<button class="btn btn-good" style="font-size:16px;font-weight:700;padding:14px 36px;box-shadow:0 4px 22px rgba(63,190,142,.4);" data-action="addGoal">+ Add Goal</button>'+
+    '</div>'+
+  '</div>'+
+  '<div class="task-list">'+(items.map(goalRow).join('') || '<div class="empty">Nothing here yet — add the goals that actually matter to you.</div>')+'</div>';
+}
+function goalLiveCurrent(g){
+  if(g.autoTrack==='streak') return computeStreak();
+  return g.current||0;
+}
+function goalDeadlineTag(g){
+  if(!g.deadline) return '';
+  const days = Math.ceil((new Date(g.deadline+'T00:00:00') - new Date(todayStr()+'T00:00:00'))/86400000);
+  let cls='tag', label;
+  if(days<0){ cls='tag tag-danger'; label='Past due'; }
+  else if(days===0){ cls='tag tag-med'; label='Due today'; }
+  else if(days<=7){ cls='tag tag-med'; label=days+'d left'; }
+  else { cls='tag'; label=fmtDateShort(g.deadline); }
+  return '<span class="'+cls+'" style="margin-left:8px;">'+label+'</span>';
+}
+function goalRow(g){
+  const hasTracker = g.target!=null && g.target>0;
+  const current = goalLiveCurrent(g);
+  if(g.autoTrack==='streak' && hasTracker && current>=g.target && !g.done){ g.done=true; }
+  const pct = hasTracker ? clamp(Math.round(current/g.target*100),0,100) : 0;
+  const isArmed = armed.has('goalcomplete:'+g.id);
+  return '<div class="task-item-v2 '+(g.done?'done':'')+'" style="'+(hasTracker?'':'align-items:center;')+'">'+
+    '<button class="btn btn-sm '+(g.done?'btn-good':(isArmed?'btn-primary':'btn-ghost'))+'" data-action="toggleGoal" data-id="'+g.id+'" style="flex-shrink:0;">'+(g.done?'&#10003; Done':(isArmed?'Confirm?':'Mark Done')) +'</button>'+
+    '<div style="flex:1;min-width:160px;">'+
+      '<div class="task-title">'+escapeHtml(g.label)+(g.autoTrack==='streak'?'<span class="tag" style="margin-left:8px;">&#128293; Streak</span>':'')+goalDeadlineTag(g)+'</div>'+
+      (hasTracker ? (
+        '<div class="progress" style="margin-top:6px;max-width:220px;"><div class="progress-bar" style="width:'+pct+'%;background:'+goalColor()+';'+goalGlowStyle(pct)+'"></div></div>'+
+        '<div class="kpi-sub" style="margin-top:4px;">'+current+' / '+g.target+' '+escapeHtml(g.unit||'')+'</div>'
+      ) : '')+
+    '</div>'+
+    '<button class="btn btn-ghost btn-sm" data-action="openGoalEditModal" data-id="'+g.id+'">Edit</button>'+
+  '</div>';
+}
+function openGoalEditModal(id){
+  ui.editingGoalId = id;
+  const o = document.getElementById('goalEditOverlay');
+  if(!o) return;
+  o.classList.remove('hidden');
+  renderGoalEditModalInto();
+}
+function closeGoalEditModal(){ ui.editingGoalId = null; const o=document.getElementById('goalEditOverlay'); if(o) o.classList.add('hidden'); }
+function renderGoalEditModal(){
+  const g = state.goals.items.find(function(x){return x.id===ui.editingGoalId;});
+  if(!g) return '';
+  const hasTracker = g.target!=null && g.target>0;
+  const isStreak = g.autoTrack==='streak';
+  return '<div class="section-title" style="margin-bottom:14px;">Edit Goal</div>'+
+    '<div class="field"><label>Goal</label><input class="input" id="editGoalLabel-'+g.id+'" value="'+escapeHtml(g.label)+'" style="width:100%;"></div>'+
+    '<div class="grid grid-2" style="margin-top:10px;">'+
+      '<div class="field"><label>Target (optional)</label><input class="input" type="number" id="editGoalTarget-'+g.id+'" value="'+(g.target!=null?g.target:'')+'"></div>'+
+      '<div class="field"><label>Unit (optional)</label><input class="input" id="editGoalUnit-'+g.id+'" value="'+escapeHtml(g.unit||'')+'"></div>'+
+    '</div>'+
+    '<div class="grid grid-2" style="margin-top:10px;">'+
+      '<div class="field"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="editGoalDeadline-'+g.id+'" value="'+(g.deadline||'')+'" style="flex:1;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editGoalDeadline-'+g.id+'">&#128197;</button></div></div>'+
+      '<div class="field"><label>Tracking</label><select class="input" id="editGoalTrackMode-'+g.id+'" style="width:100%;"><option value="manual" '+(!isStreak?'selected':'')+'>I\'ll update progress myself</option><option value="streak" '+(isStreak?'selected':'')+'>Auto-track from my streak</option></select></div>'+
+    '</div>'+
+    (hasTracker && !isStreak ? '<div class="field" style="margin-top:10px;"><label>Current progress</label><input class="input" type="number" id="editGoalCurrent-'+g.id+'" value="'+(g.current||0)+'"></div>' : '')+
+    (isStreak ? '<div class="kpi-sub" style="margin-top:10px;">Current progress is your live streak ('+computeStreak()+' days) — no manual entry needed.</div>' : '')+
+    '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
+      deleteBtn('goal', g.id)+
+      '<div class="row">'+
+        '<button class="btn btn-ghost" data-action="closeGoalEditModal">Cancel</button>'+
+        '<button class="btn btn-primary" data-action="saveEditGoal" data-id="'+g.id+'">Save</button>'+
+      '</div>'+
+    '</div>';
+}
+function renderGoalEditModalInto(){ const el=document.getElementById('goalEditContent'); if(el) el.innerHTML = renderGoalEditModal(); }
+function saveEditGoal(id){
+  const g = state.goals.items.find(function(x){return x.id===id;}); if(!g) return;
+  g.label = document.getElementById('editGoalLabel-'+id).value.trim() || g.label;
+  g.target = Number(document.getElementById('editGoalTarget-'+id).value) || null;
+  g.unit = document.getElementById('editGoalUnit-'+id).value.trim();
+  const deadlineEl = document.getElementById('editGoalDeadline-'+id);
+  g.deadline = deadlineEl && deadlineEl.value ? deadlineEl.value : null;
+  const trackModeEl = document.getElementById('editGoalTrackMode-'+id);
+  g.autoTrack = (trackModeEl && trackModeEl.value==='streak') ? 'streak' : null;
+  if(g.autoTrack==='streak'){
+    g.current = computeStreak();
+  } else {
+    const curEl = document.getElementById('editGoalCurrent-'+id);
+    if(curEl){
+      const val = Number(curEl.value);
+      if(!isNaN(val)) g.current = val;
+    }
+  }
+  if(g.target && g.current>=g.target && !g.done){ g.done=true; playSessionComplete(); }
+  closeGoalEditModal();
+  persist('goals'); renderView();
+}
+function addGoal(){
+  const el = document.getElementById('newGoalLabel');
+  const label = el.value.trim();
+  if(!label) return;
+  const target = Number(document.getElementById('newGoalTarget').value) || null;
+  const unit = document.getElementById('newGoalUnit').value.trim();
+  const deadlineEl = document.getElementById('newGoalDeadline');
+  const deadline = deadlineEl && deadlineEl.value ? deadlineEl.value : null;
+  const trackModeEl = document.getElementById('newGoalTrackMode');
+  const autoTrack = (trackModeEl && trackModeEl.value==='streak') ? 'streak' : null;
+  const current = autoTrack==='streak' ? computeStreak() : 0;
+  state.goals.items.push({id:uid(), label:label, done:false, target:target, current:current, unit:unit, deadline:deadline, autoTrack:autoTrack, createdAt:todayStr()});
+  playSessionComplete();
+  persist('goals'); renderView();
+}
+function toggleGoal(id){
+  const g = state.goals.items.find(function(x){ return x.id===id; }); if(!g) return;
+  if(g.done){ g.done = false; playTick(); persist('goals'); renderView(); return; }
+  const key = 'goalcomplete:'+id;
+  if(!armed.has(key)){
+    armed.add(key); renderView();
+    setTimeout(function(){ if(armed.has(key)){ armed.delete(key); renderView(); } }, 3000);
+    return;
+  }
+  armed.delete(key);
+  g.done = true;
+  playSessionComplete();
+  persist('goals'); renderView();
+}
+

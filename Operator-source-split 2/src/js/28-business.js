@@ -1,0 +1,718 @@
+// ============ BUSINESS ============
+function nextStageLabel(stage){
+  const idx = STAGE_ORDER.indexOf(stage);
+  if(idx<0 || idx>=STAGE_ORDER.length-1) return null;
+  return STAGE_LABELS[STAGE_ORDER[idx+1]];
+}
+function renderBusiness(){
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Business</div><div class="view-sub">Recurring revenue, who you\'re serving, and what you owe.</div></div></div>'+
+  '<div class="tabs">'+
+    '<div class="tab '+(ui.businessTab==='overview'?'active':'')+'" data-action="businessTab" data-tab="overview">Overview</div>'+
+    '<div class="tab '+(ui.businessTab==='clients'?'active':'')+'" data-action="businessTab" data-tab="clients">Clients</div>'+
+    '<div class="tab '+(ui.businessTab==='packages'?'active':'')+'" data-action="businessTab" data-tab="packages">Packages</div>'+
+    '<div class="tab '+(ui.businessTab==='finances'?'active':'')+'" data-action="businessTab" data-tab="finances">Finances</div>'+
+  '</div>'+
+  '<div class="tab-panel">'+(ui.businessTab==='clients' ? renderClientsTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
+}
+function renderBusinessOverview(){
+  const clients = arr(state.business.clients);
+  const activeClients = clients.filter(function(c){ return c.status==='active'; });
+  const mrr = activeClients.reduce(function(a,c){ return a+Number(c.mrr||0); },0);
+  const pipeline = arr(state.business.pipeline);
+  const potentialValue = pipeline.filter(function(p){ return p.stage!=='lost' && p.stage!=='closed'; }).reduce(function(a,p){ return a+Number(p.value||0); },0);
+
+  return '<div class="grid grid-3 section">'+
+    '<div class="card" style="text-align:center;"><div class="kpi-label">Current MRR</div><div class="hero-num" style="color:#3FBE8E;font-size:38px;">$'+mrr.toLocaleString()+'</div><div class="kpi-sub">'+activeClients.length+' Active Client'+(activeClients.length===1?'':'s')+' &middot; <button class="btn btn-ghost btn-sm" data-action="businessTab" data-tab="clients">View Clients</button></div></div>'+
+    '<div class="card" style="text-align:center;"><div class="kpi-label">Potential Pipeline Value</div><div class="hero-num" style="color:#E8A23D;font-size:38px;">$'+potentialValue.toLocaleString()+'</div><div class="kpi-sub">From Open Leads</div></div>'+
+    '<div class="card" style="text-align:center;"><div class="kpi-label">Total Potential MRR</div><div class="hero-num" style="color:#8fdcff;font-size:38px;">$'+(mrr+potentialValue).toLocaleString()+'</div><div class="kpi-sub">If Everything Closes</div></div>'+
+  '</div>'+
+  renderClientOpsPanel()+
+  renderLeadsTab();
+}
+function renderLeadsTab(){
+  const pipeline = arr(state.business.pipeline);
+  const active = pipeline.filter(function(p){ return p.stage!=='lost'; });
+  return '<div class="section"><div class="section-title">Leads &amp; Pipeline<button class="btn btn-sm" data-action="toggleForm" data-form="prospect">'+(ui.forms.prospect?'Close':'+ Add Prospect')+'</button></div>'+
+    (ui.forms.prospect ? '<div class="card" style="margin-bottom:12px;"><div class="row">'+
+      '<input class="input" id="pName" placeholder="Contact name" style="width:130px;">'+
+      '<input class="input" id="pCompany" placeholder="Company" style="width:130px;">'+
+      '<input class="input" id="pTrade" placeholder="Trade" style="width:110px;">'+
+      '<input class="input" id="pPhone" placeholder="Phone" style="width:110px;">'+
+      '<input class="input" type="number" id="pValue" placeholder="Est. value" style="width:100px;">'+
+      '<input class="input" type="date" id="pFollowUp">'+
+      '<button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="pFollowUp">&#128197;</button>'+
+      '<button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="pFollowUp">Today</button>'+
+      '<button class="btn btn-primary" data-action="addProspect" style="margin-left:auto;">Add</button>'+
+    '</div>'+
+    '<div class="field" style="margin-top:10px;"><label>Lead source</label><div class="row" style="gap:6px;">'+LEAD_SOURCES.map(function(s){ const active=ui.newProspectLeadSource===s.id; return '<span class="chip'+(active?' active':'')+'" data-action="setNewProspectLeadSource" data-value="'+s.id+'">'+s.emoji+' '+s.label+'</span>'; }).join('')+'</div></div>'+
+    '</div>' : '')+
+    '<div class="pipeline-cols">'+PIPELINE_STAGES.map(function(s){
+      const items = pipeline.filter(function(p){ return p.stage===s; });
+      const val = items.reduce(function(a,p){ return a+Number(p.value||0); },0);
+      return '<div class="card"><div class="pipeline-col-count">'+items.length+'</div><div class="pipeline-col-label">'+STAGE_LABELS[s]+'</div><div class="kpi-sub">$'+val.toLocaleString()+'</div></div>';
+    }).join('')+'</div>'+
+    '<div class="task-list">'+(active.map(prospectRow).join('') || '<div class="empty">No prospects yet.</div>')+'</div>'+
+  '</div>';
+}
+function renderClientsTab(){
+  const clients = arr(state.business.clients);
+  return '<div class="section"><div class="section-title">Clients<button class="btn btn-good btn-sm" data-action="toggleForm" data-form="client">'+(ui.forms.client?'Close':'+ Add Client')+'</button></div>'+
+    (ui.forms.client ? '<div class="card" style="margin-bottom:14px;max-width:500px;"><div class="grid grid-2">'+
+      '<input class="input" id="clientName" placeholder="Contact name">'+
+      '<input class="input" id="clientBusiness" placeholder="Business">'+
+    '</div>'+
+      '<textarea class="input" id="clientNotes" placeholder="What are they like to work with? Anything worth remembering." style="width:100%;min-height:70px;margin-top:8px;"></textarea>'+
+      '<button class="btn btn-good" style="margin-top:10px;" data-action="addClient">Add Client</button>'+
+    '</div>' : '')+
+    '<div class="client-card-grid">'+(clients.map(clientCard).join('') || '<div class="empty">No clients yet. Add one above, or convert a closed lead from the Pipeline.</div>')+'</div>'+
+  '</div>';
+}
+function manualTouchesThisWeek(c){
+  const wk = thisWeekKey();
+  return arr(c.touches).filter(function(t){ return startOfWeekStr(t)===wk; }).length;
+}
+function deliverableWeekCount(d){
+  const wk = thisWeekKey(), wkEnd = endOfWeekStr(todayStr());
+  return arr(d.completedDates).filter(function(dt){ return dt>=wk && dt<=wkEnd; }).length;
+}
+function deliverableMonthCount(d){
+  const mk = thisMonthKey();
+  return arr(d.completedDates).filter(function(dt){ return monthKeyOf(dt)===mk; }).length;
+}
+function monthlyTargetFor(d){
+  const target = d.weeklyTarget||1;
+  const now = new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  return Math.max(1, Math.round(target * daysInMonth/7));
+}
+function deliverablePaceStatus(d){
+  const monthlyTarget = monthlyTargetFor(d);
+  const now = new Date();
+  const dayOfMonth = now.getDate();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const doneThisMonth = deliverableMonthCount(d);
+  const expected = monthlyTarget * (dayOfMonth/daysInMonth);
+  if(doneThisMonth>=monthlyTarget) return 'good';
+  if(expected<=0) return 'good';
+  const ratio = doneThisMonth/expected;
+  if(ratio>=1) return 'good';
+  if(ratio>=0.6) return 'warn';
+  return 'danger';
+}
+function isDeliverableDoneThisWeek(d){
+  if(d.recurring){
+    if(deliverableMonthCount(d) >= monthlyTargetFor(d)) return true;
+    return deliverableWeekCount(d) >= (d.weeklyTarget||1);
+  }
+  return d.status==='done';
+}
+function deliverablesDoneThisWeek(c){
+  const wk = thisWeekKey();
+  return arr(c.deliverables).filter(function(d){
+    if(d.recurring) return isDeliverableDoneThisWeek(d);
+    return d.status==='done' && d.completedAt && startOfWeekStr(d.completedAt)===wk;
+  }).length;
+}
+function incrementDeliverableProgress(clientId, deliverableId){
+  const c = state.business.clients.find(function(x){return x.id===clientId;}); if(!c) return;
+  const d = arr(c.deliverables).find(function(x){return x.id===deliverableId;}); if(!d) return;
+  if(!Array.isArray(d.completedDates)) d.completedDates=[];
+  const target = d.weeklyTarget||1;
+  const count = deliverableWeekCount(d);
+  d.completedDates.push(todayStr());
+  if(count+1>=target) playTaskComplete(); else playTick();
+  persist('business'); renderView();
+  // Logging progress always counts, locked in or not — just a heads-up, not a gate.
+  if(!state.focus.activeSession) showLockInToast();
+}
+function undoDeliverableProgress(clientId, deliverableId){
+  const c = state.business.clients.find(function(x){return x.id===clientId;}); if(!c) return;
+  const d = arr(c.deliverables).find(function(x){return x.id===deliverableId;}); if(!d) return;
+  const list = arr(d.completedDates);
+  if(list.length){ list.pop(); d.completedDates = list; playTick(); persist('business'); renderView(); }
+}
+function recurringDeliverableRowHtml(clientId, d, readOnly){
+  const monthCount = deliverableMonthCount(d);
+  const monthlyTarget = monthlyTargetFor(d);
+  const weekCount = deliverableWeekCount(d);
+  const weekTarget = d.weeklyTarget||1;
+  const pace = deliverablePaceStatus(d);
+  const paceColor = pace==='good' ? 'var(--good)' : pace==='warn' ? 'var(--accent)' : 'var(--danger)';
+  return '<div class="deliv-counter">'+
+    '<div class="deliv-counter-ring" style="border-color:'+paceColor+';color:'+paceColor+';">'+monthCount+'</div>'+
+    '<div class="deliv-counter-info">'+
+      '<div class="deliv-counter-title">'+escapeHtml(d.title)+'</div>'+
+      '<div class="kpi-sub">'+monthCount+' / '+monthlyTarget+' this month &middot; '+weekCount+'/'+weekTarget+' this week</div>'+
+    '</div>'+
+    (readOnly ? '' :
+      '<div class="deliv-counter-actions">'+
+        '<button class="deliv-step-btn" data-action="undoDeliverableProgress" data-client="'+clientId+'" data-id="'+d.id+'" title="Remove one" '+(monthCount<=0?'disabled':'')+'>&#8722;</button>'+
+        '<button class="deliv-step-btn" data-action="incrementDeliverableProgress" data-client="'+clientId+'" data-id="'+d.id+'" title="Log one">&#43;</button>'+
+      '</div>'
+    )+
+  '</div>';
+}
+function clientGreenlitThisWeek(c){
+  const recurring = arr(c.deliverables).filter(function(d){ return d.recurring; });
+  const deliverablesOk = recurring.length ? recurring.every(isDeliverableDoneThisWeek) : true;
+  const touched = manualTouchesThisWeek(c) > 0;
+  return deliverablesOk && touched;
+}
+function clientHealthStatus(c){
+  // Health is the worse of: deliverable pace (are we on track for reels/ads this month?)
+  // and communication (how recently have we logged a touch with this client?).
+  const recurring = arr(c.deliverables).filter(function(d){ return d.recurring; });
+  const paceLevels = recurring.map(deliverablePaceStatus);
+  const worstPace = paceLevels.indexOf('danger')>=0 ? 'danger' : paceLevels.indexOf('warn')>=0 ? 'warn' : 'good';
+  const careTier = clientCareTier(c);
+  const careLevel = careTier.cls==='tag-danger' ? 'danger' : careTier.cls==='tag-warn' ? 'warn' : 'good';
+  const rank = {good:0, warn:1, danger:2};
+  const worst = rank[worstPace] >= rank[careLevel] ? worstPace : careLevel;
+  const level = worst==='danger' ? 'red' : worst==='warn' ? 'yellow' : 'green';
+  return {level:level, paceLevel:worstPace, careLevel:careLevel, hasDeliverables:recurring.length>0};
+}
+// kept as an alias so any lingering references keep working
+function clientWeeklyStatus(c){ return clientHealthStatus(c); }
+const CLIENT_HEALTH_META = {
+  green:{cls:'tag-good', emoji:'&#128994;', label:'Healthy'},
+  yellow:{cls:'tag-warn', emoji:'&#128993;', label:'Slipping'},
+  red:{cls:'tag-danger', emoji:'&#128308;', label:'Needs attention'}
+};
+const CLIENT_STATUS_META = CLIENT_HEALTH_META;
+function clientHealthTagHtml(c){
+  const status = clientHealthStatus(c);
+  const m = CLIENT_HEALTH_META[status.level];
+  return '<span class="tag '+m.cls+'">'+m.emoji+' '+m.label+'</span>';
+}
+function clientStatusTagHtml(c){ return clientHealthTagHtml(c); }
+function clientTouchCountThisWeek(c){ return manualTouchesThisWeek(c) + deliverablesDoneThisWeek(c); }
+function clientTendedThisWeek(c){ return clientTouchCountThisWeek(c) > 0; }
+function lastTouchInfo(c){
+  const dates = arr(c.touches).slice();
+  arr(c.deliverables).forEach(function(d){ if(d.status==='done' && d.completedAt) dates.push(d.completedAt); });
+  if(!dates.length) return null;
+  dates.sort();
+  return dates[dates.length-1];
+}
+function logClientTouch(id){
+  const c = state.business.clients.find(function(x){ return x.id===id; }); if(!c) return;
+  if(!Array.isArray(c.touches)) c.touches=[];
+  c.touches.push(todayStr());
+  playPositive();
+  persist('business'); renderView();
+  // The touch always counts, locked in or not — this is just a heads-up, not a gate.
+  if(!state.focus.activeSession) showLockInToast();
+}
+function undoClientTouch(id){
+  const c = state.business.clients.find(function(x){ return x.id===id; }); if(!c) return;
+  if(!Array.isArray(c.touches) || !c.touches.length) return;
+  c.touches.pop();
+  playTick();
+  persist('business'); renderView();
+}
+function clientCareSettings(){
+  return (state.settings && state.settings.clientCare) || defaultSettings().clientCare;
+}
+function clientCareTier(c){
+  const cfg = clientCareSettings();
+  const last = lastTouchInfo(c);
+  if(!last) return {cls:'tag-danger', label:'Never tended'};
+  const daysAgo = daysAgoFrom(last);
+  const hoursAgo = Math.max(0,daysAgo)*24;
+  if(daysAgo<=0) return {cls:'tag-good', label:'Tended today'};
+  if(hoursAgo > (cfg.redHours||72)) return {cls:'tag-danger', label:'Needs attention'};
+  if(hoursAgo > (cfg.yellowHours||48)) return {cls:'tag-warn', label:'Getting stale'};
+  return {cls:'tag-good', label:'Tended recently'};
+}
+function clientCareTagHtml(c){
+  const count = clientTouchCountThisWeek(c);
+  const tier = clientCareTier(c);
+  if(!count) return '<span class="tag '+tier.cls+'">'+tier.label+'</span>';
+  return '<span class="tag '+tier.cls+'">&#10003; Tended '+(count>1?count+'&times; ':'')+'this week</span>';
+}
+function clientCard(c){
+  const deliverables = arr(c.deliverables);
+  const doneCount = deliverables.filter(isDeliverableDoneThisWeek).length;
+  const isActive = c.status==='active';
+  const pkg = c.packageId ? arr(state.business.packages).find(function(x){return x.id===c.packageId;}) : null;
+  return '<div class="client-card">'+
+    '<div class="row" style="justify-content:space-between;align-items:flex-start;cursor:pointer;" data-action="openClientModal" data-id="'+c.id+'">'+
+      '<div>'+
+        '<div class="task-card-title" style="font-size:18px;">'+escapeHtml(c.business||c.name||'Client')+'</div>'+
+        (c.name && c.business ? '<div class="kpi-sub">'+escapeHtml(c.name)+'</div>' : '')+
+      '</div>'+
+      '<span class="tag '+(isActive?'tag-good':'tag-danger')+'">'+(isActive?'Active':'Paused')+'</span>'+
+    '</div>'+
+    '<div class="card" style="padding:12px 14px;cursor:pointer;" data-action="openClientModal" data-id="'+c.id+'">'+
+      '<div class="row" style="justify-content:space-between;align-items:center;">'+
+        (pkg ? '<span class="tag" style="background:var(--good-dim);color:var(--good);font-weight:600;">'+escapeHtml(pkg.name)+'</span>' : '<span class="kpi-sub">No package assigned</span>')+
+        (pkg && deliverables.length ? '<span class="kpi-sub">'+doneCount+' / '+deliverables.length+' done this week</span>' : '')+
+      '</div>'+
+    '</div>'+
+    (isActive ? '<div class="row" style="align-items:center;gap:8px;flex-wrap:wrap;">'+clientStatusTagHtml(c)+'</div>' : '')+
+    (c.notes ? '<div class="kpi-sub" style="line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">'+escapeHtml(c.notes)+'</div>' : '')+
+    '<div class="row" style="margin-top:auto;padding-top:10px;justify-content:flex-end;align-items:center;">'+
+      (isActive ? clientTouchControlHtml(c) : '')+
+    '</div>'+
+  '</div>';
+}
+function openClientModal(id){
+  ui.showClientModal = id;
+  ui.pickingPackageForClient = null;
+  ui.newClientJournalTag = null;
+  ui.newClientJournalDraft = '';
+  const o = document.getElementById('clientModalOverlay');
+  if(!o) return;
+  o.classList.remove('hidden');
+  renderClientModalInto();
+}
+function closeClientModal(){ ui.showClientModal = null; ui.pickingPackageForClient = null; const o=document.getElementById('clientModalOverlay'); if(o) o.classList.add('hidden'); }
+function closeClientModalAndSave(){
+  const c = state.business.clients.find(function(x){return x.id===ui.showClientModal;});
+  if(c){
+    const notesEl = document.getElementById('clientModalNotes');
+    if(notesEl) c.notes = notesEl.value.trim();
+    const startDateEl = document.getElementById('clientModalStartDate');
+    if(startDateEl) c.startDate = startDateEl.value || null;
+    const billingDayEl = document.getElementById('clientModalBillingDay');
+    if(billingDayEl) c.billingDay = clamp(Number(billingDayEl.value)||1, 1, 28);
+    persist('business');
+  }
+  closeClientModal();
+  renderView();
+}
+function viewClientJournalFromModal(id){
+  closeClientModal();
+  ui.view = 'personal';
+  ui.personalTab = 'journal';
+  ui.journalViewMode = 'clients';
+  ui.journalTabClientId = id;
+  renderView();
+  openClientJournalPopover(id);
+}
+function setClientLeadSource(id, val){
+  const c = state.business.clients.find(function(x){return x.id===id;}); if(!c) return;
+  c.leadSource = (c.leadSource===val) ? null : val;
+  persist('business'); renderClientModalInto();
+}
+function renderClientModal(){
+  const c = state.business.clients.find(function(x){return x.id===ui.showClientModal;});
+  if(!c) return '';
+  const deliverables = arr(c.deliverables);
+  const pendingCount = deliverables.filter(function(d){return !isDeliverableDoneThisWeek(d);}).length;
+  const isActive = c.status==='active';
+  const pkg = c.packageId ? arr(state.business.packages).find(function(x){return x.id===c.packageId;}) : null;
+  return '<div class="card" style="margin-bottom:16px;">'+
+      '<div class="row" style="justify-content:space-between;align-items:flex-start;">'+
+        '<div><div class="section-title" style="margin-bottom:2px;">'+escapeHtml(c.business||c.name||'Client')+'</div>'+
+        (c.name && c.business ? '<div class="kpi-sub">'+escapeHtml(c.name)+'</div>' : '')+'</div>'+
+        '<span class="tag '+(isActive?'tag-good':'tag-danger')+'" style="cursor:pointer;" data-action="toggleClientStatus" data-id="'+c.id+'" title="Tap to toggle">'+(isActive?'Active':'Paused')+'</span>'+
+      '</div>'+
+      '<div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap;align-items:center;">'+
+        clientHealthTagHtml(c)+
+        (isActive ? clientCareTagHtml(c) : '')+
+        (pkg ? '<span class="tag" style="background:var(--good-dim);color:var(--good);font-weight:600;">'+escapeHtml(pkg.name)+'</span>' : '<span class="kpi-sub">No package assigned</span>')+
+      '</div>'+
+      (isActive ? '<div class="row" style="justify-content:flex-end;margin-top:8px;">'+clientTouchControlHtml(c)+'</div>' : '')+
+    '</div>'+
+    '<div class="kpi-label" style="margin-bottom:8px;">Deliverables<span class="kpi-sub" style="margin-left:6px;">'+pendingCount+' pending</span></div>'+
+    '<div class="task-list" style="margin-bottom:8px;">'+(deliverables.map(function(d){return deliverableRow(c.id,d);}).join('') || '<div class="empty">No deliverables yet — assign a package above, or add a one-off below.</div>')+'</div>'+
+    '<span style="display:inline-block;margin-bottom:16px;font-size:12.5px;color:var(--accent);cursor:pointer;" data-action="openCustomDeliverableDrawer" data-id="'+c.id+'">&#8618; Add custom deliverable</span>'+
+    '<div class="section-title" style="margin-bottom:8px;">Plan</div>'+
+    renderClientPackageField(c)+
+    '<div class="field" style="margin-bottom:16px;"><label>How we acquired them</label><div class="row" style="gap:6px;flex-wrap:wrap;">'+LEAD_SOURCES.map(function(s){ const active=c.leadSource===s.id; return '<span class="chip'+(active?' active':'')+'" data-action="setClientLeadSource" data-id="'+c.id+'" data-value="'+s.id+'">'+s.emoji+' '+s.label+'</span>'; }).join('')+'</div></div>'+
+    clientBillingCycleFieldHtml(c)+
+    '<div class="row" style="justify-content:center;margin-bottom:16px;"><button class="btn btn-ghost btn-sm" data-action="viewClientJournalFromModal" data-id="'+c.id+'">View Client Journal &rarr;</button></div>'+
+    renderClientEventsSection(c)+
+    '<div class="field" style="margin-bottom:16px;"><label>Notes</label><textarea class="input" id="clientModalNotes" style="width:100%;min-height:80px;" placeholder="What are they like to work with? Preferences, history, anything worth remembering.">'+escapeHtml(c.notes||'')+'</textarea></div>'+
+    '<div class="row" style="justify-content:space-between;align-items:flex-end;margin-top:16px;">'+
+      renderClientDeleteControl(c)+
+      '<button class="btn btn-primary" data-action="closeClientModalAndSave">Done</button>'+
+    '</div>';
+}
+function clientBillingCycleFieldHtml(c){
+  const todayDay = new Date().getDate();
+  const hasMrr = Number(c.mrr)>0;
+  const invoiced = hasMrr && clientInvoicedThisMonth(c.id);
+  const billingDay = c.billingDay||1;
+  const overdue = hasMrr && !invoiced && todayDay>=billingDay;
+  return '<div class="field" style="margin-bottom:16px;"><label>Working together since &amp; billing cycle</label>'+
+    '<div class="card">'+
+      '<div class="row"><input class="input" type="date" id="clientModalStartDate" value="'+(c.startDate||'')+'" style="flex:1;min-width:120px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="clientModalStartDate">&#128197;</button></div>'+
+      (c.startDate ? '<div class="kpi-sub" style="margin-top:6px;">'+daysAgoFrom(c.startDate)+' days working together</div>' : '')+
+      '<div class="row" style="margin-top:10px;align-items:center;gap:8px;flex-wrap:wrap;">'+
+        '<label style="font-size:12.5px;color:var(--text-dim);white-space:nowrap;">Cycle resets on day</label>'+
+        '<input class="input" type="number" min="1" max="28" id="clientModalBillingDay" value="'+billingDay+'" style="width:70px;">'+
+        (hasMrr ? (invoiced ? '<span class="tag tag-general">Invoiced this month</span>' : (overdue ? '<span class="tag tag-high">&#9888; Overdue for invoice</span>' : '<span class="tag tag-med">Bills the '+ordinal(billingDay)+'</span>')) : '<span class="kpi-sub">No retainer set</span>')+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+function renderClientDeleteControl(c){
+  const label = c.business || c.name || 'this client';
+  return '<div style="text-align:left;">'+
+    '<div class="kpi-sub" style="margin-bottom:6px;">Type "'+escapeHtml(label)+'" to remove this client.</div>'+
+    '<div class="row" style="gap:6px;">'+
+      '<input class="input" id="clientDeleteConfirmInput" data-client-name="'+escapeHtml(label)+'" placeholder="'+escapeHtml(label)+'" style="max-width:200px;">'+
+      '<button class="btn btn-danger btn-sm" id="clientDeleteConfirmBtn" data-action="confirmDeleteClientTyped" data-id="'+c.id+'" disabled>Remove Client</button>'+
+    '</div>'+
+  '</div>';
+}
+function renderClientEventsSection(c){
+  const events = arr(state.calendar.events).filter(function(e){ return e.linkedClient===c.id; }).sort(function(a,b){ return (a.date+String(a.time||'')).localeCompare(b.date+String(b.time||'')); });
+  const upcoming = events.filter(function(e){ return e.date>=todayStr(); });
+  if(!upcoming.length) return '';
+  return '<div class="section-title" style="margin-top:16px;margin-bottom:8px;">Upcoming Calendar Events</div>'+
+    '<div class="task-list" style="margin-bottom:16px;">'+upcoming.map(function(e){
+      return '<div class="task-item-v2">'+
+        '<div style="font-family:var(--font-display);font-weight:700;width:80px;">'+fmtDateShort(e.date)+'</div>'+
+        '<div class="task-title" style="flex:1;">'+escapeHtml(e.title)+(e.time?' &middot; '+fmt12Hour(e.time):'')+'</div>'+
+        '<button class="btn btn-ghost btn-sm" data-action="openCalEventModal" data-id="'+e.id+'">Edit</button>'+
+      '</div>';
+    }).join('')+'</div>';
+}
+function renderClientPackageField(c){
+  const packages = arr(state.business.packages);
+  const assigned = c.packageId ? packages.find(function(x){return x.id===c.packageId;}) : null;
+  const picking = ui.pickingPackageForClient === c.id;
+  let body;
+  if(picking){
+    if(!packages.length){
+      body = '<div class="kpi-sub">No packages yet — add one in Business &rarr; Packages first.</div><button class="btn btn-ghost btn-sm" style="margin-top:8px;" data-action="cancelPickPackage">Cancel</button>';
+    } else {
+      body = '<div class="row"><select class="input" id="clientPackageSelect" style="flex:1;">'+
+          packages.map(function(pk){ return '<option value="'+pk.id+'" '+(c.packageId===pk.id?'selected':'')+'>'+escapeHtml(pk.name)+' ('+arr(pk.deliverables).length+' deliverables)</option>'; }).join('')+
+        '</select>'+
+        '<button class="btn btn-good btn-sm" data-action="assignClientPackage" data-id="'+c.id+'">Assign</button>'+
+        '<button class="btn btn-ghost btn-sm" data-action="cancelPickPackage">Cancel</button>'+
+      '</div>';
+    }
+  } else if(assigned){
+    body = '<div class="row" style="justify-content:space-between;align-items:center;">'+
+      '<span class="tag" style="background:var(--good-dim);color:var(--good);">'+escapeHtml(assigned.name)+(assigned.price?' &middot; $'+Number(assigned.price).toLocaleString():'')+'</span>'+
+      '<div class="row"><button class="btn btn-ghost btn-sm" data-action="pickPackageForClient" data-id="'+c.id+'">Change</button><button class="btn btn-ghost btn-sm" data-action="clearClientPackage" data-id="'+c.id+'">Remove</button></div>'+
+    '</div>';
+  } else {
+    body = '<button class="btn btn-ghost btn-sm" data-action="pickPackageForClient" data-id="'+c.id+'">+ Set Package</button>';
+  }
+  return '<div class="field" style="margin-bottom:16px;"><label>Package</label><div class="card">'+body+'</div></div>';
+}
+function pickPackageForClient(id){ ui.pickingPackageForClient = id; renderClientModalInto(); }
+function cancelPickPackage(){ ui.pickingPackageForClient = null; renderClientModalInto(); }
+function assignClientPackage(clientId){
+  const c = state.business.clients.find(function(x){return x.id===clientId;}); if(!c) return;
+  const sel = document.getElementById('clientPackageSelect');
+  const pk = sel ? arr(state.business.packages).find(function(x){return x.id===sel.value;}) : null;
+  if(!pk) return;
+  c.deliverables = arr(c.deliverables).filter(function(d){ return !d.fromPackage; });
+  arr(pk.deliverables).forEach(function(d){
+    c.deliverables.push({id:uid(), title:d.title, dueDate:null, status:'pending', linkedTaskId:null, fromPackage:true, recurring:true, completedDates:[], weeklyTarget:d.weeklyTarget||1, sourceId:d.id});
+  });
+  c.packageId = pk.id;
+  ui.pickingPackageForClient = null;
+  playPositive();
+  persist('business'); renderClientModalInto(); renderView();
+}
+function clearClientPackage(clientId){
+  const c = state.business.clients.find(function(x){return x.id===clientId;}); if(!c) return;
+  c.deliverables = arr(c.deliverables).filter(function(d){ return !d.fromPackage; });
+  c.packageId = null;
+  persist('business'); renderClientModalInto(); renderView();
+}
+function openCustomDeliverableDrawer(clientId){
+  ui.customDeliverableClientId = clientId;
+  const o = document.getElementById('customDeliverableOverlay');
+  if(!o) return;
+  o.classList.remove('hidden');
+  renderCustomDeliverableDrawerInto();
+}
+function closeCustomDeliverableDrawer(){ ui.customDeliverableClientId = null; const o=document.getElementById('customDeliverableOverlay'); if(o) o.classList.add('hidden'); }
+function renderCustomDeliverableDrawer(){
+  const c = state.business.clients.find(function(x){return x.id===ui.customDeliverableClientId;});
+  if(!c) return '';
+  return '<div class="section-title" style="margin-bottom:14px;">Custom Deliverable<span class="kpi-sub">'+escapeHtml(c.business||c.name||'')+'</span></div>'+
+    '<div class="field"><label>Title</label><input class="input" id="newDeliverableTitle" placeholder="e.g. 4 reels" style="width:100%;"></div>'+
+    '<div class="field" style="margin-top:10px;"><label>Due date (optional)</label><div class="row"><input class="input" type="date" id="newDeliverableDue" style="flex:1;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newDeliverableDue">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="newDeliverableDue">Today</button></div></div>'+
+    '<label class="row" style="margin-top:12px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newDeliverableLinkTask" checked style="margin-right:6px;">Also add to Tasks &amp; Calendar</label>'+
+    '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
+      '<button class="btn btn-ghost" data-action="closeCustomDeliverableDrawer">Cancel</button>'+
+      '<button class="btn btn-primary" data-action="addDeliverable" data-id="'+c.id+'">Add Deliverable</button>'+
+    '</div>';
+}
+function renderCustomDeliverableDrawerInto(){ const el=document.getElementById('customDeliverableContent'); if(el) el.innerHTML = renderCustomDeliverableDrawer(); }
+function renderClientModalInto(){ const el=document.getElementById('clientModalContent'); if(el) el.innerHTML = renderClientModal(); }
+function deliverableRow(clientId, d){
+  if(d.recurring){
+    const target = d.weeklyTarget||1;
+    return '<div class="task-item-v2">'+
+      '<div style="flex:1;min-width:100px;">'+recurringDeliverableRowHtml(clientId, d, false)+'</div>'+
+      '<span class="tag" style="background:var(--good-dim);color:var(--good);">'+(target>1?target+'&times;/week':'Weekly')+'</span>'+
+      '<button class="btn btn-ghost btn-sm" data-action="removeDeliverable" data-client="'+clientId+'" data-id="'+d.id+'" title="'+(d.fromPackage?"Doesn't apply to this client — won't affect the package":'Remove')+'">Remove</button>'+
+    '</div>';
+  }
+  const overdue = d.status!=='done' && d.dueDate && d.dueDate<todayStr();
+  const dueThisWeek = d.status!=='done' && d.dueDate && !overdue && d.dueDate>=thisWeekKey() && d.dueDate<=endOfWeekStr(todayStr());
+  return '<div class="task-item-v2 '+(d.status==='done'?'done':'')+'">'+
+    '<div class="checkbox '+(d.status==='done'?'checked':'')+'" data-action="toggleDeliverable" data-client="'+clientId+'" data-id="'+d.id+'">'+(d.status==='done'?'&#10003;':'')+'</div>'+
+    '<div style="flex:1;min-width:100px;"><div class="task-title">'+escapeHtml(d.title)+'</div></div>'+
+    (d.fromPackage ? '<span class="tag" style="background:var(--good-dim);color:var(--good);">Package</span>' : '')+
+    (dueThisWeek ? '<span class="tag tag-med">This week</span>' : '')+
+    (d.dueDate ? '<span class="kpi-sub" style="color:'+(overdue?'var(--danger)':'var(--text-faint)')+';">Due '+fmtDateShort(d.dueDate)+'</span>' : '')+
+    '<button class="btn btn-ghost btn-sm" data-action="removeDeliverable" data-client="'+clientId+'" data-id="'+d.id+'" title="'+(d.fromPackage?"Doesn't apply to this client — won't affect the package":'Remove')+'">Remove</button>'+
+  '</div>';
+}
+function addDeliverable(clientId){
+  const c = state.business.clients.find(function(x){return x.id===clientId;}); if(!c) return;
+  const titleEl = document.getElementById('newDeliverableTitle');
+  const title = titleEl.value.trim();
+  if(!title) return;
+  const dueDate = document.getElementById('newDeliverableDue').value || null;
+  const linkTask = document.getElementById('newDeliverableLinkTask').checked;
+  if(!Array.isArray(c.deliverables)) c.deliverables = [];
+  const deliverable = {id:uid(), title:title, dueDate:dueDate, status:'pending', linkedTaskId:null};
+  if(linkTask){
+    const taskId = uid();
+    state.tasks.items.push({id:taskId, title:title+' — '+(c.business||c.name||'Client'), client:c.id, clients:[c.id], priority:'med', deadline:dueDate, notes:'Deliverable for '+(c.business||c.name||'client'), status:'backlog', createdAt:todayStr(), completedAt:null});
+    deliverable.linkedTaskId = taskId;
+    persist('tasks');
+  }
+  c.deliverables.push(deliverable);
+  playPositive();
+  closeCustomDeliverableDrawer();
+  persist('business'); renderView();
+}
+function toggleDeliverable(clientId, deliverableId){
+  const c = state.business.clients.find(function(x){return x.id===clientId;}); if(!c) return;
+  const d = arr(c.deliverables).find(function(x){return x.id===deliverableId;}); if(!d) return;
+  if(d.recurring){
+    incrementDeliverableProgress(clientId, deliverableId);
+    return;
+  }
+  d.status = d.status==='done' ? 'pending' : 'done';
+  d.completedAt = d.status==='done' ? todayStr() : null;
+  if(d.linkedTaskId){
+    const t = state.tasks.items.find(function(x){return x.id===d.linkedTaskId;});
+    if(t){
+      if(d.status==='done'){ t.status='done'; t.completedAt=todayStr(); } else { t.status='backlog'; t.completedAt=null; }
+      persist('tasks');
+    }
+  }
+  if(d.status==='done') playTaskComplete();
+  persist('business'); renderView();
+}
+function removeDeliverable(clientId, deliverableId){
+  const c = state.business.clients.find(function(x){return x.id===clientId;}); if(!c) return;
+  const d = arr(c.deliverables).find(function(x){return x.id===deliverableId;});
+  c.deliverables = arr(c.deliverables).filter(function(x){return x.id!==deliverableId;});
+  if(d && d.linkedTaskId){
+    state.tasks.items = state.tasks.items.filter(function(x){return x.id!==d.linkedTaskId;});
+    persist('tasks');
+  }
+  persist('business'); renderView();
+}
+function prospectRow(p){
+  const nsl = nextStageLabel(p.stage);
+  const primaryName = p.company || p.name;
+  const secondaryName = (p.company && p.name) ? p.name : '';
+  const canUndo = Array.isArray(p.stageHistory) && p.stageHistory.length>0;
+  const src = p.leadSource ? leadSourceById(p.leadSource) : null;
+  return '<div class="lead-card" data-action="openProspectEditModal" data-id="'+p.id+'" style="cursor:pointer;">'+
+    '<div class="lead-row" style="grid-template-columns:minmax(120px,2fr) 118px 130px 90px 100px 28px;align-items:center;">'+
+      '<div class="lead-name">'+escapeHtml(primaryName)+(secondaryName?' <span class="kpi-sub">'+escapeHtml(secondaryName)+'</span>':'')+'</div>'+
+      '<span class="tag stage-'+p.stage+'" '+(nsl?'data-action="advanceStage" data-id="'+p.id+'" style="cursor:pointer;" title="Click to move to '+nsl+'"':'')+'>'+STAGE_LABELS[p.stage]+'</span>'+
+      (src ? '<span class="tag" style="background:'+src.color+'22;color:'+src.color+';">'+src.emoji+' '+escapeHtml(src.label)+'</span>' : '<span></span>')+
+      '<div class="lead-value">$'+Number(p.value||0).toLocaleString()+'</div>'+
+      '<div class="lead-followup kpi-sub">'+(p.nextFollowUp?fmtDateShort(p.nextFollowUp):'—')+'</div>'+
+      (canUndo ? '<button class="btn btn-ghost btn-sm" data-action="undoStage" data-id="'+p.id+'" title="Undo last stage change" style="padding:4px 6px;">&#8630;</button>' : '<span></span>')+
+    '</div>'+
+    (p.stage==='closed' ? (p.convertedClientId ?
+      '<div class="kpi-sub" style="padding-left:4px;margin-top:4px;color:var(--good);">&#10003; Added as client</div>' :
+      '<div style="padding-left:4px;margin-top:6px;"><button class="btn btn-good btn-sm" data-action="convertToClient" data-id="'+p.id+'">+ Add as Client</button></div>'
+    ) : '')+
+  '</div>';
+}
+function toggleProspectSelect(id){
+  if(ui.selectedProspectIds.has(id)) ui.selectedProspectIds.delete(id); else ui.selectedProspectIds.add(id);
+  renderView();
+}
+function clearProspectSelection(){ ui.selectedProspectIds.clear(); renderView(); }
+function renderProspectToolbar(){
+  const ids = Array.from(ui.selectedProspectIds).filter(function(id){ return state.business.pipeline.some(function(p){return p.id===id;}); });
+  if(!ids.length) return '';
+  const selected = ids.map(function(id){ return state.business.pipeline.find(function(p){return p.id===id;}); }).filter(Boolean);
+  const anyAdvanceable = selected.some(function(p){ return !!nextStageLabel(p.stage); });
+  const anyNotLost = selected.some(function(p){ return p.stage!=='lost'; });
+  const oneClosedSelected = ids.length===1 && selected[0].stage==='closed' && !selected[0].convertedClientId;
+  return '<div class="bulk-toolbar section">'+
+    '<span class="toolbar-label">'+ids.length+' selected</span>'+
+    '<div class="toolbar-actions">'+
+      (ids.length===1 ? '<button class="btn btn-sm" data-action="openProspectEditModal" data-id="'+ids[0]+'">Edit</button>' : '')+
+      (anyAdvanceable ? '<button class="btn btn-ghost btn-sm" data-action="bulkAdvanceStage">Advance Stage</button>' : '')+
+      (oneClosedSelected ? '<button class="btn btn-good btn-sm" data-action="convertToClient" data-id="'+ids[0]+'">Add as Client</button>' : '')+
+      (anyNotLost ? '<button class="btn btn-ghost btn-sm" data-action="bulkMarkLost">Mark as Lost</button>' : '')+
+      '<button class="btn btn-danger btn-sm" data-action="bulkRemoveProspects">Remove</button>'+
+    '</div>'+
+    '<button class="btn btn-ghost btn-sm toolbar-cancel" data-action="clearProspectSelection">Cancel</button>'+
+  '</div>';
+}
+function bulkAdvanceStage(){ Array.from(ui.selectedProspectIds).forEach(function(id){ advanceStageQuiet(id); }); ui.selectedProspectIds.clear(); persist('business'); renderView(); }
+function bulkMarkLost(){ Array.from(ui.selectedProspectIds).forEach(function(id){ const p=state.business.pipeline.find(function(x){return x.id===id;}); if(p) p.stage='lost'; }); ui.selectedProspectIds.clear(); persist('business'); renderView(); }
+function bulkRemoveProspects(){
+  const ids = new Set(ui.selectedProspectIds);
+  state.business.pipeline = state.business.pipeline.filter(function(p){ return !ids.has(p.id); });
+  ui.selectedProspectIds.clear();
+  persist('business'); renderView();
+}
+function openProspectEditModal(id){
+  ui.editingProspectId = id;
+  const o = document.getElementById('prospectEditOverlay');
+  if(!o) return;
+  o.classList.remove('hidden');
+  renderProspectEditModalInto();
+}
+function closeProspectEditModal(){ ui.editingProspectId = null; ui.selectedProspectIds.clear(); const o=document.getElementById('prospectEditOverlay'); if(o) o.classList.add('hidden'); }
+function setEditingProspectLeadSource(val){
+  const p = state.business.pipeline.find(function(x){return x.id===ui.editingProspectId;});
+  if(!p) return;
+  p.leadSource = val;
+  renderProspectEditModalInto();
+}
+function renderProspectEditModal(){
+  const p = state.business.pipeline.find(function(x){return x.id===ui.editingProspectId;});
+  if(!p) return '';
+  return '<div class="section-title" style="margin-bottom:14px;">Edit Lead</div>'+
+    '<div class="grid grid-2">'+
+      '<div class="field"><label>Contact name</label><input class="input" id="editPName-'+p.id+'" value="'+escapeHtml(p.name)+'"></div>'+
+      '<div class="field"><label>Company</label><input class="input" id="editPCompany-'+p.id+'" value="'+escapeHtml(p.company||'')+'"></div>'+
+    '</div>'+
+    '<div class="grid grid-2" style="margin-top:10px;">'+
+      '<div class="field"><label>Est. value</label><input class="input" type="number" id="editPValue-'+p.id+'" value="'+(p.value||0)+'"></div>'+
+      '<div class="field"><label>Follow-up date</label><div class="row"><input class="input" type="date" id="editPFollowUp-'+p.id+'" value="'+(p.nextFollowUp||'')+'"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editPFollowUp-'+p.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="editPFollowUp-'+p.id+'">Today</button></div></div>'+
+    '</div>'+
+    '<div class="field" style="margin-top:10px;"><label>Lead source</label><div class="row" style="gap:6px;">'+LEAD_SOURCES.map(function(s){ const active=p.leadSource===s.id; return '<span class="chip'+(active?' active':'')+'" data-action="setEditingProspectLeadSource" data-value="'+s.id+'">'+s.emoji+' '+s.label+'</span>'; }).join('')+'</div></div>'+
+    '<div class="row" style="margin-top:20px;justify-content:space-between;align-items:center;">'+
+      deleteBtn('prospect', p.id)+
+      '<div class="row">'+
+        '<button class="btn btn-ghost" data-action="closeProspectEditModal">Cancel</button>'+
+        '<button class="btn btn-primary" data-action="saveEditProspect" data-id="'+p.id+'">Save</button>'+
+      '</div>'+
+    '</div>';
+}
+function renderProspectEditModalInto(){ const el=document.getElementById('prospectEditContent'); if(el) el.innerHTML = renderProspectEditModal(); }
+function saveEditProspect(id){
+  const p = state.business.pipeline.find(function(x){return x.id===id;}); if(!p) return;
+  p.name = document.getElementById('editPName-'+id).value.trim() || p.name;
+  p.company = document.getElementById('editPCompany-'+id).value.trim();
+  p.value = Number(document.getElementById('editPValue-'+id).value)||0;
+  p.nextFollowUp = document.getElementById('editPFollowUp-'+id).value || null;
+  closeProspectEditModal();
+  persist('business'); renderView();
+}
+function addClient(){
+  const name = document.getElementById('clientName').value.trim();
+  const business = document.getElementById('clientBusiness').value.trim();
+  const notesEl = document.getElementById('clientNotes');
+  const notes = notesEl ? notesEl.value.trim() : '';
+  if(!name && !business) return;
+  state.business.clients.push({id:uid(), name:name, business:business, leadSource:null, mrr:0, billingDay:1, status:'active', notes:notes, deliverables:[], journal:[], createdAt:todayStr()});
+  ui.forms.client = false;
+  playPositive();
+  persist('business'); renderView();
+}
+function toggleClientStatus(id){
+  const c = state.business.clients.find(function(x){ return x.id===id; }); if(!c) return;
+  c.status = c.status==='active' ? 'paused' : 'active';
+  persist('business'); renderView();
+}
+function addProspect(){
+  const name = document.getElementById('pName').value.trim();
+  if(!name) return;
+  state.business.pipeline.push({
+    id:uid(), name:name,
+    company: document.getElementById('pCompany').value.trim(),
+    trade: document.getElementById('pTrade').value.trim(),
+    phone: document.getElementById('pPhone').value.trim(),
+    value: Number(document.getElementById('pValue').value)||0,
+    nextFollowUp: document.getElementById('pFollowUp').value || null,
+    leadSource: ui.newProspectLeadSource || null,
+    stage:'lead', notes:'', createdAt:todayStr()
+  });
+  ui.newProspectLeadSource = null;
+  playPositive();
+  persist('business'); renderView();
+}
+function convertProspectToClient(p){
+  if(!p) return null;
+  if(p.convertedClientId) return p.convertedClientId;
+  const clientId = uid();
+  state.business.clients.push({id:clientId, name:p.name, business:p.company, leadSource:p.leadSource||null, mrr:p.value||0, billingDay:1, status:'active', notes:'', deliverables:[], journal:[], createdAt:todayStr()});
+  p.convertedClientId = clientId;
+  return clientId;
+}
+function advanceStageQuiet(id){
+  const p = state.business.pipeline.find(function(x){ return x.id===id; }); if(!p) return;
+  const idx = STAGE_ORDER.indexOf(p.stage);
+  if(idx>=0 && idx<STAGE_ORDER.length-1){
+    if(!Array.isArray(p.stageHistory)) p.stageHistory=[];
+    p.stageHistory.push(p.stage);
+    p.stage = STAGE_ORDER[idx+1];
+  }
+  if(p.stage==='closed') convertProspectToClient(p);
+}
+function advanceStage(id){
+  const p = state.business.pipeline.find(function(x){ return x.id===id; }); if(!p) return;
+  const idx = STAGE_ORDER.indexOf(p.stage);
+  if(idx>=0 && idx<STAGE_ORDER.length-1){
+    if(!Array.isArray(p.stageHistory)) p.stageHistory=[];
+    p.stageHistory.push(p.stage);
+    p.stage = STAGE_ORDER[idx+1];
+  }
+  let newClientId = null;
+  if(p.stage==='closed'){
+    newClientId = convertProspectToClient(p);
+    playPositive();
+  }
+  persist('business');
+  if(newClientId){
+    openClientModal(newClientId);
+    ui.pickingPackageForClient = newClientId;
+    renderClientModalInto();
+  } else {
+    renderView();
+  }
+}
+function undoStage(id){
+  const p = state.business.pipeline.find(function(x){ return x.id===id; }); if(!p) return;
+  if(!Array.isArray(p.stageHistory) || !p.stageHistory.length) return;
+  const wasClosed = p.stage==='closed';
+  p.stage = p.stageHistory.pop();
+  if(wasClosed && p.stage!=='closed' && p.convertedClientId){
+    const c = state.business.clients.find(function(x){ return x.id===p.convertedClientId; });
+    if(c && !arr(c.deliverables).length && Number(c.mrr)===Number(p.value||0)){
+      state.business.clients = state.business.clients.filter(function(x){ return x.id!==c.id; });
+    }
+    p.convertedClientId = null;
+  }
+  playTick();
+  persist('business'); renderView();
+}
+function markLost(id){
+  const p=state.business.pipeline.find(function(x){return x.id===id;}); if(!p) return;
+  if(!Array.isArray(p.stageHistory)) p.stageHistory=[];
+  p.stageHistory.push(p.stage);
+  p.stage='lost'; persist('business'); renderView();
+}
+function setNewProspectLeadSource(val){
+  ui.newProspectLeadSource = (ui.newProspectLeadSource===val) ? null : val;
+  document.querySelectorAll('[data-action="setNewProspectLeadSource"]').forEach(function(chipEl){
+    chipEl.classList.toggle('active', chipEl.dataset.value===ui.newProspectLeadSource);
+  });
+}
+function convertToClient(id){
+  const p = state.business.pipeline.find(function(x){ return x.id===id; }); if(!p) return;
+  const already = !!p.convertedClientId;
+  convertProspectToClient(p);
+  if(!already) playPositive();
+  persist('business'); renderView();
+}
+

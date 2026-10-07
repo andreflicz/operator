@@ -1,0 +1,82 @@
+#!/bin/bash
+# Launch the Operator dashboard as a chromeless Chrome "app window":
+# no tabs, no address bar, no bookmarks bar.
+
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+HTML_FILE="$DIR/Resources/command-center-2.html"
+
+CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
+if [ ! -x "$CHROME" ]; then
+  osascript -e 'display alert "Google Chrome not found" message "Operator needs Google Chrome installed at /Applications/Google Chrome.app to run as an app window." as critical'
+  exit 1
+fi
+
+# A dedicated Chrome profile just for this app, so it doesn't interfere
+# with your normal Chrome windows/tabs/history.
+PROFILE_DIR="$HOME/Library/Application Support/OperatorAppProfile"
+mkdir -p "$PROFILE_DIR"
+
+# --- App Activity tracking -------------------------------------------------
+# Operator can show which app is currently in the foreground and auto lock-in
+# when you've been steady on one app for a while. A web page can't see other
+# apps on its own, so this wrapper does the OS-level part: it polls the
+# frontmost app via System Events and serves recent samples over a tiny,
+# loopback-only (127.0.0.1) HTTP endpoint that the page polls. Nothing here
+# ever leaves the machine, and if any of this fails, the app just runs
+# without that feature — everything else works normally either way.
+DATA_DIR="$HOME/Library/Application Support/Operator"
+mkdir -p "$DATA_DIR"
+ACTIVITY_LOG="$DATA_DIR/activity.log"
+touch "$ACTIVITY_LOG" 2>/dev/null
+ACTIVITY_PORT=8934
+
+poll_frontmost() {
+  while true; do
+    APP=$(osascript -e 'tell application "System Events" to get name of first application process whose frontmost is true' 2>/dev/null)
+    if [ -n "$APP" ]; then
+      printf '%s\t%s\n' "$(date +%s000)" "$APP" >> "$ACTIVITY_LOG" 2>/dev/null
+    fi
+    # Keep the log from growing forever — the app only ever needs recent history.
+    if [ -f "$ACTIVITY_LOG" ]; then
+      tail -n 6000 "$ACTIVITY_LOG" > "$ACTIVITY_LOG.tmp" 2>/dev/null && mv "$ACTIVITY_LOG.tmp" "$ACTIVITY_LOG" 2>/dev/null
+    fi
+    sleep 10
+  done
+}
+
+serve_activity() {
+  while true; do
+    { printf 'HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/plain; charset=utf-8\r\nConnection: close\r\n\r\n'
+      cat "$ACTIVITY_LOG" 2>/dev/null
+    } | nc -l 127.0.0.1 "$ACTIVITY_PORT" >/dev/null 2>&1
+  done
+}
+
+POLL_PID=""
+SERVE_PID=""
+if command -v osascript >/dev/null 2>&1 && command -v nc >/dev/null 2>&1; then
+  poll_frontmost &
+  POLL_PID=$!
+  serve_activity &
+  SERVE_PID=$!
+fi
+
+cleanup() {
+  [ -n "$POLL_PID" ] && kill "$POLL_PID" 2>/dev/null
+  [ -n "$SERVE_PID" ] && kill "$SERVE_PID" 2>/dev/null
+}
+trap cleanup EXIT
+
+"$CHROME" \
+  --app="file://$HTML_FILE" \
+  --user-data-dir="$PROFILE_DIR" \
+  --window-size=1400,900 \
+  --no-first-run \
+  --no-default-browser-check \
+  > /dev/null 2>&1 &
+CHROME_PID=$!
+
+# Wait for Chrome to actually quit before this wrapper exits, so the
+# background poller/server above get cleaned up instead of lingering.
+wait "$CHROME_PID"
