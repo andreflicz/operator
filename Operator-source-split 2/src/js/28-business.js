@@ -8,11 +8,12 @@ function renderBusiness(){
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Business</div><div class="view-sub">Recurring revenue, who you\'re serving, and what you owe.</div></div></div>'+
   '<div class="tabs">'+
     '<div class="tab '+(ui.businessTab==='overview'?'active':'')+'" data-action="businessTab" data-tab="overview">Overview</div>'+
+    '<div class="tab '+(ui.businessTab==='leads'?'active':'')+'" data-action="businessTab" data-tab="leads">Leads</div>'+
     '<div class="tab '+(ui.businessTab==='clients'?'active':'')+'" data-action="businessTab" data-tab="clients">Clients</div>'+
     '<div class="tab '+(ui.businessTab==='packages'?'active':'')+'" data-action="businessTab" data-tab="packages">Packages</div>'+
     '<div class="tab '+(ui.businessTab==='finances'?'active':'')+'" data-action="businessTab" data-tab="finances">Finances</div>'+
   '</div>'+
-  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='clients' ? renderClientsTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
+  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderCrmTab('client') : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
 }
 function renderBusinessOverview(){
   const clients = arr(state.business.clients);
@@ -26,9 +27,21 @@ function renderBusinessOverview(){
     '<div class="card" style="text-align:center;"><div class="kpi-label">Potential Pipeline Value</div><div class="hero-num" style="color:#E8A23D;font-size:38px;">$'+potentialValue.toLocaleString()+'</div><div class="kpi-sub">From Open Leads</div></div>'+
     '<div class="card" style="text-align:center;"><div class="kpi-label">Total Potential MRR</div><div class="hero-num" style="color:#8fdcff;font-size:38px;">$'+(mrr+potentialValue).toLocaleString()+'</div><div class="kpi-sub">If Everything Closes</div></div>'+
   '</div>'+
-  renderClientOpsPanel()+
-  renderLeadsTab();
+  renderReachOutPanel(false)+
+  renderPipelineGlance()+
+  renderClientOpsPanel();
 }
+function renderPipelineGlance(){
+  const stages = crmStages('lead');
+  const pipeline = arr(state.business.pipeline);
+  return '<div class="section"><div class="section-title">Pipeline<span class="view-all-link" data-action="businessTab" data-tab="leads">Open Leads &rarr;</span></div>'+
+    '<div class="pipeline-glance">'+stages.map(function(s){
+      const items = pipeline.filter(function(p){ return p.stage===s.id; });
+      const val = items.reduce(function(a,p){ return a+Number(p.value||0); },0);
+      return '<div class="pipeline-glance-col" data-action="crmJumpStage" data-id="'+s.id+'"><span class="crm-col-dot" style="background:'+s.color+'"></span><div class="pipeline-col-count">'+items.length+'</div><div class="pipeline-col-label">'+escapeHtml(s.label)+'</div><div class="kpi-sub">$'+val.toLocaleString()+'</div></div>';
+    }).join('')+'</div></div>';
+}
+ACTIONS.crmJumpStage = function(el, e, id){ ui.businessTab='leads'; crmUi('lead').stage = id; renderView(); };
 function renderLeadsTab(){
   const pipeline = arr(state.business.pipeline);
   const active = pipeline.filter(function(p){ return p.stage!=='lost'; });
@@ -206,33 +219,35 @@ function lastTouchInfo(c){
 }
 function logClientTouch(id){
   const c = state.business.clients.find(function(x){ return x.id===id; }); if(!c) return;
-  if(!Array.isArray(c.touches)) c.touches=[];
-  c.touches.push(todayStr());
-  playPositive();
-  persist('business'); renderView();
+  logTouch('client', id);
   // The touch always counts, locked in or not — this is just a heads-up, not a gate.
   if(!state.focus.activeSession) showLockInToast();
 }
 function undoClientTouch(id){
   const c = state.business.clients.find(function(x){ return x.id===id; }); if(!c) return;
   if(!Array.isArray(c.touches) || !c.touches.length) return;
-  c.touches.pop();
+  const d = c.touches.pop();
+  const tpIdx = arr(c.touchpoints).map(function(t){ return t.date; }).lastIndexOf(d);
+  if(tpIdx>=0) c.touchpoints.splice(tpIdx,1);
   playTick();
   persist('business'); renderView();
 }
 function clientCareSettings(){
   return (state.settings && state.settings.clientCare) || defaultSettings().clientCare;
 }
+// Communication health follows the client's touch cadence: fine until the next touch is
+// due, amber once it's overdue, red when overdue by more than half the cadence.
 function clientCareTier(c){
-  const cfg = clientCareSettings();
-  const last = lastTouchInfo(c);
-  if(!last) return {cls:'tag-danger', label:'Never tended'};
-  const daysAgo = daysAgoFrom(last);
-  const hoursAgo = Math.max(0,daysAgo)*24;
-  if(daysAgo<=0) return {cls:'tag-good', label:'Tended today'};
-  if(hoursAgo > (cfg.redHours||72)) return {cls:'tag-danger', label:'Needs attention'};
-  if(hoursAgo > (cfg.yellowHours||48)) return {cls:'tag-warn', label:'Getting stale'};
-  return {cls:'tag-good', label:'Tended recently'};
+  const last = crmLastTouch('client', c) || lastTouchInfo(c);
+  // A client with no touch yet is measured from when they were added (same as the cadence).
+  const base = last || c.createdAt || c.startDate;
+  if(!base) return {cls:'tag-danger', label:'Never touched'};
+  if(last && daysAgoFrom(last)<=0) return {cls:'tag-good', label:'Touched today'};
+  const cad = crmCadence('client', c);
+  const over = daysAgoFrom(addDays(base, cad));
+  if(over < 0) return {cls:'tag-good', label: last ? 'In touch' : 'New — no touch yet'};
+  if(over <= Math.max(1, Math.floor(cad/2))) return {cls:'tag-warn', label: over===0 ? 'Touch due today' : 'Touch overdue '+over+'d'};
+  return {cls:'tag-danger', label:'No touch in '+daysAgoFrom(last)+'d'};
 }
 function clientCareTagHtml(c){
   const count = clientTouchCountThisWeek(c);
@@ -316,7 +331,7 @@ function renderClientModal(){
       '<div class="row" style="justify-content:space-between;align-items:flex-start;">'+
         '<div><div class="section-title" style="margin-bottom:2px;">'+escapeHtml(c.business||c.name||'Client')+'</div>'+
         (c.name && c.business ? '<div class="kpi-sub">'+escapeHtml(c.name)+'</div>' : '')+'</div>'+
-        '<span class="tag '+(isActive?'tag-good':'tag-danger')+'" style="cursor:pointer;" data-action="toggleClientStatus" data-id="'+c.id+'" title="Tap to toggle">'+(isActive?'Active':'Paused')+'</span>'+
+        (function(){ const st = crmStage('client', c.stage); return '<span class="tag" style="background:'+(st?st.color:'#8A90A2')+'22;color:'+(st?st.color:'#8A90A2')+';">'+escapeHtml(st?st.label:(isActive?'Active':'Paused'))+'</span>'; })()+
       '</div>'+
       '<div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap;align-items:center;">'+
         clientHealthTagHtml(c)+
@@ -325,7 +340,8 @@ function renderClientModal(){
       '</div>'+
       (isActive ? '<div class="row" style="justify-content:flex-end;margin-top:8px;">'+clientTouchControlHtml(c)+'</div>' : '')+
     '</div>'+
-    '<div class="kpi-label" style="margin-bottom:8px;">Deliverables<span class="kpi-sub" style="margin-left:6px;">'+pendingCount+' pending</span></div>'+
+    renderCrmBlock('client', c)+
+    '<div class="kpi-label" style="margin:16px 0 8px;">Deliverables<span class="kpi-sub" style="margin-left:6px;">'+pendingCount+' pending</span></div>'+
     '<div class="task-list" style="margin-bottom:8px;">'+(deliverables.map(function(d){return deliverableRow(c.id,d);}).join('') || '<div class="empty">No deliverables yet — assign a package above, or add a one-off below.</div>')+'</div>'+
     '<span style="display:inline-block;margin-bottom:16px;font-size:12.5px;color:var(--accent);cursor:pointer;" data-action="openCustomDeliverableDrawer" data-id="'+c.id+'">&#8618; Add custom deliverable</span>'+
     '<div class="section-title" style="margin-bottom:8px;">Plan</div>'+
@@ -597,6 +613,8 @@ function bulkRemoveProspects(){
   persist('business'); renderView();
 }
 function openProspectEditModal(id){
+  // The lead editor is now the CRM contact view.
+  if(typeof openContact==='function'){ openContact('lead', id); return; }
   ui.editingProspectId = id;
   const o = document.getElementById('prospectEditOverlay');
   if(!o) return;
@@ -647,15 +665,14 @@ function addClient(){
   const notesEl = document.getElementById('clientNotes');
   const notes = notesEl ? notesEl.value.trim() : '';
   if(!name && !business) return;
-  state.business.clients.push({id:uid(), name:name, business:business, leadSource:null, mrr:0, billingDay:1, status:'active', notes:notes, deliverables:[], journal:[], createdAt:todayStr()});
+  state.business.clients.push({id:uid(), name:name, business:business, leadSource:null, mrr:0, billingDay:1, status:'active', stage:'active', notes:notes, deliverables:[], journal:[], touches:[], touchpoints:[], timeline:[], files:[], cadenceDays:null, createdAt:todayStr()});
   ui.forms.client = false;
   playPositive();
   persist('business'); renderView();
 }
 function toggleClientStatus(id){
   const c = state.business.clients.find(function(x){ return x.id===id; }); if(!c) return;
-  c.status = c.status==='active' ? 'paused' : 'active';
-  persist('business'); renderView();
+  setStage('client', id, c.status==='active' ? 'paused' : 'active');
 }
 function addProspect(){
   const name = document.getElementById('pName').value.trim();
@@ -678,7 +695,12 @@ function convertProspectToClient(p){
   if(!p) return null;
   if(p.convertedClientId) return p.convertedClientId;
   const clientId = uid();
-  state.business.clients.push({id:clientId, name:p.name, business:p.company, leadSource:p.leadSource||null, mrr:p.value||0, billingDay:1, status:'active', notes:'', deliverables:[], journal:[], createdAt:todayStr()});
+  // Carry the whole lead history across: touchpoints, files, notes and timeline.
+  const tps = arr(p.touchpoints).map(function(t){ return Object.assign({}, t); });
+  state.business.clients.push({id:clientId, name:p.name, business:p.company, phone:p.phone||'', email:p.email||'', leadSource:p.leadSource||null, mrr:p.value||0, billingDay:1, status:'active', stage:'onboarding', notes:p.notes||'', deliverables:[], journal:[],
+    touchpoints:tps, touches:tps.map(function(t){ return t.date; }), files:arr(p.files).map(function(f){ return Object.assign({}, f); }),
+    timeline:arr(p.timeline).map(function(t){ return Object.assign({}, t); }).concat([{id:uid(), ts:Date.now(), type:'stage', text:'Won — converted from lead'}]),
+    cadenceDays:null, fromLeadId:p.id, startDate:todayStr(), createdAt:todayStr()});
   p.convertedClientId = clientId;
   return clientId;
 }

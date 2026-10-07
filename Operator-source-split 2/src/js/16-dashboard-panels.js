@@ -302,7 +302,8 @@ const PANEL_RENDERERS = {
   journal: renderJournalPanel,
   focusMini: renderFocusMiniPanel,
   calendarMini: renderCalendarMiniPanel,
-  tasks: renderTodayTasksPanel
+  tasks: renderTodayTasksPanel,
+  reachOut: function(){ return renderReachOutPanel(false); }
 };
 function clientOpsDeliverableRow(clientId, d){
   return recurringDeliverableRowHtml(clientId, d, false);

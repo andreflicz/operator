@@ -20,6 +20,7 @@ async function init(){
   state.boards = normalizeBoards(await loadKey('boards', defaultBoards()));
 
   splitActiveModeAtMidnight();
+  if(crmMigratedOnLoad) persist('business');
   applyTheme();
   applySidebarState();
   document.getElementById('loading').style.display='none';

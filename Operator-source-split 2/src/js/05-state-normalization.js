@@ -284,6 +284,7 @@ function normalizeBusiness(b){
     });
   });
   b.pipeline.forEach(function(p){ if(!Array.isArray(p.stageHistory)) p.stageHistory=[]; if(p.convertedClientId===undefined) p.convertedClientId=null; if(p.leadSource===undefined) p.leadSource=null; });
+  normalizeCrmData(b);
   return b;
 }
 function normalizeCalendar(c){
@@ -337,6 +338,13 @@ function normalizeDashboardPanels(d){
   if(!d.enabled || typeof d.enabled!=='object') d.enabled = {};
   // One-time move (Phase 2): Quick Journal sits right under the streak panel. Runs once so
   // any order you set afterwards is respected.
+  if(!d.reachOutAdded){
+    // Phase 4: "Reach out today" goes right under Quick Journal.
+    const ri = d.order.indexOf('reachOut'); if(ri>=0) d.order.splice(ri,1);
+    const ji = d.order.indexOf('journal');
+    d.order.splice(ji>=0 ? ji+1 : 1, 0, 'reachOut');
+    d.reachOutAdded = true;
+  }
   if(!d.journalRaised){
     const ji = d.order.indexOf('journal');
     if(ji>=0){

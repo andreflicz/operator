@@ -117,7 +117,8 @@ const PANEL_DEFS = [
   {id:'journal', label:'Journal'},
   {id:'focusMini', label:'Focus'},
   {id:'calendarMini', label:'Calendar'},
-  {id:'tasks', label:"Today's Tasks"}
+  {id:'tasks', label:"Today's Tasks"},
+  {id:'reachOut', label:'Reach Out Today (leads & clients due a touch)'}
 ];
 const SMALL_PANELS = ['focusMini', 'calendarMini']; // journal is full-width now that it sits near the top
 const MOODS = [

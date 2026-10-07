@@ -111,6 +111,7 @@ function renderTodayFocusMode(p){
       }).join('')+
     '</div></div></div>'
   ) : '')+
+  '<div style="max-width:900px;margin:0 auto;">'+renderReachOutPanel(true)+'</div>'+
   '<div class="section grid grid-2" style="max-width:1200px;margin:32px auto 0;align-items:start;">'+
     '<div><div class="section-title" style="justify-content:center;">Worth Doing Soon<span class="kpi-sub" style="margin-left:8px;">&middot; '+backlog.length+' waiting</span></div><div class="card" style="max-height:600px;overflow-y:auto;"><div class="task-list">'+(backlog.map(focusModeBacklogRow).join('') || '<div class="empty">Backlog is empty.</div>')+'</div></div></div>'+
     '<div><div class="section-title" style="justify-content:center;">Clients<span class="kpi-sub" style="margin-left:8px;">&middot; '+activeClients.length+' active</span></div><div class="task-list" style="display:flex;flex-direction:column;gap:12px;max-height:600px;overflow-y:auto;">'+(activeClients.length ? activeClients.map(function(c){ return renderClientHealthCard(c); }).join('') : '<div class="empty">No active clients yet.</div>')+'</div></div>'+

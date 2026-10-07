@@ -145,6 +145,7 @@ let ringInterval = null;
 function startAlarmChecker(){
   setInterval(function(){
     checkReminders();
+    checkTouchReminder();
     const now = new Date();
     const hm = nowHM(now);
     const dateKey = todayStr(now);

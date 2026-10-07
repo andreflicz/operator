@@ -149,11 +149,8 @@ function renderSettings(){
 
     business: '<div class="card section"><div class="section-title">Business Info</div><div class="grid grid-2">'+
         '<div class="field"><label>Monthly revenue goal</label><input class="input" type="number" id="setRevGoal" value="'+p.revenueGoalMonthly+'"></div>'+
-      '</div></div>'+
-      '<div class="card section"><div class="section-title">Client Care Timing<span class="kpi-sub">Controls when a client\'s status tag turns amber or red</span></div><div class="grid grid-2">'+
-        '<div class="field"><label>Amber after (hours since last touch)</label><input class="input" type="number" min="1" id="setClientCareYellow" value="'+state.settings.clientCare.yellowHours+'"></div>'+
-        '<div class="field"><label>Red after (hours since last touch)</label><input class="input" type="number" min="1" id="setClientCareRed" value="'+state.settings.clientCare.redHours+'"></div>'+
-      '</div></div>'+saveBtn,
+      '</div>'+
+      '</div>'+saveBtn+renderCrmSettings(),
 
     calendarJournal: '<div class="section"><div class="section-title">Calendar Categories<div class="row"><input class="input" id="newCatLabel" placeholder="e.g. Client call" style="width:160px;"><button class="btn btn-sm" data-action="addCalCategory">Add</button></div></div>'+
         '<div class="card">'+
