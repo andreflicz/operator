@@ -3,19 +3,19 @@ function buildUpcomingList(days){
   const cutoff = addDays(todayStr(), days||14);
   const upcoming = [];
   state.tasks.items.forEach(function(t){
-    if(t.deadline && t.status!=='done' && t.deadline<=cutoff && t.deadline>=todayStr()) upcoming.push({date:t.deadline, label:t.title, kind:'deadline'});
+    if(t.deadline && t.status!=='done' && t.deadline<=cutoff && t.deadline>=todayStr()) upcoming.push({date:t.deadline, label:t.title, kind:'deadline', id:t.id});
   });
   state.calendar.events.forEach(function(e){
     if(e.date<=cutoff && e.date>=todayStr()){
       const cat = categoryById(e.categoryId);
-      upcoming.push({date:e.date, label:e.title, kind:'event', color: cat?cat.color:'#8A90A2'});
+      upcoming.push({date:e.date, label:e.title, kind:'event', id:e.id, color: cat?cat.color:'#8A90A2'});
     }
   });
   upcoming.sort(function(a,b){ return a.date.localeCompare(b.date); });
   return upcoming;
 }
 function renderUpcomingRow(u){
-  return '<div class="task-item-v2"><div style="width:70px;font-family:var(--font-display);font-weight:700;">'+fmtDateShort(u.date)+'</div>'+
+  return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="'+u.kind+'" data-id="'+u.id+'" title="Open"><div style="width:70px;font-family:var(--font-display);font-weight:700;">'+fmtDateShort(u.date)+'</div>'+
     (u.kind==='deadline' ? '<span class="tag" style="background:var(--danger-dim);color:#ffb3b8;">Deadline</span>' : '<span class="tag" style="background:'+u.color+'22;color:'+u.color+';">Event</span>')+
     '<div class="task-title" style="flex:1;">'+escapeHtml(u.label)+'</div></div>';
 }
@@ -34,5 +34,5 @@ function renderUpcomingPopover(){
       '<button class="btn btn-primary" data-action="closeUpcomingPopover">Close</button>'+
     '</div>';
 }
-function renderUpcomingPopoverInto(){ const el=document.getElementById('upcomingContent'); if(el) el.innerHTML = renderUpcomingPopover(); }
+function renderUpcomingPopoverInto(){ const el=document.getElementById('upcomingContent'); if(el) morphInto(el, renderUpcomingPopover(), {form:true}); }
 

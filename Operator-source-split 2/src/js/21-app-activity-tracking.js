@@ -1,6 +1,7 @@
 // ============ APP ACTIVITY TRACKING ============
 // Data flow: the native Operator wrapper script polls the frontmost macOS app every
-// ~10s (via osascript/System Events) and serves recent "<timestamp>\t<appName>" lines
+// ~10s (via osascript/System Events) and serves recent "<timestamp>\t<appName>[\t<idleSeconds>]"
+// lines (idleSeconds = time since the last keyboard/mouse input; older wrappers omit it)
 // over a local, loopback-only HTTP endpoint (APP_ACTIVITY_URL). This page polls that
 // endpoint, turns the raw samples into continuous per-app intervals, keeps a rolling
 // per-day minutes total, and (optionally) auto-starts/ends a real focus session when
@@ -16,9 +17,12 @@ function parseActivityLogText(text){
     const tab = line.indexOf('\t');
     if(tab<0) continue;
     const ts = parseInt(line.slice(0,tab),10);
-    const app = line.slice(tab+1).trim();
+    const rest = line.slice(tab+1);
+    const tab2 = rest.indexOf('\t');
+    const app = (tab2<0 ? rest : rest.slice(0,tab2)).trim();
+    const idle = tab2<0 ? null : parseInt(rest.slice(tab2+1),10);
     if(!ts || !app) continue;
-    out.push({ts:ts, app:app});
+    out.push({ts:ts, app:app, idle:(idle==null || isNaN(idle)) ? null : idle});
   }
   return out;
 }
@@ -45,9 +49,9 @@ function intervalsToAppMinutes(intervals){
   });
   return map;
 }
-function mergeAppMinutes(base, add){
+function maxAppMinutes(base, add){
   const out = Object.assign({}, base||{});
-  Object.keys(add||{}).forEach(function(k){ out[k]=(out[k]||0)+add[k]; });
+  Object.keys(add||{}).forEach(function(k){ out[k]=Math.max(out[k]||0, add[k]); });
   return out;
 }
 function appMinutesForDate(dateStr){
@@ -95,15 +99,22 @@ async function pollAppActivity(){
     if(!res.ok) return;
     text = await res.text();
   }catch(e){ return; } // no wrapper/server running — silently do nothing
-  const samples = parseActivityLogText(text);
-  if(!samples.length) return;
+  // Only count active usage: a sample taken after the keyboard/mouse has been idle for a
+  // while is dropped, which leaves a gap that splits the interval (an app just sitting in
+  // the foreground no longer counts as "being on it").
+  const idleLimit = Number(st.idleSeconds)||60;
+  const samples = parseActivityLogText(text).filter(function(s){ return s.idle==null || s.idle < idleLimit; });
+  if(!samples.length){ updateCurrentAppIndicator(); return; }
   const today = todayStr();
   const byDate = {};
   samples.forEach(function(s){ const d = todayStr(new Date(s.ts)); (byDate[d]=byDate[d]||[]).push(s); });
   Object.keys(byDate).forEach(function(d){
     if(d===today) return; // only finalize PAST days; today stays live below
     const ivs = samplesToIntervals(byDate[d].sort(function(a,b){return a.ts-b.ts;}));
-    state.appActivity.days[d] = mergeAppMinutes(state.appActivity.days[d], intervalsToAppMinutes(ivs));
+    // The log is re-read in full on every poll, so a past day's samples show up again and
+    // again. Keep the larger of stored vs. recomputed per app (idempotent) instead of adding,
+    // which used to inflate past days by another copy every 15 seconds.
+    state.appActivity.days[d] = maxAppMinutes(state.appActivity.days[d], intervalsToAppMinutes(ivs));
   });
   const todaySamples = (byDate[today]||[]).sort(function(a,b){return a.ts-b.ts;});
   state.appActivity.todayIntervals = samplesToIntervals(todaySamples);
@@ -112,6 +123,30 @@ async function pollAppActivity(){
   updateCurrentAppIndicator();
   checkAutoLockIn();
   if(ui.view==='focus' && ui.focusTab==='analytics') renderView();
+}
+// Why auto lock-in is currently held back (or null when it's allowed to run).
+function autoLockInBlockedReason(){
+  if(isDayOff(todayStr())) return 'dayoff';
+  if(state.modes.active) return 'mode';
+  const st = state.settings.appTracking || {};
+  const cooldownMs = Math.max(0, Number(st.cooldownMinutes)||0)*60000;
+  const lastStop = state.focus.lastManualStopAt;
+  if(lastStop && Date.now()-lastStop < cooldownMs) return 'cooldown';
+  return null;
+}
+// Steady usage only counts from the latest point that resets it: the current app interval's
+// start, the end of the last session (manual or auto), the end of the cooldown after a
+// manual lock-out, or the end of off-time/shooting. Without this, an app that had been in
+// the foreground during the session itself counted toward auto lock-in the moment you
+// locked out.
+function autoLockInCountFrom(interval){
+  const st = state.settings.appTracking || {};
+  const cooldownMs = Math.max(0, Number(st.cooldownMinutes)||0)*60000;
+  let from = interval.start;
+  if(state.focus.lastSessionEndedAt) from = Math.max(from, state.focus.lastSessionEndedAt);
+  if(state.focus.lastManualStopAt) from = Math.max(from, state.focus.lastManualStopAt + cooldownMs);
+  if(state.modes.lastEndedAt) from = Math.max(from, state.modes.lastEndedAt);
+  return from;
 }
 function checkAutoLockIn(){
   const st = state.settings.appTracking;
@@ -122,8 +157,9 @@ function checkAutoLockIn(){
   const isLive = (Date.now()-last.end) <= APP_ACTIVITY_GAP_MS;
   const activeSession = state.focus.activeSession;
 
-  if(isLive && !activeSession && !state.modes.active){
-    const elapsedMin = (last.end-last.start)/60000;
+  if(isLive && !activeSession){
+    if(autoLockInBlockedReason()) return;
+    const elapsedMin = (last.end-autoLockInCountFrom(last))/60000;
     if(elapsedMin >= (st.thresholdMinutes||12) && autoLockInMeta.intervalStart!==last.start){
       autoLockInMeta = {app:last.app, intervalStart:last.start};
       startFocus(null);
@@ -151,6 +187,7 @@ function autoEndFocusSession(){
   const minutes = Math.max(1, Math.round((endedAt-s.startedAt)/60000));
   state.focus.sessions.push({id:uid(), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endedAt, minutes:minutes, completedTasks:arr(s.completedTasks), note:'', autoStopped:true});
   state.focus.activeSession = null;
+  state.focus.lastSessionEndedAt = endedAt;
   if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   if(state.modes.active && state.modes.active.linkedFocus){ endMode(); }
   playStopSound();

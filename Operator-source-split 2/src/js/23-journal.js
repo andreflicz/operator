@@ -39,7 +39,7 @@ function renderJournalPhotoViewModal(){
       '<button class="btn btn-primary" data-action="closeJournalPhotoView">Close</button>'+
     '</div>';
 }
-function renderJournalPhotoViewModalInto(){ const el=document.getElementById('journalPhotoViewContent'); if(el) el.innerHTML = renderJournalPhotoViewModal(); }
+function renderJournalPhotoViewModalInto(){ const el=document.getElementById('journalPhotoViewContent'); if(el) morphInto(el, renderJournalPhotoViewModal(), {form:true}); }
 function renderJournalHistory(entries){
   const pinned = entries.filter(function(e){return e.pinned;});
   const rest = entries.filter(function(e){return !e.pinned;});
@@ -136,7 +136,7 @@ function openClientJournalPopover(clientId){
   renderClientJournalPopoverInto();
 }
 function closeClientJournalPopover(){ const o=document.getElementById('clientJournalOverlay'); if(o) o.classList.add('hidden'); }
-function renderClientJournalPopoverInto(){ const el=document.getElementById('clientJournalContent'); if(el) el.innerHTML = renderClientJournalPopover(); }
+function renderClientJournalPopoverInto(){ const el=document.getElementById('clientJournalContent'); if(el) morphInto(el, renderClientJournalPopover(), {form:true}); }
 function renderClientJournalPopover(){
   const clients = arr(state.business.clients);
   return '<div class="section-title" style="justify-content:center;margin-bottom:10px;">Client Journals</div>'+
@@ -265,7 +265,7 @@ function renderJournalEditModalInto(){
     const e = state.journal.entries.find(function(x){return x.id===ui.editingJournalId;});
     ui.editingJournalMood = e ? e.mood : null;
   }
-  const el=document.getElementById('journalEditContent'); if(el) el.innerHTML = renderJournalEditModal();
+  const el=document.getElementById('journalEditContent'); if(el) morphInto(el, renderJournalEditModal(), {form:true});
 }
 function setEditingJournalMood(moodId){ ui.editingJournalMood = (ui.editingJournalMood===moodId) ? null : moodId; renderJournalEditModalInto(); }
 function saveEditJournal(id){
@@ -313,7 +313,7 @@ function renderQuickJournalModal(){
       '<button class="btn btn-primary" data-action="saveQuickJournal">Save Entry</button>'+
     '</div>';
 }
-function renderQuickJournalModalInto(){ const el=document.getElementById('quickJournalContent'); if(el) el.innerHTML = renderQuickJournalModal(); }
+function renderQuickJournalModalInto(){ const el=document.getElementById('quickJournalContent'); if(el) morphInto(el, renderQuickJournalModal(), {form:true}); }
 function saveQuickJournal(){
   addJournalEntry('quickJournalModalText');
   closeQuickJournalModal();

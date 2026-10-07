@@ -34,8 +34,11 @@ ACTIVITY_PORT=8934
 poll_frontmost() {
   while true; do
     APP=$(osascript -e 'tell application "System Events" to get name of first application process whose frontmost is true' 2>/dev/null)
+    # Seconds since the last keyboard/mouse input, so the page only counts active use
+    # (an app merely left open in the foreground doesn't count toward auto lock-in).
+    IDLE=$(ioreg -c IOHIDSystem 2>/dev/null | awk '/HIDIdleTime/ {print int($NF/1000000000); exit}')
     if [ -n "$APP" ]; then
-      printf '%s\t%s\n' "$(date +%s000)" "$APP" >> "$ACTIVITY_LOG" 2>/dev/null
+      printf '%s\t%s\t%s\n' "$(date +%s000)" "$APP" "${IDLE:-0}" >> "$ACTIVITY_LOG" 2>/dev/null
     fi
     # Keep the log from growing forever — the app only ever needs recent history.
     if [ -f "$ACTIVITY_LOG" ]; then

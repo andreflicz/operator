@@ -38,7 +38,7 @@ function taskCard(t){
   const cat = t.categoryId ? taskCategoryById(t.categoryId) : null;
   const whiteAccent = t.isVideoIdea===true;
   return '<div class="task-card '+(t.status==='done'?'done':'')+(t.ongoing?' ongoing-task-card':'')+(selected?' card-selected':'')+(isCurrent?' current-task-active':'')+(pending?' just-completed':'')+(isStaged?' staged-task-card':'')+(whiteAccent?' video-idea-card':'')+'" data-action="'+(ui.taskSelectMode?'toggleTaskSelect':'openTaskEditModal')+'" data-id="'+t.id+'" style="cursor:pointer;'+(cat && !whiteAccent?'border-left:3px solid '+cat.color+';':'')+'" '+(draggable?'draggable="true" data-task-id="'+t.id+'"':'')+'>'+
-    '<div class="row" style="justify-content:space-between;">'+(ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+priorityTag(t.priority)+(isCurrent?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">'+currentTaskLabel()+'</span>':'')+(isStaged?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">&#128204; Up Next</span>':'')+(t.ongoing?'<span class="tag tag-ongoing">&#128204; Ongoing</span>':'')+(doneToday?'<span class="tag tag-good">&#10003; Done today</span>':'')+'</div>'+
+    '<div class="row" style="justify-content:space-between;">'+(ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+(t.isVideoIdea?'':priorityTag(t.priority))+(isCurrent?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">'+currentTaskLabel()+'</span>':'')+(isStaged?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">&#128204; Up Next</span>':'')+(t.ongoing?'<span class="tag tag-ongoing">&#128204; Ongoing</span>':'')+(doneToday?'<span class="tag tag-good">&#10003; Done today</span>':'')+'</div>'+
     '<div class="task-card-title">'+escapeHtml(t.title)+'</div>'+
     (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     (t.isVideoIdea && t.videoType ? '<div style="margin-top:2px;"><span class="tag" style="background:rgba(255,255,255,.1);color:#fff;">'+escapeHtml((taskVideoTypeById(t.videoType)||{}).label||'')+'</span></div>' : '')+
@@ -140,8 +140,10 @@ function bulkRemoveTasks(){
   persist('tasks'); renderView();
 }
 function openTaskEditModal(id){
-  ui.editingTaskId = id;
   const t = state.tasks.items.find(function(x){return x.id===id;});
+  // Video ideas have their own editor — wherever they're opened from (Overview, lineup, calendar).
+  if(t && t.isVideoIdea){ openVideoIdeaEditModal(id); return; }
+  ui.editingTaskId = id;
   ui.editTaskClientsSel = t ? t.clients.slice() : ['personal'];
   const o = document.getElementById('taskEditOverlay');
   if(!o) return;
@@ -167,12 +169,15 @@ function renderTaskEditModal(){
     '</select></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editIncludeStandard-'+t.id+'" '+(t.includeInStandard?'checked':'')+' style="margin-right:6px;">Include in Today\'s Standard</label>'+
     '</div>'+
-    '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
-      '<button class="btn btn-ghost" data-action="closeTaskEditModal">Cancel</button>'+
-      '<button class="btn btn-primary" data-action="saveEditTask" data-id="'+t.id+'">Save</button>'+
+    '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
+      deleteBtn('task', t.id)+
+      '<div class="row">'+
+        '<button class="btn btn-ghost" data-action="closeTaskEditModal">Cancel</button>'+
+        '<button class="btn btn-primary" data-action="saveEditTask" data-id="'+t.id+'">Save</button>'+
+      '</div>'+
     '</div>';
 }
-function renderTaskEditModalInto(){ const el=document.getElementById('taskEditContent'); if(el) el.innerHTML = renderTaskEditModal(); }
+function renderTaskEditModalInto(){ const el=document.getElementById('taskEditContent'); if(el) morphInto(el, renderTaskEditModal(), {form:true}); }
 function saveEditTask(id){
   const t = state.tasks.items.find(function(x){return x.id===id;}); if(!t) return;
   const titleEl = document.getElementById('editTitle-'+id);

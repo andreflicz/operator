@@ -10,7 +10,7 @@ document.body.addEventListener('click', function(e){
       closeTaskEditModal(); closeProspectEditModal(); closeClientModal(); closeLockInChooser(); closeJournalEditModal(); closeGoalEditModal();
       closeWorkoutEditModal(); closeJournalClearConfirm(); closeBreakNotePrompt(); closeBreakDetail(); closeInvoiceModal();
       closeAttachReceiptModal(); closeAddTaskModal(); closeDatePicker(); closeRetainerEdit(); closeLogPaymentModal();
-      closeUpcomingPopover(); closeQuickJournalModal(); closeJournalPhotoView(); closeCalEventModal(); closeAlarmEditModal(); closePackageEditModal(); closeCustomDeliverableDrawer(); closeNewPackageModal();
+      closeUpcomingPopover(); closeQuickJournalModal(); closeJournalPhotoView(); closeCalEventModal(); closeAlarmEditModal(); closePackageEditModal(); closeCustomDeliverableDrawer(); closeNewPackageModal(); closeVideoIdeaEditModal(); closeAddVideoIdeaModal();
       ui.selectedTaskIds.clear(); ui.selectedProspectIds.clear();
       const changing = el.dataset.view !== ui.view;
       ui.view = el.dataset.view;
@@ -218,6 +218,7 @@ document.body.addEventListener('click', function(e){
     case 'toggleCalLegend': ui.showCalLegend = !ui.showCalLegend; renderView(); break;
     case 'selectCalDay': selectCalDay(el.dataset.date); break;
     case 'openCalEventModal': openCalEventModal(id); break;
+    case 'openCalItem': openCalItem(el.dataset.kind, id); break;
     case 'closeCalEventModal': closeCalEventModal(); break;
     case 'saveCalEvent': saveCalEvent(); break;
     case 'deleteCalEventFromModal': deleteCalEventFromModal(id); break;
@@ -300,6 +301,8 @@ document.body.addEventListener('click', function(e){
     case 'addVideoIdea': addVideoIdea(); break;
     case 'openAddVideoIdeaModal': openAddVideoIdeaModal(); break;
     case 'closeAddVideoIdeaModal': closeAddVideoIdeaModal(); break;
+    case 'closeVideoIdeaEditModal': closeVideoIdeaEditModal(); break;
+    case 'saveVideoIdeaEdit': saveVideoIdeaEdit(id); break;
     case 'toggleTaskSelectMode': toggleTaskSelectMode(); break;
     case 'toggleSidebar': toggleSidebar(); break;
   }

@@ -12,7 +12,7 @@ function renderBusiness(){
     '<div class="tab '+(ui.businessTab==='packages'?'active':'')+'" data-action="businessTab" data-tab="packages">Packages</div>'+
     '<div class="tab '+(ui.businessTab==='finances'?'active':'')+'" data-action="businessTab" data-tab="finances">Finances</div>'+
   '</div>'+
-  '<div class="tab-panel">'+(ui.businessTab==='clients' ? renderClientsTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
+  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='clients' ? renderClientsTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
 }
 function renderBusinessOverview(){
   const clients = arr(state.business.clients);
@@ -404,17 +404,40 @@ function assignClientPackage(clientId){
   const sel = document.getElementById('clientPackageSelect');
   const pk = sel ? arr(state.business.packages).find(function(x){return x.id===sel.value;}) : null;
   if(!pk) return;
+  archivePackageProgress(c);
   c.deliverables = arr(c.deliverables).filter(function(d){ return !d.fromPackage; });
   arr(pk.deliverables).forEach(function(d){
-    c.deliverables.push({id:uid(), title:d.title, dueDate:null, status:'pending', linkedTaskId:null, fromPackage:true, recurring:true, completedDates:[], weeklyTarget:d.weeklyTarget||1, sourceId:d.id});
+    c.deliverables.push({id:uid(), title:d.title, dueDate:null, status:'pending', linkedTaskId:null, fromPackage:true, recurring:true, completedDates:restoredPackageProgress(c, d), weeklyTarget:d.weeklyTarget||1, sourceId:d.id});
   });
   c.packageId = pk.id;
   ui.pickingPackageForClient = null;
   playPositive();
   persist('business'); renderClientModalInto(); renderView();
 }
+// Swapping or removing a client's package used to throw away every logged deliverable
+// (all the dated "+1"s) for that client. Progress is now kept per deliverable title and
+// handed back whenever a package with a matching deliverable is assigned again.
+function packageProgressKey(title){ return String(title||'').trim().toLowerCase(); }
+function archivePackageProgress(c){
+  if(!c.packageProgressArchive || typeof c.packageProgressArchive!=='object') c.packageProgressArchive = {};
+  arr(c.deliverables).forEach(function(d){
+    if(!d.fromPackage || !arr(d.completedDates).length) return;
+    const k = packageProgressKey(d.title);
+    const prev = arr(c.packageProgressArchive[k]);
+    const merged = prev.concat(arr(d.completedDates));
+    c.packageProgressArchive[k] = merged;
+  });
+}
+function restoredPackageProgress(c, pkgDeliverable){
+  const k = packageProgressKey(pkgDeliverable.title);
+  const archive = c.packageProgressArchive || {};
+  const dates = arr(archive[k]).slice();
+  if(dates.length) delete archive[k];
+  return dates;
+}
 function clearClientPackage(clientId){
   const c = state.business.clients.find(function(x){return x.id===clientId;}); if(!c) return;
+  archivePackageProgress(c);
   c.deliverables = arr(c.deliverables).filter(function(d){ return !d.fromPackage; });
   c.packageId = null;
   persist('business'); renderClientModalInto(); renderView();
@@ -439,8 +462,8 @@ function renderCustomDeliverableDrawer(){
       '<button class="btn btn-primary" data-action="addDeliverable" data-id="'+c.id+'">Add Deliverable</button>'+
     '</div>';
 }
-function renderCustomDeliverableDrawerInto(){ const el=document.getElementById('customDeliverableContent'); if(el) el.innerHTML = renderCustomDeliverableDrawer(); }
-function renderClientModalInto(){ const el=document.getElementById('clientModalContent'); if(el) el.innerHTML = renderClientModal(); }
+function renderCustomDeliverableDrawerInto(){ const el=document.getElementById('customDeliverableContent'); if(el) morphInto(el, renderCustomDeliverableDrawer(), {form:true}); }
+function renderClientModalInto(){ const el=document.getElementById('clientModalContent'); if(el) morphInto(el, renderClientModal(), {form:true}); }
 function deliverableRow(clientId, d){
   if(d.recurring){
     const target = d.weeklyTarget||1;
@@ -598,7 +621,7 @@ function renderProspectEditModal(){
       '</div>'+
     '</div>';
 }
-function renderProspectEditModalInto(){ const el=document.getElementById('prospectEditContent'); if(el) el.innerHTML = renderProspectEditModal(); }
+function renderProspectEditModalInto(){ const el=document.getElementById('prospectEditContent'); if(el) morphInto(el, renderProspectEditModal(), {form:true}); }
 function saveEditProspect(id){
   const p = state.business.pipeline.find(function(x){return x.id===id;}); if(!p) return;
   p.name = document.getElementById('editPName-'+id).value.trim() || p.name;

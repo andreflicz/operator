@@ -231,7 +231,10 @@
   .subtab{padding:6px 13px; border-radius:20px; border:1px solid var(--border); background:var(--panel-2); color:var(--text-dim); font-size:12.5px; cursor:pointer; font-weight:600; font-family:var(--font-display);}
   .subtab.active{background:var(--accent-dim); color:var(--text); border-color:var(--accent);}
   .chart-svg{width:100%; height:auto; display:block;}
-  .overlay{position:fixed; inset:0; background:rgba(6,7,12,.94); display:flex; align-items:center; justify-content:center; z-index:100; flex-direction:column; gap:18px; padding:20px;}
+  .overlay{position:fixed; inset:0; background:rgba(6,7,12,.8); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; z-index:100; flex-direction:column; gap:18px; padding:20px; animation:overlayFadeIn .16s ease-out;}
+  .overlay.overlay-instant{animation:none;}
+  .overlay.overlay-instant > .card{animation:none !important;}
+  @keyframes overlayFadeIn{ from{opacity:0;} to{opacity:1;} }
   .overlay.hidden{display:none;}
   .drawer-overlay{justify-content:flex-end !important; align-items:stretch !important; padding:0 !important; background:rgba(6,7,12,.7) !important; z-index:120;}
   #lockInNudgeOverlay{ z-index:150; }
@@ -351,10 +354,10 @@
   @keyframes goalsStrobe{ 0%,85%,100%{ text-shadow:none; } 92%{ text-shadow:0 0 14px rgba(63,190,142,.85), 0 0 28px rgba(63,190,142,.5); } }
   .ring-wrap{display:flex; flex-direction:column; align-items:center; gap:6px;}
   #viewRoot{ max-width:1400px; margin:0 auto; width:100%; }
-  #viewRoot.view-fade{ animation: viewFadeIn .28s ease; }
-  @keyframes viewFadeIn{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
-  .tab-panel{ animation: subtabFadeIn .18s ease; }
-  @keyframes subtabFadeIn{ from{opacity:0; transform:translateY(3px);} to{opacity:1; transform:translateY(0);} }
+  #viewRoot.view-fade{ animation: viewFadeIn .2s ease-out; }
+  @keyframes viewFadeIn{ from{opacity:.4;} to{opacity:1;} }
+  .tab-panel, .subtab-panel{ animation: subtabFadeIn .18s ease-out; }
+  @keyframes subtabFadeIn{ from{opacity:.45;} to{opacity:1;} }
   .day-off-wrap{ display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:56vh; }
   .day-off-card{ text-align:center; padding:36px 44px; display:flex; flex-direction:column; align-items:center; animation:dayOffFadeIn .4s ease; }
   .offtime-card{ background:#15161a; border-color:#3a3d45 !important; box-shadow:0 0 50px rgba(255,255,255,.06) !important; filter:grayscale(1); }
@@ -405,3 +408,5 @@
     .stat-chip-value{font-size:17px;}
     .kpi-value{font-size:19px;}
   }
+  .cal-item-clickable{ cursor:pointer; }
+  .cal-item-clickable:hover{ border-color:var(--accent); background:var(--panel-2); }

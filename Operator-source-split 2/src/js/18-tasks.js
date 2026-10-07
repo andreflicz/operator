@@ -99,7 +99,9 @@ function renderFocusTasksTab(){
       '<div class="subtab '+(sub==='videoIdeas'?'active':'')+'" data-action="focusTasksSubTab" data-tab="videoIdeas">&#127916; Video Ideas <span style="opacity:.7;">'+videoIdeas.length+'</span></div>'+
       '<div class="subtab '+(sub==='finished'?'active':'')+'" data-action="focusTasksSubTab" data-tab="finished">Finished <span style="opacity:.7;">'+doneAll.length+'</span></div>'+
     '</div>'+
-    (sub==='backlog' ? renderFocusBacklogTab() : sub==='videoIdeas' ? renderVideoIdeasTab() : sub==='finished' ? renderFocusFinishedTab() : renderFocusTasksOverview());
+    '<div class="subtab-panel" data-key="tasks-'+sub+'">'+
+    (sub==='backlog' ? renderFocusBacklogTab() : sub==='videoIdeas' ? renderVideoIdeasTab() : sub==='finished' ? renderFocusFinishedTab() : renderFocusTasksOverview())+
+    '</div>';
 }
 function renderVideoIdeasTab(){
   const videoIdeas = state.tasks.items.filter(function(t){ return t.isVideoIdea && t.status!=='done'; });
@@ -128,7 +130,7 @@ function renderAddVideoIdeaModal(){
       '<button class="btn btn-primary" data-action="addVideoIdea">+ Add Video Idea</button>'+
     '</div>';
 }
-function renderAddVideoIdeaModalInto(){ const el=document.getElementById('videoIdeaContent'); if(el) el.innerHTML = renderAddVideoIdeaModal(); }
+function renderAddVideoIdeaModalInto(){ const el=document.getElementById('videoIdeaContent'); if(el) morphInto(el, renderAddVideoIdeaModal(), {form:true}); }
 function addVideoIdea(){
   const el = document.getElementById('newVideoIdeaTitle');
   const title = el ? el.value.trim() : '';
@@ -138,6 +140,48 @@ function addVideoIdea(){
   state.tasks.items.push({id:uid(), title:title, client:'personal', clients:['personal'], priority:'med', deadline:null, notes:(notesEl?notesEl.value.trim():''), status:'backlog', ongoing:false, ongoingDeadline:null, ongoingFrequency:null, includeInStandard:false, categoryId:null, isVideoIdea:true, videoType:(typeEl&&typeEl.value?typeEl.value:null), createdAt:todayStr(), completedAt:null});
   playTaskAdded();
   closeAddVideoIdeaModal();
+  persist('tasks'); renderView();
+}
+function openVideoIdeaEditModal(id){
+  const t = state.tasks.items.find(function(x){return x.id===id;}); if(!t) return;
+  ui.editingVideoIdeaId = id;
+  const o = document.getElementById('videoIdeaEditOverlay');
+  if(!o) return;
+  o.classList.remove('hidden');
+  renderVideoIdeaEditModalInto();
+}
+function closeVideoIdeaEditModal(){ ui.editingVideoIdeaId = null; const o=document.getElementById('videoIdeaEditOverlay'); if(o) o.classList.add('hidden'); }
+function renderVideoIdeaEditModal(){
+  const t = state.tasks.items.find(function(x){return x.id===ui.editingVideoIdeaId;});
+  if(!t) return '';
+  const types = arr(state.tasks.videoTypes);
+  const where = t.status==='today' ? "In today's lineup" : t.status==='done' ? 'Finished' : 'In Video Ideas';
+  return '<div class="section-title" style="margin-bottom:4px;">&#127916; Video Idea</div>'+
+    '<div class="kpi-sub" style="margin-bottom:14px;">'+where+'</div>'+
+    '<div class="field"><label>Idea</label><input class="input" id="editVideoTitle-'+t.id+'" value="'+escapeHtml(t.title)+'" style="width:100%;"></div>'+
+    (types.length ? '<div class="field" style="margin-top:10px;"><label>Type</label><select class="input" id="editVideoType-'+t.id+'" style="width:100%;"><option value="">&mdash; None &mdash;</option>'+types.map(function(vt){ return '<option value="'+vt.id+'" '+(t.videoType===vt.id?'selected':'')+'>'+escapeHtml(vt.label)+'</option>'; }).join('')+'</select></div>' : '')+
+    '<div class="field" style="margin-top:10px;"><label>Due (optional)</label><div class="row"><input class="input" type="date" id="editVideoDeadline-'+t.id+'" value="'+(t.deadline||'')+'"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editVideoDeadline-'+t.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="editVideoDeadline-'+t.id+'">Clear</button></div></div>'+
+    '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="editVideoNotes-'+t.id+'" style="width:100%;min-height:90px;" placeholder="Hook, shots, references…">'+escapeHtml(t.notes||'')+'</textarea></div>'+
+    '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
+      deleteBtn('task', t.id)+
+      '<div class="row">'+
+        '<button class="btn btn-ghost" data-action="closeVideoIdeaEditModal">Cancel</button>'+
+        '<button class="btn btn-primary" data-action="saveVideoIdeaEdit" data-id="'+t.id+'">Save</button>'+
+      '</div>'+
+    '</div>';
+}
+function renderVideoIdeaEditModalInto(){ const el=document.getElementById('videoIdeaEditContent'); if(el) morphInto(el, renderVideoIdeaEditModal(), {form:true}); }
+function saveVideoIdeaEdit(id){
+  const t = state.tasks.items.find(function(x){return x.id===id;}); if(!t) return;
+  const titleEl = document.getElementById('editVideoTitle-'+id);
+  if(titleEl) t.title = titleEl.value.trim() || t.title;
+  const typeEl = document.getElementById('editVideoType-'+id);
+  if(typeEl) t.videoType = typeEl.value || null;
+  const dlEl = document.getElementById('editVideoDeadline-'+id);
+  if(dlEl) t.deadline = dlEl.value || null;
+  const notesEl = document.getElementById('editVideoNotes-'+id);
+  if(notesEl) t.notes = notesEl.value.trim();
+  closeVideoIdeaEditModal();
   persist('tasks'); renderView();
 }
 function renderFocusTasksOverview(){
@@ -267,7 +311,7 @@ function renderAddTaskModal(){
       '<button class="btn btn-good" data-action="addTaskToday">Add to Today</button>'+
     '</div>';
 }
-function renderAddTaskModalInto(){ const el=document.getElementById('addTaskContent'); if(el) el.innerHTML = renderAddTaskModal(); }
+function renderAddTaskModalInto(){ const el=document.getElementById('addTaskContent'); if(el) morphInto(el, renderAddTaskModal(), {form:true}); }
 function addTask(status){
   const title = document.getElementById('newTaskTitle').value.trim();
   if(!title) return;

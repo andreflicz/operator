@@ -5,6 +5,7 @@ function updateNavActive(){
   });
 }
 let lastRenderedView = null;
+let lastRenderedDay = null;
 function renderView(){
   if(ui.currentTaskId && (!state.focus.activeSession || state.focus.activeSession.onBreak)){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   const root = document.getElementById('viewRoot');
@@ -18,11 +19,19 @@ function renderView(){
     case 'settings': html = renderSettings(); break;
     default: html = renderToday();
   }
-  root.innerHTML = html;
   if(lastRenderedView !== ui.view){
+    // Navigating to another view: fresh content, scrolled to the top, with a soft fade.
+    root.innerHTML = html;
+    const main = root.closest('.main');
+    if(main) main.scrollTop = 0;
     root.classList.remove('view-fade'); void root.offsetWidth; root.classList.add('view-fade');
     lastRenderedView = ui.view;
+  } else {
+    // Same view: patch in place so nothing that didn't change is touched (no flash,
+    // no scroll jumps, no replayed entry animations).
+    morphInto(root, html);
   }
+  lastRenderedDay = todayStr();
   updateNavActive();
   document.querySelectorAll('.scroll-picker').forEach(function(pk){ initScrollPicker(pk.id, Number(pk.dataset.selected)); });
   const modalOverlay = document.getElementById('preFocusOverlay');
@@ -40,7 +49,8 @@ function renderView(){
   const lockInOverlay = document.getElementById('lockInOverlay');
   if(lockInOverlay && !lockInOverlay.classList.contains('hidden')){
     renderLockInModalInto();
-    if(!ui.focusOpenEnded) initScrollPicker('startPicker', 60);
+    const sp = document.getElementById('startPicker');
+    if(!ui.focusOpenEnded) initScrollPicker('startPicker', sp && sp.dataset.selected ? Number(sp.dataset.selected) : 60);
   }
   const journalEditOverlay = document.getElementById('journalEditOverlay');
   if(journalEditOverlay && !journalEditOverlay.classList.contains('hidden')) renderJournalEditModalInto();
@@ -58,6 +68,8 @@ function renderView(){
   if(workoutEditOverlay && !workoutEditOverlay.classList.contains('hidden')) renderWorkoutEditModalInto();
   const addTaskOverlay = document.getElementById('addTaskOverlay');
   if(addTaskOverlay && !addTaskOverlay.classList.contains('hidden')) renderAddTaskModalInto();
+  const videoIdeaEditOverlay = document.getElementById('videoIdeaEditOverlay');
+  if(videoIdeaEditOverlay && !videoIdeaEditOverlay.classList.contains('hidden')) renderVideoIdeaEditModalInto();
   const videoIdeaOverlay = document.getElementById('videoIdeaOverlay');
   if(videoIdeaOverlay && !videoIdeaOverlay.classList.contains('hidden')) renderAddVideoIdeaModalInto();
   const miniCalOverlay = document.getElementById('miniCalOverlay');

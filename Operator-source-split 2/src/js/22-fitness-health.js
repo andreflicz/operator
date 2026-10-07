@@ -55,7 +55,7 @@ function renderWorkoutEditModal(){
       '</div>'+
     '</div>';
 }
-function renderWorkoutEditModalInto(){ const el=document.getElementById('workoutEditContent'); if(el) el.innerHTML = renderWorkoutEditModal(); }
+function renderWorkoutEditModalInto(){ const el=document.getElementById('workoutEditContent'); if(el) morphInto(el, renderWorkoutEditModal(), {form:true}); }
 function saveEditWorkout(id){
   const g = state.health.gymLog.find(function(x){return x.id===id;}); if(!g) return;
   g.date = document.getElementById('editGymDate-'+id).value || g.date;

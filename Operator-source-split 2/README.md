@@ -18,6 +18,7 @@ src/
     manifest.json         ordered list of the section files below (build reads this)
     01-storage.js
     02-helpers.js
+    02b-dom-morph.js       in-place re-render (morphInto) used by renderView + all modals
     03-scroll-picker.js
     04-defaults.js
     05-state-normalization.js
@@ -67,6 +68,12 @@ was before, just in its own file. `scripts/build.py` concatenates everything
 back in the original order; running it against the untouched split produces
 output that's byte-identical (verified with `diff`/`md5sum`) to the
 original `command-center-2.html`.
+
+Rendering note: `renderView()` and every modal's `render…Into()` patch the live DOM with
+`morphInto()` (02b-dom-morph.js) instead of replacing `innerHTML`, so unchanged nodes are
+never rebuilt (no flashes, no lost scroll, no reset form fields). Only navigating to a
+different view does a full replace + fade. Give a wrapper element a `data-key` when it
+should be treated as new content (e.g. the active tab's panel) so its entry animation runs.
 
 It's still all one JS scope (one `(function(){ ... })()` closure at build
 time), same globals (`state`, `ui`, etc.), same one delegated click handler.

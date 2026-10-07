@@ -17,6 +17,7 @@ async function init(){
   state.settings = normalizeSettings(await loadKey('settings', defaultSettings()));
   state.appActivity = normalizeAppActivity(await loadKey('appActivity', defaultAppActivity()));
 
+  splitActiveModeAtMidnight();
   applyTheme();
   applySidebarState();
   document.getElementById('loading').style.display='none';

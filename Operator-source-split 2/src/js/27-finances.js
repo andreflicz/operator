@@ -84,7 +84,7 @@ function renderRetainerEditModal(){
       '<button class="btn btn-good" data-action="saveRetainerEdit">Save</button>'+
     '</div>';
 }
-function renderRetainerEditModalInto(){ const el=document.getElementById('retainerEditContent'); if(el) el.innerHTML = renderRetainerEditModal(); }
+function renderRetainerEditModalInto(){ const el=document.getElementById('retainerEditContent'); if(el) morphInto(el, renderRetainerEditModal(), {form:true}); }
 function saveRetainerEdit(){
   const c = state.business.clients.find(function(x){ return x.id===ui.editingRetainerClientId; }); if(!c) return;
   c.mrr = Number(document.getElementById('retainerMrr').value)||0;
@@ -141,7 +141,7 @@ function renderInvoiceModal(){
       '<button class="btn btn-good" data-action="addInvoice">Save</button>'+
     '</div>';
 }
-function renderInvoiceModalInto(){ const el=document.getElementById('invoiceModalContent'); if(el) el.innerHTML = renderInvoiceModal(); }
+function renderInvoiceModalInto(){ const el=document.getElementById('invoiceModalContent'); if(el) morphInto(el, renderInvoiceModal(), {form:true}); }
 function invoiceRow(inv){
   const paid = invoicePaid(inv);
   return '<div class="task-item-v2 '+(paid?'done':'')+'">'+
@@ -173,7 +173,7 @@ function renderAttachReceiptModal(){
       '<button class="btn btn-good" data-action="confirmAttachReceipt">Attach Receipt</button>'+
     '</div>';
 }
-function renderAttachReceiptModalInto(){ const el=document.getElementById('attachReceiptContent'); if(el) el.innerHTML = renderAttachReceiptModal(); }
+function renderAttachReceiptModalInto(){ const el=document.getElementById('attachReceiptContent'); if(el) morphInto(el, renderAttachReceiptModal(), {form:true}); }
 function confirmAttachReceipt(){
   const inv = state.finances.invoices.find(function(x){ return x.id===ui.attachingInvoiceId; }); if(!inv) return;
   const fileInput = document.getElementById('receiptFile');
@@ -280,7 +280,7 @@ function renderLogPaymentModal(){
       '<button class="btn btn-good" data-action="confirmLogPayment">Log Payment</button>'+
     '</div>';
 }
-function renderLogPaymentModalInto(){ const el=document.getElementById('logPaymentContent'); if(el) el.innerHTML = renderLogPaymentModal(); }
+function renderLogPaymentModalInto(){ const el=document.getElementById('logPaymentContent'); if(el) morphInto(el, renderLogPaymentModal(), {form:true}); }
 function confirmLogPayment(){
   const d = state.finances.debts.find(function(x){ return x.id===ui.loggingPaymentDebtId; }); if(!d) return;
   const amount = Number(document.getElementById('paymentAmount').value);

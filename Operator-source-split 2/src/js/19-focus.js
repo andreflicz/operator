@@ -32,7 +32,7 @@ function renderFocus(){
     '<div class="tab '+(tab==='tasks'?'active':'')+'" data-action="focusMainTab" data-tab="tasks">Tasks</div>'+
     '<div class="tab '+(tab==='analytics'?'active':'')+'" data-action="focusMainTab" data-tab="analytics">Analytics</div>'+
   '</div>'+
-  '<div class="tab-panel">'+
+  '<div class="tab-panel" data-key="focus-'+tab+'">'+
   (tab==='analytics' ? renderFocusAnalyticsTab() : renderFocusTasksTab())+
   '</div>';
 }
@@ -217,7 +217,7 @@ function renderManualLogModal(){
       '<button class="btn btn-primary" data-action="addManualFocusLog">Log It</button>'+
     '</div>';
 }
-function renderManualLogModalInto(){ const el=document.getElementById('manualLogContent'); if(el) el.innerHTML = renderManualLogModal(); }
+function renderManualLogModalInto(){ const el=document.getElementById('manualLogContent'); if(el) morphInto(el, renderManualLogModal(), {form:true}); }
 function renderRecentSessionsPreview(){
   const sessions = state.focus.sessions.slice().sort(function(a,b){ return b.startedAt-a.startedAt; }).slice(0,4);
   return '<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">'+
@@ -398,7 +398,7 @@ function renderBreakDetailModal(){
       '<button class="btn btn-primary" data-action="closeBreakDetail">Close</button>'+
     '</div>';
 }
-function renderBreakDetailModalInto(){ const el=document.getElementById('breakDetailContent'); if(el) el.innerHTML = renderBreakDetailModal(); }
+function renderBreakDetailModalInto(){ const el=document.getElementById('breakDetailContent'); if(el) morphInto(el, renderBreakDetailModal(), {form:true}); }
 function alarmRow(a){
   return '<div class="task-item-v2">'+
     '<div style="font-family:var(--font-display);font-weight:700; width:78px;">'+fmt12Hour(a.time)+'</div>'+
@@ -433,7 +433,7 @@ function renderAlarmEditModal(){
       '</div>'+
     '</div>';
 }
-function renderAlarmEditModalInto(){ const el=document.getElementById('alarmEditContent'); if(el) el.innerHTML = renderAlarmEditModal(); }
+function renderAlarmEditModalInto(){ const el=document.getElementById('alarmEditContent'); if(el) morphInto(el, renderAlarmEditModal(), {form:true}); }
 function saveAlarmEdit(id){
   const a = state.focus.alarms.find(function(x){return x.id===id;}); if(!a) return;
   a.time = document.getElementById('editAlarmTime-'+id).value || a.time;
@@ -463,7 +463,7 @@ function renderLockInModal(){
     '<button class="btn btn-good lock-in-btn" data-action="lockInFocus" style="margin-top:16px;">&#128274; LOCK IN</button>'+
     '<button class="btn btn-ghost" data-action="closeLockInChooser" style="margin-top:8px;width:100%;">Cancel</button>';
 }
-function renderLockInModalInto(){ const el=document.getElementById('lockInModalContent'); if(el) el.innerHTML = renderLockInModal(); }
+function renderLockInModalInto(){ const el=document.getElementById('lockInModalContent'); if(el) morphInto(el, renderLockInModal(), {form:true}); }
 function lockInFocus(){
   closeLockInChooser();
   const minutes = getPickerValue('startPicker');
@@ -471,6 +471,9 @@ function lockInFocus(){
 }
 function viewAllSessions(){ ui.focusTab='analytics'; renderView(); }
 function startFocus(minutes){
+  // Locking in exits off-time / shooting cleanly (logging that block) instead of silently
+  // refusing and leaving the app stuck in the old mode.
+  if(state.modes.active && !state.modes.active.linkedFocus) finishActiveMode(true);
   if(state.modes.active) return;
   state.focus.activeSession = {startedAt: Date.now(), plannedMinutes: minutes || null, completedTasks:[], breaks:[], onBreak:false, completeFired:false};
   if(ui.stagedTaskId){
@@ -511,7 +514,7 @@ function renderFinalStopModal(){
       '<button class="btn btn-danger" data-action="reallyConfirmStopFocus">Yes, I\'m Done</button>'+
     '</div>';
 }
-function renderFinalStopModalInto(){ const el=document.getElementById('finalStopContent'); if(el) el.innerHTML = renderFinalStopModal(); }
+function renderFinalStopModalInto(){ const el=document.getElementById('finalStopContent'); if(el) morphInto(el, renderFinalStopModal(), {form:true}); }
 function cancelFinalStop(){ closeFinalStopConfirm(); }
 function reallyConfirmStopFocus(){
   const s = state.focus.activeSession;
@@ -521,6 +524,9 @@ function reallyConfirmStopFocus(){
   const minutes = Math.max(1, Math.round((endedAt - s.startedAt)/60000));
   state.focus.sessions.push({id:uid(), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endedAt, minutes:minutes, completedTasks: arr(s.completedTasks), note:''});
   state.focus.activeSession = null;
+  // Remember the manual lock-out so auto lock-in respects its cooldown.
+  state.focus.lastManualStopAt = endedAt;
+  state.focus.lastSessionEndedAt = endedAt;
   if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   if(state.modes.active && state.modes.active.linkedFocus){ endMode(); }
   playStopSound();
@@ -552,7 +558,7 @@ function renderStopFocusModal(){
       '<button class="btn btn-danger" data-action="requestStopConfirm">Stop &amp; Log</button>'+
     '</div>';
 }
-function renderStopFocusModalInto(){ const el=document.getElementById('stopFocusContent'); if(el) el.innerHTML = renderStopFocusModal(); }
+function renderStopFocusModalInto(){ const el=document.getElementById('stopFocusContent'); if(el) morphInto(el, renderStopFocusModal(), {form:true}); }
 function openTimesUpModal(){
   const overlay = document.getElementById('timesUpOverlay');
   if(!overlay) return;
@@ -569,7 +575,7 @@ function renderTimesUpModal(){
       '<button class="btn btn-danger" data-action="stopFromTimesUp">End Session</button>'+
     '</div>';
 }
-function renderTimesUpModalInto(){ const el=document.getElementById('timesUpContent'); if(el) el.innerHTML = renderTimesUpModal(); }
+function renderTimesUpModalInto(){ const el=document.getElementById('timesUpContent'); if(el) morphInto(el, renderTimesUpModal(), {form:true}); }
 function continueFocusFromTimesUp(){
   const as = state.focus.activeSession; if(as){ as.plannedMinutes = null; persist('focus'); }
   closeTimesUpModal(); renderView();
@@ -638,7 +644,7 @@ function renderBreakNoteModal(){
       '<button class="btn btn-primary" data-action="confirmStartBreakMode">'+modeIcon('break')+' Start Break</button>'+
     '</div>';
 }
-function renderBreakNoteModalInto(){ const el=document.getElementById('breakNoteContent'); if(el) el.innerHTML = renderBreakNoteModal(); }
+function renderBreakNoteModalInto(){ const el=document.getElementById('breakNoteContent'); if(el) morphInto(el, renderBreakNoteModal(), {form:true}); }
 function confirmStartBreakMode(){
   const as = state.focus.activeSession; if(!as || as.onBreak) { closeBreakNotePrompt(); return; }
   const noteEl = document.getElementById('breakNoteInput');
@@ -725,7 +731,7 @@ function renderMultiBreakModal(){
       '<button class="btn btn-primary" data-action="confirmMultiBreak">Take The Break</button>'+
     '</div>';
 }
-function renderMultiBreakModalInto(){ const el=document.getElementById('multiBreakContent'); if(el) el.innerHTML = renderMultiBreakModal(); }
+function renderMultiBreakModalInto(){ const el=document.getElementById('multiBreakContent'); if(el) morphInto(el, renderMultiBreakModal(), {form:true}); }
 function confirmMultiBreak(){ const m=pendingBreakMinutes; closeMultiBreakWarning(); actuallyStartBreak(m); }
 function cancelMultiBreak(){ closeMultiBreakWarning(); }
 function addManualFocusLog(){

@@ -1,6 +1,7 @@
 [
   "01-storage.js",
   "02-helpers.js",
+  "02b-dom-morph.js",
   "03-scroll-picker.js",
   "04-defaults.js",
   "05-state-normalization.js",

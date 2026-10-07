@@ -34,6 +34,14 @@ function startOfWeekStr(dateStr){
   dt.setDate(dt.getDate()+diff);
   return todayStr(dt);
 }
+// Sunday-based week start (local time) — used for "time worked this week", which resets
+// every Sunday at 12 AM. Business deliverable weeks keep their Monday start.
+function startOfWeekSundayStr(dateStr){
+  const parts = (dateStr||todayStr()).split('-').map(Number);
+  const dt = new Date(parts[0], parts[1]-1, parts[2]);
+  dt.setDate(dt.getDate()-dt.getDay());
+  return todayStr(dt);
+}
 function thisWeekKey(){ return startOfWeekStr(todayStr()); }
 function endOfWeekStr(dateStr){ return addDays(startOfWeekStr(dateStr), 6); }
 function thisMonthKey(){ return monthKeyOf(todayStr()); }

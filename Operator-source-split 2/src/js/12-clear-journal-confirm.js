@@ -29,7 +29,7 @@ function renderJournalClearModal(){
       '<button class="btn btn-danger" data-action="confirmJournalClearFinal" '+(ready?'':'disabled')+'>Yes, Delete Everything</button>'+
     '</div>';
 }
-function renderJournalClearModalInto(){ const el=document.getElementById('journalClearContent'); if(el) el.innerHTML = renderJournalClearModal(); }
+function renderJournalClearModalInto(){ const el=document.getElementById('journalClearContent'); if(el) morphInto(el, renderJournalClearModal(), {form:true}); }
 function confirmJournalClearFinal(){
   if((ui.journalClearText||'').trim().toUpperCase()!=='DELETE') return;
   resetPart('journal');

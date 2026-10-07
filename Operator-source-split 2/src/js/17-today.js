@@ -81,8 +81,8 @@ function renderTodayFocusMode(p){
   const doneToday = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); });
   const deepWorkToday = deepWorkMinutesTodayLive();
   const todayInfo = calDayInfo(todayStr());
-  const todayNotices = arr(todayInfo.deadlines).map(function(t){ return {label:t.title, kind:'deadline'}; })
-    .concat(arr(todayInfo.events).map(function(e){ const cat=categoryById(e.categoryId); return {label:e.title, kind:'event', color:cat?cat.color:'#8A90A2', time:e.time}; }));
+  const todayNotices = arr(todayInfo.deadlines).filter(function(t){ return t.status!=='done'; }).map(function(t){ return {label:t.title, kind:'deadline', id:t.id}; })
+    .concat(arr(todayInfo.events).map(function(e){ const cat=categoryById(e.categoryId); return {label:e.title, kind:'event', id:e.id, color:cat?cat.color:'#8A90A2', time:e.time}; }));
   const activeClients = arr(state.business.clients).filter(function(c){ return c.status==='active'; });
 
   return renderFocusQuickLinks()+
@@ -95,7 +95,7 @@ function renderTodayFocusMode(p){
       renderMiniCalendarStrip()
     ) : '<div class="view-sub" id="liveClock"></div>')+
   '</div>'+
-  '<div class="grid grid-3 stat-chip-row section" style="max-width:800px;margin:0 auto;">'+
+  '<div class="grid grid-3 stat-chip-row section" style="max-width:800px;margin:0 auto 26px;">'+
     '<div class="stat-chip" style="text-align:center;"><div class="stat-chip-label">Day Streak</div><div class="stat-chip-value">'+computeStreak()+'</div><div class="kpi-sub">rest days still count</div></div>'+
     '<div class="stat-chip" data-action="goToFinishedTasks" style="text-align:center;cursor:pointer;"><div class="stat-chip-label">Completed Today</div><div class="stat-chip-value">'+doneToday.length+' task'+(doneToday.length===1?'':'s')+'</div></div>'+
     '<div class="stat-chip" id="statDeepWorkTodayBox" style="text-align:center;"><div class="stat-chip-label">Deep Work Today</div><div class="stat-chip-value">'+fmtHours(deepWorkToday)+'</div><div class="kpi-sub">'+fmtDurationLabel(deepWorkToday)+'</div></div>'+
@@ -105,7 +105,7 @@ function renderTodayFocusMode(p){
   (todayNotices.length ? (
     '<div class="section" style="max-width:640px;margin:0 auto;"><div class="section-title" style="justify-content:center;">Today on the Calendar</div><div class="card"><div class="task-list">'+
       todayNotices.map(function(n){
-        return '<div class="task-item-v2">'+
+        return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="'+n.kind+'" data-id="'+n.id+'">'+
           (n.kind==='deadline' ? '<span class="tag" style="background:var(--danger-dim);color:#ffb3b8;">Deadline</span>' : '<span class="tag" style="background:'+n.color+'22;color:'+n.color+';">'+(n.time?fmt12Hour(n.time):'Event')+'</span>')+
           '<div class="task-title" style="flex:1;">'+escapeHtml(n.label)+'</div>'+
         '</div>';
@@ -118,9 +118,11 @@ function renderTodayFocusMode(p){
   '</div>';
 }
 function renderToday(){
-  if(isDayOff(todayStr())) return renderDayOffView();
   const p = state.profile;
+  // A session you started yourself always wins, even on a day off — otherwise locking in
+  // left you staring at the "Taking today off" screen. The day stays marked as a rest day.
   if(state.focus.activeSession) return renderTodayFocusMode(p);
+  if(isDayOff(todayStr())) return renderDayOffView();
   if(state.modes.active && state.modes.active.type==='offtime') return renderOffTimeView();
   const hour = new Date().getHours();
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';

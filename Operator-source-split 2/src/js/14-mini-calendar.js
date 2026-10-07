@@ -58,7 +58,7 @@ function renderDatePickerModal(){
       '<button class="btn btn-ghost btn-sm" data-action="closeDatePicker">Close</button>'+
     '</div>';
 }
-function renderDatePickerModalInto(){ const el=document.getElementById('miniCalContent'); if(el) el.innerHTML = renderDatePickerModal(); }
+function renderDatePickerModalInto(){ const el=document.getElementById('miniCalContent'); if(el) morphInto(el, renderDatePickerModal(), {form:true}); }
 function pickCalToday(){
   if(!ui.datePicker) return;
   const now = new Date();

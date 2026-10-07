@@ -201,6 +201,8 @@ function normalizeFocus(f){
   }
   f.sessions = arr(f.sessions).map(function(s){ if(!Array.isArray(s.completedTasks)) s.completedTasks=[]; return s; });
   f.alarms = arr(f.alarms);
+  if(f.lastManualStopAt===undefined) f.lastManualStopAt = null;
+  if(f.lastSessionEndedAt===undefined) f.lastSessionEndedAt = null;
   f.reminders = arr(f.reminders);
   if(!Array.isArray(f.prepItems)) f.prepItems = defaultFocus().prepItems;
   if(!f.motivations || typeof f.motivations!=='object') f.motivations = defaultFocus().motivations;
@@ -352,6 +354,8 @@ function normalizeSettings(s){
   if(s.appTracking.autoLockIn===undefined) s.appTracking.autoLockIn=true;
   if(s.appTracking.thresholdMinutes==null || isNaN(Number(s.appTracking.thresholdMinutes))) s.appTracking.thresholdMinutes=12;
   if(s.appTracking.graceMinutes==null || isNaN(Number(s.appTracking.graceMinutes))) s.appTracking.graceMinutes=3;
+  if(s.appTracking.cooldownMinutes==null || isNaN(Number(s.appTracking.cooldownMinutes))) s.appTracking.cooldownMinutes=15;
+  if(s.appTracking.idleSeconds==null || isNaN(Number(s.appTracking.idleSeconds))) s.appTracking.idleSeconds=60;
   return s;
 }
 function normalizeAppActivity(a){

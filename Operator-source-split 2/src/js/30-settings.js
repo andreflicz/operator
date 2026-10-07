@@ -92,6 +92,8 @@ function renderSettings(){
         '<div class="field"><label>Auto lock-in when steady on one app</label><select class="input" id="setAppTrackingAutoLockIn"><option value="on" '+(state.settings.appTracking.autoLockIn!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.autoLockIn===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Minutes on one app before auto lock-in</label><input class="input" type="number" min="3" max="120" id="setAppTrackingThreshold" value="'+state.settings.appTracking.thresholdMinutes+'"></div>'+
         '<div class="field"><label>Minutes away before auto-ending it</label><input class="input" type="number" min="1" max="60" id="setAppTrackingGrace" value="'+state.settings.appTracking.graceMinutes+'"><div class="kpi-sub">Only applies to sessions Operator started automatically — it never auto-ends a session you started yourself</div></div>'+
+        '<div class="field"><label>Cooldown after you lock out (minutes)</label><input class="input" type="number" min="0" max="240" id="setAppTrackingCooldown" value="'+state.settings.appTracking.cooldownMinutes+'"><div class="kpi-sub">Auto lock-in stays off this long after you stop a session yourself</div></div>'+
+        '<div class="field"><label>Idle after (seconds without keyboard/mouse)</label><input class="input" type="number" min="15" max="900" id="setAppTrackingIdle" value="'+state.settings.appTracking.idleSeconds+'"><div class="kpi-sub">Idle time doesn\'t count toward auto lock-in or app time</div></div>'+
       '</div></div>'+saveBtn+
       '<div class="card section" id="alarmsSettingsSection"><div class="section-title">Alarms</div>'+
         '<div class="row" style="flex-wrap:wrap;align-items:flex-end;">'+
@@ -186,7 +188,7 @@ function renderSettings(){
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Settings</div></div></div>'+
   '<div class="settings-shell">'+
     '<div class="settings-sidenav">'+navDefs.map(function(n){ return '<button class="settings-nav-item'+(active===n.id?' active':'')+'" data-action="settingsTab" data-tab="'+n.id+'"><span style="margin-right:8px;">'+n.icon+'</span>'+n.label+'</button>'; }).join('')+'</div>'+
-    '<div class="settings-content tab-panel">'+sections[active]+'</div>'+
+    '<div class="settings-content tab-panel" data-key="settings-'+active+'">'+sections[active]+'</div>'+
   '</div>';
 }
 function deleteResetBtn(){
@@ -348,6 +350,10 @@ function saveProfile(){
   if(atAutoEl) state.settings.appTracking.autoLockIn = atAutoEl.value === 'on';
   if(atThreshEl) state.settings.appTracking.thresholdMinutes = Number(atThreshEl.value)||12;
   if(atGraceEl) state.settings.appTracking.graceMinutes = Number(atGraceEl.value)||3;
+  const atCooldownEl = document.getElementById('setAppTrackingCooldown');
+  if(atCooldownEl){ const v = Number(atCooldownEl.value); state.settings.appTracking.cooldownMinutes = (isNaN(v) || atCooldownEl.value==='') ? 15 : clamp(v,0,240); }
+  const atIdleEl = document.getElementById('setAppTrackingIdle');
+  if(atIdleEl) state.settings.appTracking.idleSeconds = clamp(Number(atIdleEl.value)||60, 15, 900);
   persist('profile'); persist('standards'); persist('settings'); renderView();
 }
 function exportData(){

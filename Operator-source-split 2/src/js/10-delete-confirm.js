@@ -11,7 +11,14 @@ function armDelete(scope,id){
 }
 function performDelete(scope, id){
   armed.delete(scope+':'+id);
-  if(scope==='task'){ state.tasks.items = state.tasks.items.filter(function(x){return x.id!==id;}); if(ui.editingTaskId===id) closeTaskEditModal(); }
+  if(scope==='task'){
+    state.tasks.items = state.tasks.items.filter(function(x){return x.id!==id;});
+    if(ui.editingTaskId===id) closeTaskEditModal();
+    if(ui.editingVideoIdeaId===id) closeVideoIdeaEditModal();
+    if(ui.currentTaskId===id){ ui.currentTaskId = null; ui.currentTaskStartedAt = null; }
+    if(ui.stagedTaskId===id) ui.stagedTaskId = null;
+    if(ui.pendingCurrentTaskId===id) ui.pendingCurrentTaskId = null;
+  }
   if(scope==='alarm'){ state.focus.alarms = state.focus.alarms.filter(function(x){return x.id!==id;}); if(ui.editingAlarmId===id) closeAlarmEditModal(); }
   if(scope==='session') state.focus.sessions = state.focus.sessions.filter(function(x){return x.id!==id;});
   if(scope==='prep') state.focus.prepItems = state.focus.prepItems.filter(function(x){return x.id!==id;});

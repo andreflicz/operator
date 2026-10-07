@@ -106,7 +106,7 @@ function renderGoalEditModal(){
       '</div>'+
     '</div>';
 }
-function renderGoalEditModalInto(){ const el=document.getElementById('goalEditContent'); if(el) el.innerHTML = renderGoalEditModal(); }
+function renderGoalEditModalInto(){ const el=document.getElementById('goalEditContent'); if(el) morphInto(el, renderGoalEditModal(), {form:true}); }
 function saveEditGoal(id){
   const g = state.goals.items.find(function(x){return x.id===id;}); if(!g) return;
   g.label = document.getElementById('editGoalLabel-'+id).value.trim() || g.label;

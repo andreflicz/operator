@@ -21,8 +21,12 @@ function initScrollPicker(id, defaultValue){
     el.querySelectorAll('.picker-item').forEach(function(item){ item.classList.remove('picker-center'); });
     if(closest){ closest.classList.add('picker-center'); el.dataset.selected = closest.dataset.value; }
   }
-  let t;
-  el.addEventListener('scroll', function(){ clearTimeout(t); t=setTimeout(updateCenter, 90); });
+  // Re-renders morph the picker in place, so only wire the scroll listener once per element.
+  if(!el._pickerWired){
+    el._pickerWired = true;
+    let t;
+    el.addEventListener('scroll', function(){ clearTimeout(t); t=setTimeout(updateCenter, 90); });
+  }
   const target = el.querySelector('.picker-item[data-value="'+defaultValue+'"]');
   if(target){ try{ el.scrollTop = target.offsetTop - el.clientHeight/2 + target.offsetHeight/2; }catch(e){} }
   updateCenter();

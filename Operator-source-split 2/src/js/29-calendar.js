@@ -72,8 +72,8 @@ function renderCalendar(){
   '</div>'+
   '<div class="section" style="max-width:680px;margin:20px auto 0;"><div class="section-title">'+dayLabel+'<button class="btn btn-primary btn-sm" data-action="openCalEventModal">+ Add Event</button></div>'+
     '<div class="task-list">'+
-      selInfo.deadlines.map(function(t){ return '<div class="task-item-v2"><span class="tag" style="background:var(--danger-dim);color:#ffb3b8;">Deadline</span><div class="task-title" style="flex:1;">'+escapeHtml(t.title)+'</div></div>'; }).join('')+
-      sortedEvents.map(function(e){ const cat=categoryById(e.categoryId); return '<div class="task-item-v2">'+(e.time?'<div style="font-family:var(--font-display);font-weight:700;width:70px;">'+fmt12Hour(e.time)+'</div>':'')+'<span class="tag" style="background:'+(cat?cat.color:'#8A90A2')+'22;color:'+(cat?cat.color:'#8A90A2')+';">'+(cat?escapeHtml(cat.label):'Event')+'</span>'+(e.linkedClient?clientTagHtml(e.linkedClient):'')+'<div class="task-title" style="flex:1;">'+escapeHtml(e.title)+'</div>'+(e.meetingLink?'<button class="btn btn-good btn-sm" data-action="joinCall" data-url="'+escapeHtml(e.meetingLink)+'">&#128222; Join Call</button>':'')+'<button class="btn btn-ghost btn-sm" data-action="openCalEventModal" data-id="'+e.id+'">Edit</button>'+deleteBtn('calevent', e.id)+'</div>'; }).join('')+
+      selInfo.deadlines.map(function(t){ return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="deadline" data-id="'+t.id+'" title="Open to edit or delete"><span class="tag" style="background:var(--danger-dim);color:#ffb3b8;">Deadline</span><div class="task-title" style="flex:1;'+(t.status==='done'?'text-decoration:line-through;opacity:.6;':'')+'">'+escapeHtml(t.title)+'</div>'+(t.isVideoIdea?'<span class="kpi-sub">&#127916; video idea</span>':'')+'</div>'; }).join('')+
+      sortedEvents.map(function(e){ const cat=categoryById(e.categoryId); return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="event" data-id="'+e.id+'" title="Open to edit or delete">'+(e.time?'<div style="font-family:var(--font-display);font-weight:700;width:70px;">'+fmt12Hour(e.time)+'</div>':'')+'<span class="tag" style="background:'+(cat?cat.color:'#8A90A2')+'22;color:'+(cat?cat.color:'#8A90A2')+';">'+(cat?escapeHtml(cat.label):'Event')+'</span>'+(e.linkedClient?clientTagHtml(e.linkedClient):'')+'<div class="task-title" style="flex:1;">'+escapeHtml(e.title)+'</div>'+(e.meetingLink?'<button class="btn btn-good btn-sm" data-action="joinCall" data-url="'+escapeHtml(e.meetingLink)+'">&#128222; Join Call</button>':'')+'<button class="btn btn-ghost btn-sm" data-action="openCalEventModal" data-id="'+e.id+'">Edit</button>'+deleteBtn('calevent', e.id)+'</div>'; }).join('')+
       ((selInfo.deadlines.length+selInfo.events.length)===0 ? '<div class="empty">Nothing scheduled this day.</div>' : '')+
     '</div>'+
   '</div>'+
@@ -112,7 +112,7 @@ function renderCalEventModal(){
       '</div>'+
     '</div>';
 }
-function renderCalEventModalInto(){ const el=document.getElementById('calEventContent'); if(el) el.innerHTML = renderCalEventModal(); }
+function renderCalEventModalInto(){ const el=document.getElementById('calEventContent'); if(el) morphInto(el, renderCalEventModal(), {form:true}); }
 function syncCalEventAlarm(ev, wantsAlarm){
   if(wantsAlarm && ev.time){
     if(ev.alarmId){
@@ -155,6 +155,14 @@ function deleteCalEventFromModal(id){
   state.calendar.events = state.calendar.events.filter(function(x){ return x.id!==id; });
   closeCalEventModal();
   persist('calendar'); persist('focus'); renderView();
+}
+// Opens whatever a calendar row points at (event or task deadline) in its editor, which
+// carries both the edit fields and Delete. Closes the Upcoming popover first so the editor
+// isn't hidden behind it.
+function openCalItem(kind, id){
+  closeUpcomingPopover();
+  if(kind==='event') openCalEventModal(id);
+  else openTaskEditModal(id);
 }
 function joinCall(url){ if(url) window.open(url, '_blank'); }
 

@@ -77,7 +77,7 @@ function renderPreFocusWhyStep(){
 }
 function preFocusGoToWhy(){ if(!ui.stagedTaskId) return; ui.preFocusStep='why'; renderPreFocusModalInto(); }
 function preFocusBackToStart(){ ui.preFocusStep='before'; renderPreFocusModalInto(); }
-function renderPreFocusModalInto(){ const el=document.getElementById('preFocusContent'); if(el) el.innerHTML = renderPreFocusModal(); }
+function renderPreFocusModalInto(){ const el=document.getElementById('preFocusContent'); if(el) morphInto(el, renderPreFocusModal(), {form:true}); }
 function closePreFocusModal(){ document.getElementById('preFocusOverlay').classList.add('hidden'); }
 function clearStagedTaskFromPreFocus(){ ui.stagedTaskId = null; ui.preFocusPicking = false; renderPreFocusModalInto(); }
 function addTaskFromPreFocus(){ closePreFocusModal(); openAddTaskModal(); }
@@ -119,14 +119,20 @@ function startMode(type){
   playRestSound();
   persist('modes'); renderView();
 }
-function endMode(){
+function finishActiveMode(silent){
   const active = state.modes.active; if(!active) return;
   const endedAt = Date.now();
   const minutes = Math.max(1, Math.round((endedAt-active.startedAt)/60000));
   state.modes.history.push({id:uid(), type:active.type, date:todayStr(new Date(active.startedAt)), startedAt:active.startedAt, endedAt:endedAt, minutes:minutes});
   state.modes.active = null;
-  playStopSound();
-  persist('modes'); renderView();
+  state.modes.lastEndedAt = endedAt;
+  if(!silent) playStopSound();
+  persist('modes');
+}
+function endMode(){
+  if(!state.modes.active) return;
+  finishActiveMode(false);
+  renderView();
 }
 function modeMinutesFor(dateStr, type){
   return state.modes.history.filter(function(m){ return m.date===dateStr && (!type || m.type===type); }).reduce(function(a,m){ return a+m.minutes; },0);

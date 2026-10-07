@@ -24,7 +24,7 @@ function renderNewPackageModal(){
       '<button class="btn btn-primary" data-action="addPackage">Create Package</button>'+
     '</div>';
 }
-function renderNewPackageModalInto(){ const el=document.getElementById('newPackageContent'); if(el) el.innerHTML = renderNewPackageModal(); }
+function renderNewPackageModalInto(){ const el=document.getElementById('newPackageContent'); if(el) morphInto(el, renderNewPackageModal(), {form:true}); }
 function packageRow(pk){
   const deliverables = arr(pk.deliverables);
   return '<div class="card" style="margin-bottom:10px;">'+
@@ -86,7 +86,7 @@ function renderPackageEditModal(){
       '<button class="btn btn-primary" data-action="closePackageEditModal">Done</button>'+
     '</div>';
 }
-function renderPackageEditModalInto(){ const el=document.getElementById('packageEditContent'); if(el) el.innerHTML = renderPackageEditModal(); }
+function renderPackageEditModalInto(){ const el=document.getElementById('packageEditContent'); if(el) morphInto(el, renderPackageEditModal(), {form:true}); }
 function savePackageFields(id){
   const pk = arr(state.business.packages).find(function(x){return x.id===id;}); if(!pk) return;
   const nameEl = document.getElementById('editPackageName-'+id);
@@ -107,6 +107,8 @@ function addPackageDeliverable(id){
   const weeklyTarget = targetEl ? Math.max(1, Number(targetEl.value)||1) : 1;
   if(!Array.isArray(pk.deliverables)) pk.deliverables=[];
   pk.deliverables.push({id:uid(), title:title, weeklyTarget:weeklyTarget});
+  titleEl.value = '';
+  if(targetEl) targetEl.value = targetEl.defaultValue;
   persist('business'); renderPackageEditModalInto();
 }
 function removePackageDeliverable(id, deliverableId){

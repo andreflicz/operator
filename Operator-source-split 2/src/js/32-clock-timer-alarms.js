@@ -11,6 +11,10 @@ function stretchLockedHeaderLine(){
   header.style.marginRight = (-rightGap)+'px';
   header.style.paddingLeft = (leftGap+16)+'px';
   header.style.paddingRight = (rightGap+16)+'px';
+  // Pull the header up over .main's top padding — that padding used to leave an empty
+  // black band above the locked-in header.
+  const padTop = parseFloat(getComputedStyle(main).paddingTop)||0;
+  header.style.marginTop = (-padTop)+'px';
 }
 window.addEventListener('resize', stretchLockedHeaderLine);
 function tickClocks(){
@@ -34,7 +38,38 @@ function tickClocks(){
 }
 function startClocks(){
   tickClocks();
-  setInterval(tickClocks, 1000);
+  setInterval(function(){
+    tickClocks();
+    if(lastRenderedDay && todayStr()!==lastRenderedDay) handleDayRollover(lastRenderedDay);
+  }, 1000);
+}
+// Midnight rollover. Previously nothing re-rendered at 12 AM unless a session was running,
+// so on a non-working day the app stayed on yesterday until you clicked something.
+function handleDayRollover(prevDay){
+  splitActiveModeAtMidnight();
+  if(ui.calendarSelectedDate===prevDay){
+    ui.calendarSelectedDate = todayStr();
+    ui.calendarYear = new Date().getFullYear();
+    ui.calendarMonth = new Date().getMonth();
+  }
+  renderView();
+}
+// An off-time / shooting block that runs past midnight is logged per day: the part before
+// midnight is saved to the day it belongs to and the block carries on from 12 AM. Break
+// mode is tied to the focus session, so it's left alone.
+function splitActiveModeAtMidnight(){
+  const active = state.modes.active;
+  if(!active || active.linkedFocus) return;
+  let changed = false;
+  while(todayStr(new Date(active.startedAt)) < todayStr()){
+    const start = new Date(active.startedAt);
+    const midnight = new Date(start.getFullYear(), start.getMonth(), start.getDate()+1).getTime();
+    const minutes = Math.max(1, Math.round((midnight-active.startedAt)/60000));
+    state.modes.history.push({id:uid(), type:active.type, date:todayStr(start), startedAt:active.startedAt, endedAt:midnight, minutes:minutes, note:active.note||'', splitAtMidnight:true});
+    active.startedAt = midnight;
+    changed = true;
+  }
+  if(changed) persist('modes');
 }
 function startModeTicker(){
   setInterval(function(){

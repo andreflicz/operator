@@ -4,7 +4,9 @@ function renderPersonalStatsPanel(){
   const streak = computeStreak();
   const todayFocusMin = deepWorkMinutesTodayLive();
   const yesterdayFocusMin = deepWorkMinutesFor(addDays(todayStr(),-1));
-  let weekFocusMin = 0; for(let i=0;i<7;i++){ weekFocusMin += deepWorkMinutesFor(addDays(todayStr(),-i)); }
+  // This week = Sunday 12 AM through now (it used to be a rolling 7 days that never reset).
+  let weekFocusMin = todayFocusMin;
+  for(let d=startOfWeekSundayStr(todayStr()); d<todayStr(); d=addDays(d,1)){ weekFocusMin += deepWorkMinutesFor(d); }
   const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today'; });
   const doneToday = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); });
   const manualItems = arr(state.standards.items);

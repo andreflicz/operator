@@ -240,7 +240,10 @@
   .subtab{padding:6px 13px; border-radius:20px; border:1px solid var(--border); background:var(--panel-2); color:var(--text-dim); font-size:12.5px; cursor:pointer; font-weight:600; font-family:var(--font-display);}
   .subtab.active{background:var(--accent-dim); color:var(--text); border-color:var(--accent);}
   .chart-svg{width:100%; height:auto; display:block;}
-  .overlay{position:fixed; inset:0; background:rgba(6,7,12,.94); display:flex; align-items:center; justify-content:center; z-index:100; flex-direction:column; gap:18px; padding:20px;}
+  .overlay{position:fixed; inset:0; background:rgba(6,7,12,.8); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; z-index:100; flex-direction:column; gap:18px; padding:20px; animation:overlayFadeIn .16s ease-out;}
+  .overlay.overlay-instant{animation:none;}
+  .overlay.overlay-instant > .card{animation:none !important;}
+  @keyframes overlayFadeIn{ from{opacity:0;} to{opacity:1;} }
   .overlay.hidden{display:none;}
   .drawer-overlay{justify-content:flex-end !important; align-items:stretch !important; padding:0 !important; background:rgba(6,7,12,.7) !important; z-index:120;}
   #lockInNudgeOverlay{ z-index:150; }
@@ -360,10 +363,10 @@
   @keyframes goalsStrobe{ 0%,85%,100%{ text-shadow:none; } 92%{ text-shadow:0 0 14px rgba(63,190,142,.85), 0 0 28px rgba(63,190,142,.5); } }
   .ring-wrap{display:flex; flex-direction:column; align-items:center; gap:6px;}
   #viewRoot{ max-width:1400px; margin:0 auto; width:100%; }
-  #viewRoot.view-fade{ animation: viewFadeIn .28s ease; }
-  @keyframes viewFadeIn{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
-  .tab-panel{ animation: subtabFadeIn .18s ease; }
-  @keyframes subtabFadeIn{ from{opacity:0; transform:translateY(3px);} to{opacity:1; transform:translateY(0);} }
+  #viewRoot.view-fade{ animation: viewFadeIn .2s ease-out; }
+  @keyframes viewFadeIn{ from{opacity:.4;} to{opacity:1;} }
+  .tab-panel, .subtab-panel{ animation: subtabFadeIn .18s ease-out; }
+  @keyframes subtabFadeIn{ from{opacity:.45;} to{opacity:1;} }
   .day-off-wrap{ display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:56vh; }
   .day-off-card{ text-align:center; padding:36px 44px; display:flex; flex-direction:column; align-items:center; animation:dayOffFadeIn .4s ease; }
   .offtime-card{ background:#15161a; border-color:#3a3d45 !important; box-shadow:0 0 50px rgba(255,255,255,.06) !important; filter:grayscale(1); }
@@ -414,6 +417,8 @@
     .stat-chip-value{font-size:17px;}
     .kpi-value{font-size:19px;}
   }
+  .cal-item-clickable{ cursor:pointer; }
+  .cal-item-clickable:hover{ border-color:var(--accent); background:var(--panel-2); }
 </style>
 </head>
 <body>
@@ -499,6 +504,9 @@
 </div>
 <div id="videoIdeaOverlay" class="overlay hidden">
   <div class="card" id="videoIdeaContent" style="max-width:440px; width:100%;"></div>
+</div>
+<div id="videoIdeaEditOverlay" class="overlay hidden">
+  <div class="card" id="videoIdeaEditContent" style="max-width:460px; width:100%; max-height:85vh; overflow-y:auto;"></div>
 </div>
 <div id="journalClearOverlay" class="overlay hidden">
   <div class="card" id="journalClearContent" style="max-width:460px; width:100%;"></div>
@@ -605,6 +613,14 @@ function startOfWeekStr(dateStr){
   dt.setDate(dt.getDate()+diff);
   return todayStr(dt);
 }
+// Sunday-based week start (local time) — used for "time worked this week", which resets
+// every Sunday at 12 AM. Business deliverable weeks keep their Monday start.
+function startOfWeekSundayStr(dateStr){
+  const parts = (dateStr||todayStr()).split('-').map(Number);
+  const dt = new Date(parts[0], parts[1]-1, parts[2]);
+  dt.setDate(dt.getDate()-dt.getDay());
+  return todayStr(dt);
+}
 function thisWeekKey(){ return startOfWeekStr(todayStr()); }
 function endOfWeekStr(dateStr){ return addDays(startOfWeekStr(dateStr), 6); }
 function thisMonthKey(){ return monthKeyOf(todayStr()); }
@@ -705,6 +721,154 @@ const RESET_TARGETS = [
   {id:'appActivity', label:'App activity history (most-used apps)'}
 ];
 
+
+// ============ DOM MORPH (in-place re-render) ============
+// Every action re-renders by building an HTML string. Swapping that string in with
+// innerHTML throws away the whole subtree: entry animations replay from opacity 0 (the
+// app-wide black flash), images re-decode, inner scroll positions jump to the top, and
+// half-typed form fields reset. morphInto() instead patches the live DOM to match the new
+// markup, so only the nodes whose content actually changed are touched.
+//
+// Matching: children are paired by key (id, data-key, data-task-id, or data-action+data-id)
+// and otherwise by position + tag name. Form fields:
+//  - default mode (views): the live value is synced to the new markup, except for the
+//    field that currently has focus, so typing is never clobbered by a background re-render.
+//  - opts.form (modals): a field the user has edited keeps their value as long as the
+//    markup's own default for it didn't change — re-rendering a modal (e.g. toggling a
+//    chip) no longer wipes edits made to other fields.
+// data-selected is skipped because scroll pickers keep their live selection there.
+const MORPH_SKIP_ATTRS = { 'data-selected': true };
+function morphKey(node){
+  if(node.nodeType!==1) return null;
+  if(node.id) return '#'+node.id;
+  const dk = node.getAttribute('data-key'); if(dk) return 'k:'+dk;
+  const tk = node.getAttribute('data-task-id'); if(tk) return 't:'+tk;
+  const did = node.getAttribute('data-id'), act = node.getAttribute('data-action');
+  if(did && act) return 'a:'+act+':'+did;
+  return null;
+}
+function morphInto(container, html, opts){
+  if(!container) return;
+  const tpl = document.createElement('template');
+  tpl.innerHTML = html;
+  morphChildren(container, tpl.content, opts||{});
+}
+function morphChildren(oldParent, newParent, opts){
+  const oldNodes = Array.prototype.slice.call(oldParent.childNodes);
+  const newNodes = Array.prototype.slice.call(newParent.childNodes);
+  const keyed = {};
+  oldNodes.forEach(function(n){ const k = morphKey(n); if(k && !keyed[k]) keyed[k] = n; });
+  const used = new Set();
+  let ptr = 0;
+  for(let i=0;i<newNodes.length;i++){
+    const nn = newNodes[i];
+    const k = morphKey(nn);
+    let match = null;
+    if(k && keyed[k] && !used.has(keyed[k]) && keyed[k].nodeName===nn.nodeName){
+      match = keyed[k];
+    } else if(!k){
+      while(ptr<oldNodes.length && (used.has(oldNodes[ptr]) || morphKey(oldNodes[ptr]))) ptr++;
+      const cand = oldNodes[ptr];
+      if(cand && cand.nodeType===nn.nodeType && cand.nodeName===nn.nodeName){ match = cand; ptr++; }
+    }
+    const ref = oldParent.childNodes[i] || null;
+    if(match){
+      used.add(match);
+      morphNode(match, nn, opts);
+      if(match!==ref) oldParent.insertBefore(match, ref);
+    } else {
+      oldParent.insertBefore(nn, ref);
+    }
+  }
+  while(oldParent.childNodes.length>newNodes.length) oldParent.removeChild(oldParent.lastChild);
+}
+function morphNode(oldN, newN, opts){
+  if(oldN.nodeType===3 || oldN.nodeType===8){
+    if(oldN.nodeValue!==newN.nodeValue) oldN.nodeValue = newN.nodeValue;
+    return;
+  }
+  if(oldN.nodeType!==1) return;
+  const tag = oldN.nodeName;
+  const isField = tag==='INPUT' || tag==='TEXTAREA' || tag==='SELECT';
+  const snap = isField ? fieldSnapshot(oldN) : null;
+  // attributes
+  const oldAttrs = oldN.attributes, newAttrs = newN.attributes;
+  for(let i=oldAttrs.length-1;i>=0;i--){
+    const name = oldAttrs[i].name;
+    if(MORPH_SKIP_ATTRS[name]) continue;
+    if(!newN.hasAttribute(name)) oldN.removeAttribute(name);
+  }
+  for(let i=0;i<newAttrs.length;i++){
+    const a = newAttrs[i];
+    if(MORPH_SKIP_ATTRS[a.name] && oldN.hasAttribute(a.name)) continue;
+    if(oldN.getAttribute(a.name)!==a.value) oldN.setAttribute(a.name, a.value);
+  }
+  if(tag==='TEXTAREA'){
+    const newDefault = newN.value;
+    if(oldN.defaultValue!==newDefault) oldN.defaultValue = newDefault;
+    restoreField(oldN, snap, newDefault, opts);
+    return;
+  }
+  morphChildren(oldN, newN, opts);
+  if(isField) restoreField(oldN, snap, tag==='INPUT' ? newN.getAttribute('value') : selectDefault(newN), opts, newN);
+}
+function selectDefault(sel){
+  const opt = sel.querySelector('option[selected]') || sel.querySelector('option');
+  return opt ? opt.value : '';
+}
+function fieldSnapshot(el){
+  const tag = el.nodeName;
+  if(tag==='SELECT') return { value:el.value, def:selectDefault(el) };
+  if(tag==='INPUT' && (el.type==='checkbox' || el.type==='radio')) return { checked:el.checked, def:el.hasAttribute('checked') };
+  if(tag==='INPUT' && el.type==='file') return null;
+  return { value:el.value, def: tag==='TEXTAREA' ? el.defaultValue : el.getAttribute('value') };
+}
+function restoreField(el, snap, newDefault, opts, newN){
+  if(!snap) return;
+  const focused = document.activeElement===el;
+  const isCheck = el.nodeName==='INPUT' && (el.type==='checkbox' || el.type==='radio');
+  if(isCheck){
+    const newChecked = newN ? newN.hasAttribute('checked') : snap.def;
+    const dirty = snap.checked!==snap.def;
+    const keep = focused || (opts.form && dirty && newChecked===snap.def);
+    el.checked = keep ? snap.checked : newChecked;
+    return;
+  }
+  const want = newDefault==null ? '' : newDefault;
+  const dirty = snap.value!==(snap.def==null ? '' : snap.def);
+  const keep = focused || (opts.form && dirty && (newDefault==null ? '' : newDefault)===(snap.def==null ? '' : snap.def));
+  const target = keep ? snap.value : want;
+  if(el.value!==target) el.value = target;
+}
+// Modal content cards are cleared when their overlay closes, so reopening a modal for a
+// different item always starts from a clean render instead of morphing stale fields.
+// Overlays also get a short fade-in — skipped when one modal hands off directly to
+// another, so chained dialogs don't flicker.
+(function watchOverlays(){
+  let lastHiddenAt = 0;
+  function setup(){
+    if(!window.MutationObserver) return;
+    const obs = new MutationObserver(function(muts){
+      muts.forEach(function(m){
+        const o = m.target;
+        const nowHidden = o.classList.contains('hidden');
+        const wasHidden = String(m.oldValue||'').split(/\s+/).indexOf('hidden')>=0;
+        if(nowHidden && !wasHidden){
+          lastHiddenAt = performance.now();
+          const card = o.querySelector(':scope > [id$="Content"]');
+          if(card && o.id!=='alarmOverlay') card.innerHTML = '';
+        } else if(!nowHidden && wasHidden){
+          const chained = performance.now()-lastHiddenAt < 150;
+          o.classList.toggle('overlay-instant', chained);
+        }
+      });
+    });
+    document.querySelectorAll('.overlay').forEach(function(o){
+      obs.observe(o, {attributes:true, attributeFilter:['class'], attributeOldValue:true});
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', setup); else setup();
+})();
 // ============ SCROLL PICKER ============
 function buildScrollPicker(id, options, selectedValue){
   const items = options.map(function(o){ return '<div class="picker-item" data-value="'+o.value+'">'+o.label+'</div>'; }).join('');
@@ -728,8 +892,12 @@ function initScrollPicker(id, defaultValue){
     el.querySelectorAll('.picker-item').forEach(function(item){ item.classList.remove('picker-center'); });
     if(closest){ closest.classList.add('picker-center'); el.dataset.selected = closest.dataset.value; }
   }
-  let t;
-  el.addEventListener('scroll', function(){ clearTimeout(t); t=setTimeout(updateCenter, 90); });
+  // Re-renders morph the picker in place, so only wire the scroll listener once per element.
+  if(!el._pickerWired){
+    el._pickerWired = true;
+    let t;
+    el.addEventListener('scroll', function(){ clearTimeout(t); t=setTimeout(updateCenter, 90); });
+  }
   const target = el.querySelector('.picker-item[data-value="'+defaultValue+'"]');
   if(target){ try{ el.scrollTop = target.offsetTop - el.clientHeight/2 + target.offsetHeight/2; }catch(e){} }
   updateCenter();
@@ -798,7 +966,7 @@ function defaultJournalTypes(){
 }
 function defaultSettings(){
   return { clientCare: { yellowHours:48, redHours:72 }, quickLinks: { businessFilesPath:'', metaAdsUrl:'https://adsmanager.facebook.com', ghlUrl:'https://app.gohighlevel.com', driveUrl:'https://drive.google.com', lastAiUsed:'chatgpt', icons:{} },
-    appTracking: { enabled:true, autoLockIn:true, thresholdMinutes:12, graceMinutes:3 } };
+    appTracking: { enabled:true, autoLockIn:true, thresholdMinutes:12, graceMinutes:3, cooldownMinutes:15, idleSeconds:60 } };
 }
 const AI_TOOLS = [
   {id:'chatgpt', emoji:'🤖', label:'ChatGPT', url:'https://chat.openai.com', bg:'#10a37f'},
@@ -1063,6 +1231,8 @@ function normalizeFocus(f){
   }
   f.sessions = arr(f.sessions).map(function(s){ if(!Array.isArray(s.completedTasks)) s.completedTasks=[]; return s; });
   f.alarms = arr(f.alarms);
+  if(f.lastManualStopAt===undefined) f.lastManualStopAt = null;
+  if(f.lastSessionEndedAt===undefined) f.lastSessionEndedAt = null;
   f.reminders = arr(f.reminders);
   if(!Array.isArray(f.prepItems)) f.prepItems = defaultFocus().prepItems;
   if(!f.motivations || typeof f.motivations!=='object') f.motivations = defaultFocus().motivations;
@@ -1214,6 +1384,8 @@ function normalizeSettings(s){
   if(s.appTracking.autoLockIn===undefined) s.appTracking.autoLockIn=true;
   if(s.appTracking.thresholdMinutes==null || isNaN(Number(s.appTracking.thresholdMinutes))) s.appTracking.thresholdMinutes=12;
   if(s.appTracking.graceMinutes==null || isNaN(Number(s.appTracking.graceMinutes))) s.appTracking.graceMinutes=3;
+  if(s.appTracking.cooldownMinutes==null || isNaN(Number(s.appTracking.cooldownMinutes))) s.appTracking.cooldownMinutes=15;
+  if(s.appTracking.idleSeconds==null || isNaN(Number(s.appTracking.idleSeconds))) s.appTracking.idleSeconds=60;
   return s;
 }
 function normalizeAppActivity(a){
@@ -1611,7 +1783,14 @@ function armDelete(scope,id){
 }
 function performDelete(scope, id){
   armed.delete(scope+':'+id);
-  if(scope==='task'){ state.tasks.items = state.tasks.items.filter(function(x){return x.id!==id;}); if(ui.editingTaskId===id) closeTaskEditModal(); }
+  if(scope==='task'){
+    state.tasks.items = state.tasks.items.filter(function(x){return x.id!==id;});
+    if(ui.editingTaskId===id) closeTaskEditModal();
+    if(ui.editingVideoIdeaId===id) closeVideoIdeaEditModal();
+    if(ui.currentTaskId===id){ ui.currentTaskId = null; ui.currentTaskStartedAt = null; }
+    if(ui.stagedTaskId===id) ui.stagedTaskId = null;
+    if(ui.pendingCurrentTaskId===id) ui.pendingCurrentTaskId = null;
+  }
   if(scope==='alarm'){ state.focus.alarms = state.focus.alarms.filter(function(x){return x.id!==id;}); if(ui.editingAlarmId===id) closeAlarmEditModal(); }
   if(scope==='session') state.focus.sessions = state.focus.sessions.filter(function(x){return x.id!==id;});
   if(scope==='prep') state.focus.prepItems = state.focus.prepItems.filter(function(x){return x.id!==id;});
@@ -1721,7 +1900,7 @@ function renderJournalClearModal(){
       '<button class="btn btn-danger" data-action="confirmJournalClearFinal" '+(ready?'':'disabled')+'>Yes, Delete Everything</button>'+
     '</div>';
 }
-function renderJournalClearModalInto(){ const el=document.getElementById('journalClearContent'); if(el) el.innerHTML = renderJournalClearModal(); }
+function renderJournalClearModalInto(){ const el=document.getElementById('journalClearContent'); if(el) morphInto(el, renderJournalClearModal(), {form:true}); }
 function confirmJournalClearFinal(){
   if((ui.journalClearText||'').trim().toUpperCase()!=='DELETE') return;
   resetPart('journal');
@@ -1768,7 +1947,7 @@ function taskCard(t){
   const cat = t.categoryId ? taskCategoryById(t.categoryId) : null;
   const whiteAccent = t.isVideoIdea===true;
   return '<div class="task-card '+(t.status==='done'?'done':'')+(t.ongoing?' ongoing-task-card':'')+(selected?' card-selected':'')+(isCurrent?' current-task-active':'')+(pending?' just-completed':'')+(isStaged?' staged-task-card':'')+(whiteAccent?' video-idea-card':'')+'" data-action="'+(ui.taskSelectMode?'toggleTaskSelect':'openTaskEditModal')+'" data-id="'+t.id+'" style="cursor:pointer;'+(cat && !whiteAccent?'border-left:3px solid '+cat.color+';':'')+'" '+(draggable?'draggable="true" data-task-id="'+t.id+'"':'')+'>'+
-    '<div class="row" style="justify-content:space-between;">'+(ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+priorityTag(t.priority)+(isCurrent?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">'+currentTaskLabel()+'</span>':'')+(isStaged?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">&#128204; Up Next</span>':'')+(t.ongoing?'<span class="tag tag-ongoing">&#128204; Ongoing</span>':'')+(doneToday?'<span class="tag tag-good">&#10003; Done today</span>':'')+'</div>'+
+    '<div class="row" style="justify-content:space-between;">'+(ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+(t.isVideoIdea?'':priorityTag(t.priority))+(isCurrent?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">'+currentTaskLabel()+'</span>':'')+(isStaged?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">&#128204; Up Next</span>':'')+(t.ongoing?'<span class="tag tag-ongoing">&#128204; Ongoing</span>':'')+(doneToday?'<span class="tag tag-good">&#10003; Done today</span>':'')+'</div>'+
     '<div class="task-card-title">'+escapeHtml(t.title)+'</div>'+
     (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     (t.isVideoIdea && t.videoType ? '<div style="margin-top:2px;"><span class="tag" style="background:rgba(255,255,255,.1);color:#fff;">'+escapeHtml((taskVideoTypeById(t.videoType)||{}).label||'')+'</span></div>' : '')+
@@ -1870,8 +2049,10 @@ function bulkRemoveTasks(){
   persist('tasks'); renderView();
 }
 function openTaskEditModal(id){
-  ui.editingTaskId = id;
   const t = state.tasks.items.find(function(x){return x.id===id;});
+  // Video ideas have their own editor — wherever they're opened from (Overview, lineup, calendar).
+  if(t && t.isVideoIdea){ openVideoIdeaEditModal(id); return; }
+  ui.editingTaskId = id;
   ui.editTaskClientsSel = t ? t.clients.slice() : ['personal'];
   const o = document.getElementById('taskEditOverlay');
   if(!o) return;
@@ -1897,12 +2078,15 @@ function renderTaskEditModal(){
     '</select></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editIncludeStandard-'+t.id+'" '+(t.includeInStandard?'checked':'')+' style="margin-right:6px;">Include in Today\'s Standard</label>'+
     '</div>'+
-    '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
-      '<button class="btn btn-ghost" data-action="closeTaskEditModal">Cancel</button>'+
-      '<button class="btn btn-primary" data-action="saveEditTask" data-id="'+t.id+'">Save</button>'+
+    '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
+      deleteBtn('task', t.id)+
+      '<div class="row">'+
+        '<button class="btn btn-ghost" data-action="closeTaskEditModal">Cancel</button>'+
+        '<button class="btn btn-primary" data-action="saveEditTask" data-id="'+t.id+'">Save</button>'+
+      '</div>'+
     '</div>';
 }
-function renderTaskEditModalInto(){ const el=document.getElementById('taskEditContent'); if(el) el.innerHTML = renderTaskEditModal(); }
+function renderTaskEditModalInto(){ const el=document.getElementById('taskEditContent'); if(el) morphInto(el, renderTaskEditModal(), {form:true}); }
 function saveEditTask(id){
   const t = state.tasks.items.find(function(x){return x.id===id;}); if(!t) return;
   const titleEl = document.getElementById('editTitle-'+id);
@@ -2001,7 +2185,7 @@ function renderDatePickerModal(){
       '<button class="btn btn-ghost btn-sm" data-action="closeDatePicker">Close</button>'+
     '</div>';
 }
-function renderDatePickerModalInto(){ const el=document.getElementById('miniCalContent'); if(el) el.innerHTML = renderDatePickerModal(); }
+function renderDatePickerModalInto(){ const el=document.getElementById('miniCalContent'); if(el) morphInto(el, renderDatePickerModal(), {form:true}); }
 function pickCalToday(){
   if(!ui.datePicker) return;
   const now = new Date();
@@ -2014,19 +2198,19 @@ function buildUpcomingList(days){
   const cutoff = addDays(todayStr(), days||14);
   const upcoming = [];
   state.tasks.items.forEach(function(t){
-    if(t.deadline && t.status!=='done' && t.deadline<=cutoff && t.deadline>=todayStr()) upcoming.push({date:t.deadline, label:t.title, kind:'deadline'});
+    if(t.deadline && t.status!=='done' && t.deadline<=cutoff && t.deadline>=todayStr()) upcoming.push({date:t.deadline, label:t.title, kind:'deadline', id:t.id});
   });
   state.calendar.events.forEach(function(e){
     if(e.date<=cutoff && e.date>=todayStr()){
       const cat = categoryById(e.categoryId);
-      upcoming.push({date:e.date, label:e.title, kind:'event', color: cat?cat.color:'#8A90A2'});
+      upcoming.push({date:e.date, label:e.title, kind:'event', id:e.id, color: cat?cat.color:'#8A90A2'});
     }
   });
   upcoming.sort(function(a,b){ return a.date.localeCompare(b.date); });
   return upcoming;
 }
 function renderUpcomingRow(u){
-  return '<div class="task-item-v2"><div style="width:70px;font-family:var(--font-display);font-weight:700;">'+fmtDateShort(u.date)+'</div>'+
+  return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="'+u.kind+'" data-id="'+u.id+'" title="Open"><div style="width:70px;font-family:var(--font-display);font-weight:700;">'+fmtDateShort(u.date)+'</div>'+
     (u.kind==='deadline' ? '<span class="tag" style="background:var(--danger-dim);color:#ffb3b8;">Deadline</span>' : '<span class="tag" style="background:'+u.color+'22;color:'+u.color+';">Event</span>')+
     '<div class="task-title" style="flex:1;">'+escapeHtml(u.label)+'</div></div>';
 }
@@ -2045,7 +2229,7 @@ function renderUpcomingPopover(){
       '<button class="btn btn-primary" data-action="closeUpcomingPopover">Close</button>'+
     '</div>';
 }
-function renderUpcomingPopoverInto(){ const el=document.getElementById('upcomingContent'); if(el) el.innerHTML = renderUpcomingPopover(); }
+function renderUpcomingPopoverInto(){ const el=document.getElementById('upcomingContent'); if(el) morphInto(el, renderUpcomingPopover(), {form:true}); }
 
 // ============ DASHBOARD PANELS (Today) ============
 function renderPersonalStatsPanel(){
@@ -2053,7 +2237,9 @@ function renderPersonalStatsPanel(){
   const streak = computeStreak();
   const todayFocusMin = deepWorkMinutesTodayLive();
   const yesterdayFocusMin = deepWorkMinutesFor(addDays(todayStr(),-1));
-  let weekFocusMin = 0; for(let i=0;i<7;i++){ weekFocusMin += deepWorkMinutesFor(addDays(todayStr(),-i)); }
+  // This week = Sunday 12 AM through now (it used to be a rolling 7 days that never reset).
+  let weekFocusMin = todayFocusMin;
+  for(let d=startOfWeekSundayStr(todayStr()); d<todayStr(); d=addDays(d,1)){ weekFocusMin += deepWorkMinutesFor(d); }
   const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today'; });
   const doneToday = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); });
   const manualItems = arr(state.standards.items);
@@ -2452,8 +2638,8 @@ function renderTodayFocusMode(p){
   const doneToday = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); });
   const deepWorkToday = deepWorkMinutesTodayLive();
   const todayInfo = calDayInfo(todayStr());
-  const todayNotices = arr(todayInfo.deadlines).map(function(t){ return {label:t.title, kind:'deadline'}; })
-    .concat(arr(todayInfo.events).map(function(e){ const cat=categoryById(e.categoryId); return {label:e.title, kind:'event', color:cat?cat.color:'#8A90A2', time:e.time}; }));
+  const todayNotices = arr(todayInfo.deadlines).filter(function(t){ return t.status!=='done'; }).map(function(t){ return {label:t.title, kind:'deadline', id:t.id}; })
+    .concat(arr(todayInfo.events).map(function(e){ const cat=categoryById(e.categoryId); return {label:e.title, kind:'event', id:e.id, color:cat?cat.color:'#8A90A2', time:e.time}; }));
   const activeClients = arr(state.business.clients).filter(function(c){ return c.status==='active'; });
 
   return renderFocusQuickLinks()+
@@ -2466,7 +2652,7 @@ function renderTodayFocusMode(p){
       renderMiniCalendarStrip()
     ) : '<div class="view-sub" id="liveClock"></div>')+
   '</div>'+
-  '<div class="grid grid-3 stat-chip-row section" style="max-width:800px;margin:0 auto;">'+
+  '<div class="grid grid-3 stat-chip-row section" style="max-width:800px;margin:0 auto 26px;">'+
     '<div class="stat-chip" style="text-align:center;"><div class="stat-chip-label">Day Streak</div><div class="stat-chip-value">'+computeStreak()+'</div><div class="kpi-sub">rest days still count</div></div>'+
     '<div class="stat-chip" data-action="goToFinishedTasks" style="text-align:center;cursor:pointer;"><div class="stat-chip-label">Completed Today</div><div class="stat-chip-value">'+doneToday.length+' task'+(doneToday.length===1?'':'s')+'</div></div>'+
     '<div class="stat-chip" id="statDeepWorkTodayBox" style="text-align:center;"><div class="stat-chip-label">Deep Work Today</div><div class="stat-chip-value">'+fmtHours(deepWorkToday)+'</div><div class="kpi-sub">'+fmtDurationLabel(deepWorkToday)+'</div></div>'+
@@ -2476,7 +2662,7 @@ function renderTodayFocusMode(p){
   (todayNotices.length ? (
     '<div class="section" style="max-width:640px;margin:0 auto;"><div class="section-title" style="justify-content:center;">Today on the Calendar</div><div class="card"><div class="task-list">'+
       todayNotices.map(function(n){
-        return '<div class="task-item-v2">'+
+        return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="'+n.kind+'" data-id="'+n.id+'">'+
           (n.kind==='deadline' ? '<span class="tag" style="background:var(--danger-dim);color:#ffb3b8;">Deadline</span>' : '<span class="tag" style="background:'+n.color+'22;color:'+n.color+';">'+(n.time?fmt12Hour(n.time):'Event')+'</span>')+
           '<div class="task-title" style="flex:1;">'+escapeHtml(n.label)+'</div>'+
         '</div>';
@@ -2489,9 +2675,11 @@ function renderTodayFocusMode(p){
   '</div>';
 }
 function renderToday(){
-  if(isDayOff(todayStr())) return renderDayOffView();
   const p = state.profile;
+  // A session you started yourself always wins, even on a day off — otherwise locking in
+  // left you staring at the "Taking today off" screen. The day stays marked as a rest day.
   if(state.focus.activeSession) return renderTodayFocusMode(p);
+  if(isDayOff(todayStr())) return renderDayOffView();
   if(state.modes.active && state.modes.active.type==='offtime') return renderOffTimeView();
   const hour = new Date().getHours();
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
@@ -2626,7 +2814,9 @@ function renderFocusTasksTab(){
       '<div class="subtab '+(sub==='videoIdeas'?'active':'')+'" data-action="focusTasksSubTab" data-tab="videoIdeas">&#127916; Video Ideas <span style="opacity:.7;">'+videoIdeas.length+'</span></div>'+
       '<div class="subtab '+(sub==='finished'?'active':'')+'" data-action="focusTasksSubTab" data-tab="finished">Finished <span style="opacity:.7;">'+doneAll.length+'</span></div>'+
     '</div>'+
-    (sub==='backlog' ? renderFocusBacklogTab() : sub==='videoIdeas' ? renderVideoIdeasTab() : sub==='finished' ? renderFocusFinishedTab() : renderFocusTasksOverview());
+    '<div class="subtab-panel" data-key="tasks-'+sub+'">'+
+    (sub==='backlog' ? renderFocusBacklogTab() : sub==='videoIdeas' ? renderVideoIdeasTab() : sub==='finished' ? renderFocusFinishedTab() : renderFocusTasksOverview())+
+    '</div>';
 }
 function renderVideoIdeasTab(){
   const videoIdeas = state.tasks.items.filter(function(t){ return t.isVideoIdea && t.status!=='done'; });
@@ -2655,7 +2845,7 @@ function renderAddVideoIdeaModal(){
       '<button class="btn btn-primary" data-action="addVideoIdea">+ Add Video Idea</button>'+
     '</div>';
 }
-function renderAddVideoIdeaModalInto(){ const el=document.getElementById('videoIdeaContent'); if(el) el.innerHTML = renderAddVideoIdeaModal(); }
+function renderAddVideoIdeaModalInto(){ const el=document.getElementById('videoIdeaContent'); if(el) morphInto(el, renderAddVideoIdeaModal(), {form:true}); }
 function addVideoIdea(){
   const el = document.getElementById('newVideoIdeaTitle');
   const title = el ? el.value.trim() : '';
@@ -2665,6 +2855,48 @@ function addVideoIdea(){
   state.tasks.items.push({id:uid(), title:title, client:'personal', clients:['personal'], priority:'med', deadline:null, notes:(notesEl?notesEl.value.trim():''), status:'backlog', ongoing:false, ongoingDeadline:null, ongoingFrequency:null, includeInStandard:false, categoryId:null, isVideoIdea:true, videoType:(typeEl&&typeEl.value?typeEl.value:null), createdAt:todayStr(), completedAt:null});
   playTaskAdded();
   closeAddVideoIdeaModal();
+  persist('tasks'); renderView();
+}
+function openVideoIdeaEditModal(id){
+  const t = state.tasks.items.find(function(x){return x.id===id;}); if(!t) return;
+  ui.editingVideoIdeaId = id;
+  const o = document.getElementById('videoIdeaEditOverlay');
+  if(!o) return;
+  o.classList.remove('hidden');
+  renderVideoIdeaEditModalInto();
+}
+function closeVideoIdeaEditModal(){ ui.editingVideoIdeaId = null; const o=document.getElementById('videoIdeaEditOverlay'); if(o) o.classList.add('hidden'); }
+function renderVideoIdeaEditModal(){
+  const t = state.tasks.items.find(function(x){return x.id===ui.editingVideoIdeaId;});
+  if(!t) return '';
+  const types = arr(state.tasks.videoTypes);
+  const where = t.status==='today' ? "In today's lineup" : t.status==='done' ? 'Finished' : 'In Video Ideas';
+  return '<div class="section-title" style="margin-bottom:4px;">&#127916; Video Idea</div>'+
+    '<div class="kpi-sub" style="margin-bottom:14px;">'+where+'</div>'+
+    '<div class="field"><label>Idea</label><input class="input" id="editVideoTitle-'+t.id+'" value="'+escapeHtml(t.title)+'" style="width:100%;"></div>'+
+    (types.length ? '<div class="field" style="margin-top:10px;"><label>Type</label><select class="input" id="editVideoType-'+t.id+'" style="width:100%;"><option value="">&mdash; None &mdash;</option>'+types.map(function(vt){ return '<option value="'+vt.id+'" '+(t.videoType===vt.id?'selected':'')+'>'+escapeHtml(vt.label)+'</option>'; }).join('')+'</select></div>' : '')+
+    '<div class="field" style="margin-top:10px;"><label>Due (optional)</label><div class="row"><input class="input" type="date" id="editVideoDeadline-'+t.id+'" value="'+(t.deadline||'')+'"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editVideoDeadline-'+t.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="editVideoDeadline-'+t.id+'">Clear</button></div></div>'+
+    '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="editVideoNotes-'+t.id+'" style="width:100%;min-height:90px;" placeholder="Hook, shots, references…">'+escapeHtml(t.notes||'')+'</textarea></div>'+
+    '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
+      deleteBtn('task', t.id)+
+      '<div class="row">'+
+        '<button class="btn btn-ghost" data-action="closeVideoIdeaEditModal">Cancel</button>'+
+        '<button class="btn btn-primary" data-action="saveVideoIdeaEdit" data-id="'+t.id+'">Save</button>'+
+      '</div>'+
+    '</div>';
+}
+function renderVideoIdeaEditModalInto(){ const el=document.getElementById('videoIdeaEditContent'); if(el) morphInto(el, renderVideoIdeaEditModal(), {form:true}); }
+function saveVideoIdeaEdit(id){
+  const t = state.tasks.items.find(function(x){return x.id===id;}); if(!t) return;
+  const titleEl = document.getElementById('editVideoTitle-'+id);
+  if(titleEl) t.title = titleEl.value.trim() || t.title;
+  const typeEl = document.getElementById('editVideoType-'+id);
+  if(typeEl) t.videoType = typeEl.value || null;
+  const dlEl = document.getElementById('editVideoDeadline-'+id);
+  if(dlEl) t.deadline = dlEl.value || null;
+  const notesEl = document.getElementById('editVideoNotes-'+id);
+  if(notesEl) t.notes = notesEl.value.trim();
+  closeVideoIdeaEditModal();
   persist('tasks'); renderView();
 }
 function renderFocusTasksOverview(){
@@ -2794,7 +3026,7 @@ function renderAddTaskModal(){
       '<button class="btn btn-good" data-action="addTaskToday">Add to Today</button>'+
     '</div>';
 }
-function renderAddTaskModalInto(){ const el=document.getElementById('addTaskContent'); if(el) el.innerHTML = renderAddTaskModal(); }
+function renderAddTaskModalInto(){ const el=document.getElementById('addTaskContent'); if(el) morphInto(el, renderAddTaskModal(), {form:true}); }
 function addTask(status){
   const title = document.getElementById('newTaskTitle').value.trim();
   if(!title) return;
@@ -2955,7 +3187,7 @@ function renderFocus(){
     '<div class="tab '+(tab==='tasks'?'active':'')+'" data-action="focusMainTab" data-tab="tasks">Tasks</div>'+
     '<div class="tab '+(tab==='analytics'?'active':'')+'" data-action="focusMainTab" data-tab="analytics">Analytics</div>'+
   '</div>'+
-  '<div class="tab-panel">'+
+  '<div class="tab-panel" data-key="focus-'+tab+'">'+
   (tab==='analytics' ? renderFocusAnalyticsTab() : renderFocusTasksTab())+
   '</div>';
 }
@@ -3140,7 +3372,7 @@ function renderManualLogModal(){
       '<button class="btn btn-primary" data-action="addManualFocusLog">Log It</button>'+
     '</div>';
 }
-function renderManualLogModalInto(){ const el=document.getElementById('manualLogContent'); if(el) el.innerHTML = renderManualLogModal(); }
+function renderManualLogModalInto(){ const el=document.getElementById('manualLogContent'); if(el) morphInto(el, renderManualLogModal(), {form:true}); }
 function renderRecentSessionsPreview(){
   const sessions = state.focus.sessions.slice().sort(function(a,b){ return b.startedAt-a.startedAt; }).slice(0,4);
   return '<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">'+
@@ -3321,7 +3553,7 @@ function renderBreakDetailModal(){
       '<button class="btn btn-primary" data-action="closeBreakDetail">Close</button>'+
     '</div>';
 }
-function renderBreakDetailModalInto(){ const el=document.getElementById('breakDetailContent'); if(el) el.innerHTML = renderBreakDetailModal(); }
+function renderBreakDetailModalInto(){ const el=document.getElementById('breakDetailContent'); if(el) morphInto(el, renderBreakDetailModal(), {form:true}); }
 function alarmRow(a){
   return '<div class="task-item-v2">'+
     '<div style="font-family:var(--font-display);font-weight:700; width:78px;">'+fmt12Hour(a.time)+'</div>'+
@@ -3356,7 +3588,7 @@ function renderAlarmEditModal(){
       '</div>'+
     '</div>';
 }
-function renderAlarmEditModalInto(){ const el=document.getElementById('alarmEditContent'); if(el) el.innerHTML = renderAlarmEditModal(); }
+function renderAlarmEditModalInto(){ const el=document.getElementById('alarmEditContent'); if(el) morphInto(el, renderAlarmEditModal(), {form:true}); }
 function saveAlarmEdit(id){
   const a = state.focus.alarms.find(function(x){return x.id===id;}); if(!a) return;
   a.time = document.getElementById('editAlarmTime-'+id).value || a.time;
@@ -3386,7 +3618,7 @@ function renderLockInModal(){
     '<button class="btn btn-good lock-in-btn" data-action="lockInFocus" style="margin-top:16px;">&#128274; LOCK IN</button>'+
     '<button class="btn btn-ghost" data-action="closeLockInChooser" style="margin-top:8px;width:100%;">Cancel</button>';
 }
-function renderLockInModalInto(){ const el=document.getElementById('lockInModalContent'); if(el) el.innerHTML = renderLockInModal(); }
+function renderLockInModalInto(){ const el=document.getElementById('lockInModalContent'); if(el) morphInto(el, renderLockInModal(), {form:true}); }
 function lockInFocus(){
   closeLockInChooser();
   const minutes = getPickerValue('startPicker');
@@ -3394,6 +3626,9 @@ function lockInFocus(){
 }
 function viewAllSessions(){ ui.focusTab='analytics'; renderView(); }
 function startFocus(minutes){
+  // Locking in exits off-time / shooting cleanly (logging that block) instead of silently
+  // refusing and leaving the app stuck in the old mode.
+  if(state.modes.active && !state.modes.active.linkedFocus) finishActiveMode(true);
   if(state.modes.active) return;
   state.focus.activeSession = {startedAt: Date.now(), plannedMinutes: minutes || null, completedTasks:[], breaks:[], onBreak:false, completeFired:false};
   if(ui.stagedTaskId){
@@ -3434,7 +3669,7 @@ function renderFinalStopModal(){
       '<button class="btn btn-danger" data-action="reallyConfirmStopFocus">Yes, I\'m Done</button>'+
     '</div>';
 }
-function renderFinalStopModalInto(){ const el=document.getElementById('finalStopContent'); if(el) el.innerHTML = renderFinalStopModal(); }
+function renderFinalStopModalInto(){ const el=document.getElementById('finalStopContent'); if(el) morphInto(el, renderFinalStopModal(), {form:true}); }
 function cancelFinalStop(){ closeFinalStopConfirm(); }
 function reallyConfirmStopFocus(){
   const s = state.focus.activeSession;
@@ -3444,6 +3679,9 @@ function reallyConfirmStopFocus(){
   const minutes = Math.max(1, Math.round((endedAt - s.startedAt)/60000));
   state.focus.sessions.push({id:uid(), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endedAt, minutes:minutes, completedTasks: arr(s.completedTasks), note:''});
   state.focus.activeSession = null;
+  // Remember the manual lock-out so auto lock-in respects its cooldown.
+  state.focus.lastManualStopAt = endedAt;
+  state.focus.lastSessionEndedAt = endedAt;
   if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   if(state.modes.active && state.modes.active.linkedFocus){ endMode(); }
   playStopSound();
@@ -3475,7 +3713,7 @@ function renderStopFocusModal(){
       '<button class="btn btn-danger" data-action="requestStopConfirm">Stop &amp; Log</button>'+
     '</div>';
 }
-function renderStopFocusModalInto(){ const el=document.getElementById('stopFocusContent'); if(el) el.innerHTML = renderStopFocusModal(); }
+function renderStopFocusModalInto(){ const el=document.getElementById('stopFocusContent'); if(el) morphInto(el, renderStopFocusModal(), {form:true}); }
 function openTimesUpModal(){
   const overlay = document.getElementById('timesUpOverlay');
   if(!overlay) return;
@@ -3492,7 +3730,7 @@ function renderTimesUpModal(){
       '<button class="btn btn-danger" data-action="stopFromTimesUp">End Session</button>'+
     '</div>';
 }
-function renderTimesUpModalInto(){ const el=document.getElementById('timesUpContent'); if(el) el.innerHTML = renderTimesUpModal(); }
+function renderTimesUpModalInto(){ const el=document.getElementById('timesUpContent'); if(el) morphInto(el, renderTimesUpModal(), {form:true}); }
 function continueFocusFromTimesUp(){
   const as = state.focus.activeSession; if(as){ as.plannedMinutes = null; persist('focus'); }
   closeTimesUpModal(); renderView();
@@ -3561,7 +3799,7 @@ function renderBreakNoteModal(){
       '<button class="btn btn-primary" data-action="confirmStartBreakMode">'+modeIcon('break')+' Start Break</button>'+
     '</div>';
 }
-function renderBreakNoteModalInto(){ const el=document.getElementById('breakNoteContent'); if(el) el.innerHTML = renderBreakNoteModal(); }
+function renderBreakNoteModalInto(){ const el=document.getElementById('breakNoteContent'); if(el) morphInto(el, renderBreakNoteModal(), {form:true}); }
 function confirmStartBreakMode(){
   const as = state.focus.activeSession; if(!as || as.onBreak) { closeBreakNotePrompt(); return; }
   const noteEl = document.getElementById('breakNoteInput');
@@ -3648,7 +3886,7 @@ function renderMultiBreakModal(){
       '<button class="btn btn-primary" data-action="confirmMultiBreak">Take The Break</button>'+
     '</div>';
 }
-function renderMultiBreakModalInto(){ const el=document.getElementById('multiBreakContent'); if(el) el.innerHTML = renderMultiBreakModal(); }
+function renderMultiBreakModalInto(){ const el=document.getElementById('multiBreakContent'); if(el) morphInto(el, renderMultiBreakModal(), {form:true}); }
 function confirmMultiBreak(){ const m=pendingBreakMinutes; closeMultiBreakWarning(); actuallyStartBreak(m); }
 function cancelMultiBreak(){ closeMultiBreakWarning(); }
 function addManualFocusLog(){
@@ -3751,7 +3989,7 @@ function renderPreFocusWhyStep(){
 }
 function preFocusGoToWhy(){ if(!ui.stagedTaskId) return; ui.preFocusStep='why'; renderPreFocusModalInto(); }
 function preFocusBackToStart(){ ui.preFocusStep='before'; renderPreFocusModalInto(); }
-function renderPreFocusModalInto(){ const el=document.getElementById('preFocusContent'); if(el) el.innerHTML = renderPreFocusModal(); }
+function renderPreFocusModalInto(){ const el=document.getElementById('preFocusContent'); if(el) morphInto(el, renderPreFocusModal(), {form:true}); }
 function closePreFocusModal(){ document.getElementById('preFocusOverlay').classList.add('hidden'); }
 function clearStagedTaskFromPreFocus(){ ui.stagedTaskId = null; ui.preFocusPicking = false; renderPreFocusModalInto(); }
 function addTaskFromPreFocus(){ closePreFocusModal(); openAddTaskModal(); }
@@ -3793,14 +4031,20 @@ function startMode(type){
   playRestSound();
   persist('modes'); renderView();
 }
-function endMode(){
+function finishActiveMode(silent){
   const active = state.modes.active; if(!active) return;
   const endedAt = Date.now();
   const minutes = Math.max(1, Math.round((endedAt-active.startedAt)/60000));
   state.modes.history.push({id:uid(), type:active.type, date:todayStr(new Date(active.startedAt)), startedAt:active.startedAt, endedAt:endedAt, minutes:minutes});
   state.modes.active = null;
-  playStopSound();
-  persist('modes'); renderView();
+  state.modes.lastEndedAt = endedAt;
+  if(!silent) playStopSound();
+  persist('modes');
+}
+function endMode(){
+  if(!state.modes.active) return;
+  finishActiveMode(false);
+  renderView();
 }
 function modeMinutesFor(dateStr, type){
   return state.modes.history.filter(function(m){ return m.date===dateStr && (!type || m.type===type); }).reduce(function(a,m){ return a+m.minutes; },0);
@@ -3808,7 +4052,8 @@ function modeMinutesFor(dateStr, type){
 
 // ============ APP ACTIVITY TRACKING ============
 // Data flow: the native Operator wrapper script polls the frontmost macOS app every
-// ~10s (via osascript/System Events) and serves recent "<timestamp>\t<appName>" lines
+// ~10s (via osascript/System Events) and serves recent "<timestamp>\t<appName>[\t<idleSeconds>]"
+// lines (idleSeconds = time since the last keyboard/mouse input; older wrappers omit it)
 // over a local, loopback-only HTTP endpoint (APP_ACTIVITY_URL). This page polls that
 // endpoint, turns the raw samples into continuous per-app intervals, keeps a rolling
 // per-day minutes total, and (optionally) auto-starts/ends a real focus session when
@@ -3824,9 +4069,12 @@ function parseActivityLogText(text){
     const tab = line.indexOf('\t');
     if(tab<0) continue;
     const ts = parseInt(line.slice(0,tab),10);
-    const app = line.slice(tab+1).trim();
+    const rest = line.slice(tab+1);
+    const tab2 = rest.indexOf('\t');
+    const app = (tab2<0 ? rest : rest.slice(0,tab2)).trim();
+    const idle = tab2<0 ? null : parseInt(rest.slice(tab2+1),10);
     if(!ts || !app) continue;
-    out.push({ts:ts, app:app});
+    out.push({ts:ts, app:app, idle:(idle==null || isNaN(idle)) ? null : idle});
   }
   return out;
 }
@@ -3853,9 +4101,9 @@ function intervalsToAppMinutes(intervals){
   });
   return map;
 }
-function mergeAppMinutes(base, add){
+function maxAppMinutes(base, add){
   const out = Object.assign({}, base||{});
-  Object.keys(add||{}).forEach(function(k){ out[k]=(out[k]||0)+add[k]; });
+  Object.keys(add||{}).forEach(function(k){ out[k]=Math.max(out[k]||0, add[k]); });
   return out;
 }
 function appMinutesForDate(dateStr){
@@ -3903,15 +4151,22 @@ async function pollAppActivity(){
     if(!res.ok) return;
     text = await res.text();
   }catch(e){ return; } // no wrapper/server running — silently do nothing
-  const samples = parseActivityLogText(text);
-  if(!samples.length) return;
+  // Only count active usage: a sample taken after the keyboard/mouse has been idle for a
+  // while is dropped, which leaves a gap that splits the interval (an app just sitting in
+  // the foreground no longer counts as "being on it").
+  const idleLimit = Number(st.idleSeconds)||60;
+  const samples = parseActivityLogText(text).filter(function(s){ return s.idle==null || s.idle < idleLimit; });
+  if(!samples.length){ updateCurrentAppIndicator(); return; }
   const today = todayStr();
   const byDate = {};
   samples.forEach(function(s){ const d = todayStr(new Date(s.ts)); (byDate[d]=byDate[d]||[]).push(s); });
   Object.keys(byDate).forEach(function(d){
     if(d===today) return; // only finalize PAST days; today stays live below
     const ivs = samplesToIntervals(byDate[d].sort(function(a,b){return a.ts-b.ts;}));
-    state.appActivity.days[d] = mergeAppMinutes(state.appActivity.days[d], intervalsToAppMinutes(ivs));
+    // The log is re-read in full on every poll, so a past day's samples show up again and
+    // again. Keep the larger of stored vs. recomputed per app (idempotent) instead of adding,
+    // which used to inflate past days by another copy every 15 seconds.
+    state.appActivity.days[d] = maxAppMinutes(state.appActivity.days[d], intervalsToAppMinutes(ivs));
   });
   const todaySamples = (byDate[today]||[]).sort(function(a,b){return a.ts-b.ts;});
   state.appActivity.todayIntervals = samplesToIntervals(todaySamples);
@@ -3920,6 +4175,30 @@ async function pollAppActivity(){
   updateCurrentAppIndicator();
   checkAutoLockIn();
   if(ui.view==='focus' && ui.focusTab==='analytics') renderView();
+}
+// Why auto lock-in is currently held back (or null when it's allowed to run).
+function autoLockInBlockedReason(){
+  if(isDayOff(todayStr())) return 'dayoff';
+  if(state.modes.active) return 'mode';
+  const st = state.settings.appTracking || {};
+  const cooldownMs = Math.max(0, Number(st.cooldownMinutes)||0)*60000;
+  const lastStop = state.focus.lastManualStopAt;
+  if(lastStop && Date.now()-lastStop < cooldownMs) return 'cooldown';
+  return null;
+}
+// Steady usage only counts from the latest point that resets it: the current app interval's
+// start, the end of the last session (manual or auto), the end of the cooldown after a
+// manual lock-out, or the end of off-time/shooting. Without this, an app that had been in
+// the foreground during the session itself counted toward auto lock-in the moment you
+// locked out.
+function autoLockInCountFrom(interval){
+  const st = state.settings.appTracking || {};
+  const cooldownMs = Math.max(0, Number(st.cooldownMinutes)||0)*60000;
+  let from = interval.start;
+  if(state.focus.lastSessionEndedAt) from = Math.max(from, state.focus.lastSessionEndedAt);
+  if(state.focus.lastManualStopAt) from = Math.max(from, state.focus.lastManualStopAt + cooldownMs);
+  if(state.modes.lastEndedAt) from = Math.max(from, state.modes.lastEndedAt);
+  return from;
 }
 function checkAutoLockIn(){
   const st = state.settings.appTracking;
@@ -3930,8 +4209,9 @@ function checkAutoLockIn(){
   const isLive = (Date.now()-last.end) <= APP_ACTIVITY_GAP_MS;
   const activeSession = state.focus.activeSession;
 
-  if(isLive && !activeSession && !state.modes.active){
-    const elapsedMin = (last.end-last.start)/60000;
+  if(isLive && !activeSession){
+    if(autoLockInBlockedReason()) return;
+    const elapsedMin = (last.end-autoLockInCountFrom(last))/60000;
     if(elapsedMin >= (st.thresholdMinutes||12) && autoLockInMeta.intervalStart!==last.start){
       autoLockInMeta = {app:last.app, intervalStart:last.start};
       startFocus(null);
@@ -3959,6 +4239,7 @@ function autoEndFocusSession(){
   const minutes = Math.max(1, Math.round((endedAt-s.startedAt)/60000));
   state.focus.sessions.push({id:uid(), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endedAt, minutes:minutes, completedTasks:arr(s.completedTasks), note:'', autoStopped:true});
   state.focus.activeSession = null;
+  state.focus.lastSessionEndedAt = endedAt;
   if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   if(state.modes.active && state.modes.active.linkedFocus){ endMode(); }
   playStopSound();
@@ -4027,7 +4308,7 @@ function renderWorkoutEditModal(){
       '</div>'+
     '</div>';
 }
-function renderWorkoutEditModalInto(){ const el=document.getElementById('workoutEditContent'); if(el) el.innerHTML = renderWorkoutEditModal(); }
+function renderWorkoutEditModalInto(){ const el=document.getElementById('workoutEditContent'); if(el) morphInto(el, renderWorkoutEditModal(), {form:true}); }
 function saveEditWorkout(id){
   const g = state.health.gymLog.find(function(x){return x.id===id;}); if(!g) return;
   g.date = document.getElementById('editGymDate-'+id).value || g.date;
@@ -4177,7 +4458,7 @@ function renderJournalPhotoViewModal(){
       '<button class="btn btn-primary" data-action="closeJournalPhotoView">Close</button>'+
     '</div>';
 }
-function renderJournalPhotoViewModalInto(){ const el=document.getElementById('journalPhotoViewContent'); if(el) el.innerHTML = renderJournalPhotoViewModal(); }
+function renderJournalPhotoViewModalInto(){ const el=document.getElementById('journalPhotoViewContent'); if(el) morphInto(el, renderJournalPhotoViewModal(), {form:true}); }
 function renderJournalHistory(entries){
   const pinned = entries.filter(function(e){return e.pinned;});
   const rest = entries.filter(function(e){return !e.pinned;});
@@ -4274,7 +4555,7 @@ function openClientJournalPopover(clientId){
   renderClientJournalPopoverInto();
 }
 function closeClientJournalPopover(){ const o=document.getElementById('clientJournalOverlay'); if(o) o.classList.add('hidden'); }
-function renderClientJournalPopoverInto(){ const el=document.getElementById('clientJournalContent'); if(el) el.innerHTML = renderClientJournalPopover(); }
+function renderClientJournalPopoverInto(){ const el=document.getElementById('clientJournalContent'); if(el) morphInto(el, renderClientJournalPopover(), {form:true}); }
 function renderClientJournalPopover(){
   const clients = arr(state.business.clients);
   return '<div class="section-title" style="justify-content:center;margin-bottom:10px;">Client Journals</div>'+
@@ -4403,7 +4684,7 @@ function renderJournalEditModalInto(){
     const e = state.journal.entries.find(function(x){return x.id===ui.editingJournalId;});
     ui.editingJournalMood = e ? e.mood : null;
   }
-  const el=document.getElementById('journalEditContent'); if(el) el.innerHTML = renderJournalEditModal();
+  const el=document.getElementById('journalEditContent'); if(el) morphInto(el, renderJournalEditModal(), {form:true});
 }
 function setEditingJournalMood(moodId){ ui.editingJournalMood = (ui.editingJournalMood===moodId) ? null : moodId; renderJournalEditModalInto(); }
 function saveEditJournal(id){
@@ -4451,7 +4732,7 @@ function renderQuickJournalModal(){
       '<button class="btn btn-primary" data-action="saveQuickJournal">Save Entry</button>'+
     '</div>';
 }
-function renderQuickJournalModalInto(){ const el=document.getElementById('quickJournalContent'); if(el) el.innerHTML = renderQuickJournalModal(); }
+function renderQuickJournalModalInto(){ const el=document.getElementById('quickJournalContent'); if(el) morphInto(el, renderQuickJournalModal(), {form:true}); }
 function saveQuickJournal(){
   addJournalEntry('quickJournalModalText');
   closeQuickJournalModal();
@@ -4565,7 +4846,7 @@ function renderGoalEditModal(){
       '</div>'+
     '</div>';
 }
-function renderGoalEditModalInto(){ const el=document.getElementById('goalEditContent'); if(el) el.innerHTML = renderGoalEditModal(); }
+function renderGoalEditModalInto(){ const el=document.getElementById('goalEditContent'); if(el) morphInto(el, renderGoalEditModal(), {form:true}); }
 function saveEditGoal(id){
   const g = state.goals.items.find(function(x){return x.id===id;}); if(!g) return;
   g.label = document.getElementById('editGoalLabel-'+id).value.trim() || g.label;
@@ -4644,7 +4925,7 @@ function renderNewPackageModal(){
       '<button class="btn btn-primary" data-action="addPackage">Create Package</button>'+
     '</div>';
 }
-function renderNewPackageModalInto(){ const el=document.getElementById('newPackageContent'); if(el) el.innerHTML = renderNewPackageModal(); }
+function renderNewPackageModalInto(){ const el=document.getElementById('newPackageContent'); if(el) morphInto(el, renderNewPackageModal(), {form:true}); }
 function packageRow(pk){
   const deliverables = arr(pk.deliverables);
   return '<div class="card" style="margin-bottom:10px;">'+
@@ -4706,7 +4987,7 @@ function renderPackageEditModal(){
       '<button class="btn btn-primary" data-action="closePackageEditModal">Done</button>'+
     '</div>';
 }
-function renderPackageEditModalInto(){ const el=document.getElementById('packageEditContent'); if(el) el.innerHTML = renderPackageEditModal(); }
+function renderPackageEditModalInto(){ const el=document.getElementById('packageEditContent'); if(el) morphInto(el, renderPackageEditModal(), {form:true}); }
 function savePackageFields(id){
   const pk = arr(state.business.packages).find(function(x){return x.id===id;}); if(!pk) return;
   const nameEl = document.getElementById('editPackageName-'+id);
@@ -4727,6 +5008,8 @@ function addPackageDeliverable(id){
   const weeklyTarget = targetEl ? Math.max(1, Number(targetEl.value)||1) : 1;
   if(!Array.isArray(pk.deliverables)) pk.deliverables=[];
   pk.deliverables.push({id:uid(), title:title, weeklyTarget:weeklyTarget});
+  titleEl.value = '';
+  if(targetEl) targetEl.value = targetEl.defaultValue;
   persist('business'); renderPackageEditModalInto();
 }
 function removePackageDeliverable(id, deliverableId){
@@ -4744,7 +5027,7 @@ function renderPersonal(){
     '<div class="tab '+(ui.personalTab==='fitness'?'active':'')+'" data-action="personalTab" data-tab="fitness">Fitness</div>'+
     '<div class="tab '+(ui.personalTab==='journal'?'active':'')+'" data-action="personalTab" data-tab="journal">Journal</div>'+
   '</div>'+
-  '<div class="tab-panel">'+(ui.personalTab==='goals' ? renderGoalsTab() : ui.personalTab==='fitness' ? renderFitness() : renderJournalTab())+'</div>';
+  '<div class="tab-panel" data-key="personal-'+ui.personalTab+'">'+(ui.personalTab==='goals' ? renderGoalsTab() : ui.personalTab==='fitness' ? renderFitness() : renderJournalTab())+'</div>';
 }
 
 // ============ FINANCES ============
@@ -4833,7 +5116,7 @@ function renderRetainerEditModal(){
       '<button class="btn btn-good" data-action="saveRetainerEdit">Save</button>'+
     '</div>';
 }
-function renderRetainerEditModalInto(){ const el=document.getElementById('retainerEditContent'); if(el) el.innerHTML = renderRetainerEditModal(); }
+function renderRetainerEditModalInto(){ const el=document.getElementById('retainerEditContent'); if(el) morphInto(el, renderRetainerEditModal(), {form:true}); }
 function saveRetainerEdit(){
   const c = state.business.clients.find(function(x){ return x.id===ui.editingRetainerClientId; }); if(!c) return;
   c.mrr = Number(document.getElementById('retainerMrr').value)||0;
@@ -4890,7 +5173,7 @@ function renderInvoiceModal(){
       '<button class="btn btn-good" data-action="addInvoice">Save</button>'+
     '</div>';
 }
-function renderInvoiceModalInto(){ const el=document.getElementById('invoiceModalContent'); if(el) el.innerHTML = renderInvoiceModal(); }
+function renderInvoiceModalInto(){ const el=document.getElementById('invoiceModalContent'); if(el) morphInto(el, renderInvoiceModal(), {form:true}); }
 function invoiceRow(inv){
   const paid = invoicePaid(inv);
   return '<div class="task-item-v2 '+(paid?'done':'')+'">'+
@@ -4922,7 +5205,7 @@ function renderAttachReceiptModal(){
       '<button class="btn btn-good" data-action="confirmAttachReceipt">Attach Receipt</button>'+
     '</div>';
 }
-function renderAttachReceiptModalInto(){ const el=document.getElementById('attachReceiptContent'); if(el) el.innerHTML = renderAttachReceiptModal(); }
+function renderAttachReceiptModalInto(){ const el=document.getElementById('attachReceiptContent'); if(el) morphInto(el, renderAttachReceiptModal(), {form:true}); }
 function confirmAttachReceipt(){
   const inv = state.finances.invoices.find(function(x){ return x.id===ui.attachingInvoiceId; }); if(!inv) return;
   const fileInput = document.getElementById('receiptFile');
@@ -5029,7 +5312,7 @@ function renderLogPaymentModal(){
       '<button class="btn btn-good" data-action="confirmLogPayment">Log Payment</button>'+
     '</div>';
 }
-function renderLogPaymentModalInto(){ const el=document.getElementById('logPaymentContent'); if(el) el.innerHTML = renderLogPaymentModal(); }
+function renderLogPaymentModalInto(){ const el=document.getElementById('logPaymentContent'); if(el) morphInto(el, renderLogPaymentModal(), {form:true}); }
 function confirmLogPayment(){
   const d = state.finances.debts.find(function(x){ return x.id===ui.loggingPaymentDebtId; }); if(!d) return;
   const amount = Number(document.getElementById('paymentAmount').value);
@@ -5065,7 +5348,7 @@ function renderBusiness(){
     '<div class="tab '+(ui.businessTab==='packages'?'active':'')+'" data-action="businessTab" data-tab="packages">Packages</div>'+
     '<div class="tab '+(ui.businessTab==='finances'?'active':'')+'" data-action="businessTab" data-tab="finances">Finances</div>'+
   '</div>'+
-  '<div class="tab-panel">'+(ui.businessTab==='clients' ? renderClientsTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
+  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='clients' ? renderClientsTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
 }
 function renderBusinessOverview(){
   const clients = arr(state.business.clients);
@@ -5457,17 +5740,40 @@ function assignClientPackage(clientId){
   const sel = document.getElementById('clientPackageSelect');
   const pk = sel ? arr(state.business.packages).find(function(x){return x.id===sel.value;}) : null;
   if(!pk) return;
+  archivePackageProgress(c);
   c.deliverables = arr(c.deliverables).filter(function(d){ return !d.fromPackage; });
   arr(pk.deliverables).forEach(function(d){
-    c.deliverables.push({id:uid(), title:d.title, dueDate:null, status:'pending', linkedTaskId:null, fromPackage:true, recurring:true, completedDates:[], weeklyTarget:d.weeklyTarget||1, sourceId:d.id});
+    c.deliverables.push({id:uid(), title:d.title, dueDate:null, status:'pending', linkedTaskId:null, fromPackage:true, recurring:true, completedDates:restoredPackageProgress(c, d), weeklyTarget:d.weeklyTarget||1, sourceId:d.id});
   });
   c.packageId = pk.id;
   ui.pickingPackageForClient = null;
   playPositive();
   persist('business'); renderClientModalInto(); renderView();
 }
+// Swapping or removing a client's package used to throw away every logged deliverable
+// (all the dated "+1"s) for that client. Progress is now kept per deliverable title and
+// handed back whenever a package with a matching deliverable is assigned again.
+function packageProgressKey(title){ return String(title||'').trim().toLowerCase(); }
+function archivePackageProgress(c){
+  if(!c.packageProgressArchive || typeof c.packageProgressArchive!=='object') c.packageProgressArchive = {};
+  arr(c.deliverables).forEach(function(d){
+    if(!d.fromPackage || !arr(d.completedDates).length) return;
+    const k = packageProgressKey(d.title);
+    const prev = arr(c.packageProgressArchive[k]);
+    const merged = prev.concat(arr(d.completedDates));
+    c.packageProgressArchive[k] = merged;
+  });
+}
+function restoredPackageProgress(c, pkgDeliverable){
+  const k = packageProgressKey(pkgDeliverable.title);
+  const archive = c.packageProgressArchive || {};
+  const dates = arr(archive[k]).slice();
+  if(dates.length) delete archive[k];
+  return dates;
+}
 function clearClientPackage(clientId){
   const c = state.business.clients.find(function(x){return x.id===clientId;}); if(!c) return;
+  archivePackageProgress(c);
   c.deliverables = arr(c.deliverables).filter(function(d){ return !d.fromPackage; });
   c.packageId = null;
   persist('business'); renderClientModalInto(); renderView();
@@ -5492,8 +5798,8 @@ function renderCustomDeliverableDrawer(){
       '<button class="btn btn-primary" data-action="addDeliverable" data-id="'+c.id+'">Add Deliverable</button>'+
     '</div>';
 }
-function renderCustomDeliverableDrawerInto(){ const el=document.getElementById('customDeliverableContent'); if(el) el.innerHTML = renderCustomDeliverableDrawer(); }
-function renderClientModalInto(){ const el=document.getElementById('clientModalContent'); if(el) el.innerHTML = renderClientModal(); }
+function renderCustomDeliverableDrawerInto(){ const el=document.getElementById('customDeliverableContent'); if(el) morphInto(el, renderCustomDeliverableDrawer(), {form:true}); }
+function renderClientModalInto(){ const el=document.getElementById('clientModalContent'); if(el) morphInto(el, renderClientModal(), {form:true}); }
 function deliverableRow(clientId, d){
   if(d.recurring){
     const target = d.weeklyTarget||1;
@@ -5651,7 +5957,7 @@ function renderProspectEditModal(){
       '</div>'+
     '</div>';
 }
-function renderProspectEditModalInto(){ const el=document.getElementById('prospectEditContent'); if(el) el.innerHTML = renderProspectEditModal(); }
+function renderProspectEditModalInto(){ const el=document.getElementById('prospectEditContent'); if(el) morphInto(el, renderProspectEditModal(), {form:true}); }
 function saveEditProspect(id){
   const p = state.business.pipeline.find(function(x){return x.id===id;}); if(!p) return;
   p.name = document.getElementById('editPName-'+id).value.trim() || p.name;
@@ -5843,8 +6149,8 @@ function renderCalendar(){
   '</div>'+
   '<div class="section" style="max-width:680px;margin:20px auto 0;"><div class="section-title">'+dayLabel+'<button class="btn btn-primary btn-sm" data-action="openCalEventModal">+ Add Event</button></div>'+
     '<div class="task-list">'+
-      selInfo.deadlines.map(function(t){ return '<div class="task-item-v2"><span class="tag" style="background:var(--danger-dim);color:#ffb3b8;">Deadline</span><div class="task-title" style="flex:1;">'+escapeHtml(t.title)+'</div></div>'; }).join('')+
-      sortedEvents.map(function(e){ const cat=categoryById(e.categoryId); return '<div class="task-item-v2">'+(e.time?'<div style="font-family:var(--font-display);font-weight:700;width:70px;">'+fmt12Hour(e.time)+'</div>':'')+'<span class="tag" style="background:'+(cat?cat.color:'#8A90A2')+'22;color:'+(cat?cat.color:'#8A90A2')+';">'+(cat?escapeHtml(cat.label):'Event')+'</span>'+(e.linkedClient?clientTagHtml(e.linkedClient):'')+'<div class="task-title" style="flex:1;">'+escapeHtml(e.title)+'</div>'+(e.meetingLink?'<button class="btn btn-good btn-sm" data-action="joinCall" data-url="'+escapeHtml(e.meetingLink)+'">&#128222; Join Call</button>':'')+'<button class="btn btn-ghost btn-sm" data-action="openCalEventModal" data-id="'+e.id+'">Edit</button>'+deleteBtn('calevent', e.id)+'</div>'; }).join('')+
+      selInfo.deadlines.map(function(t){ return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="deadline" data-id="'+t.id+'" title="Open to edit or delete"><span class="tag" style="background:var(--danger-dim);color:#ffb3b8;">Deadline</span><div class="task-title" style="flex:1;'+(t.status==='done'?'text-decoration:line-through;opacity:.6;':'')+'">'+escapeHtml(t.title)+'</div>'+(t.isVideoIdea?'<span class="kpi-sub">&#127916; video idea</span>':'')+'</div>'; }).join('')+
+      sortedEvents.map(function(e){ const cat=categoryById(e.categoryId); return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="event" data-id="'+e.id+'" title="Open to edit or delete">'+(e.time?'<div style="font-family:var(--font-display);font-weight:700;width:70px;">'+fmt12Hour(e.time)+'</div>':'')+'<span class="tag" style="background:'+(cat?cat.color:'#8A90A2')+'22;color:'+(cat?cat.color:'#8A90A2')+';">'+(cat?escapeHtml(cat.label):'Event')+'</span>'+(e.linkedClient?clientTagHtml(e.linkedClient):'')+'<div class="task-title" style="flex:1;">'+escapeHtml(e.title)+'</div>'+(e.meetingLink?'<button class="btn btn-good btn-sm" data-action="joinCall" data-url="'+escapeHtml(e.meetingLink)+'">&#128222; Join Call</button>':'')+'<button class="btn btn-ghost btn-sm" data-action="openCalEventModal" data-id="'+e.id+'">Edit</button>'+deleteBtn('calevent', e.id)+'</div>'; }).join('')+
       ((selInfo.deadlines.length+selInfo.events.length)===0 ? '<div class="empty">Nothing scheduled this day.</div>' : '')+
     '</div>'+
   '</div>'+
@@ -5883,7 +6189,7 @@ function renderCalEventModal(){
       '</div>'+
     '</div>';
 }
-function renderCalEventModalInto(){ const el=document.getElementById('calEventContent'); if(el) el.innerHTML = renderCalEventModal(); }
+function renderCalEventModalInto(){ const el=document.getElementById('calEventContent'); if(el) morphInto(el, renderCalEventModal(), {form:true}); }
 function syncCalEventAlarm(ev, wantsAlarm){
   if(wantsAlarm && ev.time){
     if(ev.alarmId){
@@ -5926,6 +6232,14 @@ function deleteCalEventFromModal(id){
   state.calendar.events = state.calendar.events.filter(function(x){ return x.id!==id; });
   closeCalEventModal();
   persist('calendar'); persist('focus'); renderView();
+}
+// Opens whatever a calendar row points at (event or task deadline) in its editor, which
+// carries both the edit fields and Delete. Closes the Upcoming popover first so the editor
+// isn't hidden behind it.
+function openCalItem(kind, id){
+  closeUpcomingPopover();
+  if(kind==='event') openCalEventModal(id);
+  else openTaskEditModal(id);
 }
 function joinCall(url){ if(url) window.open(url, '_blank'); }
 
@@ -6023,6 +6337,8 @@ function renderSettings(){
         '<div class="field"><label>Auto lock-in when steady on one app</label><select class="input" id="setAppTrackingAutoLockIn"><option value="on" '+(state.settings.appTracking.autoLockIn!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.autoLockIn===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Minutes on one app before auto lock-in</label><input class="input" type="number" min="3" max="120" id="setAppTrackingThreshold" value="'+state.settings.appTracking.thresholdMinutes+'"></div>'+
         '<div class="field"><label>Minutes away before auto-ending it</label><input class="input" type="number" min="1" max="60" id="setAppTrackingGrace" value="'+state.settings.appTracking.graceMinutes+'"><div class="kpi-sub">Only applies to sessions Operator started automatically — it never auto-ends a session you started yourself</div></div>'+
+        '<div class="field"><label>Cooldown after you lock out (minutes)</label><input class="input" type="number" min="0" max="240" id="setAppTrackingCooldown" value="'+state.settings.appTracking.cooldownMinutes+'"><div class="kpi-sub">Auto lock-in stays off this long after you stop a session yourself</div></div>'+
+        '<div class="field"><label>Idle after (seconds without keyboard/mouse)</label><input class="input" type="number" min="15" max="900" id="setAppTrackingIdle" value="'+state.settings.appTracking.idleSeconds+'"><div class="kpi-sub">Idle time doesn\'t count toward auto lock-in or app time</div></div>'+
       '</div></div>'+saveBtn+
       '<div class="card section" id="alarmsSettingsSection"><div class="section-title">Alarms</div>'+
         '<div class="row" style="flex-wrap:wrap;align-items:flex-end;">'+
@@ -6117,7 +6433,7 @@ function renderSettings(){
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Settings</div></div></div>'+
   '<div class="settings-shell">'+
     '<div class="settings-sidenav">'+navDefs.map(function(n){ return '<button class="settings-nav-item'+(active===n.id?' active':'')+'" data-action="settingsTab" data-tab="'+n.id+'"><span style="margin-right:8px;">'+n.icon+'</span>'+n.label+'</button>'; }).join('')+'</div>'+
-    '<div class="settings-content tab-panel">'+sections[active]+'</div>'+
+    '<div class="settings-content tab-panel" data-key="settings-'+active+'">'+sections[active]+'</div>'+
   '</div>';
 }
 function deleteResetBtn(){
@@ -6279,6 +6595,10 @@ function saveProfile(){
   if(atAutoEl) state.settings.appTracking.autoLockIn = atAutoEl.value === 'on';
   if(atThreshEl) state.settings.appTracking.thresholdMinutes = Number(atThreshEl.value)||12;
   if(atGraceEl) state.settings.appTracking.graceMinutes = Number(atGraceEl.value)||3;
+  const atCooldownEl = document.getElementById('setAppTrackingCooldown');
+  if(atCooldownEl){ const v = Number(atCooldownEl.value); state.settings.appTracking.cooldownMinutes = (isNaN(v) || atCooldownEl.value==='') ? 15 : clamp(v,0,240); }
+  const atIdleEl = document.getElementById('setAppTrackingIdle');
+  if(atIdleEl) state.settings.appTracking.idleSeconds = clamp(Number(atIdleEl.value)||60, 15, 900);
   persist('profile'); persist('standards'); persist('settings'); renderView();
 }
 function exportData(){
@@ -6349,6 +6669,7 @@ function updateNavActive(){
   });
 }
 let lastRenderedView = null;
+let lastRenderedDay = null;
 function renderView(){
   if(ui.currentTaskId && (!state.focus.activeSession || state.focus.activeSession.onBreak)){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   const root = document.getElementById('viewRoot');
@@ -6362,11 +6683,19 @@ function renderView(){
     case 'settings': html = renderSettings(); break;
     default: html = renderToday();
   }
-  root.innerHTML = html;
   if(lastRenderedView !== ui.view){
+    // Navigating to another view: fresh content, scrolled to the top, with a soft fade.
+    root.innerHTML = html;
+    const main = root.closest('.main');
+    if(main) main.scrollTop = 0;
     root.classList.remove('view-fade'); void root.offsetWidth; root.classList.add('view-fade');
     lastRenderedView = ui.view;
+  } else {
+    // Same view: patch in place so nothing that didn't change is touched (no flash,
+    // no scroll jumps, no replayed entry animations).
+    morphInto(root, html);
   }
+  lastRenderedDay = todayStr();
   updateNavActive();
   document.querySelectorAll('.scroll-picker').forEach(function(pk){ initScrollPicker(pk.id, Number(pk.dataset.selected)); });
   const modalOverlay = document.getElementById('preFocusOverlay');
@@ -6384,7 +6713,8 @@ function renderView(){
   const lockInOverlay = document.getElementById('lockInOverlay');
   if(lockInOverlay && !lockInOverlay.classList.contains('hidden')){
     renderLockInModalInto();
-    if(!ui.focusOpenEnded) initScrollPicker('startPicker', 60);
+    const sp = document.getElementById('startPicker');
+    if(!ui.focusOpenEnded) initScrollPicker('startPicker', sp && sp.dataset.selected ? Number(sp.dataset.selected) : 60);
   }
   const journalEditOverlay = document.getElementById('journalEditOverlay');
   if(journalEditOverlay && !journalEditOverlay.classList.contains('hidden')) renderJournalEditModalInto();
@@ -6402,6 +6732,8 @@ function renderView(){
   if(workoutEditOverlay && !workoutEditOverlay.classList.contains('hidden')) renderWorkoutEditModalInto();
   const addTaskOverlay = document.getElementById('addTaskOverlay');
   if(addTaskOverlay && !addTaskOverlay.classList.contains('hidden')) renderAddTaskModalInto();
+  const videoIdeaEditOverlay = document.getElementById('videoIdeaEditOverlay');
+  if(videoIdeaEditOverlay && !videoIdeaEditOverlay.classList.contains('hidden')) renderVideoIdeaEditModalInto();
   const videoIdeaOverlay = document.getElementById('videoIdeaOverlay');
   if(videoIdeaOverlay && !videoIdeaOverlay.classList.contains('hidden')) renderAddVideoIdeaModalInto();
   const miniCalOverlay = document.getElementById('miniCalOverlay');
@@ -6435,6 +6767,10 @@ function stretchLockedHeaderLine(){
   header.style.marginRight = (-rightGap)+'px';
   header.style.paddingLeft = (leftGap+16)+'px';
   header.style.paddingRight = (rightGap+16)+'px';
+  // Pull the header up over .main's top padding — that padding used to leave an empty
+  // black band above the locked-in header.
+  const padTop = parseFloat(getComputedStyle(main).paddingTop)||0;
+  header.style.marginTop = (-padTop)+'px';
 }
 window.addEventListener('resize', stretchLockedHeaderLine);
 function tickClocks(){
@@ -6458,7 +6794,38 @@ function tickClocks(){
 }
 function startClocks(){
   tickClocks();
-  setInterval(tickClocks, 1000);
+  setInterval(function(){
+    tickClocks();
+    if(lastRenderedDay && todayStr()!==lastRenderedDay) handleDayRollover(lastRenderedDay);
+  }, 1000);
+}
+// Midnight rollover. Previously nothing re-rendered at 12 AM unless a session was running,
+// so on a non-working day the app stayed on yesterday until you clicked something.
+function handleDayRollover(prevDay){
+  splitActiveModeAtMidnight();
+  if(ui.calendarSelectedDate===prevDay){
+    ui.calendarSelectedDate = todayStr();
+    ui.calendarYear = new Date().getFullYear();
+    ui.calendarMonth = new Date().getMonth();
+  }
+  renderView();
+}
+// An off-time / shooting block that runs past midnight is logged per day: the part before
+// midnight is saved to the day it belongs to and the block carries on from 12 AM. Break
+// mode is tied to the focus session, so it's left alone.
+function splitActiveModeAtMidnight(){
+  const active = state.modes.active;
+  if(!active || active.linkedFocus) return;
+  let changed = false;
+  while(todayStr(new Date(active.startedAt)) < todayStr()){
+    const start = new Date(active.startedAt);
+    const midnight = new Date(start.getFullYear(), start.getMonth(), start.getDate()+1).getTime();
+    const minutes = Math.max(1, Math.round((midnight-active.startedAt)/60000));
+    state.modes.history.push({id:uid(), type:active.type, date:todayStr(start), startedAt:active.startedAt, endedAt:midnight, minutes:minutes, note:active.note||'', splitAtMidnight:true});
+    active.startedAt = midnight;
+    changed = true;
+  }
+  if(changed) persist('modes');
 }
 function startModeTicker(){
   setInterval(function(){
@@ -6578,7 +6945,7 @@ document.body.addEventListener('click', function(e){
       closeTaskEditModal(); closeProspectEditModal(); closeClientModal(); closeLockInChooser(); closeJournalEditModal(); closeGoalEditModal();
       closeWorkoutEditModal(); closeJournalClearConfirm(); closeBreakNotePrompt(); closeBreakDetail(); closeInvoiceModal();
       closeAttachReceiptModal(); closeAddTaskModal(); closeDatePicker(); closeRetainerEdit(); closeLogPaymentModal();
-      closeUpcomingPopover(); closeQuickJournalModal(); closeJournalPhotoView(); closeCalEventModal(); closeAlarmEditModal(); closePackageEditModal(); closeCustomDeliverableDrawer(); closeNewPackageModal();
+      closeUpcomingPopover(); closeQuickJournalModal(); closeJournalPhotoView(); closeCalEventModal(); closeAlarmEditModal(); closePackageEditModal(); closeCustomDeliverableDrawer(); closeNewPackageModal(); closeVideoIdeaEditModal(); closeAddVideoIdeaModal();
       ui.selectedTaskIds.clear(); ui.selectedProspectIds.clear();
       const changing = el.dataset.view !== ui.view;
       ui.view = el.dataset.view;
@@ -6786,6 +7153,7 @@ document.body.addEventListener('click', function(e){
     case 'toggleCalLegend': ui.showCalLegend = !ui.showCalLegend; renderView(); break;
     case 'selectCalDay': selectCalDay(el.dataset.date); break;
     case 'openCalEventModal': openCalEventModal(id); break;
+    case 'openCalItem': openCalItem(el.dataset.kind, id); break;
     case 'closeCalEventModal': closeCalEventModal(); break;
     case 'saveCalEvent': saveCalEvent(); break;
     case 'deleteCalEventFromModal': deleteCalEventFromModal(id); break;
@@ -6868,6 +7236,8 @@ document.body.addEventListener('click', function(e){
     case 'addVideoIdea': addVideoIdea(); break;
     case 'openAddVideoIdeaModal': openAddVideoIdeaModal(); break;
     case 'closeAddVideoIdeaModal': closeAddVideoIdeaModal(); break;
+    case 'closeVideoIdeaEditModal': closeVideoIdeaEditModal(); break;
+    case 'saveVideoIdeaEdit': saveVideoIdeaEdit(id); break;
     case 'toggleTaskSelectMode': toggleTaskSelectMode(); break;
     case 'toggleSidebar': toggleSidebar(); break;
   }
@@ -7104,6 +7474,7 @@ async function init(){
   state.settings = normalizeSettings(await loadKey('settings', defaultSettings()));
   state.appActivity = normalizeAppActivity(await loadKey('appActivity', defaultAppActivity()));
 
+  splitActiveModeAtMidnight();
   applyTheme();
   applySidebarState();
   document.getElementById('loading').style.display='none';
