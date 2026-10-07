@@ -100,6 +100,7 @@ function renderTodayFocusMode(p){
     '<div class="stat-chip" id="statDeepWorkTodayBox" style="text-align:center;"><div class="stat-chip-label">Deep Work Today</div><div class="stat-chip-value">'+fmtHours(deepWorkToday)+'</div><div class="kpi-sub">'+fmtDurationLabel(deepWorkToday)+'</div></div>'+
   '</div>'+
   '<div class="hero-row section">'+renderActiveFocusHero(true)+renderCurrentTaskCard(false,false,true)+'</div>'+
+  renderVisionSlideshow()+
   renderStandardsWidget()+
   (todayNotices.length ? (
     '<div class="section" style="max-width:640px;margin:0 auto;"><div class="section-title" style="justify-content:center;">Today on the Calendar</div><div class="card"><div class="task-list">'+

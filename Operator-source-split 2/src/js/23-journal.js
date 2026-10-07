@@ -186,6 +186,17 @@ function addClientJournalEntryFromJournal(){
   persist('business'); renderView();
 }
 function renderJournalTab(){
+  // Entries (the regular journal) and Boards (freeform canvas pages) live side by side.
+  const mode = ui.journalMode==='boards' ? 'boards' : 'entries';
+  const switcher = '<div class="row" style="justify-content:center;margin-bottom:14px;"><div class="seg-tabs" style="margin:0;">'+
+    '<button class="seg-tab'+(mode==='entries'?' active':'')+'" data-action="journalMode" data-id="entries">Entries</button>'+
+    '<button class="seg-tab'+(mode==='boards'?' active':'')+'" data-action="journalMode" data-id="boards">Boards</button>'+
+  '</div></div>';
+  if(mode==='boards') return switcher+'<div class="subtab-panel" data-key="journal-boards">'+renderBoardShell('journal')+'</div>';
+  return switcher+'<div class="subtab-panel" data-key="journal-entries">'+renderJournalEntriesTab()+'</div>';
+}
+ACTIONS.journalMode = function(el, e, id){ ui.journalMode = id; renderView(); };
+function renderJournalEntriesTab(){
   const filtered = filteredJournalEntries();
   const hasFilters = !!(ui.journalFilterMood || ui.journalSearchText);
   const clientsView = ui.journalViewMode==='clients';

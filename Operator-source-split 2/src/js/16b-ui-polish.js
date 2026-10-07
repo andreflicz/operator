@@ -91,6 +91,7 @@ function fabContext(){
   }
   if(v==='calendar') return {label:'Add event', run:function(){ openCalEventModal(); }};
   if(v==='personal'){
+    if(ui.personalTab==='journal' && ui.journalMode==='boards' && typeof canvasAddNote==='function') return {label:'Add note to board', run:function(){ canvasAddNote(); }};
     if(ui.personalTab==='journal') return {label:'New journal entry', run:openQuickJournalModal};
     if(ui.personalTab==='wishlist' && typeof openWishItemModal==='function') return {label:'Add wish list item', run:function(){ openWishItemModal(null); }};
     if(ui.personalTab==='vision' && typeof canvasAddNote==='function') return {label:'Add card to board', run:function(){ canvasAddNote(); }};

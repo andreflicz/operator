@@ -124,4 +124,3 @@ ACTIONS.undoDeleteWish = function(){
   const c = document.getElementById('toastContainer'); if(c) c.innerHTML='';
   persist('personal'); renderView();
 };
-function renderVisionTab(){ return '<div class="empty">Vision board loading…</div>'; } // replaced in Phase 4
