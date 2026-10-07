@@ -725,6 +725,39 @@
   .vision-slideshow img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity 2.4s ease; transform:scale(1.04); }
   .vision-slideshow img.is-on{ opacity:.85; animation:kenBurns 12s ease-out forwards; }
   @keyframes kenBurns{ from{ transform:scale(1.04);} to{ transform:scale(1.1);} }
+
+  /* ---- Client lifecycle ---- */
+  .lc-card{ border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:12px; background:linear-gradient(180deg, rgba(143,220,255,.04), rgba(143,220,255,0)); }
+  .lc-track{ display:flex; align-items:center; flex-wrap:wrap; gap:4px; }
+  .lc-arrow{ color:var(--text-faint); font-size:12px; }
+  .lc-step{ --lc:#8A90A2; background:var(--panel-2); border:1px solid var(--border); color:var(--text-dim); font-family:var(--font-body); font-size:12px; font-weight:600; padding:5px 11px; border-radius:20px; cursor:pointer; transition:border-color .12s, color .12s, background .12s; }
+  .lc-step:hover{ border-color:var(--lc); color:var(--text); }
+  .lc-step.is-past{ color:var(--lc); border-color:transparent; background:transparent; }
+  .lc-step.is-current{ background:var(--lc); border-color:var(--lc); color:#0b0d12; box-shadow:0 0 14px -2px var(--lc); }
+  .lc-now{ margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
+  .lc-now-title{ font-family:var(--font-display); font-weight:700; font-size:15px; }
+  .lc-checklist{ display:flex; flex-direction:column; gap:2px; }
+  .lc-item{ display:flex; align-items:center; gap:10px; padding:5px 6px; border-radius:6px; font-size:13.5px; cursor:pointer; transition:background .12s; }
+  .lc-item:hover{ background:var(--panel-2); }
+  .lc-item input{ width:16px; height:16px; accent-color:var(--good); flex-shrink:0; }
+  .lc-item.is-done span{ color:var(--text-faint); text-decoration:line-through; }
+  .lc-next-ready{ animation:lcReady 2s ease-in-out infinite; }
+  @keyframes lcReady{ 0%,100%{ box-shadow:0 0 0 0 rgba(63,190,142,0);} 50%{ box-shadow:0 0 16px 2px rgba(63,190,142,.45);} }
+  .lc-badge{ display:flex; align-items:center; gap:8px; margin-top:8px; }
+  .lc-badge-bar{ flex:1; height:4px; border-radius:3px; background:var(--panel-2); overflow:hidden; }
+  .lc-badge-bar span{ display:block; height:100%; border-radius:3px; transition:width .3s ease; }
+  .lc-steps-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:10px; }
+  .lc-steps-card{ padding:12px 14px; }
+  .lc-steps-card .lc-item{ font-size:13px; padding:4px; }
+  .lc-editor{ display:flex; flex-direction:column; }
+  .lc-editor-step{ border:1px solid var(--border); border-radius:12px; padding:12px 14px; background:var(--panel-2); }
+  .lc-editor-step.is-side{ opacity:.8; border-style:dashed; }
+  .lc-editor-arrow{ text-align:center; color:var(--text-faint); font-size:16px; line-height:1; padding:4px 0; }
+  .lc-step-name{ font-family:var(--font-display); font-weight:700; font-size:14px; flex:1; min-width:120px; max-width:260px; }
+  .lc-editor-items{ display:flex; flex-direction:column; gap:4px; margin:10px 0 0 24px; }
+  .lc-editor-item{ display:flex; align-items:center; gap:6px; }
+  .lc-editor-item .input{ flex:1; }
+  .lc-editor-bullet{ color:var(--text-faint); width:16px; text-align:center; }
 </style>
 </head>
 <body>
@@ -877,6 +910,9 @@
 </div>
 <div id="filePreviewOverlay" class="overlay hidden">
   <div class="card" id="filePreviewContent" style="max-width:900px; width:100%; max-height:88vh; overflow-y:auto;"></div>
+</div>
+<div id="lifecycleOverlay" class="overlay hidden">
+  <div class="card" id="lifecycleContent" style="max-width:640px; width:100%; max-height:88vh; overflow-y:auto;"></div>
 </div>
 <div id="boardPickerOverlay" class="overlay hidden">
   <div class="card" id="boardPickerContent" style="max-width:420px; width:100%; max-height:88vh; overflow-y:auto;"></div>
@@ -1057,7 +1093,8 @@ const PANEL_DEFS = [
   {id:'focusMini', label:'Focus'},
   {id:'calendarMini', label:'Calendar'},
   {id:'tasks', label:"Today's Tasks"},
-  {id:'reachOut', label:'Reach Out Today (leads & clients due a touch)'}
+  {id:'reachOut', label:'Reach Out Today (leads & clients due a touch)'},
+  {id:'clientSteps', label:'Client Next Steps (from your client lifecycle)'}
 ];
 const SMALL_PANELS = ['focusMini', 'calendarMini']; // journal is full-width now that it sits near the top
 const MOODS = [
@@ -1900,24 +1937,17 @@ function normalizeDashboardPanels(d){
   d.order = d.order.filter(function(pid){ return validIds.indexOf(pid)>=0; });
   defaults.order.forEach(function(pid){ if(d.order.indexOf(pid)<0) d.order.push(pid); });
   if(!d.enabled || typeof d.enabled!=='object') d.enabled = {};
-  // One-time move (Phase 2): Quick Journal sits right under the streak panel. Runs once so
-  // any order you set afterwards is respected.
-  if(!d.reachOutAdded){
-    // Phase 4: "Reach out today" goes right under Quick Journal.
-    const ri = d.order.indexOf('reachOut'); if(ri>=0) d.order.splice(ri,1);
-    const ji = d.order.indexOf('journal');
-    d.order.splice(ji>=0 ? ji+1 : 1, 0, 'reachOut');
-    d.reachOutAdded = true;
-  }
-  if(!d.journalRaised){
-    const ji = d.order.indexOf('journal');
-    if(ji>=0){
-      d.order.splice(ji,1);
-      const si = d.order.indexOf('personalStats');
-      d.order.splice(si>=0 ? si+1 : 0, 0, 'journal');
-    }
-    d.journalRaised = true;
-  }
+  // One-time layout moves, applied in order and only once each, so any order you set
+  // afterwards is respected: Quick Journal under the streak panel (phase 2), then Reach Out
+  // Today under it (phase 4), then Client Next Steps under that (lifecycle).
+  const moveAfter = function(id, afterId, fallbackIdx){
+    const i = d.order.indexOf(id); if(i>=0) d.order.splice(i,1);
+    const a = d.order.indexOf(afterId);
+    d.order.splice(a>=0 ? a+1 : fallbackIdx, 0, id);
+  };
+  if(!d.journalRaised){ moveAfter('journal', 'personalStats', 0); d.journalRaised = true; }
+  if(!d.reachOutAdded){ moveAfter('reachOut', 'journal', 1); d.reachOutAdded = true; }
+  if(!d.clientStepsAdded){ moveAfter('clientSteps', 'reachOut', 2); d.clientStepsAdded = true; }
   return d;
 }
 function normalizeModes(m){
@@ -3258,7 +3288,8 @@ const PANEL_RENDERERS = {
   focusMini: renderFocusMiniPanel,
   calendarMini: renderCalendarMiniPanel,
   tasks: renderTodayTasksPanel,
-  reachOut: function(){ return renderReachOutPanel(false); }
+  reachOut: function(){ return renderReachOutPanel(false); },
+  clientSteps: renderClientStepsPanel
 };
 function clientOpsDeliverableRow(clientId, d){
   return recurringDeliverableRowHtml(clientId, d, false);
@@ -7686,6 +7717,7 @@ function renderClientModal(){
       '</div>'+
       (isActive ? '<div class="row" style="justify-content:flex-end;margin-top:8px;">'+clientTouchControlHtml(c)+'</div>' : '')+
     '</div>'+
+    renderClientLifecycle(c)+
     renderCrmBlock('client', c)+
     '<div class="kpi-label" style="margin:16px 0 8px;">Deliverables<span class="kpi-sub" style="margin-left:6px;">'+pendingCount+' pending</span></div>'+
     '<div class="task-list" style="margin-bottom:8px;">'+(deliverables.map(function(d){return deliverableRow(c.id,d);}).join('') || '<div class="empty">No deliverables yet — assign a package above, or add a one-off below.</div>')+'</div>'+
@@ -8046,6 +8078,7 @@ function convertProspectToClient(p){
   state.business.clients.push({id:clientId, name:p.name, business:p.company, phone:p.phone||'', email:p.email||'', leadSource:p.leadSource||null, mrr:p.value||0, billingDay:1, status:'active', stage:'onboarding', notes:p.notes||'', deliverables:[], journal:[],
     touchpoints:tps, touches:tps.map(function(t){ return t.date; }), files:arr(p.files).map(function(f){ return Object.assign({}, f); }),
     timeline:arr(p.timeline).map(function(t){ return Object.assign({}, t); }).concat([{id:uid(), ts:Date.now(), type:'stage', text:'Won — converted from lead'}]),
+    lifecycle:{checks:{}, enteredAt:{onboarding:Date.now()}},
     cadenceDays:null, fromLeadId:p.id, startDate:todayStr(), createdAt:todayStr()});
   p.convertedClientId = clientId;
   return clientId;
@@ -8187,6 +8220,7 @@ function normalizeCrmData(b){
     }
     syncClientStatus(c, b);
   });
+  normalizeLifecycle(b);
 }
 function crm(){ return state.business.crm; }
 function crmStages(kind){ return kind==='lead' ? crm().leadStages : crm().clientStages; }
@@ -8294,7 +8328,7 @@ function setStage(kind, id, stageId, opts){
   if(kind==='lead'){ if(!Array.isArray(x.stageHistory)) x.stageHistory=[]; x.stageHistory.push(x.stage); }
   x.stage = stageId;
   crmTimeline(x, 'stage', (from?from.label:'—')+' → '+st.label);
-  if(kind==='client') syncClientStatus(x);
+  if(kind==='client'){ syncClientStatus(x); if(!x.lifecycle) x.lifecycle = {checks:{}, enteredAt:{}}; x.lifecycle.enteredAt[stageId] = Date.now(); }
   let newClientId = null;
   if(kind==='lead' && st.kind==='won' && !x.convertedClientId){ newClientId = convertProspectToClient(x); playSessionComplete(); }
   else playTick();
@@ -8413,6 +8447,7 @@ function crmToolbar(kind){
       '<button class="seg-tab'+(f.view==='board'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="board">Board</button>'+
       '<button class="seg-tab'+(f.view==='list'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="list">List</button>'+
     '</div>'+
+    (kind==='client' ? '<button class="btn btn-ghost btn-sm" data-action="openLifecycleEditor" title="Design the steps every client goes through">&#9881; Lifecycle</button>' : '')+
     '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="'+kind+'">+ Add '+(kind==='lead'?'lead':'client')+'</button>'+
   '</div>';
 }
@@ -8443,6 +8478,7 @@ function crmCard(kind, x){
         (src ? '<span class="tag" style="background:'+src.color+'22;color:'+src.color+';">'+src.emoji+' '+escapeHtml(src.label)+'</span>' : '')+
         (kind==='client' && x.status==='active' ? clientHealthTagHtml(x) : '')+
       '</div>'+
+      (kind==='client' ? lcBadgeHtml(x) : '')+
       (x.lostReason && x.stage==='lost' ? '<div class="kpi-sub">Lost: '+escapeHtml(x.lostReason)+'</div>' : '')+
       (x.convertedClientId ? '<div class="kpi-sub" style="color:var(--good);">&#10003; Now a client</div>' : '')+
     '</div>'+
@@ -8808,12 +8844,15 @@ ACTIONS.saveNewContact = function(){
   if(kind==='lead'){
     state.business.pipeline.push(Object.assign(base, {company:company, value:Number(g('ncValue'))||0, trade:'', nextFollowUp:null, stageHistory:[], convertedClientId:null}));
   } else {
-    const c = Object.assign(base, {business:company, mrr:Number(g('ncValue'))||0, billingDay:1, deliverables:[], journal:[], touches:[], packageId:null, startDate:todayStr()});
+    const c = Object.assign(base, {business:company, mrr:Number(g('ncValue'))||0, billingDay:1, deliverables:[], journal:[], touches:[], packageId:null, startDate:todayStr(), lifecycle:{checks:{}, enteredAt:{}}});
+    c.lifecycle.enteredAt[c.stage] = Date.now();
     syncClientStatus(c);
     state.business.clients.push(c);
   }
   hideOverlay('newContactOverlay');
   playPositive(); persist('business'); renderView();
+  // a new client opens straight onto their first lifecycle step
+  if(kind==='client') openClientModal(base.id);
 };
 // ---- daily touch reminder ----
 let lastTouchReminderDay = null;
@@ -8848,7 +8887,7 @@ function renderCrmSettings(){
       '<div class="field"><label>Daily "reach out" reminder</label><div class="row" style="gap:6px;"><input type="checkbox" id="setTouchReminder" '+(c.dailyReminder.enabled?'checked':'')+'><input class="input" type="time" id="setTouchReminderTime" value="'+c.dailyReminder.time+'" style="width:120px;"></div></div>'+
     '</div><div class="kpi-sub" style="margin-top:8px;">Client health turns amber once a touch is overdue and red when it\'s overdue by more than half the cadence.</div></div>'+
     '<div class="card section"><div class="section-title">Lead stages</div>'+stageEditor('lead')+'</div>'+
-    '<div class="card section"><div class="section-title">Client stages</div>'+stageEditor('client')+'</div>';
+    '<div class="card section"><div class="section-title">Client lifecycle<span class="kpi-sub">the steps every client goes through, each with its own checklist</span></div><button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">&#9881; Edit client lifecycle</button></div>';
 }
 function saveCrmSettingsFields(){
   const c = crm();
@@ -8875,10 +8914,18 @@ ACTIONS.addStage = function(el){
   const label = inp ? inp.value.trim() : ''; if(!label) return;
   const list = crmStages(kind);
   const st = {id:uid(), label:label, color:SWATCHES[list.length%SWATCHES.length]};
-  if(kind==='client') st.active = true;
-  // new stages go before the closed (won/lost/churned) ones
-  const firstClosed = list.findIndex(function(s){ return !!s.kind; });
-  list.splice(firstClosed<0 ? list.length : firstClosed, 0, st);
+  if(kind==='client'){ st.active = true; st.checklist = []; }
+  // New lead stages go before Won/Lost. New client steps go at the end of the active path
+  // (after the last active step, before side states like Paused and Churned).
+  let at;
+  if(kind==='client'){
+    let lastActive = -1; list.forEach(function(s, i){ if(s.active!==false && !s.kind) lastActive = i; });
+    at = lastActive+1;
+  } else {
+    const firstClosed = list.findIndex(function(s){ return !!s.kind; });
+    at = firstClosed<0 ? list.length : firstClosed;
+  }
+  list.splice(at, 0, st);
   inp.value = '';
   persist('business'); renderView();
 };
@@ -8890,6 +8937,234 @@ ACTIONS.removeStage = function(el){
   list.splice(idx,1);
   persist('business'); renderView();
 };
+
+// ============ CLIENT LIFECYCLE (your system for every new client) ============
+// The client stages are the steps of a journey you design (Onboarding → Kickoff → …).
+// Each step carries a checklist, so whenever a client lands on a step you see exactly what
+// to do. Progress is stored per client; an item also counts as done when the task created
+// from it is finished.
+const DEFAULT_LIFECYCLE_CHECKLISTS = {
+  onboarding: ['Send welcome message','Contract signed','First invoice paid','Collect brand assets & logins','Book kickoff call'],
+  active: ['Monthly content plan sent','Weekly check-in','Monthly results recap'],
+  atrisk: ['Call to understand what\'s off','Send a quick win / results summary','Agree on a fix plan'],
+  paused: ['Confirm restart date'],
+  churned: ['Ask for feedback','Ask for a testimonial / referral']
+};
+// Called from normalizeCrmData: every client stage gets a checklist array; the defaults
+// above are filled in once (never again after you edit them).
+function normalizeLifecycle(b){
+  b.crm.clientStages.forEach(function(st){
+    if(!Array.isArray(st.checklist)){
+      st.checklist = (!b.crm.lifecycleSeeded ? (DEFAULT_LIFECYCLE_CHECKLISTS[st.id]||[]) : []).map(function(t, i){ return {id:'lc'+st.id+i, text:t}; });
+    }
+  });
+  b.crm.lifecycleSeeded = true;
+  b.clients.forEach(function(c){
+    if(!c.lifecycle || typeof c.lifecycle!=='object') c.lifecycle = {};
+    if(!c.lifecycle.checks || typeof c.lifecycle.checks!=='object') c.lifecycle.checks = {};
+    if(!c.lifecycle.enteredAt || typeof c.lifecycle.enteredAt!=='object') c.lifecycle.enteredAt = {};
+  });
+}
+function lifecycleSteps(){ return crmStages('client').filter(function(s){ return s.active!==false && !s.kind; }); }
+function lcRef(c, st, it){ return c.id+':'+st.id+':'+it.id; }
+function lcItemDone(c, st, it){
+  if(arr((c.lifecycle||{}).checks && c.lifecycle.checks[st.id]).indexOf(it.id)>=0) return true;
+  const ref = lcRef(c, st, it);
+  return state.tasks.items.some(function(t){ return t.lifecycleRef===ref && t.status==='done'; });
+}
+function lcProgress(c){
+  const st = crmStage('client', c.stage);
+  const items = st ? arr(st.checklist) : [];
+  const done = items.filter(function(it){ return lcItemDone(c, st, it); }).length;
+  return {stage:st, total:items.length, done:done};
+}
+function lcNextStep(c){
+  const steps = lifecycleSteps();
+  const i = steps.findIndex(function(s){ return s.id===c.stage; });
+  return i>=0 && i<steps.length-1 ? steps[i+1] : null;
+}
+function lcPrevStep(c){
+  const steps = lifecycleSteps();
+  const i = steps.findIndex(function(s){ return s.id===c.stage; });
+  return i>0 ? steps[i-1] : null;
+}
+// ---- per-client tracker (top of the client view) ----
+function renderClientLifecycle(c){
+  const steps = lifecycleSteps();
+  const cur = crmStage('client', c.stage);
+  const curIdx = steps.findIndex(function(s){ return s.id===c.stage; });
+  const prog = lcProgress(c);
+  const next = lcNextStep(c), prev = lcPrevStep(c);
+  const entered = (c.lifecycle && c.lifecycle.enteredAt && c.lifecycle.enteredAt[c.stage]) || null;
+  const days = entered ? Math.max(0, Math.floor((Date.now()-entered)/86400000)) : null;
+  const allDone = prog.total>0 && prog.done===prog.total;
+  return '<div class="lc-card">'+
+    '<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px;">'+
+      '<div class="kind-label" style="margin:0;">Client lifecycle</div>'+
+      '<button class="mini-move" data-action="openLifecycleEditor">&#9881; Edit steps</button>'+
+    '</div>'+
+    '<div class="lc-track">'+steps.map(function(s, i){
+      const state_ = i<curIdx ? 'is-past' : i===curIdx ? 'is-current' : '';
+      return (i ? '<span class="lc-arrow">&rarr;</span>' : '')+
+        '<button class="lc-step '+state_+'" data-action="lcGoStep" data-id="'+c.id+'" data-step="'+s.id+'" title="Move to '+escapeHtml(s.label)+'" style="--lc:'+s.color+'">'+(i<curIdx?'&#10003; ':'')+escapeHtml(s.label)+'</button>';
+    }).join('')+
+    (curIdx<0 && cur ? '<span class="lc-arrow">&middot;</span><span class="lc-step is-current" style="--lc:'+cur.color+'">'+escapeHtml(cur.label)+'</span>' : '')+
+    '</div>'+
+    (cur ? '<div class="lc-now">'+
+      '<div class="row" style="justify-content:space-between;align-items:baseline;">'+
+        '<div><span class="lc-now-title" style="color:'+cur.color+'">'+escapeHtml(cur.label)+'</span>'+(prog.total?'<span class="kpi-sub" style="margin-left:8px;">'+prog.done+' / '+prog.total+' done</span>':'')+'</div>'+
+        (days!=null ? '<span class="kpi-sub">'+(days===0?'started today':days+' day'+(days===1?'':'s')+' in this step')+'</span>' : '')+
+      '</div>'+
+      (prog.total ? '<div class="progress" style="margin:8px 0 10px;"><div class="progress-bar'+(allDone?' good':'')+'" style="width:'+Math.round(prog.done/prog.total*100)+'%"></div></div>' : '')+
+      (prog.total ? '<div class="lc-checklist">'+arr(cur.checklist).map(function(it){
+        const done = lcItemDone(c, cur, it);
+        const linked = state.tasks.items.find(function(t){ return t.lifecycleRef===lcRef(c,cur,it) && t.status!=='done'; });
+        return '<label class="lc-item'+(done?' is-done':'')+'"><input type="checkbox" data-lc-check="'+c.id+':'+cur.id+':'+it.id+'" '+(done?'checked':'')+'><span>'+escapeHtml(it.text)+'</span>'+(linked?'<span class="tag tag-ongoing" style="margin-left:auto;">in tasks</span>':'')+'</label>';
+      }).join('')+'</div>'
+      : '<div class="kpi-sub">No checklist for this step yet — <span class="mini-move mini-move-today" data-action="openLifecycleEditor">add one</span>.</div>')+
+      '<div class="row" style="justify-content:space-between;margin-top:12px;gap:8px;">'+
+        '<div class="row" style="gap:6px;">'+
+          (prev ? '<button class="btn btn-ghost btn-sm" data-action="lcGoStep" data-id="'+c.id+'" data-step="'+prev.id+'">&larr; '+escapeHtml(prev.label)+'</button>' : '')+
+          (prog.total && prog.done<prog.total ? '<button class="btn btn-ghost btn-sm" data-action="lcToTasks" data-id="'+c.id+'" title="Add the unchecked items to your task list">Add to my tasks</button>' : '')+
+        '</div>'+
+        (next ? '<button class="btn btn-sm '+(allDone?'btn-good lc-next-ready':'')+'" data-action="lcGoStep" data-id="'+c.id+'" data-step="'+next.id+'">Next: '+escapeHtml(next.label)+' &rarr;</button>' : '')+
+      '</div>'+
+    '</div>' : '')+
+  '</div>';
+}
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.dataset || !t.dataset.lcCheck) return;
+  const p = t.dataset.lcCheck.split(':');
+  const c = crmFind('client', p[0]); if(!c) return;
+  const list = c.lifecycle.checks[p[1]] || (c.lifecycle.checks[p[1]] = []);
+  const i = list.indexOf(p[2]);
+  if(t.checked && i<0) list.push(p[2]);
+  if(!t.checked && i>=0) list.splice(i,1);
+  // unchecking also reopens a task created from this item
+  if(!t.checked){ const tk = state.tasks.items.find(function(x){ return x.lifecycleRef===t.dataset.lcCheck && x.status==='done'; }); if(tk){ tk.status='backlog'; tk.completedAt=null; persist('tasks'); } }
+  const prog = lcProgress(c);
+  if(t.checked) (prog.total && prog.done===prog.total) ? playSessionComplete() : playTick();
+  if(t.checked && prog.total && prog.done===prog.total){ const nx = lcNextStep(c); showToast((crmName('client',c))+': '+prog.stage.label+' complete'+(nx?' — ready for '+nx.label:''), {icon:'&#9989;'}); }
+  persist('business'); renderView(); rerenderContactModal();
+});
+ACTIONS.lcGoStep = function(el){ setStage('client', el.dataset.id, el.dataset.step); };
+ACTIONS.lcToTasks = function(el){
+  const c = crmFind('client', el.dataset.id); if(!c) return;
+  const st = crmStage('client', c.stage); if(!st) return;
+  let added = 0;
+  arr(st.checklist).forEach(function(it){
+    const ref = lcRef(c, st, it);
+    if(lcItemDone(c, st, it) || state.tasks.items.some(function(t){ return t.lifecycleRef===ref; })) return;
+    state.tasks.items.push({id:uid(), title:it.text+' — '+crmName('client',c), client:c.id, clients:[c.id], priority:'med', deadline:null, notes:st.label+' step for '+crmName('client',c), status:'backlog', createdAt:todayStr(), completedAt:null, lifecycleRef:ref});
+    added++;
+  });
+  if(added){ playTaskAdded(); showToast(added+' item'+(added===1?'':'s')+' added to your backlog', {icon:'&#9745;'}); }
+  persist('tasks'); renderView(); rerenderContactModal();
+};
+// Card / list badge: "Onboarding · 2/5"
+function lcBadgeHtml(c){
+  const p = lcProgress(c);
+  if(!p.stage || !p.total) return '';
+  return '<div class="lc-badge"><span class="lc-badge-bar"><span style="width:'+Math.round(p.done/p.total*100)+'%;background:'+p.stage.color+'"></span></span><span class="kpi-sub">'+p.done+'/'+p.total+'</span></div>';
+}
+// ---- "Client next steps" on the Today dashboard ----
+function renderClientStepsPanel(){
+  const rows = [];
+  crmList('client').forEach(function(c){
+    if(!clientStageActive(c.stage)) return;
+    const st = crmStage('client', c.stage); if(!st) return;
+    const open = arr(st.checklist).filter(function(it){ return !lcItemDone(c, st, it); });
+    if(open.length) rows.push({c:c, st:st, open:open});
+  });
+  if(!rows.length) return '';
+  return '<div class="section"><div class="section-title">Client Next Steps<span class="kpi-sub">from your client lifecycle</span><span class="view-all-link" data-action="openLifecycleEditor">Edit steps</span></div>'+
+    '<div class="lc-steps-grid">'+rows.map(function(r){
+      return '<div class="card lc-steps-card" data-key="lcs-'+r.c.id+'">'+
+        '<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px;">'+
+          '<span class="task-card-title" style="font-size:14px;cursor:pointer;" data-action="openContact" data-kind="client" data-id="'+r.c.id+'">'+escapeHtml(crmName('client', r.c))+'</span>'+
+          '<span class="tag" style="background:'+r.st.color+'22;color:'+r.st.color+';">'+escapeHtml(r.st.label)+'</span>'+
+        '</div>'+
+        r.open.slice(0,3).map(function(it){ return '<label class="lc-item"><input type="checkbox" data-lc-check="'+r.c.id+':'+r.st.id+':'+it.id+'"><span>'+escapeHtml(it.text)+'</span></label>'; }).join('')+
+        (r.open.length>3 ? '<div class="kpi-sub" style="margin-top:2px;">+'+(r.open.length-3)+' more</div>' : '')+
+      '</div>';
+    }).join('')+'</div></div>';
+}
+// ---- lifecycle editor ----
+function openLifecycleEditor(){ showOverlay('lifecycleOverlay'); renderLifecycleEditorInto(); }
+ACTIONS.openLifecycleEditor = openLifecycleEditor;
+ACTIONS.closeLifecycleEditor = function(){ hideOverlay('lifecycleOverlay'); renderView(); };
+function renderLifecycleEditor(){
+  const stages = crmStages('client');
+  const counts = {}; crmList('client').forEach(function(c){ counts[c.stage] = (counts[c.stage]||0)+1; });
+  return '<div class="section-title" style="margin-bottom:4px;">Client lifecycle</div>'+
+    '<div class="kpi-sub" style="margin-bottom:16px;">The steps every client goes through, in order. Give each step a checklist and you\'ll always know what to do next — it shows on the client and on your Today page.</div>'+
+    '<div class="lc-editor">'+stages.map(function(s, i){
+      const isPath = s.active!==false && !s.kind;
+      return (i ? '<div class="lc-editor-arrow">'+(isPath && stages[i-1].active!==false && !stages[i-1].kind ? '&darr;' : '&middot;')+'</div>' : '')+
+      '<div class="lc-editor-step'+(isPath?'':' is-side')+'" data-key="lce-'+s.id+'">'+
+        '<div class="row" style="gap:8px;align-items:center;">'+
+          '<span class="swatch" style="background:'+s.color+';width:16px;height:16px;flex-shrink:0;" data-action="cycleStageColor" data-kind="client" data-id="'+s.id+'" title="Change color"></span>'+
+          '<input class="input lc-step-name" data-stage-label="client:'+s.id+'" value="'+escapeHtml(s.label)+'">'+
+          '<span class="kpi-sub" style="white-space:nowrap;">'+(counts[s.id]||0)+' client'+((counts[s.id]||0)===1?'':'s')+'</span>'+
+          '<span style="flex:1"></span>'+
+          '<button class="btn btn-ghost btn-sm" data-action="moveStage" data-kind="client" data-id="'+s.id+'" data-dir="-1" '+(i===0?'disabled':'')+' title="Move up">&uarr;</button>'+
+          '<button class="btn btn-ghost btn-sm" data-action="moveStage" data-kind="client" data-id="'+s.id+'" data-dir="1" '+(i===stages.length-1?'disabled':'')+' title="Move down">&darr;</button>'+
+          (s.kind ? '' : '<button class="btn btn-ghost btn-sm mini-move-danger" data-action="removeStage" data-kind="client" data-id="'+s.id+'" title="Remove step — its clients move to the first step">&#10005;</button>')+
+        '</div>'+
+        (s.kind ? '<div class="kpi-sub" style="margin:4px 0 0 24px;">End of the relationship — not part of the active path.</div>'
+                : '<label class="row kpi-sub" style="gap:6px;margin:6px 0 0 24px;cursor:pointer;"><input type="checkbox" data-stage-active="'+s.id+'" '+(s.active!==false?'checked':'')+'>Part of the active path (unchecked = side state like Paused)</label>')+
+        '<div class="lc-editor-items">'+arr(s.checklist).map(function(it, j, all){
+          return '<div class="lc-editor-item" data-key="lci-'+it.id+'">'+
+            '<span class="lc-editor-bullet">&#9744;</span>'+
+            '<input class="input input-sm" data-lc-item="'+s.id+':'+it.id+'" value="'+escapeHtml(it.text)+'">'+
+            '<button class="mini-move" data-action="lcItemMove" data-id="'+s.id+'" data-item="'+it.id+'" data-dir="-1" '+(j===0?'disabled':'')+'>&uarr;</button>'+
+            '<button class="mini-move" data-action="lcItemMove" data-id="'+s.id+'" data-item="'+it.id+'" data-dir="1" '+(j===all.length-1?'disabled':'')+'>&darr;</button>'+
+            '<button class="mini-move mini-move-danger" data-action="lcItemRemove" data-id="'+s.id+'" data-item="'+it.id+'">&#10005;</button>'+
+          '</div>';
+        }).join('')+
+          '<div class="lc-editor-item"><span class="lc-editor-bullet" style="opacity:.4;">+</span><input class="input input-sm" id="lcNewItem-'+s.id+'" data-lc-new-item="'+s.id+'" placeholder="Add a to-do for this step (Enter)"><button class="btn btn-sm" data-action="lcItemAdd" data-id="'+s.id+'">Add</button></div>'+
+        '</div>'+
+      '</div>';
+    }).join('')+'</div>'+
+    '<div class="row" style="margin-top:14px;gap:8px;"><input class="input" id="newStage-client" placeholder="New step name, e.g. Kickoff call" style="flex:1;"><button class="btn btn-primary btn-sm" data-action="addStage" data-kind="client">+ Add step</button></div>'+
+    '<div class="row" style="margin-top:18px;justify-content:flex-end;"><button class="btn btn-primary" data-action="closeLifecycleEditor">Done</button></div>';
+}
+function renderLifecycleEditorInto(){ const el=document.getElementById('lifecycleContent'); if(el) morphInto(el, renderLifecycleEditor(), {form:true}); }
+registerModal('lifecycleOverlay', renderLifecycleEditorInto);
+function lcStage(id){ return crmStage('client', id); }
+ACTIONS.lcItemAdd = function(el){
+  const st = lcStage(el.dataset.id); if(!st) return;
+  const inp = document.getElementById('lcNewItem-'+st.id);
+  const text = inp ? inp.value.trim() : ''; if(!text) return;
+  if(!Array.isArray(st.checklist)) st.checklist = [];
+  st.checklist.push({id:uid(), text:text});
+  inp.value = '';
+  persist('business'); renderView();
+  const again = document.getElementById('lcNewItem-'+st.id); if(again) again.focus();
+};
+ACTIONS.lcItemRemove = function(el){
+  const st = lcStage(el.dataset.id); if(!st) return;
+  st.checklist = arr(st.checklist).filter(function(it){ return it.id!==el.dataset.item; });
+  persist('business'); renderView();
+};
+ACTIONS.lcItemMove = function(el){
+  const st = lcStage(el.dataset.id); if(!st) return;
+  const list = arr(st.checklist); const i = list.findIndex(function(it){ return it.id===el.dataset.item; });
+  const j = i+Number(el.dataset.dir); if(i<0 || j<0 || j>=list.length) return;
+  const t = list[i]; list[i] = list[j]; list[j] = t;
+  persist('business'); renderView();
+};
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.dataset || !t.dataset.lcItem) return;
+  const p = t.dataset.lcItem.split(':'); const st = lcStage(p[0]); if(!st) return;
+  const it = arr(st.checklist).find(function(x){ return x.id===p[1]; });
+  if(it && t.value.trim()){ it.text = t.value.trim(); persist('business'); }
+});
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Enter' || !e.target || !e.target.dataset) return;
+  if(e.target.dataset.lcNewItem){ e.preventDefault(); ACTIONS.lcItemAdd({dataset:{id:e.target.dataset.lcNewItem}}); }
+  if(e.target.id==='newStage-client'){ e.preventDefault(); ACTIONS.addStage({dataset:{kind:'client'}}); }
+});
 // ============ CALENDAR ============
 function categoryById(id){ return arr(state.calendar.categories).find(function(c){ return c.id===id; }); }
 function calDayInfo(dateStr){

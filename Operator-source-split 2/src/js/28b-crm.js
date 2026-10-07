@@ -68,6 +68,7 @@ function normalizeCrmData(b){
     }
     syncClientStatus(c, b);
   });
+  normalizeLifecycle(b);
 }
 function crm(){ return state.business.crm; }
 function crmStages(kind){ return kind==='lead' ? crm().leadStages : crm().clientStages; }
@@ -175,7 +176,7 @@ function setStage(kind, id, stageId, opts){
   if(kind==='lead'){ if(!Array.isArray(x.stageHistory)) x.stageHistory=[]; x.stageHistory.push(x.stage); }
   x.stage = stageId;
   crmTimeline(x, 'stage', (from?from.label:'—')+' → '+st.label);
-  if(kind==='client') syncClientStatus(x);
+  if(kind==='client'){ syncClientStatus(x); if(!x.lifecycle) x.lifecycle = {checks:{}, enteredAt:{}}; x.lifecycle.enteredAt[stageId] = Date.now(); }
   let newClientId = null;
   if(kind==='lead' && st.kind==='won' && !x.convertedClientId){ newClientId = convertProspectToClient(x); playSessionComplete(); }
   else playTick();
@@ -294,6 +295,7 @@ function crmToolbar(kind){
       '<button class="seg-tab'+(f.view==='board'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="board">Board</button>'+
       '<button class="seg-tab'+(f.view==='list'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="list">List</button>'+
     '</div>'+
+    (kind==='client' ? '<button class="btn btn-ghost btn-sm" data-action="openLifecycleEditor" title="Design the steps every client goes through">&#9881; Lifecycle</button>' : '')+
     '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="'+kind+'">+ Add '+(kind==='lead'?'lead':'client')+'</button>'+
   '</div>';
 }
@@ -324,6 +326,7 @@ function crmCard(kind, x){
         (src ? '<span class="tag" style="background:'+src.color+'22;color:'+src.color+';">'+src.emoji+' '+escapeHtml(src.label)+'</span>' : '')+
         (kind==='client' && x.status==='active' ? clientHealthTagHtml(x) : '')+
       '</div>'+
+      (kind==='client' ? lcBadgeHtml(x) : '')+
       (x.lostReason && x.stage==='lost' ? '<div class="kpi-sub">Lost: '+escapeHtml(x.lostReason)+'</div>' : '')+
       (x.convertedClientId ? '<div class="kpi-sub" style="color:var(--good);">&#10003; Now a client</div>' : '')+
     '</div>'+
@@ -689,12 +692,15 @@ ACTIONS.saveNewContact = function(){
   if(kind==='lead'){
     state.business.pipeline.push(Object.assign(base, {company:company, value:Number(g('ncValue'))||0, trade:'', nextFollowUp:null, stageHistory:[], convertedClientId:null}));
   } else {
-    const c = Object.assign(base, {business:company, mrr:Number(g('ncValue'))||0, billingDay:1, deliverables:[], journal:[], touches:[], packageId:null, startDate:todayStr()});
+    const c = Object.assign(base, {business:company, mrr:Number(g('ncValue'))||0, billingDay:1, deliverables:[], journal:[], touches:[], packageId:null, startDate:todayStr(), lifecycle:{checks:{}, enteredAt:{}}});
+    c.lifecycle.enteredAt[c.stage] = Date.now();
     syncClientStatus(c);
     state.business.clients.push(c);
   }
   hideOverlay('newContactOverlay');
   playPositive(); persist('business'); renderView();
+  // a new client opens straight onto their first lifecycle step
+  if(kind==='client') openClientModal(base.id);
 };
 // ---- daily touch reminder ----
 let lastTouchReminderDay = null;
@@ -729,7 +735,7 @@ function renderCrmSettings(){
       '<div class="field"><label>Daily "reach out" reminder</label><div class="row" style="gap:6px;"><input type="checkbox" id="setTouchReminder" '+(c.dailyReminder.enabled?'checked':'')+'><input class="input" type="time" id="setTouchReminderTime" value="'+c.dailyReminder.time+'" style="width:120px;"></div></div>'+
     '</div><div class="kpi-sub" style="margin-top:8px;">Client health turns amber once a touch is overdue and red when it\'s overdue by more than half the cadence.</div></div>'+
     '<div class="card section"><div class="section-title">Lead stages</div>'+stageEditor('lead')+'</div>'+
-    '<div class="card section"><div class="section-title">Client stages</div>'+stageEditor('client')+'</div>';
+    '<div class="card section"><div class="section-title">Client lifecycle<span class="kpi-sub">the steps every client goes through, each with its own checklist</span></div><button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">&#9881; Edit client lifecycle</button></div>';
 }
 function saveCrmSettingsFields(){
   const c = crm();
@@ -756,10 +762,18 @@ ACTIONS.addStage = function(el){
   const label = inp ? inp.value.trim() : ''; if(!label) return;
   const list = crmStages(kind);
   const st = {id:uid(), label:label, color:SWATCHES[list.length%SWATCHES.length]};
-  if(kind==='client') st.active = true;
-  // new stages go before the closed (won/lost/churned) ones
-  const firstClosed = list.findIndex(function(s){ return !!s.kind; });
-  list.splice(firstClosed<0 ? list.length : firstClosed, 0, st);
+  if(kind==='client'){ st.active = true; st.checklist = []; }
+  // New lead stages go before Won/Lost. New client steps go at the end of the active path
+  // (after the last active step, before side states like Paused and Churned).
+  let at;
+  if(kind==='client'){
+    let lastActive = -1; list.forEach(function(s, i){ if(s.active!==false && !s.kind) lastActive = i; });
+    at = lastActive+1;
+  } else {
+    const firstClosed = list.findIndex(function(s){ return !!s.kind; });
+    at = firstClosed<0 ? list.length : firstClosed;
+  }
+  list.splice(at, 0, st);
   inp.value = '';
   persist('business'); renderView();
 };

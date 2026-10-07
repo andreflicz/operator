@@ -340,6 +340,7 @@ function renderClientModal(){
       '</div>'+
       (isActive ? '<div class="row" style="justify-content:flex-end;margin-top:8px;">'+clientTouchControlHtml(c)+'</div>' : '')+
     '</div>'+
+    renderClientLifecycle(c)+
     renderCrmBlock('client', c)+
     '<div class="kpi-label" style="margin:16px 0 8px;">Deliverables<span class="kpi-sub" style="margin-left:6px;">'+pendingCount+' pending</span></div>'+
     '<div class="task-list" style="margin-bottom:8px;">'+(deliverables.map(function(d){return deliverableRow(c.id,d);}).join('') || '<div class="empty">No deliverables yet — assign a package above, or add a one-off below.</div>')+'</div>'+
@@ -700,6 +701,7 @@ function convertProspectToClient(p){
   state.business.clients.push({id:clientId, name:p.name, business:p.company, phone:p.phone||'', email:p.email||'', leadSource:p.leadSource||null, mrr:p.value||0, billingDay:1, status:'active', stage:'onboarding', notes:p.notes||'', deliverables:[], journal:[],
     touchpoints:tps, touches:tps.map(function(t){ return t.date; }), files:arr(p.files).map(function(f){ return Object.assign({}, f); }),
     timeline:arr(p.timeline).map(function(t){ return Object.assign({}, t); }).concat([{id:uid(), ts:Date.now(), type:'stage', text:'Won — converted from lead'}]),
+    lifecycle:{checks:{}, enteredAt:{onboarding:Date.now()}},
     cadenceDays:null, fromLeadId:p.id, startDate:todayStr(), createdAt:todayStr()});
   p.convertedClientId = clientId;
   return clientId;

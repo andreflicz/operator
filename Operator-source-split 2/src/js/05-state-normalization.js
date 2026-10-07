@@ -336,24 +336,17 @@ function normalizeDashboardPanels(d){
   d.order = d.order.filter(function(pid){ return validIds.indexOf(pid)>=0; });
   defaults.order.forEach(function(pid){ if(d.order.indexOf(pid)<0) d.order.push(pid); });
   if(!d.enabled || typeof d.enabled!=='object') d.enabled = {};
-  // One-time move (Phase 2): Quick Journal sits right under the streak panel. Runs once so
-  // any order you set afterwards is respected.
-  if(!d.reachOutAdded){
-    // Phase 4: "Reach out today" goes right under Quick Journal.
-    const ri = d.order.indexOf('reachOut'); if(ri>=0) d.order.splice(ri,1);
-    const ji = d.order.indexOf('journal');
-    d.order.splice(ji>=0 ? ji+1 : 1, 0, 'reachOut');
-    d.reachOutAdded = true;
-  }
-  if(!d.journalRaised){
-    const ji = d.order.indexOf('journal');
-    if(ji>=0){
-      d.order.splice(ji,1);
-      const si = d.order.indexOf('personalStats');
-      d.order.splice(si>=0 ? si+1 : 0, 0, 'journal');
-    }
-    d.journalRaised = true;
-  }
+  // One-time layout moves, applied in order and only once each, so any order you set
+  // afterwards is respected: Quick Journal under the streak panel (phase 2), then Reach Out
+  // Today under it (phase 4), then Client Next Steps under that (lifecycle).
+  const moveAfter = function(id, afterId, fallbackIdx){
+    const i = d.order.indexOf(id); if(i>=0) d.order.splice(i,1);
+    const a = d.order.indexOf(afterId);
+    d.order.splice(a>=0 ? a+1 : fallbackIdx, 0, id);
+  };
+  if(!d.journalRaised){ moveAfter('journal', 'personalStats', 0); d.journalRaised = true; }
+  if(!d.reachOutAdded){ moveAfter('reachOut', 'journal', 1); d.reachOutAdded = true; }
+  if(!d.clientStepsAdded){ moveAfter('clientSteps', 'reachOut', 2); d.clientStepsAdded = true; }
   return d;
 }
 function normalizeModes(m){

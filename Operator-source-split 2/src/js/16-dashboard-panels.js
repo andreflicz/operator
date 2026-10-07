@@ -303,7 +303,8 @@ const PANEL_RENDERERS = {
   focusMini: renderFocusMiniPanel,
   calendarMini: renderCalendarMiniPanel,
   tasks: renderTodayTasksPanel,
-  reachOut: function(){ return renderReachOutPanel(false); }
+  reachOut: function(){ return renderReachOutPanel(false); },
+  clientSteps: renderClientStepsPanel
 };
 function clientOpsDeliverableRow(clientId, d){
   return recurringDeliverableRowHtml(clientId, d, false);

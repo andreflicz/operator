@@ -110,6 +110,8 @@ const SP = require('./common.js').OUT;
   check('FAB = add client', (await p.getAttribute('#fabAdd','title'))==='Add client');
   await p.click('#fabAdd'); await p.fill('#ncName','Zed'); await p.fill('#ncCompany','Zed Media'); await p.fill('#ncValue','900'); await p.click('[data-action="saveNewContact"]');
   check('new client created', (await E("state.business.clients.some(c=>c.business==='Zed Media' && c.stage==='onboarding' && c.status==='active')")));
+  check('new client opens on its lifecycle', await p.isVisible('#clientModalOverlay:not(.hidden) .lc-card'));
+  await p.click('[data-action="closeClientModalAndSave"]');
   await p.screenshot({path:SP+'/p4-clients.png'});
   await p.click('[data-action="businessTab"][data-tab="leads"]');
   await p.screenshot({path:SP+'/p4-leads.png'});
