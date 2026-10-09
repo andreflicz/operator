@@ -64,8 +64,12 @@ function contactMenuHtml(kind, x){
 }
 // ---- boards ----
 function boardMenuHtml(elId){
-  if(elId) return '<div class="ctx-title">Card</div>'+ci('bDup', '&#10697; Duplicate')+ci('bFwd', '&#11014; Bring forward')+ci('bBack', '&#11015; Send back')+SEP+ci('bDel', '&#128465; Delete', {cls:'ctx-danger'});
-  return '<div class="ctx-title">Board</div>'+
+  const n = cv.sel.size;
+  const paste = boardClip ? ci('bPaste', '&#128203; Paste '+boardClip.els.length+' card'+(boardClip.els.length===1?'':'s')+' <span class="ctx-kbd">&#8984;V</span>') : '';
+  if(elId) return '<div class="ctx-title">'+(n>1 ? n+' cards' : 'Card')+'</div>'+
+    ci('bCopy', '&#128203; Copy <span class="ctx-kbd">&#8984;C</span>')+ci('bCut', '&#9986; Cut <span class="ctx-kbd">&#8984;X</span>')+ci('bDup', '&#10697; Duplicate')+paste+SEP+
+    ci('bFwd', '&#11014; Bring forward')+ci('bBack', '&#11015; Send back')+SEP+ci('bDel', '&#128465; Delete'+(n>1?' '+n:''), {cls:'ctx-danger'});
+  return '<div class="ctx-title">Board</div>'+paste+
     crow('Add here', chip('bAdd', 'Note', {a:'note'})+chip('bAdd', 'Label', {a:'label'})+chip('bAdd', 'List', {a:'list'}))+
     ci('bBg', '&#127912; Background…')+ci('bFit', '&#9974; Fit everything')+ci('bFull', ui.boardFull ? '&#10530; Exit full screen' : '&#9974; Full screen');
 }
@@ -93,7 +97,8 @@ document.addEventListener('contextmenu', function(e){
   const host = t.closest('#boardHost');
   if(host && !cv.view){
     const bel = t.closest('.bel[data-el]');
-    if(bel){ cv.sel = new Set([bel.dataset.el]); drawBoard(); }
+    // right-clicking one of several selected cards keeps them all selected (like the Finder)
+    if(bel && !cv.sel.has(bel.dataset.el)){ cv.sel = new Set([bel.dataset.el]); drawBoard(); }
     const r = host.getBoundingClientRect(), b = cvBoard(), v = b ? b.viewport : {x:0, y:0, zoom:1};
     ctxShow(boardMenuHtml(bel ? bel.dataset.el : null), e.clientX, e.clientY, {x:(e.clientX - r.left - v.x)/v.zoom, y:(e.clientY - r.top - v.y)/v.zoom});
     return;
@@ -145,6 +150,9 @@ ACTIONS.ctx = function(el){
   else if(op==='bFit') ACTIONS.boardFit();
   else if(op==='bFull') ACTIONS.boardFullscreen({dataset:{kind:cv.kind}});
   else if(op==='bDup') ACTIONS.boardDuplicate();
+  else if(op==='bCopy') ACTIONS.boardCopySel();
+  else if(op==='bCut') ACTIONS.boardCutSel();
+  else if(op==='bPaste') ACTIONS.boardPasteClip();
   else if(op==='bFwd') ACTIONS.boardForward();
   else if(op==='bBack') ACTIONS.boardBackward();
   else if(op==='bDel') ACTIONS.boardDelete();

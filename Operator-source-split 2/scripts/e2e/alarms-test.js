@@ -22,15 +22,17 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   await p.clock.setSystemTime(at(7,3));
   await p.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
   await p.waitForTimeout(100);
-  check('wake screen shows after a missed minute', await p.isVisible('#wakeOverlay .wake-screen.is-ringing'));
+  check('wake screen shows after a missed minute', await p.isVisible('#wakeOverlay .wk2'));
   check('wake screen has I\'m up + snooze', await p.isVisible('[data-action="wakeImUp"]') && await p.isVisible('[data-action="wakeSnooze"]'));
   check('it does not ring twice for the same morning', await E("state.focus.wake.lastFiredTs===localTs('2026-10-07','07:00')"));
   await p.click('[data-action="wakeSnooze"]');
   check('snooze hides it and schedules a re-ring', !(await p.isVisible('#wakeOverlay')) && await E("!!(state.focus.snooze && state.focus.snooze.wake)"));
   await p.clock.runFor(9*60000+3000);
-  check('rings again after the snooze', await p.isVisible('#wakeOverlay .wake-screen.is-ringing'));
+  check('rings again after the snooze', await p.isVisible('#wakeOverlay .wk2'));
   await p.click('[data-action="wakeImUp"]');
-  check('"I\'m up" closes the wake screen and ends sleep mode', !(await p.isVisible('#wakeOverlay')) && await E("!state.modes.active"));
+  check('"I\'m up" opens the morning briefing and ends sleep mode', await p.isVisible('#wakeOverlay .brief') && await E("!state.modes.active"));
+  await p.click('[data-action="wakeBriefDone"]');
+  check('"Let\'s go" closes it', !(await p.isVisible('#wakeOverlay')));
   check('no page errors (wake)', p.errors.length===0, p.errors);
   await p.close();
 
@@ -50,12 +52,14 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   await p.click('[data-action="wakeTestSoon"]');
   await p.click('[data-action="closeWakeSetup"]');
   await p.clock.runFor(62000);
-  check('"ring in 1 min" test works', await p.isVisible('#wakeOverlay .wake-screen.is-ringing') && (await p.textContent('#wakeOverlay')).includes('TEST'));
+  check('"ring in 1 min" test works', await p.isVisible('#wakeOverlay .wk2') && (await p.textContent('#wakeOverlay')).includes('TEST'));
   await p.click('[data-action="wakeImUp"]');
+  await p.click('[data-action="wakeBriefDone"]');
   check('the override does not fire at the usual 7:00', await (async()=>{ await p.clock.setSystemTime(at(7,1)); await E('checkAllAlarms()'); return !(await p.isVisible('#wakeOverlay')); })());
   await p.clock.setSystemTime(at(8,31)); await E('checkAllAlarms()');
-  check('…and fires at the changed time', await p.isVisible('#wakeOverlay .wake-screen.is-ringing'));
+  check('…and fires at the changed time', await p.isVisible('#wakeOverlay .wk2'));
   await p.click('[data-action="wakeImUp"]');
+  await p.click('[data-action="wakeBriefDone"]');
   check('no page errors (setup)', p.errors.length===0, p.errors);
   await p.close();
 
@@ -74,8 +78,9 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   check('night plan sets a one-morning wake time', await E("const o=state.focus.wake.override; o && o.date==='2026-10-08' && o.time==='06:15'"));
   check('no stray one-off alarm created', await E("state.focus.alarms.length===0"));
   await p.clock.setSystemTime(at(6,15,8)); await E('checkAllAlarms()');
-  check('wake screen shows the plan', (await p.textContent('#wakeOverlay')).includes('Edit reel'));
   await p.click('[data-action="wakeImUp"]');
+  check('the morning briefing shows the plan', (await p.textContent('#wakeOverlay')).includes('Edit reel'));
+  await p.click('[data-action="wakeBriefDone"]');
   await p.close();
 
   // --- regular alarms catch up instead of being skipped; task travel/ready alarms ---
@@ -137,7 +142,7 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   await M("hideOverlay('wakeSetupOverlay')");
   calls.length = 0; await M("window.__beeps = 0");
   await m.clock.setSystemTime(at(7,0)); await M('checkAllAlarms()'); await m.waitForTimeout(300);
-  check('alarm rings with the vision board on the main screen', await m.isVisible('#wakeOverlay .wake-screen') && (await m.textContent('#wakeOverlay')).includes('Mind + Body'));
+  check('alarm rings with the vision board on the main screen', await m.isVisible('#wakeOverlay .wk2') && (await m.textContent('#wakeOverlay')).includes('Mind + Body'));
   check('it plays the song (and wakes / unmutes the Mac)', calls.some(c => c.startsWith('/music/play')) && calls.some(c => c==='/wake'), calls);
   await m.waitForTimeout(3000);
   check('no alarm beep while the song plays', await M("window.__beeps")===0);

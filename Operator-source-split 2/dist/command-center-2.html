@@ -1728,6 +1728,153 @@
   .mg-more{ display:flex; justify-content:flex-end; margin-top:8px; }
   .mg-more .view-all-link{ position:static; }
   .goal-card-actions{ flex-wrap:wrap; row-gap:6px; }
+  /* goal bars readable on any background: a visible track, an outline, and the goal marked at the end */
+  .biz-bar, .hq-stage-bar{ background:rgba(var(--ink),.13) !important; box-shadow:inset 0 0 0 1px rgba(var(--ink),.12); }
+  .hq-mrr .biz-bar{ height:12px; overflow:visible; border-radius:7px; margin-top:22px; }
+  .hq-mrr .biz-bar > span:not(.biz-bar-end){ border-radius:7px 0 0 7px; }
+  .biz-bar-end{ position:absolute; right:0; bottom:calc(100% + 4px); font-size:11px; font-weight:700; color:var(--text-dim); letter-spacing:.02em; }
+  .biz-bar-end::after{ content:''; position:absolute; right:0; top:calc(100% + 3px); width:2px; height:18px; border-radius:2px; background:var(--strong); opacity:.7; }
+  /* ---- locked in: your layout ---- */
+  .ll-bar{ display:flex; justify-content:flex-end; max-width:1200px; margin:-6px auto 6px; }
+  .ll-btn{ border:1px solid var(--border); background:transparent; color:var(--text-faint); border-radius:999px; padding:4px 12px; font-size:12px; font-weight:600; cursor:pointer; transition:color .15s, border-color .15s; }
+  .ll-btn:hover{ color:var(--text); border-color:var(--border-strong); }
+  .ll-btn.is-on{ color:#0b0d12; background:var(--accent); border-color:var(--accent); }
+  .ll-block{ margin-bottom:22px; }
+  .ll-block.is-editing{ position:relative; border:1px dashed rgba(232,162,61,.45); border-radius:16px; padding:12px; }
+  .ll-head{ display:flex; align-items:center; gap:6px; margin-bottom:10px; }
+  .ll-name{ flex:1; font-family:var(--font-display); font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); }
+  .ll-ctl{ width:28px; height:26px; border-radius:8px; border:1px solid var(--border); background:var(--panel-2); color:var(--text-dim); cursor:pointer; }
+  .ll-ctl:hover:not([disabled]){ color:var(--text); border-color:var(--border-strong); }
+  .ll-ctl[disabled]{ opacity:.35; cursor:default; }
+  .ll-hide:hover{ color:var(--danger-text) !important; border-color:var(--danger) !important; }
+  .ll-tray{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; max-width:1200px; margin:10px auto 30px; padding:14px 16px; border:1px dashed var(--border-strong); border-radius:14px; }
+  .ll-add{ border:1px solid var(--border); background:var(--panel-2); color:var(--text-dim); border-radius:999px; padding:6px 12px; font-size:12.5px; font-weight:600; cursor:pointer; }
+  .ll-add:hover{ color:var(--text); border-color:var(--accent); }
+  /* ---- client card face + flip ---- */
+  #clientModalContent.cm-flip{ animation:cmFlip .42s cubic-bezier(.2,.8,.2,1); transform-origin:50% 50%; }
+  @keyframes cmFlip{ 0%{ transform:perspective(1400px) rotateY(-80deg); opacity:.3; } 100%{ transform:perspective(1400px) rotateY(0); opacity:1; } }
+  @media (prefers-reduced-motion: reduce){ #clientModalContent.cm-flip{ animation:none; } }
+  .cf{ display:flex; flex-direction:column; gap:16px; }
+  .cf-head{ display:flex; align-items:center; gap:14px; }
+  .cf-head .cc2-avatar{ width:54px; height:54px; font-size:18px; border-radius:16px; }
+  .cf-names{ flex:1; min-width:0; }
+  .cf-biz{ font-family:var(--font-display); font-weight:800; font-size:24px; line-height:1.15; }
+  .cf-facts{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+  .cf-fact{ display:flex; flex-direction:column; gap:2px; padding:12px 14px; border-radius:12px; background:var(--panel-2); border:1px solid var(--border); }
+  .cf-k, .cf-sec-k{ font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); }
+  .cf-v{ font-family:var(--font-display); font-weight:700; font-size:17px; }
+  .cf-s{ font-size:11.5px; color:var(--text-dim); }
+  .cf-sec{ display:flex; flex-direction:column; gap:8px; }
+  .cf-plan{ display:flex; align-items:baseline; gap:10px; }
+  .cf-plan-name{ font-family:var(--font-display); font-weight:700; font-size:16px; color:var(--good-text); }
+  .cf-delivs{ display:flex; flex-direction:column; gap:6px; }
+  .cf-deliv{ display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px; background:var(--panel-2); border:1px solid var(--border); }
+  .cf-deliv-t{ flex:1; min-width:0; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cf-deliv-n{ font-size:12px; font-weight:700; white-space:nowrap; }
+  .cf-notes{ white-space:pre-wrap; line-height:1.55; color:var(--text); padding:12px 14px; border-radius:12px; background:var(--panel-2); border:1px solid var(--border); }
+  .cf-foot{ display:flex; justify-content:flex-end; gap:8px; margin-top:4px; }
+  @media (max-width:600px){ .cf-facts{ grid-template-columns:1fr; } }
+  /* ---- wake-up: ringing ---- */
+  .wk2{ position:absolute; inset:0; overflow:hidden; display:flex; align-items:center; justify-content:center; background:#05060b; color:#fff; }
+  .wk2-aura{ position:absolute; inset:-20%; filter:blur(70px); opacity:.85; pointer-events:none; }
+  .wk2-aura i{ position:absolute; width:46vmax; height:46vmax; border-radius:50%; animation:wkDrift 22s ease-in-out infinite alternate; }
+  .wk2-aura i:nth-child(1){ left:5%; top:10%; background:radial-gradient(circle, rgba(232,162,61,.55), transparent 65%); }
+  .wk2-aura i:nth-child(2){ right:0; top:30%; background:radial-gradient(circle, rgba(120,110,255,.38), transparent 65%); animation-duration:28s; animation-delay:-6s; }
+  .wk2-aura i:nth-child(3){ left:30%; bottom:-10%; background:radial-gradient(circle, rgba(255,110,90,.32), transparent 65%); animation-duration:34s; animation-delay:-12s; }
+  .wk2[data-sky="night"] .wk2-aura i:nth-child(1){ background:radial-gradient(circle, rgba(90,110,255,.45), transparent 65%); }
+  @keyframes wkDrift{ 0%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(6vmax,-4vmax) scale(1.12); } 100%{ transform:translate(-5vmax,5vmax) scale(.95); } }
+  .wk2-center{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px; padding:24px; animation:wkRise .9s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes wkRise{ from{ opacity:0; transform:translateY(24px) scale(.98); } to{ opacity:1; transform:none; } }
+  .wk2-greet{ font-family:var(--font-display); font-size:20px; font-weight:600; color:rgba(255,255,255,.75); letter-spacing:.02em; }
+  .wk2-clock{ font-family:var(--font-display); font-weight:800; font-size:clamp(96px, 15vw, 210px); line-height:.95; letter-spacing:-.04em; background:linear-gradient(180deg, #fff 30%, rgba(255,214,160,.85)); -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:0 0 80px rgba(232,162,61,.25); animation:wkBreathe 4s ease-in-out infinite; }
+  @keyframes wkBreathe{ 0%,100%{ opacity:1; } 50%{ opacity:.82; } }
+  .wk2-date{ font-size:17px; color:rgba(255,255,255,.7); margin-bottom:22px; }
+  .wk2-actions{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center; }
+  .wk2-up{ position:relative; border:none; cursor:pointer; font-family:var(--font-display); font-weight:800; font-size:22px; color:#1a1305; background:linear-gradient(180deg, #ffc56b, #E8A23D); padding:20px 46px; border-radius:999px; box-shadow:0 14px 50px rgba(232,162,61,.45); transition:transform .15s; }
+  .wk2-up::before{ content:''; position:absolute; inset:-6px; border-radius:999px; border:2px solid rgba(255,197,107,.6); animation:wkRing 2s ease-out infinite; }
+  @keyframes wkRing{ 0%{ transform:scale(.96); opacity:.9; } 100%{ transform:scale(1.25); opacity:0; } }
+  .wk2-up:hover{ transform:translateY(-2px) scale(1.02); }
+  .wk2-snooze{ border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.06); color:#fff; font-weight:600; font-size:15px; padding:16px 26px; border-radius:999px; cursor:pointer; backdrop-filter:blur(8px); }
+  .wk2-snooze:hover{ background:rgba(255,255,255,.12); }
+  .wk2-music{ display:inline-flex; align-items:center; gap:10px; margin-top:26px; padding:10px 18px; border-radius:999px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); backdrop-filter:blur(10px); font-size:14px; }
+  .wk2-song{ font-weight:700; } .wk2-src{ color:rgba(255,255,255,.55); font-size:12px; }
+  .wk2-eq{ display:inline-flex; align-items:flex-end; gap:3px; height:16px; }
+  .wk2-eq i{ width:3px; border-radius:2px; background:#ffc56b; animation:wkEq 1s ease-in-out infinite; }
+  .wk2-eq i:nth-child(1){ height:40%; } .wk2-eq i:nth-child(2){ height:90%; animation-delay:-.3s; } .wk2-eq i:nth-child(3){ height:60%; animation-delay:-.55s; } .wk2-eq i:nth-child(4){ height:75%; animation-delay:-.8s; }
+  @keyframes wkEq{ 0%,100%{ transform:scaleY(.35); } 50%{ transform:scaleY(1); } }
+  .wk2-eq i{ transform-origin:bottom; }
+  .wk2-vision{ position:absolute; right:28px; bottom:28px; z-index:3; width:300px; height:190px; display:flex; border-radius:18px; overflow:hidden; cursor:pointer; border:1px solid rgba(255,255,255,.14); box-shadow:0 20px 50px rgba(0,0,0,.5); transition:all .45s cubic-bezier(.2,.8,.2,1); background:#0d0f15; }
+  .wk2-vision:hover{ transform:translateY(-3px); border-color:rgba(255,197,107,.5); }
+  .wk2-vision .wake-board{ flex:1; border:none; border-radius:0; pointer-events:none; }
+  .wk2-vision-k{ position:absolute; left:12px; top:10px; z-index:2; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#fff; background:rgba(0,0,0,.45); padding:3px 8px; border-radius:6px; }
+  .wk2.board-open .wk2-vision{ right:40px; bottom:40px; width:calc(100% - 80px); height:calc(100% - 80px); cursor:zoom-out; }
+  .wk2.board-open .wk2-center{ opacity:0; pointer-events:none; }
+  .wk2-vision-x{ position:absolute; right:12px; top:12px; z-index:3; width:34px; height:34px; border-radius:50%; border:none; background:rgba(0,0,0,.55); color:#fff; cursor:pointer; }
+  @media (max-width:800px){ .wk2-vision{ width:200px; height:130px; right:14px; bottom:14px; } }
+  /* ---- morning briefing ---- */
+  .brief{ position:absolute; inset:0; overflow-y:auto; background:radial-gradient(ellipse at 50% -10%, rgba(232,162,61,.16), transparent 55%), #05060b; color:#fff; }
+  .brief-grid-bg{ position:fixed; inset:0; pointer-events:none; background-image:linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px); background-size:44px 44px; mask-image:radial-gradient(ellipse at 50% 30%, #000 30%, transparent 75%); animation:brGrid 30s linear infinite; }
+  @keyframes brGrid{ from{ background-position:0 0; } to{ background-position:44px 44px; } }
+  .brief-inner{ position:relative; max-width:1180px; margin:0 auto; padding:54px 40px 60px; }
+  .brief-inner > *{ animation:brIn .7s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes brIn{ from{ opacity:0; transform:translateY(18px); filter:blur(6px); } to{ opacity:1; transform:none; filter:none; } }
+  .brief-cols > *{ animation:brIn .7s cubic-bezier(.2,.8,.2,1) both; }
+  .brief-top{ display:flex; align-items:center; gap:10px; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.55); font-weight:700; }
+  .brief-brand{ color:#ffc56b; letter-spacing:.3em; }
+  .brief-dot{ width:6px; height:6px; border-radius:50%; background:#3FBE8E; box-shadow:0 0 10px #3FBE8E; animation:wkBreathe 1.6s ease-in-out infinite; }
+  .brief-sys{ margin-left:auto; color:#3FBE8E; }
+  .brief-hello{ font-family:var(--font-display); font-weight:800; font-size:clamp(44px, 6.5vw, 86px); line-height:1.02; letter-spacing:-.03em; margin:22px 0 8px; }
+  .brief-hello span{ background:linear-gradient(90deg, #ffc56b, #ff8a5c); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .brief-sub{ font-size:17px; color:rgba(255,255,255,.7); margin-bottom:30px; }
+  .brief-cols{ display:grid; grid-template-columns:1fr 1.25fr 1fr; gap:16px; animation:none !important; }
+  @media (max-width:1000px){ .brief-cols{ grid-template-columns:1fr; } }
+  .br-card{ background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); border-radius:20px; padding:20px 22px; backdrop-filter:blur(8px); }
+  .br-k{ font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:12px; }
+  .br-stats{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .br-stat{ padding:12px; border-radius:14px; background:rgba(255,255,255,.04); }
+  .br-stat-v{ font-family:var(--font-display); font-weight:800; font-size:24px; }
+  .br-stat.is-good .br-stat-v{ color:#3FBE8E; }
+  .br-stat-k{ font-size:12px; color:rgba(255,255,255,.55); }
+  .br-line{ margin-top:12px; font-size:14px; color:rgba(255,255,255,.75); line-height:1.5; }
+  .br-note{ font-size:15px; line-height:1.55; white-space:pre-wrap; margin-bottom:10px; color:rgba(255,255,255,.88); }
+  .br-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; counter-reset:br; }
+  .br-list li{ counter-increment:br; display:flex; align-items:center; gap:8px; padding:9px 12px; border-radius:12px; background:rgba(255,255,255,.035); font-weight:600; }
+  .br-list li::before{ content:counter(br); width:18px; color:rgba(255,255,255,.4); font-family:var(--font-display); }
+  .br-list li > span:not(.tag){ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .br-list li > .tag{ flex:none; }
+  .br-list li.is-first{ background:rgba(232,162,61,.12); box-shadow:inset 3px 0 0 #E8A23D; }
+  .br-list li em{ font-style:normal; font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#ffc56b; }
+  .br-agenda{ display:flex; flex-direction:column; gap:5px; font-size:14px; }
+  .br-agenda b{ color:#ffc56b; margin-right:6px; } .br-agenda b.is-due{ color:#ff7a7a; }
+  .br-goals{ display:flex; flex-direction:column; gap:10px; }
+  .br-goal{ display:grid; grid-template-columns:1fr auto; gap:4px 10px; align-items:center; }
+  .br-goal-k{ font-size:13px; color:rgba(255,255,255,.75); }
+  .br-goal-v{ font-family:var(--font-display); font-weight:700; }
+  .br-goal-bar{ grid-column:1 / -1; height:6px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; }
+  .br-goal-bar i{ display:block; height:100%; border-radius:999px; background:linear-gradient(90deg, var(--mg1), var(--mg2)); animation:brBar 1.4s cubic-bezier(.2,.8,.2,1) both .6s; transform-origin:left; }
+  @keyframes brBar{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+  .br-why{ display:flex; flex-direction:column; gap:4px; font-size:14px; } .br-why span::before{ content:'→ '; color:#ffc56b; }
+  .brief-cta{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:30px; }
+  .brief-go{ border:none; cursor:pointer; font-family:var(--font-display); font-weight:800; font-size:18px; color:#06120c; background:linear-gradient(180deg, #5fe0ad, #3FBE8E); padding:16px 30px; border-radius:16px; box-shadow:0 12px 40px rgba(63,190,142,.35); max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .brief-go:hover{ transform:translateY(-1px); }
+  .brief-later{ border:1px solid rgba(255,255,255,.2); background:transparent; color:#fff; font-weight:700; font-size:16px; padding:15px 24px; border-radius:16px; cursor:pointer; }
+  .brief-later:hover{ background:rgba(255,255,255,.08); }
+  @media (prefers-reduced-motion: reduce){ .wk2-aura i, .wk2-clock, .brief-grid-bg, .wk2-up::before, .wk2-eq i{ animation:none; } }
+  /* ---- integrations: GoHighLevel ---- */
+  .ghl-card{ display:flex; flex-direction:column; gap:6px; }
+  .ghl-head{ display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+  .ghl-logo{ width:42px; height:42px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:13px; color:#fff; background:linear-gradient(135deg, #2f6df6, #1aa260); letter-spacing:.02em; }
+  .ghl-title{ font-family:var(--font-display); font-weight:700; font-size:16px; }
+  .ghl-steps{ margin:4px 0 0; padding-left:20px; display:flex; flex-direction:column; gap:6px; font-size:13.5px; color:var(--text-dim); line-height:1.5; }
+  .ghl-steps b{ color:var(--text); }
+  .ghl-steps code{ font-size:11.5px; background:var(--panel-2); border:1px solid var(--border); border-radius:5px; padding:0 4px; margin:0 1px; white-space:nowrap; }
+  .ghl-status{ font-size:13px; color:var(--text-dim); }
+  .ghl-err{ margin-top:8px; padding:9px 12px; border-radius:10px; background:var(--danger-dim); color:var(--danger-text); font-size:13px; }
+  .ghl-map{ display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:8px; }
+  .ghl-map-row{ display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:10px; background:var(--panel-2); border:1px solid var(--border); }
+  .ghl-map-k{ flex:1; min-width:0; font-weight:600; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ghl-map-row select{ width:150px; padding:5px 8px; }
+  .ghl-toggles{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:8px; margin-top:12px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -2819,7 +2966,7 @@ function defaultJournalTypes(){
 }
 function defaultSettings(){
   return { clientCare: { yellowHours:48, redHours:72 }, quickLinks: { businessFilesPath:'', metaAdsUrl:'https://adsmanager.facebook.com', ghlUrl:'https://app.gohighlevel.com', driveUrl:'https://drive.google.com', lastAiUsed:'chatgpt', icons:{} },
-    appTracking: { enabled:true, autoLockIn:true, thresholdMinutes:12, graceMinutes:3, cooldownMinutes:15, idleSeconds:60 } };
+    appTracking: { enabled:true, autoLockIn:true, thresholdMinutes:12, graceMinutes:3, cooldownMinutes:15, idleSeconds:60, awayMinutes:10 } };
 }
 const AI_TOOLS = [
   {id:'chatgpt', emoji:'🤖', label:'ChatGPT', url:'https://chat.openai.com', bg:'#10a37f'},
@@ -2903,7 +3050,7 @@ let state = {
   boards: defaultBoards()
 };
 let ui = {
-  view:'today', healthTab:'workouts', businessTab:'overview', personalTab:'goals', focusTab:'overview', settingsTab:'general',
+  view:'today', healthTab:'workouts', businessTab:'overview', personalTab:'goals', focusTab:'overview', settingsTab:'you',
   forms:{task:false, client:false, prospect:false, breakForm:false},
   pendingFocusMinutes: null,
   focusOpenEnded: false,
@@ -5306,29 +5453,8 @@ function renderTodayFocusMode(p){
     ) : '<div class="view-sub" id="liveClock"></div>')+
     renderNowNextBar()+
   '</div>'+
-  '<div class="grid grid-3 stat-chip-row section" style="max-width:800px;margin:0 auto 26px;">'+
-    '<div class="stat-chip" style="text-align:center;"><div class="stat-chip-label">Day Streak</div><div class="stat-chip-value">'+computeStreak()+'</div><div class="kpi-sub">rest days still count</div></div>'+
-    '<div class="stat-chip" data-action="goToFinishedTasks" style="text-align:center;cursor:pointer;"><div class="stat-chip-label">Completed Today</div><div class="stat-chip-value">'+doneToday.length+' task'+(doneToday.length===1?'':'s')+'</div></div>'+
-    '<div class="stat-chip" id="statDeepWorkTodayBox" style="text-align:center;"><div class="stat-chip-label">Deep Work Today</div><div class="stat-chip-value">'+fmtHours(deepWorkToday)+'</div><div class="kpi-sub">'+fmtDurationLabel(deepWorkToday)+'</div></div>'+
-  '</div>'+
-  '<div class="hero-row section">'+renderActiveFocusHero(true)+renderCurrentTaskCard(false,false,true)+'</div>'+
-  renderVisionSlideshow()+
-  renderStandardsWidget()+
-  (todayNotices.length ? (
-    '<div class="section" style="max-width:640px;margin:0 auto;"><div class="section-title" style="justify-content:center;">Today on the Calendar</div><div class="card"><div class="task-list">'+
-      todayNotices.map(function(n){
-        return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="'+n.kind+'" data-id="'+n.id+'">'+
-          (n.kind==='deadline' ? '<span class="tag" style="background:var(--danger-dim);color:var(--danger-text);">Deadline</span>' : '<span class="tag" style="background:'+n.color+'22;color:'+n.color+';">'+(n.time?fmt12Hour(n.time):'Event')+'</span>')+
-          '<div class="task-title" style="flex:1;">'+escapeHtml(n.label)+'</div>'+
-        '</div>';
-      }).join('')+
-    '</div></div></div>'
-  ) : '')+
-  '<div style="max-width:900px;margin:0 auto;">'+renderReachOutPanel(true)+'</div>'+
-  '<div class="section grid grid-2" style="max-width:1200px;margin:32px auto 0;align-items:start;">'+
-    '<div><div class="section-title" style="justify-content:center;">Worth Doing Soon<span class="kpi-sub" style="margin-left:8px;">&middot; '+backlog.length+' waiting</span></div><div class="card" style="max-height:600px;overflow-y:auto;"><div class="task-list">'+(backlog.map(focusModeBacklogRow).join('') || '<div class="empty">Backlog is empty.</div>')+'</div></div></div>'+
-    '<div><div class="section-title" style="justify-content:center;">Clients<span class="kpi-sub" style="margin-left:8px;">&middot; '+activeClients.length+' active</span></div><div class="task-list" style="display:flex;flex-direction:column;gap:12px;max-height:600px;overflow-y:auto;">'+(activeClients.length ? activeClients.map(function(c){ return renderClientHealthCard(c); }).join('') : '<div class="empty">No active clients yet.</div>')+'</div></div>'+
-  '</div>';
+  lockedLayoutToolbarHtml()+
+  lockedBlocksHtml({backlog:backlog, doneToday:doneToday, deepWorkToday:deepWorkToday, todayNotices:todayNotices, activeClients:activeClients});
 }
 function renderToday(){
   const p = state.profile;
@@ -5546,6 +5672,88 @@ ACTIONS.taskCtx = function(el, e, id){
   else if(op.indexOf('pri-')===0){ t.priority = op.slice(4); save(); }
   else if(op==='delete') deleteTasksUndoable([t.id]);
 };
+
+// ============ LOCKED IN: YOUR LAYOUT ============
+// The locked-in page is a stack of blocks you arrange yourself: Customize → move blocks up or
+// down, hide them, or add ones that aren't there (Journal, Goals, This week, Your why…). The
+// timer can move but never hides. Two half-width blocks next to each other share a row.
+const LOCKED_BLOCKS = {
+  stats:     {label:'Streak, tasks & deep work', render:function(c){ return '<div class="grid grid-3 stat-chip-row" style="max-width:800px;margin:0 auto;">'+
+      '<div class="stat-chip" style="text-align:center;"><div class="stat-chip-label">Day Streak</div><div class="stat-chip-value">'+computeStreak()+'</div><div class="kpi-sub">rest days still count</div></div>'+
+      '<div class="stat-chip" data-action="goToFinishedTasks" style="text-align:center;cursor:pointer;"><div class="stat-chip-label">Completed Today</div><div class="stat-chip-value">'+c.doneToday.length+' task'+(c.doneToday.length===1?'':'s')+'</div></div>'+
+      '<div class="stat-chip" id="statDeepWorkTodayBox" style="text-align:center;"><div class="stat-chip-label">Deep Work Today</div><div class="stat-chip-value">'+fmtHours(c.deepWorkToday)+'</div><div class="kpi-sub">'+fmtDurationLabel(c.deepWorkToday)+'</div></div>'+
+    '</div>'; }},
+  timer:     {label:'Timer & current task', pinned:true, render:function(){ return '<div class="hero-row">'+renderActiveFocusHero(true)+renderCurrentTaskCard(false,false,true)+'</div>'; }},
+  vision:    {label:'Vision board', render:function(){ return renderVisionSlideshow(); }},
+  standards: {label:'Today\'s Standard', render:function(){ return renderStandardsWidget(); }},
+  calendar:  {label:'Today on the calendar', render:function(c){
+      if(!c.todayNotices.length) return lockedEditing() ? '<div class="empty" style="max-width:640px;margin:0 auto;">Nothing on the calendar today.</div>' : '';
+      return '<div style="max-width:640px;margin:0 auto;"><div class="section-title" style="justify-content:center;">Today on the Calendar</div><div class="card"><div class="task-list">'+
+        c.todayNotices.map(function(n){
+          return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="'+n.kind+'" data-id="'+n.id+'">'+
+            (n.kind==='deadline' ? '<span class="tag" style="background:var(--danger-dim);color:var(--danger-text);">Deadline</span>' : '<span class="tag" style="background:'+n.color+'22;color:'+n.color+';">'+(n.time?fmt12Hour(n.time):'Event')+'</span>')+
+            '<div class="task-title" style="flex:1;">'+escapeHtml(n.label)+'</div>'+
+          '</div>';
+        }).join('')+'</div></div></div>'; }},
+  reachout:  {label:'Reach out', render:function(){ return '<div style="max-width:900px;margin:0 auto;">'+renderReachOutPanel(true)+'</div>'; }},
+  backlog:   {label:'Worth doing soon', half:true, render:function(c){ return '<div><div class="section-title" style="justify-content:center;">Worth Doing Soon<span class="kpi-sub" style="margin-left:8px;">&middot; '+c.backlog.length+' waiting</span></div><div class="card" style="max-height:600px;overflow-y:auto;"><div class="task-list">'+(c.backlog.map(focusModeBacklogRow).join('') || '<div class="empty">Backlog is empty.</div>')+'</div></div></div>'; }},
+  clients:   {label:'Clients', half:true, render:function(c){ return '<div><div class="section-title" style="justify-content:center;">Clients<span class="kpi-sub" style="margin-left:8px;">&middot; '+c.activeClients.length+' active</span></div><div class="task-list" style="display:flex;flex-direction:column;gap:12px;max-height:600px;overflow-y:auto;">'+(c.activeClients.length ? c.activeClients.map(function(x){ return renderClientHealthCard(x); }).join('') : '<div class="empty">No active clients yet.</div>')+'</div></div>'; }},
+  journal:   {label:'Quick journal', render:function(){ return '<div style="max-width:900px;margin:0 auto;">'+renderJournalPanel()+'</div>'; }},
+  goals:     {label:'Goals', render:function(){ return '<div style="max-width:1100px;margin:0 auto;">'+renderGoalsPanel()+'</div>'; }},
+  week:      {label:'This week', render:function(){ return '<div style="max-width:1100px;margin:0 auto;">'+renderProgressPanel()+'</div>'; }},
+  why:       {label:'Your why', render:function(){ return '<div style="max-width:1000px;margin:0 auto;">'+renderWhyPanel()+'</div>'; }},
+  tasks:     {label:'Today\'s tasks', render:function(){ return '<div style="max-width:1100px;margin:0 auto;">'+renderTodayTasksPanel()+'</div>'; }}
+};
+const LOCKED_DEFAULT = ['stats', 'timer', 'vision', 'standards', 'calendar', 'reachout', 'backlog', 'clients'];
+function lockedLayout(){
+  const saved = state.profile.lockedLayout;
+  const order = (saved && Array.isArray(saved.order) ? saved.order : LOCKED_DEFAULT).filter(function(id){ return LOCKED_BLOCKS[id]; });
+  if(order.indexOf('timer')<0) order.unshift('timer');
+  return order;
+}
+function lockedEditing(){ return !!ui.lockedEdit; }
+function saveLockedLayout(order){ state.profile.lockedLayout = {order:order}; persist('profile'); renderView(); }
+function lockedLayoutToolbarHtml(){
+  return '<div class="ll-bar"><button class="ll-btn'+(lockedEditing()?' is-on':'')+'" data-action="toggleLockedEdit" title="Choose what\'s on this page">'+(lockedEditing() ? '&#10003; Done' : '&#9998; Customize')+'</button></div>';
+}
+function lockedBlocksHtml(c){
+  const order = lockedLayout(), editing = lockedEditing();
+  let out = '', i = 0;
+  const wrap = function(id, inner, idx){
+    if(!editing) return inner ? '<div class="ll-block section" data-key="ll-'+id+'">'+inner+'</div>' : '';
+    const b = LOCKED_BLOCKS[id];
+    return '<div class="ll-block section is-editing" data-key="ll-'+id+'">'+
+      '<div class="ll-head"><span class="ll-name">'+b.label+'</span>'+
+        '<button class="ll-ctl" data-action="lockedMove" data-id="'+id+'" data-dir="-1" title="Move up"'+(idx===0?' disabled':'')+'>&#8593;</button>'+
+        '<button class="ll-ctl" data-action="lockedMove" data-id="'+id+'" data-dir="1" title="Move down"'+(idx===order.length-1?' disabled':'')+'>&#8595;</button>'+
+        (b.pinned ? '' : '<button class="ll-ctl ll-hide" data-action="lockedHide" data-id="'+id+'" title="Take it off this page">&#10005;</button>')+
+      '</div>'+(inner || '<div class="empty">Nothing to show right now.</div>')+'</div>';
+  };
+  while(i < order.length){
+    const id = order[i], b = LOCKED_BLOCKS[id];
+    if(!editing && b.half && order[i+1] && LOCKED_BLOCKS[order[i+1]].half){
+      out += '<div class="section grid grid-2" style="max-width:1200px;margin:32px auto 0;align-items:start;">'+b.render(c)+LOCKED_BLOCKS[order[i+1]].render(c)+'</div>';
+      i += 2; continue;
+    }
+    out += wrap(id, b.render(c), i); i++;
+  }
+  if(editing){
+    const hidden = Object.keys(LOCKED_BLOCKS).filter(function(id){ return order.indexOf(id)<0; });
+    out += '<div class="ll-tray"><span class="kind-label" style="margin:0;">Add to this page</span>'+
+      (hidden.length ? hidden.map(function(id){ return '<button class="ll-add" data-action="lockedAdd" data-id="'+id+'">+ '+LOCKED_BLOCKS[id].label+'</button>'; }).join('') : '<span class="kpi-sub">Everything\'s already here.</span>')+
+      '<button class="btn btn-ghost btn-sm" data-action="lockedReset" style="margin-left:auto;">Reset to default</button></div>';
+  }
+  return out;
+}
+ACTIONS.toggleLockedEdit = function(){ ui.lockedEdit = !ui.lockedEdit; renderView(); };
+ACTIONS.lockedMove = function(el, e, id){
+  const order = lockedLayout(), i = order.indexOf(id), j = i + Number(el.dataset.dir);
+  if(i<0 || j<0 || j>=order.length) return;
+  order.splice(i, 1); order.splice(j, 0, id); saveLockedLayout(order);
+};
+ACTIONS.lockedHide = function(el, e, id){ if(LOCKED_BLOCKS[id] && LOCKED_BLOCKS[id].pinned) return; saveLockedLayout(lockedLayout().filter(function(x){ return x!==id; })); };
+ACTIONS.lockedAdd = function(el, e, id){ const o = lockedLayout(); if(o.indexOf(id)<0) o.push(id); saveLockedLayout(o); };
+ACTIONS.lockedReset = function(){ state.profile.lockedLayout = null; persist('profile'); renderView(); };
 // ============ TASKS ============
 function currentTaskLabel(){ return state.focus.activeSession ? 'Current Task' : 'Next Task'; }
 function renderCurrentTaskCard(big, gridMode, heroFit){
@@ -5901,11 +6109,11 @@ function pullSpecificFromBacklog(id){
   playTaskAdded();
   persist('tasks'); renderView();
 }
-function accumulateCurrentTaskTime(taskId){
+function accumulateCurrentTaskTime(taskId, endAt){
   if(ui.currentTaskId!==taskId || !ui.currentTaskStartedAt) return;
   const t=state.tasks.items.find(function(x){return x.id===taskId;});
   if(t){
-    const now = Date.now();
+    const now = Math.max(ui.currentTaskStartedAt, Math.min(Date.now(), endAt || Date.now()));
     const mins = Math.max(0, Math.round((now-ui.currentTaskStartedAt)/60000));
     t.trackedMinutes = (t.trackedMinutes||0) + mins;
     // Timing log per task, so analytics can say what each session was spent on and
@@ -6000,8 +6208,8 @@ function demoteTask(id){ const t=state.tasks.items.find(function(x){return x.id=
 
 // ============ NOW / UP NEXT (Focus → Tasks) ============
 // One place that says what you're on and what comes after it.
-//  • Now — only while locked in: the task being timed. ✓ Done finishes it; Release stops timing
-//    it and leaves it on today's list.
+//  • Now — the task you're on, timed (locked in or not — lock in and it counts as deep work).
+//    ✓ Done finishes it; Release stops timing it and leaves it on today's list.
 //  • Up next — one task lined up. Drag a card onto it or pick from the list.
 // Nothing ever starts on its own: Start now / Lock in is always your click, and dropping a card
 // onto Now while locked in asks first.
@@ -6009,17 +6217,17 @@ function nnTask(id){ return id ? state.tasks.items.find(function(t){ return t.id
 function nnExplicitNext(){ const t = nnTask(state.focus.nextTaskId) || nnTask(ui.stagedTaskId); return t && t.id!==ui.currentTaskId ? t : null; }
 function nowNextPanelHtml(){
   const as = state.focus.activeSession, inS = !!as, onBreak = !!(inS && as.onBreak);
-  const cur = inS ? nnTask(ui.currentTaskId) : null;
-  const pend = inS ? nnTask(ui.pendingCurrentTaskId) : null;
+  const cur = nnTask(ui.currentTaskId);
+  const pend = nnTask(ui.pendingCurrentTaskId);
   const explicit = nnExplicitNext();
   let next = explicit;
   if(!next){ const s = nextUpTask(); if(s && s.id!==ui.currentTaskId && !(pend && s.id===pend.id)) next = s; }
   const title = function(t){ return '<div class="nn-title">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span></div>'; };
   const picker = function(label){ return '<span class="nn-pick-wrap"><button class="btn btn-ghost btn-sm" data-action="toggleNextPicker" data-where="panel">'+label+' &#9662;</button>'+nextPickerHtml('panel')+'</span>'; };
   let now = '';
-  if(inS){
+  {
     now = '<div class="nn-cell nn-now'+(cur?' has-task':'')+(pend?' is-asking':'')+'" data-dropzone="current">'+
-      '<div class="nn-k">Now'+tip('What\'s being timed while you\'re locked in. ✓ Done finishes it. Release stops timing it and leaves it on today\'s list.')+'</div>'+
+      '<div class="nn-k">Now'+(!inS && cur ? '<span class="nn-sug">not locked in</span>' : '')+tip('What you\'re on, timed. Lock in and it counts as deep work. ✓ Done finishes it; Release stops timing it and leaves it on today\'s list.')+'</div>'+
       (pend
         ? '<div class="nn-title"><span>'+(cur?'Switch to':'Start')+' &ldquo;'+escapeHtml(pend.title)+'&rdquo;?</span></div>'+
           '<div class="nn-acts"><button class="btn btn-good btn-sm" data-action="confirmPendingCurrentTask">'+(cur?'&#8646; Switch':'&#9654; Start')+'</button>'+
@@ -6028,7 +6236,8 @@ function nowNextPanelHtml(){
         : cur
           ? '<div class="nn-row">'+title(cur)+'<span class="nn-timer" id="currentTaskElapsedBar">'+formatElapsed(Date.now()-(ui.currentTaskStartedAt||Date.now()))+'</span></div>'+
             '<div class="nn-acts"><button class="btn btn-good btn-sm" data-action="finishCurrentTask">&#10003; Done</button>'+
-              '<button class="btn btn-ghost btn-sm" data-action="releaseCurrentTask" title="Stop timing it — it stays on today\'s list">Release</button></div>'
+              '<button class="btn btn-ghost btn-sm" data-action="releaseCurrentTask" title="Stop timing it — it stays on today\'s list">Release</button>'+
+              (inS ? '' : '<button class="btn btn-ghost btn-sm" data-action="openLockInChooser" title="Lock in — it counts as deep work">&#128274; Lock in</button>')+'</div>'
           : '<div class="nn-title nn-empty">'+(onBreak ? 'On a break' : 'Nothing being timed')+'</div><div class="nn-hint">Start what\'s next, or drag a card here</div>')+
     '</div>';
   }
@@ -6037,17 +6246,17 @@ function nowNextPanelHtml(){
     (next
       ? title(next)+
         '<div class="nn-acts">'+
-          (inS ? (onBreak ? '' : '<button class="btn btn-primary btn-sm" data-action="nnStartNext" data-id="'+next.id+'">&#9654; '+(cur ? 'Switch to it' : 'Start now')+'</button>')
-               : '<button class="btn btn-good btn-sm" data-action="nnLockInNext" data-id="'+next.id+'">&#128274; Lock in on it</button>')+
+          (onBreak ? '' : '<button class="btn btn-primary btn-sm" data-action="nnStartNext" data-id="'+next.id+'">&#9654; '+(cur ? 'Switch to it' : 'Start now')+'</button>')+
+          (inS ? '' : '<button class="btn btn-good btn-sm" data-action="nnLockInNext" data-id="'+next.id+'">&#128274; Lock in on it</button>')+
           picker('Change')+
           (explicit ? '<button class="btn btn-ghost btn-sm" data-action="clearStagedTask" title="Clear what\'s next">&#10005;</button>' : '')+
         '</div>'
       : '<div class="nn-title nn-empty">Nothing lined up</div><div class="nn-acts">'+picker('Pick one')+'<span class="nn-hint">or drag a card here</span></div>')+
   '</div>';
-  return '<div class="nn-panel'+(inS ? ' is-locked' : '')+'" data-key="nn-panel">'+now+nextCell+'</div>';
+  return '<div class="nn-panel is-locked'+(inS ? '' : ' is-free')+'" data-key="nn-panel">'+now+nextCell+'</div>';
 }
 ACTIONS.nnStartNext = function(el, e, id){
-  const t = nnTask(id); if(!t || !state.focus.activeSession) return;
+  const t = nnTask(id); if(!t) return;
   if(t.status==='backlog'){ t.status = 'today'; persist('tasks'); }
   ui.pendingCurrentTaskId = null;
   setCurrentTask(id);
@@ -7521,13 +7730,15 @@ async function pollAppActivity(){
   }catch(e){ return; } // no wrapper/server running — silently do nothing
   // Nothing new since the last poll → nothing to recompute or save.
   const sig = text.length+':'+text.slice(-80);
-  if(sig===lastActivitySig){ updateCurrentAppIndicator(); checkAutoLockIn(); return; }
+  if(sig===lastActivitySig){ updateCurrentAppIndicator(); checkAwayFromSession(); checkAutoLockIn(); return; }
   lastActivitySig = sig;
   // Only count active usage: a sample taken after the keyboard/mouse has been idle for a
   // while is dropped, which leaves a gap that splits the interval (an app just sitting in
   // the foreground no longer counts as "being on it").
   const idleLimit = Number(st.idleSeconds)||60;
-  const samples = parseActivityLogText(text).filter(function(s){ return s.idle==null || s.idle < idleLimit; });
+  const allSamples = parseActivityLogText(text);
+  if(allSamples.length) lastRawSampleAt = Math.max(lastRawSampleAt, allSamples[allSamples.length-1].ts);
+  const samples = allSamples.filter(function(s){ return s.idle==null || s.idle < idleLimit; });
   if(!samples.length){ updateCurrentAppIndicator(); return; }
   const today = todayStr();
   const byDate = {};
@@ -7550,6 +7761,8 @@ async function pollAppActivity(){
   state.appActivity.todayDate = today;
   persist('appActivity');
   updateCurrentAppIndicator();
+  checkAwayFromSession();
+  checkAwayReturn();
   checkAutoLockIn();
   checkDistraction();
   if(ui.view==='focus' && ui.focusTab==='analytics') renderView();
@@ -7652,6 +7865,77 @@ function autoEndFocusSession(endAt){
   persist('focus'); renderView();
   showToast('Session ended — you moved off work apps at '+fmt12Hour(nowHM(new Date(endedAt)))+' ('+fmtDurationLabel(minutes)+' logged)', {icon:'&#9209;'});
 }
+// ---- only active time counts ----
+// A session — even one you started yourself — stops at the last moment you were active once
+// the Mac has had no keyboard/mouse input for "away" minutes (default 10), or was asleep that
+// long. The away time is never logged. When you're back, a notice offers to add it back in
+// case you were working away from the keys (a call, reading on paper).
+let lastRawSampleAt = 0;
+function awayLimitMs(){ const st = state.settings.appTracking || {}; return clamp(Number(st.awayMinutes)||10, 3, 120)*60000; }
+function sessionAwayFrom(s, ivs, now){
+  const limit = awayLimitMs();
+  let prevEnd = s.startedAt;
+  for(let i=0;i<ivs.length;i++){
+    const iv = ivs[i]; if(iv.end < s.startedAt) continue;
+    if(Math.max(iv.start, s.startedAt) - prevEnd >= limit) return prevEnd;
+    prevEnd = Math.max(prevEnd, iv.end);
+  }
+  return now - prevEnd >= limit ? prevEnd : null;
+}
+function checkAwayFromSession(){
+  const s = state.focus.activeSession;
+  const st = state.settings.appTracking;
+  if(!st || st.enabled===false || st.awayStop===false) return;
+  const now = Date.now();
+  // the tracker has to be running (a fresh sample, idle or not) for silence to mean "away"
+  if(!lastRawSampleAt || now-lastRawSampleAt > 90000) return;
+  // a task being timed outside a session stops at the last active moment too
+  if(!s && ui.currentTaskId && ui.currentTaskStartedAt){
+    const tf = sessionAwayFrom({startedAt:ui.currentTaskStartedAt}, state.appActivity.todayIntervals, now);
+    if(tf!=null){ accumulateCurrentTaskTime(ui.currentTaskId, tf); persist('tasks'); renderView(); }
+    return;
+  }
+  if(!s || s.onBreak || s.autoStarted) return;
+  if(todayStr(new Date(s.startedAt))!==todayStr()) return;
+  const from = sessionAwayFrom(s, state.appActivity.todayIntervals, now);
+  if(from==null) return;
+  endSessionForAway(Math.max(from, s.startedAt+60000), now);
+}
+function endSessionForAway(endAt, now){
+  const s = state.focus.activeSession; if(!s || endAt>=now) return;
+  const copy = JSON.parse(JSON.stringify(s));
+  if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId, endAt); persist('tasks'); }
+  const minutes = Math.max(1, Math.round((endAt-s.startedAt)/60000));
+  const id = uid();
+  state.focus.sessions.push({id:id, type:sessionType(s), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endAt, minutes:minutes, completedTasks:arr(s.completedTasks), note:'', autoStopped:true, away:true, reviewed:false});
+  state.focus.activeSession = null;
+  state.focus.lastSessionEndedAt = endAt;
+  state.focus.awayStop = {sessionId:id, active:copy, endedAt:endAt, at:now, shown:false};
+  if(state.modes.active && state.modes.active.linkedFocus) endMode();
+  persist('focus'); renderView();
+}
+// once you're back (fresh activity after the stop), say what happened — with a way to undo it
+function checkAwayReturn(){
+  const a = state.focus.awayStop; if(!a || a.shown) return;
+  if(Date.now()-a.at > 12*3600000){ state.focus.awayStop = null; persist('focus'); return; }
+  const ivs = state.appActivity.todayIntervals, last = ivs[ivs.length-1];
+  // fresh activity after the stretch away (the Mac may have slept through it, so the stop and
+  // the return can land on the same check)
+  if(!last || last.end <= a.endedAt + awayLimitMs() || Date.now()-last.end > APP_ACTIVITY_GAP_MS) return;
+  a.shown = true; persist('focus');
+  const away = Math.round((Date.now()-a.endedAt)/60000);
+  showToast('You stepped away at '+fmt12Hour(nowHM(new Date(a.endedAt)))+' — your session stopped there ('+fmtDurationLabel(away)+' away, not counted).', {icon:'&#128694;', actionLabel:'I was working — add it back', actionAction:'restoreAwaySession', duration:20000});
+}
+ACTIONS.restoreAwaySession = function(){
+  const a = state.focus.awayStop; if(!a) return;
+  state.focus.sessions = state.focus.sessions.filter(function(x){ return x.id!==a.sessionId; });
+  if(state.focus.activeSession) state.focus.activeSession.startedAt = Math.min(state.focus.activeSession.startedAt, a.active.startedAt);
+  else state.focus.activeSession = a.active;
+  state.focus.awayStop = null;
+  clearToasts();
+  persist('focus'); renderView();
+  showToast('Added back — the session runs from '+fmt12Hour(nowHM(new Date(state.focus.activeSession.startedAt)))+'.', {icon:'&#128274;'});
+};
 function startAppActivityPolling(){
   pollAppActivity();
   setInterval(pollAppActivity, 15000);
@@ -8523,11 +8807,23 @@ function updatesTypeId(){
   return hit ? hit.id : null;
 }
 function isUpdateEntry(e){ const id = updatesTypeId(); return !!(id && e && e.mood===id); }
+// Ranges: the latest session (updates posted with less than an hour between them — one sitting
+// of changes), the last hour or two, or by days.
+const UPDATE_SESSION_GAP = 60*60000;
+function updatesRange(){ return ui.updatesRange || 'session'; }
 function updateEntries(){
-  const since = ui.updatesRange==='7' ? addDays(todayStr(), -6) : ui.updatesRange==='30' ? addDays(todayStr(), -29) : null;
+  const r = updatesRange();
+  const since = r==='7' ? addDays(todayStr(), -6) : r==='30' ? addDays(todayStr(), -29) : null;
+  const sinceTs = r==='1h' ? Date.now()-3600000 : r==='2h' ? Date.now()-2*3600000 : null;
   const q = (ui.updatesSearch||'').toLowerCase();
-  return state.journal.entries.filter(function(e){ return isUpdateEntry(e) && (!since || e.date>=since) && (!q || String(e.text||'').toLowerCase().indexOf(q)>=0); })
+  let list = state.journal.entries.filter(function(e){ return isUpdateEntry(e) && (!since || e.date>=since) && (!sinceTs || (e.timestamp||0)>=sinceTs) && (!q || String(e.text||'').toLowerCase().indexOf(q)>=0); })
     .sort(function(a, b){ return b.timestamp-a.timestamp; });
+  if(r==='session' && list.length){
+    let n = 1;
+    while(n < list.length && (list[n-1].timestamp - list[n].timestamp) < UPDATE_SESSION_GAP) n++;
+    list = list.slice(0, n);
+  }
+  return list;
 }
 function updateCopyText(e){ return fmtDateShort(e.date)+(e.timestamp ? ' · '+fmtTimeShort(e.timestamp) : '')+'\n'+(e.text||''); }
 function copyToClipboard(text, what){
@@ -8576,11 +8872,11 @@ function renderUpdatesTab(){
       '<div class="kpi-sub" style="margin:0 auto 14px;">Which journal type are they filed under?'+tip('Notes about changes to the app live here — each in full, with one-click copy — and stay out of your journal.')+'</div>'+
       '<div class="row" style="justify-content:center;gap:8px;flex-wrap:wrap;">'+picker+'<button class="btn btn-good btn-sm" data-action="createUpdatesType">+ Make an "Updates" type</button></div></div>';
   }
-  const list = updateEntries(), r = ui.updatesRange || 'all';
+  const list = updateEntries(), r = updatesRange();
   const groups = [], byDate = {};
   list.forEach(function(e){ if(!byDate[e.date]){ byDate[e.date] = []; groups.push(e.date); } byDate[e.date].push(e); });
   return '<div class="upd-bar">'+
-      '<div class="seg-tabs" style="margin:0;">'+[['7','7 days'],['30','30 days'],['all','All']].map(function(x){ return '<button class="seg-tab'+(r===x[0]?' active':'')+'" data-action="updatesRange" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>'+
+      '<div class="seg-tabs" style="margin:0;">'+[['session','Latest session'],['1h','Last hour'],['2h','Last 2 hours'],['7','7 days'],['30','30 days'],['all','All']].map(function(x){ return '<button class="seg-tab'+(r===x[0]?' active':'')+'" data-action="updatesRange" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>'+
       '<input class="input" id="updatesSearch" placeholder="Search updates…" value="'+escapeHtml(ui.updatesSearch||'')+'" style="flex:1;min-width:160px;max-width:280px;">'+
       '<span style="flex:1"></span>'+
       '<span class="kpi-sub">'+list.length+' update'+(list.length===1?'':'s')+'</span>'+
@@ -10141,6 +10437,69 @@ document.addEventListener('pointerdown', function(e){
   if(e.target.closest && (e.target.closest('.board-bg-pop') || e.target.closest('[data-action="boardBgToggle"]'))) return;
   ui.boardBgOpen = false; renderView();
 }, true);
+
+// ============ BOARDS: COPY / CUT / PASTE ============
+// ⌘C / ⌘X the selected cards, open any board, ⌘V — they land where the pointer is (or the
+// middle of the view), keeping their layout. Works from the right-click menu too. The cards
+// also go on the system clipboard (tagged so a paste knows they're Operator cards), so it
+// survives switching boards or reopening the app; images are shared, not re-uploaded.
+const BOARD_CLIP_MARK = 'operator-board-cards:v1:';
+let boardClip = null, boardPointer = null;
+document.addEventListener('pointermove', function(e){
+  if(cv.host && cv.host.contains(e.target)) boardPointer = {x:e.clientX, y:e.clientY, at:Date.now()};
+}, {passive:true});
+function boardSelectionCopy(){
+  const b = cvBoard(); if(!b || !cv.sel.size) return null;
+  return b.elements.filter(function(x){ return cv.sel.has(x.id); }).map(function(x){ return JSON.parse(JSON.stringify(x)); });
+}
+function boardCopy(cut, clipboardEvent){
+  const els = boardSelectionCopy(); if(!els || !els.length) return false;
+  boardClip = {els:els, from:cv.boardId};
+  const text = BOARD_CLIP_MARK+JSON.stringify(els);
+  if(clipboardEvent && clipboardEvent.clipboardData){ clipboardEvent.clipboardData.setData('text/plain', text); clipboardEvent.preventDefault(); }
+  else { try{ if(navigator.clipboard) navigator.clipboard.writeText(text).catch(function(){}); }catch(err){} }
+  if(cut) ACTIONS.boardDelete();
+  showToast((cut ? 'Cut ' : 'Copied ')+els.length+' card'+(els.length===1?'':'s')+' — open any board and paste (⌘V)', {icon:'&#128203;', duration:2200});
+  return true;
+}
+function elBox(x){ return x.type==='line' ? {l:Math.min(x.x1, x.x2), t:Math.min(x.y1, x.y2), r:Math.max(x.x1, x.x2), b:Math.max(x.y1, x.y2)} : {l:x.x, t:x.y, r:x.x+(x.w||0), b:x.y+(x.h||0)}; }
+function boardPaste(els){
+  const b = cvBoard(); if(!b || !els || !els.length) return;
+  snapshot();
+  const box = els.map(elBox).reduce(function(a, q){ return {l:Math.min(a.l, q.l), t:Math.min(a.t, q.t), r:Math.max(a.r, q.r), b:Math.max(a.b, q.b)}; });
+  const fresh = boardPointer && Date.now()-boardPointer.at < 8000;
+  const at = fresh ? screenToWorld(boardPointer.x, boardPointer.y) : viewCenter();
+  let dx = at.x - (box.l+box.r)/2, dy = at.y - (box.t+box.b)/2;
+  // pasting onto the same spot it came from: nudge so the copy is visible
+  if(Math.abs(dx) < 4 && Math.abs(dy) < 4){ dx = 24; dy = 24; }
+  let z = maxZ(b);
+  const added = els.map(function(src){
+    const c = JSON.parse(JSON.stringify(src)); c.id = uid(); c.z = ++z;
+    if(c.type==='line'){ c.x1 += dx; c.y1 += dy; c.x2 += dx; c.y2 += dy; } else { c.x = Math.round(c.x+dx); c.y = Math.round(c.y+dy); }
+    return c;
+  });
+  added.forEach(function(c){ b.elements.push(c); });
+  cv.sel = new Set(added.map(function(c){ return c.id; }));
+  commitBoard(true);
+  playTick();
+}
+function boardCanUseKeys(e){ return boardActive() && !cv.view && !cv.editing && !typingInField(e.target) && !document.querySelector('.overlay:not(.hidden)'); }
+document.addEventListener('copy', function(e){ if(boardCanUseKeys(e) && cv.sel.size && !String(window.getSelection()||'').trim()) boardCopy(false, e); });
+document.addEventListener('cut', function(e){ if(boardCanUseKeys(e) && cv.sel.size && !String(window.getSelection()||'').trim()) boardCopy(true, e); });
+// runs before the board's own paste handler (images / plain text become new cards)
+document.addEventListener('paste', function(e){
+  if(!boardCanUseKeys(e)) return;
+  const text = (e.clipboardData && e.clipboardData.getData('text/plain')) || '';
+  let els = null;
+  if(text.indexOf(BOARD_CLIP_MARK)===0){ try{ els = JSON.parse(text.slice(BOARD_CLIP_MARK.length)); }catch(err){ els = null; } }
+  else if(!text && boardClip && !(e.clipboardData && e.clipboardData.files && e.clipboardData.files.length)) els = boardClip.els;
+  if(!els) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  boardPaste(els);
+}, true);
+ACTIONS.boardCopySel = function(){ boardCopy(false); };
+ACTIONS.boardCutSel = function(){ boardCopy(true); };
+ACTIONS.boardPasteClip = function(){ if(boardClip) boardPaste(boardClip.els); };
 // ============ FINANCES ============
 function renderFinances(){
   const debts = state.finances.debts;
@@ -10486,7 +10845,7 @@ function renderBusinessOverview(){
       '<div class="hq-mrr">'+
         '<div class="stat-tile-k">Monthly recurring</div>'+
         '<div class="biz-mrr">$'+mrr.toLocaleString()+'</div>'+
-        (goal ? '<div class="biz-bar"><span class="biz-bar-mrr" style="width:'+Math.min(100, mrr/goal*100)+'%"></span>'+(pipe ? '<span class="biz-bar-pipe" style="width:'+Math.max(0, Math.min(100-mrr/goal*100, pipe/goal*100))+'%"></span>' : '')+'</div>'+
+        (goal ? '<div class="biz-bar"><span class="biz-bar-mrr" style="width:'+Math.min(100, mrr/goal*100)+'%"></span>'+(pipe ? '<span class="biz-bar-pipe" style="width:'+Math.max(0, Math.min(100-mrr/goal*100, pipe/goal*100))+'%"></span>' : '')+'<span class="biz-bar-end" title="Goal">'+money(goal)+'</span></div>'+
           '<div class="biz-goal-k">'+Math.round(mrr/goal*100)+'% of '+money(goal)+(pipe ? ' &middot; '+money(pipe)+' in pipeline' : '')+'</div>' : '')+
       '</div>'+
       '<div class="hq-months" title="Collected per month"><div class="biz-mbars">'+months.map(function(m, i){
@@ -10795,8 +11154,11 @@ function clientCard(c){
     '</div>'+
   '</div>';
 }
-function openClientModal(id){
+// Opens on the card face; Edit flips it over. A client you just added or won opens straight
+// on the back, ready to set up.
+function openClientModal(id, edit){
   ui.showClientModal = id;
+  ui.clientEdit = !!edit;
   ui.pickingPackageForClient = null;
   ui.newClientJournalTag = null;
   ui.newClientJournalDraft = '';
@@ -10837,11 +11199,13 @@ function setClientLeadSource(id, val){
 function renderClientModal(){
   const c = state.business.clients.find(function(x){return x.id===ui.showClientModal;});
   if(!c) return '';
+  if(!ui.clientEdit) return clientCardFrontHtml(c);
   const deliverables = arr(c.deliverables);
   const pendingCount = deliverables.filter(function(d){return !isDeliverableDoneThisWeek(d);}).length;
   const isActive = c.status==='active';
   const pkg = c.packageId ? arr(state.business.packages).find(function(x){return x.id===c.packageId;}) : null;
-  return '<div class="card" style="margin-bottom:16px;">'+
+  return '<div class="row" style="justify-content:space-between;margin-bottom:10px;"><button class="btn btn-ghost btn-sm" data-action="clientFlip" data-id="front">&larr; Card</button><span class="kpi-sub">Editing</span></div>'+
+    '<div class="card" style="margin-bottom:16px;">'+
       '<div class="row" style="justify-content:space-between;align-items:flex-start;">'+
         '<div class="client-name-edit"><input class="client-name-input" data-client-field="business" data-id="'+c.id+'" value="'+escapeHtml(c.business||'')+'" placeholder="Business name" title="Click to rename">'+
         '<input class="client-contact-input" data-client-field="name" data-id="'+c.id+'" value="'+escapeHtml(c.name||'')+'" placeholder="Contact name"></div>'+
@@ -10871,6 +11235,56 @@ function renderClientModal(){
       '<button class="btn btn-primary" data-action="closeClientModalAndSave">Done</button>'+
     '</div>';
 }
+// ---- the card face: just the things you glance at ----
+function clientTenureLabel(c){
+  const since = c.startDate || c.createdAt; if(!since) return '—';
+  const d = Math.max(0, daysAgoFrom(since));
+  if(d < 14) return d+' day'+(d===1?'':'s');
+  if(d < 60) return Math.round(d/7)+' weeks';
+  const m = Math.round(d/30.4);
+  return m < 24 ? m+' months' : (Math.round(m/12*10)/10)+' years';
+}
+function clientCardFrontHtml(c){
+  const pkg = c.packageId ? arr(state.business.packages).find(function(x){ return x.id===c.packageId; }) : null;
+  const src = c.leadSource ? LEAD_SOURCES.find(function(s){ return s.id===c.leadSource; }) : null;
+  const delivs = arr(c.deliverables);
+  const recurring = delivs.filter(function(d){ return d.recurring; }), oneOff = delivs.filter(function(d){ return !d.recurring && d.status!=='done'; });
+  const st = crmStage('client', c.stage);
+  return '<div class="cf">'+
+    '<div class="cf-head">'+clientAvatarHtml(c, false, true)+
+      '<div class="cf-names"><div class="cf-biz">'+escapeHtml(c.business||c.name||'Client')+'</div>'+(c.name && c.business ? '<div class="kpi-sub">'+escapeHtml(c.name)+'</div>' : '')+'</div>'+
+      clientHealthTagHtml(c)+
+    '</div>'+
+    '<div class="cf-facts">'+
+      '<div class="cf-fact"><span class="cf-k">Working together</span><span class="cf-v">'+clientTenureLabel(c)+'</span>'+((c.startDate||c.createdAt) ? '<span class="cf-s">since '+fmtDateShort(c.startDate||c.createdAt)+'</span>' : '')+'</div>'+
+      '<div class="cf-fact"><span class="cf-k">How we got them</span><span class="cf-v">'+(src ? src.emoji+' '+escapeHtml(src.label) : '—')+'</span></div>'+
+      '<div class="cf-fact"><span class="cf-k">Monthly</span><span class="cf-v">'+(Number(c.mrr) ? '$'+Number(c.mrr).toLocaleString() : '—')+'</span>'+(st ? '<span class="cf-s">'+escapeHtml(st.label)+'</span>' : '')+'</div>'+
+    '</div>'+
+    '<div class="cf-sec"><div class="cf-sec-k">Plan &amp; deliverables</div>'+
+      '<div class="cf-plan">'+(pkg ? '<span class="cf-plan-name">'+escapeHtml(pkg.name)+'</span>'+(pkg.price ? '<span class="kpi-sub">$'+Number(pkg.price).toLocaleString()+'/mo</span>' : '') : '<span class="kpi-sub">No plan assigned</span>')+'</div>'+
+      (recurring.length || oneOff.length ? '<div class="cf-delivs">'+
+        recurring.map(function(d){
+          const done = deliverableWeekCount(d), need = deliverableWeekNeed(d), pace = deliverablePaceStatus(d);
+          return '<div class="cf-deliv"><span class="cf-deliv-t">'+escapeHtml(d.title)+'</span>'+weekDotsHtml(Math.min(done, need), need, pace)+'<span class="cf-deliv-n" style="color:'+paceColorOf(pace)+'">'+done+'/'+need+' &middot; '+paceWord(pace)+'</span></div>';
+        }).join('')+
+        oneOff.map(function(d){ return '<div class="cf-deliv"><span class="cf-deliv-t">'+escapeHtml(d.title)+'</span><span class="cf-deliv-n kpi-sub">one-off'+(d.dueDate ? ' &middot; due '+fmtDateShort(d.dueDate) : '')+'</span></div>'; }).join('')+
+      '</div>' : '<div class="kpi-sub" style="margin-top:6px;">No deliverables yet.</div>')+
+    '</div>'+
+    '<div class="cf-sec"><div class="cf-sec-k">Notes</div>'+(c.notes ? '<div class="cf-notes">'+escapeHtml(c.notes)+'</div>' : '<div class="kpi-sub">No notes yet — add some on the back of the card.</div>')+'</div>'+
+    '<div class="cf-foot"><button class="btn btn-ghost" data-action="closeClientModalAndSave">Close</button><button class="btn btn-primary" data-action="clientFlip" data-id="back">&#9998; Edit</button></div>'+
+  '</div>';
+}
+ACTIONS.clientFlip = function(el, e, id){
+  if(id==='front'){ // keep what was typed on the back before flipping
+    const c = state.business.clients.find(function(x){ return x.id===ui.showClientModal; });
+    const notesEl = document.getElementById('clientModalNotes'); if(c && notesEl){ c.notes = notesEl.value.trim(); persist('business'); }
+  }
+  ui.clientEdit = id==='back';
+  const box = document.getElementById('clientModalContent');
+  if(box){ box.classList.remove('cm-flip'); void box.offsetWidth; box.classList.add('cm-flip'); }
+  renderClientModalInto();
+  if(box) box.scrollTop = 0;
+};
 function clientBillingCycleFieldHtml(c){
   const todayDay = new Date().getDate();
   const hasMrr = Number(c.mrr)>0;
@@ -11250,7 +11664,7 @@ function advanceStage(id){
   }
   persist('business');
   if(newClientId){
-    openClientModal(newClientId);
+    openClientModal(newClientId, true);
     ui.pickingPackageForClient = newClientId;
     renderClientModalInto();
   } else {
@@ -11493,6 +11907,7 @@ function setStage(kind, id, stageId, opts){
   if(kind==='lead'){ if(!Array.isArray(x.stageHistory)) x.stageHistory=[]; x.stageHistory.push(x.stage); }
   x.stage = stageId;
   crmTimeline(x, 'stage', (from?from.label:'—')+' → '+st.label);
+  if(kind==='lead' && typeof ghlPushStage==='function') ghlPushStage(x);
   if(kind==='client'){ syncClientStatus(x); if(!x.lifecycle) x.lifecycle = {checks:{}, enteredAt:{}}; x.lifecycle.enteredAt[stageId] = Date.now(); }
   let newClientId = null;
   if(kind==='lead' && st.kind==='won' && !x.convertedClientId){ newClientId = convertProspectToClient(x); playSessionComplete(); }
@@ -11504,7 +11919,7 @@ function setStage(kind, id, stageId, opts){
   }
   renderView(); rerenderContactModal();
 }
-ACTIONS.openConvertedClient = function(){ if(ui.lastConvertedClientId){ hideOverlay('contactOverlay'); openClientModal(ui.lastConvertedClientId); } };
+ACTIONS.openConvertedClient = function(){ if(ui.lastConvertedClientId){ hideOverlay('contactOverlay'); openClientModal(ui.lastConvertedClientId, true); } };
 document.addEventListener('change', function(e){
   const t = e.target; if(!t || !t.dataset) return;
   if(t.dataset.crmStage){ const p = t.dataset.crmStage.split(':'); setStage(p[0], p[1], t.value); }
@@ -11835,7 +12250,7 @@ ACTIONS.markLeadWon = function(el, e, id){
   const won = crmStages('lead').find(function(s){ return s.kind==='won'; });
   hideOverlay('contactOverlay');
   setStage('lead', id, won.id);
-  if(p.convertedClientId) openClientModal(p.convertedClientId);
+  if(p.convertedClientId) openClientModal(p.convertedClientId, true);
 };
 ACTIONS.markLeadLost = function(el, e, id){ const p = crmFind('lead', id); if(p) saveLeadFields(p); hideOverlay('contactOverlay'); openLostReason(id); };
 let lastDeletedContact = null;
@@ -12052,7 +12467,7 @@ ACTIONS.saveNewContact = function(){
   hideOverlay('newContactOverlay');
   playPositive(); persist('business'); renderView();
   // a new client opens straight onto their first lifecycle step
-  if(kind==='client') openClientModal(base.id);
+  if(kind==='client') openClientModal(base.id, true);
 };
 // ---- daily touch reminder ----
 let lastTouchReminderDay = null;
@@ -13553,10 +13968,9 @@ function renderSettings(){
   const saveBtn = '<button class="btn btn-primary section" data-action="saveProfile">Save Changes</button>';
 
   const sections = {
+    integrations: ghlSettingsHtml(),
     updates: '<div class="upd-panel">'+renderUpdatesTab()+'</div>',
-    general: '<div class="card section"><div class="section-title">Personal Info</div><div class="grid grid-2">'+
-        '<div class="field"><label>Name</label><input class="input" id="setName" value="'+escapeHtml(p.name)+'"></div>'+
-        '<div class="field"><label>Business name</label><input class="input" id="setBusinessName" value="'+escapeHtml(p.businessName||'')+'" placeholder="e.g. Rivera Media Co."></div>'+
+    general: '<div class="card section"><div class="section-title">Preferences</div><div class="grid grid-2">'+
         '<div class="field"><label>Sound effects</label><select class="input" id="setSound"><option value="on" '+(p.soundEnabled!==false?'selected':'')+'>On</option><option value="off" '+(p.soundEnabled===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Note field after finishing a task in Focus</label><select class="input" id="setFocusNote"><option value="on" '+(p.focusNotePromptEnabled!==false?'selected':'')+'>Enabled</option><option value="off" '+(p.focusNotePromptEnabled===false?'selected':'')+'>Disabled</option></select></div>'+
         '<div class="field"><label>Notify when a focus timer ends</label><select class="input" id="setNotifyEnd"><option value="on" '+(p.notifyOnFocusEnd!==false?'selected':'')+'>On</option><option value="off" '+(p.notifyOnFocusEnd===false?'selected':'')+'>Off</option></select></div>'+
@@ -13636,7 +14050,8 @@ function renderSettings(){
         '<div class="field"><label>Track foreground app</label><select class="input" id="setAppTrackingEnabled"><option value="on" '+(state.settings.appTracking.enabled!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.enabled===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Auto lock-in when steady on work apps</label><select class="input" id="setAppTrackingAutoLockIn"><option value="on" '+(state.settings.appTracking.autoLockIn!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.autoLockIn===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Minutes on one app before auto lock-in</label><input class="input" type="number" min="3" max="120" id="setAppTrackingThreshold" value="'+state.settings.appTracking.thresholdMinutes+'"></div>'+
-        '<div class="field"><label>Minutes away before auto-ending it'+tip('Only applies to sessions Operator started automatically — it never auto-ends a session you started yourself.')+'</label><input class="input" type="number" min="1" max="60" id="setAppTrackingGrace" value="'+state.settings.appTracking.graceMinutes+'"></div>'+
+        '<div class="field"><label>Stop any session after (minutes away)'+tip('No keyboard or mouse for this long — or the Mac asleep — and the session stops at the last moment you were active, so only active time counts. Coming back, you can add the time back if you were working away from the keys.')+'</label><input class="input" type="number" min="3" max="120" id="setAppTrackingAway" value="'+(state.settings.appTracking.awayMinutes||10)+'"></div>'+
+        '<div class="field"><label>Minutes off work apps before ending an auto session'+tip('For sessions Operator started on its own: how long on non-work apps before it ends them.')+'</label><input class="input" type="number" min="1" max="60" id="setAppTrackingGrace" value="'+state.settings.appTracking.graceMinutes+'"></div>'+
         '<div class="field"><label>Cooldown after you lock out (minutes)'+tip('Auto lock-in stays off this long after you stop a session yourself.')+'</label><input class="input" type="number" min="0" max="240" id="setAppTrackingCooldown" value="'+state.settings.appTracking.cooldownMinutes+'"></div>'+
         '<div class="field"><label>Day recap ready at'+tip('A small nudge at this time says your recap is ready — what you did, your work habits, and any sessions that started on their own. Open it any time from Today or Analytics.')+'</label><input class="input" type="time" id="setRecapTime" value="'+(state.settings.appTracking.recapTime||'21:30')+'"></div>'+
         '<div class="field"><label>Idle after (seconds without keyboard/mouse)'+tip('Idle time doesn\'t count toward auto lock-in or app time.')+'</label><input class="input" type="number" min="15" max="900" id="setAppTrackingIdle" value="'+state.settings.appTracking.idleSeconds+'"></div>'+
@@ -13664,6 +14079,12 @@ function renderSettings(){
         '<div class="task-list">'+(prepItems.map(function(item){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(item.label)+'</div>'+deleteBtn('prep', item.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet — add one above.</div>')+'</div>'+
         '</div>'+
       '</div>'+
+      '',
+
+    you: '<div class="card section"><div class="section-title">About you</div><div class="grid grid-2">'+
+        '<div class="field"><label>Name</label><input class="input" id="setName" value="'+escapeHtml(p.name)+'"></div>'+
+        '<div class="field"><label>Business name</label><input class="input" id="setBusinessName" value="'+escapeHtml(p.businessName||'')+'" placeholder="e.g. Rivera Media Co."></div>'+
+      '</div></div>'+
       '<div class="section"><div class="section-title">Why You\'re Doing This</div><div class="card"><div class="grid grid-2">'+
         '<div><div class="kind-label" style="color:var(--good);">Getting</div>'+
           '<div class="task-list">'+(toward.map(function(m){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(m.text)+'</div>'+deleteBtn('motivation', m.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
@@ -13673,9 +14094,8 @@ function renderSettings(){
           '<div class="task-list">'+(away.map(function(m){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(m.text)+'</div>'+deleteBtn('motivation', m.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
           '<div class="row" style="margin-top:8px;"><input class="input" id="newMotivAway" placeholder="e.g. More debt" style="flex:1;min-width:100px;"><button class="btn btn-sm" data-action="addMotivation" data-kind="away">Add</button></div>'+
         '</div>'+
-      '</div></div></div>',
-
-    standards: '<div class="card section"><div class="section-title">Fitness &amp; Deep Work</div><div class="grid grid-2">'+
+      '</div></div></div>'+
+      '<div class="card section"><div class="section-title">Targets — health &amp; deep work</div><div class="grid grid-2">'+
         '<div class="field"><label>Daily calorie target</label><input class="input" type="number" id="setCalories" value="'+p.calorieTarget+'"></div>'+
         '<div class="field"><label>Goal weight</label><input class="input" type="number" step="0.1" id="setGoalWeight" value="'+(p.goalWeight!=null?p.goalWeight:'')+'"></div>'+
         '<div class="field"><label>Workout days per week (goal)</label><input class="input" type="number" id="setWeeklyWorkout" value="'+p.weeklyWorkoutTarget+'"></div>'+
@@ -13720,15 +14140,17 @@ function renderSettings(){
       '</div>'
   };
   const navDefs = [
+    {id:'you', label:'You', icon:'&#128100;'},
     {id:'general', label:'General', icon:'&#9881;'},
     {id:'display', label:'Display', icon:'&#127912;'},
     {id:'focus', label:'Focus &amp; Alarms', icon:'&#9201;'},
-    {id:'standards', label:'Standards', icon:'&#127939;'},
     {id:'business', label:'Business', icon:'&#9635;'},
     {id:'calendarJournal', label:'Calendar &amp; Journal', icon:'&#9638;'},
+    {id:'integrations', label:'Integrations', icon:'&#128279;'},
     {id:'updates', label:'App updates', icon:'&#128227;'}
   ];
-  const active = sections[ui.settingsTab] ? ui.settingsTab : 'general';
+  const tab = ui.settingsTab==='standards' ? 'you' : ui.settingsTab;   // Standards now live under You
+  const active = sections[tab] ? tab : 'you';
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Settings</div></div></div>'+
   '<div class="settings-shell">'+
     '<div class="settings-sidenav">'+navDefs.map(function(n){ return '<button class="settings-nav-item'+(active===n.id?' active':'')+'" data-action="settingsTab" data-tab="'+n.id+'"><span style="margin-right:8px;">'+n.icon+'</span>'+n.label+'</button>'; }).join('')+'</div>'+
@@ -13894,6 +14316,7 @@ function saveProfile(){
   if(atAutoEl) state.settings.appTracking.autoLockIn = atAutoEl.value === 'on';
   if(atThreshEl) state.settings.appTracking.thresholdMinutes = Number(atThreshEl.value)||12;
   if(atGraceEl) state.settings.appTracking.graceMinutes = Number(atGraceEl.value)||3;
+  const atAwayEl = document.getElementById('setAppTrackingAway'); if(atAwayEl) state.settings.appTracking.awayMinutes = clamp(Number(atAwayEl.value)||10, 3, 120);
   const atCooldownEl = document.getElementById('setAppTrackingCooldown');
   if(atCooldownEl){ const v = Number(atCooldownEl.value); state.settings.appTracking.cooldownMinutes = (isNaN(v) || atCooldownEl.value==='') ? 15 : clamp(v,0,240); }
   const rtEl = document.getElementById('setRecapTime');
@@ -14001,7 +14424,8 @@ function renderView(){
   try{ renderViewInner(); } finally { RC = null; }
 }
 function renderViewInner(){
-  if(ui.currentTaskId && (!state.focus.activeSession || state.focus.activeSession.onBreak)){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
+  // a task can be timed without locking in (Now on Focus → Tasks); a break still pauses it
+  if(ui.currentTaskId && state.focus.activeSession && state.focus.activeSession.onBreak){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   const root = document.getElementById('viewRoot');
   let html = '';
   switch(ui.view){
@@ -14507,6 +14931,7 @@ function fireWake(opts){
   opts = opts || {};
   const w = wakeCfg();
   wakeRing = {startedAt:Date.now(), test:!!opts.test, snoozed:!!opts.snoozed, mediaFailed:false};
+  ui.wakeMode = 'ring'; ui.wakeBoardBig = false;
   closeOtherOverlaysForWake();
   showOverlay('wakeOverlay');
   renderWakeOverlayInto();
@@ -14526,15 +14951,27 @@ function stopWakeRing(){
   wakeRing = null;
   hideOverlay('wakeOverlay');
 }
+// "I'm up" stops the alarm and turns the screen into the morning briefing — the day ahead,
+// yesterday in numbers, the goals — then Lock in or Let's go takes you into the day.
 function wakeImUp(){
   const wasTest = wakeRing && wakeRing.test;
-  stopWakeRing();
+  clearInterval(wakeBeepTimer); wakeBeepTimer = null;
+  stopWakeMedia(false);
+  wakeRing = null;
   if(!wasTest && state.modes.active && state.modes.active.sleep) finishActiveMode(true);
-  if(!wasTest){ ui.view = 'today'; }
+  ui.wakeMode = 'brief'; ui.wakeBriefTest = !!wasTest; ui.wakeBoardBig = false;
   playPositive();
-  renderView();
-  showToast(wasTest ? 'Test done — that\'s how your mornings will look.' : 'Good morning. Let\'s get it.', {icon:'&#9728;&#65039;'});
+  renderWakeOverlayInto();
 }
+function endBriefing(){
+  ui.wakeMode = null;
+  hideOverlay('wakeOverlay');
+  ui.view = 'today';
+  renderView();
+}
+ACTIONS.wakeBriefDone = function(){ const t = ui.wakeBriefTest; endBriefing(); showToast(t ? 'Test done — that\'s how your mornings will look.' : 'Let\'s get it.', {icon:'&#9728;&#65039;'}); };
+ACTIONS.wakeBriefLockIn = function(el, e, id){ endBriefing(); if(id) setNextUp(id); renderView(); openLockInChooser(); };
+ACTIONS.wakeBoardToggle = function(){ ui.wakeBoardBig = !ui.wakeBoardBig; renderWakeOverlayInto(); };
 function wakeSnooze(){
   const mins = wakeCfg().snoozeMinutes||9;
   const test = wakeRing && wakeRing.test;
@@ -14548,48 +14985,83 @@ ACTIONS.wakeSnooze = function(){ wakeSnooze(); };
 ACTIONS.wakePlayMusic = function(){ const w = wakeCfg(); if(w.media) playWakeMedia(w.media, function(){ showToast('Couldn\'t play that — try uploading the song file instead.', {icon:'&#9888;'}); }); clearInterval(wakeBeepTimer); if(wakeRing){ wakeRing.mediaFailed = false; renderWakeOverlayInto(); } };
 function wakeGreeting(){ const h = new Date().getHours(); return h<5 ? 'Still up' : h<12 ? 'Good morning' : h<18 ? 'Good afternoon' : 'Good evening'; }
 function upcomingNightPlan(){ const np = state.focus.nightPlan; return (np && np.date>=todayStr()) ? np : null; }
-function renderWakeScreen(){
-  const ringing = true, mode = 'ring';
-  const today = todayStr();
-  const b = masterVisionBoard();
-  const np = upcomingNightPlan();
-  const planTasks = np ? arr(np.taskIds).map(function(id){ return state.tasks.items.find(function(t){ return t.id===id; }); }).filter(Boolean) : [];
-  const todayTasks = planTasks.length ? planTasks : state.tasks.items.filter(function(t){ return t.status==='today'; }).slice(0, 6);
+function wakeTodayPlan(){
+  const np = upcomingNightPlan(), today = todayStr();
+  const planTasks = np && np.date===today ? arr(np.taskIds).map(function(id){ return state.tasks.items.find(function(t){ return t.id===id; }); }).filter(Boolean) : [];
+  const tasks = planTasks.length ? planTasks : lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today'; }));
+  return {note: np && np.date===today ? np.note : '', tasks: tasks.filter(function(t){ return t.status!=='done'; }).slice(0, 6)};
+}
+function wakeWeatherLine(){
+  const now = typeof wxNow==='function' ? wxNow() : null;
+  return now ? wxIcon(wxKind(now.code), skyPhase())+' '+now.temp+'&deg; '+escapeHtml(wxLabel(now.code).toLowerCase())+(now.hi!=null ? ' &middot; high '+now.hi+'&deg;' : '') : '';
+}
+function wakeRingHtml(){
+  const w = wakeCfg(), b = masterVisionBoard();
+  const playing = w.media && !(wakeRing && wakeRing.mediaFailed);
+  return '<div class="wk2'+(ui.wakeBoardBig?' board-open':'')+'" data-sky="'+skyPhase()+'">'+
+    '<div class="wk2-aura"><i></i><i></i><i></i></div>'+
+    '<div class="wk2-center">'+
+      '<div class="wk2-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test ? ' <span class="tag">TEST</span>' : '')+'</div>'+
+      '<div class="wk2-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+'</div>'+
+      '<div class="wk2-date">'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div>'+
+      '<div class="wk2-actions">'+
+        '<button class="wk2-up" data-action="wakeImUp"><span>&#9728;&#65039; I\'m up</span></button>'+
+        '<button class="wk2-snooze" data-action="wakeSnooze">Snooze '+(w.snoozeMinutes||9)+' min</button>'+
+      '</div>'+
+      (w.media ? '<div class="wk2-music'+(playing?' is-playing':'')+'">'+
+          (playing ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '')+
+          '<span class="wk2-song">'+escapeHtml(mediaName(w.media))+'</span><span class="wk2-src">'+escapeHtml(mediaKindLabel(w.media))+'</span>'+
+          (wakeRing && wakeRing.mediaFailed ? '<button class="btn btn-good btn-sm" data-action="wakePlayMusic">&#9654; Play</button>' : '')+
+        '</div>' : '')+
+    '</div>'+
+    (b && b.elements.length
+      ? '<div class="wk2-vision" data-action="wakeBoardToggle" title="'+(ui.wakeBoardBig?'Close':'Open your vision board')+'">'+(ui.wakeBoardBig ? '<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button>' : '<span class="wk2-vision-k">&#127775; Vision board</span>')+boardStaticHtml(b, 'wake-board')+'</div>'
+      : '')+
+  '</div>';
+}
+function wakeBriefHtml(){
+  const today = todayStr(), y = addDays(today, -1);
+  const yDeep = deepWorkMinutesFor(y), target = state.standards.deepWorkTargetMinutes || 180;
+  const yDone = state.tasks.items.filter(function(t){ return t.completedAt===y; }).length;
+  const yWork = typeof workoutDay==='function' ? workoutDay(y) : {n:0, m:0};
+  const yStd = dayStandardsComplete(y);
+  const plan = wakeTodayPlan();
   const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a,c){ return (a.time||'').localeCompare(c.time||''); });
   const deadlines = state.tasks.items.filter(function(t){ return t.deadline===today && t.status!=='done'; });
   const why = arr(state.focus.motivations && state.focus.motivations.toward).slice(0, 3);
-  const nw = nextWake();
-  const card = function(title, body){ return body ? '<div class="wake-card"><div class="wake-card-title">'+title+'</div>'+body+'</div>' : ''; };
-  const planBody = (np && np.note ? '<div class="wake-note">'+escapeHtml(np.note)+'</div>' : '')+
-    (todayTasks.length ? '<div class="wake-list">'+todayTasks.map(function(t){ return '<div class="wake-li'+(t.status==='done'?' is-done':'')+'">'+(t.status==='done'?'&#10003;':'&#9675;')+' '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '');
-  const agendaBody = (events.length || deadlines.length) ? '<div class="wake-list">'+
-      events.map(function(e){ return '<div class="wake-li"><span class="wake-time">'+(e.time?fmt12Hour(e.time):'All day')+'</span> '+escapeHtml(e.title)+(e.location?' <span class="kpi-sub">&#128205; '+escapeHtml(e.location)+'</span>':'')+'</div>'; }).join('')+
-      deadlines.map(function(t){ return '<div class="wake-li"><span class="wake-time" style="color:var(--danger);">Due'+(t.deadlineTime?' '+fmt12Hour(t.deadlineTime):'')+'</span> '+escapeHtml(t.title)+'</div>'; }).join('')+
-    '</div>' : '';
-  const whyBody = why.length ? '<div class="wake-list">'+why.map(function(m){ return '<div class="wake-li">&rarr; '+escapeHtml(m.text)+'</div>'; }).join('')+'</div>' : '';
-  const w = wakeCfg();
-  return '<div class="wake-screen is-ringing">'+
-    '<div class="wake-left">'+
-      '<div class="wake-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test && mode==='ring' ? ' <span class="tag">TEST</span>' : '')+'</div>'+
-      '<div class="wake-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+'</div>'+
-      '<div class="wake-date">'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+'</div>'+
-      (ringing ? '<div class="wake-actions">'+
-          '<button class="btn wake-up-btn" data-action="wakeImUp">&#9728;&#65039; I\'m up</button>'+
-          '<button class="btn btn-ghost wake-snooze-btn" data-action="wakeSnooze">Snooze '+(w.snoozeMinutes||9)+' min</button>'+
-        '</div>'+
-        (w.media ? '<div class="wake-music">'+(wakeRing && wakeRing.mediaFailed ? '<button class="btn btn-good btn-sm" data-action="wakePlayMusic">&#9654; Play '+escapeHtml(mediaName(w.media))+'</button>' : '&#9835; '+escapeHtml(mediaName(w.media))+' <span class="kpi-sub">'+escapeHtml(mediaKindLabel(w.media))+'</span>')+'</div>' : '')
-        : '<div class="wake-next">'+(nw ? '&#9200; Wake-up '+fmt12Hour(nw.time)+' '+morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts) : '&#9200; No wake-up alarm set')+'</div>')+
-      '<div class="wake-cards">'+
-        card(np && np.date===today ? 'Last night\'s plan' : np ? 'Plan for '+morningLabel(np.date) : 'Today', planBody)+
-        card('On the calendar', agendaBody)+
-        card('Why you\'re doing this', whyBody)+
+  const goals = typeof masterGoalDefs==='function' ? masterGoalDefs() : [];
+  const first = plan.tasks[0];
+  let d = 0; const step = function(){ d += 90; return ' style="animation-delay:'+d+'ms"'; };
+  const stat = function(v, k, good){ return '<div class="br-stat'+(good?' is-good':'')+'"><div class="br-stat-v">'+v+'</div><div class="br-stat-k">'+k+'</div></div>'; };
+  return '<div class="brief">'+
+    '<div class="brief-grid-bg"></div>'+
+    '<div class="brief-inner">'+
+      '<div class="brief-top"'+step()+'><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>Morning briefing</span><span class="brief-sys">All systems go</span></div>'+
+      '<h1 class="brief-hello"'+step()+'>'+wakeGreeting()+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
+      '<div class="brief-sub"'+step()+'>'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+' &middot; '+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div>'+
+      '<div class="brief-cols">'+
+        '<section class="br-card"'+step()+'><div class="br-k">Yesterday</div><div class="br-stats">'+
+          stat(fmtHours(yDeep), 'deep work', yDeep>=target)+stat(yDone, 'tasks done')+stat(yWork.n ? yWork.n+(yWork.m?' &middot; '+fmtDurationLabel(yWork.m):'') : '—', 'workouts', yWork.n>0)+stat(computeStreak()+'d', 'streak', yStd)+
+        '</div><div class="br-line">'+(yStd ? '&#10003; You hit the standard — keep the run going.' : yDeep ? 'Short of the standard. Today\'s a clean slate.' : 'No deep work logged. Today we change that.')+'</div></section>'+
+        '<section class="br-card br-today"'+step()+'><div class="br-k">Today\'s plan</div>'+
+          (plan.note ? '<div class="br-note">'+escapeHtml(plan.note)+'</div>' : '')+
+          (plan.tasks.length ? '<ol class="br-list">'+plan.tasks.map(function(t, i){ return '<li'+(i===0?' class="is-first"':'')+'>'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span>'+(i===0?'<em>first up</em>':'')+'</li>'; }).join('')+'</ol>' : '<div class="br-line">Nothing lined up yet — pick your first move.</div>')+
+          ((events.length || deadlines.length) ? '<div class="br-k" style="margin-top:12px;">On the calendar</div><div class="br-agenda">'+
+            events.map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('')+
+            deadlines.map(function(t){ return '<div><b class="is-due">Due'+(t.deadlineTime ? ' '+fmt12Hour(t.deadlineTime) : '')+'</b> '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '')+
+        '</section>'+
+        '<section class="br-card"'+step()+'><div class="br-k">Goals</div><div class="br-goals">'+
+          goals.map(function(m){ const pct = masterPct(m); return '<div class="br-goal" style="--mg1:'+m.color+';--mg2:'+m.color2+';"><span class="br-goal-k">'+m.icon+' '+m.label+'</span><span class="br-goal-v">'+(m.cur==null ? '—' : m.fmt(m.cur))+'</span><span class="br-goal-bar"><i style="width:'+pct.toFixed(0)+'%"></i></span></div>'; }).join('')+
+        '</div>'+(why.length ? '<div class="br-k" style="margin-top:12px;">Why</div><div class="br-why">'+why.map(function(m){ return '<span>'+escapeHtml(m.text)+'</span>'; }).join('')+'</div>' : '')+'</section>'+
       '</div>'+
-    '</div>'+
-    '<div class="wake-right">'+
-      (b && b.elements.length ? boardStaticHtml(b, 'wake-board') : '<div class="wake-board-empty"><div style="font-size:30px;">&#127775;</div><div>Your vision board shows up here.</div><div class="kpi-sub">Journal &rarr; Boards</div></div>')+
+      '<div class="brief-cta"'+step()+'>'+
+        (first ? '<button class="brief-go" data-action="wakeBriefLockIn" data-id="'+first.id+'">&#128274; Lock in on &ldquo;'+escapeHtml(first.title)+'&rdquo;</button>' : '<button class="brief-go" data-action="wakeBriefLockIn">&#128274; Lock in</button>')+
+        '<button class="brief-later" data-action="wakeBriefDone">Let\'s go &rarr;</button>'+
+      '</div>'+
     '</div>'+
   '</div>';
 }
+function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : wakeRingHtml(); }
 function renderWakeOverlayInto(){
   const el = document.getElementById('wakeContent'); if(!el) return;
   morphInto(el, renderWakeScreen());
@@ -15257,8 +15729,9 @@ afterRenderHooks.push(function(){
 // Real footage as the background — a space flyover, Tokyo at night, a rainy skyline — like a live
 // wallpaper. Add your own clips (any .mp4/.mov/.webm, e.g. free 4K loops from Pexels or Mixkit) or a
 // direct video link. Files stay on this Mac in IndexedDB under their own "vidb:" key, so they never
-// bloat the JSON backup. The video plays muted on a loop behind a soft veil (so text stays readable)
-// and pauses whenever Operator isn't the window in front, so it costs nothing while you're elsewhere.
+// bloat the JSON backup. The video plays by itself — muted, on a loop, behind a soft veil so text
+// stays readable — whenever the window is on screen, and stops when it's minimized or hidden
+// (optionally also whenever Operator isn't the window in front, to save battery).
 function videoWalls(){ return arr(state.profile.videoWalls); }
 function videoWallById(id){ return videoWalls().find(function(v){ return v.id===id; }) || null; }
 const VW = {wrap:null, video:null, id:null, url:null};
@@ -15282,8 +15755,11 @@ function videoWallMount(id){
   if(!VW.wrap){
     VW.wrap = document.createElement('div'); VW.wrap.className = 'scene-layer scene-video-wrap'; VW.wrap.id = 'sceneVideoWrap';
     VW.video = document.createElement('video'); VW.video.className = 'scene-video';
-    VW.video.muted = true; VW.video.loop = true; VW.video.playsInline = true; VW.video.setAttribute('muted', ''); VW.video.setAttribute('playsinline', ''); VW.video.preload = 'auto';
+    VW.video.muted = true; VW.video.defaultMuted = true; VW.video.loop = true; VW.video.autoplay = true; VW.video.playsInline = true;
+    VW.video.setAttribute('muted', ''); VW.video.setAttribute('playsinline', ''); VW.video.setAttribute('autoplay', ''); VW.video.preload = 'auto';
     VW.video.addEventListener('playing', function(){ VW.wrap && VW.wrap.classList.add('is-ready'); });
+    // start the moment there's enough to play, and pick back up if the stream hiccups or ends
+    ['canplay', 'stalled', 'suspend', 'ended'].forEach(function(ev){ VW.video.addEventListener(ev, function(){ if(VW.video && VW.video.paused) videoWallPlayPause(); }); });
     VW.wrap.appendChild(VW.video);
     document.body.insertBefore(VW.wrap, document.body.firstChild);
   }
@@ -15298,10 +15774,14 @@ function videoWallMount(id){
     videoWallPlayPause();
   });
 }
-function videoWallShouldPlay(){ return !document.hidden && (document.hasFocus() || state.profile.videoWallAlwaysPlay===true); }
+function videoWallShouldPlay(){ return !document.hidden && (state.profile.videoWallPauseBehind!==true || document.hasFocus()); }
 function videoWallPlayPause(){
   if(!VW.video || !VW.video.src) return;
-  if(videoWallShouldPlay()){ const p = VW.video.play(); if(p && p.catch) p.catch(function(){}); }
+  if(videoWallShouldPlay()){
+    const p = VW.video.play();
+    // if the browser holds playback back, retry on the next interaction with the window
+    if(p && p.catch) p.catch(function(){ const go = function(){ document.removeEventListener('pointerdown', go, true); document.removeEventListener('keydown', go, true); videoWallPlayPause(); }; document.addEventListener('pointerdown', go, true); document.addEventListener('keydown', go, true); });
+  }
   else VW.video.pause();
 }
 window.addEventListener('focus', videoWallPlayPause);
@@ -15341,7 +15821,7 @@ async function addVideoWallFile(file){
   const v = {id:uid(), name:videoWallName(file.name), src:'vidb:'+key, thumb:thumb, size:file.size};
   state.profile.videoWalls = videoWalls().concat([v]);
   setScene('vid:'+v.id);
-  showToast('Video wallpaper on — it pauses whenever Operator isn\'t in front.', {icon:'&#127902;'});
+  showToast('Video wallpaper on.', {icon:'&#127902;'});
 }
 async function addVideoWallUrl(raw){
   const url = String(raw||'').trim();
@@ -15367,7 +15847,7 @@ ACTIONS.videoWallRemove = function(el, e, id){
 document.addEventListener('change', function(e){
   const t = e.target;
   if(t && t.id==='videoWallFile' && t.files && t.files[0]){ addVideoWallFile(t.files[0]); t.value = ''; }
-  else if(t && t.id==='videoWallAlways'){ state.profile.videoWallAlwaysPlay = t.checked; persist('profile'); videoWallPlayPause(); }
+  else if(t && t.id==='videoWallPauseBehind'){ state.profile.videoWallPauseBehind = t.checked; persist('profile'); videoWallPlayPause(); }
 });
 document.addEventListener('keydown', function(e){ if(e.key==='Enter' && e.target && e.target.id==='videoWallUrl'){ e.preventDefault(); ACTIONS.videoWallAddUrl(); } });
 // ---- picker (inside Settings → Display → Scene) ----
@@ -15386,8 +15866,310 @@ function videoWallAddHtml(){
     '<button class="btn btn-ghost btn-sm" data-action="videoWallLink">&#128279; From a link</button>'+
     '<input type="file" id="videoWallFile" accept="video/*" hidden>'+
     (ui.videoWallLink ? '<div class="row vw-link"><input class="input" id="videoWallUrl" placeholder="https://…/clip.mp4" style="flex:1;min-width:220px;"><button class="btn btn-sm" data-action="videoWallAddUrl">Add</button></div>' : '')+
-    (sceneId().indexOf('vid:')===0 ? '<label class="row" style="gap:8px;width:100%;font-size:12.5px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="videoWallAlways" '+(state.profile.videoWallAlwaysPlay===true?'checked':'')+'>Keep playing when Operator isn\'t in front (uses more battery)</label>' : '')+
+    (sceneId().indexOf('vid:')===0 ? '<label class="row" style="gap:8px;width:100%;font-size:12.5px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="videoWallPauseBehind" '+(state.profile.videoWallPauseBehind===true?'checked':'')+'>Pause when Operator isn\'t the window in front (saves battery)</label>' : '')+
   '</div>';
+}
+
+// ============ GOHIGHLEVEL ============
+// Settings → Integrations. Paste a Private Integration key + your Location ID; the Operator app
+// on your Mac keeps the key (not this page, not your exports) and makes the calls for us at
+// 127.0.0.1:8936. Every 10 minutes (and on Sync now):
+//  • Leads — open opportunities in the pipeline you pick come in as leads, each GHL stage mapped
+//    to one of yours. Move a lead here and it moves in GHL (and back).
+//  • Appointments — the next two weeks of bookings land in the Calendar, linked to the lead or
+//    client, so meetings get logged as touches on their own.
+//  • Messages — a text, email, call or DM you send from GHL counts as a touch, so "who to reach
+//    out to" stays honest.
+const GHL_HELPER = 'http://127.0.0.1:8936/ghl/';
+function ghlCfg(){
+  const s = state.settings;
+  if(!s.ghl || typeof s.ghl!=='object') s.ghl = {};
+  const g = s.ghl;
+  if(g.locationId===undefined) g.locationId = '';
+  if(g.pipelineId===undefined) g.pipelineId = '';
+  if(!g.stageMap || typeof g.stageMap!=='object') g.stageMap = {};
+  if(!Array.isArray(g.pipelines)) g.pipelines = [];
+  ['syncCalendar', 'syncMessages', 'pushStages', 'autoSync'].forEach(function(k){ if(g[k]===undefined) g[k] = true; });
+  return g;
+}
+function ghlOn(){ const g = ghlCfg(); return !!(g.connected && g.locationId && g.pipelineId); }
+async function ghlFetch(url){
+  let res;
+  try{ res = await fetch(url, {cache:'no-store'}); }
+  catch(e){ const err = new Error('The GoHighLevel bridge isn\'t running — open Operator from the Operator app on your Mac.'); err.noHelper = true; throw err; }
+  const text = await res.text(); let json = null; try{ json = JSON.parse(text); }catch(e){}
+  if(!res.ok){
+    const msg = json && (json.message || json.error || json.msg);
+    const err = new Error(res.status===401 ? 'GoHighLevel didn\'t accept the key (401) — check it and its scopes.' : res.status===403 ? 'Not allowed (403) — the key is missing a scope for this.' : (Array.isArray(msg) ? msg.join(', ') : msg) || ('GoHighLevel said '+res.status));
+    err.status = res.status; throw err;
+  }
+  return json || {};
+}
+function ghlCall(method, path, body){ return ghlFetch(GHL_HELPER+'api?m='+method+'&p='+hexUtf8(path)+(body ? '&b='+hexUtf8(JSON.stringify(body)) : '')); }
+function ghlQ(obj){ return Object.keys(obj).filter(function(k){ return obj[k]!=null && obj[k]!==''; }).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(obj[k]); }).join('&'); }
+function ghlDate(v){ if(v==null || v==='') return todayStr(); const d = new Date(typeof v==='number' || /^\d+$/.test(String(v)) ? Number(v) : v); return isNaN(d) ? todayStr() : todayStr(d); }
+function digits(s){ return String(s||'').replace(/\D/g, '').slice(-10); }
+// ---- stage mapping ----
+function ghlGuessStage(name, i, n){
+  const s = String(name||'').toLowerCase();
+  if(/lost|dead|unqualif|no.?show|not interested/.test(s)) return 'lost';
+  if(/won|closed|sold|signed|client/.test(s)) return 'closed';
+  if(/proposal|quote|offer|contract/.test(s)) return 'proposal';
+  if(/book|appoint|call|meet|discovery|demo|consult/.test(s)) return 'discovery';
+  if(/contact|reached|follow|engag|replied|respond/.test(s)) return 'contacted';
+  if(/new|lead|incoming|fresh/.test(s)) return 'lead';
+  const open = ['lead', 'contacted', 'discovery', 'proposal'];
+  return open[Math.min(open.length-1, Math.floor(i/Math.max(1, n)*open.length))];
+}
+function ghlPipeline(){ const g = ghlCfg(); return g.pipelines.find(function(p){ return p.id===g.pipelineId; }) || null; }
+function ghlAutoMap(){
+  const g = ghlCfg(), p = ghlPipeline(); if(!p) return;
+  const valid = crmStages('lead').map(function(s){ return s.id; });
+  p.stages.forEach(function(st, i){ if(!g.stageMap[st.id] || valid.indexOf(g.stageMap[st.id])<0) g.stageMap[st.id] = ghlGuessStage(st.name, i, p.stages.length); });
+}
+function ghlStageFor(opStage){
+  const g = ghlCfg(), p = ghlPipeline(); if(!p) return null;
+  const hit = p.stages.find(function(st){ return g.stageMap[st.id]===opStage; });
+  return hit ? hit.id : null;
+}
+// ---- connecting ----
+ACTIONS.ghlConnect = async function(){
+  const keyEl = document.getElementById('ghlKey'), locEl = document.getElementById('ghlLoc');
+  const key = keyEl ? keyEl.value.trim() : '', loc = locEl ? locEl.value.trim() : '';
+  const g = ghlCfg();
+  if(!loc){ showToast('Add your Location ID first.', {icon:'&#9888;'}); return; }
+  ui.ghlBusy = 'Connecting…'; ui.ghlError = null; renderView();
+  try{
+    if(key) await ghlFetch(GHL_HELPER+'save?t='+hexUtf8(key));
+    else { const st = await ghlFetch(GHL_HELPER+'status'); if(!st.hasKey) throw new Error('Paste your Private Integration key.'); }
+    g.locationId = loc;
+    const r = await ghlCall('GET', '/opportunities/pipelines?'+ghlQ({locationId:loc}));
+    g.pipelines = arr(r.pipelines).map(function(p){ return {id:p.id, name:p.name, stages:arr(p.stages).slice().sort(function(a, b){ return (a.position||0)-(b.position||0); }).map(function(s){ return {id:s.id, name:s.name}; })}; });
+    if(!g.pipelines.length) throw new Error('Connected, but this location has no pipelines yet.');
+    if(!g.pipelines.some(function(p){ return p.id===g.pipelineId; })) g.pipelineId = g.pipelines[0].id;
+    g.connected = true;
+    ghlAutoMap();
+    persist('settings');
+    ui.ghlBusy = null; renderView();
+    showToast('Connected to GoHighLevel — '+g.pipelines.length+' pipeline'+(g.pipelines.length===1?'':'s')+' found. Check the stage matches, then Sync now.', {icon:'&#9989;', duration:6000});
+  }catch(e){ ui.ghlBusy = null; ui.ghlError = e.message; renderView(); }
+};
+ACTIONS.ghlDisconnect = async function(){
+  if(!confirm('Disconnect GoHighLevel? Leads and appointments already brought in stay where they are.')) return;
+  try{ await ghlFetch(GHL_HELPER+'forget'); }catch(e){}
+  const g = ghlCfg(); g.connected = false; g.lastSync = null; g.lastResult = null;
+  persist('settings'); renderView();
+};
+ACTIONS.ghlPickPipeline = function(el){ const g = ghlCfg(); g.pipelineId = el.value; ghlAutoMap(); persist('settings'); renderView(); };
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.dataset) return;
+  if(t.dataset.ghlStage){ ghlCfg().stageMap[t.dataset.ghlStage] = t.value; persist('settings'); }
+  else if(t.id==='ghlPipeline') ACTIONS.ghlPickPipeline(t);
+  else if(t.dataset.ghlToggle){ ghlCfg()[t.dataset.ghlToggle] = t.checked; persist('settings'); }
+});
+// ---- syncing ----
+let ghlSyncing = false;
+ACTIONS.ghlSyncNow = function(){ ghlSync(true); };
+async function ghlSync(manual){
+  if(!ghlOn() || ghlSyncing) return;
+  ghlSyncing = true; ui.ghlBusy = 'Syncing…'; ui.ghlError = null; if(manual) renderView();
+  const g = ghlCfg(), out = {newLeads:0, movedLeads:0, events:0, touches:0, linked:0};
+  const contacts = {}; // contactId → {id, name, email, phone, company}
+  try{
+    await ghlPullOpportunities(g, out, contacts);
+    ghlLinkClients(contacts, out);
+    if(g.syncCalendar) await ghlPullAppointments(g, out);
+    if(g.syncMessages) await ghlPullMessages(g, out, contacts);
+    g.lastSync = Date.now(); g.lastResult = out;
+    persist('settings'); persist('business'); persist('calendar');
+    ui.ghlBusy = null; renderView();
+    if(manual) showToast('GoHighLevel synced — '+ghlResultLine(out)+'.', {icon:'&#128260;', duration:5000});
+  }catch(e){
+    ui.ghlBusy = null; ui.ghlError = e.message; g.lastError = {at:Date.now(), msg:e.message}; persist('settings');
+    if(manual) renderView();
+  }finally{ ghlSyncing = false; }
+}
+function ghlResultLine(r){
+  if(!r) return '';
+  const bits = [];
+  bits.push(r.newLeads+' new lead'+(r.newLeads===1?'':'s'));
+  if(r.movedLeads) bits.push(r.movedLeads+' moved');
+  bits.push(r.events+' appointment'+(r.events===1?'':'s'));
+  bits.push(r.touches+' message'+(r.touches===1?'':'s')+' counted');
+  return bits.join(' · ');
+}
+async function ghlPullOpportunities(g, out, contacts){
+  const leads = state.business.pipeline;
+  let page = 0, after = null, afterId = null;
+  while(page++ < 10){
+    const r = await ghlCall('GET', '/opportunities/search?'+ghlQ({location_id:g.locationId, pipeline_id:g.pipelineId, status:'open', limit:100, startAfter:after, startAfterId:afterId}));
+    const opps = arr(r.opportunities);
+    opps.forEach(function(o){
+      const c = o.contact || {};
+      const cid = o.contactId || c.id || null;
+      if(cid) contacts[cid] = {id:cid, name:c.name || o.name || '', email:c.email || '', phone:c.phone || '', company:c.companyName || ''};
+      const mapped = g.stageMap[o.pipelineStageId] || 'lead';
+      // already here? by GHL id first, then — so your existing leads aren't doubled on the first
+      // sync — by email, phone, or the same company/name
+      const em = String(c.email||'').toLowerCase(), ph = digits(c.phone), co = String(c.companyName||o.name||'').trim().toLowerCase(), nm = String(c.name||'').trim().toLowerCase();
+      let x = leads.find(function(l){ return l.ghlOppId===o.id; }) ||
+        (cid ? leads.find(function(l){ return l.ghlContactId===cid && !l.ghlOppId; }) : null) ||
+        leads.find(function(l){
+          if(l.ghlOppId || l.convertedClientId) return false;
+          return (em && String(l.email||'').toLowerCase()===em) || (ph.length>=7 && digits(l.phone)===ph) ||
+            (co && String(l.company||'').trim().toLowerCase()===co) || (nm && nm.length>3 && String(l.name||'').trim().toLowerCase()===nm);
+        });
+      if(!x){
+        x = {id:uid(), name:c.name || o.name || '', company:c.companyName || o.name || c.name || 'Lead', phone:c.phone || '', email:c.email || '', notes:'', leadSource:null, stage:mapped,
+          createdAt:ghlDate(o.createdAt), touchpoints:[], timeline:[], files:[], cadenceDays:null, value:Number(o.monetaryValue)||0, trade:'', nextFollowUp:null, stageHistory:[], convertedClientId:null,
+          ghlOppId:o.id, ghlContactId:cid, ghlStageId:o.pipelineStageId};
+        crmTimeline(x, 'note', 'Came in from GoHighLevel');
+        leads.push(x); out.newLeads++;
+      } else {
+        x.ghlOppId = o.id; x.ghlContactId = cid || x.ghlContactId;
+        if(o.pipelineStageId && o.pipelineStageId!==x.ghlStageId){
+          x.ghlStageId = o.pipelineStageId;
+          if(x.stage!==mapped && crmStage('lead', mapped)){
+            if(!Array.isArray(x.stageHistory)) x.stageHistory = [];
+            x.stageHistory.push(x.stage);
+            const from = crmStage('lead', x.stage), to = crmStage('lead', mapped);
+            x.stage = mapped; crmTimeline(x, 'stage', (from?from.label:'—')+' → '+to.label+' (in GoHighLevel)');
+            if(to.kind==='won' && !x.convertedClientId) convertProspectToClient(x);
+            out.movedLeads++;
+          }
+        }
+        if(o.monetaryValue!=null && Number(o.monetaryValue)!==Number(x.value)) x.value = Number(o.monetaryValue)||0;
+        if(!x.phone && c.phone) x.phone = c.phone;
+        if(!x.email && c.email) x.email = c.email;
+      }
+    });
+    const meta = r.meta || {};
+    if(opps.length < 100 || !meta.startAfter) break;
+    after = meta.startAfter; afterId = meta.startAfterId;
+  }
+}
+// clients you already have get matched to their GHL contact by email or phone
+function ghlLinkClients(contacts, out){
+  const list = Object.keys(contacts).map(function(k){ return contacts[k]; });
+  state.business.clients.forEach(function(cl){
+    if(cl.ghlContactId) return;
+    const em = String(cl.email||'').toLowerCase(), ph = digits(cl.phone);
+    const hit = list.find(function(c){ return (em && String(c.email||'').toLowerCase()===em) || (ph.length>=7 && digits(c.phone)===ph); });
+    if(hit){ cl.ghlContactId = hit.id; out.linked++; }
+  });
+}
+function ghlRecordForContact(cid){
+  if(!cid) return null;
+  const cl = state.business.clients.find(function(c){ return c.ghlContactId===cid; }); if(cl) return {kind:'client', x:cl};
+  const ld = state.business.pipeline.find(function(l){ return l.ghlContactId===cid && !l.convertedClientId; }); if(ld) return {kind:'lead', x:ld};
+  return null;
+}
+function ghlCalendarCategory(){
+  const cats = arr(state.calendar.categories);
+  const hit = cats.find(function(c){ return /call|meet|appoint|client/i.test(c.label||''); }) || cats.find(function(c){ return /work/i.test(c.label||'') || c.id==='work'; }) || cats[0];
+  return hit ? hit.id : null;
+}
+async function ghlPullAppointments(g, out){
+  const cals = arr((await ghlCall('GET', '/calendars/?'+ghlQ({locationId:g.locationId}))).calendars);
+  const start = Date.now()-86400000, end = Date.now()+14*86400000;
+  const seen = {};
+  for(const cal of cals.slice(0, 25)){
+    const evs = arr((await ghlCall('GET', '/calendars/events?'+ghlQ({locationId:g.locationId, calendarId:cal.id, startTime:start, endTime:end}))).events);
+    evs.forEach(function(ev){
+      const cancelled = /cancel|invalid|noshow/i.test(ev.appointmentStatus||ev.status||'');
+      let x = state.calendar.events.find(function(e){ return e.ghlEventId===ev.id; });
+      if(cancelled){ if(x) state.calendar.events = state.calendar.events.filter(function(e){ return e!==x; }); return; }
+      const d = new Date(ev.startTime);
+      if(isNaN(d)) return;
+      const rec = ghlRecordForContact(ev.contactId);
+      const fields = {date:todayStr(d), time:pad2(d.getHours())+':'+pad2(d.getMinutes()), title:ev.title || cal.name || 'Appointment',
+        linkedClient: rec ? (rec.kind==='lead' ? 'lead:'+rec.x.id : rec.x.id) : null,
+        meetingLink: /^https?:\/\//.test(ev.address||'') ? ev.address : null};
+      if(!x){ x = Object.assign({id:uid(), categoryId:ghlCalendarCategory(), alarmId:null, ghlEventId:ev.id, source:'ghl'}, fields); state.calendar.events.push(x); }
+      else Object.assign(x, fields);
+      seen[ev.id] = true; out.events++;
+      // a booked call moves a new/contacted lead to the "call booked" stage (if you have one mapped)
+      if(rec && rec.kind==='lead' && (rec.x.stage==='lead' || rec.x.stage==='contacted') && crmStage('lead', 'discovery')){ rec.x.stage = 'discovery'; crmTimeline(rec.x, 'stage', 'Call booked (GoHighLevel)'); }
+    });
+  }
+}
+function ghlTouchType(t){
+  const s = String(t||'').toUpperCase();
+  if(/EMAIL/.test(s)) return 'email';
+  if(/CALL|VOICE/.test(s)) return 'call';
+  if(/FB|INSTAGRAM|IG|WHATSAPP|GMB|LIVE_CHAT|CHAT/.test(s)) return 'dm';
+  return 'text';
+}
+async function ghlPullMessages(g, out, contacts){
+  const r = await ghlCall('GET', '/conversations/search?'+ghlQ({locationId:g.locationId, limit:100, sort:'desc', sortBy:'last_message_date'}));
+  arr(r.conversations).forEach(function(cv){
+    const cid = cv.contactId; if(!cid) return;
+    if(!contacts[cid]) contacts[cid] = {id:cid, name:cv.fullName || cv.contactName || '', email:cv.email || '', phone:cv.phone || ''};
+    if(!/out/i.test(cv.lastMessageDirection||'')) return; // only what you sent counts as you reaching out
+    const at = Number(cv.lastMessageDate) || Date.parse(cv.lastMessageDate) || 0; if(!at) return;
+    let rec = ghlRecordForContact(cid);
+    if(!rec){ ghlLinkClients(contacts, out); rec = ghlRecordForContact(cid); }
+    if(!rec || (rec.x.ghlLastMsgAt && rec.x.ghlLastMsgAt >= at)) return;
+    rec.x.ghlLastMsgAt = at;
+    const date = todayStr(new Date(at));
+    if(!Array.isArray(rec.x.touchpoints)) rec.x.touchpoints = [];
+    rec.x.touchpoints.push({id:uid(), type:ghlTouchType(cv.lastMessageType), date:date, note:'Sent from GoHighLevel', ts:at, via:'ghl'});
+    if(rec.kind==='client'){ if(!Array.isArray(rec.x.touches)) rec.x.touches = []; rec.x.touches.push(date); }
+    if(rec.x.followUp && rec.x.followUp.date && date >= rec.x.followUp.date) rec.x.followUp = null;
+    out.touches++;
+  });
+}
+// moving a linked lead here moves it in GHL too
+function ghlPushStage(x){
+  if(!ghlOn() || !ghlCfg().pushStages || !x || !x.ghlOppId) return;
+  const st = crmStage('lead', x.stage); if(!st) return;
+  let body = null;
+  if(st.kind==='won') body = {status:'won'};
+  else if(st.kind==='lost') body = {status:'lost'};
+  else { const sid = ghlStageFor(x.stage); if(!sid || sid===x.ghlStageId) return; body = {pipelineStageId:sid, pipelineId:ghlCfg().pipelineId}; x.ghlStageId = sid; }
+  ghlCall('PUT', '/opportunities/'+encodeURIComponent(x.ghlOppId), body)
+    .catch(function(e){ showToast('Couldn\'t update GoHighLevel: '+e.message, {icon:'&#9888;', duration:5000}); });
+}
+setInterval(function(){ if(typeof state!=='undefined' && state && state.settings && ghlOn() && ghlCfg().autoSync) ghlSync(false); }, 10*60000);
+setTimeout(function wait(){ if(typeof state!=='undefined' && state && state.settings && state.business && state.business.crm){ if(ghlOn() && ghlCfg().autoSync) ghlSync(false); } else setTimeout(wait, 2000); }, 15000);
+// ---- the settings card ----
+function ghlSettingsHtml(){
+  const g = ghlCfg(), p = ghlPipeline();
+  const ago = g.lastSync ? Math.max(0, Math.round((Date.now()-g.lastSync)/60000)) : null;
+  const toggle = function(k, label){ return '<label class="row" style="gap:8px;font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" data-ghl-toggle="'+k+'" '+(g[k]?'checked':'')+'>'+label+'</label>'; };
+  const head = '<div class="ghl-head"><span class="ghl-logo">GHL</span><div><div class="ghl-title">GoHighLevel</div><div class="kpi-sub">Leads, appointments and messages, in sync with your pipeline.</div></div>'+
+    (g.connected ? '<span class="tag tag-good" style="margin-left:auto;">&#10003; Connected</span>' : '')+'</div>';
+  const err = ui.ghlError ? '<div class="ghl-err">&#9888; '+escapeHtml(ui.ghlError)+'</div>' : '';
+  const busy = ui.ghlBusy ? '<span class="kpi-sub">'+escapeHtml(ui.ghlBusy)+'</span>' : '';
+  if(!g.connected){
+    return '<div class="section"><div class="card ghl-card">'+head+
+      '<ol class="ghl-steps">'+
+        '<li>In GoHighLevel, open the sub-account &rarr; <b>Settings &rarr; Private Integrations</b> &rarr; <b>Create new integration</b>.</li>'+
+        '<li>Give it these scopes: <code>contacts.readonly</code> <code>opportunities.readonly</code> <code>opportunities.write</code> <code>calendars.readonly</code> <code>calendars/events.readonly</code> <code>conversations.readonly</code> <code>locations.readonly</code>.</li>'+
+        '<li>Copy the key it shows you, and your <b>Location ID</b> (Settings &rarr; Business Profile, or the part of the URL after <code>/location/</code>).</li>'+
+      '</ol>'+
+      '<div class="grid grid-2" style="margin-top:12px;">'+
+        '<div class="field"><label>Private Integration key'+tip('Saved on this Mac by the Operator app — not in Operator\'s data, exports or backups.')+'</label><input class="input" type="password" id="ghlKey" placeholder="pit-…" autocomplete="off"></div>'+
+        '<div class="field"><label>Location ID</label><input class="input" id="ghlLoc" value="'+escapeHtml(g.locationId||'')+'" placeholder="e.g. ve9EPM428h8vShlRW1KT" autocomplete="off"></div>'+
+      '</div>'+err+
+      '<div class="row" style="margin-top:12px;justify-content:flex-end;gap:10px;">'+busy+'<button class="btn btn-primary" data-action="ghlConnect"'+(ui.ghlBusy?' disabled':'')+'>Connect</button></div>'+
+    '</div></div>';
+  }
+  return '<div class="section"><div class="card ghl-card">'+head+
+    '<div class="ghl-status">'+(g.lastSync ? 'Last sync '+(ago<1 ? 'just now' : ago<60 ? ago+' min ago' : fmtTimeShort(g.lastSync))+(g.lastResult ? ' &middot; '+escapeHtml(ghlResultLine(g.lastResult)) : '') : 'Not synced yet')+'</div>'+err+
+    '<div class="grid grid-2" style="margin-top:12px;">'+
+      '<div class="field"><label>Pipeline</label><select class="input" id="ghlPipeline">'+g.pipelines.map(function(x){ return '<option value="'+escapeHtml(x.id)+'"'+(x.id===g.pipelineId?' selected':'')+'>'+escapeHtml(x.name)+'</option>'; }).join('')+'</select></div>'+
+      '<div class="field"><label>Location</label><div class="kpi-sub" style="padding:9px 0;">'+escapeHtml(g.locationId)+'</div></div>'+
+    '</div>'+
+    (p ? '<div class="kind-label" style="margin-top:6px;">Stages'+tip('Which of your lead stages each GoHighLevel stage counts as. Moving a lead in either place moves it in the other.')+'</div><div class="ghl-map">'+p.stages.map(function(st){
+      return '<div class="ghl-map-row"><span class="ghl-map-k">'+escapeHtml(st.name)+'</span><span class="kpi-sub">&rarr;</span><select class="input" data-ghl-stage="'+escapeHtml(st.id)+'">'+crmStages('lead').map(function(s){ return '<option value="'+s.id+'"'+(g.stageMap[st.id]===s.id?' selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select></div>';
+    }).join('')+'</div>' : '')+
+    '<div class="ghl-toggles">'+toggle('syncCalendar', 'Bring in appointments (next 2 weeks)')+toggle('syncMessages', 'Count messages you send from GHL as touches')+toggle('pushStages', 'Send stage changes back to GHL')+toggle('autoSync', 'Sync every 10 minutes')+'</div>'+
+    '<div class="row" style="margin-top:14px;justify-content:space-between;gap:10px;">'+
+      '<button class="btn btn-ghost btn-sm" data-action="ghlDisconnect">Disconnect</button>'+
+      '<span class="row" style="gap:10px;">'+busy+'<button class="btn btn-primary" data-action="ghlSyncNow"'+(ui.ghlBusy?' disabled':'')+'>&#128260; Sync now</button></span>'+
+    '</div>'+
+  '</div></div>';
 }
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
@@ -15826,7 +16608,7 @@ document.body.addEventListener('drop', function(e){
   const t = state.tasks.items.find(function(x){ return x.id===taskId; });
   if(!t) return;
   // Nothing starts timing from a drop: onto Now (locked in) it asks first; onto Up next it just lines it up.
-  if(newZone==='current'){ if(state.focus.activeSession){ if(t.status==='backlog'){ t.status = 'today'; persist('tasks'); } stagePendingCurrentTask(taskId); } else { stageNextTask(taskId); } return; }
+  if(newZone==='current'){ if(t.status==='backlog'){ t.status = 'today'; persist('tasks'); } stagePendingCurrentTask(taskId); return; }
   if(newZone==='next'){ dropOnNext(taskId); return; }
   if(newZone==='order'){ const r = zone.getBoundingClientRect(); reorderLineup(taskId, zone.dataset.id, e.clientY > r.top + r.height/2); return; }
   if(t.status===newZone) return;
@@ -16035,8 +16817,12 @@ function contactMenuHtml(kind, x){
 }
 // ---- boards ----
 function boardMenuHtml(elId){
-  if(elId) return '<div class="ctx-title">Card</div>'+ci('bDup', '&#10697; Duplicate')+ci('bFwd', '&#11014; Bring forward')+ci('bBack', '&#11015; Send back')+SEP+ci('bDel', '&#128465; Delete', {cls:'ctx-danger'});
-  return '<div class="ctx-title">Board</div>'+
+  const n = cv.sel.size;
+  const paste = boardClip ? ci('bPaste', '&#128203; Paste '+boardClip.els.length+' card'+(boardClip.els.length===1?'':'s')+' <span class="ctx-kbd">&#8984;V</span>') : '';
+  if(elId) return '<div class="ctx-title">'+(n>1 ? n+' cards' : 'Card')+'</div>'+
+    ci('bCopy', '&#128203; Copy <span class="ctx-kbd">&#8984;C</span>')+ci('bCut', '&#9986; Cut <span class="ctx-kbd">&#8984;X</span>')+ci('bDup', '&#10697; Duplicate')+paste+SEP+
+    ci('bFwd', '&#11014; Bring forward')+ci('bBack', '&#11015; Send back')+SEP+ci('bDel', '&#128465; Delete'+(n>1?' '+n:''), {cls:'ctx-danger'});
+  return '<div class="ctx-title">Board</div>'+paste+
     crow('Add here', chip('bAdd', 'Note', {a:'note'})+chip('bAdd', 'Label', {a:'label'})+chip('bAdd', 'List', {a:'list'}))+
     ci('bBg', '&#127912; Background…')+ci('bFit', '&#9974; Fit everything')+ci('bFull', ui.boardFull ? '&#10530; Exit full screen' : '&#9974; Full screen');
 }
@@ -16064,7 +16850,8 @@ document.addEventListener('contextmenu', function(e){
   const host = t.closest('#boardHost');
   if(host && !cv.view){
     const bel = t.closest('.bel[data-el]');
-    if(bel){ cv.sel = new Set([bel.dataset.el]); drawBoard(); }
+    // right-clicking one of several selected cards keeps them all selected (like the Finder)
+    if(bel && !cv.sel.has(bel.dataset.el)){ cv.sel = new Set([bel.dataset.el]); drawBoard(); }
     const r = host.getBoundingClientRect(), b = cvBoard(), v = b ? b.viewport : {x:0, y:0, zoom:1};
     ctxShow(boardMenuHtml(bel ? bel.dataset.el : null), e.clientX, e.clientY, {x:(e.clientX - r.left - v.x)/v.zoom, y:(e.clientY - r.top - v.y)/v.zoom});
     return;
@@ -16116,6 +16903,9 @@ ACTIONS.ctx = function(el){
   else if(op==='bFit') ACTIONS.boardFit();
   else if(op==='bFull') ACTIONS.boardFullscreen({dataset:{kind:cv.kind}});
   else if(op==='bDup') ACTIONS.boardDuplicate();
+  else if(op==='bCopy') ACTIONS.boardCopySel();
+  else if(op==='bCut') ACTIONS.boardCutSel();
+  else if(op==='bPaste') ACTIONS.boardPasteClip();
   else if(op==='bFwd') ACTIONS.boardForward();
   else if(op==='bBack') ACTIONS.boardBackward();
   else if(op==='bDel') ACTIONS.boardDelete();

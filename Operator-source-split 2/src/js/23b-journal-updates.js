@@ -12,11 +12,23 @@ function updatesTypeId(){
   return hit ? hit.id : null;
 }
 function isUpdateEntry(e){ const id = updatesTypeId(); return !!(id && e && e.mood===id); }
+// Ranges: the latest session (updates posted with less than an hour between them — one sitting
+// of changes), the last hour or two, or by days.
+const UPDATE_SESSION_GAP = 60*60000;
+function updatesRange(){ return ui.updatesRange || 'session'; }
 function updateEntries(){
-  const since = ui.updatesRange==='7' ? addDays(todayStr(), -6) : ui.updatesRange==='30' ? addDays(todayStr(), -29) : null;
+  const r = updatesRange();
+  const since = r==='7' ? addDays(todayStr(), -6) : r==='30' ? addDays(todayStr(), -29) : null;
+  const sinceTs = r==='1h' ? Date.now()-3600000 : r==='2h' ? Date.now()-2*3600000 : null;
   const q = (ui.updatesSearch||'').toLowerCase();
-  return state.journal.entries.filter(function(e){ return isUpdateEntry(e) && (!since || e.date>=since) && (!q || String(e.text||'').toLowerCase().indexOf(q)>=0); })
+  let list = state.journal.entries.filter(function(e){ return isUpdateEntry(e) && (!since || e.date>=since) && (!sinceTs || (e.timestamp||0)>=sinceTs) && (!q || String(e.text||'').toLowerCase().indexOf(q)>=0); })
     .sort(function(a, b){ return b.timestamp-a.timestamp; });
+  if(r==='session' && list.length){
+    let n = 1;
+    while(n < list.length && (list[n-1].timestamp - list[n].timestamp) < UPDATE_SESSION_GAP) n++;
+    list = list.slice(0, n);
+  }
+  return list;
 }
 function updateCopyText(e){ return fmtDateShort(e.date)+(e.timestamp ? ' · '+fmtTimeShort(e.timestamp) : '')+'\n'+(e.text||''); }
 function copyToClipboard(text, what){
@@ -65,11 +77,11 @@ function renderUpdatesTab(){
       '<div class="kpi-sub" style="margin:0 auto 14px;">Which journal type are they filed under?'+tip('Notes about changes to the app live here — each in full, with one-click copy — and stay out of your journal.')+'</div>'+
       '<div class="row" style="justify-content:center;gap:8px;flex-wrap:wrap;">'+picker+'<button class="btn btn-good btn-sm" data-action="createUpdatesType">+ Make an "Updates" type</button></div></div>';
   }
-  const list = updateEntries(), r = ui.updatesRange || 'all';
+  const list = updateEntries(), r = updatesRange();
   const groups = [], byDate = {};
   list.forEach(function(e){ if(!byDate[e.date]){ byDate[e.date] = []; groups.push(e.date); } byDate[e.date].push(e); });
   return '<div class="upd-bar">'+
-      '<div class="seg-tabs" style="margin:0;">'+[['7','7 days'],['30','30 days'],['all','All']].map(function(x){ return '<button class="seg-tab'+(r===x[0]?' active':'')+'" data-action="updatesRange" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>'+
+      '<div class="seg-tabs" style="margin:0;">'+[['session','Latest session'],['1h','Last hour'],['2h','Last 2 hours'],['7','7 days'],['30','30 days'],['all','All']].map(function(x){ return '<button class="seg-tab'+(r===x[0]?' active':'')+'" data-action="updatesRange" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>'+
       '<input class="input" id="updatesSearch" placeholder="Search updates…" value="'+escapeHtml(ui.updatesSearch||'')+'" style="flex:1;min-width:160px;max-width:280px;">'+
       '<span style="flex:1"></span>'+
       '<span class="kpi-sub">'+list.length+' update'+(list.length===1?'':'s')+'</span>'+

@@ -7,7 +7,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   const E = (code) => p.evaluate(c => window.__op.ev(c), code);
   await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="clients"]');
   // pop-ups open at the top even if the previous one was scrolled down
-  await p.click('.cc2[data-key="cc2-c1"] .cc2-top'); await p.waitForTimeout(150);
+  await p.click('.cc2[data-key="cc2-c1"] .cc2-top'); await p.waitForTimeout(150); await p.click('[data-action="clientFlip"][data-id="back"]'); 
   await p.evaluate(()=>{ document.getElementById('clientModalContent').scrollTop = 2000; });
   await p.click('[data-action="closeClientModalAndSave"]'); await p.waitForTimeout(150);
   await p.click('.cc2[data-key="cc2-c2"] .cc2-top'); await p.waitForTimeout(150);
@@ -15,7 +15,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('[data-action="closeClientModalAndSave"]');
   // a client without progress data (older add path) can start a cycle without crashing
   await E("state.business.clients.push({id:'c3', name:'Raw', business:'Raw Co', status:'active', stage:'active', touches:[], deliverables:[], journal:[]}); renderView();");
-  await E("openClientModal('c3')");
+  await E("openClientModal('c3', true)");
   await p.click('#clientModalContent [data-action="lcStartCycle"]');
   check('client without progress data can start a cycle', (await E("!!clientStep(state.business.clients.find(c=>c.id==='c3'))")));
   // switching cycles and back resumes the step

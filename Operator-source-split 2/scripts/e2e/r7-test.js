@@ -59,7 +59,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const p = await newPage(b, OUT+'/r7.html', {profile:{name:'Andre'}, tasks:{items:many}}, NOW);
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await p.click('[data-action="nav"][data-view="focus"]'); await p.waitForTimeout(300);
-    check('not locked in: just Up next, with Lock in on it', await p.isVisible('.nn-next [data-action="nnLockInNext"]') && !(await p.$('.nn-now')));
+    check('not locked in: Up next has Lock in on it', await p.isVisible('.nn-next [data-action="nnLockInNext"]'));
     await p.click('[data-action="nnLockInNext"]'); await p.waitForTimeout(200);
     check('Lock in on it opens the lock-in chooser with that task lined up', (await E("ui.stagedTaskId"))!==null && await p.isVisible('#lockInChooserOverlay:not(.hidden), .overlay:not(.hidden)'));
     await p.context().close();
@@ -131,6 +131,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('updates are kept out of My Journal', (await p.$$('.journal-entry')).length===1);
     check('the journal has no Updates tab — app updates aren\'t part of the everyday journal', !(await p.$('[data-action="journalMode"][data-id="updates"]')));
     await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="updates"]'); await p.waitForTimeout(200);
+    await p.click('[data-action="updatesRange"][data-id="all"]'); await p.waitForTimeout(100);
     check('Settings → App updates lists every update', (await p.$$('.upd-card')).length===2);
     check('…in full, with no Read More', (await p.textContent('.upd-card[data-journal-id="e1"] .upd-text')).length > 300 && !(await p.$('.upd-card [data-action="toggleJournalExpand"]')));
     await p.click('.upd-card[data-journal-id="e1"] [data-action="copyUpdate"]'); await p.waitForTimeout(150);

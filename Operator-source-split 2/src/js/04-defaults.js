@@ -70,7 +70,7 @@ function defaultJournalTypes(){
 }
 function defaultSettings(){
   return { clientCare: { yellowHours:48, redHours:72 }, quickLinks: { businessFilesPath:'', metaAdsUrl:'https://adsmanager.facebook.com', ghlUrl:'https://app.gohighlevel.com', driveUrl:'https://drive.google.com', lastAiUsed:'chatgpt', icons:{} },
-    appTracking: { enabled:true, autoLockIn:true, thresholdMinutes:12, graceMinutes:3, cooldownMinutes:15, idleSeconds:60 } };
+    appTracking: { enabled:true, autoLockIn:true, thresholdMinutes:12, graceMinutes:3, cooldownMinutes:15, idleSeconds:60, awayMinutes:10 } };
 }
 const AI_TOOLS = [
   {id:'chatgpt', emoji:'🤖', label:'ChatGPT', url:'https://chat.openai.com', bg:'#10a37f'},

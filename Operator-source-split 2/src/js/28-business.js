@@ -40,7 +40,7 @@ function renderBusinessOverview(){
       '<div class="hq-mrr">'+
         '<div class="stat-tile-k">Monthly recurring</div>'+
         '<div class="biz-mrr">$'+mrr.toLocaleString()+'</div>'+
-        (goal ? '<div class="biz-bar"><span class="biz-bar-mrr" style="width:'+Math.min(100, mrr/goal*100)+'%"></span>'+(pipe ? '<span class="biz-bar-pipe" style="width:'+Math.max(0, Math.min(100-mrr/goal*100, pipe/goal*100))+'%"></span>' : '')+'</div>'+
+        (goal ? '<div class="biz-bar"><span class="biz-bar-mrr" style="width:'+Math.min(100, mrr/goal*100)+'%"></span>'+(pipe ? '<span class="biz-bar-pipe" style="width:'+Math.max(0, Math.min(100-mrr/goal*100, pipe/goal*100))+'%"></span>' : '')+'<span class="biz-bar-end" title="Goal">'+money(goal)+'</span></div>'+
           '<div class="biz-goal-k">'+Math.round(mrr/goal*100)+'% of '+money(goal)+(pipe ? ' &middot; '+money(pipe)+' in pipeline' : '')+'</div>' : '')+
       '</div>'+
       '<div class="hq-months" title="Collected per month"><div class="biz-mbars">'+months.map(function(m, i){
@@ -349,8 +349,11 @@ function clientCard(c){
     '</div>'+
   '</div>';
 }
-function openClientModal(id){
+// Opens on the card face; Edit flips it over. A client you just added or won opens straight
+// on the back, ready to set up.
+function openClientModal(id, edit){
   ui.showClientModal = id;
+  ui.clientEdit = !!edit;
   ui.pickingPackageForClient = null;
   ui.newClientJournalTag = null;
   ui.newClientJournalDraft = '';
@@ -391,11 +394,13 @@ function setClientLeadSource(id, val){
 function renderClientModal(){
   const c = state.business.clients.find(function(x){return x.id===ui.showClientModal;});
   if(!c) return '';
+  if(!ui.clientEdit) return clientCardFrontHtml(c);
   const deliverables = arr(c.deliverables);
   const pendingCount = deliverables.filter(function(d){return !isDeliverableDoneThisWeek(d);}).length;
   const isActive = c.status==='active';
   const pkg = c.packageId ? arr(state.business.packages).find(function(x){return x.id===c.packageId;}) : null;
-  return '<div class="card" style="margin-bottom:16px;">'+
+  return '<div class="row" style="justify-content:space-between;margin-bottom:10px;"><button class="btn btn-ghost btn-sm" data-action="clientFlip" data-id="front">&larr; Card</button><span class="kpi-sub">Editing</span></div>'+
+    '<div class="card" style="margin-bottom:16px;">'+
       '<div class="row" style="justify-content:space-between;align-items:flex-start;">'+
         '<div class="client-name-edit"><input class="client-name-input" data-client-field="business" data-id="'+c.id+'" value="'+escapeHtml(c.business||'')+'" placeholder="Business name" title="Click to rename">'+
         '<input class="client-contact-input" data-client-field="name" data-id="'+c.id+'" value="'+escapeHtml(c.name||'')+'" placeholder="Contact name"></div>'+
@@ -425,6 +430,56 @@ function renderClientModal(){
       '<button class="btn btn-primary" data-action="closeClientModalAndSave">Done</button>'+
     '</div>';
 }
+// ---- the card face: just the things you glance at ----
+function clientTenureLabel(c){
+  const since = c.startDate || c.createdAt; if(!since) return '—';
+  const d = Math.max(0, daysAgoFrom(since));
+  if(d < 14) return d+' day'+(d===1?'':'s');
+  if(d < 60) return Math.round(d/7)+' weeks';
+  const m = Math.round(d/30.4);
+  return m < 24 ? m+' months' : (Math.round(m/12*10)/10)+' years';
+}
+function clientCardFrontHtml(c){
+  const pkg = c.packageId ? arr(state.business.packages).find(function(x){ return x.id===c.packageId; }) : null;
+  const src = c.leadSource ? LEAD_SOURCES.find(function(s){ return s.id===c.leadSource; }) : null;
+  const delivs = arr(c.deliverables);
+  const recurring = delivs.filter(function(d){ return d.recurring; }), oneOff = delivs.filter(function(d){ return !d.recurring && d.status!=='done'; });
+  const st = crmStage('client', c.stage);
+  return '<div class="cf">'+
+    '<div class="cf-head">'+clientAvatarHtml(c, false, true)+
+      '<div class="cf-names"><div class="cf-biz">'+escapeHtml(c.business||c.name||'Client')+'</div>'+(c.name && c.business ? '<div class="kpi-sub">'+escapeHtml(c.name)+'</div>' : '')+'</div>'+
+      clientHealthTagHtml(c)+
+    '</div>'+
+    '<div class="cf-facts">'+
+      '<div class="cf-fact"><span class="cf-k">Working together</span><span class="cf-v">'+clientTenureLabel(c)+'</span>'+((c.startDate||c.createdAt) ? '<span class="cf-s">since '+fmtDateShort(c.startDate||c.createdAt)+'</span>' : '')+'</div>'+
+      '<div class="cf-fact"><span class="cf-k">How we got them</span><span class="cf-v">'+(src ? src.emoji+' '+escapeHtml(src.label) : '—')+'</span></div>'+
+      '<div class="cf-fact"><span class="cf-k">Monthly</span><span class="cf-v">'+(Number(c.mrr) ? '$'+Number(c.mrr).toLocaleString() : '—')+'</span>'+(st ? '<span class="cf-s">'+escapeHtml(st.label)+'</span>' : '')+'</div>'+
+    '</div>'+
+    '<div class="cf-sec"><div class="cf-sec-k">Plan &amp; deliverables</div>'+
+      '<div class="cf-plan">'+(pkg ? '<span class="cf-plan-name">'+escapeHtml(pkg.name)+'</span>'+(pkg.price ? '<span class="kpi-sub">$'+Number(pkg.price).toLocaleString()+'/mo</span>' : '') : '<span class="kpi-sub">No plan assigned</span>')+'</div>'+
+      (recurring.length || oneOff.length ? '<div class="cf-delivs">'+
+        recurring.map(function(d){
+          const done = deliverableWeekCount(d), need = deliverableWeekNeed(d), pace = deliverablePaceStatus(d);
+          return '<div class="cf-deliv"><span class="cf-deliv-t">'+escapeHtml(d.title)+'</span>'+weekDotsHtml(Math.min(done, need), need, pace)+'<span class="cf-deliv-n" style="color:'+paceColorOf(pace)+'">'+done+'/'+need+' &middot; '+paceWord(pace)+'</span></div>';
+        }).join('')+
+        oneOff.map(function(d){ return '<div class="cf-deliv"><span class="cf-deliv-t">'+escapeHtml(d.title)+'</span><span class="cf-deliv-n kpi-sub">one-off'+(d.dueDate ? ' &middot; due '+fmtDateShort(d.dueDate) : '')+'</span></div>'; }).join('')+
+      '</div>' : '<div class="kpi-sub" style="margin-top:6px;">No deliverables yet.</div>')+
+    '</div>'+
+    '<div class="cf-sec"><div class="cf-sec-k">Notes</div>'+(c.notes ? '<div class="cf-notes">'+escapeHtml(c.notes)+'</div>' : '<div class="kpi-sub">No notes yet — add some on the back of the card.</div>')+'</div>'+
+    '<div class="cf-foot"><button class="btn btn-ghost" data-action="closeClientModalAndSave">Close</button><button class="btn btn-primary" data-action="clientFlip" data-id="back">&#9998; Edit</button></div>'+
+  '</div>';
+}
+ACTIONS.clientFlip = function(el, e, id){
+  if(id==='front'){ // keep what was typed on the back before flipping
+    const c = state.business.clients.find(function(x){ return x.id===ui.showClientModal; });
+    const notesEl = document.getElementById('clientModalNotes'); if(c && notesEl){ c.notes = notesEl.value.trim(); persist('business'); }
+  }
+  ui.clientEdit = id==='back';
+  const box = document.getElementById('clientModalContent');
+  if(box){ box.classList.remove('cm-flip'); void box.offsetWidth; box.classList.add('cm-flip'); }
+  renderClientModalInto();
+  if(box) box.scrollTop = 0;
+};
 function clientBillingCycleFieldHtml(c){
   const todayDay = new Date().getDate();
   const hasMrr = Number(c.mrr)>0;
@@ -804,7 +859,7 @@ function advanceStage(id){
   }
   persist('business');
   if(newClientId){
-    openClientModal(newClientId);
+    openClientModal(newClientId, true);
     ui.pickingPackageForClient = newClientId;
     renderClientModalInto();
   } else {

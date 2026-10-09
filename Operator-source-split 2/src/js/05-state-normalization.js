@@ -20,7 +20,7 @@ let state = {
   boards: defaultBoards()
 };
 let ui = {
-  view:'today', healthTab:'workouts', businessTab:'overview', personalTab:'goals', focusTab:'overview', settingsTab:'general',
+  view:'today', healthTab:'workouts', businessTab:'overview', personalTab:'goals', focusTab:'overview', settingsTab:'you',
   forms:{task:false, client:false, prospect:false, breakForm:false},
   pendingFocusMinutes: null,
   focusOpenEnded: false,

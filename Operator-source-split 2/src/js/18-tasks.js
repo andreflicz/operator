@@ -353,11 +353,11 @@ function pullSpecificFromBacklog(id){
   playTaskAdded();
   persist('tasks'); renderView();
 }
-function accumulateCurrentTaskTime(taskId){
+function accumulateCurrentTaskTime(taskId, endAt){
   if(ui.currentTaskId!==taskId || !ui.currentTaskStartedAt) return;
   const t=state.tasks.items.find(function(x){return x.id===taskId;});
   if(t){
-    const now = Date.now();
+    const now = Math.max(ui.currentTaskStartedAt, Math.min(Date.now(), endAt || Date.now()));
     const mins = Math.max(0, Math.round((now-ui.currentTaskStartedAt)/60000));
     t.trackedMinutes = (t.trackedMinutes||0) + mins;
     // Timing log per task, so analytics can say what each session was spent on and

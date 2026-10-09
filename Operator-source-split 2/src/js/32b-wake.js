@@ -223,6 +223,7 @@ function fireWake(opts){
   opts = opts || {};
   const w = wakeCfg();
   wakeRing = {startedAt:Date.now(), test:!!opts.test, snoozed:!!opts.snoozed, mediaFailed:false};
+  ui.wakeMode = 'ring'; ui.wakeBoardBig = false;
   closeOtherOverlaysForWake();
   showOverlay('wakeOverlay');
   renderWakeOverlayInto();
@@ -242,15 +243,27 @@ function stopWakeRing(){
   wakeRing = null;
   hideOverlay('wakeOverlay');
 }
+// "I'm up" stops the alarm and turns the screen into the morning briefing — the day ahead,
+// yesterday in numbers, the goals — then Lock in or Let's go takes you into the day.
 function wakeImUp(){
   const wasTest = wakeRing && wakeRing.test;
-  stopWakeRing();
+  clearInterval(wakeBeepTimer); wakeBeepTimer = null;
+  stopWakeMedia(false);
+  wakeRing = null;
   if(!wasTest && state.modes.active && state.modes.active.sleep) finishActiveMode(true);
-  if(!wasTest){ ui.view = 'today'; }
+  ui.wakeMode = 'brief'; ui.wakeBriefTest = !!wasTest; ui.wakeBoardBig = false;
   playPositive();
-  renderView();
-  showToast(wasTest ? 'Test done — that\'s how your mornings will look.' : 'Good morning. Let\'s get it.', {icon:'&#9728;&#65039;'});
+  renderWakeOverlayInto();
 }
+function endBriefing(){
+  ui.wakeMode = null;
+  hideOverlay('wakeOverlay');
+  ui.view = 'today';
+  renderView();
+}
+ACTIONS.wakeBriefDone = function(){ const t = ui.wakeBriefTest; endBriefing(); showToast(t ? 'Test done — that\'s how your mornings will look.' : 'Let\'s get it.', {icon:'&#9728;&#65039;'}); };
+ACTIONS.wakeBriefLockIn = function(el, e, id){ endBriefing(); if(id) setNextUp(id); renderView(); openLockInChooser(); };
+ACTIONS.wakeBoardToggle = function(){ ui.wakeBoardBig = !ui.wakeBoardBig; renderWakeOverlayInto(); };
 function wakeSnooze(){
   const mins = wakeCfg().snoozeMinutes||9;
   const test = wakeRing && wakeRing.test;
@@ -264,48 +277,83 @@ ACTIONS.wakeSnooze = function(){ wakeSnooze(); };
 ACTIONS.wakePlayMusic = function(){ const w = wakeCfg(); if(w.media) playWakeMedia(w.media, function(){ showToast('Couldn\'t play that — try uploading the song file instead.', {icon:'&#9888;'}); }); clearInterval(wakeBeepTimer); if(wakeRing){ wakeRing.mediaFailed = false; renderWakeOverlayInto(); } };
 function wakeGreeting(){ const h = new Date().getHours(); return h<5 ? 'Still up' : h<12 ? 'Good morning' : h<18 ? 'Good afternoon' : 'Good evening'; }
 function upcomingNightPlan(){ const np = state.focus.nightPlan; return (np && np.date>=todayStr()) ? np : null; }
-function renderWakeScreen(){
-  const ringing = true, mode = 'ring';
-  const today = todayStr();
-  const b = masterVisionBoard();
-  const np = upcomingNightPlan();
-  const planTasks = np ? arr(np.taskIds).map(function(id){ return state.tasks.items.find(function(t){ return t.id===id; }); }).filter(Boolean) : [];
-  const todayTasks = planTasks.length ? planTasks : state.tasks.items.filter(function(t){ return t.status==='today'; }).slice(0, 6);
+function wakeTodayPlan(){
+  const np = upcomingNightPlan(), today = todayStr();
+  const planTasks = np && np.date===today ? arr(np.taskIds).map(function(id){ return state.tasks.items.find(function(t){ return t.id===id; }); }).filter(Boolean) : [];
+  const tasks = planTasks.length ? planTasks : lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today'; }));
+  return {note: np && np.date===today ? np.note : '', tasks: tasks.filter(function(t){ return t.status!=='done'; }).slice(0, 6)};
+}
+function wakeWeatherLine(){
+  const now = typeof wxNow==='function' ? wxNow() : null;
+  return now ? wxIcon(wxKind(now.code), skyPhase())+' '+now.temp+'&deg; '+escapeHtml(wxLabel(now.code).toLowerCase())+(now.hi!=null ? ' &middot; high '+now.hi+'&deg;' : '') : '';
+}
+function wakeRingHtml(){
+  const w = wakeCfg(), b = masterVisionBoard();
+  const playing = w.media && !(wakeRing && wakeRing.mediaFailed);
+  return '<div class="wk2'+(ui.wakeBoardBig?' board-open':'')+'" data-sky="'+skyPhase()+'">'+
+    '<div class="wk2-aura"><i></i><i></i><i></i></div>'+
+    '<div class="wk2-center">'+
+      '<div class="wk2-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test ? ' <span class="tag">TEST</span>' : '')+'</div>'+
+      '<div class="wk2-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+'</div>'+
+      '<div class="wk2-date">'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div>'+
+      '<div class="wk2-actions">'+
+        '<button class="wk2-up" data-action="wakeImUp"><span>&#9728;&#65039; I\'m up</span></button>'+
+        '<button class="wk2-snooze" data-action="wakeSnooze">Snooze '+(w.snoozeMinutes||9)+' min</button>'+
+      '</div>'+
+      (w.media ? '<div class="wk2-music'+(playing?' is-playing':'')+'">'+
+          (playing ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '')+
+          '<span class="wk2-song">'+escapeHtml(mediaName(w.media))+'</span><span class="wk2-src">'+escapeHtml(mediaKindLabel(w.media))+'</span>'+
+          (wakeRing && wakeRing.mediaFailed ? '<button class="btn btn-good btn-sm" data-action="wakePlayMusic">&#9654; Play</button>' : '')+
+        '</div>' : '')+
+    '</div>'+
+    (b && b.elements.length
+      ? '<div class="wk2-vision" data-action="wakeBoardToggle" title="'+(ui.wakeBoardBig?'Close':'Open your vision board')+'">'+(ui.wakeBoardBig ? '<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button>' : '<span class="wk2-vision-k">&#127775; Vision board</span>')+boardStaticHtml(b, 'wake-board')+'</div>'
+      : '')+
+  '</div>';
+}
+function wakeBriefHtml(){
+  const today = todayStr(), y = addDays(today, -1);
+  const yDeep = deepWorkMinutesFor(y), target = state.standards.deepWorkTargetMinutes || 180;
+  const yDone = state.tasks.items.filter(function(t){ return t.completedAt===y; }).length;
+  const yWork = typeof workoutDay==='function' ? workoutDay(y) : {n:0, m:0};
+  const yStd = dayStandardsComplete(y);
+  const plan = wakeTodayPlan();
   const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a,c){ return (a.time||'').localeCompare(c.time||''); });
   const deadlines = state.tasks.items.filter(function(t){ return t.deadline===today && t.status!=='done'; });
   const why = arr(state.focus.motivations && state.focus.motivations.toward).slice(0, 3);
-  const nw = nextWake();
-  const card = function(title, body){ return body ? '<div class="wake-card"><div class="wake-card-title">'+title+'</div>'+body+'</div>' : ''; };
-  const planBody = (np && np.note ? '<div class="wake-note">'+escapeHtml(np.note)+'</div>' : '')+
-    (todayTasks.length ? '<div class="wake-list">'+todayTasks.map(function(t){ return '<div class="wake-li'+(t.status==='done'?' is-done':'')+'">'+(t.status==='done'?'&#10003;':'&#9675;')+' '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '');
-  const agendaBody = (events.length || deadlines.length) ? '<div class="wake-list">'+
-      events.map(function(e){ return '<div class="wake-li"><span class="wake-time">'+(e.time?fmt12Hour(e.time):'All day')+'</span> '+escapeHtml(e.title)+(e.location?' <span class="kpi-sub">&#128205; '+escapeHtml(e.location)+'</span>':'')+'</div>'; }).join('')+
-      deadlines.map(function(t){ return '<div class="wake-li"><span class="wake-time" style="color:var(--danger);">Due'+(t.deadlineTime?' '+fmt12Hour(t.deadlineTime):'')+'</span> '+escapeHtml(t.title)+'</div>'; }).join('')+
-    '</div>' : '';
-  const whyBody = why.length ? '<div class="wake-list">'+why.map(function(m){ return '<div class="wake-li">&rarr; '+escapeHtml(m.text)+'</div>'; }).join('')+'</div>' : '';
-  const w = wakeCfg();
-  return '<div class="wake-screen is-ringing">'+
-    '<div class="wake-left">'+
-      '<div class="wake-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test && mode==='ring' ? ' <span class="tag">TEST</span>' : '')+'</div>'+
-      '<div class="wake-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+'</div>'+
-      '<div class="wake-date">'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+'</div>'+
-      (ringing ? '<div class="wake-actions">'+
-          '<button class="btn wake-up-btn" data-action="wakeImUp">&#9728;&#65039; I\'m up</button>'+
-          '<button class="btn btn-ghost wake-snooze-btn" data-action="wakeSnooze">Snooze '+(w.snoozeMinutes||9)+' min</button>'+
-        '</div>'+
-        (w.media ? '<div class="wake-music">'+(wakeRing && wakeRing.mediaFailed ? '<button class="btn btn-good btn-sm" data-action="wakePlayMusic">&#9654; Play '+escapeHtml(mediaName(w.media))+'</button>' : '&#9835; '+escapeHtml(mediaName(w.media))+' <span class="kpi-sub">'+escapeHtml(mediaKindLabel(w.media))+'</span>')+'</div>' : '')
-        : '<div class="wake-next">'+(nw ? '&#9200; Wake-up '+fmt12Hour(nw.time)+' '+morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts) : '&#9200; No wake-up alarm set')+'</div>')+
-      '<div class="wake-cards">'+
-        card(np && np.date===today ? 'Last night\'s plan' : np ? 'Plan for '+morningLabel(np.date) : 'Today', planBody)+
-        card('On the calendar', agendaBody)+
-        card('Why you\'re doing this', whyBody)+
+  const goals = typeof masterGoalDefs==='function' ? masterGoalDefs() : [];
+  const first = plan.tasks[0];
+  let d = 0; const step = function(){ d += 90; return ' style="animation-delay:'+d+'ms"'; };
+  const stat = function(v, k, good){ return '<div class="br-stat'+(good?' is-good':'')+'"><div class="br-stat-v">'+v+'</div><div class="br-stat-k">'+k+'</div></div>'; };
+  return '<div class="brief">'+
+    '<div class="brief-grid-bg"></div>'+
+    '<div class="brief-inner">'+
+      '<div class="brief-top"'+step()+'><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>Morning briefing</span><span class="brief-sys">All systems go</span></div>'+
+      '<h1 class="brief-hello"'+step()+'>'+wakeGreeting()+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
+      '<div class="brief-sub"'+step()+'>'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+' &middot; '+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div>'+
+      '<div class="brief-cols">'+
+        '<section class="br-card"'+step()+'><div class="br-k">Yesterday</div><div class="br-stats">'+
+          stat(fmtHours(yDeep), 'deep work', yDeep>=target)+stat(yDone, 'tasks done')+stat(yWork.n ? yWork.n+(yWork.m?' &middot; '+fmtDurationLabel(yWork.m):'') : '—', 'workouts', yWork.n>0)+stat(computeStreak()+'d', 'streak', yStd)+
+        '</div><div class="br-line">'+(yStd ? '&#10003; You hit the standard — keep the run going.' : yDeep ? 'Short of the standard. Today\'s a clean slate.' : 'No deep work logged. Today we change that.')+'</div></section>'+
+        '<section class="br-card br-today"'+step()+'><div class="br-k">Today\'s plan</div>'+
+          (plan.note ? '<div class="br-note">'+escapeHtml(plan.note)+'</div>' : '')+
+          (plan.tasks.length ? '<ol class="br-list">'+plan.tasks.map(function(t, i){ return '<li'+(i===0?' class="is-first"':'')+'>'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span>'+(i===0?'<em>first up</em>':'')+'</li>'; }).join('')+'</ol>' : '<div class="br-line">Nothing lined up yet — pick your first move.</div>')+
+          ((events.length || deadlines.length) ? '<div class="br-k" style="margin-top:12px;">On the calendar</div><div class="br-agenda">'+
+            events.map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('')+
+            deadlines.map(function(t){ return '<div><b class="is-due">Due'+(t.deadlineTime ? ' '+fmt12Hour(t.deadlineTime) : '')+'</b> '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '')+
+        '</section>'+
+        '<section class="br-card"'+step()+'><div class="br-k">Goals</div><div class="br-goals">'+
+          goals.map(function(m){ const pct = masterPct(m); return '<div class="br-goal" style="--mg1:'+m.color+';--mg2:'+m.color2+';"><span class="br-goal-k">'+m.icon+' '+m.label+'</span><span class="br-goal-v">'+(m.cur==null ? '—' : m.fmt(m.cur))+'</span><span class="br-goal-bar"><i style="width:'+pct.toFixed(0)+'%"></i></span></div>'; }).join('')+
+        '</div>'+(why.length ? '<div class="br-k" style="margin-top:12px;">Why</div><div class="br-why">'+why.map(function(m){ return '<span>'+escapeHtml(m.text)+'</span>'; }).join('')+'</div>' : '')+'</section>'+
       '</div>'+
-    '</div>'+
-    '<div class="wake-right">'+
-      (b && b.elements.length ? boardStaticHtml(b, 'wake-board') : '<div class="wake-board-empty"><div style="font-size:30px;">&#127775;</div><div>Your vision board shows up here.</div><div class="kpi-sub">Journal &rarr; Boards</div></div>')+
+      '<div class="brief-cta"'+step()+'>'+
+        (first ? '<button class="brief-go" data-action="wakeBriefLockIn" data-id="'+first.id+'">&#128274; Lock in on &ldquo;'+escapeHtml(first.title)+'&rdquo;</button>' : '<button class="brief-go" data-action="wakeBriefLockIn">&#128274; Lock in</button>')+
+        '<button class="brief-later" data-action="wakeBriefDone">Let\'s go &rarr;</button>'+
+      '</div>'+
     '</div>'+
   '</div>';
 }
+function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : wakeRingHtml(); }
 function renderWakeOverlayInto(){
   const el = document.getElementById('wakeContent'); if(!el) return;
   morphInto(el, renderWakeScreen());

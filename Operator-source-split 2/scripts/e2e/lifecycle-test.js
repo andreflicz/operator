@@ -73,7 +73,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('[data-action="closeClientModalAndSave"]');
   // put existing client Nina into the Retainer cycle from her page
   await p.click('[data-action="businessTab"][data-tab="clients"]');
-  await p.click('.cc2[data-key="cc2-c1"] .cc2-top');
+  await p.click('.cc2[data-key="cc2-c1"] .cc2-top'); await p.click('[data-action="clientFlip"][data-id="back"]'); 
   await p.selectOption('[data-cycle-assign="c1"]', await E("cycles().find(c=>c.name==='Retainer client').id"));
   check('assign cycle from client page', (await E("clientStep(state.business.clients[0]).label"))==='Onboarding');
   await p.click('[data-action="closeClientModalAndSave"]');
@@ -100,7 +100,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Client Next Steps lists cycle items', await p.isVisible('.hub-card[data-key="hub-c1"] .hub-step .lc-item'));
   await p.screenshot({path:OUT+'/cy-today.png'});
   await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="clients"]');
-  await p.click('.cc2[data-key="cc2-c1"] .cc2-top'); await p.waitForTimeout(300);
+  await p.click('.cc2[data-key="cc2-c1"] .cc2-top'); await p.waitForTimeout(300); await p.click('[data-action="clientFlip"][data-id="back"]'); 
   await p.screenshot({path:OUT+'/cy-client.png'});
   await p.click('[data-action="closeClientModalAndSave"]');
   await p.click('[data-action="businessTab"][data-tab="lifecycle"]');

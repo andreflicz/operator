@@ -197,6 +197,59 @@ serve_wake() {
   done
 }
 
+# --- GoHighLevel bridge -----------------------------------------------------
+# The page can't call GoHighLevel itself (browsers block it), so it asks this tiny
+# loopback-only server on 127.0.0.1:8936, which makes the call with curl and hands the
+# answer back. Your Private Integration key is saved in a file only you can read
+# ($DATA_DIR/ghl.key, permissions 600) — it never goes into the app's data or exports.
+#   /ghl/save?t=<hex key>   store the key        /ghl/forget   delete it
+#   /ghl/status             is a key saved?
+#   /ghl/api?m=GET|PUT|POST&p=<hex path>[&b=<hex json body>]   call the GHL API (v2)
+GHL_PORT=8936
+GHL_KEY_FILE="$DATA_DIR/ghl.key"
+ghl_hexdec() { printf '%b' "$(printf '%s' "$1" | sed 's/../\\x&/g')"; }
+ghl_param() { printf '%s' "$2" | sed -n "s/.*[?&]$1=\([0-9a-zA-Z]*\).*/\1/p"; }
+ghl_respond() {
+  IFS= read -r REQ_LINE
+  REQ_PATH=$(printf '%s' "$REQ_LINE" | awk '{print $2}')
+  CODE=400; BODY='{"error":"bad request"}'
+  case "$REQ_PATH" in
+    /ghl/save*)
+      T=$(ghl_hexdec "$(ghl_param t "$REQ_PATH")")
+      if [ -n "$T" ]; then ( umask 077; printf '%s' "$T" > "$GHL_KEY_FILE" ); chmod 600 "$GHL_KEY_FILE" 2>/dev/null; CODE=200; BODY='{"ok":true}'; fi ;;
+    /ghl/forget*)
+      rm -f "$GHL_KEY_FILE"; CODE=200; BODY='{"ok":true}' ;;
+    /ghl/status*)
+      CODE=200; if [ -s "$GHL_KEY_FILE" ]; then BODY='{"ok":true,"hasKey":true}'; else BODY='{"ok":true,"hasKey":false}'; fi ;;
+    /ghl/api*)
+      M=$(ghl_param m "$REQ_PATH"); P=$(ghl_hexdec "$(ghl_param p "$REQ_PATH")"); B=$(ghl_hexdec "$(ghl_param b "$REQ_PATH")")
+      case "$M" in GET|PUT|POST) ;; *) M=GET ;; esac
+      case "$P" in
+        /contacts*|/opportunities*|/calendars*|/conversations*|/locations*|/users*)
+          if [ ! -s "$GHL_KEY_FILE" ]; then CODE=401; BODY='{"error":"no key saved"}'
+          else
+            OUT=$(curl -sS --max-time 25 -X "$M" \
+              -H "Authorization: Bearer $(cat "$GHL_KEY_FILE")" -H "Version: 2021-07-28" -H "Accept: application/json" \
+              ${B:+-H "Content-Type: application/json" --data "$B"} \
+              -w '\n%{http_code}' "https://services.leadconnectorhq.com$P" 2>&1)
+            CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
+            case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":"could not reach GoHighLevel"}' ;; esac
+            [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach GoHighLevel"}'; }
+          fi ;;
+        *) CODE=403; BODY='{"error":"path not allowed"}' ;;
+      esac ;;
+  esac
+  LEN=$(printf '%s' "$BODY" | wc -c | tr -d ' ')
+  printf 'HTTP/1.1 %s OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: %s\r\nConnection: close\r\n\r\n%s' "$CODE" "$LEN" "$BODY"
+}
+serve_ghl() {
+  GHL_FIFO="$DATA_DIR/ghl.fifo"
+  rm -f "$GHL_FIFO"; mkfifo "$GHL_FIFO" 2>/dev/null || return
+  while true; do
+    cat "$GHL_FIFO" | nc -l 127.0.0.1 "$GHL_PORT" 2>/dev/null | ghl_respond > "$GHL_FIFO"
+  done
+}
+
 POLL_PID=""
 SERVE_PID=""
 if command -v osascript >/dev/null 2>&1 && command -v nc >/dev/null 2>&1; then
@@ -234,6 +287,11 @@ if command -v osascript >/dev/null 2>&1 && command -v nc >/dev/null 2>&1; then
   serve_wake &
   WAKE_PID=$!
 fi
+GHL_PID=""
+if command -v nc >/dev/null 2>&1 && command -v curl >/dev/null 2>&1 && command -v mkfifo >/dev/null 2>&1; then
+  serve_ghl &
+  GHL_PID=$!
+fi
 # Keep the Mac from idle-sleeping while Operator is open (the display can still turn
 # off), so a morning alarm can fire. Closing the lid on battery still sleeps.
 if command -v caffeinate >/dev/null 2>&1; then
@@ -246,6 +304,8 @@ cleanup() {
   [ -n "$POLL_PID" ] && kill "$POLL_PID" 2>/dev/null
   [ -n "$SERVE_PID" ] && kill "$SERVE_PID" 2>/dev/null
   [ -n "$WAKE_PID" ] && kill "$WAKE_PID" 2>/dev/null
+  [ -n "$GHL_PID" ] && kill "$GHL_PID" 2>/dev/null
+  rm -f "$DATA_DIR/ghl.fifo" 2>/dev/null
   [ -n "$CAFF_PID" ] && kill "$CAFF_PID" 2>/dev/null
 }
 trap cleanup EXIT

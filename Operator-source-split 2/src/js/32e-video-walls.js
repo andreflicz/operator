@@ -3,8 +3,9 @@
 // Real footage as the background — a space flyover, Tokyo at night, a rainy skyline — like a live
 // wallpaper. Add your own clips (any .mp4/.mov/.webm, e.g. free 4K loops from Pexels or Mixkit) or a
 // direct video link. Files stay on this Mac in IndexedDB under their own "vidb:" key, so they never
-// bloat the JSON backup. The video plays muted on a loop behind a soft veil (so text stays readable)
-// and pauses whenever Operator isn't the window in front, so it costs nothing while you're elsewhere.
+// bloat the JSON backup. The video plays by itself — muted, on a loop, behind a soft veil so text
+// stays readable — whenever the window is on screen, and stops when it's minimized or hidden
+// (optionally also whenever Operator isn't the window in front, to save battery).
 function videoWalls(){ return arr(state.profile.videoWalls); }
 function videoWallById(id){ return videoWalls().find(function(v){ return v.id===id; }) || null; }
 const VW = {wrap:null, video:null, id:null, url:null};
@@ -28,8 +29,11 @@ function videoWallMount(id){
   if(!VW.wrap){
     VW.wrap = document.createElement('div'); VW.wrap.className = 'scene-layer scene-video-wrap'; VW.wrap.id = 'sceneVideoWrap';
     VW.video = document.createElement('video'); VW.video.className = 'scene-video';
-    VW.video.muted = true; VW.video.loop = true; VW.video.playsInline = true; VW.video.setAttribute('muted', ''); VW.video.setAttribute('playsinline', ''); VW.video.preload = 'auto';
+    VW.video.muted = true; VW.video.defaultMuted = true; VW.video.loop = true; VW.video.autoplay = true; VW.video.playsInline = true;
+    VW.video.setAttribute('muted', ''); VW.video.setAttribute('playsinline', ''); VW.video.setAttribute('autoplay', ''); VW.video.preload = 'auto';
     VW.video.addEventListener('playing', function(){ VW.wrap && VW.wrap.classList.add('is-ready'); });
+    // start the moment there's enough to play, and pick back up if the stream hiccups or ends
+    ['canplay', 'stalled', 'suspend', 'ended'].forEach(function(ev){ VW.video.addEventListener(ev, function(){ if(VW.video && VW.video.paused) videoWallPlayPause(); }); });
     VW.wrap.appendChild(VW.video);
     document.body.insertBefore(VW.wrap, document.body.firstChild);
   }
@@ -44,10 +48,14 @@ function videoWallMount(id){
     videoWallPlayPause();
   });
 }
-function videoWallShouldPlay(){ return !document.hidden && (document.hasFocus() || state.profile.videoWallAlwaysPlay===true); }
+function videoWallShouldPlay(){ return !document.hidden && (state.profile.videoWallPauseBehind!==true || document.hasFocus()); }
 function videoWallPlayPause(){
   if(!VW.video || !VW.video.src) return;
-  if(videoWallShouldPlay()){ const p = VW.video.play(); if(p && p.catch) p.catch(function(){}); }
+  if(videoWallShouldPlay()){
+    const p = VW.video.play();
+    // if the browser holds playback back, retry on the next interaction with the window
+    if(p && p.catch) p.catch(function(){ const go = function(){ document.removeEventListener('pointerdown', go, true); document.removeEventListener('keydown', go, true); videoWallPlayPause(); }; document.addEventListener('pointerdown', go, true); document.addEventListener('keydown', go, true); });
+  }
   else VW.video.pause();
 }
 window.addEventListener('focus', videoWallPlayPause);
@@ -87,7 +95,7 @@ async function addVideoWallFile(file){
   const v = {id:uid(), name:videoWallName(file.name), src:'vidb:'+key, thumb:thumb, size:file.size};
   state.profile.videoWalls = videoWalls().concat([v]);
   setScene('vid:'+v.id);
-  showToast('Video wallpaper on — it pauses whenever Operator isn\'t in front.', {icon:'&#127902;'});
+  showToast('Video wallpaper on.', {icon:'&#127902;'});
 }
 async function addVideoWallUrl(raw){
   const url = String(raw||'').trim();
@@ -113,7 +121,7 @@ ACTIONS.videoWallRemove = function(el, e, id){
 document.addEventListener('change', function(e){
   const t = e.target;
   if(t && t.id==='videoWallFile' && t.files && t.files[0]){ addVideoWallFile(t.files[0]); t.value = ''; }
-  else if(t && t.id==='videoWallAlways'){ state.profile.videoWallAlwaysPlay = t.checked; persist('profile'); videoWallPlayPause(); }
+  else if(t && t.id==='videoWallPauseBehind'){ state.profile.videoWallPauseBehind = t.checked; persist('profile'); videoWallPlayPause(); }
 });
 document.addEventListener('keydown', function(e){ if(e.key==='Enter' && e.target && e.target.id==='videoWallUrl'){ e.preventDefault(); ACTIONS.videoWallAddUrl(); } });
 // ---- picker (inside Settings → Display → Scene) ----
@@ -132,6 +140,6 @@ function videoWallAddHtml(){
     '<button class="btn btn-ghost btn-sm" data-action="videoWallLink">&#128279; From a link</button>'+
     '<input type="file" id="videoWallFile" accept="video/*" hidden>'+
     (ui.videoWallLink ? '<div class="row vw-link"><input class="input" id="videoWallUrl" placeholder="https://…/clip.mp4" style="flex:1;min-width:220px;"><button class="btn btn-sm" data-action="videoWallAddUrl">Add</button></div>' : '')+
-    (sceneId().indexOf('vid:')===0 ? '<label class="row" style="gap:8px;width:100%;font-size:12.5px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="videoWallAlways" '+(state.profile.videoWallAlwaysPlay===true?'checked':'')+'>Keep playing when Operator isn\'t in front (uses more battery)</label>' : '')+
+    (sceneId().indexOf('vid:')===0 ? '<label class="row" style="gap:8px;width:100%;font-size:12.5px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="videoWallPauseBehind" '+(state.profile.videoWallPauseBehind===true?'checked':'')+'>Pause when Operator isn\'t the window in front (saves battery)</label>' : '')+
   '</div>';
 }

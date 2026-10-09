@@ -435,7 +435,7 @@ document.body.addEventListener('drop', function(e){
   const t = state.tasks.items.find(function(x){ return x.id===taskId; });
   if(!t) return;
   // Nothing starts timing from a drop: onto Now (locked in) it asks first; onto Up next it just lines it up.
-  if(newZone==='current'){ if(state.focus.activeSession){ if(t.status==='backlog'){ t.status = 'today'; persist('tasks'); } stagePendingCurrentTask(taskId); } else { stageNextTask(taskId); } return; }
+  if(newZone==='current'){ if(t.status==='backlog'){ t.status = 'today'; persist('tasks'); } stagePendingCurrentTask(taskId); return; }
   if(newZone==='next'){ dropOnNext(taskId); return; }
   if(newZone==='order'){ const r = zone.getBoundingClientRect(); reorderLineup(taskId, zone.dataset.id, e.clientY > r.top + r.height/2); return; }
   if(t.status===newZone) return;

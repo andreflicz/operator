@@ -190,6 +190,7 @@ function setStage(kind, id, stageId, opts){
   if(kind==='lead'){ if(!Array.isArray(x.stageHistory)) x.stageHistory=[]; x.stageHistory.push(x.stage); }
   x.stage = stageId;
   crmTimeline(x, 'stage', (from?from.label:'—')+' → '+st.label);
+  if(kind==='lead' && typeof ghlPushStage==='function') ghlPushStage(x);
   if(kind==='client'){ syncClientStatus(x); if(!x.lifecycle) x.lifecycle = {checks:{}, enteredAt:{}}; x.lifecycle.enteredAt[stageId] = Date.now(); }
   let newClientId = null;
   if(kind==='lead' && st.kind==='won' && !x.convertedClientId){ newClientId = convertProspectToClient(x); playSessionComplete(); }
@@ -201,7 +202,7 @@ function setStage(kind, id, stageId, opts){
   }
   renderView(); rerenderContactModal();
 }
-ACTIONS.openConvertedClient = function(){ if(ui.lastConvertedClientId){ hideOverlay('contactOverlay'); openClientModal(ui.lastConvertedClientId); } };
+ACTIONS.openConvertedClient = function(){ if(ui.lastConvertedClientId){ hideOverlay('contactOverlay'); openClientModal(ui.lastConvertedClientId, true); } };
 document.addEventListener('change', function(e){
   const t = e.target; if(!t || !t.dataset) return;
   if(t.dataset.crmStage){ const p = t.dataset.crmStage.split(':'); setStage(p[0], p[1], t.value); }
@@ -532,7 +533,7 @@ ACTIONS.markLeadWon = function(el, e, id){
   const won = crmStages('lead').find(function(s){ return s.kind==='won'; });
   hideOverlay('contactOverlay');
   setStage('lead', id, won.id);
-  if(p.convertedClientId) openClientModal(p.convertedClientId);
+  if(p.convertedClientId) openClientModal(p.convertedClientId, true);
 };
 ACTIONS.markLeadLost = function(el, e, id){ const p = crmFind('lead', id); if(p) saveLeadFields(p); hideOverlay('contactOverlay'); openLostReason(id); };
 let lastDeletedContact = null;
@@ -749,7 +750,7 @@ ACTIONS.saveNewContact = function(){
   hideOverlay('newContactOverlay');
   playPositive(); persist('business'); renderView();
   // a new client opens straight onto their first lifecycle step
-  if(kind==='client') openClientModal(base.id);
+  if(kind==='client') openClientModal(base.id, true);
 };
 // ---- daily touch reminder ----
 let lastTouchReminderDay = null;

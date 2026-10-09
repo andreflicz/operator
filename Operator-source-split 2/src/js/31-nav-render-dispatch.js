@@ -17,7 +17,8 @@ function renderView(){
   try{ renderViewInner(); } finally { RC = null; }
 }
 function renderViewInner(){
-  if(ui.currentTaskId && (!state.focus.activeSession || state.focus.activeSession.onBreak)){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
+  // a task can be timed without locking in (Now on Focus → Tasks); a break still pauses it
+  if(ui.currentTaskId && state.focus.activeSession && state.focus.activeSession.onBreak){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   const root = document.getElementById('viewRoot');
   let html = '';
   switch(ui.view){

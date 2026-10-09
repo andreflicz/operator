@@ -11,10 +11,9 @@ function renderSettings(){
   const saveBtn = '<button class="btn btn-primary section" data-action="saveProfile">Save Changes</button>';
 
   const sections = {
+    integrations: ghlSettingsHtml(),
     updates: '<div class="upd-panel">'+renderUpdatesTab()+'</div>',
-    general: '<div class="card section"><div class="section-title">Personal Info</div><div class="grid grid-2">'+
-        '<div class="field"><label>Name</label><input class="input" id="setName" value="'+escapeHtml(p.name)+'"></div>'+
-        '<div class="field"><label>Business name</label><input class="input" id="setBusinessName" value="'+escapeHtml(p.businessName||'')+'" placeholder="e.g. Rivera Media Co."></div>'+
+    general: '<div class="card section"><div class="section-title">Preferences</div><div class="grid grid-2">'+
         '<div class="field"><label>Sound effects</label><select class="input" id="setSound"><option value="on" '+(p.soundEnabled!==false?'selected':'')+'>On</option><option value="off" '+(p.soundEnabled===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Note field after finishing a task in Focus</label><select class="input" id="setFocusNote"><option value="on" '+(p.focusNotePromptEnabled!==false?'selected':'')+'>Enabled</option><option value="off" '+(p.focusNotePromptEnabled===false?'selected':'')+'>Disabled</option></select></div>'+
         '<div class="field"><label>Notify when a focus timer ends</label><select class="input" id="setNotifyEnd"><option value="on" '+(p.notifyOnFocusEnd!==false?'selected':'')+'>On</option><option value="off" '+(p.notifyOnFocusEnd===false?'selected':'')+'>Off</option></select></div>'+
@@ -94,7 +93,8 @@ function renderSettings(){
         '<div class="field"><label>Track foreground app</label><select class="input" id="setAppTrackingEnabled"><option value="on" '+(state.settings.appTracking.enabled!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.enabled===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Auto lock-in when steady on work apps</label><select class="input" id="setAppTrackingAutoLockIn"><option value="on" '+(state.settings.appTracking.autoLockIn!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.autoLockIn===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Minutes on one app before auto lock-in</label><input class="input" type="number" min="3" max="120" id="setAppTrackingThreshold" value="'+state.settings.appTracking.thresholdMinutes+'"></div>'+
-        '<div class="field"><label>Minutes away before auto-ending it'+tip('Only applies to sessions Operator started automatically — it never auto-ends a session you started yourself.')+'</label><input class="input" type="number" min="1" max="60" id="setAppTrackingGrace" value="'+state.settings.appTracking.graceMinutes+'"></div>'+
+        '<div class="field"><label>Stop any session after (minutes away)'+tip('No keyboard or mouse for this long — or the Mac asleep — and the session stops at the last moment you were active, so only active time counts. Coming back, you can add the time back if you were working away from the keys.')+'</label><input class="input" type="number" min="3" max="120" id="setAppTrackingAway" value="'+(state.settings.appTracking.awayMinutes||10)+'"></div>'+
+        '<div class="field"><label>Minutes off work apps before ending an auto session'+tip('For sessions Operator started on its own: how long on non-work apps before it ends them.')+'</label><input class="input" type="number" min="1" max="60" id="setAppTrackingGrace" value="'+state.settings.appTracking.graceMinutes+'"></div>'+
         '<div class="field"><label>Cooldown after you lock out (minutes)'+tip('Auto lock-in stays off this long after you stop a session yourself.')+'</label><input class="input" type="number" min="0" max="240" id="setAppTrackingCooldown" value="'+state.settings.appTracking.cooldownMinutes+'"></div>'+
         '<div class="field"><label>Day recap ready at'+tip('A small nudge at this time says your recap is ready — what you did, your work habits, and any sessions that started on their own. Open it any time from Today or Analytics.')+'</label><input class="input" type="time" id="setRecapTime" value="'+(state.settings.appTracking.recapTime||'21:30')+'"></div>'+
         '<div class="field"><label>Idle after (seconds without keyboard/mouse)'+tip('Idle time doesn\'t count toward auto lock-in or app time.')+'</label><input class="input" type="number" min="15" max="900" id="setAppTrackingIdle" value="'+state.settings.appTracking.idleSeconds+'"></div>'+
@@ -122,6 +122,12 @@ function renderSettings(){
         '<div class="task-list">'+(prepItems.map(function(item){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(item.label)+'</div>'+deleteBtn('prep', item.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet — add one above.</div>')+'</div>'+
         '</div>'+
       '</div>'+
+      '',
+
+    you: '<div class="card section"><div class="section-title">About you</div><div class="grid grid-2">'+
+        '<div class="field"><label>Name</label><input class="input" id="setName" value="'+escapeHtml(p.name)+'"></div>'+
+        '<div class="field"><label>Business name</label><input class="input" id="setBusinessName" value="'+escapeHtml(p.businessName||'')+'" placeholder="e.g. Rivera Media Co."></div>'+
+      '</div></div>'+
       '<div class="section"><div class="section-title">Why You\'re Doing This</div><div class="card"><div class="grid grid-2">'+
         '<div><div class="kind-label" style="color:var(--good);">Getting</div>'+
           '<div class="task-list">'+(toward.map(function(m){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(m.text)+'</div>'+deleteBtn('motivation', m.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
@@ -131,9 +137,8 @@ function renderSettings(){
           '<div class="task-list">'+(away.map(function(m){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(m.text)+'</div>'+deleteBtn('motivation', m.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
           '<div class="row" style="margin-top:8px;"><input class="input" id="newMotivAway" placeholder="e.g. More debt" style="flex:1;min-width:100px;"><button class="btn btn-sm" data-action="addMotivation" data-kind="away">Add</button></div>'+
         '</div>'+
-      '</div></div></div>',
-
-    standards: '<div class="card section"><div class="section-title">Fitness &amp; Deep Work</div><div class="grid grid-2">'+
+      '</div></div></div>'+
+      '<div class="card section"><div class="section-title">Targets — health &amp; deep work</div><div class="grid grid-2">'+
         '<div class="field"><label>Daily calorie target</label><input class="input" type="number" id="setCalories" value="'+p.calorieTarget+'"></div>'+
         '<div class="field"><label>Goal weight</label><input class="input" type="number" step="0.1" id="setGoalWeight" value="'+(p.goalWeight!=null?p.goalWeight:'')+'"></div>'+
         '<div class="field"><label>Workout days per week (goal)</label><input class="input" type="number" id="setWeeklyWorkout" value="'+p.weeklyWorkoutTarget+'"></div>'+
@@ -178,15 +183,17 @@ function renderSettings(){
       '</div>'
   };
   const navDefs = [
+    {id:'you', label:'You', icon:'&#128100;'},
     {id:'general', label:'General', icon:'&#9881;'},
     {id:'display', label:'Display', icon:'&#127912;'},
     {id:'focus', label:'Focus &amp; Alarms', icon:'&#9201;'},
-    {id:'standards', label:'Standards', icon:'&#127939;'},
     {id:'business', label:'Business', icon:'&#9635;'},
     {id:'calendarJournal', label:'Calendar &amp; Journal', icon:'&#9638;'},
+    {id:'integrations', label:'Integrations', icon:'&#128279;'},
     {id:'updates', label:'App updates', icon:'&#128227;'}
   ];
-  const active = sections[ui.settingsTab] ? ui.settingsTab : 'general';
+  const tab = ui.settingsTab==='standards' ? 'you' : ui.settingsTab;   // Standards now live under You
+  const active = sections[tab] ? tab : 'you';
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Settings</div></div></div>'+
   '<div class="settings-shell">'+
     '<div class="settings-sidenav">'+navDefs.map(function(n){ return '<button class="settings-nav-item'+(active===n.id?' active':'')+'" data-action="settingsTab" data-tab="'+n.id+'"><span style="margin-right:8px;">'+n.icon+'</span>'+n.label+'</button>'; }).join('')+'</div>'+
@@ -352,6 +359,7 @@ function saveProfile(){
   if(atAutoEl) state.settings.appTracking.autoLockIn = atAutoEl.value === 'on';
   if(atThreshEl) state.settings.appTracking.thresholdMinutes = Number(atThreshEl.value)||12;
   if(atGraceEl) state.settings.appTracking.graceMinutes = Number(atGraceEl.value)||3;
+  const atAwayEl = document.getElementById('setAppTrackingAway'); if(atAwayEl) state.settings.appTracking.awayMinutes = clamp(Number(atAwayEl.value)||10, 3, 120);
   const atCooldownEl = document.getElementById('setAppTrackingCooldown');
   if(atCooldownEl){ const v = Number(atCooldownEl.value); state.settings.appTracking.cooldownMinutes = (isNaN(v) || atCooldownEl.value==='') ? 15 : clamp(v,0,240); }
   const rtEl = document.getElementById('setRecapTime');

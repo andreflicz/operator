@@ -94,29 +94,8 @@ function renderTodayFocusMode(p){
     ) : '<div class="view-sub" id="liveClock"></div>')+
     renderNowNextBar()+
   '</div>'+
-  '<div class="grid grid-3 stat-chip-row section" style="max-width:800px;margin:0 auto 26px;">'+
-    '<div class="stat-chip" style="text-align:center;"><div class="stat-chip-label">Day Streak</div><div class="stat-chip-value">'+computeStreak()+'</div><div class="kpi-sub">rest days still count</div></div>'+
-    '<div class="stat-chip" data-action="goToFinishedTasks" style="text-align:center;cursor:pointer;"><div class="stat-chip-label">Completed Today</div><div class="stat-chip-value">'+doneToday.length+' task'+(doneToday.length===1?'':'s')+'</div></div>'+
-    '<div class="stat-chip" id="statDeepWorkTodayBox" style="text-align:center;"><div class="stat-chip-label">Deep Work Today</div><div class="stat-chip-value">'+fmtHours(deepWorkToday)+'</div><div class="kpi-sub">'+fmtDurationLabel(deepWorkToday)+'</div></div>'+
-  '</div>'+
-  '<div class="hero-row section">'+renderActiveFocusHero(true)+renderCurrentTaskCard(false,false,true)+'</div>'+
-  renderVisionSlideshow()+
-  renderStandardsWidget()+
-  (todayNotices.length ? (
-    '<div class="section" style="max-width:640px;margin:0 auto;"><div class="section-title" style="justify-content:center;">Today on the Calendar</div><div class="card"><div class="task-list">'+
-      todayNotices.map(function(n){
-        return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="'+n.kind+'" data-id="'+n.id+'">'+
-          (n.kind==='deadline' ? '<span class="tag" style="background:var(--danger-dim);color:var(--danger-text);">Deadline</span>' : '<span class="tag" style="background:'+n.color+'22;color:'+n.color+';">'+(n.time?fmt12Hour(n.time):'Event')+'</span>')+
-          '<div class="task-title" style="flex:1;">'+escapeHtml(n.label)+'</div>'+
-        '</div>';
-      }).join('')+
-    '</div></div></div>'
-  ) : '')+
-  '<div style="max-width:900px;margin:0 auto;">'+renderReachOutPanel(true)+'</div>'+
-  '<div class="section grid grid-2" style="max-width:1200px;margin:32px auto 0;align-items:start;">'+
-    '<div><div class="section-title" style="justify-content:center;">Worth Doing Soon<span class="kpi-sub" style="margin-left:8px;">&middot; '+backlog.length+' waiting</span></div><div class="card" style="max-height:600px;overflow-y:auto;"><div class="task-list">'+(backlog.map(focusModeBacklogRow).join('') || '<div class="empty">Backlog is empty.</div>')+'</div></div></div>'+
-    '<div><div class="section-title" style="justify-content:center;">Clients<span class="kpi-sub" style="margin-left:8px;">&middot; '+activeClients.length+' active</span></div><div class="task-list" style="display:flex;flex-direction:column;gap:12px;max-height:600px;overflow-y:auto;">'+(activeClients.length ? activeClients.map(function(c){ return renderClientHealthCard(c); }).join('') : '<div class="empty">No active clients yet.</div>')+'</div></div>'+
-  '</div>';
+  lockedLayoutToolbarHtml()+
+  lockedBlocksHtml({backlog:backlog, doneToday:doneToday, deepWorkToday:deepWorkToday, todayNotices:todayNotices, activeClients:activeClients});
 }
 function renderToday(){
   const p = state.profile;

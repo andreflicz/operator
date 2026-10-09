@@ -105,13 +105,15 @@ async function pollAppActivity(){
   }catch(e){ return; } // no wrapper/server running — silently do nothing
   // Nothing new since the last poll → nothing to recompute or save.
   const sig = text.length+':'+text.slice(-80);
-  if(sig===lastActivitySig){ updateCurrentAppIndicator(); checkAutoLockIn(); return; }
+  if(sig===lastActivitySig){ updateCurrentAppIndicator(); checkAwayFromSession(); checkAutoLockIn(); return; }
   lastActivitySig = sig;
   // Only count active usage: a sample taken after the keyboard/mouse has been idle for a
   // while is dropped, which leaves a gap that splits the interval (an app just sitting in
   // the foreground no longer counts as "being on it").
   const idleLimit = Number(st.idleSeconds)||60;
-  const samples = parseActivityLogText(text).filter(function(s){ return s.idle==null || s.idle < idleLimit; });
+  const allSamples = parseActivityLogText(text);
+  if(allSamples.length) lastRawSampleAt = Math.max(lastRawSampleAt, allSamples[allSamples.length-1].ts);
+  const samples = allSamples.filter(function(s){ return s.idle==null || s.idle < idleLimit; });
   if(!samples.length){ updateCurrentAppIndicator(); return; }
   const today = todayStr();
   const byDate = {};
@@ -134,6 +136,8 @@ async function pollAppActivity(){
   state.appActivity.todayDate = today;
   persist('appActivity');
   updateCurrentAppIndicator();
+  checkAwayFromSession();
+  checkAwayReturn();
   checkAutoLockIn();
   checkDistraction();
   if(ui.view==='focus' && ui.focusTab==='analytics') renderView();
@@ -236,6 +240,77 @@ function autoEndFocusSession(endAt){
   persist('focus'); renderView();
   showToast('Session ended — you moved off work apps at '+fmt12Hour(nowHM(new Date(endedAt)))+' ('+fmtDurationLabel(minutes)+' logged)', {icon:'&#9209;'});
 }
+// ---- only active time counts ----
+// A session — even one you started yourself — stops at the last moment you were active once
+// the Mac has had no keyboard/mouse input for "away" minutes (default 10), or was asleep that
+// long. The away time is never logged. When you're back, a notice offers to add it back in
+// case you were working away from the keys (a call, reading on paper).
+let lastRawSampleAt = 0;
+function awayLimitMs(){ const st = state.settings.appTracking || {}; return clamp(Number(st.awayMinutes)||10, 3, 120)*60000; }
+function sessionAwayFrom(s, ivs, now){
+  const limit = awayLimitMs();
+  let prevEnd = s.startedAt;
+  for(let i=0;i<ivs.length;i++){
+    const iv = ivs[i]; if(iv.end < s.startedAt) continue;
+    if(Math.max(iv.start, s.startedAt) - prevEnd >= limit) return prevEnd;
+    prevEnd = Math.max(prevEnd, iv.end);
+  }
+  return now - prevEnd >= limit ? prevEnd : null;
+}
+function checkAwayFromSession(){
+  const s = state.focus.activeSession;
+  const st = state.settings.appTracking;
+  if(!st || st.enabled===false || st.awayStop===false) return;
+  const now = Date.now();
+  // the tracker has to be running (a fresh sample, idle or not) for silence to mean "away"
+  if(!lastRawSampleAt || now-lastRawSampleAt > 90000) return;
+  // a task being timed outside a session stops at the last active moment too
+  if(!s && ui.currentTaskId && ui.currentTaskStartedAt){
+    const tf = sessionAwayFrom({startedAt:ui.currentTaskStartedAt}, state.appActivity.todayIntervals, now);
+    if(tf!=null){ accumulateCurrentTaskTime(ui.currentTaskId, tf); persist('tasks'); renderView(); }
+    return;
+  }
+  if(!s || s.onBreak || s.autoStarted) return;
+  if(todayStr(new Date(s.startedAt))!==todayStr()) return;
+  const from = sessionAwayFrom(s, state.appActivity.todayIntervals, now);
+  if(from==null) return;
+  endSessionForAway(Math.max(from, s.startedAt+60000), now);
+}
+function endSessionForAway(endAt, now){
+  const s = state.focus.activeSession; if(!s || endAt>=now) return;
+  const copy = JSON.parse(JSON.stringify(s));
+  if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId, endAt); persist('tasks'); }
+  const minutes = Math.max(1, Math.round((endAt-s.startedAt)/60000));
+  const id = uid();
+  state.focus.sessions.push({id:id, type:sessionType(s), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endAt, minutes:minutes, completedTasks:arr(s.completedTasks), note:'', autoStopped:true, away:true, reviewed:false});
+  state.focus.activeSession = null;
+  state.focus.lastSessionEndedAt = endAt;
+  state.focus.awayStop = {sessionId:id, active:copy, endedAt:endAt, at:now, shown:false};
+  if(state.modes.active && state.modes.active.linkedFocus) endMode();
+  persist('focus'); renderView();
+}
+// once you're back (fresh activity after the stop), say what happened — with a way to undo it
+function checkAwayReturn(){
+  const a = state.focus.awayStop; if(!a || a.shown) return;
+  if(Date.now()-a.at > 12*3600000){ state.focus.awayStop = null; persist('focus'); return; }
+  const ivs = state.appActivity.todayIntervals, last = ivs[ivs.length-1];
+  // fresh activity after the stretch away (the Mac may have slept through it, so the stop and
+  // the return can land on the same check)
+  if(!last || last.end <= a.endedAt + awayLimitMs() || Date.now()-last.end > APP_ACTIVITY_GAP_MS) return;
+  a.shown = true; persist('focus');
+  const away = Math.round((Date.now()-a.endedAt)/60000);
+  showToast('You stepped away at '+fmt12Hour(nowHM(new Date(a.endedAt)))+' — your session stopped there ('+fmtDurationLabel(away)+' away, not counted).', {icon:'&#128694;', actionLabel:'I was working — add it back', actionAction:'restoreAwaySession', duration:20000});
+}
+ACTIONS.restoreAwaySession = function(){
+  const a = state.focus.awayStop; if(!a) return;
+  state.focus.sessions = state.focus.sessions.filter(function(x){ return x.id!==a.sessionId; });
+  if(state.focus.activeSession) state.focus.activeSession.startedAt = Math.min(state.focus.activeSession.startedAt, a.active.startedAt);
+  else state.focus.activeSession = a.active;
+  state.focus.awayStop = null;
+  clearToasts();
+  persist('focus'); renderView();
+  showToast('Added back — the session runs from '+fmt12Hour(nowHM(new Date(state.focus.activeSession.startedAt)))+'.', {icon:'&#128274;'});
+};
 function startAppActivityPolling(){
   pollAppActivity();
   setInterval(pollAppActivity, 15000);
