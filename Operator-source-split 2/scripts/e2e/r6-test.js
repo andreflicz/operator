@@ -55,7 +55,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('…then offers Undo', items2.some(t => /Undo — done for today/.test(t)), items2);
     await p.keyboard.press('Escape');
     // desktop-style selecting: drag a box across empty space
-    await p.evaluate(() => document.querySelector('.carousel').scrollIntoView({block:'center'}));
+    await p.evaluate(() => { document.querySelector('.carousel').scrollIntoView({block:'center'}); const t = document.querySelector('.task-column .car-track'); t.scrollLeft = t.scrollWidth/3; });
+    await p.waitForTimeout(150);
     const cards = await p.$$eval('.task-column.is-car .task-card[data-id]:not(.car-clone)', els => els.map(e => { const r = e.getBoundingClientRect(); return {id:e.dataset.id, x:r.left, y:r.top, r:r.right, b:r.bottom}; }).filter(c => c.x > 230 && c.r < 1400).sort((a, b) => a.x - b.x));
     const top = Math.min.apply(null, cards.map(c => c.y)) - 14;
     await p.mouse.move(cards[0].x + 20, top); await p.mouse.down();

@@ -15,6 +15,14 @@
 //    chip) no longer wipes edits made to other fields.
 // data-selected is skipped because scroll pickers keep their live selection there.
 const MORPH_SKIP_ATTRS = { 'data-selected': true };
+// Classes scripts add at runtime (carousel arrows and edge fades). A re-render keeps them so
+// nothing blinks off for a frame; the carousel's own update corrects them right after.
+const MORPH_STICKY_CLASSES = ['can-prev', 'can-next', 'fade-l', 'fade-r'];
+function withStickyClasses(oldN, value){
+  let v = value;
+  for(let i=0;i<MORPH_STICKY_CLASSES.length;i++){ const c = MORPH_STICKY_CLASSES[i]; if(oldN.classList.contains(c) && (' '+v+' ').indexOf(' '+c+' ')<0) v += ' '+c; }
+  return v;
+}
 function morphKey(node){
   if(node.nodeType!==1) return null;
   if(node.id) return '#'+node.id;
@@ -45,8 +53,30 @@ function morphChildren(oldParent, newParent, opts){
       match = keyed[k];
     } else if(!k){
       while(ptr<oldNodes.length && (used.has(oldNodes[ptr]) || morphKey(oldNodes[ptr]))) ptr++;
-      const cand = oldNodes[ptr];
-      if(cand && cand.nodeType===nn.nodeType && cand.nodeName===nn.nodeName){ match = cand; ptr++; }
+      // Something new appearing above (a pop-up, the selection bar) shifts every later sibling by
+      // one. Matching purely by position would then morph each section into the next one — the
+      // whole page rebuilds and flickers. So look a few nodes ahead for the same element first,
+      // and don't reuse a node that a later new sibling is clearly the twin of.
+      const cls = nn.nodeType===1 ? nn.getAttribute('class') : null;
+      let pick = -1;
+      if(nn.nodeType===1){
+        for(let j=ptr, seen=0; j<oldNodes.length && seen<4; j++){
+          const o = oldNodes[j]; if(used.has(o) || morphKey(o)) continue; seen++;
+          if(o.nodeType===1 && o.nodeName===nn.nodeName && o.getAttribute('class')===cls){ pick = j; break; }
+        }
+      }
+      if(pick>=0){ match = oldNodes[pick]; if(pick===ptr) ptr++; }
+      else {
+        const cand = oldNodes[ptr];
+        if(cand && cand.nodeType===nn.nodeType && cand.nodeName===nn.nodeName){
+          let twinLater = false;
+          if(cand.nodeType===1){
+            const cc = cand.getAttribute('class');
+            for(let j=i+1; j<newNodes.length && j<=i+4; j++){ const f = newNodes[j]; if(f.nodeType===1 && !morphKey(f) && f.nodeName===cand.nodeName && f.getAttribute('class')===cc){ twinLater = true; break; } }
+          }
+          if(!twinLater){ match = cand; ptr++; }
+        }
+      }
     }
     const ref = oldParent.childNodes[i] || null;
     if(match){
@@ -80,7 +110,8 @@ function morphNode(oldN, newN, opts){
   for(let i=0;i<newAttrs.length;i++){
     const a = newAttrs[i];
     if(MORPH_SKIP_ATTRS[a.name] && oldN.hasAttribute(a.name)) continue;
-    if(oldN.getAttribute(a.name)!==a.value) oldN.setAttribute(a.name, a.value);
+    const val = a.name==='class' && oldN.classList.length ? withStickyClasses(oldN, a.value) : a.value;
+    if(oldN.getAttribute(a.name)!==val) oldN.setAttribute(a.name, val);
   }
   if(tag==='TEXTAREA'){
     const newDefault = newN.value;

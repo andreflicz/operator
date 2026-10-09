@@ -6,7 +6,7 @@ function nextUpTask(){
   const items = state.tasks.items;
   const pick = function(id){ return id ? items.find(function(x){ return x.id===id && x.status!=='done'; }) : null; };
   return pick(ui.pendingCurrentTaskId) || pick(ui.stagedTaskId) || (state.focus.nextTaskId!==ui.currentTaskId ? pick(state.focus.nextTaskId) : null) ||
-    sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='today' && t.id!==ui.currentTaskId && !isOngoingDoneToday(t); }))[0] || null;
+    lineupOrdered(items.filter(function(t){ return t.status==='today' && t.id!==ui.currentTaskId && !isOngoingDoneToday(t); }))[0] || null;
 }
 function renderNowNextBar(standalone){
   const cur = ui.currentTaskId ? state.tasks.items.find(function(x){ return x.id===ui.currentTaskId; }) : null;

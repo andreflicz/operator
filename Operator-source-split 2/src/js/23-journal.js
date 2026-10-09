@@ -80,7 +80,7 @@ function filteredJournalEntries(){
   const allEntries = state.journal.entries.slice().sort(function(a,b){ return b.timestamp-a.timestamp; });
   const searchLower = (ui.journalSearchText||'').toLowerCase();
   return allEntries.filter(function(e){
-    const matchesMood = !ui.journalFilterMood || e.mood===ui.journalFilterMood;
+    const matchesMood = ui.journalFilterMood ? e.mood===ui.journalFilterMood : !isUpdateEntry(e);
     const matchesSearch = !searchLower || e.text.toLowerCase().indexOf(searchLower)>=0;
     return matchesMood && matchesSearch;
   });

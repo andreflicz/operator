@@ -23,24 +23,29 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('one Clients panel replaces the three old ones, where they were', order.filter(x=>x!=='vision' && x!=='agenda').indexOf('clientHub')===2 && !order.some(id=>['reachOut','clientSteps','clientOps'].includes(id)), order);
   check('Clients panel shown on Today', await p.isVisible('.client-hub'));
   check('panel has client cards and leads to reach out', (await p.$$('.client-hub .hub-card')).length===2 && (await p.textContent('.client-hub .hub-leads')).includes('Peak Roofing'));
-  // weekly pace: fine early in the week, amber late, red when the week can't be finished / was missed
+  // weekly pace, always ahead of the curve: green = ahead of where the week should be by today,
+  // yellow = exactly on it (on time, not ahead), red = behind it
   const D = "state.business.clients[0].deliverables[0]";
   await E(D+".createdAt='2026-10-05'; "+D+".completedDates=[]; "+D+".weeklyTarget=2");
   const at = async (day, code) => { await p.clock.setSystemTime(new Date(2026,9,day,10,0).getTime()); if(code) await E(code); return E("deliverablePaceStatus("+D+")"); };
-  check('0/2 on Tuesday is fine', await at(6)==='good');
+  check('0/2 on Tuesday is on the curve = yellow', await at(6)==='warn');
   check('0/2 on Thursday (behind, nothing done) is red', await at(8)==='danger');
   await E(D+".completedDates=['2026-10-07']; renderView()");
-  check('1/2 midweek is green (on pace)', await at(8)==='good');
-  check('1/2 on Saturday is still on pace', await at(10)==='good');
-  check('1/2 on Sunday: behind but working = yellow', await at(11)==='warn');
+  check('1/2 on Wednesday is ahead = green', await at(7)==='good');
+  check('1/2 on Thursday is right on pace = yellow', await at(8)==='warn');
+  check('1/2 on Sunday is behind = red', await at(11)==='danger');
+  await E(D+".completedDates=['2026-10-07','2026-10-09']");
+  check('2/2 on Sunday is on time but not ahead = yellow', await at(11)==='warn');
+  check('2/2 by Friday is ahead = green', await at(9)==='good');
   await E(D+".completedDates=[]");
   check('0/2 on Sunday is red', await at(11)==='danger');
   await E(D+".completedDates=['2026-10-07']");
   check('a missed week stays red into the next week', await at(12)==='danger');
   await E("ui.view='today'; renderView()");
-  check('card shows last week\'s shortfall', (await p.textContent('.hub-card[data-key="hub-c1"]')).includes('last wk 1/2'));
+  check('card shows what\'s owed from last week', (await p.textContent('.hub-card[data-key="hub-c1"]')).includes('+1 owed') && (await p.textContent('.hub-card[data-key="hub-c1"]')).includes('0/3'));
   await p.click('.client-hub [data-action="incrementDeliverableProgress"][data-id="d1"]');
-  check('making it up turns it green again', await E("deliverablePaceStatus("+D+")")==='good' && await p.isVisible('.hub-card[data-key="hub-c1"] .cc2-owed.is-caught'));
+  check('making it up gets it back on pace', await E("deliverablePaceStatus("+D+")")==='warn' && await p.isVisible('.hub-card[data-key="hub-c1"] .cc2-owed.is-caught'));
+  check('the pill says why: On pace, not "Slipping"', /On pace/.test(await p.textContent('.hub-card[data-key="hub-c1"]')) || /On pace|Check in/.test(await E("clientHealthLabel(clientHealthStatus(state.business.clients[0]))")));
   // converted leads
   check('already-converted lead: task re-tagged to the client on load', await E("JSON.stringify(state.tasks.items.find(t=>t.id==='t2').clients)")==='["personal","c9"]');
   check('converted lead is not offered as a (Lead) tag', await E("!clientCheckboxOptions().some(o=>o.value==='lead:l9')"));

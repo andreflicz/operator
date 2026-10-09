@@ -14,7 +14,7 @@ function clientColor(c){
   return 'hsl('+(Math.abs(h)%360)+',42%,40%)';
 }
 // Health is color only (the card edge and a ring round the initials); hover for the why.
-function clientHealthTitle(c){ const hs = clientHealthStatus(c); return CLIENT_HEALTH_META[hs.level].label+' — '+clientHealthReason(c, hs); }
+function clientHealthTitle(c){ const hs = clientHealthStatus(c); return clientHealthLabel(hs)+' — '+clientHealthReason(c, hs); }
 function clientAvatarHtml(c, small, withHealth){
   const hs = withHealth ? clientHealthStatus(c) : null;
   return '<span class="cc2-avatar'+(small?' cc2-avatar-sm':'')+(hs?' ring-'+hs.level:'')+'" style="background:'+clientColor(c)+'"'+(hs?' title="'+escapeHtml(clientHealthTitle(c))+'"':'')+'>'+escapeHtml(clientInitials(c))+'</span>';
@@ -30,16 +30,16 @@ function clientDelivRowsHtml(c, compact){
   const recurring = arr(c.deliverables).filter(function(d){ return d.recurring; });
   if(!recurring.length) return '';
   return '<div class="cc2-delivs">'+recurring.map(function(d){
-    const done = deliverableWeekCount(d), target = d.weeklyTarget||1;
+    const done = deliverableWeekCount(d), target = deliverableWeekNeed(d);
     const pace = deliverablePaceStatus(d);
     const lw = deliverableLastWeek(d);
     const caughtUp = done>=lw.missed;
     const today = arr(d.completedDates).indexOf(todayStr())>=0;
-    return '<div class="cc2-deliv" data-key="dv-'+c.id+'-'+d.id+'" title="'+escapeHtml(d.title)+': '+done+' of '+target+' this week · '+deliverableMonthCount(d)+' this month">'+
+    return '<div class="cc2-deliv" data-key="dv-'+c.id+'-'+d.id+'" title="'+escapeHtml(d.title)+': '+done+' of '+target+' this week ('+paceWord(pace)+')'+(lw.missed?' · includes '+deliverableOwed(d)+' owed from last week':'')+' · '+deliverableMonthCount(d)+' this month">'+
       '<span class="cc2-deliv-title">'+escapeHtml(d.title)+'</span>'+
       weekDotsHtml(Math.min(done, target), target, pace)+
       '<span class="cc2-deliv-count" style="color:'+paceColorOf(pace)+'">'+done+'/'+target+'</span>'+
-      (lw.missed ? '<span class="cc2-owed'+(caughtUp?' is-caught':'')+'" title="Last week ended at '+lw.done+'/'+lw.target+(caughtUp?' — caught up this week':' — log '+lw.missed+' this week to catch up')+'">last wk '+lw.done+'/'+lw.target+'</span>' : '')+
+      (lw.missed ? '<span class="cc2-owed'+(caughtUp?' is-caught':'')+'" title="Last week ended at '+lw.done+'/'+lw.target+(caughtUp?' — caught up this week':' — log '+lw.missed+' this week to catch up')+'">+'+deliverableOwed(d)+' owed</span>' : '')+
       '<button class="cc2-deliv-btn cc2-plus'+(today?' did-today':'')+'" data-action="incrementDeliverableProgress" data-client="'+c.id+'" data-id="'+d.id+'" title="Log one">+</button>'+
     '</div>';
   }).join('')+'</div>';
@@ -84,8 +84,9 @@ function renderClientsHome(){
   return '<div class="cc2-statrow">'+
       stat(levels.length, 'active client'+(levels.length===1?'':'s'))+
       stat('$'+mrr.toLocaleString(), 'MRR')+
-      stat(levels.filter(function(l){ return l==='green'; }).length, 'healthy', 'is-good')+
-      stat(levels.filter(function(l){ return l!=='green'; }).length, 'need attention', levels.some(function(l){ return l!=='green'; })?'is-warn':'')+
+      stat(levels.filter(function(l){ return l==='green'; }).length, 'ahead', 'is-good')+
+      stat(levels.filter(function(l){ return l==='yellow'; }).length, 'on pace', levels.some(function(l){ return l==='yellow'; })?'is-warn':'')+
+      stat(levels.filter(function(l){ return l==='red'; }).length, 'behind / check in', levels.some(function(l){ return l==='red'; })?'is-bad':'')+
       stat(due, 'to reach out to', due?'is-warn':'')+
     '</div>'+
     (function(){

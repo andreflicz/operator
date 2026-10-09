@@ -154,20 +154,21 @@ function deliverablePaceStatus(d){
   if(RC && d.id) return memo('dps:'+d.id, function(){ return deliverablePaceStatusRaw(d); });
   return deliverablePaceStatusRaw(d);
 }
-// Green = on pace or ahead. Yellow = behind, but you've done some this week. Red = behind
-// with nothing done yet. "On pace" is judged per week (an 8-a-month reel plan = 2 a week):
-// early in the week 0 is fine, it fills up as the week goes, and anything missed last week
-// has to be made up first.
-function deliverablePaceStatusRaw(d){
-  const target = d.weeklyTarget||1;
-  const done = deliverableWeekCount(d);
-  const owed = Math.min(target, deliverableLastWeek(d).missed);
-  if(done >= target+owed) return 'good';
+// Always be ahead of the curve. Green = ahead of where the week should be by today. Yellow =
+// exactly on the curve (on time, not ahead — e.g. 2 of 2 on Sunday). Red = behind it.
+// The curve is per week (an 8-a-month reel plan = 2 a week) and fills up as the week goes;
+// anything missed last week is added on top, and shown as "owed" so the count adds up.
+function deliverableOwed(d){ return Math.min(d.weeklyTarget||1, deliverableLastWeek(d).missed); }
+function deliverableWeekNeed(d){ return (d.weeklyTarget||1) + deliverableOwed(d); }
+function deliverableDueByToday(d){
   const daysIn = ((new Date().getDay()+6)%7)+1; // Mon = 1 … Sun = 7
-  const required = owed + Math.floor(target*daysIn/7);
-  if(done >= required) return 'good';
-  return done>0 ? 'warn' : 'danger';
+  return deliverableOwed(d) + Math.floor((d.weeklyTarget||1)*daysIn/7);
 }
+function deliverablePaceStatusRaw(d){
+  const done = deliverableWeekCount(d), due = deliverableDueByToday(d);
+  return done > due ? 'good' : done===due ? 'warn' : 'danger';
+}
+function paceWord(pace){ return pace==='good' ? 'ahead' : pace==='warn' ? 'on pace' : 'behind'; }
 function isDeliverableDoneThisWeek(d){
   if(d.recurring){
     if(deliverableMonthCount(d) >= monthlyTargetFor(d)) return true;
@@ -204,14 +205,14 @@ function recurringDeliverableRowHtml(clientId, d, readOnly){
   const monthCount = deliverableMonthCount(d);
   const monthlyTarget = monthlyTargetFor(d);
   const weekCount = deliverableWeekCount(d);
-  const weekTarget = d.weeklyTarget||1;
+  const weekTarget = deliverableWeekNeed(d), owed = deliverableOwed(d);
   const pace = deliverablePaceStatus(d);
   const paceColor = pace==='good' ? 'var(--good)' : pace==='warn' ? 'var(--accent)' : 'var(--danger)';
   return '<div class="deliv-counter">'+
     '<div class="deliv-counter-ring" style="border-color:'+paceColor+';color:'+paceColor+';">'+monthCount+'</div>'+
     '<div class="deliv-counter-info">'+
       '<div class="deliv-counter-title">'+escapeHtml(d.title)+'</div>'+
-      '<div class="kpi-sub">'+monthCount+' / '+monthlyTarget+' this month &middot; '+weekCount+'/'+weekTarget+' this week</div>'+
+      '<div class="kpi-sub">'+monthCount+' / '+monthlyTarget+' this month &middot; '+weekCount+'/'+weekTarget+' this week'+(owed?' (incl. '+owed+' owed from last week)':'')+' &middot; <span style="color:'+paceColor+';">'+paceWord(pace)+'</span></div>'+
     '</div>'+
     (readOnly ? '' :
       '<div class="deliv-counter-actions">'+
@@ -248,22 +249,29 @@ function clientHealthStatusRaw(c){
 function clientWeeklyStatus(c){ return clientHealthStatus(c); }
 const CLIENT_HEALTH_META = {
   green:{cls:'tag-good', emoji:'&#128994;', label:'Healthy'},
-  yellow:{cls:'tag-warn', emoji:'&#128993;', label:'Slipping'},
+  yellow:{cls:'tag-warn', emoji:'&#128993;', label:'On pace'},
   red:{cls:'tag-danger', emoji:'&#128308;', label:'Needs attention'}
 };
 const CLIENT_STATUS_META = CLIENT_HEALTH_META;
 // Health is shown as a colored status pill: dot + label + the short reason behind it.
+// Says which thing set the color: deliverables (ahead / on pace / behind) or keeping in touch.
+function clientHealthCause(status){ const rank = {good:0, warn:1, danger:2}; return status.hasDeliverables && rank[status.paceLevel] >= rank[status.careLevel] ? 'pace' : 'care'; }
 function clientHealthReason(c, status){
-  if(status.level==='green') return status.hasDeliverables ? 'on pace' : 'in touch';
-  const rank = {good:0, warn:1, danger:2};
-  if(rank[status.careLevel] >= rank[status.paceLevel]) return clientCareTier(c).label.toLowerCase();
-  return 'behind on deliverables';
+  if(status.level==='green') return status.hasDeliverables ? 'ahead of the week' : 'in touch';
+  if(clientHealthCause(status)==='care') return clientCareTier(c).label.toLowerCase();
+  if(status.level==='yellow') return 'right on the curve — get ahead';
+  const owed = arr(c.deliverables).filter(function(d){ return d.recurring; }).reduce(function(a, d){ return a + deliverableOwed(d); }, 0);
+  return owed ? owed+' owed from last week' : 'behind on deliverables';
+}
+function clientHealthLabel(status){
+  if(status.level==='green') return status.hasDeliverables ? 'Ahead' : 'Healthy';
+  if(status.level==='yellow') return 'On pace';
+  return clientHealthCause(status)==='care' ? 'Check in' : 'Behind';
 }
 function clientHealthTagHtml(c){
   const status = clientHealthStatus(c);
-  const m = CLIENT_HEALTH_META[status.level];
-  return '<span class="health-pill health-'+status.level+'" title="Client health — deliverable pace and time since last touch">'+
-    '<span class="health-dot"></span><span class="health-label">'+m.label+'</span>'+
+  return '<span class="health-pill health-'+status.level+'" title="Green = ahead of the week · Yellow = right on pace · Red = behind, or a check-in is due">'+
+    '<span class="health-dot"></span><span class="health-label">'+clientHealthLabel(status)+'</span>'+
     '<span class="health-reason">'+escapeHtml(clientHealthReason(c, status))+'</span>'+
   '</span>';
 }

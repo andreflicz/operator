@@ -11,6 +11,7 @@ function renderSettings(){
   const saveBtn = '<button class="btn btn-primary section" data-action="saveProfile">Save Changes</button>';
 
   const sections = {
+    updates: '<div class="upd-panel">'+renderUpdatesTab()+'</div>',
     general: '<div class="card section"><div class="section-title">Personal Info</div><div class="grid grid-2">'+
         '<div class="field"><label>Name</label><input class="input" id="setName" value="'+escapeHtml(p.name)+'"></div>'+
         '<div class="field"><label>Business name</label><input class="input" id="setBusinessName" value="'+escapeHtml(p.businessName||'')+'" placeholder="e.g. Rivera Media Co."></div>'+
@@ -182,7 +183,8 @@ function renderSettings(){
     {id:'focus', label:'Focus &amp; Alarms', icon:'&#9201;'},
     {id:'standards', label:'Standards', icon:'&#127939;'},
     {id:'business', label:'Business', icon:'&#9635;'},
-    {id:'calendarJournal', label:'Calendar &amp; Journal', icon:'&#9638;'}
+    {id:'calendarJournal', label:'Calendar &amp; Journal', icon:'&#9638;'},
+    {id:'updates', label:'App updates', icon:'&#128227;'}
   ];
   const active = sections[ui.settingsTab] ? ui.settingsTab : 'general';
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Settings</div></div></div>'+

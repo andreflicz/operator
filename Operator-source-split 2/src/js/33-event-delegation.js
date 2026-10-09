@@ -406,7 +406,10 @@ document.body.addEventListener('dragstart', function(e){
   if(!card) return;
   e.dataTransfer.setData('text/plain', card.dataset.taskId);
   e.dataTransfer.effectAllowed = 'move';
+  // light up where it can go (Now / Up next / the list) while it's in the air
+  document.body.classList.add('is-dragging-task');
 });
+document.body.addEventListener('dragend', function(){ document.body.classList.remove('is-dragging-task'); });
 document.body.addEventListener('dragover', function(e){
   const zone = e.target.closest && e.target.closest('[data-dropzone]');
   if(!zone) return;
@@ -422,6 +425,7 @@ document.body.addEventListener('dragleave', function(e){
   if(zone && !zone.contains(e.relatedTarget)) zone.classList.remove('drop-hover');
 });
 document.body.addEventListener('drop', function(e){
+  document.body.classList.remove('is-dragging-task');
   const zone = e.target.closest && e.target.closest('[data-dropzone]');
   if(!zone) return;
   e.preventDefault();
@@ -430,7 +434,10 @@ document.body.addEventListener('drop', function(e){
   const newZone = zone.dataset.dropzone;
   const t = state.tasks.items.find(function(x){ return x.id===taskId; });
   if(!t) return;
-  if(newZone==='current'){ if(state.focus.activeSession){ setCurrentTask(taskId); } else { stageNextTask(taskId); } return; }
+  // Nothing starts timing from a drop: onto Now (locked in) it asks first; onto Up next it just lines it up.
+  if(newZone==='current'){ if(state.focus.activeSession){ if(t.status==='backlog'){ t.status = 'today'; persist('tasks'); } stagePendingCurrentTask(taskId); } else { stageNextTask(taskId); } return; }
+  if(newZone==='next'){ dropOnNext(taskId); return; }
+  if(newZone==='order'){ const r = zone.getBoundingClientRect(); reorderLineup(taskId, zone.dataset.id, e.clientY > r.top + r.height/2); return; }
   if(t.status===newZone) return;
   if(newZone==='done'){
     completeTask(taskId);

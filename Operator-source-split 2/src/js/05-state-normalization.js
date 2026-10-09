@@ -362,6 +362,8 @@ function normalizeGoals(g){
     if(it.unit===undefined) it.unit='';
     if(it.deadline===undefined) it.deadline=null;
     if(it.autoTrack===undefined) it.autoTrack=null;
+    if(it.period===undefined) it.period=null;
+    if(it.start===undefined) it.start=null;
   });
   return g;
 }

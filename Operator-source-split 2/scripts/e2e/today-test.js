@@ -65,6 +65,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('next-up survives a reload', (await p.textContent('.lockin-sub')).includes('Edit Nina reel'));
   // goals
   await p.click('[data-action="nav"][data-view="personal"]'); await p.click('[data-action="personalTab"][data-tab="goals"]');
+  await p.click('[data-action="toggleForm"][data-form="newGoal"]');
   await p.fill('#newGoalLabel', 'Post 3 reels'); await p.fill('#newGoalTarget', '3'); await p.fill('#newGoalUnit', 'reels');
   await p.click('[data-action="addGoal"]');
   check('goal card added', (await p.$$('.goal-card')).length===1);

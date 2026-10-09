@@ -323,7 +323,7 @@ function renderFitnessStatsSection(){
   const wk = workoutTotals(weekDays(0)), last30 = []; for(let i=29;i>=0;i--) last30.push(addDays(todayStr(), -i));
   const m30 = workoutTotals(last30);
   const tile = function(label, v, sub){ return '<div class="card" style="text-align:center;"><div class="kpi-label">'+label+'</div><div class="kpi-value" style="color:var(--train);">'+v+'</div>'+(sub?'<div class="kpi-sub">'+sub+'</div>':'')+'</div>'; };
-  return '<div class="section"><div class="section-title">Fitness'+tip('From the workouts you log in Personal → Fitness — enter how long each one took and it lands here.')+'<span class="view-all-link" data-action="goToFitness">Log a workout &rarr;</span></div><div class="grid grid-4">'+
+  return '<div class="section"><div class="section-title">Fitness'+tip('From the workouts you log in Personal → Health — enter how long each one took and it lands here.')+'<span class="view-all-link" data-action="goToFitness">Log a workout &rarr;</span></div><div class="grid grid-4">'+
       tile('Total Workouts', all.n, dates.length ? 'since '+fmtDateShort(dates.sort()[0]) : 'none logged yet')+
       tile('Time Working Out', fmtDurationLabel(all.m), all.n ? fmtDurationLabel(Math.round(all.m/all.n))+' per workout' : '')+
       tile('This Week', wk.n, fmtDurationLabel(wk.m))+

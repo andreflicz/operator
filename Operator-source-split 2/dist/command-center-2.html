@@ -1601,6 +1601,133 @@
   .marquee-box{ position:fixed; left:0; top:0; z-index:9000; pointer-events:none; border:1px solid var(--accent); background:rgba(232,162,61,.10); border-radius:4px; will-change:transform; }
   body.marquee-on, body.marquee-on *{ user-select:none !important; cursor:crosshair; }
   .marquee-hit{ box-shadow:0 0 0 2px var(--accent) !important; }
+  .cc2-stat.is-bad .cc2-stat-v{ color:var(--danger); }
+  /* ---- Now / Up next (Focus → Tasks) ---- */
+  .nn-panel{ display:grid; grid-template-columns:1fr; gap:12px; max-width:640px; margin:6px auto 26px; }
+  .nn-panel.is-locked{ grid-template-columns:1.15fr 1fr; max-width:920px; }
+  .nn-cell{ position:relative; display:flex; flex-direction:column; gap:8px; min-width:0; padding:14px 16px; border-radius:14px; border:1px solid var(--border); background:var(--panel); transition:border-color .15s, background .15s; }
+  .nn-cell.drop-hover{ border-color:var(--accent); background:rgba(232,162,61,.07); }
+  .nn-now.has-task{ border-color:rgba(63,190,142,.45); box-shadow:inset 3px 0 0 var(--good); }
+  .nn-now.is-asking{ border-color:var(--accent); box-shadow:inset 3px 0 0 var(--accent); }
+  .nn-k{ display:flex; align-items:center; gap:6px; font-family:var(--font-display); font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); }
+  .nn-now .nn-k{ color:var(--good); }
+  .nn-sug{ text-transform:none; letter-spacing:0; font-weight:600; font-size:10.5px; color:var(--text-faint); border:1px dashed var(--border-strong); border-radius:6px; padding:0 5px; }
+  .nn-row{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .nn-title{ display:flex; align-items:center; gap:8px; min-width:0; flex:1; font-size:16px; font-weight:650; }
+  .nn-title > span:last-child{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+  .nn-empty{ color:var(--text-faint); font-weight:500; font-size:14.5px; }
+  .nn-hint{ font-size:12px; color:var(--text-faint); }
+  .nn-timer{ font-family:var(--font-display); font-weight:700; font-size:20px; color:var(--good); font-variant-numeric:tabular-nums; flex-shrink:0; contain:layout paint; }
+  .nn-acts{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .nn-pick-wrap{ position:relative; }
+  .nn-pick-wrap .next-picker{ left:0; right:auto; width:320px; }
+  @media (max-width:760px){ .nn-panel.is-locked{ grid-template-columns:1fr; } }
+  /* floating actions for picked tasks */
+  #bulkBar .bulk-toolbar.is-floating{ animation:bulkIn .16s ease-out; padding:10px 14px; gap:10px; }
+  @keyframes bulkIn{ from{ opacity:0; transform:translate(-50%, 10px); } to{ opacity:1; transform:translate(-50%, 0); } }
+  /* ---- goals: tracked + your own ---- */
+  .goal-kinds{ display:flex; flex-wrap:wrap; gap:6px; }
+  .goal-kind{ border:1px solid var(--border); background:var(--panel-2); color:var(--text-dim); border-radius:999px; padding:6px 12px; font-size:12.5px; font-weight:600; cursor:pointer; transition:border-color .15s, color .15s, background .15s; }
+  .goal-kind:hover{ color:var(--text); border-color:var(--border-strong); }
+  .goal-kind.is-on{ color:var(--text); border-color:var(--accent); background:rgba(232,162,61,.12); }
+  .goal-now{ padding:9px 0; font-weight:700; font-family:var(--font-display); }
+  .goal-card.is-tracked{ border-color:rgba(232,162,61,.22); }
+  .goal-card.is-hit{ border-color:rgba(63,190,142,.5); }
+  .goal-icon{ font-size:15px; line-height:1; margin-right:2px; }
+  .goal-src{ font-size:11px; color:var(--text-faint); margin-top:2px; }
+  .goal-sugs{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:12px; }
+  .goal-sug{ border:1px dashed var(--border-strong); background:transparent; color:var(--text-dim); border-radius:10px; padding:6px 10px; font-size:12.5px; cursor:pointer; }
+  .goal-sug:hover{ color:var(--text); border-color:var(--accent); border-style:solid; }
+  .goal-sug b{ color:var(--accent); margin-left:4px; }
+  .goal-card-actions .btn{ white-space:nowrap; }
+  /* ---- journal → updates ---- */
+  .upd-panel{ max-width:820px; margin:0 auto; }
+  .upd-bar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px; position:sticky; top:0; z-index:5; padding:8px 0; background:var(--bg); }
+  .upd-card{ background:var(--panel); border:1px solid var(--border); border-left:3px solid #8fdcff; border-radius:14px; padding:14px 18px 16px; margin-bottom:10px; }
+  .upd-head{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .upd-date{ font-family:var(--font-display); font-weight:700; font-size:13px; }
+  .upd-time{ font-size:12px; color:var(--text-faint); }
+  .upd-text{ white-space:pre-wrap; word-break:break-word; font-size:14.5px; line-height:1.6; color:var(--text); user-select:text; }
+  .upd-copy{ display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border); background:var(--panel-2); color:var(--text-dim); border-radius:8px; padding:5px 10px; font-size:12px; font-weight:600; cursor:pointer; transition:color .15s, border-color .15s; }
+  .upd-copy:hover{ color:var(--text); border-color:var(--border-strong); }
+  .upd-copied{ display:none; color:var(--good); }
+  .upd-copy.is-copied .upd-copied{ display:inline; } .upd-copy.is-copied .upd-copy-l, .upd-copy.is-copied .upd-copy-i{ display:none; }
+  .upd-foot{ justify-content:flex-end; gap:8px; margin-top:16px; }
+  .upd-empty{ text-align:center; padding:28px 20px; max-width:560px; margin:0 auto; }
+  body.is-dragging-task .nn-cell{ border-style:dashed; border-color:rgba(232,162,61,.6); background:rgba(232,162,61,.05); }
+  body.is-dragging-task .nn-cell.drop-hover{ border-style:solid; border-color:var(--accent); background:rgba(232,162,61,.12); transform:scale(1.01); }
+  .nn-cell{ transition:border-color .15s, background .15s, transform .15s; }
+  /* ---- Today's list ---- */
+  .seg-tabs.seg-sm .seg-tab{ padding:5px 10px; font-size:12px; }
+  .tl-wrap{ border:none !important; background:none !important; padding:0 !important; min-height:0 !important; max-height:none !important; }
+  .tl-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+  .tl-row{ position:relative; display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:var(--panel); transition:border-color .15s, background .15s, opacity .2s; }
+  .tl-row:hover{ border-color:var(--border-strong); }
+  .tl-row.is-now{ border-color:rgba(63,190,142,.5); box-shadow:inset 3px 0 0 var(--good); }
+  .tl-row.is-next{ box-shadow:inset 3px 0 0 var(--accent); }
+  .tl-row.is-done{ opacity:.55; } .tl-row.is-done .tl-title{ text-decoration:line-through; }
+  .tl-row.drop-above::before, .tl-row.drop-below::after{ content:''; position:absolute; left:8px; right:8px; height:2px; border-radius:2px; background:var(--accent); box-shadow:0 0 8px var(--accent); }
+  .tl-row.drop-above::before{ top:-5px; } .tl-row.drop-below::after{ bottom:-5px; }
+  .tl-grip{ cursor:grab; color:var(--text-faint); font-size:12px; letter-spacing:-3px; padding:0 2px; user-select:none; }
+  .tl-num{ width:20px; text-align:right; font-family:var(--font-display); font-weight:700; color:var(--text-faint); font-variant-numeric:tabular-nums; }
+  .tl-row.is-next .tl-num{ color:var(--accent); } .tl-row.is-now .tl-num{ color:var(--good); }
+  .tl-check{ flex:none; width:20px; height:20px; border-radius:6px; border:1.5px solid var(--border-strong); background:transparent; color:#0b0d12; font-size:12px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0; transition:background .15s, border-color .15s; }
+  .tl-check:hover{ border-color:var(--good); }
+  .tl-check.is-on{ background:var(--good); border-color:var(--good); }
+  .tl-main{ flex:1; min-width:0; display:flex; align-items:center; gap:8px; cursor:pointer; }
+  .tl-title{ font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+  .tl-badge{ flex:none; font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); border:1px solid rgba(232,162,61,.5); border-radius:6px; padding:1px 6px; }
+  .tl-badge.is-now{ color:var(--good); border-color:rgba(63,190,142,.5); }
+  .tl-row .card-more{ flex:none; width:24px; height:22px; border-radius:7px; border:1px solid transparent; background:transparent; color:var(--text-faint); font-size:16px; cursor:pointer; opacity:.6; padding:0; }
+  .tl-row:hover .card-more{ opacity:1; }
+  /* ---- master goals ---- */
+  .mg-wrap{ display:flex; flex-direction:column; gap:14px; }
+  .mg-hero{ position:relative; overflow:hidden; padding:26px 30px 22px; border-radius:20px; border:1px solid rgba(var(--ink),.08);
+    background:radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--mg1) 18%, transparent), transparent 55%), radial-gradient(90% 120% at 100% 100%, color-mix(in srgb, var(--mg1) 9%, transparent), transparent 60%), var(--panel); }
+  .mg-hero-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .mg-k{ font-family:var(--font-display); font-size:11.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); }
+  .mg-hero-num{ display:flex; align-items:baseline; gap:8px; margin:10px 0 16px; }
+  .mg-big{ font-family:var(--font-display); font-weight:800; font-size:clamp(40px, 6vw, 64px); line-height:1; letter-spacing:-.02em; background:linear-gradient(180deg, var(--strong), color-mix(in srgb, var(--mg1) 70%, var(--strong))); -webkit-background-clip:text; background-clip:text; color:transparent; font-variant-numeric:tabular-nums; }
+  .mg-of{ font-size:18px; color:var(--text-faint); font-weight:600; }
+  .mg-pct{ margin-left:auto; font-family:var(--font-display); font-weight:800; font-size:22px; color:var(--mg1); }
+  .mg-bar{ position:relative; height:14px; border-radius:999px; background:rgba(var(--ink),.07); overflow:visible; }
+  .mg-bar-fill{ height:100%; border-radius:999px; background:linear-gradient(90deg, var(--mg1), var(--mg2)); box-shadow:0 0 18px color-mix(in srgb, var(--mg1) 55%, transparent); transition:width .8s cubic-bezier(.2,.8,.2,1); }
+  .mg-tick{ position:absolute; top:-3px; bottom:-3px; width:2px; margin-left:-1px; border-radius:2px; background:rgba(var(--ink),.18); }
+  .mg-tick.is-past{ background:rgba(255,255,255,.55); }
+  .mg-hero-foot{ display:flex; justify-content:space-between; gap:10px; margin-top:12px; font-size:13px; color:var(--text-dim); font-weight:600; }
+  .mg-src{ font-size:12px; color:var(--text-faint); font-weight:500; }
+  .mg-src[data-action]{ cursor:pointer; } .mg-src[data-action]:hover{ color:var(--text); }
+  .mg-target{ border:1px solid rgba(var(--ink),.1); background:rgba(var(--ink),.03); color:var(--text-dim); border-radius:999px; padding:4px 11px; font-size:12px; font-weight:600; cursor:pointer; transition:color .15s, border-color .15s; }
+  .mg-target:hover{ color:var(--text); border-color:var(--mg1); }
+  .mg-pen{ opacity:.5; font-size:11px; }
+  .mg-edit{ display:inline-flex; gap:6px; align-items:center; }
+  .mg-edit-in{ width:110px; padding:5px 9px; }
+  .mg-row{ display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; }
+  @media (max-width:1100px){ .mg-row{ grid-template-columns:repeat(2, 1fr); } }
+  .mg-card{ position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px; padding:20px 14px 16px; border-radius:18px; border:1px solid rgba(var(--ink),.08);
+    background:radial-gradient(100% 80% at 50% 0%, color-mix(in srgb, var(--mg1) 12%, transparent), transparent 70%), var(--panel); }
+  .mg-card.is-hit{ border-color:color-mix(in srgb, var(--mg1) 55%, transparent); box-shadow:0 0 24px color-mix(in srgb, var(--mg1) 18%, transparent); }
+  .mg-ring{ position:relative; display:inline-flex; filter:drop-shadow(0 0 10px color-mix(in srgb, var(--mg1) 30%, transparent)); }
+  .mg-ring-arc{ transition:stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1); }
+  .mg-ring-in{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .mg-ring-v{ font-family:var(--font-display); font-weight:800; font-size:22px; line-height:1.05; font-variant-numeric:tabular-nums; }
+  .mg-ring-pct{ font-size:11px; color:var(--text-faint); font-weight:700; margin-top:2px; }
+  .mg-card-k{ font-family:var(--font-display); font-weight:700; font-size:13.5px; margin-top:4px; }
+  .mg-card-sub{ font-size:12px; color:var(--text-dim); }
+  /* compact (Today) */
+  .mg-wrap.is-compact .mg-hero{ padding:18px 22px 16px; }
+  .mg-wrap.is-compact .mg-big{ font-size:40px; }
+  .mg-wrap.is-compact .mg-hero-num{ margin:6px 0 12px; }
+  .mg-card.is-compact{ padding:14px 10px 12px; }
+  .mg-card.is-compact .mg-ring-v{ font-size:17px; }
+  .mg-card.is-compact .mg-card-k{ font-size:12.5px; }
+  .mg-row.mg-row-5{ grid-template-columns:repeat(5, 1fr); }
+  @media (max-width:1100px){ .mg-row.mg-row-5{ grid-template-columns:repeat(3, 1fr); } }
+  .mg-card.is-compact{ cursor:pointer; transition:transform .15s, border-color .15s; }
+  .mg-card.is-compact:hover{ transform:translateY(-2px); border-color:color-mix(in srgb, var(--mg1) 45%, transparent); }
+  .mg-more{ display:flex; justify-content:flex-end; margin-top:8px; }
+  .mg-more .view-all-link{ position:static; }
+  .goal-card-actions{ flex-wrap:wrap; row-gap:6px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -2004,6 +2131,14 @@ const RESET_TARGETS = [
 //    chip) no longer wipes edits made to other fields.
 // data-selected is skipped because scroll pickers keep their live selection there.
 const MORPH_SKIP_ATTRS = { 'data-selected': true };
+// Classes scripts add at runtime (carousel arrows and edge fades). A re-render keeps them so
+// nothing blinks off for a frame; the carousel's own update corrects them right after.
+const MORPH_STICKY_CLASSES = ['can-prev', 'can-next', 'fade-l', 'fade-r'];
+function withStickyClasses(oldN, value){
+  let v = value;
+  for(let i=0;i<MORPH_STICKY_CLASSES.length;i++){ const c = MORPH_STICKY_CLASSES[i]; if(oldN.classList.contains(c) && (' '+v+' ').indexOf(' '+c+' ')<0) v += ' '+c; }
+  return v;
+}
 function morphKey(node){
   if(node.nodeType!==1) return null;
   if(node.id) return '#'+node.id;
@@ -2034,8 +2169,30 @@ function morphChildren(oldParent, newParent, opts){
       match = keyed[k];
     } else if(!k){
       while(ptr<oldNodes.length && (used.has(oldNodes[ptr]) || morphKey(oldNodes[ptr]))) ptr++;
-      const cand = oldNodes[ptr];
-      if(cand && cand.nodeType===nn.nodeType && cand.nodeName===nn.nodeName){ match = cand; ptr++; }
+      // Something new appearing above (a pop-up, the selection bar) shifts every later sibling by
+      // one. Matching purely by position would then morph each section into the next one — the
+      // whole page rebuilds and flickers. So look a few nodes ahead for the same element first,
+      // and don't reuse a node that a later new sibling is clearly the twin of.
+      const cls = nn.nodeType===1 ? nn.getAttribute('class') : null;
+      let pick = -1;
+      if(nn.nodeType===1){
+        for(let j=ptr, seen=0; j<oldNodes.length && seen<4; j++){
+          const o = oldNodes[j]; if(used.has(o) || morphKey(o)) continue; seen++;
+          if(o.nodeType===1 && o.nodeName===nn.nodeName && o.getAttribute('class')===cls){ pick = j; break; }
+        }
+      }
+      if(pick>=0){ match = oldNodes[pick]; if(pick===ptr) ptr++; }
+      else {
+        const cand = oldNodes[ptr];
+        if(cand && cand.nodeType===nn.nodeType && cand.nodeName===nn.nodeName){
+          let twinLater = false;
+          if(cand.nodeType===1){
+            const cc = cand.getAttribute('class');
+            for(let j=i+1; j<newNodes.length && j<=i+4; j++){ const f = newNodes[j]; if(f.nodeType===1 && !morphKey(f) && f.nodeName===cand.nodeName && f.getAttribute('class')===cc){ twinLater = true; break; } }
+          }
+          if(!twinLater){ match = cand; ptr++; }
+        }
+      }
     }
     const ref = oldParent.childNodes[i] || null;
     if(match){
@@ -2069,7 +2226,8 @@ function morphNode(oldN, newN, opts){
   for(let i=0;i<newAttrs.length;i++){
     const a = newAttrs[i];
     if(MORPH_SKIP_ATTRS[a.name] && oldN.hasAttribute(a.name)) continue;
-    if(oldN.getAttribute(a.name)!==a.value) oldN.setAttribute(a.name, a.value);
+    const val = a.name==='class' && oldN.classList.length ? withStickyClasses(oldN, a.value) : a.value;
+    if(oldN.getAttribute(a.name)!==val) oldN.setAttribute(a.name, val);
   }
   if(tag==='TEXTAREA'){
     const newDefault = newN.value;
@@ -3087,6 +3245,8 @@ function normalizeGoals(g){
     if(it.unit===undefined) it.unit='';
     if(it.deadline===undefined) it.deadline=null;
     if(it.autoTrack===undefined) it.autoTrack=null;
+    if(it.period===undefined) it.period=null;
+    if(it.start===undefined) it.start=null;
   });
   return g;
 }
@@ -3970,22 +4130,19 @@ function toggleTaskSelect(id){
   renderView();
 }
 function clearTaskSelection(){ ui.selectedTaskIds.clear(); renderView(); }
-function selectModeBtnHtml(){
-  return '<button class="btn btn-ghost btn-sm" data-action="toggleTaskSelectMode">'+(ui.taskSelectMode?'Done Selecting':'Select Multiple')+'</button>';
-}
-// inline: the Select Multiple button sits in a section header instead, so only the bulk bar renders here
-function renderTaskToolbar(inline){
+// There's no "Select Multiple" mode any more — you just highlight (drag a box, ⌘/⇧-click, ⌘A,
+// see 33f-desktop-select.js). The actions for what you've picked float at the bottom of the
+// window instead of pushing the page down, so picking never makes anything jump.
+function renderTaskToolbar(){ return ''; }
+function bulkBarHtml(){
   const ids = Array.from(ui.selectedTaskIds).filter(function(id){ return state.tasks.items.some(function(t){return t.id===id;}); });
-  if(!ids.length){
-    if(inline) return '';
-    return '<div class="row" style="justify-content:flex-end;margin-bottom:8px;">'+selectModeBtnHtml()+'</div>';
-  }
+  if(!ids.length || !(ui.view==='focus' || ui.view==='today')) return '';
   const selectedTasks = ids.map(function(id){ return state.tasks.items.find(function(t){return t.id===id;}); }).filter(Boolean);
   const anyToday = selectedTasks.some(function(t){return t.status==='today';});
   const anyBacklog = selectedTasks.some(function(t){return t.status==='backlog';});
   const anyDone = selectedTasks.some(function(t){return t.status==='done';});
   const anyNotDone = selectedTasks.some(function(t){return t.status!=='done';});
-  return '<div class="bulk-toolbar section">'+
+  return '<div class="bulk-toolbar is-floating">'+
     '<span class="toolbar-label">'+ids.length+' selected</span>'+
     '<div class="toolbar-actions">'+
       (ids.length===1 ? '<button class="btn btn-sm" data-action="openTaskEditModal" data-id="'+ids[0]+'">Edit</button>' : '')+
@@ -3995,9 +4152,16 @@ function renderTaskToolbar(inline){
       ((anyToday||anyDone) ? '<button class="btn btn-ghost btn-sm" data-action="bulkMoveTasks" data-target="backlog">Move to Backlog</button>' : '')+
       '<button class="btn btn-danger-ghost btn-sm" data-action="bulkRemoveTasks">Remove</button>'+
     '</div>'+
-    '<button class="btn btn-ghost btn-sm toolbar-cancel" data-action="clearTaskSelection">Cancel</button>'+
+    '<button class="btn btn-ghost btn-sm toolbar-cancel" data-action="clearTaskSelection" title="Esc">Clear</button>'+
   '</div>';
 }
+afterRenderHooks.push(function(){
+  let bar = document.getElementById('bulkBar');
+  const html = bulkBarHtml();
+  if(!html){ if(bar) bar.remove(); return; }
+  if(!bar){ bar = document.createElement('div'); bar.id = 'bulkBar'; document.body.appendChild(bar); }
+  morphInto(bar, html);
+});
 function toggleTaskSelectMode(){
   ui.taskSelectMode = !ui.taskSelectMode;
   if(!ui.taskSelectMode) ui.selectedTaskIds.clear();
@@ -4537,12 +4701,12 @@ function renderClientHealthCard(c){
     '</div>'+
     (recurring.length ? '<div class="client-health-delivs">'+recurring.map(function(d){
       const weekCount = deliverableWeekCount(d);
-      const weekTarget = d.weeklyTarget||1;
+      const weekTarget = deliverableWeekNeed(d);
       const pace = deliverablePaceStatus(d);
       const paceColor = pace==='good' ? 'var(--good)' : pace==='warn' ? 'var(--accent)' : 'var(--danger)';
       return '<div class="row" style="justify-content:space-between;align-items:center;padding:4px 0;">'+
         '<span class="kpi-sub" style="color:var(--text);">'+escapeHtml(d.title)+'</span>'+
-        '<span style="font-weight:700;color:'+paceColor+';">'+weekCount+'/'+weekTarget+'<span class="kpi-sub" style="font-weight:400;"> this week</span></span>'+
+        '<span style="font-weight:700;color:'+paceColor+';">'+weekCount+'/'+weekTarget+'<span class="kpi-sub" style="font-weight:400;"> this week &middot; '+paceWord(pace)+'</span></span>'+
       '</div>';
     }).join('')+'</div>' : '<div class="kpi-sub" style="margin-top:2px;">No weekly deliverables — assign a package on their card.</div>')+
     '<div class="row client-touch-row" style="justify-content:flex-end;align-items:center;">'+
@@ -4566,7 +4730,7 @@ function nextUpTask(){
   const items = state.tasks.items;
   const pick = function(id){ return id ? items.find(function(x){ return x.id===id && x.status!=='done'; }) : null; };
   return pick(ui.pendingCurrentTaskId) || pick(ui.stagedTaskId) || (state.focus.nextTaskId!==ui.currentTaskId ? pick(state.focus.nextTaskId) : null) ||
-    sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='today' && t.id!==ui.currentTaskId && !isOngoingDoneToday(t); }))[0] || null;
+    lineupOrdered(items.filter(function(t){ return t.status==='today' && t.id!==ui.currentTaskId && !isOngoingDoneToday(t); }))[0] || null;
 }
 function renderNowNextBar(standalone){
   const cur = ui.currentTaskId ? state.tasks.items.find(function(x){ return x.id===ui.currentTaskId; }) : null;
@@ -4752,22 +4916,40 @@ function goalDaysLeftChip(g){
   return '<span class="goal-chip '+cls+'">'+(days<0 ? 'past due' : days===0 ? 'due today' : days<=60 ? days+'d left' : fmtDateShort(g.deadline))+'</span>';
 }
 function goalCardHtml(g, compact){
+  const t = goalTracker(g);
   const hasTracker = g.target!=null && g.target>0;
   const current = goalLiveCurrent(g);
-  if(g.autoTrack==='streak' && hasTracker && current>=g.target && !g.done) g.done = true;
-  const pct = hasTracker ? clamp(current/g.target*100, 0, 100) : (g.done ? 100 : 0);
+  const pct = goalPct(g);
+  const periodic = goalIsPeriodic(g), reachedNow = periodic && goalReached(g);
   const armedNow = armed.has('goalcomplete:'+g.id);
-  return '<div class="goal-card'+(g.done?' is-done':'')+'" data-key="goal-'+g.id+'">'+
-    '<div class="goal-card-head"><span class="goal-card-title" data-action="openGoalEditModal" data-id="'+g.id+'">'+escapeHtml(g.label)+'</span>'+goalDaysLeftChip(g)+(g.autoTrack==='streak'?'<span class="goal-chip">&#128293; streak</span>':'')+'</div>'+
-    (hasTracker ? progressBarHtml(pct)+'<div class="goal-card-nums"><b>'+fmtGoalNum(current, g.unit)+'</b> / '+fmtGoalNum(g.target, g.unit)+(g.unit && !/^\$/.test(g.unit)?' '+escapeHtml(g.unit):'')+'<span class="goal-pct">'+Math.round(pct)+'%</span></div>' : '')+
+  const unit = t ? t.unit : (g.unit||'');
+  const num = function(n){ return n==null ? '—' : unit==='$/mo' ? '$'+fmtGoalNum(n) : fmtGoalNum(n, unit); };
+  const unitTail = unit && unit!=='$/mo' && !/^\$/.test(unit) ? ' '+escapeHtml(unit) : unit==='$/mo' ? '/mo' : '';
+  return '<div class="goal-card'+(g.done?' is-done':'')+(t?' is-tracked':'')+(reachedNow?' is-hit':'')+'" data-key="goal-'+g.id+'">'+
+    '<div class="goal-card-head">'+(t ? '<span class="goal-icon">'+t.icon+'</span>' : '')+'<span class="goal-card-title" data-action="openGoalEditModal" data-id="'+g.id+'">'+escapeHtml(goalTitle(g))+'</span>'+goalDaysLeftChip(g)+'</div>'+
+    (hasTracker ? progressBarHtml(pct)+'<div class="goal-card-nums"><b>'+num(current)+'</b> / '+num(g.target)+unitTail+
+        (periodic ? ' <span class="kpi-sub">'+(g.period==='week'?'this week':'this month')+'</span>' : '')+
+        (g.autoTrack==='weight' && g.start!=null ? ' <span class="kpi-sub">from '+fmtGoalNum(g.start)+'</span>' : '')+
+        '<span class="goal-pct">'+(reachedNow ? '&#10003;' : Math.round(pct)+'%')+'</span></div>' : '')+
+    (t ? '<div class="goal-src" title="Updates by itself">&#9889; live '+escapeHtml(t.src)+'</div>' : '')+
     (compact ? '' : '<div class="goal-card-actions">'+
-      (hasTracker && g.autoTrack!=='streak' && !g.done ? '<button class="goal-step" data-action="goalStep" data-id="'+g.id+'" data-delta="-1" title="One less">&minus;</button><button class="goal-step" data-action="goalStep" data-id="'+g.id+'" data-delta="1" title="One more">+</button>' : '')+
+      (!t && hasTracker && !g.done ? '<button class="goal-step" data-action="goalStep" data-id="'+g.id+'" data-delta="-1" title="One less">&minus;</button><button class="goal-step" data-action="goalStep" data-id="'+g.id+'" data-delta="1" title="One more">+</button><button class="btn btn-ghost btn-sm" data-action="goalSetNumber" data-id="'+g.id+'" title="Type in where you are now">Update</button>' : '')+
       '<span style="flex:1"></span>'+
-      '<button class="btn btn-sm '+(g.done?'btn-good':(armedNow?'btn-primary':'btn-ghost'))+'" data-action="toggleGoal" data-id="'+g.id+'">'+(g.done?'&#10003; Achieved':(armedNow?'Confirm?':'Mark done'))+'</button>'+
+      (t && !g.done ? '' : '<button class="btn btn-sm '+(g.done?'btn-good':(armedNow?'btn-primary':'btn-ghost'))+'" data-action="toggleGoal" data-id="'+g.id+'">'+(g.done?'&#10003; Achieved':(armedNow?'Confirm?':'Mark done'))+'</button>')+
       '<button class="btn btn-ghost btn-sm" data-action="openGoalEditModal" data-id="'+g.id+'">Edit</button>'+
     '</div>')+
   '</div>';
 }
+ACTIONS.goalSetNumber = function(el, e, id){
+  const g = state.goals.items.find(function(x){ return x.id===id; }); if(!g) return;
+  const v = prompt('Where are you now for "'+goalTitle(g)+'"?', String(g.current||0));
+  if(v==null) return;
+  const n = Number(String(v).replace(/[^0-9.\-]/g, '')); if(isNaN(n)) return;
+  g.current = n;
+  if(g.target && g.current>=g.target && !g.done){ g.done = true; g.doneAt = todayStr(); playSessionComplete(); showToast('Goal reached: '+goalTitle(g), {icon:'&#127942;'}); }
+  else playTick();
+  persist('goals'); renderView();
+};
 function fmtGoalNum(n, unit){ n = Number(n)||0; const s = n.toLocaleString(undefined, {maximumFractionDigits:1}); return /^\$/.test(unit||'') ? '$'+s : s; }
 ACTIONS.goalStep = function(el, e, id){
   const g = state.goals.items.find(function(x){ return x.id===id; }); if(!g) return;
@@ -4790,38 +4972,35 @@ function goalStatTilesHtml(){
 }
 ACTIONS.goToWeight = function(){ ui.view='personal'; ui.personalTab='fitness'; ui.healthTab='weight'; renderView(); };
 ACTIONS.goToFitness = function(){ ui.view='personal'; ui.personalTab='fitness'; ui.healthTab='workouts'; renderView(); };
-// Today panel
+// Today panel: the master goals at a glance, plus your own open goals.
 function renderGoalsPanel(){
-  const open = state.goals.items.filter(function(g){ return !g.done; })
-    .sort(function(a,b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); }).slice(0, 4);
+  const own = state.goals.items.filter(function(g){ return !g.done; }).sort(function(a, b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); }).slice(0, 3);
   return '<div class="section goals-panel">'+
-    '<div class="section-title">Goals<span class="view-all-link" data-action="nav" data-view="personal" data-tab="goals">All goals &rarr;</span></div>'+
-    goalStatTilesHtml()+
-    (open.length ? '<div class="goal-grid" style="margin-top:10px;">'+open.map(function(g){ return goalCardHtml(g, true); }).join('')+'</div>' : '')+
+    masterGoalsHtml(true)+
+    (own.length ? '<div class="goal-grid" style="margin-top:12px;">'+own.map(function(g){ return goalCardHtml(g, true); }).join('')+'</div>' : '')+
+    '<div class="mg-more"><span class="view-all-link" data-action="nav" data-view="personal" data-tab="goals">All goals &rarr;</span></div>'+
   '</div>';
 }
-// Goals tab
+// Goals tab: the master goals, big — then your own goals for anything the app can't see.
 function renderGoalsTab(){
   const items = state.goals.items;
-  const open = items.filter(function(g){ return !g.done; }).sort(function(a,b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); });
+  const open = items.filter(function(g){ return !g.done; }).sort(function(a, b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); });
   const done = items.filter(function(g){ return g.done; });
-  const formOpen = !!ui.forms.newGoal || !items.length;
-  return '<div class="section">'+goalStatTilesHtml()+'</div>'+
+  const formOpen = !!ui.forms.newGoal;
+  return '<div class="section">'+masterGoalsHtml(false)+'</div>'+
     '<div class="section">'+
-      '<div class="section-title">Your goals'+(items.length ? '<button class="btn btn-sm '+(formOpen?'btn-ghost':'btn-good')+'" data-action="toggleForm" data-form="newGoal">'+(formOpen?'Close':'+ New goal')+'</button>' : '')+'</div>'+
+      '<div class="section-title">Your goals'+tip('For things Operator can\'t see — IG followers, a first sponsor deal, a new camera. You update the number.')+'<button class="btn btn-sm '+(formOpen?'btn-ghost':'btn-good')+'" data-action="toggleForm" data-form="newGoal">'+(formOpen?'Close':'+ Add a goal')+'</button></div>'+
       (formOpen ? '<div class="card goal-form">'+
-        '<div class="field"><label>What\'s the goal?</label><input class="input" id="newGoalLabel" placeholder="e.g. $10k/mo, 180 lbs, first sponsor deal" style="width:100%;"></div>'+
+        '<div class="grid grid-2"><div class="field"><label>Goal</label><input class="input" id="newGoalLabel" placeholder="e.g. 10k IG followers"></div>'+
+          '<div class="field"><label>By when (optional)</label><input class="input" type="date" id="newGoalDeadline"></div></div>'+
         '<div class="grid grid-3" style="margin-top:10px;">'+
-          '<div class="field"><label>Target (optional)</label><input class="input" type="number" id="newGoalTarget" placeholder="e.g. 90"></div>'+
-          '<div class="field"><label>Unit</label><input class="input" id="newGoalUnit" placeholder="lbs, $/mo, days"></div>'+
-          '<div class="field"><label>By when</label><input class="input" type="date" id="newGoalDeadline"></div>'+
+          '<div class="field"><label>Target</label><input class="input" type="number" step="any" id="newGoalTarget" placeholder="10000"></div>'+
+          '<div class="field"><label>Unit</label><input class="input" id="newGoalUnit" placeholder="followers"></div>'+
+          '<div class="field"><label>Where you are now</label><input class="input" type="number" step="any" id="newGoalCurrent" placeholder="0"></div>'+
         '</div>'+
-        '<div class="row" style="margin-top:12px;justify-content:space-between;flex-wrap:wrap;gap:10px;">'+
-          '<select class="input" id="newGoalTrackMode" style="max-width:260px;"><option value="manual">I\'ll update progress myself</option><option value="streak">Auto-track from my streak</option></select>'+
-          '<button class="btn btn-good" data-action="addGoal">+ Add goal</button>'+
-        '</div>'+
+        '<div class="row" style="margin-top:12px;justify-content:flex-end;"><button class="btn btn-good" data-action="addGoal">+ Add goal</button></div>'+
       '</div>' : '')+
-      (open.length ? '<div class="goal-grid">'+open.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : (items.length ? '<div class="empty">Every goal achieved. Set the next one.</div>' : ''))+
+      (open.length ? '<div class="goal-grid">'+open.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : (formOpen ? '' : '<div class="empty">Nothing here yet — add one for anything you track yourself.</div>'))+
     '</div>'+
     (done.length ? '<div class="section"><button class="cc2-past-toggle" data-action="toggleForm" data-form="goalsDone">'+(ui.forms.goalsDone?'&#9662;':'&#9656;')+' Achieved ('+done.length+')</button>'+
       (ui.forms.goalsDone ? '<div class="goal-grid" style="margin-top:10px;">'+done.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : '')+'</div>' : '');
@@ -4953,7 +5132,19 @@ function carouselWrap(itemsHtml, key, opts){
   const threeD = opts.threeD!==undefined ? opts.threeD : carouselOn();
   const avail = Math.max(320, window.innerWidth - (state.profile.sidebarCollapsed ? 70 : 230) - 40);
   const loop = !!(opts.loop && opts.count && opts.count*((opts.w||240)+12) > avail);
-  const clone = function(tag){ return itemsHtml.replace(/ data-key="/g, ' data-key="'+tag+'-').replace(/ id="[^"]*"/g, '').replace(/class="/, 'aria-hidden="true" class="car-clone '); };
+  // the copies on either side: every card marked as a copy (selecting only ever picks the real
+  // one; dragging a copy moves the real task), keys prefixed so the morph keeps them apart, ids dropped
+  const clone = function(tag){
+    const tpl = document.createElement('template'); tpl.innerHTML = itemsHtml;
+    tpl.content.querySelectorAll('[id]').forEach(function(el){ el.removeAttribute('id'); });
+    tpl.content.querySelectorAll('[data-key]').forEach(function(el){ el.setAttribute('data-key', tag+'-'+el.getAttribute('data-key')); });
+    Array.prototype.forEach.call(tpl.content.children, function(el, i){
+      el.classList.add('car-clone'); el.setAttribute('aria-hidden', 'true');
+      if(!el.hasAttribute('data-key')) el.setAttribute('data-key', tag+'-'+(el.getAttribute('data-id') || el.getAttribute('data-task-id') || i));
+    });
+    let out = ''; Array.prototype.forEach.call(tpl.content.childNodes, function(n){ out += n.nodeType===1 ? n.outerHTML : (n.textContent||''); });
+    return out;
+  };
   const body = loop ? clone('cA')+itemsHtml+clone('cB') : itemsHtml;
   return '<div class="carousel'+(threeD?' is-3d':'')+(opts.fit?' is-fit':'')+(loop?' is-loop':'')+(opts.bleed!==false?' bleed':'')+(opts.cls?' '+opts.cls:'')+'" data-key="car-'+key+'"'+(opts.w?' style="--car-w:'+opts.w+'px"':'')+'>'+
     '<button class="car-arrow car-prev" data-action="carouselStep" data-dir="-1" aria-label="Back">&#8249;</button>'+
@@ -5546,15 +5737,16 @@ function saveVideoIdeaEdit(id){
 }
 function renderFocusTasksOverview(){
   const items = state.tasks.items;
-  const nowNext = state.focus.activeSession ? renderNowNextBar(true) : '';
-  const today = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='today'; }));
+  const today = lineupOrdered(items.filter(function(t){ return t.status==='today'; }));
+  const listView = lineupView()==='list';
   const backlogPreview = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; })).slice(0,8);
   const backlogTotal = items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; }).length;
-  return nowNext+'<div class="focus-current">'+renderCurrentTaskCard()+'</div>'+
+  return nowNextPanelHtml()+
   renderTaskToolbar(true)+
   '<div class="section" style="margin-bottom:14px;">'+
-    '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('Highest priority and closest deadlines first. Drag a card up to the box above to line it up next.')+'<span class="row" style="margin-left:auto;gap:8px;">'+selectModeBtnHtml()+'<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button></span></div>'+
-    '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236, loop:true, count:today.length}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>'+
+    '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('In your order — switch to List and drag rows to set it (otherwise highest priority and closest deadlines first). Drag a card onto Up next to line it up. Drag a box around cards (or ⌘-click) to pick several.')+'<span class="row" style="margin-left:auto;gap:8px;">'+lineupToggleHtml()+'<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button></span></div>'+
+    (listView ? '<div class="task-column tl-wrap" data-dropzone="today">'+lineupListHtml(today)+'</div>' :
+    '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236, loop:true, count:today.length}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>')+
   '</div>'+
   (backlogTotal ? (
     '<div class="section" style="margin-bottom:14px;"><div class="section-title" style="align-items:center;">Worth Doing Soon<span class="kpi-sub">'+backlogTotal+' in the list</span><button class="btn btn-ghost btn-sm" style="margin-left:auto;" data-action="focusTasksSubTab" data-tab="backlog">See All &rarr;</button></div>'+
@@ -5571,7 +5763,7 @@ function renderFocusBacklogTab(){
   '<div class="section">'+
     '<div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">'+
       '<div class="section-title" style="margin-bottom:0;">The Whole List<span class="kpi-sub">'+backlog.length+'</span>'+tip('Highest priority and closest deadlines first.')+'</div>'+
-      '<div class="row" style="gap:8px;">'+selectModeBtnHtml()+
+      '<div class="row" style="gap:8px;">'+
         (!ui.backlogSearchOpen && !hasFilters ? '<button class="btn btn-ghost btn-sm" data-action="toggleBacklogSearch" title="Search Entries">&#128269;</button>' : '')+
         '<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button>'+
       '</div>'+
@@ -5805,6 +5997,137 @@ function undoTask(id){
 function promoteTask(id){ const t=state.tasks.items.find(function(x){return x.id===id;}); if(t){ t.status='today'; persist('tasks'); renderView(); } }
 function demoteTask(id){ const t=state.tasks.items.find(function(x){return x.id===id;}); if(t){ t.status='backlog'; persist('tasks'); renderView(); } }
 
+
+// ============ NOW / UP NEXT (Focus → Tasks) ============
+// One place that says what you're on and what comes after it.
+//  • Now — only while locked in: the task being timed. ✓ Done finishes it; Release stops timing
+//    it and leaves it on today's list.
+//  • Up next — one task lined up. Drag a card onto it or pick from the list.
+// Nothing ever starts on its own: Start now / Lock in is always your click, and dropping a card
+// onto Now while locked in asks first.
+function nnTask(id){ return id ? state.tasks.items.find(function(t){ return t.id===id && t.status!=='done'; }) : null; }
+function nnExplicitNext(){ const t = nnTask(state.focus.nextTaskId) || nnTask(ui.stagedTaskId); return t && t.id!==ui.currentTaskId ? t : null; }
+function nowNextPanelHtml(){
+  const as = state.focus.activeSession, inS = !!as, onBreak = !!(inS && as.onBreak);
+  const cur = inS ? nnTask(ui.currentTaskId) : null;
+  const pend = inS ? nnTask(ui.pendingCurrentTaskId) : null;
+  const explicit = nnExplicitNext();
+  let next = explicit;
+  if(!next){ const s = nextUpTask(); if(s && s.id!==ui.currentTaskId && !(pend && s.id===pend.id)) next = s; }
+  const title = function(t){ return '<div class="nn-title">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span></div>'; };
+  const picker = function(label){ return '<span class="nn-pick-wrap"><button class="btn btn-ghost btn-sm" data-action="toggleNextPicker" data-where="panel">'+label+' &#9662;</button>'+nextPickerHtml('panel')+'</span>'; };
+  let now = '';
+  if(inS){
+    now = '<div class="nn-cell nn-now'+(cur?' has-task':'')+(pend?' is-asking':'')+'" data-dropzone="current">'+
+      '<div class="nn-k">Now'+tip('What\'s being timed while you\'re locked in. ✓ Done finishes it. Release stops timing it and leaves it on today\'s list.')+'</div>'+
+      (pend
+        ? '<div class="nn-title"><span>'+(cur?'Switch to':'Start')+' &ldquo;'+escapeHtml(pend.title)+'&rdquo;?</span></div>'+
+          '<div class="nn-acts"><button class="btn btn-good btn-sm" data-action="confirmPendingCurrentTask">'+(cur?'&#8646; Switch':'&#9654; Start')+'</button>'+
+            '<button class="btn btn-ghost btn-sm" data-action="nnPendingToNext">Make it next</button>'+
+            '<button class="btn btn-ghost btn-sm" data-action="cancelPendingCurrentTask">Cancel</button></div>'
+        : cur
+          ? '<div class="nn-row">'+title(cur)+'<span class="nn-timer" id="currentTaskElapsedBar">'+formatElapsed(Date.now()-(ui.currentTaskStartedAt||Date.now()))+'</span></div>'+
+            '<div class="nn-acts"><button class="btn btn-good btn-sm" data-action="finishCurrentTask">&#10003; Done</button>'+
+              '<button class="btn btn-ghost btn-sm" data-action="releaseCurrentTask" title="Stop timing it — it stays on today\'s list">Release</button></div>'
+          : '<div class="nn-title nn-empty">'+(onBreak ? 'On a break' : 'Nothing being timed')+'</div><div class="nn-hint">Start what\'s next, or drag a card here</div>')+
+    '</div>';
+  }
+  const nextCell = '<div class="nn-cell nn-next" data-dropzone="next">'+
+    '<div class="nn-k">Up next'+(next && !explicit ? '<span class="nn-sug">suggested</span>' : '')+tip('One task lined up for when you\'re ready. Drag a card here or pick one — it never starts by itself.')+'</div>'+
+    (next
+      ? title(next)+
+        '<div class="nn-acts">'+
+          (inS ? (onBreak ? '' : '<button class="btn btn-primary btn-sm" data-action="nnStartNext" data-id="'+next.id+'">&#9654; '+(cur ? 'Switch to it' : 'Start now')+'</button>')
+               : '<button class="btn btn-good btn-sm" data-action="nnLockInNext" data-id="'+next.id+'">&#128274; Lock in on it</button>')+
+          picker('Change')+
+          (explicit ? '<button class="btn btn-ghost btn-sm" data-action="clearStagedTask" title="Clear what\'s next">&#10005;</button>' : '')+
+        '</div>'
+      : '<div class="nn-title nn-empty">Nothing lined up</div><div class="nn-acts">'+picker('Pick one')+'<span class="nn-hint">or drag a card here</span></div>')+
+  '</div>';
+  return '<div class="nn-panel'+(inS ? ' is-locked' : '')+'" data-key="nn-panel">'+now+nextCell+'</div>';
+}
+ACTIONS.nnStartNext = function(el, e, id){
+  const t = nnTask(id); if(!t || !state.focus.activeSession) return;
+  if(t.status==='backlog'){ t.status = 'today'; persist('tasks'); }
+  ui.pendingCurrentTaskId = null;
+  setCurrentTask(id);
+};
+ACTIONS.nnLockInNext = function(el, e, id){
+  const t = nnTask(id); if(!t) return;
+  if(t.status==='backlog'){ t.status = 'today'; persist('tasks'); }
+  setNextUp(id); renderView(); openLockInChooser();
+};
+ACTIONS.nnPendingToNext = function(){
+  const id = ui.pendingCurrentTaskId; ui.pendingCurrentTaskId = null;
+  if(id) setNextUp(id);
+  playTick(); renderView();
+};
+// a card dropped on Up next just lines it up
+function dropOnNext(taskId){
+  const t = nnTask(taskId); if(!t) return;
+  if(t.status==='backlog'){ t.status = 'today'; persist('tasks'); }
+  if(ui.pendingCurrentTaskId===taskId) ui.pendingCurrentTaskId = null;
+  setNextUp(taskId); playTick(); renderView();
+}
+
+// ============ TODAY'S LIST (your order) ============
+// Today's Lineup as a numbered list in the order you'll do things. Drag rows to reorder; tick
+// one off and the next moves up. The top of the list is what's suggested Up next (unless you've
+// lined something else up yourself), and the cards view follows the same order.
+// The order is stored as a list of task ids — tasks you haven't placed yet go after, by priority.
+function lineupOrdered(list){
+  const pos = {}; arr(state.focus.lineupOrder).forEach(function(id, i){ pos[id] = i; });
+  const placed = list.filter(function(t){ return pos[t.id]!==undefined; }).sort(function(a, b){ return pos[a.id]-pos[b.id]; });
+  return placed.concat(sortByPriorityAndDeadline(list.filter(function(t){ return pos[t.id]===undefined; })));
+}
+function lineupView(){ return state.profile.lineupView==='list' ? 'list' : 'cards'; }
+ACTIONS.setLineupView = function(el, e, id){ state.profile.lineupView = id==='list' ? 'list' : 'cards'; persist('profile'); renderView(); };
+function lineupToggleHtml(){
+  const v = lineupView();
+  return '<div class="seg-tabs seg-sm" style="margin:0;">'+
+    '<button class="seg-tab'+(v==='cards'?' active':'')+'" data-action="setLineupView" data-id="cards" title="Cards">&#9638; Cards</button>'+
+    '<button class="seg-tab'+(v==='list'?' active':'')+'" data-action="setLineupView" data-id="list" title="A list, in the order you\'ll do them">&#9776; List</button>'+
+  '</div>';
+}
+function lineupListHtml(today){
+  if(!today.length) return '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>';
+  const next = nextUpTask(), nextId = next ? next.id : null;
+  return '<ol class="tl-list">'+today.map(function(t, i){
+    const isNow = ui.currentTaskId===t.id, isNext = !isNow && nextId===t.id, doneToday = isOngoingDoneToday(t);
+    const selected = ui.selectedTaskIds.has(t.id);
+    return '<li class="tl-row'+(isNow?' is-now':'')+(isNext?' is-next':'')+(doneToday?' is-done':'')+(selected?' row-selected':'')+(justCompletedTaskId===t.id?' just-completed':'')+'" draggable="true" data-task-id="'+t.id+'" data-dropzone="order" data-id="'+t.id+'">'+
+      '<span class="tl-grip" title="Drag to reorder">&#8942;&#8942;</span>'+
+      '<span class="tl-num">'+(i+1)+'</span>'+
+      '<button class="tl-check'+(doneToday?' is-on':'')+'" data-action="'+(doneToday?'undoTask':'completeTask')+'" data-id="'+t.id+'" title="'+(doneToday?'Undo':(t.ongoing?'Done for today':'Done'))+'">'+(doneToday?'&#10003;':'')+'</button>'+
+      '<span class="tl-main" data-action="openTaskEditModal" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span class="tl-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-ongoing">&#128204;</span>':'')+'</span>'+
+      clientTagsHtml(t.clients)+
+      (t.deadline ? deadlineTag(t) : '')+
+      (isNow ? '<span class="tl-badge is-now">Now</span>' : isNext ? '<span class="tl-badge">Up next</span>' : '')+
+      '<button class="card-more" data-action="taskMenuBtn" data-id="'+t.id+'" title="More — or right-click">&#8943;</button>'+
+    '</li>';
+  }).join('')+'</ol>';
+}
+// drop a task onto a row: it goes just above or below it (pulled onto today's list if needed)
+function reorderLineup(taskId, targetId, after){
+  const t = state.tasks.items.find(function(x){ return x.id===taskId; }); if(!t || taskId===targetId) return;
+  if(t.status!=='today'){ if(t.status==='done') return; t.status = 'today'; persist('tasks'); }
+  const ids = lineupOrdered(state.tasks.items.filter(function(x){ return x.status==='today'; })).map(function(x){ return x.id; }).filter(function(id){ return id!==taskId; });
+  let at = ids.indexOf(targetId); if(at<0) at = ids.length; else if(after) at++;
+  ids.splice(at, 0, taskId);
+  state.focus.lineupOrder = ids;
+  playTick(); persist('focus'); renderView();
+}
+document.addEventListener('dragover', function(e){
+  const row = e.target.closest && e.target.closest('.tl-row'); if(!row) return;
+  const r = row.getBoundingClientRect(), below = e.clientY > r.top + r.height/2;
+  if(row.classList.contains('drop-below')!==below || !(row.classList.contains('drop-above') || row.classList.contains('drop-below'))){
+    document.querySelectorAll('.tl-row.drop-above, .tl-row.drop-below').forEach(function(x){ if(x!==row) x.classList.remove('drop-above', 'drop-below'); });
+    row.classList.toggle('drop-below', below); row.classList.toggle('drop-above', !below);
+  }
+});
+function clearTlDropMarks(){ document.querySelectorAll('.tl-row.drop-above, .tl-row.drop-below').forEach(function(x){ x.classList.remove('drop-above', 'drop-below'); }); }
+document.addEventListener('dragend', clearTlDropMarks);
+document.addEventListener('drop', function(){ setTimeout(clearTlDropMarks, 0); });
 // ============ FOCUS ============
 function formatElapsed(ms){
   ms = Math.max(0, ms);
@@ -6919,7 +7242,7 @@ function renderFitnessStatsSection(){
   const wk = workoutTotals(weekDays(0)), last30 = []; for(let i=29;i>=0;i--) last30.push(addDays(todayStr(), -i));
   const m30 = workoutTotals(last30);
   const tile = function(label, v, sub){ return '<div class="card" style="text-align:center;"><div class="kpi-label">'+label+'</div><div class="kpi-value" style="color:var(--train);">'+v+'</div>'+(sub?'<div class="kpi-sub">'+sub+'</div>':'')+'</div>'; };
-  return '<div class="section"><div class="section-title">Fitness'+tip('From the workouts you log in Personal → Fitness — enter how long each one took and it lands here.')+'<span class="view-all-link" data-action="goToFitness">Log a workout &rarr;</span></div><div class="grid grid-4">'+
+  return '<div class="section"><div class="section-title">Fitness'+tip('From the workouts you log in Personal → Health — enter how long each one took and it lands here.')+'<span class="view-all-link" data-action="goToFitness">Log a workout &rarr;</span></div><div class="grid grid-4">'+
       tile('Total Workouts', all.n, dates.length ? 'since '+fmtDateShort(dates.sort()[0]) : 'none logged yet')+
       tile('Time Working Out', fmtDurationLabel(all.m), all.n ? fmtDurationLabel(Math.round(all.m/all.n))+' per workout' : '')+
       tile('This Week', wk.n, fmtDurationLabel(wk.m))+
@@ -7904,7 +8227,7 @@ function filteredJournalEntries(){
   const allEntries = state.journal.entries.slice().sort(function(a,b){ return b.timestamp-a.timestamp; });
   const searchLower = (ui.journalSearchText||'').toLowerCase();
   return allEntries.filter(function(e){
-    const matchesMood = !ui.journalFilterMood || e.mood===ui.journalFilterMood;
+    const matchesMood = ui.journalFilterMood ? e.mood===ui.journalFilterMood : !isUpdateEntry(e);
     const matchesSearch = !searchLower || e.text.toLowerCase().indexOf(searchLower)>=0;
     return matchesMood && matchesSearch;
   });
@@ -8186,11 +8509,170 @@ function saveQuickJournal(){
   closeQuickJournalModal();
 }
 
-// ============ GOALS ============
-function goalLiveCurrent(g){
-  if(g.autoTrack==='streak') return computeStreak();
-  return g.current||0;
+
+// ============ SETTINGS → APP UPDATES ============
+// Notes about changes to the app itself (entries filed under an "Updates" journal type) aren't
+// part of the everyday journal — they live in Settings → App updates: every one in full (no Read
+// More), newest first, each with a Copy button, plus Copy all for a date range. They're kept out
+// of My Journal entirely.
+function updatesTypeId(){
+  const set = state.journal && state.journal.updatesType;
+  const all = journalTypes().concat(MOODS);
+  if(set && all.some(function(m){ return m.id===set; })) return set;
+  const hit = all.find(function(m){ return /update/i.test(m.label||'') || /update/i.test(m.id||''); });
+  return hit ? hit.id : null;
 }
+function isUpdateEntry(e){ const id = updatesTypeId(); return !!(id && e && e.mood===id); }
+function updateEntries(){
+  const since = ui.updatesRange==='7' ? addDays(todayStr(), -6) : ui.updatesRange==='30' ? addDays(todayStr(), -29) : null;
+  const q = (ui.updatesSearch||'').toLowerCase();
+  return state.journal.entries.filter(function(e){ return isUpdateEntry(e) && (!since || e.date>=since) && (!q || String(e.text||'').toLowerCase().indexOf(q)>=0); })
+    .sort(function(a, b){ return b.timestamp-a.timestamp; });
+}
+function updateCopyText(e){ return fmtDateShort(e.date)+(e.timestamp ? ' · '+fmtTimeShort(e.timestamp) : '')+'\n'+(e.text||''); }
+function copyToClipboard(text, what){
+  const done = function(){ showToast((what||'Copied')+' — ready to paste', {icon:'&#128203;', duration:1600}); };
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(function(){ if(fallbackCopy(text)) done(); });
+  else if(fallbackCopy(text)) done();
+}
+ACTIONS.copyUpdate = function(el, e, id){
+  const en = state.journal.entries.find(function(x){ return x.id===id; }); if(!en) return;
+  copyToClipboard(en.text||'', 'Update copied');
+  el.classList.add('is-copied'); setTimeout(function(){ el.classList.remove('is-copied'); }, 1200);
+};
+ACTIONS.copyAllUpdates = function(){
+  const list = updateEntries(); if(!list.length) return;
+  copyToClipboard(list.slice().reverse().map(updateCopyText).join('\n\n———\n\n'), list.length+' update'+(list.length===1?'':'s')+' copied');
+};
+ACTIONS.updatesRange = function(el, e, id){ ui.updatesRange = id; renderView(); };
+ACTIONS.setUpdatesType = function(el){ state.journal.updatesType = el.value || null; persist('journal'); renderView(); };
+ACTIONS.createUpdatesType = function(){
+  if(!Array.isArray(state.journal.types) || !state.journal.types.length) state.journal.types = defaultJournalTypes().slice();
+  const t = {id:'updates', emoji:'&#128227;', label:'Updates', color:'#8fdcff'};
+  if(!state.journal.types.some(function(x){ return x.id==='updates'; })) state.journal.types.push({id:t.id, emoji:'📣', label:t.label, color:t.color});
+  state.journal.updatesType = 'updates';
+  persist('journal'); renderView();
+};
+document.addEventListener('change', function(e){ if(e.target && e.target.id==='updatesTypeSel') ACTIONS.setUpdatesType(e.target); });
+document.addEventListener('input', function(e){ if(e.target && e.target.id==='updatesSearch'){ ui.updatesSearch = e.target.value; clearTimeout(ui._updT); ui._updT = setTimeout(renderView, 150); } });
+function updateCardHtml(e){
+  const photos = arr(e.photos);
+  return '<article class="upd-card" data-journal-id="'+e.id+'">'+
+    '<header class="upd-head"><span class="upd-date">'+escapeHtml(fmtDateShort(e.date))+'</span><span class="upd-time">'+(e.timestamp ? fmtTimeShort(e.timestamp) : '')+'</span>'+
+      '<span style="flex:1"></span>'+
+      '<button class="upd-copy" data-action="copyUpdate" data-id="'+e.id+'" title="Copy this update"><span class="upd-copy-i">&#128203;</span><span class="upd-copy-l">Copy</span><span class="upd-copied">&#10003; Copied</span></button>'+
+      '<button class="je-more" data-action="journalMenu" data-id="'+e.id+'" title="Pin, edit, remove">&#8943;</button>'+
+    '</header>'+
+    '<div class="upd-text">'+escapeHtml(e.text||'')+'</div>'+
+    (photos.length ? '<div class="row" style="margin-top:10px;flex-wrap:wrap;">'+photos.map(function(src, idx){ return '<img src="'+escapeHtml(blobUrl(src))+'" class="journal-photo-thumb" data-action="viewJournalPhoto" data-id="'+e.id+'" data-idx="'+idx+'">'; }).join('')+'</div>' : '')+
+  '</article>';
+}
+function renderUpdatesTab(){
+  const typeId = updatesTypeId();
+  const types = journalTypes().concat(MOODS.filter(function(m){ return !journalTypes().some(function(t){ return t.id===m.id; }); }));
+  const picker = '<select class="input" id="updatesTypeSel" style="max-width:220px;">'+types.map(function(t){ return '<option value="'+escapeHtml(t.id)+'"'+(t.id===typeId?' selected':'')+'>'+escapeHtml((t.emoji||'')+' '+t.label)+'</option>'; }).join('')+'</select>';
+  if(!typeId){
+    return '<div class="card upd-empty"><div style="font-size:28px;">&#128227;</div><div class="section-title" style="justify-content:center;margin:6px 0;">Updates</div>'+
+      '<div class="kpi-sub" style="margin:0 auto 14px;">Which journal type are they filed under?'+tip('Notes about changes to the app live here — each in full, with one-click copy — and stay out of your journal.')+'</div>'+
+      '<div class="row" style="justify-content:center;gap:8px;flex-wrap:wrap;">'+picker+'<button class="btn btn-good btn-sm" data-action="createUpdatesType">+ Make an "Updates" type</button></div></div>';
+  }
+  const list = updateEntries(), r = ui.updatesRange || 'all';
+  const groups = [], byDate = {};
+  list.forEach(function(e){ if(!byDate[e.date]){ byDate[e.date] = []; groups.push(e.date); } byDate[e.date].push(e); });
+  return '<div class="upd-bar">'+
+      '<div class="seg-tabs" style="margin:0;">'+[['7','7 days'],['30','30 days'],['all','All']].map(function(x){ return '<button class="seg-tab'+(r===x[0]?' active':'')+'" data-action="updatesRange" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>'+
+      '<input class="input" id="updatesSearch" placeholder="Search updates…" value="'+escapeHtml(ui.updatesSearch||'')+'" style="flex:1;min-width:160px;max-width:280px;">'+
+      '<span style="flex:1"></span>'+
+      '<span class="kpi-sub">'+list.length+' update'+(list.length===1?'':'s')+'</span>'+
+      '<button class="btn btn-primary btn-sm" data-action="copyAllUpdates"'+(list.length?'':' disabled')+'>&#128203; Copy all</button>'+
+    '</div>'+
+    (list.length ? groups.map(function(d){
+      const label = d===todayStr() ? 'Today' : d===addDays(todayStr(), -1) ? 'Yesterday' : weekdayShort(d)+', '+fmtDateShort(d);
+      return '<div class="kind-label">'+label+'</div>'+byDate[d].map(updateCardHtml).join('');
+    }).join('') : '<div class="empty">No updates '+(r==='all' ? 'yet' : 'in this range')+'. Journal entries filed under '+escapeHtml((moodById(typeId)||{}).label||'Updates')+' show up here, not in your journal.</div>')+
+    '<div class="row upd-foot"><span class="kpi-sub">Counted as updates:</span>'+picker+'</div>';
+}
+// ============ GOALS ============
+// Two kinds:
+//  • Tracked goals fill themselves from what the app already knows — MRR from your active
+//    clients, weight from Health → Weight, workouts from Health → Workouts, hours from your
+//    locked-in sessions, days in a row from the Today's Standard streak, active clients.
+//  • Your own goals are for things the app can't see (IG followers, a first sponsor deal):
+//    you bump them with + / − or type the number in.
+const GOAL_TRACKERS = {
+  mrr:      {icon:'&#128176;', label:'Monthly revenue', unit:'$/mo', src:'from your active clients\' MRR', name:function(g){ return '$'+fmtGoalNum(g.target)+'/mo MRR'; }},
+  weight:   {icon:'&#9878;&#65039;', label:'Body weight', unit:'lbs', src:'from Health → Weight', name:function(g){ return 'Reach '+fmtGoalNum(g.target)+' lbs'; }},
+  workouts: {icon:'&#127947;&#65039;', label:'Workouts', unit:'workouts', src:'from Health → Workouts', periods:true, name:function(g){ return fmtGoalNum(g.target)+' workouts '+goalPeriodLabel(g); }},
+  hours:    {icon:'&#9201;&#65039;', label:'Hours of deep work', unit:'h', src:'from your locked-in sessions', periods:true, name:function(g){ return fmtGoalNum(g.target)+'h of deep work '+goalPeriodLabel(g); }},
+  streak:   {icon:'&#128293;', label:'Days in a row', unit:'days', src:'from your Today\'s Standard streak', name:function(g){ return fmtGoalNum(g.target)+'-day streak'; }},
+  clients:  {icon:'&#129309;', label:'Active clients', unit:'clients', src:'from Business → Clients', name:function(g){ return fmtGoalNum(g.target)+' active clients'; }}
+};
+const GOAL_KINDS = ['mrr', 'weight', 'workouts', 'hours', 'streak', 'clients', 'custom'];
+function goalTracker(g){ return g && g.autoTrack ? GOAL_TRACKERS[g.autoTrack] || null : null; }
+function goalPeriodLabel(g){ return g.period==='week' ? 'a week' : g.period==='month' ? 'a month' : 'in total'; }
+function goalIsPeriodic(g){ const t = goalTracker(g); return !!(t && t.periods && (g.period==='week' || g.period==='month')); }
+function goalRange(g){
+  const today = todayStr();
+  if(g.period==='week') return [startOfWeekStr(today), today];
+  if(g.period==='month') return [today.slice(0, 8)+'01', today];
+  return [g.createdAt || today, today];
+}
+function sumOverDays(from, to, fn){
+  let t = 0, d = from, guard = 0;
+  while(d<=to && guard++ < 1500){ t += fn(d); d = addDays(d, 1); }
+  return t;
+}
+function latestWeight(){
+  const log = arr(state.health.weightLog); let best = null;
+  log.forEach(function(w){ if(w && w.weight!=null && (!best || w.date>=best.date)) best = w; });
+  return best ? Number(best.weight) : null;
+}
+// where a weight goal is measured from: your first logged weight (same as Health → Weight)
+function firstWeight(){
+  const log = arr(state.health.weightLog); let first = null;
+  log.forEach(function(w){ if(w && w.weight!=null && (!first || w.date<first.date)) first = w; });
+  return first ? Number(first.weight) : null;
+}
+function goalLiveCurrentRaw(g){
+  switch(g.autoTrack){
+    case 'streak': return computeStreak();
+    case 'mrr': return activeMrr();
+    case 'clients': return arr(state.business.clients).filter(function(c){ return c.status==='active'; }).length;
+    case 'weight': return latestWeight();
+    case 'workouts': { const r = goalRange(g); return sumOverDays(r[0], r[1], function(d){ return workoutDay(d).n; }); }
+    case 'hours': { const r = goalRange(g); const today = todayStr(); return Math.round(sumOverDays(r[0], r[1], function(d){ return d===today ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); })/6)/10; }
+    default: return Number(g.current)||0;
+  }
+}
+function goalLiveCurrent(g){ return RC && g.id ? memo('goal:'+g.id, function(){ return goalLiveCurrentRaw(g); }) : goalLiveCurrentRaw(g); }
+function goalPct(g){
+  if(!(g.target>0)) return g.done ? 100 : 0;
+  const cur = goalLiveCurrent(g);
+  if(g.autoTrack==='weight'){
+    if(cur==null || g.start==null || Number(g.start)===Number(g.target)) return cur!=null && goalReached(g) ? 100 : 0;
+    return clamp((g.start-cur)/(g.start-g.target)*100, 0, 100);
+  }
+  return clamp(cur/g.target*100, 0, 100);
+}
+function goalReached(g){
+  if(!(g.target>0)) return false;
+  const cur = goalLiveCurrent(g);
+  if(g.autoTrack==='weight') return cur!=null && (g.start!=null && Number(g.start) < Number(g.target) ? cur>=g.target : cur<=g.target);
+  return cur>=g.target;
+}
+// Tracked goals tick themselves off the first time they're reached (weekly/monthly ones just show
+// "done this week" and roll over).
+function settleGoals(){
+  let changed = false;
+  state.goals.items.forEach(function(g){
+    if(g.done || !g.autoTrack || goalIsPeriodic(g) || !goalReached(g)) return;
+    g.done = true; g.doneAt = todayStr(); changed = true;
+    showToast('Goal reached: '+goalTitle(g), {icon:'&#127942;'});
+  });
+  if(changed){ playSessionComplete(); persist('goals'); }
+}
+afterRenderHooks.push(function(){ if(state.goals && state.goals.items.some(function(g){ return g.autoTrack && !g.done; })) setTimeout(settleGoals, 0); });
+function goalTitle(g){ const t = goalTracker(g); return g.label || (t ? t.name(g) : 'Goal'); }
 function goalDeadlineTag(g){
   if(!g.deadline) return '';
   const days = Math.ceil((new Date(g.deadline+'T00:00:00') - new Date(todayStr()+'T00:00:00'))/86400000);
@@ -8201,26 +8683,50 @@ function goalDeadlineTag(g){
   else { cls='tag'; label=fmtDateShort(g.deadline); }
   return '<span class="'+cls+'" style="margin-left:8px;">'+label+'</span>';
 }
-function goalRow(g){
-  const hasTracker = g.target!=null && g.target>0;
-  const current = goalLiveCurrent(g);
-  if(g.autoTrack==='streak' && hasTracker && current>=g.target && !g.done){ g.done=true; }
-  const pct = hasTracker ? clamp(Math.round(current/g.target*100),0,100) : 0;
-  const isArmed = armed.has('goalcomplete:'+g.id);
-  return '<div class="task-item-v2 '+(g.done?'done':'')+'" style="'+(hasTracker?'':'align-items:center;')+'">'+
-    '<button class="btn btn-sm '+(g.done?'btn-good':(isArmed?'btn-primary':'btn-ghost'))+'" data-action="toggleGoal" data-id="'+g.id+'" style="flex-shrink:0;">'+(g.done?'&#10003; Done':(isArmed?'Confirm?':'Mark Done')) +'</button>'+
-    '<div style="flex:1;min-width:160px;">'+
-      '<div class="task-title">'+escapeHtml(g.label)+(g.autoTrack==='streak'?'<span class="tag" style="margin-left:8px;">&#128293; Streak</span>':'')+goalDeadlineTag(g)+'</div>'+
-      (hasTracker ? (
-        '<div class="progress" style="margin-top:6px;max-width:220px;"><div class="progress-bar" style="width:'+pct+'%;background:'+goalColor()+';'+goalGlowStyle(pct)+'"></div></div>'+
-        '<div class="kpi-sub" style="margin-top:4px;">'+current+' / '+g.target+' '+escapeHtml(g.unit||'')+'</div>'
-      ) : '')+
-    '</div>'+
-    '<button class="btn btn-ghost btn-sm" data-action="openGoalEditModal" data-id="'+g.id+'">Edit</button>'+
-  '</div>';
+// ---- the kind picker shared by the new-goal form and the editor ----
+function goalKindChipsHtml(cur, action){
+  return '<div class="goal-kinds">'+GOAL_KINDS.map(function(k){
+    const t = GOAL_TRACKERS[k];
+    return '<button class="goal-kind'+(cur===k?' is-on':'')+'" data-action="'+action+'" data-id="'+k+'">'+(t ? t.icon+' '+t.label : '&#9997;&#65039; Something else')+'</button>';
+  }).join('')+'</div>';
 }
+function goalFieldsHtml(prefix, kind, g){
+  g = g || {};
+  const t = GOAL_TRACKERS[kind];
+  const v = function(x){ return x!=null && x!=='' ? escapeHtml(String(x)) : ''; };
+  const placeholder = {mrr:String(state.profile.revenueGoalMonthly||10000), weight:String(state.profile.goalWeight||180), workouts:String(state.profile.weeklyWorkoutTarget||4), hours:'20', streak:'30', clients:'10', custom:'10000'}[kind];
+  return '<div class="grid grid-3" style="margin-top:12px;">'+
+      '<div class="field"><label>Target'+(t ? ' ('+t.unit+')' : '')+'</label><input class="input" type="number" step="any" id="'+prefix+'Target" value="'+v(g.target)+'" placeholder="'+placeholder+'"></div>'+
+      (t && t.periods
+        ? '<div class="field"><label>Counted</label><select class="input" id="'+prefix+'Period">'+[['week','Every week'],['month','Every month'],['all','In total, from today']].map(function(o){ return '<option value="'+o[0]+'"'+((g.period||'week')===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select></div>'
+        : !t ? '<div class="field"><label>Unit</label><input class="input" id="'+prefix+'Unit" value="'+v(g.unit)+'" placeholder="followers, $, reels…"></div>'
+        : '<div class="field"><label>Right now</label><div class="goal-now">'+goalNowText(kind)+'</div></div>')+
+      '<div class="field"><label>By when (optional)</label><input class="input" type="date" id="'+prefix+'Deadline" value="'+v(g.deadline)+'"></div>'+
+    '</div>'+
+    (!t ? '<div class="grid grid-2" style="margin-top:10px;"><div class="field"><label>Where you are now</label><input class="input" type="number" step="any" id="'+prefix+'Current" value="'+v(g.current)+'" placeholder="0"></div></div>' : '')+
+    '<div class="field" style="margin-top:10px;"><label>Name it (optional)</label><input class="input" id="'+prefix+'Label" value="'+v(g.label)+'" placeholder="'+(t ? escapeHtml(t.name({target:Number(placeholder), period:g.period||'week'})) : 'e.g. 10k IG followers')+'" style="width:100%;"></div>'+
+    (t ? '<div class="kpi-sub" style="margin-top:8px;">&#9889; Fills in by itself '+escapeHtml(t.src)+'.</div>' : '<div class="kpi-sub" style="margin-top:8px;">For things Operator can\'t see — you update the number yourself.</div>');
+}
+function goalNowText(kind){
+  if(kind==='mrr') return '$'+fmtGoalNum(activeMrr())+'/mo';
+  if(kind==='weight'){ const w = latestWeight(); return w!=null ? w+' lbs' : 'log your weight'; }
+  if(kind==='streak') return computeStreak()+' days';
+  if(kind==='clients') return arr(state.business.clients).filter(function(c){ return c.status==='active'; }).length+' active';
+  return '';
+}
+function readGoalFields(prefix, kind){
+  const val = function(id){ const el = document.getElementById(prefix+id); return el ? el.value.trim() : ''; };
+  const out = {autoTrack: kind==='custom' ? null : kind, label: val('Label'), target: Number(val('Target')) || null, deadline: val('Deadline') || null};
+  if(GOAL_TRACKERS[kind] && GOAL_TRACKERS[kind].periods) out.period = val('Period') || 'week';
+  if(kind==='custom'){ out.unit = val('Unit'); const c = Number(val('Current')); out.current = isNaN(c) ? 0 : c; }
+  else out.unit = GOAL_TRACKERS[kind].unit;
+  return out;
+}
+// ---- editing ----
 function openGoalEditModal(id){
   ui.editingGoalId = id;
+  const g = state.goals.items.find(function(x){ return x.id===id; });
+  ui.editGoalKind = g ? (g.autoTrack && GOAL_TRACKERS[g.autoTrack] ? g.autoTrack : 'custom') : 'custom';
   const o = document.getElementById('goalEditOverlay');
   if(!o) return;
   o.classList.remove('hidden');
@@ -8230,20 +8736,9 @@ function closeGoalEditModal(){ ui.editingGoalId = null; const o=document.getElem
 function renderGoalEditModal(){
   const g = state.goals.items.find(function(x){return x.id===ui.editingGoalId;});
   if(!g) return '';
-  const hasTracker = g.target!=null && g.target>0;
-  const isStreak = g.autoTrack==='streak';
-  return '<div class="section-title" style="margin-bottom:14px;">Edit Goal</div>'+
-    '<div class="field"><label>Goal</label><input class="input" id="editGoalLabel-'+g.id+'" value="'+escapeHtml(g.label)+'" style="width:100%;"></div>'+
-    '<div class="grid grid-2" style="margin-top:10px;">'+
-      '<div class="field"><label>Target (optional)</label><input class="input" type="number" id="editGoalTarget-'+g.id+'" value="'+(g.target!=null?g.target:'')+'"></div>'+
-      '<div class="field"><label>Unit (optional)</label><input class="input" id="editGoalUnit-'+g.id+'" value="'+escapeHtml(g.unit||'')+'"></div>'+
-    '</div>'+
-    '<div class="grid grid-2" style="margin-top:10px;">'+
-      '<div class="field"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="editGoalDeadline-'+g.id+'" value="'+(g.deadline||'')+'" style="flex:1;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editGoalDeadline-'+g.id+'">&#128197;</button></div></div>'+
-      '<div class="field"><label>Tracking</label><select class="input" id="editGoalTrackMode-'+g.id+'" style="width:100%;"><option value="manual" '+(!isStreak?'selected':'')+'>I\'ll update progress myself</option><option value="streak" '+(isStreak?'selected':'')+'>Auto-track from my streak</option></select></div>'+
-    '</div>'+
-    (hasTracker && !isStreak ? '<div class="field" style="margin-top:10px;"><label>Current progress</label><input class="input" type="number" id="editGoalCurrent-'+g.id+'" value="'+(g.current||0)+'"></div>' : '')+
-    (isStreak ? '<div class="kpi-sub" style="margin-top:10px;">Progress = your live streak ('+computeStreak()+' days)'+tip('It updates on its own — no manual entry needed.')+'</div>' : '')+
+  const kind = ui.editGoalKind || 'custom';
+  return '<div class="section-title" style="margin-bottom:10px;">Edit Goal</div>'+
+    goalFieldsHtml('editGoal', kind, g)+
     '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
       deleteBtn('goal', g.id)+
       '<div class="row">'+
@@ -8252,44 +8747,49 @@ function renderGoalEditModal(){
       '</div>'+
     '</div>';
 }
+ACTIONS.editGoalKind = function(el, e, id){ ui.editGoalKind = id; renderGoalEditModalInto(); };
 function renderGoalEditModalInto(){ const el=document.getElementById('goalEditContent'); if(el) morphInto(el, renderGoalEditModal(), {form:true}); }
 function saveEditGoal(id){
   const g = state.goals.items.find(function(x){return x.id===id;}); if(!g) return;
-  g.label = document.getElementById('editGoalLabel-'+id).value.trim() || g.label;
-  g.target = Number(document.getElementById('editGoalTarget-'+id).value) || null;
-  g.unit = document.getElementById('editGoalUnit-'+id).value.trim();
-  const deadlineEl = document.getElementById('editGoalDeadline-'+id);
-  g.deadline = deadlineEl && deadlineEl.value ? deadlineEl.value : null;
-  const trackModeEl = document.getElementById('editGoalTrackMode-'+id);
-  g.autoTrack = (trackModeEl && trackModeEl.value==='streak') ? 'streak' : null;
-  if(g.autoTrack==='streak'){
-    g.current = computeStreak();
-  } else {
-    const curEl = document.getElementById('editGoalCurrent-'+id);
-    if(curEl){
-      const val = Number(curEl.value);
-      if(!isNaN(val)) g.current = val;
-    }
-  }
-  if(g.target && g.current>=g.target && !g.done){ g.done=true; playSessionComplete(); }
+  const kind = ui.editGoalKind || 'custom';
+  const f = readGoalFields('editGoal', kind);
+  if(f.autoTrack==='weight' && (g.autoTrack!=='weight' || g.start==null)) g.start = firstWeight();
+  if(f.autoTrack && f.autoTrack!==g.autoTrack && f.period==='all') g.createdAt = todayStr();
+  Object.assign(g, f);
+  if(g.done && !goalIsPeriodic(g) && g.target && !goalReached(g) && g.autoTrack) g.done = false;
+  if(!g.autoTrack && g.target && g.current>=g.target && !g.done){ g.done = true; playSessionComplete(); }
   closeGoalEditModal();
   persist('goals'); renderView();
 }
+// ---- adding ----
+ACTIONS.newGoalKind = function(el, e, id){ ui.newGoalKind = id; renderView(); };
 function addGoal(){
-  const el = document.getElementById('newGoalLabel');
-  const label = el.value.trim();
-  if(!label) return;
-  const target = Number(document.getElementById('newGoalTarget').value) || null;
-  const unit = document.getElementById('newGoalUnit').value.trim();
-  const deadlineEl = document.getElementById('newGoalDeadline');
-  const deadline = deadlineEl && deadlineEl.value ? deadlineEl.value : null;
-  const trackModeEl = document.getElementById('newGoalTrackMode');
-  const autoTrack = (trackModeEl && trackModeEl.value==='streak') ? 'streak' : null;
-  const current = autoTrack==='streak' ? computeStreak() : 0;
-  state.goals.items.push({id:uid(), label:label, done:false, target:target, current:current, unit:unit, deadline:deadline, autoTrack:autoTrack, createdAt:todayStr()});
+  const f = readGoalFields('newGoal', 'custom');
+  if(!f.label){ showToast('Give it a name — e.g. 10k IG followers.', {icon:'&#127919;'}); return; }
+  createGoal(f);
+}
+function createGoal(f){
+  const g = Object.assign({id:uid(), label:'', done:false, target:null, current:0, unit:'', deadline:null, autoTrack:null, createdAt:todayStr()}, f);
+  if(g.autoTrack==='weight') g.start = firstWeight();
+  state.goals.items.push(g);
+  ui.forms.newGoal = false;
   playSessionComplete();
   persist('goals'); renderView();
 }
+// One-tap master goals from the targets already set in Settings (revenue, goal weight, workouts a week).
+function goalSuggestions(){
+  const has = function(k){ return state.goals.items.some(function(g){ return g.autoTrack===k && !g.done; }); };
+  const out = [];
+  if(!has('mrr') && state.profile.revenueGoalMonthly) out.push({autoTrack:'mrr', target:state.profile.revenueGoalMonthly, unit:'$/mo'});
+  if(!has('weight') && state.profile.goalWeight) out.push({autoTrack:'weight', target:state.profile.goalWeight, unit:'lbs'});
+  if(!has('workouts') && state.profile.weeklyWorkoutTarget) out.push({autoTrack:'workouts', target:state.profile.weeklyWorkoutTarget, period:'week', unit:'workouts'});
+  if(!has('hours')) out.push({autoTrack:'hours', target:Math.round((state.standards.deepWorkTargetMinutes||180)*5/60), period:'week', unit:'h'});
+  if(!has('streak')) out.push({autoTrack:'streak', target:30, unit:'days'});
+  return out;
+}
+ACTIONS.addSuggestedGoal = function(el, e, id){
+  const s = goalSuggestions().find(function(x){ return x.autoTrack===id; }); if(s) createGoal(s);
+};
 function toggleGoal(id){
   const g = state.goals.items.find(function(x){ return x.id===id; }); if(!g) return;
   if(g.done){ g.done = false; playTick(); persist('goals'); renderView(); return; }
@@ -8300,11 +8800,112 @@ function toggleGoal(id){
     return;
   }
   armed.delete(key);
-  g.done = true;
+  g.done = true; g.doneAt = todayStr();
   playSessionComplete();
   persist('goals'); renderView();
 }
 
+// ============ MASTER GOALS ============
+// The big ones, always there — nothing to set up. Each reads a number the app already keeps:
+//  • Revenue  — MRR from your active clients (Business)
+//  • Weight   — your latest weigh-in (Health → Weight), measured from your first one
+//  • Workouts — workouts logged this week (Health → Workouts)
+//  • Deep work — hours locked in this week
+//  • Streak   — days in a row you've hit Today's Standard
+// Targets are the ones in Settings (revenue, goal weight, workouts a week) plus two of their own;
+// tap a target to change it right here. Anything the app can't see (IG followers, a first
+// sponsor deal) goes under Your goals, which you update yourself.
+function masterGoalDefs(){
+  const p = state.profile;
+  const deepTarget = p.weeklyDeepHoursGoal || Math.round((state.standards.deepWorkTargetMinutes||180)*5/60);
+  const w = latestWeight(), w0 = firstWeight();
+  const ws = startOfWeekStr(todayStr());
+  const wk = sumOverDays(ws, todayStr(), function(d){ return workoutDay(d).n; });
+  const deepMin = sumOverDays(ws, todayStr(), function(d){ return d===todayStr() ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); });
+  const active = arr(state.business.clients).filter(function(c){ return c.status==='active'; }).length;
+  return [
+    {key:'mrr', icon:'&#128176;', label:'Monthly revenue', cur:activeMrr(), target:p.revenueGoalMonthly||0, field:'revenueGoalMonthly', fmt:function(n){ return '$'+fmtGoalNum(n); }, suffix:'/mo',
+      src:active+' active client'+(active===1?'':'s'), go:'goToClients', color:'#3FBE8E', color2:'#8fe3c2'},
+    {key:'weight', icon:'&#9878;&#65039;', label:'Body weight', cur:w, start:w0, target:p.goalWeight, field:'goalWeight', fmt:function(n){ return fmtGoalNum(n); }, suffix:' lbs',
+      src: w==null ? 'log a weigh-in in Health' : 'from '+fmtGoalNum(w0)+' lbs', go:'goToWeight', color:'#5BB4E5', color2:'#a9dcf7'},
+    {key:'workouts', icon:'&#127947;&#65039;', label:'Workouts this week', cur:wk, target:p.weeklyWorkoutTarget||0, field:'weeklyWorkoutTarget', fmt:function(n){ return fmtGoalNum(n); }, suffix:'',
+      src:'logged in Health', go:'goToFitness', color:'#E8A23D', color2:'#f5cf8e'},
+    {key:'deep', icon:'&#9201;&#65039;', label:'Deep work this week', cur:Math.round(deepMin/6)/10, target:deepTarget, field:'weeklyDeepHoursGoal', fmt:function(n){ return fmtGoalNum(n)+'h'; }, suffix:'',
+      src:'hours locked in', go:'goToAnalytics', color:'#B39DDB', color2:'#ddd0f3'},
+    {key:'streak', icon:'&#128293;', label:'Days in a row', cur:computeStreak(), target:p.streakGoal||30, field:'streakGoal', fmt:function(n){ return fmtGoalNum(n); }, suffix:' days',
+      src:'Today\'s Standard', go:null, color:'#FF7A45', color2:'#ffc0a3'}
+  ];
+}
+function masterPct(m){
+  if(m.cur==null || !(m.target>0)) return 0;
+  if(m.key==='weight'){
+    if(m.start==null || m.start===m.target) return m.cur===m.target ? 100 : 0;
+    return clamp((m.start-m.cur)/(m.start-m.target)*100, 0, 100);
+  }
+  return clamp(m.cur/m.target*100, 0, 100);
+}
+function masterToGo(m){
+  if(m.cur==null) return '';
+  if(!(m.target>0)) return 'set a target';
+  if(m.key==='weight'){ const d = Math.abs(m.cur-m.target); return masterPct(m)>=100 || d<0.05 ? 'reached' : fmtGoalNum(d)+' lbs to go'; }
+  const left = m.target-m.cur;
+  if(left<=0) return m.key==='mrr' ? 'reached — raise the bar' : 'hit';
+  return m.fmt(Math.round(left*10)/10)+(m.key==='mrr'?'/mo':'')+' to go';
+}
+function ringSvg(pct, c1, c2, id, size){
+  size = size || 112; const r = size/2 - 8, C = 2*Math.PI*r, off = C*(1-pct/100);
+  return '<svg class="mg-ring-svg" viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'">'+
+    '<defs><linearGradient id="mgg-'+id+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+c2+'"/><stop offset="1" stop-color="'+c1+'"/></linearGradient></defs>'+
+    '<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" style="stroke:rgba(var(--ink),.07)" stroke-width="9"/>'+
+    '<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="url(#mgg-'+id+')" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 '+size/2+' '+size/2+')" class="mg-ring-arc"/>'+
+  '</svg>';
+}
+function masterTargetHtml(m){
+  if(ui.editMaster===m.key){
+    return '<span class="mg-edit"><input class="input mg-edit-in" id="mgEdit-'+m.key+'" type="number" step="any" value="'+(m.target!=null?m.target:'')+'" placeholder="target"><button class="btn btn-primary btn-sm" data-action="saveMasterTarget" data-id="'+m.key+'">Set</button></span>';
+  }
+  return '<button class="mg-target" data-action="editMasterTarget" data-id="'+m.key+'" title="Change the target">'+(m.target>0 || (m.key==='weight' && m.target!=null) ? 'goal '+m.fmt(m.target)+m.suffix : 'set a goal')+' <span class="mg-pen">&#9998;</span></button>';
+}
+// the money goal, front and center
+function masterHeroHtml(m){
+  const pct = masterPct(m);
+  return '<div class="mg-hero" style="--mg1:'+m.color+';--mg2:'+m.color2+';">'+
+    '<div class="mg-hero-top"><span class="mg-k">'+m.icon+' '+m.label+'</span>'+masterTargetHtml(m)+'</div>'+
+    '<div class="mg-hero-num"><span class="mg-big">'+m.fmt(m.cur)+'</span><span class="mg-of">'+m.suffix+'</span><span class="mg-pct">'+Math.round(pct)+'%</span></div>'+
+    '<div class="mg-bar"><div class="mg-bar-fill" style="width:'+pct.toFixed(1)+'%"></div>'+[25,50,75].map(function(t){ return '<span class="mg-tick'+(pct>=t?' is-past':'')+'" style="left:'+t+'%"></span>'; }).join('')+'</div>'+
+    '<div class="mg-hero-foot"><span>'+escapeHtml(masterToGo(m))+'</span><span class="mg-src"'+(m.go?' data-action="'+m.go+'"':'')+'>'+escapeHtml(m.src)+(m.go?' &rarr;':'')+'</span></div>'+
+  '</div>';
+}
+function masterRingHtml(m, compact){
+  const pct = masterPct(m), hit = pct>=100;
+  return '<div class="mg-card'+(hit?' is-hit':'')+(compact?' is-compact':'')+'"'+(compact?' data-action="nav" data-view="personal" data-tab="goals" title="Goals"':'')+' style="--mg1:'+m.color+';--mg2:'+m.color2+';">'+
+    '<div class="mg-ring">'+ringSvg(pct, m.color, m.color2, m.key+(compact?'c':''), compact ? 84 : 112)+
+      '<div class="mg-ring-in"><span class="mg-ring-v">'+(m.cur==null ? '—' : m.fmt(m.cur))+'</span>'+(compact ? '' : '<span class="mg-ring-pct">'+(hit ? '&#10003;' : Math.round(pct)+'%')+'</span>')+'</div>'+
+    '</div>'+
+    '<div class="mg-card-k">'+m.icon+' '+m.label+'</div>'+
+    (compact ? '<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div>'
+      : masterTargetHtml(m)+'<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div><div class="mg-src"'+(m.go?' data-action="'+m.go+'"':'')+'>'+escapeHtml(m.src)+(m.go?' &rarr;':'')+'</div>')+
+  '</div>';
+}
+function masterGoalsHtml(compact){
+  const defs = masterGoalDefs();
+  // On Today it's one row of rings (the Business panel above already shows MRR big); the Goals
+  // tab gets the full hero.
+  if(compact) return '<div class="mg-wrap is-compact"><div class="mg-row mg-row-5">'+defs.map(function(m){ return masterRingHtml(m, true); }).join('')+'</div></div>';
+  return '<div class="mg-wrap">'+masterHeroHtml(defs[0])+'<div class="mg-row">'+defs.slice(1).map(function(m){ return masterRingHtml(m, false); }).join('')+'</div></div>';
+}
+ACTIONS.editMasterTarget = function(el, e, id){ ui.editMaster = id; renderView(); setTimeout(function(){ const i = document.getElementById('mgEdit-'+id); if(i){ i.focus(); i.select(); } }, 30); };
+ACTIONS.saveMasterTarget = function(el, e, id){
+  const m = masterGoalDefs().find(function(x){ return x.key===id; }); const i = document.getElementById('mgEdit-'+id);
+  if(m && i){ const raw = i.value.trim(), n = Number(raw); state.profile[m.field] = raw==='' ? (id==='weight' ? null : 0) : (isNaN(n) ? state.profile[m.field] : n); persist('profile'); playTick(); }
+  ui.editMaster = null; renderView();
+};
+document.addEventListener('keydown', function(e){
+  const t = e.target; if(!t || !t.id || t.id.indexOf('mgEdit-')!==0) return;
+  if(e.key==='Enter'){ e.preventDefault(); ACTIONS.saveMasterTarget(null, null, t.id.slice(7)); }
+  else if(e.key==='Escape'){ ui.editMaster = null; renderView(); }
+});
+ACTIONS.goToClients = function(){ ui.view='business'; ui.businessTab='clients'; renderView(); };
 // ============ PACKAGES / PLANS ============
 function renderPackagesTab(){
   const packages = arr(state.business.packages);
@@ -8430,7 +9031,7 @@ function renderPersonal(){
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Personal'+tip('Goals first, then body, then the running log of what\'s on your mind — journal entries and boards, including your vision board.')+'</div></div></div>'+
   '<div class="tabs">'+
     '<div class="tab '+(ui.personalTab==='goals'?'active':'')+'" data-action="personalTab" data-tab="goals">Goals</div>'+
-    '<div class="tab '+(ui.personalTab==='fitness'?'active':'')+'" data-action="personalTab" data-tab="fitness">Fitness</div>'+
+    '<div class="tab '+(ui.personalTab==='fitness'?'active':'')+'" data-action="personalTab" data-tab="fitness">Health</div>'+
     '<div class="tab '+(ui.personalTab==='journal'?'active':'')+'" data-action="personalTab" data-tab="journal">Journal</div>'+
     '<div class="tab '+(ui.personalTab==='wishlist'?'active':'')+'" data-action="personalTab" data-tab="wishlist">Wish List</div>'+
   '</div>'+
@@ -9999,20 +10600,21 @@ function deliverablePaceStatus(d){
   if(RC && d.id) return memo('dps:'+d.id, function(){ return deliverablePaceStatusRaw(d); });
   return deliverablePaceStatusRaw(d);
 }
-// Green = on pace or ahead. Yellow = behind, but you've done some this week. Red = behind
-// with nothing done yet. "On pace" is judged per week (an 8-a-month reel plan = 2 a week):
-// early in the week 0 is fine, it fills up as the week goes, and anything missed last week
-// has to be made up first.
-function deliverablePaceStatusRaw(d){
-  const target = d.weeklyTarget||1;
-  const done = deliverableWeekCount(d);
-  const owed = Math.min(target, deliverableLastWeek(d).missed);
-  if(done >= target+owed) return 'good';
+// Always be ahead of the curve. Green = ahead of where the week should be by today. Yellow =
+// exactly on the curve (on time, not ahead — e.g. 2 of 2 on Sunday). Red = behind it.
+// The curve is per week (an 8-a-month reel plan = 2 a week) and fills up as the week goes;
+// anything missed last week is added on top, and shown as "owed" so the count adds up.
+function deliverableOwed(d){ return Math.min(d.weeklyTarget||1, deliverableLastWeek(d).missed); }
+function deliverableWeekNeed(d){ return (d.weeklyTarget||1) + deliverableOwed(d); }
+function deliverableDueByToday(d){
   const daysIn = ((new Date().getDay()+6)%7)+1; // Mon = 1 … Sun = 7
-  const required = owed + Math.floor(target*daysIn/7);
-  if(done >= required) return 'good';
-  return done>0 ? 'warn' : 'danger';
+  return deliverableOwed(d) + Math.floor((d.weeklyTarget||1)*daysIn/7);
 }
+function deliverablePaceStatusRaw(d){
+  const done = deliverableWeekCount(d), due = deliverableDueByToday(d);
+  return done > due ? 'good' : done===due ? 'warn' : 'danger';
+}
+function paceWord(pace){ return pace==='good' ? 'ahead' : pace==='warn' ? 'on pace' : 'behind'; }
 function isDeliverableDoneThisWeek(d){
   if(d.recurring){
     if(deliverableMonthCount(d) >= monthlyTargetFor(d)) return true;
@@ -10049,14 +10651,14 @@ function recurringDeliverableRowHtml(clientId, d, readOnly){
   const monthCount = deliverableMonthCount(d);
   const monthlyTarget = monthlyTargetFor(d);
   const weekCount = deliverableWeekCount(d);
-  const weekTarget = d.weeklyTarget||1;
+  const weekTarget = deliverableWeekNeed(d), owed = deliverableOwed(d);
   const pace = deliverablePaceStatus(d);
   const paceColor = pace==='good' ? 'var(--good)' : pace==='warn' ? 'var(--accent)' : 'var(--danger)';
   return '<div class="deliv-counter">'+
     '<div class="deliv-counter-ring" style="border-color:'+paceColor+';color:'+paceColor+';">'+monthCount+'</div>'+
     '<div class="deliv-counter-info">'+
       '<div class="deliv-counter-title">'+escapeHtml(d.title)+'</div>'+
-      '<div class="kpi-sub">'+monthCount+' / '+monthlyTarget+' this month &middot; '+weekCount+'/'+weekTarget+' this week</div>'+
+      '<div class="kpi-sub">'+monthCount+' / '+monthlyTarget+' this month &middot; '+weekCount+'/'+weekTarget+' this week'+(owed?' (incl. '+owed+' owed from last week)':'')+' &middot; <span style="color:'+paceColor+';">'+paceWord(pace)+'</span></div>'+
     '</div>'+
     (readOnly ? '' :
       '<div class="deliv-counter-actions">'+
@@ -10093,22 +10695,29 @@ function clientHealthStatusRaw(c){
 function clientWeeklyStatus(c){ return clientHealthStatus(c); }
 const CLIENT_HEALTH_META = {
   green:{cls:'tag-good', emoji:'&#128994;', label:'Healthy'},
-  yellow:{cls:'tag-warn', emoji:'&#128993;', label:'Slipping'},
+  yellow:{cls:'tag-warn', emoji:'&#128993;', label:'On pace'},
   red:{cls:'tag-danger', emoji:'&#128308;', label:'Needs attention'}
 };
 const CLIENT_STATUS_META = CLIENT_HEALTH_META;
 // Health is shown as a colored status pill: dot + label + the short reason behind it.
+// Says which thing set the color: deliverables (ahead / on pace / behind) or keeping in touch.
+function clientHealthCause(status){ const rank = {good:0, warn:1, danger:2}; return status.hasDeliverables && rank[status.paceLevel] >= rank[status.careLevel] ? 'pace' : 'care'; }
 function clientHealthReason(c, status){
-  if(status.level==='green') return status.hasDeliverables ? 'on pace' : 'in touch';
-  const rank = {good:0, warn:1, danger:2};
-  if(rank[status.careLevel] >= rank[status.paceLevel]) return clientCareTier(c).label.toLowerCase();
-  return 'behind on deliverables';
+  if(status.level==='green') return status.hasDeliverables ? 'ahead of the week' : 'in touch';
+  if(clientHealthCause(status)==='care') return clientCareTier(c).label.toLowerCase();
+  if(status.level==='yellow') return 'right on the curve — get ahead';
+  const owed = arr(c.deliverables).filter(function(d){ return d.recurring; }).reduce(function(a, d){ return a + deliverableOwed(d); }, 0);
+  return owed ? owed+' owed from last week' : 'behind on deliverables';
+}
+function clientHealthLabel(status){
+  if(status.level==='green') return status.hasDeliverables ? 'Ahead' : 'Healthy';
+  if(status.level==='yellow') return 'On pace';
+  return clientHealthCause(status)==='care' ? 'Check in' : 'Behind';
 }
 function clientHealthTagHtml(c){
   const status = clientHealthStatus(c);
-  const m = CLIENT_HEALTH_META[status.level];
-  return '<span class="health-pill health-'+status.level+'" title="Client health — deliverable pace and time since last touch">'+
-    '<span class="health-dot"></span><span class="health-label">'+m.label+'</span>'+
+  return '<span class="health-pill health-'+status.level+'" title="Green = ahead of the week · Yellow = right on pace · Red = behind, or a check-in is due">'+
+    '<span class="health-dot"></span><span class="health-label">'+clientHealthLabel(status)+'</span>'+
     '<span class="health-reason">'+escapeHtml(clientHealthReason(c, status))+'</span>'+
   '</span>';
 }
@@ -12081,7 +12690,7 @@ function clientColor(c){
   return 'hsl('+(Math.abs(h)%360)+',42%,40%)';
 }
 // Health is color only (the card edge and a ring round the initials); hover for the why.
-function clientHealthTitle(c){ const hs = clientHealthStatus(c); return CLIENT_HEALTH_META[hs.level].label+' — '+clientHealthReason(c, hs); }
+function clientHealthTitle(c){ const hs = clientHealthStatus(c); return clientHealthLabel(hs)+' — '+clientHealthReason(c, hs); }
 function clientAvatarHtml(c, small, withHealth){
   const hs = withHealth ? clientHealthStatus(c) : null;
   return '<span class="cc2-avatar'+(small?' cc2-avatar-sm':'')+(hs?' ring-'+hs.level:'')+'" style="background:'+clientColor(c)+'"'+(hs?' title="'+escapeHtml(clientHealthTitle(c))+'"':'')+'>'+escapeHtml(clientInitials(c))+'</span>';
@@ -12097,16 +12706,16 @@ function clientDelivRowsHtml(c, compact){
   const recurring = arr(c.deliverables).filter(function(d){ return d.recurring; });
   if(!recurring.length) return '';
   return '<div class="cc2-delivs">'+recurring.map(function(d){
-    const done = deliverableWeekCount(d), target = d.weeklyTarget||1;
+    const done = deliverableWeekCount(d), target = deliverableWeekNeed(d);
     const pace = deliverablePaceStatus(d);
     const lw = deliverableLastWeek(d);
     const caughtUp = done>=lw.missed;
     const today = arr(d.completedDates).indexOf(todayStr())>=0;
-    return '<div class="cc2-deliv" data-key="dv-'+c.id+'-'+d.id+'" title="'+escapeHtml(d.title)+': '+done+' of '+target+' this week · '+deliverableMonthCount(d)+' this month">'+
+    return '<div class="cc2-deliv" data-key="dv-'+c.id+'-'+d.id+'" title="'+escapeHtml(d.title)+': '+done+' of '+target+' this week ('+paceWord(pace)+')'+(lw.missed?' · includes '+deliverableOwed(d)+' owed from last week':'')+' · '+deliverableMonthCount(d)+' this month">'+
       '<span class="cc2-deliv-title">'+escapeHtml(d.title)+'</span>'+
       weekDotsHtml(Math.min(done, target), target, pace)+
       '<span class="cc2-deliv-count" style="color:'+paceColorOf(pace)+'">'+done+'/'+target+'</span>'+
-      (lw.missed ? '<span class="cc2-owed'+(caughtUp?' is-caught':'')+'" title="Last week ended at '+lw.done+'/'+lw.target+(caughtUp?' — caught up this week':' — log '+lw.missed+' this week to catch up')+'">last wk '+lw.done+'/'+lw.target+'</span>' : '')+
+      (lw.missed ? '<span class="cc2-owed'+(caughtUp?' is-caught':'')+'" title="Last week ended at '+lw.done+'/'+lw.target+(caughtUp?' — caught up this week':' — log '+lw.missed+' this week to catch up')+'">+'+deliverableOwed(d)+' owed</span>' : '')+
       '<button class="cc2-deliv-btn cc2-plus'+(today?' did-today':'')+'" data-action="incrementDeliverableProgress" data-client="'+c.id+'" data-id="'+d.id+'" title="Log one">+</button>'+
     '</div>';
   }).join('')+'</div>';
@@ -12151,8 +12760,9 @@ function renderClientsHome(){
   return '<div class="cc2-statrow">'+
       stat(levels.length, 'active client'+(levels.length===1?'':'s'))+
       stat('$'+mrr.toLocaleString(), 'MRR')+
-      stat(levels.filter(function(l){ return l==='green'; }).length, 'healthy', 'is-good')+
-      stat(levels.filter(function(l){ return l!=='green'; }).length, 'need attention', levels.some(function(l){ return l!=='green'; })?'is-warn':'')+
+      stat(levels.filter(function(l){ return l==='green'; }).length, 'ahead', 'is-good')+
+      stat(levels.filter(function(l){ return l==='yellow'; }).length, 'on pace', levels.some(function(l){ return l==='yellow'; })?'is-warn':'')+
+      stat(levels.filter(function(l){ return l==='red'; }).length, 'behind / check in', levels.some(function(l){ return l==='red'; })?'is-bad':'')+
       stat(due, 'to reach out to', due?'is-warn':'')+
     '</div>'+
     (function(){
@@ -12943,6 +13553,7 @@ function renderSettings(){
   const saveBtn = '<button class="btn btn-primary section" data-action="saveProfile">Save Changes</button>';
 
   const sections = {
+    updates: '<div class="upd-panel">'+renderUpdatesTab()+'</div>',
     general: '<div class="card section"><div class="section-title">Personal Info</div><div class="grid grid-2">'+
         '<div class="field"><label>Name</label><input class="input" id="setName" value="'+escapeHtml(p.name)+'"></div>'+
         '<div class="field"><label>Business name</label><input class="input" id="setBusinessName" value="'+escapeHtml(p.businessName||'')+'" placeholder="e.g. Rivera Media Co."></div>'+
@@ -13114,7 +13725,8 @@ function renderSettings(){
     {id:'focus', label:'Focus &amp; Alarms', icon:'&#9201;'},
     {id:'standards', label:'Standards', icon:'&#127939;'},
     {id:'business', label:'Business', icon:'&#9635;'},
-    {id:'calendarJournal', label:'Calendar &amp; Journal', icon:'&#9638;'}
+    {id:'calendarJournal', label:'Calendar &amp; Journal', icon:'&#9638;'},
+    {id:'updates', label:'App updates', icon:'&#128227;'}
   ];
   const active = sections[ui.settingsTab] ? ui.settingsTab : 'general';
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Settings</div></div></div>'+
@@ -15185,7 +15797,10 @@ document.body.addEventListener('dragstart', function(e){
   if(!card) return;
   e.dataTransfer.setData('text/plain', card.dataset.taskId);
   e.dataTransfer.effectAllowed = 'move';
+  // light up where it can go (Now / Up next / the list) while it's in the air
+  document.body.classList.add('is-dragging-task');
 });
+document.body.addEventListener('dragend', function(){ document.body.classList.remove('is-dragging-task'); });
 document.body.addEventListener('dragover', function(e){
   const zone = e.target.closest && e.target.closest('[data-dropzone]');
   if(!zone) return;
@@ -15201,6 +15816,7 @@ document.body.addEventListener('dragleave', function(e){
   if(zone && !zone.contains(e.relatedTarget)) zone.classList.remove('drop-hover');
 });
 document.body.addEventListener('drop', function(e){
+  document.body.classList.remove('is-dragging-task');
   const zone = e.target.closest && e.target.closest('[data-dropzone]');
   if(!zone) return;
   e.preventDefault();
@@ -15209,7 +15825,10 @@ document.body.addEventListener('drop', function(e){
   const newZone = zone.dataset.dropzone;
   const t = state.tasks.items.find(function(x){ return x.id===taskId; });
   if(!t) return;
-  if(newZone==='current'){ if(state.focus.activeSession){ setCurrentTask(taskId); } else { stageNextTask(taskId); } return; }
+  // Nothing starts timing from a drop: onto Now (locked in) it asks first; onto Up next it just lines it up.
+  if(newZone==='current'){ if(state.focus.activeSession){ if(t.status==='backlog'){ t.status = 'today'; persist('tasks'); } stagePendingCurrentTask(taskId); } else { stageNextTask(taskId); } return; }
+  if(newZone==='next'){ dropOnNext(taskId); return; }
+  if(newZone==='order'){ const r = zone.getBoundingClientRect(); reorderLineup(taskId, zone.dataset.id, e.clientY > r.top + r.height/2); return; }
   if(t.status===newZone) return;
   if(newZone==='done'){
     completeTask(taskId);
@@ -15598,7 +16217,7 @@ document.addEventListener('pointercancel', endNavDrag, true);
 // Like the Finder: drag a box across empty space to pick up every task it touches, ⌘- or
 // ⇧-click cards to add or drop them, ⌘A for every task on the page — then right-click any
 // picked card for actions on all of them at once. Esc or a click on empty space lets go.
-const SEL_CARD = '.task-card[data-id], .task-item-v2[data-task-id], .finished-row[data-task-id], .video-idea-compact[data-task-id]';
+const SEL_CARD = '.task-card[data-id], .tl-row[data-task-id], .task-item-v2[data-task-id], .finished-row[data-task-id], .video-idea-compact[data-task-id]';
 function selCardId(el){ return el.getAttribute('data-id') || el.getAttribute('data-task-id'); }
 function selVisibleCards(){
   return Array.prototype.filter.call(document.querySelectorAll('#viewRoot '+SEL_CARD.split(', ').join(', #viewRoot ')), function(el){

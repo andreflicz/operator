@@ -13,7 +13,19 @@ function carouselWrap(itemsHtml, key, opts){
   const threeD = opts.threeD!==undefined ? opts.threeD : carouselOn();
   const avail = Math.max(320, window.innerWidth - (state.profile.sidebarCollapsed ? 70 : 230) - 40);
   const loop = !!(opts.loop && opts.count && opts.count*((opts.w||240)+12) > avail);
-  const clone = function(tag){ return itemsHtml.replace(/ data-key="/g, ' data-key="'+tag+'-').replace(/ id="[^"]*"/g, '').replace(/class="/, 'aria-hidden="true" class="car-clone '); };
+  // the copies on either side: every card marked as a copy (selecting only ever picks the real
+  // one; dragging a copy moves the real task), keys prefixed so the morph keeps them apart, ids dropped
+  const clone = function(tag){
+    const tpl = document.createElement('template'); tpl.innerHTML = itemsHtml;
+    tpl.content.querySelectorAll('[id]').forEach(function(el){ el.removeAttribute('id'); });
+    tpl.content.querySelectorAll('[data-key]').forEach(function(el){ el.setAttribute('data-key', tag+'-'+el.getAttribute('data-key')); });
+    Array.prototype.forEach.call(tpl.content.children, function(el, i){
+      el.classList.add('car-clone'); el.setAttribute('aria-hidden', 'true');
+      if(!el.hasAttribute('data-key')) el.setAttribute('data-key', tag+'-'+(el.getAttribute('data-id') || el.getAttribute('data-task-id') || i));
+    });
+    let out = ''; Array.prototype.forEach.call(tpl.content.childNodes, function(n){ out += n.nodeType===1 ? n.outerHTML : (n.textContent||''); });
+    return out;
+  };
   const body = loop ? clone('cA')+itemsHtml+clone('cB') : itemsHtml;
   return '<div class="carousel'+(threeD?' is-3d':'')+(opts.fit?' is-fit':'')+(loop?' is-loop':'')+(opts.bleed!==false?' bleed':'')+(opts.cls?' '+opts.cls:'')+'" data-key="car-'+key+'"'+(opts.w?' style="--car-w:'+opts.w+'px"':'')+'>'+
     '<button class="car-arrow car-prev" data-action="carouselStep" data-dir="-1" aria-label="Back">&#8249;</button>'+

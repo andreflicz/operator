@@ -3,7 +3,7 @@
 // Like the Finder: drag a box across empty space to pick up every task it touches, ⌘- or
 // ⇧-click cards to add or drop them, ⌘A for every task on the page — then right-click any
 // picked card for actions on all of them at once. Esc or a click on empty space lets go.
-const SEL_CARD = '.task-card[data-id], .task-item-v2[data-task-id], .finished-row[data-task-id], .video-idea-compact[data-task-id]';
+const SEL_CARD = '.task-card[data-id], .tl-row[data-task-id], .task-item-v2[data-task-id], .finished-row[data-task-id], .video-idea-compact[data-task-id]';
 function selCardId(el){ return el.getAttribute('data-id') || el.getAttribute('data-task-id'); }
 function selVisibleCards(){
   return Array.prototype.filter.call(document.querySelectorAll('#viewRoot '+SEL_CARD.split(', ').join(', #viewRoot ')), function(el){

@@ -325,12 +325,12 @@ function renderClientHealthCard(c){
     '</div>'+
     (recurring.length ? '<div class="client-health-delivs">'+recurring.map(function(d){
       const weekCount = deliverableWeekCount(d);
-      const weekTarget = d.weeklyTarget||1;
+      const weekTarget = deliverableWeekNeed(d);
       const pace = deliverablePaceStatus(d);
       const paceColor = pace==='good' ? 'var(--good)' : pace==='warn' ? 'var(--accent)' : 'var(--danger)';
       return '<div class="row" style="justify-content:space-between;align-items:center;padding:4px 0;">'+
         '<span class="kpi-sub" style="color:var(--text);">'+escapeHtml(d.title)+'</span>'+
-        '<span style="font-weight:700;color:'+paceColor+';">'+weekCount+'/'+weekTarget+'<span class="kpi-sub" style="font-weight:400;"> this week</span></span>'+
+        '<span style="font-weight:700;color:'+paceColor+';">'+weekCount+'/'+weekTarget+'<span class="kpi-sub" style="font-weight:400;"> this week &middot; '+paceWord(pace)+'</span></span>'+
       '</div>';
     }).join('')+'</div>' : '<div class="kpi-sub" style="margin-top:2px;">No weekly deliverables — assign a package on their card.</div>')+
     '<div class="row client-touch-row" style="justify-content:flex-end;align-items:center;">'+

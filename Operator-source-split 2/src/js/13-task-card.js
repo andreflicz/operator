@@ -90,22 +90,19 @@ function toggleTaskSelect(id){
   renderView();
 }
 function clearTaskSelection(){ ui.selectedTaskIds.clear(); renderView(); }
-function selectModeBtnHtml(){
-  return '<button class="btn btn-ghost btn-sm" data-action="toggleTaskSelectMode">'+(ui.taskSelectMode?'Done Selecting':'Select Multiple')+'</button>';
-}
-// inline: the Select Multiple button sits in a section header instead, so only the bulk bar renders here
-function renderTaskToolbar(inline){
+// There's no "Select Multiple" mode any more — you just highlight (drag a box, ⌘/⇧-click, ⌘A,
+// see 33f-desktop-select.js). The actions for what you've picked float at the bottom of the
+// window instead of pushing the page down, so picking never makes anything jump.
+function renderTaskToolbar(){ return ''; }
+function bulkBarHtml(){
   const ids = Array.from(ui.selectedTaskIds).filter(function(id){ return state.tasks.items.some(function(t){return t.id===id;}); });
-  if(!ids.length){
-    if(inline) return '';
-    return '<div class="row" style="justify-content:flex-end;margin-bottom:8px;">'+selectModeBtnHtml()+'</div>';
-  }
+  if(!ids.length || !(ui.view==='focus' || ui.view==='today')) return '';
   const selectedTasks = ids.map(function(id){ return state.tasks.items.find(function(t){return t.id===id;}); }).filter(Boolean);
   const anyToday = selectedTasks.some(function(t){return t.status==='today';});
   const anyBacklog = selectedTasks.some(function(t){return t.status==='backlog';});
   const anyDone = selectedTasks.some(function(t){return t.status==='done';});
   const anyNotDone = selectedTasks.some(function(t){return t.status!=='done';});
-  return '<div class="bulk-toolbar section">'+
+  return '<div class="bulk-toolbar is-floating">'+
     '<span class="toolbar-label">'+ids.length+' selected</span>'+
     '<div class="toolbar-actions">'+
       (ids.length===1 ? '<button class="btn btn-sm" data-action="openTaskEditModal" data-id="'+ids[0]+'">Edit</button>' : '')+
@@ -115,9 +112,16 @@ function renderTaskToolbar(inline){
       ((anyToday||anyDone) ? '<button class="btn btn-ghost btn-sm" data-action="bulkMoveTasks" data-target="backlog">Move to Backlog</button>' : '')+
       '<button class="btn btn-danger-ghost btn-sm" data-action="bulkRemoveTasks">Remove</button>'+
     '</div>'+
-    '<button class="btn btn-ghost btn-sm toolbar-cancel" data-action="clearTaskSelection">Cancel</button>'+
+    '<button class="btn btn-ghost btn-sm toolbar-cancel" data-action="clearTaskSelection" title="Esc">Clear</button>'+
   '</div>';
 }
+afterRenderHooks.push(function(){
+  let bar = document.getElementById('bulkBar');
+  const html = bulkBarHtml();
+  if(!html){ if(bar) bar.remove(); return; }
+  if(!bar){ bar = document.createElement('div'); bar.id = 'bulkBar'; document.body.appendChild(bar); }
+  morphInto(bar, html);
+});
 function toggleTaskSelectMode(){
   ui.taskSelectMode = !ui.taskSelectMode;
   if(!ui.taskSelectMode) ui.selectedTaskIds.clear();
