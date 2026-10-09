@@ -1875,6 +1875,9 @@
   .ghl-map-k{ flex:1; min-width:0; font-weight:600; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .ghl-map-row select{ width:150px; padding:5px 8px; }
   .ghl-toggles{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:8px; margin-top:12px; }
+  .ghl-bridge{ margin-top:10px; font-size:12.5px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; color:var(--text-dim); }
+  .ghl-bridge.is-ok{ color:var(--good-text); }
+  .ghl-bridge.is-missing{ color:var(--warn-text); padding:9px 12px; border-radius:10px; background:rgba(232,162,61,.1); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -15893,17 +15896,46 @@ function ghlCfg(){
   return g;
 }
 function ghlOn(){ const g = ghlCfg(); return !!(g.connected && g.locationId && g.pipelineId); }
-async function ghlFetch(url){
-  let res;
-  try{ res = await fetch(url, {cache:'no-store'}); }
-  catch(e){ const err = new Error('The GoHighLevel bridge isn\'t running — open Operator from the Operator app on your Mac.'); err.noHelper = true; throw err; }
-  const text = await res.text(); let json = null; try{ json = JSON.parse(text); }catch(e){}
-  if(!res.ok){
-    const msg = json && (json.message || json.error || json.msg);
-    const err = new Error(res.status===401 ? 'GoHighLevel didn\'t accept the key (401) — check it and its scopes.' : res.status===403 ? 'Not allowed (403) — the key is missing a scope for this.' : (Array.isArray(msg) ? msg.join(', ') : msg) || ('GoHighLevel said '+res.status));
-    err.status = res.status; throw err;
+// The Operator app's GHL bridge answers one request at a time and needs a moment between them,
+// so requests go out one by one (queued), and a refused one is retried a few times before
+// we decide the bridge isn't there.
+const GHL_RETRY_MS = [120, 250, 450, 700, 1000, 1500];
+let ghlQueue = Promise.resolve();
+function ghlSleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+async function ghlFetchOnce(url){
+  for(let i=0; ; i++){
+    try{ return await fetch(url, {cache:'no-store'}); }
+    catch(e){
+      if(i >= GHL_RETRY_MS.length){
+        const err = new Error('Can\'t reach Operator\'s GoHighLevel connection on this Mac. Quit Operator completely (⌘Q) and open it again from the Operator app — if an older Operator window was still open, the new connection never started.');
+        err.noHelper = true; throw err;
+      }
+      await ghlSleep(GHL_RETRY_MS[i]);
+    }
   }
-  return json || {};
+}
+function ghlFetch(url){
+  const run = ghlQueue.then(async function(){
+    const res = await ghlFetchOnce(url);
+    const text = await res.text(); let json = null; try{ json = JSON.parse(text); }catch(e){}
+    if(!res.ok){
+      const msg = json && (json.message || json.error || json.msg);
+      const err = new Error(res.status===401 ? 'GoHighLevel didn\'t accept the key (401) — check it and its scopes.' : res.status===403 ? 'Not allowed (403) — the key is missing a scope for this.' : (Array.isArray(msg) ? msg.join(', ') : msg) || ('GoHighLevel said '+res.status));
+      err.status = res.status; throw err;
+    }
+    await ghlSleep(40); // a breath before the next request
+    return json || {};
+  });
+  ghlQueue = run.catch(function(){});
+  return run;
+}
+// Is the bridge there? Checked when Integrations opens, so a missing bridge shows up front.
+ACTIONS.ghlCheckBridge = function(){ ghlCheckBridge(true); };
+function ghlCheckBridge(force){
+  if(ui.ghlBridge && !force && Date.now()-ui.ghlBridge.at < 30000) return;
+  ui.ghlBridge = {state:'checking', at:Date.now()};
+  ghlFetch(GHL_HELPER+'status').then(function(r){ ui.ghlBridge = {state:'ok', hasKey:!!r.hasKey, at:Date.now()}; renderView(); })
+    .catch(function(e){ ui.ghlBridge = {state:'missing', at:Date.now(), msg:e.message}; renderView(); });
 }
 function ghlCall(method, path, body){ return ghlFetch(GHL_HELPER+'api?m='+method+'&p='+hexUtf8(path)+(body ? '&b='+hexUtf8(JSON.stringify(body)) : '')); }
 function ghlQ(obj){ return Object.keys(obj).filter(function(k){ return obj[k]!=null && obj[k]!==''; }).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(obj[k]); }).join('&'); }
@@ -16139,7 +16171,11 @@ function ghlSettingsHtml(){
   const toggle = function(k, label){ return '<label class="row" style="gap:8px;font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" data-ghl-toggle="'+k+'" '+(g[k]?'checked':'')+'>'+label+'</label>'; };
   const head = '<div class="ghl-head"><span class="ghl-logo">GHL</span><div><div class="ghl-title">GoHighLevel</div><div class="kpi-sub">Leads, appointments and messages, in sync with your pipeline.</div></div>'+
     (g.connected ? '<span class="tag tag-good" style="margin-left:auto;">&#10003; Connected</span>' : '')+'</div>';
-  const err = ui.ghlError ? '<div class="ghl-err">&#9888; '+escapeHtml(ui.ghlError)+'</div>' : '';
+  if(!ui.ghlBridge || (ui.ghlBridge.state!=='checking' && Date.now()-ui.ghlBridge.at > 30000)) setTimeout(function(){ ghlCheckBridge(false); }, 0);
+  const br = ui.ghlBridge || {state:'checking'};
+  const bridge = '<div class="ghl-bridge is-'+br.state+'">'+(br.state==='ok' ? '&#9679; Operator app connection ready' : br.state==='checking' ? '&#9675; Checking the Operator app connection…' :
+    '&#9679; The Operator app connection isn\'t running. Quit Operator completely (&#8984;Q) and open it again from the Operator app. <button class="btn btn-ghost btn-sm" data-action="ghlCheckBridge">Check again</button>')+'</div>';
+  const err = ui.ghlError && !(br.state==='missing' && /reach Operator/.test(ui.ghlError)) ? '<div class="ghl-err">&#9888; '+escapeHtml(ui.ghlError)+'</div>' : '';
   const busy = ui.ghlBusy ? '<span class="kpi-sub">'+escapeHtml(ui.ghlBusy)+'</span>' : '';
   if(!g.connected){
     return '<div class="section"><div class="card ghl-card">'+head+
@@ -16147,7 +16183,7 @@ function ghlSettingsHtml(){
         '<li>In GoHighLevel, open the sub-account &rarr; <b>Settings &rarr; Private Integrations</b> &rarr; <b>Create new integration</b>.</li>'+
         '<li>Give it these scopes: <code>contacts.readonly</code> <code>opportunities.readonly</code> <code>opportunities.write</code> <code>calendars.readonly</code> <code>calendars/events.readonly</code> <code>conversations.readonly</code> <code>locations.readonly</code>.</li>'+
         '<li>Copy the key it shows you, and your <b>Location ID</b> (Settings &rarr; Business Profile, or the part of the URL after <code>/location/</code>).</li>'+
-      '</ol>'+
+      '</ol>'+bridge+
       '<div class="grid grid-2" style="margin-top:12px;">'+
         '<div class="field"><label>Private Integration key'+tip('Saved on this Mac by the Operator app — not in Operator\'s data, exports or backups.')+'</label><input class="input" type="password" id="ghlKey" placeholder="pit-…" autocomplete="off"></div>'+
         '<div class="field"><label>Location ID</label><input class="input" id="ghlLoc" value="'+escapeHtml(g.locationId||'')+'" placeholder="e.g. ve9EPM428h8vShlRW1KT" autocomplete="off"></div>'+
@@ -16156,7 +16192,7 @@ function ghlSettingsHtml(){
     '</div></div>';
   }
   return '<div class="section"><div class="card ghl-card">'+head+
-    '<div class="ghl-status">'+(g.lastSync ? 'Last sync '+(ago<1 ? 'just now' : ago<60 ? ago+' min ago' : fmtTimeShort(g.lastSync))+(g.lastResult ? ' &middot; '+escapeHtml(ghlResultLine(g.lastResult)) : '') : 'Not synced yet')+'</div>'+err+
+    bridge+'<div class="ghl-status">'+(g.lastSync ? 'Last sync '+(ago<1 ? 'just now' : ago<60 ? ago+' min ago' : fmtTimeShort(g.lastSync))+(g.lastResult ? ' &middot; '+escapeHtml(ghlResultLine(g.lastResult)) : '') : 'Not synced yet')+'</div>'+err+
     '<div class="grid grid-2" style="margin-top:12px;">'+
       '<div class="field"><label>Pipeline</label><select class="input" id="ghlPipeline">'+g.pipelines.map(function(x){ return '<option value="'+escapeHtml(x.id)+'"'+(x.id===g.pipelineId?' selected':'')+'>'+escapeHtml(x.name)+'</option>'; }).join('')+'</select></div>'+
       '<div class="field"><label>Location</label><div class="kpi-sub" style="padding:9px 0;">'+escapeHtml(g.locationId)+'</div></div>'+

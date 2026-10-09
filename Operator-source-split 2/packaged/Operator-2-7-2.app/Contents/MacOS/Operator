@@ -228,10 +228,14 @@ ghl_respond() {
         /contacts*|/opportunities*|/calendars*|/conversations*|/locations*|/users*)
           if [ ! -s "$GHL_KEY_FILE" ]; then CODE=401; BODY='{"error":"no key saved"}'
           else
-            OUT=$(curl -sS --max-time 25 -X "$M" \
-              -H "Authorization: Bearer $(cat "$GHL_KEY_FILE")" -H "Version: 2021-07-28" -H "Accept: application/json" \
-              ${B:+-H "Content-Type: application/json" --data "$B"} \
-              -w '\n%{http_code}' "https://services.leadconnectorhq.com$P" 2>&1)
+            GHL_AUTH="Authorization: Bearer $(cat "$GHL_KEY_FILE")"
+            if [ -n "$B" ]; then
+              OUT=$(curl -sS --max-time 25 -X "$M" -H "$GHL_AUTH" -H "Version: 2021-07-28" -H "Accept: application/json" \
+                -H "Content-Type: application/json" --data "$B" -w '\n%{http_code}' "https://services.leadconnectorhq.com$P" 2>&1)
+            else
+              OUT=$(curl -sS --max-time 25 -X "$M" -H "$GHL_AUTH" -H "Version: 2021-07-28" -H "Accept: application/json" \
+                -w '\n%{http_code}' "https://services.leadconnectorhq.com$P" 2>&1)
+            fi
             CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
             case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":"could not reach GoHighLevel"}' ;; esac
             [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach GoHighLevel"}'; }
