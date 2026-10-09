@@ -47,7 +47,7 @@ function clientDelivRowsHtml(c, compact){
 function clientNextTouchHtml(c){
   if(!crmTracked('client', c)) return '<span class="kpi-sub">—</span>';
   const n = crmOverdueDays('client', c);
-  return '<span class="crm-due '+overdueLevel(n)+'">'+dueLabel(n)+'</span>';
+  return '<span class="crm-due '+overdueLevel(n)+'">'+dueLabel(n, 'client', c)+'</span>';
 }
 function clientCardV2(c){
   const active = clientStageActive(c.stage);
@@ -164,7 +164,7 @@ function renderClientHubPanel(){
       '</div>';
     }).join('')) : '')+
     (leadsDue.length ? '<div class="hub-leads"><span class="kind-label" style="margin:0 6px 0 0;">Leads to reach out to</span>'+leadsDue.slice(0, 8).map(function(r){
-      return '<span class="hub-lead '+overdueLevel(r.n)+'" data-key="hl-'+r.x.id+'"><span class="hub-lead-name" data-action="openContact" data-kind="lead" data-id="'+r.x.id+'">'+escapeHtml(crmName('lead', r.x))+'</span><span class="crm-due '+overdueLevel(r.n)+'">'+dueLabel(r.n)+'</span>'+touchButtonsHtml('lead', r.x)+touchMenuHtml('lead', r.x)+'</span>';
+      return '<span class="hub-lead '+overdueLevel(r.n)+'" data-key="hl-'+r.x.id+'"><span class="hub-lead-name" data-action="openContact" data-kind="lead" data-id="'+r.x.id+'">'+escapeHtml(crmName('lead', r.x))+'</span><span class="crm-due '+overdueLevel(r.n)+'">'+dueLabel(r.n, r.kind, r.x)+'</span>'+touchButtonsHtml('lead', r.x)+touchMenuHtml('lead', r.x)+'</span>';
     }).join('')+(leadsDue.length>8?'<span class="view-all-link" data-action="goToLeads">+'+(leadsDue.length-8)+' more</span>':'')+'</div>' : '')+
   '</div>';
 }

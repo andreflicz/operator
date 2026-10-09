@@ -176,6 +176,54 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.context().close();
   }
 
+  // ---- outreach: follow-ups, one-tap reach out, meetings, the week ----
+  {
+    const tp = (d,t) => ({id:'tp'+d+(t||''), type:t||'text', date:d, note:''});
+    const p = await newPage(b, OUT+'/r5.html', {profile:{name:'Andre Flicz'}, tasks,
+      calendar:{events:[{id:'ev1', date:'2026-10-08', time:'10:00', title:'Strategy call', linkedClient:'lead:l1'}, {id:'ev2', date:'2026-10-08', time:'17:00', title:'Later call', linkedClient:'c1'}]},
+      business:{packages:[], crm:{autoMeetingSince:'2026-10-01'}, pipeline:[{id:'l1', company:'Peak Roofing', name:'Mike Brown', phone:'(555) 201-3344', email:'mike@peak.com', stage:'proposal', value:2000, createdAt:'2026-09-20', touchpoints:[tp('2026-10-06','call')]}, {id:'l2', company:'No Phone Co', stage:'lead', value:500, createdAt:'2026-10-07', touchpoints:[]}],
+        clients:[{id:'c1', name:'Nina Park', business:'Nina Co', status:'active', stage:'active', mrr:2500, createdAt:'2026-09-01', touches:[], touchpoints:[tp('2026-10-07','dm')], deliverables:[], journal:[]}]}}, NOW);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await p.waitForTimeout(4500);
+    check('a calendar meeting linked to a lead logs a "meeting" touch once it starts', (await E("state.business.pipeline[0].touchpoints.some(t=>t.type==='meeting' && t.date==='2026-10-08')")) && (await E("state.calendar.events[0].touchLogged"))===true);
+    check('…but not one that hasn\'t started yet', !(await E("state.business.clients[0].touchpoints.some(t=>t.type==='meeting')")));
+    await E("autoLogMeetings()");
+    check('…and only once', (await E("state.business.pipeline[0].touchpoints.filter(t=>t.type==='meeting').length"))===1);
+    // follow-up with a reason
+    await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="leads"]'); await p.waitForTimeout(200);
+    await p.click('.crm-card[data-crm-drag="lead:l1"] .crm-card-name', {button:'right'}); await p.click('#appCtxMenu [data-op="fu"][data-b="3"]'); await p.waitForTimeout(100);
+    await p.fill('#fuNote', 'send the case study'); await p.keyboard.press('Enter'); await p.waitForTimeout(200);
+    const fu = await E("state.business.pipeline[0].followUp");
+    check('right-click → Follow up in 3 days, with a reason', fu && fu.date==='2026-10-11' && fu.note==='send the case study', fu);
+    check('…the card says when and why', /follow up Sun · send the case study/.test(await p.textContent('.crm-card[data-crm-drag="lead:l1"] .crm-due')));
+    check('…and it replaces the usual rhythm', (await E("crmNextDue('lead', state.business.pipeline[0])"))==='2026-10-11');
+    await E("state.business.pipeline[0].followUp.date='2026-10-08'; renderView()");
+    check('on the day, it shows up in the reach-out list', await E("reachOutList().some(r=>r.x.id==='l1')"));
+    // one tap
+    await E("openExternal = function(u){ window.__ext = u; }");
+    await p.click('.crm-card[data-crm-drag="lead:l1"] .crm-card-name', {button:'right'}); await p.click('#appCtxMenu [data-op="reach"][data-b="text"]'); await p.waitForTimeout(150);
+    const url = await p.evaluate(() => window.__ext || '');
+    check('Text opens Messages with the template filled in', url.indexOf('sms:5552013344&body=')===0 && /Hey%20Mike!%20Andre%20Flicz%20here/.test(url), url.slice(0, 90));
+    check('…logs the text', (await E("state.business.pipeline[0].touchpoints.slice(-1)[0].type"))==='text');
+    check('…and completes the follow-up', (await E("state.business.pipeline[0].followUp"))===null);
+    await E("reachOut('lead','l1','email')");
+    check('Email opens Mail with subject + body', /^mailto:mike%40peak\.com\?subject=Quick%20follow-up&body=Hi%20Mike/.test(await p.evaluate(() => window.__ext)));
+    await p.evaluate(() => { window.__ext = ''; });
+    await E("reachOut('lead','l2','text')");
+    check('no phone number: asks for one instead of texting', !(await p.evaluate(() => window.__ext)) && (await E("state.business.pipeline[1].touchpoints.length"))===0 && await p.isVisible('#contactOverlay:not(.hidden)'));
+    await p.keyboard.press('Escape');
+    // the week
+    await p.click('[data-action="businessTab"][data-tab="overview"]'); await p.waitForTimeout(200);
+    const wk = await p.evaluate(() => { const o = document.querySelector('.hq-outreach'); return o ? {text:o.textContent, bars:o.querySelectorAll('.ow-day').length} : null; });
+    check('Business overview shows this week\'s outreach (reached, due, streak)', wk && wk.bars===7 && /people reached/.test(wk.text) && /day streak/.test(wk.text) && /Peak Roofing/.test(wk.text), wk && wk.text.slice(0, 120));
+    // templates
+    await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="business"]'); await p.waitForTimeout(150);
+    await p.fill('[data-tpl="leadText"]', 'Yo {first}, {me} here'); await p.waitForTimeout(500);
+    check('message templates are editable in Settings → Business', (await E("crm().templates.leadText"))==='Yo {first}, {me} here' && (await E("fillTemplate(crm().templates.leadText,'lead',state.business.pipeline[0])"))==='Yo Mike, Andre Flicz here');
+    check('no errors', !p.errors.length, p.errors);
+    await p.context().close();
+  }
+
   await b.close();
   process.exit(report() ? 1 : 0);
 })();

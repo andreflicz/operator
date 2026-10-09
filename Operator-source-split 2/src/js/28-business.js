@@ -67,6 +67,7 @@ function renderBusinessOverview(){
         (leadsDue.length ? '<div class="hq-due"><span class="kind-label" style="margin:0;">Reach out</span>'+leadsDue.slice(0, 4).map(function(r){ return '<span class="hq-due-lead" data-action="openContact" data-kind="lead" data-id="'+r.x.id+'">'+escapeHtml(crmName('lead', r.x))+'</span>'; }).join('')+(leadsDue.length>4 ? '<span class="kpi-sub">+'+(leadsDue.length-4)+'</span>' : '')+'</div>' : '')+
       '</div>'+
     '</div>'+
+    outreachWeekHtml()+
   '</div>';
 }
 function renderPipelineGlance(){

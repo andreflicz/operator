@@ -29,7 +29,8 @@ async function init(){
   document.getElementById('loading').style.display='none';
   document.getElementById('app').style.display='flex';
   renderView();
-  sceneMount();
+  // the app first, then the scene fades in behind it
+  requestAnimationFrame(function(){ setTimeout(sceneMount, 0); });
   setTimeout(function(){ refreshWeather(false); }, 1500);
   startClocks();
   startFocusTicker();

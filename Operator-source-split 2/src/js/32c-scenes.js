@@ -349,9 +349,10 @@ window.addEventListener('blur', sceneStop);
 document.addEventListener('visibilitychange', function(){ if(document.hidden) sceneStop(); else if(SC.bg) sceneStart(); });
 // ---- picking one ----
 const sceneThumbs = {};
-function sceneThumb(id){
-  if(id==='minimal') return '';
-  const x = sceneCtxFor(id), key = id+'|'+x.phase+'|'+x.wx+'|'+document.documentElement.getAttribute('data-theme');
+function sceneThumbKey(id){ const x = sceneCtxFor(id); return id+'|'+x.phase+'|'+x.wx+'|'+document.documentElement.getAttribute('data-theme'); }
+function sceneThumb(id){ return id==='minimal' ? '' : (sceneThumbs[sceneThumbKey(id)] || ''); }
+function paintSceneThumb(id){
+  const x = sceneCtxFor(id), key = sceneThumbKey(id);
   if(sceneThumbs[key]) return sceneThumbs[key];
   const cv = document.createElement('canvas'), W = 168, H = 100; cv.width = W*2; cv.height = H*2;
   const c = cv.getContext('2d'); c.setTransform(2, 0, 0, 2, 0, 0);
@@ -364,7 +365,7 @@ function sceneSettingsHtml(){
   return '<div class="section"><div class="section-title">Scene'+tip('A living background behind the app — it follows the real time of day (Sky also shows the live weather). Minimal keeps it clean and straight to the point. Scenes pause whenever Operator isn\'t the window in front.')+'</div><div class="card">'+
     '<div class="scene-grid">'+SCENES.map(function(s){
       const th = sceneThumb(s.id);
-      return '<button class="scene-card'+(cur===s.id?' is-on':'')+'" data-action="setScene" data-id="'+s.id+'">'+
+      return '<button class="scene-card'+(cur===s.id?' is-on':'')+'" data-action="setScene" data-id="'+s.id+'" data-thumb="'+s.id+'">'+
         '<span class="scene-thumb'+(s.id==='minimal'?' is-minimal':'')+'"'+(th ? ' style="background-image:url('+th+')"' : '')+'></span>'+
         '<span class="scene-name">'+s.label+(s.sub ? ' <em>'+s.sub+'</em>' : '')+'</span></button>';
     }).join('')+'</div>'+
@@ -374,3 +375,11 @@ function sceneSettingsHtml(){
 function setScene(id){ state.profile.scene = id; persist('profile'); sceneMount(); renderView(); }
 ACTIONS.setScene = function(el, e, id){ setScene(id); };
 document.addEventListener('change', function(e){ if(e.target && e.target.id==='setSceneAnimate'){ state.profile.sceneAnimate = e.target.checked; persist('profile'); sceneStop(); sceneBuild(); sceneStart(); } });
+afterRenderHooks.push(function(){
+  const cards = document.querySelectorAll('.scene-card[data-thumb]'); if(!cards.length) return;
+  const todo = [].filter.call(cards, function(c){ const t = c.querySelector('.scene-thumb'); return c.dataset.thumb!=='minimal' && t && !t.style.backgroundImage; });
+  if(!todo.length) return;
+  const idle = window.requestIdleCallback || function(fn){ return setTimeout(fn, 60); };
+  const next = function(){ const c = todo.shift(); if(!c) return; if(c.isConnected){ const url = paintSceneThumb(c.dataset.thumb); const t = c.querySelector('.scene-thumb'); if(url && t) t.style.backgroundImage = 'url('+url+')'; } idle(next); };
+  idle(next);
+});

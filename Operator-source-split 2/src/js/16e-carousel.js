@@ -32,7 +32,8 @@ document.addEventListener('scroll', function(e){
   if(!carRaf) carRaf = requestAnimationFrame(function(){ carRaf = 0; carPending.forEach(carUpdate); carPending.clear(); });
 }, {capture:true, passive:true});
 window.addEventListener('resize', function(){ requestAnimationFrame(carUpdateAll); });
-afterRenderHooks.push(carUpdateAll);
+let carHookRaf = 0;
+afterRenderHooks.push(function(){ if(!carHookRaf && document.querySelector('.car-track')) carHookRaf = requestAnimationFrame(function(){ carHookRaf = 0; carUpdateAll(); }); });
 ACTIONS.carouselStep = function(el){
   const track = el.parentElement && el.parentElement.querySelector('.car-track'); if(!track) return;
   track.scrollBy({left:Number(el.dataset.dir) * Math.max(220, track.clientWidth*0.75), behavior:'smooth'});

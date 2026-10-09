@@ -97,6 +97,8 @@ function crmLastTouchRaw(kind, x){
   return dates.sort()[dates.length-1];
 }
 function crmNextDue(kind, x){
+  // a follow-up you set ("Thursday, about the proposal") replaces the usual rhythm until it's done
+  if(x.followUp && x.followUp.date) return x.followUp.date;
   const base = crmLastTouch(kind, x) || x.createdAt || todayStr();
   return addDays(base, crmCadence(kind, x));
 }
@@ -104,6 +106,12 @@ function crmOverdueDays(kind, x){ return crmTracked(kind, x) ? daysAgoFrom(crmNe
 function overdueLevel(n){ if(n==null || n<0) return ''; if(n===0) return 'due-0'; if(n<=2) return 'due-1'; if(n<=6) return 'due-2'; return 'due-3'; }
 function dueLabel(n, kind, x){
   if(n==null) return '';
+  if(x && x.followUp && x.followUp.date){
+    const note = x.followUp.note ? ' · '+escapeHtml(x.followUp.note) : '';
+    if(n<0) return 'follow up '+(n>=-6 ? weekdayShort(x.followUp.date) : fmtDateShort(x.followUp.date))+note;
+    if(n===0) return 'follow up today'+note;
+    return 'follow-up '+n+'d overdue'+note;
+  }
   if(n<0) return 'touch in '+(-n)+'d';
   if(n===0) return 'touch due today';
   return n+'d overdue';
@@ -122,6 +130,7 @@ function logTouch(kind, id, type, date, note){
   if(!Array.isArray(x.touchpoints)) x.touchpoints = [];
   x.touchpoints.push(tp);
   if(kind==='client'){ if(!Array.isArray(x.touches)) x.touches=[]; x.touches.push(date); }
+  if(x.followUp && x.followUp.date && date >= x.followUp.date){ crmTimeline(x, 'followup', 'Followed up'+(x.followUp.note?' — '+x.followUp.note:'')); x.followUp = null; }
   x.lastTouchType = type;
   crm().lastTouchType = type;
   lastTouchLogged = {kind:kind, id:id, tpId:tp.id, date:date};
@@ -160,7 +169,7 @@ ACTIONS.deleteTouchpoint = function(el){
 };
 function touchMenuHtml(kind, x){
   if(ui.touchMenu!==kind+':'+x.id) return '';
-  return '<div class="touch-menu">'+TOUCH_TYPES.map(function(t){
+  return '<div class="touch-menu"><div class="touch-menu-reach">'+reachButtonsHtml(kind, x)+'</div>'+TOUCH_TYPES.map(function(t){
     return '<button class="touch-menu-btn" data-action="logTouchType" data-kind="'+kind+'" data-id="'+x.id+'" data-type="'+t.id+'" title="Log a '+t.label.toLowerCase()+'">'+t.icon+'<span>'+t.label+'</span></button>';
   }).join('')+'</div>';
 }
@@ -363,7 +372,7 @@ function crmCard(kind, x){
       (x.convertedClientId ? '<div class="kpi-sub" style="color:var(--good);">&#10003; Now a client</div>' : '')+
     '</div>'+
     (crmTracked(kind,x) ? '<div class="crm-card-foot">'+
-      '<span class="crm-due '+lvl+'" title="Last touch: '+(lt?fmtDateShort(lt):'never')+' · every '+crmCadence(kind,x)+'d">'+dueLabel(n)+'</span>'+
+      '<span class="crm-due '+lvl+'" title="Last touch: '+(lt?fmtDateShort(lt):'never')+' · every '+crmCadence(kind,x)+'d">'+dueLabel(n, kind, x)+'</span>'+
       touchButtonsHtml(kind, x)+
     '</div>'+touchMenuHtml(kind, x) : '')+
   '</div>';
@@ -401,7 +410,7 @@ function renderCrmList(kind){
         '<span class="kpi-sub">'+(src?src.emoji+' '+src.label:'—')+'</span>'+
         '<span>'+(Number(kind==='lead'?x.value:x.mrr) ? '$'+Number(kind==='lead'?x.value:x.mrr).toLocaleString() : '—')+'</span>'+
         '<span class="kpi-sub">'+(lt ? relativeDayLabel(lt) : 'never')+'</span>'+
-        '<span class="crm-due '+overdueLevel(n)+'">'+(crmTracked(kind,x) ? dueLabel(n) : (st?st.label:''))+'</span>'+
+        '<span class="crm-due '+overdueLevel(n)+'">'+(crmTracked(kind,x) ? dueLabel(n, kind, x) : (st?st.label:''))+'</span>'+
         '<span>'+(crmTracked(kind,x) ? touchButtonsHtml(kind,x) : '')+'</span>'+
         touchMenuHtml(kind, x)+
       '</div>';
@@ -421,6 +430,10 @@ function renderCrmTab(kind){
 }
 // ---- Reach out today (Focus page) ----
 function reachOutList(){
+  if(RC) return memo('reachOut', reachOutListRaw);
+  return reachOutListRaw();
+}
+function reachOutListRaw(){
   const out = [];
   ['client','lead'].forEach(function(kind){
     crmList(kind).forEach(function(x){
@@ -444,7 +457,7 @@ function renderReachOutPanel(compact){
           '<div class="reach-name">'+escapeHtml(crmName(r.kind,x))+' <span class="tag '+(r.kind==='lead'?'tag-warn':'tag-client')+'" style="margin-left:4px;">'+(r.kind==='lead'?'Lead':'Client')+'</span></div>'+
           '<div class="kpi-sub">'+(lt?'Last touch '+relativeDayLabel(lt):'Never contacted')+' &middot; every '+crmCadence(r.kind,x)+'d</div>'+
         '</div>'+
-        '<span class="crm-due '+overdueLevel(r.n)+'">'+dueLabel(r.n)+'</span>'+
+        '<span class="crm-due '+overdueLevel(r.n)+'">'+dueLabel(r.n, r.kind, r.x)+'</span>'+
         touchButtonsHtml(r.kind, x)+
         touchMenuHtml(r.kind, x)+
       '</div>';
@@ -550,8 +563,9 @@ function renderCrmBlock(kind, x){
     '<div class="grid grid-3">'+
       '<div class="field"><label>Stage</label><select class="input" data-crm-stage="'+kind+':'+x.id+'">'+crmStages(kind).map(function(s){ return '<option value="'+s.id+'" '+(x.stage===s.id?'selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select></div>'+
       '<div class="field"><label>Contact cadence</label><select class="input" data-crm-cadence="'+kind+':'+x.id+'">'+[1,2,3,4,5,7,10,14,21,30].map(function(d){ return '<option value="'+d+'" '+(cad===d?'selected':'')+'>Every '+(d===1?'day':d===7?'week':d===14?'2 weeks':d===30?'month':d+' days')+(x.cadenceDays?'':(d===cad?' (default)':''))+'</option>'; }).join('')+'</select></div>'+
-      '<div class="field"><label>Next touch</label><div class="crm-due '+overdueLevel(n)+'" style="padding-top:7px;">'+(crmTracked(kind,x) ? dueLabel(n)+' &middot; '+fmtDateShort(crmNextDue(kind,x)) : 'not tracked in this stage')+'</div><div class="kpi-sub">Last: '+(lt?fmtDateShort(lt)+' ('+relativeDayLabel(lt)+')':'never')+'</div></div>'+
+      '<div class="field"><label>Next touch</label><div class="crm-due '+overdueLevel(n)+'" style="padding-top:7px;">'+(crmTracked(kind,x) ? dueLabel(n, kind, x)+' &middot; '+fmtDateShort(crmNextDue(kind,x)) : 'not tracked in this stage')+'</div><div class="kpi-sub">Last: '+(lt?fmtDateShort(lt)+' ('+relativeDayLabel(lt)+')':'never')+'</div></div>'+
     '</div>'+
+    followUpFormHtml(kind, x)+
     '<div class="kind-label">Log a touchpoint</div>'+
     '<div class="touch-form">'+
       '<div class="row" style="gap:4px;">'+TOUCH_TYPES.map(function(t){ return '<label class="chip touch-type-chip'+(lastType===t.id?' active':'')+'"><input type="radio" name="crmTouchType-'+x.id+'" value="'+t.id+'" '+(lastType===t.id?'checked':'')+' style="display:none;">'+t.icon+' '+t.label+'</label>'; }).join('')+'</div>'+
@@ -769,6 +783,7 @@ function renderCrmSettings(){
       '<div class="field"><label>Clients: every (days)</label><input class="input" type="number" min="1" id="setClientCadence" value="'+c.clientCadenceDays+'"></div>'+
       '<div class="field"><label>Daily "reach out" reminder</label><div class="row" style="gap:6px;"><input type="checkbox" id="setTouchReminder" '+(c.dailyReminder.enabled?'checked':'')+'><input class="input" type="time" id="setTouchReminderTime" value="'+c.dailyReminder.time+'" style="width:120px;"></div></div>'+
     '</div></div>'+
+    messageTemplatesHtml()+
     '<div class="card section"><div class="section-title">Lead stages</div>'+stageEditor('lead')+'</div>'+
     '<div class="card section"><div class="section-title">Client cycles'+tip('Your playbooks — steps with calls, forms, videos and to-dos.')+'</div><button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">&#9881; Edit client cycles</button></div>'+
     '<div class="card section"><div class="section-title">Client statuses</div>'+stageEditor('client')+'</div>';

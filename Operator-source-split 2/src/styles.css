@@ -1494,3 +1494,34 @@
   .journal-entry:hover .je-more{ opacity:1; }
   .je-more:hover{ color:var(--text); background:var(--panel-2); }
   .je-pin{ color:var(--accent); }
+  /* ---- outreach ---- */
+  .fu-pop{ width:300px; }
+  .fu-body{ display:flex; flex-direction:column; gap:8px; padding:4px 6px 6px; }
+  .fu-card{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:8px 10px; border:1px dashed var(--border); border-radius:10px; margin-bottom:12px; }
+  .fu-when{ font-size:13px; font-weight:600; }
+  .touch-menu-reach{ display:flex; gap:4px; padding-bottom:6px; margin-bottom:6px; border-bottom:1px solid var(--border); width:100%; }
+  .reach-btn.is-off, .ctx-chip.is-off{ opacity:.45; }
+  .hq-outreach{ border-top:1px solid var(--border); padding-top:24px; }
+  .ow-grid{ display:grid; grid-template-columns:auto minmax(220px, 300px) 1fr; gap:32px; align-items:center; }
+  .ow-stats{ display:flex; gap:24px; }
+  .ow-stats > div{ display:flex; flex-direction:column; }
+  .ow-stats b{ font:700 26px var(--font-display); }
+  .ow-stats span{ font-size:12px; color:var(--text-dim); }
+  .ow-days{ display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; height:84px; }
+  .ow-day{ display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .ow-bar{ flex:1; width:100%; max-width:22px; border-radius:6px; background:rgba(var(--ink),.04); display:flex; align-items:flex-end; overflow:hidden; }
+  .ow-bar span{ display:block; width:100%; background:linear-gradient(180deg, var(--good), rgba(63,190,142,.45)); border-radius:6px; }
+  .ow-day em{ font-style:normal; font-size:10.5px; font-weight:700; color:var(--text-faint); }
+  .ow-day.is-today em{ color:var(--text); }
+  .ow-day.is-future .ow-bar{ opacity:.5; }
+  .ow-lists{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .ow-chips{ display:flex; flex-wrap:wrap; gap:5px; }
+  .ow-chip{ font-size:12px; font-weight:600; border-radius:999px; padding:3px 10px; cursor:pointer; border:1px solid var(--border); }
+  .ow-chip.is-done{ color:var(--good-text); background:var(--good-dim); border-color:transparent; }
+  .ow-chip.is-due{ color:var(--danger-text); background:var(--danger-dim); border-color:transparent; }
+  .ow-chip.is-later{ color:var(--text-dim); border-style:dashed; }
+  @media (max-width:1100px){ .ow-grid{ grid-template-columns:1fr; } }
+  .crm-card-foot .crm-due, .cc2-foot .crm-due, .hub-foot .crm-due, .hq-meta .crm-due{ min-width:0; flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .crm-card-foot .touch-btns, .cc2-foot .touch-btns, .hub-foot .touch-btns{ flex-shrink:0; }
+  .scene-layer{ animation:sceneIn .9s ease-out both; }
+  @keyframes sceneIn{ from{ opacity:0; } to{ opacity:1; } }
