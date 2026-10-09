@@ -5,13 +5,13 @@
 function nextUpTask(){
   const items = state.tasks.items;
   const pick = function(id){ return id ? items.find(function(x){ return x.id===id && x.status!=='done'; }) : null; };
-  return pick(ui.pendingCurrentTaskId) || pick(ui.stagedTaskId) ||
+  return pick(ui.pendingCurrentTaskId) || pick(ui.stagedTaskId) || (state.focus.nextTaskId!==ui.currentTaskId ? pick(state.focus.nextTaskId) : null) ||
     sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='today' && t.id!==ui.currentTaskId && !isOngoingDoneToday(t); }))[0] || null;
 }
 function renderNowNextBar(standalone){
   const cur = ui.currentTaskId ? state.tasks.items.find(function(x){ return x.id===ui.currentTaskId; }) : null;
   const next = nextUpTask();
-  if(!cur && !next) return '';
+  if(!cur && !next && ui.nextPicker!=='bar' && !state.tasks.items.some(function(t){ return t.status==='today'; })) return '';
   return '<div class="now-next'+(standalone?' now-next-standalone':'')+'">'+
     '<div class="now-next-cell now-cell">'+
       '<span class="now-next-label">Now</span>'+
@@ -23,8 +23,9 @@ function renderNowNextBar(standalone){
       (next ? '<span class="now-next-title">'+escapeHtml(next.title)+'</span>'+
               '<button class="mini-move mini-move-today" data-action="'+(state.focus.activeSession?'setCurrentTask':'stagePendingCurrentTask')+'" data-id="'+next.id+'">'+(cur?'Switch':'Start')+' &rarr;</button>'
             : '<span class="now-next-title now-next-empty">Nothing lined up</span>')+
+      '<button class="mini-move" data-action="toggleNextPicker" data-where="bar" title="Pick what\'s next">Change</button>'+
     '</div>'+
-  '</div>';
+  '</div>'+nextPickerHtml('bar');
 }
 // Compact video idea card: title + type/due at a glance, notes and actions on click.
 const expandedVideoIdeas = new Set();
@@ -95,7 +96,7 @@ function fabContext(){
     if(ui.personalTab==='journal') return {label:'New journal entry', run:openQuickJournalModal};
     if(ui.personalTab==='wishlist' && typeof openWishItemModal==='function') return {label:'Add wish list item', run:function(){ openWishItemModal(null); }};
     if((ui.personalTab==='vision' || ui.personalTab==='milanote') && typeof canvasAddNote==='function') return {label:'Add card to board', run:function(){ canvasAddNote(); }};
-    if(ui.personalTab==='fitness') return {label:'Log workout', run:function(){ const el=document.getElementById('workoutType')||document.querySelector('#viewRoot input'); if(el) el.focus(); }};
+    if(ui.personalTab==='fitness') return {label:'Log workout', run:function(){ ui.healthTab='workouts'; renderView(); const el=document.getElementById('gymType'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
     return {label:'Add goal', run:function(){ const el=document.getElementById('newGoalTitle')||document.querySelector('#viewRoot .tab-panel input'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
   }
   return null;

@@ -14,9 +14,9 @@ const SP = require('./common.js').OUT;
   };
   let p = await newPage(b, SP+'/t.html', seed);
   const order = await p.evaluate(() => window.__op.state.dashboardPanels.order);
-  check('journal raised under streak', order.filter(x=>x!=='vision')[1]==='journal', order);
+  check('journal raised under streak', order.filter(x=>x!=='vision' && x!=='agenda')[1]==='journal', order);
   check('streak card rendered', await p.isVisible('.streak-card .streak-num'));
-  check('today header centered', await p.evaluate(() => getComputedStyle(document.querySelector('.today-header')).alignItems)==='center');
+  check('today hero', await p.isVisible('.today-hero .lockin-cta'));
   check('client health color-coded', await p.isVisible('.hub-card.hl-red .cc2-avatar.ring-red'));
   await p.screenshot({path:SP+'/p2-today.png', fullPage:false});
   // paste image into quick journal
@@ -77,7 +77,7 @@ const SP = require('./common.js').OUT;
   check('view all deadlines → calendar list', await p.isVisible('text=All Deadlines'));
   // day off sleepy dots
   await p.click('[data-action="nav"][data-view="today"]');
-  await p.click('.today-header [data-action="toggleDayOff"]');
+  await p.evaluate(() => window.__op.ev('toggleDayOff()'));
   const dots = await p.evaluate(() => getComputedStyle(document.querySelector('.sleepy-dots'),'::after').animationName);
   check('sleepy dots animate', /sleepyDots/.test(dots), dots);
   await p.screenshot({path:SP+'/p2-dayoff.png'});

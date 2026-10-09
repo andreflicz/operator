@@ -23,6 +23,8 @@ async function init(){
   splitActiveModeAtMidnight();
   if(crmMigratedOnLoad) persist('business');
   remapConvertedLeadRefs();
+  // what you lined up as "next" survives a restart
+  if(state.focus.nextTaskId && !state.focus.activeSession && state.tasks.items.some(function(t){ return t.id===state.focus.nextTaskId && t.status!=='done'; })) ui.stagedTaskId = state.focus.nextTaskId;
   applyTheme();
   applySidebarState();
   document.getElementById('loading').style.display='none';

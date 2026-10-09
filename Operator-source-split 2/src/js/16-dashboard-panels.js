@@ -14,12 +14,8 @@ function renderPersonalStatsPanel(){
   const target = state.standards.deepWorkTargetMinutes || 180;
   const deepWorkPct = clamp(Math.round(todayFocusMin/target*100),0,100);
   const allStandardsDone = dayStandardsComplete(todayStr());
-  const streakTicked = (lastRenderedStreak!==null && streak!==lastRenderedStreak);
-  lastRenderedStreak = streak;
-
   return '<div class="section">'+
-  renderStreakCard(streak, {ticked:streakTicked, editable:true, status: streak===0 ? 'Complete today\'s standard to start one' : (allStandardsDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Complete today\'s standard to keep it going')})+
-  '<div class="grid grid-3 stat-chip-row" style="margin-top:10px;">'+
+  '<div class="grid grid-3 stat-chip-row">'+
     '<div class="stat-chip" id="statDeepWorkBox">'+deepWorkStatInnerHtml(todayFocusMin)+'</div>'+
     '<div class="stat-chip">'+
       '<div class="stat-chip-label">Time Worked</div>'+
@@ -42,57 +38,46 @@ function renderPersonalStatsPanel(){
   yesterdayStandardsFixupHtml()+
   '</div>';
 }
-function renderBusinessPanel(){
-  const clients = arr(state.business.clients);
-  const activeClients = clients.filter(function(c){ return c.status==='active'; });
-  const mrr = activeClients.reduce(function(a,c){ return a+Number(c.mrr||0); },0);
-  const pipeline = arr(state.business.pipeline);
-  const potentialValue = pipeline.filter(function(p){ return p.stage!=='lost' && p.stage!=='closed'; }).reduce(function(a,p){ return a+Number(p.value||0); },0);
-  const inPipeline = pipeline.filter(function(pr){ return pr.stage!=='lost' && pr.stage!=='closed'; });
-  const upcomingCutoff = addDays(todayStr(),7);
-  const upcomingDeadlines = state.tasks.items.filter(function(t){ return t.deadline && t.status!=='done' && t.deadline<=upcomingCutoff; }).sort(function(a,b){ return a.deadline.localeCompare(b.deadline); });
-
-  return '<div class="section">'+
-  '<div class="grid grid-3">'+
-    '<div class="card" style="text-align:center;"><div class="kpi-label">Current MRR</div><div class="hero-num" style="color:#3FBE8E;font-size:34px;">$'+mrr.toLocaleString()+'</div></div>'+
-    '<div class="card" style="text-align:center;"><div class="kpi-label">Potential Pipeline Value</div><div class="hero-num" style="color:#E8A23D;font-size:34px;">$'+potentialValue.toLocaleString()+'</div></div>'+
-    '<div class="card" style="text-align:center;"><div class="kpi-label">Total Potential MRR</div><div class="hero-num" style="color:#8fdcff;font-size:34px;">$'+(mrr+potentialValue).toLocaleString()+'</div></div>'+
-  '</div>'+
-  '<div class="grid grid-2 stat-chip-row" style="margin-top:10px;">'+
-    '<div class="stat-chip"><div class="stat-chip-label row" style="justify-content:space-between;">Leads in Pipeline<span class="view-all-link" data-action="goToLeads">View all &rarr;</span></div><div class="stat-chip-value">'+inPipeline.length+'</div>'+
-      (inPipeline.length ? '<div class="kpi-sub" style="margin-top:6px;">'+inPipeline.slice(0,3).map(function(pr){return escapeHtml(pr.company||pr.name);}).join(', ')+(inPipeline.length>3?'…':'')+'</div>' : '<div class="kpi-sub" style="margin-top:6px;">none right now</div>')+
-    '</div>'+
-    '<div class="stat-chip"><div class="stat-chip-label row" style="justify-content:space-between;">Upcoming Deadlines<span class="view-all-link" data-action="goToDeadlines">View all &rarr;</span></div><div class="stat-chip-value">'+upcomingDeadlines.length+'</div>'+
-      (upcomingDeadlines.length ? '<div class="kpi-sub" style="margin-top:6px;">'+upcomingDeadlines.slice(0,3).map(function(t){return escapeHtml(t.title)+' ('+fmtDateShort(t.deadline)+')';}).join(', ')+(upcomingDeadlines.length>3?'…':'')+'</div>' : '<div class="kpi-sub" style="margin-top:6px;">nothing due in 7 days</div>')+
-    '</div>'+
-  '</div></div>';
+function collectedByMonth(monthKey){
+  const inc = arr(state.finances.income).filter(function(x){ return monthKeyOf(x.date)===monthKey; }).reduce(function(a,x){ return a+Number(x.amount||0); }, 0);
+  const inv = arr(state.finances.invoices).filter(function(x){ return monthKeyOf(x.date)===monthKey; }).reduce(function(a,x){ return a+Number(x.amount||0); }, 0);
+  return inc+inv;
 }
-function renderGoalsPanel(){
-  const items = state.goals.items;
-  const done = items.filter(function(g){ return g.done; });
-  const mrr = arr(state.business.clients).filter(function(c){return c.status==='active';}).reduce(function(a,c){return a+Number(c.mrr||0);},0);
-  const mrrGoal = state.profile.revenueGoalMonthly||1;
-  const mrrPct = clamp(mrr/mrrGoal*100,0,100);
-  const weightLog = state.health.weightLog.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
-  const latestWeight = weightLog.length?weightLog[weightLog.length-1].weight:null;
-  const startWeight = weightLog.length?weightLog[0].weight:null;
-  const goalWeight = state.profile.goalWeight;
-  let weightPct = 0;
-  if(latestWeight!=null && goalWeight!=null && startWeight!=null && startWeight!==goalWeight){
-    weightPct = clamp(Math.round(((startWeight-latestWeight)/(startWeight-goalWeight))*100),0,100);
-  }
-  const achievedPct = items.length?Math.round(done.length/items.length*100):0;
-  return '<div class="section">'+
-    '<div class="card"><div class="row" style="justify-content:space-around;">'+
-      '<div class="ring-wrap" style="'+goalGlowFilter(mrrPct)+'">'+svgRing(mrrPct,110,goalColor(),'$'+mrr.toLocaleString(),'of $'+mrrGoal.toLocaleString()+' MRR')+'</div>'+
-      (goalWeight!=null ? (
-        latestWeight!=null
-          ? '<div class="ring-wrap" style="'+goalGlowFilter(weightPct)+'">'+svgRing(weightPct,110,goalColor(),latestWeight,'toward '+goalWeight+' goal')+'</div>'
-          : '<div class="ring-wrap"><div class="empty" style="width:110px;font-size:11.5px;">Log your weight to see progress</div></div>'
-      ) : '')+
-      '<div class="ring-wrap" style="'+goalGlowFilter(achievedPct)+'">'+svgRing(achievedPct,110,goalColor(),done.length+'/'+items.length,'goals achieved')+'</div>'+
-    '</div>'+
-    '<div class="row" style="justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="nav" data-view="personal" data-tab="goals">View All Goals</button></div>'+
+function money(n){ n = Number(n)||0; return n>=10000 ? '$'+(n/1000).toFixed(n>=100000?0:1).replace(/\.0$/,'')+'k' : '$'+n.toLocaleString(); }
+function renderBusinessPanel(){
+  const active = arr(state.business.clients).filter(function(c){ return c.status==='active'; });
+  const mrr = active.reduce(function(a,c){ return a+Number(c.mrr||0); },0);
+  const open = arr(state.business.pipeline).filter(function(p){ return typeof leadIsOpen==='function' ? leadIsOpen(p) : (p.stage!=='lost' && p.stage!=='closed'); });
+  const pipe = open.reduce(function(a,p){ return a+Number(p.value||0); },0);
+  const goal = Number(state.profile.revenueGoalMonthly)||0;
+  const scale = Math.max(goal, mrr+pipe, 1);
+  const cutoff = addDays(todayStr(),7);
+  const due = state.tasks.items.filter(function(t){ return t.deadline && t.status!=='done' && t.deadline<=cutoff; }).sort(function(a,b){ return a.deadline.localeCompare(b.deadline); });
+  // last 6 months collected
+  const months = []; const now = new Date();
+  for(let k=5;k>=0;k--){ const d = new Date(now.getFullYear(), now.getMonth()-k, 1); const key = d.getFullYear()+'-'+pad2(d.getMonth()+1); months.push({key:key, label:d.toLocaleDateString(undefined,{month:'short'}), v:collectedByMonth(key)}); }
+  const maxV = Math.max.apply(null, months.map(function(m){ return m.v; }).concat([mrr, 1]));
+  return '<div class="section biz-panel">'+
+    '<div class="section-title">Business<span class="view-all-link" data-action="nav" data-view="business">Open Business &rarr;</span></div>'+
+    '<div class="card biz-card">'+
+      '<div class="biz-main">'+
+        '<div class="stat-tile-k">MRR</div>'+
+        '<div class="biz-mrr">$'+mrr.toLocaleString()+'</div>'+
+        (goal ? '<div class="biz-bar" title="'+Math.round(mrr/goal*100)+'% of your $'+goal.toLocaleString()+'/mo goal'+(pipe?' · pipeline adds $'+pipe.toLocaleString():'')+'">'+
+          '<span class="biz-bar-mrr" style="width:'+Math.min(100, mrr/goal*100)+'%"></span>'+
+          (pipe ? '<span class="biz-bar-pipe" style="width:'+Math.max(0, Math.min(100-mrr/goal*100, pipe/goal*100))+'%"></span>' : '')+
+        '</div><div class="biz-goal-k">'+Math.round(mrr/goal*100)+'% of '+money(goal)+'</div>' : '')+
+      '</div>'+
+      '<div class="biz-months" title="Collected per month">'+
+        '<div class="biz-mbars">'+months.map(function(m, i){
+          return '<div class="biz-mcol'+(i===5?' is-now':'')+'" title="'+m.label+': $'+m.v.toLocaleString()+'"><div class="biz-mbar-wrap"><div class="biz-mbar" style="height:'+Math.max(m.v?4:0, m.v/maxV*100)+'%"></div></div><span>'+m.label+'</span></div>';
+        }).join('')+'</div>'+
+      '</div>'+
+      '<div class="biz-side">'+
+        '<div class="biz-mini" data-action="goToClients"><span class="biz-mini-v">'+active.length+'</span><span class="biz-mini-k">clients</span></div>'+
+        '<div class="biz-mini" data-action="goToLeads"><span class="biz-mini-v">'+money(pipe)+'</span><span class="biz-mini-k">pipeline</span></div>'+
+        '<div class="biz-mini" data-action="goToDeadlines"><span class="biz-mini-v'+(due.length?' is-warn':'')+'">'+due.length+'</span><span class="biz-mini-k">due this week</span></div>'+
+      '</div>'+
     '</div>'+
   '</div>';
 }
@@ -303,7 +288,11 @@ const PANEL_RENDERERS = {
   calendarMini: renderCalendarMiniPanel,
   tasks: renderTodayTasksPanel,
   clientHub: function(){ return renderClientHubPanel(); },
-  vision: function(){ return renderVisionPanel(); }
+  vision: function(){ return renderVisionPanel(); },
+  agenda: renderAgendaPanel,
+  week: renderWeekPanel,
+  heatmap: renderHeatmapPanel,
+  why: renderWhyPanel
 };
 function clientOpsDeliverableRow(clientId, d){
   return recurringDeliverableRowHtml(clientId, d, false);

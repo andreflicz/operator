@@ -144,21 +144,8 @@ function renderToday(){
     }
   }
   return renderFocusQuickLinks()+
-    '<div class="view-header today-header"><div>'+
-      businessNameTagHtml()+
-      '<div class="view-title">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
-      (state.profile.bigClockOnToday ? (
-        '<div id="liveClockBig" class="cal-big-clock" style="font-size:38px;margin-top:6px;"></div>'+
-        renderMiniCalendarStrip()
-      ) : '<div class="view-sub" id="liveClock"></div>')+
-      '</div>'+
-      '<div class="row" style="gap:8px;justify-content:center;">'+
-        '<button class="btn" style="border-color:var(--accent);color:var(--accent);" data-action="toggleDayOff">Take Today Off</button>'+
-        wakeChipHtml()+
-      '</div>'+
-    '</div>'+
+    renderTodayHero(greeting)+
     renderMorningPlanCard()+
-    renderEveningCard()+
-    panelsHtml;
+    '<div class="today-panels">'+panelsHtml+'</div>';
 }
 

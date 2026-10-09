@@ -395,6 +395,7 @@ function normalizeDashboardPanels(d){
   };
   if(!d.journalRaised){ moveAfter('journal', 'personalStats', 0); d.journalRaised = true; }
   if(!d.visionPanelAdded){ moveAfter('vision', 'personalStats', 0); d.visionPanelAdded = true; }
+  if(!d.v2PanelsAdded){ moveAfter('agenda', 'vision', 1); moveAfter('week', 'goals', d.order.length); moveAfter('heatmap', 'week', d.order.length); moveAfter('why', 'heatmap', d.order.length); d.v2PanelsAdded = true; }
   if(!d.reachOutAdded){ moveAfter('clientHub', 'journal', 1); d.reachOutAdded = true; d.clientStepsAdded = true; }
   return d;
 }

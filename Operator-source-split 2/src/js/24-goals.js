@@ -1,46 +1,4 @@
 // ============ GOALS ============
-function renderGoalsTab(){
-  const items = state.goals.items;
-  const done = items.filter(function(g){ return g.done; });
-  const mrr = arr(state.business.clients).filter(function(c){return c.status==='active';}).reduce(function(a,c){return a+Number(c.mrr||0);},0);
-  const mrrGoal = state.profile.revenueGoalMonthly||1;
-  const mrrPct = clamp(mrr/mrrGoal*100,0,100);
-  const weightLog = state.health.weightLog.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
-  const latestWeight = weightLog.length?weightLog[weightLog.length-1].weight:null;
-  const startWeight = weightLog.length?weightLog[0].weight:null;
-  const goalWeight = state.profile.goalWeight;
-  let weightPct = 0;
-  if(latestWeight!=null && goalWeight!=null && startWeight!=null && startWeight!==goalWeight){
-    weightPct = clamp(Math.round(((startWeight-latestWeight)/(startWeight-goalWeight))*100),0,100);
-  }
-  const last7=[]; for(let i=0;i<7;i++) last7.push(addDays(todayStr(),-i));
-  const trained7 = last7.filter(function(d){ return state.health.gymLog.some(function(g){return g.date===d;}); }).length;
-  const workoutPct = clamp(trained7/(state.profile.weeklyWorkoutTarget||1)*100,0,100);
-  const achievedPct = items.length?Math.round(done.length/items.length*100):0;
-
-  return '<div class="card section"><div style="text-align:center;margin-bottom:16px;"><div class="section-title" style="justify-content:center;margin-bottom:2px;">Snapshot</div><div class="kpi-sub">how the big-picture numbers are trending</div></div><div class="row" style="justify-content:space-around;flex-wrap:wrap;gap:18px;">'+
-      '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Revenue</div><div class="ring-wrap" style="'+goalGlowFilter(mrrPct)+'">'+svgRing(mrrPct,130,goalColor(),'$'+mrr.toLocaleString(),'of $'+mrrGoal.toLocaleString()+' MRR')+'</div></div>'+
-      (goalWeight!=null ? '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Weight</div><div class="ring-wrap" style="'+goalGlowFilter(weightPct)+'">'+svgRing(weightPct,130,goalColor(),(latestWeight!=null?latestWeight:'—'),'toward '+goalWeight+' goal')+'</div></div>' : '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Weight</div><div class="ring-wrap"><div class="empty" style="width:130px;">Set a goal weight in Settings</div></div></div>')+
-      '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Workouts</div><div class="ring-wrap" style="'+goalGlowFilter(workoutPct)+'">'+svgRing(workoutPct,130,goalColor(),trained7+'/'+state.profile.weeklyWorkoutTarget,'this week')+'</div></div>'+
-      '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Goals Achieved</div><div class="ring-wrap" style="'+goalGlowFilter(achievedPct)+'">'+svgRing(achievedPct,130,goalColor(),done.length+'/'+items.length,items.length?'of your goals':'none set yet')+'</div></div>'+
-    '</div></div>'+
-  '<div class="card section">'+
-    '<div class="kpi-sub" style="margin-bottom:14px;text-align:center;">Add a goal, and optionally pair it with your own tracker.</div>'+
-    '<div class="grid grid-3">'+
-      '<div class="field"><label>Goal</label><input class="input" id="newGoalLabel" placeholder="e.g. First sponsor deal" style="width:100%;"></div>'+
-      '<div class="field"><label>Target (optional)</label><input class="input" type="number" id="newGoalTarget" placeholder="e.g. 90" style="width:100%;"></div>'+
-      '<div class="field"><label>Unit (optional)</label><input class="input" id="newGoalUnit" placeholder="e.g. lbs, $/mo, days" style="width:100%;"></div>'+
-    '</div>'+
-    '<div class="grid grid-2" style="margin-top:12px;">'+
-      '<div class="field"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="newGoalDeadline" style="flex:1;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newGoalDeadline">&#128197;</button></div></div>'+
-      '<div class="field"><label>Tracking</label><select class="input" id="newGoalTrackMode" style="width:100%;"><option value="manual">I\'ll update progress myself</option><option value="streak">Auto-track from my streak</option></select></div>'+
-    '</div>'+
-    '<div class="row" style="justify-content:center;margin-top:18px;">'+
-      '<button class="btn btn-good" style="font-size:16px;font-weight:700;padding:14px 36px;box-shadow:0 4px 22px rgba(63,190,142,.4);" data-action="addGoal">+ Add Goal</button>'+
-    '</div>'+
-  '</div>'+
-  '<div class="task-list">'+(items.map(goalRow).join('') || '<div class="empty">Nothing here yet — add the goals that actually matter to you.</div>')+'</div>';
-}
 function goalLiveCurrent(g){
   if(g.autoTrack==='streak') return computeStreak();
   return g.current||0;

@@ -489,6 +489,7 @@ function startFocus(minutes){
   if(ui.stagedTaskId){
     const st = state.tasks.items.find(function(x){return x.id===ui.stagedTaskId;});
     if(st){ ui.currentTaskId = ui.stagedTaskId; ui.currentTaskStartedAt = Date.now(); }
+    if(state.focus.nextTaskId===ui.stagedTaskId) state.focus.nextTaskId = null;
     ui.stagedTaskId = null;
   }
   persist('focus'); renderView();
@@ -496,12 +497,13 @@ function startFocus(minutes){
 function stageNextTask(taskId){
   const t = state.tasks.items.find(function(x){return x.id===taskId;}); if(!t) return;
   ui.stagedTaskId = taskId;
+  state.focus.nextTaskId = taskId; persist('focus');
   ui.justStaged = true;
   playTick();
   renderView();
   setTimeout(function(){ ui.justStaged = false; renderView(); }, 1000);
 }
-function clearStagedTask(){ ui.stagedTaskId = null; renderView(); }
+function clearStagedTask(){ ui.stagedTaskId = null; if(state.focus.nextTaskId){ state.focus.nextTaskId = null; persist('focus'); } renderView(); }
 function openStopFocus(){
   const overlay = document.getElementById('stopFocusOverlay');
   overlay.classList.remove('hidden');

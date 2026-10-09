@@ -17,20 +17,9 @@ function renderBusiness(){
   '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
 }
 function renderBusinessOverview(){
-  const clients = arr(state.business.clients);
-  const activeClients = clients.filter(function(c){ return c.status==='active'; });
-  const mrr = activeClients.reduce(function(a,c){ return a+Number(c.mrr||0); },0);
-  const pipeline = arr(state.business.pipeline);
-  const potentialValue = pipeline.filter(function(p){ return p.stage!=='lost' && p.stage!=='closed'; }).reduce(function(a,p){ return a+Number(p.value||0); },0);
-
-  return '<div class="grid grid-3 section">'+
-    '<div class="card" style="text-align:center;"><div class="kpi-label">Current MRR</div><div class="hero-num" style="color:#3FBE8E;font-size:38px;">$'+mrr.toLocaleString()+'</div><div class="kpi-sub">'+activeClients.length+' Active Client'+(activeClients.length===1?'':'s')+' &middot; <button class="btn btn-ghost btn-sm" data-action="businessTab" data-tab="clients">View Clients</button></div></div>'+
-    '<div class="card" style="text-align:center;"><div class="kpi-label">Potential Pipeline Value</div><div class="hero-num" style="color:#E8A23D;font-size:38px;">$'+potentialValue.toLocaleString()+'</div><div class="kpi-sub">From Open Leads</div></div>'+
-    '<div class="card" style="text-align:center;"><div class="kpi-label">Total Potential MRR</div><div class="hero-num" style="color:#8fdcff;font-size:38px;">$'+(mrr+potentialValue).toLocaleString()+'</div><div class="kpi-sub">If Everything Closes</div></div>'+
-  '</div>'+
-  renderReachOutPanel(false)+
-  renderPipelineGlance()+
-  renderClientOpsPanel();
+  return renderBusinessPanel().replace('<div class="section-title">Business<span class="view-all-link" data-action="nav" data-view="business">Open Business &rarr;</span></div>', '')+
+  renderClientHubPanel()+
+  renderPipelineGlance();
 }
 function renderPipelineGlance(){
   const stages = crmStages('lead');

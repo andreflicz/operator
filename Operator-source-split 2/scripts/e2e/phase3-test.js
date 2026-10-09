@@ -96,8 +96,9 @@ const SP = require('./common.js').OUT;
   check('task became reminder with time', await E("!!state.focus.reminders.find(r=>r.fromTaskId==='t3' && r.time==='22:30')") && await E("!state.tasks.items.some(t=>t.id==='t3')"));
   // night plan
   await p.click('[data-action="nav"][data-view="today"]');
-  check('evening card shown at 9pm', await p.isVisible('.evening-card'));
-  await p.click('.evening-card [data-action="openNightPlan"]');
+  check('wind down shown at 9pm', await p.isVisible('[data-action="toggleWindDown"]'));
+  await p.click('[data-action="toggleWindDown"]');
+  await p.click('.wind-drop [data-action="openNightPlan"]');
   await p.check('#nightPlanContent [data-plan-task="t1"]');
   await p.fill('#nightPlanNewTask', 'Write hooks'); await p.click('[data-action="nightPlanAddTask"]');
   await p.fill('#nightPlanNote', 'Big shoot day. Eat first.');
@@ -107,7 +108,8 @@ const SP = require('./common.js').OUT;
   check('night plan saved for tomorrow w/ 2 tasks', np.date===ds(new Date(2026,9,8)) && np.taskIds.length===2 && np.note.includes('Big shoot'), np);
   check('wake alarm set for that morning', await E("const o=state.focus.wake.override; o && o.time==='05:45' && o.date==='"+np.date+"'"));
   // sleep mode
-  await p.click('.evening-card [data-action="startSleepMode"]');
+  if(!(await p.isVisible('.wind-drop'))) await p.click('[data-action="toggleWindDown"]');
+  await p.click('.wind-drop [data-action="startSleepMode"]');
   check('sleep view', (await p.textContent('#viewRoot')).includes('Sleep mode') && await p.isVisible('.sleep-card'));
   check('sleep shows next alarm 5:45', (await p.textContent('.sleep-card')).includes('5:45'));
   check('auto lock-in blocked in sleep', await E("autoLockInBlockedReason()")==='mode');

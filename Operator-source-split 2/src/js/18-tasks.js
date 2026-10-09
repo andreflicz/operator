@@ -367,6 +367,7 @@ function setCurrentTask(taskId){
   const as = state.focus.activeSession;
   if(as && as.onBreak) return;
   if(ui.currentTaskId) accumulateCurrentTaskTime(ui.currentTaskId);
+  if(state.focus.nextTaskId===taskId){ state.focus.nextTaskId = null; persist('focus'); }
   ui.currentTaskId = taskId;
   ui.currentTaskStartedAt = Date.now();
   persist('tasks'); renderView();
