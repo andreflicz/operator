@@ -29,7 +29,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   {
     const p = await newPage(b, OUT+'/r5.html', {profile:{name:'Andre', theme:'light'}, tasks}, NOW);
     check('light theme is on before the app even renders (no dark flash)', await p.evaluate(() => document.documentElement.getAttribute('data-theme'))==='light');
-    check('…and the page is actually light', await p.evaluate(() => getComputedStyle(document.body).backgroundColor)==='rgb(243, 244, 247)');
+    check('…and the page is actually light', await p.evaluate(() => getComputedStyle(document.body).backgroundColor)==='rgb(205, 210, 219)');
     await p.evaluate(() => window.__op.ev("ACTIONS.setTheme(null, null, 'dark')"));
     await p.waitForTimeout(400);
     check('switching to dark from settings applies at once', await p.evaluate(() => document.documentElement.getAttribute('data-theme')==='dark' && getComputedStyle(document.body).backgroundColor==='rgb(11, 13, 18)'));

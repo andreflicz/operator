@@ -46,9 +46,10 @@ const SP = require('./common.js').OUT;
   await p.click('[data-action="saveTimeBlock"]');
   check('session edited to 165m', await E("state.focus.sessions.find(s=>s.id==='s1').minutes")===165);
   await p.click('.day-detail [data-action="editTimeBlock"][data-id="s1"]');
-  await p.click('#sessionEditContent label:has(input[value="training"])');
+  check('Training is no longer offered as a type', (await p.$$('#sessionEditContent input[value="training"]')).length===0);
+  await p.click('#sessionEditContent label:has(input[value="shooting"])');
   await p.click('[data-action="saveTimeBlock"]');
-  check('session retyped to training (not deep)', await E("deepWorkMinutesFor(todayStr())")===0 && await E("dayModeTotals(todayStr()).training")===165);
+  check('session retyped to shooting (not deep)', await E("deepWorkMinutesFor(todayStr())")===0 && await E("dayModeTotals(todayStr()).shooting")===165);
   await p.click('.day-detail [data-action="editTimeBlock"][data-id="s1"]');
   await p.click('[data-action="deleteTimeBlock"]');
   check('session deleted', await E("state.focus.sessions.some(s=>s.id==='s1')")===false);
@@ -124,10 +125,11 @@ const SP = require('./common.js').OUT;
   check('morning plan card', await p.isVisible('.morning-plan-card'));
   await p.click('[data-action="applyNightPlan"]');
   check('plan tasks moved to today', await E("state.tasks.items.filter(t=>state.focus.nightPlan.taskIds.includes(t.id)).every(t=>t.status==='today')"));
-  // training mode
+  // old training blocks still load and count (as Other) — nothing recorded is lost
   await E("startMode('training')");
-  check('training mode active', await E("state.modes.active.type")==='training');
+  check('legacy training mode still runs', await E("state.modes.active.type")==='training');
   await E("endMode()");
+  check('legacy training minutes fold into Other', await E("dayModeTotals(todayStr()).other")>=await E("modeMinutesFor(todayStr(),'training')"));
   // wish list
   await p.click('[data-action="nav"][data-view="personal"]'); await p.click('[data-action="personalTab"][data-tab="wishlist"]');
   check('FAB = wish list', (await p.getAttribute('#fabAdd','title'))==='Add wish list item');

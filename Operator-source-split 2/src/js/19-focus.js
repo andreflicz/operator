@@ -208,6 +208,7 @@ function renderBreakForm(){
 function renderManualLogForm(){
   return '<div class="row" style="justify-content:center;gap:10px;">'+
     '<button class="btn btn-ghost btn-sm" data-action="openManualLogModal">+ Log Time Manually</button>'+
+    '<button class="btn btn-ghost btn-sm" data-action="goToFitness">&#127947; Log a Workout</button>'+
     '<button class="btn btn-ghost btn-sm" data-action="viewAllSessions">View All Sessions</button>'+
   '</div>';
 }

@@ -14,10 +14,10 @@ function hmOf(ts){ return ts ? nowHM(new Date(ts)) : ''; }
 function renderSessionEditModal(){
   const eb = ui.editingTimeBlock; if(!eb) return '';
   const b = timeBlockFind(eb.kind, eb.id); if(!b) return '';
-  const types = eb.kind==='mode'
-    ? [['break','Break'],['offtime','Off-time'],['shooting','Shooting'],['training','Training']]
-    : [['deep','Deep work'],['training','Training'],['shooting','Shooting']];
   const cur = eb.kind==='mode' ? b.type : sessionType(b);
+  const types = (eb.kind==='mode'
+    ? [['break','Break'],['offtime','Off-time'],['shooting','Shooting']]
+    : [['deep','Deep work'],['shooting','Shooting']]).concat(cur==='training' ? [['training','Training (old)']] : []);
   // Older manual logs only stored a duration; show their start as "unknown" until edited.
   const hasTimes = !(b.manual && b.startedAt===b.endedAt);
   return '<div class="section-title" style="margin-bottom:4px;">Edit '+(eb.kind==='mode'?'Time Block':'Session')+'</div>'+
@@ -104,12 +104,21 @@ function dayModeTotals(dateStr){
   const as = state.focus.activeSession;
   const liveSession = function(type){ return (isToday && as && sessionType(as)===type && !as.onBreak) ? Math.floor((Date.now()-as.startedAt)/60000) : 0; };
   const training = rawSessionMinutesFor(dateStr,'training') + modeMinutesFor(dateStr,'training') + liveModeMinutes(dateStr,'training') + liveSession('training');
+  const workout = workoutDay(dateStr).m;
   const shooting = rawSessionMinutesFor(dateStr,'shooting') + modeMinutesFor(dateStr,'shooting') + liveModeMinutes(dateStr,'shooting') + liveSession('shooting');
   let excludedLive = 0;
   if(isToday && as && !as.onBreak && ui.currentTaskId && ui.currentTaskStartedAt && !taskCountsAsDeepWork(ui.currentTaskId)) excludedLive = Math.floor((Date.now()-ui.currentTaskStartedAt)/60000);
-  const other = modeMinutesFor(dateStr,'break') + liveModeMinutes(dateStr,'break') + excludedTaskMinutesFor(dateStr) + excludedLive;
-  return {deep:deep, training:training, shooting:shooting, other:other, total:deep+training+shooting+other};
+  const other = modeMinutesFor(dateStr,'break') + liveModeMinutes(dateStr,'break') + excludedTaskMinutesFor(dateStr) + excludedLive + training;
+  return {deep:deep, workout:workout, shooting:shooting, other:other, total:deep+workout+shooting+other};
 }
+// Workouts logged in Fitness, per day: how many and the minutes you entered for them.
+function workoutDayMap(){
+  const m = {};
+  arr(state.health.gymLog).forEach(function(g){ if(!g || !g.date) return; const d = m[g.date] || (m[g.date] = {n:0, m:0}); d.n++; d.m += Math.max(0, Number(g.duration)||0); });
+  return m;
+}
+function workoutDay(dateStr){ return (RC ? memo('workoutDays', workoutDayMap) : workoutDayMap())[dateStr] || {n:0, m:0}; }
+function workoutTotals(days){ const t = {n:0, m:0}; days.forEach(function(d){ const x = workoutDay(d); t.n += x.n; t.m += x.m; }); return t; }
 function fmtDelta(mins){
   if(!mins) return 'same';
   return (mins>0?'+':'−')+fmtDurationLabel(Math.abs(mins));
@@ -124,7 +133,7 @@ function weekDays(offsetWeeks){
   return out;
 }
 function sumTotals(days){
-  const t = {deep:0, training:0, shooting:0, other:0, total:0};
+  const t = {deep:0, workout:0, shooting:0, other:0, total:0};
   days.forEach(function(d){ if(d>todayStr()) return; const x = dayModeTotals(d); Object.keys(t).forEach(function(k){ t[k]+=x[k]; }); });
   return t;
 }
@@ -272,7 +281,7 @@ function renderAnalyticsWeek(offset){
         modeLegendHtml()+
       '</div>'+
       weekStackChart(days, sel)+
-      '<div class="mode-tiles mode-tiles-sm">'+TIME_TYPES.map(function(tt){ return '<div class="mode-tile"><span class="mode-tile-dot" style="background:'+tt.color+'"></span><div class="mode-tile-val">'+fmtDurationLabel(t[tt.id])+'</div><div class="mode-tile-label">'+tt.label+' &middot; '+fmtDelta(t[tt.id]-p[tt.id])+'</div></div>'; }).join('')+'</div>'+
+      '<div class="mode-tiles mode-tiles-sm">'+TIME_TYPES.map(function(tt){ const wn = tt.id==='workout' ? workoutTotals(days).n : 0; return '<div class="mode-tile"'+(tt.id==='workout'?' data-action="goToFitness" style="cursor:pointer;"':'')+'><span class="mode-tile-dot" style="background:'+tt.color+'"></span><div class="mode-tile-val">'+fmtDurationLabel(t[tt.id])+'</div><div class="mode-tile-label">'+tt.label+(tt.id==='workout' ? ' &middot; '+wn+' workout'+(wn===1?'':'s') : ' &middot; '+fmtDelta(t[tt.id]-p[tt.id]))+'</div></div>'; }).join('')+'</div>'+
     '</div>'+
     '<div class="section" style="margin-top:16px;">'+dayDetailHtml(sel)+'</div>';
 }
@@ -303,9 +312,23 @@ function renderFocusAnalyticsTab(){
   if(r==='today') body = renderAnalyticsToday();
   else if(r==='week') body = renderAnalyticsWeek(0);
   else if(r==='lastweek') body = renderAnalyticsWeek(-1);
-  else body = renderFocusAnalytics()+renderTaskStatsSection()+renderTimeByTaskSection();
+  else body = renderFocusAnalytics()+renderTaskStatsSection()+renderFitnessStatsSection()+renderTimeByTaskSection();
   return '<div class="subtab-panel" data-key="analytics-'+r+'">'+body+'</div>'+
     '<div class="section" style="margin-top:16px;">'+renderManualLogForm()+'</div>';
+}
+// Workouts you log in Fitness (with the minutes you enter) — totals for the analytics page.
+function renderFitnessStatsSection(){
+  const map = workoutDayMap(), dates = Object.keys(map);
+  const all = dates.reduce(function(a, d){ a.n += map[d].n; a.m += map[d].m; return a; }, {n:0, m:0});
+  const wk = workoutTotals(weekDays(0)), last30 = []; for(let i=29;i>=0;i--) last30.push(addDays(todayStr(), -i));
+  const m30 = workoutTotals(last30);
+  const tile = function(label, v, sub){ return '<div class="card" style="text-align:center;"><div class="kpi-label">'+label+'</div><div class="kpi-value" style="color:var(--train);">'+v+'</div>'+(sub?'<div class="kpi-sub">'+sub+'</div>':'')+'</div>'; };
+  return '<div class="section"><div class="section-title">Fitness'+tip('From the workouts you log in Personal → Fitness — enter how long each one took and it lands here.')+'<span class="view-all-link" data-action="goToFitness">Log a workout &rarr;</span></div><div class="grid grid-4">'+
+      tile('Total Workouts', all.n, dates.length ? 'since '+fmtDateShort(dates.sort()[0]) : 'none logged yet')+
+      tile('Time Working Out', fmtDurationLabel(all.m), all.n ? fmtDurationLabel(Math.round(all.m/all.n))+' per workout' : '')+
+      tile('This Week', wk.n, fmtDurationLabel(wk.m))+
+      tile('Last 30 Days', m30.n, fmtDurationLabel(m30.m))+
+    '</div></div>';
 }
 function renderTaskStatsSection(){
   const items = state.tasks.items;

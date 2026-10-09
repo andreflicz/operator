@@ -55,9 +55,12 @@
   "32-clock-timer-alarms.js",
   "32b-wake.js",
   "32c-scenes.js",
+  "32e-video-walls.js",
   "33-event-delegation.js",
   "33b-overlay-dismiss.js",
   "33c-context-menu.js",
   "33d-fast-press.js",
+  "33e-nav-order.js",
+  "33f-desktop-select.js",
   "34-init.js"
 ]

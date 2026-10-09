@@ -31,12 +31,13 @@ function appMenuHtml(){
     SEP+
     (s ? ci('stop', '&#9632; Stop &amp; log session')+(s.onBreak ? '' : ci('break', '&#9749; Take a break')) : ci('lockin', '&#128274; Lock in <span class="ctx-kbd">L</span>'))+
     ci('recap', '&#128202; Day recap')+
+    (selectableView() && selVisibleCards().length ? ci('selAll', '&#9745; Select all tasks <span class="ctx-kbd">&#8984;A</span>') : '')+
     ci('wake', '&#9200; Wake-up alarm')+
     SEP+
     crow('Go to', ['today','focus','business','calendar','personal'].map(function(v){ return chip('go', v[0].toUpperCase()+v.slice(1), {a:v, on:ui.view===v}); }).join(''))+
     SEP+
     crow('Theme', [['dark','Dark'],['light','Light'],['auto','Auto']].map(function(t){ return chip('theme', t[1], {a:t[0], on:theme===t[0]}); }).join(''))+
-    crow('Scene', SCENES.map(function(sc){ return chip('scene', sc.label, {a:sc.id, on:scene===sc.id}); }).join(''))+
+    crow('Scene', SCENES.map(function(sc){ return chip('scene', sc.label, {a:sc.id, on:scene===sc.id}); }).join('')+videoWalls().map(function(v){ return chip('scene', '&#9654; '+escapeHtml(v.name), {a:'vid:'+v.id, on:scene==='vid:'+v.id}); }).join(''))+
     crow('Cards', chip('layout', 'Grid', {a:'grid', on:lay==='grid'})+chip('layout', 'Carousel', {a:'carousel', on:lay==='carousel'}))+
     SEP+
     ci('sidebar', state.profile.sidebarCollapsed ? '&#9776; Show the menu' : '&#9776; Hide the menu')+
@@ -119,6 +120,7 @@ ACTIONS.ctx = function(el){
   else if(op==='stop') openStopFocus();
   else if(op==='break') openBreakNotePrompt();
   else if(op==='recap') ACTIONS.openDayRecap();
+  else if(op==='selAll') selectAllVisibleTasks();
   else if(op==='wake') openWakeSetup();
   else if(op==='go') go(a);
   else if(op==='theme') setThemePref(a);

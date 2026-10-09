@@ -523,16 +523,17 @@
     --night-surface:#11131b; --off-surface:#15161a; --off-btn:#22242c; --off-btn-hover:#2a2d36; --off-btn-border:#3a3d45; --off-btn-text:#E7E9EE;
   }
   :root[data-theme="light"]{ color-scheme:light;
-    --bg:#F3F4F7; --panel:#FFFFFF; --panel-2:#F2F4F8; --border:#E1E5EC;
-    --text:#161A23; --text-dim:#5D6577; --text-faint:#9AA2B3;
-    --good:#1FA373; --good-dim:rgba(31,163,115,.12); --danger:#DC4B55; --danger-dim:rgba(220,75,85,.10);
-    --info:#2A8BC0; --info-dim:rgba(42,139,192,.12); --shoot:#9257DC; --shoot-dim:rgba(146,87,220,.12); --train:#4A72E8;
-    --ink:22,26,38; --sh-k:.32;
-    --border-strong:#C5CBD8; --pop:#FFFFFF; --pop-border:#DFE3EA; --qtip-border:#C5CBD8;
-    --glass:rgba(255,255,255,.94); --scrim:rgba(28,32,44,.38); --now-cell:rgba(255,255,255,.8);
-    --strong:#11141B; --danger-text:#C2343E; --warn-text:#996000; --info-text:#1D78AB; --good-text:#14875C; --night-text:#4A57C8;
-    --due-1:#C66A12; --due-2:#C64B2B; --chart-grid:#E6E9EF;
-    --night-surface:#EEF0FA; --off-surface:#F1F2F5; --off-btn:#EEF0F4; --off-btn-hover:#E6E9EF; --off-btn-border:#CDD2DC; --off-btn-text:#2A2E38;
+    /* Soft light: slate-grey paper rather than white — same calm feel as the dark theme, just with the lights up a little. */
+    --bg:#CDD2DB; --panel:#E2E5EB; --panel-2:#D8DCE3; --border:#C0C6D1;
+    --text:#151922; --text-dim:#4C5466; --text-faint:#7A8294;
+    --good:#1A9367; --good-dim:rgba(26,147,103,.14); --danger:#CC3F4A; --danger-dim:rgba(204,63,74,.12);
+    --info:#2680B2; --info-dim:rgba(38,128,178,.14); --shoot:#8650CF; --shoot-dim:rgba(134,80,207,.14); --train:#4467D6;
+    --ink:22,26,38; --sh-k:.38;
+    --border-strong:#AEB5C2; --pop:#E8EAEF; --pop-border:#BEC4CF; --qtip-border:#AEB5C2;
+    --glass:rgba(226,229,235,.95); --scrim:rgba(24,28,38,.42); --now-cell:rgba(232,235,240,.85);
+    --strong:#0F1218; --danger-text:#B52F3A; --warn-text:#8A5600; --info-text:#1A6E9E; --good-text:#11784F; --night-text:#4450B8;
+    --due-1:#B65F0E; --due-2:#B84327; --chart-grid:#C9CED8;
+    --night-surface:#D6D9E8; --off-surface:#D9DCE3; --off-btn:#D5D9E0; --off-btn-hover:#CCD1D9; --off-btn-border:#B5BCC8; --off-btn-text:#262A34;
   }
   .mode-btn-row{ display:flex; gap:10px; width:100%; margin-top:12px; }
   .mode-btn-row .btn{ flex:1; padding:16px 10px; font-size:15px; letter-spacing:.02em; }
@@ -1423,10 +1424,10 @@
   /* ---- scenes: a living background behind translucent panels ---- */
   .scene-layer{ position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:0; }
   body.has-scene{ background:#05060a; --panel:rgba(20,23,31,.86); --panel-2:rgba(25,29,39,.88); }
-  :root[data-theme="light"] body.has-scene{ background:#dfe7f2; --panel:rgba(255,255,255,.86); --panel-2:rgba(242,244,248,.9); }
+  :root[data-theme="light"] body.has-scene{ background:#c9d2de; --panel:rgba(228,231,237,.86); --panel-2:rgba(216,220,227,.9); }
   body.has-scene .app{ position:relative; z-index:1; }
   body.has-scene .sidebar{ background:rgba(16,18,26,.8); }
-  :root[data-theme="light"] body.has-scene .sidebar{ background:rgba(255,255,255,.8); }
+  :root[data-theme="light"] body.has-scene .sidebar{ background:rgba(222,226,233,.82); }
   body.has-scene .view-title, body.has-scene .tabs .tab{ text-shadow:0 1px 14px rgba(0,0,0,.35); }
   :root[data-theme="light"] body.has-scene .view-title, :root[data-theme="light"] body.has-scene .tabs .tab{ text-shadow:0 1px 12px rgba(255,255,255,.6); }
   .scene-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(132px, 1fr)); gap:10px; }
@@ -1534,6 +1535,72 @@
   .crm-card-foot .touch-btns, .cc2-foot .touch-btns, .hub-foot .touch-btns{ flex-shrink:0; }
   .scene-layer{ animation:sceneIn .9s ease-out both; }
   @keyframes sceneIn{ from{ opacity:0; } to{ opacity:1; } }
+  /* the locked-in timer card is never a scroll box (a 1px overflow made macOS flash a scrollbar on every tick) */
+  .focus-hero-col{ height:auto !important; min-height:340px; overflow:visible !important; }
+  #focusElapsed, #modeElapsed, #currentTaskElapsed, #currentTaskElapsedBar{ contain:layout paint; }
+  .load-more{ grid-column:1 / -1; display:block; margin:10px auto 0; background:none; border:1px dashed var(--border); color:var(--text-dim); border-radius:999px; padding:6px 16px; font-size:12px; cursor:pointer; }
+  .load-more:hover{ color:var(--text); border-color:var(--border-strong); }
+  /* carousel rows run to the edges of the window (past the page padding), unboxed */
+  .carousel.bleed{ margin-left:-36px; margin-right:-36px; }
+  .carousel.bleed > .car-track{ padding-left:36px; padding-right:36px; scroll-padding-inline:36px; }
+  .carousel.bleed .car-prev{ left:10px; } .carousel.bleed .car-next{ right:10px; }
+  .task-column.is-car{ border:none !important; background:none !important; padding:0 !important; min-height:0 !important; max-height:none !important; overflow:visible !important; }
+  .carousel.is-loop > .car-track{ scroll-snap-type:none; }
+  @media (max-width:900px){ .carousel.bleed{ margin-left:-16px; margin-right:-16px; } .carousel.bleed > .car-track{ padding-left:16px; padding-right:16px; } }
+  /* ---- round 6b: one progress panel, quieter sky line, small hold-to-start modes ---- */
+  .pg-card{ display:grid; grid-template-columns:minmax(260px,1fr) auto; gap:0; padding:0; align-items:stretch; overflow:hidden; }
+  .pg-card .pg-week{ padding:16px 20px; display:flex; flex-direction:column; min-width:0; }
+  .pg-card .pg-week .wk-bars{ flex:1; min-height:120px; height:auto; }
+  .pg-card .pg-heat{ padding:16px 20px; border-left:1px solid var(--border); flex-direction:column; align-items:flex-start; gap:14px; flex-wrap:nowrap; overflow:visible; }
+  .pg-card .pg-heat .hm-stats{ width:100%; flex:none; grid-template-columns:repeat(3, 1fr); min-width:0; gap:12px; }
+  .pg-card .pg-heat .hm-stat .stat-tile-v{ font-size:18px; }
+  .pg-card .pg-heat .hm-cell{ width:13px; height:13px; }
+  .pg-card .pg-heat .hm-grid, .pg-card .pg-heat .hm-col{ gap:3px; }
+  @media (max-width:1100px){ .pg-card{ grid-template-columns:1fr; } .pg-card .pg-heat{ border-left:none; border-top:1px solid var(--border); } }
+  .sky-chip{ font-size:11.5px; gap:5px; padding:1px 8px 1px 5px; border:none; background:rgba(var(--ink),.045); color:var(--text-dim); line-height:18px; }
+  .sky-chip b{ font-weight:600; color:var(--text-dim); }
+  .sky-chip-i{ font-size:12px; }
+  .th-subrow{ gap:8px; }
+  .th-modes{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+  .th-mode.dayoff-btn{ border-radius:999px; padding:4px 11px 4px 8px; font-size:12px; font-weight:600; gap:6px; color:var(--text-dim); border-color:var(--border); background:rgba(var(--ink),.025); box-shadow:none; }
+  .th-mode.dayoff-btn:hover{ color:var(--text); transform:translateY(-1px); }
+  .th-mode-i{ position:relative; font-size:12.5px; line-height:1; }
+  .th-mode .dayoff-hint{ font-size:9.5px; padding:0 4px; }
+  .th-mode.dayoff-btn[data-hold="dayoff"]:hover{ border-color:rgba(232,162,61,.6); }
+  .th-mode-shooting:hover{ border-color:rgba(179,157,219,.6) !important; }
+  .th-mode-shooting .dayoff-fill{ background:linear-gradient(90deg, rgba(179,157,219,.3), rgba(179,157,219,.5)); }
+  .th-mode-offtime .dayoff-fill{ background:linear-gradient(90deg, rgba(var(--ink),.12), rgba(var(--ink),.22)); }
+  .th-mode.held{ color:var(--text) !important; }
+  .task-card .card-more{ margin-left:auto; flex:none; width:24px; height:22px; border-radius:7px; border:1px solid transparent; background:transparent; color:var(--text-faint); font-size:16px; line-height:1; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; opacity:.55; transition:opacity .15s, background .15s, border-color .15s; padding:0; }
+  .task-card:hover .card-more{ opacity:1; }
+  .task-card .card-more:hover{ background:rgba(var(--ink),.07); border-color:var(--border); color:var(--text); }
+  @media (hover:none){ .task-card .card-more{ opacity:1; } }
+  .task-card{ position:relative; }
+  .task-card .card-more{ position:absolute; top:9px; right:9px; margin:0; }
+  .task-card > .row:first-child{ padding-right:26px; }
+  /* ---- video wallpapers ---- */
+  .scene-video-wrap{ overflow:hidden; background:#05060a; }
+  .scene-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .9s ease; }
+  .scene-video-wrap.is-ready .scene-video{ opacity:1; }
+  .scene-video-wrap::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(4,6,12,.28), rgba(4,6,12,.46)); pointer-events:none; }
+  :root[data-theme="light"] .scene-video-wrap::after{ background:linear-gradient(180deg, rgba(205,210,219,.22), rgba(205,210,219,.38)); }
+  .scene-card-video{ position:relative; }
+  .scene-thumb.is-video-blank{ background:linear-gradient(135deg, #10131c, #23293a); }
+  .scene-vid-badge{ position:absolute; left:6px; bottom:6px; font-size:9px; color:#fff; background:rgba(0,0,0,.5); border-radius:6px; padding:2px 5px; line-height:1; }
+  .scene-card-video .scene-thumb{ position:relative; }
+  .scene-vid-x{ position:absolute; top:4px; right:4px; width:20px; height:20px; border-radius:50%; background:rgba(0,0,0,.55); color:#fff; font-size:10px; display:none; align-items:center; justify-content:center; cursor:pointer; }
+  .scene-card-video:hover .scene-vid-x{ display:inline-flex; }
+  .scene-vid-x:hover{ background:var(--danger); }
+  .vw-add{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:14px; padding-top:12px; border-top:1px solid var(--border); }
+  .vw-add .kind-label{ margin-right:auto !important; }
+  .vw-link{ width:100%; gap:8px; }
+  /* ---- movable sidebar tabs ---- */
+  #sidebarNav > .nav-item.nav-dragging{ background:rgba(var(--ink),.08); box-shadow:0 6px 18px rgba(0,0,0,calc(.4*var(--sh-k))); cursor:grabbing; transform:scale(1.02); }
+  body.nav-sorting, body.nav-sorting *{ cursor:grabbing !important; user-select:none; }
+  /* ---- desktop-style selecting ---- */
+  .marquee-box{ position:fixed; left:0; top:0; z-index:9000; pointer-events:none; border:1px solid var(--accent); background:rgba(232,162,61,.10); border-radius:4px; will-change:transform; }
+  body.marquee-on, body.marquee-on *{ user-select:none !important; cursor:crosshair; }
+  .marquee-hit{ box-shadow:0 0 0 2px var(--accent) !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -1866,6 +1933,7 @@ function applySidebarState(){
   const nav = document.getElementById('sidebarNav');
   if(!nav) return;
   nav.classList.toggle('collapsed', !!state.profile.sidebarCollapsed);
+  if(typeof applyNavOrder==='function') applyNavOrder();
   document.body.classList.toggle('sb-collapsed', !!state.profile.sidebarCollapsed);
   setTimeout(function(){ if(typeof stretchLockedHeaderLine==='function') stretchLockedHeaderLine(); if(typeof sceneRefresh==='function') sceneRefresh(); }, 240);
 }
@@ -1890,8 +1958,7 @@ const PANEL_DEFS = [
   {id:'tasks', label:"Today's Tasks"},
   {id:'vision', label:'Vision Board'},
   {id:'agenda', label:'Today — timeline of events, deadlines & alarms'},
-  {id:'week', label:'This Week — deep work per day'},
-  {id:'heatmap', label:'Consistency — 16-week heatmap'},
+  {id:'week', label:'This Week & Consistency — deep work per day + 6-month heatmap'},
   {id:'why', label:'Your Why'}
 ];
 const SMALL_PANELS = ['focusMini', 'calendarMini']; // journal is full-width now that it sits near the top
@@ -2568,11 +2635,13 @@ function defaultDashboardPanels(){
 }
 function defaultModes(){ return { active:null, history:[] }; }
 const MODE_LABELS = { break:'Break Mode', offtime:'Off-Time Mode', shooting:'Shooting Mode', training:'Training Mode' };
+// Training mode is retired: old Training minutes now count as Other, and "Working out" is the
+// time you log on each workout in Fitness.
 // Session/time types used by analytics. Deep work is the only one that counts as deep work;
 // shooting also counts toward the daily standard (a shoot day doesn't break the streak).
 const TIME_TYPES = [
   {id:'deep', label:'Deep work', color:'#E8A23D'},
-  {id:'training', label:'Training', color:'#7AA2FF'},
+  {id:'workout', label:'Working out', color:'#7AA2FF'},
   {id:'shooting', label:'Shooting', color:'#C58FFF'},
   {id:'other', label:'Other', color:'#8A90A2'}
 ];
@@ -2861,6 +2930,7 @@ function normalizeWake(f){
     sound: ['standard','peaceful','loud'].indexOf(w.sound)>=0 ? w.sound : 'peaceful',
     media: (w.media && (w.media.ref || w.media.url || (w.media.type==='music' && w.media.q))) ? w.media : null,
     snoozeMinutes: Number(w.snoozeMinutes)>0 ? Number(w.snoozeMinutes) : 9,
+    openIn: ['firefox','safari','chrome'].indexOf(w.openIn)>=0 ? w.openIn : 'firefox',
     lastFiredTs: Number(w.lastFiredTs)||0,
     armedAt: Number(w.armedAt)||Date.now()
   };
@@ -3053,6 +3123,8 @@ function normalizeDashboardPanels(d){
   if(!d.v2PanelsAdded){ moveAfter('agenda', 'vision', 1); moveAfter('week', 'goals', d.order.length); moveAfter('heatmap', 'week', d.order.length); moveAfter('why', 'heatmap', d.order.length); d.v2PanelsAdded = true; }
   if(!d.agendaOff){ d.enabled.agenda = false; d.agendaOff = true; }
   if(!d.reachOutAdded){ moveAfter('clientHub', 'journal', 1); d.reachOutAdded = true; d.clientStepsAdded = true; }
+  // This Week and Consistency became one panel: it shows if either one was showing.
+  if(!d.progressMerged){ if(d.enabled.week===false && d.enabled.heatmap!==false) d.enabled.week = true; delete d.enabled.heatmap; d.progressMerged = true; }
   return d;
 }
 function normalizeModes(m){
@@ -3352,8 +3424,14 @@ function rawSessionMinutesFor(dateStr, type){
 function deepWorkMinutesFor(dateStr){
   return Math.max(0, rawSessionMinutesFor(dateStr,'deep') - excludedTaskMinutesFor(dateStr) - distractionMinutesFor(dateStr));
 }
+// The finished part of today's deep work is cached between renders (the timer asks every second;
+// recomputing it from every session and the app-activity log each time made ticks heavy).
+let dwTodayCache = null;
 function deepWorkMinutesTodayLive(){
-  let mins = deepWorkMinutesFor(todayStr());
+  const today = todayStr();
+  if(RC || !dwTodayCache || dwTodayCache.date!==today || dwTodayCache.gen!==renderGen || Date.now()-dwTodayCache.at > 30000)
+    dwTodayCache = {date:today, gen:renderGen, at:Date.now(), v:deepWorkMinutesFor(today)};
+  let mins = dwTodayCache.v;
   const as = state.focus.activeSession;
   if(as && sessionType(as)==='deep'){
     if(as.onBreak) mins += Math.floor((as.frozenElapsedMs||0)/60000);
@@ -3840,7 +3918,7 @@ function taskCard(t){
   const cat = t.categoryId ? taskCategoryById(t.categoryId) : null;
   const whiteAccent = t.isVideoIdea===true;
   return '<div class="task-card '+(t.status==='done'?'done':'')+(t.ongoing?' ongoing-task-card':'')+(selected?' card-selected':'')+(isCurrent?' current-task-active':'')+(pending?' just-completed':'')+(isStaged?' staged-task-card':'')+(whiteAccent?' video-idea-card':'')+'" data-action="'+(ui.taskSelectMode?'toggleTaskSelect':'openTaskEditModal')+'" data-id="'+t.id+'" style="cursor:pointer;'+(cat && !whiteAccent?'border-left:3px solid '+cat.color+';':'')+'" '+(draggable?'draggable="true" data-task-id="'+t.id+'"':'')+'>'+
-    '<div class="row" style="justify-content:space-between;">'+(ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+(t.isVideoIdea?'':priorityTag(t.priority))+(isCurrent?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">'+currentTaskLabel()+'</span>':'')+(isStaged?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">&#128204; Up Next</span>':'')+(t.ongoing?'<span class="tag tag-ongoing">&#128204; Ongoing</span>':'')+(doneToday?'<span class="tag tag-good">&#10003; Done today</span>':'')+'</div>'+
+    '<div class="row" style="justify-content:space-between;">'+(ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+(t.isVideoIdea?'':priorityTag(t.priority))+(isCurrent?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">'+currentTaskLabel()+'</span>':'')+(isStaged?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">&#128204; Up Next</span>':'')+(t.ongoing?'<span class="tag tag-ongoing">&#128204; Ongoing</span>':'')+(doneToday?'<span class="tag tag-good">&#10003; Done today</span>':'')+(ui.taskSelectMode?'':'<button class="card-more" data-action="taskMenuBtn" data-id="'+t.id+'" title="More — or right-click the card" aria-label="More actions">&#8943;</button>')+'</div>'+
     '<div class="task-card-title">'+escapeHtml(t.title)+'</div>'+
     (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     (t.isVideoIdea && t.videoType ? '<div style="margin-top:2px;"><span class="tag" style="background:rgba(var(--ink),.1);color:var(--text);">'+escapeHtml((taskVideoTypeById(t.videoType)||{}).label||'')+'</span></div>' : '')+
@@ -3850,9 +3928,6 @@ function taskCard(t){
       clientTagsHtml(t.clients)+
       (t.deadline ? deadlineTag(t) : '')+
     '</div>'+
-    (t.status==='backlog' ? '<div class="mini-move-row"><button class="mini-move mini-move-today" data-action="pullSpecificFromBacklog" data-id="'+t.id+'">+ Move to today</button></div>' : '')+
-    (t.status==='today' ? '<div class="mini-move-row"><button class="mini-move" data-action="moveTaskToBacklog" data-id="'+t.id+'">&larr; Move back to '+(t.isVideoIdea?'video ideas':'backlog')+'</button></div>' : '')+
-    (t.ongoing ? '<div class="row" style="margin-top:8px;"><button class="btn btn-sm '+(doneToday?'btn-ghost':'btn-good')+'" data-action="'+(doneToday?'undoTask':'completeTask')+'" data-id="'+t.id+'" style="width:100%;">'+(doneToday?'Undo — done for today':'&#10003; Mark done for today')+'</button></div>' : '')+
   '</div>';
 }
 function finishedTaskRow(t){
@@ -4392,14 +4467,10 @@ function renderStandardsWidget(){
     yesterdayStandardsFixupHtml()+
     '</div>';
 }
-// Lock In lives in the header — this panel is just the other modes, in one tidy row.
+// The mode buttons live in the hero now (hold to start) — this panel only shows a running mode.
 function renderFocusMiniPanel(){
   if(state.modes.active) return '<div class="section">'+renderLockInCard()+'</div>';
-  return '<div class="section"><div class="card modes-strip">'+
-    '<button class="btn shooting-btn" data-action="startMode" data-type="shooting">&#127916; Shooting</button>'+
-    '<button class="btn training-btn" data-action="startMode" data-type="training">&#128218; Training</button>'+
-    '<button class="btn offtime-btn" data-action="startMode" data-type="offtime">&#127937; Off-time</button>'+
-  '</div></div>';
+  return '';
 }
 function renderRemindersMiniPanel(){
   const upcoming = arr(state.focus.reminders).slice().sort(function(a,b){ return (a.date+String(a.time||'')).localeCompare(b.date+String(b.time||'')); });
@@ -4433,8 +4504,8 @@ const PANEL_RENDERERS = {
   clientHub: function(){ return renderClientHubPanel(); },
   vision: function(){ return renderVisionPanel(); },
   agenda: renderAgendaPanel,
-  week: renderWeekPanel,
-  heatmap: renderHeatmapPanel,
+  week: renderProgressPanel,
+  heatmap: function(){ return ''; },
   why: renderWhyPanel
 };
 function clientOpsDeliverableRow(clientId, d){
@@ -4785,6 +4856,10 @@ function renderAgendaPanel(){
 }
 // ---- this week: deep work per day ----
 function renderWeekPanel(){
+  return '<div class="section week-panel"><div class="section-title">This week<span class="view-all-link" data-action="goToAnalytics">Analytics &rarr;</span></div>'+
+    '<div class="card wk-card">'+weekBlockHtml()+'</div></div>';
+}
+function weekBlockHtml(){
   const ws = startOfWeekStr(todayStr());
   const target = state.standards.deepWorkTargetMinutes || 180;
   const days = []; let total = 0, best = 0;
@@ -4795,8 +4870,7 @@ function renderWeekPanel(){
   }
   const scale = Math.max(target*1.2, best, 60);
   const names = ['M','T','W','T','F','S','S'];
-  return '<div class="section week-panel"><div class="section-title">This week<span class="view-all-link" data-action="goToAnalytics">Analytics &rarr;</span></div>'+
-    '<div class="card wk-card">'+
+  return ''+
       '<div class="wk-top"><div><div class="stat-tile-v">'+fmtHours(total)+'</div><div class="stat-tile-sub">deep work this week</div></div>'+
         '<div style="text-align:right;"><div class="stat-tile-v" style="font-size:18px;">'+days.filter(function(x){ return x.m>=target; }).length+'<span class="stat-tile-of">/7</span></div><div class="stat-tile-sub">days on target</div></div></div>'+
       '<div class="wk-bars"><div class="wk-target" style="bottom:'+(target/scale*100)+'%;" title="Daily target '+fmtDurationLabel(target)+'"></div>'+
@@ -4806,12 +4880,15 @@ function renderWeekPanel(){
             '<div class="wk-bar-wrap"><div class="wk-bar'+(x.m>=target?' hit':'')+'" style="height:'+Math.max(x.m?3:0, x.m/scale*100)+'%"></div></div>'+
             '<div class="wk-day">'+names[i]+'</div></div>';
         }).join('')+
-      '</div>'+
-    '</div></div>';
+      '</div>';
 }
 ACTIONS.goToAnalytics = function(){ ui.view='focus'; ui.focusTab='analytics'; renderView(); };
 // ---- consistency heatmap (last 26 weeks) + streak stats ----
 function renderHeatmapPanel(){
+  return '<div class="section heatmap-panel"><div class="section-title">Consistency</div>'+
+    '<div class="card hm-card">'+heatBlockHtml()+'</div></div>';
+}
+function heatBlockHtml(){
   const target = state.standards.deepWorkTargetMinutes || 180;
   const WEEKS = 26;
   const start = addDays(startOfWeekStr(todayStr()), -(WEEKS-1)*7);
@@ -4833,16 +4910,19 @@ function renderHeatmapPanel(){
     cols += '<div class="hm-col">'+cells+'</div>';
   }
   const stat = function(v, k){ return '<div class="hm-stat"><div class="stat-tile-v">'+v+'</div><div class="stat-tile-sub">'+k+'</div></div>'; };
-  return '<div class="section heatmap-panel"><div class="section-title">Consistency</div>'+
-    '<div class="card hm-card">'+
+  return ''+
       '<div class="hm-main"><div class="hm-grid">'+cols+'</div>'+
         '<div class="hm-foot"><span>Last 6 months'+tip('Darker = more deep work that day. Outlined days hit the standard.')+'</span><span class="hm-legend">less <span class="hm-cell hm-1"></span><span class="hm-cell hm-2"></span><span class="hm-cell hm-3"></span><span class="hm-cell hm-4"></span> more</span></div></div>'+
       '<div class="hm-stats">'+
         stat(counted ? Math.round(hit/counted*100)+'%' : '—', 'days the standard was hit')+
         stat(best+'d', 'longest run on target')+
         stat(worked ? fmtHours(Math.round(totalMin/worked)) : '—', 'average on days you worked')+
-      '</div>'+
-    '</div></div>';
+      '</div>';
+}
+// This week's bars and the 6-month heatmap, side by side in one panel.
+function renderProgressPanel(){
+  return '<div class="section progress-panel"><div class="section-title">This week<span class="view-all-link" data-action="goToAnalytics">Analytics &rarr;</span></div>'+
+    '<div class="card pg-card"><div class="pg-week wk-card">'+weekBlockHtml()+'</div><div class="pg-heat hm-card">'+heatBlockHtml()+'</div></div></div>';
 }
 // ---- your why ----
 function renderWhyPanel(){
@@ -4866,17 +4946,32 @@ ACTIONS.goToWhySettings = function(){ ui.view='settings'; ui.settingsTab='focus'
 // ends (a scroll-driven CSS animation, so it costs no script work while you scroll).
 function cardLayout(){ return state.profile.cardLayout==='carousel' ? 'carousel' : 'grid'; }
 function carouselOn(){ return cardLayout()==='carousel'; }
+// opts.loop + opts.count: a long row loops forever — the cards are laid out three times and the
+// scroll position quietly jumps back to the middle copy, so there's never an end to hit.
 function carouselWrap(itemsHtml, key, opts){
   opts = opts || {};
   const threeD = opts.threeD!==undefined ? opts.threeD : carouselOn();
-  return '<div class="carousel'+(threeD?' is-3d':'')+(opts.fit?' is-fit':'')+(opts.cls?' '+opts.cls:'')+'" data-key="car-'+key+'"'+(opts.w?' style="--car-w:'+opts.w+'px"':'')+'>'+
+  const avail = Math.max(320, window.innerWidth - (state.profile.sidebarCollapsed ? 70 : 230) - 40);
+  const loop = !!(opts.loop && opts.count && opts.count*((opts.w||240)+12) > avail);
+  const clone = function(tag){ return itemsHtml.replace(/ data-key="/g, ' data-key="'+tag+'-').replace(/ id="[^"]*"/g, '').replace(/class="/, 'aria-hidden="true" class="car-clone '); };
+  const body = loop ? clone('cA')+itemsHtml+clone('cB') : itemsHtml;
+  return '<div class="carousel'+(threeD?' is-3d':'')+(opts.fit?' is-fit':'')+(loop?' is-loop':'')+(opts.bleed!==false?' bleed':'')+(opts.cls?' '+opts.cls:'')+'" data-key="car-'+key+'"'+(opts.w?' style="--car-w:'+opts.w+'px"':'')+'>'+
     '<button class="car-arrow car-prev" data-action="carouselStep" data-dir="-1" aria-label="Back">&#8249;</button>'+
-    '<div class="car-track'+(opts.trackCls?' '+opts.trackCls:'')+'" data-car="'+key+'">'+itemsHtml+'</div>'+
+    '<div class="car-track'+(opts.trackCls?' '+opts.trackCls:'')+'" data-car="'+key+'"'+(loop?' data-loop="1"':'')+'>'+body+'</div>'+
     '<button class="car-arrow car-next" data-action="carouselStep" data-dir="1" aria-label="More">&#8250;</button>'+
   '</div>';
 }
 function carUpdate(track){
   const wrap = track.parentElement; if(!wrap) return;
+  if(track.dataset.loop){
+    const third = track.scrollWidth/3;
+    if(!track._loopInit){ track._loopInit = true; track.scrollLeft = third; }
+    else if(track.scrollLeft < third*0.5) track.scrollLeft += third;
+    else if(track.scrollLeft > third*1.5) track.scrollLeft -= third;
+    if(!wrap.classList.contains('can-prev')) wrap.classList.add('can-prev', 'can-next');
+    track.classList.add('fade-l', 'fade-r');
+    return;
+  }
   const max = track.scrollWidth - track.clientWidth;
   const l = track.scrollLeft > 4, r = track.scrollLeft < max - 4;
   if(track.classList.contains('fade-l')!==l) track.classList.toggle('fade-l', l);
@@ -4892,6 +4987,24 @@ document.addEventListener('scroll', function(e){
   if(!carRaf) carRaf = requestAnimationFrame(function(){ carRaf = 0; carPending.forEach(carUpdate); carPending.clear(); });
 }, {capture:true, passive:true});
 window.addEventListener('resize', function(){ requestAnimationFrame(carUpdateAll); });
+// A plain mouse wheel moves a carousel row sideways while the pointer is over it. A page scroll
+// already under way glides straight past (so rows never trap you mid-page), and a row that has
+// hit its end hands the wheel back to the page.
+let carPageWheelAt = 0;
+document.addEventListener('wheel', function(e){
+  if(e.ctrlKey) return;
+  const track = e.target.closest && e.target.closest('.car-track');
+  if(!track){ carPageWheelAt = e.timeStamp; return; }
+  if(Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey) return;   // trackpad sideways / shift-wheel scroll natively
+  if(e.timeStamp - carPageWheelAt < 350){ carPageWheelAt = e.timeStamp; return; }
+  const dy = e.deltaMode===1 ? e.deltaY*40 : e.deltaY;
+  const max = track.scrollWidth - track.clientWidth;
+  if(max <= 2) return;
+  if(!track.dataset.loop && ((dy < 0 && track.scrollLeft <= 1) || (dy > 0 && track.scrollLeft >= max-1))) return;
+  e.preventDefault();
+  if(Math.abs(dy) >= 50) track.scrollBy({left:dy*1.6, behavior:'smooth'});   // notched mouse wheel: glide
+  else track.scrollLeft += dy;                                              // trackpad: follow the fingers
+}, {passive:false, capture:true});
 let carHookRaf = 0;
 afterRenderHooks.push(function(){ if(!carHookRaf && document.querySelector('.car-track')) carHookRaf = requestAnimationFrame(function(){ carHookRaf = 0; carUpdateAll(); }); });
 ACTIONS.carouselStep = function(el){
@@ -5044,7 +5157,8 @@ function renderToday(){
     if(SMALL_PANELS.indexOf(pid)>=0){
       const rowPanels = [];
       while(i<enabledOrder.length && SMALL_PANELS.indexOf(enabledOrder[i])>=0){ rowPanels.push(enabledOrder[i]); i++; }
-      panelsHtml += '<div class="small-panels-row section">'+rowPanels.map(function(rpid){ const fn=PANEL_RENDERERS[rpid]; return fn ? '<div class="small-panel-box">'+fn()+'</div>' : ''; }).join('')+'</div>';
+      const boxes = rowPanels.map(function(rpid){ const fn=PANEL_RENDERERS[rpid], h = fn ? fn() : ''; return h ? '<div class="small-panel-box">'+h+'</div>' : ''; }).join('');
+      if(boxes) panelsHtml += '<div class="small-panels-row section">'+boxes+'</div>';
     } else {
       const fn = PANEL_RENDERERS[pid];
       if(fn) panelsHtml += fn();
@@ -5076,7 +5190,7 @@ function renderTodayHero(greeting){
       businessNameTagHtml()+
       '<div class="th-greet">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
       (p.bigClockOnToday ? '<div id="liveClockBig" class="cal-big-clock th-bigclock"></div>'+skyChipHtml() : '<div class="th-subrow"><div class="th-sub" id="liveClock"></div>'+skyChipHtml()+'</div>')+
-      '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: streak===0 ? 'Hit today\'s standard to start one' : (allDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Hit today\'s standard to keep it')})+'</div>'+
+      '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: streak===0 ? 'Hit today\'s standard to start one'+tip('The streak counts days in a row you hit Today\'s Standard — the deep-work target plus your checklist. Rest days you take off don\'t break it.') : (allDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Hit today\'s standard to keep it')})+'</div>'+
     '</div>'+
     '<div class="th-right">'+
       '<button class="lockin-cta" data-action="openLockInChooser" title="Lock in (L)">'+
@@ -5088,8 +5202,8 @@ function renderTodayHero(greeting){
         '<button class="th-btn" data-action="toggleNextPicker" data-where="hero"><span class="th-btn-i">&#128204;</span>'+(next ? 'Change next' : 'Pick next')+'</button>'+
         (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going — sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
         (evening ? '<button class="th-btn th-btn-night'+(ui.windDownOpen?' is-open':'')+'" data-action="toggleWindDown"><span class="th-btn-i">&#127769;</span>Wind down<span class="th-caret">&#9662;</span></button>' : '')+
-        dayOffButtonHtml()+
       '</div>'+
+      '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+holdModeBtnHtml('offtime', '&#127937;', 'Off-time')+dayOffButtonHtml()+'</div>'+
       nextPickerHtml('hero')+
       (evening && ui.windDownOpen ? '<div class="wind-drop" data-key="wind-drop">'+windDownTilesHtml()+'</div>' : '')+
     '</div>'+
@@ -5098,8 +5212,14 @@ function renderTodayHero(greeting){
 ACTIONS.toggleWindDown = function(){ ui.windDownOpen = !ui.windDownOpen; ui.nextPicker = null; renderView(); };
 // ---- Take Today Off: hold to confirm (a click alone does nothing but explain) ----
 function dayOffButtonHtml(){
-  return '<button class="th-btn dayoff-btn" data-hold="dayoff" title="Hold to take today off">'+
-    '<span class="dayoff-fill"></span><span class="th-btn-i dayoff-i">&#127796;</span><span class="dayoff-label">Day off</span><span class="dayoff-hint">hold</span>'+
+  return '<button class="th-mode dayoff-btn" data-hold="dayoff" title="Hold to take today off">'+
+    '<span class="dayoff-fill"></span><span class="th-mode-i">&#127796;</span><span class="dayoff-label">Day off</span><span class="dayoff-hint">hold</span>'+
+  '</button>';
+}
+// Shooting / Off-time sit next to Day off as small pills — hold to start, so a stray click never flips you into a mode.
+function holdModeBtnHtml(type, icon, label){
+  return '<button class="th-mode dayoff-btn th-mode-'+type+'" data-hold="mode" data-type="'+type+'" title="Hold to start '+label+'">'+
+    '<span class="dayoff-fill"></span><span class="th-mode-i">'+icon+'</span><span class="dayoff-label">'+label+'</span><span class="dayoff-hint">hold</span>'+
   '</button>';
 }
 let holdTimer = null, holdEl = null;
@@ -5113,6 +5233,7 @@ document.addEventListener('pointerdown', function(e){
     el.classList.remove('holding'); el.classList.add('held');
     holdTimer = null; holdEl = null;
     if(kind==='dayoff') setTimeout(function(){ toggleDayOff(); showToast('Today is a rest day — the streak is safe. Enjoy it.', {icon:'&#127796;'}); }, 180);
+    else if(kind==='mode') setTimeout(function(){ startMode(el.dataset.type); }, 180);
   }, 900);
 });
 function endHold(e){
@@ -5167,20 +5288,23 @@ function taskFromEl(el){
   const id = el && (el.getAttribute('data-task-id') || el.getAttribute('data-id'));
   return id ? state.tasks.items.find(function(t){ return t.id===id; }) : null;
 }
-function closeTaskMenu(){ const m = document.getElementById('taskCtxMenu'); if(m) m.remove(); }
+let taskMenuClosed = {id:null, at:0};
+function closeTaskMenu(){ const m = document.getElementById('taskCtxMenu'); if(m){ taskMenuClosed = {id:m.dataset.id, at:Date.now()}; m.remove(); } }
 function openTaskMenu(t, x, y){
   closeTaskMenu();
   const inSession = !!state.focus.activeSession;
   const isNext = (nextUpTask()||{}).id===t.id;
   const item = function(op, label, extra){ return '<button class="ctx-item'+(extra||'')+'" data-action="taskCtx" data-op="'+op+'" data-id="'+t.id+'">'+label+'</button>'; };
   const m = document.createElement('div');
-  m.id = 'taskCtxMenu'; m.className = 'ctx-menu';
+  m.id = 'taskCtxMenu'; m.className = 'ctx-menu'; m.dataset.id = t.id; m.dataset.at = Date.now();
   m.innerHTML = '<div class="ctx-title">'+escapeHtml(t.title)+'</div>'+
     (t.status!=='done' ? item('start', inSession ? '&#9654; Start timing now' : '&#128274; Lock in on this') : '')+
     (t.status!=='done' && !isNext ? item('next', '&#128204; Make it next up') : '')+
     item('edit', '&#9998; Edit…')+
-    (t.status!=='done' ? item('done', '&#10003; Mark done') : item('undo', '&#8634; Back to today'))+
-    (t.status==='backlog' ? item('today', '&rarr; Move to today') : t.status==='today' ? item('backlog', '&larr; Move to backlog') : '')+
+    (t.status==='done' ? item('undo', '&#8634; Back to today')
+      : t.ongoing ? (isOngoingDoneToday(t) ? item('undo', '&#8634; Undo — done for today') : item('done', '&#10003; Mark done for today'))
+      : item('done', '&#10003; Mark done'))+
+    (t.status==='backlog' ? item('today', '&rarr; Move to today') : t.status==='today' ? item('backlog', '&larr; Move back to '+(t.isVideoIdea?'video ideas':'backlog')) : '')+
     '<div class="ctx-sep"></div>'+
     '<div class="ctx-row"><span class="ctx-k">Due</span>'+item('dueToday','Today',' ctx-chip')+item('dueTomorrow','Tomorrow',' ctx-chip')+(t.deadline?item('dueClear','Clear',' ctx-chip'):'')+'</div>'+
     '<div class="ctx-row"><span class="ctx-k">Priority</span>'+['high','med','low'].map(function(pr){ return item('pri-'+pr, pr==='med'?'Med':pr[0].toUpperCase()+pr.slice(1), ' ctx-chip'+(t.priority===pr?' is-on':'')); }).join('')+'</div>'+
@@ -5201,7 +5325,14 @@ document.addEventListener('contextmenu', function(e){
 document.addEventListener('pointerdown', function(e){ const m = document.getElementById('taskCtxMenu'); if(m && !m.contains(e.target)) closeTaskMenu(); }, true);
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeTaskMenu(); });
 window.addEventListener('blur', closeTaskMenu);
-document.addEventListener('scroll', closeTaskMenu, true);
+document.addEventListener('scroll', function(){ const m = document.getElementById('taskCtxMenu'); if(m && Date.now()-Number(m.dataset.at||0) > 200) closeTaskMenu(); }, true);
+// The ⋯ on a task card opens the same menu, tucked under the button.
+ACTIONS.taskMenuBtn = function(el, e, id){
+  const t = state.tasks.items.find(function(x){ return x.id===id; }); if(!t) return;
+  if(taskMenuClosed.id===id && Date.now()-taskMenuClosed.at < 400) return; // this press just closed it
+  const r = el.getBoundingClientRect();
+  openTaskMenu(t, r.right-200, r.bottom+4);
+};
 ACTIONS.taskCtx = function(el, e, id){
   const t = state.tasks.items.find(function(x){ return x.id===id; });
   closeTaskMenu();
@@ -5423,11 +5554,11 @@ function renderFocusTasksOverview(){
   renderTaskToolbar(true)+
   '<div class="section" style="margin-bottom:14px;">'+
     '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('Highest priority and closest deadlines first. Drag a card up to the box above to line it up next.')+'<span class="row" style="margin-left:auto;gap:8px;">'+selectModeBtnHtml()+'<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button></span></div>'+
-    '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>'+
+    '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236, loop:true, count:today.length}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>'+
   '</div>'+
   (backlogTotal ? (
     '<div class="section" style="margin-bottom:14px;"><div class="section-title" style="align-items:center;">Worth Doing Soon<span class="kpi-sub">'+backlogTotal+' in the list</span><button class="btn btn-ghost btn-sm" style="margin-left:auto;" data-action="focusTasksSubTab" data-tab="backlog">See All &rarr;</button></div>'+
-      (carouselOn() ? carouselWrap(backlogPreview.map(function(t){ return taskCard(t); }).join(''), 'soon', {w:236}) : '<div class="task-card-grid">'+backlogPreview.map(function(t){ return taskCard(t); }).join('')+'</div>')+
+      (carouselOn() ? (function(){ const all = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; })); return carouselWrap(all.map(function(t){ return taskCard(t); }).join(''), 'soon', {w:236, loop:true, count:all.length}); })() : '<div class="task-card-grid">'+backlogPreview.map(function(t){ return taskCard(t); }).join('')+'</div>')+
     '</div>'
   ) : '')+
   renderOngoingTasksPanel();
@@ -5464,8 +5595,15 @@ function renderBacklogResultsList(backlog){
     if(q && t.title.toLowerCase().indexOf(q)<0) return false;
     return true;
   });
-  return filtered.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing matches. Try clearing filters, or add a task above.</div>';
+  if(!filtered.length) return '<div class="empty">Nothing matches. Try clearing filters, or add a task above.</div>';
+  // long lists render in pages that keep loading as you scroll (an endless list, without the cost)
+  const lim = listLimit('backlog');
+  return filtered.slice(0, lim).map(function(t){ return taskCard(t); }).join('')+moreLoader('backlog', filtered.length - lim);
 }
+const LIST_PAGE = 48;
+function listLimit(key){ ui.listLimits = ui.listLimits || {}; return ui.listLimits[key] || LIST_PAGE; }
+function moreLoader(key, hidden){ return hidden > 0 ? '<button class="load-more" data-action="loadMore" data-id="'+key+'" data-autoload="1">Show '+Math.min(hidden, LIST_PAGE)+' more</button>' : ''; }
+ACTIONS.loadMore = function(el, e, key){ ui.listLimits = ui.listLimits || {}; ui.listLimits[key] = listLimit(key) + LIST_PAGE; renderView(); };
 function setBacklogPriorityFilter(val){ ui.backlogPriorityFilter = (ui.backlogPriorityFilter===val)?null:val; refreshBacklogResults(); }
 function clearBacklogFilters(){ ui.backlogSearchText=''; ui.backlogPriorityFilter=null; ui.backlogSearchOpen=false; renderView(); }
 function toggleBacklogSearch(){
@@ -5492,7 +5630,7 @@ function renderFocusFinishedTab(){
   '</div>'+
   '<div class="section">'+
     '<div class="section-title">Everything Knocked Out<span class="kpi-sub">'+doneEarlier.length+' more</span></div>'+
-    '<div class="task-list">'+(doneEarlier.map(finishedTaskRow).join('') || '<div class="empty">Nothing else yet — it all starts today.</div>')+'</div>'+
+    '<div class="task-list">'+(doneEarlier.slice(0, listLimit('finished')).map(finishedTaskRow).join('') || '<div class="empty">Nothing else yet — it all starts today.</div>')+moreLoader('finished', doneEarlier.length - listLimit('finished'))+'</div>'+
   '</div>';
 }
 function openAddTaskModal(){
@@ -5808,7 +5946,7 @@ function renderOngoingTasksPanel(){
   const ongoing = state.tasks.items.filter(function(t){ return t.ongoing && t.status!=='done'; });
   if(!ongoing.length) return '';
   return '<div class="section"><div class="section-title">Ongoing'+tip('Ongoing tasks stay live until they\'re actually done — check one off for today and it comes back tomorrow.')+'</div>'+
-    (carouselOn() ? carouselWrap(ongoing.map(function(t){ return taskCard(t); }).join(''), 'ongoing', {w:236}) : '<div class="task-card-grid">'+ongoing.map(function(t){ return taskCard(t); }).join('')+'</div>')+
+    (carouselOn() ? carouselWrap(ongoing.map(function(t){ return taskCard(t); }).join(''), 'ongoing', {w:236, loop:true, count:ongoing.length}) : '<div class="task-card-grid">'+ongoing.map(function(t){ return taskCard(t); }).join('')+'</div>')+
   '</div>';
 }
 function reminderRow(r){
@@ -5877,6 +6015,7 @@ function renderBreakForm(){
 function renderManualLogForm(){
   return '<div class="row" style="justify-content:center;gap:10px;">'+
     '<button class="btn btn-ghost btn-sm" data-action="openManualLogModal">+ Log Time Manually</button>'+
+    '<button class="btn btn-ghost btn-sm" data-action="goToFitness">&#127947; Log a Workout</button>'+
     '<button class="btn btn-ghost btn-sm" data-action="viewAllSessions">View All Sessions</button>'+
   '</div>';
 }
@@ -6471,10 +6610,10 @@ function hmOf(ts){ return ts ? nowHM(new Date(ts)) : ''; }
 function renderSessionEditModal(){
   const eb = ui.editingTimeBlock; if(!eb) return '';
   const b = timeBlockFind(eb.kind, eb.id); if(!b) return '';
-  const types = eb.kind==='mode'
-    ? [['break','Break'],['offtime','Off-time'],['shooting','Shooting'],['training','Training']]
-    : [['deep','Deep work'],['training','Training'],['shooting','Shooting']];
   const cur = eb.kind==='mode' ? b.type : sessionType(b);
+  const types = (eb.kind==='mode'
+    ? [['break','Break'],['offtime','Off-time'],['shooting','Shooting']]
+    : [['deep','Deep work'],['shooting','Shooting']]).concat(cur==='training' ? [['training','Training (old)']] : []);
   // Older manual logs only stored a duration; show their start as "unknown" until edited.
   const hasTimes = !(b.manual && b.startedAt===b.endedAt);
   return '<div class="section-title" style="margin-bottom:4px;">Edit '+(eb.kind==='mode'?'Time Block':'Session')+'</div>'+
@@ -6561,12 +6700,21 @@ function dayModeTotals(dateStr){
   const as = state.focus.activeSession;
   const liveSession = function(type){ return (isToday && as && sessionType(as)===type && !as.onBreak) ? Math.floor((Date.now()-as.startedAt)/60000) : 0; };
   const training = rawSessionMinutesFor(dateStr,'training') + modeMinutesFor(dateStr,'training') + liveModeMinutes(dateStr,'training') + liveSession('training');
+  const workout = workoutDay(dateStr).m;
   const shooting = rawSessionMinutesFor(dateStr,'shooting') + modeMinutesFor(dateStr,'shooting') + liveModeMinutes(dateStr,'shooting') + liveSession('shooting');
   let excludedLive = 0;
   if(isToday && as && !as.onBreak && ui.currentTaskId && ui.currentTaskStartedAt && !taskCountsAsDeepWork(ui.currentTaskId)) excludedLive = Math.floor((Date.now()-ui.currentTaskStartedAt)/60000);
-  const other = modeMinutesFor(dateStr,'break') + liveModeMinutes(dateStr,'break') + excludedTaskMinutesFor(dateStr) + excludedLive;
-  return {deep:deep, training:training, shooting:shooting, other:other, total:deep+training+shooting+other};
+  const other = modeMinutesFor(dateStr,'break') + liveModeMinutes(dateStr,'break') + excludedTaskMinutesFor(dateStr) + excludedLive + training;
+  return {deep:deep, workout:workout, shooting:shooting, other:other, total:deep+workout+shooting+other};
 }
+// Workouts logged in Fitness, per day: how many and the minutes you entered for them.
+function workoutDayMap(){
+  const m = {};
+  arr(state.health.gymLog).forEach(function(g){ if(!g || !g.date) return; const d = m[g.date] || (m[g.date] = {n:0, m:0}); d.n++; d.m += Math.max(0, Number(g.duration)||0); });
+  return m;
+}
+function workoutDay(dateStr){ return (RC ? memo('workoutDays', workoutDayMap) : workoutDayMap())[dateStr] || {n:0, m:0}; }
+function workoutTotals(days){ const t = {n:0, m:0}; days.forEach(function(d){ const x = workoutDay(d); t.n += x.n; t.m += x.m; }); return t; }
 function fmtDelta(mins){
   if(!mins) return 'same';
   return (mins>0?'+':'−')+fmtDurationLabel(Math.abs(mins));
@@ -6581,7 +6729,7 @@ function weekDays(offsetWeeks){
   return out;
 }
 function sumTotals(days){
-  const t = {deep:0, training:0, shooting:0, other:0, total:0};
+  const t = {deep:0, workout:0, shooting:0, other:0, total:0};
   days.forEach(function(d){ if(d>todayStr()) return; const x = dayModeTotals(d); Object.keys(t).forEach(function(k){ t[k]+=x[k]; }); });
   return t;
 }
@@ -6729,7 +6877,7 @@ function renderAnalyticsWeek(offset){
         modeLegendHtml()+
       '</div>'+
       weekStackChart(days, sel)+
-      '<div class="mode-tiles mode-tiles-sm">'+TIME_TYPES.map(function(tt){ return '<div class="mode-tile"><span class="mode-tile-dot" style="background:'+tt.color+'"></span><div class="mode-tile-val">'+fmtDurationLabel(t[tt.id])+'</div><div class="mode-tile-label">'+tt.label+' &middot; '+fmtDelta(t[tt.id]-p[tt.id])+'</div></div>'; }).join('')+'</div>'+
+      '<div class="mode-tiles mode-tiles-sm">'+TIME_TYPES.map(function(tt){ const wn = tt.id==='workout' ? workoutTotals(days).n : 0; return '<div class="mode-tile"'+(tt.id==='workout'?' data-action="goToFitness" style="cursor:pointer;"':'')+'><span class="mode-tile-dot" style="background:'+tt.color+'"></span><div class="mode-tile-val">'+fmtDurationLabel(t[tt.id])+'</div><div class="mode-tile-label">'+tt.label+(tt.id==='workout' ? ' &middot; '+wn+' workout'+(wn===1?'':'s') : ' &middot; '+fmtDelta(t[tt.id]-p[tt.id]))+'</div></div>'; }).join('')+'</div>'+
     '</div>'+
     '<div class="section" style="margin-top:16px;">'+dayDetailHtml(sel)+'</div>';
 }
@@ -6760,9 +6908,23 @@ function renderFocusAnalyticsTab(){
   if(r==='today') body = renderAnalyticsToday();
   else if(r==='week') body = renderAnalyticsWeek(0);
   else if(r==='lastweek') body = renderAnalyticsWeek(-1);
-  else body = renderFocusAnalytics()+renderTaskStatsSection()+renderTimeByTaskSection();
+  else body = renderFocusAnalytics()+renderTaskStatsSection()+renderFitnessStatsSection()+renderTimeByTaskSection();
   return '<div class="subtab-panel" data-key="analytics-'+r+'">'+body+'</div>'+
     '<div class="section" style="margin-top:16px;">'+renderManualLogForm()+'</div>';
+}
+// Workouts you log in Fitness (with the minutes you enter) — totals for the analytics page.
+function renderFitnessStatsSection(){
+  const map = workoutDayMap(), dates = Object.keys(map);
+  const all = dates.reduce(function(a, d){ a.n += map[d].n; a.m += map[d].m; return a; }, {n:0, m:0});
+  const wk = workoutTotals(weekDays(0)), last30 = []; for(let i=29;i>=0;i--) last30.push(addDays(todayStr(), -i));
+  const m30 = workoutTotals(last30);
+  const tile = function(label, v, sub){ return '<div class="card" style="text-align:center;"><div class="kpi-label">'+label+'</div><div class="kpi-value" style="color:var(--train);">'+v+'</div>'+(sub?'<div class="kpi-sub">'+sub+'</div>':'')+'</div>'; };
+  return '<div class="section"><div class="section-title">Fitness'+tip('From the workouts you log in Personal → Fitness — enter how long each one took and it lands here.')+'<span class="view-all-link" data-action="goToFitness">Log a workout &rarr;</span></div><div class="grid grid-4">'+
+      tile('Total Workouts', all.n, dates.length ? 'since '+fmtDateShort(dates.sort()[0]) : 'none logged yet')+
+      tile('Time Working Out', fmtDurationLabel(all.m), all.n ? fmtDurationLabel(Math.round(all.m/all.n))+' per workout' : '')+
+      tile('This Week', wk.n, fmtDurationLabel(wk.m))+
+      tile('Last 30 Days', m30.n, fmtDurationLabel(m30.m))+
+    '</div></div>';
 }
 function renderTaskStatsSection(){
   const items = state.tasks.items;
@@ -6878,7 +7040,6 @@ function renderLockInCard(){
     '<button class="btn btn-good lock-in-btn" data-action="openLockInChooser">&#128274; LOCK IN</button>'+
     '<div class="mode-btn-row">'+
       '<button class="btn shooting-btn" data-action="startMode" data-type="shooting">&#127916; SHOOTING</button>'+
-      '<button class="btn training-btn" data-action="startMode" data-type="training">&#128218; TRAINING</button>'+
     '</div>'+
     '<button class="btn offtime-btn" style="margin-top:12px;" data-action="startMode" data-type="offtime">&#127937; OFF-TIME MODE</button>'+
   '</div>';
@@ -7025,6 +7186,7 @@ function updateCurrentAppIndicator(){
   else { el.textContent=''; el.style.display='none'; }
   if(typeof updateActivityPill==='function') updateActivityPill();
 }
+let lastActivitySig = '', pastDayCounts = {};
 async function pollAppActivity(){
   const st = state.settings.appTracking;
   if(!st || st.enabled===false) { updateCurrentAppIndicator(); return; }
@@ -7034,6 +7196,10 @@ async function pollAppActivity(){
     if(!res.ok) return;
     text = await res.text();
   }catch(e){ return; } // no wrapper/server running — silently do nothing
+  // Nothing new since the last poll → nothing to recompute or save.
+  const sig = text.length+':'+text.slice(-80);
+  if(sig===lastActivitySig){ updateCurrentAppIndicator(); checkAutoLockIn(); return; }
+  lastActivitySig = sig;
   // Only count active usage: a sample taken after the keyboard/mouse has been idle for a
   // while is dropped, which leaves a gap that splits the interval (an app just sitting in
   // the foreground no longer counts as "being on it").
@@ -7045,6 +7211,7 @@ async function pollAppActivity(){
   samples.forEach(function(s){ const d = todayStr(new Date(s.ts)); (byDate[d]=byDate[d]||[]).push(s); });
   Object.keys(byDate).forEach(function(d){
     if(d===today) return; // only finalize PAST days; today stays live below
+    if(pastDayCounts[d]===byDate[d].length) return; // already finalized with these exact samples
     const ivs = samplesToIntervals(byDate[d].sort(function(a,b){return a.ts-b.ts;}));
     // The log is re-read in full on every poll, so a past day's samples show up again and
     // again. Keep the larger of stored vs. recomputed per app (idempotent) instead of adding,
@@ -7053,6 +7220,7 @@ async function pollAppActivity(){
     // Also keep the part that happened while locked in (Analytics shows that first).
     if(!state.appActivity.lockedDays) state.appActivity.lockedDays = {};
     state.appActivity.lockedDays[d] = maxAppMinutes(state.appActivity.lockedDays[d], clipIntervalsToWindows(ivs, sessionWindowsFor(d)));
+    pastDayCounts[d] = byDate[d].length;
   });
   const todaySamples = (byDate[today]||[]).sort(function(a,b){return a.ts-b.ts;});
   state.appActivity.todayIntervals = samplesToIntervals(todaySamples);
@@ -7728,7 +7896,7 @@ function renderJournalHistory(entries){
     const label = d===todayStr() ? 'Today' : d===addDays(todayStr(),-1) ? 'Yesterday' : fmtDateShort(d);
     html += '<div class="kind-label">'+label+'</div>'+groups[d].map(journalEntryRow).join('');
   });
-  if(hidden>0) html += '<div class="row" style="justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="journalShowMore">Show '+Math.min(hidden, JOURNAL_PAGE)+' more &middot; '+hidden+' older</button></div>';
+  if(hidden>0) html += '<div class="row" style="justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="journalShowMore" data-autoload="1">Show '+Math.min(hidden, JOURNAL_PAGE)+' more &middot; '+hidden+' older</button></div>';
   return html || '<div class="empty">Nothing matches yet.</div>';
 }
 ACTIONS.journalShowMore = function(){ ui.journalShowCount = (ui.journalShowCount || JOURNAL_PAGE) + JOURNAL_PAGE; updateJournalHistoryDisplay(); };
@@ -12000,7 +12168,7 @@ function renderClientsHome(){
         '</div>' : '');
     })()+
     '<div class="subtab-panel" data-key="clients-home">'+
-      (active.length ? (carouselOn() ? carouselWrap(active.map(clientCardV2).join(''), 'clients', {w:340, trackCls:'cc2-car'}) : '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>') : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
+      (active.length ? (carouselOn() ? carouselWrap(active.map(clientCardV2).join(''), 'clients', {w:340, trackCls:'cc2-car', loop:true, count:active.length}) : '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>') : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
       (rest.length ? '<div class="cc2-past"><button class="cc2-past-toggle" data-action="toggleClientsPast">'+(ui.clientsPastOpen?'&#9662;':'&#9656;')+' Paused &amp; past clients ('+rest.length+')</button>'+
         (ui.clientsPastOpen ? '<div class="cc2-grid cc2-grid-sm">'+rest.map(clientCardV2).join('')+'</div>' : '')+'</div>' : '')+
     '</div>';
@@ -12052,7 +12220,7 @@ function renderClientHubPanel(){
   if(!clients.length && !leadsDue.length) return '';
   return '<div class="section client-hub">'+
     '<div class="section-title">Clients<span class="view-all-link" data-action="goToClients">All clients &rarr;</span></div>'+
-    (clients.length ? (function(cards){ return carouselOn() ? carouselWrap(cards, 'hub', {w:300}) : '<div class="hub-grid">'+cards+'</div>'; })(clients.map(function(c){
+    (clients.length ? (function(cards){ return carouselOn() ? carouselWrap(cards, 'hub', {w:300, loop:true, count:clients.length}) : '<div class="hub-grid">'+cards+'</div>'; })(clients.map(function(c){
       const hs = clientHealthStatus(c);
       return '<div class="hub-card hl-'+hs.level+'" data-key="hub-'+c.id+'">'+
         '<div class="hub-head" title="'+escapeHtml(clientHealthTitle(c))+'">'+clientAvatarHtml(c, true, true)+
@@ -13212,10 +13380,11 @@ let lastRenderedView = null;
 let lastRenderedDay = null;
 // While several things change at once (e.g. navigating closes every open pop-up first),
 // renders are held so the page is drawn once at the end instead of once per step.
-let renderHold = 0;
+let renderHold = 0, renderGen = 0;
 function holdRenders(fn){ renderHold++; try{ fn(); } finally{ renderHold--; } }
 function renderView(){
   if(renderHold) return;
+  renderGen++;
   RC = {};
   try{ renderViewInner(); } finally { RC = null; }
 }
@@ -13401,8 +13570,13 @@ function startModeTicker(){
     if(el) setTimerText(el, Date.now()-active.startedAt);
   }, 1000);
 }
+// Deep work only changes once a minute — rebuild those boxes only when the number actually moves,
+// not on every tick (rebuilding them every second made the page relayout constantly).
+let lastLiveDeepMins = null;
 function tickLiveDeepWork(){
   const mins = deepWorkMinutesTodayLive();
+  if(mins===lastLiveDeepMins) return;   // a render in between already shows the current value
+  lastLiveDeepMins = mins;
   const statBox = document.getElementById('statDeepWorkBox');
   if(statBox) statBox.innerHTML = deepWorkStatInnerHtml(mins);
   const focusBox = document.getElementById('statDeepWorkTodayBox');
@@ -13451,10 +13625,13 @@ function startFocusTicker(){
         const dwTarget = state.standards.deepWorkTargetMinutes || 180;
         const liveToday = deepWorkMinutesTodayLive();
         const openPct = clamp(Math.round((liveToday/dwTarget)*100),0,100);
-        bar.style.width = openPct+'%';
-        bar.classList.toggle('good', openPct>=100);
+        // Only touch the DOM when something actually changed — rewriting the same text every
+        // second re-lays-out the card under the clock.
+        if(bar.style.width!==openPct+'%') bar.style.width = openPct+'%';
+        if(bar.classList.contains('good')!==(openPct>=100)) bar.classList.toggle('good', openPct>=100);
         const sub = bar.parentElement && bar.parentElement.nextElementSibling;
-        if(sub && sub.classList.contains('kpi-sub')) sub.textContent = 'Open-ended · '+fmtDurationLabel(liveToday)+' of '+fmtDurationLabel(dwTarget)+" today's goal";
+        const txt = 'Open-ended · '+fmtDurationLabel(liveToday)+' of '+fmtDurationLabel(dwTarget)+" today's goal";
+        if(sub && sub.classList.contains('kpi-sub') && sub.textContent!==txt) sub.textContent = txt;
       }
     }
   }, 1000);
@@ -13642,6 +13819,13 @@ function appleMusicFromLink(u){
 }
 function mediaKindLabel(m){ if(!m) return ''; if(m.type==='music') return 'Apple Music '+(m.k==='playlist'?'playlist':'song'); if(m.ref) return 'uploaded song'; return /youtu/.test(m.url||'') ? 'YouTube' : isDirectAudioUrl(m.url) ? 'song link' : 'link'; }
 function mediaName(m){ return !m ? '' : m.type==='music' ? m.q : (m.name || m.url || 'Song'); }
+const WAKE_HELPER = 'http://127.0.0.1:8935/';
+// The launcher stops asking Chrome "which website is open?" while Operator is the window in front
+// (each question made Chrome pause) — so tell it when that changes.
+function opFocusPing(f){ try{ fetch(WAKE_HELPER+'opfocus?f='+f).catch(function(){}); }catch(e){} }
+window.addEventListener('focus', function(){ opFocusPing(1); });
+window.addEventListener('blur', function(){ opFocusPing(0); });
+setTimeout(function(){ opFocusPing(document.hasFocus() ? 1 : 0); }, 1500);
 function hexUtf8(str){ return Array.prototype.map.call(new TextEncoder().encode(String(str||'')), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
 async function musicApp(cmd, media){
   const ctl = typeof AbortController!=='undefined' ? new AbortController() : null;
@@ -13678,6 +13862,15 @@ async function playWakeMedia(media, onFail){
         wakeAudioRamp = setInterval(function(){ if(!wakeAudio){ clearInterval(wakeAudioRamp); return; } wakeAudio.volume = Math.min(1, wakeAudio.volume+0.03); if(wakeAudio.volume>=1) clearInterval(wakeAudioRamp); }, 1500);
       }
       return true;
+    }
+    // links open in the browser you pick (Firefox by default — its ad blocker skips YouTube ads)
+    const via = wakeCfg().openIn || 'firefox';
+    if(via!=='chrome'){
+      try{
+        const ctl = new AbortController(), tm = setTimeout(function(){ ctl.abort(); }, 3000);
+        const res = await fetch(WAKE_HELPER+'open?b='+via+'&u='+hexUtf8(media.url), {signal:ctl.signal}); clearTimeout(tm);
+        if(res.ok) return true;
+      }catch(e){ /* no launcher (opened as a plain file) — fall back to a window here */ }
     }
     const w = window.open(media.url, 'operatorWakeMusic');
     if(!w){ onFail(); return false; }
@@ -13891,7 +14084,8 @@ function wakeMusicPickerHtml(w){
         '<button class="btn btn-sm btn-primary" data-action="wakeSetAppleMusic">Use it</button>'+
       '</div>'
     : src==='upload' ? '<button class="btn btn-sm" data-action="wakePickMusic">&#11014; Choose a song file</button>'
-    : '<input class="input" data-wake="mediaUrl" placeholder="YouTube or song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="width:100%;">');
+    : '<input class="input" data-wake="mediaUrl" placeholder="YouTube or song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="width:100%;">'+
+      '<div class="row" style="gap:8px;margin-top:8px;align-items:center;"><span class="kpi-sub">Open in</span><div class="seg-tabs" style="margin:0;">'+[['firefox','Firefox'],['safari','Safari'],['chrome','Chrome']].map(function(b){ return '<button class="seg-tab'+((w.openIn||'firefox')===b[0]?' active':'')+'" data-action="wakeOpenIn" data-id="'+b[0]+'">'+b[1]+'</button>'; }).join('')+'</div>'+tip('Firefox with an ad blocker plays YouTube without the ads. If Firefox isn\'t installed it opens in your default browser.')+'</div>');
 }
 ACTIONS.wakeMusicSource = function(el, e, id){ ui.wakeSrc = id; renderWakeSetupInto(); };
 ACTIONS.wakeMusicKind = function(el, e, id){ ui.wakeMusicKind = id; renderWakeSetupInto(); };
@@ -14058,6 +14252,7 @@ function wakeSettingsCardHtml(){
       '<div class="row" style="gap:8px;"><button class="btn btn-ghost btn-sm" data-action="wakeTestNow">Preview</button><button class="btn btn-primary" data-action="openWakeSetup">Set up</button></div>'+
     '</div></div>';
 }
+ACTIONS.wakeOpenIn = function(el, e, id){ wakeCfg().openIn = id; saveWake(); };
 
 // ============ SCENES ============
 // Optional living backgrounds behind the app. Minimal (no scene) stays the default; the others paint
@@ -14074,7 +14269,7 @@ const SCENES = [
   {id:'tokyo', label:'Tokyo'},
   {id:'snow', label:'Snow'}
 ];
-function sceneId(){ const id = state.profile.scene || 'minimal'; return SCENES.some(function(s){ return s.id===id; }) ? id : 'minimal'; }
+function sceneId(){ const id = state.profile.scene || 'minimal'; if(id.indexOf('vid:')===0) return videoWallById(id.slice(4)) ? id : 'minimal'; return SCENES.some(function(s){ return s.id===id; }) ? id : 'minimal'; }
 function sceneAnimates(){ return state.profile.sceneAnimate!==false && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
 function rng(seed){ let a = seed>>>0; return function(){ a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a>>>15, 1 | a); t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t; return ((t ^ t>>>14)>>>0) / 4294967296; }; }
 function hexRgb(h){ const n = parseInt(h.slice(1), 16); return [n>>16 & 255, n>>8 & 255, n & 255]; }
@@ -14360,7 +14555,7 @@ function sceneTick(x, c, dt, t){
 const SC = {bg:null, fx:null, x:null, raf:0, last:0, key:'', builtAt:0, running:false};
 function sceneCtxFor(id){ return {id:id, phase:id==='space' ? 'night' : skyPhase(), wx:id==='sky' && wxNow() ? wxKind(wxNow().code) : 'clear', w:window.innerWidth, h:window.innerHeight}; }
 function sceneBuild(){
-  const id = sceneId(); if(id==='minimal' || !SC.bg) return;
+  const id = sceneId(); if(!SCENE_DEFS[id] || !SC.bg) return;
   const x = sceneCtxFor(id), dpr = Math.min(1.5, window.devicePixelRatio || 1);
   const sb = document.getElementById('sidebarNav'); sceneLeft = sb && window.innerWidth > 900 ? sb.getBoundingClientRect().right : 0;
   SC.bg.width = Math.round(x.w*dpr); SC.bg.height = Math.round(x.h*dpr);
@@ -14379,14 +14574,15 @@ function sceneLoop(t){
   SC.last = t;
   if(SC.x) sceneTick(SC.x, SC.fx.getContext('2d'), dt, t);
 }
-function sceneShouldRun(){ return sceneId()!=='minimal' && sceneAnimates() && !document.hidden && document.hasFocus(); }
+function sceneShouldRun(){ return !!SCENE_DEFS[sceneId()] && sceneAnimates() && !document.hidden && document.hasFocus(); }
 function sceneStart(){ if(SC.running || !sceneShouldRun()) return; SC.running = true; SC.last = 0; SC.raf = requestAnimationFrame(sceneLoop); }
 function sceneStop(){ SC.running = false; if(SC.raf) cancelAnimationFrame(SC.raf); SC.raf = 0; }
 function sceneMount(){
   const id = sceneId();
   document.body.classList.toggle('has-scene', id!=='minimal');
-  document.body.setAttribute('data-scene', id);
-  if(id==='minimal'){ sceneStop(); if(SC.bg){ SC.bg.remove(); SC.fx.remove(); SC.bg = SC.fx = SC.x = null; } return; }
+  document.body.setAttribute('data-scene', id.indexOf('vid:')===0 ? 'video' : id);
+  videoWallMount(id.indexOf('vid:')===0 ? id.slice(4) : null);
+  if(!SCENE_DEFS[id]){ sceneStop(); if(SC.bg){ SC.bg.remove(); SC.fx.remove(); SC.bg = SC.fx = SC.x = null; } return; }
   if(!SC.bg){
     SC.bg = document.createElement('canvas'); SC.bg.className = 'scene-layer'; SC.bg.id = 'sceneBg';
     SC.fx = document.createElement('canvas'); SC.fx.className = 'scene-layer'; SC.fx.id = 'sceneFx';
@@ -14394,7 +14590,7 @@ function sceneMount(){
   }
   sceneBuild(); sceneStart();
 }
-function sceneRefresh(){ if(sceneId()!=='minimal' && SC.bg){ sceneBuild(); } }
+function sceneRefresh(){ if(SCENE_DEFS[sceneId()] && SC.bg){ sceneBuild(); } }
 function onThemeChanged(){ sceneRefresh(); }
 // keep the world in step with the clock (the sun moves, the phase changes) and the window
 setInterval(function(){
@@ -14428,8 +14624,9 @@ function sceneSettingsHtml(){
       return '<button class="scene-card'+(cur===s.id?' is-on':'')+'" data-action="setScene" data-id="'+s.id+'" data-thumb="'+s.id+'">'+
         '<span class="scene-thumb'+(s.id==='minimal'?' is-minimal':'')+'"'+(th ? ' style="background-image:url('+th+')"' : '')+'></span>'+
         '<span class="scene-name">'+s.label+(s.sub ? ' <em>'+s.sub+'</em>' : '')+'</span></button>';
-    }).join('')+'</div>'+
-    (cur!=='minimal' ? '<label class="row" style="gap:8px;margin-top:12px;font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="setSceneAnimate" '+(state.profile.sceneAnimate!==false?'checked':'')+'>Animate (stars, clouds, snow…)</label>' : '')+
+    }).join('')+videoWallCardsHtml(cur)+'</div>'+
+    videoWallAddHtml()+
+    (SCENE_DEFS[cur] ? '<label class="row" style="gap:8px;margin-top:12px;font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="setSceneAnimate" '+(state.profile.sceneAnimate!==false?'checked':'')+'>Animate (stars, clouds, snow…)</label>' : '')+
   '</div></div>';
 }
 function setScene(id){ state.profile.scene = id; persist('profile'); sceneMount(); renderView(); }
@@ -14443,6 +14640,143 @@ afterRenderHooks.push(function(){
   const next = function(){ const c = todo.shift(); if(!c) return; if(c.isConnected){ const url = paintSceneThumb(c.dataset.thumb); const t = c.querySelector('.scene-thumb'); if(url && t) t.style.backgroundImage = 'url('+url+')'; } idle(next); };
   idle(next);
 });
+
+// ============ VIDEO WALLPAPERS ============
+// Real footage as the background — a space flyover, Tokyo at night, a rainy skyline — like a live
+// wallpaper. Add your own clips (any .mp4/.mov/.webm, e.g. free 4K loops from Pexels or Mixkit) or a
+// direct video link. Files stay on this Mac in IndexedDB under their own "vidb:" key, so they never
+// bloat the JSON backup. The video plays muted on a loop behind a soft veil (so text stays readable)
+// and pauses whenever Operator isn't the window in front, so it costs nothing while you're elsewhere.
+function videoWalls(){ return arr(state.profile.videoWalls); }
+function videoWallById(id){ return videoWalls().find(function(v){ return v.id===id; }) || null; }
+const VW = {wrap:null, video:null, id:null, url:null};
+async function videoWallSrc(v){
+  if(!v) return null;
+  if(String(v.src).indexOf('vidb:')!==0) return v.src;
+  try{
+    const b = await blobTx('readonly', function(store){ return store.get(v.src.slice(5)); });
+    return b ? URL.createObjectURL(b) : null;
+  }catch(e){ return null; }
+}
+function videoWallRelease(){
+  if(VW.url && VW.url.indexOf('blob:')===0){ try{ URL.revokeObjectURL(VW.url); }catch(e){} }
+  VW.url = null;
+}
+function videoWallMount(id){
+  if(!id){
+    if(VW.wrap){ VW.video.pause(); VW.video.removeAttribute('src'); VW.video.load(); VW.wrap.remove(); VW.wrap = VW.video = null; }
+    videoWallRelease(); VW.id = null; return;
+  }
+  if(!VW.wrap){
+    VW.wrap = document.createElement('div'); VW.wrap.className = 'scene-layer scene-video-wrap'; VW.wrap.id = 'sceneVideoWrap';
+    VW.video = document.createElement('video'); VW.video.className = 'scene-video';
+    VW.video.muted = true; VW.video.loop = true; VW.video.playsInline = true; VW.video.setAttribute('muted', ''); VW.video.setAttribute('playsinline', ''); VW.video.preload = 'auto';
+    VW.video.addEventListener('playing', function(){ VW.wrap && VW.wrap.classList.add('is-ready'); });
+    VW.wrap.appendChild(VW.video);
+    document.body.insertBefore(VW.wrap, document.body.firstChild);
+  }
+  if(VW.id===id) { videoWallPlayPause(); return; }
+  VW.id = id; VW.wrap.classList.remove('is-ready');
+  const v = videoWallById(id);
+  videoWallSrc(v).then(function(url){
+    if(VW.id!==id || !VW.video) { if(url && url.indexOf('blob:')===0) URL.revokeObjectURL(url); return; }
+    videoWallRelease(); VW.url = url;
+    if(!url){ showToast('That video couldn\'t be loaded — try adding it again.', {icon:'&#127902;'}); return; }
+    VW.video.src = url;
+    videoWallPlayPause();
+  });
+}
+function videoWallShouldPlay(){ return !document.hidden && (document.hasFocus() || state.profile.videoWallAlwaysPlay===true); }
+function videoWallPlayPause(){
+  if(!VW.video || !VW.video.src) return;
+  if(videoWallShouldPlay()){ const p = VW.video.play(); if(p && p.catch) p.catch(function(){}); }
+  else VW.video.pause();
+}
+window.addEventListener('focus', videoWallPlayPause);
+window.addEventListener('blur', videoWallPlayPause);
+document.addEventListener('visibilitychange', videoWallPlayPause);
+// ---- adding / removing ----
+function videoWallName(raw){
+  const base = String(raw||'').split(/[\\/?#]/).filter(Boolean).pop() || 'Video';
+  const name = base.replace(/\.[a-z0-9]{2,4}$/i, '').replace(/[-_]+/g, ' ').trim();
+  return name.length > 28 ? name.slice(0, 27)+'…' : (name || 'Video');
+}
+// A still from a couple of seconds in, for the picker card (links from other sites may not allow it).
+function videoWallThumb(url){
+  return new Promise(function(resolve){
+    const v = document.createElement('video'); let done = false;
+    const finish = function(d){ if(done) return; done = true; v.removeAttribute('src'); v.load(); resolve(d); };
+    v.muted = true; v.preload = 'auto'; v.crossOrigin = 'anonymous';
+    v.addEventListener('loadeddata', function(){ try{ v.currentTime = Math.min(2, (v.duration||4)/3); }catch(e){ finish(''); } });
+    v.addEventListener('seeked', function(){
+      try{ const c = document.createElement('canvas'); c.width = 336; c.height = 200;
+        const s = Math.max(c.width/v.videoWidth, c.height/v.videoHeight), w = v.videoWidth*s, h = v.videoHeight*s;
+        c.getContext('2d').drawImage(v, (c.width-w)/2, (c.height-h)/2, w, h); finish(c.toDataURL('image/jpeg', 0.78)); }
+      catch(e){ finish(''); }
+    });
+    v.addEventListener('error', function(){ finish(''); });
+    setTimeout(function(){ finish(''); }, 8000);
+    v.src = url;
+  });
+}
+async function addVideoWallFile(file){
+  if(!file || !(file.type||'').match(/^video\//)){ showToast('Pick a video file (.mp4, .mov or .webm).', {icon:'&#127902;'}); return; }
+  const key = 'vw'+uid();
+  try{ await blobTx('readwrite', function(store){ return store.put(file, key); }); }
+  catch(e){ showToast('Couldn\'t save that video — the disk may be full.', {icon:'&#9888;'}); return; }
+  const url = URL.createObjectURL(file);
+  const thumb = await videoWallThumb(url); URL.revokeObjectURL(url);
+  const v = {id:uid(), name:videoWallName(file.name), src:'vidb:'+key, thumb:thumb, size:file.size};
+  state.profile.videoWalls = videoWalls().concat([v]);
+  setScene('vid:'+v.id);
+  showToast('Video wallpaper on — it pauses whenever Operator isn\'t in front.', {icon:'&#127902;'});
+}
+async function addVideoWallUrl(raw){
+  const url = String(raw||'').trim();
+  if(!/^https?:\/\/\S+$/i.test(url)){ showToast('Paste a direct link to a video file (ending in .mp4 or .webm).', {icon:'&#127902;'}); return; }
+  const v = {id:uid(), name:videoWallName(url), src:url, thumb:''};
+  state.profile.videoWalls = videoWalls().concat([v]);
+  ui.videoWallLink = false;
+  setScene('vid:'+v.id);
+  videoWallThumb(url).then(function(t){ if(t){ v.thumb = t; persist('profile'); renderView(); } });
+}
+ACTIONS.videoWallPickFile = function(){ const i = document.getElementById('videoWallFile'); if(i) i.click(); };
+ACTIONS.videoWallLink = function(){ ui.videoWallLink = !ui.videoWallLink; renderView(); setTimeout(function(){ const i = document.getElementById('videoWallUrl'); if(i) i.focus(); }, 30); };
+ACTIONS.videoWallAddUrl = function(){ const i = document.getElementById('videoWallUrl'); addVideoWallUrl(i ? i.value : ''); };
+ACTIONS.videoWallRemove = function(el, e, id){
+  if(e) e.stopPropagation();
+  const v = videoWallById(id); if(!v) return;
+  if(!confirm('Remove the "'+v.name+'" wallpaper?')) return;
+  state.profile.videoWalls = videoWalls().filter(function(x){ return x.id!==id; });
+  if(String(v.src).indexOf('vidb:')===0) blobTx('readwrite', function(store){ return store.delete(v.src.slice(5)); }).catch(function(){});
+  if(state.profile.scene==='vid:'+id) state.profile.scene = 'minimal';
+  persist('profile'); sceneMount(); renderView();
+};
+document.addEventListener('change', function(e){
+  const t = e.target;
+  if(t && t.id==='videoWallFile' && t.files && t.files[0]){ addVideoWallFile(t.files[0]); t.value = ''; }
+  else if(t && t.id==='videoWallAlways'){ state.profile.videoWallAlwaysPlay = t.checked; persist('profile'); videoWallPlayPause(); }
+});
+document.addEventListener('keydown', function(e){ if(e.key==='Enter' && e.target && e.target.id==='videoWallUrl'){ e.preventDefault(); ACTIONS.videoWallAddUrl(); } });
+// ---- picker (inside Settings → Display → Scene) ----
+function videoWallCardsHtml(cur){
+  return videoWalls().map(function(v){
+    return '<button class="scene-card scene-card-video'+(cur==='vid:'+v.id?' is-on':'')+'" data-action="setScene" data-id="vid:'+v.id+'">'+
+      '<span class="scene-thumb'+(v.thumb?'':' is-video-blank')+'"'+(v.thumb ? ' style="background-image:url('+v.thumb+')"' : '')+'><span class="scene-vid-badge">&#9654;</span></span>'+
+      '<span class="scene-name">'+escapeHtml(v.name)+'</span>'+
+      '<span class="scene-vid-x" data-action="videoWallRemove" data-id="'+v.id+'" title="Remove">&#10005;</span></button>';
+  }).join('');
+}
+function videoWallAddHtml(){
+  return '<div class="vw-add">'+
+    '<span class="kind-label" style="margin:0;">Video wallpaper'+tip('Real footage behind the app — space, Tokyo at night, a skyline in the rain. Free 4K loops: pexels.com/videos or mixkit.co (search "tokyo night", "space", "shanghai"). Download one, then add it here. Short loops (10–60s, 1080p) are smoothest.')+'</span>'+
+    '<button class="btn btn-ghost btn-sm" data-action="videoWallPickFile">&#127902; Add a video file</button>'+
+    '<button class="btn btn-ghost btn-sm" data-action="videoWallLink">&#128279; From a link</button>'+
+    '<input type="file" id="videoWallFile" accept="video/*" hidden>'+
+    (ui.videoWallLink ? '<div class="row vw-link"><input class="input" id="videoWallUrl" placeholder="https://…/clip.mp4" style="flex:1;min-width:220px;"><button class="btn btn-sm" data-action="videoWallAddUrl">Add</button></div>' : '')+
+    (sceneId().indexOf('vid:')===0 ? '<label class="row" style="gap:8px;width:100%;font-size:12.5px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="videoWallAlways" '+(state.profile.videoWallAlwaysPlay===true?'checked':'')+'>Keep playing when Operator isn\'t in front (uses more battery)</label>' : '')+
+  '</div>';
+}
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
@@ -15049,12 +15383,13 @@ function appMenuHtml(){
     SEP+
     (s ? ci('stop', '&#9632; Stop &amp; log session')+(s.onBreak ? '' : ci('break', '&#9749; Take a break')) : ci('lockin', '&#128274; Lock in <span class="ctx-kbd">L</span>'))+
     ci('recap', '&#128202; Day recap')+
+    (selectableView() && selVisibleCards().length ? ci('selAll', '&#9745; Select all tasks <span class="ctx-kbd">&#8984;A</span>') : '')+
     ci('wake', '&#9200; Wake-up alarm')+
     SEP+
     crow('Go to', ['today','focus','business','calendar','personal'].map(function(v){ return chip('go', v[0].toUpperCase()+v.slice(1), {a:v, on:ui.view===v}); }).join(''))+
     SEP+
     crow('Theme', [['dark','Dark'],['light','Light'],['auto','Auto']].map(function(t){ return chip('theme', t[1], {a:t[0], on:theme===t[0]}); }).join(''))+
-    crow('Scene', SCENES.map(function(sc){ return chip('scene', sc.label, {a:sc.id, on:scene===sc.id}); }).join(''))+
+    crow('Scene', SCENES.map(function(sc){ return chip('scene', sc.label, {a:sc.id, on:scene===sc.id}); }).join('')+videoWalls().map(function(v){ return chip('scene', '&#9654; '+escapeHtml(v.name), {a:'vid:'+v.id, on:scene==='vid:'+v.id}); }).join(''))+
     crow('Cards', chip('layout', 'Grid', {a:'grid', on:lay==='grid'})+chip('layout', 'Carousel', {a:'carousel', on:lay==='carousel'}))+
     SEP+
     ci('sidebar', state.profile.sidebarCollapsed ? '&#9776; Show the menu' : '&#9776; Hide the menu')+
@@ -15137,6 +15472,7 @@ ACTIONS.ctx = function(el){
   else if(op==='stop') openStopFocus();
   else if(op==='break') openBreakNotePrompt();
   else if(op==='recap') ACTIONS.openDayRecap();
+  else if(op==='selAll') selectAllVisibleTasks();
   else if(op==='wake') openWakeSetup();
   else if(op==='go') go(a);
   else if(op==='theme') setThemePref(a);
@@ -15170,6 +15506,223 @@ ACTIONS.journalMenu = function(el, e, id){
   const entry = state.journal.entries.find(function(x){ return x.id===id; }); if(!entry) return;
   const r = el.getBoundingClientRect();
   ctxShow(journalMenuHtml(entry), r.right - 220, r.bottom + 6);
+};
+
+// ============ RESPOND ON PRESS ============
+// Switching pages and tabs happens the moment the mouse button goes down — not when it comes back
+// up — which takes the 80–150ms a click is held off every switch. The real click that follows is
+// recognised and ignored, so nothing runs twice.
+const FAST_ACTIONS = {nav:1, businessTab:1, settingsTab:1, personalTab:1, focusMainTab:1, focusTasksSubTab:1, journalMode:1, analyticsRange:1, crmView:1, healthTab:1};
+let fastPress = null;
+function pressSig(el){ return [el.dataset.action, el.dataset.view||'', el.dataset.tab||'', el.dataset.id||'', el.dataset.kind||''].join('|'); }
+document.addEventListener('pointerdown', function(e){
+  if(e.button!==0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const el = e.target.closest && e.target.closest('[data-action]');
+  if(!el || !FAST_ACTIONS[el.dataset.action] || el.disabled) return;
+  fastPress = {sig:pressSig(el), at:Date.now()};
+  el.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true}));
+}, true);
+document.addEventListener('click', function(e){
+  if(!fastPress || !e.isTrusted) return;
+  const fp = fastPress; fastPress = null;
+  if(Date.now()-fp.at > 1500) return;
+  const el = e.target.closest && e.target.closest('[data-action]');
+  if(el && pressSig(el)===fp.sig){ e.stopImmediatePropagation(); e.preventDefault(); }
+}, true);
+// "Show more" buttons marked data-autoload press themselves as they scroll into view.
+let autoloadIO = null;
+afterRenderHooks.push(function(){
+  const btns = document.querySelectorAll('[data-autoload]'); if(!btns.length || !('IntersectionObserver' in window)) return;
+  if(!autoloadIO) autoloadIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){ if(en.isIntersecting && en.target.isConnected && !en.target._fired){ en.target._fired = true; autoloadIO.unobserve(en.target); setTimeout(function(){ en.target.click(); }, 0); } });
+  }, {rootMargin:'600px 0px'});
+  btns.forEach(function(b){ if(!b._observed){ b._observed = true; autoloadIO.observe(b); } });
+});
+
+// ============ MOVABLE SIDEBAR TABS ============
+// Drag a sidebar tab up or down to put it where you want it; the order is remembered.
+const NAV_VIEWS = ['today', 'focus', 'business', 'calendar', 'personal', 'settings'];
+function navOrder(){
+  const saved = arr(state.profile.navOrder).filter(function(v){ return NAV_VIEWS.indexOf(v)>=0; });
+  NAV_VIEWS.forEach(function(v){ if(saved.indexOf(v)<0) saved.push(v); });
+  return saved;
+}
+function navItems(){ return Array.prototype.slice.call(document.querySelectorAll('#sidebarNav > .nav-item')); }
+function applyNavOrder(){
+  const items = navItems(); if(!items.length) return;
+  const anchor = items[0].previousElementSibling;
+  const byView = {}; items.forEach(function(b){ byView[b.dataset.view] = b; });
+  let after = anchor;
+  navOrder().forEach(function(v){
+    const b = byView[v]; if(!b) return;
+    if(after ? after.nextElementSibling!==b : b.parentNode.firstElementChild!==b) b.parentNode.insertBefore(b, after ? after.nextElementSibling : b.parentNode.firstElementChild);
+    after = b;
+  });
+}
+let navDrag = null;
+document.addEventListener('pointerdown', function(e){
+  if(e.button!==0) return;
+  const b = e.target.closest && e.target.closest('#sidebarNav > .nav-item'); if(!b) return;
+  navDrag = {el:b, y:e.clientY, moving:false};
+}, true);
+document.addEventListener('pointermove', function(e){
+  if(!navDrag) return;
+  if(!navDrag.moving){
+    if(Math.abs(e.clientY - navDrag.y) < 6) return;
+    navDrag.moving = true; navDrag.el.classList.add('nav-dragging'); document.body.classList.add('nav-sorting');
+  }
+  const others = navItems().filter(function(x){ return x!==navDrag.el; });
+  let before = null;
+  for(let i=0;i<others.length;i++){ const r = others[i].getBoundingClientRect(); if(e.clientY < r.top + r.height/2){ before = others[i]; break; } }
+  const parent = navDrag.el.parentNode;
+  if(before){ if(navDrag.el.nextElementSibling!==before) parent.insertBefore(navDrag.el, before); }
+  else { const last = others[others.length-1]; if(last && last.nextElementSibling!==navDrag.el) parent.insertBefore(navDrag.el, last.nextElementSibling); }
+  e.preventDefault();
+}, true);
+function endNavDrag(){
+  if(!navDrag) return;
+  const d = navDrag; navDrag = null;
+  if(!d.moving) return;
+  d.el.classList.remove('nav-dragging'); document.body.classList.remove('nav-sorting');
+  const order = navItems().map(function(b){ return b.dataset.view; });
+  if(order.join()!==navOrder().join()){ state.profile.navOrder = order; persist('profile'); playTick(); }
+  // the click that ends a drag shouldn't count as a click
+  const swallow = function(ev){ ev.stopImmediatePropagation(); ev.preventDefault(); };
+  document.addEventListener('click', swallow, true);
+  setTimeout(function(){ document.removeEventListener('click', swallow, true); }, 0);
+}
+document.addEventListener('pointerup', endNavDrag, true);
+document.addEventListener('pointercancel', endNavDrag, true);
+
+// ============ DESKTOP-STYLE SELECTING ============
+// Like the Finder: drag a box across empty space to pick up every task it touches, ⌘- or
+// ⇧-click cards to add or drop them, ⌘A for every task on the page — then right-click any
+// picked card for actions on all of them at once. Esc or a click on empty space lets go.
+const SEL_CARD = '.task-card[data-id], .task-item-v2[data-task-id], .finished-row[data-task-id], .video-idea-compact[data-task-id]';
+function selCardId(el){ return el.getAttribute('data-id') || el.getAttribute('data-task-id'); }
+function selVisibleCards(){
+  return Array.prototype.filter.call(document.querySelectorAll('#viewRoot '+SEL_CARD.split(', ').join(', #viewRoot ')), function(el){
+    return !el.classList.contains('car-clone') && !el.closest('.car-clone') && el.getClientRects().length;
+  });
+}
+function selectableView(){ return ui.view==='focus' || ui.view==='today'; }
+function setTaskSelection(ids, additive){
+  if(!additive) ui.selectedTaskIds.clear();
+  ids.forEach(function(id){ if(state.tasks.items.some(function(t){ return t.id===id; })) ui.selectedTaskIds.add(id); });
+  renderView();
+}
+// ---- drag a box ----
+let marq = null;
+function marqIsEmptySpot(t){
+  if(!t || !t.closest) return false;
+  if(!t.closest('#viewRoot')) return false;
+  return !t.closest(SEL_CARD+', button, a, input, textarea, select, label, [contenteditable="true"], [data-action], [draggable="true"], .ctx-menu, .bulk-toolbar, .overlay, #boardHost, .bel, .car-arrow, svg, canvas, video, .chip, .tag');
+}
+document.addEventListener('pointerdown', function(e){
+  if(e.button!==0 || e.pointerType==='touch' || !selectableView()) return;
+  if(document.querySelector('.overlay:not(.hidden)')) return;
+  if(!marqIsEmptySpot(e.target)) return;
+  marq = {x:e.clientX, y:e.clientY, add:e.shiftKey || e.metaKey, box:null, cards:null, hits:new Set(), raf:0, lx:0, ly:0};
+}, true);
+function marqUpdate(){
+  marq.raf = 0;
+  const x1 = Math.min(marq.x, marq.lx), y1 = Math.min(marq.y, marq.ly), x2 = Math.max(marq.x, marq.lx), y2 = Math.max(marq.y, marq.ly);
+  marq.box.style.transform = 'translate('+x1+'px,'+y1+'px)'; marq.box.style.width = (x2-x1)+'px'; marq.box.style.height = (y2-y1)+'px';
+  marq.cards.forEach(function(c){
+    const r = c.el.getBoundingClientRect();
+    const hit = r.right > x1 && r.left < x2 && r.bottom > y1 && r.top < y2;
+    if(hit!==c.hit){ c.hit = hit; c.el.classList.toggle('marquee-hit', hit); if(hit) marq.hits.add(c.id); else marq.hits.delete(c.id); }
+  });
+}
+document.addEventListener('pointermove', function(e){
+  if(!marq) return;
+  marq.lx = e.clientX; marq.ly = e.clientY;
+  if(!marq.box){
+    if(Math.abs(e.clientX-marq.x) < 6 && Math.abs(e.clientY-marq.y) < 6) return;
+    marq.box = document.createElement('div'); marq.box.className = 'marquee-box'; document.body.appendChild(marq.box);
+    document.body.classList.add('marquee-on');
+    marq.cards = selVisibleCards().map(function(el){ return {el:el, id:selCardId(el), hit:false}; });
+    try{ window.getSelection().removeAllRanges(); }catch(err){}
+  }
+  e.preventDefault();
+  if(!marq.raf) marq.raf = requestAnimationFrame(marqUpdate);
+}, true);
+function marqEnd(e){
+  if(!marq) return;
+  const m = marq; marq = null;
+  if(m.raf) cancelAnimationFrame(m.raf);
+  if(!m.box){
+    // a plain click on empty space lets go of the selection (like clicking the desktop)
+    if(e && e.type==='pointerup' && ui.selectedTaskIds.size && !m.add && !ui.taskSelectMode){ ui.selectedTaskIds.clear(); renderView(); }
+    return;
+  }
+  m.box.remove(); document.body.classList.remove('marquee-on');
+  m.cards.forEach(function(c){ c.el.classList.remove('marquee-hit'); });
+  const swallow = function(ev){ ev.stopImmediatePropagation(); ev.preventDefault(); };
+  document.addEventListener('click', swallow, true); setTimeout(function(){ document.removeEventListener('click', swallow, true); }, 0);
+  if(m.hits.size || !m.add) setTaskSelection(Array.from(m.hits), m.add);
+}
+document.addEventListener('pointerup', marqEnd, true);
+document.addEventListener('pointercancel', marqEnd, true);
+// ---- ⌘ / ⇧ click a card to add or drop it ----
+document.addEventListener('click', function(e){
+  if(!(e.metaKey || e.shiftKey) || e.button!==0 || !selectableView()) return;
+  const card = e.target.closest && e.target.closest(SEL_CARD); if(!card || card.closest('.car-clone')) return;
+  if(e.target.closest('input, textarea, select, .card-more')) return;
+  const id = selCardId(card); if(!id) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  if(ui.selectedTaskIds.has(id)) ui.selectedTaskIds.delete(id); else ui.selectedTaskIds.add(id);
+  renderView();
+}, true);
+// ---- ⌘A / Esc ----
+function selectAllVisibleTasks(){ setTaskSelection(selVisibleCards().map(selCardId), false); }
+document.addEventListener('keydown', function(e){
+  if(!selectableView() || typingInField(e.target) || document.querySelector('.overlay:not(.hidden)')) return;
+  if((e.metaKey || e.ctrlKey) && (e.key==='a' || e.key==='A') && selVisibleCards().length){ e.preventDefault(); selectAllVisibleTasks(); }
+  else if(e.key==='Escape' && ui.selectedTaskIds.size && !document.getElementById('taskCtxMenu')){ ui.selectedTaskIds.clear(); renderView(); }
+});
+// ---- right-click a picked card: one menu for all of them ----
+document.addEventListener('contextmenu', function(e){
+  if(e.altKey || ui.selectedTaskIds.size < 2) return;
+  const card = e.target.closest && e.target.closest(SEL_CARD); if(!card) return;
+  const id = selCardId(card); if(!ui.selectedTaskIds.has(id)) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  openBulkTaskMenu(e.clientX, e.clientY);
+}, true);
+function openBulkTaskMenu(x, y){
+  closeTaskMenu();
+  const ids = Array.from(ui.selectedTaskIds), tasks = ids.map(function(id){ return state.tasks.items.find(function(t){ return t.id===id; }); }).filter(Boolean);
+  const any = function(fn){ return tasks.some(fn); };
+  const item = function(op, label, extra){ return '<button class="ctx-item'+(extra||'')+'" data-action="taskBulk" data-op="'+op+'">'+label+'</button>'; };
+  const m = document.createElement('div');
+  m.id = 'taskCtxMenu'; m.className = 'ctx-menu'; m.dataset.id = '__bulk'; m.dataset.at = Date.now();
+  m.innerHTML = '<div class="ctx-title">'+tasks.length+' tasks selected</div>'+
+    (any(function(t){ return t.status!=='done'; }) ? item('done', '&#10003; Mark done') : '')+
+    (any(function(t){ return t.status==='done'; }) ? item('undo', '&#8634; Back to today') : '')+
+    (any(function(t){ return t.status!=='today'; }) ? item('today', '&rarr; Move to today') : '')+
+    (any(function(t){ return t.status!=='backlog'; }) ? item('backlog', '&larr; Move to backlog') : '')+
+    '<div class="ctx-sep"></div>'+
+    '<div class="ctx-row"><span class="ctx-k">Due</span>'+item('dueToday','Today',' ctx-chip')+item('dueTomorrow','Tomorrow',' ctx-chip')+item('dueClear','Clear',' ctx-chip')+'</div>'+
+    '<div class="ctx-row"><span class="ctx-k">Priority</span>'+item('pri-high','High',' ctx-chip')+item('pri-med','Med',' ctx-chip')+item('pri-low','Low',' ctx-chip')+'</div>'+
+    '<div class="ctx-sep"></div>'+
+    item('clear', 'Deselect all')+
+    item('delete', '&#128465; Delete '+tasks.length, ' ctx-danger');
+  document.body.appendChild(m);
+  const r = m.getBoundingClientRect();
+  m.style.left = Math.min(x, window.innerWidth-r.width-8)+'px';
+  m.style.top = Math.min(y, window.innerHeight-r.height-8)+'px';
+}
+ACTIONS.taskBulk = function(el){
+  const op = el.dataset.op; closeTaskMenu();
+  const ids = Array.from(ui.selectedTaskIds);
+  const each = function(fn){ ids.forEach(function(id){ const t = state.tasks.items.find(function(x){ return x.id===id; }); if(t) fn(t); }); };
+  if(op==='done'){ holdRenders(function(){ each(function(t){ if(t.status!=='done' && !isOngoingDoneToday(t)) completeTask(t.id); }); }); ui.selectedTaskIds.clear(); renderView(); }
+  else if(op==='undo'){ holdRenders(function(){ each(function(t){ if(t.status==='done') undoTask(t.id); }); }); ui.selectedTaskIds.clear(); renderView(); }
+  else if(op==='today' || op==='backlog'){ each(function(t){ if(t.status==='done') return; if(op==='backlog' && ui.currentTaskId===t.id) accumulateCurrentTaskTime(t.id); t.status = op; }); ui.selectedTaskIds.clear(); playTick(); persist('tasks'); renderView(); }
+  else if(op.indexOf('pri-')===0){ each(function(t){ t.priority = op.slice(4); }); persist('tasks'); renderView(); }
+  else if(op==='dueToday' || op==='dueTomorrow' || op==='dueClear'){ const d = op==='dueClear' ? null : op==='dueToday' ? todayStr() : addDays(todayStr(), 1); each(function(t){ t.deadline = d; if(!d) t.deadlineTime = null; }); persist('tasks'); renderView(); }
+  else if(op==='clear'){ ui.selectedTaskIds.clear(); renderView(); }
+  else if(op==='delete'){ ui.selectedTaskIds.clear(); deleteTasksUndoable(ids); }
 };
 // ============ INIT ============
 async function init(){

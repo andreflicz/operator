@@ -14,7 +14,7 @@ const SCENES = [
   {id:'tokyo', label:'Tokyo'},
   {id:'snow', label:'Snow'}
 ];
-function sceneId(){ const id = state.profile.scene || 'minimal'; return SCENES.some(function(s){ return s.id===id; }) ? id : 'minimal'; }
+function sceneId(){ const id = state.profile.scene || 'minimal'; if(id.indexOf('vid:')===0) return videoWallById(id.slice(4)) ? id : 'minimal'; return SCENES.some(function(s){ return s.id===id; }) ? id : 'minimal'; }
 function sceneAnimates(){ return state.profile.sceneAnimate!==false && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
 function rng(seed){ let a = seed>>>0; return function(){ a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a>>>15, 1 | a); t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t; return ((t ^ t>>>14)>>>0) / 4294967296; }; }
 function hexRgb(h){ const n = parseInt(h.slice(1), 16); return [n>>16 & 255, n>>8 & 255, n & 255]; }
@@ -300,7 +300,7 @@ function sceneTick(x, c, dt, t){
 const SC = {bg:null, fx:null, x:null, raf:0, last:0, key:'', builtAt:0, running:false};
 function sceneCtxFor(id){ return {id:id, phase:id==='space' ? 'night' : skyPhase(), wx:id==='sky' && wxNow() ? wxKind(wxNow().code) : 'clear', w:window.innerWidth, h:window.innerHeight}; }
 function sceneBuild(){
-  const id = sceneId(); if(id==='minimal' || !SC.bg) return;
+  const id = sceneId(); if(!SCENE_DEFS[id] || !SC.bg) return;
   const x = sceneCtxFor(id), dpr = Math.min(1.5, window.devicePixelRatio || 1);
   const sb = document.getElementById('sidebarNav'); sceneLeft = sb && window.innerWidth > 900 ? sb.getBoundingClientRect().right : 0;
   SC.bg.width = Math.round(x.w*dpr); SC.bg.height = Math.round(x.h*dpr);
@@ -319,14 +319,15 @@ function sceneLoop(t){
   SC.last = t;
   if(SC.x) sceneTick(SC.x, SC.fx.getContext('2d'), dt, t);
 }
-function sceneShouldRun(){ return sceneId()!=='minimal' && sceneAnimates() && !document.hidden && document.hasFocus(); }
+function sceneShouldRun(){ return !!SCENE_DEFS[sceneId()] && sceneAnimates() && !document.hidden && document.hasFocus(); }
 function sceneStart(){ if(SC.running || !sceneShouldRun()) return; SC.running = true; SC.last = 0; SC.raf = requestAnimationFrame(sceneLoop); }
 function sceneStop(){ SC.running = false; if(SC.raf) cancelAnimationFrame(SC.raf); SC.raf = 0; }
 function sceneMount(){
   const id = sceneId();
   document.body.classList.toggle('has-scene', id!=='minimal');
-  document.body.setAttribute('data-scene', id);
-  if(id==='minimal'){ sceneStop(); if(SC.bg){ SC.bg.remove(); SC.fx.remove(); SC.bg = SC.fx = SC.x = null; } return; }
+  document.body.setAttribute('data-scene', id.indexOf('vid:')===0 ? 'video' : id);
+  videoWallMount(id.indexOf('vid:')===0 ? id.slice(4) : null);
+  if(!SCENE_DEFS[id]){ sceneStop(); if(SC.bg){ SC.bg.remove(); SC.fx.remove(); SC.bg = SC.fx = SC.x = null; } return; }
   if(!SC.bg){
     SC.bg = document.createElement('canvas'); SC.bg.className = 'scene-layer'; SC.bg.id = 'sceneBg';
     SC.fx = document.createElement('canvas'); SC.fx.className = 'scene-layer'; SC.fx.id = 'sceneFx';
@@ -334,7 +335,7 @@ function sceneMount(){
   }
   sceneBuild(); sceneStart();
 }
-function sceneRefresh(){ if(sceneId()!=='minimal' && SC.bg){ sceneBuild(); } }
+function sceneRefresh(){ if(SCENE_DEFS[sceneId()] && SC.bg){ sceneBuild(); } }
 function onThemeChanged(){ sceneRefresh(); }
 // keep the world in step with the clock (the sun moves, the phase changes) and the window
 setInterval(function(){
@@ -368,8 +369,9 @@ function sceneSettingsHtml(){
       return '<button class="scene-card'+(cur===s.id?' is-on':'')+'" data-action="setScene" data-id="'+s.id+'" data-thumb="'+s.id+'">'+
         '<span class="scene-thumb'+(s.id==='minimal'?' is-minimal':'')+'"'+(th ? ' style="background-image:url('+th+')"' : '')+'></span>'+
         '<span class="scene-name">'+s.label+(s.sub ? ' <em>'+s.sub+'</em>' : '')+'</span></button>';
-    }).join('')+'</div>'+
-    (cur!=='minimal' ? '<label class="row" style="gap:8px;margin-top:12px;font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="setSceneAnimate" '+(state.profile.sceneAnimate!==false?'checked':'')+'>Animate (stars, clouds, snow…)</label>' : '')+
+    }).join('')+videoWallCardsHtml(cur)+'</div>'+
+    videoWallAddHtml()+
+    (SCENE_DEFS[cur] ? '<label class="row" style="gap:8px;margin-top:12px;font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="setSceneAnimate" '+(state.profile.sceneAnimate!==false?'checked':'')+'>Animate (stars, clouds, snow…)</label>' : '')+
   '</div></div>';
 }
 function setScene(id){ state.profile.scene = id; persist('profile'); sceneMount(); renderView(); }

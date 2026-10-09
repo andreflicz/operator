@@ -523,16 +523,17 @@
     --night-surface:#11131b; --off-surface:#15161a; --off-btn:#22242c; --off-btn-hover:#2a2d36; --off-btn-border:#3a3d45; --off-btn-text:#E7E9EE;
   }
   :root[data-theme="light"]{ color-scheme:light;
-    --bg:#F3F4F7; --panel:#FFFFFF; --panel-2:#F2F4F8; --border:#E1E5EC;
-    --text:#161A23; --text-dim:#5D6577; --text-faint:#9AA2B3;
-    --good:#1FA373; --good-dim:rgba(31,163,115,.12); --danger:#DC4B55; --danger-dim:rgba(220,75,85,.10);
-    --info:#2A8BC0; --info-dim:rgba(42,139,192,.12); --shoot:#9257DC; --shoot-dim:rgba(146,87,220,.12); --train:#4A72E8;
-    --ink:22,26,38; --sh-k:.32;
-    --border-strong:#C5CBD8; --pop:#FFFFFF; --pop-border:#DFE3EA; --qtip-border:#C5CBD8;
-    --glass:rgba(255,255,255,.94); --scrim:rgba(28,32,44,.38); --now-cell:rgba(255,255,255,.8);
-    --strong:#11141B; --danger-text:#C2343E; --warn-text:#996000; --info-text:#1D78AB; --good-text:#14875C; --night-text:#4A57C8;
-    --due-1:#C66A12; --due-2:#C64B2B; --chart-grid:#E6E9EF;
-    --night-surface:#EEF0FA; --off-surface:#F1F2F5; --off-btn:#EEF0F4; --off-btn-hover:#E6E9EF; --off-btn-border:#CDD2DC; --off-btn-text:#2A2E38;
+    /* Soft light: slate-grey paper rather than white — same calm feel as the dark theme, just with the lights up a little. */
+    --bg:#CDD2DB; --panel:#E2E5EB; --panel-2:#D8DCE3; --border:#C0C6D1;
+    --text:#151922; --text-dim:#4C5466; --text-faint:#7A8294;
+    --good:#1A9367; --good-dim:rgba(26,147,103,.14); --danger:#CC3F4A; --danger-dim:rgba(204,63,74,.12);
+    --info:#2680B2; --info-dim:rgba(38,128,178,.14); --shoot:#8650CF; --shoot-dim:rgba(134,80,207,.14); --train:#4467D6;
+    --ink:22,26,38; --sh-k:.38;
+    --border-strong:#AEB5C2; --pop:#E8EAEF; --pop-border:#BEC4CF; --qtip-border:#AEB5C2;
+    --glass:rgba(226,229,235,.95); --scrim:rgba(24,28,38,.42); --now-cell:rgba(232,235,240,.85);
+    --strong:#0F1218; --danger-text:#B52F3A; --warn-text:#8A5600; --info-text:#1A6E9E; --good-text:#11784F; --night-text:#4450B8;
+    --due-1:#B65F0E; --due-2:#B84327; --chart-grid:#C9CED8;
+    --night-surface:#D6D9E8; --off-surface:#D9DCE3; --off-btn:#D5D9E0; --off-btn-hover:#CCD1D9; --off-btn-border:#B5BCC8; --off-btn-text:#262A34;
   }
   .mode-btn-row{ display:flex; gap:10px; width:100%; margin-top:12px; }
   .mode-btn-row .btn{ flex:1; padding:16px 10px; font-size:15px; letter-spacing:.02em; }
@@ -1423,10 +1424,10 @@
   /* ---- scenes: a living background behind translucent panels ---- */
   .scene-layer{ position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:0; }
   body.has-scene{ background:#05060a; --panel:rgba(20,23,31,.86); --panel-2:rgba(25,29,39,.88); }
-  :root[data-theme="light"] body.has-scene{ background:#dfe7f2; --panel:rgba(255,255,255,.86); --panel-2:rgba(242,244,248,.9); }
+  :root[data-theme="light"] body.has-scene{ background:#c9d2de; --panel:rgba(228,231,237,.86); --panel-2:rgba(216,220,227,.9); }
   body.has-scene .app{ position:relative; z-index:1; }
   body.has-scene .sidebar{ background:rgba(16,18,26,.8); }
-  :root[data-theme="light"] body.has-scene .sidebar{ background:rgba(255,255,255,.8); }
+  :root[data-theme="light"] body.has-scene .sidebar{ background:rgba(222,226,233,.82); }
   body.has-scene .view-title, body.has-scene .tabs .tab{ text-shadow:0 1px 14px rgba(0,0,0,.35); }
   :root[data-theme="light"] body.has-scene .view-title, :root[data-theme="light"] body.has-scene .tabs .tab{ text-shadow:0 1px 12px rgba(255,255,255,.6); }
   .scene-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(132px, 1fr)); gap:10px; }
@@ -1574,6 +1575,32 @@
   .task-card:hover .card-more{ opacity:1; }
   .task-card .card-more:hover{ background:rgba(var(--ink),.07); border-color:var(--border); color:var(--text); }
   @media (hover:none){ .task-card .card-more{ opacity:1; } }
+  .task-card{ position:relative; }
+  .task-card .card-more{ position:absolute; top:9px; right:9px; margin:0; }
+  .task-card > .row:first-child{ padding-right:26px; }
+  /* ---- video wallpapers ---- */
+  .scene-video-wrap{ overflow:hidden; background:#05060a; }
+  .scene-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .9s ease; }
+  .scene-video-wrap.is-ready .scene-video{ opacity:1; }
+  .scene-video-wrap::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(4,6,12,.28), rgba(4,6,12,.46)); pointer-events:none; }
+  :root[data-theme="light"] .scene-video-wrap::after{ background:linear-gradient(180deg, rgba(205,210,219,.22), rgba(205,210,219,.38)); }
+  .scene-card-video{ position:relative; }
+  .scene-thumb.is-video-blank{ background:linear-gradient(135deg, #10131c, #23293a); }
+  .scene-vid-badge{ position:absolute; left:6px; bottom:6px; font-size:9px; color:#fff; background:rgba(0,0,0,.5); border-radius:6px; padding:2px 5px; line-height:1; }
+  .scene-card-video .scene-thumb{ position:relative; }
+  .scene-vid-x{ position:absolute; top:4px; right:4px; width:20px; height:20px; border-radius:50%; background:rgba(0,0,0,.55); color:#fff; font-size:10px; display:none; align-items:center; justify-content:center; cursor:pointer; }
+  .scene-card-video:hover .scene-vid-x{ display:inline-flex; }
+  .scene-vid-x:hover{ background:var(--danger); }
+  .vw-add{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:14px; padding-top:12px; border-top:1px solid var(--border); }
+  .vw-add .kind-label{ margin-right:auto !important; }
+  .vw-link{ width:100%; gap:8px; }
+  /* ---- movable sidebar tabs ---- */
+  #sidebarNav > .nav-item.nav-dragging{ background:rgba(var(--ink),.08); box-shadow:0 6px 18px rgba(0,0,0,calc(.4*var(--sh-k))); cursor:grabbing; transform:scale(1.02); }
+  body.nav-sorting, body.nav-sorting *{ cursor:grabbing !important; user-select:none; }
+  /* ---- desktop-style selecting ---- */
+  .marquee-box{ position:fixed; left:0; top:0; z-index:9000; pointer-events:none; border:1px solid var(--accent); background:rgba(232,162,61,.10); border-radius:4px; will-change:transform; }
+  body.marquee-on, body.marquee-on *{ user-select:none !important; cursor:crosshair; }
+  .marquee-hit{ box-shadow:0 0 0 2px var(--accent) !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -1906,6 +1933,7 @@ function applySidebarState(){
   const nav = document.getElementById('sidebarNav');
   if(!nav) return;
   nav.classList.toggle('collapsed', !!state.profile.sidebarCollapsed);
+  if(typeof applyNavOrder==='function') applyNavOrder();
   document.body.classList.toggle('sb-collapsed', !!state.profile.sidebarCollapsed);
   setTimeout(function(){ if(typeof stretchLockedHeaderLine==='function') stretchLockedHeaderLine(); if(typeof sceneRefresh==='function') sceneRefresh(); }, 240);
 }
@@ -2607,11 +2635,13 @@ function defaultDashboardPanels(){
 }
 function defaultModes(){ return { active:null, history:[] }; }
 const MODE_LABELS = { break:'Break Mode', offtime:'Off-Time Mode', shooting:'Shooting Mode', training:'Training Mode' };
+// Training mode is retired: old Training minutes now count as Other, and "Working out" is the
+// time you log on each workout in Fitness.
 // Session/time types used by analytics. Deep work is the only one that counts as deep work;
 // shooting also counts toward the daily standard (a shoot day doesn't break the streak).
 const TIME_TYPES = [
   {id:'deep', label:'Deep work', color:'#E8A23D'},
-  {id:'training', label:'Training', color:'#7AA2FF'},
+  {id:'workout', label:'Working out', color:'#7AA2FF'},
   {id:'shooting', label:'Shooting', color:'#C58FFF'},
   {id:'other', label:'Other', color:'#8A90A2'}
 ];
@@ -5985,6 +6015,7 @@ function renderBreakForm(){
 function renderManualLogForm(){
   return '<div class="row" style="justify-content:center;gap:10px;">'+
     '<button class="btn btn-ghost btn-sm" data-action="openManualLogModal">+ Log Time Manually</button>'+
+    '<button class="btn btn-ghost btn-sm" data-action="goToFitness">&#127947; Log a Workout</button>'+
     '<button class="btn btn-ghost btn-sm" data-action="viewAllSessions">View All Sessions</button>'+
   '</div>';
 }
@@ -6579,10 +6610,10 @@ function hmOf(ts){ return ts ? nowHM(new Date(ts)) : ''; }
 function renderSessionEditModal(){
   const eb = ui.editingTimeBlock; if(!eb) return '';
   const b = timeBlockFind(eb.kind, eb.id); if(!b) return '';
-  const types = eb.kind==='mode'
-    ? [['break','Break'],['offtime','Off-time'],['shooting','Shooting'],['training','Training']]
-    : [['deep','Deep work'],['training','Training'],['shooting','Shooting']];
   const cur = eb.kind==='mode' ? b.type : sessionType(b);
+  const types = (eb.kind==='mode'
+    ? [['break','Break'],['offtime','Off-time'],['shooting','Shooting']]
+    : [['deep','Deep work'],['shooting','Shooting']]).concat(cur==='training' ? [['training','Training (old)']] : []);
   // Older manual logs only stored a duration; show their start as "unknown" until edited.
   const hasTimes = !(b.manual && b.startedAt===b.endedAt);
   return '<div class="section-title" style="margin-bottom:4px;">Edit '+(eb.kind==='mode'?'Time Block':'Session')+'</div>'+
@@ -6669,12 +6700,21 @@ function dayModeTotals(dateStr){
   const as = state.focus.activeSession;
   const liveSession = function(type){ return (isToday && as && sessionType(as)===type && !as.onBreak) ? Math.floor((Date.now()-as.startedAt)/60000) : 0; };
   const training = rawSessionMinutesFor(dateStr,'training') + modeMinutesFor(dateStr,'training') + liveModeMinutes(dateStr,'training') + liveSession('training');
+  const workout = workoutDay(dateStr).m;
   const shooting = rawSessionMinutesFor(dateStr,'shooting') + modeMinutesFor(dateStr,'shooting') + liveModeMinutes(dateStr,'shooting') + liveSession('shooting');
   let excludedLive = 0;
   if(isToday && as && !as.onBreak && ui.currentTaskId && ui.currentTaskStartedAt && !taskCountsAsDeepWork(ui.currentTaskId)) excludedLive = Math.floor((Date.now()-ui.currentTaskStartedAt)/60000);
-  const other = modeMinutesFor(dateStr,'break') + liveModeMinutes(dateStr,'break') + excludedTaskMinutesFor(dateStr) + excludedLive;
-  return {deep:deep, training:training, shooting:shooting, other:other, total:deep+training+shooting+other};
+  const other = modeMinutesFor(dateStr,'break') + liveModeMinutes(dateStr,'break') + excludedTaskMinutesFor(dateStr) + excludedLive + training;
+  return {deep:deep, workout:workout, shooting:shooting, other:other, total:deep+workout+shooting+other};
 }
+// Workouts logged in Fitness, per day: how many and the minutes you entered for them.
+function workoutDayMap(){
+  const m = {};
+  arr(state.health.gymLog).forEach(function(g){ if(!g || !g.date) return; const d = m[g.date] || (m[g.date] = {n:0, m:0}); d.n++; d.m += Math.max(0, Number(g.duration)||0); });
+  return m;
+}
+function workoutDay(dateStr){ return (RC ? memo('workoutDays', workoutDayMap) : workoutDayMap())[dateStr] || {n:0, m:0}; }
+function workoutTotals(days){ const t = {n:0, m:0}; days.forEach(function(d){ const x = workoutDay(d); t.n += x.n; t.m += x.m; }); return t; }
 function fmtDelta(mins){
   if(!mins) return 'same';
   return (mins>0?'+':'−')+fmtDurationLabel(Math.abs(mins));
@@ -6689,7 +6729,7 @@ function weekDays(offsetWeeks){
   return out;
 }
 function sumTotals(days){
-  const t = {deep:0, training:0, shooting:0, other:0, total:0};
+  const t = {deep:0, workout:0, shooting:0, other:0, total:0};
   days.forEach(function(d){ if(d>todayStr()) return; const x = dayModeTotals(d); Object.keys(t).forEach(function(k){ t[k]+=x[k]; }); });
   return t;
 }
@@ -6837,7 +6877,7 @@ function renderAnalyticsWeek(offset){
         modeLegendHtml()+
       '</div>'+
       weekStackChart(days, sel)+
-      '<div class="mode-tiles mode-tiles-sm">'+TIME_TYPES.map(function(tt){ return '<div class="mode-tile"><span class="mode-tile-dot" style="background:'+tt.color+'"></span><div class="mode-tile-val">'+fmtDurationLabel(t[tt.id])+'</div><div class="mode-tile-label">'+tt.label+' &middot; '+fmtDelta(t[tt.id]-p[tt.id])+'</div></div>'; }).join('')+'</div>'+
+      '<div class="mode-tiles mode-tiles-sm">'+TIME_TYPES.map(function(tt){ const wn = tt.id==='workout' ? workoutTotals(days).n : 0; return '<div class="mode-tile"'+(tt.id==='workout'?' data-action="goToFitness" style="cursor:pointer;"':'')+'><span class="mode-tile-dot" style="background:'+tt.color+'"></span><div class="mode-tile-val">'+fmtDurationLabel(t[tt.id])+'</div><div class="mode-tile-label">'+tt.label+(tt.id==='workout' ? ' &middot; '+wn+' workout'+(wn===1?'':'s') : ' &middot; '+fmtDelta(t[tt.id]-p[tt.id]))+'</div></div>'; }).join('')+'</div>'+
     '</div>'+
     '<div class="section" style="margin-top:16px;">'+dayDetailHtml(sel)+'</div>';
 }
@@ -6868,9 +6908,23 @@ function renderFocusAnalyticsTab(){
   if(r==='today') body = renderAnalyticsToday();
   else if(r==='week') body = renderAnalyticsWeek(0);
   else if(r==='lastweek') body = renderAnalyticsWeek(-1);
-  else body = renderFocusAnalytics()+renderTaskStatsSection()+renderTimeByTaskSection();
+  else body = renderFocusAnalytics()+renderTaskStatsSection()+renderFitnessStatsSection()+renderTimeByTaskSection();
   return '<div class="subtab-panel" data-key="analytics-'+r+'">'+body+'</div>'+
     '<div class="section" style="margin-top:16px;">'+renderManualLogForm()+'</div>';
+}
+// Workouts you log in Fitness (with the minutes you enter) — totals for the analytics page.
+function renderFitnessStatsSection(){
+  const map = workoutDayMap(), dates = Object.keys(map);
+  const all = dates.reduce(function(a, d){ a.n += map[d].n; a.m += map[d].m; return a; }, {n:0, m:0});
+  const wk = workoutTotals(weekDays(0)), last30 = []; for(let i=29;i>=0;i--) last30.push(addDays(todayStr(), -i));
+  const m30 = workoutTotals(last30);
+  const tile = function(label, v, sub){ return '<div class="card" style="text-align:center;"><div class="kpi-label">'+label+'</div><div class="kpi-value" style="color:var(--train);">'+v+'</div>'+(sub?'<div class="kpi-sub">'+sub+'</div>':'')+'</div>'; };
+  return '<div class="section"><div class="section-title">Fitness'+tip('From the workouts you log in Personal → Fitness — enter how long each one took and it lands here.')+'<span class="view-all-link" data-action="goToFitness">Log a workout &rarr;</span></div><div class="grid grid-4">'+
+      tile('Total Workouts', all.n, dates.length ? 'since '+fmtDateShort(dates.sort()[0]) : 'none logged yet')+
+      tile('Time Working Out', fmtDurationLabel(all.m), all.n ? fmtDurationLabel(Math.round(all.m/all.n))+' per workout' : '')+
+      tile('This Week', wk.n, fmtDurationLabel(wk.m))+
+      tile('Last 30 Days', m30.n, fmtDurationLabel(m30.m))+
+    '</div></div>';
 }
 function renderTaskStatsSection(){
   const items = state.tasks.items;
@@ -13571,10 +13625,13 @@ function startFocusTicker(){
         const dwTarget = state.standards.deepWorkTargetMinutes || 180;
         const liveToday = deepWorkMinutesTodayLive();
         const openPct = clamp(Math.round((liveToday/dwTarget)*100),0,100);
-        bar.style.width = openPct+'%';
-        bar.classList.toggle('good', openPct>=100);
+        // Only touch the DOM when something actually changed — rewriting the same text every
+        // second re-lays-out the card under the clock.
+        if(bar.style.width!==openPct+'%') bar.style.width = openPct+'%';
+        if(bar.classList.contains('good')!==(openPct>=100)) bar.classList.toggle('good', openPct>=100);
         const sub = bar.parentElement && bar.parentElement.nextElementSibling;
-        if(sub && sub.classList.contains('kpi-sub')) sub.textContent = 'Open-ended · '+fmtDurationLabel(liveToday)+' of '+fmtDurationLabel(dwTarget)+" today's goal";
+        const txt = 'Open-ended · '+fmtDurationLabel(liveToday)+' of '+fmtDurationLabel(dwTarget)+" today's goal";
+        if(sub && sub.classList.contains('kpi-sub') && sub.textContent!==txt) sub.textContent = txt;
       }
     }
   }, 1000);
@@ -14212,7 +14269,7 @@ const SCENES = [
   {id:'tokyo', label:'Tokyo'},
   {id:'snow', label:'Snow'}
 ];
-function sceneId(){ const id = state.profile.scene || 'minimal'; return SCENES.some(function(s){ return s.id===id; }) ? id : 'minimal'; }
+function sceneId(){ const id = state.profile.scene || 'minimal'; if(id.indexOf('vid:')===0) return videoWallById(id.slice(4)) ? id : 'minimal'; return SCENES.some(function(s){ return s.id===id; }) ? id : 'minimal'; }
 function sceneAnimates(){ return state.profile.sceneAnimate!==false && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
 function rng(seed){ let a = seed>>>0; return function(){ a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a>>>15, 1 | a); t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t; return ((t ^ t>>>14)>>>0) / 4294967296; }; }
 function hexRgb(h){ const n = parseInt(h.slice(1), 16); return [n>>16 & 255, n>>8 & 255, n & 255]; }
@@ -14498,7 +14555,7 @@ function sceneTick(x, c, dt, t){
 const SC = {bg:null, fx:null, x:null, raf:0, last:0, key:'', builtAt:0, running:false};
 function sceneCtxFor(id){ return {id:id, phase:id==='space' ? 'night' : skyPhase(), wx:id==='sky' && wxNow() ? wxKind(wxNow().code) : 'clear', w:window.innerWidth, h:window.innerHeight}; }
 function sceneBuild(){
-  const id = sceneId(); if(id==='minimal' || !SC.bg) return;
+  const id = sceneId(); if(!SCENE_DEFS[id] || !SC.bg) return;
   const x = sceneCtxFor(id), dpr = Math.min(1.5, window.devicePixelRatio || 1);
   const sb = document.getElementById('sidebarNav'); sceneLeft = sb && window.innerWidth > 900 ? sb.getBoundingClientRect().right : 0;
   SC.bg.width = Math.round(x.w*dpr); SC.bg.height = Math.round(x.h*dpr);
@@ -14517,14 +14574,15 @@ function sceneLoop(t){
   SC.last = t;
   if(SC.x) sceneTick(SC.x, SC.fx.getContext('2d'), dt, t);
 }
-function sceneShouldRun(){ return sceneId()!=='minimal' && sceneAnimates() && !document.hidden && document.hasFocus(); }
+function sceneShouldRun(){ return !!SCENE_DEFS[sceneId()] && sceneAnimates() && !document.hidden && document.hasFocus(); }
 function sceneStart(){ if(SC.running || !sceneShouldRun()) return; SC.running = true; SC.last = 0; SC.raf = requestAnimationFrame(sceneLoop); }
 function sceneStop(){ SC.running = false; if(SC.raf) cancelAnimationFrame(SC.raf); SC.raf = 0; }
 function sceneMount(){
   const id = sceneId();
   document.body.classList.toggle('has-scene', id!=='minimal');
-  document.body.setAttribute('data-scene', id);
-  if(id==='minimal'){ sceneStop(); if(SC.bg){ SC.bg.remove(); SC.fx.remove(); SC.bg = SC.fx = SC.x = null; } return; }
+  document.body.setAttribute('data-scene', id.indexOf('vid:')===0 ? 'video' : id);
+  videoWallMount(id.indexOf('vid:')===0 ? id.slice(4) : null);
+  if(!SCENE_DEFS[id]){ sceneStop(); if(SC.bg){ SC.bg.remove(); SC.fx.remove(); SC.bg = SC.fx = SC.x = null; } return; }
   if(!SC.bg){
     SC.bg = document.createElement('canvas'); SC.bg.className = 'scene-layer'; SC.bg.id = 'sceneBg';
     SC.fx = document.createElement('canvas'); SC.fx.className = 'scene-layer'; SC.fx.id = 'sceneFx';
@@ -14532,7 +14590,7 @@ function sceneMount(){
   }
   sceneBuild(); sceneStart();
 }
-function sceneRefresh(){ if(sceneId()!=='minimal' && SC.bg){ sceneBuild(); } }
+function sceneRefresh(){ if(SCENE_DEFS[sceneId()] && SC.bg){ sceneBuild(); } }
 function onThemeChanged(){ sceneRefresh(); }
 // keep the world in step with the clock (the sun moves, the phase changes) and the window
 setInterval(function(){
@@ -14566,8 +14624,9 @@ function sceneSettingsHtml(){
       return '<button class="scene-card'+(cur===s.id?' is-on':'')+'" data-action="setScene" data-id="'+s.id+'" data-thumb="'+s.id+'">'+
         '<span class="scene-thumb'+(s.id==='minimal'?' is-minimal':'')+'"'+(th ? ' style="background-image:url('+th+')"' : '')+'></span>'+
         '<span class="scene-name">'+s.label+(s.sub ? ' <em>'+s.sub+'</em>' : '')+'</span></button>';
-    }).join('')+'</div>'+
-    (cur!=='minimal' ? '<label class="row" style="gap:8px;margin-top:12px;font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="setSceneAnimate" '+(state.profile.sceneAnimate!==false?'checked':'')+'>Animate (stars, clouds, snow…)</label>' : '')+
+    }).join('')+videoWallCardsHtml(cur)+'</div>'+
+    videoWallAddHtml()+
+    (SCENE_DEFS[cur] ? '<label class="row" style="gap:8px;margin-top:12px;font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="setSceneAnimate" '+(state.profile.sceneAnimate!==false?'checked':'')+'>Animate (stars, clouds, snow…)</label>' : '')+
   '</div></div>';
 }
 function setScene(id){ state.profile.scene = id; persist('profile'); sceneMount(); renderView(); }
@@ -14581,6 +14640,143 @@ afterRenderHooks.push(function(){
   const next = function(){ const c = todo.shift(); if(!c) return; if(c.isConnected){ const url = paintSceneThumb(c.dataset.thumb); const t = c.querySelector('.scene-thumb'); if(url && t) t.style.backgroundImage = 'url('+url+')'; } idle(next); };
   idle(next);
 });
+
+// ============ VIDEO WALLPAPERS ============
+// Real footage as the background — a space flyover, Tokyo at night, a rainy skyline — like a live
+// wallpaper. Add your own clips (any .mp4/.mov/.webm, e.g. free 4K loops from Pexels or Mixkit) or a
+// direct video link. Files stay on this Mac in IndexedDB under their own "vidb:" key, so they never
+// bloat the JSON backup. The video plays muted on a loop behind a soft veil (so text stays readable)
+// and pauses whenever Operator isn't the window in front, so it costs nothing while you're elsewhere.
+function videoWalls(){ return arr(state.profile.videoWalls); }
+function videoWallById(id){ return videoWalls().find(function(v){ return v.id===id; }) || null; }
+const VW = {wrap:null, video:null, id:null, url:null};
+async function videoWallSrc(v){
+  if(!v) return null;
+  if(String(v.src).indexOf('vidb:')!==0) return v.src;
+  try{
+    const b = await blobTx('readonly', function(store){ return store.get(v.src.slice(5)); });
+    return b ? URL.createObjectURL(b) : null;
+  }catch(e){ return null; }
+}
+function videoWallRelease(){
+  if(VW.url && VW.url.indexOf('blob:')===0){ try{ URL.revokeObjectURL(VW.url); }catch(e){} }
+  VW.url = null;
+}
+function videoWallMount(id){
+  if(!id){
+    if(VW.wrap){ VW.video.pause(); VW.video.removeAttribute('src'); VW.video.load(); VW.wrap.remove(); VW.wrap = VW.video = null; }
+    videoWallRelease(); VW.id = null; return;
+  }
+  if(!VW.wrap){
+    VW.wrap = document.createElement('div'); VW.wrap.className = 'scene-layer scene-video-wrap'; VW.wrap.id = 'sceneVideoWrap';
+    VW.video = document.createElement('video'); VW.video.className = 'scene-video';
+    VW.video.muted = true; VW.video.loop = true; VW.video.playsInline = true; VW.video.setAttribute('muted', ''); VW.video.setAttribute('playsinline', ''); VW.video.preload = 'auto';
+    VW.video.addEventListener('playing', function(){ VW.wrap && VW.wrap.classList.add('is-ready'); });
+    VW.wrap.appendChild(VW.video);
+    document.body.insertBefore(VW.wrap, document.body.firstChild);
+  }
+  if(VW.id===id) { videoWallPlayPause(); return; }
+  VW.id = id; VW.wrap.classList.remove('is-ready');
+  const v = videoWallById(id);
+  videoWallSrc(v).then(function(url){
+    if(VW.id!==id || !VW.video) { if(url && url.indexOf('blob:')===0) URL.revokeObjectURL(url); return; }
+    videoWallRelease(); VW.url = url;
+    if(!url){ showToast('That video couldn\'t be loaded — try adding it again.', {icon:'&#127902;'}); return; }
+    VW.video.src = url;
+    videoWallPlayPause();
+  });
+}
+function videoWallShouldPlay(){ return !document.hidden && (document.hasFocus() || state.profile.videoWallAlwaysPlay===true); }
+function videoWallPlayPause(){
+  if(!VW.video || !VW.video.src) return;
+  if(videoWallShouldPlay()){ const p = VW.video.play(); if(p && p.catch) p.catch(function(){}); }
+  else VW.video.pause();
+}
+window.addEventListener('focus', videoWallPlayPause);
+window.addEventListener('blur', videoWallPlayPause);
+document.addEventListener('visibilitychange', videoWallPlayPause);
+// ---- adding / removing ----
+function videoWallName(raw){
+  const base = String(raw||'').split(/[\\/?#]/).filter(Boolean).pop() || 'Video';
+  const name = base.replace(/\.[a-z0-9]{2,4}$/i, '').replace(/[-_]+/g, ' ').trim();
+  return name.length > 28 ? name.slice(0, 27)+'…' : (name || 'Video');
+}
+// A still from a couple of seconds in, for the picker card (links from other sites may not allow it).
+function videoWallThumb(url){
+  return new Promise(function(resolve){
+    const v = document.createElement('video'); let done = false;
+    const finish = function(d){ if(done) return; done = true; v.removeAttribute('src'); v.load(); resolve(d); };
+    v.muted = true; v.preload = 'auto'; v.crossOrigin = 'anonymous';
+    v.addEventListener('loadeddata', function(){ try{ v.currentTime = Math.min(2, (v.duration||4)/3); }catch(e){ finish(''); } });
+    v.addEventListener('seeked', function(){
+      try{ const c = document.createElement('canvas'); c.width = 336; c.height = 200;
+        const s = Math.max(c.width/v.videoWidth, c.height/v.videoHeight), w = v.videoWidth*s, h = v.videoHeight*s;
+        c.getContext('2d').drawImage(v, (c.width-w)/2, (c.height-h)/2, w, h); finish(c.toDataURL('image/jpeg', 0.78)); }
+      catch(e){ finish(''); }
+    });
+    v.addEventListener('error', function(){ finish(''); });
+    setTimeout(function(){ finish(''); }, 8000);
+    v.src = url;
+  });
+}
+async function addVideoWallFile(file){
+  if(!file || !(file.type||'').match(/^video\//)){ showToast('Pick a video file (.mp4, .mov or .webm).', {icon:'&#127902;'}); return; }
+  const key = 'vw'+uid();
+  try{ await blobTx('readwrite', function(store){ return store.put(file, key); }); }
+  catch(e){ showToast('Couldn\'t save that video — the disk may be full.', {icon:'&#9888;'}); return; }
+  const url = URL.createObjectURL(file);
+  const thumb = await videoWallThumb(url); URL.revokeObjectURL(url);
+  const v = {id:uid(), name:videoWallName(file.name), src:'vidb:'+key, thumb:thumb, size:file.size};
+  state.profile.videoWalls = videoWalls().concat([v]);
+  setScene('vid:'+v.id);
+  showToast('Video wallpaper on — it pauses whenever Operator isn\'t in front.', {icon:'&#127902;'});
+}
+async function addVideoWallUrl(raw){
+  const url = String(raw||'').trim();
+  if(!/^https?:\/\/\S+$/i.test(url)){ showToast('Paste a direct link to a video file (ending in .mp4 or .webm).', {icon:'&#127902;'}); return; }
+  const v = {id:uid(), name:videoWallName(url), src:url, thumb:''};
+  state.profile.videoWalls = videoWalls().concat([v]);
+  ui.videoWallLink = false;
+  setScene('vid:'+v.id);
+  videoWallThumb(url).then(function(t){ if(t){ v.thumb = t; persist('profile'); renderView(); } });
+}
+ACTIONS.videoWallPickFile = function(){ const i = document.getElementById('videoWallFile'); if(i) i.click(); };
+ACTIONS.videoWallLink = function(){ ui.videoWallLink = !ui.videoWallLink; renderView(); setTimeout(function(){ const i = document.getElementById('videoWallUrl'); if(i) i.focus(); }, 30); };
+ACTIONS.videoWallAddUrl = function(){ const i = document.getElementById('videoWallUrl'); addVideoWallUrl(i ? i.value : ''); };
+ACTIONS.videoWallRemove = function(el, e, id){
+  if(e) e.stopPropagation();
+  const v = videoWallById(id); if(!v) return;
+  if(!confirm('Remove the "'+v.name+'" wallpaper?')) return;
+  state.profile.videoWalls = videoWalls().filter(function(x){ return x.id!==id; });
+  if(String(v.src).indexOf('vidb:')===0) blobTx('readwrite', function(store){ return store.delete(v.src.slice(5)); }).catch(function(){});
+  if(state.profile.scene==='vid:'+id) state.profile.scene = 'minimal';
+  persist('profile'); sceneMount(); renderView();
+};
+document.addEventListener('change', function(e){
+  const t = e.target;
+  if(t && t.id==='videoWallFile' && t.files && t.files[0]){ addVideoWallFile(t.files[0]); t.value = ''; }
+  else if(t && t.id==='videoWallAlways'){ state.profile.videoWallAlwaysPlay = t.checked; persist('profile'); videoWallPlayPause(); }
+});
+document.addEventListener('keydown', function(e){ if(e.key==='Enter' && e.target && e.target.id==='videoWallUrl'){ e.preventDefault(); ACTIONS.videoWallAddUrl(); } });
+// ---- picker (inside Settings → Display → Scene) ----
+function videoWallCardsHtml(cur){
+  return videoWalls().map(function(v){
+    return '<button class="scene-card scene-card-video'+(cur==='vid:'+v.id?' is-on':'')+'" data-action="setScene" data-id="vid:'+v.id+'">'+
+      '<span class="scene-thumb'+(v.thumb?'':' is-video-blank')+'"'+(v.thumb ? ' style="background-image:url('+v.thumb+')"' : '')+'><span class="scene-vid-badge">&#9654;</span></span>'+
+      '<span class="scene-name">'+escapeHtml(v.name)+'</span>'+
+      '<span class="scene-vid-x" data-action="videoWallRemove" data-id="'+v.id+'" title="Remove">&#10005;</span></button>';
+  }).join('');
+}
+function videoWallAddHtml(){
+  return '<div class="vw-add">'+
+    '<span class="kind-label" style="margin:0;">Video wallpaper'+tip('Real footage behind the app — space, Tokyo at night, a skyline in the rain. Free 4K loops: pexels.com/videos or mixkit.co (search "tokyo night", "space", "shanghai"). Download one, then add it here. Short loops (10–60s, 1080p) are smoothest.')+'</span>'+
+    '<button class="btn btn-ghost btn-sm" data-action="videoWallPickFile">&#127902; Add a video file</button>'+
+    '<button class="btn btn-ghost btn-sm" data-action="videoWallLink">&#128279; From a link</button>'+
+    '<input type="file" id="videoWallFile" accept="video/*" hidden>'+
+    (ui.videoWallLink ? '<div class="row vw-link"><input class="input" id="videoWallUrl" placeholder="https://…/clip.mp4" style="flex:1;min-width:220px;"><button class="btn btn-sm" data-action="videoWallAddUrl">Add</button></div>' : '')+
+    (sceneId().indexOf('vid:')===0 ? '<label class="row" style="gap:8px;width:100%;font-size:12.5px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="videoWallAlways" '+(state.profile.videoWallAlwaysPlay===true?'checked':'')+'>Keep playing when Operator isn\'t in front (uses more battery)</label>' : '')+
+  '</div>';
+}
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
@@ -15187,12 +15383,13 @@ function appMenuHtml(){
     SEP+
     (s ? ci('stop', '&#9632; Stop &amp; log session')+(s.onBreak ? '' : ci('break', '&#9749; Take a break')) : ci('lockin', '&#128274; Lock in <span class="ctx-kbd">L</span>'))+
     ci('recap', '&#128202; Day recap')+
+    (selectableView() && selVisibleCards().length ? ci('selAll', '&#9745; Select all tasks <span class="ctx-kbd">&#8984;A</span>') : '')+
     ci('wake', '&#9200; Wake-up alarm')+
     SEP+
     crow('Go to', ['today','focus','business','calendar','personal'].map(function(v){ return chip('go', v[0].toUpperCase()+v.slice(1), {a:v, on:ui.view===v}); }).join(''))+
     SEP+
     crow('Theme', [['dark','Dark'],['light','Light'],['auto','Auto']].map(function(t){ return chip('theme', t[1], {a:t[0], on:theme===t[0]}); }).join(''))+
-    crow('Scene', SCENES.map(function(sc){ return chip('scene', sc.label, {a:sc.id, on:scene===sc.id}); }).join(''))+
+    crow('Scene', SCENES.map(function(sc){ return chip('scene', sc.label, {a:sc.id, on:scene===sc.id}); }).join('')+videoWalls().map(function(v){ return chip('scene', '&#9654; '+escapeHtml(v.name), {a:'vid:'+v.id, on:scene==='vid:'+v.id}); }).join(''))+
     crow('Cards', chip('layout', 'Grid', {a:'grid', on:lay==='grid'})+chip('layout', 'Carousel', {a:'carousel', on:lay==='carousel'}))+
     SEP+
     ci('sidebar', state.profile.sidebarCollapsed ? '&#9776; Show the menu' : '&#9776; Hide the menu')+
@@ -15275,6 +15472,7 @@ ACTIONS.ctx = function(el){
   else if(op==='stop') openStopFocus();
   else if(op==='break') openBreakNotePrompt();
   else if(op==='recap') ACTIONS.openDayRecap();
+  else if(op==='selAll') selectAllVisibleTasks();
   else if(op==='wake') openWakeSetup();
   else if(op==='go') go(a);
   else if(op==='theme') setThemePref(a);
@@ -15340,6 +15538,192 @@ afterRenderHooks.push(function(){
   }, {rootMargin:'600px 0px'});
   btns.forEach(function(b){ if(!b._observed){ b._observed = true; autoloadIO.observe(b); } });
 });
+
+// ============ MOVABLE SIDEBAR TABS ============
+// Drag a sidebar tab up or down to put it where you want it; the order is remembered.
+const NAV_VIEWS = ['today', 'focus', 'business', 'calendar', 'personal', 'settings'];
+function navOrder(){
+  const saved = arr(state.profile.navOrder).filter(function(v){ return NAV_VIEWS.indexOf(v)>=0; });
+  NAV_VIEWS.forEach(function(v){ if(saved.indexOf(v)<0) saved.push(v); });
+  return saved;
+}
+function navItems(){ return Array.prototype.slice.call(document.querySelectorAll('#sidebarNav > .nav-item')); }
+function applyNavOrder(){
+  const items = navItems(); if(!items.length) return;
+  const anchor = items[0].previousElementSibling;
+  const byView = {}; items.forEach(function(b){ byView[b.dataset.view] = b; });
+  let after = anchor;
+  navOrder().forEach(function(v){
+    const b = byView[v]; if(!b) return;
+    if(after ? after.nextElementSibling!==b : b.parentNode.firstElementChild!==b) b.parentNode.insertBefore(b, after ? after.nextElementSibling : b.parentNode.firstElementChild);
+    after = b;
+  });
+}
+let navDrag = null;
+document.addEventListener('pointerdown', function(e){
+  if(e.button!==0) return;
+  const b = e.target.closest && e.target.closest('#sidebarNav > .nav-item'); if(!b) return;
+  navDrag = {el:b, y:e.clientY, moving:false};
+}, true);
+document.addEventListener('pointermove', function(e){
+  if(!navDrag) return;
+  if(!navDrag.moving){
+    if(Math.abs(e.clientY - navDrag.y) < 6) return;
+    navDrag.moving = true; navDrag.el.classList.add('nav-dragging'); document.body.classList.add('nav-sorting');
+  }
+  const others = navItems().filter(function(x){ return x!==navDrag.el; });
+  let before = null;
+  for(let i=0;i<others.length;i++){ const r = others[i].getBoundingClientRect(); if(e.clientY < r.top + r.height/2){ before = others[i]; break; } }
+  const parent = navDrag.el.parentNode;
+  if(before){ if(navDrag.el.nextElementSibling!==before) parent.insertBefore(navDrag.el, before); }
+  else { const last = others[others.length-1]; if(last && last.nextElementSibling!==navDrag.el) parent.insertBefore(navDrag.el, last.nextElementSibling); }
+  e.preventDefault();
+}, true);
+function endNavDrag(){
+  if(!navDrag) return;
+  const d = navDrag; navDrag = null;
+  if(!d.moving) return;
+  d.el.classList.remove('nav-dragging'); document.body.classList.remove('nav-sorting');
+  const order = navItems().map(function(b){ return b.dataset.view; });
+  if(order.join()!==navOrder().join()){ state.profile.navOrder = order; persist('profile'); playTick(); }
+  // the click that ends a drag shouldn't count as a click
+  const swallow = function(ev){ ev.stopImmediatePropagation(); ev.preventDefault(); };
+  document.addEventListener('click', swallow, true);
+  setTimeout(function(){ document.removeEventListener('click', swallow, true); }, 0);
+}
+document.addEventListener('pointerup', endNavDrag, true);
+document.addEventListener('pointercancel', endNavDrag, true);
+
+// ============ DESKTOP-STYLE SELECTING ============
+// Like the Finder: drag a box across empty space to pick up every task it touches, ⌘- or
+// ⇧-click cards to add or drop them, ⌘A for every task on the page — then right-click any
+// picked card for actions on all of them at once. Esc or a click on empty space lets go.
+const SEL_CARD = '.task-card[data-id], .task-item-v2[data-task-id], .finished-row[data-task-id], .video-idea-compact[data-task-id]';
+function selCardId(el){ return el.getAttribute('data-id') || el.getAttribute('data-task-id'); }
+function selVisibleCards(){
+  return Array.prototype.filter.call(document.querySelectorAll('#viewRoot '+SEL_CARD.split(', ').join(', #viewRoot ')), function(el){
+    return !el.classList.contains('car-clone') && !el.closest('.car-clone') && el.getClientRects().length;
+  });
+}
+function selectableView(){ return ui.view==='focus' || ui.view==='today'; }
+function setTaskSelection(ids, additive){
+  if(!additive) ui.selectedTaskIds.clear();
+  ids.forEach(function(id){ if(state.tasks.items.some(function(t){ return t.id===id; })) ui.selectedTaskIds.add(id); });
+  renderView();
+}
+// ---- drag a box ----
+let marq = null;
+function marqIsEmptySpot(t){
+  if(!t || !t.closest) return false;
+  if(!t.closest('#viewRoot')) return false;
+  return !t.closest(SEL_CARD+', button, a, input, textarea, select, label, [contenteditable="true"], [data-action], [draggable="true"], .ctx-menu, .bulk-toolbar, .overlay, #boardHost, .bel, .car-arrow, svg, canvas, video, .chip, .tag');
+}
+document.addEventListener('pointerdown', function(e){
+  if(e.button!==0 || e.pointerType==='touch' || !selectableView()) return;
+  if(document.querySelector('.overlay:not(.hidden)')) return;
+  if(!marqIsEmptySpot(e.target)) return;
+  marq = {x:e.clientX, y:e.clientY, add:e.shiftKey || e.metaKey, box:null, cards:null, hits:new Set(), raf:0, lx:0, ly:0};
+}, true);
+function marqUpdate(){
+  marq.raf = 0;
+  const x1 = Math.min(marq.x, marq.lx), y1 = Math.min(marq.y, marq.ly), x2 = Math.max(marq.x, marq.lx), y2 = Math.max(marq.y, marq.ly);
+  marq.box.style.transform = 'translate('+x1+'px,'+y1+'px)'; marq.box.style.width = (x2-x1)+'px'; marq.box.style.height = (y2-y1)+'px';
+  marq.cards.forEach(function(c){
+    const r = c.el.getBoundingClientRect();
+    const hit = r.right > x1 && r.left < x2 && r.bottom > y1 && r.top < y2;
+    if(hit!==c.hit){ c.hit = hit; c.el.classList.toggle('marquee-hit', hit); if(hit) marq.hits.add(c.id); else marq.hits.delete(c.id); }
+  });
+}
+document.addEventListener('pointermove', function(e){
+  if(!marq) return;
+  marq.lx = e.clientX; marq.ly = e.clientY;
+  if(!marq.box){
+    if(Math.abs(e.clientX-marq.x) < 6 && Math.abs(e.clientY-marq.y) < 6) return;
+    marq.box = document.createElement('div'); marq.box.className = 'marquee-box'; document.body.appendChild(marq.box);
+    document.body.classList.add('marquee-on');
+    marq.cards = selVisibleCards().map(function(el){ return {el:el, id:selCardId(el), hit:false}; });
+    try{ window.getSelection().removeAllRanges(); }catch(err){}
+  }
+  e.preventDefault();
+  if(!marq.raf) marq.raf = requestAnimationFrame(marqUpdate);
+}, true);
+function marqEnd(e){
+  if(!marq) return;
+  const m = marq; marq = null;
+  if(m.raf) cancelAnimationFrame(m.raf);
+  if(!m.box){
+    // a plain click on empty space lets go of the selection (like clicking the desktop)
+    if(e && e.type==='pointerup' && ui.selectedTaskIds.size && !m.add && !ui.taskSelectMode){ ui.selectedTaskIds.clear(); renderView(); }
+    return;
+  }
+  m.box.remove(); document.body.classList.remove('marquee-on');
+  m.cards.forEach(function(c){ c.el.classList.remove('marquee-hit'); });
+  const swallow = function(ev){ ev.stopImmediatePropagation(); ev.preventDefault(); };
+  document.addEventListener('click', swallow, true); setTimeout(function(){ document.removeEventListener('click', swallow, true); }, 0);
+  if(m.hits.size || !m.add) setTaskSelection(Array.from(m.hits), m.add);
+}
+document.addEventListener('pointerup', marqEnd, true);
+document.addEventListener('pointercancel', marqEnd, true);
+// ---- ⌘ / ⇧ click a card to add or drop it ----
+document.addEventListener('click', function(e){
+  if(!(e.metaKey || e.shiftKey) || e.button!==0 || !selectableView()) return;
+  const card = e.target.closest && e.target.closest(SEL_CARD); if(!card || card.closest('.car-clone')) return;
+  if(e.target.closest('input, textarea, select, .card-more')) return;
+  const id = selCardId(card); if(!id) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  if(ui.selectedTaskIds.has(id)) ui.selectedTaskIds.delete(id); else ui.selectedTaskIds.add(id);
+  renderView();
+}, true);
+// ---- ⌘A / Esc ----
+function selectAllVisibleTasks(){ setTaskSelection(selVisibleCards().map(selCardId), false); }
+document.addEventListener('keydown', function(e){
+  if(!selectableView() || typingInField(e.target) || document.querySelector('.overlay:not(.hidden)')) return;
+  if((e.metaKey || e.ctrlKey) && (e.key==='a' || e.key==='A') && selVisibleCards().length){ e.preventDefault(); selectAllVisibleTasks(); }
+  else if(e.key==='Escape' && ui.selectedTaskIds.size && !document.getElementById('taskCtxMenu')){ ui.selectedTaskIds.clear(); renderView(); }
+});
+// ---- right-click a picked card: one menu for all of them ----
+document.addEventListener('contextmenu', function(e){
+  if(e.altKey || ui.selectedTaskIds.size < 2) return;
+  const card = e.target.closest && e.target.closest(SEL_CARD); if(!card) return;
+  const id = selCardId(card); if(!ui.selectedTaskIds.has(id)) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  openBulkTaskMenu(e.clientX, e.clientY);
+}, true);
+function openBulkTaskMenu(x, y){
+  closeTaskMenu();
+  const ids = Array.from(ui.selectedTaskIds), tasks = ids.map(function(id){ return state.tasks.items.find(function(t){ return t.id===id; }); }).filter(Boolean);
+  const any = function(fn){ return tasks.some(fn); };
+  const item = function(op, label, extra){ return '<button class="ctx-item'+(extra||'')+'" data-action="taskBulk" data-op="'+op+'">'+label+'</button>'; };
+  const m = document.createElement('div');
+  m.id = 'taskCtxMenu'; m.className = 'ctx-menu'; m.dataset.id = '__bulk'; m.dataset.at = Date.now();
+  m.innerHTML = '<div class="ctx-title">'+tasks.length+' tasks selected</div>'+
+    (any(function(t){ return t.status!=='done'; }) ? item('done', '&#10003; Mark done') : '')+
+    (any(function(t){ return t.status==='done'; }) ? item('undo', '&#8634; Back to today') : '')+
+    (any(function(t){ return t.status!=='today'; }) ? item('today', '&rarr; Move to today') : '')+
+    (any(function(t){ return t.status!=='backlog'; }) ? item('backlog', '&larr; Move to backlog') : '')+
+    '<div class="ctx-sep"></div>'+
+    '<div class="ctx-row"><span class="ctx-k">Due</span>'+item('dueToday','Today',' ctx-chip')+item('dueTomorrow','Tomorrow',' ctx-chip')+item('dueClear','Clear',' ctx-chip')+'</div>'+
+    '<div class="ctx-row"><span class="ctx-k">Priority</span>'+item('pri-high','High',' ctx-chip')+item('pri-med','Med',' ctx-chip')+item('pri-low','Low',' ctx-chip')+'</div>'+
+    '<div class="ctx-sep"></div>'+
+    item('clear', 'Deselect all')+
+    item('delete', '&#128465; Delete '+tasks.length, ' ctx-danger');
+  document.body.appendChild(m);
+  const r = m.getBoundingClientRect();
+  m.style.left = Math.min(x, window.innerWidth-r.width-8)+'px';
+  m.style.top = Math.min(y, window.innerHeight-r.height-8)+'px';
+}
+ACTIONS.taskBulk = function(el){
+  const op = el.dataset.op; closeTaskMenu();
+  const ids = Array.from(ui.selectedTaskIds);
+  const each = function(fn){ ids.forEach(function(id){ const t = state.tasks.items.find(function(x){ return x.id===id; }); if(t) fn(t); }); };
+  if(op==='done'){ holdRenders(function(){ each(function(t){ if(t.status!=='done' && !isOngoingDoneToday(t)) completeTask(t.id); }); }); ui.selectedTaskIds.clear(); renderView(); }
+  else if(op==='undo'){ holdRenders(function(){ each(function(t){ if(t.status==='done') undoTask(t.id); }); }); ui.selectedTaskIds.clear(); renderView(); }
+  else if(op==='today' || op==='backlog'){ each(function(t){ if(t.status==='done') return; if(op==='backlog' && ui.currentTaskId===t.id) accumulateCurrentTaskTime(t.id); t.status = op; }); ui.selectedTaskIds.clear(); playTick(); persist('tasks'); renderView(); }
+  else if(op.indexOf('pri-')===0){ each(function(t){ t.priority = op.slice(4); }); persist('tasks'); renderView(); }
+  else if(op==='dueToday' || op==='dueTomorrow' || op==='dueClear'){ const d = op==='dueClear' ? null : op==='dueToday' ? todayStr() : addDays(todayStr(), 1); each(function(t){ t.deadline = d; if(!d) t.deadlineTime = null; }); persist('tasks'); renderView(); }
+  else if(op==='clear'){ ui.selectedTaskIds.clear(); renderView(); }
+  else if(op==='delete'){ ui.selectedTaskIds.clear(); deleteTasksUndoable(ids); }
+};
 // ============ INIT ============
 async function init(){
   state.profile = normalizeProfile(await loadKey('profile', defaultProfile()));

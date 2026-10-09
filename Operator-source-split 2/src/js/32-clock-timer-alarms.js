@@ -148,10 +148,13 @@ function startFocusTicker(){
         const dwTarget = state.standards.deepWorkTargetMinutes || 180;
         const liveToday = deepWorkMinutesTodayLive();
         const openPct = clamp(Math.round((liveToday/dwTarget)*100),0,100);
-        bar.style.width = openPct+'%';
-        bar.classList.toggle('good', openPct>=100);
+        // Only touch the DOM when something actually changed — rewriting the same text every
+        // second re-lays-out the card under the clock.
+        if(bar.style.width!==openPct+'%') bar.style.width = openPct+'%';
+        if(bar.classList.contains('good')!==(openPct>=100)) bar.classList.toggle('good', openPct>=100);
         const sub = bar.parentElement && bar.parentElement.nextElementSibling;
-        if(sub && sub.classList.contains('kpi-sub')) sub.textContent = 'Open-ended · '+fmtDurationLabel(liveToday)+' of '+fmtDurationLabel(dwTarget)+" today's goal";
+        const txt = 'Open-ended · '+fmtDurationLabel(liveToday)+' of '+fmtDurationLabel(dwTarget)+" today's goal";
+        if(sub && sub.classList.contains('kpi-sub') && sub.textContent!==txt) sub.textContent = txt;
       }
     }
   }, 1000);

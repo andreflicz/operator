@@ -44,11 +44,13 @@ function defaultDashboardPanels(){
 }
 function defaultModes(){ return { active:null, history:[] }; }
 const MODE_LABELS = { break:'Break Mode', offtime:'Off-Time Mode', shooting:'Shooting Mode', training:'Training Mode' };
+// Training mode is retired: old Training minutes now count as Other, and "Working out" is the
+// time you log on each workout in Fitness.
 // Session/time types used by analytics. Deep work is the only one that counts as deep work;
 // shooting also counts toward the daily standard (a shoot day doesn't break the streak).
 const TIME_TYPES = [
   {id:'deep', label:'Deep work', color:'#E8A23D'},
-  {id:'training', label:'Training', color:'#7AA2FF'},
+  {id:'workout', label:'Working out', color:'#7AA2FF'},
   {id:'shooting', label:'Shooting', color:'#C58FFF'},
   {id:'other', label:'Other', color:'#8A90A2'}
 ];
