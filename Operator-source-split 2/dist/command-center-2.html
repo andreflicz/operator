@@ -1478,6 +1478,31 @@
   .cal-mini-empty{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; height:100%; box-sizing:border-box; }
   .small-panels-row > .small-panel-box > .section{ margin:0; height:100%; }
   .small-panels-row > .small-panel-box > .section > .card{ height:100%; box-sizing:border-box; }
+  /* ---- board backgrounds ---- */
+  .board-bg{ position:absolute; inset:0; background-size:cover; background-position:center; pointer-events:none; z-index:0; }
+  .board-world{ z-index:1; }
+  .board-light .bel-note, .board-light .bel-list, .board-light .bel-board{ background:#ffffff; border-color:#dde1e8; }
+  .board-light .bel-body, .board-light .bel-list, .board-light .bel-board-name, .board-light .bel-title:not(.bel-head .bel-title){ color:#161a23; }
+  .board-light .bel{ box-shadow:0 4px 16px rgba(20,24,36,.12); }
+  .board-light .board-lines line[stroke="#E7E9EE"], .board-light .board-lines line[stroke="#e7e9ee"], .board-light .board-lines line[stroke="#8A90A2"]{ stroke:#2a2f3c; }
+  .board-bg-pop{ position:absolute; top:calc(100% + 8px); right:0; z-index:30; width:340px; padding:12px; border-radius:14px; background:var(--pop); border:1px solid var(--pop-border); box-shadow:0 18px 50px rgba(0,0,0,calc(.55*var(--sh-k))); animation:overlayFadeIn .12s ease-out; }
+  .board-bg-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; }
+  .board-bg-sw{ display:flex; flex-direction:column; align-items:center; gap:4px; background:none; border:none; padding:0; cursor:pointer; color:var(--text-dim); }
+  .board-bg-sw span{ width:100%; aspect-ratio:4/3; border-radius:8px; border:2px solid var(--border); }
+  .board-bg-sw em{ font-style:normal; font-size:10.5px; white-space:nowrap; }
+  .board-bg-sw.is-on span{ border-color:var(--accent); }
+  .board-bg-sw:hover span{ border-color:var(--border-strong); }
+  .vision-panel-box{ background:var(--sunken, #0a0c10); }
+  /* ---- app right-click menu ---- */
+  .ctx-app{ max-width:340px; min-width:250px; }
+  .ctx-chips{ display:flex; flex-wrap:wrap; gap:4px; }
+  .ctx-app .ctx-row{ align-items:flex-start; }
+  .ctx-app .ctx-k{ padding-top:5px; }
+  .ctx-kbd{ float:right; font-size:10.5px; color:var(--text-faint); border:1px solid var(--border); border-radius:4px; padding:0 5px; margin-top:1px; }
+  .je-more{ background:none; border:none; color:var(--text-faint); font-size:18px; line-height:1; padding:0 6px; border-radius:6px; cursor:pointer; opacity:0; transition:opacity .15s; }
+  .journal-entry:hover .je-more{ opacity:1; }
+  .je-more:hover{ color:var(--text); background:var(--panel-2); }
+  .je-pin{ color:var(--accent); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -7605,18 +7630,15 @@ function journalEntryRow(e){
   const mood = e.mood ? moodById(e.mood) : null;
   const isStarred = e.mood==='starred';
   const photos = arr(e.photos);
-  return '<div class="journal-entry'+(isStarred?' journal-entry-starred':'')+'" style="'+(mood && !isStarred?'border-left:4px solid '+mood.color+';':'')+'">'+
+  // pin / edit / remove live in the right-click menu (or the ⋯ that shows on hover)
+  return '<div class="journal-entry'+(isStarred?' journal-entry-starred':'')+'" data-journal-id="'+e.id+'" style="'+(mood && !isStarred?'border-left:4px solid '+mood.color+';':'')+'">'+
     '<div class="row" style="justify-content:space-between;">'+
-      '<div class="kpi-sub">'+(mood?mood.emoji+' ':'')+fmtTimeShort(e.timestamp)+'</div>'+
-      '<div class="row">'+
-        '<button class="btn btn-ghost btn-sm" data-action="togglePinJournal" data-id="'+e.id+'">'+(e.pinned?'\u2605 Pinned':'\u2606 Pin')+'</button>'+
-        '<button class="btn btn-ghost btn-sm" data-action="openJournalEditModal" data-id="'+e.id+'">Edit</button>'+
-      '</div>'+
+      '<div class="kpi-sub">'+(mood?mood.emoji+' ':'')+fmtTimeShort(e.timestamp)+(e.pinned?' <span class="je-pin" title="Pinned">&#9733;</span>':'')+'</div>'+
+      '<button class="je-more" data-action="journalMenu" data-id="'+e.id+'" title="Pin, edit, remove (or right-click the entry)">&#8943;</button>'+
     '</div>'+
     '<div class="journal-text">'+escapeHtml(shown)+'</div>'+
     (photos.length ? '<div class="row" style="margin-bottom:8px;flex-wrap:wrap;">'+photos.map(function(src, idx){ return '<img src="'+escapeHtml(blobUrl(src))+'" class="journal-photo-thumb" data-action="viewJournalPhoto" data-id="'+e.id+'" data-idx="'+idx+'">'; }).join('')+'</div>' : '')+
     (isLong ? '<button class="btn btn-ghost btn-sm" data-action="toggleJournalExpand" data-id="'+e.id+'">'+(expanded?'Show Less':'Read More')+'</button>' : '')+
-    deleteBtn('journal', e.id)+
   '</div>';
 }
 // One-time cleanup: older journal photos were stored as giant text strings inside the journal
@@ -8436,7 +8458,9 @@ function renderBoardShell(kind){
         (path[0] && masterVisionBoard() && path[0].id===masterVisionBoard().id ? '<span class="board-master-tag" title="Shows on Today and on the wake-up screen">&#9733; Vision board</span>'
           : (!b.parentId && !view ? '<button class="board-tool" data-action="boardMakeMaster" title="Make this the board you wake up to">&#9734; Make it my vision board</button>' : ''))+
       '</div>'+
-      '<div class="row" style="gap:6px;">'+
+      '<div class="row" style="gap:6px;position:relative;">'+
+        tool('boardBgToggle', '&#127912; Background', 'Change this board\'s background', ui.boardBgOpen ? ' data-on="1"' : '')+
+        (ui.boardBgOpen ? boardBgPickerHtml(b) : '')+
         tool('boardToggleView', view?'&#9998; Edit':'&#128065; View', view?'Back to editing':'View mode — hide the editing tools')+
         tool('boardFullscreen', full?'&#10530; Exit full screen':'&#9974; Full screen', full?'Exit full screen (Esc)':'Full screen')+
       '</div>'+
@@ -8546,6 +8570,7 @@ function elHtml(el, single){
 }
 function drawBoard(){
   const b = cvBoard(); if(!b || !cv.els) return;
+  applyBoardBg(cv.host, b);
   applyViewport();
   cv.host.classList.toggle('is-view', cv.view);
   const els = b.elements.slice().sort(function(a,b2){ return (a.z||0)-(b2.z||0); });
@@ -9022,7 +9047,7 @@ function boardStaticHtml(b, cls){
   const body = els.filter(function(e){ return e.type!=='line'; }).map(function(e){ return elHtml(shift(e), false); }).join('').replace(/ data-(el|key|handle|field)="[^"]*"/g, '');
   cv.sel = savedSel;
   const lines = els.filter(function(e){ return e.type==='line'; }).map(function(e){ const c = shift(e); return '<line x1="'+c.x1+'" y1="'+c.y1+'" x2="'+c.x2+'" y2="'+c.y2+'" stroke="'+(c.color||'#8A90A2')+'" stroke-width="'+(c.width||2)+'" stroke-linecap="round"'+(c.arrow?' marker-end="url(#bArrowS)"':'')+'/>'; }).join('');
-  return '<div class="board-static '+(cls||'')+'" data-bw="'+bb.w+'" data-bh="'+bb.h+'">'+
+  return '<div class="board-static '+(cls||'')+(boardIsLight(b)?' board-light':'')+'" style="'+boardBgStyle(b)+'" data-bw="'+bb.w+'" data-bh="'+bb.h+'">'+
     '<div class="board-static-world" style="width:'+bb.w+'px;height:'+bb.h+'px;">'+
       '<svg class="board-lines" width="'+bb.w+'" height="'+bb.h+'"><defs><marker id="bArrowS" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/></marker></defs>'+lines+'</svg>'+
       body+
@@ -9229,6 +9254,92 @@ async function importMilanoteFiles(files){
     showToast('Couldn\'t read that file: '+(err && err.message || err), {icon:'&#9888;', duration:6000});
   }
 }
+
+// ============ BOARD BACKGROUNDS ============
+// Every board can have its own background: a color, a gradient, a dot / grid / ruled pattern,
+// or a photo of your own. "Match theme" (the default) is dark in dark mode and light in light mode.
+// Light backgrounds switch the cards to white and the default-colored lines to dark ink.
+const BOARD_BGS = [
+  {id:'auto', label:'Match theme'},
+  {id:'midnight', label:'Midnight', color:'#0a0c10', dots:'rgba(255,255,255,.07)'},
+  {id:'charcoal', label:'Charcoal', color:'#17191f'},
+  {id:'night', label:'Night sky', color:'#0b1430', grad:'linear-gradient(160deg,#0b1430,#1d2b52)', dots:'rgba(255,255,255,.05)'},
+  {id:'forest', label:'Forest', color:'#0f1f1a', grad:'linear-gradient(160deg,#0d1c17,#1c3a2e)'},
+  {id:'plum', label:'Plum', color:'#1c1028', grad:'linear-gradient(160deg,#1a0f26,#3a1d40)'},
+  {id:'sunset', label:'Sunset', color:'#2b1d3a', grad:'linear-gradient(170deg,#241a3d,#6b3a5c 55%,#c97a5c)'},
+  {id:'blueprint', label:'Blueprint', color:'#123a6b', grid:'rgba(255,255,255,.12)'},
+  {id:'cloud', label:'Cloud', color:'#eef1f6', dots:'rgba(20,24,36,.14)', light:true},
+  {id:'paper', label:'Paper', color:'#f6f2e9', lines:'rgba(60,70,90,.12)', light:true},
+  {id:'sand', label:'Sand', color:'#efe5d3', light:true},
+  {id:'white', label:'White', color:'#ffffff', grid:'rgba(20,24,36,.06)', light:true}
+];
+function boardBgPreset(b){
+  const id = b && typeof b.bg==='string' ? b.bg : 'auto';
+  if(id==='auto') return BOARD_BGS.find(function(x){ return x.id===(document.documentElement.getAttribute('data-theme')==='light' ? 'cloud' : 'midnight'); });
+  return BOARD_BGS.find(function(x){ return x.id===id; }) || BOARD_BGS[1];
+}
+function boardBgPattern(p){
+  if(p.dots) return 'radial-gradient('+p.dots+' 1px, transparent 1.2px)';
+  if(p.grid) return 'linear-gradient('+p.grid+' 1px, transparent 1px), linear-gradient(90deg, '+p.grid+' 1px, transparent 1px)';
+  if(p.lines) return 'linear-gradient('+p.lines+' 1px, transparent 1px)';
+  return 'none';
+}
+function boardHasImage(b){ return !!(b && b.bg && typeof b.bg==='object' && b.bg.img); }
+function boardIsLight(b){ return !boardHasImage(b) && !!boardBgPreset(b).light; }
+// the live canvas: color + zoom-following pattern on the host, gradient / photo on a still layer under it
+function applyBoardBg(host, b){
+  if(!host || !b) return;
+  const p = boardBgPreset(b), img = boardHasImage(b);
+  host.style.backgroundColor = img ? '#0a0c10' : p.color;
+  host.style.backgroundImage = img ? 'none' : boardBgPattern(p);
+  host.classList.toggle('board-light', boardIsLight(b));
+  let layer = host.querySelector(':scope > .board-bg');
+  if(!layer){ layer = document.createElement('div'); layer.className = 'board-bg'; host.insertBefore(layer, host.firstChild); }
+  const bgImg = img ? 'linear-gradient(rgba(0,0,0,'+(b.bg.dim!=null ? b.bg.dim : 0.25)+'), rgba(0,0,0,'+(b.bg.dim!=null ? b.bg.dim : 0.25)+')), url("'+blobUrl(b.bg.img)+'")' : (p.grad || 'none');
+  if(layer.style.backgroundImage!==bgImg) layer.style.backgroundImage = bgImg;
+}
+// the same look for pictures of a board (Today, the wake screen, the strip)
+function boardBgStyle(b){
+  const p = boardBgPreset(b);
+  if(boardHasImage(b)) return 'background:linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.25)), url(&quot;'+escapeHtml(blobUrl(b.bg.img))+'&quot;) center/cover, #0a0c10;';
+  return 'background:'+(p.grad ? p.grad+', ' : '')+p.color+';';
+}
+function boardBgPickerHtml(b){
+  const cur = boardHasImage(b) ? 'image' : (typeof b.bg==='string' ? b.bg : 'auto');
+  return '<div class="board-bg-pop" data-key="bgpop-'+b.id+'">'+
+    '<div class="board-bg-grid">'+BOARD_BGS.map(function(p){
+      const sw = p.id==='auto' ? 'linear-gradient(135deg,#0a0c10 50%,#eef1f6 50%)' : (p.grad || p.color);
+      return '<button class="board-bg-sw'+(cur===p.id?' is-on':'')+'" data-action="boardSetBg" data-id="'+p.id+'" title="'+escapeHtml(p.label)+'"><span style="background:'+sw+'"></span><em>'+escapeHtml(p.label)+'</em></button>';
+    }).join('')+'</div>'+
+    '<div class="row" style="gap:6px;margin-top:10px;"><button class="btn btn-sm" data-action="boardBgUpload">&#128444; Use a photo</button>'+(cur==='image' ? '<button class="btn btn-ghost btn-sm" data-action="boardSetBg" data-id="auto">Remove photo</button>' : '')+'</div>'+
+  '</div>';
+}
+ACTIONS.boardBgToggle = function(){ ui.boardBgOpen = !ui.boardBgOpen; renderView(); };
+ACTIONS.boardSetBg = function(el, e, id){
+  const b = cvBoard() || boardById(ui.boardIds && ui.boardIds.journal); if(!b) return;
+  if(boardHasImage(b) && typeof blobRemove==='function'){ try{ blobRemove(b.bg.img); }catch(err){} }
+  b.bg = id; persist('boards'); renderView();
+  if(cv.host) applyBoardBg(cv.host, b);
+};
+ACTIONS.boardBgUpload = function(){
+  const b = cvBoard(); if(!b) return;
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = async function(){
+    const f = inp.files && inp.files[0]; if(!f) return;
+    try{
+      const ref = await storeImageFile(f);
+      if(boardHasImage(b) && typeof blobRemove==='function'){ try{ blobRemove(b.bg.img); }catch(err){} }
+      b.bg = {img:ref, dim:0.25}; persist('boards'); ui.boardBgOpen = false; renderView();
+      if(cv.host) applyBoardBg(cv.host, b);
+    }catch(err){ showToast('Couldn\'t use that image.', {icon:'&#9888;'}); }
+  };
+  inp.click();
+};
+document.addEventListener('pointerdown', function(e){
+  if(!ui.boardBgOpen) return;
+  if(e.target.closest && (e.target.closest('.board-bg-pop') || e.target.closest('[data-action="boardBgToggle"]'))) return;
+  ui.boardBgOpen = false; renderView();
+}, true);
 // ============ FINANCES ============
 function renderFinances(){
   const debts = state.finances.debts;
@@ -14671,6 +14782,161 @@ document.addEventListener('keydown', function(e){
   if(!open.length) return;
   if(dismissOverlay(open[open.length-1])) e.preventDefault();
 });
+
+// ============ RIGHT-CLICK, EVERYWHERE ============
+// Right-click anywhere for Operator's own menu: quick add, lock in, recap, jump to a page, and the
+// look-and-feel switches (theme, scene, card layout). Things you right-click get their own menu —
+// tasks (17b), journal entries, clients & leads, boards. Text fields keep the normal Mac menu
+// (copy, paste, spelling), and Option-right-click always gives the normal menu too.
+let ctxTarget = null;
+function ctxClose(){ const m = document.getElementById('appCtxMenu'); if(m) m.remove(); ctxTarget = null; }
+function ctxShow(html, x, y, target){
+  closeTaskMenu(); ctxClose();
+  ctxTarget = target || null;
+  const m = document.createElement('div');
+  m.id = 'appCtxMenu'; m.className = 'ctx-menu ctx-app'; m.innerHTML = html;
+  document.body.appendChild(m);
+  const r = m.getBoundingClientRect();
+  m.style.left = Math.max(8, Math.min(x, window.innerWidth-r.width-8))+'px';
+  m.style.top = Math.max(8, Math.min(y, window.innerHeight-r.height-8))+'px';
+}
+function ci(op, label, opts){
+  opts = opts || {};
+  return '<button class="ctx-item'+(opts.cls?' '+opts.cls:'')+(opts.on?' is-on':'')+'" data-action="ctx" data-op="'+op+'"'+(opts.a!=null?' data-a="'+escapeHtml(String(opts.a))+'"':'')+(opts.b!=null?' data-b="'+escapeHtml(String(opts.b))+'"':'')+(opts.title?' title="'+escapeHtml(opts.title)+'"':'')+'>'+label+'</button>';
+}
+function chip(op, label, opts){ opts = opts || {}; opts.cls = 'ctx-chip'+(opts.cls?' '+opts.cls:''); return ci(op, label, opts); }
+function crow(k, inner){ return '<div class="ctx-row">'+(k?'<span class="ctx-k">'+k+'</span>':'')+'<div class="ctx-chips">'+inner+'</div></div>'; }
+const SEP = '<div class="ctx-sep"></div>';
+// ---- the app menu ----
+function appMenuHtml(){
+  const s = state.focus.activeSession, theme = state.profile.theme || 'dark', scene = sceneId(), lay = cardLayout();
+  return '<div class="ctx-title">Operator</div>'+
+    crow('Add', chip('add', 'Task', {a:'task'})+chip('add', 'Lead', {a:'lead'})+chip('add', 'Client', {a:'client'})+chip('add', 'Note', {a:'journal'})+chip('add', 'Event', {a:'event'}))+
+    SEP+
+    (s ? ci('stop', '&#9632; Stop &amp; log session')+(s.onBreak ? '' : ci('break', '&#9749; Take a break')) : ci('lockin', '&#128274; Lock in <span class="ctx-kbd">L</span>'))+
+    ci('recap', '&#128202; Day recap')+
+    ci('wake', '&#9200; Wake-up alarm')+
+    SEP+
+    crow('Go to', ['today','focus','business','calendar','personal'].map(function(v){ return chip('go', v[0].toUpperCase()+v.slice(1), {a:v, on:ui.view===v}); }).join(''))+
+    SEP+
+    crow('Theme', [['dark','Dark'],['light','Light'],['auto','Auto']].map(function(t){ return chip('theme', t[1], {a:t[0], on:theme===t[0]}); }).join(''))+
+    crow('Scene', SCENES.map(function(sc){ return chip('scene', sc.label, {a:sc.id, on:scene===sc.id}); }).join(''))+
+    crow('Cards', chip('layout', 'Grid', {a:'grid', on:lay==='grid'})+chip('layout', 'Carousel', {a:'carousel', on:lay==='carousel'}))+
+    SEP+
+    ci('sidebar', state.profile.sidebarCollapsed ? '&#9776; Show the menu' : '&#9776; Hide the menu')+
+    ci('go', '&#9881; Settings', {a:'settings'});
+}
+// ---- journal entries ----
+function journalMenuHtml(e){
+  return '<div class="ctx-title">'+escapeHtml((e.text||'Entry').slice(0, 48))+'</div>'+
+    ci('jPin', e.pinned ? '&#9733; Unpin' : '&#9734; Pin to top', {a:e.id})+
+    ci('jEdit', '&#9998; Edit…', {a:e.id})+
+    ci('jStar', e.mood==='starred' ? '&#10024; Unstar' : '&#10024; Star it', {a:e.id})+
+    ci('jCopy', '&#128203; Copy text', {a:e.id})+
+    SEP+ci('jRemove', '&#128465; Remove', {a:e.id, cls:'ctx-danger'});
+}
+// ---- clients & leads ----
+function contactMenuHtml(kind, x){
+  return '<div class="ctx-title">'+escapeHtml(crmName(kind, x))+'</div>'+
+    ci('open', '&#8599; Open card', {a:kind, b:x.id})+
+    (typeof contactReachHtml==='function' ? contactReachHtml(kind, x) : '')+
+    crow('Log', TOUCH_TYPES.map(function(t){ return chip('touch', t.icon, {a:kind+':'+x.id, b:t.id, title:'Log a '+t.label.toLowerCase()}); }).join(''))+
+    (typeof followUpMenuHtml==='function' ? followUpMenuHtml(kind, x) : '')+
+    SEP+
+    crow('Stage', crmStages(kind).map(function(st){ return chip('stage', escapeHtml(st.label), {a:kind+':'+x.id, b:st.id, on:x.stage===st.id}); }).join(''));
+}
+// ---- boards ----
+function boardMenuHtml(elId){
+  if(elId) return '<div class="ctx-title">Card</div>'+ci('bDup', '&#10697; Duplicate')+ci('bFwd', '&#11014; Bring forward')+ci('bBack', '&#11015; Send back')+SEP+ci('bDel', '&#128465; Delete', {cls:'ctx-danger'});
+  return '<div class="ctx-title">Board</div>'+
+    crow('Add here', chip('bAdd', 'Note', {a:'note'})+chip('bAdd', 'Label', {a:'label'})+chip('bAdd', 'List', {a:'list'}))+
+    ci('bBg', '&#127912; Background…')+ci('bFit', '&#9974; Fit everything')+ci('bFull', ui.boardFull ? '&#10530; Exit full screen' : '&#9974; Full screen');
+}
+function contactFromEl(el){
+  const card = el.closest('.crm-card, .cc2, .hub-card, .crm-row, .hq-row, .reach-row, .hub-lead, .hq-due-lead, .cc2-head');
+  if(!card) return null;
+  const a = card.matches('[data-action="openContact"][data-kind][data-id]') ? card : card.querySelector('[data-action="openContact"][data-kind][data-id]');
+  if(!a) return null;
+  const x = crmFind(a.dataset.kind, a.dataset.id);
+  return x ? {kind:a.dataset.kind, x:x} : null;
+}
+document.addEventListener('contextmenu', function(e){
+  if(e.defaultPrevented) return;            // a task — its own menu already opened
+  if(e.altKey){ ctxClose(); return; }       // Option-right-click: the normal menu
+  const t = e.target;
+  if(!t.closest || t.closest('input, textarea, select, [contenteditable="true"], .ctx-menu')){ ctxClose(); return; }
+  const sel = window.getSelection && String(window.getSelection());
+  if(sel && sel.trim()){ ctxClose(); return; } // selected text: keep Copy / Look Up
+  if(t.closest('#wakeOverlay:not(.hidden), #alarmOverlay:not(.hidden)')) return;
+  e.preventDefault();
+  const je = t.closest('.journal-entry[data-journal-id]');
+  if(je){ const entry = state.journal.entries.find(function(x){ return x.id===je.dataset.journalId; }); if(entry){ ctxShow(journalMenuHtml(entry), e.clientX, e.clientY); return; } }
+  const c = contactFromEl(t);
+  if(c){ ctxShow(contactMenuHtml(c.kind, c.x), e.clientX, e.clientY); return; }
+  const host = t.closest('#boardHost');
+  if(host && !cv.view){
+    const bel = t.closest('.bel[data-el]');
+    if(bel){ cv.sel = new Set([bel.dataset.el]); drawBoard(); }
+    const r = host.getBoundingClientRect(), b = cvBoard(), v = b ? b.viewport : {x:0, y:0, zoom:1};
+    ctxShow(boardMenuHtml(bel ? bel.dataset.el : null), e.clientX, e.clientY, {x:(e.clientX - r.left - v.x)/v.zoom, y:(e.clientY - r.top - v.y)/v.zoom});
+    return;
+  }
+  ctxShow(appMenuHtml(), e.clientX, e.clientY);
+});
+document.addEventListener('pointerdown', function(e){ const m = document.getElementById('appCtxMenu'); if(m && !m.contains(e.target)) ctxClose(); }, true);
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') ctxClose(); });
+window.addEventListener('blur', ctxClose);
+document.addEventListener('scroll', function(e){ if(!(e.target && e.target.closest && e.target.closest('.ctx-menu'))) ctxClose(); }, true);
+let journalRemoved = null;
+ACTIONS.undoJournalRemove = function(){ if(!journalRemoved) return; state.journal.entries.splice(Math.min(journalRemoved.i, state.journal.entries.length), 0, journalRemoved.e); journalRemoved = null; clearToasts(); persist('journal'); renderView(); };
+ACTIONS.ctx = function(el){
+  const op = el.dataset.op, a = el.dataset.a, b2 = el.dataset.b, at = ctxTarget;
+  ctxClose();
+  const go = function(v){ const n = document.querySelector('[data-action="nav"][data-view="'+v+'"]'); if(n) n.click(); else { ui.view = v; renderView(); } };
+  if(op==='add'){
+    if(a==='task') openAddTaskModal();
+    else if(a==='lead' || a==='client') openNewContactModal(a);
+    else if(a==='event') openCalEventModal();
+    else if(a==='journal'){ ui.view = 'personal'; ui.personalTab = 'journal'; ui.journalMode = 'entries'; renderView(); setTimeout(function(){ const ta = document.getElementById('journalPageText'); if(ta) ta.focus(); }, 30); }
+  }
+  else if(op==='lockin') openLockInChooser();
+  else if(op==='stop') openStopFocus();
+  else if(op==='break') openBreakNotePrompt();
+  else if(op==='recap') ACTIONS.openDayRecap();
+  else if(op==='wake') openWakeSetup();
+  else if(op==='go') go(a);
+  else if(op==='theme') setThemePref(a);
+  else if(op==='scene') setScene(a);
+  else if(op==='layout') ACTIONS.setCardLayout(null, null, a);
+  else if(op==='sidebar') toggleSidebar();
+  else if(op==='jPin') togglePinJournal(a);
+  else if(op==='jEdit') openJournalEditModal(a);
+  else if(op==='jStar'){ const e = state.journal.entries.find(function(x){ return x.id===a; }); if(e){ e.mood = e.mood==='starred' ? null : 'starred'; persist('journal'); renderView(); } }
+  else if(op==='jCopy'){ const e = state.journal.entries.find(function(x){ return x.id===a; }); if(e && navigator.clipboard) navigator.clipboard.writeText(e.text||'').then(function(){ showToast('Copied', {icon:'&#128203;', duration:1500}); }).catch(function(){}); }
+  else if(op==='jRemove'){
+    const i = state.journal.entries.findIndex(function(x){ return x.id===a; }); if(i<0) return;
+    journalRemoved = {i:i, e:state.journal.entries.splice(i, 1)[0]};
+    persist('journal'); renderView();
+    showToast('Entry removed', {icon:'&#128465;', actionLabel:'Undo', actionAction:'undoJournalRemove', duration:6000});
+  }
+  else if(op==='open'){ openContact(a, b2); }
+  else if(op==='touch'){ const p = a.split(':'); logTouch(p[0], p[1], b2); }
+  else if(op==='stage'){ const p = a.split(':'); setStage(p[0], p[1], b2); renderView(); }
+  else if(op==='bAdd'){ if(a==='note') addElement({type:'note', header:false, title:'', body:'Double-click to write', w:220, h:90}, at); else if(a==='label') addElement({type:'note', header:true, color:BOARD_COLORS[Math.floor(Math.random()*6)], title:'Category', body:'', w:240, h:56}, at); else addElement({type:'list', title:'List', color:'#3a3f4d', items:[{id:uid(), text:'First thing'}], w:240, h:100}, at); }
+  else if(op==='bBg'){ ui.boardBgOpen = true; renderView(); }
+  else if(op==='bFit') ACTIONS.boardFit();
+  else if(op==='bFull') ACTIONS.boardFullscreen({dataset:{kind:cv.kind}});
+  else if(op==='bDup') ACTIONS.boardDuplicate();
+  else if(op==='bFwd') ACTIONS.boardForward();
+  else if(op==='bBack') ACTIONS.boardBackward();
+  else if(op==='bDel') ACTIONS.boardDelete();
+  else if(typeof ctxExtra==='function') ctxExtra(op, a, b2);
+};
+ACTIONS.journalMenu = function(el, e, id){
+  const entry = state.journal.entries.find(function(x){ return x.id===id; }); if(!entry) return;
+  const r = el.getBoundingClientRect();
+  ctxShow(journalMenuHtml(entry), r.right - 220, r.bottom + 6);
+};
 // ============ INIT ============
 async function init(){
   state.profile = normalizeProfile(await loadKey('profile', defaultProfile()));

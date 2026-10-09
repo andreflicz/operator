@@ -114,6 +114,68 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.context().close();
   }
 
+  // ---- board backgrounds ----
+  {
+    const els=[{id:'e1', type:'note', header:false, title:'', body:'Hi', x:40, y:40, w:200, h:80},{id:'e4',type:'line',color:'#E7E9EE',width:2,arrow:true,x1:300,y1:60,x2:500,y2:120}];
+    const p = await newPage(b, OUT+'/r5.html', {profile:{name:'Andre'}, tasks, boards:{boards:[{id:'v1',kind:'vision',name:'Vision Board',parentId:null,elements:els,viewport:{x:0,y:0,zoom:1}}], masterId:'v1'}}, NOW);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await p.click('[data-action="nav"][data-view="personal"]'); await p.click('[data-action="personalTab"][data-tab="journal"]'); await p.click('[data-action="journalMode"][data-id="boards"]'); await p.waitForTimeout(250);
+    check('boards start on "Match theme" (dark in dark mode)', await p.evaluate(() => getComputedStyle(document.getElementById('boardHost')).backgroundColor)==='rgb(10, 12, 16)');
+    await p.click('[data-action="boardBgToggle"]'); await p.waitForTimeout(150);
+    check('the Background button opens a picker of looks + photo upload', (await p.$$('.board-bg-sw')).length>=10 && await p.isVisible('[data-action="boardBgUpload"]'));
+    await p.click('[data-action="boardSetBg"][data-id="paper"]'); await p.waitForTimeout(200);
+    const paper = await p.evaluate(() => { const h = document.getElementById('boardHost'); return {bg:getComputedStyle(h).backgroundColor, light:h.classList.contains('board-light'), card:getComputedStyle(h.querySelector('.bel-note')).backgroundColor, line:getComputedStyle(h.querySelector('.board-lines line')).stroke}; });
+    check('Paper: light background, white cards, dark lines', paper.bg==='rgb(246, 242, 233)' && paper.light && paper.card==='rgb(255, 255, 255)' && paper.line==='rgb(42, 47, 60)', paper);
+    check('…saved on the board', (await E("state.boards.boards[0].bg"))==='paper');
+    await p.click('[data-action="boardSetBg"][data-id="sunset"]'); await p.waitForTimeout(200);
+    check('gradients paint the still layer under the cards', /gradient/.test(await p.evaluate(() => document.querySelector('#boardHost > .board-bg').style.backgroundImage)));
+    await p.click('[data-action="nav"][data-view="today"]'); await p.waitForTimeout(250);
+    check('the vision board on Today shows its background too', /gradient/.test(await p.evaluate(() => (document.querySelector('.vision-panel-box .board-static')||{style:{}}).style.background||'')));
+    check('no errors', !p.errors.length, p.errors);
+    await p.context().close();
+  }
+
+  // ---- right-click everywhere ----
+  {
+    const p = await newPage(b, OUT+'/r5.html', {profile:{name:'Andre'}, tasks, journal:{entries:[{id:'j1',timestamp:NOW-3600e3,date:'2026-10-08',text:'Shot two reels.'},{id:'j2',timestamp:NOW-7200e3,date:'2026-10-08',text:'Batch edits tomorrow.'}]},
+      business:{packages:[], pipeline:[{id:'l1',company:'Peak Roofing',stage:'proposal',value:2000,createdAt:'2026-09-20',touchpoints:[]}], clients:[]}}, NOW);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await p.mouse.click(1200, 600, {button:'right'}); await p.waitForTimeout(100);
+    check('right-click on the page opens Operator\'s own menu', await p.isVisible('#appCtxMenu') && /Theme/.test(await p.textContent('#appCtxMenu')));
+    await p.click('#appCtxMenu [data-op="theme"][data-a="light"]'); await p.waitForTimeout(400);
+    check('…its theme switch works', await p.evaluate(() => document.documentElement.getAttribute('data-theme'))==='light' && !(await p.isVisible('#appCtxMenu')));
+    await p.mouse.click(1200, 600, {button:'right'}); await p.click('#appCtxMenu [data-op="scene"][data-a="space"]'); await p.waitForTimeout(250);
+    check('…and its scene switch', await p.evaluate(() => document.body.getAttribute('data-scene'))==='space');
+    await p.mouse.click(1200, 600, {button:'right'}); await p.click('#appCtxMenu [data-op="add"][data-a="task"]'); await p.waitForTimeout(150);
+    check('…quick add opens the new-task pop-up', await p.isVisible('#addTaskOverlay:not(.hidden)'));
+    await p.keyboard.press('Escape');
+    await p.click('#newTaskTitle', {button:'right'}).catch(()=>{});
+    check('text fields keep the normal menu', !(await p.isVisible('#appCtxMenu')));
+    await p.keyboard.press('Escape'); await p.keyboard.press('Escape');
+    // journal: no buttons on the entry, everything on right-click
+    await p.click('[data-action="nav"][data-view="personal"]'); await p.click('[data-action="personalTab"][data-tab="journal"]'); await p.waitForTimeout(200);
+    check('journal entries no longer show Pin / Edit / Remove buttons', (await p.$$('.journal-entry [data-action="togglePinJournal"], .journal-entry [data-action="openJournalEditModal"], .journal-entry [data-action="armDelete"]')).length===0);
+    await p.click('.journal-entry[data-journal-id="j2"] .journal-text', {button:'right'}); await p.waitForTimeout(100);
+    await p.click('#appCtxMenu [data-op="jPin"]'); await p.waitForTimeout(150);
+    check('right-click → Pin pins the entry', (await E("state.journal.entries.find(e=>e.id==='j2').pinned"))===true);
+    await p.click('.journal-entry[data-journal-id="j1"] .journal-text', {button:'right'}); await p.click('#appCtxMenu [data-op="jRemove"]'); await p.waitForTimeout(150);
+    check('right-click → Remove removes it…', (await E("state.journal.entries.length"))===1);
+    await E("ACTIONS.undoJournalRemove()"); await p.waitForTimeout(100);
+    check('…with Undo', (await E("state.journal.entries.length"))===2);
+    await p.click('.journal-entry[data-journal-id="j1"] .journal-text', {button:'right'}); await p.click('#appCtxMenu [data-op="jEdit"]'); await p.waitForTimeout(150);
+    check('right-click → Edit opens the editor', await p.isVisible('#journalEditOverlay:not(.hidden)'));
+    await p.keyboard.press('Escape');
+    // leads
+    await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="leads"]'); await p.waitForTimeout(200);
+    await p.click('.crm-card .crm-card-name', {button:'right'}); await p.waitForTimeout(100);
+    await p.click('#appCtxMenu [data-op="touch"][data-b="call"]'); await p.waitForTimeout(150);
+    check('right-click a lead → log a call', (await E("state.business.pipeline[0].touchpoints.length"))===1 && (await E("state.business.pipeline[0].touchpoints[0].type"))==='call');
+    await p.click('.crm-card .crm-card-name', {button:'right'}); await p.click('#appCtxMenu [data-op="stage"][data-b="discovery"]').catch(()=>{}); await p.waitForTimeout(150);
+    check('…or move it to another stage', (await E("state.business.pipeline[0].stage"))==='discovery');
+    check('no errors', !p.errors.length, p.errors);
+    await p.context().close();
+  }
+
   await b.close();
   process.exit(report() ? 1 : 0);
 })();

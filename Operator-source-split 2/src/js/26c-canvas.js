@@ -93,7 +93,9 @@ function renderBoardShell(kind){
         (path[0] && masterVisionBoard() && path[0].id===masterVisionBoard().id ? '<span class="board-master-tag" title="Shows on Today and on the wake-up screen">&#9733; Vision board</span>'
           : (!b.parentId && !view ? '<button class="board-tool" data-action="boardMakeMaster" title="Make this the board you wake up to">&#9734; Make it my vision board</button>' : ''))+
       '</div>'+
-      '<div class="row" style="gap:6px;">'+
+      '<div class="row" style="gap:6px;position:relative;">'+
+        tool('boardBgToggle', '&#127912; Background', 'Change this board\'s background', ui.boardBgOpen ? ' data-on="1"' : '')+
+        (ui.boardBgOpen ? boardBgPickerHtml(b) : '')+
         tool('boardToggleView', view?'&#9998; Edit':'&#128065; View', view?'Back to editing':'View mode — hide the editing tools')+
         tool('boardFullscreen', full?'&#10530; Exit full screen':'&#9974; Full screen', full?'Exit full screen (Esc)':'Full screen')+
       '</div>'+
@@ -203,6 +205,7 @@ function elHtml(el, single){
 }
 function drawBoard(){
   const b = cvBoard(); if(!b || !cv.els) return;
+  applyBoardBg(cv.host, b);
   applyViewport();
   cv.host.classList.toggle('is-view', cv.view);
   const els = b.elements.slice().sort(function(a,b2){ return (a.z||0)-(b2.z||0); });
@@ -679,7 +682,7 @@ function boardStaticHtml(b, cls){
   const body = els.filter(function(e){ return e.type!=='line'; }).map(function(e){ return elHtml(shift(e), false); }).join('').replace(/ data-(el|key|handle|field)="[^"]*"/g, '');
   cv.sel = savedSel;
   const lines = els.filter(function(e){ return e.type==='line'; }).map(function(e){ const c = shift(e); return '<line x1="'+c.x1+'" y1="'+c.y1+'" x2="'+c.x2+'" y2="'+c.y2+'" stroke="'+(c.color||'#8A90A2')+'" stroke-width="'+(c.width||2)+'" stroke-linecap="round"'+(c.arrow?' marker-end="url(#bArrowS)"':'')+'/>'; }).join('');
-  return '<div class="board-static '+(cls||'')+'" data-bw="'+bb.w+'" data-bh="'+bb.h+'">'+
+  return '<div class="board-static '+(cls||'')+(boardIsLight(b)?' board-light':'')+'" style="'+boardBgStyle(b)+'" data-bw="'+bb.w+'" data-bh="'+bb.h+'">'+
     '<div class="board-static-world" style="width:'+bb.w+'px;height:'+bb.h+'px;">'+
       '<svg class="board-lines" width="'+bb.w+'" height="'+bb.h+'"><defs><marker id="bArrowS" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/></marker></defs>'+lines+'</svg>'+
       body+

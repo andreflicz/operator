@@ -41,6 +41,7 @@
   "26b-wishlist.js",
   "26c-canvas.js",
   "26d-milanote-import.js",
+  "26e-board-bg.js",
   "27-finances.js",
   "28-business.js",
   "28b-crm.js",
@@ -55,5 +56,6 @@
   "32c-scenes.js",
   "33-event-delegation.js",
   "33b-overlay-dismiss.js",
+  "33c-context-menu.js",
   "34-init.js"
 ]

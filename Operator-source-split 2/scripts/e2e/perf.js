@@ -76,7 +76,7 @@ function heavySeed(){
     ['select calendar day', '.cal-cell[data-action="selectCalDay"]'],
     ['nav Personal', '[data-action="nav"][data-view="personal"]'],
     ['tab Journal', '[data-action="personalTab"][data-tab="journal"]'],
-    ['pin journal entry', '[data-action="togglePinJournal"]'],
+    ['journal menu', '[data-action="journalMenu"]'],
     ['nav Settings', '[data-action="nav"][data-view="settings"]'],
     ['nav Today (again)', '[data-action="nav"][data-view="today"]'],
   ];

@@ -6,18 +6,15 @@ function journalEntryRow(e){
   const mood = e.mood ? moodById(e.mood) : null;
   const isStarred = e.mood==='starred';
   const photos = arr(e.photos);
-  return '<div class="journal-entry'+(isStarred?' journal-entry-starred':'')+'" style="'+(mood && !isStarred?'border-left:4px solid '+mood.color+';':'')+'">'+
+  // pin / edit / remove live in the right-click menu (or the ⋯ that shows on hover)
+  return '<div class="journal-entry'+(isStarred?' journal-entry-starred':'')+'" data-journal-id="'+e.id+'" style="'+(mood && !isStarred?'border-left:4px solid '+mood.color+';':'')+'">'+
     '<div class="row" style="justify-content:space-between;">'+
-      '<div class="kpi-sub">'+(mood?mood.emoji+' ':'')+fmtTimeShort(e.timestamp)+'</div>'+
-      '<div class="row">'+
-        '<button class="btn btn-ghost btn-sm" data-action="togglePinJournal" data-id="'+e.id+'">'+(e.pinned?'\u2605 Pinned':'\u2606 Pin')+'</button>'+
-        '<button class="btn btn-ghost btn-sm" data-action="openJournalEditModal" data-id="'+e.id+'">Edit</button>'+
-      '</div>'+
+      '<div class="kpi-sub">'+(mood?mood.emoji+' ':'')+fmtTimeShort(e.timestamp)+(e.pinned?' <span class="je-pin" title="Pinned">&#9733;</span>':'')+'</div>'+
+      '<button class="je-more" data-action="journalMenu" data-id="'+e.id+'" title="Pin, edit, remove (or right-click the entry)">&#8943;</button>'+
     '</div>'+
     '<div class="journal-text">'+escapeHtml(shown)+'</div>'+
     (photos.length ? '<div class="row" style="margin-bottom:8px;flex-wrap:wrap;">'+photos.map(function(src, idx){ return '<img src="'+escapeHtml(blobUrl(src))+'" class="journal-photo-thumb" data-action="viewJournalPhoto" data-id="'+e.id+'" data-idx="'+idx+'">'; }).join('')+'</div>' : '')+
     (isLong ? '<button class="btn btn-ghost btn-sm" data-action="toggleJournalExpand" data-id="'+e.id+'">'+(expanded?'Show Less':'Read More')+'</button>' : '')+
-    deleteBtn('journal', e.id)+
   '</div>';
 }
 // One-time cleanup: older journal photos were stored as giant text strings inside the journal
