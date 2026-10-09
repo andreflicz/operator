@@ -417,6 +417,7 @@ function normalizeSettings(s){
   if(!s.quickLinks.driveUrl) s.quickLinks.driveUrl='https://drive.google.com';
   if(!s.quickLinks.lastAiUsed) s.quickLinks.lastAiUsed='chatgpt';
   if(!s.quickLinks.icons || typeof s.quickLinks.icons!=='object') s.quickLinks.icons={};
+  if(!s.weather || typeof s.weather!=='object') s.weather={};
   if(!s.appTracking || typeof s.appTracking!=='object') s.appTracking={};
   if(s.appTracking.enabled===undefined) s.appTracking.enabled=true;
   if(s.appTracking.autoLockIn===undefined) s.appTracking.autoLockIn=true;

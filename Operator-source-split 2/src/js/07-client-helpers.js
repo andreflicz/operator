@@ -65,7 +65,7 @@ function clientTagHtml(val){
   if(String(val).indexOf('lead:')===0){
     const lp = arr(state.business && state.business.pipeline).find(function(x){ return x.id===String(val).slice(5); });
     if(lp && lp.convertedClientId) return clientTagHtml(lp.convertedClientId);
-    return '<span class="tag" style="background:rgba(232,162,61,.16);color:#E8A23D;">'+escapeHtml(clientLabel(val))+' (Lead)</span>';
+    return '<span class="tag" style="background:rgba(232,162,61,.16);color:var(--warn-text);">'+escapeHtml(clientLabel(val))+' (Lead)</span>';
   }
   return '<span class="tag tag-client">'+escapeHtml(clientLabel(val))+'</span>';
 }

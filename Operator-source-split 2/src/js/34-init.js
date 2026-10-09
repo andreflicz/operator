@@ -29,6 +29,8 @@ async function init(){
   document.getElementById('loading').style.display='none';
   document.getElementById('app').style.display='flex';
   renderView();
+  sceneMount();
+  setTimeout(function(){ refreshWeather(false); }, 1500);
   startClocks();
   startFocusTicker();
   startModeTicker();

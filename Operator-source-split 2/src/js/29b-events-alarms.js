@@ -299,14 +299,14 @@ function renderSleepView(){
   return '<div class="view-header today-header"><div><div class="view-title">Sleep mode<span class="sleepy-dots" aria-hidden="true"></span></div><div class="view-sub" id="liveClock"></div></div></div>'+
   '<div class="day-off-wrap"><div class="card day-off-card sleep-card">'+
     '<div class="sleep-moon">&#127769;</div>'+
-    '<div class="hero-num" id="modeElapsed" style="color:#c9d3ff;">'+formatElapsed(Date.now()-active.startedAt)+'</div>'+
-    '<div class="hero-label" style="color:#9AA0AC;">resting &middot; auto lock-in paused</div>'+
+    '<div class="hero-num" id="modeElapsed" style="color:var(--night-text);">'+formatElapsed(Date.now()-active.startedAt)+'</div>'+
+    '<div class="hero-label" style="color:var(--text-dim);">resting &middot; auto lock-in paused</div>'+
     '<div class="sleep-grid">'+
       '<button class="sleep-tile sleep-tile-btn" data-action="openWakeSetup"><div class="kpi-label">Wake-up</div>'+(nw ? '<div class="sleep-tile-val">'+fmt12Hour(nw.time)+'</div><div class="kpi-sub">'+morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts)+'</div>' : '<div class="sleep-tile-val">Not set</div><div class="kpi-sub">Tap to set it</div>')+'</button>'+
       '<button class="sleep-tile sleep-tile-btn" data-action="openNightPlan"><div class="kpi-label">'+(np?'Plan for '+morningLabel(np.date):'Tomorrow\'s plan')+'</div>'+(np ? '<div class="sleep-tile-val">'+npTasks.length+' task'+(npTasks.length===1?'':'s')+'</div><div class="kpi-sub">'+(np.note?escapeHtml(np.note.slice(0,70))+(np.note.length>70?'…':''):'no note')+'</div>' : '<div class="sleep-tile-val">Not planned</div><div class="kpi-sub">Tap to plan</div>')+'</button>'+
     '</div>'+
     '<div class="row" style="justify-content:center;margin-top:16px;gap:10px;">'+
-      '<button class="btn" style="border-color:#9AA0AC;color:#fff;" data-action="endMode">I\'m up</button>'+
+      '<button class="btn" style="border-color:var(--border-strong);color:var(--text);" data-action="endMode">I\'m up</button>'+
     '</div>'+
   '</div></div>';
 }

@@ -148,8 +148,8 @@ function renderRecap(){
     '</div>'+
     recapTimelineHtml(date, sessions)+
     ((workMin || otherMin) ? '<div class="rc-split"><div class="rc-split-bar"><span style="width:'+(workMin/Math.max(1,workMin+otherMin)*100)+'%"></span></div>'+
-      '<div class="kpi-sub"><b style="color:var(--good);">'+fmtDurationLabel(workMin)+'</b> on work apps &middot; <b style="color:#ffb3b8;">'+fmtDurationLabel(otherMin)+'</b> on everything else'+(breaks.length?' &middot; '+breaks.length+' break'+(breaks.length===1?'':'s'):'')+
-        (distractionMinutesFor(date) ? ' &middot; <b style="color:#ffb3b8;">'+fmtDurationLabel(distractionMinutesFor(date))+'</b> on not-work sites while locked in (not counted)' : '')+'</div></div>' : '')+
+      '<div class="kpi-sub"><b style="color:var(--good);">'+fmtDurationLabel(workMin)+'</b> on work apps &middot; <b style="color:var(--danger-text);">'+fmtDurationLabel(otherMin)+'</b> on everything else'+(breaks.length?' &middot; '+breaks.length+' break'+(breaks.length===1?'':'s'):'')+
+        (distractionMinutesFor(date) ? ' &middot; <b style="color:var(--danger-text);">'+fmtDurationLabel(distractionMinutesFor(date))+'</b> on not-work sites while locked in (not counted)' : '')+'</div></div>' : '')+
     (apps.length ? '<div class="rc-apps">'+apps.slice(0, 6).map(function(a){ const c = activityCategory(a.app); return '<span class="rc-app"><span class="wa-dot" style="background:'+CAT_META[c].color+'"></span>'+escapeHtml(a.app)+'<span class="kpi-sub">'+fmtDurationLabel(a.minutes)+'</span></span>'; }).join('')+'</div>' : '')+
     '<div class="kind-label" style="margin-top:16px;">Sessions'+(pending?' &middot; '+pending+' started automatically to check':'')+'</div>'+
     (sessions.length ? '<div class="rc-sessions">'+sessions.map(function(s){

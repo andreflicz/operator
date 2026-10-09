@@ -90,7 +90,7 @@ function startModeTicker(){
     const active = state.modes.active;
     if(!active) return;
     const el = document.getElementById('modeElapsed');
-    if(el) el.textContent = formatElapsed(Date.now()-active.startedAt);
+    if(el) setTimerText(el, Date.now()-active.startedAt);
   }, 1000);
 }
 function tickLiveDeepWork(){
@@ -121,10 +121,7 @@ function startFocusTicker(){
       return;
     }
     const el = document.getElementById('focusElapsed');
-    if(el){
-      const ms = Date.now() - as.startedAt;
-      el.textContent = formatElapsed(ms);
-    }
+    if(el) setTimerText(el, Date.now() - as.startedAt);
     if(as.plannedMinutes){
       const ms = Date.now() - as.startedAt;
       const pct = clamp(Math.round((ms/60000/as.plannedMinutes)*100),0,100);

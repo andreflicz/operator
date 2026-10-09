@@ -9,12 +9,12 @@ function renderFinances(){
   const thisMonthTotal = thisMonthIncome + thisMonthInvoiced;
   const pct = clamp(Math.round((thisMonthTotal/(state.profile.revenueGoalMonthly||1))*100),0,100);
   return '<div class="grid grid-3 section">'+
-    '<div class="card" style="min-height:128px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">Total Debt</div><div class="kpi-value" style="color:#E8636B;">$'+totalDebt.toLocaleString()+'</div></div>'+
+    '<div class="card" style="min-height:128px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">Total Debt</div><div class="kpi-value" style="color:var(--danger);">$'+totalDebt.toLocaleString()+'</div></div>'+
     '<div class="card" style="min-height:128px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">This Month</div><div class="kpi-value">$'+thisMonthTotal.toLocaleString()+'</div>'+
       '<div class="progress" style="margin-top:8px;"><div class="progress-bar" style="width:'+pct+'%;background:'+goalColor()+';'+goalGlowStyle(pct)+'"></div></div>'+
       '<div class="kpi-sub">of $'+(state.profile.revenueGoalMonthly||0).toLocaleString()+' goal &middot; includes $'+thisMonthInvoiced.toLocaleString()+' invoiced to clients</div>'+
     '</div>'+
-    '<div class="card" style="min-height:128px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">Paid Off So Far</div><div class="kpi-value" style="color:#3FBE8E;">$'+(totalOriginal-totalDebt).toLocaleString()+'</div></div>'+
+    '<div class="card" style="min-height:128px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">Paid Off So Far</div><div class="kpi-value" style="color:var(--good);">$'+(totalOriginal-totalDebt).toLocaleString()+'</div></div>'+
   '</div>'+
   '<div class="grid grid-2 section" style="align-items:start;">'+
   '<div class="section" style="margin-bottom:0;"><div class="section-title">Debts<button class="btn btn-sm" data-action="toggleForm" data-form="debt">'+(ui.forms.debt?'Close':'+ Add Debt')+'</button></div>'+
@@ -228,7 +228,7 @@ function incomeRow(i){
       deleteBtn('income', i.id)+
     '</div>'+
     '<div class="row" style="justify-content:space-between;align-items:center;margin-top:8px;">'+
-      '<span class="kpi-value" style="font-size:18px;color:#3FBE8E;">$'+Number(i.amount).toLocaleString()+'</span>'+
+      '<span class="kpi-value" style="font-size:18px;color:var(--good);">$'+Number(i.amount).toLocaleString()+'</span>'+
     '</div>'+
   '</div>';
 }

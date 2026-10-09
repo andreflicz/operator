@@ -14,10 +14,10 @@ function renderOffTimeView(){
   return '<div class="view-header today-header"><div>'+businessNameTagHtml()+'<div class="view-title">Off the clock.</div><div class="view-sub" id="liveClock"></div></div></div>'+
   '<div class="day-off-wrap"><div class="card day-off-card offtime-card">'+
     '<div style="font-size:40px;">&#127937;</div>'+
-    '<div class="hero-num" id="modeElapsed" style="color:#fff;">'+formatElapsed(elapsed)+'</div>'+
-    '<div class="hero-label" style="color:#9AA0AC;">off-time'+(active.note?' — '+escapeHtml(active.note):'')+'</div>'+
+    '<div class="hero-num" id="modeElapsed" style="color:var(--strong);">'+formatElapsed(elapsed)+'</div>'+
+    '<div class="hero-label" style="color:var(--text-dim);">off-time'+(active.note?' — '+escapeHtml(active.note):'')+'</div>'+
     '<div style="max-width:380px;margin:16px 0 6px;font-size:14.5px;color:var(--text-dim);line-height:1.5;">The work day is done. Nothing else is tracked while you’re off — enjoy it.</div>'+
-    '<button class="btn" style="border-color:#9AA0AC;color:#fff;margin-top:10px;" data-action="endMode">End Off-Time</button>'+
+    '<button class="btn" style="border-color:var(--border-strong);color:var(--text);margin-top:10px;" data-action="endMode">End Off-Time</button>'+
   '</div></div>';
 }
 function focusKnockOutRow(t){
@@ -106,7 +106,7 @@ function renderTodayFocusMode(p){
     '<div class="section" style="max-width:640px;margin:0 auto;"><div class="section-title" style="justify-content:center;">Today on the Calendar</div><div class="card"><div class="task-list">'+
       todayNotices.map(function(n){
         return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="'+n.kind+'" data-id="'+n.id+'">'+
-          (n.kind==='deadline' ? '<span class="tag" style="background:var(--danger-dim);color:#ffb3b8;">Deadline</span>' : '<span class="tag" style="background:'+n.color+'22;color:'+n.color+';">'+(n.time?fmt12Hour(n.time):'Event')+'</span>')+
+          (n.kind==='deadline' ? '<span class="tag" style="background:var(--danger-dim);color:var(--danger-text);">Deadline</span>' : '<span class="tag" style="background:'+n.color+'22;color:'+n.color+';">'+(n.time?fmt12Hour(n.time):'Event')+'</span>')+
           '<div class="task-title" style="flex:1;">'+escapeHtml(n.label)+'</div>'+
         '</div>';
       }).join('')+

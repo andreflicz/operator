@@ -3,7 +3,15 @@ function formatElapsed(ms){
   ms = Math.max(0, ms);
   const totalSec = Math.floor(ms/1000);
   const h = Math.floor(totalSec/3600), m = Math.floor((totalSec%3600)/60), s = totalSec%60;
-  return (h>0?pad2(h)+':':'')+pad2(m)+':'+pad2(s);
+  return (h>0?h+':':'')+pad2(m)+':'+pad2(s);
+}
+// Timers past an hour get one more group of digits — the class lets the clock shrink to fit its card.
+function hoursCls(ms){ return ms>=3600000 ? ' has-hours' : ''; }
+function setTimerText(el, ms){
+  const t = formatElapsed(ms);
+  if(el.textContent!==t) el.textContent = t;
+  const long = ms>=3600000;
+  if(el.classList.contains('has-hours')!==long) el.classList.toggle('has-hours', long);
 }
 function computeTimeOfDayBuckets(){
   const buckets = [
@@ -78,7 +86,7 @@ function renderActiveFocusHero(big){
   if(onBreak){
     const breakInfo = active.breaks[active.breaks.length-1];
     timerCardInner = '<div class="kpi-label" style="color:var(--info);">'+modeIcon('break')+' ON BREAK</div>'+
-      '<div class="hero-num '+sizeClass+'" id="modeElapsed" style="color:var(--info);">'+formatElapsed(Date.now()-(active.breakStartedAt||Date.now()))+'</div>'+
+      '<div class="hero-num '+sizeClass+hoursCls(Date.now()-(active.breakStartedAt||Date.now()))+'" id="modeElapsed" style="color:var(--info);">'+formatElapsed(Date.now()-(active.breakStartedAt||Date.now()))+'</div>'+
       (breakInfo&&breakInfo.note ? '<div class="kpi-sub">'+escapeHtml(breakInfo.note)+'</div>' : '')+
       (active.breakEndsAt ? '<div class="break-remaining" id="breakRemaining">'+formatElapsed(Math.max(0, active.breakEndsAt-Date.now()))+' left</div>' : '')+
       '<div class="row" style="justify-content:center;gap:6px;margin-top:10px;">'+
@@ -89,7 +97,7 @@ function renderActiveFocusHero(big){
     const dwTarget = state.standards.deepWorkTargetMinutes || 180;
     const liveToday = deepWorkMinutesTodayLive();
     const openPct = clamp(Math.round((liveToday/dwTarget)*100),0,100);
-    timerCardInner = '<div class="hero-num '+sizeClass+'" id="focusElapsed">'+formatElapsed(elapsed)+'</div>'+
+    timerCardInner = '<div class="hero-num '+sizeClass+hoursCls(elapsed)+'" id="focusElapsed">'+formatElapsed(elapsed)+'</div>'+
       '<div class="progress"><div class="progress-bar'+(openPct>=100?' good':'')+'" id="focusProgressBar" style="width:'+openPct+'%"></div></div>'+
       '<div class="kpi-sub">Open-ended &middot; '+fmtDurationLabel(liveToday)+' of '+fmtDurationLabel(dwTarget)+' today\'s goal</div>'+
       '<div class="row" style="margin-top:8px;justify-content:center;">'+
@@ -564,7 +572,7 @@ function renderStopFocusModal(){
     '</div>'+
     '<div class="section-title" style="margin-top:18px;margin-bottom:8px;">Remaining Tasks for Today</div>'+
     (todayTasksRemaining.length ? '<div class="task-list">'+todayTasksRemaining.map(function(t){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(t.title)+'</div></div>'; }).join('')+'</div>' : '<div class="empty">Nothing left on today\'s list.</div>')+
-    (upcomingDeadlines.length ? '<div class="kind-label">Upcoming Deadlines</div><div class="task-list">'+upcomingDeadlines.map(function(t){ return '<div class="task-item-v2"><span class="tag" style="background:var(--danger-dim);color:#ffb3b8;">'+fmtDateShort(t.deadline)+'</span><div class="task-title" style="flex:1;">'+escapeHtml(t.title)+'</div></div>'; }).join('')+'</div>' : '')+
+    (upcomingDeadlines.length ? '<div class="kind-label">Upcoming Deadlines</div><div class="task-list">'+upcomingDeadlines.map(function(t){ return '<div class="task-item-v2"><span class="tag" style="background:var(--danger-dim);color:var(--danger-text);">'+fmtDateShort(t.deadline)+'</span><div class="task-title" style="flex:1;">'+escapeHtml(t.title)+'</div></div>'; }).join('')+'</div>' : '')+
     '<div class="kpi-sub" style="margin-top:10px;">'+backlogCount+' more item'+(backlogCount===1?'':'s')+' waiting in your backlog.</div>'+
     '<div class="section-title" style="margin-top:18px;margin-bottom:8px;">Finished This Session</div>'+
     (completed.length ? '<div class="task-list">'+completed.map(function(t){ return '<div class="task-item-v2" style="border-color:var(--good);"><div class="task-title" style="color:var(--good);">&#10003; '+escapeHtml(t.title)+'</div></div>'; }).join('')+'</div>' : '<div class="empty">Nothing marked complete yet — still time to knock one out before you stop.</div>')+

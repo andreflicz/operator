@@ -5,6 +5,8 @@
   "02c-registry.js",
   "02d-blob-store.js",
   "02e-tips.js",
+  "02f-sun-theme.js",
+  "02g-weather.js",
   "03-scroll-picker.js",
   "04-defaults.js",
   "05-state-normalization.js",
@@ -49,6 +51,7 @@
   "31-nav-render-dispatch.js",
   "32-clock-timer-alarms.js",
   "32b-wake.js",
+  "32c-scenes.js",
   "33-event-delegation.js",
   "33b-overlay-dismiss.js",
   "34-init.js"

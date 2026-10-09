@@ -1,1 +1,8 @@
+<script>
+(function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
+if(t==='auto'){var d=new Date(),m=d.getHours()*60+d.getMinutes(),k=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),
+c=JSON.parse(localStorage.getItem('opsdash:sunCache')||'null'),hm=function(x,f){x=String(x||f).split(':');return (+x[0]||0)*60+(+x[1]||0);},
+r=hm(p.dayStart,'07:00'),s=hm(p.nightStart,'19:00');if(c&&c.date===k){r=c.rise;s=c.set;}t=(m>=r&&m<s)?'light':'dark';}
+document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){}})();
+</script>
 </head>

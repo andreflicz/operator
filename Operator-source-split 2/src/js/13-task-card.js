@@ -41,7 +41,7 @@ function taskCard(t){
     '<div class="row" style="justify-content:space-between;">'+(ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+(t.isVideoIdea?'':priorityTag(t.priority))+(isCurrent?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">'+currentTaskLabel()+'</span>':'')+(isStaged?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">&#128204; Up Next</span>':'')+(t.ongoing?'<span class="tag tag-ongoing">&#128204; Ongoing</span>':'')+(doneToday?'<span class="tag tag-good">&#10003; Done today</span>':'')+'</div>'+
     '<div class="task-card-title">'+escapeHtml(t.title)+'</div>'+
     (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
-    (t.isVideoIdea && t.videoType ? '<div style="margin-top:2px;"><span class="tag" style="background:rgba(255,255,255,.1);color:#fff;">'+escapeHtml((taskVideoTypeById(t.videoType)||{}).label||'')+'</span></div>' : '')+
+    (t.isVideoIdea && t.videoType ? '<div style="margin-top:2px;"><span class="tag" style="background:rgba(var(--ink),.1);color:var(--text);">'+escapeHtml((taskVideoTypeById(t.videoType)||{}).label||'')+'</span></div>' : '')+
     (cat ? '<div style="margin-top:4px;">'+taskCategoryTagHtml(t)+'</div>' : '')+
     (t.ongoing ? '<div class="ongoing-days-pill" style="align-self:flex-start;">'+daysInProgress(t)+' day'+(daysInProgress(t)===1?'':'s')+' in progress</div>' : '')+
     '<div class="row" style="justify-content:space-between;margin-top:auto;padding-top:6px;">'+

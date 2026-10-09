@@ -139,7 +139,7 @@ function weekStackChart(days, selected){
   const stepH = max>480 ? 120 : 60;
   for(let m=stepH; m<=max; m+=stepH){
     const y = h-padB-(h-padB-padT)*(m/max);
-    out += '<line x1="0" x2="'+w+'" y1="'+y.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="#1e222d" stroke-dasharray="3 4"/><text x="'+(w-2)+'" y="'+(y-3).toFixed(1)+'" font-size="9" fill="#4E5568" text-anchor="end">'+(m/60)+'h</text>';
+    out += '<line x1="0" x2="'+w+'" y1="'+y.toFixed(1)+'" y2="'+y.toFixed(1)+'" style="stroke:var(--chart-grid)" stroke-dasharray="3 4"/><text x="'+(w-2)+'" y="'+(y-3).toFixed(1)+'" font-size="9" style="fill:var(--text-faint)" text-anchor="end">'+(m/60)+'h</text>';
   }
   days.forEach(function(d, i){
     const t = totals[i];
@@ -158,10 +158,10 @@ function weekStackChart(days, selected){
     out += '<g class="wk-bar'+(isSel?' is-selected':'')+(t?'':' is-future')+'" data-action="analyticsPickDay" data-id="'+d+'">'+
       '<title>'+weekdayShort(d)+' '+fmtDateShort(d)+(t?' — '+fmtDurationLabel(t.total)+' ('+TIME_TYPES.map(function(tt){ return tt.label+' '+fmtDurationLabel(t[tt.id]); }).join(', ')+')':'')+'</title>'+
       '<rect x="'+(i*gap+2).toFixed(1)+'" y="0" width="'+(gap-4).toFixed(1)+'" height="'+h+'" fill="'+(isSel?'rgba(232,162,61,.08)':'transparent')+'" rx="6"/>'+
-      (t && !t.total ? '<rect x="'+x.toFixed(1)+'" y="'+(h-padB-2)+'" width="'+barW.toFixed(1)+'" height="2" fill="#262B38"/>' : '')+
+      (t && !t.total ? '<rect x="'+x.toFixed(1)+'" y="'+(h-padB-2)+'" width="'+barW.toFixed(1)+'" height="2" style="fill:var(--border)"/>' : '')+
       segs+
-      '<text x="'+(x+barW/2).toFixed(1)+'" y="'+(h-10)+'" font-size="11" fill="'+(isSel?'#E7E9EE':'#8A90A2')+'" text-anchor="middle" font-weight="'+(isSel?'700':'500')+'">'+weekdayShort(d).slice(0,3)+'</text>'+
-      (t && t.total ? '<text x="'+(x+barW/2).toFixed(1)+'" y="'+(y-4).toFixed(1)+'" font-size="9.5" fill="#8A90A2" text-anchor="middle">'+fmtDurationLabel(t.total)+'</text>' : '')+
+      '<text x="'+(x+barW/2).toFixed(1)+'" y="'+(h-10)+'" font-size="11" style="fill:'+(isSel?'var(--text)':'var(--text-dim)')+'" text-anchor="middle" font-weight="'+(isSel?'700':'500')+'">'+weekdayShort(d).slice(0,3)+'</text>'+
+      (t && t.total ? '<text x="'+(x+barW/2).toFixed(1)+'" y="'+(y-4).toFixed(1)+'" font-size="9.5" style="fill:var(--text-dim)" text-anchor="middle">'+fmtDurationLabel(t.total)+'</text>' : '')+
     '</g>';
   });
   return '<svg viewBox="0 0 '+w+' '+h+'" class="chart-svg wk-chart">'+out+'</svg>';
@@ -318,6 +318,6 @@ function renderTaskStatsSection(){
       '<div class="card" style="text-align:center;"><div class="kpi-label">Completed All-Time</div><div class="kpi-value">'+doneAll.length+'</div></div>'+
       '<div class="card" style="text-align:center;"><div class="kpi-label">Completed Last 7 Days</div><div class="kpi-value">'+doneLast7.length+'</div></div>'+
       '<div class="card" style="text-align:center;"><div class="kpi-label">Open High Priority</div><div class="kpi-value" style="color:var(--danger);">'+openHigh+'</div></div>'+
-      '<div class="card" style="text-align:center;"><div class="kpi-label">Ongoing Tasks</div><div class="kpi-value" style="color:#8fdcff;">'+ongoingCount+'</div></div>'+
+      '<div class="card" style="text-align:center;"><div class="kpi-label">Ongoing Tasks</div><div class="kpi-value" style="color:var(--info);">'+ongoingCount+'</div></div>'+
     '</div></div>';
 }

@@ -11,11 +11,12 @@ function renderTodayHero(greeting){
   lastRenderedStreak = streak;
   const allDone = dayStandardsComplete(todayStr());
   const evening = isWindDownTime();
-  return '<div class="today-hero" data-key="today-hero">'+
+  const sky = state.profile.skyChip===false ? '' : ' data-sky="'+skyPhase()+'" data-wx="'+(wxNow() ? wxKind(wxNow().code) : 'clear')+'"';
+  return '<div class="today-hero"'+sky+' data-key="today-hero">'+
     '<div class="th-left">'+
       businessNameTagHtml()+
       '<div class="th-greet">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
-      (p.bigClockOnToday ? '<div id="liveClockBig" class="cal-big-clock th-bigclock"></div>' : '<div class="th-sub" id="liveClock"></div>')+
+      (p.bigClockOnToday ? '<div id="liveClockBig" class="cal-big-clock th-bigclock"></div>'+skyChipHtml() : '<div class="th-subrow"><div class="th-sub" id="liveClock"></div>'+skyChipHtml()+'</div>')+
       '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: streak===0 ? 'Hit today\'s standard to start one' : (allDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Hit today\'s standard to keep it')})+'</div>'+
     '</div>'+
     '<div class="th-right">'+

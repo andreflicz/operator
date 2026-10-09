@@ -13,7 +13,7 @@ function svgBarChart(values, labels, opts){
     const y = h-padB-barH;
     bars += '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+barW.toFixed(1)+'" height="'+barH.toFixed(1)+'" rx="3" fill="'+(v>0?'#E8A23D':'#1e222d')+'"/>';
     if(i%2===0 || n<=8){
-      labelsSvg += '<text x="'+(x+barW/2).toFixed(1)+'" y="'+(h-6)+'" font-size="8" fill="#4E5568" text-anchor="middle">'+labels[i]+'</text>';
+      labelsSvg += '<text x="'+(x+barW/2).toFixed(1)+'" y="'+(h-6)+'" font-size="8" style="fill:var(--text-faint)" text-anchor="middle">'+labels[i]+'</text>';
     }
   });
   return '<svg viewBox="0 0 '+w+' '+h+'" class="chart-svg" preserveAspectRatio="none">'+bars+labelsSvg+'</svg>';
@@ -41,10 +41,10 @@ function svgRing(pct, size, color, label, sublabel){
   const circumference = 2*Math.PI*r;
   const dash = circumference * pct/100;
   return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'">'+
-    '<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="#1e222d" stroke-width="10"/>'+
+    '<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" style="stroke:var(--chart-grid)" stroke-width="10"/>'+
     '<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+dash.toFixed(1)+' '+circumference.toFixed(1)+'" transform="rotate(-90 '+c+' '+c+')"/>'+
-    '<text x="'+c+'" y="'+(c-2)+'" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="18" font-weight="700" fill="#E7E9EE">'+escapeHtml(label)+'</text>'+
-    (sublabel?'<text x="'+c+'" y="'+(c+16)+'" text-anchor="middle" font-size="9" fill="#8A90A2">'+escapeHtml(sublabel)+'</text>':'')+
+    '<text x="'+c+'" y="'+(c-2)+'" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="18" font-weight="700" style="fill:var(--text)">'+escapeHtml(label)+'</text>'+
+    (sublabel?'<text x="'+c+'" y="'+(c+16)+'" text-anchor="middle" font-size="9" style="fill:var(--text-dim)">'+escapeHtml(sublabel)+'</text>':'')+
   '</svg>';
 }
 

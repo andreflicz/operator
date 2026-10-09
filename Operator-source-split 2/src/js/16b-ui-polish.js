@@ -36,7 +36,7 @@ function videoIdeaCompactCard(t){
     '<div class="vic-head" data-action="toggleVideoIdeaExpand" data-id="'+t.id+'">'+
       '<span class="vic-title">'+escapeHtml(t.title)+'</span>'+
       '<span class="vic-meta">'+
-        (vt ? '<span class="tag" style="background:rgba(255,255,255,.08);color:#fff;">'+escapeHtml(vt.label)+'</span>' : '')+
+        (vt ? '<span class="tag" style="background:rgba(var(--ink),.08);color:var(--text);">'+escapeHtml(vt.label)+'</span>' : '')+
         (t.status==='today' ? '<span class="tag tag-good">Today</span>' : '')+
         (t.deadline ? deadlineTag(t) : '')+
         '<span class="vic-chevron">'+(open?'&#9652;':'&#9662;')+'</span>'+
@@ -117,7 +117,7 @@ function applyCursorSetting(){
     return "url(\"data:image/svg+xml;utf8,"+encodeURIComponent(
       '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">'+
       '<g stroke="'+accent+'" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="2" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="22" y2="12"/></g>'+
-      (dot ? '<circle cx="12" cy="12" r="3" fill="'+accent+'"/>' : '<circle cx="12" cy="12" r="1.3" fill="#E7E9EE"/>')+
+      (dot ? '<circle cx="12" cy="12" r="3" fill="'+accent+'"/>' : '<circle cx="12" cy="12" r="1.3" fill="'+(document.documentElement.getAttribute('data-theme')==='light'?'#161A23':'#E7E9EE')+'"/>')+
       '</svg>')+"\") 12 12";
   };
   document.documentElement.style.setProperty('--cursor-default', svg(false)+', crosshair');

@@ -109,9 +109,9 @@ function renderActiveModeHero(){
   const elapsed = Date.now() - active.startedAt;
   const label = MODE_LABELS[active.type] || 'Mode';
   const color = modeColor(active.type);
-  return '<div class="hero-card focus-active-glow" style="border-color:'+color+';box-shadow:none;">'+
+  return '<div class="hero-card mode-hero focus-active-glow" style="border-color:'+color+';box-shadow:none;">'+
     '<div class="kpi-label" style="color:'+color+';">'+modeIcon(active.type)+' '+label.toUpperCase()+'</div>'+
-    '<div class="hero-num hero-num-lg" id="modeElapsed" style="color:'+color+';">'+formatElapsed(elapsed)+'</div>'+
+    '<div class="hero-num hero-num-lg'+hoursCls(elapsed)+'" id="modeElapsed" style="color:'+color+';">'+formatElapsed(elapsed)+'</div>'+
     (active.note ? '<div class="kpi-sub">'+escapeHtml(active.note)+'</div>' : '')+
     '<button class="btn btn-primary" style="margin-top:12px;" data-action="endMode">End '+label+'</button>'+
   '</div>';

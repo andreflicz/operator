@@ -28,7 +28,7 @@ function renderSettings(){
         '<div class="task-list">'+RESET_TARGETS.map(function(t){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+t.label+'</div>'+resetPartBtn(t)+'</div>'; }).join('')+'</div>'+
       '</div></div>',
 
-    display: '<div class="section"><div class="section-title">Appearance'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
+    display: themeSettingsHtml()+sceneSettingsHtml()+weatherSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
         '<div class="row">'+SWATCHES.map(function(sw){ return '<span class="swatch '+(p.accentColor===sw?'sel':'')+'" style="background:'+sw+';" data-action="pickThemeColor" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Today Header Style</div>'+

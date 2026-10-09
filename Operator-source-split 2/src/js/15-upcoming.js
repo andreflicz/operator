@@ -16,7 +16,7 @@ function buildUpcomingList(days){
 }
 function renderUpcomingRow(u){
   return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="'+u.kind+'" data-id="'+u.id+'" title="Open"><div style="width:70px;font-family:var(--font-display);font-weight:700;">'+fmtDateShort(u.date)+'</div>'+
-    (u.kind==='deadline' ? '<span class="tag" style="background:var(--danger-dim);color:#ffb3b8;">Deadline</span>' : '<span class="tag" style="background:'+u.color+'22;color:'+u.color+';">Event</span>')+
+    (u.kind==='deadline' ? '<span class="tag" style="background:var(--danger-dim);color:var(--danger-text);">Deadline</span>' : '<span class="tag" style="background:'+u.color+'22;color:'+u.color+';">Event</span>')+
     '<div class="task-title" style="flex:1;">'+escapeHtml(u.label)+'</div></div>';
 }
 function openUpcomingPopover(){

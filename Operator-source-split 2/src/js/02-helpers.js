@@ -25,7 +25,7 @@ function weekdayShort(dateStr){
   const parts = dateStr.split('-').map(Number);
   return (fmtMemo.wd[dateStr] = FMT_WEEKDAY.format(new Date(parts[0], parts[1]-1, parts[2])));
 }
-function fmtTimeShort(ts){ return FMT_TIME.format(new Date(ts)); }
+function fmtTimeShort(ts){ const d = new Date(ts); return isNaN(d) ? '' : FMT_TIME.format(d); }
 // Render-scoped cache: only active while renderView runs (state can't change mid-render),
 // so repeated stats lookups — streak, per-day standards, per-day minutes — are computed once
 // per render instead of re-scanning a year of sessions for every day they're asked about.
@@ -106,6 +106,7 @@ function applyTheme(){
     const color = state.profile.accentColor || '#E8A23D';
     document.documentElement.style.setProperty('--accent', color);
     document.documentElement.style.setProperty('--accent-dim', hexToRgba(color, 0.14));
+    applyThemeMode(false);
     applyCursorSetting();
   }catch(e){}
 }
@@ -114,7 +115,7 @@ function applySidebarState(){
   if(!nav) return;
   nav.classList.toggle('collapsed', !!state.profile.sidebarCollapsed);
   document.body.classList.toggle('sb-collapsed', !!state.profile.sidebarCollapsed);
-  setTimeout(function(){ if(typeof stretchLockedHeaderLine==='function') stretchLockedHeaderLine(); }, 230);
+  setTimeout(function(){ if(typeof stretchLockedHeaderLine==='function') stretchLockedHeaderLine(); if(typeof sceneRefresh==='function') sceneRefresh(); }, 240);
 }
 function toggleSidebar(){
   state.profile.sidebarCollapsed = !state.profile.sidebarCollapsed;
