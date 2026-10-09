@@ -20,7 +20,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   const E = (code) => p.evaluate(c => window.__op.ev(c), code);
   // panel merge
   const order = await E("state.dashboardPanels.order");
-  check('one Clients panel replaces the three old ones, where they were', order.indexOf('clientHub')===2 && !order.some(id=>['reachOut','clientSteps','clientOps'].includes(id)), order);
+  check('one Clients panel replaces the three old ones, where they were', order.filter(x=>x!=='vision').indexOf('clientHub')===2 && !order.some(id=>['reachOut','clientSteps','clientOps'].includes(id)), order);
   check('Clients panel shown on Today', await p.isVisible('.client-hub'));
   check('panel has client cards and leads to reach out', (await p.$$('.client-hub .hub-card')).length===2 && (await p.textContent('.client-hub .hub-leads')).includes('Peak Roofing'));
   // weekly pace: fine early in the week, amber late, red when the week can't be finished / was missed

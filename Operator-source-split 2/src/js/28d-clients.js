@@ -53,8 +53,6 @@ function clientCardV2(c){
   const active = clientStageActive(c.stage);
   const hs = active ? clientHealthStatus(c) : null;
   const st = crmStage('client', c.stage);
-  const p = lcProgress(c);
-  const step = (!c.cycleDone && p.step) ? '<span class="cc2-step" style="color:'+p.step.color+'">'+escapeHtml(p.step.label)+(p.total?' '+p.done+'/'+p.total:'')+'</span>' : '';
   return '<div class="cc2'+(hs?' hl-'+hs.level:' is-inactive')+'" data-key="cc2-'+c.id+'"'+(hs?' title="'+escapeHtml(clientHealthTitle(c))+'"':'')+'>'+
     '<div class="cc2-top" data-action="openContact" data-kind="client" data-id="'+c.id+'">'+
       clientAvatarHtml(c, false, !!hs)+
@@ -63,7 +61,7 @@ function clientCardV2(c){
           : '<span class="tag" style="background:'+(st?st.color:'#8A90A2')+'22;color:'+(st?st.color:'#8A90A2')+';">'+escapeHtml(st?st.label:'Inactive')+'</span>')+
     '</div>'+
     clientDelivRowsHtml(c, true)+
-    (active ? '<div class="cc2-foot">'+step+(step?'<span class="cc2-sep">&middot;</span>':'')+clientNextTouchHtml(c)+'<span style="flex:1"></span>'+touchButtonsHtml('client', c)+'</div>'+touchMenuHtml('client', c) : '')+
+    (active ? '<div class="cc2-foot">'+clientNextTouchHtml(c)+'<span style="flex:1"></span>'+touchButtonsHtml('client', c)+'</div>'+touchMenuHtml('client', c) : '')+
   '</div>';
 }
 function clientSortFn(sort){

@@ -14,7 +14,7 @@ const SP = require('./common.js').OUT;
   };
   let p = await newPage(b, SP+'/t.html', seed);
   const order = await p.evaluate(() => window.__op.state.dashboardPanels.order);
-  check('journal raised under streak', order[1]==='journal', order);
+  check('journal raised under streak', order.filter(x=>x!=='vision')[1]==='journal', order);
   check('streak card rendered', await p.isVisible('.streak-card .streak-num'));
   check('today header centered', await p.evaluate(() => getComputedStyle(document.querySelector('.today-header')).alignItems)==='center');
   check('client health color-coded', await p.isVisible('.hub-card.hl-red .cc2-avatar.ring-red'));

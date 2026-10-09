@@ -262,8 +262,8 @@ function clientCareTier(c){
   const cad = crmCadence('client', c);
   const over = daysAgoFrom(addDays(base, cad));
   if(over < 0) return {cls:'tag-good', label: last ? 'In touch' : 'New — no touch yet'};
-  if(over <= Math.max(1, Math.floor(cad/2))) return {cls:'tag-warn', label: over===0 ? 'Touch due today' : 'Touch overdue '+over+'d'};
-  return {cls:'tag-danger', label:'No touch in '+daysAgoFrom(last)+'d'};
+  // due (or overdue) for a touch = red: reach out
+  return {cls:'tag-danger', label: over===0 ? 'Touch due today' : last ? 'No touch in '+daysAgoFrom(last)+'d' : 'Touch overdue '+over+'d'};
 }
 function clientCareTagHtml(c){
   const count = clientTouchCountThisWeek(c);

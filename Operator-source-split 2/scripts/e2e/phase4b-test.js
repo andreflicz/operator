@@ -111,13 +111,10 @@ const SP = require('./common.js').OUT;
   check('journal note added', (await els()).length===1);
   await p.click('[data-action="journalMode"][data-id="entries"]');
   check('entries still there', await p.isVisible('#journalPageText'));
-  // slideshow on lock-in screen
-  await p.click('[data-action="personalTab"][data-tab="vision"]');
-  await p.check('#setVisionSlideshow');
-  await E("state.focus.activeSession={startedAt:Date.now(), plannedMinutes:null, completedTasks:[], breaks:[], onBreak:false}; persist('focus');");
+  // the master vision board shows on Today (no slideshow any more)
   await p.click('[data-action="nav"][data-view="today"]');
   await p.waitForTimeout(200);
-  check('slideshow on lock-in screen', await p.isVisible('#visionSlideshow img.is-on'));
+  check('vision board on Today', await p.isVisible('.vision-panel .board-static'));
   check('no page errors', p.errors.length===0, p.errors);
   await b.close();
   process.exit(report()?1:0);

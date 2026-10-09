@@ -950,3 +950,28 @@
   .touch-more-btn:hover{ background:transparent; color:var(--text); }
   .touch-btns.is-touched .touch-log-btn{ background:var(--good-dim); border-color:rgba(63,190,142,.5); color:var(--good); font-weight:700; }
   .cc2-owed.is-caught{ color:var(--text-faint); background:var(--panel-2); }
+  /* ---- boards: switcher strip, full screen, vision on Today ---- */
+  .board-strip{ display:flex; gap:10px; overflow-x:auto; padding:2px 2px 8px; scroll-snap-type:x proximity; }
+  .board-pill{ flex:0 0 168px; display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:left; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:8px; color:var(--text); scroll-snap-align:start; transition:border-color .15s, transform .15s, box-shadow .15s; }
+  .board-pill:hover{ border-color:#3a4152; transform:translateY(-1px); }
+  .board-pill.is-active{ border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset; }
+  .board-pill-thumb{ width:100%; height:84px; border-radius:8px; background:#0a0c10; overflow:hidden; display:flex; margin-bottom:6px; pointer-events:none; }
+  .board-pill-thumb .board-static{ flex:1; }
+  .board-pill-empty{ margin:auto; font-size:11px; color:var(--text-faint); }
+  .board-pill-name{ font-family:var(--font-display); font-weight:700; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+  .board-pill-count{ font-size:11px; color:var(--text-faint); }
+  .board-pill-new{ align-items:center; justify-content:center; border-style:dashed; background:transparent; color:var(--text-dim); min-height:136px; }
+  .board-pill-plus{ font-size:24px; line-height:1; margin-bottom:6px; color:var(--text-dim); }
+  .board-thumb .bel{ box-shadow:none; }
+  .board-shell.is-full{ position:fixed; inset:0; z-index:250; background:var(--bg); padding:14px 16px; gap:8px; animation:overlayFadeIn .15s ease-out; }
+  .board-shell.is-full .board-host{ flex:1; height:auto; min-height:0; }
+  .vision-panel-box{ position:relative; height:clamp(220px, 34vh, 360px); border-radius:16px; overflow:hidden; background:#0a0c10; border:1px solid var(--border); cursor:pointer; transition:border-color .2s; }
+  .vision-panel-box:hover{ border-color:#3a4152; }
+  .vision-panel-box .board-static{ position:absolute; inset:0; }
+  .vision-panel-hint{ position:absolute; right:12px; bottom:10px; font-size:11.5px; color:var(--text-dim); background:rgba(10,12,16,.75); border:1px solid var(--border); border-radius:20px; padding:4px 10px; opacity:0; transition:opacity .2s; }
+  .vision-panel-box:hover .vision-panel-hint{ opacity:1; }
+  .vision-panel-empty{ display:flex; align-items:center; gap:12px; cursor:pointer; }
+  .vision-panel-empty:hover{ border-color:var(--accent); }
+  .cc2-foot, .hub-foot{ margin-top:auto; min-height:38px; }
+  .cc2-grid, .hub-grid{ align-items:stretch; }
+  .crm-due.due-0, .crm-due.due-1, .crm-due.due-2, .crm-due.due-3{ color:var(--danger); }

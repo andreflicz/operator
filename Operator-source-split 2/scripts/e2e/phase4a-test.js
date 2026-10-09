@@ -31,7 +31,7 @@ const SP = require('./common.js').OUT;
   check('stage labels renamed', (await E("crmStage('lead','discovery').label"))==='Call booked' && (await E("crmStage('lead','closed').label"))==='Won');
   check('migration persisted', (await p.evaluate(()=>JSON.parse(localStorage.getItem('opsdash:business')).clients[0].touchpoints.length))===2);
   // client health from cadence (last touch 9d ago, cadence 7 → overdue 2d → amber)
-  check('client health amber when touch overdue', (await E("clientHealthStatus(state.business.clients[0]).level"))==='yellow', await E("clientCareTier(state.business.clients[0])"));
+  check('client health red when a touch is due', (await E("clientHealthStatus(state.business.clients[0]).level"))==='red', await E("clientCareTier(state.business.clients[0])"));
   // reach out list on Today
   const ro = await E("reachOutList().map(r=>r.x.id+':'+r.n)");
   check('reach out list sorted most overdue', ro[0].startsWith('p1:') && ro.includes('c1:2'), ro);

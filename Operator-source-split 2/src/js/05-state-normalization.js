@@ -394,6 +394,7 @@ function normalizeDashboardPanels(d){
     d.order.splice(a>=0 ? a+1 : fallbackIdx, 0, id);
   };
   if(!d.journalRaised){ moveAfter('journal', 'personalStats', 0); d.journalRaised = true; }
+  if(!d.visionPanelAdded){ moveAfter('vision', 'personalStats', 0); d.visionPanelAdded = true; }
   if(!d.reachOutAdded){ moveAfter('clientHub', 'journal', 1); d.reachOutAdded = true; d.clientStepsAdded = true; }
   return d;
 }
@@ -437,6 +438,18 @@ function normalizeBoards(b){
     if(bd.parentId===undefined) bd.parentId = null;
     if(!bd.viewport || typeof bd.viewport!=='object') bd.viewport = {x:0, y:0, zoom:1};
   });
+  // One master Vision board (plus boards nested inside it); every other top-level vision
+  // board moves, with everything nested in it, to the Milanote section. Nothing is deleted.
+  if(!b.milanoteSplit){
+    const byId = {}; b.boards.forEach(function(bd){ byId[bd.id] = bd; });
+    let master = b.masterId && byId[b.masterId] && byId[b.masterId].kind==='vision' ? byId[b.masterId] : null;
+    if(!master) master = b.boards.filter(function(bd){ return bd.kind==='vision' && !bd.parentId; })[0] || null;
+    b.masterId = master ? master.id : null;
+    const rootOf = function(bd){ let cur = bd, guard = 0; while(cur && cur.parentId && byId[cur.parentId] && guard++<30) cur = byId[cur.parentId]; return cur; };
+    b.boards.forEach(function(bd){ if(bd.kind==='vision' && (!master || rootOf(bd)!==master)) bd.kind = 'milanote'; });
+    b.milanoteSplit = true;
+  }
+  if(b.masterId && !b.boards.some(function(bd){ return bd.id===b.masterId; })) b.masterId = null;
   return b;
 }
 function normalizeAppActivity(a){

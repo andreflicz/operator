@@ -302,7 +302,8 @@ const PANEL_RENDERERS = {
   focusMini: renderFocusMiniPanel,
   calendarMini: renderCalendarMiniPanel,
   tasks: renderTodayTasksPanel,
-  clientHub: function(){ return renderClientHubPanel(); }
+  clientHub: function(){ return renderClientHubPanel(); },
+  vision: function(){ return renderVisionPanel(); }
 };
 function clientOpsDeliverableRow(clientId, d){
   return recurringDeliverableRowHtml(clientId, d, false);

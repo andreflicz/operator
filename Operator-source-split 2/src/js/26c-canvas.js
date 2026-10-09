@@ -18,16 +18,23 @@ function boardsOfKind(kind){ return arr(state.boards.boards).filter(function(b){
 function currentBoardId(kind){
   ui.boardIds = ui.boardIds || {};
   let id = ui.boardIds[kind];
-  if(!boardById(id)){
-    const roots = boardsOfKind(kind).filter(function(b){ return !b.parentId; });
-    id = roots.length ? roots[0].id : null;
+  const b = boardById(id);
+  if(!b || b.kind!==kind){
+    if(kind==='vision'){ const m = masterVisionBoard(); id = m ? m.id : null; }
+    else { const roots = boardsOfKind(kind).filter(function(x){ return !x.parentId; }); id = roots.length ? roots[0].id : null; }
     ui.boardIds[kind] = id;
   }
   return id;
 }
+const BOARD_KIND_META = {
+  vision:{icon:'&#127775;', title:'Your vision board', sub:'One board for everything you\'re going after — it\'s what you wake up to. Photos, category cards, lists and boards inside it.'},
+  milanote:{icon:'&#128204;', title:'Milanote', sub:'All your other boards — moodboards, plans, shoot ideas. Bring your old Milanote boards in with Import.'},
+  journal:{icon:'&#128221;', title:'Journal boards', sub:'A freeform page for text cards, images and lists, next to your regular entries.'}
+};
 function createBoard(kind, name, parentId){
   const b = {id:uid(), name:name||'Untitled board', kind:kind, parentId:parentId||null, elements:[], viewport:{x:60, y:40, zoom:1}, createdAt:Date.now()};
   state.boards.boards.push(b);
+  if(kind==='vision' && !parentId && !masterVisionBoard()) state.boards.masterId = b.id;
   persist('boards');
   return b;
 }
@@ -35,36 +42,52 @@ function boardPath(b){ const out = []; let cur = b; let guard = 0; while(cur && 
 let boardSaveTimer = null;
 function saveBoardsSoon(){ clearTimeout(boardSaveTimer); boardSaveTimer = setTimeout(function(){ persist('boards'); }, 350); }
 // ---- page shell (header + toolbar are normal re-rendered markup; the canvas is not) ----
+function boardStripHtml(kind, current){
+  const roots = boardsOfKind(kind).filter(function(x){ return !x.parentId; });
+  const activeRoot = current ? boardPath(current)[0] : null;
+  return '<div class="board-strip">'+roots.map(function(r){
+      const count = r.elements.length;
+      return '<button class="board-pill'+(activeRoot && activeRoot.id===r.id?' is-active':'')+'" data-action="boardOpen" data-kind="'+kind+'" data-id="'+r.id+'" title="Open '+escapeHtml(r.name)+'">'+
+        '<span class="board-pill-thumb">'+(count ? boardStaticHtml(r, 'board-thumb') : '<span class="board-pill-empty">empty</span>')+'</span>'+
+        '<span class="board-pill-name">'+escapeHtml(r.name)+'</span><span class="board-pill-count">'+count+' item'+(count===1?'':'s')+'</span>'+
+      '</button>';
+    }).join('')+
+    '<button class="board-pill board-pill-new" data-action="boardNew" data-kind="'+kind+'"><span class="board-pill-plus">+</span><span class="board-pill-name">New board</span></button>'+
+    (kind==='milanote' ? '<button class="board-pill board-pill-new" data-action="boardImport"><span class="board-pill-plus">&#11014;</span><span class="board-pill-name">Import from Milanote</span><span class="board-pill-count">.zip, .md, images</span></button>' : '')+
+  '</div>';
+}
 function renderBoardShell(kind){
   const id = currentBoardId(kind);
   const b = id ? boardById(id) : null;
+  const meta = BOARD_KIND_META[kind] || BOARD_KIND_META.milanote;
   if(!b){
     return '<div class="board-empty card">'+
-      '<div style="font-size:34px;">'+(kind==='vision'?'&#127775;':'&#128221;')+'</div>'+
-      '<div class="section-title" style="justify-content:center;margin:8px 0 4px;">'+(kind==='vision'?'Your vision board':'Journal boards')+'</div>'+
-      '<div class="kpi-sub" style="max-width:420px;margin:0 auto 16px;">'+(kind==='vision'
-        ? 'A free canvas for photos, category cards, lists and nested boards — look at it any time.'
-        : 'A freeform page for text cards, images and lists, next to your regular entries.')+'</div>'+
+      '<div style="font-size:34px;">'+meta.icon+'</div>'+
+      '<div class="section-title" style="justify-content:center;margin:8px 0 4px;">'+meta.title+'</div>'+
+      '<div class="kpi-sub" style="max-width:440px;margin:0 auto 16px;">'+meta.sub+'</div>'+
       '<div class="row" style="justify-content:center;gap:8px;">'+
-        '<button class="btn btn-primary" data-action="boardNew" data-kind="'+kind+'">+ New '+(kind==='vision'?'vision board':'board')+'</button>'+
+        '<button class="btn btn-primary" data-action="boardNew" data-kind="'+kind+'">+ '+(kind==='vision'?'Create my vision board':'New board')+'</button>'+
         (kind==='vision' ? '<button class="btn btn-ghost" data-action="boardTemplate">Start from my Milanote layout</button>' : '')+
-      '</div></div>';
+        (kind==='milanote' ? '<button class="btn btn-ghost" data-action="boardImport">&#11014; Import from Milanote</button>' : '')+
+      '</div>'+
+      (kind==='milanote' ? '<div class="kpi-sub" style="margin-top:12px;">In Milanote: open a board &rarr; &#8943; menu &rarr; Export &rarr; Markdown (or download the images) &rarr; drop the file(s) here.</div>' : '')+
+    '</div>';
   }
   const view = !!(ui.boardView && ui.boardView[kind]);
+  const full = ui.boardFull===kind;
   const path = boardPath(b);
-  const roots = boardsOfKind(kind).filter(function(x){ return !x.parentId; });
   const selCount = cv.boardId===b.id ? cv.sel.size : 0;
   const tool = function(action, label, title, extra){ return '<button class="board-tool" data-action="'+action+'" data-kind="'+kind+'" title="'+escapeHtml(title||label)+'"'+(extra||'')+'>'+label+'</button>'; };
-  return '<div class="board-shell'+(view?' is-view':'')+'">'+
+  return '<div class="board-shell'+(view?' is-view':'')+(full?' is-full':'')+'" data-key="shell-'+kind+'">'+
+    (kind!=='vision' && !full ? boardStripHtml(kind, b) : '')+
     '<div class="board-bar">'+
       '<div class="board-crumbs">'+
-        (roots.length>1 || path.length>1 ? '<select class="input input-sm" data-board-pick="'+kind+'">'+boardsOfKind(kind).map(function(x){ return '<option value="'+x.id+'" '+(x.id===b.id?'selected':'')+'>'+(x.parentId?'&nbsp;&nbsp;↳ ':'')+escapeHtml(x.name)+'</option>'; }).join('')+'</select>' : '')+
         path.slice(0,-1).map(function(x){ return '<span class="board-crumb" data-action="boardOpen" data-kind="'+kind+'" data-id="'+x.id+'">'+escapeHtml(x.name)+'</span><span class="board-crumb-sep">/</span>'; }).join('')+
         (view ? '<span class="board-title-static">'+escapeHtml(b.name)+'</span>' : '<input class="board-title-input" data-board-rename="'+b.id+'" value="'+escapeHtml(b.name)+'">')+
       '</div>'+
       '<div class="row" style="gap:6px;">'+
-        (view ? '' : tool('boardNew','+ Board','New top-level board'))+
         tool('boardToggleView', view?'&#9998; Edit':'&#128065; View', view?'Back to editing':'View mode — hide the editing tools')+
+        tool('boardFullscreen', full?'&#10530; Exit full screen':'&#9974; Full screen', full?'Exit full screen (Esc)':'Full screen')+
       '</div>'+
     '</div>'+
     (view ? '' : '<div class="board-toolbar">'+
@@ -73,7 +96,7 @@ function renderBoardShell(kind){
       tool('boardAddList','&#9776; List','Add a list card')+
       tool('boardAddImage','&#128444; Image','Upload images (or paste / drop them on the board)')+
       tool('boardAddImageUrl','&#128279; Image URL','Add an image from a link')+
-      tool('boardAddNested','&#128203; Board','Add a nested board')+
+      tool('boardAddNested','&#128203; Board','Add a board inside this one')+
       tool('boardAddLine','&#9585; Line','Add a line / divider')+
       tool('boardAddArrow','&#10140; Arrow','Add an arrow')+
       '<span class="board-tool-sep"></span>'+
@@ -91,17 +114,28 @@ function renderBoardShell(kind){
       tool('boardZoomIn','+','Zoom in')+
       tool('boardFit','&#9974; Fit','Fit everything')+
       '<span style="flex:1"></span>'+
-      (path.length>1 || roots.length>1 ? tool('boardDeleteBoard','Delete board','Delete this board (and boards inside it)') : '')+
+      (kind==='milanote' && !b.parentId ? tool('boardImport','&#11014; Import','Import a Milanote export into a new board') : '')+
+      (path.length>1 || (kind!=='vision') ? tool('boardDeleteBoard','Delete board','Delete this board (and boards inside it)') : '')+
     '</div>')+
-    '<div class="board-host" id="boardHost" data-photo-drop="board" data-morph-ignore="'+kind+':'+b.id+':'+(view?'v':'e')+'"></div>'+
-    (view ? '' : '<div class="board-hint">Drag background to pan · scroll to move · Ctrl/⌘+scroll to zoom · Shift+drag to select · double-click a card to edit · paste or drop images</div>')+
+    '<div class="board-host" id="boardHost" data-photo-drop="board" data-morph-ignore="'+kind+':'+b.id+':'+(view?'v':'e')+(full?':f':'')+'"></div>'+
+    (view || full ? '' : '<div class="board-hint">Drag background to pan · scroll to move · Ctrl/⌘+scroll to zoom · Shift+drag to select · double-click a card to edit · paste or drop images</div>')+
   '</div>';
 }
-function renderVisionTab(){
-  return '<div class="row" style="justify-content:flex-end;margin-bottom:8px;">'+
-      '<label class="row kpi-sub" style="gap:6px;cursor:pointer;"><input type="checkbox" id="setVisionSlideshow" '+(state.profile.visionSlideshow?'checked':'')+'>Slow slideshow of these images on the lock-in screen</label>'+
-    '</div>'+renderBoardShell('vision');
+function renderVisionTab(){ return renderBoardShell('vision'); }
+function renderMilanoteTab(){ return renderBoardShell('milanote'); }
+ACTIONS.boardFullscreen = function(el){
+  const kind = el.dataset.kind;
+  if(ui.boardFull===kind){ exitBoardFullscreen(); return; }
+  ui.boardFull = kind;
+  try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); }catch(e){}
+  renderView();
+};
+function exitBoardFullscreen(){
+  ui.boardFull = null;
+  try{ if(document.fullscreenElement) document.exitFullscreen().catch(function(){}); }catch(e){}
+  renderView();
 }
+document.addEventListener('fullscreenchange', function(){ if(!document.fullscreenElement && ui.boardFull){ ui.boardFull = null; renderView(); } });
 // ---- mounting ----
 afterRenderHooks.push(function(){
   const host = document.getElementById('boardHost');
@@ -398,6 +432,7 @@ function boardActive(){ return !!(cv.host && document.body.contains(cv.host) && 
 function typingInField(t){ return t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)); }
 document.addEventListener('keydown', function(e){
   if(!boardActive()) return;
+  if(ui.boardFull && e.key==='Escape' && !cv.editing && !cv.sel.size && !document.querySelector('.overlay:not(.hidden)')){ e.preventDefault(); exitBoardFullscreen(); return; }
   if(cv.editing){ if(e.key==='Escape'){ e.preventDefault(); finishEditing(); } return; }
   if(typingInField(e.target)) return;
   if(document.querySelector('.overlay:not(.hidden)')) return;
@@ -428,11 +463,12 @@ document.addEventListener('change', function(e){
   const t = e.target; if(!t || !t.dataset) return;
   if(t.dataset.boardPick) openBoard(t.dataset.boardPick, t.value);
   if(t.dataset.boardRename){ const b = boardById(t.dataset.boardRename); if(b && t.value.trim()){ b.name = t.value.trim(); persist('boards'); renderView(); } }
-  if(t.id==='setVisionSlideshow'){ state.profile.visionSlideshow = t.checked; persist('profile'); }
 });
 ACTIONS.boardNew = function(el){
-  const kind = el.dataset.kind || (ui.view==='personal' && ui.personalTab==='journal' ? 'journal' : 'vision');
-  const b = createBoard(kind, kind==='vision' ? (boardsOfKind('vision').length ? 'Vision board '+(boardsOfKind('vision').length+1) : 'Vision Board') : 'Journal board '+(boardsOfKind('journal').length+1));
+  const kind = el.dataset.kind || (ui.view==='personal' && ui.personalTab==='journal' ? 'journal' : ui.personalTab==='milanote' ? 'milanote' : 'vision');
+  const n = boardsOfKind(kind).filter(function(x){ return !x.parentId; }).length;
+  const name = kind==='vision' ? 'Vision Board' : kind==='journal' ? 'Journal board '+(n+1) : (n ? 'Board '+(n+1) : 'My board');
+  const b = createBoard(kind, kind==='vision' && masterVisionBoard() ? 'New board' : name, kind==='vision' && masterVisionBoard() ? masterVisionBoard().id : null);
   openBoard(kind, b.id);
 };
 ACTIONS.boardToggleView = function(el){
@@ -522,8 +558,8 @@ ACTIONS.undoDeleteBoard = function(){
 // Starter layout mirroring the Milanote board: category label cards, the "avoiding" list,
 // a nested "The Key To Life" board and a vertical divider. Drop your photos in around them.
 ACTIONS.boardTemplate = function(){
-  const b = createBoard('vision', 'Vision Board');
-  const key = createBoard('vision', 'The Key To Life', b.id);
+  const b = createBoard(masterVisionBoard() ? 'milanote' : 'vision', 'Vision Board');
+  const key = createBoard(b.kind, 'The Key To Life', b.id);
   const els = [
     {type:'note', header:true, color:'#3FBE8E', title:'Mind + Body', body:'Feeding the body and the brain. Free of temptation.', x:40, y:40, w:300, h:96},
     {type:'note', header:true, color:'#E8A23D', title:'Being creative', body:'', x:380, y:40, w:260, h:70},
@@ -535,39 +571,12 @@ ACTIONS.boardTemplate = function(){
   ];
   els.forEach(function(e, i){ e.id = uid(); e.z = i+1; b.elements.push(e); });
   persist('boards');
-  openBoard('vision', b.id);
+  if(b.kind!=='vision'){ ui.view='personal'; ui.personalTab='milanote'; }
+  openBoard(b.kind, b.id);
   setTimeout(fitBoard, 50);
 };
-// ---- slideshow on the lock-in screen ----
-function visionImageRefs(){
-  const out = [];
-  boardsOfKind('vision').forEach(function(b){ b.elements.forEach(function(e){ if(e.type==='image' && e.ref) out.push(e.ref); }); });
-  return out;
-}
-function renderVisionSlideshow(){
-  if(!state.profile.visionSlideshow) return '';
-  const refs = visionImageRefs(); if(!refs.length) return '';
-  return '<div class="section" style="max-width:900px;margin:0 auto 26px;"><div class="vision-slideshow" id="visionSlideshow" data-morph-ignore="slideshow:'+refs.length+'" data-action="goToVision" title="Open vision board"></div></div>';
-}
 ACTIONS.goToVision = function(){ ui.view='personal'; ui.personalTab='vision'; renderView(); };
-let slideshowTimer = null;
-afterRenderHooks.push(function(){
-  const host = document.getElementById('visionSlideshow');
-  if(!host){ clearInterval(slideshowTimer); slideshowTimer = null; return; }
-  if(host._mounted) return;
-  host._mounted = true;
-  const refs = visionImageRefs().sort(function(){ return Math.random()-0.5; }).slice(0, 30);
-  host.innerHTML = refs.map(function(r, i){ return '<img src="'+escapeHtml(blobUrl(r))+'" data-ref="'+escapeHtml(r)+'" class="'+(i===0?'is-on':'')+'" alt="">'; }).join('');
-  let i = 0;
-  clearInterval(slideshowTimer);
-  slideshowTimer = setInterval(function(){
-    const imgs = host.querySelectorAll('img'); if(!imgs.length || !document.body.contains(host)){ clearInterval(slideshowTimer); return; }
-    imgs.forEach(function(im){ if(im.src===BLANK_IMG) im.src = blobUrl(im.dataset.ref); });
-    imgs[i % imgs.length].classList.remove('is-on');
-    i++;
-    imgs[i % imgs.length].classList.add('is-on');
-  }, 9000);
-});
+function renderVisionSlideshow(){ return ''; }
 // ---- static (read-only) render of a board — wake screen, second display, previews ----
 // The master vision board is the one board that shows up on the wake screen.
 function masterVisionBoard(){
@@ -612,3 +621,22 @@ function fitStaticBoards(root){
 }
 window.addEventListener('resize', function(){ fitStaticBoards(); });
 afterRenderHooks.push(function(){ fitStaticBoards(); });
+// ---- the master vision board on Today ----
+function renderVisionPanel(){
+  const b = masterVisionBoard();
+  if(!b || !b.elements.length){
+    return '<div class="section"><div class="card vision-panel-empty" data-action="goToVision"><span style="font-size:22px;">&#127775;</span><div><div class="kpi-label" style="margin:0;">Vision board</div><div class="kpi-sub">Build the one board you wake up to &rarr;</div></div></div></div>';
+  }
+  return '<div class="section vision-panel">'+
+    '<div class="vision-panel-box" data-action="openVisionFull" title="Open your vision board full screen">'+boardStaticHtml(b, 'vision-panel-board')+
+      '<span class="vision-panel-hint">&#9974; Full screen</span></div>'+
+  '</div>';
+}
+ACTIONS.openVisionFull = function(){
+  ui.view = 'personal'; ui.personalTab = 'vision';
+  ui.boardView = ui.boardView || {}; ui.boardView.vision = true;
+  ui.boardFull = 'vision';
+  try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); }catch(e){}
+  renderView();
+  setTimeout(fitBoard, 80);
+};
