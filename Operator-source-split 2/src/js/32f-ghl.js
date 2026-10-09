@@ -18,7 +18,7 @@ function ghlCfg(){
   if(g.pipelineId===undefined) g.pipelineId = '';
   if(!g.stageMap || typeof g.stageMap!=='object') g.stageMap = {};
   if(!Array.isArray(g.pipelines)) g.pipelines = [];
-  ['syncCalendar', 'syncMessages', 'pushStages', 'autoSync'].forEach(function(k){ if(g[k]===undefined) g[k] = true; });
+  ['syncCalendar', 'syncMessages', 'pushStages', 'autoSync', 'pushNewLeads'].forEach(function(k){ if(g[k]===undefined) g[k] = true; });
   return g;
 }
 function ghlOn(){ const g = ghlCfg(); return !!(g.connected && g.locationId && g.pipelineId); }
@@ -105,7 +105,7 @@ ACTIONS.ghlConnect = async function(){
     g.pipelines = arr(r.pipelines).map(function(p){ return {id:p.id, name:p.name, stages:arr(p.stages).slice().sort(function(a, b){ return (a.position||0)-(b.position||0); }).map(function(s){ return {id:s.id, name:s.name}; })}; });
     if(!g.pipelines.length) throw new Error('Connected, but this location has no pipelines yet.');
     if(!g.pipelines.some(function(p){ return p.id===g.pipelineId; })) g.pipelineId = g.pipelines[0].id;
-    g.connected = true;
+    g.connected = true; if(!g.connectedAt) g.connectedAt = Date.now();
     ghlAutoMap();
     persist('settings');
     ui.ghlBusy = null; renderView();
@@ -134,6 +134,7 @@ async function ghlSync(manual){
   const g = ghlCfg(), out = {newLeads:0, movedLeads:0, events:0, touches:0, linked:0};
   const contacts = {}; // contactId → {id, name, email, phone, company}
   try{
+    await ghlPushLocal(g, out);
     await ghlPullOpportunities(g, out, contacts);
     ghlLinkClients(contacts, out);
     if(g.syncCalendar) await ghlPullAppointments(g, out);
@@ -182,7 +183,9 @@ async function ghlPullOpportunities(g, out, contacts){
           createdAt:ghlDate(o.createdAt), touchpoints:[], timeline:[], files:[], cadenceDays:null, value:Number(o.monetaryValue)||0, trade:'', nextFollowUp:null, stageHistory:[], convertedClientId:null,
           ghlOppId:o.id, ghlContactId:cid, ghlStageId:o.pipelineStageId};
         crmTimeline(x, 'note', 'Came in from GoHighLevel');
+        x.ghlSig = ghlSig(x);
         leads.push(x); out.newLeads++;
+        if(g.lastSync) g.recentLeads = [{id:x.id, name:x.company || x.name || 'Lead', at:Date.now()}].concat(arr(g.recentLeads)).slice(0, 20);
       } else {
         x.ghlOppId = o.id; x.ghlContactId = cid || x.ghlContactId;
         if(o.pipelineStageId && o.pipelineStageId!==x.ghlStageId){
@@ -199,6 +202,7 @@ async function ghlPullOpportunities(g, out, contacts){
         if(o.monetaryValue!=null && Number(o.monetaryValue)!==Number(x.value)) x.value = Number(o.monetaryValue)||0;
         if(!x.phone && c.phone) x.phone = c.phone;
         if(!x.email && c.email) x.email = c.email;
+        if(!x.ghlSig) x.ghlSig = ghlSig(x);
       }
     });
     const meta = r.meta || {};
@@ -260,6 +264,16 @@ function ghlTouchType(t){
 }
 async function ghlPullMessages(g, out, contacts){
   const r = await ghlCall('GET', '/conversations/search?'+ghlQ({locationId:g.locationId, limit:100, sort:'desc', sortBy:'last_message_date'}));
+  // unread messages from people → the bell (and a heads-up for ones that just came in)
+  const prev = {}; arr(g.inbox).forEach(function(m){ prev[m.contactId+':'+m.at] = true; });
+  g.inbox = arr(r.conversations).filter(function(cv){ return cv.contactId && Number(cv.unreadCount)>0 && /in/i.test(cv.lastMessageDirection||''); }).slice(0, 30).map(function(cv){
+    return {contactId:cv.contactId, convId:cv.id, name:cv.fullName || cv.contactName || '', body:cv.lastMessageBody || '', at:Number(cv.lastMessageDate) || Date.parse(cv.lastMessageDate) || 0};
+  });
+  const fresh = g.inbox.filter(function(m){ return !prev[m.contactId+':'+m.at]; });
+  if(fresh.length && g.lastSync){
+    playPositive();
+    showToast(fresh.length===1 ? '&#128172; '+escapeHtml(fresh[0].name || 'Someone')+': '+escapeHtml(String(fresh[0].body||'').slice(0, 80)) : fresh.length+' new messages in GoHighLevel', {icon:'&#128172;', duration:7000, actionLabel:'Open', actionAction:fresh.length===1 ? 'openGhlContact' : 'toggleNotifs', actionId:fresh[0].contactId});
+  }
   arr(r.conversations).forEach(function(cv){
     const cid = cv.contactId; if(!cid) return;
     if(!contacts[cid]) contacts[cid] = {id:cid, name:cv.fullName || cv.contactName || '', email:cv.email || '', phone:cv.phone || ''};
@@ -288,7 +302,12 @@ function ghlPushStage(x){
   ghlCall('PUT', '/opportunities/'+encodeURIComponent(x.ghlOppId), body)
     .catch(function(e){ showToast('Couldn\'t update GoHighLevel: '+e.message, {icon:'&#9888;', duration:5000}); });
 }
-setInterval(function(){ if(typeof state!=='undefined' && state && state.settings && ghlOn() && ghlCfg().autoSync) ghlSync(false); }, 10*60000);
+// every 3 minutes while Operator is on screen (new leads and messages show up fast), every 10 otherwise
+setInterval(function(){
+  if(typeof state==='undefined' || !state || !state.settings || !ghlOn() || !ghlCfg().autoSync) return;
+  const every = (document.hidden ? 10 : 3)*60000;
+  if(Date.now()-(ghlCfg().lastSync||0) >= every) ghlSync(false);
+}, 60000);
 setTimeout(function wait(){ if(typeof state!=='undefined' && state && state.settings && state.business && state.business.crm){ if(ghlOn() && ghlCfg().autoSync) ghlSync(false); } else setTimeout(wait, 2000); }, 15000);
 // ---- the settings card ----
 function ghlSettingsHtml(){
@@ -307,7 +326,7 @@ function ghlSettingsHtml(){
     return '<div class="section"><div class="card ghl-card">'+head+
       '<ol class="ghl-steps">'+
         '<li>In GoHighLevel, open the sub-account &rarr; <b>Settings &rarr; Private Integrations</b> &rarr; <b>Create new integration</b>.</li>'+
-        '<li>Give it these scopes: <code>contacts.readonly</code> <code>opportunities.readonly</code> <code>opportunities.write</code> <code>calendars.readonly</code> <code>calendars/events.readonly</code> <code>conversations.readonly</code> <code>locations.readonly</code>.</li>'+
+        '<li>Give it these scopes: <code>contacts.readonly</code> <code>contacts.write</code> <code>opportunities.readonly</code> <code>opportunities.write</code> <code>calendars.readonly</code> <code>calendars/events.readonly</code> <code>conversations.readonly</code> <code>conversations.write</code> <code>conversations/message.readonly</code> <code>conversations/message.write</code> <code>locations.readonly</code>.</li>'+
         '<li>Copy the key it shows you, and your <b>Location ID</b> (Settings &rarr; Business Profile, or the part of the URL after <code>/location/</code>).</li>'+
       '</ol>'+bridge+
       '<div class="grid grid-2" style="margin-top:12px;">'+
@@ -326,7 +345,8 @@ function ghlSettingsHtml(){
     (p ? '<div class="kind-label" style="margin-top:6px;">Stages'+tip('Which of your lead stages each GoHighLevel stage counts as. Moving a lead in either place moves it in the other.')+'</div><div class="ghl-map">'+p.stages.map(function(st){
       return '<div class="ghl-map-row"><span class="ghl-map-k">'+escapeHtml(st.name)+'</span><span class="kpi-sub">&rarr;</span><select class="input" data-ghl-stage="'+escapeHtml(st.id)+'">'+crmStages('lead').map(function(s){ return '<option value="'+s.id+'"'+(g.stageMap[st.id]===s.id?' selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select></div>';
     }).join('')+'</div>' : '')+
-    '<div class="ghl-toggles">'+toggle('syncCalendar', 'Bring in appointments (next 2 weeks)')+toggle('syncMessages', 'Count messages you send from GHL as touches')+toggle('pushStages', 'Send stage changes back to GHL')+toggle('autoSync', 'Sync every 10 minutes')+'</div>'+
+    '<div class="ghl-toggles">'+toggle('syncCalendar', 'Bring in appointments (next 2 weeks)')+toggle('syncMessages', 'Messages: count what you send as touches, and show new ones in the bell')+toggle('pushStages', 'Send stage changes back to GHL')+toggle('pushNewLeads', 'Send leads you add in Operator (and their detail changes) to GHL')+toggle('autoSync', 'Keep in sync on its own (every 3 min while Operator is open)')+'</div>'+
+    '<div class="kpi-sub" style="margin-top:8px;">Open any lead or client and hit <b>&#128172; GoHighLevel</b> to text, email, add notes and tasks, and see their appointments — right here. Added scopes since you connected? Messages need <code>conversations/message.write</code> and editing contacts needs <code>contacts.write</code>.</div>'+
     '<div class="row" style="margin-top:14px;justify-content:space-between;gap:10px;">'+
       '<button class="btn btn-ghost btn-sm" data-action="ghlDisconnect">Disconnect</button>'+
       '<span class="row" style="gap:10px;">'+busy+'<button class="btn btn-primary" data-action="ghlSyncNow"'+(ui.ghlBusy?' disabled':'')+'>&#128260; Sync now</button></span>'+

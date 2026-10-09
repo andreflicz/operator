@@ -165,11 +165,10 @@ function renderTaskEditModal(){
     '<div class="field" style="margin-top:10px;"><label>Deadline</label><div class="row"><input class="input" type="date" id="editDeadline-'+t.id+'" value="'+(t.deadline||'')+'"><input class="input" type="time" id="editDeadlineTime-'+t.id+'" value="'+(t.deadlineTime||'')+'" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editDeadline-'+t.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="editDeadline-'+t.id+'">Today</button>'+(t.deadline?'<button class="btn btn-ghost btn-sm" data-action="clearField" data-target="editDeadline-'+t.id+'" title="Remove deadline">Clear</button>':'')+'</div></div>'+
     taskAlarmFieldsHtml('editTask-'+t.id+'-', t)+
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="editNotes-'+t.id+'" style="width:100%;min-height:60px;">'+escapeHtml(t.notes||'')+'</textarea></div>'+
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editCountsDeep-'+t.id+'" '+(t.countsDeepWork!==false?'checked':'')+' style="margin-right:6px;">Counts toward deep work'+(function(){ const c=t.categoryId?taskCategoryById(t.categoryId):null; return c && c.countsDeepWork===false ? ' <span class="kpi-sub">(its category "'+escapeHtml(c.label)+'" doesn\'t count)</span>' : ''; })()+'</label>'+
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editOngoing-'+t.id+'" '+(t.ongoing?'checked':'')+' style="margin-right:6px;">&#128204; Ongoing'+tip('For work that takes more than one day — it stays live until it\'s actually done.')+'</label>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editCountsDeep-'+t.id+'" '+(t.countsDeepWork!==false?'checked':'')+' style="margin-right:6px;">&#9201; Time on this counts as deep work'+tip('When you time this task, those minutes go toward your daily deep-work goal (and the streak). Untick it for admin, calls or errands — the time is still tracked, it just isn\'t deep work.')+(function(){ const c=t.categoryId?taskCategoryById(t.categoryId):null; return c && c.countsDeepWork===false ? ' <span class="kpi-sub">(its category "'+escapeHtml(c.label)+'" doesn\'t count)</span>' : ''; })()+'</label>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editOngoing-'+t.id+'" '+(t.ongoing?'checked':'')+' style="margin-right:6px;">&#128204; Ongoing — takes more than a day'+tip('It stays on your list day after day until it\'s actually finished: tick it off for today without closing it. When it\'s due is just the Deadline above.')+'</label>'+
     '<div id="editTaskOngoingExtra-'+t.id+'" style="display:'+(t.ongoing?'block':'none')+';">'+
-    '<div class="field" style="margin-top:10px;"><label>Ongoing target date (optional)</label><div class="row"><input class="input" type="date" id="editOngoingDeadline-'+t.id+'" value="'+(t.ongoingDeadline||'')+'"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editOngoingDeadline-'+t.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="editOngoingDeadline-'+t.id+'">Clear</button></div></div>'+
-    '<div class="field" style="margin-top:10px;"><label>Frequency (optional)</label><select class="input" id="editOngoingFrequency-'+t.id+'">'+
+    '<div class="field" style="margin-top:10px;"><label>How often you work on it (optional)</label><select class="input" id="editOngoingFrequency-'+t.id+'">'+
       ['', 'daily', 'few', 'weekly'].map(function(v){ const lbl = v==='' ? '&mdash;' : v==='daily'?'Daily':v==='few'?'A few times a week':'Weekly'; return '<option value="'+v+'" '+((t.ongoingFrequency||'')===v?'selected':'')+'>'+lbl+'</option>'; }).join('')+
     '</select></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editIncludeStandard-'+t.id+'" '+(t.includeInStandard?'checked':'')+' style="margin-right:6px;">Include in Today\'s Standard</label>'+
@@ -202,8 +201,7 @@ function saveEditTask(id){
   const ongoingEl = document.getElementById('editOngoing-'+id);
   t.ongoing = !!(ongoingEl && ongoingEl.checked);
   if(t.ongoing){
-    const ongoingDeadlineEl = document.getElementById('editOngoingDeadline-'+id);
-    t.ongoingDeadline = ongoingDeadlineEl ? (ongoingDeadlineEl.value || null) : t.ongoingDeadline;
+    t.ongoingDeadline = t.deadline;
     const ongoingFrequencyEl = document.getElementById('editOngoingFrequency-'+id);
     t.ongoingFrequency = ongoingFrequencyEl ? (ongoingFrequencyEl.value || null) : t.ongoingFrequency;
     const includeStandardEl = document.getElementById('editIncludeStandard-'+id);

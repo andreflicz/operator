@@ -467,7 +467,7 @@ function clientCardFrontHtml(c){
       '</div>' : '<div class="kpi-sub" style="margin-top:6px;">No deliverables yet.</div>')+
     '</div>'+
     '<div class="cf-sec"><div class="cf-sec-k">Notes</div>'+(c.notes ? '<div class="cf-notes">'+escapeHtml(c.notes)+'</div>' : '<div class="kpi-sub">No notes yet — add some on the back of the card.</div>')+'</div>'+
-    '<div class="cf-foot"><button class="btn btn-ghost" data-action="closeClientModalAndSave">Close</button><button class="btn btn-primary" data-action="clientFlip" data-id="back">&#9998; Edit</button></div>'+
+    '<div class="cf-foot"><button class="btn btn-ghost" data-action="closeClientModalAndSave">Close</button>'+ghlPaneBtnHtml('client', c)+'<button class="btn btn-primary" data-action="clientFlip" data-id="back">&#9998; Edit</button></div>'+
   '</div>';
 }
 ACTIONS.clientFlip = function(el, e, id){

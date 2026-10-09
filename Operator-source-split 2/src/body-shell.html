@@ -1,7 +1,7 @@
 <div id="loading">Loading Operator…</div>
 <div id="app" class="app" style="display:none;">
   <nav class="sidebar" id="sidebarNav">
-    <div class="brand"><span class="brand-text">Operator<em>.</em></span><button class="sidebar-toggle" data-action="toggleSidebar" title="Collapse menu">&#9776;</button></div>
+    <div class="brand"><span class="brand-text">Operator<em>.</em></span><span class="brand-btns"><button class="notif-bell" id="notifBell" data-action="toggleNotifs" title="Notifications"><span class="notif-bell-i">&#128276;</span><span class="notif-count" id="notifCount" hidden></span></button><button class="sidebar-toggle" data-action="toggleSidebar" title="Collapse menu">&#9776;</button></span></div>
     <div class="app-activity-indicator" id="currentAppIndicator" style="display:none;" title="What's currently in the foreground"></div>
     <button class="nav-item" data-action="nav" data-view="today"><span class="nav-icon">&#9670;</span><span class="nav-label">Today</span></button>
     <button class="nav-item" data-action="nav" data-view="focus"><span class="nav-icon">&#9201;</span><span class="nav-label">Focus</span></button>
@@ -9,10 +9,15 @@
     <button class="nav-item" data-action="nav" data-view="calendar"><span class="nav-icon">&#9638;</span><span class="nav-label">Calendar</span></button>
     <button class="nav-item" data-action="nav" data-view="personal"><span class="nav-icon">&#9679;</span><span class="nav-label">Personal</span></button>
     <button class="nav-item" data-action="nav" data-view="settings"><span class="nav-icon">&#9881;</span><span class="nav-label">Settings</span></button>
+    <div class="sb-foot"><div id="musicPlayer"></div></div>
   </nav>
+  <div id="notifPanel" class="notif-panel" hidden></div>
   <main class="main"><div id="viewRoot"></div></main>
 </div>
 <div id="toastContainer" class="toast-container"></div>
+<div id="ghlOverlay" class="overlay hidden">
+  <div class="card ghl-pane" id="ghlContent"></div>
+</div>
 <div id="lockInNudgeOverlay" class="overlay hidden">
   <div class="card" id="lockInNudgeContent" style="max-width:380px;width:100%;text-align:center;"></div>
 </div>

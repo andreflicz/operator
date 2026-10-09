@@ -124,7 +124,7 @@ function showToast(message, opts){
   container.innerHTML = '<div class="toast" id="activeToast">'+
     '<span class="toast-icon">'+(opts.icon||'&#128276;')+'</span>'+
     '<span>'+escapeHtml(message)+'</span>'+
-    (opts.actionLabel ? '<span class="toast-action" data-action="'+opts.actionAction+'">'+escapeHtml(opts.actionLabel)+'</span>' : '')+
+    (opts.actionLabel ? '<span class="toast-action" data-action="'+opts.actionAction+'"'+(opts.actionId ? ' data-id="'+escapeHtml(opts.actionId)+'"' : '')+'>'+escapeHtml(opts.actionLabel)+'</span>' : '')+
   '</div>';
   const el = document.getElementById('activeToast');
   requestAnimationFrame(function(){ if(el) el.classList.add('show'); });
@@ -172,6 +172,8 @@ function normalizeTasks(t){
     if(item.deadline===undefined) item.deadline=null;
     if(item.ongoing===undefined) item.ongoing=false;
     if(item.ongoingDeadline===undefined) item.ongoingDeadline=null;
+    // one date per task now: an ongoing task's old "target date" becomes its deadline if it had none
+    if(item.ongoing && item.ongoingDeadline && !item.deadline) item.deadline = item.ongoingDeadline;
     if(item.ongoingFrequency===undefined) item.ongoingFrequency=null;
     if(item.includeInStandard===undefined) item.includeInStandard=false;
     if(item.trackedMinutes===undefined) item.trackedMinutes=0;

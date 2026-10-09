@@ -60,7 +60,7 @@ function wakeArm(){ wakeCfg().armedAt = Date.now(); }
 // Everything for it goes through one queue, retried until it gets through.
 const HELPER_RETRY_MS = [100, 200, 300, 500, 800, 1100];
 let helperChain = Promise.resolve();
-function helperFetch(url, timeoutMs){
+function helperFetch(url, timeoutMs, wantJson){
   const run = async function(){
     for(let i=0;i<=HELPER_RETRY_MS.length;i++){
       const ctl = typeof AbortController!=='undefined' ? new AbortController() : null;
@@ -68,10 +68,11 @@ function helperFetch(url, timeoutMs){
       try{
         const res = await fetch(url, {cache:'no-store', signal: ctl ? ctl.signal : undefined});
         clearTimeout(timer);
+        if(wantJson){ let j = null; try{ j = await res.json(); }catch(e){} return res.ok ? (j || {}) : null; }
         return res.ok;
-      }catch(e){ clearTimeout(timer); if(i===HELPER_RETRY_MS.length) return false; await new Promise(function(r){ setTimeout(r, HELPER_RETRY_MS[i]); }); }
+      }catch(e){ clearTimeout(timer); if(i===HELPER_RETRY_MS.length || (wantJson && i>=2)) return wantJson ? null : false; await new Promise(function(r){ setTimeout(r, HELPER_RETRY_MS[i]); }); }
     }
-    return false;
+    return wantJson ? null : false;
   };
   const p = helperChain.then(run, run);
   helperChain = p.catch(function(){});
@@ -346,7 +347,7 @@ function wakeWeatherLine(){
 function wakeRingHtml(){
   const w = wakeCfg();
   const playing = wakeUsesMusic(w) && !(wakeRing && wakeRing.mediaFailed);
-  return '<div class="wk2" data-sky="'+skyPhase()+'">'+
+  return '<div class="wk2" data-sky="'+skyLook()+'">'+
     '<div class="wk2-aura"><i></i><i></i><i></i></div>'+
     '<div class="wk2-center">'+
       '<div class="wk2-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test ? ' <span class="tag">TEST</span>' : '')+'</div>'+

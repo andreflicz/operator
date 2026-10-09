@@ -8,7 +8,11 @@
 // onto Now while locked in asks first.
 function nnTask(id){ return id ? state.tasks.items.find(function(t){ return t.id===id && t.status!=='done'; }) : null; }
 function nnExplicitNext(){ const t = nnTask(state.focus.nextTaskId) || nnTask(ui.stagedTaskId); return t && t.id!==ui.currentTaskId ? t : null; }
-function nowNextPanelHtml(){
+// opts.stack: the two halves stacked (Now on top, Up next below) — the drop slot on Today and
+// on the locked-in page.
+function nowNextPanelHtml(opts){
+  opts = opts || {};
+  const where = opts.stack ? 'stack' : 'panel', timerId = opts.stack ? 'currentTaskElapsed' : 'currentTaskElapsedBar';
   const as = state.focus.activeSession, inS = !!as, onBreak = !!(inS && as.onBreak);
   const cur = nnTask(ui.currentTaskId);
   const pend = nnTask(ui.pendingCurrentTaskId);
@@ -16,7 +20,7 @@ function nowNextPanelHtml(){
   let next = explicit;
   if(!next){ const s = nextUpTask(); if(s && s.id!==ui.currentTaskId && !(pend && s.id===pend.id)) next = s; }
   const title = function(t){ return '<div class="nn-title">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span></div>'; };
-  const picker = function(label){ return '<span class="nn-pick-wrap"><button class="btn btn-ghost btn-sm" data-action="toggleNextPicker" data-where="panel">'+label+' &#9662;</button>'+nextPickerHtml('panel')+'</span>'; };
+  const picker = function(label){ return '<span class="nn-pick-wrap"><button class="btn btn-ghost btn-sm" data-action="toggleNextPicker" data-where="'+where+'">'+label+' &#9662;</button>'+nextPickerHtml(where)+'</span>'; };
   let now = '';
   {
     now = '<div class="nn-cell nn-now'+(cur?' has-task':'')+(pend?' is-asking':'')+'" data-dropzone="current">'+
@@ -27,7 +31,7 @@ function nowNextPanelHtml(){
             '<button class="btn btn-ghost btn-sm" data-action="nnPendingToNext">Make it next</button>'+
             '<button class="btn btn-ghost btn-sm" data-action="cancelPendingCurrentTask">Cancel</button></div>'
         : cur
-          ? '<div class="nn-row">'+title(cur)+'<span class="nn-timer" id="currentTaskElapsedBar">'+formatElapsed(Date.now()-(ui.currentTaskStartedAt||Date.now()))+'</span></div>'+
+          ? '<div class="nn-row">'+title(cur)+'<span class="nn-timer" id="'+timerId+'">'+formatElapsed(Date.now()-(ui.currentTaskStartedAt||Date.now()))+'</span></div>'+
             '<div class="nn-acts"><button class="btn btn-good btn-sm" data-action="finishCurrentTask">&#10003; Done</button>'+
               '<button class="btn btn-ghost btn-sm" data-action="releaseCurrentTask" title="Stop timing it — it stays on today\'s list">Release</button>'+
               (inS ? '' : '<button class="btn btn-ghost btn-sm" data-action="openLockInChooser" title="Lock in — it counts as deep work">&#128274; Lock in</button>')+'</div>'
@@ -46,6 +50,7 @@ function nowNextPanelHtml(){
         '</div>'
       : '<div class="nn-title nn-empty">Nothing lined up</div><div class="nn-acts">'+picker('Pick one')+'<span class="nn-hint">or drag a card here</span></div>')+
   '</div>';
+  if(opts.stack) return '<div class="nn-panel nn-stack'+(opts.hero?' nn-hero':'')+(inS ? '' : ' is-free')+'" data-key="nn-stack">'+now+nextCell+'</div>';
   return '<div class="nn-panel is-locked'+(inS ? '' : ' is-free')+'" data-key="nn-panel">'+now+nextCell+'</div>';
 }
 ACTIONS.nnStartNext = function(el, e, id){

@@ -9,7 +9,7 @@ const LOCKED_BLOCKS = {
       '<div class="stat-chip" data-action="goToFinishedTasks" style="text-align:center;cursor:pointer;"><div class="stat-chip-label">Completed Today</div><div class="stat-chip-value">'+c.doneToday.length+' task'+(c.doneToday.length===1?'':'s')+'</div></div>'+
       '<div class="stat-chip" id="statDeepWorkTodayBox" style="text-align:center;"><div class="stat-chip-label">Deep Work Today</div><div class="stat-chip-value">'+fmtHours(c.deepWorkToday)+'</div><div class="kpi-sub">'+fmtDurationLabel(c.deepWorkToday)+'</div></div>'+
     '</div>'; }},
-  timer:     {label:'Timer & current task', pinned:true, render:function(){ return '<div class="hero-row">'+renderActiveFocusHero(true)+renderCurrentTaskCard(false,false,true)+'</div>'; }},
+  timer:     {label:'Timer & current task', pinned:true, render:function(){ return '<div class="hero-row">'+renderActiveFocusHero(true)+nowNextPanelHtml({stack:true, hero:true})+'</div>'; }},
   vision:    {label:'Vision board', render:function(){ return renderVisionSlideshow(); }},
   standards: {label:'Today\'s Standard', render:function(){ return renderStandardsWidget(); }},
   calendar:  {label:'Today on the calendar', render:function(c){

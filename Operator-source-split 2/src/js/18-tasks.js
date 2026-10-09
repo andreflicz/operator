@@ -294,10 +294,9 @@ function renderAddTaskModal(){
     '<div class="field" style="margin-top:10px;"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="newTaskDeadline"><input class="input" type="time" id="newTaskDeadlineTime" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="newTaskDeadline">Today</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskDeadline" title="Remove deadline">Clear</button></div></div>'+
     taskAlarmFieldsHtml('newTask', null)+
     '<div class="field" style="margin-top:10px;"><label>Notes (optional)</label><textarea class="input" id="newTaskNotes" placeholder="Any details worth remembering" style="width:100%;min-height:60px;"></textarea></div>'+
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskOngoing" style="margin-right:6px;">&#128204; Ongoing'+tip('For work that takes more than one day — it stays live until it\'s actually done.')+'</label>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskOngoing" style="margin-right:6px;">&#128204; Ongoing — takes more than a day'+tip('It stays on your list day after day until it\'s actually finished: tick it off for today without closing it. When it\'s due is just the Deadline above.')+'</label>'+
     '<div id="newTaskOngoingExtra" style="display:none;">'+
-    '<div class="field" style="margin-top:10px;"><label>Ongoing target date (optional)</label><div class="row"><input class="input" type="date" id="newTaskOngoingDeadline"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskOngoingDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskOngoingDeadline">Clear</button></div></div>'+
-    '<div class="field" style="margin-top:10px;"><label>Frequency (optional)</label><select class="input" id="newTaskOngoingFrequency"><option value="">&mdash;</option><option value="daily">Daily</option><option value="few">A few times a week</option><option value="weekly">Weekly</option></select></div>'+
+    '<div class="field" style="margin-top:10px;"><label>How often you work on it (optional)</label><select class="input" id="newTaskOngoingFrequency"><option value="">&mdash;</option><option value="daily">Daily</option><option value="few">A few times a week</option><option value="weekly">Weekly</option></select></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskIncludeStandard" style="margin-right:6px;">Include in Today\'s Standard</label>'+
     '</div>'+
     '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
@@ -318,8 +317,7 @@ function addTask(status){
   const notes = document.getElementById('newTaskNotes').value.trim();
   const ongoingEl = document.getElementById('newTaskOngoing');
   const ongoing = !!(ongoingEl && ongoingEl.checked);
-  const ongoingDeadlineEl = document.getElementById('newTaskOngoingDeadline');
-  const ongoingDeadline = (ongoing && ongoingDeadlineEl) ? (ongoingDeadlineEl.value || null) : null;
+  const ongoingDeadline = ongoing ? deadline : null;
   const ongoingFrequencyEl = document.getElementById('newTaskOngoingFrequency');
   const ongoingFrequency = (ongoing && ongoingFrequencyEl) ? (ongoingFrequencyEl.value || null) : null;
   const includeStandardEl = document.getElementById('newTaskIncludeStandard');

@@ -501,7 +501,7 @@ function renderContact(){
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="leadNotes-'+p.id+'" style="width:100%;min-height:70px;">'+escapeHtml(p.notes||'')+'</textarea></div>'+
     '<div class="row" style="margin-top:18px;justify-content:space-between;">'+
       '<button class="btn btn-ghost btn-sm mini-move-danger" data-action="deleteContact" data-kind="lead" data-id="'+p.id+'">Delete lead</button>'+
-      '<div class="row">'+
+      '<div class="row">'+ghlPaneBtnHtml('lead', p)+
         (leadIsOpen(p) ? '<button class="btn btn-ghost btn-sm" data-action="markLeadLost" data-id="'+p.id+'">Mark lost</button><button class="btn btn-good btn-sm" data-action="markLeadWon" data-id="'+p.id+'">&#127881; Won → client</button>' : '')+
         '<button class="btn btn-primary" data-action="saveLead" data-id="'+p.id+'">Save</button>'+
       '</div>'+

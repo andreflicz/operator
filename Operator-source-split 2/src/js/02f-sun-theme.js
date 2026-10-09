@@ -45,6 +45,21 @@ function skyPhase(d){
   if(m < w.set) return 'golden';
   return 'dusk';
 }
+// The look of the sky (the Today header tint, the Sky scene, the wake screen): follows the sun by
+// default, or keep the one you like — e.g. Sunset all day, even when it's light out.
+const SKY_LOOKS = [['auto','&#127763; Follow the sun'],['dawn','Dawn'],['morning','Morning'],['day','Day'],['golden','&#127749; Sunset'],['dusk','Dusk'],['night','Night']];
+function skyLook(){ const o = state.profile && state.profile.skyLook; return o && o!=='auto' && SKY_LOOKS.some(function(x){ return x[0]===o; }) ? o : skyPhase(); }
+ACTIONS.setSkyLook = function(el, e, id){
+  state.profile.skyLook = id==='auto' ? null : id; persist('profile');
+  if(typeof sceneMount==='function') sceneMount();
+  renderView();
+};
+function skyLookSettingsHtml(){
+  const cur = (state.profile.skyLook || 'auto');
+  return '<div class="section"><div class="section-title">Sky look'+tip('The color of the sky in the Today header, the Sky scene and the wake screen. Follow the sun, or keep one look all day — like Sunset.')+'</div><div class="card">'+
+    '<div class="seg-tabs" style="margin:0;flex-wrap:wrap;">'+SKY_LOOKS.map(function(x){ return '<button class="seg-tab'+(cur===x[0]?' active':'')+'" data-action="setSkyLook" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>'+
+  '</div></div>';
+}
 function effectiveTheme(d){
   const t = (state.profile && state.profile.theme) || 'dark';
   if(t==='auto'){

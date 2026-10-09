@@ -11,7 +11,7 @@ function renderTodayHero(greeting){
   lastRenderedStreak = streak;
   const allDone = dayStandardsComplete(todayStr());
   const evening = isWindDownTime();
-  const sky = state.profile.skyChip===false ? '' : ' data-sky="'+skyPhase()+'" data-wx="'+(wxNow() ? wxKind(wxNow().code) : 'clear')+'"';
+  const sky = state.profile.skyChip===false ? '' : ' data-sky="'+skyLook()+'" data-wx="'+(wxNow() ? wxKind(wxNow().code) : 'clear')+'"';
   return '<div class="today-hero"'+sky+' data-key="today-hero">'+
     '<div class="th-left">'+
       businessNameTagHtml()+

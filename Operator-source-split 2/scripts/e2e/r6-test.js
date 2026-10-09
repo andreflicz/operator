@@ -138,7 +138,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const order = await p.$$eval('#sidebarNav > .nav-item', e => e.map(x => x.dataset.view));
     check('dragging a sidebar tab moves it', order[0]==='calendar', order);
     check('…and the new order is saved', (await E("state.profile.navOrder[0]"))==='calendar');
-    await p.reload(); await p.waitForTimeout(500);
+    await p.waitForTimeout(600); await p.reload(); await p.waitForTimeout(500);
     check('…and is still there after a restart', (await p.$$eval('#sidebarNav > .nav-item', e => e.map(x => x.dataset.view)))[0]==='calendar');
     await p.click('#sidebarNav [data-view="business"]'); await p.waitForTimeout(150);
     check('tabs still work as normal clicks', (await E("ui.view"))==='business');

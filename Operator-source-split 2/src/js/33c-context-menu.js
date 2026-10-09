@@ -38,6 +38,7 @@ function appMenuHtml(){
     crow('Go to', ['today','focus','business','calendar','personal'].map(function(v){ return chip('go', v[0].toUpperCase()+v.slice(1), {a:v, on:ui.view===v}); }).join(''))+
     SEP+
     crow('Theme', [['dark','Dark'],['light','Light'],['auto','Auto']].map(function(t){ return chip('theme', t[1], {a:t[0], on:theme===t[0]}); }).join(''))+
+    crow('Sky', SKY_LOOKS.map(function(x){ return chip('sky', x[0]==='auto' ? 'Auto' : x[1].replace(/&#\d+;\s*/,''), {a:x[0], on:(state.profile.skyLook||'auto')===x[0]}); }).join(''))+
     crow('Scene', SCENES.map(function(sc){ return chip('scene', sc.label, {a:sc.id, on:scene===sc.id}); }).join('')+videoWalls().map(function(v){ return chip('scene', '&#9654; '+escapeHtml(v.name), {a:'vid:'+v.id, on:scene==='vid:'+v.id}); }).join(''))+
     crow('Cards', chip('layout', 'Grid', {a:'grid', on:lay==='grid'})+chip('layout', 'Carousel', {a:'carousel', on:lay==='carousel'}))+
     SEP+
@@ -132,6 +133,7 @@ ACTIONS.ctx = function(el){
   else if(op==='go') go(a);
   else if(op==='theme') setThemePref(a);
   else if(op==='scene') setScene(a);
+  else if(op==='sky') ACTIONS.setSkyLook(null, null, a);
   else if(op==='layout') ACTIONS.setCardLayout(null, null, a);
   else if(op==='sidebar') toggleSidebar();
   else if(op==='jPin') togglePinJournal(a);

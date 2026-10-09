@@ -115,7 +115,7 @@ function renderTodayTasksPanel(){
     ))+
   '</div>';
 
-  const currentTaskRow = '<div style="margin-bottom:16px;">'+renderCurrentTaskCard()+'</div>';
+  const currentTaskRow = '<div style="margin-bottom:16px;max-width:460px;margin-left:auto;margin-right:auto;">'+nowNextPanelHtml({stack:true})+'</div>';
 
   if(isEmpty){
     return '<div class="section">'+
@@ -132,9 +132,9 @@ function renderTodayTasksPanel(){
   const remaining = todayTasks.filter(function(t){ return t.id!==currentId; }).concat(doneToday);
   return '<div class="section">'+
     renderTaskToolbar(true)+
-    (carouselOn() ? '<div>'+carouselWrap(renderCurrentTaskCard(false, true)+remaining.map(function(t){ return taskCard(t); }).join(''), 'today-tasks', {w:236})+'</div>' :
+    (carouselOn() ? '<div>'+carouselWrap(nowNextPanelHtml({stack:true})+remaining.map(function(t){ return taskCard(t); }).join(''), 'today-tasks', {w:236})+'</div>' :
     '<div class="task-card-grid">'+
-      renderCurrentTaskCard(false, true)+
+      nowNextPanelHtml({stack:true})+
       (remaining.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing else queued for today.</div>')+
     '</div>')+
   '</div>';

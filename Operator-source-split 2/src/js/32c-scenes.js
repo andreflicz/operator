@@ -298,7 +298,7 @@ function sceneTick(x, c, dt, t){
 }
 // ---- mounting & the loop ----
 const SC = {bg:null, fx:null, x:null, raf:0, last:0, key:'', builtAt:0, running:false};
-function sceneCtxFor(id){ return {id:id, phase:id==='space' ? 'night' : skyPhase(), wx:id==='sky' && wxNow() ? wxKind(wxNow().code) : 'clear', w:window.innerWidth, h:window.innerHeight}; }
+function sceneCtxFor(id){ return {id:id, phase:id==='space' ? 'night' : skyLook(), wx:id==='sky' && wxNow() ? wxKind(wxNow().code) : 'clear', w:window.innerWidth, h:window.innerHeight}; }
 function sceneBuild(){
   const id = sceneId(); if(!SCENE_DEFS[id] || !SC.bg) return;
   const x = sceneCtxFor(id), dpr = Math.min(1.5, window.devicePixelRatio || 1);

@@ -1954,6 +1954,101 @@
   .mn-row{ display:flex; gap:8px; align-items:flex-end; }
   .mn-input{ flex:1; resize:vertical; min-height:44px; }
   .sleep-note{ margin-top:16px; width:100%; max-width:460px; text-align:left; }
+
+  /* ---- Now / Up next stacked: the drop slot on Today and the locked-in page ---- */
+  .nn-panel.nn-stack{ grid-template-columns:1fr; grid-template-rows:1fr 1fr; gap:8px; margin:0; max-width:none; min-width:0; }
+  .nn-stack .nn-cell{ justify-content:center; padding:12px 14px; }
+  .nn-stack .nn-title{ font-size:15px; }
+  .nn-stack .nn-acts{ flex-wrap:wrap; }
+  .nn-stack .nn-hint{ font-size:12px; }
+  .nn-stack.nn-hero{ flex:1; min-width:260px; height:340px; }
+  .task-card-grid > .nn-stack{ min-height:200px; }
+  .car-track > .nn-stack{ min-height:190px; }
+
+  /* ---- notifications ---- */
+  .brand-btns{ display:inline-flex; align-items:center; gap:2px; }
+  .notif-bell{ position:relative; width:30px; height:30px; border-radius:9px; border:none; background:transparent; color:var(--text-dim); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:14px; transition:background .15s; }
+  .notif-bell:hover{ background:var(--panel-2); }
+  .notif-bell-i{ filter:grayscale(1); opacity:.75; transition:filter .2s, opacity .2s; }
+  .notif-bell:hover .notif-bell-i, .notif-bell.has-urgent .notif-bell-i{ filter:none; opacity:1; }
+  .notif-count{ position:absolute; top:1px; right:0; min-width:16px; height:16px; padding:0 4px; border-radius:999px; background:var(--accent); color:#1a1206; font-size:10px; font-weight:800; line-height:16px; text-align:center; box-shadow:0 0 0 2px var(--panel); }
+  .notif-bell.has-urgent .notif-count{ background:var(--danger); color:#fff; }
+  .sidebar.collapsed .brand-btns{ flex-direction:column; }
+  .notif-panel{ position:fixed; left:14px; top:62px; z-index:900; width:360px; max-width:calc(100vw - 28px); max-height:min(70vh, 620px); overflow-y:auto; background:var(--pop, var(--panel)); border:1px solid var(--border-strong); border-radius:16px; box-shadow:0 24px 60px rgba(0,0,0,calc(.5*var(--sh-k, 1))); padding:10px; animation:npIn .18s cubic-bezier(.2,.8,.2,1); }
+  @keyframes npIn{ from{ opacity:0; transform:translateY(-6px) scale(.98); } to{ opacity:1; transform:none; } }
+  .np-head{ display:flex; align-items:center; gap:6px; padding:4px 6px 8px; }
+  .np-title{ flex:1; font-family:var(--font-display); font-weight:700; font-size:15px; }
+  .np-clear{ border:none; background:transparent; color:var(--text-faint); font-size:12px; cursor:pointer; } .np-clear:hover{ color:var(--text); }
+  .np-x{ border:none; background:transparent; color:var(--text-faint); cursor:pointer; font-size:12px; padding:4px 6px; }
+  .np-group{ margin-top:6px; }
+  .np-k{ font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); padding:6px 8px 4px; }
+  .np-item{ display:flex; align-items:center; gap:4px; border-radius:11px; transition:background .12s; }
+  .np-item:hover{ background:var(--panel-2); }
+  .np-main{ flex:1; min-width:0; display:flex; align-items:flex-start; gap:10px; padding:8px; border:none; background:transparent; color:var(--text); text-align:left; cursor:pointer; font-family:var(--font-body); }
+  .np-i{ flex:none; width:28px; height:28px; border-radius:9px; display:flex; align-items:center; justify-content:center; background:var(--panel-2); font-size:14px; }
+  .np-item.is-danger .np-i{ background:rgba(232,99,107,.16); box-shadow:inset 0 0 0 1px rgba(232,99,107,.4); }
+  .np-item.is-warn .np-i{ background:rgba(232,162,61,.14); box-shadow:inset 0 0 0 1px rgba(232,162,61,.35); }
+  .np-txt{ display:flex; flex-direction:column; min-width:0; }
+  .np-t{ font-weight:600; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .np-s{ font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .np-dismiss{ flex:none; border:none; background:transparent; color:var(--text-faint); cursor:pointer; opacity:0; padding:6px 8px; font-size:11px; }
+  .np-item:hover .np-dismiss{ opacity:1; } .np-dismiss:hover{ color:var(--text); }
+  .np-empty{ text-align:center; color:var(--text-dim); padding:26px 10px; font-size:13.5px; }
+
+  /* ---- Apple Music player in the menu ---- */
+  .sb-foot{ margin-top:auto; padding-top:12px; }
+  .mp{ border:1px solid var(--border); border-radius:14px; background:var(--panel-2); padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .mp.is-playing{ border-color:rgba(197,143,255,.35); box-shadow:0 0 24px rgba(197,143,255,.08); }
+  .mp-top{ display:flex; align-items:center; gap:9px; cursor:pointer; min-width:0; }
+  .mp-art{ flex:none; width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #fa2d48, #a33ee8); color:#fff; font-size:15px; }
+  .mp-art .wk2-eq{ transform:scale(.7); }
+  .mp-meta{ display:flex; flex-direction:column; min-width:0; }
+  .mp-name{ font-size:12.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mp-artist{ font-size:11.5px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mp-prog{ height:3px; border-radius:3px; background:var(--border); overflow:hidden; }
+  .mp-prog i{ display:block; height:100%; background:linear-gradient(90deg, #fa2d48, #c58fff); transition:width 1s linear; }
+  .mp-ctl{ display:flex; align-items:center; gap:4px; }
+  .mp-btn{ width:28px; height:28px; border-radius:50%; border:none; background:transparent; color:var(--text-dim); cursor:pointer; font-size:11px; display:inline-flex; align-items:center; justify-content:center; }
+  .mp-btn:hover{ color:var(--text); background:var(--panel); }
+  .mp-btn.mp-main{ width:32px; height:32px; background:var(--text); color:var(--bg); font-size:11px; }
+  .mp-btn.mp-main:hover{ transform:scale(1.06); background:var(--text); }
+  .mp-time{ margin-left:auto; font-size:10.5px; color:var(--text-faint); font-variant-numeric:tabular-nums; }
+  .mp-more{ display:flex; flex-direction:column; gap:8px; border-top:1px solid var(--border); padding-top:8px; }
+  .mp-vol{ display:flex; align-items:center; gap:6px; font-size:12px; } .mp-vol input{ flex:1; accent-color:#c58fff; }
+  .mp-search .input{ width:100%; padding:6px 9px; font-size:12px; }
+  .mp-lists{ display:flex; flex-direction:column; gap:2px; max-height:180px; overflow-y:auto; }
+  .mp-list{ text-align:left; border:none; background:transparent; color:var(--text-dim); font-size:12.5px; padding:5px 7px; border-radius:7px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mp-list:hover{ background:var(--panel); color:var(--text); }
+  .sidebar.collapsed .mp-meta, .sidebar.collapsed .mp-prog, .sidebar.collapsed .mp-time, .sidebar.collapsed .mp-more, .sidebar.collapsed .mp-ctl .mp-btn:not(.mp-main){ display:none; }
+  .sidebar.collapsed .mp{ padding:6px; align-items:center; } .sidebar.collapsed .mp-top{ justify-content:center; }
+  @media (max-width:800px){ .sb-foot{ display:none; } }
+
+  /* ---- GoHighLevel pane ---- */
+  .ghl-pane{ width:min(760px, 100%); max-height:88vh; overflow:hidden; display:flex; flex-direction:column; }
+  .gp-head{ display:flex; align-items:center; gap:12px; }
+  .gp-who{ min-width:0; } .gp-name{ font-family:var(--font-display); font-weight:700; font-size:18px; }
+  .gp-body{ flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
+  .gp-thread{ flex:1; min-height:200px; max-height:46vh; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:10px 4px; }
+  .gp-msg{ display:flex; flex-direction:column; max-width:78%; }
+  .gp-msg.is-in{ align-self:flex-start; } .gp-msg.is-out{ align-self:flex-end; align-items:flex-end; }
+  .gp-bubble{ padding:9px 13px; border-radius:16px; font-size:14px; line-height:1.4; white-space:pre-wrap; word-break:break-word; }
+  .gp-msg.is-in .gp-bubble{ background:var(--panel-2); border-bottom-left-radius:5px; }
+  .gp-msg.is-out .gp-bubble{ background:linear-gradient(180deg, #2f8cff, #1f6fe0); color:#fff; border-bottom-right-radius:5px; }
+  .gp-meta{ font-size:10.5px; color:var(--text-faint); margin-top:3px; }
+  .gp-compose{ display:flex; flex-direction:column; gap:8px; border-top:1px solid var(--border); padding-top:10px; }
+  .gp-send-row{ display:flex; gap:8px; align-items:flex-end; } .gp-send-row textarea{ flex:1; resize:vertical; min-height:44px; }
+  .gp-add{ display:flex; gap:8px; align-items:flex-end; margin-bottom:10px; } .gp-add textarea{ flex:1; }
+  .gp-list{ display:flex; flex-direction:column; gap:6px; overflow-y:auto; max-height:50vh; }
+  .gp-note{ padding:10px 12px; border-radius:12px; background:var(--panel-2); } .gp-note-b{ white-space:pre-wrap; font-size:13.5px; line-height:1.45; }
+  .gp-task{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; background:var(--panel-2); }
+  .gp-task.is-done .gp-task-t{ text-decoration:line-through; opacity:.55; }
+  .gp-task-t{ flex:1; font-weight:600; }
+  .gp-tick{ width:20px; height:20px; border-radius:6px; border:1.5px solid var(--border-strong); background:transparent; color:#0b0d12; font-size:12px; font-weight:800; cursor:pointer; padding:0; }
+  .gp-task.is-done .gp-tick{ background:var(--good); border-color:var(--good); }
+  .gp-appt{ display:flex; gap:10px; align-items:center; padding:9px 12px; border-radius:10px; background:var(--panel-2); }
+  .gp-appt-d{ font-weight:700; color:var(--accent); min-width:120px; }
+  .gp-loading{ color:var(--text-dim); font-size:13px; padding:18px; text-align:center; }
+  .gp-empty{ display:flex; flex-direction:column; align-items:center; gap:12px; padding:30px 10px; text-align:center; color:var(--text-dim); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -1967,7 +2062,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 <div id="loading">Loading Operator…</div>
 <div id="app" class="app" style="display:none;">
   <nav class="sidebar" id="sidebarNav">
-    <div class="brand"><span class="brand-text">Operator<em>.</em></span><button class="sidebar-toggle" data-action="toggleSidebar" title="Collapse menu">&#9776;</button></div>
+    <div class="brand"><span class="brand-text">Operator<em>.</em></span><span class="brand-btns"><button class="notif-bell" id="notifBell" data-action="toggleNotifs" title="Notifications"><span class="notif-bell-i">&#128276;</span><span class="notif-count" id="notifCount" hidden></span></button><button class="sidebar-toggle" data-action="toggleSidebar" title="Collapse menu">&#9776;</button></span></div>
     <div class="app-activity-indicator" id="currentAppIndicator" style="display:none;" title="What's currently in the foreground"></div>
     <button class="nav-item" data-action="nav" data-view="today"><span class="nav-icon">&#9670;</span><span class="nav-label">Today</span></button>
     <button class="nav-item" data-action="nav" data-view="focus"><span class="nav-icon">&#9201;</span><span class="nav-label">Focus</span></button>
@@ -1975,10 +2070,15 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
     <button class="nav-item" data-action="nav" data-view="calendar"><span class="nav-icon">&#9638;</span><span class="nav-label">Calendar</span></button>
     <button class="nav-item" data-action="nav" data-view="personal"><span class="nav-icon">&#9679;</span><span class="nav-label">Personal</span></button>
     <button class="nav-item" data-action="nav" data-view="settings"><span class="nav-icon">&#9881;</span><span class="nav-label">Settings</span></button>
+    <div class="sb-foot"><div id="musicPlayer"></div></div>
   </nav>
+  <div id="notifPanel" class="notif-panel" hidden></div>
   <main class="main"><div id="viewRoot"></div></main>
 </div>
 <div id="toastContainer" class="toast-container"></div>
+<div id="ghlOverlay" class="overlay hidden">
+  <div class="card ghl-pane" id="ghlContent"></div>
+</div>
 <div id="lockInNudgeOverlay" class="overlay hidden">
   <div class="card" id="lockInNudgeContent" style="max-width:380px;width:100%;text-align:center;"></div>
 </div>
@@ -2777,6 +2877,21 @@ function skyPhase(d){
   if(m < w.set) return 'golden';
   return 'dusk';
 }
+// The look of the sky (the Today header tint, the Sky scene, the wake screen): follows the sun by
+// default, or keep the one you like — e.g. Sunset all day, even when it's light out.
+const SKY_LOOKS = [['auto','&#127763; Follow the sun'],['dawn','Dawn'],['morning','Morning'],['day','Day'],['golden','&#127749; Sunset'],['dusk','Dusk'],['night','Night']];
+function skyLook(){ const o = state.profile && state.profile.skyLook; return o && o!=='auto' && SKY_LOOKS.some(function(x){ return x[0]===o; }) ? o : skyPhase(); }
+ACTIONS.setSkyLook = function(el, e, id){
+  state.profile.skyLook = id==='auto' ? null : id; persist('profile');
+  if(typeof sceneMount==='function') sceneMount();
+  renderView();
+};
+function skyLookSettingsHtml(){
+  const cur = (state.profile.skyLook || 'auto');
+  return '<div class="section"><div class="section-title">Sky look'+tip('The color of the sky in the Today header, the Sky scene and the wake screen. Follow the sun, or keep one look all day — like Sunset.')+'</div><div class="card">'+
+    '<div class="seg-tabs" style="margin:0;flex-wrap:wrap;">'+SKY_LOOKS.map(function(x){ return '<button class="seg-tab'+(cur===x[0]?' active':'')+'" data-action="setSkyLook" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>'+
+  '</div></div>';
+}
 function effectiveTheme(d){
   const t = (state.profile && state.profile.theme) || 'dark';
   if(t==='auto'){
@@ -3234,7 +3349,7 @@ function showToast(message, opts){
   container.innerHTML = '<div class="toast" id="activeToast">'+
     '<span class="toast-icon">'+(opts.icon||'&#128276;')+'</span>'+
     '<span>'+escapeHtml(message)+'</span>'+
-    (opts.actionLabel ? '<span class="toast-action" data-action="'+opts.actionAction+'">'+escapeHtml(opts.actionLabel)+'</span>' : '')+
+    (opts.actionLabel ? '<span class="toast-action" data-action="'+opts.actionAction+'"'+(opts.actionId ? ' data-id="'+escapeHtml(opts.actionId)+'"' : '')+'>'+escapeHtml(opts.actionLabel)+'</span>' : '')+
   '</div>';
   const el = document.getElementById('activeToast');
   requestAnimationFrame(function(){ if(el) el.classList.add('show'); });
@@ -3282,6 +3397,8 @@ function normalizeTasks(t){
     if(item.deadline===undefined) item.deadline=null;
     if(item.ongoing===undefined) item.ongoing=false;
     if(item.ongoingDeadline===undefined) item.ongoingDeadline=null;
+    // one date per task now: an ongoing task's old "target date" becomes its deadline if it had none
+    if(item.ongoing && item.ongoingDeadline && !item.deadline) item.deadline = item.ongoingDeadline;
     if(item.ongoingFrequency===undefined) item.ongoingFrequency=null;
     if(item.includeInStandard===undefined) item.includeInStandard=false;
     if(item.trackedMinutes===undefined) item.trackedMinutes=0;
@@ -4495,11 +4612,10 @@ function renderTaskEditModal(){
     '<div class="field" style="margin-top:10px;"><label>Deadline</label><div class="row"><input class="input" type="date" id="editDeadline-'+t.id+'" value="'+(t.deadline||'')+'"><input class="input" type="time" id="editDeadlineTime-'+t.id+'" value="'+(t.deadlineTime||'')+'" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editDeadline-'+t.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="editDeadline-'+t.id+'">Today</button>'+(t.deadline?'<button class="btn btn-ghost btn-sm" data-action="clearField" data-target="editDeadline-'+t.id+'" title="Remove deadline">Clear</button>':'')+'</div></div>'+
     taskAlarmFieldsHtml('editTask-'+t.id+'-', t)+
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="editNotes-'+t.id+'" style="width:100%;min-height:60px;">'+escapeHtml(t.notes||'')+'</textarea></div>'+
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editCountsDeep-'+t.id+'" '+(t.countsDeepWork!==false?'checked':'')+' style="margin-right:6px;">Counts toward deep work'+(function(){ const c=t.categoryId?taskCategoryById(t.categoryId):null; return c && c.countsDeepWork===false ? ' <span class="kpi-sub">(its category "'+escapeHtml(c.label)+'" doesn\'t count)</span>' : ''; })()+'</label>'+
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editOngoing-'+t.id+'" '+(t.ongoing?'checked':'')+' style="margin-right:6px;">&#128204; Ongoing'+tip('For work that takes more than one day — it stays live until it\'s actually done.')+'</label>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editCountsDeep-'+t.id+'" '+(t.countsDeepWork!==false?'checked':'')+' style="margin-right:6px;">&#9201; Time on this counts as deep work'+tip('When you time this task, those minutes go toward your daily deep-work goal (and the streak). Untick it for admin, calls or errands — the time is still tracked, it just isn\'t deep work.')+(function(){ const c=t.categoryId?taskCategoryById(t.categoryId):null; return c && c.countsDeepWork===false ? ' <span class="kpi-sub">(its category "'+escapeHtml(c.label)+'" doesn\'t count)</span>' : ''; })()+'</label>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editOngoing-'+t.id+'" '+(t.ongoing?'checked':'')+' style="margin-right:6px;">&#128204; Ongoing — takes more than a day'+tip('It stays on your list day after day until it\'s actually finished: tick it off for today without closing it. When it\'s due is just the Deadline above.')+'</label>'+
     '<div id="editTaskOngoingExtra-'+t.id+'" style="display:'+(t.ongoing?'block':'none')+';">'+
-    '<div class="field" style="margin-top:10px;"><label>Ongoing target date (optional)</label><div class="row"><input class="input" type="date" id="editOngoingDeadline-'+t.id+'" value="'+(t.ongoingDeadline||'')+'"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editOngoingDeadline-'+t.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="editOngoingDeadline-'+t.id+'">Clear</button></div></div>'+
-    '<div class="field" style="margin-top:10px;"><label>Frequency (optional)</label><select class="input" id="editOngoingFrequency-'+t.id+'">'+
+    '<div class="field" style="margin-top:10px;"><label>How often you work on it (optional)</label><select class="input" id="editOngoingFrequency-'+t.id+'">'+
       ['', 'daily', 'few', 'weekly'].map(function(v){ const lbl = v==='' ? '&mdash;' : v==='daily'?'Daily':v==='few'?'A few times a week':'Weekly'; return '<option value="'+v+'" '+((t.ongoingFrequency||'')===v?'selected':'')+'>'+lbl+'</option>'; }).join('')+
     '</select></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editIncludeStandard-'+t.id+'" '+(t.includeInStandard?'checked':'')+' style="margin-right:6px;">Include in Today\'s Standard</label>'+
@@ -4532,8 +4648,7 @@ function saveEditTask(id){
   const ongoingEl = document.getElementById('editOngoing-'+id);
   t.ongoing = !!(ongoingEl && ongoingEl.checked);
   if(t.ongoing){
-    const ongoingDeadlineEl = document.getElementById('editOngoingDeadline-'+id);
-    t.ongoingDeadline = ongoingDeadlineEl ? (ongoingDeadlineEl.value || null) : t.ongoingDeadline;
+    t.ongoingDeadline = t.deadline;
     const ongoingFrequencyEl = document.getElementById('editOngoingFrequency-'+id);
     t.ongoingFrequency = ongoingFrequencyEl ? (ongoingFrequencyEl.value || null) : t.ongoingFrequency;
     const includeStandardEl = document.getElementById('editIncludeStandard-'+id);
@@ -4781,7 +4896,7 @@ function renderTodayTasksPanel(){
     ))+
   '</div>';
 
-  const currentTaskRow = '<div style="margin-bottom:16px;">'+renderCurrentTaskCard()+'</div>';
+  const currentTaskRow = '<div style="margin-bottom:16px;max-width:460px;margin-left:auto;margin-right:auto;">'+nowNextPanelHtml({stack:true})+'</div>';
 
   if(isEmpty){
     return '<div class="section">'+
@@ -4798,9 +4913,9 @@ function renderTodayTasksPanel(){
   const remaining = todayTasks.filter(function(t){ return t.id!==currentId; }).concat(doneToday);
   return '<div class="section">'+
     renderTaskToolbar(true)+
-    (carouselOn() ? '<div>'+carouselWrap(renderCurrentTaskCard(false, true)+remaining.map(function(t){ return taskCard(t); }).join(''), 'today-tasks', {w:236})+'</div>' :
+    (carouselOn() ? '<div>'+carouselWrap(nowNextPanelHtml({stack:true})+remaining.map(function(t){ return taskCard(t); }).join(''), 'today-tasks', {w:236})+'</div>' :
     '<div class="task-card-grid">'+
-      renderCurrentTaskCard(false, true)+
+      nowNextPanelHtml({stack:true})+
       (remaining.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing else queued for today.</div>')+
     '</div>')+
   '</div>';
@@ -5652,7 +5767,7 @@ function renderTodayHero(greeting){
   lastRenderedStreak = streak;
   const allDone = dayStandardsComplete(todayStr());
   const evening = isWindDownTime();
-  const sky = state.profile.skyChip===false ? '' : ' data-sky="'+skyPhase()+'" data-wx="'+(wxNow() ? wxKind(wxNow().code) : 'clear')+'"';
+  const sky = state.profile.skyChip===false ? '' : ' data-sky="'+skyLook()+'" data-wx="'+(wxNow() ? wxKind(wxNow().code) : 'clear')+'"';
   return '<div class="today-hero"'+sky+' data-key="today-hero">'+
     '<div class="th-left">'+
       businessNameTagHtml()+
@@ -5834,7 +5949,7 @@ const LOCKED_BLOCKS = {
       '<div class="stat-chip" data-action="goToFinishedTasks" style="text-align:center;cursor:pointer;"><div class="stat-chip-label">Completed Today</div><div class="stat-chip-value">'+c.doneToday.length+' task'+(c.doneToday.length===1?'':'s')+'</div></div>'+
       '<div class="stat-chip" id="statDeepWorkTodayBox" style="text-align:center;"><div class="stat-chip-label">Deep Work Today</div><div class="stat-chip-value">'+fmtHours(c.deepWorkToday)+'</div><div class="kpi-sub">'+fmtDurationLabel(c.deepWorkToday)+'</div></div>'+
     '</div>'; }},
-  timer:     {label:'Timer & current task', pinned:true, render:function(){ return '<div class="hero-row">'+renderActiveFocusHero(true)+renderCurrentTaskCard(false,false,true)+'</div>'; }},
+  timer:     {label:'Timer & current task', pinned:true, render:function(){ return '<div class="hero-row">'+renderActiveFocusHero(true)+nowNextPanelHtml({stack:true, hero:true})+'</div>'; }},
   vision:    {label:'Vision board', render:function(){ return renderVisionSlideshow(); }},
   standards: {label:'Today\'s Standard', render:function(){ return renderStandardsWidget(); }},
   calendar:  {label:'Today on the calendar', render:function(c){
@@ -6238,10 +6353,9 @@ function renderAddTaskModal(){
     '<div class="field" style="margin-top:10px;"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="newTaskDeadline"><input class="input" type="time" id="newTaskDeadlineTime" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="newTaskDeadline">Today</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskDeadline" title="Remove deadline">Clear</button></div></div>'+
     taskAlarmFieldsHtml('newTask', null)+
     '<div class="field" style="margin-top:10px;"><label>Notes (optional)</label><textarea class="input" id="newTaskNotes" placeholder="Any details worth remembering" style="width:100%;min-height:60px;"></textarea></div>'+
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskOngoing" style="margin-right:6px;">&#128204; Ongoing'+tip('For work that takes more than one day — it stays live until it\'s actually done.')+'</label>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskOngoing" style="margin-right:6px;">&#128204; Ongoing — takes more than a day'+tip('It stays on your list day after day until it\'s actually finished: tick it off for today without closing it. When it\'s due is just the Deadline above.')+'</label>'+
     '<div id="newTaskOngoingExtra" style="display:none;">'+
-    '<div class="field" style="margin-top:10px;"><label>Ongoing target date (optional)</label><div class="row"><input class="input" type="date" id="newTaskOngoingDeadline"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskOngoingDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskOngoingDeadline">Clear</button></div></div>'+
-    '<div class="field" style="margin-top:10px;"><label>Frequency (optional)</label><select class="input" id="newTaskOngoingFrequency"><option value="">&mdash;</option><option value="daily">Daily</option><option value="few">A few times a week</option><option value="weekly">Weekly</option></select></div>'+
+    '<div class="field" style="margin-top:10px;"><label>How often you work on it (optional)</label><select class="input" id="newTaskOngoingFrequency"><option value="">&mdash;</option><option value="daily">Daily</option><option value="few">A few times a week</option><option value="weekly">Weekly</option></select></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskIncludeStandard" style="margin-right:6px;">Include in Today\'s Standard</label>'+
     '</div>'+
     '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
@@ -6262,8 +6376,7 @@ function addTask(status){
   const notes = document.getElementById('newTaskNotes').value.trim();
   const ongoingEl = document.getElementById('newTaskOngoing');
   const ongoing = !!(ongoingEl && ongoingEl.checked);
-  const ongoingDeadlineEl = document.getElementById('newTaskOngoingDeadline');
-  const ongoingDeadline = (ongoing && ongoingDeadlineEl) ? (ongoingDeadlineEl.value || null) : null;
+  const ongoingDeadline = ongoing ? deadline : null;
   const ongoingFrequencyEl = document.getElementById('newTaskOngoingFrequency');
   const ongoingFrequency = (ongoing && ongoingFrequencyEl) ? (ongoingFrequencyEl.value || null) : null;
   const includeStandardEl = document.getElementById('newTaskIncludeStandard');
@@ -6403,7 +6516,11 @@ function demoteTask(id){ const t=state.tasks.items.find(function(x){return x.id=
 // onto Now while locked in asks first.
 function nnTask(id){ return id ? state.tasks.items.find(function(t){ return t.id===id && t.status!=='done'; }) : null; }
 function nnExplicitNext(){ const t = nnTask(state.focus.nextTaskId) || nnTask(ui.stagedTaskId); return t && t.id!==ui.currentTaskId ? t : null; }
-function nowNextPanelHtml(){
+// opts.stack: the two halves stacked (Now on top, Up next below) — the drop slot on Today and
+// on the locked-in page.
+function nowNextPanelHtml(opts){
+  opts = opts || {};
+  const where = opts.stack ? 'stack' : 'panel', timerId = opts.stack ? 'currentTaskElapsed' : 'currentTaskElapsedBar';
   const as = state.focus.activeSession, inS = !!as, onBreak = !!(inS && as.onBreak);
   const cur = nnTask(ui.currentTaskId);
   const pend = nnTask(ui.pendingCurrentTaskId);
@@ -6411,7 +6528,7 @@ function nowNextPanelHtml(){
   let next = explicit;
   if(!next){ const s = nextUpTask(); if(s && s.id!==ui.currentTaskId && !(pend && s.id===pend.id)) next = s; }
   const title = function(t){ return '<div class="nn-title">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span></div>'; };
-  const picker = function(label){ return '<span class="nn-pick-wrap"><button class="btn btn-ghost btn-sm" data-action="toggleNextPicker" data-where="panel">'+label+' &#9662;</button>'+nextPickerHtml('panel')+'</span>'; };
+  const picker = function(label){ return '<span class="nn-pick-wrap"><button class="btn btn-ghost btn-sm" data-action="toggleNextPicker" data-where="'+where+'">'+label+' &#9662;</button>'+nextPickerHtml(where)+'</span>'; };
   let now = '';
   {
     now = '<div class="nn-cell nn-now'+(cur?' has-task':'')+(pend?' is-asking':'')+'" data-dropzone="current">'+
@@ -6422,7 +6539,7 @@ function nowNextPanelHtml(){
             '<button class="btn btn-ghost btn-sm" data-action="nnPendingToNext">Make it next</button>'+
             '<button class="btn btn-ghost btn-sm" data-action="cancelPendingCurrentTask">Cancel</button></div>'
         : cur
-          ? '<div class="nn-row">'+title(cur)+'<span class="nn-timer" id="currentTaskElapsedBar">'+formatElapsed(Date.now()-(ui.currentTaskStartedAt||Date.now()))+'</span></div>'+
+          ? '<div class="nn-row">'+title(cur)+'<span class="nn-timer" id="'+timerId+'">'+formatElapsed(Date.now()-(ui.currentTaskStartedAt||Date.now()))+'</span></div>'+
             '<div class="nn-acts"><button class="btn btn-good btn-sm" data-action="finishCurrentTask">&#10003; Done</button>'+
               '<button class="btn btn-ghost btn-sm" data-action="releaseCurrentTask" title="Stop timing it — it stays on today\'s list">Release</button>'+
               (inS ? '' : '<button class="btn btn-ghost btn-sm" data-action="openLockInChooser" title="Lock in — it counts as deep work">&#128274; Lock in</button>')+'</div>'
@@ -6441,6 +6558,7 @@ function nowNextPanelHtml(){
         '</div>'
       : '<div class="nn-title nn-empty">Nothing lined up</div><div class="nn-acts">'+picker('Pick one')+'<span class="nn-hint">or drag a card here</span></div>')+
   '</div>';
+  if(opts.stack) return '<div class="nn-panel nn-stack'+(opts.hero?' nn-hero':'')+(inS ? '' : ' is-free')+'" data-key="nn-stack">'+now+nextCell+'</div>';
   return '<div class="nn-panel is-locked'+(inS ? '' : ' is-free')+'" data-key="nn-panel">'+now+nextCell+'</div>';
 }
 ACTIONS.nnStartNext = function(el, e, id){
@@ -11503,7 +11621,7 @@ function clientCardFrontHtml(c){
       '</div>' : '<div class="kpi-sub" style="margin-top:6px;">No deliverables yet.</div>')+
     '</div>'+
     '<div class="cf-sec"><div class="cf-sec-k">Notes</div>'+(c.notes ? '<div class="cf-notes">'+escapeHtml(c.notes)+'</div>' : '<div class="kpi-sub">No notes yet — add some on the back of the card.</div>')+'</div>'+
-    '<div class="cf-foot"><button class="btn btn-ghost" data-action="closeClientModalAndSave">Close</button><button class="btn btn-primary" data-action="clientFlip" data-id="back">&#9998; Edit</button></div>'+
+    '<div class="cf-foot"><button class="btn btn-ghost" data-action="closeClientModalAndSave">Close</button>'+ghlPaneBtnHtml('client', c)+'<button class="btn btn-primary" data-action="clientFlip" data-id="back">&#9998; Edit</button></div>'+
   '</div>';
 }
 ACTIONS.clientFlip = function(el, e, id){
@@ -12450,7 +12568,7 @@ function renderContact(){
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="leadNotes-'+p.id+'" style="width:100%;min-height:70px;">'+escapeHtml(p.notes||'')+'</textarea></div>'+
     '<div class="row" style="margin-top:18px;justify-content:space-between;">'+
       '<button class="btn btn-ghost btn-sm mini-move-danger" data-action="deleteContact" data-kind="lead" data-id="'+p.id+'">Delete lead</button>'+
-      '<div class="row">'+
+      '<div class="row">'+ghlPaneBtnHtml('lead', p)+
         (leadIsOpen(p) ? '<button class="btn btn-ghost btn-sm" data-action="markLeadLost" data-id="'+p.id+'">Mark lost</button><button class="btn btn-good btn-sm" data-action="markLeadWon" data-id="'+p.id+'">&#127881; Won → client</button>' : '')+
         '<button class="btn btn-primary" data-action="saveLead" data-id="'+p.id+'">Save</button>'+
       '</div>'+
@@ -14216,7 +14334,7 @@ function renderSettings(){
         '<div class="task-list">'+RESET_TARGETS.map(function(t){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+t.label+'</div>'+resetPartBtn(t)+'</div>'; }).join('')+'</div>'+
       '</div></div>',
 
-    display: themeSettingsHtml()+sceneSettingsHtml()+weatherSettingsHtml()+cardLayoutSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
+    display: themeSettingsHtml()+skyLookSettingsHtml()+'<div class="section"><div class="section-title">Music'+tip('A small Apple Music player at the bottom of the menu — what\'s playing, play/pause, skip, volume and your playlists. Works when Operator is opened from the Operator app.')+'</div><div class="card"><label class="row" style="gap:8px;font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="setMusicPlayer" '+(state.profile.musicPlayer!==false?'checked':'')+'>Show the Apple Music player in the menu</label></div></div>'+sceneSettingsHtml()+weatherSettingsHtml()+cardLayoutSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
         '<div class="row">'+SWATCHES.map(function(sw){ return '<span class="swatch '+(p.accentColor===sw?'sel':'')+'" style="background:'+sw+';" data-action="pickThemeColor" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Today Header Style</div>'+
@@ -14239,13 +14357,13 @@ function renderSettings(){
           '</div>';
         }).join('')+'</div>'+
       '</div></div>'+
-      '<div class="section"><div class="section-title">Task Categories'+tip('Give task types their own color — shown as a left border on the card. Untick “Counts as deep work” for types that shouldn\'t add to deep work.')+'<div class="row"><input class="input" id="newTaskCatLabel" placeholder="e.g. Video Idea" style="width:160px;"><button class="btn btn-sm" data-action="addTaskCategory">Add</button></div></div>'+
+      '<div class="section"><div class="section-title">Task Categories'+tip('Give task types their own color — shown as a left border on the card. Untick “Time counts as deep work” for types that shouldn\'t add to deep work.')+'<div class="row"><input class="input" id="newTaskCatLabel" placeholder="e.g. Video Idea" style="width:160px;"><button class="btn btn-sm" data-action="addTaskCategory">Add</button></div></div>'+
         '<div class="card">'+
           '<div class="row" style="margin-bottom:10px;">'+SWATCHES.map(function(sw){ return '<span class="swatch'+(pickedSwatch===sw?' swatch-active':'')+'" style="background:'+sw+';" data-action="pickSwatch" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
           '<div class="task-list">'+(arr(state.tasks.categories).map(function(c){ return '<div class="task-item-v2">'+
             '<span class="swatch" style="background:'+c.color+';width:18px;height:18px;cursor:pointer;" data-action="cycleTaskCategoryColor" data-id="'+c.id+'" title="Click to change color"></span>'+
             '<input class="input" data-task-cat-label="'+c.id+'" value="'+escapeHtml(c.label)+'" style="flex:1;max-width:220px;">'+
-            '<label class="row kpi-sub" style="gap:4px;cursor:pointer;" title="Time on tasks in this category counts toward deep work"><input type="checkbox" data-task-cat-deep="'+c.id+'" '+(c.countsDeepWork!==false?'checked':'')+'>Counts as deep work</label>'+
+            '<label class="row kpi-sub" style="gap:4px;cursor:pointer;" title="Time on tasks in this category counts toward deep work"><input type="checkbox" data-task-cat-deep="'+c.id+'" '+(c.countsDeepWork!==false?'checked':'')+'>Time counts as deep work</label>'+
             deleteBtn('taskcat', c.id)+
           '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
         '</div>'+
@@ -14999,7 +15117,7 @@ function wakeArm(){ wakeCfg().armedAt = Date.now(); }
 // Everything for it goes through one queue, retried until it gets through.
 const HELPER_RETRY_MS = [100, 200, 300, 500, 800, 1100];
 let helperChain = Promise.resolve();
-function helperFetch(url, timeoutMs){
+function helperFetch(url, timeoutMs, wantJson){
   const run = async function(){
     for(let i=0;i<=HELPER_RETRY_MS.length;i++){
       const ctl = typeof AbortController!=='undefined' ? new AbortController() : null;
@@ -15007,10 +15125,11 @@ function helperFetch(url, timeoutMs){
       try{
         const res = await fetch(url, {cache:'no-store', signal: ctl ? ctl.signal : undefined});
         clearTimeout(timer);
+        if(wantJson){ let j = null; try{ j = await res.json(); }catch(e){} return res.ok ? (j || {}) : null; }
         return res.ok;
-      }catch(e){ clearTimeout(timer); if(i===HELPER_RETRY_MS.length) return false; await new Promise(function(r){ setTimeout(r, HELPER_RETRY_MS[i]); }); }
+      }catch(e){ clearTimeout(timer); if(i===HELPER_RETRY_MS.length || (wantJson && i>=2)) return wantJson ? null : false; await new Promise(function(r){ setTimeout(r, HELPER_RETRY_MS[i]); }); }
     }
-    return false;
+    return wantJson ? null : false;
   };
   const p = helperChain.then(run, run);
   helperChain = p.catch(function(){});
@@ -15285,7 +15404,7 @@ function wakeWeatherLine(){
 function wakeRingHtml(){
   const w = wakeCfg();
   const playing = wakeUsesMusic(w) && !(wakeRing && wakeRing.mediaFailed);
-  return '<div class="wk2" data-sky="'+skyPhase()+'">'+
+  return '<div class="wk2" data-sky="'+skyLook()+'">'+
     '<div class="wk2-aura"><i></i><i></i><i></i></div>'+
     '<div class="wk2-center">'+
       '<div class="wk2-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test ? ' <span class="tag">TEST</span>' : '')+'</div>'+
@@ -15938,7 +16057,7 @@ function sceneTick(x, c, dt, t){
 }
 // ---- mounting & the loop ----
 const SC = {bg:null, fx:null, x:null, raf:0, last:0, key:'', builtAt:0, running:false};
-function sceneCtxFor(id){ return {id:id, phase:id==='space' ? 'night' : skyPhase(), wx:id==='sky' && wxNow() ? wxKind(wxNow().code) : 'clear', w:window.innerWidth, h:window.innerHeight}; }
+function sceneCtxFor(id){ return {id:id, phase:id==='space' ? 'night' : skyLook(), wx:id==='sky' && wxNow() ? wxKind(wxNow().code) : 'clear', w:window.innerWidth, h:window.innerHeight}; }
 function sceneBuild(){
   const id = sceneId(); if(!SCENE_DEFS[id] || !SC.bg) return;
   const x = sceneCtxFor(id), dpr = Math.min(1.5, window.devicePixelRatio || 1);
@@ -16190,7 +16309,7 @@ function ghlCfg(){
   if(g.pipelineId===undefined) g.pipelineId = '';
   if(!g.stageMap || typeof g.stageMap!=='object') g.stageMap = {};
   if(!Array.isArray(g.pipelines)) g.pipelines = [];
-  ['syncCalendar', 'syncMessages', 'pushStages', 'autoSync'].forEach(function(k){ if(g[k]===undefined) g[k] = true; });
+  ['syncCalendar', 'syncMessages', 'pushStages', 'autoSync', 'pushNewLeads'].forEach(function(k){ if(g[k]===undefined) g[k] = true; });
   return g;
 }
 function ghlOn(){ const g = ghlCfg(); return !!(g.connected && g.locationId && g.pipelineId); }
@@ -16277,7 +16396,7 @@ ACTIONS.ghlConnect = async function(){
     g.pipelines = arr(r.pipelines).map(function(p){ return {id:p.id, name:p.name, stages:arr(p.stages).slice().sort(function(a, b){ return (a.position||0)-(b.position||0); }).map(function(s){ return {id:s.id, name:s.name}; })}; });
     if(!g.pipelines.length) throw new Error('Connected, but this location has no pipelines yet.');
     if(!g.pipelines.some(function(p){ return p.id===g.pipelineId; })) g.pipelineId = g.pipelines[0].id;
-    g.connected = true;
+    g.connected = true; if(!g.connectedAt) g.connectedAt = Date.now();
     ghlAutoMap();
     persist('settings');
     ui.ghlBusy = null; renderView();
@@ -16306,6 +16425,7 @@ async function ghlSync(manual){
   const g = ghlCfg(), out = {newLeads:0, movedLeads:0, events:0, touches:0, linked:0};
   const contacts = {}; // contactId → {id, name, email, phone, company}
   try{
+    await ghlPushLocal(g, out);
     await ghlPullOpportunities(g, out, contacts);
     ghlLinkClients(contacts, out);
     if(g.syncCalendar) await ghlPullAppointments(g, out);
@@ -16354,7 +16474,9 @@ async function ghlPullOpportunities(g, out, contacts){
           createdAt:ghlDate(o.createdAt), touchpoints:[], timeline:[], files:[], cadenceDays:null, value:Number(o.monetaryValue)||0, trade:'', nextFollowUp:null, stageHistory:[], convertedClientId:null,
           ghlOppId:o.id, ghlContactId:cid, ghlStageId:o.pipelineStageId};
         crmTimeline(x, 'note', 'Came in from GoHighLevel');
+        x.ghlSig = ghlSig(x);
         leads.push(x); out.newLeads++;
+        if(g.lastSync) g.recentLeads = [{id:x.id, name:x.company || x.name || 'Lead', at:Date.now()}].concat(arr(g.recentLeads)).slice(0, 20);
       } else {
         x.ghlOppId = o.id; x.ghlContactId = cid || x.ghlContactId;
         if(o.pipelineStageId && o.pipelineStageId!==x.ghlStageId){
@@ -16371,6 +16493,7 @@ async function ghlPullOpportunities(g, out, contacts){
         if(o.monetaryValue!=null && Number(o.monetaryValue)!==Number(x.value)) x.value = Number(o.monetaryValue)||0;
         if(!x.phone && c.phone) x.phone = c.phone;
         if(!x.email && c.email) x.email = c.email;
+        if(!x.ghlSig) x.ghlSig = ghlSig(x);
       }
     });
     const meta = r.meta || {};
@@ -16432,6 +16555,16 @@ function ghlTouchType(t){
 }
 async function ghlPullMessages(g, out, contacts){
   const r = await ghlCall('GET', '/conversations/search?'+ghlQ({locationId:g.locationId, limit:100, sort:'desc', sortBy:'last_message_date'}));
+  // unread messages from people → the bell (and a heads-up for ones that just came in)
+  const prev = {}; arr(g.inbox).forEach(function(m){ prev[m.contactId+':'+m.at] = true; });
+  g.inbox = arr(r.conversations).filter(function(cv){ return cv.contactId && Number(cv.unreadCount)>0 && /in/i.test(cv.lastMessageDirection||''); }).slice(0, 30).map(function(cv){
+    return {contactId:cv.contactId, convId:cv.id, name:cv.fullName || cv.contactName || '', body:cv.lastMessageBody || '', at:Number(cv.lastMessageDate) || Date.parse(cv.lastMessageDate) || 0};
+  });
+  const fresh = g.inbox.filter(function(m){ return !prev[m.contactId+':'+m.at]; });
+  if(fresh.length && g.lastSync){
+    playPositive();
+    showToast(fresh.length===1 ? '&#128172; '+escapeHtml(fresh[0].name || 'Someone')+': '+escapeHtml(String(fresh[0].body||'').slice(0, 80)) : fresh.length+' new messages in GoHighLevel', {icon:'&#128172;', duration:7000, actionLabel:'Open', actionAction:fresh.length===1 ? 'openGhlContact' : 'toggleNotifs', actionId:fresh[0].contactId});
+  }
   arr(r.conversations).forEach(function(cv){
     const cid = cv.contactId; if(!cid) return;
     if(!contacts[cid]) contacts[cid] = {id:cid, name:cv.fullName || cv.contactName || '', email:cv.email || '', phone:cv.phone || ''};
@@ -16460,7 +16593,12 @@ function ghlPushStage(x){
   ghlCall('PUT', '/opportunities/'+encodeURIComponent(x.ghlOppId), body)
     .catch(function(e){ showToast('Couldn\'t update GoHighLevel: '+e.message, {icon:'&#9888;', duration:5000}); });
 }
-setInterval(function(){ if(typeof state!=='undefined' && state && state.settings && ghlOn() && ghlCfg().autoSync) ghlSync(false); }, 10*60000);
+// every 3 minutes while Operator is on screen (new leads and messages show up fast), every 10 otherwise
+setInterval(function(){
+  if(typeof state==='undefined' || !state || !state.settings || !ghlOn() || !ghlCfg().autoSync) return;
+  const every = (document.hidden ? 10 : 3)*60000;
+  if(Date.now()-(ghlCfg().lastSync||0) >= every) ghlSync(false);
+}, 60000);
 setTimeout(function wait(){ if(typeof state!=='undefined' && state && state.settings && state.business && state.business.crm){ if(ghlOn() && ghlCfg().autoSync) ghlSync(false); } else setTimeout(wait, 2000); }, 15000);
 // ---- the settings card ----
 function ghlSettingsHtml(){
@@ -16479,7 +16617,7 @@ function ghlSettingsHtml(){
     return '<div class="section"><div class="card ghl-card">'+head+
       '<ol class="ghl-steps">'+
         '<li>In GoHighLevel, open the sub-account &rarr; <b>Settings &rarr; Private Integrations</b> &rarr; <b>Create new integration</b>.</li>'+
-        '<li>Give it these scopes: <code>contacts.readonly</code> <code>opportunities.readonly</code> <code>opportunities.write</code> <code>calendars.readonly</code> <code>calendars/events.readonly</code> <code>conversations.readonly</code> <code>locations.readonly</code>.</li>'+
+        '<li>Give it these scopes: <code>contacts.readonly</code> <code>contacts.write</code> <code>opportunities.readonly</code> <code>opportunities.write</code> <code>calendars.readonly</code> <code>calendars/events.readonly</code> <code>conversations.readonly</code> <code>conversations.write</code> <code>conversations/message.readonly</code> <code>conversations/message.write</code> <code>locations.readonly</code>.</li>'+
         '<li>Copy the key it shows you, and your <b>Location ID</b> (Settings &rarr; Business Profile, or the part of the URL after <code>/location/</code>).</li>'+
       '</ol>'+bridge+
       '<div class="grid grid-2" style="margin-top:12px;">'+
@@ -16498,12 +16636,261 @@ function ghlSettingsHtml(){
     (p ? '<div class="kind-label" style="margin-top:6px;">Stages'+tip('Which of your lead stages each GoHighLevel stage counts as. Moving a lead in either place moves it in the other.')+'</div><div class="ghl-map">'+p.stages.map(function(st){
       return '<div class="ghl-map-row"><span class="ghl-map-k">'+escapeHtml(st.name)+'</span><span class="kpi-sub">&rarr;</span><select class="input" data-ghl-stage="'+escapeHtml(st.id)+'">'+crmStages('lead').map(function(s){ return '<option value="'+s.id+'"'+(g.stageMap[st.id]===s.id?' selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select></div>';
     }).join('')+'</div>' : '')+
-    '<div class="ghl-toggles">'+toggle('syncCalendar', 'Bring in appointments (next 2 weeks)')+toggle('syncMessages', 'Count messages you send from GHL as touches')+toggle('pushStages', 'Send stage changes back to GHL')+toggle('autoSync', 'Sync every 10 minutes')+'</div>'+
+    '<div class="ghl-toggles">'+toggle('syncCalendar', 'Bring in appointments (next 2 weeks)')+toggle('syncMessages', 'Messages: count what you send as touches, and show new ones in the bell')+toggle('pushStages', 'Send stage changes back to GHL')+toggle('pushNewLeads', 'Send leads you add in Operator (and their detail changes) to GHL')+toggle('autoSync', 'Keep in sync on its own (every 3 min while Operator is open)')+'</div>'+
+    '<div class="kpi-sub" style="margin-top:8px;">Open any lead or client and hit <b>&#128172; GoHighLevel</b> to text, email, add notes and tasks, and see their appointments — right here. Added scopes since you connected? Messages need <code>conversations/message.write</code> and editing contacts needs <code>contacts.write</code>.</div>'+
     '<div class="row" style="margin-top:14px;justify-content:space-between;gap:10px;">'+
       '<button class="btn btn-ghost btn-sm" data-action="ghlDisconnect">Disconnect</button>'+
       '<span class="row" style="gap:10px;">'+busy+'<button class="btn btn-primary" data-action="ghlSyncNow"'+(ui.ghlBusy?' disabled':'')+'>&#128260; Sync now</button></span>'+
     '</div>'+
   '</div></div>';
+}
+
+// ============ GOHIGHLEVEL, INSIDE OPERATOR ============
+// Open any lead or client's GoHighLevel side without leaving the app: the whole conversation
+// (reply by text or email right here), their notes, GHL tasks, appointments, and their contact
+// details (edit them here and GHL updates). A lead that isn't in GoHighLevel yet gets an
+// "Add to GoHighLevel" button — and new leads you add in Operator go to GHL on their own.
+// Everything goes through the same Operator-app bridge as the sync.
+function ghlRec(kind, id){ return kind==='client' ? state.business.clients.find(function(c){ return c.id===id; }) : state.business.pipeline.find(function(l){ return l.id===id; }); }
+function ghlRecName(kind, x){ return kind==='client' ? (x.business || x.name || 'Client') : (x.company || x.name || 'Lead'); }
+function ghlSplitName(n){ const p = String(n||'').trim().split(/\s+/); return {firstName:p[0]||'', lastName:p.slice(1).join(' ')}; }
+function ghlSig(x){ return [x.name||'', x.email||'', x.phone||'', x.company||x.business||''].join('|'); }
+function ghlContactBody(kind, x){
+  const nm = x.name || (kind==='client' ? x.business : x.company) || '';
+  return Object.assign({name:nm, email:x.email || undefined, phone:x.phone || undefined, companyName:(kind==='client' ? x.business : x.company) || undefined}, ghlSplitName(nm));
+}
+// a lead/client that isn't in GHL yet → contact (+ opportunity for an open lead)
+async function ghlPushRecord(kind, x){
+  const g = ghlCfg();
+  const r = await ghlCall('POST', '/contacts/upsert', Object.assign({locationId:g.locationId, source:'Operator'}, ghlContactBody(kind, x)));
+  const c = r.contact || r; if(!c || !c.id) throw new Error('GoHighLevel didn\'t send back a contact.');
+  x.ghlContactId = c.id; x.ghlSig = ghlSig(x);
+  if(kind==='lead' && !x.ghlOppId && g.pipelineId && leadIsOpen(x)){
+    const p = ghlPipeline(), sid = ghlStageFor(x.stage) || (p && p.stages[0] && p.stages[0].id);
+    if(sid){
+      const o = await ghlCall('POST', '/opportunities/', {pipelineId:g.pipelineId, locationId:g.locationId, name:ghlRecName(kind, x), pipelineStageId:sid, status:'open', contactId:c.id, monetaryValue:Number(x.value)||0});
+      const opp = o.opportunity || o; if(opp && opp.id){ x.ghlOppId = opp.id; x.ghlStageId = sid; }
+    }
+  }
+  crmTimeline(x, 'note', 'Added to GoHighLevel');
+  persist('business');
+}
+// during a sync: new leads made here go to GHL, and details you changed here go back up
+async function ghlPushLocal(g, out){
+  if(!g.connectedAt){ g.connectedAt = Date.now(); return; }
+  const since = todayStr(new Date(g.connectedAt));
+  for(const x of state.business.pipeline){
+    if(x.convertedClientId || !leadIsOpen(x)) continue;
+    if(!x.ghlContactId){
+      if(g.pushNewLeads!==false && (x.createdAt||'') >= since && !x.ghlPushFailed){
+        try{ await ghlPushRecord('lead', x); out.pushed = (out.pushed||0)+1; }catch(e){ x.ghlPushFailed = true; }
+      }
+    } else if(x.ghlSig && x.ghlSig!==ghlSig(x)){
+      try{ await ghlCall('PUT', '/contacts/'+encodeURIComponent(x.ghlContactId), ghlContactBody('lead', x)); x.ghlSig = ghlSig(x); out.updated = (out.updated||0)+1; }catch(e){}
+    } else if(!x.ghlSig) x.ghlSig = ghlSig(x);
+  }
+}
+// ---- the pane ----
+function ghlPane(){ return ui.ghlPane || null; }
+ACTIONS.openGhlContact = function(el, e, id){
+  if(e) e.stopPropagation();
+  let kind = el && el.dataset ? el.dataset.kind : null, rec = null, cid = null;
+  if(kind){ rec = ghlRec(kind, id); cid = rec && rec.ghlContactId; }
+  else { cid = id; const r = ghlRecordForContact(cid); if(r){ kind = r.kind; rec = r.x; } }
+  ui.ghlPane = {cid:cid, kind:kind, id:rec ? rec.id : null, tab:'messages', channel:'SMS', data:{}, loading:{}, err:null};
+  showOverlay('ghlOverlay'); renderGhlPaneInto();
+  if(cid) ghlLoadTab('contact').then(function(){ ghlLoadTab('messages'); });
+};
+ACTIONS.closeGhlPane = function(){ ui.ghlPane = null; hideOverlay('ghlOverlay'); renderView(); };
+ACTIONS.ghlTab = function(el, e, id){ const p = ghlPane(); if(!p) return; p.tab = id; renderGhlPaneInto(); if(!p.data[id]) ghlLoadTab(id); };
+ACTIONS.ghlChannel = function(el, e, id){ const p = ghlPane(); if(!p) return; p.channel = id; renderGhlPaneInto(); };
+async function ghlLoadTab(tab){
+  const p = ghlPane(); if(!p || !p.cid) return;
+  const g = ghlCfg(), cid = encodeURIComponent(p.cid);
+  p.loading[tab] = true; renderGhlPaneInto();
+  try{
+    if(tab==='contact'){ const r = await ghlCall('GET', '/contacts/'+cid); p.data.contact = r.contact || r; }
+    else if(tab==='messages'){
+      const s = await ghlCall('GET', '/conversations/search?'+ghlQ({locationId:g.locationId, contactId:p.cid, limit:1}));
+      const cv = arr(s.conversations)[0];
+      p.convId = cv ? cv.id : null;
+      if(p.convId){
+        const r = await ghlCall('GET', '/conversations/'+encodeURIComponent(p.convId)+'/messages?limit=40');
+        const m = r.messages && Array.isArray(r.messages.messages) ? r.messages.messages : arr(r.messages);
+        p.data.messages = m.slice().sort(function(a, b){ return Date.parse(a.dateAdded||0)-Date.parse(b.dateAdded||0); });
+        // seen it here → it's read (in GHL too), and off the notifications
+        if(cv.unreadCount){ ghlCall('PUT', '/conversations/'+encodeURIComponent(p.convId), {unreadCount:0}).catch(function(){}); }
+        g.inbox = arr(g.inbox).filter(function(x){ return x.contactId!==p.cid; }); persist('settings');
+      } else p.data.messages = [];
+    }
+    else if(tab==='notes'){ const r = await ghlCall('GET', '/contacts/'+cid+'/notes'); p.data.notes = arr(r.notes).sort(function(a, b){ return Date.parse(b.dateAdded||0)-Date.parse(a.dateAdded||0); }); }
+    else if(tab==='tasks'){ const r = await ghlCall('GET', '/contacts/'+cid+'/tasks'); p.data.tasks = arr(r.tasks); }
+    else if(tab==='appts'){ const r = await ghlCall('GET', '/contacts/'+cid+'/appointments'); p.data.appts = arr(r.events || r.appointments); }
+    p.err = null;
+  }catch(e){ p.err = e.message; }
+  p.loading[tab] = false;
+  if(ghlPane()===p){ renderGhlPaneInto(); if(tab==='messages') ghlScrollThread(); }
+}
+function ghlScrollThread(){ requestAnimationFrame(function(){ const t = document.getElementById('ghlThread'); if(t) t.scrollTop = t.scrollHeight; }); }
+function ghlWhen(v){ const d = new Date(typeof v==='number' ? v : Date.parse(v)); if(isNaN(d)) return ''; return (todayStr(d)===todayStr() ? '' : fmtDateShort(todayStr(d))+' ')+d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}); }
+function ghlMsgType(m){ const t = String(m.messageType||m.type||''); return /EMAIL/i.test(t) ? 'Email' : /CALL/i.test(t) ? 'Call' : /FB|INSTAGRAM|IG/i.test(t) ? 'DM' : 'SMS'; }
+function ghlPaneHtml(){
+  const p = ghlPane(); if(!p) return '';
+  const rec = p.kind ? ghlRec(p.kind, p.id) : null;
+  const c = p.data.contact || {};
+  const name = c.contactName || c.name || [c.firstName, c.lastName].filter(Boolean).join(' ') || (rec ? ghlRecName(p.kind, rec) : 'Contact');
+  const head = '<div class="gp-head"><span class="ghl-logo">GHL</span><div class="gp-who"><div class="gp-name">'+escapeHtml(name)+'</div><div class="kpi-sub">'+
+      [c.companyName || (rec && (rec.company || rec.business)), c.phone || (rec && rec.phone), c.email || (rec && rec.email)].filter(Boolean).map(escapeHtml).join(' &middot; ')+'</div></div>'+
+      '<span style="flex:1"></span>'+(p.cid ? '<button class="btn btn-ghost btn-sm" data-action="ghlRefresh" title="Reload from GoHighLevel">&#8635;</button>' : '')+
+      '<button class="btn btn-ghost btn-sm" data-action="closeGhlPane">Close</button></div>';
+  if(!ghlOn()) return head+'<div class="empty">Connect GoHighLevel in Settings &rarr; Integrations first.</div>';
+  if(!p.cid){
+    return head+'<div class="gp-empty"><div style="font-size:28px;">&#128228;</div><div>'+escapeHtml(rec ? ghlRecName(p.kind, rec) : 'This contact')+' isn\'t in GoHighLevel yet.</div>'+
+      (rec ? '<button class="btn btn-primary" data-action="ghlPushOne"'+(p.busy?' disabled':'')+'>'+(p.busy ? 'Adding…' : 'Add to GoHighLevel')+'</button>' : '')+
+      (p.err ? '<div class="ghl-err">&#9888; '+escapeHtml(p.err)+'</div>' : '')+'</div>';
+  }
+  const tab = function(id, label){ return '<button class="seg-tab'+(p.tab===id?' active':'')+'" data-action="ghlTab" data-id="'+id+'">'+label+'</button>'; };
+  let body = '';
+  const loading = p.loading[p.tab] && !p.data[p.tab];
+  if(loading) body = '<div class="gp-loading">Loading from GoHighLevel…</div>';
+  else if(p.tab==='messages'){
+    const msgs = arr(p.data.messages);
+    body = '<div class="gp-thread" id="ghlThread">'+(msgs.length ? msgs.map(function(m){
+        const out = /out/i.test(m.direction||'');
+        return '<div class="gp-msg '+(out?'is-out':'is-in')+'"><div class="gp-bubble">'+escapeHtml(m.body || m.subject || (ghlMsgType(m)==='Call' ? 'Call' : ''))+'</div><div class="gp-meta">'+ghlMsgType(m)+' &middot; '+ghlWhen(m.dateAdded)+'</div></div>';
+      }).join('') : '<div class="gp-loading">No messages yet — say hi.</div>')+'</div>'+
+      '<div class="gp-compose">'+
+        '<div class="seg-tabs seg-sm" style="margin:0;"><button class="seg-tab'+(p.channel==='SMS'?' active':'')+'" data-action="ghlChannel" data-id="SMS">Text</button><button class="seg-tab'+(p.channel==='Email'?' active':'')+'" data-action="ghlChannel" data-id="Email">Email</button></div>'+
+        (p.channel==='Email' ? '<input class="input" id="ghlSubject" placeholder="Subject">' : '')+
+        '<div class="gp-send-row"><textarea class="input" id="ghlMsg" rows="2" placeholder="'+(p.channel==='Email'?'Write an email…':'Write a text…')+' (⌘↵ to send)"></textarea><button class="btn btn-primary" data-action="ghlSend"'+(p.sending?' disabled':'')+'>'+(p.sending?'Sending…':'Send')+'</button></div>'+
+      '</div>';
+  }
+  else if(p.tab==='notes'){
+    body = '<div class="gp-add"><textarea class="input" id="ghlNote" rows="2" placeholder="Add a note…"></textarea><button class="btn btn-primary btn-sm" data-action="ghlAddNote">Add</button></div>'+
+      '<div class="gp-list">'+(arr(p.data.notes).map(function(n){ return '<div class="gp-note"><div class="gp-note-b">'+escapeHtml(n.body||'')+'</div><div class="gp-meta">'+ghlWhen(n.dateAdded)+'</div></div>'; }).join('') || '<div class="gp-loading">No notes yet.</div>')+'</div>';
+  }
+  else if(p.tab==='tasks'){
+    body = '<div class="gp-add"><input class="input" id="ghlTaskTitle" placeholder="New task…" style="flex:1;"><input class="input" type="date" id="ghlTaskDue" value="'+addDays(todayStr(), 1)+'" style="width:150px;">'+
+        '<label class="kpi-sub" style="display:flex;gap:4px;align-items:center;white-space:nowrap;"><input type="checkbox" id="ghlTaskMine" checked>also in my tasks</label><button class="btn btn-primary btn-sm" data-action="ghlAddTask">Add</button></div>'+
+      '<div class="gp-list">'+(arr(p.data.tasks).map(function(t){
+        return '<div class="gp-task'+(t.completed?' is-done':'')+'"><button class="gp-tick" data-action="ghlTaskDone" data-id="'+escapeHtml(t.id)+'" title="'+(t.completed?'Done':'Mark done')+'">'+(t.completed?'&#10003;':'')+'</button><span class="gp-task-t">'+escapeHtml(t.title||'')+'</span><span class="gp-meta">'+(t.dueDate ? 'due '+fmtDateShort(todayStr(new Date(t.dueDate))) : '')+'</span></div>';
+      }).join('') || '<div class="gp-loading">No tasks.</div>')+'</div>';
+  }
+  else if(p.tab==='appts'){
+    body = '<div class="gp-list">'+(arr(p.data.appts).sort(function(a, b){ return Date.parse(a.startTime||0)-Date.parse(b.startTime||0); }).map(function(a){
+      return '<div class="gp-appt"><span class="gp-appt-d">'+ghlWhen(a.startTime)+'</span><span>'+escapeHtml(a.title || 'Appointment')+'</span><span class="kpi-sub">'+escapeHtml(a.appointmentStatus || a.status || '')+'</span></div>';
+    }).join('') || '<div class="gp-loading">No appointments.</div>')+'</div>';
+  }
+  else if(p.tab==='details'){
+    const v = function(k){ return escapeHtml(c[k] || ''); };
+    body = '<div class="grid grid-2 gp-details">'+
+      '<div class="field"><label>First name</label><input class="input" id="ghlFirst" value="'+v('firstName')+'"></div>'+
+      '<div class="field"><label>Last name</label><input class="input" id="ghlLast" value="'+v('lastName')+'"></div>'+
+      '<div class="field"><label>Phone</label><input class="input" id="ghlPhone" value="'+v('phone')+'"></div>'+
+      '<div class="field"><label>Email</label><input class="input" id="ghlEmail" value="'+v('email')+'"></div>'+
+      '<div class="field"><label>Company</label><input class="input" id="ghlCompany" value="'+v('companyName')+'"></div>'+
+      '<div class="field"><label>Tags</label><input class="input" id="ghlTags" value="'+escapeHtml(arr(c.tags).join(', '))+'" placeholder="comma, separated"></div>'+
+    '</div><div class="row" style="justify-content:flex-end;margin-top:12px;"><button class="btn btn-primary" data-action="ghlSaveContact"'+(p.saving?' disabled':'')+'>'+(p.saving?'Saving…':'Save to GoHighLevel')+'</button></div>';
+  }
+  return head+
+    '<div class="seg-tabs" style="margin:10px 0 12px;">'+tab('messages','&#128172; Conversation')+tab('notes','&#128221; Notes')+tab('tasks','&#9745; Tasks')+tab('appts','&#128197; Appointments')+tab('details','&#9998; Details')+'</div>'+
+    (p.err ? '<div class="ghl-err">&#9888; '+escapeHtml(p.err)+'</div>' : '')+
+    '<div class="gp-body">'+body+'</div>';
+}
+function renderGhlPaneInto(){ const el = document.getElementById('ghlContent'); if(el) morphInto(el, ghlPaneHtml(), {form:true}); }
+registerModal('ghlOverlay', renderGhlPaneInto);
+ACTIONS.ghlRefresh = function(){ const p = ghlPane(); if(!p) return; p.data = {}; ghlLoadTab('contact').then(function(){ ghlLoadTab(p.tab); }); };
+ACTIONS.ghlPushOne = async function(){
+  const p = ghlPane(); if(!p) return; const rec = ghlRec(p.kind, p.id); if(!rec) return;
+  p.busy = true; p.err = null; renderGhlPaneInto();
+  try{ await ghlPushRecord(p.kind, rec); p.cid = rec.ghlContactId; p.busy = false; renderGhlPaneInto(); await ghlLoadTab('contact'); ghlLoadTab('messages'); showToast('Added to GoHighLevel.', {icon:'&#10003;'}); }
+  catch(e){ p.busy = false; p.err = e.message; renderGhlPaneInto(); }
+};
+// log what you sent as a touch on the lead/client, the same as one sent from GHL
+function ghlLogTouch(p, type, note){
+  const rec = p.kind ? ghlRec(p.kind, p.id) : null; if(!rec) return;
+  if(!Array.isArray(rec.touchpoints)) rec.touchpoints = [];
+  rec.touchpoints.push({id:uid(), type:type, date:todayStr(), note:note, ts:Date.now(), via:'ghl'});
+  rec.ghlLastMsgAt = Date.now();
+  if(p.kind==='client'){ if(!Array.isArray(rec.touches)) rec.touches = []; rec.touches.push(todayStr()); }
+  if(rec.followUp && rec.followUp.date && todayStr() >= rec.followUp.date) rec.followUp = null;
+  persist('business');
+}
+ACTIONS.ghlSend = async function(){
+  const p = ghlPane(); if(!p || p.sending) return;
+  const box = document.getElementById('ghlMsg'), text = box ? box.value.trim() : ''; if(!text) return;
+  const subjEl = document.getElementById('ghlSubject'), subject = subjEl ? subjEl.value.trim() : '';
+  const body = p.channel==='Email' ? {type:'Email', contactId:p.cid, subject:subject || 'Quick note', html:escapeHtml(text).replace(/\n/g, '<br>'), message:text} : {type:'SMS', contactId:p.cid, message:text};
+  p.sending = true; renderGhlPaneInto();
+  try{
+    await ghlCall('POST', '/conversations/messages', body);
+    p.data.messages = arr(p.data.messages).concat([{direction:'outbound', body:text, messageType:p.channel==='Email'?'TYPE_EMAIL':'TYPE_SMS', dateAdded:new Date().toISOString()}]);
+    if(box) box.value = ''; if(subjEl) subjEl.value = '';
+    ghlLogTouch(p, p.channel==='Email' ? 'email' : 'text', 'Sent from Operator');
+    playTick(); p.err = null;
+  }catch(e){ p.err = 'Couldn\'t send: '+e.message; }
+  p.sending = false; renderGhlPaneInto(); ghlScrollThread();
+};
+document.addEventListener('keydown', function(e){
+  if(e.key==='Enter' && (e.metaKey || e.ctrlKey) && e.target && e.target.id==='ghlMsg'){ e.preventDefault(); ACTIONS.ghlSend(); }
+  if(e.key==='Enter' && (e.metaKey || e.ctrlKey) && e.target && e.target.id==='ghlNote'){ e.preventDefault(); ACTIONS.ghlAddNote(); }
+  if(e.key==='Enter' && e.target && e.target.id==='ghlTaskTitle'){ e.preventDefault(); ACTIONS.ghlAddTask(); }
+});
+ACTIONS.ghlAddNote = async function(){
+  const p = ghlPane(); if(!p) return; const box = document.getElementById('ghlNote'), text = box ? box.value.trim() : ''; if(!text) return;
+  try{
+    const r = await ghlCall('POST', '/contacts/'+encodeURIComponent(p.cid)+'/notes', {body:text});
+    p.data.notes = [r.note || {body:text, dateAdded:new Date().toISOString()}].concat(arr(p.data.notes));
+    if(box) box.value = '';
+    const rec = p.kind ? ghlRec(p.kind, p.id) : null; if(rec){ crmTimeline(rec, 'note', text); persist('business'); }
+    p.err = null; playTick();
+  }catch(e){ p.err = 'Couldn\'t save the note: '+e.message; }
+  renderGhlPaneInto();
+};
+ACTIONS.ghlAddTask = async function(){
+  const p = ghlPane(); if(!p) return;
+  const t = document.getElementById('ghlTaskTitle'), d = document.getElementById('ghlTaskDue'), mine = document.getElementById('ghlTaskMine');
+  const title = t ? t.value.trim() : ''; if(!title) return;
+  const due = (d && d.value) || addDays(todayStr(), 1);
+  try{
+    const r = await ghlCall('POST', '/contacts/'+encodeURIComponent(p.cid)+'/tasks', {title:title, body:'', dueDate:new Date(localTs(due, '17:00')).toISOString(), completed:false});
+    const gt = r.task || {id:'', title:title, dueDate:due};
+    p.data.tasks = arr(p.data.tasks).concat([gt]);
+    if(mine && mine.checked){
+      const rec = p.kind ? ghlRec(p.kind, p.id) : null;
+      const cl = rec ? (p.kind==='lead' ? 'lead:'+rec.id : rec.id) : 'personal';
+      state.tasks.items.push({id:uid(), title:title, client:cl, clients:[cl], priority:'med', deadline:due, notes:'', status:'backlog', createdAt:todayStr(), completedAt:null, ghlTaskId:gt.id||null, ghlContactId:p.cid});
+      persist('tasks');
+    }
+    if(t) t.value = ''; p.err = null; playTaskAdded();
+  }catch(e){ p.err = 'Couldn\'t add the task: '+e.message; }
+  renderGhlPaneInto();
+};
+ACTIONS.ghlTaskDone = async function(el, e, id){
+  const p = ghlPane(); if(!p) return; const t = arr(p.data.tasks).find(function(x){ return x.id===id; }); if(!t || t.completed) return;
+  t.completed = true; renderGhlPaneInto();
+  try{ await ghlCall('PUT', '/contacts/'+encodeURIComponent(p.cid)+'/tasks/'+encodeURIComponent(id)+'/completed', {completed:true}); playTaskComplete(); }
+  catch(err){ t.completed = false; p.err = err.message; renderGhlPaneInto(); }
+};
+ACTIONS.ghlSaveContact = async function(){
+  const p = ghlPane(); if(!p) return;
+  const v = function(id){ const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const body = {firstName:v('ghlFirst'), lastName:v('ghlLast'), phone:v('ghlPhone') || undefined, email:v('ghlEmail') || undefined, companyName:v('ghlCompany') || undefined,
+    tags:v('ghlTags').split(',').map(function(s){ return s.trim(); }).filter(Boolean)};
+  body.name = [body.firstName, body.lastName].filter(Boolean).join(' ');
+  p.saving = true; renderGhlPaneInto();
+  try{
+    const r = await ghlCall('PUT', '/contacts/'+encodeURIComponent(p.cid), body);
+    p.data.contact = Object.assign({}, p.data.contact, r.contact || body);
+    const rec = p.kind ? ghlRec(p.kind, p.id) : null;
+    if(rec){ if(body.name) rec.name = body.name; if(body.email) rec.email = body.email; if(body.phone) rec.phone = body.phone; if(p.kind==='lead' && body.companyName) rec.company = body.companyName; rec.ghlSig = ghlSig(rec); persist('business'); }
+    p.err = null; showToast('Saved to GoHighLevel.', {icon:'&#10003;'});
+  }catch(e){ p.err = 'Couldn\'t save: '+e.message; }
+  p.saving = false; renderGhlPaneInto();
+};
+function ghlPaneBtnHtml(kind, x){
+  if(!ghlCfg().connected || !x) return '';
+  return '<button class="btn btn-ghost btn-sm gp-open" data-action="openGhlContact" data-kind="'+kind+'" data-id="'+x.id+'" title="Messages, notes, tasks and appointments in GoHighLevel">&#128172; '+(x.ghlContactId ? 'GoHighLevel' : 'Add to GHL')+'</button>';
 }
 
 // ============ NOTE FOR THE MORNING ============
@@ -16548,6 +16935,215 @@ function renderMorningNotePanel(){
   return '<div class="section mn-panel"><div class="section-title">&#127769; Note for '+escapeHtml(morningLabel(target))+tip('Shows up first thing in your Good Morning briefing when the alarm goes off.')+'</div>'+
     '<div class="card">'+morningNoteBoxHtml('morningNoteInput')+'</div></div>';
 }
+
+// ============ APPLE MUSIC PLAYER (sidebar) ============
+// A small player at the bottom of the sidebar that drives the Music app on this Mac through the
+// Operator app (127.0.0.1:8935): what's playing, play/pause, skip, volume, and your playlists to
+// pick from — so music, like the wake-up song, never needs another window. It only shows when
+// the Operator app is there to talk to, and only asks what's playing while Operator is on screen.
+const MP = {now:null, at:0, helper:null, lists:null, timer:null, tick:null, open:false, failAt:0};
+function mpOn(){ return state.profile.musicPlayer!==false; }
+function mpUrl(path){ return WAKE_HELPER+'music/'+path; }
+async function mpPoll(){
+  if(!mpOn() || document.hidden){ return; }
+  if(MP.helper===false && Date.now()-MP.failAt < 60000) return;
+  const j = await helperFetch(mpUrl('now'), 3500, true);
+  if(!j){ MP.helper = false; MP.failAt = Date.now(); mpRender(); return; }
+  MP.helper = true; MP.now = j; MP.at = Date.now(); mpRender();
+}
+function mpStart(){
+  clearInterval(MP.timer); MP.timer = setInterval(mpPoll, 5000);
+  clearInterval(MP.tick); MP.tick = setInterval(mpTickBar, 1000);
+  setTimeout(mpPoll, 1200);
+}
+document.addEventListener('visibilitychange', function(){ if(!document.hidden) mpPoll(); });
+function mpPos(){
+  const n = MP.now; if(!n || !n.dur) return 0;
+  return Math.min(n.dur, (n.pos||0) + (n.state==='playing' ? (Date.now()-MP.at)/1000 : 0));
+}
+function mpFmt(s){ s = Math.max(0, Math.round(s)); return Math.floor(s/60)+':'+pad2(s%60); }
+function mpTickBar(){
+  const n = MP.now; if(!n || n.state!=='playing') return;
+  const bar = document.getElementById('mpBar'), t = document.getElementById('mpTime');
+  if(bar) bar.style.width = (n.dur ? mpPos()/n.dur*100 : 0).toFixed(1)+'%';
+  if(t) t.textContent = mpFmt(mpPos())+' / '+mpFmt(n.dur);
+}
+function mpHtml(){
+  if(!mpOn() || !MP.helper) return '';
+  const n = MP.now || {state:'off'};
+  const playing = n.state==='playing', has = n.state==='playing' || n.state==='paused';
+  const btn = function(c, icon, title, cls){ return '<button class="mp-btn'+(cls?' '+cls:'')+'" data-action="mpCmd" data-id="'+c+'" title="'+title+'">'+icon+'</button>'; };
+  return '<div class="mp'+(playing?' is-playing':'')+(MP.open?' is-open':'')+'">'+
+    '<div class="mp-top" data-action="mpToggle" title="'+(MP.open?'Hide':'Playlists & volume')+'">'+
+      '<span class="mp-art">'+(playing ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9835;')+'</span>'+
+      '<span class="mp-meta"><span class="mp-name">'+(has ? escapeHtml(n.name||'') : 'Apple Music')+'</span><span class="mp-artist">'+(has ? escapeHtml(n.artist||'') : 'Pick a playlist')+'</span></span>'+
+    '</div>'+
+    (has ? '<div class="mp-prog"><i id="mpBar" style="width:'+(n.dur ? mpPos()/n.dur*100 : 0).toFixed(1)+'%"></i></div>' : '')+
+    '<div class="mp-ctl">'+btn('prev', '&#9198;', 'Previous')+btn('playpause', playing ? '&#10073;&#10073;' : '&#9654;', playing ? 'Pause' : 'Play', 'mp-main')+btn('next', '&#9197;', 'Next')+
+      (has ? '<span class="mp-time" id="mpTime">'+mpFmt(mpPos())+' / '+mpFmt(n.dur||0)+'</span>' : '')+'</div>'+
+    (MP.open ? '<div class="mp-more">'+
+      '<label class="mp-vol"><span>&#128264;</span><input type="range" min="0" max="100" value="'+(n.vol||50)+'" id="mpVol"></label>'+
+      '<div class="mp-search"><input class="input" id="mpQuery" placeholder="Play a song or playlist…"></div>'+
+      '<div class="mp-lists">'+(MP.lists==null ? '<span class="kpi-sub">Loading playlists…</span>' : MP.lists.length ? MP.lists.map(function(l){ return '<button class="mp-list" data-action="mpPick" data-id="'+escapeHtml(l)+'">'+escapeHtml(l)+'</button>'; }).join('') : '<span class="kpi-sub">No playlists found.</span>')+'</div>'+
+    '</div>' : '')+
+  '</div>';
+}
+function mpRender(){ const el = document.getElementById('musicPlayer'); if(el) morphInto(el, mpHtml()); }
+ACTIONS.mpCmd = async function(el, e, id){
+  if(e) e.stopPropagation();
+  // feel instant: flip play/pause on screen right away
+  if(id==='playpause' && MP.now && (MP.now.state==='playing' || MP.now.state==='paused')){ MP.now.pos = mpPos(); MP.at = Date.now(); MP.now.state = MP.now.state==='playing' ? 'paused' : 'playing'; mpRender(); }
+  const j = await helperFetch(mpUrl('cmd?c='+id), 4000, true);
+  if(j){ MP.now = j; MP.at = Date.now(); mpRender(); }
+};
+ACTIONS.mpToggle = function(){
+  MP.open = !MP.open; mpRender();
+  if(MP.open && MP.lists==null) helperFetch(mpUrl('playlists'), 6000, true).then(function(j){ MP.lists = j && Array.isArray(j.lists) ? j.lists : []; mpRender(); });
+};
+async function mpPlay(name, kind){
+  const j = await helperFetch(mpUrl('pick?k='+(kind||'playlist')+'&q='+hexUtf8(name)), 8000, true);
+  if(j && j.state){ MP.now = j; MP.at = Date.now(); mpRender(); }
+  else showToast('Couldn\'t find "'+name+'" in your Music library.', {icon:'&#9835;'});
+}
+ACTIONS.mpPick = function(el, e, id){ mpPlay(id, 'playlist'); };
+document.addEventListener('keydown', function(e){
+  if(e.key==='Enter' && e.target && e.target.id==='mpQuery'){ e.preventDefault(); const v = e.target.value.trim(); if(v){ mpPlay(v, 'any'); e.target.value = ''; } }
+});
+let mpVolT = null;
+document.addEventListener('input', function(e){
+  if(e.target && e.target.id==='mpVol'){ const v = Math.round(Number(e.target.value)); if(MP.now) MP.now.vol = v; clearTimeout(mpVolT); mpVolT = setTimeout(function(){ helperFetch(mpUrl('vol?v='+v), 3000); }, 120); }
+});
+ACTIONS.setMusicPlayer = function(el){ state.profile.musicPlayer = !!el.checked; persist('profile'); if(mpOn()) mpPoll(); mpRender(); };
+document.addEventListener('change', function(e){ if(e.target && e.target.id==='setMusicPlayer') ACTIONS.setMusicPlayer(e.target); });
+afterRenderHooks.push(function(){ if(!MP.timer && typeof state!=='undefined' && state && state.profile) mpStart(); });
+
+// ============ NOTIFICATIONS ============
+// The bell next to "Operator." collects what needs you, worked out fresh from your data:
+//  • deadlines — tasks overdue, due today or tomorrow; one-off client deliverables coming due
+//  • clients — behind on this week's deliverables, a check-in due, a retainer to invoice
+//  • leads — follow-ups that are due
+//  • the calendar — what's coming up in the next few hours
+//  • GoHighLevel — new messages waiting for a reply, and leads that just came in
+// Click one to go straight to it. ✕ hides it for today (it comes back tomorrow if it still
+// applies); "Clear all" does that for everything showing.
+function notifDismissed(){ const d = state.focus.notifDismissed; return d && typeof d==='object' ? d : (state.focus.notifDismissed = {}); }
+function notifList(){
+  const today = todayStr(), tomorrow = addDays(today, 1), out = [];
+  const add = function(n){ out.push(n); };
+  // deadlines
+  state.tasks.items.forEach(function(t){
+    if(t.status==='done' || !t.deadline || t.deadline > tomorrow) return;
+    const over = t.deadline < today;
+    add({key:'task:'+t.id+':'+t.deadline, kind:'deadline', level: over ? 'danger' : t.deadline===today ? 'warn' : 'info', icon:'&#9201;',
+      title:t.title, sub: over ? 'Overdue since '+fmtDateShort(t.deadline) : t.deadline===today ? 'Due today'+(t.deadlineTime ? ' at '+fmt12Hour(t.deadlineTime) : '') : 'Due tomorrow',
+      act:{a:'openTaskEditModal', id:t.id}, sort: over ? 0 : t.deadline===today ? 1 : 3});
+  });
+  // clients
+  arr(state.business.clients).filter(function(c){ return c.status==='active'; }).forEach(function(c){
+    const name = c.business || c.name || 'Client';
+    arr(c.deliverables).forEach(function(d){
+      if(d.recurring){
+        if(deliverablePaceStatus(d)==='danger') add({key:'pace:'+c.id+':'+d.id+':'+thisWeekKey(), kind:'client', level:'danger', icon:'&#127916;',
+          title:name+' — '+d.title+' behind', sub:deliverableWeekCount(d)+' of '+(d.weeklyTarget||1)+' this week', act:{a:'openClientModal', id:c.id}, sort:1});
+      } else if(d.status!=='done' && d.dueDate && d.dueDate<=tomorrow){
+        add({key:'deliv:'+c.id+':'+d.id, kind:'client', level: d.dueDate<today ? 'danger' : 'warn', icon:'&#128230;', title:name+' — '+d.title,
+          sub: d.dueDate<today ? 'Deliverable overdue' : d.dueDate===today ? 'Deliverable due today' : 'Deliverable due tomorrow', act:{a:'openClientModal', id:c.id}, sort:1});
+      }
+    });
+    const care = clientCareTier(c);
+    if(care.cls==='tag-danger') add({key:'care:'+c.id+':'+today, kind:'client', level:'warn', icon:'&#128075;', title:'Check in with '+name, sub:care.label, act:{a:'openClientModal', id:c.id}, sort:2});
+    if(Number(c.mrr)>0 && typeof clientInvoicedThisMonth==='function' && !clientInvoicedThisMonth(c.id) && new Date().getDate() >= (c.billingDay||1))
+      add({key:'inv:'+c.id+':'+thisMonthKey(), kind:'client', level:'warn', icon:'&#128176;', title:'Invoice '+name, sub:'$'+Number(c.mrr).toLocaleString()+' retainer — billing day passed', act:{a:'openClientModal', id:c.id}, sort:2});
+  });
+  // leads
+  arr(state.business.pipeline).forEach(function(x){
+    if(x.convertedClientId) return;
+    const n = typeof crmOverdueDays==='function' ? crmOverdueDays('lead', x) : null;
+    if(n==null || n<0 || !(x.followUp && x.followUp.date) && n<1) return;
+    add({key:'lead:'+x.id+':'+today, kind:'lead', level: n>2 ? 'danger' : 'warn', icon:'&#127919;', title:'Follow up with '+(x.company || x.name || 'lead'),
+      sub: dueLabel(n, 'lead', x).replace(/<[^>]+>/g, ''), act:{a:'openProspectEditModal', id:x.id}, sort:2});
+  });
+  // calendar: the next few hours
+  const now = Date.now();
+  arr(state.calendar.events).forEach(function(e){
+    if(e.date!==today || !e.time) return;
+    const ts = localTs(e.date, e.time), mins = Math.round((ts-now)/60000);
+    if(mins < -15 || mins > 180) return;
+    add({key:'ev:'+e.id+':'+e.date, kind:'calendar', level: mins<=30 ? 'warn' : 'info', icon:'&#128197;', title:e.title,
+      sub: mins<=0 ? 'Happening now' : 'In '+fmtDurationLabel(mins)+' · '+fmt12Hour(e.time), act:{a:'openCalItem', kind:'event', id:e.id}, sort: mins<=30 ? 0 : 4});
+  });
+  // GoHighLevel
+  const g = state.settings && state.settings.ghl;
+  if(g && g.connected){
+    arr(g.inbox).forEach(function(m){
+      add({key:'ghlmsg:'+m.contactId+':'+m.at, kind:'ghl', level:'warn', icon:'&#128172;', title:(m.name || 'Someone')+' messaged you', sub:String(m.body||'').slice(0, 90) || 'New message in GoHighLevel',
+        act:{a:'openGhlContact', id:m.contactId}, sort:1, at:m.at});
+    });
+    arr(g.recentLeads).forEach(function(l){
+      if(Date.now()-l.at > 2*86400000) return;
+      add({key:'ghllead:'+l.id, kind:'ghl', level:'info', icon:'&#10024;', title:'New lead: '+l.name, sub:'From GoHighLevel', act:{a:'openProspectEditModal', id:l.id}, sort:3, at:l.at});
+    });
+  }
+  const dis = notifDismissed();
+  return out.filter(function(n){ return dis[n.key]!==today; }).sort(function(a, b){ return a.sort-b.sort || (b.at||0)-(a.at||0); });
+}
+function notifBadge(){
+  const el = document.getElementById('notifCount'), bell = document.getElementById('notifBell'); if(!el || !bell) return;
+  let list = [];
+  try{ list = notifList(); }catch(e){ return; }
+  const urgent = list.filter(function(n){ return n.level!=='info'; }).length;
+  const txt = urgent ? (urgent>9 ? '9+' : String(urgent)) : '';
+  if(el.textContent!==txt) el.textContent = txt;
+  if(el.hidden!==!urgent) el.hidden = !urgent;
+  bell.classList.toggle('has-urgent', list.some(function(n){ return n.level==='danger'; }));
+  if(ui.notifOpen) notifRender(list);
+}
+function notifPanelHtml(list){
+  const groups = [['deadline','Deadlines'],['client','Clients'],['lead','Leads'],['calendar','Coming up'],['ghl','GoHighLevel']];
+  return '<div class="np-head"><span class="np-title">Notifications</span>'+(list.length ? '<button class="np-clear" data-action="notifClearAll">Clear all</button>' : '')+'<button class="np-x" data-action="toggleNotifs" title="Close">&#10005;</button></div>'+
+    (list.length ? groups.map(function(gr){
+      const items = list.filter(function(n){ return n.kind===gr[0]; }); if(!items.length) return '';
+      return '<div class="np-group"><div class="np-k">'+gr[1]+'</div>'+items.map(function(n){
+        return '<div class="np-item is-'+n.level+'" data-key="np-'+escapeHtml(n.key)+'">'+
+          '<button class="np-main" data-action="notifOpen" data-id="'+escapeHtml(n.key)+'"><span class="np-i">'+n.icon+'</span><span class="np-txt"><span class="np-t">'+escapeHtml(n.title)+'</span><span class="np-s">'+escapeHtml(n.sub||'')+'</span></span></button>'+
+          '<button class="np-dismiss" data-action="notifDismiss" data-id="'+escapeHtml(n.key)+'" title="Hide for today">&#10005;</button></div>';
+      }).join('')+'</div>';
+    }).join('') : '<div class="np-empty"><div style="font-size:26px;">&#10024;</div>All clear — nothing needs you right now.</div>');
+}
+function notifRender(list){ const el = document.getElementById('notifPanel'); if(el) morphInto(el, notifPanelHtml(list || notifList())); }
+ACTIONS.toggleNotifs = function(){
+  ui.notifOpen = !ui.notifOpen;
+  const el = document.getElementById('notifPanel'); if(!el) return;
+  el.hidden = !ui.notifOpen;
+  if(ui.notifOpen){ notifRender(); playTick(); }
+};
+function notifByKey(key){ return notifList().find(function(n){ return n.key===key; }); }
+ACTIONS.notifOpen = function(el, e, key){
+  const n = notifByKey(key); if(!n) return;
+  ui.notifOpen = false; const p = document.getElementById('notifPanel'); if(p) p.hidden = true;
+  const a = n.act;
+  if(a.a==='openTaskEditModal') openTaskEditModal(a.id);
+  else if(a.a==='openClientModal') openClientModal(a.id);
+  else if(a.a==='openProspectEditModal') openProspectEditModal(a.id);
+  else if(a.a==='openCalItem') openCalItem(a.kind, a.id);
+  else if(a.a==='openGhlContact' && ACTIONS.openGhlContact) ACTIONS.openGhlContact(null, null, a.id);
+};
+ACTIONS.notifDismiss = function(el, e, key){ notifDismissed()[key] = todayStr(); persist('focus'); notifBadge(); notifRender(); };
+ACTIONS.notifClearAll = function(){ const d = notifDismissed(), t = todayStr(); notifList().forEach(function(n){ d[n.key] = t; }); persist('focus'); notifBadge(); notifRender(); };
+// clicking anywhere else closes it
+document.addEventListener('pointerdown', function(e){
+  if(!ui.notifOpen) return;
+  if(e.target.closest && (e.target.closest('#notifPanel') || e.target.closest('#notifBell'))) return;
+  ui.notifOpen = false; const p = document.getElementById('notifPanel'); if(p) p.hidden = true;
+}, true);
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && ui.notifOpen){ ACTIONS.toggleNotifs(); } });
+// keep the badge current: after changes, and once a minute (deadlines and meetings come due on their own)
+let notifT = 0;
+afterRenderHooks.push(function(){ if(notifT) return; notifT = setTimeout(function(){ notifT = 0; notifBadge(); }, 400); });
+setInterval(function(){ if(typeof state!=='undefined' && state && state.tasks) notifBadge(); }, 60000);
+// old "hidden for today" marks don't need keeping
+function notifPrune(){ const d = notifDismissed(), t = todayStr(); Object.keys(d).forEach(function(k){ if(d[k] < addDays(t, -2)) delete d[k]; }); }
+setTimeout(function(){ try{ notifPrune(); }catch(e){} }, 5000);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
@@ -17169,6 +17765,7 @@ function appMenuHtml(){
     crow('Go to', ['today','focus','business','calendar','personal'].map(function(v){ return chip('go', v[0].toUpperCase()+v.slice(1), {a:v, on:ui.view===v}); }).join(''))+
     SEP+
     crow('Theme', [['dark','Dark'],['light','Light'],['auto','Auto']].map(function(t){ return chip('theme', t[1], {a:t[0], on:theme===t[0]}); }).join(''))+
+    crow('Sky', SKY_LOOKS.map(function(x){ return chip('sky', x[0]==='auto' ? 'Auto' : x[1].replace(/&#\d+;\s*/,''), {a:x[0], on:(state.profile.skyLook||'auto')===x[0]}); }).join(''))+
     crow('Scene', SCENES.map(function(sc){ return chip('scene', sc.label, {a:sc.id, on:scene===sc.id}); }).join('')+videoWalls().map(function(v){ return chip('scene', '&#9654; '+escapeHtml(v.name), {a:'vid:'+v.id, on:scene==='vid:'+v.id}); }).join(''))+
     crow('Cards', chip('layout', 'Grid', {a:'grid', on:lay==='grid'})+chip('layout', 'Carousel', {a:'carousel', on:lay==='carousel'}))+
     SEP+
@@ -17263,6 +17860,7 @@ ACTIONS.ctx = function(el){
   else if(op==='go') go(a);
   else if(op==='theme') setThemePref(a);
   else if(op==='scene') setScene(a);
+  else if(op==='sky') ACTIONS.setSkyLook(null, null, a);
   else if(op==='layout') ACTIONS.setCardLayout(null, null, a);
   else if(op==='sidebar') toggleSidebar();
   else if(op==='jPin') togglePinJournal(a);

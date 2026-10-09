@@ -82,213 +82,38 @@ serve_activity() {
   done
 }
 
-# --- Alarm wake-up helper ---------------------------------------------------
-# The page talks to 127.0.0.1:8935 when an alarm rings:
-#   /wake        bring the Operator window to the front, wake the display, unmute
-#   /music/play  play a song or playlist from Apple Music (?k=song|playlist&q=<name, hex>)
-#   /music/stop  pause it again (snooze / Stop)
-#   /music/finish  let the song that's on play to its end, then pause ("I'm up")
-# Wake-up music through the Music app has no ads and doesn't depend on the browser.
-# If the song can't be found (or Music isn't allowed), the Mac's own alert sound rings
-# instead, so you still wake up.
+# --- Local helpers: alarm wake-up, music, GoHighLevel -------------------------
+# The page talks to two loopback-only ports (nothing here is reachable from outside the Mac):
+#   127.0.0.1:8935  wake the Mac when an alarm rings, wake-up music and the in-app Apple Music
+#                   player (through the Music app — no ads), open links in another browser
+#   127.0.0.1:8936  the GoHighLevel bridge: browsers can't call GoHighLevel themselves, so it
+#                   makes the call with curl. Your Private Integration key stays in a file only
+#                   you can read ($DATA_DIR/ghl.key, permissions 600) — never in the app's data.
+# Everything they do is in Resources/helper.sh. Resources/bridge.pl keeps each port listening
+# all the time and answers requests side by side, so nothing bounces off a busy listener.
+# (If Perl were ever missing, a simpler one-at-a-time listener takes over.)
 WAKE_PORT=8935
-RAMP_PID_FILE="$DATA_DIR/music-ramp.pid"
-FALLBACK_PID_FILE="$DATA_DIR/music-fallback.pid"
-FINISH_PID_FILE="$DATA_DIR/music-finish.pid"
-wake_front() {
-  caffeinate -u -t 5 >/dev/null 2>&1 &
-  # An alarm nobody can hear is no alarm: unmute, and bring a very low volume up.
-  osascript -e 'set v to output volume of (get volume settings)' -e 'if v < 35 then set volume output volume 50' -e 'set volume without output muted' >/dev/null 2>&1
-  osascript -e "tell application \"System Events\" to set frontmost of (first process whose unix id is $CHROME_PID) to true" >/dev/null 2>&1
-}
-stop_music() {
-  for f in "$RAMP_PID_FILE" "$FALLBACK_PID_FILE" "$FINISH_PID_FILE"; do
-    if [ -f "$f" ]; then kill "$(cat "$f")" 2>/dev/null; rm -f "$f"; fi
-  done
-  osascript >/dev/null 2>&1 <<'APPLESCRIPT'
-if application "Music" is running then
-  tell application "Music"
-    if player state is playing then pause
-    set song repeat to off
-  end tell
-end if
-APPLESCRIPT
-}
-finish_music() {
-  for f in "$RAMP_PID_FILE" "$FALLBACK_PID_FILE" "$FINISH_PID_FILE"; do
-    if [ -f "$f" ]; then kill "$(cat "$f")" 2>/dev/null; rm -f "$f"; fi
-  done
-  # no more repeating; note the track that's on and how long it has left
-  INFO=$(osascript 2>/dev/null <<'APPLESCRIPT'
-if application "Music" is running then
-  tell application "Music"
-    set song repeat to off
-    if player state is playing then return ((persistent ID of current track) & " " & (round ((duration of current track) - player position) rounding up))
-  end tell
-end if
-return ""
-APPLESCRIPT
-)
-  [ -z "$INFO" ] && return
-  TRACK=${INFO% *}; LEFT=${INFO##* }
-  case "$LEFT" in ''|*[!0-9]*) LEFT=300 ;; esac
-  # wait it out, then pause the moment that track is over (before the next one gets going)
-  ( [ "$LEFT" -gt 3 ] && sleep $((LEFT-3))
-    n=0
-    while [ $n -lt 30 ]; do
-      NOW=$(osascript -e 'tell application "Music" to if player state is playing then return persistent ID of current track' 2>/dev/null)
-      if [ "$NOW" != "$TRACK" ]; then
-        [ -n "$NOW" ] && osascript -e 'tell application "Music" to pause' >/dev/null 2>&1
-        break
-      fi
-      sleep 1; n=$((n+1))
-    done
-    rm -f "$FINISH_PID_FILE" ) &
-  echo $! > "$FINISH_PID_FILE"
-}
-play_music() {
-  stop_music
-  RESULT=$(osascript - "$1" "$2" 2>/dev/null <<'APPLESCRIPT'
-on run argv
-  set q to item 1 of argv
-  set k to item 2 of argv
-  tell application "Music"
-    set sound volume to 35
-    if k is "playlist" then
-      try
-        set song repeat to all
-        play playlist q
-        return "ok"
-      end try
-    end if
-    try
-      set hits to (search library playlist 1 for q only songs)
-      if (count of hits) > 0 then
-        set song repeat to one
-        play (item 1 of hits)
-        return "ok"
-      end if
-    end try
-    try
-      set song repeat to all
-      play playlist q
-      return "ok"
-    end try
-  end tell
-  return "notfound"
-end run
-APPLESCRIPT
-)
-  if [ "$RESULT" = "ok" ]; then
-    # fade the music up over about a minute
-    ( for v in 45 55 65 75 85 100; do
-        sleep 8
-        osascript -e "tell application \"Music\" to set sound volume to $v" >/dev/null 2>&1
-      done ) &
-    echo $! > "$RAMP_PID_FILE"
-  else
-    ( n=0; while [ $n -lt 300 ]; do afplay /System/Library/Sounds/Glass.aiff >/dev/null 2>&1; n=$((n+1)); done ) &
-    echo $! > "$FALLBACK_PID_FILE"
-  fi
-}
-serve_wake() {
-  while true; do
-    REQ=$(printf 'HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/plain\r\nContent-Length: 2\r\nConnection: close\r\n\r\nok' \
-      | nc -l 127.0.0.1 "$WAKE_PORT" 2>/dev/null | sed -n '1p')
-    REQ_PATH=$(printf '%s' "$REQ" | awk '{print $2}')
-    case "$REQ_PATH" in
-      /music/play*)
-        K=$(printf '%s' "$REQ_PATH" | sed -n 's/.*[?&]k=\([a-z]*\).*/\1/p')
-        HEX=$(printf '%s' "$REQ_PATH" | sed -n 's/.*[?&]q=\([0-9a-fA-F]*\).*/\1/p')
-        Q=$(printf '%b' "$(printf '%s' "$HEX" | sed 's/../\\x&/g')")
-        if [ -n "$Q" ]; then play_music "$Q" "${K:-song}" & fi
-        ;;
-      /music/stop*)
-        stop_music &
-        ;;
-      /music/finish*)
-        finish_music &
-        ;;
-      /opfocus*)
-        F=$(printf '%s' "$REQ_PATH" | sed -n 's/.*[?&]f=\([01]\).*/\1/p')
-        printf '%s %s' "${F:-0}" "$(date +%s)" > "$DATA_DIR/opfocus" 2>/dev/null
-        ;;
-      /open*)
-        # open a web link in another browser (music in Firefox: its ad blocker skips the ads)
-        B=$(printf '%s' "$REQ_PATH" | sed -n 's/.*[?&]b=\([a-z]*\).*/\1/p')
-        HEX=$(printf '%s' "$REQ_PATH" | sed -n 's/.*[?&]u=\([0-9a-fA-F]*\).*/\1/p')
-        U=$(printf '%b' "$(printf '%s' "$HEX" | sed 's/../\\x&/g')")
-        case "$U" in
-          http://*|https://*)
-            case "$B" in
-              firefox) open -a Firefox "$U" 2>/dev/null || open "$U" ;;
-              safari) open -a Safari "$U" 2>/dev/null || open "$U" ;;
-              *) open "$U" ;;
-            esac ;;
-        esac
-        ;;
-      *)
-        wake_front &
-        ;;
-    esac
-  done
-}
-
-# --- GoHighLevel bridge -----------------------------------------------------
-# The page can't call GoHighLevel itself (browsers block it), so it asks this tiny
-# loopback-only server on 127.0.0.1:8936, which makes the call with curl and hands the
-# answer back. Your Private Integration key is saved in a file only you can read
-# ($DATA_DIR/ghl.key, permissions 600) — it never goes into the app's data or exports.
-#   /ghl/save?t=<hex key>   store the key        /ghl/forget   delete it
-#   /ghl/status             is a key saved?
-#   /ghl/api?m=GET|PUT|POST&p=<hex path>[&b=<hex json body>]   call the GHL API (v2)
 GHL_PORT=8936
-GHL_KEY_FILE="$DATA_DIR/ghl.key"
-ghl_hexdec() { printf '%b' "$(printf '%s' "$1" | sed 's/../\\x&/g')"; }
-ghl_param() { printf '%s' "$2" | sed -n "s/.*[?&]$1=\([0-9a-zA-Z]*\).*/\1/p"; }
-ghl_respond() {
-  IFS= read -r REQ_LINE
-  REQ_PATH=$(printf '%s' "$REQ_LINE" | awk '{print $2}')
-  CODE=400; BODY='{"error":"bad request"}'
-  case "$REQ_PATH" in
-    /ghl/save*)
-      T=$(ghl_hexdec "$(ghl_param t "$REQ_PATH")")
-      if [ -n "$T" ]; then ( umask 077; printf '%s' "$T" > "$GHL_KEY_FILE" ); chmod 600 "$GHL_KEY_FILE" 2>/dev/null; CODE=200; BODY='{"ok":true}'; fi ;;
-    /ghl/forget*)
-      rm -f "$GHL_KEY_FILE"; CODE=200; BODY='{"ok":true}' ;;
-    /ghl/status*)
-      CODE=200; if [ -s "$GHL_KEY_FILE" ]; then BODY='{"ok":true,"hasKey":true}'; else BODY='{"ok":true,"hasKey":false}'; fi ;;
-    /ghl/api*)
-      M=$(ghl_param m "$REQ_PATH"); P=$(ghl_hexdec "$(ghl_param p "$REQ_PATH")"); B=$(ghl_hexdec "$(ghl_param b "$REQ_PATH")")
-      case "$M" in GET|PUT|POST) ;; *) M=GET ;; esac
-      case "$P" in
-        /contacts*|/opportunities*|/calendars*|/conversations*|/locations*|/users*)
-          if [ ! -s "$GHL_KEY_FILE" ]; then CODE=401; BODY='{"error":"no key saved"}'
-          else
-            GHL_AUTH="Authorization: Bearer $(cat "$GHL_KEY_FILE")"
-            if [ -n "$B" ]; then
-              OUT=$(curl -sS --max-time 25 -X "$M" -H "$GHL_AUTH" -H "Version: 2021-07-28" -H "Accept: application/json" \
-                -H "Content-Type: application/json" --data "$B" -w '\n%{http_code}' "https://services.leadconnectorhq.com$P" 2>&1)
-            else
-              OUT=$(curl -sS --max-time 25 -X "$M" -H "$GHL_AUTH" -H "Version: 2021-07-28" -H "Accept: application/json" \
-                -w '\n%{http_code}' "https://services.leadconnectorhq.com$P" 2>&1)
-            fi
-            CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
-            case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":"could not reach GoHighLevel"}' ;; esac
-            [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach GoHighLevel"}'; }
-          fi ;;
-        *) CODE=403; BODY='{"error":"path not allowed"}' ;;
-      esac ;;
-  esac
-  LEN=$(printf '%s' "$BODY" | wc -c | tr -d ' ')
-  printf 'HTTP/1.1 %s OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: %s\r\nConnection: close\r\n\r\n%s' "$CODE" "$LEN" "$BODY"
-}
-serve_ghl() {
-  GHL_FIFO="$DATA_DIR/ghl.fifo"
-  rm -f "$GHL_FIFO"; mkfifo "$GHL_FIFO" 2>/dev/null || return
+HELPER="$DIR/Resources/helper.sh"
+BRIDGE="$DIR/Resources/bridge.pl"
+export DATA_DIR
+helper_call() { /bin/bash "$HELPER" "$1" "$2" >/dev/null 2>&1; }
+serve_fallback() { # kind, port — one request at a time
+  FIFO="$DATA_DIR/$1.fifo"
+  rm -f "$FIFO"; mkfifo "$FIFO" 2>/dev/null || return
   while true; do
-    cat "$GHL_FIFO" | nc -l 127.0.0.1 "$GHL_PORT" 2>/dev/null | ghl_respond > "$GHL_FIFO"
+    cat "$FIFO" | nc -l 127.0.0.1 "$2" 2>/dev/null | /bin/bash "$HELPER" "$1" > "$FIFO"
   done
+}
+start_helper() { # kind, port → echoes the pid
+  if command -v perl >/dev/null 2>&1 && perl -MIO::Socket::INET -e 1 >/dev/null 2>&1; then
+    perl "$BRIDGE" "$2" "$1" "$HELPER" >/dev/null 2>&1 &
+  elif command -v nc >/dev/null 2>&1 && command -v mkfifo >/dev/null 2>&1; then
+    serve_fallback "$1" "$2" >/dev/null 2>&1 &
+  else
+    return
+  fi
+  echo $!
 }
 
 POLL_PID=""
@@ -322,17 +147,11 @@ fi
   > /dev/null 2>&1 &
 CHROME_PID=$!
 
-WAKE_PID=""
 CAFF_PID=""
-if command -v osascript >/dev/null 2>&1 && command -v nc >/dev/null 2>&1; then
-  serve_wake &
-  WAKE_PID=$!
-fi
+export CHROME_PID
+WAKE_PID=$(start_helper wake "$WAKE_PORT")
 GHL_PID=""
-if command -v nc >/dev/null 2>&1 && command -v curl >/dev/null 2>&1 && command -v mkfifo >/dev/null 2>&1; then
-  serve_ghl &
-  GHL_PID=$!
-fi
+command -v curl >/dev/null 2>&1 && GHL_PID=$(start_helper ghl "$GHL_PORT")
 # Keep the Mac from idle-sleeping while Operator is open (the display can still turn
 # off), so a morning alarm can fire. Closing the lid on battery still sleeps.
 if command -v caffeinate >/dev/null 2>&1; then
@@ -341,12 +160,12 @@ if command -v caffeinate >/dev/null 2>&1; then
 fi
 
 cleanup() {
-  stop_music >/dev/null 2>&1
+  helper_call wake "GET /music/stop HTTP/1.1"
   [ -n "$POLL_PID" ] && kill "$POLL_PID" 2>/dev/null
   [ -n "$SERVE_PID" ] && kill "$SERVE_PID" 2>/dev/null
   [ -n "$WAKE_PID" ] && kill "$WAKE_PID" 2>/dev/null
   [ -n "$GHL_PID" ] && kill "$GHL_PID" 2>/dev/null
-  rm -f "$DATA_DIR/ghl.fifo" 2>/dev/null
+  rm -f "$DATA_DIR/ghl.fifo" "$DATA_DIR/wake.fifo" 2>/dev/null
   [ -n "$CAFF_PID" ] && kill "$CAFF_PID" 2>/dev/null
 }
 trap cleanup EXIT
