@@ -252,9 +252,9 @@ function dayDetailHtml(dateStr){
 }
 function analyticsRangeTabs(){
   const r = ui.analyticsRange || 'today';
-  return '<div class="seg-tabs">'+[['today','Today'],['week','This week'],['lastweek','Last week'],['all','All time']].map(function(x){
+  return '<div class="row" style="justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;"><div class="seg-tabs" style="margin:0;">'+[['today','Today'],['week','This week'],['lastweek','Last week'],['all','All time']].map(function(x){
     return '<button class="seg-tab'+(r===x[0]?' active':'')+'" data-action="analyticsRange" data-id="'+x[0]+'">'+x[1]+'</button>';
-  }).join('')+'</div>';
+  }).join('')+'</div><button class="btn btn-ghost btn-sm" data-action="openDayRecap">&#128202; Day recap</button></div>';
 }
 ACTIONS.analyticsRange = function(el, e, id){ ui.analyticsRange = id; ui.analyticsDay = null; renderView(); };
 ACTIONS.analyticsPickDay = function(el, e, id){ if(id>todayStr()) return; ui.analyticsDay = id; renderView(); };

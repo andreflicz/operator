@@ -74,16 +74,99 @@ serve_activity() {
 }
 
 # --- Alarm wake-up helper ---------------------------------------------------
-# When an alarm rings, the page pings 127.0.0.1:8935. This brings the Operator
-# window to the front and wakes the display, so the alarm is seen and heard even
-# if the window was hidden behind other apps or the screen had gone dark.
+# The page talks to 127.0.0.1:8935 when an alarm rings:
+#   /wake        bring the Operator window to the front, wake the display, unmute
+#   /music/play  play a song or playlist from Apple Music (?k=song|playlist&q=<name, hex>)
+#   /music/stop  pause it again ("I'm up" / snooze)
+# Wake-up music through the Music app has no ads and doesn't depend on the browser.
+# If the song can't be found (or Music isn't allowed), the Mac's own alert sound rings
+# instead, so you still wake up.
 WAKE_PORT=8935
+RAMP_PID_FILE="$DATA_DIR/music-ramp.pid"
+FALLBACK_PID_FILE="$DATA_DIR/music-fallback.pid"
+wake_front() {
+  caffeinate -u -t 5 >/dev/null 2>&1 &
+  # An alarm nobody can hear is no alarm: unmute, and bring a very low volume up.
+  osascript -e 'set v to output volume of (get volume settings)' -e 'if v < 35 then set volume output volume 50' -e 'set volume without output muted' >/dev/null 2>&1
+  osascript -e "tell application \"System Events\" to set frontmost of (first process whose unix id is $CHROME_PID) to true" >/dev/null 2>&1
+}
+stop_music() {
+  for f in "$RAMP_PID_FILE" "$FALLBACK_PID_FILE"; do
+    if [ -f "$f" ]; then kill "$(cat "$f")" 2>/dev/null; rm -f "$f"; fi
+  done
+  osascript >/dev/null 2>&1 <<'APPLESCRIPT'
+if application "Music" is running then
+  tell application "Music"
+    if player state is playing then pause
+    set song repeat to off
+  end tell
+end if
+APPLESCRIPT
+}
+play_music() {
+  stop_music
+  RESULT=$(osascript - "$1" "$2" 2>/dev/null <<'APPLESCRIPT'
+on run argv
+  set q to item 1 of argv
+  set k to item 2 of argv
+  tell application "Music"
+    set sound volume to 35
+    if k is "playlist" then
+      try
+        set song repeat to all
+        play playlist q
+        return "ok"
+      end try
+    end if
+    try
+      set hits to (search library playlist 1 for q only songs)
+      if (count of hits) > 0 then
+        set song repeat to one
+        play (item 1 of hits)
+        return "ok"
+      end if
+    end try
+    try
+      set song repeat to all
+      play playlist q
+      return "ok"
+    end try
+  end tell
+  return "notfound"
+end run
+APPLESCRIPT
+)
+  if [ "$RESULT" = "ok" ]; then
+    # fade the music up over about a minute
+    ( for v in 45 55 65 75 85 100; do
+        sleep 8
+        osascript -e "tell application \"Music\" to set sound volume to $v" >/dev/null 2>&1
+      done ) &
+    echo $! > "$RAMP_PID_FILE"
+  else
+    ( n=0; while [ $n -lt 300 ]; do afplay /System/Library/Sounds/Glass.aiff >/dev/null 2>&1; n=$((n+1)); done ) &
+    echo $! > "$FALLBACK_PID_FILE"
+  fi
+}
 serve_wake() {
   while true; do
-    printf 'HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: 2\r\nConnection: close\r\n\r\nok' \
-      | nc -l 127.0.0.1 "$WAKE_PORT" >/dev/null 2>&1
-    caffeinate -u -t 5 >/dev/null 2>&1 &
-    osascript -e "tell application \"System Events\" to set frontmost of (first process whose unix id is $CHROME_PID) to true" >/dev/null 2>&1
+    REQ=$(printf 'HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/plain\r\nContent-Length: 2\r\nConnection: close\r\n\r\nok' \
+      | nc -l 127.0.0.1 "$WAKE_PORT" 2>/dev/null | sed -n '1p')
+    REQ_PATH=$(printf '%s' "$REQ" | awk '{print $2}')
+    case "$REQ_PATH" in
+      /music/play*)
+        K=$(printf '%s' "$REQ_PATH" | sed -n 's/.*[?&]k=\([a-z]*\).*/\1/p')
+        HEX=$(printf '%s' "$REQ_PATH" | sed -n 's/.*[?&]q=\([0-9a-fA-F]*\).*/\1/p')
+        Q=$(printf '%b' "$(printf '%s' "$HEX" | sed 's/../\\x&/g')")
+        if [ -n "$Q" ]; then play_music "$Q" "${K:-song}" & fi
+        ;;
+      /music/stop*)
+        stop_music &
+        ;;
+      *)
+        wake_front &
+        ;;
+    esac
   done
 }
 
@@ -129,6 +212,7 @@ if command -v caffeinate >/dev/null 2>&1; then
 fi
 
 cleanup() {
+  stop_music >/dev/null 2>&1
   [ -n "$POLL_PID" ] && kill "$POLL_PID" 2>/dev/null
   [ -n "$SERVE_PID" ] && kill "$SERVE_PID" 2>/dev/null
   [ -n "$WAKE_PID" ] && kill "$WAKE_PID" 2>/dev/null

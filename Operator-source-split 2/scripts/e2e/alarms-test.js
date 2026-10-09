@@ -1,5 +1,5 @@
 // Wake-up alarm, on-time alarms (no more "only rings when I open the window"), wake
-// screen, night plan → alarm, task travel/get-ready alarms, break timer, second screen.
+// screen, night plan → alarm, task travel/get-ready alarms, break timer, wake-up music.
 const path = require('path');
 const { instrument, launch, newPage, check, report, OUT } = require('./common.js');
 const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7 Oct 2026
@@ -117,15 +117,40 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   check('no page errors (break)', p.errors.length===0, p.errors);
   await p.close();
 
-  // --- second-screen view ---
-  const ctx = await b.newContext({viewport:{width:1280, height:800}});
-  const d = await ctx.newPage(); const derr = []; d.on('pageerror', e=>derr.push(e.message));
-  await d.addInitScript(() => { localStorage.setItem('opsdash:focus', JSON.stringify({wake:{enabled:true, time:'07:00', days:[1,2,3,4,5,6]}})); localStorage.setItem('opsdash:boards', JSON.stringify({boards:[{id:'v1', kind:'vision', name:'Vision Board', parentId:null, elements:[{id:'e1', type:'note', header:true, color:'#3FBE8E', title:'Mind + Body', body:'', x:0, y:0, w:300, h:96}], viewport:{x:0,y:0,zoom:1}}]})); });
-  await d.goto('file://'+path.resolve(OUT+'/al.html')+'#wake'); await d.waitForTimeout(400);
-  check('second-screen view shows the wake screen + vision board', await d.isVisible('#wakeOverlay .wake-screen.is-display') && (await d.textContent('#wakeOverlay')).includes('Mind + Body'));
-  check('second-screen view hides the app', !(await d.isVisible('#app')));
-  check('static board is scaled to fit', await d.evaluate(() => /scale\(/.test(document.querySelector('.board-static-world').style.transform)));
-  check('no page errors (display)', derr.length===0, derr);
+  // --- wake-up music: Apple Music through the Operator app, no beep, no screen-permission prompt ---
+  const m = await newPage(b, OUT+'/al.html', {focus:{wake:{enabled:true, time:'07:00', days:[0,1,2,3,4,5,6]}}, boards:{boards:[{id:'v1', kind:'vision', name:'Vision Board', parentId:null, elements:[{id:'e1', type:'note', header:true, color:'#3FBE8E', title:'Mind + Body', body:'', x:0, y:0, w:300, h:96}], viewport:{x:0,y:0,zoom:1}}]}}, at(6,0));
+  const M = (code) => m.evaluate(c => window.__op.ev(c), code);
+  const calls = [];
+  await m.route('http://127.0.0.1:8935/**', r => { calls.push(new URL(r.request().url()).pathname + new URL(r.request().url()).search); r.fulfill({status:200, body:'ok', headers:{'Access-Control-Allow-Origin':'*'}}); });
+  await m.evaluate(() => { window.__screenAsked = 0; window.getScreenDetails = function(){ window.__screenAsked++; return Promise.reject(new Error('no')); }; });
+  await M("(function(){ const o = playAlarmSound; window.__beeps = 0; playAlarmSound = function(x){ window.__beeps++; return o(x); }; })()");
+  await M('openWakeSetup()');
+  check('no second-screen option in the setup', !(await m.textContent('#wakeSetupContent')).includes('Second screen'));
+  check('Apple Music is the first music option', await m.isVisible('#wakeMusicQuery'));
+  await m.fill('#wakeMusicQuery', 'https://music.apple.com/us/album/lose-yourself/1440903625?i=1440903630');
+  await m.click('[data-action="wakeSetAppleMusic"]');
+  check('an Apple Music link becomes the song name', await M("JSON.stringify(state.focus.wake.media)")===JSON.stringify({type:'music', k:'song', q:'lose yourself'}));
+  await m.click('[data-action="wakePreviewMusic"]'); await m.waitForTimeout(150);
+  check('Test asks the Operator app to play it', calls.some(c => c.startsWith('/music/play?k=song&q=6c6f736520796f757273656c66')), calls);
+  await m.click('[data-action="wakePreviewMusic"]'); await m.waitForTimeout(150);
+  check('…and Stop pauses it', calls.some(c => c==='/music/stop'), calls);
+  await M("hideOverlay('wakeSetupOverlay')");
+  calls.length = 0; await M("window.__beeps = 0");
+  await m.clock.setSystemTime(at(7,0)); await M('checkAllAlarms()'); await m.waitForTimeout(300);
+  check('alarm rings with the vision board on the main screen', await m.isVisible('#wakeOverlay .wake-screen') && (await m.textContent('#wakeOverlay')).includes('Mind + Body'));
+  check('it plays the song (and wakes / unmutes the Mac)', calls.some(c => c.startsWith('/music/play')) && calls.some(c => c==='/wake'), calls);
+  await m.waitForTimeout(3000);
+  check('no alarm beep while the song plays', await M("window.__beeps")===0);
+  check('never asks for screen permissions', await m.evaluate(() => window.__screenAsked)===0);
+  await m.click('[data-action="wakeImUp"]'); await m.waitForTimeout(150);
+  check('"I\'m up" stops the music', calls.some(c => c==='/music/stop'), calls);
+  // if the Operator app isn't there to play it, the alarm sound steps in
+  await m.unroute('http://127.0.0.1:8935/**');
+  await m.route('http://127.0.0.1:8935/**', r => r.abort());
+  await M("window.__beeps = 0; fireWake({test:true})"); await m.waitForTimeout(400);
+  check('music can\'t start → alarm sound instead', await M("window.__beeps")>0 && await m.isVisible('[data-action="wakePlayMusic"]'));
+  await m.click('[data-action="wakeImUp"]');
+  check('no page errors (music)', m.errors.length===0, m.errors);
   await b.close();
   process.exit(report()?1:0);
 })();

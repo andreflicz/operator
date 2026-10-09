@@ -27,7 +27,7 @@ function rawSessionMinutesFor(dateStr, type){
   return state.focus.sessions.filter(function(s){ return s.date===dateStr && sessionType(s)===type; }).reduce(function(a,s){ return a+(s.minutes||0); },0);
 }
 function deepWorkMinutesFor(dateStr){
-  return Math.max(0, rawSessionMinutesFor(dateStr,'deep') - excludedTaskMinutesFor(dateStr));
+  return Math.max(0, rawSessionMinutesFor(dateStr,'deep') - excludedTaskMinutesFor(dateStr) - distractionMinutesFor(dateStr));
 }
 function deepWorkMinutesTodayLive(){
   let mins = deepWorkMinutesFor(todayStr());
@@ -69,20 +69,22 @@ function fmtHours(mins){ return ((Number(mins)||0)/60).toFixed(1)+'h'; }
 function manualStandardsDoneFor(dateStr){
   const items = arr(state.standards.items).filter(function(it){ return !it.createdAt || it.createdAt<=dateStr; });
   if(!items.length) return true;
-  const rec = state.standards.completions.find(function(c){ return c.date===dateStr; });
+  const rec = RC ? memo('complByDate', function(){ const m = {}; state.standards.completions.forEach(function(c){ m[c.date] = c; }); return m; })[dateStr]
+                 : state.standards.completions.find(function(c){ return c.date===dateStr; });
   if(!rec) return false;
   return items.every(function(it){ return rec.doneIds.indexOf(it.id)>=0; });
 }
 function trainedDoneFor(dateStr){
+  if(RC) return !!memo('gymDates', function(){ const m = {}; arr(state.health.gymLog).forEach(function(g){ m[g.date] = true; }); return m; })[dateStr];
   return arr(state.health.gymLog).some(function(g){ return g.date===dateStr; });
 }
 function ongoingStandardTasksDoneFor(dateStr){
   // Only count tasks that already existed (and were still active) on that date — a task
   // added later can't retroactively require a check-off on days before it existed, or
   // every day before its creation would wrongly show as an incomplete standard forever.
-  const tasks = arr(state.tasks.items).filter(function(t){
-    return t.ongoing && t.includeInStandard && t.status!=='done' && (t.createdAt||dateStr)<=dateStr;
-  });
+  const pool = RC ? memo('stdOngoing', function(){ return arr(state.tasks.items).filter(function(t){ return t.ongoing && t.includeInStandard && t.status!=='done'; }); })
+                  : arr(state.tasks.items).filter(function(t){ return t.ongoing && t.includeInStandard && t.status!=='done'; });
+  const tasks = pool.filter(function(t){ return (t.createdAt||dateStr)<=dateStr; });
   if(!tasks.length) return true;
   return tasks.every(function(t){ return arr(t.ongoingDoneDates).indexOf(dateStr)>=0; });
 }

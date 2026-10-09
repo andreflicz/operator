@@ -128,6 +128,7 @@ async function pollAppActivity(){
   persist('appActivity');
   updateCurrentAppIndicator();
   checkAutoLockIn();
+  checkDistraction();
   if(ui.view==='focus' && ui.focusTab==='analytics') renderView();
 }
 // Why auto lock-in is currently held back (or null when it's allowed to run).

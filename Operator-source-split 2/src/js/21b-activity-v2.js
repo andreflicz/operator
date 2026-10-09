@@ -5,6 +5,10 @@
 const DEFAULT_WORK_ACTIVITY = ['final cut pro','adobe premiere pro','davinci resolve','capcut','adobe photoshop','adobe lightroom classic','lightroom','adobe after effects','adobe illustrator','figma','notion','code','visual studio code','cursor','xcode','canva','frame.io','logic pro','garageband',
   'docs.google.com','sheets.google.com','slides.google.com','drive.google.com','app.gohighlevel.com','adsmanager.facebook.com','business.facebook.com','canva.com','figma.com','notion.so','frame.io','chatgpt.com','chat.openai.com','claude.ai','capcut.com','studio.youtube.com'];
 const NEUTRAL_ACTIVITY = ['operator','finder','system settings','system preferences','loginwindow'];
+// Streaming / feeds never count as work (YouTube Studio is separate and counts as work).
+const DEFAULT_NOT_WORK = ['youtube.com','m.youtube.com','music.youtube.com','youtu.be','disneyplus.com','netflix.com','hulu.com','max.com','play.max.com','hbomax.com','primevideo.com','tv.apple.com','twitch.tv','tiktok.com','reddit.com','x.com','twitter.com','crunchyroll.com','peacocktv.com','paramountplus.com','espn.com','9gag.com',
+  'tv','netflix','disney+','prime video','steam','twitch','arcade','chess'];
+const BROWSER_APPS = ['safari','google chrome','arc','brave browser','microsoft edge','firefox','chromium','opera'];
 function activityKey(name){ return String(name||'').trim().toLowerCase(); }
 function activityCats(){ const st = state.settings.appTracking; if(!st.categories || typeof st.categories!=='object') st.categories = {}; return st.categories; }
 function activityCategory(name){
@@ -13,6 +17,7 @@ function activityCategory(name){
   if(set) return set;
   if(NEUTRAL_ACTIVITY.indexOf(k)>=0) return 'neutral';
   if(DEFAULT_WORK_ACTIVITY.indexOf(k)>=0) return 'work';
+  if(DEFAULT_NOT_WORK.indexOf(k)>=0) return 'other';
   return 'unsorted';
 }
 function setActivityCategory(name, cat){
@@ -31,10 +36,12 @@ function updateActivityPill(){
   el.classList.remove('is-hidden');
   const cat = app ? activityCategory(app) : 'neutral';
   el.dataset.cat = cat;
-  const lock = s ? (s.onBreak ? '&#9749; on break' : '&#128274; '+fmtDurationLabel(Math.max(0, Math.round((Date.now()-s.startedAt)/60000)))) : '';
-  const html = '<span class="ap-dot"></span><span class="ap-name">'+(app ? escapeHtml(app) : 'Away')+'</span>'+(lock ? '<span class="ap-lock">'+lock+'</span>' : '');
+  const notCounting = !!(s && !s.onBreak && cat==='other');
+  const siteUnknown = app && BROWSER_APPS.indexOf(activityKey(app))>=0;
+  const lock = s ? (s.onBreak ? '&#9749; on break' : '&#128274; '+fmtDurationLabel(Math.max(0, Math.round((Date.now()-s.startedAt)/60000)))+(notCounting ? ' &middot; not counting' : '')) : '';
+  const html = (app ? '<span class="ap-dot"></span><span class="ap-name">'+escapeHtml(app)+'</span>'+(siteUnknown ? '<span class="ap-warn">?</span>' : '') : '')+(lock ? '<span class="ap-lock'+(app?'':' ap-lock-only')+(notCounting?' is-off':'')+'">'+lock+'</span>' : '');
   if(el._html!==html){ el.innerHTML = html; el._html = html; }
-  el.title = app ? app+' — '+CAT_META[cat].label+' (click to change)' : '';
+  el.title = !app ? '' : siteUnknown ? 'Operator can\'t see which website is open in '+app+' — click for how to allow it' : app+' — '+CAT_META[cat].label+(notCounting ? ' · this time isn\'t counted as deep work' : '')+' (click to change)';
 }
 setInterval(function(){ try{ if(state && state.settings) updateActivityPill(); }catch(e){} }, 5000);
 afterRenderHooks.push(function(){ updateActivityPill(); document.body.classList.toggle('sb-collapsed', !!state.profile.sidebarCollapsed); });
@@ -49,10 +56,13 @@ function renderPillMenu(){
   if(!m){ m = document.createElement('div'); m.id = 'activityPillMenu'; m.className = 'ap-menu'; document.body.appendChild(m); }
   const app = ui.pillMenu==='__none' ? null : ui.pillMenu;
   const cat = app ? activityCategory(app) : null;
-  m.innerHTML = (app ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div>'+
+  const browser = app && BROWSER_APPS.indexOf(activityKey(app))>=0;
+  m.innerHTML = (browser ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div><div class="ap-menu-hint" style="margin-top:0;">Operator can\'t see which website is open, so it can\'t tell YouTube from work.'+
+      (activityKey(app)==='firefox' ? ' Firefox doesn\'t allow this — Safari, Chrome, Arc, Brave and Edge do.' : ' On your Mac: System Settings &rarr; Privacy &amp; Security &rarr; Automation &rarr; Operator &rarr; turn on '+escapeHtml(app)+'. Then reopen Operator.')+'</div>'
+    : app ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div>'+
       '<div class="ap-menu-k">Is this work?</div>'+
       '<div class="ap-seg">'+['work','other'].map(function(c){ return '<button class="ap-seg-btn'+(cat===c?' is-on':'')+'" data-action="pillSetCat" data-id="'+c+'">'+CAT_META[c].label+'</button>'; }).join('')+'</div>'+
-      '<div class="ap-menu-hint">Only work apps &amp; sites start an automatic lock-in.</div>' : '<div class="ap-menu-title">Nothing in front right now</div>')+
+      '<div class="ap-menu-hint">Only work apps &amp; sites start an automatic lock-in. Time on “not work” ones while you\'re locked in doesn\'t count as deep work.</div>' : '<div class="ap-menu-title">Nothing in front right now</div>')+
     '<button class="ap-menu-link" data-action="goToActivitySettings">All apps &amp; sites &rarr;</button>';
 }
 ACTIONS.pillSetCat = function(el, e, id){ if(ui.pillMenu && ui.pillMenu!=='__none') setActivityCategory(ui.pillMenu, id); renderPillMenu(); updateActivityPill(); playTick(); };
@@ -95,7 +105,13 @@ ACTIONS.addWorkApp = function(){ const i = document.getElementById('newWorkApp')
 function sessionsOn(date){ return state.focus.sessions.filter(function(s){ return s.date===date; }).sort(function(a,b){ return a.startedAt-b.startedAt; }); }
 function recapNeeded(date){ return sessionsOn(date).some(function(s){ return s.auto && !s.reviewed; }); }
 function openDayRecap(date){ ui.recapDate = date || todayStr(); showOverlay('recapOverlay'); renderRecapInto(); }
-ACTIONS.openDayRecap = function(el){ openDayRecap(el && el.dataset && el.dataset.date); };
+// The recap button opens yesterday's recap if it still has sessions to check, else today's.
+function recapDefaultDate(){ const y = addDays(todayStr(), -1); return recapNeeded(y) ? y : todayStr(); }
+function recapPendingCount(){ return [todayStr(), addDays(todayStr(), -1)].reduce(function(n, d){ return n + sessionsOn(d).filter(function(s){ return s.auto && !s.reviewed; }).length; }, 0); }
+ACTIONS.openDayRecap = function(el){ openDayRecap((el && el.dataset && el.dataset.date) || recapDefaultDate()); };
+ACTIONS.openRecapToday = function(){ clearToasts(); openDayRecap(todayStr()); };
+ACTIONS.openRecapYesterday = function(){ clearToasts(); openDayRecap(addDays(todayStr(), -1)); };
+function clearToasts(){ const c = document.getElementById('toastContainer'); if(c) c.innerHTML = ''; }
 ACTIONS.closeDayRecap = function(){ state.focus.recapSeen = state.focus.recapSeen || {}; state.focus.recapSeen[ui.recapDate] = true; persist('focus'); hideOverlay('recapOverlay'); renderView(); };
 function recapTimelineHtml(date, sessions){
   const dayStart = localTs(date, '06:00'), dayEnd = localTs(addDays(date,1), '00:00');
@@ -132,7 +148,8 @@ function renderRecap(){
     '</div>'+
     recapTimelineHtml(date, sessions)+
     ((workMin || otherMin) ? '<div class="rc-split"><div class="rc-split-bar"><span style="width:'+(workMin/Math.max(1,workMin+otherMin)*100)+'%"></span></div>'+
-      '<div class="kpi-sub"><b style="color:var(--good);">'+fmtDurationLabel(workMin)+'</b> on work apps &middot; <b style="color:#ffb3b8;">'+fmtDurationLabel(otherMin)+'</b> on everything else'+(breaks.length?' &middot; '+breaks.length+' break'+(breaks.length===1?'':'s'):'')+'</div></div>' : '')+
+      '<div class="kpi-sub"><b style="color:var(--good);">'+fmtDurationLabel(workMin)+'</b> on work apps &middot; <b style="color:#ffb3b8;">'+fmtDurationLabel(otherMin)+'</b> on everything else'+(breaks.length?' &middot; '+breaks.length+' break'+(breaks.length===1?'':'s'):'')+
+        (distractionMinutesFor(date) ? ' &middot; <b style="color:#ffb3b8;">'+fmtDurationLabel(distractionMinutesFor(date))+'</b> on not-work sites while locked in (not counted)' : '')+'</div></div>' : '')+
     (apps.length ? '<div class="rc-apps">'+apps.slice(0, 6).map(function(a){ const c = activityCategory(a.app); return '<span class="rc-app"><span class="wa-dot" style="background:'+CAT_META[c].color+'"></span>'+escapeHtml(a.app)+'<span class="kpi-sub">'+fmtDurationLabel(a.minutes)+'</span></span>'; }).join('')+'</div>' : '')+
     '<div class="kind-label" style="margin-top:16px;">Sessions'+(pending?' &middot; '+pending+' started automatically to check':'')+'</div>'+
     (sessions.length ? '<div class="rc-sessions">'+sessions.map(function(s){
@@ -169,13 +186,52 @@ ACTIONS.undoRecapDiscard = function(){ if(!lastDiscardedSession) return; state.f
 ACTIONS.recapEdit = function(el, e, id){ const s = recapSession(id); if(s) s.reviewed = true; hideOverlay('recapOverlay'); openTimeBlockEdit('session', id); };
 // When it pops up: going to sleep, at the recap time in the evening (once), or the next
 // morning if yesterday still has automatic sessions to check.
+// Never pops up on its own: at the recap time (and the next morning, if automatic sessions
+// still need a look) a small note offers it, once. The Recap button opens it any time.
+const recapNudged = {};
 function maybeShowRecap(){
-  if(isWakeDisplay || state.focus.activeSession || document.querySelector('.overlay:not(.hidden)')) return;
+  if(state.focus.activeSession || document.querySelector('.overlay:not(.hidden)')) return;
   const seen = state.focus.recapSeen || {};
   const today = todayStr(), yest = addDays(today, -1);
   const rt = (state.settings.appTracking && state.settings.appTracking.recapTime) || '21:30';
-  if(!seen[yest] && recapNeeded(yest) && new Date().getHours()>=5){ openDayRecap(yest); return; }
-  if(!seen[today] && nowHM()>=rt && sessionsOn(today).length){ openDayRecap(today); }
+  if(!seen[yest] && !recapNudged[yest] && recapNeeded(yest) && new Date().getHours()>=5){
+    recapNudged[yest] = true;
+    showToast('Yesterday has sessions that started on their own — want to check them?', {icon:'&#128202;', actionLabel:'Open recap', actionAction:'openRecapYesterday', duration:15000});
+    return;
+  }
+  if(!seen[today] && !recapNudged[today] && nowHM()>=rt && sessionsOn(today).length){
+    recapNudged[today] = true;
+    showToast('Your day recap is ready.', {icon:'&#128202;', actionLabel:'Open', actionAction:'openRecapToday', duration:15000});
+  }
 }
 setInterval(function(){ try{ if(state && state.focus) maybeShowRecap(); }catch(e){} }, 60000);
 setTimeout(function(){ try{ maybeShowRecap(); }catch(e){} }, 4000);
+
+// ---- time on not-work apps/sites during a locked-in session doesn't count ----
+// Counted from the day this rule started (so past streaks never change), using what was
+// in front during each session.
+function distractionMinutesFor(dateStr){
+  const st = state.settings.appTracking;
+  if(!st || st.enabled===false || !st.distractionSince || dateStr < st.distractionSince) return 0;
+  if(RC) return memo('dist:'+dateStr, function(){ return distractionMinutesRaw(dateStr); });
+  return distractionMinutesRaw(dateStr);
+}
+function distractionMinutesRaw(dateStr){
+  const m = lockedInAppMinutesFor(dateStr);
+  if(!m) return 0;
+  let n = 0;
+  Object.keys(m).forEach(function(app){ if(activityCategory(app)==='other') n += m[app]; });
+  return n;
+}
+// A heads-up the first time a locked-in stretch drifts onto a not-work site.
+const distractionNudged = {};
+function checkDistraction(){
+  const s = state.focus.activeSession; if(!s || s.onBreak) return;
+  const ivs = state.appActivity.todayIntervals; if(!ivs.length) return;
+  const last = ivs[ivs.length-1];
+  if(Date.now()-last.end > APP_ACTIVITY_GAP_MS || activityCategory(last.app)!=='other') return;
+  const from = Math.max(last.start, s.startedAt);
+  if(last.end-from < 2*60000 || distractionNudged[last.start]) return;
+  distractionNudged[last.start] = true;
+  showToast('You\'re on '+last.app+' — this time won\'t count as deep work.', {icon:'&#128064;', duration:8000});
+}

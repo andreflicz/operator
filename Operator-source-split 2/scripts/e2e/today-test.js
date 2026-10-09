@@ -54,8 +54,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // panels on Today
   await p.click('[data-action="nav"][data-view="today"]');
   check('morning: no wind down, streak in the hero', !(await p.isVisible('[data-action="toggleWindDown"]')) && await p.isVisible('.today-hero .streak-num'));
-  check('agenda shows wake + event', (await p.textContent('.agenda-panel')).includes('Wake up') && (await p.textContent('.agenda-panel')).includes('Client call') && await p.isVisible('.ag-now'));
+  check('Today timeline panel is off', (await p.$$('.agenda-panel')).length===0);
+  await p.locator('.week-panel').scrollIntoViewIfNeeded();
   check('week chart, heatmap and why panels', await p.isVisible('.week-panel .wk-bars') && (await p.$$('.heatmap-panel .hm-cell')).length>100 && (await p.textContent('.why-panel')).includes('Freedom of time'));
+  await p.locator('.biz-card').scrollIntoViewIfNeeded();
   check('business snapshot redesigned', await p.isVisible('.biz-card .biz-mrr'));
   check('panel subtitles hidden', await p.evaluate(() => [...document.querySelectorAll('.today-panels .section-title > .kpi-sub')].every(e => getComputedStyle(e).display==='none')));
   // next survives a restart

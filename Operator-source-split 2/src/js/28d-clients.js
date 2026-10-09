@@ -88,11 +88,19 @@ function renderClientsHome(){
       stat(levels.filter(function(l){ return l!=='green'; }).length, 'need attention', levels.some(function(l){ return l!=='green'; })?'is-warn':'')+
       stat(due, 'to reach out to', due?'is-warn':'')+
     '</div>'+
-    '<div class="crm-toolbar">'+
-      '<input class="input" id="crmSearch-client" placeholder="Search clients…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
-      '<select class="input" data-client-sort>'+[['health','Sort: needs attention first'],['due','Sort: most overdue touch'],['mrr','Sort: MRR'],['name','Sort: name']].map(function(o){ return '<option value="'+o[0]+'" '+((f.csort||'health')===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
-      '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="client">+ Add client</button>'+
-    '</div>'+
+    (function(){
+      const active = (f.q?1:0)+((f.csort||'health')!=='health'?1:0);
+      return '<div class="crm-toolbar crm-toolbar-slim">'+
+          '<button class="btn btn-ghost btn-sm crm-tools-btn'+(f.toolsOpen?' is-open':'')+'" data-action="crmToggleTools" data-kind="client">&#128269; Search &amp; sort'+(active?'<span class="th-badge">'+active+'</span>':'')+'</button>'+
+          (active ? '<button class="mini-move" data-action="crmClearFilters" data-kind="client">Clear</button>' : '')+
+          '<span style="flex:1"></span>'+
+          '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="client">+ Add client</button>'+
+        '</div>'+
+        (f.toolsOpen ? '<div class="crm-toolbar crm-tools-row">'+
+          '<input class="input" id="crmSearch-client" placeholder="Search clients…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
+          '<select class="input" data-client-sort>'+[['health','Sort: needs attention first'],['due','Sort: most overdue touch'],['mrr','Sort: MRR'],['name','Sort: name']].map(function(o){ return '<option value="'+o[0]+'" '+((f.csort||'health')===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
+        '</div>' : '');
+    })()+
     '<div class="subtab-panel" data-key="clients-home">'+
       (active.length ? '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>' : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
       (rest.length ? '<div class="cc2-past"><button class="cc2-past-toggle" data-action="toggleClientsPast">'+(ui.clientsPastOpen?'&#9662;':'&#9656;')+' Paused &amp; past clients ('+rest.length+')</button>'+

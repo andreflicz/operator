@@ -16,10 +16,57 @@ function renderBusiness(){
   '</div>'+
   '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
 }
+// Business → Overview: one card — revenue on top, clients and pipeline side by side.
 function renderBusinessOverview(){
-  return renderBusinessPanel().replace('<div class="section-title">Business<span class="view-all-link" data-action="nav" data-view="business">Open Business &rarr;</span></div>', '')+
-  renderClientHubPanel()+
-  renderPipelineGlance();
+  const active = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
+  const mrr = active.reduce(function(a,c){ return a+Number(c.mrr||0); }, 0);
+  const goal = Number(state.profile.revenueGoalMonthly)||0;
+  const openLeads = arr(state.business.pipeline).filter(leadIsOpen);
+  const pipe = openLeads.reduce(function(a,p){ return a+Number(p.value||0); }, 0);
+  const months = []; const now = new Date();
+  for(let k=5;k>=0;k--){ const d = new Date(now.getFullYear(), now.getMonth()-k, 1); const key = d.getFullYear()+'-'+pad2(d.getMonth()+1); months.push({label:d.toLocaleDateString(undefined,{month:'short'}), v:collectedByMonth(key)}); }
+  const maxV = Math.max.apply(null, months.map(function(m){ return m.v; }).concat([1]));
+  const clients = active.slice().sort(clientSortFn('health'));
+  const stages = crmStages('lead').filter(function(s){ return s.kind!=='won' && s.kind!=='lost'; });
+  const stageRows = stages.map(function(s){
+    const items = openLeads.filter(function(p){ return p.stage===s.id; });
+    return {s:s, n:items.length, v:items.reduce(function(a,p){ return a+Number(p.value||0); }, 0)};
+  });
+  const maxStage = Math.max.apply(null, stageRows.map(function(r){ return r.n; }).concat([1]));
+  const leadsDue = reachOutList().filter(function(r){ return r.kind==='lead'; });
+  return '<div class="card hq">'+
+    '<div class="hq-top">'+
+      '<div class="hq-mrr">'+
+        '<div class="stat-tile-k">Monthly recurring</div>'+
+        '<div class="biz-mrr">$'+mrr.toLocaleString()+'</div>'+
+        (goal ? '<div class="biz-bar"><span class="biz-bar-mrr" style="width:'+Math.min(100, mrr/goal*100)+'%"></span>'+(pipe ? '<span class="biz-bar-pipe" style="width:'+Math.max(0, Math.min(100-mrr/goal*100, pipe/goal*100))+'%"></span>' : '')+'</div>'+
+          '<div class="biz-goal-k">'+Math.round(mrr/goal*100)+'% of '+money(goal)+(pipe ? ' &middot; '+money(pipe)+' in pipeline' : '')+'</div>' : '')+
+      '</div>'+
+      '<div class="hq-months" title="Collected per month"><div class="biz-mbars">'+months.map(function(m, i){
+        return '<div class="biz-mcol'+(i===5?' is-now':'')+'" title="'+m.label+': $'+m.v.toLocaleString()+'"><div class="biz-mbar-wrap"><div class="biz-mbar" style="height:'+Math.max(m.v?4:0, m.v/maxV*100)+'%"></div></div><span>'+m.label+'</span></div>';
+      }).join('')+'</div></div>'+
+    '</div>'+
+    '<div class="hq-cols">'+
+      '<div class="hq-col">'+
+        '<div class="hq-col-head" data-action="businessTab" data-tab="clients"><span>Clients</span><span class="hq-count">'+active.length+'</span><span class="view-all-link">All &rarr;</span></div>'+
+        (clients.length ? clients.slice(0, 8).map(function(c){
+          return '<div class="hq-row" data-action="openContact" data-kind="client" data-id="'+c.id+'" data-key="hqc-'+c.id+'">'+clientAvatarHtml(c, true, true)+
+            '<span class="hq-name">'+escapeHtml(crmName('client', c))+'</span>'+
+            '<span class="hq-meta">'+clientNextTouchHtml(c)+'</span>'+
+            '<span class="hq-val">'+(Number(c.mrr) ? money(c.mrr) : '')+'</span></div>';
+        }).join('')+(clients.length>8 ? '<div class="hq-more" data-action="businessTab" data-tab="clients">+'+(clients.length-8)+' more</div>' : '')
+        : '<div class="kpi-sub" style="padding:8px 2px;">No active clients yet.</div>')+
+      '</div>'+
+      '<div class="hq-col">'+
+        '<div class="hq-col-head" data-action="businessTab" data-tab="leads"><span>Pipeline</span><span class="hq-count">'+openLeads.length+'</span><span class="view-all-link">Leads &rarr;</span></div>'+
+        stageRows.map(function(r){
+          return '<div class="hq-stage" data-action="crmJumpStage" data-id="'+r.s.id+'"><span class="hq-stage-name"><span class="crm-col-dot" style="background:'+r.s.color+'"></span>'+escapeHtml(r.s.label)+'</span>'+
+            '<span class="hq-stage-bar"><span style="width:'+(r.n/maxStage*100)+'%;background:'+r.s.color+'"></span></span><span class="hq-stage-n">'+r.n+'</span><span class="hq-val">'+(r.v ? money(r.v) : '')+'</span></div>';
+        }).join('')+
+        (leadsDue.length ? '<div class="hq-due"><span class="kind-label" style="margin:0;">Reach out</span>'+leadsDue.slice(0, 4).map(function(r){ return '<span class="hq-due-lead" data-action="openContact" data-kind="lead" data-id="'+r.x.id+'">'+escapeHtml(crmName('lead', r.x))+'</span>'; }).join('')+(leadsDue.length>4 ? '<span class="kpi-sub">+'+(leadsDue.length-4)+'</span>' : '')+'</div>' : '')+
+      '</div>'+
+    '</div>'+
+  '</div>';
 }
 function renderPipelineGlance(){
   const stages = crmStages('lead');
@@ -88,9 +135,7 @@ function monthlyTargetFor(d){
   const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
   return Math.max(1, Math.round(target * daysInMonth/7));
 }
-// Pace is judged per week (an 8-a-month reel plan = 2 a week). Early in the week you're fine
-// even at 0/2; it turns amber when the days left only just cover what's left, red once
-// you can't make it at one a day — and red stays until last week's shortfall is made up.
+// Week counts for a deliverable (weeks run Monday–Sunday).
 function deliverableWeekCountFor(d, weekStart){
   const end = addDays(weekStart, 6);
   return arr(d.completedDates).filter(function(dt){ return dt>=weekStart && dt<=end; }).length;
@@ -104,18 +149,22 @@ function deliverableLastWeek(d){
   return {done:done, target:target, missed:Math.max(0, target-done)};
 }
 function deliverablePaceStatus(d){
+  if(RC && d.id) return memo('dps:'+d.id, function(){ return deliverablePaceStatusRaw(d); });
+  return deliverablePaceStatusRaw(d);
+}
+// Green = on pace or ahead. Yellow = behind, but you've done some this week. Red = behind
+// with nothing done yet. "On pace" is judged per week (an 8-a-month reel plan = 2 a week):
+// early in the week 0 is fine, it fills up as the week goes, and anything missed last week
+// has to be made up first.
+function deliverablePaceStatusRaw(d){
   const target = d.weeklyTarget||1;
   const done = deliverableWeekCount(d);
-  const lw = deliverableLastWeek(d);
-  if(lw.missed>0 && done < lw.missed) return 'danger';
-  const remaining = target - done;
-  if(remaining<=0) return 'good';
-  const today = new Date();
-  const daysLeft = 7 - ((today.getDay()+6)%7); // Mon = 7 … Sun = 1, today included
-  const slack = daysLeft - remaining;
-  if(slack>=2) return 'good';
-  if(slack>=0) return 'warn';
-  return 'danger';
+  const owed = Math.min(target, deliverableLastWeek(d).missed);
+  if(done >= target+owed) return 'good';
+  const daysIn = ((new Date().getDay()+6)%7)+1; // Mon = 1 … Sun = 7
+  const required = owed + Math.floor(target*daysIn/7);
+  if(done >= required) return 'good';
+  return done>0 ? 'warn' : 'danger';
 }
 function isDeliverableDoneThisWeek(d){
   if(d.recurring){
@@ -177,6 +226,10 @@ function clientGreenlitThisWeek(c){
   return deliverablesOk && touched;
 }
 function clientHealthStatus(c){
+  if(RC) return memo('hs:'+c.id, function(){ return clientHealthStatusRaw(c); });
+  return clientHealthStatusRaw(c);
+}
+function clientHealthStatusRaw(c){
   // Health is the worse of: deliverable pace (are we on track for reels/ads this month?)
   // and communication (how recently have we logged a touch with this client?).
   const recurring = arr(c.deliverables).filter(function(d){ return d.recurring; });

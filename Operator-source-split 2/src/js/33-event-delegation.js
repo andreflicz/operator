@@ -6,11 +6,13 @@ document.body.addEventListener('click', function(e){
   const id = el.dataset.id;
   switch(a){
     case 'nav': {
-      closePreFocusModal(); closeStopFocus(); closeTimesUpModal(); closeMultiBreakWarning(); closeFinalStopConfirm();
-      closeTaskEditModal(); closeProspectEditModal(); closeClientModal(); closeLockInChooser(); closeJournalEditModal(); closeGoalEditModal();
-      closeWorkoutEditModal(); closeJournalClearConfirm(); closeBreakNotePrompt(); closeBreakDetail(); closeInvoiceModal();
-      closeAttachReceiptModal(); closeAddTaskModal(); closeDatePicker(); closeRetainerEdit(); closeLogPaymentModal();
-      closeUpcomingPopover(); closeQuickJournalModal(); closeJournalPhotoView(); closeCalEventModal(); closeAlarmEditModal(); closePackageEditModal(); closeCustomDeliverableDrawer(); closeNewPackageModal(); closeVideoIdeaEditModal(); closeAddVideoIdeaModal();
+      holdRenders(function(){
+        closePreFocusModal(); closeStopFocus(); closeTimesUpModal(); closeMultiBreakWarning(); closeFinalStopConfirm();
+        closeTaskEditModal(); closeProspectEditModal(); closeClientModal(); closeLockInChooser(); closeJournalEditModal(); closeGoalEditModal();
+        closeWorkoutEditModal(); closeJournalClearConfirm(); closeBreakNotePrompt(); closeBreakDetail(); closeInvoiceModal();
+        closeAttachReceiptModal(); closeAddTaskModal(); closeDatePicker(); closeRetainerEdit(); closeLogPaymentModal();
+        closeUpcomingPopover(); closeQuickJournalModal(); closeJournalPhotoView(); closeCalEventModal(); closeAlarmEditModal(); closePackageEditModal(); closeCustomDeliverableDrawer(); closeNewPackageModal(); closeVideoIdeaEditModal(); closeAddVideoIdeaModal();
+      });
       ui.selectedTaskIds.clear(); ui.selectedProspectIds.clear();
       const changing = el.dataset.view !== ui.view;
       ui.view = el.dataset.view;

@@ -28,9 +28,11 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E(D+".createdAt='2026-10-05'; "+D+".completedDates=[]; "+D+".weeklyTarget=2");
   const at = async (day, code) => { await p.clock.setSystemTime(new Date(2026,9,day,10,0).getTime()); if(code) await E(code); return E("deliverablePaceStatus("+D+")"); };
   check('0/2 on Tuesday is fine', await at(6)==='good');
+  check('0/2 on Thursday (behind, nothing done) is red', await at(8)==='danger');
   await E(D+".completedDates=['2026-10-07']; renderView()");
-  check('1/2 midweek is green', await at(8)==='good');
-  check('1/2 on Saturday turns amber', await at(10)==='warn');
+  check('1/2 midweek is green (on pace)', await at(8)==='good');
+  check('1/2 on Saturday is still on pace', await at(10)==='good');
+  check('1/2 on Sunday: behind but working = yellow', await at(11)==='warn');
   await E(D+".completedDates=[]");
   check('0/2 on Sunday is red', await at(11)==='danger');
   await E(D+".completedDates=['2026-10-07']");
@@ -52,8 +54,11 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('paused clients tucked away', (await p.textContent('.cc2-past-toggle')).includes('(1)'));
   await p.click('.cc2-past-toggle');
   check('paused clients expand', (await p.$$('.cc2')).length===4);
+  check('search & sort hidden behind a button', !(await p.isVisible('#crmSearch-client')));
+  await p.click('[data-action="crmToggleTools"][data-kind="client"]');
   await p.fill('#crmSearch-client', 'nina'); await p.waitForTimeout(250);
   check('search filters the cards', (await p.$$('.cc2-grid:not(.cc2-grid-sm) .cc2')).length===1);
+  check('active search shows a badge on the button', await p.isVisible('.crm-tools-btn .th-badge'));
   await p.fill('#crmSearch-client', ''); await p.waitForTimeout(250);
   await p.click('.cc2[data-key="cc2-c1"] .cc2-top');
   check('card opens the client page', await p.isVisible('#clientModalOverlay:not(.hidden)'));

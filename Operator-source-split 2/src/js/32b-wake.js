@@ -1,8 +1,8 @@
 
 // ============ WAKE-UP ALARM, ON-TIME ALARMS, WAKE SCREEN, BREAK TIMER ============
 // One master wake-up alarm (e.g. 7:00 AM Mon–Sat) that can be changed for a single morning
-// at any hour of the night, a full-screen wake screen (clock, master vision board, the plan,
-// today's calendar) with music that starts by itself, and an optional second-display view.
+// at any hour of the night, and a full-screen wake screen (clock, vision board, the plan,
+// today's calendar) with music that starts by itself.
 //
 // Alarms used to be matched against the current minute every 4 s. When Chrome slowed the
 // timers of a background window, that minute was skipped and the alarm only rang once the
@@ -11,7 +11,6 @@
 const ALARM_GRACE_MS = 15*60000;
 const WAKE_GRACE_MS = 2*3600000;
 const WAKE_PING_URL = 'http://127.0.0.1:8935/wake';
-const isWakeDisplay = location.hash==='#wake';
 function dowOf(dateStr){ return new Date(localTs(dateStr, '12:00')).getDay(); }
 function wakeCfg(){ return state.focus.wake; }
 function wakeTimeFor(dateStr){
@@ -79,7 +78,7 @@ function alarmOwnerGone(al){
   return !t || t.status==='done';
 }
 function checkAllAlarms(){
-  if(isWakeDisplay || !state.focus) return;
+  if(!state.focus) return;
   const now = Date.now();
   let changed = false;
   const yesterday = addDays(todayStr(), -1);
@@ -133,13 +132,42 @@ function snoozeRegularAlarm(al){
   persist('focus');
 }
 // ---- music ----
-let wakeAudio = null, wakeAudioRamp = null, wakeMediaWin = null, wakeObjectUrl = null;
+// Wake-up music, most reliable first: a song or playlist from Apple Music (the Operator app
+// asks the Music app to play it — your own library, no ads), an uploaded song (plays on this
+// page, fading in), or a web/YouTube link (opens in a window; YouTube may run an ad first).
+// When music is set there's no alarm beep — the beep only steps in if the music can't start.
+const MUSIC_URL = 'http://127.0.0.1:8935/music/';
+let wakeAudio = null, wakeAudioRamp = null, wakeMediaWin = null, wakeObjectUrl = null, wakeMusicApp = false;
 function isDirectAudioUrl(u){ return /^data:audio\//i.test(u||'') || /\.(mp3|m4a|aac|wav|ogg|oga|flac|opus)(\?|#|$)/i.test(u||''); }
-function mediaKindLabel(m){ if(!m) return ''; if(m.ref) return 'song'; return /youtu/.test(m.url||'') ? 'YouTube' : isDirectAudioUrl(m.url) ? 'song' : 'link'; }
+function appleMusicFromLink(u){
+  const m = /music\.apple\.com\/[a-z]{2}\/(album|song|playlist)\/([^/?#]+)/i.exec(u||'');
+  if(!m) return null;
+  let q = m[2]; try{ q = decodeURIComponent(q); }catch(e){}
+  return {type:'music', k: m[1].toLowerCase()==='playlist' ? 'playlist' : 'song', q: q.replace(/-/g, ' ').trim()};
+}
+function mediaKindLabel(m){ if(!m) return ''; if(m.type==='music') return 'Apple Music '+(m.k==='playlist'?'playlist':'song'); if(m.ref) return 'uploaded song'; return /youtu/.test(m.url||'') ? 'YouTube' : isDirectAudioUrl(m.url) ? 'song link' : 'link'; }
+function mediaName(m){ return !m ? '' : m.type==='music' ? m.q : (m.name || m.url || 'Song'); }
+function hexUtf8(str){ return Array.prototype.map.call(new TextEncoder().encode(String(str||'')), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
+async function musicApp(cmd, media){
+  const ctl = typeof AbortController!=='undefined' ? new AbortController() : null;
+  const timer = setTimeout(function(){ if(ctl) ctl.abort(); }, 4000);
+  try{
+    const url = MUSIC_URL+cmd+(media ? '?k='+(media.k==='playlist'?'playlist':'song')+'&q='+hexUtf8(media.q) : '');
+    const res = await fetch(url, {cache:'no-store', signal: ctl ? ctl.signal : undefined});
+    return res.ok;
+  }catch(e){ return false; }
+  finally{ clearTimeout(timer); }
+}
 async function playWakeMedia(media, onFail){
   stopWakeMedia(true);
   onFail = onFail || function(){};
   try{
+    if(media.type==='music'){
+      const ok = await musicApp('play', media);
+      if(!ok){ onFail(); return false; }
+      wakeMusicApp = true;
+      return true;
+    }
     if(media.ref || isDirectAudioUrl(media.url)){
       let src = media.url;
       if(media.ref){
@@ -170,6 +198,7 @@ function stopWakeMedia(immediate){
     else { const fade = setInterval(function(){ a.volume = Math.max(0, a.volume-0.1); if(a.volume<=0.01){ clearInterval(fade); try{ a.pause(); }catch(e){} } }, 120); }
   }
   if(wakeObjectUrl){ const u = wakeObjectUrl; wakeObjectUrl = null; setTimeout(function(){ URL.revokeObjectURL(u); }, 3000); }
+  if(wakeMusicApp){ wakeMusicApp = false; musicApp('stop'); }
 }
 // ---- the wake screen ----
 let wakeRing = null; // {startedAt, test, soundFailed}
@@ -186,8 +215,6 @@ function fireWake(opts){
   if(w.media){
     playWakeMedia(w.media, function(){ if(wakeRing){ wakeRing.mediaFailed = true; renderWakeOverlayInto(); } startBeeps(); });
   } else startBeeps();
-  if(w.secondScreen) openWakeDisplay(true);
-  postToWakeDisplay();
   try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Time to get up'); }catch(e){}
 }
 function closeOtherOverlaysForWake(){
@@ -198,7 +225,6 @@ function stopWakeRing(){
   stopWakeMedia(false);
   wakeRing = null;
   hideOverlay('wakeOverlay');
-  postToWakeDisplay();
 }
 function wakeImUp(){
   const wasTest = wakeRing && wakeRing.test;
@@ -217,14 +243,13 @@ function wakeSnooze(){
   persist('focus'); renderView();
   showToast('Snoozed — ringing again at '+fmt12Hour(nowHM(new Date(Date.now()+mins*60000))), {icon:'&#128164;'});
 }
-ACTIONS.wakeImUp = function(){ if(isWakeDisplay){ try{ window.opener && window.opener.postMessage({operatorWake:'up'}, '*'); }catch(e){} displayRinging = false; renderWakeDisplay(); return; } wakeImUp(); };
-ACTIONS.wakeSnooze = function(){ if(isWakeDisplay){ try{ window.opener && window.opener.postMessage({operatorWake:'snooze'}, '*'); }catch(e){} displayRinging = false; renderWakeDisplay(); return; } wakeSnooze(); };
+ACTIONS.wakeImUp = function(){ wakeImUp(); };
+ACTIONS.wakeSnooze = function(){ wakeSnooze(); };
 ACTIONS.wakePlayMusic = function(){ const w = wakeCfg(); if(w.media) playWakeMedia(w.media, function(){ showToast('Couldn\'t play that — try uploading the song file instead.', {icon:'&#9888;'}); }); clearInterval(wakeBeepTimer); if(wakeRing){ wakeRing.mediaFailed = false; renderWakeOverlayInto(); } };
 function wakeGreeting(){ const h = new Date().getHours(); return h<5 ? 'Still up' : h<12 ? 'Good morning' : h<18 ? 'Good afternoon' : 'Good evening'; }
 function upcomingNightPlan(){ const np = state.focus.nightPlan; return (np && np.date>=todayStr()) ? np : null; }
-function renderWakeScreen(mode){
-  // mode: 'ring' (main window, alarm going off) | 'display' (second screen) | 'display-ring'
-  const ringing = mode==='ring' || mode==='display-ring';
+function renderWakeScreen(){
+  const ringing = true, mode = 'ring';
   const today = todayStr();
   const b = masterVisionBoard();
   const np = upcomingNightPlan();
@@ -243,7 +268,7 @@ function renderWakeScreen(mode){
     '</div>' : '';
   const whyBody = why.length ? '<div class="wake-list">'+why.map(function(m){ return '<div class="wake-li">&rarr; '+escapeHtml(m.text)+'</div>'; }).join('')+'</div>' : '';
   const w = wakeCfg();
-  return '<div class="wake-screen'+(ringing?' is-ringing':'')+(mode.indexOf('display')===0?' is-display':'')+'">'+
+  return '<div class="wake-screen is-ringing">'+
     '<div class="wake-left">'+
       '<div class="wake-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test && mode==='ring' ? ' <span class="tag">TEST</span>' : '')+'</div>'+
       '<div class="wake-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+'</div>'+
@@ -252,23 +277,22 @@ function renderWakeScreen(mode){
           '<button class="btn wake-up-btn" data-action="wakeImUp">&#9728;&#65039; I\'m up</button>'+
           '<button class="btn btn-ghost wake-snooze-btn" data-action="wakeSnooze">Snooze '+(w.snoozeMinutes||9)+' min</button>'+
         '</div>'+
-        (mode==='ring' && w.media ? '<div class="wake-music">'+(wakeRing && wakeRing.mediaFailed ? '<button class="btn btn-good btn-sm" data-action="wakePlayMusic">&#9654; Play '+escapeHtml(w.media.name||mediaKindLabel(w.media))+'</button>' : '&#9835; '+escapeHtml(w.media.name||mediaKindLabel(w.media)))+'</div>' : '')
+        (w.media ? '<div class="wake-music">'+(wakeRing && wakeRing.mediaFailed ? '<button class="btn btn-good btn-sm" data-action="wakePlayMusic">&#9654; Play '+escapeHtml(mediaName(w.media))+'</button>' : '&#9835; '+escapeHtml(mediaName(w.media))+' <span class="kpi-sub">'+escapeHtml(mediaKindLabel(w.media))+'</span>')+'</div>' : '')
         : '<div class="wake-next">'+(nw ? '&#9200; Wake-up '+fmt12Hour(nw.time)+' '+morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts) : '&#9200; No wake-up alarm set')+'</div>')+
       '<div class="wake-cards">'+
         card(np && np.date===today ? 'Last night\'s plan' : np ? 'Plan for '+morningLabel(np.date) : 'Today', planBody)+
         card('On the calendar', agendaBody)+
         card('Why you\'re doing this', whyBody)+
       '</div>'+
-      (mode.indexOf('display')===0 ? '<div class="wake-display-tools"><button class="btn btn-ghost btn-sm" data-action="wakeDisplayFullscreen">&#9974; Full screen</button></div>' : '')+
     '</div>'+
     '<div class="wake-right">'+
-      (b && b.elements.length ? boardStaticHtml(b, 'wake-board') : '<div class="wake-board-empty"><div style="font-size:30px;">&#127775;</div><div>Your vision board shows up here.</div><div class="kpi-sub">Personal &rarr; Vision board</div></div>')+
+      (b && b.elements.length ? boardStaticHtml(b, 'wake-board') : '<div class="wake-board-empty"><div style="font-size:30px;">&#127775;</div><div>Your vision board shows up here.</div><div class="kpi-sub">Journal &rarr; Boards</div></div>')+
     '</div>'+
   '</div>';
 }
 function renderWakeOverlayInto(){
   const el = document.getElementById('wakeContent'); if(!el) return;
-  morphInto(el, renderWakeScreen(isWakeDisplay ? (displayRinging?'display-ring':'display') : 'ring'));
+  morphInto(el, renderWakeScreen());
   requestAnimationFrame(function(){ fitStaticBoards(el); });
   clearInterval(wakeClockTimer);
   wakeClockTimer = setInterval(function(){
@@ -278,58 +302,6 @@ function renderWakeOverlayInto(){
   }, 1000);
 }
 registerModal('wakeOverlay', renderWakeOverlayInto);
-// ---- second display ----
-let wakeDisplayWin = null;
-let displayRinging = false;
-async function otherScreenPlacement(){
-  try{
-    if(!window.getScreenDetails) return null;
-    const sd = await window.getScreenDetails();
-    const other = sd.screens.find(function(s){ return s!==sd.currentScreen; });
-    return other ? {left:other.availLeft, top:other.availTop, width:other.availWidth, height:other.availHeight} : null;
-  }catch(e){ return null; }
-}
-async function openWakeDisplay(auto){
-  if(wakeDisplayWin && !wakeDisplayWin.closed){ postToWakeDisplay(); return; }
-  const pl = await otherScreenPlacement();
-  const feat = pl ? 'popup=1,left='+pl.left+',top='+pl.top+',width='+pl.width+',height='+pl.height : 'popup=1,width=1280,height=800';
-  wakeDisplayWin = window.open(location.href.split('#')[0]+'#wake', 'operatorWakeDisplay', feat);
-  if(!wakeDisplayWin && !auto) showToast('The window was blocked — allow pop-ups for Operator.', {icon:'&#9888;'});
-}
-function postToWakeDisplay(){
-  if(!wakeDisplayWin || wakeDisplayWin.closed) return;
-  try{ wakeDisplayWin.postMessage({operatorWake:'ring', on:!!wakeRing}, '*'); }catch(e){}
-}
-window.addEventListener('message', function(e){
-  const d = e.data; if(!d || !d.operatorWake) return;
-  if(isWakeDisplay){
-    if(d.operatorWake==='ring'){ displayRinging = !!d.on; renderWakeDisplay(); }
-    return;
-  }
-  if(d.operatorWake==='hello') postToWakeDisplay();
-  else if(d.operatorWake==='up' && wakeRing) wakeImUp();
-  else if(d.operatorWake==='snooze' && wakeRing) wakeSnooze();
-});
-ACTIONS.wakeDisplayFullscreen = function(){ try{ document.documentElement.requestFullscreen(); }catch(e){} };
-function renderWakeDisplay(){ renderWakeOverlayInto(); }
-// The #wake window: an ambient screen for the second monitor (no trackers, no alarms of
-// its own — the main window rings and tells this one).
-async function startWakeDisplay(){
-  document.title = 'Operator — Morning';
-  document.body.classList.add('wake-display-mode');
-  document.getElementById('loading').style.display = 'none';
-  showOverlay('wakeOverlay');
-  renderWakeDisplay();
-  try{ window.opener && window.opener.postMessage({operatorWake:'hello'}, '*'); }catch(e){}
-  setInterval(renderWakeDisplay, 60000);
-  window.addEventListener('storage', async function(e){
-    const k = String(e.key||'').replace(/^opsdash:/, '');
-    if(['focus','boards','tasks','calendar','profile'].indexOf(k)<0) return;
-    const norm = {focus:normalizeFocus, boards:normalizeBoards, tasks:normalizeTasks, calendar:normalizeCalendar, profile:normalizeProfile}[k];
-    state[k] = norm(await loadKey(k, state[k]));
-    renderWakeDisplay();
-  });
-}
 // ---- setup modal ----
 function openWakeSetup(){ ui.wakeOverrideDate = wakeTargetDate(); showOverlay('wakeSetupOverlay'); renderWakeSetupInto(); }
 ACTIONS.openWakeSetup = openWakeSetup;
@@ -364,23 +336,19 @@ function renderWakeSetup(){
       '<div class="kpi-sub" style="margin-top:4px;">'+(ov ? (ov.off ? 'No alarm '+morningLabel(od)+'.' : 'Changed to '+fmt12Hour(ov.time)+' for '+morningLabel(od)+' only.') : (base ? 'Usual time. Change it here for '+morningLabel(od)+' only — your daily alarm stays the same.' : 'No alarm usually — set a time here to wake up '+morningLabel(od)+'.'))+'</div>'+
     '</div>'+
     '<div class="ws-block">'+
-      '<div class="kind-label">Sound</div>'+
+      '<div class="kind-label">Wake-up music — starts by itself, no alarm sound</div>'+
+      (w.media ? '<div class="ws-media"><span>&#9835; '+escapeHtml(mediaName(w.media))+'</span><span class="kpi-sub">'+escapeHtml(mediaKindLabel(w.media))+'</span><span style="flex:1"></span>'+
+          '<button class="btn btn-ghost btn-sm" data-action="wakePreviewMusic">'+((wakeAudio||wakeMusicApp)?'&#10073;&#10073; Stop':'&#9654; Test')+'</button><button class="btn btn-ghost btn-sm mini-move-danger" data-action="wakeClearMusic">Remove</button></div>' : '')+
+      wakeMusicPickerHtml(w)+
+      '<input type="file" id="wakeMusicFile" accept="audio/*" style="display:none;">'+
+    '</div>'+
+    '<div class="ws-block">'+
+      '<div class="kind-label">Alarm sound'+(w.media ? ' <span class="kpi-sub" style="text-transform:none;letter-spacing:0;font-weight:500;">— only if the music can\'t start</span>' : '')+'</div>'+
       '<div class="row" style="gap:6px;flex-wrap:wrap;">'+['peaceful','standard','loud'].map(function(s){ return '<button class="btn btn-sm '+(w.sound===s?'btn-primary':'btn-ghost')+'" data-action="wakeSound" data-id="'+s+'">'+s[0].toUpperCase()+s.slice(1)+'</button>'; }).join('')+
         '<button class="btn btn-ghost btn-sm" data-action="wakePreviewSound">&#9654; Hear it</button></div>'+
-      '<div class="kind-label" style="margin-top:14px;">Wake-up music — starts by itself</div>'+
-      (w.media ? '<div class="ws-media"><span>&#9835; '+escapeHtml(w.media.name||w.media.url||'Song')+'</span><span class="kpi-sub">'+mediaKindLabel(w.media)+'</span><span style="flex:1"></span>'+
-          '<button class="btn btn-ghost btn-sm" data-action="wakePreviewMusic">'+(wakeAudio?'&#10073;&#10073; Stop':'&#9654; Preview')+'</button><button class="btn btn-ghost btn-sm mini-move-danger" data-action="wakeClearMusic">Remove</button></div>' : '')+
-      '<div class="row" style="gap:8px;margin-top:6px;flex-wrap:wrap;">'+
-        '<button class="btn btn-sm" data-action="wakePickMusic">&#11014; Upload a song</button>'+
-        '<input class="input" data-wake="mediaUrl" placeholder="…or paste a YouTube / song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="flex:1;min-width:200px;">'+
-      '</div>'+
-      '<div class="kpi-sub" style="margin-top:4px;">An uploaded song plays right on the wake screen, fading in. A YouTube link opens and plays on its own.</div>'+
-      '<input type="file" id="wakeMusicFile" accept="audio/*" style="display:none;">'+
     '</div>'+
     '<div class="ws-block grid grid-2">'+
       '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+
-      '<div class="field"><label>Second screen</label><div class="ws-check"><input type="checkbox" id="wakeSecondScreen" data-wake="secondScreen" '+(w.secondScreen?'checked':'')+'><span>Also show the wake screen on my other display</span></div>'+
-        '<div class="row" style="gap:6px;margin-top:6px;"><button class="btn btn-ghost btn-sm" data-action="wakeOpenDisplay">Open it now</button></div></div>'+
     '</div>'+
     '<div class="row" style="margin-top:18px;justify-content:space-between;gap:8px;flex-wrap:wrap;">'+
       '<div class="row" style="gap:8px;"><button class="btn btn-ghost btn-sm" data-action="wakeTestSoon" title="Rings in one minute — switch to another app to check it comes up on its own">&#128276; Test: ring in 1 min</button><button class="btn btn-ghost btn-sm" data-action="wakeTestNow">Preview wake screen</button></div>'+
@@ -407,11 +375,40 @@ ACTIONS.wakePreviewSound = function(){ playAlarmSound(wakeCfg().sound); };
 ACTIONS.wakePickMusic = function(){ const f = document.getElementById('wakeMusicFile'); if(f) f.click(); };
 ACTIONS.wakeClearMusic = function(){ stopWakeMedia(true); const w = wakeCfg(); if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref); w.media = null; saveWake(); };
 ACTIONS.wakePreviewMusic = function(){
-  if(wakeAudio){ stopWakeMedia(true); renderWakeSetupInto(); return; }
+  if(wakeAudio || wakeMusicApp){ stopWakeMedia(true); renderWakeSetupInto(); return; }
   const w = wakeCfg(); if(!w.media) return;
-  playWakeMedia(Object.assign({}, w.media, {preview:true}), function(){ showToast('Couldn\'t play that link here.', {icon:'&#9888;'}); }).then(renderWakeSetupInto);
+  playWakeMedia(Object.assign({}, w.media, {preview:true}), function(){
+    showToast(w.media.type==='music' ? 'Apple Music plays through the Operator app — open Operator from its icon (not the file in a browser).' : 'Couldn\'t play that here.', {icon:'&#9888;', duration:7000});
+  }).then(renderWakeSetupInto);
 };
-ACTIONS.wakeOpenDisplay = function(){ openWakeDisplay(false); };
+// Music source picker in the setup: Apple Music (by name or link), a song file, or a link.
+function wakeMusicPickerHtml(w){
+  const src = ui.wakeSrc || (w.media ? (w.media.type==='music' ? 'music' : w.media.ref ? 'upload' : 'link') : 'music');
+  const kind = ui.wakeMusicKind || (w.media && w.media.type==='music' ? w.media.k : 'song');
+  const tab = function(id, label){ return '<button class="seg-tab'+(src===id?' active':'')+'" data-action="wakeMusicSource" data-id="'+id+'">'+label+'</button>'; };
+  return '<div class="seg-tabs ws-src" style="margin:8px 0;">'+tab('music','&#63743; Apple Music')+tab('upload','&#11014; Song file')+tab('link','&#128279; Link')+'</div>'+
+    (src==='music' ? '<div class="row" style="gap:8px;flex-wrap:wrap;">'+
+        '<input class="input" id="wakeMusicQuery" placeholder="Song or playlist name (or an Apple Music link)" value="'+escapeHtml(w.media && w.media.type==='music' ? w.media.q : '')+'" style="flex:1;min-width:220px;">'+
+        '<div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(kind==='song'?' active':'')+'" data-action="wakeMusicKind" data-id="song">Song</button><button class="seg-tab'+(kind==='playlist'?' active':'')+'" data-action="wakeMusicKind" data-id="playlist">Playlist</button></div>'+
+        '<button class="btn btn-sm btn-primary" data-action="wakeSetAppleMusic">Use it</button>'+
+      '</div>'+
+      '<div class="kpi-sub" style="margin-top:6px;">Plays from your Apple Music library through the Music app — no ads, volume fades up. The first time, macOS asks to let Operator control Music: click OK (do it now with Test, so it doesn\'t ask in the morning).</div>'
+    : src==='upload' ? '<button class="btn btn-sm" data-action="wakePickMusic">&#11014; Choose a song file</button><div class="kpi-sub" style="margin-top:6px;">Plays right on the wake screen and fades in.</div>'
+    : '<input class="input" data-wake="mediaUrl" placeholder="YouTube or song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="width:100%;"><div class="kpi-sub" style="margin-top:6px;">Opens and plays by itself. YouTube may play an ad first — Apple Music or a song file start instantly.</div>');
+}
+ACTIONS.wakeMusicSource = function(el, e, id){ ui.wakeSrc = id; renderWakeSetupInto(); };
+ACTIONS.wakeMusicKind = function(el, e, id){ ui.wakeMusicKind = id; renderWakeSetupInto(); };
+ACTIONS.wakeSetAppleMusic = function(){
+  const inp = document.getElementById('wakeMusicQuery');
+  const v = inp ? inp.value.trim() : '';
+  if(!v){ if(inp) inp.focus(); return; }
+  const w = wakeCfg();
+  const fromLink = appleMusicFromLink(v);
+  if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref);
+  w.media = fromLink || {type:'music', q:v, k: ui.wakeMusicKind || 'song'};
+  saveWake();
+  showToast('Wake-up music: '+mediaName(w.media)+' (Apple Music) — hit Test to hear it', {icon:'&#9835;', duration:5000});
+};
 ACTIONS.wakeTestNow = function(){ hideOverlay('wakeSetupOverlay'); stopWakeMedia(true); fireWake({test:true}); };
 ACTIONS.wakeTestSoon = function(){
   state.focus.snooze = {ts:Date.now()+60000, wake:true, test:true};
@@ -446,10 +443,12 @@ document.addEventListener('change', function(e){
   else if(key==='mediaUrl'){
     const v = t.value.trim();
     if(!v){ if(w.media && w.media.url) w.media = null; }
-    else { if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref); w.media = {url:v, name:/youtu/.test(v)?'YouTube':v.replace(/^https?:\/\/(www\.)?/,'').slice(0,40)}; }
+    else {
+      if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref);
+      w.media = appleMusicFromLink(v) || {url:v, name:/youtu/.test(v)?'YouTube':v.replace(/^https?:\/\/(www\.)?/,'').slice(0,40)};
+    }
   }
   else if(key==='snoozeMinutes') w.snoozeMinutes = Number(t.value)||9;
-  else if(key==='secondScreen'){ w.secondScreen = t.checked; if(t.checked) otherScreenPlacement(); }
   saveWake();
   renderView();
 });

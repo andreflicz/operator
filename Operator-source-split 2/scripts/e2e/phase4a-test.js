@@ -61,6 +61,7 @@ const SP = require('./common.js').OUT;
   // list view, search, filter
   await p.click('[data-action="crmView"][data-id="list"]');
   check('list view', await p.isVisible('.crm-list'));
+  await p.click('[data-action="crmToggleTools"][data-kind="lead"]');
   await p.fill('#crmSearch-lead', 'roof'); await p.waitForTimeout(250);
   check('search filters', (await p.$$('.crm-row:not(.crm-row-head)')).length===1);
   await p.fill('#crmSearch-lead', ''); await p.waitForTimeout(250);

@@ -55,9 +55,32 @@ const T0 = new Date(2026,9,8,10,0).getTime();
   check('keep all marks them reviewed', await E("state.focus.sessions.every(s=>!s.auto || s.reviewed)") && !(await p.isVisible('#recapOverlay')));
   // recap pops up the next morning when yesterday has unchecked auto sessions
   await E("state.focus.sessions.push({id:'old', type:'deep', date:addDays(todayStr(),-1), startedAt:Date.now()-86400000, endedAt:Date.now()-86400000+3600000, minutes:60, completedTasks:[], auto:true, reviewed:false}); delete state.focus.recapSeen[addDays(todayStr(),-1)]; maybeShowRecap()");
-  check('yesterday\'s recap pops up if sessions need checking', await p.isVisible('#recapOverlay') && (await p.textContent('#recapOverlay')).includes('Yesterday'));
+  check('yesterday\'s unchecked sessions get a note (not a pop-up)', !(await p.isVisible('#recapOverlay:not(.hidden)')) && (await p.textContent('#toastContainer')).includes('Yesterday'));
+  await p.click('#toastContainer [data-action="openRecapYesterday"]');
+  check('the note opens yesterday\'s recap', await p.isVisible('#recapOverlay') && (await p.textContent('#recapOverlay')).includes('Yesterday'));
   await p.click('#recapOverlay [data-action="recapDiscard"][data-id="old"]');
   check('discard removes a session (undo available)', !(await E("state.focus.sessions.some(s=>s.id==='old')")) && (await p.textContent('#toastContainer')).includes('Undo'));
+  // streaming sites never count as work; time on them while locked in doesn't count
+  await p.keyboard.press('Escape');
+  check('YouTube / Disney+ are not work by default', await E("activityCategory('youtube.com')")==='work' /* set earlier in this test */ && await E("activityCategory('disneyplus.com')")==='other' && await E("activityCategory('netflix.com')")==='other' && await E("activityCategory('studio.youtube.com')")==='work');
+  await E("setActivityCategory('youtube.com','other')");
+  await E("state.focus.activeSession = {startedAt:"+(T0+40*60000)+", breaks:[], onBreak:false, completedTasks:[]}; persist('focus')");
+  add(40.2, 52, 'Final Cut Pro'); add(52.2, 64, 'Safari', 'youtube.com');
+  await poll(64);
+  const dist = await E("distractionMinutesFor(todayStr())");
+  const live = await E("deepWorkMinutesTodayLive()"), raw = await E("rawSessionMinutesFor(todayStr(),'deep') + Math.floor((Date.now()-state.focus.activeSession.startedAt)/60000)");
+  check('12 min of YouTube inside a session isn\'t counted', dist>=11 && dist<=13 && live===raw-dist, {dist, live, raw});
+  check('a heads-up when a session drifts onto YouTube', (await p.textContent('#toastContainer')).includes('won\'t count'));
+  check('pill says the time isn\'t counting', (await p.textContent('#activityPill')).includes('not counting'));
+  check('days before this rule are never changed', await E("distractionMinutesFor('2020-01-01')")===0);
+  await E("state.focus.activeSession = null; persist('focus')");
+  // a browser whose website can't be read
+  add(64.2, 66, 'Safari');
+  await poll(66);
+  check('browser without a website shows a "?" on the pill', await p.isVisible('#activityPill .ap-warn'));
+  await E("ui.pillMenu = null; renderPillMenu()");
+  await p.click('#activityPill');
+  check('…and explains how to allow it', (await p.textContent('#activityPillMenu')).includes('Automation'));
   check('no page errors', p.errors.length===0, p.errors);
   await b.close();
   process.exit(report()?1:0);

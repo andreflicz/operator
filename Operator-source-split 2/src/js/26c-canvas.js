@@ -15,21 +15,25 @@ const BOARD_COLORS = ['#E8A23D','#3FBE8E','#E8636B','#8fdcff','#b39ddb','#f48fb1
 const cv = { kind:null, boardId:null, host:null, world:null, els:null, svg:null, marquee:null, sel:new Set(), drag:null, editing:null, history:{}, view:false };
 function boardById(id){ return arr(state.boards.boards).find(function(b){ return b.id===id; }) || null; }
 function boardsOfKind(kind){ return arr(state.boards.boards).filter(function(b){ return b.kind===kind; }); }
+// All boards live in Journal → Boards: the vision board (the one you wake up to) is pinned
+// first, then every other board.
 function currentBoardId(kind){
   ui.boardIds = ui.boardIds || {};
   let id = ui.boardIds[kind];
-  const b = boardById(id);
-  if(!b || b.kind!==kind){
-    if(kind==='vision'){ const m = masterVisionBoard(); id = m ? m.id : null; }
-    else { const roots = boardsOfKind(kind).filter(function(x){ return !x.parentId; }); id = roots.length ? roots[0].id : null; }
+  if(!boardById(id)){
+    const m = masterVisionBoard();
+    const roots = rootBoards();
+    id = m ? m.id : (roots.length ? roots[0].id : null);
     ui.boardIds[kind] = id;
   }
   return id;
 }
+function rootBoards(){
+  const m = masterVisionBoard();
+  return arr(state.boards.boards).filter(function(b){ return !b.parentId && (!m || b.id!==m.id); });
+}
 const BOARD_KIND_META = {
-  vision:{icon:'&#127775;', title:'Your vision board', sub:'One board for everything you\'re going after — it\'s what you wake up to. Photos, category cards, lists and boards inside it.'},
-  milanote:{icon:'&#128204;', title:'Milanote', sub:'All your other boards — moodboards, plans, shoot ideas. Bring your old Milanote boards in with Import.'},
-  journal:{icon:'&#128221;', title:'Journal boards', sub:'A freeform page for text cards, images and lists, next to your regular entries.'}
+  journal:{icon:'&#128204;', title:'Boards', sub:'Your vision board — the one you wake up to — and every other board: moodboards, plans, shoot ideas, journal pages. Bring old Milanote boards in with Import.'}
 };
 function createBoard(kind, name, parentId){
   const b = {id:uid(), name:name||'Untitled board', kind:kind, parentId:parentId||null, elements:[], viewport:{x:60, y:40, zoom:1}, createdAt:Date.now()};
@@ -43,34 +47,37 @@ let boardSaveTimer = null;
 function saveBoardsSoon(){ clearTimeout(boardSaveTimer); boardSaveTimer = setTimeout(function(){ persist('boards'); }, 350); }
 // ---- page shell (header + toolbar are normal re-rendered markup; the canvas is not) ----
 function boardStripHtml(kind, current){
-  const roots = boardsOfKind(kind).filter(function(x){ return !x.parentId; });
+  const master = masterVisionBoard();
+  const list = (master ? [master] : []).concat(rootBoards());
   const activeRoot = current ? boardPath(current)[0] : null;
-  return '<div class="board-strip">'+roots.map(function(r){
+  return '<div class="board-strip">'+list.map(function(r){
       const count = r.elements.length;
-      return '<button class="board-pill'+(activeRoot && activeRoot.id===r.id?' is-active':'')+'" data-action="boardOpen" data-kind="'+kind+'" data-id="'+r.id+'" title="Open '+escapeHtml(r.name)+'">'+
-        '<span class="board-pill-thumb">'+(count ? boardStaticHtml(r, 'board-thumb') : '<span class="board-pill-empty">empty</span>')+'</span>'+
-        '<span class="board-pill-name">'+escapeHtml(r.name)+'</span><span class="board-pill-count">'+count+' item'+(count===1?'':'s')+'</span>'+
+      const isMaster = master && r.id===master.id;
+      return '<button class="board-pill'+(activeRoot && activeRoot.id===r.id?' is-active':'')+(isMaster?' is-master':'')+'" data-action="boardOpen" data-kind="'+kind+'" data-id="'+r.id+'" title="Open '+escapeHtml(r.name)+'">'+
+        '<span class="board-pill-thumb">'+(count ? boardStaticHtml(r, 'board-thumb') : '<span class="board-pill-empty">empty</span>')+(isMaster ? '<span class="board-pill-star" title="Your vision board — shows on Today and when you wake up">&#9733;</span>' : '')+'</span>'+
+        '<span class="board-pill-text"><span class="board-pill-name">'+escapeHtml(r.name)+'</span><span class="board-pill-count">'+(isMaster ? 'vision board &middot; ' : '')+count+' item'+(count===1?'':'s')+'</span></span>'+
       '</button>';
     }).join('')+
-    '<button class="board-pill board-pill-new" data-action="boardNew" data-kind="'+kind+'"><span class="board-pill-plus">+</span><span class="board-pill-name">New board</span></button>'+
-    (kind==='milanote' ? '<button class="board-pill board-pill-new" data-action="boardImport"><span class="board-pill-plus">&#11014;</span><span class="board-pill-name">Import from Milanote</span><span class="board-pill-count">.zip, .md, images</span></button>' : '')+
+    (master ? '' : '<button class="board-pill board-pill-new" data-action="boardNewVision"><span class="board-pill-plus">&#9733;</span><span class="board-pill-text"><span class="board-pill-name">Vision board</span><span class="board-pill-count">the one you wake up to</span></span></button>')+
+    '<button class="board-pill board-pill-new" data-action="boardNew" data-kind="'+kind+'"><span class="board-pill-plus">+</span><span class="board-pill-text"><span class="board-pill-name">New board</span></span></button>'+
+    '<button class="board-pill board-pill-new" data-action="boardImport"><span class="board-pill-plus">&#11014;</span><span class="board-pill-text"><span class="board-pill-name">Import boards</span><span class="board-pill-count">Milanote export, .md, images</span></span></button>'+
   '</div>';
 }
 function renderBoardShell(kind){
   const id = currentBoardId(kind);
   const b = id ? boardById(id) : null;
-  const meta = BOARD_KIND_META[kind] || BOARD_KIND_META.milanote;
+  const meta = BOARD_KIND_META.journal;
   if(!b){
     return '<div class="board-empty card">'+
       '<div style="font-size:34px;">'+meta.icon+'</div>'+
       '<div class="section-title" style="justify-content:center;margin:8px 0 4px;">'+meta.title+'</div>'+
       '<div class="kpi-sub" style="max-width:440px;margin:0 auto 16px;">'+meta.sub+'</div>'+
       '<div class="row" style="justify-content:center;gap:8px;">'+
-        '<button class="btn btn-primary" data-action="boardNew" data-kind="'+kind+'">+ '+(kind==='vision'?'Create my vision board':'New board')+'</button>'+
-        (kind==='vision' ? '<button class="btn btn-ghost" data-action="boardTemplate">Start from my Milanote layout</button>' : '')+
-        (kind==='milanote' ? '<button class="btn btn-ghost" data-action="boardImport">&#11014; Import from Milanote</button>' : '')+
+        '<button class="btn btn-primary" data-action="boardTemplate">&#9733; Create my vision board</button>'+
+        '<button class="btn btn-ghost" data-action="boardNew" data-kind="'+kind+'">+ Blank board</button>'+
+        '<button class="btn btn-ghost" data-action="boardImport">&#11014; Import boards</button>'+
       '</div>'+
-      (kind==='milanote' ? '<div class="kpi-sub" style="margin-top:12px;">In Milanote: open a board &rarr; &#8943; menu &rarr; Export &rarr; Markdown (or download the images) &rarr; drop the file(s) here.</div>' : '')+
+      '<div class="kpi-sub" style="margin-top:12px;">Moving from Milanote? Open a board there &rarr; &#8943; menu &rarr; Export &rarr; Markdown (or download the images), then Import here.</div>'+
     '</div>';
   }
   const view = !!(ui.boardView && ui.boardView[kind]);
@@ -79,11 +86,13 @@ function renderBoardShell(kind){
   const selCount = cv.boardId===b.id ? cv.sel.size : 0;
   const tool = function(action, label, title, extra){ return '<button class="board-tool" data-action="'+action+'" data-kind="'+kind+'" title="'+escapeHtml(title||label)+'"'+(extra||'')+'>'+label+'</button>'; };
   return '<div class="board-shell'+(view?' is-view':'')+(full?' is-full':'')+'" data-key="shell-'+kind+'">'+
-    (kind!=='vision' && !full ? boardStripHtml(kind, b) : '')+
+    (!full ? boardStripHtml(kind, b) : '')+
     '<div class="board-bar">'+
       '<div class="board-crumbs">'+
         path.slice(0,-1).map(function(x){ return '<span class="board-crumb" data-action="boardOpen" data-kind="'+kind+'" data-id="'+x.id+'">'+escapeHtml(x.name)+'</span><span class="board-crumb-sep">/</span>'; }).join('')+
         (view ? '<span class="board-title-static">'+escapeHtml(b.name)+'</span>' : '<input class="board-title-input" data-board-rename="'+b.id+'" value="'+escapeHtml(b.name)+'">')+
+        (path[0] && masterVisionBoard() && path[0].id===masterVisionBoard().id ? '<span class="board-master-tag" title="Shows on Today and on the wake-up screen">&#9733; Vision board</span>'
+          : (!b.parentId && !view ? '<button class="board-tool" data-action="boardMakeMaster" title="Make this the board you wake up to">&#9734; Make it my vision board</button>' : ''))+
       '</div>'+
       '<div class="row" style="gap:6px;">'+
         tool('boardToggleView', view?'&#9998; Edit':'&#128065; View', view?'Back to editing':'View mode — hide the editing tools')+
@@ -97,8 +106,8 @@ function renderBoardShell(kind){
       tool('boardAddImage','&#128444; Image','Upload images (or paste / drop them on the board)')+
       tool('boardAddImageUrl','&#128279; Image URL','Add an image from a link')+
       tool('boardAddNested','&#128203; Board','Add a board inside this one')+
-      tool('boardAddLine','&#9585; Line','Add a line / divider')+
-      tool('boardAddArrow','&#10140; Arrow','Add an arrow')+
+      tool('boardAddLine','&#9585; Line','Draw a line: click the start, then the end', cv.lineDraw && !cv.lineDraw.arrow ? ' data-on="1"' : '')+
+      tool('boardAddArrow','&#10140; Arrow','Draw an arrow: click where it starts, then where it points', cv.lineDraw && cv.lineDraw.arrow ? ' data-on="1"' : '')+
       '<span class="board-tool-sep"></span>'+
       BOARD_COLORS.map(function(c){ return '<button class="board-swatch" data-action="boardColor" data-kind="'+kind+'" data-id="'+c+'" style="background:'+c+'" title="Color selected"'+(selCount?'':' disabled')+'></button>'; }).join('')+
       '<span class="board-tool-sep"></span>'+
@@ -114,15 +123,12 @@ function renderBoardShell(kind){
       tool('boardZoomIn','+','Zoom in')+
       tool('boardFit','&#9974; Fit','Fit everything')+
       '<span style="flex:1"></span>'+
-      (kind==='milanote' && !b.parentId ? tool('boardImport','&#11014; Import','Import a Milanote export into a new board') : '')+
-      (path.length>1 || (kind!=='vision') ? tool('boardDeleteBoard','Delete board','Delete this board (and boards inside it)') : '')+
+      (!(masterVisionBoard() && b.id===masterVisionBoard().id) ? tool('boardDeleteBoard','Delete board','Delete this board (and boards inside it)') : '')+
     '</div>')+
     '<div class="board-host" id="boardHost" data-photo-drop="board" data-morph-ignore="'+kind+':'+b.id+':'+(view?'v':'e')+(full?':f':'')+'"></div>'+
     (view || full ? '' : '<div class="board-hint">Drag background to pan · scroll to move · Ctrl/⌘+scroll to zoom · Shift+drag to select · double-click a card to edit · paste or drop images</div>')+
   '</div>';
 }
-function renderVisionTab(){ return renderBoardShell('vision'); }
-function renderMilanoteTab(){ return renderBoardShell('milanote'); }
 ACTIONS.boardFullscreen = function(el){
   const kind = el.dataset.kind;
   if(ui.boardFull===kind){ exitBoardFullscreen(); return; }
@@ -209,7 +215,7 @@ function drawBoard(){
   const lines = els.filter(function(e){ return e.type==='line'; }).map(function(e){
     const sel = cv.sel.has(e.id);
     return '<line data-key="ln-'+e.id+'" data-el="'+e.id+'" class="bline'+(sel?' is-sel':'')+'" x1="'+e.x1+'" y1="'+e.y1+'" x2="'+e.x2+'" y2="'+e.y2+'" stroke="'+(e.color||'#8A90A2')+'" stroke-width="'+(e.width||2)+'" stroke-linecap="round"'+(e.arrow?' marker-end="url(#bArrow)"':'')+'/>'+
-      '<line data-key="lh-'+e.id+'" data-el="'+e.id+'" class="bline-hit" x1="'+e.x1+'" y1="'+e.y1+'" x2="'+e.x2+'" y2="'+e.y2+'" stroke="transparent" stroke-width="14"/>';
+      '<line data-key="lh-'+e.id+'" data-el="'+e.id+'" class="bline-hit" x1="'+e.x1+'" y1="'+e.y1+'" x2="'+e.x2+'" y2="'+e.y2+'" stroke="transparent" stroke-width="22" stroke-linecap="round"/>';
   }).join('');
   cv.svg.innerHTML = lines;
 }
@@ -259,6 +265,13 @@ function elFromTarget(t){ const n = t.closest && t.closest('[data-el]'); return 
 function boardPointerDown(e){
   const b = cvBoard(); if(!b) return;
   if(e.button===2) return;
+  if(cv.lineDraw){
+    e.preventDefault();
+    const pt = lineDrawPoint(e);
+    if(!cv.lineDraw.start){ cv.lineDraw.start = pt; cv.lineDraw.down = {cx:e.clientX, cy:e.clientY}; drawLinePreview(pt); setDrawHint(cv.lineDraw.arrow ? 'Now click where the arrow points' : 'Now click where the line ends'); }
+    else finishLineDraw(pt);
+    return;
+  }
   if(cv.editing){
     if(e.target.closest('[contenteditable="true"]')) return;
     finishEditing();
@@ -289,6 +302,7 @@ function boardPointerDown(e){
   cv.drag.pointerId = e.pointerId;
 }
 function boardPointerMove(e){
+  if(cv.lineDraw && cv.lineDraw.start){ drawLinePreview(lineDrawPoint(e)); return; }
   const d = cv.drag; if(!d) return;
   const b = cvBoard(); if(!b) return;
   const dx = e.clientX - d.start.cx, dy = e.clientY - d.start.cy;
@@ -332,6 +346,9 @@ function boardPointerMove(e){
   }
 }
 function boardPointerUp(e){
+  // press-and-drag also draws: let go somewhere else and that's the end point
+  if(cv.lineDraw && cv.lineDraw.start && cv.lineDraw.down && Math.abs(e.clientX-cv.lineDraw.down.cx)+Math.abs(e.clientY-cv.lineDraw.down.cy) > 10){ finishLineDraw(lineDrawPoint(e)); return; }
+  if(cv.lineDraw && cv.lineDraw.down) cv.lineDraw.down = null;
   const d = cv.drag; if(!d) return;
   cv.drag = null;
   cv.host.classList.remove('is-dragging');
@@ -432,6 +449,7 @@ function boardActive(){ return !!(cv.host && document.body.contains(cv.host) && 
 function typingInField(t){ return t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)); }
 document.addEventListener('keydown', function(e){
   if(!boardActive()) return;
+  if(cv.lineDraw && e.key==='Escape'){ e.preventDefault(); cancelLineDraw(); return; }
   if(ui.boardFull && e.key==='Escape' && !cv.editing && !cv.sel.size && !document.querySelector('.overlay:not(.hidden)')){ e.preventDefault(); exitBoardFullscreen(); return; }
   if(cv.editing){ if(e.key==='Escape'){ e.preventDefault(); finishEditing(); } return; }
   if(typingInField(e.target)) return;
@@ -464,12 +482,17 @@ document.addEventListener('change', function(e){
   if(t.dataset.boardPick) openBoard(t.dataset.boardPick, t.value);
   if(t.dataset.boardRename){ const b = boardById(t.dataset.boardRename); if(b && t.value.trim()){ b.name = t.value.trim(); persist('boards'); renderView(); } }
 });
-ACTIONS.boardNew = function(el){
-  const kind = el.dataset.kind || (ui.view==='personal' && ui.personalTab==='journal' ? 'journal' : ui.personalTab==='milanote' ? 'milanote' : 'vision');
-  const n = boardsOfKind(kind).filter(function(x){ return !x.parentId; }).length;
-  const name = kind==='vision' ? 'Vision Board' : kind==='journal' ? 'Journal board '+(n+1) : (n ? 'Board '+(n+1) : 'My board');
-  const b = createBoard(kind, kind==='vision' && masterVisionBoard() ? 'New board' : name, kind==='vision' && masterVisionBoard() ? masterVisionBoard().id : null);
-  openBoard(kind, b.id);
+ACTIONS.boardNew = function(){
+  const b = createBoard('journal', 'Board '+(rootBoards().length+1));
+  openBoard('journal', b.id);
+};
+ACTIONS.boardNewVision = function(){ ACTIONS.boardTemplate(); };
+ACTIONS.boardMakeMaster = function(){
+  const b = cvBoard(); if(!b) return;
+  const root = boardPath(b)[0];
+  state.boards.masterId = root.id;
+  persist('boards'); playPositive(); renderView();
+  showToast('“'+root.name+'” is your vision board now — it shows on Today and when your alarm goes off.', {icon:'&#9733;'});
 };
 ACTIONS.boardToggleView = function(el){
   if(cv.editing) finishEditing();
@@ -480,8 +503,57 @@ function canvasAddNote(){ if(cvBoard()) ACTIONS.boardAddNote(); }
 ACTIONS.boardAddNote = function(){ addElement({type:'note', header:false, title:'', body:'Double-click to write', w:220, h:90}); };
 ACTIONS.boardAddLabel = function(){ addElement({type:'note', header:true, color:BOARD_COLORS[Math.floor(Math.random()*6)], title:'Category', body:'One-line subtitle', w:260, h:96}); };
 ACTIONS.boardAddList = function(){ addElement({type:'list', title:'List', color:'#3a3f4d', items:[{id:uid(), text:'First thing'},{id:uid(), text:'Second thing'}], w:260, h:120}); };
-ACTIONS.boardAddLine = function(){ addElement({type:'line', color:'#8A90A2', width:2, arrow:false}); };
-ACTIONS.boardAddArrow = function(){ addElement({type:'line', color:'#E7E9EE', width:2, arrow:true}); };
+// Lines and arrows are drawn: pick the tool, click where it starts, then where it ends
+// (or press and drag). Shift keeps it straight; Esc cancels.
+ACTIONS.boardAddLine = function(){ startLineDraw(false); };
+ACTIONS.boardAddArrow = function(){ startLineDraw(true); };
+function startLineDraw(arrow){
+  if(!cvBoard() || cv.view) return;
+  if(cv.lineDraw && cv.lineDraw.arrow===arrow){ cancelLineDraw(); return; }
+  cv.lineDraw = {arrow:arrow, color: arrow ? '#E7E9EE' : '#8A90A2', start:null};
+  cv.sel.clear();
+  if(cv.host){ cv.host.classList.add('is-drawing'); setDrawHint(arrow ? 'Click where the arrow starts, then where it points' : 'Click where the line starts, then where it ends'); }
+  drawBoard(); renderView();
+}
+function cancelLineDraw(){
+  cv.lineDraw = null;
+  if(cv.host){ cv.host.classList.remove('is-drawing'); setDrawHint(''); }
+  const pv = cv.svg && cv.svg.querySelector('.bline-preview'); if(pv) pv.remove();
+  renderView();
+}
+function setDrawHint(text){
+  if(!cv.host) return;
+  let h = cv.host.querySelector('.board-draw-hint');
+  if(!text){ if(h) h.remove(); return; }
+  if(!h){ h = document.createElement('div'); h.className = 'board-draw-hint'; cv.host.appendChild(h); }
+  h.textContent = text+' · Esc to cancel';
+}
+function lineDrawPoint(e){
+  const w = screenToWorld(e.clientX, e.clientY);
+  const st = cv.lineDraw && cv.lineDraw.start;
+  if(st && e.shiftKey){ if(Math.abs(w.x-st.x) > Math.abs(w.y-st.y)) w.y = st.y; else w.x = st.x; }
+  return {x:Math.round(w.x), y:Math.round(w.y)};
+}
+function drawLinePreview(end){
+  const st = cv.lineDraw.start; if(!st || !cv.svg) return;
+  let pv = cv.svg.querySelector('.bline-preview');
+  if(!pv){ pv = document.createElementNS('http://www.w3.org/2000/svg', 'line'); pv.setAttribute('class', 'bline-preview'); cv.svg.appendChild(pv); }
+  pv.setAttribute('x1', st.x); pv.setAttribute('y1', st.y); pv.setAttribute('x2', end.x); pv.setAttribute('y2', end.y);
+  pv.setAttribute('stroke', cv.lineDraw.color); pv.setAttribute('stroke-width', 2); pv.setAttribute('stroke-dasharray', '6 5');
+  if(cv.lineDraw.arrow) pv.setAttribute('marker-end', 'url(#bArrow)'); else pv.removeAttribute('marker-end');
+}
+function finishLineDraw(end){
+  const ld = cv.lineDraw, b = cvBoard(); if(!ld || !ld.start || !b) return false;
+  if(Math.abs(end.x-ld.start.x) + Math.abs(end.y-ld.start.y) < 6) return false;
+  snapshot();
+  const el = {id:uid(), type:'line', color:ld.color, width:2, arrow:ld.arrow, x1:ld.start.x, y1:ld.start.y, x2:end.x, y2:end.y, z:maxZ(b)+1};
+  b.elements.push(el);
+  cv.lineDraw = null;
+  if(cv.host){ cv.host.classList.remove('is-drawing'); setDrawHint(''); }
+  cv.sel = new Set([el.id]);
+  commitBoard(true);
+  return true;
+}
 ACTIONS.boardAddImage = function(){
   const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.multiple = true;
   inp.onchange = function(){ addImagesToBoard(Array.prototype.slice.call(inp.files||[])); };
@@ -558,7 +630,7 @@ ACTIONS.undoDeleteBoard = function(){
 // Starter layout mirroring the Milanote board: category label cards, the "avoiding" list,
 // a nested "The Key To Life" board and a vertical divider. Drop your photos in around them.
 ACTIONS.boardTemplate = function(){
-  const b = createBoard(masterVisionBoard() ? 'milanote' : 'vision', 'Vision Board');
+  const b = createBoard(masterVisionBoard() ? 'journal' : 'vision', 'Vision Board');
   const key = createBoard(b.kind, 'The Key To Life', b.id);
   const els = [
     {type:'note', header:true, color:'#3FBE8E', title:'Mind + Body', body:'Feeding the body and the brain. Free of temptation.', x:40, y:40, w:300, h:96},
@@ -571,18 +643,22 @@ ACTIONS.boardTemplate = function(){
   ];
   els.forEach(function(e, i){ e.id = uid(); e.z = i+1; b.elements.push(e); });
   persist('boards');
-  if(b.kind!=='vision'){ ui.view='personal'; ui.personalTab='milanote'; }
-  openBoard(b.kind, b.id);
+  ui.view = 'personal'; ui.personalTab = 'journal'; ui.journalMode = 'boards';
+  openBoard('journal', b.id);
   setTimeout(fitBoard, 50);
 };
-ACTIONS.goToVision = function(){ ui.view='personal'; ui.personalTab='vision'; renderView(); };
+function showBoardsPage(boardId){
+  ui.view = 'personal'; ui.personalTab = 'journal'; ui.journalMode = 'boards';
+  ui.boardIds = ui.boardIds || {}; if(boardId) ui.boardIds.journal = boardId;
+}
+ACTIONS.goToVision = function(){ const m = masterVisionBoard(); showBoardsPage(m && m.id); renderView(); };
 function renderVisionSlideshow(){ return ''; }
 // ---- static (read-only) render of a board — wake screen, second display, previews ----
 // The master vision board is the one board that shows up on the wake screen.
 function masterVisionBoard(){
   const id = state.boards.masterId;
   const b = id ? boardById(id) : null;
-  if(b && b.kind==='vision') return b;
+  if(b && !b.parentId) return b;
   return boardsOfKind('vision').filter(function(x){ return !x.parentId; })[0] || null;
 }
 function boardBounds(b){
@@ -600,7 +676,8 @@ function boardStaticHtml(b, cls){
   const els = b.elements.slice().sort(function(a,c){ return (a.z||0)-(c.z||0); });
   const shift = function(e){ const c = Object.assign({}, e); if(c.type==='line'){ c.x1-=bb.x; c.x2-=bb.x; c.y1-=bb.y; c.y2-=bb.y; } else { c.x-=bb.x; c.y-=bb.y; } return c; };
   const savedSel = cv.sel; cv.sel = new Set();
-  const body = els.filter(function(e){ return e.type!=='line'; }).map(function(e){ return elHtml(shift(e), false); }).join('');
+  // previews are pictures, not the live canvas: no element ids / edit hooks in them
+  const body = els.filter(function(e){ return e.type!=='line'; }).map(function(e){ return elHtml(shift(e), false); }).join('').replace(/ data-(el|key|handle|field)="[^"]*"/g, '');
   cv.sel = savedSel;
   const lines = els.filter(function(e){ return e.type==='line'; }).map(function(e){ const c = shift(e); return '<line x1="'+c.x1+'" y1="'+c.y1+'" x2="'+c.x2+'" y2="'+c.y2+'" stroke="'+(c.color||'#8A90A2')+'" stroke-width="'+(c.width||2)+'" stroke-linecap="round"'+(c.arrow?' marker-end="url(#bArrowS)"':'')+'/>'; }).join('');
   return '<div class="board-static '+(cls||'')+'" data-bw="'+bb.w+'" data-bh="'+bb.h+'">'+
@@ -633,9 +710,9 @@ function renderVisionPanel(){
   '</div>';
 }
 ACTIONS.openVisionFull = function(){
-  ui.view = 'personal'; ui.personalTab = 'vision';
-  ui.boardView = ui.boardView || {}; ui.boardView.vision = true;
-  ui.boardFull = 'vision';
+  const m = masterVisionBoard(); showBoardsPage(m && m.id);
+  ui.boardView = ui.boardView || {}; ui.boardView.journal = true;
+  ui.boardFull = 'journal';
   try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); }catch(e){}
   renderView();
   setTimeout(fitBoard, 80);

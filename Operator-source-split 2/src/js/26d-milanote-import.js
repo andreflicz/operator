@@ -1,6 +1,6 @@
 
-// ============ MILANOTE IMPORT ============
-// Brings a Milanote export into a new board in the Milanote section. Accepts what Milanote
+// ============ IMPORT BOARDS (e.g. from Milanote) ============
+// Brings a Milanote export (or any notes/images) into a new board in Journal → Boards. Accepts what Milanote
 // gives you: a Markdown / text export, images, an HTML page, or a .zip of any of those.
 // Headings become colored label cards, paragraphs become notes, bullet lists become list
 // cards, images (linked or inside the zip) become image cards — laid out in columns.
@@ -156,11 +156,11 @@ async function importMilanoteFiles(files){
       imported++;
     }
     const first = files[0].name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim();
-    const b = createBoard('milanote', first || 'Milanote import');
+    const b = createBoard('journal', first || 'Imported board');
     b.elements = els;
     persist('boards');
-    ui.view = 'personal'; ui.personalTab = 'milanote';
-    openBoard('milanote', b.id);
+    showBoardsPage(b.id);
+    openBoard('journal', b.id);
     setTimeout(fitBoard, 80);
     playPositive();
     showToast('Imported '+imported+' card'+(imported===1?'':'s')+' into “'+b.name+'”'+(skipped?' ('+skipped+' image'+(skipped===1?'':'s')+' not found)':''), {icon:'&#128204;', duration:6000});

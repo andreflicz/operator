@@ -809,9 +809,6 @@
   .wake-right{ position:relative; padding:28px; display:flex; }
   .wake-board{ flex:1; border-radius:18px; background:#0d0f15; border:1px solid #1d212c; }
   .wake-board-empty{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--text-dim); border:1px dashed var(--border); border-radius:18px; }
-  .wake-display-tools{ margin-top:auto; padding-top:12px; }
-  .wake-display-mode #app{ display:none !important; }
-  .wake-display-mode .quick-journal-fab, .wake-display-mode .fab-add{ display:none !important; }
   @media (max-width:900px){ .wake-screen{ grid-template-columns:1fr; grid-template-rows:auto 50vh; overflow-y:auto; } .wake-left{ padding:28px 22px; } }
   .board-static{ position:relative; overflow:hidden; }
   .board-static-world{ position:absolute; left:0; top:0; transform-origin:0 0; }
@@ -1115,7 +1112,6 @@
   .hm-cell{ width:15px; height:15px; }
   .hm-stats{ flex:1; display:grid; grid-template-columns:repeat(auto-fit, minmax(130px,1fr)); gap:14px; min-width:220px; }
   .hm-stat .stat-tile-v{ font-size:22px; }
-  @media (min-width: 901px){ #viewRoot:has(> .quick-access-dock) { padding-right:56px; } }
   /* ---- fitness ---- */
   .fit-hero{ display:flex; align-items:center; gap:28px; flex-wrap:wrap; padding:20px 22px; background:radial-gradient(ellipse at 0% 50%, rgba(232,162,61,.08), transparent 60%), var(--panel); }
   .fit-mid{ flex:1; min-width:260px; display:flex; flex-direction:column; gap:10px; }
@@ -1231,7 +1227,6 @@
   .activity-pill[data-cat="unsorted"] .ap-dot{ background:#8A90A2; }
   .ap-name{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
   .ap-lock{ color:var(--good); font-size:11.5px; white-space:nowrap; border-left:1px solid var(--border); padding-left:8px; }
-  .wake-display-mode .activity-pill{ display:none; }
   .ap-menu{ position:fixed; left:236px; bottom:56px; z-index:95; width:260px; background:#171a23; border:1px solid #2c3242; border-radius:12px; padding:12px; box-shadow:0 18px 50px rgba(0,0,0,.55); animation:overlayFadeIn .12s ease-out; }
   body.sb-collapsed .ap-menu{ left:76px; }
   .ap-menu-title{ font-family:var(--font-display); font-weight:700; margin-bottom:8px; word-break:break-all; }
@@ -1274,6 +1269,77 @@
   .rc-sess-time{ font-family:var(--font-display); font-weight:700; }
   .rc-sess-len{ color:var(--text-dim); }
   @media (max-width:640px){ .rc-stats{ grid-template-columns:1fr 1fr; } }
+  /* ---- performance: nothing animates forever on the main thread ----
+     Looping box-shadow / text-shadow pulses repainted the page ~60 times a second even
+     when idle, which made every click feel slower. Glows are static now; the locked-in
+     timer keeps its breathing glow on its own GPU layer (opacity only, no repaints). */
+  .lockin-cta::after{ animation:none; opacity:0; }
+  .lockin-cta:hover::after{ opacity:1; animation:lockinSheen 1.1s ease-out 1; }
+  .cc2-avatar.ring-red, .health-red .health-dot, .week-chip-broken, .streak-dot-broken, .goals-title-glow, .lc-next-ready{ animation:none; }
+  .health-red .health-dot{ box-shadow:0 0 6px var(--danger); }
+  .lc-next-ready{ box-shadow:0 0 12px 1px rgba(63,190,142,.35); }
+  .focus-active-glow{ animation:none; position:relative; box-shadow:0 0 18px 2px rgba(232,162,61,.16); }
+  .focus-active-glow::after{ content:''; position:absolute; inset:-1px; border-radius:inherit; box-shadow:0 0 30px 6px rgba(232,162,61,.34); opacity:0; pointer-events:none; will-change:opacity; animation:glowBreath 2.4s ease-in-out infinite; }
+  @keyframes glowBreath{ 0%,100%{ opacity:0; } 50%{ opacity:1; } }
+  .activity-pill{ backdrop-filter:none; background:#151821; }
+  /* Panels below the fold aren't laid out or painted until you scroll near them. */
+  .today-panels > .section:not(.vision-panel), .today-panels > .small-panels-row{ content-visibility:auto; contain-intrinsic-size:auto 360px; }
+  .crm-list, .finished-list{ content-visibility:auto; contain-intrinsic-size:auto 600px; }
+  .th-badge{ margin-left:auto; min-width:18px; height:18px; border-radius:9px; background:var(--accent); color:#1a1305; font-size:11px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; padding:0 5px; }
+  .ap-lock.ap-lock-only{ border-left:none; padding-left:0; }
+  /* boards: drawing lines, master badge */
+  .board-host.is-drawing{ cursor:crosshair; }
+  .board-host.is-drawing .bel, .board-host.is-drawing .bline-hit{ pointer-events:none; }
+  .board-draw-hint{ position:absolute; top:12px; left:50%; transform:translateX(-50%); background:rgba(10,12,16,.9); border:1px solid var(--accent); color:var(--text); font-size:12.5px; font-weight:600; padding:6px 14px; border-radius:999px; pointer-events:none; z-index:5; white-space:nowrap; }
+  .board-lines .bline-preview{ pointer-events:none; }
+  .board-tool[data-on="1"]{ background:var(--accent-dim); color:var(--accent); border-color:rgba(232,162,61,.4); }
+  .bel-line-end{ width:16px; height:16px; margin:-8px 0 0 -8px; }
+  .board-master-tag{ font-size:12px; font-weight:700; color:#f3c988; background:rgba(232,162,61,.12); border:1px solid rgba(232,162,61,.3); border-radius:999px; padding:3px 10px; white-space:nowrap; }
+  .board-pill.is-master{ border-color:rgba(232,162,61,.45); }
+  .board-pill.is-master.is-active{ box-shadow:0 0 0 1px var(--accent) inset; }
+  .board-pill-thumb{ position:relative; }
+  .board-pill-star{ position:absolute; top:6px; left:6px; width:22px; height:22px; border-radius:50%; background:rgba(10,12,16,.85); color:var(--accent); font-size:13px; display:flex; align-items:center; justify-content:center; }
+  /* ---- Business HQ (Overview) ---- */
+  .hq{ padding:22px 24px; display:flex; flex-direction:column; gap:22px; background:radial-gradient(ellipse at 0% 0%, rgba(63,190,142,.08), transparent 50%), var(--panel); }
+  .hq-top{ display:grid; grid-template-columns:minmax(260px,1fr) minmax(260px,1.1fr); gap:28px; align-items:center; }
+  .hq-mrr{ display:flex; flex-direction:column; gap:8px; }
+  .hq-mrr .biz-mrr{ font-size:48px; }
+  .hq-months .biz-mbars{ min-height:110px; }
+  .hq-cols{ display:grid; grid-template-columns:1fr 1fr; gap:22px; border-top:1px solid var(--border); padding-top:18px; }
+  .hq-col{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .hq-col-head{ display:flex; align-items:center; gap:8px; font-family:var(--font-display); font-weight:700; font-size:15px; margin-bottom:8px; cursor:pointer; }
+  .hq-col-head .view-all-link{ margin-left:auto; }
+  .hq-count{ font-size:12px; color:var(--text-dim); background:var(--panel-2); border-radius:999px; padding:1px 8px; font-family:var(--font-body); }
+  .hq-row{ display:flex; align-items:center; gap:10px; padding:7px 6px; border-radius:9px; cursor:pointer; }
+  .hq-row:hover, .hq-stage:hover{ background:var(--panel-2); }
+  .hq-name{ flex:1; min-width:0; font-weight:600; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hq-meta{ font-size:12px; white-space:nowrap; }
+  .hq-val{ font-family:var(--font-display); font-weight:700; font-size:13px; min-width:54px; text-align:right; }
+  .hq-more{ font-size:12px; color:var(--text-dim); padding:4px 6px; cursor:pointer; }
+  .hq-stage{ display:flex; align-items:center; gap:10px; padding:7px 6px; border-radius:9px; cursor:pointer; }
+  .hq-stage-name{ width:120px; display:flex; align-items:center; gap:7px; font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hq-stage-bar{ flex:1; height:8px; border-radius:5px; background:var(--panel-2); overflow:hidden; }
+  .hq-stage-bar span{ display:block; height:100%; border-radius:5px; opacity:.8; }
+  .hq-stage-n{ font-family:var(--font-display); font-weight:700; font-size:13px; width:22px; text-align:right; }
+  .hq-due{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); }
+  .hq-due-lead{ font-size:12px; font-weight:600; color:#ffb3b8; background:var(--danger-dim); border-radius:999px; padding:3px 10px; cursor:pointer; }
+  @media (max-width:900px){ .hq-top, .hq-cols{ grid-template-columns:1fr; } }
+  .crm-toolbar-slim{ align-items:center; }
+  .crm-tools-btn{ display:inline-flex; align-items:center; gap:6px; }
+  .crm-tools-btn.is-open{ border-color:var(--accent); color:var(--accent); }
+  .crm-tools-row{ animation:subtabFadeIn .15s ease-out; margin-top:-4px; }
+  .ap-lock.is-off{ color:#ffb3b8; }
+  .ap-warn{ width:16px; height:16px; border-radius:50%; background:rgba(232,162,61,.2); color:var(--accent); font-size:10.5px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+  /* compact board strip so the canvas fits on screen */
+  .board-strip{ gap:8px; padding-bottom:6px; }
+  .board-pill{ flex:0 0 auto; flex-direction:row; align-items:center; gap:10px; padding:6px 14px 6px 6px; max-width:240px; min-height:0; border-radius:12px; }
+  .board-pill-thumb{ width:64px; height:44px; margin:0; flex-shrink:0; border-radius:8px; }
+  .board-pill-text{ display:flex; flex-direction:column; min-width:0; }
+  .board-pill-new{ min-height:0; padding:6px 14px 6px 8px; }
+  .board-pill-plus{ width:44px; height:44px; margin:0; border-radius:8px; border:1px dashed var(--border); display:inline-flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .board-pill-star{ top:3px; left:3px; width:18px; height:18px; font-size:11px; }
+  .board-shell:not(.is-full):not(.is-view) .board-host{ height:calc(100vh - 380px); min-height:400px; }
+  .board-shell.is-view:not(.is-full) .board-host{ height:calc(100vh - 320px); min-height:400px; }
 </style>
 </head>
 <body>
@@ -1598,6 +1664,7 @@ function applySidebarState(){
   const nav = document.getElementById('sidebarNav');
   if(!nav) return;
   nav.classList.toggle('collapsed', !!state.profile.sidebarCollapsed);
+  document.body.classList.toggle('sb-collapsed', !!state.profile.sidebarCollapsed);
   setTimeout(function(){ if(typeof stretchLockedHeaderLine==='function') stretchLockedHeaderLine(); }, 230);
 }
 function toggleSidebar(){
@@ -2336,9 +2403,8 @@ function normalizeWake(f){
     days: Array.isArray(w.days) ? w.days.map(Number).filter(function(d){ return d>=0 && d<=6; }) : [1,2,3,4,5,6],
     override: (w.override && w.override.date && w.override.date>=todayStr()) ? w.override : null,
     sound: ['standard','peaceful','loud'].indexOf(w.sound)>=0 ? w.sound : 'peaceful',
-    media: (w.media && (w.media.ref || w.media.url)) ? w.media : null,
+    media: (w.media && (w.media.ref || w.media.url || (w.media.type==='music' && w.media.q))) ? w.media : null,
     snoozeMinutes: Number(w.snoozeMinutes)>0 ? Number(w.snoozeMinutes) : 9,
-    secondScreen: !!w.secondScreen,
     lastFiredTs: Number(w.lastFiredTs)||0,
     armedAt: Number(w.armedAt)||Date.now()
   };
@@ -2529,6 +2595,7 @@ function normalizeDashboardPanels(d){
   if(!d.journalRaised){ moveAfter('journal', 'personalStats', 0); d.journalRaised = true; }
   if(!d.visionPanelAdded){ moveAfter('vision', 'personalStats', 0); d.visionPanelAdded = true; }
   if(!d.v2PanelsAdded){ moveAfter('agenda', 'vision', 1); moveAfter('week', 'goals', d.order.length); moveAfter('heatmap', 'week', d.order.length); moveAfter('why', 'heatmap', d.order.length); d.v2PanelsAdded = true; }
+  if(!d.agendaOff){ d.enabled.agenda = false; d.agendaOff = true; }
   if(!d.reachOutAdded){ moveAfter('clientHub', 'journal', 1); d.reachOutAdded = true; d.clientStepsAdded = true; }
   return d;
 }
@@ -2557,6 +2624,7 @@ function normalizeSettings(s){
   if(s.appTracking.graceMinutes==null || isNaN(Number(s.appTracking.graceMinutes))) s.appTracking.graceMinutes=3;
   if(s.appTracking.cooldownMinutes==null || isNaN(Number(s.appTracking.cooldownMinutes))) s.appTracking.cooldownMinutes=15;
   if(s.appTracking.idleSeconds==null || isNaN(Number(s.appTracking.idleSeconds))) s.appTracking.idleSeconds=60;
+  if(!s.appTracking.distractionSince) s.appTracking.distractionSince = todayStr();
   return s;
 }
 function normalizePersonal(p){
@@ -2583,6 +2651,8 @@ function normalizeBoards(b){
     b.boards.forEach(function(bd){ if(bd.kind==='vision' && (!master || rootOf(bd)!==master)) bd.kind = 'milanote'; });
     b.milanoteSplit = true;
   }
+  // Everything now lives in Journal → Boards (the separate Milanote section is gone).
+  if(!b.journalMerge){ b.boards.forEach(function(bd){ if(bd.kind==='milanote') bd.kind = 'journal'; }); b.journalMerge = true; }
   if(b.masterId && !b.boards.some(function(bd){ return bd.id===b.masterId; })) b.masterId = null;
   return b;
 }
@@ -2823,7 +2893,7 @@ function rawSessionMinutesFor(dateStr, type){
   return state.focus.sessions.filter(function(s){ return s.date===dateStr && sessionType(s)===type; }).reduce(function(a,s){ return a+(s.minutes||0); },0);
 }
 function deepWorkMinutesFor(dateStr){
-  return Math.max(0, rawSessionMinutesFor(dateStr,'deep') - excludedTaskMinutesFor(dateStr));
+  return Math.max(0, rawSessionMinutesFor(dateStr,'deep') - excludedTaskMinutesFor(dateStr) - distractionMinutesFor(dateStr));
 }
 function deepWorkMinutesTodayLive(){
   let mins = deepWorkMinutesFor(todayStr());
@@ -2865,20 +2935,22 @@ function fmtHours(mins){ return ((Number(mins)||0)/60).toFixed(1)+'h'; }
 function manualStandardsDoneFor(dateStr){
   const items = arr(state.standards.items).filter(function(it){ return !it.createdAt || it.createdAt<=dateStr; });
   if(!items.length) return true;
-  const rec = state.standards.completions.find(function(c){ return c.date===dateStr; });
+  const rec = RC ? memo('complByDate', function(){ const m = {}; state.standards.completions.forEach(function(c){ m[c.date] = c; }); return m; })[dateStr]
+                 : state.standards.completions.find(function(c){ return c.date===dateStr; });
   if(!rec) return false;
   return items.every(function(it){ return rec.doneIds.indexOf(it.id)>=0; });
 }
 function trainedDoneFor(dateStr){
+  if(RC) return !!memo('gymDates', function(){ const m = {}; arr(state.health.gymLog).forEach(function(g){ m[g.date] = true; }); return m; })[dateStr];
   return arr(state.health.gymLog).some(function(g){ return g.date===dateStr; });
 }
 function ongoingStandardTasksDoneFor(dateStr){
   // Only count tasks that already existed (and were still active) on that date — a task
   // added later can't retroactively require a check-off on days before it existed, or
   // every day before its creation would wrongly show as an incomplete standard forever.
-  const tasks = arr(state.tasks.items).filter(function(t){
-    return t.ongoing && t.includeInStandard && t.status!=='done' && (t.createdAt||dateStr)<=dateStr;
-  });
+  const pool = RC ? memo('stdOngoing', function(){ return arr(state.tasks.items).filter(function(t){ return t.ongoing && t.includeInStandard && t.status!=='done'; }); })
+                  : arr(state.tasks.items).filter(function(t){ return t.ongoing && t.includeInStandard && t.status!=='done'; });
+  const tasks = pool.filter(function(t){ return (t.createdAt||dateStr)<=dateStr; });
   if(!tasks.length) return true;
   return tasks.every(function(t){ return arr(t.ongoingDoneDates).indexOf(dateStr)>=0; });
 }
@@ -3347,13 +3419,13 @@ function daysInProgress(t){
   const now = new Date(todayStr());
   return Math.max(0, Math.round((now-start)/86400000));
 }
+function todayMidnightMs(){ const tp = todayStr().split('-').map(Number); return +new Date(tp[0],tp[1]-1,tp[2]); }
 function daysAgoFrom(dateStr){
   if(!dateStr) return null;
   const p = dateStr.split('-').map(Number);
   const d = new Date(p[0],p[1]-1,p[2]);
-  const tp = todayStr().split('-').map(Number);
-  const now = new Date(tp[0],tp[1]-1,tp[2]);
-  return Math.round((now-d)/86400000);
+  const nowMs = RC ? memo('todayMid', todayMidnightMs) : todayMidnightMs();
+  return Math.round((nowMs-d)/86400000);
 }
 function relativeDayLabel(dateStr){
   const d = daysAgoFrom(dateStr);
@@ -4048,7 +4120,6 @@ function fabContext(){
     if(ui.personalTab==='journal' && ui.journalMode==='boards' && typeof canvasAddNote==='function') return {label:'Add note to board', run:function(){ canvasAddNote(); }};
     if(ui.personalTab==='journal') return {label:'New journal entry', run:openQuickJournalModal};
     if(ui.personalTab==='wishlist' && typeof openWishItemModal==='function') return {label:'Add wish list item', run:function(){ openWishItemModal(null); }};
-    if((ui.personalTab==='vision' || ui.personalTab==='milanote') && typeof canvasAddNote==='function') return {label:'Add card to board', run:function(){ canvasAddNote(); }};
     if(ui.personalTab==='fitness') return {label:'Log workout', run:function(){ ui.healthTab='workouts'; renderView(); const el=document.getElementById('gymType'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
     return {label:'Add goal', run:function(){ const el=document.getElementById('newGoalTitle')||document.querySelector('#viewRoot .tab-panel input'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
   }
@@ -4502,6 +4573,7 @@ function renderTodayHero(greeting){
       '</button>'+
       '<div class="th-actions">'+
         '<button class="th-btn" data-action="toggleNextPicker" data-where="hero"><span class="th-btn-i">&#128204;</span>'+(next ? 'Change next' : 'Pick next')+'</button>'+
+        (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going — sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
         (evening ? '<button class="th-btn th-btn-night'+(ui.windDownOpen?' is-open':'')+'" data-action="toggleWindDown"><span class="th-btn-i">&#127769;</span>Wind down<span class="th-caret">&#9662;</span></button>' : '')+
         dayOffButtonHtml()+
       '</div>'+
@@ -6112,9 +6184,9 @@ function dayDetailHtml(dateStr){
 }
 function analyticsRangeTabs(){
   const r = ui.analyticsRange || 'today';
-  return '<div class="seg-tabs">'+[['today','Today'],['week','This week'],['lastweek','Last week'],['all','All time']].map(function(x){
+  return '<div class="row" style="justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;"><div class="seg-tabs" style="margin:0;">'+[['today','Today'],['week','This week'],['lastweek','Last week'],['all','All time']].map(function(x){
     return '<button class="seg-tab'+(r===x[0]?' active':'')+'" data-action="analyticsRange" data-id="'+x[0]+'">'+x[1]+'</button>';
-  }).join('')+'</div>';
+  }).join('')+'</div><button class="btn btn-ghost btn-sm" data-action="openDayRecap">&#128202; Day recap</button></div>';
 }
 ACTIONS.analyticsRange = function(el, e, id){ ui.analyticsRange = id; ui.analyticsDay = null; renderView(); };
 ACTIONS.analyticsPickDay = function(el, e, id){ if(id>todayStr()) return; ui.analyticsDay = id; renderView(); };
@@ -6463,6 +6535,7 @@ async function pollAppActivity(){
   persist('appActivity');
   updateCurrentAppIndicator();
   checkAutoLockIn();
+  checkDistraction();
   if(ui.view==='focus' && ui.focusTab==='analytics') renderView();
 }
 // Why auto lock-in is currently held back (or null when it's allowed to run).
@@ -6575,6 +6648,10 @@ function startAppActivityPolling(){
 const DEFAULT_WORK_ACTIVITY = ['final cut pro','adobe premiere pro','davinci resolve','capcut','adobe photoshop','adobe lightroom classic','lightroom','adobe after effects','adobe illustrator','figma','notion','code','visual studio code','cursor','xcode','canva','frame.io','logic pro','garageband',
   'docs.google.com','sheets.google.com','slides.google.com','drive.google.com','app.gohighlevel.com','adsmanager.facebook.com','business.facebook.com','canva.com','figma.com','notion.so','frame.io','chatgpt.com','chat.openai.com','claude.ai','capcut.com','studio.youtube.com'];
 const NEUTRAL_ACTIVITY = ['operator','finder','system settings','system preferences','loginwindow'];
+// Streaming / feeds never count as work (YouTube Studio is separate and counts as work).
+const DEFAULT_NOT_WORK = ['youtube.com','m.youtube.com','music.youtube.com','youtu.be','disneyplus.com','netflix.com','hulu.com','max.com','play.max.com','hbomax.com','primevideo.com','tv.apple.com','twitch.tv','tiktok.com','reddit.com','x.com','twitter.com','crunchyroll.com','peacocktv.com','paramountplus.com','espn.com','9gag.com',
+  'tv','netflix','disney+','prime video','steam','twitch','arcade','chess'];
+const BROWSER_APPS = ['safari','google chrome','arc','brave browser','microsoft edge','firefox','chromium','opera'];
 function activityKey(name){ return String(name||'').trim().toLowerCase(); }
 function activityCats(){ const st = state.settings.appTracking; if(!st.categories || typeof st.categories!=='object') st.categories = {}; return st.categories; }
 function activityCategory(name){
@@ -6583,6 +6660,7 @@ function activityCategory(name){
   if(set) return set;
   if(NEUTRAL_ACTIVITY.indexOf(k)>=0) return 'neutral';
   if(DEFAULT_WORK_ACTIVITY.indexOf(k)>=0) return 'work';
+  if(DEFAULT_NOT_WORK.indexOf(k)>=0) return 'other';
   return 'unsorted';
 }
 function setActivityCategory(name, cat){
@@ -6601,10 +6679,12 @@ function updateActivityPill(){
   el.classList.remove('is-hidden');
   const cat = app ? activityCategory(app) : 'neutral';
   el.dataset.cat = cat;
-  const lock = s ? (s.onBreak ? '&#9749; on break' : '&#128274; '+fmtDurationLabel(Math.max(0, Math.round((Date.now()-s.startedAt)/60000)))) : '';
-  const html = '<span class="ap-dot"></span><span class="ap-name">'+(app ? escapeHtml(app) : 'Away')+'</span>'+(lock ? '<span class="ap-lock">'+lock+'</span>' : '');
+  const notCounting = !!(s && !s.onBreak && cat==='other');
+  const siteUnknown = app && BROWSER_APPS.indexOf(activityKey(app))>=0;
+  const lock = s ? (s.onBreak ? '&#9749; on break' : '&#128274; '+fmtDurationLabel(Math.max(0, Math.round((Date.now()-s.startedAt)/60000)))+(notCounting ? ' &middot; not counting' : '')) : '';
+  const html = (app ? '<span class="ap-dot"></span><span class="ap-name">'+escapeHtml(app)+'</span>'+(siteUnknown ? '<span class="ap-warn">?</span>' : '') : '')+(lock ? '<span class="ap-lock'+(app?'':' ap-lock-only')+(notCounting?' is-off':'')+'">'+lock+'</span>' : '');
   if(el._html!==html){ el.innerHTML = html; el._html = html; }
-  el.title = app ? app+' — '+CAT_META[cat].label+' (click to change)' : '';
+  el.title = !app ? '' : siteUnknown ? 'Operator can\'t see which website is open in '+app+' — click for how to allow it' : app+' — '+CAT_META[cat].label+(notCounting ? ' · this time isn\'t counted as deep work' : '')+' (click to change)';
 }
 setInterval(function(){ try{ if(state && state.settings) updateActivityPill(); }catch(e){} }, 5000);
 afterRenderHooks.push(function(){ updateActivityPill(); document.body.classList.toggle('sb-collapsed', !!state.profile.sidebarCollapsed); });
@@ -6619,10 +6699,13 @@ function renderPillMenu(){
   if(!m){ m = document.createElement('div'); m.id = 'activityPillMenu'; m.className = 'ap-menu'; document.body.appendChild(m); }
   const app = ui.pillMenu==='__none' ? null : ui.pillMenu;
   const cat = app ? activityCategory(app) : null;
-  m.innerHTML = (app ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div>'+
+  const browser = app && BROWSER_APPS.indexOf(activityKey(app))>=0;
+  m.innerHTML = (browser ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div><div class="ap-menu-hint" style="margin-top:0;">Operator can\'t see which website is open, so it can\'t tell YouTube from work.'+
+      (activityKey(app)==='firefox' ? ' Firefox doesn\'t allow this — Safari, Chrome, Arc, Brave and Edge do.' : ' On your Mac: System Settings &rarr; Privacy &amp; Security &rarr; Automation &rarr; Operator &rarr; turn on '+escapeHtml(app)+'. Then reopen Operator.')+'</div>'
+    : app ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div>'+
       '<div class="ap-menu-k">Is this work?</div>'+
       '<div class="ap-seg">'+['work','other'].map(function(c){ return '<button class="ap-seg-btn'+(cat===c?' is-on':'')+'" data-action="pillSetCat" data-id="'+c+'">'+CAT_META[c].label+'</button>'; }).join('')+'</div>'+
-      '<div class="ap-menu-hint">Only work apps &amp; sites start an automatic lock-in.</div>' : '<div class="ap-menu-title">Nothing in front right now</div>')+
+      '<div class="ap-menu-hint">Only work apps &amp; sites start an automatic lock-in. Time on “not work” ones while you\'re locked in doesn\'t count as deep work.</div>' : '<div class="ap-menu-title">Nothing in front right now</div>')+
     '<button class="ap-menu-link" data-action="goToActivitySettings">All apps &amp; sites &rarr;</button>';
 }
 ACTIONS.pillSetCat = function(el, e, id){ if(ui.pillMenu && ui.pillMenu!=='__none') setActivityCategory(ui.pillMenu, id); renderPillMenu(); updateActivityPill(); playTick(); };
@@ -6665,7 +6748,13 @@ ACTIONS.addWorkApp = function(){ const i = document.getElementById('newWorkApp')
 function sessionsOn(date){ return state.focus.sessions.filter(function(s){ return s.date===date; }).sort(function(a,b){ return a.startedAt-b.startedAt; }); }
 function recapNeeded(date){ return sessionsOn(date).some(function(s){ return s.auto && !s.reviewed; }); }
 function openDayRecap(date){ ui.recapDate = date || todayStr(); showOverlay('recapOverlay'); renderRecapInto(); }
-ACTIONS.openDayRecap = function(el){ openDayRecap(el && el.dataset && el.dataset.date); };
+// The recap button opens yesterday's recap if it still has sessions to check, else today's.
+function recapDefaultDate(){ const y = addDays(todayStr(), -1); return recapNeeded(y) ? y : todayStr(); }
+function recapPendingCount(){ return [todayStr(), addDays(todayStr(), -1)].reduce(function(n, d){ return n + sessionsOn(d).filter(function(s){ return s.auto && !s.reviewed; }).length; }, 0); }
+ACTIONS.openDayRecap = function(el){ openDayRecap((el && el.dataset && el.dataset.date) || recapDefaultDate()); };
+ACTIONS.openRecapToday = function(){ clearToasts(); openDayRecap(todayStr()); };
+ACTIONS.openRecapYesterday = function(){ clearToasts(); openDayRecap(addDays(todayStr(), -1)); };
+function clearToasts(){ const c = document.getElementById('toastContainer'); if(c) c.innerHTML = ''; }
 ACTIONS.closeDayRecap = function(){ state.focus.recapSeen = state.focus.recapSeen || {}; state.focus.recapSeen[ui.recapDate] = true; persist('focus'); hideOverlay('recapOverlay'); renderView(); };
 function recapTimelineHtml(date, sessions){
   const dayStart = localTs(date, '06:00'), dayEnd = localTs(addDays(date,1), '00:00');
@@ -6702,7 +6791,8 @@ function renderRecap(){
     '</div>'+
     recapTimelineHtml(date, sessions)+
     ((workMin || otherMin) ? '<div class="rc-split"><div class="rc-split-bar"><span style="width:'+(workMin/Math.max(1,workMin+otherMin)*100)+'%"></span></div>'+
-      '<div class="kpi-sub"><b style="color:var(--good);">'+fmtDurationLabel(workMin)+'</b> on work apps &middot; <b style="color:#ffb3b8;">'+fmtDurationLabel(otherMin)+'</b> on everything else'+(breaks.length?' &middot; '+breaks.length+' break'+(breaks.length===1?'':'s'):'')+'</div></div>' : '')+
+      '<div class="kpi-sub"><b style="color:var(--good);">'+fmtDurationLabel(workMin)+'</b> on work apps &middot; <b style="color:#ffb3b8;">'+fmtDurationLabel(otherMin)+'</b> on everything else'+(breaks.length?' &middot; '+breaks.length+' break'+(breaks.length===1?'':'s'):'')+
+        (distractionMinutesFor(date) ? ' &middot; <b style="color:#ffb3b8;">'+fmtDurationLabel(distractionMinutesFor(date))+'</b> on not-work sites while locked in (not counted)' : '')+'</div></div>' : '')+
     (apps.length ? '<div class="rc-apps">'+apps.slice(0, 6).map(function(a){ const c = activityCategory(a.app); return '<span class="rc-app"><span class="wa-dot" style="background:'+CAT_META[c].color+'"></span>'+escapeHtml(a.app)+'<span class="kpi-sub">'+fmtDurationLabel(a.minutes)+'</span></span>'; }).join('')+'</div>' : '')+
     '<div class="kind-label" style="margin-top:16px;">Sessions'+(pending?' &middot; '+pending+' started automatically to check':'')+'</div>'+
     (sessions.length ? '<div class="rc-sessions">'+sessions.map(function(s){
@@ -6739,16 +6829,55 @@ ACTIONS.undoRecapDiscard = function(){ if(!lastDiscardedSession) return; state.f
 ACTIONS.recapEdit = function(el, e, id){ const s = recapSession(id); if(s) s.reviewed = true; hideOverlay('recapOverlay'); openTimeBlockEdit('session', id); };
 // When it pops up: going to sleep, at the recap time in the evening (once), or the next
 // morning if yesterday still has automatic sessions to check.
+// Never pops up on its own: at the recap time (and the next morning, if automatic sessions
+// still need a look) a small note offers it, once. The Recap button opens it any time.
+const recapNudged = {};
 function maybeShowRecap(){
-  if(isWakeDisplay || state.focus.activeSession || document.querySelector('.overlay:not(.hidden)')) return;
+  if(state.focus.activeSession || document.querySelector('.overlay:not(.hidden)')) return;
   const seen = state.focus.recapSeen || {};
   const today = todayStr(), yest = addDays(today, -1);
   const rt = (state.settings.appTracking && state.settings.appTracking.recapTime) || '21:30';
-  if(!seen[yest] && recapNeeded(yest) && new Date().getHours()>=5){ openDayRecap(yest); return; }
-  if(!seen[today] && nowHM()>=rt && sessionsOn(today).length){ openDayRecap(today); }
+  if(!seen[yest] && !recapNudged[yest] && recapNeeded(yest) && new Date().getHours()>=5){
+    recapNudged[yest] = true;
+    showToast('Yesterday has sessions that started on their own — want to check them?', {icon:'&#128202;', actionLabel:'Open recap', actionAction:'openRecapYesterday', duration:15000});
+    return;
+  }
+  if(!seen[today] && !recapNudged[today] && nowHM()>=rt && sessionsOn(today).length){
+    recapNudged[today] = true;
+    showToast('Your day recap is ready.', {icon:'&#128202;', actionLabel:'Open', actionAction:'openRecapToday', duration:15000});
+  }
 }
 setInterval(function(){ try{ if(state && state.focus) maybeShowRecap(); }catch(e){} }, 60000);
 setTimeout(function(){ try{ maybeShowRecap(); }catch(e){} }, 4000);
+
+// ---- time on not-work apps/sites during a locked-in session doesn't count ----
+// Counted from the day this rule started (so past streaks never change), using what was
+// in front during each session.
+function distractionMinutesFor(dateStr){
+  const st = state.settings.appTracking;
+  if(!st || st.enabled===false || !st.distractionSince || dateStr < st.distractionSince) return 0;
+  if(RC) return memo('dist:'+dateStr, function(){ return distractionMinutesRaw(dateStr); });
+  return distractionMinutesRaw(dateStr);
+}
+function distractionMinutesRaw(dateStr){
+  const m = lockedInAppMinutesFor(dateStr);
+  if(!m) return 0;
+  let n = 0;
+  Object.keys(m).forEach(function(app){ if(activityCategory(app)==='other') n += m[app]; });
+  return n;
+}
+// A heads-up the first time a locked-in stretch drifts onto a not-work site.
+const distractionNudged = {};
+function checkDistraction(){
+  const s = state.focus.activeSession; if(!s || s.onBreak) return;
+  const ivs = state.appActivity.todayIntervals; if(!ivs.length) return;
+  const last = ivs[ivs.length-1];
+  if(Date.now()-last.end > APP_ACTIVITY_GAP_MS || activityCategory(last.app)!=='other') return;
+  const from = Math.max(last.start, s.startedAt);
+  if(last.end-from < 2*60000 || distractionNudged[last.start]) return;
+  distractionNudged[last.start] = true;
+  showToast('You\'re on '+last.app+' — this time won\'t count as deep work.', {icon:'&#128064;', duration:8000});
+}
 // ============ FITNESS (Health) ============
 function renderFitness(){
   return '<div class="subtabs">'+
@@ -7608,16 +7737,15 @@ function removePackageDeliverable(id, deliverableId){
 
 // ============ PERSONAL (Goals / Fitness / Journal) ============
 function renderPersonal(){
+  if(ui.personalTab==='vision' || ui.personalTab==='milanote'){ ui.personalTab = 'journal'; ui.journalMode = 'boards'; }
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Personal</div><div class="view-sub">Goals first, then body, then the running log of what\'s on your mind.</div></div></div>'+
   '<div class="tabs">'+
     '<div class="tab '+(ui.personalTab==='goals'?'active':'')+'" data-action="personalTab" data-tab="goals">Goals</div>'+
     '<div class="tab '+(ui.personalTab==='fitness'?'active':'')+'" data-action="personalTab" data-tab="fitness">Fitness</div>'+
     '<div class="tab '+(ui.personalTab==='journal'?'active':'')+'" data-action="personalTab" data-tab="journal">Journal</div>'+
-    '<div class="tab '+(ui.personalTab==='vision'?'active':'')+'" data-action="personalTab" data-tab="vision">Vision Board</div>'+
-    '<div class="tab '+(ui.personalTab==='milanote'?'active':'')+'" data-action="personalTab" data-tab="milanote">Milanote</div>'+
     '<div class="tab '+(ui.personalTab==='wishlist'?'active':'')+'" data-action="personalTab" data-tab="wishlist">Wish List</div>'+
   '</div>'+
-  '<div class="tab-panel" data-key="personal-'+ui.personalTab+'">'+(ui.personalTab==='goals' ? renderGoalsTab() : ui.personalTab==='fitness' ? renderFitness() : ui.personalTab==='wishlist' ? renderWishlistTab() : ui.personalTab==='vision' ? renderVisionTab() : ui.personalTab==='milanote' ? renderMilanoteTab() : renderJournalTab())+'</div>';
+  '<div class="tab-panel" data-key="personal-'+ui.personalTab+'">'+(ui.personalTab==='goals' ? renderGoalsTab() : ui.personalTab==='fitness' ? renderFitness() : ui.personalTab==='wishlist' ? renderWishlistTab() :  renderJournalTab())+'</div>';
 }
 
 
@@ -7763,21 +7891,25 @@ const BOARD_COLORS = ['#E8A23D','#3FBE8E','#E8636B','#8fdcff','#b39ddb','#f48fb1
 const cv = { kind:null, boardId:null, host:null, world:null, els:null, svg:null, marquee:null, sel:new Set(), drag:null, editing:null, history:{}, view:false };
 function boardById(id){ return arr(state.boards.boards).find(function(b){ return b.id===id; }) || null; }
 function boardsOfKind(kind){ return arr(state.boards.boards).filter(function(b){ return b.kind===kind; }); }
+// All boards live in Journal → Boards: the vision board (the one you wake up to) is pinned
+// first, then every other board.
 function currentBoardId(kind){
   ui.boardIds = ui.boardIds || {};
   let id = ui.boardIds[kind];
-  const b = boardById(id);
-  if(!b || b.kind!==kind){
-    if(kind==='vision'){ const m = masterVisionBoard(); id = m ? m.id : null; }
-    else { const roots = boardsOfKind(kind).filter(function(x){ return !x.parentId; }); id = roots.length ? roots[0].id : null; }
+  if(!boardById(id)){
+    const m = masterVisionBoard();
+    const roots = rootBoards();
+    id = m ? m.id : (roots.length ? roots[0].id : null);
     ui.boardIds[kind] = id;
   }
   return id;
 }
+function rootBoards(){
+  const m = masterVisionBoard();
+  return arr(state.boards.boards).filter(function(b){ return !b.parentId && (!m || b.id!==m.id); });
+}
 const BOARD_KIND_META = {
-  vision:{icon:'&#127775;', title:'Your vision board', sub:'One board for everything you\'re going after — it\'s what you wake up to. Photos, category cards, lists and boards inside it.'},
-  milanote:{icon:'&#128204;', title:'Milanote', sub:'All your other boards — moodboards, plans, shoot ideas. Bring your old Milanote boards in with Import.'},
-  journal:{icon:'&#128221;', title:'Journal boards', sub:'A freeform page for text cards, images and lists, next to your regular entries.'}
+  journal:{icon:'&#128204;', title:'Boards', sub:'Your vision board — the one you wake up to — and every other board: moodboards, plans, shoot ideas, journal pages. Bring old Milanote boards in with Import.'}
 };
 function createBoard(kind, name, parentId){
   const b = {id:uid(), name:name||'Untitled board', kind:kind, parentId:parentId||null, elements:[], viewport:{x:60, y:40, zoom:1}, createdAt:Date.now()};
@@ -7791,34 +7923,37 @@ let boardSaveTimer = null;
 function saveBoardsSoon(){ clearTimeout(boardSaveTimer); boardSaveTimer = setTimeout(function(){ persist('boards'); }, 350); }
 // ---- page shell (header + toolbar are normal re-rendered markup; the canvas is not) ----
 function boardStripHtml(kind, current){
-  const roots = boardsOfKind(kind).filter(function(x){ return !x.parentId; });
+  const master = masterVisionBoard();
+  const list = (master ? [master] : []).concat(rootBoards());
   const activeRoot = current ? boardPath(current)[0] : null;
-  return '<div class="board-strip">'+roots.map(function(r){
+  return '<div class="board-strip">'+list.map(function(r){
       const count = r.elements.length;
-      return '<button class="board-pill'+(activeRoot && activeRoot.id===r.id?' is-active':'')+'" data-action="boardOpen" data-kind="'+kind+'" data-id="'+r.id+'" title="Open '+escapeHtml(r.name)+'">'+
-        '<span class="board-pill-thumb">'+(count ? boardStaticHtml(r, 'board-thumb') : '<span class="board-pill-empty">empty</span>')+'</span>'+
-        '<span class="board-pill-name">'+escapeHtml(r.name)+'</span><span class="board-pill-count">'+count+' item'+(count===1?'':'s')+'</span>'+
+      const isMaster = master && r.id===master.id;
+      return '<button class="board-pill'+(activeRoot && activeRoot.id===r.id?' is-active':'')+(isMaster?' is-master':'')+'" data-action="boardOpen" data-kind="'+kind+'" data-id="'+r.id+'" title="Open '+escapeHtml(r.name)+'">'+
+        '<span class="board-pill-thumb">'+(count ? boardStaticHtml(r, 'board-thumb') : '<span class="board-pill-empty">empty</span>')+(isMaster ? '<span class="board-pill-star" title="Your vision board — shows on Today and when you wake up">&#9733;</span>' : '')+'</span>'+
+        '<span class="board-pill-text"><span class="board-pill-name">'+escapeHtml(r.name)+'</span><span class="board-pill-count">'+(isMaster ? 'vision board &middot; ' : '')+count+' item'+(count===1?'':'s')+'</span></span>'+
       '</button>';
     }).join('')+
-    '<button class="board-pill board-pill-new" data-action="boardNew" data-kind="'+kind+'"><span class="board-pill-plus">+</span><span class="board-pill-name">New board</span></button>'+
-    (kind==='milanote' ? '<button class="board-pill board-pill-new" data-action="boardImport"><span class="board-pill-plus">&#11014;</span><span class="board-pill-name">Import from Milanote</span><span class="board-pill-count">.zip, .md, images</span></button>' : '')+
+    (master ? '' : '<button class="board-pill board-pill-new" data-action="boardNewVision"><span class="board-pill-plus">&#9733;</span><span class="board-pill-text"><span class="board-pill-name">Vision board</span><span class="board-pill-count">the one you wake up to</span></span></button>')+
+    '<button class="board-pill board-pill-new" data-action="boardNew" data-kind="'+kind+'"><span class="board-pill-plus">+</span><span class="board-pill-text"><span class="board-pill-name">New board</span></span></button>'+
+    '<button class="board-pill board-pill-new" data-action="boardImport"><span class="board-pill-plus">&#11014;</span><span class="board-pill-text"><span class="board-pill-name">Import boards</span><span class="board-pill-count">Milanote export, .md, images</span></span></button>'+
   '</div>';
 }
 function renderBoardShell(kind){
   const id = currentBoardId(kind);
   const b = id ? boardById(id) : null;
-  const meta = BOARD_KIND_META[kind] || BOARD_KIND_META.milanote;
+  const meta = BOARD_KIND_META.journal;
   if(!b){
     return '<div class="board-empty card">'+
       '<div style="font-size:34px;">'+meta.icon+'</div>'+
       '<div class="section-title" style="justify-content:center;margin:8px 0 4px;">'+meta.title+'</div>'+
       '<div class="kpi-sub" style="max-width:440px;margin:0 auto 16px;">'+meta.sub+'</div>'+
       '<div class="row" style="justify-content:center;gap:8px;">'+
-        '<button class="btn btn-primary" data-action="boardNew" data-kind="'+kind+'">+ '+(kind==='vision'?'Create my vision board':'New board')+'</button>'+
-        (kind==='vision' ? '<button class="btn btn-ghost" data-action="boardTemplate">Start from my Milanote layout</button>' : '')+
-        (kind==='milanote' ? '<button class="btn btn-ghost" data-action="boardImport">&#11014; Import from Milanote</button>' : '')+
+        '<button class="btn btn-primary" data-action="boardTemplate">&#9733; Create my vision board</button>'+
+        '<button class="btn btn-ghost" data-action="boardNew" data-kind="'+kind+'">+ Blank board</button>'+
+        '<button class="btn btn-ghost" data-action="boardImport">&#11014; Import boards</button>'+
       '</div>'+
-      (kind==='milanote' ? '<div class="kpi-sub" style="margin-top:12px;">In Milanote: open a board &rarr; &#8943; menu &rarr; Export &rarr; Markdown (or download the images) &rarr; drop the file(s) here.</div>' : '')+
+      '<div class="kpi-sub" style="margin-top:12px;">Moving from Milanote? Open a board there &rarr; &#8943; menu &rarr; Export &rarr; Markdown (or download the images), then Import here.</div>'+
     '</div>';
   }
   const view = !!(ui.boardView && ui.boardView[kind]);
@@ -7827,11 +7962,13 @@ function renderBoardShell(kind){
   const selCount = cv.boardId===b.id ? cv.sel.size : 0;
   const tool = function(action, label, title, extra){ return '<button class="board-tool" data-action="'+action+'" data-kind="'+kind+'" title="'+escapeHtml(title||label)+'"'+(extra||'')+'>'+label+'</button>'; };
   return '<div class="board-shell'+(view?' is-view':'')+(full?' is-full':'')+'" data-key="shell-'+kind+'">'+
-    (kind!=='vision' && !full ? boardStripHtml(kind, b) : '')+
+    (!full ? boardStripHtml(kind, b) : '')+
     '<div class="board-bar">'+
       '<div class="board-crumbs">'+
         path.slice(0,-1).map(function(x){ return '<span class="board-crumb" data-action="boardOpen" data-kind="'+kind+'" data-id="'+x.id+'">'+escapeHtml(x.name)+'</span><span class="board-crumb-sep">/</span>'; }).join('')+
         (view ? '<span class="board-title-static">'+escapeHtml(b.name)+'</span>' : '<input class="board-title-input" data-board-rename="'+b.id+'" value="'+escapeHtml(b.name)+'">')+
+        (path[0] && masterVisionBoard() && path[0].id===masterVisionBoard().id ? '<span class="board-master-tag" title="Shows on Today and on the wake-up screen">&#9733; Vision board</span>'
+          : (!b.parentId && !view ? '<button class="board-tool" data-action="boardMakeMaster" title="Make this the board you wake up to">&#9734; Make it my vision board</button>' : ''))+
       '</div>'+
       '<div class="row" style="gap:6px;">'+
         tool('boardToggleView', view?'&#9998; Edit':'&#128065; View', view?'Back to editing':'View mode — hide the editing tools')+
@@ -7845,8 +7982,8 @@ function renderBoardShell(kind){
       tool('boardAddImage','&#128444; Image','Upload images (or paste / drop them on the board)')+
       tool('boardAddImageUrl','&#128279; Image URL','Add an image from a link')+
       tool('boardAddNested','&#128203; Board','Add a board inside this one')+
-      tool('boardAddLine','&#9585; Line','Add a line / divider')+
-      tool('boardAddArrow','&#10140; Arrow','Add an arrow')+
+      tool('boardAddLine','&#9585; Line','Draw a line: click the start, then the end', cv.lineDraw && !cv.lineDraw.arrow ? ' data-on="1"' : '')+
+      tool('boardAddArrow','&#10140; Arrow','Draw an arrow: click where it starts, then where it points', cv.lineDraw && cv.lineDraw.arrow ? ' data-on="1"' : '')+
       '<span class="board-tool-sep"></span>'+
       BOARD_COLORS.map(function(c){ return '<button class="board-swatch" data-action="boardColor" data-kind="'+kind+'" data-id="'+c+'" style="background:'+c+'" title="Color selected"'+(selCount?'':' disabled')+'></button>'; }).join('')+
       '<span class="board-tool-sep"></span>'+
@@ -7862,15 +7999,12 @@ function renderBoardShell(kind){
       tool('boardZoomIn','+','Zoom in')+
       tool('boardFit','&#9974; Fit','Fit everything')+
       '<span style="flex:1"></span>'+
-      (kind==='milanote' && !b.parentId ? tool('boardImport','&#11014; Import','Import a Milanote export into a new board') : '')+
-      (path.length>1 || (kind!=='vision') ? tool('boardDeleteBoard','Delete board','Delete this board (and boards inside it)') : '')+
+      (!(masterVisionBoard() && b.id===masterVisionBoard().id) ? tool('boardDeleteBoard','Delete board','Delete this board (and boards inside it)') : '')+
     '</div>')+
     '<div class="board-host" id="boardHost" data-photo-drop="board" data-morph-ignore="'+kind+':'+b.id+':'+(view?'v':'e')+(full?':f':'')+'"></div>'+
     (view || full ? '' : '<div class="board-hint">Drag background to pan · scroll to move · Ctrl/⌘+scroll to zoom · Shift+drag to select · double-click a card to edit · paste or drop images</div>')+
   '</div>';
 }
-function renderVisionTab(){ return renderBoardShell('vision'); }
-function renderMilanoteTab(){ return renderBoardShell('milanote'); }
 ACTIONS.boardFullscreen = function(el){
   const kind = el.dataset.kind;
   if(ui.boardFull===kind){ exitBoardFullscreen(); return; }
@@ -7957,7 +8091,7 @@ function drawBoard(){
   const lines = els.filter(function(e){ return e.type==='line'; }).map(function(e){
     const sel = cv.sel.has(e.id);
     return '<line data-key="ln-'+e.id+'" data-el="'+e.id+'" class="bline'+(sel?' is-sel':'')+'" x1="'+e.x1+'" y1="'+e.y1+'" x2="'+e.x2+'" y2="'+e.y2+'" stroke="'+(e.color||'#8A90A2')+'" stroke-width="'+(e.width||2)+'" stroke-linecap="round"'+(e.arrow?' marker-end="url(#bArrow)"':'')+'/>'+
-      '<line data-key="lh-'+e.id+'" data-el="'+e.id+'" class="bline-hit" x1="'+e.x1+'" y1="'+e.y1+'" x2="'+e.x2+'" y2="'+e.y2+'" stroke="transparent" stroke-width="14"/>';
+      '<line data-key="lh-'+e.id+'" data-el="'+e.id+'" class="bline-hit" x1="'+e.x1+'" y1="'+e.y1+'" x2="'+e.x2+'" y2="'+e.y2+'" stroke="transparent" stroke-width="22" stroke-linecap="round"/>';
   }).join('');
   cv.svg.innerHTML = lines;
 }
@@ -8007,6 +8141,13 @@ function elFromTarget(t){ const n = t.closest && t.closest('[data-el]'); return 
 function boardPointerDown(e){
   const b = cvBoard(); if(!b) return;
   if(e.button===2) return;
+  if(cv.lineDraw){
+    e.preventDefault();
+    const pt = lineDrawPoint(e);
+    if(!cv.lineDraw.start){ cv.lineDraw.start = pt; cv.lineDraw.down = {cx:e.clientX, cy:e.clientY}; drawLinePreview(pt); setDrawHint(cv.lineDraw.arrow ? 'Now click where the arrow points' : 'Now click where the line ends'); }
+    else finishLineDraw(pt);
+    return;
+  }
   if(cv.editing){
     if(e.target.closest('[contenteditable="true"]')) return;
     finishEditing();
@@ -8037,6 +8178,7 @@ function boardPointerDown(e){
   cv.drag.pointerId = e.pointerId;
 }
 function boardPointerMove(e){
+  if(cv.lineDraw && cv.lineDraw.start){ drawLinePreview(lineDrawPoint(e)); return; }
   const d = cv.drag; if(!d) return;
   const b = cvBoard(); if(!b) return;
   const dx = e.clientX - d.start.cx, dy = e.clientY - d.start.cy;
@@ -8080,6 +8222,9 @@ function boardPointerMove(e){
   }
 }
 function boardPointerUp(e){
+  // press-and-drag also draws: let go somewhere else and that's the end point
+  if(cv.lineDraw && cv.lineDraw.start && cv.lineDraw.down && Math.abs(e.clientX-cv.lineDraw.down.cx)+Math.abs(e.clientY-cv.lineDraw.down.cy) > 10){ finishLineDraw(lineDrawPoint(e)); return; }
+  if(cv.lineDraw && cv.lineDraw.down) cv.lineDraw.down = null;
   const d = cv.drag; if(!d) return;
   cv.drag = null;
   cv.host.classList.remove('is-dragging');
@@ -8180,6 +8325,7 @@ function boardActive(){ return !!(cv.host && document.body.contains(cv.host) && 
 function typingInField(t){ return t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)); }
 document.addEventListener('keydown', function(e){
   if(!boardActive()) return;
+  if(cv.lineDraw && e.key==='Escape'){ e.preventDefault(); cancelLineDraw(); return; }
   if(ui.boardFull && e.key==='Escape' && !cv.editing && !cv.sel.size && !document.querySelector('.overlay:not(.hidden)')){ e.preventDefault(); exitBoardFullscreen(); return; }
   if(cv.editing){ if(e.key==='Escape'){ e.preventDefault(); finishEditing(); } return; }
   if(typingInField(e.target)) return;
@@ -8212,12 +8358,17 @@ document.addEventListener('change', function(e){
   if(t.dataset.boardPick) openBoard(t.dataset.boardPick, t.value);
   if(t.dataset.boardRename){ const b = boardById(t.dataset.boardRename); if(b && t.value.trim()){ b.name = t.value.trim(); persist('boards'); renderView(); } }
 });
-ACTIONS.boardNew = function(el){
-  const kind = el.dataset.kind || (ui.view==='personal' && ui.personalTab==='journal' ? 'journal' : ui.personalTab==='milanote' ? 'milanote' : 'vision');
-  const n = boardsOfKind(kind).filter(function(x){ return !x.parentId; }).length;
-  const name = kind==='vision' ? 'Vision Board' : kind==='journal' ? 'Journal board '+(n+1) : (n ? 'Board '+(n+1) : 'My board');
-  const b = createBoard(kind, kind==='vision' && masterVisionBoard() ? 'New board' : name, kind==='vision' && masterVisionBoard() ? masterVisionBoard().id : null);
-  openBoard(kind, b.id);
+ACTIONS.boardNew = function(){
+  const b = createBoard('journal', 'Board '+(rootBoards().length+1));
+  openBoard('journal', b.id);
+};
+ACTIONS.boardNewVision = function(){ ACTIONS.boardTemplate(); };
+ACTIONS.boardMakeMaster = function(){
+  const b = cvBoard(); if(!b) return;
+  const root = boardPath(b)[0];
+  state.boards.masterId = root.id;
+  persist('boards'); playPositive(); renderView();
+  showToast('“'+root.name+'” is your vision board now — it shows on Today and when your alarm goes off.', {icon:'&#9733;'});
 };
 ACTIONS.boardToggleView = function(el){
   if(cv.editing) finishEditing();
@@ -8228,8 +8379,57 @@ function canvasAddNote(){ if(cvBoard()) ACTIONS.boardAddNote(); }
 ACTIONS.boardAddNote = function(){ addElement({type:'note', header:false, title:'', body:'Double-click to write', w:220, h:90}); };
 ACTIONS.boardAddLabel = function(){ addElement({type:'note', header:true, color:BOARD_COLORS[Math.floor(Math.random()*6)], title:'Category', body:'One-line subtitle', w:260, h:96}); };
 ACTIONS.boardAddList = function(){ addElement({type:'list', title:'List', color:'#3a3f4d', items:[{id:uid(), text:'First thing'},{id:uid(), text:'Second thing'}], w:260, h:120}); };
-ACTIONS.boardAddLine = function(){ addElement({type:'line', color:'#8A90A2', width:2, arrow:false}); };
-ACTIONS.boardAddArrow = function(){ addElement({type:'line', color:'#E7E9EE', width:2, arrow:true}); };
+// Lines and arrows are drawn: pick the tool, click where it starts, then where it ends
+// (or press and drag). Shift keeps it straight; Esc cancels.
+ACTIONS.boardAddLine = function(){ startLineDraw(false); };
+ACTIONS.boardAddArrow = function(){ startLineDraw(true); };
+function startLineDraw(arrow){
+  if(!cvBoard() || cv.view) return;
+  if(cv.lineDraw && cv.lineDraw.arrow===arrow){ cancelLineDraw(); return; }
+  cv.lineDraw = {arrow:arrow, color: arrow ? '#E7E9EE' : '#8A90A2', start:null};
+  cv.sel.clear();
+  if(cv.host){ cv.host.classList.add('is-drawing'); setDrawHint(arrow ? 'Click where the arrow starts, then where it points' : 'Click where the line starts, then where it ends'); }
+  drawBoard(); renderView();
+}
+function cancelLineDraw(){
+  cv.lineDraw = null;
+  if(cv.host){ cv.host.classList.remove('is-drawing'); setDrawHint(''); }
+  const pv = cv.svg && cv.svg.querySelector('.bline-preview'); if(pv) pv.remove();
+  renderView();
+}
+function setDrawHint(text){
+  if(!cv.host) return;
+  let h = cv.host.querySelector('.board-draw-hint');
+  if(!text){ if(h) h.remove(); return; }
+  if(!h){ h = document.createElement('div'); h.className = 'board-draw-hint'; cv.host.appendChild(h); }
+  h.textContent = text+' · Esc to cancel';
+}
+function lineDrawPoint(e){
+  const w = screenToWorld(e.clientX, e.clientY);
+  const st = cv.lineDraw && cv.lineDraw.start;
+  if(st && e.shiftKey){ if(Math.abs(w.x-st.x) > Math.abs(w.y-st.y)) w.y = st.y; else w.x = st.x; }
+  return {x:Math.round(w.x), y:Math.round(w.y)};
+}
+function drawLinePreview(end){
+  const st = cv.lineDraw.start; if(!st || !cv.svg) return;
+  let pv = cv.svg.querySelector('.bline-preview');
+  if(!pv){ pv = document.createElementNS('http://www.w3.org/2000/svg', 'line'); pv.setAttribute('class', 'bline-preview'); cv.svg.appendChild(pv); }
+  pv.setAttribute('x1', st.x); pv.setAttribute('y1', st.y); pv.setAttribute('x2', end.x); pv.setAttribute('y2', end.y);
+  pv.setAttribute('stroke', cv.lineDraw.color); pv.setAttribute('stroke-width', 2); pv.setAttribute('stroke-dasharray', '6 5');
+  if(cv.lineDraw.arrow) pv.setAttribute('marker-end', 'url(#bArrow)'); else pv.removeAttribute('marker-end');
+}
+function finishLineDraw(end){
+  const ld = cv.lineDraw, b = cvBoard(); if(!ld || !ld.start || !b) return false;
+  if(Math.abs(end.x-ld.start.x) + Math.abs(end.y-ld.start.y) < 6) return false;
+  snapshot();
+  const el = {id:uid(), type:'line', color:ld.color, width:2, arrow:ld.arrow, x1:ld.start.x, y1:ld.start.y, x2:end.x, y2:end.y, z:maxZ(b)+1};
+  b.elements.push(el);
+  cv.lineDraw = null;
+  if(cv.host){ cv.host.classList.remove('is-drawing'); setDrawHint(''); }
+  cv.sel = new Set([el.id]);
+  commitBoard(true);
+  return true;
+}
 ACTIONS.boardAddImage = function(){
   const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.multiple = true;
   inp.onchange = function(){ addImagesToBoard(Array.prototype.slice.call(inp.files||[])); };
@@ -8306,7 +8506,7 @@ ACTIONS.undoDeleteBoard = function(){
 // Starter layout mirroring the Milanote board: category label cards, the "avoiding" list,
 // a nested "The Key To Life" board and a vertical divider. Drop your photos in around them.
 ACTIONS.boardTemplate = function(){
-  const b = createBoard(masterVisionBoard() ? 'milanote' : 'vision', 'Vision Board');
+  const b = createBoard(masterVisionBoard() ? 'journal' : 'vision', 'Vision Board');
   const key = createBoard(b.kind, 'The Key To Life', b.id);
   const els = [
     {type:'note', header:true, color:'#3FBE8E', title:'Mind + Body', body:'Feeding the body and the brain. Free of temptation.', x:40, y:40, w:300, h:96},
@@ -8319,18 +8519,22 @@ ACTIONS.boardTemplate = function(){
   ];
   els.forEach(function(e, i){ e.id = uid(); e.z = i+1; b.elements.push(e); });
   persist('boards');
-  if(b.kind!=='vision'){ ui.view='personal'; ui.personalTab='milanote'; }
-  openBoard(b.kind, b.id);
+  ui.view = 'personal'; ui.personalTab = 'journal'; ui.journalMode = 'boards';
+  openBoard('journal', b.id);
   setTimeout(fitBoard, 50);
 };
-ACTIONS.goToVision = function(){ ui.view='personal'; ui.personalTab='vision'; renderView(); };
+function showBoardsPage(boardId){
+  ui.view = 'personal'; ui.personalTab = 'journal'; ui.journalMode = 'boards';
+  ui.boardIds = ui.boardIds || {}; if(boardId) ui.boardIds.journal = boardId;
+}
+ACTIONS.goToVision = function(){ const m = masterVisionBoard(); showBoardsPage(m && m.id); renderView(); };
 function renderVisionSlideshow(){ return ''; }
 // ---- static (read-only) render of a board — wake screen, second display, previews ----
 // The master vision board is the one board that shows up on the wake screen.
 function masterVisionBoard(){
   const id = state.boards.masterId;
   const b = id ? boardById(id) : null;
-  if(b && b.kind==='vision') return b;
+  if(b && !b.parentId) return b;
   return boardsOfKind('vision').filter(function(x){ return !x.parentId; })[0] || null;
 }
 function boardBounds(b){
@@ -8348,7 +8552,8 @@ function boardStaticHtml(b, cls){
   const els = b.elements.slice().sort(function(a,c){ return (a.z||0)-(c.z||0); });
   const shift = function(e){ const c = Object.assign({}, e); if(c.type==='line'){ c.x1-=bb.x; c.x2-=bb.x; c.y1-=bb.y; c.y2-=bb.y; } else { c.x-=bb.x; c.y-=bb.y; } return c; };
   const savedSel = cv.sel; cv.sel = new Set();
-  const body = els.filter(function(e){ return e.type!=='line'; }).map(function(e){ return elHtml(shift(e), false); }).join('');
+  // previews are pictures, not the live canvas: no element ids / edit hooks in them
+  const body = els.filter(function(e){ return e.type!=='line'; }).map(function(e){ return elHtml(shift(e), false); }).join('').replace(/ data-(el|key|handle|field)="[^"]*"/g, '');
   cv.sel = savedSel;
   const lines = els.filter(function(e){ return e.type==='line'; }).map(function(e){ const c = shift(e); return '<line x1="'+c.x1+'" y1="'+c.y1+'" x2="'+c.x2+'" y2="'+c.y2+'" stroke="'+(c.color||'#8A90A2')+'" stroke-width="'+(c.width||2)+'" stroke-linecap="round"'+(c.arrow?' marker-end="url(#bArrowS)"':'')+'/>'; }).join('');
   return '<div class="board-static '+(cls||'')+'" data-bw="'+bb.w+'" data-bh="'+bb.h+'">'+
@@ -8381,16 +8586,16 @@ function renderVisionPanel(){
   '</div>';
 }
 ACTIONS.openVisionFull = function(){
-  ui.view = 'personal'; ui.personalTab = 'vision';
-  ui.boardView = ui.boardView || {}; ui.boardView.vision = true;
-  ui.boardFull = 'vision';
+  const m = masterVisionBoard(); showBoardsPage(m && m.id);
+  ui.boardView = ui.boardView || {}; ui.boardView.journal = true;
+  ui.boardFull = 'journal';
   try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); }catch(e){}
   renderView();
   setTimeout(fitBoard, 80);
 };
 
-// ============ MILANOTE IMPORT ============
-// Brings a Milanote export into a new board in the Milanote section. Accepts what Milanote
+// ============ IMPORT BOARDS (e.g. from Milanote) ============
+// Brings a Milanote export (or any notes/images) into a new board in Journal → Boards. Accepts what Milanote
 // gives you: a Markdown / text export, images, an HTML page, or a .zip of any of those.
 // Headings become colored label cards, paragraphs become notes, bullet lists become list
 // cards, images (linked or inside the zip) become image cards — laid out in columns.
@@ -8546,11 +8751,11 @@ async function importMilanoteFiles(files){
       imported++;
     }
     const first = files[0].name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim();
-    const b = createBoard('milanote', first || 'Milanote import');
+    const b = createBoard('journal', first || 'Imported board');
     b.elements = els;
     persist('boards');
-    ui.view = 'personal'; ui.personalTab = 'milanote';
-    openBoard('milanote', b.id);
+    showBoardsPage(b.id);
+    openBoard('journal', b.id);
     setTimeout(fitBoard, 80);
     playPositive();
     showToast('Imported '+imported+' card'+(imported===1?'':'s')+' into “'+b.name+'”'+(skipped?' ('+skipped+' image'+(skipped===1?'':'s')+' not found)':''), {icon:'&#128204;', duration:6000});
@@ -8880,10 +9085,57 @@ function renderBusiness(){
   '</div>'+
   '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
 }
+// Business → Overview: one card — revenue on top, clients and pipeline side by side.
 function renderBusinessOverview(){
-  return renderBusinessPanel().replace('<div class="section-title">Business<span class="view-all-link" data-action="nav" data-view="business">Open Business &rarr;</span></div>', '')+
-  renderClientHubPanel()+
-  renderPipelineGlance();
+  const active = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
+  const mrr = active.reduce(function(a,c){ return a+Number(c.mrr||0); }, 0);
+  const goal = Number(state.profile.revenueGoalMonthly)||0;
+  const openLeads = arr(state.business.pipeline).filter(leadIsOpen);
+  const pipe = openLeads.reduce(function(a,p){ return a+Number(p.value||0); }, 0);
+  const months = []; const now = new Date();
+  for(let k=5;k>=0;k--){ const d = new Date(now.getFullYear(), now.getMonth()-k, 1); const key = d.getFullYear()+'-'+pad2(d.getMonth()+1); months.push({label:d.toLocaleDateString(undefined,{month:'short'}), v:collectedByMonth(key)}); }
+  const maxV = Math.max.apply(null, months.map(function(m){ return m.v; }).concat([1]));
+  const clients = active.slice().sort(clientSortFn('health'));
+  const stages = crmStages('lead').filter(function(s){ return s.kind!=='won' && s.kind!=='lost'; });
+  const stageRows = stages.map(function(s){
+    const items = openLeads.filter(function(p){ return p.stage===s.id; });
+    return {s:s, n:items.length, v:items.reduce(function(a,p){ return a+Number(p.value||0); }, 0)};
+  });
+  const maxStage = Math.max.apply(null, stageRows.map(function(r){ return r.n; }).concat([1]));
+  const leadsDue = reachOutList().filter(function(r){ return r.kind==='lead'; });
+  return '<div class="card hq">'+
+    '<div class="hq-top">'+
+      '<div class="hq-mrr">'+
+        '<div class="stat-tile-k">Monthly recurring</div>'+
+        '<div class="biz-mrr">$'+mrr.toLocaleString()+'</div>'+
+        (goal ? '<div class="biz-bar"><span class="biz-bar-mrr" style="width:'+Math.min(100, mrr/goal*100)+'%"></span>'+(pipe ? '<span class="biz-bar-pipe" style="width:'+Math.max(0, Math.min(100-mrr/goal*100, pipe/goal*100))+'%"></span>' : '')+'</div>'+
+          '<div class="biz-goal-k">'+Math.round(mrr/goal*100)+'% of '+money(goal)+(pipe ? ' &middot; '+money(pipe)+' in pipeline' : '')+'</div>' : '')+
+      '</div>'+
+      '<div class="hq-months" title="Collected per month"><div class="biz-mbars">'+months.map(function(m, i){
+        return '<div class="biz-mcol'+(i===5?' is-now':'')+'" title="'+m.label+': $'+m.v.toLocaleString()+'"><div class="biz-mbar-wrap"><div class="biz-mbar" style="height:'+Math.max(m.v?4:0, m.v/maxV*100)+'%"></div></div><span>'+m.label+'</span></div>';
+      }).join('')+'</div></div>'+
+    '</div>'+
+    '<div class="hq-cols">'+
+      '<div class="hq-col">'+
+        '<div class="hq-col-head" data-action="businessTab" data-tab="clients"><span>Clients</span><span class="hq-count">'+active.length+'</span><span class="view-all-link">All &rarr;</span></div>'+
+        (clients.length ? clients.slice(0, 8).map(function(c){
+          return '<div class="hq-row" data-action="openContact" data-kind="client" data-id="'+c.id+'" data-key="hqc-'+c.id+'">'+clientAvatarHtml(c, true, true)+
+            '<span class="hq-name">'+escapeHtml(crmName('client', c))+'</span>'+
+            '<span class="hq-meta">'+clientNextTouchHtml(c)+'</span>'+
+            '<span class="hq-val">'+(Number(c.mrr) ? money(c.mrr) : '')+'</span></div>';
+        }).join('')+(clients.length>8 ? '<div class="hq-more" data-action="businessTab" data-tab="clients">+'+(clients.length-8)+' more</div>' : '')
+        : '<div class="kpi-sub" style="padding:8px 2px;">No active clients yet.</div>')+
+      '</div>'+
+      '<div class="hq-col">'+
+        '<div class="hq-col-head" data-action="businessTab" data-tab="leads"><span>Pipeline</span><span class="hq-count">'+openLeads.length+'</span><span class="view-all-link">Leads &rarr;</span></div>'+
+        stageRows.map(function(r){
+          return '<div class="hq-stage" data-action="crmJumpStage" data-id="'+r.s.id+'"><span class="hq-stage-name"><span class="crm-col-dot" style="background:'+r.s.color+'"></span>'+escapeHtml(r.s.label)+'</span>'+
+            '<span class="hq-stage-bar"><span style="width:'+(r.n/maxStage*100)+'%;background:'+r.s.color+'"></span></span><span class="hq-stage-n">'+r.n+'</span><span class="hq-val">'+(r.v ? money(r.v) : '')+'</span></div>';
+        }).join('')+
+        (leadsDue.length ? '<div class="hq-due"><span class="kind-label" style="margin:0;">Reach out</span>'+leadsDue.slice(0, 4).map(function(r){ return '<span class="hq-due-lead" data-action="openContact" data-kind="lead" data-id="'+r.x.id+'">'+escapeHtml(crmName('lead', r.x))+'</span>'; }).join('')+(leadsDue.length>4 ? '<span class="kpi-sub">+'+(leadsDue.length-4)+'</span>' : '')+'</div>' : '')+
+      '</div>'+
+    '</div>'+
+  '</div>';
 }
 function renderPipelineGlance(){
   const stages = crmStages('lead');
@@ -8952,9 +9204,7 @@ function monthlyTargetFor(d){
   const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
   return Math.max(1, Math.round(target * daysInMonth/7));
 }
-// Pace is judged per week (an 8-a-month reel plan = 2 a week). Early in the week you're fine
-// even at 0/2; it turns amber when the days left only just cover what's left, red once
-// you can't make it at one a day — and red stays until last week's shortfall is made up.
+// Week counts for a deliverable (weeks run Monday–Sunday).
 function deliverableWeekCountFor(d, weekStart){
   const end = addDays(weekStart, 6);
   return arr(d.completedDates).filter(function(dt){ return dt>=weekStart && dt<=end; }).length;
@@ -8968,18 +9218,22 @@ function deliverableLastWeek(d){
   return {done:done, target:target, missed:Math.max(0, target-done)};
 }
 function deliverablePaceStatus(d){
+  if(RC && d.id) return memo('dps:'+d.id, function(){ return deliverablePaceStatusRaw(d); });
+  return deliverablePaceStatusRaw(d);
+}
+// Green = on pace or ahead. Yellow = behind, but you've done some this week. Red = behind
+// with nothing done yet. "On pace" is judged per week (an 8-a-month reel plan = 2 a week):
+// early in the week 0 is fine, it fills up as the week goes, and anything missed last week
+// has to be made up first.
+function deliverablePaceStatusRaw(d){
   const target = d.weeklyTarget||1;
   const done = deliverableWeekCount(d);
-  const lw = deliverableLastWeek(d);
-  if(lw.missed>0 && done < lw.missed) return 'danger';
-  const remaining = target - done;
-  if(remaining<=0) return 'good';
-  const today = new Date();
-  const daysLeft = 7 - ((today.getDay()+6)%7); // Mon = 7 … Sun = 1, today included
-  const slack = daysLeft - remaining;
-  if(slack>=2) return 'good';
-  if(slack>=0) return 'warn';
-  return 'danger';
+  const owed = Math.min(target, deliverableLastWeek(d).missed);
+  if(done >= target+owed) return 'good';
+  const daysIn = ((new Date().getDay()+6)%7)+1; // Mon = 1 … Sun = 7
+  const required = owed + Math.floor(target*daysIn/7);
+  if(done >= required) return 'good';
+  return done>0 ? 'warn' : 'danger';
 }
 function isDeliverableDoneThisWeek(d){
   if(d.recurring){
@@ -9041,6 +9295,10 @@ function clientGreenlitThisWeek(c){
   return deliverablesOk && touched;
 }
 function clientHealthStatus(c){
+  if(RC) return memo('hs:'+c.id, function(){ return clientHealthStatusRaw(c); });
+  return clientHealthStatusRaw(c);
+}
+function clientHealthStatusRaw(c){
   // Health is the worse of: deliverable pace (are we on track for reels/ads this month?)
   // and communication (how recently have we logged a touch with this client?).
   const recurring = arr(c.deliverables).filter(function(d){ return d.recurring; });
@@ -9745,6 +10003,10 @@ function leadIsOpen(p){ const st = crmStage('lead', p.stage); return !(st && (st
 function crmTracked(kind, x){ return kind==='lead' ? leadIsOpen(x) : clientStageActive(x.stage); }
 function crmCadence(kind, x){ return Number(x.cadenceDays) || (kind==='lead' ? crm().leadCadenceDays : crm().clientCadenceDays) || 7; }
 function crmLastTouch(kind, x){
+  if(RC) return memo('lt:'+kind+':'+x.id, function(){ return crmLastTouchRaw(kind, x); });
+  return crmLastTouchRaw(kind, x);
+}
+function crmLastTouchRaw(kind, x){
   const dates = arr(x.touchpoints).map(function(t){ return t.date; });
   if(kind==='client') arr(x.touches).forEach(function(d){ dates.push(d); });
   if(!dates.length) return null;
@@ -9941,23 +10203,44 @@ function crmFiltered(kind){
   };
   return list.slice().sort(sorts[f.sort]||sorts.due);
 }
+// Search, filters and sort sit behind one button so the page stays clean; a badge shows how
+// many are active while it's closed.
+function crmFiltersActive(kind){
+  const f = crmUi(kind);
+  return (f.q?1:0)+(f.stage?1:0)+(f.source?1:0)+(f.last?1:0)+((f.sort||'due')!=='due'?1:0);
+}
 function crmToolbar(kind){
   const f = crmUi(kind);
   const sources = LEAD_SOURCES;
-  return '<div class="crm-toolbar">'+
-    '<input class="input" id="crmSearch-'+kind+'" placeholder="Search '+(kind==='lead'?'leads':'clients')+'…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
-    '<select class="input" data-crm-filter="'+kind+':stage"><option value="">All stages</option>'+crmStages(kind).map(function(s){ return '<option value="'+s.id+'" '+(f.stage===s.id?'selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select>'+
-    '<select class="input" data-crm-filter="'+kind+':source"><option value="">Any source</option>'+sources.map(function(s){ return '<option value="'+s.id+'" '+(f.source===s.id?'selected':'')+'>'+s.label+'</option>'; }).join('')+'</select>'+
-    '<select class="input" data-crm-filter="'+kind+':last"><option value="">Last contacted: any</option>'+[['due','Touch due / overdue'],['7','Not in 7+ days'],['14','Not in 14+ days'],['30','Not in 30+ days'],['never','Never contacted']].map(function(o){ return '<option value="'+o[0]+'" '+(f.last===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
-    '<select class="input" data-crm-filter="'+kind+':sort">'+[['due','Sort: most overdue'],['last','Sort: last contacted'],['value','Sort: '+(kind==='lead'?'value':'MRR')],['name','Sort: name'],['created','Sort: newest']].map(function(o){ return '<option value="'+o[0]+'" '+(f.sort===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
-    '<div class="seg-tabs" style="margin:0;">'+
-      '<button class="seg-tab'+(f.view==='board'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="board">Board</button>'+
-      '<button class="seg-tab'+(f.view==='list'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="list">List</button>'+
+  const active = crmFiltersActive(kind);
+  return '<div class="crm-toolbar crm-toolbar-slim">'+
+      '<button class="btn btn-ghost btn-sm crm-tools-btn'+(f.toolsOpen?' is-open':'')+'" data-action="crmToggleTools" data-kind="'+kind+'">&#128269; Search &amp; sort'+(active?'<span class="th-badge">'+active+'</span>':'')+'</button>'+
+      (active ? '<button class="mini-move" data-action="crmClearFilters" data-kind="'+kind+'">Clear</button>' : '')+
+      '<span style="flex:1"></span>'+
+      '<div class="seg-tabs" style="margin:0;">'+
+        '<button class="seg-tab'+(f.view==='board'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="board">Board</button>'+
+        '<button class="seg-tab'+(f.view==='list'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="list">List</button>'+
+      '</div>'+
+      '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="'+kind+'">+ Add '+(kind==='lead'?'lead':'client')+'</button>'+
     '</div>'+
-    (kind==='client' ? '<div class="seg-tabs" style="margin:0;" title="Group the board by"><button class="seg-tab'+(f.group!=='cycle'?' active':'')+'" data-action="crmGroup" data-id="stage">By status</button><button class="seg-tab'+(f.group==='cycle'?' active':'')+'" data-action="crmGroup" data-id="cycle">By cycle step</button></div><button class="btn btn-ghost btn-sm" data-action="openLifecycleEditor" title="Design your client cycles: steps, calls, forms, videos">&#9881; Cycles</button>' : '')+
-    '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="'+kind+'">+ Add '+(kind==='lead'?'lead':'client')+'</button>'+
-  '</div>';
+    (f.toolsOpen ? '<div class="crm-toolbar crm-tools-row">'+
+      '<input class="input" id="crmSearch-'+kind+'" placeholder="Search '+(kind==='lead'?'leads':'clients')+'…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
+      '<select class="input" data-crm-filter="'+kind+':stage"><option value="">All stages</option>'+crmStages(kind).map(function(s){ return '<option value="'+s.id+'" '+(f.stage===s.id?'selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select>'+
+      '<select class="input" data-crm-filter="'+kind+':source"><option value="">Any source</option>'+sources.map(function(s){ return '<option value="'+s.id+'" '+(f.source===s.id?'selected':'')+'>'+s.label+'</option>'; }).join('')+'</select>'+
+      '<select class="input" data-crm-filter="'+kind+':last"><option value="">Last contacted: any</option>'+[['due','Touch due / overdue'],['7','Not in 7+ days'],['14','Not in 14+ days'],['30','Not in 30+ days'],['never','Never contacted']].map(function(o){ return '<option value="'+o[0]+'" '+(f.last===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
+      '<select class="input" data-crm-filter="'+kind+':sort">'+[['due','Sort: most overdue'],['last','Sort: last contacted'],['value','Sort: '+(kind==='lead'?'value':'MRR')],['name','Sort: name'],['created','Sort: newest']].map(function(o){ return '<option value="'+o[0]+'" '+(f.sort===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
+    '</div>' : '');
 }
+ACTIONS.crmToggleTools = function(el){
+  const kind = el.dataset.kind, f = crmUi(kind);
+  f.toolsOpen = !f.toolsOpen; renderView();
+  if(f.toolsOpen){ const i = document.getElementById('crmSearch-'+kind); if(i) i.focus(); }
+};
+ACTIONS.crmClearFilters = function(el){
+  const f = crmUi(el.dataset.kind);
+  f.q = ''; f.stage = ''; f.source = ''; f.last = ''; f.sort = 'due'; f.csort = 'health';
+  renderView();
+};
 ACTIONS.crmView = function(el, e, id){ crmUi(el.dataset.kind).view = id; renderView(); };
 document.addEventListener('change', function(e){
   const t = e.target; if(!t || !t.dataset || !t.dataset.crmFilter) return;
@@ -11076,11 +11359,19 @@ function renderClientsHome(){
       stat(levels.filter(function(l){ return l!=='green'; }).length, 'need attention', levels.some(function(l){ return l!=='green'; })?'is-warn':'')+
       stat(due, 'to reach out to', due?'is-warn':'')+
     '</div>'+
-    '<div class="crm-toolbar">'+
-      '<input class="input" id="crmSearch-client" placeholder="Search clients…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
-      '<select class="input" data-client-sort>'+[['health','Sort: needs attention first'],['due','Sort: most overdue touch'],['mrr','Sort: MRR'],['name','Sort: name']].map(function(o){ return '<option value="'+o[0]+'" '+((f.csort||'health')===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
-      '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="client">+ Add client</button>'+
-    '</div>'+
+    (function(){
+      const active = (f.q?1:0)+((f.csort||'health')!=='health'?1:0);
+      return '<div class="crm-toolbar crm-toolbar-slim">'+
+          '<button class="btn btn-ghost btn-sm crm-tools-btn'+(f.toolsOpen?' is-open':'')+'" data-action="crmToggleTools" data-kind="client">&#128269; Search &amp; sort'+(active?'<span class="th-badge">'+active+'</span>':'')+'</button>'+
+          (active ? '<button class="mini-move" data-action="crmClearFilters" data-kind="client">Clear</button>' : '')+
+          '<span style="flex:1"></span>'+
+          '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="client">+ Add client</button>'+
+        '</div>'+
+        (f.toolsOpen ? '<div class="crm-toolbar crm-tools-row">'+
+          '<input class="input" id="crmSearch-client" placeholder="Search clients…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
+          '<select class="input" data-client-sort>'+[['health','Sort: needs attention first'],['due','Sort: most overdue touch'],['mrr','Sort: MRR'],['name','Sort: name']].map(function(o){ return '<option value="'+o[0]+'" '+((f.csort||'health')===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
+        '</div>' : '');
+    })()+
     '<div class="subtab-panel" data-key="clients-home">'+
       (active.length ? '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>' : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
       (rest.length ? '<div class="cc2-past"><button class="cc2-past-toggle" data-action="toggleClientsPast">'+(ui.clientsPastOpen?'&#9662;':'&#9656;')+' Paused &amp; past clients ('+rest.length+')</button>'+
@@ -12120,7 +12411,12 @@ function updateNavActive(){
 }
 let lastRenderedView = null;
 let lastRenderedDay = null;
+// While several things change at once (e.g. navigating closes every open pop-up first),
+// renders are held so the page is drawn once at the end instead of once per step.
+let renderHold = 0;
+function holdRenders(fn){ renderHold++; try{ fn(); } finally{ renderHold--; } }
 function renderView(){
+  if(renderHold) return;
   RC = {};
   try{ renderViewInner(); } finally { RC = null; }
 }
@@ -12404,8 +12700,8 @@ function snoozeAlarm(){ const al = lastFiredAlarm; dismissAlarm(); snoozeRegular
 
 // ============ WAKE-UP ALARM, ON-TIME ALARMS, WAKE SCREEN, BREAK TIMER ============
 // One master wake-up alarm (e.g. 7:00 AM Mon–Sat) that can be changed for a single morning
-// at any hour of the night, a full-screen wake screen (clock, master vision board, the plan,
-// today's calendar) with music that starts by itself, and an optional second-display view.
+// at any hour of the night, and a full-screen wake screen (clock, vision board, the plan,
+// today's calendar) with music that starts by itself.
 //
 // Alarms used to be matched against the current minute every 4 s. When Chrome slowed the
 // timers of a background window, that minute was skipped and the alarm only rang once the
@@ -12414,7 +12710,6 @@ function snoozeAlarm(){ const al = lastFiredAlarm; dismissAlarm(); snoozeRegular
 const ALARM_GRACE_MS = 15*60000;
 const WAKE_GRACE_MS = 2*3600000;
 const WAKE_PING_URL = 'http://127.0.0.1:8935/wake';
-const isWakeDisplay = location.hash==='#wake';
 function dowOf(dateStr){ return new Date(localTs(dateStr, '12:00')).getDay(); }
 function wakeCfg(){ return state.focus.wake; }
 function wakeTimeFor(dateStr){
@@ -12482,7 +12777,7 @@ function alarmOwnerGone(al){
   return !t || t.status==='done';
 }
 function checkAllAlarms(){
-  if(isWakeDisplay || !state.focus) return;
+  if(!state.focus) return;
   const now = Date.now();
   let changed = false;
   const yesterday = addDays(todayStr(), -1);
@@ -12536,13 +12831,42 @@ function snoozeRegularAlarm(al){
   persist('focus');
 }
 // ---- music ----
-let wakeAudio = null, wakeAudioRamp = null, wakeMediaWin = null, wakeObjectUrl = null;
+// Wake-up music, most reliable first: a song or playlist from Apple Music (the Operator app
+// asks the Music app to play it — your own library, no ads), an uploaded song (plays on this
+// page, fading in), or a web/YouTube link (opens in a window; YouTube may run an ad first).
+// When music is set there's no alarm beep — the beep only steps in if the music can't start.
+const MUSIC_URL = 'http://127.0.0.1:8935/music/';
+let wakeAudio = null, wakeAudioRamp = null, wakeMediaWin = null, wakeObjectUrl = null, wakeMusicApp = false;
 function isDirectAudioUrl(u){ return /^data:audio\//i.test(u||'') || /\.(mp3|m4a|aac|wav|ogg|oga|flac|opus)(\?|#|$)/i.test(u||''); }
-function mediaKindLabel(m){ if(!m) return ''; if(m.ref) return 'song'; return /youtu/.test(m.url||'') ? 'YouTube' : isDirectAudioUrl(m.url) ? 'song' : 'link'; }
+function appleMusicFromLink(u){
+  const m = /music\.apple\.com\/[a-z]{2}\/(album|song|playlist)\/([^/?#]+)/i.exec(u||'');
+  if(!m) return null;
+  let q = m[2]; try{ q = decodeURIComponent(q); }catch(e){}
+  return {type:'music', k: m[1].toLowerCase()==='playlist' ? 'playlist' : 'song', q: q.replace(/-/g, ' ').trim()};
+}
+function mediaKindLabel(m){ if(!m) return ''; if(m.type==='music') return 'Apple Music '+(m.k==='playlist'?'playlist':'song'); if(m.ref) return 'uploaded song'; return /youtu/.test(m.url||'') ? 'YouTube' : isDirectAudioUrl(m.url) ? 'song link' : 'link'; }
+function mediaName(m){ return !m ? '' : m.type==='music' ? m.q : (m.name || m.url || 'Song'); }
+function hexUtf8(str){ return Array.prototype.map.call(new TextEncoder().encode(String(str||'')), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
+async function musicApp(cmd, media){
+  const ctl = typeof AbortController!=='undefined' ? new AbortController() : null;
+  const timer = setTimeout(function(){ if(ctl) ctl.abort(); }, 4000);
+  try{
+    const url = MUSIC_URL+cmd+(media ? '?k='+(media.k==='playlist'?'playlist':'song')+'&q='+hexUtf8(media.q) : '');
+    const res = await fetch(url, {cache:'no-store', signal: ctl ? ctl.signal : undefined});
+    return res.ok;
+  }catch(e){ return false; }
+  finally{ clearTimeout(timer); }
+}
 async function playWakeMedia(media, onFail){
   stopWakeMedia(true);
   onFail = onFail || function(){};
   try{
+    if(media.type==='music'){
+      const ok = await musicApp('play', media);
+      if(!ok){ onFail(); return false; }
+      wakeMusicApp = true;
+      return true;
+    }
     if(media.ref || isDirectAudioUrl(media.url)){
       let src = media.url;
       if(media.ref){
@@ -12573,6 +12897,7 @@ function stopWakeMedia(immediate){
     else { const fade = setInterval(function(){ a.volume = Math.max(0, a.volume-0.1); if(a.volume<=0.01){ clearInterval(fade); try{ a.pause(); }catch(e){} } }, 120); }
   }
   if(wakeObjectUrl){ const u = wakeObjectUrl; wakeObjectUrl = null; setTimeout(function(){ URL.revokeObjectURL(u); }, 3000); }
+  if(wakeMusicApp){ wakeMusicApp = false; musicApp('stop'); }
 }
 // ---- the wake screen ----
 let wakeRing = null; // {startedAt, test, soundFailed}
@@ -12589,8 +12914,6 @@ function fireWake(opts){
   if(w.media){
     playWakeMedia(w.media, function(){ if(wakeRing){ wakeRing.mediaFailed = true; renderWakeOverlayInto(); } startBeeps(); });
   } else startBeeps();
-  if(w.secondScreen) openWakeDisplay(true);
-  postToWakeDisplay();
   try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Time to get up'); }catch(e){}
 }
 function closeOtherOverlaysForWake(){
@@ -12601,7 +12924,6 @@ function stopWakeRing(){
   stopWakeMedia(false);
   wakeRing = null;
   hideOverlay('wakeOverlay');
-  postToWakeDisplay();
 }
 function wakeImUp(){
   const wasTest = wakeRing && wakeRing.test;
@@ -12620,14 +12942,13 @@ function wakeSnooze(){
   persist('focus'); renderView();
   showToast('Snoozed — ringing again at '+fmt12Hour(nowHM(new Date(Date.now()+mins*60000))), {icon:'&#128164;'});
 }
-ACTIONS.wakeImUp = function(){ if(isWakeDisplay){ try{ window.opener && window.opener.postMessage({operatorWake:'up'}, '*'); }catch(e){} displayRinging = false; renderWakeDisplay(); return; } wakeImUp(); };
-ACTIONS.wakeSnooze = function(){ if(isWakeDisplay){ try{ window.opener && window.opener.postMessage({operatorWake:'snooze'}, '*'); }catch(e){} displayRinging = false; renderWakeDisplay(); return; } wakeSnooze(); };
+ACTIONS.wakeImUp = function(){ wakeImUp(); };
+ACTIONS.wakeSnooze = function(){ wakeSnooze(); };
 ACTIONS.wakePlayMusic = function(){ const w = wakeCfg(); if(w.media) playWakeMedia(w.media, function(){ showToast('Couldn\'t play that — try uploading the song file instead.', {icon:'&#9888;'}); }); clearInterval(wakeBeepTimer); if(wakeRing){ wakeRing.mediaFailed = false; renderWakeOverlayInto(); } };
 function wakeGreeting(){ const h = new Date().getHours(); return h<5 ? 'Still up' : h<12 ? 'Good morning' : h<18 ? 'Good afternoon' : 'Good evening'; }
 function upcomingNightPlan(){ const np = state.focus.nightPlan; return (np && np.date>=todayStr()) ? np : null; }
-function renderWakeScreen(mode){
-  // mode: 'ring' (main window, alarm going off) | 'display' (second screen) | 'display-ring'
-  const ringing = mode==='ring' || mode==='display-ring';
+function renderWakeScreen(){
+  const ringing = true, mode = 'ring';
   const today = todayStr();
   const b = masterVisionBoard();
   const np = upcomingNightPlan();
@@ -12646,7 +12967,7 @@ function renderWakeScreen(mode){
     '</div>' : '';
   const whyBody = why.length ? '<div class="wake-list">'+why.map(function(m){ return '<div class="wake-li">&rarr; '+escapeHtml(m.text)+'</div>'; }).join('')+'</div>' : '';
   const w = wakeCfg();
-  return '<div class="wake-screen'+(ringing?' is-ringing':'')+(mode.indexOf('display')===0?' is-display':'')+'">'+
+  return '<div class="wake-screen is-ringing">'+
     '<div class="wake-left">'+
       '<div class="wake-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test && mode==='ring' ? ' <span class="tag">TEST</span>' : '')+'</div>'+
       '<div class="wake-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+'</div>'+
@@ -12655,23 +12976,22 @@ function renderWakeScreen(mode){
           '<button class="btn wake-up-btn" data-action="wakeImUp">&#9728;&#65039; I\'m up</button>'+
           '<button class="btn btn-ghost wake-snooze-btn" data-action="wakeSnooze">Snooze '+(w.snoozeMinutes||9)+' min</button>'+
         '</div>'+
-        (mode==='ring' && w.media ? '<div class="wake-music">'+(wakeRing && wakeRing.mediaFailed ? '<button class="btn btn-good btn-sm" data-action="wakePlayMusic">&#9654; Play '+escapeHtml(w.media.name||mediaKindLabel(w.media))+'</button>' : '&#9835; '+escapeHtml(w.media.name||mediaKindLabel(w.media)))+'</div>' : '')
+        (w.media ? '<div class="wake-music">'+(wakeRing && wakeRing.mediaFailed ? '<button class="btn btn-good btn-sm" data-action="wakePlayMusic">&#9654; Play '+escapeHtml(mediaName(w.media))+'</button>' : '&#9835; '+escapeHtml(mediaName(w.media))+' <span class="kpi-sub">'+escapeHtml(mediaKindLabel(w.media))+'</span>')+'</div>' : '')
         : '<div class="wake-next">'+(nw ? '&#9200; Wake-up '+fmt12Hour(nw.time)+' '+morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts) : '&#9200; No wake-up alarm set')+'</div>')+
       '<div class="wake-cards">'+
         card(np && np.date===today ? 'Last night\'s plan' : np ? 'Plan for '+morningLabel(np.date) : 'Today', planBody)+
         card('On the calendar', agendaBody)+
         card('Why you\'re doing this', whyBody)+
       '</div>'+
-      (mode.indexOf('display')===0 ? '<div class="wake-display-tools"><button class="btn btn-ghost btn-sm" data-action="wakeDisplayFullscreen">&#9974; Full screen</button></div>' : '')+
     '</div>'+
     '<div class="wake-right">'+
-      (b && b.elements.length ? boardStaticHtml(b, 'wake-board') : '<div class="wake-board-empty"><div style="font-size:30px;">&#127775;</div><div>Your vision board shows up here.</div><div class="kpi-sub">Personal &rarr; Vision board</div></div>')+
+      (b && b.elements.length ? boardStaticHtml(b, 'wake-board') : '<div class="wake-board-empty"><div style="font-size:30px;">&#127775;</div><div>Your vision board shows up here.</div><div class="kpi-sub">Journal &rarr; Boards</div></div>')+
     '</div>'+
   '</div>';
 }
 function renderWakeOverlayInto(){
   const el = document.getElementById('wakeContent'); if(!el) return;
-  morphInto(el, renderWakeScreen(isWakeDisplay ? (displayRinging?'display-ring':'display') : 'ring'));
+  morphInto(el, renderWakeScreen());
   requestAnimationFrame(function(){ fitStaticBoards(el); });
   clearInterval(wakeClockTimer);
   wakeClockTimer = setInterval(function(){
@@ -12681,58 +13001,6 @@ function renderWakeOverlayInto(){
   }, 1000);
 }
 registerModal('wakeOverlay', renderWakeOverlayInto);
-// ---- second display ----
-let wakeDisplayWin = null;
-let displayRinging = false;
-async function otherScreenPlacement(){
-  try{
-    if(!window.getScreenDetails) return null;
-    const sd = await window.getScreenDetails();
-    const other = sd.screens.find(function(s){ return s!==sd.currentScreen; });
-    return other ? {left:other.availLeft, top:other.availTop, width:other.availWidth, height:other.availHeight} : null;
-  }catch(e){ return null; }
-}
-async function openWakeDisplay(auto){
-  if(wakeDisplayWin && !wakeDisplayWin.closed){ postToWakeDisplay(); return; }
-  const pl = await otherScreenPlacement();
-  const feat = pl ? 'popup=1,left='+pl.left+',top='+pl.top+',width='+pl.width+',height='+pl.height : 'popup=1,width=1280,height=800';
-  wakeDisplayWin = window.open(location.href.split('#')[0]+'#wake', 'operatorWakeDisplay', feat);
-  if(!wakeDisplayWin && !auto) showToast('The window was blocked — allow pop-ups for Operator.', {icon:'&#9888;'});
-}
-function postToWakeDisplay(){
-  if(!wakeDisplayWin || wakeDisplayWin.closed) return;
-  try{ wakeDisplayWin.postMessage({operatorWake:'ring', on:!!wakeRing}, '*'); }catch(e){}
-}
-window.addEventListener('message', function(e){
-  const d = e.data; if(!d || !d.operatorWake) return;
-  if(isWakeDisplay){
-    if(d.operatorWake==='ring'){ displayRinging = !!d.on; renderWakeDisplay(); }
-    return;
-  }
-  if(d.operatorWake==='hello') postToWakeDisplay();
-  else if(d.operatorWake==='up' && wakeRing) wakeImUp();
-  else if(d.operatorWake==='snooze' && wakeRing) wakeSnooze();
-});
-ACTIONS.wakeDisplayFullscreen = function(){ try{ document.documentElement.requestFullscreen(); }catch(e){} };
-function renderWakeDisplay(){ renderWakeOverlayInto(); }
-// The #wake window: an ambient screen for the second monitor (no trackers, no alarms of
-// its own — the main window rings and tells this one).
-async function startWakeDisplay(){
-  document.title = 'Operator — Morning';
-  document.body.classList.add('wake-display-mode');
-  document.getElementById('loading').style.display = 'none';
-  showOverlay('wakeOverlay');
-  renderWakeDisplay();
-  try{ window.opener && window.opener.postMessage({operatorWake:'hello'}, '*'); }catch(e){}
-  setInterval(renderWakeDisplay, 60000);
-  window.addEventListener('storage', async function(e){
-    const k = String(e.key||'').replace(/^opsdash:/, '');
-    if(['focus','boards','tasks','calendar','profile'].indexOf(k)<0) return;
-    const norm = {focus:normalizeFocus, boards:normalizeBoards, tasks:normalizeTasks, calendar:normalizeCalendar, profile:normalizeProfile}[k];
-    state[k] = norm(await loadKey(k, state[k]));
-    renderWakeDisplay();
-  });
-}
 // ---- setup modal ----
 function openWakeSetup(){ ui.wakeOverrideDate = wakeTargetDate(); showOverlay('wakeSetupOverlay'); renderWakeSetupInto(); }
 ACTIONS.openWakeSetup = openWakeSetup;
@@ -12767,23 +13035,19 @@ function renderWakeSetup(){
       '<div class="kpi-sub" style="margin-top:4px;">'+(ov ? (ov.off ? 'No alarm '+morningLabel(od)+'.' : 'Changed to '+fmt12Hour(ov.time)+' for '+morningLabel(od)+' only.') : (base ? 'Usual time. Change it here for '+morningLabel(od)+' only — your daily alarm stays the same.' : 'No alarm usually — set a time here to wake up '+morningLabel(od)+'.'))+'</div>'+
     '</div>'+
     '<div class="ws-block">'+
-      '<div class="kind-label">Sound</div>'+
+      '<div class="kind-label">Wake-up music — starts by itself, no alarm sound</div>'+
+      (w.media ? '<div class="ws-media"><span>&#9835; '+escapeHtml(mediaName(w.media))+'</span><span class="kpi-sub">'+escapeHtml(mediaKindLabel(w.media))+'</span><span style="flex:1"></span>'+
+          '<button class="btn btn-ghost btn-sm" data-action="wakePreviewMusic">'+((wakeAudio||wakeMusicApp)?'&#10073;&#10073; Stop':'&#9654; Test')+'</button><button class="btn btn-ghost btn-sm mini-move-danger" data-action="wakeClearMusic">Remove</button></div>' : '')+
+      wakeMusicPickerHtml(w)+
+      '<input type="file" id="wakeMusicFile" accept="audio/*" style="display:none;">'+
+    '</div>'+
+    '<div class="ws-block">'+
+      '<div class="kind-label">Alarm sound'+(w.media ? ' <span class="kpi-sub" style="text-transform:none;letter-spacing:0;font-weight:500;">— only if the music can\'t start</span>' : '')+'</div>'+
       '<div class="row" style="gap:6px;flex-wrap:wrap;">'+['peaceful','standard','loud'].map(function(s){ return '<button class="btn btn-sm '+(w.sound===s?'btn-primary':'btn-ghost')+'" data-action="wakeSound" data-id="'+s+'">'+s[0].toUpperCase()+s.slice(1)+'</button>'; }).join('')+
         '<button class="btn btn-ghost btn-sm" data-action="wakePreviewSound">&#9654; Hear it</button></div>'+
-      '<div class="kind-label" style="margin-top:14px;">Wake-up music — starts by itself</div>'+
-      (w.media ? '<div class="ws-media"><span>&#9835; '+escapeHtml(w.media.name||w.media.url||'Song')+'</span><span class="kpi-sub">'+mediaKindLabel(w.media)+'</span><span style="flex:1"></span>'+
-          '<button class="btn btn-ghost btn-sm" data-action="wakePreviewMusic">'+(wakeAudio?'&#10073;&#10073; Stop':'&#9654; Preview')+'</button><button class="btn btn-ghost btn-sm mini-move-danger" data-action="wakeClearMusic">Remove</button></div>' : '')+
-      '<div class="row" style="gap:8px;margin-top:6px;flex-wrap:wrap;">'+
-        '<button class="btn btn-sm" data-action="wakePickMusic">&#11014; Upload a song</button>'+
-        '<input class="input" data-wake="mediaUrl" placeholder="…or paste a YouTube / song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="flex:1;min-width:200px;">'+
-      '</div>'+
-      '<div class="kpi-sub" style="margin-top:4px;">An uploaded song plays right on the wake screen, fading in. A YouTube link opens and plays on its own.</div>'+
-      '<input type="file" id="wakeMusicFile" accept="audio/*" style="display:none;">'+
     '</div>'+
     '<div class="ws-block grid grid-2">'+
       '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+
-      '<div class="field"><label>Second screen</label><div class="ws-check"><input type="checkbox" id="wakeSecondScreen" data-wake="secondScreen" '+(w.secondScreen?'checked':'')+'><span>Also show the wake screen on my other display</span></div>'+
-        '<div class="row" style="gap:6px;margin-top:6px;"><button class="btn btn-ghost btn-sm" data-action="wakeOpenDisplay">Open it now</button></div></div>'+
     '</div>'+
     '<div class="row" style="margin-top:18px;justify-content:space-between;gap:8px;flex-wrap:wrap;">'+
       '<div class="row" style="gap:8px;"><button class="btn btn-ghost btn-sm" data-action="wakeTestSoon" title="Rings in one minute — switch to another app to check it comes up on its own">&#128276; Test: ring in 1 min</button><button class="btn btn-ghost btn-sm" data-action="wakeTestNow">Preview wake screen</button></div>'+
@@ -12810,11 +13074,40 @@ ACTIONS.wakePreviewSound = function(){ playAlarmSound(wakeCfg().sound); };
 ACTIONS.wakePickMusic = function(){ const f = document.getElementById('wakeMusicFile'); if(f) f.click(); };
 ACTIONS.wakeClearMusic = function(){ stopWakeMedia(true); const w = wakeCfg(); if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref); w.media = null; saveWake(); };
 ACTIONS.wakePreviewMusic = function(){
-  if(wakeAudio){ stopWakeMedia(true); renderWakeSetupInto(); return; }
+  if(wakeAudio || wakeMusicApp){ stopWakeMedia(true); renderWakeSetupInto(); return; }
   const w = wakeCfg(); if(!w.media) return;
-  playWakeMedia(Object.assign({}, w.media, {preview:true}), function(){ showToast('Couldn\'t play that link here.', {icon:'&#9888;'}); }).then(renderWakeSetupInto);
+  playWakeMedia(Object.assign({}, w.media, {preview:true}), function(){
+    showToast(w.media.type==='music' ? 'Apple Music plays through the Operator app — open Operator from its icon (not the file in a browser).' : 'Couldn\'t play that here.', {icon:'&#9888;', duration:7000});
+  }).then(renderWakeSetupInto);
 };
-ACTIONS.wakeOpenDisplay = function(){ openWakeDisplay(false); };
+// Music source picker in the setup: Apple Music (by name or link), a song file, or a link.
+function wakeMusicPickerHtml(w){
+  const src = ui.wakeSrc || (w.media ? (w.media.type==='music' ? 'music' : w.media.ref ? 'upload' : 'link') : 'music');
+  const kind = ui.wakeMusicKind || (w.media && w.media.type==='music' ? w.media.k : 'song');
+  const tab = function(id, label){ return '<button class="seg-tab'+(src===id?' active':'')+'" data-action="wakeMusicSource" data-id="'+id+'">'+label+'</button>'; };
+  return '<div class="seg-tabs ws-src" style="margin:8px 0;">'+tab('music','&#63743; Apple Music')+tab('upload','&#11014; Song file')+tab('link','&#128279; Link')+'</div>'+
+    (src==='music' ? '<div class="row" style="gap:8px;flex-wrap:wrap;">'+
+        '<input class="input" id="wakeMusicQuery" placeholder="Song or playlist name (or an Apple Music link)" value="'+escapeHtml(w.media && w.media.type==='music' ? w.media.q : '')+'" style="flex:1;min-width:220px;">'+
+        '<div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(kind==='song'?' active':'')+'" data-action="wakeMusicKind" data-id="song">Song</button><button class="seg-tab'+(kind==='playlist'?' active':'')+'" data-action="wakeMusicKind" data-id="playlist">Playlist</button></div>'+
+        '<button class="btn btn-sm btn-primary" data-action="wakeSetAppleMusic">Use it</button>'+
+      '</div>'+
+      '<div class="kpi-sub" style="margin-top:6px;">Plays from your Apple Music library through the Music app — no ads, volume fades up. The first time, macOS asks to let Operator control Music: click OK (do it now with Test, so it doesn\'t ask in the morning).</div>'
+    : src==='upload' ? '<button class="btn btn-sm" data-action="wakePickMusic">&#11014; Choose a song file</button><div class="kpi-sub" style="margin-top:6px;">Plays right on the wake screen and fades in.</div>'
+    : '<input class="input" data-wake="mediaUrl" placeholder="YouTube or song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="width:100%;"><div class="kpi-sub" style="margin-top:6px;">Opens and plays by itself. YouTube may play an ad first — Apple Music or a song file start instantly.</div>');
+}
+ACTIONS.wakeMusicSource = function(el, e, id){ ui.wakeSrc = id; renderWakeSetupInto(); };
+ACTIONS.wakeMusicKind = function(el, e, id){ ui.wakeMusicKind = id; renderWakeSetupInto(); };
+ACTIONS.wakeSetAppleMusic = function(){
+  const inp = document.getElementById('wakeMusicQuery');
+  const v = inp ? inp.value.trim() : '';
+  if(!v){ if(inp) inp.focus(); return; }
+  const w = wakeCfg();
+  const fromLink = appleMusicFromLink(v);
+  if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref);
+  w.media = fromLink || {type:'music', q:v, k: ui.wakeMusicKind || 'song'};
+  saveWake();
+  showToast('Wake-up music: '+mediaName(w.media)+' (Apple Music) — hit Test to hear it', {icon:'&#9835;', duration:5000});
+};
 ACTIONS.wakeTestNow = function(){ hideOverlay('wakeSetupOverlay'); stopWakeMedia(true); fireWake({test:true}); };
 ACTIONS.wakeTestSoon = function(){
   state.focus.snooze = {ts:Date.now()+60000, wake:true, test:true};
@@ -12849,10 +13142,12 @@ document.addEventListener('change', function(e){
   else if(key==='mediaUrl'){
     const v = t.value.trim();
     if(!v){ if(w.media && w.media.url) w.media = null; }
-    else { if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref); w.media = {url:v, name:/youtu/.test(v)?'YouTube':v.replace(/^https?:\/\/(www\.)?/,'').slice(0,40)}; }
+    else {
+      if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref);
+      w.media = appleMusicFromLink(v) || {url:v, name:/youtu/.test(v)?'YouTube':v.replace(/^https?:\/\/(www\.)?/,'').slice(0,40)};
+    }
   }
   else if(key==='snoozeMinutes') w.snoozeMinutes = Number(t.value)||9;
-  else if(key==='secondScreen'){ w.secondScreen = t.checked; if(t.checked) otherScreenPlacement(); }
   saveWake();
   renderView();
 });
@@ -12973,11 +13268,13 @@ document.body.addEventListener('click', function(e){
   const id = el.dataset.id;
   switch(a){
     case 'nav': {
-      closePreFocusModal(); closeStopFocus(); closeTimesUpModal(); closeMultiBreakWarning(); closeFinalStopConfirm();
-      closeTaskEditModal(); closeProspectEditModal(); closeClientModal(); closeLockInChooser(); closeJournalEditModal(); closeGoalEditModal();
-      closeWorkoutEditModal(); closeJournalClearConfirm(); closeBreakNotePrompt(); closeBreakDetail(); closeInvoiceModal();
-      closeAttachReceiptModal(); closeAddTaskModal(); closeDatePicker(); closeRetainerEdit(); closeLogPaymentModal();
-      closeUpcomingPopover(); closeQuickJournalModal(); closeJournalPhotoView(); closeCalEventModal(); closeAlarmEditModal(); closePackageEditModal(); closeCustomDeliverableDrawer(); closeNewPackageModal(); closeVideoIdeaEditModal(); closeAddVideoIdeaModal();
+      holdRenders(function(){
+        closePreFocusModal(); closeStopFocus(); closeTimesUpModal(); closeMultiBreakWarning(); closeFinalStopConfirm();
+        closeTaskEditModal(); closeProspectEditModal(); closeClientModal(); closeLockInChooser(); closeJournalEditModal(); closeGoalEditModal();
+        closeWorkoutEditModal(); closeJournalClearConfirm(); closeBreakNotePrompt(); closeBreakDetail(); closeInvoiceModal();
+        closeAttachReceiptModal(); closeAddTaskModal(); closeDatePicker(); closeRetainerEdit(); closeLogPaymentModal();
+        closeUpcomingPopover(); closeQuickJournalModal(); closeJournalPhotoView(); closeCalEventModal(); closeAlarmEditModal(); closePackageEditModal(); closeCustomDeliverableDrawer(); closeNewPackageModal(); closeVideoIdeaEditModal(); closeAddVideoIdeaModal();
+      });
       ui.selectedTaskIds.clear(); ui.selectedProspectIds.clear();
       const changing = el.dataset.view !== ui.view;
       ui.view = el.dataset.view;
@@ -13497,6 +13794,45 @@ document.body.addEventListener('change', function(e){
   }
 });
 
+
+// ============ CLICK OUTSIDE / ESC CLOSES POP-UPS ============
+// Clicking the dark area around a pop-up (or pressing Esc) closes it. Pop-ups that edit
+// something that already exists save on the way out (the same as their Save button), so
+// nothing typed is lost; "add new" pop-ups just close. Alarms and the wake screen never
+// close this way.
+const OVERLAY_KEEP_OPEN = ['alarmOverlay','wakeOverlay','timesUpOverlay','finalStopOverlay','multiBreakOverlay','stopFocusOverlay'];
+const OVERLAY_DISMISS = {
+  taskEditOverlay: function(){ if(ui.editingTaskId) saveEditTask(ui.editingTaskId); else closeTaskEditModal(); },
+  clientModalOverlay: function(){ closeClientModalAndSave(); },
+  contactOverlay: function(){ if(ui.contactLeadId) ACTIONS.saveLead(null, null, ui.contactLeadId); else hideOverlay('contactOverlay'); },
+  journalEditOverlay: function(){ if(ui.editingJournalId) saveEditJournal(ui.editingJournalId); else closeJournalEditModal(); },
+  goalEditOverlay: function(){ if(ui.editingGoalId) saveEditGoal(ui.editingGoalId); else closeGoalEditModal(); },
+  workoutEditOverlay: function(){ if(ui.editingWorkoutId) saveEditWorkout(ui.editingWorkoutId); else closeWorkoutEditModal(); },
+  videoIdeaEditOverlay: function(){ if(ui.editingVideoIdeaId) saveVideoIdeaEdit(ui.editingVideoIdeaId); else closeVideoIdeaEditModal(); }
+};
+function dismissOverlay(o){
+  if(!o || o.classList.contains('hidden') || OVERLAY_KEEP_OPEN.indexOf(o.id)>=0) return false;
+  if(OVERLAY_DISMISS[o.id]){ OVERLAY_DISMISS[o.id](); return true; }
+  const btn = o.querySelector('[data-action^="close"], [data-action^="cancel"]');
+  if(btn){ btn.click(); return true; }
+  o.classList.add('hidden');
+  return true;
+}
+let pressedOnBackdrop = null;
+document.addEventListener('pointerdown', function(e){
+  const t = e.target;
+  pressedOnBackdrop = (t && t.classList && t.classList.contains('overlay') && !t.classList.contains('hidden')) ? t : null;
+}, true);
+document.addEventListener('click', function(e){
+  const o = pressedOnBackdrop; pressedOnBackdrop = null;
+  if(o && e.target===o) dismissOverlay(o);
+}, true);
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Escape' || e.defaultPrevented) return;
+  const open = Array.prototype.filter.call(document.querySelectorAll('.overlay'), function(o){ return !o.classList.contains('hidden'); });
+  if(!open.length) return;
+  if(dismissOverlay(open[open.length-1])) e.preventDefault();
+});
 // ============ INIT ============
 async function init(){
   state.profile = normalizeProfile(await loadKey('profile', defaultProfile()));
@@ -13518,7 +13854,6 @@ async function init(){
   state.personal = normalizePersonal(await loadKey('personal', defaultPersonal()));
   state.boards = normalizeBoards(await loadKey('boards', defaultBoards()));
 
-  if(isWakeDisplay){ startWakeDisplay(); return; }
   splitActiveModeAtMidnight();
   if(crmMigratedOnLoad) persist('business');
   remapConvertedLeadRefs();

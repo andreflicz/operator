@@ -87,6 +87,10 @@ function leadIsOpen(p){ const st = crmStage('lead', p.stage); return !(st && (st
 function crmTracked(kind, x){ return kind==='lead' ? leadIsOpen(x) : clientStageActive(x.stage); }
 function crmCadence(kind, x){ return Number(x.cadenceDays) || (kind==='lead' ? crm().leadCadenceDays : crm().clientCadenceDays) || 7; }
 function crmLastTouch(kind, x){
+  if(RC) return memo('lt:'+kind+':'+x.id, function(){ return crmLastTouchRaw(kind, x); });
+  return crmLastTouchRaw(kind, x);
+}
+function crmLastTouchRaw(kind, x){
   const dates = arr(x.touchpoints).map(function(t){ return t.date; });
   if(kind==='client') arr(x.touches).forEach(function(d){ dates.push(d); });
   if(!dates.length) return null;
@@ -283,23 +287,44 @@ function crmFiltered(kind){
   };
   return list.slice().sort(sorts[f.sort]||sorts.due);
 }
+// Search, filters and sort sit behind one button so the page stays clean; a badge shows how
+// many are active while it's closed.
+function crmFiltersActive(kind){
+  const f = crmUi(kind);
+  return (f.q?1:0)+(f.stage?1:0)+(f.source?1:0)+(f.last?1:0)+((f.sort||'due')!=='due'?1:0);
+}
 function crmToolbar(kind){
   const f = crmUi(kind);
   const sources = LEAD_SOURCES;
-  return '<div class="crm-toolbar">'+
-    '<input class="input" id="crmSearch-'+kind+'" placeholder="Search '+(kind==='lead'?'leads':'clients')+'…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
-    '<select class="input" data-crm-filter="'+kind+':stage"><option value="">All stages</option>'+crmStages(kind).map(function(s){ return '<option value="'+s.id+'" '+(f.stage===s.id?'selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select>'+
-    '<select class="input" data-crm-filter="'+kind+':source"><option value="">Any source</option>'+sources.map(function(s){ return '<option value="'+s.id+'" '+(f.source===s.id?'selected':'')+'>'+s.label+'</option>'; }).join('')+'</select>'+
-    '<select class="input" data-crm-filter="'+kind+':last"><option value="">Last contacted: any</option>'+[['due','Touch due / overdue'],['7','Not in 7+ days'],['14','Not in 14+ days'],['30','Not in 30+ days'],['never','Never contacted']].map(function(o){ return '<option value="'+o[0]+'" '+(f.last===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
-    '<select class="input" data-crm-filter="'+kind+':sort">'+[['due','Sort: most overdue'],['last','Sort: last contacted'],['value','Sort: '+(kind==='lead'?'value':'MRR')],['name','Sort: name'],['created','Sort: newest']].map(function(o){ return '<option value="'+o[0]+'" '+(f.sort===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
-    '<div class="seg-tabs" style="margin:0;">'+
-      '<button class="seg-tab'+(f.view==='board'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="board">Board</button>'+
-      '<button class="seg-tab'+(f.view==='list'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="list">List</button>'+
+  const active = crmFiltersActive(kind);
+  return '<div class="crm-toolbar crm-toolbar-slim">'+
+      '<button class="btn btn-ghost btn-sm crm-tools-btn'+(f.toolsOpen?' is-open':'')+'" data-action="crmToggleTools" data-kind="'+kind+'">&#128269; Search &amp; sort'+(active?'<span class="th-badge">'+active+'</span>':'')+'</button>'+
+      (active ? '<button class="mini-move" data-action="crmClearFilters" data-kind="'+kind+'">Clear</button>' : '')+
+      '<span style="flex:1"></span>'+
+      '<div class="seg-tabs" style="margin:0;">'+
+        '<button class="seg-tab'+(f.view==='board'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="board">Board</button>'+
+        '<button class="seg-tab'+(f.view==='list'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="list">List</button>'+
+      '</div>'+
+      '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="'+kind+'">+ Add '+(kind==='lead'?'lead':'client')+'</button>'+
     '</div>'+
-    (kind==='client' ? '<div class="seg-tabs" style="margin:0;" title="Group the board by"><button class="seg-tab'+(f.group!=='cycle'?' active':'')+'" data-action="crmGroup" data-id="stage">By status</button><button class="seg-tab'+(f.group==='cycle'?' active':'')+'" data-action="crmGroup" data-id="cycle">By cycle step</button></div><button class="btn btn-ghost btn-sm" data-action="openLifecycleEditor" title="Design your client cycles: steps, calls, forms, videos">&#9881; Cycles</button>' : '')+
-    '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="'+kind+'">+ Add '+(kind==='lead'?'lead':'client')+'</button>'+
-  '</div>';
+    (f.toolsOpen ? '<div class="crm-toolbar crm-tools-row">'+
+      '<input class="input" id="crmSearch-'+kind+'" placeholder="Search '+(kind==='lead'?'leads':'clients')+'…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
+      '<select class="input" data-crm-filter="'+kind+':stage"><option value="">All stages</option>'+crmStages(kind).map(function(s){ return '<option value="'+s.id+'" '+(f.stage===s.id?'selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select>'+
+      '<select class="input" data-crm-filter="'+kind+':source"><option value="">Any source</option>'+sources.map(function(s){ return '<option value="'+s.id+'" '+(f.source===s.id?'selected':'')+'>'+s.label+'</option>'; }).join('')+'</select>'+
+      '<select class="input" data-crm-filter="'+kind+':last"><option value="">Last contacted: any</option>'+[['due','Touch due / overdue'],['7','Not in 7+ days'],['14','Not in 14+ days'],['30','Not in 30+ days'],['never','Never contacted']].map(function(o){ return '<option value="'+o[0]+'" '+(f.last===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
+      '<select class="input" data-crm-filter="'+kind+':sort">'+[['due','Sort: most overdue'],['last','Sort: last contacted'],['value','Sort: '+(kind==='lead'?'value':'MRR')],['name','Sort: name'],['created','Sort: newest']].map(function(o){ return '<option value="'+o[0]+'" '+(f.sort===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
+    '</div>' : '');
 }
+ACTIONS.crmToggleTools = function(el){
+  const kind = el.dataset.kind, f = crmUi(kind);
+  f.toolsOpen = !f.toolsOpen; renderView();
+  if(f.toolsOpen){ const i = document.getElementById('crmSearch-'+kind); if(i) i.focus(); }
+};
+ACTIONS.crmClearFilters = function(el){
+  const f = crmUi(el.dataset.kind);
+  f.q = ''; f.stage = ''; f.source = ''; f.last = ''; f.sort = 'due'; f.csort = 'health';
+  renderView();
+};
 ACTIONS.crmView = function(el, e, id){ crmUi(el.dataset.kind).view = id; renderView(); };
 document.addEventListener('change', function(e){
   const t = e.target; if(!t || !t.dataset || !t.dataset.crmFilter) return;

@@ -49,5 +49,6 @@
   "32-clock-timer-alarms.js",
   "32b-wake.js",
   "33-event-delegation.js",
+  "33b-overlay-dismiss.js",
   "34-init.js"
 ]

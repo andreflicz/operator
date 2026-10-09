@@ -7,11 +7,11 @@ const SP = require('./common.js').OUT;
   const E = (code) => p.evaluate(c => window.__op.ev(c), code);
   const els = () => E("cvBoard().elements");
   await p.click('[data-action="nav"][data-view="personal"]');
-  await p.click('[data-action="personalTab"][data-tab="vision"]');
+  await p.click('[data-action="personalTab"][data-tab="journal"]'); await p.click('[data-action="journalMode"][data-id="boards"]');
   check('empty state', await p.isVisible('.board-empty'));
   await p.click('[data-action="boardTemplate"]'); await p.waitForTimeout(200);
   check('template board (7 elements, nested board)', (await els()).length===7 && (await E("boardsOfKind('vision').length"))===2);
-  check('cards rendered', (await p.$$('.bel')).length===6 && (await p.$$('.board-lines line.bline')).length===1);
+  check('cards rendered', (await p.$$('#boardHost .bel')).length===6 && (await p.$$('.board-lines line.bline')).length===1);
   await p.screenshot({path:SP+'/p4-vision.png'});
   // add note + edit text
   await p.click('[data-action="boardAddNote"]');
@@ -99,7 +99,7 @@ const SP = require('./common.js').OUT;
   await p.waitForTimeout(500);
   const count = (await els()).length;
   await p.reload(); await p.waitForTimeout(500);
-  await p.click('[data-action="nav"][data-view="personal"]'); await p.click('[data-action="personalTab"][data-tab="vision"]');
+  await p.click('[data-action="nav"][data-view="personal"]'); await p.click('[data-action="personalTab"][data-tab="journal"]'); await p.click('[data-action="journalMode"][data-id="boards"]');
   check('autosaved across reload', (await els()).length===count && (await p.$$('.bel')).length>0);
   // journal boards
   await p.click('[data-action="personalTab"][data-tab="journal"]');

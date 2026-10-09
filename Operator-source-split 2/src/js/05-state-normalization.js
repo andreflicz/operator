@@ -203,9 +203,8 @@ function normalizeWake(f){
     days: Array.isArray(w.days) ? w.days.map(Number).filter(function(d){ return d>=0 && d<=6; }) : [1,2,3,4,5,6],
     override: (w.override && w.override.date && w.override.date>=todayStr()) ? w.override : null,
     sound: ['standard','peaceful','loud'].indexOf(w.sound)>=0 ? w.sound : 'peaceful',
-    media: (w.media && (w.media.ref || w.media.url)) ? w.media : null,
+    media: (w.media && (w.media.ref || w.media.url || (w.media.type==='music' && w.media.q))) ? w.media : null,
     snoozeMinutes: Number(w.snoozeMinutes)>0 ? Number(w.snoozeMinutes) : 9,
-    secondScreen: !!w.secondScreen,
     lastFiredTs: Number(w.lastFiredTs)||0,
     armedAt: Number(w.armedAt)||Date.now()
   };
@@ -396,6 +395,7 @@ function normalizeDashboardPanels(d){
   if(!d.journalRaised){ moveAfter('journal', 'personalStats', 0); d.journalRaised = true; }
   if(!d.visionPanelAdded){ moveAfter('vision', 'personalStats', 0); d.visionPanelAdded = true; }
   if(!d.v2PanelsAdded){ moveAfter('agenda', 'vision', 1); moveAfter('week', 'goals', d.order.length); moveAfter('heatmap', 'week', d.order.length); moveAfter('why', 'heatmap', d.order.length); d.v2PanelsAdded = true; }
+  if(!d.agendaOff){ d.enabled.agenda = false; d.agendaOff = true; }
   if(!d.reachOutAdded){ moveAfter('clientHub', 'journal', 1); d.reachOutAdded = true; d.clientStepsAdded = true; }
   return d;
 }
@@ -424,6 +424,7 @@ function normalizeSettings(s){
   if(s.appTracking.graceMinutes==null || isNaN(Number(s.appTracking.graceMinutes))) s.appTracking.graceMinutes=3;
   if(s.appTracking.cooldownMinutes==null || isNaN(Number(s.appTracking.cooldownMinutes))) s.appTracking.cooldownMinutes=15;
   if(s.appTracking.idleSeconds==null || isNaN(Number(s.appTracking.idleSeconds))) s.appTracking.idleSeconds=60;
+  if(!s.appTracking.distractionSince) s.appTracking.distractionSince = todayStr();
   return s;
 }
 function normalizePersonal(p){
@@ -450,6 +451,8 @@ function normalizeBoards(b){
     b.boards.forEach(function(bd){ if(bd.kind==='vision' && (!master || rootOf(bd)!==master)) bd.kind = 'milanote'; });
     b.milanoteSplit = true;
   }
+  // Everything now lives in Journal → Boards (the separate Milanote section is gone).
+  if(!b.journalMerge){ b.boards.forEach(function(bd){ if(bd.kind==='milanote') bd.kind = 'journal'; }); b.journalMerge = true; }
   if(b.masterId && !b.boards.some(function(bd){ return bd.id===b.masterId; })) b.masterId = null;
   return b;
 }

@@ -23,6 +23,6 @@
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSAppleEventsUsageDescription</key>
-    <string>Operator checks which app is currently in the foreground so it can show your most-used apps and auto lock-in when you've been steady on one app for a while. This stays entirely on your Mac.</string>
+    <string>Operator checks which app (and, in your browser, which website) is in front so it can track work time and lock in automatically, and asks the Music app to play your wake-up song. Everything stays on your Mac.</string>
 </dict>
 </plist>

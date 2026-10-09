@@ -72,13 +72,13 @@ function daysInProgress(t){
   const now = new Date(todayStr());
   return Math.max(0, Math.round((now-start)/86400000));
 }
+function todayMidnightMs(){ const tp = todayStr().split('-').map(Number); return +new Date(tp[0],tp[1]-1,tp[2]); }
 function daysAgoFrom(dateStr){
   if(!dateStr) return null;
   const p = dateStr.split('-').map(Number);
   const d = new Date(p[0],p[1]-1,p[2]);
-  const tp = todayStr().split('-').map(Number);
-  const now = new Date(tp[0],tp[1]-1,tp[2]);
-  return Math.round((now-d)/86400000);
+  const nowMs = RC ? memo('todayMid', todayMidnightMs) : todayMidnightMs();
+  return Math.round((nowMs-d)/86400000);
 }
 function relativeDayLabel(dateStr){
   const d = daysAgoFrom(dateStr);

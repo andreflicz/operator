@@ -95,7 +95,6 @@ function fabContext(){
     if(ui.personalTab==='journal' && ui.journalMode==='boards' && typeof canvasAddNote==='function') return {label:'Add note to board', run:function(){ canvasAddNote(); }};
     if(ui.personalTab==='journal') return {label:'New journal entry', run:openQuickJournalModal};
     if(ui.personalTab==='wishlist' && typeof openWishItemModal==='function') return {label:'Add wish list item', run:function(){ openWishItemModal(null); }};
-    if((ui.personalTab==='vision' || ui.personalTab==='milanote') && typeof canvasAddNote==='function') return {label:'Add card to board', run:function(){ canvasAddNote(); }};
     if(ui.personalTab==='fitness') return {label:'Log workout', run:function(){ ui.healthTab='workouts'; renderView(); const el=document.getElementById('gymType'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
     return {label:'Add goal', run:function(){ const el=document.getElementById('newGoalTitle')||document.querySelector('#viewRoot .tab-panel input'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
   }

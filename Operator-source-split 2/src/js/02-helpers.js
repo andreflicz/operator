@@ -113,6 +113,7 @@ function applySidebarState(){
   const nav = document.getElementById('sidebarNav');
   if(!nav) return;
   nav.classList.toggle('collapsed', !!state.profile.sidebarCollapsed);
+  document.body.classList.toggle('sb-collapsed', !!state.profile.sidebarCollapsed);
   setTimeout(function(){ if(typeof stretchLockedHeaderLine==='function') stretchLockedHeaderLine(); }, 230);
 }
 function toggleSidebar(){
