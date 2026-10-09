@@ -959,6 +959,321 @@
   .touch-more-btn:hover{ background:transparent; color:var(--text); }
   .touch-btns.is-touched .touch-log-btn{ background:var(--good-dim); border-color:rgba(63,190,142,.5); color:var(--good); font-weight:700; }
   .cc2-owed.is-caught{ color:var(--text-faint); background:var(--panel-2); }
+  /* ---- boards: switcher strip, full screen, vision on Today ---- */
+  .board-strip{ display:flex; gap:10px; overflow-x:auto; padding:2px 2px 8px; scroll-snap-type:x proximity; }
+  .board-pill{ flex:0 0 168px; display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:left; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:8px; color:var(--text); scroll-snap-align:start; transition:border-color .15s, transform .15s, box-shadow .15s; }
+  .board-pill:hover{ border-color:#3a4152; transform:translateY(-1px); }
+  .board-pill.is-active{ border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset; }
+  .board-pill-thumb{ width:100%; height:84px; border-radius:8px; background:#0a0c10; overflow:hidden; display:flex; margin-bottom:6px; pointer-events:none; }
+  .board-pill-thumb .board-static{ flex:1; }
+  .board-pill-empty{ margin:auto; font-size:11px; color:var(--text-faint); }
+  .board-pill-name{ font-family:var(--font-display); font-weight:700; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+  .board-pill-count{ font-size:11px; color:var(--text-faint); }
+  .board-pill-new{ align-items:center; justify-content:center; border-style:dashed; background:transparent; color:var(--text-dim); min-height:136px; }
+  .board-pill-plus{ font-size:24px; line-height:1; margin-bottom:6px; color:var(--text-dim); }
+  .board-thumb .bel{ box-shadow:none; }
+  .board-shell.is-full{ position:fixed; inset:0; z-index:250; background:var(--bg); padding:14px 16px; gap:8px; animation:overlayFadeIn .15s ease-out; }
+  .board-shell.is-full .board-host{ flex:1; height:auto; min-height:0; }
+  .vision-panel-box{ position:relative; height:clamp(220px, 34vh, 360px); border-radius:16px; overflow:hidden; background:#0a0c10; border:1px solid var(--border); cursor:pointer; transition:border-color .2s; }
+  .vision-panel-box:hover{ border-color:#3a4152; }
+  .vision-panel-box .board-static{ position:absolute; inset:0; }
+  .vision-panel-hint{ position:absolute; right:12px; bottom:10px; font-size:11.5px; color:var(--text-dim); background:rgba(10,12,16,.75); border:1px solid var(--border); border-radius:20px; padding:4px 10px; opacity:0; transition:opacity .2s; }
+  .vision-panel-box:hover .vision-panel-hint{ opacity:1; }
+  .vision-panel-empty{ display:flex; align-items:center; gap:12px; cursor:pointer; }
+  .vision-panel-empty:hover{ border-color:var(--accent); }
+  .cc2-foot, .hub-foot{ margin-top:auto; min-height:38px; }
+  .cc2-grid, .hub-grid{ align-items:stretch; }
+  .crm-due.due-0, .crm-due.due-1, .crm-due.due-2, .crm-due.due-3{ color:var(--danger); }
+  /* ---- Today hero ---- */
+  .today-hero{ display:flex; align-items:stretch; justify-content:space-between; gap:24px; flex-wrap:wrap; margin:6px 0 22px; padding:22px 24px; border-radius:18px; border:1px solid var(--border); background:radial-gradient(ellipse at 100% 0%, rgba(63,190,142,.10), transparent 55%), radial-gradient(ellipse at 0% 100%, rgba(232,162,61,.07), transparent 60%), var(--panel); }
+  .th-left{ display:flex; flex-direction:column; gap:6px; min-width:240px; justify-content:center; }
+  .th-greet{ font-family:var(--font-display); font-size:30px; font-weight:700; letter-spacing:-.01em; line-height:1.15; }
+  .th-sub{ color:var(--text-dim); font-size:14px; }
+  .th-bigclock{ font-size:38px; margin-top:2px; }
+  .th-chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  .th-chip{ display:inline-flex; align-items:center; gap:6px; background:var(--panel-2); border:1px solid var(--border); border-radius:999px; padding:7px 14px; font-size:13px; font-weight:600; color:var(--text-dim); }
+  .th-chip.is-hot{ color:#f3c988; border-color:rgba(232,162,61,.35); }
+  .th-right{ position:relative; display:flex; flex-direction:column; align-items:stretch; gap:10px; min-width:280px; max-width:400px; flex:1; justify-content:center; }
+  .lockin-cta{ position:relative; display:flex; align-items:center; gap:14px; text-align:left; padding:18px 20px; border-radius:16px; border:1px solid rgba(63,190,142,.6); background:linear-gradient(135deg, #3FBE8E, #2a9c72); color:#06140e; box-shadow:0 10px 34px rgba(63,190,142,.32), inset 0 1px 0 rgba(255,255,255,.25); transition:transform .15s ease, box-shadow .2s ease; overflow:hidden; }
+  .lockin-cta::after{ content:''; position:absolute; inset:0; background:linear-gradient(110deg, transparent 30%, rgba(255,255,255,.22) 50%, transparent 70%); transform:translateX(-120%); animation:lockinSheen 5s ease-in-out infinite; }
+  @keyframes lockinSheen{ 0%,70%{ transform:translateX(-120%);} 100%{ transform:translateX(120%);} }
+  .lockin-cta:hover{ transform:translateY(-2px); box-shadow:0 14px 40px rgba(63,190,142,.45), inset 0 1px 0 rgba(255,255,255,.25); }
+  .lockin-cta:active{ transform:translateY(0) scale(.99); }
+  .lockin-icon{ font-size:26px; width:48px; height:48px; border-radius:14px; background:rgba(6,20,14,.18); display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .lockin-copy{ display:flex; flex-direction:column; min-width:0; flex:1; }
+  .lockin-title{ font-family:var(--font-display); font-size:22px; font-weight:800; letter-spacing:.01em; text-transform:uppercase; }
+  .lockin-sub{ font-size:13px; font-weight:600; opacity:.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .lockin-key{ font-family:var(--font-display); font-size:11px; font-weight:700; border:1px solid rgba(6,20,14,.35); border-radius:6px; padding:2px 6px; opacity:.7; }
+  .th-actions{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .th-link{ background:none; border:none; color:var(--text-dim); font-size:13px; font-weight:600; padding:4px 2px; }
+  .th-link:hover{ color:var(--text); }
+  .dayoff-btn{ position:relative; overflow:hidden; display:inline-flex; align-items:center; gap:8px; border-radius:999px; border:1px solid rgba(232,162,61,.45); background:transparent; color:var(--accent); font-weight:600; font-size:13px; padding:8px 14px; transition:transform .15s, border-color .2s, background .2s, box-shadow .2s; user-select:none; touch-action:none; }
+  .dayoff-btn:hover{ transform:translateY(-1px); background:rgba(232,162,61,.08); box-shadow:0 6px 20px rgba(232,162,61,.18); }
+  .dayoff-fill{ position:absolute; left:0; top:0; bottom:0; width:0; background:linear-gradient(90deg, rgba(232,162,61,.35), rgba(232,162,61,.55)); transition:width .2s ease; }
+  .dayoff-btn.holding .dayoff-fill{ width:100%; transition:width .9s linear; }
+  .dayoff-btn.held{ background:var(--accent); color:#1a1305; }
+  .dayoff-label, .dayoff-hint{ position:relative; }
+  .dayoff-hint{ font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; opacity:0; transition:opacity .2s; border:1px solid currentColor; border-radius:5px; padding:0 5px; }
+  .dayoff-btn:hover .dayoff-hint{ opacity:.8; }
+  .dayoff-btn.nudge{ animation:nudgeX .45s ease; }
+  @keyframes nudgeX{ 0%,100%{ transform:translateX(0);} 25%{ transform:translateX(-4px);} 75%{ transform:translateX(4px);} }
+  .next-picker{ position:absolute; top:100%; left:0; right:0; z-index:30; margin-top:6px; background:var(--panel-2); border:1px solid var(--border); border-radius:12px; padding:10px; box-shadow:0 18px 40px rgba(0,0,0,.45); max-height:340px; overflow-y:auto; animation:overlayFadeIn .12s ease-out; }
+  .now-next{ position:relative; }
+  .np-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .np-row{ display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:transparent; border:1px solid transparent; border-radius:8px; padding:7px 8px; color:var(--text); font-size:13px; }
+  .np-row:hover{ background:var(--panel); border-color:var(--border); }
+  .np-row.is-on{ border-color:var(--accent); background:var(--accent-dim); }
+  .np-title{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .np-check{ color:var(--accent); font-weight:700; }
+  .np-auto{ color:var(--text-dim); font-style:italic; margin-top:4px; }
+  /* right-click menu */
+  .ctx-menu{ position:fixed; z-index:400; min-width:220px; max-width:280px; background:#171a23; border:1px solid #2c3242; border-radius:12px; padding:6px; box-shadow:0 18px 50px rgba(0,0,0,.55); animation:overlayFadeIn .1s ease-out; }
+  .ctx-title{ font-size:11.5px; color:var(--text-faint); padding:4px 8px 6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ctx-item{ display:block; width:100%; text-align:left; background:transparent; border:none; color:var(--text); font-size:13px; padding:7px 9px; border-radius:7px; }
+  .ctx-item:hover{ background:var(--panel-2); }
+  .ctx-danger{ color:#ffb3b8; } .ctx-danger:hover{ background:var(--danger-dim); }
+  .ctx-sep{ height:1px; background:var(--border); margin:5px 2px; }
+  .ctx-row{ display:flex; align-items:center; gap:4px; padding:3px 6px; }
+  .ctx-k{ font-size:11px; color:var(--text-faint); width:52px; flex-shrink:0; }
+  .ctx-chip{ display:inline-block; width:auto; padding:4px 9px; border:1px solid var(--border); border-radius:999px; font-size:12px; }
+  .ctx-chip.is-on{ border-color:var(--accent); color:var(--accent); }
+  /* calmer panel headers on Today */
+  .today-panels .section-title > .kpi-sub{ display:none; }
+  /* stat tiles + goals */
+  .stat-tiles{ display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:10px; }
+  .stat-tile{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:14px 16px; display:flex; flex-direction:column; gap:6px; transition:border-color .15s; }
+  .stat-tile:hover{ border-color:#343a4a; }
+  .stat-tile-k{ font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); font-weight:700; }
+  .stat-tile-v{ font-family:var(--font-display); font-size:26px; font-weight:700; line-height:1.1; }
+  .stat-tile-of{ font-size:15px; color:var(--text-faint); font-weight:600; }
+  .stat-tile-sub{ font-size:12px; color:var(--text-dim); }
+  .pb{ height:6px; border-radius:4px; background:var(--panel-2); overflow:hidden; }
+  .pb-fill{ height:100%; border-radius:4px; transition:width .5s ease; }
+  .goal-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:10px; }
+  .goal-card{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:14px 16px; display:flex; flex-direction:column; gap:8px; }
+  .goal-card.is-done{ opacity:.7; }
+  .goal-card-head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .goal-card-title{ font-family:var(--font-display); font-weight:700; font-size:15px; flex:1; min-width:0; cursor:pointer; }
+  .goal-chip{ font-size:11px; font-weight:600; color:var(--text-dim); background:var(--panel-2); border-radius:999px; padding:2px 8px; white-space:nowrap; }
+  .goal-chip.is-soon{ color:#f3c988; } .goal-chip.is-late{ color:#ffb3b8; background:var(--danger-dim); }
+  .goal-card-nums{ display:flex; align-items:baseline; gap:4px; font-size:12.5px; color:var(--text-dim); }
+  .goal-card-nums b{ color:var(--text); font-family:var(--font-display); font-size:15px; }
+  .goal-pct{ margin-left:auto; font-weight:700; color:var(--text-dim); }
+  .goal-card-actions{ display:flex; align-items:center; gap:6px; margin-top:2px; }
+  .goal-step{ width:28px; height:28px; border-radius:50%; border:1px solid var(--border); background:transparent; color:var(--text); font-size:15px; }
+  .goal-step:hover{ border-color:var(--good); color:var(--good); }
+  .goal-form{ margin-bottom:12px; }
+  /* agenda */
+  .ag-card{ padding:10px 14px; }
+  .ag-row{ display:flex; align-items:center; gap:12px; padding:7px 4px; border-radius:8px; }
+  .ag-row[data-action]{ cursor:pointer; } .ag-row[data-action]:hover{ background:var(--panel-2); }
+  .ag-row.is-past{ opacity:.45; }
+  .ag-time{ font-family:var(--font-display); font-weight:700; font-size:12.5px; width:70px; color:var(--text-dim); flex-shrink:0; }
+  .ag-dot{ width:8px; height:8px; border-radius:50%; background:var(--text-faint); flex-shrink:0; }
+  .ag-wake .ag-dot{ background:var(--accent); } .ag-deadline .ag-dot{ background:var(--danger); } .ag-alarm .ag-dot, .ag-reminder .ag-dot{ background:var(--info); }
+  .ag-label{ flex:1; min-width:0; font-size:13.5px; }
+  .ag-now{ display:flex; align-items:center; gap:8px; margin:2px 0; }
+  .ag-now::before, .ag-now::after{ content:''; height:1px; background:var(--good); opacity:.6; }
+  .ag-now::before{ width:76px; } .ag-now::after{ flex:1; }
+  .ag-now span{ font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--good); }
+  /* this week */
+  .wk-card{ padding:16px 18px; }
+  .wk-top{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px; }
+  .wk-bars{ position:relative; display:grid; grid-template-columns:repeat(7,1fr); gap:10px; height:130px; }
+  .wk-target{ position:absolute; left:0; right:0; border-top:1px dashed rgba(63,190,142,.45); pointer-events:none; }
+  .wk-col{ display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; }
+  .wk-bar-wrap{ flex:1; width:100%; display:flex; align-items:flex-end; justify-content:center; }
+  .wk-bar{ width:70%; max-width:34px; border-radius:6px 6px 3px 3px; background:linear-gradient(180deg, rgba(232,162,61,.9), rgba(232,162,61,.45)); transition:height .5s ease; }
+  .wk-bar.hit{ background:linear-gradient(180deg, #3FBE8E, rgba(63,190,142,.5)); }
+  .wk-day{ font-size:11px; font-weight:700; color:var(--text-faint); }
+  .wk-col.is-today .wk-day{ color:var(--text); }
+  .wk-col.is-future .wk-bar-wrap{ background:repeating-linear-gradient(0deg, transparent 0 6px, rgba(255,255,255,.02) 6px 7px); border-radius:6px; }
+  /* heatmap */
+  .hm-card{ padding:16px 18px; overflow-x:auto; }
+  .hm-grid{ display:flex; gap:4px; }
+  .hm-col{ display:flex; flex-direction:column; gap:4px; }
+  .hm-cell{ display:inline-block; width:14px; height:14px; border-radius:4px; background:var(--panel-2); }
+  .hm-cell.hm-1{ background:rgba(63,190,142,.22); } .hm-cell.hm-2{ background:rgba(63,190,142,.42); } .hm-cell.hm-3{ background:rgba(63,190,142,.65); } .hm-cell.hm-4{ background:#3FBE8E; }
+  .hm-cell.hm-off{ background:rgba(232,162,61,.25); }
+  .hm-cell.is-future{ background:transparent; border:1px dashed var(--border); }
+  .hm-cell.is-std{ box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55); }
+  .hm-foot{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:10px; font-size:12px; color:var(--text-dim); flex-wrap:wrap; }
+  .hm-legend{ display:inline-flex; align-items:center; gap:4px; }
+  .hm-legend .hm-cell{ width:10px; height:10px; }
+  /* why */
+  .why-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:10px; }
+  .why-col{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:14px 16px; display:flex; flex-direction:column; gap:8px; }
+  .why-toward{ border-top:3px solid var(--good); } .why-away{ border-top:3px solid var(--danger); }
+  .why-k{ font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); font-weight:700; }
+  .why-item{ font-family:var(--font-display); font-size:15px; font-weight:600; line-height:1.35; }
+  .why-empty{ display:flex; align-items:center; gap:12px; cursor:pointer; } .why-empty:hover{ border-color:var(--accent); }
+  @media (max-width:760px){ .th-right{ max-width:none; } .th-greet{ font-size:24px; } }
+  @media (min-width: 901px){ .today-hero .th-right{ margin-right:44px; } }
+  .hm-card{ display:flex; gap:28px; align-items:center; flex-wrap:wrap; }
+  .hm-main{ flex:0 0 auto; max-width:100%; overflow-x:auto; }
+  .hm-grid{ gap:4px; }
+  .hm-cell{ width:15px; height:15px; }
+  .hm-stats{ flex:1; display:grid; grid-template-columns:repeat(auto-fit, minmax(130px,1fr)); gap:14px; min-width:220px; }
+  .hm-stat .stat-tile-v{ font-size:22px; }
+  @media (min-width: 901px){ #viewRoot:has(> .quick-access-dock) { padding-right:56px; } }
+  /* ---- fitness ---- */
+  .fit-hero{ display:flex; align-items:center; gap:28px; flex-wrap:wrap; padding:20px 22px; background:radial-gradient(ellipse at 0% 50%, rgba(232,162,61,.08), transparent 60%), var(--panel); }
+  .fit-mid{ flex:1; min-width:260px; display:flex; flex-direction:column; gap:10px; }
+  .fit-strip{ display:grid; grid-template-columns:repeat(7,1fr); gap:8px; }
+  .fit-day{ display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .fit-day-dot{ width:42px; height:42px; border-radius:50%; border:2px dashed var(--border); display:flex; align-items:center; justify-content:center; font-size:19px; transition:transform .2s, background .2s; }
+  .fit-day.is-done .fit-day-dot{ border:2px solid var(--good); background:var(--good-dim); }
+  .fit-day.is-today .fit-day-dot{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(232,162,61,.15); }
+  .fit-day.is-today.is-done .fit-day-dot{ border-color:var(--good); box-shadow:0 0 0 3px rgba(63,190,142,.18); }
+  .fit-day.is-future .fit-day-dot{ opacity:.35; }
+  .fit-day:hover .fit-day-dot{ transform:scale(1.06); }
+  .fit-day-n{ font-size:11px; font-weight:700; color:var(--text-faint); }
+  .fit-day.is-today .fit-day-n{ color:var(--text); }
+  .fit-today{ font-size:13px; color:var(--text-dim); }
+  .fit-stats{ display:grid; grid-template-columns:repeat(3, auto); gap:22px; }
+  .fit-stats .stat-tile-v{ font-size:22px; }
+  .fit-log{ display:flex; flex-direction:column; gap:12px; }
+  .fit-types{ display:flex; gap:8px; flex-wrap:wrap; }
+  .fit-type{ display:inline-flex; align-items:center; gap:8px; background:var(--panel-2); border:1px solid var(--border); border-radius:12px; padding:9px 14px; color:var(--text); font-weight:600; font-size:13px; transition:border-color .15s, transform .15s, background .15s; }
+  .fit-type:hover{ transform:translateY(-1px); border-color:#3a4152; }
+  .fit-type.is-on{ border-color:var(--accent); background:var(--accent-dim); }
+  .fit-type-i{ font-size:17px; }
+  .fit-row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .fit-durs{ display:flex; gap:4px; background:var(--panel-2); border:1px solid var(--border); border-radius:10px; padding:3px; }
+  .fit-dur{ background:transparent; border:none; color:var(--text-dim); font-weight:600; font-size:12.5px; padding:6px 10px; border-radius:7px; }
+  .fit-dur.is-on{ background:var(--accent); color:#1a1305; }
+  .fit-log-btn{ padding:10px 20px; }
+  .fit-week{ margin-bottom:14px; }
+  .fit-week-head{ display:flex; justify-content:space-between; align-items:baseline; font-family:var(--font-display); font-weight:700; font-size:13px; margin-bottom:6px; color:var(--text-dim); }
+  .fit-entry{ display:flex; align-items:center; gap:12px; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:10px 12px; margin-bottom:6px; }
+  .fit-entry-i{ font-size:20px; width:36px; height:36px; border-radius:10px; background:var(--panel-2); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .fit-entry-main{ flex:1; min-width:0; }
+  .fit-entry-title{ font-weight:600; }
+  /* ---- business snapshot ---- */
+  .biz-card{ display:grid; grid-template-columns:minmax(260px, 1.5fr) minmax(200px, 1fr) minmax(200px, .9fr); gap:26px; padding:20px 22px; background:radial-gradient(ellipse at 0% 0%, rgba(63,190,142,.09), transparent 55%), var(--panel); }
+  .biz-main{ display:flex; flex-direction:column; gap:10px; }
+  .biz-mrr{ font-family:var(--font-display); font-size:44px; font-weight:700; line-height:1; letter-spacing:-.02em; color:#fff; }
+  .biz-mrr span{ font-size:16px; color:var(--text-faint); font-weight:600; margin-left:3px; }
+  .biz-bar{ position:relative; display:flex; height:12px; border-radius:7px; background:var(--panel-2); overflow:visible; margin-top:16px; }
+  .biz-bar-mrr{ height:100%; background:linear-gradient(90deg, #2a9c72, #3FBE8E); border-radius:7px 0 0 7px; transition:width .6s ease; }
+  .biz-bar-pipe{ height:100%; background:repeating-linear-gradient(135deg, rgba(232,162,61,.75) 0 6px, rgba(232,162,61,.45) 6px 12px); transition:width .6s ease; }
+  .biz-goal{ position:absolute; top:-6px; bottom:-6px; width:2px; background:#fff; border-radius:2px; }
+  .biz-goal span{ position:absolute; bottom:100%; left:50%; transform:translateX(-50%); font-size:10.5px; font-weight:700; color:var(--text-dim); white-space:nowrap; margin-bottom:2px; }
+  .biz-legend{ display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--text-dim); }
+  .biz-legend b{ color:var(--text); }
+  .biz-dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
+  .biz-dot-pipe{ background:var(--accent); }
+  .biz-months{ display:flex; flex-direction:column; gap:8px; }
+  .biz-mbars{ flex:1; display:grid; grid-template-columns:repeat(6,1fr); gap:8px; min-height:100px; }
+  .biz-mcol{ display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .biz-mcol span{ font-size:10.5px; color:var(--text-faint); font-weight:600; }
+  .biz-mbar-wrap{ flex:1; width:100%; display:flex; align-items:flex-end; justify-content:center; }
+  .biz-mbar{ width:70%; border-radius:5px 5px 2px 2px; background:rgba(143,220,255,.35); transition:height .5s ease; }
+  .biz-mcol.is-now .biz-mbar{ background:linear-gradient(180deg, #8fdcff, rgba(143,220,255,.5)); }
+  .biz-mcol.is-now span{ color:var(--text); }
+  .biz-side{ display:flex; flex-direction:column; gap:8px; justify-content:center; }
+  .biz-mini{ display:flex; align-items:center; gap:12px; background:var(--panel-2); border:1px solid var(--border); border-radius:12px; padding:9px 12px; cursor:pointer; transition:border-color .15s; min-width:0; }
+  .biz-mini:hover{ border-color:#3a4152; }
+  .biz-mini-v{ font-family:var(--font-display); font-weight:700; font-size:20px; min-width:26px; }
+  .biz-mini-v.is-warn{ color:var(--accent); }
+  .biz-mini-k{ font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+  @media (max-width:1000px){ .biz-card{ grid-template-columns:1fr; } }
+  /* simpler business card */
+  .biz-card{ grid-template-columns:minmax(220px,1.1fr) minmax(220px,1.3fr) minmax(170px,.8fr); align-items:center; }
+  .biz-mrr{ font-size:40px; }
+  .biz-bar{ height:8px; margin-top:12px; overflow:hidden; }
+  .biz-bar-pipe{ opacity:.55; }
+  .biz-goal-k{ font-size:12px; color:var(--text-dim); margin-top:2px; }
+  .biz-mbars{ min-height:84px; }
+  .biz-side{ gap:6px; }
+  .biz-mini{ padding:7px 12px; gap:10px; }
+  .biz-mini-v{ font-size:17px; }
+  /* hero: streak, buttons, wind-down dropdown */
+  .th-streak{ margin-top:10px; }
+  .th-streak .streak-card{ margin:0; background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:14px; padding:10px 14px; display:inline-flex; align-items:center; gap:16px; flex-wrap:wrap; text-align:left; }
+  .th-streak .streak-main{ margin:0; }
+  .th-streak .streak-status{ margin:0; font-size:12px; }
+  .th-actions{ justify-content:flex-start; gap:8px; }
+  .th-btn{ position:relative; overflow:hidden; display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.03); border:1px solid var(--border); color:var(--text); border-radius:12px; padding:8px 12px 8px 8px; font-weight:600; font-size:13px; transition:transform .15s, border-color .2s, background .2s, box-shadow .2s; user-select:none; }
+  .th-btn:hover{ transform:translateY(-1px); border-color:#3a4152; background:rgba(255,255,255,.05); }
+  .th-btn-i{ position:relative; width:26px; height:26px; border-radius:8px; background:var(--panel-2); display:inline-flex; align-items:center; justify-content:center; font-size:14px; }
+  .th-caret{ font-size:10px; color:var(--text-faint); transition:transform .2s; }
+  .th-btn-night{ border-color:rgba(160,175,255,.3); }
+  .th-btn-night .th-btn-i{ background:rgba(120,130,200,.2); }
+  .th-btn-night:hover{ border-color:rgba(160,175,255,.6); box-shadow:0 6px 20px rgba(120,130,200,.18); }
+  .th-btn-night.is-open .th-caret{ transform:rotate(180deg); }
+  .dayoff-btn{ border-radius:12px; padding:8px 12px 8px 8px; color:var(--text); border-color:rgba(232,162,61,.35); }
+  .dayoff-btn .dayoff-i{ background:rgba(232,162,61,.16); }
+  .dayoff-btn:hover{ border-color:rgba(232,162,61,.7); background:rgba(232,162,61,.06); box-shadow:0 6px 20px rgba(232,162,61,.16); }
+  .dayoff-btn.held{ color:#1a1305; }
+  .wind-drop{ position:absolute; top:100%; left:0; right:0; z-index:30; margin-top:8px; background:#12141c; border:1px solid rgba(160,175,255,.3); border-radius:14px; padding:10px; box-shadow:0 18px 44px rgba(0,0,0,.5); animation:overlayFadeIn .14s ease-out; }
+  .wind-drop .evening-tiles{ grid-template-columns:1fr; gap:6px; }
+  .wind-drop .evening-tile{ flex-direction:row; align-items:center; gap:10px; padding:10px 12px; }
+  .wind-drop .evening-tile .kpi-sub{ margin-left:auto; }
+  .wind-drop .evening-tile-v{ font-size:16px; }
+  .th-actions{ display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:8px; }
+  .th-btn{ justify-content:flex-start; white-space:nowrap; min-width:0; }
+  .th-btn .dayoff-hint{ margin-left:auto; }
+  .th-btn .th-caret{ margin-left:auto; }
+  .th-streak .streak-card.is-compact{ flex-direction:row; }
+  .th-right{ max-width:470px; }
+  .th-btn{ gap:6px; font-size:12.5px; padding:7px 10px 7px 7px; overflow:hidden; text-overflow:ellipsis; }
+  .th-btn-i{ width:22px; height:22px; font-size:12.5px; flex-shrink:0; }
+  /* ---- activity pill ---- */
+  .app-activity-indicator{ display:none !important; }
+  .activity-pill{ position:fixed; left:236px; bottom:16px; z-index:90; display:inline-flex; align-items:center; gap:8px; max-width:340px; background:rgba(20,23,31,.92); backdrop-filter:blur(8px); border:1px solid var(--border); border-radius:999px; padding:6px 12px 6px 10px; color:var(--text); font-size:12.5px; font-weight:600; box-shadow:0 8px 24px rgba(0,0,0,.35); transition:left .22s cubic-bezier(.4,0,.2,1), opacity .2s, transform .2s, border-color .2s; }
+  .activity-pill:hover{ border-color:#3a4152; }
+  .activity-pill.is-hidden{ opacity:0; pointer-events:none; transform:translateY(6px); }
+  body.sb-collapsed .activity-pill{ left:76px; }
+  .ap-dot{ width:8px; height:8px; border-radius:50%; background:var(--text-faint); flex-shrink:0; }
+  .activity-pill[data-cat="work"] .ap-dot{ background:var(--good); box-shadow:0 0 8px var(--good); }
+  .activity-pill[data-cat="other"] .ap-dot{ background:var(--danger); }
+  .activity-pill[data-cat="unsorted"] .ap-dot{ background:#8A90A2; }
+  .ap-name{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+  .ap-lock{ color:var(--good); font-size:11.5px; white-space:nowrap; border-left:1px solid var(--border); padding-left:8px; }
+  .wake-display-mode .activity-pill{ display:none; }
+  .ap-menu{ position:fixed; left:236px; bottom:56px; z-index:95; width:260px; background:#171a23; border:1px solid #2c3242; border-radius:12px; padding:12px; box-shadow:0 18px 50px rgba(0,0,0,.55); animation:overlayFadeIn .12s ease-out; }
+  body.sb-collapsed .ap-menu{ left:76px; }
+  .ap-menu-title{ font-family:var(--font-display); font-weight:700; margin-bottom:8px; word-break:break-all; }
+  .ap-menu-k{ font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; font-weight:700; margin-bottom:6px; }
+  .ap-menu-hint{ font-size:11.5px; color:var(--text-dim); margin-top:8px; }
+  .ap-menu-link{ background:none; border:none; color:var(--accent); font-size:12.5px; font-weight:600; padding:8px 0 0; }
+  .ap-seg{ display:inline-flex; background:var(--panel-2); border:1px solid var(--border); border-radius:9px; padding:2px; gap:2px; }
+  .ap-seg-btn{ background:transparent; border:none; color:var(--text-dim); font-size:12px; font-weight:600; padding:5px 10px; border-radius:7px; }
+  .ap-seg-btn.is-on[data-id="work"]{ background:var(--good-dim); color:var(--good); }
+  .ap-seg-btn.is-on[data-id="other"]{ background:var(--danger-dim); color:#ffb3b8; }
+  .wa-list{ display:flex; flex-direction:column; gap:4px; max-height:380px; overflow-y:auto; }
+  .wa-row{ display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:8px; }
+  .wa-row:hover{ background:var(--panel-2); }
+  .wa-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; display:inline-block; }
+  .wa-name{ flex:1; min-width:0; font-weight:600; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  @media (max-width:900px){ .activity-pill{ left:12px; } .ap-menu{ left:12px; } }
+  /* ---- day recap ---- */
+  .rc-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:14px; }
+  .rc-title{ font-family:var(--font-display); font-size:20px; font-weight:700; }
+  .rc-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
+  .rc-stat{ background:var(--panel-2); border-radius:12px; padding:10px 12px; }
+  .rc-stat .stat-tile-v{ font-size:20px; }
+  .rc-stat.is-good .stat-tile-v{ color:var(--good); }
+  .rc-timeline{ margin:6px 0 14px; }
+  .rc-track{ position:relative; height:22px; border-radius:8px; background:var(--panel-2); overflow:hidden; }
+  .rc-blk{ position:absolute; top:3px; bottom:3px; border-radius:5px; background:var(--good); }
+  .rc-blk.is-auto{ background:rgba(63,190,142,.6); }
+  .rc-blk.is-pending{ background:repeating-linear-gradient(135deg, rgba(232,162,61,.85) 0 5px, rgba(232,162,61,.5) 5px 10px); }
+  .rc-blk.is-break{ background:rgba(143,220,255,.45); top:8px; bottom:8px; }
+  .rc-ticks{ position:relative; height:16px; }
+  .rc-tick{ position:absolute; transform:translateX(-50%); font-size:10.5px; color:var(--text-faint); top:3px; }
+  .rc-split{ margin-bottom:10px; }
+  .rc-split-bar{ height:6px; border-radius:4px; background:var(--danger-dim); overflow:hidden; margin-bottom:6px; }
+  .rc-split-bar span{ display:block; height:100%; background:var(--good); }
+  .rc-apps{ display:flex; flex-wrap:wrap; gap:6px; }
+  .rc-app{ display:inline-flex; align-items:center; gap:6px; background:var(--panel-2); border-radius:999px; padding:4px 10px; font-size:12px; font-weight:600; }
+  .rc-sessions{ display:flex; flex-direction:column; gap:6px; }
+  .rc-sess{ display:flex; align-items:center; gap:10px; background:var(--panel-2); border:1px solid transparent; border-radius:10px; padding:8px 10px; font-size:13px; }
+  .rc-sess.is-pending{ border-color:rgba(232,162,61,.45); }
+  .rc-sess-time{ font-family:var(--font-display); font-weight:700; }
+  .rc-sess-len{ color:var(--text-dim); }
+  @media (max-width:640px){ .rc-stats{ grid-template-columns:1fr 1fr; } }
 </style>
 </head>
 <body>
@@ -1117,6 +1432,10 @@
 </div>
 <div id="boardPickerOverlay" class="overlay hidden">
   <div class="card" id="boardPickerContent" style="max-width:420px; width:100%; max-height:88vh; overflow-y:auto;"></div>
+</div>
+<button id="activityPill" class="activity-pill is-hidden" data-action="activityPillMenu"></button>
+<div id="recapOverlay" class="overlay hidden">
+  <div class="card" id="recapContent" style="max-width:720px; width:100%; max-height:90vh; overflow-y:auto;"></div>
 </div>
 <div id="wakeSetupOverlay" class="overlay hidden">
   <div class="card" id="wakeSetupContent" style="max-width:560px; width:100%; max-height:90vh; overflow-y:auto;"></div>
@@ -1299,7 +1618,12 @@ const PANEL_DEFS = [
   {id:'journal', label:'Journal'},
   {id:'focusMini', label:'Focus'},
   {id:'calendarMini', label:'Calendar'},
-  {id:'tasks', label:"Today's Tasks"}
+  {id:'tasks', label:"Today's Tasks"},
+  {id:'vision', label:'Vision Board'},
+  {id:'agenda', label:'Today — timeline of events, deadlines & alarms'},
+  {id:'week', label:'This Week — deep work per day'},
+  {id:'heatmap', label:'Consistency — 16-week heatmap'},
+  {id:'why', label:'Your Why'}
 ];
 const SMALL_PANELS = ['focusMini', 'calendarMini']; // journal is full-width now that it sits near the top
 const MOODS = [
@@ -2203,6 +2527,8 @@ function normalizeDashboardPanels(d){
     d.order.splice(a>=0 ? a+1 : fallbackIdx, 0, id);
   };
   if(!d.journalRaised){ moveAfter('journal', 'personalStats', 0); d.journalRaised = true; }
+  if(!d.visionPanelAdded){ moveAfter('vision', 'personalStats', 0); d.visionPanelAdded = true; }
+  if(!d.v2PanelsAdded){ moveAfter('agenda', 'vision', 1); moveAfter('week', 'goals', d.order.length); moveAfter('heatmap', 'week', d.order.length); moveAfter('why', 'heatmap', d.order.length); d.v2PanelsAdded = true; }
   if(!d.reachOutAdded){ moveAfter('clientHub', 'journal', 1); d.reachOutAdded = true; d.clientStepsAdded = true; }
   return d;
 }
@@ -2246,6 +2572,18 @@ function normalizeBoards(b){
     if(bd.parentId===undefined) bd.parentId = null;
     if(!bd.viewport || typeof bd.viewport!=='object') bd.viewport = {x:0, y:0, zoom:1};
   });
+  // One master Vision board (plus boards nested inside it); every other top-level vision
+  // board moves, with everything nested in it, to the Milanote section. Nothing is deleted.
+  if(!b.milanoteSplit){
+    const byId = {}; b.boards.forEach(function(bd){ byId[bd.id] = bd; });
+    let master = b.masterId && byId[b.masterId] && byId[b.masterId].kind==='vision' ? byId[b.masterId] : null;
+    if(!master) master = b.boards.filter(function(bd){ return bd.kind==='vision' && !bd.parentId; })[0] || null;
+    b.masterId = master ? master.id : null;
+    const rootOf = function(bd){ let cur = bd, guard = 0; while(cur && cur.parentId && byId[cur.parentId] && guard++<30) cur = byId[cur.parentId]; return cur; };
+    b.boards.forEach(function(bd){ if(bd.kind==='vision' && (!master || rootOf(bd)!==master)) bd.kind = 'milanote'; });
+    b.milanoteSplit = true;
+  }
+  if(b.masterId && !b.boards.some(function(bd){ return bd.id===b.masterId; })) b.masterId = null;
   return b;
 }
 function normalizeAppActivity(a){
@@ -3283,12 +3621,8 @@ function renderPersonalStatsPanel(){
   const target = state.standards.deepWorkTargetMinutes || 180;
   const deepWorkPct = clamp(Math.round(todayFocusMin/target*100),0,100);
   const allStandardsDone = dayStandardsComplete(todayStr());
-  const streakTicked = (lastRenderedStreak!==null && streak!==lastRenderedStreak);
-  lastRenderedStreak = streak;
-
   return '<div class="section">'+
-  renderStreakCard(streak, {ticked:streakTicked, editable:true, status: streak===0 ? 'Complete today\'s standard to start one' : (allStandardsDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Complete today\'s standard to keep it going')})+
-  '<div class="grid grid-3 stat-chip-row" style="margin-top:10px;">'+
+  '<div class="grid grid-3 stat-chip-row">'+
     '<div class="stat-chip" id="statDeepWorkBox">'+deepWorkStatInnerHtml(todayFocusMin)+'</div>'+
     '<div class="stat-chip">'+
       '<div class="stat-chip-label">Time Worked</div>'+
@@ -3311,57 +3645,46 @@ function renderPersonalStatsPanel(){
   yesterdayStandardsFixupHtml()+
   '</div>';
 }
-function renderBusinessPanel(){
-  const clients = arr(state.business.clients);
-  const activeClients = clients.filter(function(c){ return c.status==='active'; });
-  const mrr = activeClients.reduce(function(a,c){ return a+Number(c.mrr||0); },0);
-  const pipeline = arr(state.business.pipeline);
-  const potentialValue = pipeline.filter(function(p){ return p.stage!=='lost' && p.stage!=='closed'; }).reduce(function(a,p){ return a+Number(p.value||0); },0);
-  const inPipeline = pipeline.filter(function(pr){ return pr.stage!=='lost' && pr.stage!=='closed'; });
-  const upcomingCutoff = addDays(todayStr(),7);
-  const upcomingDeadlines = state.tasks.items.filter(function(t){ return t.deadline && t.status!=='done' && t.deadline<=upcomingCutoff; }).sort(function(a,b){ return a.deadline.localeCompare(b.deadline); });
-
-  return '<div class="section">'+
-  '<div class="grid grid-3">'+
-    '<div class="card" style="text-align:center;"><div class="kpi-label">Current MRR</div><div class="hero-num" style="color:#3FBE8E;font-size:34px;">$'+mrr.toLocaleString()+'</div></div>'+
-    '<div class="card" style="text-align:center;"><div class="kpi-label">Potential Pipeline Value</div><div class="hero-num" style="color:#E8A23D;font-size:34px;">$'+potentialValue.toLocaleString()+'</div></div>'+
-    '<div class="card" style="text-align:center;"><div class="kpi-label">Total Potential MRR</div><div class="hero-num" style="color:#8fdcff;font-size:34px;">$'+(mrr+potentialValue).toLocaleString()+'</div></div>'+
-  '</div>'+
-  '<div class="grid grid-2 stat-chip-row" style="margin-top:10px;">'+
-    '<div class="stat-chip"><div class="stat-chip-label row" style="justify-content:space-between;">Leads in Pipeline<span class="view-all-link" data-action="goToLeads">View all &rarr;</span></div><div class="stat-chip-value">'+inPipeline.length+'</div>'+
-      (inPipeline.length ? '<div class="kpi-sub" style="margin-top:6px;">'+inPipeline.slice(0,3).map(function(pr){return escapeHtml(pr.company||pr.name);}).join(', ')+(inPipeline.length>3?'…':'')+'</div>' : '<div class="kpi-sub" style="margin-top:6px;">none right now</div>')+
-    '</div>'+
-    '<div class="stat-chip"><div class="stat-chip-label row" style="justify-content:space-between;">Upcoming Deadlines<span class="view-all-link" data-action="goToDeadlines">View all &rarr;</span></div><div class="stat-chip-value">'+upcomingDeadlines.length+'</div>'+
-      (upcomingDeadlines.length ? '<div class="kpi-sub" style="margin-top:6px;">'+upcomingDeadlines.slice(0,3).map(function(t){return escapeHtml(t.title)+' ('+fmtDateShort(t.deadline)+')';}).join(', ')+(upcomingDeadlines.length>3?'…':'')+'</div>' : '<div class="kpi-sub" style="margin-top:6px;">nothing due in 7 days</div>')+
-    '</div>'+
-  '</div></div>';
+function collectedByMonth(monthKey){
+  const inc = arr(state.finances.income).filter(function(x){ return monthKeyOf(x.date)===monthKey; }).reduce(function(a,x){ return a+Number(x.amount||0); }, 0);
+  const inv = arr(state.finances.invoices).filter(function(x){ return monthKeyOf(x.date)===monthKey; }).reduce(function(a,x){ return a+Number(x.amount||0); }, 0);
+  return inc+inv;
 }
-function renderGoalsPanel(){
-  const items = state.goals.items;
-  const done = items.filter(function(g){ return g.done; });
-  const mrr = arr(state.business.clients).filter(function(c){return c.status==='active';}).reduce(function(a,c){return a+Number(c.mrr||0);},0);
-  const mrrGoal = state.profile.revenueGoalMonthly||1;
-  const mrrPct = clamp(mrr/mrrGoal*100,0,100);
-  const weightLog = state.health.weightLog.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
-  const latestWeight = weightLog.length?weightLog[weightLog.length-1].weight:null;
-  const startWeight = weightLog.length?weightLog[0].weight:null;
-  const goalWeight = state.profile.goalWeight;
-  let weightPct = 0;
-  if(latestWeight!=null && goalWeight!=null && startWeight!=null && startWeight!==goalWeight){
-    weightPct = clamp(Math.round(((startWeight-latestWeight)/(startWeight-goalWeight))*100),0,100);
-  }
-  const achievedPct = items.length?Math.round(done.length/items.length*100):0;
-  return '<div class="section">'+
-    '<div class="card"><div class="row" style="justify-content:space-around;">'+
-      '<div class="ring-wrap" style="'+goalGlowFilter(mrrPct)+'">'+svgRing(mrrPct,110,goalColor(),'$'+mrr.toLocaleString(),'of $'+mrrGoal.toLocaleString()+' MRR')+'</div>'+
-      (goalWeight!=null ? (
-        latestWeight!=null
-          ? '<div class="ring-wrap" style="'+goalGlowFilter(weightPct)+'">'+svgRing(weightPct,110,goalColor(),latestWeight,'toward '+goalWeight+' goal')+'</div>'
-          : '<div class="ring-wrap"><div class="empty" style="width:110px;font-size:11.5px;">Log your weight to see progress</div></div>'
-      ) : '')+
-      '<div class="ring-wrap" style="'+goalGlowFilter(achievedPct)+'">'+svgRing(achievedPct,110,goalColor(),done.length+'/'+items.length,'goals achieved')+'</div>'+
-    '</div>'+
-    '<div class="row" style="justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="nav" data-view="personal" data-tab="goals">View All Goals</button></div>'+
+function money(n){ n = Number(n)||0; return n>=10000 ? '$'+(n/1000).toFixed(n>=100000?0:1).replace(/\.0$/,'')+'k' : '$'+n.toLocaleString(); }
+function renderBusinessPanel(){
+  const active = arr(state.business.clients).filter(function(c){ return c.status==='active'; });
+  const mrr = active.reduce(function(a,c){ return a+Number(c.mrr||0); },0);
+  const open = arr(state.business.pipeline).filter(function(p){ return typeof leadIsOpen==='function' ? leadIsOpen(p) : (p.stage!=='lost' && p.stage!=='closed'); });
+  const pipe = open.reduce(function(a,p){ return a+Number(p.value||0); },0);
+  const goal = Number(state.profile.revenueGoalMonthly)||0;
+  const scale = Math.max(goal, mrr+pipe, 1);
+  const cutoff = addDays(todayStr(),7);
+  const due = state.tasks.items.filter(function(t){ return t.deadline && t.status!=='done' && t.deadline<=cutoff; }).sort(function(a,b){ return a.deadline.localeCompare(b.deadline); });
+  // last 6 months collected
+  const months = []; const now = new Date();
+  for(let k=5;k>=0;k--){ const d = new Date(now.getFullYear(), now.getMonth()-k, 1); const key = d.getFullYear()+'-'+pad2(d.getMonth()+1); months.push({key:key, label:d.toLocaleDateString(undefined,{month:'short'}), v:collectedByMonth(key)}); }
+  const maxV = Math.max.apply(null, months.map(function(m){ return m.v; }).concat([mrr, 1]));
+  return '<div class="section biz-panel">'+
+    '<div class="section-title">Business<span class="view-all-link" data-action="nav" data-view="business">Open Business &rarr;</span></div>'+
+    '<div class="card biz-card">'+
+      '<div class="biz-main">'+
+        '<div class="stat-tile-k">MRR</div>'+
+        '<div class="biz-mrr">$'+mrr.toLocaleString()+'</div>'+
+        (goal ? '<div class="biz-bar" title="'+Math.round(mrr/goal*100)+'% of your $'+goal.toLocaleString()+'/mo goal'+(pipe?' · pipeline adds $'+pipe.toLocaleString():'')+'">'+
+          '<span class="biz-bar-mrr" style="width:'+Math.min(100, mrr/goal*100)+'%"></span>'+
+          (pipe ? '<span class="biz-bar-pipe" style="width:'+Math.max(0, Math.min(100-mrr/goal*100, pipe/goal*100))+'%"></span>' : '')+
+        '</div><div class="biz-goal-k">'+Math.round(mrr/goal*100)+'% of '+money(goal)+'</div>' : '')+
+      '</div>'+
+      '<div class="biz-months" title="Collected per month">'+
+        '<div class="biz-mbars">'+months.map(function(m, i){
+          return '<div class="biz-mcol'+(i===5?' is-now':'')+'" title="'+m.label+': $'+m.v.toLocaleString()+'"><div class="biz-mbar-wrap"><div class="biz-mbar" style="height:'+Math.max(m.v?4:0, m.v/maxV*100)+'%"></div></div><span>'+m.label+'</span></div>';
+        }).join('')+'</div>'+
+      '</div>'+
+      '<div class="biz-side">'+
+        '<div class="biz-mini" data-action="goToClients"><span class="biz-mini-v">'+active.length+'</span><span class="biz-mini-k">clients</span></div>'+
+        '<div class="biz-mini" data-action="goToLeads"><span class="biz-mini-v">'+money(pipe)+'</span><span class="biz-mini-k">pipeline</span></div>'+
+        '<div class="biz-mini" data-action="goToDeadlines"><span class="biz-mini-v'+(due.length?' is-warn':'')+'">'+due.length+'</span><span class="biz-mini-k">due this week</span></div>'+
+      '</div>'+
     '</div>'+
   '</div>';
 }
@@ -3571,7 +3894,12 @@ const PANEL_RENDERERS = {
   focusMini: renderFocusMiniPanel,
   calendarMini: renderCalendarMiniPanel,
   tasks: renderTodayTasksPanel,
-  clientHub: function(){ return renderClientHubPanel(); }
+  clientHub: function(){ return renderClientHubPanel(); },
+  vision: function(){ return renderVisionPanel(); },
+  agenda: renderAgendaPanel,
+  week: renderWeekPanel,
+  heatmap: renderHeatmapPanel,
+  why: renderWhyPanel
 };
 function clientOpsDeliverableRow(clientId, d){
   return recurringDeliverableRowHtml(clientId, d, false);
@@ -3630,13 +3958,13 @@ function renderClientOpsPanel(){
 function nextUpTask(){
   const items = state.tasks.items;
   const pick = function(id){ return id ? items.find(function(x){ return x.id===id && x.status!=='done'; }) : null; };
-  return pick(ui.pendingCurrentTaskId) || pick(ui.stagedTaskId) ||
+  return pick(ui.pendingCurrentTaskId) || pick(ui.stagedTaskId) || (state.focus.nextTaskId!==ui.currentTaskId ? pick(state.focus.nextTaskId) : null) ||
     sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='today' && t.id!==ui.currentTaskId && !isOngoingDoneToday(t); }))[0] || null;
 }
 function renderNowNextBar(standalone){
   const cur = ui.currentTaskId ? state.tasks.items.find(function(x){ return x.id===ui.currentTaskId; }) : null;
   const next = nextUpTask();
-  if(!cur && !next) return '';
+  if(!cur && !next && ui.nextPicker!=='bar' && !state.tasks.items.some(function(t){ return t.status==='today'; })) return '';
   return '<div class="now-next'+(standalone?' now-next-standalone':'')+'">'+
     '<div class="now-next-cell now-cell">'+
       '<span class="now-next-label">Now</span>'+
@@ -3648,8 +3976,9 @@ function renderNowNextBar(standalone){
       (next ? '<span class="now-next-title">'+escapeHtml(next.title)+'</span>'+
               '<button class="mini-move mini-move-today" data-action="'+(state.focus.activeSession?'setCurrentTask':'stagePendingCurrentTask')+'" data-id="'+next.id+'">'+(cur?'Switch':'Start')+' &rarr;</button>'
             : '<span class="now-next-title now-next-empty">Nothing lined up</span>')+
+      '<button class="mini-move" data-action="toggleNextPicker" data-where="bar" title="Pick what\'s next">Change</button>'+
     '</div>'+
-  '</div>';
+  '</div>'+nextPickerHtml('bar');
 }
 // Compact video idea card: title + type/due at a glance, notes and actions on click.
 const expandedVideoIdeas = new Set();
@@ -3719,8 +4048,8 @@ function fabContext(){
     if(ui.personalTab==='journal' && ui.journalMode==='boards' && typeof canvasAddNote==='function') return {label:'Add note to board', run:function(){ canvasAddNote(); }};
     if(ui.personalTab==='journal') return {label:'New journal entry', run:openQuickJournalModal};
     if(ui.personalTab==='wishlist' && typeof openWishItemModal==='function') return {label:'Add wish list item', run:function(){ openWishItemModal(null); }};
-    if(ui.personalTab==='vision' && typeof canvasAddNote==='function') return {label:'Add card to board', run:function(){ canvasAddNote(); }};
-    if(ui.personalTab==='fitness') return {label:'Log workout', run:function(){ const el=document.getElementById('workoutType')||document.querySelector('#viewRoot input'); if(el) el.focus(); }};
+    if((ui.personalTab==='vision' || ui.personalTab==='milanote') && typeof canvasAddNote==='function') return {label:'Add card to board', run:function(){ canvasAddNote(); }};
+    if(ui.personalTab==='fitness') return {label:'Log workout', run:function(){ ui.healthTab='workouts'; renderView(); const el=document.getElementById('gymType'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
     return {label:'Add goal', run:function(){ const el=document.getElementById('newGoalTitle')||document.querySelector('#viewRoot .tab-panel input'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
   }
   return null;
@@ -3784,6 +4113,216 @@ ACTIONS.undoDeleteTasks = function(){
   playTick();
   persist('tasks'); renderView();
 };
+
+// ============ TODAY PANELS v2: goals, agenda, week, consistency, your why ============
+function progressBarHtml(pct, color){
+  return '<div class="pb"><div class="pb-fill" style="width:'+clamp(Math.round(pct),0,100)+'%;background:'+(color||goalColor())+';"></div></div>';
+}
+function activeMrr(){ return arr(state.business.clients).filter(function(c){ return c.status==='active'; }).reduce(function(a,c){ return a+Number(c.mrr||0); }, 0); }
+function weightProgress(){
+  const log = state.health.weightLog.slice().sort(function(a,b){ return a.date.localeCompare(b.date); });
+  const latest = log.length ? log[log.length-1].weight : null, start = log.length ? log[0].weight : null, goal = state.profile.goalWeight;
+  let pct = 0;
+  if(latest!=null && goal!=null && start!=null && start!==goal) pct = clamp(Math.round(((start-latest)/(start-goal))*100),0,100);
+  return {latest:latest, start:start, goal:goal, pct:pct};
+}
+function workoutsThisWeek(){
+  const ws = startOfWeekStr(todayStr()); let n = 0;
+  for(let i=0;i<7;i++){ const d = addDays(ws, i); if(d<=todayStr() && trainedDoneFor(d)) n++; }
+  return n;
+}
+function statTileHtml(label, value, sub, pct, color, action){
+  return '<div class="stat-tile"'+(action?' data-action="'+action+'" style="cursor:pointer;"':'')+'>'+
+    '<div class="stat-tile-k">'+label+'</div>'+
+    '<div class="stat-tile-v">'+value+'</div>'+
+    (pct!=null ? progressBarHtml(pct, color) : '')+
+    '<div class="stat-tile-sub">'+sub+'</div>'+
+  '</div>';
+}
+function goalDaysLeftChip(g){
+  if(!g.deadline) return '';
+  const days = Math.round((localTs(g.deadline,'12:00')-localTs(todayStr(),'12:00'))/86400000);
+  const cls = days<0 ? 'is-late' : days<=7 ? 'is-soon' : '';
+  return '<span class="goal-chip '+cls+'">'+(days<0 ? 'past due' : days===0 ? 'due today' : days<=60 ? days+'d left' : fmtDateShort(g.deadline))+'</span>';
+}
+function goalCardHtml(g, compact){
+  const hasTracker = g.target!=null && g.target>0;
+  const current = goalLiveCurrent(g);
+  if(g.autoTrack==='streak' && hasTracker && current>=g.target && !g.done) g.done = true;
+  const pct = hasTracker ? clamp(current/g.target*100, 0, 100) : (g.done ? 100 : 0);
+  const armedNow = armed.has('goalcomplete:'+g.id);
+  return '<div class="goal-card'+(g.done?' is-done':'')+'" data-key="goal-'+g.id+'">'+
+    '<div class="goal-card-head"><span class="goal-card-title" data-action="openGoalEditModal" data-id="'+g.id+'">'+escapeHtml(g.label)+'</span>'+goalDaysLeftChip(g)+(g.autoTrack==='streak'?'<span class="goal-chip">&#128293; streak</span>':'')+'</div>'+
+    (hasTracker ? progressBarHtml(pct)+'<div class="goal-card-nums"><b>'+fmtGoalNum(current, g.unit)+'</b> / '+fmtGoalNum(g.target, g.unit)+(g.unit && !/^\$/.test(g.unit)?' '+escapeHtml(g.unit):'')+'<span class="goal-pct">'+Math.round(pct)+'%</span></div>' : '')+
+    (compact ? '' : '<div class="goal-card-actions">'+
+      (hasTracker && g.autoTrack!=='streak' && !g.done ? '<button class="goal-step" data-action="goalStep" data-id="'+g.id+'" data-delta="-1" title="One less">&minus;</button><button class="goal-step" data-action="goalStep" data-id="'+g.id+'" data-delta="1" title="One more">+</button>' : '')+
+      '<span style="flex:1"></span>'+
+      '<button class="btn btn-sm '+(g.done?'btn-good':(armedNow?'btn-primary':'btn-ghost'))+'" data-action="toggleGoal" data-id="'+g.id+'">'+(g.done?'&#10003; Achieved':(armedNow?'Confirm?':'Mark done'))+'</button>'+
+      '<button class="btn btn-ghost btn-sm" data-action="openGoalEditModal" data-id="'+g.id+'">Edit</button>'+
+    '</div>')+
+  '</div>';
+}
+function fmtGoalNum(n, unit){ n = Number(n)||0; const s = n.toLocaleString(undefined, {maximumFractionDigits:1}); return /^\$/.test(unit||'') ? '$'+s : s; }
+ACTIONS.goalStep = function(el, e, id){
+  const g = state.goals.items.find(function(x){ return x.id===id; }); if(!g) return;
+  g.current = Math.max(0, (Number(g.current)||0) + Number(el.dataset.delta||1));
+  if(g.target && g.current>=g.target && !g.done){ g.done = true; playSessionComplete(); showToast('Goal reached: '+g.label, {icon:'&#127942;'}); }
+  else playTick();
+  persist('goals'); renderView();
+};
+function goalStatTilesHtml(){
+  const mrr = activeMrr(), mrrGoal = state.profile.revenueGoalMonthly||0;
+  const w = weightProgress();
+  const wk = workoutsThisWeek(), wkT = state.profile.weeklyWorkoutTarget||0;
+  const items = state.goals.items, done = items.filter(function(g){ return g.done; }).length;
+  return '<div class="stat-tiles">'+
+    statTileHtml('Revenue', '$'+mrr.toLocaleString(), mrrGoal ? 'of $'+mrrGoal.toLocaleString()+'/mo goal' : 'set a goal in Settings', mrrGoal ? mrr/mrrGoal*100 : null, 'var(--good)')+
+    (w.goal!=null ? statTileHtml('Weight', w.latest!=null ? w.latest : '—', w.latest!=null ? 'goal '+w.goal+(w.latest!==w.goal?' · '+Math.abs(w.latest-w.goal).toFixed(1)+' to go':'') : 'log your weight', w.pct, 'var(--info)', 'goToWeight') : '')+
+    statTileHtml('Workouts', wk+(wkT?'<span class="stat-tile-of">/'+wkT+'</span>':''), 'this week', wkT ? wk/wkT*100 : null, 'var(--accent)', 'goToFitness')+
+    statTileHtml('Goals', done+'<span class="stat-tile-of">/'+items.length+'</span>', items.length ? 'achieved' : 'none set yet', items.length ? done/items.length*100 : null, goalColor())+
+  '</div>';
+}
+ACTIONS.goToWeight = function(){ ui.view='personal'; ui.personalTab='fitness'; ui.healthTab='weight'; renderView(); };
+ACTIONS.goToFitness = function(){ ui.view='personal'; ui.personalTab='fitness'; ui.healthTab='workouts'; renderView(); };
+// Today panel
+function renderGoalsPanel(){
+  const open = state.goals.items.filter(function(g){ return !g.done; })
+    .sort(function(a,b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); }).slice(0, 4);
+  return '<div class="section goals-panel">'+
+    '<div class="section-title">Goals<span class="view-all-link" data-action="nav" data-view="personal" data-tab="goals">All goals &rarr;</span></div>'+
+    goalStatTilesHtml()+
+    (open.length ? '<div class="goal-grid" style="margin-top:10px;">'+open.map(function(g){ return goalCardHtml(g, true); }).join('')+'</div>' : '')+
+  '</div>';
+}
+// Goals tab
+function renderGoalsTab(){
+  const items = state.goals.items;
+  const open = items.filter(function(g){ return !g.done; }).sort(function(a,b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); });
+  const done = items.filter(function(g){ return g.done; });
+  const formOpen = !!ui.forms.newGoal || !items.length;
+  return '<div class="section">'+goalStatTilesHtml()+'</div>'+
+    '<div class="section">'+
+      '<div class="section-title">Your goals'+(items.length ? '<button class="btn btn-sm '+(formOpen?'btn-ghost':'btn-good')+'" data-action="toggleForm" data-form="newGoal">'+(formOpen?'Close':'+ New goal')+'</button>' : '')+'</div>'+
+      (formOpen ? '<div class="card goal-form">'+
+        '<div class="field"><label>What\'s the goal?</label><input class="input" id="newGoalLabel" placeholder="e.g. $10k/mo, 180 lbs, first sponsor deal" style="width:100%;"></div>'+
+        '<div class="grid grid-3" style="margin-top:10px;">'+
+          '<div class="field"><label>Target (optional)</label><input class="input" type="number" id="newGoalTarget" placeholder="e.g. 90"></div>'+
+          '<div class="field"><label>Unit</label><input class="input" id="newGoalUnit" placeholder="lbs, $/mo, days"></div>'+
+          '<div class="field"><label>By when</label><input class="input" type="date" id="newGoalDeadline"></div>'+
+        '</div>'+
+        '<div class="row" style="margin-top:12px;justify-content:space-between;flex-wrap:wrap;gap:10px;">'+
+          '<select class="input" id="newGoalTrackMode" style="max-width:260px;"><option value="manual">I\'ll update progress myself</option><option value="streak">Auto-track from my streak</option></select>'+
+          '<button class="btn btn-good" data-action="addGoal">+ Add goal</button>'+
+        '</div>'+
+      '</div>' : '')+
+      (open.length ? '<div class="goal-grid">'+open.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : (items.length ? '<div class="empty">Every goal achieved. Set the next one.</div>' : ''))+
+    '</div>'+
+    (done.length ? '<div class="section"><button class="cc2-past-toggle" data-action="toggleForm" data-form="goalsDone">'+(ui.forms.goalsDone?'&#9662;':'&#9656;')+' Achieved ('+done.length+')</button>'+
+      (ui.forms.goalsDone ? '<div class="goal-grid" style="margin-top:10px;">'+done.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : '')+'</div>' : '');
+}
+// ---- agenda: today's timeline ----
+function agendaItems(){
+  const today = todayStr(), out = [];
+  const wt = typeof wakeTimeFor==='function' ? wakeTimeFor(today) : null;
+  if(wt) out.push({time:wt, label:'Wake up', icon:'&#9728;&#65039;', kind:'wake'});
+  state.calendar.events.filter(function(e){ return e.date===today; }).forEach(function(e){ const c = categoryById(e.categoryId); out.push({time:e.time||'', label:e.title, icon:'&#128197;', kind:'event', color:c?c.color:null, action:'openCalItem', id:e.id, sub:e.location||''}); });
+  state.tasks.items.filter(function(t){ return t.deadline===today && t.status!=='done'; }).forEach(function(t){ out.push({time:t.deadlineTime||'', label:t.title, icon:'&#9888;&#65039;', kind:'deadline', action:'openTaskEditModal', id:t.id}); });
+  arr(state.focus.alarms).filter(function(a){ return a.enabled && a.time && !a.eventId && !a.taskId && (a.date ? a.date===today : arr(a.days).indexOf(new Date().getDay())>=0); }).forEach(function(a){ out.push({time:a.time, label:a.label||'Alarm', icon:'&#9200;', kind:'alarm'}); });
+  arr(state.focus.reminders).filter(function(r){ return r.date===today; }).forEach(function(r){ out.push({time:r.time||'', label:r.label, icon:'&#128276;', kind:'reminder'}); });
+  return out.sort(function(a,b){ return (a.time||'00:00').localeCompare(b.time||'00:00'); });
+}
+function renderAgendaPanel(){
+  const items = agendaItems();
+  const now = nowHM();
+  let nowPlaced = false;
+  const rows = items.map(function(it){
+    let line = '';
+    if(!nowPlaced && it.time && it.time>now){ nowPlaced = true; line = '<div class="ag-now"><span>now</span></div>'; }
+    const past = it.time && it.time<=now;
+    return line+'<div class="ag-row'+(past?' is-past':'')+' ag-'+it.kind+'"'+(it.action?' data-action="'+it.action+'" data-kind="'+(it.kind==='deadline'?'deadline':'event')+'" data-id="'+it.id+'"':'')+'>'+
+      '<span class="ag-time">'+(it.time ? fmt12Hour(it.time) : 'Today')+'</span>'+
+      '<span class="ag-dot"'+(it.color?' style="background:'+it.color+'"':'')+'></span>'+
+      '<span class="ag-label">'+it.icon+' '+escapeHtml(it.label)+(it.sub?' <span class="kpi-sub">'+escapeHtml(it.sub)+'</span>':'')+'</span>'+
+    '</div>';
+  }).join('');
+  return '<div class="section agenda-panel"><div class="section-title">Today<span class="view-all-link" data-action="nav" data-view="calendar">Calendar &rarr;</span></div>'+
+    '<div class="card ag-card">'+(items.length ? rows+(nowPlaced?'':'<div class="ag-now"><span>now</span></div>') : '<div class="empty" style="padding:10px;">Nothing scheduled — a clean day to get work done.</div>')+'</div></div>';
+}
+// ---- this week: deep work per day ----
+function renderWeekPanel(){
+  const ws = startOfWeekStr(todayStr());
+  const target = state.standards.deepWorkTargetMinutes || 180;
+  const days = []; let total = 0, best = 0;
+  for(let i=0;i<7;i++){
+    const d = addDays(ws, i);
+    const m = d===todayStr() ? deepWorkMinutesTodayLive() : (d<todayStr() ? deepWorkMinutesFor(d) : 0);
+    days.push({d:d, m:m}); total += m; best = Math.max(best, m);
+  }
+  const scale = Math.max(target*1.2, best, 60);
+  const names = ['M','T','W','T','F','S','S'];
+  return '<div class="section week-panel"><div class="section-title">This week<span class="view-all-link" data-action="goToAnalytics">Analytics &rarr;</span></div>'+
+    '<div class="card wk-card">'+
+      '<div class="wk-top"><div><div class="stat-tile-v">'+fmtHours(total)+'</div><div class="stat-tile-sub">deep work this week</div></div>'+
+        '<div style="text-align:right;"><div class="stat-tile-v" style="font-size:18px;">'+days.filter(function(x){ return x.m>=target; }).length+'<span class="stat-tile-of">/7</span></div><div class="stat-tile-sub">days on target</div></div></div>'+
+      '<div class="wk-bars"><div class="wk-target" style="bottom:'+(target/scale*100)+'%;" title="Daily target '+fmtDurationLabel(target)+'"></div>'+
+        days.map(function(x, i){
+          const future = x.d>todayStr(), isToday = x.d===todayStr();
+          return '<div class="wk-col'+(isToday?' is-today':'')+(future?' is-future':'')+'" title="'+weekdayShort(x.d)+': '+fmtDurationLabel(x.m)+'">'+
+            '<div class="wk-bar-wrap"><div class="wk-bar'+(x.m>=target?' hit':'')+'" style="height:'+Math.max(x.m?3:0, x.m/scale*100)+'%"></div></div>'+
+            '<div class="wk-day">'+names[i]+'</div></div>';
+        }).join('')+
+      '</div>'+
+    '</div></div>';
+}
+ACTIONS.goToAnalytics = function(){ ui.view='focus'; ui.focusTab='analytics'; renderView(); };
+// ---- consistency heatmap (last 26 weeks) + streak stats ----
+function renderHeatmapPanel(){
+  const target = state.standards.deepWorkTargetMinutes || 180;
+  const WEEKS = 26;
+  const start = addDays(startOfWeekStr(todayStr()), -(WEEKS-1)*7);
+  let cols = '', hit = 0, counted = 0, totalMin = 0, worked = 0, run = 0, best = 0;
+  for(let w=0; w<WEEKS; w++){
+    let cells = '';
+    for(let i=0;i<7;i++){
+      const d = addDays(start, w*7+i);
+      if(d>todayStr()){ cells += '<span class="hm-cell is-future"></span>'; continue; }
+      const m = d===todayStr() ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d);
+      const off = isDayOff(d);
+      const lvl = off ? 'off' : m<=0 ? 0 : m<target*0.34 ? 1 : m<target*0.67 ? 2 : m<target ? 3 : 4;
+      const std = dayStandardsComplete(d);
+      if(!off){ counted++; if(std) hit++; }
+      if(m>0){ totalMin += m; worked++; }
+      if(m>=target || off) { run++; best = Math.max(best, run); } else if(d!==todayStr()) run = 0;
+      cells += '<span class="hm-cell hm-'+lvl+(std?' is-std':'')+'" title="'+fmtDateShort(d)+(off?' · day off':' · '+fmtDurationLabel(m)+(std?' · standard ✓':''))+'"></span>';
+    }
+    cols += '<div class="hm-col">'+cells+'</div>';
+  }
+  const stat = function(v, k){ return '<div class="hm-stat"><div class="stat-tile-v">'+v+'</div><div class="stat-tile-sub">'+k+'</div></div>'; };
+  return '<div class="section heatmap-panel"><div class="section-title">Consistency</div>'+
+    '<div class="card hm-card">'+
+      '<div class="hm-main"><div class="hm-grid">'+cols+'</div>'+
+        '<div class="hm-foot"><span>last 6 months &middot; outlined = standard hit</span><span class="hm-legend">less <span class="hm-cell hm-1"></span><span class="hm-cell hm-2"></span><span class="hm-cell hm-3"></span><span class="hm-cell hm-4"></span> more</span></div></div>'+
+      '<div class="hm-stats">'+
+        stat(counted ? Math.round(hit/counted*100)+'%' : '—', 'days the standard was hit')+
+        stat(best+'d', 'longest run on target')+
+        stat(worked ? fmtHours(Math.round(totalMin/worked)) : '—', 'average on days you worked')+
+      '</div>'+
+    '</div></div>';
+}
+// ---- your why ----
+function renderWhyPanel(){
+  const m = state.focus.motivations || {toward:[], away:[]};
+  const toward = arr(m.toward), away = arr(m.away);
+  if(!toward.length && !away.length){
+    return '<div class="section"><div class="card why-empty" data-action="goToWhySettings"><span style="font-size:20px;">&#129517;</span><div><div class="kpi-label" style="margin:0;">Your why</div><div class="kpi-sub">Write down what you\'re working toward and what you\'re getting away from &rarr;</div></div></div></div>';
+  }
+  return '<div class="section why-panel"><div class="section-title">Your why<span class="view-all-link" data-action="goToWhySettings">Edit &rarr;</span></div>'+
+    '<div class="why-grid">'+
+      (toward.length ? '<div class="why-col why-toward"><div class="why-k">Going after</div>'+toward.map(function(x){ return '<div class="why-item">'+escapeHtml(x.text)+'</div>'; }).join('')+'</div>' : '')+
+      (away.length ? '<div class="why-col why-away"><div class="why-k">Leaving behind</div>'+away.map(function(x){ return '<div class="why-item">'+escapeHtml(x.text)+'</div>'; }).join('')+'</div>' : '')+
+    '</div></div>';
+}
+ACTIONS.goToWhySettings = function(){ ui.view='settings'; ui.settingsTab='focus'; renderView(); setTimeout(function(){ const el = document.getElementById('newMotivToward'); if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); } }, 40); };
 // ============ TODAY ============
 function renderDayOffView(){
   const streak = computeStreak();
@@ -3930,24 +4469,176 @@ function renderToday(){
     }
   }
   return renderFocusQuickLinks()+
-    '<div class="view-header today-header"><div>'+
-      businessNameTagHtml()+
-      '<div class="view-title">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
-      (state.profile.bigClockOnToday ? (
-        '<div id="liveClockBig" class="cal-big-clock" style="font-size:38px;margin-top:6px;"></div>'+
-        renderMiniCalendarStrip()
-      ) : '<div class="view-sub" id="liveClock"></div>')+
-      '</div>'+
-      '<div class="row" style="gap:8px;justify-content:center;">'+
-        '<button class="btn" style="border-color:var(--accent);color:var(--accent);" data-action="toggleDayOff">Take Today Off</button>'+
-        wakeChipHtml()+
-      '</div>'+
-    '</div>'+
+    renderTodayHero(greeting)+
     renderMorningPlanCard()+
-    renderEveningCard()+
-    panelsHtml;
+    '<div class="today-panels">'+panelsHtml+'</div>';
 }
 
+
+// ============ TODAY (not locked in): hero, next-task picker, task right-click menu ============
+// The page opens on a hero: greeting + clock on the left, a big Lock In button on the right
+// with what's up next (which you can pick yourself), and a hold-to-confirm Take Today Off.
+function isWindDownTime(){ const h = new Date().getHours(); return h>=18 || h<4; }
+function renderTodayHero(greeting){
+  const p = state.profile;
+  const next = nextUpTask();
+  const streak = computeStreak();
+  const ticked = (lastRenderedStreak!==null && streak!==lastRenderedStreak);
+  lastRenderedStreak = streak;
+  const allDone = dayStandardsComplete(todayStr());
+  const evening = isWindDownTime();
+  return '<div class="today-hero" data-key="today-hero">'+
+    '<div class="th-left">'+
+      businessNameTagHtml()+
+      '<div class="th-greet">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
+      (p.bigClockOnToday ? '<div id="liveClockBig" class="cal-big-clock th-bigclock"></div>' : '<div class="th-sub" id="liveClock"></div>')+
+      '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: streak===0 ? 'Hit today\'s standard to start one' : (allDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Hit today\'s standard to keep it')})+'</div>'+
+    '</div>'+
+    '<div class="th-right">'+
+      '<button class="lockin-cta" data-action="openLockInChooser" title="Lock in (L)">'+
+        '<span class="lockin-icon">&#128274;</span>'+
+        '<span class="lockin-copy"><span class="lockin-title">Lock in</span><span class="lockin-sub">'+(next ? 'Up next: '+escapeHtml(next.title) : 'Start a focus session')+'</span></span>'+
+        '<span class="lockin-key">L</span>'+
+      '</button>'+
+      '<div class="th-actions">'+
+        '<button class="th-btn" data-action="toggleNextPicker" data-where="hero"><span class="th-btn-i">&#128204;</span>'+(next ? 'Change next' : 'Pick next')+'</button>'+
+        (evening ? '<button class="th-btn th-btn-night'+(ui.windDownOpen?' is-open':'')+'" data-action="toggleWindDown"><span class="th-btn-i">&#127769;</span>Wind down<span class="th-caret">&#9662;</span></button>' : '')+
+        dayOffButtonHtml()+
+      '</div>'+
+      nextPickerHtml('hero')+
+      (evening && ui.windDownOpen ? '<div class="wind-drop" data-key="wind-drop">'+windDownTilesHtml()+'</div>' : '')+
+    '</div>'+
+  '</div>';
+}
+ACTIONS.toggleWindDown = function(){ ui.windDownOpen = !ui.windDownOpen; ui.nextPicker = null; renderView(); };
+// ---- Take Today Off: hold to confirm (a click alone does nothing but explain) ----
+function dayOffButtonHtml(){
+  return '<button class="th-btn dayoff-btn" data-hold="dayoff" title="Hold to take today off">'+
+    '<span class="dayoff-fill"></span><span class="th-btn-i dayoff-i">&#127796;</span><span class="dayoff-label">Day off</span><span class="dayoff-hint">hold</span>'+
+  '</button>';
+}
+let holdTimer = null, holdEl = null;
+function cancelHold(){ clearTimeout(holdTimer); holdTimer = null; if(holdEl) holdEl.classList.remove('holding'); holdEl = null; }
+document.addEventListener('pointerdown', function(e){
+  const el = e.target.closest && e.target.closest('[data-hold]'); if(!el || e.button!==0) return;
+  cancelHold();
+  holdEl = el; el.classList.add('holding');
+  holdTimer = setTimeout(function(){
+    const kind = el.dataset.hold;
+    el.classList.remove('holding'); el.classList.add('held');
+    holdTimer = null; holdEl = null;
+    if(kind==='dayoff') setTimeout(function(){ toggleDayOff(); showToast('Today is a rest day — the streak is safe. Enjoy it.', {icon:'&#127796;'}); }, 180);
+  }, 900);
+});
+function endHold(e){
+  if(!holdEl) return;
+  if(e.type==='pointerleave' && e.target!==holdEl) return;
+  const el = holdEl, pending = !!holdTimer;
+  cancelHold();
+  if(pending && e.type==='pointerup'){ el.classList.add('nudge'); setTimeout(function(){ el.classList.remove('nudge'); }, 500); }
+}
+['pointerup','pointerleave','pointercancel'].forEach(function(t){ document.addEventListener(t, endHold, true); });
+// ---- picking what's next ----
+function setNextUp(id){
+  state.focus.nextTaskId = id || null;
+  if(!state.focus.activeSession) ui.stagedTaskId = id || null;
+  persist('focus');
+}
+function nextPickerHtml(where){
+  if(ui.nextPicker!==where) return '';
+  const cur = ui.currentTaskId;
+  const today = sortByPriorityAndDeadline(state.tasks.items.filter(function(t){ return t.status==='today' && t.id!==cur && !isOngoingDoneToday(t); }));
+  const backlog = sortByPriorityAndDeadline(state.tasks.items.filter(function(t){ return t.status==='backlog'; })).slice(0, 6);
+  const next = nextUpTask();
+  const row = function(t, fromBacklog){
+    return '<button class="np-row'+(next && next.id===t.id?' is-on':'')+'" data-action="pickNextTask" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span class="np-title">'+escapeHtml(t.title)+'</span>'+(fromBacklog?'<span class="kpi-sub">backlog</span>':'')+(next && next.id===t.id?'<span class="np-check">&#10003;</span>':'')+'</button>';
+  };
+  return '<div class="next-picker" data-key="np-'+where+'">'+
+    '<div class="np-head"><span class="kind-label" style="margin:0;">What\'s next?</span><button class="mini-move" data-action="toggleNextPicker" data-where="'+where+'">&#10005;</button></div>'+
+    (today.length ? today.map(function(t){ return row(t, false); }).join('') : '<div class="kpi-sub" style="padding:4px 2px;">Nothing on today\'s list yet.</div>')+
+    (backlog.length ? '<div class="kind-label" style="margin:8px 0 4px;">From the backlog</div>'+backlog.map(function(t){ return row(t, true); }).join('') : '')+
+    (state.focus.nextTaskId ? '<button class="np-row np-auto" data-action="pickNextTask" data-id="">Let Operator pick (highest priority)</button>' : '')+
+  '</div>';
+}
+ACTIONS.toggleNextPicker = function(el){ const w = el.dataset.where||'hero'; ui.nextPicker = ui.nextPicker===w ? null : w; ui.windDownOpen = false; renderView(); };
+ACTIONS.pickNextTask = function(el, e, id){
+  const t = id ? state.tasks.items.find(function(x){ return x.id===id; }) : null;
+  if(t && t.status==='backlog'){ t.status = 'today'; persist('tasks'); }
+  if(state.focus.activeSession && t) ui.pendingCurrentTaskId = null;
+  setNextUp(t ? t.id : null);
+  ui.nextPicker = null;
+  playTick();
+  renderView();
+};
+// L = lock in, from anywhere outside a text field
+document.addEventListener('keydown', function(e){
+  if(e.key!=='l' && e.key!=='L') return;
+  if(e.metaKey || e.ctrlKey || e.altKey || typingInField(e.target) || document.querySelector('.overlay:not(.hidden)')) return;
+  if(state.focus.activeSession || !(ui.view==='today' || ui.view==='focus')) return;
+  e.preventDefault(); openLockInChooser();
+});
+// ---- right-click a task ----
+function taskFromEl(el){
+  const id = el && (el.getAttribute('data-task-id') || el.getAttribute('data-id'));
+  return id ? state.tasks.items.find(function(t){ return t.id===id; }) : null;
+}
+function closeTaskMenu(){ const m = document.getElementById('taskCtxMenu'); if(m) m.remove(); }
+function openTaskMenu(t, x, y){
+  closeTaskMenu();
+  const inSession = !!state.focus.activeSession;
+  const isNext = (nextUpTask()||{}).id===t.id;
+  const item = function(op, label, extra){ return '<button class="ctx-item'+(extra||'')+'" data-action="taskCtx" data-op="'+op+'" data-id="'+t.id+'">'+label+'</button>'; };
+  const m = document.createElement('div');
+  m.id = 'taskCtxMenu'; m.className = 'ctx-menu';
+  m.innerHTML = '<div class="ctx-title">'+escapeHtml(t.title)+'</div>'+
+    (t.status!=='done' ? item('start', inSession ? '&#9654; Start timing now' : '&#128274; Lock in on this') : '')+
+    (t.status!=='done' && !isNext ? item('next', '&#128204; Make it next up') : '')+
+    item('edit', '&#9998; Edit…')+
+    (t.status!=='done' ? item('done', '&#10003; Mark done') : item('undo', '&#8634; Back to today'))+
+    (t.status==='backlog' ? item('today', '&rarr; Move to today') : t.status==='today' ? item('backlog', '&larr; Move to backlog') : '')+
+    '<div class="ctx-sep"></div>'+
+    '<div class="ctx-row"><span class="ctx-k">Due</span>'+item('dueToday','Today',' ctx-chip')+item('dueTomorrow','Tomorrow',' ctx-chip')+(t.deadline?item('dueClear','Clear',' ctx-chip'):'')+'</div>'+
+    '<div class="ctx-row"><span class="ctx-k">Priority</span>'+['high','med','low'].map(function(pr){ return item('pri-'+pr, pr==='med'?'Med':pr[0].toUpperCase()+pr.slice(1), ' ctx-chip'+(t.priority===pr?' is-on':'')); }).join('')+'</div>'+
+    '<div class="ctx-sep"></div>'+
+    item('delete', '&#128465; Delete', ' ctx-danger');
+  document.body.appendChild(m);
+  const r = m.getBoundingClientRect();
+  m.style.left = Math.min(x, window.innerWidth-r.width-8)+'px';
+  m.style.top = Math.min(y, window.innerHeight-r.height-8)+'px';
+}
+document.addEventListener('contextmenu', function(e){
+  const el = e.target.closest && e.target.closest('[data-task-id], .task-card[data-id], .task-item-v2[data-id], .vic-head[data-id]');
+  const t = taskFromEl(el);
+  if(!t){ closeTaskMenu(); return; }
+  e.preventDefault();
+  openTaskMenu(t, e.clientX, e.clientY);
+});
+document.addEventListener('pointerdown', function(e){ const m = document.getElementById('taskCtxMenu'); if(m && !m.contains(e.target)) closeTaskMenu(); }, true);
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeTaskMenu(); });
+window.addEventListener('blur', closeTaskMenu);
+document.addEventListener('scroll', closeTaskMenu, true);
+ACTIONS.taskCtx = function(el, e, id){
+  const t = state.tasks.items.find(function(x){ return x.id===id; });
+  closeTaskMenu();
+  if(!t) return;
+  const op = el.dataset.op;
+  const save = function(){ persist('tasks'); renderView(); };
+  if(op==='start'){
+    if(t.status!=='today'){ t.status = 'today'; persist('tasks'); }
+    if(state.focus.activeSession) setCurrentTask(t.id); else { setNextUp(t.id); renderView(); openLockInChooser(); }
+  }
+  else if(op==='next'){ if(t.status==='backlog') t.status = 'today'; setNextUp(t.id); playTick(); save(); }
+  else if(op==='edit') openTaskEditModal(t.id);
+  else if(op==='done') completeTask(t.id);
+  else if(op==='undo') undoTask(t.id);
+  else if(op==='today') pullSpecificFromBacklog(t.id);
+  else if(op==='backlog') moveTaskToBacklog(t.id);
+  else if(op==='dueToday'){ t.deadline = todayStr(); save(); }
+  else if(op==='dueTomorrow'){ t.deadline = addDays(todayStr(), 1); save(); }
+  else if(op==='dueClear'){ t.deadline = null; t.deadlineTime = null; save(); }
+  else if(op.indexOf('pri-')===0){ t.priority = op.slice(4); save(); }
+  else if(op==='delete') deleteTasksUndoable([t.id]);
+};
 // ============ TASKS ============
 function currentTaskLabel(){ return state.focus.activeSession ? 'Current Task' : 'Next Task'; }
 function renderCurrentTaskCard(big, gridMode, heroFit){
@@ -4317,6 +5008,7 @@ function setCurrentTask(taskId){
   const as = state.focus.activeSession;
   if(as && as.onBreak) return;
   if(ui.currentTaskId) accumulateCurrentTaskTime(ui.currentTaskId);
+  if(state.focus.nextTaskId===taskId){ state.focus.nextTaskId = null; persist('focus'); }
   ui.currentTaskId = taskId;
   ui.currentTaskStartedAt = Date.now();
   persist('tasks'); renderView();
@@ -4878,6 +5570,7 @@ function startFocus(minutes){
   if(ui.stagedTaskId){
     const st = state.tasks.items.find(function(x){return x.id===ui.stagedTaskId;});
     if(st){ ui.currentTaskId = ui.stagedTaskId; ui.currentTaskStartedAt = Date.now(); }
+    if(state.focus.nextTaskId===ui.stagedTaskId) state.focus.nextTaskId = null;
     ui.stagedTaskId = null;
   }
   persist('focus'); renderView();
@@ -4885,12 +5578,13 @@ function startFocus(minutes){
 function stageNextTask(taskId){
   const t = state.tasks.items.find(function(x){return x.id===taskId;}); if(!t) return;
   ui.stagedTaskId = taskId;
+  state.focus.nextTaskId = taskId; persist('focus');
   ui.justStaged = true;
   playTick();
   renderView();
   setTimeout(function(){ ui.justStaged = false; renderView(); }, 1000);
 }
-function clearStagedTask(){ ui.stagedTaskId = null; renderView(); }
+function clearStagedTask(){ ui.stagedTaskId = null; if(state.focus.nextTaskId){ state.focus.nextTaskId = null; persist('focus'); } renderView(); }
 function openStopFocus(){
   const overlay = document.getElementById('stopFocusOverlay');
   overlay.classList.remove('hidden');
@@ -5658,12 +6352,14 @@ function parseActivityLogText(text){
     const tab = line.indexOf('\t');
     if(tab<0) continue;
     const ts = parseInt(line.slice(0,tab),10);
-    const rest = line.slice(tab+1);
-    const tab2 = rest.indexOf('\t');
-    const app = (tab2<0 ? rest : rest.slice(0,tab2)).trim();
-    const idle = tab2<0 ? null : parseInt(rest.slice(tab2+1),10);
-    if(!ts || !app) continue;
-    out.push({ts:ts, app:app, idle:(idle==null || isNaN(idle)) ? null : idle});
+    // <ts>\t<app>[\t<idleSeconds>[\t<site>]] — in a browser the site's domain stands in for
+    // the app, so websites are tracked (and sorted into work / not work) like apps.
+    const parts = line.slice(tab+1).split('\t');
+    const host = (parts[0]||'').trim();
+    const idle = parts.length>1 ? parseInt(parts[1],10) : null;
+    const site = (parts[2]||'').trim();
+    if(!ts || !host) continue;
+    out.push({ts:ts, app:site || host, via:site ? host : null, idle:(idle==null || isNaN(idle)) ? null : idle});
   }
   return out;
 }
@@ -5730,6 +6426,7 @@ function updateCurrentAppIndicator(){
   const app = currentForegroundApp();
   if(app){ el.textContent = '\u25CF '+app; el.style.display = 'block'; }
   else { el.textContent=''; el.style.display='none'; }
+  if(typeof updateActivityPill==='function') updateActivityPill();
 }
 async function pollAppActivity(){
   const st = state.settings.appTracking;
@@ -5792,6 +6489,27 @@ function autoLockInCountFrom(interval){
   if(state.modes.lastEndedAt) from = Math.max(from, state.modes.lastEndedAt);
   return from;
 }
+// Auto lock-in only counts time on apps/sites marked "work" (Operator itself is neutral:
+// it neither starts nor ends a session). Once you've been on work apps for the threshold,
+// a session starts, dated back to when that work stretch began — no prompt; you review the
+// day's sessions in the end-of-day recap. It ends (at the last moment you were on a work
+// app) once you've been on non-work apps — or away — for the grace period.
+function workStretchStart(ivs){
+  let i = ivs.length-1;
+  if(i<0 || activityCategory(ivs[i].app)!=='work') return null;
+  let start = ivs[i].start;
+  for(i=i-1; i>=0; i--){
+    const iv = ivs[i];
+    if(start - iv.end > APP_ACTIVITY_GAP_MS) break;
+    const c = activityCategory(iv.app);
+    if(c==='work' || c==='neutral') start = iv.start; else break;
+  }
+  return start;
+}
+function lastWorkEnd(ivs){
+  for(let i=ivs.length-1;i>=0;i--) if(activityCategory(ivs[i].app)==='work') return ivs[i].end;
+  return null;
+}
 function checkAutoLockIn(){
   const st = state.settings.appTracking;
   if(!st || st.enabled===false || st.autoLockIn===false) return;
@@ -5803,47 +6521,234 @@ function checkAutoLockIn(){
 
   if(isLive && !activeSession){
     if(autoLockInBlockedReason()) return;
-    const elapsedMin = (last.end-autoLockInCountFrom(last))/60000;
-    if(elapsedMin >= (st.thresholdMinutes||12) && autoLockInMeta.intervalStart!==last.start){
-      autoLockInMeta = {app:last.app, intervalStart:last.start};
+    const stretch = workStretchStart(ivs);
+    if(stretch==null) return;
+    const from = Math.max(stretch, autoLockInCountFrom({start:stretch}));
+    const elapsedMin = (last.end-from)/60000;
+    if(elapsedMin >= (st.thresholdMinutes||12) && autoLockInMeta.intervalStart!==from){
+      autoLockInMeta = {app:last.app, intervalStart:from};
       startFocus(null);
-      if(state.focus.activeSession) state.focus.activeSession.autoStarted = true;
-      persist('focus');
-      showToast('Auto-locked in \u2014 you\u2019ve been on '+last.app+' for '+Math.round(elapsedMin)+' min', {icon:'&#128274;'});
+      const s = state.focus.activeSession;
+      if(s){ s.autoStarted = true; s.startedAt = from; s.autoApp = last.app; }
+      persist('focus'); renderView();
+      showToast('Locked in automatically — on '+last.app+' since '+fmt12Hour(nowHM(new Date(from))), {icon:'&#128274;'});
     }
     return;
   }
 
-  if(activeSession && activeSession.autoStarted){
-    if(!isLive) return; // idle/away — leave it running rather than guess
-    if(last.app === autoLockInMeta.app){ autoLockInMeta.intervalStart = last.start; return; }
-    const awayMin = (Date.now()-last.start)/60000;
-    if(awayMin >= (st.graceMinutes||3)){
-      autoEndFocusSession();
+  if(activeSession && activeSession.autoStarted && !activeSession.onBreak){
+    const cat = activityCategory(last.app);
+    const lw = lastWorkEnd(ivs) || activeSession.startedAt;
+    const grace = (st.graceMinutes||3)*60000;
+    if(isLive && cat==='work') return;
+    if(isLive && cat==='neutral' && Date.now()-lw < grace*3) return;
+    const awayLimit = isLive ? grace : Math.max(10*60000, grace*2);
+    if(Date.now()-lw >= awayLimit){
+      autoEndFocusSession(Math.max(lw, activeSession.startedAt+60000));
       autoLockInMeta = {app:null, intervalStart:null};
     }
   }
 }
-function autoEndFocusSession(){
+function autoEndFocusSession(endAt){
   const s = state.focus.activeSession;
   if(!s) return;
-  const endedAt = Date.now();
+  const endedAt = Math.min(Date.now(), endAt || Date.now());
   const minutes = Math.max(1, Math.round((endedAt-s.startedAt)/60000));
   if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
-  state.focus.sessions.push({id:uid(), type:sessionType(s), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endedAt, minutes:minutes, completedTasks:arr(s.completedTasks), note:'', autoStopped:true});
+  state.focus.sessions.push({id:uid(), type:sessionType(s), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endedAt, minutes:minutes, completedTasks:arr(s.completedTasks), note:'', autoStopped:true, auto:!!s.autoStarted, reviewed:false, app:s.autoApp||null});
   state.focus.activeSession = null;
   state.focus.lastSessionEndedAt = endedAt;
-  if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   if(state.modes.active && state.modes.active.linkedFocus){ endMode(); }
   playStopSound();
   persist('focus'); renderView();
-  showToast('Auto-ended focus session \u2014 you switched apps', {icon:'&#9209;'});
+  showToast('Session ended — you moved off work apps at '+fmt12Hour(nowHM(new Date(endedAt)))+' ('+fmtDurationLabel(minutes)+' logged)', {icon:'&#9209;'});
 }
 function startAppActivityPolling(){
   pollAppActivity();
   setInterval(pollAppActivity, 15000);
 }
 
+
+// ============ WORK vs NOT-WORK APPS, ACTIVITY PILL, END-OF-DAY RECAP ============
+// Every app (and website, when you're in a browser) is "work", "not work", or — until you
+// sort it — unsorted (treated as not work). Only work apps start an automatic lock-in.
+const DEFAULT_WORK_ACTIVITY = ['final cut pro','adobe premiere pro','davinci resolve','capcut','adobe photoshop','adobe lightroom classic','lightroom','adobe after effects','adobe illustrator','figma','notion','code','visual studio code','cursor','xcode','canva','frame.io','logic pro','garageband',
+  'docs.google.com','sheets.google.com','slides.google.com','drive.google.com','app.gohighlevel.com','adsmanager.facebook.com','business.facebook.com','canva.com','figma.com','notion.so','frame.io','chatgpt.com','chat.openai.com','claude.ai','capcut.com','studio.youtube.com'];
+const NEUTRAL_ACTIVITY = ['operator','finder','system settings','system preferences','loginwindow'];
+function activityKey(name){ return String(name||'').trim().toLowerCase(); }
+function activityCats(){ const st = state.settings.appTracking; if(!st.categories || typeof st.categories!=='object') st.categories = {}; return st.categories; }
+function activityCategory(name){
+  const k = activityKey(name);
+  const set = activityCats()[k];
+  if(set) return set;
+  if(NEUTRAL_ACTIVITY.indexOf(k)>=0) return 'neutral';
+  if(DEFAULT_WORK_ACTIVITY.indexOf(k)>=0) return 'work';
+  return 'unsorted';
+}
+function setActivityCategory(name, cat){
+  const k = activityKey(name); if(!k) return;
+  activityCats()[k] = cat;
+  persist('settings');
+}
+const CAT_META = {work:{label:'Work', color:'var(--good)'}, other:{label:'Not work', color:'var(--danger)'}, neutral:{label:'Neutral', color:'var(--text-faint)'}, unsorted:{label:'Unsorted', color:'#8A90A2'}};
+// ---- the always-visible pill (bottom-left, works with the sidebar closed) ----
+function updateActivityPill(){
+  const el = document.getElementById('activityPill'); if(!el) return;
+  const st = state.settings.appTracking;
+  const app = (st && st.enabled!==false) ? currentForegroundApp() : null;
+  const s = state.focus.activeSession;
+  if(!app && !s){ el.classList.add('is-hidden'); return; }
+  el.classList.remove('is-hidden');
+  const cat = app ? activityCategory(app) : 'neutral';
+  el.dataset.cat = cat;
+  const lock = s ? (s.onBreak ? '&#9749; on break' : '&#128274; '+fmtDurationLabel(Math.max(0, Math.round((Date.now()-s.startedAt)/60000)))) : '';
+  const html = '<span class="ap-dot"></span><span class="ap-name">'+(app ? escapeHtml(app) : 'Away')+'</span>'+(lock ? '<span class="ap-lock">'+lock+'</span>' : '');
+  if(el._html!==html){ el.innerHTML = html; el._html = html; }
+  el.title = app ? app+' — '+CAT_META[cat].label+' (click to change)' : '';
+}
+setInterval(function(){ try{ if(state && state.settings) updateActivityPill(); }catch(e){} }, 5000);
+afterRenderHooks.push(function(){ updateActivityPill(); document.body.classList.toggle('sb-collapsed', !!state.profile.sidebarCollapsed); });
+ACTIONS.activityPillMenu = function(){
+  const app = currentForegroundApp();
+  ui.pillMenu = ui.pillMenu ? null : (app || '__none');
+  renderPillMenu();
+};
+function renderPillMenu(){
+  let m = document.getElementById('activityPillMenu');
+  if(!ui.pillMenu){ if(m) m.remove(); return; }
+  if(!m){ m = document.createElement('div'); m.id = 'activityPillMenu'; m.className = 'ap-menu'; document.body.appendChild(m); }
+  const app = ui.pillMenu==='__none' ? null : ui.pillMenu;
+  const cat = app ? activityCategory(app) : null;
+  m.innerHTML = (app ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div>'+
+      '<div class="ap-menu-k">Is this work?</div>'+
+      '<div class="ap-seg">'+['work','other'].map(function(c){ return '<button class="ap-seg-btn'+(cat===c?' is-on':'')+'" data-action="pillSetCat" data-id="'+c+'">'+CAT_META[c].label+'</button>'; }).join('')+'</div>'+
+      '<div class="ap-menu-hint">Only work apps &amp; sites start an automatic lock-in.</div>' : '<div class="ap-menu-title">Nothing in front right now</div>')+
+    '<button class="ap-menu-link" data-action="goToActivitySettings">All apps &amp; sites &rarr;</button>';
+}
+ACTIONS.pillSetCat = function(el, e, id){ if(ui.pillMenu && ui.pillMenu!=='__none') setActivityCategory(ui.pillMenu, id); renderPillMenu(); updateActivityPill(); playTick(); };
+ACTIONS.goToActivitySettings = function(){ ui.pillMenu = null; renderPillMenu(); ui.view='settings'; ui.settingsTab='focus'; renderView(); setTimeout(function(){ const s = document.getElementById('workAppsSection'); if(s) s.scrollIntoView({behavior:'smooth', block:'start'}); }, 40); };
+document.addEventListener('pointerdown', function(e){ if(!ui.pillMenu) return; if(e.target.closest && (e.target.closest('#activityPillMenu') || e.target.closest('#activityPill'))) return; ui.pillMenu = null; renderPillMenu(); }, true);
+// ---- Settings: sort apps & sites ----
+function recentActivityTotals(days){
+  const totals = {};
+  for(let i=0;i<days;i++){
+    const d = addDays(todayStr(), -i);
+    const m = appMinutesForDate(d);
+    Object.keys(m).forEach(function(k){ totals[k] = (totals[k]||0)+m[k]; });
+  }
+  Object.keys(activityCats()).forEach(function(k){ if(!Object.keys(totals).some(function(t){ return activityKey(t)===k; })) totals[k] = 0; });
+  return Object.keys(totals).map(function(k){ return {name:k, minutes:totals[k]}; }).sort(function(a,b){ return b.minutes-a.minutes; });
+}
+function workAppsSettingsHtml(){
+  const list = recentActivityTotals(14).filter(function(x){ return activityCategory(x.name)!=='neutral'; });
+  const filter = ui.workAppFilter || 'all';
+  const shown = list.filter(function(x){ const c = activityCategory(x.name); return filter==='all' || c===filter || (filter==='other' && c==='unsorted'); }).slice(0, 60);
+  const unsorted = list.filter(function(x){ return activityCategory(x.name)==='unsorted'; }).length;
+  return '<div class="card section" id="workAppsSection">'+
+    '<div class="section-title">Work apps &amp; sites<span class="kpi-sub">only work ones start an automatic lock-in</span></div>'+
+    '<div class="row" style="gap:6px;margin-bottom:10px;flex-wrap:wrap;">'+
+      [['all','All'],['work','Work'],['other','Not work']].map(function(f){ return '<button class="btn btn-sm '+(filter===f[0]?'btn-primary':'btn-ghost')+'" data-action="workAppFilter" data-id="'+f[0]+'">'+f[1]+'</button>'; }).join('')+
+      (unsorted ? '<span class="kpi-sub" style="align-self:center;">'+unsorted+' not sorted yet (counted as not work)</span>' : '')+
+    '</div>'+
+    '<div class="wa-list">'+(shown.map(function(x){
+      const c = activityCategory(x.name);
+      return '<div class="wa-row" data-key="wa-'+escapeHtml(x.name)+'"><span class="wa-dot" style="background:'+CAT_META[c].color+'"></span><span class="wa-name">'+escapeHtml(x.name)+'</span><span class="kpi-sub">'+(x.minutes?fmtDurationLabel(x.minutes)+' / 2 wks':'')+'</span>'+
+        '<span class="ap-seg">'+['work','other'].map(function(k){ return '<button class="ap-seg-btn'+(c===k?' is-on':'')+'" data-action="setWorkApp" data-name="'+escapeHtml(x.name)+'" data-id="'+k+'">'+CAT_META[k].label+'</button>'; }).join('')+'</span></div>';
+    }).join('') || '<div class="empty">Nothing tracked yet — apps and sites show up here as you use them.</div>')+'</div>'+
+    '<div class="row" style="gap:8px;margin-top:10px;"><input class="input" id="newWorkApp" placeholder="Add an app or site (e.g. Final Cut Pro, figma.com)" style="flex:1;"><button class="btn btn-sm" data-action="addWorkApp">Add as work</button></div>'+
+  '</div>';
+}
+ACTIONS.workAppFilter = function(el, e, id){ ui.workAppFilter = id; renderView(); };
+ACTIONS.setWorkApp = function(el, e, id){ setActivityCategory(el.dataset.name, id); playTick(); renderView(); };
+ACTIONS.addWorkApp = function(){ const i = document.getElementById('newWorkApp'); const v = i && i.value.trim(); if(!v) return; setActivityCategory(v.replace(/^https?:\/\//,'').replace(/^www\./,'').replace(/\/.*$/,''), 'work'); i.value=''; renderView(); };
+// ---- End-of-day recap: what you did, how you worked, approve the sessions ----
+function sessionsOn(date){ return state.focus.sessions.filter(function(s){ return s.date===date; }).sort(function(a,b){ return a.startedAt-b.startedAt; }); }
+function recapNeeded(date){ return sessionsOn(date).some(function(s){ return s.auto && !s.reviewed; }); }
+function openDayRecap(date){ ui.recapDate = date || todayStr(); showOverlay('recapOverlay'); renderRecapInto(); }
+ACTIONS.openDayRecap = function(el){ openDayRecap(el && el.dataset && el.dataset.date); };
+ACTIONS.closeDayRecap = function(){ state.focus.recapSeen = state.focus.recapSeen || {}; state.focus.recapSeen[ui.recapDate] = true; persist('focus'); hideOverlay('recapOverlay'); renderView(); };
+function recapTimelineHtml(date, sessions){
+  const dayStart = localTs(date, '06:00'), dayEnd = localTs(addDays(date,1), '00:00');
+  const span = dayEnd-dayStart;
+  const pos = function(ts){ return clamp((ts-dayStart)/span*100, 0, 100); };
+  const blocks = sessions.map(function(s){ return '<span class="rc-blk'+(s.auto?' is-auto':'')+(s.auto && !s.reviewed?' is-pending':'')+'" style="left:'+pos(s.startedAt)+'%;width:'+Math.max(0.6, pos(s.endedAt)-pos(s.startedAt))+'%" title="'+fmt12Hour(nowHM(new Date(s.startedAt)))+'–'+fmt12Hour(nowHM(new Date(s.endedAt)))+'"></span>'; }).join('');
+  const modes = state.modes.history.filter(function(m){ return m.date===date && m.type==='break'; }).map(function(m){ return '<span class="rc-blk is-break" style="left:'+pos(m.startedAt)+'%;width:'+Math.max(0.4, pos(m.endedAt)-pos(m.startedAt))+'%" title="Break"></span>'; }).join('');
+  const ticks = [6,9,12,15,18,21].map(function(h){ return '<span class="rc-tick" style="left:'+pos(localTs(date, pad2(h)+':00'))+'%">'+(h===12?'12p':h>12?(h-12)+'p':h+'a')+'</span>'; }).join('');
+  return '<div class="rc-timeline"><div class="rc-track">'+modes+blocks+'</div><div class="rc-ticks">'+ticks+'</div></div>';
+}
+function renderRecap(){
+  const date = ui.recapDate || todayStr();
+  const sessions = sessionsOn(date);
+  const deep = date===todayStr() ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(date);
+  const target = state.standards.deepWorkTargetMinutes || 180;
+  const tasksDone = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===date; });
+  const breaks = state.modes.history.filter(function(m){ return m.date===date && m.type==='break'; });
+  const apps = topAppsForDate(date, 30);
+  let workMin = 0, otherMin = 0;
+  apps.forEach(function(a){ const c = activityCategory(a.app); if(c==='work') workMin += a.minutes; else if(c!=='neutral') otherMin += a.minutes; });
+  const longest = sessions.reduce(function(m,s){ return Math.max(m, s.minutes||0); }, 0);
+  const first = sessions[0];
+  const pending = sessions.filter(function(s){ return s.auto && !s.reviewed; }).length;
+  const stat = function(v, k, cls){ return '<div class="rc-stat'+(cls?' '+cls:'')+'"><div class="stat-tile-v">'+v+'</div><div class="stat-tile-sub">'+k+'</div></div>'; };
+  const dayLabel = date===todayStr() ? 'Today' : date===addDays(todayStr(),-1) ? 'Yesterday' : weekdayShort(date);
+  return '<div class="rc">'+
+    '<div class="rc-head"><div><div class="stat-tile-k">Day recap</div><div class="rc-title">'+dayLabel+' &middot; '+new Date(localTs(date,'12:00')).toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+'</div></div>'+
+      '<span class="tag '+(dayStandardsComplete(date)?'tag-good':'')+'">'+(dayStandardsComplete(date)?'&#10003; Standard hit':'Standard not hit')+'</span></div>'+
+    '<div class="rc-stats">'+
+      stat(fmtHours(deep), 'deep work &middot; '+Math.round(deep/target*100)+'% of goal', deep>=target?'is-good':'')+
+      stat(sessions.length, 'session'+(sessions.length===1?'':'s')+(longest?' &middot; longest '+fmtDurationLabel(longest):''))+
+      stat(tasksDone.length, 'task'+(tasksDone.length===1?'':'s')+' done')+
+      stat(first ? fmt12Hour(nowHM(new Date(first.startedAt))) : '—', 'first lock-in')+
+    '</div>'+
+    recapTimelineHtml(date, sessions)+
+    ((workMin || otherMin) ? '<div class="rc-split"><div class="rc-split-bar"><span style="width:'+(workMin/Math.max(1,workMin+otherMin)*100)+'%"></span></div>'+
+      '<div class="kpi-sub"><b style="color:var(--good);">'+fmtDurationLabel(workMin)+'</b> on work apps &middot; <b style="color:#ffb3b8;">'+fmtDurationLabel(otherMin)+'</b> on everything else'+(breaks.length?' &middot; '+breaks.length+' break'+(breaks.length===1?'':'s'):'')+'</div></div>' : '')+
+    (apps.length ? '<div class="rc-apps">'+apps.slice(0, 6).map(function(a){ const c = activityCategory(a.app); return '<span class="rc-app"><span class="wa-dot" style="background:'+CAT_META[c].color+'"></span>'+escapeHtml(a.app)+'<span class="kpi-sub">'+fmtDurationLabel(a.minutes)+'</span></span>'; }).join('')+'</div>' : '')+
+    '<div class="kind-label" style="margin-top:16px;">Sessions'+(pending?' &middot; '+pending+' started automatically to check':'')+'</div>'+
+    (sessions.length ? '<div class="rc-sessions">'+sessions.map(function(s){
+      return '<div class="rc-sess'+(s.auto && !s.reviewed?' is-pending':'')+'" data-key="rcs-'+s.id+'">'+
+        '<span class="rc-sess-time">'+fmt12Hour(nowHM(new Date(s.startedAt)))+' – '+fmt12Hour(nowHM(new Date(s.endedAt)))+'</span>'+
+        '<span class="rc-sess-len">'+fmtDurationLabel(s.minutes||0)+'</span>'+
+        (s.auto ? '<span class="tag">auto'+(s.app?' &middot; '+escapeHtml(s.app):'')+'</span>' : '<span class="tag tag-good">you</span>')+
+        '<span style="flex:1"></span>'+
+        (s.auto && !s.reviewed ? '<button class="mini-move mini-move-today" data-action="recapApprove" data-id="'+s.id+'">&#10003; Keep</button>' : (s.auto ? '<span class="kpi-sub">kept</span>' : ''))+
+        '<button class="mini-move" data-action="recapEdit" data-id="'+s.id+'">Edit</button>'+
+        '<button class="mini-move mini-move-danger" data-action="recapDiscard" data-id="'+s.id+'" title="Wasn\'t real work — remove it">&#10005;</button>'+
+      '</div>';
+    }).join('')+'</div>' : '<div class="kpi-sub">No locked-in sessions this day.</div>')+
+    '<div class="row" style="justify-content:space-between;margin-top:18px;gap:8px;flex-wrap:wrap;">'+
+      '<button class="btn btn-ghost btn-sm" data-action="goToActivitySettings">Sort work apps</button>'+
+      '<div class="row" style="gap:8px;">'+(pending ? '<button class="btn btn-good" data-action="recapApproveAll">&#10003; Keep all &amp; close</button>' : '<button class="btn btn-primary" data-action="closeDayRecap">Done</button>')+'</div>'+
+    '</div>'+
+  '</div>';
+}
+function renderRecapInto(){ const el = document.getElementById('recapContent'); if(el) morphInto(el, renderRecap()); }
+registerModal('recapOverlay', renderRecapInto);
+function recapSession(id){ return state.focus.sessions.find(function(s){ return s.id===id; }); }
+ACTIONS.recapApprove = function(el, e, id){ const s = recapSession(id); if(s){ s.reviewed = true; persist('focus'); playTick(); renderRecapInto(); } };
+ACTIONS.recapApproveAll = function(){ sessionsOn(ui.recapDate).forEach(function(s){ if(s.auto) s.reviewed = true; }); persist('focus'); playPositive(); ACTIONS.closeDayRecap(); };
+let lastDiscardedSession = null;
+ACTIONS.recapDiscard = function(el, e, id){
+  const i = state.focus.sessions.findIndex(function(s){ return s.id===id; }); if(i<0) return;
+  lastDiscardedSession = {s:state.focus.sessions[i], i:i};
+  state.focus.sessions.splice(i, 1);
+  persist('focus'); renderRecapInto(); renderView();
+  showToast('Session removed', {icon:'&#128465;', actionLabel:'Undo', actionAction:'undoRecapDiscard', duration:7000});
+};
+ACTIONS.undoRecapDiscard = function(){ if(!lastDiscardedSession) return; state.focus.sessions.splice(lastDiscardedSession.i, 0, lastDiscardedSession.s); lastDiscardedSession = null; persist('focus'); renderView(); if(overlayOpen('recapOverlay')) renderRecapInto(); };
+ACTIONS.recapEdit = function(el, e, id){ const s = recapSession(id); if(s) s.reviewed = true; hideOverlay('recapOverlay'); openTimeBlockEdit('session', id); };
+// When it pops up: going to sleep, at the recap time in the evening (once), or the next
+// morning if yesterday still has automatic sessions to check.
+function maybeShowRecap(){
+  if(isWakeDisplay || state.focus.activeSession || document.querySelector('.overlay:not(.hidden)')) return;
+  const seen = state.focus.recapSeen || {};
+  const today = todayStr(), yest = addDays(today, -1);
+  const rt = (state.settings.appTracking && state.settings.appTracking.recapTime) || '21:30';
+  if(!seen[yest] && recapNeeded(yest) && new Date().getHours()>=5){ openDayRecap(yest); return; }
+  if(!seen[today] && nowHM()>=rt && sessionsOn(today).length){ openDayRecap(today); }
+}
+setInterval(function(){ try{ if(state && state.focus) maybeShowRecap(); }catch(e){} }, 60000);
+setTimeout(function(){ try{ maybeShowRecap(); }catch(e){} }, 4000);
 // ============ FITNESS (Health) ============
 function renderFitness(){
   return '<div class="subtabs">'+
@@ -5853,26 +6758,111 @@ function renderFitness(){
   '</div>'+
   (ui.healthTab==='workouts' ? renderWorkouts() : ui.healthTab==='weight' ? renderWeight() : renderCalories());
 }
+const WORKOUT_TYPES = [
+  {id:'Lift', icon:'&#127947;&#65039;'}, {id:'Run', icon:'&#127939;'}, {id:'Walk', icon:'&#128694;'}, {id:'Bike', icon:'&#128692;'},
+  {id:'Yoga', icon:'&#129496;'}, {id:'Sports', icon:'&#9917;'}, {id:'Swim', icon:'&#127946;'}, {id:'Boxing', icon:'&#129354;'}
+];
+function workoutIcon(type){
+  const t = String(type||'').toLowerCase();
+  if(/lift|weight|gym|push|pull|leg|chest|back|arm|strength/.test(t)) return '&#127947;&#65039;';
+  if(/run|jog|sprint/.test(t)) return '&#127939;';
+  if(/walk|steps/.test(t)) return '&#128694;';
+  if(/bike|cycl|spin/.test(t)) return '&#128692;';
+  if(/yoga|stretch|mobility|pilates/.test(t)) return '&#129496;';
+  if(/swim/.test(t)) return '&#127946;';
+  if(/box|mma|fight|kick/.test(t)) return '&#129354;';
+  if(/hike/.test(t)) return '&#129406;';
+  if(/ball|soccer|football|tennis|sport|golf/.test(t)) return '&#9917;';
+  return '&#128170;';
+}
+function workoutTypeChoices(){
+  const counts = {};
+  state.health.gymLog.forEach(function(g){ const k = String(g.type||'').trim(); if(k) counts[k] = (counts[k]||0)+1; });
+  const mine = Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; }).slice(0, 6);
+  const out = mine.map(function(k){ return {id:k, icon:workoutIcon(k)}; });
+  WORKOUT_TYPES.forEach(function(t){ if(out.length<8 && !out.some(function(o){ return o.id.toLowerCase()===t.id.toLowerCase(); })) out.push(t); });
+  return out;
+}
+function weeksOnTargetStreak(){
+  const target = state.profile.weeklyWorkoutTarget||0; if(!target) return 0;
+  let n = 0, ws = addDays(startOfWeekStr(todayStr()), -7);
+  for(let k=0;k<104;k++){
+    let c = 0; for(let i=0;i<7;i++) if(trainedDoneFor(addDays(ws, i))) c++;
+    if(c>=target){ n++; ws = addDays(ws, -7); } else break;
+  }
+  if(workoutsThisWeek()>=target) n++;
+  return n;
+}
 function renderWorkouts(){
   const log = state.health.gymLog.slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
-  const last7 = []; for(let i=0;i<7;i++) last7.push(addDays(todayStr(),-i));
-  const trained7 = last7.filter(function(d){ return state.health.gymLog.some(function(g){return g.date===d;}); }).length;
-  return '<div class="section"><div class="card" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;"><div><div class="kpi-label">Trained</div><div class="kpi-value">'+trained7+'/'+state.profile.weeklyWorkoutTarget+'</div><div class="kpi-sub">last 7 days &middot; target set in Settings</div></div>'+'<span class="tag '+(trainedDoneFor(todayStr())?'tag-good':'tag-med')+'">'+(trainedDoneFor(todayStr())?'✓ Counted toward today\'s standard':'Not yet logged today')+'</span>'+'</div></div>'+
-  '<div class="card section">'+
-    '<div class="grid grid-2">'+
-      '<div class="field"><label>Date</label><div class="row"><input class="input" type="date" id="gymDate" value="'+todayStr()+'"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="gymDate">&#128197;</button></div></div>'+
-      '<div class="field"><label>Type</label><input class="input" id="gymType" placeholder="Walk, lift, run, etc."></div>'+
+  const target = state.profile.weeklyWorkoutTarget||0;
+  const wk = workoutsThisWeek();
+  const ws = startOfWeekStr(todayStr());
+  const weekMins = log.filter(function(g){ return g.date>=ws && g.date<=todayStr(); }).reduce(function(a,g){ return a+(Number(g.duration)||0); }, 0);
+  const monthCount = log.filter(function(g){ return monthKeyOf(g.date)===thisMonthKey(); }).length;
+  const names = ['M','T','W','T','F','S','S'];
+  const strip = names.map(function(n, i){
+    const d = addDays(ws, i), done = log.filter(function(g){ return g.date===d; });
+    return '<div class="fit-day'+(d===todayStr()?' is-today':'')+(done.length?' is-done':'')+(d>todayStr()?' is-future':'')+'" title="'+fmtDateShort(d)+(done.length?': '+escapeHtml(done.map(function(g){ return g.type; }).join(', ')):'')+'">'+
+      '<span class="fit-day-dot">'+(done.length ? workoutIcon(done[0].type) : '')+'</span><span class="fit-day-n">'+n+'</span></div>';
+  }).join('');
+  const sel = ui.fitType || '', dur = ui.fitDur==null ? 45 : ui.fitDur;
+  const groups = {};
+  log.forEach(function(g){ const k = startOfWeekStr(g.date); (groups[k] = groups[k]||[]).push(g); });
+  const weekLabel = function(k){ return k===ws ? 'This week' : k===addDays(ws,-7) ? 'Last week' : 'Week of '+fmtDateShort(k); };
+  return '<div class="card fit-hero section">'+
+      '<div class="fit-ring">'+svgRing(target ? clamp(wk/target*100,0,100) : 0, 112, wk>=target && target ? 'var(--good)' : 'var(--accent)', wk+(target?'/'+target:''), 'this week')+'</div>'+
+      '<div class="fit-mid"><div class="fit-strip">'+strip+'</div>'+
+        '<div class="fit-today">'+(trainedDoneFor(todayStr()) ? '<span style="color:var(--good);">&#10003; Trained today — counts toward today\'s standard</span>' : 'Not trained yet today')+'</div></div>'+
+      '<div class="fit-stats">'+
+        '<div><div class="stat-tile-v">'+weeksOnTargetStreak()+'</div><div class="stat-tile-sub">week streak on target</div></div>'+
+        '<div><div class="stat-tile-v">'+fmtDurationLabel(weekMins)+'</div><div class="stat-tile-sub">trained this week</div></div>'+
+        '<div><div class="stat-tile-v">'+monthCount+'</div><div class="stat-tile-sub">workouts this month</div></div>'+
+      '</div>'+
     '</div>'+
-    '<div class="grid grid-2" style="margin-top:10px;">'+
-      '<div class="field"><label>Duration</label>'+buildScrollPicker('workoutPicker', durationOptions(180), 30)+'</div>'+
-      '<div class="field"><label>Notes</label><input class="input" id="gymNotes"></div>'+
-    '</div>'+
-    '<button class="btn btn-primary" data-action="addWorkout" style="margin-top:10px;">Log</button>'+
-  '</div>'+
-  '<div class="task-list">'+(log.map(function(g){
-    return '<div class="task-item-v2"><div style="width:60px;font-family:var(--font-display);font-weight:700;">'+fmtDateShort(g.date)+'</div><div class="task-title">'+escapeHtml(g.type)+(g.duration?' &middot; '+fmtDurationLabel(g.duration):'')+'</div><div class="kpi-sub">'+escapeHtml(g.notes||'')+'</div><button class="btn btn-ghost btn-sm" data-action="openWorkoutEditModal" data-id="'+g.id+'">Edit</button>'+deleteBtn('gym', g.id)+'</div>';
-  }).join('') || '<div class="empty">No workouts logged yet.</div>')+'</div>';
+    '<div class="section"><div class="section-title">Log a workout</div><div class="card fit-log">'+
+      '<div class="fit-types">'+workoutTypeChoices().map(function(t){ return '<button class="fit-type'+(sel===t.id?' is-on':'')+'" data-action="fitPickType" data-id="'+escapeHtml(t.id)+'"><span class="fit-type-i">'+t.icon+'</span>'+escapeHtml(t.id)+'</button>'; }).join('')+'</div>'+
+      '<div class="fit-row">'+
+        '<input class="input" id="gymType" placeholder="…or type it (e.g. Push day)" value="'+escapeHtml(sel)+'" style="flex:1;min-width:180px;">'+
+        '<div class="fit-durs">'+[15,30,45,60,90,120].map(function(m){ return '<button class="fit-dur'+(dur===m?' is-on':'')+'" data-action="fitPickDur" data-id="'+m+'">'+(m<60?m+'m':(m/60)+'h')+'</button>'; }).join('')+'</div>'+
+      '</div>'+
+      '<div class="fit-row">'+
+        '<input class="input" type="date" id="gymDate" value="'+(ui.fitDate||todayStr())+'" style="width:160px;">'+
+        '<input class="input" id="gymNotes" placeholder="Notes (optional) — PRs, how it felt" style="flex:1;min-width:180px;">'+
+        '<button class="btn btn-good fit-log-btn" data-action="fitLog">&#10003; Log workout</button>'+
+      '</div>'+
+    '</div></div>'+
+    '<div class="section"><div class="section-title">History</div>'+
+      (log.length ? Object.keys(groups).sort().reverse().slice(0, 10).map(function(k){
+        const items = groups[k];
+        return '<div class="fit-week"><div class="fit-week-head"><span>'+weekLabel(k)+'</span><span class="kpi-sub">'+items.length+' workout'+(items.length===1?'':'s')+' &middot; '+fmtDurationLabel(items.reduce(function(a,g){ return a+(Number(g.duration)||0); },0))+'</span></div>'+
+          items.map(function(g){
+            return '<div class="fit-entry" data-key="gym-'+g.id+'"><span class="fit-entry-i">'+workoutIcon(g.type)+'</span>'+
+              '<div class="fit-entry-main"><div class="fit-entry-title">'+escapeHtml(g.type)+(g.duration?' <span class="kpi-sub">&middot; '+fmtDurationLabel(g.duration)+'</span>':'')+'</div>'+(g.notes?'<div class="kpi-sub">'+escapeHtml(g.notes)+'</div>':'')+'</div>'+
+              '<span class="kpi-sub">'+weekdayShort(g.date)+' '+fmtDateShort(g.date)+'</span>'+
+              '<button class="btn btn-ghost btn-sm" data-action="openWorkoutEditModal" data-id="'+g.id+'">Edit</button>'+deleteBtn('gym', g.id)+
+            '</div>';
+          }).join('')+'</div>';
+      }).join('') : '<div class="empty">No workouts logged yet — pick one above.</div>')+
+    '</div>';
 }
+ACTIONS.fitPickType = function(el, e, id){ ui.fitType = ui.fitType===id ? '' : id; renderView(); };
+ACTIONS.fitPickDur = function(el, e, id){ ui.fitDur = Number(id); renderView(); };
+ACTIONS.fitLog = function(){
+  const typeEl = document.getElementById('gymType');
+  const type = (typeEl && typeEl.value.trim()) || ui.fitType;
+  if(!type){ if(typeEl) typeEl.focus(); showToast('Pick or type what you did.', {icon:'&#128170;'}); return; }
+  const date = (document.getElementById('gymDate')||{}).value || todayStr();
+  const notes = ((document.getElementById('gymNotes')||{}).value||'').trim();
+  const firstToday = date===todayStr() && !trainedDoneFor(date);
+  state.health.gymLog.push({id:uid(), date:date, type:type, duration:ui.fitDur==null?45:ui.fitDur, notes:notes});
+  ui.fitType = ''; ui.fitDate = null;
+  if(typeEl) typeEl.value = '';
+  const n = document.getElementById('gymNotes'); if(n) n.value = '';
+  playPositive();
+  persist('health'); renderView();
+  showToast(firstToday ? 'Logged — today\'s training standard is done.' : 'Workout logged.', {icon:workoutIcon(type)});
+};
 function openWorkoutEditModal(id){
   ui.editingWorkoutId = id;
   const o = document.getElementById('workoutEditOverlay');
@@ -6378,48 +7368,6 @@ function saveQuickJournal(){
 }
 
 // ============ GOALS ============
-function renderGoalsTab(){
-  const items = state.goals.items;
-  const done = items.filter(function(g){ return g.done; });
-  const mrr = arr(state.business.clients).filter(function(c){return c.status==='active';}).reduce(function(a,c){return a+Number(c.mrr||0);},0);
-  const mrrGoal = state.profile.revenueGoalMonthly||1;
-  const mrrPct = clamp(mrr/mrrGoal*100,0,100);
-  const weightLog = state.health.weightLog.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
-  const latestWeight = weightLog.length?weightLog[weightLog.length-1].weight:null;
-  const startWeight = weightLog.length?weightLog[0].weight:null;
-  const goalWeight = state.profile.goalWeight;
-  let weightPct = 0;
-  if(latestWeight!=null && goalWeight!=null && startWeight!=null && startWeight!==goalWeight){
-    weightPct = clamp(Math.round(((startWeight-latestWeight)/(startWeight-goalWeight))*100),0,100);
-  }
-  const last7=[]; for(let i=0;i<7;i++) last7.push(addDays(todayStr(),-i));
-  const trained7 = last7.filter(function(d){ return state.health.gymLog.some(function(g){return g.date===d;}); }).length;
-  const workoutPct = clamp(trained7/(state.profile.weeklyWorkoutTarget||1)*100,0,100);
-  const achievedPct = items.length?Math.round(done.length/items.length*100):0;
-
-  return '<div class="card section"><div style="text-align:center;margin-bottom:16px;"><div class="section-title" style="justify-content:center;margin-bottom:2px;">Snapshot</div><div class="kpi-sub">how the big-picture numbers are trending</div></div><div class="row" style="justify-content:space-around;flex-wrap:wrap;gap:18px;">'+
-      '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Revenue</div><div class="ring-wrap" style="'+goalGlowFilter(mrrPct)+'">'+svgRing(mrrPct,130,goalColor(),'$'+mrr.toLocaleString(),'of $'+mrrGoal.toLocaleString()+' MRR')+'</div></div>'+
-      (goalWeight!=null ? '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Weight</div><div class="ring-wrap" style="'+goalGlowFilter(weightPct)+'">'+svgRing(weightPct,130,goalColor(),(latestWeight!=null?latestWeight:'—'),'toward '+goalWeight+' goal')+'</div></div>' : '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Weight</div><div class="ring-wrap"><div class="empty" style="width:130px;">Set a goal weight in Settings</div></div></div>')+
-      '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Workouts</div><div class="ring-wrap" style="'+goalGlowFilter(workoutPct)+'">'+svgRing(workoutPct,130,goalColor(),trained7+'/'+state.profile.weeklyWorkoutTarget,'this week')+'</div></div>'+
-      '<div style="text-align:center;"><div class="kpi-label" style="margin-bottom:6px;">Goals Achieved</div><div class="ring-wrap" style="'+goalGlowFilter(achievedPct)+'">'+svgRing(achievedPct,130,goalColor(),done.length+'/'+items.length,items.length?'of your goals':'none set yet')+'</div></div>'+
-    '</div></div>'+
-  '<div class="card section">'+
-    '<div class="kpi-sub" style="margin-bottom:14px;text-align:center;">Add a goal, and optionally pair it with your own tracker.</div>'+
-    '<div class="grid grid-3">'+
-      '<div class="field"><label>Goal</label><input class="input" id="newGoalLabel" placeholder="e.g. First sponsor deal" style="width:100%;"></div>'+
-      '<div class="field"><label>Target (optional)</label><input class="input" type="number" id="newGoalTarget" placeholder="e.g. 90" style="width:100%;"></div>'+
-      '<div class="field"><label>Unit (optional)</label><input class="input" id="newGoalUnit" placeholder="e.g. lbs, $/mo, days" style="width:100%;"></div>'+
-    '</div>'+
-    '<div class="grid grid-2" style="margin-top:12px;">'+
-      '<div class="field"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="newGoalDeadline" style="flex:1;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newGoalDeadline">&#128197;</button></div></div>'+
-      '<div class="field"><label>Tracking</label><select class="input" id="newGoalTrackMode" style="width:100%;"><option value="manual">I\'ll update progress myself</option><option value="streak">Auto-track from my streak</option></select></div>'+
-    '</div>'+
-    '<div class="row" style="justify-content:center;margin-top:18px;">'+
-      '<button class="btn btn-good" style="font-size:16px;font-weight:700;padding:14px 36px;box-shadow:0 4px 22px rgba(63,190,142,.4);" data-action="addGoal">+ Add Goal</button>'+
-    '</div>'+
-  '</div>'+
-  '<div class="task-list">'+(items.map(goalRow).join('') || '<div class="empty">Nothing here yet — add the goals that actually matter to you.</div>')+'</div>';
-}
 function goalLiveCurrent(g){
   if(g.autoTrack==='streak') return computeStreak();
   return g.current||0;
@@ -6666,9 +7614,10 @@ function renderPersonal(){
     '<div class="tab '+(ui.personalTab==='fitness'?'active':'')+'" data-action="personalTab" data-tab="fitness">Fitness</div>'+
     '<div class="tab '+(ui.personalTab==='journal'?'active':'')+'" data-action="personalTab" data-tab="journal">Journal</div>'+
     '<div class="tab '+(ui.personalTab==='vision'?'active':'')+'" data-action="personalTab" data-tab="vision">Vision Board</div>'+
+    '<div class="tab '+(ui.personalTab==='milanote'?'active':'')+'" data-action="personalTab" data-tab="milanote">Milanote</div>'+
     '<div class="tab '+(ui.personalTab==='wishlist'?'active':'')+'" data-action="personalTab" data-tab="wishlist">Wish List</div>'+
   '</div>'+
-  '<div class="tab-panel" data-key="personal-'+ui.personalTab+'">'+(ui.personalTab==='goals' ? renderGoalsTab() : ui.personalTab==='fitness' ? renderFitness() : ui.personalTab==='wishlist' ? renderWishlistTab() : ui.personalTab==='vision' ? renderVisionTab() : renderJournalTab())+'</div>';
+  '<div class="tab-panel" data-key="personal-'+ui.personalTab+'">'+(ui.personalTab==='goals' ? renderGoalsTab() : ui.personalTab==='fitness' ? renderFitness() : ui.personalTab==='wishlist' ? renderWishlistTab() : ui.personalTab==='vision' ? renderVisionTab() : ui.personalTab==='milanote' ? renderMilanoteTab() : renderJournalTab())+'</div>';
 }
 
 
@@ -6817,16 +7766,23 @@ function boardsOfKind(kind){ return arr(state.boards.boards).filter(function(b){
 function currentBoardId(kind){
   ui.boardIds = ui.boardIds || {};
   let id = ui.boardIds[kind];
-  if(!boardById(id)){
-    const roots = boardsOfKind(kind).filter(function(b){ return !b.parentId; });
-    id = roots.length ? roots[0].id : null;
+  const b = boardById(id);
+  if(!b || b.kind!==kind){
+    if(kind==='vision'){ const m = masterVisionBoard(); id = m ? m.id : null; }
+    else { const roots = boardsOfKind(kind).filter(function(x){ return !x.parentId; }); id = roots.length ? roots[0].id : null; }
     ui.boardIds[kind] = id;
   }
   return id;
 }
+const BOARD_KIND_META = {
+  vision:{icon:'&#127775;', title:'Your vision board', sub:'One board for everything you\'re going after — it\'s what you wake up to. Photos, category cards, lists and boards inside it.'},
+  milanote:{icon:'&#128204;', title:'Milanote', sub:'All your other boards — moodboards, plans, shoot ideas. Bring your old Milanote boards in with Import.'},
+  journal:{icon:'&#128221;', title:'Journal boards', sub:'A freeform page for text cards, images and lists, next to your regular entries.'}
+};
 function createBoard(kind, name, parentId){
   const b = {id:uid(), name:name||'Untitled board', kind:kind, parentId:parentId||null, elements:[], viewport:{x:60, y:40, zoom:1}, createdAt:Date.now()};
   state.boards.boards.push(b);
+  if(kind==='vision' && !parentId && !masterVisionBoard()) state.boards.masterId = b.id;
   persist('boards');
   return b;
 }
@@ -6834,36 +7790,52 @@ function boardPath(b){ const out = []; let cur = b; let guard = 0; while(cur && 
 let boardSaveTimer = null;
 function saveBoardsSoon(){ clearTimeout(boardSaveTimer); boardSaveTimer = setTimeout(function(){ persist('boards'); }, 350); }
 // ---- page shell (header + toolbar are normal re-rendered markup; the canvas is not) ----
+function boardStripHtml(kind, current){
+  const roots = boardsOfKind(kind).filter(function(x){ return !x.parentId; });
+  const activeRoot = current ? boardPath(current)[0] : null;
+  return '<div class="board-strip">'+roots.map(function(r){
+      const count = r.elements.length;
+      return '<button class="board-pill'+(activeRoot && activeRoot.id===r.id?' is-active':'')+'" data-action="boardOpen" data-kind="'+kind+'" data-id="'+r.id+'" title="Open '+escapeHtml(r.name)+'">'+
+        '<span class="board-pill-thumb">'+(count ? boardStaticHtml(r, 'board-thumb') : '<span class="board-pill-empty">empty</span>')+'</span>'+
+        '<span class="board-pill-name">'+escapeHtml(r.name)+'</span><span class="board-pill-count">'+count+' item'+(count===1?'':'s')+'</span>'+
+      '</button>';
+    }).join('')+
+    '<button class="board-pill board-pill-new" data-action="boardNew" data-kind="'+kind+'"><span class="board-pill-plus">+</span><span class="board-pill-name">New board</span></button>'+
+    (kind==='milanote' ? '<button class="board-pill board-pill-new" data-action="boardImport"><span class="board-pill-plus">&#11014;</span><span class="board-pill-name">Import from Milanote</span><span class="board-pill-count">.zip, .md, images</span></button>' : '')+
+  '</div>';
+}
 function renderBoardShell(kind){
   const id = currentBoardId(kind);
   const b = id ? boardById(id) : null;
+  const meta = BOARD_KIND_META[kind] || BOARD_KIND_META.milanote;
   if(!b){
     return '<div class="board-empty card">'+
-      '<div style="font-size:34px;">'+(kind==='vision'?'&#127775;':'&#128221;')+'</div>'+
-      '<div class="section-title" style="justify-content:center;margin:8px 0 4px;">'+(kind==='vision'?'Your vision board':'Journal boards')+'</div>'+
-      '<div class="kpi-sub" style="max-width:420px;margin:0 auto 16px;">'+(kind==='vision'
-        ? 'A free canvas for photos, category cards, lists and nested boards — look at it any time.'
-        : 'A freeform page for text cards, images and lists, next to your regular entries.')+'</div>'+
+      '<div style="font-size:34px;">'+meta.icon+'</div>'+
+      '<div class="section-title" style="justify-content:center;margin:8px 0 4px;">'+meta.title+'</div>'+
+      '<div class="kpi-sub" style="max-width:440px;margin:0 auto 16px;">'+meta.sub+'</div>'+
       '<div class="row" style="justify-content:center;gap:8px;">'+
-        '<button class="btn btn-primary" data-action="boardNew" data-kind="'+kind+'">+ New '+(kind==='vision'?'vision board':'board')+'</button>'+
+        '<button class="btn btn-primary" data-action="boardNew" data-kind="'+kind+'">+ '+(kind==='vision'?'Create my vision board':'New board')+'</button>'+
         (kind==='vision' ? '<button class="btn btn-ghost" data-action="boardTemplate">Start from my Milanote layout</button>' : '')+
-      '</div></div>';
+        (kind==='milanote' ? '<button class="btn btn-ghost" data-action="boardImport">&#11014; Import from Milanote</button>' : '')+
+      '</div>'+
+      (kind==='milanote' ? '<div class="kpi-sub" style="margin-top:12px;">In Milanote: open a board &rarr; &#8943; menu &rarr; Export &rarr; Markdown (or download the images) &rarr; drop the file(s) here.</div>' : '')+
+    '</div>';
   }
   const view = !!(ui.boardView && ui.boardView[kind]);
+  const full = ui.boardFull===kind;
   const path = boardPath(b);
-  const roots = boardsOfKind(kind).filter(function(x){ return !x.parentId; });
   const selCount = cv.boardId===b.id ? cv.sel.size : 0;
   const tool = function(action, label, title, extra){ return '<button class="board-tool" data-action="'+action+'" data-kind="'+kind+'" title="'+escapeHtml(title||label)+'"'+(extra||'')+'>'+label+'</button>'; };
-  return '<div class="board-shell'+(view?' is-view':'')+'">'+
+  return '<div class="board-shell'+(view?' is-view':'')+(full?' is-full':'')+'" data-key="shell-'+kind+'">'+
+    (kind!=='vision' && !full ? boardStripHtml(kind, b) : '')+
     '<div class="board-bar">'+
       '<div class="board-crumbs">'+
-        (roots.length>1 || path.length>1 ? '<select class="input input-sm" data-board-pick="'+kind+'">'+boardsOfKind(kind).map(function(x){ return '<option value="'+x.id+'" '+(x.id===b.id?'selected':'')+'>'+(x.parentId?'&nbsp;&nbsp;↳ ':'')+escapeHtml(x.name)+'</option>'; }).join('')+'</select>' : '')+
         path.slice(0,-1).map(function(x){ return '<span class="board-crumb" data-action="boardOpen" data-kind="'+kind+'" data-id="'+x.id+'">'+escapeHtml(x.name)+'</span><span class="board-crumb-sep">/</span>'; }).join('')+
         (view ? '<span class="board-title-static">'+escapeHtml(b.name)+'</span>' : '<input class="board-title-input" data-board-rename="'+b.id+'" value="'+escapeHtml(b.name)+'">')+
       '</div>'+
       '<div class="row" style="gap:6px;">'+
-        (view ? '' : tool('boardNew','+ Board','New top-level board'))+
         tool('boardToggleView', view?'&#9998; Edit':'&#128065; View', view?'Back to editing':'View mode — hide the editing tools')+
+        tool('boardFullscreen', full?'&#10530; Exit full screen':'&#9974; Full screen', full?'Exit full screen (Esc)':'Full screen')+
       '</div>'+
     '</div>'+
     (view ? '' : '<div class="board-toolbar">'+
@@ -6872,7 +7844,7 @@ function renderBoardShell(kind){
       tool('boardAddList','&#9776; List','Add a list card')+
       tool('boardAddImage','&#128444; Image','Upload images (or paste / drop them on the board)')+
       tool('boardAddImageUrl','&#128279; Image URL','Add an image from a link')+
-      tool('boardAddNested','&#128203; Board','Add a nested board')+
+      tool('boardAddNested','&#128203; Board','Add a board inside this one')+
       tool('boardAddLine','&#9585; Line','Add a line / divider')+
       tool('boardAddArrow','&#10140; Arrow','Add an arrow')+
       '<span class="board-tool-sep"></span>'+
@@ -6890,17 +7862,28 @@ function renderBoardShell(kind){
       tool('boardZoomIn','+','Zoom in')+
       tool('boardFit','&#9974; Fit','Fit everything')+
       '<span style="flex:1"></span>'+
-      (path.length>1 || roots.length>1 ? tool('boardDeleteBoard','Delete board','Delete this board (and boards inside it)') : '')+
+      (kind==='milanote' && !b.parentId ? tool('boardImport','&#11014; Import','Import a Milanote export into a new board') : '')+
+      (path.length>1 || (kind!=='vision') ? tool('boardDeleteBoard','Delete board','Delete this board (and boards inside it)') : '')+
     '</div>')+
-    '<div class="board-host" id="boardHost" data-photo-drop="board" data-morph-ignore="'+kind+':'+b.id+':'+(view?'v':'e')+'"></div>'+
-    (view ? '' : '<div class="board-hint">Drag background to pan · scroll to move · Ctrl/⌘+scroll to zoom · Shift+drag to select · double-click a card to edit · paste or drop images</div>')+
+    '<div class="board-host" id="boardHost" data-photo-drop="board" data-morph-ignore="'+kind+':'+b.id+':'+(view?'v':'e')+(full?':f':'')+'"></div>'+
+    (view || full ? '' : '<div class="board-hint">Drag background to pan · scroll to move · Ctrl/⌘+scroll to zoom · Shift+drag to select · double-click a card to edit · paste or drop images</div>')+
   '</div>';
 }
-function renderVisionTab(){
-  return '<div class="row" style="justify-content:flex-end;margin-bottom:8px;">'+
-      '<label class="row kpi-sub" style="gap:6px;cursor:pointer;"><input type="checkbox" id="setVisionSlideshow" '+(state.profile.visionSlideshow?'checked':'')+'>Slow slideshow of these images on the lock-in screen</label>'+
-    '</div>'+renderBoardShell('vision');
+function renderVisionTab(){ return renderBoardShell('vision'); }
+function renderMilanoteTab(){ return renderBoardShell('milanote'); }
+ACTIONS.boardFullscreen = function(el){
+  const kind = el.dataset.kind;
+  if(ui.boardFull===kind){ exitBoardFullscreen(); return; }
+  ui.boardFull = kind;
+  try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); }catch(e){}
+  renderView();
+};
+function exitBoardFullscreen(){
+  ui.boardFull = null;
+  try{ if(document.fullscreenElement) document.exitFullscreen().catch(function(){}); }catch(e){}
+  renderView();
 }
+document.addEventListener('fullscreenchange', function(){ if(!document.fullscreenElement && ui.boardFull){ ui.boardFull = null; renderView(); } });
 // ---- mounting ----
 afterRenderHooks.push(function(){
   const host = document.getElementById('boardHost');
@@ -7197,6 +8180,7 @@ function boardActive(){ return !!(cv.host && document.body.contains(cv.host) && 
 function typingInField(t){ return t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)); }
 document.addEventListener('keydown', function(e){
   if(!boardActive()) return;
+  if(ui.boardFull && e.key==='Escape' && !cv.editing && !cv.sel.size && !document.querySelector('.overlay:not(.hidden)')){ e.preventDefault(); exitBoardFullscreen(); return; }
   if(cv.editing){ if(e.key==='Escape'){ e.preventDefault(); finishEditing(); } return; }
   if(typingInField(e.target)) return;
   if(document.querySelector('.overlay:not(.hidden)')) return;
@@ -7227,11 +8211,12 @@ document.addEventListener('change', function(e){
   const t = e.target; if(!t || !t.dataset) return;
   if(t.dataset.boardPick) openBoard(t.dataset.boardPick, t.value);
   if(t.dataset.boardRename){ const b = boardById(t.dataset.boardRename); if(b && t.value.trim()){ b.name = t.value.trim(); persist('boards'); renderView(); } }
-  if(t.id==='setVisionSlideshow'){ state.profile.visionSlideshow = t.checked; persist('profile'); }
 });
 ACTIONS.boardNew = function(el){
-  const kind = el.dataset.kind || (ui.view==='personal' && ui.personalTab==='journal' ? 'journal' : 'vision');
-  const b = createBoard(kind, kind==='vision' ? (boardsOfKind('vision').length ? 'Vision board '+(boardsOfKind('vision').length+1) : 'Vision Board') : 'Journal board '+(boardsOfKind('journal').length+1));
+  const kind = el.dataset.kind || (ui.view==='personal' && ui.personalTab==='journal' ? 'journal' : ui.personalTab==='milanote' ? 'milanote' : 'vision');
+  const n = boardsOfKind(kind).filter(function(x){ return !x.parentId; }).length;
+  const name = kind==='vision' ? 'Vision Board' : kind==='journal' ? 'Journal board '+(n+1) : (n ? 'Board '+(n+1) : 'My board');
+  const b = createBoard(kind, kind==='vision' && masterVisionBoard() ? 'New board' : name, kind==='vision' && masterVisionBoard() ? masterVisionBoard().id : null);
   openBoard(kind, b.id);
 };
 ACTIONS.boardToggleView = function(el){
@@ -7321,8 +8306,8 @@ ACTIONS.undoDeleteBoard = function(){
 // Starter layout mirroring the Milanote board: category label cards, the "avoiding" list,
 // a nested "The Key To Life" board and a vertical divider. Drop your photos in around them.
 ACTIONS.boardTemplate = function(){
-  const b = createBoard('vision', 'Vision Board');
-  const key = createBoard('vision', 'The Key To Life', b.id);
+  const b = createBoard(masterVisionBoard() ? 'milanote' : 'vision', 'Vision Board');
+  const key = createBoard(b.kind, 'The Key To Life', b.id);
   const els = [
     {type:'note', header:true, color:'#3FBE8E', title:'Mind + Body', body:'Feeding the body and the brain. Free of temptation.', x:40, y:40, w:300, h:96},
     {type:'note', header:true, color:'#E8A23D', title:'Being creative', body:'', x:380, y:40, w:260, h:70},
@@ -7334,39 +8319,12 @@ ACTIONS.boardTemplate = function(){
   ];
   els.forEach(function(e, i){ e.id = uid(); e.z = i+1; b.elements.push(e); });
   persist('boards');
-  openBoard('vision', b.id);
+  if(b.kind!=='vision'){ ui.view='personal'; ui.personalTab='milanote'; }
+  openBoard(b.kind, b.id);
   setTimeout(fitBoard, 50);
 };
-// ---- slideshow on the lock-in screen ----
-function visionImageRefs(){
-  const out = [];
-  boardsOfKind('vision').forEach(function(b){ b.elements.forEach(function(e){ if(e.type==='image' && e.ref) out.push(e.ref); }); });
-  return out;
-}
-function renderVisionSlideshow(){
-  if(!state.profile.visionSlideshow) return '';
-  const refs = visionImageRefs(); if(!refs.length) return '';
-  return '<div class="section" style="max-width:900px;margin:0 auto 26px;"><div class="vision-slideshow" id="visionSlideshow" data-morph-ignore="slideshow:'+refs.length+'" data-action="goToVision" title="Open vision board"></div></div>';
-}
 ACTIONS.goToVision = function(){ ui.view='personal'; ui.personalTab='vision'; renderView(); };
-let slideshowTimer = null;
-afterRenderHooks.push(function(){
-  const host = document.getElementById('visionSlideshow');
-  if(!host){ clearInterval(slideshowTimer); slideshowTimer = null; return; }
-  if(host._mounted) return;
-  host._mounted = true;
-  const refs = visionImageRefs().sort(function(){ return Math.random()-0.5; }).slice(0, 30);
-  host.innerHTML = refs.map(function(r, i){ return '<img src="'+escapeHtml(blobUrl(r))+'" data-ref="'+escapeHtml(r)+'" class="'+(i===0?'is-on':'')+'" alt="">'; }).join('');
-  let i = 0;
-  clearInterval(slideshowTimer);
-  slideshowTimer = setInterval(function(){
-    const imgs = host.querySelectorAll('img'); if(!imgs.length || !document.body.contains(host)){ clearInterval(slideshowTimer); return; }
-    imgs.forEach(function(im){ if(im.src===BLANK_IMG) im.src = blobUrl(im.dataset.ref); });
-    imgs[i % imgs.length].classList.remove('is-on');
-    i++;
-    imgs[i % imgs.length].classList.add('is-on');
-  }, 9000);
-});
+function renderVisionSlideshow(){ return ''; }
 // ---- static (read-only) render of a board — wake screen, second display, previews ----
 // The master vision board is the one board that shows up on the wake screen.
 function masterVisionBoard(){
@@ -7411,6 +8369,195 @@ function fitStaticBoards(root){
 }
 window.addEventListener('resize', function(){ fitStaticBoards(); });
 afterRenderHooks.push(function(){ fitStaticBoards(); });
+// ---- the master vision board on Today ----
+function renderVisionPanel(){
+  const b = masterVisionBoard();
+  if(!b || !b.elements.length){
+    return '<div class="section"><div class="card vision-panel-empty" data-action="goToVision"><span style="font-size:22px;">&#127775;</span><div><div class="kpi-label" style="margin:0;">Vision board</div><div class="kpi-sub">Build the one board you wake up to &rarr;</div></div></div></div>';
+  }
+  return '<div class="section vision-panel">'+
+    '<div class="vision-panel-box" data-action="openVisionFull" title="Open your vision board full screen">'+boardStaticHtml(b, 'vision-panel-board')+
+      '<span class="vision-panel-hint">&#9974; Full screen</span></div>'+
+  '</div>';
+}
+ACTIONS.openVisionFull = function(){
+  ui.view = 'personal'; ui.personalTab = 'vision';
+  ui.boardView = ui.boardView || {}; ui.boardView.vision = true;
+  ui.boardFull = 'vision';
+  try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); }catch(e){}
+  renderView();
+  setTimeout(fitBoard, 80);
+};
+
+// ============ MILANOTE IMPORT ============
+// Brings a Milanote export into a new board in the Milanote section. Accepts what Milanote
+// gives you: a Markdown / text export, images, an HTML page, or a .zip of any of those.
+// Headings become colored label cards, paragraphs become notes, bullet lists become list
+// cards, images (linked or inside the zip) become image cards — laid out in columns.
+ACTIONS.boardImport = function(){
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.multiple = true;
+  inp.accept = '.zip,.md,.markdown,.txt,.html,.htm,image/*';
+  inp.onchange = function(){ importMilanoteFiles(Array.prototype.slice.call(inp.files||[])); };
+  inp.click();
+};
+// ---- minimal zip reader (stored + deflate), using the browser's DecompressionStream ----
+async function inflateRaw(bytes){
+  const ds = new DecompressionStream('deflate-raw');
+  const out = new Response(new Blob([bytes]).stream().pipeThrough(ds));
+  return new Uint8Array(await out.arrayBuffer());
+}
+async function unzipEntries(buf){
+  const dv = new DataView(buf), u8 = new Uint8Array(buf);
+  let eocd = -1;
+  for(let i=buf.byteLength-22; i>=Math.max(0, buf.byteLength-65557); i--){ if(dv.getUint32(i, true)===0x06054b50){ eocd = i; break; } }
+  if(eocd<0) throw new Error('Not a zip file');
+  const count = dv.getUint16(eocd+10, true);
+  let p = dv.getUint32(eocd+16, true);
+  const dec = new TextDecoder();
+  const out = [];
+  for(let n=0; n<count; n++){
+    if(dv.getUint32(p, true)!==0x02014b50) break;
+    const method = dv.getUint16(p+10, true), csize = dv.getUint32(p+20, true);
+    const nameLen = dv.getUint16(p+28, true), extraLen = dv.getUint16(p+30, true), commentLen = dv.getUint16(p+32, true);
+    const local = dv.getUint32(p+42, true);
+    const name = dec.decode(u8.subarray(p+46, p+46+nameLen));
+    p += 46+nameLen+extraLen+commentLen;
+    if(/\/$/.test(name) || /(^|\/)(__MACOSX|\.DS_Store)/.test(name)) continue;
+    const dataStart = local+30+dv.getUint16(local+26, true)+dv.getUint16(local+28, true);
+    const raw = u8.subarray(dataStart, dataStart+csize);
+    let data = null;
+    if(method===0) data = raw.slice();
+    else if(method===8) data = await inflateRaw(raw);
+    else continue;
+    out.push({name:name, data:data});
+  }
+  return out;
+}
+function mimeFor(name){
+  const ext = (name.split('.').pop()||'').toLowerCase();
+  return {png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', gif:'image/gif', webp:'image/webp', avif:'image/avif', svg:'image/svg+xml', heic:'image/heic'}[ext] || '';
+}
+function baseName(path){ return decodeURIComponent(String(path||'').split(/[\\/]/).pop()||'').toLowerCase(); }
+// ---- text → cards ----
+function cleanMd(s){
+  return String(s||'')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, t, u){ return t===u ? u : t+' ('+u+')'; })
+    .replace(/(\*\*|__)(.*?)\1/g, '$2').replace(/(^|\s)[*_](\S[^*_]*)[*_]/g, '$1$2')
+    .replace(/`([^`]*)`/g, '$1').trim();
+}
+function parseMarkdownCards(text){
+  const cards = [];
+  const lines = String(text||'').replace(/\r\n?/g, '\n').split('\n');
+  let para = [], list = null, lastHeading = null;
+  const flushPara = function(){ const t = cleanMd(para.join('\n')); if(t) cards.push({type:'note', body:t}); para = []; };
+  const flushList = function(){ if(list && list.items.length) cards.push({type:'list', title:list.title, items:list.items}); list = null; };
+  lines.forEach(function(raw){
+    const line = raw.replace(/\s+$/, '');
+    const imgRe = /!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g; let m;
+    while((m = imgRe.exec(line))){ flushPara(); flushList(); cards.push({type:'image', src:m[2], alt:m[1]}); }
+    const htmlImg = /<img[^>]+src=["']([^"']+)["']/gi; let hm;
+    while((hm = htmlImg.exec(line))){ flushPara(); flushList(); cards.push({type:'image', src:hm[1]}); }
+    const bare = line.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/<img[^>]*>/gi, '').trim();
+    if(!bare){ flushPara(); return; }
+    const h = /^(#{1,6})\s+(.*)$/.exec(bare);
+    if(h){ flushPara(); flushList(); lastHeading = cleanMd(h[2]); cards.push({type:'label', title:lastHeading, level:h[1].length}); return; }
+    const li = /^\s*(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?(.*)$/.exec(bare);
+    if(li){ flushPara(); if(!list) list = {title:lastHeading && cards.length && cards[cards.length-1].type==='label' ? (cards.pop(), lastHeading) : 'List', items:[]}; list.items.push(cleanMd(li[1])); return; }
+    if(/^(-{3,}|\*{3,}|_{3,})$/.test(bare)){ flushPara(); flushList(); return; }
+    flushList();
+    para.push(bare.replace(/^>\s?/, ''));
+  });
+  flushPara(); flushList();
+  return cards;
+}
+function htmlToMarkdownish(html){
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const out = [];
+  const walk = function(node){
+    node.childNodes.forEach(function(n){
+      if(n.nodeType===3){ const t = n.textContent.trim(); if(t) out.push(t); return; }
+      if(n.nodeType!==1) return;
+      const tag = n.tagName.toLowerCase();
+      if(tag==='script' || tag==='style') return;
+      if(/^h[1-6]$/.test(tag)){ out.push('\n'+'#'.repeat(Number(tag[1]))+' '+n.textContent.trim()+'\n'); return; }
+      if(tag==='li'){ out.push('- '+n.textContent.trim()); return; }
+      if(tag==='img'){ out.push('![]('+(n.getAttribute('src')||'')+')'); return; }
+      if(tag==='p' || tag==='div' || tag==='section' || tag==='article'){ out.push(''); walk(n); out.push(''); return; }
+      walk(n);
+    });
+  };
+  walk(doc.body||doc);
+  return out.join('\n');
+}
+async function imageSize(blob){
+  try{ const bm = await createImageBitmap(blob); const r = {w:bm.width, h:bm.height}; bm.close && bm.close(); return r; }
+  catch(e){ return {w:4, h:3}; }
+}
+async function importMilanoteFiles(files){
+  if(!files.length) return;
+  showToast('Importing '+(files.length===1 ? files[0].name : files.length+' files')+'…', {icon:'&#11014;', duration:2500});
+  try{
+    // expand zips
+    let entries = [];
+    for(const f of files){
+      if(/\.zip$/i.test(f.name) || f.type==='application/zip'){
+        const inner = await unzipEntries(await f.arrayBuffer());
+        inner.forEach(function(e){ entries.push({name:e.name, blob:new Blob([e.data], {type:mimeFor(e.name)})}); });
+      } else entries.push({name:f.name, blob:f});
+    }
+    const imagesByName = {};
+    entries.forEach(function(e){ if(mimeFor(e.name) || /^image\//.test(e.blob.type)) imagesByName[baseName(e.name)] = e; });
+    const usedImages = new Set();
+    let cards = [];
+    for(const e of entries){
+      if(/\.(md|markdown|txt)$/i.test(e.name)) cards = cards.concat(parseMarkdownCards(await e.blob.text()));
+      else if(/\.html?$/i.test(e.name)) cards = cards.concat(parseMarkdownCards(htmlToMarkdownish(await e.blob.text())));
+    }
+    cards.forEach(function(c){ if(c.type==='image' && !/^https?:/i.test(c.src) && imagesByName[baseName(c.src)]) usedImages.add(baseName(c.src)); });
+    Object.keys(imagesByName).forEach(function(k){ if(!usedImages.has(k)) cards.push({type:'image', src:k, loose:true}); });
+    if(!cards.length){ showToast('Nothing to import in that file.', {icon:'&#9888;'}); return; }
+    // build elements in a 4-column masonry
+    const COLS = 4, W = 280, GAP = 28;
+    const colY = [0,0,0,0];
+    const els = [];
+    let colorIdx = 0, z = 1;
+    const place = function(el, h){
+      let c = 0; for(let i=1;i<COLS;i++) if(colY[i]<colY[c]) c = i;
+      el.x = c*(W+GAP); el.y = colY[c]; el.w = W; el.h = h; el.z = z++; el.id = uid();
+      colY[c] += h+GAP; els.push(el);
+    };
+    let imported = 0, skipped = 0;
+    for(const c of cards){
+      if(c.type==='label'){ place({type:'note', header:true, color:BOARD_COLORS[colorIdx++ % 7], title:c.title, body:''}, 56); }
+      else if(c.type==='note'){ const lines = Math.ceil(c.body.length/34) + (c.body.match(/\n/g)||[]).length; place({type:'note', header:false, title:'', body:c.body}, Math.min(420, 30+lines*20)); }
+      else if(c.type==='list'){ place({type:'list', title:c.title, color:'#3a3f4d', items:c.items.map(function(t){ return {id:uid(), text:t}; })}, 48+c.items.length*22); }
+      else if(c.type==='image'){
+        let ref = null, size = {w:4, h:3};
+        if(/^https?:/i.test(c.src)) ref = c.src;
+        else {
+          const e = imagesByName[baseName(c.src)];
+          if(e){ const blob = e.blob.type ? e.blob : new Blob([e.blob], {type:mimeFor(e.name)||'image/png'}); size = await imageSize(blob); ref = await storeImageFile(new File([blob], baseName(e.name), {type:blob.type})); }
+        }
+        if(!ref){ skipped++; continue; }
+        place({type:'image', ref:ref}, Math.round(W*size.h/Math.max(1,size.w)));
+      }
+      imported++;
+    }
+    const first = files[0].name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim();
+    const b = createBoard('milanote', first || 'Milanote import');
+    b.elements = els;
+    persist('boards');
+    ui.view = 'personal'; ui.personalTab = 'milanote';
+    openBoard('milanote', b.id);
+    setTimeout(fitBoard, 80);
+    playPositive();
+    showToast('Imported '+imported+' card'+(imported===1?'':'s')+' into “'+b.name+'”'+(skipped?' ('+skipped+' image'+(skipped===1?'':'s')+' not found)':''), {icon:'&#128204;', duration:6000});
+  }catch(err){
+    showToast('Couldn\'t read that file: '+(err && err.message || err), {icon:'&#9888;', duration:6000});
+  }
+}
 // ============ FINANCES ============
 function renderFinances(){
   const debts = state.finances.debts;
@@ -7734,20 +8881,9 @@ function renderBusiness(){
   '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
 }
 function renderBusinessOverview(){
-  const clients = arr(state.business.clients);
-  const activeClients = clients.filter(function(c){ return c.status==='active'; });
-  const mrr = activeClients.reduce(function(a,c){ return a+Number(c.mrr||0); },0);
-  const pipeline = arr(state.business.pipeline);
-  const potentialValue = pipeline.filter(function(p){ return p.stage!=='lost' && p.stage!=='closed'; }).reduce(function(a,p){ return a+Number(p.value||0); },0);
-
-  return '<div class="grid grid-3 section">'+
-    '<div class="card" style="text-align:center;"><div class="kpi-label">Current MRR</div><div class="hero-num" style="color:#3FBE8E;font-size:38px;">$'+mrr.toLocaleString()+'</div><div class="kpi-sub">'+activeClients.length+' Active Client'+(activeClients.length===1?'':'s')+' &middot; <button class="btn btn-ghost btn-sm" data-action="businessTab" data-tab="clients">View Clients</button></div></div>'+
-    '<div class="card" style="text-align:center;"><div class="kpi-label">Potential Pipeline Value</div><div class="hero-num" style="color:#E8A23D;font-size:38px;">$'+potentialValue.toLocaleString()+'</div><div class="kpi-sub">From Open Leads</div></div>'+
-    '<div class="card" style="text-align:center;"><div class="kpi-label">Total Potential MRR</div><div class="hero-num" style="color:#8fdcff;font-size:38px;">$'+(mrr+potentialValue).toLocaleString()+'</div><div class="kpi-sub">If Everything Closes</div></div>'+
-  '</div>'+
-  renderReachOutPanel(false)+
-  renderPipelineGlance()+
-  renderClientOpsPanel();
+  return renderBusinessPanel().replace('<div class="section-title">Business<span class="view-all-link" data-action="nav" data-view="business">Open Business &rarr;</span></div>', '')+
+  renderClientHubPanel()+
+  renderPipelineGlance();
 }
 function renderPipelineGlance(){
   const stages = crmStages('lead');
@@ -7979,8 +9115,8 @@ function clientCareTier(c){
   const cad = crmCadence('client', c);
   const over = daysAgoFrom(addDays(base, cad));
   if(over < 0) return {cls:'tag-good', label: last ? 'In touch' : 'New — no touch yet'};
-  if(over <= Math.max(1, Math.floor(cad/2))) return {cls:'tag-warn', label: over===0 ? 'Touch due today' : 'Touch overdue '+over+'d'};
-  return {cls:'tag-danger', label:'No touch in '+daysAgoFrom(last)+'d'};
+  // due (or overdue) for a touch = red: reach out
+  return {cls:'tag-danger', label: over===0 ? 'Touch due today' : last ? 'No touch in '+daysAgoFrom(last)+'d' : 'Touch overdue '+over+'d'};
 }
 function clientCareTagHtml(c){
   const count = clientTouchCountThisWeek(c);
@@ -9905,8 +11041,6 @@ function clientCardV2(c){
   const active = clientStageActive(c.stage);
   const hs = active ? clientHealthStatus(c) : null;
   const st = crmStage('client', c.stage);
-  const p = lcProgress(c);
-  const step = (!c.cycleDone && p.step) ? '<span class="cc2-step" style="color:'+p.step.color+'">'+escapeHtml(p.step.label)+(p.total?' '+p.done+'/'+p.total:'')+'</span>' : '';
   return '<div class="cc2'+(hs?' hl-'+hs.level:' is-inactive')+'" data-key="cc2-'+c.id+'"'+(hs?' title="'+escapeHtml(clientHealthTitle(c))+'"':'')+'>'+
     '<div class="cc2-top" data-action="openContact" data-kind="client" data-id="'+c.id+'">'+
       clientAvatarHtml(c, false, !!hs)+
@@ -9915,7 +11049,7 @@ function clientCardV2(c){
           : '<span class="tag" style="background:'+(st?st.color:'#8A90A2')+'22;color:'+(st?st.color:'#8A90A2')+';">'+escapeHtml(st?st.label:'Inactive')+'</span>')+
     '</div>'+
     clientDelivRowsHtml(c, true)+
-    (active ? '<div class="cc2-foot">'+step+(step?'<span class="cc2-sep">&middot;</span>':'')+clientNextTouchHtml(c)+'<span style="flex:1"></span>'+touchButtonsHtml('client', c)+'</div>'+touchMenuHtml('client', c) : '')+
+    (active ? '<div class="cc2-foot">'+clientNextTouchHtml(c)+'<span style="flex:1"></span>'+touchButtonsHtml('client', c)+'</div>'+touchMenuHtml('client', c) : '')+
   '</div>';
 }
 function clientSortFn(sort){
@@ -10496,6 +11630,8 @@ function renderMorningPlanCard(){
 ACTIONS.startSleepMode = function(){
   if(state.focus.activeSession){ showToast('Stop your session first, then start Sleep mode.', {icon:'&#127769;'}); return; }
   startMode('offtime', {sleep:true, note:'Sleep'});
+  ui.windDownOpen = false;
+  if(sessionsOn(todayStr()).length) openDayRecap(todayStr());
 };
 function renderSleepView(){
   const active = state.modes.active;
@@ -10516,22 +11652,21 @@ function renderSleepView(){
     '</div>'+
   '</div></div>';
 }
-// Winding down: tomorrow's wake-up, the plan and going to sleep — one card (evenings).
-function renderEveningCard(){
-  const h = new Date().getHours();
-  if(h<18 && h>=4) return '';
+// Winding down: tomorrow's wake-up, the plan and going to sleep (a dropdown in the Today
+// hero, evenings only).
+function renderEveningCard(){ return ''; }
+function windDownTilesHtml(){
   const target = planTargetDate();
   const np = state.focus.nightPlan && state.focus.nightPlan.date===target ? state.focus.nightPlan : null;
   const nw = nextWake();
   const count = np ? arr(np.taskIds).length : 0;
-  return '<div class="section"><div class="card evening-card">'+
-    '<div class="evening-head"><div class="kpi-label">&#127769; Winding down</div><div class="kpi-sub">'+(np ? morningLabel(target)[0].toUpperCase()+morningLabel(target).slice(1)+' is planned.' : 'Line up '+morningLabel(target)+', check your alarm, then sleep.')+'</div></div>'+
-    '<div class="evening-tiles">'+
-      '<button class="evening-tile" data-action="openWakeSetup"><span class="evening-tile-k">Wake-up</span><span class="evening-tile-v">'+(nw ? fmt12Hour(nw.time) : 'Not set')+'</span><span class="kpi-sub">'+(nw ? morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts) : 'Set it')+'</span></button>'+
-      '<button class="evening-tile" data-action="openNightPlan"><span class="evening-tile-k">'+escapeHtml(morningLabel(target)[0].toUpperCase()+morningLabel(target).slice(1))+'</span><span class="evening-tile-v">'+(np ? count+' task'+(count===1?'':'s') : 'Plan it')+'</span><span class="kpi-sub">'+(np ? 'Edit plan' : 'Tasks + a note')+'</span></button>'+
+  const ml = morningLabel(target);
+  return '<div class="evening-tiles">'+
+      '<button class="evening-tile" data-action="openWakeSetup"><span class="evening-tile-k">Wake-up</span><span class="evening-tile-v">'+(nw ? fmt12Hour(nw.time) : 'Not set')+'</span><span class="kpi-sub">'+(nw ? morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts) : 'Set your alarm')+'</span></button>'+
+      '<button class="evening-tile" data-action="openNightPlan"><span class="evening-tile-k">'+escapeHtml(ml[0].toUpperCase()+ml.slice(1))+'</span><span class="evening-tile-v">'+(np ? count+' task'+(count===1?'':'s') : 'Plan it')+'</span><span class="kpi-sub">'+(np ? 'Edit plan' : 'Tasks + a note')+'</span></button>'+
+      '<button class="evening-tile" data-action="openDayRecap"><span class="evening-tile-k">Recap</span><span class="evening-tile-v">'+fmtHours(deepWorkMinutesTodayLive())+'</span><span class="kpi-sub">See how today went</span></button>'+
       '<button class="evening-tile evening-sleep" data-action="startSleepMode"><span class="evening-moon">&#127769;</span><span class="evening-tile-v">Go to sleep</span><span class="kpi-sub">Pauses auto lock-in</span></button>'+
-    '</div>'+
-  '</div></div>';
+    '</div>';
 }
 // ============ SETTINGS ============
 function renderSettings(){
@@ -10628,12 +11763,14 @@ function renderSettings(){
 
     focus: '<div class="card section"><div class="section-title">App Tracking<span class="kpi-sub">Sees which app is in the foreground on this Mac — nothing leaves the machine</span></div><div class="grid grid-2">'+
         '<div class="field"><label>Track foreground app</label><select class="input" id="setAppTrackingEnabled"><option value="on" '+(state.settings.appTracking.enabled!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.enabled===false?'selected':'')+'>Off</option></select></div>'+
-        '<div class="field"><label>Auto lock-in when steady on one app</label><select class="input" id="setAppTrackingAutoLockIn"><option value="on" '+(state.settings.appTracking.autoLockIn!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.autoLockIn===false?'selected':'')+'>Off</option></select></div>'+
+        '<div class="field"><label>Auto lock-in when steady on work apps</label><select class="input" id="setAppTrackingAutoLockIn"><option value="on" '+(state.settings.appTracking.autoLockIn!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.autoLockIn===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Minutes on one app before auto lock-in</label><input class="input" type="number" min="3" max="120" id="setAppTrackingThreshold" value="'+state.settings.appTracking.thresholdMinutes+'"></div>'+
         '<div class="field"><label>Minutes away before auto-ending it</label><input class="input" type="number" min="1" max="60" id="setAppTrackingGrace" value="'+state.settings.appTracking.graceMinutes+'"><div class="kpi-sub">Only applies to sessions Operator started automatically — it never auto-ends a session you started yourself</div></div>'+
         '<div class="field"><label>Cooldown after you lock out (minutes)</label><input class="input" type="number" min="0" max="240" id="setAppTrackingCooldown" value="'+state.settings.appTracking.cooldownMinutes+'"><div class="kpi-sub">Auto lock-in stays off this long after you stop a session yourself</div></div>'+
+        '<div class="field"><label>Day recap pops up at</label><input class="input" type="time" id="setRecapTime" value="'+(state.settings.appTracking.recapTime||'21:30')+'"><div class="kpi-sub">Shows what you did and lets you check sessions that started automatically</div></div>'+
         '<div class="field"><label>Idle after (seconds without keyboard/mouse)</label><input class="input" type="number" min="15" max="900" id="setAppTrackingIdle" value="'+state.settings.appTracking.idleSeconds+'"><div class="kpi-sub">Idle time doesn\'t count toward auto lock-in or app time</div></div>'+
       '</div></div>'+saveBtn+
+      workAppsSettingsHtml()+
       wakeSettingsCardHtml()+
       '<div class="card section" id="alarmsSettingsSection"><div class="section-title">Other alarms</div>'+
         '<div class="row" style="flex-wrap:wrap;align-items:flex-end;">'+
@@ -10889,6 +12026,8 @@ function saveProfile(){
   if(atGraceEl) state.settings.appTracking.graceMinutes = Number(atGraceEl.value)||3;
   const atCooldownEl = document.getElementById('setAppTrackingCooldown');
   if(atCooldownEl){ const v = Number(atCooldownEl.value); state.settings.appTracking.cooldownMinutes = (isNaN(v) || atCooldownEl.value==='') ? 15 : clamp(v,0,240); }
+  const rtEl = document.getElementById('setRecapTime');
+  if(rtEl && rtEl.value) state.settings.appTracking.recapTime = rtEl.value;
   const atIdleEl = document.getElementById('setAppTrackingIdle');
   if(atIdleEl) state.settings.appTracking.idleSeconds = clamp(Number(atIdleEl.value)||60, 15, 900);
   persist('profile'); persist('standards'); persist('settings'); renderView();
@@ -11073,23 +12212,37 @@ function renderViewInner(){
 }
 
 // ============ CLOCK / TIMER / ALARMS ============
+// The locked-in header's tint + divider run edge to edge of the content area. Measured from
+// the view container (not the header itself, whose margins this sets), and re-run whenever
+// the content area changes size — collapsing the sidebar used to leave a black strip
+// because the header was measured mid-animation.
 function stretchLockedHeaderLine(){
   const header = document.querySelector('.locked-in-header');
   const main = document.querySelector('.main');
-  if(!header || !main) return;
+  const root = document.getElementById('viewRoot');
+  if(!header || !main || !root) return;
   const mainRect = main.getBoundingClientRect();
-  const headerRect = header.getBoundingClientRect();
-  const leftGap = Math.max(0, headerRect.left - mainRect.left);
-  const rightGap = Math.max(0, mainRect.right - headerRect.right);
+  const rootRect = root.getBoundingClientRect();
+  const rs = getComputedStyle(root);
+  const leftGap = Math.max(0, rootRect.left + (parseFloat(rs.paddingLeft)||0) - mainRect.left);
+  const rightGap = Math.max(0, mainRect.right - (main.offsetWidth - main.clientWidth) - (rootRect.right - (parseFloat(rs.paddingRight)||0)));
   header.style.marginLeft = (-leftGap)+'px';
   header.style.marginRight = (-rightGap)+'px';
   header.style.paddingLeft = (leftGap+16)+'px';
   header.style.paddingRight = (rightGap+16)+'px';
-  // Pull the header up over .main's top padding — that padding used to leave an empty
-  // black band above the locked-in header.
   const padTop = parseFloat(getComputedStyle(main).paddingTop)||0;
   header.style.marginTop = (-padTop)+'px';
 }
+(function(){
+  const watch = function(){
+    const main = document.querySelector('.main');
+    if(!main || !window.ResizeObserver) return;
+    new ResizeObserver(function(){ stretchLockedHeaderLine(); }).observe(main);
+    const nav = document.getElementById('sidebarNav');
+    if(nav) nav.addEventListener('transitionend', stretchLockedHeaderLine);
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', watch); else watch();
+})();
 window.addEventListener('resize', stretchLockedHeaderLine);
 function tickClocks(){
   const now = new Date();
@@ -12369,6 +13522,8 @@ async function init(){
   splitActiveModeAtMidnight();
   if(crmMigratedOnLoad) persist('business');
   remapConvertedLeadRefs();
+  // what you lined up as "next" survives a restart
+  if(state.focus.nextTaskId && !state.focus.activeSession && state.tasks.items.some(function(t){ return t.id===state.focus.nextTaskId && t.status!=='done'; })) ui.stagedTaskId = state.focus.nextTaskId;
   applyTheme();
   applySidebarState();
   document.getElementById('loading').style.display='none';
