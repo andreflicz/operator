@@ -10,8 +10,9 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('inline photo moved to image store', typeof ref==='string' && ref.startsWith('idb:'), ref && ref.slice(0,30));
   await p.reload(); await p.waitForTimeout(500);
   await p.click('[data-action="nav"][data-view="personal"]'); await p.click('[data-action="personalTab"][data-tab="journal"]');
-  await p.waitForTimeout(400);
-  check('photo still displays after reload', await p.evaluate(() => { const i = document.querySelector('.journal-entry .journal-photo-thumb'); return !!i && i.src.startsWith('blob:') && i.naturalWidth===4; }));
+  // the image store loads asynchronously; give it a few seconds on a busy machine
+  const shown = await p.waitForFunction(() => { const i = document.querySelector('.journal-entry .journal-photo-thumb'); return !!i && i.src.startsWith('blob:') && i.naturalWidth===4; }, null, {timeout:5000}).then(()=>true, ()=>false);
+  check('photo still displays after reload', shown);
   check('no page errors', p.errors.length===0, p.errors);
   await b.close();
   process.exit(report()?1:0);

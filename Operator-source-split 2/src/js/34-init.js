@@ -19,6 +19,7 @@ async function init(){
   state.personal = normalizePersonal(await loadKey('personal', defaultPersonal()));
   state.boards = normalizeBoards(await loadKey('boards', defaultBoards()));
 
+  if(isWakeDisplay){ startWakeDisplay(); return; }
   splitActiveModeAtMidnight();
   if(crmMigratedOnLoad) persist('business');
   applyTheme();

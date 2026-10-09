@@ -56,6 +56,20 @@ serve_activity() {
   done
 }
 
+# --- Alarm wake-up helper ---------------------------------------------------
+# When an alarm rings, the page pings 127.0.0.1:8935. This brings the Operator
+# window to the front and wakes the display, so the alarm is seen and heard even
+# if the window was hidden behind other apps or the screen had gone dark.
+WAKE_PORT=8935
+serve_wake() {
+  while true; do
+    printf 'HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: 2\r\nConnection: close\r\n\r\nok' \
+      | nc -l 127.0.0.1 "$WAKE_PORT" >/dev/null 2>&1
+    caffeinate -u -t 5 >/dev/null 2>&1 &
+    osascript -e "tell application \"System Events\" to set frontmost of (first process whose unix id is $CHROME_PID) to true" >/dev/null 2>&1
+  done
+}
+
 POLL_PID=""
 SERVE_PID=""
 if command -v osascript >/dev/null 2>&1 && command -v nc >/dev/null 2>&1; then
@@ -65,20 +79,45 @@ if command -v osascript >/dev/null 2>&1 && command -v nc >/dev/null 2>&1; then
   SERVE_PID=$!
 fi
 
-cleanup() {
-  [ -n "$POLL_PID" ] && kill "$POLL_PID" 2>/dev/null
-  [ -n "$SERVE_PID" ] && kill "$SERVE_PID" 2>/dev/null
-}
-trap cleanup EXIT
-
+# Chrome flags for an app that has to ring on time:
+#  - background windows normally get their timers slowed to ~1/minute, which made
+#    alarms only go off once the window was opened; these flags keep them on time
+#  - autoplay without a click, so wake-up music/sound starts by itself
+#  - no pop-up blocking, so a wake-up YouTube link / second-screen view can open
 "$CHROME" \
   --app="file://$HTML_FILE" \
   --user-data-dir="$PROFILE_DIR" \
   --window-size=1400,900 \
   --no-first-run \
   --no-default-browser-check \
+  --autoplay-policy=no-user-gesture-required \
+  --disable-background-timer-throttling \
+  --disable-renderer-backgrounding \
+  --disable-backgrounding-occluded-windows \
+  --disable-popup-blocking \
   > /dev/null 2>&1 &
 CHROME_PID=$!
+
+WAKE_PID=""
+CAFF_PID=""
+if command -v osascript >/dev/null 2>&1 && command -v nc >/dev/null 2>&1; then
+  serve_wake &
+  WAKE_PID=$!
+fi
+# Keep the Mac from idle-sleeping while Operator is open (the display can still turn
+# off), so a morning alarm can fire. Closing the lid on battery still sleeps.
+if command -v caffeinate >/dev/null 2>&1; then
+  caffeinate -i -w "$CHROME_PID" >/dev/null 2>&1 &
+  CAFF_PID=$!
+fi
+
+cleanup() {
+  [ -n "$POLL_PID" ] && kill "$POLL_PID" 2>/dev/null
+  [ -n "$SERVE_PID" ] && kill "$SERVE_PID" 2>/dev/null
+  [ -n "$WAKE_PID" ] && kill "$WAKE_PID" 2>/dev/null
+  [ -n "$CAFF_PID" ] && kill "$CAFF_PID" 2>/dev/null
+}
+trap cleanup EXIT
 
 # Wait for Chrome to actually quit before this wrapper exits, so the
 # background poller/server above get cleaned up instead of lingering.

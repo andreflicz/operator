@@ -107,14 +107,17 @@ function renderCalEventModal(){
     '<div class="field" style="margin-top:10px;"><label>Location (optional)</label><input class="input" id="calEventLocation" value="'+escapeHtml(e.location||'')+'" placeholder="Address or place" style="width:100%;"></div>'+
     '<label class="row" style="margin-top:12px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventSetAlarm" '+(wantsAlarm?'checked':'')+' style="margin-right:6px;">&#128276; Alarm at the event time (needs a time)</label>'+
     '<div class="field" style="margin-top:10px;"><label>Remind me before</label><select class="input" id="calEventRemindBefore" style="width:100%;">'+[[0,'&mdash; No extra reminder'],[10,'10 min before'],[15,'15 min before'],[30,'30 min before'],[60,'1 hour before'],[120,'2 hours before'],[1440,'1 day before']].map(function(o){ return '<option value="'+o[0]+'" '+(Number(e.remindBefore||0)===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select></div>'+
-    '<label class="row" style="margin-top:12px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventIsShoot" '+(e.isShoot?'checked':'')+' style="margin-right:6px;">&#127916; This is a shoot — add prep alarms</label>'+
-    '<div id="calEventShootExtra" class="card" style="display:'+(e.isShoot?'block':'none')+';margin-top:8px;padding:12px 14px;">'+
+    '<div class="card task-alarm-box" style="margin-top:10px;padding:12px 14px;">'+
+      '<div class="kind-label" style="margin-top:0;">Getting there</div>'+
       '<div class="grid grid-2">'+
+        '<div class="field"><label>Travel time (minutes)</label><input class="input" type="number" min="0" step="5" id="calEventTravel" value="'+(e.travelMinutes||'')+'" placeholder="0"></div>'+
         '<div class="field"><label>Start getting ready at</label><input class="input" type="time" id="calEventReadyTime" value="'+(e.readyTime||'')+'"></div>'+
-        '<div class="field"><label>Travel time (minutes)</label><input class="input" type="number" min="0" step="5" id="calEventTravel" value="'+(e.travelMinutes||'')+'" placeholder="e.g. 60"></div>'+
       '</div>'+
-      '<div class="kpi-sub" style="margin-top:6px;" id="calEventLeaveHint">'+(e.time && e.travelMinutes ? 'Leave alarm at '+fmt12Hour(shiftHM(e.time, -Number(e.travelMinutes)))+'.' : 'A "Leave" alarm goes off at event time minus travel time.')+'</div>'+
-      '<label class="row" style="margin-top:8px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventAutoShoot" '+(e.autoShootMode!==false?'checked':'')+' style="margin-right:6px;">Start Shooting Mode automatically at the first prep alarm (prep + travel + shoot tracked together)</label>'+
+      '<div class="kpi-sub" style="margin-top:6px;" id="calEventLeaveHint">'+(e.time && e.travelMinutes ? 'Leave alarm at '+fmt12Hour(shiftHM(e.time, -Number(e.travelMinutes)))+'.' : 'With a travel time, a "Time to leave" alarm rings at event time minus travel.')+'</div>'+
+    '</div>'+
+    '<label class="row" style="margin-top:12px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventIsShoot" '+(e.isShoot?'checked':'')+' style="margin-right:6px;">&#127916; This is a shoot</label>'+
+    '<div id="calEventShootExtra" style="display:'+(e.isShoot?'block':'none')+';margin-top:4px;">'+
+      '<label class="row" style="font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventAutoShoot" '+(e.autoShootMode!==false?'checked':'')+' style="margin-right:6px;">Start Shooting Mode automatically at the first prep alarm (prep + travel + shoot tracked together)</label>'+
     '</div>'+
     '<div class="field" style="margin-top:12px;"><label>Tasks for this event</label>'+renderEventTaskPicker(e)+'</div>'+
     '<div class="row" style="margin-top:20px;justify-content:'+(editing?'space-between':'flex-end')+';">'+

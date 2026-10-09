@@ -101,6 +101,7 @@ function startFocusTicker(){
     }
     const as = state.focus.activeSession;
     if(as && !as.onBreak) tickLiveDeepWork();
+    checkBreakTimer();
     if(!as) return;
     if(as.onBreak){
       return;
@@ -139,32 +140,16 @@ function startFocusTicker(){
     }
   }, 1000);
 }
-let firedKeys = new Set();
-let lastMinute = '';
 let ringInterval = null;
+// Checks every 2 s (and the moment the window comes back into view). See 32b-wake.js for
+// how missed minutes are caught up instead of skipped.
 function startAlarmChecker(){
-  setInterval(function(){
-    checkReminders();
-    checkTouchReminder();
-    const now = new Date();
-    const hm = nowHM(now);
-    const dateKey = todayStr(now);
-    const minuteKey = dateKey+'T'+hm;
-    if(minuteKey!==lastMinute){ firedKeys.clear(); lastMinute=minuteKey; }
-    (state.focus.alarms||[]).forEach(function(al){
-      if(!al.enabled) return;
-      if(al.time!==hm) return;
-      if(al.date){ if(al.date!==dateKey) return; } else { if(al.days.indexOf(now.getDay())<0) return; }
-      const fk = al.id+minuteKey;
-      if(firedKeys.has(fk)) return;
-      firedKeys.add(fk);
-      triggerAlarm(al);
-      if(al.date){
-        state.focus.alarms = state.focus.alarms.filter(function(x){ return x.id!==al.id; });
-        persist('focus'); renderView();
-      }
-    });
-  }, 4000);
+  const run = function(){
+    try{ checkReminders(); checkTouchReminder(); }catch(e){}
+    checkAllAlarms();
+  };
+  run();
+  setInterval(run, 2000);
 }
 let lastFiredAlarm = null;
 function triggerAlarm(al){
@@ -174,15 +159,18 @@ function triggerAlarm(al){
   if(extra) extra.innerHTML = renderAlarmExtra(al);
   onEventAlarm(al);
   document.getElementById('alarmOverlay').classList.remove('hidden');
-  playBeep();
+  pingWrapper();
   clearInterval(ringInterval);
-  ringInterval = setInterval(playBeep, 2400);
+  if(!startAlarmMediaIfAny(al)){
+    playBeep();
+    ringInterval = setInterval(playBeep, 2400);
+  }
   try{
     if('Notification' in window && Notification.permission==='granted'){
       new Notification('Operator: ' + ((al && al.label) || 'Reminder'));
     }
   }catch(e){}
 }
-function dismissAlarm(){ clearInterval(ringInterval); document.getElementById('alarmOverlay').classList.add('hidden'); }
-function snoozeAlarm(){ const al = lastFiredAlarm; dismissAlarm(); setTimeout(function(){ triggerAlarm(Object.assign({}, al||{}, {label:((al&&al.label)||'Reminder')+' (snoozed)', eventId:null})); }, 5*60*1000); }
+function dismissAlarm(){ clearInterval(ringInterval); stopWakeMedia(false); document.getElementById('alarmOverlay').classList.add('hidden'); }
+function snoozeAlarm(){ const al = lastFiredAlarm; dismissAlarm(); snoozeRegularAlarm(al); }
 

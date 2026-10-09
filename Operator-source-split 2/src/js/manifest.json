@@ -42,6 +42,7 @@
   "30-settings.js",
   "31-nav-render-dispatch.js",
   "32-clock-timer-alarms.js",
+  "32b-wake.js",
   "33-event-delegation.js",
   "34-init.js"
 ]

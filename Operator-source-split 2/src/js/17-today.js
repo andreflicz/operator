@@ -154,7 +154,7 @@ function renderToday(){
       '</div>'+
       '<div class="row" style="gap:8px;justify-content:center;">'+
         '<button class="btn" style="border-color:var(--accent);color:var(--accent);" data-action="toggleDayOff">Take Today Off</button>'+
-        '<button class="btn btn-ghost sleep-btn" data-action="startSleepMode" title="Off-time for the night: pauses auto lock-in, shows your alarm and tomorrow\'s plan">&#127769; Sleep</button>'+
+        wakeChipHtml()+
       '</div>'+
     '</div>'+
     renderMorningPlanCard()+

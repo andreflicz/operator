@@ -99,7 +99,8 @@ function renderSettings(){
         '<div class="field"><label>Cooldown after you lock out (minutes)</label><input class="input" type="number" min="0" max="240" id="setAppTrackingCooldown" value="'+state.settings.appTracking.cooldownMinutes+'"><div class="kpi-sub">Auto lock-in stays off this long after you stop a session yourself</div></div>'+
         '<div class="field"><label>Idle after (seconds without keyboard/mouse)</label><input class="input" type="number" min="15" max="900" id="setAppTrackingIdle" value="'+state.settings.appTracking.idleSeconds+'"><div class="kpi-sub">Idle time doesn\'t count toward auto lock-in or app time</div></div>'+
       '</div></div>'+saveBtn+
-      '<div class="card section" id="alarmsSettingsSection"><div class="section-title">Alarms</div>'+
+      wakeSettingsCardHtml()+
+      '<div class="card section" id="alarmsSettingsSection"><div class="section-title">Other alarms</div>'+
         '<div class="row" style="flex-wrap:wrap;align-items:flex-end;">'+
           '<div class="field" style="flex:1;min-width:160px;"><label>What?</label><input class="input" id="newAlarmLabel" placeholder="e.g. Kitchen closes"></div>'+
           '<div class="field"><label>Time</label><input class="input" type="time" id="newAlarmTime" value="09:00" style="width:120px;"></div>'+

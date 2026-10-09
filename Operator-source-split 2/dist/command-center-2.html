@@ -782,6 +782,82 @@
   .lc-type-select{ width:126px; flex-shrink:0; }
   .lc-editor-item{ flex-wrap:wrap; }
   .lc-editor-item .input{ min-width:140px; }
+  /* ---- wake-up alarm ---- */
+  .wake-overlay{ z-index:300; padding:0; background:#06070b; animation:wakeIn .6s ease-out; }
+  @keyframes wakeIn{ from{opacity:0;} to{opacity:1;} }
+  .wake-content{ position:absolute; inset:0; }
+  .wake-screen{ position:absolute; inset:0; display:grid; grid-template-columns:minmax(340px, 38%) 1fr; gap:0; background:radial-gradient(ellipse at 20% 0%, rgba(232,162,61,.10), transparent 55%), #06070b; }
+  .wake-left{ padding:44px 40px; display:flex; flex-direction:column; gap:10px; overflow-y:auto; }
+  .wake-greet{ font-family:var(--font-display); font-size:20px; color:var(--text-dim); font-weight:600; }
+  .wake-clock{ font-family:var(--font-display); font-size:clamp(64px, 9vw, 120px); font-weight:700; line-height:1; letter-spacing:-.03em; color:#fff; }
+  .wake-screen.is-ringing .wake-clock{ animation:wakePulse 2.6s ease-in-out infinite; }
+  @keyframes wakePulse{ 0%,100%{ text-shadow:0 0 0 rgba(232,162,61,0);} 50%{ text-shadow:0 0 40px rgba(232,162,61,.45);} }
+  .wake-date{ color:var(--text-dim); font-size:16px; margin-bottom:10px; }
+  .wake-actions{ display:flex; gap:10px; flex-wrap:wrap; margin:6px 0 4px; }
+  .wake-up-btn{ background:var(--accent); border-color:var(--accent); color:#1a1305; font-size:18px; font-weight:700; padding:14px 28px; border-radius:14px; box-shadow:0 8px 30px rgba(232,162,61,.35); }
+  .wake-up-btn:hover{ box-shadow:0 10px 36px rgba(232,162,61,.5); }
+  .wake-snooze-btn{ padding:14px 20px; border-radius:14px; }
+  .wake-music{ color:var(--text-dim); font-size:13px; }
+  .wake-next{ color:var(--text-dim); font-size:14px; }
+  .wake-cards{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+  .wake-card{ background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:12px; padding:12px 16px; }
+  .wake-card-title{ font-family:var(--font-display); font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); font-weight:700; margin-bottom:6px; }
+  .wake-note{ font-size:15px; line-height:1.5; white-space:pre-wrap; margin-bottom:6px; }
+  .wake-list{ display:flex; flex-direction:column; gap:4px; font-size:14px; }
+  .wake-li.is-done{ color:var(--text-faint); text-decoration:line-through; }
+  .wake-time{ font-family:var(--font-display); font-weight:700; color:var(--accent); margin-right:4px; }
+  .wake-right{ position:relative; padding:28px; display:flex; }
+  .wake-board{ flex:1; border-radius:18px; background:#0d0f15; border:1px solid #1d212c; }
+  .wake-board-empty{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--text-dim); border:1px dashed var(--border); border-radius:18px; }
+  .wake-display-tools{ margin-top:auto; padding-top:12px; }
+  .wake-display-mode #app{ display:none !important; }
+  .wake-display-mode .quick-journal-fab, .wake-display-mode .fab-add{ display:none !important; }
+  @media (max-width:900px){ .wake-screen{ grid-template-columns:1fr; grid-template-rows:auto 50vh; overflow-y:auto; } .wake-left{ padding:28px 22px; } }
+  .board-static{ position:relative; overflow:hidden; }
+  .board-static-world{ position:absolute; left:0; top:0; transform-origin:0 0; }
+  .board-static .board-lines{ position:absolute; left:0; top:0; overflow:visible; pointer-events:none; }
+  .board-static .bel{ cursor:default; }
+  .wake-setup .ws-main{ display:flex; flex-direction:column; align-items:center; gap:10px; margin:18px 0 6px; transition:opacity .2s; }
+  .wake-setup .ws-main.is-off{ opacity:.45; }
+  .ws-time{ font-family:var(--font-display); font-size:44px; font-weight:700; background:transparent; border:1px solid var(--border); border-radius:14px; color:var(--text); padding:4px 16px; text-align:center; color-scheme:dark; }
+  .ws-time:focus{ outline:none; border-color:var(--accent); }
+  .ws-time.ws-time-sm{ font-size:24px; padding:2px 10px; border-radius:10px; }
+  .ws-days{ display:flex; gap:6px; }
+  .ws-day{ width:34px; height:34px; border-radius:50%; border:1px solid var(--border); background:transparent; color:var(--text-dim); font-weight:700; font-family:var(--font-display); transition:background .15s, color .15s, border-color .15s; }
+  .ws-day.is-on{ background:var(--accent); border-color:var(--accent); color:#1a1305; }
+  .ws-day:hover{ border-color:var(--accent); }
+  .ws-next{ text-align:center; font-size:13px; color:var(--text-dim); background:var(--panel-2); border-radius:10px; padding:8px 12px; margin-bottom:6px; }
+  .ws-next b{ color:var(--text); }
+  .ws-block{ border-top:1px solid var(--border); padding-top:12px; margin-top:12px; }
+  .ws-block .kind-label{ margin-top:0; }
+  .ws-media{ display:flex; align-items:center; gap:8px; background:var(--panel-2); border-radius:10px; padding:8px 12px; margin-bottom:6px; }
+  .ws-switch{ position:relative; display:inline-block; width:46px; height:26px; flex-shrink:0; }
+  .ws-switch input{ opacity:0; width:0; height:0; position:absolute; }
+  .ws-switch span{ position:absolute; inset:0; background:var(--border); border-radius:20px; transition:background .2s; cursor:pointer; }
+  .ws-switch span::after{ content:''; position:absolute; left:3px; top:3px; width:20px; height:20px; border-radius:50%; background:#fff; transition:transform .2s; }
+  .ws-switch input:checked + span{ background:var(--good); }
+  .ws-switch input:checked + span::after{ transform:translateX(20px); }
+  .btn.is-active{ border-color:var(--danger); color:var(--danger); }
+  .wake-chip{ display:inline-flex; align-items:center; gap:6px; background:var(--panel); border:1px solid var(--border); color:var(--text); border-radius:999px; padding:7px 14px; font-size:13px; font-weight:600; transition:border-color .15s, background .15s; }
+  .wake-chip:hover{ border-color:var(--accent); background:var(--panel-2); }
+  .wake-chip.is-unset{ color:var(--text-dim); border-style:dashed; }
+  .wake-settings-time{ font-family:var(--font-display); font-size:30px; font-weight:700; margin:4px 0 2px; }
+  .evening-card{ flex-direction:column; align-items:stretch; }
+  .evening-tiles{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+  .evening-tile{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:left; background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:12px; padding:12px 14px; color:var(--text); transition:border-color .15s, transform .15s, background .15s; }
+  .evening-tile:hover{ border-color:rgba(160,175,255,.55); transform:translateY(-1px); background:rgba(160,175,255,.06); }
+  .evening-tile-k{ font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); font-weight:700; font-family:var(--font-display); }
+  .evening-tile-v{ font-family:var(--font-display); font-size:20px; font-weight:700; color:#c9d3ff; }
+  .evening-sleep{ background:linear-gradient(135deg, rgba(120,130,200,.22), rgba(120,130,200,.06)); border-color:rgba(160,175,255,.35); }
+  .evening-moon{ font-size:18px; }
+  @media (max-width:640px){ .evening-tiles{ grid-template-columns:1fr; } }
+  .sleep-tile-btn{ color:var(--text); cursor:pointer; transition:border-color .15s; }
+  .sleep-tile-btn:hover{ border-color:rgba(160,175,255,.55); }
+  .break-remaining{ font-family:var(--font-display); font-size:15px; color:var(--info); margin-top:4px; }
+  .task-alarm-box{ margin-top:10px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:rgba(255,255,255,.02); }
+  .ws-check{ display:flex; align-items:flex-start; gap:8px; font-size:12.5px; color:var(--text-dim); line-height:1.4; }
+  .ws-check input{ margin-top:2px; flex-shrink:0; }
+  .wake-snooze-btn{ border:1px solid var(--border); color:var(--text); }
 </style>
 </head>
 <body>
@@ -940,6 +1016,12 @@
 </div>
 <div id="boardPickerOverlay" class="overlay hidden">
   <div class="card" id="boardPickerContent" style="max-width:420px; width:100%; max-height:88vh; overflow-y:auto;"></div>
+</div>
+<div id="wakeSetupOverlay" class="overlay hidden">
+  <div class="card" id="wakeSetupContent" style="max-width:560px; width:100%; max-height:90vh; overflow-y:auto;"></div>
+</div>
+<div id="wakeOverlay" class="overlay wake-overlay hidden">
+  <div id="wakeContent" class="wake-content"></div>
 </div>
 <input type="file" id="journalPhotoInput" accept="image/*" multiple style="display:none;">
 <button class="btn quick-journal-fab" data-action="openQuickJournalModal" title="Quick Journal">&#128221;</button>
@@ -1819,6 +1901,40 @@ function taskCategoryTagHtml(t){
   if(!cat) return '';
   return '<span class="tag" style="background:'+hexToRgba(cat.color,0.16)+';color:'+cat.color+';border:1px solid '+hexToRgba(cat.color,0.4)+';">'+escapeHtml(cat.label)+'</span>';
 }
+// The master wake-up alarm: one daily alarm (e.g. 7:00 Mon–Sat) plus an optional
+// one-morning change. The first time this runs, an existing repeating "wake-up" alarm and
+// any upcoming night-plan wake alarms are folded into it (their settings carry over).
+function normalizeWake(f){
+  const fresh = !f.wake || typeof f.wake!=='object';
+  const w = fresh ? {} : f.wake;
+  const out = {
+    enabled: w.enabled===true,
+    time: /^\d\d:\d\d$/.test(w.time||'') ? w.time : '07:00',
+    days: Array.isArray(w.days) ? w.days.map(Number).filter(function(d){ return d>=0 && d<=6; }) : [1,2,3,4,5,6],
+    override: (w.override && w.override.date && w.override.date>=todayStr()) ? w.override : null,
+    sound: ['standard','peaceful','loud'].indexOf(w.sound)>=0 ? w.sound : 'peaceful',
+    media: (w.media && (w.media.ref || w.media.url)) ? w.media : null,
+    snoozeMinutes: Number(w.snoozeMinutes)>0 ? Number(w.snoozeMinutes) : 9,
+    secondScreen: !!w.secondScreen,
+    lastFiredTs: Number(w.lastFiredTs)||0,
+    armedAt: Number(w.armedAt)||Date.now()
+  };
+  if(fresh){
+    const rep = arr(f.alarms).find(function(a){ return a.wake && !a.date && arr(a.days).length; });
+    if(rep){
+      out.enabled = rep.enabled!==false; out.time = rep.time || out.time; out.days = arr(rep.days).slice();
+      if(rep.mediaUrl) out.media = {url:rep.mediaUrl, name:rep.mediaUrl};
+    }
+    const oneOff = arr(f.alarms).filter(function(a){ return (a.wake || a.kind==='wake') && a.date && a.date>=todayStr(); })
+      .sort(function(a,b){ return (a.date+a.time).localeCompare(b.date+b.time); })[0];
+    if(oneOff){
+      out.override = {date:oneOff.date, time:oneOff.time};
+      if(oneOff.mediaUrl && !out.media) out.media = {url:oneOff.mediaUrl, name:oneOff.mediaUrl};
+    }
+    f.alarms = arr(f.alarms).filter(function(a){ return a!==rep && !((a.wake || a.kind==='wake') && a.date); });
+  }
+  return out;
+}
 function normalizeFocus(f){
   f=f||{};
   if(f.activeSession===undefined) f.activeSession=null;
@@ -1833,6 +1949,9 @@ function normalizeFocus(f){
   f.taskSegments = arr(f.taskSegments);
   if(f.nightPlan===undefined) f.nightPlan = null;
   f.alarms = arr(f.alarms);
+  f.alarms.forEach(function(a){ if(!Array.isArray(a.days)) a.days = []; if(!a.armedAt) a.armedAt = Date.now(); });
+  f.wake = normalizeWake(f);
+  if(f.snooze && !(f.snooze.ts > Date.now()-2*3600000)) f.snooze = null;
   if(f.lastManualStopAt===undefined) f.lastManualStopAt = null;
   if(f.lastSessionEndedAt===undefined) f.lastSessionEndedAt = null;
   f.reminders = arr(f.reminders);
@@ -2842,6 +2961,7 @@ function renderTaskEditModal(){
     '<div class="field" style="margin-top:10px;"><label>Priority</label><select class="input" id="editPriority-'+t.id+'"><option value="low" '+(t.priority==='low'?'selected':'')+'>Low</option><option value="med" '+(t.priority==='med'?'selected':'')+'>Medium</option><option value="high" '+(t.priority==='high'?'selected':'')+'>High</option></select></div>'+
     '<div class="field" style="margin-top:10px;"><label>Category</label><select class="input" id="editCategory-'+t.id+'"><option value="">&mdash; None &mdash;</option>'+arr(state.tasks.categories).map(function(c){ return '<option value="'+c.id+'" '+(t.categoryId===c.id?'selected':'')+'>'+escapeHtml(c.label)+'</option>'; }).join('')+'</select></div>'+
     '<div class="field" style="margin-top:10px;"><label>Deadline</label><div class="row"><input class="input" type="date" id="editDeadline-'+t.id+'" value="'+(t.deadline||'')+'"><input class="input" type="time" id="editDeadlineTime-'+t.id+'" value="'+(t.deadlineTime||'')+'" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editDeadline-'+t.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="editDeadline-'+t.id+'">Today</button>'+(t.deadline?'<button class="btn btn-ghost btn-sm" data-action="clearField" data-target="editDeadline-'+t.id+'" title="Remove deadline">Clear</button>':'')+'</div></div>'+
+    taskAlarmFieldsHtml('editTask-'+t.id+'-', t)+
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="editNotes-'+t.id+'" style="width:100%;min-height:60px;">'+escapeHtml(t.notes||'')+'</textarea></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editCountsDeep-'+t.id+'" '+(t.countsDeepWork!==false?'checked':'')+' style="margin-right:6px;">Counts toward deep work'+(function(){ const c=t.categoryId?taskCategoryById(t.categoryId):null; return c && c.countsDeepWork===false ? ' <span class="kpi-sub">(its category "'+escapeHtml(c.label)+'" doesn\'t count)</span>' : ''; })()+'</label>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editOngoing-'+t.id+'" '+(t.ongoing?'checked':'')+' style="margin-right:6px;">&#128204; Ongoing (may take more than one day)</label>'+
@@ -2891,6 +3011,8 @@ function saveEditTask(id){
     t.ongoingFrequency = null;
     t.includeInStandard = false;
   }
+  const alarmCfg = readTaskAlarmFields('editTask-'+id+'-');
+  if(alarmCfg!==undefined){ if(alarmCfg) t.alarm = alarmCfg; else delete t.alarm; syncTaskAlarms(t); }
   ui.selectedTaskIds.clear();
   closeTaskEditModal();
   persist('tasks'); renderView();
@@ -3685,7 +3807,7 @@ function renderToday(){
       '</div>'+
       '<div class="row" style="gap:8px;justify-content:center;">'+
         '<button class="btn" style="border-color:var(--accent);color:var(--accent);" data-action="toggleDayOff">Take Today Off</button>'+
-        '<button class="btn btn-ghost sleep-btn" data-action="startSleepMode" title="Off-time for the night: pauses auto lock-in, shows your alarm and tomorrow\'s plan">&#127769; Sleep</button>'+
+        wakeChipHtml()+
       '</div>'+
     '</div>'+
     renderMorningPlanCard()+
@@ -3976,6 +4098,7 @@ function renderAddTaskModal(){
     '<div class="field" style="margin-top:10px;"><label>Priority</label><select class="input" id="newTaskPriority"><option value="low">Low</option><option value="med" selected>Medium</option><option value="high">High</option></select></div>'+
     '<div class="field" style="margin-top:10px;"><label>Category (optional)</label><select class="input" id="newTaskCategory"><option value="">&mdash; None &mdash;</option>'+arr(state.tasks.categories).map(function(c){ return '<option value="'+c.id+'">'+escapeHtml(c.label)+'</option>'; }).join('')+'</select></div>'+
     '<div class="field" style="margin-top:10px;"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="newTaskDeadline"><input class="input" type="time" id="newTaskDeadlineTime" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="newTaskDeadline">Today</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskDeadline" title="Remove deadline">Clear</button></div></div>'+
+    taskAlarmFieldsHtml('newTask', null)+
     '<div class="field" style="margin-top:10px;"><label>Notes (optional)</label><textarea class="input" id="newTaskNotes" placeholder="Any details worth remembering" style="width:100%;min-height:60px;"></textarea></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskOngoing" style="margin-right:6px;">&#128204; Ongoing (may take more than one day)</label>'+
     '<div id="newTaskOngoingExtra" style="display:none;">'+
@@ -4010,6 +4133,9 @@ function addTask(status){
   const categoryEl = document.getElementById('newTaskCategory');
   const categoryId = categoryEl && categoryEl.value ? categoryEl.value : null;
   state.tasks.items.push({id:uid(), title:title, client:clients[0], clients:clients, priority:priority, deadline:deadline, notes:notes, status:status, ongoing:ongoing, ongoingDeadline:ongoingDeadline, ongoingFrequency:ongoingFrequency, includeInStandard:includeInStandard, categoryId:categoryId, deadlineTime:deadlineTime, eventId:ui.newTaskEventId||null, createdAt:todayStr(), completedAt:null});
+  const newT = state.tasks.items[state.tasks.items.length-1];
+  const alarmCfg = readTaskAlarmFields('newTask');
+  if(alarmCfg){ newT.alarm = alarmCfg; syncTaskAlarms(newT); if(deadline && deadlineTime) showToast('Alarms set: '+taskAlarmHint(newT).replace(/&middot;/g,'·'), {icon:'&#9200;', duration:5000}); }
   if(ui.newTaskEventId){ const ev = state.calendar.events.find(function(x){ return x.id===ui.newTaskEventId; }); if(ev){ ev.taskIds = arr(ev.taskIds).concat([state.tasks.items[state.tasks.items.length-1].id]); persist('calendar'); } ui.newTaskEventId = null; }
   closeAddTaskModal();
   playTaskAdded();
@@ -4209,7 +4335,11 @@ function renderActiveFocusHero(big){
     timerCardInner = '<div class="kpi-label" style="color:var(--info);">'+modeIcon('break')+' ON BREAK</div>'+
       '<div class="hero-num '+sizeClass+'" id="modeElapsed" style="color:var(--info);">'+formatElapsed(Date.now()-(active.breakStartedAt||Date.now()))+'</div>'+
       (breakInfo&&breakInfo.note ? '<div class="kpi-sub">'+escapeHtml(breakInfo.note)+'</div>' : '')+
-      '<button class="btn btn-primary btn-sm" data-action="endBreakModeFromFocus" style="margin-top:10px;">End Break</button>';
+      (active.breakEndsAt ? '<div class="break-remaining" id="breakRemaining">'+formatElapsed(Math.max(0, active.breakEndsAt-Date.now()))+' left</div>' : '')+
+      '<div class="row" style="justify-content:center;gap:6px;margin-top:10px;">'+
+        (active.breakEndsAt ? '<button class="btn btn-ghost btn-sm" data-action="extendBreak" data-minutes="5">+5 min</button>' : '')+
+        '<button class="btn btn-primary btn-sm" data-action="endBreakModeFromFocus">End Break</button>'+
+      '</div>';
   } else {
     const dwTarget = state.standards.deepWorkTargetMinutes || 180;
     const liveToday = deepWorkMinutesTodayLive();
@@ -4777,6 +4907,9 @@ function renderBreakNoteModal(){
   return '<div class="section-title" style="margin-bottom:8px;">'+modeIcon('break')+' Break Mode</div>'+
     '<div class="kpi-sub" style="margin-bottom:12px;">What\'s this break for? A quick note helps you see your break patterns later.</div>'+
     '<input class="input" id="breakNoteInput" placeholder="e.g. Lunch, quick walk, phone call" style="width:100%;">'+
+    '<div class="kind-label" style="margin-top:14px;">How long?</div>'+
+    '<div class="row break-len-row" style="gap:6px;flex-wrap:wrap;">'+[5,10,15,20,30,45,60,'open'].map(function(m){ const on = (ui.breakMinutes==null ? 15 : ui.breakMinutes)===m; return '<button class="btn btn-sm '+(on?'btn-primary':'btn-ghost')+'" data-action="pickBreakMinutes" data-minutes="'+m+'">'+(m==='open'?'No timer':m+' min')+'</button>'; }).join('')+'</div>'+
+    '<div class="kpi-sub" style="margin-top:6px;">'+((ui.breakMinutes==null?15:ui.breakMinutes)==='open' ? 'The break runs until you end it.' : 'Ends by itself after '+(ui.breakMinutes==null?15:ui.breakMinutes)+' min and you\'re back in the session.')+'</div>'+
     '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
       '<button class="btn btn-ghost" data-action="closeBreakNotePrompt">Cancel</button>'+
       '<button class="btn btn-primary" data-action="confirmStartBreakMode">'+modeIcon('break')+' Start Break</button>'+
@@ -4789,9 +4922,11 @@ function confirmStartBreakMode(){
   const note = noteEl ? noteEl.value.trim() : '';
   closeBreakNotePrompt();
   if(!Array.isArray(as.breaks)) as.breaks=[];
-  as.breaks.push({start:Date.now(), note:note});
+  const breakLen = ui.breakMinutes==null ? 15 : ui.breakMinutes;
+  as.breaks.push({start:Date.now(), note:note, minutes:breakLen==='open'?null:breakLen});
   as.onBreak = true;
   as.breakStartedAt = Date.now();
+  as.breakEndsAt = breakLen==='open' ? null : Date.now()+breakLen*60000;
   as.frozenElapsedMs = Date.now() - as.startedAt;
   state.modes.active = {type:'break', startedAt:Date.now(), note:note, linkedFocus:true};
   if(ui.currentTaskId){ ui.pausedTaskId = ui.currentTaskId; accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
@@ -4806,6 +4941,7 @@ function endBreakModeFromFocus(){
   const actualBreakMs = Date.now() - startedAt;
   as.startedAt += actualBreakMs;
   as.onBreak = false;
+  as.breakEndsAt = null;
   const minutes = Math.max(1, Math.round(actualBreakMs/60000));
   state.modes.history.push({id:uid(), type:'break', date:todayStr(new Date(startedAt)), startedAt:startedAt, endedAt:Date.now(), minutes:minutes, note:lastBreak.note||''});
   state.modes.active = null;
@@ -7098,6 +7234,50 @@ afterRenderHooks.push(function(){
     imgs[i % imgs.length].classList.add('is-on');
   }, 9000);
 });
+// ---- static (read-only) render of a board — wake screen, second display, previews ----
+// The master vision board is the one board that shows up on the wake screen.
+function masterVisionBoard(){
+  const id = state.boards.masterId;
+  const b = id ? boardById(id) : null;
+  if(b && b.kind==='vision') return b;
+  return boardsOfKind('vision').filter(function(x){ return !x.parentId; })[0] || null;
+}
+function boardBounds(b){
+  let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+  b.elements.forEach(function(e){
+    if(e.type==='line'){ minX=Math.min(minX,e.x1,e.x2); maxX=Math.max(maxX,e.x1,e.x2); minY=Math.min(minY,e.y1,e.y2); maxY=Math.max(maxY,e.y1,e.y2); }
+    else { minX=Math.min(minX,e.x); minY=Math.min(minY,e.y); maxX=Math.max(maxX,e.x+e.w); maxY=Math.max(maxY,e.y+(e.h||0)); }
+  });
+  if(minX===Infinity) return null;
+  return {x:minX-20, y:minY-20, w:maxX-minX+40, h:maxY-minY+40};
+}
+function boardStaticHtml(b, cls){
+  if(!b || !b.elements.length) return '';
+  const bb = boardBounds(b); if(!bb) return '';
+  const els = b.elements.slice().sort(function(a,c){ return (a.z||0)-(c.z||0); });
+  const shift = function(e){ const c = Object.assign({}, e); if(c.type==='line'){ c.x1-=bb.x; c.x2-=bb.x; c.y1-=bb.y; c.y2-=bb.y; } else { c.x-=bb.x; c.y-=bb.y; } return c; };
+  const savedSel = cv.sel; cv.sel = new Set();
+  const body = els.filter(function(e){ return e.type!=='line'; }).map(function(e){ return elHtml(shift(e), false); }).join('');
+  cv.sel = savedSel;
+  const lines = els.filter(function(e){ return e.type==='line'; }).map(function(e){ const c = shift(e); return '<line x1="'+c.x1+'" y1="'+c.y1+'" x2="'+c.x2+'" y2="'+c.y2+'" stroke="'+(c.color||'#8A90A2')+'" stroke-width="'+(c.width||2)+'" stroke-linecap="round"'+(c.arrow?' marker-end="url(#bArrowS)"':'')+'/>'; }).join('');
+  return '<div class="board-static '+(cls||'')+'" data-bw="'+bb.w+'" data-bh="'+bb.h+'">'+
+    '<div class="board-static-world" style="width:'+bb.w+'px;height:'+bb.h+'px;">'+
+      '<svg class="board-lines" width="'+bb.w+'" height="'+bb.h+'"><defs><marker id="bArrowS" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/></marker></defs>'+lines+'</svg>'+
+      body+
+    '</div></div>';
+}
+// Scale every static board to fit its box (contain, centred).
+function fitStaticBoards(root){
+  (root||document).querySelectorAll('.board-static').forEach(function(box){
+    const w = Number(box.dataset.bw)||1, h = Number(box.dataset.bh)||1;
+    const r = box.getBoundingClientRect(); if(!r.width || !r.height) return;
+    const s = Math.min(r.width/w, r.height/h, 2);
+    const world = box.firstElementChild;
+    world.style.transform = 'translate('+Math.round((r.width-w*s)/2)+'px,'+Math.round((r.height-h*s)/2)+'px) scale('+s+')';
+  });
+}
+window.addEventListener('resize', function(){ fitStaticBoards(); });
+afterRenderHooks.push(function(){ fitStaticBoards(); });
 // ============ FINANCES ============
 function renderFinances(){
   const debts = state.finances.debts;
@@ -9618,14 +9798,17 @@ function renderCalEventModal(){
     '<div class="field" style="margin-top:10px;"><label>Location (optional)</label><input class="input" id="calEventLocation" value="'+escapeHtml(e.location||'')+'" placeholder="Address or place" style="width:100%;"></div>'+
     '<label class="row" style="margin-top:12px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventSetAlarm" '+(wantsAlarm?'checked':'')+' style="margin-right:6px;">&#128276; Alarm at the event time (needs a time)</label>'+
     '<div class="field" style="margin-top:10px;"><label>Remind me before</label><select class="input" id="calEventRemindBefore" style="width:100%;">'+[[0,'&mdash; No extra reminder'],[10,'10 min before'],[15,'15 min before'],[30,'30 min before'],[60,'1 hour before'],[120,'2 hours before'],[1440,'1 day before']].map(function(o){ return '<option value="'+o[0]+'" '+(Number(e.remindBefore||0)===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select></div>'+
-    '<label class="row" style="margin-top:12px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventIsShoot" '+(e.isShoot?'checked':'')+' style="margin-right:6px;">&#127916; This is a shoot — add prep alarms</label>'+
-    '<div id="calEventShootExtra" class="card" style="display:'+(e.isShoot?'block':'none')+';margin-top:8px;padding:12px 14px;">'+
+    '<div class="card task-alarm-box" style="margin-top:10px;padding:12px 14px;">'+
+      '<div class="kind-label" style="margin-top:0;">Getting there</div>'+
       '<div class="grid grid-2">'+
+        '<div class="field"><label>Travel time (minutes)</label><input class="input" type="number" min="0" step="5" id="calEventTravel" value="'+(e.travelMinutes||'')+'" placeholder="0"></div>'+
         '<div class="field"><label>Start getting ready at</label><input class="input" type="time" id="calEventReadyTime" value="'+(e.readyTime||'')+'"></div>'+
-        '<div class="field"><label>Travel time (minutes)</label><input class="input" type="number" min="0" step="5" id="calEventTravel" value="'+(e.travelMinutes||'')+'" placeholder="e.g. 60"></div>'+
       '</div>'+
-      '<div class="kpi-sub" style="margin-top:6px;" id="calEventLeaveHint">'+(e.time && e.travelMinutes ? 'Leave alarm at '+fmt12Hour(shiftHM(e.time, -Number(e.travelMinutes)))+'.' : 'A "Leave" alarm goes off at event time minus travel time.')+'</div>'+
-      '<label class="row" style="margin-top:8px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventAutoShoot" '+(e.autoShootMode!==false?'checked':'')+' style="margin-right:6px;">Start Shooting Mode automatically at the first prep alarm (prep + travel + shoot tracked together)</label>'+
+      '<div class="kpi-sub" style="margin-top:6px;" id="calEventLeaveHint">'+(e.time && e.travelMinutes ? 'Leave alarm at '+fmt12Hour(shiftHM(e.time, -Number(e.travelMinutes)))+'.' : 'With a travel time, a "Time to leave" alarm rings at event time minus travel.')+'</div>'+
+    '</div>'+
+    '<label class="row" style="margin-top:12px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventIsShoot" '+(e.isShoot?'checked':'')+' style="margin-right:6px;">&#127916; This is a shoot</label>'+
+    '<div id="calEventShootExtra" style="display:'+(e.isShoot?'block':'none')+';margin-top:4px;">'+
+      '<label class="row" style="font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventAutoShoot" '+(e.autoShootMode!==false?'checked':'')+' style="margin-right:6px;">Start Shooting Mode automatically at the first prep alarm (prep + travel + shoot tracked together)</label>'+
     '</div>'+
     '<div class="field" style="margin-top:12px;"><label>Tasks for this event</label>'+renderEventTaskPicker(e)+'</div>'+
     '<div class="row" style="margin-top:20px;justify-content:'+(editing?'space-between':'flex-end')+';">'+
@@ -9721,8 +9904,8 @@ function readEventExtras(ev){
   ev.location = v('calEventLocation').trim() || null;
   ev.remindBefore = Number(v('calEventRemindBefore'))||0;
   ev.isShoot = c('calEventIsShoot');
-  ev.readyTime = ev.isShoot ? (v('calEventReadyTime')||null) : null;
-  ev.travelMinutes = ev.isShoot ? (Number(v('calEventTravel'))||0) : 0;
+  ev.readyTime = v('calEventReadyTime')||null;
+  ev.travelMinutes = Number(v('calEventTravel'))||0;
   ev.autoShootMode = ev.isShoot && c('calEventAutoShoot');
   const boxes = document.querySelectorAll('#calEventContent [data-event-task]');
   if(boxes.length){
@@ -9757,9 +9940,9 @@ function eventStartTs(ev){ return ev.time ? localTs(ev.date, ev.time) : null; }
 function syncEventExtraAlarms(ev){
   const start = eventStartTs(ev);
   const at = function(ts){ const d = new Date(ts); return [todayStr(d), nowHM(d)]; };
-  if(ev.isShoot && ev.readyTime) upsertEventAlarm(ev, 'ready', ev.date, ev.readyTime, 'Start getting ready — '+ev.title);
+  if(ev.readyTime) upsertEventAlarm(ev, 'ready', ev.date, ev.readyTime, 'Start getting ready — '+ev.title);
   else upsertEventAlarm(ev, 'ready', null);
-  if(ev.isShoot && start && ev.travelMinutes>0){ const x = at(start-ev.travelMinutes*60000); upsertEventAlarm(ev, 'leave', x[0], x[1], 'Time to leave — '+ev.title+(ev.location?' ('+ev.location+')':'')); }
+  if(start && ev.travelMinutes>0){ const x = at(start-ev.travelMinutes*60000); upsertEventAlarm(ev, 'leave', x[0], x[1], 'Time to leave — '+ev.title+(ev.location?' ('+ev.location+')':'')); }
   else upsertEventAlarm(ev, 'leave', null);
   if(start && ev.remindBefore>0){ const y = at(start-ev.remindBefore*60000); upsertEventAlarm(ev, 'remind', y[0], y[1], ev.title+' in '+fmtDurationLabel(ev.remindBefore)); }
   else upsertEventAlarm(ev, 'remind', null);
@@ -9806,13 +9989,13 @@ function renderAlarmExtra(al){
     html += '<div class="kpi-sub" style="margin-top:6px;">'+escapeHtml(ev.title)+(ev.time?' at '+fmt12Hour(ev.time):'')+(ev.location?' &middot; &#128205; '+escapeHtml(ev.location):'')+'</div>';
     if(ev.isShoot && !(state.modes.active && state.modes.active.type==='shooting')) html += '<button class="btn btn-sm shooting-btn-sm" style="margin-top:10px;" data-action="startShootFromEvent" data-id="'+ev.id+'">&#127916; Start shooting mode</button>';
   }
-  if(al && al.mediaUrl) html += '<button class="btn btn-good" style="margin-top:12px;" data-action="playAlarmMedia" data-url="'+escapeHtml(al.mediaUrl)+'">&#9654; Play wake-up '+(/youtu/.test(al.mediaUrl)?'video':'song')+'</button>';
   return html;
 }
 ACTIONS.playAlarmMedia = function(el){
   clearInterval(ringInterval);
   const url = el.dataset.url;
-  if(url) window.open(safariizeUrl(url), '_blank');
+  if(url) playWakeMedia({url:url}, function(){ window.open(safariizeUrl(url), '_blank'); });
+  el.remove();
 };
 // ---- Reminders: mini alarm (sound + notification + banner) ----
 function fireReminder(r){
@@ -9858,6 +10041,8 @@ ACTIONS.undoTaskToReminder = function(){
 // ---- Next alarm ----
 function nextAlarmOccurrence(){
   const now = Date.now(); let best = null;
+  const nw = typeof nextWake==='function' ? nextWake() : null;
+  if(nw) best = {alarm:{label:'Wake up', time:nw.time, wake:true}, ts:nw.ts, date:nw.date, wake:true};
   arr(state.focus.alarms).forEach(function(a){
     if(!a.enabled || !a.time) return;
     for(let i=0;i<8;i++){
@@ -9881,10 +10066,8 @@ function planTargetDate(){ return new Date().getHours()>=15 ? addDays(todayStr()
 function openNightPlan(){
   const np = state.focus.nightPlan;
   const target = planTargetDate();
-  ui.nightPlanDraft = (np && np.date===target) ? {date:np.date, taskIds:arr(np.taskIds).slice(), note:np.note||'', alarmTime:'', mediaUrl:''} : {date:target, taskIds:[], note:'', alarmTime:'', mediaUrl:''};
-  const al = np && np.date===target && np.alarmId ? state.focus.alarms.find(function(a){ return a.id===np.alarmId; }) : null;
-  if(al){ ui.nightPlanDraft.alarmTime = al.time; ui.nightPlanDraft.mediaUrl = al.mediaUrl||''; }
-  else { const next = nextAlarmOccurrence(); if(next && next.date===target) ui.nightPlanDraft.alarmTime = ''; }
+  ui.nightPlanDraft = (np && np.date===target) ? {date:np.date, taskIds:arr(np.taskIds).slice(), note:np.note||''} : {date:target, taskIds:[], note:''};
+  ui.nightPlanDraft.alarmTime = wakeTimeFor(target) || '';
   showOverlay('nightPlanOverlay'); renderNightPlanModalInto();
 }
 function renderNightPlanModal(){
@@ -9892,7 +10075,7 @@ function renderNightPlanModal(){
   const sel = new Set(d.taskIds);
   const cands = state.tasks.items.filter(function(t){ return t.status!=='done'; })
     .sort(function(a,b){ return (sel.has(b.id)?1:0)-(sel.has(a.id)?1:0) || taskPriorityRank(a)-taskPriorityRank(b); }).slice(0,80);
-  const next = nextAlarmOccurrence();
+  const base = wakeBaseTimeFor(d.date);
   const dayLabel = d.date===todayStr() ? 'today' : 'tomorrow ('+weekdayShort(d.date)+')';
   return '<div class="section-title" style="margin-bottom:4px;">&#127769; Plan '+dayLabel+'</div>'+
     '<div class="kpi-sub" style="margin-bottom:14px;">Shows up when your alarm goes off and on the Today page in the morning.</div>'+
@@ -9901,10 +10084,10 @@ function renderNightPlanModal(){
     '</div>'+
     '<div class="row" style="margin-top:6px;gap:6px;"><input class="input" id="nightPlanNewTask" placeholder="+ Add a new task to the plan" style="flex:1;"><button class="btn btn-sm" data-action="nightPlanAddTask">Add</button></div></div>'+
     '<div class="field" style="margin-top:12px;"><label>Note to wake up to</label><textarea class="input" id="nightPlanNote" style="width:100%;min-height:70px;" placeholder="What matters tomorrow, and why.">'+escapeHtml(d.note||'')+'</textarea></div>'+
-    '<div class="grid grid-2" style="margin-top:12px;">'+
-      '<div class="field"><label>Wake-up alarm</label><input class="input" type="time" id="nightPlanAlarm" value="'+escapeHtml(d.alarmTime||'')+'"><div class="kpi-sub">'+(next?'Next alarm: '+fmt12Hour(next.alarm.time)+' '+(next.date===todayStr()?'today':weekdayShort(next.date))+' ('+escapeHtml(next.alarm.label||'Alarm')+')':'No alarm set')+'</div></div>'+
-      '<div class="field"><label>Wake-up song / YouTube link (optional)</label><input class="input" id="nightPlanMedia" value="'+escapeHtml(d.mediaUrl||'')+'" placeholder="https://…"></div>'+
-    '</div>'+
+    '<div class="field night-wake-field" style="margin-top:12px;"><label>&#9200; Wake up '+morningLabel(d.date)+' at</label>'+
+      '<div class="row" style="gap:10px;align-items:center;flex-wrap:wrap;"><input class="input ws-time ws-time-sm" type="time" id="nightPlanAlarm" value="'+escapeHtml(d.alarmTime||'')+'">'+
+      '<span class="kpi-sub">'+(base ? 'Usual: '+fmt12Hour(base)+' ('+wakeDaysLabel(wakeCfg().days)+'). A different time here only changes '+morningLabel(d.date)+'.' : 'No daily alarm that day — set a time to wake up '+morningLabel(d.date)+'.')+'</span>'+
+      '<button class="btn btn-ghost btn-sm" data-action="openWakeSetup">Alarm settings &amp; music</button></div></div>'+
     '<div class="row" style="margin-top:18px;justify-content:space-between;">'+
       (state.focus.nightPlan ? '<button class="btn btn-ghost btn-sm mini-move-danger" data-action="clearNightPlan">Clear plan</button>' : '<span></span>')+
       '<div class="row"><button class="btn btn-ghost" data-action="closeNightPlan">Cancel</button><button class="btn btn-primary" data-action="saveNightPlan">Save plan</button></div>'+
@@ -9917,7 +10100,6 @@ function readNightPlanForm(){
   d.taskIds = Array.prototype.map.call(document.querySelectorAll('#nightPlanContent [data-plan-task]:checked'), function(b){ return b.dataset.planTask; });
   const note = document.getElementById('nightPlanNote'); if(note) d.note = note.value;
   const al = document.getElementById('nightPlanAlarm'); if(al) d.alarmTime = al.value;
-  const md = document.getElementById('nightPlanMedia'); if(md) d.mediaUrl = md.value.trim();
 }
 ACTIONS.openNightPlan = openNightPlan;
 ACTIONS.closeNightPlan = function(){ ui.nightPlanDraft = null; hideOverlay('nightPlanOverlay'); };
@@ -9936,21 +10118,22 @@ ACTIONS.saveNightPlan = function(){
   readNightPlanForm();
   const d = ui.nightPlanDraft; if(!d) return;
   const prev = state.focus.nightPlan;
-  let alarmId = prev && prev.date===d.date ? prev.alarmId : null;
-  if(d.alarmTime){
-    let a = alarmId ? state.focus.alarms.find(function(x){ return x.id===alarmId; }) : null;
-    if(!a){ a = {id:uid(), days:[], enabled:true}; state.focus.alarms.push(a); alarmId = a.id; }
-    a.time = d.alarmTime; a.date = d.date; a.label = 'Wake up'; a.wake = true; a.kind = 'wake'; a.enabled = true;
-    a.wakeNote = d.note||''; a.mediaUrl = d.mediaUrl||'';
-  } else if(alarmId){
-    state.focus.alarms = state.focus.alarms.filter(function(x){ return x.id!==alarmId; }); alarmId = null;
+  // Older plans made their own one-off alarm; the wake-up alarm handles it now.
+  if(prev && prev.alarmId) state.focus.alarms = state.focus.alarms.filter(function(x){ return x.id!==prev.alarmId; });
+  const w = wakeCfg();
+  if((d.alarmTime||null)!==(wakeTimeFor(d.date)||null)){
+    if(!d.alarmTime) w.override = wakeBaseTimeFor(d.date) ? {date:d.date, off:true} : null;
+    else if(d.alarmTime===wakeBaseTimeFor(d.date)) w.override = null;
+    else w.override = {date:d.date, time:d.alarmTime};
+    wakeArm();
   }
-  state.focus.nightPlan = {date:d.date, taskIds:d.taskIds, note:d.note||'', alarmId:alarmId, createdAt:Date.now(), applied:false, dismissed:false};
+  state.focus.nightPlan = {date:d.date, taskIds:d.taskIds, note:d.note||'', alarmId:null, createdAt:Date.now(), applied:false, dismissed:false};
   ui.nightPlanDraft = null;
   hideOverlay('nightPlanOverlay');
   playPositive();
   persist('focus'); renderView();
-  showToast('Plan saved for '+(d.date===todayStr()?'today':'tomorrow'), {icon:'&#127769;'});
+  const t = wakeTimeFor(d.date);
+  showToast('Plan saved for '+morningLabel(d.date)+(t?' — alarm '+fmt12Hour(t):''), {icon:'&#127769;'});
 };
 ACTIONS.clearNightPlan = function(){
   const np = state.focus.nightPlan;
@@ -9989,8 +10172,8 @@ ACTIONS.startSleepMode = function(){
 };
 function renderSleepView(){
   const active = state.modes.active;
-  const next = nextAlarmOccurrence();
-  const np = state.focus.nightPlan && state.focus.nightPlan.date>=todayStr() ? state.focus.nightPlan : null;
+  const nw = nextWake();
+  const np = upcomingNightPlan();
   const npTasks = np ? arr(np.taskIds).map(function(id){ return state.tasks.items.find(function(t){ return t.id===id; }); }).filter(Boolean) : [];
   return '<div class="view-header today-header"><div><div class="view-title">Sleep mode<span class="sleepy-dots" aria-hidden="true"></span></div><div class="view-sub" id="liveClock"></div></div></div>'+
   '<div class="day-off-wrap"><div class="card day-off-card sleep-card">'+
@@ -9998,22 +10181,29 @@ function renderSleepView(){
     '<div class="hero-num" id="modeElapsed" style="color:#c9d3ff;">'+formatElapsed(Date.now()-active.startedAt)+'</div>'+
     '<div class="hero-label" style="color:#9AA0AC;">resting &middot; auto lock-in paused</div>'+
     '<div class="sleep-grid">'+
-      '<div class="sleep-tile"><div class="kpi-label">Next alarm</div>'+(next ? '<div class="sleep-tile-val">'+fmt12Hour(next.alarm.time)+'</div><div class="kpi-sub">'+escapeHtml(next.alarm.label||'Alarm')+' &middot; in '+untilLabel(next.ts)+'</div>' : '<div class="kpi-sub">No alarm set</div>')+'</div>'+
-      '<div class="sleep-tile"><div class="kpi-label">Tomorrow\'s plan</div>'+(np ? '<div class="sleep-tile-val">'+npTasks.length+' task'+(npTasks.length===1?'':'s')+'</div><div class="kpi-sub">'+(np.note?escapeHtml(np.note.slice(0,70))+(np.note.length>70?'…':''):'no note')+'</div>' : '<div class="kpi-sub">Not planned yet</div>')+'</div>'+
+      '<button class="sleep-tile sleep-tile-btn" data-action="openWakeSetup"><div class="kpi-label">Wake-up</div>'+(nw ? '<div class="sleep-tile-val">'+fmt12Hour(nw.time)+'</div><div class="kpi-sub">'+morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts)+'</div>' : '<div class="sleep-tile-val">Not set</div><div class="kpi-sub">Tap to set it</div>')+'</button>'+
+      '<button class="sleep-tile sleep-tile-btn" data-action="openNightPlan"><div class="kpi-label">'+(np?'Plan for '+morningLabel(np.date):'Tomorrow\'s plan')+'</div>'+(np ? '<div class="sleep-tile-val">'+npTasks.length+' task'+(npTasks.length===1?'':'s')+'</div><div class="kpi-sub">'+(np.note?escapeHtml(np.note.slice(0,70))+(np.note.length>70?'…':''):'no note')+'</div>' : '<div class="sleep-tile-val">Not planned</div><div class="kpi-sub">Tap to plan</div>')+'</button>'+
     '</div>'+
     '<div class="row" style="justify-content:center;margin-top:16px;gap:10px;">'+
-      '<button class="btn btn-ghost" data-action="openNightPlan">'+(np?'Edit plan &amp; alarm':'Plan tomorrow &amp; set alarm')+'</button>'+
       '<button class="btn" style="border-color:#9AA0AC;color:#fff;" data-action="endMode">I\'m up</button>'+
     '</div>'+
   '</div></div>';
 }
+// Winding down: tomorrow's wake-up, the plan and going to sleep — one card (evenings).
 function renderEveningCard(){
   const h = new Date().getHours();
   if(h<18 && h>=4) return '';
-  const np = state.focus.nightPlan && state.focus.nightPlan.date===planTargetDate() ? state.focus.nightPlan : null;
+  const target = planTargetDate();
+  const np = state.focus.nightPlan && state.focus.nightPlan.date===target ? state.focus.nightPlan : null;
+  const nw = nextWake();
+  const count = np ? arr(np.taskIds).length : 0;
   return '<div class="section"><div class="card evening-card">'+
-    '<div><div class="kpi-label">&#127769; Winding down</div><div class="kpi-sub">'+(np?'Tomorrow is planned ('+arr(np.taskIds).length+' tasks).':'Set tomorrow\'s list and alarm before bed.')+'</div></div>'+
-    '<div class="row" style="gap:8px;"><button class="btn btn-ghost btn-sm" data-action="openNightPlan">'+(np?'Edit plan':'Plan tomorrow')+'</button><button class="btn btn-sm sleep-btn" data-action="startSleepMode">Sleep mode</button></div>'+
+    '<div class="evening-head"><div class="kpi-label">&#127769; Winding down</div><div class="kpi-sub">'+(np ? morningLabel(target)[0].toUpperCase()+morningLabel(target).slice(1)+' is planned.' : 'Line up '+morningLabel(target)+', check your alarm, then sleep.')+'</div></div>'+
+    '<div class="evening-tiles">'+
+      '<button class="evening-tile" data-action="openWakeSetup"><span class="evening-tile-k">Wake-up</span><span class="evening-tile-v">'+(nw ? fmt12Hour(nw.time) : 'Not set')+'</span><span class="kpi-sub">'+(nw ? morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts) : 'Set it')+'</span></button>'+
+      '<button class="evening-tile" data-action="openNightPlan"><span class="evening-tile-k">'+escapeHtml(morningLabel(target)[0].toUpperCase()+morningLabel(target).slice(1))+'</span><span class="evening-tile-v">'+(np ? count+' task'+(count===1?'':'s') : 'Plan it')+'</span><span class="kpi-sub">'+(np ? 'Edit plan' : 'Tasks + a note')+'</span></button>'+
+      '<button class="evening-tile evening-sleep" data-action="startSleepMode"><span class="evening-moon">&#127769;</span><span class="evening-tile-v">Go to sleep</span><span class="kpi-sub">Pauses auto lock-in</span></button>'+
+    '</div>'+
   '</div></div>';
 }
 // ============ SETTINGS ============
@@ -10117,7 +10307,8 @@ function renderSettings(){
         '<div class="field"><label>Cooldown after you lock out (minutes)</label><input class="input" type="number" min="0" max="240" id="setAppTrackingCooldown" value="'+state.settings.appTracking.cooldownMinutes+'"><div class="kpi-sub">Auto lock-in stays off this long after you stop a session yourself</div></div>'+
         '<div class="field"><label>Idle after (seconds without keyboard/mouse)</label><input class="input" type="number" min="15" max="900" id="setAppTrackingIdle" value="'+state.settings.appTracking.idleSeconds+'"><div class="kpi-sub">Idle time doesn\'t count toward auto lock-in or app time</div></div>'+
       '</div></div>'+saveBtn+
-      '<div class="card section" id="alarmsSettingsSection"><div class="section-title">Alarms</div>'+
+      wakeSettingsCardHtml()+
+      '<div class="card section" id="alarmsSettingsSection"><div class="section-title">Other alarms</div>'+
         '<div class="row" style="flex-wrap:wrap;align-items:flex-end;">'+
           '<div class="field" style="flex:1;min-width:160px;"><label>What?</label><input class="input" id="newAlarmLabel" placeholder="e.g. Kitchen closes"></div>'+
           '<div class="field"><label>Time</label><input class="input" type="time" id="newAlarmTime" value="09:00" style="width:120px;"></div>'+
@@ -10657,6 +10848,7 @@ function startFocusTicker(){
     }
     const as = state.focus.activeSession;
     if(as && !as.onBreak) tickLiveDeepWork();
+    checkBreakTimer();
     if(!as) return;
     if(as.onBreak){
       return;
@@ -10695,32 +10887,16 @@ function startFocusTicker(){
     }
   }, 1000);
 }
-let firedKeys = new Set();
-let lastMinute = '';
 let ringInterval = null;
+// Checks every 2 s (and the moment the window comes back into view). See 32b-wake.js for
+// how missed minutes are caught up instead of skipped.
 function startAlarmChecker(){
-  setInterval(function(){
-    checkReminders();
-    checkTouchReminder();
-    const now = new Date();
-    const hm = nowHM(now);
-    const dateKey = todayStr(now);
-    const minuteKey = dateKey+'T'+hm;
-    if(minuteKey!==lastMinute){ firedKeys.clear(); lastMinute=minuteKey; }
-    (state.focus.alarms||[]).forEach(function(al){
-      if(!al.enabled) return;
-      if(al.time!==hm) return;
-      if(al.date){ if(al.date!==dateKey) return; } else { if(al.days.indexOf(now.getDay())<0) return; }
-      const fk = al.id+minuteKey;
-      if(firedKeys.has(fk)) return;
-      firedKeys.add(fk);
-      triggerAlarm(al);
-      if(al.date){
-        state.focus.alarms = state.focus.alarms.filter(function(x){ return x.id!==al.id; });
-        persist('focus'); renderView();
-      }
-    });
-  }, 4000);
+  const run = function(){
+    try{ checkReminders(); checkTouchReminder(); }catch(e){}
+    checkAllAlarms();
+  };
+  run();
+  setInterval(run, 2000);
 }
 let lastFiredAlarm = null;
 function triggerAlarm(al){
@@ -10730,18 +10906,585 @@ function triggerAlarm(al){
   if(extra) extra.innerHTML = renderAlarmExtra(al);
   onEventAlarm(al);
   document.getElementById('alarmOverlay').classList.remove('hidden');
-  playBeep();
+  pingWrapper();
   clearInterval(ringInterval);
-  ringInterval = setInterval(playBeep, 2400);
+  if(!startAlarmMediaIfAny(al)){
+    playBeep();
+    ringInterval = setInterval(playBeep, 2400);
+  }
   try{
     if('Notification' in window && Notification.permission==='granted'){
       new Notification('Operator: ' + ((al && al.label) || 'Reminder'));
     }
   }catch(e){}
 }
-function dismissAlarm(){ clearInterval(ringInterval); document.getElementById('alarmOverlay').classList.add('hidden'); }
-function snoozeAlarm(){ const al = lastFiredAlarm; dismissAlarm(); setTimeout(function(){ triggerAlarm(Object.assign({}, al||{}, {label:((al&&al.label)||'Reminder')+' (snoozed)', eventId:null})); }, 5*60*1000); }
+function dismissAlarm(){ clearInterval(ringInterval); stopWakeMedia(false); document.getElementById('alarmOverlay').classList.add('hidden'); }
+function snoozeAlarm(){ const al = lastFiredAlarm; dismissAlarm(); snoozeRegularAlarm(al); }
 
+
+// ============ WAKE-UP ALARM, ON-TIME ALARMS, WAKE SCREEN, BREAK TIMER ============
+// One master wake-up alarm (e.g. 7:00 AM Mon–Sat) that can be changed for a single morning
+// at any hour of the night, a full-screen wake screen (clock, master vision board, the plan,
+// today's calendar) with music that starts by itself, and an optional second-display view.
+//
+// Alarms used to be matched against the current minute every 4 s. When Chrome slowed the
+// timers of a background window, that minute was skipped and the alarm only rang once the
+// window was opened. Now every alarm keeps the time it last rang, and anything scheduled
+// since then (within a grace window) rings on the next check — late by seconds, not missed.
+const ALARM_GRACE_MS = 15*60000;
+const WAKE_GRACE_MS = 2*3600000;
+const WAKE_PING_URL = 'http://127.0.0.1:8935/wake';
+const isWakeDisplay = location.hash==='#wake';
+function dowOf(dateStr){ return new Date(localTs(dateStr, '12:00')).getDay(); }
+function wakeCfg(){ return state.focus.wake; }
+function wakeTimeFor(dateStr){
+  const w = wakeCfg(); if(!w) return null;
+  if(w.override && w.override.date===dateStr) return w.override.off ? null : (w.override.time||null);
+  if(!w.enabled) return null;
+  return w.days.indexOf(dowOf(dateStr))>=0 ? w.time : null;
+}
+function wakeBaseTimeFor(dateStr){ const w = wakeCfg(); return (w && w.enabled && w.days.indexOf(dowOf(dateStr))>=0) ? w.time : null; }
+function nextWake(){
+  const now = Date.now();
+  for(let i=0;i<9;i++){
+    const d = addDays(todayStr(), i), t = wakeTimeFor(d);
+    if(!t) continue;
+    const ts = localTs(d, t);
+    if(ts>now) return {ts:ts, date:d, time:t, override:!!(wakeCfg().override && wakeCfg().override.date===d)};
+  }
+  return null;
+}
+// The morning "tomorrow's alarm" refers to right now: after midnight (or before this
+// morning's alarm) it's today — so setting things up at 1 AM still targets the same morning.
+function wakeTargetDate(){
+  const now = new Date(), today = todayStr();
+  if(now.getHours()<4) return today;
+  if(now.getHours()<12){ const t = wakeTimeFor(today) || wakeBaseTimeFor(today); if(t && localTs(today, t)>Date.now()) return today; }
+  return addDays(today, 1);
+}
+function morningLabel(dateStr){
+  if(dateStr===todayStr()) return new Date().getHours()<12 ? 'this morning' : 'today';
+  if(dateStr===addDays(todayStr(),1)) return 'tomorrow';
+  return weekdayShort(dateStr);
+}
+function wakeDaysLabel(days){
+  const s = arr(days).slice().sort().join(',');
+  if(s==='0,1,2,3,4,5,6') return 'every day';
+  if(s==='1,2,3,4,5') return 'Mon–Fri';
+  if(s==='1,2,3,4,5,6') return 'Mon–Sat';
+  if(s==='0,6') return 'weekends';
+  if(!s) return 'no days';
+  const names = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  return arr(days).slice().sort().map(function(d){ return names[d]; }).join(', ');
+}
+function wakeArm(){ wakeCfg().armedAt = Date.now(); }
+// Ask the Operator.app wrapper to bring the window to the front and wake the display.
+function pingWrapper(){
+  try{ fetch(WAKE_PING_URL, {mode:'no-cors', cache:'no-store'}).catch(function(){}); }catch(e){}
+}
+// ---- scheduling / checking ----
+const alarmSigs = {};
+function lastScheduledTs(al, now){
+  const today = todayStr(new Date(now));
+  const days = [today, addDays(today, -1)];
+  for(let i=0;i<days.length;i++){
+    const d = days[i];
+    if(al.date){ if(al.date!==d) continue; }
+    else if(arr(al.days).indexOf(dowOf(d))<0) continue;
+    const ts = localTs(d, al.time);
+    if(ts<=now) return ts;
+  }
+  return null;
+}
+function alarmOwnerGone(al){
+  if(!al.taskId) return false;
+  const t = state.tasks.items.find(function(x){ return x.id===al.taskId; });
+  return !t || t.status==='done';
+}
+function checkAllAlarms(){
+  if(isWakeDisplay || !state.focus) return;
+  const now = Date.now();
+  let changed = false;
+  const yesterday = addDays(todayStr(), -1);
+  const before = state.focus.alarms.length;
+  state.focus.alarms = state.focus.alarms.filter(function(a){ return !(a.date && a.date<yesterday); });
+  if(state.focus.alarms.length!==before) changed = true;
+  state.focus.alarms.forEach(function(al){
+    const sig = (al.enabled?1:0)+'|'+al.time+'|'+(al.date||'')+'|'+arr(al.days).join(',');
+    if(!al.armedAt){ al.armedAt = now; changed = true; }
+    else if(alarmSigs[al.id] && alarmSigs[al.id]!==sig){ al.armedAt = now; changed = true; }
+    alarmSigs[al.id] = sig;
+    if(!al.enabled || !al.time || alarmOwnerGone(al)) return;
+    const ts = lastScheduledTs(al, now);
+    if(!ts || ts<=(al.lastFiredTs||0) || ts<al.armedAt-1000 || now-ts>ALARM_GRACE_MS) return;
+    al.lastFiredTs = ts; changed = true;
+    triggerAlarm(al);
+  });
+  const fired = state.focus.alarms.filter(function(a){ return a.date && a.lastFiredTs; });
+  if(fired.length){ state.focus.alarms = state.focus.alarms.filter(function(a){ return !(a.date && a.lastFiredTs); }); changed = true; }
+  // master wake-up alarm
+  const w = wakeCfg();
+  if(w){
+    const days = [todayStr(), yesterday];
+    for(let i=0;i<days.length;i++){
+      const t = wakeTimeFor(days[i]); if(!t) continue;
+      const ts = localTs(days[i], t);
+      if(ts>now) continue;
+      if(ts>w.lastFiredTs && ts>=w.armedAt-1000 && now-ts<=WAKE_GRACE_MS){ w.lastFiredTs = ts; changed = true; fireWake({}); }
+      break;
+    }
+    if(w.override && w.override.date<todayStr()){ w.override = null; changed = true; }
+  }
+  // snoozes and test rings
+  const sn = state.focus.snooze;
+  if(sn && sn.ts<=now){
+    state.focus.snooze = null; changed = true;
+    if(sn.wake) fireWake({test:sn.test, snoozed:!sn.test}); else triggerAlarm(sn.alarm||{label:'Reminder'});
+  }
+  if(changed){ persist('focus'); if(fired.length) renderView(); }
+}
+document.addEventListener('visibilitychange', function(){ if(!document.hidden){ try{ checkAllAlarms(); checkBreakTimer(); }catch(e){} } });
+window.addEventListener('focus', function(){ try{ checkAllAlarms(); }catch(e){} });
+// ---- regular alarm overlay: music starts by itself ----
+function startAlarmMediaIfAny(al){
+  if(!al || !al.mediaUrl) return false;
+  playWakeMedia({url:al.mediaUrl}, function(){ const ex = document.getElementById('alarmExtra'); if(ex) ex.insertAdjacentHTML('beforeend', '<button class="btn btn-good" style="margin-top:12px;" data-action="playAlarmMedia" data-url="'+escapeHtml(al.mediaUrl)+'">&#9654; Play wake-up song</button>'); });
+  return true;
+}
+function snoozeRegularAlarm(al){
+  state.focus.snooze = {ts:Date.now()+5*60000, alarm:Object.assign({}, al||{}, {label:((al&&al.label)||'Reminder').replace(/ \(snoozed\)$/,'')+' (snoozed)', eventId:null, mediaUrl:null})};
+  persist('focus');
+}
+// ---- music ----
+let wakeAudio = null, wakeAudioRamp = null, wakeMediaWin = null, wakeObjectUrl = null;
+function isDirectAudioUrl(u){ return /^data:audio\//i.test(u||'') || /\.(mp3|m4a|aac|wav|ogg|oga|flac|opus)(\?|#|$)/i.test(u||''); }
+function mediaKindLabel(m){ if(!m) return ''; if(m.ref) return 'song'; return /youtu/.test(m.url||'') ? 'YouTube' : isDirectAudioUrl(m.url) ? 'song' : 'link'; }
+async function playWakeMedia(media, onFail){
+  stopWakeMedia(true);
+  onFail = onFail || function(){};
+  try{
+    if(media.ref || isDirectAudioUrl(media.url)){
+      let src = media.url;
+      if(media.ref){
+        if(isBlobRef(media.ref)){ const b = await blobFetch(media.ref); if(!b){ onFail(); return false; } wakeObjectUrl = URL.createObjectURL(b); src = wakeObjectUrl; }
+        else src = media.ref;
+      }
+      const a = new Audio(src);
+      a.loop = true; a.volume = media.preview ? 0.6 : 0.15;
+      wakeAudio = a;
+      await a.play();
+      if(!media.preview){
+        clearInterval(wakeAudioRamp);
+        wakeAudioRamp = setInterval(function(){ if(!wakeAudio){ clearInterval(wakeAudioRamp); return; } wakeAudio.volume = Math.min(1, wakeAudio.volume+0.03); if(wakeAudio.volume>=1) clearInterval(wakeAudioRamp); }, 1500);
+      }
+      return true;
+    }
+    const w = window.open(media.url, 'operatorWakeMusic');
+    if(!w){ onFail(); return false; }
+    wakeMediaWin = w;
+    return true;
+  }catch(e){ wakeAudio = null; onFail(); return false; }
+}
+function stopWakeMedia(immediate){
+  clearInterval(wakeAudioRamp);
+  const a = wakeAudio; wakeAudio = null;
+  if(a){
+    if(immediate){ try{ a.pause(); }catch(e){} }
+    else { const fade = setInterval(function(){ a.volume = Math.max(0, a.volume-0.1); if(a.volume<=0.01){ clearInterval(fade); try{ a.pause(); }catch(e){} } }, 120); }
+  }
+  if(wakeObjectUrl){ const u = wakeObjectUrl; wakeObjectUrl = null; setTimeout(function(){ URL.revokeObjectURL(u); }, 3000); }
+}
+// ---- the wake screen ----
+let wakeRing = null; // {startedAt, test, soundFailed}
+let wakeBeepTimer = null, wakeClockTimer = null;
+function fireWake(opts){
+  opts = opts || {};
+  const w = wakeCfg();
+  wakeRing = {startedAt:Date.now(), test:!!opts.test, snoozed:!!opts.snoozed, mediaFailed:false};
+  closeOtherOverlaysForWake();
+  showOverlay('wakeOverlay');
+  renderWakeOverlayInto();
+  pingWrapper();
+  const startBeeps = function(){ clearInterval(wakeBeepTimer); playAlarmSound(w.sound); wakeBeepTimer = setInterval(function(){ playAlarmSound(w.sound); }, 2600); };
+  if(w.media){
+    playWakeMedia(w.media, function(){ if(wakeRing){ wakeRing.mediaFailed = true; renderWakeOverlayInto(); } startBeeps(); });
+  } else startBeeps();
+  if(w.secondScreen) openWakeDisplay(true);
+  postToWakeDisplay();
+  try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Time to get up'); }catch(e){}
+}
+function closeOtherOverlaysForWake(){
+  if(overlayOpen('alarmOverlay')){ clearInterval(ringInterval); hideOverlay('alarmOverlay'); }
+}
+function stopWakeRing(){
+  clearInterval(wakeBeepTimer); wakeBeepTimer = null;
+  stopWakeMedia(false);
+  wakeRing = null;
+  hideOverlay('wakeOverlay');
+  postToWakeDisplay();
+}
+function wakeImUp(){
+  const wasTest = wakeRing && wakeRing.test;
+  stopWakeRing();
+  if(!wasTest && state.modes.active && state.modes.active.sleep) finishActiveMode(true);
+  if(!wasTest){ ui.view = 'today'; }
+  playPositive();
+  renderView();
+  showToast(wasTest ? 'Test done — that\'s how your mornings will look.' : 'Good morning. Let\'s get it.', {icon:'&#9728;&#65039;'});
+}
+function wakeSnooze(){
+  const mins = wakeCfg().snoozeMinutes||9;
+  const test = wakeRing && wakeRing.test;
+  stopWakeRing();
+  state.focus.snooze = {ts:Date.now()+mins*60000, wake:true, test:test};
+  persist('focus'); renderView();
+  showToast('Snoozed — ringing again at '+fmt12Hour(nowHM(new Date(Date.now()+mins*60000))), {icon:'&#128164;'});
+}
+ACTIONS.wakeImUp = function(){ if(isWakeDisplay){ try{ window.opener && window.opener.postMessage({operatorWake:'up'}, '*'); }catch(e){} displayRinging = false; renderWakeDisplay(); return; } wakeImUp(); };
+ACTIONS.wakeSnooze = function(){ if(isWakeDisplay){ try{ window.opener && window.opener.postMessage({operatorWake:'snooze'}, '*'); }catch(e){} displayRinging = false; renderWakeDisplay(); return; } wakeSnooze(); };
+ACTIONS.wakePlayMusic = function(){ const w = wakeCfg(); if(w.media) playWakeMedia(w.media, function(){ showToast('Couldn\'t play that — try uploading the song file instead.', {icon:'&#9888;'}); }); clearInterval(wakeBeepTimer); if(wakeRing){ wakeRing.mediaFailed = false; renderWakeOverlayInto(); } };
+function wakeGreeting(){ const h = new Date().getHours(); return h<5 ? 'Still up' : h<12 ? 'Good morning' : h<18 ? 'Good afternoon' : 'Good evening'; }
+function upcomingNightPlan(){ const np = state.focus.nightPlan; return (np && np.date>=todayStr()) ? np : null; }
+function renderWakeScreen(mode){
+  // mode: 'ring' (main window, alarm going off) | 'display' (second screen) | 'display-ring'
+  const ringing = mode==='ring' || mode==='display-ring';
+  const today = todayStr();
+  const b = masterVisionBoard();
+  const np = upcomingNightPlan();
+  const planTasks = np ? arr(np.taskIds).map(function(id){ return state.tasks.items.find(function(t){ return t.id===id; }); }).filter(Boolean) : [];
+  const todayTasks = planTasks.length ? planTasks : state.tasks.items.filter(function(t){ return t.status==='today'; }).slice(0, 6);
+  const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a,c){ return (a.time||'').localeCompare(c.time||''); });
+  const deadlines = state.tasks.items.filter(function(t){ return t.deadline===today && t.status!=='done'; });
+  const why = arr(state.focus.motivations && state.focus.motivations.toward).slice(0, 3);
+  const nw = nextWake();
+  const card = function(title, body){ return body ? '<div class="wake-card"><div class="wake-card-title">'+title+'</div>'+body+'</div>' : ''; };
+  const planBody = (np && np.note ? '<div class="wake-note">'+escapeHtml(np.note)+'</div>' : '')+
+    (todayTasks.length ? '<div class="wake-list">'+todayTasks.map(function(t){ return '<div class="wake-li'+(t.status==='done'?' is-done':'')+'">'+(t.status==='done'?'&#10003;':'&#9675;')+' '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '');
+  const agendaBody = (events.length || deadlines.length) ? '<div class="wake-list">'+
+      events.map(function(e){ return '<div class="wake-li"><span class="wake-time">'+(e.time?fmt12Hour(e.time):'All day')+'</span> '+escapeHtml(e.title)+(e.location?' <span class="kpi-sub">&#128205; '+escapeHtml(e.location)+'</span>':'')+'</div>'; }).join('')+
+      deadlines.map(function(t){ return '<div class="wake-li"><span class="wake-time" style="color:var(--danger);">Due'+(t.deadlineTime?' '+fmt12Hour(t.deadlineTime):'')+'</span> '+escapeHtml(t.title)+'</div>'; }).join('')+
+    '</div>' : '';
+  const whyBody = why.length ? '<div class="wake-list">'+why.map(function(m){ return '<div class="wake-li">&rarr; '+escapeHtml(m.text)+'</div>'; }).join('')+'</div>' : '';
+  const w = wakeCfg();
+  return '<div class="wake-screen'+(ringing?' is-ringing':'')+(mode.indexOf('display')===0?' is-display':'')+'">'+
+    '<div class="wake-left">'+
+      '<div class="wake-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test && mode==='ring' ? ' <span class="tag">TEST</span>' : '')+'</div>'+
+      '<div class="wake-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+'</div>'+
+      '<div class="wake-date">'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+'</div>'+
+      (ringing ? '<div class="wake-actions">'+
+          '<button class="btn wake-up-btn" data-action="wakeImUp">&#9728;&#65039; I\'m up</button>'+
+          '<button class="btn btn-ghost wake-snooze-btn" data-action="wakeSnooze">Snooze '+(w.snoozeMinutes||9)+' min</button>'+
+        '</div>'+
+        (mode==='ring' && w.media ? '<div class="wake-music">'+(wakeRing && wakeRing.mediaFailed ? '<button class="btn btn-good btn-sm" data-action="wakePlayMusic">&#9654; Play '+escapeHtml(w.media.name||mediaKindLabel(w.media))+'</button>' : '&#9835; '+escapeHtml(w.media.name||mediaKindLabel(w.media)))+'</div>' : '')
+        : '<div class="wake-next">'+(nw ? '&#9200; Wake-up '+fmt12Hour(nw.time)+' '+morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts) : '&#9200; No wake-up alarm set')+'</div>')+
+      '<div class="wake-cards">'+
+        card(np && np.date===today ? 'Last night\'s plan' : np ? 'Plan for '+morningLabel(np.date) : 'Today', planBody)+
+        card('On the calendar', agendaBody)+
+        card('Why you\'re doing this', whyBody)+
+      '</div>'+
+      (mode.indexOf('display')===0 ? '<div class="wake-display-tools"><button class="btn btn-ghost btn-sm" data-action="wakeDisplayFullscreen">&#9974; Full screen</button></div>' : '')+
+    '</div>'+
+    '<div class="wake-right">'+
+      (b && b.elements.length ? boardStaticHtml(b, 'wake-board') : '<div class="wake-board-empty"><div style="font-size:30px;">&#127775;</div><div>Your vision board shows up here.</div><div class="kpi-sub">Personal &rarr; Vision board</div></div>')+
+    '</div>'+
+  '</div>';
+}
+function renderWakeOverlayInto(){
+  const el = document.getElementById('wakeContent'); if(!el) return;
+  morphInto(el, renderWakeScreen(isWakeDisplay ? (displayRinging?'display-ring':'display') : 'ring'));
+  requestAnimationFrame(function(){ fitStaticBoards(el); });
+  clearInterval(wakeClockTimer);
+  wakeClockTimer = setInterval(function(){
+    if(!overlayOpen('wakeOverlay')){ clearInterval(wakeClockTimer); return; }
+    const c = document.getElementById('wakeClock');
+    if(c) c.textContent = new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'});
+  }, 1000);
+}
+registerModal('wakeOverlay', renderWakeOverlayInto);
+// ---- second display ----
+let wakeDisplayWin = null;
+let displayRinging = false;
+async function otherScreenPlacement(){
+  try{
+    if(!window.getScreenDetails) return null;
+    const sd = await window.getScreenDetails();
+    const other = sd.screens.find(function(s){ return s!==sd.currentScreen; });
+    return other ? {left:other.availLeft, top:other.availTop, width:other.availWidth, height:other.availHeight} : null;
+  }catch(e){ return null; }
+}
+async function openWakeDisplay(auto){
+  if(wakeDisplayWin && !wakeDisplayWin.closed){ postToWakeDisplay(); return; }
+  const pl = await otherScreenPlacement();
+  const feat = pl ? 'popup=1,left='+pl.left+',top='+pl.top+',width='+pl.width+',height='+pl.height : 'popup=1,width=1280,height=800';
+  wakeDisplayWin = window.open(location.href.split('#')[0]+'#wake', 'operatorWakeDisplay', feat);
+  if(!wakeDisplayWin && !auto) showToast('The window was blocked — allow pop-ups for Operator.', {icon:'&#9888;'});
+}
+function postToWakeDisplay(){
+  if(!wakeDisplayWin || wakeDisplayWin.closed) return;
+  try{ wakeDisplayWin.postMessage({operatorWake:'ring', on:!!wakeRing}, '*'); }catch(e){}
+}
+window.addEventListener('message', function(e){
+  const d = e.data; if(!d || !d.operatorWake) return;
+  if(isWakeDisplay){
+    if(d.operatorWake==='ring'){ displayRinging = !!d.on; renderWakeDisplay(); }
+    return;
+  }
+  if(d.operatorWake==='hello') postToWakeDisplay();
+  else if(d.operatorWake==='up' && wakeRing) wakeImUp();
+  else if(d.operatorWake==='snooze' && wakeRing) wakeSnooze();
+});
+ACTIONS.wakeDisplayFullscreen = function(){ try{ document.documentElement.requestFullscreen(); }catch(e){} };
+function renderWakeDisplay(){ renderWakeOverlayInto(); }
+// The #wake window: an ambient screen for the second monitor (no trackers, no alarms of
+// its own — the main window rings and tells this one).
+async function startWakeDisplay(){
+  document.title = 'Operator — Morning';
+  document.body.classList.add('wake-display-mode');
+  document.getElementById('loading').style.display = 'none';
+  showOverlay('wakeOverlay');
+  renderWakeDisplay();
+  try{ window.opener && window.opener.postMessage({operatorWake:'hello'}, '*'); }catch(e){}
+  setInterval(renderWakeDisplay, 60000);
+  window.addEventListener('storage', async function(e){
+    const k = String(e.key||'').replace(/^opsdash:/, '');
+    if(['focus','boards','tasks','calendar','profile'].indexOf(k)<0) return;
+    const norm = {focus:normalizeFocus, boards:normalizeBoards, tasks:normalizeTasks, calendar:normalizeCalendar, profile:normalizeProfile}[k];
+    state[k] = norm(await loadKey(k, state[k]));
+    renderWakeDisplay();
+  });
+}
+// ---- setup modal ----
+function openWakeSetup(){ ui.wakeOverrideDate = wakeTargetDate(); showOverlay('wakeSetupOverlay'); renderWakeSetupInto(); }
+ACTIONS.openWakeSetup = openWakeSetup;
+ACTIONS.closeWakeSetup = function(){ hideOverlay('wakeSetupOverlay'); stopWakeMedia(true); renderView(); };
+function renderWakeSetup(){
+  const w = wakeCfg();
+  const od = ui.wakeOverrideDate || wakeTargetDate();
+  const ov = w.override && w.override.date===od ? w.override : null;
+  const base = wakeBaseTimeFor(od);
+  const eff = wakeTimeFor(od);
+  const nw = nextWake();
+  const names = ['S','M','T','W','T','F','S'];
+  const sn = state.focus.snooze;
+  return '<div class="wake-setup">'+
+    '<div class="row" style="justify-content:space-between;align-items:flex-start;gap:12px;">'+
+      '<div><div class="section-title" style="margin:0;">&#9200; Wake-up alarm</div><div class="kpi-sub">Your one daily alarm — the wake screen with your vision board, plan and music.</div></div>'+
+      '<label class="ws-switch" title="Turn the daily alarm on/off"><input type="checkbox" data-wake="enabled" '+(w.enabled?'checked':'')+'><span></span></label>'+
+    '</div>'+
+    '<div class="ws-main'+(w.enabled?'':' is-off')+'">'+
+      '<input class="ws-time" type="time" data-wake="time" value="'+w.time+'">'+
+      '<div class="ws-days">'+names.map(function(n, d){ return '<button class="ws-day'+(w.days.indexOf(d)>=0?' is-on':'')+'" data-action="wakeDay" data-id="'+d+'" title="'+['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d]+'">'+n+'</button>'; }).join('')+'</div>'+
+      '<div class="kpi-sub">'+(w.enabled ? fmt12Hour(w.time)+' '+wakeDaysLabel(w.days) : 'Daily alarm is off')+'</div>'+
+    '</div>'+
+    '<div class="ws-next">'+(nw ? 'Next ring: <b>'+fmt12Hour(nw.time)+' '+morningLabel(nw.date)+'</b> ('+weekdayShort(nw.date)+') &middot; in '+untilLabel(nw.ts)+(nw.override?' &middot; one-time change':'') : 'Nothing will ring — turn the alarm on or set a time below.')+(sn && sn.wake ? '<br>'+(sn.test?'Test':'Snooze')+' ringing at '+fmt12Hour(nowHM(new Date(sn.ts))) : '')+'</div>'+
+    '<div class="ws-block">'+
+      '<div class="kind-label">Just for '+morningLabel(od)+' ('+weekdayShort(od)+')</div>'+
+      '<div class="row" style="gap:8px;flex-wrap:wrap;">'+
+        '<input class="input" type="time" data-wake="overrideTime" value="'+(eff||'')+'" style="width:130px;">'+
+        '<button class="btn btn-ghost btn-sm'+(ov && ov.off?' is-active':'')+'" data-action="wakeSkip">No alarm that morning</button>'+
+        (ov ? '<button class="btn btn-ghost btn-sm" data-action="wakeClearOverride">Back to usual'+(base?' ('+fmt12Hour(base)+')':'')+'</button>' : '')+
+      '</div>'+
+      '<div class="kpi-sub" style="margin-top:4px;">'+(ov ? (ov.off ? 'No alarm '+morningLabel(od)+'.' : 'Changed to '+fmt12Hour(ov.time)+' for '+morningLabel(od)+' only.') : (base ? 'Usual time. Change it here for '+morningLabel(od)+' only — your daily alarm stays the same.' : 'No alarm usually — set a time here to wake up '+morningLabel(od)+'.'))+'</div>'+
+    '</div>'+
+    '<div class="ws-block">'+
+      '<div class="kind-label">Sound</div>'+
+      '<div class="row" style="gap:6px;flex-wrap:wrap;">'+['peaceful','standard','loud'].map(function(s){ return '<button class="btn btn-sm '+(w.sound===s?'btn-primary':'btn-ghost')+'" data-action="wakeSound" data-id="'+s+'">'+s[0].toUpperCase()+s.slice(1)+'</button>'; }).join('')+
+        '<button class="btn btn-ghost btn-sm" data-action="wakePreviewSound">&#9654; Hear it</button></div>'+
+      '<div class="kind-label" style="margin-top:14px;">Wake-up music — starts by itself</div>'+
+      (w.media ? '<div class="ws-media"><span>&#9835; '+escapeHtml(w.media.name||w.media.url||'Song')+'</span><span class="kpi-sub">'+mediaKindLabel(w.media)+'</span><span style="flex:1"></span>'+
+          '<button class="btn btn-ghost btn-sm" data-action="wakePreviewMusic">'+(wakeAudio?'&#10073;&#10073; Stop':'&#9654; Preview')+'</button><button class="btn btn-ghost btn-sm mini-move-danger" data-action="wakeClearMusic">Remove</button></div>' : '')+
+      '<div class="row" style="gap:8px;margin-top:6px;flex-wrap:wrap;">'+
+        '<button class="btn btn-sm" data-action="wakePickMusic">&#11014; Upload a song</button>'+
+        '<input class="input" data-wake="mediaUrl" placeholder="…or paste a YouTube / song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="flex:1;min-width:200px;">'+
+      '</div>'+
+      '<div class="kpi-sub" style="margin-top:4px;">An uploaded song plays right on the wake screen, fading in. A YouTube link opens and plays on its own.</div>'+
+      '<input type="file" id="wakeMusicFile" accept="audio/*" style="display:none;">'+
+    '</div>'+
+    '<div class="ws-block grid grid-2">'+
+      '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+
+      '<div class="field"><label>Second screen</label><div class="ws-check"><input type="checkbox" id="wakeSecondScreen" data-wake="secondScreen" '+(w.secondScreen?'checked':'')+'><span>Also show the wake screen on my other display</span></div>'+
+        '<div class="row" style="gap:6px;margin-top:6px;"><button class="btn btn-ghost btn-sm" data-action="wakeOpenDisplay">Open it now</button></div></div>'+
+    '</div>'+
+    '<div class="row" style="margin-top:18px;justify-content:space-between;gap:8px;flex-wrap:wrap;">'+
+      '<div class="row" style="gap:8px;"><button class="btn btn-ghost btn-sm" data-action="wakeTestSoon" title="Rings in one minute — switch to another app to check it comes up on its own">&#128276; Test: ring in 1 min</button><button class="btn btn-ghost btn-sm" data-action="wakeTestNow">Preview wake screen</button></div>'+
+      '<button class="btn btn-primary" data-action="closeWakeSetup">Done</button>'+
+    '</div>'+
+  '</div>';
+}
+function renderWakeSetupInto(){ const el = document.getElementById('wakeSetupContent'); if(el) morphInto(el, renderWakeSetup(), {form:true}); }
+registerModal('wakeSetupOverlay', renderWakeSetupInto);
+function saveWake(){ persist('focus'); renderWakeSetupInto(); }
+ACTIONS.wakeDay = function(el, e, id){
+  const w = wakeCfg(), d = Number(id), i = w.days.indexOf(d);
+  if(i>=0) w.days.splice(i,1); else w.days.push(d);
+  w.days.sort(); wakeArm(); saveWake();
+};
+ACTIONS.wakeSkip = function(){
+  const w = wakeCfg(), od = ui.wakeOverrideDate || wakeTargetDate();
+  w.override = (w.override && w.override.date===od && w.override.off) ? null : {date:od, off:true};
+  wakeArm(); saveWake();
+};
+ACTIONS.wakeClearOverride = function(){ wakeCfg().override = null; wakeArm(); saveWake(); };
+ACTIONS.wakeSound = function(el, e, id){ wakeCfg().sound = id; playAlarmSound(id); saveWake(); };
+ACTIONS.wakePreviewSound = function(){ playAlarmSound(wakeCfg().sound); };
+ACTIONS.wakePickMusic = function(){ const f = document.getElementById('wakeMusicFile'); if(f) f.click(); };
+ACTIONS.wakeClearMusic = function(){ stopWakeMedia(true); const w = wakeCfg(); if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref); w.media = null; saveWake(); };
+ACTIONS.wakePreviewMusic = function(){
+  if(wakeAudio){ stopWakeMedia(true); renderWakeSetupInto(); return; }
+  const w = wakeCfg(); if(!w.media) return;
+  playWakeMedia(Object.assign({}, w.media, {preview:true}), function(){ showToast('Couldn\'t play that link here.', {icon:'&#9888;'}); }).then(renderWakeSetupInto);
+};
+ACTIONS.wakeOpenDisplay = function(){ openWakeDisplay(false); };
+ACTIONS.wakeTestNow = function(){ hideOverlay('wakeSetupOverlay'); stopWakeMedia(true); fireWake({test:true}); };
+ACTIONS.wakeTestSoon = function(){
+  state.focus.snooze = {ts:Date.now()+60000, wake:true, test:true};
+  persist('focus'); renderWakeSetupInto();
+  showToast('Test alarm rings at '+fmt12Hour(nowHM(new Date(Date.now()+60000)))+' — switch to another app if you want to see it pop up.', {icon:'&#128276;', duration:6000});
+};
+document.addEventListener('change', function(e){
+  const t = e.target;
+  if(t.id==='wakeMusicFile'){
+    const file = t.files && t.files[0]; if(!file) return;
+    t.value = '';
+    blobStore(file).then(function(ref){
+      const w = wakeCfg();
+      if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref);
+      w.media = {ref:ref, name:file.name.replace(/\.[^.]+$/, '')};
+      saveWake();
+      showToast('Wake-up song set: '+w.media.name, {icon:'&#9835;'});
+    });
+    return;
+  }
+  const key = t.dataset && t.dataset.wake; if(!key) return;
+  const w = wakeCfg();
+  if(key==='enabled'){ w.enabled = t.checked; wakeArm(); }
+  else if(key==='time'){ if(t.value){ w.time = t.value; wakeArm(); } }
+  else if(key==='overrideTime'){
+    const od = ui.wakeOverrideDate || wakeTargetDate();
+    if(!t.value){ w.override = {date:od, off:true}; }
+    else if(t.value===wakeBaseTimeFor(od)) w.override = null;
+    else w.override = {date:od, time:t.value};
+    wakeArm();
+  }
+  else if(key==='mediaUrl'){
+    const v = t.value.trim();
+    if(!v){ if(w.media && w.media.url) w.media = null; }
+    else { if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref); w.media = {url:v, name:/youtu/.test(v)?'YouTube':v.replace(/^https?:\/\/(www\.)?/,'').slice(0,40)}; }
+  }
+  else if(key==='snoozeMinutes') w.snoozeMinutes = Number(t.value)||9;
+  else if(key==='secondScreen'){ w.secondScreen = t.checked; if(t.checked) otherScreenPlacement(); }
+  saveWake();
+  renderView();
+});
+// ---- small pieces shown elsewhere ----
+function wakeChipHtml(){
+  const nw = nextWake();
+  return '<button class="wake-chip'+(nw?'':' is-unset')+'" data-action="openWakeSetup" title="Wake-up alarm">&#9200; '+
+    (nw ? fmt12Hour(nw.time)+' '+morningLabel(nw.date) : 'Set wake-up alarm')+'</button>';
+}
+// ---- break timer: breaks end on their own ----
+function checkBreakTimer(){
+  const as = state.focus && state.focus.activeSession;
+  if(!as || !as.onBreak || !as.breakEndsAt) return;
+  const left = as.breakEndsAt-Date.now();
+  const el = document.getElementById('breakRemaining');
+  if(el) el.textContent = left>0 ? formatElapsed(left)+' left' : 'Break over';
+  if(left<=0){
+    as.breakEndsAt = null;
+    endBreakModeFromFocus();
+    playSessionComplete();
+    pingWrapper();
+    showToast('Break\'s over — back to it.', {icon:'&#9201;', duration:6000});
+    try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Break is over'); }catch(e){}
+  }
+}
+ACTIONS.extendBreak = function(el){
+  const as = state.focus.activeSession; if(!as || !as.onBreak) return;
+  const m = Number(el.dataset.minutes)||5;
+  as.breakEndsAt = Math.max(as.breakEndsAt||Date.now(), Date.now()) + m*60000;
+  persist('focus'); renderView();
+};
+ACTIONS.pickBreakMinutes = function(el){ ui.breakMinutes = el.dataset.minutes==='open' ? 'open' : Number(el.dataset.minutes); renderBreakNoteModalInto(); };
+// ---- alarms that go with a task: at the time, time to leave, start getting ready ----
+function upsertOwnedAlarm(owner, mapKey, kind, dateStr, hm, label, link){
+  owner[mapKey] = owner[mapKey] || {};
+  const existingId = owner[mapKey][kind];
+  if(!dateStr || !hm){
+    if(existingId){ state.focus.alarms = state.focus.alarms.filter(function(a){ return a.id!==existingId; }); delete owner[mapKey][kind]; }
+    return;
+  }
+  let a = existingId ? state.focus.alarms.find(function(x){ return x.id===existingId; }) : null;
+  if(!a){ a = {id:uid(), days:[], enabled:true, armedAt:Date.now()}; state.focus.alarms.push(a); owner[mapKey][kind] = a.id; }
+  if(a.time!==hm || a.date!==dateStr) a.lastFiredTs = 0;
+  a.time = hm; a.date = dateStr; a.label = label; a.kind = kind; a.enabled = true;
+  Object.assign(a, link||{});
+}
+function taskAlarmPlan(t){
+  const al = t.alarm;
+  if(!al || !t.deadline || !t.deadlineTime) return [];
+  const start = localTs(t.deadline, t.deadlineTime);
+  const at = function(ts){ const d = new Date(ts); return {date:todayStr(d), time:nowHM(d)}; };
+  const out = [];
+  const travel = Number(al.travel)||0, ready = Number(al.ready)||0;
+  if(ready>0) out.push(Object.assign({kind:'ready', label:'Start getting ready — '+t.title}, at(start-(travel+ready)*60000)));
+  if(travel>0) out.push(Object.assign({kind:'leave', label:'Time to leave — '+t.title}, at(start-travel*60000)));
+  if(al.on) out.push(Object.assign({kind:'at', label:t.title}, at(start)));
+  return out;
+}
+function syncTaskAlarms(t){
+  const plan = taskAlarmPlan(t);
+  ['ready','leave','at'].forEach(function(kind){
+    const p = plan.find(function(x){ return x.kind===kind; });
+    upsertOwnedAlarm(t, 'alarmIds', kind, p?p.date:null, p?p.time:null, p?p.label:'', {taskId:t.id});
+  });
+  if(t.alarmIds && !Object.keys(t.alarmIds).length) delete t.alarmIds;
+  persist('focus');
+}
+function taskAlarmFieldsHtml(prefix, t){
+  const al = (t && t.alarm) || {};
+  return '<div class="task-alarm-box">'+
+    '<label class="row" style="gap:6px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="'+prefix+'AlarmOn" '+(al.on?'checked':'')+'>&#9200; Alarm at the deadline time</label>'+
+    '<div class="row" style="gap:10px;margin-top:8px;flex-wrap:wrap;align-items:center;">'+
+      '<span class="kpi-sub">Travel</span><input class="input" type="number" min="0" step="5" id="'+prefix+'AlarmTravel" value="'+(al.travel||'')+'" placeholder="0" style="width:74px;"><span class="kpi-sub">min</span>'+
+      '<span class="kpi-sub" style="margin-left:6px;">Get ready</span><input class="input" type="number" min="0" step="5" id="'+prefix+'AlarmReady" value="'+(al.ready||'')+'" placeholder="0" style="width:74px;"><span class="kpi-sub">min</span>'+
+    '</div>'+
+    '<div class="kpi-sub" id="'+prefix+'AlarmHint" style="margin-top:6px;">'+taskAlarmHint(t)+'</div>'+
+  '</div>';
+}
+function taskAlarmHint(t){
+  const plan = t ? taskAlarmPlan(t) : [];
+  if(!plan.length) return 'Needs a deadline time. E.g. 9:00 AM, 60 min travel, 60 min to get ready → up at 7:00, leave at 8:00.';
+  return plan.map(function(p){ return (p.kind==='ready'?'Get ready':p.kind==='leave'?'Leave':'Alarm')+' '+fmt12Hour(p.time)+(p.date!==t.deadline?' ('+weekdayShort(p.date)+')':''); }).join(' &middot; ');
+}
+function readTaskAlarmFields(prefix){
+  const g = function(id){ return document.getElementById(prefix+id); };
+  if(!g('AlarmOn')) return undefined;
+  const on = g('AlarmOn').checked, travel = Number(g('AlarmTravel').value)||0, ready = Number(g('AlarmReady').value)||0;
+  return (on || travel || ready) ? {on:on, travel:travel, ready:ready} : null;
+}
+// live hint while typing in the task modals
+document.addEventListener('input', function(e){
+  const t = e.target; if(!t.id) return;
+  const m = /^(newTask|editTask-.+?-)(AlarmOn|AlarmTravel|AlarmReady)$|^(newTaskDeadline(Time)?)$|^(editDeadline(Time)?-.+)$/.exec(t.id);
+  if(!m) return;
+  const prefix = m[1] || (m[3] ? 'newTask' : 'editTask-'+t.id.replace(/^editDeadline(Time)?-/, '')+'-');
+  const hint = document.getElementById(prefix+'AlarmHint'); if(!hint) return;
+  const dl = prefix==='newTask' ? document.getElementById('newTaskDeadline') : document.getElementById('editDeadline-'+prefix.slice(9,-1));
+  const dt = prefix==='newTask' ? document.getElementById('newTaskDeadlineTime') : document.getElementById('editDeadlineTime-'+prefix.slice(9,-1));
+  const fake = {title:'', deadline:dl && dl.value, deadlineTime:dt && dt.value, alarm:readTaskAlarmFields(prefix)};
+  hint.innerHTML = taskAlarmHint(fake);
+});
+document.addEventListener('change', function(e){ if(e.target && /AlarmOn$/.test(e.target.id||'')) e.target.dispatchEvent(new Event('input', {bubbles:true})); });
+function wakeSettingsCardHtml(){
+  const w = wakeCfg(), nw = nextWake();
+  return '<div class="card section wake-settings-card" id="wakeSettingsSection">'+
+    '<div class="row" style="justify-content:space-between;gap:12px;flex-wrap:wrap;">'+
+      '<div><div class="section-title" style="margin:0;">&#9200; Wake-up alarm</div>'+
+        '<div class="wake-settings-time">'+(w.enabled ? fmt12Hour(w.time) : 'Off')+'<span class="kpi-sub"> '+(w.enabled ? wakeDaysLabel(w.days) : '')+'</span></div>'+
+        '<div class="kpi-sub">'+(nw ? 'Next: '+fmt12Hour(nw.time)+' '+morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts)+(nw.override?' (one-time change)':'') : 'Nothing scheduled')+(w.media ? ' &middot; &#9835; '+escapeHtml(w.media.name||'music') : '')+'</div></div>'+
+      '<div class="row" style="gap:8px;"><button class="btn btn-ghost btn-sm" data-action="wakeTestNow">Preview</button><button class="btn btn-primary" data-action="openWakeSetup">Set up</button></div>'+
+    '</div></div>';
+}
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
@@ -11295,6 +12038,7 @@ async function init(){
   state.personal = normalizePersonal(await loadKey('personal', defaultPersonal()));
   state.boards = normalizeBoards(await loadKey('boards', defaultBoards()));
 
+  if(isWakeDisplay){ startWakeDisplay(); return; }
   splitActiveModeAtMidnight();
   if(crmMigratedOnLoad) persist('business');
   applyTheme();

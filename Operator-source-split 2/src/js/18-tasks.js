@@ -281,6 +281,7 @@ function renderAddTaskModal(){
     '<div class="field" style="margin-top:10px;"><label>Priority</label><select class="input" id="newTaskPriority"><option value="low">Low</option><option value="med" selected>Medium</option><option value="high">High</option></select></div>'+
     '<div class="field" style="margin-top:10px;"><label>Category (optional)</label><select class="input" id="newTaskCategory"><option value="">&mdash; None &mdash;</option>'+arr(state.tasks.categories).map(function(c){ return '<option value="'+c.id+'">'+escapeHtml(c.label)+'</option>'; }).join('')+'</select></div>'+
     '<div class="field" style="margin-top:10px;"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="newTaskDeadline"><input class="input" type="time" id="newTaskDeadlineTime" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="newTaskDeadline">Today</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskDeadline" title="Remove deadline">Clear</button></div></div>'+
+    taskAlarmFieldsHtml('newTask', null)+
     '<div class="field" style="margin-top:10px;"><label>Notes (optional)</label><textarea class="input" id="newTaskNotes" placeholder="Any details worth remembering" style="width:100%;min-height:60px;"></textarea></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskOngoing" style="margin-right:6px;">&#128204; Ongoing (may take more than one day)</label>'+
     '<div id="newTaskOngoingExtra" style="display:none;">'+
@@ -315,6 +316,9 @@ function addTask(status){
   const categoryEl = document.getElementById('newTaskCategory');
   const categoryId = categoryEl && categoryEl.value ? categoryEl.value : null;
   state.tasks.items.push({id:uid(), title:title, client:clients[0], clients:clients, priority:priority, deadline:deadline, notes:notes, status:status, ongoing:ongoing, ongoingDeadline:ongoingDeadline, ongoingFrequency:ongoingFrequency, includeInStandard:includeInStandard, categoryId:categoryId, deadlineTime:deadlineTime, eventId:ui.newTaskEventId||null, createdAt:todayStr(), completedAt:null});
+  const newT = state.tasks.items[state.tasks.items.length-1];
+  const alarmCfg = readTaskAlarmFields('newTask');
+  if(alarmCfg){ newT.alarm = alarmCfg; syncTaskAlarms(newT); if(deadline && deadlineTime) showToast('Alarms set: '+taskAlarmHint(newT).replace(/&middot;/g,'·'), {icon:'&#9200;', duration:5000}); }
   if(ui.newTaskEventId){ const ev = state.calendar.events.find(function(x){ return x.id===ui.newTaskEventId; }); if(ev){ ev.taskIds = arr(ev.taskIds).concat([state.tasks.items[state.tasks.items.length-1].id]); persist('calendar'); } ui.newTaskEventId = null; }
   closeAddTaskModal();
   playTaskAdded();

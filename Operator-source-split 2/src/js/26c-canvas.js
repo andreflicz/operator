@@ -568,3 +568,47 @@ afterRenderHooks.push(function(){
     imgs[i % imgs.length].classList.add('is-on');
   }, 9000);
 });
+// ---- static (read-only) render of a board — wake screen, second display, previews ----
+// The master vision board is the one board that shows up on the wake screen.
+function masterVisionBoard(){
+  const id = state.boards.masterId;
+  const b = id ? boardById(id) : null;
+  if(b && b.kind==='vision') return b;
+  return boardsOfKind('vision').filter(function(x){ return !x.parentId; })[0] || null;
+}
+function boardBounds(b){
+  let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+  b.elements.forEach(function(e){
+    if(e.type==='line'){ minX=Math.min(minX,e.x1,e.x2); maxX=Math.max(maxX,e.x1,e.x2); minY=Math.min(minY,e.y1,e.y2); maxY=Math.max(maxY,e.y1,e.y2); }
+    else { minX=Math.min(minX,e.x); minY=Math.min(minY,e.y); maxX=Math.max(maxX,e.x+e.w); maxY=Math.max(maxY,e.y+(e.h||0)); }
+  });
+  if(minX===Infinity) return null;
+  return {x:minX-20, y:minY-20, w:maxX-minX+40, h:maxY-minY+40};
+}
+function boardStaticHtml(b, cls){
+  if(!b || !b.elements.length) return '';
+  const bb = boardBounds(b); if(!bb) return '';
+  const els = b.elements.slice().sort(function(a,c){ return (a.z||0)-(c.z||0); });
+  const shift = function(e){ const c = Object.assign({}, e); if(c.type==='line'){ c.x1-=bb.x; c.x2-=bb.x; c.y1-=bb.y; c.y2-=bb.y; } else { c.x-=bb.x; c.y-=bb.y; } return c; };
+  const savedSel = cv.sel; cv.sel = new Set();
+  const body = els.filter(function(e){ return e.type!=='line'; }).map(function(e){ return elHtml(shift(e), false); }).join('');
+  cv.sel = savedSel;
+  const lines = els.filter(function(e){ return e.type==='line'; }).map(function(e){ const c = shift(e); return '<line x1="'+c.x1+'" y1="'+c.y1+'" x2="'+c.x2+'" y2="'+c.y2+'" stroke="'+(c.color||'#8A90A2')+'" stroke-width="'+(c.width||2)+'" stroke-linecap="round"'+(c.arrow?' marker-end="url(#bArrowS)"':'')+'/>'; }).join('');
+  return '<div class="board-static '+(cls||'')+'" data-bw="'+bb.w+'" data-bh="'+bb.h+'">'+
+    '<div class="board-static-world" style="width:'+bb.w+'px;height:'+bb.h+'px;">'+
+      '<svg class="board-lines" width="'+bb.w+'" height="'+bb.h+'"><defs><marker id="bArrowS" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/></marker></defs>'+lines+'</svg>'+
+      body+
+    '</div></div>';
+}
+// Scale every static board to fit its box (contain, centred).
+function fitStaticBoards(root){
+  (root||document).querySelectorAll('.board-static').forEach(function(box){
+    const w = Number(box.dataset.bw)||1, h = Number(box.dataset.bh)||1;
+    const r = box.getBoundingClientRect(); if(!r.width || !r.height) return;
+    const s = Math.min(r.width/w, r.height/h, 2);
+    const world = box.firstElementChild;
+    world.style.transform = 'translate('+Math.round((r.width-w*s)/2)+'px,'+Math.round((r.height-h*s)/2)+'px) scale('+s+')';
+  });
+}
+window.addEventListener('resize', function(){ fitStaticBoards(); });
+afterRenderHooks.push(function(){ fitStaticBoards(); });

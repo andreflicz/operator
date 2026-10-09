@@ -191,6 +191,40 @@ function taskCategoryTagHtml(t){
   if(!cat) return '';
   return '<span class="tag" style="background:'+hexToRgba(cat.color,0.16)+';color:'+cat.color+';border:1px solid '+hexToRgba(cat.color,0.4)+';">'+escapeHtml(cat.label)+'</span>';
 }
+// The master wake-up alarm: one daily alarm (e.g. 7:00 Mon–Sat) plus an optional
+// one-morning change. The first time this runs, an existing repeating "wake-up" alarm and
+// any upcoming night-plan wake alarms are folded into it (their settings carry over).
+function normalizeWake(f){
+  const fresh = !f.wake || typeof f.wake!=='object';
+  const w = fresh ? {} : f.wake;
+  const out = {
+    enabled: w.enabled===true,
+    time: /^\d\d:\d\d$/.test(w.time||'') ? w.time : '07:00',
+    days: Array.isArray(w.days) ? w.days.map(Number).filter(function(d){ return d>=0 && d<=6; }) : [1,2,3,4,5,6],
+    override: (w.override && w.override.date && w.override.date>=todayStr()) ? w.override : null,
+    sound: ['standard','peaceful','loud'].indexOf(w.sound)>=0 ? w.sound : 'peaceful',
+    media: (w.media && (w.media.ref || w.media.url)) ? w.media : null,
+    snoozeMinutes: Number(w.snoozeMinutes)>0 ? Number(w.snoozeMinutes) : 9,
+    secondScreen: !!w.secondScreen,
+    lastFiredTs: Number(w.lastFiredTs)||0,
+    armedAt: Number(w.armedAt)||Date.now()
+  };
+  if(fresh){
+    const rep = arr(f.alarms).find(function(a){ return a.wake && !a.date && arr(a.days).length; });
+    if(rep){
+      out.enabled = rep.enabled!==false; out.time = rep.time || out.time; out.days = arr(rep.days).slice();
+      if(rep.mediaUrl) out.media = {url:rep.mediaUrl, name:rep.mediaUrl};
+    }
+    const oneOff = arr(f.alarms).filter(function(a){ return (a.wake || a.kind==='wake') && a.date && a.date>=todayStr(); })
+      .sort(function(a,b){ return (a.date+a.time).localeCompare(b.date+b.time); })[0];
+    if(oneOff){
+      out.override = {date:oneOff.date, time:oneOff.time};
+      if(oneOff.mediaUrl && !out.media) out.media = {url:oneOff.mediaUrl, name:oneOff.mediaUrl};
+    }
+    f.alarms = arr(f.alarms).filter(function(a){ return a!==rep && !((a.wake || a.kind==='wake') && a.date); });
+  }
+  return out;
+}
 function normalizeFocus(f){
   f=f||{};
   if(f.activeSession===undefined) f.activeSession=null;
@@ -205,6 +239,9 @@ function normalizeFocus(f){
   f.taskSegments = arr(f.taskSegments);
   if(f.nightPlan===undefined) f.nightPlan = null;
   f.alarms = arr(f.alarms);
+  f.alarms.forEach(function(a){ if(!Array.isArray(a.days)) a.days = []; if(!a.armedAt) a.armedAt = Date.now(); });
+  f.wake = normalizeWake(f);
+  if(f.snooze && !(f.snooze.ts > Date.now()-2*3600000)) f.snooze = null;
   if(f.lastManualStopAt===undefined) f.lastManualStopAt = null;
   if(f.lastSessionEndedAt===undefined) f.lastSessionEndedAt = null;
   f.reminders = arr(f.reminders);

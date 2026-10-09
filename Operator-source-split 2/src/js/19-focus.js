@@ -79,7 +79,11 @@ function renderActiveFocusHero(big){
     timerCardInner = '<div class="kpi-label" style="color:var(--info);">'+modeIcon('break')+' ON BREAK</div>'+
       '<div class="hero-num '+sizeClass+'" id="modeElapsed" style="color:var(--info);">'+formatElapsed(Date.now()-(active.breakStartedAt||Date.now()))+'</div>'+
       (breakInfo&&breakInfo.note ? '<div class="kpi-sub">'+escapeHtml(breakInfo.note)+'</div>' : '')+
-      '<button class="btn btn-primary btn-sm" data-action="endBreakModeFromFocus" style="margin-top:10px;">End Break</button>';
+      (active.breakEndsAt ? '<div class="break-remaining" id="breakRemaining">'+formatElapsed(Math.max(0, active.breakEndsAt-Date.now()))+' left</div>' : '')+
+      '<div class="row" style="justify-content:center;gap:6px;margin-top:10px;">'+
+        (active.breakEndsAt ? '<button class="btn btn-ghost btn-sm" data-action="extendBreak" data-minutes="5">+5 min</button>' : '')+
+        '<button class="btn btn-primary btn-sm" data-action="endBreakModeFromFocus">End Break</button>'+
+      '</div>';
   } else {
     const dwTarget = state.standards.deepWorkTargetMinutes || 180;
     const liveToday = deepWorkMinutesTodayLive();
@@ -647,6 +651,9 @@ function renderBreakNoteModal(){
   return '<div class="section-title" style="margin-bottom:8px;">'+modeIcon('break')+' Break Mode</div>'+
     '<div class="kpi-sub" style="margin-bottom:12px;">What\'s this break for? A quick note helps you see your break patterns later.</div>'+
     '<input class="input" id="breakNoteInput" placeholder="e.g. Lunch, quick walk, phone call" style="width:100%;">'+
+    '<div class="kind-label" style="margin-top:14px;">How long?</div>'+
+    '<div class="row break-len-row" style="gap:6px;flex-wrap:wrap;">'+[5,10,15,20,30,45,60,'open'].map(function(m){ const on = (ui.breakMinutes==null ? 15 : ui.breakMinutes)===m; return '<button class="btn btn-sm '+(on?'btn-primary':'btn-ghost')+'" data-action="pickBreakMinutes" data-minutes="'+m+'">'+(m==='open'?'No timer':m+' min')+'</button>'; }).join('')+'</div>'+
+    '<div class="kpi-sub" style="margin-top:6px;">'+((ui.breakMinutes==null?15:ui.breakMinutes)==='open' ? 'The break runs until you end it.' : 'Ends by itself after '+(ui.breakMinutes==null?15:ui.breakMinutes)+' min and you\'re back in the session.')+'</div>'+
     '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
       '<button class="btn btn-ghost" data-action="closeBreakNotePrompt">Cancel</button>'+
       '<button class="btn btn-primary" data-action="confirmStartBreakMode">'+modeIcon('break')+' Start Break</button>'+
@@ -659,9 +666,11 @@ function confirmStartBreakMode(){
   const note = noteEl ? noteEl.value.trim() : '';
   closeBreakNotePrompt();
   if(!Array.isArray(as.breaks)) as.breaks=[];
-  as.breaks.push({start:Date.now(), note:note});
+  const breakLen = ui.breakMinutes==null ? 15 : ui.breakMinutes;
+  as.breaks.push({start:Date.now(), note:note, minutes:breakLen==='open'?null:breakLen});
   as.onBreak = true;
   as.breakStartedAt = Date.now();
+  as.breakEndsAt = breakLen==='open' ? null : Date.now()+breakLen*60000;
   as.frozenElapsedMs = Date.now() - as.startedAt;
   state.modes.active = {type:'break', startedAt:Date.now(), note:note, linkedFocus:true};
   if(ui.currentTaskId){ ui.pausedTaskId = ui.currentTaskId; accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
@@ -676,6 +685,7 @@ function endBreakModeFromFocus(){
   const actualBreakMs = Date.now() - startedAt;
   as.startedAt += actualBreakMs;
   as.onBreak = false;
+  as.breakEndsAt = null;
   const minutes = Math.max(1, Math.round(actualBreakMs/60000));
   state.modes.history.push({id:uid(), type:'break', date:todayStr(new Date(startedAt)), startedAt:startedAt, endedAt:Date.now(), minutes:minutes, note:lastBreak.note||''});
   state.modes.active = null;

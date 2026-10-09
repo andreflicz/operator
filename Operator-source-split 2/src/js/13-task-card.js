@@ -159,6 +159,7 @@ function renderTaskEditModal(){
     '<div class="field" style="margin-top:10px;"><label>Priority</label><select class="input" id="editPriority-'+t.id+'"><option value="low" '+(t.priority==='low'?'selected':'')+'>Low</option><option value="med" '+(t.priority==='med'?'selected':'')+'>Medium</option><option value="high" '+(t.priority==='high'?'selected':'')+'>High</option></select></div>'+
     '<div class="field" style="margin-top:10px;"><label>Category</label><select class="input" id="editCategory-'+t.id+'"><option value="">&mdash; None &mdash;</option>'+arr(state.tasks.categories).map(function(c){ return '<option value="'+c.id+'" '+(t.categoryId===c.id?'selected':'')+'>'+escapeHtml(c.label)+'</option>'; }).join('')+'</select></div>'+
     '<div class="field" style="margin-top:10px;"><label>Deadline</label><div class="row"><input class="input" type="date" id="editDeadline-'+t.id+'" value="'+(t.deadline||'')+'"><input class="input" type="time" id="editDeadlineTime-'+t.id+'" value="'+(t.deadlineTime||'')+'" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editDeadline-'+t.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="editDeadline-'+t.id+'">Today</button>'+(t.deadline?'<button class="btn btn-ghost btn-sm" data-action="clearField" data-target="editDeadline-'+t.id+'" title="Remove deadline">Clear</button>':'')+'</div></div>'+
+    taskAlarmFieldsHtml('editTask-'+t.id+'-', t)+
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="editNotes-'+t.id+'" style="width:100%;min-height:60px;">'+escapeHtml(t.notes||'')+'</textarea></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editCountsDeep-'+t.id+'" '+(t.countsDeepWork!==false?'checked':'')+' style="margin-right:6px;">Counts toward deep work'+(function(){ const c=t.categoryId?taskCategoryById(t.categoryId):null; return c && c.countsDeepWork===false ? ' <span class="kpi-sub">(its category "'+escapeHtml(c.label)+'" doesn\'t count)</span>' : ''; })()+'</label>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editOngoing-'+t.id+'" '+(t.ongoing?'checked':'')+' style="margin-right:6px;">&#128204; Ongoing (may take more than one day)</label>'+
@@ -208,6 +209,8 @@ function saveEditTask(id){
     t.ongoingFrequency = null;
     t.includeInStandard = false;
   }
+  const alarmCfg = readTaskAlarmFields('editTask-'+id+'-');
+  if(alarmCfg!==undefined){ if(alarmCfg) t.alarm = alarmCfg; else delete t.alarm; syncTaskAlarms(t); }
   ui.selectedTaskIds.clear();
   closeTaskEditModal();
   persist('tasks'); renderView();

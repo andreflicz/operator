@@ -24,8 +24,8 @@ function readEventExtras(ev){
   ev.location = v('calEventLocation').trim() || null;
   ev.remindBefore = Number(v('calEventRemindBefore'))||0;
   ev.isShoot = c('calEventIsShoot');
-  ev.readyTime = ev.isShoot ? (v('calEventReadyTime')||null) : null;
-  ev.travelMinutes = ev.isShoot ? (Number(v('calEventTravel'))||0) : 0;
+  ev.readyTime = v('calEventReadyTime')||null;
+  ev.travelMinutes = Number(v('calEventTravel'))||0;
   ev.autoShootMode = ev.isShoot && c('calEventAutoShoot');
   const boxes = document.querySelectorAll('#calEventContent [data-event-task]');
   if(boxes.length){
@@ -60,9 +60,9 @@ function eventStartTs(ev){ return ev.time ? localTs(ev.date, ev.time) : null; }
 function syncEventExtraAlarms(ev){
   const start = eventStartTs(ev);
   const at = function(ts){ const d = new Date(ts); return [todayStr(d), nowHM(d)]; };
-  if(ev.isShoot && ev.readyTime) upsertEventAlarm(ev, 'ready', ev.date, ev.readyTime, 'Start getting ready — '+ev.title);
+  if(ev.readyTime) upsertEventAlarm(ev, 'ready', ev.date, ev.readyTime, 'Start getting ready — '+ev.title);
   else upsertEventAlarm(ev, 'ready', null);
-  if(ev.isShoot && start && ev.travelMinutes>0){ const x = at(start-ev.travelMinutes*60000); upsertEventAlarm(ev, 'leave', x[0], x[1], 'Time to leave — '+ev.title+(ev.location?' ('+ev.location+')':'')); }
+  if(start && ev.travelMinutes>0){ const x = at(start-ev.travelMinutes*60000); upsertEventAlarm(ev, 'leave', x[0], x[1], 'Time to leave — '+ev.title+(ev.location?' ('+ev.location+')':'')); }
   else upsertEventAlarm(ev, 'leave', null);
   if(start && ev.remindBefore>0){ const y = at(start-ev.remindBefore*60000); upsertEventAlarm(ev, 'remind', y[0], y[1], ev.title+' in '+fmtDurationLabel(ev.remindBefore)); }
   else upsertEventAlarm(ev, 'remind', null);
@@ -109,13 +109,13 @@ function renderAlarmExtra(al){
     html += '<div class="kpi-sub" style="margin-top:6px;">'+escapeHtml(ev.title)+(ev.time?' at '+fmt12Hour(ev.time):'')+(ev.location?' &middot; &#128205; '+escapeHtml(ev.location):'')+'</div>';
     if(ev.isShoot && !(state.modes.active && state.modes.active.type==='shooting')) html += '<button class="btn btn-sm shooting-btn-sm" style="margin-top:10px;" data-action="startShootFromEvent" data-id="'+ev.id+'">&#127916; Start shooting mode</button>';
   }
-  if(al && al.mediaUrl) html += '<button class="btn btn-good" style="margin-top:12px;" data-action="playAlarmMedia" data-url="'+escapeHtml(al.mediaUrl)+'">&#9654; Play wake-up '+(/youtu/.test(al.mediaUrl)?'video':'song')+'</button>';
   return html;
 }
 ACTIONS.playAlarmMedia = function(el){
   clearInterval(ringInterval);
   const url = el.dataset.url;
-  if(url) window.open(safariizeUrl(url), '_blank');
+  if(url) playWakeMedia({url:url}, function(){ window.open(safariizeUrl(url), '_blank'); });
+  el.remove();
 };
 // ---- Reminders: mini alarm (sound + notification + banner) ----
 function fireReminder(r){
@@ -161,6 +161,8 @@ ACTIONS.undoTaskToReminder = function(){
 // ---- Next alarm ----
 function nextAlarmOccurrence(){
   const now = Date.now(); let best = null;
+  const nw = typeof nextWake==='function' ? nextWake() : null;
+  if(nw) best = {alarm:{label:'Wake up', time:nw.time, wake:true}, ts:nw.ts, date:nw.date, wake:true};
   arr(state.focus.alarms).forEach(function(a){
     if(!a.enabled || !a.time) return;
     for(let i=0;i<8;i++){
@@ -184,10 +186,8 @@ function planTargetDate(){ return new Date().getHours()>=15 ? addDays(todayStr()
 function openNightPlan(){
   const np = state.focus.nightPlan;
   const target = planTargetDate();
-  ui.nightPlanDraft = (np && np.date===target) ? {date:np.date, taskIds:arr(np.taskIds).slice(), note:np.note||'', alarmTime:'', mediaUrl:''} : {date:target, taskIds:[], note:'', alarmTime:'', mediaUrl:''};
-  const al = np && np.date===target && np.alarmId ? state.focus.alarms.find(function(a){ return a.id===np.alarmId; }) : null;
-  if(al){ ui.nightPlanDraft.alarmTime = al.time; ui.nightPlanDraft.mediaUrl = al.mediaUrl||''; }
-  else { const next = nextAlarmOccurrence(); if(next && next.date===target) ui.nightPlanDraft.alarmTime = ''; }
+  ui.nightPlanDraft = (np && np.date===target) ? {date:np.date, taskIds:arr(np.taskIds).slice(), note:np.note||''} : {date:target, taskIds:[], note:''};
+  ui.nightPlanDraft.alarmTime = wakeTimeFor(target) || '';
   showOverlay('nightPlanOverlay'); renderNightPlanModalInto();
 }
 function renderNightPlanModal(){
@@ -195,7 +195,7 @@ function renderNightPlanModal(){
   const sel = new Set(d.taskIds);
   const cands = state.tasks.items.filter(function(t){ return t.status!=='done'; })
     .sort(function(a,b){ return (sel.has(b.id)?1:0)-(sel.has(a.id)?1:0) || taskPriorityRank(a)-taskPriorityRank(b); }).slice(0,80);
-  const next = nextAlarmOccurrence();
+  const base = wakeBaseTimeFor(d.date);
   const dayLabel = d.date===todayStr() ? 'today' : 'tomorrow ('+weekdayShort(d.date)+')';
   return '<div class="section-title" style="margin-bottom:4px;">&#127769; Plan '+dayLabel+'</div>'+
     '<div class="kpi-sub" style="margin-bottom:14px;">Shows up when your alarm goes off and on the Today page in the morning.</div>'+
@@ -204,10 +204,10 @@ function renderNightPlanModal(){
     '</div>'+
     '<div class="row" style="margin-top:6px;gap:6px;"><input class="input" id="nightPlanNewTask" placeholder="+ Add a new task to the plan" style="flex:1;"><button class="btn btn-sm" data-action="nightPlanAddTask">Add</button></div></div>'+
     '<div class="field" style="margin-top:12px;"><label>Note to wake up to</label><textarea class="input" id="nightPlanNote" style="width:100%;min-height:70px;" placeholder="What matters tomorrow, and why.">'+escapeHtml(d.note||'')+'</textarea></div>'+
-    '<div class="grid grid-2" style="margin-top:12px;">'+
-      '<div class="field"><label>Wake-up alarm</label><input class="input" type="time" id="nightPlanAlarm" value="'+escapeHtml(d.alarmTime||'')+'"><div class="kpi-sub">'+(next?'Next alarm: '+fmt12Hour(next.alarm.time)+' '+(next.date===todayStr()?'today':weekdayShort(next.date))+' ('+escapeHtml(next.alarm.label||'Alarm')+')':'No alarm set')+'</div></div>'+
-      '<div class="field"><label>Wake-up song / YouTube link (optional)</label><input class="input" id="nightPlanMedia" value="'+escapeHtml(d.mediaUrl||'')+'" placeholder="https://…"></div>'+
-    '</div>'+
+    '<div class="field night-wake-field" style="margin-top:12px;"><label>&#9200; Wake up '+morningLabel(d.date)+' at</label>'+
+      '<div class="row" style="gap:10px;align-items:center;flex-wrap:wrap;"><input class="input ws-time ws-time-sm" type="time" id="nightPlanAlarm" value="'+escapeHtml(d.alarmTime||'')+'">'+
+      '<span class="kpi-sub">'+(base ? 'Usual: '+fmt12Hour(base)+' ('+wakeDaysLabel(wakeCfg().days)+'). A different time here only changes '+morningLabel(d.date)+'.' : 'No daily alarm that day — set a time to wake up '+morningLabel(d.date)+'.')+'</span>'+
+      '<button class="btn btn-ghost btn-sm" data-action="openWakeSetup">Alarm settings &amp; music</button></div></div>'+
     '<div class="row" style="margin-top:18px;justify-content:space-between;">'+
       (state.focus.nightPlan ? '<button class="btn btn-ghost btn-sm mini-move-danger" data-action="clearNightPlan">Clear plan</button>' : '<span></span>')+
       '<div class="row"><button class="btn btn-ghost" data-action="closeNightPlan">Cancel</button><button class="btn btn-primary" data-action="saveNightPlan">Save plan</button></div>'+
@@ -220,7 +220,6 @@ function readNightPlanForm(){
   d.taskIds = Array.prototype.map.call(document.querySelectorAll('#nightPlanContent [data-plan-task]:checked'), function(b){ return b.dataset.planTask; });
   const note = document.getElementById('nightPlanNote'); if(note) d.note = note.value;
   const al = document.getElementById('nightPlanAlarm'); if(al) d.alarmTime = al.value;
-  const md = document.getElementById('nightPlanMedia'); if(md) d.mediaUrl = md.value.trim();
 }
 ACTIONS.openNightPlan = openNightPlan;
 ACTIONS.closeNightPlan = function(){ ui.nightPlanDraft = null; hideOverlay('nightPlanOverlay'); };
@@ -239,21 +238,22 @@ ACTIONS.saveNightPlan = function(){
   readNightPlanForm();
   const d = ui.nightPlanDraft; if(!d) return;
   const prev = state.focus.nightPlan;
-  let alarmId = prev && prev.date===d.date ? prev.alarmId : null;
-  if(d.alarmTime){
-    let a = alarmId ? state.focus.alarms.find(function(x){ return x.id===alarmId; }) : null;
-    if(!a){ a = {id:uid(), days:[], enabled:true}; state.focus.alarms.push(a); alarmId = a.id; }
-    a.time = d.alarmTime; a.date = d.date; a.label = 'Wake up'; a.wake = true; a.kind = 'wake'; a.enabled = true;
-    a.wakeNote = d.note||''; a.mediaUrl = d.mediaUrl||'';
-  } else if(alarmId){
-    state.focus.alarms = state.focus.alarms.filter(function(x){ return x.id!==alarmId; }); alarmId = null;
+  // Older plans made their own one-off alarm; the wake-up alarm handles it now.
+  if(prev && prev.alarmId) state.focus.alarms = state.focus.alarms.filter(function(x){ return x.id!==prev.alarmId; });
+  const w = wakeCfg();
+  if((d.alarmTime||null)!==(wakeTimeFor(d.date)||null)){
+    if(!d.alarmTime) w.override = wakeBaseTimeFor(d.date) ? {date:d.date, off:true} : null;
+    else if(d.alarmTime===wakeBaseTimeFor(d.date)) w.override = null;
+    else w.override = {date:d.date, time:d.alarmTime};
+    wakeArm();
   }
-  state.focus.nightPlan = {date:d.date, taskIds:d.taskIds, note:d.note||'', alarmId:alarmId, createdAt:Date.now(), applied:false, dismissed:false};
+  state.focus.nightPlan = {date:d.date, taskIds:d.taskIds, note:d.note||'', alarmId:null, createdAt:Date.now(), applied:false, dismissed:false};
   ui.nightPlanDraft = null;
   hideOverlay('nightPlanOverlay');
   playPositive();
   persist('focus'); renderView();
-  showToast('Plan saved for '+(d.date===todayStr()?'today':'tomorrow'), {icon:'&#127769;'});
+  const t = wakeTimeFor(d.date);
+  showToast('Plan saved for '+morningLabel(d.date)+(t?' — alarm '+fmt12Hour(t):''), {icon:'&#127769;'});
 };
 ACTIONS.clearNightPlan = function(){
   const np = state.focus.nightPlan;
@@ -292,8 +292,8 @@ ACTIONS.startSleepMode = function(){
 };
 function renderSleepView(){
   const active = state.modes.active;
-  const next = nextAlarmOccurrence();
-  const np = state.focus.nightPlan && state.focus.nightPlan.date>=todayStr() ? state.focus.nightPlan : null;
+  const nw = nextWake();
+  const np = upcomingNightPlan();
   const npTasks = np ? arr(np.taskIds).map(function(id){ return state.tasks.items.find(function(t){ return t.id===id; }); }).filter(Boolean) : [];
   return '<div class="view-header today-header"><div><div class="view-title">Sleep mode<span class="sleepy-dots" aria-hidden="true"></span></div><div class="view-sub" id="liveClock"></div></div></div>'+
   '<div class="day-off-wrap"><div class="card day-off-card sleep-card">'+
@@ -301,21 +301,28 @@ function renderSleepView(){
     '<div class="hero-num" id="modeElapsed" style="color:#c9d3ff;">'+formatElapsed(Date.now()-active.startedAt)+'</div>'+
     '<div class="hero-label" style="color:#9AA0AC;">resting &middot; auto lock-in paused</div>'+
     '<div class="sleep-grid">'+
-      '<div class="sleep-tile"><div class="kpi-label">Next alarm</div>'+(next ? '<div class="sleep-tile-val">'+fmt12Hour(next.alarm.time)+'</div><div class="kpi-sub">'+escapeHtml(next.alarm.label||'Alarm')+' &middot; in '+untilLabel(next.ts)+'</div>' : '<div class="kpi-sub">No alarm set</div>')+'</div>'+
-      '<div class="sleep-tile"><div class="kpi-label">Tomorrow\'s plan</div>'+(np ? '<div class="sleep-tile-val">'+npTasks.length+' task'+(npTasks.length===1?'':'s')+'</div><div class="kpi-sub">'+(np.note?escapeHtml(np.note.slice(0,70))+(np.note.length>70?'…':''):'no note')+'</div>' : '<div class="kpi-sub">Not planned yet</div>')+'</div>'+
+      '<button class="sleep-tile sleep-tile-btn" data-action="openWakeSetup"><div class="kpi-label">Wake-up</div>'+(nw ? '<div class="sleep-tile-val">'+fmt12Hour(nw.time)+'</div><div class="kpi-sub">'+morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts)+'</div>' : '<div class="sleep-tile-val">Not set</div><div class="kpi-sub">Tap to set it</div>')+'</button>'+
+      '<button class="sleep-tile sleep-tile-btn" data-action="openNightPlan"><div class="kpi-label">'+(np?'Plan for '+morningLabel(np.date):'Tomorrow\'s plan')+'</div>'+(np ? '<div class="sleep-tile-val">'+npTasks.length+' task'+(npTasks.length===1?'':'s')+'</div><div class="kpi-sub">'+(np.note?escapeHtml(np.note.slice(0,70))+(np.note.length>70?'…':''):'no note')+'</div>' : '<div class="sleep-tile-val">Not planned</div><div class="kpi-sub">Tap to plan</div>')+'</button>'+
     '</div>'+
     '<div class="row" style="justify-content:center;margin-top:16px;gap:10px;">'+
-      '<button class="btn btn-ghost" data-action="openNightPlan">'+(np?'Edit plan &amp; alarm':'Plan tomorrow &amp; set alarm')+'</button>'+
       '<button class="btn" style="border-color:#9AA0AC;color:#fff;" data-action="endMode">I\'m up</button>'+
     '</div>'+
   '</div></div>';
 }
+// Winding down: tomorrow's wake-up, the plan and going to sleep — one card (evenings).
 function renderEveningCard(){
   const h = new Date().getHours();
   if(h<18 && h>=4) return '';
-  const np = state.focus.nightPlan && state.focus.nightPlan.date===planTargetDate() ? state.focus.nightPlan : null;
+  const target = planTargetDate();
+  const np = state.focus.nightPlan && state.focus.nightPlan.date===target ? state.focus.nightPlan : null;
+  const nw = nextWake();
+  const count = np ? arr(np.taskIds).length : 0;
   return '<div class="section"><div class="card evening-card">'+
-    '<div><div class="kpi-label">&#127769; Winding down</div><div class="kpi-sub">'+(np?'Tomorrow is planned ('+arr(np.taskIds).length+' tasks).':'Set tomorrow\'s list and alarm before bed.')+'</div></div>'+
-    '<div class="row" style="gap:8px;"><button class="btn btn-ghost btn-sm" data-action="openNightPlan">'+(np?'Edit plan':'Plan tomorrow')+'</button><button class="btn btn-sm sleep-btn" data-action="startSleepMode">Sleep mode</button></div>'+
+    '<div class="evening-head"><div class="kpi-label">&#127769; Winding down</div><div class="kpi-sub">'+(np ? morningLabel(target)[0].toUpperCase()+morningLabel(target).slice(1)+' is planned.' : 'Line up '+morningLabel(target)+', check your alarm, then sleep.')+'</div></div>'+
+    '<div class="evening-tiles">'+
+      '<button class="evening-tile" data-action="openWakeSetup"><span class="evening-tile-k">Wake-up</span><span class="evening-tile-v">'+(nw ? fmt12Hour(nw.time) : 'Not set')+'</span><span class="kpi-sub">'+(nw ? morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts) : 'Set it')+'</span></button>'+
+      '<button class="evening-tile" data-action="openNightPlan"><span class="evening-tile-k">'+escapeHtml(morningLabel(target)[0].toUpperCase()+morningLabel(target).slice(1))+'</span><span class="evening-tile-v">'+(np ? count+' task'+(count===1?'':'s') : 'Plan it')+'</span><span class="kpi-sub">'+(np ? 'Edit plan' : 'Tasks + a note')+'</span></button>'+
+      '<button class="evening-tile evening-sleep" data-action="startSleepMode"><span class="evening-moon">&#127769;</span><span class="evening-tile-v">Go to sleep</span><span class="kpi-sub">Pauses auto lock-in</span></button>'+
+    '</div>'+
   '</div></div>';
 }
