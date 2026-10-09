@@ -35,9 +35,9 @@ const SP = require('./common.js').OUT;
   // reach out list on Today
   const ro = await E("reachOutList().map(r=>r.x.id+':'+r.n)");
   check('reach out list sorted most overdue', ro[0].startsWith('p1:') && ro.includes('c1:2'), ro);
-  check('reach out panel on dashboard', await p.isVisible('.reach-list'));
+  check('reach out panel on dashboard', await p.isVisible('.client-hub .hub-card[data-key="hub-c1"]'));
   // one-click log touch from dashboard
-  await p.click('.reach-row[data-key="reach-c1"] .touch-log-btn');
+  await p.click('.hub-card[data-key="hub-c1"] .touch-log-btn');
   check('one-click touch logged', (await E("state.business.clients[0].touchpoints.length"))===3 && (await E("state.business.clients[0].touches.length"))===3);
   check('client now healthy', (await E("clientHealthStatus(state.business.clients[0]).level"))==='green');
   await p.click('.toast .toast-action');
@@ -106,7 +106,7 @@ const SP = require('./common.js').OUT;
   await p.click('[data-action="closeClientModalAndSave"]');
   // clients tab board
   await p.click('[data-action="businessTab"][data-tab="clients"]');
-  check('clients board with 5 stages', (await p.$$('.crm-col')).length===5);
+  check('clients tab shows client cards', (await p.$$('.cc2')).length>=1);
   check('FAB = add client', (await p.getAttribute('#fabAdd','title'))==='Add client');
   await p.click('#fabAdd'); await p.fill('#ncName','Zed'); await p.fill('#ncCompany','Zed Media'); await p.fill('#ncValue','900'); await p.click('[data-action="saveNewContact"]');
   check('new client created', (await E("state.business.clients.some(c=>c.business==='Zed Media' && c.stage==='onboarding' && c.status==='active')")));

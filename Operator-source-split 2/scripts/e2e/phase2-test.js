@@ -17,7 +17,7 @@ const SP = require('./common.js').OUT;
   check('journal raised under streak', order[1]==='journal', order);
   check('streak card rendered', await p.isVisible('.streak-card .streak-num'));
   check('today header centered', await p.evaluate(() => getComputedStyle(document.querySelector('.today-header')).alignItems)==='center');
-  check('health pill', await p.isVisible('.health-pill.health-red'));
+  check('client health color-coded', await p.isVisible('.hub-card.hl-red .cc2-avatar.ring-red'));
   await p.screenshot({path:SP+'/p2-today.png', fullPage:false});
   // paste image into quick journal
   await p.evaluate(async () => {

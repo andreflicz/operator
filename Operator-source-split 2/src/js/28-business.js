@@ -10,10 +10,11 @@ function renderBusiness(){
     '<div class="tab '+(ui.businessTab==='overview'?'active':'')+'" data-action="businessTab" data-tab="overview">Overview</div>'+
     '<div class="tab '+(ui.businessTab==='leads'?'active':'')+'" data-action="businessTab" data-tab="leads">Leads</div>'+
     '<div class="tab '+(ui.businessTab==='clients'?'active':'')+'" data-action="businessTab" data-tab="clients">Clients</div>'+
+    '<div class="tab '+(ui.businessTab==='lifecycle'?'active':'')+'" data-action="businessTab" data-tab="lifecycle">Lifecycle</div>'+
     '<div class="tab '+(ui.businessTab==='packages'?'active':'')+'" data-action="businessTab" data-tab="packages">Packages</div>'+
     '<div class="tab '+(ui.businessTab==='finances'?'active':'')+'" data-action="businessTab" data-tab="finances">Finances</div>'+
   '</div>'+
-  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderCrmTab('client') : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
+  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
 }
 function renderBusinessOverview(){
   const clients = arr(state.business.clients);
@@ -98,18 +99,33 @@ function monthlyTargetFor(d){
   const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
   return Math.max(1, Math.round(target * daysInMonth/7));
 }
+// Pace is judged per week (an 8-a-month reel plan = 2 a week). Early in the week you're fine
+// even at 0/2; it turns amber when the days left only just cover what's left, red once
+// you can't make it at one a day — and red stays until last week's shortfall is made up.
+function deliverableWeekCountFor(d, weekStart){
+  const end = addDays(weekStart, 6);
+  return arr(d.completedDates).filter(function(dt){ return dt>=weekStart && dt<=end; }).length;
+}
+function deliverableLastWeek(d){
+  const target = d.weeklyTarget||1;
+  const start = addDays(thisWeekKey(), -7);
+  // only count weeks the deliverable existed for
+  if(d.createdAt && d.createdAt > addDays(start, 6)) return {done:0, target:target, missed:0};
+  const done = deliverableWeekCountFor(d, start);
+  return {done:done, target:target, missed:Math.max(0, target-done)};
+}
 function deliverablePaceStatus(d){
-  const monthlyTarget = monthlyTargetFor(d);
-  const now = new Date();
-  const dayOfMonth = now.getDate();
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
-  const doneThisMonth = deliverableMonthCount(d);
-  const expected = monthlyTarget * (dayOfMonth/daysInMonth);
-  if(doneThisMonth>=monthlyTarget) return 'good';
-  if(expected<=0) return 'good';
-  const ratio = doneThisMonth/expected;
-  if(ratio>=1) return 'good';
-  if(ratio>=0.6) return 'warn';
+  const target = d.weeklyTarget||1;
+  const done = deliverableWeekCount(d);
+  const lw = deliverableLastWeek(d);
+  if(lw.missed>0 && done < lw.missed) return 'danger';
+  const remaining = target - done;
+  if(remaining<=0) return 'good';
+  const today = new Date();
+  const daysLeft = 7 - ((today.getDay()+6)%7); // Mon = 7 … Sun = 1, today included
+  const slack = daysLeft - remaining;
+  if(slack>=2) return 'good';
+  if(slack>=0) return 'warn';
   return 'danger';
 }
 function isDeliverableDoneThisWeek(d){
@@ -329,8 +345,8 @@ function renderClientModal(){
   const pkg = c.packageId ? arr(state.business.packages).find(function(x){return x.id===c.packageId;}) : null;
   return '<div class="card" style="margin-bottom:16px;">'+
       '<div class="row" style="justify-content:space-between;align-items:flex-start;">'+
-        '<div><div class="section-title" style="margin-bottom:2px;">'+escapeHtml(c.business||c.name||'Client')+'</div>'+
-        (c.name && c.business ? '<div class="kpi-sub">'+escapeHtml(c.name)+'</div>' : '')+'</div>'+
+        '<div class="client-name-edit"><input class="client-name-input" data-client-field="business" data-id="'+c.id+'" value="'+escapeHtml(c.business||'')+'" placeholder="Business name" title="Click to rename">'+
+        '<input class="client-contact-input" data-client-field="name" data-id="'+c.id+'" value="'+escapeHtml(c.name||'')+'" placeholder="Contact name"></div>'+
         (function(){ const st = crmStage('client', c.stage); return '<span class="tag" style="background:'+(st?st.color:'#8A90A2')+'22;color:'+(st?st.color:'#8A90A2')+';">'+escapeHtml(st?st.label:(isActive?'Active':'Paused'))+'</span>'; })()+
       '</div>'+
       '<div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap;align-items:center;">'+
@@ -434,7 +450,7 @@ function assignClientPackage(clientId){
   archivePackageProgress(c);
   c.deliverables = arr(c.deliverables).filter(function(d){ return !d.fromPackage; });
   arr(pk.deliverables).forEach(function(d){
-    c.deliverables.push({id:uid(), title:d.title, dueDate:null, status:'pending', linkedTaskId:null, fromPackage:true, recurring:true, completedDates:restoredPackageProgress(c, d), weeklyTarget:d.weeklyTarget||1, sourceId:d.id});
+    c.deliverables.push({id:uid(), title:d.title, dueDate:null, status:'pending', linkedTaskId:null, fromPackage:true, recurring:true, completedDates:restoredPackageProgress(c, d), weeklyTarget:d.weeklyTarget||1, sourceId:d.id, createdAt:todayStr()});
   });
   c.packageId = pk.id;
   ui.pickingPackageForClient = null;
@@ -704,6 +720,7 @@ function convertProspectToClient(p){
     lifecycle:{checks:{}, enteredAt:{}, events:{}, links:{}},
     cadenceDays:null, fromLeadId:p.id, startDate:todayStr(), createdAt:todayStr()});
   p.convertedClientId = clientId;
+  remapConvertedLeadRefs();
   // won clients start the default cycle straight away
   const nc = state.business.clients[state.business.clients.length-1];
   nc.cycleId = null; nc.cycleDone = false;
@@ -777,3 +794,12 @@ function convertToClient(id){
   persist('business'); renderView();
 }
 
+// Rename a client right from their page (business + contact name).
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.dataset || !t.dataset.clientField) return;
+  const c = state.business.clients.find(function(x){ return x.id===t.dataset.id; }); if(!c) return;
+  const v = t.value.trim();
+  if(t.dataset.clientField==='business'){ if(!v && !c.name){ t.value = c.business||''; return; } c.business = v; }
+  else c.name = v;
+  persist('business'); renderView();
+});

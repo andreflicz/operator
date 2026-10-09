@@ -8,7 +8,7 @@ function clientOptionsHtml(selected){
 }
 function clientCheckboxOptions(){
   const clients = arr(state.business && state.business.clients);
-  const leads = arr(state.business && state.business.pipeline).filter(function(p){ return p.stage!=='lost'; });
+  const leads = arr(state.business && state.business.pipeline).filter(function(p){ return p.stage!=='lost' && !p.convertedClientId; });
   return [{value:'personal',label:'Personal'},{value:'general',label:'General Business'}]
     .concat(clients.map(function(c){ return {value:c.id, label:(c.business||c.name||'Client')}; }))
     .concat(leads.map(function(p){ return {value:'lead:'+p.id, label:(p.company||p.name||'Lead')+' (Lead)'}; }));
@@ -52,6 +52,7 @@ function clientLabel(val){
   if(String(val).indexOf('lead:')===0){
     const leadId = val.slice(5);
     const p = arr(state.business && state.business.pipeline).find(function(x){ return x.id===leadId; });
+    if(p && p.convertedClientId) return clientLabel(p.convertedClientId);
     return p ? (p.company||p.name||'Lead') : 'Lead';
   }
   const c = arr(state.business && state.business.clients).find(function(x){ return x.id===val; });
@@ -61,7 +62,11 @@ function clientLabel(val){
 function clientTagHtml(val){
   if(!val || val==='personal') return '<span class="tag tag-personal">Personal</span>';
   if(val==='general') return '<span class="tag tag-general">General Business</span>';
-  if(String(val).indexOf('lead:')===0) return '<span class="tag" style="background:rgba(232,162,61,.16);color:#E8A23D;">'+escapeHtml(clientLabel(val))+' (Lead)</span>';
+  if(String(val).indexOf('lead:')===0){
+    const lp = arr(state.business && state.business.pipeline).find(function(x){ return x.id===String(val).slice(5); });
+    if(lp && lp.convertedClientId) return clientTagHtml(lp.convertedClientId);
+    return '<span class="tag" style="background:rgba(232,162,61,.16);color:#E8A23D;">'+escapeHtml(clientLabel(val))+' (Lead)</span>';
+  }
   return '<span class="tag tag-client">'+escapeHtml(clientLabel(val))+'</span>';
 }
 function clientTagsHtml(arrVal){
@@ -74,3 +79,23 @@ function priorityTag(pr){
   return '<span class="tag tag-med">Medium</span>';
 }
 
+// A lead that became a client: anything tagged with the lead (tasks, events) now points at
+// the client, so the old "(Lead)" tag doesn't linger. Runs on conversion and once on load.
+function remapConvertedLeadRefs(){
+  const map = {};
+  arr(state.business && state.business.pipeline).forEach(function(p){ if(p.convertedClientId && arr(state.business.clients).some(function(c){ return c.id===p.convertedClientId; })) map['lead:'+p.id] = p.convertedClientId; });
+  if(!Object.keys(map).length) return false;
+  let tasks = false, cal = false;
+  arr(state.tasks && state.tasks.items).forEach(function(t){
+    if(Array.isArray(t.clients) && t.clients.some(function(v){ return map[v]; })){
+      const out = [];
+      t.clients.forEach(function(v){ const nv = map[v]||v; if(out.indexOf(nv)<0) out.push(nv); });
+      t.clients = out; tasks = true;
+    }
+    if(map[t.client]){ t.client = map[t.client]; tasks = true; }
+  });
+  arr(state.calendar && state.calendar.events).forEach(function(e){ if(map[e.linkedClient]){ e.linkedClient = map[e.linkedClient]; cal = true; } });
+  if(tasks) persist('tasks');
+  if(cal) persist('calendar');
+  return tasks || cal;
+}

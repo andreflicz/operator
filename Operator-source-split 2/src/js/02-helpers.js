@@ -128,14 +128,12 @@ const SWATCHES = ['#E8A23D','#8fdcff','#3FBE8E','#E8636B','#b39ddb','#f48fb1','#
 const PANEL_DEFS = [
   {id:'personalStats', label:'Streak & Personal Stats (includes Standard)'},
   {id:'business', label:'Business Snapshot'},
-  {id:'clientOps', label:'Client Health (deliverable pace & touches)'},
+  {id:'clientHub', label:'Clients — health, deliverables, next steps & who to reach out to'},
   {id:'goals', label:'Goals'},
   {id:'journal', label:'Journal'},
   {id:'focusMini', label:'Focus'},
   {id:'calendarMini', label:'Calendar'},
-  {id:'tasks', label:"Today's Tasks"},
-  {id:'reachOut', label:'Reach Out Today (leads & clients due a touch)'},
-  {id:'clientSteps', label:'Client Next Steps (from your client lifecycle)'}
+  {id:'tasks', label:"Today's Tasks"}
 ];
 const SMALL_PANELS = ['focusMini', 'calendarMini']; // journal is full-width now that it sits near the top
 const MOODS = [

@@ -297,14 +297,12 @@ function addMiniReminder(){
 const PANEL_RENDERERS = {
   personalStats: renderPersonalStatsPanel,
   business: renderBusinessPanel,
-  clientOps: renderClientOpsPanel,
   goals: renderGoalsPanel,
   journal: renderJournalPanel,
   focusMini: renderFocusMiniPanel,
   calendarMini: renderCalendarMiniPanel,
   tasks: renderTodayTasksPanel,
-  reachOut: function(){ return renderReachOutPanel(false); },
-  clientSteps: renderClientStepsPanel
+  clientHub: function(){ return renderClientHubPanel(); }
 };
 function clientOpsDeliverableRow(clientId, d){
   return recurringDeliverableRowHtml(clientId, d, false);

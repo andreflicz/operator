@@ -22,6 +22,7 @@ async function init(){
   if(isWakeDisplay){ startWakeDisplay(); return; }
   splitActiveModeAtMidnight();
   if(crmMigratedOnLoad) persist('business');
+  remapConvertedLeadRefs();
   applyTheme();
   applySidebarState();
   document.getElementById('loading').style.display='none';

@@ -84,7 +84,7 @@ function fabContext(){
   if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='videoIdeas') return {label:'Add video idea', run:openAddVideoIdeaModal};
   if(v==='focus' || v==='today') return {label:'Add task', run:openAddTaskModal};
   if(v==='business'){
-    if(ui.businessTab==='clients') return {label:'Add client', run:function(){ if(typeof openNewContactModal==='function') openNewContactModal('client'); else { ui.forms.client=true; renderView(); } }};
+    if(ui.businessTab==='clients' || ui.businessTab==='lifecycle') return {label:'Add client', run:function(){ if(typeof openNewContactModal==='function') openNewContactModal('client'); else { ui.forms.client=true; renderView(); } }};
     if(ui.businessTab==='packages') return {label:'Add package', run:openNewPackageModal};
     if(ui.businessTab==='finances') return {label:'Add invoice', run:function(){ openInvoiceModal('personal'); }};
     return {label:'Add lead', run:function(){ if(typeof openNewContactModal==='function') openNewContactModal('lead'); else { ui.forms.prospect=true; renderView(); } }};

@@ -370,6 +370,18 @@ function normalizeDashboardPanels(d){
   const defaults = defaultDashboardPanels();
   const validIds = defaults.order;
   if(!Array.isArray(d.order) || !d.order.length) d.order = defaults.order.slice();
+  // Client Health, Reach Out Today and Client Next Steps became one Clients panel; it takes
+  // the place of whichever of them sat highest (and stays hidden if all three were hidden).
+  if(!d.clientHubMerged){
+    const old = ['clientOps','reachOut','clientSteps'];
+    const idxs = old.map(function(id){ return d.order.indexOf(id); }).filter(function(i){ return i>=0; });
+    const en = d.enabled || {};
+    if(idxs.length && d.order.indexOf('clientHub')<0) d.order.splice(Math.min.apply(null, idxs), 0, 'clientHub');
+    if(old.every(function(id){ return en[id]===false; })) en.clientHub = false;
+    old.forEach(function(id){ delete en[id]; });
+    d.enabled = en;
+    d.clientHubMerged = true;
+  }
   d.order = d.order.filter(function(pid){ return validIds.indexOf(pid)>=0; });
   defaults.order.forEach(function(pid){ if(d.order.indexOf(pid)<0) d.order.push(pid); });
   if(!d.enabled || typeof d.enabled!=='object') d.enabled = {};
@@ -382,8 +394,7 @@ function normalizeDashboardPanels(d){
     d.order.splice(a>=0 ? a+1 : fallbackIdx, 0, id);
   };
   if(!d.journalRaised){ moveAfter('journal', 'personalStats', 0); d.journalRaised = true; }
-  if(!d.reachOutAdded){ moveAfter('reachOut', 'journal', 1); d.reachOutAdded = true; }
-  if(!d.clientStepsAdded){ moveAfter('clientSteps', 'reachOut', 2); d.clientStepsAdded = true; }
+  if(!d.reachOutAdded){ moveAfter('clientHub', 'journal', 1); d.reachOutAdded = true; d.clientStepsAdded = true; }
   return d;
 }
 function normalizeModes(m){

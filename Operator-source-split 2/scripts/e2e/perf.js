@@ -70,7 +70,7 @@ function heavySeed(){
     ['tab Leads', '[data-action="businessTab"][data-tab="leads"]'],
     ['log touch (lead)', '.touch-log-btn'],
     ['tab Clients', '[data-action="businessTab"][data-tab="clients"]'],
-    ['open client', '.crm-card-main'],
+    ['open client', '.cc2-top'],
     ['close client', '[data-action="closeClientModalAndSave"]'],
     ['nav Calendar', '[data-action="nav"][data-view="calendar"]'],
     ['select calendar day', '.cal-cell[data-action="selectCalDay"]'],

@@ -7,10 +7,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   const E = (code) => p.evaluate(c => window.__op.ev(c), code);
   await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="clients"]');
   // pop-ups open at the top even if the previous one was scrolled down
-  await p.click('.crm-card[data-key="crm-c1"] .crm-card-main'); await p.waitForTimeout(150);
+  await p.click('.cc2[data-key="cc2-c1"] .cc2-top'); await p.waitForTimeout(150);
   await p.evaluate(()=>{ document.getElementById('clientModalContent').scrollTop = 2000; });
   await p.click('[data-action="closeClientModalAndSave"]'); await p.waitForTimeout(150);
-  await p.click('.crm-card[data-key="crm-c2"] .crm-card-main'); await p.waitForTimeout(150);
+  await p.click('.cc2[data-key="cc2-c2"] .cc2-top'); await p.waitForTimeout(150);
   check('pop-up opens scrolled to top', (await p.evaluate(()=>document.getElementById('clientModalContent').scrollTop))===0);
   await p.click('[data-action="closeClientModalAndSave"]');
   // a client without progress data (older add path) can start a cycle without crashing

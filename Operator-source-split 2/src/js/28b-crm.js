@@ -162,9 +162,10 @@ function touchMenuHtml(kind, x){
 }
 function touchButtonsHtml(kind, x){
   const last = touchTypeById(x.lastTouchType || crm().lastTouchType);
-  return '<div class="touch-btns">'+
-    '<button class="touch-log-btn" data-action="quickTouch" data-kind="'+kind+'" data-id="'+x.id+'" title="Log a '+last.label.toLowerCase()+' (today)">'+last.icon+' Log touch</button>'+
-    '<button class="touch-more-btn" data-action="toggleTouchMenu" data-kind="'+kind+'" data-id="'+x.id+'" title="Pick the type">&#9662;</button>'+
+  const touched = crmLastTouch(kind, x)===todayStr();
+  return '<div class="touch-btns'+(touched?' is-touched':'')+'">'+
+    '<button class="touch-log-btn" data-action="quickTouch" data-kind="'+kind+'" data-id="'+x.id+'" title="'+(touched?'Touched today — log another ':'Log a ')+last.label.toLowerCase()+' (today)">'+(touched?'&#10003;':last.icon)+'</button>'+
+    '<button class="touch-more-btn" data-action="toggleTouchMenu" data-kind="'+kind+'" data-id="'+x.id+'" title="Log a call, text, DM, email…">&#8964;</button>'+
   '</div>';
 }
 // ---- stages ----
@@ -317,14 +318,15 @@ function crmCard(kind, x){
   const src = x.leadSource ? leadSourceById(x.leadSource) : null;
   const money = Number(kind==='lead' ? x.value : x.mrr)||0;
   const lt = crmLastTouch(kind, x);
-  return '<div class="crm-card '+lvl+'" draggable="true" data-crm-drag="'+kind+':'+x.id+'" data-key="crm-'+x.id+'">'+
+  const hl = kind==='client' && x.status==='active' ? ' hl-'+clientHealthStatus(x).level : '';
+  return '<div class="crm-card '+lvl+hl+'" draggable="true" data-crm-drag="'+kind+':'+x.id+'" data-key="crm-'+x.id+'">'+
     '<div class="crm-card-main" data-action="openContact" data-kind="'+kind+'" data-id="'+x.id+'">'+
       '<div class="crm-card-name">'+escapeHtml(crmName(kind,x))+'</div>'+
       (crmSubName(kind,x) ? '<div class="kpi-sub">'+escapeHtml(crmSubName(kind,x))+'</div>' : '')+
       '<div class="crm-card-meta">'+
         (money ? '<span class="crm-money">$'+money.toLocaleString()+(kind==='client'?'/mo':'')+'</span>' : '')+
         (src ? '<span class="tag" style="background:'+src.color+'22;color:'+src.color+';">'+src.emoji+' '+escapeHtml(src.label)+'</span>' : '')+
-        (kind==='client' && x.status==='active' ? clientHealthTagHtml(x) : '')+
+        (kind==='client' && x.status==='active' ? '<span class="health-dot-sm hd-'+clientHealthStatus(x).level+'" title="'+escapeHtml(clientHealthTitle(x))+'"></span>' : '')+
       '</div>'+
       (kind==='client' ? lcBadgeHtml(x) : '')+
       (x.lostReason && x.stage==='lost' ? '<div class="kpi-sub">Lost: '+escapeHtml(x.lostReason)+'</div>' : '')+

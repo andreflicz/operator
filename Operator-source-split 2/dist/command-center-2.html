@@ -858,6 +858,107 @@
   .ws-check{ display:flex; align-items:flex-start; gap:8px; font-size:12.5px; color:var(--text-dim); line-height:1.4; }
   .ws-check input{ margin-top:2px; flex-shrink:0; }
   .wake-snooze-btn{ border:1px solid var(--border); color:var(--text); }
+  /* ---- clients: cards, lifecycle tab, Today panel ---- */
+  .cc2-statrow{ display:grid; grid-template-columns:repeat(auto-fit, minmax(130px,1fr)); gap:10px; margin-bottom:14px; }
+  .cc2-stat{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px 16px; }
+  .cc2-stat-v{ font-family:var(--font-display); font-size:24px; font-weight:700; }
+  .cc2-stat-k{ font-size:12px; color:var(--text-dim); }
+  .cc2-stat.is-good .cc2-stat-v{ color:var(--good); }
+  .cc2-stat.is-warn .cc2-stat-v{ color:var(--accent); }
+  .cc2-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:14px; align-content:start; }
+  .cc2-grid-sm{ margin-top:10px; opacity:.85; }
+  .cc2{ position:relative; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px 16px 12px; display:flex; flex-direction:column; gap:12px; transition:border-color .15s, transform .15s, box-shadow .15s; overflow:hidden; }
+  .cc2::before{ content:''; position:absolute; left:0; top:0; right:0; height:3px; background:var(--border); }
+  .cc2.hl-green::before{ background:linear-gradient(90deg, var(--good), transparent); }
+  .cc2.hl-yellow::before{ background:linear-gradient(90deg, var(--accent), transparent); }
+  .cc2.hl-red::before{ background:linear-gradient(90deg, var(--danger), transparent); }
+  .cc2:hover{ border-color:#343a4a; transform:translateY(-1px); box-shadow:0 10px 26px rgba(0,0,0,.28); }
+  .cc2.is-inactive{ opacity:.8; }
+  .cc2-top{ display:flex; align-items:center; gap:12px; cursor:pointer; }
+  .cc2-avatar{ width:40px; height:40px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; font-size:14px; color:#fff; flex-shrink:0; letter-spacing:.02em; }
+  .cc2-avatar-sm{ width:28px; height:28px; border-radius:8px; font-size:11px; }
+  .cc2-name{ flex:1; min-width:0; }
+  .cc2-title{ font-family:var(--font-display); font-weight:700; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cc2-stats{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; background:var(--panel-2); border-radius:10px; padding:9px 12px; }
+  .cc2-stats > div{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .cc2-k{ font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); font-weight:700; }
+  .cc2-v{ font-family:var(--font-display); font-weight:700; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cc2-v-sm{ font-size:13px; font-family:var(--font-body); }
+  .cc2-delivs{ display:flex; flex-direction:column; gap:7px; }
+  .cc2-deliv{ display:flex; align-items:center; gap:8px; font-size:13px; }
+  .cc2-deliv-title{ width:34%; min-width:70px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text); }
+  .cc2-deliv-bar{ flex:1; height:6px; border-radius:4px; background:var(--panel-2); overflow:hidden; }
+  .cc2-deliv-bar span{ display:block; height:100%; border-radius:4px; transition:width .35s ease, background .35s; }
+  .cc2-deliv-count{ font-family:var(--font-display); font-weight:700; font-size:12.5px; min-width:34px; text-align:right; transition:color .35s; }
+  .cc2-deliv-btn{ width:24px; height:24px; border-radius:7px; border:1px solid var(--border); background:transparent; color:var(--text-dim); font-size:14px; line-height:1; display:inline-flex; align-items:center; justify-content:center; transition:border-color .15s, color .15s, background .15s; }
+  .cc2-deliv-btn:hover:not([disabled]){ border-color:var(--good); color:var(--good); }
+  .cc2-deliv-btn[disabled]{ opacity:.35; }
+  .cc2-plus.did-today{ border-color:rgba(63,190,142,.45); color:var(--good); background:var(--good-dim); }
+  .cc2 .lc-badge{ margin-top:0; }
+  .cc2-foot{ display:flex; align-items:center; gap:8px; border-top:1px solid var(--border); padding-top:10px; }
+  .cc2-past{ margin-top:18px; }
+  .cc2-past-toggle{ background:none; border:none; color:var(--text-dim); font-weight:600; font-size:13px; padding:4px 0; }
+  .cc2-past-toggle:hover{ color:var(--text); }
+  .lc-tab-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .lc-notin{ display:flex; flex-direction:column; gap:6px; }
+  .lc-notin-row{ display:flex; align-items:center; gap:10px; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:8px 12px; }
+  .lc-notin-name{ font-weight:600; cursor:pointer; }
+  .hub-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:12px; }
+  .hub-card{ position:relative; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:10px; border-left:3px solid var(--border); }
+  .hub-card.hl-green{ border-left-color:var(--good); } .hub-card.hl-yellow{ border-left-color:var(--accent); } .hub-card.hl-red{ border-left-color:var(--danger); }
+  .hub-head{ display:flex; align-items:center; gap:8px; }
+  .hub-name{ flex:1; min-width:0; font-family:var(--font-display); font-weight:700; font-size:14.5px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hub-head .health-reason{ display:none; }
+  .hub-step{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; }
+  .hub-step .lc-item{ flex:1; min-width:0; }
+  .hub-foot{ display:flex; align-items:center; gap:8px; }
+  .hub-leads{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .hub-lead{ position:relative; display:inline-flex; align-items:center; gap:8px; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:6px 8px 6px 12px; font-size:13px; }
+  .hub-lead-name{ font-weight:600; cursor:pointer; }
+  .hub-lead .touch-menu{ position:absolute; top:100%; left:0; z-index:5; }
+  .cc2-top .health-reason{ display:none; }
+  .cc2-avatar.ring-green{ box-shadow:0 0 0 2px var(--panel), 0 0 0 4px var(--good); }
+  .cc2-avatar.ring-yellow{ box-shadow:0 0 0 2px var(--panel), 0 0 0 4px var(--accent); }
+  .cc2-avatar.ring-red{ box-shadow:0 0 0 2px var(--panel), 0 0 0 4px var(--danger); animation:ringPulse 2.4s ease-in-out infinite; }
+  @keyframes ringPulse{ 0%,100%{ box-shadow:0 0 0 2px var(--panel), 0 0 0 4px var(--danger); } 50%{ box-shadow:0 0 0 2px var(--panel), 0 0 0 4px var(--danger), 0 0 14px 2px rgba(232,99,107,.45); } }
+  .cc2-avatar-sm.ring-green, .cc2-avatar-sm.ring-yellow, .cc2-avatar-sm.ring-red{ box-shadow:0 0 0 2px var(--panel), 0 0 0 3.5px var(--good); }
+  .cc2-avatar-sm.ring-yellow{ box-shadow:0 0 0 2px var(--panel), 0 0 0 3.5px var(--accent); }
+  .cc2-avatar-sm.ring-red{ box-shadow:0 0 0 2px var(--panel), 0 0 0 3.5px var(--danger); }
+  .cc2.hl-green{ border-color:rgba(63,190,142,.22); } .cc2.hl-yellow{ border-color:rgba(232,162,61,.28); } .cc2.hl-red{ border-color:rgba(232,99,107,.32); }
+  .cc2.hl-green::before, .cc2.hl-yellow::before, .cc2.hl-red::before{ height:3px; }
+  .health-dot-sm{ display:inline-block; width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .hd-green{ background:var(--good); box-shadow:0 0 6px var(--good); } .hd-yellow{ background:var(--accent); box-shadow:0 0 6px var(--accent); } .hd-red{ background:var(--danger); box-shadow:0 0 6px var(--danger); }
+  .crm-card.hl-green{ border-left-color:var(--good); } .crm-card.hl-yellow{ border-left-color:var(--accent); } .crm-card.hl-red{ border-left-color:var(--danger); }
+  .client-name-edit{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
+  .client-name-input, .client-contact-input{ background:transparent; border:1px solid transparent; border-radius:8px; color:var(--text); padding:2px 6px; margin-left:-7px; transition:border-color .15s, background .15s; width:100%; max-width:420px; }
+  .client-name-input{ font-family:var(--font-display); font-size:20px; font-weight:700; }
+  .client-contact-input{ font-size:13px; color:var(--text-dim); }
+  .client-name-input:hover, .client-contact-input:hover{ border-color:var(--border); }
+  .client-name-input:focus, .client-contact-input:focus{ outline:none; border-color:var(--accent); background:var(--panel-2); }
+  /* slimmer client cards + touch button */
+  .cc2{ padding:14px 14px 10px; gap:10px; }
+  .cc2-mrr{ font-family:var(--font-display); font-weight:700; font-size:14px; color:var(--text); white-space:nowrap; }
+  .cc2-mrr span{ font-family:var(--font-body); font-weight:500; font-size:11px; color:var(--text-faint); margin-left:1px; }
+  .cc2-avatar{ width:36px; height:36px; border-radius:10px; font-size:13px; }
+  .cc2-title{ font-size:15px; }
+  .cc2-delivs{ gap:6px; }
+  .cc2-deliv{ gap:8px; font-size:12.5px; }
+  .cc2-deliv-title{ flex:1; width:auto; color:var(--text-dim); }
+  .cc2-deliv-bar{ flex:0 0 70px; }
+  .wk-dots{ display:inline-flex; gap:4px; }
+  .wk-dot{ width:9px; height:9px; border-radius:50%; border:1.5px solid var(--border); transition:background .3s, border-color .3s; }
+  .cc2-owed{ font-size:10.5px; font-weight:700; color:#ffb3b8; background:var(--danger-dim); border-radius:6px; padding:1px 6px; white-space:nowrap; }
+  .cc2-deliv-btn{ width:22px; height:22px; border-radius:50%; font-size:13px; }
+  .cc2-foot{ font-size:12px; gap:6px; padding-top:8px; }
+  .cc2-step{ font-weight:700; font-size:11.5px; white-space:nowrap; }
+  .cc2-sep{ color:var(--text-faint); }
+  .touch-btns{ border:none; border-radius:0; overflow:visible; gap:1px; align-items:center; }
+  .touch-log-btn{ width:30px; height:30px; padding:0; border-radius:50%; border:1px solid var(--border); background:var(--panel-2); font-size:14px; display:inline-flex; align-items:center; justify-content:center; color:var(--text); }
+  .touch-more-btn{ border:none; background:transparent; padding:0 4px; height:30px; font-size:13px; color:var(--text-faint); border-radius:6px; line-height:1; }
+  .touch-log-btn:hover{ border-color:var(--good); background:var(--good-dim); }
+  .touch-more-btn:hover{ background:transparent; color:var(--text); }
+  .touch-btns.is-touched .touch-log-btn{ background:var(--good-dim); border-color:rgba(63,190,142,.5); color:var(--good); font-weight:700; }
+  .cc2-owed.is-caught{ color:var(--text-faint); background:var(--panel-2); }
 </style>
 </head>
 <body>
@@ -1193,14 +1294,12 @@ const SWATCHES = ['#E8A23D','#8fdcff','#3FBE8E','#E8636B','#b39ddb','#f48fb1','#
 const PANEL_DEFS = [
   {id:'personalStats', label:'Streak & Personal Stats (includes Standard)'},
   {id:'business', label:'Business Snapshot'},
-  {id:'clientOps', label:'Client Health (deliverable pace & touches)'},
+  {id:'clientHub', label:'Clients — health, deliverables, next steps & who to reach out to'},
   {id:'goals', label:'Goals'},
   {id:'journal', label:'Journal'},
   {id:'focusMini', label:'Focus'},
   {id:'calendarMini', label:'Calendar'},
-  {id:'tasks', label:"Today's Tasks"},
-  {id:'reachOut', label:'Reach Out Today (leads & clients due a touch)'},
-  {id:'clientSteps', label:'Client Next Steps (from your client lifecycle)'}
+  {id:'tasks', label:"Today's Tasks"}
 ];
 const SMALL_PANELS = ['focusMini', 'calendarMini']; // journal is full-width now that it sits near the top
 const MOODS = [
@@ -2080,6 +2179,18 @@ function normalizeDashboardPanels(d){
   const defaults = defaultDashboardPanels();
   const validIds = defaults.order;
   if(!Array.isArray(d.order) || !d.order.length) d.order = defaults.order.slice();
+  // Client Health, Reach Out Today and Client Next Steps became one Clients panel; it takes
+  // the place of whichever of them sat highest (and stays hidden if all three were hidden).
+  if(!d.clientHubMerged){
+    const old = ['clientOps','reachOut','clientSteps'];
+    const idxs = old.map(function(id){ return d.order.indexOf(id); }).filter(function(i){ return i>=0; });
+    const en = d.enabled || {};
+    if(idxs.length && d.order.indexOf('clientHub')<0) d.order.splice(Math.min.apply(null, idxs), 0, 'clientHub');
+    if(old.every(function(id){ return en[id]===false; })) en.clientHub = false;
+    old.forEach(function(id){ delete en[id]; });
+    d.enabled = en;
+    d.clientHubMerged = true;
+  }
   d.order = d.order.filter(function(pid){ return validIds.indexOf(pid)>=0; });
   defaults.order.forEach(function(pid){ if(d.order.indexOf(pid)<0) d.order.push(pid); });
   if(!d.enabled || typeof d.enabled!=='object') d.enabled = {};
@@ -2092,8 +2203,7 @@ function normalizeDashboardPanels(d){
     d.order.splice(a>=0 ? a+1 : fallbackIdx, 0, id);
   };
   if(!d.journalRaised){ moveAfter('journal', 'personalStats', 0); d.journalRaised = true; }
-  if(!d.reachOutAdded){ moveAfter('reachOut', 'journal', 1); d.reachOutAdded = true; }
-  if(!d.clientStepsAdded){ moveAfter('clientSteps', 'reachOut', 2); d.clientStepsAdded = true; }
+  if(!d.reachOutAdded){ moveAfter('clientHub', 'journal', 1); d.reachOutAdded = true; d.clientStepsAdded = true; }
   return d;
 }
 function normalizeModes(m){
@@ -2255,7 +2365,7 @@ function clientOptionsHtml(selected){
 }
 function clientCheckboxOptions(){
   const clients = arr(state.business && state.business.clients);
-  const leads = arr(state.business && state.business.pipeline).filter(function(p){ return p.stage!=='lost'; });
+  const leads = arr(state.business && state.business.pipeline).filter(function(p){ return p.stage!=='lost' && !p.convertedClientId; });
   return [{value:'personal',label:'Personal'},{value:'general',label:'General Business'}]
     .concat(clients.map(function(c){ return {value:c.id, label:(c.business||c.name||'Client')}; }))
     .concat(leads.map(function(p){ return {value:'lead:'+p.id, label:(p.company||p.name||'Lead')+' (Lead)'}; }));
@@ -2299,6 +2409,7 @@ function clientLabel(val){
   if(String(val).indexOf('lead:')===0){
     const leadId = val.slice(5);
     const p = arr(state.business && state.business.pipeline).find(function(x){ return x.id===leadId; });
+    if(p && p.convertedClientId) return clientLabel(p.convertedClientId);
     return p ? (p.company||p.name||'Lead') : 'Lead';
   }
   const c = arr(state.business && state.business.clients).find(function(x){ return x.id===val; });
@@ -2308,7 +2419,11 @@ function clientLabel(val){
 function clientTagHtml(val){
   if(!val || val==='personal') return '<span class="tag tag-personal">Personal</span>';
   if(val==='general') return '<span class="tag tag-general">General Business</span>';
-  if(String(val).indexOf('lead:')===0) return '<span class="tag" style="background:rgba(232,162,61,.16);color:#E8A23D;">'+escapeHtml(clientLabel(val))+' (Lead)</span>';
+  if(String(val).indexOf('lead:')===0){
+    const lp = arr(state.business && state.business.pipeline).find(function(x){ return x.id===String(val).slice(5); });
+    if(lp && lp.convertedClientId) return clientTagHtml(lp.convertedClientId);
+    return '<span class="tag" style="background:rgba(232,162,61,.16);color:#E8A23D;">'+escapeHtml(clientLabel(val))+' (Lead)</span>';
+  }
   return '<span class="tag tag-client">'+escapeHtml(clientLabel(val))+'</span>';
 }
 function clientTagsHtml(arrVal){
@@ -2321,6 +2436,26 @@ function priorityTag(pr){
   return '<span class="tag tag-med">Medium</span>';
 }
 
+// A lead that became a client: anything tagged with the lead (tasks, events) now points at
+// the client, so the old "(Lead)" tag doesn't linger. Runs on conversion and once on load.
+function remapConvertedLeadRefs(){
+  const map = {};
+  arr(state.business && state.business.pipeline).forEach(function(p){ if(p.convertedClientId && arr(state.business.clients).some(function(c){ return c.id===p.convertedClientId; })) map['lead:'+p.id] = p.convertedClientId; });
+  if(!Object.keys(map).length) return false;
+  let tasks = false, cal = false;
+  arr(state.tasks && state.tasks.items).forEach(function(t){
+    if(Array.isArray(t.clients) && t.clients.some(function(v){ return map[v]; })){
+      const out = [];
+      t.clients.forEach(function(v){ const nv = map[v]||v; if(out.indexOf(nv)<0) out.push(nv); });
+      t.clients = out; tasks = true;
+    }
+    if(map[t.client]){ t.client = map[t.client]; tasks = true; }
+  });
+  arr(state.calendar && state.calendar.events).forEach(function(e){ if(map[e.linkedClient]){ e.linkedClient = map[e.linkedClient]; cal = true; } });
+  if(tasks) persist('tasks');
+  if(cal) persist('calendar');
+  return tasks || cal;
+}
 // ============ DAYS OFF / STANDARD / STREAK ============
 function isDayOff(dateStr){ return state.daysOff.dates.indexOf(dateStr)>=0; }
 function toggleDayOff(){
@@ -3431,14 +3566,12 @@ function addMiniReminder(){
 const PANEL_RENDERERS = {
   personalStats: renderPersonalStatsPanel,
   business: renderBusinessPanel,
-  clientOps: renderClientOpsPanel,
   goals: renderGoalsPanel,
   journal: renderJournalPanel,
   focusMini: renderFocusMiniPanel,
   calendarMini: renderCalendarMiniPanel,
   tasks: renderTodayTasksPanel,
-  reachOut: function(){ return renderReachOutPanel(false); },
-  clientSteps: renderClientStepsPanel
+  clientHub: function(){ return renderClientHubPanel(); }
 };
 function clientOpsDeliverableRow(clientId, d){
   return recurringDeliverableRowHtml(clientId, d, false);
@@ -3576,7 +3709,7 @@ function fabContext(){
   if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='videoIdeas') return {label:'Add video idea', run:openAddVideoIdeaModal};
   if(v==='focus' || v==='today') return {label:'Add task', run:openAddTaskModal};
   if(v==='business'){
-    if(ui.businessTab==='clients') return {label:'Add client', run:function(){ if(typeof openNewContactModal==='function') openNewContactModal('client'); else { ui.forms.client=true; renderView(); } }};
+    if(ui.businessTab==='clients' || ui.businessTab==='lifecycle') return {label:'Add client', run:function(){ if(typeof openNewContactModal==='function') openNewContactModal('client'); else { ui.forms.client=true; renderView(); } }};
     if(ui.businessTab==='packages') return {label:'Add package', run:openNewPackageModal};
     if(ui.businessTab==='finances') return {label:'Add invoice', run:function(){ openInvoiceModal('personal'); }};
     return {label:'Add lead', run:function(){ if(typeof openNewContactModal==='function') openNewContactModal('lead'); else { ui.forms.prospect=true; renderView(); } }};
@@ -7594,10 +7727,11 @@ function renderBusiness(){
     '<div class="tab '+(ui.businessTab==='overview'?'active':'')+'" data-action="businessTab" data-tab="overview">Overview</div>'+
     '<div class="tab '+(ui.businessTab==='leads'?'active':'')+'" data-action="businessTab" data-tab="leads">Leads</div>'+
     '<div class="tab '+(ui.businessTab==='clients'?'active':'')+'" data-action="businessTab" data-tab="clients">Clients</div>'+
+    '<div class="tab '+(ui.businessTab==='lifecycle'?'active':'')+'" data-action="businessTab" data-tab="lifecycle">Lifecycle</div>'+
     '<div class="tab '+(ui.businessTab==='packages'?'active':'')+'" data-action="businessTab" data-tab="packages">Packages</div>'+
     '<div class="tab '+(ui.businessTab==='finances'?'active':'')+'" data-action="businessTab" data-tab="finances">Finances</div>'+
   '</div>'+
-  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderCrmTab('client') : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
+  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
 }
 function renderBusinessOverview(){
   const clients = arr(state.business.clients);
@@ -7682,18 +7816,33 @@ function monthlyTargetFor(d){
   const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
   return Math.max(1, Math.round(target * daysInMonth/7));
 }
+// Pace is judged per week (an 8-a-month reel plan = 2 a week). Early in the week you're fine
+// even at 0/2; it turns amber when the days left only just cover what's left, red once
+// you can't make it at one a day — and red stays until last week's shortfall is made up.
+function deliverableWeekCountFor(d, weekStart){
+  const end = addDays(weekStart, 6);
+  return arr(d.completedDates).filter(function(dt){ return dt>=weekStart && dt<=end; }).length;
+}
+function deliverableLastWeek(d){
+  const target = d.weeklyTarget||1;
+  const start = addDays(thisWeekKey(), -7);
+  // only count weeks the deliverable existed for
+  if(d.createdAt && d.createdAt > addDays(start, 6)) return {done:0, target:target, missed:0};
+  const done = deliverableWeekCountFor(d, start);
+  return {done:done, target:target, missed:Math.max(0, target-done)};
+}
 function deliverablePaceStatus(d){
-  const monthlyTarget = monthlyTargetFor(d);
-  const now = new Date();
-  const dayOfMonth = now.getDate();
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
-  const doneThisMonth = deliverableMonthCount(d);
-  const expected = monthlyTarget * (dayOfMonth/daysInMonth);
-  if(doneThisMonth>=monthlyTarget) return 'good';
-  if(expected<=0) return 'good';
-  const ratio = doneThisMonth/expected;
-  if(ratio>=1) return 'good';
-  if(ratio>=0.6) return 'warn';
+  const target = d.weeklyTarget||1;
+  const done = deliverableWeekCount(d);
+  const lw = deliverableLastWeek(d);
+  if(lw.missed>0 && done < lw.missed) return 'danger';
+  const remaining = target - done;
+  if(remaining<=0) return 'good';
+  const today = new Date();
+  const daysLeft = 7 - ((today.getDay()+6)%7); // Mon = 7 … Sun = 1, today included
+  const slack = daysLeft - remaining;
+  if(slack>=2) return 'good';
+  if(slack>=0) return 'warn';
   return 'danger';
 }
 function isDeliverableDoneThisWeek(d){
@@ -7913,8 +8062,8 @@ function renderClientModal(){
   const pkg = c.packageId ? arr(state.business.packages).find(function(x){return x.id===c.packageId;}) : null;
   return '<div class="card" style="margin-bottom:16px;">'+
       '<div class="row" style="justify-content:space-between;align-items:flex-start;">'+
-        '<div><div class="section-title" style="margin-bottom:2px;">'+escapeHtml(c.business||c.name||'Client')+'</div>'+
-        (c.name && c.business ? '<div class="kpi-sub">'+escapeHtml(c.name)+'</div>' : '')+'</div>'+
+        '<div class="client-name-edit"><input class="client-name-input" data-client-field="business" data-id="'+c.id+'" value="'+escapeHtml(c.business||'')+'" placeholder="Business name" title="Click to rename">'+
+        '<input class="client-contact-input" data-client-field="name" data-id="'+c.id+'" value="'+escapeHtml(c.name||'')+'" placeholder="Contact name"></div>'+
         (function(){ const st = crmStage('client', c.stage); return '<span class="tag" style="background:'+(st?st.color:'#8A90A2')+'22;color:'+(st?st.color:'#8A90A2')+';">'+escapeHtml(st?st.label:(isActive?'Active':'Paused'))+'</span>'; })()+
       '</div>'+
       '<div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap;align-items:center;">'+
@@ -8018,7 +8167,7 @@ function assignClientPackage(clientId){
   archivePackageProgress(c);
   c.deliverables = arr(c.deliverables).filter(function(d){ return !d.fromPackage; });
   arr(pk.deliverables).forEach(function(d){
-    c.deliverables.push({id:uid(), title:d.title, dueDate:null, status:'pending', linkedTaskId:null, fromPackage:true, recurring:true, completedDates:restoredPackageProgress(c, d), weeklyTarget:d.weeklyTarget||1, sourceId:d.id});
+    c.deliverables.push({id:uid(), title:d.title, dueDate:null, status:'pending', linkedTaskId:null, fromPackage:true, recurring:true, completedDates:restoredPackageProgress(c, d), weeklyTarget:d.weeklyTarget||1, sourceId:d.id, createdAt:todayStr()});
   });
   c.packageId = pk.id;
   ui.pickingPackageForClient = null;
@@ -8288,6 +8437,7 @@ function convertProspectToClient(p){
     lifecycle:{checks:{}, enteredAt:{}, events:{}, links:{}},
     cadenceDays:null, fromLeadId:p.id, startDate:todayStr(), createdAt:todayStr()});
   p.convertedClientId = clientId;
+  remapConvertedLeadRefs();
   // won clients start the default cycle straight away
   const nc = state.business.clients[state.business.clients.length-1];
   nc.cycleId = null; nc.cycleDone = false;
@@ -8361,6 +8511,15 @@ function convertToClient(id){
   persist('business'); renderView();
 }
 
+// Rename a client right from their page (business + contact name).
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.dataset || !t.dataset.clientField) return;
+  const c = state.business.clients.find(function(x){ return x.id===t.dataset.id; }); if(!c) return;
+  const v = t.value.trim();
+  if(t.dataset.clientField==='business'){ if(!v && !c.name){ t.value = c.business||''; return; } c.business = v; }
+  else c.name = v;
+  persist('business'); renderView();
+});
 
 // ============ CRM: LEADS → CLIENTS LIFECYCLE ============
 // One contact model across two lists: leads live in business.pipeline and clients in
@@ -8525,9 +8684,10 @@ function touchMenuHtml(kind, x){
 }
 function touchButtonsHtml(kind, x){
   const last = touchTypeById(x.lastTouchType || crm().lastTouchType);
-  return '<div class="touch-btns">'+
-    '<button class="touch-log-btn" data-action="quickTouch" data-kind="'+kind+'" data-id="'+x.id+'" title="Log a '+last.label.toLowerCase()+' (today)">'+last.icon+' Log touch</button>'+
-    '<button class="touch-more-btn" data-action="toggleTouchMenu" data-kind="'+kind+'" data-id="'+x.id+'" title="Pick the type">&#9662;</button>'+
+  const touched = crmLastTouch(kind, x)===todayStr();
+  return '<div class="touch-btns'+(touched?' is-touched':'')+'">'+
+    '<button class="touch-log-btn" data-action="quickTouch" data-kind="'+kind+'" data-id="'+x.id+'" title="'+(touched?'Touched today — log another ':'Log a ')+last.label.toLowerCase()+' (today)">'+(touched?'&#10003;':last.icon)+'</button>'+
+    '<button class="touch-more-btn" data-action="toggleTouchMenu" data-kind="'+kind+'" data-id="'+x.id+'" title="Log a call, text, DM, email…">&#8964;</button>'+
   '</div>';
 }
 // ---- stages ----
@@ -8680,14 +8840,15 @@ function crmCard(kind, x){
   const src = x.leadSource ? leadSourceById(x.leadSource) : null;
   const money = Number(kind==='lead' ? x.value : x.mrr)||0;
   const lt = crmLastTouch(kind, x);
-  return '<div class="crm-card '+lvl+'" draggable="true" data-crm-drag="'+kind+':'+x.id+'" data-key="crm-'+x.id+'">'+
+  const hl = kind==='client' && x.status==='active' ? ' hl-'+clientHealthStatus(x).level : '';
+  return '<div class="crm-card '+lvl+hl+'" draggable="true" data-crm-drag="'+kind+':'+x.id+'" data-key="crm-'+x.id+'">'+
     '<div class="crm-card-main" data-action="openContact" data-kind="'+kind+'" data-id="'+x.id+'">'+
       '<div class="crm-card-name">'+escapeHtml(crmName(kind,x))+'</div>'+
       (crmSubName(kind,x) ? '<div class="kpi-sub">'+escapeHtml(crmSubName(kind,x))+'</div>' : '')+
       '<div class="crm-card-meta">'+
         (money ? '<span class="crm-money">$'+money.toLocaleString()+(kind==='client'?'/mo':'')+'</span>' : '')+
         (src ? '<span class="tag" style="background:'+src.color+'22;color:'+src.color+';">'+src.emoji+' '+escapeHtml(src.label)+'</span>' : '')+
-        (kind==='client' && x.status==='active' ? clientHealthTagHtml(x) : '')+
+        (kind==='client' && x.status==='active' ? '<span class="health-dot-sm hd-'+clientHealthStatus(x).level+'" title="'+escapeHtml(clientHealthTitle(x))+'"></span>' : '')+
       '</div>'+
       (kind==='client' ? lcBadgeHtml(x) : '')+
       (x.lostReason && x.stage==='lost' ? '<div class="kpi-sub">Lost: '+escapeHtml(x.lostReason)+'</div>' : '')+
@@ -9689,6 +9850,172 @@ document.addEventListener('keydown', function(e){
   if(e.target.dataset.cyNewItem){ e.preventDefault(); const p = e.target.dataset.cyNewItem.split(':'); ACTIONS.cyItemAdd({dataset:{id:p[0], step:p[1]}}); }
   if(e.target.id==='cyNewStep'){ e.preventDefault(); ACTIONS.cyStepAdd({dataset:{id:ui.editingCycleId}}); }
 });
+
+// ============ CLIENTS: cards + health, Lifecycle tab, Clients dashboard panel ============
+// Clients tab = one card per client (health, deliverables, next touch, where they are in
+// their cycle). The cycle board lives in its own Lifecycle tab. On Today, one Clients panel
+// replaces Client Health / Reach Out Today / Client Next Steps.
+const HEALTH_RANK = {red:0, yellow:1, green:2};
+function clientInitials(c){
+  const n = String(crmName('client', c)||'?').trim().split(/\s+/);
+  return ((n[0]||'?')[0] + (n.length>1 ? n[n.length-1][0] : (n[0][1]||''))).toUpperCase();
+}
+function clientColor(c){
+  const s = String((c.business||'')+(c.name||'')+c.id); let h = 2166136261;
+  for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return 'hsl('+(Math.abs(h)%360)+',42%,40%)';
+}
+// Health is color only (the card edge and a ring round the initials); hover for the why.
+function clientHealthTitle(c){ const hs = clientHealthStatus(c); return CLIENT_HEALTH_META[hs.level].label+' — '+clientHealthReason(c, hs); }
+function clientAvatarHtml(c, small, withHealth){
+  const hs = withHealth ? clientHealthStatus(c) : null;
+  return '<span class="cc2-avatar'+(small?' cc2-avatar-sm':'')+(hs?' ring-'+hs.level:'')+'" style="background:'+clientColor(c)+'"'+(hs?' title="'+escapeHtml(clientHealthTitle(c))+'"':'')+'>'+escapeHtml(clientInitials(c))+'</span>';
+}
+function paceColorOf(p){ return p==='good' ? 'var(--good)' : p==='warn' ? 'var(--accent)' : 'var(--danger)'; }
+function weekDotsHtml(done, target, pace){
+  if(target>7) return '<span class="cc2-deliv-bar"><span style="width:'+Math.min(100, Math.round(done/target*100))+'%;background:'+paceColorOf(pace)+'"></span></span>';
+  let h = '<span class="wk-dots">';
+  for(let i=0;i<target;i++) h += '<span class="wk-dot'+(i<done?' on':'')+'" style="'+(i<done?'background:'+paceColorOf(pace)+';border-color:'+paceColorOf(pace):'')+'"></span>';
+  return h+'</span>';
+}
+function clientDelivRowsHtml(c, compact){
+  const recurring = arr(c.deliverables).filter(function(d){ return d.recurring; });
+  if(!recurring.length) return '';
+  return '<div class="cc2-delivs">'+recurring.map(function(d){
+    const done = deliverableWeekCount(d), target = d.weeklyTarget||1;
+    const pace = deliverablePaceStatus(d);
+    const lw = deliverableLastWeek(d);
+    const caughtUp = done>=lw.missed;
+    const today = arr(d.completedDates).indexOf(todayStr())>=0;
+    return '<div class="cc2-deliv" data-key="dv-'+c.id+'-'+d.id+'" title="'+escapeHtml(d.title)+': '+done+' of '+target+' this week · '+deliverableMonthCount(d)+' this month">'+
+      '<span class="cc2-deliv-title">'+escapeHtml(d.title)+'</span>'+
+      weekDotsHtml(Math.min(done, target), target, pace)+
+      '<span class="cc2-deliv-count" style="color:'+paceColorOf(pace)+'">'+done+'/'+target+'</span>'+
+      (lw.missed ? '<span class="cc2-owed'+(caughtUp?' is-caught':'')+'" title="Last week ended at '+lw.done+'/'+lw.target+(caughtUp?' — caught up this week':' — log '+lw.missed+' this week to catch up')+'">last wk '+lw.done+'/'+lw.target+'</span>' : '')+
+      '<button class="cc2-deliv-btn cc2-plus'+(today?' did-today':'')+'" data-action="incrementDeliverableProgress" data-client="'+c.id+'" data-id="'+d.id+'" title="Log one">+</button>'+
+    '</div>';
+  }).join('')+'</div>';
+}
+function clientNextTouchHtml(c){
+  if(!crmTracked('client', c)) return '<span class="kpi-sub">—</span>';
+  const n = crmOverdueDays('client', c);
+  return '<span class="crm-due '+overdueLevel(n)+'">'+dueLabel(n)+'</span>';
+}
+function clientCardV2(c){
+  const active = clientStageActive(c.stage);
+  const hs = active ? clientHealthStatus(c) : null;
+  const st = crmStage('client', c.stage);
+  const p = lcProgress(c);
+  const step = (!c.cycleDone && p.step) ? '<span class="cc2-step" style="color:'+p.step.color+'">'+escapeHtml(p.step.label)+(p.total?' '+p.done+'/'+p.total:'')+'</span>' : '';
+  return '<div class="cc2'+(hs?' hl-'+hs.level:' is-inactive')+'" data-key="cc2-'+c.id+'"'+(hs?' title="'+escapeHtml(clientHealthTitle(c))+'"':'')+'>'+
+    '<div class="cc2-top" data-action="openContact" data-kind="client" data-id="'+c.id+'">'+
+      clientAvatarHtml(c, false, !!hs)+
+      '<div class="cc2-name"><div class="cc2-title">'+escapeHtml(crmName('client', c))+'</div>'+(crmSubName('client', c)?'<div class="kpi-sub">'+escapeHtml(crmSubName('client', c))+'</div>':'')+'</div>'+
+      (hs ? (Number(c.mrr) ? '<span class="cc2-mrr">$'+Number(c.mrr).toLocaleString()+'<span>/mo</span></span>' : '')
+          : '<span class="tag" style="background:'+(st?st.color:'#8A90A2')+'22;color:'+(st?st.color:'#8A90A2')+';">'+escapeHtml(st?st.label:'Inactive')+'</span>')+
+    '</div>'+
+    clientDelivRowsHtml(c, true)+
+    (active ? '<div class="cc2-foot">'+step+(step?'<span class="cc2-sep">&middot;</span>':'')+clientNextTouchHtml(c)+'<span style="flex:1"></span>'+touchButtonsHtml('client', c)+'</div>'+touchMenuHtml('client', c) : '')+
+  '</div>';
+}
+function clientSortFn(sort){
+  const due = function(c){ const n = crmOverdueDays('client', c); return n==null ? -9999 : n; };
+  if(sort==='name') return function(a,b){ return crmName('client',a).localeCompare(crmName('client',b)); };
+  if(sort==='mrr') return function(a,b){ return (Number(b.mrr)||0)-(Number(a.mrr)||0); };
+  if(sort==='due') return function(a,b){ return due(b)-due(a); };
+  return function(a,b){ return HEALTH_RANK[clientHealthStatus(a).level]-HEALTH_RANK[clientHealthStatus(b).level] || due(b)-due(a); };
+}
+function renderClientsHome(){
+  const f = crmUi('client');
+  const q = (f.q||'').trim().toLowerCase();
+  const all = crmList('client').filter(function(c){ return !q || [c.name, c.business, c.email, c.phone, c.notes].join(' ').toLowerCase().indexOf(q)>=0; });
+  const active = all.filter(function(c){ return clientStageActive(c.stage); }).sort(clientSortFn(f.csort||'health'));
+  const rest = all.filter(function(c){ return !clientStageActive(c.stage); });
+  const levels = crmList('client').filter(function(c){ return clientStageActive(c.stage); }).map(function(c){ return clientHealthStatus(c).level; });
+  const mrr = crmList('client').filter(function(c){ return clientStageActive(c.stage); }).reduce(function(a,c){ return a+(Number(c.mrr)||0); }, 0);
+  const due = crmList('client').filter(function(c){ const n = crmOverdueDays('client', c); return n!=null && n>=0; }).length;
+  const stat = function(v, k, cls){ return '<div class="cc2-stat'+(cls?' '+cls:'')+'"><div class="cc2-stat-v">'+v+'</div><div class="cc2-stat-k">'+k+'</div></div>'; };
+  return '<div class="cc2-statrow">'+
+      stat(levels.length, 'active client'+(levels.length===1?'':'s'))+
+      stat('$'+mrr.toLocaleString(), 'MRR')+
+      stat(levels.filter(function(l){ return l==='green'; }).length, 'healthy', 'is-good')+
+      stat(levels.filter(function(l){ return l!=='green'; }).length, 'need attention', levels.some(function(l){ return l!=='green'; })?'is-warn':'')+
+      stat(due, 'to reach out to', due?'is-warn':'')+
+    '</div>'+
+    '<div class="crm-toolbar">'+
+      '<input class="input" id="crmSearch-client" placeholder="Search clients…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
+      '<select class="input" data-client-sort>'+[['health','Sort: needs attention first'],['due','Sort: most overdue touch'],['mrr','Sort: MRR'],['name','Sort: name']].map(function(o){ return '<option value="'+o[0]+'" '+((f.csort||'health')===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
+      '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="client">+ Add client</button>'+
+    '</div>'+
+    '<div class="subtab-panel" data-key="clients-home">'+
+      (active.length ? '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>' : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
+      (rest.length ? '<div class="cc2-past"><button class="cc2-past-toggle" data-action="toggleClientsPast">'+(ui.clientsPastOpen?'&#9662;':'&#9656;')+' Paused &amp; past clients ('+rest.length+')</button>'+
+        (ui.clientsPastOpen ? '<div class="cc2-grid cc2-grid-sm">'+rest.map(clientCardV2).join('')+'</div>' : '')+'</div>' : '')+
+    '</div>';
+}
+ACTIONS.toggleClientsPast = function(){ ui.clientsPastOpen = !ui.clientsPastOpen; renderView(); };
+document.addEventListener('change', function(e){ const t = e.target; if(t && t.dataset && t.dataset.clientSort!==undefined){ crmUi('client').csort = t.value; renderView(); } });
+// ---- Lifecycle tab ----
+function renderLifecycleTab(){
+  const f = crmUi('client');
+  const list = cycles();
+  if(!list.length) return '<div class="empty">No client cycles yet. <button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">Create your first cycle</button></div>';
+  const cy = cycleById(f.cycleId) || list[0];
+  f.cycleId = cy.id;
+  const activeClients = crmList('client').filter(function(c){ return clientStageActive(c.stage); });
+  const notIn = activeClients.filter(function(c){ return !c.cycleId || (c.cycleDone && c.cycleId!==cy.id); });
+  const inCycle = activeClients.filter(function(c){ return c.cycleId===cy.id && !c.cycleDone; }).length;
+  return '<div class="lc-tab-head">'+
+      '<div class="cy-tabs" style="margin:0;">'+list.map(function(x){
+        const n = activeClients.filter(function(c){ return c.cycleId===x.id && !c.cycleDone; }).length;
+        return '<button class="cy-tab'+(x.id===cy.id?' active':'')+'" style="--cy:'+(x.color||'#E8A23D')+'" data-action="lcTabCycle" data-id="'+x.id+'"><span class="crm-col-dot" style="background:'+(x.color||'#E8A23D')+'"></span>'+escapeHtml(x.name)+'<span class="crm-col-count">'+n+'</span></button>';
+      }).join('')+'</div>'+
+      '<span style="flex:1"></span>'+
+      '<button class="btn btn-ghost btn-sm" data-action="openLifecycleEditor" data-cycle="'+cy.id+'">&#9881; Edit cycles &amp; steps</button>'+
+    '</div>'+
+    '<div class="kpi-sub" style="margin:4px 0 12px;">'+inCycle+' client'+(inCycle===1?'':'s')+' going through '+escapeHtml(cy.name)+' &middot; drag a card to move them to another step.</div>'+
+    '<div class="subtab-panel" data-key="lc-board-'+cy.id+'">'+renderCycleBoard()+'</div>'+
+    (notIn.length ? '<div class="section" style="margin-top:18px;"><div class="section-title">Not in a cycle<span class="kpi-sub">active clients without a running cycle</span></div>'+
+      '<div class="lc-notin">'+notIn.map(function(c){
+        return '<div class="lc-notin-row" data-key="lcn-'+c.id+'"><span class="cc2-avatar cc2-avatar-sm" style="background:'+clientColor(c)+'">'+escapeHtml(clientInitials(c))+'</span>'+
+          '<span class="lc-notin-name" data-action="openContact" data-kind="client" data-id="'+c.id+'">'+escapeHtml(crmName('client', c))+'</span>'+
+          (c.cycleDone ? '<span class="kpi-sub">finished '+escapeHtml((clientCycle(c)||{}).name||'')+'</span>' : '')+
+          '<span style="flex:1"></span><button class="mini-move mini-move-today" data-action="lcStartCycle" data-id="'+c.id+'" data-cycle="'+cy.id+'">Start '+escapeHtml(cy.name)+' &rarr;</button></div>';
+      }).join('')+'</div></div>' : '');
+}
+ACTIONS.lcTabCycle = function(el, e, id){ crmUi('client').cycleId = id; renderView(); };
+// ---- Clients panel on Today ----
+function clientNextStepHtml(c){
+  if(c.cycleDone || !clientCycle(c)) return '';
+  const st = clientStep(c); if(!st) return '';
+  const open = st.checklist.filter(function(it){ return !lcItemDone(c, st, it); });
+  return '<div class="hub-step"><span class="tag" style="background:'+st.color+'22;color:'+st.color+';">'+escapeHtml(st.label)+'</span>'+
+    (open.length ? lcItemHtml(c, st, open[0], true)+(open.length>1?'<span class="kpi-sub" style="cursor:pointer;" data-action="openContact" data-kind="client" data-id="'+c.id+'">+'+(open.length-1)+'</span>':'')
+                 : '<span class="kpi-sub">step done &mdash; move them on</span>')+
+  '</div>';
+}
+function renderClientHubPanel(){
+  const clients = crmList('client').filter(function(c){ return clientStageActive(c.stage); }).sort(clientSortFn('health'));
+  const leadsDue = reachOutList().filter(function(r){ return r.kind==='lead'; });
+  if(!clients.length && !leadsDue.length) return '';
+  return '<div class="section client-hub">'+
+    '<div class="section-title">Clients<span class="view-all-link" data-action="goToClients">All clients &rarr;</span></div>'+
+    (clients.length ? '<div class="hub-grid">'+clients.map(function(c){
+      const hs = clientHealthStatus(c);
+      return '<div class="hub-card hl-'+hs.level+'" data-key="hub-'+c.id+'">'+
+        '<div class="hub-head" title="'+escapeHtml(clientHealthTitle(c))+'">'+clientAvatarHtml(c, true, true)+
+          '<span class="hub-name" data-action="openContact" data-kind="client" data-id="'+c.id+'">'+escapeHtml(crmName('client', c))+'</span></div>'+
+        clientDelivRowsHtml(c, true)+
+        clientNextStepHtml(c)+
+        '<div class="hub-foot">'+clientNextTouchHtml(c)+'<span style="flex:1"></span>'+touchButtonsHtml('client', c)+'</div>'+touchMenuHtml('client', c)+
+      '</div>';
+    }).join('')+'</div>' : '')+
+    (leadsDue.length ? '<div class="hub-leads"><span class="kind-label" style="margin:0 6px 0 0;">Leads to reach out to</span>'+leadsDue.slice(0, 8).map(function(r){
+      return '<span class="hub-lead '+overdueLevel(r.n)+'" data-key="hl-'+r.x.id+'"><span class="hub-lead-name" data-action="openContact" data-kind="lead" data-id="'+r.x.id+'">'+escapeHtml(crmName('lead', r.x))+'</span><span class="crm-due '+overdueLevel(r.n)+'">'+dueLabel(r.n)+'</span>'+touchButtonsHtml('lead', r.x)+touchMenuHtml('lead', r.x)+'</span>';
+    }).join('')+(leadsDue.length>8?'<span class="view-all-link" data-action="goToLeads">+'+(leadsDue.length-8)+' more</span>':'')+'</div>' : '')+
+  '</div>';
+}
+ACTIONS.goToClients = function(){ ui.view='business'; ui.businessTab='clients'; renderView(); };
 // ============ CALENDAR ============
 function categoryById(id){ return arr(state.calendar.categories).find(function(c){ return c.id===id; }); }
 function calDayInfo(dateStr){
@@ -12041,6 +12368,7 @@ async function init(){
   if(isWakeDisplay){ startWakeDisplay(); return; }
   splitActiveModeAtMidnight();
   if(crmMigratedOnLoad) persist('business');
+  remapConvertedLeadRefs();
   applyTheme();
   applySidebarState();
   document.getElementById('loading').style.display='none';

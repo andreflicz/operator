@@ -22,7 +22,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('retainer starts with call / form / videos', (await E("cycles()[0].steps[0].checklist.map(i=>i.type).slice(0,3).join()"))==='meeting,form,video');
   check('established client not forced into a cycle', (await E("state.business.clients[0].cycleId"))===null);
   // editor: build a new cycle
-  await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="clients"]');
+  await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="lifecycle"]');
   await p.click('[data-action="openLifecycleEditor"]');
   await p.click('[data-action="cyNew"]');
   const cid = await E("ui.editingCycleId");
@@ -47,7 +47,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('undo delete', (await E("cycles().length"))===4);
   await p.click('[data-action="closeLifecycleEditor"]');
   // new client picks the cycle
-  await p.click('[data-action="openNewContact"][data-kind="client"]');
+  await p.click('#fabAdd');
   check('cycle picker in new client form (default preselected)', (await p.inputValue('#ncCycle'))===cid);
   await p.fill('#ncName','Zed'); await p.fill('#ncCompany','Zed Media'); await p.click('[data-action="saveNewContact"]');
   const zid = await E("state.business.clients.find(c=>c.business==='Zed Media').id");
@@ -72,13 +72,14 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('finish cycle → Onboarding client becomes Active', z.cycleDone===true && z.stage==='active', {done:z.cycleDone, stage:z.stage});
   await p.click('[data-action="closeClientModalAndSave"]');
   // put existing client Nina into the Retainer cycle from her page
-  await p.click('.crm-card[data-key="crm-c1"] .crm-card-main');
+  await p.click('[data-action="businessTab"][data-tab="clients"]');
+  await p.click('.cc2[data-key="cc2-c1"] .cc2-top');
   await p.selectOption('[data-cycle-assign="c1"]', await E("cycles().find(c=>c.name==='Retainer client').id"));
   check('assign cycle from client page', (await E("clientStep(state.business.clients[0]).label"))==='Onboarding');
   await p.click('[data-action="closeClientModalAndSave"]');
   // board grouped by cycle step + drag
-  await p.click('[data-action="crmGroup"][data-id="cycle"]');
-  await p.selectOption('[data-cycle-board]', await E("cycles().find(c=>c.name==='Retainer client').id"));
+  await p.click('[data-action="businessTab"][data-tab="lifecycle"]');
+  await p.click('[data-action="lcTabCycle"][data-id="'+(await E("cycles().find(c=>c.name==='Retainer client').id"))+'"]');
   check('board by cycle step: 4 steps + Done', (await p.$$('.crm-col')).length===5);
   const kickId = await E("cycles().find(c=>c.name==='Retainer client').steps[1].id");
   await p.evaluate((kickId) => {
@@ -96,13 +97,13 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('won lead starts the default cycle', (await E("clientCycle(state.business.clients.find(c=>c.fromLeadId==='p1')).id"))===cid);
   // Today panel
   await p.click('[data-action="nav"][data-view="today"]');
-  check('Client Next Steps lists cycle items', await p.isVisible('.lc-steps-card[data-key="lcs-c1"]'));
+  check('Client Next Steps lists cycle items', await p.isVisible('.hub-card[data-key="hub-c1"] .hub-step .lc-item'));
   await p.screenshot({path:OUT+'/cy-today.png'});
   await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="clients"]');
-  await p.click('[data-action="crmGroup"][data-id="stage"]');
-  await p.click('.crm-card[data-key="crm-c1"] .crm-card-main'); await p.waitForTimeout(300);
+  await p.click('.cc2[data-key="cc2-c1"] .cc2-top'); await p.waitForTimeout(300);
   await p.screenshot({path:OUT+'/cy-client.png'});
   await p.click('[data-action="closeClientModalAndSave"]');
+  await p.click('[data-action="businessTab"][data-tab="lifecycle"]');
   await p.click('[data-action="openLifecycleEditor"]'); await p.waitForTimeout(300);
   await p.screenshot({path:OUT+'/cy-editor.png'});
   await p.reload(); await p.waitForTimeout(400);
