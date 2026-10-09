@@ -17,7 +17,7 @@ function renderTodayHero(greeting){
       businessNameTagHtml()+
       '<div class="th-greet">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
       (p.bigClockOnToday ? '<div id="liveClockBig" class="cal-big-clock th-bigclock"></div>'+skyChipHtml() : '<div class="th-subrow"><div class="th-sub" id="liveClock"></div>'+skyChipHtml()+'</div>')+
-      '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: streak===0 ? 'Hit today\'s standard to start one' : (allDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Hit today\'s standard to keep it')})+'</div>'+
+      '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: streak===0 ? 'Hit today\'s standard to start one'+tip('The streak counts days in a row you hit Today\'s Standard — the deep-work target plus your checklist. Rest days you take off don\'t break it.') : (allDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Hit today\'s standard to keep it')})+'</div>'+
     '</div>'+
     '<div class="th-right">'+
       '<button class="lockin-cta" data-action="openLockInChooser" title="Lock in (L)">'+
@@ -29,8 +29,8 @@ function renderTodayHero(greeting){
         '<button class="th-btn" data-action="toggleNextPicker" data-where="hero"><span class="th-btn-i">&#128204;</span>'+(next ? 'Change next' : 'Pick next')+'</button>'+
         (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going — sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
         (evening ? '<button class="th-btn th-btn-night'+(ui.windDownOpen?' is-open':'')+'" data-action="toggleWindDown"><span class="th-btn-i">&#127769;</span>Wind down<span class="th-caret">&#9662;</span></button>' : '')+
-        dayOffButtonHtml()+
       '</div>'+
+      '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+holdModeBtnHtml('offtime', '&#127937;', 'Off-time')+dayOffButtonHtml()+'</div>'+
       nextPickerHtml('hero')+
       (evening && ui.windDownOpen ? '<div class="wind-drop" data-key="wind-drop">'+windDownTilesHtml()+'</div>' : '')+
     '</div>'+
@@ -39,8 +39,14 @@ function renderTodayHero(greeting){
 ACTIONS.toggleWindDown = function(){ ui.windDownOpen = !ui.windDownOpen; ui.nextPicker = null; renderView(); };
 // ---- Take Today Off: hold to confirm (a click alone does nothing but explain) ----
 function dayOffButtonHtml(){
-  return '<button class="th-btn dayoff-btn" data-hold="dayoff" title="Hold to take today off">'+
-    '<span class="dayoff-fill"></span><span class="th-btn-i dayoff-i">&#127796;</span><span class="dayoff-label">Day off</span><span class="dayoff-hint">hold</span>'+
+  return '<button class="th-mode dayoff-btn" data-hold="dayoff" title="Hold to take today off">'+
+    '<span class="dayoff-fill"></span><span class="th-mode-i">&#127796;</span><span class="dayoff-label">Day off</span><span class="dayoff-hint">hold</span>'+
+  '</button>';
+}
+// Shooting / Off-time sit next to Day off as small pills — hold to start, so a stray click never flips you into a mode.
+function holdModeBtnHtml(type, icon, label){
+  return '<button class="th-mode dayoff-btn th-mode-'+type+'" data-hold="mode" data-type="'+type+'" title="Hold to start '+label+'">'+
+    '<span class="dayoff-fill"></span><span class="th-mode-i">'+icon+'</span><span class="dayoff-label">'+label+'</span><span class="dayoff-hint">hold</span>'+
   '</button>';
 }
 let holdTimer = null, holdEl = null;
@@ -54,6 +60,7 @@ document.addEventListener('pointerdown', function(e){
     el.classList.remove('holding'); el.classList.add('held');
     holdTimer = null; holdEl = null;
     if(kind==='dayoff') setTimeout(function(){ toggleDayOff(); showToast('Today is a rest day — the streak is safe. Enjoy it.', {icon:'&#127796;'}); }, 180);
+    else if(kind==='mode') setTimeout(function(){ startMode(el.dataset.type); }, 180);
   }, 900);
 });
 function endHold(e){
@@ -108,20 +115,23 @@ function taskFromEl(el){
   const id = el && (el.getAttribute('data-task-id') || el.getAttribute('data-id'));
   return id ? state.tasks.items.find(function(t){ return t.id===id; }) : null;
 }
-function closeTaskMenu(){ const m = document.getElementById('taskCtxMenu'); if(m) m.remove(); }
+let taskMenuClosed = {id:null, at:0};
+function closeTaskMenu(){ const m = document.getElementById('taskCtxMenu'); if(m){ taskMenuClosed = {id:m.dataset.id, at:Date.now()}; m.remove(); } }
 function openTaskMenu(t, x, y){
   closeTaskMenu();
   const inSession = !!state.focus.activeSession;
   const isNext = (nextUpTask()||{}).id===t.id;
   const item = function(op, label, extra){ return '<button class="ctx-item'+(extra||'')+'" data-action="taskCtx" data-op="'+op+'" data-id="'+t.id+'">'+label+'</button>'; };
   const m = document.createElement('div');
-  m.id = 'taskCtxMenu'; m.className = 'ctx-menu';
+  m.id = 'taskCtxMenu'; m.className = 'ctx-menu'; m.dataset.id = t.id; m.dataset.at = Date.now();
   m.innerHTML = '<div class="ctx-title">'+escapeHtml(t.title)+'</div>'+
     (t.status!=='done' ? item('start', inSession ? '&#9654; Start timing now' : '&#128274; Lock in on this') : '')+
     (t.status!=='done' && !isNext ? item('next', '&#128204; Make it next up') : '')+
     item('edit', '&#9998; Edit…')+
-    (t.status!=='done' ? item('done', '&#10003; Mark done') : item('undo', '&#8634; Back to today'))+
-    (t.status==='backlog' ? item('today', '&rarr; Move to today') : t.status==='today' ? item('backlog', '&larr; Move to backlog') : '')+
+    (t.status==='done' ? item('undo', '&#8634; Back to today')
+      : t.ongoing ? (isOngoingDoneToday(t) ? item('undo', '&#8634; Undo — done for today') : item('done', '&#10003; Mark done for today'))
+      : item('done', '&#10003; Mark done'))+
+    (t.status==='backlog' ? item('today', '&rarr; Move to today') : t.status==='today' ? item('backlog', '&larr; Move back to '+(t.isVideoIdea?'video ideas':'backlog')) : '')+
     '<div class="ctx-sep"></div>'+
     '<div class="ctx-row"><span class="ctx-k">Due</span>'+item('dueToday','Today',' ctx-chip')+item('dueTomorrow','Tomorrow',' ctx-chip')+(t.deadline?item('dueClear','Clear',' ctx-chip'):'')+'</div>'+
     '<div class="ctx-row"><span class="ctx-k">Priority</span>'+['high','med','low'].map(function(pr){ return item('pri-'+pr, pr==='med'?'Med':pr[0].toUpperCase()+pr.slice(1), ' ctx-chip'+(t.priority===pr?' is-on':'')); }).join('')+'</div>'+
@@ -142,7 +152,14 @@ document.addEventListener('contextmenu', function(e){
 document.addEventListener('pointerdown', function(e){ const m = document.getElementById('taskCtxMenu'); if(m && !m.contains(e.target)) closeTaskMenu(); }, true);
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeTaskMenu(); });
 window.addEventListener('blur', closeTaskMenu);
-document.addEventListener('scroll', closeTaskMenu, true);
+document.addEventListener('scroll', function(){ const m = document.getElementById('taskCtxMenu'); if(m && Date.now()-Number(m.dataset.at||0) > 200) closeTaskMenu(); }, true);
+// The ⋯ on a task card opens the same menu, tucked under the button.
+ACTIONS.taskMenuBtn = function(el, e, id){
+  const t = state.tasks.items.find(function(x){ return x.id===id; }); if(!t) return;
+  if(taskMenuClosed.id===id && Date.now()-taskMenuClosed.at < 400) return; // this press just closed it
+  const r = el.getBoundingClientRect();
+  openTaskMenu(t, r.right-200, r.bottom+4);
+};
 ACTIONS.taskCtx = function(el, e, id){
   const t = state.tasks.items.find(function(x){ return x.id===id; });
   closeTaskMenu();

@@ -53,8 +53,9 @@ const SP = require('./common.js').OUT;
   // Focus tasks: mini move controls + compact video ideas
   await p.click('[data-action="nav"][data-view="focus"]');
   check('FAB = add task', (await p.getAttribute('#fabAdd','title'))==='Add task');
-  check('minimal move control on today card', await p.isVisible('.task-card[data-id="t1"] .mini-move'));
-  await p.click('.task-card[data-id="t1"] .mini-move');
+  check('card actions tucked into the ⋯ menu', await p.isVisible('.task-card[data-id="t1"] .card-more') && (await p.$$('.task-card .mini-move-row')).length===0);
+  await p.click('.task-card[data-id="t1"] .card-more');
+  await p.click('#taskCtxMenu [data-op="backlog"]');
   check('moved to backlog', await p.evaluate(() => window.__op.state.tasks.items.find(t=>t.id==='t1').status)==='backlog');
   await p.click('[data-action="focusTasksSubTab"][data-tab="videoIdeas"]');
   check('FAB = video idea', (await p.getAttribute('#fabAdd','title'))==='Add video idea');

@@ -1546,6 +1546,34 @@
   .task-column.is-car{ border:none !important; background:none !important; padding:0 !important; min-height:0 !important; max-height:none !important; overflow:visible !important; }
   .carousel.is-loop > .car-track{ scroll-snap-type:none; }
   @media (max-width:900px){ .carousel.bleed{ margin-left:-16px; margin-right:-16px; } .carousel.bleed > .car-track{ padding-left:16px; padding-right:16px; } }
+  /* ---- round 6b: one progress panel, quieter sky line, small hold-to-start modes ---- */
+  .pg-card{ display:grid; grid-template-columns:minmax(260px,1fr) auto; gap:0; padding:0; align-items:stretch; overflow:hidden; }
+  .pg-card .pg-week{ padding:16px 20px; display:flex; flex-direction:column; min-width:0; }
+  .pg-card .pg-week .wk-bars{ flex:1; min-height:120px; height:auto; }
+  .pg-card .pg-heat{ padding:16px 20px; border-left:1px solid var(--border); flex-direction:column; align-items:flex-start; gap:14px; flex-wrap:nowrap; overflow:visible; }
+  .pg-card .pg-heat .hm-stats{ width:100%; flex:none; grid-template-columns:repeat(3, 1fr); min-width:0; gap:12px; }
+  .pg-card .pg-heat .hm-stat .stat-tile-v{ font-size:18px; }
+  .pg-card .pg-heat .hm-cell{ width:13px; height:13px; }
+  .pg-card .pg-heat .hm-grid, .pg-card .pg-heat .hm-col{ gap:3px; }
+  @media (max-width:1100px){ .pg-card{ grid-template-columns:1fr; } .pg-card .pg-heat{ border-left:none; border-top:1px solid var(--border); } }
+  .sky-chip{ font-size:11.5px; gap:5px; padding:1px 8px 1px 5px; border:none; background:rgba(var(--ink),.045); color:var(--text-dim); line-height:18px; }
+  .sky-chip b{ font-weight:600; color:var(--text-dim); }
+  .sky-chip-i{ font-size:12px; }
+  .th-subrow{ gap:8px; }
+  .th-modes{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+  .th-mode.dayoff-btn{ border-radius:999px; padding:4px 11px 4px 8px; font-size:12px; font-weight:600; gap:6px; color:var(--text-dim); border-color:var(--border); background:rgba(var(--ink),.025); box-shadow:none; }
+  .th-mode.dayoff-btn:hover{ color:var(--text); transform:translateY(-1px); }
+  .th-mode-i{ position:relative; font-size:12.5px; line-height:1; }
+  .th-mode .dayoff-hint{ font-size:9.5px; padding:0 4px; }
+  .th-mode.dayoff-btn[data-hold="dayoff"]:hover{ border-color:rgba(232,162,61,.6); }
+  .th-mode-shooting:hover{ border-color:rgba(179,157,219,.6) !important; }
+  .th-mode-shooting .dayoff-fill{ background:linear-gradient(90deg, rgba(179,157,219,.3), rgba(179,157,219,.5)); }
+  .th-mode-offtime .dayoff-fill{ background:linear-gradient(90deg, rgba(var(--ink),.12), rgba(var(--ink),.22)); }
+  .th-mode.held{ color:var(--text) !important; }
+  .task-card .card-more{ margin-left:auto; flex:none; width:24px; height:22px; border-radius:7px; border:1px solid transparent; background:transparent; color:var(--text-faint); font-size:16px; line-height:1; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; opacity:.55; transition:opacity .15s, background .15s, border-color .15s; padding:0; }
+  .task-card:hover .card-more{ opacity:1; }
+  .task-card .card-more:hover{ background:rgba(var(--ink),.07); border-color:var(--border); color:var(--text); }
+  @media (hover:none){ .task-card .card-more{ opacity:1; } }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -1902,8 +1930,7 @@ const PANEL_DEFS = [
   {id:'tasks', label:"Today's Tasks"},
   {id:'vision', label:'Vision Board'},
   {id:'agenda', label:'Today — timeline of events, deadlines & alarms'},
-  {id:'week', label:'This Week — deep work per day'},
-  {id:'heatmap', label:'Consistency — 16-week heatmap'},
+  {id:'week', label:'This Week & Consistency — deep work per day + 6-month heatmap'},
   {id:'why', label:'Your Why'}
 ];
 const SMALL_PANELS = ['focusMini', 'calendarMini']; // journal is full-width now that it sits near the top
@@ -3066,6 +3093,8 @@ function normalizeDashboardPanels(d){
   if(!d.v2PanelsAdded){ moveAfter('agenda', 'vision', 1); moveAfter('week', 'goals', d.order.length); moveAfter('heatmap', 'week', d.order.length); moveAfter('why', 'heatmap', d.order.length); d.v2PanelsAdded = true; }
   if(!d.agendaOff){ d.enabled.agenda = false; d.agendaOff = true; }
   if(!d.reachOutAdded){ moveAfter('clientHub', 'journal', 1); d.reachOutAdded = true; d.clientStepsAdded = true; }
+  // This Week and Consistency became one panel: it shows if either one was showing.
+  if(!d.progressMerged){ if(d.enabled.week===false && d.enabled.heatmap!==false) d.enabled.week = true; delete d.enabled.heatmap; d.progressMerged = true; }
   return d;
 }
 function normalizeModes(m){
@@ -3859,7 +3888,7 @@ function taskCard(t){
   const cat = t.categoryId ? taskCategoryById(t.categoryId) : null;
   const whiteAccent = t.isVideoIdea===true;
   return '<div class="task-card '+(t.status==='done'?'done':'')+(t.ongoing?' ongoing-task-card':'')+(selected?' card-selected':'')+(isCurrent?' current-task-active':'')+(pending?' just-completed':'')+(isStaged?' staged-task-card':'')+(whiteAccent?' video-idea-card':'')+'" data-action="'+(ui.taskSelectMode?'toggleTaskSelect':'openTaskEditModal')+'" data-id="'+t.id+'" style="cursor:pointer;'+(cat && !whiteAccent?'border-left:3px solid '+cat.color+';':'')+'" '+(draggable?'draggable="true" data-task-id="'+t.id+'"':'')+'>'+
-    '<div class="row" style="justify-content:space-between;">'+(ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+(t.isVideoIdea?'':priorityTag(t.priority))+(isCurrent?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">'+currentTaskLabel()+'</span>':'')+(isStaged?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">&#128204; Up Next</span>':'')+(t.ongoing?'<span class="tag tag-ongoing">&#128204; Ongoing</span>':'')+(doneToday?'<span class="tag tag-good">&#10003; Done today</span>':'')+'</div>'+
+    '<div class="row" style="justify-content:space-between;">'+(ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+(t.isVideoIdea?'':priorityTag(t.priority))+(isCurrent?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">'+currentTaskLabel()+'</span>':'')+(isStaged?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">&#128204; Up Next</span>':'')+(t.ongoing?'<span class="tag tag-ongoing">&#128204; Ongoing</span>':'')+(doneToday?'<span class="tag tag-good">&#10003; Done today</span>':'')+(ui.taskSelectMode?'':'<button class="card-more" data-action="taskMenuBtn" data-id="'+t.id+'" title="More — or right-click the card" aria-label="More actions">&#8943;</button>')+'</div>'+
     '<div class="task-card-title">'+escapeHtml(t.title)+'</div>'+
     (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     (t.isVideoIdea && t.videoType ? '<div style="margin-top:2px;"><span class="tag" style="background:rgba(var(--ink),.1);color:var(--text);">'+escapeHtml((taskVideoTypeById(t.videoType)||{}).label||'')+'</span></div>' : '')+
@@ -3869,9 +3898,6 @@ function taskCard(t){
       clientTagsHtml(t.clients)+
       (t.deadline ? deadlineTag(t) : '')+
     '</div>'+
-    (t.status==='backlog' ? '<div class="mini-move-row"><button class="mini-move mini-move-today" data-action="pullSpecificFromBacklog" data-id="'+t.id+'">+ Move to today</button></div>' : '')+
-    (t.status==='today' ? '<div class="mini-move-row"><button class="mini-move" data-action="moveTaskToBacklog" data-id="'+t.id+'">&larr; Move back to '+(t.isVideoIdea?'video ideas':'backlog')+'</button></div>' : '')+
-    (t.ongoing ? '<div class="row" style="margin-top:8px;"><button class="btn btn-sm '+(doneToday?'btn-ghost':'btn-good')+'" data-action="'+(doneToday?'undoTask':'completeTask')+'" data-id="'+t.id+'" style="width:100%;">'+(doneToday?'Undo — done for today':'&#10003; Mark done for today')+'</button></div>' : '')+
   '</div>';
 }
 function finishedTaskRow(t){
@@ -4411,14 +4437,10 @@ function renderStandardsWidget(){
     yesterdayStandardsFixupHtml()+
     '</div>';
 }
-// Lock In lives in the header — this panel is just the other modes, in one tidy row.
+// The mode buttons live in the hero now (hold to start) — this panel only shows a running mode.
 function renderFocusMiniPanel(){
   if(state.modes.active) return '<div class="section">'+renderLockInCard()+'</div>';
-  return '<div class="section"><div class="card modes-strip">'+
-    '<button class="btn shooting-btn" data-action="startMode" data-type="shooting">&#127916; Shooting</button>'+
-    '<button class="btn training-btn" data-action="startMode" data-type="training">&#128218; Training</button>'+
-    '<button class="btn offtime-btn" data-action="startMode" data-type="offtime">&#127937; Off-time</button>'+
-  '</div></div>';
+  return '';
 }
 function renderRemindersMiniPanel(){
   const upcoming = arr(state.focus.reminders).slice().sort(function(a,b){ return (a.date+String(a.time||'')).localeCompare(b.date+String(b.time||'')); });
@@ -4452,8 +4474,8 @@ const PANEL_RENDERERS = {
   clientHub: function(){ return renderClientHubPanel(); },
   vision: function(){ return renderVisionPanel(); },
   agenda: renderAgendaPanel,
-  week: renderWeekPanel,
-  heatmap: renderHeatmapPanel,
+  week: renderProgressPanel,
+  heatmap: function(){ return ''; },
   why: renderWhyPanel
 };
 function clientOpsDeliverableRow(clientId, d){
@@ -4804,6 +4826,10 @@ function renderAgendaPanel(){
 }
 // ---- this week: deep work per day ----
 function renderWeekPanel(){
+  return '<div class="section week-panel"><div class="section-title">This week<span class="view-all-link" data-action="goToAnalytics">Analytics &rarr;</span></div>'+
+    '<div class="card wk-card">'+weekBlockHtml()+'</div></div>';
+}
+function weekBlockHtml(){
   const ws = startOfWeekStr(todayStr());
   const target = state.standards.deepWorkTargetMinutes || 180;
   const days = []; let total = 0, best = 0;
@@ -4814,8 +4840,7 @@ function renderWeekPanel(){
   }
   const scale = Math.max(target*1.2, best, 60);
   const names = ['M','T','W','T','F','S','S'];
-  return '<div class="section week-panel"><div class="section-title">This week<span class="view-all-link" data-action="goToAnalytics">Analytics &rarr;</span></div>'+
-    '<div class="card wk-card">'+
+  return ''+
       '<div class="wk-top"><div><div class="stat-tile-v">'+fmtHours(total)+'</div><div class="stat-tile-sub">deep work this week</div></div>'+
         '<div style="text-align:right;"><div class="stat-tile-v" style="font-size:18px;">'+days.filter(function(x){ return x.m>=target; }).length+'<span class="stat-tile-of">/7</span></div><div class="stat-tile-sub">days on target</div></div></div>'+
       '<div class="wk-bars"><div class="wk-target" style="bottom:'+(target/scale*100)+'%;" title="Daily target '+fmtDurationLabel(target)+'"></div>'+
@@ -4825,12 +4850,15 @@ function renderWeekPanel(){
             '<div class="wk-bar-wrap"><div class="wk-bar'+(x.m>=target?' hit':'')+'" style="height:'+Math.max(x.m?3:0, x.m/scale*100)+'%"></div></div>'+
             '<div class="wk-day">'+names[i]+'</div></div>';
         }).join('')+
-      '</div>'+
-    '</div></div>';
+      '</div>';
 }
 ACTIONS.goToAnalytics = function(){ ui.view='focus'; ui.focusTab='analytics'; renderView(); };
 // ---- consistency heatmap (last 26 weeks) + streak stats ----
 function renderHeatmapPanel(){
+  return '<div class="section heatmap-panel"><div class="section-title">Consistency</div>'+
+    '<div class="card hm-card">'+heatBlockHtml()+'</div></div>';
+}
+function heatBlockHtml(){
   const target = state.standards.deepWorkTargetMinutes || 180;
   const WEEKS = 26;
   const start = addDays(startOfWeekStr(todayStr()), -(WEEKS-1)*7);
@@ -4852,16 +4880,19 @@ function renderHeatmapPanel(){
     cols += '<div class="hm-col">'+cells+'</div>';
   }
   const stat = function(v, k){ return '<div class="hm-stat"><div class="stat-tile-v">'+v+'</div><div class="stat-tile-sub">'+k+'</div></div>'; };
-  return '<div class="section heatmap-panel"><div class="section-title">Consistency</div>'+
-    '<div class="card hm-card">'+
+  return ''+
       '<div class="hm-main"><div class="hm-grid">'+cols+'</div>'+
         '<div class="hm-foot"><span>Last 6 months'+tip('Darker = more deep work that day. Outlined days hit the standard.')+'</span><span class="hm-legend">less <span class="hm-cell hm-1"></span><span class="hm-cell hm-2"></span><span class="hm-cell hm-3"></span><span class="hm-cell hm-4"></span> more</span></div></div>'+
       '<div class="hm-stats">'+
         stat(counted ? Math.round(hit/counted*100)+'%' : '—', 'days the standard was hit')+
         stat(best+'d', 'longest run on target')+
         stat(worked ? fmtHours(Math.round(totalMin/worked)) : '—', 'average on days you worked')+
-      '</div>'+
-    '</div></div>';
+      '</div>';
+}
+// This week's bars and the 6-month heatmap, side by side in one panel.
+function renderProgressPanel(){
+  return '<div class="section progress-panel"><div class="section-title">This week<span class="view-all-link" data-action="goToAnalytics">Analytics &rarr;</span></div>'+
+    '<div class="card pg-card"><div class="pg-week wk-card">'+weekBlockHtml()+'</div><div class="pg-heat hm-card">'+heatBlockHtml()+'</div></div></div>';
 }
 // ---- your why ----
 function renderWhyPanel(){
@@ -4926,6 +4957,24 @@ document.addEventListener('scroll', function(e){
   if(!carRaf) carRaf = requestAnimationFrame(function(){ carRaf = 0; carPending.forEach(carUpdate); carPending.clear(); });
 }, {capture:true, passive:true});
 window.addEventListener('resize', function(){ requestAnimationFrame(carUpdateAll); });
+// A plain mouse wheel moves a carousel row sideways while the pointer is over it. A page scroll
+// already under way glides straight past (so rows never trap you mid-page), and a row that has
+// hit its end hands the wheel back to the page.
+let carPageWheelAt = 0;
+document.addEventListener('wheel', function(e){
+  if(e.ctrlKey) return;
+  const track = e.target.closest && e.target.closest('.car-track');
+  if(!track){ carPageWheelAt = e.timeStamp; return; }
+  if(Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey) return;   // trackpad sideways / shift-wheel scroll natively
+  if(e.timeStamp - carPageWheelAt < 350){ carPageWheelAt = e.timeStamp; return; }
+  const dy = e.deltaMode===1 ? e.deltaY*40 : e.deltaY;
+  const max = track.scrollWidth - track.clientWidth;
+  if(max <= 2) return;
+  if(!track.dataset.loop && ((dy < 0 && track.scrollLeft <= 1) || (dy > 0 && track.scrollLeft >= max-1))) return;
+  e.preventDefault();
+  if(Math.abs(dy) >= 50) track.scrollBy({left:dy*1.6, behavior:'smooth'});   // notched mouse wheel: glide
+  else track.scrollLeft += dy;                                              // trackpad: follow the fingers
+}, {passive:false, capture:true});
 let carHookRaf = 0;
 afterRenderHooks.push(function(){ if(!carHookRaf && document.querySelector('.car-track')) carHookRaf = requestAnimationFrame(function(){ carHookRaf = 0; carUpdateAll(); }); });
 ACTIONS.carouselStep = function(el){
@@ -5078,7 +5127,8 @@ function renderToday(){
     if(SMALL_PANELS.indexOf(pid)>=0){
       const rowPanels = [];
       while(i<enabledOrder.length && SMALL_PANELS.indexOf(enabledOrder[i])>=0){ rowPanels.push(enabledOrder[i]); i++; }
-      panelsHtml += '<div class="small-panels-row section">'+rowPanels.map(function(rpid){ const fn=PANEL_RENDERERS[rpid]; return fn ? '<div class="small-panel-box">'+fn()+'</div>' : ''; }).join('')+'</div>';
+      const boxes = rowPanels.map(function(rpid){ const fn=PANEL_RENDERERS[rpid], h = fn ? fn() : ''; return h ? '<div class="small-panel-box">'+h+'</div>' : ''; }).join('');
+      if(boxes) panelsHtml += '<div class="small-panels-row section">'+boxes+'</div>';
     } else {
       const fn = PANEL_RENDERERS[pid];
       if(fn) panelsHtml += fn();
@@ -5110,7 +5160,7 @@ function renderTodayHero(greeting){
       businessNameTagHtml()+
       '<div class="th-greet">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
       (p.bigClockOnToday ? '<div id="liveClockBig" class="cal-big-clock th-bigclock"></div>'+skyChipHtml() : '<div class="th-subrow"><div class="th-sub" id="liveClock"></div>'+skyChipHtml()+'</div>')+
-      '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: streak===0 ? 'Hit today\'s standard to start one' : (allDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Hit today\'s standard to keep it')})+'</div>'+
+      '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: streak===0 ? 'Hit today\'s standard to start one'+tip('The streak counts days in a row you hit Today\'s Standard — the deep-work target plus your checklist. Rest days you take off don\'t break it.') : (allDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Hit today\'s standard to keep it')})+'</div>'+
     '</div>'+
     '<div class="th-right">'+
       '<button class="lockin-cta" data-action="openLockInChooser" title="Lock in (L)">'+
@@ -5122,8 +5172,8 @@ function renderTodayHero(greeting){
         '<button class="th-btn" data-action="toggleNextPicker" data-where="hero"><span class="th-btn-i">&#128204;</span>'+(next ? 'Change next' : 'Pick next')+'</button>'+
         (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going — sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
         (evening ? '<button class="th-btn th-btn-night'+(ui.windDownOpen?' is-open':'')+'" data-action="toggleWindDown"><span class="th-btn-i">&#127769;</span>Wind down<span class="th-caret">&#9662;</span></button>' : '')+
-        dayOffButtonHtml()+
       '</div>'+
+      '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+holdModeBtnHtml('offtime', '&#127937;', 'Off-time')+dayOffButtonHtml()+'</div>'+
       nextPickerHtml('hero')+
       (evening && ui.windDownOpen ? '<div class="wind-drop" data-key="wind-drop">'+windDownTilesHtml()+'</div>' : '')+
     '</div>'+
@@ -5132,8 +5182,14 @@ function renderTodayHero(greeting){
 ACTIONS.toggleWindDown = function(){ ui.windDownOpen = !ui.windDownOpen; ui.nextPicker = null; renderView(); };
 // ---- Take Today Off: hold to confirm (a click alone does nothing but explain) ----
 function dayOffButtonHtml(){
-  return '<button class="th-btn dayoff-btn" data-hold="dayoff" title="Hold to take today off">'+
-    '<span class="dayoff-fill"></span><span class="th-btn-i dayoff-i">&#127796;</span><span class="dayoff-label">Day off</span><span class="dayoff-hint">hold</span>'+
+  return '<button class="th-mode dayoff-btn" data-hold="dayoff" title="Hold to take today off">'+
+    '<span class="dayoff-fill"></span><span class="th-mode-i">&#127796;</span><span class="dayoff-label">Day off</span><span class="dayoff-hint">hold</span>'+
+  '</button>';
+}
+// Shooting / Off-time sit next to Day off as small pills — hold to start, so a stray click never flips you into a mode.
+function holdModeBtnHtml(type, icon, label){
+  return '<button class="th-mode dayoff-btn th-mode-'+type+'" data-hold="mode" data-type="'+type+'" title="Hold to start '+label+'">'+
+    '<span class="dayoff-fill"></span><span class="th-mode-i">'+icon+'</span><span class="dayoff-label">'+label+'</span><span class="dayoff-hint">hold</span>'+
   '</button>';
 }
 let holdTimer = null, holdEl = null;
@@ -5147,6 +5203,7 @@ document.addEventListener('pointerdown', function(e){
     el.classList.remove('holding'); el.classList.add('held');
     holdTimer = null; holdEl = null;
     if(kind==='dayoff') setTimeout(function(){ toggleDayOff(); showToast('Today is a rest day — the streak is safe. Enjoy it.', {icon:'&#127796;'}); }, 180);
+    else if(kind==='mode') setTimeout(function(){ startMode(el.dataset.type); }, 180);
   }, 900);
 });
 function endHold(e){
@@ -5201,20 +5258,23 @@ function taskFromEl(el){
   const id = el && (el.getAttribute('data-task-id') || el.getAttribute('data-id'));
   return id ? state.tasks.items.find(function(t){ return t.id===id; }) : null;
 }
-function closeTaskMenu(){ const m = document.getElementById('taskCtxMenu'); if(m) m.remove(); }
+let taskMenuClosed = {id:null, at:0};
+function closeTaskMenu(){ const m = document.getElementById('taskCtxMenu'); if(m){ taskMenuClosed = {id:m.dataset.id, at:Date.now()}; m.remove(); } }
 function openTaskMenu(t, x, y){
   closeTaskMenu();
   const inSession = !!state.focus.activeSession;
   const isNext = (nextUpTask()||{}).id===t.id;
   const item = function(op, label, extra){ return '<button class="ctx-item'+(extra||'')+'" data-action="taskCtx" data-op="'+op+'" data-id="'+t.id+'">'+label+'</button>'; };
   const m = document.createElement('div');
-  m.id = 'taskCtxMenu'; m.className = 'ctx-menu';
+  m.id = 'taskCtxMenu'; m.className = 'ctx-menu'; m.dataset.id = t.id; m.dataset.at = Date.now();
   m.innerHTML = '<div class="ctx-title">'+escapeHtml(t.title)+'</div>'+
     (t.status!=='done' ? item('start', inSession ? '&#9654; Start timing now' : '&#128274; Lock in on this') : '')+
     (t.status!=='done' && !isNext ? item('next', '&#128204; Make it next up') : '')+
     item('edit', '&#9998; Edit…')+
-    (t.status!=='done' ? item('done', '&#10003; Mark done') : item('undo', '&#8634; Back to today'))+
-    (t.status==='backlog' ? item('today', '&rarr; Move to today') : t.status==='today' ? item('backlog', '&larr; Move to backlog') : '')+
+    (t.status==='done' ? item('undo', '&#8634; Back to today')
+      : t.ongoing ? (isOngoingDoneToday(t) ? item('undo', '&#8634; Undo — done for today') : item('done', '&#10003; Mark done for today'))
+      : item('done', '&#10003; Mark done'))+
+    (t.status==='backlog' ? item('today', '&rarr; Move to today') : t.status==='today' ? item('backlog', '&larr; Move back to '+(t.isVideoIdea?'video ideas':'backlog')) : '')+
     '<div class="ctx-sep"></div>'+
     '<div class="ctx-row"><span class="ctx-k">Due</span>'+item('dueToday','Today',' ctx-chip')+item('dueTomorrow','Tomorrow',' ctx-chip')+(t.deadline?item('dueClear','Clear',' ctx-chip'):'')+'</div>'+
     '<div class="ctx-row"><span class="ctx-k">Priority</span>'+['high','med','low'].map(function(pr){ return item('pri-'+pr, pr==='med'?'Med':pr[0].toUpperCase()+pr.slice(1), ' ctx-chip'+(t.priority===pr?' is-on':'')); }).join('')+'</div>'+
@@ -5235,7 +5295,14 @@ document.addEventListener('contextmenu', function(e){
 document.addEventListener('pointerdown', function(e){ const m = document.getElementById('taskCtxMenu'); if(m && !m.contains(e.target)) closeTaskMenu(); }, true);
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeTaskMenu(); });
 window.addEventListener('blur', closeTaskMenu);
-document.addEventListener('scroll', closeTaskMenu, true);
+document.addEventListener('scroll', function(){ const m = document.getElementById('taskCtxMenu'); if(m && Date.now()-Number(m.dataset.at||0) > 200) closeTaskMenu(); }, true);
+// The ⋯ on a task card opens the same menu, tucked under the button.
+ACTIONS.taskMenuBtn = function(el, e, id){
+  const t = state.tasks.items.find(function(x){ return x.id===id; }); if(!t) return;
+  if(taskMenuClosed.id===id && Date.now()-taskMenuClosed.at < 400) return; // this press just closed it
+  const r = el.getBoundingClientRect();
+  openTaskMenu(t, r.right-200, r.bottom+4);
+};
 ACTIONS.taskCtx = function(el, e, id){
   const t = state.tasks.items.find(function(x){ return x.id===id; });
   closeTaskMenu();
@@ -6919,7 +6986,6 @@ function renderLockInCard(){
     '<button class="btn btn-good lock-in-btn" data-action="openLockInChooser">&#128274; LOCK IN</button>'+
     '<div class="mode-btn-row">'+
       '<button class="btn shooting-btn" data-action="startMode" data-type="shooting">&#127916; SHOOTING</button>'+
-      '<button class="btn training-btn" data-action="startMode" data-type="training">&#128218; TRAINING</button>'+
     '</div>'+
     '<button class="btn offtime-btn" style="margin-top:12px;" data-action="startMode" data-type="offtime">&#127937; OFF-TIME MODE</button>'+
   '</div>';

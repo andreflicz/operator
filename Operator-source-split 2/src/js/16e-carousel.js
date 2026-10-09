@@ -47,6 +47,24 @@ document.addEventListener('scroll', function(e){
   if(!carRaf) carRaf = requestAnimationFrame(function(){ carRaf = 0; carPending.forEach(carUpdate); carPending.clear(); });
 }, {capture:true, passive:true});
 window.addEventListener('resize', function(){ requestAnimationFrame(carUpdateAll); });
+// A plain mouse wheel moves a carousel row sideways while the pointer is over it. A page scroll
+// already under way glides straight past (so rows never trap you mid-page), and a row that has
+// hit its end hands the wheel back to the page.
+let carPageWheelAt = 0;
+document.addEventListener('wheel', function(e){
+  if(e.ctrlKey) return;
+  const track = e.target.closest && e.target.closest('.car-track');
+  if(!track){ carPageWheelAt = e.timeStamp; return; }
+  if(Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey) return;   // trackpad sideways / shift-wheel scroll natively
+  if(e.timeStamp - carPageWheelAt < 350){ carPageWheelAt = e.timeStamp; return; }
+  const dy = e.deltaMode===1 ? e.deltaY*40 : e.deltaY;
+  const max = track.scrollWidth - track.clientWidth;
+  if(max <= 2) return;
+  if(!track.dataset.loop && ((dy < 0 && track.scrollLeft <= 1) || (dy > 0 && track.scrollLeft >= max-1))) return;
+  e.preventDefault();
+  if(Math.abs(dy) >= 50) track.scrollBy({left:dy*1.6, behavior:'smooth'});   // notched mouse wheel: glide
+  else track.scrollLeft += dy;                                              // trackpad: follow the fingers
+}, {passive:false, capture:true});
 let carHookRaf = 0;
 afterRenderHooks.push(function(){ if(!carHookRaf && document.querySelector('.car-track')) carHookRaf = requestAnimationFrame(function(){ carHookRaf = 0; carUpdateAll(); }); });
 ACTIONS.carouselStep = function(el){

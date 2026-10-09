@@ -25,9 +25,9 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('picking a backlog task moves it to today and makes it next', await E("state.tasks.items.find(t=>t.id==='t3').status")==='today' && (await p.textContent('.lockin-sub')).includes('Script hooks'));
   check('next pick is saved', await E("state.focus.nextTaskId")==='t3');
   // take today off: a click only nudges, holding confirms
-  await p.click('.dayoff-btn');
+  await p.click('[data-hold="dayoff"]');
   check('a click alone doesn\'t take the day off', !(await E("isDayOff(todayStr())")));
-  const box = await p.locator('.dayoff-btn').boundingBox();
+  const box = await p.locator('[data-hold="dayoff"]').boundingBox();
   await p.mouse.move(box.x+box.width/2, box.y+box.height/2); await p.mouse.down();
   await p.clock.runFor(1200); await p.waitForTimeout(250);
   await p.mouse.up();
@@ -55,8 +55,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('[data-action="nav"][data-view="today"]');
   check('morning: no wind down, streak in the hero', !(await p.isVisible('[data-action="toggleWindDown"]')) && await p.isVisible('.today-hero .streak-num'));
   check('Today timeline panel is off', (await p.$$('.agenda-panel')).length===0);
-  await p.locator('.week-panel').scrollIntoViewIfNeeded();
-  check('week chart, heatmap and why panels', await p.isVisible('.week-panel .wk-bars') && (await p.$$('.heatmap-panel .hm-cell')).length>100 && (await p.textContent('.why-panel')).includes('Freedom of time'));
+  await p.locator('.progress-panel').scrollIntoViewIfNeeded();
+  check('week chart + heatmap in one panel, and why panel', await p.isVisible('.progress-panel .wk-bars') && (await p.$$('.progress-panel .hm-cell')).length>100 && (await p.$$('.heatmap-panel, .week-panel')).length===0 && (await p.textContent('.why-panel')).includes('Freedom of time'));
   await p.locator('.biz-card').scrollIntoViewIfNeeded();
   check('business snapshot redesigned', await p.isVisible('.biz-card .biz-mrr'));
   check('panel subtitles hidden', await p.evaluate(() => [...document.querySelectorAll('.today-panels .section-title > .kpi-sub')].every(e => getComputedStyle(e).display==='none')));

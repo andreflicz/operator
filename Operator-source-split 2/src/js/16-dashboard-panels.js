@@ -255,14 +255,10 @@ function renderStandardsWidget(){
     yesterdayStandardsFixupHtml()+
     '</div>';
 }
-// Lock In lives in the header — this panel is just the other modes, in one tidy row.
+// The mode buttons live in the hero now (hold to start) — this panel only shows a running mode.
 function renderFocusMiniPanel(){
   if(state.modes.active) return '<div class="section">'+renderLockInCard()+'</div>';
-  return '<div class="section"><div class="card modes-strip">'+
-    '<button class="btn shooting-btn" data-action="startMode" data-type="shooting">&#127916; Shooting</button>'+
-    '<button class="btn training-btn" data-action="startMode" data-type="training">&#128218; Training</button>'+
-    '<button class="btn offtime-btn" data-action="startMode" data-type="offtime">&#127937; Off-time</button>'+
-  '</div></div>';
+  return '';
 }
 function renderRemindersMiniPanel(){
   const upcoming = arr(state.focus.reminders).slice().sort(function(a,b){ return (a.date+String(a.time||'')).localeCompare(b.date+String(b.time||'')); });
@@ -296,8 +292,8 @@ const PANEL_RENDERERS = {
   clientHub: function(){ return renderClientHubPanel(); },
   vision: function(){ return renderVisionPanel(); },
   agenda: renderAgendaPanel,
-  week: renderWeekPanel,
-  heatmap: renderHeatmapPanel,
+  week: renderProgressPanel,
+  heatmap: function(){ return ''; },
   why: renderWhyPanel
 };
 function clientOpsDeliverableRow(clientId, d){

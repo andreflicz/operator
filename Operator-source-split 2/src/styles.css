@@ -1537,3 +1537,31 @@
   .task-column.is-car{ border:none !important; background:none !important; padding:0 !important; min-height:0 !important; max-height:none !important; overflow:visible !important; }
   .carousel.is-loop > .car-track{ scroll-snap-type:none; }
   @media (max-width:900px){ .carousel.bleed{ margin-left:-16px; margin-right:-16px; } .carousel.bleed > .car-track{ padding-left:16px; padding-right:16px; } }
+  /* ---- round 6b: one progress panel, quieter sky line, small hold-to-start modes ---- */
+  .pg-card{ display:grid; grid-template-columns:minmax(260px,1fr) auto; gap:0; padding:0; align-items:stretch; overflow:hidden; }
+  .pg-card .pg-week{ padding:16px 20px; display:flex; flex-direction:column; min-width:0; }
+  .pg-card .pg-week .wk-bars{ flex:1; min-height:120px; height:auto; }
+  .pg-card .pg-heat{ padding:16px 20px; border-left:1px solid var(--border); flex-direction:column; align-items:flex-start; gap:14px; flex-wrap:nowrap; overflow:visible; }
+  .pg-card .pg-heat .hm-stats{ width:100%; flex:none; grid-template-columns:repeat(3, 1fr); min-width:0; gap:12px; }
+  .pg-card .pg-heat .hm-stat .stat-tile-v{ font-size:18px; }
+  .pg-card .pg-heat .hm-cell{ width:13px; height:13px; }
+  .pg-card .pg-heat .hm-grid, .pg-card .pg-heat .hm-col{ gap:3px; }
+  @media (max-width:1100px){ .pg-card{ grid-template-columns:1fr; } .pg-card .pg-heat{ border-left:none; border-top:1px solid var(--border); } }
+  .sky-chip{ font-size:11.5px; gap:5px; padding:1px 8px 1px 5px; border:none; background:rgba(var(--ink),.045); color:var(--text-dim); line-height:18px; }
+  .sky-chip b{ font-weight:600; color:var(--text-dim); }
+  .sky-chip-i{ font-size:12px; }
+  .th-subrow{ gap:8px; }
+  .th-modes{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+  .th-mode.dayoff-btn{ border-radius:999px; padding:4px 11px 4px 8px; font-size:12px; font-weight:600; gap:6px; color:var(--text-dim); border-color:var(--border); background:rgba(var(--ink),.025); box-shadow:none; }
+  .th-mode.dayoff-btn:hover{ color:var(--text); transform:translateY(-1px); }
+  .th-mode-i{ position:relative; font-size:12.5px; line-height:1; }
+  .th-mode .dayoff-hint{ font-size:9.5px; padding:0 4px; }
+  .th-mode.dayoff-btn[data-hold="dayoff"]:hover{ border-color:rgba(232,162,61,.6); }
+  .th-mode-shooting:hover{ border-color:rgba(179,157,219,.6) !important; }
+  .th-mode-shooting .dayoff-fill{ background:linear-gradient(90deg, rgba(179,157,219,.3), rgba(179,157,219,.5)); }
+  .th-mode-offtime .dayoff-fill{ background:linear-gradient(90deg, rgba(var(--ink),.12), rgba(var(--ink),.22)); }
+  .th-mode.held{ color:var(--text) !important; }
+  .task-card .card-more{ margin-left:auto; flex:none; width:24px; height:22px; border-radius:7px; border:1px solid transparent; background:transparent; color:var(--text-faint); font-size:16px; line-height:1; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; opacity:.55; transition:opacity .15s, background .15s, border-color .15s; padding:0; }
+  .task-card:hover .card-more{ opacity:1; }
+  .task-card .card-more:hover{ background:rgba(var(--ink),.07); border-color:var(--border); color:var(--text); }
+  @media (hover:none){ .task-card .card-more{ opacity:1; } }

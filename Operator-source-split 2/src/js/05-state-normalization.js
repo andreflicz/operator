@@ -398,6 +398,8 @@ function normalizeDashboardPanels(d){
   if(!d.v2PanelsAdded){ moveAfter('agenda', 'vision', 1); moveAfter('week', 'goals', d.order.length); moveAfter('heatmap', 'week', d.order.length); moveAfter('why', 'heatmap', d.order.length); d.v2PanelsAdded = true; }
   if(!d.agendaOff){ d.enabled.agenda = false; d.agendaOff = true; }
   if(!d.reachOutAdded){ moveAfter('clientHub', 'journal', 1); d.reachOutAdded = true; d.clientStepsAdded = true; }
+  // This Week and Consistency became one panel: it shows if either one was showing.
+  if(!d.progressMerged){ if(d.enabled.week===false && d.enabled.heatmap!==false) d.enabled.week = true; delete d.enabled.heatmap; d.progressMerged = true; }
   return d;
 }
 function normalizeModes(m){

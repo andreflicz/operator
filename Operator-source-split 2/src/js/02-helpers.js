@@ -138,8 +138,7 @@ const PANEL_DEFS = [
   {id:'tasks', label:"Today's Tasks"},
   {id:'vision', label:'Vision Board'},
   {id:'agenda', label:'Today — timeline of events, deadlines & alarms'},
-  {id:'week', label:'This Week — deep work per day'},
-  {id:'heatmap', label:'Consistency — 16-week heatmap'},
+  {id:'week', label:'This Week & Consistency — deep work per day + 6-month heatmap'},
   {id:'why', label:'Your Why'}
 ];
 const SMALL_PANELS = ['focusMini', 'calendarMini']; // journal is full-width now that it sits near the top

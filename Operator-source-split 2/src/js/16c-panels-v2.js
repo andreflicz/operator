@@ -135,6 +135,10 @@ function renderAgendaPanel(){
 }
 // ---- this week: deep work per day ----
 function renderWeekPanel(){
+  return '<div class="section week-panel"><div class="section-title">This week<span class="view-all-link" data-action="goToAnalytics">Analytics &rarr;</span></div>'+
+    '<div class="card wk-card">'+weekBlockHtml()+'</div></div>';
+}
+function weekBlockHtml(){
   const ws = startOfWeekStr(todayStr());
   const target = state.standards.deepWorkTargetMinutes || 180;
   const days = []; let total = 0, best = 0;
@@ -145,8 +149,7 @@ function renderWeekPanel(){
   }
   const scale = Math.max(target*1.2, best, 60);
   const names = ['M','T','W','T','F','S','S'];
-  return '<div class="section week-panel"><div class="section-title">This week<span class="view-all-link" data-action="goToAnalytics">Analytics &rarr;</span></div>'+
-    '<div class="card wk-card">'+
+  return ''+
       '<div class="wk-top"><div><div class="stat-tile-v">'+fmtHours(total)+'</div><div class="stat-tile-sub">deep work this week</div></div>'+
         '<div style="text-align:right;"><div class="stat-tile-v" style="font-size:18px;">'+days.filter(function(x){ return x.m>=target; }).length+'<span class="stat-tile-of">/7</span></div><div class="stat-tile-sub">days on target</div></div></div>'+
       '<div class="wk-bars"><div class="wk-target" style="bottom:'+(target/scale*100)+'%;" title="Daily target '+fmtDurationLabel(target)+'"></div>'+
@@ -156,12 +159,15 @@ function renderWeekPanel(){
             '<div class="wk-bar-wrap"><div class="wk-bar'+(x.m>=target?' hit':'')+'" style="height:'+Math.max(x.m?3:0, x.m/scale*100)+'%"></div></div>'+
             '<div class="wk-day">'+names[i]+'</div></div>';
         }).join('')+
-      '</div>'+
-    '</div></div>';
+      '</div>';
 }
 ACTIONS.goToAnalytics = function(){ ui.view='focus'; ui.focusTab='analytics'; renderView(); };
 // ---- consistency heatmap (last 26 weeks) + streak stats ----
 function renderHeatmapPanel(){
+  return '<div class="section heatmap-panel"><div class="section-title">Consistency</div>'+
+    '<div class="card hm-card">'+heatBlockHtml()+'</div></div>';
+}
+function heatBlockHtml(){
   const target = state.standards.deepWorkTargetMinutes || 180;
   const WEEKS = 26;
   const start = addDays(startOfWeekStr(todayStr()), -(WEEKS-1)*7);
@@ -183,16 +189,19 @@ function renderHeatmapPanel(){
     cols += '<div class="hm-col">'+cells+'</div>';
   }
   const stat = function(v, k){ return '<div class="hm-stat"><div class="stat-tile-v">'+v+'</div><div class="stat-tile-sub">'+k+'</div></div>'; };
-  return '<div class="section heatmap-panel"><div class="section-title">Consistency</div>'+
-    '<div class="card hm-card">'+
+  return ''+
       '<div class="hm-main"><div class="hm-grid">'+cols+'</div>'+
         '<div class="hm-foot"><span>Last 6 months'+tip('Darker = more deep work that day. Outlined days hit the standard.')+'</span><span class="hm-legend">less <span class="hm-cell hm-1"></span><span class="hm-cell hm-2"></span><span class="hm-cell hm-3"></span><span class="hm-cell hm-4"></span> more</span></div></div>'+
       '<div class="hm-stats">'+
         stat(counted ? Math.round(hit/counted*100)+'%' : '—', 'days the standard was hit')+
         stat(best+'d', 'longest run on target')+
         stat(worked ? fmtHours(Math.round(totalMin/worked)) : '—', 'average on days you worked')+
-      '</div>'+
-    '</div></div>';
+      '</div>';
+}
+// This week's bars and the 6-month heatmap, side by side in one panel.
+function renderProgressPanel(){
+  return '<div class="section progress-panel"><div class="section-title">This week<span class="view-all-link" data-action="goToAnalytics">Analytics &rarr;</span></div>'+
+    '<div class="card pg-card"><div class="pg-week wk-card">'+weekBlockHtml()+'</div><div class="pg-heat hm-card">'+heatBlockHtml()+'</div></div></div>';
 }
 // ---- your why ----
 function renderWhyPanel(){

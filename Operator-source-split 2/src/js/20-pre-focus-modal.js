@@ -98,7 +98,6 @@ function renderLockInCard(){
     '<button class="btn btn-good lock-in-btn" data-action="openLockInChooser">&#128274; LOCK IN</button>'+
     '<div class="mode-btn-row">'+
       '<button class="btn shooting-btn" data-action="startMode" data-type="shooting">&#127916; SHOOTING</button>'+
-      '<button class="btn training-btn" data-action="startMode" data-type="training">&#128218; TRAINING</button>'+
     '</div>'+
     '<button class="btn offtime-btn" style="margin-top:12px;" data-action="startMode" data-type="offtime">&#127937; OFF-TIME MODE</button>'+
   '</div>';

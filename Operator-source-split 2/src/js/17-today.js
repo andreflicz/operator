@@ -136,7 +136,8 @@ function renderToday(){
     if(SMALL_PANELS.indexOf(pid)>=0){
       const rowPanels = [];
       while(i<enabledOrder.length && SMALL_PANELS.indexOf(enabledOrder[i])>=0){ rowPanels.push(enabledOrder[i]); i++; }
-      panelsHtml += '<div class="small-panels-row section">'+rowPanels.map(function(rpid){ const fn=PANEL_RENDERERS[rpid]; return fn ? '<div class="small-panel-box">'+fn()+'</div>' : ''; }).join('')+'</div>';
+      const boxes = rowPanels.map(function(rpid){ const fn=PANEL_RENDERERS[rpid], h = fn ? fn() : ''; return h ? '<div class="small-panel-box">'+h+'</div>' : ''; }).join('');
+      if(boxes) panelsHtml += '<div class="small-panels-row section">'+boxes+'</div>';
     } else {
       const fn = PANEL_RENDERERS[pid];
       if(fn) panelsHtml += fn();

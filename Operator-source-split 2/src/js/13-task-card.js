@@ -38,7 +38,7 @@ function taskCard(t){
   const cat = t.categoryId ? taskCategoryById(t.categoryId) : null;
   const whiteAccent = t.isVideoIdea===true;
   return '<div class="task-card '+(t.status==='done'?'done':'')+(t.ongoing?' ongoing-task-card':'')+(selected?' card-selected':'')+(isCurrent?' current-task-active':'')+(pending?' just-completed':'')+(isStaged?' staged-task-card':'')+(whiteAccent?' video-idea-card':'')+'" data-action="'+(ui.taskSelectMode?'toggleTaskSelect':'openTaskEditModal')+'" data-id="'+t.id+'" style="cursor:pointer;'+(cat && !whiteAccent?'border-left:3px solid '+cat.color+';':'')+'" '+(draggable?'draggable="true" data-task-id="'+t.id+'"':'')+'>'+
-    '<div class="row" style="justify-content:space-between;">'+(ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+(t.isVideoIdea?'':priorityTag(t.priority))+(isCurrent?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">'+currentTaskLabel()+'</span>':'')+(isStaged?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">&#128204; Up Next</span>':'')+(t.ongoing?'<span class="tag tag-ongoing">&#128204; Ongoing</span>':'')+(doneToday?'<span class="tag tag-good">&#10003; Done today</span>':'')+'</div>'+
+    '<div class="row" style="justify-content:space-between;">'+(ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+(t.isVideoIdea?'':priorityTag(t.priority))+(isCurrent?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">'+currentTaskLabel()+'</span>':'')+(isStaged?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">&#128204; Up Next</span>':'')+(t.ongoing?'<span class="tag tag-ongoing">&#128204; Ongoing</span>':'')+(doneToday?'<span class="tag tag-good">&#10003; Done today</span>':'')+(ui.taskSelectMode?'':'<button class="card-more" data-action="taskMenuBtn" data-id="'+t.id+'" title="More — or right-click the card" aria-label="More actions">&#8943;</button>')+'</div>'+
     '<div class="task-card-title">'+escapeHtml(t.title)+'</div>'+
     (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     (t.isVideoIdea && t.videoType ? '<div style="margin-top:2px;"><span class="tag" style="background:rgba(var(--ink),.1);color:var(--text);">'+escapeHtml((taskVideoTypeById(t.videoType)||{}).label||'')+'</span></div>' : '')+
@@ -48,9 +48,6 @@ function taskCard(t){
       clientTagsHtml(t.clients)+
       (t.deadline ? deadlineTag(t) : '')+
     '</div>'+
-    (t.status==='backlog' ? '<div class="mini-move-row"><button class="mini-move mini-move-today" data-action="pullSpecificFromBacklog" data-id="'+t.id+'">+ Move to today</button></div>' : '')+
-    (t.status==='today' ? '<div class="mini-move-row"><button class="mini-move" data-action="moveTaskToBacklog" data-id="'+t.id+'">&larr; Move back to '+(t.isVideoIdea?'video ideas':'backlog')+'</button></div>' : '')+
-    (t.ongoing ? '<div class="row" style="margin-top:8px;"><button class="btn btn-sm '+(doneToday?'btn-ghost':'btn-good')+'" data-action="'+(doneToday?'undoTask':'completeTask')+'" data-id="'+t.id+'" style="width:100%;">'+(doneToday?'Undo — done for today':'&#10003; Mark done for today')+'</button></div>' : '')+
   '</div>';
 }
 function finishedTaskRow(t){
