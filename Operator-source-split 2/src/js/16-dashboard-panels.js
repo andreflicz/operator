@@ -83,10 +83,9 @@ function renderBusinessPanel(){
 }
 function renderCalendarMiniPanel(){
   const upcoming = buildUpcomingList(14);
+  if(!upcoming.length) return '<div class="section"><div class="card cal-mini-empty"><span class="kpi-sub">&#128197; Nothing coming up in the next two weeks</span><button class="btn btn-ghost btn-sm" data-action="nav" data-view="calendar">Open calendar &rarr;</button></div></div>';
   return '<div class="section"><div class="card">'+
-    '<div class="task-list">'+
-      (upcoming.slice(0,6).map(renderUpcomingRow).join('') || '<div class="empty">Nothing coming up in the next two weeks.</div>')+
-    '</div>'+
+    '<div class="task-list">'+upcoming.slice(0,6).map(renderUpcomingRow).join('')+'</div>'+
     '<button class="btn btn-ghost btn-sm" data-action="nav" data-view="calendar" style="margin-top:auto;padding-top:12px;">&#128197; Open Calendar</button>'+
   '</div></div>';
 }
@@ -132,11 +131,12 @@ function renderTodayTasksPanel(){
   const currentId = ui.currentTaskId;
   const remaining = todayTasks.filter(function(t){ return t.id!==currentId; }).concat(doneToday);
   return '<div class="section">'+
-    renderTaskToolbar()+
-    '<div class="task-card-grid" style="margin-top:14px;">'+
+    renderTaskToolbar(true)+
+    (carouselOn() ? '<div>'+carouselWrap(renderCurrentTaskCard(false, true)+remaining.map(function(t){ return taskCard(t); }).join(''), 'today-tasks', {w:236})+'</div>' :
+    '<div class="task-card-grid">'+
       renderCurrentTaskCard(false, true)+
       (remaining.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing else queued for today.</div>')+
-    '</div>'+
+    '</div>')+
   '</div>';
 }
 function renderMoodPicker(){
@@ -255,8 +255,14 @@ function renderStandardsWidget(){
     yesterdayStandardsFixupHtml()+
     '</div>';
 }
+// Lock In lives in the header — this panel is just the other modes, in one tidy row.
 function renderFocusMiniPanel(){
-  return '<div class="section">'+renderLockInCard()+'</div>';
+  if(state.modes.active) return '<div class="section">'+renderLockInCard()+'</div>';
+  return '<div class="section"><div class="card modes-strip">'+
+    '<button class="btn shooting-btn" data-action="startMode" data-type="shooting">&#127916; Shooting</button>'+
+    '<button class="btn training-btn" data-action="startMode" data-type="training">&#128218; Training</button>'+
+    '<button class="btn offtime-btn" data-action="startMode" data-type="offtime">&#127937; Off-time</button>'+
+  '</div></div>';
 }
 function renderRemindersMiniPanel(){
   const upcoming = arr(state.focus.reminders).slice().sort(function(a,b){ return (a.date+String(a.time||'')).localeCompare(b.date+String(b.time||'')); });

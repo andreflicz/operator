@@ -101,7 +101,7 @@ function renderClientsHome(){
         '</div>' : '');
     })()+
     '<div class="subtab-panel" data-key="clients-home">'+
-      (active.length ? '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>' : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
+      (active.length ? (carouselOn() ? carouselWrap(active.map(clientCardV2).join(''), 'clients', {w:340, trackCls:'cc2-car'}) : '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>') : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
       (rest.length ? '<div class="cc2-past"><button class="cc2-past-toggle" data-action="toggleClientsPast">'+(ui.clientsPastOpen?'&#9662;':'&#9656;')+' Paused &amp; past clients ('+rest.length+')</button>'+
         (ui.clientsPastOpen ? '<div class="cc2-grid cc2-grid-sm">'+rest.map(clientCardV2).join('')+'</div>' : '')+'</div>' : '')+
     '</div>';
@@ -153,7 +153,7 @@ function renderClientHubPanel(){
   if(!clients.length && !leadsDue.length) return '';
   return '<div class="section client-hub">'+
     '<div class="section-title">Clients<span class="view-all-link" data-action="goToClients">All clients &rarr;</span></div>'+
-    (clients.length ? '<div class="hub-grid">'+clients.map(function(c){
+    (clients.length ? (function(cards){ return carouselOn() ? carouselWrap(cards, 'hub', {w:300}) : '<div class="hub-grid">'+cards+'</div>'; })(clients.map(function(c){
       const hs = clientHealthStatus(c);
       return '<div class="hub-card hl-'+hs.level+'" data-key="hub-'+c.id+'">'+
         '<div class="hub-head" title="'+escapeHtml(clientHealthTitle(c))+'">'+clientAvatarHtml(c, true, true)+
@@ -162,7 +162,7 @@ function renderClientHubPanel(){
         clientNextStepHtml(c)+
         '<div class="hub-foot">'+clientNextTouchHtml(c)+'<span style="flex:1"></span>'+touchButtonsHtml('client', c)+'</div>'+touchMenuHtml('client', c)+
       '</div>';
-    }).join('')+'</div>' : '')+
+    }).join('')) : '')+
     (leadsDue.length ? '<div class="hub-leads"><span class="kind-label" style="margin:0 6px 0 0;">Leads to reach out to</span>'+leadsDue.slice(0, 8).map(function(r){
       return '<span class="hub-lead '+overdueLevel(r.n)+'" data-key="hl-'+r.x.id+'"><span class="hub-lead-name" data-action="openContact" data-kind="lead" data-id="'+r.x.id+'">'+escapeHtml(crmName('lead', r.x))+'</span><span class="crm-due '+overdueLevel(r.n)+'">'+dueLabel(r.n)+'</span>'+touchButtonsHtml('lead', r.x)+touchMenuHtml('lead', r.x)+'</span>';
     }).join('')+(leadsDue.length>8?'<span class="view-all-link" data-action="goToLeads">+'+(leadsDue.length-8)+' more</span>':'')+'</div>' : '')+

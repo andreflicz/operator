@@ -86,6 +86,34 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.context().close();
   }
 
+  // ---- leads board fits the screen (Grid) / slides as a 3D carousel (Carousel) ----
+  {
+    const leads = []; for(let i=0;i<8;i++) leads.push({id:'l'+i, company:'Lead '+i, stage:['lead','contacted','call','proposal'][i%4], value:900, createdAt:'2026-09-20', touchpoints:[]});
+    const clients = []; for(let i=0;i<6;i++) clients.push({id:'c'+i, name:'C'+i, business:'Biz '+i, status:'active', stage:'active', mrr:1000, createdAt:'2026-09-01', touches:['2026-10-07'], touchpoints:[], deliverables:[], journal:[]});
+    const p = await newPage(b, OUT+'/r5.html', {profile:{name:'Andre'}, tasks, business:{packages:[], pipeline:leads, clients}}, NOW);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="leads"]'); await p.waitForTimeout(200);
+    const fit = await p.evaluate(() => { const t = document.querySelector('.crm-car .car-track'); return {sw:t.scrollWidth, cw:t.clientWidth, cols:t.querySelectorAll('.crm-col').length, arrows:[...document.querySelectorAll('.crm-car .car-arrow')].filter(a => getComputedStyle(a).opacity!=='0').length}; });
+    check('Grid: every lead stage fits across the screen — no sideways scrolling', fit.cols>=6 && fit.sw <= fit.cw+2 && fit.arrows===0, fit);
+    await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="display"]');
+    await p.click('[data-action="setCardLayout"][data-id="carousel"]'); await p.waitForTimeout(150);
+    await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="leads"]'); await p.waitForTimeout(300);
+    const car = await p.evaluate(() => { const w = document.querySelector('.crm-car'), t = w.querySelector('.car-track'); return {threeD:w.classList.contains('is-3d'), over:t.scrollWidth > t.clientWidth, next:w.classList.contains('can-next'), prev:w.classList.contains('can-prev'), fade:t.classList.contains('fade-r'), bar:getComputedStyle(t).scrollbarWidth}; });
+    check('Carousel: the board slides — faded edge and a › arrow, no scrollbar', car.threeD && car.over && car.next && !car.prev && car.fade && car.bar==='none', car);
+    await p.click('.crm-car .car-next'); await p.waitForTimeout(800);
+    const moved = await p.evaluate(() => { const w = document.querySelector('.crm-car'); return {left:w.querySelector('.car-track').scrollLeft, prev:w.classList.contains('can-prev')}; });
+    check('…the arrow slides it along and the ‹ arrow appears', moved.left > 100 && moved.prev, moved);
+    const tilt = await p.evaluate(() => [...document.querySelectorAll('.crm-car .crm-col')].some(c => getComputedStyle(c).transform!=='none' && getComputedStyle(c).transform!=='matrix(1, 0, 0, 1, 0, 0)'));
+    check('…columns near the ends tilt in 3D', tilt);
+    await p.click('[data-action="businessTab"][data-tab="clients"]'); await p.waitForTimeout(200);
+    check('client cards ride the same carousel', await p.isVisible('.carousel .cc2-car') || await p.isVisible('.cc2-car'));
+    await p.click('[data-action="nav"][data-view="focus"]'); await p.waitForTimeout(200);
+    check('…and so does today\'s lineup of tasks', (await p.$$('[data-dropzone="today"] .carousel .task-card')).length===1 || (await p.$$('[data-dropzone="today"] .car-track > *')).length>=1);
+    check('carousel layout is remembered', (await E("JSON.parse(localStorage.getItem('opsdash:profile')).cardLayout"))==='carousel');
+    check('no errors in either layout', !p.errors.length, p.errors);
+    await p.context().close();
+  }
+
   await b.close();
   process.exit(report() ? 1 : 0);
 })();

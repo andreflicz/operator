@@ -1441,6 +1441,43 @@
   .wx-results{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
   .wx-result{ border:1px solid var(--border); background:var(--panel-2); color:var(--text); border-radius:999px; padding:5px 12px; font-size:12.5px; cursor:pointer; }
   .wx-result:hover{ border-color:var(--accent); }
+  /* ---- carousel rows: no scrollbar — faded edges, arrows, and (Carousel layout) a 3D tilt ---- */
+  .carousel{ position:relative; --car-w:240px; }
+  .car-track{ display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x proximity; scrollbar-width:none; padding:4px 2px 12px; align-items:stretch; overscroll-behavior-x:contain; }
+  .car-track::-webkit-scrollbar{ display:none; }
+  .car-track > *{ flex:0 0 var(--car-w); min-width:0; scroll-snap-align:start; }
+  .car-track.fade-l.fade-r{ -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%); mask-image:linear-gradient(90deg, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%); }
+  .car-track.fade-l:not(.fade-r){ -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 64px); mask-image:linear-gradient(90deg, transparent 0, #000 64px); }
+  .car-track.fade-r:not(.fade-l){ -webkit-mask-image:linear-gradient(90deg, #000 calc(100% - 64px), transparent 100%); mask-image:linear-gradient(90deg, #000 calc(100% - 64px), transparent 100%); }
+  .car-arrow{ position:absolute; top:50%; z-index:5; width:38px; height:38px; margin-top:-19px; border-radius:50%; border:1px solid var(--border); background:var(--pop); color:var(--text); font-size:24px; line-height:1; padding:0 0 3px; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(0,0,0,calc(.4*var(--sh-k))); opacity:0; pointer-events:none; transform:scale(.85); transition:opacity .2s, transform .2s, border-color .15s, color .15s; cursor:pointer; }
+  .car-prev{ left:-8px; } .car-next{ right:-8px; }
+  .carousel.can-prev .car-prev, .carousel.can-next .car-next{ opacity:1; pointer-events:auto; transform:none; }
+  .car-arrow:hover{ border-color:var(--accent); color:var(--accent); }
+  .crm-car .car-track{ align-items:flex-start; padding-bottom:10px; }
+  .crm-car .car-arrow{ top:110px; }
+  .carousel.is-fit .car-track > .crm-col{ flex:1 1 0; min-width:190px; }
+  .carousel.is-fit .car-track > .crm-col.is-closed{ flex:.65 1 0; min-width:140px; }
+  .crm-car .car-track > .crm-col{ max-height:72vh; }
+  .task-column.is-car{ min-height:0; padding:8px 6px 0; }
+  @supports (animation-timeline: view()){
+    .carousel.is-3d .car-track > *{ animation:carTilt linear both; animation-timeline:view(inline); }
+  }
+  @keyframes carTilt{
+    0%{ transform:perspective(900px) rotateY(-34deg) scale(.84); opacity:.2; }
+    21%, 79%{ transform:perspective(900px) rotateY(0deg) scale(1); opacity:1; }
+    100%{ transform:perspective(900px) rotateY(34deg) scale(.84); opacity:.2; }
+  }
+  /* ---- Today: no headings above the panels; each panel's link sits in its corner on hover; even spacing ---- */
+  .today-panels > .section, .today-panels > .small-panels-row{ position:relative; margin-bottom:14px; }
+  .today-panels > .section > .section-title{ position:absolute; top:10px; right:12px; z-index:3; margin:0; font-size:0; gap:6px; pointer-events:none; justify-content:flex-end; }
+  .today-panels > .section > .section-title > *:not(.kpi-sub){ font-size:11.5px; pointer-events:auto; opacity:0; transition:opacity .15s; }
+  .today-panels > .section > .section-title > .view-all-link, .today-panels > .section > .section-title > button{ background:var(--pop); border:1px solid var(--border); border-radius:999px; padding:3px 10px; }
+  .today-panels > .section:hover > .section-title > *:not(.kpi-sub), .today-panels > .section > .section-title > *:focus-visible{ opacity:1; }
+  .card.modes-strip, .small-panel-box .card.modes-strip{ display:grid !important; flex-direction:row; grid-template-columns:repeat(3, 1fr); gap:10px; padding:14px; height:100%; align-content:center; box-sizing:border-box; }
+  .modes-strip .btn{ width:100%; margin:0 !important; padding:12px 8px; font-size:13.5px; letter-spacing:.02em; }
+  .cal-mini-empty{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; height:100%; box-sizing:border-box; }
+  .small-panels-row > .small-panel-box > .section{ margin:0; height:100%; }
+  .small-panels-row > .small-panel-box > .section > .card{ height:100%; box-sizing:border-box; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -4127,10 +4164,9 @@ function renderBusinessPanel(){
 }
 function renderCalendarMiniPanel(){
   const upcoming = buildUpcomingList(14);
+  if(!upcoming.length) return '<div class="section"><div class="card cal-mini-empty"><span class="kpi-sub">&#128197; Nothing coming up in the next two weeks</span><button class="btn btn-ghost btn-sm" data-action="nav" data-view="calendar">Open calendar &rarr;</button></div></div>';
   return '<div class="section"><div class="card">'+
-    '<div class="task-list">'+
-      (upcoming.slice(0,6).map(renderUpcomingRow).join('') || '<div class="empty">Nothing coming up in the next two weeks.</div>')+
-    '</div>'+
+    '<div class="task-list">'+upcoming.slice(0,6).map(renderUpcomingRow).join('')+'</div>'+
     '<button class="btn btn-ghost btn-sm" data-action="nav" data-view="calendar" style="margin-top:auto;padding-top:12px;">&#128197; Open Calendar</button>'+
   '</div></div>';
 }
@@ -4176,11 +4212,12 @@ function renderTodayTasksPanel(){
   const currentId = ui.currentTaskId;
   const remaining = todayTasks.filter(function(t){ return t.id!==currentId; }).concat(doneToday);
   return '<div class="section">'+
-    renderTaskToolbar()+
-    '<div class="task-card-grid" style="margin-top:14px;">'+
+    renderTaskToolbar(true)+
+    (carouselOn() ? '<div>'+carouselWrap(renderCurrentTaskCard(false, true)+remaining.map(function(t){ return taskCard(t); }).join(''), 'today-tasks', {w:236})+'</div>' :
+    '<div class="task-card-grid">'+
       renderCurrentTaskCard(false, true)+
       (remaining.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing else queued for today.</div>')+
-    '</div>'+
+    '</div>')+
   '</div>';
 }
 function renderMoodPicker(){
@@ -4299,8 +4336,14 @@ function renderStandardsWidget(){
     yesterdayStandardsFixupHtml()+
     '</div>';
 }
+// Lock In lives in the header — this panel is just the other modes, in one tidy row.
 function renderFocusMiniPanel(){
-  return '<div class="section">'+renderLockInCard()+'</div>';
+  if(state.modes.active) return '<div class="section">'+renderLockInCard()+'</div>';
+  return '<div class="section"><div class="card modes-strip">'+
+    '<button class="btn shooting-btn" data-action="startMode" data-type="shooting">&#127916; Shooting</button>'+
+    '<button class="btn training-btn" data-action="startMode" data-type="training">&#128218; Training</button>'+
+    '<button class="btn offtime-btn" data-action="startMode" data-type="offtime">&#127937; Off-time</button>'+
+  '</div></div>';
 }
 function renderRemindersMiniPanel(){
   const upcoming = arr(state.focus.reminders).slice().sort(function(a,b){ return (a.date+String(a.time||'')).localeCompare(b.date+String(b.time||'')); });
@@ -4759,6 +4802,53 @@ function renderWhyPanel(){
     '</div></div>';
 }
 ACTIONS.goToWhySettings = function(){ ui.view='settings'; ui.settingsTab='focus'; renderView(); setTimeout(function(){ const el = document.getElementById('newMotivToward'); if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); } }, 40); };
+
+// ============ CAROUSEL LAYOUT ============
+// Rows that don't fit slide sideways instead of showing a scrollbar: the edges fade, ‹ › arrows
+// appear only when there's more that way. With "Card layout: Carousel" (Settings → Display) the
+// leads board, client cards and task rows become a 3D carousel — cards tilt and fade toward the
+// ends (a scroll-driven CSS animation, so it costs no script work while you scroll).
+function cardLayout(){ return state.profile.cardLayout==='carousel' ? 'carousel' : 'grid'; }
+function carouselOn(){ return cardLayout()==='carousel'; }
+function carouselWrap(itemsHtml, key, opts){
+  opts = opts || {};
+  const threeD = opts.threeD!==undefined ? opts.threeD : carouselOn();
+  return '<div class="carousel'+(threeD?' is-3d':'')+(opts.fit?' is-fit':'')+(opts.cls?' '+opts.cls:'')+'" data-key="car-'+key+'"'+(opts.w?' style="--car-w:'+opts.w+'px"':'')+'>'+
+    '<button class="car-arrow car-prev" data-action="carouselStep" data-dir="-1" aria-label="Back">&#8249;</button>'+
+    '<div class="car-track'+(opts.trackCls?' '+opts.trackCls:'')+'" data-car="'+key+'">'+itemsHtml+'</div>'+
+    '<button class="car-arrow car-next" data-action="carouselStep" data-dir="1" aria-label="More">&#8250;</button>'+
+  '</div>';
+}
+function carUpdate(track){
+  const wrap = track.parentElement; if(!wrap) return;
+  const max = track.scrollWidth - track.clientWidth;
+  const l = track.scrollLeft > 4, r = track.scrollLeft < max - 4;
+  if(track.classList.contains('fade-l')!==l) track.classList.toggle('fade-l', l);
+  if(track.classList.contains('fade-r')!==r) track.classList.toggle('fade-r', r);
+  if(wrap.classList.contains('can-prev')!==l) wrap.classList.toggle('can-prev', l);
+  if(wrap.classList.contains('can-next')!==r) wrap.classList.toggle('can-next', r);
+}
+function carUpdateAll(){ document.querySelectorAll('.car-track').forEach(carUpdate); }
+let carRaf = 0, carPending = new Set();
+document.addEventListener('scroll', function(e){
+  const t = e.target; if(!t || !t.classList || !t.classList.contains('car-track')) return;
+  carPending.add(t);
+  if(!carRaf) carRaf = requestAnimationFrame(function(){ carRaf = 0; carPending.forEach(carUpdate); carPending.clear(); });
+}, {capture:true, passive:true});
+window.addEventListener('resize', function(){ requestAnimationFrame(carUpdateAll); });
+afterRenderHooks.push(carUpdateAll);
+ACTIONS.carouselStep = function(el){
+  const track = el.parentElement && el.parentElement.querySelector('.car-track'); if(!track) return;
+  track.scrollBy({left:Number(el.dataset.dir) * Math.max(220, track.clientWidth*0.75), behavior:'smooth'});
+};
+ACTIONS.setCardLayout = function(el, e, id){ state.profile.cardLayout = id; persist('profile'); renderView(); };
+function cardLayoutSettingsHtml(){
+  const cur = cardLayout();
+  const opt = function(id, label){ return '<button class="seg-tab'+(cur===id?' active':'')+'" data-action="setCardLayout" data-id="'+id+'">'+label+'</button>'; };
+  return '<div class="section"><div class="section-title">Card layout'+tip('Carousel lines up leads, clients and tasks in a sliding row — cards tilt and fade toward the edges, with arrows to move. Grid keeps them in rows; the leads board then stretches to fit the screen.')+'</div><div class="card">'+
+    '<div class="seg-tabs" style="margin:0;">'+opt('grid', '&#9638; Grid')+opt('carousel', '&#10697; Carousel')+'</div>'+
+  '</div></div>';
+}
 // ============ TODAY ============
 function renderDayOffView(){
   const streak = computeStreak();
@@ -5276,11 +5366,11 @@ function renderFocusTasksOverview(){
   renderTaskToolbar(true)+
   '<div class="section" style="margin-bottom:14px;">'+
     '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('Highest priority and closest deadlines first. Drag a card up to the box above to line it up next.')+'<span class="row" style="margin-left:auto;gap:8px;">'+selectModeBtnHtml()+'<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button></span></div>'+
-    '<div class="task-column fixed-size" data-dropzone="today"><div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div></div>'+
+    '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>'+
   '</div>'+
   (backlogTotal ? (
     '<div class="section" style="margin-bottom:14px;"><div class="section-title" style="align-items:center;">Worth Doing Soon<span class="kpi-sub">'+backlogTotal+' in the list</span><button class="btn btn-ghost btn-sm" style="margin-left:auto;" data-action="focusTasksSubTab" data-tab="backlog">See All &rarr;</button></div>'+
-      '<div class="task-card-grid">'+backlogPreview.map(function(t){ return taskCard(t); }).join('')+'</div>'+
+      (carouselOn() ? carouselWrap(backlogPreview.map(function(t){ return taskCard(t); }).join(''), 'soon', {w:236}) : '<div class="task-card-grid">'+backlogPreview.map(function(t){ return taskCard(t); }).join('')+'</div>')+
     '</div>'
   ) : '')+
   renderOngoingTasksPanel();
@@ -5661,7 +5751,7 @@ function renderOngoingTasksPanel(){
   const ongoing = state.tasks.items.filter(function(t){ return t.ongoing && t.status!=='done'; });
   if(!ongoing.length) return '';
   return '<div class="section"><div class="section-title">Ongoing'+tip('Ongoing tasks stay live until they\'re actually done — check one off for today and it comes back tomorrow.')+'</div>'+
-    '<div class="task-card-grid">'+ongoing.map(function(t){ return taskCard(t); }).join('')+'</div>'+
+    (carouselOn() ? carouselWrap(ongoing.map(function(t){ return taskCard(t); }).join(''), 'ongoing', {w:236}) : '<div class="task-card-grid">'+ongoing.map(function(t){ return taskCard(t); }).join('')+'</div>')+
   '</div>';
 }
 function reminderRow(r){
@@ -10664,7 +10754,7 @@ function renderCrmBoard(kind){
   const list = crmFiltered(kind);
   const f = crmUi(kind);
   const stages = crmStages(kind).filter(function(s){ return !f.stage || s.id===f.stage; });
-  return '<div class="crm-board">'+stages.map(function(st){
+  return carouselWrap(stages.map(function(st){
     const items = list.filter(function(x){ return x.stage===st.id; });
     const total = items.reduce(function(a,x){ return a+(Number(kind==='lead'?x.value:x.mrr)||0); },0);
     const closed = st.kind==='won' || st.kind==='lost' || st.kind==='churned';
@@ -10676,7 +10766,7 @@ function renderCrmBoard(kind){
         (!items.length ? '<div class="crm-col-empty">Drop here</div>' : '')+
       '</div>'+
     '</div>';
-  }).join('')+'</div>';
+  }).join(''), 'crm-'+kind, {fit:!carouselOn(), w:272, trackCls:'crm-board', cls:'crm-car'});
 }
 function renderCrmList(kind){
   const list = crmFiltered(kind);
@@ -11751,7 +11841,7 @@ function renderClientsHome(){
         '</div>' : '');
     })()+
     '<div class="subtab-panel" data-key="clients-home">'+
-      (active.length ? '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>' : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
+      (active.length ? (carouselOn() ? carouselWrap(active.map(clientCardV2).join(''), 'clients', {w:340, trackCls:'cc2-car'}) : '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>') : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
       (rest.length ? '<div class="cc2-past"><button class="cc2-past-toggle" data-action="toggleClientsPast">'+(ui.clientsPastOpen?'&#9662;':'&#9656;')+' Paused &amp; past clients ('+rest.length+')</button>'+
         (ui.clientsPastOpen ? '<div class="cc2-grid cc2-grid-sm">'+rest.map(clientCardV2).join('')+'</div>' : '')+'</div>' : '')+
     '</div>';
@@ -11803,7 +11893,7 @@ function renderClientHubPanel(){
   if(!clients.length && !leadsDue.length) return '';
   return '<div class="section client-hub">'+
     '<div class="section-title">Clients<span class="view-all-link" data-action="goToClients">All clients &rarr;</span></div>'+
-    (clients.length ? '<div class="hub-grid">'+clients.map(function(c){
+    (clients.length ? (function(cards){ return carouselOn() ? carouselWrap(cards, 'hub', {w:300}) : '<div class="hub-grid">'+cards+'</div>'; })(clients.map(function(c){
       const hs = clientHealthStatus(c);
       return '<div class="hub-card hl-'+hs.level+'" data-key="hub-'+c.id+'">'+
         '<div class="hub-head" title="'+escapeHtml(clientHealthTitle(c))+'">'+clientAvatarHtml(c, true, true)+
@@ -11812,7 +11902,7 @@ function renderClientHubPanel(){
         clientNextStepHtml(c)+
         '<div class="hub-foot">'+clientNextTouchHtml(c)+'<span style="flex:1"></span>'+touchButtonsHtml('client', c)+'</div>'+touchMenuHtml('client', c)+
       '</div>';
-    }).join('')+'</div>' : '')+
+    }).join('')) : '')+
     (leadsDue.length ? '<div class="hub-leads"><span class="kind-label" style="margin:0 6px 0 0;">Leads to reach out to</span>'+leadsDue.slice(0, 8).map(function(r){
       return '<span class="hub-lead '+overdueLevel(r.n)+'" data-key="hl-'+r.x.id+'"><span class="hub-lead-name" data-action="openContact" data-kind="lead" data-id="'+r.x.id+'">'+escapeHtml(crmName('lead', r.x))+'</span><span class="crm-due '+overdueLevel(r.n)+'">'+dueLabel(r.n)+'</span>'+touchButtonsHtml('lead', r.x)+touchMenuHtml('lead', r.x)+'</span>';
     }).join('')+(leadsDue.length>8?'<span class="view-all-link" data-action="goToLeads">+'+(leadsDue.length-8)+' more</span>':'')+'</div>' : '')+
@@ -12366,7 +12456,7 @@ function renderSettings(){
         '<div class="task-list">'+RESET_TARGETS.map(function(t){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+t.label+'</div>'+resetPartBtn(t)+'</div>'; }).join('')+'</div>'+
       '</div></div>',
 
-    display: themeSettingsHtml()+sceneSettingsHtml()+weatherSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
+    display: themeSettingsHtml()+sceneSettingsHtml()+weatherSettingsHtml()+cardLayoutSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
         '<div class="row">'+SWATCHES.map(function(sw){ return '<span class="swatch '+(p.accentColor===sw?'sel':'')+'" style="background:'+sw+';" data-action="pickThemeColor" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Today Header Style</div>'+

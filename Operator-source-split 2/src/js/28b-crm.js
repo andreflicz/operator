@@ -372,7 +372,7 @@ function renderCrmBoard(kind){
   const list = crmFiltered(kind);
   const f = crmUi(kind);
   const stages = crmStages(kind).filter(function(s){ return !f.stage || s.id===f.stage; });
-  return '<div class="crm-board">'+stages.map(function(st){
+  return carouselWrap(stages.map(function(st){
     const items = list.filter(function(x){ return x.stage===st.id; });
     const total = items.reduce(function(a,x){ return a+(Number(kind==='lead'?x.value:x.mrr)||0); },0);
     const closed = st.kind==='won' || st.kind==='lost' || st.kind==='churned';
@@ -384,7 +384,7 @@ function renderCrmBoard(kind){
         (!items.length ? '<div class="crm-col-empty">Drop here</div>' : '')+
       '</div>'+
     '</div>';
-  }).join('')+'</div>';
+  }).join(''), 'crm-'+kind, {fit:!carouselOn(), w:272, trackCls:'crm-board', cls:'crm-car'});
 }
 function renderCrmList(kind){
   const list = crmFiltered(kind);

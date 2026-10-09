@@ -1432,3 +1432,40 @@
   .wx-results{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
   .wx-result{ border:1px solid var(--border); background:var(--panel-2); color:var(--text); border-radius:999px; padding:5px 12px; font-size:12.5px; cursor:pointer; }
   .wx-result:hover{ border-color:var(--accent); }
+  /* ---- carousel rows: no scrollbar — faded edges, arrows, and (Carousel layout) a 3D tilt ---- */
+  .carousel{ position:relative; --car-w:240px; }
+  .car-track{ display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x proximity; scrollbar-width:none; padding:4px 2px 12px; align-items:stretch; overscroll-behavior-x:contain; }
+  .car-track::-webkit-scrollbar{ display:none; }
+  .car-track > *{ flex:0 0 var(--car-w); min-width:0; scroll-snap-align:start; }
+  .car-track.fade-l.fade-r{ -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%); mask-image:linear-gradient(90deg, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%); }
+  .car-track.fade-l:not(.fade-r){ -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 64px); mask-image:linear-gradient(90deg, transparent 0, #000 64px); }
+  .car-track.fade-r:not(.fade-l){ -webkit-mask-image:linear-gradient(90deg, #000 calc(100% - 64px), transparent 100%); mask-image:linear-gradient(90deg, #000 calc(100% - 64px), transparent 100%); }
+  .car-arrow{ position:absolute; top:50%; z-index:5; width:38px; height:38px; margin-top:-19px; border-radius:50%; border:1px solid var(--border); background:var(--pop); color:var(--text); font-size:24px; line-height:1; padding:0 0 3px; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(0,0,0,calc(.4*var(--sh-k))); opacity:0; pointer-events:none; transform:scale(.85); transition:opacity .2s, transform .2s, border-color .15s, color .15s; cursor:pointer; }
+  .car-prev{ left:-8px; } .car-next{ right:-8px; }
+  .carousel.can-prev .car-prev, .carousel.can-next .car-next{ opacity:1; pointer-events:auto; transform:none; }
+  .car-arrow:hover{ border-color:var(--accent); color:var(--accent); }
+  .crm-car .car-track{ align-items:flex-start; padding-bottom:10px; }
+  .crm-car .car-arrow{ top:110px; }
+  .carousel.is-fit .car-track > .crm-col{ flex:1 1 0; min-width:190px; }
+  .carousel.is-fit .car-track > .crm-col.is-closed{ flex:.65 1 0; min-width:140px; }
+  .crm-car .car-track > .crm-col{ max-height:72vh; }
+  .task-column.is-car{ min-height:0; padding:8px 6px 0; }
+  @supports (animation-timeline: view()){
+    .carousel.is-3d .car-track > *{ animation:carTilt linear both; animation-timeline:view(inline); }
+  }
+  @keyframes carTilt{
+    0%{ transform:perspective(900px) rotateY(-34deg) scale(.84); opacity:.2; }
+    21%, 79%{ transform:perspective(900px) rotateY(0deg) scale(1); opacity:1; }
+    100%{ transform:perspective(900px) rotateY(34deg) scale(.84); opacity:.2; }
+  }
+  /* ---- Today: no headings above the panels; each panel's link sits in its corner on hover; even spacing ---- */
+  .today-panels > .section, .today-panels > .small-panels-row{ position:relative; margin-bottom:14px; }
+  .today-panels > .section > .section-title{ position:absolute; top:10px; right:12px; z-index:3; margin:0; font-size:0; gap:6px; pointer-events:none; justify-content:flex-end; }
+  .today-panels > .section > .section-title > *:not(.kpi-sub){ font-size:11.5px; pointer-events:auto; opacity:0; transition:opacity .15s; }
+  .today-panels > .section > .section-title > .view-all-link, .today-panels > .section > .section-title > button{ background:var(--pop); border:1px solid var(--border); border-radius:999px; padding:3px 10px; }
+  .today-panels > .section:hover > .section-title > *:not(.kpi-sub), .today-panels > .section > .section-title > *:focus-visible{ opacity:1; }
+  .card.modes-strip, .small-panel-box .card.modes-strip{ display:grid !important; flex-direction:row; grid-template-columns:repeat(3, 1fr); gap:10px; padding:14px; height:100%; align-content:center; box-sizing:border-box; }
+  .modes-strip .btn{ width:100%; margin:0 !important; padding:12px 8px; font-size:13.5px; letter-spacing:.02em; }
+  .cal-mini-empty{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; height:100%; box-sizing:border-box; }
+  .small-panels-row > .small-panel-box > .section{ margin:0; height:100%; }
+  .small-panels-row > .small-panel-box > .section > .card{ height:100%; box-sizing:border-box; }
