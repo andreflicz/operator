@@ -40,12 +40,13 @@ function carUpdate(track){
     if(!track._loopInit){ track._loopInit = true; track.scrollLeft = third; }
     else if(track.scrollLeft < third*0.5) track.scrollLeft += third;
     else if(track.scrollLeft > third*1.5) track.scrollLeft -= third;
-    if(!wrap.classList.contains('can-prev')) wrap.classList.add('can-prev', 'can-next');
+    if(!wrap.classList.contains('can-prev')) wrap.classList.add('can-prev', 'can-next', 'car-over');
     track.classList.add('fade-l', 'fade-r');
     return;
   }
   const max = track.scrollWidth - track.clientWidth;
   const l = track.scrollLeft > 4, r = track.scrollLeft < max - 4;
+  if(wrap.classList.contains('car-over')!==(max > 4)) wrap.classList.toggle('car-over', max > 4);
   if(track.classList.contains('fade-l')!==l) track.classList.toggle('fade-l', l);
   if(track.classList.contains('fade-r')!==r) track.classList.toggle('fade-r', r);
   if(wrap.classList.contains('can-prev')!==l) wrap.classList.toggle('can-prev', l);

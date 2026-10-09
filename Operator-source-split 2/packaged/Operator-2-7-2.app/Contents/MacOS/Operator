@@ -86,13 +86,15 @@ serve_activity() {
 # The page talks to 127.0.0.1:8935 when an alarm rings:
 #   /wake        bring the Operator window to the front, wake the display, unmute
 #   /music/play  play a song or playlist from Apple Music (?k=song|playlist&q=<name, hex>)
-#   /music/stop  pause it again ("I'm up" / snooze)
+#   /music/stop  pause it again (snooze / Stop)
+#   /music/finish  let the song that's on play to its end, then pause ("I'm up")
 # Wake-up music through the Music app has no ads and doesn't depend on the browser.
 # If the song can't be found (or Music isn't allowed), the Mac's own alert sound rings
 # instead, so you still wake up.
 WAKE_PORT=8935
 RAMP_PID_FILE="$DATA_DIR/music-ramp.pid"
 FALLBACK_PID_FILE="$DATA_DIR/music-fallback.pid"
+FINISH_PID_FILE="$DATA_DIR/music-finish.pid"
 wake_front() {
   caffeinate -u -t 5 >/dev/null 2>&1 &
   # An alarm nobody can hear is no alarm: unmute, and bring a very low volume up.
@@ -100,7 +102,7 @@ wake_front() {
   osascript -e "tell application \"System Events\" to set frontmost of (first process whose unix id is $CHROME_PID) to true" >/dev/null 2>&1
 }
 stop_music() {
-  for f in "$RAMP_PID_FILE" "$FALLBACK_PID_FILE"; do
+  for f in "$RAMP_PID_FILE" "$FALLBACK_PID_FILE" "$FINISH_PID_FILE"; do
     if [ -f "$f" ]; then kill "$(cat "$f")" 2>/dev/null; rm -f "$f"; fi
   done
   osascript >/dev/null 2>&1 <<'APPLESCRIPT'
@@ -111,6 +113,38 @@ if application "Music" is running then
   end tell
 end if
 APPLESCRIPT
+}
+finish_music() {
+  for f in "$RAMP_PID_FILE" "$FALLBACK_PID_FILE" "$FINISH_PID_FILE"; do
+    if [ -f "$f" ]; then kill "$(cat "$f")" 2>/dev/null; rm -f "$f"; fi
+  done
+  # no more repeating; note the track that's on and how long it has left
+  INFO=$(osascript 2>/dev/null <<'APPLESCRIPT'
+if application "Music" is running then
+  tell application "Music"
+    set song repeat to off
+    if player state is playing then return ((persistent ID of current track) & " " & (round ((duration of current track) - player position) rounding up))
+  end tell
+end if
+return ""
+APPLESCRIPT
+)
+  [ -z "$INFO" ] && return
+  TRACK=${INFO% *}; LEFT=${INFO##* }
+  case "$LEFT" in ''|*[!0-9]*) LEFT=300 ;; esac
+  # wait it out, then pause the moment that track is over (before the next one gets going)
+  ( [ "$LEFT" -gt 3 ] && sleep $((LEFT-3))
+    n=0
+    while [ $n -lt 30 ]; do
+      NOW=$(osascript -e 'tell application "Music" to if player state is playing then return persistent ID of current track' 2>/dev/null)
+      if [ "$NOW" != "$TRACK" ]; then
+        [ -n "$NOW" ] && osascript -e 'tell application "Music" to pause' >/dev/null 2>&1
+        break
+      fi
+      sleep 1; n=$((n+1))
+    done
+    rm -f "$FINISH_PID_FILE" ) &
+  echo $! > "$FINISH_PID_FILE"
 }
 play_music() {
   stop_music
@@ -171,6 +205,9 @@ serve_wake() {
         ;;
       /music/stop*)
         stop_music &
+        ;;
+      /music/finish*)
+        finish_music &
         ;;
       /opfocus*)
         F=$(printf '%s' "$REQ_PATH" | sed -n 's/.*[?&]f=\([01]\).*/\1/p')

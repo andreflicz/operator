@@ -32,14 +32,12 @@ function clientDelivRowsHtml(c, compact){
   return '<div class="cc2-delivs">'+recurring.map(function(d){
     const done = deliverableWeekCount(d), target = deliverableWeekNeed(d);
     const pace = deliverablePaceStatus(d);
-    const lw = deliverableLastWeek(d);
-    const caughtUp = done>=lw.missed;
     const today = arr(d.completedDates).indexOf(todayStr())>=0;
-    return '<div class="cc2-deliv" data-key="dv-'+c.id+'-'+d.id+'" title="'+escapeHtml(d.title)+': '+done+' of '+target+' this week ('+paceWord(pace)+')'+(lw.missed?' · includes '+deliverableOwed(d)+' owed from last week':'')+' · '+deliverableMonthCount(d)+' this month">'+
+    return '<div class="cc2-deliv" data-key="dv-'+c.id+'-'+d.id+'" title="'+escapeHtml(d.title)+': '+done+' of '+target+' this week ('+delivPaceWord(d)+') · '+deliverableMonthCount(d)+' this month">'+
       '<span class="cc2-deliv-title">'+escapeHtml(d.title)+'</span>'+
       weekDotsHtml(Math.min(done, target), target, pace)+
       '<span class="cc2-deliv-count" style="color:'+paceColorOf(pace)+'">'+done+'/'+target+'</span>'+
-      (lw.missed ? '<span class="cc2-owed'+(caughtUp?' is-caught':'')+'" title="Last week ended at '+lw.done+'/'+lw.target+(caughtUp?' — caught up this week':' — log '+lw.missed+' this week to catch up')+'">+'+deliverableOwed(d)+' owed</span>' : '')+
+      (done>=target ? '<span class="cc2-owed is-caught" title="This week\'s number is in">&#10003;</span>' : '')+
       '<button class="cc2-deliv-btn cc2-plus'+(today?' did-today':'')+'" data-action="incrementDeliverableProgress" data-client="'+c.id+'" data-id="'+d.id+'" title="Log one">+</button>'+
     '</div>';
   }).join('')+'</div>';

@@ -55,9 +55,29 @@ function wakeDaysLabel(days){
 }
 function wakeArm(){ wakeCfg().armedAt = Date.now(); }
 // Ask the Operator.app wrapper to bring the window to the front and wake the display.
-function pingWrapper(){
-  try{ fetch(WAKE_PING_URL, {mode:'no-cors', cache:'no-store'}).catch(function(){}); }catch(e){}
+// The helper on 127.0.0.1:8935 answers one request at a time, so a second request sent at the
+// same moment (bring the window up + start the music) used to bounce — and the music "failed".
+// Everything for it goes through one queue, retried until it gets through.
+const HELPER_RETRY_MS = [100, 200, 300, 500, 800, 1100];
+let helperChain = Promise.resolve();
+function helperFetch(url, timeoutMs){
+  const run = async function(){
+    for(let i=0;i<=HELPER_RETRY_MS.length;i++){
+      const ctl = typeof AbortController!=='undefined' ? new AbortController() : null;
+      const timer = setTimeout(function(){ if(ctl) ctl.abort(); }, timeoutMs||4000);
+      try{
+        const res = await fetch(url, {cache:'no-store', signal: ctl ? ctl.signal : undefined});
+        clearTimeout(timer);
+        return res.ok;
+      }catch(e){ clearTimeout(timer); if(i===HELPER_RETRY_MS.length) return false; await new Promise(function(r){ setTimeout(r, HELPER_RETRY_MS[i]); }); }
+    }
+    return false;
+  };
+  const p = helperChain.then(run, run);
+  helperChain = p.catch(function(){});
+  return p;
 }
+function pingWrapper(){ helperFetch(WAKE_PING_URL, 2500); }
 // ---- scheduling / checking ----
 const alarmSigs = {};
 function lastScheduledTs(al, now){
@@ -122,9 +142,12 @@ function checkAllAlarms(){
 document.addEventListener('visibilitychange', function(){ if(!document.hidden){ try{ checkAllAlarms(); checkBreakTimer(); }catch(e){} } });
 window.addEventListener('focus', function(){ try{ checkAllAlarms(); }catch(e){} });
 // ---- regular alarm overlay: music starts by itself ----
+// Music is just another alarm sound: when an alarm has a song it plays instead of the beep.
+// If it can't start, the beep rings instead — nothing to click.
 function startAlarmMediaIfAny(al){
   if(!al || !al.mediaUrl) return false;
-  playWakeMedia({url:al.mediaUrl}, function(){ const ex = document.getElementById('alarmExtra'); if(ex) ex.insertAdjacentHTML('beforeend', '<button class="btn btn-good" style="margin-top:12px;" data-action="playAlarmMedia" data-url="'+escapeHtml(al.mediaUrl)+'">&#9654; Play wake-up song</button>'); });
+  const media = appleMusicFromLink(al.mediaUrl) || {url:al.mediaUrl};
+  playWakeMedia(media, function(){ clearInterval(ringInterval); playBeep(); ringInterval = setInterval(playBeep, 2400); });
   return true;
 }
 function snoozeRegularAlarm(al){
@@ -150,20 +173,13 @@ function mediaName(m){ return !m ? '' : m.type==='music' ? m.q : (m.name || m.ur
 const WAKE_HELPER = 'http://127.0.0.1:8935/';
 // The launcher stops asking Chrome "which website is open?" while Operator is the window in front
 // (each question made Chrome pause) — so tell it when that changes.
-function opFocusPing(f){ try{ fetch(WAKE_HELPER+'opfocus?f='+f).catch(function(){}); }catch(e){} }
+function opFocusPing(f){ helperFetch(WAKE_HELPER+'opfocus?f='+f, 2000); }
 window.addEventListener('focus', function(){ opFocusPing(1); });
 window.addEventListener('blur', function(){ opFocusPing(0); });
 setTimeout(function(){ opFocusPing(document.hasFocus() ? 1 : 0); }, 1500);
 function hexUtf8(str){ return Array.prototype.map.call(new TextEncoder().encode(String(str||'')), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
-async function musicApp(cmd, media){
-  const ctl = typeof AbortController!=='undefined' ? new AbortController() : null;
-  const timer = setTimeout(function(){ if(ctl) ctl.abort(); }, 4000);
-  try{
-    const url = MUSIC_URL+cmd+(media ? '?k='+(media.k==='playlist'?'playlist':'song')+'&q='+hexUtf8(media.q) : '');
-    const res = await fetch(url, {cache:'no-store', signal: ctl ? ctl.signal : undefined});
-    return res.ok;
-  }catch(e){ return false; }
-  finally{ clearTimeout(timer); }
+function musicApp(cmd, media){
+  return helperFetch(MUSIC_URL+cmd+(media ? '?k='+(media.k==='playlist'?'playlist':'song')+'&q='+hexUtf8(media.q) : ''), 4000);
 }
 async function playWakeMedia(media, onFail){
   stopWakeMedia(true);
@@ -207,7 +223,7 @@ async function playWakeMedia(media, onFail){
   }catch(e){ wakeAudio = null; onFail(); return false; }
 }
 function stopWakeMedia(immediate){
-  clearInterval(wakeAudioRamp);
+  clearInterval(wakeAudioRamp); wakeFinishing = false;
   const a = wakeAudio; wakeAudio = null;
   if(a){
     if(immediate){ try{ a.pause(); }catch(e){} }
@@ -215,6 +231,30 @@ function stopWakeMedia(immediate){
   }
   if(wakeObjectUrl){ const u = wakeObjectUrl; wakeObjectUrl = null; setTimeout(function(){ URL.revokeObjectURL(u); }, 3000); }
   if(wakeMusicApp){ wakeMusicApp = false; musicApp('stop'); }
+}
+// "I'm up" doesn't cut the song off: it plays out to the end and then stops (no more looping,
+// and in the Music app it pauses when the track is over). Stop ends it right away.
+let wakeFinishing = false;
+function finishWakeMedia(){
+  clearInterval(wakeAudioRamp);
+  const a = wakeAudio;
+  if(a){
+    a.loop = false; wakeFinishing = true;
+    a.addEventListener('ended', function(){ if(wakeAudio===a) stopWakeMedia(true); wakeFinishing = false; if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); }, {once:true});
+  }
+  if(wakeMusicApp){ wakeFinishing = true; wakeMusicApp = false; musicApp('finish'); }
+}
+ACTIONS.wakeStopMusic = function(){
+  const m = wakeCfg().media;
+  stopWakeMedia(false);
+  if(m && m.type==='music') musicApp('stop');
+  renderWakeOverlayInto();
+};
+// the little "still playing" pill on the briefing
+function wakeMusicPillHtml(){
+  const m = wakeCfg().media;
+  if(!m || !wakeFinishing) return '';
+  return '<div class="brief-music"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span><span class="brief-music-t">'+escapeHtml(mediaName(m))+'</span><span class="kpi-sub">plays out, then stops</span><button class="brief-music-x" data-action="wakeStopMusic" title="Stop the music now">&#9632;</button></div>';
 }
 // ---- the wake screen ----
 let wakeRing = null; // {startedAt, test, soundFailed}
@@ -228,12 +268,25 @@ function fireWake(opts){
   showOverlay('wakeOverlay');
   renderWakeOverlayInto();
   pingWrapper();
-  const startBeeps = function(){ clearInterval(wakeBeepTimer); playAlarmSound(w.sound); wakeBeepTimer = setInterval(function(){ playAlarmSound(w.sound); }, 2600); };
-  if(w.media){
-    playWakeMedia(w.media, function(){ if(wakeRing){ wakeRing.mediaFailed = true; renderWakeOverlayInto(); } startBeeps(); });
+  const startBeeps = function(){ clearInterval(wakeBeepTimer); playAlarmSound(wakeBeepSound(w)); wakeBeepTimer = setInterval(function(){ playAlarmSound(wakeBeepSound(w)); }, 2600); };
+  if(wakeUsesMusic(w)){
+    const ring = wakeRing;
+    const tryMusic = function(n){
+      playWakeMedia(w.media, function(){
+        if(wakeRing!==ring) return;
+        if(!wakeBeepTimer) startBeeps();
+        ring.mediaFailed = true; renderWakeOverlayInto();
+        // keep trying the music for a minute — the moment it plays, the beeping stops
+        if(n < 8) setTimeout(function(){ if(wakeRing===ring) tryMusic(n+1); }, 6000);
+      }).then(function(ok){ if(ok && wakeRing===ring){ clearInterval(wakeBeepTimer); wakeBeepTimer = null; ring.mediaFailed = false; renderWakeOverlayInto(); } });
+    };
+    tryMusic(0);
   } else startBeeps();
   try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Time to get up'); }catch(e){}
 }
+// The alarm sound is one choice: Peaceful / Standard / Loud — or Music (your song or playlist).
+function wakeUsesMusic(w){ return !!(w && w.media && w.useMusic!==false); }
+function wakeBeepSound(w){ return w && ['peaceful','standard','loud'].indexOf(w.sound)>=0 ? w.sound : 'standard'; }
 function closeOtherOverlaysForWake(){
   if(overlayOpen('alarmOverlay')){ clearInterval(ringInterval); hideOverlay('alarmOverlay'); }
 }
@@ -248,12 +301,15 @@ function stopWakeRing(){
 function wakeImUp(){
   const wasTest = wakeRing && wakeRing.test;
   clearInterval(wakeBeepTimer); wakeBeepTimer = null;
-  stopWakeMedia(false);
+  finishWakeMedia();
   wakeRing = null;
   if(!wasTest && state.modes.active && state.modes.active.sleep) finishActiveMode(true);
-  ui.wakeMode = 'brief'; ui.wakeBriefTest = !!wasTest; ui.wakeBoardBig = false;
-  playPositive();
+  ui.wakeMode = 'brief'; ui.wakeBriefTest = !!wasTest; ui.wakeBoardBig = false; ui.wakeIntroDone = false;
+  playWakeChime();
   renderWakeOverlayInto();
+  // after the intro has played, take it out (so re-renders don't replay it)
+  clearTimeout(ui._wakeIntroT);
+  ui._wakeIntroT = setTimeout(function(){ if(ui.wakeMode==='brief' && !ui.wakeIntroDone){ ui.wakeIntroDone = true; renderWakeOverlayInto(); } }, 3600);
 }
 function endBriefing(){
   ui.wakeMode = null;
@@ -288,9 +344,9 @@ function wakeWeatherLine(){
   return now ? wxIcon(wxKind(now.code), skyPhase())+' '+now.temp+'&deg; '+escapeHtml(wxLabel(now.code).toLowerCase())+(now.hi!=null ? ' &middot; high '+now.hi+'&deg;' : '') : '';
 }
 function wakeRingHtml(){
-  const w = wakeCfg(), b = masterVisionBoard();
-  const playing = w.media && !(wakeRing && wakeRing.mediaFailed);
-  return '<div class="wk2'+(ui.wakeBoardBig?' board-open':'')+'" data-sky="'+skyPhase()+'">'+
+  const w = wakeCfg();
+  const playing = wakeUsesMusic(w) && !(wakeRing && wakeRing.mediaFailed);
+  return '<div class="wk2" data-sky="'+skyPhase()+'">'+
     '<div class="wk2-aura"><i></i><i></i><i></i></div>'+
     '<div class="wk2-center">'+
       '<div class="wk2-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test ? ' <span class="tag">TEST</span>' : '')+'</div>'+
@@ -300,15 +356,11 @@ function wakeRingHtml(){
         '<button class="wk2-up" data-action="wakeImUp"><span>&#9728;&#65039; I\'m up</span></button>'+
         '<button class="wk2-snooze" data-action="wakeSnooze">Snooze '+(w.snoozeMinutes||9)+' min</button>'+
       '</div>'+
-      (w.media ? '<div class="wk2-music'+(playing?' is-playing':'')+'">'+
+      (wakeUsesMusic(w) ? '<div class="wk2-music'+(playing?' is-playing':'')+'">'+
           (playing ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '')+
-          '<span class="wk2-song">'+escapeHtml(mediaName(w.media))+'</span><span class="wk2-src">'+escapeHtml(mediaKindLabel(w.media))+'</span>'+
-          (wakeRing && wakeRing.mediaFailed ? '<button class="btn btn-good btn-sm" data-action="wakePlayMusic">&#9654; Play</button>' : '')+
+          '<span class="wk2-song">'+escapeHtml(mediaName(w.media))+'</span><span class="wk2-src">'+(wakeRing && wakeRing.mediaFailed ? 'starting the music…' : escapeHtml(mediaKindLabel(w.media)))+'</span>'+
         '</div>' : '')+
     '</div>'+
-    (b && b.elements.length
-      ? '<div class="wk2-vision" data-action="wakeBoardToggle" title="'+(ui.wakeBoardBig?'Close':'Open your vision board')+'">'+(ui.wakeBoardBig ? '<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button>' : '<span class="wk2-vision-k">&#127775; Vision board</span>')+boardStaticHtml(b, 'wake-board')+'</div>'
-      : '')+
   '</div>';
 }
 function wakeBriefHtml(){
@@ -323,14 +375,25 @@ function wakeBriefHtml(){
   const why = arr(state.focus.motivations && state.focus.motivations.toward).slice(0, 3);
   const goals = typeof masterGoalDefs==='function' ? masterGoalDefs() : [];
   const first = plan.tasks[0];
-  let d = 0; const step = function(){ d += 90; return ' style="animation-delay:'+d+'ms"'; };
+  const notes = morningNotesFor(today).map(function(n){ return n.text; });
+  if(plan.note && notes.indexOf(plan.note)<0) notes.unshift(plan.note);
+  const vb = masterVisionBoard();
+  // It opens like a phone starting up: one big "Good morning" fades in out of a blur, holds,
+  // then lifts away and the briefing builds in underneath. Click to skip.
+  const intro = !ui.wakeIntroDone;
+  let d = intro ? 2700 : 0; const step = function(){ d += 90; return ' style="animation-delay:'+d+'ms"'; };
   const stat = function(v, k, good){ return '<div class="br-stat'+(good?' is-good':'')+'"><div class="br-stat-v">'+v+'</div><div class="br-stat-k">'+k+'</div></div>'; };
-  return '<div class="brief">'+
+  return '<div class="brief'+(ui.wakeBoardBig?' board-open':'')+'">'+
+    (intro ? '<div class="brief-intro" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div><div class="bi-word">'+wakeGreeting()+'</div>'+(state.profile.name ? '<div class="bi-name">'+escapeHtml(state.profile.name)+'</div>' : '')+'</div>' : '')+
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner">'+
       '<div class="brief-top"'+step()+'><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>Morning briefing</span><span class="brief-sys">All systems go</span></div>'+
       '<h1 class="brief-hello"'+step()+'>'+wakeGreeting()+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
       '<div class="brief-sub"'+step()+'>'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+' &middot; '+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div>'+
+      wakeMusicPillHtml()+
+      (notes.length ? '<section class="br-lastnight"'+step()+'><div class="br-k">&#127769; From last night</div>'+notes.map(function(t){ return '<div class="br-ln-text">'+escapeHtml(t)+'</div>'; }).join('')+'</section>' : '')+
+      (vb && vb.elements.length ? '<section class="br-vision"'+step()+' data-action="wakeBoardToggle" title="Open your vision board">'+
+          '<span class="br-vision-k">&#127775; Vision</span>'+boardStaticHtml(vb, 'wake-board')+'<span class="br-vision-hint">Click to open</span></section>' : '')+
       '<div class="brief-cols">'+
         '<section class="br-card"'+step()+'><div class="br-k">Yesterday</div><div class="br-stats">'+
           stat(fmtHours(yDeep), 'deep work', yDeep>=target)+stat(yDone, 'tasks done')+stat(yWork.n ? yWork.n+(yWork.m?' &middot; '+fmtDurationLabel(yWork.m):'') : '—', 'workouts', yWork.n>0)+stat(computeStreak()+'d', 'streak', yStd)+
@@ -351,13 +414,16 @@ function wakeBriefHtml(){
         '<button class="brief-later" data-action="wakeBriefDone">Let\'s go &rarr;</button>'+
       '</div>'+
     '</div>'+
+    (ui.wakeBoardBig && vb ? '<div class="br-vision-big" data-action="wakeBoardToggle" title="Close">'+boardStaticHtml(vb, 'wake-board')+'<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button></div>' : '')+
   '</div>';
 }
+ACTIONS.wakeIntroSkip = function(){ ui.wakeIntroDone = true; renderWakeOverlayInto(); };
 function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : wakeRingHtml(); }
 function renderWakeOverlayInto(){
   const el = document.getElementById('wakeContent'); if(!el) return;
   morphInto(el, renderWakeScreen());
   requestAnimationFrame(function(){ fitStaticBoards(el); });
+  setTimeout(function(){ fitStaticBoards(el); }, 500);
   clearInterval(wakeClockTimer);
   wakeClockTimer = setInterval(function(){
     if(!overlayOpen('wakeOverlay')){ clearInterval(wakeClockTimer); return; }
@@ -400,16 +466,17 @@ function renderWakeSetup(){
       (ov || !base ? '<div class="kpi-sub" style="margin-top:4px;">'+(ov ? (ov.off ? 'No alarm '+morningLabel(od)+'.' : 'Changed to '+fmt12Hour(ov.time)+' for '+morningLabel(od)+' only.') : 'No alarm usually that day.')+'</div>' : '')+
     '</div>'+
     '<div class="ws-block">'+
-      '<div class="kind-label">Wake-up music'+tip('Starts by itself when the alarm goes off — no alarm sound plays with it.')+'</div>'+
-      (w.media ? '<div class="ws-media"><span>&#9835; '+escapeHtml(mediaName(w.media))+'</span><span class="kpi-sub">'+escapeHtml(mediaKindLabel(w.media))+'</span><span style="flex:1"></span>'+
+      '<div class="kind-label">Alarm sound'+tip('Pick a tone, or Music to wake up to a song or playlist — the music plays instead of the tone. If the music ever can\'t start, your tone rings instead, so you still wake up.')+'</div>'+
+      '<div class="ws-sounds">'+[['peaceful','&#127808;','Peaceful'],['standard','&#128276;','Standard'],['loud','&#128226;','Loud']].map(function(x){ const on = !wakeUsesMusic(w) && wakeBeepSound(w)===x[0]; return '<button class="ws-sound'+(on?' is-on':'')+'" data-action="wakeSound" data-id="'+x[0]+'"><span class="ws-sound-i">'+x[1]+'</span>'+x[2]+'</button>'; }).join('')+
+        '<button class="ws-sound ws-sound-music'+(wakeUsesMusic(w) || ui.wakeMusicOpen ? ' is-on' : '')+'" data-action="wakeUseMusic"><span class="ws-sound-i">&#9835;</span>Music</button>'+
+      '</div>'+
+      (wakeUsesMusic(w) || ui.wakeMusicOpen ? '<div class="ws-music-pane">'+
+        (w.media ? '<div class="ws-media"><span>&#9835; '+escapeHtml(mediaName(w.media))+'</span><span class="kpi-sub">'+escapeHtml(mediaKindLabel(w.media))+'</span><span style="flex:1"></span>'+
           '<button class="btn btn-ghost btn-sm" data-action="wakePreviewMusic">'+((wakeAudio||wakeMusicApp)?'&#10073;&#10073; Stop':'&#9654; Test')+'</button><button class="btn btn-ghost btn-sm mini-move-danger" data-action="wakeClearMusic">Remove</button></div>' : '')+
-      wakeMusicPickerHtml(w)+
-      '<input type="file" id="wakeMusicFile" accept="audio/*" style="display:none;">'+
-    '</div>'+
-    '<div class="ws-block">'+
-      '<div class="kind-label">Alarm sound'+(w.media ? tip('Only plays if the music can\'t start.') : '')+'</div>'+
-      '<div class="row" style="gap:6px;flex-wrap:wrap;">'+['peaceful','standard','loud'].map(function(s){ return '<button class="btn btn-sm '+(w.sound===s?'btn-primary':'btn-ghost')+'" data-action="wakeSound" data-id="'+s+'">'+s[0].toUpperCase()+s.slice(1)+'</button>'; }).join('')+
-        '<button class="btn btn-ghost btn-sm" data-action="wakePreviewSound">&#9654; Hear it</button></div>'+
+        wakeMusicPickerHtml(w)+
+        '<input type="file" id="wakeMusicFile" accept="audio/*" style="display:none;">'+
+        '<div class="kpi-sub" style="margin-top:8px;">Backup if the music can\'t start: '+['peaceful','standard','loud'].map(function(x){ return '<button class="ws-backup'+(wakeBeepSound(w)===x?' is-on':'')+'" data-action="wakeBackupSound" data-id="'+x+'">'+x[0].toUpperCase()+x.slice(1)+'</button>'; }).join(' ')+'</div>'+
+      '</div>' : '<div class="row" style="margin-top:8px;"><button class="btn btn-ghost btn-sm" data-action="wakePreviewSound">&#9654; Hear it</button></div>')+
     '</div>'+
     '<div class="ws-block grid grid-2">'+
       '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+
@@ -434,10 +501,12 @@ ACTIONS.wakeSkip = function(){
   wakeArm(); saveWake();
 };
 ACTIONS.wakeClearOverride = function(){ wakeCfg().override = null; wakeArm(); saveWake(); };
-ACTIONS.wakeSound = function(el, e, id){ wakeCfg().sound = id; playAlarmSound(id); saveWake(); };
+ACTIONS.wakeSound = function(el, e, id){ const w = wakeCfg(); w.sound = id; w.useMusic = false; ui.wakeMusicOpen = false; stopWakeMedia(true); playAlarmSound(id); saveWake(); };
+ACTIONS.wakeBackupSound = function(el, e, id){ wakeCfg().sound = id; playAlarmSound(id); saveWake(); };
+ACTIONS.wakeUseMusic = function(){ const w = wakeCfg(); if(w.media) w.useMusic = true; ui.wakeMusicOpen = true; saveWake(); };
 ACTIONS.wakePreviewSound = function(){ playAlarmSound(wakeCfg().sound); };
 ACTIONS.wakePickMusic = function(){ const f = document.getElementById('wakeMusicFile'); if(f) f.click(); };
-ACTIONS.wakeClearMusic = function(){ stopWakeMedia(true); const w = wakeCfg(); if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref); w.media = null; saveWake(); };
+ACTIONS.wakeClearMusic = function(){ stopWakeMedia(true); const w = wakeCfg(); if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref); w.media = null; w.useMusic = false; saveWake(); };
 ACTIONS.wakePreviewMusic = function(){
   if(wakeAudio || wakeMusicApp){ stopWakeMedia(true); renderWakeSetupInto(); return; }
   const w = wakeCfg(); if(!w.media) return;
@@ -473,6 +542,7 @@ ACTIONS.wakeSetAppleMusic = function(){
   const fromLink = appleMusicFromLink(v);
   if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref);
   w.media = fromLink || {type:'music', q:v, k: ui.wakeMusicKind || 'song'};
+  w.useMusic = true;
   saveWake();
   showToast('Wake-up music: '+mediaName(w.media)+' (Apple Music) — hit Test to hear it', {icon:'&#9835;', duration:5000});
 };
@@ -490,7 +560,7 @@ document.addEventListener('change', function(e){
     blobStore(file).then(function(ref){
       const w = wakeCfg();
       if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref);
-      w.media = {ref:ref, name:file.name.replace(/\.[^.]+$/, '')};
+      w.media = {ref:ref, name:file.name.replace(/\.[^.]+$/, '')};  w.useMusic = true;
       saveWake();
       showToast('Wake-up song set: '+w.media.name, {icon:'&#9835;'});
     });
@@ -512,7 +582,7 @@ document.addEventListener('change', function(e){
     if(!v){ if(w.media && w.media.url) w.media = null; }
     else {
       if(w.media && isBlobRef(w.media.ref)) blobRemove(w.media.ref);
-      w.media = appleMusicFromLink(v) || {url:v, name:/youtu/.test(v)?'YouTube':v.replace(/^https?:\/\/(www\.)?/,'').slice(0,40)};
+      w.media = appleMusicFromLink(v) || {url:v, name:/youtu/.test(v)?'YouTube':v.replace(/^https?:\/\/(www\.)?/,'').slice(0,40)}; w.useMusic = true;
     }
   }
   else if(key==='snoozeMinutes') w.snoozeMinutes = Number(t.value)||9;

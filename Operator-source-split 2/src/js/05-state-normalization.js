@@ -238,6 +238,7 @@ function normalizeFocus(f){
   f.sessions = arr(f.sessions).map(function(s){ if(!Array.isArray(s.completedTasks)) s.completedTasks=[]; if(!s.type) s.type='deep'; return s; });
   f.taskSegments = arr(f.taskSegments);
   if(f.nightPlan===undefined) f.nightPlan = null;
+  f.morningNotes = arr(f.morningNotes);
   f.alarms = arr(f.alarms);
   f.alarms.forEach(function(a){ if(!Array.isArray(a.days)) a.days = []; if(!a.armedAt) a.armedAt = Date.now(); });
   f.wake = normalizeWake(f);

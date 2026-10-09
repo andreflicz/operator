@@ -109,7 +109,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.dragAndDrop('.tl-row[data-task-id="d"]', '.tl-row[data-task-id="b"]', {targetPosition:{x:200, y:4}}); await p.waitForTimeout(150);
     check('drag a row to put it where you want it', (await order())==='dbac' || (await order()).startsWith('db'), await order());
     check('the top of the list is what\'s Up next', (await E("nextUpTask().id"))==='d' && await p.isVisible('.tl-row[data-task-id="d"] .tl-badge'));
-    await p.click('.tl-row[data-task-id="d"] .tl-check'); await p.waitForTimeout(1500);
+    check('rows have no tick circles — a stray click never finishes a task', !(await p.$('.tl-row .tl-check')));
+    await p.click('.tl-row[data-task-id="d"] .tl-title'); await p.waitForTimeout(200);
+    check('clicking a row opens it', await E("ui.editingTaskId==='d' || !document.getElementById('taskEditOverlay').classList.contains('hidden')"));
+    await E("closeTaskEditModal(); completeTask('d')"); await p.waitForTimeout(1500);
     check('tick it off and the next one moves up', (await E("nextUpTask().id"))==='b');
     check('the order sticks (saved)', (await E("state.focus.lineupOrder.indexOf('b')")) < (await E("state.focus.lineupOrder.indexOf('a')")));
     await p.click('[data-action="setLineupView"][data-id="cards"]'); await p.waitForTimeout(150);
@@ -131,12 +134,12 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('updates are kept out of My Journal', (await p.$$('.journal-entry')).length===1);
     check('the journal has no Updates tab — app updates aren\'t part of the everyday journal', !(await p.$('[data-action="journalMode"][data-id="updates"]')));
     await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="updates"]'); await p.waitForTimeout(200);
-    await p.click('[data-action="updatesRange"][data-id="all"]'); await p.waitForTimeout(100);
+    await p.selectOption('#updatesRangeSel', 'all'); await p.waitForTimeout(100);
     check('Settings → App updates lists every update', (await p.$$('.upd-card')).length===2);
     check('…in full, with no Read More', (await p.textContent('.upd-card[data-journal-id="e1"] .upd-text')).length > 300 && !(await p.$('.upd-card [data-action="toggleJournalExpand"]')));
     await p.click('.upd-card[data-journal-id="e1"] [data-action="copyUpdate"]'); await p.waitForTimeout(150);
     check('Copy puts one update on the clipboard', (await p.evaluate(() => navigator.clipboard.readText())).startsWith('JJS — weekly update'));
-    await p.click('[data-action="updatesRange"][data-id="7"]'); await p.waitForTimeout(150);
+    await p.selectOption('#updatesRangeSel', '7'); await p.waitForTimeout(150);
     check('the range narrows to the last 7 days', (await p.$$('.upd-card')).length===1);
     await p.click('[data-action="copyAllUpdates"]'); await p.waitForTimeout(150);
     check('Copy all copies everything in range, dated', /^Oct 8 · /.test(await p.evaluate(() => navigator.clipboard.readText())));

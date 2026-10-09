@@ -1,7 +1,8 @@
 
 // ============ TODAY'S LIST (your order) ============
 // Today's Lineup as a numbered list in the order you'll do things. Drag rows to reorder; tick
-// one off and the next moves up. The top of the list is what's suggested Up next (unless you've
+// one off (⋯ or right-click → Done) and the next moves up. Clicking a row opens it — nothing
+// gets finished by a stray click. The top of the list is what's suggested Up next (unless you've
 // lined something else up yourself), and the cards view follows the same order.
 // The order is stored as a list of task ids — tasks you haven't placed yet go after, by priority.
 function lineupOrdered(list){
@@ -24,11 +25,10 @@ function lineupListHtml(today){
   return '<ol class="tl-list">'+today.map(function(t, i){
     const isNow = ui.currentTaskId===t.id, isNext = !isNow && nextId===t.id, doneToday = isOngoingDoneToday(t);
     const selected = ui.selectedTaskIds.has(t.id);
-    return '<li class="tl-row'+(isNow?' is-now':'')+(isNext?' is-next':'')+(doneToday?' is-done':'')+(selected?' row-selected':'')+(justCompletedTaskId===t.id?' just-completed':'')+'" draggable="true" data-task-id="'+t.id+'" data-dropzone="order" data-id="'+t.id+'">'+
+    return '<li class="tl-row'+(isNow?' is-now':'')+(isNext?' is-next':'')+(doneToday?' is-done':'')+(selected?' row-selected':'')+(justCompletedTaskId===t.id?' just-completed':'')+'" draggable="true" data-task-id="'+t.id+'" data-dropzone="order" data-id="'+t.id+'" data-action="openTaskEditModal" title="Open — right-click for more">'+
       '<span class="tl-grip" title="Drag to reorder">&#8942;&#8942;</span>'+
       '<span class="tl-num">'+(i+1)+'</span>'+
-      '<button class="tl-check'+(doneToday?' is-on':'')+'" data-action="'+(doneToday?'undoTask':'completeTask')+'" data-id="'+t.id+'" title="'+(doneToday?'Undo':(t.ongoing?'Done for today':'Done'))+'">'+(doneToday?'&#10003;':'')+'</button>'+
-      '<span class="tl-main" data-action="openTaskEditModal" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span class="tl-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-ongoing">&#128204;</span>':'')+'</span>'+
+      '<span class="tl-main">'+priorityTag(t.priority)+'<span class="tl-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-ongoing">&#128204;</span>':'')+'</span>'+
       clientTagsHtml(t.clients)+
       (t.deadline ? deadlineTag(t) : '')+
       (isNow ? '<span class="tl-badge is-now">Now</span>' : isNext ? '<span class="tl-badge">Up next</span>' : '')+

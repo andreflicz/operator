@@ -54,7 +54,10 @@ ACTIONS.createUpdatesType = function(){
   state.journal.updatesType = 'updates';
   persist('journal'); renderView();
 };
-document.addEventListener('change', function(e){ if(e.target && e.target.id==='updatesTypeSel') ACTIONS.setUpdatesType(e.target); });
+document.addEventListener('change', function(e){
+  if(e.target && e.target.id==='updatesTypeSel') ACTIONS.setUpdatesType(e.target);
+  if(e.target && e.target.id==='updatesRangeSel'){ ui.updatesRange = e.target.value; renderView(); }
+});
 document.addEventListener('input', function(e){ if(e.target && e.target.id==='updatesSearch'){ ui.updatesSearch = e.target.value; clearTimeout(ui._updT); ui._updT = setTimeout(renderView, 150); } });
 function updateCardHtml(e){
   const photos = arr(e.photos);
@@ -80,12 +83,12 @@ function renderUpdatesTab(){
   const list = updateEntries(), r = updatesRange();
   const groups = [], byDate = {};
   list.forEach(function(e){ if(!byDate[e.date]){ byDate[e.date] = []; groups.push(e.date); } byDate[e.date].push(e); });
+  const RANGES = [['session','Latest session'],['1h','Last hour'],['2h','Last 2 hours'],['7','Last 7 days'],['30','Last 30 days'],['all','All time']];
   return '<div class="upd-bar">'+
-      '<div class="seg-tabs" style="margin:0;">'+[['session','Latest session'],['1h','Last hour'],['2h','Last 2 hours'],['7','7 days'],['30','30 days'],['all','All']].map(function(x){ return '<button class="seg-tab'+(r===x[0]?' active':'')+'" data-action="updatesRange" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>'+
-      '<input class="input" id="updatesSearch" placeholder="Search updates…" value="'+escapeHtml(ui.updatesSearch||'')+'" style="flex:1;min-width:160px;max-width:280px;">'+
-      '<span style="flex:1"></span>'+
-      '<span class="kpi-sub">'+list.length+' update'+(list.length===1?'':'s')+'</span>'+
-      '<button class="btn btn-primary btn-sm" data-action="copyAllUpdates"'+(list.length?'':' disabled')+'>&#128203; Copy all</button>'+
+      '<select class="input upd-range" id="updatesRangeSel" title="Which updates to show">'+RANGES.map(function(x){ return '<option value="'+x[0]+'"'+(r===x[0]?' selected':'')+'>'+x[1]+'</option>'; }).join('')+'</select>'+
+      '<input class="input upd-search" id="updatesSearch" placeholder="Search…" value="'+escapeHtml(ui.updatesSearch||'')+'">'+
+      '<span class="upd-count">'+list.length+' update'+(list.length===1?'':'s')+'</span>'+
+      '<button class="btn btn-primary btn-sm upd-copyall" data-action="copyAllUpdates"'+(list.length?'':' disabled')+'>&#128203; Copy all</button>'+
     '</div>'+
     (list.length ? groups.map(function(d){
       const label = d===todayStr() ? 'Today' : d===addDays(todayStr(), -1) ? 'Yesterday' : weekdayShort(d)+', '+fmtDateShort(d);

@@ -108,9 +108,14 @@ function renderToday(){
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
   const order = arr(state.dashboardPanels.order);
   const enabledOrder = order.filter(function(pid){ return state.dashboardPanels.enabled[pid]!==false; });
+  const editing = todayEditing();
   let panelsHtml = '';
   let i = 0;
-  while(i < enabledOrder.length){
+  if(editing){
+    const vis = enabledOrder.filter(function(pid){ return pid!=='heatmap'; });
+    panelsHtml = vis.map(function(pid, idx){ const fn = PANEL_RENDERERS[pid]; return todayEditWrap(pid, fn ? fn() : '', idx, vis.length); }).join('')+todayEditTrayHtml();
+  }
+  while(!editing && i < enabledOrder.length){
     const pid = enabledOrder[i];
     if(SMALL_PANELS.indexOf(pid)>=0){
       const rowPanels = [];
@@ -126,6 +131,7 @@ function renderToday(){
   return renderFocusQuickLinks()+
     renderTodayHero(greeting)+
     renderMorningPlanCard()+
-    '<div class="today-panels">'+panelsHtml+'</div>';
+    pageEditBtnHtml('toggleTodayEdit', editing)+
+    '<div class="today-panels'+(editing?' is-editing':'')+'">'+panelsHtml+'</div>';
 }
 

@@ -123,11 +123,12 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("fireWake({test:true})"); await p.waitForTimeout(300);
     check('the alarm screen: big clock, I\'m up, snooze', await p.isVisible('.wk2-clock') && await p.isVisible('.wk2-up') && await p.isVisible('.wk2-snooze'));
-    check('…with a small vision board you can open', await p.isVisible('.wk2-vision'));
-    await p.click('.wk2-vision'); await p.waitForTimeout(200);
-    check('clicking it opens the vision board big', await p.isVisible('.wk2.board-open'));
-    await p.click('.wk2-vision-x'); await p.waitForTimeout(200);
+    check('…and no vision board on the alarm screen (it\'s in the briefing now)', !(await p.isVisible('.wk2-vision')));
     await p.click('[data-action="wakeImUp"]'); await p.waitForTimeout(400);
+    check('the briefing opens with the vision board', await p.isVisible('.br-vision'));
+    await p.click('.br-vision'); await p.waitForTimeout(200);
+    check('clicking it opens the vision board big', await p.isVisible('.br-vision-big'));
+    await p.click('.br-vision-big .wk2-vision-x'); await p.waitForTimeout(200);
     const brief = await p.textContent('.brief');
     check('"I\'m up" opens the morning briefing', /Good morning/.test(brief) && /Yesterday/.test(brief) && /Today.s plan/.test(brief) && /Goals/.test(brief) && /Edit JJS reel/.test(brief));
     await p.click('[data-action="wakeBriefDone"]'); await p.waitForTimeout(200);
@@ -202,9 +203,9 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('Settings opens on You', (await E("ui.settingsTab"))==='you' && /About you/.test(await p.textContent('#viewRoot')) && await p.isVisible('#setName') && /Daily Standard/.test(await p.textContent('#viewRoot')) && /Why You/.test(await p.textContent('#viewRoot')));
     await p.click('[data-action="settingsTab"][data-tab="updates"]'); await p.waitForTimeout(150);
     check('App updates open on the latest session', (await p.$$('.upd-card')).length===2);
-    await p.click('[data-action="updatesRange"][data-id="1h"]'); await p.waitForTimeout(100);
+    await p.selectOption('#updatesRangeSel', '1h'); await p.waitForTimeout(100);
     check('…or the last hour', (await p.$$('.upd-card')).length===2);
-    await p.click('[data-action="updatesRange"][data-id="all"]'); await p.waitForTimeout(100);
+    await p.selectOption('#updatesRangeSel', 'all'); await p.waitForTimeout(100);
     check('…or everything', (await p.$$('.upd-card')).length===3);
     await p.click('[data-action="nav"][data-view="business"]'); await p.waitForTimeout(200);
     check('the revenue bar shows where the goal is', await p.isVisible('.hq-mrr .biz-bar-end') && /\$10k|\$10,000/.test(await p.textContent('.hq-mrr .biz-bar-end')));

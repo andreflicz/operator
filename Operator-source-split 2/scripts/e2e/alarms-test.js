@@ -131,6 +131,8 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   await M("(function(){ const o = playAlarmSound; window.__beeps = 0; playAlarmSound = function(x){ window.__beeps++; return o(x); }; })()");
   await M('openWakeSetup()');
   check('no second-screen option in the setup', !(await m.textContent('#wakeSetupContent')).includes('Second screen'));
+  check('Music is one of the alarm sounds', await m.isVisible('.ws-sound-music'));
+  await m.click('[data-action="wakeUseMusic"]'); await m.waitForTimeout(100);
   check('Apple Music is the first music option', await m.isVisible('#wakeMusicQuery'));
   await m.fill('#wakeMusicQuery', 'https://music.apple.com/us/album/lose-yourself/1440903625?i=1440903630');
   await m.click('[data-action="wakeSetAppleMusic"]');
@@ -142,18 +144,23 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   await M("hideOverlay('wakeSetupOverlay')");
   calls.length = 0; await M("window.__beeps = 0");
   await m.clock.setSystemTime(at(7,0)); await M('checkAllAlarms()'); await m.waitForTimeout(300);
-  check('alarm rings with the vision board on the main screen', await m.isVisible('#wakeOverlay .wk2') && (await m.textContent('#wakeOverlay')).includes('Mind + Body'));
+  check('alarm rings: the wake screen comes up', await m.isVisible('#wakeOverlay .wk2'));
   check('it plays the song (and wakes / unmutes the Mac)', calls.some(c => c.startsWith('/music/play')) && calls.some(c => c==='/wake'), calls);
   await m.waitForTimeout(3000);
   check('no alarm beep while the song plays', await M("window.__beeps")===0);
   check('never asks for screen permissions', await m.evaluate(() => window.__screenAsked)===0);
-  await m.click('[data-action="wakeImUp"]'); await m.waitForTimeout(150);
-  check('"I\'m up" stops the music', calls.some(c => c==='/music/stop'), calls);
+  await m.click('[data-action="wakeImUp"]'); await m.waitForTimeout(300);
+  check('"I\'m up" lets the song play out instead of cutting it off', calls.some(c => c==='/music/finish') && !calls.some(c => c==='/music/stop'), calls);
+  check('…and the briefing has the vision board', (await m.textContent('#wakeOverlay')).includes('Mind + Body'));
+  await m.click('[data-action="wakeStopMusic"]'); await m.waitForTimeout(300);
+  check('the little ■ on the briefing stops it right away', calls.some(c => c==='/music/stop'), calls);
+  await M("endBriefing()");
   // if the Operator app isn't there to play it, the alarm sound steps in
   await m.unroute('http://127.0.0.1:8935/**');
   await m.route('http://127.0.0.1:8935/**', r => r.abort());
-  await M("window.__beeps = 0; fireWake({test:true})"); await m.waitForTimeout(400);
-  check('music can\'t start → alarm sound instead', await M("window.__beeps")>0 && await m.isVisible('[data-action="wakePlayMusic"]'));
+  await M("window.__beeps = 0; fireWake({test:true})");
+  for(let i=0;i<40;i++){ await m.clock.runFor(400); await m.waitForTimeout(40); }
+  check('music can\'t start → the alarm sound rings instead, nothing to click', await M("window.__beeps")>0 && !(await m.isVisible('[data-action="wakePlayMusic"]')));
   await m.click('[data-action="wakeImUp"]');
   check('no page errors (music)', m.errors.length===0, m.errors);
   await b.close();

@@ -92,7 +92,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("openWakeSetup()"); await p.waitForTimeout(150);
   const wk = await p.evaluate(() => { const r = document.getElementById('wakeSetupContent'); return {tips:r.querySelectorAll('.qtip').length, long:[...r.querySelectorAll('.kpi-sub')].map(e => e.textContent.trim()).filter(t => t.length > 60), music:[...r.querySelectorAll('.kind-label')].map(e => e.textContent).join('|')}; });
   check('wake setup explanations are tips', wk.tips >= 4 && !wk.long.length, wk);
-  check('…labels stay short ("Wake-up music", "Alarm sound")', /Wake-up music\?/.test(wk.music) && !/starts by itself/i.test(wk.music), wk.music);
+  check('…labels stay short ("Alarm sound")', /Alarm sound\?/.test(wk.music) && !/starts by itself/i.test(wk.music), wk.music);
   await p.click('[data-action="closeWakeSetup"]');
 
   // ---- nothing chunky left on the main pages ----

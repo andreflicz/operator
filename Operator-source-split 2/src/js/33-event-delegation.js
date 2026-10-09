@@ -6,6 +6,7 @@ document.body.addEventListener('click', function(e){
   const id = el.dataset.id;
   switch(a){
     case 'nav': {
+      ui.boardReturnTo = null;
       holdRenders(function(){
         closePreFocusModal(); closeStopFocus(); closeTimesUpModal(); closeMultiBreakWarning(); closeFinalStopConfirm();
         closeTaskEditModal(); closeProspectEditModal(); closeClientModal(); closeLockInChooser(); closeJournalEditModal(); closeGoalEditModal();

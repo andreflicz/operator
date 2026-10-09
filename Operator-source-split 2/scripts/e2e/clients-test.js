@@ -35,17 +35,19 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('1/2 on Thursday is right on pace = yellow', await at(8)==='warn');
   check('1/2 on Sunday is behind = red', await at(11)==='danger');
   await E(D+".completedDates=['2026-10-07','2026-10-09']");
-  check('2/2 on Sunday is on time but not ahead = yellow', await at(11)==='warn');
+  check('2/2 on Sunday: the week\'s number is in = green', await at(11)==='good');
   check('2/2 by Friday is ahead = green', await at(9)==='good');
   await E(D+".completedDates=[]");
   check('0/2 on Sunday is red', await at(11)==='danger');
   await E(D+".completedDates=['2026-10-07']");
-  check('a missed week stays red into the next week', await at(12)==='danger');
+  check('a missed week doesn\'t carry over — Monday starts clean (on pace, not red)', await at(12)==='warn');
   await E("ui.view='today'; renderView()");
-  check('card shows what\'s owed from last week', (await p.textContent('.hub-card[data-key="hub-c1"]')).includes('+1 owed') && (await p.textContent('.hub-card[data-key="hub-c1"]')).includes('0/3'));
+  check('card shows just this week: 0/2, nothing "owed"', !(await p.textContent('.hub-card[data-key="hub-c1"]')).includes('owed') && (await p.textContent('.hub-card[data-key="hub-c1"]')).includes('0/2'));
   await p.click('.client-hub [data-action="incrementDeliverableProgress"][data-id="d1"]');
-  check('making it up gets it back on pace', await E("deliverablePaceStatus("+D+")")==='warn' && await p.isVisible('.hub-card[data-key="hub-c1"] .cc2-owed.is-caught'));
-  check('the pill says why: On pace, not "Slipping"', /On pace/.test(await p.textContent('.hub-card[data-key="hub-c1"]')) || /On pace|Check in/.test(await E("clientHealthLabel(clientHealthStatus(state.business.clients[0]))")));
+  check('one on Monday puts you ahead', await E("deliverablePaceStatus("+D+")")==='good');
+  await p.click('.client-hub [data-action="incrementDeliverableProgress"][data-id="d1"]');
+  check('2/2 = done for the week, with a check', (await p.textContent('.hub-card[data-key="hub-c1"]')).includes('2/2') && await p.isVisible('.hub-card[data-key="hub-c1"] .cc2-owed.is-caught'));
+  check('the pill says Ahead / done for the week', /Ahead/.test(await E("clientHealthLabel(clientHealthStatus(state.business.clients[0]))")) || /Check in/.test(await E("clientHealthLabel(clientHealthStatus(state.business.clients[0]))")));
   // converted leads
   check('already-converted lead: task re-tagged to the client on load', await E("JSON.stringify(state.tasks.items.find(t=>t.id==='t2').clients)")==='["personal","c9"]');
   check('converted lead is not offered as a (Lead) tag', await E("!clientCheckboxOptions().some(o=>o.value==='lead:l9')"));

@@ -14,7 +14,7 @@ function renderSettings(){
     integrations: ghlSettingsHtml(),
     updates: '<div class="upd-panel">'+renderUpdatesTab()+'</div>',
     general: '<div class="card section"><div class="section-title">Preferences</div><div class="grid grid-2">'+
-        '<div class="field"><label>Sound effects</label><select class="input" id="setSound"><option value="on" '+(p.soundEnabled!==false?'selected':'')+'>On</option><option value="off" '+(p.soundEnabled===false?'selected':'')+'>Off</option></select></div>'+
+        '<div class="field"><label>Sound effects</label><div class="row" style="gap:6px;"><select class="input" id="setSound"><option value="modern" '+(p.soundEnabled!==false && p.soundPack!=='classic'?'selected':'')+'>Modern</option><option value="classic" '+(p.soundEnabled!==false && p.soundPack==='classic'?'selected':'')+'>Classic beeps</option><option value="off" '+(p.soundEnabled===false?'selected':'')+'>Off</option></select><button class="btn btn-ghost btn-sm" data-action="previewSounds" title="Hear them">&#9654;</button></div></div>'+
         '<div class="field"><label>Note field after finishing a task in Focus</label><select class="input" id="setFocusNote"><option value="on" '+(p.focusNotePromptEnabled!==false?'selected':'')+'>Enabled</option><option value="off" '+(p.focusNotePromptEnabled===false?'selected':'')+'>Disabled</option></select></div>'+
         '<div class="field"><label>Notify when a focus timer ends</label><select class="input" id="setNotifyEnd"><option value="on" '+(p.notifyOnFocusEnd!==false?'selected':'')+'>On</option><option value="off" '+(p.notifyOnFocusEnd===false?'selected':'')+'>Off</option></select></div>'+
       '</div></div>'+saveBtn+
@@ -328,7 +328,7 @@ function saveProfile(){
   const nameEl = document.getElementById('setName'); if(nameEl) state.profile.name = nameEl.value.trim() || 'Operator';
   const bizNameEl = document.getElementById('setBusinessName');
   if(bizNameEl) state.profile.businessName = bizNameEl.value.trim();
-  const soundEl = document.getElementById('setSound'); if(soundEl) state.profile.soundEnabled = soundEl.value === 'on';
+  const soundEl = document.getElementById('setSound'); if(soundEl){ state.profile.soundEnabled = soundEl.value!=='off'; if(soundEl.value!=='off') state.profile.soundPack = soundEl.value==='classic' ? 'classic' : 'modern'; }
   const focusNoteEl = document.getElementById('setFocusNote'); if(focusNoteEl) state.profile.focusNotePromptEnabled = focusNoteEl.value === 'on';
   const notifyEl = document.getElementById('setNotifyEnd'); if(notifyEl) state.profile.notifyOnFocusEnd = notifyEl.value === 'on';
   const calEl = document.getElementById('setCalories'); if(calEl) state.profile.calorieTarget = Number(calEl.value)||2000;

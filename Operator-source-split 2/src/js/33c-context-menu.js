@@ -33,6 +33,7 @@ function appMenuHtml(){
     ci('recap', '&#128202; Day recap')+
     (selectableView() && selVisibleCards().length ? ci('selAll', '&#9745; Select all tasks <span class="ctx-kbd">&#8984;A</span>') : '')+
     ci('wake', '&#9200; Wake-up alarm')+
+    (ui.view==='today' ? ci('editPage', s ? (ui.lockedEdit ? '&#10003; Done editing' : '&#9998; Edit this page') : (ui.todayEdit ? '&#10003; Done editing' : '&#9998; Edit this page')) : '')+
     SEP+
     crow('Go to', ['today','focus','business','calendar','personal'].map(function(v){ return chip('go', v[0].toUpperCase()+v.slice(1), {a:v, on:ui.view===v}); }).join(''))+
     SEP+
@@ -127,6 +128,7 @@ ACTIONS.ctx = function(el){
   else if(op==='recap') ACTIONS.openDayRecap();
   else if(op==='selAll') selectAllVisibleTasks();
   else if(op==='wake') openWakeSetup();
+  else if(op==='editPage'){ if(state.focus.activeSession) ACTIONS.toggleLockedEdit(); else ACTIONS.toggleTodayEdit(); }
   else if(op==='go') go(a);
   else if(op==='theme') setThemePref(a);
   else if(op==='scene') setScene(a);

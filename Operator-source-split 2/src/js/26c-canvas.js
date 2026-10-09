@@ -97,7 +97,7 @@ function renderBoardShell(kind){
         tool('boardBgToggle', '&#127912; Background', 'Change this board\'s background', ui.boardBgOpen ? ' data-on="1"' : '')+
         (ui.boardBgOpen ? boardBgPickerHtml(b) : '')+
         tool('boardToggleView', view?'&#9998; Edit':'&#128065; View', view?'Back to editing':'View mode — hide the editing tools')+
-        tool('boardFullscreen', full?'&#10530; Exit full screen':'&#9974; Full screen', full?'Exit full screen (Esc)':'Full screen')+
+        tool('boardFullscreen', full?(ui.boardReturnTo?'&#8592; Back':'&#10530; Exit full screen'):'&#9974; Full screen', full?(ui.boardReturnTo?'Back to where you were (Esc)':'Exit full screen (Esc)'):'Full screen')+
       '</div>'+
     '</div>'+
     (view ? '' : '<div class="board-toolbar">'+
@@ -137,12 +137,21 @@ ACTIONS.boardFullscreen = function(el){
   try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); }catch(e){}
   renderView();
 };
+function boardReturnBack(){
+  const r = ui.boardReturnTo; ui.boardReturnTo = null;
+  if(!r) return;
+  if(ui.boardView) ui.boardView.journal = false;
+  ui.view = r.view;
+  renderView();
+  const root = document.getElementById('viewRoot'); if(root && r.scroll) root.scrollTop = r.scroll;
+}
 function exitBoardFullscreen(){
   ui.boardFull = null;
   try{ if(document.fullscreenElement) document.exitFullscreen().catch(function(){}); }catch(e){}
+  if(ui.boardReturnTo){ boardReturnBack(); return; }
   renderView();
 }
-document.addEventListener('fullscreenchange', function(){ if(!document.fullscreenElement && ui.boardFull){ ui.boardFull = null; renderView(); } });
+document.addEventListener('fullscreenchange', function(){ if(!document.fullscreenElement && ui.boardFull){ ui.boardFull = null; if(ui.boardReturnTo){ boardReturnBack(); return; } renderView(); } });
 // ---- mounting ----
 afterRenderHooks.push(function(){
   const host = document.getElementById('boardHost');
@@ -157,8 +166,14 @@ afterRenderHooks.push(function(){
     drawBoard();
   }
 });
+// Opening a board always frames everything on it, centred (like Milanote) — and while you
+// haven't panned or zoomed yourself, it stays framed as the window or full screen changes size.
+let cvResizeObs = null;
+function fitBoardSoon(){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ if(!cv.userMoved || cv._fitPending){ cv._fitPending = false; fitBoard(); } }); }); }
 function mountBoard(host, key){
+  const sameBoard = host._cvKey && host._cvKey.split(':')[1]===key.split(':')[1];
   cv.host = host; host._cvKey = key;
+  if(!sameBoard || ui.boardFull){ cv.userMoved = false; cv._fitPending = true; }
   host.innerHTML = '<div class="board-world"><svg class="board-lines" width="1" height="1"><defs><marker id="bArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/></marker></defs><g class="board-lines-g"></g></svg><div class="board-els"></div></div><div class="board-marquee"></div>';
   cv.world = host.querySelector('.board-world');
   cv.els = host.querySelector('.board-els');
@@ -173,7 +188,19 @@ function mountBoard(host, key){
     host.addEventListener('dblclick', boardDblClick);
     host.addEventListener('wheel', boardWheel, {passive:false});
   }
+  if(typeof ResizeObserver!=='undefined'){
+    if(cvResizeObs) cvResizeObs.disconnect();
+    let last = '';
+    cvResizeObs = new ResizeObserver(function(){
+      if(!cv.host) return;
+      const r = cv.host.getBoundingClientRect(), sig = Math.round(r.width)+'x'+Math.round(r.height);
+      if(sig===last) return; last = sig;
+      if(!cv.userMoved && !cv.drag) fitBoard();
+    });
+    cvResizeObs.observe(host);
+  }
   drawBoard();
+  fitBoardSoon();
 }
 function cvBoard(){ return boardById(cv.boardId); }
 function applyViewport(){
@@ -318,7 +345,7 @@ function boardPointerMove(e){
   }
   const z = b.viewport.zoom;
   if(d.type==='pan'){
-    b.viewport.x = d.vx + dx; b.viewport.y = d.vy + dy; applyViewport();
+    b.viewport.x = d.vx + dx; b.viewport.y = d.vy + dy; cv.userMoved = true; applyViewport();
   } else if(d.type==='move'){
     b.elements.forEach(function(x){
       const o = d.origins[x.id]; if(!o) return;
@@ -379,6 +406,7 @@ function boardWheel(e){
   } else {
     b.viewport.x -= e.deltaX; b.viewport.y -= e.deltaY;
   }
+  cv.userMoved = true;
   applyViewport(); saveBoardsSoon();
 }
 function zoomBy(f){
@@ -386,6 +414,7 @@ function zoomBy(f){
   const r = cv.host.getBoundingClientRect(); const mx = r.width/2, my = r.height/2;
   const z0 = b.viewport.zoom, z1 = clamp(z0*f, 0.15, 4);
   b.viewport.x = mx - (mx-b.viewport.x)*z1/z0; b.viewport.y = my - (my-b.viewport.y)*z1/z0; b.viewport.zoom = z1;
+  cv.userMoved = true;
   applyViewport(); saveBoardsSoon();
 }
 function fitBoard(){
@@ -393,9 +422,17 @@ function fitBoard(){
   let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
   b.elements.forEach(function(e){
     if(e.type==='line'){ minX=Math.min(minX,e.x1,e.x2); maxX=Math.max(maxX,e.x1,e.x2); minY=Math.min(minY,e.y1,e.y2); maxY=Math.max(maxY,e.y1,e.y2); }
-    else { minX=Math.min(minX,e.x); minY=Math.min(minY,e.y); maxX=Math.max(maxX,e.x+e.w); maxY=Math.max(maxY,e.y+e.h); }
+    else {
+      // cards grow with their text, so measure the drawn card when there is one
+      const node = cv.els && cv.els.querySelector('[data-el="'+e.id+'"]');
+      const h = Math.max(e.h||0, node ? node.offsetHeight : 0), w = Math.max(e.w||0, node ? node.offsetWidth : 0);
+      minX=Math.min(minX,e.x); minY=Math.min(minY,e.y); maxX=Math.max(maxX,e.x+w); maxY=Math.max(maxY,e.y+h);
+    }
   });
+  if(!isFinite(minX) || !isFinite(minY)) return;
   const r = cv.host.getBoundingClientRect(), pad = 40;
+  if(!r.width || !r.height) return;
+  cv.userMoved = false;
   const z = clamp(Math.min((r.width-pad*2)/Math.max(1,maxX-minX), (r.height-pad*2)/Math.max(1,maxY-minY)), 0.15, 1.5);
   b.viewport = {zoom:z, x:(r.width-(maxX-minX)*z)/2 - minX*z, y:(r.height-(maxY-minY)*z)/2 - minY*z};
   applyViewport(); saveBoardsSoon();
@@ -654,7 +691,7 @@ function showBoardsPage(boardId){
   ui.boardIds = ui.boardIds || {}; if(boardId) ui.boardIds.journal = boardId;
 }
 ACTIONS.goToVision = function(){ const m = masterVisionBoard(); showBoardsPage(m && m.id); renderView(); };
-function renderVisionSlideshow(){ return ''; }
+function renderVisionSlideshow(){ return renderVisionPanel(); }
 // ---- static (read-only) render of a board — wake screen, second display, previews ----
 // The master vision board is the one board that shows up on the wake screen.
 function masterVisionBoard(){
@@ -711,8 +748,11 @@ function renderVisionPanel(){
       '<span class="vision-panel-hint">&#9974; Full screen</span></div>'+
   '</div>';
 }
+// Opened from Today / the locked-in page: closing it (Esc, Exit full screen) takes you back there.
 ACTIONS.openVisionFull = function(){
-  const m = masterVisionBoard(); showBoardsPage(m && m.id);
+  const m = masterVisionBoard();
+  ui.boardReturnTo = {view:ui.view, scroll:(document.getElementById('viewRoot')||{}).scrollTop||0};
+  showBoardsPage(m && m.id);
   ui.boardView = ui.boardView || {}; ui.boardView.journal = true;
   ui.boardFull = 'journal';
   try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); }catch(e){}
