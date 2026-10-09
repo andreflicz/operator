@@ -93,12 +93,14 @@ function renderSettings(){
 
     focus: '<div class="card section"><div class="section-title">App Tracking<span class="kpi-sub">Sees which app is in the foreground on this Mac — nothing leaves the machine</span></div><div class="grid grid-2">'+
         '<div class="field"><label>Track foreground app</label><select class="input" id="setAppTrackingEnabled"><option value="on" '+(state.settings.appTracking.enabled!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.enabled===false?'selected':'')+'>Off</option></select></div>'+
-        '<div class="field"><label>Auto lock-in when steady on one app</label><select class="input" id="setAppTrackingAutoLockIn"><option value="on" '+(state.settings.appTracking.autoLockIn!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.autoLockIn===false?'selected':'')+'>Off</option></select></div>'+
+        '<div class="field"><label>Auto lock-in when steady on work apps</label><select class="input" id="setAppTrackingAutoLockIn"><option value="on" '+(state.settings.appTracking.autoLockIn!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.autoLockIn===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Minutes on one app before auto lock-in</label><input class="input" type="number" min="3" max="120" id="setAppTrackingThreshold" value="'+state.settings.appTracking.thresholdMinutes+'"></div>'+
         '<div class="field"><label>Minutes away before auto-ending it</label><input class="input" type="number" min="1" max="60" id="setAppTrackingGrace" value="'+state.settings.appTracking.graceMinutes+'"><div class="kpi-sub">Only applies to sessions Operator started automatically — it never auto-ends a session you started yourself</div></div>'+
         '<div class="field"><label>Cooldown after you lock out (minutes)</label><input class="input" type="number" min="0" max="240" id="setAppTrackingCooldown" value="'+state.settings.appTracking.cooldownMinutes+'"><div class="kpi-sub">Auto lock-in stays off this long after you stop a session yourself</div></div>'+
+        '<div class="field"><label>Day recap pops up at</label><input class="input" type="time" id="setRecapTime" value="'+(state.settings.appTracking.recapTime||'21:30')+'"><div class="kpi-sub">Shows what you did and lets you check sessions that started automatically</div></div>'+
         '<div class="field"><label>Idle after (seconds without keyboard/mouse)</label><input class="input" type="number" min="15" max="900" id="setAppTrackingIdle" value="'+state.settings.appTracking.idleSeconds+'"><div class="kpi-sub">Idle time doesn\'t count toward auto lock-in or app time</div></div>'+
       '</div></div>'+saveBtn+
+      workAppsSettingsHtml()+
       wakeSettingsCardHtml()+
       '<div class="card section" id="alarmsSettingsSection"><div class="section-title">Other alarms</div>'+
         '<div class="row" style="flex-wrap:wrap;align-items:flex-end;">'+
@@ -354,6 +356,8 @@ function saveProfile(){
   if(atGraceEl) state.settings.appTracking.graceMinutes = Number(atGraceEl.value)||3;
   const atCooldownEl = document.getElementById('setAppTrackingCooldown');
   if(atCooldownEl){ const v = Number(atCooldownEl.value); state.settings.appTracking.cooldownMinutes = (isNaN(v) || atCooldownEl.value==='') ? 15 : clamp(v,0,240); }
+  const rtEl = document.getElementById('setRecapTime');
+  if(rtEl && rtEl.value) state.settings.appTracking.recapTime = rtEl.value;
   const atIdleEl = document.getElementById('setAppTrackingIdle');
   if(atIdleEl) state.settings.appTracking.idleSeconds = clamp(Number(atIdleEl.value)||60, 15, 900);
   persist('profile'); persist('standards'); persist('settings'); renderView();

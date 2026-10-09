@@ -110,6 +110,8 @@ const SP = require('./common.js').OUT;
   // sleep mode
   if(!(await p.isVisible('.wind-drop'))) await p.click('[data-action="toggleWindDown"]');
   await p.click('.wind-drop [data-action="startSleepMode"]');
+  check('going to sleep shows the day recap', await p.isVisible('#recapOverlay:not(.hidden)'));
+  await p.click('#recapOverlay [data-action="closeDayRecap"]');
   check('sleep view', (await p.textContent('#viewRoot')).includes('Sleep mode') && await p.isVisible('.sleep-card'));
   check('sleep shows next alarm 5:45', (await p.textContent('.sleep-card')).includes('5:45'));
   check('auto lock-in blocked in sleep', await E("autoLockInBlockedReason()")==='mode');

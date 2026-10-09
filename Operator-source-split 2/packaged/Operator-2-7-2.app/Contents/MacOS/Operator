@@ -21,7 +21,8 @@ mkdir -p "$PROFILE_DIR"
 # Operator can show which app is currently in the foreground and auto lock-in
 # when you've been steady on one app for a while. A web page can't see other
 # apps on its own, so this wrapper does the OS-level part: it polls the
-# frontmost app via System Events and serves recent samples over a tiny,
+# frontmost app (and, in a browser, the website's domain) via System Events and serves
+# recent samples over a tiny,
 # loopback-only (127.0.0.1) HTTP endpoint that the page polls. Nothing here
 # ever leaves the machine, and if any of this fails, the app just runs
 # without that feature — everything else works normally either way.
@@ -37,8 +38,24 @@ poll_frontmost() {
     # Seconds since the last keyboard/mouse input, so the page only counts active use
     # (an app merely left open in the foreground doesn't count toward auto lock-in).
     IDLE=$(ioreg -c IOHIDSystem 2>/dev/null | awk '/HIDIdleTime/ {print int($NF/1000000000); exit}')
+    # In a browser, also note which website is open (just the domain), so sites can be
+    # sorted into work / not work like apps. macOS asks once for permission to read it.
+    SITE=""
+    case "$APP" in
+      "Google Chrome"|"Brave Browser"|"Microsoft Edge"|"Arc"|"Chromium")
+        URL=$(osascript -e "tell application \"$APP\" to get URL of active tab of front window" 2>/dev/null) ;;
+      "Safari")
+        URL=$(osascript -e 'tell application "Safari" to get URL of front document' 2>/dev/null) ;;
+      *) URL="" ;;
+    esac
+    if [ -n "$URL" ]; then
+      case "$URL" in
+        file://*Operator*|file://*command-center*) SITE="Operator" ;;
+        http://*|https://*) SITE=$(printf '%s' "$URL" | sed -E 's#^[a-z]+://##; s#/.*$##; s#:.*$##; s#^www\.##') ;;
+      esac
+    fi
     if [ -n "$APP" ]; then
-      printf '%s\t%s\t%s\n' "$(date +%s000)" "$APP" "${IDLE:-0}" >> "$ACTIVITY_LOG" 2>/dev/null
+      printf '%s\t%s\t%s\t%s\n' "$(date +%s000)" "$APP" "${IDLE:-0}" "$SITE" >> "$ACTIVITY_LOG" 2>/dev/null
     fi
     # Keep the log from growing forever — the app only ever needs recent history.
     if [ -f "$ACTIVITY_LOG" ]; then

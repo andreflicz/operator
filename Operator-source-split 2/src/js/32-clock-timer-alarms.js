@@ -1,21 +1,35 @@
 // ============ CLOCK / TIMER / ALARMS ============
+// The locked-in header's tint + divider run edge to edge of the content area. Measured from
+// the view container (not the header itself, whose margins this sets), and re-run whenever
+// the content area changes size — collapsing the sidebar used to leave a black strip
+// because the header was measured mid-animation.
 function stretchLockedHeaderLine(){
   const header = document.querySelector('.locked-in-header');
   const main = document.querySelector('.main');
-  if(!header || !main) return;
+  const root = document.getElementById('viewRoot');
+  if(!header || !main || !root) return;
   const mainRect = main.getBoundingClientRect();
-  const headerRect = header.getBoundingClientRect();
-  const leftGap = Math.max(0, headerRect.left - mainRect.left);
-  const rightGap = Math.max(0, mainRect.right - headerRect.right);
+  const rootRect = root.getBoundingClientRect();
+  const rs = getComputedStyle(root);
+  const leftGap = Math.max(0, rootRect.left + (parseFloat(rs.paddingLeft)||0) - mainRect.left);
+  const rightGap = Math.max(0, mainRect.right - (main.offsetWidth - main.clientWidth) - (rootRect.right - (parseFloat(rs.paddingRight)||0)));
   header.style.marginLeft = (-leftGap)+'px';
   header.style.marginRight = (-rightGap)+'px';
   header.style.paddingLeft = (leftGap+16)+'px';
   header.style.paddingRight = (rightGap+16)+'px';
-  // Pull the header up over .main's top padding — that padding used to leave an empty
-  // black band above the locked-in header.
   const padTop = parseFloat(getComputedStyle(main).paddingTop)||0;
   header.style.marginTop = (-padTop)+'px';
 }
+(function(){
+  const watch = function(){
+    const main = document.querySelector('.main');
+    if(!main || !window.ResizeObserver) return;
+    new ResizeObserver(function(){ stretchLockedHeaderLine(); }).observe(main);
+    const nav = document.getElementById('sidebarNav');
+    if(nav) nav.addEventListener('transitionend', stretchLockedHeaderLine);
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', watch); else watch();
+})();
 window.addEventListener('resize', stretchLockedHeaderLine);
 function tickClocks(){
   const now = new Date();

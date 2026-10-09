@@ -289,6 +289,8 @@ function renderMorningPlanCard(){
 ACTIONS.startSleepMode = function(){
   if(state.focus.activeSession){ showToast('Stop your session first, then start Sleep mode.', {icon:'&#127769;'}); return; }
   startMode('offtime', {sleep:true, note:'Sleep'});
+  ui.windDownOpen = false;
+  if(sessionsOn(todayStr()).length) openDayRecap(todayStr());
 };
 function renderSleepView(){
   const active = state.modes.active;
@@ -321,6 +323,7 @@ function windDownTilesHtml(){
   return '<div class="evening-tiles">'+
       '<button class="evening-tile" data-action="openWakeSetup"><span class="evening-tile-k">Wake-up</span><span class="evening-tile-v">'+(nw ? fmt12Hour(nw.time) : 'Not set')+'</span><span class="kpi-sub">'+(nw ? morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts) : 'Set your alarm')+'</span></button>'+
       '<button class="evening-tile" data-action="openNightPlan"><span class="evening-tile-k">'+escapeHtml(ml[0].toUpperCase()+ml.slice(1))+'</span><span class="evening-tile-v">'+(np ? count+' task'+(count===1?'':'s') : 'Plan it')+'</span><span class="kpi-sub">'+(np ? 'Edit plan' : 'Tasks + a note')+'</span></button>'+
+      '<button class="evening-tile" data-action="openDayRecap"><span class="evening-tile-k">Recap</span><span class="evening-tile-v">'+fmtHours(deepWorkMinutesTodayLive())+'</span><span class="kpi-sub">See how today went</span></button>'+
       '<button class="evening-tile evening-sleep" data-action="startSleepMode"><span class="evening-moon">&#127769;</span><span class="evening-tile-v">Go to sleep</span><span class="kpi-sub">Pauses auto lock-in</span></button>'+
     '</div>';
 }

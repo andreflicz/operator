@@ -28,6 +28,7 @@
   "19b-sessions-analytics.js",
   "20-pre-focus-modal.js",
   "21-app-activity-tracking.js",
+  "21b-activity-v2.js",
   "22-fitness-health.js",
   "23-journal.js",
   "24-goals.js",

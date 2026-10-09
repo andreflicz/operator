@@ -17,12 +17,14 @@ function parseActivityLogText(text){
     const tab = line.indexOf('\t');
     if(tab<0) continue;
     const ts = parseInt(line.slice(0,tab),10);
-    const rest = line.slice(tab+1);
-    const tab2 = rest.indexOf('\t');
-    const app = (tab2<0 ? rest : rest.slice(0,tab2)).trim();
-    const idle = tab2<0 ? null : parseInt(rest.slice(tab2+1),10);
-    if(!ts || !app) continue;
-    out.push({ts:ts, app:app, idle:(idle==null || isNaN(idle)) ? null : idle});
+    // <ts>\t<app>[\t<idleSeconds>[\t<site>]] — in a browser the site's domain stands in for
+    // the app, so websites are tracked (and sorted into work / not work) like apps.
+    const parts = line.slice(tab+1).split('\t');
+    const host = (parts[0]||'').trim();
+    const idle = parts.length>1 ? parseInt(parts[1],10) : null;
+    const site = (parts[2]||'').trim();
+    if(!ts || !host) continue;
+    out.push({ts:ts, app:site || host, via:site ? host : null, idle:(idle==null || isNaN(idle)) ? null : idle});
   }
   return out;
 }
@@ -89,6 +91,7 @@ function updateCurrentAppIndicator(){
   const app = currentForegroundApp();
   if(app){ el.textContent = '\u25CF '+app; el.style.display = 'block'; }
   else { el.textContent=''; el.style.display='none'; }
+  if(typeof updateActivityPill==='function') updateActivityPill();
 }
 async function pollAppActivity(){
   const st = state.settings.appTracking;
@@ -151,6 +154,27 @@ function autoLockInCountFrom(interval){
   if(state.modes.lastEndedAt) from = Math.max(from, state.modes.lastEndedAt);
   return from;
 }
+// Auto lock-in only counts time on apps/sites marked "work" (Operator itself is neutral:
+// it neither starts nor ends a session). Once you've been on work apps for the threshold,
+// a session starts, dated back to when that work stretch began — no prompt; you review the
+// day's sessions in the end-of-day recap. It ends (at the last moment you were on a work
+// app) once you've been on non-work apps — or away — for the grace period.
+function workStretchStart(ivs){
+  let i = ivs.length-1;
+  if(i<0 || activityCategory(ivs[i].app)!=='work') return null;
+  let start = ivs[i].start;
+  for(i=i-1; i>=0; i--){
+    const iv = ivs[i];
+    if(start - iv.end > APP_ACTIVITY_GAP_MS) break;
+    const c = activityCategory(iv.app);
+    if(c==='work' || c==='neutral') start = iv.start; else break;
+  }
+  return start;
+}
+function lastWorkEnd(ivs){
+  for(let i=ivs.length-1;i>=0;i--) if(activityCategory(ivs[i].app)==='work') return ivs[i].end;
+  return null;
+}
 function checkAutoLockIn(){
   const st = state.settings.appTracking;
   if(!st || st.enabled===false || st.autoLockIn===false) return;
@@ -162,41 +186,47 @@ function checkAutoLockIn(){
 
   if(isLive && !activeSession){
     if(autoLockInBlockedReason()) return;
-    const elapsedMin = (last.end-autoLockInCountFrom(last))/60000;
-    if(elapsedMin >= (st.thresholdMinutes||12) && autoLockInMeta.intervalStart!==last.start){
-      autoLockInMeta = {app:last.app, intervalStart:last.start};
+    const stretch = workStretchStart(ivs);
+    if(stretch==null) return;
+    const from = Math.max(stretch, autoLockInCountFrom({start:stretch}));
+    const elapsedMin = (last.end-from)/60000;
+    if(elapsedMin >= (st.thresholdMinutes||12) && autoLockInMeta.intervalStart!==from){
+      autoLockInMeta = {app:last.app, intervalStart:from};
       startFocus(null);
-      if(state.focus.activeSession) state.focus.activeSession.autoStarted = true;
-      persist('focus');
-      showToast('Auto-locked in \u2014 you\u2019ve been on '+last.app+' for '+Math.round(elapsedMin)+' min', {icon:'&#128274;'});
+      const s = state.focus.activeSession;
+      if(s){ s.autoStarted = true; s.startedAt = from; s.autoApp = last.app; }
+      persist('focus'); renderView();
+      showToast('Locked in automatically — on '+last.app+' since '+fmt12Hour(nowHM(new Date(from))), {icon:'&#128274;'});
     }
     return;
   }
 
-  if(activeSession && activeSession.autoStarted){
-    if(!isLive) return; // idle/away — leave it running rather than guess
-    if(last.app === autoLockInMeta.app){ autoLockInMeta.intervalStart = last.start; return; }
-    const awayMin = (Date.now()-last.start)/60000;
-    if(awayMin >= (st.graceMinutes||3)){
-      autoEndFocusSession();
+  if(activeSession && activeSession.autoStarted && !activeSession.onBreak){
+    const cat = activityCategory(last.app);
+    const lw = lastWorkEnd(ivs) || activeSession.startedAt;
+    const grace = (st.graceMinutes||3)*60000;
+    if(isLive && cat==='work') return;
+    if(isLive && cat==='neutral' && Date.now()-lw < grace*3) return;
+    const awayLimit = isLive ? grace : Math.max(10*60000, grace*2);
+    if(Date.now()-lw >= awayLimit){
+      autoEndFocusSession(Math.max(lw, activeSession.startedAt+60000));
       autoLockInMeta = {app:null, intervalStart:null};
     }
   }
 }
-function autoEndFocusSession(){
+function autoEndFocusSession(endAt){
   const s = state.focus.activeSession;
   if(!s) return;
-  const endedAt = Date.now();
+  const endedAt = Math.min(Date.now(), endAt || Date.now());
   const minutes = Math.max(1, Math.round((endedAt-s.startedAt)/60000));
   if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
-  state.focus.sessions.push({id:uid(), type:sessionType(s), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endedAt, minutes:minutes, completedTasks:arr(s.completedTasks), note:'', autoStopped:true});
+  state.focus.sessions.push({id:uid(), type:sessionType(s), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endedAt, minutes:minutes, completedTasks:arr(s.completedTasks), note:'', autoStopped:true, auto:!!s.autoStarted, reviewed:false, app:s.autoApp||null});
   state.focus.activeSession = null;
   state.focus.lastSessionEndedAt = endedAt;
-  if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   if(state.modes.active && state.modes.active.linkedFocus){ endMode(); }
   playStopSound();
   persist('focus'); renderView();
-  showToast('Auto-ended focus session \u2014 you switched apps', {icon:'&#9209;'});
+  showToast('Session ended — you moved off work apps at '+fmt12Hour(nowHM(new Date(endedAt)))+' ('+fmtDurationLabel(minutes)+' logged)', {icon:'&#9209;'});
 }
 function startAppActivityPolling(){
   pollAppActivity();

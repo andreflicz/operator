@@ -105,6 +105,7 @@ async function newPage(browser, seed, clockAt){
     const afterStop = !!state.focus.activeSession;
     // simulate cooldown over, but only 1 min of steady use since then
     state.focus.lastManualStopAt = now - 16*60000;
+    window.__op.ev("setActivityCategory('Google Chrome', 'work')"); // only work apps auto lock in now
     state.appActivity.todayIntervals = [{app:'Google Chrome', start: now-30*60000, end: now}];
     checkAutoLockIn();
     const shortUse = !!state.focus.activeSession;
