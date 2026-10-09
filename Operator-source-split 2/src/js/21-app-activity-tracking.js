@@ -93,6 +93,7 @@ function updateCurrentAppIndicator(){
   else { el.textContent=''; el.style.display='none'; }
   if(typeof updateActivityPill==='function') updateActivityPill();
 }
+let lastActivitySig = '', pastDayCounts = {};
 async function pollAppActivity(){
   const st = state.settings.appTracking;
   if(!st || st.enabled===false) { updateCurrentAppIndicator(); return; }
@@ -102,6 +103,10 @@ async function pollAppActivity(){
     if(!res.ok) return;
     text = await res.text();
   }catch(e){ return; } // no wrapper/server running — silently do nothing
+  // Nothing new since the last poll → nothing to recompute or save.
+  const sig = text.length+':'+text.slice(-80);
+  if(sig===lastActivitySig){ updateCurrentAppIndicator(); checkAutoLockIn(); return; }
+  lastActivitySig = sig;
   // Only count active usage: a sample taken after the keyboard/mouse has been idle for a
   // while is dropped, which leaves a gap that splits the interval (an app just sitting in
   // the foreground no longer counts as "being on it").
@@ -113,6 +118,7 @@ async function pollAppActivity(){
   samples.forEach(function(s){ const d = todayStr(new Date(s.ts)); (byDate[d]=byDate[d]||[]).push(s); });
   Object.keys(byDate).forEach(function(d){
     if(d===today) return; // only finalize PAST days; today stays live below
+    if(pastDayCounts[d]===byDate[d].length) return; // already finalized with these exact samples
     const ivs = samplesToIntervals(byDate[d].sort(function(a,b){return a.ts-b.ts;}));
     // The log is re-read in full on every poll, so a past day's samples show up again and
     // again. Keep the larger of stored vs. recomputed per app (idempotent) instead of adding,
@@ -121,6 +127,7 @@ async function pollAppActivity(){
     // Also keep the part that happened while locked in (Analytics shows that first).
     if(!state.appActivity.lockedDays) state.appActivity.lockedDays = {};
     state.appActivity.lockedDays[d] = maxAppMinutes(state.appActivity.lockedDays[d], clipIntervalsToWindows(ivs, sessionWindowsFor(d)));
+    pastDayCounts[d] = byDate[d].length;
   });
   const todaySamples = (byDate[today]||[]).sort(function(a,b){return a.ts-b.ts;});
   state.appActivity.todayIntervals = samplesToIntervals(todaySamples);

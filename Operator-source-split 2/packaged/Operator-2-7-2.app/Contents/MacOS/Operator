@@ -29,6 +29,7 @@ mkdir -p "$PROFILE_DIR"
 DATA_DIR="$HOME/Library/Application Support/Operator"
 mkdir -p "$DATA_DIR"
 ACTIVITY_LOG="$DATA_DIR/activity.log"
+printf '0 0' > "$DATA_DIR/opfocus" 2>/dev/null  # fresh start: not known to be in front yet
 touch "$ACTIVITY_LOG" 2>/dev/null
 ACTIVITY_PORT=8934
 
@@ -41,7 +42,15 @@ poll_frontmost() {
     # In a browser, also note which website is open (just the domain), so sites can be
     # sorted into work / not work like apps. macOS asks once for permission to read it.
     SITE=""
-    case "$APP" in
+    URL=""
+    # Operator itself runs in Chrome. While it's the window in front (the page says so), don't
+    # ask Chrome for its URL — every such question makes Chrome stop and answer, a hitch
+    # every 10 seconds right while you're clicking around Operator.
+    OPF=""
+    [ -f "$DATA_DIR/opfocus" ] && OPF=$(cut -d' ' -f1 "$DATA_DIR/opfocus" 2>/dev/null)
+    if [ "$APP" = "Google Chrome" ] && [ "$OPF" = "1" ]; then SITE="Operator"; APP_SKIP_URL=1; else APP_SKIP_URL=""; fi
+    case "$APP_SKIP_URL$APP" in
+      1*) ;;
       "Google Chrome"|"Brave Browser"|"Microsoft Edge"|"Arc"|"Chromium")
         URL=$(osascript -e "tell application \"$APP\" to get URL of active tab of front window" 2>/dev/null) ;;
       "Safari")
@@ -163,6 +172,24 @@ serve_wake() {
       /music/stop*)
         stop_music &
         ;;
+      /opfocus*)
+        F=$(printf '%s' "$REQ_PATH" | sed -n 's/.*[?&]f=\([01]\).*/\1/p')
+        printf '%s %s' "${F:-0}" "$(date +%s)" > "$DATA_DIR/opfocus" 2>/dev/null
+        ;;
+      /open*)
+        # open a web link in another browser (music in Firefox: its ad blocker skips the ads)
+        B=$(printf '%s' "$REQ_PATH" | sed -n 's/.*[?&]b=\([a-z]*\).*/\1/p')
+        HEX=$(printf '%s' "$REQ_PATH" | sed -n 's/.*[?&]u=\([0-9a-fA-F]*\).*/\1/p')
+        U=$(printf '%b' "$(printf '%s' "$HEX" | sed 's/../\\x&/g')")
+        case "$U" in
+          http://*|https://*)
+            case "$B" in
+              firefox) open -a Firefox "$U" 2>/dev/null || open "$U" ;;
+              safari) open -a Safari "$U" 2>/dev/null || open "$U" ;;
+              *) open "$U" ;;
+            esac ;;
+        esac
+        ;;
       *)
         wake_front &
         ;;
@@ -195,6 +222,9 @@ fi
   --disable-renderer-backgrounding \
   --disable-backgrounding-occluded-windows \
   --disable-popup-blocking \
+  --ignore-gpu-blocklist \
+  --enable-gpu-rasterization \
+  --enable-zero-copy \
   > /dev/null 2>&1 &
 CHROME_PID=$!
 

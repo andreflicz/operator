@@ -197,11 +197,11 @@ function renderFocusTasksOverview(){
   renderTaskToolbar(true)+
   '<div class="section" style="margin-bottom:14px;">'+
     '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('Highest priority and closest deadlines first. Drag a card up to the box above to line it up next.')+'<span class="row" style="margin-left:auto;gap:8px;">'+selectModeBtnHtml()+'<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button></span></div>'+
-    '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>'+
+    '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236, loop:true, count:today.length}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>'+
   '</div>'+
   (backlogTotal ? (
     '<div class="section" style="margin-bottom:14px;"><div class="section-title" style="align-items:center;">Worth Doing Soon<span class="kpi-sub">'+backlogTotal+' in the list</span><button class="btn btn-ghost btn-sm" style="margin-left:auto;" data-action="focusTasksSubTab" data-tab="backlog">See All &rarr;</button></div>'+
-      (carouselOn() ? carouselWrap(backlogPreview.map(function(t){ return taskCard(t); }).join(''), 'soon', {w:236}) : '<div class="task-card-grid">'+backlogPreview.map(function(t){ return taskCard(t); }).join('')+'</div>')+
+      (carouselOn() ? (function(){ const all = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; })); return carouselWrap(all.map(function(t){ return taskCard(t); }).join(''), 'soon', {w:236, loop:true, count:all.length}); })() : '<div class="task-card-grid">'+backlogPreview.map(function(t){ return taskCard(t); }).join('')+'</div>')+
     '</div>'
   ) : '')+
   renderOngoingTasksPanel();
@@ -238,8 +238,15 @@ function renderBacklogResultsList(backlog){
     if(q && t.title.toLowerCase().indexOf(q)<0) return false;
     return true;
   });
-  return filtered.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing matches. Try clearing filters, or add a task above.</div>';
+  if(!filtered.length) return '<div class="empty">Nothing matches. Try clearing filters, or add a task above.</div>';
+  // long lists render in pages that keep loading as you scroll (an endless list, without the cost)
+  const lim = listLimit('backlog');
+  return filtered.slice(0, lim).map(function(t){ return taskCard(t); }).join('')+moreLoader('backlog', filtered.length - lim);
 }
+const LIST_PAGE = 48;
+function listLimit(key){ ui.listLimits = ui.listLimits || {}; return ui.listLimits[key] || LIST_PAGE; }
+function moreLoader(key, hidden){ return hidden > 0 ? '<button class="load-more" data-action="loadMore" data-id="'+key+'" data-autoload="1">Show '+Math.min(hidden, LIST_PAGE)+' more</button>' : ''; }
+ACTIONS.loadMore = function(el, e, key){ ui.listLimits = ui.listLimits || {}; ui.listLimits[key] = listLimit(key) + LIST_PAGE; renderView(); };
 function setBacklogPriorityFilter(val){ ui.backlogPriorityFilter = (ui.backlogPriorityFilter===val)?null:val; refreshBacklogResults(); }
 function clearBacklogFilters(){ ui.backlogSearchText=''; ui.backlogPriorityFilter=null; ui.backlogSearchOpen=false; renderView(); }
 function toggleBacklogSearch(){
@@ -266,7 +273,7 @@ function renderFocusFinishedTab(){
   '</div>'+
   '<div class="section">'+
     '<div class="section-title">Everything Knocked Out<span class="kpi-sub">'+doneEarlier.length+' more</span></div>'+
-    '<div class="task-list">'+(doneEarlier.map(finishedTaskRow).join('') || '<div class="empty">Nothing else yet — it all starts today.</div>')+'</div>'+
+    '<div class="task-list">'+(doneEarlier.slice(0, listLimit('finished')).map(finishedTaskRow).join('') || '<div class="empty">Nothing else yet — it all starts today.</div>')+moreLoader('finished', doneEarlier.length - listLimit('finished'))+'</div>'+
   '</div>';
 }
 function openAddTaskModal(){

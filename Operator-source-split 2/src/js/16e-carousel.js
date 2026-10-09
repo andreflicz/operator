@@ -6,17 +6,32 @@
 // ends (a scroll-driven CSS animation, so it costs no script work while you scroll).
 function cardLayout(){ return state.profile.cardLayout==='carousel' ? 'carousel' : 'grid'; }
 function carouselOn(){ return cardLayout()==='carousel'; }
+// opts.loop + opts.count: a long row loops forever — the cards are laid out three times and the
+// scroll position quietly jumps back to the middle copy, so there's never an end to hit.
 function carouselWrap(itemsHtml, key, opts){
   opts = opts || {};
   const threeD = opts.threeD!==undefined ? opts.threeD : carouselOn();
-  return '<div class="carousel'+(threeD?' is-3d':'')+(opts.fit?' is-fit':'')+(opts.cls?' '+opts.cls:'')+'" data-key="car-'+key+'"'+(opts.w?' style="--car-w:'+opts.w+'px"':'')+'>'+
+  const avail = Math.max(320, window.innerWidth - (state.profile.sidebarCollapsed ? 70 : 230) - 40);
+  const loop = !!(opts.loop && opts.count && opts.count*((opts.w||240)+12) > avail);
+  const clone = function(tag){ return itemsHtml.replace(/ data-key="/g, ' data-key="'+tag+'-').replace(/ id="[^"]*"/g, '').replace(/class="/, 'aria-hidden="true" class="car-clone '); };
+  const body = loop ? clone('cA')+itemsHtml+clone('cB') : itemsHtml;
+  return '<div class="carousel'+(threeD?' is-3d':'')+(opts.fit?' is-fit':'')+(loop?' is-loop':'')+(opts.bleed!==false?' bleed':'')+(opts.cls?' '+opts.cls:'')+'" data-key="car-'+key+'"'+(opts.w?' style="--car-w:'+opts.w+'px"':'')+'>'+
     '<button class="car-arrow car-prev" data-action="carouselStep" data-dir="-1" aria-label="Back">&#8249;</button>'+
-    '<div class="car-track'+(opts.trackCls?' '+opts.trackCls:'')+'" data-car="'+key+'">'+itemsHtml+'</div>'+
+    '<div class="car-track'+(opts.trackCls?' '+opts.trackCls:'')+'" data-car="'+key+'"'+(loop?' data-loop="1"':'')+'>'+body+'</div>'+
     '<button class="car-arrow car-next" data-action="carouselStep" data-dir="1" aria-label="More">&#8250;</button>'+
   '</div>';
 }
 function carUpdate(track){
   const wrap = track.parentElement; if(!wrap) return;
+  if(track.dataset.loop){
+    const third = track.scrollWidth/3;
+    if(!track._loopInit){ track._loopInit = true; track.scrollLeft = third; }
+    else if(track.scrollLeft < third*0.5) track.scrollLeft += third;
+    else if(track.scrollLeft > third*1.5) track.scrollLeft -= third;
+    if(!wrap.classList.contains('can-prev')) wrap.classList.add('can-prev', 'can-next');
+    track.classList.add('fade-l', 'fade-r');
+    return;
+  }
   const max = track.scrollWidth - track.clientWidth;
   const l = track.scrollLeft > 4, r = track.scrollLeft < max - 4;
   if(track.classList.contains('fade-l')!==l) track.classList.toggle('fade-l', l);

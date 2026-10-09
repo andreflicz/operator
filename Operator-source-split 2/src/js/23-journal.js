@@ -72,7 +72,7 @@ function renderJournalHistory(entries){
     const label = d===todayStr() ? 'Today' : d===addDays(todayStr(),-1) ? 'Yesterday' : fmtDateShort(d);
     html += '<div class="kind-label">'+label+'</div>'+groups[d].map(journalEntryRow).join('');
   });
-  if(hidden>0) html += '<div class="row" style="justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="journalShowMore">Show '+Math.min(hidden, JOURNAL_PAGE)+' more &middot; '+hidden+' older</button></div>';
+  if(hidden>0) html += '<div class="row" style="justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="journalShowMore" data-autoload="1">Show '+Math.min(hidden, JOURNAL_PAGE)+' more &middot; '+hidden+' older</button></div>';
   return html || '<div class="empty">Nothing matches yet.</div>';
 }
 ACTIONS.journalShowMore = function(){ ui.journalShowCount = (ui.journalShowCount || JOURNAL_PAGE) + JOURNAL_PAGE; updateJournalHistoryDisplay(); };

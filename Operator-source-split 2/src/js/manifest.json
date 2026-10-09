@@ -58,5 +58,6 @@
   "33-event-delegation.js",
   "33b-overlay-dismiss.js",
   "33c-context-menu.js",
+  "33d-fast-press.js",
   "34-init.js"
 ]

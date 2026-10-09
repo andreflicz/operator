@@ -205,6 +205,7 @@ function normalizeWake(f){
     sound: ['standard','peaceful','loud'].indexOf(w.sound)>=0 ? w.sound : 'peaceful',
     media: (w.media && (w.media.ref || w.media.url || (w.media.type==='music' && w.media.q))) ? w.media : null,
     snoozeMinutes: Number(w.snoozeMinutes)>0 ? Number(w.snoozeMinutes) : 9,
+    openIn: ['firefox','safari','chrome'].indexOf(w.openIn)>=0 ? w.openIn : 'firefox',
     lastFiredTs: Number(w.lastFiredTs)||0,
     armedAt: Number(w.armedAt)||Date.now()
   };

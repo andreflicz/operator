@@ -29,8 +29,14 @@ function rawSessionMinutesFor(dateStr, type){
 function deepWorkMinutesFor(dateStr){
   return Math.max(0, rawSessionMinutesFor(dateStr,'deep') - excludedTaskMinutesFor(dateStr) - distractionMinutesFor(dateStr));
 }
+// The finished part of today's deep work is cached between renders (the timer asks every second;
+// recomputing it from every session and the app-activity log each time made ticks heavy).
+let dwTodayCache = null;
 function deepWorkMinutesTodayLive(){
-  let mins = deepWorkMinutesFor(todayStr());
+  const today = todayStr();
+  if(RC || !dwTodayCache || dwTodayCache.date!==today || dwTodayCache.gen!==renderGen || Date.now()-dwTodayCache.at > 30000)
+    dwTodayCache = {date:today, gen:renderGen, at:Date.now(), v:deepWorkMinutesFor(today)};
+  let mins = dwTodayCache.v;
   const as = state.focus.activeSession;
   if(as && sessionType(as)==='deep'){
     if(as.onBreak) mins += Math.floor((as.frozenElapsedMs||0)/60000);

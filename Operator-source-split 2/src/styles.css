@@ -1525,3 +1525,15 @@
   .crm-card-foot .touch-btns, .cc2-foot .touch-btns, .hub-foot .touch-btns{ flex-shrink:0; }
   .scene-layer{ animation:sceneIn .9s ease-out both; }
   @keyframes sceneIn{ from{ opacity:0; } to{ opacity:1; } }
+  /* the locked-in timer card is never a scroll box (a 1px overflow made macOS flash a scrollbar on every tick) */
+  .focus-hero-col{ height:auto !important; min-height:340px; overflow:visible !important; }
+  #focusElapsed, #modeElapsed, #currentTaskElapsed, #currentTaskElapsedBar{ contain:layout paint; }
+  .load-more{ grid-column:1 / -1; display:block; margin:10px auto 0; background:none; border:1px dashed var(--border); color:var(--text-dim); border-radius:999px; padding:6px 16px; font-size:12px; cursor:pointer; }
+  .load-more:hover{ color:var(--text); border-color:var(--border-strong); }
+  /* carousel rows run to the edges of the window (past the page padding), unboxed */
+  .carousel.bleed{ margin-left:-36px; margin-right:-36px; }
+  .carousel.bleed > .car-track{ padding-left:36px; padding-right:36px; scroll-padding-inline:36px; }
+  .carousel.bleed .car-prev{ left:10px; } .carousel.bleed .car-next{ right:10px; }
+  .task-column.is-car{ border:none !important; background:none !important; padding:0 !important; min-height:0 !important; max-height:none !important; overflow:visible !important; }
+  .carousel.is-loop > .car-track{ scroll-snap-type:none; }
+  @media (max-width:900px){ .carousel.bleed{ margin-left:-16px; margin-right:-16px; } .carousel.bleed > .car-track{ padding-left:16px; padding-right:16px; } }

@@ -93,8 +93,13 @@ function startModeTicker(){
     if(el) setTimerText(el, Date.now()-active.startedAt);
   }, 1000);
 }
+// Deep work only changes once a minute — rebuild those boxes only when the number actually moves,
+// not on every tick (rebuilding them every second made the page relayout constantly).
+let lastLiveDeepMins = null;
 function tickLiveDeepWork(){
   const mins = deepWorkMinutesTodayLive();
+  if(mins===lastLiveDeepMins) return;   // a render in between already shows the current value
+  lastLiveDeepMins = mins;
   const statBox = document.getElementById('statDeepWorkBox');
   if(statBox) statBox.innerHTML = deepWorkStatInnerHtml(mins);
   const focusBox = document.getElementById('statDeepWorkTodayBox');

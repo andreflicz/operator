@@ -147,6 +147,13 @@ function appleMusicFromLink(u){
 }
 function mediaKindLabel(m){ if(!m) return ''; if(m.type==='music') return 'Apple Music '+(m.k==='playlist'?'playlist':'song'); if(m.ref) return 'uploaded song'; return /youtu/.test(m.url||'') ? 'YouTube' : isDirectAudioUrl(m.url) ? 'song link' : 'link'; }
 function mediaName(m){ return !m ? '' : m.type==='music' ? m.q : (m.name || m.url || 'Song'); }
+const WAKE_HELPER = 'http://127.0.0.1:8935/';
+// The launcher stops asking Chrome "which website is open?" while Operator is the window in front
+// (each question made Chrome pause) — so tell it when that changes.
+function opFocusPing(f){ try{ fetch(WAKE_HELPER+'opfocus?f='+f).catch(function(){}); }catch(e){} }
+window.addEventListener('focus', function(){ opFocusPing(1); });
+window.addEventListener('blur', function(){ opFocusPing(0); });
+setTimeout(function(){ opFocusPing(document.hasFocus() ? 1 : 0); }, 1500);
 function hexUtf8(str){ return Array.prototype.map.call(new TextEncoder().encode(String(str||'')), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
 async function musicApp(cmd, media){
   const ctl = typeof AbortController!=='undefined' ? new AbortController() : null;
@@ -183,6 +190,15 @@ async function playWakeMedia(media, onFail){
         wakeAudioRamp = setInterval(function(){ if(!wakeAudio){ clearInterval(wakeAudioRamp); return; } wakeAudio.volume = Math.min(1, wakeAudio.volume+0.03); if(wakeAudio.volume>=1) clearInterval(wakeAudioRamp); }, 1500);
       }
       return true;
+    }
+    // links open in the browser you pick (Firefox by default — its ad blocker skips YouTube ads)
+    const via = wakeCfg().openIn || 'firefox';
+    if(via!=='chrome'){
+      try{
+        const ctl = new AbortController(), tm = setTimeout(function(){ ctl.abort(); }, 3000);
+        const res = await fetch(WAKE_HELPER+'open?b='+via+'&u='+hexUtf8(media.url), {signal:ctl.signal}); clearTimeout(tm);
+        if(res.ok) return true;
+      }catch(e){ /* no launcher (opened as a plain file) — fall back to a window here */ }
     }
     const w = window.open(media.url, 'operatorWakeMusic');
     if(!w){ onFail(); return false; }
@@ -396,7 +412,8 @@ function wakeMusicPickerHtml(w){
         '<button class="btn btn-sm btn-primary" data-action="wakeSetAppleMusic">Use it</button>'+
       '</div>'
     : src==='upload' ? '<button class="btn btn-sm" data-action="wakePickMusic">&#11014; Choose a song file</button>'
-    : '<input class="input" data-wake="mediaUrl" placeholder="YouTube or song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="width:100%;">');
+    : '<input class="input" data-wake="mediaUrl" placeholder="YouTube or song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="width:100%;">'+
+      '<div class="row" style="gap:8px;margin-top:8px;align-items:center;"><span class="kpi-sub">Open in</span><div class="seg-tabs" style="margin:0;">'+[['firefox','Firefox'],['safari','Safari'],['chrome','Chrome']].map(function(b){ return '<button class="seg-tab'+((w.openIn||'firefox')===b[0]?' active':'')+'" data-action="wakeOpenIn" data-id="'+b[0]+'">'+b[1]+'</button>'; }).join('')+'</div>'+tip('Firefox with an ad blocker plays YouTube without the ads. If Firefox isn\'t installed it opens in your default browser.')+'</div>');
 }
 ACTIONS.wakeMusicSource = function(el, e, id){ ui.wakeSrc = id; renderWakeSetupInto(); };
 ACTIONS.wakeMusicKind = function(el, e, id){ ui.wakeMusicKind = id; renderWakeSetupInto(); };
@@ -563,3 +580,4 @@ function wakeSettingsCardHtml(){
       '<div class="row" style="gap:8px;"><button class="btn btn-ghost btn-sm" data-action="wakeTestNow">Preview</button><button class="btn btn-primary" data-action="openWakeSetup">Set up</button></div>'+
     '</div></div>';
 }
+ACTIONS.wakeOpenIn = function(el, e, id){ wakeCfg().openIn = id; saveWake(); };

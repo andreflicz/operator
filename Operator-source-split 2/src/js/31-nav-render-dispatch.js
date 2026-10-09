@@ -8,10 +8,11 @@ let lastRenderedView = null;
 let lastRenderedDay = null;
 // While several things change at once (e.g. navigating closes every open pop-up first),
 // renders are held so the page is drawn once at the end instead of once per step.
-let renderHold = 0;
+let renderHold = 0, renderGen = 0;
 function holdRenders(fn){ renderHold++; try{ fn(); } finally{ renderHold--; } }
 function renderView(){
   if(renderHold) return;
+  renderGen++;
   RC = {};
   try{ renderViewInner(); } finally { RC = null; }
 }

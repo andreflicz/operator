@@ -1534,6 +1534,18 @@
   .crm-card-foot .touch-btns, .cc2-foot .touch-btns, .hub-foot .touch-btns{ flex-shrink:0; }
   .scene-layer{ animation:sceneIn .9s ease-out both; }
   @keyframes sceneIn{ from{ opacity:0; } to{ opacity:1; } }
+  /* the locked-in timer card is never a scroll box (a 1px overflow made macOS flash a scrollbar on every tick) */
+  .focus-hero-col{ height:auto !important; min-height:340px; overflow:visible !important; }
+  #focusElapsed, #modeElapsed, #currentTaskElapsed, #currentTaskElapsedBar{ contain:layout paint; }
+  .load-more{ grid-column:1 / -1; display:block; margin:10px auto 0; background:none; border:1px dashed var(--border); color:var(--text-dim); border-radius:999px; padding:6px 16px; font-size:12px; cursor:pointer; }
+  .load-more:hover{ color:var(--text); border-color:var(--border-strong); }
+  /* carousel rows run to the edges of the window (past the page padding), unboxed */
+  .carousel.bleed{ margin-left:-36px; margin-right:-36px; }
+  .carousel.bleed > .car-track{ padding-left:36px; padding-right:36px; scroll-padding-inline:36px; }
+  .carousel.bleed .car-prev{ left:10px; } .carousel.bleed .car-next{ right:10px; }
+  .task-column.is-car{ border:none !important; background:none !important; padding:0 !important; min-height:0 !important; max-height:none !important; overflow:visible !important; }
+  .carousel.is-loop > .car-track{ scroll-snap-type:none; }
+  @media (max-width:900px){ .carousel.bleed{ margin-left:-16px; margin-right:-16px; } .carousel.bleed > .car-track{ padding-left:16px; padding-right:16px; } }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -2861,6 +2873,7 @@ function normalizeWake(f){
     sound: ['standard','peaceful','loud'].indexOf(w.sound)>=0 ? w.sound : 'peaceful',
     media: (w.media && (w.media.ref || w.media.url || (w.media.type==='music' && w.media.q))) ? w.media : null,
     snoozeMinutes: Number(w.snoozeMinutes)>0 ? Number(w.snoozeMinutes) : 9,
+    openIn: ['firefox','safari','chrome'].indexOf(w.openIn)>=0 ? w.openIn : 'firefox',
     lastFiredTs: Number(w.lastFiredTs)||0,
     armedAt: Number(w.armedAt)||Date.now()
   };
@@ -3352,8 +3365,14 @@ function rawSessionMinutesFor(dateStr, type){
 function deepWorkMinutesFor(dateStr){
   return Math.max(0, rawSessionMinutesFor(dateStr,'deep') - excludedTaskMinutesFor(dateStr) - distractionMinutesFor(dateStr));
 }
+// The finished part of today's deep work is cached between renders (the timer asks every second;
+// recomputing it from every session and the app-activity log each time made ticks heavy).
+let dwTodayCache = null;
 function deepWorkMinutesTodayLive(){
-  let mins = deepWorkMinutesFor(todayStr());
+  const today = todayStr();
+  if(RC || !dwTodayCache || dwTodayCache.date!==today || dwTodayCache.gen!==renderGen || Date.now()-dwTodayCache.at > 30000)
+    dwTodayCache = {date:today, gen:renderGen, at:Date.now(), v:deepWorkMinutesFor(today)};
+  let mins = dwTodayCache.v;
   const as = state.focus.activeSession;
   if(as && sessionType(as)==='deep'){
     if(as.onBreak) mins += Math.floor((as.frozenElapsedMs||0)/60000);
@@ -4866,17 +4885,32 @@ ACTIONS.goToWhySettings = function(){ ui.view='settings'; ui.settingsTab='focus'
 // ends (a scroll-driven CSS animation, so it costs no script work while you scroll).
 function cardLayout(){ return state.profile.cardLayout==='carousel' ? 'carousel' : 'grid'; }
 function carouselOn(){ return cardLayout()==='carousel'; }
+// opts.loop + opts.count: a long row loops forever — the cards are laid out three times and the
+// scroll position quietly jumps back to the middle copy, so there's never an end to hit.
 function carouselWrap(itemsHtml, key, opts){
   opts = opts || {};
   const threeD = opts.threeD!==undefined ? opts.threeD : carouselOn();
-  return '<div class="carousel'+(threeD?' is-3d':'')+(opts.fit?' is-fit':'')+(opts.cls?' '+opts.cls:'')+'" data-key="car-'+key+'"'+(opts.w?' style="--car-w:'+opts.w+'px"':'')+'>'+
+  const avail = Math.max(320, window.innerWidth - (state.profile.sidebarCollapsed ? 70 : 230) - 40);
+  const loop = !!(opts.loop && opts.count && opts.count*((opts.w||240)+12) > avail);
+  const clone = function(tag){ return itemsHtml.replace(/ data-key="/g, ' data-key="'+tag+'-').replace(/ id="[^"]*"/g, '').replace(/class="/, 'aria-hidden="true" class="car-clone '); };
+  const body = loop ? clone('cA')+itemsHtml+clone('cB') : itemsHtml;
+  return '<div class="carousel'+(threeD?' is-3d':'')+(opts.fit?' is-fit':'')+(loop?' is-loop':'')+(opts.bleed!==false?' bleed':'')+(opts.cls?' '+opts.cls:'')+'" data-key="car-'+key+'"'+(opts.w?' style="--car-w:'+opts.w+'px"':'')+'>'+
     '<button class="car-arrow car-prev" data-action="carouselStep" data-dir="-1" aria-label="Back">&#8249;</button>'+
-    '<div class="car-track'+(opts.trackCls?' '+opts.trackCls:'')+'" data-car="'+key+'">'+itemsHtml+'</div>'+
+    '<div class="car-track'+(opts.trackCls?' '+opts.trackCls:'')+'" data-car="'+key+'"'+(loop?' data-loop="1"':'')+'>'+body+'</div>'+
     '<button class="car-arrow car-next" data-action="carouselStep" data-dir="1" aria-label="More">&#8250;</button>'+
   '</div>';
 }
 function carUpdate(track){
   const wrap = track.parentElement; if(!wrap) return;
+  if(track.dataset.loop){
+    const third = track.scrollWidth/3;
+    if(!track._loopInit){ track._loopInit = true; track.scrollLeft = third; }
+    else if(track.scrollLeft < third*0.5) track.scrollLeft += third;
+    else if(track.scrollLeft > third*1.5) track.scrollLeft -= third;
+    if(!wrap.classList.contains('can-prev')) wrap.classList.add('can-prev', 'can-next');
+    track.classList.add('fade-l', 'fade-r');
+    return;
+  }
   const max = track.scrollWidth - track.clientWidth;
   const l = track.scrollLeft > 4, r = track.scrollLeft < max - 4;
   if(track.classList.contains('fade-l')!==l) track.classList.toggle('fade-l', l);
@@ -5423,11 +5457,11 @@ function renderFocusTasksOverview(){
   renderTaskToolbar(true)+
   '<div class="section" style="margin-bottom:14px;">'+
     '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('Highest priority and closest deadlines first. Drag a card up to the box above to line it up next.')+'<span class="row" style="margin-left:auto;gap:8px;">'+selectModeBtnHtml()+'<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button></span></div>'+
-    '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>'+
+    '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236, loop:true, count:today.length}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>'+
   '</div>'+
   (backlogTotal ? (
     '<div class="section" style="margin-bottom:14px;"><div class="section-title" style="align-items:center;">Worth Doing Soon<span class="kpi-sub">'+backlogTotal+' in the list</span><button class="btn btn-ghost btn-sm" style="margin-left:auto;" data-action="focusTasksSubTab" data-tab="backlog">See All &rarr;</button></div>'+
-      (carouselOn() ? carouselWrap(backlogPreview.map(function(t){ return taskCard(t); }).join(''), 'soon', {w:236}) : '<div class="task-card-grid">'+backlogPreview.map(function(t){ return taskCard(t); }).join('')+'</div>')+
+      (carouselOn() ? (function(){ const all = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; })); return carouselWrap(all.map(function(t){ return taskCard(t); }).join(''), 'soon', {w:236, loop:true, count:all.length}); })() : '<div class="task-card-grid">'+backlogPreview.map(function(t){ return taskCard(t); }).join('')+'</div>')+
     '</div>'
   ) : '')+
   renderOngoingTasksPanel();
@@ -5464,8 +5498,15 @@ function renderBacklogResultsList(backlog){
     if(q && t.title.toLowerCase().indexOf(q)<0) return false;
     return true;
   });
-  return filtered.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing matches. Try clearing filters, or add a task above.</div>';
+  if(!filtered.length) return '<div class="empty">Nothing matches. Try clearing filters, or add a task above.</div>';
+  // long lists render in pages that keep loading as you scroll (an endless list, without the cost)
+  const lim = listLimit('backlog');
+  return filtered.slice(0, lim).map(function(t){ return taskCard(t); }).join('')+moreLoader('backlog', filtered.length - lim);
 }
+const LIST_PAGE = 48;
+function listLimit(key){ ui.listLimits = ui.listLimits || {}; return ui.listLimits[key] || LIST_PAGE; }
+function moreLoader(key, hidden){ return hidden > 0 ? '<button class="load-more" data-action="loadMore" data-id="'+key+'" data-autoload="1">Show '+Math.min(hidden, LIST_PAGE)+' more</button>' : ''; }
+ACTIONS.loadMore = function(el, e, key){ ui.listLimits = ui.listLimits || {}; ui.listLimits[key] = listLimit(key) + LIST_PAGE; renderView(); };
 function setBacklogPriorityFilter(val){ ui.backlogPriorityFilter = (ui.backlogPriorityFilter===val)?null:val; refreshBacklogResults(); }
 function clearBacklogFilters(){ ui.backlogSearchText=''; ui.backlogPriorityFilter=null; ui.backlogSearchOpen=false; renderView(); }
 function toggleBacklogSearch(){
@@ -5492,7 +5533,7 @@ function renderFocusFinishedTab(){
   '</div>'+
   '<div class="section">'+
     '<div class="section-title">Everything Knocked Out<span class="kpi-sub">'+doneEarlier.length+' more</span></div>'+
-    '<div class="task-list">'+(doneEarlier.map(finishedTaskRow).join('') || '<div class="empty">Nothing else yet — it all starts today.</div>')+'</div>'+
+    '<div class="task-list">'+(doneEarlier.slice(0, listLimit('finished')).map(finishedTaskRow).join('') || '<div class="empty">Nothing else yet — it all starts today.</div>')+moreLoader('finished', doneEarlier.length - listLimit('finished'))+'</div>'+
   '</div>';
 }
 function openAddTaskModal(){
@@ -5808,7 +5849,7 @@ function renderOngoingTasksPanel(){
   const ongoing = state.tasks.items.filter(function(t){ return t.ongoing && t.status!=='done'; });
   if(!ongoing.length) return '';
   return '<div class="section"><div class="section-title">Ongoing'+tip('Ongoing tasks stay live until they\'re actually done — check one off for today and it comes back tomorrow.')+'</div>'+
-    (carouselOn() ? carouselWrap(ongoing.map(function(t){ return taskCard(t); }).join(''), 'ongoing', {w:236}) : '<div class="task-card-grid">'+ongoing.map(function(t){ return taskCard(t); }).join('')+'</div>')+
+    (carouselOn() ? carouselWrap(ongoing.map(function(t){ return taskCard(t); }).join(''), 'ongoing', {w:236, loop:true, count:ongoing.length}) : '<div class="task-card-grid">'+ongoing.map(function(t){ return taskCard(t); }).join('')+'</div>')+
   '</div>';
 }
 function reminderRow(r){
@@ -7025,6 +7066,7 @@ function updateCurrentAppIndicator(){
   else { el.textContent=''; el.style.display='none'; }
   if(typeof updateActivityPill==='function') updateActivityPill();
 }
+let lastActivitySig = '', pastDayCounts = {};
 async function pollAppActivity(){
   const st = state.settings.appTracking;
   if(!st || st.enabled===false) { updateCurrentAppIndicator(); return; }
@@ -7034,6 +7076,10 @@ async function pollAppActivity(){
     if(!res.ok) return;
     text = await res.text();
   }catch(e){ return; } // no wrapper/server running — silently do nothing
+  // Nothing new since the last poll → nothing to recompute or save.
+  const sig = text.length+':'+text.slice(-80);
+  if(sig===lastActivitySig){ updateCurrentAppIndicator(); checkAutoLockIn(); return; }
+  lastActivitySig = sig;
   // Only count active usage: a sample taken after the keyboard/mouse has been idle for a
   // while is dropped, which leaves a gap that splits the interval (an app just sitting in
   // the foreground no longer counts as "being on it").
@@ -7045,6 +7091,7 @@ async function pollAppActivity(){
   samples.forEach(function(s){ const d = todayStr(new Date(s.ts)); (byDate[d]=byDate[d]||[]).push(s); });
   Object.keys(byDate).forEach(function(d){
     if(d===today) return; // only finalize PAST days; today stays live below
+    if(pastDayCounts[d]===byDate[d].length) return; // already finalized with these exact samples
     const ivs = samplesToIntervals(byDate[d].sort(function(a,b){return a.ts-b.ts;}));
     // The log is re-read in full on every poll, so a past day's samples show up again and
     // again. Keep the larger of stored vs. recomputed per app (idempotent) instead of adding,
@@ -7053,6 +7100,7 @@ async function pollAppActivity(){
     // Also keep the part that happened while locked in (Analytics shows that first).
     if(!state.appActivity.lockedDays) state.appActivity.lockedDays = {};
     state.appActivity.lockedDays[d] = maxAppMinutes(state.appActivity.lockedDays[d], clipIntervalsToWindows(ivs, sessionWindowsFor(d)));
+    pastDayCounts[d] = byDate[d].length;
   });
   const todaySamples = (byDate[today]||[]).sort(function(a,b){return a.ts-b.ts;});
   state.appActivity.todayIntervals = samplesToIntervals(todaySamples);
@@ -7728,7 +7776,7 @@ function renderJournalHistory(entries){
     const label = d===todayStr() ? 'Today' : d===addDays(todayStr(),-1) ? 'Yesterday' : fmtDateShort(d);
     html += '<div class="kind-label">'+label+'</div>'+groups[d].map(journalEntryRow).join('');
   });
-  if(hidden>0) html += '<div class="row" style="justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="journalShowMore">Show '+Math.min(hidden, JOURNAL_PAGE)+' more &middot; '+hidden+' older</button></div>';
+  if(hidden>0) html += '<div class="row" style="justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="journalShowMore" data-autoload="1">Show '+Math.min(hidden, JOURNAL_PAGE)+' more &middot; '+hidden+' older</button></div>';
   return html || '<div class="empty">Nothing matches yet.</div>';
 }
 ACTIONS.journalShowMore = function(){ ui.journalShowCount = (ui.journalShowCount || JOURNAL_PAGE) + JOURNAL_PAGE; updateJournalHistoryDisplay(); };
@@ -12000,7 +12048,7 @@ function renderClientsHome(){
         '</div>' : '');
     })()+
     '<div class="subtab-panel" data-key="clients-home">'+
-      (active.length ? (carouselOn() ? carouselWrap(active.map(clientCardV2).join(''), 'clients', {w:340, trackCls:'cc2-car'}) : '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>') : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
+      (active.length ? (carouselOn() ? carouselWrap(active.map(clientCardV2).join(''), 'clients', {w:340, trackCls:'cc2-car', loop:true, count:active.length}) : '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>') : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
       (rest.length ? '<div class="cc2-past"><button class="cc2-past-toggle" data-action="toggleClientsPast">'+(ui.clientsPastOpen?'&#9662;':'&#9656;')+' Paused &amp; past clients ('+rest.length+')</button>'+
         (ui.clientsPastOpen ? '<div class="cc2-grid cc2-grid-sm">'+rest.map(clientCardV2).join('')+'</div>' : '')+'</div>' : '')+
     '</div>';
@@ -12052,7 +12100,7 @@ function renderClientHubPanel(){
   if(!clients.length && !leadsDue.length) return '';
   return '<div class="section client-hub">'+
     '<div class="section-title">Clients<span class="view-all-link" data-action="goToClients">All clients &rarr;</span></div>'+
-    (clients.length ? (function(cards){ return carouselOn() ? carouselWrap(cards, 'hub', {w:300}) : '<div class="hub-grid">'+cards+'</div>'; })(clients.map(function(c){
+    (clients.length ? (function(cards){ return carouselOn() ? carouselWrap(cards, 'hub', {w:300, loop:true, count:clients.length}) : '<div class="hub-grid">'+cards+'</div>'; })(clients.map(function(c){
       const hs = clientHealthStatus(c);
       return '<div class="hub-card hl-'+hs.level+'" data-key="hub-'+c.id+'">'+
         '<div class="hub-head" title="'+escapeHtml(clientHealthTitle(c))+'">'+clientAvatarHtml(c, true, true)+
@@ -13212,10 +13260,11 @@ let lastRenderedView = null;
 let lastRenderedDay = null;
 // While several things change at once (e.g. navigating closes every open pop-up first),
 // renders are held so the page is drawn once at the end instead of once per step.
-let renderHold = 0;
+let renderHold = 0, renderGen = 0;
 function holdRenders(fn){ renderHold++; try{ fn(); } finally{ renderHold--; } }
 function renderView(){
   if(renderHold) return;
+  renderGen++;
   RC = {};
   try{ renderViewInner(); } finally { RC = null; }
 }
@@ -13401,8 +13450,13 @@ function startModeTicker(){
     if(el) setTimerText(el, Date.now()-active.startedAt);
   }, 1000);
 }
+// Deep work only changes once a minute — rebuild those boxes only when the number actually moves,
+// not on every tick (rebuilding them every second made the page relayout constantly).
+let lastLiveDeepMins = null;
 function tickLiveDeepWork(){
   const mins = deepWorkMinutesTodayLive();
+  if(mins===lastLiveDeepMins) return;   // a render in between already shows the current value
+  lastLiveDeepMins = mins;
   const statBox = document.getElementById('statDeepWorkBox');
   if(statBox) statBox.innerHTML = deepWorkStatInnerHtml(mins);
   const focusBox = document.getElementById('statDeepWorkTodayBox');
@@ -13642,6 +13696,13 @@ function appleMusicFromLink(u){
 }
 function mediaKindLabel(m){ if(!m) return ''; if(m.type==='music') return 'Apple Music '+(m.k==='playlist'?'playlist':'song'); if(m.ref) return 'uploaded song'; return /youtu/.test(m.url||'') ? 'YouTube' : isDirectAudioUrl(m.url) ? 'song link' : 'link'; }
 function mediaName(m){ return !m ? '' : m.type==='music' ? m.q : (m.name || m.url || 'Song'); }
+const WAKE_HELPER = 'http://127.0.0.1:8935/';
+// The launcher stops asking Chrome "which website is open?" while Operator is the window in front
+// (each question made Chrome pause) — so tell it when that changes.
+function opFocusPing(f){ try{ fetch(WAKE_HELPER+'opfocus?f='+f).catch(function(){}); }catch(e){} }
+window.addEventListener('focus', function(){ opFocusPing(1); });
+window.addEventListener('blur', function(){ opFocusPing(0); });
+setTimeout(function(){ opFocusPing(document.hasFocus() ? 1 : 0); }, 1500);
 function hexUtf8(str){ return Array.prototype.map.call(new TextEncoder().encode(String(str||'')), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
 async function musicApp(cmd, media){
   const ctl = typeof AbortController!=='undefined' ? new AbortController() : null;
@@ -13678,6 +13739,15 @@ async function playWakeMedia(media, onFail){
         wakeAudioRamp = setInterval(function(){ if(!wakeAudio){ clearInterval(wakeAudioRamp); return; } wakeAudio.volume = Math.min(1, wakeAudio.volume+0.03); if(wakeAudio.volume>=1) clearInterval(wakeAudioRamp); }, 1500);
       }
       return true;
+    }
+    // links open in the browser you pick (Firefox by default — its ad blocker skips YouTube ads)
+    const via = wakeCfg().openIn || 'firefox';
+    if(via!=='chrome'){
+      try{
+        const ctl = new AbortController(), tm = setTimeout(function(){ ctl.abort(); }, 3000);
+        const res = await fetch(WAKE_HELPER+'open?b='+via+'&u='+hexUtf8(media.url), {signal:ctl.signal}); clearTimeout(tm);
+        if(res.ok) return true;
+      }catch(e){ /* no launcher (opened as a plain file) — fall back to a window here */ }
     }
     const w = window.open(media.url, 'operatorWakeMusic');
     if(!w){ onFail(); return false; }
@@ -13891,7 +13961,8 @@ function wakeMusicPickerHtml(w){
         '<button class="btn btn-sm btn-primary" data-action="wakeSetAppleMusic">Use it</button>'+
       '</div>'
     : src==='upload' ? '<button class="btn btn-sm" data-action="wakePickMusic">&#11014; Choose a song file</button>'
-    : '<input class="input" data-wake="mediaUrl" placeholder="YouTube or song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="width:100%;">');
+    : '<input class="input" data-wake="mediaUrl" placeholder="YouTube or song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="width:100%;">'+
+      '<div class="row" style="gap:8px;margin-top:8px;align-items:center;"><span class="kpi-sub">Open in</span><div class="seg-tabs" style="margin:0;">'+[['firefox','Firefox'],['safari','Safari'],['chrome','Chrome']].map(function(b){ return '<button class="seg-tab'+((w.openIn||'firefox')===b[0]?' active':'')+'" data-action="wakeOpenIn" data-id="'+b[0]+'">'+b[1]+'</button>'; }).join('')+'</div>'+tip('Firefox with an ad blocker plays YouTube without the ads. If Firefox isn\'t installed it opens in your default browser.')+'</div>');
 }
 ACTIONS.wakeMusicSource = function(el, e, id){ ui.wakeSrc = id; renderWakeSetupInto(); };
 ACTIONS.wakeMusicKind = function(el, e, id){ ui.wakeMusicKind = id; renderWakeSetupInto(); };
@@ -14058,6 +14129,7 @@ function wakeSettingsCardHtml(){
       '<div class="row" style="gap:8px;"><button class="btn btn-ghost btn-sm" data-action="wakeTestNow">Preview</button><button class="btn btn-primary" data-action="openWakeSetup">Set up</button></div>'+
     '</div></div>';
 }
+ACTIONS.wakeOpenIn = function(el, e, id){ wakeCfg().openIn = id; saveWake(); };
 
 // ============ SCENES ============
 // Optional living backgrounds behind the app. Minimal (no scene) stays the default; the others paint
@@ -15171,6 +15243,37 @@ ACTIONS.journalMenu = function(el, e, id){
   const r = el.getBoundingClientRect();
   ctxShow(journalMenuHtml(entry), r.right - 220, r.bottom + 6);
 };
+
+// ============ RESPOND ON PRESS ============
+// Switching pages and tabs happens the moment the mouse button goes down — not when it comes back
+// up — which takes the 80–150ms a click is held off every switch. The real click that follows is
+// recognised and ignored, so nothing runs twice.
+const FAST_ACTIONS = {nav:1, businessTab:1, settingsTab:1, personalTab:1, focusMainTab:1, focusTasksSubTab:1, journalMode:1, analyticsRange:1, crmView:1, healthTab:1};
+let fastPress = null;
+function pressSig(el){ return [el.dataset.action, el.dataset.view||'', el.dataset.tab||'', el.dataset.id||'', el.dataset.kind||''].join('|'); }
+document.addEventListener('pointerdown', function(e){
+  if(e.button!==0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const el = e.target.closest && e.target.closest('[data-action]');
+  if(!el || !FAST_ACTIONS[el.dataset.action] || el.disabled) return;
+  fastPress = {sig:pressSig(el), at:Date.now()};
+  el.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true}));
+}, true);
+document.addEventListener('click', function(e){
+  if(!fastPress || !e.isTrusted) return;
+  const fp = fastPress; fastPress = null;
+  if(Date.now()-fp.at > 1500) return;
+  const el = e.target.closest && e.target.closest('[data-action]');
+  if(el && pressSig(el)===fp.sig){ e.stopImmediatePropagation(); e.preventDefault(); }
+}, true);
+// "Show more" buttons marked data-autoload press themselves as they scroll into view.
+let autoloadIO = null;
+afterRenderHooks.push(function(){
+  const btns = document.querySelectorAll('[data-autoload]'); if(!btns.length || !('IntersectionObserver' in window)) return;
+  if(!autoloadIO) autoloadIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){ if(en.isIntersecting && en.target.isConnected && !en.target._fired){ en.target._fired = true; autoloadIO.unobserve(en.target); setTimeout(function(){ en.target.click(); }, 0); } });
+  }, {rootMargin:'600px 0px'});
+  btns.forEach(function(b){ if(!b._observed){ b._observed = true; autoloadIO.observe(b); } });
+});
 // ============ INIT ============
 async function init(){
   state.profile = normalizeProfile(await loadKey('profile', defaultProfile()));
