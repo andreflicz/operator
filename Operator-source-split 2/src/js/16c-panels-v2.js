@@ -186,7 +186,7 @@ function renderHeatmapPanel(){
   return '<div class="section heatmap-panel"><div class="section-title">Consistency</div>'+
     '<div class="card hm-card">'+
       '<div class="hm-main"><div class="hm-grid">'+cols+'</div>'+
-        '<div class="hm-foot"><span>last 6 months &middot; outlined = standard hit</span><span class="hm-legend">less <span class="hm-cell hm-1"></span><span class="hm-cell hm-2"></span><span class="hm-cell hm-3"></span><span class="hm-cell hm-4"></span> more</span></div></div>'+
+        '<div class="hm-foot"><span>Last 6 months'+tip('Darker = more deep work that day. Outlined days hit the standard.')+'</span><span class="hm-legend">less <span class="hm-cell hm-1"></span><span class="hm-cell hm-2"></span><span class="hm-cell hm-3"></span><span class="hm-cell hm-4"></span> more</span></div></div>'+
       '<div class="hm-stats">'+
         stat(counted ? Math.round(hit/counted*100)+'%' : '—', 'days the standard was hit')+
         stat(best+'d', 'longest run on target')+

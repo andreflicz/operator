@@ -172,12 +172,11 @@ function renderClientLifecycle(c){
   const picker = '<select class="input input-sm lc-cycle-select" data-cycle-assign="'+c.id+'" title="Which cycle this client follows">'+
     '<option value="">No cycle</option>'+cycles().map(function(x){ return '<option value="'+x.id+'" '+(c.cycleId===x.id?'selected':'')+'>'+escapeHtml(x.name)+'</option>'; }).join('')+'</select>';
   const head = '<div class="row" style="justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;">'+
-      '<div class="row" style="gap:8px;align-items:center;"><div class="kind-label" style="margin:0;">Client cycle</div>'+picker+'</div>'+
+      '<div class="row" style="gap:8px;align-items:center;"><div class="kind-label" style="margin:0;">Client cycle'+tip('The playbook this client follows — you\'ll see each step\'s calls, forms and videos as you go.')+'</div>'+picker+'</div>'+
       '<button class="mini-move" data-action="openLifecycleEditor" data-cycle="'+(c.cycleId||'')+'">&#9881; Edit cycles</button>'+
     '</div>';
   if(!cy){
     return '<div class="lc-card">'+head+
-      '<div class="kpi-sub" style="margin-bottom:8px;">Pick the playbook this client follows — you\'ll see each step\'s calls, forms and videos as you go.</div>'+
       '<div class="row" style="gap:6px;">'+cycles().map(function(x){ return '<button class="btn btn-sm lc-start-btn" style="--lc:'+x.color+'" data-action="lcStartCycle" data-id="'+c.id+'" data-cycle="'+x.id+'">Start '+escapeHtml(x.name)+'</button>'; }).join('')+
       (cycles().length ? '' : '<button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">Create your first cycle</button>')+'</div>'+
     '</div>';
@@ -311,7 +310,7 @@ function renderClientStepsPanel(){
     if(open.length) rows.push({c:c, st:st, cy:clientCycle(c), open:open});
   });
   if(!rows.length) return '';
-  return '<div class="section"><div class="section-title">Client Next Steps<span class="kpi-sub">from your client cycles</span><span class="view-all-link" data-action="openLifecycleEditor">Edit cycles</span></div>'+
+  return '<div class="section"><div class="section-title">Client Next Steps'+tip('Pulled from your client cycles.')+'<span class="view-all-link" data-action="openLifecycleEditor">Edit cycles</span></div>'+
     '<div class="lc-steps-grid">'+rows.map(function(r){
       return '<div class="card lc-steps-card" data-key="lcs-'+r.c.id+'">'+
         '<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px;gap:6px;">'+
@@ -345,7 +344,7 @@ function cycleGroupBar(){
   const notIn = crmList('client').filter(function(c){ return clientStageActive(c.stage) && (!cy || c.cycleId!==cy.id); }).length;
   return '<div class="row" style="gap:8px;margin:-4px 0 12px;align-items:center;">'+
     '<span class="kpi-sub">Cycle:</span><select class="input input-sm" data-cycle-board>'+cycles().map(function(x){ return '<option value="'+x.id+'" '+(cy && cy.id===x.id?'selected':'')+'>'+escapeHtml(x.name)+'</option>'; }).join('')+'</select>'+
-    (notIn ? '<span class="kpi-sub">'+notIn+' active client'+(notIn===1?' isn\'t':'s aren\'t')+' in this cycle — assign one from their page.</span>' : '')+
+    (notIn ? '<span class="kpi-sub">'+notIn+' active client'+(notIn===1?' isn\'t':'s aren\'t')+' in this cycle</span>'+tip('Assign a cycle from the client\'s page.') : '')+
   '</div>';
 }
 document.addEventListener('change', function(e){ const t = e.target; if(t && t.dataset && t.dataset.cycleBoard!==undefined){ crmUi('client').cycleId = t.value; renderView(); } });
@@ -379,8 +378,7 @@ function renderLifecycleEditor(){
   const cy = cycleById(ui.editingCycleId);
   const usage = {}; crmList('client').forEach(function(c){ if(c.cycleId) usage[c.cycleId] = (usage[c.cycleId]||0)+1; });
   const stepCount = {}; crmList('client').forEach(function(c){ if(c.cycleStepId && !c.cycleDone) stepCount[c.cycleStepId] = (stepCount[c.cycleStepId]||0)+1; });
-  return '<div class="section-title" style="margin-bottom:4px;">Client cycles</div>'+
-    '<div class="kpi-sub" style="margin-bottom:14px;">Build a playbook for each kind of client. Every step lists what to do — calls to book, forms and videos to send, to-dos. Save a link on an item once and it\'s ready to copy for every client.</div>'+
+  return '<div class="section-title" style="margin-bottom:14px;">Client cycles'+tip('Build a playbook for each kind of client. Every step lists what to do — calls to book, forms and videos to send, to-dos. Save a link on an item once and it\'s ready to copy for every client.')+'</div>'+
     '<div class="cy-tabs">'+all.map(function(x){ return '<button class="cy-tab'+(cy && x.id===cy.id?' active':'')+'" data-action="cyPick" data-id="'+x.id+'" style="--cy:'+x.color+'"><span class="crm-col-dot" style="background:'+x.color+'"></span>'+escapeHtml(x.name)+'<span class="kpi-sub">'+(usage[x.id]||0)+'</span></button>'; }).join('')+
       '<button class="cy-tab cy-tab-add" data-action="cyNew">+ New cycle</button></div>'+
     (!cy ? '<div class="empty">No cycles yet.</div>' :

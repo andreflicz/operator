@@ -96,7 +96,7 @@
   .task-notes{font-size:12.5px; color:var(--text-dim); margin-top:4px; line-height:1.45; white-space:pre-wrap;}
   .task-card-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(190px,1fr)); gap:8px; align-content:start;}
   .task-column{ background:rgba(255,255,255,.015); border:2px dashed var(--border); border-radius:var(--radius); padding:12px; min-height:120px; transition:border-color .15s, background .15s; }
-  .task-column.fixed-size{ height:520px; overflow-y:auto; }
+  .task-column.fixed-size{ min-height:190px; max-height:520px; overflow-y:auto; }
   .task-column.drop-hover{ border-color:var(--accent); background:var(--accent-dim); }
   .task-card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:13px 14px; display:flex; flex-direction:column; gap:7px; min-height:112px;}
   .task-card.done{opacity:.55;}
@@ -1105,7 +1105,6 @@
   .why-item{ font-family:var(--font-display); font-size:15px; font-weight:600; line-height:1.35; }
   .why-empty{ display:flex; align-items:center; gap:12px; cursor:pointer; } .why-empty:hover{ border-color:var(--accent); }
   @media (max-width:760px){ .th-right{ max-width:none; } .th-greet{ font-size:24px; } }
-  @media (min-width: 901px){ .today-hero .th-right{ margin-right:44px; } }
   .hm-card{ display:flex; gap:28px; align-items:center; flex-wrap:wrap; }
   .hm-main{ flex:0 0 auto; max-width:100%; overflow-x:auto; }
   .hm-grid{ gap:4px; }
@@ -1300,14 +1299,19 @@
   .board-pill-thumb{ position:relative; }
   .board-pill-star{ position:absolute; top:6px; left:6px; width:22px; height:22px; border-radius:50%; background:rgba(10,12,16,.85); color:var(--accent); font-size:13px; display:flex; align-items:center; justify-content:center; }
   /* ---- Business HQ (Overview) ---- */
-  .hq{ padding:22px 24px; display:flex; flex-direction:column; gap:22px; background:radial-gradient(ellipse at 0% 0%, rgba(63,190,142,.08), transparent 50%), var(--panel); }
-  .hq-top{ display:grid; grid-template-columns:minmax(260px,1fr) minmax(260px,1.1fr); gap:28px; align-items:center; }
-  .hq-mrr{ display:flex; flex-direction:column; gap:8px; }
-  .hq-mrr .biz-mrr{ font-size:48px; }
-  .hq-months .biz-mbars{ min-height:110px; }
-  .hq-cols{ display:grid; grid-template-columns:1fr 1fr; gap:22px; border-top:1px solid var(--border); padding-top:18px; }
-  .hq-col{ display:flex; flex-direction:column; gap:2px; min-width:0; }
-  .hq-col-head{ display:flex; align-items:center; gap:8px; font-family:var(--font-display); font-weight:700; font-size:15px; margin-bottom:8px; cursor:pointer; }
+  .hq{ position:relative; display:flex; flex-direction:column; gap:30px; padding-top:4px; }
+  .hq::before{ content:''; position:absolute; left:-60px; top:-70px; width:640px; height:340px; background:radial-gradient(ellipse at 35% 45%, rgba(63,190,142,.11), transparent 65%); pointer-events:none; }
+  .hq > *{ position:relative; }
+  .hq-top{ display:grid; grid-template-columns:minmax(280px,1fr) minmax(300px,1.25fr); gap:48px; align-items:end; }
+  .hq-mrr{ display:flex; flex-direction:column; gap:10px; }
+  .hq-mrr .biz-mrr{ font-size:68px; line-height:1; letter-spacing:-.02em; }
+  .hq-mrr .biz-bar{ max-width:440px; }
+  .hq-months .biz-mbars{ min-height:150px; }
+  .hq-cols{ display:grid; grid-template-columns:1fr 1fr; border-top:1px solid var(--border); padding-top:26px; }
+  .hq-col{ display:flex; flex-direction:column; gap:2px; min-width:0; padding:0 32px; }
+  .hq-col:first-child{ padding-left:0; border-right:1px solid var(--border); }
+  .hq-col:last-child{ padding-right:0; }
+  .hq-col-head{ display:flex; align-items:center; gap:8px; font-family:var(--font-display); font-weight:700; font-size:17px; margin-bottom:10px; cursor:pointer; }
   .hq-col-head .view-all-link{ margin-left:auto; }
   .hq-count{ font-size:12px; color:var(--text-dim); background:var(--panel-2); border-radius:999px; padding:1px 8px; font-family:var(--font-body); }
   .hq-row{ display:flex; align-items:center; gap:10px; padding:7px 6px; border-radius:9px; cursor:pointer; }
@@ -1323,7 +1327,7 @@
   .hq-stage-n{ font-family:var(--font-display); font-weight:700; font-size:13px; width:22px; text-align:right; }
   .hq-due{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); }
   .hq-due-lead{ font-size:12px; font-weight:600; color:#ffb3b8; background:var(--danger-dim); border-radius:999px; padding:3px 10px; cursor:pointer; }
-  @media (max-width:900px){ .hq-top, .hq-cols{ grid-template-columns:1fr; } }
+  @media (max-width:900px){ .hq-top, .hq-cols{ grid-template-columns:1fr; } .hq-col{ padding:0; border:none !important; } .hq-col + .hq-col{ margin-top:22px; } }
   .crm-toolbar-slim{ align-items:center; }
   .crm-tools-btn{ display:inline-flex; align-items:center; gap:6px; }
   .crm-tools-btn.is-open{ border-color:var(--accent); color:var(--accent); }
@@ -1340,6 +1344,41 @@
   .board-pill-star{ top:3px; left:3px; width:18px; height:18px; font-size:11px; }
   .board-shell:not(.is-full):not(.is-view) .board-host{ height:calc(100vh - 380px); min-height:400px; }
   .board-shell.is-view:not(.is-full) .board-host{ height:calc(100vh - 320px); min-height:400px; }
+  /* ---- "?" help tips ---- */
+  .qtip{ display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; margin-left:7px; border-radius:50%; border:1px solid #363c4c; color:var(--text-faint); font:700 10px/1 var(--font-body); letter-spacing:0; text-transform:none; vertical-align:middle; position:relative; top:-1px; cursor:help; user-select:none; flex-shrink:0; transition:color .15s, border-color .15s, background .15s; }
+  .qtip:hover, .qtip.is-on{ color:var(--text); border-color:var(--accent); background:var(--accent-dim); }
+  .view-title .qtip{ width:16px; height:16px; font-size:10.5px; margin-left:9px; top:-2px; }
+  .qtip-pop{ position:fixed; z-index:100001; left:0; top:0; max-width:290px; padding:9px 12px; border-radius:10px; background:#1b1f2a; border:1px solid #2f3546; color:#d9dce3; font:500 12.5px/1.45 var(--font-body); letter-spacing:0; text-transform:none; text-align:left; white-space:normal; box-shadow:0 14px 34px rgba(0,0,0,.5); pointer-events:none; opacity:0; transform:translateY(4px); transition:opacity .12s ease, transform .12s ease; }
+  .qtip-pop.below{ transform:translateY(-4px); }
+  .qtip-pop.on{ opacity:1; transform:none; }
+  /* ---- tab line that also carries the page's sub-tabs / range picker ---- */
+  .tabs-with-tools{ flex-wrap:wrap; }
+  .tabs-tools{ margin-left:auto; display:flex; align-items:center; gap:8px; padding-bottom:3px; }
+  .tabs-tools .subtabs{ margin:0; }
+  .tabs-tools .seg-tabs{ margin:0; padding:2px; }
+  .tabs-tools .seg-tab{ padding:5px 12px; }
+  .focus-current{ max-width:560px; margin:6px auto 26px; }
+  .focus-current .current-task-card{ max-width:none !important; min-height:120px; }
+  /* ---- quick-access dock joins the bottom-right stack (above notes and +) ---- */
+  .quick-access-dock{ top:auto; bottom:146px; right:31px; flex-direction:column-reverse; }
+  .quick-access-dock .quick-access-items{ transform-origin:bottom right; }
+  /* ---- leads / clients toolbar: stats left, one row of same-height controls right ---- */
+  .crm-toolbar-slim{ min-height:34px; }
+  .crm-toolbar-slim .crm-stats{ margin:0; align-items:center; }
+  .crm-tools-btn{ height:32px; padding:0 12px; border-radius:10px; border:1px solid var(--border); background:var(--panel-2); color:var(--text-dim); font:600 12.5px var(--font-display); cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:border-color .15s, color .15s; }
+  .crm-tools-btn:hover{ color:var(--text); border-color:#3a4152; }
+  .crm-tools-btn.is-open{ border-color:var(--accent); color:var(--accent); }
+  .crm-tools-btn .th-badge{ margin-left:2px; }
+  .crm-toolbar-slim .seg-tabs{ height:32px; padding:2px; border-radius:10px; box-sizing:border-box; align-items:stretch; }
+  .crm-toolbar-slim .seg-tab{ padding:0 13px; display:inline-flex; align-items:center; }
+  .crm-add-btn{ height:32px; padding:0 14px; border-radius:10px; font-size:12.5px; display:inline-flex; align-items:center; }
+
+  .ws-src-row{ display:flex; align-items:center; gap:4px; margin:8px 0; }
+  .kind-label .qtip{ top:-1px; }
+  .section-title > .qtip, .kind-label > .qtip{ margin-right:auto; }
+  .board-empty .section-title > .qtip{ margin-right:0; }
+  .board-toolbar .qtip{ margin:0 4px 0 8px; top:0; }
+  .ap-menu .qtip-inline, .ap-menu-k .qtip{ top:-1px; }
 </style>
 </head>
 <body>
@@ -2028,6 +2067,54 @@ function collectBlobRefs(obj, out){
   else if(obj && typeof obj==='object') Object.keys(obj).forEach(function(k){ collectBlobRefs(obj[k], out); });
   return out;
 }
+
+// ============ "?" HELP TIPS ============
+// Explanations live behind a small "?" — hover it (or click it) to read. Pages stay down to what
+// you act on; the how-and-why is one hover away. One shared bubble, positioned on the fly so it's
+// never clipped by a scrolling modal.
+function tip(text, cls){
+  const t = escapeHtml(text);
+  return '<span class="qtip'+(cls?' '+cls:'')+'" role="img" aria-label="'+t+'" data-tip="'+t+'">?</span>';
+}
+let tipEl = null, tipFor = null;
+function showTip(el){
+  if(tipFor===el && tipEl && tipEl.classList.contains('on')) return;
+  if(!tipEl){ tipEl = document.createElement('div'); tipEl.className = 'qtip-pop'; tipEl.setAttribute('role', 'tooltip'); document.body.appendChild(tipEl); }
+  if(tipFor && tipFor!==el) tipFor.classList.remove('is-on');
+  tipFor = el;
+  el.classList.add('is-on');
+  tipEl.textContent = el.getAttribute('data-tip') || '';
+  tipEl.classList.remove('on', 'below');
+  const r = el.getBoundingClientRect(), w = tipEl.offsetWidth, h = tipEl.offsetHeight;
+  const left = Math.max(8, Math.min(window.innerWidth-w-8, Math.round(r.left+r.width/2-w/2)));
+  let top = Math.round(r.top-h-8);
+  if(top<8){ top = Math.round(r.bottom+8); tipEl.classList.add('below'); }
+  tipEl.style.left = left+'px'; tipEl.style.top = top+'px';
+  requestAnimationFrame(function(){ if(tipFor===el) tipEl.classList.add('on'); });
+}
+function hideTip(){
+  if(tipFor) tipFor.classList.remove('is-on');
+  tipFor = null;
+  if(tipEl) tipEl.classList.remove('on');
+}
+document.addEventListener('mouseover', function(e){
+  const q = e.target.closest && e.target.closest('.qtip');
+  if(q && q!==tipFor) showTip(q);
+});
+document.addEventListener('mouseout', function(e){
+  const q = e.target.closest && e.target.closest('.qtip');
+  if(q && q===tipFor && !q.contains(e.relatedTarget)) hideTip();
+});
+// Clicking "?" only shows the tip — it never ticks the checkbox or opens the card it sits in.
+document.addEventListener('click', function(e){
+  const q = e.target.closest && e.target.closest('.qtip');
+  if(!q){ if(tipFor) hideTip(); return; }
+  e.preventDefault(); e.stopPropagation();
+  showTip(q);
+}, true);
+window.addEventListener('scroll', function(){ if(tipFor) hideTip(); }, {capture:true, passive:true});
+window.addEventListener('keydown', function(e){ if(e.key==='Escape' && tipFor) hideTip(); }, true);
+afterRenderHooks.push(function(){ if(tipFor && !tipFor.isConnected) hideTip(); });
 // ============ SCROLL PICKER ============
 function buildScrollPicker(id, options, selectedValue){
   const items = options.map(function(o){ return '<div class="picker-item" data-value="'+o.value+'">'+o.label+'</div>'; }).join('');
@@ -3002,11 +3089,10 @@ function yesterdayStandardsFixupHtml(){
   const fix = yesterdayStandardsFixup();
   if(!fix) return '';
   return '<div class="card" style="text-align:center;border-color:var(--accent);margin-top:10px;">'+
-    '<div class="kpi-label" style="margin-bottom:6px;">Looks like you did the work yesterday — just missing this:</div>'+
+    '<div class="kpi-label" style="margin-bottom:6px;">Looks like you did the work yesterday — just missing this:'+tip('Tap it to confirm and restore yesterday to your streak.')+'</div>'+
     '<div class="row" style="justify-content:center;">'+
       fix.missing.map(function(it){ return '<span class="chip" data-action="toggleStandard" data-id="'+it.id+'" data-date="'+fix.date+'">'+escapeHtml(it.label)+'</span>'; }).join('')+
     '</div>'+
-    '<div class="kpi-sub" style="margin-top:8px;">Tap to confirm and restore yesterday to your streak.</div>'+
   '</div>';
 }
 function requiredWorkingDays(){ return 7 - (state.standards.daysOffAllowedPerWeek!=null ? state.standards.daysOffAllowedPerWeek : 2); }
@@ -3112,8 +3198,7 @@ function renderStreakEditModal(){
   const ov = state.standards.dayOverrides || {};
   const days = []; for(let i=27;i>=0;i--) days.push(addDays(todayStr(), -i));
   const streak = computeStreak();
-  return '<div class="section-title" style="margin-bottom:4px;">Edit Streak</div>'+
-    '<div class="kpi-sub" style="margin-bottom:14px;">Tap a day to cycle: automatic &rarr; counted &rarr; not counted. Rest days marked off stay neutral.</div>'+
+  return '<div class="section-title" style="margin-bottom:14px;">Edit Streak'+tip('Tap a day to cycle: automatic → counted → not counted. Rest days you marked off stay neutral.')+'</div>'+
     '<div class="streak-edit-grid">'+days.map(function(d){
       const o = ov[d];
       const auto = (function(){ const save = ov[d]; delete ov[d]; const r = dayStandardsComplete(d); if(save) ov[d]=save; return r; })();
@@ -3440,12 +3525,15 @@ function toggleTaskSelect(id){
   renderView();
 }
 function clearTaskSelection(){ ui.selectedTaskIds.clear(); renderView(); }
-function renderTaskToolbar(){
+function selectModeBtnHtml(){
+  return '<button class="btn btn-ghost btn-sm" data-action="toggleTaskSelectMode">'+(ui.taskSelectMode?'Done Selecting':'Select Multiple')+'</button>';
+}
+// inline: the Select Multiple button sits in a section header instead, so only the bulk bar renders here
+function renderTaskToolbar(inline){
   const ids = Array.from(ui.selectedTaskIds).filter(function(id){ return state.tasks.items.some(function(t){return t.id===id;}); });
   if(!ids.length){
-    return '<div class="row" style="justify-content:flex-end;margin-bottom:8px;">'+
-      '<button class="btn btn-ghost btn-sm" data-action="toggleTaskSelectMode">'+(ui.taskSelectMode?'Done Selecting':'Select Multiple')+'</button>'+
-    '</div>';
+    if(inline) return '';
+    return '<div class="row" style="justify-content:flex-end;margin-bottom:8px;">'+selectModeBtnHtml()+'</div>';
   }
   const selectedTasks = ids.map(function(id){ return state.tasks.items.find(function(t){return t.id===id;}); }).filter(Boolean);
   const anyToday = selectedTasks.some(function(t){return t.status==='today';});
@@ -3509,7 +3597,7 @@ function renderTaskEditModal(){
     taskAlarmFieldsHtml('editTask-'+t.id+'-', t)+
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="editNotes-'+t.id+'" style="width:100%;min-height:60px;">'+escapeHtml(t.notes||'')+'</textarea></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editCountsDeep-'+t.id+'" '+(t.countsDeepWork!==false?'checked':'')+' style="margin-right:6px;">Counts toward deep work'+(function(){ const c=t.categoryId?taskCategoryById(t.categoryId):null; return c && c.countsDeepWork===false ? ' <span class="kpi-sub">(its category "'+escapeHtml(c.label)+'" doesn\'t count)</span>' : ''; })()+'</label>'+
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editOngoing-'+t.id+'" '+(t.ongoing?'checked':'')+' style="margin-right:6px;">&#128204; Ongoing (may take more than one day)</label>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editOngoing-'+t.id+'" '+(t.ongoing?'checked':'')+' style="margin-right:6px;">&#128204; Ongoing'+tip('For work that takes more than one day — it stays live until it\'s actually done.')+'</label>'+
     '<div id="editTaskOngoingExtra-'+t.id+'" style="display:'+(t.ongoing?'block':'none')+';">'+
     '<div class="field" style="margin-top:10px;"><label>Ongoing target date (optional)</label><div class="row"><input class="input" type="date" id="editOngoingDeadline-'+t.id+'" value="'+(t.ongoingDeadline||'')+'"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editOngoingDeadline-'+t.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="editOngoingDeadline-'+t.id+'">Clear</button></div></div>'+
     '<div class="field" style="margin-top:10px;"><label>Frequency (optional)</label><select class="input" id="editOngoingFrequency-'+t.id+'">'+
@@ -3890,7 +3978,7 @@ document.addEventListener('drop', function(e){
 function renderJournalPanel(){
   const todaysJournalCount = state.journal.entries.filter(function(e){ return e.date===todayStr(); }).length;
   return '<div class="section"><div class="card journal-quick-card" data-photo-drop="journal" style="text-align:center;">'+
-    '<div class="kpi-label" style="margin-bottom:8px;">Quick Journal<span class="kpi-sub" style="margin-left:8px;">paste or drop images</span></div>'+
+    '<div class="kpi-label" style="margin-bottom:8px;">Quick Journal'+tip('Paste or drop images in too.')+'</div>'+
     '<textarea class="input" id="quickJournalText" placeholder="Anything on your mind — a win, a worry, an idea…" style="width:100%;height:90px;flex-shrink:0;text-align:left;resize:none;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
     renderJournalPhotoThumbsRow()+
     '<div class="journal-compose-actions">'+
@@ -4372,7 +4460,7 @@ function renderHeatmapPanel(){
   return '<div class="section heatmap-panel"><div class="section-title">Consistency</div>'+
     '<div class="card hm-card">'+
       '<div class="hm-main"><div class="hm-grid">'+cols+'</div>'+
-        '<div class="hm-foot"><span>last 6 months &middot; outlined = standard hit</span><span class="hm-legend">less <span class="hm-cell hm-1"></span><span class="hm-cell hm-2"></span><span class="hm-cell hm-3"></span><span class="hm-cell hm-4"></span> more</span></div></div>'+
+        '<div class="hm-foot"><span>Last 6 months'+tip('Darker = more deep work that day. Outlined days hit the standard.')+'</span><span class="hm-legend">less <span class="hm-cell hm-1"></span><span class="hm-cell hm-2"></span><span class="hm-cell hm-3"></span><span class="hm-cell hm-4"></span> more</span></div></div>'+
       '<div class="hm-stats">'+
         stat(counted ? Math.round(hit/counted*100)+'%' : '—', 'days the standard was hit')+
         stat(best+'d', 'longest run on target')+
@@ -4720,7 +4808,7 @@ function renderCurrentTaskCard(big, gridMode, heroFit){
     const st = state.tasks.items.find(function(x){ return x.id===ui.stagedTaskId; });
     if(st){
       return '<div class="task-card current-task-card staged-task-card'+(ui.justStaged?' just-staged':'')+'" data-dropzone="current" style="align-items:center;justify-content:center;text-align:center;'+sizeStyle+'">'+
-        '<div class="ctb-label">&#128204; Up Next &middot; lock in to start the clock</div>'+
+        '<div class="ctb-label">&#128204; Up Next'+tip('Lock in to start the clock on it.')+'</div>'+
         '<div class="task-card-title" style="font-size:19px;margin-top:6px;">'+escapeHtml(st.title)+'</div>'+
         '<div class="row" style="margin-top:16px;justify-content:center;">'+
           '<button class="btn btn-good" data-action="openLockInChooser">&#128274; Lock In to Start</button>'+
@@ -4747,7 +4835,7 @@ function renderCurrentTaskCard(big, gridMode, heroFit){
   if(!t){
     return '<div class="task-card current-task-card" data-dropzone="current" style="align-items:center;justify-content:center;text-align:center;'+sizeStyle+'">'+
       '<div class="ctb-label">'+currentTaskLabel()+'</div>'+
-      '<div class="ctb-empty">'+(inSession?'Drag a task here to start timing it.':'Drag a task here to line it up — you\'ll lock in to start the clock.')+'</div>'+
+      '<div class="ctb-empty">Drag a task here'+tip(inSession ? 'Whatever sits here gets timed while you\'re locked in.' : 'Line it up here, then lock in to start the clock.')+'</div>'+
     '</div>';
   }
   if(big){
@@ -4800,25 +4888,28 @@ function sortByPriorityAndDeadline(list){
 }
 function focusMainTab(el){ ui.focusTab = el.dataset.tab; renderView(); }
 function focusTasksSubTab(el){ ui.focusTasksSubTab = el.dataset.tab; renderView(); }
+// Overview / Backlog / Video Ideas / Finished sit on the same line as Tasks · Analytics,
+// so the page opens straight onto what you're on now and what's next.
+function focusTasksSubtabsHtml(){
+  const sub = ui.focusTasksSubTab || 'overview';
+  let backlogN = 0, ideasN = 0, doneN = 0;
+  state.tasks.items.forEach(function(t){
+    if(t.status==='done') doneN++;
+    else if(t.isVideoIdea) ideasN++;
+    else if(t.status==='backlog') backlogN++;
+  });
+  const pill = function(id, label, n){ return '<div class="subtab '+(sub===id?'active':'')+'" data-action="focusTasksSubTab" data-tab="'+id+'">'+label+(n===null?'':' <span style="opacity:.7;">'+n+'</span>')+'</div>'; };
+  return '<div class="subtabs">'+pill('overview', 'Overview', null)+pill('backlog', 'Backlog', backlogN)+pill('videoIdeas', '&#127916; Video Ideas', ideasN)+pill('finished', 'Finished', doneN)+'</div>';
+}
 function renderFocusTasksTab(){
   const sub = ui.focusTasksSubTab || 'overview';
-  const items = state.tasks.items;
-  const backlog = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; }));
-  const videoIdeas = items.filter(function(t){ return t.isVideoIdea && t.status!=='done'; });
-  const doneAll = items.filter(function(t){ return t.status==='done'; });
-  return '<div class="subtabs">'+
-      '<div class="subtab '+(sub==='overview'?'active':'')+'" data-action="focusTasksSubTab" data-tab="overview">Overview</div>'+
-      '<div class="subtab '+(sub==='backlog'?'active':'')+'" data-action="focusTasksSubTab" data-tab="backlog">Backlog <span style="opacity:.7;">'+backlog.length+'</span></div>'+
-      '<div class="subtab '+(sub==='videoIdeas'?'active':'')+'" data-action="focusTasksSubTab" data-tab="videoIdeas">&#127916; Video Ideas <span style="opacity:.7;">'+videoIdeas.length+'</span></div>'+
-      '<div class="subtab '+(sub==='finished'?'active':'')+'" data-action="focusTasksSubTab" data-tab="finished">Finished <span style="opacity:.7;">'+doneAll.length+'</span></div>'+
-    '</div>'+
-    '<div class="subtab-panel" data-key="tasks-'+sub+'">'+
+  return '<div class="subtab-panel" data-key="tasks-'+sub+'">'+
     (sub==='backlog' ? renderFocusBacklogTab() : sub==='videoIdeas' ? renderVideoIdeasTab() : sub==='finished' ? renderFocusFinishedTab() : renderFocusTasksOverview())+
     '</div>';
 }
 function renderVideoIdeasTab(){
   const videoIdeas = state.tasks.items.filter(function(t){ return t.isVideoIdea && t.status!=='done'; });
-  return '<div class="section" style="margin-top:14px;">'+
+  return '<div class="section">'+
     '<div class="row" style="justify-content:flex-end;margin-bottom:16px;">'+
       '<button class="btn btn-primary" data-action="openAddVideoIdeaModal">+ Add Video Idea</button>'+
     '</div>'+
@@ -4903,10 +4994,10 @@ function renderFocusTasksOverview(){
   const today = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='today'; }));
   const backlogPreview = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; })).slice(0,8);
   const backlogTotal = items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; }).length;
-  return nowNext+'<div style="max-width:440px;margin:0 auto 14px;">'+renderCurrentTaskCard()+'</div>'+
-  renderTaskToolbar()+
-  '<div class="section" style="margin-top:14px;margin-bottom:14px;">'+
-    '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+' &middot; highest priority &amp; closest deadlines first</span><button class="btn btn-primary btn-sm" data-action="openAddTaskModal" style="margin-left:auto;">+ Add a Task</button></div>'+
+  return nowNext+'<div class="focus-current">'+renderCurrentTaskCard()+'</div>'+
+  renderTaskToolbar(true)+
+  '<div class="section" style="margin-bottom:14px;">'+
+    '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('Highest priority and closest deadlines first. Drag a card up to the box above to line it up next.')+'<span class="row" style="margin-left:auto;gap:8px;">'+selectModeBtnHtml()+'<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button></span></div>'+
     '<div class="task-column fixed-size" data-dropzone="today"><div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div></div>'+
   '</div>'+
   (backlogTotal ? (
@@ -4920,11 +5011,11 @@ function renderFocusBacklogTab(){
   const items = state.tasks.items;
   const backlog = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; }));
   const hasFilters = !!(ui.backlogSearchText || ui.backlogPriorityFilter);
-  return renderTaskToolbar()+
-  '<div class="section" style="margin-top:14px;">'+
+  return renderTaskToolbar(true)+
+  '<div class="section">'+
     '<div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">'+
-      '<div class="section-title" style="margin-bottom:0;">The Whole List<span class="kpi-sub">'+backlog.length+' &middot; highest priority &amp; closest deadlines first</span></div>'+
-      '<div class="row" style="gap:8px;">'+
+      '<div class="section-title" style="margin-bottom:0;">The Whole List<span class="kpi-sub">'+backlog.length+'</span>'+tip('Highest priority and closest deadlines first.')+'</div>'+
+      '<div class="row" style="gap:8px;">'+selectModeBtnHtml()+
         (!ui.backlogSearchOpen && !hasFilters ? '<button class="btn btn-ghost btn-sm" data-action="toggleBacklogSearch" title="Search Entries">&#128269;</button>' : '')+
         '<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button>'+
       '</div>'+
@@ -4970,7 +5061,7 @@ function renderFocusFinishedTab(){
   const today = todayStr();
   const doneToday = doneAll.filter(function(t){ return t.completedAt===today; });
   const doneEarlier = doneAll.filter(function(t){ return t.completedAt!==today; });
-  return '<div class="section" style="margin-top:14px;">'+
+  return '<div class="section">'+
     '<div class="section-title">Completed Today<span class="kpi-sub">'+doneToday.length+'</span></div>'+
     '<div class="task-list">'+(doneToday.map(finishedTaskRow).join('') || '<div class="empty">Nothing finished today yet.</div>')+'</div>'+
   '</div>'+
@@ -4996,7 +5087,7 @@ function renderAddTaskModal(){
     '<div class="field" style="margin-top:10px;"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="newTaskDeadline"><input class="input" type="time" id="newTaskDeadlineTime" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="newTaskDeadline">Today</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskDeadline" title="Remove deadline">Clear</button></div></div>'+
     taskAlarmFieldsHtml('newTask', null)+
     '<div class="field" style="margin-top:10px;"><label>Notes (optional)</label><textarea class="input" id="newTaskNotes" placeholder="Any details worth remembering" style="width:100%;min-height:60px;"></textarea></div>'+
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskOngoing" style="margin-right:6px;">&#128204; Ongoing (may take more than one day)</label>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskOngoing" style="margin-right:6px;">&#128204; Ongoing'+tip('For work that takes more than one day — it stays live until it\'s actually done.')+'</label>'+
     '<div id="newTaskOngoingExtra" style="display:none;">'+
     '<div class="field" style="margin-top:10px;"><label>Ongoing target date (optional)</label><div class="row"><input class="input" type="date" id="newTaskOngoingDeadline"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskOngoingDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskOngoingDeadline">Clear</button></div></div>'+
     '<div class="field" style="margin-top:10px;"><label>Frequency (optional)</label><select class="input" id="newTaskOngoingFrequency"><option value="">&mdash;</option><option value="daily">Daily</option><option value="few">A few times a week</option><option value="weekly">Weekly</option></select></div>'+
@@ -5180,10 +5271,11 @@ function deepWorkMinutesForQualifying(dateStr){
 }
 function renderFocus(){
   const tab = ui.focusTab || 'tasks';
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus</div><div class="view-sub">Manage the work itself.</div></div></div>'+
-  '<div class="tabs">'+
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus'+tip('Manage the work itself — what you\'re on now, what\'s next, the backlog and video ideas. Analytics shows where the time went.')+'</div></div></div>'+
+  '<div class="tabs tabs-with-tools">'+
     '<div class="tab '+(tab==='tasks'?'active':'')+'" data-action="focusMainTab" data-tab="tasks">Tasks</div>'+
     '<div class="tab '+(tab==='analytics'?'active':'')+'" data-action="focusMainTab" data-tab="analytics">Analytics</div>'+
+    '<div class="tabs-tools">'+(tab==='analytics' ? analyticsRangeTabs() : focusTasksSubtabsHtml())+'</div>'+
   '</div>'+
   '<div class="tab-panel" data-key="focus-'+tab+'">'+
   (tab==='analytics' ? renderFocusAnalyticsTab() : renderFocusTasksTab())+
@@ -5282,7 +5374,7 @@ function ongoingFrequencyLabel(freq){
 function renderOngoingTasksPanel(){
   const ongoing = state.tasks.items.filter(function(t){ return t.ongoing && t.status!=='done'; });
   if(!ongoing.length) return '';
-  return '<div class="section"><div class="section-title">Ongoing<span class="kpi-sub">Stays live until it\'s actually done</span></div>'+
+  return '<div class="section"><div class="section-title">Ongoing'+tip('Ongoing tasks stay live until they\'re actually done — check one off for today and it comes back tomorrow.')+'</div>'+
     '<div class="task-card-grid">'+ongoing.map(function(t){ return taskCard(t); }).join('')+'</div>'+
   '</div>';
 }
@@ -5452,7 +5544,7 @@ function renderFocusAnalytics(){
     '<div class="hero-card" style="text-align:center;"><div class="hero-num" style="color:var(--text-faint);">'+fmtDurationLabel(stasisAllTime)+'</div><div class="hero-label">All-Time Stasis</div></div>'+
   '</div></div>'+
   '<div class="section" style="max-width:300px;margin:0 auto;"><div class="stat-chip" style="text-align:center;"><div class="stat-chip-label">Deep Work, Last 7 Days</div><div class="stat-chip-value">'+fmtDurationLabel(last7Minutes)+'</div></div></div>'+
-  '<div class="section"><div class="section-title">Today\'s Breakdown<span class="kpi-sub">for reference — the totals above are what matter</span></div><div class="grid grid-5">'+
+  '<div class="section"><div class="section-title">Today\'s Breakdown'+tip('For reference — the totals above are what matter.')+'</div><div class="grid grid-5">'+
     '<div class="card" style="text-align:center;"><div class="kpi-label">Deep Work</div><div class="kpi-value" style="color:var(--accent);">'+fmtDurationLabel(todayMinutes)+'</div></div>'+
     '<div class="card" style="text-align:center;"><div class="kpi-label">Break Mode</div><div class="kpi-value" style="color:var(--info);">'+fmtDurationLabel(breakToday)+'</div></div>'+
     '<div class="card" style="text-align:center;"><div class="kpi-label">Shooting Mode</div><div class="kpi-value" style="color:var(--shoot);">'+fmtDurationLabel(shootToday)+'</div></div>'+
@@ -5465,7 +5557,7 @@ function renderFocusAnalytics(){
     '<div class="card"><div class="kpi-label">Longest Session</div><div class="kpi-value">'+fmtDurationLabel(longestSession)+'</div></div>'+
     '<div class="card"><div class="kpi-label">Days With A Session</div><div class="kpi-value">'+daysWithSession+'</div></div>'+
   '</div>'+
-  '<div class="card section"><div class="kpi-label">Best Time Block</div><div class="kpi-value">'+(bestBucket?bestBucket.label:'—')+'</div><div class="kpi-sub">based on all-time logged minutes</div></div>'+
+  '<div class="card section"><div class="kpi-label">Best Time Block'+tip('Based on all your logged deep work.')+'</div><div class="kpi-value">'+(bestBucket?bestBucket.label:'—')+'</div></div>'+
   '<div class="section"><div class="section-title">When You Work</div><div class="card">'+svgBarChart(buckets.map(function(b){return b.minutes;}), buckets.map(function(b){return b.label;}))+'</div></div>'+
   '<div class="section"><div class="section-title">Deep Work, Last 30 Days</div><div class="card">'+svgBarChart(minutesByDay, last30.map(function(d){return fmtDateShort(d).slice(0,3);}), {max:state.standards.deepWorkTargetMinutes})+'</div></div>'+
   renderMostUsedAppsSection()+
@@ -5486,7 +5578,7 @@ function renderMostUsedAppsSection(){
       '<div style="width:64px;text-align:right;flex-shrink:0;" class="kpi-sub">'+fmtDurationLabel(a.minutes)+'</div>'+
     '</div>';
   }
-  return '<div class="section"><div class="section-title">Most Used Apps<span class="kpi-sub">tracked from the foreground app on this Mac while Operator is open</span></div>'+
+  return '<div class="section"><div class="section-title">Most Used Apps'+tip('Tracked from the app in front on this Mac while Operator is open.')+'</div>'+
     '<div class="grid grid-2">'+
       '<div class="card"><div class="kind-label" style="margin-bottom:8px;">Today</div>'+
         (todayApps.length ? todayApps.map(function(a){ return barRow(a, maxToday); }).join('') : '<div class="empty">No app activity tracked yet today.</div>')+
@@ -5500,7 +5592,7 @@ function renderTimeByTaskSection(){
   const tracked = state.tasks.items.filter(function(t){ return (t.trackedMinutes||0)>0; })
     .sort(function(a,b){ return (b.trackedMinutes||0)-(a.trackedMinutes||0); })
     .slice(0,10);
-  return '<div class="section"><div class="section-title">Time By Task<span class="kpi-sub">based on time tracked while a task is Current/Next</span></div><div class="task-list">'+
+  return '<div class="section"><div class="section-title">Time By Task'+tip('Time tracked while a task is your Current task.')+'</div><div class="task-list">'+
     (tracked.map(function(t){
       return '<div class="task-item-v2">'+
         '<div class="task-title-row">'+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-personal">&#128204; Ongoing</span>':'')+'</div>'+
@@ -5516,7 +5608,7 @@ function timeBlockLabel(m){
 }
 function renderModeHistorySection(){
   const history = state.modes.history.slice().sort(function(a,b){ return b.startedAt-a.startedAt; }).slice(0,20);
-  return '<div class="section"><div class="section-title">Break, Shooting &amp; Off-Time History<span class="kpi-sub">saved permanently for day/week/month analysis</span></div><div class="task-list">'+
+  return '<div class="section"><div class="section-title">Break, Shooting &amp; Off-Time History'+tip('Saved permanently for day / week / month analysis.')+'</div><div class="task-list">'+
     (history.map(function(m){
       const label = MODE_LABELS[m.type] || 'Mode';
       const color = modeColor(m.type);
@@ -5959,9 +6051,9 @@ function renderSessionEditModal(){
       '<div class="field"><label>Start</label><input class="input" type="time" id="tbStart" value="'+(hasTimes?hmOf(b.startedAt):'')+'"></div>'+
       '<div class="field"><label>End</label><input class="input" type="time" id="tbEnd" value="'+(hasTimes?hmOf(b.endedAt):'')+'"></div>'+
     '</div>'+
-    '<div class="field" style="margin-top:10px;"><label>Type</label><div class="row" style="gap:6px;">'+types.map(function(t){
+    '<div class="field" style="margin-top:10px;"><label>Type'+tip('Only deep work counts toward deep-work stats. Shooting also counts toward the daily standard.')+'</label><div class="row" style="gap:6px;">'+types.map(function(t){
       return '<label class="chip'+(cur===t[0]?' active':'')+'" style="cursor:pointer;"><input type="radio" name="tbType" value="'+t[0]+'" '+(cur===t[0]?'checked':'')+' style="display:none;">'+t[1]+'</label>';
-    }).join('')+'</div><div class="kpi-sub" style="margin-top:4px;">Only deep work counts toward deep-work stats. Shooting also counts toward the daily standard.</div></div>'+
+    }).join('')+'</div></div>'+
     '<div class="field" style="margin-top:10px;"><label>Note</label><input class="input" id="tbNote" value="'+escapeHtml(b.note||'')+'" placeholder="Optional"></div>'+
     (arr(b.completedTasks).length ? '<div class="kpi-sub" style="margin-top:10px;">Finished: '+arr(b.completedTasks).map(function(t){ return escapeHtml(t.title); }).join(', ')+'</div>' : '')+
     '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
@@ -6167,7 +6259,7 @@ function dayDetailHtml(dateStr){
       '<div class="card"><div class="kind-label" style="margin-top:0;">Clients</div>'+(clientRows.length ? barList(clientRows, function(){ return 'var(--info)'; }, function(r){ return clientLabel(r.key); }) : '<div class="kpi-sub">Nothing attributed to clients.</div>')+
         '<div class="kind-label">Apps'+(locked && Object.keys(locked).length?' &middot; while locked in':' &middot; active time')+'</div>'+(appRows.length ? barList(appRows, function(){ return '#5b6472'; }, function(r){ return r.key; }) : '<div class="kpi-sub">No app activity recorded.</div>')+'</div>'+
     '</div>'+
-    '<div class="card" style="margin-top:14px;"><div class="kind-label" style="margin-top:0;">Sessions &amp; Blocks<span class="kpi-sub" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px;">tap to edit times or delete</span></div>'+
+    '<div class="card" style="margin-top:14px;"><div class="kind-label" style="margin-top:0;">Sessions &amp; Blocks'+tip('Click one to edit its times or delete it.')+'</div>'+
       (sessions.length ? '<div class="task-list">'+sessions.map(function(x){
         const b = x.b; const type = x.kind==='mode' ? b.type : sessionType(b);
         const tt = TIME_TYPES.find(function(q){ return q.id===type; });
@@ -6184,9 +6276,9 @@ function dayDetailHtml(dateStr){
 }
 function analyticsRangeTabs(){
   const r = ui.analyticsRange || 'today';
-  return '<div class="row" style="justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;"><div class="seg-tabs" style="margin:0;">'+[['today','Today'],['week','This week'],['lastweek','Last week'],['all','All time']].map(function(x){
+  return '<button class="btn btn-ghost btn-sm" data-action="openDayRecap">&#128202; Day recap</button><div class="seg-tabs" style="margin:0;">'+[['today','Today'],['week','This week'],['lastweek','Last week'],['all','All time']].map(function(x){
     return '<button class="seg-tab'+(r===x[0]?' active':'')+'" data-action="analyticsRange" data-id="'+x[0]+'">'+x[1]+'</button>';
-  }).join('')+'</div><button class="btn btn-ghost btn-sm" data-action="openDayRecap">&#128202; Day recap</button></div>';
+  }).join('')+'</div>';
 }
 ACTIONS.analyticsRange = function(el, e, id){ ui.analyticsRange = id; ui.analyticsDay = null; renderView(); };
 ACTIONS.analyticsPickDay = function(el, e, id){ if(id>todayStr()) return; ui.analyticsDay = id; renderView(); };
@@ -6236,7 +6328,7 @@ function renderFocusAnalyticsTab(){
   else if(r==='week') body = renderAnalyticsWeek(0);
   else if(r==='lastweek') body = renderAnalyticsWeek(-1);
   else body = renderFocusAnalytics()+renderTaskStatsSection()+renderTimeByTaskSection();
-  return analyticsRangeTabs()+'<div class="subtab-panel" data-key="analytics-'+r+'">'+body+'</div>'+
+  return '<div class="subtab-panel" data-key="analytics-'+r+'">'+body+'</div>'+
     '<div class="section" style="margin-top:16px;">'+renderManualLogForm()+'</div>';
 }
 function renderTaskStatsSection(){
@@ -6700,12 +6792,12 @@ function renderPillMenu(){
   const app = ui.pillMenu==='__none' ? null : ui.pillMenu;
   const cat = app ? activityCategory(app) : null;
   const browser = app && BROWSER_APPS.indexOf(activityKey(app))>=0;
-  m.innerHTML = (browser ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div><div class="ap-menu-hint" style="margin-top:0;">Operator can\'t see which website is open, so it can\'t tell YouTube from work.'+
-      (activityKey(app)==='firefox' ? ' Firefox doesn\'t allow this — Safari, Chrome, Arc, Brave and Edge do.' : ' On your Mac: System Settings &rarr; Privacy &amp; Security &rarr; Automation &rarr; Operator &rarr; turn on '+escapeHtml(app)+'. Then reopen Operator.')+'</div>'
+  m.innerHTML = (browser ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div><div class="ap-menu-hint" style="margin-top:0;">Can\'t see which website is open'+
+      tip('So it can\'t tell YouTube from work.'+(activityKey(app)==='firefox' ? ' Firefox doesn\'t allow this — Safari, Chrome, Arc, Brave and Edge do.' : ' On your Mac: System Settings → Privacy & Security → Automation → Operator → turn on '+app+'. Then reopen Operator.'))+'</div>'
     : app ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div>'+
-      '<div class="ap-menu-k">Is this work?</div>'+
+      '<div class="ap-menu-k">Is this work?'+tip('Only work apps & sites start an automatic lock-in. Time on “not work” ones while you\'re locked in doesn\'t count as deep work.')+'</div>'+
       '<div class="ap-seg">'+['work','other'].map(function(c){ return '<button class="ap-seg-btn'+(cat===c?' is-on':'')+'" data-action="pillSetCat" data-id="'+c+'">'+CAT_META[c].label+'</button>'; }).join('')+'</div>'+
-      '<div class="ap-menu-hint">Only work apps &amp; sites start an automatic lock-in. Time on “not work” ones while you\'re locked in doesn\'t count as deep work.</div>' : '<div class="ap-menu-title">Nothing in front right now</div>')+
+      '' : '<div class="ap-menu-title">Nothing in front right now</div>')+
     '<button class="ap-menu-link" data-action="goToActivitySettings">All apps &amp; sites &rarr;</button>';
 }
 ACTIONS.pillSetCat = function(el, e, id){ if(ui.pillMenu && ui.pillMenu!=='__none') setActivityCategory(ui.pillMenu, id); renderPillMenu(); updateActivityPill(); playTick(); };
@@ -6728,10 +6820,10 @@ function workAppsSettingsHtml(){
   const shown = list.filter(function(x){ const c = activityCategory(x.name); return filter==='all' || c===filter || (filter==='other' && c==='unsorted'); }).slice(0, 60);
   const unsorted = list.filter(function(x){ return activityCategory(x.name)==='unsorted'; }).length;
   return '<div class="card section" id="workAppsSection">'+
-    '<div class="section-title">Work apps &amp; sites<span class="kpi-sub">only work ones start an automatic lock-in</span></div>'+
+    '<div class="section-title">Work apps &amp; sites'+tip('Only work apps & sites start an automatic lock-in, and time on “not work” ones while you\'re locked in doesn\'t count as deep work. Anything not sorted yet counts as not work.')+'</div>'+
     '<div class="row" style="gap:6px;margin-bottom:10px;flex-wrap:wrap;">'+
       [['all','All'],['work','Work'],['other','Not work']].map(function(f){ return '<button class="btn btn-sm '+(filter===f[0]?'btn-primary':'btn-ghost')+'" data-action="workAppFilter" data-id="'+f[0]+'">'+f[1]+'</button>'; }).join('')+
-      (unsorted ? '<span class="kpi-sub" style="align-self:center;">'+unsorted+' not sorted yet (counted as not work)</span>' : '')+
+      (unsorted ? '<span class="kpi-sub" style="align-self:center;">'+unsorted+' not sorted yet</span>' : '')+
     '</div>'+
     '<div class="wa-list">'+(shown.map(function(x){
       const c = activityCategory(x.name);
@@ -7083,7 +7175,7 @@ function renderCalories(){
   '<div class="section"><div class="section-title">Today\'s Log</div><div class="task-list">'+
     (today.map(function(c){ return '<div class="task-item-v2"><div class="task-title">'+escapeHtml(c.name)+'</div><div class="kpi-sub">'+c.calories+' cal</div>'+deleteBtn('calorie',c.id)+'</div>'; }).join('') || '<div class="empty">Nothing logged today yet.</div>')+
   '</div></div>'+
-  '<div class="section"><div class="section-title">Meal Library <span class="kpi-sub">edit your go-to options</span></div>'+
+  '<div class="section"><div class="section-title">Meal Library'+tip('Your go-to options — edit them here.')+'</div>'+
     '<div class="card row" style="margin-bottom:10px;">'+
       '<div class="field" style="flex:1;"><label>Name</label><input class="input" id="mealName" placeholder="e.g. Turkey chili"></div>'+
       '<div class="field"><label>Calories</label><input class="input" type="number" id="mealCalories" style="width:100px;"></div>'+
@@ -7365,13 +7457,13 @@ function renderJournalEntriesTab(){
   (clientsView ? renderClientJournalsAllTab() : (
   '<div class="card journal-compose-card" data-photo-drop="journal" style="text-align:center;margin-bottom:14px;">'+
     '<div style="position:relative;">'+
-      '<textarea class="input" id="journalPageText" placeholder="Write something…" style="width:100%;min-height:230px;text-align:left;padding-right:44px;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
+      '<textarea class="input" id="journalPageText" placeholder="Write something… (paste or drop images in too)" style="width:100%;min-height:230px;text-align:left;padding-right:44px;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
       '<button class="btn btn-ghost btn-sm" data-action="triggerJournalPhotoInput" title="Add Photo" style="position:absolute;top:8px;right:8px;padding:4px 7px;font-size:15px;line-height:1;">&#128247;</button>'+
     '</div>'+
     renderJournalPhotoThumbsRow()+
     renderJournalMoodChipsOnly()+
     '<div class="journal-compose-actions">'+
-      '<span class="kpi-sub">Paste or drop images into the box</span>'+
+      '<span></span>'+
       '<button class="btn btn-primary" data-action="addJournal" data-target="journalPageText">Save Entry</button>'+
     '</div>'+
   '</div>'+
@@ -7553,7 +7645,7 @@ function renderGoalEditModal(){
       '<div class="field"><label>Tracking</label><select class="input" id="editGoalTrackMode-'+g.id+'" style="width:100%;"><option value="manual" '+(!isStreak?'selected':'')+'>I\'ll update progress myself</option><option value="streak" '+(isStreak?'selected':'')+'>Auto-track from my streak</option></select></div>'+
     '</div>'+
     (hasTracker && !isStreak ? '<div class="field" style="margin-top:10px;"><label>Current progress</label><input class="input" type="number" id="editGoalCurrent-'+g.id+'" value="'+(g.current||0)+'"></div>' : '')+
-    (isStreak ? '<div class="kpi-sub" style="margin-top:10px;">Current progress is your live streak ('+computeStreak()+' days) — no manual entry needed.</div>' : '')+
+    (isStreak ? '<div class="kpi-sub" style="margin-top:10px;">Progress = your live streak ('+computeStreak()+' days)'+tip('It updates on its own — no manual entry needed.')+'</div>' : '')+
     '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
       deleteBtn('goal', g.id)+
       '<div class="row">'+
@@ -7632,10 +7724,9 @@ function openNewPackageModal(){
 }
 function closeNewPackageModal(){ const o=document.getElementById('newPackageOverlay'); if(o) o.classList.add('hidden'); }
 function renderNewPackageModal(){
-  return '<div class="section-title" style="margin-bottom:14px;">New Package</div>'+
+  return '<div class="section-title" style="margin-bottom:14px;">New Package'+tip('You\'ll add deliverables and a description on the next screen.')+'</div>'+
     '<div class="field"><label>Name</label><input class="input" id="newPackageName" placeholder="e.g. Growth Plan" style="width:100%;"></div>'+
     '<div class="field" style="margin-top:10px;"><label>Price (optional)</label><input class="input" type="number" id="newPackagePrice" placeholder="e.g. 1500" style="width:100%;"></div>'+
-    '<div class="kpi-sub" style="margin-top:10px;">You\'ll add deliverables and a description on the next screen.</div>'+
     '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
       '<button class="btn btn-ghost" data-action="closeNewPackageModal">Cancel</button>'+
       '<button class="btn btn-primary" data-action="addPackage">Create Package</button>'+
@@ -7691,7 +7782,7 @@ function renderPackageEditModal(){
       '<div class="field"><label>Price (optional)</label><input class="input" type="number" id="editPackagePrice-'+pk.id+'" value="'+(pk.price||'')+'"></div>'+
       '<div class="field"><label>Description (optional)</label><input class="input" id="editPackageDesc-'+pk.id+'" value="'+escapeHtml(pk.description||'')+'"></div>'+
     '</div>'+
-    '<div class="section-title" style="margin-top:16px;margin-bottom:8px;">Deliverables<span class="kpi-sub">set a weekly pace instead of a monthly total — e.g. "Reels" at 3&times;/week</span></div>'+
+    '<div class="section-title" style="margin-top:16px;margin-bottom:8px;">Deliverables'+tip('Set a weekly pace instead of a monthly total — e.g. “Reels” at 3×/week.')+'</div>'+
     '<div class="task-list" style="margin-bottom:10px;">'+(deliverables.map(function(d){
       return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(d.title)+'</div>'+
         '<div class="row" style="gap:4px;align-items:center;"><input class="input" type="number" min="1" data-action-input="packageDeliverableTarget" data-id="'+pk.id+'" data-did="'+d.id+'" value="'+(d.weeklyTarget||1)+'" style="width:56px;text-align:center;"><span class="kpi-sub">&times;/week</span></div>'+
@@ -7738,7 +7829,7 @@ function removePackageDeliverable(id, deliverableId){
 // ============ PERSONAL (Goals / Fitness / Journal) ============
 function renderPersonal(){
   if(ui.personalTab==='vision' || ui.personalTab==='milanote'){ ui.personalTab = 'journal'; ui.journalMode = 'boards'; }
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Personal</div><div class="view-sub">Goals first, then body, then the running log of what\'s on your mind.</div></div></div>'+
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Personal'+tip('Goals first, then body, then the running log of what\'s on your mind — journal entries and boards, including your vision board.')+'</div></div></div>'+
   '<div class="tabs">'+
     '<div class="tab '+(ui.personalTab==='goals'?'active':'')+'" data-action="personalTab" data-tab="goals">Goals</div>'+
     '<div class="tab '+(ui.personalTab==='fitness'?'active':'')+'" data-action="personalTab" data-tab="fitness">Fitness</div>'+
@@ -7946,14 +8037,13 @@ function renderBoardShell(kind){
   if(!b){
     return '<div class="board-empty card">'+
       '<div style="font-size:34px;">'+meta.icon+'</div>'+
-      '<div class="section-title" style="justify-content:center;margin:8px 0 4px;">'+meta.title+'</div>'+
-      '<div class="kpi-sub" style="max-width:440px;margin:0 auto 16px;">'+meta.sub+'</div>'+
-      '<div class="row" style="justify-content:center;gap:8px;">'+
+      '<div class="section-title" style="justify-content:center;margin:8px 0 16px;">'+meta.title+tip(meta.sub)+'</div>'+
+      '<div class="row" style="justify-content:center;gap:8px;align-items:center;">'+
         '<button class="btn btn-primary" data-action="boardTemplate">&#9733; Create my vision board</button>'+
         '<button class="btn btn-ghost" data-action="boardNew" data-kind="'+kind+'">+ Blank board</button>'+
         '<button class="btn btn-ghost" data-action="boardImport">&#11014; Import boards</button>'+
+        tip('Moving from Milanote? Open a board there → ⋯ menu → Export → Markdown (or download the images), then Import here.')+
       '</div>'+
-      '<div class="kpi-sub" style="margin-top:12px;">Moving from Milanote? Open a board there &rarr; &#8943; menu &rarr; Export &rarr; Markdown (or download the images), then Import here.</div>'+
     '</div>';
   }
   const view = !!(ui.boardView && ui.boardView[kind]);
@@ -7998,11 +8088,11 @@ function renderBoardShell(kind){
       tool('boardZoomOut','&minus;','Zoom out')+
       tool('boardZoomIn','+','Zoom in')+
       tool('boardFit','&#9974; Fit','Fit everything')+
+      tip('Drag the background to pan · scroll to move · Ctrl/⌘ + scroll to zoom · Shift + drag to select · double-click a card to edit · paste or drop images anywhere.', 'board-help')+
       '<span style="flex:1"></span>'+
       (!(masterVisionBoard() && b.id===masterVisionBoard().id) ? tool('boardDeleteBoard','Delete board','Delete this board (and boards inside it)') : '')+
     '</div>')+
     '<div class="board-host" id="boardHost" data-photo-drop="board" data-morph-ignore="'+kind+':'+b.id+':'+(view?'v':'e')+(full?':f':'')+'"></div>'+
-    (view || full ? '' : '<div class="board-hint">Drag background to pan · scroll to move · Ctrl/⌘+scroll to zoom · Shift+drag to select · double-click a card to edit · paste or drop images</div>')+
   '</div>';
 }
 ACTIONS.boardFullscreen = function(el){
@@ -8875,8 +8965,7 @@ function renderInvoicesSection(){
       '<div class="task-list">'+list.map(invoiceRow).join('')+'</div>'+
     '</div>';
   }).join('');
-  return '<div class="section"><div class="section-title">Client Payments &amp; Invoices<button class="btn btn-sm" data-action="openInvoiceModal">+ Add Invoice</button></div>'+
-    '<div class="kpi-sub" style="margin-bottom:14px;">An invoice logged here counts as revenue collected for the month right away. The tax receipt attachment is just your paperwork — attach it whenever you get to it, nothing is marked paid manually. Paying off a debt above only reduces the balance, it stays listed until you remove it.</div>'+
+  return '<div class="section"><div class="section-title">Client Payments &amp; Invoices'+tip('An invoice logged here counts as revenue collected for the month right away. The tax receipt is just your paperwork — attach it whenever you get to it; nothing is marked paid by hand. Paying off a debt above only lowers its balance — it stays listed until you remove it.')+'<button class="btn btn-sm" data-action="openInvoiceModal">+ Add Invoice</button></div>'+
     (retainerClients.length ? '<div class="task-list" style="margin-bottom:14px;">'+retainerClients.map(retainerClientRow).join('')+'</div>' : '')+
     (clientGroups || (invoices.length ? '' : (retainerClients.length ? '' : '<div class="empty">Add a client above, then log invoices as you bill them.</div>')))+
     (noClient.length ? '<div class="card" style="margin-bottom:10px;"><div class="task-title-row" style="margin-bottom:8px;"><span class="task-title">Other</span></div><div class="task-list">'+noClient.map(invoiceRow).join('')+'</div></div>' : '')+
@@ -8930,8 +9019,8 @@ function closeAttachReceiptModal(){ ui.attachingInvoiceId = null; const o=docume
 function renderAttachReceiptModal(){
   const inv = state.finances.invoices.find(function(x){ return x.id===ui.attachingInvoiceId; });
   if(!inv) return '';
-  return '<div class="section-title" style="margin-bottom:8px;">Attach Receipt / Tax Invoice</div>'+
-    '<div class="kpi-sub" style="margin-bottom:14px;">'+escapeHtml(inv.description||'Invoice')+' &middot; $'+Number(inv.amount||0).toLocaleString()+' — already counted as revenue collected. This just files your tax paperwork for it, and it\'s the only way this gets attached (never marked manually).</div>'+
+  return '<div class="section-title" style="margin-bottom:8px;">Attach Receipt / Tax Invoice'+tip('This invoice already counts as revenue collected — attaching just files the tax paperwork for it.')+'</div>'+
+    '<div class="kpi-sub" style="margin-bottom:14px;">'+escapeHtml(inv.description||'Invoice')+' &middot; $'+Number(inv.amount||0).toLocaleString()+'</div>'+
     '<div class="field"><input class="input" type="file" id="receiptFile" accept="image/*,.pdf" style="width:100%;"></div>'+
     '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
       '<button class="btn btn-ghost" data-action="closeAttachReceiptModal">Cancel</button>'+
@@ -9074,7 +9163,7 @@ function nextStageLabel(stage){
   return STAGE_LABELS[STAGE_ORDER[idx+1]];
 }
 function renderBusiness(){
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Business</div><div class="view-sub">Recurring revenue, who you\'re serving, and what you owe.</div></div></div>'+
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Business'+tip('Recurring revenue, who you\'re serving, who you\'re chasing, and what you owe.')+'</div></div></div>'+
   '<div class="tabs">'+
     '<div class="tab '+(ui.businessTab==='overview'?'active':'')+'" data-action="businessTab" data-tab="overview">Overview</div>'+
     '<div class="tab '+(ui.businessTab==='leads'?'active':'')+'" data-action="businessTab" data-tab="leads">Leads</div>'+
@@ -9103,7 +9192,8 @@ function renderBusinessOverview(){
   });
   const maxStage = Math.max.apply(null, stageRows.map(function(r){ return r.n; }).concat([1]));
   const leadsDue = reachOutList().filter(function(r){ return r.kind==='lead'; });
-  return '<div class="card hq">'+
+  // Laid out as the page itself — no card around it: the number up top, then clients | pipeline.
+  return '<div class="hq">'+
     '<div class="hq-top">'+
       '<div class="hq-mrr">'+
         '<div class="stat-tile-k">Monthly recurring</div>'+
@@ -10209,19 +10299,24 @@ function crmFiltersActive(kind){
   const f = crmUi(kind);
   return (f.q?1:0)+(f.stage?1:0)+(f.source?1:0)+(f.last?1:0)+((f.sort||'due')!=='due'?1:0);
 }
-function crmToolbar(kind){
+function crmToolsBtnHtml(kind, active){
+  const f = crmUi(kind);
+  return (active ? '<button class="mini-move" data-action="crmClearFilters" data-kind="'+kind+'">Clear</button>' : '')+
+    '<button class="crm-tools-btn'+(f.toolsOpen?' is-open':'')+'" data-action="crmToggleTools" data-kind="'+kind+'">&#128269; Search &amp; sort'+(active?'<span class="th-badge">'+active+'</span>':'')+'</button>';
+}
+function crmToolbar(kind, lead){
   const f = crmUi(kind);
   const sources = LEAD_SOURCES;
   const active = crmFiltersActive(kind);
   return '<div class="crm-toolbar crm-toolbar-slim">'+
-      '<button class="btn btn-ghost btn-sm crm-tools-btn'+(f.toolsOpen?' is-open':'')+'" data-action="crmToggleTools" data-kind="'+kind+'">&#128269; Search &amp; sort'+(active?'<span class="th-badge">'+active+'</span>':'')+'</button>'+
-      (active ? '<button class="mini-move" data-action="crmClearFilters" data-kind="'+kind+'">Clear</button>' : '')+
+      (lead||'')+
       '<span style="flex:1"></span>'+
+      crmToolsBtnHtml(kind, active)+
       '<div class="seg-tabs" style="margin:0;">'+
         '<button class="seg-tab'+(f.view==='board'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="board">Board</button>'+
         '<button class="seg-tab'+(f.view==='list'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="list">List</button>'+
       '</div>'+
-      '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="'+kind+'">+ Add '+(kind==='lead'?'lead':'client')+'</button>'+
+      '<button class="btn btn-primary crm-add-btn" data-action="openNewContact" data-kind="'+kind+'">+ Add '+(kind==='lead'?'lead':'client')+'</button>'+
     '</div>'+
     (f.toolsOpen ? '<div class="crm-toolbar crm-tools-row">'+
       '<input class="input" id="crmSearch-'+kind+'" placeholder="Search '+(kind==='lead'?'leads':'clients')+'…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
@@ -10328,7 +10423,7 @@ function renderCrmTab(kind){
     ? '<div class="crm-stats"><span><b>'+tracked.length+'</b> open leads</span><span><b>$'+tracked.reduce(function(a,p){ return a+(Number(p.value)||0); },0).toLocaleString()+'</b> in pipeline</span><span class="'+(due?'crm-stat-due':'')+'"><b>'+due+'</b> to reach out to</span></div>'
     : '<div class="crm-stats"><span><b>'+tracked.length+'</b> active clients</span><span><b>$'+tracked.reduce(function(a,c){ return a+(Number(c.mrr)||0); },0).toLocaleString()+'</b> MRR</span><span class="'+(due?'crm-stat-due':'')+'"><b>'+due+'</b> to reach out to</span></div>';
   const cycleMode = kind==='client' && f.group==='cycle';
-  return header+crmToolbar(kind)+(cycleMode ? cycleGroupBar() : '')+'<div class="subtab-panel" data-key="crm-'+kind+'-'+f.view+(cycleMode?'-cy':'')+'">'+(f.view==='list' ? renderCrmList(kind) : cycleMode ? renderCycleBoard() : renderCrmBoard(kind))+'</div>';
+  return crmToolbar(kind, header)+(cycleMode ? cycleGroupBar() : '')+'<div class="subtab-panel" data-key="crm-'+kind+'-'+f.view+(cycleMode?'-cy':'')+'">'+(f.view==='list' ? renderCrmList(kind) : cycleMode ? renderCycleBoard() : renderCrmBoard(kind))+'</div>';
 }
 // ---- Reach out today (Focus page) ----
 function reachOutList(){
@@ -10675,13 +10770,13 @@ function renderCrmSettings(){
     }).join('')+'</div>'+
     '<div class="row" style="margin-top:8px;"><input class="input input-sm" id="newStage-'+kind+'" placeholder="New stage name" style="width:200px;"><button class="btn btn-sm" data-action="addStage" data-kind="'+kind+'">Add stage</button></div>';
   };
-  return '<div class="card section"><div class="section-title">Reach-out cadence<span class="kpi-sub">How often to touch base — each contact can override it</span></div><div class="grid grid-3">'+
+  return '<div class="card section"><div class="section-title">Reach-out cadence'+tip('How often to touch base — each contact can override it. A client goes red once a touch is due. Deliverables: green on pace, yellow when behind but you\'ve done some this week, red when behind with none.')+'</div><div class="grid grid-3">'+
       '<div class="field"><label>New leads: every (days)</label><input class="input" type="number" min="1" id="setLeadCadence" value="'+c.leadCadenceDays+'"></div>'+
       '<div class="field"><label>Clients: every (days)</label><input class="input" type="number" min="1" id="setClientCadence" value="'+c.clientCadenceDays+'"></div>'+
       '<div class="field"><label>Daily "reach out" reminder</label><div class="row" style="gap:6px;"><input type="checkbox" id="setTouchReminder" '+(c.dailyReminder.enabled?'checked':'')+'><input class="input" type="time" id="setTouchReminderTime" value="'+c.dailyReminder.time+'" style="width:120px;"></div></div>'+
-    '</div><div class="kpi-sub" style="margin-top:8px;">Client health turns amber once a touch is overdue and red when it\'s overdue by more than half the cadence.</div></div>'+
+    '</div></div>'+
     '<div class="card section"><div class="section-title">Lead stages</div>'+stageEditor('lead')+'</div>'+
-    '<div class="card section"><div class="section-title">Client cycles<span class="kpi-sub">your playbooks — steps with calls, forms, videos and to-dos</span></div><button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">&#9881; Edit client cycles</button></div>'+
+    '<div class="card section"><div class="section-title">Client cycles'+tip('Your playbooks — steps with calls, forms, videos and to-dos.')+'</div><button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">&#9881; Edit client cycles</button></div>'+
     '<div class="card section"><div class="section-title">Client statuses</div>'+stageEditor('client')+'</div>';
 }
 function saveCrmSettingsFields(){
@@ -10906,12 +11001,11 @@ function renderClientLifecycle(c){
   const picker = '<select class="input input-sm lc-cycle-select" data-cycle-assign="'+c.id+'" title="Which cycle this client follows">'+
     '<option value="">No cycle</option>'+cycles().map(function(x){ return '<option value="'+x.id+'" '+(c.cycleId===x.id?'selected':'')+'>'+escapeHtml(x.name)+'</option>'; }).join('')+'</select>';
   const head = '<div class="row" style="justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;">'+
-      '<div class="row" style="gap:8px;align-items:center;"><div class="kind-label" style="margin:0;">Client cycle</div>'+picker+'</div>'+
+      '<div class="row" style="gap:8px;align-items:center;"><div class="kind-label" style="margin:0;">Client cycle'+tip('The playbook this client follows — you\'ll see each step\'s calls, forms and videos as you go.')+'</div>'+picker+'</div>'+
       '<button class="mini-move" data-action="openLifecycleEditor" data-cycle="'+(c.cycleId||'')+'">&#9881; Edit cycles</button>'+
     '</div>';
   if(!cy){
     return '<div class="lc-card">'+head+
-      '<div class="kpi-sub" style="margin-bottom:8px;">Pick the playbook this client follows — you\'ll see each step\'s calls, forms and videos as you go.</div>'+
       '<div class="row" style="gap:6px;">'+cycles().map(function(x){ return '<button class="btn btn-sm lc-start-btn" style="--lc:'+x.color+'" data-action="lcStartCycle" data-id="'+c.id+'" data-cycle="'+x.id+'">Start '+escapeHtml(x.name)+'</button>'; }).join('')+
       (cycles().length ? '' : '<button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">Create your first cycle</button>')+'</div>'+
     '</div>';
@@ -11045,7 +11139,7 @@ function renderClientStepsPanel(){
     if(open.length) rows.push({c:c, st:st, cy:clientCycle(c), open:open});
   });
   if(!rows.length) return '';
-  return '<div class="section"><div class="section-title">Client Next Steps<span class="kpi-sub">from your client cycles</span><span class="view-all-link" data-action="openLifecycleEditor">Edit cycles</span></div>'+
+  return '<div class="section"><div class="section-title">Client Next Steps'+tip('Pulled from your client cycles.')+'<span class="view-all-link" data-action="openLifecycleEditor">Edit cycles</span></div>'+
     '<div class="lc-steps-grid">'+rows.map(function(r){
       return '<div class="card lc-steps-card" data-key="lcs-'+r.c.id+'">'+
         '<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px;gap:6px;">'+
@@ -11079,7 +11173,7 @@ function cycleGroupBar(){
   const notIn = crmList('client').filter(function(c){ return clientStageActive(c.stage) && (!cy || c.cycleId!==cy.id); }).length;
   return '<div class="row" style="gap:8px;margin:-4px 0 12px;align-items:center;">'+
     '<span class="kpi-sub">Cycle:</span><select class="input input-sm" data-cycle-board>'+cycles().map(function(x){ return '<option value="'+x.id+'" '+(cy && cy.id===x.id?'selected':'')+'>'+escapeHtml(x.name)+'</option>'; }).join('')+'</select>'+
-    (notIn ? '<span class="kpi-sub">'+notIn+' active client'+(notIn===1?' isn\'t':'s aren\'t')+' in this cycle — assign one from their page.</span>' : '')+
+    (notIn ? '<span class="kpi-sub">'+notIn+' active client'+(notIn===1?' isn\'t':'s aren\'t')+' in this cycle</span>'+tip('Assign a cycle from the client\'s page.') : '')+
   '</div>';
 }
 document.addEventListener('change', function(e){ const t = e.target; if(t && t.dataset && t.dataset.cycleBoard!==undefined){ crmUi('client').cycleId = t.value; renderView(); } });
@@ -11113,8 +11207,7 @@ function renderLifecycleEditor(){
   const cy = cycleById(ui.editingCycleId);
   const usage = {}; crmList('client').forEach(function(c){ if(c.cycleId) usage[c.cycleId] = (usage[c.cycleId]||0)+1; });
   const stepCount = {}; crmList('client').forEach(function(c){ if(c.cycleStepId && !c.cycleDone) stepCount[c.cycleStepId] = (stepCount[c.cycleStepId]||0)+1; });
-  return '<div class="section-title" style="margin-bottom:4px;">Client cycles</div>'+
-    '<div class="kpi-sub" style="margin-bottom:14px;">Build a playbook for each kind of client. Every step lists what to do — calls to book, forms and videos to send, to-dos. Save a link on an item once and it\'s ready to copy for every client.</div>'+
+  return '<div class="section-title" style="margin-bottom:14px;">Client cycles'+tip('Build a playbook for each kind of client. Every step lists what to do — calls to book, forms and videos to send, to-dos. Save a link on an item once and it\'s ready to copy for every client.')+'</div>'+
     '<div class="cy-tabs">'+all.map(function(x){ return '<button class="cy-tab'+(cy && x.id===cy.id?' active':'')+'" data-action="cyPick" data-id="'+x.id+'" style="--cy:'+x.color+'"><span class="crm-col-dot" style="background:'+x.color+'"></span>'+escapeHtml(x.name)+'<span class="kpi-sub">'+(usage[x.id]||0)+'</span></button>'; }).join('')+
       '<button class="cy-tab cy-tab-add" data-action="cyNew">+ New cycle</button></div>'+
     (!cy ? '<div class="empty">No cycles yet.</div>' :
@@ -11362,10 +11455,9 @@ function renderClientsHome(){
     (function(){
       const active = (f.q?1:0)+((f.csort||'health')!=='health'?1:0);
       return '<div class="crm-toolbar crm-toolbar-slim">'+
-          '<button class="btn btn-ghost btn-sm crm-tools-btn'+(f.toolsOpen?' is-open':'')+'" data-action="crmToggleTools" data-kind="client">&#128269; Search &amp; sort'+(active?'<span class="th-badge">'+active+'</span>':'')+'</button>'+
-          (active ? '<button class="mini-move" data-action="crmClearFilters" data-kind="client">Clear</button>' : '')+
           '<span style="flex:1"></span>'+
-          '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="client">+ Add client</button>'+
+          crmToolsBtnHtml('client', active)+
+          '<button class="btn btn-primary crm-add-btn" data-action="openNewContact" data-kind="client">+ Add client</button>'+
         '</div>'+
         (f.toolsOpen ? '<div class="crm-toolbar crm-tools-row">'+
           '<input class="input" id="crmSearch-client" placeholder="Search clients…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
@@ -11398,9 +11490,9 @@ function renderLifecycleTab(){
       '<span style="flex:1"></span>'+
       '<button class="btn btn-ghost btn-sm" data-action="openLifecycleEditor" data-cycle="'+cy.id+'">&#9881; Edit cycles &amp; steps</button>'+
     '</div>'+
-    '<div class="kpi-sub" style="margin:4px 0 12px;">'+inCycle+' client'+(inCycle===1?'':'s')+' going through '+escapeHtml(cy.name)+' &middot; drag a card to move them to another step.</div>'+
+    '<div class="kpi-sub" style="margin:4px 0 12px;">'+inCycle+' client'+(inCycle===1?'':'s')+' going through '+escapeHtml(cy.name)+tip('Drag a card to move a client to another step.')+'</div>'+
     '<div class="subtab-panel" data-key="lc-board-'+cy.id+'">'+renderCycleBoard()+'</div>'+
-    (notIn.length ? '<div class="section" style="margin-top:18px;"><div class="section-title">Not in a cycle<span class="kpi-sub">active clients without a running cycle</span></div>'+
+    (notIn.length ? '<div class="section" style="margin-top:18px;"><div class="section-title">Not in a cycle'+tip('Active clients without a running cycle.')+'</div>'+
       '<div class="lc-notin">'+notIn.map(function(c){
         return '<div class="lc-notin-row" data-key="lcn-'+c.id+'"><span class="cc2-avatar cc2-avatar-sm" style="background:'+clientColor(c)+'">'+escapeHtml(clientInitials(c))+'</span>'+
           '<span class="lc-notin-name" data-action="openContact" data-kind="client" data-id="'+c.id+'">'+escapeHtml(crmName('client', c))+'</span>'+
@@ -11484,7 +11576,7 @@ function renderCalendar(){
   const sortedEvents = selInfo.events.slice().sort(function(a,b){ return (a.time||'').localeCompare(b.time||''); });
   const upcoming = buildUpcomingList(14);
 
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Calendar</div><div class="view-sub">Work blocks, calls, and task deadlines in one place.</div></div>'+
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Calendar'+tip('Work blocks, calls, events and task deadlines in one place.')+'</div></div>'+
     '<div class="row" style="gap:8px;">'+
     '<button class="btn btn-ghost btn-sm" data-action="goToAlarmSettings" title="Alarm settings" style="opacity:.65;">&#9200; Alarms</button>'+
     '<button class="btn" data-action="openUpcomingPopover">&#128197; Upcoming ('+upcoming.length+')</button>'+
@@ -11548,15 +11640,15 @@ function renderCalEventModal(){
     '<div class="field" style="margin-top:10px;"><label>Meeting link (optional)</label><input class="input" id="calEventMeetingLink" value="'+escapeHtml(e.meetingLink||'')+'" placeholder="Google Meet / Zoom URL" style="width:100%;"></div>'+
     '<div class="field" style="margin-top:10px;"><label>Link to client or lead (optional)</label><select class="input" id="calEventLinkedClient" style="width:100%;"><option value="">&mdash;</option>'+clientCheckboxOptions().filter(function(o){return o.value!=='personal'&&o.value!=='general';}).map(function(o){ return '<option value="'+o.value+'" '+(e.linkedClient===o.value?'selected':'')+'>'+escapeHtml(o.label)+'</option>'; }).join('')+'</select></div>'+
     '<div class="field" style="margin-top:10px;"><label>Location (optional)</label><input class="input" id="calEventLocation" value="'+escapeHtml(e.location||'')+'" placeholder="Address or place" style="width:100%;"></div>'+
-    '<label class="row" style="margin-top:12px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventSetAlarm" '+(wantsAlarm?'checked':'')+' style="margin-right:6px;">&#128276; Alarm at the event time (needs a time)</label>'+
+    '<label class="row" style="margin-top:12px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventSetAlarm" '+(wantsAlarm?'checked':'')+' style="margin-right:6px;">&#128276; Alarm at the event time'+tip('Needs a start time on the event.')+'</label>'+
     '<div class="field" style="margin-top:10px;"><label>Remind me before</label><select class="input" id="calEventRemindBefore" style="width:100%;">'+[[0,'&mdash; No extra reminder'],[10,'10 min before'],[15,'15 min before'],[30,'30 min before'],[60,'1 hour before'],[120,'2 hours before'],[1440,'1 day before']].map(function(o){ return '<option value="'+o[0]+'" '+(Number(e.remindBefore||0)===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select></div>'+
     '<div class="card task-alarm-box" style="margin-top:10px;padding:12px 14px;">'+
       '<div class="kind-label" style="margin-top:0;">Getting there</div>'+
       '<div class="grid grid-2">'+
-        '<div class="field"><label>Travel time (minutes)</label><input class="input" type="number" min="0" step="5" id="calEventTravel" value="'+(e.travelMinutes||'')+'" placeholder="0"></div>'+
+        '<div class="field"><label>Travel time (minutes)'+tip('With a travel time, a “Time to leave” alarm rings at the event time minus travel.')+'</label><input class="input" type="number" min="0" step="5" id="calEventTravel" value="'+(e.travelMinutes||'')+'" placeholder="0"></div>'+
         '<div class="field"><label>Start getting ready at</label><input class="input" type="time" id="calEventReadyTime" value="'+(e.readyTime||'')+'"></div>'+
       '</div>'+
-      '<div class="kpi-sub" style="margin-top:6px;" id="calEventLeaveHint">'+(e.time && e.travelMinutes ? 'Leave alarm at '+fmt12Hour(shiftHM(e.time, -Number(e.travelMinutes)))+'.' : 'With a travel time, a "Time to leave" alarm rings at event time minus travel.')+'</div>'+
+      '<div class="kpi-sub" style="margin-top:6px;" id="calEventLeaveHint">'+(e.time && e.travelMinutes ? 'Leave alarm at '+fmt12Hour(shiftHM(e.time, -Number(e.travelMinutes)))+'.' : '')+'</div>'+
     '</div>'+
     '<label class="row" style="margin-top:12px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventIsShoot" '+(e.isShoot?'checked':'')+' style="margin-right:6px;">&#127916; This is a shoot</label>'+
     '<div id="calEventShootExtra" style="display:'+(e.isShoot?'block':'none')+';margin-top:4px;">'+
@@ -11829,8 +11921,7 @@ function renderNightPlanModal(){
     .sort(function(a,b){ return (sel.has(b.id)?1:0)-(sel.has(a.id)?1:0) || taskPriorityRank(a)-taskPriorityRank(b); }).slice(0,80);
   const base = wakeBaseTimeFor(d.date);
   const dayLabel = d.date===todayStr() ? 'today' : 'tomorrow ('+weekdayShort(d.date)+')';
-  return '<div class="section-title" style="margin-bottom:4px;">&#127769; Plan '+dayLabel+'</div>'+
-    '<div class="kpi-sub" style="margin-bottom:14px;">Shows up when your alarm goes off and on the Today page in the morning.</div>'+
+  return '<div class="section-title" style="margin-bottom:14px;">&#127769; Plan '+dayLabel+tip('Shows up when your alarm goes off, and on the Today page in the morning.')+'</div>'+
     '<div class="field"><label>Tasks to line up ('+sel.size+')</label><div class="client-check-list" style="max-height:200px;">'+
       (cands.map(function(t){ return '<label class="client-check-row"><input type="checkbox" data-plan-task="'+t.id+'" '+(sel.has(t.id)?'checked':'')+'>'+(t.isVideoIdea?'&#127916; ':'')+escapeHtml(t.title)+'</label>'; }).join('') || '<div class="kpi-sub">No open tasks yet.</div>')+
     '</div>'+
@@ -11979,18 +12070,17 @@ function renderSettings(){
         '<div class="field"><label>Note field after finishing a task in Focus</label><select class="input" id="setFocusNote"><option value="on" '+(p.focusNotePromptEnabled!==false?'selected':'')+'>Enabled</option><option value="off" '+(p.focusNotePromptEnabled===false?'selected':'')+'>Disabled</option></select></div>'+
         '<div class="field"><label>Notify when a focus timer ends</label><select class="input" id="setNotifyEnd"><option value="on" '+(p.notifyOnFocusEnd!==false?'selected':'')+'>On</option><option value="off" '+(p.notifyOnFocusEnd===false?'selected':'')+'>Off</option></select></div>'+
       '</div></div>'+saveBtn+
-      '<div class="section"><div class="section-title">Your Data</div><div class="card">'+
-        '<div class="kpi-sub" style="margin-bottom:10px;">'+(hasCloud ? 'Saved to your Claude account — it follows you back to this artifact.' : 'Saved locally in this browser only. Open this same file, in this same browser, to see it again.')+'</div>'+
+      '<div class="section"><div class="section-title">Your Data'+tip(hasCloud ? 'Saved to your Claude account — it follows you back to this artifact.' : 'Saved on this Mac in Operator\'s own storage — export a copy now and then as a backup.')+'</div><div class="card">'+
         '<div class="row"><button class="btn" data-action="exportData">Export Data (.json)</button>'+
         '<label class="btn" style="cursor:pointer;">Import Data<input type="file" id="importFile" accept=".json" style="display:none;"></label>'+
         deleteResetBtn()+'</div>'+
         '<textarea class="input" id="exportArea" style="width:100%;min-height:80px;margin-top:10px;display:none;" readonly></textarea>'+
       '</div></div>'+
-      '<div class="section"><div class="section-title">Reset Specific Data<span class="kpi-sub">Handy while testing — clears just that part</span></div><div class="card">'+
+      '<div class="section"><div class="section-title">Reset Specific Data'+tip('Handy while testing — clears just that part and leaves everything else alone.')+'</div><div class="card">'+
         '<div class="task-list">'+RESET_TARGETS.map(function(t){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+t.label+'</div>'+resetPartBtn(t)+'</div>'; }).join('')+'</div>'+
       '</div></div>',
 
-    display: '<div class="section"><div class="section-title">Appearance<span class="kpi-sub">Recolors the UI accent — won\'t change MRR, pipeline, debt, or goal colors</span></div><div class="card">'+
+    display: '<div class="section"><div class="section-title">Appearance'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
         '<div class="row">'+SWATCHES.map(function(sw){ return '<span class="swatch '+(p.accentColor===sw?'sel':'')+'" style="background:'+sw+';" data-action="pickThemeColor" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Today Header Style</div>'+
@@ -11999,11 +12089,10 @@ function renderSettings(){
       '<div class="card section"><div class="section-title">Cursor</div>'+
         '<label class="row" style="font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="setCrosshair" '+(p.crosshairCursor!==false?'checked':'')+' style="margin-right:8px;">Crosshair cursor (accent-colored, app-wide)</label>'+
       '</div>'+
-      '<div class="section"><div class="section-title">Goal Color<span class="kpi-sub">Glows brighter the closer a goal gets to done</span></div><div class="card">'+
+      '<div class="section"><div class="section-title">Goal Color'+tip('Goals glow brighter in this color the closer they get to done.')+'</div><div class="card">'+
         '<div class="row">'+SWATCHES.map(function(sw){ return '<span class="swatch '+(p.goalAccentColor===sw?'sel':'')+'" style="background:'+sw+';" data-action="pickGoalColor" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
       '</div></div>'+
-      '<div class="section"><div class="section-title">Today Dashboard Panels<span class="kpi-sub">Taken straight from their own pages</span></div><div class="card">'+
-        '<div class="kpi-sub" style="margin-bottom:10px;">Choose what shows on your main dashboard, and in what order.</div>'+
+      '<div class="section"><div class="section-title">Today Dashboard Panels'+tip('Choose what shows on your Today page, and in what order. Each panel is taken straight from its own page.')+'</div><div class="card">'+
         '<div class="task-list">'+panelOrder.map(function(pid,idx){
           const def = PANEL_DEFS.find(function(pd){return pd.id===pid;});
           const enabled = state.dashboardPanels.enabled[pid]!==false;
@@ -12014,7 +12103,7 @@ function renderSettings(){
           '</div>';
         }).join('')+'</div>'+
       '</div></div>'+
-      '<div class="section"><div class="section-title">Task Categories<span class="kpi-sub">Give task types their own color/accent — shown as a left border on the card</span><div class="row"><input class="input" id="newTaskCatLabel" placeholder="e.g. Video Idea" style="width:160px;"><button class="btn btn-sm" data-action="addTaskCategory">Add</button></div></div>'+
+      '<div class="section"><div class="section-title">Task Categories'+tip('Give task types their own color — shown as a left border on the card. Untick “Counts as deep work” for types that shouldn\'t add to deep work.')+'<div class="row"><input class="input" id="newTaskCatLabel" placeholder="e.g. Video Idea" style="width:160px;"><button class="btn btn-sm" data-action="addTaskCategory">Add</button></div></div>'+
         '<div class="card">'+
           '<div class="row" style="margin-bottom:10px;">'+SWATCHES.map(function(sw){ return '<span class="swatch'+(pickedSwatch===sw?' swatch-active':'')+'" style="background:'+sw+';" data-action="pickSwatch" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
           '<div class="task-list">'+(arr(state.tasks.categories).map(function(c){ return '<div class="task-item-v2">'+
@@ -12025,7 +12114,7 @@ function renderSettings(){
           '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
         '</div>'+
       '</div>'+
-      '<div class="section"><div class="section-title">&#127916; Video Idea Types<span class="kpi-sub">Optional type tag shown on video idea cards</span><div class="row"><input class="input" id="newVideoTypeLabel" placeholder="e.g. Tutorial" style="width:160px;"><button class="btn btn-sm" data-action="addVideoType">Add</button></div></div>'+
+      '<div class="section"><div class="section-title">&#127916; Video Idea Types'+tip('Optional type tag shown on video idea cards.')+'<div class="row"><input class="input" id="newVideoTypeLabel" placeholder="e.g. Tutorial" style="width:160px;"><button class="btn btn-sm" data-action="addVideoType">Add</button></div></div>'+
         '<div class="card">'+
           '<div class="task-list">'+(arr(state.tasks.videoTypes).map(function(vt){ return '<div class="task-item-v2">'+
             '<input class="input" data-video-type-label="'+vt.id+'" value="'+escapeHtml(vt.label)+'" style="flex:1;max-width:220px;">'+
@@ -12033,14 +12122,14 @@ function renderSettings(){
           '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
         '</div>'+
       '</div>'+
-      '<div class="card section" id="quickLinksSettingsAnchor"><div class="section-title">Quick Links<span class="kpi-sub">shown on the Today dashboard while locked in</span></div><div class="grid grid-2">'+
-        '<div class="field"><label>Open links in</label><select class="input" id="setLinkBrowser"><option value="default" '+((p.linkBrowser||'default')==='default'?'selected':'')+'>System Default</option><option value="safari" '+(p.linkBrowser==='safari'?'selected':'')+'>Force Safari</option></select><div class="kpi-sub">Force Safari opens a new tab with a special link — the first time, choose "Always Allow" when macOS asks, and it\'ll stop needing a second click.</div></div>'+
+      '<div class="card section" id="quickLinksSettingsAnchor"><div class="section-title">Quick Links'+tip('Your quick-access links — the ☰ button at the bottom right of the Today page.')+'</div><div class="grid grid-2">'+
+        '<div class="field"><label>Open links in'+tip('Force Safari opens a new tab with a special link — the first time, choose “Always Allow” when macOS asks, and it\'ll stop needing a second click.')+'</label><select class="input" id="setLinkBrowser"><option value="default" '+((p.linkBrowser||'default')==='default'?'selected':'')+'>System Default</option><option value="safari" '+(p.linkBrowser==='safari'?'selected':'')+'>Force Safari</option></select></div>'+
         '<div class="field"><label>Business files folder (path on this Mac)</label><input class="input" id="setQuickFiles" placeholder="/Users/you/Documents/Business" value="'+escapeHtml(state.settings.quickLinks.businessFilesPath||'')+'"></div>'+
         '<div class="field"><label>GoHighLevel URL</label><input class="input" id="setQuickGhl" value="'+escapeHtml(state.settings.quickLinks.ghlUrl||'')+'"></div>'+
         '<div class="field"><label>Google Drive URL</label><input class="input" id="setQuickDrive" value="'+escapeHtml(state.settings.quickLinks.driveUrl||'')+'"></div>'+
         '<div class="field"><label>Meta Ads Manager URL</label><input class="input" id="setQuickMeta" value="'+escapeHtml(state.settings.quickLinks.metaAdsUrl||'')+'"></div>'+
       '</div>'+
-      '<div class="kpi-sub" style="margin-top:14px;margin-bottom:8px;">Custom icons — upload your own logo for any of these (used as the circle icon). Otherwise a plain default is shown.</div>'+
+      '<div class="kind-label" style="margin-top:16px;margin-bottom:10px;">Icons'+tip('Upload your own logo for any of these — it\'s used as the circle icon. Otherwise a plain default is shown.')+'</div>'+
       '<div class="row" style="gap:16px;flex-wrap:wrap;">'+
         QUICK_LINK_DEFS.concat(AI_TOOLS).map(function(t){
           return '<div style="text-align:center;">'+
@@ -12052,14 +12141,14 @@ function renderSettings(){
         }).join('')+
       '</div></div>'+saveBtn,
 
-    focus: '<div class="card section"><div class="section-title">App Tracking<span class="kpi-sub">Sees which app is in the foreground on this Mac — nothing leaves the machine</span></div><div class="grid grid-2">'+
+    focus: '<div class="card section"><div class="section-title">App Tracking'+tip('Sees which app (and, in browsers, which website) is in front on this Mac — nothing leaves the machine.')+'</div><div class="grid grid-2">'+
         '<div class="field"><label>Track foreground app</label><select class="input" id="setAppTrackingEnabled"><option value="on" '+(state.settings.appTracking.enabled!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.enabled===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Auto lock-in when steady on work apps</label><select class="input" id="setAppTrackingAutoLockIn"><option value="on" '+(state.settings.appTracking.autoLockIn!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.autoLockIn===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Minutes on one app before auto lock-in</label><input class="input" type="number" min="3" max="120" id="setAppTrackingThreshold" value="'+state.settings.appTracking.thresholdMinutes+'"></div>'+
-        '<div class="field"><label>Minutes away before auto-ending it</label><input class="input" type="number" min="1" max="60" id="setAppTrackingGrace" value="'+state.settings.appTracking.graceMinutes+'"><div class="kpi-sub">Only applies to sessions Operator started automatically — it never auto-ends a session you started yourself</div></div>'+
-        '<div class="field"><label>Cooldown after you lock out (minutes)</label><input class="input" type="number" min="0" max="240" id="setAppTrackingCooldown" value="'+state.settings.appTracking.cooldownMinutes+'"><div class="kpi-sub">Auto lock-in stays off this long after you stop a session yourself</div></div>'+
-        '<div class="field"><label>Day recap pops up at</label><input class="input" type="time" id="setRecapTime" value="'+(state.settings.appTracking.recapTime||'21:30')+'"><div class="kpi-sub">Shows what you did and lets you check sessions that started automatically</div></div>'+
-        '<div class="field"><label>Idle after (seconds without keyboard/mouse)</label><input class="input" type="number" min="15" max="900" id="setAppTrackingIdle" value="'+state.settings.appTracking.idleSeconds+'"><div class="kpi-sub">Idle time doesn\'t count toward auto lock-in or app time</div></div>'+
+        '<div class="field"><label>Minutes away before auto-ending it'+tip('Only applies to sessions Operator started automatically — it never auto-ends a session you started yourself.')+'</label><input class="input" type="number" min="1" max="60" id="setAppTrackingGrace" value="'+state.settings.appTracking.graceMinutes+'"></div>'+
+        '<div class="field"><label>Cooldown after you lock out (minutes)'+tip('Auto lock-in stays off this long after you stop a session yourself.')+'</label><input class="input" type="number" min="0" max="240" id="setAppTrackingCooldown" value="'+state.settings.appTracking.cooldownMinutes+'"></div>'+
+        '<div class="field"><label>Day recap ready at'+tip('A small nudge at this time says your recap is ready — what you did, your work habits, and any sessions that started on their own. Open it any time from Today or Analytics.')+'</label><input class="input" type="time" id="setRecapTime" value="'+(state.settings.appTracking.recapTime||'21:30')+'"></div>'+
+        '<div class="field"><label>Idle after (seconds without keyboard/mouse)'+tip('Idle time doesn\'t count toward auto lock-in or app time.')+'</label><input class="input" type="number" min="15" max="900" id="setAppTrackingIdle" value="'+state.settings.appTracking.idleSeconds+'"></div>'+
       '</div></div>'+saveBtn+
       workAppsSettingsHtml()+
       wakeSettingsCardHtml()+
@@ -12079,8 +12168,8 @@ function renderSettings(){
         ['standard','peaceful','loud'].map(function(s){ return '<button class="btn '+(p.alarmSound===s?'btn-primary':'')+' btn-sm" data-action="pickAlarmSound" data-sound="'+s+'">'+s[0].toUpperCase()+s.slice(1)+'</button>'; }).join('')+
         '<button class="btn btn-ghost btn-sm" data-action="previewAlarmSound">Preview</button>'+
       '</div></div>'+
-      '<div class="section"><div class="section-title">Before-You-Start Reminders<div class="row"><input class="input" id="newPrepLabel" placeholder="e.g. Water bottle filled" style="width:200px;"><button class="btn btn-sm" data-action="addPrepItem">Add</button></div></div>'+
-        '<div class="card"><div class="kpi-sub" style="margin-bottom:8px;">Shown as a note before every focus session.</div>'+
+      '<div class="section"><div class="section-title">Before-You-Start Reminders'+tip('Shown as a note before every focus session.')+'<div class="row"><input class="input" id="newPrepLabel" placeholder="e.g. Water bottle filled" style="width:200px;"><button class="btn btn-sm" data-action="addPrepItem">Add</button></div></div>'+
+        '<div class="card">'+
         '<div class="task-list">'+(prepItems.map(function(item){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(item.label)+'</div>'+deleteBtn('prep', item.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet — add one above.</div>')+'</div>'+
         '</div>'+
       '</div>'+
@@ -12102,11 +12191,11 @@ function renderSettings(){
         '<div class="field"><label>Deep work target per day</label><select class="input" id="setDeepWorkTarget">'+deepWorkOptions.map(function(m){ return '<option value="'+m+'" '+(state.standards.deepWorkTargetMinutes===m?'selected':'')+'>'+fmtDurationLabel(m)+'</option>'; }).join('')+'</select></div>'+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Streak Rules</div><div class="grid grid-2">'+
-        '<div class="field"><label>Days off allowed per week</label><input class="input" type="number" min="0" max="6" id="setDaysOffAllowed" value="'+state.standards.daysOffAllowedPerWeek+'"><div class="kpi-sub">More than this in a trailing 7-day window turns the streak red</div></div>'+
+        '<div class="field"><label>Days off allowed per week'+tip('More than this in any 7-day stretch turns the streak red.')+'</label><input class="input" type="number" min="0" max="6" id="setDaysOffAllowed" value="'+state.standards.daysOffAllowedPerWeek+'"></div>'+
       '</div>'+
       '</div>'+saveBtn+
-      '<div class="section"><div class="section-title">Daily Standard<div class="row"><input class="input" id="newStandardLabel" placeholder="e.g. Read for 10 minutes" style="width:200px;"><button class="btn btn-sm" data-action="addStandardItem">Add</button></div></div>'+
-        '<div class="card"><div class="kpi-sub" style="margin-bottom:8px;">These plus your deep work target must be complete for a day to count.</div>'+
+      '<div class="section"><div class="section-title">Daily Standard'+tip('These plus your deep work target must be done for a day to count toward the streak.')+'<div class="row"><input class="input" id="newStandardLabel" placeholder="e.g. Read for 10 minutes" style="width:200px;"><button class="btn btn-sm" data-action="addStandardItem">Add</button></div></div>'+
+        '<div class="card">'+
         '<div class="task-list">'+(standardItems.map(function(it){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(it.label)+'</div>'+deleteBtn('standard', it.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet — add one above.</div>')+'</div>'+
         '</div>'+
       '</div>',
@@ -12116,16 +12205,14 @@ function renderSettings(){
       '</div>'+
       '</div>'+saveBtn+renderCrmSettings(),
 
-    calendarJournal: '<div class="section"><div class="section-title">Calendar Categories<div class="row"><input class="input" id="newCatLabel" placeholder="e.g. Client call" style="width:160px;"><button class="btn btn-sm" data-action="addCalCategory">Add</button></div></div>'+
+    calendarJournal: '<div class="section"><div class="section-title">Calendar Categories'+tip('Rename a category by editing its label — it saves automatically. Deleting one that\'s still in use re-labels those events as “Other”. Auto-alarm rings at the start of every event in that category.')+'<div class="row"><input class="input" id="newCatLabel" placeholder="e.g. Client call" style="width:160px;"><button class="btn btn-sm" data-action="addCalCategory">Add</button></div></div>'+
         '<div class="card">'+
-          '<div class="kpi-sub" style="margin-bottom:8px;">Rename a category by editing its label — it saves automatically. Deleting a category still in use re-labels those events as "Other".</div>'+
           '<div class="row" style="margin-bottom:10px;">'+SWATCHES.map(function(sw){ return '<span class="swatch" style="background:'+sw+';" data-action="pickSwatch" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
           '<div class="task-list">'+(categories.map(function(c){ return '<div class="task-item-v2"><span class="cal-dot" style="background:'+c.color+';width:12px;height:12px;"></span><input class="input" data-cal-cat-label="'+c.id+'" value="'+escapeHtml(c.label)+'" style="flex:1;max-width:220px;"><label class="row" style="font-size:11.5px;color:var(--text-dim);white-space:nowrap;"><input type="checkbox" data-cal-cat-autoremind="'+c.id+'" '+(c.autoRemind?'checked':'')+' style="margin-right:4px;">Auto-alarm</label>'+deleteBtn('calcat', c.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
         '</div>'+
       '</div>'+
-      '<div class="section"><div class="section-title">Journal Types</div>'+
+      '<div class="section"><div class="section-title">Journal Types'+tip('Add your own moods/types — pick a color, an emoji and a name. “Starred” is built in for the glow effect and can\'t be removed.')+'</div>'+
         '<div class="card">'+
-          '<div class="kpi-sub" style="margin-bottom:8px;">Add your own moods/types — pick a color, an emoji, and a name. "Starred" is built in for the glow effect and can\'t be removed.</div>'+
           '<div class="row" style="margin-bottom:10px;">'+
             '<input class="input" id="newJournalTypeEmoji" placeholder="&#128077;" maxlength="4" style="width:56px;text-align:center;">'+
             '<input class="input" id="newJournalTypeLabel" placeholder="e.g. Gratitude" style="flex:1;min-width:140px;">'+
@@ -13016,7 +13103,7 @@ function renderWakeSetup(){
   const sn = state.focus.snooze;
   return '<div class="wake-setup">'+
     '<div class="row" style="justify-content:space-between;align-items:flex-start;gap:12px;">'+
-      '<div><div class="section-title" style="margin:0;">&#9200; Wake-up alarm</div><div class="kpi-sub">Your one daily alarm — the wake screen with your vision board, plan and music.</div></div>'+
+      '<div class="section-title" style="margin:0;">&#9200; Wake-up alarm'+tip('Your one daily alarm — it opens the wake screen with your vision board, today\'s plan and your music.')+'</div>'+
       '<label class="ws-switch" title="Turn the daily alarm on/off"><input type="checkbox" data-wake="enabled" '+(w.enabled?'checked':'')+'><span></span></label>'+
     '</div>'+
     '<div class="ws-main'+(w.enabled?'':' is-off')+'">'+
@@ -13026,23 +13113,23 @@ function renderWakeSetup(){
     '</div>'+
     '<div class="ws-next">'+(nw ? 'Next ring: <b>'+fmt12Hour(nw.time)+' '+morningLabel(nw.date)+'</b> ('+weekdayShort(nw.date)+') &middot; in '+untilLabel(nw.ts)+(nw.override?' &middot; one-time change':'') : 'Nothing will ring — turn the alarm on or set a time below.')+(sn && sn.wake ? '<br>'+(sn.test?'Test':'Snooze')+' ringing at '+fmt12Hour(nowHM(new Date(sn.ts))) : '')+'</div>'+
     '<div class="ws-block">'+
-      '<div class="kind-label">Just for '+morningLabel(od)+' ('+weekdayShort(od)+')</div>'+
+      '<div class="kind-label">Just for '+morningLabel(od)+' ('+weekdayShort(od)+')'+tip('Change the time — or skip the alarm — for this one morning. Your daily alarm stays the same.')+'</div>'+
       '<div class="row" style="gap:8px;flex-wrap:wrap;">'+
         '<input class="input" type="time" data-wake="overrideTime" value="'+(eff||'')+'" style="width:130px;">'+
         '<button class="btn btn-ghost btn-sm'+(ov && ov.off?' is-active':'')+'" data-action="wakeSkip">No alarm that morning</button>'+
         (ov ? '<button class="btn btn-ghost btn-sm" data-action="wakeClearOverride">Back to usual'+(base?' ('+fmt12Hour(base)+')':'')+'</button>' : '')+
       '</div>'+
-      '<div class="kpi-sub" style="margin-top:4px;">'+(ov ? (ov.off ? 'No alarm '+morningLabel(od)+'.' : 'Changed to '+fmt12Hour(ov.time)+' for '+morningLabel(od)+' only.') : (base ? 'Usual time. Change it here for '+morningLabel(od)+' only — your daily alarm stays the same.' : 'No alarm usually — set a time here to wake up '+morningLabel(od)+'.'))+'</div>'+
+      (ov || !base ? '<div class="kpi-sub" style="margin-top:4px;">'+(ov ? (ov.off ? 'No alarm '+morningLabel(od)+'.' : 'Changed to '+fmt12Hour(ov.time)+' for '+morningLabel(od)+' only.') : 'No alarm usually that day.')+'</div>' : '')+
     '</div>'+
     '<div class="ws-block">'+
-      '<div class="kind-label">Wake-up music — starts by itself, no alarm sound</div>'+
+      '<div class="kind-label">Wake-up music'+tip('Starts by itself when the alarm goes off — no alarm sound plays with it.')+'</div>'+
       (w.media ? '<div class="ws-media"><span>&#9835; '+escapeHtml(mediaName(w.media))+'</span><span class="kpi-sub">'+escapeHtml(mediaKindLabel(w.media))+'</span><span style="flex:1"></span>'+
           '<button class="btn btn-ghost btn-sm" data-action="wakePreviewMusic">'+((wakeAudio||wakeMusicApp)?'&#10073;&#10073; Stop':'&#9654; Test')+'</button><button class="btn btn-ghost btn-sm mini-move-danger" data-action="wakeClearMusic">Remove</button></div>' : '')+
       wakeMusicPickerHtml(w)+
       '<input type="file" id="wakeMusicFile" accept="audio/*" style="display:none;">'+
     '</div>'+
     '<div class="ws-block">'+
-      '<div class="kind-label">Alarm sound'+(w.media ? ' <span class="kpi-sub" style="text-transform:none;letter-spacing:0;font-weight:500;">— only if the music can\'t start</span>' : '')+'</div>'+
+      '<div class="kind-label">Alarm sound'+(w.media ? tip('Only plays if the music can\'t start.') : '')+'</div>'+
       '<div class="row" style="gap:6px;flex-wrap:wrap;">'+['peaceful','standard','loud'].map(function(s){ return '<button class="btn btn-sm '+(w.sound===s?'btn-primary':'btn-ghost')+'" data-action="wakeSound" data-id="'+s+'">'+s[0].toUpperCase()+s.slice(1)+'</button>'; }).join('')+
         '<button class="btn btn-ghost btn-sm" data-action="wakePreviewSound">&#9654; Hear it</button></div>'+
     '</div>'+
@@ -13085,15 +13172,17 @@ function wakeMusicPickerHtml(w){
   const src = ui.wakeSrc || (w.media ? (w.media.type==='music' ? 'music' : w.media.ref ? 'upload' : 'link') : 'music');
   const kind = ui.wakeMusicKind || (w.media && w.media.type==='music' ? w.media.k : 'song');
   const tab = function(id, label){ return '<button class="seg-tab'+(src===id?' active':'')+'" data-action="wakeMusicSource" data-id="'+id+'">'+label+'</button>'; };
-  return '<div class="seg-tabs ws-src" style="margin:8px 0;">'+tab('music','&#63743; Apple Music')+tab('upload','&#11014; Song file')+tab('link','&#128279; Link')+'</div>'+
+  const help = src==='music' ? 'Plays from your Apple Music library through the Music app — no ads, and the volume fades up. The first time, macOS asks to let Operator control Music: click OK (do it now with Test, so it never asks in the morning).'
+    : src==='upload' ? 'Plays right on the wake screen and fades in.'
+    : 'Opens and plays by itself. YouTube may play an ad first — Apple Music or a song file start instantly.';
+  return '<div class="ws-src-row"><div class="seg-tabs ws-src" style="margin:0;">'+tab('music','&#63743; Apple Music')+tab('upload','&#11014; Song file')+tab('link','&#128279; Link')+'</div>'+tip(help)+'</div>'+
     (src==='music' ? '<div class="row" style="gap:8px;flex-wrap:wrap;">'+
         '<input class="input" id="wakeMusicQuery" placeholder="Song or playlist name (or an Apple Music link)" value="'+escapeHtml(w.media && w.media.type==='music' ? w.media.q : '')+'" style="flex:1;min-width:220px;">'+
         '<div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(kind==='song'?' active':'')+'" data-action="wakeMusicKind" data-id="song">Song</button><button class="seg-tab'+(kind==='playlist'?' active':'')+'" data-action="wakeMusicKind" data-id="playlist">Playlist</button></div>'+
         '<button class="btn btn-sm btn-primary" data-action="wakeSetAppleMusic">Use it</button>'+
-      '</div>'+
-      '<div class="kpi-sub" style="margin-top:6px;">Plays from your Apple Music library through the Music app — no ads, volume fades up. The first time, macOS asks to let Operator control Music: click OK (do it now with Test, so it doesn\'t ask in the morning).</div>'
-    : src==='upload' ? '<button class="btn btn-sm" data-action="wakePickMusic">&#11014; Choose a song file</button><div class="kpi-sub" style="margin-top:6px;">Plays right on the wake screen and fades in.</div>'
-    : '<input class="input" data-wake="mediaUrl" placeholder="YouTube or song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="width:100%;"><div class="kpi-sub" style="margin-top:6px;">Opens and plays by itself. YouTube may play an ad first — Apple Music or a song file start instantly.</div>');
+      '</div>'
+    : src==='upload' ? '<button class="btn btn-sm" data-action="wakePickMusic">&#11014; Choose a song file</button>'
+    : '<input class="input" data-wake="mediaUrl" placeholder="YouTube or song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="width:100%;">');
 }
 ACTIONS.wakeMusicSource = function(el, e, id){ ui.wakeSrc = id; renderWakeSetupInto(); };
 ACTIONS.wakeMusicKind = function(el, e, id){ ui.wakeMusicKind = id; renderWakeSetupInto(); };
@@ -13218,7 +13307,7 @@ function syncTaskAlarms(t){
 function taskAlarmFieldsHtml(prefix, t){
   const al = (t && t.alarm) || {};
   return '<div class="task-alarm-box">'+
-    '<label class="row" style="gap:6px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="'+prefix+'AlarmOn" '+(al.on?'checked':'')+'>&#9200; Alarm at the deadline time</label>'+
+    '<label class="row" style="gap:6px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="'+prefix+'AlarmOn" '+(al.on?'checked':'')+'>&#9200; Alarm at the deadline time'+tip('Needs a deadline time. Add travel and get-ready minutes for extra alarms — e.g. 9:00 AM, 60 min travel, 60 min to get ready → up at 7:00, leave at 8:00.')+'</label>'+
     '<div class="row" style="gap:10px;margin-top:8px;flex-wrap:wrap;align-items:center;">'+
       '<span class="kpi-sub">Travel</span><input class="input" type="number" min="0" step="5" id="'+prefix+'AlarmTravel" value="'+(al.travel||'')+'" placeholder="0" style="width:74px;"><span class="kpi-sub">min</span>'+
       '<span class="kpi-sub" style="margin-left:6px;">Get ready</span><input class="input" type="number" min="0" step="5" id="'+prefix+'AlarmReady" value="'+(al.ready||'')+'" placeholder="0" style="width:74px;"><span class="kpi-sub">min</span>'+
@@ -13228,7 +13317,7 @@ function taskAlarmFieldsHtml(prefix, t){
 }
 function taskAlarmHint(t){
   const plan = t ? taskAlarmPlan(t) : [];
-  if(!plan.length) return 'Needs a deadline time. E.g. 9:00 AM, 60 min travel, 60 min to get ready → up at 7:00, leave at 8:00.';
+  if(!plan.length) return t && t.alarm && !(t.deadline && t.deadlineTime) ? 'Needs a deadline time.' : '';
   return plan.map(function(p){ return (p.kind==='ready'?'Get ready':p.kind==='leave'?'Leave':'Alarm')+' '+fmt12Hour(p.time)+(p.date!==t.deadline?' ('+weekdayShort(p.date)+')':''); }).join(' &middot; ');
 }
 function readTaskAlarmFields(prefix){

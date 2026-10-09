@@ -203,7 +203,7 @@ function renderCalories(){
   '<div class="section"><div class="section-title">Today\'s Log</div><div class="task-list">'+
     (today.map(function(c){ return '<div class="task-item-v2"><div class="task-title">'+escapeHtml(c.name)+'</div><div class="kpi-sub">'+c.calories+' cal</div>'+deleteBtn('calorie',c.id)+'</div>'; }).join('') || '<div class="empty">Nothing logged today yet.</div>')+
   '</div></div>'+
-  '<div class="section"><div class="section-title">Meal Library <span class="kpi-sub">edit your go-to options</span></div>'+
+  '<div class="section"><div class="section-title">Meal Library'+tip('Your go-to options — edit them here.')+'</div>'+
     '<div class="card row" style="margin-bottom:10px;">'+
       '<div class="field" style="flex:1;"><label>Name</label><input class="input" id="mealName" placeholder="e.g. Turkey chili"></div>'+
       '<div class="field"><label>Calories</label><input class="input" type="number" id="mealCalories" style="width:100px;"></div>'+

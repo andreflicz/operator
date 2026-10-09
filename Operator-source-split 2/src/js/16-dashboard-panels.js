@@ -211,7 +211,7 @@ document.addEventListener('drop', function(e){
 function renderJournalPanel(){
   const todaysJournalCount = state.journal.entries.filter(function(e){ return e.date===todayStr(); }).length;
   return '<div class="section"><div class="card journal-quick-card" data-photo-drop="journal" style="text-align:center;">'+
-    '<div class="kpi-label" style="margin-bottom:8px;">Quick Journal<span class="kpi-sub" style="margin-left:8px;">paste or drop images</span></div>'+
+    '<div class="kpi-label" style="margin-bottom:8px;">Quick Journal'+tip('Paste or drop images in too.')+'</div>'+
     '<textarea class="input" id="quickJournalText" placeholder="Anything on your mind — a win, a worry, an idea…" style="width:100%;height:90px;flex-shrink:0;text-align:left;resize:none;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
     renderJournalPhotoThumbsRow()+
     '<div class="journal-compose-actions">'+

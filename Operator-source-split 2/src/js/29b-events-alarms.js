@@ -197,8 +197,7 @@ function renderNightPlanModal(){
     .sort(function(a,b){ return (sel.has(b.id)?1:0)-(sel.has(a.id)?1:0) || taskPriorityRank(a)-taskPriorityRank(b); }).slice(0,80);
   const base = wakeBaseTimeFor(d.date);
   const dayLabel = d.date===todayStr() ? 'today' : 'tomorrow ('+weekdayShort(d.date)+')';
-  return '<div class="section-title" style="margin-bottom:4px;">&#127769; Plan '+dayLabel+'</div>'+
-    '<div class="kpi-sub" style="margin-bottom:14px;">Shows up when your alarm goes off and on the Today page in the morning.</div>'+
+  return '<div class="section-title" style="margin-bottom:14px;">&#127769; Plan '+dayLabel+tip('Shows up when your alarm goes off, and on the Today page in the morning.')+'</div>'+
     '<div class="field"><label>Tasks to line up ('+sel.size+')</label><div class="client-check-list" style="max-height:200px;">'+
       (cands.map(function(t){ return '<label class="client-check-row"><input type="checkbox" data-plan-task="'+t.id+'" '+(sel.has(t.id)?'checked':'')+'>'+(t.isVideoIdea?'&#127916; ':'')+escapeHtml(t.title)+'</label>'; }).join('') || '<div class="kpi-sub">No open tasks yet.</div>')+
     '</div>'+

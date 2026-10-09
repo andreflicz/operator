@@ -93,12 +93,15 @@ function toggleTaskSelect(id){
   renderView();
 }
 function clearTaskSelection(){ ui.selectedTaskIds.clear(); renderView(); }
-function renderTaskToolbar(){
+function selectModeBtnHtml(){
+  return '<button class="btn btn-ghost btn-sm" data-action="toggleTaskSelectMode">'+(ui.taskSelectMode?'Done Selecting':'Select Multiple')+'</button>';
+}
+// inline: the Select Multiple button sits in a section header instead, so only the bulk bar renders here
+function renderTaskToolbar(inline){
   const ids = Array.from(ui.selectedTaskIds).filter(function(id){ return state.tasks.items.some(function(t){return t.id===id;}); });
   if(!ids.length){
-    return '<div class="row" style="justify-content:flex-end;margin-bottom:8px;">'+
-      '<button class="btn btn-ghost btn-sm" data-action="toggleTaskSelectMode">'+(ui.taskSelectMode?'Done Selecting':'Select Multiple')+'</button>'+
-    '</div>';
+    if(inline) return '';
+    return '<div class="row" style="justify-content:flex-end;margin-bottom:8px;">'+selectModeBtnHtml()+'</div>';
   }
   const selectedTasks = ids.map(function(id){ return state.tasks.items.find(function(t){return t.id===id;}); }).filter(Boolean);
   const anyToday = selectedTasks.some(function(t){return t.status==='today';});
@@ -162,7 +165,7 @@ function renderTaskEditModal(){
     taskAlarmFieldsHtml('editTask-'+t.id+'-', t)+
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="editNotes-'+t.id+'" style="width:100%;min-height:60px;">'+escapeHtml(t.notes||'')+'</textarea></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editCountsDeep-'+t.id+'" '+(t.countsDeepWork!==false?'checked':'')+' style="margin-right:6px;">Counts toward deep work'+(function(){ const c=t.categoryId?taskCategoryById(t.categoryId):null; return c && c.countsDeepWork===false ? ' <span class="kpi-sub">(its category "'+escapeHtml(c.label)+'" doesn\'t count)</span>' : ''; })()+'</label>'+
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editOngoing-'+t.id+'" '+(t.ongoing?'checked':'')+' style="margin-right:6px;">&#128204; Ongoing (may take more than one day)</label>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editOngoing-'+t.id+'" '+(t.ongoing?'checked':'')+' style="margin-right:6px;">&#128204; Ongoing'+tip('For work that takes more than one day — it stays live until it\'s actually done.')+'</label>'+
     '<div id="editTaskOngoingExtra-'+t.id+'" style="display:'+(t.ongoing?'block':'none')+';">'+
     '<div class="field" style="margin-top:10px;"><label>Ongoing target date (optional)</label><div class="row"><input class="input" type="date" id="editOngoingDeadline-'+t.id+'" value="'+(t.ongoingDeadline||'')+'"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editOngoingDeadline-'+t.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="editOngoingDeadline-'+t.id+'">Clear</button></div></div>'+
     '<div class="field" style="margin-top:10px;"><label>Frequency (optional)</label><select class="input" id="editOngoingFrequency-'+t.id+'">'+

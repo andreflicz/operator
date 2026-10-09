@@ -317,7 +317,7 @@ function renderWakeSetup(){
   const sn = state.focus.snooze;
   return '<div class="wake-setup">'+
     '<div class="row" style="justify-content:space-between;align-items:flex-start;gap:12px;">'+
-      '<div><div class="section-title" style="margin:0;">&#9200; Wake-up alarm</div><div class="kpi-sub">Your one daily alarm — the wake screen with your vision board, plan and music.</div></div>'+
+      '<div class="section-title" style="margin:0;">&#9200; Wake-up alarm'+tip('Your one daily alarm — it opens the wake screen with your vision board, today\'s plan and your music.')+'</div>'+
       '<label class="ws-switch" title="Turn the daily alarm on/off"><input type="checkbox" data-wake="enabled" '+(w.enabled?'checked':'')+'><span></span></label>'+
     '</div>'+
     '<div class="ws-main'+(w.enabled?'':' is-off')+'">'+
@@ -327,23 +327,23 @@ function renderWakeSetup(){
     '</div>'+
     '<div class="ws-next">'+(nw ? 'Next ring: <b>'+fmt12Hour(nw.time)+' '+morningLabel(nw.date)+'</b> ('+weekdayShort(nw.date)+') &middot; in '+untilLabel(nw.ts)+(nw.override?' &middot; one-time change':'') : 'Nothing will ring — turn the alarm on or set a time below.')+(sn && sn.wake ? '<br>'+(sn.test?'Test':'Snooze')+' ringing at '+fmt12Hour(nowHM(new Date(sn.ts))) : '')+'</div>'+
     '<div class="ws-block">'+
-      '<div class="kind-label">Just for '+morningLabel(od)+' ('+weekdayShort(od)+')</div>'+
+      '<div class="kind-label">Just for '+morningLabel(od)+' ('+weekdayShort(od)+')'+tip('Change the time — or skip the alarm — for this one morning. Your daily alarm stays the same.')+'</div>'+
       '<div class="row" style="gap:8px;flex-wrap:wrap;">'+
         '<input class="input" type="time" data-wake="overrideTime" value="'+(eff||'')+'" style="width:130px;">'+
         '<button class="btn btn-ghost btn-sm'+(ov && ov.off?' is-active':'')+'" data-action="wakeSkip">No alarm that morning</button>'+
         (ov ? '<button class="btn btn-ghost btn-sm" data-action="wakeClearOverride">Back to usual'+(base?' ('+fmt12Hour(base)+')':'')+'</button>' : '')+
       '</div>'+
-      '<div class="kpi-sub" style="margin-top:4px;">'+(ov ? (ov.off ? 'No alarm '+morningLabel(od)+'.' : 'Changed to '+fmt12Hour(ov.time)+' for '+morningLabel(od)+' only.') : (base ? 'Usual time. Change it here for '+morningLabel(od)+' only — your daily alarm stays the same.' : 'No alarm usually — set a time here to wake up '+morningLabel(od)+'.'))+'</div>'+
+      (ov || !base ? '<div class="kpi-sub" style="margin-top:4px;">'+(ov ? (ov.off ? 'No alarm '+morningLabel(od)+'.' : 'Changed to '+fmt12Hour(ov.time)+' for '+morningLabel(od)+' only.') : 'No alarm usually that day.')+'</div>' : '')+
     '</div>'+
     '<div class="ws-block">'+
-      '<div class="kind-label">Wake-up music — starts by itself, no alarm sound</div>'+
+      '<div class="kind-label">Wake-up music'+tip('Starts by itself when the alarm goes off — no alarm sound plays with it.')+'</div>'+
       (w.media ? '<div class="ws-media"><span>&#9835; '+escapeHtml(mediaName(w.media))+'</span><span class="kpi-sub">'+escapeHtml(mediaKindLabel(w.media))+'</span><span style="flex:1"></span>'+
           '<button class="btn btn-ghost btn-sm" data-action="wakePreviewMusic">'+((wakeAudio||wakeMusicApp)?'&#10073;&#10073; Stop':'&#9654; Test')+'</button><button class="btn btn-ghost btn-sm mini-move-danger" data-action="wakeClearMusic">Remove</button></div>' : '')+
       wakeMusicPickerHtml(w)+
       '<input type="file" id="wakeMusicFile" accept="audio/*" style="display:none;">'+
     '</div>'+
     '<div class="ws-block">'+
-      '<div class="kind-label">Alarm sound'+(w.media ? ' <span class="kpi-sub" style="text-transform:none;letter-spacing:0;font-weight:500;">— only if the music can\'t start</span>' : '')+'</div>'+
+      '<div class="kind-label">Alarm sound'+(w.media ? tip('Only plays if the music can\'t start.') : '')+'</div>'+
       '<div class="row" style="gap:6px;flex-wrap:wrap;">'+['peaceful','standard','loud'].map(function(s){ return '<button class="btn btn-sm '+(w.sound===s?'btn-primary':'btn-ghost')+'" data-action="wakeSound" data-id="'+s+'">'+s[0].toUpperCase()+s.slice(1)+'</button>'; }).join('')+
         '<button class="btn btn-ghost btn-sm" data-action="wakePreviewSound">&#9654; Hear it</button></div>'+
     '</div>'+
@@ -386,15 +386,17 @@ function wakeMusicPickerHtml(w){
   const src = ui.wakeSrc || (w.media ? (w.media.type==='music' ? 'music' : w.media.ref ? 'upload' : 'link') : 'music');
   const kind = ui.wakeMusicKind || (w.media && w.media.type==='music' ? w.media.k : 'song');
   const tab = function(id, label){ return '<button class="seg-tab'+(src===id?' active':'')+'" data-action="wakeMusicSource" data-id="'+id+'">'+label+'</button>'; };
-  return '<div class="seg-tabs ws-src" style="margin:8px 0;">'+tab('music','&#63743; Apple Music')+tab('upload','&#11014; Song file')+tab('link','&#128279; Link')+'</div>'+
+  const help = src==='music' ? 'Plays from your Apple Music library through the Music app — no ads, and the volume fades up. The first time, macOS asks to let Operator control Music: click OK (do it now with Test, so it never asks in the morning).'
+    : src==='upload' ? 'Plays right on the wake screen and fades in.'
+    : 'Opens and plays by itself. YouTube may play an ad first — Apple Music or a song file start instantly.';
+  return '<div class="ws-src-row"><div class="seg-tabs ws-src" style="margin:0;">'+tab('music','&#63743; Apple Music')+tab('upload','&#11014; Song file')+tab('link','&#128279; Link')+'</div>'+tip(help)+'</div>'+
     (src==='music' ? '<div class="row" style="gap:8px;flex-wrap:wrap;">'+
         '<input class="input" id="wakeMusicQuery" placeholder="Song or playlist name (or an Apple Music link)" value="'+escapeHtml(w.media && w.media.type==='music' ? w.media.q : '')+'" style="flex:1;min-width:220px;">'+
         '<div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(kind==='song'?' active':'')+'" data-action="wakeMusicKind" data-id="song">Song</button><button class="seg-tab'+(kind==='playlist'?' active':'')+'" data-action="wakeMusicKind" data-id="playlist">Playlist</button></div>'+
         '<button class="btn btn-sm btn-primary" data-action="wakeSetAppleMusic">Use it</button>'+
-      '</div>'+
-      '<div class="kpi-sub" style="margin-top:6px;">Plays from your Apple Music library through the Music app — no ads, volume fades up. The first time, macOS asks to let Operator control Music: click OK (do it now with Test, so it doesn\'t ask in the morning).</div>'
-    : src==='upload' ? '<button class="btn btn-sm" data-action="wakePickMusic">&#11014; Choose a song file</button><div class="kpi-sub" style="margin-top:6px;">Plays right on the wake screen and fades in.</div>'
-    : '<input class="input" data-wake="mediaUrl" placeholder="YouTube or song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="width:100%;"><div class="kpi-sub" style="margin-top:6px;">Opens and plays by itself. YouTube may play an ad first — Apple Music or a song file start instantly.</div>');
+      '</div>'
+    : src==='upload' ? '<button class="btn btn-sm" data-action="wakePickMusic">&#11014; Choose a song file</button>'
+    : '<input class="input" data-wake="mediaUrl" placeholder="YouTube or song link" value="'+escapeHtml(w.media && w.media.url ? w.media.url : '')+'" style="width:100%;">');
 }
 ACTIONS.wakeMusicSource = function(el, e, id){ ui.wakeSrc = id; renderWakeSetupInto(); };
 ACTIONS.wakeMusicKind = function(el, e, id){ ui.wakeMusicKind = id; renderWakeSetupInto(); };
@@ -519,7 +521,7 @@ function syncTaskAlarms(t){
 function taskAlarmFieldsHtml(prefix, t){
   const al = (t && t.alarm) || {};
   return '<div class="task-alarm-box">'+
-    '<label class="row" style="gap:6px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="'+prefix+'AlarmOn" '+(al.on?'checked':'')+'>&#9200; Alarm at the deadline time</label>'+
+    '<label class="row" style="gap:6px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="'+prefix+'AlarmOn" '+(al.on?'checked':'')+'>&#9200; Alarm at the deadline time'+tip('Needs a deadline time. Add travel and get-ready minutes for extra alarms — e.g. 9:00 AM, 60 min travel, 60 min to get ready → up at 7:00, leave at 8:00.')+'</label>'+
     '<div class="row" style="gap:10px;margin-top:8px;flex-wrap:wrap;align-items:center;">'+
       '<span class="kpi-sub">Travel</span><input class="input" type="number" min="0" step="5" id="'+prefix+'AlarmTravel" value="'+(al.travel||'')+'" placeholder="0" style="width:74px;"><span class="kpi-sub">min</span>'+
       '<span class="kpi-sub" style="margin-left:6px;">Get ready</span><input class="input" type="number" min="0" step="5" id="'+prefix+'AlarmReady" value="'+(al.ready||'')+'" placeholder="0" style="width:74px;"><span class="kpi-sub">min</span>'+
@@ -529,7 +531,7 @@ function taskAlarmFieldsHtml(prefix, t){
 }
 function taskAlarmHint(t){
   const plan = t ? taskAlarmPlan(t) : [];
-  if(!plan.length) return 'Needs a deadline time. E.g. 9:00 AM, 60 min travel, 60 min to get ready → up at 7:00, leave at 8:00.';
+  if(!plan.length) return t && t.alarm && !(t.deadline && t.deadlineTime) ? 'Needs a deadline time.' : '';
   return plan.map(function(p){ return (p.kind==='ready'?'Get ready':p.kind==='leave'?'Leave':'Alarm')+' '+fmt12Hour(p.time)+(p.date!==t.deadline?' ('+weekdayShort(p.date)+')':''); }).join(' &middot; ');
 }
 function readTaskAlarmFields(prefix){

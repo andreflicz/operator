@@ -7,8 +7,7 @@ function renderStreakEditModal(){
   const ov = state.standards.dayOverrides || {};
   const days = []; for(let i=27;i>=0;i--) days.push(addDays(todayStr(), -i));
   const streak = computeStreak();
-  return '<div class="section-title" style="margin-bottom:4px;">Edit Streak</div>'+
-    '<div class="kpi-sub" style="margin-bottom:14px;">Tap a day to cycle: automatic &rarr; counted &rarr; not counted. Rest days marked off stay neutral.</div>'+
+  return '<div class="section-title" style="margin-bottom:14px;">Edit Streak'+tip('Tap a day to cycle: automatic → counted → not counted. Rest days you marked off stay neutral.')+'</div>'+
     '<div class="streak-edit-grid">'+days.map(function(d){
       const o = ov[d];
       const auto = (function(){ const save = ov[d]; delete ov[d]; const r = dayStandardsComplete(d); if(save) ov[d]=save; return r; })();

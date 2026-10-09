@@ -57,12 +57,12 @@ function renderPillMenu(){
   const app = ui.pillMenu==='__none' ? null : ui.pillMenu;
   const cat = app ? activityCategory(app) : null;
   const browser = app && BROWSER_APPS.indexOf(activityKey(app))>=0;
-  m.innerHTML = (browser ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div><div class="ap-menu-hint" style="margin-top:0;">Operator can\'t see which website is open, so it can\'t tell YouTube from work.'+
-      (activityKey(app)==='firefox' ? ' Firefox doesn\'t allow this — Safari, Chrome, Arc, Brave and Edge do.' : ' On your Mac: System Settings &rarr; Privacy &amp; Security &rarr; Automation &rarr; Operator &rarr; turn on '+escapeHtml(app)+'. Then reopen Operator.')+'</div>'
+  m.innerHTML = (browser ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div><div class="ap-menu-hint" style="margin-top:0;">Can\'t see which website is open'+
+      tip('So it can\'t tell YouTube from work.'+(activityKey(app)==='firefox' ? ' Firefox doesn\'t allow this — Safari, Chrome, Arc, Brave and Edge do.' : ' On your Mac: System Settings → Privacy & Security → Automation → Operator → turn on '+app+'. Then reopen Operator.'))+'</div>'
     : app ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div>'+
-      '<div class="ap-menu-k">Is this work?</div>'+
+      '<div class="ap-menu-k">Is this work?'+tip('Only work apps & sites start an automatic lock-in. Time on “not work” ones while you\'re locked in doesn\'t count as deep work.')+'</div>'+
       '<div class="ap-seg">'+['work','other'].map(function(c){ return '<button class="ap-seg-btn'+(cat===c?' is-on':'')+'" data-action="pillSetCat" data-id="'+c+'">'+CAT_META[c].label+'</button>'; }).join('')+'</div>'+
-      '<div class="ap-menu-hint">Only work apps &amp; sites start an automatic lock-in. Time on “not work” ones while you\'re locked in doesn\'t count as deep work.</div>' : '<div class="ap-menu-title">Nothing in front right now</div>')+
+      '' : '<div class="ap-menu-title">Nothing in front right now</div>')+
     '<button class="ap-menu-link" data-action="goToActivitySettings">All apps &amp; sites &rarr;</button>';
 }
 ACTIONS.pillSetCat = function(el, e, id){ if(ui.pillMenu && ui.pillMenu!=='__none') setActivityCategory(ui.pillMenu, id); renderPillMenu(); updateActivityPill(); playTick(); };
@@ -85,10 +85,10 @@ function workAppsSettingsHtml(){
   const shown = list.filter(function(x){ const c = activityCategory(x.name); return filter==='all' || c===filter || (filter==='other' && c==='unsorted'); }).slice(0, 60);
   const unsorted = list.filter(function(x){ return activityCategory(x.name)==='unsorted'; }).length;
   return '<div class="card section" id="workAppsSection">'+
-    '<div class="section-title">Work apps &amp; sites<span class="kpi-sub">only work ones start an automatic lock-in</span></div>'+
+    '<div class="section-title">Work apps &amp; sites'+tip('Only work apps & sites start an automatic lock-in, and time on “not work” ones while you\'re locked in doesn\'t count as deep work. Anything not sorted yet counts as not work.')+'</div>'+
     '<div class="row" style="gap:6px;margin-bottom:10px;flex-wrap:wrap;">'+
       [['all','All'],['work','Work'],['other','Not work']].map(function(f){ return '<button class="btn btn-sm '+(filter===f[0]?'btn-primary':'btn-ghost')+'" data-action="workAppFilter" data-id="'+f[0]+'">'+f[1]+'</button>'; }).join('')+
-      (unsorted ? '<span class="kpi-sub" style="align-self:center;">'+unsorted+' not sorted yet (counted as not work)</span>' : '')+
+      (unsorted ? '<span class="kpi-sub" style="align-self:center;">'+unsorted+' not sorted yet</span>' : '')+
     '</div>'+
     '<div class="wa-list">'+(shown.map(function(x){
       const c = activityCategory(x.name);

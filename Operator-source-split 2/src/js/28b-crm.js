@@ -293,19 +293,24 @@ function crmFiltersActive(kind){
   const f = crmUi(kind);
   return (f.q?1:0)+(f.stage?1:0)+(f.source?1:0)+(f.last?1:0)+((f.sort||'due')!=='due'?1:0);
 }
-function crmToolbar(kind){
+function crmToolsBtnHtml(kind, active){
+  const f = crmUi(kind);
+  return (active ? '<button class="mini-move" data-action="crmClearFilters" data-kind="'+kind+'">Clear</button>' : '')+
+    '<button class="crm-tools-btn'+(f.toolsOpen?' is-open':'')+'" data-action="crmToggleTools" data-kind="'+kind+'">&#128269; Search &amp; sort'+(active?'<span class="th-badge">'+active+'</span>':'')+'</button>';
+}
+function crmToolbar(kind, lead){
   const f = crmUi(kind);
   const sources = LEAD_SOURCES;
   const active = crmFiltersActive(kind);
   return '<div class="crm-toolbar crm-toolbar-slim">'+
-      '<button class="btn btn-ghost btn-sm crm-tools-btn'+(f.toolsOpen?' is-open':'')+'" data-action="crmToggleTools" data-kind="'+kind+'">&#128269; Search &amp; sort'+(active?'<span class="th-badge">'+active+'</span>':'')+'</button>'+
-      (active ? '<button class="mini-move" data-action="crmClearFilters" data-kind="'+kind+'">Clear</button>' : '')+
+      (lead||'')+
       '<span style="flex:1"></span>'+
+      crmToolsBtnHtml(kind, active)+
       '<div class="seg-tabs" style="margin:0;">'+
         '<button class="seg-tab'+(f.view==='board'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="board">Board</button>'+
         '<button class="seg-tab'+(f.view==='list'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="list">List</button>'+
       '</div>'+
-      '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="'+kind+'">+ Add '+(kind==='lead'?'lead':'client')+'</button>'+
+      '<button class="btn btn-primary crm-add-btn" data-action="openNewContact" data-kind="'+kind+'">+ Add '+(kind==='lead'?'lead':'client')+'</button>'+
     '</div>'+
     (f.toolsOpen ? '<div class="crm-toolbar crm-tools-row">'+
       '<input class="input" id="crmSearch-'+kind+'" placeholder="Search '+(kind==='lead'?'leads':'clients')+'…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
@@ -412,7 +417,7 @@ function renderCrmTab(kind){
     ? '<div class="crm-stats"><span><b>'+tracked.length+'</b> open leads</span><span><b>$'+tracked.reduce(function(a,p){ return a+(Number(p.value)||0); },0).toLocaleString()+'</b> in pipeline</span><span class="'+(due?'crm-stat-due':'')+'"><b>'+due+'</b> to reach out to</span></div>'
     : '<div class="crm-stats"><span><b>'+tracked.length+'</b> active clients</span><span><b>$'+tracked.reduce(function(a,c){ return a+(Number(c.mrr)||0); },0).toLocaleString()+'</b> MRR</span><span class="'+(due?'crm-stat-due':'')+'"><b>'+due+'</b> to reach out to</span></div>';
   const cycleMode = kind==='client' && f.group==='cycle';
-  return header+crmToolbar(kind)+(cycleMode ? cycleGroupBar() : '')+'<div class="subtab-panel" data-key="crm-'+kind+'-'+f.view+(cycleMode?'-cy':'')+'">'+(f.view==='list' ? renderCrmList(kind) : cycleMode ? renderCycleBoard() : renderCrmBoard(kind))+'</div>';
+  return crmToolbar(kind, header)+(cycleMode ? cycleGroupBar() : '')+'<div class="subtab-panel" data-key="crm-'+kind+'-'+f.view+(cycleMode?'-cy':'')+'">'+(f.view==='list' ? renderCrmList(kind) : cycleMode ? renderCycleBoard() : renderCrmBoard(kind))+'</div>';
 }
 // ---- Reach out today (Focus page) ----
 function reachOutList(){
@@ -759,13 +764,13 @@ function renderCrmSettings(){
     }).join('')+'</div>'+
     '<div class="row" style="margin-top:8px;"><input class="input input-sm" id="newStage-'+kind+'" placeholder="New stage name" style="width:200px;"><button class="btn btn-sm" data-action="addStage" data-kind="'+kind+'">Add stage</button></div>';
   };
-  return '<div class="card section"><div class="section-title">Reach-out cadence<span class="kpi-sub">How often to touch base — each contact can override it</span></div><div class="grid grid-3">'+
+  return '<div class="card section"><div class="section-title">Reach-out cadence'+tip('How often to touch base — each contact can override it. A client goes red once a touch is due. Deliverables: green on pace, yellow when behind but you\'ve done some this week, red when behind with none.')+'</div><div class="grid grid-3">'+
       '<div class="field"><label>New leads: every (days)</label><input class="input" type="number" min="1" id="setLeadCadence" value="'+c.leadCadenceDays+'"></div>'+
       '<div class="field"><label>Clients: every (days)</label><input class="input" type="number" min="1" id="setClientCadence" value="'+c.clientCadenceDays+'"></div>'+
       '<div class="field"><label>Daily "reach out" reminder</label><div class="row" style="gap:6px;"><input type="checkbox" id="setTouchReminder" '+(c.dailyReminder.enabled?'checked':'')+'><input class="input" type="time" id="setTouchReminderTime" value="'+c.dailyReminder.time+'" style="width:120px;"></div></div>'+
-    '</div><div class="kpi-sub" style="margin-top:8px;">Client health turns amber once a touch is overdue and red when it\'s overdue by more than half the cadence.</div></div>'+
+    '</div></div>'+
     '<div class="card section"><div class="section-title">Lead stages</div>'+stageEditor('lead')+'</div>'+
-    '<div class="card section"><div class="section-title">Client cycles<span class="kpi-sub">your playbooks — steps with calls, forms, videos and to-dos</span></div><button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">&#9881; Edit client cycles</button></div>'+
+    '<div class="card section"><div class="section-title">Client cycles'+tip('Your playbooks — steps with calls, forms, videos and to-dos.')+'</div><button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">&#9881; Edit client cycles</button></div>'+
     '<div class="card section"><div class="section-title">Client statuses</div>'+stageEditor('client')+'</div>';
 }
 function saveCrmSettingsFields(){

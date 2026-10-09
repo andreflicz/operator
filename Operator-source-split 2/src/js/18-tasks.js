@@ -7,7 +7,7 @@ function renderCurrentTaskCard(big, gridMode, heroFit){
     const st = state.tasks.items.find(function(x){ return x.id===ui.stagedTaskId; });
     if(st){
       return '<div class="task-card current-task-card staged-task-card'+(ui.justStaged?' just-staged':'')+'" data-dropzone="current" style="align-items:center;justify-content:center;text-align:center;'+sizeStyle+'">'+
-        '<div class="ctb-label">&#128204; Up Next &middot; lock in to start the clock</div>'+
+        '<div class="ctb-label">&#128204; Up Next'+tip('Lock in to start the clock on it.')+'</div>'+
         '<div class="task-card-title" style="font-size:19px;margin-top:6px;">'+escapeHtml(st.title)+'</div>'+
         '<div class="row" style="margin-top:16px;justify-content:center;">'+
           '<button class="btn btn-good" data-action="openLockInChooser">&#128274; Lock In to Start</button>'+
@@ -34,7 +34,7 @@ function renderCurrentTaskCard(big, gridMode, heroFit){
   if(!t){
     return '<div class="task-card current-task-card" data-dropzone="current" style="align-items:center;justify-content:center;text-align:center;'+sizeStyle+'">'+
       '<div class="ctb-label">'+currentTaskLabel()+'</div>'+
-      '<div class="ctb-empty">'+(inSession?'Drag a task here to start timing it.':'Drag a task here to line it up — you\'ll lock in to start the clock.')+'</div>'+
+      '<div class="ctb-empty">Drag a task here'+tip(inSession ? 'Whatever sits here gets timed while you\'re locked in.' : 'Line it up here, then lock in to start the clock.')+'</div>'+
     '</div>';
   }
   if(big){
@@ -87,25 +87,28 @@ function sortByPriorityAndDeadline(list){
 }
 function focusMainTab(el){ ui.focusTab = el.dataset.tab; renderView(); }
 function focusTasksSubTab(el){ ui.focusTasksSubTab = el.dataset.tab; renderView(); }
+// Overview / Backlog / Video Ideas / Finished sit on the same line as Tasks · Analytics,
+// so the page opens straight onto what you're on now and what's next.
+function focusTasksSubtabsHtml(){
+  const sub = ui.focusTasksSubTab || 'overview';
+  let backlogN = 0, ideasN = 0, doneN = 0;
+  state.tasks.items.forEach(function(t){
+    if(t.status==='done') doneN++;
+    else if(t.isVideoIdea) ideasN++;
+    else if(t.status==='backlog') backlogN++;
+  });
+  const pill = function(id, label, n){ return '<div class="subtab '+(sub===id?'active':'')+'" data-action="focusTasksSubTab" data-tab="'+id+'">'+label+(n===null?'':' <span style="opacity:.7;">'+n+'</span>')+'</div>'; };
+  return '<div class="subtabs">'+pill('overview', 'Overview', null)+pill('backlog', 'Backlog', backlogN)+pill('videoIdeas', '&#127916; Video Ideas', ideasN)+pill('finished', 'Finished', doneN)+'</div>';
+}
 function renderFocusTasksTab(){
   const sub = ui.focusTasksSubTab || 'overview';
-  const items = state.tasks.items;
-  const backlog = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; }));
-  const videoIdeas = items.filter(function(t){ return t.isVideoIdea && t.status!=='done'; });
-  const doneAll = items.filter(function(t){ return t.status==='done'; });
-  return '<div class="subtabs">'+
-      '<div class="subtab '+(sub==='overview'?'active':'')+'" data-action="focusTasksSubTab" data-tab="overview">Overview</div>'+
-      '<div class="subtab '+(sub==='backlog'?'active':'')+'" data-action="focusTasksSubTab" data-tab="backlog">Backlog <span style="opacity:.7;">'+backlog.length+'</span></div>'+
-      '<div class="subtab '+(sub==='videoIdeas'?'active':'')+'" data-action="focusTasksSubTab" data-tab="videoIdeas">&#127916; Video Ideas <span style="opacity:.7;">'+videoIdeas.length+'</span></div>'+
-      '<div class="subtab '+(sub==='finished'?'active':'')+'" data-action="focusTasksSubTab" data-tab="finished">Finished <span style="opacity:.7;">'+doneAll.length+'</span></div>'+
-    '</div>'+
-    '<div class="subtab-panel" data-key="tasks-'+sub+'">'+
+  return '<div class="subtab-panel" data-key="tasks-'+sub+'">'+
     (sub==='backlog' ? renderFocusBacklogTab() : sub==='videoIdeas' ? renderVideoIdeasTab() : sub==='finished' ? renderFocusFinishedTab() : renderFocusTasksOverview())+
     '</div>';
 }
 function renderVideoIdeasTab(){
   const videoIdeas = state.tasks.items.filter(function(t){ return t.isVideoIdea && t.status!=='done'; });
-  return '<div class="section" style="margin-top:14px;">'+
+  return '<div class="section">'+
     '<div class="row" style="justify-content:flex-end;margin-bottom:16px;">'+
       '<button class="btn btn-primary" data-action="openAddVideoIdeaModal">+ Add Video Idea</button>'+
     '</div>'+
@@ -190,10 +193,10 @@ function renderFocusTasksOverview(){
   const today = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='today'; }));
   const backlogPreview = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; })).slice(0,8);
   const backlogTotal = items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; }).length;
-  return nowNext+'<div style="max-width:440px;margin:0 auto 14px;">'+renderCurrentTaskCard()+'</div>'+
-  renderTaskToolbar()+
-  '<div class="section" style="margin-top:14px;margin-bottom:14px;">'+
-    '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+' &middot; highest priority &amp; closest deadlines first</span><button class="btn btn-primary btn-sm" data-action="openAddTaskModal" style="margin-left:auto;">+ Add a Task</button></div>'+
+  return nowNext+'<div class="focus-current">'+renderCurrentTaskCard()+'</div>'+
+  renderTaskToolbar(true)+
+  '<div class="section" style="margin-bottom:14px;">'+
+    '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('Highest priority and closest deadlines first. Drag a card up to the box above to line it up next.')+'<span class="row" style="margin-left:auto;gap:8px;">'+selectModeBtnHtml()+'<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button></span></div>'+
     '<div class="task-column fixed-size" data-dropzone="today"><div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div></div>'+
   '</div>'+
   (backlogTotal ? (
@@ -207,11 +210,11 @@ function renderFocusBacklogTab(){
   const items = state.tasks.items;
   const backlog = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; }));
   const hasFilters = !!(ui.backlogSearchText || ui.backlogPriorityFilter);
-  return renderTaskToolbar()+
-  '<div class="section" style="margin-top:14px;">'+
+  return renderTaskToolbar(true)+
+  '<div class="section">'+
     '<div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">'+
-      '<div class="section-title" style="margin-bottom:0;">The Whole List<span class="kpi-sub">'+backlog.length+' &middot; highest priority &amp; closest deadlines first</span></div>'+
-      '<div class="row" style="gap:8px;">'+
+      '<div class="section-title" style="margin-bottom:0;">The Whole List<span class="kpi-sub">'+backlog.length+'</span>'+tip('Highest priority and closest deadlines first.')+'</div>'+
+      '<div class="row" style="gap:8px;">'+selectModeBtnHtml()+
         (!ui.backlogSearchOpen && !hasFilters ? '<button class="btn btn-ghost btn-sm" data-action="toggleBacklogSearch" title="Search Entries">&#128269;</button>' : '')+
         '<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button>'+
       '</div>'+
@@ -257,7 +260,7 @@ function renderFocusFinishedTab(){
   const today = todayStr();
   const doneToday = doneAll.filter(function(t){ return t.completedAt===today; });
   const doneEarlier = doneAll.filter(function(t){ return t.completedAt!==today; });
-  return '<div class="section" style="margin-top:14px;">'+
+  return '<div class="section">'+
     '<div class="section-title">Completed Today<span class="kpi-sub">'+doneToday.length+'</span></div>'+
     '<div class="task-list">'+(doneToday.map(finishedTaskRow).join('') || '<div class="empty">Nothing finished today yet.</div>')+'</div>'+
   '</div>'+
@@ -283,7 +286,7 @@ function renderAddTaskModal(){
     '<div class="field" style="margin-top:10px;"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="newTaskDeadline"><input class="input" type="time" id="newTaskDeadlineTime" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="newTaskDeadline">Today</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskDeadline" title="Remove deadline">Clear</button></div></div>'+
     taskAlarmFieldsHtml('newTask', null)+
     '<div class="field" style="margin-top:10px;"><label>Notes (optional)</label><textarea class="input" id="newTaskNotes" placeholder="Any details worth remembering" style="width:100%;min-height:60px;"></textarea></div>'+
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskOngoing" style="margin-right:6px;">&#128204; Ongoing (may take more than one day)</label>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskOngoing" style="margin-right:6px;">&#128204; Ongoing'+tip('For work that takes more than one day — it stays live until it\'s actually done.')+'</label>'+
     '<div id="newTaskOngoingExtra" style="display:none;">'+
     '<div class="field" style="margin-top:10px;"><label>Ongoing target date (optional)</label><div class="row"><input class="input" type="date" id="newTaskOngoingDeadline"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskOngoingDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskOngoingDeadline">Clear</button></div></div>'+
     '<div class="field" style="margin-top:10px;"><label>Frequency (optional)</label><select class="input" id="newTaskOngoingFrequency"><option value="">&mdash;</option><option value="daily">Daily</option><option value="few">A few times a week</option><option value="weekly">Weekly</option></select></div>'+

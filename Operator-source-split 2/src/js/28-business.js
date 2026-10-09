@@ -5,7 +5,7 @@ function nextStageLabel(stage){
   return STAGE_LABELS[STAGE_ORDER[idx+1]];
 }
 function renderBusiness(){
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Business</div><div class="view-sub">Recurring revenue, who you\'re serving, and what you owe.</div></div></div>'+
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Business'+tip('Recurring revenue, who you\'re serving, who you\'re chasing, and what you owe.')+'</div></div></div>'+
   '<div class="tabs">'+
     '<div class="tab '+(ui.businessTab==='overview'?'active':'')+'" data-action="businessTab" data-tab="overview">Overview</div>'+
     '<div class="tab '+(ui.businessTab==='leads'?'active':'')+'" data-action="businessTab" data-tab="leads">Leads</div>'+
@@ -34,7 +34,8 @@ function renderBusinessOverview(){
   });
   const maxStage = Math.max.apply(null, stageRows.map(function(r){ return r.n; }).concat([1]));
   const leadsDue = reachOutList().filter(function(r){ return r.kind==='lead'; });
-  return '<div class="card hq">'+
+  // Laid out as the page itself — no card around it: the number up top, then clients | pipeline.
+  return '<div class="hq">'+
     '<div class="hq-top">'+
       '<div class="hq-mrr">'+
         '<div class="stat-tile-k">Monthly recurring</div>'+

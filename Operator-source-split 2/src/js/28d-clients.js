@@ -91,10 +91,9 @@ function renderClientsHome(){
     (function(){
       const active = (f.q?1:0)+((f.csort||'health')!=='health'?1:0);
       return '<div class="crm-toolbar crm-toolbar-slim">'+
-          '<button class="btn btn-ghost btn-sm crm-tools-btn'+(f.toolsOpen?' is-open':'')+'" data-action="crmToggleTools" data-kind="client">&#128269; Search &amp; sort'+(active?'<span class="th-badge">'+active+'</span>':'')+'</button>'+
-          (active ? '<button class="mini-move" data-action="crmClearFilters" data-kind="client">Clear</button>' : '')+
           '<span style="flex:1"></span>'+
-          '<button class="btn btn-primary btn-sm" data-action="openNewContact" data-kind="client">+ Add client</button>'+
+          crmToolsBtnHtml('client', active)+
+          '<button class="btn btn-primary crm-add-btn" data-action="openNewContact" data-kind="client">+ Add client</button>'+
         '</div>'+
         (f.toolsOpen ? '<div class="crm-toolbar crm-tools-row">'+
           '<input class="input" id="crmSearch-client" placeholder="Search clients…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
@@ -127,9 +126,9 @@ function renderLifecycleTab(){
       '<span style="flex:1"></span>'+
       '<button class="btn btn-ghost btn-sm" data-action="openLifecycleEditor" data-cycle="'+cy.id+'">&#9881; Edit cycles &amp; steps</button>'+
     '</div>'+
-    '<div class="kpi-sub" style="margin:4px 0 12px;">'+inCycle+' client'+(inCycle===1?'':'s')+' going through '+escapeHtml(cy.name)+' &middot; drag a card to move them to another step.</div>'+
+    '<div class="kpi-sub" style="margin:4px 0 12px;">'+inCycle+' client'+(inCycle===1?'':'s')+' going through '+escapeHtml(cy.name)+tip('Drag a card to move a client to another step.')+'</div>'+
     '<div class="subtab-panel" data-key="lc-board-'+cy.id+'">'+renderCycleBoard()+'</div>'+
-    (notIn.length ? '<div class="section" style="margin-top:18px;"><div class="section-title">Not in a cycle<span class="kpi-sub">active clients without a running cycle</span></div>'+
+    (notIn.length ? '<div class="section" style="margin-top:18px;"><div class="section-title">Not in a cycle'+tip('Active clients without a running cycle.')+'</div>'+
       '<div class="lc-notin">'+notIn.map(function(c){
         return '<div class="lc-notin-row" data-key="lcn-'+c.id+'"><span class="cc2-avatar cc2-avatar-sm" style="background:'+clientColor(c)+'">'+escapeHtml(clientInitials(c))+'</span>'+
           '<span class="lc-notin-name" data-action="openContact" data-kind="client" data-id="'+c.id+'">'+escapeHtml(crmName('client', c))+'</span>'+

@@ -4,6 +4,7 @@
   "02b-dom-morph.js",
   "02c-registry.js",
   "02d-blob-store.js",
+  "02e-tips.js",
   "03-scroll-picker.js",
   "04-defaults.js",
   "05-state-normalization.js",

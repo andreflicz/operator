@@ -15,10 +15,9 @@ function openNewPackageModal(){
 }
 function closeNewPackageModal(){ const o=document.getElementById('newPackageOverlay'); if(o) o.classList.add('hidden'); }
 function renderNewPackageModal(){
-  return '<div class="section-title" style="margin-bottom:14px;">New Package</div>'+
+  return '<div class="section-title" style="margin-bottom:14px;">New Package'+tip('You\'ll add deliverables and a description on the next screen.')+'</div>'+
     '<div class="field"><label>Name</label><input class="input" id="newPackageName" placeholder="e.g. Growth Plan" style="width:100%;"></div>'+
     '<div class="field" style="margin-top:10px;"><label>Price (optional)</label><input class="input" type="number" id="newPackagePrice" placeholder="e.g. 1500" style="width:100%;"></div>'+
-    '<div class="kpi-sub" style="margin-top:10px;">You\'ll add deliverables and a description on the next screen.</div>'+
     '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
       '<button class="btn btn-ghost" data-action="closeNewPackageModal">Cancel</button>'+
       '<button class="btn btn-primary" data-action="addPackage">Create Package</button>'+
@@ -74,7 +73,7 @@ function renderPackageEditModal(){
       '<div class="field"><label>Price (optional)</label><input class="input" type="number" id="editPackagePrice-'+pk.id+'" value="'+(pk.price||'')+'"></div>'+
       '<div class="field"><label>Description (optional)</label><input class="input" id="editPackageDesc-'+pk.id+'" value="'+escapeHtml(pk.description||'')+'"></div>'+
     '</div>'+
-    '<div class="section-title" style="margin-top:16px;margin-bottom:8px;">Deliverables<span class="kpi-sub">set a weekly pace instead of a monthly total — e.g. "Reels" at 3&times;/week</span></div>'+
+    '<div class="section-title" style="margin-top:16px;margin-bottom:8px;">Deliverables'+tip('Set a weekly pace instead of a monthly total — e.g. “Reels” at 3×/week.')+'</div>'+
     '<div class="task-list" style="margin-bottom:10px;">'+(deliverables.map(function(d){
       return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(d.title)+'</div>'+
         '<div class="row" style="gap:4px;align-items:center;"><input class="input" type="number" min="1" data-action-input="packageDeliverableTarget" data-id="'+pk.id+'" data-did="'+d.id+'" value="'+(d.weeklyTarget||1)+'" style="width:56px;text-align:center;"><span class="kpi-sub">&times;/week</span></div>'+

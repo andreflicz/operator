@@ -27,10 +27,11 @@ function deepWorkMinutesForQualifying(dateStr){
 }
 function renderFocus(){
   const tab = ui.focusTab || 'tasks';
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus</div><div class="view-sub">Manage the work itself.</div></div></div>'+
-  '<div class="tabs">'+
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus'+tip('Manage the work itself — what you\'re on now, what\'s next, the backlog and video ideas. Analytics shows where the time went.')+'</div></div></div>'+
+  '<div class="tabs tabs-with-tools">'+
     '<div class="tab '+(tab==='tasks'?'active':'')+'" data-action="focusMainTab" data-tab="tasks">Tasks</div>'+
     '<div class="tab '+(tab==='analytics'?'active':'')+'" data-action="focusMainTab" data-tab="analytics">Analytics</div>'+
+    '<div class="tabs-tools">'+(tab==='analytics' ? analyticsRangeTabs() : focusTasksSubtabsHtml())+'</div>'+
   '</div>'+
   '<div class="tab-panel" data-key="focus-'+tab+'">'+
   (tab==='analytics' ? renderFocusAnalyticsTab() : renderFocusTasksTab())+
@@ -129,7 +130,7 @@ function ongoingFrequencyLabel(freq){
 function renderOngoingTasksPanel(){
   const ongoing = state.tasks.items.filter(function(t){ return t.ongoing && t.status!=='done'; });
   if(!ongoing.length) return '';
-  return '<div class="section"><div class="section-title">Ongoing<span class="kpi-sub">Stays live until it\'s actually done</span></div>'+
+  return '<div class="section"><div class="section-title">Ongoing'+tip('Ongoing tasks stay live until they\'re actually done — check one off for today and it comes back tomorrow.')+'</div>'+
     '<div class="task-card-grid">'+ongoing.map(function(t){ return taskCard(t); }).join('')+'</div>'+
   '</div>';
 }
@@ -299,7 +300,7 @@ function renderFocusAnalytics(){
     '<div class="hero-card" style="text-align:center;"><div class="hero-num" style="color:var(--text-faint);">'+fmtDurationLabel(stasisAllTime)+'</div><div class="hero-label">All-Time Stasis</div></div>'+
   '</div></div>'+
   '<div class="section" style="max-width:300px;margin:0 auto;"><div class="stat-chip" style="text-align:center;"><div class="stat-chip-label">Deep Work, Last 7 Days</div><div class="stat-chip-value">'+fmtDurationLabel(last7Minutes)+'</div></div></div>'+
-  '<div class="section"><div class="section-title">Today\'s Breakdown<span class="kpi-sub">for reference — the totals above are what matter</span></div><div class="grid grid-5">'+
+  '<div class="section"><div class="section-title">Today\'s Breakdown'+tip('For reference — the totals above are what matter.')+'</div><div class="grid grid-5">'+
     '<div class="card" style="text-align:center;"><div class="kpi-label">Deep Work</div><div class="kpi-value" style="color:var(--accent);">'+fmtDurationLabel(todayMinutes)+'</div></div>'+
     '<div class="card" style="text-align:center;"><div class="kpi-label">Break Mode</div><div class="kpi-value" style="color:var(--info);">'+fmtDurationLabel(breakToday)+'</div></div>'+
     '<div class="card" style="text-align:center;"><div class="kpi-label">Shooting Mode</div><div class="kpi-value" style="color:var(--shoot);">'+fmtDurationLabel(shootToday)+'</div></div>'+
@@ -312,7 +313,7 @@ function renderFocusAnalytics(){
     '<div class="card"><div class="kpi-label">Longest Session</div><div class="kpi-value">'+fmtDurationLabel(longestSession)+'</div></div>'+
     '<div class="card"><div class="kpi-label">Days With A Session</div><div class="kpi-value">'+daysWithSession+'</div></div>'+
   '</div>'+
-  '<div class="card section"><div class="kpi-label">Best Time Block</div><div class="kpi-value">'+(bestBucket?bestBucket.label:'—')+'</div><div class="kpi-sub">based on all-time logged minutes</div></div>'+
+  '<div class="card section"><div class="kpi-label">Best Time Block'+tip('Based on all your logged deep work.')+'</div><div class="kpi-value">'+(bestBucket?bestBucket.label:'—')+'</div></div>'+
   '<div class="section"><div class="section-title">When You Work</div><div class="card">'+svgBarChart(buckets.map(function(b){return b.minutes;}), buckets.map(function(b){return b.label;}))+'</div></div>'+
   '<div class="section"><div class="section-title">Deep Work, Last 30 Days</div><div class="card">'+svgBarChart(minutesByDay, last30.map(function(d){return fmtDateShort(d).slice(0,3);}), {max:state.standards.deepWorkTargetMinutes})+'</div></div>'+
   renderMostUsedAppsSection()+
@@ -333,7 +334,7 @@ function renderMostUsedAppsSection(){
       '<div style="width:64px;text-align:right;flex-shrink:0;" class="kpi-sub">'+fmtDurationLabel(a.minutes)+'</div>'+
     '</div>';
   }
-  return '<div class="section"><div class="section-title">Most Used Apps<span class="kpi-sub">tracked from the foreground app on this Mac while Operator is open</span></div>'+
+  return '<div class="section"><div class="section-title">Most Used Apps'+tip('Tracked from the app in front on this Mac while Operator is open.')+'</div>'+
     '<div class="grid grid-2">'+
       '<div class="card"><div class="kind-label" style="margin-bottom:8px;">Today</div>'+
         (todayApps.length ? todayApps.map(function(a){ return barRow(a, maxToday); }).join('') : '<div class="empty">No app activity tracked yet today.</div>')+
@@ -347,7 +348,7 @@ function renderTimeByTaskSection(){
   const tracked = state.tasks.items.filter(function(t){ return (t.trackedMinutes||0)>0; })
     .sort(function(a,b){ return (b.trackedMinutes||0)-(a.trackedMinutes||0); })
     .slice(0,10);
-  return '<div class="section"><div class="section-title">Time By Task<span class="kpi-sub">based on time tracked while a task is Current/Next</span></div><div class="task-list">'+
+  return '<div class="section"><div class="section-title">Time By Task'+tip('Time tracked while a task is your Current task.')+'</div><div class="task-list">'+
     (tracked.map(function(t){
       return '<div class="task-item-v2">'+
         '<div class="task-title-row">'+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-personal">&#128204; Ongoing</span>':'')+'</div>'+
@@ -363,7 +364,7 @@ function timeBlockLabel(m){
 }
 function renderModeHistorySection(){
   const history = state.modes.history.slice().sort(function(a,b){ return b.startedAt-a.startedAt; }).slice(0,20);
-  return '<div class="section"><div class="section-title">Break, Shooting &amp; Off-Time History<span class="kpi-sub">saved permanently for day/week/month analysis</span></div><div class="task-list">'+
+  return '<div class="section"><div class="section-title">Break, Shooting &amp; Off-Time History'+tip('Saved permanently for day / week / month analysis.')+'</div><div class="task-list">'+
     (history.map(function(m){
       const label = MODE_LABELS[m.type] || 'Mode';
       const color = modeColor(m.type);

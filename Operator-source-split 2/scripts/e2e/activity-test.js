@@ -80,7 +80,7 @@ const T0 = new Date(2026,9,8,10,0).getTime();
   check('browser without a website shows a "?" on the pill', await p.isVisible('#activityPill .ap-warn'));
   await E("ui.pillMenu = null; renderPillMenu()");
   await p.click('#activityPill');
-  check('…and explains how to allow it', (await p.textContent('#activityPillMenu')).includes('Automation'));
+  check('…and explains how to allow it (behind its "?")', (await p.textContent('#activityPillMenu')).includes('website') && (await p.getAttribute('#activityPillMenu .qtip', 'data-tip')).includes('Automation'));
   check('no page errors', p.errors.length===0, p.errors);
   await b.close();
   process.exit(report()?1:0);

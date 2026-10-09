@@ -234,13 +234,13 @@ function renderJournalEntriesTab(){
   (clientsView ? renderClientJournalsAllTab() : (
   '<div class="card journal-compose-card" data-photo-drop="journal" style="text-align:center;margin-bottom:14px;">'+
     '<div style="position:relative;">'+
-      '<textarea class="input" id="journalPageText" placeholder="Write something…" style="width:100%;min-height:230px;text-align:left;padding-right:44px;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
+      '<textarea class="input" id="journalPageText" placeholder="Write something… (paste or drop images in too)" style="width:100%;min-height:230px;text-align:left;padding-right:44px;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
       '<button class="btn btn-ghost btn-sm" data-action="triggerJournalPhotoInput" title="Add Photo" style="position:absolute;top:8px;right:8px;padding:4px 7px;font-size:15px;line-height:1;">&#128247;</button>'+
     '</div>'+
     renderJournalPhotoThumbsRow()+
     renderJournalMoodChipsOnly()+
     '<div class="journal-compose-actions">'+
-      '<span class="kpi-sub">Paste or drop images into the box</span>'+
+      '<span></span>'+
       '<button class="btn btn-primary" data-action="addJournal" data-target="journalPageText">Save Entry</button>'+
     '</div>'+
   '</div>'+

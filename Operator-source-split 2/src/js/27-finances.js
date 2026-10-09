@@ -110,8 +110,7 @@ function renderInvoicesSection(){
       '<div class="task-list">'+list.map(invoiceRow).join('')+'</div>'+
     '</div>';
   }).join('');
-  return '<div class="section"><div class="section-title">Client Payments &amp; Invoices<button class="btn btn-sm" data-action="openInvoiceModal">+ Add Invoice</button></div>'+
-    '<div class="kpi-sub" style="margin-bottom:14px;">An invoice logged here counts as revenue collected for the month right away. The tax receipt attachment is just your paperwork — attach it whenever you get to it, nothing is marked paid manually. Paying off a debt above only reduces the balance, it stays listed until you remove it.</div>'+
+  return '<div class="section"><div class="section-title">Client Payments &amp; Invoices'+tip('An invoice logged here counts as revenue collected for the month right away. The tax receipt is just your paperwork — attach it whenever you get to it; nothing is marked paid by hand. Paying off a debt above only lowers its balance — it stays listed until you remove it.')+'<button class="btn btn-sm" data-action="openInvoiceModal">+ Add Invoice</button></div>'+
     (retainerClients.length ? '<div class="task-list" style="margin-bottom:14px;">'+retainerClients.map(retainerClientRow).join('')+'</div>' : '')+
     (clientGroups || (invoices.length ? '' : (retainerClients.length ? '' : '<div class="empty">Add a client above, then log invoices as you bill them.</div>')))+
     (noClient.length ? '<div class="card" style="margin-bottom:10px;"><div class="task-title-row" style="margin-bottom:8px;"><span class="task-title">Other</span></div><div class="task-list">'+noClient.map(invoiceRow).join('')+'</div></div>' : '')+
@@ -165,8 +164,8 @@ function closeAttachReceiptModal(){ ui.attachingInvoiceId = null; const o=docume
 function renderAttachReceiptModal(){
   const inv = state.finances.invoices.find(function(x){ return x.id===ui.attachingInvoiceId; });
   if(!inv) return '';
-  return '<div class="section-title" style="margin-bottom:8px;">Attach Receipt / Tax Invoice</div>'+
-    '<div class="kpi-sub" style="margin-bottom:14px;">'+escapeHtml(inv.description||'Invoice')+' &middot; $'+Number(inv.amount||0).toLocaleString()+' — already counted as revenue collected. This just files your tax paperwork for it, and it\'s the only way this gets attached (never marked manually).</div>'+
+  return '<div class="section-title" style="margin-bottom:8px;">Attach Receipt / Tax Invoice'+tip('This invoice already counts as revenue collected — attaching just files the tax paperwork for it.')+'</div>'+
+    '<div class="kpi-sub" style="margin-bottom:14px;">'+escapeHtml(inv.description||'Invoice')+' &middot; $'+Number(inv.amount||0).toLocaleString()+'</div>'+
     '<div class="field"><input class="input" type="file" id="receiptFile" accept="image/*,.pdf" style="width:100%;"></div>'+
     '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
       '<button class="btn btn-ghost" data-action="closeAttachReceiptModal">Cancel</button>'+

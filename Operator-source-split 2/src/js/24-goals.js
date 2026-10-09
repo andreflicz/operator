@@ -55,7 +55,7 @@ function renderGoalEditModal(){
       '<div class="field"><label>Tracking</label><select class="input" id="editGoalTrackMode-'+g.id+'" style="width:100%;"><option value="manual" '+(!isStreak?'selected':'')+'>I\'ll update progress myself</option><option value="streak" '+(isStreak?'selected':'')+'>Auto-track from my streak</option></select></div>'+
     '</div>'+
     (hasTracker && !isStreak ? '<div class="field" style="margin-top:10px;"><label>Current progress</label><input class="input" type="number" id="editGoalCurrent-'+g.id+'" value="'+(g.current||0)+'"></div>' : '')+
-    (isStreak ? '<div class="kpi-sub" style="margin-top:10px;">Current progress is your live streak ('+computeStreak()+' days) — no manual entry needed.</div>' : '')+
+    (isStreak ? '<div class="kpi-sub" style="margin-top:10px;">Progress = your live streak ('+computeStreak()+' days)'+tip('It updates on its own — no manual entry needed.')+'</div>' : '')+
     '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
       deleteBtn('goal', g.id)+
       '<div class="row">'+

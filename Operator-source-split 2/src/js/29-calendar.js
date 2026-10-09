@@ -41,7 +41,7 @@ function renderCalendar(){
   const sortedEvents = selInfo.events.slice().sort(function(a,b){ return (a.time||'').localeCompare(b.time||''); });
   const upcoming = buildUpcomingList(14);
 
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Calendar</div><div class="view-sub">Work blocks, calls, and task deadlines in one place.</div></div>'+
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Calendar'+tip('Work blocks, calls, events and task deadlines in one place.')+'</div></div>'+
     '<div class="row" style="gap:8px;">'+
     '<button class="btn btn-ghost btn-sm" data-action="goToAlarmSettings" title="Alarm settings" style="opacity:.65;">&#9200; Alarms</button>'+
     '<button class="btn" data-action="openUpcomingPopover">&#128197; Upcoming ('+upcoming.length+')</button>'+
@@ -105,15 +105,15 @@ function renderCalEventModal(){
     '<div class="field" style="margin-top:10px;"><label>Meeting link (optional)</label><input class="input" id="calEventMeetingLink" value="'+escapeHtml(e.meetingLink||'')+'" placeholder="Google Meet / Zoom URL" style="width:100%;"></div>'+
     '<div class="field" style="margin-top:10px;"><label>Link to client or lead (optional)</label><select class="input" id="calEventLinkedClient" style="width:100%;"><option value="">&mdash;</option>'+clientCheckboxOptions().filter(function(o){return o.value!=='personal'&&o.value!=='general';}).map(function(o){ return '<option value="'+o.value+'" '+(e.linkedClient===o.value?'selected':'')+'>'+escapeHtml(o.label)+'</option>'; }).join('')+'</select></div>'+
     '<div class="field" style="margin-top:10px;"><label>Location (optional)</label><input class="input" id="calEventLocation" value="'+escapeHtml(e.location||'')+'" placeholder="Address or place" style="width:100%;"></div>'+
-    '<label class="row" style="margin-top:12px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventSetAlarm" '+(wantsAlarm?'checked':'')+' style="margin-right:6px;">&#128276; Alarm at the event time (needs a time)</label>'+
+    '<label class="row" style="margin-top:12px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventSetAlarm" '+(wantsAlarm?'checked':'')+' style="margin-right:6px;">&#128276; Alarm at the event time'+tip('Needs a start time on the event.')+'</label>'+
     '<div class="field" style="margin-top:10px;"><label>Remind me before</label><select class="input" id="calEventRemindBefore" style="width:100%;">'+[[0,'&mdash; No extra reminder'],[10,'10 min before'],[15,'15 min before'],[30,'30 min before'],[60,'1 hour before'],[120,'2 hours before'],[1440,'1 day before']].map(function(o){ return '<option value="'+o[0]+'" '+(Number(e.remindBefore||0)===o[0]?'selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select></div>'+
     '<div class="card task-alarm-box" style="margin-top:10px;padding:12px 14px;">'+
       '<div class="kind-label" style="margin-top:0;">Getting there</div>'+
       '<div class="grid grid-2">'+
-        '<div class="field"><label>Travel time (minutes)</label><input class="input" type="number" min="0" step="5" id="calEventTravel" value="'+(e.travelMinutes||'')+'" placeholder="0"></div>'+
+        '<div class="field"><label>Travel time (minutes)'+tip('With a travel time, a “Time to leave” alarm rings at the event time minus travel.')+'</label><input class="input" type="number" min="0" step="5" id="calEventTravel" value="'+(e.travelMinutes||'')+'" placeholder="0"></div>'+
         '<div class="field"><label>Start getting ready at</label><input class="input" type="time" id="calEventReadyTime" value="'+(e.readyTime||'')+'"></div>'+
       '</div>'+
-      '<div class="kpi-sub" style="margin-top:6px;" id="calEventLeaveHint">'+(e.time && e.travelMinutes ? 'Leave alarm at '+fmt12Hour(shiftHM(e.time, -Number(e.travelMinutes)))+'.' : 'With a travel time, a "Time to leave" alarm rings at event time minus travel.')+'</div>'+
+      '<div class="kpi-sub" style="margin-top:6px;" id="calEventLeaveHint">'+(e.time && e.travelMinutes ? 'Leave alarm at '+fmt12Hour(shiftHM(e.time, -Number(e.travelMinutes)))+'.' : '')+'</div>'+
     '</div>'+
     '<label class="row" style="margin-top:12px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="calEventIsShoot" '+(e.isShoot?'checked':'')+' style="margin-right:6px;">&#127916; This is a shoot</label>'+
     '<div id="calEventShootExtra" style="display:'+(e.isShoot?'block':'none')+';margin-top:4px;">'+

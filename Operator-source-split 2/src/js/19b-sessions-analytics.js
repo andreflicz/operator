@@ -27,9 +27,9 @@ function renderSessionEditModal(){
       '<div class="field"><label>Start</label><input class="input" type="time" id="tbStart" value="'+(hasTimes?hmOf(b.startedAt):'')+'"></div>'+
       '<div class="field"><label>End</label><input class="input" type="time" id="tbEnd" value="'+(hasTimes?hmOf(b.endedAt):'')+'"></div>'+
     '</div>'+
-    '<div class="field" style="margin-top:10px;"><label>Type</label><div class="row" style="gap:6px;">'+types.map(function(t){
+    '<div class="field" style="margin-top:10px;"><label>Type'+tip('Only deep work counts toward deep-work stats. Shooting also counts toward the daily standard.')+'</label><div class="row" style="gap:6px;">'+types.map(function(t){
       return '<label class="chip'+(cur===t[0]?' active':'')+'" style="cursor:pointer;"><input type="radio" name="tbType" value="'+t[0]+'" '+(cur===t[0]?'checked':'')+' style="display:none;">'+t[1]+'</label>';
-    }).join('')+'</div><div class="kpi-sub" style="margin-top:4px;">Only deep work counts toward deep-work stats. Shooting also counts toward the daily standard.</div></div>'+
+    }).join('')+'</div></div>'+
     '<div class="field" style="margin-top:10px;"><label>Note</label><input class="input" id="tbNote" value="'+escapeHtml(b.note||'')+'" placeholder="Optional"></div>'+
     (arr(b.completedTasks).length ? '<div class="kpi-sub" style="margin-top:10px;">Finished: '+arr(b.completedTasks).map(function(t){ return escapeHtml(t.title); }).join(', ')+'</div>' : '')+
     '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
@@ -235,7 +235,7 @@ function dayDetailHtml(dateStr){
       '<div class="card"><div class="kind-label" style="margin-top:0;">Clients</div>'+(clientRows.length ? barList(clientRows, function(){ return 'var(--info)'; }, function(r){ return clientLabel(r.key); }) : '<div class="kpi-sub">Nothing attributed to clients.</div>')+
         '<div class="kind-label">Apps'+(locked && Object.keys(locked).length?' &middot; while locked in':' &middot; active time')+'</div>'+(appRows.length ? barList(appRows, function(){ return '#5b6472'; }, function(r){ return r.key; }) : '<div class="kpi-sub">No app activity recorded.</div>')+'</div>'+
     '</div>'+
-    '<div class="card" style="margin-top:14px;"><div class="kind-label" style="margin-top:0;">Sessions &amp; Blocks<span class="kpi-sub" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px;">tap to edit times or delete</span></div>'+
+    '<div class="card" style="margin-top:14px;"><div class="kind-label" style="margin-top:0;">Sessions &amp; Blocks'+tip('Click one to edit its times or delete it.')+'</div>'+
       (sessions.length ? '<div class="task-list">'+sessions.map(function(x){
         const b = x.b; const type = x.kind==='mode' ? b.type : sessionType(b);
         const tt = TIME_TYPES.find(function(q){ return q.id===type; });
@@ -252,9 +252,9 @@ function dayDetailHtml(dateStr){
 }
 function analyticsRangeTabs(){
   const r = ui.analyticsRange || 'today';
-  return '<div class="row" style="justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;"><div class="seg-tabs" style="margin:0;">'+[['today','Today'],['week','This week'],['lastweek','Last week'],['all','All time']].map(function(x){
+  return '<button class="btn btn-ghost btn-sm" data-action="openDayRecap">&#128202; Day recap</button><div class="seg-tabs" style="margin:0;">'+[['today','Today'],['week','This week'],['lastweek','Last week'],['all','All time']].map(function(x){
     return '<button class="seg-tab'+(r===x[0]?' active':'')+'" data-action="analyticsRange" data-id="'+x[0]+'">'+x[1]+'</button>';
-  }).join('')+'</div><button class="btn btn-ghost btn-sm" data-action="openDayRecap">&#128202; Day recap</button></div>';
+  }).join('')+'</div>';
 }
 ACTIONS.analyticsRange = function(el, e, id){ ui.analyticsRange = id; ui.analyticsDay = null; renderView(); };
 ACTIONS.analyticsPickDay = function(el, e, id){ if(id>todayStr()) return; ui.analyticsDay = id; renderView(); };
@@ -304,7 +304,7 @@ function renderFocusAnalyticsTab(){
   else if(r==='week') body = renderAnalyticsWeek(0);
   else if(r==='lastweek') body = renderAnalyticsWeek(-1);
   else body = renderFocusAnalytics()+renderTaskStatsSection()+renderTimeByTaskSection();
-  return analyticsRangeTabs()+'<div class="subtab-panel" data-key="analytics-'+r+'">'+body+'</div>'+
+  return '<div class="subtab-panel" data-key="analytics-'+r+'">'+body+'</div>'+
     '<div class="section" style="margin-top:16px;">'+renderManualLogForm()+'</div>';
 }
 function renderTaskStatsSection(){

@@ -70,14 +70,13 @@ function renderBoardShell(kind){
   if(!b){
     return '<div class="board-empty card">'+
       '<div style="font-size:34px;">'+meta.icon+'</div>'+
-      '<div class="section-title" style="justify-content:center;margin:8px 0 4px;">'+meta.title+'</div>'+
-      '<div class="kpi-sub" style="max-width:440px;margin:0 auto 16px;">'+meta.sub+'</div>'+
-      '<div class="row" style="justify-content:center;gap:8px;">'+
+      '<div class="section-title" style="justify-content:center;margin:8px 0 16px;">'+meta.title+tip(meta.sub)+'</div>'+
+      '<div class="row" style="justify-content:center;gap:8px;align-items:center;">'+
         '<button class="btn btn-primary" data-action="boardTemplate">&#9733; Create my vision board</button>'+
         '<button class="btn btn-ghost" data-action="boardNew" data-kind="'+kind+'">+ Blank board</button>'+
         '<button class="btn btn-ghost" data-action="boardImport">&#11014; Import boards</button>'+
+        tip('Moving from Milanote? Open a board there → ⋯ menu → Export → Markdown (or download the images), then Import here.')+
       '</div>'+
-      '<div class="kpi-sub" style="margin-top:12px;">Moving from Milanote? Open a board there &rarr; &#8943; menu &rarr; Export &rarr; Markdown (or download the images), then Import here.</div>'+
     '</div>';
   }
   const view = !!(ui.boardView && ui.boardView[kind]);
@@ -122,11 +121,11 @@ function renderBoardShell(kind){
       tool('boardZoomOut','&minus;','Zoom out')+
       tool('boardZoomIn','+','Zoom in')+
       tool('boardFit','&#9974; Fit','Fit everything')+
+      tip('Drag the background to pan · scroll to move · Ctrl/⌘ + scroll to zoom · Shift + drag to select · double-click a card to edit · paste or drop images anywhere.', 'board-help')+
       '<span style="flex:1"></span>'+
       (!(masterVisionBoard() && b.id===masterVisionBoard().id) ? tool('boardDeleteBoard','Delete board','Delete this board (and boards inside it)') : '')+
     '</div>')+
     '<div class="board-host" id="boardHost" data-photo-drop="board" data-morph-ignore="'+kind+':'+b.id+':'+(view?'v':'e')+(full?':f':'')+'"></div>'+
-    (view || full ? '' : '<div class="board-hint">Drag background to pan · scroll to move · Ctrl/⌘+scroll to zoom · Shift+drag to select · double-click a card to edit · paste or drop images</div>')+
   '</div>';
 }
 ACTIONS.boardFullscreen = function(el){
