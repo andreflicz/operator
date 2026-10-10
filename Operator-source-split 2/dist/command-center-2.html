@@ -3253,6 +3253,65 @@
   .brk-warn{ margin-top:14px; padding:10px 12px; border-radius:12px; background:rgba(255,190,90,.1); border:1px solid rgba(255,190,90,.3); color:rgba(255,236,205,.9); font-size:12.5px; line-height:1.45; text-align:left; }
   .brk-warn b{ color:#ffd38a; font-weight:700; }
   .hq::before{ display:none; } /* the glow was clipped at the page edge (a visible split) */
+  /* ---------- music dock: always in the top-right corner ---------- */
+  .md{ position:fixed; top:12px; right:16px; z-index:60; }
+  .md-in{ display:flex; align-items:center; gap:4px; padding:4px; border-radius:999px; background:rgba(14,16,24,.62); border:1px solid rgba(255,255,255,.1); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); box-shadow:0 8px 24px rgba(0,0,0,.25); }
+  html[data-theme="light"] .md-in{ background:rgba(255,255,255,.75); border-color:rgba(0,0,0,.08); }
+  .md-b{ width:28px; height:28px; border-radius:50%; border:none; display:inline-flex; align-items:center; justify-content:center; background:transparent; color:var(--text-dim); font-size:12px; font-weight:800; cursor:pointer; transition:background .15s, color .15s, transform .15s, box-shadow .2s; }
+  .md-b:hover{ background:rgba(255,255,255,.08); color:var(--text); transform:scale(1.06); }
+  .md-b.is-unset{ opacity:.45; }
+  .md-fm.is-on{ background:var(--accent); color:#1a1305; }
+  .md-sun{ font-size:14px; } .md-sun.is-on{ background:#ffc56b; color:#2a1a00; box-shadow:0 0 14px rgba(255,197,107,.55); }
+  .md-n{ color:var(--c); } .md-n.is-on{ background:var(--c); color:#0d0f14; box-shadow:0 0 14px var(--c); }
+  .md-b .wk2-eq{ transform:scale(.7); } .md-b .wk2-eq i{ background:currentColor; }
+  .md-now{ max-width:150px; padding:0 4px 0 10px; font-size:12px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .md-skip{ font-size:11px; }
+  body.np-locked-on .md{ display:none; } /* the minimal view has the player in the middle */
+  .toast-container{ top:58px !important; }
+  /* ---------- minimal locked view: the corner clock, the technique timeline, the player ---------- */
+  .np-clock{ display:flex; flex-direction:column; gap:2px; line-height:1; }
+  .np-clock-t{ display:flex; align-items:baseline; gap:5px; } .np-clock-t b{ font-family:var(--font-display); font-size:30px; font-weight:800; letter-spacing:-.02em; font-variant-numeric:tabular-nums; color:#fff; }
+  .np-clock-t span{ font-size:12px; font-weight:700; color:rgba(255,255,255,.6); }
+  .np-clock-d{ margin-top:4px; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.55); }
+  .np-clock-r{ margin-top:8px; font-size:12px; color:rgba(255,255,255,.55); }
+  .np-top{ align-items:flex-start !important; padding:26px 32px !important; }
+  .lv-out{ opacity:.7; } .lv-out:hover{ opacity:1; }
+  .np-tl{ display:flex; gap:4px; height:30px; align-items:stretch; margin-bottom:10px; }
+  .np-tl i{ position:relative; border-radius:6px; background:rgba(255,255,255,.12); overflow:hidden; display:flex; align-items:flex-end; }
+  .np-tl i u{ position:absolute; left:0; top:0; bottom:0; text-decoration:none; transition:width 1s linear; }
+  .np-tl-w u{ background:linear-gradient(90deg, rgba(255,197,107,.85), #ffc56b); } .np-tl-r u{ background:#7ef0c0; }
+  .np-tl-r{ background:rgba(126,240,192,.14) !important; }
+  .np-tl i.is-done u{ opacity:.55; }
+  .np-tl i.is-cur{ box-shadow:0 0 0 2px rgba(255,255,255,.75); }
+  .np-tl em{ position:relative; z-index:1; font-style:normal; font-size:10.5px; font-weight:800; color:rgba(0,0,0,.55); padding:0 0 4px 6px; mix-blend-mode:normal; }
+  .np-tl i:not(.is-done):not(.is-cur) em{ color:rgba(255,255,255,.45); }
+  .np-c.np-music.is-on{ background:rgba(255,255,255,.22); } .np-c .wk2-eq i{ background:#fff; }
+  .np-c-sp{ width:54px; }
+  .np-mrow{ display:flex; align-items:center; gap:6px; margin-top:16px; padding:6px 6px 6px 14px; border-radius:999px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); width:max-content; max-width:100%; }
+  .np-mnow{ font-size:13px; font-weight:600; color:rgba(255,255,255,.85); max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .np-msrc{ display:flex; gap:2px; margin-left:4px; padding-left:6px; border-left:1px solid rgba(255,255,255,.12); }
+  .np-mrow .md-b{ color:rgba(255,255,255,.7); } .np-mrow .md-n{ color:var(--c); }
+  .np-art{ position:relative; } .np-art-eq{ position:absolute; right:18px; bottom:18px; transform:scale(1.6); transform-origin:right bottom; } .np-art-eq i{ background:rgba(255,255,255,.9) !important; }
+  .lv-corner{ top:58px !important; } /* below the music dock */
+  /* ---------- the journal orb: a small glass marble with a light inside that breathes ---------- */
+  .quick-journal-fab.jorb{ position:fixed; bottom:96px; right:28px; z-index:450; width:46px; height:46px; padding:0; border:none; border-radius:50%; cursor:pointer;
+    background:radial-gradient(circle at 32% 28%, rgba(255,255,255,.55), rgba(255,255,255,.08) 34%, rgba(120,170,255,.10) 60%, rgba(160,120,255,.22) 100%);
+    box-shadow:inset 0 -6px 14px rgba(120,90,255,.25), inset 0 3px 8px rgba(255,255,255,.25), 0 10px 30px rgba(80,120,255,.25), 0 0 0 1px rgba(255,255,255,.18);
+    -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); animation:jorbFloat 6s ease-in-out infinite; transition:transform .25s cubic-bezier(.2,.9,.3,1.3); }
+  .jorb-core{ position:absolute; left:50%; top:54%; width:16px; height:16px; margin:-8px 0 0 -8px; border-radius:50%; background:radial-gradient(circle, #fff, #b9d4ff 40%, rgba(140,120,255,0) 72%); filter:blur(.5px); animation:jorbBreath 3.6s ease-in-out infinite; }
+  .jorb-shine{ position:absolute; left:10px; top:7px; width:14px; height:8px; border-radius:50%; background:rgba(255,255,255,.75); filter:blur(1.5px); transform:rotate(-25deg); }
+  .jorb-ring{ position:absolute; inset:-5px; border-radius:50%; border:1px solid rgba(170,190,255,.25); animation:jorbRing 3.6s ease-in-out infinite; }
+  .quick-journal-fab.jorb:hover{ transform:scale(1.12); } .quick-journal-fab.jorb:hover .jorb-core{ animation-duration:1.4s; }
+  @keyframes jorbFloat{ 0%, 100%{ translate:0 0; } 50%{ translate:0 -5px; } }
+  @keyframes jorbBreath{ 0%, 100%{ transform:scale(.75); opacity:.75; } 50%{ transform:scale(1.15); opacity:1; } }
+  @keyframes jorbRing{ 0%, 100%{ transform:scale(.92); opacity:0; } 50%{ transform:scale(1.08); opacity:1; } }
+  @media (prefers-reduced-motion:reduce){ .quick-journal-fab.jorb, .jorb-core, .jorb-ring{ animation:none; } }
+  /* everywhere — even over Good morning, the work preview and the full-screen views — and the note opens on top */
+  body.np-on .quick-journal-fab.jorb{ display:block !important; bottom:28px; }
+  #quickJournalOverlay{ z-index:460 !important; }
+  .snz-acts{ display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .snz-music{ border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:rgba(255,255,255,.75); border-radius:999px; padding:7px 16px; font-size:12.5px; font-weight:600; cursor:pointer; }
+  .snz-music:hover{ background:rgba(255,255,255,.12); color:#fff; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -3444,7 +3503,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
   <div id="wakeContent" class="wake-content"></div>
 </div>
 <input type="file" id="journalPhotoInput" accept="image/*" multiple style="display:none;">
-<button class="btn quick-journal-fab" data-action="openQuickJournalModal" title="Quick Journal">&#128221;</button>
+<button class="quick-journal-fab jorb" data-action="openQuickJournalModal" title="Journal — a quick note"><span class="jorb-core"></span><span class="jorb-shine"></span><span class="jorb-ring"></span></button>
 <button class="fab-add" id="fabAdd" data-action="fabAdd" title="Add"><span class="fab-sheen"></span><span class="fab-plus">+</span><i class="fab-spark s1"></i><i class="fab-spark s2"></i><i class="fab-spark s3"></i></button>
 
 <script>
@@ -7215,7 +7274,7 @@ function renderTodayFocusMode(p){
   return renderFocusQuickLinks()+
   '<div class="locked-in-header">'+
     businessNameTagHtml()+
-    '<div class="locked-in-badge">&#128274; Locked In</div>'+'<div class="lv-corner">'+focusPlayerHtml(false)+lockedViewBtnHtml()+'</div>'+
+    '<div class="locked-in-badge">&#128274; Locked In</div>'+'<div class="lv-corner">'+lockedViewBtnHtml()+'</div>'+
     '<div class="view-title" style="margin:0;">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
     (state.profile.bigClockOnToday ? (
       '<div id="liveClockBig" class="cal-big-clock" style="font-size:38px;margin-top:6px;"></div>'+
@@ -17130,6 +17189,8 @@ window.addEventListener('blur', function(){ opFocusPing(0); });
 setTimeout(function(){ opFocusPing(document.hasFocus() ? 1 : 0); }, 1500);
 function hexUtf8(str){ return Array.prototype.map.call(new TextEncoder().encode(String(str||'')), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
 function musicApp(cmd, media){
+  // transport controls go through /music/cmd (there is no /music/pause route — pausing silently failed before)
+  if(['pause','play','next','prev','playpause'].indexOf(cmd)>=0) return helperFetch(MUSIC_URL+'cmd?c='+cmd, 4000);
   return helperFetch(MUSIC_URL+cmd+(media ? '?k='+(media.k==='playlist'?'playlist':'song')+'&q='+hexUtf8(media.q) : ''), 4000, false, cmd==='play');
 }
 async function playWakeMedia(media, onFail){
@@ -20491,10 +20552,17 @@ function snoozeHtml(){
       '<div class="snz-sub">Ringing again at '+(sn ? fmtTimeShort(sn.ts) : '')+'</div>'+
       (nn.headline ? '<div class="snz-note">'+escapeHtml(nn.headline)+'</div>' : '')+
     '</div>'+
-    '<div class="snz-acts"><button class="dawn-btn" data-action="snoozeUp">&#9728;&#65039; I’m up</button></div>'+
+    '<div class="snz-acts"><button class="dawn-btn" data-action="snoozeUp">&#9728;&#65039; I’m up</button>'+
+      '<button class="snz-music" data-action="snoozeMusic" title="Pause or play whatever music is on">'+(ui.snzMusicPaused ? '&#9654; Play music' : '&#10073;&#10073; Pause music')+'</button></div>'+
   '</div>';
 }
 function tickSnooze(){ const el = document.getElementById('snzLeft'), sn = state.focus.snooze; if(el && sn) el.textContent = formatElapsed(Math.max(0, sn.ts - Date.now())); }
+// pause / play the music while snoozing (Apple Music through the launcher, or Operator's own tracks)
+ACTIONS.snoozeMusic = function(){
+  if(!ui.snzMusicPaused){ ui.snzMusicPaused = true; ui.snzFm = FM.playing; if(FM.playing) focusMusicStop(); musicApp('pause'); }
+  else { ui.snzMusicPaused = false; if(ui.snzFm) focusMusicPlay(); else musicApp('play'); }
+  renderWakeOverlayInto();
+};
 ACTIONS.snoozeUp = function(){ state.focus.snooze = null; persist('focus'); wakeImUp(); };
 
 // ---- 3 Good morning: everything on one screen ----
@@ -20512,33 +20580,27 @@ function playlistBtnHtml(){
     '<span class="plb-i">'+(on ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9654;')+'</span><span class="plb-t">'+escapeHtml(pl ? pl.q : 'Morning playlist')+'</span></button>';
 }
 function plRefresh(){ if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto(); }
-ACTIONS.stopMorningPlaylist = function(){ ui.plPlaying = false; musicApp('pause'); plRefresh(); };
 // a playlist link (Apple Music → ••• → Share → Copy Link) or its name; a link is turned into the
 // playlist's real name by the launcher, and kept so Apple Music can open it if it isn't in your library
-async function setMorningPlaylistFrom(v){
+async function setPlaylistFrom(v){
   v = String(v||'').trim();
-  if(!v){ state.profile.morningPlaylist = null; persist('profile'); return null; }
+  if(!v) return null;
   let pl = {q:v, k:'playlist'};
   if(/^(https?|music|itms):\/\//i.test(v)){
     const url = v.replace(/^(music|itms):\/\//i, 'https://'), slug = appleMusicFromLink(url);
-    pl = {q: slug && !/^pl\./i.test(slug.q) ? slug.q : 'Morning playlist', k:'playlist', url:url};
+    pl = {q: slug && !/^pl\./i.test(slug.q) ? slug.q : 'Playlist', k:'playlist', url:url};
     const r = await fetchWithin(MUSIC_URL+'resolve?u='+hexUtf8(url), 12000);
     if(r && r.ok){ try{ const j = await r.json(); if(j && j.name) pl.q = j.name; }catch(e){} }
   }
+  return pl;
+}
+async function setMorningPlaylistFrom(v){
+  const pl = await setPlaylistFrom(v);
+  if(pl && pl.q==='Playlist') pl.q = 'Morning playlist';
   state.profile.morningPlaylist = pl; persist('profile');
   return pl;
 }
-ACTIONS.playMorningPlaylist = async function(){
-  const pl = morningPlaylist(); if(!pl) return;
-  ui.plPlaying = true; plRefresh();
-  const r = await fetchWithin(MUSIC_URL+'pick?k=playlist&q='+hexUtf8(pl.q)+(pl.url ? '&u='+hexUtf8(pl.url) : ''), 12000);
-  if(r && r.ok) return;
-  ui.plPlaying = false; plRefresh();
-  let j = null; try{ j = r ? await r.json() : null; }catch(e){}
-  if(j && j.opened) showToast('“'+escapeHtml(pl.q)+'” isn’t in your library yet — it’s open in Apple Music now. Tap ＋ Add once, then it plays from here.', {icon:'&#9835;', duration:9000});
-  else if(r) showToast('No playlist called “'+escapeHtml(pl.q)+'” in your library. Paste its link in Settings → Sound instead.', {icon:'&#9888;', duration:7000});
-  else showToast('Apple Music plays through the Operator app — it isn’t reachable right now.', {icon:'&#9888;'});
-};
+// (playing and pausing it lives with the music dock)
 ACTIONS.setMorningPlaylist = async function(){
   const v = window.prompt('Your morning playlist — paste its Apple Music link (••• → Share → Copy Link), or type its exact name:', ''); if(!v || !v.trim()) return;
   await setMorningPlaylistFrom(v);
@@ -20898,13 +20960,43 @@ function nextRingLabel(){
   const day = new Date(best.ts), d = ds2(day), when = d===today ? '' : d===addDays(today, 1) ? 'Tomorrow ' : weekdayShort(d)+' ';
   return when+fmtTimeShort(best.ts)+' &middot; '+escapeHtml(best.label);
 }
+// a technique's whole session laid out as blocks (work / break), with where you are in it
+function npTimelineHtml(st){
+  if(!st || !st.m.work || typeof lockMethodSegments!=='function') return '';
+  const segs = lockMethodSegments(st.id).filter(function(x){ return x.k==='w' || x.k==='r'; });
+  const total = segs.reduce(function(a, x){ return a + x.min; }, 0);
+  let cur = st.onBreak ? 2*(st.round-1)-1 : 2*(st.round-1);
+  if(!st.m.rounds) cur = Math.min(cur, segs.length-1);
+  return '<div class="np-tl">'+segs.map(function(x, i){
+    const fill = i<cur ? 1 : i===cur ? (st.onBreak ? 1 - st.left/((x.min||1)*60000) : (st.frac||0)) : 0;
+    return '<i class="np-tl-'+x.k+(i===cur?' is-cur':'')+(i<cur?' is-done':'')+'" style="flex:'+(x.min/total).toFixed(3)+'" title="'+(x.k==='w' ? 'Round '+x.round+' · '+x.min+' min of work' : (x.long?'Long break':'Break')+' · '+x.min+' min')+'">'+
+      '<u'+(i===cur?' id="npTlFill"':'')+' style="width:'+(Math.max(0, Math.min(1, fill))*100).toFixed(1)+'%"></u><em>'+x.min+'</em></i>';
+  }).join('')+'</div>';
+}
+// the clock up in the corner: big time, small date, the next alarm underneath
+function npClockHtml(){
+  const d = new Date(), ring = nextRingLabel();
+  const t = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}), m = /^(.*?)\s*([AP]M)$/i.exec(t);
+  return '<div class="np-clock"><div class="np-clock-t"><b id="npClockT">'+(m ? m[1] : t)+'</b><span id="npClockA">'+(m ? m[2] : '')+'</span></div>'+
+    '<div class="np-clock-d" id="npClockD">'+d.toLocaleDateString(undefined, {weekday:'long', month:'short', day:'numeric'})+'</div>'+
+    (ring ? '<div class="np-clock-r">&#9200; '+ring+'</div>' : '')+'</div>';
+}
+setInterval(function(){
+  const t = document.getElementById('npClockT'); if(!t) return;
+  const d = new Date(), s = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}), m = /^(.*?)\s*([AP]M)$/i.exec(s);
+  const tt = m ? m[1] : s; if(t.textContent!==tt) t.textContent = tt;
+  const a = document.getElementById('npClockA'); if(a && m && a.textContent!==m[2]) a.textContent = m[2];
+  const f = document.getElementById('npTlFill'), st = typeof methodState==='function' ? methodState() : null;
+  if(f && st){ const fr = st.onBreak ? (function(){ const as = state.focus.activeSession, b = as.breaks[as.breaks.length-1] || {}; return b.minutes ? 1 - st.left/(b.minutes*60000) : 0; })() : (st.frac||0); f.style.width = (Math.max(0, Math.min(1, fr))*100).toFixed(1)+'%'; }
+}, 1000);
 function renderLockedMinimal(){
   const as = state.focus.activeSession, onBreak = !!as.onBreak;
   const cur = ui.currentTaskId ? state.tasks.items.find(function(t){ return t.id===ui.currentTaskId; }) : null;
   const nx = typeof nextUpTask==='function' ? nextUpTask() : null;
   const m = as.method && typeof LOCK_METHODS!=='undefined' ? LOCK_METHODS[as.method.id] : null;
+  const st = typeof methodState==='function' ? methodState() : null;
   const elapsed = onBreak ? (as.frozenElapsedMs||0) : Date.now()-as.startedAt;
-  const ring = nextRingLabel();
+  const tl = npTimelineHtml(st);
   let body;
   if(onBreak){
     const b = as.breaks[as.breaks.length-1] || {};
@@ -20915,31 +21007,34 @@ function renderLockedMinimal(){
         '<div class="np-k">On a break</div>'+
         '<div class="np-title">'+(b.note ? escapeHtml(b.note) : 'Breathe. Stretch. Look away.')+'</div>'+
         '<div class="np-sub">'+(left!=null ? 'Back at '+fmtTimeShort(as.breakEndsAt) : 'No timer — end it when you\'re ready')+'</div>'+
-        '<div class="np-prog"><div class="np-bar"><i id="npBreakBar" style="width:'+(total && left!=null ? ((1 - left/total)*100).toFixed(1) : 0)+'%"></i></div>'+
+        '<div class="np-prog">'+tl+'<div class="np-bar"><i id="npBreakBar" style="width:'+(total && left!=null ? ((1 - left/total)*100).toFixed(1) : 0)+'%"></i></div>'+
           '<div class="np-times"><span id="modeElapsed">'+formatElapsed(Date.now()-(as.breakStartedAt||Date.now()))+'</span><span id="breakRemaining">'+(left!=null ? formatElapsed(left)+' left' : '')+'</span></div></div>'+
-        '<div class="np-ctl">'+(as.breakEndsAt ? '<button class="np-c" data-action="extendBreak" data-minutes="5" title="5 more minutes">+5</button>' : '')+
-          '<button class="np-c is-main" data-action="endBreakModeFromFocus" title="End the break">&#9654;</button></div>'+
+        '<div class="np-ctl">'+(as.breakEndsAt ? '<button class="np-c" data-action="extendBreak" data-minutes="5" title="5 more minutes">+5</button>' : '<span class="np-c-sp"></span>')+
+          '<button class="np-c is-main" data-action="endBreakModeFromFocus" title="End the break">&#9654;</button>'+npMusicBtnHtml()+'</div>'+
+        npMusicRowHtml()+
       '</div>';
   } else {
     const pct = as.plannedMinutes ? Math.min(100, elapsed/(as.plannedMinutes*60000)*100) : Math.min(100, deepWorkMinutesTodayLive()/(state.standards.deepWorkTargetMinutes||180)*100);
-    body = '<div class="np-art"><span>'+(m ? m.icon : '&#128274;')+'</span></div>'+
+    body = '<div class="np-art'+(musicOn() ? ' is-music' : '')+'"><span>'+(m ? m.icon : '&#128274;')+'</span>'+(musicOn() ? '<span class="np-art-eq wk2-eq"><i></i><i></i><i></i><i></i></span>' : '')+'</div>'+
       '<div class="np-meta">'+
         '<div class="np-k">'+(m && as.method.id!=='block' ? m.label : 'Locked in')+'</div>'+
         '<div class="np-title">'+(cur ? escapeHtml(cur.title) : 'Deep work')+'</div>'+
-        '<div class="np-sub">'+(typeof methodState==='function' && methodState() ? '<span id="msLine">'+methodLine(methodState())+'</span>' : (as.plannedMinutes ? fmtDurationLabel(as.plannedMinutes)+' session' : fmtDurationLabel(deepWorkMinutesTodayLive())+' of deep work today'))+'</div>'+
-        '<div class="np-prog"><div class="np-bar"><i id="focusProgressBar" style="width:'+pct.toFixed(1)+'%"></i></div>'+
-          '<div class="np-times"><span id="focusElapsed">'+formatElapsed(elapsed)+'</span><span>'+(as.plannedMinutes ? fmtTimeShort(as.startedAt + as.plannedMinutes*60000) : '')+'</span></div></div>'+
+        '<div class="np-sub">'+(st ? '<span id="msLine">'+methodLine(st)+'</span>' : (as.plannedMinutes ? fmtDurationLabel(as.plannedMinutes)+' session' : fmtDurationLabel(deepWorkMinutesTodayLive())+' of deep work today'))+'</div>'+
+        '<div class="np-prog">'+(tl || '<div class="np-bar"><i id="focusProgressBar" style="width:'+pct.toFixed(1)+'%"></i></div>')+
+          '<div class="np-times"><span id="focusElapsed">'+formatElapsed(elapsed)+'</span><span>'+(as.plannedMinutes ? 'until '+fmtTimeShort(as.startedAt + as.plannedMinutes*60000) : '')+'</span></div></div>'+
         '<div class="np-ctl">'+
           '<button class="np-c" data-action="openBreakNotePrompt" title="Take a break">&#9749;</button>'+
           (cur ? '<button class="np-c is-main" data-action="finishCurrentTask" title="Done with this task">&#10003;</button>' : '<button class="np-c is-main" data-action="openStopFocus" title="Lock out">&#9632;</button>')+
-          '<button class="np-c" data-action="openStopFocus" title="Lock out">&#128275;</button>'+
+          npMusicBtnHtml()+
         '</div>'+
+        npMusicRowHtml()+
         (nx && (!cur || nx.id!==cur.id) ? '<div class="np-next">Up next &middot; '+escapeHtml(nx.title)+'</div>' : '')+
       '</div>';
   }
-  return '<div class="np'+(onBreak?' is-break':'')+'">'+
+  return '<div class="np np-locked'+(onBreak?' is-break':'')+'">'+
     '<div class="np-bg"></div>'+
-    '<div class="np-top"><span class="np-time" id="liveClock"></span>'+(ring ? '<span class="np-ring">&#9200; '+ring+'</span>' : '')+'<span style="flex:1"></span>'+focusPlayerHtml(true)+lockedViewBtnHtml()+'</div>'+
+    '<div class="np-top">'+npClockHtml()+'<span style="flex:1"></span>'+
+      '<button class="lv-btn lv-out" data-action="openStopFocus" title="Lock out">&#128275; Lock out</button>'+lockedViewBtnHtml()+'</div>'+
     '<div class="np-main">'+body+'</div>'+
   '</div>';
 }
@@ -21238,6 +21333,115 @@ setInterval(function(){ if(typeof state!=='undefined' && state && state.profile)
 document.addEventListener('fullscreenchange', function(){ if(!document.fullscreenElement && TF.via==='web'){ TF.via = null; } });
 ACTIONS.toggleTrueFull = function(){ state.profile.trueFull = !trueFullOn(); persist('profile'); if(!trueFullOn() && TF.want){ TF.want = false; trueFullSet(false); } renderView(); };
 ACTIONS.noop = function(){};
+// ============ MUSIC DOCK ============
+// Always up in the top-right corner, tiny: ▶ plays Operator's own generated tracks; ☀ is your
+// morning playlist; 1 · 2 · 3 are three Apple Music playlists of your choosing (each its own colour).
+// Only one thing plays at a time. In the minimal locked-in view the same controls sit under the timer.
+const DOCK_COLORS = ['#5fd4c4', '#a98bff', '#ff8fb1'];
+const SUN_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="4.3" fill="currentColor"/><path d="M12 2.6v2.3M12 19.1v2.3M2.6 12h2.3M19.1 12h2.3M5.4 5.4l1.6 1.6M17 17l1.6 1.6M5.4 18.6L7 17M17 7l1.6-1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+function userPlaylists(){
+  let p = state.profile.playlists;
+  if(!Array.isArray(p)) p = state.profile.playlists = [null, null, null];
+  while(p.length < 3) p.push(null);
+  return p;
+}
+// what's playing: 'fm' (generated), 'sun' (morning playlist), or 0/1/2 (a numbered playlist)
+function dockSrc(){ if(FM.playing) return 'fm'; return ui.amSrc!=null ? ui.amSrc : null; }
+function musicOn(){ return dockSrc()!=null; }
+function dockSrcName(){
+  const s = dockSrc();
+  if(s==='fm') return FOCUS_TRACKS[FM.idx].name;
+  if(s==='sun'){ const m = morningPlaylist(); return m ? m.q : 'Morning playlist'; }
+  if(s!=null){ const p = userPlaylists()[s]; return p ? p.q : ''; }
+  return '';
+}
+async function playApplePlaylist(pl, src){
+  if(!pl) return false;
+  if(FM.playing) focusMusicStop();
+  ui.amSrc = src; if(src==='sun') ui.plPlaying = true; dockRefresh();
+  const r = await fetchWithin(MUSIC_URL+'pick?k=playlist&q='+hexUtf8(pl.q)+(pl.url ? '&u='+hexUtf8(pl.url) : ''), 12000);
+  if(r && r.ok) return true;
+  if(ui.amSrc===src){ ui.amSrc = null; if(src==='sun') ui.plPlaying = false; }
+  dockRefresh();
+  let j = null; try{ j = r ? await r.json() : null; }catch(e){}
+  if(j && j.opened) showToast('“'+escapeHtml(pl.q)+'” isn’t in your library yet — it’s open in Apple Music now. Tap ＋ Add once, then it plays from here.', {icon:'&#9835;', duration:9000});
+  else if(r) showToast('No playlist called “'+escapeHtml(pl.q)+'” in your library. Paste its link in Settings → Sound instead.', {icon:'&#9888;', duration:7000});
+  else showToast('Apple Music plays through the Operator app — it isn’t reachable right now.', {icon:'&#9888;'});
+  return false;
+}
+function stopAppleMusic(){ if(ui.amSrc!=null){ ui.amSrc = null; ui.plPlaying = false; musicApp('pause'); } }
+// the morning playlist goes through the same path (☀ in the dock, the play button on Good morning)
+ACTIONS.playMorningPlaylist = function(){ return playApplePlaylist(morningPlaylist(), 'sun'); };
+ACTIONS.stopMorningPlaylist = function(){ stopAppleMusic(); dockRefresh(); };
+ACTIONS.dockFm = function(){
+  if(FM.playing){ focusMusicStop(); }
+  else { stopAppleMusic(); focusMusicPlay(); }
+  dockRefresh();
+};
+ACTIONS.dockSun = function(){
+  if(dockSrc()==='sun'){ stopAppleMusic(); dockRefresh(); return; }
+  if(!morningPlaylist()){ ACTIONS.setMorningPlaylist(); return; }
+  ACTIONS.playMorningPlaylist();
+};
+async function setUserPlaylist(i, v){
+  const pl = await setPlaylistFrom(v);
+  userPlaylists()[i] = pl; persist('profile');
+  return pl;
+}
+ACTIONS.dockPl = function(el, e, id){
+  const i = Number(id), pl = userPlaylists()[i];
+  if(!pl){ const v = window.prompt('Playlist '+(i+1)+' — paste its Apple Music link (••• → Share → Copy Link), or type its exact name:', ''); if(!v || !v.trim()) return; setUserPlaylist(i, v).then(function(p){ if(p) playApplePlaylist(p, i); dockRefresh(); }); return; }
+  if(dockSrc()===i){ stopAppleMusic(); dockRefresh(); return; }
+  playApplePlaylist(pl, i);
+};
+// right-click a number to change which playlist it plays
+document.addEventListener('contextmenu', function(e){
+  const b = e.target.closest && e.target.closest('[data-action="dockPl"]'); if(!b) return;
+  e.preventDefault(); e.stopPropagation();
+  const i = Number(b.dataset.id), cur = userPlaylists()[i];
+  const v = window.prompt('Playlist '+(i+1)+' — paste an Apple Music link or a name (empty to clear):', cur ? (cur.url || cur.q) : '');
+  if(v===null) return;
+  if(!v.trim()){ userPlaylists()[i] = null; persist('profile'); dockRefresh(); return; }
+  setUserPlaylist(i, v).then(dockRefresh);
+}, true);
+ACTIONS.dockNext = function(){ if(dockSrc()==='fm') ACTIONS.fmNext(); else if(dockSrc()!=null) musicApp('next'); };
+// the third button in the minimal view: music on / off (picks up whatever played last)
+ACTIONS.npMusic = function(){
+  const s = dockSrc();
+  if(s!=null){ ui.lastSrc = s; if(s==='fm') focusMusicStop(); else stopAppleMusic(); dockRefresh(); return; }
+  const last = ui.lastSrc;
+  if(last==='sun' && morningPlaylist()) ACTIONS.playMorningPlaylist();
+  else if(typeof last==='number' && userPlaylists()[last]) playApplePlaylist(userPlaylists()[last], last);
+  else { focusMusicPlay(); dockRefresh(); }
+};
+function dockBtnsHtml(){
+  const s = dockSrc(), pls = userPlaylists();
+  return '<button class="md-b md-fm'+(s==='fm'?' is-on':'')+'" data-action="dockFm" title="'+(s==='fm' ? 'Pause' : 'Play Operator’s focus tracks')+'">'+(s==='fm' ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9654;')+'</button>'+
+    '<button class="md-b md-sun'+(s==='sun'?' is-on':'')+(morningPlaylist()?'':' is-unset')+'" data-action="dockSun" title="'+(morningPlaylist() ? (s==='sun' ? 'Pause ' : 'Play ')+escapeHtml(morningPlaylist().q) : 'Pick a morning playlist')+'">'+SUN_SVG+'</button>'+
+    [0,1,2].map(function(i){ const p = pls[i]; return '<button class="md-b md-n'+(s===i?' is-on':'')+(p?'':' is-unset')+'" style="--c:'+DOCK_COLORS[i]+'" data-action="dockPl" data-id="'+i+'" title="'+(p ? (s===i ? 'Pause ' : 'Play ')+escapeHtml(p.q)+' (right-click to change)' : 'Set playlist '+(i+1))+'">'+(i+1)+'</button>'; }).join('');
+}
+function dockHtml(){
+  const name = dockSrcName();
+  return '<div class="md-in'+(musicOn()?' is-playing':'')+'">'+(name ? '<span class="md-now" title="'+escapeHtml(name)+'">'+escapeHtml(name)+'</span><button class="md-b md-skip" data-action="dockNext" title="Next">&#9197;</button>' : '')+dockBtnsHtml()+'</div>';
+}
+function npMusicBtnHtml(){ const on = musicOn(); return '<button class="np-c np-music'+(on?' is-on':'')+'" data-action="npMusic" title="'+(on ? 'Pause the music' : 'Music')+'">'+(on ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9835;')+'</button>'; }
+function npMusicRowHtml(){
+  const name = dockSrcName();
+  return '<div class="np-mrow"><span class="np-mnow">'+(name ? escapeHtml(name) : 'Music')+'</span>'+(name ? '<button class="md-b md-skip" data-action="dockNext" title="Next">&#9197;</button>' : '')+'<span class="np-msrc">'+dockBtnsHtml()+'</span></div>';
+}
+function dockRefresh(){
+  let d = document.getElementById('musicDock');
+  if(!d){ d = document.createElement('div'); d.id = 'musicDock'; d.className = 'md'; document.body.appendChild(d); }
+  const h = dockHtml(); if(d._h!==h){ d.innerHTML = h; d._h = h; }
+  const key = String(dockSrc())+'|'+dockSrcName()+'|'+JSON.stringify(userPlaylists().map(function(p){ return p ? p.q : ''; }))+'|'+(morningPlaylist() ? morningPlaylist().q : '');
+  document.querySelectorAll('.np-mrow, .np-c.np-music').forEach(function(el){ if(el.dataset.k===key) return; const n = el.classList.contains('np-mrow') ? npMusicRowHtml() : npMusicBtnHtml(); const t = document.createElement('div'); t.innerHTML = n; const nn = t.firstChild; nn.dataset.k = key; el.replaceWith(nn); });
+  const art = document.querySelector('.np-locked .np-art:not(.is-break)');
+  if(art){ const on = musicOn(); art.classList.toggle('is-music', on); const eq = art.querySelector('.np-art-eq'); if(on && !eq) art.insertAdjacentHTML('beforeend', '<span class="np-art-eq wk2-eq"><i></i><i></i><i></i><i></i></span>'); if(!on && eq) eq.remove(); }
+  if(overlayOpen('wakeOverlay') && ui.wakeMode==='brief' && ui._dockKey!==key){ ui._dockKey = key; renderWakeOverlayInto(); }
+}
+// the old player's refresh now refreshes the dock too
+fmRefresh = function(){ dockRefresh(); };
+afterRenderHooks.push(function(){ dockRefresh(); document.body.classList.toggle('np-locked-on', !!document.querySelector('#viewRoot .np-locked')); });
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

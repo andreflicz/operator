@@ -281,10 +281,17 @@ function snoozeHtml(){
       '<div class="snz-sub">Ringing again at '+(sn ? fmtTimeShort(sn.ts) : '')+'</div>'+
       (nn.headline ? '<div class="snz-note">'+escapeHtml(nn.headline)+'</div>' : '')+
     '</div>'+
-    '<div class="snz-acts"><button class="dawn-btn" data-action="snoozeUp">&#9728;&#65039; I’m up</button></div>'+
+    '<div class="snz-acts"><button class="dawn-btn" data-action="snoozeUp">&#9728;&#65039; I’m up</button>'+
+      '<button class="snz-music" data-action="snoozeMusic" title="Pause or play whatever music is on">'+(ui.snzMusicPaused ? '&#9654; Play music' : '&#10073;&#10073; Pause music')+'</button></div>'+
   '</div>';
 }
 function tickSnooze(){ const el = document.getElementById('snzLeft'), sn = state.focus.snooze; if(el && sn) el.textContent = formatElapsed(Math.max(0, sn.ts - Date.now())); }
+// pause / play the music while snoozing (Apple Music through the launcher, or Operator's own tracks)
+ACTIONS.snoozeMusic = function(){
+  if(!ui.snzMusicPaused){ ui.snzMusicPaused = true; ui.snzFm = FM.playing; if(FM.playing) focusMusicStop(); musicApp('pause'); }
+  else { ui.snzMusicPaused = false; if(ui.snzFm) focusMusicPlay(); else musicApp('play'); }
+  renderWakeOverlayInto();
+};
 ACTIONS.snoozeUp = function(){ state.focus.snooze = null; persist('focus'); wakeImUp(); };
 
 // ---- 3 Good morning: everything on one screen ----
@@ -302,33 +309,27 @@ function playlistBtnHtml(){
     '<span class="plb-i">'+(on ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9654;')+'</span><span class="plb-t">'+escapeHtml(pl ? pl.q : 'Morning playlist')+'</span></button>';
 }
 function plRefresh(){ if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto(); }
-ACTIONS.stopMorningPlaylist = function(){ ui.plPlaying = false; musicApp('pause'); plRefresh(); };
 // a playlist link (Apple Music → ••• → Share → Copy Link) or its name; a link is turned into the
 // playlist's real name by the launcher, and kept so Apple Music can open it if it isn't in your library
-async function setMorningPlaylistFrom(v){
+async function setPlaylistFrom(v){
   v = String(v||'').trim();
-  if(!v){ state.profile.morningPlaylist = null; persist('profile'); return null; }
+  if(!v) return null;
   let pl = {q:v, k:'playlist'};
   if(/^(https?|music|itms):\/\//i.test(v)){
     const url = v.replace(/^(music|itms):\/\//i, 'https://'), slug = appleMusicFromLink(url);
-    pl = {q: slug && !/^pl\./i.test(slug.q) ? slug.q : 'Morning playlist', k:'playlist', url:url};
+    pl = {q: slug && !/^pl\./i.test(slug.q) ? slug.q : 'Playlist', k:'playlist', url:url};
     const r = await fetchWithin(MUSIC_URL+'resolve?u='+hexUtf8(url), 12000);
     if(r && r.ok){ try{ const j = await r.json(); if(j && j.name) pl.q = j.name; }catch(e){} }
   }
+  return pl;
+}
+async function setMorningPlaylistFrom(v){
+  const pl = await setPlaylistFrom(v);
+  if(pl && pl.q==='Playlist') pl.q = 'Morning playlist';
   state.profile.morningPlaylist = pl; persist('profile');
   return pl;
 }
-ACTIONS.playMorningPlaylist = async function(){
-  const pl = morningPlaylist(); if(!pl) return;
-  ui.plPlaying = true; plRefresh();
-  const r = await fetchWithin(MUSIC_URL+'pick?k=playlist&q='+hexUtf8(pl.q)+(pl.url ? '&u='+hexUtf8(pl.url) : ''), 12000);
-  if(r && r.ok) return;
-  ui.plPlaying = false; plRefresh();
-  let j = null; try{ j = r ? await r.json() : null; }catch(e){}
-  if(j && j.opened) showToast('“'+escapeHtml(pl.q)+'” isn’t in your library yet — it’s open in Apple Music now. Tap ＋ Add once, then it plays from here.', {icon:'&#9835;', duration:9000});
-  else if(r) showToast('No playlist called “'+escapeHtml(pl.q)+'” in your library. Paste its link in Settings → Sound instead.', {icon:'&#9888;', duration:7000});
-  else showToast('Apple Music plays through the Operator app — it isn’t reachable right now.', {icon:'&#9888;'});
-};
+// (playing and pausing it lives with the music dock)
 ACTIONS.setMorningPlaylist = async function(){
   const v = window.prompt('Your morning playlist — paste its Apple Music link (••• → Share → Copy Link), or type its exact name:', ''); if(!v || !v.trim()) return;
   await setMorningPlaylistFrom(v);

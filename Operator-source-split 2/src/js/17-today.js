@@ -83,7 +83,7 @@ function renderTodayFocusMode(p){
   return renderFocusQuickLinks()+
   '<div class="locked-in-header">'+
     businessNameTagHtml()+
-    '<div class="locked-in-badge">&#128274; Locked In</div>'+'<div class="lv-corner">'+focusPlayerHtml(false)+lockedViewBtnHtml()+'</div>'+
+    '<div class="locked-in-badge">&#128274; Locked In</div>'+'<div class="lv-corner">'+lockedViewBtnHtml()+'</div>'+
     '<div class="view-title" style="margin:0;">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
     (state.profile.bigClockOnToday ? (
       '<div id="liveClockBig" class="cal-big-clock" style="font-size:38px;margin-top:6px;"></div>'+

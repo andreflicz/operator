@@ -45,13 +45,43 @@ function nextRingLabel(){
   const day = new Date(best.ts), d = ds2(day), when = d===today ? '' : d===addDays(today, 1) ? 'Tomorrow ' : weekdayShort(d)+' ';
   return when+fmtTimeShort(best.ts)+' &middot; '+escapeHtml(best.label);
 }
+// a technique's whole session laid out as blocks (work / break), with where you are in it
+function npTimelineHtml(st){
+  if(!st || !st.m.work || typeof lockMethodSegments!=='function') return '';
+  const segs = lockMethodSegments(st.id).filter(function(x){ return x.k==='w' || x.k==='r'; });
+  const total = segs.reduce(function(a, x){ return a + x.min; }, 0);
+  let cur = st.onBreak ? 2*(st.round-1)-1 : 2*(st.round-1);
+  if(!st.m.rounds) cur = Math.min(cur, segs.length-1);
+  return '<div class="np-tl">'+segs.map(function(x, i){
+    const fill = i<cur ? 1 : i===cur ? (st.onBreak ? 1 - st.left/((x.min||1)*60000) : (st.frac||0)) : 0;
+    return '<i class="np-tl-'+x.k+(i===cur?' is-cur':'')+(i<cur?' is-done':'')+'" style="flex:'+(x.min/total).toFixed(3)+'" title="'+(x.k==='w' ? 'Round '+x.round+' · '+x.min+' min of work' : (x.long?'Long break':'Break')+' · '+x.min+' min')+'">'+
+      '<u'+(i===cur?' id="npTlFill"':'')+' style="width:'+(Math.max(0, Math.min(1, fill))*100).toFixed(1)+'%"></u><em>'+x.min+'</em></i>';
+  }).join('')+'</div>';
+}
+// the clock up in the corner: big time, small date, the next alarm underneath
+function npClockHtml(){
+  const d = new Date(), ring = nextRingLabel();
+  const t = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}), m = /^(.*?)\s*([AP]M)$/i.exec(t);
+  return '<div class="np-clock"><div class="np-clock-t"><b id="npClockT">'+(m ? m[1] : t)+'</b><span id="npClockA">'+(m ? m[2] : '')+'</span></div>'+
+    '<div class="np-clock-d" id="npClockD">'+d.toLocaleDateString(undefined, {weekday:'long', month:'short', day:'numeric'})+'</div>'+
+    (ring ? '<div class="np-clock-r">&#9200; '+ring+'</div>' : '')+'</div>';
+}
+setInterval(function(){
+  const t = document.getElementById('npClockT'); if(!t) return;
+  const d = new Date(), s = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}), m = /^(.*?)\s*([AP]M)$/i.exec(s);
+  const tt = m ? m[1] : s; if(t.textContent!==tt) t.textContent = tt;
+  const a = document.getElementById('npClockA'); if(a && m && a.textContent!==m[2]) a.textContent = m[2];
+  const f = document.getElementById('npTlFill'), st = typeof methodState==='function' ? methodState() : null;
+  if(f && st){ const fr = st.onBreak ? (function(){ const as = state.focus.activeSession, b = as.breaks[as.breaks.length-1] || {}; return b.minutes ? 1 - st.left/(b.minutes*60000) : 0; })() : (st.frac||0); f.style.width = (Math.max(0, Math.min(1, fr))*100).toFixed(1)+'%'; }
+}, 1000);
 function renderLockedMinimal(){
   const as = state.focus.activeSession, onBreak = !!as.onBreak;
   const cur = ui.currentTaskId ? state.tasks.items.find(function(t){ return t.id===ui.currentTaskId; }) : null;
   const nx = typeof nextUpTask==='function' ? nextUpTask() : null;
   const m = as.method && typeof LOCK_METHODS!=='undefined' ? LOCK_METHODS[as.method.id] : null;
+  const st = typeof methodState==='function' ? methodState() : null;
   const elapsed = onBreak ? (as.frozenElapsedMs||0) : Date.now()-as.startedAt;
-  const ring = nextRingLabel();
+  const tl = npTimelineHtml(st);
   let body;
   if(onBreak){
     const b = as.breaks[as.breaks.length-1] || {};
@@ -62,31 +92,34 @@ function renderLockedMinimal(){
         '<div class="np-k">On a break</div>'+
         '<div class="np-title">'+(b.note ? escapeHtml(b.note) : 'Breathe. Stretch. Look away.')+'</div>'+
         '<div class="np-sub">'+(left!=null ? 'Back at '+fmtTimeShort(as.breakEndsAt) : 'No timer — end it when you\'re ready')+'</div>'+
-        '<div class="np-prog"><div class="np-bar"><i id="npBreakBar" style="width:'+(total && left!=null ? ((1 - left/total)*100).toFixed(1) : 0)+'%"></i></div>'+
+        '<div class="np-prog">'+tl+'<div class="np-bar"><i id="npBreakBar" style="width:'+(total && left!=null ? ((1 - left/total)*100).toFixed(1) : 0)+'%"></i></div>'+
           '<div class="np-times"><span id="modeElapsed">'+formatElapsed(Date.now()-(as.breakStartedAt||Date.now()))+'</span><span id="breakRemaining">'+(left!=null ? formatElapsed(left)+' left' : '')+'</span></div></div>'+
-        '<div class="np-ctl">'+(as.breakEndsAt ? '<button class="np-c" data-action="extendBreak" data-minutes="5" title="5 more minutes">+5</button>' : '')+
-          '<button class="np-c is-main" data-action="endBreakModeFromFocus" title="End the break">&#9654;</button></div>'+
+        '<div class="np-ctl">'+(as.breakEndsAt ? '<button class="np-c" data-action="extendBreak" data-minutes="5" title="5 more minutes">+5</button>' : '<span class="np-c-sp"></span>')+
+          '<button class="np-c is-main" data-action="endBreakModeFromFocus" title="End the break">&#9654;</button>'+npMusicBtnHtml()+'</div>'+
+        npMusicRowHtml()+
       '</div>';
   } else {
     const pct = as.plannedMinutes ? Math.min(100, elapsed/(as.plannedMinutes*60000)*100) : Math.min(100, deepWorkMinutesTodayLive()/(state.standards.deepWorkTargetMinutes||180)*100);
-    body = '<div class="np-art"><span>'+(m ? m.icon : '&#128274;')+'</span></div>'+
+    body = '<div class="np-art'+(musicOn() ? ' is-music' : '')+'"><span>'+(m ? m.icon : '&#128274;')+'</span>'+(musicOn() ? '<span class="np-art-eq wk2-eq"><i></i><i></i><i></i><i></i></span>' : '')+'</div>'+
       '<div class="np-meta">'+
         '<div class="np-k">'+(m && as.method.id!=='block' ? m.label : 'Locked in')+'</div>'+
         '<div class="np-title">'+(cur ? escapeHtml(cur.title) : 'Deep work')+'</div>'+
-        '<div class="np-sub">'+(typeof methodState==='function' && methodState() ? '<span id="msLine">'+methodLine(methodState())+'</span>' : (as.plannedMinutes ? fmtDurationLabel(as.plannedMinutes)+' session' : fmtDurationLabel(deepWorkMinutesTodayLive())+' of deep work today'))+'</div>'+
-        '<div class="np-prog"><div class="np-bar"><i id="focusProgressBar" style="width:'+pct.toFixed(1)+'%"></i></div>'+
-          '<div class="np-times"><span id="focusElapsed">'+formatElapsed(elapsed)+'</span><span>'+(as.plannedMinutes ? fmtTimeShort(as.startedAt + as.plannedMinutes*60000) : '')+'</span></div></div>'+
+        '<div class="np-sub">'+(st ? '<span id="msLine">'+methodLine(st)+'</span>' : (as.plannedMinutes ? fmtDurationLabel(as.plannedMinutes)+' session' : fmtDurationLabel(deepWorkMinutesTodayLive())+' of deep work today'))+'</div>'+
+        '<div class="np-prog">'+(tl || '<div class="np-bar"><i id="focusProgressBar" style="width:'+pct.toFixed(1)+'%"></i></div>')+
+          '<div class="np-times"><span id="focusElapsed">'+formatElapsed(elapsed)+'</span><span>'+(as.plannedMinutes ? 'until '+fmtTimeShort(as.startedAt + as.plannedMinutes*60000) : '')+'</span></div></div>'+
         '<div class="np-ctl">'+
           '<button class="np-c" data-action="openBreakNotePrompt" title="Take a break">&#9749;</button>'+
           (cur ? '<button class="np-c is-main" data-action="finishCurrentTask" title="Done with this task">&#10003;</button>' : '<button class="np-c is-main" data-action="openStopFocus" title="Lock out">&#9632;</button>')+
-          '<button class="np-c" data-action="openStopFocus" title="Lock out">&#128275;</button>'+
+          npMusicBtnHtml()+
         '</div>'+
+        npMusicRowHtml()+
         (nx && (!cur || nx.id!==cur.id) ? '<div class="np-next">Up next &middot; '+escapeHtml(nx.title)+'</div>' : '')+
       '</div>';
   }
-  return '<div class="np'+(onBreak?' is-break':'')+'">'+
+  return '<div class="np np-locked'+(onBreak?' is-break':'')+'">'+
     '<div class="np-bg"></div>'+
-    '<div class="np-top"><span class="np-time" id="liveClock"></span>'+(ring ? '<span class="np-ring">&#9200; '+ring+'</span>' : '')+'<span style="flex:1"></span>'+focusPlayerHtml(true)+lockedViewBtnHtml()+'</div>'+
+    '<div class="np-top">'+npClockHtml()+'<span style="flex:1"></span>'+
+      '<button class="lv-btn lv-out" data-action="openStopFocus" title="Lock out">&#128275; Lock out</button>'+lockedViewBtnHtml()+'</div>'+
     '<div class="np-main">'+body+'</div>'+
   '</div>';
 }
