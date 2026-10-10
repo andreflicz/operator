@@ -89,7 +89,7 @@ function nextQuote(kind){ ui.qOff = ui.qOff || {}; ui.qOff[kind] = (ui.qOff[kind
 ACTIONS.nextQuote = function(el, e, id){ nextQuote(id); };
 setInterval(function(){
   if(typeof ui==='undefined' || !ui) return;
-  if(overlayOpen('wakeOverlay') && ui.wakeMode==='brief' && ui.briefSkipped) nextQuote('morning');
+  if(overlayOpen('wakeOverlay') && ui.wakeMode==='brief' && briefBuilt()) nextQuote('morning');
   if(overlayOpen('planOverlay')){ nextQuote('work'); setTimeout(function(){ nextQuote('action'); }, 9000); }
 }, 45000);
 // small, human things for a good day — three a morning
@@ -139,26 +139,40 @@ async function fetchWithin(url, ms){
   const ctl = new AbortController(), tm = setTimeout(function(){ ctl.abort(); }, ms);
   try{ const r = await fetch(url, {cache:'no-store', signal:ctl.signal}); clearTimeout(tm); return r; }catch(e){ clearTimeout(tm); return null; }
 }
-async function loadMorningNews(){
-  if(!morningNewsOn()) return;
-  const today = todayStr();
-  if(ui.morningNews && ui.morningNews.date===today && (ui.morningNews.items || ui.morningNews.loading)) return;
-  ui.morningNews = {date:today, loading:true, items:null};
+// the morning paper: your headlines, plus a sports and a tech section (each one is just topics —
+// change them in Settings → Wake-up alarm; empty a section to drop it)
+function sectionTopics(v, dflt){ return String(v==null ? dflt : v).split(',').map(function(x){ return x.trim(); }).filter(Boolean).join(', '); }
+function newsSections(){
+  const w = wakeCfg();
+  return [{id:'sports', label:'Sports', icon:'&#127936;', q:sectionTopics(w.newsSports, 'NBA, NFL')}, {id:'tech', label:'Tech', icon:'&#128187;', q:sectionTopics(w.newsTech, 'AI, Apple, startups')}].filter(function(x){ return x.q; });
+}
+async function fetchNews(topics){
   let items = null;
   try{
-    const topics = newsTopics();
     const res = await fetchWithin(WAKE_HELPER+'news'+(topics ? '?q='+hexUtf8(topics) : ''), 9000);
     if(res && res.ok) items = parseRss(await res.text());
   }catch(e){}
   if(!items || !items.length){
     // an Operator still running last version's launcher has no /news — read the feed another way
     try{
-      const topics = newsTopics(), feed = topics ? 'https://news.google.com/rss/search?q='+encodeURIComponent(topicsQuery(topics))+'&hl=en-US&gl=US&ceid=US:en' : 'https://feeds.npr.org/1001/rss.xml';
+      const feed = topics ? 'https://news.google.com/rss/search?q='+encodeURIComponent(topicsQuery(topics))+'&hl=en-US&gl=US&ceid=US:en' : 'https://feeds.npr.org/1001/rss.xml';
       const res = await fetchWithin('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(feed), 8000);
       if(res && res.ok){ const j = await res.json(); items = arr(j && j.items).slice(0, 6).map(function(x){ return splitSource({title:String(x.title||'').trim(), link:String(x.link||''), src:topics ? '' : 'NPR'}); }).filter(function(x){ return x.title; }); }
     }catch(e){}
   }
-  ui.morningNews = {date:today, loading:false, items:items && items.length ? items : null};
+  return items && items.length ? items : null;
+}
+async function loadMorningNews(){
+  if(!morningNewsOn()) return;
+  const today = todayStr();
+  if(ui.morningNews && ui.morningNews.date===today && (ui.morningNews.items || ui.morningNews.loading)) return;
+  ui.morningNews = {date:today, loading:true, items:null, sec:{}};
+  const secs = newsSections();
+  const all = await Promise.all([fetchNews(newsTopics())].concat(secs.map(function(x){ return fetchNews(x.q); })));
+  const items = all[0], seen = {}, sec = {};
+  arr(items).forEach(function(n){ seen[n.title] = 1; });
+  secs.forEach(function(x, i){ const list = arr(all[i+1]).filter(function(n){ if(seen[n.title]) return false; seen[n.title] = 1; return true; }); if(list.length) sec[x.id] = list; });
+  ui.morningNews = {date:today, loading:false, items:items, sec:sec};
   if(ui.morningNews.items && ui.wakeMode==='brief' && overlayOpen('wakeOverlay')){
     // it arrived after the page started building: give it its moment instead of popping in
     ui.briefNewsAt = Date.now();
@@ -279,6 +293,25 @@ ACTIONS.setMorningPlaylist = function(){
   if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto();
   ACTIONS.playMorningPlaylist();
 };
+// you, lately: streak, training, weight, and something you wrote a while back
+function briefMemory(){
+  const today = todayStr(), es = arr(state.journal.entries).filter(function(e){ return e.text && e.date < addDays(today, -6); });
+  if(!es.length) return null;
+  const want = [365, 180, 90, 30, 14, 7];
+  for(let i=0;i<want.length;i++){ const d = addDays(today, -want[i]), hit = es.find(function(e){ return e.date===d; }); if(hit) return {e:hit, ago:want[i]}; }
+  const pinned = es.filter(function(e){ return e.pinned; }), pool = pinned.length ? pinned : es, e = pool[dayNum() % pool.length];
+  return {e:e, ago:Math.round((Date.parse(today) - Date.parse(e.date))/86400000)};
+}
+function agoLabel(n){ return n>=365 ? 'A year ago' : n>=170 ? 'Six months ago' : n>=85 ? 'Three months ago' : n>=28 ? 'A month ago' : n>=14 ? 'Two weeks ago' : n+' days ago'; }
+function briefYouHtml(){
+  const streak = computeStreak(), wk = typeof workoutsThisWeek==='function' ? workoutsThisWeek() : 0, wp = typeof weightProgress==='function' ? weightProgress() : {};
+  const tiles = [['&#128293;', streak, streak===1 ? 'day streak' : 'day streak'], ['&#127947;&#65039;', wk, 'workouts this week']];
+  if(wp.latest!=null) tiles.push(['&#9878;&#65039;', wp.latest, wp.goal!=null ? 'lbs &middot; goal '+wp.goal : 'lbs']);
+  const mem = briefMemory();
+  const memHtml = mem ? '<div class="br-mem"><small>'+agoLabel(mem.ago)+' you wrote</small><p>'+(mem.e.title ? '<b>'+escapeHtml(mem.e.title)+'</b> ' : '')+escapeHtml(String(mem.e.text).slice(0, 140))+(String(mem.e.text).length > 140 ? '…' : '')+'</p></div>' : '';
+  return {voice: mem ? 'And a little something from you, '+agoLabel(mem.ago).toLowerCase()+'.' : 'Here’s where you’re at.',
+    html:'<div class="br-k">&#128100; You, Lately</div><div class="br-you-t">'+tiles.map(function(t){ return '<div><span>'+t[0]+'</span><b>'+t[1]+'</b><small>'+t[2]+'</small></div>'; }).join('')+'</div>'+memHtml};
+}
 function wakeBriefHtml(){
   const today = todayStr(), name = state.profile.name || '';
   const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
@@ -294,13 +327,14 @@ function wakeBriefHtml(){
   // as it arrives. Delays are fixed when a piece first appears (re-renders keep the same node, so
   // nothing plays twice); skipping the intro shifts the whole schedule earlier.
   const cine = wakeCfg().intro!=='quick';
-  const base = briefBase(), gap = 2300;
+  const base = briefBase();
   const sunLine = mNow < win.rise ? 'The sun comes up at '+fmtMinOfDay(win.rise)+'.' : mNow < win.set ? 'The sun’s been up since '+fmtMinOfDay(win.rise)+'.' : '';
   const lines = [];
-  let k = 0;
+  // each piece waits until its line of narration has been said and had a moment to sink in
+  let k = 0, tcur = base;
   const panel = function(cls, anim, voice, html, extraStyle, attrs){
-    const d = base + (k++)*gap;
-    if(voice) lines.push({at: d - 380, text: voice});
+    const d = tcur; k++;
+    if(voice){ lines.push({at: d - 380, text: voice}); tcur += Math.max(2800, voice.split(' ').length*BRIEF_WORD_MS + 1800); } else tcur += 1200;
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
   const slept = lastNightSleep();
@@ -315,28 +349,35 @@ function wakeBriefHtml(){
   if(nn.headline || nn.morning) colA.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+
     (nn.headline ? '<div class="br-ln-head">'+escapeHtml(nn.headline)+'</div>' : '')+(nn.morning ? '<div class="br-ln-text">'+escapeHtml(nn.morning)+'</div>' : '')));
   else if(vb && vb.elements.length) colA.push(panel('br-vision', 'br-a-scale', 'And this is what it’s all for.', boardStaticHtml(vb, 'wake-board'), '', ' data-action="wakeBoardToggle" title="Open your vision board"'));
+  const you = briefYouHtml();
+  if(you) colA.push(panel('br-you', 'br-a-rise', you.voice, you.html));
   // column 2: a line to carry, and a few small things for a good day
   colB.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
   colB.push(panel('br-thoughts', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+
     thoughtsOfDay(4).map(function(x, i){ return '<div class="br-th" style="--i:'+i+'"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')));
   // column 3: the world, then the day ahead
   if(news){
-    const d0 = base + k*gap, late = ui.briefNewsAt ? Math.max(600, d0 - (ui.briefNewsAt - (ui.briefT0||0))) : null;
-    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there.', '<div class="br-k">&#128240; '+(newsTopics() ? 'Your News <span class="br-src">'+escapeHtml(newsTopics())+'</span>' : 'The News'+(news[0].src ? ' <span class="br-src">'+escapeHtml(news[0].src)+'</span>' : ''))+'</div>'+
-      news.slice(0, 6).map(function(n, i){ return '<button class="br-news-i'+(i===0?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+escapeHtml(n.title)+(n.src && newsTopics() ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; }).join(''), late!=null ? ';--late:'+late+'ms' : ''));
+    const d0 = tcur, late = ui.briefNewsAt ? Math.max(600, d0 - (ui.briefNewsAt - (ui.briefT0||0))) : null;
+    const sec = (ui.morningNews && ui.morningNews.sec) || {}, secs = newsSections().filter(function(x){ return sec[x.id]; });
+    const item = function(n, i, top){ return '<button class="br-news-i'+(top?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+escapeHtml(n.title)+(n.src ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; };
+    colC.push(panel('br-news', 'br-a-rise', secs.length ? 'Here’s what’s happening — the news, '+secs.map(function(x){ return x.label.toLowerCase(); }).join(' and ')+'.' : 'Here’s what’s happening out there.',
+      '<div class="br-k">&#128240; '+(newsTopics() ? 'Your News' : 'Headlines')+'</div>'+
+      news.slice(0, secs.length ? 3 : 6).map(function(n, i){ return item(n, i, i===0); }).join('')+
+      secs.map(function(x){ return '<div class="br-news-sec"><div class="br-news-h">'+x.icon+' '+x.label+'<span>'+escapeHtml(x.q)+'</span></div>'+sec[x.id].slice(0, 3).map(function(n, i){ return item(n, i, false); }).join('')+'</div>'; }).join(''),
+      late!=null ? ';--late:'+late+'ms' : ''));
   } else if(morningNewsOn() && ui.morningNews && ui.morningNews.loading){
-    colC.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+(base + k*gap)+'ms"><div class="br-k">&#128240; The News</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');
+    colC.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">&#128240; The News</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');
   }
   // the day ahead — just the calendar; the work plan waits for the business preview
-  colC.push(panel('br-day', 'br-a-right', events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.',
+  colB.push(panel('br-day', 'br-a-right', events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.',
     '<div class="br-k">&#128197; Today</div>'+
     (events.length ? '<div class="br-agenda">'+events.slice(0, 3).map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b>'+escapeHtml(e.title)+'</div>'; }).join('')+'</div>' : '<div class="br-day-plan">Nothing scheduled. Enjoy the morning.</div>')));
-  const ctaD = base + k*gap;
+  const ctaD = tcur;
   lines.push({at: ctaD - 380, text: 'Get ready to start your day.'});
   ui.briefLines = lines;
   const shift = ui.briefShift || 0;
   const w = wakeCfg(), song = (wakeFinishing || wakeAudio || wakeMusicApp) && w.media ? mediaName(w.media) : '';
-  return '<div class="brief brief2 brief3 brief4'+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
+  return '<div class="brief brief2 brief3 brief4 bg-'+(wakeCfg().briefBg==='dark' ? 'dark' : 'sunrise')+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
     (cine
       ? '<div class="brief-intro is-cinematic" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div>'+
           '<div class="bi-time">'+timeStr+'</div>'+
@@ -346,9 +387,9 @@ function wakeBriefHtml(){
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner b4">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        '<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+playlistBtnHtml()+'</span>'+
-        // one button: Skip while it's still building, then ✕ to close
-        (ui.briefSkipped ? '<button class="brief-x" data-action="wakeBriefDone" title="Close">&#10005;</button>' : '<button class="brief-skipall" data-action="briefSkip" title="Show everything now">Skip &#9197;</button>')+'</div>'+
+        '<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : playlistBtnHtml())+'</span>'+
+        // one button: Skip takes you straight to the app
+        '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
       '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
       '<div class="br-voice br-p br-a-fade" style="--d:'+(base-700)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
       '<div class="b4-grid"><div class="b4-col">'+colA.join('')+'</div><div class="b4-col">'+colB.join('')+'</div><div class="b4-col">'+colC.join('')+'</div></div>'+
@@ -370,6 +411,8 @@ ACTIONS.wakeIntroSkip = function(){
 };
 // ---- the narration: one line at a time, typed out ----
 let briefVoiceTimer = null;
+const BRIEF_WORD_MS = 340; // about 175 words a minute — an easy, unhurried read
+function briefBuilt(){ const l = ui.briefLines || []; return !!l.length && Date.now() - (ui.briefT0||0) > l[l.length-1].at + 2000; }
 function briefVoiceRun(){
   clearInterval(briefVoiceTimer);
   briefVoiceTimer = setInterval(function(){
@@ -380,7 +423,7 @@ function briefVoiceRun(){
     if(ui.briefSkipped && lines.length) cur = lines[lines.length-1];
     // a word at a time, at a calm reading pace (it used to type letter by letter, too fast)
     const words = cur ? cur.text.split(' ') : [];
-    const txt = cur ? (ui.briefSkipped ? cur.text : words.slice(0, Math.max(0, Math.floor((t - cur.at)/240) + 1)).join(' ')) : '';
+    const txt = cur ? (ui.briefSkipped ? cur.text : words.slice(0, Math.max(0, Math.floor((t - cur.at)/BRIEF_WORD_MS) + 1)).join(' ')) : '';
     if(el.textContent!==txt) el.textContent = txt;
     const wrap = el.parentNode; if(wrap) wrap.classList.toggle('is-typing', !!cur && txt.length < cur.text.length);
     // as the narration reaches each piece, bring it into view if it's below the fold
@@ -392,7 +435,12 @@ function briefVoiceRun(){
     }
   }, 120);
 }
-ACTIONS.briefSkip = function(){ ui.wakeIntroDone = true; ui.briefSkipped = true; renderWakeOverlayInto(); };
+// Skip: the page lifts away and you're on the front page
+ACTIONS.briefSkip = function(){
+  ui.wakeIntroDone = true; ui.briefSkipped = true;
+  const b = document.querySelector('#wakeContent .brief'); if(b) b.classList.add('is-leaving');
+  setTimeout(function(){ if(ui.wakeMode==='brief') endBriefing(); }, 420);
+};
 
 // ---- 5 Start work: the work intro, then straight into Lock in ----
 function clockIn(opts){

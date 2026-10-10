@@ -241,6 +241,9 @@ function normalizeWake(f){
     }
     f.alarms = arr(f.alarms).filter(function(a){ return a!==rep && !((a.wake || a.kind==='wake') && a.date); });
   }
+  // keep everything else you've set (news topics, sections, background…) — newer settings
+  // aren't listed above and used to be dropped on every load
+  Object.keys(w).forEach(function(k){ if(!(k in out)) out[k] = w[k]; });
   return out;
 }
 function normalizeFocus(f){
