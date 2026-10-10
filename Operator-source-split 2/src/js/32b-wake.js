@@ -649,7 +649,8 @@ function checkBreakTimer(){
     endBreakModeFromFocus();
     playSessionComplete();
     pingWrapper();
-    showToast('Break\'s over — back to it.', {icon:'&#9201;', duration:6000});
+    const mm = as.method && typeof LOCK_METHODS!=='undefined' ? LOCK_METHODS[as.method.id] : null;
+    showToast(mm && mm.work ? 'Round '+(as.round||2)+(mm.rounds ? ' of '+mm.rounds : '')+'. Back to it.' : 'Break\'s over. Back to it.', {icon:'&#9201;', duration:6000});
     try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Break is over'); }catch(e){}
   }
 }

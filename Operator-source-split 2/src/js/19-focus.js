@@ -88,7 +88,8 @@ function renderActiveFocusHero(big){
     const breakInfo = active.breaks[active.breaks.length-1];
     timerCardInner = '<div class="kpi-label" style="color:var(--info);">'+modeIcon('break')+' ON BREAK</div>'+
       '<div class="hero-num '+sizeClass+hoursCls(Date.now()-(active.breakStartedAt||Date.now()))+'" id="modeElapsed" style="color:var(--info);">'+formatElapsed(Date.now()-(active.breakStartedAt||Date.now()))+'</div>'+
-      (breakInfo&&breakInfo.note ? '<div class="kpi-sub">'+escapeHtml(breakInfo.note)+'</div>' : '')+
+      (breakInfo&&breakInfo.note&&!active.method ? '<div class="kpi-sub">'+escapeHtml(breakInfo.note)+'</div>' : '')+
+      (typeof methodStripHtml==='function' ? methodStripHtml(active) : '')+
       (active.breakEndsAt ? '<div class="break-remaining" id="breakRemaining">'+formatElapsed(Math.max(0, active.breakEndsAt-Date.now()))+' left</div>' : '')+
       '<div class="row" style="justify-content:center;gap:6px;margin-top:10px;">'+
         (active.breakEndsAt ? '<button class="btn btn-ghost btn-sm" data-action="extendBreak" data-minutes="5">+5 min</button>' : '')+
@@ -98,9 +99,14 @@ function renderActiveFocusHero(big){
     const dwTarget = state.standards.deepWorkTargetMinutes || 180;
     const liveToday = deepWorkMinutesTodayLive();
     const openPct = clamp(Math.round((liveToday/dwTarget)*100),0,100);
+    const strip = typeof methodStripHtml==='function' ? methodStripHtml(active) : '';
     timerCardInner = '<div class="hero-num '+sizeClass+hoursCls(elapsed)+'" id="focusElapsed">'+formatElapsed(elapsed)+'</div>'+
-      '<div class="progress"><div class="progress-bar'+(openPct>=100?' good':'')+'" id="focusProgressBar" style="width:'+openPct+'%"></div></div>'+
-      '<div class="kpi-sub">Open-ended &middot; '+fmtDurationLabel(liveToday)+' of '+fmtDurationLabel(dwTarget)+' today\'s goal</div>'+
+      // a technique gets its own single bar instead of the plain progress bar
+      (strip ? strip : active.plannedMinutes
+        ? '<div class="progress"><div class="progress-bar" id="focusProgressBar" style="width:'+pct+'%"></div></div>'+
+          '<div class="kpi-sub">'+fmtDurationLabel(active.plannedMinutes)+' session &middot; ends around '+fmtTimeShort(active.startedAt + active.plannedMinutes*60000)+'</div>'
+        : '<div class="progress"><div class="progress-bar'+(openPct>=100?' good':'')+'" id="focusProgressBar" style="width:'+openPct+'%"></div></div>'+
+          '<div class="kpi-sub">Open-ended &middot; '+fmtDurationLabel(liveToday)+' of '+fmtDurationLabel(dwTarget)+' today\'s goal</div>')+
       '<div class="row" style="margin-top:8px;justify-content:center;">'+
         '<button class="btn btn-ghost btn-sm" data-action="openBreakNotePrompt">'+modeIcon('break')+' Break Mode</button>'+
       '</div>';
@@ -512,6 +518,7 @@ function startFocus(minutes){
   if(state.modes.active && !state.modes.active.linkedFocus) finishActiveMode(true);
   if(state.modes.active) return;
   state.focus.activeSession = {startedAt: Date.now(), plannedMinutes: minutes || null, completedTasks:[], breaks:[], onBreak:false, completeFired:false};
+  if(ui.pendingLockMethod){ state.focus.activeSession.method = ui.pendingLockMethod; state.focus.activeSession.round = 1; state.focus.activeSession.segStart = 0; }
   if(ui.stagedTaskId){
     const st = state.tasks.items.find(function(x){return x.id===ui.stagedTaskId;});
     if(st){ ui.currentTaskId = ui.stagedTaskId; ui.currentTaskStartedAt = Date.now(); }

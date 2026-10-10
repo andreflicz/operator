@@ -123,6 +123,7 @@ function startFocusTicker(){
     checkBreakTimer();
     checkMethodTimer();
     if(!as) return;
+    tickMethodStrip();
     if(as.onBreak){
       return;
     }

@@ -173,9 +173,29 @@ const RESET_TARGETS = [
 // Dragging shows a small pill under the cursor (a number or a dot + the name) instead of a
 // see-through screenshot of the whole card; the card it came from dims while it's in the air.
 const DRAG_DOT = {high:'#ff6b6b', med:'#e8a23d', low:'#8a90a2'};
+// one glowing line where the dragged thing will land (above or below that row)
+function markDropLine(sel, row, below){
+  document.querySelectorAll(sel+'.drop-above, '+sel+'.drop-below').forEach(function(x){ if(x!==row) x.classList.remove('drop-above', 'drop-below'); });
+  if(row){ row.classList.toggle('drop-below', !!below); row.classList.toggle('drop-above', !below); }
+}
+document.addEventListener('dragend', function(){ document.body.classList.remove('is-list-drag'); });
+document.addEventListener('drop', function(){ setTimeout(function(){ document.body.classList.remove('is-list-drag'); }, 0); });
+// dragging near the top or bottom of a scrolling list scrolls it, so you can reach the far end
+let dragScrollAt = 0;
+document.addEventListener('dragover', function(e){
+  const now = Date.now(); if(now - dragScrollAt < 16) return; dragScrollAt = now;
+  let el = e.target && e.target.nodeType===1 ? e.target : null;
+  while(el && el!==document.body){ const cs = getComputedStyle(el); if(/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 2) break; el = el.parentElement; }
+  if(!el || el===document.body) return;
+  const r = el.getBoundingClientRect(), edge = Math.min(80, r.height/4);
+  if(e.clientY < r.top + edge) el.scrollTop -= Math.ceil((r.top + edge - e.clientY)/6);
+  else if(e.clientY > r.bottom - edge) el.scrollTop += Math.ceil((e.clientY - (r.bottom - edge))/6);
+});
 function dragGhost(e, label, opts){
   opts = opts || {};
   if(opts.src){ const src = opts.src; src.classList.add('is-drag-src'); src.addEventListener('dragend', function(){ src.classList.remove('is-drag-src'); }, {once:true}); }
+  // while something's in the air, every list shows its gaps as faint lines; the one you'd drop into glows
+  document.body.classList.add('is-list-drag');
   if(!e.dataTransfer || !e.dataTransfer.setDragImage) return;
   const g = document.createElement('div');
   g.className = 'drag-ghost';

@@ -2610,6 +2610,68 @@
   .settings-shell.is-compact .settings-content .field label{ font-size:11.5px; margin-bottom:4px; }
   .settings-shell.is-compact .settings-content .task-item-v2{ padding:8px 12px; }
   .settings-shell.is-compact .settings-nav-item{ padding:9px 12px; }
+
+  /* ================= ROUND 12 ================= */
+  /* Lock in: method details */
+  .ls-about{ text-align:center; color:rgba(255,255,255,.72); font-size:15px; line-height:1.55; max-width:560px; margin:2px auto 14px; animation:lsRow .4s both; }
+  .ls-preview{ position:relative; height:46px; padding:12px 0; }
+  .ls-preview i, .ms-bar i{ position:relative; cursor:default; }
+  .ls-preview i:hover{ filter:brightness(1.25); box-shadow:0 0 0 2px rgba(255,255,255,.55); }
+  .ls-preview i[data-tip]:hover::after, .ms-bar i[data-tip]:hover::after{ content:attr(data-tip); position:absolute; left:50%; bottom:calc(100% + 10px); transform:translateX(-50%); white-space:nowrap; padding:7px 11px; border-radius:10px; background:rgba(14,15,22,.96); border:1px solid rgba(255,255,255,.14); color:#fff; font-size:12.5px; font-weight:600; letter-spacing:0; box-shadow:0 10px 30px rgba(0,0,0,.45); z-index:5; pointer-events:none; animation:tipIn .14s ease both; }
+  .ls-preview i[data-when]:hover::before{ content:attr(data-when); position:absolute; left:50%; top:calc(100% + 6px); transform:translateX(-50%); white-space:nowrap; font-size:11px; font-weight:700; color:#ffc56b; font-variant-numeric:tabular-nums; pointer-events:none; }
+  @keyframes tipIn{ from{ opacity:0; transform:translate(-50%, 4px); } to{ opacity:1; transform:translate(-50%, 0); } }
+  .ls-legend{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px 18px; margin-top:12px; font-size:13px; color:rgba(255,255,255,.6); }
+  .ls-legend b{ color:#fff; font-weight:700; } .ls-legend i{ display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:7px; vertical-align:-1px; }
+  .lsl-w{ background:#e8a23d; } .lsl-r{ background:rgba(63,190,142,.8); }
+  .ls-legend-h{ color:rgba(255,255,255,.35); font-size:12px; }
+  .ls-mcard span:last-child{ letter-spacing:.01em; }
+  /* Lock in: rows can move with arrows too */
+  .ls-moves{ display:inline-flex; gap:2px; flex:none; }
+  .ls-moves .wd-ctl{ opacity:.35; transition:opacity .15s; } .ls-row:hover .ls-moves .wd-ctl:not([disabled]){ opacity:1; }
+  .ls-inner{ scroll-padding:40px; }
+  /* Drag and drop: while something's in the air, the list shows its slots; the landing spot glows */
+  .wd-row, .ls-row, .tl-row{ position:relative; }
+  body.is-list-drag .wd-list .wd-row::before, body.is-list-drag .tl-list .tl-row::before{ content:''; position:absolute; left:14px; right:14px; top:-5px; height:2px; border-radius:2px; background:rgba(255,255,255,.08); pointer-events:none; transition:background .12s; }
+  .wd-row.drop-above::before, .wd-row.drop-below::after, .tl-row.drop-above::before, .tl-row.drop-below::after{ content:''; position:absolute; left:6px; right:6px; height:3px; border-radius:3px; background:#ffc56b !important; box-shadow:0 0 0 3px rgba(232,162,61,.18), 0 0 14px rgba(255,197,107,.8); pointer-events:none; z-index:2; }
+  .wd-row.drop-above::before, .tl-row.drop-above::before{ top:-6px; } .wd-row.drop-below::after, .tl-row.drop-below::after{ bottom:-6px; top:auto; }
+  .wd:not(.ls) .wd-row.drop-above::before, .wd:not(.ls) .wd-row.drop-below::after{ background:#a3acff !important; box-shadow:0 0 0 3px rgba(143,155,255,.18), 0 0 14px rgba(163,172,255,.8); }
+  .is-drag-src{ opacity:.35 !important; outline:1.5px dashed rgba(255,255,255,.35); outline-offset:-2px; }
+  /* Wind down: centered like Lock in */
+  .wd:not(.ls) .wd-inner{ display:flex; flex-direction:column; justify-content:safe center; max-width:760px; }
+  .wd:not(.ls) .wd-title-h{ text-align:center; } .wd:not(.ls) .wd-sub{ text-align:center; }
+  .wd:not(.ls) .wd-inner > *{ width:100%; }
+  /* the stamp holds the screen while the locked-in page draws underneath, then lifts */
+  .lock-flash.is-hold{ animation:none; background:radial-gradient(ellipse at 50% 45%, rgba(63,190,142,.18), transparent 60%), rgba(5,6,10,.97); transition:opacity .6s ease, backdrop-filter .6s ease; }
+  .lock-flash.is-hold.is-leaving{ opacity:0; }
+  .lock-flash.is-hold .lf-ring{ animation:lfRing 1.4s cubic-bezier(.2,.8,.2,1) forwards; } .lock-flash .lf-ring.is-2{ animation-delay:.35s !important; opacity:0; }
+  /* the method on the locked-in timer */
+  .ms{ margin:6px auto 12px; max-width:340px; width:100%; display:flex; flex-direction:column; align-items:center; gap:7px; }
+  .ms-k{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#e8a23d; }
+  .ms.is-break .ms-k{ color:var(--info); }
+  .ms-bar{ display:flex; gap:3px; width:100%; height:8px; }
+  .ms-bar i{ border-radius:4px; background:rgba(127,127,127,.18); overflow:visible; }
+  .ms-bar i u{ display:block; height:100%; border-radius:4px; text-decoration:none; transition:width 1s linear; }
+  .ms-bar .ms-w u{ background:linear-gradient(90deg, #e8a23d, #ffc56b); } .ms-bar .ms-r u{ background:#3fbe8e; }
+  .ms-bar i.is-cur{ box-shadow:0 0 0 1.5px rgba(232,162,61,.55); } .ms-bar .ms-r.is-cur{ box-shadow:0 0 0 1.5px rgba(63,190,142,.6); }
+  .ms-line{ font-size:13px; color:var(--text-dim); font-variant-numeric:tabular-nums; } .ms-line b{ color:var(--text); }
+  .ms-btn{ margin-top:2px; }
+  /* the technique, explained as a card */
+  .ls-about{ display:grid; grid-template-columns:auto 1fr; gap:22px; align-items:center; text-align:left; max-width:none; margin:4px 0 16px; padding:18px 22px; border-radius:18px;
+    background:linear-gradient(120deg, rgba(232,162,61,.10), rgba(255,255,255,.025) 55%); border:1px solid rgba(232,162,61,.22); animation:lsRow .45s cubic-bezier(.2,.9,.3,1.15) both; }
+  .ls-about-id{ display:flex; align-items:center; gap:12px; padding-right:22px; border-right:1px solid rgba(255,255,255,.08); }
+  .ls-about-i{ width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; background:rgba(232,162,61,.14); box-shadow:inset 0 0 0 1px rgba(232,162,61,.3); }
+  .ls-about-id b{ display:block; font-family:var(--font-display); font-size:18px; color:#fff; } .ls-about-id span{ font-size:12px; color:#ffc56b; letter-spacing:.02em; }
+  .ls-about-txt{ display:grid; grid-template-columns:1.4fr 1fr; gap:20px; }
+  .ls-about-k{ display:block; font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.45); margin-bottom:5px; } .ls-about-k.is-best{ color:#7ef0c0; }
+  .ls-about-txt p{ margin:0; font-size:14px; line-height:1.5; color:rgba(255,255,255,.82); }
+  @media (max-width:760px){ .ls-about{ grid-template-columns:1fr; } .ls-about-id{ border-right:none; padding-right:0; } .ls-about-txt{ grid-template-columns:1fr; gap:10px; } }
+  /* one slim bar + one line on the timer */
+  .ms{ gap:8px; margin:10px auto 6px; max-width:300px; }
+  .ms-bar{ height:5px; gap:2px; } .ms-bar i, .ms-bar i u{ border-radius:3px; }
+  .ms-bar i.is-cur{ box-shadow:none; } .ms-bar .ms-w:not(.is-cur):not(:has(u[style*="100"])){ opacity:.8; }
+  .ms-line{ display:flex; flex-wrap:wrap; justify-content:center; gap:2px 8px; font-size:12.5px; line-height:1.4; }
+  .ms-k{ font-size:12.5px; font-weight:700; letter-spacing:0; text-transform:none; }
+  .ms-k::after{ content:'·'; margin-left:8px; color:var(--text-dim); font-weight:400; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -3015,9 +3077,29 @@ const RESET_TARGETS = [
 // Dragging shows a small pill under the cursor (a number or a dot + the name) instead of a
 // see-through screenshot of the whole card; the card it came from dims while it's in the air.
 const DRAG_DOT = {high:'#ff6b6b', med:'#e8a23d', low:'#8a90a2'};
+// one glowing line where the dragged thing will land (above or below that row)
+function markDropLine(sel, row, below){
+  document.querySelectorAll(sel+'.drop-above, '+sel+'.drop-below').forEach(function(x){ if(x!==row) x.classList.remove('drop-above', 'drop-below'); });
+  if(row){ row.classList.toggle('drop-below', !!below); row.classList.toggle('drop-above', !below); }
+}
+document.addEventListener('dragend', function(){ document.body.classList.remove('is-list-drag'); });
+document.addEventListener('drop', function(){ setTimeout(function(){ document.body.classList.remove('is-list-drag'); }, 0); });
+// dragging near the top or bottom of a scrolling list scrolls it, so you can reach the far end
+let dragScrollAt = 0;
+document.addEventListener('dragover', function(e){
+  const now = Date.now(); if(now - dragScrollAt < 16) return; dragScrollAt = now;
+  let el = e.target && e.target.nodeType===1 ? e.target : null;
+  while(el && el!==document.body){ const cs = getComputedStyle(el); if(/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 2) break; el = el.parentElement; }
+  if(!el || el===document.body) return;
+  const r = el.getBoundingClientRect(), edge = Math.min(80, r.height/4);
+  if(e.clientY < r.top + edge) el.scrollTop -= Math.ceil((r.top + edge - e.clientY)/6);
+  else if(e.clientY > r.bottom - edge) el.scrollTop += Math.ceil((e.clientY - (r.bottom - edge))/6);
+});
 function dragGhost(e, label, opts){
   opts = opts || {};
   if(opts.src){ const src = opts.src; src.classList.add('is-drag-src'); src.addEventListener('dragend', function(){ src.classList.remove('is-drag-src'); }, {once:true}); }
+  // while something's in the air, every list shows its gaps as faint lines; the one you'd drop into glows
+  document.body.classList.add('is-list-drag');
   if(!e.dataTransfer || !e.dataTransfer.setDragImage) return;
   const g = document.createElement('div');
   g.className = 'drag-ghost';
@@ -7417,7 +7499,8 @@ function renderActiveFocusHero(big){
     const breakInfo = active.breaks[active.breaks.length-1];
     timerCardInner = '<div class="kpi-label" style="color:var(--info);">'+modeIcon('break')+' ON BREAK</div>'+
       '<div class="hero-num '+sizeClass+hoursCls(Date.now()-(active.breakStartedAt||Date.now()))+'" id="modeElapsed" style="color:var(--info);">'+formatElapsed(Date.now()-(active.breakStartedAt||Date.now()))+'</div>'+
-      (breakInfo&&breakInfo.note ? '<div class="kpi-sub">'+escapeHtml(breakInfo.note)+'</div>' : '')+
+      (breakInfo&&breakInfo.note&&!active.method ? '<div class="kpi-sub">'+escapeHtml(breakInfo.note)+'</div>' : '')+
+      (typeof methodStripHtml==='function' ? methodStripHtml(active) : '')+
       (active.breakEndsAt ? '<div class="break-remaining" id="breakRemaining">'+formatElapsed(Math.max(0, active.breakEndsAt-Date.now()))+' left</div>' : '')+
       '<div class="row" style="justify-content:center;gap:6px;margin-top:10px;">'+
         (active.breakEndsAt ? '<button class="btn btn-ghost btn-sm" data-action="extendBreak" data-minutes="5">+5 min</button>' : '')+
@@ -7427,9 +7510,14 @@ function renderActiveFocusHero(big){
     const dwTarget = state.standards.deepWorkTargetMinutes || 180;
     const liveToday = deepWorkMinutesTodayLive();
     const openPct = clamp(Math.round((liveToday/dwTarget)*100),0,100);
+    const strip = typeof methodStripHtml==='function' ? methodStripHtml(active) : '';
     timerCardInner = '<div class="hero-num '+sizeClass+hoursCls(elapsed)+'" id="focusElapsed">'+formatElapsed(elapsed)+'</div>'+
-      '<div class="progress"><div class="progress-bar'+(openPct>=100?' good':'')+'" id="focusProgressBar" style="width:'+openPct+'%"></div></div>'+
-      '<div class="kpi-sub">Open-ended &middot; '+fmtDurationLabel(liveToday)+' of '+fmtDurationLabel(dwTarget)+' today\'s goal</div>'+
+      // a technique gets its own single bar instead of the plain progress bar
+      (strip ? strip : active.plannedMinutes
+        ? '<div class="progress"><div class="progress-bar" id="focusProgressBar" style="width:'+pct+'%"></div></div>'+
+          '<div class="kpi-sub">'+fmtDurationLabel(active.plannedMinutes)+' session &middot; ends around '+fmtTimeShort(active.startedAt + active.plannedMinutes*60000)+'</div>'
+        : '<div class="progress"><div class="progress-bar'+(openPct>=100?' good':'')+'" id="focusProgressBar" style="width:'+openPct+'%"></div></div>'+
+          '<div class="kpi-sub">Open-ended &middot; '+fmtDurationLabel(liveToday)+' of '+fmtDurationLabel(dwTarget)+' today\'s goal</div>')+
       '<div class="row" style="margin-top:8px;justify-content:center;">'+
         '<button class="btn btn-ghost btn-sm" data-action="openBreakNotePrompt">'+modeIcon('break')+' Break Mode</button>'+
       '</div>';
@@ -7841,6 +7929,7 @@ function startFocus(minutes){
   if(state.modes.active && !state.modes.active.linkedFocus) finishActiveMode(true);
   if(state.modes.active) return;
   state.focus.activeSession = {startedAt: Date.now(), plannedMinutes: minutes || null, completedTasks:[], breaks:[], onBreak:false, completeFired:false};
+  if(ui.pendingLockMethod){ state.focus.activeSession.method = ui.pendingLockMethod; state.focus.activeSession.round = 1; state.focus.activeSession.segStart = 0; }
   if(ui.stagedTaskId){
     const st = state.tasks.items.find(function(x){return x.id===ui.stagedTaskId;});
     if(st){ ui.currentTaskId = ui.stagedTaskId; ui.currentTaskStartedAt = Date.now(); }
@@ -15763,6 +15852,7 @@ function startFocusTicker(){
     checkBreakTimer();
     checkMethodTimer();
     if(!as) return;
+    tickMethodStrip();
     if(as.onBreak){
       return;
     }
@@ -16485,7 +16575,8 @@ function checkBreakTimer(){
     endBreakModeFromFocus();
     playSessionComplete();
     pingWrapper();
-    showToast('Break\'s over — back to it.', {icon:'&#9201;', duration:6000});
+    const mm = as.method && typeof LOCK_METHODS!=='undefined' ? LOCK_METHODS[as.method.id] : null;
+    showToast(mm && mm.work ? 'Round '+(as.round||2)+(mm.rounds ? ' of '+mm.rounds : '')+'. Back to it.' : 'Break\'s over. Back to it.', {icon:'&#9201;', duration:6000});
     try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Break is over'); }catch(e){}
   }
 }
@@ -18711,12 +18802,12 @@ afterRenderHooks.push(function(){ if(typeof state!=='undefined' && state && stat
 // picked. The timer starts after the "Locked in" stamp, not under it.
 const LOCK_STEPS = [['task','Task'],['method','Method'],['prep','Set up'],['why','Why']];
 const LOCK_METHODS = {
-  block:     {label:'Single block', icon:'&#127919;', sub:'One stretch, your length'},
-  pomodoro:  {label:'Pomodoro', icon:'&#127813;', sub:'25 on · 5 off · ×4', work:25, rest:5, long:15, every:4, rounds:4},
-  '5217':    {label:'52 / 17', icon:'&#9203;', sub:'52 on · 17 off, repeat', work:52, rest:17},
-  ultradian: {label:'90 / 20', icon:'&#127754;', sub:'90 on · 20 off, repeat', work:90, rest:20},
-  flow:      {label:'Flowtime', icon:'&#127744;', sub:'Go till you dip · break ⅕ of it'},
-  done:      {label:'Until it\'s done', icon:'&#9989;', sub:'Ends when the task does'}
+  block:     {label:'Single Block', icon:'&#127919;', sub:'One Stretch, Your Length', how:'One focused stretch, as long as you set. No breaks unless you take one.', best:'Deep work with a clear finish line'},
+  pomodoro:  {label:'Pomodoro', icon:'&#127813;', sub:'25 On · 5 Off · 4 Rounds', work:25, rest:5, long:15, every:4, rounds:4, how:'Four 25-minute sprints with a 5-minute breather between each. Breaks start and end by themselves.', best:'Getting started on things you\'ve been putting off'},
+  '5217':    {label:'52 / 17', icon:'&#9203;', sub:'52 On · 17 Off · Repeats', work:52, rest:17, how:'52 minutes on, 17 off, on repeat. Long enough to go deep, with real rest between.', best:'Full workdays, so you\'re still sharp in the afternoon'},
+  ultradian: {label:'90 / 20', icon:'&#127754;', sub:'90 On · 20 Off · Repeats', work:90, rest:20, how:'90 minutes on, 20 off. Rides your body\'s natural 90-minute energy cycle.', best:'Hard, creative work that needs a long runway'},
+  flow:      {label:'Flowtime', icon:'&#127744;', sub:'No Timer · Break When You Dip', how:'No clock cutting you off. Work until focus fades, then rest about a fifth of what you did.', best:'When you\'re already in the zone'},
+  done:      {label:'Until It\'s Done', icon:'&#9989;', sub:'Ends With the Task', how:'No timer at all. The session ends the moment the task is ticked off.', best:'One thing that just has to get finished'}
 };
 const LOCK_METHOD_ORDER = ['block','pomodoro','5217','ultradian','flow','done'];
 function lockTaskPick(id){ return id ? state.tasks.items.find(function(t){ return t.id===id && t.status!=='done'; }) || null : null; }
@@ -18812,16 +18903,19 @@ function lockGo(){
   closeLockSeq();
   // the stamp plays first; the clock starts when it's done
   ui.lockStarting = true;
-  playLockIn(); lockFlash(t, method);
+  playLockIn(); const cover = lockFlash(t, method);
+  if(typeof playLockInSong==='function') playLockInSong();
+  // The stamp covers the whole window while the page underneath turns into the locked-in
+  // screen; it only lifts once that's drawn, so you never see the switch happen.
   setTimeout(function(){
     ui.lockStarting = false;
     ui.stagedTaskId = t ? t.id : null;
     if(nx){ state.focus.nextTaskId = nx.id; }
+    ui.view = 'today';
+    ui.pendingLockMethod = {id:method, taskId:t ? t.id : null};
     startFocus(planned);
-    const as = state.focus.activeSession; if(!as) return;
-    as.method = {id:method, taskId:t ? t.id : null};
-    as.round = 1; as.segStart = 0;
-    persist('focus'); renderView();
+    ui.pendingLockMethod = null;
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ cover.classList.add('is-leaving'); setTimeout(function(){ if(cover.parentNode) cover.parentNode.removeChild(cover); }, 650); }); });
   }, LOCK_FLASH_MS);
 }
 const LOCK_FLASH_MS = 1500;
@@ -18829,16 +18923,17 @@ const LOCK_FLASH_MS = 1500;
 function lockFlash(t, method){
   const m = LOCK_METHODS[method];
   const d = document.createElement('div');
-  d.className = 'lock-flash';
-  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#128274; Locked in</div>'+(t ? '<div class="lf-t">'+escapeHtml(t.title)+'</div>' : '')+(m && method!=='block' ? '<div class="lf-m">'+m.icon+' '+m.label+'</div>' : '');
+  d.className = 'lock-flash is-hold';
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-ring is-2"></div><div class="lf-k">&#128274; Locked In</div>'+(t ? '<div class="lf-t">'+escapeHtml(t.title)+'</div>' : '')+(m && method!=='block' ? '<div class="lf-m">'+m.icon+' '+m.label+'</div>' : '');
   document.body.appendChild(d);
-  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 1900);
+  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 6000); // safety
+  return d;
 }
 // locking out gets its own stamp: what you just put in
 function lockOutFlash(minutes, done){
   const d = document.createElement('div');
   d.className = 'lock-flash is-out';
-  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#128275; Locked out</div><div class="lf-t">'+fmtDurationLabel(minutes)+' of deep work'+(done ? ' &middot; '+done+' task'+(done===1?'':'s')+' done' : '')+'</div>';
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#128275; Locked Out</div><div class="lf-t">'+fmtDurationLabel(minutes)+' of deep work'+(done ? ' &middot; '+done+' task'+(done===1?'':'s')+' done' : '')+'</div>';
   document.body.appendChild(d);
   setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 2100);
 }
@@ -18848,13 +18943,75 @@ function checkMethodTimer(){
   if(!as || !as.method || as.onBreak) return;
   const m = LOCK_METHODS[as.method.id]; if(!m || !m.work) return;
   const worked = Date.now() - as.startedAt;
-  if(worked - (as.segStart||0) < m.work*60000) return;
   const round = as.round || 1;
+  const leftMs = m.work*60000 - (worked - (as.segStart||0));
+  if(leftMs > 0){
+    // a soft heads-up a minute out, so the break doesn't cut a thought in half
+    if(leftMs <= 60000 && as.warnedRound!==round && m.work>=5){
+      as.warnedRound = round; persist('focus');
+      playStep(1);
+      const last = m.rounds && round>=m.rounds;
+      showToast(last ? 'One minute left in your last round.' : 'One minute, then a '+(m.long && m.every && round%m.every===0 ? m.long : m.rest)+' min break. Wrap up the thought.', {icon:m.icon, duration:6000});
+    }
+    return;
+  }
   if(m.rounds && round >= m.rounds) return; // the last round ends the session (Time's up)
   const rest = m.long && m.every && round % m.every===0 ? m.long : m.rest;
-  methodBreak(rest, m.label+' · break '+round);
   as.round = round + 1;
-  persist('focus');
+  methodBreak(rest, m.label+' · break '+round);
+}
+// what the method is doing right now, for the locked-in timer card (updated every second)
+function methodState(as){
+  as = as || state.focus.activeSession;
+  if(!as || !as.method || !LOCK_METHODS[as.method.id] || as.method.id==='block') return null;
+  const id = as.method.id, m = LOCK_METHODS[id], round = as.round || 1;
+  const st = {id:id, m:m, round:round, onBreak:!!as.onBreak};
+  if(m.work){
+    if(as.onBreak){ st.left = Math.max(0, (as.breakEndsAt||Date.now()) - Date.now()); }
+    else { const inSeg = (Date.now() - as.startedAt) - (as.segStart||0); st.inSeg = inSeg; st.left = Math.max(0, m.work*60000 - inSeg); st.frac = Math.min(1, inSeg/(m.work*60000)); }
+    st.last = !!(m.rounds && round>=m.rounds);
+  } else if(id==='flow' && !as.onBreak){ st.inSeg = (Date.now() - as.startedAt) - (as.segStart||0); st.earned = flowBreakMinutes(); }
+  return st;
+}
+function methodLine(st){
+  const m = st.m;
+  if(m.work){
+    const r = 'Round '+(st.onBreak ? st.round-1 : st.round)+(m.rounds ? ' of '+m.rounds : '');
+    if(st.onBreak) return r+' done · Round '+st.round+' up next';
+    return r+' · '+(st.last ? 'Last round, <b>'+formatElapsed(st.left)+'</b> to go' : 'Break in <b>'+formatElapsed(st.left)+'</b>');
+  }
+  if(st.id==='flow') return st.onBreak ? 'Resting · back when you\'re ready' : 'In the flow for <b>'+formatElapsed(st.inSeg||0)+'</b> · break earned: <b>'+(st.earned||5)+' min</b>';
+  const as = state.focus.activeSession, t = as && lockTaskPick(as.method.taskId);
+  return t ? 'Until <b>'+escapeHtml(t.title)+'</b> is done' : 'Until it\'s done';
+}
+function methodStripHtml(as){
+  const st = methodState(as); if(!st) return '';
+  const m = st.m;
+  let bar = '';
+  if(m.rounds){
+    const segs = lockMethodSegments(st.id), total = segs.reduce(function(a, x){ return a + x.min; }, 0);
+    // which piece are we in? work round r is piece 2(r-1); its break is the next one
+    const cur = st.onBreak ? 2*(st.round-1)-1 : 2*(st.round-1);
+    bar = '<div class="ms-bar">'+segs.map(function(x, i){
+      const fill = i<cur ? 1 : i===cur ? (st.onBreak ? 1 - st.left/((x.min||1)*60000) : (st.frac||0)) : 0;
+      return '<i class="ms-'+x.k+(i===cur?' is-cur':'')+'" style="flex:'+(x.min/total).toFixed(3)+'" data-tip="'+(x.k==='w' ? 'Round '+x.round+' · '+x.min+' min' : (x.long?'Long break':'Break')+' · '+x.min+' min')+'"><u'+(i===cur?' id="msFill"':'')+' style="width:'+(Math.max(0, Math.min(1, fill))*100).toFixed(1)+'%"></u></i>';
+    }).join('')+'</div>';
+  } else if(m.work && !st.onBreak){
+    bar = '<div class="ms-bar"><i class="ms-w is-cur" style="flex:1" data-tip="This round · '+m.work+' min, then '+m.rest+' min off"><u id="msFill" style="width:'+((st.frac||0)*100).toFixed(1)+'%"></u></i></div>';
+  }
+  return '<div class="ms'+(st.onBreak?' is-break':'')+'">'+bar+'<div class="ms-line"><span class="ms-k">'+m.icon+' '+m.label+'</span><span id="msLine">'+methodLine(st)+'</span></div>'+
+    (st.id==='flow' && !st.onBreak ? '<button class="btn btn-ghost btn-sm ms-btn" data-action="openBreakNotePrompt">Take my '+(st.earned||5)+' min</button>' : '')+'</div>';
+}
+function tickMethodStrip(){
+  const line = document.getElementById('msLine'); if(!line) return;
+  const st = methodState(); if(!st) return;
+  const html = methodLine(st); if(line.innerHTML!==html) line.innerHTML = html;
+  const f = document.getElementById('msFill');
+  if(f){
+    let fr = st.frac;
+    if(st.onBreak){ const as = state.focus.activeSession, b = as.breaks && as.breaks[as.breaks.length-1]; fr = b && b.minutes ? 1 - st.left/(b.minutes*60000) : null; }
+    if(fr!=null) f.style.width = (Math.max(0, Math.min(1, fr))*100).toFixed(1)+'%';
+  }
 }
 function methodBreak(minutes, note){
   const as = state.focus.activeSession; if(!as || as.onBreak) return;
@@ -18869,7 +19026,7 @@ function methodBreak(minutes, note){
   if(ui.currentTaskId){ ui.pausedTaskId = ui.currentTaskId; accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   ui.pendingCurrentTaskId = null;
   playRestSound(); pingWrapper();
-  showToast('Round done — '+minutes+' min break. It ends by itself.', {icon:'&#9749;', duration:7000});
+  showToast('Round done. '+minutes+' min break: stand up, look out a window. It ends by itself.', {icon:'&#9749;', duration:8000});
   try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: '+minutes+' min break'); }catch(e){}
   persist('focus'); persist('modes'); renderView();
 }
@@ -18905,10 +19062,23 @@ document.addEventListener('dragstart', function(e){
   const n = r.querySelector('.wd-num'), t = r.querySelector('.wd-title');
   dragGhost(e, t ? t.textContent : '', {num: n ? n.textContent : null, src: r});
 });
-document.addEventListener('dragover', function(e){ if(ui.lockSeq && ui.lockSeq.dragId && e.target.closest && e.target.closest('.ls-row')) e.preventDefault(); });
+document.addEventListener('dragover', function(e){
+  if(!ui.lockSeq || !ui.lockSeq.dragId || !e.target.closest) return;
+  const r = e.target.closest('.ls-row'); if(!r) return;
+  e.preventDefault();
+  const rect = r.getBoundingClientRect(); markDropLine('.ls-row', r, e.clientY > rect.top + rect.height/2);
+});
+document.addEventListener('dragend', function(){ if(ui.lockSeq) ui.lockSeq.dragId = null; markDropLine('.ls-row', null); });
+ACTIONS.lockMove = function(el, e, id){
+  const ids = lockLineup().map(function(t){ return t.id; }), i = ids.indexOf(id), j = i + Number(el.dataset.dir);
+  if(i<0 || j<0 || j>=ids.length) return;
+  ids.splice(i, 1); ids.splice(j, 0, id);
+  state.focus.lineupOrder = ids.concat(arr(state.focus.lineupOrder).filter(function(x){ return ids.indexOf(x)<0; }));
+  persist('focus'); playDrop(); renderLockSeqInto();
+};
 document.addEventListener('drop', function(e){
   const r = e.target.closest && e.target.closest('.ls-row'); if(!r || !ui.lockSeq || !ui.lockSeq.dragId) return;
-  e.preventDefault();
+  e.preventDefault(); markDropLine('.ls-row', null);
   const id = ui.lockSeq.dragId, rect = r.getBoundingClientRect(); ui.lockSeq.dragId = null;
   if(id===r.dataset.id) return;
   const ids = lockLineup().map(function(t){ return t.id; }).filter(function(x){ return x!==id; });
@@ -18923,13 +19093,15 @@ function lockTaskHtml(){
   const q = (s.search||'').toLowerCase();
   const pool = sortByPriorityAndDeadline(state.tasks.items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea && (!q || t.title.toLowerCase().indexOf(q)>=0); })).slice(0, 10);
   return '<div class="ls-task">'+
-    (lineup.length ? '<ol class="wd-list ls-list">'+lineup.slice(0, 10).map(function(t, i){
+    (lineup.length ? '<ol class="wd-list ls-list">'+lineup.map(function(t, i){
       const isNow = t.id===s.nowId, isNext = t.id===s.nextId;
       return '<li class="wd-row ls-row'+(isNow?' is-now':'')+(isNext?' is-next':'')+'" draggable="true" data-id="'+t.id+'" style="animation-delay:'+(i*45)+'ms">'+
         '<span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+
         '<button class="ls-row-main" data-action="lockSetNow" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span class="wd-title">'+escapeHtml(t.title)+'</span></button>'+
         '<span class="ls-slots"><button class="ls-slot ls-slot-now'+(isNow?' is-on':'')+'" data-action="lockSetNow" data-id="'+t.id+'">Now</button>'+
-          '<button class="ls-slot ls-slot-next'+(isNext?' is-on':'')+'" data-action="lockSetNext" data-id="'+t.id+'">Next</button></span></li>';
+          '<button class="ls-slot ls-slot-next'+(isNext?' is-on':'')+'" data-action="lockSetNext" data-id="'+t.id+'">Next</button></span>'+
+        '<span class="ls-moves"><button class="wd-ctl" data-action="lockMove" data-id="'+t.id+'" data-dir="-1" title="Move up"'+(i===0?' disabled':'')+'>&#8593;</button>'+
+          '<button class="wd-ctl" data-action="lockMove" data-id="'+t.id+'" data-dir="1" title="Move down"'+(i===lineup.length-1?' disabled':'')+'>&#8595;</button></span></li>';
     }).join('')+'</ol>' : '<div class="wd-empty">Today\'s lineup is empty.</div>')+
     '<div class="ls-add">'+
       '<div class="wd-add"><input class="input" id="lockNewTask" placeholder="+ Add a task to today"><button class="btn btn-sm" data-action="lockNewTask">Add</button></div>'+
@@ -18938,25 +19110,52 @@ function lockTaskHtml(){
     '</div>'+
   '</div>';
 }
+// The method's shape, laid out from now: every piece says what it is and when (hover it).
+function lockMethodSegments(id){
+  const m = LOCK_METHODS[id], segs = [];
+  if(m.rounds){ for(let i=1;i<=m.rounds;i++){ segs.push({k:'w', min:m.work, round:i}); if(i<m.rounds){ const long = m.long && i%m.every===0; segs.push({k:'r', min:long ? m.long : m.rest, long:long, round:i}); } } }
+  else if(m.work){ for(let i=1;i<=3;i++){ segs.push({k:'w', min:m.work, round:i}); segs.push({k:'r', min:m.rest, round:i}); } segs.push({k:'more', min:m.work*0.6}); }
+  else if(id==='flow') segs.push({k:'w', min:70, grad:true, flow:true}, {k:'r', min:14, flow:true}, {k:'w', min:45, grad:true, flow:true}, {k:'r', min:9, flow:true}, {k:'more', min:30});
+  else segs.push({k:'w', min:100, grad:true, open:true}, {k:'flag', min:6});
+  return segs;
+}
 function lockPreviewHtml(id){
   const m = LOCK_METHODS[id];
   if(id==='block') return '';
-  let segs = [];
-  if(m.rounds){ for(let i=1;i<=m.rounds;i++){ segs.push(['w', m.work]); if(i<m.rounds) segs.push(['r', m.long && i%m.every===0 ? m.long : m.rest]); } }
-  else if(m.work){ for(let i=0;i<3;i++){ segs.push(['w', m.work]); segs.push(['r', m.rest]); } segs.push(['more', m.work*0.6]); }
-  else if(id==='flow') segs = [['w', 70, 'grad'], ['r', 14], ['w', 45, 'grad'], ['r', 9], ['more', 30]];
-  else segs = [['w', 100, 'grad'], ['flag', 6]];
-  const total = segs.reduce(function(a, x){ return a + x[1]; }, 0);
-  return '<div class="ls-preview">'+segs.map(function(x){ return '<i class="lsp-'+x[0]+(x[2]?' is-'+x[2]:'')+'" style="flex:'+(x[1]/total).toFixed(3)+'">'+(x[0]==='flag' ? '&#9873;' : '')+'</i>'; }).join('')+'</div>';
+  const segs = lockMethodSegments(id), total = segs.reduce(function(a, x){ return a + x.min; }, 0);
+  const timed = !!m.work;
+  let t = Date.now();
+  const tm = function(ms){ return fmtTimeShort(ms); };
+  const out = segs.map(function(x){
+    let tip = '', when = '';
+    if(timed && (x.k==='w' || x.k==='r')){ when = tm(t)+' – '+tm(t + x.min*60000); t += x.min*60000; }
+    if(x.k==='w') tip = x.open ? 'Work until the task is ticked off' : x.flow ? 'Work until your focus dips. No timer.' : 'Round '+x.round+(m.rounds ? ' of '+m.rounds : '')+' · '+x.min+' min focus';
+    else if(x.k==='r') tip = x.flow ? 'Break · about a fifth of what you just did (50 min → 10 min)' : (x.long ? 'Long break' : 'Break')+' · '+x.min+' min';
+    else if(x.k==='more') tip = timed ? 'Keeps going, '+m.work+' on / '+m.rest+' off, until you lock out' : 'And again, as long as you like';
+    else tip = 'Task done → you\'re done';
+    return '<i class="lsp-'+x.k+(x.grad?' is-grad':'')+'" style="flex:'+(x.min/total).toFixed(3)+'" data-tip="'+escapeHtml(tip)+'"'+(when ? ' data-when="'+when+'"' : '')+'>'+(x.k==='flag' ? '&#9873;' : '')+'</i>';
+  }).join('');
+  const focus = segs.filter(function(x){ return x.k==='w'; }).reduce(function(a, x){ return a + x.min; }, 0), rest = segs.filter(function(x){ return x.k==='r'; }).reduce(function(a, x){ return a + x.min; }, 0);
+  return '<div class="ls-preview">'+out+'</div>'+
+    '<div class="ls-legend">'+(m.rounds
+      ? '<span><i class="lsl-w"></i>Focus <b>'+fmtDurationLabel(focus)+'</b></span><span><i class="lsl-r"></i>Breaks <b>'+fmtDurationLabel(rest)+'</b></span>'
+      : m.work ? '<span><i class="lsl-w"></i>Focus <b>'+m.work+' min</b></span><span><i class="lsl-r"></i>Break <b>'+m.rest+' min</b></span><span>Repeats until you lock out</span>'
+      : id==='flow' ? '<span><i class="lsl-w"></i>Focus <b>as long as it lasts</b></span><span><i class="lsl-r"></i>Break <b>⅕ of it</b></span>'
+      : '<span><i class="lsl-w"></i>Focus <b>until it\'s done</b></span>')+'<span class="ls-legend-h">Hover the bar for times</span></div>';
 }
 function lockMethodHtml(){
-  const s = ui.lockSeq, m = s.minutes, planned = lockPlannedMinutes(s);
+  const s = ui.lockSeq, m = s.minutes;
   const tile = function(v, big, small){ const on = !s.custom && (v==='open' ? !m : m===v); return '<button class="ls-len'+(on?' is-on':'')+'" data-action="lockLength" data-min="'+v+'"><b>'+big+'</b><span>'+small+'</span></button>'; };
-  let total = planned;
   const mm = LOCK_METHODS[s.method];
+  let total = lockPlannedMinutes(s);
   if(mm.rounds) total = mm.rounds*mm.work + (mm.rounds-1)*mm.rest;
   return '<div class="ls-method">'+
     '<div class="ls-methods">'+LOCK_METHOD_ORDER.map(function(id, i){ const x = LOCK_METHODS[id]; return '<button class="ls-mcard'+(s.method===id?' is-on':'')+'" data-action="lockMethod" data-id="'+id+'" style="animation-delay:'+(i*40)+'ms"><span class="ls-mi">'+x.icon+'</span><b>'+x.label+'</b><span>'+x.sub+'</span></button>'; }).join('')+'</div>'+
+    '<div class="ls-about" data-key="about-'+s.method+'">'+
+      '<div class="ls-about-id"><span class="ls-about-i">'+mm.icon+'</span><div><b>'+mm.label+'</b><span>'+mm.sub+'</span></div></div>'+
+      '<div class="ls-about-txt"><div><span class="ls-about-k">How it works</span><p>'+mm.how+'</p></div>'+
+        '<div><span class="ls-about-k is-best">Best for</span><p>'+mm.best+'</p></div></div>'+
+    '</div>'+
     (s.method==='block' ? '<div class="ls-lens">'+
         tile(25, '25', 'min')+tile(50, '50', 'min')+tile(90, '90', 'min')+tile(120, '2', 'hours')+tile(180, '3', 'hours')+tile('open', '&infin;', 'open')+
       '</div>'+
