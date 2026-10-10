@@ -25,7 +25,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('Snooze → a calm snooze screen (the overlay stays)', await E("ui.wakeMode")==='snooze' && await p.isVisible('.snz'));
     await p.click('[data-action="snoozeUp"]'); await p.waitForTimeout(500);
     check('…and "I\'m up" from there goes to Good morning', await E("ui.wakeMode")==='brief');
-    await p.$eval('[data-action="briefSkip"]', e => e.click()).catch(()=>{}); await p.waitForTimeout(900);
+    check('one corner button: Skip', await p.isVisible('.brief-skipall') && !(await p.$('.brief-x')));
+    await E("briefRevealAll()"); await p.waitForTimeout(900);
     const fits = await p.evaluate(() => { const o = document.querySelector('#wakeOverlay .brief, #wakeOverlay'); return o.scrollHeight <= o.clientHeight + 2; });
     check('Good morning fits one screen (no scrolling)', fits);
     check('no work in Good morning', !/Monthly recurring|Plan of attack|LOCK IN/i.test(await p.textContent('#wakeOverlay')));
@@ -33,7 +34,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     if(q1!=null){ await p.$eval('.br-quote .qt-next', e => e.click()); await p.waitForTimeout(700); }
     check('the quote ↻ button brings a different quote', q1!=null && (await p.textContent('.br-quote .qt blockquote'))!==q1);
     await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(120);
-    check('Start my morning plays a leave animation', await p.$('.brief.is-leaving')!==null);
+    check('Start my morning: Good morning lifts off over the preview (no black gap)', await p.$('#wakeOverlay.is-leaving')!==null && await p.isVisible('#planOverlay .wi'));
     await p.waitForTimeout(1600);
     check('…then the business preview opens (no Morning-mode detour)', await p.isVisible('#planOverlay .wi') && !(await p.$('.mm-clockin')));
     const wi = await p.textContent('#planOverlay');

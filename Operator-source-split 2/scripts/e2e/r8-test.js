@@ -135,7 +135,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.click('.br-vision-big .wk2-vision-x'); await p.waitForTimeout(200);
     const brief = await p.textContent('.brief');
     check('"I\'m up" opens the morning briefing', /Good morning/.test(brief) && await p.isVisible('[data-action="wakeStartMorning"]'));
-    await p.$eval('[data-action="briefSkip"]', e=>e.click()).catch(()=>{}); await p.waitForTimeout(80); await p.$eval('[data-action="wakeBriefDone"]', e=>e.click()); await p.waitForTimeout(200);
+    await p.$eval('[data-action="briefSkip"]', e=>e.click()); await p.clock.runFor(700).catch(()=>{}); await p.waitForTimeout(700); await p.waitForTimeout(200);
     check('Let\'s go takes you into the day', !(await p.isVisible('#wakeOverlay:not(.hidden)')) && (await E("ui.view"))==='today');
     check('no errors (wake)', !p.errors.length, p.errors);
     await p.context().close();

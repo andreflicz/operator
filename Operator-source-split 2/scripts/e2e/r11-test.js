@@ -100,7 +100,7 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     await p.waitForTimeout(8600);
     check('the narration types itself out', (await p.textContent('#brVoice')).length > 2 || (await E("ui.briefLines.length")) > 4);
     check('pieces arrive one at a time, not all at once', await p.evaluate(() => { const els = Array.from(document.querySelectorAll('#wakeContent .br-p[data-k]')); return els.some(e => getComputedStyle(e).opacity < 0.5) && els.some(e => getComputedStyle(e).opacity > 0.9); }));
-    await p.click('[data-action="briefSkip"]'); await p.waitForTimeout(900);
+    await p.evaluate(() => window.__op.ev("briefRevealAll()")); await p.waitForTimeout(900);
     const brief = await p.textContent('#wakeOverlay');
     check('your note, a line for today, and the weather', /Call Mike first/.test(brief) && await p.isVisible('.br-quote blockquote') && /54/.test(await p.textContent('.br-hero')));
     check('headlines (through the launcher)', /Fed holds rates steady/.test(brief));

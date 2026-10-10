@@ -34,8 +34,8 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(300);
     check('I\'m up → Good morning, and sleep mode ends', await E("ui.wakeMode")==='brief' && !(await E("state.modes.active && state.modes.active.sleep")));
     check('only one corner button while it builds (Skip, no ✕)', await p.isVisible('.brief-skipall') && !(await p.$('.brief-x')));
-    await p.$eval('[data-action="briefSkip"]', e => e.click()); await p.waitForTimeout(900);
-    check('…then the ✕ (and no Skip)', await p.isVisible('.brief-x') && !(await p.$('.brief-skipall')));
+    // round 14: Skip leaves Good morning for the app (checked in r14); here we show the whole page at once
+    await E("briefRevealAll()"); await p.waitForTimeout(900);
     const brief = await p.textContent('#wakeOverlay');
     check('the weather and the sun lead it: temp, sunrise / sunset arc', /58°/.test(await p.textContent('.br-hero')) && await p.isVisible('.br-hero .sun-arc') && /Sunrise/.test(await p.textContent('.br-hero')));
     check('how you slept last night', await p.isVisible('.brh-sleep') && /Slept/.test(await p.textContent('.brh-sleep')));

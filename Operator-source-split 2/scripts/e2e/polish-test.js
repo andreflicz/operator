@@ -41,7 +41,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // wake screen ignores Esc / outside clicks
   await E("fireWake({test:true})"); await p.keyboard.press('Escape'); await p.mouse.click(5, 5);
   check('wake screen can\'t be dismissed by accident', await p.isVisible('#wakeOverlay:not(.hidden)'));
-  await p.click('[data-action="wakeStartDay"]'); await p.$eval('[data-action="briefSkip"]', e=>e.click()).catch(()=>{}); await p.waitForTimeout(80); await p.$eval('[data-action="wakeBriefDone"]', e=>e.click());
+  await p.click('[data-action="wakeStartDay"]'); await p.$eval('[data-action="briefSkip"]', e=>e.click()); await p.clock.runFor(700).catch(()=>{}); await p.waitForTimeout(700);
   // recap: gentle note, not a pop-up
   await E("state.focus.activeSession = null; persist('focus'); renderView()");
   await p.clock.setSystemTime(T+40*60000); await E("maybeShowRecap()");

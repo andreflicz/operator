@@ -32,7 +32,7 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   check('rings again after the snooze', await p.isVisible('#wakeOverlay .wk2'));
   await p.click('[data-action="wakeStartDay"]');
   check('"I\'m up" opens the morning briefing and ends sleep mode', await p.isVisible('#wakeOverlay .brief') && await E("!state.modes.active"));
-  await p.$eval('[data-action="briefSkip"]', e=>e.click()).catch(()=>{}); await p.waitForTimeout(80); await p.$eval('[data-action="wakeBriefDone"]', e=>e.click());
+  await p.$eval('[data-action="briefSkip"]', e=>e.click()); await p.clock.runFor(700).catch(()=>{}); await p.waitForTimeout(700);
   check('"Let\'s go" closes it', !(await p.isVisible('#wakeOverlay')));
   check('no page errors (wake)', p.errors.length===0, p.errors);
   await p.close();
@@ -56,12 +56,12 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   await p.clock.runFor(62000);
   check('"ring in 1 min" test works', await p.isVisible('#wakeOverlay .wk2') && (await p.textContent('#wakeOverlay')).includes('TEST'));
   await p.click('[data-action="wakeStartDay"]');
-  await p.$eval('[data-action="briefSkip"]', e=>e.click()).catch(()=>{}); await p.waitForTimeout(80); await p.$eval('[data-action="wakeBriefDone"]', e=>e.click());
+  await p.$eval('[data-action="briefSkip"]', e=>e.click()); await p.clock.runFor(700).catch(()=>{}); await p.waitForTimeout(700);
   check('the override does not fire at the usual 7:00', await (async()=>{ await p.clock.setSystemTime(at(7,1)); await E('checkAllAlarms()'); return !(await p.isVisible('#wakeOverlay')); })());
   await p.clock.setSystemTime(at(8,31)); await E('checkAllAlarms()');
   check('…and fires at the changed time', await p.isVisible('#wakeOverlay .wk2'));
   await p.click('[data-action="wakeStartDay"]');
-  await p.$eval('[data-action="briefSkip"]', e=>e.click()).catch(()=>{}); await p.waitForTimeout(80); await p.$eval('[data-action="wakeBriefDone"]', e=>e.click());
+  await p.$eval('[data-action="briefSkip"]', e=>e.click()); await p.clock.runFor(700).catch(()=>{}); await p.waitForTimeout(700);
   check('no page errors (setup)', p.errors.length===0, p.errors);
   await p.close();
 
@@ -82,7 +82,7 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   check('no stray one-off alarm created', await E("state.focus.alarms.length===0"));
   await p.clock.setSystemTime(at(6,15,8)); await E('checkAllAlarms()');
   await p.click('[data-action="wakeStartDay"]');
-  await E("ACTIONS.briefSkip()");
+  await E("briefRevealAll()");
   // round 13: Start my morning goes straight to the business preview (no Morning mode / .mm-clockin in between)
   await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(900);
   check('Start my morning (after Good morning) shows the plan in the business preview', !(await p.isVisible('#wakeOverlay')) && await p.isVisible('#planOverlay .pr-go') && (await p.textContent('#planOverlay')).includes('Edit reel'));

@@ -460,6 +460,8 @@ function briefVoiceRun(){
     }
   }, 120);
 }
+// shows the whole page at once (no narration build-up) — used by tests
+function briefRevealAll(){ ui.wakeIntroDone = true; ui.briefSkipped = true; renderWakeOverlayInto(); }
 // Skip: the page lifts away and you're on the front page
 ACTIONS.briefSkip = function(){
   ui.wakeIntroDone = true; ui.briefSkipped = true;
