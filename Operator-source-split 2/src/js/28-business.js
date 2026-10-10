@@ -355,6 +355,7 @@ function clientCard(c){
 function openClientModal(id, edit){
   ui.showClientModal = id;
   ui.clientEdit = !!edit;
+  ui.clientSec = edit ? 'plan' : 'overview';
   ui.pickingPackageForClient = null;
   ui.newClientJournalTag = null;
   ui.newClientJournalDraft = '';
@@ -366,15 +367,7 @@ function openClientModal(id, edit){
 function closeClientModal(){ ui.showClientModal = null; ui.pickingPackageForClient = null; const o=document.getElementById('clientModalOverlay'); if(o) o.classList.add('hidden'); }
 function closeClientModalAndSave(){
   const c = state.business.clients.find(function(x){return x.id===ui.showClientModal;});
-  if(c){
-    const notesEl = document.getElementById('clientModalNotes');
-    if(notesEl) c.notes = notesEl.value.trim();
-    const startDateEl = document.getElementById('clientModalStartDate');
-    if(startDateEl) c.startDate = startDateEl.value || null;
-    const billingDayEl = document.getElementById('clientModalBillingDay');
-    if(billingDayEl) c.billingDay = clamp(Number(billingDayEl.value)||1, 1, 28);
-    persist('business');
-  }
+  if(c){ saveClientModalFields(c); persist('business'); }
   closeClientModal();
   renderView();
 }
@@ -392,46 +385,56 @@ function setClientLeadSource(id, val){
   c.leadSource = (c.leadSource===val) ? null : val;
   persist('business'); renderClientModalInto();
 }
+// The client, laid out like settings: the client up top on the left with the sections under it,
+// one section at a time on the right. Overview is what you glance at; everything else edits in place.
+const CLIENT_SECTIONS = [['overview','&#9673;','Overview'],['plan','&#128230;','Plan & deliverables'],['contact','&#128172;','Contact & touchpoints'],['cycle','&#8635;','Client cycle'],['billing','&#128176;','Billing & dates'],['notes','&#128221;','Notes & journal']];
+function saveClientModalFields(c){
+  const notesEl = document.getElementById('clientModalNotes'); if(notesEl) c.notes = notesEl.value.trim();
+  const startDateEl = document.getElementById('clientModalStartDate'); if(startDateEl) c.startDate = startDateEl.value || null;
+  const billingDayEl = document.getElementById('clientModalBillingDay'); if(billingDayEl) c.billingDay = clamp(Number(billingDayEl.value)||1, 1, 28);
+}
+ACTIONS.clientSec = function(el, e, id){
+  const c = state.business.clients.find(function(x){ return x.id===ui.showClientModal; });
+  if(c){ saveClientModalFields(c); persist('business'); }
+  ui.clientSec = id; ui.clientEdit = id!=='overview';
+  renderClientModalInto();
+  const pane = document.querySelector('#clientModalContent .cm-pane'); if(pane) pane.scrollTop = 0;
+};
 function renderClientModal(){
   const c = state.business.clients.find(function(x){return x.id===ui.showClientModal;});
   if(!c) return '';
-  if(!ui.clientEdit) return clientCardFrontHtml(c);
+  const sec = CLIENT_SECTIONS.some(function(x){ return x[0]===ui.clientSec; }) ? ui.clientSec : 'overview';
   const deliverables = arr(c.deliverables);
   const pendingCount = deliverables.filter(function(d){return !isDeliverableDoneThisWeek(d);}).length;
-  const isActive = c.status==='active';
-  const pkg = c.packageId ? arr(state.business.packages).find(function(x){return x.id===c.packageId;}) : null;
-  return '<div class="row" style="justify-content:space-between;margin-bottom:10px;"><button class="btn btn-ghost btn-sm" data-action="clientFlip" data-id="front">&larr; Card</button><span class="kpi-sub">Editing</span></div>'+
-    '<div class="card" style="margin-bottom:16px;">'+
-      '<div class="row" style="justify-content:space-between;align-items:flex-start;">'+
-        '<div class="client-name-edit"><input class="client-name-input" data-client-field="business" data-id="'+c.id+'" value="'+escapeHtml(c.business||'')+'" placeholder="Business name" title="Click to rename">'+
-        '<input class="client-contact-input" data-client-field="name" data-id="'+c.id+'" value="'+escapeHtml(c.name||'')+'" placeholder="Contact name"></div>'+
-        (function(){ const st = crmStage('client', c.stage); return '<span class="tag" style="background:'+(st?st.color:'#8A90A2')+'22;color:'+(st?st.color:'#8A90A2')+';">'+escapeHtml(st?st.label:(isActive?'Active':'Paused'))+'</span>'; })()+
-      '</div>'+
-      '<div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap;align-items:center;">'+
-        clientHealthTagHtml(c)+
-        (isActive ? clientCareTagHtml(c) : '')+
-        (pkg ? '<span class="tag" style="background:var(--good-dim);color:var(--good);font-weight:600;">'+escapeHtml(pkg.name)+'</span>' : '<span class="kpi-sub">No package assigned</span>')+
-      '</div>'+
-      (isActive ? '<div class="row" style="justify-content:flex-end;margin-top:8px;">'+clientTouchControlHtml(c)+'</div>' : '')+
-    '</div>'+
-    renderClientLifecycle(c)+
-    renderCrmBlock('client', c)+
-    // the plan and what it delivers, together in one block
-    '<div class="kpi-label" style="margin:16px 0 8px;">Plan &amp; deliverables<span class="kpi-sub" style="margin-left:6px;">'+pendingCount+' pending this week</span></div>'+
-    '<div class="card plan-block">'+
-      renderClientPackageField(c, true)+
+  const st = crmStage('client', c.stage);
+  let body = '';
+  if(sec==='overview') body = clientCardFrontHtml(c);
+  else if(sec==='plan') body = '<div class="cm-h">Plan &amp; deliverables<span class="kpi-sub">'+pendingCount+' pending this week</span></div>'+
+    '<div class="plan-block">'+renderClientPackageField(c, true)+
       '<div class="task-list plan-delivs">'+(deliverables.map(function(d){return deliverableRow(c.id,d);}).join('') || '<div class="empty">No deliverables yet — pick a package above, or add a one-off.</div>')+'</div>'+
-      '<span class="plan-add" data-action="openCustomDeliverableDrawer" data-id="'+c.id+'">&#43; Add a one-off deliverable</span>'+
-    '</div>'+
-    '<div class="field" style="margin-bottom:16px;"><label>How we acquired them</label><div class="row" style="gap:6px;flex-wrap:wrap;">'+LEAD_SOURCES.map(function(s){ const active=c.leadSource===s.id; return '<span class="chip'+(active?' active':'')+'" data-action="setClientLeadSource" data-id="'+c.id+'" data-value="'+s.id+'">'+s.emoji+' '+s.label+'</span>'; }).join('')+'</div></div>'+
-    clientBillingCycleFieldHtml(c)+
-    '<div class="row" style="justify-content:center;margin-bottom:16px;"><button class="btn btn-ghost btn-sm" data-action="viewClientJournalFromModal" data-id="'+c.id+'">View Client Journal &rarr;</button></div>'+
-    renderClientEventsSection(c)+
-    '<div class="field" style="margin-bottom:16px;"><label>Notes</label><textarea class="input" id="clientModalNotes" style="width:100%;min-height:80px;" placeholder="What are they like to work with? Preferences, history, anything worth remembering.">'+escapeHtml(c.notes||'')+'</textarea></div>'+
-    '<div class="row" style="justify-content:space-between;align-items:flex-end;margin-top:16px;">'+
-      renderClientDeleteControl(c)+
-      '<button class="btn btn-primary" data-action="closeClientModalAndSave">Done</button>'+
-    '</div>';
+      '<span class="plan-add" data-action="openCustomDeliverableDrawer" data-id="'+c.id+'">&#43; Add a one-off deliverable</span></div>';
+  else if(sec==='contact') body = '<div class="cm-h">Contact &amp; touchpoints</div>'+
+    '<div class="cm-grp"><div class="client-name-edit"><input class="client-name-input" data-client-field="business" data-id="'+c.id+'" value="'+escapeHtml(c.business||'')+'" placeholder="Business name" title="Click to rename">'+
+      '<input class="client-contact-input" data-client-field="name" data-id="'+c.id+'" value="'+escapeHtml(c.name||'')+'" placeholder="Contact name"></div>'+
+      (c.status==='active' ? '<div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap;align-items:center;">'+clientCareTagHtml(c)+'<span style="flex:1"></span>'+clientTouchControlHtml(c)+'</div>' : '')+'</div>'+
+    renderCrmBlock('client', c)+
+    '<div class="field" style="margin-top:14px;"><label>How we got them</label><div class="row" style="gap:6px;flex-wrap:wrap;">'+LEAD_SOURCES.map(function(s){ const active=c.leadSource===s.id; return '<span class="chip'+(active?' active':'')+'" data-action="setClientLeadSource" data-id="'+c.id+'" data-value="'+s.id+'">'+s.emoji+' '+s.label+'</span>'; }).join('')+'</div></div>';
+  else if(sec==='cycle') body = '<div class="cm-h">Client cycle</div>'+renderClientLifecycle(c);
+  else if(sec==='billing') body = '<div class="cm-h">Billing &amp; dates</div>'+clientBillingCycleFieldHtml(c)+renderClientEventsSection(c);
+  else body = '<div class="cm-h">Notes &amp; journal</div>'+
+    '<div class="field"><textarea class="input" id="clientModalNotes" style="width:100%;min-height:160px;" placeholder="What are they like to work with? Preferences, history, anything worth remembering.">'+escapeHtml(c.notes||'')+'</textarea></div>'+
+    '<button class="btn btn-ghost btn-sm" data-action="viewClientJournalFromModal" data-id="'+c.id+'">Open their journal &rarr;</button>'+
+    '<div class="cm-danger">'+renderClientDeleteControl(c)+'</div>';
+  return '<div class="cm">'+
+    '<aside class="cm-nav">'+
+      '<div class="cm-who">'+clientAvatarHtml(c, false, true)+'<div><b>'+escapeHtml(c.business||c.name||'Client')+'</b>'+(c.name && c.business ? '<span>'+escapeHtml(c.name)+'</span>' : '')+'</div></div>'+
+      '<div class="cm-tags">'+clientHealthTagHtml(c)+(st ? '<span class="tag" style="background:'+st.color+'22;color:'+st.color+';">'+escapeHtml(st.label)+'</span>' : '')+'</div>'+
+      CLIENT_SECTIONS.map(function(x){ return '<button class="cm-nav-i'+(sec===x[0]?' is-on':'')+'" data-action="clientSec" data-id="'+x[0]+'"><span>'+x[1]+'</span>'+x[2]+'</button>'; }).join('')+
+      '<span style="flex:1"></span>'+ghlPaneBtnHtml('client', c)+
+    '</aside>'+
+    '<div class="cm-pane" data-key="cm-'+sec+'">'+body+'</div>'+
+    '<button class="cm-x" data-action="closeClientModalAndSave" title="Done">&#10005;</button>'+
+  '</div>';
 }
 // ---- the card face: just the things you glance at ----
 function clientTenureLabel(c){
@@ -449,10 +452,6 @@ function clientCardFrontHtml(c){
   const recurring = delivs.filter(function(d){ return d.recurring; }), oneOff = delivs.filter(function(d){ return !d.recurring && d.status!=='done'; });
   const st = crmStage('client', c.stage);
   return '<div class="cf">'+
-    '<div class="cf-head">'+clientAvatarHtml(c, false, true)+
-      '<div class="cf-names"><div class="cf-biz">'+escapeHtml(c.business||c.name||'Client')+'</div>'+(c.name && c.business ? '<div class="kpi-sub">'+escapeHtml(c.name)+'</div>' : '')+'</div>'+
-      clientHealthTagHtml(c)+
-    '</div>'+
     '<div class="cf-facts">'+
       '<div class="cf-fact"><span class="cf-k">Working together</span><span class="cf-v">'+clientTenureLabel(c)+'</span>'+((c.startDate||c.createdAt) ? '<span class="cf-s">since '+fmtDateShort(c.startDate||c.createdAt)+'</span>' : '')+'</div>'+
       '<div class="cf-fact"><span class="cf-k">How we got them</span><span class="cf-v">'+(src ? src.emoji+' '+escapeHtml(src.label) : '—')+'</span></div>'+
@@ -468,21 +467,10 @@ function clientCardFrontHtml(c){
         oneOff.map(function(d){ return '<div class="cf-deliv"><span class="cf-deliv-t">'+escapeHtml(d.title)+'</span><span class="cf-deliv-n kpi-sub">one-off'+(d.dueDate ? ' &middot; due '+fmtDateShort(d.dueDate) : '')+'</span></div>'; }).join('')+
       '</div>' : '<div class="kpi-sub" style="margin-top:6px;">No deliverables yet.</div>')+
     '</div>'+
-    '<div class="cf-sec"><div class="cf-sec-k">Notes</div>'+(c.notes ? '<div class="cf-notes">'+escapeHtml(c.notes)+'</div>' : '<div class="kpi-sub">No notes yet — add some on the back of the card.</div>')+'</div>'+
-    '<div class="cf-foot"><button class="btn btn-ghost" data-action="closeClientModalAndSave">Close</button>'+ghlPaneBtnHtml('client', c)+'<button class="btn btn-primary" data-action="clientFlip" data-id="back">&#9998; Edit</button></div>'+
+    '<div class="cf-sec"><div class="cf-sec-k">Notes</div>'+(c.notes ? '<div class="cf-notes">'+escapeHtml(c.notes)+'</div>' : '<div class="kpi-sub">No notes yet — add some in Notes.</div>')+'</div>'+
   '</div>';
 }
-ACTIONS.clientFlip = function(el, e, id){
-  if(id==='front'){ // keep what was typed on the back before flipping
-    const c = state.business.clients.find(function(x){ return x.id===ui.showClientModal; });
-    const notesEl = document.getElementById('clientModalNotes'); if(c && notesEl){ c.notes = notesEl.value.trim(); persist('business'); }
-  }
-  ui.clientEdit = id==='back';
-  const box = document.getElementById('clientModalContent');
-  if(box){ box.classList.remove('cm-flip'); void box.offsetWidth; box.classList.add('cm-flip'); }
-  renderClientModalInto();
-  if(box) box.scrollTop = 0;
-};
+ACTIONS.clientFlip = function(el, e, id){ ACTIONS.clientSec(el, e, id==='back' ? 'plan' : 'overview'); };
 function clientBillingCycleFieldHtml(c){
   const todayDay = new Date().getDate();
   const hasMrr = Number(c.mrr)>0;
