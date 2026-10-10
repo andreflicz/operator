@@ -59,7 +59,7 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     check('tick a routine step', (await E("state.focus.routineDone.ids.length"))===1);
     check('auto lock-in stays paused in the morning', await E("autoLockInBlockedReason()")==='mode');
     await p.click('[data-action="morningLockIn"]'); await p.waitForTimeout(300);
-    check('"I\'m ready — lock in" ends the morning and opens Lock In on #1', !(await E("state.modes.active")) && await p.isVisible('#lockInOverlay:not(.hidden)') && await E("nextUpTask().id")==='e');
+    check('"I\'m ready — lock in" ends the morning and opens the Lock In sequence on #1', !(await E("state.modes.active")) && await p.isVisible('#lockSeqOverlay:not(.hidden)') && await E("ui.lockSeq.taskId")==='e');
     check('no errors (day loop)', !p.errors.length, p.errors);
     await p.context().close();
   }
@@ -94,6 +94,47 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     await E("openClientModal('c1', true)"); await p.waitForTimeout(300);
     check('edit side: plan & deliverables in one block', (await p.$$('.plan-block')).length===1);
     check('no errors (today / clients)', !p.errors.length, p.errors);
+    await p.context().close();
+  }
+
+  // ---- the Lock In sequence: 1 Task → 2 Length → 3 Set up → 4 Why, with ⚡ Lock in now ----
+  {
+    const T = new Date(2026,9,9,14,30).getTime();
+    const seed = {profile:{name:'Andre'}, tasks:{items:[
+        {id:'a', title:'Edit JJS reel 3', status:'today', priority:'high', clients:['personal']}, {id:'b', title:'Script Nova ad', status:'today', priority:'med', clients:['personal']},
+        {id:'d', title:'Call Mike back', status:'backlog', priority:'high', clients:['personal']}]}, focus:{lineupOrder:['b','a']}};
+    const p = await newPage(b, OUT+'/r10.html', seed, T);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await E("ui.view='today'; renderView()"); await p.waitForTimeout(200);
+    await p.click('.lockin-cta'); await p.waitForTimeout(250);
+    check('Lock In opens a 4-step sequence', await p.isVisible('#lockSeqOverlay:not(.hidden)') && (await p.$$('#lockSeqOverlay .wd-step')).length===4);
+    check('step 1 starts on what\'s up next, lineup numbered in order', await E("ui.lockSeq.taskId")==='b' && (await p.$$eval('#lockSeqOverlay .ls-row .wd-num', e => e.map(x => x.textContent))).join()==='01,02');
+    check('⚡ Lock in now is there on every step', await p.isVisible('#lockSeqOverlay [data-action="lockNow"]'));
+    await p.click('#lockSeqOverlay .wd-chip:has-text("Call Mike back")'); await p.waitForTimeout(100);
+    check('pick from the rest of your list', await E("ui.lockSeq.taskId")==='d' && /Call Mike back/.test(await p.textContent('.ls-pick')));
+    await p.keyboard.press('Enter'); await p.waitForTimeout(150);
+    check('Enter → next step (Length)', await E("ui.lockSeq.step")==='length');
+    await p.click('[data-action="lockLength"][data-min="25"]'); await p.waitForTimeout(100);
+    check('pick 25 minutes — shows when you\'re done', await E("ui.lockSeq.minutes")===25 && /Done at/.test(await p.textContent('.ls-ends')));
+    await p.click('[data-action="lockCustom"]'); await p.fill('#lockCustomMin', '40');
+    await p.click('#lockSeqOverlay [data-action="lockNext"]'); await p.waitForTimeout(150);
+    check('custom length', await E("ui.lockSeq.minutes")===40 && await E("ui.lockSeq.step")==='prep');
+    const n = (await p.$$('.ls-check')).length;
+    for(let i=0;i<n;i++) await p.click('.ls-check >> nth='+i);
+    check('tick the set-up checklist', /All set/.test(await p.textContent('.ls-ready')));
+    await p.click('#lockSeqOverlay [data-action="lockNext"]'); await p.waitForTimeout(150);
+    check('Why: getting / avoiding + deep work after this session', await p.isVisible('.ls-col.is-get') && await p.isVisible('.ls-col.is-avoid') && /0\.7h/.test(await p.textContent('.ls-bar-k')));
+    await p.click('.ls-go'); await p.waitForTimeout(200);
+    const s = await E("JSON.stringify({m:state.focus.activeSession && state.focus.activeSession.plannedMinutes, cur:ui.currentTaskId, st:state.tasks.items.find(t=>t.id==='d').status, last:state.focus.lastLockMinutes})");
+    check('LOCK IN starts it: the task, 40 min, pulled into today', s==='{"m":40,"cur":"d","st":"today","last":40}', s);
+    check('a "Locked in" stamp plays', await p.isVisible('.lock-flash'));
+    await E("state.focus.sessions.push(Object.assign({id:'x', minutes:1, date:todayStr(), endedAt:Date.now()}, state.focus.activeSession)); state.focus.activeSession=null; ui.currentTaskId=null; renderView()");
+    await p.waitForTimeout(1800);
+    await p.keyboard.press('l'); await p.waitForTimeout(150);
+    check('next time it remembers your length', await E("ui.lockSeq.minutes")===40);
+    await p.click('#lockSeqOverlay [data-action="lockNow"]'); await p.waitForTimeout(150);
+    check('⚡ Lock in now starts straight from step 1', await E("!!state.focus.activeSession && state.focus.activeSession.plannedMinutes===40") && !(await p.isVisible('#lockSeqOverlay:not(.hidden)')));
+    check('no errors (lock in)', !p.errors.length, p.errors);
     await p.context().close();
   }
 

@@ -467,7 +467,9 @@ function chooseOpenEnded(){
   closeLockInChooser();
   openPreFocusModal(null);
 }
-function openLockInChooser(){
+// every Lock In button opens the Lock In sequence (32m-lock-in.js)
+function openLockInChooser(){ openLockSeq(); }
+function openLockLengthPicker(){
   const o = document.getElementById('lockInOverlay');
   if(!o) return;
   o.classList.remove('hidden');
@@ -780,7 +782,8 @@ function addManualFocusLog(){
   closeManualLogModal();
   persist('focus'); renderView();
 }
-function openPreFocusModal(minutes){
+function openPreFocusModal(minutes){ openLockSeq(minutes!==undefined && minutes!==null ? {minutes:minutes} : {}); }
+function openPreFocusChecklist(minutes){
   ui.pendingFocusMinutes = minutes;
   ui.preFocusStep = 'before';
   const overlay = document.getElementById('preFocusOverlay');

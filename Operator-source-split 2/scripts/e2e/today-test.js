@@ -13,11 +13,12 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('hero with a big Lock In button', await p.isVisible('.today-hero .lockin-cta'));
   check('Lock In shows what\'s up next (highest priority by default)', (await p.textContent('.lockin-sub')).includes('Send invoice'));
   await p.click('.lockin-cta');
-  check('Lock In opens the lock-in chooser', await p.isVisible('#lockInOverlay:not(.hidden)'));
-  await E("closeLockInChooser()");
+  check('Lock In opens the Lock In sequence', await p.isVisible('#lockSeqOverlay:not(.hidden)'));
+  await p.keyboard.press('Escape');
+  check('Esc closes it', !(await p.isVisible('#lockSeqOverlay:not(.hidden)')));
   await p.keyboard.press('l');
-  check('"L" opens it too', await p.isVisible('#lockInOverlay:not(.hidden)'));
-  await E("closeLockInChooser()");
+  check('"L" opens it too', await p.isVisible('#lockSeqOverlay:not(.hidden)'));
+  await E("closeLockSeq()");
   // pick what's next
   await p.click('[data-action="toggleNextPicker"][data-where="hero"]');
   check('next picker lists today + backlog', (await p.$$('.next-picker .np-row')).length===3);

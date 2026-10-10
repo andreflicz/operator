@@ -80,11 +80,11 @@ async function newPage(browser, seed, clockAt){
   await page.evaluate(() => { document.querySelector('[data-action="nav"][data-view="today"]').click(); });
   // drive the real flow: open chooser -> lock in -> stage task -> start
   await page.evaluate(() => { document.body.insertAdjacentHTML('beforeend','<button id="__lk" data-action="openLockInChooser">x</button>'); document.getElementById('__lk').click(); });
-  await page.click('[data-action="chooseOpenEnded"]');
-  await page.click('[data-action="openPreFocusPick"]');
-  await page.click('[data-action="stageExistingTaskFromPreFocus"][data-id="t9"]');
-  await page.click('[data-action="preFocusGoToWhy"]');
-  await page.click('[data-action="confirmStartFocus"]');
+  await page.click('#lockSeqOverlay [data-action="lockPickTask"][data-id="t9"]');
+  await page.click('#lockSeqOverlay [data-action="lockNext"]');
+  await page.click('#lockSeqOverlay [data-action="lockLength"][data-min="open"]');
+  await page.click('#lockSeqOverlay [data-action="lockStep"][data-id="why"]');
+  await page.click('#lockSeqOverlay [data-action="lockGo"]');
   const st = await page.evaluate(() => ({ modes: JSON.parse(localStorage.getItem('opsdash:modes')), focus: JSON.parse(localStorage.getItem('opsdash:focus')) }));
   check('1.2 off-time ended on manual lock-in', !st.modes.active && st.modes.history.some(h=>h.type==='offtime'), st.modes);
   check('1.2 session started', !!st.focus.activeSession);
