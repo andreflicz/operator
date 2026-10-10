@@ -269,7 +269,7 @@ function renderMorningView(){
   const vb = masterVisionBoard();
   return '<div class="mm" data-sky="'+skyLook()+'">'+
     '<div class="mm-head"><div><div class="mm-k">&#9728;&#65039; Morning</div><div class="mm-greet">'+wakeGreeting()+', '+escapeHtml(p.name||'')+'.</div>'+
-      '<div class="mm-sub">Up for <span id="modeElapsed">'+formatElapsed(Date.now()-active.startedAt)+'</span> &middot; '+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div></div>'+
+      '<div class="mm-sub"><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+' &middot; Up for <span id="modeElapsed">'+formatElapsed(Date.now()-active.startedAt)+'</span></span>'+skyChipHtml()+'</div></div>'+
       '<button class="btn btn-ghost btn-sm" data-action="morningBriefing">&#9728;&#65039; Good morning</button></div>'+
     (notes.length ? '<div class="mm-note"><div class="mm-k">&#127769; From Last Night</div>'+notes.map(function(n){ return '<div class="mm-note-t">'+escapeHtml(n.text)+'</div>'; }).join('')+'</div>' : '')+
     '<div class="mm-grid">'+

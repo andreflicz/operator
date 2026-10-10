@@ -265,7 +265,7 @@ function analyticsRangeTabs(){
     return '<button class="seg-tab'+(r===x[0]?' active':'')+'" data-action="analyticsRange" data-id="'+x[0]+'">'+x[1]+'</button>';
   }).join('')+'</div>';
 }
-ACTIONS.analyticsRange = function(el, e, id){ ui.analyticsRange = id; ui.analyticsDay = null; renderView(); };
+ACTIONS.analyticsRange = function(el, e, id){ ui.analyticsRange = id; ui.analyticsDay = null; ui.sessionsPage = false; renderView(); };
 ACTIONS.analyticsPickDay = function(el, e, id){ if(id>todayStr()) return; ui.analyticsDay = id; renderView(); };
 function renderAnalyticsWeek(offset){
   const days = weekDays(offset);
@@ -306,16 +306,7 @@ function renderAnalyticsToday(){
   return '<div class="card analytics-hero"><div class="kpi-label">Deep work by hour</div>'+strip+'</div>'+
     '<div class="section" style="margin-top:16px;">'+dayDetailHtml(today)+'</div>';
 }
-function renderFocusAnalyticsTab(){
-  const r = ui.analyticsRange || 'today';
-  let body;
-  if(r==='today') body = renderAnalyticsToday();
-  else if(r==='week') body = renderAnalyticsWeek(0);
-  else if(r==='lastweek') body = renderAnalyticsWeek(-1);
-  else body = renderFocusAnalytics()+renderTaskStatsSection()+renderFitnessStatsSection()+renderTimeByTaskSection();
-  return '<div class="subtab-panel" data-key="analytics-'+r+'">'+body+'</div>'+
-    '<div class="section" style="margin-top:16px;">'+renderManualLogForm()+'</div>';
-}
+// renderFocusAnalyticsTab lives in 19d-analytics-v2.js
 // Workouts you log in Fitness (with the minutes you enter) — totals for the analytics page.
 function renderFitnessStatsSection(){
   const map = workoutDayMap(), dates = Object.keys(map);

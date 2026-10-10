@@ -181,6 +181,11 @@ function wakeRingHtml(){
 }
 
 // ---- 3 Good morning ----
+// last night, from going to sleep (Wind down → Go to sleep) to getting up
+function lastNightSleep(){
+  const h = state.modes.history.filter(function(m){ return m.sleep && m.endedAt && Date.now() - m.endedAt < 8*3600000 && m.minutes >= 60; }).sort(function(a, b){ return b.endedAt - a.endedAt; })[0];
+  return h ? {minutes:h.minutes, from:h.startedAt, to:h.endedAt} : null;
+}
 function briefBase(){ return wakeCfg().intro!=='quick' ? 5600 : 3000; }
 function wakeBriefHtml(){
   const today = todayStr(), name = state.profile.name || '';
@@ -207,12 +212,14 @@ function wakeBriefHtml(){
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
   // the hero: the weather and the sun — the first, biggest thing you see
-  const hero = panel('br-hero', 'br-a-blur', 'It’s '+timeStr+'.'+(now ? ' '+now.temp+'° and '+wxLabel(now.code).toLowerCase()+' outside.' : '')+(sunLine ? ' '+sunLine : ''),
+  const slept = lastNightSleep();
+  const hero = panel('br-hero', 'br-a-blur', 'It’s '+timeStr+'.'+(now ? ' '+now.temp+'° and '+wxLabel(now.code).toLowerCase()+' outside.' : '')+(slept ? ' You got '+fmtDurationLabel(slept.minutes)+' of sleep.' : sunLine ? ' '+sunLine : ''),
     '<div class="brh-wx">'+
       '<span class="brh-i">'+(now ? wxIcon(wxKind(now.code), phase) : SKY_META[phase].icon)+'</span>'+
       '<div>'+(now ? '<div class="brh-t">'+now.temp+'&deg;</div><div class="brh-l">'+escapeHtml(wxLabel(now.code))+'</div>' : '<div class="brh-l is-big">'+SKY_META[phase].label+'</div>')+
         (now && now.hi!=null ? '<div class="brh-hl">High '+now.hi+'&deg; &middot; Low '+now.lo+'&deg;</div>' : '')+'</div>'+
     '</div>'+
+    (function(){ const sl = lastNightSleep(); return sl ? '<div class="brh-sleep"><span class="brh-sleep-i">&#128564;</span><div><small>Slept</small><b>'+fmtDurationLabel(sl.minutes)+'</b><span>'+fmtTimeShort(sl.from)+' &rarr; '+fmtTimeShort(sl.to)+'</span></div></div>' : ''; })()+
     '<div class="brh-sun">'+sunArcHtml({w:300, h:78, pad:10, r:5, animate:true})+
       '<div class="brh-sun-row"><span><small>Sunrise</small>'+fmtMinOfDay(win.rise)+'</span><span class="brh-day">'+daylightLabel()+'</span><span><small>Sunset</small>'+fmtMinOfDay(win.set)+'</span></div>'+
     '</div>');
@@ -253,8 +260,8 @@ function wakeBriefHtml(){
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        (ui.briefSkipped ? '' : '<button class="brief-skipall" data-action="briefSkip" title="Show everything now">Skip &#9197;</button>')+
-        '<button class="brief-x" data-action="wakeBriefDone" title="Close">&#10005;</button></div>'+
+        // one button: Skip while it's still building, then ✕ to close
+        (ui.briefSkipped ? '<button class="brief-x" data-action="wakeBriefDone" title="Close">&#10005;</button>' : '<button class="brief-skipall" data-action="briefSkip" title="Show everything now">Skip &#9197;</button>')+'</div>'+
       '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
       '<div class="br-voice br-p br-a-fade" style="--d:'+(base-700)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
       '<div class="brief-music-slot">'+wakeMusicPillHtml()+'</div>'+
@@ -285,6 +292,7 @@ function briefVoiceRun(){
     if(!el || ui.wakeMode!=='brief' || !overlayOpen('wakeOverlay')){ if(!overlayOpen('wakeOverlay')) clearInterval(briefVoiceTimer); return; }
     const lines = ui.briefLines || [], t = Date.now() - (ui.briefT0||0);
     let cur = null; lines.forEach(function(l){ if(t >= l.at) cur = l; });
+    if(ui.briefSkipped && lines.length) cur = lines[lines.length-1];
     const txt = cur ? (ui.briefSkipped ? cur.text : cur.text.slice(0, Math.max(0, Math.floor((t - cur.at)/30)))) : '';
     if(el.textContent!==txt) el.textContent = txt;
     const wrap = el.parentNode; if(wrap) wrap.classList.toggle('is-typing', !!cur && txt.length < cur.text.length);

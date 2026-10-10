@@ -33,6 +33,7 @@
   "18c-task-list.js",
   "19-focus.js",
   "19b-sessions-analytics.js",
+  "19d-analytics-v2.js",
   "20-pre-focus-modal.js",
   "21-app-activity-tracking.js",
   "21b-activity-v2.js",
