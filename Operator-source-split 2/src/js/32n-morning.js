@@ -455,6 +455,17 @@ function workClientsHtml(){
     return '<button class="wi-cl is-'+r.h.level+'" data-action="openContact" data-kind="client" data-id="'+r.c.id+'"><i></i><b>'+escapeHtml(crmName('client', r.c))+'</b><span>'+word+'</span></button>';
   }).join('')+'</div></div>';
 }
+// the last seven days of deep work, today on the right
+function workWeekHtml(target){
+  const today = todayStr(), days = [];
+  for(let i=6;i>=0;i--){ const dd = addDays(today, -i); days.push({d:dd, m: i===0 ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(dd)}); }
+  const total = days.reduce(function(a, x){ return a + x.m; }, 0), top = Math.max(target, ...days.map(function(x){ return x.m; }), 1);
+  const hit = days.filter(function(x){ return x.m >= target; }).length;
+  return '<div class="wi-week"><div class="wi-sec">Your week <span>'+fmtHours(total)+' &middot; '+hit+'/7 days on target</span></div>'+
+    '<div class="wi-wk-bars"><i class="wi-wk-goal" style="bottom:'+Math.min(96, target/top*100).toFixed(1)+'%" title="Daily target: '+fmtHours(target)+'"></i>'+days.map(function(x){
+      return '<div class="wi-wk'+(x.d===today?' is-today':'')+(x.m>=target?' is-hit':'')+'" title="'+weekdayShort(x.d)+': '+fmtDurationLabel(x.m)+'"><u style="height:'+Math.max(3, x.m/top*100).toFixed(1)+'%"></u><span>'+weekdayShort(x.d).slice(0,1)+'</span></div>';
+    }).join('')+'</div></div>';
+}
 function renderPlanReveal(){
   if(!ui.planReveal) return '';
   const plan = todaysPlan().filter(function(t){ return t.status!=='done'; }).slice(0, 6), first = plan[0];
@@ -475,19 +486,23 @@ function renderPlanReveal(){
       '<h1 class="wi-h" style="animation-delay:100ms">Let’s get to work'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
       '<div class="wi-stats n'+stats.length+'">'+stats.map(function(s){ return '<div class="wi-stat"'+(s.go ? ' data-action="'+s.go+'"' : '')+' style="'+at(140)+'"><div class="wi-stat-k">'+s.k+'</div><div class="wi-stat-v">'+s.v+'</div>'+(s.pct!=null ? '<div class="wi-bar"><i style="width:'+s.pct.toFixed(1)+'%"></i></div>' : '')+'<div class="wi-stat-s">'+escapeHtml(s.sub)+'</div></div>'; }).join('')+'</div>'+
       '<div class="wi-cols">'+
-        '<div class="wi-plan" style="'+at(300)+'"><div class="wi-sec">Plan of Attack <span>'+(plan.length ? plan.length+(plan.length===1?' thing':' things')+' &middot; ' : '')+'aim for '+fmtHours(target)+'</span></div>'+
-          (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(d + i*60)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">Due today</span>' : '')+'</li>'; }).join('')+'</ol>'
-            : '<div class="wd-empty">Nothing planned yet. Pick your first move in Lock in.</div>')+
-          (events.length ? '<div class="wi-cal">'+events.slice(0, 3).map(function(e){ return '<span><b>'+fmt12Hour(e.time)+'</b>'+escapeHtml(e.title)+'</span>'; }).join('')+'</div>' : '')+
+        '<div class="wi-col">'+
+          '<div class="wi-plan" style="'+at(300)+'"><div class="wi-sec">Plan of Attack <span>'+(plan.length ? plan.length+(plan.length===1?' thing':' things')+' &middot; ' : '')+'aim for '+fmtHours(target)+'</span></div>'+
+            (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(d + i*60)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">Due today</span>' : '')+'</li>'; }).join('')+'</ol>'
+              : '<div class="wd-empty">Nothing planned yet. Pick your first move in Lock in.</div>')+
+            (events.length ? '<div class="wi-cal">'+events.slice(0, 3).map(function(e){ return '<span><b>'+fmt12Hour(e.time)+'</b>'+escapeHtml(e.title)+'</span>'; }).join('')+'</div>' : '')+
+          '</div>'+
+          workClientsHtml()+
         '</div>'+
-        '<div class="wi-right" style="'+at(300)+'">'+(nightNote().work ? '<div class="wi-note"><span>&#127769; You told yourself</span><p>'+escapeHtml(nightNote().work)+'</p></div>' : '')+
-          '<div class="wi-side">'+quoteHtml(q, 'is-work', 'work')+'</div></div>'+
+        '<div class="wi-col wi-right" style="'+at(300)+'">'+(nightNote().work ? '<div class="wi-note"><span>&#127769; You told yourself</span><p>'+escapeHtml(nightNote().work)+'</p></div>' : '')+
+          '<div class="wi-side">'+quoteHtml(q, 'is-work', 'work')+'</div>'+
+          workWeekHtml(target)+
+          '<div class="wi-act">'+quoteHtml(quoteFor('action'), 'is-act', 'action')+'</div>'+
+        '</div>'+
       '</div>'+
-      '<div class="wi-row2" style="'+at(200)+'">'+workClientsHtml()+'<div class="wi-act">'+quoteHtml(quoteFor('action'), 'is-act', 'action')+'</div></div>'+
       '<div class="pr-cta" style="animation-delay:420ms">'+
         '<button class="ls-go pr-go" data-action="planLockIn"'+(first ? ' data-id="'+first.id+'"' : '')+'><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>'+
         (first ? '<div class="ls-go-sub">First up: '+escapeHtml(first.title)+'</div>' : '')+
-        '<button class="pr-later" data-action="closePlanReveal">Not yet</button>'+
       '</div>'+
     '</div>'+
   '</div>';

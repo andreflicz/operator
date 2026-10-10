@@ -78,7 +78,7 @@ function renderLockedMinimal(){
 }
 // full-screen feel: the sidebar and floating buttons step aside in the minimal view
 afterRenderHooks.push(function(){
-  const on = !!(state.focus && state.focus.activeSession && ui.view==='today' && lockedMinimal());
+  const on = !!(state.focus && state.focus.activeSession && ui.view==='today' && lockedMinimal()) || !!(ui.view==='today' && document.querySelector('#viewRoot .rest-full'));
   document.body.classList.toggle('np-on', on);
   const brk = !!(state.focus && state.focus.activeSession && state.focus.activeSession.onBreak);
   document.body.classList.toggle('is-on-break', brk);
@@ -230,16 +230,24 @@ const REST_IDEAS = [
   ['&#127774;','Get some sun.','Ten minutes of daylight does more than you’d think.']
 ];
 function restIdeas(n){ const d = Number(todayStr().replace(/-/g,'')), out = []; for(let i=0;i<n;i++) out.push(REST_IDEAS[(d + i*3) % REST_IDEAS.length]); return out; }
+// day off and the weekend: full-screen, minimal, like the minimal locked view (the corner button gives the sidebar back)
+function restFull(){ return ui.restFull!==false; }
+ACTIONS.toggleRestFull = function(){ ui.restFull = !restFull(); renderView(); };
+function restTopHtml(extra){
+  return '<div class="np-top"><span class="np-time" id="liveClock"></span><span style="flex:1"></span>'+(extra||'')+
+    '<button class="lv-btn" data-action="toggleRestFull" title="'+(restFull() ? 'Show the sidebar' : 'Full screen')+'">'+(restFull() ? '&#8690;' : '&#8689;')+'</button></div>';
+}
+function weekDeepMinutes(){ let m = 0; for(let i=0;i<7;i++){ const d = addDays(todayStr(), -i); m += i===0 ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); } return m; }
 // clocked out on the last work day before a day off: the weekend starts now, in the day-off look
 function renderWeekendOffView(elapsed){
   const today = todayStr(), nw = nextWorkDay(today), wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
   const ideas = restIdeas(3);
-  return '<div class="dayoff is-weekend">'+
+  return '<div class="np rest dayoff is-weekend'+(restFull() ? ' rest-full' : '')+'">'+
     '<div class="dayoff-bg"></div>'+
+    restTopHtml()+
     '<div class="dayoff-in">'+
       '<div class="dayoff-k">&#127937; Clocked out &middot; day off tomorrow</div>'+
       '<h1 class="dayoff-h">That’s the week'+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
-      '<div class="dayoff-sub" id="liveClock"></div>'+
       '<div class="dayoff-cards">'+
         '<div class="dayoff-c"><b>'+fmtHours(deepWorkMinutesTodayLive())+'</b><span>deep work today</span></div>'+
         '<div class="dayoff-c"><b id="modeElapsed">'+formatElapsed(elapsed)+'</b><span>off the clock</span></div>'+
@@ -254,21 +262,22 @@ function renderWeekendOffView(elapsed){
   '</div>';
 }
 function renderDayOffView(){
-  const streak = computeStreak(), today = todayStr(), nw = nextWorkDay(today), w = wakeCfg();
+  const streak = computeStreak(), nw = nextWorkDay(todayStr());
   const wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
-  const ideas = restIdeas(3);
-  return '<div class="dayoff">'+
-    '<div class="dayoff-bg"></div>'+
-    '<div class="dayoff-in">'+
-      '<div class="dayoff-k">&#127796; Day off</div>'+
-      '<h1 class="dayoff-h">Rest is part of the plan'+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
-      '<div class="dayoff-sub" id="liveClock"></div>'+
-      '<div class="dayoff-cards">'+
-        '<div class="dayoff-c"><b>'+streak+'</b><span>day streak — safe today</span></div>'+
-        (nw ? '<div class="dayoff-c"><b>'+weekdayShort(nw)+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
+  const stat = function(v, k){ return '<div class="rest-s"><b>'+v+'</b><span>'+k+'</span></div>'; };
+  return '<div class="np rest is-dayoff'+(restFull() ? ' rest-full' : '')+'">'+
+    '<div class="np-bg"></div>'+
+    restTopHtml('<button class="lv-btn rest-work" data-action="quickDayOff" title="Turn the day off back off">Work today</button>')+
+    '<div class="np-main">'+
+      '<div class="np-art is-dayoff"><span>&#127796;</span></div>'+
+      '<div class="np-meta">'+
+        '<div class="np-title rest-h">Day off.</div>'+
+        '<div class="rest-stats">'+
+          stat(streak, 'day streak')+
+          stat(fmtHours(weekDeepMinutes()), 'deep work this week')+
+          (nw ? stat(weekdayShort(nw), 'back'+(wake ? ' &middot; '+fmt12Hour(wake) : '')) : '')+
+        '</div>'+
       '</div>'+
-      (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
-      '<button class="dayoff-back" data-action="quickDayOff">Actually, I’ll work today</button>'+
     '</div>'+
   '</div>';
 }

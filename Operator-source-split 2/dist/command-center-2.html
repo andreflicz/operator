@@ -3134,6 +3134,46 @@
   .dayoff.is-weekend .dayoff-bg{ background:radial-gradient(55% 55% at 25% 30%, rgba(255,170,90,.24), transparent 70%), radial-gradient(50% 50% at 80% 70%, rgba(150,120,255,.2), transparent 70%), radial-gradient(40% 40% at 60% 20%, rgba(63,190,142,.14), transparent 70%); }
   .dayoff.is-weekend .dayoff-k{ color:#ffc56b; }
   .dayoff.is-weekend .dayoff-h span{ background:linear-gradient(90deg, #ffc56b, #c3a6ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+  /* business preview: two balanced columns */
+  .wi-cols{ grid-template-columns:1.25fr 1fr !important; align-items:stretch !important; }
+  .wi-col{ display:flex; flex-direction:column; gap:10px; min-height:0; }
+  .wi-col > .wi-plan{ flex:1; } .wi-col .wi-clients{ flex:none; }
+  .wi-right .wi-side{ flex:1 1 auto; } .wi-right .wi-act{ flex:1 1 auto; }
+  .wi-week{ padding:14px 16px; border-radius:20px; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.08); }
+  .wi-wk-bars{ position:relative; display:grid; grid-template-columns:repeat(7, 1fr); gap:8px; height:74px; margin-top:10px; padding-bottom:16px; }
+  .wi-wk-goal{ position:absolute; left:0; right:0; border-top:1px dashed rgba(255,255,255,.22); margin-bottom:16px; pointer-events:none; }
+  .wi-wk{ position:relative; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; height:100%; }
+  .wi-wk u{ display:block; width:100%; max-width:26px; border-radius:6px 6px 3px 3px; background:rgba(255,255,255,.16); text-decoration:none; transition:height .6s ease; }
+  .wi-wk.is-hit u{ background:linear-gradient(180deg, #7ef0c0, #3fbe8e); } .wi-wk.is-today u{ box-shadow:0 0 0 1px rgba(255,255,255,.55); }
+  .wi-wk span{ position:absolute; bottom:-16px; font-size:10.5px; color:rgba(255,255,255,.45); } .wi-wk.is-today span{ color:#fff; font-weight:700; }
+  .wi-row2{ display:none; }
+  @media (max-height:820px){ #planOverlay .wi-right .wi-act{ display:none; } }
+  @media (max-height:720px){ #planOverlay .wi-week{ display:none; } }
+  @media (max-width:860px){ .wi-cols{ grid-template-columns:1fr !important; } }
+  #planOverlay .wi-top .wd-close{ position:relative; z-index:3; }
+
+  /* day off / weekend: full screen and minimal */
+  .np.rest{ min-height:calc(100vh - 60px); border-radius:28px; }
+  .np.rest.rest-full{ min-height:100vh; border-radius:0; }
+  .np.rest .dayoff-bg, .np.rest .np-bg{ position:absolute; inset:-10%; }
+  .np.rest.dayoff{ align-items:stretch; justify-content:flex-start; }
+  .np.rest.dayoff .dayoff-in{ margin:auto; padding:0 0 8vh; }
+  .np.is-dayoff .np-bg{ background:radial-gradient(60% 60% at 28% 40%, rgba(63,190,142,.38), transparent 70%), radial-gradient(50% 50% at 78% 65%, rgba(111,195,255,.26), transparent 70%), radial-gradient(35% 35% at 60% 15%, rgba(255,197,107,.16), transparent 70%), #07100e; filter:blur(40px); animation:restDrift 24s ease-in-out infinite alternate; }
+  .np.is-weekend .dayoff-bg{ background:radial-gradient(55% 55% at 25% 30%, rgba(255,170,90,.3), transparent 70%), radial-gradient(50% 50% at 80% 70%, rgba(150,120,255,.26), transparent 70%), radial-gradient(40% 40% at 60% 20%, rgba(63,190,142,.14), transparent 70%), #0c0a10; filter:blur(36px); }
+  @keyframes restDrift{ to{ transform:translate3d(2%, -2%, 0) scale(1.04); } }
+  .np-art.is-dayoff{ background:linear-gradient(145deg, #7ef0c0, #2fa57c 50%, #3a7bd5); }
+  .rest-h{ font-size:clamp(48px, 6.5vw, 88px) !important; letter-spacing:-.04em !important; margin:2px 0 6px; }
+  .rest-stats{ display:flex; gap:clamp(18px, 3vw, 40px); margin-top:18px; flex-wrap:wrap; }
+  .rest-s{ display:flex; flex-direction:column; gap:2px; } .rest-s b{ font-family:var(--font-display); font-size:30px; font-weight:800; letter-spacing:-.02em; color:#fff; }
+  .rest-s span{ font-size:12.5px; color:rgba(255,255,255,.6); }
+  .rest-work{ font-size:12.5px; font-weight:600; padding:0 14px; width:auto !important; }
+  body.np-on .np.rest.rest-full{ border-radius:0; }
+  @media (prefers-reduced-motion:reduce){ .np.is-dayoff .np-bg{ animation:none; } }
+
+  .wi-wk-bars{ height:64px; padding-bottom:0; margin-bottom:18px; } .wi-wk-goal{ margin-bottom:0; }
+  #planOverlay .wi-inner{ justify-content:center; } #planOverlay .wi .pr-cta{ margin-top:22px; padding-top:0; }
+  .np.rest:not(.rest-full) .np-art{ width:clamp(150px, 20vw, 260px); } .np.rest:not(.rest-full) .np-main{ gap:clamp(24px, 4vw, 50px); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -20492,6 +20532,17 @@ function workClientsHtml(){
     return '<button class="wi-cl is-'+r.h.level+'" data-action="openContact" data-kind="client" data-id="'+r.c.id+'"><i></i><b>'+escapeHtml(crmName('client', r.c))+'</b><span>'+word+'</span></button>';
   }).join('')+'</div></div>';
 }
+// the last seven days of deep work, today on the right
+function workWeekHtml(target){
+  const today = todayStr(), days = [];
+  for(let i=6;i>=0;i--){ const dd = addDays(today, -i); days.push({d:dd, m: i===0 ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(dd)}); }
+  const total = days.reduce(function(a, x){ return a + x.m; }, 0), top = Math.max(target, ...days.map(function(x){ return x.m; }), 1);
+  const hit = days.filter(function(x){ return x.m >= target; }).length;
+  return '<div class="wi-week"><div class="wi-sec">Your week <span>'+fmtHours(total)+' &middot; '+hit+'/7 days on target</span></div>'+
+    '<div class="wi-wk-bars"><i class="wi-wk-goal" style="bottom:'+Math.min(96, target/top*100).toFixed(1)+'%" title="Daily target: '+fmtHours(target)+'"></i>'+days.map(function(x){
+      return '<div class="wi-wk'+(x.d===today?' is-today':'')+(x.m>=target?' is-hit':'')+'" title="'+weekdayShort(x.d)+': '+fmtDurationLabel(x.m)+'"><u style="height:'+Math.max(3, x.m/top*100).toFixed(1)+'%"></u><span>'+weekdayShort(x.d).slice(0,1)+'</span></div>';
+    }).join('')+'</div></div>';
+}
 function renderPlanReveal(){
   if(!ui.planReveal) return '';
   const plan = todaysPlan().filter(function(t){ return t.status!=='done'; }).slice(0, 6), first = plan[0];
@@ -20512,19 +20563,23 @@ function renderPlanReveal(){
       '<h1 class="wi-h" style="animation-delay:100ms">Let’s get to work'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
       '<div class="wi-stats n'+stats.length+'">'+stats.map(function(s){ return '<div class="wi-stat"'+(s.go ? ' data-action="'+s.go+'"' : '')+' style="'+at(140)+'"><div class="wi-stat-k">'+s.k+'</div><div class="wi-stat-v">'+s.v+'</div>'+(s.pct!=null ? '<div class="wi-bar"><i style="width:'+s.pct.toFixed(1)+'%"></i></div>' : '')+'<div class="wi-stat-s">'+escapeHtml(s.sub)+'</div></div>'; }).join('')+'</div>'+
       '<div class="wi-cols">'+
-        '<div class="wi-plan" style="'+at(300)+'"><div class="wi-sec">Plan of Attack <span>'+(plan.length ? plan.length+(plan.length===1?' thing':' things')+' &middot; ' : '')+'aim for '+fmtHours(target)+'</span></div>'+
-          (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(d + i*60)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">Due today</span>' : '')+'</li>'; }).join('')+'</ol>'
-            : '<div class="wd-empty">Nothing planned yet. Pick your first move in Lock in.</div>')+
-          (events.length ? '<div class="wi-cal">'+events.slice(0, 3).map(function(e){ return '<span><b>'+fmt12Hour(e.time)+'</b>'+escapeHtml(e.title)+'</span>'; }).join('')+'</div>' : '')+
+        '<div class="wi-col">'+
+          '<div class="wi-plan" style="'+at(300)+'"><div class="wi-sec">Plan of Attack <span>'+(plan.length ? plan.length+(plan.length===1?' thing':' things')+' &middot; ' : '')+'aim for '+fmtHours(target)+'</span></div>'+
+            (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(d + i*60)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">Due today</span>' : '')+'</li>'; }).join('')+'</ol>'
+              : '<div class="wd-empty">Nothing planned yet. Pick your first move in Lock in.</div>')+
+            (events.length ? '<div class="wi-cal">'+events.slice(0, 3).map(function(e){ return '<span><b>'+fmt12Hour(e.time)+'</b>'+escapeHtml(e.title)+'</span>'; }).join('')+'</div>' : '')+
+          '</div>'+
+          workClientsHtml()+
         '</div>'+
-        '<div class="wi-right" style="'+at(300)+'">'+(nightNote().work ? '<div class="wi-note"><span>&#127769; You told yourself</span><p>'+escapeHtml(nightNote().work)+'</p></div>' : '')+
-          '<div class="wi-side">'+quoteHtml(q, 'is-work', 'work')+'</div></div>'+
+        '<div class="wi-col wi-right" style="'+at(300)+'">'+(nightNote().work ? '<div class="wi-note"><span>&#127769; You told yourself</span><p>'+escapeHtml(nightNote().work)+'</p></div>' : '')+
+          '<div class="wi-side">'+quoteHtml(q, 'is-work', 'work')+'</div>'+
+          workWeekHtml(target)+
+          '<div class="wi-act">'+quoteHtml(quoteFor('action'), 'is-act', 'action')+'</div>'+
+        '</div>'+
       '</div>'+
-      '<div class="wi-row2" style="'+at(200)+'">'+workClientsHtml()+'<div class="wi-act">'+quoteHtml(quoteFor('action'), 'is-act', 'action')+'</div></div>'+
       '<div class="pr-cta" style="animation-delay:420ms">'+
         '<button class="ls-go pr-go" data-action="planLockIn"'+(first ? ' data-id="'+first.id+'"' : '')+'><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>'+
         (first ? '<div class="ls-go-sub">First up: '+escapeHtml(first.title)+'</div>' : '')+
-        '<button class="pr-later" data-action="closePlanReveal">Not yet</button>'+
       '</div>'+
     '</div>'+
   '</div>';
@@ -20631,7 +20686,7 @@ function renderLockedMinimal(){
 }
 // full-screen feel: the sidebar and floating buttons step aside in the minimal view
 afterRenderHooks.push(function(){
-  const on = !!(state.focus && state.focus.activeSession && ui.view==='today' && lockedMinimal());
+  const on = !!(state.focus && state.focus.activeSession && ui.view==='today' && lockedMinimal()) || !!(ui.view==='today' && document.querySelector('#viewRoot .rest-full'));
   document.body.classList.toggle('np-on', on);
   const brk = !!(state.focus && state.focus.activeSession && state.focus.activeSession.onBreak);
   document.body.classList.toggle('is-on-break', brk);
@@ -20783,16 +20838,24 @@ const REST_IDEAS = [
   ['&#127774;','Get some sun.','Ten minutes of daylight does more than you’d think.']
 ];
 function restIdeas(n){ const d = Number(todayStr().replace(/-/g,'')), out = []; for(let i=0;i<n;i++) out.push(REST_IDEAS[(d + i*3) % REST_IDEAS.length]); return out; }
+// day off and the weekend: full-screen, minimal, like the minimal locked view (the corner button gives the sidebar back)
+function restFull(){ return ui.restFull!==false; }
+ACTIONS.toggleRestFull = function(){ ui.restFull = !restFull(); renderView(); };
+function restTopHtml(extra){
+  return '<div class="np-top"><span class="np-time" id="liveClock"></span><span style="flex:1"></span>'+(extra||'')+
+    '<button class="lv-btn" data-action="toggleRestFull" title="'+(restFull() ? 'Show the sidebar' : 'Full screen')+'">'+(restFull() ? '&#8690;' : '&#8689;')+'</button></div>';
+}
+function weekDeepMinutes(){ let m = 0; for(let i=0;i<7;i++){ const d = addDays(todayStr(), -i); m += i===0 ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); } return m; }
 // clocked out on the last work day before a day off: the weekend starts now, in the day-off look
 function renderWeekendOffView(elapsed){
   const today = todayStr(), nw = nextWorkDay(today), wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
   const ideas = restIdeas(3);
-  return '<div class="dayoff is-weekend">'+
+  return '<div class="np rest dayoff is-weekend'+(restFull() ? ' rest-full' : '')+'">'+
     '<div class="dayoff-bg"></div>'+
+    restTopHtml()+
     '<div class="dayoff-in">'+
       '<div class="dayoff-k">&#127937; Clocked out &middot; day off tomorrow</div>'+
       '<h1 class="dayoff-h">That’s the week'+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
-      '<div class="dayoff-sub" id="liveClock"></div>'+
       '<div class="dayoff-cards">'+
         '<div class="dayoff-c"><b>'+fmtHours(deepWorkMinutesTodayLive())+'</b><span>deep work today</span></div>'+
         '<div class="dayoff-c"><b id="modeElapsed">'+formatElapsed(elapsed)+'</b><span>off the clock</span></div>'+
@@ -20807,21 +20870,22 @@ function renderWeekendOffView(elapsed){
   '</div>';
 }
 function renderDayOffView(){
-  const streak = computeStreak(), today = todayStr(), nw = nextWorkDay(today), w = wakeCfg();
+  const streak = computeStreak(), nw = nextWorkDay(todayStr());
   const wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
-  const ideas = restIdeas(3);
-  return '<div class="dayoff">'+
-    '<div class="dayoff-bg"></div>'+
-    '<div class="dayoff-in">'+
-      '<div class="dayoff-k">&#127796; Day off</div>'+
-      '<h1 class="dayoff-h">Rest is part of the plan'+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
-      '<div class="dayoff-sub" id="liveClock"></div>'+
-      '<div class="dayoff-cards">'+
-        '<div class="dayoff-c"><b>'+streak+'</b><span>day streak — safe today</span></div>'+
-        (nw ? '<div class="dayoff-c"><b>'+weekdayShort(nw)+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
+  const stat = function(v, k){ return '<div class="rest-s"><b>'+v+'</b><span>'+k+'</span></div>'; };
+  return '<div class="np rest is-dayoff'+(restFull() ? ' rest-full' : '')+'">'+
+    '<div class="np-bg"></div>'+
+    restTopHtml('<button class="lv-btn rest-work" data-action="quickDayOff" title="Turn the day off back off">Work today</button>')+
+    '<div class="np-main">'+
+      '<div class="np-art is-dayoff"><span>&#127796;</span></div>'+
+      '<div class="np-meta">'+
+        '<div class="np-title rest-h">Day off.</div>'+
+        '<div class="rest-stats">'+
+          stat(streak, 'day streak')+
+          stat(fmtHours(weekDeepMinutes()), 'deep work this week')+
+          (nw ? stat(weekdayShort(nw), 'back'+(wake ? ' &middot; '+fmt12Hour(wake) : '')) : '')+
+        '</div>'+
       '</div>'+
-      (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
-      '<button class="dayoff-back" data-action="quickDayOff">Actually, I’ll work today</button>'+
     '</div>'+
   '</div>';
 }
