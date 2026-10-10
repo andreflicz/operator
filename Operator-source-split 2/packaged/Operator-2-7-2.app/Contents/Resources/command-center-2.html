@@ -1045,7 +1045,7 @@
   .np-row{ display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:transparent; border:1px solid transparent; border-radius:8px; padding:7px 8px; color:var(--text); font-size:13px; }
   .np-row:hover{ background:var(--panel); border-color:var(--border); }
   .np-row.is-on{ border-color:var(--accent); background:var(--accent-dim); }
-  .np-title{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .npk-title{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .np-check{ color:var(--accent); font-weight:700; }
   .np-auto{ color:var(--text-dim); font-style:italic; margin-top:4px; }
   /* right-click menu */
@@ -1982,24 +1982,24 @@
   .sidebar.collapsed .brand-btns{ flex-direction:column; }
   .notif-panel{ position:fixed; left:14px; top:62px; z-index:900; width:360px; max-width:calc(100vw - 28px); max-height:min(70vh, 620px); overflow-y:auto; background:var(--pop, var(--panel)); border:1px solid var(--border-strong); border-radius:16px; box-shadow:0 24px 60px rgba(0,0,0,calc(.5*var(--sh-k, 1))); padding:10px; animation:npIn .18s cubic-bezier(.2,.8,.2,1); }
   @keyframes npIn{ from{ opacity:0; transform:translateY(-6px) scale(.98); } to{ opacity:1; transform:none; } }
-  .np-head{ display:flex; align-items:center; gap:6px; padding:4px 6px 8px; }
-  .np-title{ flex:1; font-family:var(--font-display); font-weight:700; font-size:15px; }
-  .np-clear{ border:none; background:transparent; color:var(--text-faint); font-size:12px; cursor:pointer; } .np-clear:hover{ color:var(--text); }
-  .np-x{ border:none; background:transparent; color:var(--text-faint); cursor:pointer; font-size:12px; padding:4px 6px; }
-  .np-group{ margin-top:6px; }
-  .np-k{ font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); padding:6px 8px 4px; }
-  .np-item{ display:flex; align-items:center; gap:4px; border-radius:11px; transition:background .12s; }
-  .np-item:hover{ background:var(--panel-2); }
-  .np-main{ flex:1; min-width:0; display:flex; align-items:flex-start; gap:10px; padding:8px; border:none; background:transparent; color:var(--text); text-align:left; cursor:pointer; font-family:var(--font-body); }
-  .np-i{ flex:none; width:28px; height:28px; border-radius:9px; display:flex; align-items:center; justify-content:center; background:var(--panel-2); font-size:14px; }
-  .np-item.is-danger .np-i{ background:rgba(232,99,107,.16); box-shadow:inset 0 0 0 1px rgba(232,99,107,.4); }
-  .np-item.is-warn .np-i{ background:rgba(232,162,61,.14); box-shadow:inset 0 0 0 1px rgba(232,162,61,.35); }
-  .np-txt{ display:flex; flex-direction:column; min-width:0; }
-  .np-t{ font-weight:600; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .np-s{ font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .np-dismiss{ flex:none; border:none; background:transparent; color:var(--text-faint); cursor:pointer; opacity:0; padding:6px 8px; font-size:11px; }
-  .np-item:hover .np-dismiss{ opacity:1; } .np-dismiss:hover{ color:var(--text); }
-  .np-empty{ text-align:center; color:var(--text-dim); padding:26px 10px; font-size:13.5px; }
+  .nt-head{ display:flex; align-items:center; gap:6px; padding:4px 6px 8px; }
+  .nt-title{ flex:1; font-family:var(--font-display); font-weight:700; font-size:15px; }
+  .nt-clear{ border:none; background:transparent; color:var(--text-faint); font-size:12px; cursor:pointer; } .nt-clear:hover{ color:var(--text); }
+  .nt-x{ border:none; background:transparent; color:var(--text-faint); cursor:pointer; font-size:12px; padding:4px 6px; }
+  .nt-group{ margin-top:6px; }
+  .nt-k{ font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); padding:6px 8px 4px; }
+  .nt-item{ display:flex; align-items:center; gap:4px; border-radius:11px; transition:background .12s; }
+  .nt-item:hover{ background:var(--panel-2); }
+  .nt-main{ flex:1; min-width:0; display:flex; align-items:flex-start; gap:10px; padding:8px; border:none; background:transparent; color:var(--text); text-align:left; cursor:pointer; font-family:var(--font-body); }
+  .nt-i{ flex:none; width:28px; height:28px; border-radius:9px; display:flex; align-items:center; justify-content:center; background:var(--panel-2); font-size:14px; }
+  .nt-item.is-danger .nt-i{ background:rgba(232,99,107,.16); box-shadow:inset 0 0 0 1px rgba(232,99,107,.4); }
+  .nt-item.is-warn .nt-i{ background:rgba(232,162,61,.14); box-shadow:inset 0 0 0 1px rgba(232,162,61,.35); }
+  .nt-txt{ display:flex; flex-direction:column; min-width:0; }
+  .nt-t{ font-weight:600; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .nt-s{ font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .nt-dismiss{ flex:none; border:none; background:transparent; color:var(--text-faint); cursor:pointer; opacity:0; padding:6px 8px; font-size:11px; }
+  .nt-item:hover .nt-dismiss{ opacity:1; } .nt-dismiss:hover{ color:var(--text); }
+  .nt-empty{ text-align:center; color:var(--text-dim); padding:26px 10px; font-size:13.5px; }
 
   /* ---- GoHighLevel pane ---- */
   .ghl-pane{ width:min(760px, 100%); max-height:88vh; overflow:hidden; display:flex; flex-direction:column; }
@@ -2983,7 +2983,7 @@
   .np-art.is-break{ background:linear-gradient(145deg, #6fc3ff, #4a6cf0 55%, #7b4fd6); }
   .np-meta{ width:min(520px, 90vw); display:flex; flex-direction:column; gap:6px; }
   .np-k{ font-size:12px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,.6); }
-  .np-title{ font-family:var(--font-display); font-size:clamp(28px, 3.4vw, 44px); font-weight:800; line-height:1.1; letter-spacing:-.02em; }
+  .np .np-title{ font-family:var(--font-display); font-size:clamp(28px, 3.4vw, 44px); font-weight:800; line-height:1.1; letter-spacing:-.02em; }
   .np-sub{ font-size:16px; color:rgba(255,255,255,.7); } .np-sub b{ color:#fff; }
   .np-prog{ margin-top:22px; }
   .np-bar{ height:6px; border-radius:4px; background:rgba(255,255,255,.18); overflow:hidden; } .np-bar i{ display:block; height:100%; background:#fff; border-radius:4px; transition:width 1s linear; }
@@ -3224,6 +3224,17 @@
   .carousel.bleed{ margin-left:calc(-1 * var(--bleed-l, 36px)); margin-right:calc(-1 * var(--bleed-r, 36px)); }
   .carousel.bleed > .car-track{ padding-left:var(--bleed-l, 36px); padding-right:var(--bleed-r, 36px); scroll-padding-inline:var(--bleed-l, 36px); padding-top:10px; padding-bottom:18px; margin-top:-6px; margin-bottom:-6px; }
   .carousel.bleed .car-prev{ left:max(10px, calc(var(--bleed-l, 36px) - 54px)); } .carousel.bleed .car-next{ right:max(10px, calc(var(--bleed-r, 36px) - 54px)); }
+
+  /* Good morning: quicker pieces, no grid edge, the whole screen is the page */
+  .brief2 .br-p{ animation-duration:.75s !important; }
+  .brief2 .br-thoughts .br-th{ animation-duration:.6s; animation-delay:calc(var(--d, 0ms) - var(--shift, 0ms) + 150ms + var(--i)*140ms); }
+  .brief4 .brief-grid-bg{ display:none; }
+  .brief4 .b4-grid.cols-2{ grid-template-columns:1.15fr 1fr; }
+
+  /* notifications: show the whole line — wrap instead of cutting off with dots */
+  .nt-t, .nt-s{ white-space:normal !important; overflow:visible !important; text-overflow:clip !important; overflow-wrap:anywhere; }
+  .nt-t{ line-height:1.3; } .nt-s{ line-height:1.35; margin-top:2px; }
+  .nt-title{ white-space:nowrap; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -7342,7 +7353,7 @@ function nextPickerHtml(where){
   const backlog = sortByPriorityAndDeadline(state.tasks.items.filter(function(t){ return t.status==='backlog'; })).slice(0, 6);
   const next = nextUpTask();
   const row = function(t, fromBacklog){
-    return '<button class="np-row'+(next && next.id===t.id?' is-on':'')+'" data-action="pickNextTask" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span class="np-title">'+escapeHtml(t.title)+'</span>'+(fromBacklog?'<span class="kpi-sub">backlog</span>':'')+(next && next.id===t.id?'<span class="np-check">&#10003;</span>':'')+'</button>';
+    return '<button class="np-row'+(next && next.id===t.id?' is-on':'')+'" data-action="pickNextTask" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span class="npk-title">'+escapeHtml(t.title)+'</span>'+(fromBacklog?'<span class="kpi-sub">backlog</span>':'')+(next && next.id===t.id?'<span class="np-check">&#10003;</span>':'')+'</button>';
   };
   return '<div class="next-picker" data-key="np-'+where+'">'+
     '<div class="np-head"><span class="kind-label" style="margin:0;">What\'s next?</span><button class="mini-move" data-action="toggleNextPicker" data-where="'+where+'">&#10005;</button></div>'+
@@ -17988,6 +17999,7 @@ function sceneSettingsHtml(){
         '<span class="scene-name">'+s.label+(s.sub ? ' <em>'+s.sub+'</em>' : '')+'</span></button>';
     }).join('')+videoWallCardsHtml(cur)+'</div>'+
     videoWallAddHtml()+
+    '<div class="scene-motion"><span>Full screen'+tip('Good morning, the work preview, the minimal locked-in view, breaks and day off take the whole display (real macOS full screen through the Operator launcher). Off keeps them in the window.')+'</span><div class="seg">'+[['on','On'],['off','Off']].map(function(m){ const on = (state.profile.trueFull!==false)===(m[0]==='on'); return '<button class="seg-b'+(on?' is-on':'')+'" data-action="'+(on ? 'noop' : 'toggleTrueFull')+'">'+m[1]+'</button>'; }).join('')+'</div></div>'+
     (SCENE_DEFS[cur] ? '<div class="scene-motion"><span>Motion'+tip('Off keeps the picture still (fastest) — it still fades from morning to day to dusk to night. Calm moves the clouds, stars and snow gently. Smooth is twice the frame rate.')+'</span><div class="seg">'+[['off','Off'],['calm','Calm'],['smooth','Smooth']].map(function(m){ return '<button class="seg-b'+(sceneMotion()===m[0]?' is-on':'')+'" data-action="setSceneMotion" data-id="'+m[0]+'">'+m[1]+'</button>'; }).join('')+'</div></div>' : '')+
   '</div></div>';
 }
@@ -19401,15 +19413,15 @@ function notifBadge(){
 }
 function notifPanelHtml(list){
   const groups = [['deadline','Deadlines'],['client','Clients'],['lead','Leads'],['calendar','Coming up'],['ghl','GoHighLevel']];
-  return '<div class="np-head"><span class="np-title">Notifications</span>'+(list.length ? '<button class="np-clear" data-action="notifClearAll">Clear all</button>' : '')+'<button class="np-x" data-action="toggleNotifs" title="Close">&#10005;</button></div>'+
+  return '<div class="nt-head"><span class="nt-title">Notifications</span>'+(list.length ? '<button class="nt-clear" data-action="notifClearAll">Clear all</button>' : '')+'<button class="nt-x" data-action="toggleNotifs" title="Close">&#10005;</button></div>'+
     (list.length ? groups.map(function(gr){
       const items = list.filter(function(n){ return n.kind===gr[0]; }); if(!items.length) return '';
-      return '<div class="np-group"><div class="np-k">'+gr[1]+'</div>'+items.map(function(n){
-        return '<div class="np-item is-'+n.level+'" data-key="np-'+escapeHtml(n.key)+'">'+
-          '<button class="np-main" data-action="notifOpen" data-id="'+escapeHtml(n.key)+'"><span class="np-i">'+n.icon+'</span><span class="np-txt"><span class="np-t">'+escapeHtml(n.title)+'</span><span class="np-s">'+escapeHtml(n.sub||'')+'</span></span></button>'+
-          '<button class="np-dismiss" data-action="notifDismiss" data-id="'+escapeHtml(n.key)+'" title="Hide for today">&#10005;</button></div>';
+      return '<div class="nt-group"><div class="nt-k">'+gr[1]+'</div>'+items.map(function(n){
+        return '<div class="nt-item is-'+n.level+'" data-key="np-'+escapeHtml(n.key)+'">'+
+          '<button class="nt-main" data-action="notifOpen" data-id="'+escapeHtml(n.key)+'"><span class="nt-i">'+n.icon+'</span><span class="nt-txt"><span class="nt-t">'+escapeHtml(n.title)+'</span><span class="nt-s">'+escapeHtml(n.sub||'')+'</span></span></button>'+
+          '<button class="nt-dismiss" data-action="notifDismiss" data-id="'+escapeHtml(n.key)+'" title="Hide for today">&#10005;</button></div>';
       }).join('')+'</div>';
-    }).join('') : '<div class="np-empty"><div style="font-size:26px;">&#10024;</div>All clear — nothing needs you right now.</div>');
+    }).join('') : '<div class="nt-empty"><div style="font-size:26px;">&#10024;</div>All clear — nothing needs you right now.</div>');
 }
 function notifRender(list){ const el = document.getElementById('notifPanel'); if(el) morphInto(el, notifPanelHtml(list || notifList())); }
 ACTIONS.toggleNotifs = function(){
@@ -20442,7 +20454,7 @@ function lastNightSleep(){
   const h = state.modes.history.filter(function(m){ return m.sleep && m.endedAt && Date.now() - m.endedAt < 8*3600000 && m.minutes >= 60; }).sort(function(a, b){ return b.endedAt - a.endedAt; })[0];
   return h ? {minutes:h.minutes, from:h.startedAt, to:h.endedAt} : null;
 }
-function briefBase(){ return wakeCfg().intro!=='quick' ? 5600 : 3000; }
+function briefBase(){ return wakeCfg().intro!=='quick' ? 4800 : 1800; }
 // your morning playlist (Apple Music), one click — and it can follow the wake-up song by itself
 function morningPlaylist(){ const m = state.profile.morningPlaylist; return m && m.q ? m : null; }
 function playlistBtnHtml(){
@@ -20525,7 +20537,7 @@ function wakeBriefHtml(){
   let k = 0, tcur = base;
   const panel = function(cls, anim, voice, html, extraStyle, attrs){
     const d = tcur; k++;
-    if(voice){ lines.push({at: d - 380, text: voice}); tcur += Math.max(2800, voice.split(' ').length*BRIEF_WORD_MS + 1800); } else tcur += 1200;
+    if(voice){ lines.push({at: d - 380, text: voice}); tcur += Math.max(1500, voice.split(' ').length*BRIEF_WORD_MS + 650); } else tcur += 800;
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
   const slept = lastNightSleep();
@@ -20583,7 +20595,8 @@ function wakeBriefHtml(){
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
       '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
       '<div class="br-voice br-p br-a-fade" style="--d:'+(base-700)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
-      '<div class="b4-grid"><div class="b4-col">'+colA.join('')+'</div><div class="b4-col">'+colB.join('')+'</div><div class="b4-col">'+colC.join('')+'</div></div>'+
+      // no news column (headlines off) → two columns that fill the width instead of an empty third
+      '<div class="b4-grid'+(colC.length ? '' : ' cols-2')+'"><div class="b4-col">'+colA.join('')+'</div><div class="b4-col">'+colB.join('')+'</div>'+(colC.length ? '<div class="b4-col">'+colC.join('')+'</div>' : '')+'</div>'+
       '<div class="brief-cta br-p br-a-rise" data-k="'+k+'" style="--d:'+ctaD+'ms">'+
         '<button class="brief-go brief-morning" data-action="wakeStartMorning">&#9728;&#65039; Start My Morning</button>'+
       '</div>'+
@@ -20602,7 +20615,7 @@ ACTIONS.wakeIntroSkip = function(){
 };
 // ---- the narration: one line at a time, typed out ----
 let briefVoiceTimer = null;
-const BRIEF_WORD_MS = 340; // about 175 words a minute — an easy, unhurried read
+const BRIEF_WORD_MS = 190; // a comfortable read: each line finishes before the next piece arrives
 function briefBuilt(){ const l = ui.briefLines || []; return !!l.length && Date.now() - (ui.briefT0||0) > l[l.length-1].at + 2000; }
 function briefVoiceRun(){
   clearInterval(briefVoiceTimer);
@@ -20628,6 +20641,25 @@ function briefVoiceRun(){
 }
 // shows the whole page at once (no narration build-up) — used by tests
 function briefRevealAll(){ ui.wakeIntroDone = true; ui.briefSkipped = true; renderWakeOverlayInto(); }
+// a click anywhere on the page (not on a button) brings the next piece in right away
+function briefAdvance(){
+  const lines = ui.briefLines || [], t = Date.now() - (ui.briefT0||0);
+  const next = lines.find(function(l){ return l.at > t; });
+  if(!next){ return; }
+  const shift = next.at - t;
+  ui.briefT0 = (ui.briefT0||Date.now()) - shift; ui.briefShift = (ui.briefShift||0) + shift; ui.wakeIntroDone = true;
+  renderWakeOverlayInto();
+}
+document.addEventListener('click', function(e){
+  if(ui.wakeMode!=='brief' || !overlayOpen('wakeOverlay')) return;
+  const b = e.target.closest && e.target.closest('#wakeContent .brief4'); if(!b) return;
+  // the Start button can't be pressed before it has appeared (a click there was starting the morning blind)
+  const piece = e.target.closest('.brief-cta');
+  const hidden = piece && parseFloat(getComputedStyle(piece).opacity) < 0.08;
+  if(hidden){ e.preventDefault(); e.stopImmediatePropagation(); briefAdvance(); return; }
+  if(e.target.closest('button, a, input, [data-action]')) return;
+  briefAdvance();
+}, true);
 // Skip: the page lifts away and you're on the front page
 ACTIONS.briefSkip = function(){
   ui.wakeIntroDone = true; ui.briefSkipped = true;
@@ -21104,6 +21136,48 @@ function renderDayOffView(){
     '</div>'+
   '</div>';
 }
+
+// ---- true full screen: Good morning, the work preview and the full-screen views take the whole
+// display, not just the window. The launcher puts the window into real macOS full screen (no
+// "press Esc" bubble; macOS asks once for Accessibility permission); without it, Chrome's own.
+function trueFullOn(){ return state.profile.trueFull!==false; }
+function wantTrueFull(){
+  if(!trueFullOn()) return false;
+  return document.body.classList.contains('np-on') || overlayOpen('planOverlay') || (overlayOpen('wakeOverlay') && (ui.wakeMode==='brief' || ui.wakeMode==='ring' || ui.wakeMode==='snooze'));
+}
+const TF = {want:false, via:null, busy:false, warned:false};
+async function trueFullSet(on){
+  // only undo a full screen we made (if you'd already made the window full screen, it stays)
+  if(!on && !TF.via) return;
+  if(!on && TF.via==='web'){ try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){} TF.via = null; return; }
+  TF.busy = true;
+  let ok = false, why = '';
+  try{
+    const r = await fetchWithin(WAKE_HELPER+'window/full?f='+(on ? 1 : 0), 4000);
+    ok = !!(r && r.ok); if(!ok && r){ try{ why = (await r.json()).error || ''; }catch(e){} }
+  }catch(e){}
+  if(ok) TF.via = on ? 'mac' : null;
+  else if(why==='accessibility') {
+    // no launcher (or no permission yet): the browser's own full screen
+    try{
+      if(on && !document.fullscreenElement && document.documentElement.requestFullscreen){ await document.documentElement.requestFullscreen({navigationUI:'hide'}); TF.via = 'web'; }
+      else if(!on && document.fullscreenElement && TF.via==='web'){ await document.exitFullscreen(); TF.via = null; }
+    }catch(e){}
+    if(on && why==='accessibility' && !TF.warned){ TF.warned = true; showToast('For true full screen, allow Operator in System Settings → Privacy & Security → Accessibility.', {icon:'&#9974;', duration:8000}); }
+  }
+  TF.busy = false;
+}
+function trueFullSync(){
+  const w = wantTrueFull();
+  if(w===TF.want || TF.busy) return;
+  TF.want = w; trueFullSet(w);
+}
+afterRenderHooks.push(function(){ setTimeout(trueFullSync, 0); });
+setInterval(function(){ if(typeof state!=='undefined' && state && state.profile) trueFullSync(); }, 700);
+// leaving Chrome's full screen with Esc counts as "not now" until the screen changes
+document.addEventListener('fullscreenchange', function(){ if(!document.fullscreenElement && TF.via==='web'){ TF.via = null; } });
+ACTIONS.toggleTrueFull = function(){ state.profile.trueFull = !trueFullOn(); persist('profile'); if(!trueFullOn() && TF.want){ TF.want = false; trueFullSet(false); } renderView(); };
+ACTIONS.noop = function(){};
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

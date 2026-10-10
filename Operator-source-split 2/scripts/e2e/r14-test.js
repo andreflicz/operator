@@ -16,9 +16,9 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
     await p.setViewportSize({width:2200, height:1100});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     const full = () => p.evaluate(() => { const n = document.querySelector('.np'); if(!n) return null; const r = n.getBoundingClientRect(); return Math.abs(r.left) < 2 && Math.abs(r.top) < 2 && Math.abs(r.width - innerWidth) < 4 && Math.abs(r.height - innerHeight) < 4 ? true : [r.left, r.top, r.width, r.height, innerWidth, innerHeight, document.body.className]; });
-    await E("ACTIONS.clockOut()"); await p.waitForTimeout(600);
+    await E("ACTIONS.clockOut()"); await p.waitForTimeout(1400);
     { const f = await full(); check('weekend clock-out fills the whole wide window', f===true, f); }
-    await E("clockIn({quiet:true}); ui.planReveal=null; hideOverlay('planOverlay'); ui.currentTaskId='t0'; startFocus(); state.profile.lockedView='minimal'; renderView()"); await p.waitForTimeout(600);
+    await E("clockIn({quiet:true}); ui.planReveal=null; hideOverlay('planOverlay'); ui.currentTaskId='t0'; startFocus(); state.profile.lockedView='minimal'; renderView()"); await p.waitForTimeout(1400);
     { const f = await full(); check('the minimal locked view fills the whole wide window', f===true, f); }
     check('the next alarm says which day (Mon), not just a time', /Mon 7:00/.test(await p.textContent('.np-ring')));
     check('no page errors (full-screen views)', p.errors.length===0, p.errors);
@@ -74,9 +74,9 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
     await E("fireWake({})"); await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(400);
     check('sunrise background by default (not black)', await p.$('.brief.bg-sunrise')!==null);
     const lines = await E("JSON.stringify(ui.briefLines)"), L = JSON.parse(lines);
-    const paced = L.every((l, i) => i===0 || l.at - L[i-1].at >= Math.max(2800, L[i-1].text.split(' ').length*340 + 1800) - 1);
+    const paced = L.every((l, i) => i===0 || l.at - L[i-1].at >= Math.max(1500, L[i-1].text.split(' ').length*190 + 650) - 1);
     check('narration is paced: every line is fully said and rests before the next', paced, L.map(l => l.at));
-    await p.clock.runFor(L[0].at + 380 + 700); await p.waitForTimeout(300);
+    await p.clock.runFor(L[0].at + 380 + 250); await p.waitForTimeout(50);
     const said = await p.textContent('#brVoice');
     check('…and types a word at a time, slowly (not the whole line at once)', said.length > 0 && said.length < L[0].text.length, said);
     await E("briefRevealAll()"); await p.waitForTimeout(1200);

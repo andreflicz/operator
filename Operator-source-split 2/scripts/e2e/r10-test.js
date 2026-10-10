@@ -56,7 +56,7 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     check('briefing: the note and today (the plan waits for the business preview)', /Today/.test(await p.textContent('.br-day .br-k')) && /Call Mike first/.test(brief) && !/Call Mike back|Edit JJS reel 3/.test(brief));
     await E("ACTIONS.wakeIntroSkip()");
     // round 13: Start my morning hands off (520 ms leave animation) to the business preview, not Morning mode
-    await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(900);
+    await p.evaluate(() => window.__op.ev("briefRevealAll()")); await p.waitForTimeout(900); await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(900);
     check('Start my morning → the business preview (no Morning mode)', !(await E("state.modes.active && state.modes.active.morning")) && !(await p.isVisible('#wakeOverlay:not(.hidden)')) && await p.isVisible('#planOverlay:not(.hidden) .wi-plan') && !(await p.isVisible('.mm-card')));
     const plan = await p.$$eval('#planOverlay .pr-list .pr-t', e => e.map(x => x.textContent));
     check('…its Plan of Attack is last night\'s plan, #1 first', plan[0]==='Call Mike back' && plan[1]==='Edit JJS reel 3', plan);

@@ -106,7 +106,7 @@ function nextPickerHtml(where){
   const backlog = sortByPriorityAndDeadline(state.tasks.items.filter(function(t){ return t.status==='backlog'; })).slice(0, 6);
   const next = nextUpTask();
   const row = function(t, fromBacklog){
-    return '<button class="np-row'+(next && next.id===t.id?' is-on':'')+'" data-action="pickNextTask" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span class="np-title">'+escapeHtml(t.title)+'</span>'+(fromBacklog?'<span class="kpi-sub">backlog</span>':'')+(next && next.id===t.id?'<span class="np-check">&#10003;</span>':'')+'</button>';
+    return '<button class="np-row'+(next && next.id===t.id?' is-on':'')+'" data-action="pickNextTask" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span class="npk-title">'+escapeHtml(t.title)+'</span>'+(fromBacklog?'<span class="kpi-sub">backlog</span>':'')+(next && next.id===t.id?'<span class="np-check">&#10003;</span>':'')+'</button>';
   };
   return '<div class="next-picker" data-key="np-'+where+'">'+
     '<div class="np-head"><span class="kind-label" style="margin:0;">What\'s next?</span><button class="mini-move" data-action="toggleNextPicker" data-where="'+where+'">&#10005;</button></div>'+

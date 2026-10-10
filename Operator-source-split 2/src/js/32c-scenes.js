@@ -419,6 +419,7 @@ function sceneSettingsHtml(){
         '<span class="scene-name">'+s.label+(s.sub ? ' <em>'+s.sub+'</em>' : '')+'</span></button>';
     }).join('')+videoWallCardsHtml(cur)+'</div>'+
     videoWallAddHtml()+
+    '<div class="scene-motion"><span>Full screen'+tip('Good morning, the work preview, the minimal locked-in view, breaks and day off take the whole display (real macOS full screen through the Operator launcher). Off keeps them in the window.')+'</span><div class="seg">'+[['on','On'],['off','Off']].map(function(m){ const on = (state.profile.trueFull!==false)===(m[0]==='on'); return '<button class="seg-b'+(on?' is-on':'')+'" data-action="'+(on ? 'noop' : 'toggleTrueFull')+'">'+m[1]+'</button>'; }).join('')+'</div></div>'+
     (SCENE_DEFS[cur] ? '<div class="scene-motion"><span>Motion'+tip('Off keeps the picture still (fastest) — it still fades from morning to day to dusk to night. Calm moves the clouds, stars and snow gently. Smooth is twice the frame rate.')+'</span><div class="seg">'+[['off','Off'],['calm','Calm'],['smooth','Smooth']].map(function(m){ return '<button class="seg-b'+(sceneMotion()===m[0]?' is-on':'')+'" data-action="setSceneMotion" data-id="'+m[0]+'">'+m[1]+'</button>'; }).join('')+'</div></div>' : '')+
   '</div></div>';
 }

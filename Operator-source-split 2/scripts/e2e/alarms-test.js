@@ -84,7 +84,7 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   await p.click('[data-action="wakeStartDay"]');
   await E("briefRevealAll()");
   // round 13: Start my morning goes straight to the business preview (no Morning mode / .mm-clockin in between)
-  await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(900);
+  await p.evaluate(() => window.__op.ev("briefRevealAll()")); await p.waitForTimeout(900); await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(900);
   check('Start my morning (after Good morning) shows the plan in the business preview', !(await p.isVisible('#wakeOverlay')) && await p.isVisible('#planOverlay .pr-go') && (await p.textContent('#planOverlay')).includes('Edit reel'));
   await p.click('[data-action="closePlanReveal"]');
   await p.close();

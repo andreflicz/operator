@@ -332,3 +332,45 @@ function renderDayOffView(){
     '</div>'+
   '</div>';
 }
+
+// ---- true full screen: Good morning, the work preview and the full-screen views take the whole
+// display, not just the window. The launcher puts the window into real macOS full screen (no
+// "press Esc" bubble; macOS asks once for Accessibility permission); without it, Chrome's own.
+function trueFullOn(){ return state.profile.trueFull!==false; }
+function wantTrueFull(){
+  if(!trueFullOn()) return false;
+  return document.body.classList.contains('np-on') || overlayOpen('planOverlay') || (overlayOpen('wakeOverlay') && (ui.wakeMode==='brief' || ui.wakeMode==='ring' || ui.wakeMode==='snooze'));
+}
+const TF = {want:false, via:null, busy:false, warned:false};
+async function trueFullSet(on){
+  // only undo a full screen we made (if you'd already made the window full screen, it stays)
+  if(!on && !TF.via) return;
+  if(!on && TF.via==='web'){ try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){} TF.via = null; return; }
+  TF.busy = true;
+  let ok = false, why = '';
+  try{
+    const r = await fetchWithin(WAKE_HELPER+'window/full?f='+(on ? 1 : 0), 4000);
+    ok = !!(r && r.ok); if(!ok && r){ try{ why = (await r.json()).error || ''; }catch(e){} }
+  }catch(e){}
+  if(ok) TF.via = on ? 'mac' : null;
+  else if(why==='accessibility') {
+    // no launcher (or no permission yet): the browser's own full screen
+    try{
+      if(on && !document.fullscreenElement && document.documentElement.requestFullscreen){ await document.documentElement.requestFullscreen({navigationUI:'hide'}); TF.via = 'web'; }
+      else if(!on && document.fullscreenElement && TF.via==='web'){ await document.exitFullscreen(); TF.via = null; }
+    }catch(e){}
+    if(on && why==='accessibility' && !TF.warned){ TF.warned = true; showToast('For true full screen, allow Operator in System Settings → Privacy & Security → Accessibility.', {icon:'&#9974;', duration:8000}); }
+  }
+  TF.busy = false;
+}
+function trueFullSync(){
+  const w = wantTrueFull();
+  if(w===TF.want || TF.busy) return;
+  TF.want = w; trueFullSet(w);
+}
+afterRenderHooks.push(function(){ setTimeout(trueFullSync, 0); });
+setInterval(function(){ if(typeof state!=='undefined' && state && state.profile) trueFullSync(); }, 700);
+// leaving Chrome's full screen with Esc counts as "not now" until the screen changes
+document.addEventListener('fullscreenchange', function(){ if(!document.fullscreenElement && TF.via==='web'){ TF.via = null; } });
+ACTIONS.toggleTrueFull = function(){ state.profile.trueFull = !trueFullOn(); persist('profile'); if(!trueFullOn() && TF.want){ TF.want = false; trueFullSet(false); } renderView(); };
+ACTIONS.noop = function(){};

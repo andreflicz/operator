@@ -169,6 +169,21 @@ link_name() { # Apple Music link → the playlist's name, from the page's title
   [ -z "$T" ] && T=$(printf '%s' "$PAGE" | sed -n 's/.*<title>\([^<]*\)<\/title>.*/\1/p' | head -1)
   printf '%s' "$T" | sed 's/&amp;/\&/g; s/&#39;/'"'"'/g; s/&#x27;/'"'"'/g; s/&quot;/"/g; s/ - Apple Music$//; s/ on Apple Music$//; s/ - [Pp]laylist.*$//; s/^  *//; s/  *$//'
 }
+# Operator's own Chrome window (not your everyday Chrome): the pid the launcher started, or the
+# main process using Operator's profile
+operator_pid() {
+  if [ -n "$CHROME_PID" ] && kill -0 "$CHROME_PID" 2>/dev/null; then echo "$CHROME_PID"; return; fi
+  PD="${PROFILE_DIR:-$HOME/Library/Application Support/OperatorAppProfile}"
+  for p in $(pgrep -f -- "--user-data-dir=$PD" 2>/dev/null); do
+    ps -o args= -p "$p" 2>/dev/null | grep -q -- "--type=" || { echo "$p"; return; }
+  done
+}
+# real macOS full screen for the window (needs Accessibility permission for Operator once)
+window_full() { # 1|0
+  P=$(operator_pid); [ -z "$P" ] && { echo "no window"; return 1; }
+  V=false; [ "$1" = "1" ] && V=true
+  osascript -e "tell application \"System Events\" to tell (first process whose unix id is $P) to set value of attribute \"AXFullScreen\" of window 1 to $V" 2>&1 >/dev/null
+}
 playlists_json() {
   OUT=$(osascript 2>/dev/null <<'APPLESCRIPT'
 tell application "Music"
@@ -226,6 +241,11 @@ wake_respond() {
           *) respond 404 '{"ok":false,"error":"not found in your library"}' ;;
         esac
       fi ;;
+    /window/full*)
+      F=$(param f); case "$F" in 1) ;; *) F=0 ;; esac
+      ERR=$(window_full "$F")
+      if [ -z "$ERR" ]; then respond 200 '{"ok":true}'
+      else case "$ERR" in *ssistive*|*-1719*|*-25211*|*not\ allowed*) respond 403 '{"ok":false,"error":"accessibility"}' ;; *) respond 500 "{\"ok\":false,\"error\":\"$(je "$ERR")\"}" ;; esac; fi ;;
     /music/resolve*)
       U=$(hexdec "$(param u)"); N=$(link_name "$U")
       if [ -n "$N" ]; then respond 200 "{\"ok\":true,\"name\":\"$(je "$N")\"}"; else respond 404 '{"ok":false}'; fi ;;
@@ -245,7 +265,7 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":6}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":7}' ;;
     /news*)
       # a few headlines for the Good morning screen (news sites don't let a page fetch them directly)
       # ?q=<hex topics> → Google News for your topics (last 2 days); otherwise NPR's top stories

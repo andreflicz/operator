@@ -82,15 +82,15 @@ function notifBadge(){
 }
 function notifPanelHtml(list){
   const groups = [['deadline','Deadlines'],['client','Clients'],['lead','Leads'],['calendar','Coming up'],['ghl','GoHighLevel']];
-  return '<div class="np-head"><span class="np-title">Notifications</span>'+(list.length ? '<button class="np-clear" data-action="notifClearAll">Clear all</button>' : '')+'<button class="np-x" data-action="toggleNotifs" title="Close">&#10005;</button></div>'+
+  return '<div class="nt-head"><span class="nt-title">Notifications</span>'+(list.length ? '<button class="nt-clear" data-action="notifClearAll">Clear all</button>' : '')+'<button class="nt-x" data-action="toggleNotifs" title="Close">&#10005;</button></div>'+
     (list.length ? groups.map(function(gr){
       const items = list.filter(function(n){ return n.kind===gr[0]; }); if(!items.length) return '';
-      return '<div class="np-group"><div class="np-k">'+gr[1]+'</div>'+items.map(function(n){
-        return '<div class="np-item is-'+n.level+'" data-key="np-'+escapeHtml(n.key)+'">'+
-          '<button class="np-main" data-action="notifOpen" data-id="'+escapeHtml(n.key)+'"><span class="np-i">'+n.icon+'</span><span class="np-txt"><span class="np-t">'+escapeHtml(n.title)+'</span><span class="np-s">'+escapeHtml(n.sub||'')+'</span></span></button>'+
-          '<button class="np-dismiss" data-action="notifDismiss" data-id="'+escapeHtml(n.key)+'" title="Hide for today">&#10005;</button></div>';
+      return '<div class="nt-group"><div class="nt-k">'+gr[1]+'</div>'+items.map(function(n){
+        return '<div class="nt-item is-'+n.level+'" data-key="np-'+escapeHtml(n.key)+'">'+
+          '<button class="nt-main" data-action="notifOpen" data-id="'+escapeHtml(n.key)+'"><span class="nt-i">'+n.icon+'</span><span class="nt-txt"><span class="nt-t">'+escapeHtml(n.title)+'</span><span class="nt-s">'+escapeHtml(n.sub||'')+'</span></span></button>'+
+          '<button class="nt-dismiss" data-action="notifDismiss" data-id="'+escapeHtml(n.key)+'" title="Hide for today">&#10005;</button></div>';
       }).join('')+'</div>';
-    }).join('') : '<div class="np-empty"><div style="font-size:26px;">&#10024;</div>All clear — nothing needs you right now.</div>');
+    }).join('') : '<div class="nt-empty"><div style="font-size:26px;">&#10024;</div>All clear — nothing needs you right now.</div>');
 }
 function notifRender(list){ const el = document.getElementById('notifPanel'); if(el) morphInto(el, notifPanelHtml(list || notifList())); }
 ACTIONS.toggleNotifs = function(){
