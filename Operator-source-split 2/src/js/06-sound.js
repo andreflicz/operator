@@ -261,7 +261,7 @@ function soundSettingsHtml(){
     '</div>'+
     '<div class="card section"><div class="section-title">&#9728;&#65039; Mornings</div>'+
       '<div class="snd-pl"><label><b>Morning playlist</b><small>An Apple Music playlist — the play button on Good morning starts it, and it follows your wake-up song by itself</small></label>'+
-        '<div class="snd-music" style="margin-top:8px;"><input class="input" id="sndMorningPl" placeholder="Playlist name in Apple Music" value="'+escapeHtml(p.morningPlaylist && p.morningPlaylist.q || '')+'"><button class="btn btn-sm btn-primary" data-action="sndMorningPlSet">Save</button></div></div>'+
+        '<div class="snd-music" style="margin-top:8px;"><input class="input" id="sndMorningPl" placeholder="Apple Music playlist link, or its exact name" value="'+escapeHtml(p.morningPlaylist && (p.morningPlaylist.url || p.morningPlaylist.q) || '')+'"><button class="btn btn-sm btn-primary" data-action="sndMorningPlSet">Save</button></div></div>'+
       '<div class="snd-rows">'+
         tog('morningPlAfterSong', 'Play it after the wake-up song', 'When the song ends, the playlist carries on', true)+
         tog('focusMusic', 'Focus music after the lock-in intro', 'Quiet tracks keep playing until you lock out', true)+
@@ -300,4 +300,4 @@ ACTIONS.previewSounds = function(){
   seq.forEach(function(f, i){ setTimeout(f, i*420); });
 };
 
-ACTIONS.sndMorningPlSet = function(){ const i = document.getElementById('sndMorningPl'), v = i ? i.value.trim() : ''; state.profile.morningPlaylist = v ? {q:v, k:'playlist'} : null; saveSound(); showToast(v ? 'Morning playlist: '+v : 'Morning playlist cleared', {icon:'&#9835;'}); };
+ACTIONS.sndMorningPlSet = async function(){ const i = document.getElementById('sndMorningPl'), v = i ? i.value.trim() : ''; const pl = await setMorningPlaylistFrom(v); saveSound(); showToast(pl ? 'Morning playlist: '+escapeHtml(pl.q) : 'Morning playlist cleared', {icon:'&#9835;'}); };

@@ -3220,6 +3220,10 @@
   #wakeOverlay.is-leaving{ animation:wakeLift .56s cubic-bezier(.5,0,.2,1) forwards; pointer-events:none; }
   @keyframes wakeLift{ to{ opacity:0; transform:translateY(-14px) scale(1.01); filter:blur(3px); } }
   #planOverlay .wi{ animation:none; }
+  /* carousel rows run to the window's edges on wide screens; arrows live in the margin */
+  .carousel.bleed{ margin-left:calc(-1 * var(--bleed-l, 36px)); margin-right:calc(-1 * var(--bleed-r, 36px)); }
+  .carousel.bleed > .car-track{ padding-left:var(--bleed-l, 36px); padding-right:var(--bleed-r, 36px); scroll-padding-inline:var(--bleed-l, 36px); padding-top:10px; padding-bottom:18px; margin-top:-6px; margin-bottom:-6px; }
+  .carousel.bleed .car-prev{ left:max(10px, calc(var(--bleed-l, 36px) - 54px)); } .carousel.bleed .car-next{ right:max(10px, calc(var(--bleed-r, 36px) - 54px)); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -5257,7 +5261,7 @@ function soundSettingsHtml(){
     '</div>'+
     '<div class="card section"><div class="section-title">&#9728;&#65039; Mornings</div>'+
       '<div class="snd-pl"><label><b>Morning playlist</b><small>An Apple Music playlist — the play button on Good morning starts it, and it follows your wake-up song by itself</small></label>'+
-        '<div class="snd-music" style="margin-top:8px;"><input class="input" id="sndMorningPl" placeholder="Playlist name in Apple Music" value="'+escapeHtml(p.morningPlaylist && p.morningPlaylist.q || '')+'"><button class="btn btn-sm btn-primary" data-action="sndMorningPlSet">Save</button></div></div>'+
+        '<div class="snd-music" style="margin-top:8px;"><input class="input" id="sndMorningPl" placeholder="Apple Music playlist link, or its exact name" value="'+escapeHtml(p.morningPlaylist && (p.morningPlaylist.url || p.morningPlaylist.q) || '')+'"><button class="btn btn-sm btn-primary" data-action="sndMorningPlSet">Save</button></div></div>'+
       '<div class="snd-rows">'+
         tog('morningPlAfterSong', 'Play it after the wake-up song', 'When the song ends, the playlist carries on', true)+
         tog('focusMusic', 'Focus music after the lock-in intro', 'Quiet tracks keep playing until you lock out', true)+
@@ -5296,7 +5300,7 @@ ACTIONS.previewSounds = function(){
   seq.forEach(function(f, i){ setTimeout(f, i*420); });
 };
 
-ACTIONS.sndMorningPlSet = function(){ const i = document.getElementById('sndMorningPl'), v = i ? i.value.trim() : ''; state.profile.morningPlaylist = v ? {q:v, k:'playlist'} : null; saveSound(); showToast(v ? 'Morning playlist: '+v : 'Morning playlist cleared', {icon:'&#9835;'}); };
+ACTIONS.sndMorningPlSet = async function(){ const i = document.getElementById('sndMorningPl'), v = i ? i.value.trim() : ''; const pl = await setMorningPlaylistFrom(v); saveSound(); showToast(pl ? 'Morning playlist: '+escapeHtml(pl.q) : 'Morning playlist cleared', {icon:'&#9835;'}); };
 // ============ CLIENT HELPERS ============
 function clientOptionsHtml(selected){
   const clients = arr(state.business && state.business.clients);
@@ -7086,6 +7090,17 @@ function cardLayoutSettingsHtml(){
     '<div class="seg-tabs" style="margin:0;">'+opt('grid', '&#9638; Grid')+opt('carousel', '&#10697; Carousel')+'</div>'+
   '</div></div>';
 }
+// On wide windows the page sits in a 1400px column; carousel rows reach past it to the window's
+// edges (so cards aren't cut at the column), and their arrows sit out in that open margin.
+function carouselBleedMeasure(){
+  const vr = document.getElementById('viewRoot'), main = vr && vr.parentElement;
+  if(!vr || !main) return;
+  const a = vr.getBoundingClientRect(), m = main.getBoundingClientRect();
+  vr.style.setProperty('--bleed-l', Math.max(16, Math.round(a.left - m.left))+'px');
+  vr.style.setProperty('--bleed-r', Math.max(16, Math.round(m.right - a.right - (main.offsetWidth - main.clientWidth)))+'px');
+}
+afterRenderHooks.push(carouselBleedMeasure);
+window.addEventListener('resize', function(){ clearTimeout(carouselBleedMeasure.t); carouselBleedMeasure.t = setTimeout(carouselBleedMeasure, 120); });
 // ============ TODAY ============
 // renderDayOffView lives in 32p-locked-views.js
 function renderOffTimeView(){
@@ -20437,10 +20452,35 @@ function playlistBtnHtml(){
 }
 function plRefresh(){ if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto(); }
 ACTIONS.stopMorningPlaylist = function(){ ui.plPlaying = false; musicApp('pause'); plRefresh(); };
-ACTIONS.playMorningPlaylist = function(){ const pl = morningPlaylist(); if(!pl) return; ui.plPlaying = true; plRefresh(); musicApp('play', {type:'music', k:'playlist', q:pl.q}).then(function(ok){ if(!ok){ ui.plPlaying = false; plRefresh(); showToast('Couldn\'t start '+pl.q+' — Apple Music plays through the Operator app; check the playlist name in Settings → Sound.', {icon:'&#9888;'}); } }); };
-ACTIONS.setMorningPlaylist = function(){
-  const v = window.prompt('Which Apple Music playlist should your mornings play? (its exact name)', ''); if(!v || !v.trim()) return;
-  state.profile.morningPlaylist = {q:v.trim(), k:'playlist'}; persist('profile');
+// a playlist link (Apple Music → ••• → Share → Copy Link) or its name; a link is turned into the
+// playlist's real name by the launcher, and kept so Apple Music can open it if it isn't in your library
+async function setMorningPlaylistFrom(v){
+  v = String(v||'').trim();
+  if(!v){ state.profile.morningPlaylist = null; persist('profile'); return null; }
+  let pl = {q:v, k:'playlist'};
+  if(/^(https?|music|itms):\/\//i.test(v)){
+    const url = v.replace(/^(music|itms):\/\//i, 'https://'), slug = appleMusicFromLink(url);
+    pl = {q: slug && !/^pl\./i.test(slug.q) ? slug.q : 'Morning playlist', k:'playlist', url:url};
+    const r = await fetchWithin(MUSIC_URL+'resolve?u='+hexUtf8(url), 12000);
+    if(r && r.ok){ try{ const j = await r.json(); if(j && j.name) pl.q = j.name; }catch(e){} }
+  }
+  state.profile.morningPlaylist = pl; persist('profile');
+  return pl;
+}
+ACTIONS.playMorningPlaylist = async function(){
+  const pl = morningPlaylist(); if(!pl) return;
+  ui.plPlaying = true; plRefresh();
+  const r = await fetchWithin(MUSIC_URL+'pick?k=playlist&q='+hexUtf8(pl.q)+(pl.url ? '&u='+hexUtf8(pl.url) : ''), 12000);
+  if(r && r.ok) return;
+  ui.plPlaying = false; plRefresh();
+  let j = null; try{ j = r ? await r.json() : null; }catch(e){}
+  if(j && j.opened) showToast('“'+escapeHtml(pl.q)+'” isn’t in your library yet — it’s open in Apple Music now. Tap ＋ Add once, then it plays from here.', {icon:'&#9835;', duration:9000});
+  else if(r) showToast('No playlist called “'+escapeHtml(pl.q)+'” in your library. Paste its link in Settings → Sound instead.', {icon:'&#9888;', duration:7000});
+  else showToast('Apple Music plays through the Operator app — it isn’t reachable right now.', {icon:'&#9888;'});
+};
+ACTIONS.setMorningPlaylist = async function(){
+  const v = window.prompt('Your morning playlist — paste its Apple Music link (••• → Share → Copy Link), or type its exact name:', ''); if(!v || !v.trim()) return;
+  await setMorningPlaylistFrom(v);
   if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto();
   ACTIONS.playMorningPlaylist();
 };

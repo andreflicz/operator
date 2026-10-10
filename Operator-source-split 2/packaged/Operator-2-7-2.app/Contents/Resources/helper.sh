@@ -93,6 +93,13 @@ on run argv
         play playlist q
         return "ok"
       end try
+      try
+        set pl to (first user playlist whose name contains q)
+        set song repeat to all
+        play pl
+        return "ok"
+      end try
+      return "notfound"
     end if
     try
       set hits to (search library playlist 1 for q only songs)
@@ -154,6 +161,14 @@ APPLESCRIPT
       printf '{"ok":true,"state":"%s","name":"%s","artist":"%s","album":"%s","pos":%s,"dur":%s,"vol":%s,"shuffle":%s}' "$(je "$ST")" "$(je "$NM")" "$(je "$AR")" "$(je "$AL")" "$PO" "$DU" "$VO" "$SH" ;;
   esac
 }
+link_name() { # Apple Music link → the playlist's name, from the page's title
+  U=$(printf '%s' "$1" | sed 's#^music://#https://#; s#^itms://#https://#')
+  case "$U" in https://music.apple.com/*|https://embed.music.apple.com/*) ;; *) return ;; esac
+  PAGE=$(curl -sL --max-time 8 -A 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15' "$U" 2>/dev/null | tr '\n' ' ')
+  T=$(printf '%s' "$PAGE" | sed -n 's/.*<meta property="og:title" content="\([^"]*\)".*/\1/p' | head -1)
+  [ -z "$T" ] && T=$(printf '%s' "$PAGE" | sed -n 's/.*<title>\([^<]*\)<\/title>.*/\1/p' | head -1)
+  printf '%s' "$T" | sed 's/&amp;/\&/g; s/&#39;/'"'"'/g; s/&#x27;/'"'"'/g; s/&quot;/"/g; s/ - Apple Music$//; s/ on Apple Music$//; s/ - [Pp]laylist.*$//; s/^  *//; s/  *$//'
+}
 playlists_json() {
   OUT=$(osascript 2>/dev/null <<'APPLESCRIPT'
 tell application "Music"
@@ -201,9 +216,19 @@ wake_respond() {
       respond 200 '{"ok":true}' ;;
     /music/playlists*) respond 200 "$(playlists_json)" ;;
     /music/pick*)
-      # play a playlist or a song from the in-app player (no fade-in, no repeat-one)
-      K=$(param k); Q=$(hexdec "$(param q)")
-      if [ -n "$Q" ] && play_music "$Q" "${K:-playlist}" noramp; then respond 200 "$(now_playing)"; else respond 404 '{"ok":false,"error":"not found in your library"}'; fi ;;
+      # play a playlist or a song from the in-app player (no fade-in, no repeat-one); with a link
+      # (u=) for something that isn't in your library yet, Apple Music opens it so you can add it
+      K=$(param k); Q=$(hexdec "$(param q)"); U=$(hexdec "$(param u)")
+      if [ -n "$Q" ] && play_music "$Q" "${K:-playlist}" noramp; then respond 200 "$(now_playing)"
+      else
+        case "$U" in
+          https://music.apple.com/*) open "$(printf '%s' "$U" | sed 's#^https://#music://#')" >/dev/null 2>&1; respond 404 '{"ok":false,"error":"not in your library","opened":true}' ;;
+          *) respond 404 '{"ok":false,"error":"not found in your library"}' ;;
+        esac
+      fi ;;
+    /music/resolve*)
+      U=$(hexdec "$(param u)"); N=$(link_name "$U")
+      if [ -n "$N" ]; then respond 200 "{\"ok\":true,\"name\":\"$(je "$N")\"}"; else respond 404 '{"ok":false}'; fi ;;
     /opfocus*)
       F=$(param f); case "$F" in 1) ;; *) F=0 ;; esac
       printf '%s %s' "$F" "$(date +%s)" > "$DATA_DIR/opfocus" 2>/dev/null
@@ -220,7 +245,7 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":5}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":6}' ;;
     /news*)
       # a few headlines for the Good morning screen (news sites don't let a page fetch them directly)
       # ?q=<hex topics> → Google News for your topics (last 2 days); otherwise NPR's top stories

@@ -286,10 +286,35 @@ function playlistBtnHtml(){
 }
 function plRefresh(){ if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto(); }
 ACTIONS.stopMorningPlaylist = function(){ ui.plPlaying = false; musicApp('pause'); plRefresh(); };
-ACTIONS.playMorningPlaylist = function(){ const pl = morningPlaylist(); if(!pl) return; ui.plPlaying = true; plRefresh(); musicApp('play', {type:'music', k:'playlist', q:pl.q}).then(function(ok){ if(!ok){ ui.plPlaying = false; plRefresh(); showToast('Couldn\'t start '+pl.q+' — Apple Music plays through the Operator app; check the playlist name in Settings → Sound.', {icon:'&#9888;'}); } }); };
-ACTIONS.setMorningPlaylist = function(){
-  const v = window.prompt('Which Apple Music playlist should your mornings play? (its exact name)', ''); if(!v || !v.trim()) return;
-  state.profile.morningPlaylist = {q:v.trim(), k:'playlist'}; persist('profile');
+// a playlist link (Apple Music → ••• → Share → Copy Link) or its name; a link is turned into the
+// playlist's real name by the launcher, and kept so Apple Music can open it if it isn't in your library
+async function setMorningPlaylistFrom(v){
+  v = String(v||'').trim();
+  if(!v){ state.profile.morningPlaylist = null; persist('profile'); return null; }
+  let pl = {q:v, k:'playlist'};
+  if(/^(https?|music|itms):\/\//i.test(v)){
+    const url = v.replace(/^(music|itms):\/\//i, 'https://'), slug = appleMusicFromLink(url);
+    pl = {q: slug && !/^pl\./i.test(slug.q) ? slug.q : 'Morning playlist', k:'playlist', url:url};
+    const r = await fetchWithin(MUSIC_URL+'resolve?u='+hexUtf8(url), 12000);
+    if(r && r.ok){ try{ const j = await r.json(); if(j && j.name) pl.q = j.name; }catch(e){} }
+  }
+  state.profile.morningPlaylist = pl; persist('profile');
+  return pl;
+}
+ACTIONS.playMorningPlaylist = async function(){
+  const pl = morningPlaylist(); if(!pl) return;
+  ui.plPlaying = true; plRefresh();
+  const r = await fetchWithin(MUSIC_URL+'pick?k=playlist&q='+hexUtf8(pl.q)+(pl.url ? '&u='+hexUtf8(pl.url) : ''), 12000);
+  if(r && r.ok) return;
+  ui.plPlaying = false; plRefresh();
+  let j = null; try{ j = r ? await r.json() : null; }catch(e){}
+  if(j && j.opened) showToast('“'+escapeHtml(pl.q)+'” isn’t in your library yet — it’s open in Apple Music now. Tap ＋ Add once, then it plays from here.', {icon:'&#9835;', duration:9000});
+  else if(r) showToast('No playlist called “'+escapeHtml(pl.q)+'” in your library. Paste its link in Settings → Sound instead.', {icon:'&#9888;', duration:7000});
+  else showToast('Apple Music plays through the Operator app — it isn’t reachable right now.', {icon:'&#9888;'});
+};
+ACTIONS.setMorningPlaylist = async function(){
+  const v = window.prompt('Your morning playlist — paste its Apple Music link (••• → Share → Copy Link), or type its exact name:', ''); if(!v || !v.trim()) return;
+  await setMorningPlaylistFrom(v);
   if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto();
   ACTIONS.playMorningPlaylist();
 };

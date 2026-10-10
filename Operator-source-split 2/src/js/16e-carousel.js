@@ -92,3 +92,14 @@ function cardLayoutSettingsHtml(){
     '<div class="seg-tabs" style="margin:0;">'+opt('grid', '&#9638; Grid')+opt('carousel', '&#10697; Carousel')+'</div>'+
   '</div></div>';
 }
+// On wide windows the page sits in a 1400px column; carousel rows reach past it to the window's
+// edges (so cards aren't cut at the column), and their arrows sit out in that open margin.
+function carouselBleedMeasure(){
+  const vr = document.getElementById('viewRoot'), main = vr && vr.parentElement;
+  if(!vr || !main) return;
+  const a = vr.getBoundingClientRect(), m = main.getBoundingClientRect();
+  vr.style.setProperty('--bleed-l', Math.max(16, Math.round(a.left - m.left))+'px');
+  vr.style.setProperty('--bleed-r', Math.max(16, Math.round(m.right - a.right - (main.offsetWidth - main.clientWidth)))+'px');
+}
+afterRenderHooks.push(carouselBleedMeasure);
+window.addEventListener('resize', function(){ clearTimeout(carouselBleedMeasure.t); carouselBleedMeasure.t = setTimeout(carouselBleedMeasure, 120); });

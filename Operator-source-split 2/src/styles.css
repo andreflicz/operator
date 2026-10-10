@@ -3211,3 +3211,7 @@
   #wakeOverlay.is-leaving{ animation:wakeLift .56s cubic-bezier(.5,0,.2,1) forwards; pointer-events:none; }
   @keyframes wakeLift{ to{ opacity:0; transform:translateY(-14px) scale(1.01); filter:blur(3px); } }
   #planOverlay .wi{ animation:none; }
+  /* carousel rows run to the window's edges on wide screens; arrows live in the margin */
+  .carousel.bleed{ margin-left:calc(-1 * var(--bleed-l, 36px)); margin-right:calc(-1 * var(--bleed-r, 36px)); }
+  .carousel.bleed > .car-track{ padding-left:var(--bleed-l, 36px); padding-right:var(--bleed-r, 36px); scroll-padding-inline:var(--bleed-l, 36px); padding-top:10px; padding-bottom:18px; margin-top:-6px; margin-bottom:-6px; }
+  .carousel.bleed .car-prev{ left:max(10px, calc(var(--bleed-l, 36px) - 54px)); } .carousel.bleed .car-next{ right:max(10px, calc(var(--bleed-r, 36px) - 54px)); }
