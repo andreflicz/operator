@@ -111,31 +111,78 @@ document.addEventListener('contextmenu', function(e){ if(onBreakNow() && e.targe
 
 // ---- focus music: quiet, minimal tracks, made live ----
 // Each track: a chord loop, a tempo, how the notes fall (an arpeggio pattern), and a texture.
+// Five tracks, each with its own feel (they used to share one recipe, so every song opened the
+// same way): two warm lo-fi loops, then three quiet, spacious ones in the spirit of game soundtracks
+// you can work to for hours — felt piano, a harp-like figure, and slow bells over a drone.
+const fmHz = function(m){ return 440*Math.pow(2, (m-69)/12); }; // midi note → Hz
 const FOCUS_TRACKS = [
-  {name:'First Light', bpm:68, prog:[[174.6,220,261.6,329.6],[164.8,196,246.9,293.7],[146.8,174.6,220,261.6],[130.8,164.8,196,246.9]], arp:[0,2,1,3,2,1], wave:'triangle', hiss:0.005},
-  {name:'Low Tide', bpm:60, prog:[[130.8,196,246.9,329.6],[110,164.8,220,261.6],[116.5,174.6,220,293.7],[98,146.8,196,246.9]], arp:[0,1,2,1], wave:'sine', hiss:0.004},
-  {name:'Paper Lanterns', bpm:74, prog:[[146.8,220,277.2,329.6],[123.5,185,246.9,293.7],[138.6,207.7,261.6,329.6],[110,164.8,220,277.2]], arp:[3,2,0,2,1,2], wave:'triangle', hiss:0.006},
-  {name:'Night Bus', bpm:64, prog:[[110,164.8,207.7,261.6],[98,146.8,185,233.1],[103.8,155.6,196,246.9],[92.5,138.6,174.6,220]], arp:[0,2,3,2], wave:'sine', hiss:0.007},
-  {name:'Still Water', bpm:56, prog:[[130.8,164.8,196,246.9],[146.8,174.6,220,261.6],[123.5,164.8,196,246.9],[110,146.8,174.6,220]], arp:[0,1,2,3,2,1,0], wave:'sine', hiss:0.003},
-  {name:'Late Studio', bpm:70, prog:[[155.6,196,233.1,293.7],[138.6,174.6,207.7,261.6],[123.5,155.6,185,233.1],[116.5,146.8,174.6,220]], arp:[1,3,2,0], wave:'triangle', hiss:0.006}
+  {name:'First Light', style:'lofi', bpm:68, prog:[[174.6,220,261.6,329.6],[164.8,196,246.9,293.7],[146.8,174.6,220,261.6],[130.8,164.8,196,246.9]], arp:[0,2,1,3,2,1], wave:'triangle', hiss:0.005},
+  {name:'Still Water', style:'lofi', soft:true, bpm:56, prog:[[130.8,164.8,196,246.9],[146.8,174.6,220,261.6],[123.5,164.8,196,246.9],[110,146.8,174.6,220]], arp:[0,1,2,3,2,1,0], wave:'sine', hiss:0.003},
+  // felt piano: a low note, a slowly rolled chord, and now and then a few melody notes drifting on top
+  {name:'Meadow', style:'piano', bpm:54, prog:[[43,55,59,62,66],[40,52,55,59,64],[36,48,55,59,62],[38,50,54,57,62]], scale:[67,69,71,74,76,78,79,81], hiss:0.002},
+  // a harp-like figure that keeps turning over, gentle and bright
+  {name:'Clearwater', style:'harp', bpm:76, prog:[[45,57,61,64,69],[42,54,57,61,66],[38,50,57,62,66],[40,52,56,59,64]], fig:[0,2,3,4,3,2,1,2], hiss:0},
+  // almost nothing: a deep drone that breathes, with a bell every so often
+  {name:'Far Lands', style:'bells', bpm:40, prog:[[38,45,50],[36,43,48],[41,48,53],[38,45,52]], scale:[62,64,67,69,72,74,76,79], hiss:0.002}
 ];
-const FM = {playing:false, idx:0, bar:0, nextAt:0, timer:0, bus:null, hiss:null};
+const FM = {playing:false, idx:0, bar:0, nextAt:0, timer:0, bus:null, hiss:null, rnd:1};
 const FM_BARS = 24; // about a minute and a half to two minutes a track
 function fmVolume(){ const v = Number(state.profile.musicVolume); return isFinite(v) && state.profile.musicVolume!=null ? Math.max(0, Math.min(1, v)) : 0.7; }
+function fmRand(){ FM.rnd = (FM.rnd*16807) % 2147483647; return (FM.rnd - 1)/2147483646; }
 function fmBus(ctx){
   if(FM.bus && FM.bus.ctx===ctx) return FM.bus;
-  const g = ctx.createGain(); g.gain.value = 0.0001; g.connect(sfxOut(ctx));
+  // a soft echo trails every note — that sense of space is most of the mood
+  const g = ctx.createGain(), dl = ctx.createDelay(2), fb = ctx.createGain(), lp = ctx.createBiquadFilter(), wet = ctx.createGain();
+  g.gain.value = 0.0001; dl.delayTime.value = 0.42; fb.gain.value = 0.32; lp.type = 'lowpass'; lp.frequency.value = 2400; wet.gain.value = 0.35;
+  const out = sfxOut(ctx);
+  g.connect(out); g.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(wet); wet.connect(out);
   FM.bus = {ctx:ctx, g:g};
   return FM.bus;
 }
+// a felt-piano-ish note: a pure tone with a little body, quick to speak, long to fade
+function fmKey(ctx, out, t, freq, dur, vol){
+  const g = ctx.createGain(), f = ctx.createBiquadFilter();
+  f.type = 'lowpass'; f.frequency.setValueAtTime(Math.min(6000, freq*6), t); f.frequency.exponentialRampToValueAtTime(Math.max(400, freq*1.5), t + dur*0.6);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.012); g.gain.exponentialRampToValueAtTime(vol*0.35, t + 0.4); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  [[1, 'sine', 1], [2, 'triangle', 0.18], [3, 'sine', 0.06]].forEach(function(h){ const o = ctx.createOscillator(), og = ctx.createGain(); o.type = h[1]; o.frequency.value = freq*h[0]; o.detune.value = (Math.random()-0.5)*6; og.gain.value = h[2]; o.connect(og); og.connect(f); o.start(t); o.stop(t + dur + 0.05); });
+  f.connect(g); g.connect(out);
+}
+// a bell: inharmonic partials, a long shimmer
+function fmBell(ctx, out, t, freq, vol){
+  const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, t + 5);
+  [[1, 1], [2.76, 0.25], [5.4, 0.08]].forEach(function(h){ const o = ctx.createOscillator(), og = ctx.createGain(); o.type = 'sine'; o.frequency.value = freq*h[0]; og.gain.value = h[1]; o.connect(og); og.connect(g); o.start(t); o.stop(t + 5.1); });
+  g.connect(out);
+}
 function fmBar(ctx, out, t, tr, bar){
   const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length];
-  padChord(ctx, out, t, ch, len*0.35, len*0.45, len*0.6, 0.022);
-  sfxPluck(ctx, out, t, ch[0]/2, len*0.9, 0.04, 'sine');
-  const steps = tr.arp.length, step = len/steps;
-  tr.arp.forEach(function(n, i){ if((bar + i) % 5 === 4) return; sfxPluck(ctx, out, t + i*step + (i%2 ? step*0.08 : 0), ch[n % ch.length]*2, step*2.2, 0.014 + (i===0 ? 0.006 : 0), tr.wave); });
-  // a soft brush on the off-beats
-  for(let i=0;i<4;i++) sfxTap(ctx, out, t + i*beat + beat*0.5, 4200, 0.018);
+  if(tr.style==='lofi'){
+    padChord(ctx, out, t, ch, len*0.35, len*0.45, len*0.6, tr.soft ? 0.018 : 0.022);
+    sfxPluck(ctx, out, t, ch[0]/2, len*0.9, 0.04, 'sine');
+    const steps = tr.arp.length, step = len/steps;
+    tr.arp.forEach(function(n, i){ if((bar + i) % 5 === 4) return; sfxPluck(ctx, out, t + i*step + (i%2 ? step*0.08 : 0), ch[n % ch.length]*2, step*2.2, 0.014 + (i===0 ? 0.006 : 0), tr.wave); });
+    if(!tr.soft) for(let i=0;i<4;i++) sfxTap(ctx, out, t + i*beat + beat*0.5, 4200, 0.018);
+    return;
+  }
+  if(tr.style==='piano'){
+    // it opens on a single low note and lets the room fill in before anything else happens
+    fmKey(ctx, out, t, fmHz(ch[0]), len*1.6, 0.1);
+    if(bar===0) return;
+    ch.slice(1).forEach(function(m, i){ if(fmRand() < 0.85) fmKey(ctx, out, t + beat*(0.5 + i*0.32) + fmRand()*0.05, fmHz(m), len*1.2, 0.05); });
+    if(bar > 1 && fmRand() < 0.7){ const k = 1 + Math.floor(fmRand()*3); for(let i=0;i<k;i++) fmKey(ctx, out, t + beat*(1.5 + i*(0.8 + fmRand()*0.6)), fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), len, 0.06); }
+    return;
+  }
+  if(tr.style==='harp'){
+    const step = beat/2;
+    tr.fig.forEach(function(n, i){ fmKey(ctx, out, t + i*step + (i%2 ? 0.015 : 0), fmHz(ch[n % ch.length] + 12), step*5, 0.05 - (i%2 ? 0.014 : 0)); });
+    if(bar % 2===0) fmKey(ctx, out, t, fmHz(ch[0]), len*1.4, 0.09);
+    return;
+  }
+  if(tr.style==='bells'){
+    padChord(ctx, out, t, ch.map(fmHz), len*0.45, len*0.2, len*0.7, 0.016);
+    if(bar===0) return;
+    if(fmRand() < 0.75) fmBell(ctx, out, t + beat*(0.5 + fmRand()*2), fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), 0.03);
+    if(fmRand() < 0.3) fmBell(ctx, out, t + beat*(2.5 + fmRand()), fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]) , 0.018);
+  }
 }
 function fmHiss(ctx, out, level){
   if(FM.hiss){ try{ FM.hiss.stop(); }catch(e){} FM.hiss = null; }
@@ -160,6 +207,7 @@ function fmSchedule(){
 function focusMusicPlay(idx){
   const ctx = getAudioCtx(); if(!ctx) return;
   if(idx!=null){ FM.idx = ((idx % FOCUS_TRACKS.length) + FOCUS_TRACKS.length) % FOCUS_TRACKS.length; FM.bar = 0; }
+  FM.rnd = 1 + Math.floor(Math.random()*2147483000);
   const bus = fmBus(ctx);
   bus.g.gain.cancelScheduledValues(ctx.currentTime);
   bus.g.gain.setValueAtTime(Math.max(0.0001, bus.g.gain.value), ctx.currentTime);
