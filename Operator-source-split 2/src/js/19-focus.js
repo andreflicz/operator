@@ -576,7 +576,7 @@ function reallyConfirmStopFocus(){
   state.focus.lastSessionEndedAt = endedAt;
   if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   if(state.modes.active && state.modes.active.linkedFocus){ finishActiveMode(true); }
-  playLockOut(); lockOutFlash(minutes, arr(s.completedTasks).length);
+  playLockOut(); stopLockInSong(); lockOutFlash(minutes, arr(s.completedTasks).length);
   persist('focus'); renderView();
 }
 function renderStopFocusModal(){

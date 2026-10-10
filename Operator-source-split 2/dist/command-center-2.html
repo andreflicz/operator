@@ -2672,6 +2672,135 @@
   .ms-line{ display:flex; flex-wrap:wrap; justify-content:center; gap:2px 8px; font-size:12.5px; line-height:1.4; }
   .ms-k{ font-size:12.5px; font-weight:700; letter-spacing:0; text-transform:none; }
   .ms-k::after{ content:'·'; margin-left:8px; color:var(--text-dim); font-weight:400; }
+  /* the sun's arc */
+  .sun-arc{ display:block; overflow:visible; }
+  .sa-horizon{ stroke:rgba(var(--ink),.12); stroke-width:1; }
+  .sa-track{ fill:none; stroke:rgba(var(--ink),.18); stroke-width:1.2; stroke-dasharray:2 3; }
+  .sa-done{ fill:none; stroke:url(#none); stroke:#ffb347; stroke-width:1.6; stroke-linecap:round; }
+  .sa-sun{ fill:#ffc56b; } .sa-glow{ fill:rgba(255,197,107,.22); }
+  .sun-arc.is-night .sa-sun{ fill:#cfd8ff; } .sun-arc.is-night .sa-glow{ fill:rgba(180,195,255,.16); }
+  .sun-arc.is-anim .sa-done{ animation:saDraw 2.2s cubic-bezier(.3,.7,.2,1) both; animation-delay:inherit; }
+  .sun-arc.is-anim .sa-sun, .sun-arc.is-anim .sa-glow{ animation:saPop .8s 1.6s cubic-bezier(.2,.9,.3,1.4) both; transform-box:fill-box; transform-origin:center; }
+  @keyframes saDraw{ from{ stroke-dasharray:0 100; } }
+  @keyframes saPop{ from{ opacity:0; transform:scale(.2); } }
+  /* Today: one tidy sky pill */
+  .skyp{ display:inline-flex; align-items:center; gap:10px; height:30px; padding:0 12px 0 9px; border-radius:999px; background:rgba(var(--ink),.045); border:1px solid rgba(var(--ink),.07); color:var(--text-dim); font-size:12.5px; white-space:nowrap; vertical-align:middle; }
+  .skyp-wx{ display:inline-flex; align-items:center; gap:6px; }
+  .skyp-i{ font-size:14px; line-height:1; } .skyp-wx b{ color:var(--text); font-weight:700; font-variant-numeric:tabular-nums; }
+  .skyp-l{ color:var(--text-dim); }
+  .skyp-sun{ position:relative; display:inline-flex; align-items:flex-end; gap:6px; padding-left:10px; border-left:1px solid rgba(var(--ink),.1); height:20px; }
+  .skyp-sun .sun-arc{ margin-top:-4px; }
+  .skyp-times{ display:flex; flex-direction:column; justify-content:space-between; height:22px; font-size:9.5px; line-height:1; color:var(--text-dim); font-variant-numeric:tabular-nums; opacity:.85; }
+  .skyp-times span:first-child::before{ content:'↑ '; color:#ffb347; } .skyp-times span:last-child::before{ content:'↓ '; color:#ff8a5c; }
+  .th-subrow{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  /* ---------- the morning, round 12 ---------- */
+  /* a quote, set properly: big serif, room to breathe, the author under a thin rule */
+  .qt{ position:relative; margin:0; padding:6px 0 2px 34px; }
+  .qt-mark{ position:absolute; left:-2px; top:-14px; font-family:'Iowan Old Style', 'New York', Georgia, serif; font-size:64px; line-height:1; color:rgba(255,197,107,.45); }
+  .qt blockquote{ margin:0; font-family:'Iowan Old Style', 'New York', 'Palatino Linotype', Georgia, serif; font-style:italic; font-size:clamp(19px, 1.8vw, 23px); line-height:1.55; letter-spacing:.005em; color:inherit; text-wrap:pretty; }
+  .qt figcaption{ display:flex; align-items:center; gap:10px; margin-top:16px; font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.5); }
+  .qt-rule{ width:26px; height:1px; background:currentColor; opacity:.6; }
+  .mm .qt figcaption, .wi .qt figcaption{ color:var(--text-faint, rgba(255,255,255,.5)); }
+  .qt.is-ring{ padding:0; text-align:center; max-width:560px; margin:0 auto; } .qt.is-ring .qt-mark{ display:none; }
+  .qt.is-ring blockquote{ font-size:clamp(17px, 1.7vw, 21px); color:rgba(255,255,255,.82); }
+  .qt.is-ring figcaption{ justify-content:center; margin-top:10px; }
+  /* 1 dawn */
+  .dawn{ --p:0; position:absolute; inset:0; overflow:hidden; color:#fff; background:#020309; }
+  .dawn-sky{ position:absolute; inset:0; background:linear-gradient(180deg, #03040b 0%, #0b1030 40%, #3a2350 70%, #ff8a5c 100%); opacity:calc(.08 + var(--p)*.92); transition:opacity 4s linear; }
+  .dawn-sun{ position:absolute; left:50%; width:70vmin; height:70vmin; margin-left:-35vmin; border-radius:50%; bottom:calc(-70vmin + var(--p)*30vmin); background:radial-gradient(circle, rgba(255,214,150,.95), rgba(255,150,90,.55) 35%, rgba(255,110,80,.12) 60%, transparent 70%); filter:blur(12px); opacity:calc(var(--p)*.9); transition:bottom 4s linear, opacity 4s linear; }
+  .dawn-haze{ position:absolute; inset:auto 0 0 0; height:40%; background:linear-gradient(0deg, rgba(255,170,110,calc(var(--p)*.25)), transparent); }
+  .dawn-c{ position:relative; z-index:2; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center; }
+  .dawn-clock{ font-family:var(--font-display); font-weight:200; font-size:clamp(80px, 13vw, 180px); letter-spacing:-.04em; line-height:1; color:rgba(255,255,255,calc(.25 + var(--p)*.65)); }
+  .dawn-sub{ font-size:16px; color:rgba(255,255,255,calc(.3 + var(--p)*.4)); letter-spacing:.02em; }
+  .dawn-acts{ position:absolute; z-index:3; left:0; right:0; bottom:40px; display:flex; justify-content:center; gap:10px; }
+  .dawn-btn{ border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:rgba(255,255,255,.75); border-radius:999px; padding:10px 20px; font-weight:600; cursor:pointer; backdrop-filter:blur(8px); }
+  .dawn-btn:hover{ background:rgba(255,255,255,.14); color:#fff; } .dawn-btn.is-ghost{ border-color:transparent; background:transparent; }
+  /* 2 the alarm */
+  .wk3 .wk2-greet{ font-size:clamp(20px, 2vw, 26px); color:rgba(255,255,255,.85); letter-spacing:.01em; }
+  .wk3-date{ font-size:16px; color:rgba(255,255,255,.6); letter-spacing:.02em; margin-bottom:6px; }
+  .wk3-quote{ margin:18px auto 22px; padding:0 20px; animation:br2Fade 2s .8s both; }
+  .wk3 .wk2-note{ margin:0 auto 22px; }
+  .wk3-actions{ gap:16px; } .wk3 .wk2-up{ padding:20px 44px; } .wk3 .wk2-snooze{ padding:18px 26px; }
+  /* 3 Good morning */
+  .brief3 .brief-top{ align-items:center; }
+  .brief-x{ border:none; background:rgba(255,255,255,.06); color:rgba(255,255,255,.6); width:30px; height:30px; border-radius:50%; cursor:pointer; margin-left:8px; } .brief-x:hover{ color:#fff; background:rgba(255,255,255,.12); }
+  .brief2 .br-hero{ display:flex; align-items:center; justify-content:space-between; gap:30px; flex-wrap:wrap; margin-top:20px !important; padding:24px 30px !important;
+    background:linear-gradient(120deg, rgba(255,170,90,.13), rgba(120,140,255,.07) 60%, rgba(255,255,255,.03)) !important; border-color:rgba(255,197,107,.22) !important; }
+  .brief3[data-sky="night"] .br-hero, .brief3[data-sky="dawn"] .br-hero{ background:linear-gradient(120deg, rgba(120,140,255,.14), rgba(255,140,110,.08) 70%) !important; }
+  .brh-wx{ display:flex; align-items:center; gap:18px; }
+  .brh-i{ font-size:54px; line-height:1; filter:drop-shadow(0 6px 20px rgba(255,190,110,.35)); }
+  .brh-t{ font-family:var(--font-display); font-size:64px; font-weight:200; letter-spacing:-.04em; line-height:.95; }
+  .brh-l{ font-size:17px; color:rgba(255,255,255,.88); margin-top:2px; } .brh-l.is-big{ font-family:var(--font-display); font-size:30px; }
+  .brh-hl{ font-size:13px; color:rgba(255,255,255,.5); margin-top:4px; letter-spacing:.02em; }
+  .brh-sun{ display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .brh-sun .sun-arc{ width:300px; height:78px; max-width:70vw; } .brh-sun .sa-track{ stroke:rgba(255,255,255,.25); } .brh-sun .sa-horizon{ stroke:rgba(255,255,255,.14); }
+  .brh-sun .sun-arc.is-anim{ animation-delay:calc(var(--d, 0ms) - var(--shift, 0ms) + 400ms); }
+  .brh-sun-row{ display:flex; justify-content:space-between; align-items:flex-end; width:300px; max-width:70vw; font-family:var(--font-display); font-size:16px; font-weight:600; font-variant-numeric:tabular-nums; }
+  .brh-sun-row small{ display:block; font-family:var(--font-body, inherit); font-size:10.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.45); margin-bottom:2px; }
+  .brh-sun-row > span:last-child{ text-align:right; } .brh-day{ font-size:12px; font-weight:500; color:rgba(255,255,255,.5); font-family:inherit; }
+  .brief2 .br-quote{ padding:24px 26px 22px !important; }
+  .br-th{ display:flex; align-items:flex-start; gap:14px; padding:12px 0; border-top:1px solid rgba(127,127,127,.12); }
+  .br-th:first-of-type{ border-top:none; padding-top:2px; }
+  .br-th-i{ flex:none; width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; background:rgba(255,255,255,.06); }
+  .br-th b{ display:block; font-size:15.5px; font-weight:700; } .br-th span:not(.br-th-i){ display:block; font-size:13.5px; line-height:1.4; color:rgba(255,255,255,.6); margin-top:2px; }
+  .brief2 .br-thoughts .br-th{ animation:br2Rise 1s cubic-bezier(.2,.75,.15,1) both; animation-delay:calc(var(--d, 0ms) - var(--shift, 0ms) + 300ms + var(--i)*320ms); }
+  .brief.brief2.is-skipped .br-thoughts .br-th{ animation-delay:.1s; }
+  .br-news-i{ display:flex; align-items:baseline; gap:10px; } .br-news-i span{ flex:1; } .br-news-i i{ font-style:normal; color:rgba(255,255,255,.3); transition:color .15s, transform .15s; } .br-news-i:hover i{ color:#ffc56b; transform:translate(2px, -2px); }
+  .br-news-wait{ display:flex; gap:6px; padding:8px 0; } .br-news-wait i{ width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.35); animation:brDots 1.2s ease-in-out infinite; } .br-news-wait i:nth-child(2){ animation-delay:.2s; } .br-news-wait i:nth-child(3){ animation-delay:.4s; }
+  @keyframes brDots{ 0%,100%{ opacity:.25; transform:translateY(0); } 50%{ opacity:1; transform:translateY(-3px); } }
+  .br-day .br-agenda b{ display:inline-block; min-width:70px; }
+  .br-day-plan{ font-size:14px; color:rgba(255,255,255,.7); margin-top:8px; line-height:1.45; } .br-day-plan b{ color:#fff; }
+  .brief3 .brief-cta{ justify-content:center; } .brief3 .brief-go.brief-morning{ font-size:20px; padding:18px 40px; border-radius:999px; }
+  .brief-intro.is-cinematic{ animation-delay:4.3s; animation-duration:.9s; }
+  .brief-intro.is-cinematic .bi-time{ animation:biTime 2s cubic-bezier(.3,.7,.2,1) .1s both; }
+  .brief-intro.is-cinematic .bi-word{ animation:biIn 1.2s cubic-bezier(.2,.75,.15,1) 1.7s both, biShine 2s ease-in-out 2.2s both; }
+  .brief-intro.is-cinematic .bi-name{ animation:biIn 1s cubic-bezier(.2,.75,.15,1) 2.5s both; }
+  .brief-intro.is-cinematic .bi-line{ animation-delay:3.1s; }
+  .brief-intro.is-cinematic .bi-glow{ animation:biGlow 2.6s ease-out 1.3s both; }
+  /* 4 morning mode */
+  .mm-thoughts{ margin-top:4px; } .mm .br-th span:not(.br-th-i){ color:var(--text-dim); } .mm .br-th-i{ background:rgba(var(--ink),.05); }
+  .mm .qt{ color:var(--text); } .mm .qt-mark{ color:rgba(232,162,61,.5); }
+  /* 5 Start work: the work intro */
+  .wi{ position:relative; width:100%; height:100%; display:flex; flex-direction:column; color:#fff; overflow-y:auto;
+    background:radial-gradient(ellipse at 50% -20%, rgba(63,190,142,.16), transparent 55%), radial-gradient(ellipse at 100% 100%, rgba(232,162,61,.10), transparent 50%), #06070b; }
+  .wi-top{ display:flex; align-items:center; gap:12px; padding:22px 32px 0; }
+  .wi-inner{ flex:1; width:100%; max-width:1000px; margin:0 auto; padding:24px 32px 40px; display:flex; flex-direction:column; justify-content:safe center; }
+  .wi-inner > *{ animation:lsRow .7s cubic-bezier(.2,.9,.3,1.1) both; }
+  .wi-k{ font-size:11px; font-weight:800; letter-spacing:.22em; text-transform:uppercase; color:#7ef0c0; text-align:center; }
+  .wi-h{ font-family:var(--font-display); font-weight:800; font-size:clamp(34px, 4.6vw, 60px); letter-spacing:-.03em; line-height:1.05; text-align:center; margin:10px 0 26px; animation-name:br2Blur !important; animation-duration:1.3s !important; }
+  .wi-h span{ background:linear-gradient(90deg, #7ef0c0, #ffc56b); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .wi-stats{ display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; animation:none !important; }
+  .wi-stat{ padding:16px 18px; border-radius:18px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); animation:lsRow .7s cubic-bezier(.2,.9,.3,1.1) both; }
+  .wi-stat-k{ font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.45); }
+  .wi-stat-v{ font-family:var(--font-display); font-size:30px; font-weight:700; letter-spacing:-.02em; margin:6px 0 4px; font-variant-numeric:tabular-nums; }
+  .wi-stat-s{ font-size:12.5px; color:rgba(255,255,255,.55); }
+  .wi-bar{ height:4px; border-radius:3px; background:rgba(255,255,255,.08); margin:2px 0 7px; overflow:hidden; } .wi-bar i{ display:block; height:100%; background:linear-gradient(90deg, #3fbe8e, #7ef0c0); border-radius:3px; animation:br2Bar 1.6s 1.4s cubic-bezier(.2,.8,.2,1) both; transform-origin:left; }
+  .wi-cols{ display:grid; grid-template-columns:3fr 2fr; gap:14px; margin-top:14px; animation:none !important; align-items:start; }
+  .wi-plan, .wi-side{ padding:18px 20px; border-radius:20px; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.08); animation:lsRow .7s cubic-bezier(.2,.9,.3,1.1) both; }
+  .wi-sec{ display:flex; justify-content:space-between; font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:12px; } .wi-sec span{ letter-spacing:.04em; text-transform:none; font-weight:600; }
+  .wi .pr-row{ padding:11px 14px; font-size:15px; }
+  .wi-cal{ display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:12px; font-size:13px; color:rgba(255,255,255,.7); } .wi-cal b{ color:#ffc56b; margin-right:5px; }
+  .wi-side{ display:flex; flex-direction:column; gap:18px; } .wi-side .qt{ color:#fff; } .wi-side .qt blockquote{ font-size:19px; }
+  .wi-target{ display:flex; align-items:baseline; gap:8px; padding-top:14px; border-top:1px solid rgba(255,255,255,.08); font-size:13px; color:rgba(255,255,255,.55); } .wi-target b{ font-family:var(--font-display); font-size:24px; color:#7ef0c0; }
+  @media (max-width:860px){ .wi-stats{ grid-template-columns:repeat(2, 1fr); } .wi-cols{ grid-template-columns:1fr; } }
+  /* Settings → Sound */
+  .snd-h{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; }
+  .snd-seg{ margin:0 0 14px; }
+  .snd-vol{ display:flex; align-items:center; gap:10px; margin-bottom:6px; font-size:14px; } .snd-vol input{ flex:1; max-width:360px; accent-color:var(--accent); } .snd-vol b{ min-width:44px; font-size:13px; color:var(--text-dim); font-variant-numeric:tabular-nums; }
+  .snd-vol.is-off, .snd-rows.is-off{ opacity:.4; pointer-events:none; }
+  .snd-rows{ display:flex; flex-direction:column; }
+  .snd-row{ display:flex; justify-content:space-between; align-items:center; gap:16px; padding:11px 0; border-top:1px solid var(--border); cursor:pointer; }
+  .snd-row:first-child{ border-top:none; } .snd-row b{ display:block; font-size:14px; font-weight:600; } .snd-row small{ display:block; font-size:12.5px; color:var(--text-dim); margin-top:2px; }
+  .snd-tiles{ display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; }
+  .snd-tile{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:14px 16px; border-radius:16px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text); cursor:pointer; text-align:left; transition:border-color .15s, background .15s, transform .15s; }
+  .snd-tile:hover{ transform:translateY(-1px); border-color:rgba(232,162,61,.45); }
+  .snd-tile.is-on{ border-color:var(--accent); background:linear-gradient(140deg, rgba(232,162,61,.16), rgba(232,162,61,.03)); }
+  .snd-tile-i{ font-size:20px; margin-bottom:4px; } .snd-tile b{ font-size:14px; } .snd-tile small{ font-size:12px; color:var(--text-dim); }
+  .snd-music{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:12px; } .snd-music .input{ flex:1; min-width:220px; } .snd-music .snd-seg{ margin:0; }
+  @media (max-width:760px){ .snd-tiles{ grid-template-columns:repeat(2, 1fr); } }
+  .mm-k + .qt, .br-k + .qt{ margin-top:16px; }
+  .mm-k + .br-th, .br-k + .br-th{ border-top:none; padding-top:4px; }
+  .mm-thoughts{ margin-top:10px; padding-top:14px; border-top:1px solid var(--border); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -3662,19 +3791,38 @@ function wxIcon(kind, phase){
   return {clear: night ? '&#127769;' : SKY_META[phase].icon, partly: night ? '&#9729;&#65039;' : '&#9925;', cloudy:'&#9729;&#65039;', fog:'&#127787;&#65039;',
     drizzle:'&#127782;&#65039;', rain:'&#127783;&#65039;', snow:'&#127784;&#65039;', storm:'&#9928;&#65039;'}[kind] || SKY_META[phase].icon;
 }
+// The sun's path today as a thin arc, sunrise on the left and sunset on the right, with the sun
+// (or the moon, at night) where it is right now. Used small on Today and big on Good morning.
+function sunArcHtml(o){
+  o = o || {};
+  const W = o.w || 120, H = o.h || 40, pad = o.pad==null ? 6 : o.pad;
+  const win = dayWindow(), d = new Date(), m = d.getHours()*60 + d.getMinutes();
+  const up = m >= win.rise && m <= win.set;
+  const f = Math.max(0, Math.min(1, (m - win.rise) / Math.max(1, win.set - win.rise)));
+  const x0 = pad, x2 = W - pad, y0 = H - 3, ctlY = -H*0.55;
+  const pt = function(t){ return {x:(1-t)*(1-t)*x0 + 2*(1-t)*t*(W/2) + t*t*x2, y:(1-t)*(1-t)*y0 + 2*(1-t)*t*ctlY + t*t*y0}; };
+  const sun = pt(up ? f : (m < win.rise ? 0 : 1));
+  const path = 'M'+x0+' '+y0+' Q'+(W/2)+' '+ctlY.toFixed(1)+' '+x2+' '+y0;
+  const anim = o.animate ? ' is-anim' : '';
+  return '<svg class="sun-arc'+anim+(up?'':' is-night')+'" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" aria-hidden="true" style="--f:'+(up ? f : 0).toFixed(3)+'">'+
+    '<line x1="0" y1="'+y0+'" x2="'+W+'" y2="'+y0+'" class="sa-horizon"/>'+
+    '<path d="'+path+'" class="sa-track" pathLength="100"/>'+
+    (up ? '<path d="'+path+'" class="sa-done" pathLength="100" style="stroke-dasharray:'+(f*100).toFixed(1)+' 100"/>' : '')+
+    '<circle class="sa-glow" cx="'+sun.x.toFixed(1)+'" cy="'+sun.y.toFixed(1)+'" r="'+(o.r ? o.r*2.4 : 7)+'"/>'+
+    '<circle class="sa-sun" cx="'+sun.x.toFixed(1)+'" cy="'+sun.y.toFixed(1)+'" r="'+(o.r || 3.2)+'"/>'+
+  '</svg>';
+}
+function daylightLabel(){ const w = dayWindow(), len = w.set - w.rise; return Math.floor(len/60)+'h '+(len%60)+'m of daylight'; }
 function skyChipHtml(){
   if(state.profile.skyChip===false) return '';
   const phase = skyPhase(), now = wxNow(), w = dayWindow();
-  const m = new Date().getHours()*60 + new Date().getMinutes();
-  let when = '';
-  if(phase==='golden' || (phase==='day' && w.set-m <= 120)) when = 'sunset '+fmtMinOfDay(w.set);
-  else if(phase==='dawn' || phase==='night' && m < w.rise) when = 'sunrise '+fmtMinOfDay(w.rise);
   const kind = now ? wxKind(now.code) : 'clear';
-  const parts = [SKY_META[phase].label];
-  if(now) parts.push('<b>'+now.temp+'&deg;</b> '+escapeHtml(wxLabel(now.code).toLowerCase()));
-  if(when) parts.push(when);
-  return '<span class="sky-chip sky-text" data-sky="'+phase+'" title="'+(now ? 'Feels like '+now.feels+'° · high '+now.hi+'° / low '+now.lo+'°'+(weatherCfg().place ? ' · '+escapeHtml(weatherCfg().place) : '') : 'Set a weather location in Settings → Display')+'">'+
-    '<span class="sky-chip-i">'+wxIcon(kind, phase)+'</span>'+parts.join(' &middot; ')+'</span>';
+  const tipTxt = (now ? 'Feels like '+now.feels+'° · high '+now.hi+'° / low '+now.lo+'°' : SKY_META[phase].label)+' · sunrise '+fmtMinOfDay(w.rise)+' · sunset '+fmtMinOfDay(w.set)+(weatherCfg().place ? ' · '+weatherCfg().place : '');
+  // one tidy pill: the weather, then the sun's arc with sunrise and sunset under its ends
+  return '<span class="skyp" data-sky="'+phase+'" title="'+escapeHtml(tipTxt)+'">'+
+    '<span class="skyp-wx"><span class="skyp-i">'+wxIcon(kind, phase)+'</span>'+(now ? '<b>'+now.temp+'&deg;</b><span class="skyp-l">'+escapeHtml(wxLabel(now.code))+'</span>' : '<span class="skyp-l">'+SKY_META[phase].label+'</span>')+'</span>'+
+    '<span class="skyp-sun">'+sunArcHtml({w:64, h:20, pad:4, r:2.6})+'<span class="skyp-times"><span>'+fmtMinOfDay(w.rise)+'</span><span>'+fmtMinOfDay(w.set)+'</span></span></span>'+
+  '</span>';
 }
 // ---- settings ----
 function weatherSettingsHtml(){
@@ -4416,7 +4564,7 @@ function tone(freqs, dur, gainPeak){
       const osc=ctx.createOscillator(), gain=ctx.createGain();
       osc.type='sine'; osc.frequency.value=freq;
       gain.gain.setValueAtTime(0.0001,t);
-      gain.gain.exponentialRampToValueAtTime(gainPeak||0.25,t+0.02);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, (gainPeak||0.25)*sfxVolume()),t+0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001,t+dur);
       osc.connect(gain).connect(ctx.destination);
       osc.start(t); osc.stop(t+dur+0.02);
@@ -4428,6 +4576,8 @@ function tone(freqs, dur, gainPeak){
 // "Modern" (default): soft, glassy plucks and taps through a little room reverb — closer to a
 // phone's UI sounds than a beep. "Classic" is the original sine beeps. Settings → Preferences.
 function soundPack(){ return state.profile.soundPack==='classic' ? 'classic' : 'modern'; }
+function sfxVolume(){ const v = Number(state.profile.sfxVolume); return isFinite(v) && state.profile.sfxVolume!=null ? Math.max(0, Math.min(1, v)) : 0.8; }
+function soundPref(k, dflt){ const v = state.profile.sounds && state.profile.sounds[k]; return v===undefined ? dflt : v; }
 let sfxBus = null;
 function sfxImpulse(ctx, secs, decay){
   const len = Math.floor(ctx.sampleRate*secs), buf = ctx.createBuffer(2, len, ctx.sampleRate);
@@ -4438,12 +4588,15 @@ function sfxOut(ctx){
   if(sfxBus && sfxBus.ctx===ctx) return sfxBus.input;
   const input = ctx.createGain(), dry = ctx.createGain(), wet = ctx.createGain(), verb = ctx.createConvolver(), comp = ctx.createDynamicsCompressor(), lp = ctx.createBiquadFilter();
   dry.gain.value = 0.9; wet.gain.value = 0.28; verb.buffer = sfxImpulse(ctx, 1.4, 3.4);
+  input.gain.value = sfxVolume()/0.8;
   lp.type = 'lowpass'; lp.frequency.value = 9000;
   comp.threshold.value = -14; comp.ratio.value = 3;
   input.connect(dry); dry.connect(comp); input.connect(verb); verb.connect(wet); wet.connect(comp);
   comp.connect(lp); lp.connect(ctx.destination);
   sfxBus = {ctx:ctx, input:input};
   return input;
+}
+function applySfxVolume(){ if(sfxBus) sfxBus.input.gain.value = sfxVolume()/0.8;
 }
 // a soft plucked note: two slightly detuned voices through a closing low-pass
 function sfxPluck(ctx, out, t, freq, dur, vol, type){
@@ -4515,13 +4668,13 @@ function playRestSound(){ playSfx('rest', function(){ tone([440,330], 0.3, 0.2);
 function playTaskComplete(){ playSfx('complete', function(){ tone([523,659,784,1046], 0.2, 0.4); }); }
 function playTaskAdded(){ playSfx('added', function(){ tone([880,1046], 0.1, 0.18); }); }
 function playJournalSound(){ playSfx('journal', function(){ tone([587,740], 0.16, 0.16); }); }
-function playLockIn(){ playSfx('lockin', function(){ tone([523,659], 0.18, 0.25); }); }
+function playLockIn(){ if(lockStartSound()==='none') return; playSfx('lockin', function(){ tone([523,659], 0.18, 0.25); }); }
 function playFanfare(){ playSfx('fanfare', function(){ tone([523,659,784], 0.3, 0.3); }); }
 function playPing(){ playSfx('ping', function(){ tone([1200,1500], 0.08, 0.15); }); }
 function playNight(){ playSfx('night', function(){ tone([440,330], 0.3, 0.2); }); }
-function playNav(){ playSfx('nav', null); }
-function playDragLift(){ playSfx('lift', null); }
-function playDrop(){ playSfx('drop', function(){ tone([660], 0.08, 0.15); }); }
+function playNav(){ if(soundPref('nav', true)) playSfx('nav', null); }
+function playDragLift(){ if(soundPref('drag', true)) playSfx('lift', null); }
+function playDrop(){ if(soundPref('drag', true)) playSfx('drop', function(){ tone([660], 0.08, 0.15); }); }
 function playLockOut(){ playSfx('lockout', function(){ tone([659,494], 0.16, 0.22); }); }
 function playDeny(){ playSfx('deny', function(){ tone([220,208], 0.12, 0.2); }); }
 function playStep(i){ if(soundPack()==='classic'){ tone([523], 0.08, 0.15); return; } sfx(stepSfx(i)); }
@@ -4580,6 +4733,101 @@ function playAlarmSound(style){
 }
 function playBeep(){ playAlarmSound(); }
 
+
+// ---- longer moments: dawn, the work intro, the lock-in start-up ----
+// A slow pad: a few sines per note, detuned, through a gentle low-pass, with a long attack.
+function padChord(ctx, out, t, freqs, attack, hold, release, vol){
+  const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1800; f.Q.value = 0.4;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t+attack);
+  g.gain.setValueAtTime(vol, t+attack+hold); g.gain.exponentialRampToValueAtTime(0.0001, t+attack+hold+release);
+  freqs.forEach(function(fr){ [-6, 0, 7].forEach(function(det){ const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = fr; o.detune.value = det; o.connect(f); o.start(t); o.stop(t+attack+hold+release+0.1); }); });
+  f.connect(g); g.connect(out);
+}
+SFX.dawn = function(c, o, t){ padChord(c, o, t, [130.8, 196, 261.6, 329.6, 392], 9, 14, 8, 0.035); [523.3, 659.3, 784].forEach(function(f, i){ sfxPluck(c, o, t+6+i*1.6, f, 3, 0.02, 'sine'); }); };
+SFX.workintro = function(c, o, t){ padChord(c, o, t, [174.6, 220, 261.6, 329.6], 1.6, 1.6, 2.4, 0.04); sfxSweep(c, o, t, 220, 440, 1.6, 0.03); [523.3, 659.3, 784, 1046.5].forEach(function(f, i){ sfxPluck(c, o, t+0.9+i*0.16, f, 1.4, 0.045, 'sine'); }); };
+// "Chill intro": about fifteen seconds of lo-fi — four warm chords, a slow arpeggio, a soft low end
+SFX.chill = function(c, o, t){
+  const prog = [[174.6, 220, 261.6, 329.6], [164.8, 196, 246.9, 293.7], [146.8, 174.6, 220, 261.6, 329.6], [130.8, 164.8, 196, 246.9]];
+  prog.forEach(function(ch, i){
+    const at = t + i*3.4;
+    padChord(c, o, at, ch, 1.2, 1.8, 2.2, 0.028);
+    sfxPluck(c, o, at, ch[0]/2, 2.6, 0.05, 'sine');
+    ch.concat([ch[1]*2, ch[2]*2]).forEach(function(f, j){ sfxPluck(c, o, at + 0.42*j, f*2, 1.1, 0.018, 'triangle'); });
+  });
+  // a little tape hiss under it
+  const len = Math.floor(c.sampleRate*14), buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i] = (Math.random()*2-1)*0.5;
+  const src = c.createBufferSource(), hp = c.createBiquadFilter(), g = c.createGain();
+  src.buffer = buf; hp.type = 'bandpass'; hp.frequency.value = 3500; hp.Q.value = 0.6;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.006, t+1.5); g.gain.setValueAtTime(0.006, t+11); g.gain.exponentialRampToValueAtTime(0.0001, t+14);
+  src.connect(hp); hp.connect(g); g.connect(o); src.start(t); src.stop(t+14);
+};
+function playDawnPad(){ if(soundPref('dawn', true)) sfx(SFX.dawn); }
+function playWorkIntro(){ if(soundPref('workintro', true)) playSfx('workintro', function(){ tone([523,659,784], 0.3, 0.25); }); }
+// what plays as you lock in: none / the chime / the chill intro / your own music
+function lockStartSound(){ const v = state.profile.lockSound; return ['none','chime','chill','music'].indexOf(v)>=0 ? v : 'chill'; }
+let lockSongPlaying = false;
+function playLockInSong(){
+  const k = lockStartSound();
+  if(k==='chill'){ setTimeout(function(){ sfx(SFX.chill); }, 700); return; }
+  if(k==='music'){ const m = state.profile.lockMusic; if(m && m.q && typeof musicApp==='function'){ musicApp('play', m).then(function(ok){ lockSongPlaying = !!ok; }); } }
+}
+function stopLockInSong(){ if(lockSongPlaying && soundPref('lockMusicStop', true) && typeof musicApp==='function'){ lockSongPlaying = false; musicApp('stop'); } }
+
+// ---- Settings → Sound ----
+function soundSettingsHtml(){
+  const p = state.profile, on = p.soundEnabled!==false, pack = on ? soundPack() : 'off', ls = lockStartSound(), lm = p.lockMusic || null;
+  const seg = function(cur, act, opts){ return '<div class="seg-tabs snd-seg">'+opts.map(function(o){ return '<button class="seg-tab'+(cur===o[0]?' active':'')+'" data-action="'+act+'" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div>'; };
+  const tog = function(k, label, sub, dflt){ const v = soundPref(k, dflt); return '<label class="snd-row"><span><b>'+label+'</b><small>'+sub+'</small></span><span class="ws-switch"><input type="checkbox" data-snd="'+k+'" '+(v?'checked':'')+'><span></span></span></label>'; };
+  const tile = function(id, icon, label, sub){ return '<button class="snd-tile'+(ls===id?' is-on':'')+'" data-action="sndLockSound" data-id="'+id+'"><span class="snd-tile-i">'+icon+'</span><b>'+label+'</b><small>'+sub+'</small></button>'; };
+  return '<div class="snd">'+
+    '<div class="card section"><div class="snd-h"><div><div class="section-title" style="margin:0;">&#127925; Sound Effects</div><div class="kpi-sub">Clicks, ticks and chimes around the app.</div></div><button class="btn btn-ghost btn-sm" data-action="previewSounds">&#9654; Hear them</button></div>'+
+      seg(pack, 'sndPack', [['modern','Soft'],['classic','Classic beeps'],['off','Off']])+
+      '<div class="snd-vol'+(on?'':' is-off')+'"><span>&#128264;</span><input type="range" min="0" max="100" step="5" id="sndVol" value="'+Math.round(sfxVolume()*100)+'"><span>&#128266;</span><b id="sndVolV">'+Math.round(sfxVolume()*100)+'%</b></div>'+
+      '<div class="snd-rows'+(on?'':' is-off')+'">'+
+        tog('nav', 'Moving around', 'A soft note when you switch pages', true)+
+        tog('drag', 'Drag and drop', 'A lift and a landing when you move things', true)+
+      '</div></div>'+
+    '<div class="card section"><div class="snd-h"><div><div class="section-title" style="margin:0;">&#128274; When You Lock In</div><div class="kpi-sub">What plays the moment you lock in.</div></div><button class="btn btn-ghost btn-sm" data-action="sndPreviewLock">&#9654; Hear it</button></div>'+
+      '<div class="snd-tiles">'+tile('none', '&#128263;', 'Silent', 'Nothing at all')+tile('chime', '&#10024;', 'Chime', 'A quick rising chime')+tile('chill', '&#127769;', 'Chill Intro', '15 seconds of lo-fi')+tile('music', '&#9835;', 'My Music', 'A song or playlist')+'</div>'+
+      (ls==='music' ? '<div class="snd-music">'+
+          '<input class="input" id="sndLockQuery" placeholder="Apple Music song or playlist name" value="'+escapeHtml(lm ? lm.q : '')+'">'+
+          seg(lm && lm.k==='playlist' ? 'playlist' : 'song', 'sndLockKind', [['song','Song'],['playlist','Playlist']])+
+          '<button class="btn btn-sm btn-primary" data-action="sndLockSet">Use it</button>'+
+        '</div>'+(lm ? '<div class="kpi-sub" style="margin-top:6px;">&#9835; '+escapeHtml(lm.q)+' &middot; Plays through the Music app</div>' : '')+
+        '<div class="snd-rows">'+tog('lockMusicStop', 'Stop it when I lock out', 'Otherwise it keeps playing', true)+'</div>' : '')+
+    '</div>'+
+    '<div class="card section"><div class="section-title">&#9728;&#65039; Mornings</div>'+
+      '<div class="snd-rows">'+
+        tog('dawn', 'Dawn before the alarm', 'A slow chord swells under the sunrise in the last 90 seconds', true)+
+        tog('workintro', 'Start work', 'A warm swell when the work intro opens', true)+
+      '</div>'+
+      '<div class="snd-h" style="margin-top:12px;"><div class="kpi-sub">Your alarm tone or wake-up music lives with the alarm.</div><button class="btn btn-ghost btn-sm" data-action="openWakeSetup">&#9200; Alarm sound</button></div>'+
+    '</div>'+
+  '</div>';
+}
+function saveSound(){ persist('profile'); if(typeof renderView==='function') renderView(); }
+ACTIONS.sndPack = function(el, e, id){ const p = state.profile; p.soundEnabled = id!=='off'; if(id!=='off') p.soundPack = id; saveSound(); if(id!=='off') playPositive(); };
+ACTIONS.sndLockSound = function(el, e, id){ state.profile.lockSound = id; saveSound(); };
+ACTIONS.sndPreviewLock = function(){ playLockIn(); const k = lockStartSound(); if(k==='chill') setTimeout(function(){ sfx(SFX.chill); }, 700); else if(k==='music'){ const m = state.profile.lockMusic; if(m && m.q) musicApp('play', m).then(function(ok){ if(!ok) showToast('Music plays through the Operator app — open Operator from its icon.', {icon:'&#9888;'}); }); } };
+ACTIONS.sndLockKind = function(el, e, id){ ui.sndLockKind = id; const m = state.profile.lockMusic; if(m){ m.k = id; saveSound(); } else renderView(); };
+ACTIONS.sndLockSet = function(){
+  const i = document.getElementById('sndLockQuery'), v = i ? i.value.trim() : ''; if(!v){ if(i) i.focus(); return; }
+  const fromLink = typeof appleMusicFromLink==='function' ? appleMusicFromLink(v) : null;
+  state.profile.lockMusic = fromLink || {type:'music', q:v, k: ui.sndLockKind || 'song'};
+  saveSound(); showToast('Lock-in music: '+state.profile.lockMusic.q, {icon:'&#9835;'});
+};
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.dataset || !t.dataset.snd) return;
+  state.profile.sounds = Object.assign({}, state.profile.sounds||{}); state.profile.sounds[t.dataset.snd] = !!t.checked; persist('profile');
+});
+document.addEventListener('input', function(e){
+  const t = e.target; if(!t || t.id!=='sndVol') return;
+  state.profile.sfxVolume = Number(t.value)/100; applySfxVolume();
+  const v = document.getElementById('sndVolV'); if(v) v.textContent = t.value+'%';
+  clearTimeout(ui._sndT); ui._sndT = setTimeout(function(){ persist('profile'); playTick(); }, 180);
+});
 // ============ CLIENT HELPERS ============
 function clientOptionsHtml(selected){
   const clients = arr(state.business && state.business.clients);
@@ -7987,7 +8235,7 @@ function reallyConfirmStopFocus(){
   state.focus.lastSessionEndedAt = endedAt;
   if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   if(state.modes.active && state.modes.active.linkedFocus){ finishActiveMode(true); }
-  playLockOut(); lockOutFlash(minutes, arr(s.completedTasks).length);
+  playLockOut(); stopLockInSong(); lockOutFlash(minutes, arr(s.completedTasks).length);
   persist('focus'); renderView();
 }
 function renderStopFocusModal(){
@@ -15294,7 +15542,7 @@ function renderSettings(){
         '<div class="field"><label>Business name</label><input class="input" id="setBusinessName" value="'+escapeHtml(p.businessName||'')+'" placeholder="e.g. Rivera Media Co."></div>'+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Preferences</div><div class="grid grid-2">'+
-        '<div class="field"><label>Sound effects</label><div class="row" style="gap:6px;"><select class="input" id="setSound"><option value="modern" '+(p.soundEnabled!==false && p.soundPack!=='classic'?'selected':'')+'>Modern</option><option value="classic" '+(p.soundEnabled!==false && p.soundPack==='classic'?'selected':'')+'>Classic beeps</option><option value="off" '+(p.soundEnabled===false?'selected':'')+'>Off</option></select><button class="btn btn-ghost btn-sm" data-action="previewSounds" title="Hear them">&#9654;</button></div></div>'+
+        '<div class="field"><label>Sound</label><button class="btn btn-ghost btn-sm" data-action="settingsTab" data-tab="sound" style="align-self:flex-start;">&#128266; Sound settings &rarr;</button></div>'+
         '<div class="field"><label>Note field after finishing a task in Focus</label><select class="input" id="setFocusNote"><option value="on" '+(p.focusNotePromptEnabled!==false?'selected':'')+'>Enabled</option><option value="off" '+(p.focusNotePromptEnabled===false?'selected':'')+'>Disabled</option></select></div>'+
         '<div class="field"><label>Notify when a focus timer ends</label><select class="input" id="setNotifyEnd"><option value="on" '+(p.notifyOnFocusEnd!==false?'selected':'')+'>On</option><option value="off" '+(p.notifyOnFocusEnd===false?'selected':'')+'>Off</option></select></div>'+
       '</div></div>'+
@@ -15356,6 +15604,7 @@ function renderSettings(){
   const navDefs = [
     {id:'you', label:'You', icon:'&#128100;'},
     {id:'display', label:'Display', icon:'&#127912;'},
+    {id:'sound', label:'Sound', icon:'&#128266;'},
     {id:'focus', label:'Focus &amp; Alarms', icon:'&#9201;'},
     {id:'business', label:'Business', icon:'&#9635;'},
     {id:'calendarJournal', label:'Calendar &amp; Journal', icon:'&#9638;'},
@@ -15364,6 +15613,7 @@ function renderSettings(){
     {id:'updates', label:'App updates', icon:'&#128227;'}
   ];
   // Standards and General (preferences) now live under You; export / reset under Data
+  sections.sound = soundSettingsHtml();
   const tab = (ui.settingsTab==='standards' || ui.settingsTab==='general') ? 'you' : ui.settingsTab;
   const active = sections[tab] ? tab : 'you';
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Settings</div></div></div>'+
@@ -16061,6 +16311,7 @@ function checkAllAlarms(){
     }
     if(w.override && w.override.date<todayStr()){ w.override = null; changed = true; }
   }
+  if(typeof checkDawn==='function') checkDawn();
   // snoozes and test rings
   const sn = state.focus.snooze;
   if(sn && sn.ts<=now){
@@ -16236,7 +16487,7 @@ function wakeImUp(){
   if(!wasTest && state.modes.active && state.modes.active.sleep) finishActiveMode(true);
   if(!wasTest && typeof applyNightPlanAuto==='function') applyNightPlanAuto();
   ui.wakeMode = 'brief'; ui.wakeBriefTest = !!wasTest; ui.wakeBoardBig = false; ui.wakeIntroDone = false;
-  ui.briefT0 = Date.now(); ui.briefShift = 0; ui.briefSkipped = false; ui.briefNewsAt = null; ui.briefLineSeen = 0;
+  ui.briefT0 = Date.now(); ui.briefShift = 0; ui.briefSkipped = false; ui.briefNewsAt = null; ui.briefLineSeen = 0; ui.dawnTs = null;
   loadMorningNews();
   playWakeChime();
   renderWakeOverlayInto();
@@ -16263,9 +16514,9 @@ function wakeSnooze(){
   showToast('Snoozed — ringing again at '+fmt12Hour(nowHM(new Date(Date.now()+mins*60000))), {icon:'&#128164;'});
 }
 ACTIONS.wakeImUp = function(){ wakeImUp(); };
+ACTIONS.wakeStartDay = function(){ wakeImUp(); };
 ACTIONS.wakeSnooze = function(){ wakeSnooze(); };
 ACTIONS.wakePlayMusic = function(){ const w = wakeCfg(); if(w.media) playWakeMedia(w.media, function(){ showToast('Couldn\'t play that — try uploading the song file instead.', {icon:'&#9888;'}); }); clearInterval(wakeBeepTimer); if(wakeRing){ wakeRing.mediaFailed = false; renderWakeOverlayInto(); } };
-function wakeGreeting(){ const h = new Date().getHours(); return h<5 ? 'Still up' : h<12 ? 'Good morning' : h<18 ? 'Good afternoon' : 'Good evening'; }
 function upcomingNightPlan(){ const np = state.focus.nightPlan; return (np && np.date>=todayStr()) ? np : null; }
 function wakeTodayPlan(){
   const np = upcomingNightPlan(), today = todayStr();
@@ -16277,112 +16528,8 @@ function wakeWeatherLine(){
   const now = typeof wxNow==='function' ? wxNow() : null;
   return now ? wxIcon(wxKind(now.code), skyPhase())+' '+now.temp+'&deg; '+escapeHtml(wxLabel(now.code).toLowerCase())+(now.hi!=null ? ' &middot; high '+now.hi+'&deg;' : '') : '';
 }
-function wakeRingHtml(){
-  const w = wakeCfg();
-  const playing = wakeUsesMusic(w) && !(wakeRing && wakeRing.mediaFailed);
-  return '<div class="wk2" data-sky="'+skyLook()+'">'+
-    '<div class="wk2-aura"><i></i><i></i><i></i></div>'+
-    '<div class="wk2-center">'+
-      '<div class="wk2-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test ? ' <span class="tag">TEST</span>' : '')+'</div>'+
-      '<div class="wk2-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+'</div>'+
-      '<div class="wk2-date">'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div>'+
-      (function(){ const ns = morningNotesFor(todayStr()); return ns.length ? '<div class="wk2-note">&ldquo;'+escapeHtml(ns[ns.length-1].text)+'&rdquo;<span>— you, last night</span></div>' : ''; })()+
-      '<div class="wk2-actions">'+
-        '<button class="wk2-up" data-action="wakeImUp"><span>&#9728;&#65039; I\'m up</span></button>'+
-        '<button class="wk2-snooze" data-action="wakeSnooze">Snooze '+(w.snoozeMinutes||9)+' min</button>'+
-      '</div>'+
-      (wakeUsesMusic(w) ? '<div class="wk2-music'+(playing?' is-playing':'')+'">'+
-          (playing ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '')+
-          '<span class="wk2-song">'+escapeHtml(mediaName(w.media))+'</span><span class="wk2-src">'+(wakeRing && wakeRing.mediaFailed ? 'starting the music…' : escapeHtml(mediaKindLabel(w.media)))+'</span>'+
-        '</div>' : '')+
-    '</div>'+
-  '</div>';
-}
-function wakeBriefHtml(){
-  const today = todayStr(), y = addDays(today, -1), name = state.profile.name || '';
-  const yDeep = deepWorkMinutesFor(y), target = state.standards.deepWorkTargetMinutes || 180;
-  const yDone = state.tasks.items.filter(function(t){ return t.completedAt===y; }).length;
-  const yWork = typeof workoutDay==='function' ? workoutDay(y) : {n:0, m:0};
-  const yStd = dayStandardsComplete(y);
-  const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a,c){ return (a.time||'').localeCompare(c.time||''); });
-  const deadlines = state.tasks.items.filter(function(t){ return t.deadline===today && t.status!=='done'; });
-  const goals = typeof masterGoalDefs==='function' ? masterGoalDefs().slice(0, 4) : [];
-  const notes = morningNotesFor(today).map(function(n){ return n.text; });
-  const vb = masterVisionBoard();
-  const q = quoteOfDay();
-  const news = ui.morningNews && ui.morningNews.date===today ? ui.morningNews.items : null;
-  const now = typeof wxNow==='function' ? wxNow() : null, phase = skyPhase(), win = dayWindow();
-  const timeStr = new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
-  // The page builds itself one piece at a time, slowly, with a line of narration typing above
-  // each piece as it arrives. Delays are fixed when a piece first appears (re-renders keep the
-  // same node, so nothing plays twice); skipping the intro shifts the whole schedule earlier.
-  const cine = wakeCfg().intro!=='quick';
-  const base = cine ? 7400 : 3000, gap = 1500;
-  const lines = [{at: base - 600, text: 'It\'s '+timeStr+'.'+(now ? ' '+now.temp+'° and '+wxLabel(now.code).toLowerCase()+'.' : '')}];
-  let k = 0;
-  const panel = function(cls, anim, voice, html, extraStyle){
-    const d = base + (k++)*gap;
-    if(voice) lines.push({at: d - 350, text: voice});
-    return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'">'+html+'</section>';
-  };
-  const left = [], right = [];
-  if(notes.length) left.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note.', '<div class="br-k">&#127769; From last night</div>'+notes.map(function(t){ return '<div class="br-ln-text">'+escapeHtml(t)+'</div>'; }).join('')));
-  right.push(panel('br-quote', 'br-a-words', 'Something to carry today.', '<div class="br-k">&#10024; For today</div><blockquote>&ldquo;'+escapeHtml(q[0])+'&rdquo;</blockquote><cite>&mdash; '+escapeHtml(q[1])+'</cite>'));
-  if(vb && vb.elements.length) left.push(panel('br-vision', 'br-a-scale', 'This is what it\'s for.', '<span class="br-vision-k">&#127775; Vision</span>'+boardStaticHtml(vb, 'wake-board')+'<span class="br-vision-hint">Click to open</span>').replace('<section ', '<section data-action="wakeBoardToggle" title="Open your vision board" '));
-  right.push(panel('br-today', 'br-a-right', events.length ? (events.length===1 ? 'One thing on the calendar.' : events.length+' things on the calendar.') : 'Nothing on the calendar. The day\'s yours.',
-    '<div class="br-k">&#128197; Today</div>'+
-    '<div class="br-wx">'+(now ? '<span class="br-wx-i">'+wxIcon(wxKind(now.code), phase)+'</span><span class="br-wx-t">'+now.temp+'&deg;</span><span class="br-wx-l">'+escapeHtml(wxLabel(now.code))+(now.hi!=null ? '<br><small>high '+now.hi+'&deg; &middot; low '+now.lo+'&deg;</small>' : '')+'</span>' : '<span class="br-wx-l">'+SKY_META[phase].icon+' '+SKY_META[phase].label+'</span>')+
-      '<span class="br-sun">&#127749; '+fmtMinOfDay(win.rise)+'<br>&#127751; '+fmtMinOfDay(win.set)+'</span></div>'+
-    ((events.length || deadlines.length) ? '<div class="br-agenda">'+events.map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('')+
-      deadlines.map(function(t){ return '<div><b class="is-due">Due'+(t.deadlineTime ? ' '+fmt12Hour(t.deadlineTime) : '')+'</b> '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '')));
-  if(goals.length) left.push(panel('br-goals-p', 'br-a-rise', 'Where your goals stand.', '<div class="br-k">&#127919; Goals</div><div class="br-goals">'+
-    goals.map(function(m){ const pct = masterPct(m); return '<div class="br-goal" style="--mg1:'+m.color+';--mg2:'+m.color2+';"><span class="br-goal-k">'+m.icon+' '+m.label+'</span><span class="br-goal-v">'+(m.cur==null ? '—' : m.fmt(m.cur))+'</span><span class="br-goal-bar"><i style="width:'+pct.toFixed(0)+'%"></i></span></div>'; }).join('')+'</div>'));
-  const stat = function(v, kk, good){ return '<div class="br-stat'+(good?' is-good':'')+'"><div class="br-stat-v">'+v+'</div><div class="br-stat-k">'+kk+'</div></div>'; };
-  right.push(panel('br-yday', 'br-a-rise', yDeep ? 'Yesterday: '+fmtHours(yDeep)+' of deep work'+(yDone ? ', '+yDone+' done' : '')+'.' : 'Yesterday\'s behind you.',
-    '<div class="br-k">Yesterday</div><div class="br-stats">'+stat(fmtHours(yDeep), 'deep work', yDeep>=target)+stat(yDone, 'done')+stat(yWork.n || '—', 'workouts', yWork.n>0)+stat(computeStreak()+'d', 'streak', yStd)+'</div>'));
-  if(news){
-    // headlines that came in after the page started get their own turn instead of popping in
-    const d0 = base + k*gap, late = ui.briefNewsAt ? Math.max(600, d0 - (ui.briefNewsAt - (ui.briefT0||0))) : null;
-    right.push(panel('br-news', 'br-a-rise', 'And what\'s going on out there.', '<div class="br-k">&#128240; Headlines'+(news[0].src ? ' <span class="br-src">'+escapeHtml(news[0].src)+'</span>' : '')+'</div>'+
-      news.slice(0, 3).map(function(n){ return '<button class="br-news-i" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'">'+escapeHtml(n.title)+'</button>'; }).join(''), late!=null ? ';--late:'+late+'ms' : ''));
-  }
-  const ctaD = base + k*gap;
-  lines.push({at: ctaD - 350, text: 'Take your time. Whenever you\'re ready.'});
-  ui.briefLines = lines;
-  const shift = ui.briefShift || 0;
-  return '<div class="brief brief2'+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" style="--shift:'+shift+'ms">'+
-    (cine
-      ? '<div class="brief-intro is-cinematic" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div>'+
-          '<div class="bi-time">'+timeStr+'</div>'+
-          '<div class="bi-word">'+wakeGreeting()+'</div>'+(name ? '<div class="bi-name">'+escapeHtml(name)+'</div>' : '')+
-          '<div class="bi-line">'+(wakeWeatherLine() ? wakeWeatherLine() : new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'}))+'</div></div>'
-      : '<div class="brief-intro" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div><div class="bi-word">'+wakeGreeting()+'</div>'+(name ? '<div class="bi-name">'+escapeHtml(name)+'</div>' : '')+'</div>')+
-    '<div class="brief-grid-bg"></div>'+
-    '<div class="brief-inner">'+
-      '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1400)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        (ui.briefSkipped ? '' : '<button class="brief-skipall" data-action="briefSkip" title="Show everything now">Skip &#9197;</button>')+'</div>'+
-      '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1100)+'ms">'+wakeGreeting()+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
-      '<div class="br-voice br-p br-a-fade" style="--d:'+(base-800)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
-      '<div class="brief-music-slot">'+wakeMusicPillHtml()+'</div>'+
-      '<div class="brief2-cols"><div class="brief2-col is-left">'+left.join('')+'</div><div class="brief2-col is-right">'+right.join('')+'</div></div>'+
-      '<div class="brief-cta br-p br-a-rise" data-k="'+k+'" style="--d:'+ctaD+'ms">'+
-        '<button class="brief-go brief-morning" data-action="wakeStartMorning">&#9728;&#65039; Start my morning</button>'+
-        '<button class="brief-go brief-clockin" data-action="wakeClockIn">&#128339; Clock in</button>'+
-        '<button class="brief-skip" data-action="wakeBriefDone">Close</button>'+
-      '</div>'+
-    '</div>'+
-    (ui.wakeBoardBig && vb ? '<div class="br-vision-big" data-action="wakeBoardToggle" title="Close">'+boardStaticHtml(vb, 'wake-board')+'<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button></div>' : '')+
-  '</div>';
-}
-// skipping the intro moves the whole schedule up so the page starts building right away
-ACTIONS.wakeIntroSkip = function(){
-  if(!ui.wakeIntroDone){
-    const base = wakeCfg().intro!=='quick' ? 7400 : 3000, el = Date.now() - (ui.briefT0||Date.now());
-    const shift = Math.max(0, base - 1500 - el);
-    ui.briefShift = (ui.briefShift||0) + shift; ui.briefT0 = (ui.briefT0||Date.now()) - shift;
-  }
-  ui.wakeIntroDone = true; renderWakeOverlayInto();
-};function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : wakeRingHtml(); }
+// the alarm, Good morning and the dawn before it are drawn in 32n-morning.js
+function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : ui.wakeMode==='dawn' ? dawnHtml() : wakeRingHtml(); }
 function renderWakeOverlayInto(){
   const el = document.getElementById('wakeContent'); if(!el) return;
   morphInto(el, renderWakeScreen());
@@ -16393,6 +16540,7 @@ function renderWakeOverlayInto(){
     if(!overlayOpen('wakeOverlay')){ clearInterval(wakeClockTimer); return; }
     const c = document.getElementById('wakeClock');
     if(c) c.textContent = new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'});
+    if(ui.wakeMode==='dawn') tickDawn();
   }, 1000);
 }
 registerModal('wakeOverlay', renderWakeOverlayInto);
@@ -18772,7 +18920,7 @@ function renderMorningView(){
     '<div class="mm-head"><div><div class="mm-k">&#9728;&#65039; Morning</div><div class="mm-greet">'+wakeGreeting()+', '+escapeHtml(p.name||'')+'.</div>'+
       '<div class="mm-sub">Up for <span id="modeElapsed">'+formatElapsed(Date.now()-active.startedAt)+'</span> &middot; '+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div></div>'+
       '<button class="btn btn-ghost btn-sm" data-action="morningBriefing">&#9728;&#65039; Good morning</button></div>'+
-    (notes.length ? '<div class="mm-note"><div class="mm-k">&#127769; From last night</div>'+notes.map(function(n){ return '<div class="mm-note-t">'+escapeHtml(n.text)+'</div>'; }).join('')+'</div>' : '')+
+    (notes.length ? '<div class="mm-note"><div class="mm-k">&#127769; From Last Night</div>'+notes.map(function(n){ return '<div class="mm-note-t">'+escapeHtml(n.text)+'</div>'; }).join('')+'</div>' : '')+
     '<div class="mm-grid">'+
       '<div class="mm-card"><div class="mm-card-h"><span class="mm-k">Get going</span><span class="kpi-sub">'+done.length+'/'+routine.length+'</span><button class="mm-edit" data-action="routineEdit">'+(editing?'Done':'&#9998;')+'</button></div>'+
         '<div class="mm-routine">'+routine.map(function(r){ const on = done.indexOf(r.id)>=0;
@@ -18780,13 +18928,14 @@ function renderMorningView(){
           (editing ? '<div class="mn-row"><input class="input" id="routineNew" placeholder="+ Add a step (Enter)"><button class="btn btn-sm" data-action="routineAdd">Add</button></div>' : '')+
         '</div></div>'+
       '<div class="mm-card mm-side">'+
-        '<div class="mm-quote"><div class="mm-k">&#10024; For today</div><blockquote>&ldquo;'+escapeHtml(q[0])+'&rdquo;</blockquote><cite>&mdash; '+escapeHtml(q[1])+'</cite></div>'+
+        '<div class="mm-quote"><div class="mm-k">&#10024; For Today</div>'+quoteHtml(q)+'</div>'+
+        '<div class="mm-thoughts"><div class="mm-k">&#127807; For a Good Day</div>'+thoughtsOfDay(3).map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>'+
         (vb && vb.elements.length ? '<div class="mm-vision" data-action="openVisionFull" title="Open your vision board">'+boardStaticHtml(vb, 'wake-board')+'</div>' : '')+
       '</div>'+
     '</div>'+
     '<div class="mm-cta">'+
-      '<button class="brief-go brief-clockin mm-clockin" data-action="clockIn">&#128339; Clock in</button>'+
-      '<button class="brief-later mm-end" data-action="endMode">End morning</button>'+
+      '<button class="brief-go brief-clockin mm-clockin" data-action="clockIn">&#128188; Start Work</button>'+
+      '<button class="brief-later mm-end" data-action="endMode">End Morning</button>'+
     '</div>'+
   '</div>';
 }
@@ -18977,7 +19126,7 @@ function methodLine(st){
   const m = st.m;
   if(m.work){
     const r = 'Round '+(st.onBreak ? st.round-1 : st.round)+(m.rounds ? ' of '+m.rounds : '');
-    if(st.onBreak) return r+' done · Round '+st.round+' up next';
+    if(st.onBreak) return r+' done';
     return r+' · '+(st.last ? 'Last round, <b>'+formatElapsed(st.left)+'</b> to go' : 'Break in <b>'+formatElapsed(st.left)+'</b>');
   }
   if(st.id==='flow') return st.onBreak ? 'Resting · back when you\'re ready' : 'In the flow for <b>'+formatElapsed(st.inSeg||0)+'</b> · break earned: <b>'+(st.earned||5)+' min</b>';
@@ -19212,48 +19361,96 @@ function lockSeqHtml(){
 function renderLockSeqInto(){ const el = document.getElementById('lockSeqContent'); if(el) morphInto(el, lockSeqHtml(), {form:true}); }
 registerModal('lockSeqOverlay', renderLockSeqInto);
 ACTIONS.goToFocusSettings = function(){ closeLockSeq(); ui.view = 'settings'; ui.settingsTab = 'focus'; renderView(); };
-// ============ GOOD MORNING: THE START-UP ============
-// After "I'm up", the morning builds itself slowly, one piece at a time, with a quiet line of
-// narration typing above it — the time and weather, your note from last night, a line to carry,
-// the vision board, today, your goals, yesterday, a few headlines. Then two ways forward:
-// Start my morning (life first: teeth, breakfast…) or Clock in (the plan of attack, then Lock in).
+// ============ THE MORNING: DAWN → ALARM → GOOD MORNING → START WORK ============
+// 1 Dawn       — the last 20 minutes before the alarm (when you went to sleep through Wind down):
+//                the screen comes up out of the dark like a sunrise, and a soft chord swells in
+//                the last minute and a half.
+// 2 The alarm  — your music, the time, a line for the day, and two buttons: Snooze / Start your day.
+// 3 Good morning — human first. The weather and the sun, your note from last night, a quote, a few
+//                things for a good day (get outside, water, music…), the vision board, the news, and
+//                a small look at the day ahead. One way forward: Start my morning.
+// 4 Morning mode — routine, breakfast, the walk. Start work when you're ready.
+// 5 Start work — the work intro: the business in numbers, a line to work by, the plan of attack,
+//                and straight into Lock in.
 // Clock out (Focus / Today) is the other end of the work day.
 
-// ---- a line for the day (chosen by date, so it's the same all day) ----
+function wakeGreeting(){ return 'Good morning'; }
+
+// ---- lines for the day (chosen by date, so they're the same all day) ----
 const MORNING_QUOTES = [
   ['We suffer more often in imagination than in reality.', 'Seneca'],
-  ['The impediment to action advances action. What stands in the way becomes the way.', 'Marcus Aurelius'],
-  ['Waste no more time arguing about what a good man should be. Be one.', 'Marcus Aurelius'],
-  ['First say to yourself what you would be; and then do what you have to do.', 'Epictetus'],
-  ['No man is free who is not master of himself.', 'Epictetus'],
   ['Begin at once to live, and count each separate day as a separate life.', 'Seneca'],
+  ['When you arise in the morning, think of what a precious privilege it is to be alive — to breathe, to think, to enjoy, to love.', 'Marcus Aurelius'],
+  ['The impediment to action advances action. What stands in the way becomes the way.', 'Marcus Aurelius'],
   ['How we spend our days is, of course, how we spend our lives.', 'Annie Dillard'],
-  ['Amateurs sit and wait for inspiration, the rest of us just get up and go to work.', 'Stephen King'],
-  ['Discipline equals freedom.', 'Jocko Willink'],
-  ['Be so good they can’t ignore you.', 'Steve Martin'],
-  ['Hard choices, easy life. Easy choices, hard life.', 'Jerzy Gregorek'],
-  ['Make each day your masterpiece.', 'John Wooden'],
-  ['Slow is smooth, and smooth is fast.', 'Navy SEAL saying'],
-  ['Small deeds done are better than great deeds planned.', 'Peter Marshall'],
-  ['Well done is better than well said.', 'Benjamin Franklin'],
-  ['Lost time is never found again.', 'Benjamin Franklin'],
   ['The sun himself is weak when he first rises, and gathers strength and courage as the day gets on.', 'Charles Dickens'],
   ['Write it on your heart that every day is the best day in the year.', 'Ralph Waldo Emerson'],
   ['The best time to plant a tree was twenty years ago. The second best time is now.', 'Proverb'],
   ['Stay hungry. Stay foolish.', 'Steve Jobs'],
-  ['Everything is figureoutable.', 'Marie Forleo'],
+  ['Rest is not idleness.', 'John Lubbock'],
+  ['Look deep into nature, and then you will understand everything better.', 'Albert Einstein'],
+  ['Every morning we are born again. What we do today is what matters most.', 'Buddha'],
+  ['First say to yourself what you would be; and then do what you have to do.', 'Epictetus'],
+  ['No man is free who is not master of himself.', 'Epictetus'],
   ['The obstacle is the way.', 'Ryan Holiday'],
+  ['Everything is figureoutable.', 'Marie Forleo'],
+  ['You could leave life right now. Let that determine what you do and say and think.', 'Marcus Aurelius'],
+  ['Happiness is not something ready made. It comes from your own actions.', 'Dalai Lama']
+];
+const WORK_QUOTES = [
+  ['Amateurs sit and wait for inspiration. The rest of us just get up and go to work.', 'Stephen King'],
+  ['Be so good they can’t ignore you.', 'Steve Martin'],
+  ['Discipline equals freedom.', 'Jocko Willink'],
+  ['Hard choices, easy life. Easy choices, hard life.', 'Jerzy Gregorek'],
+  ['Well done is better than well said.', 'Benjamin Franklin'],
+  ['Small deeds done are better than great deeds planned.', 'Peter Marshall'],
+  ['Make each day your masterpiece.', 'John Wooden'],
+  ['Slow is smooth, and smooth is fast.', 'Navy SEAL saying'],
+  ['Don’t watch the clock; do what it does. Keep going.', 'Sam Levenson'],
+  ['Ideas are easy. Implementation is hard.', 'Guy Kawasaki'],
+  ['Focus is a matter of deciding what things you’re not going to do.', 'John Carmack'],
   ['We are what we repeatedly do. Excellence, then, is not an act, but a habit.', 'Will Durant'],
   ['Motivation is what gets you started. Habit is what keeps you going.', 'Jim Ryun'],
-  ['You could leave life right now. Let that determine what you do and say and think.', 'Marcus Aurelius']
+  ['Lost time is never found again.', 'Benjamin Franklin']
 ];
-function quoteOfDay(){
-  const d = new Date(), start = new Date(d.getFullYear(), 0, 0);
-  const day = Math.floor((d - start)/86400000);
-  return MORNING_QUOTES[day % MORNING_QUOTES.length];
-}
-// ---- headlines (through the launcher; hidden when it can't get them) ----
+// small, human things for a good day — three a morning
+const MORNING_THOUGHTS = [
+  ['&#127749;', 'Get outside in the first hour.', 'Ten minutes of morning light sets your whole day.'],
+  ['&#127795;', 'Walk to the park.', 'No phone. Just look around for a bit.'],
+  ['&#128167;', 'Water before coffee.', 'A full glass, first thing.'],
+  ['&#127911;', 'Put on something you love.', 'Music while you get ready changes the whole mood.'],
+  ['&#128245;', 'Phone face-down till breakfast is done.', 'The world can wait twenty minutes.'],
+  ['&#127859;', 'Make breakfast like it matters.', 'Sit down for it.'],
+  ['&#10024;', 'Romanticize it.', 'The coffee, the light, the walk. This is your life — enjoy it.'],
+  ['&#128591;', 'Name one thing you’re grateful for.', 'Say it out loud.'],
+  ['&#128075;', 'Text someone you love good morning.', 'Takes ten seconds, makes their day.'],
+  ['&#127788;&#65039;', 'Five slow breaths.', 'Before you look at a screen.'],
+  ['&#128719;', 'Make your bed.', 'First win of the day.'],
+  ['&#9729;&#65039;', 'Look at the sky for a minute.', 'Whatever it’s doing today.'],
+  ['&#127939;', 'Move a little.', 'A stretch, a walk, a few push-ups. Wake the body up.'],
+  ['&#128588;', 'You don’t have to rush.', 'A calm morning makes a sharp afternoon.']
+];
+function dayNum(){ const d = new Date(), start = new Date(d.getFullYear(), 0, 0); return Math.floor((d - start)/86400000); }
+function quoteOfDay(){ return MORNING_QUOTES[dayNum() % MORNING_QUOTES.length]; }
+function workQuoteOfDay(){ return WORK_QUOTES[dayNum() % WORK_QUOTES.length]; }
+function thoughtsOfDay(n){ const out = [], len = MORNING_THOUGHTS.length, d = dayNum(); for(let i=0;i<(n||3);i++) out.push(MORNING_THOUGHTS[(d*3 + i*5) % len]); return out.filter(function(x, i, a){ return a.indexOf(x)===i; }); }
+function quoteHtml(q, cls){ return '<figure class="qt '+(cls||'')+'"><span class="qt-mark">&ldquo;</span><blockquote>'+escapeHtml(q[0])+'</blockquote><figcaption><span class="qt-rule"></span>'+escapeHtml(q[1])+'</figcaption></figure>'; }
+
+// ---- headlines (through the launcher; a public feed reader if the launcher can't) ----
 function morningNewsOn(){ return wakeCfg().news!==false; }
+function parseRss(text){
+  const xml = new DOMParser().parseFromString(text, 'text/xml');
+  const chan = xml.querySelector('channel > title');
+  const src = chan ? chan.textContent.replace(/\s*[:\-|].*$/, '').trim() : '';
+  return Array.prototype.slice.call(xml.querySelectorAll('item')).slice(0, 4).map(function(it){
+    const t = it.querySelector('title'), l = it.querySelector('link');
+    return {title:(t ? t.textContent : '').trim(), link:(l ? l.textContent : '').trim(), src:src};
+  }).filter(function(x){ return x.title; });
+}
+async function fetchWithin(url, ms){
+  const ctl = new AbortController(), tm = setTimeout(function(){ ctl.abort(); }, ms);
+  try{ const r = await fetch(url, {cache:'no-store', signal:ctl.signal}); clearTimeout(tm); return r; }catch(e){ clearTimeout(tm); return null; }
+}
 async function loadMorningNews(){
   if(!morningNewsOn()) return;
   const today = todayStr();
@@ -19261,18 +19458,16 @@ async function loadMorningNews(){
   ui.morningNews = {date:today, loading:true, items:null};
   let items = null;
   try{
-    const ctl = new AbortController(), tm = setTimeout(function(){ ctl.abort(); }, 9000);
-    const res = await fetch(WAKE_HELPER+'news', {cache:'no-store', signal:ctl.signal}); clearTimeout(tm);
-    if(res.ok){
-      const xml = new DOMParser().parseFromString(await res.text(), 'text/xml');
-      const chan = xml.querySelector('channel > title');
-      const src = chan ? chan.textContent.replace(/\s*[:\-|].*$/, '').trim() : '';
-      items = Array.prototype.slice.call(xml.querySelectorAll('item')).slice(0, 4).map(function(it){
-        const t = it.querySelector('title'), l = it.querySelector('link');
-        return {title:(t ? t.textContent : '').trim(), link:(l ? l.textContent : '').trim(), src:src};
-      }).filter(function(x){ return x.title; });
-    }
+    const res = await fetchWithin(WAKE_HELPER+'news', 9000);
+    if(res && res.ok) items = parseRss(await res.text());
   }catch(e){}
+  if(!items || !items.length){
+    // an Operator still running last version's launcher has no /news — read the feed another way
+    try{
+      const res = await fetchWithin('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://feeds.npr.org/1001/rss.xml'), 8000);
+      if(res && res.ok){ const j = await res.json(); items = arr(j && j.items).slice(0, 4).map(function(x){ return {title:String(x.title||'').trim(), link:String(x.link||''), src:'NPR'}; }).filter(function(x){ return x.title; }); }
+    }catch(e){}
+  }
   ui.morningNews = {date:today, loading:false, items:items && items.length ? items : null};
   if(ui.morningNews.items && ui.wakeMode==='brief' && overlayOpen('wakeOverlay')){
     // it arrived after the page started building: give it its moment instead of popping in
@@ -19281,6 +19476,169 @@ async function loadMorningNews(){
   }
 }
 ACTIONS.openNewsLink = function(el){ const u = el.dataset.url; if(!/^https?:\/\//.test(u||'')) return; helperFetch(WAKE_HELPER+'open?b=default&u='+hexUtf8(u), 3000).then(function(ok){ if(!ok) window.open(u, '_blank'); }); };
+
+// ---- 1 dawn: the screen comes up like a sunrise before the alarm ----
+const DAWN_MS = 20*60000;
+let dawnDismissedTs = 0;
+function checkDawn(){
+  const m = state.modes && state.modes.active;
+  if(!m || !m.sleep || overlayOpen('wakeOverlay')) return;
+  const nw = nextWake(); if(!nw) return;
+  const left = nw.ts - Date.now();
+  if(left > DAWN_MS || left <= 0 || dawnDismissedTs===nw.ts) return;
+  ui.wakeMode = 'dawn'; ui.dawnTs = nw.ts; ui.dawnTime = nw.time; ui.dawnPad = false;
+  closeOtherOverlaysForWake();
+  showOverlay('wakeOverlay'); renderWakeOverlayInto();
+  pingWrapper();
+}
+function dawnProgress(){ return ui.dawnTs ? Math.max(0, Math.min(1, 1 - (ui.dawnTs - Date.now())/DAWN_MS)) : 1; }
+function dawnHtml(){
+  const p = dawnProgress();
+  return '<div class="dawn" id="dawnSky" style="--p:'+p.toFixed(3)+'">'+
+    '<div class="dawn-sky"></div><div class="dawn-sun"></div><div class="dawn-haze"></div>'+
+    '<div class="dawn-c">'+
+      '<div class="dawn-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</div>'+
+      '<div class="dawn-sub">Alarm at '+fmt12Hour(ui.dawnTime||'')+'. Rest a little longer.</div>'+
+    '</div>'+
+    '<div class="dawn-acts"><button class="dawn-btn" data-action="dawnUp">I’m already up</button><button class="dawn-btn is-ghost" data-action="dawnDismiss" title="Hide until the alarm">Hide</button></div>'+
+  '</div>';
+}
+function tickDawn(){
+  const el = document.getElementById('dawnSky'); if(!el) return;
+  const p = dawnProgress();
+  el.style.setProperty('--p', p.toFixed(3));
+  // the last minute and a half: a soft chord swells under the light
+  if(!ui.dawnPad && ui.dawnTs && ui.dawnTs - Date.now() <= 90000){ ui.dawnPad = true; playDawnPad(); }
+}
+ACTIONS.dawnDismiss = function(){ dawnDismissedTs = ui.dawnTs; ui.wakeMode = null; hideOverlay('wakeOverlay'); };
+ACTIONS.dawnUp = function(){
+  // up before the alarm: it won't ring this morning, and Good morning starts now
+  const w = wakeCfg(); if(ui.dawnTs){ w.lastFiredTs = Math.max(w.lastFiredTs||0, ui.dawnTs); persist('focus'); }
+  wakeImUp();
+};
+
+// ---- 2 the alarm: Snooze / Start your day ----
+function wakeRingHtml(){
+  const w = wakeCfg();
+  const playing = wakeUsesMusic(w) && !(wakeRing && wakeRing.mediaFailed);
+  const q = quoteOfDay(), name = state.profile.name;
+  const ns = morningNotesFor(todayStr());
+  return '<div class="wk2 wk3" data-sky="'+skyLook()+'">'+
+    '<div class="wk2-aura"><i></i><i></i><i></i></div>'+
+    '<div class="wk2-center">'+
+      '<div class="wk2-greet">Good morning'+(name ? ', '+escapeHtml(name) : '')+(wakeRing && wakeRing.test ? ' <span class="tag">TEST</span>' : '')+'</div>'+
+      '<div class="wk2-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</div>'+
+      '<div class="wk3-date">'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</div>'+
+      '<div class="wk3-quote">'+quoteHtml(q, 'is-ring')+'</div>'+
+      (ns.length ? '<div class="wk2-note">&ldquo;'+escapeHtml(ns[ns.length-1].text)+'&rdquo;<span>You, last night</span></div>' : '')+
+      '<div class="wk2-actions wk3-actions">'+
+        '<button class="wk2-snooze" data-action="wakeSnooze">&#128164; Snooze '+(w.snoozeMinutes||9)+' min</button>'+
+        '<button class="wk2-up" data-action="wakeStartDay"><span>&#9728;&#65039; Start your day</span></button>'+
+      '</div>'+
+      (wakeUsesMusic(w) ? '<div class="wk2-music'+(playing?' is-playing':'')+'">'+
+          (playing ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '')+
+          '<span class="wk2-song">'+escapeHtml(mediaName(w.media))+'</span><span class="wk2-src">'+(wakeRing && wakeRing.mediaFailed ? 'Starting the music…' : escapeHtml(mediaKindLabel(w.media)))+'</span>'+
+        '</div>' : '')+
+    '</div>'+
+  '</div>';
+}
+
+// ---- 3 Good morning ----
+function briefBase(){ return wakeCfg().intro!=='quick' ? 5600 : 3000; }
+function wakeBriefHtml(){
+  const today = todayStr(), name = state.profile.name || '';
+  const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
+  const notes = morningNotesFor(today).map(function(n){ return n.text; });
+  const vb = masterVisionBoard();
+  const q = quoteOfDay();
+  const news = ui.morningNews && ui.morningNews.date===today ? ui.morningNews.items : null;
+  const now = typeof wxNow==='function' ? wxNow() : null, phase = skyPhase(), win = dayWindow();
+  const timeStr = new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+  const mNow = new Date().getHours()*60 + new Date().getMinutes();
+  const plan = typeof todaysPlan==='function' ? todaysPlan().filter(function(t){ return t.status!=='done'; }) : [];
+  // The page builds itself one piece at a time, with a line of narration typing above each piece
+  // as it arrives. Delays are fixed when a piece first appears (re-renders keep the same node, so
+  // nothing plays twice); skipping the intro shifts the whole schedule earlier.
+  const cine = wakeCfg().intro!=='quick';
+  const base = briefBase(), gap = 1150;
+  const sunLine = mNow < win.rise ? 'The sun comes up at '+fmtMinOfDay(win.rise)+'.' : mNow < win.set ? 'The sun’s been up since '+fmtMinOfDay(win.rise)+'.' : '';
+  const lines = [];
+  let k = 0;
+  const panel = function(cls, anim, voice, html, extraStyle, attrs){
+    const d = base + (k++)*gap;
+    if(voice) lines.push({at: d - 380, text: voice});
+    return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
+  };
+  // the hero: the weather and the sun — the first, biggest thing you see
+  const hero = panel('br-hero', 'br-a-blur', 'It’s '+timeStr+'.'+(now ? ' '+now.temp+'° and '+wxLabel(now.code).toLowerCase()+' outside.' : '')+(sunLine ? ' '+sunLine : ''),
+    '<div class="brh-wx">'+
+      '<span class="brh-i">'+(now ? wxIcon(wxKind(now.code), phase) : SKY_META[phase].icon)+'</span>'+
+      '<div>'+(now ? '<div class="brh-t">'+now.temp+'&deg;</div><div class="brh-l">'+escapeHtml(wxLabel(now.code))+'</div>' : '<div class="brh-l is-big">'+SKY_META[phase].label+'</div>')+
+        (now && now.hi!=null ? '<div class="brh-hl">High '+now.hi+'&deg; &middot; Low '+now.lo+'&deg;</div>' : '')+'</div>'+
+    '</div>'+
+    '<div class="brh-sun">'+sunArcHtml({w:300, h:78, pad:10, r:5, animate:true})+
+      '<div class="brh-sun-row"><span><small>Sunrise</small>'+fmtMinOfDay(win.rise)+'</span><span class="brh-day">'+daylightLabel()+'</span><span><small>Sunset</small>'+fmtMinOfDay(win.set)+'</span></div>'+
+    '</div>');
+  const left = [], right = [];
+  if(notes.length) left.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+notes.map(function(t){ return '<div class="br-ln-text">'+escapeHtml(t)+'</div>'; }).join('')));
+  left.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q)));
+  left.push(panel('br-thoughts', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+
+    thoughtsOfDay(3).map(function(x, i){ return '<div class="br-th" style="--i:'+i+'"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')));
+  if(vb && vb.elements.length) right.push(panel('br-vision', 'br-a-scale', 'And this is what it’s all for.', '<span class="br-vision-k">&#127775; Vision</span>'+boardStaticHtml(vb, 'wake-board')+'<span class="br-vision-hint">Click to open</span>', '', ' data-action="wakeBoardToggle" title="Open your vision board"'));
+  if(news){
+    // headlines that came in after the page started get their own turn instead of popping in
+    const d0 = base + k*gap, late = ui.briefNewsAt ? Math.max(600, d0 - (ui.briefNewsAt - (ui.briefT0||0))) : null;
+    right.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there.', '<div class="br-k">&#128240; Headlines'+(news[0].src ? ' <span class="br-src">'+escapeHtml(news[0].src)+'</span>' : '')+'</div>'+
+      news.slice(0, 4).map(function(n){ return '<button class="br-news-i" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+escapeHtml(n.title)+'</span><i>&#8599;</i></button>'; }).join(''), late!=null ? ';--late:'+late+'ms' : ''));
+  } else if(morningNewsOn() && ui.morningNews && ui.morningNews.loading){
+    right.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+(base + k*gap)+'ms"><div class="br-k">&#128240; Headlines</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');
+  }
+  // the day ahead — small, just the shape of it
+  const dayBits = [];
+  if(events.length) dayBits.push(events.length===1 ? 'One thing on the calendar' : events.length+' things on the calendar');
+  if(plan.length) dayBits.push(plan.length===1 ? 'one thing planned' : plan.length+' things planned');
+  right.push(panel('br-day', 'br-a-right', dayBits.length ? 'Later today: '+dayBits.join(', ')+'. No rush.' : 'Nothing on the calendar. The day’s yours.',
+    '<div class="br-k">&#128197; The Day Ahead</div>'+
+    (events.length ? '<div class="br-agenda">'+events.slice(0, 4).map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b>'+escapeHtml(e.title)+'</div>'; }).join('')+'</div>' : '')+
+    (plan.length ? '<div class="br-day-plan">'+(plan.length===1 ? 'One thing' : plan.length+' things')+' planned for work. First up: <b>'+escapeHtml(plan[0].title)+'</b></div>' : '')+
+    (!events.length && !plan.length ? '<div class="br-day-plan">Nothing scheduled. Enjoy it.</div>' : '')));
+  const ctaD = base + k*gap;
+  lines.push({at: ctaD - 380, text: 'Take your time. Work can wait until you’re ready.'});
+  ui.briefLines = lines;
+  const shift = ui.briefShift || 0;
+  return '<div class="brief brief2 brief3'+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
+    (cine
+      ? '<div class="brief-intro is-cinematic" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div>'+
+          '<div class="bi-time">'+timeStr+'</div>'+
+          '<div class="bi-word">Good morning</div>'+(name ? '<div class="bi-name">'+escapeHtml(name)+'</div>' : '')+
+          '<div class="bi-line">'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</div></div>'
+      : '<div class="brief-intro" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div><div class="bi-word">Good morning</div>'+(name ? '<div class="bi-name">'+escapeHtml(name)+'</div>' : '')+'</div>')+
+    '<div class="brief-grid-bg"></div>'+
+    '<div class="brief-inner">'+
+      '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
+        (ui.briefSkipped ? '' : '<button class="brief-skipall" data-action="briefSkip" title="Show everything now">Skip &#9197;</button>')+
+        '<button class="brief-x" data-action="wakeBriefDone" title="Close">&#10005;</button></div>'+
+      '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
+      '<div class="br-voice br-p br-a-fade" style="--d:'+(base-700)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
+      '<div class="brief-music-slot">'+wakeMusicPillHtml()+'</div>'+
+      hero+
+      '<div class="brief2-cols"><div class="brief2-col is-left">'+left.join('')+'</div><div class="brief2-col is-right">'+right.join('')+'</div></div>'+
+      '<div class="brief-cta br-p br-a-rise" data-k="'+k+'" style="--d:'+ctaD+'ms">'+
+        '<button class="brief-go brief-morning" data-action="wakeStartMorning">&#9728;&#65039; Start My Morning</button>'+
+      '</div>'+
+    '</div>'+
+    (ui.wakeBoardBig && vb ? '<div class="br-vision-big" data-action="wakeBoardToggle" title="Close">'+boardStaticHtml(vb, 'wake-board')+'<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button></div>' : '')+
+  '</div>';
+}
+// skipping the intro moves the whole schedule up so the page starts building right away
+ACTIONS.wakeIntroSkip = function(){
+  if(!ui.wakeIntroDone){
+    const base = briefBase(), el = Date.now() - (ui.briefT0||Date.now());
+    const shift = Math.max(0, base - 1400 - el);
+    ui.briefShift = (ui.briefShift||0) + shift; ui.briefT0 = (ui.briefT0||Date.now()) - shift;
+  }
+  ui.wakeIntroDone = true; renderWakeOverlayInto();
+};
 // ---- the narration: one line at a time, typed out ----
 let briefVoiceTimer = null;
 function briefVoiceRun(){
@@ -19290,21 +19648,21 @@ function briefVoiceRun(){
     if(!el || ui.wakeMode!=='brief' || !overlayOpen('wakeOverlay')){ if(!overlayOpen('wakeOverlay')) clearInterval(briefVoiceTimer); return; }
     const lines = ui.briefLines || [], t = Date.now() - (ui.briefT0||0);
     let cur = null; lines.forEach(function(l){ if(t >= l.at) cur = l; });
-    const txt = cur ? (ui.briefSkipped ? cur.text : cur.text.slice(0, Math.max(0, Math.floor((t - cur.at)/32)))) : '';
+    const txt = cur ? (ui.briefSkipped ? cur.text : cur.text.slice(0, Math.max(0, Math.floor((t - cur.at)/30)))) : '';
     if(el.textContent!==txt) el.textContent = txt;
     const wrap = el.parentNode; if(wrap) wrap.classList.toggle('is-typing', !!cur && txt.length < cur.text.length);
     // as the narration reaches each piece, bring it into view if it's below the fold
     const idx = cur ? lines.indexOf(cur) : -1;
     if(idx>0 && idx!==ui.briefLineSeen && !ui.briefSkipped){
       ui.briefLineSeen = idx;
-      const target = document.querySelector('#wakeContent .br-p[data-k="'+(idx-1)+'"]');
+      const target = document.querySelector('#wakeContent .br-p[data-k="'+idx+'"]');
       if(target) setTimeout(function(){ target.scrollIntoView({block:'nearest', behavior:'smooth'}); }, 400);
     }
-  }, 32);
+  }, 30);
 }
 ACTIONS.briefSkip = function(){ ui.wakeIntroDone = true; ui.briefSkipped = true; renderWakeOverlayInto(); };
 
-// ---- Clock in: the plan of attack, then Lock in ----
+// ---- 5 Start work: the work intro, then straight into Lock in ----
 function clockIn(){
   const m = state.modes.active;
   if(m && (m.morning || (m.type==='offtime' && !m.sleep))) finishActiveMode(true);
@@ -19312,29 +19670,61 @@ function clockIn(){
   ui.view = 'today'; renderView();
   ui.planReveal = {at:Date.now()};
   showOverlay('planOverlay'); renderPlanRevealInto();
-  playStep(0); setTimeout(function(){ playStep(2); }, 260); setTimeout(function(){ playStep(4); }, 520);
+  playWorkIntro();
 }
 ACTIONS.clockIn = function(){ clockIn(); };
 ACTIONS.closePlanReveal = function(){ ui.planReveal = null; hideOverlay('planOverlay'); renderView(); };
-ACTIONS.planLockIn = function(el, e, id){ ui.planReveal = null; hideOverlay('planOverlay'); if(id) setNextUp(id); renderView(); openLockInChooser(); };
+ACTIONS.planLockIn = function(el, e, id){
+  // the intro hands over to the Lock in steps with the first task already picked
+  ui.planReveal = null; hideOverlay('planOverlay');
+  if(id){ setNextUp(id); ui.stagedTaskId = id; }
+  renderView(); openLockInChooser();
+};
+function workStats(){
+  const clients = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
+  const mrr = clients.reduce(function(a, c){ return a + Number(c.mrr||0); }, 0);
+  const goal = Number(state.profile.revenueGoalMonthly)||0;
+  const open = arr(state.business.pipeline).filter(leadIsOpen);
+  const pipe = open.reduce(function(a, p){ return a + Number(p.value||0); }, 0);
+  const d = new Date(), key = d.getFullYear()+'-'+pad2(d.getMonth()+1);
+  const collected = typeof collectedByMonth==='function' ? collectedByMonth(key) : 0;
+  const y = addDays(todayStr(), -1), yDeep = deepWorkMinutesFor(y);
+  return [
+    {k:'Monthly recurring', v:money(mrr), sub: goal ? Math.round(mrr/goal*100)+'% of '+money(goal) : clients.length+' active client'+(clients.length===1?'':'s'), pct: goal ? Math.min(100, mrr/goal*100) : null},
+    {k:'Collected this month', v:money(collected), sub:new Date().toLocaleDateString(undefined, {month:'long'})},
+    {k:'Open leads', v:String(open.length), sub: pipe ? money(pipe)+' in the pipeline' : 'In the pipeline'},
+    {k:'Deep work yesterday', v:fmtHours(yDeep), sub:'Streak: '+computeStreak()+' day'+(computeStreak()===1?'':'s')}
+  ];
+}
 function renderPlanReveal(){
   if(!ui.planReveal) return '';
-  const plan = todaysPlan().filter(function(t){ return t.status!=='done'; }).slice(0, 8), first = plan[0];
-  const today = todayStr();
-  const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
-  const deadlines = state.tasks.items.filter(function(t){ return t.deadline===today && t.status!=='done'; });
-  const line = plan.length ? (plan.length===1 ? 'One thing today.' : plan.length+' things today.')+' First up: '+first.title+'.' : 'Nothing planned yet. Pick your first move.';
-  return '<div class="pr">'+
-    '<div class="pr-top"><span class="pr-badge">&#128339; Clocked in</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
+  const plan = todaysPlan().filter(function(t){ return t.status!=='done'; }).slice(0, 6), first = plan[0];
+  const today = todayStr(), name = state.profile.name || '';
+  const events = state.calendar.events.filter(function(e){ return e.date===today && e.time; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
+  const q = workQuoteOfDay();
+  const stats = workStats();
+  const target = state.standards.deepWorkTargetMinutes || 180;
+  let d = 900;
+  const at = function(step){ const v = d; d += step||260; return 'animation-delay:'+v+'ms'; };
+  return '<div class="wi">'+
+    '<div class="wi-top"><span class="pr-badge">&#128339; Clocked In</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
       '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
-    '<div class="pr-inner">'+
-      '<div class="pr-k">Plan of attack</div>'+
-      '<h2 class="pr-line">'+escapeHtml(line)+'</h2>'+
-      (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(500 + i*220)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">due today</span>' : '')+'</li>'; }).join('')+'</ol>' : '')+
-      ((events.length || deadlines.length) ? '<div class="pr-cal" style="animation-delay:'+(600 + plan.length*220)+'ms">'+events.map(function(e){ return '<span><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</span>'; }).join('')+'</div>' : '')+
-      '<div class="pr-cta" style="animation-delay:'+(800 + plan.length*220)+'ms">'+
-        (first ? '<button class="ls-go pr-go" data-action="planLockIn" data-id="'+first.id+'"><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button><div class="ls-go-sub">on &ldquo;'+escapeHtml(first.title)+'&rdquo;</div>'
-          : '<button class="ls-go pr-go" data-action="planLockIn"><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>')+
+    '<div class="wi-inner">'+
+      '<div class="wi-k" style="animation-delay:200ms">Work Mode</div>'+
+      '<h1 class="wi-h" style="animation-delay:420ms">Let’s get to work'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
+      '<div class="wi-stats">'+stats.map(function(s){ return '<div class="wi-stat" style="'+at(140)+'"><div class="wi-stat-k">'+s.k+'</div><div class="wi-stat-v">'+s.v+'</div>'+(s.pct!=null ? '<div class="wi-bar"><i style="width:'+s.pct.toFixed(1)+'%"></i></div>' : '')+'<div class="wi-stat-s">'+escapeHtml(s.sub)+'</div></div>'; }).join('')+'</div>'+
+      '<div class="wi-cols">'+
+        '<div class="wi-plan" style="'+at(300)+'"><div class="wi-sec">Plan of Attack <span>'+(plan.length ? plan.length+(plan.length===1?' thing':' things') : '')+'</span></div>'+
+          (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(d + i*160)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">Due today</span>' : '')+'</li>'; }).join('')+'</ol>'
+            : '<div class="wd-empty">Nothing planned yet. Pick your first move in Lock in.</div>')+
+          (events.length ? '<div class="wi-cal">'+events.slice(0, 3).map(function(e){ return '<span><b>'+fmt12Hour(e.time)+'</b>'+escapeHtml(e.title)+'</span>'; }).join('')+'</div>' : '')+
+        '</div>'+
+        '<div class="wi-side" style="'+at(300)+'">'+quoteHtml(q, 'is-work')+
+          '<div class="wi-target"><span>Today’s target</span><b>'+fmtHours(target)+'</b><span>of deep work</span></div></div>'+
+      '</div>'+
+      '<div class="pr-cta" style="animation-delay:'+(d + plan.length*160 + 200)+'ms">'+
+        '<button class="ls-go pr-go" data-action="planLockIn"'+(first ? ' data-id="'+first.id+'"' : '')+'><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>'+
+        (first ? '<div class="ls-go-sub">First up: '+escapeHtml(first.title)+'</div>' : '')+
         '<button class="pr-later" data-action="closePlanReveal">Not yet</button>'+
       '</div>'+
     '</div>'+
@@ -19347,7 +19737,7 @@ registerModal('planOverlay', renderPlanRevealInto);
 function clockOutFlash(){
   const d = document.createElement('div');
   d.className = 'lock-flash is-out is-clock';
-  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#127937; Clocked out</div><div class="lf-t">'+fmtHours(deepWorkMinutesTodayLive())+' of deep work today</div>';
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#127937; Clocked Out</div><div class="lf-t">'+fmtHours(deepWorkMinutesTodayLive())+' of deep work today</div>';
   document.body.appendChild(d);
   setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 2100);
 }

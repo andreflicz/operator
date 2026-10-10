@@ -25,7 +25,7 @@ function tone(freqs, dur, gainPeak){
       const osc=ctx.createOscillator(), gain=ctx.createGain();
       osc.type='sine'; osc.frequency.value=freq;
       gain.gain.setValueAtTime(0.0001,t);
-      gain.gain.exponentialRampToValueAtTime(gainPeak||0.25,t+0.02);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, (gainPeak||0.25)*sfxVolume()),t+0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001,t+dur);
       osc.connect(gain).connect(ctx.destination);
       osc.start(t); osc.stop(t+dur+0.02);
@@ -37,6 +37,8 @@ function tone(freqs, dur, gainPeak){
 // "Modern" (default): soft, glassy plucks and taps through a little room reverb — closer to a
 // phone's UI sounds than a beep. "Classic" is the original sine beeps. Settings → Preferences.
 function soundPack(){ return state.profile.soundPack==='classic' ? 'classic' : 'modern'; }
+function sfxVolume(){ const v = Number(state.profile.sfxVolume); return isFinite(v) && state.profile.sfxVolume!=null ? Math.max(0, Math.min(1, v)) : 0.8; }
+function soundPref(k, dflt){ const v = state.profile.sounds && state.profile.sounds[k]; return v===undefined ? dflt : v; }
 let sfxBus = null;
 function sfxImpulse(ctx, secs, decay){
   const len = Math.floor(ctx.sampleRate*secs), buf = ctx.createBuffer(2, len, ctx.sampleRate);
@@ -47,12 +49,15 @@ function sfxOut(ctx){
   if(sfxBus && sfxBus.ctx===ctx) return sfxBus.input;
   const input = ctx.createGain(), dry = ctx.createGain(), wet = ctx.createGain(), verb = ctx.createConvolver(), comp = ctx.createDynamicsCompressor(), lp = ctx.createBiquadFilter();
   dry.gain.value = 0.9; wet.gain.value = 0.28; verb.buffer = sfxImpulse(ctx, 1.4, 3.4);
+  input.gain.value = sfxVolume()/0.8;
   lp.type = 'lowpass'; lp.frequency.value = 9000;
   comp.threshold.value = -14; comp.ratio.value = 3;
   input.connect(dry); dry.connect(comp); input.connect(verb); verb.connect(wet); wet.connect(comp);
   comp.connect(lp); lp.connect(ctx.destination);
   sfxBus = {ctx:ctx, input:input};
   return input;
+}
+function applySfxVolume(){ if(sfxBus) sfxBus.input.gain.value = sfxVolume()/0.8;
 }
 // a soft plucked note: two slightly detuned voices through a closing low-pass
 function sfxPluck(ctx, out, t, freq, dur, vol, type){
@@ -124,13 +129,13 @@ function playRestSound(){ playSfx('rest', function(){ tone([440,330], 0.3, 0.2);
 function playTaskComplete(){ playSfx('complete', function(){ tone([523,659,784,1046], 0.2, 0.4); }); }
 function playTaskAdded(){ playSfx('added', function(){ tone([880,1046], 0.1, 0.18); }); }
 function playJournalSound(){ playSfx('journal', function(){ tone([587,740], 0.16, 0.16); }); }
-function playLockIn(){ playSfx('lockin', function(){ tone([523,659], 0.18, 0.25); }); }
+function playLockIn(){ if(lockStartSound()==='none') return; playSfx('lockin', function(){ tone([523,659], 0.18, 0.25); }); }
 function playFanfare(){ playSfx('fanfare', function(){ tone([523,659,784], 0.3, 0.3); }); }
 function playPing(){ playSfx('ping', function(){ tone([1200,1500], 0.08, 0.15); }); }
 function playNight(){ playSfx('night', function(){ tone([440,330], 0.3, 0.2); }); }
-function playNav(){ playSfx('nav', null); }
-function playDragLift(){ playSfx('lift', null); }
-function playDrop(){ playSfx('drop', function(){ tone([660], 0.08, 0.15); }); }
+function playNav(){ if(soundPref('nav', true)) playSfx('nav', null); }
+function playDragLift(){ if(soundPref('drag', true)) playSfx('lift', null); }
+function playDrop(){ if(soundPref('drag', true)) playSfx('drop', function(){ tone([660], 0.08, 0.15); }); }
 function playLockOut(){ playSfx('lockout', function(){ tone([659,494], 0.16, 0.22); }); }
 function playDeny(){ playSfx('deny', function(){ tone([220,208], 0.12, 0.2); }); }
 function playStep(i){ if(soundPack()==='classic'){ tone([523], 0.08, 0.15); return; } sfx(stepSfx(i)); }
@@ -189,3 +194,98 @@ function playAlarmSound(style){
 }
 function playBeep(){ playAlarmSound(); }
 
+
+// ---- longer moments: dawn, the work intro, the lock-in start-up ----
+// A slow pad: a few sines per note, detuned, through a gentle low-pass, with a long attack.
+function padChord(ctx, out, t, freqs, attack, hold, release, vol){
+  const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1800; f.Q.value = 0.4;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t+attack);
+  g.gain.setValueAtTime(vol, t+attack+hold); g.gain.exponentialRampToValueAtTime(0.0001, t+attack+hold+release);
+  freqs.forEach(function(fr){ [-6, 0, 7].forEach(function(det){ const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = fr; o.detune.value = det; o.connect(f); o.start(t); o.stop(t+attack+hold+release+0.1); }); });
+  f.connect(g); g.connect(out);
+}
+SFX.dawn = function(c, o, t){ padChord(c, o, t, [130.8, 196, 261.6, 329.6, 392], 9, 14, 8, 0.035); [523.3, 659.3, 784].forEach(function(f, i){ sfxPluck(c, o, t+6+i*1.6, f, 3, 0.02, 'sine'); }); };
+SFX.workintro = function(c, o, t){ padChord(c, o, t, [174.6, 220, 261.6, 329.6], 1.6, 1.6, 2.4, 0.04); sfxSweep(c, o, t, 220, 440, 1.6, 0.03); [523.3, 659.3, 784, 1046.5].forEach(function(f, i){ sfxPluck(c, o, t+0.9+i*0.16, f, 1.4, 0.045, 'sine'); }); };
+// "Chill intro": about fifteen seconds of lo-fi — four warm chords, a slow arpeggio, a soft low end
+SFX.chill = function(c, o, t){
+  const prog = [[174.6, 220, 261.6, 329.6], [164.8, 196, 246.9, 293.7], [146.8, 174.6, 220, 261.6, 329.6], [130.8, 164.8, 196, 246.9]];
+  prog.forEach(function(ch, i){
+    const at = t + i*3.4;
+    padChord(c, o, at, ch, 1.2, 1.8, 2.2, 0.028);
+    sfxPluck(c, o, at, ch[0]/2, 2.6, 0.05, 'sine');
+    ch.concat([ch[1]*2, ch[2]*2]).forEach(function(f, j){ sfxPluck(c, o, at + 0.42*j, f*2, 1.1, 0.018, 'triangle'); });
+  });
+  // a little tape hiss under it
+  const len = Math.floor(c.sampleRate*14), buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i] = (Math.random()*2-1)*0.5;
+  const src = c.createBufferSource(), hp = c.createBiquadFilter(), g = c.createGain();
+  src.buffer = buf; hp.type = 'bandpass'; hp.frequency.value = 3500; hp.Q.value = 0.6;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.006, t+1.5); g.gain.setValueAtTime(0.006, t+11); g.gain.exponentialRampToValueAtTime(0.0001, t+14);
+  src.connect(hp); hp.connect(g); g.connect(o); src.start(t); src.stop(t+14);
+};
+function playDawnPad(){ if(soundPref('dawn', true)) sfx(SFX.dawn); }
+function playWorkIntro(){ if(soundPref('workintro', true)) playSfx('workintro', function(){ tone([523,659,784], 0.3, 0.25); }); }
+// what plays as you lock in: none / the chime / the chill intro / your own music
+function lockStartSound(){ const v = state.profile.lockSound; return ['none','chime','chill','music'].indexOf(v)>=0 ? v : 'chill'; }
+let lockSongPlaying = false;
+function playLockInSong(){
+  const k = lockStartSound();
+  if(k==='chill'){ setTimeout(function(){ sfx(SFX.chill); }, 700); return; }
+  if(k==='music'){ const m = state.profile.lockMusic; if(m && m.q && typeof musicApp==='function'){ musicApp('play', m).then(function(ok){ lockSongPlaying = !!ok; }); } }
+}
+function stopLockInSong(){ if(lockSongPlaying && soundPref('lockMusicStop', true) && typeof musicApp==='function'){ lockSongPlaying = false; musicApp('stop'); } }
+
+// ---- Settings → Sound ----
+function soundSettingsHtml(){
+  const p = state.profile, on = p.soundEnabled!==false, pack = on ? soundPack() : 'off', ls = lockStartSound(), lm = p.lockMusic || null;
+  const seg = function(cur, act, opts){ return '<div class="seg-tabs snd-seg">'+opts.map(function(o){ return '<button class="seg-tab'+(cur===o[0]?' active':'')+'" data-action="'+act+'" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div>'; };
+  const tog = function(k, label, sub, dflt){ const v = soundPref(k, dflt); return '<label class="snd-row"><span><b>'+label+'</b><small>'+sub+'</small></span><span class="ws-switch"><input type="checkbox" data-snd="'+k+'" '+(v?'checked':'')+'><span></span></span></label>'; };
+  const tile = function(id, icon, label, sub){ return '<button class="snd-tile'+(ls===id?' is-on':'')+'" data-action="sndLockSound" data-id="'+id+'"><span class="snd-tile-i">'+icon+'</span><b>'+label+'</b><small>'+sub+'</small></button>'; };
+  return '<div class="snd">'+
+    '<div class="card section"><div class="snd-h"><div><div class="section-title" style="margin:0;">&#127925; Sound Effects</div><div class="kpi-sub">Clicks, ticks and chimes around the app.</div></div><button class="btn btn-ghost btn-sm" data-action="previewSounds">&#9654; Hear them</button></div>'+
+      seg(pack, 'sndPack', [['modern','Soft'],['classic','Classic beeps'],['off','Off']])+
+      '<div class="snd-vol'+(on?'':' is-off')+'"><span>&#128264;</span><input type="range" min="0" max="100" step="5" id="sndVol" value="'+Math.round(sfxVolume()*100)+'"><span>&#128266;</span><b id="sndVolV">'+Math.round(sfxVolume()*100)+'%</b></div>'+
+      '<div class="snd-rows'+(on?'':' is-off')+'">'+
+        tog('nav', 'Moving around', 'A soft note when you switch pages', true)+
+        tog('drag', 'Drag and drop', 'A lift and a landing when you move things', true)+
+      '</div></div>'+
+    '<div class="card section"><div class="snd-h"><div><div class="section-title" style="margin:0;">&#128274; When You Lock In</div><div class="kpi-sub">What plays the moment you lock in.</div></div><button class="btn btn-ghost btn-sm" data-action="sndPreviewLock">&#9654; Hear it</button></div>'+
+      '<div class="snd-tiles">'+tile('none', '&#128263;', 'Silent', 'Nothing at all')+tile('chime', '&#10024;', 'Chime', 'A quick rising chime')+tile('chill', '&#127769;', 'Chill Intro', '15 seconds of lo-fi')+tile('music', '&#9835;', 'My Music', 'A song or playlist')+'</div>'+
+      (ls==='music' ? '<div class="snd-music">'+
+          '<input class="input" id="sndLockQuery" placeholder="Apple Music song or playlist name" value="'+escapeHtml(lm ? lm.q : '')+'">'+
+          seg(lm && lm.k==='playlist' ? 'playlist' : 'song', 'sndLockKind', [['song','Song'],['playlist','Playlist']])+
+          '<button class="btn btn-sm btn-primary" data-action="sndLockSet">Use it</button>'+
+        '</div>'+(lm ? '<div class="kpi-sub" style="margin-top:6px;">&#9835; '+escapeHtml(lm.q)+' &middot; Plays through the Music app</div>' : '')+
+        '<div class="snd-rows">'+tog('lockMusicStop', 'Stop it when I lock out', 'Otherwise it keeps playing', true)+'</div>' : '')+
+    '</div>'+
+    '<div class="card section"><div class="section-title">&#9728;&#65039; Mornings</div>'+
+      '<div class="snd-rows">'+
+        tog('dawn', 'Dawn before the alarm', 'A slow chord swells under the sunrise in the last 90 seconds', true)+
+        tog('workintro', 'Start work', 'A warm swell when the work intro opens', true)+
+      '</div>'+
+      '<div class="snd-h" style="margin-top:12px;"><div class="kpi-sub">Your alarm tone or wake-up music lives with the alarm.</div><button class="btn btn-ghost btn-sm" data-action="openWakeSetup">&#9200; Alarm sound</button></div>'+
+    '</div>'+
+  '</div>';
+}
+function saveSound(){ persist('profile'); if(typeof renderView==='function') renderView(); }
+ACTIONS.sndPack = function(el, e, id){ const p = state.profile; p.soundEnabled = id!=='off'; if(id!=='off') p.soundPack = id; saveSound(); if(id!=='off') playPositive(); };
+ACTIONS.sndLockSound = function(el, e, id){ state.profile.lockSound = id; saveSound(); };
+ACTIONS.sndPreviewLock = function(){ playLockIn(); const k = lockStartSound(); if(k==='chill') setTimeout(function(){ sfx(SFX.chill); }, 700); else if(k==='music'){ const m = state.profile.lockMusic; if(m && m.q) musicApp('play', m).then(function(ok){ if(!ok) showToast('Music plays through the Operator app — open Operator from its icon.', {icon:'&#9888;'}); }); } };
+ACTIONS.sndLockKind = function(el, e, id){ ui.sndLockKind = id; const m = state.profile.lockMusic; if(m){ m.k = id; saveSound(); } else renderView(); };
+ACTIONS.sndLockSet = function(){
+  const i = document.getElementById('sndLockQuery'), v = i ? i.value.trim() : ''; if(!v){ if(i) i.focus(); return; }
+  const fromLink = typeof appleMusicFromLink==='function' ? appleMusicFromLink(v) : null;
+  state.profile.lockMusic = fromLink || {type:'music', q:v, k: ui.sndLockKind || 'song'};
+  saveSound(); showToast('Lock-in music: '+state.profile.lockMusic.q, {icon:'&#9835;'});
+};
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.dataset || !t.dataset.snd) return;
+  state.profile.sounds = Object.assign({}, state.profile.sounds||{}); state.profile.sounds[t.dataset.snd] = !!t.checked; persist('profile');
+});
+document.addEventListener('input', function(e){
+  const t = e.target; if(!t || t.id!=='sndVol') return;
+  state.profile.sfxVolume = Number(t.value)/100; applySfxVolume();
+  const v = document.getElementById('sndVolV'); if(v) v.textContent = t.value+'%';
+  clearTimeout(ui._sndT); ui._sndT = setTimeout(function(){ persist('profile'); playTick(); }, 180);
+});

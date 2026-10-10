@@ -271,7 +271,7 @@ function renderMorningView(){
     '<div class="mm-head"><div><div class="mm-k">&#9728;&#65039; Morning</div><div class="mm-greet">'+wakeGreeting()+', '+escapeHtml(p.name||'')+'.</div>'+
       '<div class="mm-sub">Up for <span id="modeElapsed">'+formatElapsed(Date.now()-active.startedAt)+'</span> &middot; '+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div></div>'+
       '<button class="btn btn-ghost btn-sm" data-action="morningBriefing">&#9728;&#65039; Good morning</button></div>'+
-    (notes.length ? '<div class="mm-note"><div class="mm-k">&#127769; From last night</div>'+notes.map(function(n){ return '<div class="mm-note-t">'+escapeHtml(n.text)+'</div>'; }).join('')+'</div>' : '')+
+    (notes.length ? '<div class="mm-note"><div class="mm-k">&#127769; From Last Night</div>'+notes.map(function(n){ return '<div class="mm-note-t">'+escapeHtml(n.text)+'</div>'; }).join('')+'</div>' : '')+
     '<div class="mm-grid">'+
       '<div class="mm-card"><div class="mm-card-h"><span class="mm-k">Get going</span><span class="kpi-sub">'+done.length+'/'+routine.length+'</span><button class="mm-edit" data-action="routineEdit">'+(editing?'Done':'&#9998;')+'</button></div>'+
         '<div class="mm-routine">'+routine.map(function(r){ const on = done.indexOf(r.id)>=0;
@@ -279,13 +279,14 @@ function renderMorningView(){
           (editing ? '<div class="mn-row"><input class="input" id="routineNew" placeholder="+ Add a step (Enter)"><button class="btn btn-sm" data-action="routineAdd">Add</button></div>' : '')+
         '</div></div>'+
       '<div class="mm-card mm-side">'+
-        '<div class="mm-quote"><div class="mm-k">&#10024; For today</div><blockquote>&ldquo;'+escapeHtml(q[0])+'&rdquo;</blockquote><cite>&mdash; '+escapeHtml(q[1])+'</cite></div>'+
+        '<div class="mm-quote"><div class="mm-k">&#10024; For Today</div>'+quoteHtml(q)+'</div>'+
+        '<div class="mm-thoughts"><div class="mm-k">&#127807; For a Good Day</div>'+thoughtsOfDay(3).map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>'+
         (vb && vb.elements.length ? '<div class="mm-vision" data-action="openVisionFull" title="Open your vision board">'+boardStaticHtml(vb, 'wake-board')+'</div>' : '')+
       '</div>'+
     '</div>'+
     '<div class="mm-cta">'+
-      '<button class="brief-go brief-clockin mm-clockin" data-action="clockIn">&#128339; Clock in</button>'+
-      '<button class="brief-later mm-end" data-action="endMode">End morning</button>'+
+      '<button class="brief-go brief-clockin mm-clockin" data-action="clockIn">&#128188; Start Work</button>'+
+      '<button class="brief-later mm-end" data-action="endMode">End Morning</button>'+
     '</div>'+
   '</div>';
 }

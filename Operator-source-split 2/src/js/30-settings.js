@@ -124,7 +124,7 @@ function renderSettings(){
         '<div class="field"><label>Business name</label><input class="input" id="setBusinessName" value="'+escapeHtml(p.businessName||'')+'" placeholder="e.g. Rivera Media Co."></div>'+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Preferences</div><div class="grid grid-2">'+
-        '<div class="field"><label>Sound effects</label><div class="row" style="gap:6px;"><select class="input" id="setSound"><option value="modern" '+(p.soundEnabled!==false && p.soundPack!=='classic'?'selected':'')+'>Modern</option><option value="classic" '+(p.soundEnabled!==false && p.soundPack==='classic'?'selected':'')+'>Classic beeps</option><option value="off" '+(p.soundEnabled===false?'selected':'')+'>Off</option></select><button class="btn btn-ghost btn-sm" data-action="previewSounds" title="Hear them">&#9654;</button></div></div>'+
+        '<div class="field"><label>Sound</label><button class="btn btn-ghost btn-sm" data-action="settingsTab" data-tab="sound" style="align-self:flex-start;">&#128266; Sound settings &rarr;</button></div>'+
         '<div class="field"><label>Note field after finishing a task in Focus</label><select class="input" id="setFocusNote"><option value="on" '+(p.focusNotePromptEnabled!==false?'selected':'')+'>Enabled</option><option value="off" '+(p.focusNotePromptEnabled===false?'selected':'')+'>Disabled</option></select></div>'+
         '<div class="field"><label>Notify when a focus timer ends</label><select class="input" id="setNotifyEnd"><option value="on" '+(p.notifyOnFocusEnd!==false?'selected':'')+'>On</option><option value="off" '+(p.notifyOnFocusEnd===false?'selected':'')+'>Off</option></select></div>'+
       '</div></div>'+
@@ -186,6 +186,7 @@ function renderSettings(){
   const navDefs = [
     {id:'you', label:'You', icon:'&#128100;'},
     {id:'display', label:'Display', icon:'&#127912;'},
+    {id:'sound', label:'Sound', icon:'&#128266;'},
     {id:'focus', label:'Focus &amp; Alarms', icon:'&#9201;'},
     {id:'business', label:'Business', icon:'&#9635;'},
     {id:'calendarJournal', label:'Calendar &amp; Journal', icon:'&#9638;'},
@@ -194,6 +195,7 @@ function renderSettings(){
     {id:'updates', label:'App updates', icon:'&#128227;'}
   ];
   // Standards and General (preferences) now live under You; export / reset under Data
+  sections.sound = soundSettingsHtml();
   const tab = (ui.settingsTab==='standards' || ui.settingsTab==='general') ? 'you' : ui.settingsTab;
   const active = sections[tab] ? tab : 'you';
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Settings</div></div></div>'+

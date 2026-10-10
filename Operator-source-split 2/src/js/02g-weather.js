@@ -48,19 +48,38 @@ function wxIcon(kind, phase){
   return {clear: night ? '&#127769;' : SKY_META[phase].icon, partly: night ? '&#9729;&#65039;' : '&#9925;', cloudy:'&#9729;&#65039;', fog:'&#127787;&#65039;',
     drizzle:'&#127782;&#65039;', rain:'&#127783;&#65039;', snow:'&#127784;&#65039;', storm:'&#9928;&#65039;'}[kind] || SKY_META[phase].icon;
 }
+// The sun's path today as a thin arc, sunrise on the left and sunset on the right, with the sun
+// (or the moon, at night) where it is right now. Used small on Today and big on Good morning.
+function sunArcHtml(o){
+  o = o || {};
+  const W = o.w || 120, H = o.h || 40, pad = o.pad==null ? 6 : o.pad;
+  const win = dayWindow(), d = new Date(), m = d.getHours()*60 + d.getMinutes();
+  const up = m >= win.rise && m <= win.set;
+  const f = Math.max(0, Math.min(1, (m - win.rise) / Math.max(1, win.set - win.rise)));
+  const x0 = pad, x2 = W - pad, y0 = H - 3, ctlY = -H*0.55;
+  const pt = function(t){ return {x:(1-t)*(1-t)*x0 + 2*(1-t)*t*(W/2) + t*t*x2, y:(1-t)*(1-t)*y0 + 2*(1-t)*t*ctlY + t*t*y0}; };
+  const sun = pt(up ? f : (m < win.rise ? 0 : 1));
+  const path = 'M'+x0+' '+y0+' Q'+(W/2)+' '+ctlY.toFixed(1)+' '+x2+' '+y0;
+  const anim = o.animate ? ' is-anim' : '';
+  return '<svg class="sun-arc'+anim+(up?'':' is-night')+'" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" aria-hidden="true" style="--f:'+(up ? f : 0).toFixed(3)+'">'+
+    '<line x1="0" y1="'+y0+'" x2="'+W+'" y2="'+y0+'" class="sa-horizon"/>'+
+    '<path d="'+path+'" class="sa-track" pathLength="100"/>'+
+    (up ? '<path d="'+path+'" class="sa-done" pathLength="100" style="stroke-dasharray:'+(f*100).toFixed(1)+' 100"/>' : '')+
+    '<circle class="sa-glow" cx="'+sun.x.toFixed(1)+'" cy="'+sun.y.toFixed(1)+'" r="'+(o.r ? o.r*2.4 : 7)+'"/>'+
+    '<circle class="sa-sun" cx="'+sun.x.toFixed(1)+'" cy="'+sun.y.toFixed(1)+'" r="'+(o.r || 3.2)+'"/>'+
+  '</svg>';
+}
+function daylightLabel(){ const w = dayWindow(), len = w.set - w.rise; return Math.floor(len/60)+'h '+(len%60)+'m of daylight'; }
 function skyChipHtml(){
   if(state.profile.skyChip===false) return '';
   const phase = skyPhase(), now = wxNow(), w = dayWindow();
-  const m = new Date().getHours()*60 + new Date().getMinutes();
-  let when = '';
-  if(phase==='golden' || (phase==='day' && w.set-m <= 120)) when = 'sunset '+fmtMinOfDay(w.set);
-  else if(phase==='dawn' || phase==='night' && m < w.rise) when = 'sunrise '+fmtMinOfDay(w.rise);
   const kind = now ? wxKind(now.code) : 'clear';
-  const parts = [SKY_META[phase].label];
-  if(now) parts.push('<b>'+now.temp+'&deg;</b> '+escapeHtml(wxLabel(now.code).toLowerCase()));
-  if(when) parts.push(when);
-  return '<span class="sky-chip sky-text" data-sky="'+phase+'" title="'+(now ? 'Feels like '+now.feels+'° · high '+now.hi+'° / low '+now.lo+'°'+(weatherCfg().place ? ' · '+escapeHtml(weatherCfg().place) : '') : 'Set a weather location in Settings → Display')+'">'+
-    '<span class="sky-chip-i">'+wxIcon(kind, phase)+'</span>'+parts.join(' &middot; ')+'</span>';
+  const tipTxt = (now ? 'Feels like '+now.feels+'° · high '+now.hi+'° / low '+now.lo+'°' : SKY_META[phase].label)+' · sunrise '+fmtMinOfDay(w.rise)+' · sunset '+fmtMinOfDay(w.set)+(weatherCfg().place ? ' · '+weatherCfg().place : '');
+  // one tidy pill: the weather, then the sun's arc with sunrise and sunset under its ends
+  return '<span class="skyp" data-sky="'+phase+'" title="'+escapeHtml(tipTxt)+'">'+
+    '<span class="skyp-wx"><span class="skyp-i">'+wxIcon(kind, phase)+'</span>'+(now ? '<b>'+now.temp+'&deg;</b><span class="skyp-l">'+escapeHtml(wxLabel(now.code))+'</span>' : '<span class="skyp-l">'+SKY_META[phase].label+'</span>')+'</span>'+
+    '<span class="skyp-sun">'+sunArcHtml({w:64, h:20, pad:4, r:2.6})+'<span class="skyp-times"><span>'+fmtMinOfDay(w.rise)+'</span><span>'+fmtMinOfDay(w.set)+'</span></span></span>'+
+  '</span>';
 }
 // ---- settings ----
 function weatherSettingsHtml(){

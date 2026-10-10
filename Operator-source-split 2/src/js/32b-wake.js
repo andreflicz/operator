@@ -135,6 +135,7 @@ function checkAllAlarms(){
     }
     if(w.override && w.override.date<todayStr()){ w.override = null; changed = true; }
   }
+  if(typeof checkDawn==='function') checkDawn();
   // snoozes and test rings
   const sn = state.focus.snooze;
   if(sn && sn.ts<=now){
@@ -310,7 +311,7 @@ function wakeImUp(){
   if(!wasTest && state.modes.active && state.modes.active.sleep) finishActiveMode(true);
   if(!wasTest && typeof applyNightPlanAuto==='function') applyNightPlanAuto();
   ui.wakeMode = 'brief'; ui.wakeBriefTest = !!wasTest; ui.wakeBoardBig = false; ui.wakeIntroDone = false;
-  ui.briefT0 = Date.now(); ui.briefShift = 0; ui.briefSkipped = false; ui.briefNewsAt = null; ui.briefLineSeen = 0;
+  ui.briefT0 = Date.now(); ui.briefShift = 0; ui.briefSkipped = false; ui.briefNewsAt = null; ui.briefLineSeen = 0; ui.dawnTs = null;
   loadMorningNews();
   playWakeChime();
   renderWakeOverlayInto();
@@ -337,9 +338,9 @@ function wakeSnooze(){
   showToast('Snoozed — ringing again at '+fmt12Hour(nowHM(new Date(Date.now()+mins*60000))), {icon:'&#128164;'});
 }
 ACTIONS.wakeImUp = function(){ wakeImUp(); };
+ACTIONS.wakeStartDay = function(){ wakeImUp(); };
 ACTIONS.wakeSnooze = function(){ wakeSnooze(); };
 ACTIONS.wakePlayMusic = function(){ const w = wakeCfg(); if(w.media) playWakeMedia(w.media, function(){ showToast('Couldn\'t play that — try uploading the song file instead.', {icon:'&#9888;'}); }); clearInterval(wakeBeepTimer); if(wakeRing){ wakeRing.mediaFailed = false; renderWakeOverlayInto(); } };
-function wakeGreeting(){ const h = new Date().getHours(); return h<5 ? 'Still up' : h<12 ? 'Good morning' : h<18 ? 'Good afternoon' : 'Good evening'; }
 function upcomingNightPlan(){ const np = state.focus.nightPlan; return (np && np.date>=todayStr()) ? np : null; }
 function wakeTodayPlan(){
   const np = upcomingNightPlan(), today = todayStr();
@@ -351,112 +352,8 @@ function wakeWeatherLine(){
   const now = typeof wxNow==='function' ? wxNow() : null;
   return now ? wxIcon(wxKind(now.code), skyPhase())+' '+now.temp+'&deg; '+escapeHtml(wxLabel(now.code).toLowerCase())+(now.hi!=null ? ' &middot; high '+now.hi+'&deg;' : '') : '';
 }
-function wakeRingHtml(){
-  const w = wakeCfg();
-  const playing = wakeUsesMusic(w) && !(wakeRing && wakeRing.mediaFailed);
-  return '<div class="wk2" data-sky="'+skyLook()+'">'+
-    '<div class="wk2-aura"><i></i><i></i><i></i></div>'+
-    '<div class="wk2-center">'+
-      '<div class="wk2-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test ? ' <span class="tag">TEST</span>' : '')+'</div>'+
-      '<div class="wk2-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+'</div>'+
-      '<div class="wk2-date">'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div>'+
-      (function(){ const ns = morningNotesFor(todayStr()); return ns.length ? '<div class="wk2-note">&ldquo;'+escapeHtml(ns[ns.length-1].text)+'&rdquo;<span>— you, last night</span></div>' : ''; })()+
-      '<div class="wk2-actions">'+
-        '<button class="wk2-up" data-action="wakeImUp"><span>&#9728;&#65039; I\'m up</span></button>'+
-        '<button class="wk2-snooze" data-action="wakeSnooze">Snooze '+(w.snoozeMinutes||9)+' min</button>'+
-      '</div>'+
-      (wakeUsesMusic(w) ? '<div class="wk2-music'+(playing?' is-playing':'')+'">'+
-          (playing ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '')+
-          '<span class="wk2-song">'+escapeHtml(mediaName(w.media))+'</span><span class="wk2-src">'+(wakeRing && wakeRing.mediaFailed ? 'starting the music…' : escapeHtml(mediaKindLabel(w.media)))+'</span>'+
-        '</div>' : '')+
-    '</div>'+
-  '</div>';
-}
-function wakeBriefHtml(){
-  const today = todayStr(), y = addDays(today, -1), name = state.profile.name || '';
-  const yDeep = deepWorkMinutesFor(y), target = state.standards.deepWorkTargetMinutes || 180;
-  const yDone = state.tasks.items.filter(function(t){ return t.completedAt===y; }).length;
-  const yWork = typeof workoutDay==='function' ? workoutDay(y) : {n:0, m:0};
-  const yStd = dayStandardsComplete(y);
-  const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a,c){ return (a.time||'').localeCompare(c.time||''); });
-  const deadlines = state.tasks.items.filter(function(t){ return t.deadline===today && t.status!=='done'; });
-  const goals = typeof masterGoalDefs==='function' ? masterGoalDefs().slice(0, 4) : [];
-  const notes = morningNotesFor(today).map(function(n){ return n.text; });
-  const vb = masterVisionBoard();
-  const q = quoteOfDay();
-  const news = ui.morningNews && ui.morningNews.date===today ? ui.morningNews.items : null;
-  const now = typeof wxNow==='function' ? wxNow() : null, phase = skyPhase(), win = dayWindow();
-  const timeStr = new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
-  // The page builds itself one piece at a time, slowly, with a line of narration typing above
-  // each piece as it arrives. Delays are fixed when a piece first appears (re-renders keep the
-  // same node, so nothing plays twice); skipping the intro shifts the whole schedule earlier.
-  const cine = wakeCfg().intro!=='quick';
-  const base = cine ? 7400 : 3000, gap = 1500;
-  const lines = [{at: base - 600, text: 'It\'s '+timeStr+'.'+(now ? ' '+now.temp+'° and '+wxLabel(now.code).toLowerCase()+'.' : '')}];
-  let k = 0;
-  const panel = function(cls, anim, voice, html, extraStyle){
-    const d = base + (k++)*gap;
-    if(voice) lines.push({at: d - 350, text: voice});
-    return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'">'+html+'</section>';
-  };
-  const left = [], right = [];
-  if(notes.length) left.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note.', '<div class="br-k">&#127769; From last night</div>'+notes.map(function(t){ return '<div class="br-ln-text">'+escapeHtml(t)+'</div>'; }).join('')));
-  right.push(panel('br-quote', 'br-a-words', 'Something to carry today.', '<div class="br-k">&#10024; For today</div><blockquote>&ldquo;'+escapeHtml(q[0])+'&rdquo;</blockquote><cite>&mdash; '+escapeHtml(q[1])+'</cite>'));
-  if(vb && vb.elements.length) left.push(panel('br-vision', 'br-a-scale', 'This is what it\'s for.', '<span class="br-vision-k">&#127775; Vision</span>'+boardStaticHtml(vb, 'wake-board')+'<span class="br-vision-hint">Click to open</span>').replace('<section ', '<section data-action="wakeBoardToggle" title="Open your vision board" '));
-  right.push(panel('br-today', 'br-a-right', events.length ? (events.length===1 ? 'One thing on the calendar.' : events.length+' things on the calendar.') : 'Nothing on the calendar. The day\'s yours.',
-    '<div class="br-k">&#128197; Today</div>'+
-    '<div class="br-wx">'+(now ? '<span class="br-wx-i">'+wxIcon(wxKind(now.code), phase)+'</span><span class="br-wx-t">'+now.temp+'&deg;</span><span class="br-wx-l">'+escapeHtml(wxLabel(now.code))+(now.hi!=null ? '<br><small>high '+now.hi+'&deg; &middot; low '+now.lo+'&deg;</small>' : '')+'</span>' : '<span class="br-wx-l">'+SKY_META[phase].icon+' '+SKY_META[phase].label+'</span>')+
-      '<span class="br-sun">&#127749; '+fmtMinOfDay(win.rise)+'<br>&#127751; '+fmtMinOfDay(win.set)+'</span></div>'+
-    ((events.length || deadlines.length) ? '<div class="br-agenda">'+events.map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('')+
-      deadlines.map(function(t){ return '<div><b class="is-due">Due'+(t.deadlineTime ? ' '+fmt12Hour(t.deadlineTime) : '')+'</b> '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '')));
-  if(goals.length) left.push(panel('br-goals-p', 'br-a-rise', 'Where your goals stand.', '<div class="br-k">&#127919; Goals</div><div class="br-goals">'+
-    goals.map(function(m){ const pct = masterPct(m); return '<div class="br-goal" style="--mg1:'+m.color+';--mg2:'+m.color2+';"><span class="br-goal-k">'+m.icon+' '+m.label+'</span><span class="br-goal-v">'+(m.cur==null ? '—' : m.fmt(m.cur))+'</span><span class="br-goal-bar"><i style="width:'+pct.toFixed(0)+'%"></i></span></div>'; }).join('')+'</div>'));
-  const stat = function(v, kk, good){ return '<div class="br-stat'+(good?' is-good':'')+'"><div class="br-stat-v">'+v+'</div><div class="br-stat-k">'+kk+'</div></div>'; };
-  right.push(panel('br-yday', 'br-a-rise', yDeep ? 'Yesterday: '+fmtHours(yDeep)+' of deep work'+(yDone ? ', '+yDone+' done' : '')+'.' : 'Yesterday\'s behind you.',
-    '<div class="br-k">Yesterday</div><div class="br-stats">'+stat(fmtHours(yDeep), 'deep work', yDeep>=target)+stat(yDone, 'done')+stat(yWork.n || '—', 'workouts', yWork.n>0)+stat(computeStreak()+'d', 'streak', yStd)+'</div>'));
-  if(news){
-    // headlines that came in after the page started get their own turn instead of popping in
-    const d0 = base + k*gap, late = ui.briefNewsAt ? Math.max(600, d0 - (ui.briefNewsAt - (ui.briefT0||0))) : null;
-    right.push(panel('br-news', 'br-a-rise', 'And what\'s going on out there.', '<div class="br-k">&#128240; Headlines'+(news[0].src ? ' <span class="br-src">'+escapeHtml(news[0].src)+'</span>' : '')+'</div>'+
-      news.slice(0, 3).map(function(n){ return '<button class="br-news-i" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'">'+escapeHtml(n.title)+'</button>'; }).join(''), late!=null ? ';--late:'+late+'ms' : ''));
-  }
-  const ctaD = base + k*gap;
-  lines.push({at: ctaD - 350, text: 'Take your time. Whenever you\'re ready.'});
-  ui.briefLines = lines;
-  const shift = ui.briefShift || 0;
-  return '<div class="brief brief2'+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" style="--shift:'+shift+'ms">'+
-    (cine
-      ? '<div class="brief-intro is-cinematic" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div>'+
-          '<div class="bi-time">'+timeStr+'</div>'+
-          '<div class="bi-word">'+wakeGreeting()+'</div>'+(name ? '<div class="bi-name">'+escapeHtml(name)+'</div>' : '')+
-          '<div class="bi-line">'+(wakeWeatherLine() ? wakeWeatherLine() : new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'}))+'</div></div>'
-      : '<div class="brief-intro" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div><div class="bi-word">'+wakeGreeting()+'</div>'+(name ? '<div class="bi-name">'+escapeHtml(name)+'</div>' : '')+'</div>')+
-    '<div class="brief-grid-bg"></div>'+
-    '<div class="brief-inner">'+
-      '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1400)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        (ui.briefSkipped ? '' : '<button class="brief-skipall" data-action="briefSkip" title="Show everything now">Skip &#9197;</button>')+'</div>'+
-      '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1100)+'ms">'+wakeGreeting()+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
-      '<div class="br-voice br-p br-a-fade" style="--d:'+(base-800)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
-      '<div class="brief-music-slot">'+wakeMusicPillHtml()+'</div>'+
-      '<div class="brief2-cols"><div class="brief2-col is-left">'+left.join('')+'</div><div class="brief2-col is-right">'+right.join('')+'</div></div>'+
-      '<div class="brief-cta br-p br-a-rise" data-k="'+k+'" style="--d:'+ctaD+'ms">'+
-        '<button class="brief-go brief-morning" data-action="wakeStartMorning">&#9728;&#65039; Start my morning</button>'+
-        '<button class="brief-go brief-clockin" data-action="wakeClockIn">&#128339; Clock in</button>'+
-        '<button class="brief-skip" data-action="wakeBriefDone">Close</button>'+
-      '</div>'+
-    '</div>'+
-    (ui.wakeBoardBig && vb ? '<div class="br-vision-big" data-action="wakeBoardToggle" title="Close">'+boardStaticHtml(vb, 'wake-board')+'<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button></div>' : '')+
-  '</div>';
-}
-// skipping the intro moves the whole schedule up so the page starts building right away
-ACTIONS.wakeIntroSkip = function(){
-  if(!ui.wakeIntroDone){
-    const base = wakeCfg().intro!=='quick' ? 7400 : 3000, el = Date.now() - (ui.briefT0||Date.now());
-    const shift = Math.max(0, base - 1500 - el);
-    ui.briefShift = (ui.briefShift||0) + shift; ui.briefT0 = (ui.briefT0||Date.now()) - shift;
-  }
-  ui.wakeIntroDone = true; renderWakeOverlayInto();
-};function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : wakeRingHtml(); }
+// the alarm, Good morning and the dawn before it are drawn in 32n-morning.js
+function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : ui.wakeMode==='dawn' ? dawnHtml() : wakeRingHtml(); }
 function renderWakeOverlayInto(){
   const el = document.getElementById('wakeContent'); if(!el) return;
   morphInto(el, renderWakeScreen());
@@ -467,6 +364,7 @@ function renderWakeOverlayInto(){
     if(!overlayOpen('wakeOverlay')){ clearInterval(wakeClockTimer); return; }
     const c = document.getElementById('wakeClock');
     if(c) c.textContent = new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'});
+    if(ui.wakeMode==='dawn') tickDawn();
   }, 1000);
 }
 registerModal('wakeOverlay', renderWakeOverlayInto);
