@@ -7,9 +7,15 @@
 function morningNotes(){ return arr(state.focus.morningNotes); }
 function morningNotesFor(date){ return morningNotes().filter(function(n){ return n.forDate===date; }); }
 function morningNoteTarget(){ return typeof wakeTargetDate==='function' ? wakeTargetDate() : addDays(todayStr(), 1); }
-function addMorningNote(text){
-  text = String(text||'').trim(); if(!text) return false;
-  state.focus.morningNotes = morningNotes().concat([{id:uid(), text:text, forDate:morningNoteTarget(), at:Date.now()}])
+// extra: {morning, work} — the note in parts: the headline (on the alarm), a message for the
+// morning (Good morning) and one for before work (Start work)
+function addMorningNote(text, extra){
+  text = String(text||'').trim(); extra = extra || {};
+  const morning = String(extra.morning||'').trim(), work = String(extra.work||'').trim();
+  if(!text && !morning && !work) return false;
+  const n = {id:uid(), text:text || morning || work, forDate:morningNoteTarget(), at:Date.now()};
+  if(morning || work){ n.headline = text; n.morning = morning; n.work = work; }
+  state.focus.morningNotes = morningNotes().concat([n])
     // keep a couple of weeks — older ones have done their job
     .filter(function(n){ return n.forDate >= addDays(todayStr(), -14); });
   persist('focus');

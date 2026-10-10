@@ -289,3 +289,9 @@ document.addEventListener('input', function(e){
   const v = document.getElementById('sndVolV'); if(v) v.textContent = t.value+'%';
   clearTimeout(ui._sndT); ui._sndT = setTimeout(function(){ persist('profile'); playTick(); }, 180);
 });
+// "Hear them": a short tour of the set, one sound after another
+ACTIONS.previewSounds = function(){
+  if(!soundOn()){ showToast('Sound effects are off.', {icon:'&#128263;'}); return; }
+  const seq = [playTick, playNav, playTaskAdded, playDrop, playPositive, playTaskComplete, playLockIn];
+  seq.forEach(function(f, i){ setTimeout(f, i*420); });
+};

@@ -48,7 +48,8 @@ if application "Music" is running then
 end if
 APPLESCRIPT
 }
-finish_music() {
+finish_music() { # [playlist to play once the song is over]
+  THEN="$1"
   kill_music_jobs
   # no more repeating; note the track that's on and how long it has left
   INFO=$(osascript 2>/dev/null <<'APPLESCRIPT'
@@ -61,7 +62,7 @@ end if
 return ""
 APPLESCRIPT
 )
-  [ -z "$INFO" ] && return
+  if [ -z "$INFO" ]; then [ -n "$THEN" ] && { play_music "$THEN" playlist noramp >/dev/null 2>&1 </dev/null & }; return; fi
   TRACK=${INFO% *}; LEFT=${INFO##* }
   case "$LEFT" in ''|*[!0-9]*) LEFT=300 ;; esac
   # wait it out, then pause the moment that track is over (before the next one gets going)
@@ -70,7 +71,8 @@ APPLESCRIPT
     while [ $n -lt 30 ]; do
       NOW=$(osascript -e 'tell application "Music" to if player state is playing then return persistent ID of current track' 2>/dev/null)
       if [ "$NOW" != "$TRACK" ]; then
-        [ -n "$NOW" ] && osascript -e 'tell application "Music" to pause' >/dev/null 2>&1
+        if [ -n "$THEN" ]; then rm -f "$FINISH_PID_FILE"; play_music "$THEN" playlist noramp
+        else [ -n "$NOW" ] && osascript -e 'tell application "Music" to pause' >/dev/null 2>&1; fi
         break
       fi
       sleep 1; n=$((n+1))
@@ -180,7 +182,7 @@ wake_respond() {
       if [ -n "$Q" ]; then play_music "$Q" "${K:-song}" >/dev/null 2>&1 </dev/null & fi
       respond 200 '{"ok":true}' ;;
     /music/stop*) stop_music >/dev/null 2>&1 & respond 200 '{"ok":true}' ;;
-    /music/finish*) finish_music >/dev/null 2>&1; respond 200 '{"ok":true}' ;;
+    /music/finish*) finish_music "$(hexdec "$(param q)")" >/dev/null 2>&1 </dev/null; respond 200 '{"ok":true}' ;;
     /music/now*) respond 200 "$(now_playing)" ;;
     /music/cmd*)
       kill_music_jobs

@@ -28,8 +28,11 @@ ACTIONS.windNext = function(){ windReadForm(); const i = WIND_STEPS.findIndex(fu
 ACTIONS.windBack = function(){ windReadForm(); const i = WIND_STEPS.findIndex(function(s){ return s[0]===ui.wind.step; }); ui.wind.step = WIND_STEPS[Math.max(0, i-1)][0]; renderWindInto(); };
 function windReadForm(){
   const w = ui.wind; if(!w) return;
-  const n = document.getElementById('windNote');
-  if(n && n.value.trim()){ addMorningNote(n.value); n.value = ''; }
+  const n = document.getElementById('windNote'), nm = document.getElementById('windNoteMorning'), nw = document.getElementById('windNoteWork');
+  if((n && n.value.trim()) || (nm && nm.value.trim()) || (nw && nw.value.trim())){
+    addMorningNote(n ? n.value : '', {morning:nm ? nm.value : '', work:nw ? nw.value : ''});
+    [n, nm, nw].forEach(function(x){ if(x) x.value = ''; });
+  }
   const a = document.getElementById('windAlarm'); if(a) w.alarm = a.value;
 }
 // save the plan + alarm (and optionally go to sleep)
@@ -171,9 +174,11 @@ function windPlanHtml(){
 function windNoteHtml(){
   const w = ui.wind, notes = morningNotesFor(w.target);
   return '<div class="wd-note">'+
-    '<div class="wd-sub">Shows up on your alarm screen and at the top of tomorrow\'s briefing.</div>'+
-    (notes.length ? '<div class="wd-notes">'+notes.map(function(n){ return '<div class="wd-note-item"><span>&ldquo;'+escapeHtml(n.text)+'&rdquo;</span><button class="mn-x" data-action="removeMorningNote" data-id="'+n.id+'" title="Remove">&#10005;</button></div>'; }).join('')+'</div>' : '')+
-    '<textarea class="input wd-note-input" id="windNote" placeholder="What does tomorrow-you need to hear?"></textarea>'+
+    '<div class="wd-sub">Three short lines for tomorrow-you.</div>'+
+    (notes.length ? '<div class="wd-notes">'+notes.map(function(n){ return '<div class="wd-note-item"><div><b>'+escapeHtml(n.headline!=null ? n.headline||'—' : n.text)+'</b>'+(n.morning ? '<span>☀️ '+escapeHtml(n.morning)+'</span>' : '')+(n.work ? '<span>💼 '+escapeHtml(n.work)+'</span>' : '')+'</div><button class="mn-x" data-action="removeMorningNote" data-id="'+n.id+'" title="Remove">&#10005;</button></div>'; }).join('')+'</div>' : '')+
+    '<div class="wd-nf"><label><span>&#9200; The headline</span><small>Big on your alarm screen</small></label><input class="input wd-nf-head" id="windNote" placeholder="e.g. Big shoot day. Up and at it."></div>'+
+    '<div class="wd-nf"><label><span>&#9728;&#65039; When you wake up</span><small>In Good morning</small></label><textarea class="input" id="windNoteMorning" rows="2" placeholder="e.g. Coffee, a walk, then straight into it."></textarea></div>'+
+    '<div class="wd-nf"><label><span>&#128188; Before you start work</span><small>Right before you lock in</small></label><textarea class="input" id="windNoteWork" rows="2" placeholder="e.g. Finish the JJS edit before you touch email."></textarea></div>'+
   '</div>';
 }
 function windAlarmHtml(){

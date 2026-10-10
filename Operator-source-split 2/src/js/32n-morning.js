@@ -14,41 +14,57 @@
 function wakeGreeting(){ return 'Good morning'; }
 
 // ---- lines for the day (chosen by date, so they're the same all day) ----
+// Quotes: a mix of philosophers, athletes, makers and founders — famous and not. Only lines whose
+// source is solid; lines with no name are our own.
 const MORNING_QUOTES = [
+  ['At dawn, when you have trouble getting out of bed, tell yourself: “I have to go to work — as a human being.”', 'Marcus Aurelius'],
+  ['No man is free who is not master of himself.', 'Epictetus'],
+  ['First say to yourself what you would be; and then do what you have to do.', 'Epictetus'],
+  ['It is not that we have a short time to live, but that we waste a lot of it.', 'Seneca'],
   ['We suffer more often in imagination than in reality.', 'Seneca'],
   ['Begin at once to live, and count each separate day as a separate life.', 'Seneca'],
-  ['When you arise in the morning, think of what a precious privilege it is to be alive — to breathe, to think, to enjoy, to love.', 'Marcus Aurelius'],
+  ['Waste no more time arguing about what a good man should be. Be one.', 'Marcus Aurelius'],
   ['The impediment to action advances action. What stands in the way becomes the way.', 'Marcus Aurelius'],
+  ['He who has a why to live can bear almost any how.', 'Friedrich Nietzsche'],
+  ['Do nothing which is of no use.', 'Miyamoto Musashi'],
+  ['Well begun is half done.', 'Aristotle'],
   ['How we spend our days is, of course, how we spend our lives.', 'Annie Dillard'],
   ['The sun himself is weak when he first rises, and gathers strength and courage as the day gets on.', 'Charles Dickens'],
   ['Write it on your heart that every day is the best day in the year.', 'Ralph Waldo Emerson'],
-  ['The best time to plant a tree was twenty years ago. The second best time is now.', 'Proverb'],
-  ['Stay hungry. Stay foolish.', 'Steve Jobs'],
-  ['Rest is not idleness.', 'John Lubbock'],
-  ['Look deep into nature, and then you will understand everything better.', 'Albert Einstein'],
-  ['Every morning we are born again. What we do today is what matters most.', 'Buddha'],
-  ['First say to yourself what you would be; and then do what you have to do.', 'Epictetus'],
-  ['No man is free who is not master of himself.', 'Epictetus'],
-  ['The obstacle is the way.', 'Ryan Holiday'],
-  ['Everything is figureoutable.', 'Marie Forleo'],
-  ['You could leave life right now. Let that determine what you do and say and think.', 'Marcus Aurelius'],
-  ['Happiness is not something ready made. It comes from your own actions.', 'Dalai Lama']
-];
-const WORK_QUOTES = [
-  ['Amateurs sit and wait for inspiration. The rest of us just get up and go to work.', 'Stephen King'],
-  ['Be so good they can’t ignore you.', 'Steve Martin'],
+  ['Rest at the end, not in the middle.', 'Kobe Bryant'],
+  ['Everything negative — pressure, challenges — is all an opportunity for me to rise.', 'Kobe Bryant'],
+  ['You are in danger of living a life so comfortable and soft that you will die without ever realizing your true potential.', 'David Goggins'],
   ['Discipline equals freedom.', 'Jocko Willink'],
   ['Hard choices, easy life. Easy choices, hard life.', 'Jerzy Gregorek'],
-  ['Well done is better than well said.', 'Benjamin Franklin'],
-  ['Small deeds done are better than great deeds planned.', 'Peter Marshall'],
-  ['Make each day your masterpiece.', 'John Wooden'],
-  ['Slow is smooth, and smooth is fast.', 'Navy SEAL saying'],
-  ['Don’t watch the clock; do what it does. Keep going.', 'Sam Levenson'],
-  ['Ideas are easy. Implementation is hard.', 'Guy Kawasaki'],
+  ['Inspiration is for amateurs — the rest of us just show up and get to work.', 'Chuck Close'],
+  ['What you do every day matters more than what you do once in a while.', 'Gretchen Rubin'],
+  ['Keep hammering.', 'Cameron Hanes'],
+  ['The best time to plant a tree was twenty years ago. The second best time is now.', 'Proverb'],
+  ['You don’t need a perfect day. You need a good first hour.', ''],
+  ['The version of you that you want to be is built in mornings like this one.', '']
+];
+const WORK_QUOTES = [
+  ['Volume negates luck.', 'Alex Hormozi'],
+  ['Make people an offer so good they would feel stupid saying no.', 'Alex Hormozi'],
+  ['Real artists ship.', 'Steve Jobs'],
+  ['Your time is limited, so don’t waste it living someone else’s life.', 'Steve Jobs'],
+  ['Creativity is just connecting things.', 'Steve Jobs'],
+  ['Learn to sell. Learn to build. If you can do both, you will be unstoppable.', 'Naval Ravikant'],
+  ['Play long-term games with long-term people.', 'Naval Ravikant'],
+  ['Make something people want.', 'Paul Graham'],
+  ['Do things that don’t scale.', 'Paul Graham'],
+  ['If you double the number of experiments you do per year, you’re going to double your inventiveness.', 'Jeff Bezos'],
+  ['The work you do while you procrastinate is probably the work you should be doing for the rest of your life.', 'Jessica Hische'],
   ['Focus is a matter of deciding what things you’re not going to do.', 'John Carmack'],
-  ['We are what we repeatedly do. Excellence, then, is not an act, but a habit.', 'Will Durant'],
-  ['Motivation is what gets you started. Habit is what keeps you going.', 'Jim Ryun'],
-  ['Lost time is never found again.', 'Benjamin Franklin']
+  ['Amateurs sit and wait for inspiration. The rest of us just get up and go to work.', 'Stephen King'],
+  ['Be so good they can’t ignore you.', 'Steve Martin'],
+  ['Ideas are easy. Implementation is hard.', 'Guy Kawasaki'],
+  ['Absorb what is useful, discard what is useless, and add what is specifically your own.', 'Bruce Lee'],
+  ['Nobody cares. Work harder.', 'Cameron Hanes'],
+  ['Slow is smooth, and smooth is fast.', 'Navy SEAL saying'],
+  ['Done is better than perfect.', 'Facebook office poster'],
+  ['One focused hour beats a distracted day.', ''],
+  ['Ship it, then make it better.', '']
 ];
 // small, human things for a good day — three a morning
 const MORNING_THOUGHTS = [
@@ -71,7 +87,7 @@ function dayNum(){ const d = new Date(), start = new Date(d.getFullYear(), 0, 0)
 function quoteOfDay(){ return MORNING_QUOTES[dayNum() % MORNING_QUOTES.length]; }
 function workQuoteOfDay(){ return WORK_QUOTES[dayNum() % WORK_QUOTES.length]; }
 function thoughtsOfDay(n){ const out = [], len = MORNING_THOUGHTS.length, d = dayNum(); for(let i=0;i<(n||3);i++) out.push(MORNING_THOUGHTS[(d*3 + i*5) % len]); return out.filter(function(x, i, a){ return a.indexOf(x)===i; }); }
-function quoteHtml(q, cls){ return '<figure class="qt '+(cls||'')+'"><span class="qt-mark">&ldquo;</span><blockquote>'+escapeHtml(q[0])+'</blockquote><figcaption><span class="qt-rule"></span>'+escapeHtml(q[1])+'</figcaption></figure>'; }
+function quoteHtml(q, cls){ return '<figure class="qt '+(cls||'')+'"><span class="qt-mark">&ldquo;</span><blockquote>'+escapeHtml(q[0])+'</blockquote>'+(q[1] ? '<figcaption><span class="qt-rule"></span>'+escapeHtml(q[1])+'</figcaption>' : '')+'</figure>'; }
 
 // ---- headlines (through the launcher; a public feed reader if the launcher can't) ----
 function morningNewsOn(){ return wakeCfg().news!==false; }
@@ -79,7 +95,7 @@ function parseRss(text){
   const xml = new DOMParser().parseFromString(text, 'text/xml');
   const chan = xml.querySelector('channel > title');
   const src = chan ? chan.textContent.replace(/\s*[:\-|].*$/, '').trim() : '';
-  return Array.prototype.slice.call(xml.querySelectorAll('item')).slice(0, 4).map(function(it){
+  return Array.prototype.slice.call(xml.querySelectorAll('item')).slice(0, 6).map(function(it){
     const t = it.querySelector('title'), l = it.querySelector('link');
     return {title:(t ? t.textContent : '').trim(), link:(l ? l.textContent : '').trim(), src:src};
   }).filter(function(x){ return x.title; });
@@ -102,7 +118,7 @@ async function loadMorningNews(){
     // an Operator still running last version's launcher has no /news — read the feed another way
     try{
       const res = await fetchWithin('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://feeds.npr.org/1001/rss.xml'), 8000);
-      if(res && res.ok){ const j = await res.json(); items = arr(j && j.items).slice(0, 4).map(function(x){ return {title:String(x.title||'').trim(), link:String(x.link||''), src:'NPR'}; }).filter(function(x){ return x.title; }); }
+      if(res && res.ok){ const j = await res.json(); items = arr(j && j.items).slice(0, 6).map(function(x){ return {title:String(x.title||'').trim(), link:String(x.link||''), src:'NPR'}; }).filter(function(x){ return x.title; }); }
     }catch(e){}
   }
   ui.morningNews = {date:today, loading:false, items:items && items.length ? items : null};
@@ -154,55 +170,92 @@ ACTIONS.dawnUp = function(){
   wakeImUp();
 };
 
-// ---- 2 the alarm: Snooze / Start your day ----
+// ---- the note from last night: a headline (on the alarm), a message for the morning, and one
+// for before work. Older notes were just one line — that line counts as the headline.
+function nightNote(date){
+  const ns = morningNotesFor(date || todayStr()), out = {headline:'', morning:'', work:''};
+  ns.forEach(function(n){
+    if(n.headline || n.morning || n.work){ if(n.headline) out.headline = n.headline; if(n.morning) out.morning = n.morning; if(n.work) out.work = n.work; }
+    else if(n.text) out.headline = out.headline ? out.headline+' · '+n.text : n.text;
+  });
+  return out;
+}
+// ---- 2 the alarm: Snooze / I'm up ----
 function wakeRingHtml(){
   const w = wakeCfg();
   const playing = wakeUsesMusic(w) && !(wakeRing && wakeRing.mediaFailed);
-  const q = quoteOfDay(), name = state.profile.name;
-  const ns = morningNotesFor(todayStr());
+  const q = quoteOfDay(), name = state.profile.name, nn = nightNote();
   return '<div class="wk2 wk3" data-sky="'+skyLook()+'">'+
     '<div class="wk2-aura"><i></i><i></i><i></i></div>'+
     '<div class="wk2-center">'+
       '<div class="wk2-greet">Good morning'+(name ? ', '+escapeHtml(name) : '')+(wakeRing && wakeRing.test ? ' <span class="tag">TEST</span>' : '')+'</div>'+
       '<div class="wk2-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</div>'+
       '<div class="wk3-date">'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</div>'+
+      (nn.headline ? '<div class="wk3-head">'+escapeHtml(nn.headline)+'</div>' : '')+
       '<div class="wk3-quote">'+quoteHtml(q, 'is-ring')+'</div>'+
-      (ns.length ? '<div class="wk2-note">&ldquo;'+escapeHtml(ns[ns.length-1].text)+'&rdquo;<span>You, last night</span></div>' : '')+
       '<div class="wk2-actions wk3-actions">'+
         '<button class="wk2-snooze" data-action="wakeSnooze">&#128164; Snooze '+(w.snoozeMinutes||9)+' min</button>'+
-        '<button class="wk2-up" data-action="wakeStartDay"><span>&#9728;&#65039; Start your day</span></button>'+
+        '<button class="wk2-up" data-action="wakeStartDay"><span>&#9728;&#65039; I’m up</span></button>'+
       '</div>'+
-      (wakeUsesMusic(w) ? '<div class="wk2-music'+(playing?' is-playing':'')+'">'+
-          (playing ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '')+
-          '<span class="wk2-song">'+escapeHtml(mediaName(w.media))+'</span><span class="wk2-src">'+(wakeRing && wakeRing.mediaFailed ? 'Starting the music…' : escapeHtml(mediaKindLabel(w.media)))+'</span>'+
-        '</div>' : '')+
+      (wakeUsesMusic(w) ? '<div class="wk2-music'+(playing?' is-playing':'')+'">'+(playing ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '')+
+          '<span class="wk2-song">'+escapeHtml(mediaName(w.media))+'</span></div>' : '')+
     '</div>'+
   '</div>';
 }
+// ---- snooze: a calm screen that counts down to the next ring ----
+function snoozeHtml(){
+  const sn = state.focus.snooze, left = sn ? Math.max(0, sn.ts - Date.now()) : 0, nn = nightNote();
+  return '<div class="snz">'+
+    '<div class="snz-moon"></div>'+
+    '<div class="snz-c">'+
+      '<div class="snz-k">&#128164; Snoozing</div>'+
+      '<div class="snz-left" id="snzLeft">'+formatElapsed(left)+'</div>'+
+      '<div class="snz-sub">Ringing again at '+(sn ? fmtTimeShort(sn.ts) : '')+'</div>'+
+      (nn.headline ? '<div class="snz-note">'+escapeHtml(nn.headline)+'</div>' : '')+
+    '</div>'+
+    '<div class="snz-acts"><button class="dawn-btn" data-action="snoozeUp">&#9728;&#65039; I’m up</button></div>'+
+  '</div>';
+}
+function tickSnooze(){ const el = document.getElementById('snzLeft'), sn = state.focus.snooze; if(el && sn) el.textContent = formatElapsed(Math.max(0, sn.ts - Date.now())); }
+ACTIONS.snoozeUp = function(){ state.focus.snooze = null; persist('focus'); wakeImUp(); };
 
-// ---- 3 Good morning ----
+// ---- 3 Good morning: everything on one screen ----
 // last night, from going to sleep (Wind down → Go to sleep) to getting up
 function lastNightSleep(){
   const h = state.modes.history.filter(function(m){ return m.sleep && m.endedAt && Date.now() - m.endedAt < 8*3600000 && m.minutes >= 60; }).sort(function(a, b){ return b.endedAt - a.endedAt; })[0];
   return h ? {minutes:h.minutes, from:h.startedAt, to:h.endedAt} : null;
 }
 function briefBase(){ return wakeCfg().intro!=='quick' ? 5600 : 3000; }
+// your morning playlist (Apple Music), one click — and it can follow the wake-up song by itself
+function morningPlaylist(){ const m = state.profile.morningPlaylist; return m && m.q ? m : null; }
+function playlistBtnHtml(){
+  const pl = morningPlaylist();
+  return pl ? '<button class="br-pl" data-action="playMorningPlaylist" title="Play '+escapeHtml(pl.q)+' in the Music app">&#9654; '+escapeHtml(pl.q)+'</button>'
+    : '<button class="br-pl is-unset" data-action="setMorningPlaylist" title="Pick a playlist for your mornings">&#9835; Morning playlist</button>';
+}
+ACTIONS.playMorningPlaylist = function(){ const pl = morningPlaylist(); if(!pl) return; musicApp('play', {type:'music', k:'playlist', q:pl.q}).then(function(ok){ if(!ok) showToast('Couldn\'t start '+pl.q+' — check the name in Settings → Sound.', {icon:'&#9888;'}); }); };
+ACTIONS.setMorningPlaylist = function(){
+  const v = window.prompt('Which Apple Music playlist should your mornings play? (its exact name)', ''); if(!v || !v.trim()) return;
+  state.profile.morningPlaylist = {q:v.trim(), k:'playlist'}; persist('profile');
+  if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto();
+  ACTIONS.playMorningPlaylist();
+};
 function wakeBriefHtml(){
   const today = todayStr(), name = state.profile.name || '';
   const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
-  const notes = morningNotesFor(today).map(function(n){ return n.text; });
-  const vb = masterVisionBoard();
+  const nn = nightNote(today);
   const q = quoteOfDay();
   const news = ui.morningNews && ui.morningNews.date===today ? ui.morningNews.items : null;
   const now = typeof wxNow==='function' ? wxNow() : null, phase = skyPhase(), win = dayWindow();
   const timeStr = new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
   const mNow = new Date().getHours()*60 + new Date().getMinutes();
   const plan = typeof todaysPlan==='function' ? todaysPlan().filter(function(t){ return t.status!=='done'; }) : [];
+  const vb = masterVisionBoard();
   // The page builds itself one piece at a time, with a line of narration typing above each piece
   // as it arrives. Delays are fixed when a piece first appears (re-renders keep the same node, so
   // nothing plays twice); skipping the intro shifts the whole schedule earlier.
   const cine = wakeCfg().intro!=='quick';
-  const base = briefBase(), gap = 1150;
+  const base = briefBase(), gap = 2300;
   const sunLine = mNow < win.rise ? 'The sun comes up at '+fmtMinOfDay(win.rise)+'.' : mNow < win.set ? 'The sun’s been up since '+fmtMinOfDay(win.rise)+'.' : '';
   const lines = [];
   let k = 0;
@@ -211,46 +264,44 @@ function wakeBriefHtml(){
     if(voice) lines.push({at: d - 380, text: voice});
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
-  // the hero: the weather and the sun — the first, biggest thing you see
   const slept = lastNightSleep();
-  const hero = panel('br-hero', 'br-a-blur', 'It’s '+timeStr+'.'+(now ? ' '+now.temp+'° and '+wxLabel(now.code).toLowerCase()+' outside.' : '')+(slept ? ' You got '+fmtDurationLabel(slept.minutes)+' of sleep.' : sunLine ? ' '+sunLine : ''),
-    '<div class="brh-wx">'+
-      '<span class="brh-i">'+(now ? wxIcon(wxKind(now.code), phase) : SKY_META[phase].icon)+'</span>'+
-      '<div>'+(now ? '<div class="brh-t">'+now.temp+'&deg;</div><div class="brh-l">'+escapeHtml(wxLabel(now.code))+'</div>' : '<div class="brh-l is-big">'+SKY_META[phase].label+'</div>')+
-        (now && now.hi!=null ? '<div class="brh-hl">High '+now.hi+'&deg; &middot; Low '+now.lo+'&deg;</div>' : '')+'</div>'+
-    '</div>'+
-    (function(){ const sl = lastNightSleep(); return sl ? '<div class="brh-sleep"><span class="brh-sleep-i">&#128564;</span><div><small>Slept</small><b>'+fmtDurationLabel(sl.minutes)+'</b><span>'+fmtTimeShort(sl.from)+' &rarr; '+fmtTimeShort(sl.to)+'</span></div></div>' : ''; })()+
-    '<div class="brh-sun">'+sunArcHtml({w:300, h:78, pad:10, r:5, animate:true})+
-      '<div class="brh-sun-row"><span><small>Sunrise</small>'+fmtMinOfDay(win.rise)+'</span><span class="brh-day">'+daylightLabel()+'</span><span><small>Sunset</small>'+fmtMinOfDay(win.set)+'</span></div>'+
-    '</div>');
-  const left = [], right = [];
-  if(notes.length) left.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+notes.map(function(t){ return '<div class="br-ln-text">'+escapeHtml(t)+'</div>'; }).join('')));
-  left.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q)));
-  left.push(panel('br-thoughts', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+
-    thoughtsOfDay(3).map(function(x, i){ return '<div class="br-th" style="--i:'+i+'"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')));
-  if(vb && vb.elements.length) right.push(panel('br-vision', 'br-a-scale', 'And this is what it’s all for.', '<span class="br-vision-k">&#127775; Vision</span>'+boardStaticHtml(vb, 'wake-board')+'<span class="br-vision-hint">Click to open</span>', '', ' data-action="wakeBoardToggle" title="Open your vision board"'));
+  // column 1: the weather and the sun (and how you slept), then your note
+  const colA = [], colB = [], colC = [];
+  colA.push(panel('br-hero', 'br-a-blur', 'It’s '+timeStr+'.'+(now ? ' '+now.temp+'° and '+wxLabel(now.code).toLowerCase()+' outside.' : '')+(slept ? ' You got '+fmtDurationLabel(slept.minutes)+' of sleep.' : sunLine ? ' '+sunLine : ''),
+    '<div class="brh-top"><div class="brh-wx"><span class="brh-i">'+(now ? wxIcon(wxKind(now.code), phase) : SKY_META[phase].icon)+'</span>'+
+      '<div>'+(now ? '<div class="brh-t">'+now.temp+'&deg;</div><div class="brh-l">'+escapeHtml(wxLabel(now.code))+(now.hi!=null ? ' <span>&middot; H '+now.hi+'&deg; L '+now.lo+'&deg;</span>' : '')+'</div>' : '<div class="brh-l is-big">'+SKY_META[phase].label+'</div>')+'</div></div>'+
+      (slept ? '<div class="brh-sleep"><small>Slept</small><b>'+fmtDurationLabel(slept.minutes)+'</b><span>'+fmtTimeShort(slept.from)+' &rarr; '+fmtTimeShort(slept.to)+'</span></div>' : '')+'</div>'+
+    '<div class="brh-sun">'+sunArcHtml({w:300, h:64, pad:8, r:4.5, animate:true})+
+      '<div class="brh-sun-row"><span><small>Sunrise</small>'+fmtMinOfDay(win.rise)+'</span><span class="brh-day">'+daylightLabel()+'</span><span><small>Sunset</small>'+fmtMinOfDay(win.set)+'</span></div></div>'));
+  if(nn.headline || nn.morning) colA.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+
+    (nn.headline ? '<div class="br-ln-head">'+escapeHtml(nn.headline)+'</div>' : '')+(nn.morning ? '<div class="br-ln-text">'+escapeHtml(nn.morning)+'</div>' : '')));
+  else if(vb && vb.elements.length) colA.push(panel('br-vision', 'br-a-scale', 'And this is what it’s all for.', boardStaticHtml(vb, 'wake-board'), '', ' data-action="wakeBoardToggle" title="Open your vision board"'));
+  // column 2: a line to carry, and a few small things for a good day
+  colB.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q)));
+  colB.push(panel('br-thoughts', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+
+    thoughtsOfDay(4).map(function(x, i){ return '<div class="br-th" style="--i:'+i+'"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')));
+  // column 3: the world, then the day ahead
   if(news){
-    // headlines that came in after the page started get their own turn instead of popping in
     const d0 = base + k*gap, late = ui.briefNewsAt ? Math.max(600, d0 - (ui.briefNewsAt - (ui.briefT0||0))) : null;
-    right.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there.', '<div class="br-k">&#128240; Headlines'+(news[0].src ? ' <span class="br-src">'+escapeHtml(news[0].src)+'</span>' : '')+'</div>'+
-      news.slice(0, 4).map(function(n){ return '<button class="br-news-i" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+escapeHtml(n.title)+'</span><i>&#8599;</i></button>'; }).join(''), late!=null ? ';--late:'+late+'ms' : ''));
+    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there.', '<div class="br-k">&#128240; The News'+(news[0].src ? ' <span class="br-src">'+escapeHtml(news[0].src)+'</span>' : '')+'</div>'+
+      news.slice(0, 6).map(function(n, i){ return '<button class="br-news-i'+(i===0?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+escapeHtml(n.title)+'</span><i>&#8599;</i></button>'; }).join(''), late!=null ? ';--late:'+late+'ms' : ''));
   } else if(morningNewsOn() && ui.morningNews && ui.morningNews.loading){
-    right.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+(base + k*gap)+'ms"><div class="br-k">&#128240; Headlines</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');
+    colC.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+(base + k*gap)+'ms"><div class="br-k">&#128240; The News</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');
   }
-  // the day ahead — small, just the shape of it
   const dayBits = [];
-  if(events.length) dayBits.push(events.length===1 ? 'One thing on the calendar' : events.length+' things on the calendar');
+  if(events.length) dayBits.push(events.length===1 ? 'one thing on the calendar' : events.length+' things on the calendar');
   if(plan.length) dayBits.push(plan.length===1 ? 'one thing planned' : plan.length+' things planned');
-  right.push(panel('br-day', 'br-a-right', dayBits.length ? 'Later today: '+dayBits.join(', ')+'. No rush.' : 'Nothing on the calendar. The day’s yours.',
+  colC.push(panel('br-day', 'br-a-right', dayBits.length ? 'Later today: '+dayBits.join(', ')+'.' : 'Nothing on the calendar. The day’s yours.',
     '<div class="br-k">&#128197; The Day Ahead</div>'+
-    (events.length ? '<div class="br-agenda">'+events.slice(0, 4).map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b>'+escapeHtml(e.title)+'</div>'; }).join('')+'</div>' : '')+
-    (plan.length ? '<div class="br-day-plan">'+(plan.length===1 ? 'One thing' : plan.length+' things')+' planned for work. First up: <b>'+escapeHtml(plan[0].title)+'</b></div>' : '')+
+    (events.length ? '<div class="br-agenda">'+events.slice(0, 3).map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b>'+escapeHtml(e.title)+'</div>'; }).join('')+'</div>' : '')+
+    (plan.length ? '<div class="br-day-plan">'+(plan.length===1 ? 'One thing' : plan.length+' things')+' planned. First up: <b>'+escapeHtml(plan[0].title)+'</b></div>' : '')+
     (!events.length && !plan.length ? '<div class="br-day-plan">Nothing scheduled. Enjoy it.</div>' : '')));
   const ctaD = base + k*gap;
   lines.push({at: ctaD - 380, text: 'Get ready to start your day.'});
   ui.briefLines = lines;
   const shift = ui.briefShift || 0;
-  return '<div class="brief brief2 brief3'+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
+  const w = wakeCfg(), song = (wakeFinishing || wakeAudio || wakeMusicApp) && w.media ? mediaName(w.media) : '';
+  return '<div class="brief brief2 brief3 brief4'+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
     (cine
       ? '<div class="brief-intro is-cinematic" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div>'+
           '<div class="bi-time">'+timeStr+'</div>'+
@@ -258,15 +309,14 @@ function wakeBriefHtml(){
           '<div class="bi-line">'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</div></div>'
       : '<div class="brief-intro" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div><div class="bi-word">Good morning</div>'+(name ? '<div class="bi-name">'+escapeHtml(name)+'</div>' : '')+'</div>')+
     '<div class="brief-grid-bg"></div>'+
-    '<div class="brief-inner">'+
+    '<div class="brief-inner b4">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
+        '<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+playlistBtnHtml()+'</span>'+
         // one button: Skip while it's still building, then ✕ to close
         (ui.briefSkipped ? '<button class="brief-x" data-action="wakeBriefDone" title="Close">&#10005;</button>' : '<button class="brief-skipall" data-action="briefSkip" title="Show everything now">Skip &#9197;</button>')+'</div>'+
       '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
       '<div class="br-voice br-p br-a-fade" style="--d:'+(base-700)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
-      '<div class="brief-music-slot">'+wakeMusicPillHtml()+'</div>'+
-      hero+
-      '<div class="brief2-cols"><div class="brief2-col is-left">'+left.join('')+'</div><div class="brief2-col is-right">'+right.join('')+'</div></div>'+
+      '<div class="b4-grid"><div class="b4-col">'+colA.join('')+'</div><div class="b4-col">'+colB.join('')+'</div><div class="b4-col">'+colC.join('')+'</div></div>'+
       '<div class="brief-cta br-p br-a-rise" data-k="'+k+'" style="--d:'+ctaD+'ms">'+
         '<button class="brief-go brief-morning" data-action="wakeStartMorning">&#9728;&#65039; Start My Morning</button>'+
       '</div>'+
@@ -293,7 +343,9 @@ function briefVoiceRun(){
     const lines = ui.briefLines || [], t = Date.now() - (ui.briefT0||0);
     let cur = null; lines.forEach(function(l){ if(t >= l.at) cur = l; });
     if(ui.briefSkipped && lines.length) cur = lines[lines.length-1];
-    const txt = cur ? (ui.briefSkipped ? cur.text : cur.text.slice(0, Math.max(0, Math.floor((t - cur.at)/30)))) : '';
+    // a word at a time, at a calm reading pace (it used to type letter by letter, too fast)
+    const words = cur ? cur.text.split(' ') : [];
+    const txt = cur ? (ui.briefSkipped ? cur.text : words.slice(0, Math.max(0, Math.floor((t - cur.at)/240) + 1)).join(' ')) : '';
     if(el.textContent!==txt) el.textContent = txt;
     const wrap = el.parentNode; if(wrap) wrap.classList.toggle('is-typing', !!cur && txt.length < cur.text.length);
     // as the narration reaches each piece, bring it into view if it's below the fold
@@ -303,19 +355,20 @@ function briefVoiceRun(){
       const target = document.querySelector('#wakeContent .br-p[data-k="'+idx+'"]');
       if(target) setTimeout(function(){ target.scrollIntoView({block:'nearest', behavior:'smooth'}); }, 400);
     }
-  }, 30);
+  }, 120);
 }
 ACTIONS.briefSkip = function(){ ui.wakeIntroDone = true; ui.briefSkipped = true; renderWakeOverlayInto(); };
 
 // ---- 5 Start work: the work intro, then straight into Lock in ----
-function clockIn(){
+function clockIn(opts){
+  opts = opts || {};
   const m = state.modes.active;
   if(m && (m.morning || (m.type==='offtime' && !m.sleep))) finishActiveMode(true);
   if(typeof applyNightPlanAuto==='function') applyNightPlanAuto();
   ui.view = 'today'; renderView();
   ui.planReveal = {at:Date.now()};
   showOverlay('planOverlay'); renderPlanRevealInto();
-  playWorkIntro();
+  if(!opts.quiet) playWorkIntro();
 }
 ACTIONS.clockIn = function(){ clockIn(); };
 ACTIONS.closePlanReveal = function(){ ui.planReveal = null; hideOverlay('planOverlay'); renderView(); };
@@ -349,25 +402,27 @@ function renderPlanReveal(){
   const q = workQuoteOfDay();
   const stats = workStats();
   const target = state.standards.deepWorkTargetMinutes || 180;
-  let d = 900;
-  const at = function(step){ const v = d; d += step||260; return 'animation-delay:'+v+'ms'; };
+  // quick and calm: everything is in within about a second
+  let d = 220;
+  const at = function(step){ const v = d; d += Math.round((step||260)/3); return 'animation-delay:'+v+'ms'; };
   return '<div class="wi">'+
     '<div class="wi-top"><span class="pr-badge">&#128339; Clocked In</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
+      '<span class="wi-pl">'+playlistBtnHtml()+'</span>'+
       '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
     '<div class="wi-inner">'+
-      '<div class="wi-k" style="animation-delay:200ms">Work Mode</div>'+
-      '<h1 class="wi-h" style="animation-delay:420ms">Let’s get to work'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
+      '<div class="wi-k" style="animation-delay:40ms">Work Mode</div>'+
+      '<h1 class="wi-h" style="animation-delay:100ms">Let’s get to work'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
       '<div class="wi-stats">'+stats.map(function(s){ return '<div class="wi-stat" style="'+at(140)+'"><div class="wi-stat-k">'+s.k+'</div><div class="wi-stat-v">'+s.v+'</div>'+(s.pct!=null ? '<div class="wi-bar"><i style="width:'+s.pct.toFixed(1)+'%"></i></div>' : '')+'<div class="wi-stat-s">'+escapeHtml(s.sub)+'</div></div>'; }).join('')+'</div>'+
       '<div class="wi-cols">'+
         '<div class="wi-plan" style="'+at(300)+'"><div class="wi-sec">Plan of Attack <span>'+(plan.length ? plan.length+(plan.length===1?' thing':' things') : '')+'</span></div>'+
-          (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(d + i*160)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">Due today</span>' : '')+'</li>'; }).join('')+'</ol>'
+          (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(d + i*60)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">Due today</span>' : '')+'</li>'; }).join('')+'</ol>'
             : '<div class="wd-empty">Nothing planned yet. Pick your first move in Lock in.</div>')+
           (events.length ? '<div class="wi-cal">'+events.slice(0, 3).map(function(e){ return '<span><b>'+fmt12Hour(e.time)+'</b>'+escapeHtml(e.title)+'</span>'; }).join('')+'</div>' : '')+
         '</div>'+
-        '<div class="wi-side" style="'+at(300)+'">'+quoteHtml(q, 'is-work')+
+        '<div class="wi-side" style="'+at(300)+'">'+(nightNote().work ? '<div class="wi-note"><span>&#127769; You told yourself</span><p>'+escapeHtml(nightNote().work)+'</p></div>' : '')+quoteHtml(q, 'is-work')+
           '<div class="wi-target"><span>Today’s target</span><b>'+fmtHours(target)+'</b><span>of deep work</span></div></div>'+
       '</div>'+
-      '<div class="pr-cta" style="animation-delay:'+(d + plan.length*160 + 200)+'ms">'+
+      '<div class="pr-cta" style="animation-delay:420ms">'+
         '<button class="ls-go pr-go" data-action="planLockIn"'+(first ? ' data-id="'+first.id+'"' : '')+'><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>'+
         (first ? '<div class="ls-go-sub">First up: '+escapeHtml(first.title)+'</div>' : '')+
         '<button class="pr-later" data-action="closePlanReveal">Not yet</button>'+

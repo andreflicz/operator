@@ -2879,3 +2879,70 @@
   .streak-dot-broken, .lc-next-ready, .cc2-avatar.ring-red, .goals-title-glow, .activity-pill[data-state="break"], .ls-go{ animation:none !important; }
   .streak-dot-broken{ box-shadow:0 0 10px 2px rgba(232,99,107,.45); } .cc2-avatar.ring-red{ box-shadow:0 0 0 2px var(--panel), 0 0 0 4px var(--danger), 0 0 12px rgba(232,99,107,.35); }
   .lc-next-ready{ box-shadow:0 0 14px 2px rgba(63,190,142,.35); }
+  /* ---------- Good morning on one screen ---------- */
+  #wakeOverlay:has(.brief4){ overflow:hidden !important; }
+  .brief4{ height:100vh; overflow:hidden; }
+  .brief4 .brief-inner.b4{ height:100vh; max-width:1320px; padding:clamp(16px, 2.6vh, 30px) clamp(20px, 3vw, 44px) clamp(14px, 2.2vh, 26px); display:flex; flex-direction:column; }
+  .brief4 .brief-top{ flex:none; display:flex; align-items:center; gap:10px; }
+  .b4-music{ margin-left:auto; display:flex; align-items:center; gap:8px; }
+  .b4-song{ display:inline-flex; align-items:center; gap:9px; height:30px; padding:0 6px 0 12px; border-radius:999px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); font-size:13px; font-weight:600; letter-spacing:0; text-transform:none; color:#fff; max-width:260px; }
+  .b4-song .wk2-eq{ height:12px; flex:none; }
+  .b4-stop{ border:none; background:rgba(255,255,255,.1); color:rgba(255,255,255,.75); width:20px; height:20px; border-radius:50%; font-size:9px; cursor:pointer; flex:none; }
+  .br-pl{ height:30px; padding:0 13px; border-radius:999px; border:1px solid rgba(255,197,107,.35); background:rgba(255,197,107,.08); color:#ffd08a; font-size:12.5px; font-weight:700; cursor:pointer; letter-spacing:0; text-transform:none; white-space:nowrap; }
+  .br-pl:hover{ background:rgba(255,197,107,.16); } .br-pl.is-unset{ color:rgba(255,255,255,.6); border-color:rgba(255,255,255,.16); background:transparent; }
+  .brief4 .brief-hello{ flex:none; font-size:clamp(40px, 6.4vh, 74px); margin:clamp(6px, 1.4vh, 16px) 0 4px; text-shadow:0 2px 30px rgba(255,170,90,.25); }
+  .brief4 .br-voice{ flex:none; font-size:clamp(16px, 2.2vh, 21px); color:#bfe6ff; font-weight:600; min-height:30px; }
+  .b4-grid{ flex:1; min-height:0; display:grid; grid-template-columns:1.15fr 1fr 1fr; gap:clamp(10px, 1.4vh, 16px); margin-top:clamp(8px, 1.6vh, 18px); }
+  .b4-col{ display:flex; flex-direction:column; gap:clamp(10px, 1.4vh, 16px); min-height:0; }
+  .b4-col > .br-p{ min-height:0; overflow:hidden; }
+  .brief4 .br-p:not(.brief-top):not(.brief-hello):not(.br-voice):not(.brief-cta){ padding:clamp(12px, 1.8vh, 20px) clamp(14px, 1.4vw, 22px) !important; }
+  .brief4 .br-hero{ flex:none; display:flex; flex-direction:column; gap:12px; margin:0 !important; }
+  .brh-top{ display:flex; align-items:center; justify-content:space-between; gap:14px; }
+  .brief4 .brh-i{ font-size:clamp(34px, 5vh, 50px); } .brief4 .brh-t{ font-size:clamp(42px, 6.4vh, 64px); font-weight:300; }
+  .brief4 .brh-l{ font-size:15px; font-weight:600; color:#fff; } .brief4 .brh-l span{ font-weight:500; color:rgba(255,255,255,.55); }
+  .brief4 .brh-sleep{ border:none; padding:0; text-align:right; } .brief4 .brh-sleep b{ font-size:clamp(22px, 3vh, 28px); }
+  .brief4 .brh-sun{ align-items:stretch; } .brief4 .brh-sun .sun-arc{ width:100%; height:auto; max-width:none; } .brief4 .brh-sun-row{ width:auto; max-width:none; font-size:15px; }
+  .brief4 .br-lastnight, .brief4 .br-vision{ flex:1; }
+  .br-ln-head{ font-family:var(--font-display); font-size:clamp(20px, 2.8vh, 28px); font-weight:800; line-height:1.2; color:#fff; letter-spacing:-.01em; }
+  .br-ln-head + .br-ln-text{ margin-top:8px; font-size:clamp(15px, 2vh, 18px); font-weight:500; color:rgba(255,255,255,.82); font-family:inherit; }
+  .brief4 .br-quote{ flex:none; } .brief4 .qt blockquote{ font-size:clamp(18px, 2.5vh, 24px); color:#fff; line-height:1.45; }
+  .brief4 .br-thoughts{ flex:1; } .brief4 .br-th{ padding:clamp(6px, 1vh, 11px) 0; } .brief4 .br-th b{ color:#fff; font-size:15px; }
+  .brief4 .br-news{ flex:1; } .br-news-i.is-top span{ font-weight:700; color:#fff; font-size:15px; }
+  .brief4 .br-news-i{ padding:clamp(6px, 1vh, 9px) 0; font-size:14px; color:rgba(255,255,255,.88); }
+  .brief4 .br-day{ flex:none; }
+  .brief4 .br-k{ color:rgba(255,255,255,.62); }
+  .brief4 .brief-cta{ flex:none; margin-top:clamp(10px, 1.8vh, 20px); }
+  .brief4 .brief-go.brief-morning{ font-size:19px; padding:15px 38px; }
+  @media (max-width:1000px){ .b4-grid{ grid-template-columns:1fr 1fr; } .b4-col:nth-child(3){ display:none; } }
+  /* Start my morning: Good morning lifts away */
+  .brief.is-leaving{ animation:b4Leave .52s cubic-bezier(.5,0,.2,1) forwards; }
+  @keyframes b4Leave{ to{ opacity:0; transform:translateY(-18px) scale(1.015); filter:blur(4px); } }
+  .wi{ animation:wiIn .6s cubic-bezier(.2,.8,.2,1) both; } @keyframes wiIn{ from{ opacity:0; transform:translateY(14px); } }
+  .wi-pl{ margin-left:auto; margin-right:10px; }
+  .wi-note{ padding:12px 14px; border-radius:14px; background:rgba(126,140,255,.1); border:1px solid rgba(160,170,255,.22); }
+  .wi-note span{ font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#b9c0ff; } .wi-note p{ margin:6px 0 0; font-size:15.5px; font-weight:600; line-height:1.4; color:#fff; }
+  /* the alarm: last night's headline */
+  .wk3-head{ max-width:640px; margin:6px auto 0; padding:0 20px; font-family:var(--font-display); font-size:clamp(20px, 2.6vw, 30px); font-weight:800; line-height:1.2; color:#fff; text-align:center; text-shadow:0 2px 24px rgba(0,0,0,.4); }
+  /* snooze: a calm, dim screen that eases in */
+  .snz{ position:absolute; inset:0; overflow:hidden; color:#fff; background:radial-gradient(ellipse at 50% 120%, #1b1640 0%, #08081a 55%, #030308 100%); animation:snzIn 1.2s ease both; }
+  @keyframes snzIn{ from{ opacity:0; filter:blur(8px); } }
+  .snz-moon{ position:absolute; left:50%; top:22%; width:120px; height:120px; margin-left:-60px; border-radius:50%; background:radial-gradient(circle at 35% 35%, #e9ecff, #aab3e8 60%, #7d86c4); box-shadow:0 0 80px rgba(170,180,255,.25); opacity:.85; animation:snzMoon 1.6s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes snzMoon{ from{ opacity:0; transform:translateY(30px); } }
+  .snz-c{ position:relative; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding-top:12vh; text-align:center; }
+  .snz-k{ font-size:12px; font-weight:800; letter-spacing:.24em; text-transform:uppercase; color:rgba(200,205,255,.6); }
+  .snz-left{ font-family:var(--font-display); font-size:clamp(70px, 11vw, 140px); font-weight:200; letter-spacing:-.03em; line-height:1; font-variant-numeric:tabular-nums; color:rgba(255,255,255,.9); }
+  .snz-sub{ font-size:15px; color:rgba(255,255,255,.5); }
+  .snz-note{ margin-top:16px; max-width:520px; font-size:18px; font-weight:600; color:rgba(255,255,255,.8); }
+  .snz-acts{ position:absolute; left:0; right:0; bottom:44px; display:flex; justify-content:center; }
+  /* Wind down: the note in three parts */
+  .wd-nf{ display:grid; grid-template-columns:200px 1fr; gap:14px; align-items:start; margin-bottom:12px; }
+  .wd-nf label span{ display:block; font-weight:700; font-size:14.5px; } .wd-nf label small{ font-size:12px; color:rgba(255,255,255,.5); }
+  .wd-nf-head{ font-size:18px !important; font-weight:700; }
+  .wd-note-item div{ flex:1; display:flex; flex-direction:column; gap:3px; } .wd-note-item b{ font-size:16px; } .wd-note-item div span{ font-size:13.5px; color:rgba(255,255,255,.7); }
+  @media (max-width:700px){ .wd-nf{ grid-template-columns:1fr; gap:6px; } }
+  .brief4 .brh-sleep{ display:flex; flex-direction:column; align-items:flex-end; gap:1px; white-space:nowrap; }
+  .brief4 .brh-sleep small{ font-size:10.5px; font-weight:700; letter-spacing:.14em; color:rgba(255,255,255,.45); }
+  .brief4 .brh-sleep span{ font-size:12px; }
+  .brief4 .brh-hl{ font-size:12.5px; color:rgba(255,255,255,.55); margin-top:2px; white-space:nowrap; }
+  .wi-inner > *, .wi-stat, .wi-plan, .wi-side, .wi .pr-row, .wi .pr-cta{ animation-duration:.45s !important; }
+  .wi-h{ animation-duration:.6s !important; }

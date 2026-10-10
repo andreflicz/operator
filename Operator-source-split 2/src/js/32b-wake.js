@@ -247,7 +247,9 @@ function finishWakeMedia(){
     a.loop = false; wakeFinishing = true;
     a.addEventListener('ended', function(){ if(wakeAudio===a) stopWakeMedia(true); wakeFinishing = false; if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); }, {once:true});
   }
-  if(wakeMusicApp){ wakeFinishing = true; wakeMusicApp = false; musicApp('finish'); }
+  const pl = typeof morningPlaylist==='function' && state.profile.morningPlaylistAuto!==false ? morningPlaylist() : null;
+  if(wakeMusicApp){ wakeFinishing = true; wakeMusicApp = false; helperFetch(MUSIC_URL+'finish'+(pl ? '?k=playlist&q='+hexUtf8(pl.q) : ''), 4000); }
+  else if(a && pl){ a.addEventListener('ended', function(){ musicApp('play', {type:'music', k:'playlist', q:pl.q}); }, {once:true}); }
 }
 ACTIONS.wakeStopMusic = function(){
   const m = wakeCfg().media;
@@ -324,18 +326,26 @@ function endBriefing(){
   renderView();
 }
 // Start my morning: off the screen and into Morning mode (routine, note, plan) until you're ready to work.
-ACTIONS.wakeStartMorning = function(){ const t = ui.wakeBriefTest; endBriefing(); if(t){ showToast('Test done — this is where Morning mode starts.', {icon:'&#9728;&#65039;'}); return; } startMorning(); };
-ACTIONS.wakeBriefDone = function(){ const t = ui.wakeBriefTest; endBriefing(); showToast(t ? 'Test done — that\'s how your mornings will look.' : 'Let\'s get it.', {icon:'&#9728;&#65039;'}); };
+// Start my morning → the business preview (the same screen as Clock in): Lock in from there, or ✕ to the app
+ACTIONS.wakeStartMorning = function(){
+  // a short, quiet hand-off: Good morning lifts away and the business preview rises in its place
+  const b = document.querySelector('#wakeContent .brief'); if(b) b.classList.add('is-leaving');
+  setTimeout(function(){ endBriefing(); clockIn({quiet:true, from:'morning'}); }, 520);
+};
+ACTIONS.wakeBriefDone = function(){ endBriefing(); };
 ACTIONS.wakeBriefLockIn = function(el, e, id){ endBriefing(); if(id) setNextUp(id); renderView(); openLockInChooser(); };
 ACTIONS.wakeClockIn = function(){ const t = ui.wakeBriefTest; endBriefing(); if(t){ showToast('Test done — this is where Clock in shows your plan.', {icon:'&#128339;'}); return; } clockIn(); };
 ACTIONS.wakeBoardToggle = function(){ ui.wakeBoardBig = !ui.wakeBoardBig; renderWakeOverlayInto(); };
 function wakeSnooze(){
   const mins = wakeCfg().snoozeMinutes||9;
   const test = wakeRing && wakeRing.test;
-  stopWakeRing();
+  clearInterval(wakeBeepTimer); wakeBeepTimer = null;
+  stopWakeMedia(false);
+  wakeRing = null;
   state.focus.snooze = {ts:Date.now()+mins*60000, wake:true, test:test};
-  persist('focus'); renderView();
-  showToast('Snoozed — ringing again at '+fmt12Hour(nowHM(new Date(Date.now()+mins*60000))), {icon:'&#128164;'});
+  persist('focus');
+  // the screen stays, dimmed, counting down to the next ring
+  ui.wakeMode = 'snooze'; renderWakeOverlayInto();
 }
 ACTIONS.wakeImUp = function(){ wakeImUp(); };
 ACTIONS.wakeStartDay = function(){ wakeImUp(); };
@@ -353,7 +363,7 @@ function wakeWeatherLine(){
   return now ? wxIcon(wxKind(now.code), skyPhase())+' '+now.temp+'&deg; '+escapeHtml(wxLabel(now.code).toLowerCase())+(now.hi!=null ? ' &middot; high '+now.hi+'&deg;' : '') : '';
 }
 // the alarm, Good morning and the dawn before it are drawn in 32n-morning.js
-function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : ui.wakeMode==='dawn' ? dawnHtml() : wakeRingHtml(); }
+function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : ui.wakeMode==='dawn' ? dawnHtml() : ui.wakeMode==='snooze' ? snoozeHtml() : wakeRingHtml(); }
 function renderWakeOverlayInto(){
   const el = document.getElementById('wakeContent'); if(!el) return;
   morphInto(el, renderWakeScreen());
@@ -364,7 +374,7 @@ function renderWakeOverlayInto(){
     if(!overlayOpen('wakeOverlay')){ clearInterval(wakeClockTimer); return; }
     const c = document.getElementById('wakeClock');
     if(c) c.textContent = new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'});
-    if(ui.wakeMode==='dawn') tickDawn();
+    if(ui.wakeMode==='dawn') tickDawn(); else if(ui.wakeMode==='snooze') tickSnooze();
   }, 1000);
 }
 registerModal('wakeOverlay', renderWakeOverlayInto);
