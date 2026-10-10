@@ -43,7 +43,8 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     check('going to sleep goes straight to Sleep mode', await E("state.modes.active && state.modes.active.sleep") && !(await p.isVisible('#recapOverlay:not(.hidden)')) && !(await p.isVisible('#windOverlay:not(.hidden)')));
     // morning
     await p.clock.setSystemTime(new Date(2026,9,10,7,0,5).getTime()); await E("checkAllAlarms()"); await p.waitForTimeout(400);
-    check('the alarm shows last night\'s note', await p.isVisible('.wk2-note') && /Call Mike first/.test(await p.textContent('.wk2-note')));
+    // round 13: the note's headline sits big on the alarm screen (.wk3-head, was .wk2-note)
+    check('the alarm shows last night\'s note', await p.isVisible('.wk3-head') && /Call Mike first/.test(await p.textContent('.wk3-head')));
     await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(300);
     check('cinematic intro (setting) plays', await p.isVisible('.brief-intro.is-cinematic'));
     check('the plan lined itself up: #1 is up next', await E("state.focus.lineupOrder[0]")==='e' && await E("state.focus.nextTaskId")==='e' && await E("state.tasks.items.find(t=>t.id==='e').status")==='today');
@@ -51,16 +52,25 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     await p.waitForTimeout(4500);
     check('briefing doesn\'t pop in twice (same nodes after the intro)', await h.evaluate(n => n.isConnected));
     const brief = await p.textContent('#wakeOverlay');
-    check('briefing: the note and the day ahead (the plan waits for Start work)', /The Day Ahead/i.test(brief) && /Call Mike first/.test(brief));
+    // round 13: "The Day Ahead" is now "Today", and the brief has no work in it at all
+    check('briefing: the note and today (the plan waits for the business preview)', /Today/.test(await p.textContent('.br-day .br-k')) && /Call Mike first/.test(brief) && !/Call Mike back|Edit JJS reel 3/.test(brief));
     await E("ACTIONS.wakeIntroSkip()");
-    await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(300);
-    check('Start my morning → Morning mode with a routine, the note and the plan', await E("state.modes.active && state.modes.active.morning") && await p.isVisible('.mm-card') && /Call Mike first/.test(await p.textContent('#viewRoot')) && /Breakfast/.test(await p.textContent('#viewRoot')));
+    // round 13: Start my morning hands off (520 ms leave animation) to the business preview, not Morning mode
+    await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(900);
+    check('Start my morning → the business preview (no Morning mode)', !(await E("state.modes.active && state.modes.active.morning")) && !(await p.isVisible('#wakeOverlay:not(.hidden)')) && await p.isVisible('#planOverlay:not(.hidden) .wi-plan') && !(await p.isVisible('.mm-card')));
+    const plan = await p.$$eval('#planOverlay .pr-list .pr-t', e => e.map(x => x.textContent));
+    check('…its Plan of Attack is last night\'s plan, #1 first', plan[0]==='Call Mike back' && plan[1]==='Edit JJS reel 3', plan);
+    check('…no "Not yet" — the corner ✕ closes it', await p.isVisible('#planOverlay .wd-close[data-action="closePlanReveal"]') && !/Not yet/.test(await p.textContent('#planOverlay')));
+    await p.click('#planOverlay .pr-go'); await p.waitForTimeout(300);
+    check('LOCK IN → Lock In on #1', !(await E("state.modes.active")) && !(await p.isVisible('#planOverlay:not(.hidden)')) && await p.isVisible('#lockSeqOverlay:not(.hidden)') && await E("ui.lockSeq.nowId")==='e');
+    // Morning mode still exists for the other ways in (no button on the Good morning any more)
+    await E("closeLockSeq(); ACTIONS.startMorning()"); await p.waitForTimeout(300);
+    check('Morning mode: a routine and the note', await E("!!(state.modes.active && state.modes.active.morning)") && await p.isVisible('.mm-card') && /Call Mike first/.test(await p.textContent('#viewRoot')) && /Breakfast/.test(await p.textContent('#viewRoot')));
     await p.click('.mm-r-main >> nth=0'); await p.waitForTimeout(100);
     check('tick a routine step', (await E("state.focus.routineDone.ids.length"))===1);
     check('auto lock-in stays paused in the morning', await E("autoLockInBlockedReason()")==='mode');
-    await p.click('[data-action="clockIn"]'); await p.waitForTimeout(300);
-    await p.click('#planOverlay .pr-go'); await p.waitForTimeout(300);
-    check('Clock in → the plan → Lock In on #1', !(await E("state.modes.active")) && await p.isVisible('#lockSeqOverlay:not(.hidden)') && await E("ui.lockSeq.nowId")==='e');
+    await p.click('.mm-clockin[data-action="clockIn"]'); await p.waitForTimeout(300);
+    check('Start Work ends Morning mode and opens the business preview', !(await E("state.modes.active")) && await p.isVisible('#planOverlay:not(.hidden) .pr-go'));
     check('no errors (day loop)', !p.errors.length, p.errors);
     await p.context().close();
   }

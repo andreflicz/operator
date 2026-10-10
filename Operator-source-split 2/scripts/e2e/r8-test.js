@@ -72,8 +72,9 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
         {id:'cv2', contactId:'k1', lastMessageDate:NOW-7200000, lastMessageDirection:'inbound', lastMessageType:'TYPE_EMAIL'}]});
       return json({error:'unknown'}, 404);
     });
-    await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="integrations"]'); await p.waitForTimeout(150);
-    check('Settings → Integrations has GoHighLevel, with setup steps', /GoHighLevel/.test(await p.textContent('#viewRoot')) && await p.isVisible('#ghlKey') && /Private Integrations/.test(await p.textContent('.ghl-steps')));
+    await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="system"]'); await p.waitForTimeout(150);
+    // round 13: Integrations lives inside the "Connections & Data" group
+    check('Settings → Connections & Data → Integrations has GoHighLevel, with setup steps', /GoHighLevel/.test(await p.textContent('#viewRoot')) && await p.isVisible('#ghlKey') && /Private Integrations/.test(await p.textContent('.ghl-steps')));
     await p.fill('#ghlKey', 'pit-secret-123'); await p.fill('#ghlLoc', 'LOC123');
     await p.click('[data-action="ghlConnect"]'); await p.waitForTimeout(400);
     check('the key goes to the Operator app on the Mac — not into Operator\'s data', calls.includes('save:pit-secret-123') && !(await E("JSON.stringify(state)")).includes('pit-secret-123'));
@@ -111,8 +112,11 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const face = await p.textContent('#clientModalContent');
     check('a client opens on a simple card: health, name, plan + deliverables, how we got them, how long, notes', /JJS Fitness/.test(face) && /Growth/.test(face) && /Reels/.test(face) && /Meta Ads/.test(face) && /months/.test(face) && /Call on Fridays/.test(face) && await p.isVisible('#clientModalContent .health-pill'));
     check('…with nothing to edit on the face', !(await p.$('#clientModalContent input, #clientModalContent textarea')));
-    await p.click('[data-action="clientFlip"][data-id="back"]'); await p.waitForTimeout(300);
-    check('Edit flips it over to everything you can change', await p.isVisible('#clientModalNotes') && await p.isVisible('.client-name-input'));
+    // round 13: no flip — the modal has sections; editing lives in Contact / Notes
+    await p.click('[data-action="clientSec"][data-id="contact"]'); await p.waitForTimeout(300);
+    check('the Contact section lets you change the name', await p.isVisible('.client-name-input'));
+    await p.click('[data-action="clientSec"][data-id="notes"]'); await p.waitForTimeout(300);
+    check('…and Notes lets you edit the notes', await p.isVisible('#clientModalNotes') && (await p.inputValue('#clientModalNotes'))==='Call on Fridays.');
     await p.context().close();
   }
 
@@ -201,7 +205,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await p.click('[data-action="nav"][data-view="settings"]'); await p.waitForTimeout(150);
     check('Settings opens on You', (await E("ui.settingsTab"))==='you' && /About you/.test(await p.textContent('#viewRoot')) && await p.isVisible('#setName') && /Daily Standard/.test(await p.textContent('#viewRoot')) && /Why You/.test(await p.textContent('#viewRoot')));
-    await p.click('[data-action="settingsTab"][data-tab="updates"]'); await p.waitForTimeout(150);
+    await p.click('[data-action="settingsTab"][data-tab="system"]'); await p.waitForTimeout(150); // App updates is a part of "Connections & Data" now
     check('App updates open on the latest session', (await p.$$('.upd-card')).length===2);
     await p.selectOption('#updatesRangeSel', '1h'); await p.waitForTimeout(100);
     check('…or the last hour', (await p.$$('.upd-card')).length===2);

@@ -66,10 +66,15 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     check('"I\'m up" lets the song finish (no stop)', calls.includes('/music/finish') && !calls.includes('/music/stop'), calls);
     check('it opens with a big "Good morning", like a phone starting up', await p.isVisible('.brief-intro .bi-word') && /Good morning/.test(await p.textContent('.bi-word')));
     check('last night\'s note is up top in the briefing', (await p.textContent('.br-lastnight')).includes('Call Mike first'));
-    check('the vision board is in the briefing', await p.isVisible('.br-vision') && (await p.textContent('.br-vision')).includes('Mind + Body'));
-    const off = await p.evaluate(() => { const box = document.querySelector('.br-vision .board-static'); const w = box.firstElementChild; const r = box.getBoundingClientRect(), n = w.getBoundingClientRect(); return Math.abs((r.left+r.width/2)-(n.left+n.width/2)); });
+    // round 13: one-screen brief — column 1 shows last night's note OR the vision board, not both
+    check('with a note, the note takes the vision board\'s spot (one screen)', !(await p.$('.br-vision')));
+    await E("ACTIONS.wakeBoardToggle()"); await p.waitForTimeout(200);
+    check('the vision board still opens big from the briefing', await p.isVisible('.br-vision-big') && (await p.textContent('.br-vision-big')).includes('Mind + Body'));
+    const off = await p.evaluate(() => { const box = document.querySelector('.br-vision-big .board-static'); const w = box.firstElementChild; const r = box.getBoundingClientRect(), n = w.getBoundingClientRect(); return Math.abs((r.left+r.width/2)-(n.left+n.width/2)); });
     check('…centered on what\'s on it (even far from the origin)', off < 3, off);
-    check('a little pill shows the song is still playing', await p.isVisible('.brief-music'));
+    await E("ACTIONS.wakeBoardToggle()"); await p.waitForTimeout(150);
+    // the old floating .brief-music pill became the song chip in the brief's top bar
+    check('a little chip shows the song is still playing', await p.isVisible('.b4-song') && (await p.textContent('.b4-song')).includes('Morning Run'));
     await E("ACTIONS.wakeIntroSkip()"); await p.waitForTimeout(100);
     check('the intro can be skipped', !(await p.isVisible('.brief-intro')) && await p.isVisible('.brief.intro-skipped'));
     await p.click('[data-action="wakeStopMusic"]'); await p.waitForTimeout(200);
