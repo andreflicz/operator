@@ -5,7 +5,8 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 function instrument(src, out){
   let s = fs.readFileSync(src,'utf8'); const i = s.lastIndexOf('})();');
-  s = s.slice(0,i)+"window.__op={get state(){return state;}, get ui(){return ui;}, checkAutoLockIn:checkAutoLockIn, pollAppActivity:pollAppActivity, parseActivityLogText:parseActivityLogText, todayStr:todayStr, renderView:renderView, ev:function(code){ return eval(code); }};\n"+s.slice(i);
+  // saves are batched (250 ms) in the app; a test reading localStorage gets them flushed first
+  s = s.slice(0,i)+"(function(){ var g = Storage.prototype.getItem, busy = false; Storage.prototype.getItem = function(k){ if(!busy && persistTimer){ busy = true; try{ persistFlush(); }finally{ busy = false; } } return g.call(this, k); }; })();\n"+"window.__op={get state(){return state;}, get ui(){return ui;}, checkAutoLockIn:checkAutoLockIn, pollAppActivity:pollAppActivity, parseActivityLogText:parseActivityLogText, todayStr:todayStr, renderView:renderView, ev:function(code){ return eval(code); }};\n"+s.slice(i);
   fs.writeFileSync(out, s);
 }
 function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
