@@ -2867,3 +2867,15 @@
   .mm-k + .qt, .br-k + .qt{ margin-top:12px; }
   .wi-side .qt-mark{ height:20px; }
   #quickJournalOverlay.qj-pop-overlay #quickJournalContent{ border:1px solid rgba(var(--ink),.1) !important; outline:none !important; }
+
+  /* ================= ROUND 13 ================= */
+  /* speed: no live blur behind panels over the moving scene (it re-blurs every frame) */
+  body.has-scene .mini-cal-strip, body.has-scene .hq-top, body.has-scene .hq-cols, body.has-scene .hq-outreach{ -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+  body.has-scene .mini-cal-strip{ background:rgba(10,12,18,.82); } body.has-scene .hq-top, body.has-scene .hq-cols, body.has-scene .hq-outreach{ background:rgba(14,16,24,.9); }
+  :root[data-theme="light"] body.has-scene .hq-top, :root[data-theme="light"] body.has-scene .hq-cols, :root[data-theme="light"] body.has-scene .hq-outreach{ background:rgba(244,246,250,.94); }
+  body.has-scene .activity-pill{ -webkit-backdrop-filter:none; backdrop-filter:none; background:var(--panel-2); }
+  /* speed: glows that repaint a shadow every frame become still (or opacity-only) */
+  .focus-active-glow{ animation:none !important; }
+  .streak-dot-broken, .lc-next-ready, .cc2-avatar.ring-red, .goals-title-glow, .activity-pill[data-state="break"], .ls-go{ animation:none !important; }
+  .streak-dot-broken{ box-shadow:0 0 10px 2px rgba(232,99,107,.45); } .cc2-avatar.ring-red{ box-shadow:0 0 0 2px var(--panel), 0 0 0 4px var(--danger), 0 0 12px rgba(232,99,107,.35); }
+  .lc-next-ready{ box-shadow:0 0 14px 2px rgba(63,190,142,.35); }

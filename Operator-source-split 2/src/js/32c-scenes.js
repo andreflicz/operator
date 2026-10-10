@@ -323,6 +323,8 @@ function sceneTick(x, c, dt, t){
   if(x.flashAt!=null){ x.flashAt -= dt*1000; if(x.flashAt <= 0){ x.flash = 0.18; x.flashAt = 5000 + Math.random()*9000; } if(x.flash > 0){ c.fillStyle = 'rgba(230,235,255,'+x.flash.toFixed(2)+')'; c.fillRect(0, 0, w, h); x.flash -= dt*0.6; } }
 }
 // ---- mounting & the loop ----
+let sceneBusyAt = 0;
+['pointerdown', 'wheel', 'keydown', 'scroll'].forEach(function(ev){ window.addEventListener(ev, function(){ sceneBusyAt = performance.now(); }, {passive:true, capture:true}); });
 const SC = {bg:null, fx:null, x:null, raf:0, last:0, key:'', builtAt:0, running:false};
 function sceneCtxFor(id){ return {id:id, phase:id==='space' ? 'night' : skyLook(), wx:id==='sky' && wxNow() ? wxKind(wxNow().code) : 'clear', w:window.innerWidth, h:window.innerHeight}; }
 function sceneBuild(){
@@ -345,7 +347,9 @@ function sceneBuild(){
 function sceneLoop(t){
   if(!SC.running){ SC.raf = 0; return; }
   SC.raf = requestAnimationFrame(sceneLoop);
-  if(t - SC.last < 33) return;
+  // ~20 frames a second is plenty for drifting clouds; and while you're clicking, scrolling or
+  // typing the scene holds still, so every bit of the computer goes to the app itself
+  if(t - SC.last < 50 || performance.now() - sceneBusyAt < 1200) return;
   const dt = SC.last ? Math.min(0.1, (t - SC.last)/1000) : 0.033;
   SC.last = t;
   if(SC.x) sceneTick(SC.x, SC.fx.getContext('2d'), dt, t);

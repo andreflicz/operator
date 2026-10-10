@@ -218,7 +218,7 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":4}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":5}' ;;
     /news*)
       # a few headlines for the Good morning screen (news sites don't let a page fetch them directly)
       X=$(curl -s -m 6 -A "Mozilla/5.0 (Macintosh) Operator" "https://feeds.npr.org/1001/rss.xml" 2>/dev/null)
@@ -274,7 +274,13 @@ case "$KIND" in
   ghl) ghl_respond ;;
   activity)
     # recent foreground-app samples for the page (written by the launcher every 10 s)
-    BODY=$(cat "$DATA_DIR/activity.log" 2>/dev/null)
+    # ?since=<ms> → only the newer lines, marked "#inc" so the page knows it's a top-up
+    SINCE=$(param since)
+    case "$SINCE" in
+      ''|*[!0-9]*) BODY=$(cat "$DATA_DIR/activity.log" 2>/dev/null) ;;
+      *) BODY="#inc
+$(awk -F'\t' -v s="$SINCE" '$1+0 > s+0' "$DATA_DIR/activity.log" 2>/dev/null)" ;;
+    esac
     respond 200 "$BODY" 'text/plain; charset=utf-8' ;;
   *) wake_respond ;;
 esac

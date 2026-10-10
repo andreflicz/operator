@@ -93,25 +93,36 @@ function updateCurrentAppIndicator(){
   else { el.textContent=''; el.style.display='none'; }
   if(typeof updateActivityPill==='function') updateActivityPill();
 }
-let lastActivitySig = '', pastDayCounts = {};
+let lastActivitySig = '', pastDayCounts = {}, actSamples = null, actLastTs = 0;
 async function pollAppActivity(){
   const st = state.settings.appTracking;
   if(!st || st.enabled===false) { updateCurrentAppIndicator(); return; }
   let text;
   try{
-    const res = await fetch(APP_ACTIVITY_URL, {cache:'no-store'});
+    // after the first poll, only ask for what's new (the log holds up to ~17 hours of samples;
+    // fetching and re-reading all of it every 15 seconds was a regular hitch)
+    const res = await fetch(APP_ACTIVITY_URL+(actSamples && actLastTs ? '?since='+actLastTs : ''), {cache:'no-store'});
     if(!res.ok) return;
     text = await res.text();
   }catch(e){ return; } // no wrapper/server running — silently do nothing
-  // Nothing new since the last poll → nothing to recompute or save.
-  const sig = text.length+':'+text.slice(-80);
-  if(sig===lastActivitySig){ updateCurrentAppIndicator(); checkAwayFromSession(); checkAutoLockIn(); return; }
-  lastActivitySig = sig;
+  let allSamples;
+  if(text.slice(0, 5)==='#inc\n'){
+    const fresh = parseActivityLogText(text.slice(5)).filter(function(x){ return x.ts > actLastTs; });
+    if(!fresh.length || !actSamples){ updateCurrentAppIndicator(); checkAwayFromSession(); checkAutoLockIn(); if(!actSamples) actLastTs = 0; return; }
+    actSamples = actSamples.concat(fresh).slice(-7000);
+    allSamples = actSamples;
+  } else {
+    // Nothing new since the last poll → nothing to recompute or save.
+    const sig = text.length+':'+text.slice(-80);
+    if(sig===lastActivitySig){ updateCurrentAppIndicator(); checkAwayFromSession(); checkAutoLockIn(); return; }
+    lastActivitySig = sig;
+    allSamples = actSamples = parseActivityLogText(text);
+  }
+  if(allSamples.length) actLastTs = allSamples[allSamples.length-1].ts;
   // Only count active usage: a sample taken after the keyboard/mouse has been idle for a
   // while is dropped, which leaves a gap that splits the interval (an app just sitting in
   // the foreground no longer counts as "being on it").
   const idleLimit = Number(st.idleSeconds)||60;
-  const allSamples = parseActivityLogText(text);
   if(allSamples.length) lastRawSampleAt = Math.max(lastRawSampleAt, allSamples[allSamples.length-1].ts);
   const samples = allSamples.filter(function(s){ return s.idle==null || s.idle < idleLimit; });
   if(!samples.length){ updateCurrentAppIndicator(); return; }
