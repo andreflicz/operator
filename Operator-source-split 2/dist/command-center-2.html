@@ -3076,6 +3076,14 @@
   .cm-x{ position:absolute; top:14px; right:14px; width:32px; height:32px; border-radius:50%; border:none; background:rgba(var(--ink),.06); color:var(--text-dim); cursor:pointer; z-index:2; } .cm-x:hover{ color:var(--text); background:rgba(var(--ink),.12); }
   .cm .cf{ padding:0; } .cm .cf-facts{ margin-top:0; }
   @media (max-width:760px){ .cm{ grid-template-columns:1fr; } .cm-nav{ flex-direction:row; flex-wrap:wrap; border-right:none; border-bottom:1px solid var(--border); } .cm-who, .cm-tags{ display:none; } .cm-nav-i{ width:auto; } }
+  /* settings: five places, parts under quiet headings, finer options folded away */
+  .set-part + .set-part{ margin-top:34px; }
+  .set-part-h{ font-family:var(--font-display); font-size:13px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); margin:0 0 12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+  .set-more{ margin-top:6px; border:1px solid var(--border); border-radius:14px; padding:0 16px; background:rgba(var(--ink),.02); }
+  .set-more > summary{ list-style:none; cursor:pointer; padding:14px 0; font-weight:700; font-size:14px; display:flex; align-items:baseline; gap:10px; }
+  .set-more > summary::-webkit-details-marker{ display:none; } .set-more > summary::before{ content:'›'; display:inline-block; transition:transform .2s; color:var(--text-dim); }
+  .set-more[open] > summary::before{ transform:rotate(90deg); } .set-more > summary span{ font-size:12.5px; font-weight:500; color:var(--text-dim); }
+  .set-more[open]{ padding-bottom:6px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -15980,7 +15988,10 @@ function renderSettings(){
         '<div class="task-list">'+RESET_TARGETS.map(function(t){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+t.label+'</div>'+resetPartBtn(t)+'</div>'; }).join('')+'</div>'+
       '</div></div>',
 
-    display: themeSettingsHtml()+skyLookSettingsHtml()+sceneSettingsHtml()+weatherSettingsHtml()+cardLayoutSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
+    display: themeSettingsHtml()+sceneSettingsHtml()+weatherSettingsHtml()+
+      // the finer appearance choices wait behind one row instead of filling the page
+      '<details class="set-more"'+(ui.setMoreOpen?' open':'')+'><summary data-action="toggleSetMore">More appearance options <span>Sky look, card layout, accent color, header, cursor</span></summary>'+
+      skyLookSettingsHtml()+cardLayoutSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
         '<div class="row">'+SWATCHES.map(function(sw){ return '<span class="swatch '+(p.accentColor===sw?'sel':'')+'" style="background:'+sw+';" data-action="pickThemeColor" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Today Header Style</div>'+
@@ -15991,7 +16002,7 @@ function renderSettings(){
       '</div>'+
       '<div class="section"><div class="section-title">Goal Color'+tip('Goals glow brighter in this color the closer they get to done.')+'</div><div class="card">'+
         '<div class="row">'+SWATCHES.map(function(sw){ return '<span class="swatch '+(p.goalAccentColor===sw?'sel':'')+'" style="background:'+sw+';" data-action="pickGoalColor" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
-      '</div></div>'+
+      '</div></div></details>'+
       '<div class="section"><div class="section-title">Today Dashboard Panels'+tip('Choose what shows on your Today page, and in what order. Each panel is taken straight from its own page.')+'</div><div class="card">'+
         '<div class="task-list">'+panelOrder.map(function(pid,idx){
           const def = PANEL_DEFS.find(function(pd){return pd.id===pid;});
@@ -16140,27 +16151,28 @@ function renderSettings(){
         '</div>'+
       '</div>'
   };
-  const navDefs = [
-    {id:'you', label:'You', icon:'&#128100;'},
-    {id:'display', label:'Display', icon:'&#127912;'},
-    {id:'sound', label:'Sound', icon:'&#128266;'},
-    {id:'focus', label:'Focus &amp; Alarms', icon:'&#9201;'},
-    {id:'business', label:'Business', icon:'&#9635;'},
-    {id:'calendarJournal', label:'Calendar &amp; Journal', icon:'&#9638;'},
-    {id:'integrations', label:'Integrations', icon:'&#128279;'},
-    {id:'data', label:'Data', icon:'&#128190;'},
-    {id:'updates', label:'App updates', icon:'&#128227;'}
-  ];
-  // Standards and General (preferences) now live under You; export / reset under Data
   sections.sound = soundSettingsHtml();
-  const tab = (ui.settingsTab==='standards' || ui.settingsTab==='general') ? 'you' : ui.settingsTab;
-  const active = sections[tab] ? tab : 'you';
+  // five places instead of nine: related settings live together, each part under its own heading
+  const groups = [
+    {id:'you', label:'You', icon:'&#128100;', parts:[['you','']]},
+    {id:'look', label:'Look & Sound', icon:'&#127912;', parts:[['display','Appearance'],['sound','Sound']]},
+    {id:'focus', label:'Focus & Alarms', icon:'&#9201;', parts:[['focus','']]},
+    {id:'work', label:'Business & Calendar', icon:'&#9635;', parts:[['business','Business'],['calendarJournal','Calendar & journal']]},
+    {id:'system', label:'Connections & Data', icon:'&#128279;', parts:[['integrations','Integrations'],['data','Your data'],['updates','App updates']]}
+  ];
+  // Standards and General (preferences) live under You
+  const want = (ui.settingsTab==='standards' || ui.settingsTab==='general') ? 'you' : (ui.settingsTab || 'you');
+  const grp = groups.find(function(g){ return g.id===want || g.parts.some(function(x){ return x[0]===want; }); }) || groups[0];
+  const body = grp.parts.map(function(x){ return '<div class="set-part" id="setPart-'+x[0]+'">'+(grp.parts.length>1 ? '<div class="set-part-h">'+x[1]+'</div>' : '')+sections[x[0]]+'</div>'; }).join('');
+  if(want!==grp.id && grp.parts[0][0]!==want){ const target = want; setTimeout(function(){ const el = document.getElementById('setPart-'+target); if(el) el.scrollIntoView({block:'start'}); }, 30); }
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Settings</div></div></div>'+
   '<div class="settings-shell is-compact">'+
-    '<div class="settings-sidenav">'+navDefs.map(function(n){ return '<button class="settings-nav-item'+(active===n.id?' active':'')+'" data-action="settingsTab" data-tab="'+n.id+'"><span style="margin-right:8px;">'+n.icon+'</span>'+n.label+'</button>'; }).join('')+'</div>'+
-    '<div class="settings-content tab-panel" data-key="settings-'+active+'">'+sections[active]+'</div>'+
+    '<div class="settings-sidenav">'+groups.map(function(g){ return '<button class="settings-nav-item'+(grp.id===g.id?' active':'')+'" data-action="settingsTab" data-tab="'+g.id+'"><span style="margin-right:8px;">'+g.icon+'</span>'+g.label+'</button>'; }).join('')+'</div>'+
+    '<div class="settings-content tab-panel" data-key="settings-'+grp.id+'">'+body+'</div>'+
   '</div>';
 }
+ACTIONS.toggleSetMore = function(el, e){ e.preventDefault(); ui.setMoreOpen = !ui.setMoreOpen; renderView(); };
+
 function deleteResetBtn(){
   const key='reset:all';
   if(armed.has(key)) return '<button class="btn btn-danger" data-action="confirmReset">Confirm Reset — Erases Everything</button>';
