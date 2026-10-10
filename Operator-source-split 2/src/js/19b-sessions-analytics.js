@@ -230,8 +230,10 @@ function dayDetailHtml(dateStr){
     .sort(function(a,b){ return a.b.startedAt-b.b.startedAt; });
   const finished = state.tasks.items.filter(function(x){ return x.status==='done' && x.completedAt===dateStr; });
   const locked = lockedInAppMinutesFor(dateStr);
-  const appMap = locked && Object.keys(locked).length ? locked : appMinutesForDate(dateStr);
-  const appRows = topEntries(appMap, 6);
+  // every app you used that day — locked in or not — with the locked-in part noted
+  const appMap = Object.assign({}, appMinutesForDate(dateStr) || {}); // a copy — never touch the saved numbers
+  if(locked) Object.keys(locked).forEach(function(k){ appMap[k] = Math.max(appMap[k]||0, locked[k]); });
+  const appRows = topEntries(appMap, 8);
   const label = dateStr===todayStr() ? 'Today' : dateStr===addDays(todayStr(),-1) ? 'Yesterday' : weekdayShort(dateStr)+', '+fmtDateShort(dateStr);
   return '<div class="day-detail">'+
     '<div class="day-detail-head"><div><div class="section-title" style="margin:0;">'+label+'</div><div class="kpi-sub">'+fmtDurationLabel(t.total)+' tracked &middot; '+deltaHtml(t.deep-prev.deep,'deep work vs day before')+' &middot; '+deltaHtml(t.deep-lastWeekSame.deep,'vs last '+weekdayShort(dateStr))+'</div></div></div>'+
@@ -242,7 +244,7 @@ function dayDetailHtml(dateStr){
       '<div class="card"><div class="kind-label" style="margin-top:0;">Top Tasks</div>'+(taskRows.length ? barList(taskRows, function(r){ return taskCountsAsDeepWork(r.key)?'var(--accent)':'#8A90A2'; }, function(r){ const tk = state.tasks.items.find(function(x){ return x.id===r.key; }); return tk ? tk.title : 'Deleted task'; }) : '<div class="kpi-sub">No task timing yet — set a Current task while locked in.</div>')+
         (finished.length ? '<div class="kind-label">Finished</div><div class="kpi-sub" style="line-height:1.6;">'+finished.map(function(x){ return '&#10003; '+escapeHtml(x.title); }).join('<br>')+'</div>' : '')+'</div>'+
       '<div class="card"><div class="kind-label" style="margin-top:0;">Clients</div>'+(clientRows.length ? barList(clientRows, function(){ return 'var(--info)'; }, function(r){ return clientLabel(r.key); }) : '<div class="kpi-sub">Nothing attributed to clients.</div>')+
-        '<div class="kind-label">Apps'+(locked && Object.keys(locked).length?' &middot; while locked in':' &middot; active time')+'</div>'+(appRows.length ? barList(appRows, function(){ return '#5b6472'; }, function(r){ return r.key; }) : '<div class="kpi-sub">No app activity recorded.</div>')+'</div>'+
+        '<div class="kind-label">Apps &middot; all day'+(locked && Object.keys(locked).length ? ' <span style="text-transform:none;letter-spacing:0;font-weight:500;">(locked-in part in brackets)</span>' : '')+'</div>'+(appRows.length ? barList(appRows, function(r){ return locked && locked[r.key] ? 'var(--accent)' : '#5b6472'; }, function(r){ return r.key+(locked && locked[r.key] ? ' ('+fmtDurationLabel(locked[r.key])+')' : ''); }) : '<div class="kpi-sub">No app activity recorded.</div>')+'</div>'+
     '</div>'+
     '<div class="card" style="margin-top:14px;"><div class="kind-label" style="margin-top:0;">Sessions &amp; Blocks'+tip('Click one to edit its times or delete it.')+'</div>'+
       (sessions.length ? '<div class="task-list">'+sessions.map(function(x){

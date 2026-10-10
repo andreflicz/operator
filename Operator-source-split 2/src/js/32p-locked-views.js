@@ -9,7 +9,18 @@
 
 // ---- the minimal view ----
 function lockedMinimal(){ return state.profile.lockedView==='minimal'; }
-ACTIONS.toggleLockedView = function(){ state.profile.lockedView = lockedMinimal() ? 'full' : 'minimal'; persist('profile'); playNav(); renderView(); };
+// a full-screen view leaves with a short fade-and-settle instead of snapping away
+function npLeave(then){
+  const n = document.querySelector('#viewRoot .np');
+  if(!n){ then(); return; }
+  n.classList.add('is-leaving');
+  setTimeout(then, 340);
+}
+ACTIONS.toggleLockedView = function(){
+  const leaving = lockedMinimal();
+  const go = function(){ state.profile.lockedView = leaving ? 'full' : 'minimal'; persist('profile'); playNav(); renderView(); };
+  if(leaving) npLeave(go); else go();
+};
 document.addEventListener('keydown', function(e){
   if(e.key!=='m' && e.key!=='M') return;
   if(e.metaKey || e.ctrlKey || e.altKey || (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) || (e.target && e.target.isContentEditable)) return;

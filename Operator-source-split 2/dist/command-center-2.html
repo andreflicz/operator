@@ -3235,6 +3235,24 @@
   .nt-t, .nt-s{ white-space:normal !important; overflow:visible !important; text-overflow:clip !important; overflow-wrap:anywhere; }
   .nt-t{ line-height:1.3; } .nt-s{ line-height:1.35; margin-top:2px; }
   .nt-title{ white-space:nowrap; }
+
+  /* quotes size themselves to the box, and who said it is always visible */
+  .qt.q-short blockquote{ font-size:clamp(22px, 2.1vw, 28px) !important; line-height:1.35; }
+  .qt.q-long blockquote{ font-size:clamp(15px, 1.25vw, 17px) !important; line-height:1.5; }
+  .qt figcaption{ flex:none; }
+  .br-quote, .wi-side, .wi-act{ display:flex; flex-direction:column; justify-content:center; }
+  .brief4 .br-quote{ flex:none !important; overflow:visible !important; }
+  .wi-side .qt, .wi-act .qt{ width:100%; }
+
+  /* full-screen views: leaving fades and settles; nothing scrolls */
+  .np.is-leaving{ animation:npOut .34s cubic-bezier(.5,0,.3,1) forwards !important; pointer-events:none; }
+  @keyframes npOut{ to{ opacity:0; transform:scale(.985); filter:blur(3px); } }
+  body.np-on .np.rest{ overflow:hidden !important; }
+  .np.rest .dayoff-in{ max-height:100vh; }
+
+  .brk-warn{ margin-top:14px; padding:10px 12px; border-radius:12px; background:rgba(255,190,90,.1); border:1px solid rgba(255,190,90,.3); color:rgba(255,236,205,.9); font-size:12.5px; line-height:1.45; text-align:left; }
+  .brk-warn b{ color:#ffd38a; font-weight:700; }
+  .hq::before{ display:none; } /* the glow was clipped at the page edge (a visible split) */
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -7313,6 +7331,11 @@ ACTIONS.undoQuickMode = function(){
   state.modes.active = u.prev; persist('modes'); clearToasts(); renderView();
 };
 ACTIONS.quickDayOff = function(){
+  // leaving the full-screen day off: let it fade out first
+  if(isDayOff(todayStr()) && document.querySelector('#viewRoot .np.rest') && typeof npLeave==='function'){ npLeave(function(){ ACTIONS.quickDayOffNow(); }); return; }
+  ACTIONS.quickDayOffNow();
+};
+ACTIONS.quickDayOffNow = function(){
   toggleDayOff();
   dayOffFlash(isDayOff(todayStr()));
   showToast(isDayOff(todayStr()) ? 'Today is a rest day — the streak is safe. Enjoy it.' : 'Back on — today counts.', {icon:'&#127796;', actionLabel:'Undo', actionAction:'quickDayOffUndo', duration:6000});
@@ -8845,6 +8868,12 @@ function closeBreakNotePrompt(){ const o=document.getElementById('breakNoteOverl
 // The break pop-up: how long (big tiles), an optional note (or one tap on a common reason), and
 // one clear start. It shows when you'll be back.
 const BREAK_REASONS = [['&#9749;','Coffee'],['&#128694;','Walk'],['&#127869;&#65039;','Food'],['&#129496;','Stretch'],['&#128222;','Call']];
+// taking a break in the middle of a timed technique (Pomodoro, 52/17, 90/20) throws off its rhythm — say so
+function breakRhythmNote(){
+  const st = typeof methodState==='function' ? methodState() : null;
+  if(!st || !st.m.work || st.onBreak) return '';
+  return '<div class="brk-warn"><b>Heads up — this isn’t one of your '+escapeHtml(st.m.label)+' breaks.</b> It pauses round '+st.round+' and breaks the rhythm. Your next planned break is in '+formatElapsed(st.left)+'.</div>';
+}
 function renderBreakNoteModal(){
   const len = ui.breakMinutes==null ? 15 : ui.breakMinutes, as = state.focus.activeSession;
   const flow = as && as.method && as.method.id==='flow' ? flowBreakMinutes() : null;
@@ -8853,6 +8882,7 @@ function renderBreakNoteModal(){
     '<div class="brk-i">&#9749;</div>'+
     '<div class="brk-h">Take a break</div>'+
     '<div class="brk-s">'+(as ? fmtDurationLabel(Math.floor((Date.now()-as.startedAt)/60000))+' in'+(flow ? ' &middot; you\'ve earned about '+flow+' min' : '') : '')+'</div>'+
+    breakRhythmNote()+
     '<div class="brk-lens">'+[5,10,15,20,30,'open'].map(function(m){ const on = len===m; return '<button class="brk-len'+(on?' is-on':'')+'" data-action="pickBreakMinutes" data-minutes="'+m+'"><b>'+(m==='open'?'&infin;':m)+'</b><span>'+(m==='open'?'open':'min')+'</span></button>'; }).join('')+'</div>'+
     '<div class="brk-back">'+(len==='open' ? 'No timer — end it whenever you\'re ready' : 'Back at <b>'+fmtTimeShort(Date.now()+len*60000)+'</b>')+'</div>'+
     '<div class="brk-note"><input class="input" id="breakNoteInput" placeholder="What\'s it for? (optional)" value="'+escapeHtml(ui.breakNoteDraft||'')+'">'+
@@ -9221,8 +9251,10 @@ function dayDetailHtml(dateStr){
     .sort(function(a,b){ return a.b.startedAt-b.b.startedAt; });
   const finished = state.tasks.items.filter(function(x){ return x.status==='done' && x.completedAt===dateStr; });
   const locked = lockedInAppMinutesFor(dateStr);
-  const appMap = locked && Object.keys(locked).length ? locked : appMinutesForDate(dateStr);
-  const appRows = topEntries(appMap, 6);
+  // every app you used that day — locked in or not — with the locked-in part noted
+  const appMap = Object.assign({}, appMinutesForDate(dateStr) || {}); // a copy — never touch the saved numbers
+  if(locked) Object.keys(locked).forEach(function(k){ appMap[k] = Math.max(appMap[k]||0, locked[k]); });
+  const appRows = topEntries(appMap, 8);
   const label = dateStr===todayStr() ? 'Today' : dateStr===addDays(todayStr(),-1) ? 'Yesterday' : weekdayShort(dateStr)+', '+fmtDateShort(dateStr);
   return '<div class="day-detail">'+
     '<div class="day-detail-head"><div><div class="section-title" style="margin:0;">'+label+'</div><div class="kpi-sub">'+fmtDurationLabel(t.total)+' tracked &middot; '+deltaHtml(t.deep-prev.deep,'deep work vs day before')+' &middot; '+deltaHtml(t.deep-lastWeekSame.deep,'vs last '+weekdayShort(dateStr))+'</div></div></div>'+
@@ -9233,7 +9265,7 @@ function dayDetailHtml(dateStr){
       '<div class="card"><div class="kind-label" style="margin-top:0;">Top Tasks</div>'+(taskRows.length ? barList(taskRows, function(r){ return taskCountsAsDeepWork(r.key)?'var(--accent)':'#8A90A2'; }, function(r){ const tk = state.tasks.items.find(function(x){ return x.id===r.key; }); return tk ? tk.title : 'Deleted task'; }) : '<div class="kpi-sub">No task timing yet — set a Current task while locked in.</div>')+
         (finished.length ? '<div class="kind-label">Finished</div><div class="kpi-sub" style="line-height:1.6;">'+finished.map(function(x){ return '&#10003; '+escapeHtml(x.title); }).join('<br>')+'</div>' : '')+'</div>'+
       '<div class="card"><div class="kind-label" style="margin-top:0;">Clients</div>'+(clientRows.length ? barList(clientRows, function(){ return 'var(--info)'; }, function(r){ return clientLabel(r.key); }) : '<div class="kpi-sub">Nothing attributed to clients.</div>')+
-        '<div class="kind-label">Apps'+(locked && Object.keys(locked).length?' &middot; while locked in':' &middot; active time')+'</div>'+(appRows.length ? barList(appRows, function(){ return '#5b6472'; }, function(r){ return r.key; }) : '<div class="kpi-sub">No app activity recorded.</div>')+'</div>'+
+        '<div class="kind-label">Apps &middot; all day'+(locked && Object.keys(locked).length ? ' <span style="text-transform:none;letter-spacing:0;font-weight:500;">(locked-in part in brackets)</span>' : '')+'</div>'+(appRows.length ? barList(appRows, function(r){ return locked && locked[r.key] ? 'var(--accent)' : '#5b6472'; }, function(r){ return r.key+(locked && locked[r.key] ? ' ('+fmtDurationLabel(locked[r.key])+')' : ''); }) : '<div class="kpi-sub">No app activity recorded.</div>')+'</div>'+
     '</div>'+
     '<div class="card" style="margin-top:14px;"><div class="kind-label" style="margin-top:0;">Sessions &amp; Blocks'+tip('Click one to edit its times or delete it.')+'</div>'+
       (sessions.length ? '<div class="task-list">'+sessions.map(function(x){
@@ -20219,7 +20251,23 @@ const MORNING_QUOTES = [
   ['Keep hammering.', 'Cameron Hanes'],
   ['The best time to plant a tree was twenty years ago. The second best time is now.', 'Proverb'],
   ['You don’t need a perfect day. You need a good first hour.', ''],
-  ['The version of you that you want to be is built in mornings like this one.', '']
+  ['The version of you that you want to be is built in mornings like this one.', ''],
+  ['Morning is when I am awake and there is a dawn in me.', 'Henry David Thoreau'],
+  ['Lose an hour in the morning, and you will spend all day looking for it.', 'Richard Whately'],
+  ['Make each day your masterpiece.', 'John Wooden'],
+  ['Don’t let what you cannot do interfere with what you can do.', 'John Wooden'],
+  ['You do not rise to the level of your goals. You fall to the level of your systems.', 'James Clear'],
+  ['Every action you take is a vote for the type of person you wish to become.', 'James Clear'],
+  ['The days are long but the decades are short.', 'Sam Altman'],
+  ['Hard work beats talent when talent doesn’t work hard.', 'Tim Notke'],
+  ['You miss 100% of the shots you don’t take.', 'Wayne Gretzky'],
+  ['I’ve failed over and over and over again in my life. And that is why I succeed.', 'Michael Jordan'],
+  ['It ain’t about how hard you hit. It’s about how hard you can get hit and keep moving forward.', 'Rocky Balboa'],
+  ['Small deeds done are better than great deeds planned.', 'Peter Marshall'],
+  ['Talent is cheaper than table salt. What separates the talented individual from the successful one is a lot of hard work.', 'Stephen King'],
+  ['The morning is wiser than the evening.', 'Russian proverb'],
+  ['Nobody is coming. It’s you, today, again.', ''],
+  ['Slow is fine. Stopped is the only thing that isn’t.', '']
 ];
 const WORK_QUOTES = [
   ['Volume negates luck.', 'Alex Hormozi'],
@@ -20294,7 +20342,8 @@ function dayNum(){ const d = new Date(), start = new Date(d.getFullYear(), 0, 0)
 function quoteOfDay(){ return quoteFor('morning'); }
 function workQuoteOfDay(){ return quoteFor('work'); }
 function thoughtsOfDay(n){ const out = [], len = MORNING_THOUGHTS.length, d = dayNum(); for(let i=0;i<(n||3);i++) out.push(MORNING_THOUGHTS[(d*3 + i*5) % len]); return out.filter(function(x, i, a){ return a.indexOf(x)===i; }); }
-function quoteHtml(q, cls, kind){ return '<figure class="qt '+(cls||'')+'"'+(kind ? ' data-q="'+kind+'" data-cls="'+(cls||'')+'"' : '')+'><span class="qt-mark">&ldquo;</span>'+(kind ? '<button class="qt-next" data-action="nextQuote" data-id="'+kind+'" title="Another one">&#8635;</button>' : '')+'<blockquote>'+escapeHtml(q[0])+'</blockquote>'+(q[1] ? '<figcaption><span class="qt-rule"></span>'+escapeHtml(q[1])+'</figcaption>' : '')+'</figure>'; }
+function quoteLenCls(t){ const n = String(t||'').length; return n < 55 ? ' q-short' : n > 120 ? ' q-long' : ''; }
+function quoteHtml(q, cls, kind){ return '<figure class="qt '+(cls||'')+quoteLenCls(q[0])+'"'+(kind ? ' data-q="'+kind+'" data-cls="'+(cls||'')+'"' : '')+'><span class="qt-mark">&ldquo;</span>'+(kind ? '<button class="qt-next" data-action="nextQuote" data-id="'+kind+'" title="Another one">&#8635;</button>' : '')+'<blockquote>'+escapeHtml(q[0])+'</blockquote>'+(q[1] ? '<figcaption><span class="qt-rule"></span>'+escapeHtml(q[1])+'</figcaption>' : '')+'</figure>'; }
 
 // ---- headlines (through the launcher; a public feed reader if the launcher can't) ----
 function morningNewsOn(){ return wakeCfg().news!==false; }
@@ -20598,7 +20647,7 @@ function wakeBriefHtml(){
       // no news column (headlines off) → two columns that fill the width instead of an empty third
       '<div class="b4-grid'+(colC.length ? '' : ' cols-2')+'"><div class="b4-col">'+colA.join('')+'</div><div class="b4-col">'+colB.join('')+'</div>'+(colC.length ? '<div class="b4-col">'+colC.join('')+'</div>' : '')+'</div>'+
       '<div class="brief-cta br-p br-a-rise" data-k="'+k+'" style="--d:'+ctaD+'ms">'+
-        '<button class="brief-go brief-morning" data-action="wakeStartMorning">&#9728;&#65039; Start My Morning</button>'+
+        '<button class="brief-go brief-morning" data-action="wakeStartMorning">Get to Work &#8594;</button>'+
       '</div>'+
     '</div>'+
     (ui.wakeBoardBig && vb ? '<div class="br-vision-big" data-action="wakeBoardToggle" title="Close">'+boardStaticHtml(vb, 'wake-board')+'<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button></div>' : '')+
@@ -20813,7 +20862,18 @@ document.addEventListener('animationend', function(e){ if(e.target && e.target.c
 
 // ---- the minimal view ----
 function lockedMinimal(){ return state.profile.lockedView==='minimal'; }
-ACTIONS.toggleLockedView = function(){ state.profile.lockedView = lockedMinimal() ? 'full' : 'minimal'; persist('profile'); playNav(); renderView(); };
+// a full-screen view leaves with a short fade-and-settle instead of snapping away
+function npLeave(then){
+  const n = document.querySelector('#viewRoot .np');
+  if(!n){ then(); return; }
+  n.classList.add('is-leaving');
+  setTimeout(then, 340);
+}
+ACTIONS.toggleLockedView = function(){
+  const leaving = lockedMinimal();
+  const go = function(){ state.profile.lockedView = leaving ? 'full' : 'minimal'; persist('profile'); playNav(); renderView(); };
+  if(leaving) npLeave(go); else go();
+};
 document.addEventListener('keydown', function(e){
   if(e.key!=='m' && e.key!=='M') return;
   if(e.metaKey || e.ctrlKey || e.altKey || (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) || (e.target && e.target.isContentEditable)) return;

@@ -686,6 +686,12 @@ function closeBreakNotePrompt(){ const o=document.getElementById('breakNoteOverl
 // The break pop-up: how long (big tiles), an optional note (or one tap on a common reason), and
 // one clear start. It shows when you'll be back.
 const BREAK_REASONS = [['&#9749;','Coffee'],['&#128694;','Walk'],['&#127869;&#65039;','Food'],['&#129496;','Stretch'],['&#128222;','Call']];
+// taking a break in the middle of a timed technique (Pomodoro, 52/17, 90/20) throws off its rhythm — say so
+function breakRhythmNote(){
+  const st = typeof methodState==='function' ? methodState() : null;
+  if(!st || !st.m.work || st.onBreak) return '';
+  return '<div class="brk-warn"><b>Heads up — this isn’t one of your '+escapeHtml(st.m.label)+' breaks.</b> It pauses round '+st.round+' and breaks the rhythm. Your next planned break is in '+formatElapsed(st.left)+'.</div>';
+}
 function renderBreakNoteModal(){
   const len = ui.breakMinutes==null ? 15 : ui.breakMinutes, as = state.focus.activeSession;
   const flow = as && as.method && as.method.id==='flow' ? flowBreakMinutes() : null;
@@ -694,6 +700,7 @@ function renderBreakNoteModal(){
     '<div class="brk-i">&#9749;</div>'+
     '<div class="brk-h">Take a break</div>'+
     '<div class="brk-s">'+(as ? fmtDurationLabel(Math.floor((Date.now()-as.startedAt)/60000))+' in'+(flow ? ' &middot; you\'ve earned about '+flow+' min' : '') : '')+'</div>'+
+    breakRhythmNote()+
     '<div class="brk-lens">'+[5,10,15,20,30,'open'].map(function(m){ const on = len===m; return '<button class="brk-len'+(on?' is-on':'')+'" data-action="pickBreakMinutes" data-minutes="'+m+'"><b>'+(m==='open'?'&infin;':m)+'</b><span>'+(m==='open'?'open':'min')+'</span></button>'; }).join('')+'</div>'+
     '<div class="brk-back">'+(len==='open' ? 'No timer — end it whenever you\'re ready' : 'Back at <b>'+fmtTimeShort(Date.now()+len*60000)+'</b>')+'</div>'+
     '<div class="brk-note"><input class="input" id="breakNoteInput" placeholder="What\'s it for? (optional)" value="'+escapeHtml(ui.breakNoteDraft||'')+'">'+

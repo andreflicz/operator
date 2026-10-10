@@ -41,7 +41,23 @@ const MORNING_QUOTES = [
   ['Keep hammering.', 'Cameron Hanes'],
   ['The best time to plant a tree was twenty years ago. The second best time is now.', 'Proverb'],
   ['You don’t need a perfect day. You need a good first hour.', ''],
-  ['The version of you that you want to be is built in mornings like this one.', '']
+  ['The version of you that you want to be is built in mornings like this one.', ''],
+  ['Morning is when I am awake and there is a dawn in me.', 'Henry David Thoreau'],
+  ['Lose an hour in the morning, and you will spend all day looking for it.', 'Richard Whately'],
+  ['Make each day your masterpiece.', 'John Wooden'],
+  ['Don’t let what you cannot do interfere with what you can do.', 'John Wooden'],
+  ['You do not rise to the level of your goals. You fall to the level of your systems.', 'James Clear'],
+  ['Every action you take is a vote for the type of person you wish to become.', 'James Clear'],
+  ['The days are long but the decades are short.', 'Sam Altman'],
+  ['Hard work beats talent when talent doesn’t work hard.', 'Tim Notke'],
+  ['You miss 100% of the shots you don’t take.', 'Wayne Gretzky'],
+  ['I’ve failed over and over and over again in my life. And that is why I succeed.', 'Michael Jordan'],
+  ['It ain’t about how hard you hit. It’s about how hard you can get hit and keep moving forward.', 'Rocky Balboa'],
+  ['Small deeds done are better than great deeds planned.', 'Peter Marshall'],
+  ['Talent is cheaper than table salt. What separates the talented individual from the successful one is a lot of hard work.', 'Stephen King'],
+  ['The morning is wiser than the evening.', 'Russian proverb'],
+  ['Nobody is coming. It’s you, today, again.', ''],
+  ['Slow is fine. Stopped is the only thing that isn’t.', '']
 ];
 const WORK_QUOTES = [
   ['Volume negates luck.', 'Alex Hormozi'],
@@ -116,7 +132,8 @@ function dayNum(){ const d = new Date(), start = new Date(d.getFullYear(), 0, 0)
 function quoteOfDay(){ return quoteFor('morning'); }
 function workQuoteOfDay(){ return quoteFor('work'); }
 function thoughtsOfDay(n){ const out = [], len = MORNING_THOUGHTS.length, d = dayNum(); for(let i=0;i<(n||3);i++) out.push(MORNING_THOUGHTS[(d*3 + i*5) % len]); return out.filter(function(x, i, a){ return a.indexOf(x)===i; }); }
-function quoteHtml(q, cls, kind){ return '<figure class="qt '+(cls||'')+'"'+(kind ? ' data-q="'+kind+'" data-cls="'+(cls||'')+'"' : '')+'><span class="qt-mark">&ldquo;</span>'+(kind ? '<button class="qt-next" data-action="nextQuote" data-id="'+kind+'" title="Another one">&#8635;</button>' : '')+'<blockquote>'+escapeHtml(q[0])+'</blockquote>'+(q[1] ? '<figcaption><span class="qt-rule"></span>'+escapeHtml(q[1])+'</figcaption>' : '')+'</figure>'; }
+function quoteLenCls(t){ const n = String(t||'').length; return n < 55 ? ' q-short' : n > 120 ? ' q-long' : ''; }
+function quoteHtml(q, cls, kind){ return '<figure class="qt '+(cls||'')+quoteLenCls(q[0])+'"'+(kind ? ' data-q="'+kind+'" data-cls="'+(cls||'')+'"' : '')+'><span class="qt-mark">&ldquo;</span>'+(kind ? '<button class="qt-next" data-action="nextQuote" data-id="'+kind+'" title="Another one">&#8635;</button>' : '')+'<blockquote>'+escapeHtml(q[0])+'</blockquote>'+(q[1] ? '<figcaption><span class="qt-rule"></span>'+escapeHtml(q[1])+'</figcaption>' : '')+'</figure>'; }
 
 // ---- headlines (through the launcher; a public feed reader if the launcher can't) ----
 function morningNewsOn(){ return wakeCfg().news!==false; }
@@ -420,7 +437,7 @@ function wakeBriefHtml(){
       // no news column (headlines off) → two columns that fill the width instead of an empty third
       '<div class="b4-grid'+(colC.length ? '' : ' cols-2')+'"><div class="b4-col">'+colA.join('')+'</div><div class="b4-col">'+colB.join('')+'</div>'+(colC.length ? '<div class="b4-col">'+colC.join('')+'</div>' : '')+'</div>'+
       '<div class="brief-cta br-p br-a-rise" data-k="'+k+'" style="--d:'+ctaD+'ms">'+
-        '<button class="brief-go brief-morning" data-action="wakeStartMorning">&#9728;&#65039; Start My Morning</button>'+
+        '<button class="brief-go brief-morning" data-action="wakeStartMorning">Get to Work &#8594;</button>'+
       '</div>'+
     '</div>'+
     (ui.wakeBoardBig && vb ? '<div class="br-vision-big" data-action="wakeBoardToggle" title="Close">'+boardStaticHtml(vb, 'wake-board')+'<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button></div>' : '')+

@@ -66,6 +66,11 @@ ACTIONS.undoQuickMode = function(){
   state.modes.active = u.prev; persist('modes'); clearToasts(); renderView();
 };
 ACTIONS.quickDayOff = function(){
+  // leaving the full-screen day off: let it fade out first
+  if(isDayOff(todayStr()) && document.querySelector('#viewRoot .np.rest') && typeof npLeave==='function'){ npLeave(function(){ ACTIONS.quickDayOffNow(); }); return; }
+  ACTIONS.quickDayOffNow();
+};
+ACTIONS.quickDayOffNow = function(){
   toggleDayOff();
   dayOffFlash(isDayOff(todayStr()));
   showToast(isDayOff(todayStr()) ? 'Today is a rest day — the streak is safe. Enjoy it.' : 'Back on — today counts.', {icon:'&#127796;', actionLabel:'Undo', actionAction:'quickDayOffUndo', duration:6000});
