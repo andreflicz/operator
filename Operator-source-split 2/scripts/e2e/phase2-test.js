@@ -76,11 +76,14 @@ const SP = require('./common.js').OUT;
   await p.click('[data-action="nav"][data-view="today"]');
   await p.click('[data-action="goToDeadlines"]');
   check('view all deadlines → calendar list', await p.isVisible('text=All Deadlines'));
-  // day off sleepy dots
+  // day off: round 13 replaced the "Taking today off..." sleepy dots with the minimal day-off view,
+  // whose calm gradient background drifts (sleepy dots now only live on Sleep mode)
   await p.click('[data-action="nav"][data-view="today"]');
   await p.evaluate(() => window.__op.ev('toggleDayOff()'));
-  const dots = await p.evaluate(() => getComputedStyle(document.querySelector('.sleepy-dots'),'::after').animationName);
-  check('sleepy dots animate', /sleepyDots/.test(dots), dots);
+  await p.waitForTimeout(200);
+  check('day-off view shown', await p.isVisible('.np.rest.is-dayoff') && /Day off\./.test(await p.textContent('.np.rest.is-dayoff .rest-h')));
+  const drift = await p.evaluate(() => { const bg = document.querySelector('.np.rest.is-dayoff .np-bg'); return bg ? getComputedStyle(bg).animationName : null; });
+  check('day-off background animates', /restDrift/.test(drift||''), drift);
   await p.screenshot({path:SP+'/p2-dayoff.png'});
   check('crosshair cursor on', await p.evaluate(() => document.body.classList.contains('crosshair-cursor')));
   check('no page errors', p.errors.length===0, p.errors);

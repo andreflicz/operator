@@ -98,7 +98,11 @@ const SP = require('./common.js').OUT;
   await p.click('[data-action="markLeadWon"]');
   const conv = await E("state.business.clients.find(c=>c.fromLeadId==='p1')");
   check('won → client with touches, files, timeline', conv && conv.stage==='onboarding' && conv.touchpoints.length===1 && conv.files.length===2 && conv.timeline.length>=3, conv);
-  check('client modal opened with CRM block', await p.isVisible('#clientModalOverlay:not(.hidden) .crm-block'));
+  // round 13: the client modal is split into sections; a won client opens on "Plan & deliverables" (ready
+  // to set up) and the CRM block (touch form, timeline) lives under "Contact & touchpoints"
+  check('client modal opened on the plan section', await p.isVisible('#clientModalOverlay:not(.hidden) .cm-nav-i.is-on[data-id="plan"]'));
+  await p.click('#clientModalContent [data-action="clientSec"][data-id="contact"]');
+  check('client modal contact section has CRM block', await p.isVisible('#clientModalOverlay:not(.hidden) .cm-pane .crm-block'));
   // client modal: log touch via form with note
   await p.click('#clientModalContent .touch-type-chip:has(input[value="email"])');
   await p.fill('#crmTouchNote-'+conv.id, 'Sent onboarding doc');
@@ -111,13 +115,18 @@ const SP = require('./common.js').OUT;
   check('FAB = add client', (await p.getAttribute('#fabAdd','title'))==='Add client');
   await p.click('#fabAdd'); await p.fill('#ncName','Zed'); await p.fill('#ncCompany','Zed Media'); await p.fill('#ncValue','900'); await p.click('[data-action="saveNewContact"]');
   check('new client created', (await E("state.business.clients.some(c=>c.business==='Zed Media' && c.stage==='onboarding' && c.status==='active')")));
-  check('new client opens on its lifecycle', await p.isVisible('#clientModalOverlay:not(.hidden) .lc-card'));
+  // round 13: a new client opens on its Plan section; the lifecycle moved to its own "Client cycle" section
+  check('new client opens ready to set up (plan section)', await p.isVisible('#clientModalOverlay:not(.hidden) .cm-nav-i.is-on[data-id="plan"]'));
+  await p.click('#clientModalContent [data-action="clientSec"][data-id="cycle"]');
+  check('new client cycle section shows its lifecycle', await p.isVisible('#clientModalOverlay:not(.hidden) .cm-pane .lc-card'));
   await p.click('[data-action="closeClientModalAndSave"]');
   await p.screenshot({path:SP+'/p4-clients.png'});
   await p.click('[data-action="businessTab"][data-tab="leads"]');
   await p.screenshot({path:SP+'/p4-leads.png'});
   // settings: stages + cadence
-  await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="business"]');
+  // round 13: settings are grouped — Business lives under the "Business & Calendar" group (tab "work")
+  await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="work"]');
+  check('business settings shown in the work group', await p.isVisible('#setPart-business #newStage-lead'));
   await p.fill('#newStage-lead', 'Follow-up'); await p.click('[data-action="addStage"][data-kind="lead"]');
   check('stage added before Won', (await E("crmStages('lead').map(s=>s.label).join('|')")).includes('Proposal sent|Follow-up|Won'));
   await p.fill('[data-stage-label="lead:lead"]', 'Fresh'); await p.press('[data-stage-label="lead:lead"]','Tab');

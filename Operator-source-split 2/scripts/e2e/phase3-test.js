@@ -128,8 +128,12 @@ const SP = require('./common.js').OUT;
   await E("ui.wakeIntroDone = true; renderWakeOverlayInto();");
   check('the morning briefing shows the note', (await p.textContent('#wakeOverlay')).includes('Big shoot day'));
   check('plan tasks moved to today, in order', await E("state.tasks.items.filter(t=>state.focus.nightPlan.taskIds.includes(t.id)).every(t=>t.status==='today') && state.focus.lineupOrder[0]==='t1'"));
-  await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(200); await p.click('.mm-clockin'); await p.waitForTimeout(200);
-  check('Clock in shows the plan of attack', (await p.textContent('#planOverlay')).includes('Write hooks'));
+  // round 13: Start my morning no longer goes through Morning mode's Clock in — after a 520 ms hand-off it
+  // ends the briefing and clocks in quietly, opening the business preview (#planOverlay) directly
+  await p.click('[data-action="wakeStartMorning"]'); await p.clock.runFor(700); await p.waitForTimeout(200);
+  check('Start my morning closes the briefing', !(await p.isVisible('#wakeOverlay:not(.hidden)')));
+  check('Start my morning opens the business preview', await p.isVisible('#planOverlay:not(.hidden) .pr-go[data-action="planLockIn"]'));
+  check('business preview shows the plan of attack', (await p.textContent('#planOverlay')).includes('Write hooks'));
   await p.click('[data-action="closePlanReveal"]');
   // old training blocks still load and count (as Other) — nothing recorded is lost
   await E("startMode('training')");

@@ -51,6 +51,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('cycle picker in new client form (default preselected)', (await p.inputValue('#ncCycle'))===cid);
   await p.fill('#ncName','Zed'); await p.fill('#ncCompany','Zed Media'); await p.click('[data-action="saveNewContact"]');
   const zid = await E("state.business.clients.find(c=>c.business==='Zed Media').id");
+  // round 13: the client modal is sectioned; a new client opens on "Plan & deliverables" and the cycle
+  // has its own "Client cycle" section
+  check('new client modal has a Client cycle section', await p.isVisible('#clientModalContent [data-action="clientSec"][data-id="cycle"]'));
+  await p.click('#clientModalContent [data-action="clientSec"][data-id="cycle"]');
   check('new client opens on step 1 of their cycle', (await p.textContent('.lc-now-title'))==='Onboarding' && (await p.textContent('.lc-card')).includes('step 1 of 2'));
   check('form item has Copy link', await p.isVisible('.lc-card [data-action="lcCopyLink"]'));
   await p.click('.lc-card [data-action="lcCopyLink"]');
@@ -73,7 +77,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('[data-action="closeClientModalAndSave"]');
   // put existing client Nina into the Retainer cycle from her page
   await p.click('[data-action="businessTab"][data-tab="clients"]');
-  await p.click('.cc2[data-key="cc2-c1"] .cc2-top'); await p.click('[data-action="clientFlip"][data-id="back"]'); 
+  // round 13: the old card flip is replaced by sections — the cycle picker lives in "Client cycle"
+  await p.click('.cc2[data-key="cc2-c1"] .cc2-top'); await p.click('#clientModalContent [data-action="clientSec"][data-id="cycle"]');
   await p.selectOption('[data-cycle-assign="c1"]', await E("cycles().find(c=>c.name==='Retainer client').id"));
   check('assign cycle from client page', (await E("clientStep(state.business.clients[0]).label"))==='Onboarding');
   await p.click('[data-action="closeClientModalAndSave"]');
@@ -100,7 +105,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('the client cycle stays off the front page', await p.isVisible('.hub-card[data-key="hub-c1"]') && !(await p.$('.hub-card .hub-step')));
   await p.screenshot({path:OUT+'/cy-today.png'});
   await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="clients"]');
-  await p.click('.cc2[data-key="cc2-c1"] .cc2-top'); await p.waitForTimeout(300); await p.click('[data-action="clientFlip"][data-id="back"]'); 
+  await p.click('.cc2[data-key="cc2-c1"] .cc2-top'); await p.waitForTimeout(300); await p.click('#clientModalContent [data-action="clientSec"][data-id="cycle"]');
   await p.screenshot({path:OUT+'/cy-client.png'});
   await p.click('[data-action="closeClientModalAndSave"]');
   await p.click('[data-action="businessTab"][data-tab="lifecycle"]');

@@ -143,11 +143,12 @@ async function newPage(browser, seed, clockAt){
       {id:'s0', date:'2026-10-03', startedAt:+new Date(2026,9,3,9), endedAt:+new Date(2026,9,3,10), minutes:60, completedTasks:[]}
     ]}
   }, sat);
-  check('1.3 day-off view before midnight', (await page.textContent('#viewRoot')).includes('Taking today off'));
+  // round 13: the day-off view is the minimal full-screen ".np.rest.is-dayoff" with heading "Day off."
+  check('1.3 day-off view before midnight', await page.isVisible('#viewRoot .np.rest.is-dayoff') && (await page.textContent('#viewRoot')).includes('Day off.'));
   await page.clock.runFor(15000);
   await page.waitForTimeout(100);
   const txt = await page.textContent('#viewRoot');
-  check('1.3 rolled over to Sunday without interaction', !txt.includes('Taking today off') && /Sunday/.test(txt), txt.slice(0,160));
+  check('1.3 rolled over to Sunday without interaction', !txt.includes('Day off.') && !(await page.$('#viewRoot .is-dayoff')) && /Sunday/.test(txt), txt.slice(0,160));
   const week = await page.evaluate(() => { const rows=[...document.querySelectorAll('.time-worked-row')].map(r=>r.textContent); return rows; });
   check('1.3 week resets on Sunday (0m on Sunday)', week.some(w=>/This week\s*0m/.test(w)), week);
   check('no page errors (rollover)', page.errors.length===0, page.errors);
