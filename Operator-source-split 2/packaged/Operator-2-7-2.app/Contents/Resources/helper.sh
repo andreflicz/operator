@@ -265,7 +265,18 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":7}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":8}' ;;
+    /sports*)
+      # NFL / NBA scores and schedules (ESPN's public scoreboard) for Good morning
+      L=$(param l); D=$(param d)
+      case "$L" in
+        nfl) SU="https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard" ;;
+        nba) SU="https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard" ;;
+        *) respond 404 '{"ok":false}'; return ;;
+      esac
+      case "$D" in ''|*[!0-9-]*) ;; *) SU="$SU?dates=$D" ;; esac
+      SB=$(curl -s --max-time 8 "$SU" 2>/dev/null)
+      if [ -n "$SB" ]; then respond 200 "$SB"; else respond 502 '{"ok":false}'; fi ;;
     /news*)
       # a few headlines for the Good morning screen (news sites don't let a page fetch them directly)
       # ?q=<hex topics> → Google News for your topics (last 2 days); otherwise NPR's top stories

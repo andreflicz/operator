@@ -181,6 +181,7 @@ async function fetchNews(topics){
 }
 async function loadMorningNews(){
   if(!morningNewsOn()) return;
+  if(typeof loadScores==='function' && newsSections().some(function(x){ return x.id==='sports'; })) loadScores();
   const today = todayStr();
   if(ui.morningNews && ui.morningNews.date===today && (ui.morningNews.items || ui.morningNews.loading)) return;
   ui.morningNews = {date:today, loading:true, items:null, sec:{}};
@@ -350,12 +351,18 @@ function briefYouHtml(){
   const streak = computeStreak(), wk = typeof workoutsThisWeek==='function' ? workoutsThisWeek() : 0, wp = typeof weightProgress==='function' ? weightProgress() : {};
   const tiles = [['&#128293;', streak, streak===1 ? 'day streak' : 'day streak'], ['&#127947;&#65039;', wk, 'workouts this week']];
   if(wp.latest!=null) tiles.push(['&#9878;&#65039;', wp.latest, wp.goal!=null ? 'lbs &middot; goal '+wp.goal : 'lbs']);
+  const cap = typeof dueCapsule==='function' ? dueCapsule() : null;
+  if(cap){
+    openCapsule(cap);
+    return {voice:'And a message from you, from '+fmtDateShort(cap.writtenOn)+'.', html:'<div class="br-k">&#9203; From Past You</div><div class="br-cap"><small>Written '+fmtDateShort(cap.writtenOn)+(cap.hidden ? ' — you didn’t know when it would turn up' : '')+'</small>'+(cap.title ? '<b>'+escapeHtml(cap.title)+'</b>' : '')+'<p>'+escapeHtml(cap.text)+'</p></div>'};
+  }
   const mem = briefMemory();
   const memHtml = mem ? '<div class="br-mem"><small>'+agoLabel(mem.ago)+' you wrote</small><p>'+(mem.e.title ? '<b>'+escapeHtml(mem.e.title)+'</b> ' : '')+escapeHtml(String(mem.e.text).slice(0, 140))+(String(mem.e.text).length > 140 ? '…' : '')+'</p></div>' : '';
   return {voice: mem ? 'And a little something from you, '+agoLabel(mem.ago).toLowerCase()+'.' : 'Here’s where you’re at.',
     html:'<div class="br-k">&#128100; You, Lately</div><div class="br-you-t">'+tiles.map(function(t){ return '<div><span>'+t[0]+'</span><b>'+t[1]+'</b><small>'+t[2]+'</small></div>'; }).join('')+'</div>'+memHtml};
 }
 function wakeBriefHtml(){
+  if(typeof briefMinimalOn==='function' && briefMinimalOn()) return briefMinimalHtml();
   const today = todayStr(), name = state.profile.name || '';
   const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
   const nn = nightNote(today);
@@ -406,7 +413,7 @@ function wakeBriefHtml(){
     colC.push(panel('br-news', 'br-a-rise', secs.length ? 'Here’s what’s happening — the news, '+secs.map(function(x){ return x.label.toLowerCase(); }).join(' and ')+'.' : 'Here’s what’s happening out there.',
       '<div class="br-k">&#128240; '+(newsTopics() ? 'Your News' : 'Headlines')+'</div>'+
       news.slice(0, secs.length ? 3 : 6).map(function(n, i){ return item(n, i, i===0); }).join('')+
-      secs.map(function(x){ return '<div class="br-news-sec"><div class="br-news-h">'+x.icon+' '+x.label+'<span>'+escapeHtml(x.q)+'</span></div>'+sec[x.id].slice(0, 3).map(function(n, i){ return item(n, i, false); }).join('')+'</div>'; }).join(''),
+      secs.map(function(x){ const sc = x.id==='sports' && typeof scoresHtml==='function' ? scoresHtml() : ''; return '<div class="br-news-sec"><div class="br-news-h">'+x.icon+' '+x.label+'<span>'+escapeHtml(x.q)+'</span></div>'+sc+sec[x.id].slice(0, sc ? 2 : 3).map(function(n, i){ return item(n, i, false); }).join('')+'</div>'; }).join(''),
       late!=null ? ';--late:'+late+'ms' : ''));
   } else if(morningNewsOn() && ui.morningNews && ui.morningNews.loading){
     colC.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">&#128240; The News</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');
@@ -420,7 +427,7 @@ function wakeBriefHtml(){
   ui.briefLines = lines;
   const shift = ui.briefShift || 0;
   const w = wakeCfg(), song = (wakeFinishing || wakeAudio || wakeMusicApp) && w.media ? mediaName(w.media) : '';
-  return '<div class="brief brief2 brief3 brief4 bg-'+(wakeCfg().briefBg==='dark' ? 'dark' : 'sunrise')+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
+  return '<div class="brief brief2 brief3 brief4 bg-'+briefBgClass()+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
     (cine
       ? '<div class="brief-intro is-cinematic" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div>'+
           '<div class="bi-time">'+timeStr+'</div>'+
@@ -514,7 +521,7 @@ function clockIn(opts){
   if(m && (m.morning || (m.type==='offtime' && !m.sleep))) finishActiveMode(true);
   if(typeof applyNightPlanAuto==='function') applyNightPlanAuto();
   ui.view = 'today'; renderView();
-  ui.planReveal = {at:Date.now()};
+  ui.planReveal = {at:Date.now(), from:opts.from||''};
   showOverlay('planOverlay'); renderPlanRevealInto();
   if(!opts.quiet) playWorkIntro();
 }
@@ -592,6 +599,7 @@ function renderPlanReveal(){
   const at = function(step){ const v = d; d += Math.round((step||260)/3); return 'animation-delay:'+v+'ms'; };
   return '<div class="wi">'+
     '<div class="wi-top"><span class="pr-badge">&#128339; Clocked In</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
+      (ui.planReveal && ui.planReveal.from==='morning' ? '<button class="wi-back" data-action="backToMorning" title="Back to Good morning">&#8592; Morning</button>' : '')+
       '<span class="wi-pl">'+playlistBtnHtml()+'</span>'+
       '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
     '<div class="wi-inner">'+

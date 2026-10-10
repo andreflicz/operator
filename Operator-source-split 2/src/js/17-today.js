@@ -12,7 +12,7 @@ function renderOffTimeView(){
     '<div style="max-width:380px;margin:16px 0 6px;font-size:14.5px;color:var(--text-dim);line-height:1.5;">'+(typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)) ? 'That’s the week. Tomorrow’s a day off — enjoy it.' : 'The work day is done. Nothing else is tracked while you’re off.')+'</div>'+
     '<div class="row" style="gap:8px;justify-content:center;margin-top:10px;">'+
       (isWindDownTime() ? '<button class="btn th-btn-night" data-action="openWindDown">&#127769; Wind down</button>' : '')+
-      '<button class="btn" style="border-color:var(--border-strong);color:var(--text);" data-action="clockIn">&#128339; Clock back in</button>'+
+      '<button class="btn" style="border-color:var(--border-strong);color:var(--text);" data-action="clockIn">&#128339; Clock back in</button>'+tomorrowNoteBtnHtml('btn')+
     '</div>'+
   '</div></div>';
 }

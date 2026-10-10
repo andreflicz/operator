@@ -364,14 +364,15 @@ function closeQuickJournalModal(){ const o=document.getElementById('quickJournal
 function renderQuickJournalModal(){
   const today = state.journal.entries.filter(function(e){ return e.date===todayStr(); }).length;
   const now = new Date();
-  if(ui.qjSaved) return '<div class="qj3 is-saved"><div class="qj3-done"><span>&#10003;</span>Saved to your journal</div></div>';
+  if(ui.qjSaved) return '<div class="qj3 is-saved"><div class="qj3-done"><span>'+(ui.qjSaved==='capsule' ? '&#9203;' : '&#10003;')+'</span>'+(ui.qjSaved==='capsule' ? 'Sealed. Future you will find it.' : 'Saved to your journal')+'</div></div>';
   return '<div class="qj3" data-photo-drop="journal">'+
     '<div class="qj3-h"><span class="qj3-i">&#128221;</span><div><input class="qj3-name" id="quickJournalModalTextTitle" placeholder="Quick note" title="Name this note" value="'+escapeHtml(ui.qjTitleDraft||'')+'"><small>'+now.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+' &middot; '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+(today ? ' &middot; '+today+' today' : '')+'</small></div>'+
       '<button class="qj3-x" data-action="closeQuickJournalModal" title="Close (Esc)">&#10005;</button></div>'+
     '<textarea class="qj3-text" id="quickJournalModalText" placeholder="'+escapeHtml(ui.qjPrompt||QJ_PROMPTS[0])+'">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
     (arr(ui.journalDraftPhotos).length ? '<div class="qj3-photos">'+arr(ui.journalDraftPhotos).map(function(src, i){ return '<span><img src="'+escapeHtml(blobUrl(src))+'"><button data-action="removeJournalDraftPhoto" data-idx="'+i+'" title="Remove">&times;</button></span>'; }).join('')+'</div>' : '')+
     '<div class="qj3-tags">'+visibleJournalTypes().slice(0, 8).map(function(m){ return '<button class="qj3-tag'+(ui.selectedMood===m.id?' is-on':'')+'" data-action="qjMood" data-id="'+m.id+'" title="'+escapeHtml(m.label)+'">'+m.emoji+'<span>'+escapeHtml(m.label)+'</span></button>'; }).join('')+hiddenTypesChipHtml()+'</div>'+
-    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button><button class="qj3-ph" data-action="triggerJournalPhotoInput" title="Attach a photo">&#128247;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
+    capsuleBarHtml()+
+    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button><button class="qj3-ph" data-action="triggerJournalPhotoInput" title="Attach a photo">&#128247;</button><button class="qj3-ph'+(ui.qjCapsule?' is-on':'')+'" data-action="qjCapsule" title="Time capsule — send this to future you">&#9203;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
   '</div>';
 }
 function renderQuickJournalModalInto(){ const el=document.getElementById('quickJournalContent'); if(el) morphInto(el, renderQuickJournalModal(), {form:true}); }
@@ -387,6 +388,7 @@ document.addEventListener('keydown', function(e){
 function saveQuickJournal(){
   const t = document.getElementById('quickJournalModalText');
   if(!t || !t.value.trim()){ if(t){ t.focus(); t.classList.remove('is-shake'); void t.offsetWidth; t.classList.add('is-shake'); } return; }
+  if(ui.qjCapsule){ if(!capsuleSaveFromModal()) return; ui.qjSaved = 'capsule'; renderQuickJournalModalInto(); setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; }, 1200); return; }
   addJournalEntry('quickJournalModalText');
   ui.qjTitleDraft = '';
   ui.qjSaved = true; renderQuickJournalModalInto();

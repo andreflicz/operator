@@ -351,7 +351,7 @@ function renderWeekendOffView(elapsed){
       (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
       '<div class="dayoff-row">'+
         (isWindDownTime() ? '<button class="dayoff-back" data-action="openWindDown">&#127769; Wind down</button>' : '')+
-        '<button class="dayoff-back" data-action="clockIn">Clock back in</button>'+
+        '<button class="dayoff-back" data-action="clockIn">Clock back in</button>'+tomorrowNoteBtnHtml()+
       '</div>'+
     '</div>'+
   '</div>';
@@ -362,7 +362,7 @@ function renderDayOffView(){
   const stat = function(v, k){ return '<div class="rest-s"><b>'+v+'</b><span>'+k+'</span></div>'; };
   return '<div class="np rest is-dayoff'+(restFull() ? ' rest-full' : '')+'">'+
     '<div class="np-bg"></div>'+
-    restTopHtml('<button class="lv-btn rest-work" data-action="quickDayOff" title="Turn the day off back off">Work today</button>')+
+    restTopHtml(tomorrowNoteBtnHtml('lv-btn rest-work')+'<button class="lv-btn rest-work" data-action="quickDayOff" title="Turn the day off back off">Work today</button>')+
     '<div class="np-main">'+
       '<div class="np-art is-dayoff"><span>&#127796;</span></div>'+
       '<div class="np-meta">'+

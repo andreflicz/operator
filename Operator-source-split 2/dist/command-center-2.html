@@ -3312,6 +3312,76 @@
   .snz-acts{ display:flex; flex-direction:column; align-items:center; gap:12px; }
   .snz-music{ border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:rgba(255,255,255,.75); border-radius:999px; padding:7px 16px; font-size:12.5px; font-weight:600; cursor:pointer; }
   .snz-music:hover{ background:rgba(255,255,255,.12); color:#fff; }
+  .snd-pl-n{ flex:none; width:22px; font-family:var(--font-display); font-weight:800; font-size:16px; text-align:center; }
+  /* scores */
+  .gc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin:6px 0 6px; }
+  .gc{ display:flex; flex-direction:column; gap:2px; padding:7px 9px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); }
+  .gc.is-fav{ border-color:rgba(255,197,107,.5); background:rgba(255,197,107,.08); }
+  .gc-l{ display:none; }
+  .gc-m{ display:flex; align-items:center; gap:6px; font-size:13px; }
+  .gc-t{ display:inline-flex; align-items:baseline; gap:4px; color:rgba(255,255,255,.7); } .gc-t b{ font-weight:800; letter-spacing:.02em; } .gc-t i{ font-style:normal; font-variant-numeric:tabular-nums; }
+  .gc-t.is-win{ color:#fff; } .gc-at{ color:rgba(255,255,255,.35); font-size:11px; }
+  .gc-s{ font-size:10.5px; color:rgba(255,255,255,.5); display:flex; align-items:center; gap:5px; }
+  .gc-live{ width:6px; height:6px; border-radius:50%; background:#ff5a5a; box-shadow:0 0 8px #ff5a5a; }
+  /* time capsule */
+  .br-cap{ margin-top:8px; padding:12px 14px; border-radius:14px; background:linear-gradient(135deg, rgba(160,130,255,.16), rgba(111,195,255,.1)); border:1px solid rgba(180,160,255,.35); box-shadow:0 0 30px rgba(150,120,255,.15); }
+  .br-cap small{ font-size:10.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#c9b8ff; } .br-cap b{ display:block; margin-top:6px; color:#fff; } .br-cap p{ margin:4px 0 0; font-size:14px; line-height:1.5; color:rgba(255,255,255,.9); }
+  .qj3-cap{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:8px 0 2px; padding:8px 10px; border-radius:12px; background:rgba(160,130,255,.1); border:1px solid rgba(180,160,255,.3); font-size:12.5px; color:var(--text-dim); }
+  .qj3-capb{ border:1px solid var(--border); background:transparent; color:var(--text); border-radius:999px; padding:3px 10px; font-size:12px; cursor:pointer; } .qj3-capb.is-on{ background:#a98bff; border-color:#a98bff; color:#140d24; }
+  .qj3-capd{ border:1px solid var(--border); background:transparent; color:var(--text); border-radius:8px; padding:3px 6px; font-size:12px; }
+  .qj3-ph.is-on{ background:rgba(169,139,255,.25); border-radius:8px; }
+  /* note for tomorrow */
+  .tn-ov{ z-index:470 !important; }
+  .tn{ max-width:520px !important; padding:22px 24px !important; border-radius:22px !important; }
+  .tn-h{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+  .tn-k{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#b9c0ff; } .tn-t{ font-family:var(--font-display); font-size:22px; font-weight:800; margin-top:2px; }
+  .tn-x{ border:none; background:transparent; color:var(--text-faint); font-size:14px; cursor:pointer; }
+  .tn-f{ display:flex; flex-direction:column; gap:6px; margin-top:12px; } .tn-f span{ font-weight:700; font-size:13px; } .tn-f small{ display:block; font-weight:500; color:var(--text-faint); font-size:11.5px; }
+  .tn-a{ display:flex; justify-content:flex-end; margin-top:16px; }
+  .wi-back{ border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.05); color:rgba(255,255,255,.8); border-radius:999px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; margin-left:8px; } .wi-back:hover{ color:#fff; background:rgba(255,255,255,.1); }
+  /* Good morning backgrounds by time of day */
+  .brief.bg-day{ background:linear-gradient(180deg, #17406f 0%, #24609c 40%, #4f8cc6 75%, #8dbbe2 100%); }
+  .brief.bg-golden{ background:linear-gradient(180deg, #1f1a3d 0%, #4b2f58 40%, #9a4f5a 75%, #e0894c 100%); }
+  .brief.bg-night{ background:radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,.7), transparent), radial-gradient(1px 1px at 33% 9%, rgba(255,255,255,.5), transparent), radial-gradient(1.4px 1.4px at 58% 22%, rgba(255,255,255,.7), transparent), radial-gradient(1px 1px at 76% 12%, rgba(255,255,255,.5), transparent), radial-gradient(1px 1px at 88% 30%, rgba(255,255,255,.6), transparent), linear-gradient(180deg, #04060f 0%, #0b1430 60%, #1a2348 100%); }
+  .brief.bg-day::before{ content:''; position:fixed; right:-10vw; top:-20vh; width:60vw; height:60vh; pointer-events:none; background:radial-gradient(closest-side, rgba(255,240,200,.45), transparent 70%); }
+  .brief.bg-golden::before{ content:''; position:fixed; left:50%; bottom:-40vh; width:120vw; height:80vh; transform:translateX(-50%); pointer-events:none; background:radial-gradient(closest-side, rgba(255,170,90,.5), transparent 75%); }
+  .brief.bg-day .br-p:not(.brief-top):not(.brief-hello):not(.br-voice):not(.brief-cta), .brief.bg-golden .br-p:not(.brief-top):not(.brief-hello):not(.br-voice):not(.brief-cta), .brief.bg-night .br-p:not(.brief-top):not(.brief-hello):not(.br-voice):not(.brief-cta){ background:rgba(12,14,30,.45) !important; border-color:rgba(255,255,255,.12) !important; }
+  .brief.bg-day .brief-inner, .brief.bg-golden .brief-inner, .brief.bg-night .brief-inner{ position:relative; z-index:1; }
+  .brief.bg-day .brief-grid-bg, .brief.bg-golden .brief-grid-bg, .brief.bg-night .brief-grid-bg{ display:none; }
+  .brief.bg-day .brief-intro{ background:linear-gradient(180deg, #17406f, #4f8cc6); } .brief.bg-golden .brief-intro{ background:linear-gradient(180deg, #1f1a3d, #9a4f5a); } .brief.bg-night .brief-intro{ background:linear-gradient(180deg, #04060f, #1a2348); }
+  /* minimal Good morning */
+  .gmm-wrap{ height:100vh; overflow:hidden; display:flex; flex-direction:column; padding:clamp(16px, 2.6vh, 30px) clamp(20px, 3vw, 48px); }
+  .gmm-wrap .brief-top{ position:relative; z-index:2; display:flex; align-items:center; gap:10px; font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.65); }
+  .gmm-wrap .b4-music{ margin-left:auto; }
+  .gmm-hello{ position:relative; z-index:2; margin:clamp(10px, 2vh, 22px) 0 4px; text-align:center; font-family:var(--font-display); font-size:clamp(36px, 4.4vw, 60px); font-weight:800; letter-spacing:-.03em; }
+  .gmm-hello span{ background:linear-gradient(90deg, #ffd27a, #ff9a6b); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .gmm-wrap .br-voice{ position:relative; z-index:2; justify-content:center; display:flex; align-items:center; gap:8px; font-size:16px; color:#9fd6ff; min-height:24px; }
+  .gmm{ position:relative; z-index:2; flex:1; min-height:0; display:grid; grid-template-columns:1fr minmax(240px, 300px) 1fr; grid-template-rows:1fr 1fr; gap:clamp(12px, 2vh, 22px) clamp(14px, 2vw, 28px); align-items:center; max-width:1200px; width:100%; margin:clamp(10px, 2vh, 24px) auto 0; }
+  .gmm-c{ grid-column:2; grid-row:1 / span 2; display:flex; align-items:center; justify-content:center; }
+  .gmm-wx{ grid-column:1; grid-row:1; } .gmm-you{ grid-column:1; grid-row:2; }
+  .gmm-q{ grid-column:3; grid-row:1; } .gmm-day{ grid-column:3; grid-row:2; }
+  .gmm-news{ grid-column:1 / span 1; grid-row:3; } .gmm-sc{ grid-column:3; grid-row:3; }
+  .gmm:has(.gmm-news){ grid-template-rows:1fr 1fr auto; }
+  .gmm-t{ padding:14px 16px; border-radius:18px; background:rgba(12,14,30,.42); border:1px solid rgba(255,255,255,.12); animation:gmmIn .6s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i)*90ms + 150ms); }
+  @keyframes gmmIn{ from{ opacity:0; transform:translateY(10px) scale(.98); } }
+  .gmm-k{ font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.55); margin-bottom:6px; }
+  .gmm-t b{ font-family:var(--font-display); font-size:28px; font-weight:800; color:#fff; display:block; } .gmm-t span{ font-size:13px; color:rgba(255,255,255,.75); }
+  .gmm-q p{ margin:0; font-family:'Iowan Old Style', Georgia, serif; font-style:italic; font-size:16px; line-height:1.45; color:#fff; } .gmm-q small{ display:block; margin-top:6px; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.55); }
+  .gmm-ev{ font-size:13.5px; color:#fff; margin-top:3px; } .gmm-ev b{ font-family:inherit; font-size:13px; display:inline; color:#ffc56b; }
+  .gmm-note{ margin-top:8px; font-size:13px; color:#d6dcff; }
+  .gmm-n{ display:block; width:100%; text-align:left; border:none; background:none; color:rgba(255,255,255,.88); font-size:13px; line-height:1.35; padding:4px 0; cursor:pointer; } .gmm-n:hover{ color:#fff; }
+  .gmm-go{ position:relative; width:clamp(200px, 22vw, 270px); aspect-ratio:1; border-radius:50%; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+    background:radial-gradient(circle at 35% 30%, #ffe2a3, #f2a945 55%, #d9792e); color:#2a1606; box-shadow:0 30px 80px rgba(240,150,60,.45), inset 0 2px 0 rgba(255,255,255,.5); animation:gmmGo .8s cubic-bezier(.2,.9,.3,1.2) .2s both; transition:transform .2s; }
+  .gmm-go:hover{ transform:scale(1.04); }
+  .gmm-go-t{ font-family:var(--font-display); font-size:clamp(22px, 2.2vw, 28px); font-weight:800; letter-spacing:-.01em; } .gmm-go-s{ font-size:22px; }
+  .gmm-go-ring{ position:absolute; inset:-14px; border-radius:50%; border:1px solid rgba(255,210,140,.45); animation:gmmRing 3s ease-in-out infinite; }
+  @keyframes gmmGo{ from{ opacity:0; transform:scale(.8); } }
+  @keyframes gmmRing{ 0%, 100%{ transform:scale(.96); opacity:.3; } 50%{ transform:scale(1.04); opacity:1; } }
+  .gmm-sc .gc-grid{ grid-template-columns:1fr 1fr; margin:0; }
+  .gmm{ grid-template-rows:auto auto auto !important; align-content:center; }
+  .gmm-c{ grid-row:1 / span 3 !important; }
+  .gmm-sc .gc-t b{ font-family:inherit; font-size:13px; display:inline; } .gmm-sc .gc-t i{ font-size:13px; } .gmm-sc .gc-s{ font-size:10.5px; }
+  .gmm-t{ align-self:stretch; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -4869,7 +4939,7 @@ function normalizeFocus(f){
 function normalizeHealth(h){ h=h||{}; h.gymLog=arr(h.gymLog); h.weightLog=arr(h.weightLog); h.calorieEntries=arr(h.calorieEntries); return h; }
 function normalizeMeals(m){ m=m||{}; m.library = (Array.isArray(m.library) && m.library.length) ? m.library : defaultMeals().library; return m; }
 function normalizeJournal(j){
-  j=j||{}; j.entries=arr(j.entries);
+  j=j||{}; j.entries=arr(j.entries); if(!Array.isArray(j.capsules)) j.capsules=[];
   if(!Array.isArray(j.types) || !j.types.length) j.types = defaultJournalTypes();
   else {
     const retiredIds = ['idea','win','vent','reflect','tired'];
@@ -5350,6 +5420,8 @@ function soundSettingsHtml(){
     '<div class="card section"><div class="section-title">&#9728;&#65039; Mornings</div>'+
       '<div class="snd-pl"><label><b>Morning playlist</b><small>An Apple Music playlist — the play button on Good morning starts it, and it follows your wake-up song by itself</small></label>'+
         '<div class="snd-music" style="margin-top:8px;"><input class="input" id="sndMorningPl" placeholder="Apple Music playlist link, or its exact name" value="'+escapeHtml(p.morningPlaylist && (p.morningPlaylist.url || p.morningPlaylist.q) || '')+'"><button class="btn btn-sm btn-primary" data-action="sndMorningPlSet">Save</button></div></div>'+
+      '<div class="snd-pl" style="margin-top:14px;"><label><b>Playlists 1 · 2 · 3</b><small>The numbered buttons in the music dock (top right). Paste an Apple Music link or a playlist name.</small></label>'+
+        [0,1,2].map(function(i){ const pl = (p.playlists||[])[i]; return '<div class="snd-music" style="margin-top:8px;"><span class="snd-pl-n" style="color:'+(typeof DOCK_COLORS!=='undefined' ? DOCK_COLORS[i] : '#fff')+'">'+(i+1)+'</span><input class="input" id="sndPl'+i+'" placeholder="Playlist '+(i+1)+' — link or name" value="'+escapeHtml(pl ? (pl.url || pl.q) : '')+'"><button class="btn btn-sm btn-primary" data-action="sndPlSet" data-id="'+i+'">Save</button></div>'; }).join('')+'</div>'+
       '<div class="snd-rows">'+
         tog('morningPlAfterSong', 'Play it after the wake-up song', 'When the song ends, the playlist carries on', true)+
         tog('focusMusic', 'Focus music after the lock-in intro', 'Quiet tracks keep playing until you lock out', true)+
@@ -5389,6 +5461,8 @@ ACTIONS.previewSounds = function(){
 };
 
 ACTIONS.sndMorningPlSet = async function(){ const i = document.getElementById('sndMorningPl'), v = i ? i.value.trim() : ''; const pl = await setMorningPlaylistFrom(v); saveSound(); showToast(pl ? 'Morning playlist: '+escapeHtml(pl.q) : 'Morning playlist cleared', {icon:'&#9835;'}); };
+
+ACTIONS.sndPlSet = async function(el, e, id){ const i = Number(id), inp = document.getElementById('sndPl'+i), v = inp ? inp.value.trim() : ''; const pl = v ? await setUserPlaylist(i, v) : null; if(!v){ userPlaylists()[i] = null; persist('profile'); } saveSound(); if(typeof dockRefresh==='function') dockRefresh(); showToast(pl ? 'Playlist '+(i+1)+': '+escapeHtml(pl.q) : 'Playlist '+(i+1)+' cleared', {icon:'&#9835;'}); };
 // ============ CLIENT HELPERS ============
 function clientOptionsHtml(selected){
   const clients = arr(state.business && state.business.clients);
@@ -7203,7 +7277,7 @@ function renderOffTimeView(){
     '<div style="max-width:380px;margin:16px 0 6px;font-size:14.5px;color:var(--text-dim);line-height:1.5;">'+(typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)) ? 'That’s the week. Tomorrow’s a day off — enjoy it.' : 'The work day is done. Nothing else is tracked while you’re off.')+'</div>'+
     '<div class="row" style="gap:8px;justify-content:center;margin-top:10px;">'+
       (isWindDownTime() ? '<button class="btn th-btn-night" data-action="openWindDown">&#127769; Wind down</button>' : '')+
-      '<button class="btn" style="border-color:var(--border-strong);color:var(--text);" data-action="clockIn">&#128339; Clock back in</button>'+
+      '<button class="btn" style="border-color:var(--border-strong);color:var(--text);" data-action="clockIn">&#128339; Clock back in</button>'+tomorrowNoteBtnHtml('btn')+
     '</div>'+
   '</div></div>';
 }
@@ -10963,14 +11037,15 @@ function closeQuickJournalModal(){ const o=document.getElementById('quickJournal
 function renderQuickJournalModal(){
   const today = state.journal.entries.filter(function(e){ return e.date===todayStr(); }).length;
   const now = new Date();
-  if(ui.qjSaved) return '<div class="qj3 is-saved"><div class="qj3-done"><span>&#10003;</span>Saved to your journal</div></div>';
+  if(ui.qjSaved) return '<div class="qj3 is-saved"><div class="qj3-done"><span>'+(ui.qjSaved==='capsule' ? '&#9203;' : '&#10003;')+'</span>'+(ui.qjSaved==='capsule' ? 'Sealed. Future you will find it.' : 'Saved to your journal')+'</div></div>';
   return '<div class="qj3" data-photo-drop="journal">'+
     '<div class="qj3-h"><span class="qj3-i">&#128221;</span><div><input class="qj3-name" id="quickJournalModalTextTitle" placeholder="Quick note" title="Name this note" value="'+escapeHtml(ui.qjTitleDraft||'')+'"><small>'+now.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+' &middot; '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+(today ? ' &middot; '+today+' today' : '')+'</small></div>'+
       '<button class="qj3-x" data-action="closeQuickJournalModal" title="Close (Esc)">&#10005;</button></div>'+
     '<textarea class="qj3-text" id="quickJournalModalText" placeholder="'+escapeHtml(ui.qjPrompt||QJ_PROMPTS[0])+'">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
     (arr(ui.journalDraftPhotos).length ? '<div class="qj3-photos">'+arr(ui.journalDraftPhotos).map(function(src, i){ return '<span><img src="'+escapeHtml(blobUrl(src))+'"><button data-action="removeJournalDraftPhoto" data-idx="'+i+'" title="Remove">&times;</button></span>'; }).join('')+'</div>' : '')+
     '<div class="qj3-tags">'+visibleJournalTypes().slice(0, 8).map(function(m){ return '<button class="qj3-tag'+(ui.selectedMood===m.id?' is-on':'')+'" data-action="qjMood" data-id="'+m.id+'" title="'+escapeHtml(m.label)+'">'+m.emoji+'<span>'+escapeHtml(m.label)+'</span></button>'; }).join('')+hiddenTypesChipHtml()+'</div>'+
-    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button><button class="qj3-ph" data-action="triggerJournalPhotoInput" title="Attach a photo">&#128247;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
+    capsuleBarHtml()+
+    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button><button class="qj3-ph" data-action="triggerJournalPhotoInput" title="Attach a photo">&#128247;</button><button class="qj3-ph'+(ui.qjCapsule?' is-on':'')+'" data-action="qjCapsule" title="Time capsule — send this to future you">&#9203;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
   '</div>';
 }
 function renderQuickJournalModalInto(){ const el=document.getElementById('quickJournalContent'); if(el) morphInto(el, renderQuickJournalModal(), {form:true}); }
@@ -10986,6 +11061,7 @@ document.addEventListener('keydown', function(e){
 function saveQuickJournal(){
   const t = document.getElementById('quickJournalModalText');
   if(!t || !t.value.trim()){ if(t){ t.focus(); t.classList.remove('is-shake'); void t.offsetWidth; t.classList.add('is-shake'); } return; }
+  if(ui.qjCapsule){ if(!capsuleSaveFromModal()) return; ui.qjSaved = 'capsule'; renderQuickJournalModalInto(); setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; }, 1200); return; }
   addJournalEntry('quickJournalModalText');
   ui.qjTitleDraft = '';
   ui.qjSaved = true; renderQuickJournalModalInto();
@@ -17444,7 +17520,8 @@ function renderWakeSetup(){
       '<div class="field"><label>News topics'+tip('Things you care about, separated by commas — e.g. AI, Knicks, marketing. Good morning shows the latest headlines on those. Leave it empty for the top stories.')+'</label><input class="input" data-wake="newsTopics" placeholder="e.g. AI, Knicks, marketing" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
       '<div class="field"><label>Sports'+tip('Teams or leagues for the Sports section — e.g. Knicks, Giants, UFC. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, NFL, UFC" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
       '<div class="field"><label>Tech & interests'+tip('Anything else you follow — e.g. AI, Apple, marketing, crypto. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
-      '<div class="field"><label>Good morning background</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.briefBg!=='dark'?' active':'')+'" data-action="wakeBriefBg" data-id="sunrise">Sunrise</button><button class="seg-tab'+(w.briefBg==='dark'?' active':'')+'" data-action="wakeBriefBg" data-id="dark">Dark</button></div></div>'+
+      '<div class="field"><label>Good morning background'+tip('Time of day follows when you\'re up: sunrise colours early, a blue sky later in the morning, golden in the evening, night if it\'s still dark.')+'</label><div class="seg-tabs" style="margin:0;">'+[['auto','Time of day'],['sunrise','Sunrise'],['dark','Dark']].map(function(o){ const on = (w.briefBg||'auto')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefBg" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
+      '<div class="field"><label>Good morning layout'+tip('Minimal: one big Get to Work button in the middle with the important things around it.')+'</label><div class="seg-tabs" style="margin:0;">'+[['full','Full'],['minimal','Minimal']].map(function(o){ const on = (w.briefLayout||'full')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefLayout" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
       '<div class="field"><label>Headlines in Good morning</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.news!==false?' active':'')+'" data-action="wakeNews" data-id="on">On</button><button class="seg-tab'+(w.news===false?' active':'')+'" data-action="wakeNews" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+
     '</div>'+
@@ -20452,6 +20529,7 @@ async function fetchNews(topics){
 }
 async function loadMorningNews(){
   if(!morningNewsOn()) return;
+  if(typeof loadScores==='function' && newsSections().some(function(x){ return x.id==='sports'; })) loadScores();
   const today = todayStr();
   if(ui.morningNews && ui.morningNews.date===today && (ui.morningNews.items || ui.morningNews.loading)) return;
   ui.morningNews = {date:today, loading:true, items:null, sec:{}};
@@ -20621,12 +20699,18 @@ function briefYouHtml(){
   const streak = computeStreak(), wk = typeof workoutsThisWeek==='function' ? workoutsThisWeek() : 0, wp = typeof weightProgress==='function' ? weightProgress() : {};
   const tiles = [['&#128293;', streak, streak===1 ? 'day streak' : 'day streak'], ['&#127947;&#65039;', wk, 'workouts this week']];
   if(wp.latest!=null) tiles.push(['&#9878;&#65039;', wp.latest, wp.goal!=null ? 'lbs &middot; goal '+wp.goal : 'lbs']);
+  const cap = typeof dueCapsule==='function' ? dueCapsule() : null;
+  if(cap){
+    openCapsule(cap);
+    return {voice:'And a message from you, from '+fmtDateShort(cap.writtenOn)+'.', html:'<div class="br-k">&#9203; From Past You</div><div class="br-cap"><small>Written '+fmtDateShort(cap.writtenOn)+(cap.hidden ? ' — you didn’t know when it would turn up' : '')+'</small>'+(cap.title ? '<b>'+escapeHtml(cap.title)+'</b>' : '')+'<p>'+escapeHtml(cap.text)+'</p></div>'};
+  }
   const mem = briefMemory();
   const memHtml = mem ? '<div class="br-mem"><small>'+agoLabel(mem.ago)+' you wrote</small><p>'+(mem.e.title ? '<b>'+escapeHtml(mem.e.title)+'</b> ' : '')+escapeHtml(String(mem.e.text).slice(0, 140))+(String(mem.e.text).length > 140 ? '…' : '')+'</p></div>' : '';
   return {voice: mem ? 'And a little something from you, '+agoLabel(mem.ago).toLowerCase()+'.' : 'Here’s where you’re at.',
     html:'<div class="br-k">&#128100; You, Lately</div><div class="br-you-t">'+tiles.map(function(t){ return '<div><span>'+t[0]+'</span><b>'+t[1]+'</b><small>'+t[2]+'</small></div>'; }).join('')+'</div>'+memHtml};
 }
 function wakeBriefHtml(){
+  if(typeof briefMinimalOn==='function' && briefMinimalOn()) return briefMinimalHtml();
   const today = todayStr(), name = state.profile.name || '';
   const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
   const nn = nightNote(today);
@@ -20677,7 +20761,7 @@ function wakeBriefHtml(){
     colC.push(panel('br-news', 'br-a-rise', secs.length ? 'Here’s what’s happening — the news, '+secs.map(function(x){ return x.label.toLowerCase(); }).join(' and ')+'.' : 'Here’s what’s happening out there.',
       '<div class="br-k">&#128240; '+(newsTopics() ? 'Your News' : 'Headlines')+'</div>'+
       news.slice(0, secs.length ? 3 : 6).map(function(n, i){ return item(n, i, i===0); }).join('')+
-      secs.map(function(x){ return '<div class="br-news-sec"><div class="br-news-h">'+x.icon+' '+x.label+'<span>'+escapeHtml(x.q)+'</span></div>'+sec[x.id].slice(0, 3).map(function(n, i){ return item(n, i, false); }).join('')+'</div>'; }).join(''),
+      secs.map(function(x){ const sc = x.id==='sports' && typeof scoresHtml==='function' ? scoresHtml() : ''; return '<div class="br-news-sec"><div class="br-news-h">'+x.icon+' '+x.label+'<span>'+escapeHtml(x.q)+'</span></div>'+sc+sec[x.id].slice(0, sc ? 2 : 3).map(function(n, i){ return item(n, i, false); }).join('')+'</div>'; }).join(''),
       late!=null ? ';--late:'+late+'ms' : ''));
   } else if(morningNewsOn() && ui.morningNews && ui.morningNews.loading){
     colC.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">&#128240; The News</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');
@@ -20691,7 +20775,7 @@ function wakeBriefHtml(){
   ui.briefLines = lines;
   const shift = ui.briefShift || 0;
   const w = wakeCfg(), song = (wakeFinishing || wakeAudio || wakeMusicApp) && w.media ? mediaName(w.media) : '';
-  return '<div class="brief brief2 brief3 brief4 bg-'+(wakeCfg().briefBg==='dark' ? 'dark' : 'sunrise')+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
+  return '<div class="brief brief2 brief3 brief4 bg-'+briefBgClass()+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
     (cine
       ? '<div class="brief-intro is-cinematic" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div>'+
           '<div class="bi-time">'+timeStr+'</div>'+
@@ -20785,7 +20869,7 @@ function clockIn(opts){
   if(m && (m.morning || (m.type==='offtime' && !m.sleep))) finishActiveMode(true);
   if(typeof applyNightPlanAuto==='function') applyNightPlanAuto();
   ui.view = 'today'; renderView();
-  ui.planReveal = {at:Date.now()};
+  ui.planReveal = {at:Date.now(), from:opts.from||''};
   showOverlay('planOverlay'); renderPlanRevealInto();
   if(!opts.quiet) playWorkIntro();
 }
@@ -20863,6 +20947,7 @@ function renderPlanReveal(){
   const at = function(step){ const v = d; d += Math.round((step||260)/3); return 'animation-delay:'+v+'ms'; };
   return '<div class="wi">'+
     '<div class="wi-top"><span class="pr-badge">&#128339; Clocked In</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
+      (ui.planReveal && ui.planReveal.from==='morning' ? '<button class="wi-back" data-action="backToMorning" title="Back to Good morning">&#8592; Morning</button>' : '')+
       '<span class="wi-pl">'+playlistBtnHtml()+'</span>'+
       '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
     '<div class="wi-inner">'+
@@ -21266,7 +21351,7 @@ function renderWeekendOffView(elapsed){
       (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
       '<div class="dayoff-row">'+
         (isWindDownTime() ? '<button class="dayoff-back" data-action="openWindDown">&#127769; Wind down</button>' : '')+
-        '<button class="dayoff-back" data-action="clockIn">Clock back in</button>'+
+        '<button class="dayoff-back" data-action="clockIn">Clock back in</button>'+tomorrowNoteBtnHtml()+
       '</div>'+
     '</div>'+
   '</div>';
@@ -21277,7 +21362,7 @@ function renderDayOffView(){
   const stat = function(v, k){ return '<div class="rest-s"><b>'+v+'</b><span>'+k+'</span></div>'; };
   return '<div class="np rest is-dayoff'+(restFull() ? ' rest-full' : '')+'">'+
     '<div class="np-bg"></div>'+
-    restTopHtml('<button class="lv-btn rest-work" data-action="quickDayOff" title="Turn the day off back off">Work today</button>')+
+    restTopHtml(tomorrowNoteBtnHtml('lv-btn rest-work')+'<button class="lv-btn rest-work" data-action="quickDayOff" title="Turn the day off back off">Work today</button>')+
     '<div class="np-main">'+
       '<div class="np-art is-dayoff"><span>&#127796;</span></div>'+
       '<div class="np-meta">'+
@@ -21442,6 +21527,184 @@ function dockRefresh(){
 // the old player's refresh now refreshes the dock too
 fmRefresh = function(){ dockRefresh(); };
 afterRenderHooks.push(function(){ dockRefresh(); document.body.classList.toggle('np-locked-on', !!document.querySelector('#viewRoot .np-locked')); });
+// ============ GOOD MORNING, MORE ============
+// Scores (NFL + NBA: last results and what's next, your teams first), the time capsule (a note to
+// future you that turns up on some morning, rarely), the note for tomorrow (one form, three parts),
+// and the way back from the work preview to Good morning.
+
+// ---- scores ----
+const SPORTS = [{id:'nfl', label:'NFL', icon:'&#127944;'}, {id:'nba', label:'NBA', icon:'&#127936;'}];
+function ymdCompact(d){ return d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate()); }
+function parseScoreboard(j, l){
+  return arr(j && j.events).map(function(e){
+    const c = arr(e.competitions)[0] || {}, cs = arr(c.competitors);
+    const home = cs.find(function(x){ return x.homeAway==='home'; }) || cs[0] || {}, away = cs.find(function(x){ return x.homeAway==='away'; }) || cs[1] || {};
+    const st = (e.status && e.status.type) || {};
+    const t = function(x){ const tm = x.team || {}; return {abbr:tm.abbreviation||'', name:tm.displayName||'', short:tm.shortDisplayName||tm.name||'', score:x.score!=null ? String(x.score) : '', win:!!x.winner}; };
+    return {l:l, id:e.id, at:Date.parse(e.date), state:st.state, detail:st.shortDetail||'', home:t(home), away:t(away)};
+  }).filter(function(g){ return g.home.abbr && g.away.abbr && isFinite(g.at); });
+}
+async function fetchScoreboard(l){
+  const now = Date.now(), range = ymdCompact(new Date(now - 5*86400000))+'-'+ymdCompact(new Date(now + 6*86400000));
+  let j = null;
+  try{ const r = await fetchWithin(WAKE_HELPER+'sports?l='+l+'&d='+range, 9000); if(r && r.ok) j = await r.json(); }catch(e){}
+  if(!j){ try{ const r = await fetchWithin('https://site.api.espn.com/apis/site/v2/sports/'+(l==='nfl' ? 'football' : 'basketball')+'/'+l+'/scoreboard?dates='+range, 9000); if(r && r.ok) j = await r.json(); }catch(e){} }
+  return j ? parseScoreboard(j, l) : null;
+}
+function favWords(){ return sectionTopics(wakeCfg().newsSports, 'NFL, NBA').toLowerCase().split(/\s*,\s*/).filter(function(w){ return w && !/^(nfl|nba|football|basketball|sports)$/.test(w); }); }
+function isFavGame(g){ const ws = favWords(); return ws.some(function(w){ return [g.home.name, g.home.short, g.home.abbr, g.away.name, g.away.short, g.away.abbr].some(function(x){ return String(x).toLowerCase().indexOf(w)>=0; }); }); }
+function pickGames(list){
+  const favFirst = function(xs){ return xs.filter(isFavGame).concat(xs.filter(function(g){ return !isFavGame(g); })); };
+  const live = favFirst(list.filter(function(g){ return g.state==='in'; }));
+  const done = favFirst(list.filter(function(g){ return g.state==='post'; }).sort(function(a, b){ return b.at - a.at; }));
+  const next = favFirst(list.filter(function(g){ return g.state==='pre'; }).sort(function(a, b){ return a.at - b.at; }));
+  return live.slice(0, 1).concat(done.slice(0, live.length ? 1 : 2), next.slice(0, 2)).slice(0, 4);
+}
+async function loadScores(){
+  const today = todayStr();
+  if(ui.scores && ui.scores.date===today && (ui.scores.loading || ui.scores.got)) return;
+  ui.scores = {date:today, loading:true};
+  const r = await Promise.all(SPORTS.map(function(s){ return fetchScoreboard(s.id); }));
+  ui.scores = {date:today, loading:false, got:true, nfl:r[0], nba:r[1]};
+  if(ui.wakeMode==='brief' && overlayOpen('wakeOverlay')) renderWakeOverlayInto();
+}
+function scoreWhen(g){
+  const d = new Date(g.at), today = todayStr(), ds = ds2(d);
+  const day = ds===today ? 'Today' : ds===addDays(today, 1) ? 'Tomorrow' : d.toLocaleDateString(undefined, {weekday:'short'});
+  return day+' '+d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+}
+function gameChipHtml(g){
+  const fav = isFavGame(g), sp = SPORTS.find(function(s){ return s.id===g.l; });
+  const side = function(t, showScore){ return '<span class="gc-t'+(t.win ? ' is-win' : '')+'"><b>'+escapeHtml(t.abbr)+'</b>'+(showScore ? '<i>'+escapeHtml(t.score)+'</i>' : '')+'</span>'; };
+  const scored = g.state!=='pre';
+  return '<div class="gc is-'+g.state+(fav ? ' is-fav' : '')+'" title="'+escapeHtml(g.away.name+' at '+g.home.name)+'">'+
+    '<span class="gc-l">'+(sp ? sp.icon : '')+'</span>'+
+    '<span class="gc-m">'+side(g.away, scored)+'<span class="gc-at">'+(scored ? '–' : '@')+'</span>'+side(g.home, scored)+'</span>'+
+    '<span class="gc-s">'+(g.state==='in' ? '<em class="gc-live"></em>'+escapeHtml(g.detail) : g.state==='post' ? 'Final' : escapeHtml(scoreWhen(g)))+'</span></div>';
+}
+function scoresHtml(){
+  const sc = ui.scores; if(!sc || !sc.got) return '';
+  const games = []; SPORTS.forEach(function(s){ const list = sc[s.id]; if(list && list.length) games.push.apply(games, pickGames(list).slice(0, 2)); });
+  return games.length ? '<div class="gc-grid">'+games.map(gameChipHtml).join('')+'</div>' : '';
+}
+// what the voice can say about it
+function scoresSpoken(){
+  const sc = ui.scores; if(!sc || !sc.got) return '';
+  const lines = [];
+  SPORTS.forEach(function(s){
+    const g = pickGames(sc[s.id] || []);
+    const done = g.find(function(x){ return x.state==='post'; }), next = g.find(function(x){ return x.state==='pre'; });
+    if(done){ const w = done.home.win ? done.home : done.away, l = done.home.win ? done.away : done.home; lines.push('In the '+s.label+', the '+w.short+' beat the '+l.short+', '+w.score+' to '+l.score+'.'); }
+    if(next) lines.push('Next up, '+next.away.short+' at '+next.home.short+', '+scoreWhen(next).replace('Today', 'today').replace('Tomorrow', 'tomorrow')+'.');
+  });
+  return lines.join(' ');
+}
+
+// ---- the time capsule: a note to future you ----
+function capsules(){ const c = state.journal.capsules; return Array.isArray(c) ? c : (state.journal.capsules = []); }
+function randomCapsuleDate(){ const days = 30 + Math.floor(Math.random()*335); return addDays(todayStr(), days); }
+function dueCapsule(){ const t = todayStr(); return capsules().filter(function(c){ return !c.openedOn && c.openOn<=t; }).sort(function(a, b){ return a.openOn.localeCompare(b.openOn); })[0] || capsules().find(function(c){ return c.openedOn===t; }) || null; }
+// opening it: it stays on the page for the day and goes into the journal
+function openCapsule(c){
+  if(c.openedOn) return;
+  c.openedOn = todayStr();
+  state.journal.entries.push({id:uid(), date:todayStr(), timestamp:Date.now(), text:c.text, title:'⏳ '+(c.title || 'From '+fmtDateShort(c.writtenOn)), type:'freeform', mood:null, pinned:true, photos:[], capsuleFrom:c.writtenOn});
+  persist('journal');
+}
+function capsuleSaveFromModal(){
+  const t = document.getElementById('quickJournalModalText'), tt = document.getElementById('quickJournalModalTextTitle');
+  if(!t || !t.value.trim()) return false;
+  const when = ui.qjCapsule==='random' || !ui.qjCapsuleDate ? randomCapsuleDate() : ui.qjCapsuleDate;
+  capsules().push({id:uid(), text:t.value.trim(), title:tt ? tt.value.trim() : '', writtenOn:todayStr(), openOn:when, hidden:ui.qjCapsule==='random'});
+  persist('journal');
+  ui.journalDraftText = ''; ui.qjTitleDraft = ''; ui.qjCapsule = null; ui.qjCapsuleDate = null;
+  return true;
+}
+ACTIONS.qjCapsule = function(){
+  const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value;
+  ui.qjCapsule = ui.qjCapsule ? null : 'random'; renderQuickJournalModalInto();
+};
+ACTIONS.qjCapsuleWhen = function(el, e, id){ ui.qjCapsule = id; if(id==='random') ui.qjCapsuleDate = null; renderQuickJournalModalInto(); };
+document.addEventListener('change', function(e){ if(e.target && e.target.id==='qjCapsuleDate'){ ui.qjCapsuleDate = e.target.value || null; ui.qjCapsule = e.target.value ? 'date' : 'random'; } });
+function capsuleBarHtml(){
+  if(!ui.qjCapsule) return '';
+  return '<div class="qj3-cap"><span>&#9203; For future you —</span>'+
+    '<button class="qj3-capb'+(ui.qjCapsule==='random'?' is-on':'')+'" data-action="qjCapsuleWhen" data-id="random" title="Some morning in the next year — you won\'t know when">Surprise me</button>'+
+    '<input type="date" class="qj3-capd" id="qjCapsuleDate" min="'+addDays(todayStr(), 1)+'" value="'+escapeHtml(ui.qjCapsuleDate||'')+'" title="Or pick the day">'+
+  '</div>';
+}
+
+// ---- the note for tomorrow: one form, three parts, always editable ----
+function openTomorrowNote(){
+  let o = document.getElementById('tnOverlay');
+  if(!o){ o = document.createElement('div'); o.id = 'tnOverlay'; o.className = 'overlay tn-ov'; o.innerHTML = '<div class="modal tn" id="tnContent"></div>'; document.body.appendChild(o); o.addEventListener('pointerdown', function(e){ if(e.target===o) closeTomorrowNote(); }); }
+  const target = morningNoteTarget(), nn = nightNote(target);
+  document.getElementById('tnContent').innerHTML =
+    '<div class="tn-h"><div><div class="tn-k">&#127769; For '+(target===addDays(todayStr(), 1) ? 'tomorrow' : weekdayShort(target))+'</div><div class="tn-t">A note to the morning you</div></div><button class="tn-x" data-action="closeTomorrowNote">&#10005;</button></div>'+
+    '<label class="tn-f"><span>Headline<small>Big on the alarm and Good morning</small></span><input class="input" id="tnHead" maxlength="120" placeholder="e.g. Up at 6. Don’t negotiate." value="'+escapeHtml(nn.headline)+'"></label>'+
+    '<label class="tn-f"><span>For the morning<small>On Good morning — the longer version</small></span><textarea class="input" id="tnMorning" rows="3" placeholder="How you want the morning to go…">'+escapeHtml(nn.morning)+'</textarea></label>'+
+    '<label class="tn-f"><span>Before you lock in<small>On the work preview, the first time you clock in</small></span><textarea class="input" id="tnWork" rows="2" placeholder="e.g. Call Mike first. Then the JJS edit.">'+escapeHtml(nn.work)+'</textarea></label>'+
+    '<div class="tn-a"><button class="btn btn-primary" data-action="saveTomorrowNote">Save note</button></div>';
+  o.classList.remove('hidden');
+  setTimeout(function(){ const i = document.getElementById('tnHead'); if(i) i.focus(); }, 50);
+}
+function closeTomorrowNote(){ const o = document.getElementById('tnOverlay'); if(o) o.classList.add('hidden'); }
+ACTIONS.openTomorrowNote = function(){ openTomorrowNote(); };
+ACTIONS.closeTomorrowNote = function(){ closeTomorrowNote(); };
+ACTIONS.saveTomorrowNote = function(){
+  const v = function(id){ const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const target = morningNoteTarget();
+  // replace what was there for that morning (it's one note you keep updating)
+  state.focus.morningNotes = morningNotes().filter(function(n){ return n.forDate!==target; });
+  const head = v('tnHead'), morning = v('tnMorning'), work = v('tnWork');
+  if(head || morning || work) addMorningNote(head, {morning:morning, work:work});
+  persist('focus'); closeTomorrowNote();
+  showToast(head || morning || work ? 'Saved — it’ll be waiting for you.' : 'Note cleared.', {icon:'&#127769;'});
+  renderView();
+};
+function tomorrowNoteBtnHtml(cls){ const has = (function(){ const n = nightNote(morningNoteTarget()); return !!(n.headline || n.morning || n.work); })(); return '<button class="'+(cls||'dayoff-back')+'" data-action="openTomorrowNote">&#9998; '+(has ? 'Edit tomorrow’s note' : 'Note for tomorrow')+'</button>'; }
+
+// ---- from the work preview back to Good morning (it's a sequence) ----
+ACTIONS.backToMorning = function(){
+  ui.planReveal = null; hideOverlay('planOverlay');
+  ui.wakeMode = 'brief'; ui.wakeIntroDone = true; ui.briefSkipped = true; ui.briefT0 = Date.now() - 120000; ui.briefShift = 120000;
+  showOverlay('wakeOverlay'); renderWakeOverlayInto();
+};
+
+// ---- Good morning's background: by the time you're up (default), or always Sunrise / Dark ----
+function briefBgClass(){
+  const b = wakeCfg().briefBg;
+  if(b==='dark' || b==='sunrise') return b;
+  const ph = typeof skyPhase==='function' ? skyPhase() : 'morning';
+  return ph==='dawn' || ph==='morning' ? 'sunrise' : ph==='day' ? 'day' : ph==='golden' || ph==='dusk' ? 'golden' : 'night';
+}
+// ---- the minimal Good morning: one big button in the middle, the important things around it ----
+function briefMinimalOn(){ return wakeCfg().briefLayout==='minimal'; }
+function briefMinimalHtml(){
+  const name = state.profile.name || '', today = todayStr(), now = typeof wxNow==='function' ? wxNow() : null, phase = skyPhase(), win = dayWindow();
+  const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
+  const q = quoteOfDay(), nn = nightNote(today), news = ui.morningNews && ui.morningNews.date===today ? ui.morningNews.items : null;
+  const slept = lastNightSleep(), streak = computeStreak();
+  const tile = function(cls, k, html, i){ return '<div class="gmm-t '+cls+'" style="--i:'+i+'"><div class="gmm-k">'+k+'</div>'+html+'</div>'; };
+  ui.briefLines = [{at:0, text: (nn.headline ? 'You left yourself a note. ' : '')+'Get ready to start your day.'}];
+  const sc = typeof scoresHtml==='function' ? scoresHtml() : '';
+  return '<div class="brief brief2 brief4 gmm-wrap bg-'+briefBgClass()+' intro-skipped is-skipped" data-sky="'+phase+'">'+
+    '<div class="brief-top"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
+      '<span class="b4-music">'+playlistBtnHtml()+'</span><button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
+    '<h1 class="gmm-hello">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
+    '<div class="br-voice"><span class="br-voice-dot"></span><span id="brVoice"></span></div>'+
+    '<div class="gmm">'+
+      tile('gmm-wx', (now ? wxIcon(wxKind(now.code), phase) : SKY_META[phase].icon)+' Outside', now ? '<b>'+now.temp+'&deg;</b><span>'+escapeHtml(wxLabel(now.code))+(now.hi!=null ? ' · H '+now.hi+'&deg; L '+now.lo+'&deg;' : '')+'</span>' : '<b>'+SKY_META[phase].label+'</b><span>Sunset '+fmtMinOfDay(win.set)+'</span>', 0)+
+      tile('gmm-q', '&#10024; For today', '<p>'+escapeHtml(q[0])+'</p>'+(q[1] ? '<small>— '+escapeHtml(q[1])+'</small>' : ''), 1)+
+      tile('gmm-day', '&#128197; Today', events.length ? events.slice(0, 3).map(function(e){ return '<div class="gmm-ev"><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('') : '<span>Nothing scheduled.</span>', 2)+
+      tile('gmm-you', '&#128100; You', '<b>'+streak+'</b><span>day streak'+(slept ? ' · slept '+fmtDurationLabel(slept.minutes) : '')+'</span>'+(nn.headline ? '<div class="gmm-note">&#127769; '+escapeHtml(nn.headline)+'</div>' : ''), 3)+
+      '<div class="gmm-c"><button class="gmm-go" data-action="wakeStartMorning"><span class="gmm-go-ring"></span><span class="gmm-go-t">Get to Work</span><span class="gmm-go-s">&#8594;</span></button></div>'+
+      tile('gmm-news', '&#128240; Headlines', news && news.length ? news.slice(0, 3).map(function(n){ return '<button class="gmm-n" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'">'+escapeHtml(n.title)+'</button>'; }).join('') : '<span>'+(morningNewsOn() ? 'Loading…' : 'Headlines are off.')+'</span>', 4)+
+      (sc ? tile('gmm-sc', '&#127944; Scores', sc, 5) : '')+
+    '</div>'+
+  '</div>';
+}
+ACTIONS.wakeBriefLayout = function(el, e, id){ wakeCfg().briefLayout = id; persist('focus'); renderView(); if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); };
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
