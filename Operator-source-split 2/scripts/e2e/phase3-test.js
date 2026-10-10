@@ -23,9 +23,10 @@ const SP = require('./common.js').OUT;
   let p = await newPage(b, SP+'/t.html', seed, now);
   const E = (code) => p.evaluate(c => window.__op.ev(c), code);
   // deep work exclusions
-  check('deep work excludes Meta-ads category time', await E("deepWorkMinutesFor(todayStr())")===120, await E("deepWorkMinutesFor(todayStr())"));
+  // round 12: deep work counts everything you time — category / task switches no longer take time off
+  const dw0 = await E("deepWorkMinutesFor(todayStr())");
   await E("taskCategoryById('ads').countsDeepWork=false");
-  check('excluded 30m when category off', await E("deepWorkMinutesFor(todayStr())")===90);
+  check('a category set to "doesn\'t count" no longer takes time off deep work', await E("deepWorkMinutesFor(todayStr())")===dw0, dw0);
   check('shooting counts toward standard (yesterday 60+180)', await E("standardWorkMinutesFor(addDays(todayStr(),-1))")===240);
   check('yesterday standard complete via shoot', await E("dayStandardsComplete(addDays(todayStr(),-1))")===true);
   // analytics
@@ -123,11 +124,11 @@ const SP = require('./common.js').OUT;
   await p.clock.runFor(5000);
   await p.waitForTimeout(200);
   check('the alarm shows last night\'s note', (await p.textContent('#wakeOverlay')).includes('Big shoot day'));
-  await p.click('[data-action="wakeImUp"]');
+  await p.click('[data-action="wakeStartDay"]');
   await E("ui.wakeIntroDone = true; renderWakeOverlayInto();");
   check('the morning briefing shows the note', (await p.textContent('#wakeOverlay')).includes('Big shoot day'));
   check('plan tasks moved to today, in order', await E("state.tasks.items.filter(t=>state.focus.nightPlan.taskIds.includes(t.id)).every(t=>t.status==='today') && state.focus.lineupOrder[0]==='t1'"));
-  await p.click('[data-action="wakeClockIn"]'); await p.waitForTimeout(200);
+  await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(200); await p.click('.mm-clockin'); await p.waitForTimeout(200);
   check('Clock in shows the plan of attack', (await p.textContent('#planOverlay')).includes('Write hooks'));
   await p.click('[data-action="closePlanReveal"]');
   // old training blocks still load and count (as Other) — nothing recorded is lost

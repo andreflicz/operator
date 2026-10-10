@@ -247,7 +247,7 @@ function wakeBriefHtml(){
     (plan.length ? '<div class="br-day-plan">'+(plan.length===1 ? 'One thing' : plan.length+' things')+' planned for work. First up: <b>'+escapeHtml(plan[0].title)+'</b></div>' : '')+
     (!events.length && !plan.length ? '<div class="br-day-plan">Nothing scheduled. Enjoy it.</div>' : '')));
   const ctaD = base + k*gap;
-  lines.push({at: ctaD - 380, text: 'Take your time. Work can wait until you’re ready.'});
+  lines.push({at: ctaD - 380, text: 'Get ready to start your day.'});
   ui.briefLines = lines;
   const shift = ui.briefShift || 0;
   return '<div class="brief brief2 brief3'+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+

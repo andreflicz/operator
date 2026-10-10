@@ -97,7 +97,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('won lead starts the default cycle', (await E("clientCycle(state.business.clients.find(c=>c.fromLeadId==='p1')).id"))===cid);
   // Today panel
   await p.click('[data-action="nav"][data-view="today"]');
-  check('Client Next Steps lists cycle items', await p.isVisible('.hub-card[data-key="hub-c1"] .hub-step .lc-item'));
+  check('the client cycle stays off the front page', await p.isVisible('.hub-card[data-key="hub-c1"]') && !(await p.$('.hub-card .hub-step')));
   await p.screenshot({path:OUT+'/cy-today.png'});
   await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="clients"]');
   await p.click('.cc2[data-key="cc2-c1"] .cc2-top'); await p.waitForTimeout(300); await p.click('[data-action="clientFlip"][data-id="back"]'); 

@@ -109,8 +109,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("finishActiveMode(true); renderView()"); await p.waitForTimeout(150);
     check('This week + Consistency are one panel (shown since Consistency was on)', (await p.$$('.progress-panel .wk-bars')).length===1 && (await p.$$('.progress-panel .hm-cell')).length > 100 && (await p.$$('.heatmap-panel, .week-panel')).length===0);
     check('the merge is saved once and later choices stick', (await E("state.dashboardPanels.progressMerged")) && (await E("state.dashboardPanels.enabled.week"))!==false);
-    const chip = await p.evaluate(() => { const c = document.querySelector('.sky-chip'); const s = getComputedStyle(c); return {bg:s.backgroundColor, border:s.borderTopStyle}; });
-    check('the daytime line under the clock is plain text (no pill)', chip.border==='none' && /rgba\(0, 0, 0, 0\)|transparent/.test(chip.bg), chip);
+    check('the sky under the clock is one tidy pill with the sun\'s arc', await p.isVisible('.skyp .sun-arc'));
     check('the streak line has a ? explaining it', !!(await p.$('.th-streak .qtip, .th-streak [class*="tip"]')));
     check('no errors (today)', !p.errors.length, p.errors);
     await p.context().close();
@@ -155,8 +154,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const tile = await p.textContent('.mode-tiles-sm');
     check('the week shows time working out and how many workouts', /1h 20m|1h20m|80m/.test(tile) && /2 workouts/.test(tile), tile);
     await p.click('[data-action="analyticsRange"][data-id="all"]'); await p.waitForTimeout(200);
-    const fit = await p.evaluate(() => [...document.querySelectorAll('.section-title')].find(x => /Fitness/.test(x.textContent)).parentElement.textContent);
-    check('All time shows total workouts and total time working out', /Total Workouts\s*3/.test(fit) && /Time Working Out\s*2h ?20m/.test(fit), fit.slice(0, 200));
+    const fit = await p.textContent('.an-fit');
+    check('All time shows total workouts and total time working out', /Workouts\s*3/.test(fit) && /Time\s*2h ?20m/.test(fit), fit.slice(0, 200));
     check('a Log a Workout button sits next to manual time logging', await p.isVisible('[data-action="goToFitness"]'));
     check('no errors (analytics)', !p.errors.length, p.errors);
     await p.context().close();

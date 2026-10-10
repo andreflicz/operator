@@ -95,16 +95,16 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     await p.route('http://127.0.0.1:8935/**', r => { const u = new URL(r.request().url()); if(u.pathname==='/news') return r.fulfill({status:200, body:RSS, headers:{'Access-Control-Allow-Origin':'*'}}); r.fulfill({status:200, body:'{"ok":true}', headers:{'Access-Control-Allow-Origin':'*'}}); });
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("checkAllAlarms()"); await p.waitForTimeout(400);
-    await p.click('[data-action="wakeImUp"]'); await p.waitForTimeout(500);
+    await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(500);
     check('the slow, cinematic intro is the default', await E("wakeCfg().intro")==='cinematic' && await p.isVisible('.brief-intro.is-cinematic'));
     await p.waitForTimeout(8600);
     check('the narration types itself out', (await p.textContent('#brVoice')).length > 2 || (await E("ui.briefLines.length")) > 4);
     check('pieces arrive one at a time, not all at once', await p.evaluate(() => { const els = Array.from(document.querySelectorAll('#wakeContent .br-p[data-k]')); return els.some(e => getComputedStyle(e).opacity < 0.5) && els.some(e => getComputedStyle(e).opacity > 0.9); }));
     await p.click('[data-action="briefSkip"]'); await p.waitForTimeout(900);
     const brief = await p.textContent('#wakeOverlay');
-    check('your note, a line for today, and the weather', /Call Mike first/.test(brief) && await p.isVisible('.br-quote blockquote') && /54/.test(await p.textContent('.br-today')));
+    check('your note, a line for today, and the weather', /Call Mike first/.test(brief) && await p.isVisible('.br-quote blockquote') && /54/.test(await p.textContent('.br-hero')));
     check('headlines (through the launcher)', /Fed holds rates steady/.test(brief));
-    check('two ways forward: Start my morning / Clock in', await p.isVisible('[data-action="wakeStartMorning"]') && await p.isVisible('[data-action="wakeClockIn"]'));
+    check('one way forward: Start my morning', await p.isVisible('[data-action="wakeStartMorning"]') && !(await p.$('[data-action="wakeClockIn"]')));
     await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(300);
     check('Start my morning: life first — routine, note, no work list', await E("state.modes.active && state.modes.active.morning") && await p.isVisible('.mm-routine') && !(await p.$('.mm .plan-list')));
     await p.click('.mm-clockin'); await p.waitForTimeout(1600);
@@ -142,7 +142,7 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     await p.fill('#newReminderLabel', 'Pay rent'); await p.click('[data-action="remindDay"][data-id="1"]'); await p.press('#newReminderLabel', 'Enter'); await p.waitForTimeout(150);
     check('Reminders: type, pick Tomorrow, Enter', await E("state.focus.reminders.some(r=>r.label==='Pay rent' && r.date==='2026-10-10')"));
     await E("ui.view='settings'; ui.settingsTab='general'; renderView()"); await p.waitForTimeout(150);
-    check('Settings: preferences and the wake-up alarm live in You', await p.isVisible('#setSound') && /Wake-up alarm/.test(await p.textContent('#viewRoot')) && await p.isVisible('.settings-nav-item[data-tab="data"]'));
+    check('Settings: preferences and the wake-up alarm live in You', await p.isVisible('.settings-nav-item[data-tab="sound"]') && /Wake-up alarm/.test(await p.textContent('#viewRoot')) && await p.isVisible('.settings-nav-item[data-tab="data"]'));
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(150);
     check('Quick journal: a way into the full journal', await p.isVisible('.qj2-open'));
     check('no errors (pages)', !p.errors.length, p.errors);

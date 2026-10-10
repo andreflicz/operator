@@ -158,7 +158,7 @@ function renderClientHubPanel(){
         '<div class="hub-head" title="'+escapeHtml(clientHealthTitle(c))+'">'+clientAvatarHtml(c, true, true)+
           '<span class="hub-name" data-action="openContact" data-kind="client" data-id="'+c.id+'">'+escapeHtml(crmName('client', c))+'</span></div>'+
         clientDelivRowsHtml(c, true)+
-        clientNextStepHtml(c)+
+        // the client cycle (Onboarding, …) stays on the client's own page, not the front page
         '<div class="hub-foot">'+clientNextTouchHtml(c)+'<span style="flex:1"></span>'+touchButtonsHtml('client', c)+'</div>'+touchMenuHtml('client', c)+
       '</div>';
     }).join('')) : '')+

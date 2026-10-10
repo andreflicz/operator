@@ -14985,7 +14985,7 @@ function renderClientHubPanel(){
         '<div class="hub-head" title="'+escapeHtml(clientHealthTitle(c))+'">'+clientAvatarHtml(c, true, true)+
           '<span class="hub-name" data-action="openContact" data-kind="client" data-id="'+c.id+'">'+escapeHtml(crmName('client', c))+'</span></div>'+
         clientDelivRowsHtml(c, true)+
-        clientNextStepHtml(c)+
+        // the client cycle (Onboarding, …) stays on the client's own page, not the front page
         '<div class="hub-foot">'+clientNextTouchHtml(c)+'<span style="flex:1"></span>'+touchButtonsHtml('client', c)+'</div>'+touchMenuHtml('client', c)+
       '</div>';
     }).join('')) : '')+
@@ -19909,7 +19909,7 @@ function wakeBriefHtml(){
     (plan.length ? '<div class="br-day-plan">'+(plan.length===1 ? 'One thing' : plan.length+' things')+' planned for work. First up: <b>'+escapeHtml(plan[0].title)+'</b></div>' : '')+
     (!events.length && !plan.length ? '<div class="br-day-plan">Nothing scheduled. Enjoy it.</div>' : '')));
   const ctaD = base + k*gap;
-  lines.push({at: ctaD - 380, text: 'Take your time. Work can wait until you’re ready.'});
+  lines.push({at: ctaD - 380, text: 'Get ready to start your day.'});
   ui.briefLines = lines;
   const shift = ui.briefShift || 0;
   return '<div class="brief brief2 brief3'+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+

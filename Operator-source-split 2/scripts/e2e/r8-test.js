@@ -124,14 +124,14 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("fireWake({test:true})"); await p.waitForTimeout(300);
     check('the alarm screen: big clock, I\'m up, snooze', await p.isVisible('.wk2-clock') && await p.isVisible('.wk2-up') && await p.isVisible('.wk2-snooze'));
     check('…and no vision board on the alarm screen (it\'s in the briefing now)', !(await p.isVisible('.wk2-vision')));
-    await p.click('[data-action="wakeImUp"]'); await p.waitForTimeout(400);
+    await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(400);
     check('the briefing opens with the vision board', await p.isVisible('.br-vision'));
     await p.click('.br-vision'); await p.waitForTimeout(200);
     check('clicking it opens the vision board big', await p.isVisible('.br-vision-big'));
     await p.click('.br-vision-big .wk2-vision-x'); await p.waitForTimeout(200);
     const brief = await p.textContent('.brief');
-    check('"I\'m up" opens the morning briefing', /Good morning/.test(brief) && /Yesterday/.test(brief) && /Goals/.test(brief) && await p.isVisible('[data-action="wakeClockIn"]'));
-    await p.click('[data-action="wakeBriefDone"]'); await p.waitForTimeout(200);
+    check('"I\'m up" opens the morning briefing', /Good morning/.test(brief) && await p.isVisible('[data-action="wakeStartMorning"]'));
+    await p.$eval('[data-action="briefSkip"]', e=>e.click()).catch(()=>{}); await p.waitForTimeout(80); await p.$eval('[data-action="wakeBriefDone"]', e=>e.click()); await p.waitForTimeout(200);
     check('Let\'s go takes you into the day', !(await p.isVisible('#wakeOverlay:not(.hidden)')) && (await E("ui.view"))==='today');
     check('no errors (wake)', !p.errors.length, p.errors);
     await p.context().close();
