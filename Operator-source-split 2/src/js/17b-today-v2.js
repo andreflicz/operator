@@ -21,10 +21,10 @@ function renderTodayHero(greeting){
     '</div>'+
     '<div class="th-right">'+
       // in Shooting (or another mode): show it, with its own clock and an End button
-      ((state.modes.active && state.modes.active.type!=='offtime') ? '<div class="th-modecard is-'+state.modes.active.type+'">'+
+      ((state.modes.active && (state.modes.active.type!=='offtime' || state.modes.active.clockedOut)) ? '<div class="th-modecard is-'+state.modes.active.type+'">'+
           '<span class="th-modecard-i">'+modeIcon(state.modes.active.type)+'</span>'+
-          '<span class="th-modecard-copy"><span class="th-modecard-k">'+escapeHtml(MODE_LABELS[state.modes.active.type]||'Mode')+'</span><span class="th-modecard-t" id="modeElapsed">'+formatElapsed(Date.now()-state.modes.active.startedAt)+'</span></span>'+
-          '<button class="btn btn-sm th-modecard-end" data-action="endMode">End</button>'+
+          '<span class="th-modecard-copy"><span class="th-modecard-k">'+(state.modes.active.clockedOut ? 'Clocked out' : escapeHtml(MODE_LABELS[state.modes.active.type]||'Mode'))+'</span><span class="th-modecard-t" id="modeElapsed">'+formatElapsed(Date.now()-state.modes.active.startedAt)+'</span></span>'+
+          (state.modes.active.clockedOut ? '<button class="btn btn-sm th-modecard-end" data-action="clockIn">Clock in</button>' : '<button class="btn btn-sm th-modecard-end" data-action="endMode">End</button>')+
         '</div>' : '')+
       '<button class="lockin-cta'+(state.modes.active && state.modes.active.type!=='offtime' ? ' is-secondary' : '')+'" data-action="openLockInChooser" title="Lock in (L)">'+
         '<span class="lockin-icon">&#128274;</span>'+
@@ -36,7 +36,7 @@ function renderTodayHero(greeting){
         (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going — sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
         (evening ? '<button class="th-btn th-btn-night" data-action="openWindDown"><span class="th-btn-i">&#127769;</span>Wind down</button>' : '')+
       '</div>'+
-      '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+holdModeBtnHtml('offtime', '&#127937;', 'Off-time')+dayOffButtonHtml()+'</div>'+
+      '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+'<button class="th-mode th-mode-offtime" data-action="clockOut" title="Done working for the day"><span class="th-mode-i">&#127937;</span><span>Clock out</span></button>'+dayOffButtonHtml()+'</div>'+
       nextPickerHtml('hero')+
     '</div>'+
   '</div>';

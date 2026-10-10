@@ -233,20 +233,23 @@ ACTIONS.morningLockIn = function(el, e, id){
   if(id) setNextUp(id);
   renderView(); openLockInChooser();
 };
-ACTIONS.morningBriefing = function(){ ui.wakeMode = 'brief'; ui.wakeIntroDone = true; ui.wakeBriefTest = false; showOverlay('wakeOverlay'); renderWakeOverlayInto(); };
+ACTIONS.morningBriefing = function(){ ui.wakeMode = 'brief'; ui.wakeIntroDone = true; ui.briefSkipped = true; ui.briefShift = 0; ui.briefT0 = Date.now() - 1e7; ui.wakeBriefTest = false; loadMorningNews(); showOverlay('wakeOverlay'); renderWakeOverlayInto(); briefVoiceRun(); };
 function planListHtml(list, cls){
   return '<ol class="plan-list '+(cls||'')+'">'+list.map(function(t, i){ const done = t.status==='done'; return '<li class="'+(done?'is-done':'')+(i===0 && !done?' is-first':'')+'"><span class="pl-num">'+(done ? '&#10003;' : String(i+1).padStart(2,'0'))+'</span>'+priorityTag(t.priority)+'<span class="pl-t">'+escapeHtml(t.title)+'</span></li>'; }).join('')+'</ol>';
 }
+// Morning mode is life first — the routine, last night's note, the vision — and no work on the
+// screen until you Clock in (then the plan of attack shows up).
 function renderMorningView(){
   const active = state.modes.active, p = state.profile;
-  const plan = todaysPlan(), first = plan.find(function(t){ return t.status!=='done'; });
   const notes = morningNotesFor(todayStr());
   const routine = morningRoutine(), done = routineDone();
   const editing = !!ui.routineEdit;
+  const q = quoteOfDay();
+  const vb = masterVisionBoard();
   return '<div class="mm" data-sky="'+skyLook()+'">'+
     '<div class="mm-head"><div><div class="mm-k">&#9728;&#65039; Morning</div><div class="mm-greet">'+wakeGreeting()+', '+escapeHtml(p.name||'')+'.</div>'+
       '<div class="mm-sub">Up for <span id="modeElapsed">'+formatElapsed(Date.now()-active.startedAt)+'</span> &middot; '+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div></div>'+
-      '<button class="btn btn-ghost btn-sm" data-action="morningBriefing">&#128202; Briefing</button></div>'+
+      '<button class="btn btn-ghost btn-sm" data-action="morningBriefing">&#9728;&#65039; Good morning</button></div>'+
     (notes.length ? '<div class="mm-note"><div class="mm-k">&#127769; From last night</div>'+notes.map(function(n){ return '<div class="mm-note-t">'+escapeHtml(n.text)+'</div>'; }).join('')+'</div>' : '')+
     '<div class="mm-grid">'+
       '<div class="mm-card"><div class="mm-card-h"><span class="mm-k">Get going</span><span class="kpi-sub">'+done.length+'/'+routine.length+'</span><button class="mm-edit" data-action="routineEdit">'+(editing?'Done':'&#9998;')+'</button></div>'+
@@ -254,11 +257,13 @@ function renderMorningView(){
           return '<div class="mm-r'+(on?' is-on':'')+'"><button class="mm-r-main" data-action="routineTick" data-id="'+r.id+'"><span class="mm-tick">'+(on?'&#10003;':'')+'</span><span>'+escapeHtml(r.text)+'</span></button>'+(editing ? '<button class="mn-x" data-action="routineRemove" data-id="'+r.id+'">&#10005;</button>' : '')+'</div>'; }).join('')+
           (editing ? '<div class="mn-row"><input class="input" id="routineNew" placeholder="+ Add a step (Enter)"><button class="btn btn-sm" data-action="routineAdd">Add</button></div>' : '')+
         '</div></div>'+
-      '<div class="mm-card"><div class="mm-card-h"><span class="mm-k">Plan of attack</span><span class="kpi-sub">'+plan.filter(function(t){ return t.status!=='done'; }).length+' to do</span></div>'+
-        (plan.length ? planListHtml(plan.slice(0, 8)) : '<div class="kpi-sub">No plan yet — <a href="#" data-action="openWindDown" data-step="plan">make one</a>.</div>')+'</div>'+
+      '<div class="mm-card mm-side">'+
+        '<div class="mm-quote"><div class="mm-k">&#10024; For today</div><blockquote>&ldquo;'+escapeHtml(q[0])+'&rdquo;</blockquote><cite>&mdash; '+escapeHtml(q[1])+'</cite></div>'+
+        (vb && vb.elements.length ? '<div class="mm-vision" data-action="openVisionFull" title="Open your vision board">'+boardStaticHtml(vb, 'wake-board')+'</div>' : '')+
+      '</div>'+
     '</div>'+
     '<div class="mm-cta">'+
-      '<button class="brief-go" data-action="morningLockIn"'+(first ? ' data-id="'+first.id+'"' : '')+'>&#128274; I\'m ready — lock in'+(first ? ' on &ldquo;'+escapeHtml(first.title)+'&rdquo;' : '')+'</button>'+
+      '<button class="brief-go brief-clockin mm-clockin" data-action="clockIn">&#128339; Clock in</button>'+
       '<button class="brief-later mm-end" data-action="endMode">End morning</button>'+
     '</div>'+
   '</div>';

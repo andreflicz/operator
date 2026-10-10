@@ -222,7 +222,8 @@ function normalizeWake(f){
     snoozeMinutes: Number(w.snoozeMinutes)>0 ? Number(w.snoozeMinutes) : 9,
     openIn: ['firefox','safari','chrome'].indexOf(w.openIn)>=0 ? w.openIn : 'firefox',
     useMusic: w.useMusic===false ? false : true,
-    intro: w.intro==='cinematic' ? 'cinematic' : 'quick',
+    // the slow, cinematic intro unless you picked Quick yourself
+    intro: w.introChosen && w.intro==='quick' ? 'quick' : 'cinematic', introChosen: !!w.introChosen, news: w.news!==false,
     lastFiredTs: Number(w.lastFiredTs)||0,
     armedAt: Number(w.armedAt)||Date.now()
   };

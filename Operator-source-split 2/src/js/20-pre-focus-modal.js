@@ -99,7 +99,7 @@ function renderLockInCard(){
     '<div class="mode-btn-row">'+
       '<button class="btn shooting-btn" data-action="startMode" data-type="shooting">&#127916; SHOOTING</button>'+
     '</div>'+
-    '<button class="btn offtime-btn" style="margin-top:12px;" data-action="startMode" data-type="offtime">&#127937; OFF-TIME MODE</button>'+
+    '<button class="btn offtime-btn" style="margin-top:12px;" data-action="clockOut">&#127937; CLOCK OUT</button>'+
   '</div>';
 }
 function modeIcon(type){ return type==='break' ? '☕' : type==='shooting' ? '\u{1F3AC}' : type==='training' ? '\u{1F4DA}' : type==='offtime' && state.modes.active && state.modes.active.sleep ? '\u{1F319}' : '\u{1F3C1}'; }
@@ -109,10 +109,10 @@ function renderActiveModeHero(){
   const label = MODE_LABELS[active.type] || 'Mode';
   const color = modeColor(active.type);
   return '<div class="hero-card mode-hero focus-active-glow" style="border-color:'+color+';box-shadow:none;">'+
-    '<div class="kpi-label" style="color:'+color+';">'+modeIcon(active.type)+' '+label.toUpperCase()+'</div>'+
+    '<div class="kpi-label" style="color:'+color+';">'+modeIcon(active.type)+' '+(active.clockedOut ? 'CLOCKED OUT' : label.toUpperCase())+'</div>'+
     '<div class="hero-num hero-num-lg'+hoursCls(elapsed)+'" id="modeElapsed" style="color:'+color+';">'+formatElapsed(elapsed)+'</div>'+
     (active.note ? '<div class="kpi-sub">'+escapeHtml(active.note)+'</div>' : '')+
-    '<button class="btn btn-primary" style="margin-top:12px;" data-action="endMode">End '+label+'</button>'+
+    (active.clockedOut ? '<button class="btn btn-primary" style="margin-top:12px;" data-action="clockIn">&#128339; Clock in</button>' : '<button class="btn btn-primary" style="margin-top:12px;" data-action="endMode">End '+label+'</button>')+
   '</div>';
 }
 function startMode(type, extra){

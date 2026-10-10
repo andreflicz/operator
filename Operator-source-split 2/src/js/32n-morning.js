@@ -79,6 +79,13 @@ function briefVoiceRun(){
     const txt = cur ? (ui.briefSkipped ? cur.text : cur.text.slice(0, Math.max(0, Math.floor((t - cur.at)/32)))) : '';
     if(el.textContent!==txt) el.textContent = txt;
     const wrap = el.parentNode; if(wrap) wrap.classList.toggle('is-typing', !!cur && txt.length < cur.text.length);
+    // as the narration reaches each piece, bring it into view if it's below the fold
+    const idx = cur ? lines.indexOf(cur) : -1;
+    if(idx>0 && idx!==ui.briefLineSeen && !ui.briefSkipped){
+      ui.briefLineSeen = idx;
+      const target = document.querySelector('#wakeContent .br-p[data-k="'+(idx-1)+'"]');
+      if(target) setTimeout(function(){ target.scrollIntoView({block:'nearest', behavior:'smooth'}); }, 400);
+    }
   }, 32);
 }
 ACTIONS.briefSkip = function(){ ui.wakeIntroDone = true; ui.briefSkipped = true; renderWakeOverlayInto(); };
@@ -138,3 +145,6 @@ ACTIONS.clockOut = function(){
   playLockOut(); clockOutFlash();
   showToast('Done for the day.', {icon:'&#127937;', actionLabel:'Undo', actionAction:'undoQuickMode', duration:6000});
 };
+
+// the vision board fits itself once its entrance has played (it measures wrong while scaled)
+document.addEventListener('animationend', function(e){ if(e.target && e.target.classList && (e.target.classList.contains('br-vision') || e.target.classList.contains('mm-vision'))) fitStaticBoards(e.target); });
