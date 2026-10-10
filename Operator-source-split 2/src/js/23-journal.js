@@ -12,6 +12,7 @@ function journalEntryRow(e){
       '<div class="kpi-sub">'+(mood?mood.emoji+' ':'')+fmtTimeShort(e.timestamp)+(e.pinned?' <span class="je-pin" title="Pinned">&#9733;</span>':'')+'</div>'+
       '<button class="je-more" data-action="journalMenu" data-id="'+e.id+'" title="Pin, edit, remove (or right-click the entry)">&#8943;</button>'+
     '</div>'+
+    (e.title ? '<div class="journal-title">'+escapeHtml(e.title)+'</div>' : '')+
     '<div class="journal-text">'+escapeHtml(shown)+'</div>'+
     (photos.length ? '<div class="row" style="margin-bottom:8px;flex-wrap:wrap;">'+photos.map(function(src, idx){ return '<img src="'+escapeHtml(blobUrl(src))+'" class="journal-photo-thumb" data-action="viewJournalPhoto" data-id="'+e.id+'" data-idx="'+idx+'">'; }).join('')+'</div>' : '')+
     (isLong ? '<button class="btn btn-ghost btn-sm" data-action="toggleJournalExpand" data-id="'+e.id+'">'+(expanded?'Show Less':'Read More')+'</button>' : '')+
@@ -231,6 +232,7 @@ function renderJournalEntriesTab(){
   (clientsView ? renderClientJournalsAllTab() : (
   '<div class="card journal-compose-card" data-photo-drop="journal" style="text-align:center;margin-bottom:14px;">'+
     '<div style="position:relative;">'+
+      '<input class="input je-title-in" id="journalPageTextTitle" placeholder="Title (optional)">'+
       '<textarea class="input" id="journalPageText" placeholder="Write something… (paste or drop images in too)" style="width:100%;min-height:230px;text-align:left;padding-right:44px;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
       '<button class="btn btn-ghost btn-sm" data-action="triggerJournalPhotoInput" title="Add Photo" style="position:absolute;top:8px;right:8px;padding:4px 7px;font-size:15px;line-height:1;">&#128247;</button>'+
     '</div>'+
@@ -261,10 +263,10 @@ function renderJournalMoodChipsOnly(){
   '</div>';
 }
 function renderJournalMoodChipsInline(){
-  return journalTypes().map(function(m){
+  return visibleJournalTypes().map(function(m){
     const active = ui.selectedMood===m.id;
     return '<span class="chip" data-action="selectMood" data-mood="'+m.id+'" style="'+(active?'background:'+m.color+';border-color:'+m.color+';color:#06231a;':'')+'">'+m.emoji+' '+m.label+'</span>';
-  }).join('');
+  }).join('')+hiddenTypesChipHtml();
 }
 function renderJournalPhotoThumbsRow(){
   const photos = arr(ui.journalDraftPhotos);
@@ -293,6 +295,7 @@ function renderJournalEditModal(){
   const e = state.journal.entries.find(function(x){return x.id===ui.editingJournalId;});
   if(!e) return '';
   return '<div data-photo-drop="journal"><div class="section-title" style="margin-bottom:14px;">Edit Entry</div>'+
+    '<input class="input je-title-in" id="editJournalTitle" placeholder="Title (optional)" value="'+escapeHtml(e.title||'')+'">'+
     '<textarea class="input" id="editJournalText" style="width:100%;min-height:120px;">'+escapeHtml(e.text)+'</textarea>'+
     '<div class="row" style="margin:12px 0;justify-content:center;">'+
       journalTypes().map(function(m){ const active = ui.editingJournalMood===m.id; return '<span class="chip" data-action="setEditingJournalMood" data-mood="'+m.id+'" style="'+(active?'background:'+m.color+';border-color:'+m.color+';color:#06231a;':'')+'">'+m.emoji+' '+m.label+'</span>'; }).join('')+
@@ -316,6 +319,7 @@ function saveEditJournal(id){
   const text = document.getElementById('editJournalText').value.trim();
   if(!text) return;
   e.text = text;
+  const tEl = document.getElementById('editJournalTitle'); if(tEl){ const t = tEl.value.trim(); if(t) e.title = t; else delete e.title; }
   e.mood = ui.editingJournalMood!==undefined ? ui.editingJournalMood : e.mood;
   e.photos = arr(ui.journalDraftPhotos).slice();
   ui.editingJournalMood = undefined;
@@ -333,7 +337,11 @@ function addJournalEntry(targetId, type){
   const el = document.getElementById(targetId);
   const text = el.value.trim();
   if(!text) return;
-  state.journal.entries.push({id:uid(), date:todayStr(), timestamp:Date.now(), text:text, type:type||'freeform', mood:ui.selectedMood, pinned:false, photos: arr(ui.journalDraftPhotos).slice()});
+  const tEl = document.getElementById(targetId+'Title'), title = tEl ? tEl.value.trim() : '';
+  const entry = {id:uid(), date:todayStr(), timestamp:Date.now(), text:text, type:type||'freeform', mood:ui.selectedMood, pinned:false, photos: arr(ui.journalDraftPhotos).slice()};
+  if(title) entry.title = title;
+  state.journal.entries.push(entry);
+  if(tEl) tEl.value = '';
   ui.journalDraftText = '';
   ui.selectedMood = null;
   ui.journalDraftPhotos = [];
@@ -360,15 +368,17 @@ function renderQuickJournalModal(){
   return '<div class="qj3" data-photo-drop="journal">'+
     '<div class="qj3-h"><span class="qj3-i">&#128221;</span><div><b>Quick note</b><small>'+now.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+' &middot; '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+(today ? ' &middot; '+today+' today' : '')+'</small></div>'+
       '<button class="qj3-x" data-action="closeQuickJournalModal" title="Close (Esc)">&#10005;</button></div>'+
+    '<input class="qj3-title" id="quickJournalModalTextTitle" placeholder="Title (optional)" value="'+escapeHtml(ui.qjTitleDraft||'')+'">'+
     '<textarea class="qj3-text" id="quickJournalModalText" placeholder="'+escapeHtml(ui.qjPrompt||QJ_PROMPTS[0])+'">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
-    '<div class="qj3-tags">'+journalTypes().slice(0, 7).map(function(m){ return '<button class="qj3-tag'+(ui.selectedMood===m.id?' is-on':'')+'" data-action="qjMood" data-id="'+m.id+'" title="'+escapeHtml(m.label)+'">'+m.emoji+'<span>'+escapeHtml(m.label)+'</span></button>'; }).join('')+'</div>'+
-    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
+    (arr(ui.journalDraftPhotos).length ? '<div class="qj3-photos">'+arr(ui.journalDraftPhotos).map(function(src, i){ return '<span><img src="'+escapeHtml(blobUrl(src))+'"><button data-action="removeJournalDraftPhoto" data-idx="'+i+'" title="Remove">&times;</button></span>'; }).join('')+'</div>' : '')+
+    '<div class="qj3-tags">'+visibleJournalTypes().slice(0, 8).map(function(m){ return '<button class="qj3-tag'+(ui.selectedMood===m.id?' is-on':'')+'" data-action="qjMood" data-id="'+m.id+'" title="'+escapeHtml(m.label)+'">'+m.emoji+'<span>'+escapeHtml(m.label)+'</span></button>'; }).join('')+hiddenTypesChipHtml()+'</div>'+
+    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button><button class="qj3-ph" data-action="triggerJournalPhotoInput" title="Attach a photo">&#128247;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
   '</div>';
 }
 function renderQuickJournalModalInto(){ const el=document.getElementById('quickJournalContent'); if(el) morphInto(el, renderQuickJournalModal(), {form:true}); }
 ACTIONS.qjMood = function(el, e, id){ ui.selectedMood = ui.selectedMood===id ? null : id; const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; renderQuickJournalModalInto(); };
 ACTIONS.qjOpenJournal = function(){ const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; closeQuickJournalModal(); ui.view = 'personal'; ui.personalTab = 'journal'; renderView(); };
-document.addEventListener('input', function(e){ if(e.target && e.target.id==='quickJournalModalText') ui.journalDraftText = e.target.value; });
+document.addEventListener('input', function(e){ if(e.target && e.target.id==='quickJournalModalText') ui.journalDraftText = e.target.value; if(e.target && e.target.id==='quickJournalModalTextTitle') ui.qjTitleDraft = e.target.value; });
 document.addEventListener('keydown', function(e){
   if(e.target && e.target.id==='quickJournalModalText'){
     if(e.key==='Enter' && (e.metaKey || e.ctrlKey)){ e.preventDefault(); saveQuickJournal(); }
@@ -379,7 +389,21 @@ function saveQuickJournal(){
   const t = document.getElementById('quickJournalModalText');
   if(!t || !t.value.trim()){ if(t){ t.focus(); t.classList.remove('is-shake'); void t.offsetWidth; t.classList.add('is-shake'); } return; }
   addJournalEntry('quickJournalModalText');
+  ui.qjTitleDraft = '';
   ui.qjSaved = true; renderQuickJournalModalInto();
   setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; }, 900);
 }
 
+
+// ---- journal types you can tuck away: hidden ones keep their entries, they just leave the pickers ----
+function visibleJournalTypes(){ return journalTypes().filter(function(t){ return !t.hidden || ui.showHiddenTypes || ui.selectedMood===t.id; }); }
+function hiddenTypesChipHtml(){
+  const n = journalTypes().filter(function(t){ return t.hidden; }).length;
+  return n ? '<span class="chip chip-more" data-action="toggleHiddenTypes" title="'+(ui.showHiddenTypes ? 'Hide them again' : 'Show your hidden types')+'">'+(ui.showHiddenTypes ? '&minus;' : '+'+n)+'</span>' : '';
+}
+ACTIONS.toggleHiddenTypes = function(){ ui.showHiddenTypes = !ui.showHiddenTypes; if(document.getElementById('quickJournalOverlay') && !document.getElementById('quickJournalOverlay').classList.contains('hidden')) renderQuickJournalModalInto(); renderView(); };
+ACTIONS.toggleJournalTypeHidden = function(el, e, id){
+  if(!Array.isArray(state.journal.types) || !state.journal.types.length) state.journal.types = journalTypes().map(function(t){ return Object.assign({}, t); });
+  const t = state.journal.types.find(function(x){ return x.id===id; }); if(!t) return;
+  t.hidden = !t.hidden; persist('journal'); renderView();
+};

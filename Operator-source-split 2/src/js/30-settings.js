@@ -181,6 +181,7 @@ function renderSettings(){
             '<span class="swatch" style="background:'+t.color+';width:18px;height:18px;cursor:pointer;" data-action="cycleJournalTypeColor" data-id="'+t.id+'" title="Click to change color"></span>'+
             '<input class="input" data-journal-type-emoji="'+t.id+'" value="'+escapeHtml(t.emoji)+'" maxlength="4" style="width:48px;text-align:center;">'+
             '<input class="input" data-journal-type-label="'+t.id+'" value="'+escapeHtml(t.label)+'" style="flex:1;max-width:220px;">'+
+            '<button class="btn btn-ghost btn-sm" data-action="toggleJournalTypeHidden" data-id="'+t.id+'" title="'+(t.hidden ? 'Show it in the pickers again' : 'Hide it from the pickers (entries stay)')+'">'+(t.hidden ? '&#128065;&#8205; Show' : 'Hide')+'</button>'+
             (t.id==='starred' ? '<span class="kpi-sub">Built in</span>' : deleteBtn('journaltype', t.id))+
           '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
         '</div>'+

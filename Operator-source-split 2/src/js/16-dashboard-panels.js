@@ -141,10 +141,10 @@ function renderTodayTasksPanel(){
 }
 function renderMoodPicker(){
   return '<div class="row" style="margin:10px 0;justify-content:center;">'+
-    journalTypes().map(function(m){
+    visibleJournalTypes().map(function(m){
       const active = ui.selectedMood===m.id;
       return '<span class="chip" data-action="selectMood" data-mood="'+m.id+'" style="'+(active?'background:'+m.color+';border-color:'+m.color+';color:#06231a;':'')+'">'+m.emoji+' '+m.label+'</span>';
-    }).join('')+
+    }).join('')+hiddenTypesChipHtml()+
   '</div>'+
   renderJournalPhotoAttachHtml();
 }
@@ -161,7 +161,7 @@ function renderJournalPhotoAttachHtml(){
   '</div>';
 }
 function triggerJournalPhotoInput(){ const el=document.getElementById('journalPhotoInput'); if(el) el.click(); }
-function removeJournalDraftPhoto(idx){ ui.journalDraftPhotos.splice(Number(idx),1); renderView(); }
+function removeJournalDraftPhoto(idx){ ui.journalDraftPhotos.splice(Number(idx),1); renderView(); const qo = document.getElementById('quickJournalOverlay'); if(qo && !qo.classList.contains('hidden') && typeof renderQuickJournalModalInto==='function') renderQuickJournalModalInto(); }
 // Photos attach to whichever journal composer/editor is open. They're stored in the blob
 // store (IndexedDB) and the entry keeps "idb:" references.
 async function handleJournalPhotoFiles(files){
@@ -170,7 +170,7 @@ async function handleJournalPhotoFiles(files){
     const ref = await storeImageFile(file);
     ui.journalDraftPhotos.push(ref);
   }
-  if(list.length){ playTick(); renderView(); }
+  if(list.length){ playTick(); renderView(); const qo = document.getElementById('quickJournalOverlay'); if(qo && !qo.classList.contains('hidden') && typeof renderQuickJournalModalInto==='function') renderQuickJournalModalInto(); }
 }
 // Paste an image (e.g. a screenshot copied with Cmd+Ctrl+Shift+4) straight into any journal
 // text box. Plain-text pastes behave normally.
@@ -214,6 +214,7 @@ function renderJournalPanel(){
     '<div class="qj2-head"><span class="qj2-icon">&#128221;</span><div class="qj2-title">Quick journal'+tip('Paste or drop images in too.')+'</div>'+
       (todaysJournalCount ? '<span class="qj2-count">'+todaysJournalCount+' today</span>' : '')+
       '<button class="qj2-open" data-action="nav" data-view="personal" data-tab="journal">Open journal &rarr;</button></div>'+
+    '<input class="input je-title-in qj2-title" id="quickJournalTextTitle" placeholder="Title (optional)">'+
     '<textarea class="input qj2-text" id="quickJournalText" placeholder="Anything on your mind — a win, a worry, an idea…">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
     renderJournalPhotoThumbsRow()+
     '<div class="journal-compose-actions qj2-actions">'+

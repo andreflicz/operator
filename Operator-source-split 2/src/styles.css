@@ -3075,3 +3075,16 @@
   .set-more > summary::-webkit-details-marker{ display:none; } .set-more > summary::before{ content:'›'; display:inline-block; transition:transform .2s; color:var(--text-dim); }
   .set-more[open] > summary::before{ transform:rotate(90deg); } .set-more > summary span{ font-size:12.5px; font-weight:500; color:var(--text-dim); }
   .set-more[open]{ padding-bottom:6px; }
+  /* journal: titles, tucked-away types, photos in the quick note */
+  .journal-title{ font-family:var(--font-display); font-weight:800; font-size:16px; margin:4px 0 2px; }
+  .je-title-in{ width:100%; margin-bottom:8px; font-weight:700; }
+  .qj2-title{ border-bottom-left-radius:0; border-bottom-right-radius:0; }
+  .qj3-title{ border:none; outline:none; background:transparent; color:var(--text); font:inherit; font-size:17px; font-weight:800; padding:6px 18px 0; }
+  .qj3-title::placeholder{ color:var(--text-faint, rgba(127,127,127,.55)); font-weight:600; }
+  .qj3-ph{ border:none; background:transparent; font-size:15px; cursor:pointer; opacity:.55; padding:4px; } .qj3-ph:hover{ opacity:1; }
+  .qj3-photos{ display:flex; gap:8px; padding:0 18px 8px; flex-wrap:wrap; }
+  .qj3-photos span{ position:relative; } .qj3-photos img{ width:44px; height:44px; border-radius:10px; object-fit:cover; }
+  .qj3-photos button{ position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; border:none; background:var(--panel-2); color:var(--text); font-size:12px; line-height:16px; cursor:pointer; }
+  .chip-more{ opacity:.65; } .chip-more:hover{ opacity:1; }
+  .qj2-title{ background:transparent !important; border:none !important; box-shadow:none !important; padding:2px 4px 6px !important; margin:0 0 2px; font-size:15px; font-family:var(--font-display); }
+  .qj2-title::placeholder{ color:var(--text-faint, rgba(127,127,127,.55)); font-weight:600; }

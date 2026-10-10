@@ -3084,6 +3084,19 @@
   .set-more > summary::-webkit-details-marker{ display:none; } .set-more > summary::before{ content:'›'; display:inline-block; transition:transform .2s; color:var(--text-dim); }
   .set-more[open] > summary::before{ transform:rotate(90deg); } .set-more > summary span{ font-size:12.5px; font-weight:500; color:var(--text-dim); }
   .set-more[open]{ padding-bottom:6px; }
+  /* journal: titles, tucked-away types, photos in the quick note */
+  .journal-title{ font-family:var(--font-display); font-weight:800; font-size:16px; margin:4px 0 2px; }
+  .je-title-in{ width:100%; margin-bottom:8px; font-weight:700; }
+  .qj2-title{ border-bottom-left-radius:0; border-bottom-right-radius:0; }
+  .qj3-title{ border:none; outline:none; background:transparent; color:var(--text); font:inherit; font-size:17px; font-weight:800; padding:6px 18px 0; }
+  .qj3-title::placeholder{ color:var(--text-faint, rgba(127,127,127,.55)); font-weight:600; }
+  .qj3-ph{ border:none; background:transparent; font-size:15px; cursor:pointer; opacity:.55; padding:4px; } .qj3-ph:hover{ opacity:1; }
+  .qj3-photos{ display:flex; gap:8px; padding:0 18px 8px; flex-wrap:wrap; }
+  .qj3-photos span{ position:relative; } .qj3-photos img{ width:44px; height:44px; border-radius:10px; object-fit:cover; }
+  .qj3-photos button{ position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; border:none; background:var(--panel-2); color:var(--text); font-size:12px; line-height:16px; cursor:pointer; }
+  .chip-more{ opacity:.65; } .chip-more:hover{ opacity:1; }
+  .qj2-title{ background:transparent !important; border:none !important; box-shadow:none !important; padding:2px 4px 6px !important; margin:0 0 2px; font-size:15px; font-family:var(--font-display); }
+  .qj2-title::placeholder{ color:var(--text-faint, rgba(127,127,127,.55)); font-weight:600; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -6223,10 +6236,10 @@ function renderTodayTasksPanel(){
 }
 function renderMoodPicker(){
   return '<div class="row" style="margin:10px 0;justify-content:center;">'+
-    journalTypes().map(function(m){
+    visibleJournalTypes().map(function(m){
       const active = ui.selectedMood===m.id;
       return '<span class="chip" data-action="selectMood" data-mood="'+m.id+'" style="'+(active?'background:'+m.color+';border-color:'+m.color+';color:#06231a;':'')+'">'+m.emoji+' '+m.label+'</span>';
-    }).join('')+
+    }).join('')+hiddenTypesChipHtml()+
   '</div>'+
   renderJournalPhotoAttachHtml();
 }
@@ -6243,7 +6256,7 @@ function renderJournalPhotoAttachHtml(){
   '</div>';
 }
 function triggerJournalPhotoInput(){ const el=document.getElementById('journalPhotoInput'); if(el) el.click(); }
-function removeJournalDraftPhoto(idx){ ui.journalDraftPhotos.splice(Number(idx),1); renderView(); }
+function removeJournalDraftPhoto(idx){ ui.journalDraftPhotos.splice(Number(idx),1); renderView(); const qo = document.getElementById('quickJournalOverlay'); if(qo && !qo.classList.contains('hidden') && typeof renderQuickJournalModalInto==='function') renderQuickJournalModalInto(); }
 // Photos attach to whichever journal composer/editor is open. They're stored in the blob
 // store (IndexedDB) and the entry keeps "idb:" references.
 async function handleJournalPhotoFiles(files){
@@ -6252,7 +6265,7 @@ async function handleJournalPhotoFiles(files){
     const ref = await storeImageFile(file);
     ui.journalDraftPhotos.push(ref);
   }
-  if(list.length){ playTick(); renderView(); }
+  if(list.length){ playTick(); renderView(); const qo = document.getElementById('quickJournalOverlay'); if(qo && !qo.classList.contains('hidden') && typeof renderQuickJournalModalInto==='function') renderQuickJournalModalInto(); }
 }
 // Paste an image (e.g. a screenshot copied with Cmd+Ctrl+Shift+4) straight into any journal
 // text box. Plain-text pastes behave normally.
@@ -6296,6 +6309,7 @@ function renderJournalPanel(){
     '<div class="qj2-head"><span class="qj2-icon">&#128221;</span><div class="qj2-title">Quick journal'+tip('Paste or drop images in too.')+'</div>'+
       (todaysJournalCount ? '<span class="qj2-count">'+todaysJournalCount+' today</span>' : '')+
       '<button class="qj2-open" data-action="nav" data-view="personal" data-tab="journal">Open journal &rarr;</button></div>'+
+    '<input class="input je-title-in qj2-title" id="quickJournalTextTitle" placeholder="Title (optional)">'+
     '<textarea class="input qj2-text" id="quickJournalText" placeholder="Anything on your mind — a win, a worry, an idea…">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
     renderJournalPhotoThumbsRow()+
     '<div class="journal-compose-actions qj2-actions">'+
@@ -10357,6 +10371,7 @@ function journalEntryRow(e){
       '<div class="kpi-sub">'+(mood?mood.emoji+' ':'')+fmtTimeShort(e.timestamp)+(e.pinned?' <span class="je-pin" title="Pinned">&#9733;</span>':'')+'</div>'+
       '<button class="je-more" data-action="journalMenu" data-id="'+e.id+'" title="Pin, edit, remove (or right-click the entry)">&#8943;</button>'+
     '</div>'+
+    (e.title ? '<div class="journal-title">'+escapeHtml(e.title)+'</div>' : '')+
     '<div class="journal-text">'+escapeHtml(shown)+'</div>'+
     (photos.length ? '<div class="row" style="margin-bottom:8px;flex-wrap:wrap;">'+photos.map(function(src, idx){ return '<img src="'+escapeHtml(blobUrl(src))+'" class="journal-photo-thumb" data-action="viewJournalPhoto" data-id="'+e.id+'" data-idx="'+idx+'">'; }).join('')+'</div>' : '')+
     (isLong ? '<button class="btn btn-ghost btn-sm" data-action="toggleJournalExpand" data-id="'+e.id+'">'+(expanded?'Show Less':'Read More')+'</button>' : '')+
@@ -10576,6 +10591,7 @@ function renderJournalEntriesTab(){
   (clientsView ? renderClientJournalsAllTab() : (
   '<div class="card journal-compose-card" data-photo-drop="journal" style="text-align:center;margin-bottom:14px;">'+
     '<div style="position:relative;">'+
+      '<input class="input je-title-in" id="journalPageTextTitle" placeholder="Title (optional)">'+
       '<textarea class="input" id="journalPageText" placeholder="Write something… (paste or drop images in too)" style="width:100%;min-height:230px;text-align:left;padding-right:44px;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
       '<button class="btn btn-ghost btn-sm" data-action="triggerJournalPhotoInput" title="Add Photo" style="position:absolute;top:8px;right:8px;padding:4px 7px;font-size:15px;line-height:1;">&#128247;</button>'+
     '</div>'+
@@ -10606,10 +10622,10 @@ function renderJournalMoodChipsOnly(){
   '</div>';
 }
 function renderJournalMoodChipsInline(){
-  return journalTypes().map(function(m){
+  return visibleJournalTypes().map(function(m){
     const active = ui.selectedMood===m.id;
     return '<span class="chip" data-action="selectMood" data-mood="'+m.id+'" style="'+(active?'background:'+m.color+';border-color:'+m.color+';color:#06231a;':'')+'">'+m.emoji+' '+m.label+'</span>';
-  }).join('');
+  }).join('')+hiddenTypesChipHtml();
 }
 function renderJournalPhotoThumbsRow(){
   const photos = arr(ui.journalDraftPhotos);
@@ -10638,6 +10654,7 @@ function renderJournalEditModal(){
   const e = state.journal.entries.find(function(x){return x.id===ui.editingJournalId;});
   if(!e) return '';
   return '<div data-photo-drop="journal"><div class="section-title" style="margin-bottom:14px;">Edit Entry</div>'+
+    '<input class="input je-title-in" id="editJournalTitle" placeholder="Title (optional)" value="'+escapeHtml(e.title||'')+'">'+
     '<textarea class="input" id="editJournalText" style="width:100%;min-height:120px;">'+escapeHtml(e.text)+'</textarea>'+
     '<div class="row" style="margin:12px 0;justify-content:center;">'+
       journalTypes().map(function(m){ const active = ui.editingJournalMood===m.id; return '<span class="chip" data-action="setEditingJournalMood" data-mood="'+m.id+'" style="'+(active?'background:'+m.color+';border-color:'+m.color+';color:#06231a;':'')+'">'+m.emoji+' '+m.label+'</span>'; }).join('')+
@@ -10661,6 +10678,7 @@ function saveEditJournal(id){
   const text = document.getElementById('editJournalText').value.trim();
   if(!text) return;
   e.text = text;
+  const tEl = document.getElementById('editJournalTitle'); if(tEl){ const t = tEl.value.trim(); if(t) e.title = t; else delete e.title; }
   e.mood = ui.editingJournalMood!==undefined ? ui.editingJournalMood : e.mood;
   e.photos = arr(ui.journalDraftPhotos).slice();
   ui.editingJournalMood = undefined;
@@ -10678,7 +10696,11 @@ function addJournalEntry(targetId, type){
   const el = document.getElementById(targetId);
   const text = el.value.trim();
   if(!text) return;
-  state.journal.entries.push({id:uid(), date:todayStr(), timestamp:Date.now(), text:text, type:type||'freeform', mood:ui.selectedMood, pinned:false, photos: arr(ui.journalDraftPhotos).slice()});
+  const tEl = document.getElementById(targetId+'Title'), title = tEl ? tEl.value.trim() : '';
+  const entry = {id:uid(), date:todayStr(), timestamp:Date.now(), text:text, type:type||'freeform', mood:ui.selectedMood, pinned:false, photos: arr(ui.journalDraftPhotos).slice()};
+  if(title) entry.title = title;
+  state.journal.entries.push(entry);
+  if(tEl) tEl.value = '';
   ui.journalDraftText = '';
   ui.selectedMood = null;
   ui.journalDraftPhotos = [];
@@ -10705,15 +10727,17 @@ function renderQuickJournalModal(){
   return '<div class="qj3" data-photo-drop="journal">'+
     '<div class="qj3-h"><span class="qj3-i">&#128221;</span><div><b>Quick note</b><small>'+now.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+' &middot; '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+(today ? ' &middot; '+today+' today' : '')+'</small></div>'+
       '<button class="qj3-x" data-action="closeQuickJournalModal" title="Close (Esc)">&#10005;</button></div>'+
+    '<input class="qj3-title" id="quickJournalModalTextTitle" placeholder="Title (optional)" value="'+escapeHtml(ui.qjTitleDraft||'')+'">'+
     '<textarea class="qj3-text" id="quickJournalModalText" placeholder="'+escapeHtml(ui.qjPrompt||QJ_PROMPTS[0])+'">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
-    '<div class="qj3-tags">'+journalTypes().slice(0, 7).map(function(m){ return '<button class="qj3-tag'+(ui.selectedMood===m.id?' is-on':'')+'" data-action="qjMood" data-id="'+m.id+'" title="'+escapeHtml(m.label)+'">'+m.emoji+'<span>'+escapeHtml(m.label)+'</span></button>'; }).join('')+'</div>'+
-    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
+    (arr(ui.journalDraftPhotos).length ? '<div class="qj3-photos">'+arr(ui.journalDraftPhotos).map(function(src, i){ return '<span><img src="'+escapeHtml(blobUrl(src))+'"><button data-action="removeJournalDraftPhoto" data-idx="'+i+'" title="Remove">&times;</button></span>'; }).join('')+'</div>' : '')+
+    '<div class="qj3-tags">'+visibleJournalTypes().slice(0, 8).map(function(m){ return '<button class="qj3-tag'+(ui.selectedMood===m.id?' is-on':'')+'" data-action="qjMood" data-id="'+m.id+'" title="'+escapeHtml(m.label)+'">'+m.emoji+'<span>'+escapeHtml(m.label)+'</span></button>'; }).join('')+hiddenTypesChipHtml()+'</div>'+
+    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button><button class="qj3-ph" data-action="triggerJournalPhotoInput" title="Attach a photo">&#128247;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
   '</div>';
 }
 function renderQuickJournalModalInto(){ const el=document.getElementById('quickJournalContent'); if(el) morphInto(el, renderQuickJournalModal(), {form:true}); }
 ACTIONS.qjMood = function(el, e, id){ ui.selectedMood = ui.selectedMood===id ? null : id; const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; renderQuickJournalModalInto(); };
 ACTIONS.qjOpenJournal = function(){ const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; closeQuickJournalModal(); ui.view = 'personal'; ui.personalTab = 'journal'; renderView(); };
-document.addEventListener('input', function(e){ if(e.target && e.target.id==='quickJournalModalText') ui.journalDraftText = e.target.value; });
+document.addEventListener('input', function(e){ if(e.target && e.target.id==='quickJournalModalText') ui.journalDraftText = e.target.value; if(e.target && e.target.id==='quickJournalModalTextTitle') ui.qjTitleDraft = e.target.value; });
 document.addEventListener('keydown', function(e){
   if(e.target && e.target.id==='quickJournalModalText'){
     if(e.key==='Enter' && (e.metaKey || e.ctrlKey)){ e.preventDefault(); saveQuickJournal(); }
@@ -10724,10 +10748,24 @@ function saveQuickJournal(){
   const t = document.getElementById('quickJournalModalText');
   if(!t || !t.value.trim()){ if(t){ t.focus(); t.classList.remove('is-shake'); void t.offsetWidth; t.classList.add('is-shake'); } return; }
   addJournalEntry('quickJournalModalText');
+  ui.qjTitleDraft = '';
   ui.qjSaved = true; renderQuickJournalModalInto();
   setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; }, 900);
 }
 
+
+// ---- journal types you can tuck away: hidden ones keep their entries, they just leave the pickers ----
+function visibleJournalTypes(){ return journalTypes().filter(function(t){ return !t.hidden || ui.showHiddenTypes || ui.selectedMood===t.id; }); }
+function hiddenTypesChipHtml(){
+  const n = journalTypes().filter(function(t){ return t.hidden; }).length;
+  return n ? '<span class="chip chip-more" data-action="toggleHiddenTypes" title="'+(ui.showHiddenTypes ? 'Hide them again' : 'Show your hidden types')+'">'+(ui.showHiddenTypes ? '&minus;' : '+'+n)+'</span>' : '';
+}
+ACTIONS.toggleHiddenTypes = function(){ ui.showHiddenTypes = !ui.showHiddenTypes; if(document.getElementById('quickJournalOverlay') && !document.getElementById('quickJournalOverlay').classList.contains('hidden')) renderQuickJournalModalInto(); renderView(); };
+ACTIONS.toggleJournalTypeHidden = function(el, e, id){
+  if(!Array.isArray(state.journal.types) || !state.journal.types.length) state.journal.types = journalTypes().map(function(t){ return Object.assign({}, t); });
+  const t = state.journal.types.find(function(x){ return x.id===id; }); if(!t) return;
+  t.hidden = !t.hidden; persist('journal'); renderView();
+};
 
 // ============ SETTINGS → APP UPDATES ============
 // Notes about changes to the app itself (entries filed under an "Updates" journal type) aren't
@@ -16146,6 +16184,7 @@ function renderSettings(){
             '<span class="swatch" style="background:'+t.color+';width:18px;height:18px;cursor:pointer;" data-action="cycleJournalTypeColor" data-id="'+t.id+'" title="Click to change color"></span>'+
             '<input class="input" data-journal-type-emoji="'+t.id+'" value="'+escapeHtml(t.emoji)+'" maxlength="4" style="width:48px;text-align:center;">'+
             '<input class="input" data-journal-type-label="'+t.id+'" value="'+escapeHtml(t.label)+'" style="flex:1;max-width:220px;">'+
+            '<button class="btn btn-ghost btn-sm" data-action="toggleJournalTypeHidden" data-id="'+t.id+'" title="'+(t.hidden ? 'Show it in the pickers again' : 'Hide it from the pickers (entries stay)')+'">'+(t.hidden ? '&#128065;&#8205; Show' : 'Hide')+'</button>'+
             (t.id==='starred' ? '<span class="kpi-sub">Built in</span>' : deleteBtn('journaltype', t.id))+
           '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
         '</div>'+
