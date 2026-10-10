@@ -75,7 +75,9 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     await E("state.focus.activeSession.startedAt -= 25*60000+500; checkMethodTimer()"); await p.waitForTimeout(150);
     check('after 25 min the break starts on its own', await E("state.focus.activeSession.onBreak") && Math.round(await E("(state.focus.activeSession.breakEndsAt-Date.now())/60000"))===5);
     await E("state.focus.activeSession.breakEndsAt = Date.now()-5; checkBreakTimer()"); await p.waitForTimeout(150);
-    check('…and ends on its own, back to round 2', !(await E("state.focus.activeSession.onBreak")) && await E("state.focus.activeSession.round")===2);
+    check('…when it runs out it waits for you', await E("state.focus.activeSession.onBreak && !!state.focus.activeSession.breakOverAt"));
+    await E("endBreakModeFromFocus()"); await p.waitForTimeout(150);
+    check('…lock back in → round 2', !(await E("state.focus.activeSession.onBreak")) && await E("state.focus.activeSession.round")===2);
     // the status pill
     await E("renderView(); updateActivityPill()"); await p.waitForTimeout(100);
     check('status pill knows you\'re locked in', await p.getAttribute('#activityPill', 'data-state')==='locked');

@@ -2,7 +2,7 @@
 function renderPersonalStatsPanel(){
 // time worked: the week so far (big), yesterday, and a bar for each day Mon–Sun
 function timeWorkedHtml(yMin, weekMin){
-  const ws = startOfWeekStr(todayStr()), today = todayStr(), days = [];
+  const ws = startOfWeekSundayStr(todayStr()), today = todayStr(), days = [];
   for(let i=0;i<7;i++){ const d = addDays(ws, i); days.push({d:d, m: d===today ? deepWorkMinutesTodayLive() : d > today ? null : deepWorkMinutesFor(d)}); }
   const target = state.standards.deepWorkTargetMinutes || 180, top = Math.max(target, ...days.map(function(x){ return x.m||0; }));
   return '<div class="stat-chip-label">Time Worked</div>'+

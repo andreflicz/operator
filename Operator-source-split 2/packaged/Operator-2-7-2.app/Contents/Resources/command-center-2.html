@@ -6910,7 +6910,7 @@ function renderUpcomingPopoverInto(){ const el=document.getElementById('upcoming
 function renderPersonalStatsPanel(){
 // time worked: the week so far (big), yesterday, and a bar for each day Mon–Sun
 function timeWorkedHtml(yMin, weekMin){
-  const ws = startOfWeekStr(todayStr()), today = todayStr(), days = [];
+  const ws = startOfWeekSundayStr(todayStr()), today = todayStr(), days = [];
   for(let i=0;i<7;i++){ const d = addDays(ws, i); days.push({d:d, m: d===today ? deepWorkMinutesTodayLive() : d > today ? null : deepWorkMinutesFor(d)}); }
   const target = state.standards.deepWorkTargetMinutes || 180, top = Math.max(target, ...days.map(function(x){ return x.m||0; }));
   return '<div class="stat-chip-label">Time Worked</div>'+
@@ -23268,7 +23268,8 @@ afterRenderHooks.push(function(){
   const kind = !monthIntent() && !p[mk] ? 'month' : !weekIntent() && !p[wk] ? 'week' : null;
   if(!kind || ui._intAsked===kind+(kind==='month' ? mk : wk)) return;
   ui._intAsked = kind+(kind==='month' ? mk : wk);
-  setTimeout(function(){ if(ui.view==='calendar') openIntentForm(kind, true); }, 450);
+  // never on top of something you just opened — it asks again on the next visit
+  setTimeout(function(){ if(ui.view!=='calendar') return; if(document.querySelector('.overlay:not(.hidden):not(#intOverlay)')){ ui._intAsked = null; return; } openIntentForm(kind, true); }, 450);
 });
 // a strip at the top of the Calendar: the month's and the week's, one click to change them
 function intentStripHtml(){

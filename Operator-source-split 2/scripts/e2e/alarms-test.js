@@ -124,7 +124,9 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   await p.click('[data-action="confirmStartBreakMode"]');
   check('break is on with a countdown', await E("state.focus.activeSession.onBreak && !!state.focus.activeSession.breakEndsAt") && await p.isVisible('#breakRemaining'));
   await p.clock.runFor(10*60000+2000);
-  check('break ends on its own after 10 min', await E("!state.focus.activeSession.onBreak && !state.modes.active"));
+  check('after 10 min the break waits: "Break’s over", still on break', await E("state.focus.activeSession.onBreak && !!state.focus.activeSession.breakOverAt"));
+  await E('endBreakModeFromFocus()');
+  check('…and you lock back in yourself', await E("!state.focus.activeSession.onBreak && !state.modes.active"));
   check('no page errors (break)', p.errors.length===0, p.errors);
   await p.close();
 

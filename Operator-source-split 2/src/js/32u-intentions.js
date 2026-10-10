@@ -79,7 +79,8 @@ afterRenderHooks.push(function(){
   const kind = !monthIntent() && !p[mk] ? 'month' : !weekIntent() && !p[wk] ? 'week' : null;
   if(!kind || ui._intAsked===kind+(kind==='month' ? mk : wk)) return;
   ui._intAsked = kind+(kind==='month' ? mk : wk);
-  setTimeout(function(){ if(ui.view==='calendar') openIntentForm(kind, true); }, 450);
+  // never on top of something you just opened — it asks again on the next visit
+  setTimeout(function(){ if(ui.view!=='calendar') return; if(document.querySelector('.overlay:not(.hidden):not(#intOverlay)')){ ui._intAsked = null; return; } openIntentForm(kind, true); }, 450);
 });
 // a strip at the top of the Calendar: the month's and the week's, one click to change them
 function intentStripHtml(){

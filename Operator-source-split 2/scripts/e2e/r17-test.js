@@ -276,7 +276,7 @@ const newsRoute = (asked, extra) => async r => {
     await p.click('.today-hero .pcf-front'); await p.waitForTimeout(800);
     check('click: it turns over — overall and the four ratings on the back', await p.$('.today-hero .pcf.is-flipped')!==null && (await p.$$('.today-hero .pcf-back .pc-attrs > span')).length===4 && /OVR/.test(await p.textContent('.today-hero .pcf-back')));
     await p.click('.today-hero .pcf-open'); await p.waitForTimeout(400);
-    check('"Your card →" opens Personal → You (the full 2K card)', await E("ui.view==='personal' && ui.personalTab==='you'") && await p.isVisible('.you .pc-big') && (await p.$$('.you-attr')).length===4 && (await p.$$('.you .xp-step')).length===9);
+    check('"Your card →" opens Personal → You (the full 2K card)', await E("ui.view==='personal' && ui.personalTab==='you'") && await p.isVisible('.you .pc-big') && (await p.$$('.you-attr')).length===4 && (await p.$$('.you .you-tr')).length===9);
     check('You shows your body on a scale for your height (174 healthy line, 209 obese line, you at 205)', /174/.test(await p.textContent('.you-body .bmi-lab')) && /209/.test(await p.textContent('.you-body .bmi-lab')) && /205/.test(await p.textContent('.you-body .bmi-you')));
     check('…and stays simple (no daily quest, no wall of XP lines)', await p.$('.you .sys-quest, .you .you-today')===null);
     // SYSTEM windows

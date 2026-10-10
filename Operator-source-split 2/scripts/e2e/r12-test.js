@@ -99,7 +99,9 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     await p.clock.runFor(70000); await p.waitForTimeout(400);
     check('the round ends → a 5 min break on its own, round 2 next', await E("state.focus.activeSession.onBreak") && await E("state.focus.activeSession.round")===2 && /Round 1 of 4 done/.test(await p.textContent('#focusHeroCard .ms-line')));
     await p.clock.runFor(5.2*60000); await p.waitForTimeout(400);
-    check('the break ends on its own → Round 2', !(await E("state.focus.activeSession.onBreak")) && /Round 2 of 4/.test(await p.textContent('#focusHeroCard .ms-line')));
+    check('the break runs out and waits for you', await E("state.focus.activeSession.onBreak && !!state.focus.activeSession.breakOverAt"));
+    await E("endBreakModeFromFocus()"); await p.waitForTimeout(300);
+    check('lock back in → Round 2', !(await E("state.focus.activeSession.onBreak")) && /Round 2 of 4/.test(await p.textContent('#focusHeroCard .ms-line')));
     check('no errors (lock in)', !p.errors.length, p.errors);
     await p.context().close();
   }

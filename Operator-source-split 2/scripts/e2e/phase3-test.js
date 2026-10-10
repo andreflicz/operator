@@ -67,6 +67,7 @@ const SP = require('./common.js').OUT;
   await p.click('[data-action="closeStreakEdit"]');
   check('streak card shows 12', (await p.textContent('.streak-card .streak-num')).trim()==='12');
   // events + shoot prep
+  await E("intentStore().prompted['M'+monthKey()]=todayStr(); intentStore().prompted['W'+weekKey()]=todayStr()"); // the month/week prompt is covered in r18
   await p.click('[data-action="nav"][data-view="calendar"]');
   await p.click('#fabAdd');
   await p.fill('#calEventDate', ds(new Date(2026,9,8)));

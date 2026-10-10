@@ -97,7 +97,7 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     await E("startFocus(null); ui.view='today'; renderView()"); await p.waitForTimeout(300);
     check('locked in: one Now / Up next (not two)', (await p.$$('#viewRoot .now-next')).length===0 && (await p.$$('#viewRoot .nn-stack, #viewRoot [class*="nn-"]')).length>0);
     const nums = await p.$$eval('.knock-out-list .ko-num', e => e.map(x => x.textContent));
-    const titles = await p.$$eval('.knock-out-list .task-title', e => e.map(x => x.textContent));
+    const titles = await p.$$eval('.knock-out-list .ko-title', e => e.map(x => x.textContent));
     check('Knock these out is numbered 01, 02, 03', nums.join()==='01,02,03', nums);
     check('…in your lineup order', titles[0]==='Invoice clients' && titles[1]==='Edit JJS reel 3', titles);
     await E("endFocusSessionForSwitch(); ui.view='business'; ui.businessTab='clients'; renderView()"); await p.waitForTimeout(300);
