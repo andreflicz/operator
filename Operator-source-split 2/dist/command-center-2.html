@@ -3215,6 +3215,11 @@
   }
   .brief.bg-sunrise .brief-intro{ background:linear-gradient(180deg, #0f1430 0%, #231f46 45%, #4a3156 75%, #7a4552 100%); }
   .brief.bg-sunrise .bi-glow{ width:110vmin; height:110vmin; background:radial-gradient(circle, rgba(255,180,110,.45), rgba(255,130,90,.14) 45%, transparent 70%); }
+
+  /* Good morning lifts away over whatever is underneath (the business preview or the app) */
+  #wakeOverlay.is-leaving{ animation:wakeLift .56s cubic-bezier(.5,0,.2,1) forwards; pointer-events:none; }
+  @keyframes wakeLift{ to{ opacity:0; transform:translateY(-14px) scale(1.01); filter:blur(3px); } }
+  #planOverlay .wi{ animation:none; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -17210,10 +17215,17 @@ function endBriefing(){
 }
 // Start my morning: off the screen and into Morning mode (routine, note, plan) until you're ready to work.
 // Start my morning → the business preview (the same screen as Clock in): Lock in from there, or ✕ to the app
+// lifting the Good morning screen away to show whatever is already waiting underneath — so there's
+// never an empty, black moment in between
+function wakeLiftAway(then){
+  const ov = document.getElementById('wakeOverlay');
+  if(ov) ov.classList.add('is-leaving');
+  setTimeout(function(){ if(ov) ov.classList.remove('is-leaving'); if(then) then(); }, 560);
+}
 ACTIONS.wakeStartMorning = function(){
-  // a short, quiet hand-off: Good morning lifts away and the business preview rises in its place
-  const b = document.querySelector('#wakeContent .brief'); if(b) b.classList.add('is-leaving');
-  setTimeout(function(){ endBriefing(); clockIn({quiet:true, from:'morning'}); }, 520);
+  // the business preview goes in underneath first, then Good morning lifts off the top of it
+  clockIn({quiet:true, from:'morning'});
+  wakeLiftAway(function(){ ui.wakeMode = null; hideOverlay('wakeOverlay'); });
 };
 ACTIONS.wakeBriefDone = function(){ endBriefing(); };
 ACTIONS.wakeBriefBg = function(el, e, id){ const w = wakeCfg(); w.briefBg = id; persist('focus'); renderView(); if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); };
@@ -20577,8 +20589,8 @@ function briefVoiceRun(){
 // Skip: the page lifts away and you're on the front page
 ACTIONS.briefSkip = function(){
   ui.wakeIntroDone = true; ui.briefSkipped = true;
-  const b = document.querySelector('#wakeContent .brief'); if(b) b.classList.add('is-leaving');
-  setTimeout(function(){ if(ui.wakeMode==='brief') endBriefing(); }, 420);
+  ui.view = 'today'; renderView();
+  wakeLiftAway(function(){ if(ui.wakeMode==='brief') endBriefing(); });
 };
 
 // ---- 5 Start work: the work intro, then straight into Lock in ----

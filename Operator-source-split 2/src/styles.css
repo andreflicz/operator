@@ -3206,3 +3206,8 @@
   }
   .brief.bg-sunrise .brief-intro{ background:linear-gradient(180deg, #0f1430 0%, #231f46 45%, #4a3156 75%, #7a4552 100%); }
   .brief.bg-sunrise .bi-glow{ width:110vmin; height:110vmin; background:radial-gradient(circle, rgba(255,180,110,.45), rgba(255,130,90,.14) 45%, transparent 70%); }
+
+  /* Good morning lifts away over whatever is underneath (the business preview or the app) */
+  #wakeOverlay.is-leaving{ animation:wakeLift .56s cubic-bezier(.5,0,.2,1) forwards; pointer-events:none; }
+  @keyframes wakeLift{ to{ opacity:0; transform:translateY(-14px) scale(1.01); filter:blur(3px); } }
+  #planOverlay .wi{ animation:none; }

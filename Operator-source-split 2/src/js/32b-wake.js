@@ -327,10 +327,17 @@ function endBriefing(){
 }
 // Start my morning: off the screen and into Morning mode (routine, note, plan) until you're ready to work.
 // Start my morning → the business preview (the same screen as Clock in): Lock in from there, or ✕ to the app
+// lifting the Good morning screen away to show whatever is already waiting underneath — so there's
+// never an empty, black moment in between
+function wakeLiftAway(then){
+  const ov = document.getElementById('wakeOverlay');
+  if(ov) ov.classList.add('is-leaving');
+  setTimeout(function(){ if(ov) ov.classList.remove('is-leaving'); if(then) then(); }, 560);
+}
 ACTIONS.wakeStartMorning = function(){
-  // a short, quiet hand-off: Good morning lifts away and the business preview rises in its place
-  const b = document.querySelector('#wakeContent .brief'); if(b) b.classList.add('is-leaving');
-  setTimeout(function(){ endBriefing(); clockIn({quiet:true, from:'morning'}); }, 520);
+  // the business preview goes in underneath first, then Good morning lifts off the top of it
+  clockIn({quiet:true, from:'morning'});
+  wakeLiftAway(function(){ ui.wakeMode = null; hideOverlay('wakeOverlay'); });
 };
 ACTIONS.wakeBriefDone = function(){ endBriefing(); };
 ACTIONS.wakeBriefBg = function(el, e, id){ const w = wakeCfg(); w.briefBg = id; persist('focus'); renderView(); if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); };

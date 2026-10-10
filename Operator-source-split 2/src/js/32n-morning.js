@@ -438,8 +438,8 @@ function briefVoiceRun(){
 // Skip: the page lifts away and you're on the front page
 ACTIONS.briefSkip = function(){
   ui.wakeIntroDone = true; ui.briefSkipped = true;
-  const b = document.querySelector('#wakeContent .brief'); if(b) b.classList.add('is-leaving');
-  setTimeout(function(){ if(ui.wakeMode==='brief') endBriefing(); }, 420);
+  ui.view = 'today'; renderView();
+  wakeLiftAway(function(){ if(ui.wakeMode==='brief') endBriefing(); });
 };
 
 // ---- 5 Start work: the work intro, then straight into Lock in ----
