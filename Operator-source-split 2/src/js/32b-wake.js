@@ -315,6 +315,7 @@ function wakeImUp(){
   if(!wasTest && state.modes.active && state.modes.active.sleep) finishActiveMode(true);
   if(!wasTest && typeof applyNightPlanAuto==='function') applyNightPlanAuto();
   ui.wakeMode = 'brief'; ui.wakeBriefTest = !!wasTest; ui.wakeBoardBig = false; ui.wakeIntroDone = false;
+  if(typeof opBriefReset==='function') opBriefReset();
   ui.briefT0 = Date.now(); ui.briefShift = 0; ui.briefSkipped = false; ui.briefNewsAt = null; ui.briefLineSeen = 0; ui.dawnTs = null;
   loadMorningNews();
   playWakeChime();
@@ -322,6 +323,7 @@ function wakeImUp(){
   briefVoiceRun();
 }
 function endBriefing(){
+  if(typeof opStop==='function' && !overlayOpen('planOverlay')) opStop();
   ui.wakeMode = null;
   hideOverlay('wakeOverlay');
   ui.view = 'today';
@@ -342,6 +344,7 @@ ACTIONS.wakeStartMorning = function(){
   wakeLiftAway(function(){ ui.wakeMode = null; hideOverlay('wakeOverlay'); });
 };
 ACTIONS.wakeBriefDone = function(){ endBriefing(); };
+ACTIONS.wakeVoice = function(el, e, id){ wakeCfg().voice = id==='on'; persist('focus'); if(id!=='on' && typeof opStop==='function') opStop(); renderView(); };
 ACTIONS.wakeBriefBg = function(el, e, id){ const w = wakeCfg(); w.briefBg = id; persist('focus'); renderView(); if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); };
 ACTIONS.wakeBriefLockIn = function(el, e, id){ endBriefing(); if(id) setNextUp(id); renderView(); openLockInChooser(); };
 ACTIONS.wakeClockIn = function(){ const t = ui.wakeBriefTest; endBriefing(); if(t){ showToast('Test done — this is where Clock in shows your plan.', {icon:'&#128339;'}); return; } clockIn(); };
@@ -358,7 +361,7 @@ function wakeSnooze(){
   ui.wakeMode = 'snooze'; renderWakeOverlayInto();
 }
 ACTIONS.wakeImUp = function(){ wakeImUp(); };
-ACTIONS.wakeStartDay = function(){ wakeImUp(); };
+ACTIONS.wakeStartDay = function(){ if(typeof opUnlock==='function') opUnlock(); wakeImUp(); };
 ACTIONS.wakeSnooze = function(){ wakeSnooze(); };
 ACTIONS.wakePlayMusic = function(){ const w = wakeCfg(); if(w.media) playWakeMedia(w.media, function(){ showToast('Couldn\'t play that — try uploading the song file instead.', {icon:'&#9888;'}); }); clearInterval(wakeBeepTimer); if(wakeRing){ wakeRing.mediaFailed = false; renderWakeOverlayInto(); } };
 function upcomingNightPlan(){ const np = state.focus.nightPlan; return (np && np.date>=todayStr()) ? np : null; }
@@ -440,6 +443,7 @@ function renderWakeSetup(){
       '<div class="field"><label>Sports'+tip('Teams or leagues for the Sports section — e.g. Knicks, Giants, UFC. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, NFL, UFC" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
       '<div class="field"><label>Tech & interests'+tip('Anything else you follow — e.g. AI, Apple, marketing, crypto. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
       '<div class="field"><label>Good morning background'+tip('Time of day follows when you\'re up: sunrise colours early, a blue sky later in the morning, golden in the evening, night if it\'s still dark.')+'</label><div class="seg-tabs" style="margin:0;">'+[['auto','Time of day'],['sunrise','Sunrise'],['dark','Dark']].map(function(o){ const on = (w.briefBg||'auto')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefBg" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
+      '<div class="field"><label>The Operator’s voice'+tip('Good morning is spoken out loud (the Mac’s own voice), with captions. You can ask it for sports, news, tech or a business brief.')+'</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.voice!==false?' active':'')+'" data-action="wakeVoice" data-id="on">On</button><button class="seg-tab'+(w.voice===false?' active':'')+'" data-action="wakeVoice" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Good morning layout'+tip('Minimal: one big Get to Work button in the middle with the important things around it.')+'</label><div class="seg-tabs" style="margin:0;">'+[['full','Full'],['minimal','Minimal']].map(function(o){ const on = (w.briefLayout||'full')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefLayout" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
       '<div class="field"><label>Headlines in Good morning</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.news!==false?' active':'')+'" data-action="wakeNews" data-id="on">On</button><button class="seg-tab'+(w.news===false?' active':'')+'" data-action="wakeNews" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+

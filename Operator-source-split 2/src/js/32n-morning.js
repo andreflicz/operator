@@ -384,7 +384,8 @@ function wakeBriefHtml(){
   let k = 0, tcur = base;
   const panel = function(cls, anim, voice, html, extraStyle, attrs){
     const d = tcur; k++;
-    if(voice){ lines.push({at: d - 380, text: voice}); tcur += Math.max(1500, voice.split(' ').length*BRIEF_WORD_MS + 650); } else tcur += 800;
+    const wms = typeof opVoiceOn==='function' && opVoiceOn() ? 360 : BRIEF_WORD_MS;
+    if(voice){ lines.push({at: d - 380, text: voice}); tcur += Math.max(1500, voice.split(' ').length*wms + 650); } else tcur += 800;
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
   const slept = lastNightSleep();
@@ -442,6 +443,7 @@ function wakeBriefHtml(){
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
       '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
       '<div class="br-voice br-p br-a-fade" style="--d:'+(base-700)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
+      (typeof opAskHtml==='function' ? '<div class="br-p br-a-fade" style="--d:'+(base-500)+'ms">'+opAskHtml('brief')+'</div>' : '')+
       // no news column (headlines off) → two columns that fill the width instead of an empty third
       '<div class="b4-grid'+(colC.length ? '' : ' cols-2')+'"><div class="b4-col">'+colA.join('')+'</div><div class="b4-col">'+colB.join('')+'</div>'+(colC.length ? '<div class="b4-col">'+colC.join('')+'</div>' : '')+'</div>'+
       '<div class="brief-cta br-p br-a-rise" data-k="'+k+'" style="--d:'+ctaD+'ms">'+
@@ -470,6 +472,7 @@ function briefVoiceRun(){
     const el = document.getElementById('brVoice');
     if(!el || ui.wakeMode!=='brief' || !overlayOpen('wakeOverlay')){ if(!overlayOpen('wakeOverlay')) clearInterval(briefVoiceTimer); return; }
     const lines = ui.briefLines || [], t = Date.now() - (ui.briefT0||0);
+    if(typeof opBriefTick==='function' && opBriefTick(lines, t)) return;
     let cur = null; lines.forEach(function(l){ if(t >= l.at) cur = l; });
     if(ui.briefSkipped && lines.length) cur = lines[lines.length-1];
     // a word at a time, at a calm reading pace (it used to type letter by letter, too fast)
@@ -524,6 +527,7 @@ function clockIn(opts){
   ui.planReveal = {at:Date.now(), from:opts.from||''};
   showOverlay('planOverlay'); renderPlanRevealInto();
   if(!opts.quiet) playWorkIntro();
+  if(opts.from==='morning' && typeof opAutoBusinessBrief==='function') opAutoBusinessBrief();
 }
 ACTIONS.clockIn = function(){ clockIn(); };
 ACTIONS.closePlanReveal = function(){ ui.planReveal = null; hideOverlay('planOverlay'); renderView(); };
@@ -605,6 +609,7 @@ function renderPlanReveal(){
     '<div class="wi-inner">'+
       '<div class="wi-k" style="animation-delay:40ms">Work Mode</div>'+
       '<h1 class="wi-h" style="animation-delay:100ms">Let’s get to work'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
+      (typeof opAskHtml==='function' ? '<div class="wi-op">'+opAskHtml('work')+'<div class="wi-cap" id="wiCap"></div></div>' : '')+
       '<div class="wi-stats n'+stats.length+'">'+stats.map(function(s){ return '<div class="wi-stat"'+(s.go ? ' data-action="'+s.go+'"' : '')+' style="'+at(140)+'"><div class="wi-stat-k">'+s.k+'</div><div class="wi-stat-v">'+s.v+'</div>'+(s.pct!=null ? '<div class="wi-bar"><i style="width:'+s.pct.toFixed(1)+'%"></i></div>' : '')+'<div class="wi-stat-s">'+escapeHtml(s.sub)+'</div></div>'; }).join('')+'</div>'+
       '<div class="wi-cols">'+
         '<div class="wi-col">'+
