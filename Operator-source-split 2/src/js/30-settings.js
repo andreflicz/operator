@@ -46,13 +46,13 @@ function renderSettings(){
           '</div>';
         }).join('')+'</div>'+
       '</div></div>'+
-      '<div class="section"><div class="section-title">Task Categories'+tip('Give task types their own color — shown as a left border on the card. Untick “Time counts as deep work” for types that shouldn\'t add to deep work.')+'<div class="row"><input class="input" id="newTaskCatLabel" placeholder="e.g. Video Idea" style="width:160px;"><button class="btn btn-sm" data-action="addTaskCategory">Add</button></div></div>'+
+      '<div class="section"><div class="section-title">Task Categories'+tip('Give task types their own color — shown as a left border on the card.')+'<div class="row"><input class="input" id="newTaskCatLabel" placeholder="e.g. Video Idea" style="width:160px;"><button class="btn btn-sm" data-action="addTaskCategory">Add</button></div></div>'+
         '<div class="card">'+
           '<div class="row" style="margin-bottom:10px;">'+SWATCHES.map(function(sw){ return '<span class="swatch'+(pickedSwatch===sw?' swatch-active':'')+'" style="background:'+sw+';" data-action="pickSwatch" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
           '<div class="task-list">'+(arr(state.tasks.categories).map(function(c){ return '<div class="task-item-v2">'+
             '<span class="swatch" style="background:'+c.color+';width:18px;height:18px;cursor:pointer;" data-action="cycleTaskCategoryColor" data-id="'+c.id+'" title="Click to change color"></span>'+
             '<input class="input" data-task-cat-label="'+c.id+'" value="'+escapeHtml(c.label)+'" style="flex:1;max-width:220px;">'+
-            '<label class="row kpi-sub" style="gap:4px;cursor:pointer;" title="Time on tasks in this category counts toward deep work"><input type="checkbox" data-task-cat-deep="'+c.id+'" '+(c.countsDeepWork!==false?'checked':'')+'>Time counts as deep work</label>'+
+
             deleteBtn('taskcat', c.id)+
           '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
         '</div>'+

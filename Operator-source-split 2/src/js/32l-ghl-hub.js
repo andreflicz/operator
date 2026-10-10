@@ -5,7 +5,7 @@
 // Social    — the last 7 days from GHL's Social Planner (followers, reach, impressions,
 //             engagement), with a "followers" goal of yours kept up to date from it.
 // It refreshes itself every 45 seconds while you're looking at it.
-function inboxState(){ if(!ui.inbox) ui.inbox = {mode:'chats', chats:null, contacts:null, social:null, q:'', cq:'', loading:{}, err:null, at:0}; return ui.inbox; }
+function inboxState(){ if(!ui.inbox) ui.inbox = {mode:'social', chats:null, contacts:null, social:null, q:'', cq:'', loading:{}, err:null, at:0}; return ui.inbox; }
 function inboxUnread(){ const g = state.settings && state.settings.ghl; return g && g.connected ? arr(g.inbox).length : 0; }
 function initialsOf(n){ return String(n||'?').trim().split(/\s+/).slice(0, 2).map(function(w){ return w[0] ? w[0].toUpperCase() : ''; }).join('') || '?'; }
 function ghlAgo(ts){ const t = typeof ts==='number' ? ts : Date.parse(ts); if(!t) return ''; const m = Math.round((Date.now()-t)/60000); return m<1 ? 'now' : m<60 ? m+'m' : m<1440 ? Math.round(m/60)+'h' : todayStr(new Date(t))===addDays(todayStr(), -1) ? 'yesterday' : fmtDateShort(todayStr(new Date(t))); }
@@ -162,13 +162,37 @@ function inboxSocialHtml(s){
   if(s.social.empty) return '<div class="ib-empty" style="padding:30px;"><div style="font-size:30px;">&#128247;</div>No social accounts connected in GoHighLevel\'s Social Planner yet — connect Instagram, Facebook or TikTok there and they\'ll show up here.</div>';
   const st = s.social, br = st.breakdowns || {}, f = st.platformTotals && st.platformTotals.followers || {};
   const eng = br.engagement || {};
-  const engTotal = Object.keys(eng).reduce(function(a, k){ const x = eng[k]||{}; return a + (Number(x.likes)||0) + (Number(x.comments)||0) + (Number(x.shares)||0); }, 0);
-  return '<div class="sc">'+
-    '<div class="sc-grid">'+
-      Object.keys(f).map(function(k){ return '<div class="sc-card sc-plat"><div class="sc-k">'+escapeHtml(k[0].toUpperCase()+k.slice(1))+' followers</div><div class="sc-v">'+Number(f[k].total||0).toLocaleString()+'</div>'+sparkline(f[k].series)+'</div>'; }).join('')+
-      socialMetric('Reach', br.reach, '&#128065;')+socialMetric('Impressions', br.impressions, '&#128200;')+socialMetric('Posts', br.posts, '&#128221;')+
-      (engTotal ? '<div class="sc-card"><div class="sc-k">&#10084;&#65039; Engagement</div><div class="sc-v">'+engTotal.toLocaleString()+'</div><div class="kpi-sub">likes, comments &amp; shares</div></div>' : '')+
+  const sum = function(o, key){ return Object.keys(o).reduce(function(a, k){ const x = o[k]||{}; return a + (Number(x[key])||0); }, 0); };
+  const likes = sum(eng, 'likes'), comments = sum(eng, 'comments'), shares = sum(eng, 'shares'), engTotal = likes + comments + shares;
+  const tot = function(block){ return !block ? 0 : block.total!=null ? Number(block.total)||0 : Object.keys(block.platforms||{}).reduce(function(a, k){ return a + (Number(block.platforms[k].value)||0); }, 0); };
+  const reach = tot(br.reach), posts = tot(br.posts);
+  const plats = Object.keys(f).map(function(k){ const ser = arr(f[k].series).map(Number), total = Number(f[k].total)||0; const first = ser.length ? ser[0] : total; return {k:k, total:total, series:ser, gain: ser.length>1 ? ser[ser.length-1] - first : null}; }).sort(function(a, b){ return b.total - a.total; });
+  const followers = plats.reduce(function(a, x){ return a + x.total; }, 0);
+  const gain = plats.reduce(function(a, x){ return a + (x.gain||0); }, 0), hasGain = plats.some(function(x){ return x.gain!=null; });
+  const pct = function(n){ return (n*100).toFixed(n<0.1 ? 1 : 0)+'%'; };
+  const nice = function(k){ return escapeHtml(k[0].toUpperCase()+k.slice(1)); };
+  const PI = {instagram:'&#128247;', facebook:'&#128216;', tiktok:'&#127925;', youtube:'&#9654;&#65039;', linkedin:'&#128188;', twitter:'&#120143;', x:'&#120143;', google:'&#127760;', pinterest:'&#128204;'};
+  return '<div class="sc sc2">'+
+    // the headline: everyone who follows you, and how that moved this week
+    '<div class="sc-hero">'+
+      '<div><div class="sc-k">Total followers</div><div class="sc-big">'+followers.toLocaleString()+'</div>'+
+        (hasGain ? '<div class="sc-ch '+(gain>=0?'is-up':'is-down')+'">'+(gain>=0?'&#9650; +':'&#9660; ')+gain.toLocaleString()+' this week</div>' : '')+'</div>'+
+      '<div class="sc-hero-stats">'+
+        '<div><b>'+reach.toLocaleString()+'</b><span>Reach</span></div>'+
+        '<div><b>'+engTotal.toLocaleString()+'</b><span>Engagements</span></div>'+
+        '<div><b>'+(reach ? pct(engTotal/reach) : '—')+'</b><span>Engagement rate</span></div>'+
+        '<div><b>'+(posts ? Math.round(reach/posts).toLocaleString() : '—')+'</b><span>Reach per post</span></div>'+
+      '</div>'+
     '</div>'+
+    // each platform
+    (plats.length ? '<div class="sc-plats">'+plats.map(function(x){ return '<div class="sc-card sc-plat"><div class="sc-plat-h"><span class="sc-plat-i">'+(PI[x.k.toLowerCase()]||'&#128241;')+'</span><b>'+nice(x.k)+'</b>'+
+        (x.gain!=null ? '<span class="sc-ch '+(x.gain>=0?'is-up':'is-down')+'">'+(x.gain>=0?'+':'')+x.gain.toLocaleString()+'</span>' : '')+'</div>'+
+        '<div class="sc-v">'+x.total.toLocaleString()+'</div><div class="kpi-sub">followers'+(followers ? ' &middot; '+Math.round(x.total/followers*100)+'% of all' : '')+'</div>'+sparkline(x.series)+'</div>'; }).join('')+'</div>' : '')+
+    '<div class="sc-grid">'+
+      socialMetric('Reach', br.reach, '&#128065;')+socialMetric('Impressions', br.impressions, '&#128200;')+socialMetric('Posts', br.posts, '&#128221;')+
+    '</div>'+
+    (engTotal ? '<div class="sc-card sc-eng"><div class="sc-k">&#10084;&#65039; Engagement</div><div class="sc-eng-bars">'+
+      [['Likes', likes, '#ff6b8a'], ['Comments', comments, '#7fd4ff'], ['Shares', shares, '#7ef0c0']].map(function(r){ return '<div class="sc-eng-r"><span>'+r[0]+'</span><i><u style="width:'+(r[1]/Math.max(1, engTotal)*100).toFixed(1)+'%;background:'+r[2]+'"></u></i><b>'+r[1].toLocaleString()+'</b></div>'; }).join('')+'</div></div>' : '')+
     '<div class="kpi-sub" style="margin-top:10px;">Last 7 days, from GoHighLevel\'s Social Planner. A goal with "followers" in its name (like "IG followers") stays updated from these numbers.</div>'+
   '</div>';
 }
@@ -188,9 +212,9 @@ function renderConversations(){
   const s = inboxState(), on = ghlCfg().connected;
   const tab = function(id, label, n){ return '<button class="seg-tab'+(s.mode===id?' active':'')+'" data-action="inboxMode" data-id="'+id+'">'+label+(n ? ' <span class="ib-badge">'+n+'</span>' : '')+'</button>'; };
   const at = s.mode==='social' ? (ghlCfg().socialCache && ghlCfg().socialCache.at) : s.at;
-  return '<div class="view-header"><div><div class="view-title">Conversations'+tip('Your GoHighLevel chats and contacts, and your social numbers — all in one place.')+'</div></div>'+
+  return '<div class="view-header"><div><div class="view-title">Social'+tip('Your followers and how your posts are doing, plus your GoHighLevel chats and contacts.')+'</div></div>'+
       (on ? '<div class="row" style="gap:8px;align-items:center;">'+(at ? '<span class="kpi-sub">Updated '+ghlAgo(at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="'+(s.mode==='social' ? 'socialRefresh' : 'inboxRefresh')+'" title="Refresh">&#8635;</button></div>' : '')+'</div>'+
-    (on ? '<div class="seg-tabs cv-tabs">'+tab('chats', '&#128172; Chats', inboxUnread())+tab('contacts', '&#128101; Contacts')+tab('social', '&#128202; Social')+'</div>' : '')+
+    (on ? '<div class="seg-tabs cv-tabs">'+tab('social', '&#128202; Stats')+tab('chats', '&#128172; Chats', inboxUnread())+tab('contacts', '&#128101; Contacts')+'</div>' : '')+
     '<div class="tab-panel" data-key="convos-'+s.mode+'">'+renderInboxTab()+'</div>';
 }
 function convoBadge(){ const b = document.getElementById('convoBadge'); if(!b) return; const n = inboxUnread(); b.textContent = n ? String(n) : ''; b.classList.toggle('is-on', !!n); }

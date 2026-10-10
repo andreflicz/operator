@@ -2801,6 +2801,39 @@
   .mm-k + .qt, .br-k + .qt{ margin-top:16px; }
   .mm-k + .br-th, .br-k + .br-th{ border-top:none; padding-top:4px; }
   .mm-thoughts{ margin-top:10px; padding-top:14px; border-top:1px solid var(--border); }
+  /* Social */
+  .sc2 .sc-hero{ display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap; padding:22px 24px; border-radius:20px; margin-bottom:12px;
+    background:linear-gradient(120deg, rgba(225,48,108,.14), rgba(131,58,180,.10) 45%, rgba(252,175,69,.08)); border:1px solid rgba(225,48,108,.22); }
+  .sc-big{ font-family:var(--font-display); font-size:52px; font-weight:800; letter-spacing:-.03em; line-height:1.05; font-variant-numeric:tabular-nums; }
+  .sc-hero-stats{ display:grid; grid-template-columns:repeat(4, auto); gap:6px 28px; }
+  .sc-hero-stats b{ display:block; font-family:var(--font-display); font-size:22px; font-variant-numeric:tabular-nums; } .sc-hero-stats span{ font-size:12px; color:var(--text-dim); }
+  .sc-plats{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:10px; margin-bottom:10px; }
+  .sc-plat-h{ display:flex; align-items:center; gap:8px; margin-bottom:6px; } .sc-plat-h b{ flex:1; font-size:14px; } .sc-plat-i{ font-size:16px; }
+  .sc-eng{ margin-top:10px; } .sc-eng-bars{ display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+  .sc-eng-r{ display:grid; grid-template-columns:80px 1fr 60px; align-items:center; gap:10px; font-size:13px; } .sc-eng-r b{ text-align:right; font-variant-numeric:tabular-nums; }
+  .sc-eng-r i{ height:8px; border-radius:5px; background:rgba(var(--ink),.07); overflow:hidden; } .sc-eng-r u{ display:block; height:100%; border-radius:5px; }
+  @media (max-width:760px){ .sc-hero-stats{ grid-template-columns:repeat(2, auto); } }
+  /* the quick-note popup in the corner */
+  #quickJournalOverlay.qj-pop-overlay{ background:transparent !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; align-items:flex-end; justify-content:flex-end; padding:0 84px 92px 0; }
+  #quickJournalOverlay.qj-pop-overlay #quickJournalContent{ width:380px !important; max-width:calc(100vw - 32px) !important; padding:0 !important; overflow:hidden !important; border-radius:22px; box-shadow:0 30px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(var(--ink),.08); animation:qjUp .32s cubic-bezier(.2,.9,.3,1.15) both; transform-origin:100% 100%; }
+  @keyframes qjUp{ from{ opacity:0; transform:translateY(16px) scale(.94); } }
+  .qj3{ display:flex; flex-direction:column; }
+  .qj3-h{ display:flex; align-items:center; gap:11px; padding:16px 16px 8px; }
+  .qj3-i{ width:34px; height:34px; border-radius:11px; display:flex; align-items:center; justify-content:center; background:linear-gradient(140deg, rgba(232,162,61,.25), rgba(232,162,61,.06)); font-size:16px; }
+  .qj3-h b{ display:block; font-size:15px; } .qj3-h small{ font-size:11.5px; color:var(--text-dim); }
+  .qj3-h > div{ flex:1; }
+  .qj3-x{ border:none; background:transparent; color:var(--text-dim); width:28px; height:28px; border-radius:50%; cursor:pointer; } .qj3-x:hover{ background:rgba(var(--ink),.07); color:var(--text); }
+  .qj3-text{ border:none; outline:none; resize:none; background:transparent; color:var(--text); font:inherit; font-size:16px; line-height:1.55; padding:8px 18px; min-height:130px; }
+  .qj3-text::placeholder{ color:var(--text-faint, rgba(127,127,127,.6)); }
+  .qj3-text.is-shake{ animation:lsShake .4s both; }
+  .qj3-tags{ display:flex; flex-wrap:wrap; gap:6px; padding:4px 16px 12px; }
+  .qj3-tag{ display:inline-flex; align-items:center; gap:5px; border:1px solid rgba(var(--ink),.1); background:rgba(var(--ink),.03); color:var(--text-dim); border-radius:999px; padding:4px 10px 4px 8px; font-size:12px; cursor:pointer; transition:all .15s; }
+  .qj3-tag:hover{ color:var(--text); border-color:rgba(var(--ink),.22); } .qj3-tag.is-on{ color:var(--text); border-color:var(--accent); background:rgba(232,162,61,.12); }
+  .qj3-f{ display:flex; align-items:center; gap:10px; padding:10px 14px 14px 18px; border-top:1px solid rgba(var(--ink),.07); }
+  .qj3-open{ border:none; background:none; color:var(--text-dim); font-size:12.5px; font-weight:600; cursor:pointer; padding:0; margin-right:auto; } .qj3-open:hover{ color:var(--accent); }
+  .qj3-hint{ font-size:11px; color:var(--text-faint, rgba(127,127,127,.6)); }
+  .qj3.is-saved{ padding:40px 20px; align-items:center; } .qj3-done{ display:flex; flex-direction:column; align-items:center; gap:10px; font-weight:600; color:var(--text-dim); }
+  .qj3-done span{ width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#3fbe8e; color:#04140d; font-size:22px; font-weight:900; animation:lsPop .4s cubic-bezier(.2,.9,.3,1.4) both; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -2819,7 +2852,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
     <button class="nav-item" data-action="nav" data-view="today"><span class="nav-icon">&#9670;</span><span class="nav-label">Today</span></button>
     <button class="nav-item" data-action="nav" data-view="focus"><span class="nav-icon">&#9201;</span><span class="nav-label">Focus</span></button>
     <button class="nav-item" data-action="nav" data-view="business"><span class="nav-icon">&#9635;</span><span class="nav-label">Business</span></button>
-    <button class="nav-item" data-action="nav" data-view="convos"><span class="nav-icon">&#9993;</span><span class="nav-label">Conversations</span><span class="nav-badge" id="convoBadge"></span></button>
+    <button class="nav-item" data-action="nav" data-view="convos"><span class="nav-icon">&#10022;</span><span class="nav-label">Social</span><span class="nav-badge" id="convoBadge"></span></button>
     <button class="nav-item" data-action="nav" data-view="calendar"><span class="nav-icon">&#9638;</span><span class="nav-label">Calendar</span></button>
     <button class="nav-item" data-action="nav" data-view="personal"><span class="nav-icon">&#9679;</span><span class="nav-label">Personal</span></button>
     <button class="nav-item" data-action="nav" data-view="settings"><span class="nav-icon">&#9881;</span><span class="nav-label">Settings</span></button>
@@ -4957,8 +4990,17 @@ function rawSessionMinutesFor(dateStr, type){
   }
   return state.focus.sessions.filter(function(s){ return s.date===dateStr && sessionType(s)===type; }).reduce(function(a,s){ return a+(s.minutes||0); },0);
 }
+// Deep work counts almost everything: every locked-in session, plus the time you timed a task
+// as "Now" without locking in. (Only time on not-work apps inside a session comes off.)
 function deepWorkMinutesFor(dateStr){
-  return Math.max(0, rawSessionMinutesFor(dateStr,'deep') - excludedTaskMinutesFor(dateStr) - distractionMinutesFor(dateStr));
+  return Math.max(0, rawSessionMinutesFor(dateStr,'deep') + looseTaskMinutesFor(dateStr) - distractionMinutesFor(dateStr));
+}
+function looseTaskMinutesFor(dateStr){
+  if(RC){
+    const idx = memo('looseIdx', function(){ const m = {}; arr(state.focus.taskSegments).forEach(function(sg){ if(sg.inSession!==false) return; m[sg.date] = (m[sg.date]||0) + Math.max(0, Math.round((sg.end-sg.start)/60000)); }); return m; });
+    return idx[dateStr] || 0;
+  }
+  return arr(state.focus.taskSegments).filter(function(sg){ return sg.date===dateStr && sg.inSession===false; }).reduce(function(a, sg){ return a + Math.max(0, Math.round((sg.end-sg.start)/60000)); }, 0);
 }
 // The finished part of today's deep work is cached between renders (the timer asks every second;
 // recomputing it from every session and the app-activity log each time made ticks heavy).
@@ -4972,7 +5014,8 @@ function deepWorkMinutesTodayLive(){
   if(as && sessionType(as)==='deep'){
     if(as.onBreak) mins += Math.floor((as.frozenElapsedMs||0)/60000);
     else mins += Math.floor((Date.now()-as.startedAt)/60000);
-    if(ui.currentTaskId && ui.currentTaskStartedAt && !as.onBreak && !taskCountsAsDeepWork(ui.currentTaskId)) mins -= Math.floor((Date.now()-ui.currentTaskStartedAt)/60000);
+  } else if(!as && ui.currentTaskId && ui.currentTaskStartedAt){
+    mins += Math.floor((Date.now()-ui.currentTaskStartedAt)/60000);
   }
   return Math.max(0, mins);
 }
@@ -4980,10 +5023,6 @@ function taskCountsAsDeepWork(taskOrId){
   const t = typeof taskOrId!=='string' ? taskOrId : RC
     ? memo('taskById', function(){ const m = {}; state.tasks.items.forEach(function(x){ m[x.id] = x; }); return m; })[taskOrId]
     : state.tasks.items.find(function(x){ return x.id===taskOrId; });
-  if(!t) return true;
-  if(t.countsDeepWork===false) return false;
-  const cat = t.categoryId ? taskCategoryById(t.categoryId) : null;
-  if(cat && cat.countsDeepWork===false) return false;
   return true;
 }
 function excludedTaskMinutesFor(dateStr){
@@ -5577,7 +5616,7 @@ function renderTaskEditModal(){
     '<div class="field" style="margin-top:10px;"><label>Deadline</label><div class="row"><input class="input" type="date" id="editDeadline-'+t.id+'" value="'+(t.deadline||'')+'"><input class="input" type="time" id="editDeadlineTime-'+t.id+'" value="'+(t.deadlineTime||'')+'" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editDeadline-'+t.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="editDeadline-'+t.id+'">Today</button>'+(t.deadline?'<button class="btn btn-ghost btn-sm" data-action="clearField" data-target="editDeadline-'+t.id+'" title="Remove deadline">Clear</button>':'')+'</div></div>'+
     taskAlarmFieldsHtml('editTask-'+t.id+'-', t)+
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="editNotes-'+t.id+'" style="width:100%;min-height:60px;">'+escapeHtml(t.notes||'')+'</textarea></div>'+
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editCountsDeep-'+t.id+'" '+(t.countsDeepWork!==false?'checked':'')+' style="margin-right:6px;">&#9201; Time on this counts as deep work'+tip('When you time this task, those minutes go toward your daily deep-work goal (and the streak). Untick it for admin, calls or errands — the time is still tracked, it just isn\'t deep work.')+(function(){ const c=t.categoryId?taskCategoryById(t.categoryId):null; return c && c.countsDeepWork===false ? ' <span class="kpi-sub">(its category "'+escapeHtml(c.label)+'" doesn\'t count)</span>' : ''; })()+'</label>'+
+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editOngoing-'+t.id+'" '+(t.ongoing?'checked':'')+' style="margin-right:6px;">&#128204; Ongoing — takes more than a day'+tip('It stays on your list day after day until it\'s actually finished: tick it off for today without closing it. When it\'s due is just the Deadline above.')+'</label>'+
     '<div id="editTaskOngoingExtra-'+t.id+'" style="display:'+(t.ongoing?'block':'none')+';">'+
     '<div class="field" style="margin-top:10px;"><label>How often you work on it (optional)</label><select class="input" id="editOngoingFrequency-'+t.id+'">'+
@@ -7229,7 +7268,7 @@ function renderVideoIdeaEditModal(){
   const t = state.tasks.items.find(function(x){return x.id===ui.editingVideoIdeaId;});
   if(!t) return '';
   const types = arr(state.tasks.videoTypes);
-  const where = t.status==='today' ? "In today's lineup" : t.status==='done' ? 'Finished' : 'In Video Ideas';
+  const where = t.status==='today' ? "In the current lineup" : t.status==='done' ? 'Finished' : 'In Video Ideas';
   return '<div class="section-title" style="margin-bottom:4px;">&#127916; Video Idea</div>'+
     '<div class="kpi-sub" style="margin-bottom:14px;">'+where+'</div>'+
     '<div class="field"><label>Idea</label><input class="input" id="editVideoTitle-'+t.id+'" value="'+escapeHtml(t.title)+'" style="width:100%;"></div>'+
@@ -7267,7 +7306,7 @@ function renderFocusTasksOverview(){
   return nowNextPanelHtml()+
   renderTaskToolbar(true)+
   '<div class="section" style="margin-bottom:14px;">'+
-    '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('In your order — switch to List and drag rows to set it (otherwise highest priority and closest deadlines first). Drag a card onto Up next to line it up. Drag a box around cards (or ⌘-click) to pick several.')+'<span class="row" style="margin-left:auto;gap:8px;">'+lineupToggleHtml()+'</span></div>'+
+    '<div class="section-title" style="align-items:center;">Current Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('In your order — switch to List and drag rows to set it (otherwise highest priority and closest deadlines first). Drag a card onto Up next to line it up. Drag a box around cards (or ⌘-click) to pick several.')+'<span class="row" style="margin-left:auto;gap:8px;">'+lineupToggleHtml()+'</span></div>'+
     (listView ? '<div class="task-column tl-wrap" data-dropzone="today">'+lineupListHtml(today)+'</div>' :
     '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236, loop:true, count:today.length}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>')+
   '</div>'+
@@ -7545,7 +7584,7 @@ function nowNextPanelHtml(opts){
   let now = '';
   {
     now = '<div class="nn-cell nn-now'+(cur?' has-task':'')+(pend?' is-asking':'')+'" data-dropzone="current">'+
-      '<div class="nn-k">Now'+(!inS && cur ? '<span class="nn-sug">not locked in</span>' : '')+tip('What you\'re on, timed. Lock in and it counts as deep work. ✓ Done finishes it; Release stops timing it and leaves it on today\'s list.')+'</div>'+
+      '<div class="nn-k">Now'+(!inS && cur ? '<span class="nn-sug">not locked in</span>' : '')+tip('What you\'re on, timed, and it all counts as deep work. ✓ Done finishes it; Release stops timing it and leaves it on the list.')+'</div>'+
       (pend
         ? '<div class="nn-title"><span>'+(cur?'Switch to':'Start')+' &ldquo;'+escapeHtml(pend.title)+'&rdquo;?</span></div>'+
           '<div class="nn-acts"><button class="btn btn-good btn-sm" data-action="confirmPendingCurrentTask">'+(cur?'&#8646; Switch':'&#9654; Start')+'</button>'+
@@ -10147,26 +10186,47 @@ function addJournalEntry(targetId, type){
   playJournalSound();
   persist('journal'); renderView();
 }
+// The 📝 button: a little notepad that slides up from the corner — type, pick a tag, ⌘↵ to save.
+const QJ_PROMPTS = ['What’s on your mind?', 'A win from today?', 'An idea worth keeping?', 'What’s bugging you?', 'What are you grateful for?', 'What did you learn?'];
 function openQuickJournalModal(){
   const o = document.getElementById('quickJournalOverlay');
   if(!o) return;
+  o.classList.add('qj-pop-overlay');
   o.classList.remove('hidden');
+  ui.qjPrompt = QJ_PROMPTS[Math.floor(Math.random()*QJ_PROMPTS.length)];
+  ui.qjSaved = false;
   renderQuickJournalModalInto();
+  setTimeout(function(){ const t = document.getElementById('quickJournalModalText'); if(t){ t.focus(); t.setSelectionRange(t.value.length, t.value.length); } }, 60);
 }
 function closeQuickJournalModal(){ const o=document.getElementById('quickJournalOverlay'); if(o) o.classList.add('hidden'); }
 function renderQuickJournalModal(){
-  return '<div data-photo-drop="journal"><div class="section-title" style="justify-content:center;margin-bottom:8px;">Quick Journal</div>'+
-    '<textarea class="input" id="quickJournalModalText" placeholder="Anything on your mind — a win, a worry, an idea…" style="width:100%;min-height:90px;text-align:center;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
-    renderMoodPicker()+
-    '<div class="row" style="margin-top:16px;justify-content:center;">'+
-      '<button class="btn btn-ghost" data-action="closeQuickJournalModal">Cancel</button>'+
-      '<button class="btn btn-primary" data-action="saveQuickJournal">Save Entry</button>'+
-    '</div></div>';
+  const today = state.journal.entries.filter(function(e){ return e.date===todayStr(); }).length;
+  const now = new Date();
+  if(ui.qjSaved) return '<div class="qj3 is-saved"><div class="qj3-done"><span>&#10003;</span>Saved to your journal</div></div>';
+  return '<div class="qj3" data-photo-drop="journal">'+
+    '<div class="qj3-h"><span class="qj3-i">&#128221;</span><div><b>Quick note</b><small>'+now.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+' &middot; '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+(today ? ' &middot; '+today+' today' : '')+'</small></div>'+
+      '<button class="qj3-x" data-action="closeQuickJournalModal" title="Close (Esc)">&#10005;</button></div>'+
+    '<textarea class="qj3-text" id="quickJournalModalText" placeholder="'+escapeHtml(ui.qjPrompt||QJ_PROMPTS[0])+'">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
+    '<div class="qj3-tags">'+journalTypes().slice(0, 7).map(function(m){ return '<button class="qj3-tag'+(ui.selectedMood===m.id?' is-on':'')+'" data-action="qjMood" data-id="'+m.id+'" title="'+escapeHtml(m.label)+'">'+m.emoji+'<span>'+escapeHtml(m.label)+'</span></button>'; }).join('')+'</div>'+
+    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
+  '</div>';
 }
 function renderQuickJournalModalInto(){ const el=document.getElementById('quickJournalContent'); if(el) morphInto(el, renderQuickJournalModal(), {form:true}); }
+ACTIONS.qjMood = function(el, e, id){ ui.selectedMood = ui.selectedMood===id ? null : id; const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; renderQuickJournalModalInto(); };
+ACTIONS.qjOpenJournal = function(){ const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; closeQuickJournalModal(); ui.view = 'personal'; ui.personalTab = 'journal'; renderView(); };
+document.addEventListener('input', function(e){ if(e.target && e.target.id==='quickJournalModalText') ui.journalDraftText = e.target.value; });
+document.addEventListener('keydown', function(e){
+  if(e.target && e.target.id==='quickJournalModalText'){
+    if(e.key==='Enter' && (e.metaKey || e.ctrlKey)){ e.preventDefault(); saveQuickJournal(); }
+    else if(e.key==='Escape'){ e.preventDefault(); closeQuickJournalModal(); }
+  }
+});
 function saveQuickJournal(){
+  const t = document.getElementById('quickJournalModalText');
+  if(!t || !t.value.trim()){ if(t){ t.focus(); t.classList.remove('is-shake'); void t.offsetWidth; t.classList.add('is-shake'); } return; }
   addJournalEntry('quickJournalModalText');
-  closeQuickJournalModal();
+  ui.qjSaved = true; renderQuickJournalModalInto();
+  setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; }, 900);
 }
 
 
@@ -10974,7 +11034,7 @@ ACTIONS.boardFullscreen = function(el){
   const kind = el.dataset.kind;
   if(ui.boardFull===kind){ exitBoardFullscreen(); return; }
   ui.boardFull = kind;
-  try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); }catch(e){}
+  // fills the app window — no browser full screen (that brings Chrome's "press and hold Esc to exit" banner)
   renderView();
 };
 function boardReturnBack(){
@@ -11633,7 +11693,7 @@ ACTIONS.openVisionFull = function(){
   showBoardsPage(m && m.id);
   ui.boardView = ui.boardView || {}; ui.boardView.journal = true;
   ui.boardFull = 'journal';
-  try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); }catch(e){}
+  // fills the app window — no browser full screen (that brings Chrome's "press and hold Esc to exit" banner)
   renderView();
   setTimeout(fitBoard, 80);
 };
@@ -15464,13 +15524,13 @@ function renderSettings(){
           '</div>';
         }).join('')+'</div>'+
       '</div></div>'+
-      '<div class="section"><div class="section-title">Task Categories'+tip('Give task types their own color — shown as a left border on the card. Untick “Time counts as deep work” for types that shouldn\'t add to deep work.')+'<div class="row"><input class="input" id="newTaskCatLabel" placeholder="e.g. Video Idea" style="width:160px;"><button class="btn btn-sm" data-action="addTaskCategory">Add</button></div></div>'+
+      '<div class="section"><div class="section-title">Task Categories'+tip('Give task types their own color — shown as a left border on the card.')+'<div class="row"><input class="input" id="newTaskCatLabel" placeholder="e.g. Video Idea" style="width:160px;"><button class="btn btn-sm" data-action="addTaskCategory">Add</button></div></div>'+
         '<div class="card">'+
           '<div class="row" style="margin-bottom:10px;">'+SWATCHES.map(function(sw){ return '<span class="swatch'+(pickedSwatch===sw?' swatch-active':'')+'" style="background:'+sw+';" data-action="pickSwatch" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
           '<div class="task-list">'+(arr(state.tasks.categories).map(function(c){ return '<div class="task-item-v2">'+
             '<span class="swatch" style="background:'+c.color+';width:18px;height:18px;cursor:pointer;" data-action="cycleTaskCategoryColor" data-id="'+c.id+'" title="Click to change color"></span>'+
             '<input class="input" data-task-cat-label="'+c.id+'" value="'+escapeHtml(c.label)+'" style="flex:1;max-width:220px;">'+
-            '<label class="row kpi-sub" style="gap:4px;cursor:pointer;" title="Time on tasks in this category counts toward deep work"><input type="checkbox" data-task-cat-deep="'+c.id+'" '+(c.countsDeepWork!==false?'checked':'')+'>Time counts as deep work</label>'+
+
             deleteBtn('taskcat', c.id)+
           '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
         '</div>'+
@@ -18247,7 +18307,7 @@ function ghlPaneBtnHtml(kind, x){
 // Social    — the last 7 days from GHL's Social Planner (followers, reach, impressions,
 //             engagement), with a "followers" goal of yours kept up to date from it.
 // It refreshes itself every 45 seconds while you're looking at it.
-function inboxState(){ if(!ui.inbox) ui.inbox = {mode:'chats', chats:null, contacts:null, social:null, q:'', cq:'', loading:{}, err:null, at:0}; return ui.inbox; }
+function inboxState(){ if(!ui.inbox) ui.inbox = {mode:'social', chats:null, contacts:null, social:null, q:'', cq:'', loading:{}, err:null, at:0}; return ui.inbox; }
 function inboxUnread(){ const g = state.settings && state.settings.ghl; return g && g.connected ? arr(g.inbox).length : 0; }
 function initialsOf(n){ return String(n||'?').trim().split(/\s+/).slice(0, 2).map(function(w){ return w[0] ? w[0].toUpperCase() : ''; }).join('') || '?'; }
 function ghlAgo(ts){ const t = typeof ts==='number' ? ts : Date.parse(ts); if(!t) return ''; const m = Math.round((Date.now()-t)/60000); return m<1 ? 'now' : m<60 ? m+'m' : m<1440 ? Math.round(m/60)+'h' : todayStr(new Date(t))===addDays(todayStr(), -1) ? 'yesterday' : fmtDateShort(todayStr(new Date(t))); }
@@ -18404,13 +18464,37 @@ function inboxSocialHtml(s){
   if(s.social.empty) return '<div class="ib-empty" style="padding:30px;"><div style="font-size:30px;">&#128247;</div>No social accounts connected in GoHighLevel\'s Social Planner yet — connect Instagram, Facebook or TikTok there and they\'ll show up here.</div>';
   const st = s.social, br = st.breakdowns || {}, f = st.platformTotals && st.platformTotals.followers || {};
   const eng = br.engagement || {};
-  const engTotal = Object.keys(eng).reduce(function(a, k){ const x = eng[k]||{}; return a + (Number(x.likes)||0) + (Number(x.comments)||0) + (Number(x.shares)||0); }, 0);
-  return '<div class="sc">'+
-    '<div class="sc-grid">'+
-      Object.keys(f).map(function(k){ return '<div class="sc-card sc-plat"><div class="sc-k">'+escapeHtml(k[0].toUpperCase()+k.slice(1))+' followers</div><div class="sc-v">'+Number(f[k].total||0).toLocaleString()+'</div>'+sparkline(f[k].series)+'</div>'; }).join('')+
-      socialMetric('Reach', br.reach, '&#128065;')+socialMetric('Impressions', br.impressions, '&#128200;')+socialMetric('Posts', br.posts, '&#128221;')+
-      (engTotal ? '<div class="sc-card"><div class="sc-k">&#10084;&#65039; Engagement</div><div class="sc-v">'+engTotal.toLocaleString()+'</div><div class="kpi-sub">likes, comments &amp; shares</div></div>' : '')+
+  const sum = function(o, key){ return Object.keys(o).reduce(function(a, k){ const x = o[k]||{}; return a + (Number(x[key])||0); }, 0); };
+  const likes = sum(eng, 'likes'), comments = sum(eng, 'comments'), shares = sum(eng, 'shares'), engTotal = likes + comments + shares;
+  const tot = function(block){ return !block ? 0 : block.total!=null ? Number(block.total)||0 : Object.keys(block.platforms||{}).reduce(function(a, k){ return a + (Number(block.platforms[k].value)||0); }, 0); };
+  const reach = tot(br.reach), posts = tot(br.posts);
+  const plats = Object.keys(f).map(function(k){ const ser = arr(f[k].series).map(Number), total = Number(f[k].total)||0; const first = ser.length ? ser[0] : total; return {k:k, total:total, series:ser, gain: ser.length>1 ? ser[ser.length-1] - first : null}; }).sort(function(a, b){ return b.total - a.total; });
+  const followers = plats.reduce(function(a, x){ return a + x.total; }, 0);
+  const gain = plats.reduce(function(a, x){ return a + (x.gain||0); }, 0), hasGain = plats.some(function(x){ return x.gain!=null; });
+  const pct = function(n){ return (n*100).toFixed(n<0.1 ? 1 : 0)+'%'; };
+  const nice = function(k){ return escapeHtml(k[0].toUpperCase()+k.slice(1)); };
+  const PI = {instagram:'&#128247;', facebook:'&#128216;', tiktok:'&#127925;', youtube:'&#9654;&#65039;', linkedin:'&#128188;', twitter:'&#120143;', x:'&#120143;', google:'&#127760;', pinterest:'&#128204;'};
+  return '<div class="sc sc2">'+
+    // the headline: everyone who follows you, and how that moved this week
+    '<div class="sc-hero">'+
+      '<div><div class="sc-k">Total followers</div><div class="sc-big">'+followers.toLocaleString()+'</div>'+
+        (hasGain ? '<div class="sc-ch '+(gain>=0?'is-up':'is-down')+'">'+(gain>=0?'&#9650; +':'&#9660; ')+gain.toLocaleString()+' this week</div>' : '')+'</div>'+
+      '<div class="sc-hero-stats">'+
+        '<div><b>'+reach.toLocaleString()+'</b><span>Reach</span></div>'+
+        '<div><b>'+engTotal.toLocaleString()+'</b><span>Engagements</span></div>'+
+        '<div><b>'+(reach ? pct(engTotal/reach) : '—')+'</b><span>Engagement rate</span></div>'+
+        '<div><b>'+(posts ? Math.round(reach/posts).toLocaleString() : '—')+'</b><span>Reach per post</span></div>'+
+      '</div>'+
     '</div>'+
+    // each platform
+    (plats.length ? '<div class="sc-plats">'+plats.map(function(x){ return '<div class="sc-card sc-plat"><div class="sc-plat-h"><span class="sc-plat-i">'+(PI[x.k.toLowerCase()]||'&#128241;')+'</span><b>'+nice(x.k)+'</b>'+
+        (x.gain!=null ? '<span class="sc-ch '+(x.gain>=0?'is-up':'is-down')+'">'+(x.gain>=0?'+':'')+x.gain.toLocaleString()+'</span>' : '')+'</div>'+
+        '<div class="sc-v">'+x.total.toLocaleString()+'</div><div class="kpi-sub">followers'+(followers ? ' &middot; '+Math.round(x.total/followers*100)+'% of all' : '')+'</div>'+sparkline(x.series)+'</div>'; }).join('')+'</div>' : '')+
+    '<div class="sc-grid">'+
+      socialMetric('Reach', br.reach, '&#128065;')+socialMetric('Impressions', br.impressions, '&#128200;')+socialMetric('Posts', br.posts, '&#128221;')+
+    '</div>'+
+    (engTotal ? '<div class="sc-card sc-eng"><div class="sc-k">&#10084;&#65039; Engagement</div><div class="sc-eng-bars">'+
+      [['Likes', likes, '#ff6b8a'], ['Comments', comments, '#7fd4ff'], ['Shares', shares, '#7ef0c0']].map(function(r){ return '<div class="sc-eng-r"><span>'+r[0]+'</span><i><u style="width:'+(r[1]/Math.max(1, engTotal)*100).toFixed(1)+'%;background:'+r[2]+'"></u></i><b>'+r[1].toLocaleString()+'</b></div>'; }).join('')+'</div></div>' : '')+
     '<div class="kpi-sub" style="margin-top:10px;">Last 7 days, from GoHighLevel\'s Social Planner. A goal with "followers" in its name (like "IG followers") stays updated from these numbers.</div>'+
   '</div>';
 }
@@ -18430,9 +18514,9 @@ function renderConversations(){
   const s = inboxState(), on = ghlCfg().connected;
   const tab = function(id, label, n){ return '<button class="seg-tab'+(s.mode===id?' active':'')+'" data-action="inboxMode" data-id="'+id+'">'+label+(n ? ' <span class="ib-badge">'+n+'</span>' : '')+'</button>'; };
   const at = s.mode==='social' ? (ghlCfg().socialCache && ghlCfg().socialCache.at) : s.at;
-  return '<div class="view-header"><div><div class="view-title">Conversations'+tip('Your GoHighLevel chats and contacts, and your social numbers — all in one place.')+'</div></div>'+
+  return '<div class="view-header"><div><div class="view-title">Social'+tip('Your followers and how your posts are doing, plus your GoHighLevel chats and contacts.')+'</div></div>'+
       (on ? '<div class="row" style="gap:8px;align-items:center;">'+(at ? '<span class="kpi-sub">Updated '+ghlAgo(at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="'+(s.mode==='social' ? 'socialRefresh' : 'inboxRefresh')+'" title="Refresh">&#8635;</button></div>' : '')+'</div>'+
-    (on ? '<div class="seg-tabs cv-tabs">'+tab('chats', '&#128172; Chats', inboxUnread())+tab('contacts', '&#128101; Contacts')+tab('social', '&#128202; Social')+'</div>' : '')+
+    (on ? '<div class="seg-tabs cv-tabs">'+tab('social', '&#128202; Stats')+tab('chats', '&#128172; Chats', inboxUnread())+tab('contacts', '&#128101; Contacts')+'</div>' : '')+
     '<div class="tab-panel" data-key="convos-'+s.mode+'">'+renderInboxTab()+'</div>';
 }
 function convoBadge(){ const b = document.getElementById('convoBadge'); if(!b) return; const n = inboxUnread(); b.textContent = n ? String(n) : ''; b.classList.toggle('is-on', !!n); }
@@ -19251,7 +19335,7 @@ function lockTaskHtml(){
           '<button class="ls-slot ls-slot-next'+(isNext?' is-on':'')+'" data-action="lockSetNext" data-id="'+t.id+'">Next</button></span>'+
         '<span class="ls-moves"><button class="wd-ctl" data-action="lockMove" data-id="'+t.id+'" data-dir="-1" title="Move up"'+(i===0?' disabled':'')+'>&#8593;</button>'+
           '<button class="wd-ctl" data-action="lockMove" data-id="'+t.id+'" data-dir="1" title="Move down"'+(i===lineup.length-1?' disabled':'')+'>&#8595;</button></span></li>';
-    }).join('')+'</ol>' : '<div class="wd-empty">Today\'s lineup is empty.</div>')+
+    }).join('')+'</ol>' : '<div class="wd-empty">Your lineup is empty.</div>')+
     '<div class="ls-add">'+
       '<div class="wd-add"><input class="input" id="lockNewTask" placeholder="+ Add a task to today"><button class="btn btn-sm" data-action="lockNewTask">Add</button></div>'+
       (pool.length || q ? '<div class="ls-pool-h"><span class="wd-k" style="margin:0;">From your list</span><input class="input ls-search" id="lockSearch" placeholder="Search" value="'+escapeHtml(s.search||'')+'"></div>'+

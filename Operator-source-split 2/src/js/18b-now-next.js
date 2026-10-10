@@ -25,7 +25,7 @@ function nowNextPanelHtml(opts){
   let now = '';
   {
     now = '<div class="nn-cell nn-now'+(cur?' has-task':'')+(pend?' is-asking':'')+'" data-dropzone="current">'+
-      '<div class="nn-k">Now'+(!inS && cur ? '<span class="nn-sug">not locked in</span>' : '')+tip('What you\'re on, timed. Lock in and it counts as deep work. ✓ Done finishes it; Release stops timing it and leaves it on today\'s list.')+'</div>'+
+      '<div class="nn-k">Now'+(!inS && cur ? '<span class="nn-sug">not locked in</span>' : '')+tip('What you\'re on, timed, and it all counts as deep work. ✓ Done finishes it; Release stops timing it and leaves it on the list.')+'</div>'+
       (pend
         ? '<div class="nn-title"><span>'+(cur?'Switch to':'Start')+' &ldquo;'+escapeHtml(pend.title)+'&rdquo;?</span></div>'+
           '<div class="nn-acts"><button class="btn btn-good btn-sm" data-action="confirmPendingCurrentTask">'+(cur?'&#8646; Switch':'&#9654; Start')+'</button>'+

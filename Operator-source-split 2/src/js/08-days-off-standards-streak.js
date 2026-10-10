@@ -26,8 +26,17 @@ function rawSessionMinutesFor(dateStr, type){
   }
   return state.focus.sessions.filter(function(s){ return s.date===dateStr && sessionType(s)===type; }).reduce(function(a,s){ return a+(s.minutes||0); },0);
 }
+// Deep work counts almost everything: every locked-in session, plus the time you timed a task
+// as "Now" without locking in. (Only time on not-work apps inside a session comes off.)
 function deepWorkMinutesFor(dateStr){
-  return Math.max(0, rawSessionMinutesFor(dateStr,'deep') - excludedTaskMinutesFor(dateStr) - distractionMinutesFor(dateStr));
+  return Math.max(0, rawSessionMinutesFor(dateStr,'deep') + looseTaskMinutesFor(dateStr) - distractionMinutesFor(dateStr));
+}
+function looseTaskMinutesFor(dateStr){
+  if(RC){
+    const idx = memo('looseIdx', function(){ const m = {}; arr(state.focus.taskSegments).forEach(function(sg){ if(sg.inSession!==false) return; m[sg.date] = (m[sg.date]||0) + Math.max(0, Math.round((sg.end-sg.start)/60000)); }); return m; });
+    return idx[dateStr] || 0;
+  }
+  return arr(state.focus.taskSegments).filter(function(sg){ return sg.date===dateStr && sg.inSession===false; }).reduce(function(a, sg){ return a + Math.max(0, Math.round((sg.end-sg.start)/60000)); }, 0);
 }
 // The finished part of today's deep work is cached between renders (the timer asks every second;
 // recomputing it from every session and the app-activity log each time made ticks heavy).
@@ -41,7 +50,8 @@ function deepWorkMinutesTodayLive(){
   if(as && sessionType(as)==='deep'){
     if(as.onBreak) mins += Math.floor((as.frozenElapsedMs||0)/60000);
     else mins += Math.floor((Date.now()-as.startedAt)/60000);
-    if(ui.currentTaskId && ui.currentTaskStartedAt && !as.onBreak && !taskCountsAsDeepWork(ui.currentTaskId)) mins -= Math.floor((Date.now()-ui.currentTaskStartedAt)/60000);
+  } else if(!as && ui.currentTaskId && ui.currentTaskStartedAt){
+    mins += Math.floor((Date.now()-ui.currentTaskStartedAt)/60000);
   }
   return Math.max(0, mins);
 }
@@ -49,10 +59,6 @@ function taskCountsAsDeepWork(taskOrId){
   const t = typeof taskOrId!=='string' ? taskOrId : RC
     ? memo('taskById', function(){ const m = {}; state.tasks.items.forEach(function(x){ m[x.id] = x; }); return m; })[taskOrId]
     : state.tasks.items.find(function(x){ return x.id===taskOrId; });
-  if(!t) return true;
-  if(t.countsDeepWork===false) return false;
-  const cat = t.categoryId ? taskCategoryById(t.categoryId) : null;
-  if(cat && cat.countsDeepWork===false) return false;
   return true;
 }
 function excludedTaskMinutesFor(dateStr){

@@ -340,25 +340,46 @@ function addJournalEntry(targetId, type){
   playJournalSound();
   persist('journal'); renderView();
 }
+// The 📝 button: a little notepad that slides up from the corner — type, pick a tag, ⌘↵ to save.
+const QJ_PROMPTS = ['What’s on your mind?', 'A win from today?', 'An idea worth keeping?', 'What’s bugging you?', 'What are you grateful for?', 'What did you learn?'];
 function openQuickJournalModal(){
   const o = document.getElementById('quickJournalOverlay');
   if(!o) return;
+  o.classList.add('qj-pop-overlay');
   o.classList.remove('hidden');
+  ui.qjPrompt = QJ_PROMPTS[Math.floor(Math.random()*QJ_PROMPTS.length)];
+  ui.qjSaved = false;
   renderQuickJournalModalInto();
+  setTimeout(function(){ const t = document.getElementById('quickJournalModalText'); if(t){ t.focus(); t.setSelectionRange(t.value.length, t.value.length); } }, 60);
 }
 function closeQuickJournalModal(){ const o=document.getElementById('quickJournalOverlay'); if(o) o.classList.add('hidden'); }
 function renderQuickJournalModal(){
-  return '<div data-photo-drop="journal"><div class="section-title" style="justify-content:center;margin-bottom:8px;">Quick Journal</div>'+
-    '<textarea class="input" id="quickJournalModalText" placeholder="Anything on your mind — a win, a worry, an idea…" style="width:100%;min-height:90px;text-align:center;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
-    renderMoodPicker()+
-    '<div class="row" style="margin-top:16px;justify-content:center;">'+
-      '<button class="btn btn-ghost" data-action="closeQuickJournalModal">Cancel</button>'+
-      '<button class="btn btn-primary" data-action="saveQuickJournal">Save Entry</button>'+
-    '</div></div>';
+  const today = state.journal.entries.filter(function(e){ return e.date===todayStr(); }).length;
+  const now = new Date();
+  if(ui.qjSaved) return '<div class="qj3 is-saved"><div class="qj3-done"><span>&#10003;</span>Saved to your journal</div></div>';
+  return '<div class="qj3" data-photo-drop="journal">'+
+    '<div class="qj3-h"><span class="qj3-i">&#128221;</span><div><b>Quick note</b><small>'+now.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+' &middot; '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+(today ? ' &middot; '+today+' today' : '')+'</small></div>'+
+      '<button class="qj3-x" data-action="closeQuickJournalModal" title="Close (Esc)">&#10005;</button></div>'+
+    '<textarea class="qj3-text" id="quickJournalModalText" placeholder="'+escapeHtml(ui.qjPrompt||QJ_PROMPTS[0])+'">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
+    '<div class="qj3-tags">'+journalTypes().slice(0, 7).map(function(m){ return '<button class="qj3-tag'+(ui.selectedMood===m.id?' is-on':'')+'" data-action="qjMood" data-id="'+m.id+'" title="'+escapeHtml(m.label)+'">'+m.emoji+'<span>'+escapeHtml(m.label)+'</span></button>'; }).join('')+'</div>'+
+    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
+  '</div>';
 }
 function renderQuickJournalModalInto(){ const el=document.getElementById('quickJournalContent'); if(el) morphInto(el, renderQuickJournalModal(), {form:true}); }
+ACTIONS.qjMood = function(el, e, id){ ui.selectedMood = ui.selectedMood===id ? null : id; const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; renderQuickJournalModalInto(); };
+ACTIONS.qjOpenJournal = function(){ const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; closeQuickJournalModal(); ui.view = 'personal'; ui.personalTab = 'journal'; renderView(); };
+document.addEventListener('input', function(e){ if(e.target && e.target.id==='quickJournalModalText') ui.journalDraftText = e.target.value; });
+document.addEventListener('keydown', function(e){
+  if(e.target && e.target.id==='quickJournalModalText'){
+    if(e.key==='Enter' && (e.metaKey || e.ctrlKey)){ e.preventDefault(); saveQuickJournal(); }
+    else if(e.key==='Escape'){ e.preventDefault(); closeQuickJournalModal(); }
+  }
+});
 function saveQuickJournal(){
+  const t = document.getElementById('quickJournalModalText');
+  if(!t || !t.value.trim()){ if(t){ t.focus(); t.classList.remove('is-shake'); void t.offsetWidth; t.classList.add('is-shake'); } return; }
   addJournalEntry('quickJournalModalText');
-  closeQuickJournalModal();
+  ui.qjSaved = true; renderQuickJournalModalInto();
+  setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; }, 900);
 }
 

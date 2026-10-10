@@ -309,7 +309,7 @@ function lockTaskHtml(){
           '<button class="ls-slot ls-slot-next'+(isNext?' is-on':'')+'" data-action="lockSetNext" data-id="'+t.id+'">Next</button></span>'+
         '<span class="ls-moves"><button class="wd-ctl" data-action="lockMove" data-id="'+t.id+'" data-dir="-1" title="Move up"'+(i===0?' disabled':'')+'>&#8593;</button>'+
           '<button class="wd-ctl" data-action="lockMove" data-id="'+t.id+'" data-dir="1" title="Move down"'+(i===lineup.length-1?' disabled':'')+'>&#8595;</button></span></li>';
-    }).join('')+'</ol>' : '<div class="wd-empty">Today\'s lineup is empty.</div>')+
+    }).join('')+'</ol>' : '<div class="wd-empty">Your lineup is empty.</div>')+
     '<div class="ls-add">'+
       '<div class="wd-add"><input class="input" id="lockNewTask" placeholder="+ Add a task to today"><button class="btn btn-sm" data-action="lockNewTask">Add</button></div>'+
       (pool.length || q ? '<div class="ls-pool-h"><span class="wd-k" style="margin:0;">From your list</span><input class="input ls-search" id="lockSearch" placeholder="Search" value="'+escapeHtml(s.search||'')+'"></div>'+

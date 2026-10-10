@@ -134,7 +134,7 @@ ACTIONS.boardFullscreen = function(el){
   const kind = el.dataset.kind;
   if(ui.boardFull===kind){ exitBoardFullscreen(); return; }
   ui.boardFull = kind;
-  try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); }catch(e){}
+  // fills the app window — no browser full screen (that brings Chrome's "press and hold Esc to exit" banner)
   renderView();
 };
 function boardReturnBack(){
@@ -793,7 +793,7 @@ ACTIONS.openVisionFull = function(){
   showBoardsPage(m && m.id);
   ui.boardView = ui.boardView || {}; ui.boardView.journal = true;
   ui.boardFull = 'journal';
-  try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); }catch(e){}
+  // fills the app window — no browser full screen (that brings Chrome's "press and hold Esc to exit" banner)
   renderView();
   setTimeout(fitBoard, 80);
 };

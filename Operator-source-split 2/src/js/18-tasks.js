@@ -155,7 +155,7 @@ function renderVideoIdeaEditModal(){
   const t = state.tasks.items.find(function(x){return x.id===ui.editingVideoIdeaId;});
   if(!t) return '';
   const types = arr(state.tasks.videoTypes);
-  const where = t.status==='today' ? "In today's lineup" : t.status==='done' ? 'Finished' : 'In Video Ideas';
+  const where = t.status==='today' ? "In the current lineup" : t.status==='done' ? 'Finished' : 'In Video Ideas';
   return '<div class="section-title" style="margin-bottom:4px;">&#127916; Video Idea</div>'+
     '<div class="kpi-sub" style="margin-bottom:14px;">'+where+'</div>'+
     '<div class="field"><label>Idea</label><input class="input" id="editVideoTitle-'+t.id+'" value="'+escapeHtml(t.title)+'" style="width:100%;"></div>'+
@@ -193,7 +193,7 @@ function renderFocusTasksOverview(){
   return nowNextPanelHtml()+
   renderTaskToolbar(true)+
   '<div class="section" style="margin-bottom:14px;">'+
-    '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('In your order — switch to List and drag rows to set it (otherwise highest priority and closest deadlines first). Drag a card onto Up next to line it up. Drag a box around cards (or ⌘-click) to pick several.')+'<span class="row" style="margin-left:auto;gap:8px;">'+lineupToggleHtml()+'</span></div>'+
+    '<div class="section-title" style="align-items:center;">Current Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('In your order — switch to List and drag rows to set it (otherwise highest priority and closest deadlines first). Drag a card onto Up next to line it up. Drag a box around cards (or ⌘-click) to pick several.')+'<span class="row" style="margin-left:auto;gap:8px;">'+lineupToggleHtml()+'</span></div>'+
     (listView ? '<div class="task-column tl-wrap" data-dropzone="today">'+lineupListHtml(today)+'</div>' :
     '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236, loop:true, count:today.length}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>')+
   '</div>'+
