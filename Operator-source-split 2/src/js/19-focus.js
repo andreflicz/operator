@@ -78,7 +78,8 @@ function renderActiveFocusHero(big){
   const onBreak = !!active.onBreak;
   const elapsed = onBreak ? (active.frozenElapsedMs||0) : (Date.now()-active.startedAt);
   const pct = active.plannedMinutes ? clamp(Math.round((elapsed/60000/active.plannedMinutes)*100),0,100) : null;
-  const todayTasksForSession = state.tasks.items.filter(function(t){ return t.status==='today' && (!isOngoingDoneToday(t) || justCompletedTaskId===t.id); });
+  // in your order (the same order as Today's Lineup), numbered
+  const todayTasksForSession = lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today' && (!isOngoingDoneToday(t) || justCompletedTaskId===t.id); }));
   const sizeClass = big ? 'hero-num-xl' : 'hero-num-lg';
   const VISIBLE_TASK_LIMIT = 6;
 
@@ -114,7 +115,7 @@ function renderActiveFocusHero(big){
     '</div>'+
     '<div class="card knock-out-card" style="flex:'+(big?'1.8':'1.4')+';min-width:260px;">'+
       '<div class="section-title" style="margin-bottom:8px;">Knock These Out</div>'+
-      '<div class="task-list knock-out-list">'+(visibleTasks.map(focusKnockOutRow).join('') || '<div class="empty">Nothing queued for today — add one from Tasks.</div>')+'</div>'+
+      '<div class="task-list knock-out-list">'+(visibleTasks.map(function(t, i){ return focusKnockOutRow(t, i+1); }).join('') || '<div class="empty">Nothing queued for today — add one from Tasks.</div>')+'</div>'+
       (overflowCount>0 ? '<div class="row" style="justify-content:center;margin-top:8px;"><button class="btn btn-ghost btn-sm" data-action="goToFocusToday">See all '+todayTasksForSession.length+' tasks</button></div>' : '')+
     '</div>';
 }

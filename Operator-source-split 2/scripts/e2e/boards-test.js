@@ -70,7 +70,7 @@ const ZIP = fs.readFileSync(path.join(__dirname, 'fixtures', 'milanote.zip')).to
   check('import makes a new board in Journal → Boards', imp.kind==='journal' && imp.name==='My Board' && await E("ui.personalTab==='journal' && ui.journalMode==='boards'"), imp.name);
   check('headings → labels, text → notes, bullets → list', types.startsWith('note+h,note,list'), types);
   check('images from the zip', imp.elements.filter(e=>e.type==='image' && /^idb:|^data:/.test(e.ref)).length===2, types);
-  check('import button has no Milanote name', (await p.textContent('.board-pill-new[data-action="boardImport"]')).includes('Import boards'));
+  check('import is a small ⬆ pill (no Milanote name on it)', /Import/.test(await p.getAttribute('.board-pill-new[data-action="boardImport"]', 'title')) && !/Milanote/.test(await p.textContent('.board-pill-new[data-action="boardImport"]')));
   // Today panel opens the vision board full screen in Journal → Boards
   await p.click('[data-action="nav"][data-view="today"]');
   await p.click('.vision-panel-box');

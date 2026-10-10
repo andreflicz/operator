@@ -91,6 +91,14 @@ const SFX = {
   session: function(c, o, t){ [392, 523.3, 659.3, 784, 1046.5].forEach(function(f, i){ sfxPluck(c, o, t+i*0.08, f, 1.1, 0.06); }); },
   rest: function(c, o, t){ sfxPluck(c, o, t, 440, 0.7, 0.06, 'sine'); sfxPluck(c, o, t+0.12, 349.2, 0.9, 0.05, 'sine'); },
   journal: function(c, o, t){ sfxPluck(c, o, t, 740, 0.4, 0.06, 'sine'); sfxPluck(c, o, t+0.08, 1108.7, 0.5, 0.04, 'sine'); },
+  // locking in: a rising sweep that lands on a bright two-note chord
+  lockin: function(c, o, t){ sfxSweep(c, o, t, 110, 440, 0.45, 0.06); sfxSweep(c, o, t+0.05, 220, 880, 0.4, 0.03); sfxPluck(c, o, t+0.32, 659.3, 0.7, 0.07); sfxPluck(c, o, t+0.38, 987.8, 0.8, 0.06); sfxTap(c, o, t+0.3, 5200, 0.12); },
+  // hitting the day's standard / a goal: a little fanfare
+  fanfare: function(c, o, t){ [523.3, 659.3, 784, 1046.5].forEach(function(f, i){ sfxPluck(c, o, t+i*0.09, f, 0.5, 0.07); }); [784, 987.8, 1318.5].forEach(function(f){ sfxPluck(c, o, t+0.42, f, 1.4, 0.05, 'sine'); }); sfxTap(c, o, t+0.42, 6000, 0.1); },
+  // a new message: two quick glassy pings
+  ping: function(c, o, t){ sfxPluck(c, o, t, 1567.98, 0.25, 0.06, 'sine'); sfxPluck(c, o, t+0.11, 2093, 0.35, 0.05, 'sine'); },
+  // winding down: a low, warm chord that settles
+  night: function(c, o, t){ [130.8, 196, 261.6, 329.6].forEach(function(f, i){ sfxPluck(c, o, t+i*0.16, f, 2.4, 0.05, 'sine'); }); sfxSweep(c, o, t, 392, 196, 1.8, 0.025); },
   wake: function(c, o, t){ [261.6, 392, 523.3, 659.3, 784, 1046.5].forEach(function(f, i){ sfxPluck(c, o, t+i*0.13, f, 2.2, 0.055, i%2 ? 'sine' : 'triangle'); }); sfxSweep(c, o, t, 130.8, 261.6, 1.6, 0.04); }
 };
 function playSfx(name, classic){ if(soundPack()==='classic'){ if(classic) classic(); return; } sfx(SFX[name]); }
@@ -103,6 +111,10 @@ function playRestSound(){ playSfx('rest', function(){ tone([440,330], 0.3, 0.2);
 function playTaskComplete(){ playSfx('complete', function(){ tone([523,659,784,1046], 0.2, 0.4); }); }
 function playTaskAdded(){ playSfx('added', function(){ tone([880,1046], 0.1, 0.18); }); }
 function playJournalSound(){ playSfx('journal', function(){ tone([587,740], 0.16, 0.16); }); }
+function playLockIn(){ playSfx('lockin', function(){ tone([523,659], 0.18, 0.25); }); }
+function playFanfare(){ playSfx('fanfare', function(){ tone([523,659,784], 0.3, 0.3); }); }
+function playPing(){ playSfx('ping', function(){ tone([1200,1500], 0.08, 0.15); }); }
+function playNight(){ playSfx('night', function(){ tone([440,330], 0.3, 0.2); }); }
 function playWakeChime(){ playSfx('wake', function(){ tone([659,880], 0.2, 0.25); }); }
 function fmt12Hour(hm){
   if(!hm) return '';

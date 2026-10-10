@@ -61,7 +61,7 @@ ACTIONS.goalSetNumber = function(el, e, id){
   if(v==null) return;
   const n = Number(String(v).replace(/[^0-9.\-]/g, '')); if(isNaN(n)) return;
   g.current = n;
-  if(g.target && g.current>=g.target && !g.done){ g.done = true; g.doneAt = todayStr(); playSessionComplete(); showToast('Goal reached: '+goalTitle(g), {icon:'&#127942;'}); }
+  if(g.target && g.current>=g.target && !g.done){ g.done = true; g.doneAt = todayStr(); playFanfare(); showToast('Goal reached: '+goalTitle(g), {icon:'&#127942;'}); }
   else playTick();
   persist('goals'); renderView();
 };
@@ -69,7 +69,7 @@ function fmtGoalNum(n, unit){ n = Number(n)||0; const s = n.toLocaleString(undef
 ACTIONS.goalStep = function(el, e, id){
   const g = state.goals.items.find(function(x){ return x.id===id; }); if(!g) return;
   g.current = Math.max(0, (Number(g.current)||0) + Number(el.dataset.delta||1));
-  if(g.target && g.current>=g.target && !g.done){ g.done = true; playSessionComplete(); showToast('Goal reached: '+g.label, {icon:'&#127942;'}); }
+  if(g.target && g.current>=g.target && !g.done){ g.done = true; playFanfare(); showToast('Goal reached: '+g.label, {icon:'&#127942;'}); }
   else playTick();
   persist('goals'); renderView();
 };

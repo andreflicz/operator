@@ -59,8 +59,8 @@ function boardStripHtml(kind, current){
       '</button>';
     }).join('')+
     (master ? '' : '<button class="board-pill board-pill-new" data-action="boardNewVision"><span class="board-pill-plus">&#9733;</span><span class="board-pill-text"><span class="board-pill-name">Vision board</span><span class="board-pill-count">the one you wake up to</span></span></button>')+
-    '<button class="board-pill board-pill-new" data-action="boardNew" data-kind="'+kind+'"><span class="board-pill-plus">+</span><span class="board-pill-text"><span class="board-pill-name">New board</span></span></button>'+
-    '<button class="board-pill board-pill-new" data-action="boardImport"><span class="board-pill-plus">&#11014;</span><span class="board-pill-text"><span class="board-pill-name">Import boards</span><span class="board-pill-count">Milanote export, .md, images</span></span></button>'+
+    '<button class="board-pill board-pill-new board-pill-mini" data-action="boardNew" data-kind="'+kind+'" title="New board"><span class="board-pill-plus">+</span></button>'+
+    '<button class="board-pill board-pill-new board-pill-mini" data-action="boardImport" title="Import boards — a Milanote export, .md or images"><span class="board-pill-plus">&#11014;</span></button>'+
   '</div>';
 }
 function renderBoardShell(kind){
@@ -94,21 +94,21 @@ function renderBoardShell(kind){
           : (!b.parentId && !view ? '<button class="board-tool" data-action="boardMakeMaster" title="Make this the board you wake up to">&#9734; Make it my vision board</button>' : ''))+
       '</div>'+
       '<div class="row" style="gap:6px;position:relative;">'+
-        tool('boardBgToggle', '&#127912; Background', 'Change this board\'s background', ui.boardBgOpen ? ' data-on="1"' : '')+
+        tool('boardBgToggle', '&#127912;', 'Background', ui.boardBgOpen ? ' data-on="1"' : '')+
         (ui.boardBgOpen ? boardBgPickerHtml(b) : '')+
-        tool('boardToggleView', view?'&#9998; Edit':'&#128065; View', view?'Back to editing':'View mode — hide the editing tools')+
-        tool('boardFullscreen', full?(ui.boardReturnTo?'&#8592; Back':'&#10530; Exit full screen'):'&#9974; Full screen', full?(ui.boardReturnTo?'Back to where you were (Esc)':'Exit full screen (Esc)'):'Full screen')+
+        tool('boardToggleView', view?'&#9998;':'&#128065;', view?'Edit':'View only')+
+        tool('boardFullscreen', full?(ui.boardReturnTo?'&#8592; Back':'&#10530;'):'&#9974;', full?(ui.boardReturnTo?'Back to where you were (Esc)':'Exit full screen (Esc)'):'Full screen')+
       '</div>'+
     '</div>'+
     (view ? '' : '<div class="board-toolbar">'+
-      tool('boardAddNote','&#9645; Note','Add a note card')+
-      tool('boardAddLabel','&#9644; Label','Add a category card with a colored title bar')+
-      tool('boardAddList','&#9776; List','Add a list card')+
-      tool('boardAddImage','&#128444; Image','Upload images (or paste / drop them on the board)')+
-      tool('boardAddImageUrl','&#128279; Image URL','Add an image from a link')+
-      tool('boardAddNested','&#128203; Board','Add a board inside this one')+
-      tool('boardAddLine','&#9585; Line','Draw a line: click the start, then the end', cv.lineDraw && !cv.lineDraw.arrow ? ' data-on="1"' : '')+
-      tool('boardAddArrow','&#10140; Arrow','Draw an arrow: click where it starts, then where it points', cv.lineDraw && cv.lineDraw.arrow ? ' data-on="1"' : '')+
+      tool('boardAddNote','&#128221;','Note (or double-click the board)')+
+      tool('boardAddLabel','&#127991;&#65039;','Label — a card with a colored title')+
+      tool('boardAddList','&#9776;','List')+
+      tool('boardAddImage','&#128444;&#65039;','Image (or paste / drop one)')+
+      tool('boardAddImageUrl','&#128279;','Image from a link')+
+      tool('boardAddNested','&#128450;&#65039;','Board inside this one')+
+      tool('boardAddLine','&#9585;','Line — click the start, then the end', cv.lineDraw && !cv.lineDraw.arrow ? ' data-on="1"' : '')+
+      tool('boardAddArrow','&#10140;','Arrow — click the start, then where it points', cv.lineDraw && cv.lineDraw.arrow ? ' data-on="1"' : '')+
       '<span class="board-tool-sep"></span>'+
       BOARD_COLORS.map(function(c){ return '<button class="board-swatch" data-action="boardColor" data-kind="'+kind+'" data-id="'+c+'" style="background:'+c+'" title="Color selected"'+(selCount?'':' disabled')+'></button>'; }).join('')+
       '<span class="board-tool-sep"></span>'+
@@ -122,10 +122,10 @@ function renderBoardShell(kind){
       '<span class="board-tool-sep"></span>'+
       tool('boardZoomOut','&minus;','Zoom out')+
       tool('boardZoomIn','+','Zoom in')+
-      tool('boardFit','&#9974; Fit','Fit everything')+
-      tip('Drag the background to pan · scroll to move · Ctrl/⌘ + scroll to zoom · Shift + drag to select · double-click a card to edit · paste or drop images anywhere.', 'board-help')+
+      tool('boardFit','&#9974;','Fit everything')+
+      tip('Drag on empty space to select · Space + drag (or scroll) to move around · ⌘ + scroll to zoom · double-click to write · right-click for more.', 'board-help')+
       '<span style="flex:1"></span>'+
-      (!(masterVisionBoard() && b.id===masterVisionBoard().id) ? tool('boardDeleteBoard','Delete board','Delete this board (and boards inside it)') : '')+
+      (!(masterVisionBoard() && b.id===masterVisionBoard().id) ? tool('boardDeleteBoard','&#128465;&#65039;','Delete this board (and boards inside it)') : '')+
     '</div>')+
     '<div class="board-host" id="boardHost" data-photo-drop="board" data-morph-ignore="'+kind+':'+b.id+':'+(view?'v':'e')+(full?':f':'')+'"></div>'+
   '</div>';
@@ -152,6 +152,8 @@ function exitBoardFullscreen(){
   renderView();
 }
 document.addEventListener('fullscreenchange', function(){ if(!document.fullscreenElement && ui.boardFull){ ui.boardFull = null; if(ui.boardReturnTo){ boardReturnBack(); return; } renderView(); } });
+// full screen: nothing floats over the board (the activity pill, the + / journal buttons)
+afterRenderHooks.push(function(){ const on = !!ui.boardFull; if(document.body.classList.contains('board-full')!==on) document.body.classList.toggle('board-full', on); });
 // ---- mounting ----
 afterRenderHooks.push(function(){
   const host = document.getElementById('boardHost');
@@ -291,9 +293,26 @@ ACTIONS['drop:board'] = function(zone, files, e){
 };
 // ---- pointer interaction ----
 function elFromTarget(t){ const n = t.closest && t.closest('[data-el]'); return n ? n.getAttribute('data-el') : null; }
+let cvSpace = false;
+document.addEventListener('keydown', function(e){ if(e.code==='Space' && cv.host && !cv.editing && !(e.target && (e.target.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(e.target.nodeName)))){ if(!cvSpace){ cvSpace = true; cv.host.classList.add('is-space'); } e.preventDefault(); } });
+document.addEventListener('keyup', function(e){ if(e.code==='Space' && cvSpace){ cvSpace = false; if(cv.host) cv.host.classList.remove('is-space'); } });
+// the nearest end of a line, if the pointer is within reach of it (so you don't have to be precise)
+function lineEndNear(b, clientX, clientY, onlyId){
+  const r = cv.host.getBoundingClientRect(), z = b.viewport.zoom, reach = 16;
+  let best = null;
+  b.elements.forEach(function(x){
+    if(x.type!=='line' || (onlyId && x.id!==onlyId)) return;
+    ['1','2'].forEach(function(k){
+      const sx = r.left + b.viewport.x + x['x'+k]*z, sy = r.top + b.viewport.y + x['y'+k]*z;
+      const d = Math.hypot(sx-clientX, sy-clientY);
+      if(d<=reach && (!best || d<best.d)) best = {el:x, end:k, d:d};
+    });
+  });
+  return best;
+}
 function boardPointerDown(e){
   const b = cvBoard(); if(!b) return;
-  if(e.button===2) return;
+  if(e.button===2){ if(cv.lineDraw){ e.preventDefault(); cancelLineDraw(); } return; }
   if(cv.lineDraw){
     e.preventDefault();
     const pt = lineDrawPoint(e);
@@ -307,8 +326,12 @@ function boardPointerDown(e){
   }
   const start = {cx:e.clientX, cy:e.clientY};
   const handle = e.target.getAttribute && e.target.getAttribute('data-handle');
-  const lineEnd = e.target.getAttribute && e.target.getAttribute('data-line-end');
-  const elId = elFromTarget(e.target);
+  let lineEnd = e.target.getAttribute && e.target.getAttribute('data-line-end');
+  let elId = elFromTarget(e.target);
+  // grabbing near a line's end moves that end — the line needn't be selected first
+  if(!cv.view && !handle && !lineEnd && e.button===0 && !cvSpace){ const near = lineEndNear(b, e.clientX, e.clientY, elId && b.elements.some(function(x){ return x.id===elId && x.type==='line'; }) ? elId : null); if(near){ lineEnd = near.el.id+':'+near.end; cv.sel = new Set([near.el.id]); drawBoard(); } }
+  // pan: Space held, the middle button, or anything in View mode
+  if(cvSpace || e.button===1){ e.preventDefault(); cv.drag = {type:'pan', start:start, vx:b.viewport.x, vy:b.viewport.y, moved:false, el:null, pointerId:e.pointerId}; cv.host.classList.add('is-panning'); return; }
   if(!cv.view && handle){
     const el = b.elements.find(function(x){ return x.id===handle; });
     cv.drag = {type:'resize', el:el, w:el.w, h:el.h, start:start, moved:false, ratio: el.type==='image' ? el.h/Math.max(1,el.w) : null};
@@ -323,8 +346,9 @@ function boardPointerDown(e){
     b.elements.forEach(function(x){ if(cv.sel.has(x.id)) origins[x.id] = x.type==='line' ? {x1:x.x1,y1:x.y1,x2:x.x2,y2:x.y2} : {x:x.x, y:x.y}; });
     cv.drag = {type:'move', origins:origins, start:start, moved:false, selChanged:!wasSelected};
     drawBoard();
-  } else if(!cv.view && e.shiftKey){
-    cv.drag = {type:'marquee', start:start, moved:false, w0:screenToWorld(e.clientX, e.clientY)};
+  } else if(!cv.view){
+    // empty space: drag a box to select (Shift adds to what's selected)
+    cv.drag = {type:'marquee', start:start, moved:false, w0:screenToWorld(e.clientX, e.clientY), add:e.shiftKey, base:e.shiftKey ? new Set(cv.sel) : null};
   } else {
     cv.drag = {type:'pan', start:start, vx:b.viewport.x, vy:b.viewport.y, moved:false, el:elId};
   }
@@ -367,10 +391,12 @@ function boardPointerMove(e){
     cv.marquee.style.cssText = 'display:block;left:'+x+'px;top:'+y+'px;width:'+Math.abs(dx)+'px;height:'+Math.abs(dy)+'px;';
     const w1 = d.w0, w2 = screenToWorld(e.clientX, e.clientY);
     const minX = Math.min(w1.x,w2.x), maxX = Math.max(w1.x,w2.x), minY = Math.min(w1.y,w2.y), maxY = Math.max(w1.y,w2.y);
-    cv.sel = new Set(b.elements.filter(function(x){
-      if(x.type==='line') return Math.min(x.x1,x.x2)>=minX && Math.max(x.x1,x.x2)<=maxX && Math.min(x.y1,x.y2)>=minY && Math.max(x.y1,x.y2)<=maxY;
-      return x.x>=minX && x.x+x.w<=maxX && x.y>=minY && x.y+x.h<=maxY;
-    }).map(function(x){ return x.id; }));
+    const hit = b.elements.filter(function(x){
+      if(x.type==='line') return Math.max(x.x1,x.x2)>=minX && Math.min(x.x1,x.x2)<=maxX && Math.max(x.y1,x.y2)>=minY && Math.min(x.y1,x.y2)<=maxY;
+      const node = cv.els.querySelector('[data-el="'+x.id+'"]'), h = Math.max(x.h||0, node ? node.offsetHeight : 0);
+      return x.x+x.w>=minX && x.x<=maxX && x.y+h>=minY && x.y<=maxY;
+    }).map(function(x){ return x.id; });
+    cv.sel = new Set(d.base ? Array.from(d.base).concat(hit) : hit);
     drawBoard();
   }
 }
@@ -380,7 +406,8 @@ function boardPointerUp(e){
   if(cv.lineDraw && cv.lineDraw.down) cv.lineDraw.down = null;
   const d = cv.drag; if(!d) return;
   cv.drag = null;
-  cv.host.classList.remove('is-dragging');
+  cv.host.classList.remove('is-dragging', 'is-panning');
+  if(d.type==='marquee' && !d.moved){ if(cv.sel.size && !d.add){ cv.sel.clear(); drawBoard(); renderView(); } return; }
   if(cv.marquee) cv.marquee.style.display = 'none';
   const b = cvBoard(); if(!b) return;
   if(d.type==='pan'){
@@ -440,7 +467,17 @@ function fitBoard(){
 // ---- text editing ----
 function boardDblClick(e){
   const b = cvBoard(); if(!b) return;
-  const id = elFromTarget(e.target); if(!id) return;
+  let id = elFromTarget(e.target);
+  if(!id){
+    if(cv.view || cv.lineDraw) return;
+    const at = screenToWorld(e.clientX, e.clientY);
+    const el = addElement({type:'note', header:false, title:'', body:'', w:260, h:70}, {x:at.x+130, y:at.y+35});
+    if(!el) return;
+    el.x = Math.round(at.x); el.y = Math.round(at.y); drawBoard();
+    id = el.id;
+    const node0 = cv.els.querySelector('[data-el="'+id+'"]');
+    e = {target: node0 ? (node0.querySelector('[data-field="body"]') || node0) : e.target};
+  }
   const el = b.elements.find(function(x){ return x.id===id; }); if(!el) return;
   if(el.type==='board'){ openBoard(cv.kind, el.boardId); return; }
   if(cv.view || (el.type!=='note' && el.type!=='list')) return;
@@ -539,7 +576,7 @@ ACTIONS.boardToggleView = function(el){
   cv.sel.clear(); renderView();
 };
 function canvasAddNote(){ if(cvBoard()) ACTIONS.boardAddNote(); }
-ACTIONS.boardAddNote = function(){ addElement({type:'note', header:false, title:'', body:'Double-click to write', w:220, h:90}); };
+ACTIONS.boardAddNote = function(){ addElement({type:'note', header:false, title:'', body:'Double-click to write', w:260, h:96}); };
 ACTIONS.boardAddLabel = function(){ addElement({type:'note', header:true, color:BOARD_COLORS[Math.floor(Math.random()*6)], title:'Category', body:'One-line subtitle', w:260, h:96}); };
 ACTIONS.boardAddList = function(){ addElement({type:'list', title:'List', color:'#3a3f4d', items:[{id:uid(), text:'First thing'},{id:uid(), text:'Second thing'}], w:260, h:120}); };
 // Lines and arrows are drawn: pick the tool, click where it starts, then where it ends
@@ -555,7 +592,7 @@ function startLineDraw(arrow){
   drawBoard(); renderView();
 }
 function cancelLineDraw(){
-  cv.lineDraw = null;
+  cv.lineDraw = null; cv.drawCancelledAt = Date.now();
   if(cv.host){ cv.host.classList.remove('is-drawing'); setDrawHint(''); }
   const pv = cv.svg && cv.svg.querySelector('.bline-preview'); if(pv) pv.remove();
   renderView();

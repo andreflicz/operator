@@ -85,7 +85,7 @@ function confirmStartFocus(){
   const minutes = ui.pendingFocusMinutes;
   closePreFocusModal();
   startFocus(minutes);
-  playStartChime();
+  playLockIn();
 }
 function renderLockInCard(){
   const active = state.modes.active;

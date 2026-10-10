@@ -20,12 +20,12 @@ function renderOffTimeView(){
     '<button class="btn" style="border-color:var(--border-strong);color:var(--text);margin-top:10px;" data-action="endMode">End Off-Time</button>'+
   '</div></div>';
 }
-function focusKnockOutRow(t){
+function focusKnockOutRow(t, num){
   const isCurrent = ui.currentTaskId===t.id;
   const isPending = ui.pendingCurrentTaskId===t.id;
   return '<div class="task-item-v2'+(isCurrent?' is-current-task':'')+(isPending?' is-pending-task':'')+(justCompletedTaskId===t.id?' just-completed':'')+'" draggable="true" data-task-id="'+t.id+'" title="'+(isCurrent?'This is your current task':(isPending?'Waiting to be confirmed in Next Task':'Click to queue as Next Task'))+'">'+
     '<div style="flex:1;min-width:140px;'+(isCurrent?'':'cursor:pointer;')+'" '+(isCurrent?'':'data-action="stagePendingCurrentTask" data-id="'+t.id+'"')+'>'+
-      '<div class="task-title-row">'+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-ongoing" style="margin-left:6px;">&#128204;</span>':'')+'</div>'+
+      '<div class="task-title-row">'+(num ? '<span class="ko-num">'+num+'</span>' : '')+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-ongoing" style="margin-left:6px;">&#128204;</span>':'')+'</div>'+
       (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     '</div>'+
     clientTagsHtml(t.clients)+
@@ -92,7 +92,6 @@ function renderTodayFocusMode(p){
       '<div id="liveClockBig" class="cal-big-clock" style="font-size:38px;margin-top:6px;"></div>'+
       renderMiniCalendarStrip()
     ) : '<div class="view-sub" id="liveClock"></div>')+
-    renderNowNextBar()+
   '</div>'+
   lockedLayoutToolbarHtml()+
   lockedBlocksHtml({backlog:backlog, doneToday:doneToday, deepWorkToday:deepWorkToday, todayNotices:todayNotices, activeClients:activeClients});
@@ -103,7 +102,7 @@ function renderToday(){
   // left you staring at the "Taking today off" screen. The day stays marked as a rest day.
   if(state.focus.activeSession) return renderTodayFocusMode(p);
   if(isDayOff(todayStr())) return renderDayOffView();
-  if(state.modes.active && state.modes.active.type==='offtime') return state.modes.active.sleep ? renderSleepView() : renderOffTimeView();
+  if(state.modes.active && state.modes.active.type==='offtime') return state.modes.active.sleep ? renderSleepView() : state.modes.active.morning ? renderMorningView() : renderOffTimeView();
   const hour = new Date().getHours();
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
   const order = arr(state.dashboardPanels.order);

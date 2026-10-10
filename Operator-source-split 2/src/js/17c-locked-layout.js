@@ -28,12 +28,14 @@ const LOCKED_BLOCKS = {
   goals:     {label:'Goals', render:function(){ return '<div>'+renderGoalsPanel()+'</div>'; }},
   week:      {label:'This week', render:function(){ return '<div>'+renderProgressPanel()+'</div>'; }},
   why:       {label:'Your why', render:function(){ return '<div>'+renderWhyPanel()+'</div>'; }},
-  morningNote: {label:'Note for the morning', render:function(){ return renderMorningNotePanel(); }},
+  social:    {label:'Social', render:function(){ const h = renderSocialPanel(); return h ? '<div>'+h+'</div>' : ''; }},
   tasks:     {label:'Today\'s tasks', render:function(){ return '<div>'+renderTodayTasksPanel()+'</div>'; }}
 };
-const LOCKED_DEFAULT = ['stats', 'timer', 'vision', 'standards', 'calendar', 'reachout', 'backlog', 'clients'];
+const LOCKED_DEFAULT = ['stats', 'timer', 'vision', 'standards', 'calendar', 'reachout', 'backlog', 'clients', 'social'];
 function lockedLayout(){
   const saved = state.profile.lockedLayout;
+  // the Social block joins a layout you'd already customized (once — remove it and it stays gone)
+  if(saved && Array.isArray(saved.order) && !saved.socialAdded){ if(saved.order.indexOf('social')<0) saved.order.push('social'); saved.socialAdded = true; }
   const order = (saved && Array.isArray(saved.order) ? saved.order : LOCKED_DEFAULT).filter(function(id){ return LOCKED_BLOCKS[id]; });
   if(order.indexOf('timer')<0) order.unshift('timer');
   return order;

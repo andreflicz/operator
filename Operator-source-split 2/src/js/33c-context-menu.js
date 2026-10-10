@@ -32,7 +32,7 @@ function appMenuHtml(){
     (s ? ci('stop', '&#9632; Stop &amp; log session')+(s.onBreak ? '' : ci('break', '&#9749; Take a break')) : ci('lockin', '&#128274; Lock in <span class="ctx-kbd">L</span>'))+
     ci('recap', '&#128202; Day recap')+
     (selectableView() && selVisibleCards().length ? ci('selAll', '&#9745; Select all tasks <span class="ctx-kbd">&#8984;A</span>') : '')+
-    ci('wake', '&#9200; Wake-up alarm')+
+    ci('wake', '&#9200; Wake-up alarm')+ci('wind', '&#127769; Wind down — plan tomorrow')+
     (ui.view==='today' ? ci('editPage', s ? (ui.lockedEdit ? '&#10003; Done editing' : '&#9998; Edit this page') : (ui.todayEdit ? '&#10003; Done editing' : '&#9998; Edit this page')) : '')+
     SEP+
     crow('Go to', ['today','focus','business','calendar','personal'].map(function(v){ return chip('go', v[0].toUpperCase()+v.slice(1), {a:v, on:ui.view===v}); }).join(''))+
@@ -97,6 +97,8 @@ document.addEventListener('contextmenu', function(e){
   const c = contactFromEl(t);
   if(c){ ctxShow(contactMenuHtml(c.kind, c.x), e.clientX, e.clientY); return; }
   const host = t.closest('#boardHost');
+  // right-click while drawing a line just cancels it (no menu)
+  if(host && (cv.lineDraw || Date.now()-(cv.drawCancelledAt||0) < 600)){ if(cv.lineDraw) cancelLineDraw(); return; }
   if(host && !cv.view){
     const bel = t.closest('.bel[data-el]');
     // right-clicking one of several selected cards keeps them all selected (like the Finder)
@@ -129,6 +131,7 @@ ACTIONS.ctx = function(el){
   else if(op==='recap') ACTIONS.openDayRecap();
   else if(op==='selAll') selectAllVisibleTasks();
   else if(op==='wake') openWakeSetup();
+  else if(op==='wind') openWindDown();
   else if(op==='editPage'){ if(state.focus.activeSession) ACTIONS.toggleLockedEdit(); else ACTIONS.toggleTodayEdit(); }
   else if(op==='go') go(a);
   else if(op==='theme') setThemePref(a);

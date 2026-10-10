@@ -270,6 +270,7 @@ ACTIONS.applyNightPlan = function(){
 };
 ACTIONS.dismissNightPlan = function(){ const np = nightPlanForToday(); if(np){ np.dismissed = true; persist('focus'); renderView(); } };
 function renderMorningPlanCard(){
+  return ''; // last night's plan now lines itself up (see the day loop)
   const np = nightPlanForToday();
   if(!np || np.dismissed) return '';
   const tasks = arr(np.taskIds).map(function(id){ return state.tasks.items.find(function(t){ return t.id===id; }); }).filter(Boolean);
@@ -289,7 +290,6 @@ ACTIONS.startSleepMode = function(){
   if(state.focus.activeSession){ showToast('Stop your session first, then start Sleep mode.', {icon:'&#127769;'}); return; }
   startMode('offtime', {sleep:true, note:'Sleep'});
   ui.windDownOpen = false;
-  if(sessionsOn(todayStr()).length) openDayRecap(todayStr());
 };
 function renderSleepView(){
   const active = state.modes.active;
@@ -305,7 +305,8 @@ function renderSleepView(){
       '<button class="sleep-tile sleep-tile-btn" data-action="openWakeSetup"><div class="kpi-label">Wake-up</div>'+(nw ? '<div class="sleep-tile-val">'+fmt12Hour(nw.time)+'</div><div class="kpi-sub">'+morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts)+'</div>' : '<div class="sleep-tile-val">Not set</div><div class="kpi-sub">Tap to set it</div>')+'</button>'+
       '<button class="sleep-tile sleep-tile-btn" data-action="openNightPlan"><div class="kpi-label">'+(np?'Plan for '+morningLabel(np.date):'Tomorrow\'s plan')+'</div>'+(np ? '<div class="sleep-tile-val">'+npTasks.length+' task'+(npTasks.length===1?'':'s')+'</div><div class="kpi-sub">'+(np.note?escapeHtml(np.note.slice(0,70))+(np.note.length>70?'…':''):'no note')+'</div>' : '<div class="sleep-tile-val">Not planned</div><div class="kpi-sub">Tap to plan</div>')+'</button>'+
     '</div>'+
-    '<div class="sleep-note"><div class="kpi-label" style="text-align:left;">&#127769; Note for '+escapeHtml(morningLabel(morningNoteTarget()))+'</div>'+morningNoteBoxHtml('sleepNoteInput')+'</div>'+
+    (function(){ const ns = morningNotesFor(morningNoteTarget()); return ns.length ? '<div class="sleep-notes">'+ns.map(function(n){ return '<div>&ldquo;'+escapeHtml(n.text)+'&rdquo;</div>'; }).join('')+'</div>' : ''; })()+
+    '<div class="row" style="justify-content:center;margin-top:12px;"><button class="btn btn-ghost btn-sm" data-action="openWindDown" data-step="plan">&#9998; Plan &amp; note for '+escapeHtml(morningLabel(morningNoteTarget()))+'</button></div>'+
     '<div class="row" style="justify-content:center;margin-top:16px;gap:10px;">'+
       '<button class="btn" style="border-color:var(--border-strong);color:var(--text);" data-action="endMode">I\'m up</button>'+
     '</div>'+

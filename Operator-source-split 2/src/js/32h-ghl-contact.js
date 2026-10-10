@@ -46,6 +46,9 @@ async function ghlPushLocal(g, out){
 }
 // ---- the pane ----
 function ghlPane(){ return ui.ghlPane || null; }
+// what you've typed but not sent is kept, so a refresh never wipes it
+function ghlDraft(id){ const p = ghlPane(); return p && p.draft && p.draft[id] || ''; }
+document.addEventListener('input', function(e){ const t = e.target, p = ghlPane(); if(!p || !t || ['ghlMsg','ghlSubject','ghlNote'].indexOf(t.id)<0) return; p.draft = p.draft || {}; p.draft[t.id] = t.value; });
 ACTIONS.openGhlContact = function(el, e, id){
   if(e) e.stopPropagation();
   let kind = el && el.dataset ? el.dataset.kind : null, rec = null, cid = null;
@@ -55,7 +58,7 @@ ACTIONS.openGhlContact = function(el, e, id){
   showOverlay('ghlOverlay'); renderGhlPaneInto();
   if(cid) ghlLoadTab('contact').then(function(){ ghlLoadTab('messages'); });
 };
-ACTIONS.closeGhlPane = function(){ ui.ghlPane = null; hideOverlay('ghlOverlay'); renderView(); };
+ACTIONS.closeGhlPane = function(){ const inline = ui.ghlPane && ui.ghlPane.inline; ui.ghlPane = null; if(!inline) hideOverlay('ghlOverlay'); renderView(); };
 ACTIONS.ghlTab = function(el, e, id){ const p = ghlPane(); if(!p) return; p.tab = id; renderGhlPaneInto(); if(!p.data[id]) ghlLoadTab(id); };
 ACTIONS.ghlChannel = function(el, e, id){ const p = ghlPane(); if(!p) return; p.channel = id; renderGhlPaneInto(); };
 async function ghlLoadTab(tab){
@@ -85,7 +88,7 @@ async function ghlLoadTab(tab){
   p.loading[tab] = false;
   if(ghlPane()===p){ renderGhlPaneInto(); if(tab==='messages') ghlScrollThread(); }
 }
-function ghlScrollThread(){ requestAnimationFrame(function(){ const t = document.getElementById('ghlThread'); if(t) t.scrollTop = t.scrollHeight; }); }
+function ghlScrollThread(){ requestAnimationFrame(function(){ document.querySelectorAll('#ghlThread').forEach(function(t){ t.scrollTop = t.scrollHeight; }); }); }
 function ghlWhen(v){ const d = new Date(typeof v==='number' ? v : Date.parse(v)); if(isNaN(d)) return ''; return (todayStr(d)===todayStr() ? '' : fmtDateShort(todayStr(d))+' ')+d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}); }
 function ghlMsgType(m){ const t = String(m.messageType||m.type||''); return /EMAIL/i.test(t) ? 'Email' : /CALL/i.test(t) ? 'Call' : /FB|INSTAGRAM|IG/i.test(t) ? 'DM' : 'SMS'; }
 function ghlPaneHtml(){
@@ -115,12 +118,12 @@ function ghlPaneHtml(){
       }).join('') : '<div class="gp-loading">No messages yet — say hi.</div>')+'</div>'+
       '<div class="gp-compose">'+
         '<div class="seg-tabs seg-sm" style="margin:0;"><button class="seg-tab'+(p.channel==='SMS'?' active':'')+'" data-action="ghlChannel" data-id="SMS">Text</button><button class="seg-tab'+(p.channel==='Email'?' active':'')+'" data-action="ghlChannel" data-id="Email">Email</button></div>'+
-        (p.channel==='Email' ? '<input class="input" id="ghlSubject" placeholder="Subject">' : '')+
-        '<div class="gp-send-row"><textarea class="input" id="ghlMsg" rows="2" placeholder="'+(p.channel==='Email'?'Write an email…':'Write a text…')+' (⌘↵ to send)"></textarea><button class="btn btn-primary" data-action="ghlSend"'+(p.sending?' disabled':'')+'>'+(p.sending?'Sending…':'Send')+'</button></div>'+
+        (p.channel==='Email' ? '<input class="input" id="ghlSubject" placeholder="Subject" value="'+escapeHtml(ghlDraft('ghlSubject'))+'">' : '')+
+        '<div class="gp-send-row"><textarea class="input" id="ghlMsg" rows="2" placeholder="'+(p.channel==='Email'?'Write an email…':'Write a text…')+' (⌘↵ to send)">'+escapeHtml(ghlDraft('ghlMsg'))+'</textarea><button class="btn btn-primary" data-action="ghlSend"'+(p.sending?' disabled':'')+'>'+(p.sending?'Sending…':'Send')+'</button></div>'+
       '</div>';
   }
   else if(p.tab==='notes'){
-    body = '<div class="gp-add"><textarea class="input" id="ghlNote" rows="2" placeholder="Add a note…"></textarea><button class="btn btn-primary btn-sm" data-action="ghlAddNote">Add</button></div>'+
+    body = '<div class="gp-add"><textarea class="input" id="ghlNote" rows="2" placeholder="Add a note…">'+escapeHtml(ghlDraft('ghlNote'))+'</textarea><button class="btn btn-primary btn-sm" data-action="ghlAddNote">Add</button></div>'+
       '<div class="gp-list">'+(arr(p.data.notes).map(function(n){ return '<div class="gp-note"><div class="gp-note-b">'+escapeHtml(n.body||'')+'</div><div class="gp-meta">'+ghlWhen(n.dateAdded)+'</div></div>'; }).join('') || '<div class="gp-loading">No notes yet.</div>')+'</div>';
   }
   else if(p.tab==='tasks'){
@@ -151,7 +154,10 @@ function ghlPaneHtml(){
     (p.err ? '<div class="ghl-err">&#9888; '+escapeHtml(p.err)+'</div>' : '')+
     '<div class="gp-body">'+body+'</div>';
 }
-function renderGhlPaneInto(){ const el = document.getElementById('ghlContent'); if(el) morphInto(el, ghlPaneHtml(), {form:true}); }
+function renderGhlPaneInto(){
+  if(ui.ghlPane && ui.ghlPane.inline){ if(ui.view==='business' && ui.businessTab==='inbox') renderView(); return; }
+  const el = document.getElementById('ghlContent'); if(el) morphInto(el, ghlPaneHtml(), {form:true});
+}
 registerModal('ghlOverlay', renderGhlPaneInto);
 ACTIONS.ghlRefresh = function(){ const p = ghlPane(); if(!p) return; p.data = {}; ghlLoadTab('contact').then(function(){ ghlLoadTab(p.tab); }); };
 ACTIONS.ghlPushOne = async function(){
@@ -179,7 +185,7 @@ ACTIONS.ghlSend = async function(){
   try{
     await ghlCall('POST', '/conversations/messages', body);
     p.data.messages = arr(p.data.messages).concat([{direction:'outbound', body:text, messageType:p.channel==='Email'?'TYPE_EMAIL':'TYPE_SMS', dateAdded:new Date().toISOString()}]);
-    if(box) box.value = ''; if(subjEl) subjEl.value = '';
+    if(box) box.value = ''; if(subjEl) subjEl.value = ''; if(p.draft){ p.draft.ghlMsg = ''; p.draft.ghlSubject = ''; }
     ghlLogTouch(p, p.channel==='Email' ? 'email' : 'text', 'Sent from Operator');
     playTick(); p.err = null;
   }catch(e){ p.err = 'Couldn\'t send: '+e.message; }
@@ -195,7 +201,7 @@ ACTIONS.ghlAddNote = async function(){
   try{
     const r = await ghlCall('POST', '/contacts/'+encodeURIComponent(p.cid)+'/notes', {body:text});
     p.data.notes = [r.note || {body:text, dateAdded:new Date().toISOString()}].concat(arr(p.data.notes));
-    if(box) box.value = '';
+    if(box) box.value = ''; if(p.draft) p.draft.ghlNote = '';
     const rec = p.kind ? ghlRec(p.kind, p.id) : null; if(rec){ crmTimeline(rec, 'note', text); persist('business'); }
     p.err = null; playTick();
   }catch(e){ p.err = 'Couldn\'t save the note: '+e.message; }

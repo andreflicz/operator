@@ -20,7 +20,13 @@ function renderTodayHero(greeting){
       '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: streak===0 ? 'Hit today\'s standard to start one'+tip('The streak counts days in a row you hit Today\'s Standard — the deep-work target plus your checklist. Rest days you take off don\'t break it.') : (allDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Hit today\'s standard to keep it')})+'</div>'+
     '</div>'+
     '<div class="th-right">'+
-      '<button class="lockin-cta" data-action="openLockInChooser" title="Lock in (L)">'+
+      // in Shooting (or another mode): show it, with its own clock and an End button
+      ((state.modes.active && state.modes.active.type!=='offtime') ? '<div class="th-modecard is-'+state.modes.active.type+'">'+
+          '<span class="th-modecard-i">'+modeIcon(state.modes.active.type)+'</span>'+
+          '<span class="th-modecard-copy"><span class="th-modecard-k">'+escapeHtml(MODE_LABELS[state.modes.active.type]||'Mode')+'</span><span class="th-modecard-t" id="modeElapsed">'+formatElapsed(Date.now()-state.modes.active.startedAt)+'</span></span>'+
+          '<button class="btn btn-sm th-modecard-end" data-action="endMode">End</button>'+
+        '</div>' : '')+
+      '<button class="lockin-cta'+(state.modes.active && state.modes.active.type!=='offtime' ? ' is-secondary' : '')+'" data-action="openLockInChooser" title="Lock in (L)">'+
         '<span class="lockin-icon">&#128274;</span>'+
         '<span class="lockin-copy"><span class="lockin-title">Lock in</span><span class="lockin-sub">'+(next ? 'Up next: '+escapeHtml(next.title) : 'Start a focus session')+'</span></span>'+
         '<span class="lockin-key">L</span>'+
@@ -28,27 +34,39 @@ function renderTodayHero(greeting){
       '<div class="th-actions">'+
         '<button class="th-btn" data-action="toggleNextPicker" data-where="hero"><span class="th-btn-i">&#128204;</span>'+(next ? 'Change next' : 'Pick next')+'</button>'+
         (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going — sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
-        (evening ? '<button class="th-btn th-btn-night'+(ui.windDownOpen?' is-open':'')+'" data-action="toggleWindDown"><span class="th-btn-i">&#127769;</span>Wind down<span class="th-caret">&#9662;</span></button>' : '')+
+        (evening ? '<button class="th-btn th-btn-night" data-action="openWindDown"><span class="th-btn-i">&#127769;</span>Wind down</button>' : '')+
       '</div>'+
       '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+holdModeBtnHtml('offtime', '&#127937;', 'Off-time')+dayOffButtonHtml()+'</div>'+
       nextPickerHtml('hero')+
-      (evening && ui.windDownOpen ? '<div class="wind-drop" data-key="wind-drop">'+windDownTilesHtml()+'</div>' : '')+
     '</div>'+
   '</div>';
 }
 ACTIONS.toggleWindDown = function(){ ui.windDownOpen = !ui.windDownOpen; ui.nextPicker = null; renderView(); };
 // ---- Take Today Off: hold to confirm (a click alone does nothing but explain) ----
 function dayOffButtonHtml(){
-  return '<button class="th-mode dayoff-btn" data-hold="dayoff" title="Hold to take today off">'+
-    '<span class="dayoff-fill"></span><span class="th-mode-i">&#127796;</span><span class="dayoff-label">Day off</span><span class="dayoff-hint">hold</span>'+
-  '</button>';
+  return '<button class="th-mode" data-action="quickDayOff" title="Take today off (you can undo)"><span class="th-mode-i">&#127796;</span><span>Day off</span></button>';
 }
 // Shooting / Off-time sit next to Day off as small pills — hold to start, so a stray click never flips you into a mode.
+// One click starts it; a toast offers Undo for a few seconds (the old hold-to-start looked like it did nothing).
 function holdModeBtnHtml(type, icon, label){
-  return '<button class="th-mode dayoff-btn th-mode-'+type+'" data-hold="mode" data-type="'+type+'" title="Hold to start '+label+'">'+
-    '<span class="dayoff-fill"></span><span class="th-mode-i">'+icon+'</span><span class="dayoff-label">'+label+'</span><span class="dayoff-hint">hold</span>'+
-  '</button>';
+  return '<button class="th-mode th-mode-'+type+'" data-action="quickMode" data-type="'+type+'" title="Start '+label+' (you can undo)"><span class="th-mode-i">'+icon+'</span><span>'+label+'</span></button>';
 }
+ACTIONS.quickMode = function(el){
+  const type = el.dataset.type, prev = state.modes.active ? Object.assign({}, state.modes.active) : null;
+  if(state.focus.activeSession){ showToast('Stop your session first.', {icon:'&#128274;'}); return; }
+  startMode(type);
+  ui.undoMode = {prev:prev, at:Date.now()};
+  showToast((MODE_LABELS[type]||'Mode')+' started.', {icon:modeIcon(type), actionLabel:'Undo', actionAction:'undoQuickMode', duration:6000});
+};
+ACTIONS.undoQuickMode = function(){
+  const u = ui.undoMode; ui.undoMode = null; if(!u || !state.modes.active) return;
+  state.modes.active = u.prev; persist('modes'); clearToasts(); renderView();
+};
+ACTIONS.quickDayOff = function(){
+  toggleDayOff();
+  showToast(isDayOff(todayStr()) ? 'Today is a rest day — the streak is safe. Enjoy it.' : 'Back on — today counts.', {icon:'&#127796;', actionLabel:'Undo', actionAction:'quickDayOffUndo', duration:6000});
+};
+ACTIONS.quickDayOffUndo = function(){ toggleDayOff(); clearToasts(); };
 let holdTimer = null, holdEl = null;
 function cancelHold(){ clearTimeout(holdTimer); holdTimer = null; if(holdEl) holdEl.classList.remove('holding'); holdEl = null; }
 document.addEventListener('pointerdown', function(e){

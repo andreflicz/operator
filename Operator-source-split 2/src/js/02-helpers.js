@@ -141,7 +141,7 @@ const PANEL_DEFS = [
   {id:'agenda', label:'Today — timeline of events, deadlines & alarms'},
   {id:'week', label:'This Week & Consistency — deep work per day + 6-month heatmap'},
   {id:'why', label:'Your Why'},
-  {id:'morningNote', label:'Note for the morning'}
+  {id:'social', label:'Social — followers, reach, engagement'}
 ];
 const SMALL_PANELS = ['focusMini', 'calendarMini']; // journal is full-width now that it sits near the top
 const MOODS = [

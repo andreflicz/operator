@@ -13,8 +13,10 @@ function renderBusiness(){
     '<div class="tab '+(ui.businessTab==='lifecycle'?'active':'')+'" data-action="businessTab" data-tab="lifecycle">Lifecycle</div>'+
     '<div class="tab '+(ui.businessTab==='packages'?'active':'')+'" data-action="businessTab" data-tab="packages">Packages</div>'+
     '<div class="tab '+(ui.businessTab==='finances'?'active':'')+'" data-action="businessTab" data-tab="finances">Finances</div>'+
+    '<div class="tab '+(ui.businessTab==='social'?'active':'')+'" data-action="businessTab" data-tab="social">Social</div>'+
+    '<div class="tab '+(ui.businessTab==='inbox'?'active':'')+'" data-action="businessTab" data-tab="inbox">Inbox'+(inboxUnread() ? '<span class="tab-badge">'+inboxUnread()+'</span>' : '')+'</div>'+
   '</div>'+
-  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
+  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : ui.businessTab==='inbox' ? renderInboxTab() : ui.businessTab==='social' ? renderSocialTab() : renderBusinessOverview())+'</div>';
 }
 // Business → Overview: one card — revenue on top, clients and pipeline side by side.
 function renderBusinessOverview(){
@@ -416,11 +418,13 @@ function renderClientModal(){
     '</div>'+
     renderClientLifecycle(c)+
     renderCrmBlock('client', c)+
-    '<div class="kpi-label" style="margin:16px 0 8px;">Deliverables<span class="kpi-sub" style="margin-left:6px;">'+pendingCount+' pending</span></div>'+
-    '<div class="task-list" style="margin-bottom:8px;">'+(deliverables.map(function(d){return deliverableRow(c.id,d);}).join('') || '<div class="empty">No deliverables yet — assign a package above, or add a one-off below.</div>')+'</div>'+
-    '<span style="display:inline-block;margin-bottom:16px;font-size:12.5px;color:var(--accent);cursor:pointer;" data-action="openCustomDeliverableDrawer" data-id="'+c.id+'">&#8618; Add custom deliverable</span>'+
-    '<div class="section-title" style="margin-bottom:8px;">Plan</div>'+
-    renderClientPackageField(c)+
+    // the plan and what it delivers, together in one block
+    '<div class="kpi-label" style="margin:16px 0 8px;">Plan &amp; deliverables<span class="kpi-sub" style="margin-left:6px;">'+pendingCount+' pending this week</span></div>'+
+    '<div class="card plan-block">'+
+      renderClientPackageField(c, true)+
+      '<div class="task-list plan-delivs">'+(deliverables.map(function(d){return deliverableRow(c.id,d);}).join('') || '<div class="empty">No deliverables yet — pick a package above, or add a one-off.</div>')+'</div>'+
+      '<span class="plan-add" data-action="openCustomDeliverableDrawer" data-id="'+c.id+'">&#43; Add a one-off deliverable</span>'+
+    '</div>'+
     '<div class="field" style="margin-bottom:16px;"><label>How we acquired them</label><div class="row" style="gap:6px;flex-wrap:wrap;">'+LEAD_SOURCES.map(function(s){ const active=c.leadSource===s.id; return '<span class="chip'+(active?' active':'')+'" data-action="setClientLeadSource" data-id="'+c.id+'" data-value="'+s.id+'">'+s.emoji+' '+s.label+'</span>'; }).join('')+'</div></div>'+
     clientBillingCycleFieldHtml(c)+
     '<div class="row" style="justify-content:center;margin-bottom:16px;"><button class="btn btn-ghost btn-sm" data-action="viewClientJournalFromModal" data-id="'+c.id+'">View Client Journal &rarr;</button></div>'+
@@ -522,7 +526,7 @@ function renderClientEventsSection(c){
       '</div>';
     }).join('')+'</div>';
 }
-function renderClientPackageField(c){
+function renderClientPackageField(c, inline){
   const packages = arr(state.business.packages);
   const assigned = c.packageId ? packages.find(function(x){return x.id===c.packageId;}) : null;
   const picking = ui.pickingPackageForClient === c.id;
@@ -546,6 +550,7 @@ function renderClientPackageField(c){
   } else {
     body = '<button class="btn btn-ghost btn-sm" data-action="pickPackageForClient" data-id="'+c.id+'">+ Set Package</button>';
   }
+  if(inline) return '<div class="plan-pkg"><span class="kind-label" style="margin:0;">Package</span>'+body+'</div>';
   return '<div class="field" style="margin-bottom:16px;"><label>Package</label><div class="card">'+body+'</div></div>';
 }
 function pickPackageForClient(id){ ui.pickingPackageForClient = id; renderClientModalInto(); }

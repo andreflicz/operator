@@ -216,8 +216,11 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":2}' ;;
-    *) wake_front >/dev/null 2>&1 & respond 200 '{"ok":true}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":3}' ;;
+    # only an alarm ever brings Operator to the front — nothing else (an empty or unknown
+    # request used to, which pulled the window back over other apps every few seconds)
+    /wake|/wake\?*) wake_front >/dev/null 2>&1 & respond 200 '{"ok":true}' ;;
+    *) respond 404 '{"ok":false}' ;;
   esac
 }
 
@@ -234,12 +237,12 @@ ghl_respond() {
     /ghl/forget*)
       rm -f "$GHL_KEY_FILE"; CODE=200; BODY='{"ok":true}' ;;
     /ghl/status*)
-      CODE=200; if [ -s "$GHL_KEY_FILE" ]; then BODY='{"ok":true,"hasKey":true,"helper":2}'; else BODY='{"ok":true,"hasKey":false,"helper":2}'; fi ;;
+      CODE=200; if [ -s "$GHL_KEY_FILE" ]; then BODY='{"ok":true,"hasKey":true,"helper":3}'; else BODY='{"ok":true,"hasKey":false,"helper":3}'; fi ;;
     /ghl/api*)
       M=$(param m); P=$(hexdec "$(param p)"); B=$(hexdec "$(param b)")
       case "$M" in GET|PUT|POST|DELETE) ;; *) M=GET ;; esac
       case "$P" in
-        /contacts*|/opportunities*|/calendars*|/conversations*|/locations*|/users*)
+        /contacts*|/opportunities*|/calendars*|/conversations*|/locations*|/users*|/social-media-posting*)
           if [ ! -s "$GHL_KEY_FILE" ]; then CODE=401; BODY='{"error":"no key saved"}'
           else
             GHL_AUTH="Authorization: Bearer $(cat "$GHL_KEY_FILE")"
@@ -262,5 +265,9 @@ ghl_respond() {
 
 case "$KIND" in
   ghl) ghl_respond ;;
+  activity)
+    # recent foreground-app samples for the page (written by the launcher every 10 s)
+    BODY=$(cat "$DATA_DIR/activity.log" 2>/dev/null)
+    respond 200 "$BODY" 'text/plain; charset=utf-8' ;;
   *) wake_respond ;;
 esac

@@ -59,7 +59,7 @@ function skyChipHtml(){
   const parts = [SKY_META[phase].label];
   if(now) parts.push('<b>'+now.temp+'&deg;</b> '+escapeHtml(wxLabel(now.code).toLowerCase()));
   if(when) parts.push(when);
-  return '<span class="sky-chip" data-sky="'+phase+'" title="'+(now ? 'Feels like '+now.feels+'° · high '+now.hi+'° / low '+now.lo+'°'+(weatherCfg().place ? ' · '+escapeHtml(weatherCfg().place) : '') : 'Set a weather location in Settings → Display')+'">'+
+  return '<span class="sky-chip sky-text" data-sky="'+phase+'" title="'+(now ? 'Feels like '+now.feels+'° · high '+now.hi+'° / low '+now.lo+'°'+(weatherCfg().place ? ' · '+escapeHtml(weatherCfg().place) : '') : 'Set a weather location in Settings → Display')+'">'+
     '<span class="sky-chip-i">'+wxIcon(kind, phase)+'</span>'+parts.join(' &middot; ')+'</span>';
 }
 // ---- settings ----

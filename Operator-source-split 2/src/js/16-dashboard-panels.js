@@ -295,7 +295,7 @@ const PANEL_RENDERERS = {
   week: renderProgressPanel,
   heatmap: function(){ return ''; },
   why: renderWhyPanel,
-  morningNote: function(){ return renderMorningNotePanel(); }
+  social: function(){ return renderSocialPanel(); }
 };
 function clientOpsDeliverableRow(clientId, d){
   return recurringDeliverableRowHtml(clientId, d, false);

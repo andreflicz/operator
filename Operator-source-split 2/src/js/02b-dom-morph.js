@@ -18,6 +18,7 @@ const MORPH_SKIP_ATTRS = { 'data-selected': true };
 // Classes scripts add at runtime (carousel arrows and edge fades). A re-render keeps them so
 // nothing blinks off for a frame; the carousel's own update corrects them right after.
 const MORPH_STICKY_CLASSES = ['can-prev', 'can-next', 'fade-l', 'fade-r', 'car-over'];
+const MORPH_FIELDS = 'input,textarea,select';
 function withStickyClasses(oldN, value){
   let v = value;
   for(let i=0;i<MORPH_STICKY_CLASSES.length;i++){ const c = MORPH_STICKY_CLASSES[i]; if(oldN.classList.contains(c) && (' '+v+' ').indexOf(' '+c+' ')<0) v += ' '+c; }
@@ -95,6 +96,11 @@ function morphNode(oldN, newN, opts){
     return;
   }
   if(oldN.nodeType!==1) return;
+  // Fast path: a section that's exactly the same (the browser compares it natively — far
+  // quicker than walking it here) is left alone. Not for anything holding form fields, whose
+  // live values still get synced below.
+  const tag0 = oldN.nodeName;
+  if(tag0!=='INPUT' && tag0!=='TEXTAREA' && tag0!=='SELECT' && oldN.isEqualNode(newN) && !(newN.firstElementChild && newN.querySelector(MORPH_FIELDS))) return;
   // Self-managed widgets (the board canvas) own their subtree; leave it untouched.
   if(oldN.hasAttribute('data-morph-ignore') && newN.getAttribute && newN.getAttribute('data-morph-ignore')===oldN.getAttribute('data-morph-ignore')) return;
   const tag = oldN.nodeName;

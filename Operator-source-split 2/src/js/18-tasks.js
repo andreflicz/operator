@@ -205,7 +205,8 @@ function renderFocusTasksOverview(){
       (carouselOn() ? (function(){ const all = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; })); return carouselWrap(all.map(function(t){ return taskCard(t); }).join(''), 'soon', {w:236, loop:true, count:all.length}); })() : '<div class="task-card-grid">'+backlogPreview.map(function(t){ return taskCard(t); }).join('')+'</div>')+
     '</div>'
   ) : '')+
-  renderOngoingTasksPanel();
+  renderOngoingTasksPanel()+
+  renderSocialPanel();
 }
 function renderFocusBacklogTab(){
   const items = state.tasks.items;

@@ -271,7 +271,7 @@ async function ghlPullMessages(g, out, contacts){
   });
   const fresh = g.inbox.filter(function(m){ return !prev[m.contactId+':'+m.at]; });
   if(fresh.length && g.lastSync){
-    playPositive();
+    playPing();
     showToast(fresh.length===1 ? '&#128172; '+escapeHtml(fresh[0].name || 'Someone')+': '+escapeHtml(String(fresh[0].body||'').slice(0, 80)) : fresh.length+' new messages in GoHighLevel', {icon:'&#128172;', duration:7000, actionLabel:'Open', actionAction:fresh.length===1 ? 'openGhlContact' : 'toggleNotifs', actionId:fresh[0].contactId});
   }
   arr(r.conversations).forEach(function(cv){
@@ -326,7 +326,7 @@ function ghlSettingsHtml(){
     return '<div class="section"><div class="card ghl-card">'+head+
       '<ol class="ghl-steps">'+
         '<li>In GoHighLevel, open the sub-account &rarr; <b>Settings &rarr; Private Integrations</b> &rarr; <b>Create new integration</b>.</li>'+
-        '<li>Give it these scopes: <code>contacts.readonly</code> <code>contacts.write</code> <code>opportunities.readonly</code> <code>opportunities.write</code> <code>calendars.readonly</code> <code>calendars/events.readonly</code> <code>conversations.readonly</code> <code>conversations.write</code> <code>conversations/message.readonly</code> <code>conversations/message.write</code> <code>locations.readonly</code>.</li>'+
+        '<li>Give it these scopes: <code>contacts.readonly</code> <code>contacts.write</code> <code>opportunities.readonly</code> <code>opportunities.write</code> <code>calendars.readonly</code> <code>calendars/events.readonly</code> <code>conversations.readonly</code> <code>conversations.write</code> <code>conversations/message.readonly</code> <code>conversations/message.write</code> <code>locations.readonly</code> — and for social stats, <code>socialplanner/account.readonly</code> <code>socialplanner/stat.readonly</code>.</li>'+
         '<li>Copy the key it shows you, and your <b>Location ID</b> (Settings &rarr; Business Profile, or the part of the URL after <code>/location/</code>).</li>'+
       '</ol>'+bridge+
       '<div class="grid grid-2" style="margin-top:12px;">'+

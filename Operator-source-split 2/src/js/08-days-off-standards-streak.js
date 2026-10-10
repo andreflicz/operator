@@ -115,7 +115,7 @@ function toggleStandard(id, dateStr){
   const idx = rec.doneIds.indexOf(id);
   if(idx>=0) rec.doneIds.splice(idx,1); else rec.doneIds.push(id);
   const nowAllDone = dayStandardsComplete(d);
-  if(!wasAllDone && nowAllDone) playSessionComplete(); else playTick();
+  if(!wasAllDone && nowAllDone) playFanfare(); else playTick();
   persist('standards'); renderView();
 }
 // A day can look "incomplete" purely because the manual standards checklist (e.g. "Stayed within

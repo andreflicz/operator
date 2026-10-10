@@ -28,7 +28,7 @@ function renderSettings(){
         '<div class="task-list">'+RESET_TARGETS.map(function(t){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+t.label+'</div>'+resetPartBtn(t)+'</div>'; }).join('')+'</div>'+
       '</div></div>',
 
-    display: themeSettingsHtml()+skyLookSettingsHtml()+'<div class="section"><div class="section-title">Music'+tip('A small Apple Music player at the bottom of the menu — what\'s playing, play/pause, skip, volume and your playlists. Works when Operator is opened from the Operator app.')+'</div><div class="card"><label class="row" style="gap:8px;font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="setMusicPlayer" '+(state.profile.musicPlayer!==false?'checked':'')+'>Show the Apple Music player in the menu</label></div></div>'+sceneSettingsHtml()+weatherSettingsHtml()+cardLayoutSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
+    display: themeSettingsHtml()+skyLookSettingsHtml()+sceneSettingsHtml()+weatherSettingsHtml()+cardLayoutSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
         '<div class="row">'+SWATCHES.map(function(sw){ return '<span class="swatch '+(p.accentColor===sw?'sel':'')+'" style="background:'+sw+';" data-action="pickThemeColor" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Today Header Style</div>'+

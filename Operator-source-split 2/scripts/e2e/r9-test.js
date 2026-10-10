@@ -71,7 +71,7 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     check('…centered on what\'s on it (even far from the origin)', off < 3, off);
     check('a little pill shows the song is still playing', await p.isVisible('.brief-music'));
     await E("ACTIONS.wakeIntroSkip()"); await p.waitForTimeout(100);
-    check('the intro can be skipped', !(await p.$('.brief-intro')));
+    check('the intro can be skipped', !(await p.isVisible('.brief-intro')) && await p.isVisible('.brief.intro-skipped'));
     await p.click('[data-action="wakeStopMusic"]'); await p.waitForTimeout(200);
     check('■ stops the music right away', calls.includes('/music/stop'));
     check('no errors (wake)', !p.errors.length, p.errors);
@@ -168,15 +168,8 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     await E("ghlSync(false)"); await p.waitForTimeout(800);
     const up = ghl.find(x => x.path==='/contacts/upsert'), opp = ghl.find(x => x.path==='/opportunities/' && x.m==='POST');
     check('a lead you added here goes to GoHighLevel on its own (contact + opportunity)', up && up.body.email==='sara@dent.com' && opp && opp.body.contactId==='gc2' && opp.body.pipelineStageId==='s1' && (await E("state.business.pipeline[1].ghlOppId"))==='op2', {up, opp});
-    // music player
-    await E("mpPoll()"); await p.waitForTimeout(400);
-    check('the Apple Music player shows what\'s playing', (await p.textContent('#musicPlayer')).includes('Lose Yourself') && (await p.textContent('#musicPlayer')).includes('Eminem'));
-    await p.click('.mp-btn.mp-main'); await p.waitForTimeout(200);
-    check('play / pause from the menu', music.some(x => x==='/music/cmd?c=playpause'));
-    await p.click('.mp-top'); await p.waitForTimeout(300);
-    await p.click('.mp-list:has-text("Morning Run")'); await p.waitForTimeout(300);
-    check('pick one of your playlists', music.some(x => x.startsWith('/music/pick?k=playlist&q=')));
-    check('no errors (notifs / music / GHL)', !p.errors.length, p.errors);
+    check('the in-app music player is gone (no background polling)', !(await p.$('#musicPlayer')) && !music.some(x => x.startsWith('/music/now')));
+    check('no errors (notifs / GHL)', !p.errors.length, p.errors);
     await p.context().close();
   }
 

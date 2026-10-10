@@ -29,7 +29,8 @@ function weekDotsHtml(done, target, pace){
 function clientDelivRowsHtml(c, compact){
   const recurring = arr(c.deliverables).filter(function(d){ return d.recurring; });
   if(!recurring.length) return '';
-  return '<div class="cc2-delivs">'+recurring.map(function(d){
+  const pkg = c.packageId ? arr(state.business.packages).find(function(x){ return x.id===c.packageId; }) : null;
+  return '<div class="cc2-delivs">'+(pkg ? '<div class="cc2-pkg"><span class="cc2-pkg-n">'+escapeHtml(pkg.name)+'</span>'+(pkg.price ? '<span class="kpi-sub">$'+Number(pkg.price).toLocaleString()+'/mo</span>' : '')+'</div>' : '')+recurring.map(function(d){
     const done = deliverableWeekCount(d), target = deliverableWeekNeed(d);
     const pace = deliverablePaceStatus(d);
     const today = arr(d.completedDates).indexOf(todayStr())>=0;

@@ -130,7 +130,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('clicking it opens the vision board big', await p.isVisible('.br-vision-big'));
     await p.click('.br-vision-big .wk2-vision-x'); await p.waitForTimeout(200);
     const brief = await p.textContent('.brief');
-    check('"I\'m up" opens the morning briefing', /Good morning/.test(brief) && /Yesterday/.test(brief) && /Today.s plan/.test(brief) && /Goals/.test(brief) && /Edit JJS reel/.test(brief));
+    check('"I\'m up" opens the morning briefing', /Good morning/.test(brief) && /Yesterday/.test(brief) && /Plan of attack/.test(brief) && /Goals/.test(brief) && /Edit JJS reel/.test(brief));
     await p.click('[data-action="wakeBriefDone"]'); await p.waitForTimeout(200);
     check('Let\'s go takes you into the day', !(await p.isVisible('#wakeOverlay:not(.hidden)')) && (await E("ui.view"))==='today');
     check('no errors (wake)', !p.errors.length, p.errors);

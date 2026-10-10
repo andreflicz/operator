@@ -705,7 +705,7 @@
   .board-shell.is-view .board-host{ height:calc(100vh - 230px); border-color:transparent; }
   .board-host.is-dragging{ cursor:grabbing; }
   .board-host.photo-drop-hover{ outline-offset:-3px; }
-  .board-world{ position:absolute; left:0; top:0; transform-origin:0 0; will-change:transform; }
+  .board-world{ position:absolute; left:0; top:0; transform-origin:0 0; }
   .board-lines{ position:absolute; left:0; top:0; overflow:visible; pointer-events:none; }
   .board-lines .bline-hit{ pointer-events:stroke; cursor:move; }
   .board-host.is-view .board-lines .bline-hit{ pointer-events:none; }
@@ -1906,6 +1906,8 @@
 
   /* ---- round 9: Good Morning intro (like a phone starting up) ---- */
   .brief-intro{ position:fixed; inset:0; z-index:20; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:#05060b; cursor:pointer; animation:biOut .9s cubic-bezier(.6,0,.2,1) 2.35s both; }
+  .brief.intro-skipped .brief-intro{ display:none; }
+  .brief.intro-skipped .brief-inner > *, .brief.intro-skipped .brief-cols > *{ animation-delay:0s !important; }
   .bi-glow{ position:absolute; width:70vmin; height:70vmin; border-radius:50%; background:radial-gradient(circle, rgba(255,170,90,.28), rgba(255,120,80,.08) 45%, transparent 70%); filter:blur(30px); animation:biGlow 2.6s ease-out both; }
   .bi-word{ position:relative; font-family:var(--font-display); font-weight:800; font-size:clamp(64px, 11vw, 180px); line-height:1; letter-spacing:-.045em; text-align:center; padding:0 24px;
     background:linear-gradient(100deg, #fff 0%, #fff 35%, #ffd59a 50%, #fff 65%, #fff 100%); background-size:250% 100%; -webkit-background-clip:text; background-clip:text; color:transparent;
@@ -1995,34 +1997,6 @@
   .np-item:hover .np-dismiss{ opacity:1; } .np-dismiss:hover{ color:var(--text); }
   .np-empty{ text-align:center; color:var(--text-dim); padding:26px 10px; font-size:13.5px; }
 
-  /* ---- Apple Music player in the menu ---- */
-  .sb-foot{ margin-top:auto; padding-top:12px; }
-  .mp{ border:1px solid var(--border); border-radius:14px; background:var(--panel-2); padding:10px; display:flex; flex-direction:column; gap:8px; }
-  .mp.is-playing{ border-color:rgba(197,143,255,.35); box-shadow:0 0 24px rgba(197,143,255,.08); }
-  .mp-top{ display:flex; align-items:center; gap:9px; cursor:pointer; min-width:0; }
-  .mp-art{ flex:none; width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #fa2d48, #a33ee8); color:#fff; font-size:15px; }
-  .mp-art .wk2-eq{ transform:scale(.7); }
-  .mp-meta{ display:flex; flex-direction:column; min-width:0; }
-  .mp-name{ font-size:12.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .mp-artist{ font-size:11.5px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .mp-prog{ height:3px; border-radius:3px; background:var(--border); overflow:hidden; }
-  .mp-prog i{ display:block; height:100%; background:linear-gradient(90deg, #fa2d48, #c58fff); transition:width 1s linear; }
-  .mp-ctl{ display:flex; align-items:center; gap:4px; }
-  .mp-btn{ width:28px; height:28px; border-radius:50%; border:none; background:transparent; color:var(--text-dim); cursor:pointer; font-size:11px; display:inline-flex; align-items:center; justify-content:center; }
-  .mp-btn:hover{ color:var(--text); background:var(--panel); }
-  .mp-btn.mp-main{ width:32px; height:32px; background:var(--text); color:var(--bg); font-size:11px; }
-  .mp-btn.mp-main:hover{ transform:scale(1.06); background:var(--text); }
-  .mp-time{ margin-left:auto; font-size:10.5px; color:var(--text-faint); font-variant-numeric:tabular-nums; }
-  .mp-more{ display:flex; flex-direction:column; gap:8px; border-top:1px solid var(--border); padding-top:8px; }
-  .mp-vol{ display:flex; align-items:center; gap:6px; font-size:12px; } .mp-vol input{ flex:1; accent-color:#c58fff; }
-  .mp-search .input{ width:100%; padding:6px 9px; font-size:12px; }
-  .mp-lists{ display:flex; flex-direction:column; gap:2px; max-height:180px; overflow-y:auto; }
-  .mp-list{ text-align:left; border:none; background:transparent; color:var(--text-dim); font-size:12.5px; padding:5px 7px; border-radius:7px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .mp-list:hover{ background:var(--panel); color:var(--text); }
-  .sidebar.collapsed .mp-meta, .sidebar.collapsed .mp-prog, .sidebar.collapsed .mp-time, .sidebar.collapsed .mp-more, .sidebar.collapsed .mp-ctl .mp-btn:not(.mp-main){ display:none; }
-  .sidebar.collapsed .mp{ padding:6px; align-items:center; } .sidebar.collapsed .mp-top{ justify-content:center; }
-  @media (max-width:800px){ .sb-foot{ display:none; } }
-
   /* ---- GoHighLevel pane ---- */
   .ghl-pane{ width:min(760px, 100%); max-height:88vh; overflow:hidden; display:flex; flex-direction:column; }
   .gp-head{ display:flex; align-items:center; gap:12px; }
@@ -2049,6 +2023,236 @@
   .gp-appt-d{ font-weight:700; color:var(--accent); min-width:120px; }
   .gp-loading{ color:var(--text-dim); font-size:13px; padding:18px; text-align:center; }
   .gp-empty{ display:flex; flex-direction:column; align-items:center; gap:12px; padding:30px 10px; text-align:center; color:var(--text-dim); }
+
+  /* ---- numbered plan list (briefing, morning, wind down) ---- */
+  .plan-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+  .plan-list li{ display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; background:var(--panel-2); border:1px solid var(--border); font-weight:600; min-width:0; }
+  .plan-list li .tag{ flex:none; }
+  .pl-num{ flex:none; width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:12px; font-weight:800; background:var(--panel); border:1px solid var(--border-strong); color:var(--text-dim); }
+  .plan-list li.is-first{ border-color:rgba(232,162,61,.55); box-shadow:inset 3px 0 0 var(--accent); }
+  .plan-list li.is-first .pl-num{ background:var(--accent); border-color:var(--accent); color:#1a1206; }
+  .plan-list li.is-done{ opacity:.5; } .plan-list li.is-done .pl-t{ text-decoration:line-through; } .plan-list li.is-done .pl-num{ background:var(--good); border-color:var(--good); color:#06120c; }
+  .pl-t{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .plan-list.is-dark li{ background:rgba(255,255,255,.04); border-color:rgba(255,255,255,.08); color:#fff; }
+  .plan-list.is-dark .pl-num{ background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.2); color:rgba(255,255,255,.75); }
+  .plan-list.is-dark li.is-first{ background:rgba(232,162,61,.12); }
+
+  /* ---- wake ring: last night's note ---- */
+  .wk2-note{ max-width:560px; margin:14px auto 0; font-size:17px; line-height:1.45; color:rgba(255,255,255,.9); font-style:italic; text-align:center; }
+  .wk2-note span{ display:block; margin-top:4px; font-size:12px; font-style:normal; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.45); }
+
+  /* ---- briefing buttons ---- */
+  .brief-go.brief-morning{ background:linear-gradient(180deg, #ffd27a, #e8a23d); color:#1a1206; box-shadow:0 12px 40px rgba(232,162,61,.35); }
+  .brief-skip{ border:none; background:transparent; color:rgba(255,255,255,.45); font-weight:600; cursor:pointer; padding:10px 6px; margin-left:auto; }
+  .brief-skip:hover{ color:#fff; }
+
+  /* ---- cinematic intro ---- */
+  .brief-intro.is-cinematic{ animation-delay:6.4s; animation-duration:1s; }
+  .brief-intro.is-cinematic .bi-time{ position:absolute; font-family:var(--font-display); font-weight:300; font-size:clamp(90px, 16vw, 240px); letter-spacing:-.04em; color:#fff; animation:biTime 2.4s cubic-bezier(.3,.7,.2,1) .2s both; }
+  .brief-intro.is-cinematic .bi-word{ animation:biIn 1.4s cubic-bezier(.2,.75,.15,1) 2.4s both, biShine 2.4s ease-in-out 3s both; }
+  .brief-intro.is-cinematic .bi-name{ animation:biIn 1.2s cubic-bezier(.2,.75,.15,1) 3.4s both; }
+  .bi-line{ position:relative; margin-top:18px; font-size:clamp(15px, 1.6vw, 20px); color:rgba(255,255,255,.65); animation:biIn 1.1s cubic-bezier(.2,.75,.15,1) 4.4s both; }
+  .brief-intro:not(.is-cinematic) .bi-line, .brief-intro:not(.is-cinematic) .bi-time{ display:none; }
+  .brief-intro.is-cinematic .bi-glow{ animation:biGlow 3s ease-out 1.8s both; }
+  @keyframes biTime{ 0%{ opacity:0; filter:blur(30px); transform:scale(.9); } 35%{ opacity:1; filter:blur(0); transform:none; } 80%{ opacity:1; } 100%{ opacity:0; filter:blur(14px); transform:scale(1.06); } }
+
+  /* ---- wind down ---- */
+  .wind-overlay{ padding:0 !important; background:rgba(3,4,10,.86) !important; }
+  .wind-content{ width:100%; height:100%; display:flex; }
+  .wd{ position:relative; width:100%; height:100%; display:flex; flex-direction:column; color:#fff; background:radial-gradient(ellipse at 50% -20%, rgba(110,120,255,.18), transparent 60%), radial-gradient(ellipse at 90% 110%, rgba(255,140,90,.08), transparent 50%), #05060c; }
+  .wd-top{ display:flex; align-items:center; gap:12px; padding:22px 32px 0; }
+  .wd-moon{ font-size:20px; } .wd-brand{ font-family:var(--font-display); font-weight:700; letter-spacing:.2em; text-transform:uppercase; font-size:12px; color:#b9c0ff; }
+  .wd-steps{ display:flex; gap:6px; margin:0 auto; }
+  .wd-step{ display:inline-flex; align-items:center; gap:7px; border:1px solid rgba(255,255,255,.12); background:transparent; color:rgba(255,255,255,.55); border-radius:999px; padding:6px 12px 6px 6px; font-size:12.5px; font-weight:600; cursor:pointer; }
+  .wd-step span{ width:20px; height:20px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:rgba(255,255,255,.08); font-size:11px; }
+  .wd-step.is-on{ color:#fff; border-color:rgba(160,170,255,.6); background:rgba(120,130,255,.14); } .wd-step.is-on span{ background:#8f9bff; color:#0a0b18; }
+  .wd-step.is-past span{ background:rgba(63,190,142,.25); color:#7ef0c0; }
+  .wd-close{ border:none; background:rgba(255,255,255,.06); color:rgba(255,255,255,.7); width:34px; height:34px; border-radius:50%; cursor:pointer; }
+  .wd-inner{ flex:1; overflow-y:auto; width:100%; max-width:860px; margin:0 auto; padding:26px 32px 20px; animation:brIn .45s cubic-bezier(.2,.8,.2,1) both; }
+  .wd-title-h{ font-family:var(--font-display); font-weight:800; font-size:clamp(30px, 4vw, 48px); letter-spacing:-.025em; margin:0 0 18px; }
+  .wd-sub{ color:rgba(255,255,255,.6); margin:-8px 0 16px; font-size:14px; }
+  .wd-k{ font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.45); margin:18px 0 8px; }
+  .wd-foot{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:16px 32px 26px; max-width:860px; width:100%; margin:0 auto; }
+  .wd .btn-ghost{ color:rgba(255,255,255,.75); border-color:rgba(255,255,255,.18); }
+  .wd-sleep{ background:linear-gradient(180deg, #a3acff, #6f7cff); border:none; color:#0a0b18; font-weight:800; padding:12px 22px; border-radius:14px; }
+  .wd-hero{ display:flex; align-items:center; gap:26px; flex-wrap:wrap; }
+  .wd-ring{ position:relative; width:150px; height:150px; flex:none; }
+  .wd-ring svg{ width:100%; height:100%; transform:rotate(-90deg); }
+  .wd-ring-bg{ fill:none; stroke:rgba(255,255,255,.08); stroke-width:9; }
+  .wd-ring-fg{ fill:none; stroke:#e8a23d; stroke-width:9; stroke-linecap:round; transition:stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1); }
+  .wd-ring-fg.is-hit{ stroke:#3fbe8e; }
+  .wd-ring-c{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .wd-ring-v{ font-family:var(--font-display); font-weight:800; font-size:30px; } .wd-ring-k{ font-size:11px; color:rgba(255,255,255,.55); max-width:96px; }
+  .wd-stats{ flex:1; display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:10px; }
+  .wd-stat{ padding:12px 14px; border-radius:14px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); }
+  .wd-stat b{ display:block; font-family:var(--font-display); font-size:24px; } .wd-stat span{ font-size:12px; color:rgba(255,255,255,.55); }
+  .wd-stat.is-good b{ color:#3fbe8e; }
+  .wd-tl-track{ position:relative; height:18px; border-radius:9px; background:rgba(255,255,255,.05); overflow:hidden; }
+  .wd-tl-b{ position:absolute; top:3px; bottom:3px; border-radius:6px; background:#e8a23d; }
+  .wd-tl-b.wd-tl-shooting{ background:#c58fff; } .wd-tl-b.wd-tl-live{ background:#3fbe8e; animation:wkBreathe 1.6s ease-in-out infinite; }
+  .wd-tl-axis{ display:flex; justify-content:space-between; font-size:10.5px; color:rgba(255,255,255,.35); margin-top:4px; }
+  .wd-cols{ display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  @media (max-width:760px){ .wd-cols{ grid-template-columns:1fr; } .wd-steps{ display:none; } }
+  .wd-done{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px; font-size:14px; color:rgba(255,255,255,.85); }
+  .wd-tom{ display:flex; flex-direction:column; gap:5px; font-size:14px; } .wd-tom b{ color:#ffc56b; margin-right:6px; } .wd-tom b.is-due{ color:#ff7a7a; }
+  .wd-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+  .wd-row{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); cursor:grab; }
+  .wd-row:first-child{ border-color:rgba(232,162,61,.5); background:rgba(232,162,61,.1); }
+  .wd-num{ flex:none; width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; background:rgba(255,255,255,.08); }
+  .wd-row:first-child .wd-num{ background:#e8a23d; color:#1a1206; }
+  .wd-title{ flex:1; min-width:0; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .wd-ctl{ border:none; background:transparent; color:rgba(255,255,255,.5); width:26px; height:26px; border-radius:8px; cursor:pointer; }
+  .wd-ctl:hover:not([disabled]){ background:rgba(255,255,255,.08); color:#fff; } .wd-ctl[disabled]{ opacity:.25; }
+  .wd-empty{ padding:18px; border-radius:14px; border:1px dashed rgba(255,255,255,.15); color:rgba(255,255,255,.55); text-align:center; }
+  .wd-add{ display:flex; gap:8px; margin-top:10px; } .wd-add .input{ flex:1; }
+  .wd-search{ width:100%; margin-bottom:8px; }
+  .wd-pool{ display:flex; flex-wrap:wrap; gap:6px; }
+  .wd-chip{ display:inline-flex; align-items:center; gap:6px; max-width:100%; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.03); color:rgba(255,255,255,.85); border-radius:999px; padding:5px 8px 5px 6px; cursor:pointer; font-size:13px; }
+  .wd-chip span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:260px; } .wd-chip b{ color:#8f9bff; }
+  .wd-chip:hover{ border-color:rgba(160,170,255,.6); }
+  .wd .input{ background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.14); color:#fff; }
+  .wd-note-input{ width:100%; min-height:150px; font-size:18px; line-height:1.5; padding:16px; }
+  .wd-notes{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+  .wd-note-item{ display:flex; gap:8px; align-items:flex-start; padding:12px 14px; border-radius:14px; background:rgba(126,140,255,.1); border:1px solid rgba(160,170,255,.2); font-size:16px; } .wd-note-item span{ flex:1; }
+  .wd-alarm{ text-align:center; } .wd-alarm .wd-sub{ margin:-6px 0 18px; }
+  .wd-time{ font-size:64px !important; text-align:center; background:transparent !important; border:none !important; color:#fff !important; width:auto; }
+  .wd-noalarm{ font-family:var(--font-display); font-size:30px; color:rgba(255,255,255,.6); padding:18px 0; }
+  .wd-sound{ margin-top:14px; color:rgba(255,255,255,.55); font-size:13px; }
+  .sleep-notes{ margin-top:14px; display:flex; flex-direction:column; gap:6px; font-style:italic; color:var(--text-dim); max-width:460px; }
+
+  /* ---- morning mode ---- */
+  .mm{ max-width:1000px; margin:0 auto; padding:10px 0 40px; }
+  .mm-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:18px; }
+  .mm-k{ font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+  .mm-greet{ font-family:var(--font-display); font-weight:800; font-size:clamp(30px, 4vw, 46px); letter-spacing:-.025em; margin-top:4px; }
+  .mm-sub{ color:var(--text-dim); margin-top:2px; }
+  .mm-note{ padding:18px 22px; border-radius:18px; background:linear-gradient(135deg, rgba(126,140,255,.14), rgba(255,170,90,.08)); border:1px solid rgba(160,170,255,.25); margin-bottom:16px; }
+  .mm-note .mm-k{ color:#9aa5ff; }
+  .mm-note-t{ font-family:var(--font-display); font-weight:700; font-size:clamp(18px, 2.2vw, 24px); line-height:1.35; margin-top:6px; white-space:pre-wrap; }
+  .mm-grid{ display:grid; grid-template-columns:1fr 1.3fr; gap:16px; }
+  @media (max-width:800px){ .mm-grid{ grid-template-columns:1fr; } }
+  .mm-card{ padding:16px 18px; border-radius:18px; background:var(--panel); border:1px solid var(--border); }
+  .mm-card-h{ display:flex; align-items:center; gap:8px; margin-bottom:12px; } .mm-card-h .kpi-sub{ margin-left:auto; }
+  .mm-edit{ border:none; background:transparent; color:var(--text-faint); cursor:pointer; font-size:12px; }
+  .mm-routine{ display:flex; flex-direction:column; gap:6px; }
+  .mm-r{ display:flex; align-items:center; gap:6px; }
+  .mm-r-main{ flex:1; display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:var(--panel-2); color:var(--text); font-size:15px; font-weight:600; cursor:pointer; text-align:left; font-family:var(--font-body); transition:background .15s, border-color .15s; }
+  .mm-r-main:hover{ border-color:var(--border-strong); }
+  .mm-tick{ width:22px; height:22px; border-radius:50%; border:2px solid var(--border-strong); display:inline-flex; align-items:center; justify-content:center; font-size:12px; color:#06120c; flex:none; transition:all .2s; }
+  .mm-r.is-on .mm-r-main{ border-color:rgba(63,190,142,.45); background:rgba(63,190,142,.08); }
+  .mm-r.is-on .mm-tick{ background:var(--good); border-color:var(--good); }
+  .mm-r.is-on .mm-r-main span:last-child{ opacity:.6; text-decoration:line-through; }
+  .mm-cta{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:20px; }
+  .mm-cta .brief-later{ color:var(--text); border-color:var(--border-strong); }
+
+  /* ---- client plan + deliverables in one block ---- */
+  .plan-block{ display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+  .plan-pkg{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding-bottom:10px; border-bottom:1px solid var(--border); }
+  .plan-pkg > *:nth-child(2){ flex:1; }
+  .plan-add{ font-size:12.5px; color:var(--accent); cursor:pointer; align-self:flex-start; }
+  .cc2-pkg{ display:flex; align-items:baseline; gap:8px; margin-bottom:4px; }
+  .cc2-pkg-n{ font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--good); }
+
+  /* ---- Today hero: sky as plain text, modes fill the row ---- */
+  .sky-chip.sky-text{ background:none !important; border:none !important; padding:0 !important; font-size:inherit !important; color:var(--text-dim); gap:6px; line-height:inherit; }
+  .sky-chip.sky-text::before{ content:'·'; color:var(--text-faint); margin-right:2px; }
+  .sky-chip.sky-text b{ color:var(--text-dim); font-weight:600; }
+  .sky-chip.sky-text .sky-chip-i{ font-size:1em; }
+  .th-modes{ display:grid !important; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:8px; width:100%; }
+  .th-mode{ display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:7px 10px; border-radius:12px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text-dim); font-size:12.5px; font-weight:600; cursor:pointer; font-family:var(--font-body); transition:background .15s, color .15s, border-color .15s; }
+  .th-mode:hover{ color:var(--text); border-color:var(--border-strong); background:rgba(var(--ink),.06); }
+  .th-mode:active{ transform:scale(.97); }
+  /* ---- Knock these out: numbered ---- */
+  .ko-num{ flex:none; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:11.5px; font-weight:800; background:var(--panel-2); border:1px solid var(--border-strong); color:var(--text-dim); margin-right:2px; }
+  .knock-out-list .task-item-v2:first-child .ko-num{ background:var(--accent); border-color:var(--accent); color:#1a1206; }
+  /* ---- Now / Up next: one card, two halves ---- */
+  .nn-panel.nn-stack{ gap:0; background:var(--panel); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+  .nn-stack .nn-cell{ border:none; border-radius:0; background:transparent; padding:16px 18px; justify-content:center; gap:8px; }
+  .nn-stack .nn-cell + .nn-cell{ border-top:1px solid var(--border); }
+  .nn-stack .nn-now.has-task{ background:rgba(63,190,142,.06); box-shadow:inset 3px 0 0 var(--good); }
+  .nn-stack .nn-next{ background:rgba(232,162,61,.03); }
+  .nn-stack .nn-k{ display:flex; align-items:center; gap:6px; font-size:10.5px; letter-spacing:.14em; }
+  .nn-stack .nn-k .qtip{ display:none; }
+  .nn-stack .nn-title{ font-size:16px; font-weight:700; }
+  .nn-stack .nn-empty{ font-size:15px; font-weight:600; color:var(--text-dim); }
+  .nn-stack .nn-hint{ font-size:12px; color:var(--text-faint); }
+  .nn-stack .nn-acts{ gap:6px; margin-top:2px; }
+  .nn-stack.nn-hero{ height:340px; }
+  body.is-dragging-task .nn-stack .nn-cell{ border-style:none; outline:1px dashed rgba(232,162,61,.6); outline-offset:-6px; border-radius:14px; }
+
+  .th-modecard{ display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:18px; margin-bottom:10px; background:linear-gradient(135deg, rgba(197,143,255,.22), rgba(197,143,255,.06)); border:1px solid rgba(197,143,255,.45); animation:brIn .35s cubic-bezier(.2,.8,.2,1); }
+  .th-modecard-i{ font-size:26px; }
+  .th-modecard-copy{ flex:1; display:flex; flex-direction:column; }
+  .th-modecard-k{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#d7b8ff; }
+  .th-modecard-t{ font-family:var(--font-display); font-size:30px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .th-modecard-end{ border-color:rgba(197,143,255,.5) !important; }
+  .lockin-cta.is-secondary{ padding:10px 14px; min-height:0; opacity:.85; }
+  .lockin-cta.is-secondary .lockin-icon{ width:34px; height:34px; font-size:16px; }
+  .lockin-cta.is-secondary .lockin-title{ font-size:15px; }
+  /* Business overview over a scene or video: each part sits on frosted glass so it reads */
+  body.has-scene .hq-top, body.has-scene .hq-cols, body.has-scene .hq-outreach{ background:rgba(12,14,22,.72); -webkit-backdrop-filter:blur(14px) saturate(1.1); backdrop-filter:blur(14px) saturate(1.1); border:1px solid rgba(255,255,255,.08); border-radius:20px; padding:22px 24px; }
+  body.has-scene .hq-cols{ border-top:1px solid rgba(255,255,255,.08); }
+  :root[data-theme="light"] body.has-scene .hq-top, :root[data-theme="light"] body.has-scene .hq-cols, :root[data-theme="light"] body.has-scene .hq-outreach{ background:rgba(244,246,250,.8); border-color:rgba(0,0,0,.06); }
+  body.has-scene .view-header .view-title, body.has-scene .tabs{ text-shadow:0 1px 2px rgba(0,0,0,.5); }
+
+  body.board-full .activity-pill, body.board-full .ap-menu, body.board-full .fab-add, body.board-full .quick-journal-fab, body.board-full #notifPanel, body.board-full .bulk-toolbar{ display:none !important; }
+
+  /* boards: an arrow cursor (not a grabbing hand); hand only while moving around */
+  .board-host, body.crosshair-cursor .board-host, body.crosshair-cursor .board-host *{ cursor:default; }
+  .board-host .bel, body.crosshair-cursor .board-host .bel{ cursor:default; }
+  .board-host .bel [contenteditable="true"]{ cursor:text !important; }
+  .board-host.is-space, .board-host.is-space *{ cursor:grab !important; }
+  .board-host.is-panning, .board-host.is-panning *{ cursor:grabbing !important; }
+  .board-host.is-dragging .bel{ cursor:grabbing !important; }
+  .board-lines .bline-hit{ cursor:pointer !important; stroke-width:26px; }
+  .bel-line-end{ width:20px !important; height:20px !important; margin:-10px 0 0 -10px !important; background:#fff !important; border:3px solid var(--accent) !important; box-shadow:0 0 0 4px rgba(232,162,61,.25); cursor:move !important; }
+  .bel.is-sel{ outline:2px solid var(--accent); outline-offset:3px; }
+  .bel-image.is-sel img{ filter:brightness(1.05); }
+  .board-marquee{ border:1px solid rgba(232,162,61,.9) !important; background:rgba(232,162,61,.12) !important; border-radius:4px; }
+  /* notes: bigger, crisp text */
+  .bel-body{ font-size:15px !important; line-height:1.5 !important; -webkit-font-smoothing:antialiased; }
+  .bel-title{ -webkit-font-smoothing:antialiased; }
+  .board-toolbar .board-tool{ min-width:34px; justify-content:center; font-size:15px; }
+  .board-pill-mini{ padding:6px !important; min-width:0 !important; } .board-pill-mini .board-pill-plus{ margin:0 !important; }
+
+  /* ---- Business → Inbox (GoHighLevel) ---- */
+  .tab-badge{ display:inline-block; margin-left:6px; min-width:18px; padding:0 5px; border-radius:999px; background:var(--danger); color:#fff; font-size:10.5px; font-weight:800; line-height:18px; text-align:center; }
+  .ib-bar{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .ib-badge{ display:inline-block; min-width:16px; padding:0 4px; border-radius:999px; background:var(--danger); color:#fff; font-size:10px; font-weight:800; line-height:16px; }
+  .ib-split{ display:grid; grid-template-columns:minmax(260px, 360px) 1fr; gap:14px; min-height:62vh; }
+  @media (max-width:900px){ .ib-split{ grid-template-columns:1fr; } }
+  .ib-list{ display:flex; flex-direction:column; gap:4px; background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:10px; max-height:72vh; overflow-y:auto; }
+  .ib-search{ width:100%; margin-bottom:6px; }
+  .ib-row{ display:flex; align-items:center; gap:10px; width:100%; padding:9px 10px; border-radius:12px; border:1px solid transparent; background:transparent; color:var(--text); cursor:pointer; text-align:left; font-family:var(--font-body); }
+  .ib-row:hover{ background:var(--panel-2); }
+  .ib-row.is-open{ background:rgba(232,162,61,.1); border-color:rgba(232,162,61,.35); }
+  .ib-crow{ padding:4px 6px 4px 4px; } .ib-row-main{ flex:1; min-width:0; display:flex; align-items:center; gap:10px; border:none; background:transparent; color:inherit; cursor:pointer; text-align:left; padding:5px 4px; font-family:var(--font-body); }
+  .ib-av{ flex:none; width:36px; height:36px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #2f8cff, #8f6bff); color:#fff; font-weight:800; font-size:13px; }
+  .ib-txt{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+  .ib-name{ display:flex; align-items:center; gap:6px; font-weight:600; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ib-tag{ font-size:9.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--good); border:1px solid rgba(63,190,142,.4); border-radius:5px; padding:0 4px; }
+  .ib-last{ font-size:12.5px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ib-row.is-unread .ib-name, .ib-row.is-unread .ib-last{ color:var(--text); font-weight:700; }
+  .ib-when{ flex:none; display:flex; flex-direction:column; align-items:flex-end; gap:4px; font-size:11px; color:var(--text-faint); }
+  .ib-dot{ width:9px; height:9px; border-radius:50%; background:#2f8cff; box-shadow:0 0 8px #2f8cff; }
+  .ib-pane{ background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:16px 18px; display:flex; flex-direction:column; min-width:0; }
+  .ib-pane .gp-thread{ max-height:none; flex:1; }
+  .ib-empty{ margin:auto; text-align:center; color:var(--text-dim); display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .ib-new{ display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:10px; margin:4px 0 8px; border:1px dashed var(--border-strong); border-radius:12px; }
+  .ib-new .btn{ grid-column:1 / -1; } .ib-new label{ grid-column:1 / -1; }
+  .sc-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px; }
+  .sc-card{ background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:16px 18px; }
+  .sc-k{ font-size:12px; color:var(--text-dim); font-weight:600; }
+  .sc-v{ font-family:var(--font-display); font-size:30px; font-weight:800; margin-top:4px; }
+  .sc-ch{ font-size:12px; font-weight:700; margin-top:2px; } .sc-ch.is-up{ color:var(--good); } .sc-ch.is-down{ color:var(--danger-text); }
+  .sc-spark{ width:100%; height:30px; margin-top:6px; } .sc-spark polyline{ fill:none; stroke:var(--accent); stroke-width:2; vector-effect:non-scaling-stroke; }
+
+  /* ---- Social panel ---- */
+  .sp-row{ display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:10px; }
+  .sp-tile{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:12px 14px; }
+  .sp-k{ font-size:11.5px; color:var(--text-dim); font-weight:600; }
+  .sp-v{ font-family:var(--font-display); font-size:24px; font-weight:800; margin-top:2px; }
+  .sp-tile .sc-spark{ height:22px; margin-top:4px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -2070,12 +2274,14 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
     <button class="nav-item" data-action="nav" data-view="calendar"><span class="nav-icon">&#9638;</span><span class="nav-label">Calendar</span></button>
     <button class="nav-item" data-action="nav" data-view="personal"><span class="nav-icon">&#9679;</span><span class="nav-label">Personal</span></button>
     <button class="nav-item" data-action="nav" data-view="settings"><span class="nav-icon">&#9881;</span><span class="nav-label">Settings</span></button>
-    <div class="sb-foot"><div id="musicPlayer"></div></div>
   </nav>
   <div id="notifPanel" class="notif-panel" hidden></div>
   <main class="main"><div id="viewRoot"></div></main>
 </div>
 <div id="toastContainer" class="toast-container"></div>
+<div id="windOverlay" class="overlay hidden wind-overlay">
+  <div id="windContent" class="wind-content"></div>
+</div>
 <div id="ghlOverlay" class="overlay hidden">
   <div class="card ghl-pane" id="ghlContent"></div>
 </div>
@@ -2413,7 +2619,7 @@ const PANEL_DEFS = [
   {id:'agenda', label:'Today — timeline of events, deadlines & alarms'},
   {id:'week', label:'This Week & Consistency — deep work per day + 6-month heatmap'},
   {id:'why', label:'Your Why'},
-  {id:'morningNote', label:'Note for the morning'}
+  {id:'social', label:'Social — followers, reach, engagement'}
 ];
 const SMALL_PANELS = ['focusMini', 'calendarMini']; // journal is full-width now that it sits near the top
 const MOODS = [
@@ -2461,6 +2667,7 @@ const MORPH_SKIP_ATTRS = { 'data-selected': true };
 // Classes scripts add at runtime (carousel arrows and edge fades). A re-render keeps them so
 // nothing blinks off for a frame; the carousel's own update corrects them right after.
 const MORPH_STICKY_CLASSES = ['can-prev', 'can-next', 'fade-l', 'fade-r', 'car-over'];
+const MORPH_FIELDS = 'input,textarea,select';
 function withStickyClasses(oldN, value){
   let v = value;
   for(let i=0;i<MORPH_STICKY_CLASSES.length;i++){ const c = MORPH_STICKY_CLASSES[i]; if(oldN.classList.contains(c) && (' '+v+' ').indexOf(' '+c+' ')<0) v += ' '+c; }
@@ -2538,6 +2745,11 @@ function morphNode(oldN, newN, opts){
     return;
   }
   if(oldN.nodeType!==1) return;
+  // Fast path: a section that's exactly the same (the browser compares it natively — far
+  // quicker than walking it here) is left alone. Not for anything holding form fields, whose
+  // live values still get synced below.
+  const tag0 = oldN.nodeName;
+  if(tag0!=='INPUT' && tag0!=='TEXTAREA' && tag0!=='SELECT' && oldN.isEqualNode(newN) && !(newN.firstElementChild && newN.querySelector(MORPH_FIELDS))) return;
   // Self-managed widgets (the board canvas) own their subtree; leave it untouched.
   if(oldN.hasAttribute('data-morph-ignore') && newN.getAttribute && newN.getAttribute('data-morph-ignore')===oldN.getAttribute('data-morph-ignore')) return;
   const tag = oldN.nodeName;
@@ -2999,7 +3211,7 @@ function skyChipHtml(){
   const parts = [SKY_META[phase].label];
   if(now) parts.push('<b>'+now.temp+'&deg;</b> '+escapeHtml(wxLabel(now.code).toLowerCase()));
   if(when) parts.push(when);
-  return '<span class="sky-chip" data-sky="'+phase+'" title="'+(now ? 'Feels like '+now.feels+'° · high '+now.hi+'° / low '+now.lo+'°'+(weatherCfg().place ? ' · '+escapeHtml(weatherCfg().place) : '') : 'Set a weather location in Settings → Display')+'">'+
+  return '<span class="sky-chip sky-text" data-sky="'+phase+'" title="'+(now ? 'Feels like '+now.feels+'° · high '+now.hi+'° / low '+now.lo+'°'+(weatherCfg().place ? ' · '+escapeHtml(weatherCfg().place) : '') : 'Set a weather location in Settings → Display')+'">'+
     '<span class="sky-chip-i">'+wxIcon(kind, phase)+'</span>'+parts.join(' &middot; ')+'</span>';
 }
 // ---- settings ----
@@ -3433,6 +3645,8 @@ function normalizeWake(f){
     media: (w.media && (w.media.ref || w.media.url || (w.media.type==='music' && w.media.q))) ? w.media : null,
     snoozeMinutes: Number(w.snoozeMinutes)>0 ? Number(w.snoozeMinutes) : 9,
     openIn: ['firefox','safari','chrome'].indexOf(w.openIn)>=0 ? w.openIn : 'firefox',
+    useMusic: w.useMusic===false ? false : true,
+    intro: w.intro==='cinematic' ? 'cinematic' : 'quick',
     lastFiredTs: Number(w.lastFiredTs)||0,
     armedAt: Number(w.armedAt)||Date.now()
   };
@@ -3792,6 +4006,14 @@ const SFX = {
   session: function(c, o, t){ [392, 523.3, 659.3, 784, 1046.5].forEach(function(f, i){ sfxPluck(c, o, t+i*0.08, f, 1.1, 0.06); }); },
   rest: function(c, o, t){ sfxPluck(c, o, t, 440, 0.7, 0.06, 'sine'); sfxPluck(c, o, t+0.12, 349.2, 0.9, 0.05, 'sine'); },
   journal: function(c, o, t){ sfxPluck(c, o, t, 740, 0.4, 0.06, 'sine'); sfxPluck(c, o, t+0.08, 1108.7, 0.5, 0.04, 'sine'); },
+  // locking in: a rising sweep that lands on a bright two-note chord
+  lockin: function(c, o, t){ sfxSweep(c, o, t, 110, 440, 0.45, 0.06); sfxSweep(c, o, t+0.05, 220, 880, 0.4, 0.03); sfxPluck(c, o, t+0.32, 659.3, 0.7, 0.07); sfxPluck(c, o, t+0.38, 987.8, 0.8, 0.06); sfxTap(c, o, t+0.3, 5200, 0.12); },
+  // hitting the day's standard / a goal: a little fanfare
+  fanfare: function(c, o, t){ [523.3, 659.3, 784, 1046.5].forEach(function(f, i){ sfxPluck(c, o, t+i*0.09, f, 0.5, 0.07); }); [784, 987.8, 1318.5].forEach(function(f){ sfxPluck(c, o, t+0.42, f, 1.4, 0.05, 'sine'); }); sfxTap(c, o, t+0.42, 6000, 0.1); },
+  // a new message: two quick glassy pings
+  ping: function(c, o, t){ sfxPluck(c, o, t, 1567.98, 0.25, 0.06, 'sine'); sfxPluck(c, o, t+0.11, 2093, 0.35, 0.05, 'sine'); },
+  // winding down: a low, warm chord that settles
+  night: function(c, o, t){ [130.8, 196, 261.6, 329.6].forEach(function(f, i){ sfxPluck(c, o, t+i*0.16, f, 2.4, 0.05, 'sine'); }); sfxSweep(c, o, t, 392, 196, 1.8, 0.025); },
   wake: function(c, o, t){ [261.6, 392, 523.3, 659.3, 784, 1046.5].forEach(function(f, i){ sfxPluck(c, o, t+i*0.13, f, 2.2, 0.055, i%2 ? 'sine' : 'triangle'); }); sfxSweep(c, o, t, 130.8, 261.6, 1.6, 0.04); }
 };
 function playSfx(name, classic){ if(soundPack()==='classic'){ if(classic) classic(); return; } sfx(SFX[name]); }
@@ -3804,6 +4026,10 @@ function playRestSound(){ playSfx('rest', function(){ tone([440,330], 0.3, 0.2);
 function playTaskComplete(){ playSfx('complete', function(){ tone([523,659,784,1046], 0.2, 0.4); }); }
 function playTaskAdded(){ playSfx('added', function(){ tone([880,1046], 0.1, 0.18); }); }
 function playJournalSound(){ playSfx('journal', function(){ tone([587,740], 0.16, 0.16); }); }
+function playLockIn(){ playSfx('lockin', function(){ tone([523,659], 0.18, 0.25); }); }
+function playFanfare(){ playSfx('fanfare', function(){ tone([523,659,784], 0.3, 0.3); }); }
+function playPing(){ playSfx('ping', function(){ tone([1200,1500], 0.08, 0.15); }); }
+function playNight(){ playSfx('night', function(){ tone([440,330], 0.3, 0.2); }); }
 function playWakeChime(){ playSfx('wake', function(){ tone([659,880], 0.2, 0.25); }); }
 function fmt12Hour(hm){
   if(!hm) return '';
@@ -4077,7 +4303,7 @@ function toggleStandard(id, dateStr){
   const idx = rec.doneIds.indexOf(id);
   if(idx>=0) rec.doneIds.splice(idx,1); else rec.doneIds.push(id);
   const nowAllDone = dayStandardsComplete(d);
-  if(!wasAllDone && nowAllDone) playSessionComplete(); else playTick();
+  if(!wasAllDone && nowAllDone) playFanfare(); else playTick();
   persist('standards'); renderView();
 }
 // A day can look "incomplete" purely because the manual standards checklist (e.g. "Stayed within
@@ -5076,7 +5302,7 @@ const PANEL_RENDERERS = {
   week: renderProgressPanel,
   heatmap: function(){ return ''; },
   why: renderWhyPanel,
-  morningNote: function(){ return renderMorningNotePanel(); }
+  social: function(){ return renderSocialPanel(); }
 };
 function clientOpsDeliverableRow(clientId, d){
   return recurringDeliverableRowHtml(clientId, d, false);
@@ -5352,7 +5578,7 @@ ACTIONS.goalSetNumber = function(el, e, id){
   if(v==null) return;
   const n = Number(String(v).replace(/[^0-9.\-]/g, '')); if(isNaN(n)) return;
   g.current = n;
-  if(g.target && g.current>=g.target && !g.done){ g.done = true; g.doneAt = todayStr(); playSessionComplete(); showToast('Goal reached: '+goalTitle(g), {icon:'&#127942;'}); }
+  if(g.target && g.current>=g.target && !g.done){ g.done = true; g.doneAt = todayStr(); playFanfare(); showToast('Goal reached: '+goalTitle(g), {icon:'&#127942;'}); }
   else playTick();
   persist('goals'); renderView();
 };
@@ -5360,7 +5586,7 @@ function fmtGoalNum(n, unit){ n = Number(n)||0; const s = n.toLocaleString(undef
 ACTIONS.goalStep = function(el, e, id){
   const g = state.goals.items.find(function(x){ return x.id===id; }); if(!g) return;
   g.current = Math.max(0, (Number(g.current)||0) + Number(el.dataset.delta||1));
-  if(g.target && g.current>=g.target && !g.done){ g.done = true; playSessionComplete(); showToast('Goal reached: '+g.label, {icon:'&#127942;'}); }
+  if(g.target && g.current>=g.target && !g.done){ g.done = true; playFanfare(); showToast('Goal reached: '+g.label, {icon:'&#127942;'}); }
   else playTick();
   persist('goals'); renderView();
 };
@@ -5639,12 +5865,12 @@ function renderOffTimeView(){
     '<button class="btn" style="border-color:var(--border-strong);color:var(--text);margin-top:10px;" data-action="endMode">End Off-Time</button>'+
   '</div></div>';
 }
-function focusKnockOutRow(t){
+function focusKnockOutRow(t, num){
   const isCurrent = ui.currentTaskId===t.id;
   const isPending = ui.pendingCurrentTaskId===t.id;
   return '<div class="task-item-v2'+(isCurrent?' is-current-task':'')+(isPending?' is-pending-task':'')+(justCompletedTaskId===t.id?' just-completed':'')+'" draggable="true" data-task-id="'+t.id+'" title="'+(isCurrent?'This is your current task':(isPending?'Waiting to be confirmed in Next Task':'Click to queue as Next Task'))+'">'+
     '<div style="flex:1;min-width:140px;'+(isCurrent?'':'cursor:pointer;')+'" '+(isCurrent?'':'data-action="stagePendingCurrentTask" data-id="'+t.id+'"')+'>'+
-      '<div class="task-title-row">'+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-ongoing" style="margin-left:6px;">&#128204;</span>':'')+'</div>'+
+      '<div class="task-title-row">'+(num ? '<span class="ko-num">'+num+'</span>' : '')+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-ongoing" style="margin-left:6px;">&#128204;</span>':'')+'</div>'+
       (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     '</div>'+
     clientTagsHtml(t.clients)+
@@ -5711,7 +5937,6 @@ function renderTodayFocusMode(p){
       '<div id="liveClockBig" class="cal-big-clock" style="font-size:38px;margin-top:6px;"></div>'+
       renderMiniCalendarStrip()
     ) : '<div class="view-sub" id="liveClock"></div>')+
-    renderNowNextBar()+
   '</div>'+
   lockedLayoutToolbarHtml()+
   lockedBlocksHtml({backlog:backlog, doneToday:doneToday, deepWorkToday:deepWorkToday, todayNotices:todayNotices, activeClients:activeClients});
@@ -5722,7 +5947,7 @@ function renderToday(){
   // left you staring at the "Taking today off" screen. The day stays marked as a rest day.
   if(state.focus.activeSession) return renderTodayFocusMode(p);
   if(isDayOff(todayStr())) return renderDayOffView();
-  if(state.modes.active && state.modes.active.type==='offtime') return state.modes.active.sleep ? renderSleepView() : renderOffTimeView();
+  if(state.modes.active && state.modes.active.type==='offtime') return state.modes.active.sleep ? renderSleepView() : state.modes.active.morning ? renderMorningView() : renderOffTimeView();
   const hour = new Date().getHours();
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
   const order = arr(state.dashboardPanels.order);
@@ -5776,7 +6001,13 @@ function renderTodayHero(greeting){
       '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: streak===0 ? 'Hit today\'s standard to start one'+tip('The streak counts days in a row you hit Today\'s Standard — the deep-work target plus your checklist. Rest days you take off don\'t break it.') : (allDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Hit today\'s standard to keep it')})+'</div>'+
     '</div>'+
     '<div class="th-right">'+
-      '<button class="lockin-cta" data-action="openLockInChooser" title="Lock in (L)">'+
+      // in Shooting (or another mode): show it, with its own clock and an End button
+      ((state.modes.active && state.modes.active.type!=='offtime') ? '<div class="th-modecard is-'+state.modes.active.type+'">'+
+          '<span class="th-modecard-i">'+modeIcon(state.modes.active.type)+'</span>'+
+          '<span class="th-modecard-copy"><span class="th-modecard-k">'+escapeHtml(MODE_LABELS[state.modes.active.type]||'Mode')+'</span><span class="th-modecard-t" id="modeElapsed">'+formatElapsed(Date.now()-state.modes.active.startedAt)+'</span></span>'+
+          '<button class="btn btn-sm th-modecard-end" data-action="endMode">End</button>'+
+        '</div>' : '')+
+      '<button class="lockin-cta'+(state.modes.active && state.modes.active.type!=='offtime' ? ' is-secondary' : '')+'" data-action="openLockInChooser" title="Lock in (L)">'+
         '<span class="lockin-icon">&#128274;</span>'+
         '<span class="lockin-copy"><span class="lockin-title">Lock in</span><span class="lockin-sub">'+(next ? 'Up next: '+escapeHtml(next.title) : 'Start a focus session')+'</span></span>'+
         '<span class="lockin-key">L</span>'+
@@ -5784,27 +6015,39 @@ function renderTodayHero(greeting){
       '<div class="th-actions">'+
         '<button class="th-btn" data-action="toggleNextPicker" data-where="hero"><span class="th-btn-i">&#128204;</span>'+(next ? 'Change next' : 'Pick next')+'</button>'+
         (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going — sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
-        (evening ? '<button class="th-btn th-btn-night'+(ui.windDownOpen?' is-open':'')+'" data-action="toggleWindDown"><span class="th-btn-i">&#127769;</span>Wind down<span class="th-caret">&#9662;</span></button>' : '')+
+        (evening ? '<button class="th-btn th-btn-night" data-action="openWindDown"><span class="th-btn-i">&#127769;</span>Wind down</button>' : '')+
       '</div>'+
       '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+holdModeBtnHtml('offtime', '&#127937;', 'Off-time')+dayOffButtonHtml()+'</div>'+
       nextPickerHtml('hero')+
-      (evening && ui.windDownOpen ? '<div class="wind-drop" data-key="wind-drop">'+windDownTilesHtml()+'</div>' : '')+
     '</div>'+
   '</div>';
 }
 ACTIONS.toggleWindDown = function(){ ui.windDownOpen = !ui.windDownOpen; ui.nextPicker = null; renderView(); };
 // ---- Take Today Off: hold to confirm (a click alone does nothing but explain) ----
 function dayOffButtonHtml(){
-  return '<button class="th-mode dayoff-btn" data-hold="dayoff" title="Hold to take today off">'+
-    '<span class="dayoff-fill"></span><span class="th-mode-i">&#127796;</span><span class="dayoff-label">Day off</span><span class="dayoff-hint">hold</span>'+
-  '</button>';
+  return '<button class="th-mode" data-action="quickDayOff" title="Take today off (you can undo)"><span class="th-mode-i">&#127796;</span><span>Day off</span></button>';
 }
 // Shooting / Off-time sit next to Day off as small pills — hold to start, so a stray click never flips you into a mode.
+// One click starts it; a toast offers Undo for a few seconds (the old hold-to-start looked like it did nothing).
 function holdModeBtnHtml(type, icon, label){
-  return '<button class="th-mode dayoff-btn th-mode-'+type+'" data-hold="mode" data-type="'+type+'" title="Hold to start '+label+'">'+
-    '<span class="dayoff-fill"></span><span class="th-mode-i">'+icon+'</span><span class="dayoff-label">'+label+'</span><span class="dayoff-hint">hold</span>'+
-  '</button>';
+  return '<button class="th-mode th-mode-'+type+'" data-action="quickMode" data-type="'+type+'" title="Start '+label+' (you can undo)"><span class="th-mode-i">'+icon+'</span><span>'+label+'</span></button>';
 }
+ACTIONS.quickMode = function(el){
+  const type = el.dataset.type, prev = state.modes.active ? Object.assign({}, state.modes.active) : null;
+  if(state.focus.activeSession){ showToast('Stop your session first.', {icon:'&#128274;'}); return; }
+  startMode(type);
+  ui.undoMode = {prev:prev, at:Date.now()};
+  showToast((MODE_LABELS[type]||'Mode')+' started.', {icon:modeIcon(type), actionLabel:'Undo', actionAction:'undoQuickMode', duration:6000});
+};
+ACTIONS.undoQuickMode = function(){
+  const u = ui.undoMode; ui.undoMode = null; if(!u || !state.modes.active) return;
+  state.modes.active = u.prev; persist('modes'); clearToasts(); renderView();
+};
+ACTIONS.quickDayOff = function(){
+  toggleDayOff();
+  showToast(isDayOff(todayStr()) ? 'Today is a rest day — the streak is safe. Enjoy it.' : 'Back on — today counts.', {icon:'&#127796;', actionLabel:'Undo', actionAction:'quickDayOffUndo', duration:6000});
+};
+ACTIONS.quickDayOffUndo = function(){ toggleDayOff(); clearToasts(); };
 let holdTimer = null, holdEl = null;
 function cancelHold(){ clearTimeout(holdTimer); holdTimer = null; if(holdEl) holdEl.classList.remove('holding'); holdEl = null; }
 document.addEventListener('pointerdown', function(e){
@@ -5968,12 +6211,14 @@ const LOCKED_BLOCKS = {
   goals:     {label:'Goals', render:function(){ return '<div>'+renderGoalsPanel()+'</div>'; }},
   week:      {label:'This week', render:function(){ return '<div>'+renderProgressPanel()+'</div>'; }},
   why:       {label:'Your why', render:function(){ return '<div>'+renderWhyPanel()+'</div>'; }},
-  morningNote: {label:'Note for the morning', render:function(){ return renderMorningNotePanel(); }},
+  social:    {label:'Social', render:function(){ const h = renderSocialPanel(); return h ? '<div>'+h+'</div>' : ''; }},
   tasks:     {label:'Today\'s tasks', render:function(){ return '<div>'+renderTodayTasksPanel()+'</div>'; }}
 };
-const LOCKED_DEFAULT = ['stats', 'timer', 'vision', 'standards', 'calendar', 'reachout', 'backlog', 'clients'];
+const LOCKED_DEFAULT = ['stats', 'timer', 'vision', 'standards', 'calendar', 'reachout', 'backlog', 'clients', 'social'];
 function lockedLayout(){
   const saved = state.profile.lockedLayout;
+  // the Social block joins a layout you'd already customized (once — remove it and it stays gone)
+  if(saved && Array.isArray(saved.order) && !saved.socialAdded){ if(saved.order.indexOf('social')<0) saved.order.push('social'); saved.socialAdded = true; }
   const order = (saved && Array.isArray(saved.order) ? saved.order : LOCKED_DEFAULT).filter(function(id){ return LOCKED_BLOCKS[id]; });
   if(order.indexOf('timer')<0) order.unshift('timer');
   return order;
@@ -6264,7 +6509,8 @@ function renderFocusTasksOverview(){
       (carouselOn() ? (function(){ const all = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; })); return carouselWrap(all.map(function(t){ return taskCard(t); }).join(''), 'soon', {w:236, loop:true, count:all.length}); })() : '<div class="task-card-grid">'+backlogPreview.map(function(t){ return taskCard(t); }).join('')+'</div>')+
     '</div>'
   ) : '')+
-  renderOngoingTasksPanel();
+  renderOngoingTasksPanel()+
+  renderSocialPanel();
 }
 function renderFocusBacklogTab(){
   const items = state.tasks.items;
@@ -6723,7 +6969,8 @@ function renderActiveFocusHero(big){
   const onBreak = !!active.onBreak;
   const elapsed = onBreak ? (active.frozenElapsedMs||0) : (Date.now()-active.startedAt);
   const pct = active.plannedMinutes ? clamp(Math.round((elapsed/60000/active.plannedMinutes)*100),0,100) : null;
-  const todayTasksForSession = state.tasks.items.filter(function(t){ return t.status==='today' && (!isOngoingDoneToday(t) || justCompletedTaskId===t.id); });
+  // in your order (the same order as Today's Lineup), numbered
+  const todayTasksForSession = lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today' && (!isOngoingDoneToday(t) || justCompletedTaskId===t.id); }));
   const sizeClass = big ? 'hero-num-xl' : 'hero-num-lg';
   const VISIBLE_TASK_LIMIT = 6;
 
@@ -6759,7 +7006,7 @@ function renderActiveFocusHero(big){
     '</div>'+
     '<div class="card knock-out-card" style="flex:'+(big?'1.8':'1.4')+';min-width:260px;">'+
       '<div class="section-title" style="margin-bottom:8px;">Knock These Out</div>'+
-      '<div class="task-list knock-out-list">'+(visibleTasks.map(focusKnockOutRow).join('') || '<div class="empty">Nothing queued for today — add one from Tasks.</div>')+'</div>'+
+      '<div class="task-list knock-out-list">'+(visibleTasks.map(function(t, i){ return focusKnockOutRow(t, i+1); }).join('') || '<div class="empty">Nothing queued for today — add one from Tasks.</div>')+'</div>'+
       (overflowCount>0 ? '<div class="row" style="justify-content:center;margin-top:8px;"><button class="btn btn-ghost btn-sm" data-action="goToFocusToday">See all '+todayTasksForSession.length+' tasks</button></div>' : '')+
     '</div>';
 }
@@ -7865,7 +8112,7 @@ function confirmStartFocus(){
   const minutes = ui.pendingFocusMinutes;
   closePreFocusModal();
   startFocus(minutes);
-  playStartChime();
+  playLockIn();
 }
 function renderLockInCard(){
   const active = state.modes.active;
@@ -9830,8 +10077,8 @@ function boardStripHtml(kind, current){
       '</button>';
     }).join('')+
     (master ? '' : '<button class="board-pill board-pill-new" data-action="boardNewVision"><span class="board-pill-plus">&#9733;</span><span class="board-pill-text"><span class="board-pill-name">Vision board</span><span class="board-pill-count">the one you wake up to</span></span></button>')+
-    '<button class="board-pill board-pill-new" data-action="boardNew" data-kind="'+kind+'"><span class="board-pill-plus">+</span><span class="board-pill-text"><span class="board-pill-name">New board</span></span></button>'+
-    '<button class="board-pill board-pill-new" data-action="boardImport"><span class="board-pill-plus">&#11014;</span><span class="board-pill-text"><span class="board-pill-name">Import boards</span><span class="board-pill-count">Milanote export, .md, images</span></span></button>'+
+    '<button class="board-pill board-pill-new board-pill-mini" data-action="boardNew" data-kind="'+kind+'" title="New board"><span class="board-pill-plus">+</span></button>'+
+    '<button class="board-pill board-pill-new board-pill-mini" data-action="boardImport" title="Import boards — a Milanote export, .md or images"><span class="board-pill-plus">&#11014;</span></button>'+
   '</div>';
 }
 function renderBoardShell(kind){
@@ -9865,21 +10112,21 @@ function renderBoardShell(kind){
           : (!b.parentId && !view ? '<button class="board-tool" data-action="boardMakeMaster" title="Make this the board you wake up to">&#9734; Make it my vision board</button>' : ''))+
       '</div>'+
       '<div class="row" style="gap:6px;position:relative;">'+
-        tool('boardBgToggle', '&#127912; Background', 'Change this board\'s background', ui.boardBgOpen ? ' data-on="1"' : '')+
+        tool('boardBgToggle', '&#127912;', 'Background', ui.boardBgOpen ? ' data-on="1"' : '')+
         (ui.boardBgOpen ? boardBgPickerHtml(b) : '')+
-        tool('boardToggleView', view?'&#9998; Edit':'&#128065; View', view?'Back to editing':'View mode — hide the editing tools')+
-        tool('boardFullscreen', full?(ui.boardReturnTo?'&#8592; Back':'&#10530; Exit full screen'):'&#9974; Full screen', full?(ui.boardReturnTo?'Back to where you were (Esc)':'Exit full screen (Esc)'):'Full screen')+
+        tool('boardToggleView', view?'&#9998;':'&#128065;', view?'Edit':'View only')+
+        tool('boardFullscreen', full?(ui.boardReturnTo?'&#8592; Back':'&#10530;'):'&#9974;', full?(ui.boardReturnTo?'Back to where you were (Esc)':'Exit full screen (Esc)'):'Full screen')+
       '</div>'+
     '</div>'+
     (view ? '' : '<div class="board-toolbar">'+
-      tool('boardAddNote','&#9645; Note','Add a note card')+
-      tool('boardAddLabel','&#9644; Label','Add a category card with a colored title bar')+
-      tool('boardAddList','&#9776; List','Add a list card')+
-      tool('boardAddImage','&#128444; Image','Upload images (or paste / drop them on the board)')+
-      tool('boardAddImageUrl','&#128279; Image URL','Add an image from a link')+
-      tool('boardAddNested','&#128203; Board','Add a board inside this one')+
-      tool('boardAddLine','&#9585; Line','Draw a line: click the start, then the end', cv.lineDraw && !cv.lineDraw.arrow ? ' data-on="1"' : '')+
-      tool('boardAddArrow','&#10140; Arrow','Draw an arrow: click where it starts, then where it points', cv.lineDraw && cv.lineDraw.arrow ? ' data-on="1"' : '')+
+      tool('boardAddNote','&#128221;','Note (or double-click the board)')+
+      tool('boardAddLabel','&#127991;&#65039;','Label — a card with a colored title')+
+      tool('boardAddList','&#9776;','List')+
+      tool('boardAddImage','&#128444;&#65039;','Image (or paste / drop one)')+
+      tool('boardAddImageUrl','&#128279;','Image from a link')+
+      tool('boardAddNested','&#128450;&#65039;','Board inside this one')+
+      tool('boardAddLine','&#9585;','Line — click the start, then the end', cv.lineDraw && !cv.lineDraw.arrow ? ' data-on="1"' : '')+
+      tool('boardAddArrow','&#10140;','Arrow — click the start, then where it points', cv.lineDraw && cv.lineDraw.arrow ? ' data-on="1"' : '')+
       '<span class="board-tool-sep"></span>'+
       BOARD_COLORS.map(function(c){ return '<button class="board-swatch" data-action="boardColor" data-kind="'+kind+'" data-id="'+c+'" style="background:'+c+'" title="Color selected"'+(selCount?'':' disabled')+'></button>'; }).join('')+
       '<span class="board-tool-sep"></span>'+
@@ -9893,10 +10140,10 @@ function renderBoardShell(kind){
       '<span class="board-tool-sep"></span>'+
       tool('boardZoomOut','&minus;','Zoom out')+
       tool('boardZoomIn','+','Zoom in')+
-      tool('boardFit','&#9974; Fit','Fit everything')+
-      tip('Drag the background to pan · scroll to move · Ctrl/⌘ + scroll to zoom · Shift + drag to select · double-click a card to edit · paste or drop images anywhere.', 'board-help')+
+      tool('boardFit','&#9974;','Fit everything')+
+      tip('Drag on empty space to select · Space + drag (or scroll) to move around · ⌘ + scroll to zoom · double-click to write · right-click for more.', 'board-help')+
       '<span style="flex:1"></span>'+
-      (!(masterVisionBoard() && b.id===masterVisionBoard().id) ? tool('boardDeleteBoard','Delete board','Delete this board (and boards inside it)') : '')+
+      (!(masterVisionBoard() && b.id===masterVisionBoard().id) ? tool('boardDeleteBoard','&#128465;&#65039;','Delete this board (and boards inside it)') : '')+
     '</div>')+
     '<div class="board-host" id="boardHost" data-photo-drop="board" data-morph-ignore="'+kind+':'+b.id+':'+(view?'v':'e')+(full?':f':'')+'"></div>'+
   '</div>';
@@ -9923,6 +10170,8 @@ function exitBoardFullscreen(){
   renderView();
 }
 document.addEventListener('fullscreenchange', function(){ if(!document.fullscreenElement && ui.boardFull){ ui.boardFull = null; if(ui.boardReturnTo){ boardReturnBack(); return; } renderView(); } });
+// full screen: nothing floats over the board (the activity pill, the + / journal buttons)
+afterRenderHooks.push(function(){ const on = !!ui.boardFull; if(document.body.classList.contains('board-full')!==on) document.body.classList.toggle('board-full', on); });
 // ---- mounting ----
 afterRenderHooks.push(function(){
   const host = document.getElementById('boardHost');
@@ -10062,9 +10311,26 @@ ACTIONS['drop:board'] = function(zone, files, e){
 };
 // ---- pointer interaction ----
 function elFromTarget(t){ const n = t.closest && t.closest('[data-el]'); return n ? n.getAttribute('data-el') : null; }
+let cvSpace = false;
+document.addEventListener('keydown', function(e){ if(e.code==='Space' && cv.host && !cv.editing && !(e.target && (e.target.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(e.target.nodeName)))){ if(!cvSpace){ cvSpace = true; cv.host.classList.add('is-space'); } e.preventDefault(); } });
+document.addEventListener('keyup', function(e){ if(e.code==='Space' && cvSpace){ cvSpace = false; if(cv.host) cv.host.classList.remove('is-space'); } });
+// the nearest end of a line, if the pointer is within reach of it (so you don't have to be precise)
+function lineEndNear(b, clientX, clientY, onlyId){
+  const r = cv.host.getBoundingClientRect(), z = b.viewport.zoom, reach = 16;
+  let best = null;
+  b.elements.forEach(function(x){
+    if(x.type!=='line' || (onlyId && x.id!==onlyId)) return;
+    ['1','2'].forEach(function(k){
+      const sx = r.left + b.viewport.x + x['x'+k]*z, sy = r.top + b.viewport.y + x['y'+k]*z;
+      const d = Math.hypot(sx-clientX, sy-clientY);
+      if(d<=reach && (!best || d<best.d)) best = {el:x, end:k, d:d};
+    });
+  });
+  return best;
+}
 function boardPointerDown(e){
   const b = cvBoard(); if(!b) return;
-  if(e.button===2) return;
+  if(e.button===2){ if(cv.lineDraw){ e.preventDefault(); cancelLineDraw(); } return; }
   if(cv.lineDraw){
     e.preventDefault();
     const pt = lineDrawPoint(e);
@@ -10078,8 +10344,12 @@ function boardPointerDown(e){
   }
   const start = {cx:e.clientX, cy:e.clientY};
   const handle = e.target.getAttribute && e.target.getAttribute('data-handle');
-  const lineEnd = e.target.getAttribute && e.target.getAttribute('data-line-end');
-  const elId = elFromTarget(e.target);
+  let lineEnd = e.target.getAttribute && e.target.getAttribute('data-line-end');
+  let elId = elFromTarget(e.target);
+  // grabbing near a line's end moves that end — the line needn't be selected first
+  if(!cv.view && !handle && !lineEnd && e.button===0 && !cvSpace){ const near = lineEndNear(b, e.clientX, e.clientY, elId && b.elements.some(function(x){ return x.id===elId && x.type==='line'; }) ? elId : null); if(near){ lineEnd = near.el.id+':'+near.end; cv.sel = new Set([near.el.id]); drawBoard(); } }
+  // pan: Space held, the middle button, or anything in View mode
+  if(cvSpace || e.button===1){ e.preventDefault(); cv.drag = {type:'pan', start:start, vx:b.viewport.x, vy:b.viewport.y, moved:false, el:null, pointerId:e.pointerId}; cv.host.classList.add('is-panning'); return; }
   if(!cv.view && handle){
     const el = b.elements.find(function(x){ return x.id===handle; });
     cv.drag = {type:'resize', el:el, w:el.w, h:el.h, start:start, moved:false, ratio: el.type==='image' ? el.h/Math.max(1,el.w) : null};
@@ -10094,8 +10364,9 @@ function boardPointerDown(e){
     b.elements.forEach(function(x){ if(cv.sel.has(x.id)) origins[x.id] = x.type==='line' ? {x1:x.x1,y1:x.y1,x2:x.x2,y2:x.y2} : {x:x.x, y:x.y}; });
     cv.drag = {type:'move', origins:origins, start:start, moved:false, selChanged:!wasSelected};
     drawBoard();
-  } else if(!cv.view && e.shiftKey){
-    cv.drag = {type:'marquee', start:start, moved:false, w0:screenToWorld(e.clientX, e.clientY)};
+  } else if(!cv.view){
+    // empty space: drag a box to select (Shift adds to what's selected)
+    cv.drag = {type:'marquee', start:start, moved:false, w0:screenToWorld(e.clientX, e.clientY), add:e.shiftKey, base:e.shiftKey ? new Set(cv.sel) : null};
   } else {
     cv.drag = {type:'pan', start:start, vx:b.viewport.x, vy:b.viewport.y, moved:false, el:elId};
   }
@@ -10138,10 +10409,12 @@ function boardPointerMove(e){
     cv.marquee.style.cssText = 'display:block;left:'+x+'px;top:'+y+'px;width:'+Math.abs(dx)+'px;height:'+Math.abs(dy)+'px;';
     const w1 = d.w0, w2 = screenToWorld(e.clientX, e.clientY);
     const minX = Math.min(w1.x,w2.x), maxX = Math.max(w1.x,w2.x), minY = Math.min(w1.y,w2.y), maxY = Math.max(w1.y,w2.y);
-    cv.sel = new Set(b.elements.filter(function(x){
-      if(x.type==='line') return Math.min(x.x1,x.x2)>=minX && Math.max(x.x1,x.x2)<=maxX && Math.min(x.y1,x.y2)>=minY && Math.max(x.y1,x.y2)<=maxY;
-      return x.x>=minX && x.x+x.w<=maxX && x.y>=minY && x.y+x.h<=maxY;
-    }).map(function(x){ return x.id; }));
+    const hit = b.elements.filter(function(x){
+      if(x.type==='line') return Math.max(x.x1,x.x2)>=minX && Math.min(x.x1,x.x2)<=maxX && Math.max(x.y1,x.y2)>=minY && Math.min(x.y1,x.y2)<=maxY;
+      const node = cv.els.querySelector('[data-el="'+x.id+'"]'), h = Math.max(x.h||0, node ? node.offsetHeight : 0);
+      return x.x+x.w>=minX && x.x<=maxX && x.y+h>=minY && x.y<=maxY;
+    }).map(function(x){ return x.id; });
+    cv.sel = new Set(d.base ? Array.from(d.base).concat(hit) : hit);
     drawBoard();
   }
 }
@@ -10151,7 +10424,8 @@ function boardPointerUp(e){
   if(cv.lineDraw && cv.lineDraw.down) cv.lineDraw.down = null;
   const d = cv.drag; if(!d) return;
   cv.drag = null;
-  cv.host.classList.remove('is-dragging');
+  cv.host.classList.remove('is-dragging', 'is-panning');
+  if(d.type==='marquee' && !d.moved){ if(cv.sel.size && !d.add){ cv.sel.clear(); drawBoard(); renderView(); } return; }
   if(cv.marquee) cv.marquee.style.display = 'none';
   const b = cvBoard(); if(!b) return;
   if(d.type==='pan'){
@@ -10211,7 +10485,17 @@ function fitBoard(){
 // ---- text editing ----
 function boardDblClick(e){
   const b = cvBoard(); if(!b) return;
-  const id = elFromTarget(e.target); if(!id) return;
+  let id = elFromTarget(e.target);
+  if(!id){
+    if(cv.view || cv.lineDraw) return;
+    const at = screenToWorld(e.clientX, e.clientY);
+    const el = addElement({type:'note', header:false, title:'', body:'', w:260, h:70}, {x:at.x+130, y:at.y+35});
+    if(!el) return;
+    el.x = Math.round(at.x); el.y = Math.round(at.y); drawBoard();
+    id = el.id;
+    const node0 = cv.els.querySelector('[data-el="'+id+'"]');
+    e = {target: node0 ? (node0.querySelector('[data-field="body"]') || node0) : e.target};
+  }
   const el = b.elements.find(function(x){ return x.id===id; }); if(!el) return;
   if(el.type==='board'){ openBoard(cv.kind, el.boardId); return; }
   if(cv.view || (el.type!=='note' && el.type!=='list')) return;
@@ -10310,7 +10594,7 @@ ACTIONS.boardToggleView = function(el){
   cv.sel.clear(); renderView();
 };
 function canvasAddNote(){ if(cvBoard()) ACTIONS.boardAddNote(); }
-ACTIONS.boardAddNote = function(){ addElement({type:'note', header:false, title:'', body:'Double-click to write', w:220, h:90}); };
+ACTIONS.boardAddNote = function(){ addElement({type:'note', header:false, title:'', body:'Double-click to write', w:260, h:96}); };
 ACTIONS.boardAddLabel = function(){ addElement({type:'note', header:true, color:BOARD_COLORS[Math.floor(Math.random()*6)], title:'Category', body:'One-line subtitle', w:260, h:96}); };
 ACTIONS.boardAddList = function(){ addElement({type:'list', title:'List', color:'#3a3f4d', items:[{id:uid(), text:'First thing'},{id:uid(), text:'Second thing'}], w:260, h:120}); };
 // Lines and arrows are drawn: pick the tool, click where it starts, then where it ends
@@ -10326,7 +10610,7 @@ function startLineDraw(arrow){
   drawBoard(); renderView();
 }
 function cancelLineDraw(){
-  cv.lineDraw = null;
+  cv.lineDraw = null; cv.drawCancelledAt = Date.now();
   if(cv.host){ cv.host.classList.remove('is-drawing'); setDrawHint(''); }
   const pv = cv.svg && cv.svg.querySelector('.bline-preview'); if(pv) pv.remove();
   renderView();
@@ -11167,8 +11451,10 @@ function renderBusiness(){
     '<div class="tab '+(ui.businessTab==='lifecycle'?'active':'')+'" data-action="businessTab" data-tab="lifecycle">Lifecycle</div>'+
     '<div class="tab '+(ui.businessTab==='packages'?'active':'')+'" data-action="businessTab" data-tab="packages">Packages</div>'+
     '<div class="tab '+(ui.businessTab==='finances'?'active':'')+'" data-action="businessTab" data-tab="finances">Finances</div>'+
+    '<div class="tab '+(ui.businessTab==='social'?'active':'')+'" data-action="businessTab" data-tab="social">Social</div>'+
+    '<div class="tab '+(ui.businessTab==='inbox'?'active':'')+'" data-action="businessTab" data-tab="inbox">Inbox'+(inboxUnread() ? '<span class="tab-badge">'+inboxUnread()+'</span>' : '')+'</div>'+
   '</div>'+
-  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
+  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : ui.businessTab==='inbox' ? renderInboxTab() : ui.businessTab==='social' ? renderSocialTab() : renderBusinessOverview())+'</div>';
 }
 // Business → Overview: one card — revenue on top, clients and pipeline side by side.
 function renderBusinessOverview(){
@@ -11570,11 +11856,13 @@ function renderClientModal(){
     '</div>'+
     renderClientLifecycle(c)+
     renderCrmBlock('client', c)+
-    '<div class="kpi-label" style="margin:16px 0 8px;">Deliverables<span class="kpi-sub" style="margin-left:6px;">'+pendingCount+' pending</span></div>'+
-    '<div class="task-list" style="margin-bottom:8px;">'+(deliverables.map(function(d){return deliverableRow(c.id,d);}).join('') || '<div class="empty">No deliverables yet — assign a package above, or add a one-off below.</div>')+'</div>'+
-    '<span style="display:inline-block;margin-bottom:16px;font-size:12.5px;color:var(--accent);cursor:pointer;" data-action="openCustomDeliverableDrawer" data-id="'+c.id+'">&#8618; Add custom deliverable</span>'+
-    '<div class="section-title" style="margin-bottom:8px;">Plan</div>'+
-    renderClientPackageField(c)+
+    // the plan and what it delivers, together in one block
+    '<div class="kpi-label" style="margin:16px 0 8px;">Plan &amp; deliverables<span class="kpi-sub" style="margin-left:6px;">'+pendingCount+' pending this week</span></div>'+
+    '<div class="card plan-block">'+
+      renderClientPackageField(c, true)+
+      '<div class="task-list plan-delivs">'+(deliverables.map(function(d){return deliverableRow(c.id,d);}).join('') || '<div class="empty">No deliverables yet — pick a package above, or add a one-off.</div>')+'</div>'+
+      '<span class="plan-add" data-action="openCustomDeliverableDrawer" data-id="'+c.id+'">&#43; Add a one-off deliverable</span>'+
+    '</div>'+
     '<div class="field" style="margin-bottom:16px;"><label>How we acquired them</label><div class="row" style="gap:6px;flex-wrap:wrap;">'+LEAD_SOURCES.map(function(s){ const active=c.leadSource===s.id; return '<span class="chip'+(active?' active':'')+'" data-action="setClientLeadSource" data-id="'+c.id+'" data-value="'+s.id+'">'+s.emoji+' '+s.label+'</span>'; }).join('')+'</div></div>'+
     clientBillingCycleFieldHtml(c)+
     '<div class="row" style="justify-content:center;margin-bottom:16px;"><button class="btn btn-ghost btn-sm" data-action="viewClientJournalFromModal" data-id="'+c.id+'">View Client Journal &rarr;</button></div>'+
@@ -11676,7 +11964,7 @@ function renderClientEventsSection(c){
       '</div>';
     }).join('')+'</div>';
 }
-function renderClientPackageField(c){
+function renderClientPackageField(c, inline){
   const packages = arr(state.business.packages);
   const assigned = c.packageId ? packages.find(function(x){return x.id===c.packageId;}) : null;
   const picking = ui.pickingPackageForClient === c.id;
@@ -11700,6 +11988,7 @@ function renderClientPackageField(c){
   } else {
     body = '<button class="btn btn-ghost btn-sm" data-action="pickPackageForClient" data-id="'+c.id+'">+ Set Package</button>';
   }
+  if(inline) return '<div class="plan-pkg"><span class="kind-label" style="margin:0;">Package</span>'+body+'</div>';
   return '<div class="field" style="margin-bottom:16px;"><label>Package</label><div class="card">'+body+'</div></div>';
 }
 function pickPackageForClient(id){ ui.pickingPackageForClient = id; renderClientModalInto(); }
@@ -13470,7 +13759,8 @@ function weekDotsHtml(done, target, pace){
 function clientDelivRowsHtml(c, compact){
   const recurring = arr(c.deliverables).filter(function(d){ return d.recurring; });
   if(!recurring.length) return '';
-  return '<div class="cc2-delivs">'+recurring.map(function(d){
+  const pkg = c.packageId ? arr(state.business.packages).find(function(x){ return x.id===c.packageId; }) : null;
+  return '<div class="cc2-delivs">'+(pkg ? '<div class="cc2-pkg"><span class="cc2-pkg-n">'+escapeHtml(pkg.name)+'</span>'+(pkg.price ? '<span class="kpi-sub">$'+Number(pkg.price).toLocaleString()+'/mo</span>' : '')+'</div>' : '')+recurring.map(function(d){
     const done = deliverableWeekCount(d), target = deliverableWeekNeed(d);
     const pace = deliverablePaceStatus(d);
     const today = arr(d.completedDates).indexOf(todayStr())>=0;
@@ -14247,6 +14537,7 @@ ACTIONS.applyNightPlan = function(){
 };
 ACTIONS.dismissNightPlan = function(){ const np = nightPlanForToday(); if(np){ np.dismissed = true; persist('focus'); renderView(); } };
 function renderMorningPlanCard(){
+  return ''; // last night's plan now lines itself up (see the day loop)
   const np = nightPlanForToday();
   if(!np || np.dismissed) return '';
   const tasks = arr(np.taskIds).map(function(id){ return state.tasks.items.find(function(t){ return t.id===id; }); }).filter(Boolean);
@@ -14266,7 +14557,6 @@ ACTIONS.startSleepMode = function(){
   if(state.focus.activeSession){ showToast('Stop your session first, then start Sleep mode.', {icon:'&#127769;'}); return; }
   startMode('offtime', {sleep:true, note:'Sleep'});
   ui.windDownOpen = false;
-  if(sessionsOn(todayStr()).length) openDayRecap(todayStr());
 };
 function renderSleepView(){
   const active = state.modes.active;
@@ -14282,7 +14572,8 @@ function renderSleepView(){
       '<button class="sleep-tile sleep-tile-btn" data-action="openWakeSetup"><div class="kpi-label">Wake-up</div>'+(nw ? '<div class="sleep-tile-val">'+fmt12Hour(nw.time)+'</div><div class="kpi-sub">'+morningLabel(nw.date)+' &middot; in '+untilLabel(nw.ts)+'</div>' : '<div class="sleep-tile-val">Not set</div><div class="kpi-sub">Tap to set it</div>')+'</button>'+
       '<button class="sleep-tile sleep-tile-btn" data-action="openNightPlan"><div class="kpi-label">'+(np?'Plan for '+morningLabel(np.date):'Tomorrow\'s plan')+'</div>'+(np ? '<div class="sleep-tile-val">'+npTasks.length+' task'+(npTasks.length===1?'':'s')+'</div><div class="kpi-sub">'+(np.note?escapeHtml(np.note.slice(0,70))+(np.note.length>70?'…':''):'no note')+'</div>' : '<div class="sleep-tile-val">Not planned</div><div class="kpi-sub">Tap to plan</div>')+'</button>'+
     '</div>'+
-    '<div class="sleep-note"><div class="kpi-label" style="text-align:left;">&#127769; Note for '+escapeHtml(morningLabel(morningNoteTarget()))+'</div>'+morningNoteBoxHtml('sleepNoteInput')+'</div>'+
+    (function(){ const ns = morningNotesFor(morningNoteTarget()); return ns.length ? '<div class="sleep-notes">'+ns.map(function(n){ return '<div>&ldquo;'+escapeHtml(n.text)+'&rdquo;</div>'; }).join('')+'</div>' : ''; })()+
+    '<div class="row" style="justify-content:center;margin-top:12px;"><button class="btn btn-ghost btn-sm" data-action="openWindDown" data-step="plan">&#9998; Plan &amp; note for '+escapeHtml(morningLabel(morningNoteTarget()))+'</button></div>'+
     '<div class="row" style="justify-content:center;margin-top:16px;gap:10px;">'+
       '<button class="btn" style="border-color:var(--border-strong);color:var(--text);" data-action="endMode">I\'m up</button>'+
     '</div>'+
@@ -14334,7 +14625,7 @@ function renderSettings(){
         '<div class="task-list">'+RESET_TARGETS.map(function(t){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+t.label+'</div>'+resetPartBtn(t)+'</div>'; }).join('')+'</div>'+
       '</div></div>',
 
-    display: themeSettingsHtml()+skyLookSettingsHtml()+'<div class="section"><div class="section-title">Music'+tip('A small Apple Music player at the bottom of the menu — what\'s playing, play/pause, skip, volume and your playlists. Works when Operator is opened from the Operator app.')+'</div><div class="card"><label class="row" style="gap:8px;font-size:13px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" id="setMusicPlayer" '+(state.profile.musicPlayer!==false?'checked':'')+'>Show the Apple Music player in the menu</label></div></div>'+sceneSettingsHtml()+weatherSettingsHtml()+cardLayoutSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
+    display: themeSettingsHtml()+skyLookSettingsHtml()+sceneSettingsHtml()+weatherSettingsHtml()+cardLayoutSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
         '<div class="row">'+SWATCHES.map(function(sw){ return '<span class="swatch '+(p.accentColor===sw?'sel':'')+'" style="background:'+sw+';" data-action="pickThemeColor" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Today Header Style</div>'+
@@ -15362,12 +15653,10 @@ function wakeImUp(){
   finishWakeMedia();
   wakeRing = null;
   if(!wasTest && state.modes.active && state.modes.active.sleep) finishActiveMode(true);
+  if(!wasTest && typeof applyNightPlanAuto==='function') applyNightPlanAuto();
   ui.wakeMode = 'brief'; ui.wakeBriefTest = !!wasTest; ui.wakeBoardBig = false; ui.wakeIntroDone = false;
   playWakeChime();
   renderWakeOverlayInto();
-  // after the intro has played, take it out (so re-renders don't replay it)
-  clearTimeout(ui._wakeIntroT);
-  ui._wakeIntroT = setTimeout(function(){ if(ui.wakeMode==='brief' && !ui.wakeIntroDone){ ui.wakeIntroDone = true; renderWakeOverlayInto(); } }, 3600);
 }
 function endBriefing(){
   ui.wakeMode = null;
@@ -15375,6 +15664,8 @@ function endBriefing(){
   ui.view = 'today';
   renderView();
 }
+// Start my morning: off the screen and into Morning mode (routine, note, plan) until you're ready to work.
+ACTIONS.wakeStartMorning = function(){ const t = ui.wakeBriefTest; endBriefing(); if(t){ showToast('Test done — this is where Morning mode starts.', {icon:'&#9728;&#65039;'}); return; } startMorning(); };
 ACTIONS.wakeBriefDone = function(){ const t = ui.wakeBriefTest; endBriefing(); showToast(t ? 'Test done — that\'s how your mornings will look.' : 'Let\'s get it.', {icon:'&#9728;&#65039;'}); };
 ACTIONS.wakeBriefLockIn = function(el, e, id){ endBriefing(); if(id) setNextUp(id); renderView(); openLockInChooser(); };
 ACTIONS.wakeBoardToggle = function(){ ui.wakeBoardBig = !ui.wakeBoardBig; renderWakeOverlayInto(); };
@@ -15410,6 +15701,7 @@ function wakeRingHtml(){
       '<div class="wk2-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test ? ' <span class="tag">TEST</span>' : '')+'</div>'+
       '<div class="wk2-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+'</div>'+
       '<div class="wk2-date">'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div>'+
+      (function(){ const ns = morningNotesFor(todayStr()); return ns.length ? '<div class="wk2-note">&ldquo;'+escapeHtml(ns[ns.length-1].text)+'&rdquo;<span>— you, last night</span></div>' : ''; })()+
       '<div class="wk2-actions">'+
         '<button class="wk2-up" data-action="wakeImUp"><span>&#9728;&#65039; I\'m up</span></button>'+
         '<button class="wk2-snooze" data-action="wakeSnooze">Snooze '+(w.snoozeMinutes||9)+' min</button>'+
@@ -15427,7 +15719,7 @@ function wakeBriefHtml(){
   const yDone = state.tasks.items.filter(function(t){ return t.completedAt===y; }).length;
   const yWork = typeof workoutDay==='function' ? workoutDay(y) : {n:0, m:0};
   const yStd = dayStandardsComplete(y);
-  const plan = wakeTodayPlan();
+  const plan = {note:'', tasks:todaysPlan().filter(function(t){ return t.status!=='done'; }).slice(0, 8)};
   const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a,c){ return (a.time||'').localeCompare(c.time||''); });
   const deadlines = state.tasks.items.filter(function(t){ return t.deadline===today && t.status!=='done'; });
   const why = arr(state.focus.motivations && state.focus.motivations.toward).slice(0, 3);
@@ -15438,17 +15730,24 @@ function wakeBriefHtml(){
   const vb = masterVisionBoard();
   // It opens like a phone starting up: one big "Good morning" fades in out of a blur, holds,
   // then lifts away and the briefing builds in underneath. Click to skip.
-  const intro = !ui.wakeIntroDone;
-  let d = intro ? 2700 : 0; const step = function(){ d += 90; return ' style="animation-delay:'+d+'ms"'; };
+  // The intro stays in the page and fades itself out (taking it out later re-built the briefing
+  // and played its entrance twice); skipping just flips a class.
+  const cine = wakeCfg().intro==='cinematic';
+  let d = cine ? 7000 : 2700; const step = function(){ d += 90; return ' style="animation-delay:'+d+'ms"'; };
   const stat = function(v, k, good){ return '<div class="br-stat'+(good?' is-good':'')+'"><div class="br-stat-v">'+v+'</div><div class="br-stat-k">'+k+'</div></div>'; };
-  return '<div class="brief'+(ui.wakeBoardBig?' board-open':'')+'">'+
-    (intro ? '<div class="brief-intro" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div><div class="bi-word">'+wakeGreeting()+'</div>'+(state.profile.name ? '<div class="bi-name">'+escapeHtml(state.profile.name)+'</div>' : '')+'</div>' : '')+
+  return '<div class="brief'+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+'">'+
+    (cine
+      ? '<div class="brief-intro is-cinematic" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div>'+
+          '<div class="bi-time">'+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+'</div>'+
+          '<div class="bi-word">'+wakeGreeting()+'</div>'+(state.profile.name ? '<div class="bi-name">'+escapeHtml(state.profile.name)+'</div>' : '')+
+          '<div class="bi-line">'+(wakeWeatherLine() ? wakeWeatherLine()+' &middot; ' : '')+'Let\'s get it.</div></div>'
+      : '<div class="brief-intro" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div><div class="bi-word">'+wakeGreeting()+'</div>'+(state.profile.name ? '<div class="bi-name">'+escapeHtml(state.profile.name)+'</div>' : '')+'</div>')+
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner">'+
       '<div class="brief-top"'+step()+'><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>Morning briefing</span><span class="brief-sys">All systems go</span></div>'+
       '<h1 class="brief-hello"'+step()+'>'+wakeGreeting()+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
       '<div class="brief-sub"'+step()+'>'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+' &middot; '+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div>'+
-      wakeMusicPillHtml()+
+      '<div class="brief-music-slot">'+wakeMusicPillHtml()+'</div>'+
       (notes.length ? '<section class="br-lastnight"'+step()+'><div class="br-k">&#127769; From last night</div>'+notes.map(function(t){ return '<div class="br-ln-text">'+escapeHtml(t)+'</div>'; }).join('')+'</section>' : '')+
       (vb && vb.elements.length ? '<section class="br-vision"'+step()+' data-action="wakeBoardToggle" title="Open your vision board">'+
           '<span class="br-vision-k">&#127775; Vision</span>'+boardStaticHtml(vb, 'wake-board')+'<span class="br-vision-hint">Click to open</span></section>' : '')+
@@ -15456,9 +15755,8 @@ function wakeBriefHtml(){
         '<section class="br-card"'+step()+'><div class="br-k">Yesterday</div><div class="br-stats">'+
           stat(fmtHours(yDeep), 'deep work', yDeep>=target)+stat(yDone, 'tasks done')+stat(yWork.n ? yWork.n+(yWork.m?' &middot; '+fmtDurationLabel(yWork.m):'') : '—', 'workouts', yWork.n>0)+stat(computeStreak()+'d', 'streak', yStd)+
         '</div><div class="br-line">'+(yStd ? '&#10003; You hit the standard — keep the run going.' : yDeep ? 'Short of the standard. Today\'s a clean slate.' : 'No deep work logged. Today we change that.')+'</div></section>'+
-        '<section class="br-card br-today"'+step()+'><div class="br-k">Today\'s plan</div>'+
-          (plan.note ? '<div class="br-note">'+escapeHtml(plan.note)+'</div>' : '')+
-          (plan.tasks.length ? '<ol class="br-list">'+plan.tasks.map(function(t, i){ return '<li'+(i===0?' class="is-first"':'')+'>'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span>'+(i===0?'<em>first up</em>':'')+'</li>'; }).join('')+'</ol>' : '<div class="br-line">Nothing lined up yet — pick your first move.</div>')+
+        '<section class="br-card br-today"'+step()+'><div class="br-k">Plan of attack</div>'+
+          (plan.tasks.length ? planListHtml(plan.tasks, 'is-dark') : '<div class="br-line">Nothing lined up yet — pick your first move.</div>')+
           ((events.length || deadlines.length) ? '<div class="br-k" style="margin-top:12px;">On the calendar</div><div class="br-agenda">'+
             events.map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('')+
             deadlines.map(function(t){ return '<div><b class="is-due">Due'+(t.deadlineTime ? ' '+fmt12Hour(t.deadlineTime) : '')+'</b> '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '')+
@@ -15468,8 +15766,9 @@ function wakeBriefHtml(){
         '</div>'+(why.length ? '<div class="br-k" style="margin-top:12px;">Why</div><div class="br-why">'+why.map(function(m){ return '<span>'+escapeHtml(m.text)+'</span>'; }).join('')+'</div>' : '')+'</section>'+
       '</div>'+
       '<div class="brief-cta"'+step()+'>'+
-        (first ? '<button class="brief-go" data-action="wakeBriefLockIn" data-id="'+first.id+'">&#128274; Lock in on &ldquo;'+escapeHtml(first.title)+'&rdquo;</button>' : '<button class="brief-go" data-action="wakeBriefLockIn">&#128274; Lock in</button>')+
-        '<button class="brief-later" data-action="wakeBriefDone">Let\'s go &rarr;</button>'+
+        '<button class="brief-go brief-morning" data-action="wakeStartMorning">&#9728;&#65039; Start my morning</button>'+
+        (first ? '<button class="brief-later" data-action="wakeBriefLockIn" data-id="'+first.id+'">&#128274; Lock in now on #1</button>' : '<button class="brief-later" data-action="wakeBriefLockIn">&#128274; Lock in now</button>')+
+        '<button class="brief-skip" data-action="wakeBriefDone">Close</button>'+
       '</div>'+
     '</div>'+
     (ui.wakeBoardBig && vb ? '<div class="br-vision-big" data-action="wakeBoardToggle" title="Close">'+boardStaticHtml(vb, 'wake-board')+'<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button></div>' : '')+
@@ -15537,6 +15836,7 @@ function renderWakeSetup(){
       '</div>' : '<div class="row" style="margin-top:8px;"><button class="btn btn-ghost btn-sm" data-action="wakePreviewSound">&#9654; Hear it</button></div>')+
     '</div>'+
     '<div class="ws-block grid grid-2">'+
+      '<div class="field"><label>Good morning intro</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.intro!=='cinematic'?' active':'')+'" data-action="wakeIntro" data-id="quick">Quick</button><button class="seg-tab'+(w.intro==='cinematic'?' active':'')+'" data-action="wakeIntro" data-id="cinematic">Cinematic</button></div></div>'+
       '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+
     '</div>'+
     '<div class="row" style="margin-top:18px;justify-content:space-between;gap:8px;flex-wrap:wrap;">'+
@@ -15560,6 +15860,7 @@ ACTIONS.wakeSkip = function(){
 };
 ACTIONS.wakeClearOverride = function(){ wakeCfg().override = null; wakeArm(); saveWake(); };
 ACTIONS.wakeSound = function(el, e, id){ const w = wakeCfg(); w.sound = id; w.useMusic = false; ui.wakeMusicOpen = false; stopWakeMedia(true); playAlarmSound(id); saveWake(); };
+ACTIONS.wakeIntro = function(el, e, id){ wakeCfg().intro = id==='cinematic' ? 'cinematic' : 'quick'; saveWake(); };
 ACTIONS.wakeBackupSound = function(el, e, id){ wakeCfg().sound = id; playAlarmSound(id); saveWake(); };
 ACTIONS.wakeUseMusic = function(){ const w = wakeCfg(); if(w.media) w.useMusic = true; ui.wakeMusicOpen = true; saveWake(); };
 ACTIONS.wakePreviewSound = function(){ playAlarmSound(wakeCfg().sound); };
@@ -15848,15 +16149,21 @@ function ridge(c, w, h, base, amp, R, col, rough){
   return pts;
 }
 function veil(c, w, h){ c.fillStyle = document.documentElement.getAttribute('data-theme')==='light' ? 'rgba(255,255,255,.10)' : 'rgba(4,6,12,.30)'; c.fillRect(0, 0, w, h); }
-function cloudSprite(size, tone){
-  const cv = document.createElement('canvas'); cv.width = size*2.4; cv.height = size;
+// A cloud: a soft shadow underneath, puffy lit tops, and a bright rim where the sun catches it.
+function cloudSprite(size, tone, lit){
+  const cv = document.createElement('canvas'); cv.width = Math.round(size*2.6); cv.height = Math.round(size*1.15);
   const c = cv.getContext('2d');
   const R = rng(size*7 + tone.length);
-  for(let i=0;i<9;i++){
-    const x = size*0.35 + R()*size*1.7, y = size*0.45 + R()*size*0.25, r = size*(0.18 + R()*0.22);
-    const g = c.createRadialGradient(x, y, 0, x, y, r);
-    g.addColorStop(0, tone); g.addColorStop(1, tone.replace(/[\d.]+\)$/, '0)'));
-    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI*2); c.fill();
+  const puffs = [];
+  for(let i=0;i<11;i++){ const t = i/10; puffs.push({x:size*(0.35 + t*1.9 + (R()-0.5)*0.2), y:size*(0.62 - Math.sin(t*Math.PI)*0.22 + R()*0.08), r:size*(0.16 + Math.sin(t*Math.PI)*0.2 + R()*0.08)}); }
+  const fade = function(col){ return col.replace(/[\d.]+\)$/, '0)'); };
+  if(lit){
+    // underside shadow
+    puffs.forEach(function(p){ const g = c.createRadialGradient(p.x, p.y + p.r*0.35, 0, p.x, p.y + p.r*0.35, p.r*1.05); g.addColorStop(0, 'rgba(120,140,170,.22)'); g.addColorStop(1, 'rgba(120,140,170,0)'); c.fillStyle = g; c.beginPath(); c.arc(p.x, p.y + p.r*0.35, p.r*1.05, 0, Math.PI*2); c.fill(); });
+  }
+  puffs.forEach(function(p){ const g = c.createRadialGradient(p.x, p.y - p.r*0.25, p.r*0.1, p.x, p.y, p.r); g.addColorStop(0, tone); g.addColorStop(1, fade(tone)); c.fillStyle = g; c.beginPath(); c.arc(p.x, p.y, p.r, 0, Math.PI*2); c.fill(); });
+  if(lit){
+    puffs.forEach(function(p){ const g = c.createRadialGradient(p.x - p.r*0.2, p.y - p.r*0.45, 0, p.x - p.r*0.2, p.y - p.r*0.45, p.r*0.55); g.addColorStop(0, lit); g.addColorStop(1, fade(lit)); c.fillStyle = g; c.beginPath(); c.arc(p.x - p.r*0.2, p.y - p.r*0.45, p.r*0.55, 0, Math.PI*2); c.fill(); });
   }
   return cv;
 }
@@ -16023,13 +16330,21 @@ const SCENE_DEFS = {
   }
 };
 // ---- moving parts ----
+// Clouds sit at different distances: far ones small, faint and slow near the horizon; near ones
+// big, bright and quicker — so the sky has depth as they drift (parallax).
 function cloudLayer(x, n, tone, alpha){
   const night = isDark(x.phase);
-  const col = tone==='dark' ? (night ? 'rgba(40,46,60,.9)' : 'rgba(110,118,132,.85)') : (night ? 'rgba(120,130,160,.35)' : (x.phase==='golden' ? 'rgba(255,214,190,.75)' : 'rgba(255,255,255,.8)'));
+  const col = tone==='dark' ? (night ? 'rgba(40,46,60,.9)' : 'rgba(110,118,132,.85)') : (night ? 'rgba(120,130,160,.35)' : (x.phase==='golden' ? 'rgba(255,206,184,.8)' : x.phase==='morning' ? 'rgba(255,244,236,.85)' : 'rgba(255,255,255,.88)'));
+  const lit = tone!=='dark' && !night ? (x.phase==='golden' ? 'rgba(255,236,190,.9)' : 'rgba(255,255,255,.95)') : null;
   const list = [];
-  for(let i=0;i<n;i++){ const size = x.h*(0.06 + Math.random()*0.08); list.push({img:cloudSprite(Math.round(size), col), x:Math.random()*x.w*1.2 - x.w*0.1, y:x.h*(0.04 + Math.random()*0.42), v:(4 + Math.random()*8)*(0.5 + size/x.h*4), a:(alpha||1)*(0.5 + Math.random()*0.5)}); }
-  return list;
+  for(let i=0;i<n;i++){
+    const z = 0.3 + 0.7*(i/(Math.max(1, n-1)))*Math.random() + 0.15*Math.random(), size = x.h*(0.04 + 0.11*z);
+    list.push({img:cloudSprite(Math.round(size), col, lit), z:z, x:Math.random()*x.w*1.2 - x.w*0.1, y:x.h*(0.48 - 0.42*z + Math.random()*0.08), v:(3 + 11*z)*(0.7 + Math.random()*0.5), a:(alpha||1)*(0.35 + 0.6*z)});
+  }
+  return list.sort(function(a, b){ return a.z - b.z; });
 }
+// slow-turning shafts of light from the sun (daytime, clear skies)
+function raysLayer(x){ const hy = x.h*0.92, o = celestial(x.w, hy); return o.sun ? {x:o.x, y:o.y, a:0, n:9, warm: x.phase==='golden' || x.phase==='morning' || x.phase==='dawn'} : null; }
 function dropLayer(x, n){ const l = []; for(let i=0;i<n;i++) l.push({x:Math.random()*x.w, y:Math.random()*x.h, v:600 + Math.random()*500, len:10 + Math.random()*14}); return l; }
 function flakeLayer(x, n){ const l = []; for(let i=0;i<n;i++){ const z = Math.random(); l.push({x:Math.random()*x.w, y:Math.random()*x.h, r:0.8 + z*2.4, v:18 + z*48, sway:Math.random()*Math.PI*2, a:0.35 + z*0.6}); } return l; }
 function petalLayer(x, n){ const l = []; for(let i=0;i<n;i++){ const z = Math.random(); l.push({x:Math.random()*x.w, y:Math.random()*x.h, s:2 + z*4, v:14 + z*30, rot:Math.random()*6, vr:(Math.random()-0.5)*2, sway:Math.random()*6}); } return l; }
@@ -16039,6 +16354,17 @@ function sceneTick(x, c, dt, t){
   const w = x.w, h = x.h;
   c.clearRect(0, 0, w, h);
   if(x.twinkle){ x.twinkle.forEach(function(s){ const a = 0.25 + 0.75*Math.max(0, Math.sin(t/1000*s.f + s.p)); c.fillStyle = 'rgba(255,255,255,'+a.toFixed(2)+')'; c.fillRect(s.x, s.y, s.s, s.s); }); }
+  if(x.rays){
+    const r = x.rays, L = Math.max(w, h)*1.2; r.a += dt*0.012;
+    c.save(); c.globalCompositeOperation = 'lighter'; c.translate(r.x, r.y);
+    for(let i=0;i<r.n;i++){
+      const ang = r.a + i*(Math.PI*2/r.n), spread = 0.07 + 0.04*Math.sin(t/4000 + i), al = 0.035 + 0.025*Math.sin(t/3000 + i*1.3);
+      const g = c.createLinearGradient(0, 0, Math.cos(ang)*L, Math.sin(ang)*L);
+      g.addColorStop(0, r.warm ? 'rgba(255,214,150,'+al.toFixed(3)+')' : 'rgba(255,250,225,'+al.toFixed(3)+')'); g.addColorStop(1, 'rgba(255,240,210,0)');
+      c.fillStyle = g; c.beginPath(); c.moveTo(0, 0); c.lineTo(Math.cos(ang-spread)*L, Math.sin(ang-spread)*L); c.lineTo(Math.cos(ang+spread)*L, Math.sin(ang+spread)*L); c.closePath(); c.fill();
+    }
+    c.restore();
+  }
   if(x.clouds){ x.clouds.forEach(function(k){ k.x += k.v*dt; if(k.x > w + 20) k.x = -k.img.width - Math.random()*80; c.globalAlpha = k.a; c.drawImage(k.img, k.x, k.y); }); c.globalAlpha = 1; }
   if(x.mist){ x.mist.x = (x.mist.x + dt*14) % (w*2); const g = c.createLinearGradient(0, h*0.62, 0, h*0.82); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, isDark(x.phase) ? 'rgba(120,135,170,.10)' : 'rgba(255,255,255,.18)'); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.fillRect(0, h*0.62, w, h*0.2); }
   if(x.rain){ c.strokeStyle = isDark(x.phase) ? 'rgba(170,190,230,.35)' : 'rgba(80,100,140,.35)'; c.lineWidth = 1; c.beginPath(); x.rain.forEach(function(d){ d.y += d.v*dt; d.x -= d.v*dt*0.12; if(d.y > h){ d.y = -d.len; d.x = Math.random()*w*1.1; } c.moveTo(d.x, d.y); c.lineTo(d.x + d.len*0.12, d.y - d.len); }); c.stroke(); }
@@ -16067,6 +16393,11 @@ function sceneBuild(){
   SCENE_DEFS[id].paint(c, x.w, x.h, x);
   SC.fx.width = x.w; SC.fx.height = x.h;
   SCENE_DEFS[id].init(x);
+  if(id!=='space' && !isDark(x.phase) && (x.wx==='clear' || x.wx==='partly')){
+    x.rays = raysLayer(x);
+    if(!x.birds) x.birds = {next:2500 + Math.random()*5000, list:[]};
+    if(id==='sky' && x.clouds && x.clouds.length < 6) x.clouds = x.clouds.concat(cloudLayer(x, 6 - x.clouds.length, 'soft')).sort(function(a, b){ return a.z - b.z; });
+  }
   SC.x = x; SC.key = id+'|'+x.phase+'|'+x.wx+'|'+document.documentElement.getAttribute('data-theme'); SC.builtAt = Date.now();
   sceneTick(x, SC.fx.getContext('2d'), 0, performance.now());
 }
@@ -16562,7 +16893,7 @@ async function ghlPullMessages(g, out, contacts){
   });
   const fresh = g.inbox.filter(function(m){ return !prev[m.contactId+':'+m.at]; });
   if(fresh.length && g.lastSync){
-    playPositive();
+    playPing();
     showToast(fresh.length===1 ? '&#128172; '+escapeHtml(fresh[0].name || 'Someone')+': '+escapeHtml(String(fresh[0].body||'').slice(0, 80)) : fresh.length+' new messages in GoHighLevel', {icon:'&#128172;', duration:7000, actionLabel:'Open', actionAction:fresh.length===1 ? 'openGhlContact' : 'toggleNotifs', actionId:fresh[0].contactId});
   }
   arr(r.conversations).forEach(function(cv){
@@ -16617,7 +16948,7 @@ function ghlSettingsHtml(){
     return '<div class="section"><div class="card ghl-card">'+head+
       '<ol class="ghl-steps">'+
         '<li>In GoHighLevel, open the sub-account &rarr; <b>Settings &rarr; Private Integrations</b> &rarr; <b>Create new integration</b>.</li>'+
-        '<li>Give it these scopes: <code>contacts.readonly</code> <code>contacts.write</code> <code>opportunities.readonly</code> <code>opportunities.write</code> <code>calendars.readonly</code> <code>calendars/events.readonly</code> <code>conversations.readonly</code> <code>conversations.write</code> <code>conversations/message.readonly</code> <code>conversations/message.write</code> <code>locations.readonly</code>.</li>'+
+        '<li>Give it these scopes: <code>contacts.readonly</code> <code>contacts.write</code> <code>opportunities.readonly</code> <code>opportunities.write</code> <code>calendars.readonly</code> <code>calendars/events.readonly</code> <code>conversations.readonly</code> <code>conversations.write</code> <code>conversations/message.readonly</code> <code>conversations/message.write</code> <code>locations.readonly</code> — and for social stats, <code>socialplanner/account.readonly</code> <code>socialplanner/stat.readonly</code>.</li>'+
         '<li>Copy the key it shows you, and your <b>Location ID</b> (Settings &rarr; Business Profile, or the part of the URL after <code>/location/</code>).</li>'+
       '</ol>'+bridge+
       '<div class="grid grid-2" style="margin-top:12px;">'+
@@ -16692,6 +17023,9 @@ async function ghlPushLocal(g, out){
 }
 // ---- the pane ----
 function ghlPane(){ return ui.ghlPane || null; }
+// what you've typed but not sent is kept, so a refresh never wipes it
+function ghlDraft(id){ const p = ghlPane(); return p && p.draft && p.draft[id] || ''; }
+document.addEventListener('input', function(e){ const t = e.target, p = ghlPane(); if(!p || !t || ['ghlMsg','ghlSubject','ghlNote'].indexOf(t.id)<0) return; p.draft = p.draft || {}; p.draft[t.id] = t.value; });
 ACTIONS.openGhlContact = function(el, e, id){
   if(e) e.stopPropagation();
   let kind = el && el.dataset ? el.dataset.kind : null, rec = null, cid = null;
@@ -16701,7 +17035,7 @@ ACTIONS.openGhlContact = function(el, e, id){
   showOverlay('ghlOverlay'); renderGhlPaneInto();
   if(cid) ghlLoadTab('contact').then(function(){ ghlLoadTab('messages'); });
 };
-ACTIONS.closeGhlPane = function(){ ui.ghlPane = null; hideOverlay('ghlOverlay'); renderView(); };
+ACTIONS.closeGhlPane = function(){ const inline = ui.ghlPane && ui.ghlPane.inline; ui.ghlPane = null; if(!inline) hideOverlay('ghlOverlay'); renderView(); };
 ACTIONS.ghlTab = function(el, e, id){ const p = ghlPane(); if(!p) return; p.tab = id; renderGhlPaneInto(); if(!p.data[id]) ghlLoadTab(id); };
 ACTIONS.ghlChannel = function(el, e, id){ const p = ghlPane(); if(!p) return; p.channel = id; renderGhlPaneInto(); };
 async function ghlLoadTab(tab){
@@ -16731,7 +17065,7 @@ async function ghlLoadTab(tab){
   p.loading[tab] = false;
   if(ghlPane()===p){ renderGhlPaneInto(); if(tab==='messages') ghlScrollThread(); }
 }
-function ghlScrollThread(){ requestAnimationFrame(function(){ const t = document.getElementById('ghlThread'); if(t) t.scrollTop = t.scrollHeight; }); }
+function ghlScrollThread(){ requestAnimationFrame(function(){ document.querySelectorAll('#ghlThread').forEach(function(t){ t.scrollTop = t.scrollHeight; }); }); }
 function ghlWhen(v){ const d = new Date(typeof v==='number' ? v : Date.parse(v)); if(isNaN(d)) return ''; return (todayStr(d)===todayStr() ? '' : fmtDateShort(todayStr(d))+' ')+d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}); }
 function ghlMsgType(m){ const t = String(m.messageType||m.type||''); return /EMAIL/i.test(t) ? 'Email' : /CALL/i.test(t) ? 'Call' : /FB|INSTAGRAM|IG/i.test(t) ? 'DM' : 'SMS'; }
 function ghlPaneHtml(){
@@ -16761,12 +17095,12 @@ function ghlPaneHtml(){
       }).join('') : '<div class="gp-loading">No messages yet — say hi.</div>')+'</div>'+
       '<div class="gp-compose">'+
         '<div class="seg-tabs seg-sm" style="margin:0;"><button class="seg-tab'+(p.channel==='SMS'?' active':'')+'" data-action="ghlChannel" data-id="SMS">Text</button><button class="seg-tab'+(p.channel==='Email'?' active':'')+'" data-action="ghlChannel" data-id="Email">Email</button></div>'+
-        (p.channel==='Email' ? '<input class="input" id="ghlSubject" placeholder="Subject">' : '')+
-        '<div class="gp-send-row"><textarea class="input" id="ghlMsg" rows="2" placeholder="'+(p.channel==='Email'?'Write an email…':'Write a text…')+' (⌘↵ to send)"></textarea><button class="btn btn-primary" data-action="ghlSend"'+(p.sending?' disabled':'')+'>'+(p.sending?'Sending…':'Send')+'</button></div>'+
+        (p.channel==='Email' ? '<input class="input" id="ghlSubject" placeholder="Subject" value="'+escapeHtml(ghlDraft('ghlSubject'))+'">' : '')+
+        '<div class="gp-send-row"><textarea class="input" id="ghlMsg" rows="2" placeholder="'+(p.channel==='Email'?'Write an email…':'Write a text…')+' (⌘↵ to send)">'+escapeHtml(ghlDraft('ghlMsg'))+'</textarea><button class="btn btn-primary" data-action="ghlSend"'+(p.sending?' disabled':'')+'>'+(p.sending?'Sending…':'Send')+'</button></div>'+
       '</div>';
   }
   else if(p.tab==='notes'){
-    body = '<div class="gp-add"><textarea class="input" id="ghlNote" rows="2" placeholder="Add a note…"></textarea><button class="btn btn-primary btn-sm" data-action="ghlAddNote">Add</button></div>'+
+    body = '<div class="gp-add"><textarea class="input" id="ghlNote" rows="2" placeholder="Add a note…">'+escapeHtml(ghlDraft('ghlNote'))+'</textarea><button class="btn btn-primary btn-sm" data-action="ghlAddNote">Add</button></div>'+
       '<div class="gp-list">'+(arr(p.data.notes).map(function(n){ return '<div class="gp-note"><div class="gp-note-b">'+escapeHtml(n.body||'')+'</div><div class="gp-meta">'+ghlWhen(n.dateAdded)+'</div></div>'; }).join('') || '<div class="gp-loading">No notes yet.</div>')+'</div>';
   }
   else if(p.tab==='tasks'){
@@ -16797,7 +17131,10 @@ function ghlPaneHtml(){
     (p.err ? '<div class="ghl-err">&#9888; '+escapeHtml(p.err)+'</div>' : '')+
     '<div class="gp-body">'+body+'</div>';
 }
-function renderGhlPaneInto(){ const el = document.getElementById('ghlContent'); if(el) morphInto(el, ghlPaneHtml(), {form:true}); }
+function renderGhlPaneInto(){
+  if(ui.ghlPane && ui.ghlPane.inline){ if(ui.view==='business' && ui.businessTab==='inbox') renderView(); return; }
+  const el = document.getElementById('ghlContent'); if(el) morphInto(el, ghlPaneHtml(), {form:true});
+}
 registerModal('ghlOverlay', renderGhlPaneInto);
 ACTIONS.ghlRefresh = function(){ const p = ghlPane(); if(!p) return; p.data = {}; ghlLoadTab('contact').then(function(){ ghlLoadTab(p.tab); }); };
 ACTIONS.ghlPushOne = async function(){
@@ -16825,7 +17162,7 @@ ACTIONS.ghlSend = async function(){
   try{
     await ghlCall('POST', '/conversations/messages', body);
     p.data.messages = arr(p.data.messages).concat([{direction:'outbound', body:text, messageType:p.channel==='Email'?'TYPE_EMAIL':'TYPE_SMS', dateAdded:new Date().toISOString()}]);
-    if(box) box.value = ''; if(subjEl) subjEl.value = '';
+    if(box) box.value = ''; if(subjEl) subjEl.value = ''; if(p.draft){ p.draft.ghlMsg = ''; p.draft.ghlSubject = ''; }
     ghlLogTouch(p, p.channel==='Email' ? 'email' : 'text', 'Sent from Operator');
     playTick(); p.err = null;
   }catch(e){ p.err = 'Couldn\'t send: '+e.message; }
@@ -16841,7 +17178,7 @@ ACTIONS.ghlAddNote = async function(){
   try{
     const r = await ghlCall('POST', '/contacts/'+encodeURIComponent(p.cid)+'/notes', {body:text});
     p.data.notes = [r.note || {body:text, dateAdded:new Date().toISOString()}].concat(arr(p.data.notes));
-    if(box) box.value = '';
+    if(box) box.value = ''; if(p.draft) p.draft.ghlNote = '';
     const rec = p.kind ? ghlRec(p.kind, p.id) : null; if(rec){ crmTimeline(rec, 'note', text); persist('business'); }
     p.err = null; playTick();
   }catch(e){ p.err = 'Couldn\'t save the note: '+e.message; }
@@ -16893,6 +17230,229 @@ function ghlPaneBtnHtml(kind, x){
   return '<button class="btn btn-ghost btn-sm gp-open" data-action="openGhlContact" data-kind="'+kind+'" data-id="'+x.id+'" title="Messages, notes, tasks and appointments in GoHighLevel">&#128172; '+(x.ghlContactId ? 'GoHighLevel' : 'Add to GHL')+'</button>';
 }
 
+// ============ BUSINESS → INBOX: GoHighLevel, inside Operator ============
+// Chats     — every conversation, newest first, unread on top; open one and reply right there.
+// Contacts  — everyone in GoHighLevel, searchable; open, edit, text/email, or make them a lead.
+// Social    — the last 7 days from GHL's Social Planner (followers, reach, impressions,
+//             engagement), with a "followers" goal of yours kept up to date from it.
+// It refreshes itself every 45 seconds while you're looking at it.
+function inboxState(){ if(!ui.inbox) ui.inbox = {mode:'chats', chats:null, contacts:null, social:null, q:'', cq:'', loading:{}, err:null, at:0}; return ui.inbox; }
+function inboxUnread(){ const g = state.settings && state.settings.ghl; return g && g.connected ? arr(g.inbox).length : 0; }
+function initialsOf(n){ return String(n||'?').trim().split(/\s+/).slice(0, 2).map(function(w){ return w[0] ? w[0].toUpperCase() : ''; }).join('') || '?'; }
+function ghlAgo(ts){ const t = typeof ts==='number' ? ts : Date.parse(ts); if(!t) return ''; const m = Math.round((Date.now()-t)/60000); return m<1 ? 'now' : m<60 ? m+'m' : m<1440 ? Math.round(m/60)+'h' : todayStr(new Date(t))===addDays(todayStr(), -1) ? 'yesterday' : fmtDateShort(todayStr(new Date(t))); }
+async function inboxLoad(what, quiet){
+  const s = inboxState(), g = ghlCfg(); if(!ghlOn()) return;
+  s.loading[what] = true; if(!quiet) renderView();
+  try{
+    if(what==='chats'){
+      const r = await ghlCall('GET', '/conversations/search?'+ghlQ({locationId:g.locationId, limit:60, sort:'desc', sortBy:'last_message_date', query:s.q||null}));
+      s.chats = arr(r.conversations);
+      // keep the bell honest
+      g.inbox = s.chats.filter(function(cv){ return cv.contactId && Number(cv.unreadCount)>0 && /in/i.test(cv.lastMessageDirection||''); }).map(function(cv){ return {contactId:cv.contactId, convId:cv.id, name:cv.fullName || cv.contactName || '', body:cv.lastMessageBody || '', at:Number(cv.lastMessageDate) || Date.parse(cv.lastMessageDate) || 0}; });
+    } else if(what==='contacts'){
+      let r;
+      try{ r = await ghlCall('POST', '/contacts/search', {locationId:g.locationId, pageLimit:100, query:s.cq||undefined}); }
+      catch(e){ r = await ghlCall('GET', '/contacts/?'+ghlQ({locationId:g.locationId, limit:100, query:s.cq||null})); }
+      s.contacts = arr(r.contacts);
+    } else if(what==='social'){
+      const acc = await ghlCall('GET', '/social-media-posting/'+encodeURIComponent(g.locationId)+'/accounts');
+      const list = arr((acc.results && acc.results.accounts) || acc.accounts || acc.results);
+      const ids = list.map(function(a){ return a.profileId || a.id || a._id; }).filter(Boolean);
+      s.socialAccounts = list;
+      if(!ids.length){ s.social = {empty:true}; g.socialCache = {at:Date.now(), data:{empty:true}}; }
+      else {
+        const st = await ghlCall('POST', '/social-media-posting/statistics?'+ghlQ({locationId:g.locationId}), {profileIds:ids});
+        s.social = st.results || st;
+        socialFeedGoals(s.social);
+        g.socialCache = {at:Date.now(), data:s.social};
+      }
+    }
+    s.err = null; s.at = Date.now();
+    persist('settings');
+  }catch(e){ s.err = e.message; if(what==='social' && /403|scope/i.test(e.message)) s.socialScope = true; }
+  s.loading[what] = false;
+  if(ui.view==='business' && (ui.businessTab==='inbox' || ui.businessTab==='social')) renderView(); else if(what==='social') renderView(); else notifBadge();
+}
+// keep a "followers" goal (e.g. "IG followers") in step with the real number
+function socialFeedGoals(st){
+  const f = st && st.platformTotals && st.platformTotals.followers; if(!f) return;
+  arr(state.goals && state.goals.items).forEach(function(gl){
+    if(gl.autoTrack || gl.done || !/follower/i.test(gl.label||'')) return;
+    const want = /insta|\big\b/i.test(gl.label) ? 'instagram' : /face|\bfb\b/i.test(gl.label) ? 'facebook' : /tiktok/i.test(gl.label) ? 'tiktok' : /youtube|\byt\b/i.test(gl.label) ? 'youtube' : /linkedin/i.test(gl.label) ? 'linkedin' : null;
+    const v = want ? (f[want] && f[want].total) : Object.keys(f).reduce(function(a, k){ return a + (Number(f[k].total)||0); }, 0);
+    if(v!=null && Number(v)!==Number(gl.current)){ gl.current = Number(v); gl.syncedFrom = 'ghl'; }
+  });
+  persist('goals');
+}
+let inboxTimer = null;
+function inboxTick(){
+  clearTimeout(inboxTimer);
+  inboxTimer = setTimeout(function(){
+    if(ui.view==='business' && ui.businessTab==='inbox' && !document.hidden && ghlOn()){ const s = inboxState(); if(s.mode!=='social') inboxLoad(s.mode, true); }
+    inboxTick();
+  }, 45000);
+}
+ACTIONS.inboxMode = function(el, e, id){ const s = inboxState(); s.mode = id; renderView(); if(!s[id] && !s.loading[id]) inboxLoad(id); };
+ACTIONS.inboxRefresh = function(){ inboxLoad(inboxState().mode); };
+ACTIONS.inboxOpen = function(el, e, id){
+  const r = ghlRecordForContact(id);
+  ui.ghlPane = {cid:id, kind:r ? r.kind : null, id:r ? r.x.id : null, tab:'messages', channel:'SMS', data:{}, loading:{}, err:null, inline:true};
+  renderView();
+  ghlLoadTab('contact').then(function(){ ghlLoadTab('messages').then(function(){ const s = inboxState(); arr(s.chats).forEach(function(cv){ if(cv.contactId===id) cv.unreadCount = 0; }); renderView(); }); });
+};
+document.addEventListener('input', function(e){
+  const t = e.target; if(!t) return;
+  if(t.id==='inboxQ'){ inboxState().q = t.value; clearTimeout(ui._inQ); ui._inQ = setTimeout(function(){ inboxLoad('chats', true); }, 350); }
+  if(t.id==='contactQ'){ inboxState().cq = t.value; clearTimeout(ui._inC); ui._inC = setTimeout(function(){ inboxLoad('contacts', true); }, 350); }
+});
+// a new contact (and, if you like, a lead here at the same time)
+ACTIONS.inboxNewContact = function(){ const s = inboxState(); s.adding = !s.adding; renderView(); };
+ACTIONS.inboxSaveContact = async function(){
+  const v = function(id){ const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const name = v('ncName'); if(!name) return;
+  const g = ghlCfg(), body = Object.assign({locationId:g.locationId, source:'Operator', email:v('ncEmail') || undefined, phone:v('ncPhone') || undefined, companyName:v('ncCompany') || undefined, name:name}, ghlSplitName(name));
+  try{
+    const r = await ghlCall('POST', '/contacts/upsert', body);
+    const c = r.contact || r;
+    const asLead = document.getElementById('ncLead');
+    if(asLead && asLead.checked && c && c.id){
+      const x = {id:uid(), name:name, company:v('ncCompany') || name, phone:v('ncPhone'), email:v('ncEmail'), notes:'', leadSource:null, stage:'lead', createdAt:todayStr(), touchpoints:[], timeline:[], files:[], cadenceDays:null, value:0, trade:'', nextFollowUp:null, stageHistory:[], convertedClientId:null, ghlContactId:c.id};
+      x.ghlSig = ghlSig(x);
+      crmTimeline(x, 'note', 'Added from the Inbox'); state.business.pipeline.push(x); persist('business');
+      ghlPushRecord('lead', x).catch(function(){});
+    }
+    inboxState().adding = false; playPositive(); showToast(name+' added to GoHighLevel.', {icon:'&#10003;'});
+    inboxLoad('contacts');
+  }catch(e){ inboxState().err = 'Couldn\'t add them: '+e.message; renderView(); }
+};
+ACTIONS.inboxMakeLead = function(el, e, id){
+  const c = arr(inboxState().contacts).find(function(x){ return x.id===id; }); if(!c) return;
+  const name = c.contactName || [c.firstName, c.lastName].filter(Boolean).join(' ') || c.email || 'Contact';
+  const x = {id:uid(), name:name, company:c.companyName || name, phone:c.phone || '', email:c.email || '', notes:'', leadSource:null, stage:'lead', createdAt:todayStr(), touchpoints:[], timeline:[], files:[], cadenceDays:null, value:0, trade:'', nextFollowUp:null, stageHistory:[], convertedClientId:null, ghlContactId:c.id};
+  x.ghlSig = ghlSig(x); crmTimeline(x, 'note', 'Added from GoHighLevel contacts');
+  state.business.pipeline.push(x); persist('business'); playTaskAdded();
+  ghlPushRecord('lead', x).catch(function(){});
+  showToast(name+' is a lead now.', {icon:'&#127919;', actionLabel:'Open', actionAction:'openProspectEditModal', actionId:x.id});
+  renderView();
+};
+function inboxChatsHtml(s){
+  const list = arr(s.chats).slice().sort(function(a, b){ return (Number(b.unreadCount)>0) - (Number(a.unreadCount)>0) || (Number(b.lastMessageDate)||Date.parse(b.lastMessageDate)||0) - (Number(a.lastMessageDate)||Date.parse(a.lastMessageDate)||0); });
+  const open = ui.ghlPane && ui.ghlPane.inline ? ui.ghlPane.cid : null;
+  return '<div class="ib-split">'+
+    '<div class="ib-list">'+
+      '<input class="input ib-search" id="inboxQ" placeholder="Search conversations…" value="'+escapeHtml(s.q||'')+'">'+
+      (s.chats==null ? '<div class="gp-loading">Loading your conversations…</div>' : list.length ? list.map(function(cv){
+        const name = cv.fullName || cv.contactName || cv.email || cv.phone || 'Someone', unread = Number(cv.unreadCount)>0, rec = ghlRecordForContact(cv.contactId);
+        return '<button class="ib-row'+(unread?' is-unread':'')+(open===cv.contactId?' is-open':'')+'" data-action="inboxOpen" data-id="'+escapeHtml(cv.contactId)+'">'+
+          '<span class="ib-av">'+escapeHtml(initialsOf(name))+'</span>'+
+          '<span class="ib-txt"><span class="ib-name">'+escapeHtml(name)+(rec ? '<span class="ib-tag">'+(rec.kind==='client'?'Client':'Lead')+'</span>' : '')+'</span><span class="ib-last">'+(/out/i.test(cv.lastMessageDirection||'') ? 'You: ' : '')+escapeHtml(String(cv.lastMessageBody||'').slice(0, 90))+'</span></span>'+
+          '<span class="ib-when">'+ghlAgo(cv.lastMessageDate)+(unread ? '<i class="ib-dot"></i>' : '')+'</span></button>';
+      }).join('') : '<div class="gp-loading">No conversations'+(s.q ? ' match' : ' yet')+'.</div>')+
+    '</div>'+
+    '<div class="ib-pane">'+(ui.ghlPane && ui.ghlPane.inline ? ghlPaneHtml() : '<div class="ib-empty"><div style="font-size:32px;">&#128172;</div>Pick a conversation to read and reply.</div>')+'</div>'+
+  '</div>';
+}
+function inboxContactsHtml(s){
+  const open = ui.ghlPane && ui.ghlPane.inline ? ui.ghlPane.cid : null;
+  return '<div class="ib-split">'+
+    '<div class="ib-list">'+
+      '<div class="row" style="gap:6px;"><input class="input ib-search" id="contactQ" placeholder="Search contacts…" value="'+escapeHtml(s.cq||'')+'" style="flex:1;"><button class="btn btn-primary btn-sm" data-action="inboxNewContact">'+(s.adding ? 'Cancel' : '+ New')+'</button></div>'+
+      (s.adding ? '<div class="ib-new"><input class="input" id="ncName" placeholder="Name"><input class="input" id="ncPhone" placeholder="Phone"><input class="input" id="ncEmail" placeholder="Email"><input class="input" id="ncCompany" placeholder="Company">'+
+        '<label class="kpi-sub" style="display:flex;gap:6px;align-items:center;"><input type="checkbox" id="ncLead" checked>Also a lead in Operator</label><button class="btn btn-good btn-sm" data-action="inboxSaveContact">Add to GoHighLevel</button></div>' : '')+
+      (s.contacts==null ? '<div class="gp-loading">Loading contacts…</div>' : s.contacts.length ? s.contacts.map(function(c){
+        const name = c.contactName || [c.firstName, c.lastName].filter(Boolean).join(' ') || c.email || c.phone || 'Contact', rec = ghlRecordForContact(c.id);
+        return '<div class="ib-row ib-crow'+(open===c.id?' is-open':'')+'"><button class="ib-row-main" data-action="inboxOpen" data-id="'+escapeHtml(c.id)+'"><span class="ib-av">'+escapeHtml(initialsOf(name))+'</span>'+
+          '<span class="ib-txt"><span class="ib-name">'+escapeHtml(name)+(rec ? '<span class="ib-tag">'+(rec.kind==='client'?'Client':'Lead')+'</span>' : '')+'</span><span class="ib-last">'+escapeHtml([c.companyName, c.phone, c.email].filter(Boolean).join(' · '))+'</span></span></button>'+
+          (rec ? '' : '<button class="btn btn-ghost btn-sm" data-action="inboxMakeLead" data-id="'+escapeHtml(c.id)+'" title="Track them as a lead here">+ Lead</button>')+'</div>';
+      }).join('') : '<div class="gp-loading">No contacts'+(s.cq ? ' match' : '')+'.</div>')+
+    '</div>'+
+    '<div class="ib-pane">'+(ui.ghlPane && ui.ghlPane.inline ? ghlPaneHtml() : '<div class="ib-empty"><div style="font-size:32px;">&#128101;</div>Pick someone to see everything about them.</div>')+'</div>'+
+  '</div>';
+}
+function socialMetric(label, block, icon){
+  if(!block) return '';
+  const total = block.total!=null ? block.total : Object.keys(block.platforms||{}).reduce(function(a, k){ return a + (Number(block.platforms[k].value)||0); }, 0);
+  const ch = Number(block.totalChange);
+  return '<div class="sc-card"><div class="sc-k">'+icon+' '+label+'</div><div class="sc-v">'+Number(total||0).toLocaleString()+'</div>'+
+    (isFinite(ch) && block.totalChange!=null ? '<div class="sc-ch '+(ch>=0?'is-up':'is-down')+'">'+(ch>=0?'&#9650; ':'&#9660; ')+Math.abs(ch).toFixed(ch%1?1:0)+'% vs last week</div>' : '')+
+  '</div>';
+}
+function sparkline(series){
+  const s = arr(series).map(Number); if(s.length<2) return '';
+  const max = Math.max.apply(null, s), min = Math.min.apply(null, s), w = 120, h = 30;
+  const pts = s.map(function(v, i){ return (i/(s.length-1)*w).toFixed(1)+','+(h - (max===min ? h/2 : (v-min)/(max-min)*h)).toFixed(1); }).join(' ');
+  return '<svg class="sc-spark" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><polyline points="'+pts+'"/></svg>';
+}
+function inboxSocialHtml(s){
+  if(s.loading.social && !s.social) return '<div class="gp-loading">Loading your social stats…</div>';
+  if(s.socialScope) return '<div class="ib-empty" style="padding:30px;"><div style="font-size:30px;">&#128202;</div><div>GoHighLevel needs two more permissions for this: <code>socialplanner/account.readonly</code> and <code>socialplanner/stat.readonly</code>.</div><div class="kpi-sub" style="margin-top:6px;">Add them to your Private Integration, then Disconnect and Connect again in Settings &rarr; Integrations.</div></div>';
+  if(!s.social) return '<div class="gp-loading">Loading your social stats…</div>';
+  if(s.social.empty) return '<div class="ib-empty" style="padding:30px;"><div style="font-size:30px;">&#128247;</div>No social accounts connected in GoHighLevel\'s Social Planner yet — connect Instagram, Facebook or TikTok there and they\'ll show up here.</div>';
+  const st = s.social, br = st.breakdowns || {}, f = st.platformTotals && st.platformTotals.followers || {};
+  const eng = br.engagement || {};
+  const engTotal = Object.keys(eng).reduce(function(a, k){ const x = eng[k]||{}; return a + (Number(x.likes)||0) + (Number(x.comments)||0) + (Number(x.shares)||0); }, 0);
+  return '<div class="sc">'+
+    '<div class="sc-grid">'+
+      Object.keys(f).map(function(k){ return '<div class="sc-card sc-plat"><div class="sc-k">'+escapeHtml(k[0].toUpperCase()+k.slice(1))+' followers</div><div class="sc-v">'+Number(f[k].total||0).toLocaleString()+'</div>'+sparkline(f[k].series)+'</div>'; }).join('')+
+      socialMetric('Reach', br.reach, '&#128065;')+socialMetric('Impressions', br.impressions, '&#128200;')+socialMetric('Posts', br.posts, '&#128221;')+
+      (engTotal ? '<div class="sc-card"><div class="sc-k">&#10084;&#65039; Engagement</div><div class="sc-v">'+engTotal.toLocaleString()+'</div><div class="kpi-sub">likes, comments &amp; shares</div></div>' : '')+
+    '</div>'+
+    '<div class="kpi-sub" style="margin-top:10px;">Last 7 days, from GoHighLevel\'s Social Planner. A goal with "followers" in its name (like "IG followers") stays updated from these numbers.</div>'+
+  '</div>';
+}
+function renderInboxTab(){
+  if(!ghlCfg().connected) return '<div class="ib-empty" style="padding:40px;"><div style="font-size:34px;">&#128172;</div><div class="section-title" style="justify-content:center;">Your GoHighLevel inbox, here</div><div class="kpi-sub" style="margin:6px auto 14px;max-width:420px;">Connect GoHighLevel and your conversations, contacts and social stats live in this tab — reply without leaving Operator.</div><button class="btn btn-primary" data-action="goToIntegrations">Connect GoHighLevel</button></div>';
+  const s = inboxState();
+  if(s.mode==='social') s.mode = 'chats';
+  if(s[s.mode]==null && !s.loading[s.mode]) setTimeout(function(){ inboxLoad(s.mode); }, 0);
+  if(!inboxTimer) inboxTick();
+  const tab = function(id, label, n){ return '<button class="seg-tab'+(s.mode===id?' active':'')+'" data-action="inboxMode" data-id="'+id+'">'+label+(n ? ' <span class="ib-badge">'+n+'</span>' : '')+'</button>'; };
+  return '<div class="ib">'+
+    '<div class="ib-bar"><div class="seg-tabs" style="margin:0;">'+tab('chats', '&#128172; Chats', inboxUnread())+tab('contacts', '&#128101; Contacts')+'</div>'+
+      '<span style="flex:1"></span>'+(s.at ? '<span class="kpi-sub">Updated '+ghlAgo(s.at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="inboxRefresh" title="Refresh">&#8635;</button></div>'+
+    (s.err ? '<div class="ghl-err">&#9888; '+escapeHtml(s.err)+'</div>' : '')+
+    (s.mode==='contacts' ? inboxContactsHtml(s) : inboxChatsHtml(s))+
+  '</div>';
+}
+ACTIONS.goToIntegrations = function(){ ui.view = 'settings'; ui.settingsTab = 'integrations'; renderView(); };
+
+// ---- Business → Social, and the Social panel (Focus, locked in, Today) ----
+function socialData(){ const s = inboxState(), g = ghlCfg(); return s.social || (g.socialCache && g.socialCache.data) || null; }
+function socialMaybeRefresh(maxAgeMs){
+  const s = inboxState(), g = ghlCfg();
+  if(!ghlOn() || s.loading.social) return;
+  const at = (g.socialCache && g.socialCache.at) || 0;
+  if(Date.now()-at > maxAgeMs) setTimeout(function(){ inboxLoad('social', true); }, 0);
+}
+function renderSocialTab(){
+  if(!ghlCfg().connected) return renderInboxTab();
+  const s = inboxState();
+  if(!s.social && g_social()) s.social = g_social();
+  socialMaybeRefresh(10*60000);
+  return '<div class="ib"><div class="ib-bar"><div class="section-title" style="margin:0;">Social &middot; last 7 days</div><span style="flex:1"></span>'+
+    (ghlCfg().socialCache ? '<span class="kpi-sub">Updated '+ghlAgo(ghlCfg().socialCache.at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="socialRefresh" title="Refresh">&#8635;</button></div>'+
+    (s.err && s.mode==='social' ? '<div class="ghl-err">&#9888; '+escapeHtml(s.err)+'</div>' : '')+inboxSocialHtml(s)+'</div>';
+}
+function g_social(){ const g = ghlCfg(); return g.socialCache && g.socialCache.data; }
+ACTIONS.socialRefresh = function(){ inboxLoad('social'); };
+ACTIONS.goToSocial = function(){ ui.view = 'business'; ui.businessTab = 'social'; renderView(); };
+function renderSocialPanel(){
+  if(!ghlOn()) return '';
+  socialMaybeRefresh(60*60000);
+  const d = socialData();
+  if(!d || d.empty) return '';
+  const br = d.breakdowns || {}, f = d.platformTotals && d.platformTotals.followers || {};
+  const eng = br.engagement || {}, engTotal = Object.keys(eng).reduce(function(a, k){ const x = eng[k]||{}; return a + (Number(x.likes)||0) + (Number(x.comments)||0) + (Number(x.shares)||0); }, 0);
+  const tile = function(k, v, ch, extra){ return '<div class="sp-tile"><div class="sp-k">'+k+'</div><div class="sp-v">'+Number(v||0).toLocaleString()+'</div>'+(ch!=null && isFinite(ch) ? '<div class="sc-ch '+(ch>=0?'is-up':'is-down')+'">'+(ch>=0?'&#9650; ':'&#9660; ')+Math.abs(ch).toFixed(ch%1?1:0)+'%</div>' : '')+(extra||'')+'</div>'; };
+  return '<div class="section social-panel"><div class="section-title">Social<span class="kpi-sub" style="margin-left:8px;">last 7 days</span><span class="view-all-link" data-action="goToSocial">More &rarr;</span></div>'+
+    '<div class="sp-row">'+
+      Object.keys(f).map(function(k){ return tile(escapeHtml(k[0].toUpperCase()+k.slice(1))+' followers', f[k].total, null, sparkline(f[k].series)); }).join('')+
+      (br.reach ? tile('Reach', br.reach.total, br.reach.totalChange) : '')+
+      (br.impressions ? tile('Impressions', br.impressions.total, br.impressions.totalChange) : '')+
+      (engTotal ? tile('Engagement', engTotal) : '')+
+    '</div></div>';
+}
+
 // ============ NOTE FOR THE MORNING ============
 // Something you tell yourself the night before — "call Mike first", "you said you'd be up at 6,
 // don't negotiate" — waiting for you when the alarm goes off. Jot one down any time from the
@@ -16935,87 +17495,6 @@ function renderMorningNotePanel(){
   return '<div class="section mn-panel"><div class="section-title">&#127769; Note for '+escapeHtml(morningLabel(target))+tip('Shows up first thing in your Good Morning briefing when the alarm goes off.')+'</div>'+
     '<div class="card">'+morningNoteBoxHtml('morningNoteInput')+'</div></div>';
 }
-
-// ============ APPLE MUSIC PLAYER (sidebar) ============
-// A small player at the bottom of the sidebar that drives the Music app on this Mac through the
-// Operator app (127.0.0.1:8935): what's playing, play/pause, skip, volume, and your playlists to
-// pick from — so music, like the wake-up song, never needs another window. It only shows when
-// the Operator app is there to talk to, and only asks what's playing while Operator is on screen.
-const MP = {now:null, at:0, helper:null, lists:null, timer:null, tick:null, open:false, failAt:0};
-function mpOn(){ return state.profile.musicPlayer!==false; }
-function mpUrl(path){ return WAKE_HELPER+'music/'+path; }
-async function mpPoll(){
-  if(!mpOn() || document.hidden){ return; }
-  if(MP.helper===false && Date.now()-MP.failAt < 60000) return;
-  const j = await helperFetch(mpUrl('now'), 3500, true);
-  if(!j){ MP.helper = false; MP.failAt = Date.now(); mpRender(); return; }
-  MP.helper = true; MP.now = j; MP.at = Date.now(); mpRender();
-}
-function mpStart(){
-  clearInterval(MP.timer); MP.timer = setInterval(mpPoll, 5000);
-  clearInterval(MP.tick); MP.tick = setInterval(mpTickBar, 1000);
-  setTimeout(mpPoll, 1200);
-}
-document.addEventListener('visibilitychange', function(){ if(!document.hidden) mpPoll(); });
-function mpPos(){
-  const n = MP.now; if(!n || !n.dur) return 0;
-  return Math.min(n.dur, (n.pos||0) + (n.state==='playing' ? (Date.now()-MP.at)/1000 : 0));
-}
-function mpFmt(s){ s = Math.max(0, Math.round(s)); return Math.floor(s/60)+':'+pad2(s%60); }
-function mpTickBar(){
-  const n = MP.now; if(!n || n.state!=='playing') return;
-  const bar = document.getElementById('mpBar'), t = document.getElementById('mpTime');
-  if(bar) bar.style.width = (n.dur ? mpPos()/n.dur*100 : 0).toFixed(1)+'%';
-  if(t) t.textContent = mpFmt(mpPos())+' / '+mpFmt(n.dur);
-}
-function mpHtml(){
-  if(!mpOn() || !MP.helper) return '';
-  const n = MP.now || {state:'off'};
-  const playing = n.state==='playing', has = n.state==='playing' || n.state==='paused';
-  const btn = function(c, icon, title, cls){ return '<button class="mp-btn'+(cls?' '+cls:'')+'" data-action="mpCmd" data-id="'+c+'" title="'+title+'">'+icon+'</button>'; };
-  return '<div class="mp'+(playing?' is-playing':'')+(MP.open?' is-open':'')+'">'+
-    '<div class="mp-top" data-action="mpToggle" title="'+(MP.open?'Hide':'Playlists & volume')+'">'+
-      '<span class="mp-art">'+(playing ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9835;')+'</span>'+
-      '<span class="mp-meta"><span class="mp-name">'+(has ? escapeHtml(n.name||'') : 'Apple Music')+'</span><span class="mp-artist">'+(has ? escapeHtml(n.artist||'') : 'Pick a playlist')+'</span></span>'+
-    '</div>'+
-    (has ? '<div class="mp-prog"><i id="mpBar" style="width:'+(n.dur ? mpPos()/n.dur*100 : 0).toFixed(1)+'%"></i></div>' : '')+
-    '<div class="mp-ctl">'+btn('prev', '&#9198;', 'Previous')+btn('playpause', playing ? '&#10073;&#10073;' : '&#9654;', playing ? 'Pause' : 'Play', 'mp-main')+btn('next', '&#9197;', 'Next')+
-      (has ? '<span class="mp-time" id="mpTime">'+mpFmt(mpPos())+' / '+mpFmt(n.dur||0)+'</span>' : '')+'</div>'+
-    (MP.open ? '<div class="mp-more">'+
-      '<label class="mp-vol"><span>&#128264;</span><input type="range" min="0" max="100" value="'+(n.vol||50)+'" id="mpVol"></label>'+
-      '<div class="mp-search"><input class="input" id="mpQuery" placeholder="Play a song or playlist…"></div>'+
-      '<div class="mp-lists">'+(MP.lists==null ? '<span class="kpi-sub">Loading playlists…</span>' : MP.lists.length ? MP.lists.map(function(l){ return '<button class="mp-list" data-action="mpPick" data-id="'+escapeHtml(l)+'">'+escapeHtml(l)+'</button>'; }).join('') : '<span class="kpi-sub">No playlists found.</span>')+'</div>'+
-    '</div>' : '')+
-  '</div>';
-}
-function mpRender(){ const el = document.getElementById('musicPlayer'); if(el) morphInto(el, mpHtml()); }
-ACTIONS.mpCmd = async function(el, e, id){
-  if(e) e.stopPropagation();
-  // feel instant: flip play/pause on screen right away
-  if(id==='playpause' && MP.now && (MP.now.state==='playing' || MP.now.state==='paused')){ MP.now.pos = mpPos(); MP.at = Date.now(); MP.now.state = MP.now.state==='playing' ? 'paused' : 'playing'; mpRender(); }
-  const j = await helperFetch(mpUrl('cmd?c='+id), 4000, true);
-  if(j){ MP.now = j; MP.at = Date.now(); mpRender(); }
-};
-ACTIONS.mpToggle = function(){
-  MP.open = !MP.open; mpRender();
-  if(MP.open && MP.lists==null) helperFetch(mpUrl('playlists'), 6000, true).then(function(j){ MP.lists = j && Array.isArray(j.lists) ? j.lists : []; mpRender(); });
-};
-async function mpPlay(name, kind){
-  const j = await helperFetch(mpUrl('pick?k='+(kind||'playlist')+'&q='+hexUtf8(name)), 8000, true);
-  if(j && j.state){ MP.now = j; MP.at = Date.now(); mpRender(); }
-  else showToast('Couldn\'t find "'+name+'" in your Music library.', {icon:'&#9835;'});
-}
-ACTIONS.mpPick = function(el, e, id){ mpPlay(id, 'playlist'); };
-document.addEventListener('keydown', function(e){
-  if(e.key==='Enter' && e.target && e.target.id==='mpQuery'){ e.preventDefault(); const v = e.target.value.trim(); if(v){ mpPlay(v, 'any'); e.target.value = ''; } }
-});
-let mpVolT = null;
-document.addEventListener('input', function(e){
-  if(e.target && e.target.id==='mpVol'){ const v = Math.round(Number(e.target.value)); if(MP.now) MP.now.vol = v; clearTimeout(mpVolT); mpVolT = setTimeout(function(){ helperFetch(mpUrl('vol?v='+v), 3000); }, 120); }
-});
-ACTIONS.setMusicPlayer = function(el){ state.profile.musicPlayer = !!el.checked; persist('profile'); if(mpOn()) mpPoll(); mpRender(); };
-document.addEventListener('change', function(e){ if(e.target && e.target.id==='setMusicPlayer') ACTIONS.setMusicPlayer(e.target); });
-afterRenderHooks.push(function(){ if(!MP.timer && typeof state!=='undefined' && state && state.profile) mpStart(); });
 
 // ============ NOTIFICATIONS ============
 // The bell next to "Operator." collects what needs you, worked out fresh from your data:
@@ -17144,6 +17623,272 @@ setInterval(function(){ if(typeof state!=='undefined' && state && state.tasks) n
 // old "hidden for today" marks don't need keeping
 function notifPrune(){ const d = notifDismissed(), t = todayStr(); Object.keys(d).forEach(function(k){ if(d[k] < addDays(t, -2)) delete d[k]; }); }
 setTimeout(function(){ try{ notifPrune(); }catch(e){} }, 5000);
+
+// ============ THE DAY LOOP ============
+// Night:   Wind down → a clean recap of today → your plan of attack for tomorrow (numbered, in
+//          order) → a note to wake up to → the alarm → Go to sleep.
+// Morning: the alarm (with last night's note right on it) → I'm up → Good morning → the briefing
+//          (yesterday, the note, today's plan) → Start my morning: a Morning mode with your
+//          routine (water, breakfast, shower…), the note and the plan, until you hit
+//          "I'm ready — lock in". Auto lock-in stays paused through sleep and the morning.
+// The plan you make at night lines itself up the next day — nothing to click.
+
+// ---------- wind down ----------
+function windTarget(){ return typeof wakeTargetDate==='function' ? wakeTargetDate() : addDays(todayStr(), 1); }
+function windTask(id){ return state.tasks.items.find(function(t){ return t.id===id && t.status!=='done'; }) || null; }
+function openWindDown(step){
+  const target = windTarget();
+  const np = state.focus.nightPlan && state.focus.nightPlan.date===target ? state.focus.nightPlan : null;
+  let plan = np ? arr(np.taskIds).filter(windTask) : [];
+  if(!plan.length) plan = lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); })).slice(0, 6).map(function(t){ return t.id; });
+  ui.wind = {step:step || 'recap', plan:plan, target:target, search:'', alarm:(wakeTimeFor(target) || ''), noAlarm:false};
+  ui.windDownOpen = false;
+  showOverlay('windOverlay'); renderWindInto(); playNight();
+}
+ACTIONS.openWindDown = function(el){ openWindDown(el && el.dataset && el.dataset.step); };
+ACTIONS.closeWindDown = function(){ windSave(false); ui.wind = null; hideOverlay('windOverlay'); renderView(); };
+ACTIONS.windStep = function(el, e, id){ windReadForm(); ui.wind.step = id; renderWindInto(); };
+const WIND_STEPS = [['recap','Today'],['plan','Plan of attack'],['note','Note'],['alarm','Alarm']];
+ACTIONS.windNext = function(){ windReadForm(); const i = WIND_STEPS.findIndex(function(s){ return s[0]===ui.wind.step; }); ui.wind.step = WIND_STEPS[Math.min(WIND_STEPS.length-1, i+1)][0]; renderWindInto(); };
+ACTIONS.windBack = function(){ windReadForm(); const i = WIND_STEPS.findIndex(function(s){ return s[0]===ui.wind.step; }); ui.wind.step = WIND_STEPS[Math.max(0, i-1)][0]; renderWindInto(); };
+function windReadForm(){
+  const w = ui.wind; if(!w) return;
+  const n = document.getElementById('windNote');
+  if(n && n.value.trim()){ addMorningNote(n.value); n.value = ''; }
+  const a = document.getElementById('windAlarm'); if(a) w.alarm = a.value;
+}
+// save the plan + alarm (and optionally go to sleep)
+function windSave(sleep){
+  const w = ui.wind; if(!w) return;
+  windReadForm();
+  const prev = state.focus.nightPlan;
+  if(prev && prev.alarmId) state.focus.alarms = state.focus.alarms.filter(function(x){ return x.id!==prev.alarmId; });
+  state.focus.nightPlan = {date:w.target, taskIds:w.plan.filter(windTask), note:'', alarmId:null, createdAt:Date.now(), applied:false, dismissed:false};
+  const wk = wakeCfg(), base = wakeBaseTimeFor(w.target), want = w.noAlarm ? null : (w.alarm || null);
+  if((want||null)!==(wakeTimeFor(w.target)||null)){
+    if(!want) wk.override = base ? {date:w.target, off:true} : null;
+    else if(want===base) wk.override = null;
+    else wk.override = {date:w.target, time:want};
+    wakeArm();
+  }
+  persist('focus');
+  if(sleep){
+    if(state.focus.activeSession){ showToast('Stop your session first, then go to sleep.', {icon:'&#127769;'}); return; }
+    ui.wind = null; hideOverlay('windOverlay');
+    startMode('offtime', {sleep:true, note:'Sleep'});
+    const t = wakeTimeFor(w.target);
+    showToast('Good night. '+(t ? 'Alarm '+fmt12Hour(t)+' '+morningLabel(w.target)+'.' : 'No alarm set.'), {icon:'&#127769;', duration:5000});
+  }
+}
+ACTIONS.windGoToSleep = function(){ windSave(true); };
+ACTIONS.windSaveOnly = function(){ windSave(false); ui.wind = null; hideOverlay('windOverlay'); renderView(); showToast('Tomorrow\'s plan is set.', {icon:'&#127769;'}); };
+// plan editing
+ACTIONS.windAdd = function(el, e, id){ const w = ui.wind; if(!w || w.plan.indexOf(id)>=0) return; w.plan.push(id); playTick(); renderWindInto(); };
+ACTIONS.windRemove = function(el, e, id){ const w = ui.wind; w.plan = w.plan.filter(function(x){ return x!==id; }); renderWindInto(); };
+ACTIONS.windMove = function(el, e, id){ const w = ui.wind, i = w.plan.indexOf(id), j = i + Number(el.dataset.dir); if(i<0 || j<0 || j>=w.plan.length) return; w.plan.splice(i, 1); w.plan.splice(j, 0, id); renderWindInto(); };
+ACTIONS.windNewTask = function(){
+  const inp = document.getElementById('windNewTask'), title = inp ? inp.value.trim() : ''; if(!title) return;
+  const t = {id:uid(), title:title, client:'personal', clients:['personal'], priority:'med', deadline:null, notes:'', status:'backlog', createdAt:todayStr(), completedAt:null};
+  state.tasks.items.push(t); persist('tasks');
+  ui.wind.plan.push(t.id); inp.value = ''; playTaskAdded(); renderWindInto();
+  setTimeout(function(){ const i = document.getElementById('windNewTask'); if(i) i.focus(); }, 20);
+};
+ACTIONS.windNoAlarm = function(){ windReadForm(); ui.wind.noAlarm = !ui.wind.noAlarm; renderWindInto(); };
+document.addEventListener('keydown', function(e){
+  if(e.key==='Enter' && e.target && e.target.id==='windNewTask'){ e.preventDefault(); ACTIONS.windNewTask(); }
+});
+document.addEventListener('input', function(e){ if(e.target && e.target.id==='windSearch' && ui.wind){ ui.wind.search = e.target.value; clearTimeout(ui._windT); ui._windT = setTimeout(renderWindInto, 120); } });
+// drag a row to reorder
+document.addEventListener('dragstart', function(e){ const r = e.target.closest && e.target.closest('.wd-row'); if(!r || !ui.wind) return; ui.wind.dragId = r.dataset.id; e.dataTransfer.effectAllowed = 'move'; try{ e.dataTransfer.setData('text/plain', 'wind'); }catch(err){} });
+document.addEventListener('dragover', function(e){ if(ui.wind && ui.wind.dragId && e.target.closest && e.target.closest('.wd-row')) e.preventDefault(); });
+document.addEventListener('drop', function(e){
+  const r = e.target.closest && e.target.closest('.wd-row'); if(!r || !ui.wind || !ui.wind.dragId) return;
+  e.preventDefault();
+  const w = ui.wind, from = w.plan.indexOf(w.dragId), rect = r.getBoundingClientRect();
+  let to = w.plan.indexOf(r.dataset.id); if(e.clientY > rect.top + rect.height/2) to++;
+  if(from<0 || to<0) return;
+  w.plan.splice(from, 1); if(to>from) to--; w.plan.splice(to, 0, w.dragId); w.dragId = null; renderWindInto();
+});
+// ---- the recap: today in numbers ----
+function dayTimelineHtml(date){
+  const list = sessionsOn(date), start = 6*60, end = 24*60, span = end-start;
+  const pct = function(ts){ const d = new Date(ts); return Math.max(0, Math.min(100, ((d.getHours()*60+d.getMinutes())-start)/span*100)); };
+  const blocks = list.map(function(s){ const a = pct(s.startedAt), b = pct(s.endedAt||Date.now()); return '<i class="wd-tl-b wd-tl-'+sessionType(s)+'" style="left:'+a.toFixed(2)+'%;width:'+Math.max(0.6, b-a).toFixed(2)+'%" title="'+fmtTimeShort(s.startedAt)+' – '+fmtTimeShort(s.endedAt||Date.now())+' · '+fmtDurationLabel(s.minutes||0)+'"></i>'; }).join('');
+  const as = state.focus.activeSession;
+  const live = as && date===todayStr() ? '<i class="wd-tl-b wd-tl-live" style="left:'+pct(as.startedAt).toFixed(2)+'%;width:'+Math.max(0.6, pct(Date.now())-pct(as.startedAt)).toFixed(2)+'%"></i>' : '';
+  return '<div class="wd-tl"><div class="wd-tl-track">'+blocks+live+'</div><div class="wd-tl-axis"><span>6a</span><span>9a</span><span>12p</span><span>3p</span><span>6p</span><span>9p</span><span>12a</span></div></div>';
+}
+function windRecapHtml(){
+  const d = todayStr(), target = state.standards.deepWorkTargetMinutes || 180;
+  const deep = deepWorkMinutesTodayLive(), pct = Math.min(100, deep/target*100);
+  const done = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===d; });
+  const sess = sessionsOn(d), longest = sess.reduce(function(m, s){ return Math.max(m, s.minutes||0); }, 0);
+  const wk = typeof workoutDay==='function' ? workoutDay(d) : {n:0, m:0};
+  const std = dayStandardsComplete(d), streak = computeStreak();
+  const delivs = arr(state.business.clients).reduce(function(n, c){ return n + arr(c.deliverables).reduce(function(m, x){ return m + arr(x.completedDates).filter(function(z){ return z===d; }).length; }, 0); }, 0);
+  const touches = arr(state.business.clients).reduce(function(n, c){ return n + arr(c.touches).filter(function(z){ return z===d; }).length; }, 0) + arr(state.business.pipeline).reduce(function(n, l){ return n + arr(l.touchpoints).filter(function(z){ return z.date===d; }).length; }, 0);
+  const left = state.tasks.items.filter(function(t){ return t.status==='today'; }).length;
+  const tom = windTarget();
+  const tomEvents = arr(state.calendar.events).filter(function(e){ return e.date===tom; }).sort(function(a, b){ return (a.time||'').localeCompare(b.time||''); });
+  const tomDue = state.tasks.items.filter(function(t){ return t.status!=='done' && t.deadline===tom; });
+  const R = 46, C = 2*Math.PI*R;
+  return '<div class="wd-recap">'+
+    '<div class="wd-hero">'+
+      '<div class="wd-ring"><svg viewBox="0 0 110 110"><circle cx="55" cy="55" r="'+R+'" class="wd-ring-bg"/><circle cx="55" cy="55" r="'+R+'" class="wd-ring-fg'+(deep>=target?' is-hit':'')+'" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+(C*(1-pct/100)).toFixed(1)+'"/></svg>'+
+        '<div class="wd-ring-c"><div class="wd-ring-v">'+fmtHours(deep)+'</div><div class="wd-ring-k">of '+fmtHours(target)+' deep work</div></div></div>'+
+      '<div class="wd-stats">'+
+        '<div class="wd-stat"><b>'+done.length+'</b><span>tasks done</span></div>'+
+        '<div class="wd-stat"><b>'+sess.length+'</b><span>session'+(sess.length===1?'':'s')+(longest ? ' · longest '+fmtDurationLabel(longest) : '')+'</span></div>'+
+        '<div class="wd-stat'+(std?' is-good':'')+'"><b>'+(std ? '&#10003;' : '&#10005;')+'</b><span>today\'s standard</span></div>'+
+        '<div class="wd-stat"><b>'+streak+'</b><span>day streak</span></div>'+
+        (wk.n ? '<div class="wd-stat is-good"><b>'+wk.n+'</b><span>workout'+(wk.n===1?'':'s')+(wk.m ? ' · '+fmtDurationLabel(wk.m) : '')+'</span></div>' : '')+
+        ((delivs || touches) ? '<div class="wd-stat"><b>'+(delivs+touches)+'</b><span>client moves ('+delivs+' delivered, '+touches+' touches)</span></div>' : '')+
+      '</div>'+
+    '</div>'+
+    '<div class="wd-k">When you worked</div>'+dayTimelineHtml(d)+
+    '<div class="wd-cols">'+
+      '<div><div class="wd-k">Done today</div>'+(done.length ? '<ul class="wd-done">'+done.slice(0, 8).map(function(t){ return '<li>&#10003; '+escapeHtml(t.title)+'</li>'; }).join('')+(done.length>8 ? '<li class="kpi-sub">+'+(done.length-8)+' more</li>' : '')+'</ul>' : '<div class="kpi-sub">Nothing ticked off today.</div>')+
+        (left ? '<div class="kpi-sub" style="margin-top:8px;">'+left+' still on today\'s list — carry them into tomorrow\'s plan.</div>' : '')+'</div>'+
+      '<div><div class="wd-k">Tomorrow</div>'+((tomEvents.length || tomDue.length) ? '<div class="wd-tom">'+tomEvents.map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('')+tomDue.map(function(t){ return '<div><b class="is-due">Due</b> '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '<div class="kpi-sub">Nothing on the calendar yet.</div>')+'</div>'+
+    '</div>'+
+    (typeof recapPendingCount==='function' && recapPendingCount() ? '<button class="btn btn-ghost btn-sm" style="margin-top:14px;" data-action="openDayRecap">Review today\'s sessions ('+recapPendingCount()+' to check)</button>' : '')+
+  '</div>';
+}
+function windPlanHtml(){
+  const w = ui.wind;
+  const rows = w.plan.map(windTask).filter(Boolean);
+  const q = (w.search||'').toLowerCase();
+  const pool = sortByPriorityAndDeadline(state.tasks.items.filter(function(t){ return (t.status==='today' || t.status==='backlog') && w.plan.indexOf(t.id)<0 && (!q || t.title.toLowerCase().indexOf(q)>=0); })).slice(0, 14);
+  return '<div class="wd-plan">'+
+    '<div class="wd-sub">In the order you\'ll do them. #1 is what you lock in on first.</div>'+
+    (rows.length ? '<ol class="wd-list">'+rows.map(function(t, i){
+      return '<li class="wd-row" draggable="true" data-id="'+t.id+'"><span class="wd-num">'+(i+1)+'</span>'+priorityTag(t.priority)+'<span class="wd-title">'+escapeHtml(t.title)+'</span>'+
+        '<button class="wd-ctl" data-action="windMove" data-id="'+t.id+'" data-dir="-1" title="Up"'+(i===0?' disabled':'')+'>&#8593;</button><button class="wd-ctl" data-action="windMove" data-id="'+t.id+'" data-dir="1" title="Down"'+(i===rows.length-1?' disabled':'')+'>&#8595;</button>'+
+        '<button class="wd-ctl wd-x" data-action="windRemove" data-id="'+t.id+'" title="Take it off">&#10005;</button></li>';
+    }).join('')+'</ol>' : '<div class="wd-empty">Nothing planned yet — add what matters most first.</div>')+
+    '<div class="wd-add"><input class="input" id="windNewTask" placeholder="+ A new task for tomorrow (Enter)"><button class="btn btn-sm" data-action="windNewTask">Add</button></div>'+
+    '<div class="wd-k" style="margin-top:16px;">From your list</div>'+
+    '<input class="input wd-search" id="windSearch" placeholder="Search…" value="'+escapeHtml(w.search||'')+'">'+
+    '<div class="wd-pool">'+(pool.length ? pool.map(function(t){ return '<button class="wd-chip" data-action="windAdd" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span><b>+</b></button>'; }).join('') : '<span class="kpi-sub">Nothing else on your lists.</span>')+'</div>'+
+  '</div>';
+}
+function windNoteHtml(){
+  const w = ui.wind, notes = morningNotesFor(w.target);
+  return '<div class="wd-note">'+
+    '<div class="wd-sub">Shows up on your alarm screen and at the top of tomorrow\'s briefing.</div>'+
+    (notes.length ? '<div class="wd-notes">'+notes.map(function(n){ return '<div class="wd-note-item"><span>&ldquo;'+escapeHtml(n.text)+'&rdquo;</span><button class="mn-x" data-action="removeMorningNote" data-id="'+n.id+'" title="Remove">&#10005;</button></div>'; }).join('')+'</div>' : '')+
+    '<textarea class="input wd-note-input" id="windNote" placeholder="What does tomorrow-you need to hear?"></textarea>'+
+  '</div>';
+}
+function windAlarmHtml(){
+  const w = ui.wind, wk = wakeCfg(), base = wakeBaseTimeFor(w.target);
+  return '<div class="wd-alarm">'+
+    '<div class="wd-sub">'+(base ? 'Usual: '+fmt12Hour(base)+'. Changing it here only changes '+morningLabel(w.target)+'.' : 'No daily alarm that day — set one here.')+'</div>'+
+    (w.noAlarm ? '<div class="wd-noalarm">No alarm '+morningLabel(w.target)+'</div>' : '<input class="ws-time wd-time" type="time" id="windAlarm" value="'+escapeHtml(w.alarm||'')+'">')+
+    '<div class="row" style="gap:8px;justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="windNoAlarm">'+(w.noAlarm ? 'Set an alarm' : 'No alarm '+morningLabel(w.target))+'</button>'+
+      '<button class="btn btn-ghost btn-sm" data-action="openWakeSetup">Sound &amp; music</button></div>'+
+    '<div class="wd-sound">'+(wakeUsesMusic(wk) ? '&#9835; '+escapeHtml(mediaName(wk.media)) : '&#128276; '+wakeBeepSound(wk)[0].toUpperCase()+wakeBeepSound(wk).slice(1)+' tone')+'</div>'+
+  '</div>';
+}
+function windHtml(){
+  const w = ui.wind; if(!w) return '';
+  const i = WIND_STEPS.findIndex(function(s){ return s[0]===w.step; });
+  const titles = {recap:'Here\'s how today went.', plan:'Plan of attack — '+morningLabel(w.target)+'.', note:'A note for the morning.', alarm:'Wake up '+morningLabel(w.target)+' at…'};
+  const body = w.step==='plan' ? windPlanHtml() : w.step==='note' ? windNoteHtml() : w.step==='alarm' ? windAlarmHtml() : windRecapHtml();
+  return '<div class="wd">'+
+    '<div class="wd-top"><span class="wd-moon">&#127769;</span><span class="wd-brand">Wind down</span>'+
+      '<div class="wd-steps">'+WIND_STEPS.map(function(s, k){ return '<button class="wd-step'+(k===i?' is-on':'')+(k<i?' is-past':'')+'" data-action="windStep" data-id="'+s[0]+'"><span>'+(k+1)+'</span>'+s[1]+'</button>'; }).join('')+'</div>'+
+      '<button class="wd-close" data-action="closeWindDown" title="Close (your plan is kept)">&#10005;</button></div>'+
+    '<div class="wd-inner" data-key="wd-'+w.step+'"><h2 class="wd-title-h">'+titles[w.step]+'</h2>'+body+'</div>'+
+    '<div class="wd-foot">'+
+      (i>0 ? '<button class="btn btn-ghost" data-action="windBack">&larr; Back</button>' : '<span></span>')+
+      (w.step==='alarm' ? '<span class="row" style="gap:8px;"><button class="btn btn-ghost" data-action="windSaveOnly">Save — not sleeping yet</button><button class="btn wd-sleep" data-action="windGoToSleep">&#127769; Go to sleep</button></span>'
+        : '<button class="btn btn-primary" data-action="windNext">Next &rarr;</button>')+
+    '</div>'+
+  '</div>';
+}
+function renderWindInto(){ const el = document.getElementById('windContent'); if(el) morphInto(el, windHtml(), {form:true}); }
+registerModal('windOverlay', renderWindInto);
+// the old "Plan tomorrow" opens the same thing
+ACTIONS.openNightPlan = function(){ openWindDown('plan'); };
+
+// ---------- morning: the plan lines itself up; Morning mode ----------
+// Last night's plan becomes today's lineup, in that order, the first time the app sees the day.
+function applyNightPlanAuto(){
+  const np = state.focus.nightPlan;
+  if(!np || np.date!==todayStr() || np.applied) return false;
+  const ids = arr(np.taskIds).filter(function(id){ return windTask(id); });
+  ids.forEach(function(id){ const t = windTask(id); if(t && t.status==='backlog') t.status = 'today'; });
+  const rest = arr(state.focus.lineupOrder).filter(function(id){ return ids.indexOf(id)<0; });
+  state.focus.lineupOrder = ids.concat(rest);
+  if(ids[0]) state.focus.nextTaskId = ids[0];
+  np.applied = true;
+  persist('tasks'); persist('focus');
+  return true;
+}
+function todaysPlan(){
+  const np = state.focus.nightPlan;
+  const ids = np && np.date===todayStr() ? arr(np.taskIds) : [];
+  const fromPlan = ids.map(function(id){ return state.tasks.items.find(function(t){ return t.id===id; }); }).filter(Boolean);
+  if(fromPlan.length) return fromPlan;
+  return lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today'; }));
+}
+const DEFAULT_ROUTINE = [{id:'r1', text:'&#128167; Water'}, {id:'r2', text:'&#127859; Breakfast'}, {id:'r3', text:'&#128703; Shower'}, {id:'r4', text:'&#128085; Get dressed'}, {id:'r5', text:'&#129504; Read the plan'}];
+function morningRoutine(){ if(!Array.isArray(state.focus.morningRoutine)) state.focus.morningRoutine = DEFAULT_ROUTINE.map(function(x){ return {id:x.id, text:x.text.replace(/&#(\d+);/g, function(m, n){ return String.fromCodePoint(Number(n)); })}; }); return state.focus.morningRoutine; }
+function routineDone(){ const r = state.focus.routineDone; return r && r.date===todayStr() ? r.ids : []; }
+ACTIONS.routineTick = function(el, e, id){
+  const done = routineDone().slice(), i = done.indexOf(id);
+  if(i>=0) done.splice(i, 1); else { done.push(id); playTick(); }
+  state.focus.routineDone = {date:todayStr(), ids:done};
+  if(done.length===morningRoutine().length && i<0) playPositive();
+  persist('focus'); renderView();
+};
+ACTIONS.routineEdit = function(){ ui.routineEdit = !ui.routineEdit; renderView(); };
+ACTIONS.routineRemove = function(el, e, id){ state.focus.morningRoutine = morningRoutine().filter(function(x){ return x.id!==id; }); persist('focus'); renderView(); };
+ACTIONS.routineAdd = function(){ const i = document.getElementById('routineNew'), v = i ? i.value.trim() : ''; if(!v) return; morningRoutine().push({id:uid(), text:v}); i.value = ''; persist('focus'); renderView(); };
+document.addEventListener('keydown', function(e){ if(e.key==='Enter' && e.target && e.target.id==='routineNew'){ e.preventDefault(); ACTIONS.routineAdd(); } });
+function startMorning(){
+  applyNightPlanAuto();
+  if(!(state.modes.active && state.modes.active.morning)) startMode('offtime', {morning:true, note:'Morning'});
+  ui.view = 'today'; renderView();
+}
+ACTIONS.startMorning = function(){ startMorning(); };
+ACTIONS.morningLockIn = function(el, e, id){
+  if(state.modes.active && state.modes.active.morning) finishActiveMode(true);
+  if(id) setNextUp(id);
+  renderView(); openLockInChooser();
+};
+ACTIONS.morningBriefing = function(){ ui.wakeMode = 'brief'; ui.wakeIntroDone = true; ui.wakeBriefTest = false; showOverlay('wakeOverlay'); renderWakeOverlayInto(); };
+function planListHtml(list, cls){
+  return '<ol class="plan-list '+(cls||'')+'">'+list.map(function(t, i){ const done = t.status==='done'; return '<li class="'+(done?'is-done':'')+(i===0 && !done?' is-first':'')+'"><span class="pl-num">'+(done ? '&#10003;' : i+1)+'</span>'+priorityTag(t.priority)+'<span class="pl-t">'+escapeHtml(t.title)+'</span></li>'; }).join('')+'</ol>';
+}
+function renderMorningView(){
+  const active = state.modes.active, p = state.profile;
+  const plan = todaysPlan(), first = plan.find(function(t){ return t.status!=='done'; });
+  const notes = morningNotesFor(todayStr());
+  const routine = morningRoutine(), done = routineDone();
+  const editing = !!ui.routineEdit;
+  return '<div class="mm" data-sky="'+skyLook()+'">'+
+    '<div class="mm-head"><div><div class="mm-k">&#9728;&#65039; Morning</div><div class="mm-greet">'+wakeGreeting()+', '+escapeHtml(p.name||'')+'.</div>'+
+      '<div class="mm-sub">Up for <span id="modeElapsed">'+formatElapsed(Date.now()-active.startedAt)+'</span> &middot; '+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div></div>'+
+      '<button class="btn btn-ghost btn-sm" data-action="morningBriefing">&#128202; Briefing</button></div>'+
+    (notes.length ? '<div class="mm-note"><div class="mm-k">&#127769; From last night</div>'+notes.map(function(n){ return '<div class="mm-note-t">'+escapeHtml(n.text)+'</div>'; }).join('')+'</div>' : '')+
+    '<div class="mm-grid">'+
+      '<div class="mm-card"><div class="mm-card-h"><span class="mm-k">Get going</span><span class="kpi-sub">'+done.length+'/'+routine.length+'</span><button class="mm-edit" data-action="routineEdit">'+(editing?'Done':'&#9998;')+'</button></div>'+
+        '<div class="mm-routine">'+routine.map(function(r){ const on = done.indexOf(r.id)>=0;
+          return '<div class="mm-r'+(on?' is-on':'')+'"><button class="mm-r-main" data-action="routineTick" data-id="'+r.id+'"><span class="mm-tick">'+(on?'&#10003;':'')+'</span><span>'+escapeHtml(r.text)+'</span></button>'+(editing ? '<button class="mn-x" data-action="routineRemove" data-id="'+r.id+'">&#10005;</button>' : '')+'</div>'; }).join('')+
+          (editing ? '<div class="mn-row"><input class="input" id="routineNew" placeholder="+ Add a step (Enter)"><button class="btn btn-sm" data-action="routineAdd">Add</button></div>' : '')+
+        '</div></div>'+
+      '<div class="mm-card"><div class="mm-card-h"><span class="mm-k">Plan of attack</span><span class="kpi-sub">'+plan.filter(function(t){ return t.status!=='done'; }).length+' to do</span></div>'+
+        (plan.length ? planListHtml(plan.slice(0, 8)) : '<div class="kpi-sub">No plan yet — <a href="#" data-action="openWindDown" data-step="plan">make one</a>.</div>')+'</div>'+
+    '</div>'+
+    '<div class="mm-cta">'+
+      '<button class="brief-go" data-action="morningLockIn"'+(first ? ' data-id="'+first.id+'"' : '')+'>&#128274; I\'m ready — lock in'+(first ? ' on &ldquo;'+escapeHtml(first.title)+'&rdquo;' : '')+'</button>'+
+      '<button class="brief-later mm-end" data-action="endMode">End morning</button>'+
+    '</div>'+
+  '</div>';
+}
+afterRenderHooks.push(function(){ if(typeof state!=='undefined' && state && state.focus && applyNightPlanAuto()) setTimeout(renderView, 0); });
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
@@ -17759,7 +18504,7 @@ function appMenuHtml(){
     (s ? ci('stop', '&#9632; Stop &amp; log session')+(s.onBreak ? '' : ci('break', '&#9749; Take a break')) : ci('lockin', '&#128274; Lock in <span class="ctx-kbd">L</span>'))+
     ci('recap', '&#128202; Day recap')+
     (selectableView() && selVisibleCards().length ? ci('selAll', '&#9745; Select all tasks <span class="ctx-kbd">&#8984;A</span>') : '')+
-    ci('wake', '&#9200; Wake-up alarm')+
+    ci('wake', '&#9200; Wake-up alarm')+ci('wind', '&#127769; Wind down — plan tomorrow')+
     (ui.view==='today' ? ci('editPage', s ? (ui.lockedEdit ? '&#10003; Done editing' : '&#9998; Edit this page') : (ui.todayEdit ? '&#10003; Done editing' : '&#9998; Edit this page')) : '')+
     SEP+
     crow('Go to', ['today','focus','business','calendar','personal'].map(function(v){ return chip('go', v[0].toUpperCase()+v.slice(1), {a:v, on:ui.view===v}); }).join(''))+
@@ -17824,6 +18569,8 @@ document.addEventListener('contextmenu', function(e){
   const c = contactFromEl(t);
   if(c){ ctxShow(contactMenuHtml(c.kind, c.x), e.clientX, e.clientY); return; }
   const host = t.closest('#boardHost');
+  // right-click while drawing a line just cancels it (no menu)
+  if(host && (cv.lineDraw || Date.now()-(cv.drawCancelledAt||0) < 600)){ if(cv.lineDraw) cancelLineDraw(); return; }
   if(host && !cv.view){
     const bel = t.closest('.bel[data-el]');
     // right-clicking one of several selected cards keeps them all selected (like the Finder)
@@ -17856,6 +18603,7 @@ ACTIONS.ctx = function(el){
   else if(op==='recap') ACTIONS.openDayRecap();
   else if(op==='selAll') selectAllVisibleTasks();
   else if(op==='wake') openWakeSetup();
+  else if(op==='wind') openWindDown();
   else if(op==='editPage'){ if(state.focus.activeSession) ACTIONS.toggleLockedEdit(); else ACTIONS.toggleTodayEdit(); }
   else if(op==='go') go(a);
   else if(op==='theme') setThemePref(a);

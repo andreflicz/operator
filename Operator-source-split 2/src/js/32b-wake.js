@@ -305,12 +305,10 @@ function wakeImUp(){
   finishWakeMedia();
   wakeRing = null;
   if(!wasTest && state.modes.active && state.modes.active.sleep) finishActiveMode(true);
+  if(!wasTest && typeof applyNightPlanAuto==='function') applyNightPlanAuto();
   ui.wakeMode = 'brief'; ui.wakeBriefTest = !!wasTest; ui.wakeBoardBig = false; ui.wakeIntroDone = false;
   playWakeChime();
   renderWakeOverlayInto();
-  // after the intro has played, take it out (so re-renders don't replay it)
-  clearTimeout(ui._wakeIntroT);
-  ui._wakeIntroT = setTimeout(function(){ if(ui.wakeMode==='brief' && !ui.wakeIntroDone){ ui.wakeIntroDone = true; renderWakeOverlayInto(); } }, 3600);
 }
 function endBriefing(){
   ui.wakeMode = null;
@@ -318,6 +316,8 @@ function endBriefing(){
   ui.view = 'today';
   renderView();
 }
+// Start my morning: off the screen and into Morning mode (routine, note, plan) until you're ready to work.
+ACTIONS.wakeStartMorning = function(){ const t = ui.wakeBriefTest; endBriefing(); if(t){ showToast('Test done — this is where Morning mode starts.', {icon:'&#9728;&#65039;'}); return; } startMorning(); };
 ACTIONS.wakeBriefDone = function(){ const t = ui.wakeBriefTest; endBriefing(); showToast(t ? 'Test done — that\'s how your mornings will look.' : 'Let\'s get it.', {icon:'&#9728;&#65039;'}); };
 ACTIONS.wakeBriefLockIn = function(el, e, id){ endBriefing(); if(id) setNextUp(id); renderView(); openLockInChooser(); };
 ACTIONS.wakeBoardToggle = function(){ ui.wakeBoardBig = !ui.wakeBoardBig; renderWakeOverlayInto(); };
@@ -353,6 +353,7 @@ function wakeRingHtml(){
       '<div class="wk2-greet">'+wakeGreeting()+(state.profile.name?', '+escapeHtml(state.profile.name):'')+(wakeRing && wakeRing.test ? ' <span class="tag">TEST</span>' : '')+'</div>'+
       '<div class="wk2-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+'</div>'+
       '<div class="wk2-date">'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div>'+
+      (function(){ const ns = morningNotesFor(todayStr()); return ns.length ? '<div class="wk2-note">&ldquo;'+escapeHtml(ns[ns.length-1].text)+'&rdquo;<span>— you, last night</span></div>' : ''; })()+
       '<div class="wk2-actions">'+
         '<button class="wk2-up" data-action="wakeImUp"><span>&#9728;&#65039; I\'m up</span></button>'+
         '<button class="wk2-snooze" data-action="wakeSnooze">Snooze '+(w.snoozeMinutes||9)+' min</button>'+
@@ -370,7 +371,7 @@ function wakeBriefHtml(){
   const yDone = state.tasks.items.filter(function(t){ return t.completedAt===y; }).length;
   const yWork = typeof workoutDay==='function' ? workoutDay(y) : {n:0, m:0};
   const yStd = dayStandardsComplete(y);
-  const plan = wakeTodayPlan();
+  const plan = {note:'', tasks:todaysPlan().filter(function(t){ return t.status!=='done'; }).slice(0, 8)};
   const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a,c){ return (a.time||'').localeCompare(c.time||''); });
   const deadlines = state.tasks.items.filter(function(t){ return t.deadline===today && t.status!=='done'; });
   const why = arr(state.focus.motivations && state.focus.motivations.toward).slice(0, 3);
@@ -381,17 +382,24 @@ function wakeBriefHtml(){
   const vb = masterVisionBoard();
   // It opens like a phone starting up: one big "Good morning" fades in out of a blur, holds,
   // then lifts away and the briefing builds in underneath. Click to skip.
-  const intro = !ui.wakeIntroDone;
-  let d = intro ? 2700 : 0; const step = function(){ d += 90; return ' style="animation-delay:'+d+'ms"'; };
+  // The intro stays in the page and fades itself out (taking it out later re-built the briefing
+  // and played its entrance twice); skipping just flips a class.
+  const cine = wakeCfg().intro==='cinematic';
+  let d = cine ? 7000 : 2700; const step = function(){ d += 90; return ' style="animation-delay:'+d+'ms"'; };
   const stat = function(v, k, good){ return '<div class="br-stat'+(good?' is-good':'')+'"><div class="br-stat-v">'+v+'</div><div class="br-stat-k">'+k+'</div></div>'; };
-  return '<div class="brief'+(ui.wakeBoardBig?' board-open':'')+'">'+
-    (intro ? '<div class="brief-intro" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div><div class="bi-word">'+wakeGreeting()+'</div>'+(state.profile.name ? '<div class="bi-name">'+escapeHtml(state.profile.name)+'</div>' : '')+'</div>' : '')+
+  return '<div class="brief'+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+'">'+
+    (cine
+      ? '<div class="brief-intro is-cinematic" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div>'+
+          '<div class="bi-time">'+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+'</div>'+
+          '<div class="bi-word">'+wakeGreeting()+'</div>'+(state.profile.name ? '<div class="bi-name">'+escapeHtml(state.profile.name)+'</div>' : '')+
+          '<div class="bi-line">'+(wakeWeatherLine() ? wakeWeatherLine()+' &middot; ' : '')+'Let\'s get it.</div></div>'
+      : '<div class="brief-intro" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div><div class="bi-word">'+wakeGreeting()+'</div>'+(state.profile.name ? '<div class="bi-name">'+escapeHtml(state.profile.name)+'</div>' : '')+'</div>')+
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner">'+
       '<div class="brief-top"'+step()+'><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>Morning briefing</span><span class="brief-sys">All systems go</span></div>'+
       '<h1 class="brief-hello"'+step()+'>'+wakeGreeting()+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
       '<div class="brief-sub"'+step()+'>'+new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})+' &middot; '+new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'})+(wakeWeatherLine() ? ' &middot; '+wakeWeatherLine() : '')+'</div>'+
-      wakeMusicPillHtml()+
+      '<div class="brief-music-slot">'+wakeMusicPillHtml()+'</div>'+
       (notes.length ? '<section class="br-lastnight"'+step()+'><div class="br-k">&#127769; From last night</div>'+notes.map(function(t){ return '<div class="br-ln-text">'+escapeHtml(t)+'</div>'; }).join('')+'</section>' : '')+
       (vb && vb.elements.length ? '<section class="br-vision"'+step()+' data-action="wakeBoardToggle" title="Open your vision board">'+
           '<span class="br-vision-k">&#127775; Vision</span>'+boardStaticHtml(vb, 'wake-board')+'<span class="br-vision-hint">Click to open</span></section>' : '')+
@@ -399,9 +407,8 @@ function wakeBriefHtml(){
         '<section class="br-card"'+step()+'><div class="br-k">Yesterday</div><div class="br-stats">'+
           stat(fmtHours(yDeep), 'deep work', yDeep>=target)+stat(yDone, 'tasks done')+stat(yWork.n ? yWork.n+(yWork.m?' &middot; '+fmtDurationLabel(yWork.m):'') : '—', 'workouts', yWork.n>0)+stat(computeStreak()+'d', 'streak', yStd)+
         '</div><div class="br-line">'+(yStd ? '&#10003; You hit the standard — keep the run going.' : yDeep ? 'Short of the standard. Today\'s a clean slate.' : 'No deep work logged. Today we change that.')+'</div></section>'+
-        '<section class="br-card br-today"'+step()+'><div class="br-k">Today\'s plan</div>'+
-          (plan.note ? '<div class="br-note">'+escapeHtml(plan.note)+'</div>' : '')+
-          (plan.tasks.length ? '<ol class="br-list">'+plan.tasks.map(function(t, i){ return '<li'+(i===0?' class="is-first"':'')+'>'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span>'+(i===0?'<em>first up</em>':'')+'</li>'; }).join('')+'</ol>' : '<div class="br-line">Nothing lined up yet — pick your first move.</div>')+
+        '<section class="br-card br-today"'+step()+'><div class="br-k">Plan of attack</div>'+
+          (plan.tasks.length ? planListHtml(plan.tasks, 'is-dark') : '<div class="br-line">Nothing lined up yet — pick your first move.</div>')+
           ((events.length || deadlines.length) ? '<div class="br-k" style="margin-top:12px;">On the calendar</div><div class="br-agenda">'+
             events.map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('')+
             deadlines.map(function(t){ return '<div><b class="is-due">Due'+(t.deadlineTime ? ' '+fmt12Hour(t.deadlineTime) : '')+'</b> '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '')+
@@ -411,8 +418,9 @@ function wakeBriefHtml(){
         '</div>'+(why.length ? '<div class="br-k" style="margin-top:12px;">Why</div><div class="br-why">'+why.map(function(m){ return '<span>'+escapeHtml(m.text)+'</span>'; }).join('')+'</div>' : '')+'</section>'+
       '</div>'+
       '<div class="brief-cta"'+step()+'>'+
-        (first ? '<button class="brief-go" data-action="wakeBriefLockIn" data-id="'+first.id+'">&#128274; Lock in on &ldquo;'+escapeHtml(first.title)+'&rdquo;</button>' : '<button class="brief-go" data-action="wakeBriefLockIn">&#128274; Lock in</button>')+
-        '<button class="brief-later" data-action="wakeBriefDone">Let\'s go &rarr;</button>'+
+        '<button class="brief-go brief-morning" data-action="wakeStartMorning">&#9728;&#65039; Start my morning</button>'+
+        (first ? '<button class="brief-later" data-action="wakeBriefLockIn" data-id="'+first.id+'">&#128274; Lock in now on #1</button>' : '<button class="brief-later" data-action="wakeBriefLockIn">&#128274; Lock in now</button>')+
+        '<button class="brief-skip" data-action="wakeBriefDone">Close</button>'+
       '</div>'+
     '</div>'+
     (ui.wakeBoardBig && vb ? '<div class="br-vision-big" data-action="wakeBoardToggle" title="Close">'+boardStaticHtml(vb, 'wake-board')+'<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button></div>' : '')+
@@ -480,6 +488,7 @@ function renderWakeSetup(){
       '</div>' : '<div class="row" style="margin-top:8px;"><button class="btn btn-ghost btn-sm" data-action="wakePreviewSound">&#9654; Hear it</button></div>')+
     '</div>'+
     '<div class="ws-block grid grid-2">'+
+      '<div class="field"><label>Good morning intro</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.intro!=='cinematic'?' active':'')+'" data-action="wakeIntro" data-id="quick">Quick</button><button class="seg-tab'+(w.intro==='cinematic'?' active':'')+'" data-action="wakeIntro" data-id="cinematic">Cinematic</button></div></div>'+
       '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+
     '</div>'+
     '<div class="row" style="margin-top:18px;justify-content:space-between;gap:8px;flex-wrap:wrap;">'+
@@ -503,6 +512,7 @@ ACTIONS.wakeSkip = function(){
 };
 ACTIONS.wakeClearOverride = function(){ wakeCfg().override = null; wakeArm(); saveWake(); };
 ACTIONS.wakeSound = function(el, e, id){ const w = wakeCfg(); w.sound = id; w.useMusic = false; ui.wakeMusicOpen = false; stopWakeMedia(true); playAlarmSound(id); saveWake(); };
+ACTIONS.wakeIntro = function(el, e, id){ wakeCfg().intro = id==='cinematic' ? 'cinematic' : 'quick'; saveWake(); };
 ACTIONS.wakeBackupSound = function(el, e, id){ wakeCfg().sound = id; playAlarmSound(id); saveWake(); };
 ACTIONS.wakeUseMusic = function(){ const w = wakeCfg(); if(w.media) w.useMusic = true; ui.wakeMusicOpen = true; saveWake(); };
 ACTIONS.wakePreviewSound = function(){ playAlarmSound(wakeCfg().sound); };

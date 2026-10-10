@@ -24,15 +24,12 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('.next-picker [data-action="pickNextTask"][data-id="t3"]');
   check('picking a backlog task moves it to today and makes it next', await E("state.tasks.items.find(t=>t.id==='t3').status")==='today' && (await p.textContent('.lockin-sub')).includes('Script hooks'));
   check('next pick is saved', await E("state.focus.nextTaskId")==='t3');
-  // take today off: a click only nudges, holding confirms
-  await p.click('[data-hold="dayoff"]');
-  check('a click alone doesn\'t take the day off', !(await E("isDayOff(todayStr())")));
-  const box = await p.locator('[data-hold="dayoff"]').boundingBox();
-  await p.mouse.move(box.x+box.width/2, box.y+box.height/2); await p.mouse.down();
-  await p.clock.runFor(1200); await p.waitForTimeout(250);
-  await p.mouse.up();
-  check('holding it takes the day off', await E("isDayOff(todayStr())"));
-  await E("toggleDayOff()");
+  // take today off: one click, with an Undo right there
+  await p.click('[data-action="quickDayOff"]');
+  check('one click takes the day off', await E("isDayOff(todayStr())"));
+  check('…with an Undo', await p.isVisible('#toastContainer [data-action="quickDayOffUndo"]'));
+  await p.click('#toastContainer [data-action="quickDayOffUndo"]');
+  check('undo puts the day back', !(await E("isDayOff(todayStr())")));
   // right-click a task
   await p.click('[data-action="nav"][data-view="focus"]'); await p.click('[data-action="focusMainTab"][data-tab="tasks"]');
   await p.click('[data-task-id="t1"]', {button:'right'});

@@ -74,13 +74,6 @@ poll_frontmost() {
   done
 }
 
-serve_activity() {
-  while true; do
-    { printf 'HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/plain; charset=utf-8\r\nConnection: close\r\n\r\n'
-      cat "$ACTIVITY_LOG" 2>/dev/null
-    } | nc -l 127.0.0.1 "$ACTIVITY_PORT" >/dev/null 2>&1
-  done
-}
 
 # --- Local helpers: alarm wake-up, music, GoHighLevel -------------------------
 # The page talks to two loopback-only ports (nothing here is reachable from outside the Mac):
@@ -116,20 +109,43 @@ start_helper() { # kind, port → echoes the pid
   echo $!
 }
 
+# Only one Operator runs the helpers. Opening Operator again while it's running just brings the
+# window up (Chrome hands it to the running one) — it doesn't touch the helpers.
+LOCK_FILE="$DATA_DIR/launcher.pid"
+LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null)
+if [ -n "$LOCK_PID" ] && kill -0 "$LOCK_PID" 2>/dev/null && ps -o args= -p "$LOCK_PID" 2>/dev/null | grep -q "MacOS/Operator"; then
+  "$CHROME" --app="file://$HTML_FILE" --user-data-dir="$PROFILE_DIR" >/dev/null 2>&1 &
+  exit 0
+fi
+echo $$ > "$LOCK_FILE"
+
+# Anything still listening on our ports from an earlier run (an Operator that didn't close
+# cleanly) would block the new helpers — that's what made "Can't reach Operator's GoHighLevel
+# connection" show up. Clear them out first (only our own listeners: perl / nc / bash).
+free_port() {
+  command -v lsof >/dev/null 2>&1 || return
+  for pid in $(lsof -nP -tiTCP:"$1" -sTCP:LISTEN 2>/dev/null); do
+    case "$(ps -o comm= -p "$pid" 2>/dev/null)" in
+      *perl*|*nc|*bash|*cat) kill "$pid" 2>/dev/null ;;
+    esac
+  done
+}
+for port in "$ACTIVITY_PORT" "$WAKE_PORT" "$GHL_PORT"; do free_port "$port"; done
+sleep 0.3
+
 POLL_PID=""
 SERVE_PID=""
-if command -v osascript >/dev/null 2>&1 && command -v nc >/dev/null 2>&1; then
+if command -v osascript >/dev/null 2>&1; then
   poll_frontmost &
   POLL_PID=$!
-  serve_activity &
-  SERVE_PID=$!
 fi
+SERVE_PID=$(start_helper activity "$ACTIVITY_PORT")
 
 # Chrome flags for an app that has to ring on time:
 #  - background windows normally get their timers slowed to ~1/minute, which made
 #    alarms only go off once the window was opened; these flags keep them on time
 #  - autoplay without a click, so wake-up music/sound starts by itself
-#  - no pop-up blocking, so a wake-up YouTube link / second-screen view can open
+#  - no pop-up blocking, so a wake-up YouTube link can open
 "$CHROME" \
   --app="file://$HTML_FILE" \
   --user-data-dir="$PROFILE_DIR" \
@@ -147,15 +163,15 @@ fi
   > /dev/null 2>&1 &
 CHROME_PID=$!
 
-CAFF_PID=""
 export CHROME_PID
 WAKE_PID=$(start_helper wake "$WAKE_PORT")
 GHL_PID=""
 command -v curl >/dev/null 2>&1 && GHL_PID=$(start_helper ghl "$GHL_PORT")
 # Keep the Mac from idle-sleeping while Operator is open (the display can still turn
 # off), so a morning alarm can fire. Closing the lid on battery still sleeps.
+CAFF_PID=""
 if command -v caffeinate >/dev/null 2>&1; then
-  caffeinate -i -w "$CHROME_PID" >/dev/null 2>&1 &
+  caffeinate -i >/dev/null 2>&1 &
   CAFF_PID=$!
 fi
 
@@ -165,11 +181,22 @@ cleanup() {
   [ -n "$SERVE_PID" ] && kill "$SERVE_PID" 2>/dev/null
   [ -n "$WAKE_PID" ] && kill "$WAKE_PID" 2>/dev/null
   [ -n "$GHL_PID" ] && kill "$GHL_PID" 2>/dev/null
-  rm -f "$DATA_DIR/ghl.fifo" "$DATA_DIR/wake.fifo" 2>/dev/null
+  for port in "$ACTIVITY_PORT" "$WAKE_PORT" "$GHL_PORT"; do free_port "$port"; done
+  rm -f "$DATA_DIR/ghl.fifo" "$DATA_DIR/wake.fifo" "$DATA_DIR/activity.fifo" 2>/dev/null
   [ -n "$CAFF_PID" ] && kill "$CAFF_PID" 2>/dev/null
+  rm -f "$LOCK_FILE" 2>/dev/null
 }
 trap cleanup EXIT
 
-# Wait for Chrome to actually quit before this wrapper exits, so the
-# background poller/server above get cleaned up instead of lingering.
-wait "$CHROME_PID"
+# Stay up while Operator's window is open (any Chrome process using Operator's own profile —
+# even if Chrome handed the window to one that was already running), and keep the helpers
+# alive: if one ever stops, it's started again within a few seconds.
+alive() { [ -n "$1" ] && kill -0 "$1" 2>/dev/null; }
+operator_open() { alive "$CHROME_PID" || pgrep -f -- "--user-data-dir=$PROFILE_DIR" >/dev/null 2>&1; }
+sleep 3
+while operator_open; do
+  if ! alive "$WAKE_PID"; then free_port "$WAKE_PORT"; WAKE_PID=$(start_helper wake "$WAKE_PORT"); fi
+  if [ -n "$GHL_PID" ] && ! alive "$GHL_PID"; then free_port "$GHL_PORT"; GHL_PID=$(start_helper ghl "$GHL_PORT"); fi
+  if [ -n "$SERVE_PID" ] && ! alive "$SERVE_PID"; then free_port "$ACTIVITY_PORT"; SERVE_PID=$(start_helper activity "$ACTIVITY_PORT"); fi
+  sleep 5
+done

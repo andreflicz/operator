@@ -22,6 +22,8 @@ while (1) {
     my $line = <$c>;
     $line = '' unless defined $line;
     $line =~ s/\r?\n$//;
+    # a connection that opens and says nothing (Chrome warming one up) gets nothing done
+    if ($line !~ m{^[A-Z]+ /\S* HTTP}) { close $c; exit 0; }
     while (my $h = <$c>) { last if $h =~ /^\r?\n$/; }
     if ($line =~ /^OPTIONS /) {
       print $c "HTTP/1.1 204 No Content\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: GET, POST, OPTIONS\r\nAccess-Control-Allow-Headers: Content-Type\r\nContent-Length: 0\r\nConnection: close\r\n\r\n";
