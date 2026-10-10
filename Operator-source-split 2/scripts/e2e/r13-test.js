@@ -66,7 +66,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('the minimal break view shows the timer, not the tasks', await p.isVisible('.np.is-break #npBreakBar') && !(await p.$('.np .np-next')));
     await E("(function(){ const b = document.createElement('button'); b.dataset.action='finishCurrentTask'; document.body.appendChild(b); b.click(); b.remove(); })()"); await p.waitForTimeout(300);
     check('tasks are paused on a break (finish does nothing)', await E("state.tasks.items.find(t=>t.id==='t0').status")!=='done');
-    await E("ACTIONS.toggleLockedView()"); await p.waitForTimeout(300);
+    await E("ACTIONS.toggleLockedView()"); await p.waitForTimeout(700);
     check('the view switch keeps the state', await E("state.profile.lockedView")==='full' && await E("state.focus.activeSession.onBreak"));
     check('no page errors while locked in', p.errors.length===0, p.errors);
     await p.context().close();
@@ -83,7 +83,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('full screen by default (sidebar steps aside)', await E("document.body.classList.contains('np-on')"));
     await p.click('[data-action="toggleRestFull"]'); await p.waitForTimeout(300);
     check('the corner button gives the sidebar back', !(await E("document.body.classList.contains('np-on')")) && await p.isVisible('.np.rest'));
-    await p.click('[data-action="quickDayOff"]'); await p.waitForTimeout(150);
+    await p.click('[data-action="quickDayOff"]'); await p.waitForTimeout(500); // (the day off fades out first)
     check('turning it off plays a flash', await p.$('.lock-flash.is-dayoff')!==null);
     await p.waitForTimeout(400);
     check('…and today counts again', !(await E("isDayOff(todayStr())")) && !(await p.$('.np.rest')));

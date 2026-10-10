@@ -3409,3 +3409,4 @@
   .xp-m, .tn{ width:100%; max-height:88vh; overflow-y:auto; box-shadow:0 40px 100px rgba(0,0,0,.5); }
   .xp-ov, .tn-ov{ display:flex; align-items:center; justify-content:center; }
   .xp-ov.hidden, .tn-ov.hidden{ display:none !important; }
+  .quick-journal-fab.jorb, .jorb-core, .jorb-ring{ will-change:transform, opacity; }

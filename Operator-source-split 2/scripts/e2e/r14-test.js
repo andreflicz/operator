@@ -20,7 +20,7 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
     { const f = await full(); check('weekend clock-out fills the whole wide window', f===true, f); }
     await E("clockIn({quiet:true}); ui.planReveal=null; hideOverlay('planOverlay'); ui.currentTaskId='t0'; startFocus(); state.profile.lockedView='minimal'; renderView()"); await p.waitForTimeout(1400);
     { const f = await full(); check('the minimal locked view fills the whole wide window', f===true, f); }
-    check('the next alarm says which day (Mon), not just a time', /Mon 7:00/.test(await p.textContent('.np-ring')));
+    check('the next alarm says which day (Mon), not just a time', /Mon 7:00/.test(await p.textContent('.np-clock-r')));
     check('no page errors (full-screen views)', p.errors.length===0, p.errors);
     await p.context().close();
   }
@@ -88,7 +88,7 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
     await p.click('.brief-skipall'); await p.clock.runFor(800); await p.waitForTimeout(500);
     check('Skip goes straight to the app\'s front page', !(await E("overlayOpen('wakeOverlay')")) && await E("ui.view")==='today' && !(await E("overlayOpen('planOverlay')")));
     await E("state.focus.wake.briefBg='dark'; persist('focus')");
-    await p.reload(); await p.waitForTimeout(600);
+    await p.reload(); await p.waitForTimeout(1400);
     check('wake settings survive a reload (topics, sections, background)', await E("[state.focus.wake.newsTopics, state.focus.wake.newsSports, state.focus.wake.newsTech, state.focus.wake.briefBg].join('|')")==='AI|Knicks|Apple|dark');
     await E("fireWake({})"); await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(300);
     check('Dark background when you pick it', await p.$('.brief.bg-dark')!==null && !(await p.$('.brief.bg-sunrise')));

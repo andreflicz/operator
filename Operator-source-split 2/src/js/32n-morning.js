@@ -409,12 +409,12 @@ function wakeBriefHtml(){
   // column 3: the world, then the day ahead
   if(news){
     const d0 = tcur, late = ui.briefNewsAt ? Math.max(600, d0 - (ui.briefNewsAt - (ui.briefT0||0))) : null;
-    const sec = (ui.morningNews && ui.morningNews.sec) || {}, secs = newsSections().filter(function(x){ return sec[x.id]; });
+    const sec = (ui.morningNews && ui.morningNews.sec) || {}, secs = newsSections().filter(function(x){ return sec[x.id] || (x.id==='sports' && typeof scoresHtml==='function' && scoresHtml()); });
     const item = function(n, i, top){ return '<button class="br-news-i'+(top?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+escapeHtml(n.title)+(n.src ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; };
     colC.push(panel('br-news', 'br-a-rise', secs.length ? 'Here’s what’s happening — the news, '+secs.map(function(x){ return x.label.toLowerCase(); }).join(' and ')+'.' : 'Here’s what’s happening out there.',
       '<div class="br-k">&#128240; '+(newsTopics() ? 'Your News' : 'Headlines')+'</div>'+
       news.slice(0, secs.length ? 3 : 6).map(function(n, i){ return item(n, i, i===0); }).join('')+
-      secs.map(function(x){ const sc = x.id==='sports' && typeof scoresHtml==='function' ? scoresHtml() : ''; return '<div class="br-news-sec"><div class="br-news-h">'+x.icon+' '+x.label+'<span>'+escapeHtml(x.q)+'</span></div>'+sc+sec[x.id].slice(0, sc ? 2 : 3).map(function(n, i){ return item(n, i, false); }).join('')+'</div>'; }).join(''),
+      secs.map(function(x){ const sc = x.id==='sports' && typeof scoresHtml==='function' ? scoresHtml() : ''; return '<div class="br-news-sec"><div class="br-news-h">'+x.icon+' '+x.label+'<span>'+escapeHtml(x.q)+'</span></div>'+sc+arr(sec[x.id]).slice(0, sc ? 2 : 3).map(function(n, i){ return item(n, i, false); }).join('')+'</div>'; }).join(''),
       late!=null ? ';--late:'+late+'ms' : ''));
   } else if(morningNewsOn() && ui.morningNews && ui.morningNews.loading){
     colC.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">&#128240; The News</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');

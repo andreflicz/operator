@@ -3418,6 +3418,7 @@
   .xp-m, .tn{ width:100%; max-height:88vh; overflow-y:auto; box-shadow:0 40px 100px rgba(0,0,0,.5); }
   .xp-ov, .tn-ov{ display:flex; align-items:center; justify-content:center; }
   .xp-ov.hidden, .tn-ov.hidden{ display:none !important; }
+  .quick-journal-fab.jorb, .jorb-core, .jorb-ring{ will-change:transform, opacity; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -17303,7 +17304,7 @@ setTimeout(function(){ opFocusPing(document.hasFocus() ? 1 : 0); }, 1500);
 function hexUtf8(str){ return Array.prototype.map.call(new TextEncoder().encode(String(str||'')), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
 function musicApp(cmd, media){
   // transport controls go through /music/cmd (there is no /music/pause route — pausing silently failed before)
-  if(['pause','play','next','prev','playpause'].indexOf(cmd)>=0) return helperFetch(MUSIC_URL+'cmd?c='+cmd, 4000);
+  if(!media && ['pause','play','next','prev','playpause'].indexOf(cmd)>=0) return helperFetch(MUSIC_URL+'cmd?c='+cmd, 4000);
   return helperFetch(MUSIC_URL+cmd+(media ? '?k='+(media.k==='playlist'?'playlist':'song')+'&q='+hexUtf8(media.q) : ''), 4000, false, cmd==='play');
 }
 async function playWakeMedia(media, onFail){
@@ -20798,12 +20799,12 @@ function wakeBriefHtml(){
   // column 3: the world, then the day ahead
   if(news){
     const d0 = tcur, late = ui.briefNewsAt ? Math.max(600, d0 - (ui.briefNewsAt - (ui.briefT0||0))) : null;
-    const sec = (ui.morningNews && ui.morningNews.sec) || {}, secs = newsSections().filter(function(x){ return sec[x.id]; });
+    const sec = (ui.morningNews && ui.morningNews.sec) || {}, secs = newsSections().filter(function(x){ return sec[x.id] || (x.id==='sports' && typeof scoresHtml==='function' && scoresHtml()); });
     const item = function(n, i, top){ return '<button class="br-news-i'+(top?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+escapeHtml(n.title)+(n.src ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; };
     colC.push(panel('br-news', 'br-a-rise', secs.length ? 'Here’s what’s happening — the news, '+secs.map(function(x){ return x.label.toLowerCase(); }).join(' and ')+'.' : 'Here’s what’s happening out there.',
       '<div class="br-k">&#128240; '+(newsTopics() ? 'Your News' : 'Headlines')+'</div>'+
       news.slice(0, secs.length ? 3 : 6).map(function(n, i){ return item(n, i, i===0); }).join('')+
-      secs.map(function(x){ const sc = x.id==='sports' && typeof scoresHtml==='function' ? scoresHtml() : ''; return '<div class="br-news-sec"><div class="br-news-h">'+x.icon+' '+x.label+'<span>'+escapeHtml(x.q)+'</span></div>'+sc+sec[x.id].slice(0, sc ? 2 : 3).map(function(n, i){ return item(n, i, false); }).join('')+'</div>'; }).join(''),
+      secs.map(function(x){ const sc = x.id==='sports' && typeof scoresHtml==='function' ? scoresHtml() : ''; return '<div class="br-news-sec"><div class="br-news-h">'+x.icon+' '+x.label+'<span>'+escapeHtml(x.q)+'</span></div>'+sc+arr(sec[x.id]).slice(0, sc ? 2 : 3).map(function(n, i){ return item(n, i, false); }).join('')+'</div>'; }).join(''),
       late!=null ? ';--late:'+late+'ms' : ''));
   } else if(morningNewsOn() && ui.morningNews && ui.morningNews.loading){
     colC.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">&#128240; The News</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');

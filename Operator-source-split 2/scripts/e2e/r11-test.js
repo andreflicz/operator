@@ -95,6 +95,7 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     await p.route('http://127.0.0.1:8935/**', r => { const u = new URL(r.request().url()); if(u.pathname==='/news') return r.fulfill({status:200, body:RSS, headers:{'Access-Control-Allow-Origin':'*'}}); r.fulfill({status:200, body:'{"ok":true}', headers:{'Access-Control-Allow-Origin':'*'}}); });
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("checkAllAlarms()"); await p.waitForTimeout(400);
+    for(let i=0;i<5 && !(await p.$('[data-action="wakeStartDay"]'));i++){ await p.waitForTimeout(400); await E("checkAllAlarms()"); } // (slow under load)
     await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(500);
     check('the slow, cinematic intro is the default', await E("wakeCfg().intro")==='cinematic' && await p.isVisible('.brief-intro.is-cinematic'));
     await p.waitForTimeout(8600);

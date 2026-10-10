@@ -11,7 +11,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // ---- Good morning pace ----
   {
     const asked = [];
-    const p = await newPage(b, OUT+'/r15.html', {profile:{name:'Andre'}, focus:{wake:{enabled:true, time:'07:00', days:[0,1,2,3,4,5,6], news:false, intro:'quick', introChosen:true}}}, new Date(2026,9,12,7,0,5).getTime());
+    const p = await newPage(b, OUT+'/r15.html', {profile:{name:'Andre'}, focus:{wake:{enabled:true, time:'07:00', days:[0,1,2,3,4,5,6], news:false, intro:'quick', introChosen:true, voice:false}}}, new Date(2026,9,12,7,0,5).getTime()); // (spoken, it goes at the voice's pace — r16 covers that)
     await okRoute(p, asked);
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("fireWake({})"); await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(300);
@@ -20,9 +20,12 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('no empty third column when headlines are off', await p.$('.b4-grid.cols-2')!==null && (await p.$$('.b4-grid > .b4-col')).length===2);
     check('true full screen is asked for while Good morning is up', asked.some(u => u==='/window/full?f=1'));
     await p.clock.runFor(4200); await E("ui.wakeIntroDone=true; renderWakeOverlayInto()"); await p.waitForTimeout(400);
-    const before = await E("Date.now()-ui.briefT0");
+    const shown = "ui.briefLines.filter(function(l){ return Date.now()-ui.briefT0 >= l.at; }).length";
+    const before = await E(shown);
+    await p.click('.brief-hello'); await p.waitForTimeout(150); // anywhere on the page that isn't a button
+    const b2 = await E(shown);
     await p.mouse.click(700, 880); await p.waitForTimeout(150); // where the (not yet shown) Start button sits
-    check('a click brings the next piece in right away', await E("Date.now()-ui.briefT0") - before > 600);
+    check('a click brings the next piece in right away', b2 > before, [before, b2]);
     check('…and never presses a button that hasn\'t appeared yet', await E("overlayOpen('wakeOverlay') && ui.wakeMode==='brief'"));
     await E("briefRevealAll()"); await p.waitForTimeout(900);
     await p.click('.brief-skipall'); await p.clock.runFor(800); await p.waitForTimeout(700);

@@ -185,7 +185,7 @@ setTimeout(function(){ opFocusPing(document.hasFocus() ? 1 : 0); }, 1500);
 function hexUtf8(str){ return Array.prototype.map.call(new TextEncoder().encode(String(str||'')), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
 function musicApp(cmd, media){
   // transport controls go through /music/cmd (there is no /music/pause route — pausing silently failed before)
-  if(['pause','play','next','prev','playpause'].indexOf(cmd)>=0) return helperFetch(MUSIC_URL+'cmd?c='+cmd, 4000);
+  if(!media && ['pause','play','next','prev','playpause'].indexOf(cmd)>=0) return helperFetch(MUSIC_URL+'cmd?c='+cmd, 4000);
   return helperFetch(MUSIC_URL+cmd+(media ? '?k='+(media.k==='playlist'?'playlist':'song')+'&q='+hexUtf8(media.q) : ''), 4000, false, cmd==='play');
 }
 async function playWakeMedia(media, onFail){

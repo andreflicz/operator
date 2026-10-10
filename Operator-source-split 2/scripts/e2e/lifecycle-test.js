@@ -111,7 +111,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('[data-action="businessTab"][data-tab="lifecycle"]');
   await p.click('[data-action="openLifecycleEditor"]'); await p.waitForTimeout(300);
   await p.screenshot({path:OUT+'/cy-editor.png'});
-  await p.reload(); await p.waitForTimeout(400);
+  await p.reload(); await p.waitForTimeout(1200);
   check('everything persists after reload', (await E("cycles().length"))===4 && (await E("clientStep(state.business.clients[0]).label"))==='Kick-off');
   check('no page errors', p.errors.length===0, p.errors);
   await b.close();

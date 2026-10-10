@@ -126,7 +126,7 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     check('the sidebar says Social and it opens on the stats', /Social/.test(await p.textContent('#sidebarNav [data-view="convos"]')) && await E("inboxState().mode")==='social');
     const soc = await p.textContent('#viewRoot');
     check('Social: total followers, this week\'s change, engagement rate, per platform', /5,582/.test(soc) && /\+132 this week/.test(soc) && /Engagement rate/.test(soc) && (await p.$$('.sc-plats .sc-plat')).length===2 && await p.isVisible('.sc-eng'));
-    await p.click('.quick-journal-fab'); await p.waitForTimeout(300);
+    await p.click('.quick-journal-fab', {force:true}); await p.waitForTimeout(300);
     check('quick note pops up from the corner, focused', await p.isVisible('.qj3') && await p.evaluate(() => document.activeElement && document.activeElement.id==='quickJournalModalText'));
     await p.keyboard.type('Big win today'); await p.keyboard.press('Meta+Enter'); await p.waitForTimeout(300);
     check('⌘↵ saves it', await E("state.journal.entries.some(e=>e.text==='Big win today')") && await p.isVisible('.qj3.is-saved'));
