@@ -2876,6 +2876,304 @@
   .mm-k + .qt, .br-k + .qt{ margin-top:12px; }
   .wi-side .qt-mark{ height:20px; }
   #quickJournalOverlay.qj-pop-overlay #quickJournalContent{ border:1px solid rgba(var(--ink),.1) !important; outline:none !important; }
+
+  /* ================= ROUND 13 ================= */
+  /* speed: no live blur behind panels over the moving scene (it re-blurs every frame) */
+  body.has-scene .mini-cal-strip, body.has-scene .hq-top, body.has-scene .hq-cols, body.has-scene .hq-outreach{ -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+  body.has-scene .mini-cal-strip{ background:rgba(10,12,18,.82); } body.has-scene .hq-top, body.has-scene .hq-cols, body.has-scene .hq-outreach{ background:rgba(14,16,24,.9); }
+  :root[data-theme="light"] body.has-scene .hq-top, :root[data-theme="light"] body.has-scene .hq-cols, :root[data-theme="light"] body.has-scene .hq-outreach{ background:rgba(244,246,250,.94); }
+  body.has-scene .activity-pill{ -webkit-backdrop-filter:none; backdrop-filter:none; background:var(--panel-2); }
+  /* speed: glows that repaint a shadow every frame become still (or opacity-only) */
+  .focus-active-glow{ animation:none !important; }
+  .streak-dot-broken, .lc-next-ready, .cc2-avatar.ring-red, .goals-title-glow, .activity-pill[data-state="break"], .ls-go{ animation:none !important; }
+  .streak-dot-broken{ box-shadow:0 0 10px 2px rgba(232,99,107,.45); } .cc2-avatar.ring-red{ box-shadow:0 0 0 2px var(--panel), 0 0 0 4px var(--danger), 0 0 12px rgba(232,99,107,.35); }
+  .lc-next-ready{ box-shadow:0 0 14px 2px rgba(63,190,142,.35); }
+  /* ---------- Good morning on one screen ---------- */
+  #wakeOverlay:has(.brief4){ overflow:hidden !important; }
+  .brief4{ height:100vh; overflow:hidden; }
+  .brief4 .brief-inner.b4{ height:100vh; max-width:1320px; padding:clamp(16px, 2.6vh, 30px) clamp(20px, 3vw, 44px) clamp(14px, 2.2vh, 26px); display:flex; flex-direction:column; }
+  .brief4 .brief-top{ flex:none; display:flex; align-items:center; gap:10px; }
+  .b4-music{ margin-left:auto; display:flex; align-items:center; gap:8px; }
+  .b4-song{ display:inline-flex; align-items:center; gap:9px; height:30px; padding:0 6px 0 12px; border-radius:999px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); font-size:13px; font-weight:600; letter-spacing:0; text-transform:none; color:#fff; max-width:260px; }
+  .b4-song .wk2-eq{ height:12px; flex:none; }
+  .b4-stop{ border:none; background:rgba(255,255,255,.1); color:rgba(255,255,255,.75); width:20px; height:20px; border-radius:50%; font-size:9px; cursor:pointer; flex:none; }
+  .br-pl{ height:30px; padding:0 13px; border-radius:999px; border:1px solid rgba(255,197,107,.35); background:rgba(255,197,107,.08); color:#ffd08a; font-size:12.5px; font-weight:700; cursor:pointer; letter-spacing:0; text-transform:none; white-space:nowrap; }
+  .br-pl:hover{ background:rgba(255,197,107,.16); } .br-pl.is-unset{ color:rgba(255,255,255,.6); border-color:rgba(255,255,255,.16); background:transparent; }
+  .brief4 .brief-hello{ flex:none; font-size:clamp(40px, 6.4vh, 74px); margin:clamp(6px, 1.4vh, 16px) 0 4px; text-shadow:0 2px 30px rgba(255,170,90,.25); }
+  .brief4 .br-voice{ flex:none; font-size:clamp(16px, 2.2vh, 21px); color:#bfe6ff; font-weight:600; min-height:30px; }
+  .b4-grid{ flex:1; min-height:0; display:grid; grid-template-columns:1.15fr 1fr 1fr; gap:clamp(10px, 1.4vh, 16px); margin-top:clamp(8px, 1.6vh, 18px); }
+  .b4-col{ display:flex; flex-direction:column; gap:clamp(10px, 1.4vh, 16px); min-height:0; }
+  .b4-col > .br-p{ min-height:0; overflow:hidden; }
+  .brief4 .br-p:not(.brief-top):not(.brief-hello):not(.br-voice):not(.brief-cta){ padding:clamp(12px, 1.8vh, 20px) clamp(14px, 1.4vw, 22px) !important; }
+  .brief4 .br-hero{ flex:none; display:flex; flex-direction:column; gap:12px; margin:0 !important; }
+  .brh-top{ display:flex; align-items:center; justify-content:space-between; gap:14px; }
+  .brief4 .brh-i{ font-size:clamp(34px, 5vh, 50px); } .brief4 .brh-t{ font-size:clamp(42px, 6.4vh, 64px); font-weight:300; }
+  .brief4 .brh-l{ font-size:15px; font-weight:600; color:#fff; } .brief4 .brh-l span{ font-weight:500; color:rgba(255,255,255,.55); }
+  .brief4 .brh-sleep{ border:none; padding:0; text-align:right; } .brief4 .brh-sleep b{ font-size:clamp(22px, 3vh, 28px); }
+  .brief4 .brh-sun{ align-items:stretch; } .brief4 .brh-sun .sun-arc{ width:100%; height:auto; max-width:none; } .brief4 .brh-sun-row{ width:auto; max-width:none; font-size:15px; }
+  .brief4 .br-lastnight, .brief4 .br-vision{ flex:1; }
+  .br-ln-head{ font-family:var(--font-display); font-size:clamp(20px, 2.8vh, 28px); font-weight:800; line-height:1.2; color:#fff; letter-spacing:-.01em; }
+  .br-ln-head + .br-ln-text{ margin-top:8px; font-size:clamp(15px, 2vh, 18px); font-weight:500; color:rgba(255,255,255,.82); font-family:inherit; }
+  .brief4 .br-quote{ flex:none; } .brief4 .qt blockquote{ font-size:clamp(18px, 2.5vh, 24px); color:#fff; line-height:1.45; }
+  .brief4 .br-thoughts{ flex:1; } .brief4 .br-th{ padding:clamp(6px, 1vh, 11px) 0; } .brief4 .br-th b{ color:#fff; font-size:15px; }
+  .brief4 .br-news{ flex:1; } .br-news-i.is-top span{ font-weight:700; color:#fff; font-size:15px; }
+  .brief4 .br-news-i{ padding:clamp(6px, 1vh, 9px) 0; font-size:14px; color:rgba(255,255,255,.88); }
+  .brief4 .br-day{ flex:none; }
+  .brief4 .br-k{ color:rgba(255,255,255,.62); }
+  .brief4 .brief-cta{ flex:none; margin-top:clamp(10px, 1.8vh, 20px); }
+  .brief4 .brief-go.brief-morning{ font-size:19px; padding:15px 38px; }
+  @media (max-width:1000px){ .b4-grid{ grid-template-columns:1fr 1fr; } .b4-col:nth-child(3){ display:none; } }
+  /* Start my morning: Good morning lifts away */
+  .brief.is-leaving{ animation:b4Leave .52s cubic-bezier(.5,0,.2,1) forwards; }
+  @keyframes b4Leave{ to{ opacity:0; transform:translateY(-18px) scale(1.015); filter:blur(4px); } }
+  .wi{ animation:wiIn .6s cubic-bezier(.2,.8,.2,1) both; } @keyframes wiIn{ from{ opacity:0; transform:translateY(14px); } }
+  .wi-pl{ margin-left:auto; margin-right:10px; }
+  .wi-note{ padding:12px 14px; border-radius:14px; background:rgba(126,140,255,.1); border:1px solid rgba(160,170,255,.22); }
+  .wi-note span{ font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#b9c0ff; } .wi-note p{ margin:6px 0 0; font-size:15.5px; font-weight:600; line-height:1.4; color:#fff; }
+  /* the alarm: last night's headline */
+  .wk3-head{ max-width:640px; margin:6px auto 0; padding:0 20px; font-family:var(--font-display); font-size:clamp(20px, 2.6vw, 30px); font-weight:800; line-height:1.2; color:#fff; text-align:center; text-shadow:0 2px 24px rgba(0,0,0,.4); }
+  /* snooze: a calm, dim screen that eases in */
+  .snz{ position:absolute; inset:0; overflow:hidden; color:#fff; background:radial-gradient(ellipse at 50% 120%, #1b1640 0%, #08081a 55%, #030308 100%); animation:snzIn 1.2s ease both; }
+  @keyframes snzIn{ from{ opacity:0; filter:blur(8px); } }
+  .snz-moon{ position:absolute; left:50%; top:22%; width:120px; height:120px; margin-left:-60px; border-radius:50%; background:radial-gradient(circle at 35% 35%, #e9ecff, #aab3e8 60%, #7d86c4); box-shadow:0 0 80px rgba(170,180,255,.25); opacity:.85; animation:snzMoon 1.6s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes snzMoon{ from{ opacity:0; transform:translateY(30px); } }
+  .snz-c{ position:relative; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding-top:12vh; text-align:center; }
+  .snz-k{ font-size:12px; font-weight:800; letter-spacing:.24em; text-transform:uppercase; color:rgba(200,205,255,.6); }
+  .snz-left{ font-family:var(--font-display); font-size:clamp(70px, 11vw, 140px); font-weight:200; letter-spacing:-.03em; line-height:1; font-variant-numeric:tabular-nums; color:rgba(255,255,255,.9); }
+  .snz-sub{ font-size:15px; color:rgba(255,255,255,.5); }
+  .snz-note{ margin-top:16px; max-width:520px; font-size:18px; font-weight:600; color:rgba(255,255,255,.8); }
+  .snz-acts{ position:absolute; left:0; right:0; bottom:44px; display:flex; justify-content:center; }
+  /* Wind down: the note in three parts */
+  .wd-nf{ display:grid; grid-template-columns:200px 1fr; gap:14px; align-items:start; margin-bottom:12px; }
+  .wd-nf label span{ display:block; font-weight:700; font-size:14.5px; } .wd-nf label small{ font-size:12px; color:rgba(255,255,255,.5); }
+  .wd-nf-head{ font-size:18px !important; font-weight:700; }
+  .wd-note-item div{ flex:1; display:flex; flex-direction:column; gap:3px; } .wd-note-item b{ font-size:16px; } .wd-note-item div span{ font-size:13.5px; color:rgba(255,255,255,.7); }
+  @media (max-width:700px){ .wd-nf{ grid-template-columns:1fr; gap:6px; } }
+  .brief4 .brh-sleep{ display:flex; flex-direction:column; align-items:flex-end; gap:1px; white-space:nowrap; }
+  .brief4 .brh-sleep small{ font-size:10.5px; font-weight:700; letter-spacing:.14em; color:rgba(255,255,255,.45); }
+  .brief4 .brh-sleep span{ font-size:12px; }
+  .brief4 .brh-hl{ font-size:12.5px; color:rgba(255,255,255,.55); margin-top:2px; white-space:nowrap; }
+  .wi-inner > *, .wi-stat, .wi-plan, .wi-side, .wi .pr-row, .wi .pr-cta{ animation-duration:.45s !important; }
+  .wi-h{ animation-duration:.6s !important; }
+  /* ---------- locked in: the view button, focus music chip ---------- */
+  .locked-in-header{ position:relative; }
+  .lv-corner{ position:absolute; top:0; right:0; display:flex; align-items:center; gap:8px; }
+  .lv-btn{ height:32px; padding:0 14px; border-radius:999px; border:1px solid rgba(var(--ink),.14); background:rgba(var(--ink),.05); color:var(--text); font-size:12.5px; font-weight:700; cursor:pointer; white-space:nowrap; transition:background .15s, border-color .15s; }
+  .lv-btn:hover{ background:rgba(var(--ink),.1); border-color:rgba(232,162,61,.5); }
+  .fm{ display:inline-flex; align-items:center; gap:8px; height:32px; padding:0 6px 0 12px; border-radius:999px; border:1px solid rgba(var(--ink),.12); background:rgba(var(--ink),.04); font-size:12.5px; font-weight:600; color:var(--text-dim); white-space:nowrap; }
+  .fm.is-on{ color:var(--text); border-color:rgba(232,162,61,.35); } .fm .wk2-eq{ height:12px; } .fm-i{ color:#e8a23d; }
+  .fm-t{ max-width:130px; overflow:hidden; text-overflow:ellipsis; }
+  .fm-b{ border:none; background:rgba(var(--ink),.07); color:var(--text); width:24px; height:24px; border-radius:50%; font-size:10px; cursor:pointer; }
+  .fm-b:hover{ background:rgba(232,162,61,.25); }
+  /* ---------- the minimal view (like a song playing full screen) ---------- */
+  body.np-on .sidebar, body.np-on .fab-add, body.np-on .quick-journal-fab, body.np-on .activity-pill{ display:none !important; }
+  body.np-on .app{ grid-template-columns:1fr !important; } body.np-on .main{ padding:0 !important; margin:0 !important; max-width:none !important; }
+  body.np-on #viewRoot{ padding:0 !important; }
+  .np{ position:relative; min-height:100vh; display:flex; flex-direction:column; color:#fff; overflow:hidden; animation:npIn .5s ease both; }
+  @keyframes npIn{ from{ opacity:0; transform:scale(1.01); } }
+  .np-bg{ position:absolute; inset:-10%; background:radial-gradient(60% 60% at 30% 40%, rgba(232,162,61,.35), transparent 70%), radial-gradient(50% 50% at 75% 65%, rgba(63,190,142,.22), transparent 70%), #0a0a10; filter:blur(40px); }
+  .np.is-break .np-bg{ background:radial-gradient(60% 60% at 30% 40%, rgba(90,170,255,.32), transparent 70%), radial-gradient(50% 50% at 75% 65%, rgba(150,120,255,.2), transparent 70%), #08090f; }
+  .np-top{ position:relative; display:flex; align-items:center; gap:14px; padding:22px 30px; }
+  .np-time{ font-family:var(--font-display); font-size:18px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .np-ring{ font-size:13px; color:rgba(255,255,255,.65); }
+  .np .lv-btn, .np .fm{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.16); color:#fff; } .np .fm-b{ background:rgba(255,255,255,.12); color:#fff; }
+  .np-main{ position:relative; flex:1; display:flex; align-items:center; justify-content:center; gap:clamp(30px, 5vw, 70px); padding:0 6vw 8vh; flex-wrap:wrap; }
+  .np-art{ width:clamp(220px, 30vw, 380px); aspect-ratio:1; border-radius:28px; display:flex; align-items:center; justify-content:center; font-size:clamp(70px, 9vw, 120px);
+    background:linear-gradient(145deg, #f2b45c, #e8743d 55%, #8b3fbf); box-shadow:0 40px 100px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.3); }
+  .np-art.is-break{ background:linear-gradient(145deg, #6fc3ff, #4a6cf0 55%, #7b4fd6); }
+  .np-meta{ width:min(520px, 90vw); display:flex; flex-direction:column; gap:6px; }
+  .np-k{ font-size:12px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,.6); }
+  .np-title{ font-family:var(--font-display); font-size:clamp(28px, 3.4vw, 44px); font-weight:800; line-height:1.1; letter-spacing:-.02em; }
+  .np-sub{ font-size:16px; color:rgba(255,255,255,.7); } .np-sub b{ color:#fff; }
+  .np-prog{ margin-top:22px; }
+  .np-bar{ height:6px; border-radius:4px; background:rgba(255,255,255,.18); overflow:hidden; } .np-bar i{ display:block; height:100%; background:#fff; border-radius:4px; transition:width 1s linear; }
+  .np-times{ display:flex; justify-content:space-between; margin-top:8px; font-size:13px; color:rgba(255,255,255,.65); font-variant-numeric:tabular-nums; }
+  .np-times #focusElapsed, .np-times #modeElapsed{ font-family:var(--font-display); font-size:30px; font-weight:700; color:#fff; letter-spacing:-.01em; }
+  .np-times span:last-child{ align-self:flex-end; }
+  .np-ctl{ display:flex; align-items:center; gap:22px; margin-top:22px; }
+  .np-c{ width:54px; height:54px; border-radius:50%; border:none; background:rgba(255,255,255,.1); color:#fff; font-size:20px; cursor:pointer; transition:transform .15s, background .15s; }
+  .np-c:hover{ background:rgba(255,255,255,.2); transform:scale(1.06); } .np-c.is-main{ width:72px; height:72px; background:#fff; color:#111; font-size:26px; }
+  .np-next{ margin-top:18px; font-size:14px; color:rgba(255,255,255,.6); }
+  /* ---------- the break pop-up ---------- */
+  #breakNoteOverlay{ background:rgba(4,6,12,.62) !important; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+  #breakNoteContent{ max-width:440px !important; padding:0 !important; border-radius:26px !important; overflow:hidden; border:1px solid rgba(120,170,255,.25) !important; background:linear-gradient(180deg, #121826, #0c0f18) !important; color:#fff; box-shadow:0 40px 90px rgba(0,0,0,.55) !important; animation:brkIn .35s cubic-bezier(.2,.9,.3,1.15) both; }
+  @keyframes brkIn{ from{ opacity:0; transform:translateY(12px) scale(.96); } }
+  .brk{ position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; padding:30px 26px 24px; }
+  .brk-x{ position:absolute; top:14px; right:14px; border:none; background:rgba(255,255,255,.06); color:rgba(255,255,255,.6); width:30px; height:30px; border-radius:50%; cursor:pointer; }
+  .brk-i{ width:62px; height:62px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; background:radial-gradient(circle at 35% 30%, rgba(111,195,255,.35), rgba(74,108,240,.15)); box-shadow:0 0 0 6px rgba(111,195,255,.06); }
+  .brk-h{ font-family:var(--font-display); font-size:26px; font-weight:800; margin-top:12px; } .brk-s{ font-size:13px; color:rgba(255,255,255,.5); margin-top:2px; }
+  .brk-lens{ display:grid; grid-template-columns:repeat(6, 1fr); gap:6px; width:100%; margin-top:20px; }
+  .brk-len{ display:flex; flex-direction:column; align-items:center; gap:1px; padding:11px 0 9px; border-radius:14px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.03); color:#fff; cursor:pointer; transition:all .15s; }
+  .brk-len b{ font-family:var(--font-display); font-size:20px; } .brk-len span{ font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:rgba(255,255,255,.45); }
+  .brk-len:hover{ border-color:rgba(111,195,255,.5); } .brk-len.is-on{ border-color:#6fc3ff; background:rgba(111,195,255,.14); } .brk-len.is-on span{ color:#9fd6ff; }
+  .brk-back{ margin-top:12px; font-size:14px; color:rgba(255,255,255,.6); } .brk-back b{ color:#fff; }
+  .brk-note{ width:100%; margin-top:16px; } .brk-note .input{ width:100%; background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.12); color:#fff; text-align:center; }
+  .brk-chips{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:8px; }
+  .brk-chip{ border:1px solid rgba(255,255,255,.1); background:transparent; color:rgba(255,255,255,.7); border-radius:999px; padding:4px 10px; font-size:12px; cursor:pointer; } .brk-chip:hover{ color:#fff; border-color:rgba(111,195,255,.5); }
+  .brk-go{ margin-top:20px; width:100%; padding:15px; border:none; border-radius:999px; font-weight:800; font-size:16px; color:#06101c; background:linear-gradient(180deg, #9fd6ff, #5fa8ff); cursor:pointer; box-shadow:0 14px 34px rgba(95,168,255,.3); }
+  .brk-go:hover{ transform:translateY(-1px); }
+  .lock-flash.is-break .lf-ring{ border-color:rgba(111,195,255,.8); } .lock-flash.is-break .lf-k{ text-shadow:0 0 40px rgba(111,195,255,.6); }
+  /* ---------- on a break, the tasks rest ---------- */
+  body.is-on-break .task-item-v2, body.is-on-break .tl-row, body.is-on-break .knock-out-list, body.is-on-break .nn-panel, body.is-on-break .task-card{ opacity:.5; filter:saturate(.6); }
+  body.is-on-break .knock-out-card .section-title::after{ content:'Paused for your break'; margin-left:10px; font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--info); text-transform:uppercase; }
+  .lv-corner{ top:14px; right:16px; }
+  /* quotes turn over */
+  .qt{ position:relative; } .qt-next{ position:absolute; top:-4px; right:-4px; width:26px; height:26px; border-radius:50%; border:none; background:transparent; color:rgba(255,255,255,.35); cursor:pointer; font-size:14px; opacity:0; transition:opacity .2s, color .2s, transform .3s; }
+  .qt:hover .qt-next{ opacity:1; } .qt-next:hover{ color:#ffc56b; transform:rotate(90deg); }
+  .mm .qt-next{ color:var(--text-dim); }
+  .qt.qt-swap blockquote, .qt.qt-swap figcaption{ animation:qtSwap .9s ease both; } @keyframes qtSwap{ from{ opacity:0; filter:blur(3px); transform:translateY(4px); } }
+  /* business preview: more at a glance */
+  .wi-stats.n5{ grid-template-columns:repeat(5, 1fr); } .wi-stats.n6{ grid-template-columns:repeat(6, 1fr); }
+  .wi-stats.n6 .wi-stat-v, .wi-stats.n5 .wi-stat-v{ font-size:24px; }
+  .wi-stat[data-action]{ cursor:pointer; } .wi-stat[data-action]:hover{ border-color:rgba(63,190,142,.4); }
+  .wi-row2{ display:grid; grid-template-columns:3fr 2fr; gap:14px; margin-top:14px; animation:lsRow .45s both; }
+  .wi-clients, .wi-act{ padding:16px 18px; border-radius:20px; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.08); }
+  .wi-cl-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+  .wi-cl{ display:grid; grid-template-columns:10px 1fr; grid-template-rows:auto auto; column-gap:9px; align-items:center; text-align:left; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03); color:#fff; cursor:pointer; }
+  .wi-cl i{ grid-row:1 / 3; width:9px; height:9px; border-radius:50%; background:#3fbe8e; box-shadow:0 0 10px rgba(63,190,142,.6); }
+  .wi-cl.is-yellow i{ background:#e8a23d; box-shadow:0 0 10px rgba(232,162,61,.6); } .wi-cl.is-red i{ background:#ff6b6b; box-shadow:0 0 10px rgba(255,107,107,.6); }
+  .wi-cl b{ font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .wi-cl span{ font-size:11.5px; color:rgba(255,255,255,.5); }
+  .wi-cl:hover{ border-color:rgba(255,255,255,.2); }
+  .wi-act{ display:flex; align-items:center; } .wi-act .qt blockquote{ font-size:18px; color:#fff; }
+  @media (max-width:980px){ .wi-stats.n5, .wi-stats.n6{ grid-template-columns:repeat(3, 1fr); } .wi-row2{ grid-template-columns:1fr; } }
+  /* business preview fits a laptop screen */
+  .wi-top{ padding:16px 28px 0; }
+  .wi-inner{ padding:4px 28px 18px; max-width:1100px; justify-content:flex-start; }
+  .wi-h{ font-size:clamp(30px, 4.6vh, 46px) !important; margin:6px 0 16px !important; }
+  .wi-stat{ padding:12px 14px; border-radius:16px; } .wi-stat-v{ font-size:22px !important; margin:4px 0 2px; } .wi-stat-k{ font-size:10px; }
+  .wi-cols, .wi-row2{ margin-top:10px; gap:10px; }
+  .wi-plan, .wi-side, .wi-clients, .wi-act{ padding:14px 16px; }
+  .wi .pr-row{ padding:9px 12px; } .wi .pr-list{ gap:6px; }
+  .wi-side{ gap:12px; } .wi-side .qt blockquote{ font-size:17px; line-height:1.45; } .wi-act .qt blockquote{ font-size:16px; }
+  .wi-target{ padding-top:10px; } .wi-target b{ font-size:20px; }
+  .wi .pr-cta{ margin-top:14px; } .wi .pr-go{ padding:16px 30px; width:min(360px, 100%); } .wi .pr-go b{ font-size:26px; }
+  /* the playlist button: a quiet glass circle that grows into the name */
+  .plb{ display:inline-flex; align-items:center; height:34px; padding:0; border-radius:999px; cursor:pointer; color:#fff; letter-spacing:0; text-transform:none;
+    background:linear-gradient(160deg, rgba(255,255,255,.18), rgba(255,255,255,.05)); border:1px solid rgba(255,255,255,.22); box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 8px 24px rgba(0,0,0,.25);
+    -webkit-backdrop-filter:blur(12px) saturate(1.4); backdrop-filter:blur(12px) saturate(1.4); transition:padding .35s cubic-bezier(.2,.9,.3,1.1), background .2s; }
+  .plb-i{ width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size:12px; flex:none; } .plb-i .wk2-eq{ height:12px; }
+  .plb-t{ max-width:0; overflow:hidden; white-space:nowrap; font-size:12.5px; font-weight:700; opacity:0; transition:max-width .4s cubic-bezier(.2,.9,.3,1.1), opacity .25s, margin .3s; }
+  .plb:hover .plb-t, .plb.is-on .plb-t{ max-width:220px; opacity:1; margin-right:14px; }
+  .plb.is-on{ background:linear-gradient(160deg, rgba(255,197,107,.3), rgba(255,197,107,.08)); border-color:rgba(255,197,107,.45); }
+  .plb.is-unset{ opacity:.6; } .plb.is-unset:hover{ opacity:1; }
+  .snd-pl label b{ display:block; font-size:14px; } .snd-pl label small{ display:block; font-size:12.5px; color:var(--text-dim); margin-top:2px; } .snd-pl{ padding-bottom:10px; }
+  /* business preview: note, quote, plan each in their own place */
+  .wi-right{ display:flex; flex-direction:column; gap:10px; animation:lsRow .45s both; }
+  .wi-right .wi-note{ padding:14px 16px; border-radius:18px; } .wi-right .wi-side{ flex:1; display:flex; align-items:center; }
+  .br-news-i small{ display:block; margin-top:2px; font-size:11.5px; color:rgba(255,255,255,.45); font-weight:500; }
+  /* ---------- the client: sections like settings ---------- */
+  .cm{ position:relative; display:grid; grid-template-columns:240px 1fr; height:100%; }
+  .cm-nav{ display:flex; flex-direction:column; gap:3px; padding:22px 14px 16px; border-right:1px solid var(--border); background:rgba(var(--ink),.025); overflow-y:auto; }
+  .cm-who{ display:flex; align-items:center; gap:10px; padding:0 6px; } .cm-who b{ display:block; font-size:15px; line-height:1.2; } .cm-who span{ font-size:12px; color:var(--text-dim); }
+  .cm-tags{ display:flex; flex-wrap:wrap; gap:5px; padding:10px 6px 14px; margin-bottom:6px; border-bottom:1px solid var(--border); }
+  .cm-nav-i{ display:flex; align-items:center; gap:10px; width:100%; padding:9px 10px; border:none; border-radius:10px; background:transparent; color:var(--text-dim); font-size:13.5px; font-weight:600; text-align:left; cursor:pointer; transition:background .12s, color .12s; }
+  .cm-nav-i span{ width:18px; text-align:center; opacity:.8; } .cm-nav-i:hover{ background:rgba(var(--ink),.05); color:var(--text); }
+  .cm-nav-i.is-on{ background:var(--accent-dim); color:var(--text); box-shadow:inset 3px 0 0 var(--accent); }
+  .cm-pane{ padding:26px 30px 30px; overflow-y:auto; animation:cmIn .2s ease both; } @keyframes cmIn{ from{ opacity:0; transform:translateX(6px); } }
+  .cm-h{ display:flex; align-items:baseline; gap:10px; font-family:var(--font-display); font-size:20px; font-weight:800; margin-bottom:16px; } .cm-h .kpi-sub{ font-family:inherit; font-size:12.5px; font-weight:500; }
+  .cm-grp{ padding:14px 16px; border-radius:14px; border:1px solid var(--border); margin-bottom:14px; }
+  .cm-danger{ margin-top:30px; padding-top:16px; border-top:1px solid var(--border); }
+  .cm-x{ position:absolute; top:14px; right:14px; width:32px; height:32px; border-radius:50%; border:none; background:rgba(var(--ink),.06); color:var(--text-dim); cursor:pointer; z-index:2; } .cm-x:hover{ color:var(--text); background:rgba(var(--ink),.12); }
+  .cm .cf{ padding:0; } .cm .cf-facts{ margin-top:0; }
+  @media (max-width:760px){ .cm{ grid-template-columns:1fr; } .cm-nav{ flex-direction:row; flex-wrap:wrap; border-right:none; border-bottom:1px solid var(--border); } .cm-who, .cm-tags{ display:none; } .cm-nav-i{ width:auto; } }
+  /* settings: five places, parts under quiet headings, finer options folded away */
+  .set-part + .set-part{ margin-top:34px; }
+  .set-part-h{ font-family:var(--font-display); font-size:13px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); margin:0 0 12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+  .set-more{ margin-top:6px; border:1px solid var(--border); border-radius:14px; padding:0 16px; background:rgba(var(--ink),.02); }
+  .set-more > summary{ list-style:none; cursor:pointer; padding:14px 0; font-weight:700; font-size:14px; display:flex; align-items:baseline; gap:10px; }
+  .set-more > summary::-webkit-details-marker{ display:none; } .set-more > summary::before{ content:'›'; display:inline-block; transition:transform .2s; color:var(--text-dim); }
+  .set-more[open] > summary::before{ transform:rotate(90deg); } .set-more > summary span{ font-size:12.5px; font-weight:500; color:var(--text-dim); }
+  .set-more[open]{ padding-bottom:6px; }
+  /* journal: titles, tucked-away types, photos in the quick note */
+  .journal-title{ font-family:var(--font-display); font-weight:800; font-size:16px; margin:4px 0 2px; }
+  .je-title-in{ width:100%; margin-bottom:8px; font-weight:700; }
+  .qj2-title{ border-bottom-left-radius:0; border-bottom-right-radius:0; }
+  .qj3-title{ border:none; outline:none; background:transparent; color:var(--text); font:inherit; font-size:17px; font-weight:800; padding:6px 18px 0; }
+  .qj3-title::placeholder{ color:var(--text-faint, rgba(127,127,127,.55)); font-weight:600; }
+  .qj3-ph{ border:none; background:transparent; font-size:15px; cursor:pointer; opacity:.55; padding:4px; } .qj3-ph:hover{ opacity:1; }
+  .qj3-photos{ display:flex; gap:8px; padding:0 18px 8px; flex-wrap:wrap; }
+  .qj3-photos span{ position:relative; } .qj3-photos img{ width:44px; height:44px; border-radius:10px; object-fit:cover; }
+  .qj3-photos button{ position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; border:none; background:var(--panel-2); color:var(--text); font-size:12px; line-height:16px; cursor:pointer; }
+  .chip-more{ opacity:.65; } .chip-more:hover{ opacity:1; }
+  .qj2-title{ background:transparent !important; border:none !important; box-shadow:none !important; padding:2px 4px 6px !important; margin:0 0 2px; font-size:15px; font-family:var(--font-display); }
+  .qj2-title::placeholder{ color:var(--text-faint, rgba(127,127,127,.55)); font-weight:600; }
+  /* the note's name is its heading — click it and type */
+  .qj3-name{ display:block; width:100%; border:none; outline:none; background:transparent; color:var(--text); font:inherit; font-size:15px; font-weight:800; padding:2px 6px; margin:-2px -6px 1px; border-radius:7px; transition:background .15s; }
+  .qj3-name::placeholder{ color:var(--text); opacity:1; }
+  .qj3-name:hover{ background:rgba(var(--ink),.05); } .qj3-name:focus{ background:rgba(var(--ink),.07); }
+  .qj3-name:focus::placeholder{ opacity:.35; }
+  /* business preview: one screen, the button sized like the rest */
+  #planOverlay .wi{ height:100vh; overflow:hidden; }
+  #planOverlay .wi-inner{ flex:1; min-height:0; display:flex; flex-direction:column; justify-content:flex-start; padding-bottom:20px; }
+  #planOverlay .wi-cols{ flex:1; min-height:0; } #planOverlay .wi-plan{ overflow:hidden; }
+  #planOverlay .wi .pr-cta, .wi .pr-cta{ flex:none; margin-top:16px; gap:6px; }
+  .wi .pr-go{ width:auto !important; padding:13px 34px !important; gap:10px; border-radius:999px; }
+  .wi .pr-go b{ font-size:17px !important; letter-spacing:.14em; } .wi .pr-go .ls-go-i{ font-size:17px; } .wi .pr-go .ls-go-ring{ inset:-5px; }
+  .wi .ls-go-sub{ font-size:12.5px; } .wi .pr-later{ padding:4px 10px; font-size:13px; }
+  @media (max-height:780px){ #planOverlay .wi-row2 .wi-act{ display:none; } #planOverlay .wi-row2{ grid-template-columns:1fr; } }
+  #planOverlay .wi-cols{ flex:none; } #planOverlay .wi .pr-cta{ margin-top:auto; padding-top:16px; }
+  /* ---------- day off ---------- */
+  .dayoff{ position:relative; min-height:calc(100vh - 60px); display:flex; align-items:center; justify-content:center; overflow:hidden; border-radius:28px; animation:npIn .6s ease both; }
+  .dayoff-bg{ position:absolute; inset:-10%; background:radial-gradient(55% 55% at 25% 30%, rgba(63,190,142,.28), transparent 70%), radial-gradient(50% 50% at 80% 70%, rgba(111,195,255,.2), transparent 70%), radial-gradient(40% 40% at 60% 20%, rgba(255,197,107,.14), transparent 70%); filter:blur(30px); }
+  .dayoff-in{ position:relative; width:min(720px, 92%); text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px; padding:40px 0; }
+  .dayoff-k{ font-size:12px; font-weight:800; letter-spacing:.2em; text-transform:uppercase; color:#7ef0c0; }
+  .dayoff-h{ margin:0; font-family:var(--font-display); font-size:clamp(34px, 5vw, 56px); font-weight:800; letter-spacing:-.03em; line-height:1.05; }
+  .dayoff-h span{ background:linear-gradient(90deg, #7ef0c0, #9fd6ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .dayoff-sub{ color:var(--text-dim); font-size:15px; }
+  .dayoff-cards{ display:flex; gap:12px; margin-top:18px; flex-wrap:wrap; justify-content:center; }
+  .dayoff-c{ min-width:180px; padding:16px 20px; border-radius:18px; background:rgba(var(--ink),.04); border:1px solid rgba(var(--ink),.1); display:flex; flex-direction:column; gap:2px; }
+  .dayoff-c b{ font-family:var(--font-display); font-size:28px; } .dayoff-c span{ font-size:12.5px; color:var(--text-dim); }
+  .dayoff-ideas{ width:min(460px, 100%); margin-top:18px; text-align:left; padding:6px 18px; border-radius:18px; background:rgba(var(--ink),.03); border:1px solid rgba(var(--ink),.08); }
+  .dayoff-ideas .br-th span:not(.br-th-i){ color:var(--text-dim); } .dayoff-ideas .br-th-i{ background:rgba(var(--ink),.06); }
+  .dayoff-back{ margin-top:22px; border:1px solid rgba(var(--ink),.18); background:transparent; color:var(--text-dim); border-radius:999px; padding:10px 20px; font-weight:600; cursor:pointer; } .dayoff-back:hover{ color:var(--text); border-color:#7ef0c0; }
+  .lock-flash.is-dayoff .lf-ring{ border-color:rgba(126,240,192,.8); } .lock-flash.is-dayoff .lf-k{ text-shadow:0 0 40px rgba(126,240,192,.6); }
+  .lock-flash.is-dayoff.is-back .lf-ring{ border-color:rgba(255,197,107,.8); }
+  .th-mode.is-on{ border-color:rgba(197,143,255,.6); background:rgba(197,143,255,.14); color:var(--text); }
+
+  .dayoff-row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .dayoff.is-weekend .dayoff-bg{ background:radial-gradient(55% 55% at 25% 30%, rgba(255,170,90,.24), transparent 70%), radial-gradient(50% 50% at 80% 70%, rgba(150,120,255,.2), transparent 70%), radial-gradient(40% 40% at 60% 20%, rgba(63,190,142,.14), transparent 70%); }
+  .dayoff.is-weekend .dayoff-k{ color:#ffc56b; }
+  .dayoff.is-weekend .dayoff-h span{ background:linear-gradient(90deg, #ffc56b, #c3a6ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+  /* business preview: two balanced columns */
+  .wi-cols{ grid-template-columns:1.25fr 1fr !important; align-items:stretch !important; }
+  .wi-col{ display:flex; flex-direction:column; gap:10px; min-height:0; }
+  .wi-col > .wi-plan{ flex:1; } .wi-col .wi-clients{ flex:none; }
+  .wi-right .wi-side{ flex:1 1 auto; } .wi-right .wi-act{ flex:1 1 auto; }
+  .wi-week{ padding:14px 16px; border-radius:20px; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.08); }
+  .wi-wk-bars{ position:relative; display:grid; grid-template-columns:repeat(7, 1fr); gap:8px; height:74px; margin-top:10px; padding-bottom:16px; }
+  .wi-wk-goal{ position:absolute; left:0; right:0; border-top:1px dashed rgba(255,255,255,.22); margin-bottom:16px; pointer-events:none; }
+  .wi-wk{ position:relative; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; height:100%; }
+  .wi-wk u{ display:block; width:100%; max-width:26px; border-radius:6px 6px 3px 3px; background:rgba(255,255,255,.16); text-decoration:none; transition:height .6s ease; }
+  .wi-wk.is-hit u{ background:linear-gradient(180deg, #7ef0c0, #3fbe8e); } .wi-wk.is-today u{ box-shadow:0 0 0 1px rgba(255,255,255,.55); }
+  .wi-wk span{ position:absolute; bottom:-16px; font-size:10.5px; color:rgba(255,255,255,.45); } .wi-wk.is-today span{ color:#fff; font-weight:700; }
+  .wi-row2{ display:none; }
+  @media (max-height:820px){ #planOverlay .wi-right .wi-act{ display:none; } }
+  @media (max-height:720px){ #planOverlay .wi-week{ display:none; } }
+  @media (max-width:860px){ .wi-cols{ grid-template-columns:1fr !important; } }
+  #planOverlay .wi-top .wd-close{ position:relative; z-index:3; }
+
+  /* day off / weekend: full screen and minimal */
+  .np.rest{ min-height:calc(100vh - 60px); border-radius:28px; }
+  .np.rest.rest-full{ min-height:100vh; border-radius:0; }
+  .np.rest .dayoff-bg, .np.rest .np-bg{ position:absolute; inset:-10%; }
+  .np.rest.dayoff{ align-items:stretch; justify-content:flex-start; }
+  .np.rest.dayoff .dayoff-in{ margin:auto; padding:0 0 8vh; }
+  .np.is-dayoff .np-bg{ background:radial-gradient(60% 60% at 28% 40%, rgba(63,190,142,.38), transparent 70%), radial-gradient(50% 50% at 78% 65%, rgba(111,195,255,.26), transparent 70%), radial-gradient(35% 35% at 60% 15%, rgba(255,197,107,.16), transparent 70%), #07100e; filter:blur(40px); animation:restDrift 24s ease-in-out infinite alternate; }
+  .np.is-weekend .dayoff-bg{ background:radial-gradient(55% 55% at 25% 30%, rgba(255,170,90,.3), transparent 70%), radial-gradient(50% 50% at 80% 70%, rgba(150,120,255,.26), transparent 70%), radial-gradient(40% 40% at 60% 20%, rgba(63,190,142,.14), transparent 70%), #0c0a10; filter:blur(36px); }
+  @keyframes restDrift{ to{ transform:translate3d(2%, -2%, 0) scale(1.04); } }
+  .np-art.is-dayoff{ background:linear-gradient(145deg, #7ef0c0, #2fa57c 50%, #3a7bd5); }
+  .rest-h{ font-size:clamp(48px, 6.5vw, 88px) !important; letter-spacing:-.04em !important; margin:2px 0 6px; }
+  .rest-stats{ display:flex; gap:clamp(18px, 3vw, 40px); margin-top:18px; flex-wrap:wrap; }
+  .rest-s{ display:flex; flex-direction:column; gap:2px; } .rest-s b{ font-family:var(--font-display); font-size:30px; font-weight:800; letter-spacing:-.02em; color:#fff; }
+  .rest-s span{ font-size:12.5px; color:rgba(255,255,255,.6); }
+  .rest-work{ font-size:12.5px; font-weight:600; padding:0 14px; width:auto !important; }
+  body.np-on .np.rest.rest-full{ border-radius:0; }
+  @media (prefers-reduced-motion:reduce){ .np.is-dayoff .np-bg{ animation:none; } }
+
+  .wi-wk-bars{ height:64px; padding-bottom:0; margin-bottom:18px; } .wi-wk-goal{ margin-bottom:0; }
+  #planOverlay .wi-inner{ justify-content:center; } #planOverlay .wi .pr-cta{ margin-top:22px; padding-top:0; }
+  .np.rest:not(.rest-full) .np-art{ width:clamp(150px, 20vw, 260px); } .np.rest:not(.rest-full) .np-main{ gap:clamp(24px, 4vw, 50px); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -2949,7 +3247,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
   <div class="card" id="prospectEditContent" style="max-width:520px; width:100%; max-height:85vh; overflow-y:auto;"></div>
 </div>
 <div id="clientModalOverlay" class="overlay hidden">
-  <div class="card" id="clientModalContent" style="max-width:560px; width:100%; max-height:85vh; overflow-y:auto;"></div>
+  <div class="card" id="clientModalContent" style="max-width:920px; width:100%; height:min(680px, 88vh); overflow:hidden; padding:0;"></div>
 </div>
 <div id="lockInOverlay" class="overlay hidden">
   <div class="card" id="lockInModalContent" style="max-width:420px; width:100%;"></div>
@@ -3089,7 +3387,42 @@ async function loadKey(key, fallback){
   try{ const p = JSON.parse(raw); return p==null ? fallback : p; }catch(e){ return fallback; }
 }
 let persistWarnedAt = 0;
-async function persist(key){
+// Saving is batched: a burst of clicks writes each part of the data once, a moment later and off
+// the click itself (turning a big part like Focus into text on every click made clicks feel slow).
+// Anything still waiting is written the moment the window hides or closes.
+const persistPending = {}; let persistTimer = 0, persistWaiters = [];
+function persist(key){
+  persistPending[key] = true;
+  if(!persistTimer) persistTimer = setTimeout(persistFlush, 250);
+  return new Promise(function(res){ persistWaiters.push(res); });
+}
+function persistFlush(){
+  clearTimeout(persistTimer); persistTimer = 0;
+  const keys = Object.keys(persistPending), waiters = persistWaiters;
+  keys.forEach(function(k){ delete persistPending[k]; });
+  persistWaiters = [];
+  let ok = true;
+  keys.forEach(function(k){ try{ ok = persistNow(k) && ok; }catch(e){ ok = false; } });
+  waiters.forEach(function(r){ r(ok); });
+  return ok;
+}
+window.addEventListener('pagehide', persistFlush);
+window.addEventListener('beforeunload', persistFlush);
+document.addEventListener('visibilitychange', function(){ if(document.hidden) persistFlush(); });
+function persistNow(key){
+  const val = JSON.stringify(state[key]);
+  if(hasCloud){ storageSetRaw(key, val).then(function(ok){ if(!ok) persistFailed(); }); return true; }
+  let ok = true; try{ localStorage.setItem('opsdash:'+key, val); }catch(e){ ok = false; }
+  if(!ok) persistFailed();
+  return ok;
+}
+function persistFailed(){
+  if(Date.now()-persistWarnedAt > 15000 && typeof showToast==='function'){
+    persistWarnedAt = Date.now();
+    showToast("Couldn't save — browser storage is full. Export your data from Settings.", {icon:'&#9888;', duration:6000});
+  }
+}
+async function persistOld(key){
   const ok = await storageSetRaw(key, JSON.stringify(state[key]));
   // A failed write used to be silent — the change looked saved but vanished on reload.
   if(!ok && Date.now()-persistWarnedAt > 15000 && typeof showToast==='function'){
@@ -4845,10 +5178,10 @@ function lockStartSound(){ const v = state.profile.lockSound; return ['none','ch
 let lockSongPlaying = false;
 function playLockInSong(){
   const k = lockStartSound();
-  if(k==='chill'){ setTimeout(function(){ sfx(SFX.chill); }, 700); return; }
+  if(k==='chill'){ setTimeout(function(){ sfx(SFX.chill); }, 700); if(typeof focusMusicAfterIntro==='function') focusMusicAfterIntro(14500); return; }
   if(k==='music'){ const m = state.profile.lockMusic; if(m && m.q && typeof musicApp==='function'){ musicApp('play', m).then(function(ok){ lockSongPlaying = !!ok; }); } }
 }
-function stopLockInSong(){ if(lockSongPlaying && soundPref('lockMusicStop', true) && typeof musicApp==='function'){ lockSongPlaying = false; musicApp('stop'); } }
+function stopLockInSong(){ if(typeof focusMusicStop==='function'){ clearTimeout(FM.introT); focusMusicStop(); } if(lockSongPlaying && soundPref('lockMusicStop', true) && typeof musicApp==='function'){ lockSongPlaying = false; musicApp('stop'); } }
 
 // ---- Settings → Sound ----
 function soundSettingsHtml(){
@@ -4874,7 +5207,11 @@ function soundSettingsHtml(){
         '<div class="snd-rows">'+tog('lockMusicStop', 'Stop it when I lock out', 'Otherwise it keeps playing', true)+'</div>' : '')+
     '</div>'+
     '<div class="card section"><div class="section-title">&#9728;&#65039; Mornings</div>'+
+      '<div class="snd-pl"><label><b>Morning playlist</b><small>An Apple Music playlist — the play button on Good morning starts it, and it follows your wake-up song by itself</small></label>'+
+        '<div class="snd-music" style="margin-top:8px;"><input class="input" id="sndMorningPl" placeholder="Playlist name in Apple Music" value="'+escapeHtml(p.morningPlaylist && p.morningPlaylist.q || '')+'"><button class="btn btn-sm btn-primary" data-action="sndMorningPlSet">Save</button></div></div>'+
       '<div class="snd-rows">'+
+        tog('morningPlAfterSong', 'Play it after the wake-up song', 'When the song ends, the playlist carries on', true)+
+        tog('focusMusic', 'Focus music after the lock-in intro', 'Quiet tracks keep playing until you lock out', true)+
         tog('dawn', 'Dawn before the alarm', 'A slow chord swells under the sunrise in the last 90 seconds', true)+
         tog('workintro', 'Start work', 'A warm swell when the work intro opens', true)+
       '</div>'+
@@ -4903,6 +5240,14 @@ document.addEventListener('input', function(e){
   const v = document.getElementById('sndVolV'); if(v) v.textContent = t.value+'%';
   clearTimeout(ui._sndT); ui._sndT = setTimeout(function(){ persist('profile'); playTick(); }, 180);
 });
+// "Hear them": a short tour of the set, one sound after another
+ACTIONS.previewSounds = function(){
+  if(!soundOn()){ showToast('Sound effects are off.', {icon:'&#128263;'}); return; }
+  const seq = [playTick, playNav, playTaskAdded, playDrop, playPositive, playTaskComplete, playLockIn];
+  seq.forEach(function(f, i){ setTimeout(f, i*420); });
+};
+
+ACTIONS.sndMorningPlSet = function(){ const i = document.getElementById('sndMorningPl'), v = i ? i.value.trim() : ''; state.profile.morningPlaylist = v ? {q:v, k:'playlist'} : null; saveSound(); showToast(v ? 'Morning playlist: '+v : 'Morning playlist cleared', {icon:'&#9835;'}); };
 // ============ CLIENT HELPERS ============
 function clientOptionsHtml(selected){
   const clients = arr(state.business && state.business.clients);
@@ -5968,10 +6313,10 @@ function renderTodayTasksPanel(){
 }
 function renderMoodPicker(){
   return '<div class="row" style="margin:10px 0;justify-content:center;">'+
-    journalTypes().map(function(m){
+    visibleJournalTypes().map(function(m){
       const active = ui.selectedMood===m.id;
       return '<span class="chip" data-action="selectMood" data-mood="'+m.id+'" style="'+(active?'background:'+m.color+';border-color:'+m.color+';color:#06231a;':'')+'">'+m.emoji+' '+m.label+'</span>';
-    }).join('')+
+    }).join('')+hiddenTypesChipHtml()+
   '</div>'+
   renderJournalPhotoAttachHtml();
 }
@@ -5988,7 +6333,7 @@ function renderJournalPhotoAttachHtml(){
   '</div>';
 }
 function triggerJournalPhotoInput(){ const el=document.getElementById('journalPhotoInput'); if(el) el.click(); }
-function removeJournalDraftPhoto(idx){ ui.journalDraftPhotos.splice(Number(idx),1); renderView(); }
+function removeJournalDraftPhoto(idx){ ui.journalDraftPhotos.splice(Number(idx),1); renderView(); const qo = document.getElementById('quickJournalOverlay'); if(qo && !qo.classList.contains('hidden') && typeof renderQuickJournalModalInto==='function') renderQuickJournalModalInto(); }
 // Photos attach to whichever journal composer/editor is open. They're stored in the blob
 // store (IndexedDB) and the entry keeps "idb:" references.
 async function handleJournalPhotoFiles(files){
@@ -5997,7 +6342,7 @@ async function handleJournalPhotoFiles(files){
     const ref = await storeImageFile(file);
     ui.journalDraftPhotos.push(ref);
   }
-  if(list.length){ playTick(); renderView(); }
+  if(list.length){ playTick(); renderView(); const qo = document.getElementById('quickJournalOverlay'); if(qo && !qo.classList.contains('hidden') && typeof renderQuickJournalModalInto==='function') renderQuickJournalModalInto(); }
 }
 // Paste an image (e.g. a screenshot copied with Cmd+Ctrl+Shift+4) straight into any journal
 // text box. Plain-text pastes behave normally.
@@ -6041,6 +6386,7 @@ function renderJournalPanel(){
     '<div class="qj2-head"><span class="qj2-icon">&#128221;</span><div class="qj2-title">Quick journal'+tip('Paste or drop images in too.')+'</div>'+
       (todaysJournalCount ? '<span class="qj2-count">'+todaysJournalCount+' today</span>' : '')+
       '<button class="qj2-open" data-action="nav" data-view="personal" data-tab="journal">Open journal &rarr;</button></div>'+
+    '<input class="input je-title-in qj2-title" id="quickJournalTextTitle" placeholder="Title (optional)">'+
     '<textarea class="input qj2-text" id="quickJournalText" placeholder="Anything on your mind — a win, a worry, an idea…">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
     renderJournalPhotoThumbsRow()+
     '<div class="journal-compose-actions qj2-actions">'+
@@ -6692,24 +7038,17 @@ function cardLayoutSettingsHtml(){
   '</div></div>';
 }
 // ============ TODAY ============
-function renderDayOffView(){
-  const streak = computeStreak();
-  return '<div class="view-header today-header"><div>'+businessNameTagHtml()+'<div class="view-title">Taking today off<span class="sleepy-dots" aria-hidden="true"></span></div><div class="view-sub" id="liveClock"></div></div></div>'+
-  '<div class="day-off-wrap"><div class="card day-off-card" style="border-color:var(--accent); box-shadow:0 0 50px '+hexToRgba(state.profile.accentColor||'#E8A23D',0.16)+';">'+
-    '<div style="margin:4px 0 14px;">'+renderStreakCard(streak, {compact:true, status:'Rest days still count'})+'</div>'+
-    '<div style="max-width:380px;margin:6px 0;font-size:14.5px;color:var(--text-dim);line-height:1.5;">Rest is part of the plan. Nothing else is tracked today — go live your life.</div>'+
-    '<button class="btn" style="border-color:var(--accent);color:var(--accent);margin-top:10px;" data-action="toggleDayOff">Actually, I want to work today</button>'+
-  '</div></div>';
-}
+// renderDayOffView lives in 32p-locked-views.js
 function renderOffTimeView(){
   const active = state.modes.active;
   const elapsed = Date.now() - active.startedAt;
+  if(!active.sleep && typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1))) return renderWeekendOffView(elapsed);
   return '<div class="view-header today-header"><div>'+businessNameTagHtml()+'<div class="view-title">Clocked out.</div><div class="view-sub" id="liveClock"></div></div></div>'+
   '<div class="day-off-wrap"><div class="card day-off-card offtime-card">'+
     '<div style="font-size:40px;">&#127937;</div>'+
     '<div class="hero-num" id="modeElapsed" style="color:var(--strong);">'+formatElapsed(elapsed)+'</div>'+
     '<div class="hero-label" style="color:var(--text-dim);">off the clock &middot; '+fmtHours(deepWorkMinutesTodayLive())+' of deep work today</div>'+
-    '<div style="max-width:380px;margin:16px 0 6px;font-size:14.5px;color:var(--text-dim);line-height:1.5;">The work day is done. Nothing else is tracked while you’re off.</div>'+
+    '<div style="max-width:380px;margin:16px 0 6px;font-size:14.5px;color:var(--text-dim);line-height:1.5;">'+(typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)) ? 'That’s the week. Tomorrow’s a day off — enjoy it.' : 'The work day is done. Nothing else is tracked while you’re off.')+'</div>'+
     '<div class="row" style="gap:8px;justify-content:center;margin-top:10px;">'+
       (isWindDownTime() ? '<button class="btn th-btn-night" data-action="openWindDown">&#127769; Wind down</button>' : '')+
       '<button class="btn" style="border-color:var(--border-strong);color:var(--text);" data-action="clockIn">&#128339; Clock back in</button>'+
@@ -6769,6 +7108,7 @@ function renderMiniCalendarStrip(){
   return '<div class="mini-cal-strip" data-action="nav" data-view="calendar" title="Open Calendar">'+cells+'</div>';
 }
 function renderTodayFocusMode(p){
+  if(typeof lockedMinimal==='function' && lockedMinimal()) return renderLockedMinimal();
   const hour = new Date().getHours();
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
   const backlog = state.tasks.items.filter(function(t){ return t.status==='backlog'; }).slice(0,6);
@@ -6782,7 +7122,7 @@ function renderTodayFocusMode(p){
   return renderFocusQuickLinks()+
   '<div class="locked-in-header">'+
     businessNameTagHtml()+
-    '<div class="locked-in-badge">&#128274; Locked In</div>'+
+    '<div class="locked-in-badge">&#128274; Locked In</div>'+'<div class="lv-corner">'+focusPlayerHtml(false)+lockedViewBtnHtml()+'</div>'+
     '<div class="view-title" style="margin:0;">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
     (state.profile.bigClockOnToday ? (
       '<div id="liveClockBig" class="cal-big-clock" style="font-size:38px;margin-top:6px;"></div>'+
@@ -6881,10 +7221,13 @@ function dayOffButtonHtml(){
 // Shooting / Off-time sit next to Day off as small pills — hold to start, so a stray click never flips you into a mode.
 // One click starts it; a toast offers Undo for a few seconds (the old hold-to-start looked like it did nothing).
 function holdModeBtnHtml(type, icon, label){
-  return '<button class="th-mode th-mode-'+type+'" data-action="quickMode" data-type="'+type+'" title="Start '+label+' (you can undo)"><span class="th-mode-i">'+icon+'</span><span>'+label+'</span></button>';
+  const on = !!(state.modes.active && state.modes.active.type===type);
+  return '<button class="th-mode th-mode-'+type+(on?' is-on':'')+'" data-action="quickMode" data-type="'+type+'" title="'+(on ? 'End '+label : 'Start '+label+' (you can undo)')+'"><span class="th-mode-i">'+icon+'</span><span>'+(on ? 'End '+label.toLowerCase() : label)+'</span></button>';
 }
 ACTIONS.quickMode = function(el){
   const type = el.dataset.type, prev = state.modes.active ? Object.assign({}, state.modes.active) : null;
+  // the same button ends it once it's running
+  if(prev && prev.type===type){ finishActiveMode(true); playStopSound(); renderView(); showToast((MODE_LABELS[type]||'Mode')+' ended.', {icon:modeIcon(type), duration:3000}); return; }
   if(state.focus.activeSession){ showToast('Stop your session first.', {icon:'&#128274;'}); return; }
   startMode(type);
   ui.undoMode = {prev:prev, at:Date.now()};
@@ -6896,6 +7239,7 @@ ACTIONS.undoQuickMode = function(){
 };
 ACTIONS.quickDayOff = function(){
   toggleDayOff();
+  dayOffFlash(isDayOff(todayStr()));
   showToast(isDayOff(todayStr()) ? 'Today is a rest day — the streak is safe. Enjoy it.' : 'Back on — today counts.', {icon:'&#127796;', actionLabel:'Undo', actionAction:'quickDayOffUndo', duration:6000});
 };
 ACTIONS.quickDayOffUndo = function(){ toggleDayOff(); clearToasts(); };
@@ -8423,23 +8767,31 @@ function openBreakNotePrompt(){
   renderBreakNoteModalInto();
 }
 function closeBreakNotePrompt(){ const o=document.getElementById('breakNoteOverlay'); if(o) o.classList.add('hidden'); }
+// The break pop-up: how long (big tiles), an optional note (or one tap on a common reason), and
+// one clear start. It shows when you'll be back.
+const BREAK_REASONS = [['&#9749;','Coffee'],['&#128694;','Walk'],['&#127869;&#65039;','Food'],['&#129496;','Stretch'],['&#128222;','Call']];
 function renderBreakNoteModal(){
-  return '<div class="section-title" style="margin-bottom:8px;">'+modeIcon('break')+' Break Mode</div>'+
-    '<div class="kpi-sub" style="margin-bottom:12px;">What\'s this break for? A quick note helps you see your break patterns later.</div>'+
-    '<input class="input" id="breakNoteInput" placeholder="e.g. Lunch, quick walk, phone call" style="width:100%;">'+
-    '<div class="kind-label" style="margin-top:14px;">How long?</div>'+
-    '<div class="row break-len-row" style="gap:6px;flex-wrap:wrap;">'+[5,10,15,20,30,45,60,'open'].map(function(m){ const on = (ui.breakMinutes==null ? 15 : ui.breakMinutes)===m; return '<button class="btn btn-sm '+(on?'btn-primary':'btn-ghost')+'" data-action="pickBreakMinutes" data-minutes="'+m+'">'+(m==='open'?'No timer':m+' min')+'</button>'; }).join('')+'</div>'+
-    '<div class="kpi-sub" style="margin-top:6px;">'+((ui.breakMinutes==null?15:ui.breakMinutes)==='open' ? 'The break runs until you end it.' : 'Ends by itself after '+(ui.breakMinutes==null?15:ui.breakMinutes)+' min and you\'re back in the session.')+'</div>'+
-    '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
-      '<button class="btn btn-ghost" data-action="closeBreakNotePrompt">Cancel</button>'+
-      '<button class="btn btn-primary" data-action="confirmStartBreakMode">'+modeIcon('break')+' Start Break</button>'+
-    '</div>';
+  const len = ui.breakMinutes==null ? 15 : ui.breakMinutes, as = state.focus.activeSession;
+  const flow = as && as.method && as.method.id==='flow' ? flowBreakMinutes() : null;
+  return '<div class="brk">'+
+    '<button class="brk-x" data-action="closeBreakNotePrompt" title="Cancel (Esc)">&#10005;</button>'+
+    '<div class="brk-i">&#9749;</div>'+
+    '<div class="brk-h">Take a break</div>'+
+    '<div class="brk-s">'+(as ? fmtDurationLabel(Math.floor((Date.now()-as.startedAt)/60000))+' in'+(flow ? ' &middot; you\'ve earned about '+flow+' min' : '') : '')+'</div>'+
+    '<div class="brk-lens">'+[5,10,15,20,30,'open'].map(function(m){ const on = len===m; return '<button class="brk-len'+(on?' is-on':'')+'" data-action="pickBreakMinutes" data-minutes="'+m+'"><b>'+(m==='open'?'&infin;':m)+'</b><span>'+(m==='open'?'open':'min')+'</span></button>'; }).join('')+'</div>'+
+    '<div class="brk-back">'+(len==='open' ? 'No timer — end it whenever you\'re ready' : 'Back at <b>'+fmtTimeShort(Date.now()+len*60000)+'</b>')+'</div>'+
+    '<div class="brk-note"><input class="input" id="breakNoteInput" placeholder="What\'s it for? (optional)" value="'+escapeHtml(ui.breakNoteDraft||'')+'">'+
+      '<div class="brk-chips">'+BREAK_REASONS.map(function(r){ return '<button class="brk-chip" data-action="breakReason" data-id="'+r[1]+'">'+r[0]+' '+r[1]+'</button>'; }).join('')+'</div></div>'+
+    '<button class="brk-go" data-action="confirmStartBreakMode">Start break</button>'+
+  '</div>';
 }
+ACTIONS.breakReason = function(el, e, id){ const i = document.getElementById('breakNoteInput'); if(i){ i.value = id; ui.breakNoteDraft = id; } playTick(); };
 function renderBreakNoteModalInto(){ const el=document.getElementById('breakNoteContent'); if(el) morphInto(el, renderBreakNoteModal(), {form:true}); }
 function confirmStartBreakMode(){
   const as = state.focus.activeSession; if(!as || as.onBreak) { closeBreakNotePrompt(); return; }
   const noteEl = document.getElementById('breakNoteInput');
   const note = noteEl ? noteEl.value.trim() : '';
+  ui.breakNoteDraft = '';
   closeBreakNotePrompt();
   if(!Array.isArray(as.breaks)) as.breaks=[];
   const breakLen = ui.breakMinutes==null ? 15 : ui.breakMinutes;
@@ -8453,7 +8805,16 @@ function confirmStartBreakMode(){
   if(ui.currentTaskId){ ui.pausedTaskId = ui.currentTaskId; accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   ui.pendingCurrentTaskId = null;
   playRestSound();
+  breakFlash(breakLen==='open' ? null : Date.now()+breakLen*60000, note);
   persist('focus'); persist('modes'); renderView();
+}
+// a calm stamp as the break starts — same family as Locked in / Locked out
+function breakFlash(endsAt, note){
+  const d = document.createElement('div');
+  d.className = 'lock-flash is-break';
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#9749; On a break</div><div class="lf-t">'+(endsAt ? 'Back at '+fmtTimeShort(endsAt) : 'No timer')+(note ? ' &middot; '+escapeHtml(note) : '')+'</div>';
+  document.body.appendChild(d);
+  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 1900);
 }
 function endBreakModeFromFocus(){
   const as = state.focus.activeSession; if(!as || !as.onBreak) return;
@@ -9318,25 +9679,36 @@ function updateCurrentAppIndicator(){
   else { el.textContent=''; el.style.display='none'; }
   if(typeof updateActivityPill==='function') updateActivityPill();
 }
-let lastActivitySig = '', pastDayCounts = {};
+let lastActivitySig = '', pastDayCounts = {}, actSamples = null, actLastTs = 0;
 async function pollAppActivity(){
   const st = state.settings.appTracking;
   if(!st || st.enabled===false) { updateCurrentAppIndicator(); return; }
   let text;
   try{
-    const res = await fetch(APP_ACTIVITY_URL, {cache:'no-store'});
+    // after the first poll, only ask for what's new (the log holds up to ~17 hours of samples;
+    // fetching and re-reading all of it every 15 seconds was a regular hitch)
+    const res = await fetch(APP_ACTIVITY_URL+(actSamples && actLastTs ? '?since='+actLastTs : ''), {cache:'no-store'});
     if(!res.ok) return;
     text = await res.text();
   }catch(e){ return; } // no wrapper/server running — silently do nothing
-  // Nothing new since the last poll → nothing to recompute or save.
-  const sig = text.length+':'+text.slice(-80);
-  if(sig===lastActivitySig){ updateCurrentAppIndicator(); checkAwayFromSession(); checkAutoLockIn(); return; }
-  lastActivitySig = sig;
+  let allSamples;
+  if(text.slice(0, 5)==='#inc\n'){
+    const fresh = parseActivityLogText(text.slice(5)).filter(function(x){ return x.ts > actLastTs; });
+    if(!fresh.length || !actSamples){ updateCurrentAppIndicator(); checkAwayFromSession(); checkAutoLockIn(); if(!actSamples) actLastTs = 0; return; }
+    actSamples = actSamples.concat(fresh).slice(-7000);
+    allSamples = actSamples;
+  } else {
+    // Nothing new since the last poll → nothing to recompute or save.
+    const sig = text.length+':'+text.slice(-80);
+    if(sig===lastActivitySig){ updateCurrentAppIndicator(); checkAwayFromSession(); checkAutoLockIn(); return; }
+    lastActivitySig = sig;
+    allSamples = actSamples = parseActivityLogText(text);
+  }
+  if(allSamples.length) actLastTs = allSamples[allSamples.length-1].ts;
   // Only count active usage: a sample taken after the keyboard/mouse has been idle for a
   // while is dropped, which leaves a gap that splits the interval (an app just sitting in
   // the foreground no longer counts as "being on it").
   const idleLimit = Number(st.idleSeconds)||60;
-  const allSamples = parseActivityLogText(text);
   if(allSamples.length) lastRawSampleAt = Math.max(lastRawSampleAt, allSamples[allSamples.length-1].ts);
   const samples = allSamples.filter(function(s){ return s.idle==null || s.idle < idleLimit; });
   if(!samples.length){ updateCurrentAppIndicator(); return; }
@@ -10073,6 +10445,7 @@ function journalEntryRow(e){
       '<div class="kpi-sub">'+(mood?mood.emoji+' ':'')+fmtTimeShort(e.timestamp)+(e.pinned?' <span class="je-pin" title="Pinned">&#9733;</span>':'')+'</div>'+
       '<button class="je-more" data-action="journalMenu" data-id="'+e.id+'" title="Pin, edit, remove (or right-click the entry)">&#8943;</button>'+
     '</div>'+
+    (e.title ? '<div class="journal-title">'+escapeHtml(e.title)+'</div>' : '')+
     '<div class="journal-text">'+escapeHtml(shown)+'</div>'+
     (photos.length ? '<div class="row" style="margin-bottom:8px;flex-wrap:wrap;">'+photos.map(function(src, idx){ return '<img src="'+escapeHtml(blobUrl(src))+'" class="journal-photo-thumb" data-action="viewJournalPhoto" data-id="'+e.id+'" data-idx="'+idx+'">'; }).join('')+'</div>' : '')+
     (isLong ? '<button class="btn btn-ghost btn-sm" data-action="toggleJournalExpand" data-id="'+e.id+'">'+(expanded?'Show Less':'Read More')+'</button>' : '')+
@@ -10292,6 +10665,7 @@ function renderJournalEntriesTab(){
   (clientsView ? renderClientJournalsAllTab() : (
   '<div class="card journal-compose-card" data-photo-drop="journal" style="text-align:center;margin-bottom:14px;">'+
     '<div style="position:relative;">'+
+      '<input class="input je-title-in" id="journalPageTextTitle" placeholder="Title (optional)">'+
       '<textarea class="input" id="journalPageText" placeholder="Write something… (paste or drop images in too)" style="width:100%;min-height:230px;text-align:left;padding-right:44px;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
       '<button class="btn btn-ghost btn-sm" data-action="triggerJournalPhotoInput" title="Add Photo" style="position:absolute;top:8px;right:8px;padding:4px 7px;font-size:15px;line-height:1;">&#128247;</button>'+
     '</div>'+
@@ -10322,10 +10696,10 @@ function renderJournalMoodChipsOnly(){
   '</div>';
 }
 function renderJournalMoodChipsInline(){
-  return journalTypes().map(function(m){
+  return visibleJournalTypes().map(function(m){
     const active = ui.selectedMood===m.id;
     return '<span class="chip" data-action="selectMood" data-mood="'+m.id+'" style="'+(active?'background:'+m.color+';border-color:'+m.color+';color:#06231a;':'')+'">'+m.emoji+' '+m.label+'</span>';
-  }).join('');
+  }).join('')+hiddenTypesChipHtml();
 }
 function renderJournalPhotoThumbsRow(){
   const photos = arr(ui.journalDraftPhotos);
@@ -10354,6 +10728,7 @@ function renderJournalEditModal(){
   const e = state.journal.entries.find(function(x){return x.id===ui.editingJournalId;});
   if(!e) return '';
   return '<div data-photo-drop="journal"><div class="section-title" style="margin-bottom:14px;">Edit Entry</div>'+
+    '<input class="input je-title-in" id="editJournalTitle" placeholder="Title (optional)" value="'+escapeHtml(e.title||'')+'">'+
     '<textarea class="input" id="editJournalText" style="width:100%;min-height:120px;">'+escapeHtml(e.text)+'</textarea>'+
     '<div class="row" style="margin:12px 0;justify-content:center;">'+
       journalTypes().map(function(m){ const active = ui.editingJournalMood===m.id; return '<span class="chip" data-action="setEditingJournalMood" data-mood="'+m.id+'" style="'+(active?'background:'+m.color+';border-color:'+m.color+';color:#06231a;':'')+'">'+m.emoji+' '+m.label+'</span>'; }).join('')+
@@ -10377,6 +10752,7 @@ function saveEditJournal(id){
   const text = document.getElementById('editJournalText').value.trim();
   if(!text) return;
   e.text = text;
+  const tEl = document.getElementById('editJournalTitle'); if(tEl){ const t = tEl.value.trim(); if(t) e.title = t; else delete e.title; }
   e.mood = ui.editingJournalMood!==undefined ? ui.editingJournalMood : e.mood;
   e.photos = arr(ui.journalDraftPhotos).slice();
   ui.editingJournalMood = undefined;
@@ -10394,7 +10770,11 @@ function addJournalEntry(targetId, type){
   const el = document.getElementById(targetId);
   const text = el.value.trim();
   if(!text) return;
-  state.journal.entries.push({id:uid(), date:todayStr(), timestamp:Date.now(), text:text, type:type||'freeform', mood:ui.selectedMood, pinned:false, photos: arr(ui.journalDraftPhotos).slice()});
+  const tEl = document.getElementById(targetId+'Title'), title = tEl ? tEl.value.trim() : '';
+  const entry = {id:uid(), date:todayStr(), timestamp:Date.now(), text:text, type:type||'freeform', mood:ui.selectedMood, pinned:false, photos: arr(ui.journalDraftPhotos).slice()};
+  if(title) entry.title = title;
+  state.journal.entries.push(entry);
+  if(tEl) tEl.value = '';
   ui.journalDraftText = '';
   ui.selectedMood = null;
   ui.journalDraftPhotos = [];
@@ -10419,17 +10799,18 @@ function renderQuickJournalModal(){
   const now = new Date();
   if(ui.qjSaved) return '<div class="qj3 is-saved"><div class="qj3-done"><span>&#10003;</span>Saved to your journal</div></div>';
   return '<div class="qj3" data-photo-drop="journal">'+
-    '<div class="qj3-h"><span class="qj3-i">&#128221;</span><div><b>Quick note</b><small>'+now.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+' &middot; '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+(today ? ' &middot; '+today+' today' : '')+'</small></div>'+
+    '<div class="qj3-h"><span class="qj3-i">&#128221;</span><div><input class="qj3-name" id="quickJournalModalTextTitle" placeholder="Quick note" title="Name this note" value="'+escapeHtml(ui.qjTitleDraft||'')+'"><small>'+now.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+' &middot; '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+(today ? ' &middot; '+today+' today' : '')+'</small></div>'+
       '<button class="qj3-x" data-action="closeQuickJournalModal" title="Close (Esc)">&#10005;</button></div>'+
     '<textarea class="qj3-text" id="quickJournalModalText" placeholder="'+escapeHtml(ui.qjPrompt||QJ_PROMPTS[0])+'">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
-    '<div class="qj3-tags">'+journalTypes().slice(0, 7).map(function(m){ return '<button class="qj3-tag'+(ui.selectedMood===m.id?' is-on':'')+'" data-action="qjMood" data-id="'+m.id+'" title="'+escapeHtml(m.label)+'">'+m.emoji+'<span>'+escapeHtml(m.label)+'</span></button>'; }).join('')+'</div>'+
-    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
+    (arr(ui.journalDraftPhotos).length ? '<div class="qj3-photos">'+arr(ui.journalDraftPhotos).map(function(src, i){ return '<span><img src="'+escapeHtml(blobUrl(src))+'"><button data-action="removeJournalDraftPhoto" data-idx="'+i+'" title="Remove">&times;</button></span>'; }).join('')+'</div>' : '')+
+    '<div class="qj3-tags">'+visibleJournalTypes().slice(0, 8).map(function(m){ return '<button class="qj3-tag'+(ui.selectedMood===m.id?' is-on':'')+'" data-action="qjMood" data-id="'+m.id+'" title="'+escapeHtml(m.label)+'">'+m.emoji+'<span>'+escapeHtml(m.label)+'</span></button>'; }).join('')+hiddenTypesChipHtml()+'</div>'+
+    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button><button class="qj3-ph" data-action="triggerJournalPhotoInput" title="Attach a photo">&#128247;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
   '</div>';
 }
 function renderQuickJournalModalInto(){ const el=document.getElementById('quickJournalContent'); if(el) morphInto(el, renderQuickJournalModal(), {form:true}); }
 ACTIONS.qjMood = function(el, e, id){ ui.selectedMood = ui.selectedMood===id ? null : id; const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; renderQuickJournalModalInto(); };
 ACTIONS.qjOpenJournal = function(){ const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; closeQuickJournalModal(); ui.view = 'personal'; ui.personalTab = 'journal'; renderView(); };
-document.addEventListener('input', function(e){ if(e.target && e.target.id==='quickJournalModalText') ui.journalDraftText = e.target.value; });
+document.addEventListener('input', function(e){ if(e.target && e.target.id==='quickJournalModalText') ui.journalDraftText = e.target.value; if(e.target && e.target.id==='quickJournalModalTextTitle') ui.qjTitleDraft = e.target.value; });
 document.addEventListener('keydown', function(e){
   if(e.target && e.target.id==='quickJournalModalText'){
     if(e.key==='Enter' && (e.metaKey || e.ctrlKey)){ e.preventDefault(); saveQuickJournal(); }
@@ -10440,10 +10821,24 @@ function saveQuickJournal(){
   const t = document.getElementById('quickJournalModalText');
   if(!t || !t.value.trim()){ if(t){ t.focus(); t.classList.remove('is-shake'); void t.offsetWidth; t.classList.add('is-shake'); } return; }
   addJournalEntry('quickJournalModalText');
+  ui.qjTitleDraft = '';
   ui.qjSaved = true; renderQuickJournalModalInto();
   setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; }, 900);
 }
 
+
+// ---- journal types you can tuck away: hidden ones keep their entries, they just leave the pickers ----
+function visibleJournalTypes(){ return journalTypes().filter(function(t){ return !t.hidden || ui.showHiddenTypes || ui.selectedMood===t.id; }); }
+function hiddenTypesChipHtml(){
+  const n = journalTypes().filter(function(t){ return t.hidden; }).length;
+  return n ? '<span class="chip chip-more" data-action="toggleHiddenTypes" title="'+(ui.showHiddenTypes ? 'Hide them again' : 'Show your hidden types')+'">'+(ui.showHiddenTypes ? '&minus;' : '+'+n)+'</span>' : '';
+}
+ACTIONS.toggleHiddenTypes = function(){ ui.showHiddenTypes = !ui.showHiddenTypes; if(document.getElementById('quickJournalOverlay') && !document.getElementById('quickJournalOverlay').classList.contains('hidden')) renderQuickJournalModalInto(); renderView(); };
+ACTIONS.toggleJournalTypeHidden = function(el, e, id){
+  if(!Array.isArray(state.journal.types) || !state.journal.types.length) state.journal.types = journalTypes().map(function(t){ return Object.assign({}, t); });
+  const t = state.journal.types.find(function(x){ return x.id===id; }); if(!t) return;
+  t.hidden = !t.hidden; persist('journal'); renderView();
+};
 
 // ============ SETTINGS → APP UPDATES ============
 // Notes about changes to the app itself (entries filed under an "Updates" journal type) aren't
@@ -12891,6 +13286,7 @@ function clientCard(c){
 function openClientModal(id, edit){
   ui.showClientModal = id;
   ui.clientEdit = !!edit;
+  ui.clientSec = edit ? 'plan' : 'overview';
   ui.pickingPackageForClient = null;
   ui.newClientJournalTag = null;
   ui.newClientJournalDraft = '';
@@ -12902,15 +13298,7 @@ function openClientModal(id, edit){
 function closeClientModal(){ ui.showClientModal = null; ui.pickingPackageForClient = null; const o=document.getElementById('clientModalOverlay'); if(o) o.classList.add('hidden'); }
 function closeClientModalAndSave(){
   const c = state.business.clients.find(function(x){return x.id===ui.showClientModal;});
-  if(c){
-    const notesEl = document.getElementById('clientModalNotes');
-    if(notesEl) c.notes = notesEl.value.trim();
-    const startDateEl = document.getElementById('clientModalStartDate');
-    if(startDateEl) c.startDate = startDateEl.value || null;
-    const billingDayEl = document.getElementById('clientModalBillingDay');
-    if(billingDayEl) c.billingDay = clamp(Number(billingDayEl.value)||1, 1, 28);
-    persist('business');
-  }
+  if(c){ saveClientModalFields(c); persist('business'); }
   closeClientModal();
   renderView();
 }
@@ -12928,46 +13316,56 @@ function setClientLeadSource(id, val){
   c.leadSource = (c.leadSource===val) ? null : val;
   persist('business'); renderClientModalInto();
 }
+// The client, laid out like settings: the client up top on the left with the sections under it,
+// one section at a time on the right. Overview is what you glance at; everything else edits in place.
+const CLIENT_SECTIONS = [['overview','&#9673;','Overview'],['plan','&#128230;','Plan & deliverables'],['contact','&#128172;','Contact & touchpoints'],['cycle','&#8635;','Client cycle'],['billing','&#128176;','Billing & dates'],['notes','&#128221;','Notes & journal']];
+function saveClientModalFields(c){
+  const notesEl = document.getElementById('clientModalNotes'); if(notesEl) c.notes = notesEl.value.trim();
+  const startDateEl = document.getElementById('clientModalStartDate'); if(startDateEl) c.startDate = startDateEl.value || null;
+  const billingDayEl = document.getElementById('clientModalBillingDay'); if(billingDayEl) c.billingDay = clamp(Number(billingDayEl.value)||1, 1, 28);
+}
+ACTIONS.clientSec = function(el, e, id){
+  const c = state.business.clients.find(function(x){ return x.id===ui.showClientModal; });
+  if(c){ saveClientModalFields(c); persist('business'); }
+  ui.clientSec = id; ui.clientEdit = id!=='overview';
+  renderClientModalInto();
+  const pane = document.querySelector('#clientModalContent .cm-pane'); if(pane) pane.scrollTop = 0;
+};
 function renderClientModal(){
   const c = state.business.clients.find(function(x){return x.id===ui.showClientModal;});
   if(!c) return '';
-  if(!ui.clientEdit) return clientCardFrontHtml(c);
+  const sec = CLIENT_SECTIONS.some(function(x){ return x[0]===ui.clientSec; }) ? ui.clientSec : 'overview';
   const deliverables = arr(c.deliverables);
   const pendingCount = deliverables.filter(function(d){return !isDeliverableDoneThisWeek(d);}).length;
-  const isActive = c.status==='active';
-  const pkg = c.packageId ? arr(state.business.packages).find(function(x){return x.id===c.packageId;}) : null;
-  return '<div class="row" style="justify-content:space-between;margin-bottom:10px;"><button class="btn btn-ghost btn-sm" data-action="clientFlip" data-id="front">&larr; Card</button><span class="kpi-sub">Editing</span></div>'+
-    '<div class="card" style="margin-bottom:16px;">'+
-      '<div class="row" style="justify-content:space-between;align-items:flex-start;">'+
-        '<div class="client-name-edit"><input class="client-name-input" data-client-field="business" data-id="'+c.id+'" value="'+escapeHtml(c.business||'')+'" placeholder="Business name" title="Click to rename">'+
-        '<input class="client-contact-input" data-client-field="name" data-id="'+c.id+'" value="'+escapeHtml(c.name||'')+'" placeholder="Contact name"></div>'+
-        (function(){ const st = crmStage('client', c.stage); return '<span class="tag" style="background:'+(st?st.color:'#8A90A2')+'22;color:'+(st?st.color:'#8A90A2')+';">'+escapeHtml(st?st.label:(isActive?'Active':'Paused'))+'</span>'; })()+
-      '</div>'+
-      '<div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap;align-items:center;">'+
-        clientHealthTagHtml(c)+
-        (isActive ? clientCareTagHtml(c) : '')+
-        (pkg ? '<span class="tag" style="background:var(--good-dim);color:var(--good);font-weight:600;">'+escapeHtml(pkg.name)+'</span>' : '<span class="kpi-sub">No package assigned</span>')+
-      '</div>'+
-      (isActive ? '<div class="row" style="justify-content:flex-end;margin-top:8px;">'+clientTouchControlHtml(c)+'</div>' : '')+
-    '</div>'+
-    renderClientLifecycle(c)+
-    renderCrmBlock('client', c)+
-    // the plan and what it delivers, together in one block
-    '<div class="kpi-label" style="margin:16px 0 8px;">Plan &amp; deliverables<span class="kpi-sub" style="margin-left:6px;">'+pendingCount+' pending this week</span></div>'+
-    '<div class="card plan-block">'+
-      renderClientPackageField(c, true)+
+  const st = crmStage('client', c.stage);
+  let body = '';
+  if(sec==='overview') body = clientCardFrontHtml(c);
+  else if(sec==='plan') body = '<div class="cm-h">Plan &amp; deliverables<span class="kpi-sub">'+pendingCount+' pending this week</span></div>'+
+    '<div class="plan-block">'+renderClientPackageField(c, true)+
       '<div class="task-list plan-delivs">'+(deliverables.map(function(d){return deliverableRow(c.id,d);}).join('') || '<div class="empty">No deliverables yet — pick a package above, or add a one-off.</div>')+'</div>'+
-      '<span class="plan-add" data-action="openCustomDeliverableDrawer" data-id="'+c.id+'">&#43; Add a one-off deliverable</span>'+
-    '</div>'+
-    '<div class="field" style="margin-bottom:16px;"><label>How we acquired them</label><div class="row" style="gap:6px;flex-wrap:wrap;">'+LEAD_SOURCES.map(function(s){ const active=c.leadSource===s.id; return '<span class="chip'+(active?' active':'')+'" data-action="setClientLeadSource" data-id="'+c.id+'" data-value="'+s.id+'">'+s.emoji+' '+s.label+'</span>'; }).join('')+'</div></div>'+
-    clientBillingCycleFieldHtml(c)+
-    '<div class="row" style="justify-content:center;margin-bottom:16px;"><button class="btn btn-ghost btn-sm" data-action="viewClientJournalFromModal" data-id="'+c.id+'">View Client Journal &rarr;</button></div>'+
-    renderClientEventsSection(c)+
-    '<div class="field" style="margin-bottom:16px;"><label>Notes</label><textarea class="input" id="clientModalNotes" style="width:100%;min-height:80px;" placeholder="What are they like to work with? Preferences, history, anything worth remembering.">'+escapeHtml(c.notes||'')+'</textarea></div>'+
-    '<div class="row" style="justify-content:space-between;align-items:flex-end;margin-top:16px;">'+
-      renderClientDeleteControl(c)+
-      '<button class="btn btn-primary" data-action="closeClientModalAndSave">Done</button>'+
-    '</div>';
+      '<span class="plan-add" data-action="openCustomDeliverableDrawer" data-id="'+c.id+'">&#43; Add a one-off deliverable</span></div>';
+  else if(sec==='contact') body = '<div class="cm-h">Contact &amp; touchpoints</div>'+
+    '<div class="cm-grp"><div class="client-name-edit"><input class="client-name-input" data-client-field="business" data-id="'+c.id+'" value="'+escapeHtml(c.business||'')+'" placeholder="Business name" title="Click to rename">'+
+      '<input class="client-contact-input" data-client-field="name" data-id="'+c.id+'" value="'+escapeHtml(c.name||'')+'" placeholder="Contact name"></div>'+
+      (c.status==='active' ? '<div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap;align-items:center;">'+clientCareTagHtml(c)+'<span style="flex:1"></span>'+clientTouchControlHtml(c)+'</div>' : '')+'</div>'+
+    renderCrmBlock('client', c)+
+    '<div class="field" style="margin-top:14px;"><label>How we got them</label><div class="row" style="gap:6px;flex-wrap:wrap;">'+LEAD_SOURCES.map(function(s){ const active=c.leadSource===s.id; return '<span class="chip'+(active?' active':'')+'" data-action="setClientLeadSource" data-id="'+c.id+'" data-value="'+s.id+'">'+s.emoji+' '+s.label+'</span>'; }).join('')+'</div></div>';
+  else if(sec==='cycle') body = '<div class="cm-h">Client cycle</div>'+renderClientLifecycle(c);
+  else if(sec==='billing') body = '<div class="cm-h">Billing &amp; dates</div>'+clientBillingCycleFieldHtml(c)+renderClientEventsSection(c);
+  else body = '<div class="cm-h">Notes &amp; journal</div>'+
+    '<div class="field"><textarea class="input" id="clientModalNotes" style="width:100%;min-height:160px;" placeholder="What are they like to work with? Preferences, history, anything worth remembering.">'+escapeHtml(c.notes||'')+'</textarea></div>'+
+    '<button class="btn btn-ghost btn-sm" data-action="viewClientJournalFromModal" data-id="'+c.id+'">Open their journal &rarr;</button>'+
+    '<div class="cm-danger">'+renderClientDeleteControl(c)+'</div>';
+  return '<div class="cm">'+
+    '<aside class="cm-nav">'+
+      '<div class="cm-who">'+clientAvatarHtml(c, false, true)+'<div><b>'+escapeHtml(c.business||c.name||'Client')+'</b>'+(c.name && c.business ? '<span>'+escapeHtml(c.name)+'</span>' : '')+'</div></div>'+
+      '<div class="cm-tags">'+clientHealthTagHtml(c)+(st ? '<span class="tag" style="background:'+st.color+'22;color:'+st.color+';">'+escapeHtml(st.label)+'</span>' : '')+'</div>'+
+      CLIENT_SECTIONS.map(function(x){ return '<button class="cm-nav-i'+(sec===x[0]?' is-on':'')+'" data-action="clientSec" data-id="'+x[0]+'"><span>'+x[1]+'</span>'+x[2]+'</button>'; }).join('')+
+      '<span style="flex:1"></span>'+ghlPaneBtnHtml('client', c)+
+    '</aside>'+
+    '<div class="cm-pane" data-key="cm-'+sec+'">'+body+'</div>'+
+    '<button class="cm-x" data-action="closeClientModalAndSave" title="Done">&#10005;</button>'+
+  '</div>';
 }
 // ---- the card face: just the things you glance at ----
 function clientTenureLabel(c){
@@ -12985,10 +13383,6 @@ function clientCardFrontHtml(c){
   const recurring = delivs.filter(function(d){ return d.recurring; }), oneOff = delivs.filter(function(d){ return !d.recurring && d.status!=='done'; });
   const st = crmStage('client', c.stage);
   return '<div class="cf">'+
-    '<div class="cf-head">'+clientAvatarHtml(c, false, true)+
-      '<div class="cf-names"><div class="cf-biz">'+escapeHtml(c.business||c.name||'Client')+'</div>'+(c.name && c.business ? '<div class="kpi-sub">'+escapeHtml(c.name)+'</div>' : '')+'</div>'+
-      clientHealthTagHtml(c)+
-    '</div>'+
     '<div class="cf-facts">'+
       '<div class="cf-fact"><span class="cf-k">Working together</span><span class="cf-v">'+clientTenureLabel(c)+'</span>'+((c.startDate||c.createdAt) ? '<span class="cf-s">since '+fmtDateShort(c.startDate||c.createdAt)+'</span>' : '')+'</div>'+
       '<div class="cf-fact"><span class="cf-k">How we got them</span><span class="cf-v">'+(src ? src.emoji+' '+escapeHtml(src.label) : '—')+'</span></div>'+
@@ -13004,21 +13398,10 @@ function clientCardFrontHtml(c){
         oneOff.map(function(d){ return '<div class="cf-deliv"><span class="cf-deliv-t">'+escapeHtml(d.title)+'</span><span class="cf-deliv-n kpi-sub">one-off'+(d.dueDate ? ' &middot; due '+fmtDateShort(d.dueDate) : '')+'</span></div>'; }).join('')+
       '</div>' : '<div class="kpi-sub" style="margin-top:6px;">No deliverables yet.</div>')+
     '</div>'+
-    '<div class="cf-sec"><div class="cf-sec-k">Notes</div>'+(c.notes ? '<div class="cf-notes">'+escapeHtml(c.notes)+'</div>' : '<div class="kpi-sub">No notes yet — add some on the back of the card.</div>')+'</div>'+
-    '<div class="cf-foot"><button class="btn btn-ghost" data-action="closeClientModalAndSave">Close</button>'+ghlPaneBtnHtml('client', c)+'<button class="btn btn-primary" data-action="clientFlip" data-id="back">&#9998; Edit</button></div>'+
+    '<div class="cf-sec"><div class="cf-sec-k">Notes</div>'+(c.notes ? '<div class="cf-notes">'+escapeHtml(c.notes)+'</div>' : '<div class="kpi-sub">No notes yet — add some in Notes.</div>')+'</div>'+
   '</div>';
 }
-ACTIONS.clientFlip = function(el, e, id){
-  if(id==='front'){ // keep what was typed on the back before flipping
-    const c = state.business.clients.find(function(x){ return x.id===ui.showClientModal; });
-    const notesEl = document.getElementById('clientModalNotes'); if(c && notesEl){ c.notes = notesEl.value.trim(); persist('business'); }
-  }
-  ui.clientEdit = id==='back';
-  const box = document.getElementById('clientModalContent');
-  if(box){ box.classList.remove('cm-flip'); void box.offsetWidth; box.classList.add('cm-flip'); }
-  renderClientModalInto();
-  if(box) box.scrollTop = 0;
-};
+ACTIONS.clientFlip = function(el, e, id){ ACTIONS.clientSec(el, e, id==='back' ? 'plan' : 'overview'); };
 function clientBillingCycleFieldHtml(c){
   const todayDay = new Date().getDate();
   const hasMrr = Number(c.mrr)>0;
@@ -15716,7 +16099,10 @@ function renderSettings(){
         '<div class="task-list">'+RESET_TARGETS.map(function(t){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+t.label+'</div>'+resetPartBtn(t)+'</div>'; }).join('')+'</div>'+
       '</div></div>',
 
-    display: themeSettingsHtml()+skyLookSettingsHtml()+sceneSettingsHtml()+weatherSettingsHtml()+cardLayoutSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
+    display: themeSettingsHtml()+sceneSettingsHtml()+weatherSettingsHtml()+
+      // the finer appearance choices wait behind one row instead of filling the page
+      '<details class="set-more"'+(ui.setMoreOpen?' open':'')+'><summary data-action="toggleSetMore">More appearance options <span>Sky look, card layout, accent color, header, cursor</span></summary>'+
+      skyLookSettingsHtml()+cardLayoutSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
         '<div class="row">'+SWATCHES.map(function(sw){ return '<span class="swatch '+(p.accentColor===sw?'sel':'')+'" style="background:'+sw+';" data-action="pickThemeColor" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Today Header Style</div>'+
@@ -15727,7 +16113,7 @@ function renderSettings(){
       '</div>'+
       '<div class="section"><div class="section-title">Goal Color'+tip('Goals glow brighter in this color the closer they get to done.')+'</div><div class="card">'+
         '<div class="row">'+SWATCHES.map(function(sw){ return '<span class="swatch '+(p.goalAccentColor===sw?'sel':'')+'" style="background:'+sw+';" data-action="pickGoalColor" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
-      '</div></div>'+
+      '</div></div></details>'+
       '<div class="section"><div class="section-title">Today Dashboard Panels'+tip('Choose what shows on your Today page, and in what order. Each panel is taken straight from its own page.')+'</div><div class="card">'+
         '<div class="task-list">'+panelOrder.map(function(pid,idx){
           const def = PANEL_DEFS.find(function(pd){return pd.id===pid;});
@@ -15871,32 +16257,34 @@ function renderSettings(){
             '<span class="swatch" style="background:'+t.color+';width:18px;height:18px;cursor:pointer;" data-action="cycleJournalTypeColor" data-id="'+t.id+'" title="Click to change color"></span>'+
             '<input class="input" data-journal-type-emoji="'+t.id+'" value="'+escapeHtml(t.emoji)+'" maxlength="4" style="width:48px;text-align:center;">'+
             '<input class="input" data-journal-type-label="'+t.id+'" value="'+escapeHtml(t.label)+'" style="flex:1;max-width:220px;">'+
+            '<button class="btn btn-ghost btn-sm" data-action="toggleJournalTypeHidden" data-id="'+t.id+'" title="'+(t.hidden ? 'Show it in the pickers again' : 'Hide it from the pickers (entries stay)')+'">'+(t.hidden ? '&#128065;&#8205; Show' : 'Hide')+'</button>'+
             (t.id==='starred' ? '<span class="kpi-sub">Built in</span>' : deleteBtn('journaltype', t.id))+
           '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
         '</div>'+
       '</div>'
   };
-  const navDefs = [
-    {id:'you', label:'You', icon:'&#128100;'},
-    {id:'display', label:'Display', icon:'&#127912;'},
-    {id:'sound', label:'Sound', icon:'&#128266;'},
-    {id:'focus', label:'Focus &amp; Alarms', icon:'&#9201;'},
-    {id:'business', label:'Business', icon:'&#9635;'},
-    {id:'calendarJournal', label:'Calendar &amp; Journal', icon:'&#9638;'},
-    {id:'integrations', label:'Integrations', icon:'&#128279;'},
-    {id:'data', label:'Data', icon:'&#128190;'},
-    {id:'updates', label:'App updates', icon:'&#128227;'}
-  ];
-  // Standards and General (preferences) now live under You; export / reset under Data
   sections.sound = soundSettingsHtml();
-  const tab = (ui.settingsTab==='standards' || ui.settingsTab==='general') ? 'you' : ui.settingsTab;
-  const active = sections[tab] ? tab : 'you';
+  // five places instead of nine: related settings live together, each part under its own heading
+  const groups = [
+    {id:'you', label:'You', icon:'&#128100;', parts:[['you','']]},
+    {id:'look', label:'Look & Sound', icon:'&#127912;', parts:[['display','Appearance'],['sound','Sound']]},
+    {id:'focus', label:'Focus & Alarms', icon:'&#9201;', parts:[['focus','']]},
+    {id:'work', label:'Business & Calendar', icon:'&#9635;', parts:[['business','Business'],['calendarJournal','Calendar & journal']]},
+    {id:'system', label:'Connections & Data', icon:'&#128279;', parts:[['integrations','Integrations'],['data','Your data'],['updates','App updates']]}
+  ];
+  // Standards and General (preferences) live under You
+  const want = (ui.settingsTab==='standards' || ui.settingsTab==='general') ? 'you' : (ui.settingsTab || 'you');
+  const grp = groups.find(function(g){ return g.id===want || g.parts.some(function(x){ return x[0]===want; }); }) || groups[0];
+  const body = grp.parts.map(function(x){ return '<div class="set-part" id="setPart-'+x[0]+'">'+(grp.parts.length>1 ? '<div class="set-part-h">'+x[1]+'</div>' : '')+sections[x[0]]+'</div>'; }).join('');
+  if(want!==grp.id && grp.parts[0][0]!==want){ const target = want; setTimeout(function(){ const el = document.getElementById('setPart-'+target); if(el) el.scrollIntoView({block:'start'}); }, 30); }
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Settings</div></div></div>'+
   '<div class="settings-shell is-compact">'+
-    '<div class="settings-sidenav">'+navDefs.map(function(n){ return '<button class="settings-nav-item'+(active===n.id?' active':'')+'" data-action="settingsTab" data-tab="'+n.id+'"><span style="margin-right:8px;">'+n.icon+'</span>'+n.label+'</button>'; }).join('')+'</div>'+
-    '<div class="settings-content tab-panel" data-key="settings-'+active+'">'+sections[active]+'</div>'+
+    '<div class="settings-sidenav">'+groups.map(function(g){ return '<button class="settings-nav-item'+(grp.id===g.id?' active':'')+'" data-action="settingsTab" data-tab="'+g.id+'"><span style="margin-right:8px;">'+g.icon+'</span>'+g.label+'</button>'; }).join('')+'</div>'+
+    '<div class="settings-content tab-panel" data-key="settings-'+grp.id+'">'+body+'</div>'+
   '</div>';
 }
+ACTIONS.toggleSetMore = function(el, e){ e.preventDefault(); ui.setMoreOpen = !ui.setMoreOpen; renderView(); };
+
 function deleteResetBtn(){
   const key='reset:all';
   if(armed.has(key)) return '<button class="btn btn-danger" data-action="confirmReset">Confirm Reset — Erases Everything</button>';
@@ -16698,7 +17086,9 @@ function finishWakeMedia(){
     a.loop = false; wakeFinishing = true;
     a.addEventListener('ended', function(){ if(wakeAudio===a) stopWakeMedia(true); wakeFinishing = false; if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); }, {once:true});
   }
-  if(wakeMusicApp){ wakeFinishing = true; wakeMusicApp = false; musicApp('finish'); }
+  const pl = typeof morningPlaylist==='function' && soundPref('morningPlAfterSong', true) ? morningPlaylist() : null;
+  if(wakeMusicApp){ wakeFinishing = true; wakeMusicApp = false; helperFetch(MUSIC_URL+'finish'+(pl ? '?k=playlist&q='+hexUtf8(pl.q) : ''), 4000); }
+  else if(a && pl){ a.addEventListener('ended', function(){ musicApp('play', {type:'music', k:'playlist', q:pl.q}); }, {once:true}); }
 }
 ACTIONS.wakeStopMusic = function(){
   const m = wakeCfg().media;
@@ -16775,18 +17165,26 @@ function endBriefing(){
   renderView();
 }
 // Start my morning: off the screen and into Morning mode (routine, note, plan) until you're ready to work.
-ACTIONS.wakeStartMorning = function(){ const t = ui.wakeBriefTest; endBriefing(); if(t){ showToast('Test done — this is where Morning mode starts.', {icon:'&#9728;&#65039;'}); return; } startMorning(); };
-ACTIONS.wakeBriefDone = function(){ const t = ui.wakeBriefTest; endBriefing(); showToast(t ? 'Test done — that\'s how your mornings will look.' : 'Let\'s get it.', {icon:'&#9728;&#65039;'}); };
+// Start my morning → the business preview (the same screen as Clock in): Lock in from there, or ✕ to the app
+ACTIONS.wakeStartMorning = function(){
+  // a short, quiet hand-off: Good morning lifts away and the business preview rises in its place
+  const b = document.querySelector('#wakeContent .brief'); if(b) b.classList.add('is-leaving');
+  setTimeout(function(){ endBriefing(); clockIn({quiet:true, from:'morning'}); }, 520);
+};
+ACTIONS.wakeBriefDone = function(){ endBriefing(); };
 ACTIONS.wakeBriefLockIn = function(el, e, id){ endBriefing(); if(id) setNextUp(id); renderView(); openLockInChooser(); };
 ACTIONS.wakeClockIn = function(){ const t = ui.wakeBriefTest; endBriefing(); if(t){ showToast('Test done — this is where Clock in shows your plan.', {icon:'&#128339;'}); return; } clockIn(); };
 ACTIONS.wakeBoardToggle = function(){ ui.wakeBoardBig = !ui.wakeBoardBig; renderWakeOverlayInto(); };
 function wakeSnooze(){
   const mins = wakeCfg().snoozeMinutes||9;
   const test = wakeRing && wakeRing.test;
-  stopWakeRing();
+  clearInterval(wakeBeepTimer); wakeBeepTimer = null;
+  stopWakeMedia(false);
+  wakeRing = null;
   state.focus.snooze = {ts:Date.now()+mins*60000, wake:true, test:test};
-  persist('focus'); renderView();
-  showToast('Snoozed — ringing again at '+fmt12Hour(nowHM(new Date(Date.now()+mins*60000))), {icon:'&#128164;'});
+  persist('focus');
+  // the screen stays, dimmed, counting down to the next ring
+  ui.wakeMode = 'snooze'; renderWakeOverlayInto();
 }
 ACTIONS.wakeImUp = function(){ wakeImUp(); };
 ACTIONS.wakeStartDay = function(){ wakeImUp(); };
@@ -16804,7 +17202,7 @@ function wakeWeatherLine(){
   return now ? wxIcon(wxKind(now.code), skyPhase())+' '+now.temp+'&deg; '+escapeHtml(wxLabel(now.code).toLowerCase())+(now.hi!=null ? ' &middot; high '+now.hi+'&deg;' : '') : '';
 }
 // the alarm, Good morning and the dawn before it are drawn in 32n-morning.js
-function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : ui.wakeMode==='dawn' ? dawnHtml() : wakeRingHtml(); }
+function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : ui.wakeMode==='dawn' ? dawnHtml() : ui.wakeMode==='snooze' ? snoozeHtml() : wakeRingHtml(); }
 function renderWakeOverlayInto(){
   const el = document.getElementById('wakeContent'); if(!el) return;
   morphInto(el, renderWakeScreen());
@@ -16815,7 +17213,7 @@ function renderWakeOverlayInto(){
     if(!overlayOpen('wakeOverlay')){ clearInterval(wakeClockTimer); return; }
     const c = document.getElementById('wakeClock');
     if(c) c.textContent = new Date().toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'});
-    if(ui.wakeMode==='dawn') tickDawn();
+    if(ui.wakeMode==='dawn') tickDawn(); else if(ui.wakeMode==='snooze') tickSnooze();
   }, 1000);
 }
 registerModal('wakeOverlay', renderWakeOverlayInto);
@@ -16867,6 +17265,7 @@ function renderWakeSetup(){
     '</div>'+
     '<div class="ws-block grid grid-2">'+
       '<div class="field"><label>Good morning intro</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.intro==='quick'?' active':'')+'" data-action="wakeIntro" data-id="quick">Quick</button><button class="seg-tab'+(w.intro==='cinematic'?' active':'')+'" data-action="wakeIntro" data-id="cinematic">Cinematic</button></div></div>'+
+      '<div class="field"><label>News topics'+tip('Things you care about, separated by commas — e.g. AI, Knicks, marketing. Good morning shows the latest headlines on those. Leave it empty for the top stories.')+'</label><input class="input" data-wake="newsTopics" placeholder="e.g. AI, Knicks, marketing" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
       '<div class="field"><label>Headlines in Good morning</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.news!==false?' active':'')+'" data-action="wakeNews" data-id="on">On</button><button class="seg-tab'+(w.news===false?' active':'')+'" data-action="wakeNews" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+
     '</div>'+
@@ -16977,6 +17376,7 @@ document.addEventListener('change', function(e){
     }
   }
   else if(key==='snoozeMinutes') w.snoozeMinutes = Number(t.value)||9;
+  else if(key==='newsTopics'){ w.newsTopics = t.value.trim(); ui.morningNews = null; }
   saveWake();
   renderView();
 });
@@ -17416,6 +17816,8 @@ function sceneTick(x, c, dt, t){
   if(x.flashAt!=null){ x.flashAt -= dt*1000; if(x.flashAt <= 0){ x.flash = 0.18; x.flashAt = 5000 + Math.random()*9000; } if(x.flash > 0){ c.fillStyle = 'rgba(230,235,255,'+x.flash.toFixed(2)+')'; c.fillRect(0, 0, w, h); x.flash -= dt*0.6; } }
 }
 // ---- mounting & the loop ----
+let sceneBusyAt = 0;
+['pointerdown', 'wheel', 'keydown', 'scroll'].forEach(function(ev){ window.addEventListener(ev, function(){ sceneBusyAt = performance.now(); }, {passive:true, capture:true}); });
 const SC = {bg:null, fx:null, x:null, raf:0, last:0, key:'', builtAt:0, running:false};
 function sceneCtxFor(id){ return {id:id, phase:id==='space' ? 'night' : skyLook(), wx:id==='sky' && wxNow() ? wxKind(wxNow().code) : 'clear', w:window.innerWidth, h:window.innerHeight}; }
 function sceneBuild(){
@@ -17438,7 +17840,9 @@ function sceneBuild(){
 function sceneLoop(t){
   if(!SC.running){ SC.raf = 0; return; }
   SC.raf = requestAnimationFrame(sceneLoop);
-  if(t - SC.last < 33) return;
+  // ~20 frames a second is plenty for drifting clouds; and while you're clicking, scrolling or
+  // typing the scene holds still, so every bit of the computer goes to the app itself
+  if(t - SC.last < 50 || performance.now() - sceneBusyAt < 1200) return;
   const dt = SC.last ? Math.min(0.1, (t - SC.last)/1000) : 0.033;
   SC.last = t;
   if(SC.x) sceneTick(SC.x, SC.fx.getContext('2d'), dt, t);
@@ -18784,9 +19188,15 @@ function renderSocialPanel(){
 function morningNotes(){ return arr(state.focus.morningNotes); }
 function morningNotesFor(date){ return morningNotes().filter(function(n){ return n.forDate===date; }); }
 function morningNoteTarget(){ return typeof wakeTargetDate==='function' ? wakeTargetDate() : addDays(todayStr(), 1); }
-function addMorningNote(text){
-  text = String(text||'').trim(); if(!text) return false;
-  state.focus.morningNotes = morningNotes().concat([{id:uid(), text:text, forDate:morningNoteTarget(), at:Date.now()}])
+// extra: {morning, work} — the note in parts: the headline (on the alarm), a message for the
+// morning (Good morning) and one for before work (Start work)
+function addMorningNote(text, extra){
+  text = String(text||'').trim(); extra = extra || {};
+  const morning = String(extra.morning||'').trim(), work = String(extra.work||'').trim();
+  if(!text && !morning && !work) return false;
+  const n = {id:uid(), text:text || morning || work, forDate:morningNoteTarget(), at:Date.now()};
+  if(morning || work){ n.headline = text; n.morning = morning; n.work = work; }
+  state.focus.morningNotes = morningNotes().concat([n])
     // keep a couple of weeks — older ones have done their job
     .filter(function(n){ return n.forDate >= addDays(todayStr(), -14); });
   persist('focus');
@@ -18976,8 +19386,11 @@ ACTIONS.windNext = function(){ windReadForm(); const i = WIND_STEPS.findIndex(fu
 ACTIONS.windBack = function(){ windReadForm(); const i = WIND_STEPS.findIndex(function(s){ return s[0]===ui.wind.step; }); ui.wind.step = WIND_STEPS[Math.max(0, i-1)][0]; renderWindInto(); };
 function windReadForm(){
   const w = ui.wind; if(!w) return;
-  const n = document.getElementById('windNote');
-  if(n && n.value.trim()){ addMorningNote(n.value); n.value = ''; }
+  const n = document.getElementById('windNote'), nm = document.getElementById('windNoteMorning'), nw = document.getElementById('windNoteWork');
+  if((n && n.value.trim()) || (nm && nm.value.trim()) || (nw && nw.value.trim())){
+    addMorningNote(n ? n.value : '', {morning:nm ? nm.value : '', work:nw ? nw.value : ''});
+    [n, nm, nw].forEach(function(x){ if(x) x.value = ''; });
+  }
   const a = document.getElementById('windAlarm'); if(a) w.alarm = a.value;
 }
 // save the plan + alarm (and optionally go to sleep)
@@ -19119,9 +19532,11 @@ function windPlanHtml(){
 function windNoteHtml(){
   const w = ui.wind, notes = morningNotesFor(w.target);
   return '<div class="wd-note">'+
-    '<div class="wd-sub">Shows up on your alarm screen and at the top of tomorrow\'s briefing.</div>'+
-    (notes.length ? '<div class="wd-notes">'+notes.map(function(n){ return '<div class="wd-note-item"><span>&ldquo;'+escapeHtml(n.text)+'&rdquo;</span><button class="mn-x" data-action="removeMorningNote" data-id="'+n.id+'" title="Remove">&#10005;</button></div>'; }).join('')+'</div>' : '')+
-    '<textarea class="input wd-note-input" id="windNote" placeholder="What does tomorrow-you need to hear?"></textarea>'+
+    '<div class="wd-sub">Three short lines for tomorrow-you.</div>'+
+    (notes.length ? '<div class="wd-notes">'+notes.map(function(n){ return '<div class="wd-note-item"><div><b>'+escapeHtml(n.headline!=null ? n.headline||'—' : n.text)+'</b>'+(n.morning ? '<span>☀️ '+escapeHtml(n.morning)+'</span>' : '')+(n.work ? '<span>💼 '+escapeHtml(n.work)+'</span>' : '')+'</div><button class="mn-x" data-action="removeMorningNote" data-id="'+n.id+'" title="Remove">&#10005;</button></div>'; }).join('')+'</div>' : '')+
+    '<div class="wd-nf"><label><span>&#9200; The headline</span><small>Big on your alarm screen</small></label><input class="input wd-nf-head" id="windNote" placeholder="e.g. Big shoot day. Up and at it."></div>'+
+    '<div class="wd-nf"><label><span>&#9728;&#65039; When you wake up</span><small>In Good morning</small></label><textarea class="input" id="windNoteMorning" rows="2" placeholder="e.g. Coffee, a walk, then straight into it."></textarea></div>'+
+    '<div class="wd-nf"><label><span>&#128188; Before you start work</span><small>Right before you lock in</small></label><textarea class="input" id="windNoteWork" rows="2" placeholder="e.g. Finish the JJS edit before you touch email."></textarea></div>'+
   '</div>';
 }
 function windAlarmHtml(){
@@ -19425,7 +19840,7 @@ function methodLine(st){
   const m = st.m;
   if(m.work){
     const r = 'Round '+(st.onBreak ? st.round-1 : st.round)+(m.rounds ? ' of '+m.rounds : '');
-    if(st.onBreak) return r+' done';
+    if(st.onBreak){ const as = state.focus.activeSession, b = as && as.breaks[as.breaks.length-1]; return b && !b.auto ? 'Round '+st.round+(m.rounds ? ' of '+m.rounds : '')+' paused' : r+' done'; }
     return r+' · '+(st.last ? 'Last round, <b>'+formatElapsed(st.left)+'</b> to go' : 'Break in <b>'+formatElapsed(st.left)+'</b>');
   }
   if(st.id==='flow') return st.onBreak ? 'Resting · back when you\'re ready' : 'In the flow for <b>'+formatElapsed(st.inSeg||0)+'</b> · break earned: <b>'+(st.earned||5)+' min</b>';
@@ -19676,42 +20091,84 @@ ACTIONS.goToFocusSettings = function(){ closeLockSeq(); ui.view = 'settings'; ui
 function wakeGreeting(){ return 'Good morning'; }
 
 // ---- lines for the day (chosen by date, so they're the same all day) ----
+// Quotes: a mix of philosophers, athletes, makers and founders — famous and not. Only lines whose
+// source is solid; lines with no name are our own.
 const MORNING_QUOTES = [
+  ['At dawn, when you have trouble getting out of bed, tell yourself: “I have to go to work — as a human being.”', 'Marcus Aurelius'],
+  ['No man is free who is not master of himself.', 'Epictetus'],
+  ['First say to yourself what you would be; and then do what you have to do.', 'Epictetus'],
+  ['It is not that we have a short time to live, but that we waste a lot of it.', 'Seneca'],
   ['We suffer more often in imagination than in reality.', 'Seneca'],
   ['Begin at once to live, and count each separate day as a separate life.', 'Seneca'],
-  ['When you arise in the morning, think of what a precious privilege it is to be alive — to breathe, to think, to enjoy, to love.', 'Marcus Aurelius'],
+  ['Waste no more time arguing about what a good man should be. Be one.', 'Marcus Aurelius'],
   ['The impediment to action advances action. What stands in the way becomes the way.', 'Marcus Aurelius'],
+  ['He who has a why to live can bear almost any how.', 'Friedrich Nietzsche'],
+  ['Do nothing which is of no use.', 'Miyamoto Musashi'],
+  ['Well begun is half done.', 'Aristotle'],
   ['How we spend our days is, of course, how we spend our lives.', 'Annie Dillard'],
   ['The sun himself is weak when he first rises, and gathers strength and courage as the day gets on.', 'Charles Dickens'],
   ['Write it on your heart that every day is the best day in the year.', 'Ralph Waldo Emerson'],
-  ['The best time to plant a tree was twenty years ago. The second best time is now.', 'Proverb'],
-  ['Stay hungry. Stay foolish.', 'Steve Jobs'],
-  ['Rest is not idleness.', 'John Lubbock'],
-  ['Look deep into nature, and then you will understand everything better.', 'Albert Einstein'],
-  ['Every morning we are born again. What we do today is what matters most.', 'Buddha'],
-  ['First say to yourself what you would be; and then do what you have to do.', 'Epictetus'],
-  ['No man is free who is not master of himself.', 'Epictetus'],
-  ['The obstacle is the way.', 'Ryan Holiday'],
-  ['Everything is figureoutable.', 'Marie Forleo'],
-  ['You could leave life right now. Let that determine what you do and say and think.', 'Marcus Aurelius'],
-  ['Happiness is not something ready made. It comes from your own actions.', 'Dalai Lama']
-];
-const WORK_QUOTES = [
-  ['Amateurs sit and wait for inspiration. The rest of us just get up and go to work.', 'Stephen King'],
-  ['Be so good they can’t ignore you.', 'Steve Martin'],
+  ['Rest at the end, not in the middle.', 'Kobe Bryant'],
+  ['Everything negative — pressure, challenges — is all an opportunity for me to rise.', 'Kobe Bryant'],
+  ['You are in danger of living a life so comfortable and soft that you will die without ever realizing your true potential.', 'David Goggins'],
   ['Discipline equals freedom.', 'Jocko Willink'],
   ['Hard choices, easy life. Easy choices, hard life.', 'Jerzy Gregorek'],
-  ['Well done is better than well said.', 'Benjamin Franklin'],
-  ['Small deeds done are better than great deeds planned.', 'Peter Marshall'],
-  ['Make each day your masterpiece.', 'John Wooden'],
-  ['Slow is smooth, and smooth is fast.', 'Navy SEAL saying'],
-  ['Don’t watch the clock; do what it does. Keep going.', 'Sam Levenson'],
-  ['Ideas are easy. Implementation is hard.', 'Guy Kawasaki'],
-  ['Focus is a matter of deciding what things you’re not going to do.', 'John Carmack'],
-  ['We are what we repeatedly do. Excellence, then, is not an act, but a habit.', 'Will Durant'],
-  ['Motivation is what gets you started. Habit is what keeps you going.', 'Jim Ryun'],
-  ['Lost time is never found again.', 'Benjamin Franklin']
+  ['Inspiration is for amateurs — the rest of us just show up and get to work.', 'Chuck Close'],
+  ['What you do every day matters more than what you do once in a while.', 'Gretchen Rubin'],
+  ['Keep hammering.', 'Cameron Hanes'],
+  ['The best time to plant a tree was twenty years ago. The second best time is now.', 'Proverb'],
+  ['You don’t need a perfect day. You need a good first hour.', ''],
+  ['The version of you that you want to be is built in mornings like this one.', '']
 ];
+const WORK_QUOTES = [
+  ['Volume negates luck.', 'Alex Hormozi'],
+  ['Make people an offer so good they would feel stupid saying no.', 'Alex Hormozi'],
+  ['Real artists ship.', 'Steve Jobs'],
+  ['Your time is limited, so don’t waste it living someone else’s life.', 'Steve Jobs'],
+  ['Creativity is just connecting things.', 'Steve Jobs'],
+  ['Learn to sell. Learn to build. If you can do both, you will be unstoppable.', 'Naval Ravikant'],
+  ['Play long-term games with long-term people.', 'Naval Ravikant'],
+  ['Make something people want.', 'Paul Graham'],
+  ['Do things that don’t scale.', 'Paul Graham'],
+  ['If you double the number of experiments you do per year, you’re going to double your inventiveness.', 'Jeff Bezos'],
+  ['The work you do while you procrastinate is probably the work you should be doing for the rest of your life.', 'Jessica Hische'],
+  ['Focus is a matter of deciding what things you’re not going to do.', 'John Carmack'],
+  ['Amateurs sit and wait for inspiration. The rest of us just get up and go to work.', 'Stephen King'],
+  ['Be so good they can’t ignore you.', 'Steve Martin'],
+  ['Ideas are easy. Implementation is hard.', 'Guy Kawasaki'],
+  ['Absorb what is useful, discard what is useless, and add what is specifically your own.', 'Bruce Lee'],
+  ['Nobody cares. Work harder.', 'Cameron Hanes'],
+  ['Slow is smooth, and smooth is fast.', 'Navy SEAL saying'],
+  ['Done is better than perfect.', 'Facebook office poster'],
+  ['One focused hour beats a distracted day.', ''],
+  ['Ship it, then make it better.', '']
+];
+// for the work preview's second line: starting, procrastination, taking action
+const ACTION_QUOTES = [
+  ['Procrastination is the thief of time.', 'Edward Young'],
+  ['You may delay, but time will not.', 'Benjamin Franklin'],
+  ['The best way out is always through.', 'Robert Frost'],
+  ['Action is the antidote to despair.', 'Joan Baez'],
+  ['Start where you are. Use what you have. Do what you can.', 'Arthur Ashe'],
+  ['If you have to eat two frogs, eat the ugliest one first.', 'Brian Tracy'],
+  ['Inaction breeds doubt and fear. Action breeds confidence and courage.', 'Dale Carnegie'],
+  ['Small daily improvements over time lead to stunning results.', 'Robin Sharma'],
+  ['You can’t build a reputation on what you are going to do.', 'Henry Ford'],
+  ['Lost time is never found again.', 'Benjamin Franklin'],
+  ['The task you’re avoiding is usually the one that moves everything.', ''],
+  ['Two minutes of starting beats two hours of planning.', '']
+];
+// quotes turn over by themselves every so often while a page is up, or on ↻
+const QUOTE_SETS = {morning:function(){ return MORNING_QUOTES; }, work:function(){ return WORK_QUOTES; }, action:function(){ return ACTION_QUOTES; }};
+function quoteFor(kind){ const list = QUOTE_SETS[kind](), off = (ui.qOff && ui.qOff[kind]) || 0; return list[(dayNum() + off) % list.length]; }
+function nextQuote(kind){ ui.qOff = ui.qOff || {}; ui.qOff[kind] = (ui.qOff[kind]||0) + 1; document.querySelectorAll('.qt[data-q="'+kind+'"]').forEach(function(el){
+  const tmp = document.createElement('div'); tmp.innerHTML = quoteHtml(quoteFor(kind), el.dataset.cls||'', kind); const n = tmp.firstChild; n.classList.add('qt-swap'); el.replaceWith(n); }); }
+ACTIONS.nextQuote = function(el, e, id){ nextQuote(id); };
+setInterval(function(){
+  if(typeof ui==='undefined' || !ui) return;
+  if(overlayOpen('wakeOverlay') && ui.wakeMode==='brief' && ui.briefSkipped) nextQuote('morning');
+  if(overlayOpen('planOverlay')){ nextQuote('work'); setTimeout(function(){ nextQuote('action'); }, 9000); }
+}, 45000);
 // small, human things for a good day — three a morning
 const MORNING_THOUGHTS = [
   ['&#127749;', 'Get outside in the first hour.', 'Ten minutes of morning light sets your whole day.'],
@@ -19720,6 +20177,9 @@ const MORNING_THOUGHTS = [
   ['&#127911;', 'Put on something you love.', 'Music while you get ready changes the whole mood.'],
   ['&#128245;', 'Phone face-down till breakfast is done.', 'The world can wait twenty minutes.'],
   ['&#127859;', 'Make breakfast like it matters.', 'Sit down for it.'],
+  ['&#9749;', 'Make a proper coffee.', 'Or a fresh juice. Take it slow.'],
+  ['&#129367;', 'Think about what you’ll eat today.', 'Decide now and you won’t grab junk later.'],
+  ['&#127807;', 'Open a window.', 'Fresh air before the screen.'],
   ['&#10024;', 'Romanticize it.', 'The coffee, the light, the walk. This is your life — enjoy it.'],
   ['&#128591;', 'Name one thing you’re grateful for.', 'Say it out loud.'],
   ['&#128075;', 'Text someone you love good morning.', 'Takes ten seconds, makes their day.'],
@@ -19730,20 +20190,26 @@ const MORNING_THOUGHTS = [
   ['&#128588;', 'You don’t have to rush.', 'A calm morning makes a sharp afternoon.']
 ];
 function dayNum(){ const d = new Date(), start = new Date(d.getFullYear(), 0, 0); return Math.floor((d - start)/86400000); }
-function quoteOfDay(){ return MORNING_QUOTES[dayNum() % MORNING_QUOTES.length]; }
-function workQuoteOfDay(){ return WORK_QUOTES[dayNum() % WORK_QUOTES.length]; }
+function quoteOfDay(){ return quoteFor('morning'); }
+function workQuoteOfDay(){ return quoteFor('work'); }
 function thoughtsOfDay(n){ const out = [], len = MORNING_THOUGHTS.length, d = dayNum(); for(let i=0;i<(n||3);i++) out.push(MORNING_THOUGHTS[(d*3 + i*5) % len]); return out.filter(function(x, i, a){ return a.indexOf(x)===i; }); }
-function quoteHtml(q, cls){ return '<figure class="qt '+(cls||'')+'"><span class="qt-mark">&ldquo;</span><blockquote>'+escapeHtml(q[0])+'</blockquote><figcaption><span class="qt-rule"></span>'+escapeHtml(q[1])+'</figcaption></figure>'; }
+function quoteHtml(q, cls, kind){ return '<figure class="qt '+(cls||'')+'"'+(kind ? ' data-q="'+kind+'" data-cls="'+(cls||'')+'"' : '')+'><span class="qt-mark">&ldquo;</span>'+(kind ? '<button class="qt-next" data-action="nextQuote" data-id="'+kind+'" title="Another one">&#8635;</button>' : '')+'<blockquote>'+escapeHtml(q[0])+'</blockquote>'+(q[1] ? '<figcaption><span class="qt-rule"></span>'+escapeHtml(q[1])+'</figcaption>' : '')+'</figure>'; }
 
 // ---- headlines (through the launcher; a public feed reader if the launcher can't) ----
 function morningNewsOn(){ return wakeCfg().news!==false; }
+// your topics ("AI, Knicks, marketing") → headlines about those, from Google News
+function newsTopics(){ return String(wakeCfg().newsTopics||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean).join(', '); }
+function topicsQuery(t){ return t.split(',').map(function(x){ x = x.trim(); return /\s/.test(x) ? '"'+x+'"' : x; }).join(' OR ')+' when:2d'; }
+// Google News titles end in " - Source"; show the source on its own
+function splitSource(n){ const m = / - ([^-]{2,60})$/.exec(n.title); if(m && (!n.src || n.src===m[1])){ n.title = n.title.slice(0, m.index); n.src = m[1]; } return n; }
 function parseRss(text){
   const xml = new DOMParser().parseFromString(text, 'text/xml');
   const chan = xml.querySelector('channel > title');
   const src = chan ? chan.textContent.replace(/\s*[:\-|].*$/, '').trim() : '';
-  return Array.prototype.slice.call(xml.querySelectorAll('item')).slice(0, 4).map(function(it){
+  return Array.prototype.slice.call(xml.querySelectorAll('item')).slice(0, 6).map(function(it){
     const t = it.querySelector('title'), l = it.querySelector('link');
-    return {title:(t ? t.textContent : '').trim(), link:(l ? l.textContent : '').trim(), src:src};
+    const so = it.querySelector('source');
+    return splitSource({title:(t ? t.textContent : '').trim(), link:(l ? l.textContent : '').trim(), src:so ? so.textContent.trim() : src});
   }).filter(function(x){ return x.title; });
 }
 async function fetchWithin(url, ms){
@@ -19757,14 +20223,16 @@ async function loadMorningNews(){
   ui.morningNews = {date:today, loading:true, items:null};
   let items = null;
   try{
-    const res = await fetchWithin(WAKE_HELPER+'news', 9000);
+    const topics = newsTopics();
+    const res = await fetchWithin(WAKE_HELPER+'news'+(topics ? '?q='+hexUtf8(topics) : ''), 9000);
     if(res && res.ok) items = parseRss(await res.text());
   }catch(e){}
   if(!items || !items.length){
     // an Operator still running last version's launcher has no /news — read the feed another way
     try{
-      const res = await fetchWithin('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://feeds.npr.org/1001/rss.xml'), 8000);
-      if(res && res.ok){ const j = await res.json(); items = arr(j && j.items).slice(0, 4).map(function(x){ return {title:String(x.title||'').trim(), link:String(x.link||''), src:'NPR'}; }).filter(function(x){ return x.title; }); }
+      const topics = newsTopics(), feed = topics ? 'https://news.google.com/rss/search?q='+encodeURIComponent(topicsQuery(topics))+'&hl=en-US&gl=US&ceid=US:en' : 'https://feeds.npr.org/1001/rss.xml';
+      const res = await fetchWithin('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(feed), 8000);
+      if(res && res.ok){ const j = await res.json(); items = arr(j && j.items).slice(0, 6).map(function(x){ return splitSource({title:String(x.title||'').trim(), link:String(x.link||''), src:topics ? '' : 'NPR'}); }).filter(function(x){ return x.title; }); }
     }catch(e){}
   }
   ui.morningNews = {date:today, loading:false, items:items && items.length ? items : null};
@@ -19816,55 +20284,94 @@ ACTIONS.dawnUp = function(){
   wakeImUp();
 };
 
-// ---- 2 the alarm: Snooze / Start your day ----
+// ---- the note from last night: a headline (on the alarm), a message for the morning, and one
+// for before work. Older notes were just one line — that line counts as the headline.
+function nightNote(date){
+  const ns = morningNotesFor(date || todayStr()), out = {headline:'', morning:'', work:''};
+  ns.forEach(function(n){
+    if(n.headline || n.morning || n.work){ if(n.headline) out.headline = n.headline; if(n.morning) out.morning = n.morning; if(n.work) out.work = n.work; }
+    else if(n.text) out.headline = out.headline ? out.headline+' · '+n.text : n.text;
+  });
+  return out;
+}
+// ---- 2 the alarm: Snooze / I'm up ----
 function wakeRingHtml(){
   const w = wakeCfg();
   const playing = wakeUsesMusic(w) && !(wakeRing && wakeRing.mediaFailed);
-  const q = quoteOfDay(), name = state.profile.name;
-  const ns = morningNotesFor(todayStr());
+  const q = quoteOfDay(), name = state.profile.name, nn = nightNote();
   return '<div class="wk2 wk3" data-sky="'+skyLook()+'">'+
     '<div class="wk2-aura"><i></i><i></i><i></i></div>'+
     '<div class="wk2-center">'+
       '<div class="wk2-greet">Good morning'+(name ? ', '+escapeHtml(name) : '')+(wakeRing && wakeRing.test ? ' <span class="tag">TEST</span>' : '')+'</div>'+
       '<div class="wk2-clock" id="wakeClock">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</div>'+
       '<div class="wk3-date">'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</div>'+
+      (nn.headline ? '<div class="wk3-head">'+escapeHtml(nn.headline)+'</div>' : '')+
       '<div class="wk3-quote">'+quoteHtml(q, 'is-ring')+'</div>'+
-      (ns.length ? '<div class="wk2-note">&ldquo;'+escapeHtml(ns[ns.length-1].text)+'&rdquo;<span>You, last night</span></div>' : '')+
       '<div class="wk2-actions wk3-actions">'+
         '<button class="wk2-snooze" data-action="wakeSnooze">&#128164; Snooze '+(w.snoozeMinutes||9)+' min</button>'+
-        '<button class="wk2-up" data-action="wakeStartDay"><span>&#9728;&#65039; Start your day</span></button>'+
+        '<button class="wk2-up" data-action="wakeStartDay"><span>&#9728;&#65039; I’m up</span></button>'+
       '</div>'+
-      (wakeUsesMusic(w) ? '<div class="wk2-music'+(playing?' is-playing':'')+'">'+
-          (playing ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '')+
-          '<span class="wk2-song">'+escapeHtml(mediaName(w.media))+'</span><span class="wk2-src">'+(wakeRing && wakeRing.mediaFailed ? 'Starting the music…' : escapeHtml(mediaKindLabel(w.media)))+'</span>'+
-        '</div>' : '')+
+      (wakeUsesMusic(w) ? '<div class="wk2-music'+(playing?' is-playing':'')+'">'+(playing ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '')+
+          '<span class="wk2-song">'+escapeHtml(mediaName(w.media))+'</span></div>' : '')+
     '</div>'+
   '</div>';
 }
+// ---- snooze: a calm screen that counts down to the next ring ----
+function snoozeHtml(){
+  const sn = state.focus.snooze, left = sn ? Math.max(0, sn.ts - Date.now()) : 0, nn = nightNote();
+  return '<div class="snz">'+
+    '<div class="snz-moon"></div>'+
+    '<div class="snz-c">'+
+      '<div class="snz-k">&#128164; Snoozing</div>'+
+      '<div class="snz-left" id="snzLeft">'+formatElapsed(left)+'</div>'+
+      '<div class="snz-sub">Ringing again at '+(sn ? fmtTimeShort(sn.ts) : '')+'</div>'+
+      (nn.headline ? '<div class="snz-note">'+escapeHtml(nn.headline)+'</div>' : '')+
+    '</div>'+
+    '<div class="snz-acts"><button class="dawn-btn" data-action="snoozeUp">&#9728;&#65039; I’m up</button></div>'+
+  '</div>';
+}
+function tickSnooze(){ const el = document.getElementById('snzLeft'), sn = state.focus.snooze; if(el && sn) el.textContent = formatElapsed(Math.max(0, sn.ts - Date.now())); }
+ACTIONS.snoozeUp = function(){ state.focus.snooze = null; persist('focus'); wakeImUp(); };
 
-// ---- 3 Good morning ----
+// ---- 3 Good morning: everything on one screen ----
 // last night, from going to sleep (Wind down → Go to sleep) to getting up
 function lastNightSleep(){
   const h = state.modes.history.filter(function(m){ return m.sleep && m.endedAt && Date.now() - m.endedAt < 8*3600000 && m.minutes >= 60; }).sort(function(a, b){ return b.endedAt - a.endedAt; })[0];
   return h ? {minutes:h.minutes, from:h.startedAt, to:h.endedAt} : null;
 }
 function briefBase(){ return wakeCfg().intro!=='quick' ? 5600 : 3000; }
+// your morning playlist (Apple Music), one click — and it can follow the wake-up song by itself
+function morningPlaylist(){ const m = state.profile.morningPlaylist; return m && m.q ? m : null; }
+function playlistBtnHtml(){
+  const pl = morningPlaylist(), on = !!ui.plPlaying;
+  return '<button class="plb'+(on?' is-on':'')+(pl?'':' is-unset')+'" data-action="'+(pl ? (on ? 'stopMorningPlaylist' : 'playMorningPlaylist') : 'setMorningPlaylist')+'" title="'+(pl ? (on ? 'Pause' : 'Play '+escapeHtml(pl.q)) : 'Pick a morning playlist')+'">'+
+    '<span class="plb-i">'+(on ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9654;')+'</span><span class="plb-t">'+escapeHtml(pl ? pl.q : 'Morning playlist')+'</span></button>';
+}
+function plRefresh(){ if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto(); }
+ACTIONS.stopMorningPlaylist = function(){ ui.plPlaying = false; musicApp('pause'); plRefresh(); };
+ACTIONS.playMorningPlaylist = function(){ const pl = morningPlaylist(); if(!pl) return; ui.plPlaying = true; plRefresh(); musicApp('play', {type:'music', k:'playlist', q:pl.q}).then(function(ok){ if(!ok){ ui.plPlaying = false; plRefresh(); showToast('Couldn\'t start '+pl.q+' — Apple Music plays through the Operator app; check the playlist name in Settings → Sound.', {icon:'&#9888;'}); } }); };
+ACTIONS.setMorningPlaylist = function(){
+  const v = window.prompt('Which Apple Music playlist should your mornings play? (its exact name)', ''); if(!v || !v.trim()) return;
+  state.profile.morningPlaylist = {q:v.trim(), k:'playlist'}; persist('profile');
+  if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto();
+  ACTIONS.playMorningPlaylist();
+};
 function wakeBriefHtml(){
   const today = todayStr(), name = state.profile.name || '';
   const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
-  const notes = morningNotesFor(today).map(function(n){ return n.text; });
-  const vb = masterVisionBoard();
+  const nn = nightNote(today);
   const q = quoteOfDay();
   const news = ui.morningNews && ui.morningNews.date===today ? ui.morningNews.items : null;
   const now = typeof wxNow==='function' ? wxNow() : null, phase = skyPhase(), win = dayWindow();
   const timeStr = new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
   const mNow = new Date().getHours()*60 + new Date().getMinutes();
   const plan = typeof todaysPlan==='function' ? todaysPlan().filter(function(t){ return t.status!=='done'; }) : [];
+  const vb = masterVisionBoard();
   // The page builds itself one piece at a time, with a line of narration typing above each piece
   // as it arrives. Delays are fixed when a piece first appears (re-renders keep the same node, so
   // nothing plays twice); skipping the intro shifts the whole schedule earlier.
   const cine = wakeCfg().intro!=='quick';
-  const base = briefBase(), gap = 1150;
+  const base = briefBase(), gap = 2300;
   const sunLine = mNow < win.rise ? 'The sun comes up at '+fmtMinOfDay(win.rise)+'.' : mNow < win.set ? 'The sun’s been up since '+fmtMinOfDay(win.rise)+'.' : '';
   const lines = [];
   let k = 0;
@@ -19873,46 +20380,40 @@ function wakeBriefHtml(){
     if(voice) lines.push({at: d - 380, text: voice});
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
-  // the hero: the weather and the sun — the first, biggest thing you see
   const slept = lastNightSleep();
-  const hero = panel('br-hero', 'br-a-blur', 'It’s '+timeStr+'.'+(now ? ' '+now.temp+'° and '+wxLabel(now.code).toLowerCase()+' outside.' : '')+(slept ? ' You got '+fmtDurationLabel(slept.minutes)+' of sleep.' : sunLine ? ' '+sunLine : ''),
-    '<div class="brh-wx">'+
-      '<span class="brh-i">'+(now ? wxIcon(wxKind(now.code), phase) : SKY_META[phase].icon)+'</span>'+
-      '<div>'+(now ? '<div class="brh-t">'+now.temp+'&deg;</div><div class="brh-l">'+escapeHtml(wxLabel(now.code))+'</div>' : '<div class="brh-l is-big">'+SKY_META[phase].label+'</div>')+
-        (now && now.hi!=null ? '<div class="brh-hl">High '+now.hi+'&deg; &middot; Low '+now.lo+'&deg;</div>' : '')+'</div>'+
-    '</div>'+
-    (function(){ const sl = lastNightSleep(); return sl ? '<div class="brh-sleep"><span class="brh-sleep-i">&#128564;</span><div><small>Slept</small><b>'+fmtDurationLabel(sl.minutes)+'</b><span>'+fmtTimeShort(sl.from)+' &rarr; '+fmtTimeShort(sl.to)+'</span></div></div>' : ''; })()+
-    '<div class="brh-sun">'+sunArcHtml({w:300, h:78, pad:10, r:5, animate:true})+
-      '<div class="brh-sun-row"><span><small>Sunrise</small>'+fmtMinOfDay(win.rise)+'</span><span class="brh-day">'+daylightLabel()+'</span><span><small>Sunset</small>'+fmtMinOfDay(win.set)+'</span></div>'+
-    '</div>');
-  const left = [], right = [];
-  if(notes.length) left.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+notes.map(function(t){ return '<div class="br-ln-text">'+escapeHtml(t)+'</div>'; }).join('')));
-  left.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q)));
-  left.push(panel('br-thoughts', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+
-    thoughtsOfDay(3).map(function(x, i){ return '<div class="br-th" style="--i:'+i+'"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')));
-  if(vb && vb.elements.length) right.push(panel('br-vision', 'br-a-scale', 'And this is what it’s all for.', '<span class="br-vision-k">&#127775; Vision</span>'+boardStaticHtml(vb, 'wake-board')+'<span class="br-vision-hint">Click to open</span>', '', ' data-action="wakeBoardToggle" title="Open your vision board"'));
+  // column 1: the weather and the sun (and how you slept), then your note
+  const colA = [], colB = [], colC = [];
+  colA.push(panel('br-hero', 'br-a-blur', 'It’s '+timeStr+'.'+(now ? ' '+now.temp+'° and '+wxLabel(now.code).toLowerCase()+' outside.' : '')+(slept ? ' You got '+fmtDurationLabel(slept.minutes)+' of sleep.' : sunLine ? ' '+sunLine : ''),
+    '<div class="brh-top"><div class="brh-wx"><span class="brh-i">'+(now ? wxIcon(wxKind(now.code), phase) : SKY_META[phase].icon)+'</span>'+
+      '<div>'+(now ? '<div class="brh-t">'+now.temp+'&deg;</div><div class="brh-l">'+escapeHtml(wxLabel(now.code))+(now.hi!=null ? ' <span>&middot; H '+now.hi+'&deg; L '+now.lo+'&deg;</span>' : '')+'</div>' : '<div class="brh-l is-big">'+SKY_META[phase].label+'</div>')+'</div></div>'+
+      (slept ? '<div class="brh-sleep"><small>Slept</small><b>'+fmtDurationLabel(slept.minutes)+'</b><span>'+fmtTimeShort(slept.from)+' &rarr; '+fmtTimeShort(slept.to)+'</span></div>' : '')+'</div>'+
+    '<div class="brh-sun">'+sunArcHtml({w:300, h:64, pad:8, r:4.5, animate:true})+
+      '<div class="brh-sun-row"><span><small>Sunrise</small>'+fmtMinOfDay(win.rise)+'</span><span class="brh-day">'+daylightLabel()+'</span><span><small>Sunset</small>'+fmtMinOfDay(win.set)+'</span></div></div>'));
+  if(nn.headline || nn.morning) colA.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+
+    (nn.headline ? '<div class="br-ln-head">'+escapeHtml(nn.headline)+'</div>' : '')+(nn.morning ? '<div class="br-ln-text">'+escapeHtml(nn.morning)+'</div>' : '')));
+  else if(vb && vb.elements.length) colA.push(panel('br-vision', 'br-a-scale', 'And this is what it’s all for.', boardStaticHtml(vb, 'wake-board'), '', ' data-action="wakeBoardToggle" title="Open your vision board"'));
+  // column 2: a line to carry, and a few small things for a good day
+  colB.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
+  colB.push(panel('br-thoughts', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+
+    thoughtsOfDay(4).map(function(x, i){ return '<div class="br-th" style="--i:'+i+'"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')));
+  // column 3: the world, then the day ahead
   if(news){
-    // headlines that came in after the page started get their own turn instead of popping in
     const d0 = base + k*gap, late = ui.briefNewsAt ? Math.max(600, d0 - (ui.briefNewsAt - (ui.briefT0||0))) : null;
-    right.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there.', '<div class="br-k">&#128240; Headlines'+(news[0].src ? ' <span class="br-src">'+escapeHtml(news[0].src)+'</span>' : '')+'</div>'+
-      news.slice(0, 4).map(function(n){ return '<button class="br-news-i" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+escapeHtml(n.title)+'</span><i>&#8599;</i></button>'; }).join(''), late!=null ? ';--late:'+late+'ms' : ''));
+    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there.', '<div class="br-k">&#128240; '+(newsTopics() ? 'Your News <span class="br-src">'+escapeHtml(newsTopics())+'</span>' : 'The News'+(news[0].src ? ' <span class="br-src">'+escapeHtml(news[0].src)+'</span>' : ''))+'</div>'+
+      news.slice(0, 6).map(function(n, i){ return '<button class="br-news-i'+(i===0?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+escapeHtml(n.title)+(n.src && newsTopics() ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; }).join(''), late!=null ? ';--late:'+late+'ms' : ''));
   } else if(morningNewsOn() && ui.morningNews && ui.morningNews.loading){
-    right.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+(base + k*gap)+'ms"><div class="br-k">&#128240; Headlines</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');
+    colC.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+(base + k*gap)+'ms"><div class="br-k">&#128240; The News</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');
   }
-  // the day ahead — small, just the shape of it
-  const dayBits = [];
-  if(events.length) dayBits.push(events.length===1 ? 'One thing on the calendar' : events.length+' things on the calendar');
-  if(plan.length) dayBits.push(plan.length===1 ? 'one thing planned' : plan.length+' things planned');
-  right.push(panel('br-day', 'br-a-right', dayBits.length ? 'Later today: '+dayBits.join(', ')+'. No rush.' : 'Nothing on the calendar. The day’s yours.',
-    '<div class="br-k">&#128197; The Day Ahead</div>'+
-    (events.length ? '<div class="br-agenda">'+events.slice(0, 4).map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b>'+escapeHtml(e.title)+'</div>'; }).join('')+'</div>' : '')+
-    (plan.length ? '<div class="br-day-plan">'+(plan.length===1 ? 'One thing' : plan.length+' things')+' planned for work. First up: <b>'+escapeHtml(plan[0].title)+'</b></div>' : '')+
-    (!events.length && !plan.length ? '<div class="br-day-plan">Nothing scheduled. Enjoy it.</div>' : '')));
+  // the day ahead — just the calendar; the work plan waits for the business preview
+  colC.push(panel('br-day', 'br-a-right', events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.',
+    '<div class="br-k">&#128197; Today</div>'+
+    (events.length ? '<div class="br-agenda">'+events.slice(0, 3).map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b>'+escapeHtml(e.title)+'</div>'; }).join('')+'</div>' : '<div class="br-day-plan">Nothing scheduled. Enjoy the morning.</div>')));
   const ctaD = base + k*gap;
   lines.push({at: ctaD - 380, text: 'Get ready to start your day.'});
   ui.briefLines = lines;
   const shift = ui.briefShift || 0;
-  return '<div class="brief brief2 brief3'+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
+  const w = wakeCfg(), song = (wakeFinishing || wakeAudio || wakeMusicApp) && w.media ? mediaName(w.media) : '';
+  return '<div class="brief brief2 brief3 brief4'+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
     (cine
       ? '<div class="brief-intro is-cinematic" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div>'+
           '<div class="bi-time">'+timeStr+'</div>'+
@@ -19920,15 +20421,14 @@ function wakeBriefHtml(){
           '<div class="bi-line">'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</div></div>'
       : '<div class="brief-intro" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div><div class="bi-word">Good morning</div>'+(name ? '<div class="bi-name">'+escapeHtml(name)+'</div>' : '')+'</div>')+
     '<div class="brief-grid-bg"></div>'+
-    '<div class="brief-inner">'+
+    '<div class="brief-inner b4">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
+        '<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+playlistBtnHtml()+'</span>'+
         // one button: Skip while it's still building, then ✕ to close
         (ui.briefSkipped ? '<button class="brief-x" data-action="wakeBriefDone" title="Close">&#10005;</button>' : '<button class="brief-skipall" data-action="briefSkip" title="Show everything now">Skip &#9197;</button>')+'</div>'+
       '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
       '<div class="br-voice br-p br-a-fade" style="--d:'+(base-700)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
-      '<div class="brief-music-slot">'+wakeMusicPillHtml()+'</div>'+
-      hero+
-      '<div class="brief2-cols"><div class="brief2-col is-left">'+left.join('')+'</div><div class="brief2-col is-right">'+right.join('')+'</div></div>'+
+      '<div class="b4-grid"><div class="b4-col">'+colA.join('')+'</div><div class="b4-col">'+colB.join('')+'</div><div class="b4-col">'+colC.join('')+'</div></div>'+
       '<div class="brief-cta br-p br-a-rise" data-k="'+k+'" style="--d:'+ctaD+'ms">'+
         '<button class="brief-go brief-morning" data-action="wakeStartMorning">&#9728;&#65039; Start My Morning</button>'+
       '</div>'+
@@ -19955,7 +20455,9 @@ function briefVoiceRun(){
     const lines = ui.briefLines || [], t = Date.now() - (ui.briefT0||0);
     let cur = null; lines.forEach(function(l){ if(t >= l.at) cur = l; });
     if(ui.briefSkipped && lines.length) cur = lines[lines.length-1];
-    const txt = cur ? (ui.briefSkipped ? cur.text : cur.text.slice(0, Math.max(0, Math.floor((t - cur.at)/30)))) : '';
+    // a word at a time, at a calm reading pace (it used to type letter by letter, too fast)
+    const words = cur ? cur.text.split(' ') : [];
+    const txt = cur ? (ui.briefSkipped ? cur.text : words.slice(0, Math.max(0, Math.floor((t - cur.at)/240) + 1)).join(' ')) : '';
     if(el.textContent!==txt) el.textContent = txt;
     const wrap = el.parentNode; if(wrap) wrap.classList.toggle('is-typing', !!cur && txt.length < cur.text.length);
     // as the narration reaches each piece, bring it into view if it's below the fold
@@ -19965,19 +20467,20 @@ function briefVoiceRun(){
       const target = document.querySelector('#wakeContent .br-p[data-k="'+idx+'"]');
       if(target) setTimeout(function(){ target.scrollIntoView({block:'nearest', behavior:'smooth'}); }, 400);
     }
-  }, 30);
+  }, 120);
 }
 ACTIONS.briefSkip = function(){ ui.wakeIntroDone = true; ui.briefSkipped = true; renderWakeOverlayInto(); };
 
 // ---- 5 Start work: the work intro, then straight into Lock in ----
-function clockIn(){
+function clockIn(opts){
+  opts = opts || {};
   const m = state.modes.active;
   if(m && (m.morning || (m.type==='offtime' && !m.sleep))) finishActiveMode(true);
   if(typeof applyNightPlanAuto==='function') applyNightPlanAuto();
   ui.view = 'today'; renderView();
   ui.planReveal = {at:Date.now()};
   showOverlay('planOverlay'); renderPlanRevealInto();
-  playWorkIntro();
+  if(!opts.quiet) playWorkIntro();
 }
 ACTIONS.clockIn = function(){ clockIn(); };
 ACTIONS.closePlanReveal = function(){ ui.planReveal = null; hideOverlay('planOverlay'); renderView(); };
@@ -20001,7 +20504,44 @@ function workStats(){
     {k:'Collected this month', v:money(collected), sub:new Date().toLocaleDateString(undefined, {month:'long'})},
     {k:'Open leads', v:String(open.length), sub: pipe ? money(pipe)+' in the pipeline' : 'In the pipeline'},
     {k:'Deep work yesterday', v:fmtHours(yDeep), sub:'Streak: '+computeStreak()+' day'+(computeStreak()===1?'':'s')}
-  ];
+  ].concat(workSocialStats());
+}
+// followers and new messages, when GoHighLevel is connected (otherwise they simply don't show)
+function workSocialStats(){
+  const out = [];
+  try{
+    const sd = typeof socialData==='function' ? socialData() : null;
+    const f = sd && sd.platformTotals && sd.platformTotals.followers;
+    if(f && Object.keys(f).length){
+      let total = 0, gain = 0;
+      Object.keys(f).forEach(function(k){ const x = f[k]||{}, ser = arr(x.series).map(Number); total += Number(x.total)||0; if(ser.length>1) gain += ser[ser.length-1] - ser[0]; });
+      out.push({k:'Followers', v:total.toLocaleString(), sub:(gain>=0 ? '+' : '')+gain.toLocaleString()+' this week'});
+    }
+    if(typeof ghlCfg==='function' && ghlCfg().connected){ const n = inboxUnread(); out.push({k:'New messages', v:String(n), sub:n ? 'Waiting in Social' : 'Inbox clear', go:'goToConvos'}); }
+  }catch(e){}
+  return out;
+}
+// each active client's health at a glance
+function workClientsHtml(){
+  const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
+  if(!cs.length) return '';
+  const rank = {red:0, yellow:1, green:2};
+  const rows = cs.map(function(c){ return {c:c, h:clientHealthStatus(c)}; }).sort(function(a, b){ return rank[a.h.level] - rank[b.h.level]; }).slice(0, 6);
+  return '<div class="wi-clients"><div class="wi-sec">Clients <span>'+cs.length+' active</span></div><div class="wi-cl-grid">'+rows.map(function(r){
+    const word = r.h.level==='red' ? 'Needs you' : r.h.level==='yellow' ? 'Keep an eye' : 'Healthy';
+    return '<button class="wi-cl is-'+r.h.level+'" data-action="openContact" data-kind="client" data-id="'+r.c.id+'"><i></i><b>'+escapeHtml(crmName('client', r.c))+'</b><span>'+word+'</span></button>';
+  }).join('')+'</div></div>';
+}
+// the last seven days of deep work, today on the right
+function workWeekHtml(target){
+  const today = todayStr(), days = [];
+  for(let i=6;i>=0;i--){ const dd = addDays(today, -i); days.push({d:dd, m: i===0 ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(dd)}); }
+  const total = days.reduce(function(a, x){ return a + x.m; }, 0), top = Math.max(target, ...days.map(function(x){ return x.m; }), 1);
+  const hit = days.filter(function(x){ return x.m >= target; }).length;
+  return '<div class="wi-week"><div class="wi-sec">Your week <span>'+fmtHours(total)+' &middot; '+hit+'/7 days on target</span></div>'+
+    '<div class="wi-wk-bars"><i class="wi-wk-goal" style="bottom:'+Math.min(96, target/top*100).toFixed(1)+'%" title="Daily target: '+fmtHours(target)+'"></i>'+days.map(function(x){
+      return '<div class="wi-wk'+(x.d===today?' is-today':'')+(x.m>=target?' is-hit':'')+'" title="'+weekdayShort(x.d)+': '+fmtDurationLabel(x.m)+'"><u style="height:'+Math.max(3, x.m/top*100).toFixed(1)+'%"></u><span>'+weekdayShort(x.d).slice(0,1)+'</span></div>';
+    }).join('')+'</div></div>';
 }
 function renderPlanReveal(){
   if(!ui.planReveal) return '';
@@ -20011,28 +20551,35 @@ function renderPlanReveal(){
   const q = workQuoteOfDay();
   const stats = workStats();
   const target = state.standards.deepWorkTargetMinutes || 180;
-  let d = 900;
-  const at = function(step){ const v = d; d += step||260; return 'animation-delay:'+v+'ms'; };
+  // quick and calm: everything is in within about a second
+  let d = 220;
+  const at = function(step){ const v = d; d += Math.round((step||260)/3); return 'animation-delay:'+v+'ms'; };
   return '<div class="wi">'+
     '<div class="wi-top"><span class="pr-badge">&#128339; Clocked In</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
+      '<span class="wi-pl">'+playlistBtnHtml()+'</span>'+
       '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
     '<div class="wi-inner">'+
-      '<div class="wi-k" style="animation-delay:200ms">Work Mode</div>'+
-      '<h1 class="wi-h" style="animation-delay:420ms">Let’s get to work'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
-      '<div class="wi-stats">'+stats.map(function(s){ return '<div class="wi-stat" style="'+at(140)+'"><div class="wi-stat-k">'+s.k+'</div><div class="wi-stat-v">'+s.v+'</div>'+(s.pct!=null ? '<div class="wi-bar"><i style="width:'+s.pct.toFixed(1)+'%"></i></div>' : '')+'<div class="wi-stat-s">'+escapeHtml(s.sub)+'</div></div>'; }).join('')+'</div>'+
+      '<div class="wi-k" style="animation-delay:40ms">Work Mode</div>'+
+      '<h1 class="wi-h" style="animation-delay:100ms">Let’s get to work'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
+      '<div class="wi-stats n'+stats.length+'">'+stats.map(function(s){ return '<div class="wi-stat"'+(s.go ? ' data-action="'+s.go+'"' : '')+' style="'+at(140)+'"><div class="wi-stat-k">'+s.k+'</div><div class="wi-stat-v">'+s.v+'</div>'+(s.pct!=null ? '<div class="wi-bar"><i style="width:'+s.pct.toFixed(1)+'%"></i></div>' : '')+'<div class="wi-stat-s">'+escapeHtml(s.sub)+'</div></div>'; }).join('')+'</div>'+
       '<div class="wi-cols">'+
-        '<div class="wi-plan" style="'+at(300)+'"><div class="wi-sec">Plan of Attack <span>'+(plan.length ? plan.length+(plan.length===1?' thing':' things') : '')+'</span></div>'+
-          (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(d + i*160)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">Due today</span>' : '')+'</li>'; }).join('')+'</ol>'
-            : '<div class="wd-empty">Nothing planned yet. Pick your first move in Lock in.</div>')+
-          (events.length ? '<div class="wi-cal">'+events.slice(0, 3).map(function(e){ return '<span><b>'+fmt12Hour(e.time)+'</b>'+escapeHtml(e.title)+'</span>'; }).join('')+'</div>' : '')+
+        '<div class="wi-col">'+
+          '<div class="wi-plan" style="'+at(300)+'"><div class="wi-sec">Plan of Attack <span>'+(plan.length ? plan.length+(plan.length===1?' thing':' things')+' &middot; ' : '')+'aim for '+fmtHours(target)+'</span></div>'+
+            (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(d + i*60)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">Due today</span>' : '')+'</li>'; }).join('')+'</ol>'
+              : '<div class="wd-empty">Nothing planned yet. Pick your first move in Lock in.</div>')+
+            (events.length ? '<div class="wi-cal">'+events.slice(0, 3).map(function(e){ return '<span><b>'+fmt12Hour(e.time)+'</b>'+escapeHtml(e.title)+'</span>'; }).join('')+'</div>' : '')+
+          '</div>'+
+          workClientsHtml()+
         '</div>'+
-        '<div class="wi-side" style="'+at(300)+'">'+quoteHtml(q, 'is-work')+
-          '<div class="wi-target"><span>Today’s target</span><b>'+fmtHours(target)+'</b><span>of deep work</span></div></div>'+
+        '<div class="wi-col wi-right" style="'+at(300)+'">'+(nightNote().work ? '<div class="wi-note"><span>&#127769; You told yourself</span><p>'+escapeHtml(nightNote().work)+'</p></div>' : '')+
+          '<div class="wi-side">'+quoteHtml(q, 'is-work', 'work')+'</div>'+
+          workWeekHtml(target)+
+          '<div class="wi-act">'+quoteHtml(quoteFor('action'), 'is-act', 'action')+'</div>'+
+        '</div>'+
       '</div>'+
-      '<div class="pr-cta" style="animation-delay:'+(d + plan.length*160 + 200)+'ms">'+
+      '<div class="pr-cta" style="animation-delay:420ms">'+
         '<button class="ls-go pr-go" data-action="planLockIn"'+(first ? ' data-id="'+first.id+'"' : '')+'><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>'+
         (first ? '<div class="ls-go-sub">First up: '+escapeHtml(first.title)+'</div>' : '')+
-        '<button class="pr-later" data-action="closePlanReveal">Not yet</button>'+
       '</div>'+
     '</div>'+
   '</div>';
@@ -20044,7 +20591,7 @@ registerModal('planOverlay', renderPlanRevealInto);
 function clockOutFlash(){
   const d = document.createElement('div');
   d.className = 'lock-flash is-out is-clock';
-  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#127937; Clocked Out</div><div class="lf-t">'+fmtHours(deepWorkMinutesTodayLive())+' of deep work today</div>';
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#127937; Clocked Out</div><div class="lf-t">'+fmtHours(deepWorkMinutesTodayLive())+' of deep work today'+(typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)) ? ' &middot; day off tomorrow' : '')+'</div>';
   document.body.appendChild(d);
   setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 2100);
 }
@@ -20059,6 +20606,289 @@ ACTIONS.clockOut = function(){
 
 // the vision board fits itself once its entrance has played (it measures wrong while scaled)
 document.addEventListener('animationend', function(e){ if(e.target && e.target.classList && (e.target.classList.contains('br-vision') || e.target.classList.contains('mm-vision'))) fitStaticBoards(e.target); });
+// ============ LOCKED IN: THE MINIMAL VIEW, BREAKS, FOCUS MUSIC ============
+// • Minimal view — like a song playing full screen: the task as the "track", the timer as its
+//   progress, the time and your next alarm in the corners. One button switches views; nothing
+//   about the session changes when you do.
+// • On a break the tasks are paused: nothing on the list can be started, finished or moved until
+//   the break ends (the minimal view shows just the break clock).
+// • Focus music — after the lock-in intro, a playlist of quiet, minimal tracks made right here in
+//   the app (no account, no internet) keeps going until you lock out. Play / pause / skip.
+
+// ---- the minimal view ----
+function lockedMinimal(){ return state.profile.lockedView==='minimal'; }
+ACTIONS.toggleLockedView = function(){ state.profile.lockedView = lockedMinimal() ? 'full' : 'minimal'; persist('profile'); playNav(); renderView(); };
+document.addEventListener('keydown', function(e){
+  if(e.key!=='m' && e.key!=='M') return;
+  if(e.metaKey || e.ctrlKey || e.altKey || (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) || (e.target && e.target.isContentEditable)) return;
+  if(!state.focus.activeSession || ui.view!=='today' || document.querySelector('.overlay:not(.hidden)')) return;
+  e.preventDefault(); ACTIONS.toggleLockedView();
+});
+function lockedViewBtnHtml(){
+  return '<button class="lv-btn" data-action="toggleLockedView" title="'+(lockedMinimal() ? 'Back to the full view (M)' : 'Minimal view (M)')+'">'+(lockedMinimal() ? '&#9638; Full view' : '&#9673; Minimal')+'</button>';
+}
+// the next thing that will ring today: an alarm, a reminder, tomorrow's wake-up
+function nextRingLabel(){
+  const now = Date.now(), today = todayStr(), dow = new Date().getDay();
+  let best = null;
+  arr(state.focus.alarms).forEach(function(a){
+    if(!a.enabled || !a.time) return;
+    if(a.date ? a.date!==today : arr(a.days).indexOf(dow)<0) return;
+    const ts = localTs(today, a.time); if(ts > now && (!best || ts < best.ts)) best = {ts:ts, label:a.label||'Alarm'};
+  });
+  if(!best && typeof nextWake==='function'){ const w = nextWake(); if(w) best = {ts:w.ts, label:'Wake up'}; }
+  return best ? fmtTimeShort(best.ts)+' &middot; '+escapeHtml(best.label) : '';
+}
+function renderLockedMinimal(){
+  const as = state.focus.activeSession, onBreak = !!as.onBreak;
+  const cur = ui.currentTaskId ? state.tasks.items.find(function(t){ return t.id===ui.currentTaskId; }) : null;
+  const nx = typeof nextUpTask==='function' ? nextUpTask() : null;
+  const m = as.method && typeof LOCK_METHODS!=='undefined' ? LOCK_METHODS[as.method.id] : null;
+  const elapsed = onBreak ? (as.frozenElapsedMs||0) : Date.now()-as.startedAt;
+  const ring = nextRingLabel();
+  let body;
+  if(onBreak){
+    const b = as.breaks[as.breaks.length-1] || {};
+    const left = as.breakEndsAt ? Math.max(0, as.breakEndsAt - Date.now()) : null;
+    const total = b.minutes ? b.minutes*60000 : null;
+    body = '<div class="np-art is-break"><span>&#9749;</span></div>'+
+      '<div class="np-meta">'+
+        '<div class="np-k">On a break</div>'+
+        '<div class="np-title">'+(b.note ? escapeHtml(b.note) : 'Breathe. Stretch. Look away.')+'</div>'+
+        '<div class="np-sub">'+(left!=null ? 'Back at '+fmtTimeShort(as.breakEndsAt) : 'No timer — end it when you\'re ready')+'</div>'+
+        '<div class="np-prog"><div class="np-bar"><i id="npBreakBar" style="width:'+(total && left!=null ? ((1 - left/total)*100).toFixed(1) : 0)+'%"></i></div>'+
+          '<div class="np-times"><span id="modeElapsed">'+formatElapsed(Date.now()-(as.breakStartedAt||Date.now()))+'</span><span id="breakRemaining">'+(left!=null ? formatElapsed(left)+' left' : '')+'</span></div></div>'+
+        '<div class="np-ctl">'+(as.breakEndsAt ? '<button class="np-c" data-action="extendBreak" data-minutes="5" title="5 more minutes">+5</button>' : '')+
+          '<button class="np-c is-main" data-action="endBreakModeFromFocus" title="End the break">&#9654;</button></div>'+
+      '</div>';
+  } else {
+    const pct = as.plannedMinutes ? Math.min(100, elapsed/(as.plannedMinutes*60000)*100) : Math.min(100, deepWorkMinutesTodayLive()/(state.standards.deepWorkTargetMinutes||180)*100);
+    body = '<div class="np-art"><span>'+(m ? m.icon : '&#128274;')+'</span></div>'+
+      '<div class="np-meta">'+
+        '<div class="np-k">'+(m && as.method.id!=='block' ? m.label : 'Locked in')+'</div>'+
+        '<div class="np-title">'+(cur ? escapeHtml(cur.title) : 'Deep work')+'</div>'+
+        '<div class="np-sub">'+(typeof methodState==='function' && methodState() ? '<span id="msLine">'+methodLine(methodState())+'</span>' : (as.plannedMinutes ? fmtDurationLabel(as.plannedMinutes)+' session' : fmtDurationLabel(deepWorkMinutesTodayLive())+' of deep work today'))+'</div>'+
+        '<div class="np-prog"><div class="np-bar"><i id="focusProgressBar" style="width:'+pct.toFixed(1)+'%"></i></div>'+
+          '<div class="np-times"><span id="focusElapsed">'+formatElapsed(elapsed)+'</span><span>'+(as.plannedMinutes ? fmtTimeShort(as.startedAt + as.plannedMinutes*60000) : '')+'</span></div></div>'+
+        '<div class="np-ctl">'+
+          '<button class="np-c" data-action="openBreakNotePrompt" title="Take a break">&#9749;</button>'+
+          (cur ? '<button class="np-c is-main" data-action="finishCurrentTask" title="Done with this task">&#10003;</button>' : '<button class="np-c is-main" data-action="openStopFocus" title="Lock out">&#9632;</button>')+
+          '<button class="np-c" data-action="openStopFocus" title="Lock out">&#128275;</button>'+
+        '</div>'+
+        (nx && (!cur || nx.id!==cur.id) ? '<div class="np-next">Up next &middot; '+escapeHtml(nx.title)+'</div>' : '')+
+      '</div>';
+  }
+  return '<div class="np'+(onBreak?' is-break':'')+'">'+
+    '<div class="np-bg"></div>'+
+    '<div class="np-top"><span class="np-time" id="liveClock"></span>'+(ring ? '<span class="np-ring">&#9200; '+ring+'</span>' : '')+'<span style="flex:1"></span>'+focusPlayerHtml(true)+lockedViewBtnHtml()+'</div>'+
+    '<div class="np-main">'+body+'</div>'+
+  '</div>';
+}
+// full-screen feel: the sidebar and floating buttons step aside in the minimal view
+afterRenderHooks.push(function(){
+  const on = !!(state.focus && state.focus.activeSession && ui.view==='today' && lockedMinimal()) || !!(ui.view==='today' && document.querySelector('#viewRoot .rest-full'));
+  document.body.classList.toggle('np-on', on);
+  const brk = !!(state.focus && state.focus.activeSession && state.focus.activeSession.onBreak);
+  document.body.classList.toggle('is-on-break', brk);
+  const bar = document.getElementById('npBreakBar'), as = state.focus && state.focus.activeSession;
+  if(bar && as && as.breakEndsAt){ const b = as.breaks[as.breaks.length-1] || {}; if(b.minutes) bar.style.width = ((1 - Math.max(0, as.breakEndsAt-Date.now())/(b.minutes*60000))*100).toFixed(1)+'%'; }
+});
+setInterval(function(){
+  const bar = document.getElementById('npBreakBar'), as = state && state.focus && state.focus.activeSession;
+  if(!bar || !as || !as.breakEndsAt) return;
+  const b = as.breaks[as.breaks.length-1] || {}; if(b.minutes) bar.style.width = ((1 - Math.max(0, as.breakEndsAt-Date.now())/(b.minutes*60000))*100).toFixed(1)+'%';
+}, 1000);
+
+// ---- breaks: the tasks are paused ----
+const BREAK_FROZEN = ['setCurrentTask','stagePendingCurrentTask','confirmPendingCurrentTask','finishCurrentTask','releaseCurrentTask','completeTask','toggleTaskActive',
+  'promoteTask','demoteTask','undoTask','bulkCompleteTasks','bulkUndoTasks','bulkMoveTasks','bulkRemoveTasks','moveTaskToBacklog','nnStartNext','nnPendingToNext','nnLockInNext',
+  'toggleNextPicker','pickNextTask','clearStagedTask','openTaskEditModal','deleteTaskUndoable','taskMenuBtn','addTaskToday','addTaskBacklog','openAddTaskModal','setFieldToday',
+  'clearField','saveEditTask','toggleTaskSelect','stageNextTask','setNextUp'];
+function onBreakNow(){ const as = state.focus && state.focus.activeSession; return !!(as && as.onBreak); }
+function breakBlocks(action){
+  if(!onBreakNow() || BREAK_FROZEN.indexOf(action)<0) return false;
+  showToast('You\'re on a break — the tasks wait until you\'re back.', {icon:'&#9749;', duration:2600});
+  return true;
+}
+// no dragging tasks around, and no task right-click menu, while on a break
+document.addEventListener('dragstart', function(e){ if(onBreakNow() && e.target && e.target.closest && e.target.closest('[data-task-id], .tl-row, .nn-drag, .task-card')){ e.preventDefault(); breakBlocks('setCurrentTask'); } }, true);
+document.addEventListener('contextmenu', function(e){ if(onBreakNow() && e.target && e.target.closest && e.target.closest('[data-task-id]')){ e.preventDefault(); e.stopPropagation(); breakBlocks('taskMenuBtn'); } }, true);
+
+// ---- focus music: quiet, minimal tracks, made live ----
+// Each track: a chord loop, a tempo, how the notes fall (an arpeggio pattern), and a texture.
+const FOCUS_TRACKS = [
+  {name:'First Light', bpm:68, prog:[[174.6,220,261.6,329.6],[164.8,196,246.9,293.7],[146.8,174.6,220,261.6],[130.8,164.8,196,246.9]], arp:[0,2,1,3,2,1], wave:'triangle', hiss:0.005},
+  {name:'Low Tide', bpm:60, prog:[[130.8,196,246.9,329.6],[110,164.8,220,261.6],[116.5,174.6,220,293.7],[98,146.8,196,246.9]], arp:[0,1,2,1], wave:'sine', hiss:0.004},
+  {name:'Paper Lanterns', bpm:74, prog:[[146.8,220,277.2,329.6],[123.5,185,246.9,293.7],[138.6,207.7,261.6,329.6],[110,164.8,220,277.2]], arp:[3,2,0,2,1,2], wave:'triangle', hiss:0.006},
+  {name:'Night Bus', bpm:64, prog:[[110,164.8,207.7,261.6],[98,146.8,185,233.1],[103.8,155.6,196,246.9],[92.5,138.6,174.6,220]], arp:[0,2,3,2], wave:'sine', hiss:0.007},
+  {name:'Still Water', bpm:56, prog:[[130.8,164.8,196,246.9],[146.8,174.6,220,261.6],[123.5,164.8,196,246.9],[110,146.8,174.6,220]], arp:[0,1,2,3,2,1,0], wave:'sine', hiss:0.003},
+  {name:'Late Studio', bpm:70, prog:[[155.6,196,233.1,293.7],[138.6,174.6,207.7,261.6],[123.5,155.6,185,233.1],[116.5,146.8,174.6,220]], arp:[1,3,2,0], wave:'triangle', hiss:0.006}
+];
+const FM = {playing:false, idx:0, bar:0, nextAt:0, timer:0, bus:null, hiss:null};
+const FM_BARS = 24; // about a minute and a half to two minutes a track
+function fmVolume(){ const v = Number(state.profile.musicVolume); return isFinite(v) && state.profile.musicVolume!=null ? Math.max(0, Math.min(1, v)) : 0.7; }
+function fmBus(ctx){
+  if(FM.bus && FM.bus.ctx===ctx) return FM.bus;
+  const g = ctx.createGain(); g.gain.value = 0.0001; g.connect(sfxOut(ctx));
+  FM.bus = {ctx:ctx, g:g};
+  return FM.bus;
+}
+function fmBar(ctx, out, t, tr, bar){
+  const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length];
+  padChord(ctx, out, t, ch, len*0.35, len*0.45, len*0.6, 0.022);
+  sfxPluck(ctx, out, t, ch[0]/2, len*0.9, 0.04, 'sine');
+  const steps = tr.arp.length, step = len/steps;
+  tr.arp.forEach(function(n, i){ if((bar + i) % 5 === 4) return; sfxPluck(ctx, out, t + i*step + (i%2 ? step*0.08 : 0), ch[n % ch.length]*2, step*2.2, 0.014 + (i===0 ? 0.006 : 0), tr.wave); });
+  // a soft brush on the off-beats
+  for(let i=0;i<4;i++) sfxTap(ctx, out, t + i*beat + beat*0.5, 4200, 0.018);
+}
+function fmHiss(ctx, out, level){
+  if(FM.hiss){ try{ FM.hiss.stop(); }catch(e){} FM.hiss = null; }
+  if(!level) return;
+  const len = Math.floor(ctx.sampleRate*2), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i] = (Math.random()*2-1)*0.5;
+  const src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+  src.buffer = buf; src.loop = true; f.type = 'bandpass'; f.frequency.value = 3500; f.Q.value = 0.6; g.gain.value = level;
+  src.connect(f); f.connect(g); g.connect(out); src.start(); FM.hiss = src;
+}
+function fmSchedule(){
+  if(!FM.playing) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  const bus = fmBus(ctx);
+  while(FM.nextAt < ctx.currentTime + 1.5){
+    if(FM.bar >= FM_BARS){ FM.idx = (FM.idx + 1) % FOCUS_TRACKS.length; FM.bar = 0; fmHiss(ctx, bus.g, FOCUS_TRACKS[FM.idx].hiss); fmRefresh(); }
+    const tr = FOCUS_TRACKS[FM.idx];
+    fmBar(ctx, bus.g, FM.nextAt, tr, FM.bar);
+    FM.nextAt += 60/tr.bpm*4; FM.bar++;
+  }
+}
+function focusMusicPlay(idx){
+  const ctx = getAudioCtx(); if(!ctx) return;
+  if(idx!=null){ FM.idx = ((idx % FOCUS_TRACKS.length) + FOCUS_TRACKS.length) % FOCUS_TRACKS.length; FM.bar = 0; }
+  const bus = fmBus(ctx);
+  bus.g.gain.cancelScheduledValues(ctx.currentTime);
+  bus.g.gain.setValueAtTime(Math.max(0.0001, bus.g.gain.value), ctx.currentTime);
+  bus.g.gain.exponentialRampToValueAtTime(Math.max(0.0002, fmVolume()), ctx.currentTime + 2.5);
+  if(!FM.playing){ FM.nextAt = ctx.currentTime + 0.1; fmHiss(ctx, bus.g, FOCUS_TRACKS[FM.idx].hiss); }
+  FM.playing = true;
+  clearInterval(FM.timer); FM.timer = setInterval(fmSchedule, 400); fmSchedule();
+  fmRefresh();
+}
+function focusMusicStop(){
+  if(!FM.playing) return;
+  FM.playing = false; clearInterval(FM.timer);
+  const ctx = getAudioCtx();
+  if(ctx && FM.bus){ const g = FM.bus.g.gain; g.cancelScheduledValues(ctx.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), ctx.currentTime); g.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.2); }
+  setTimeout(function(){ if(!FM.playing){ fmHiss(null, null, 0); FM.bus = null; } }, 1400);
+  fmRefresh();
+}
+function fmRefresh(){ document.querySelectorAll('.fm').forEach(function(el){ el.outerHTML = focusPlayerHtml(el.classList.contains('is-np')); }); }
+ACTIONS.fmToggle = function(){ if(FM.playing) focusMusicStop(); else focusMusicPlay(); };
+ACTIONS.fmNext = function(){ const was = FM.playing; FM.idx = (FM.idx + 1) % FOCUS_TRACKS.length; FM.bar = 0; if(was){ focusMusicStop(); setTimeout(function(){ focusMusicPlay(); }, 900); } else fmRefresh(); };
+function focusPlayerHtml(np){
+  const tr = FOCUS_TRACKS[FM.idx];
+  return '<span class="fm'+(np?' is-np':'')+(FM.playing?' is-on':'')+'">'+
+    (FM.playing ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '<span class="fm-i">&#9835;</span>')+
+    '<span class="fm-t">'+escapeHtml(tr.name)+'</span>'+
+    '<button class="fm-b" data-action="fmToggle" title="'+(FM.playing?'Pause':'Play focus music')+'">'+(FM.playing ? '&#10073;&#10073;' : '&#9654;')+'</button>'+
+    '<button class="fm-b" data-action="fmNext" title="Next track">&#9197;</button></span>';
+}
+// the lock-in intro hands over to the playlist (if that's switched on)
+function focusMusicAfterIntro(delayMs){
+  if(!soundPref('focusMusic', true)) return;
+  clearTimeout(FM.introT);
+  FM.introT = setTimeout(function(){ if(state.focus.activeSession && !FM.playing) focusMusicPlay(Math.floor(Math.random()*FOCUS_TRACKS.length)); }, delayMs||0);
+}
+document.addEventListener('input', function(e){ if(e.target && e.target.id==='breakNoteInput') ui.breakNoteDraft = e.target.value; });
+
+// ---- Day off: a proper rest-day screen, a small moment when it starts or ends, and it turns
+// itself on for the days your wake-up alarm doesn't ring (e.g. Sundays) ----
+function isWorkDay(dateStr){
+  const w = typeof wakeCfg==='function' ? wakeCfg() : null;
+  if(!w || !w.enabled || !arr(w.days).length) return true; // no schedule set → every day can be a work day
+  return arr(w.days).indexOf(dowOf(dateStr))>=0;
+}
+function nextWorkDay(from){ for(let i=1;i<8;i++){ const d = addDays(from, i); if(isWorkDay(d)) return d; } return null; }
+function autoDayOffCheck(){
+  if(!state || !state.daysOff) return false;
+  const today = todayStr(), seen = state.daysOff.autoSeen = arr(state.daysOff.autoSeen);
+  if(seen.indexOf(today)>=0) return false;
+  seen.push(today); if(seen.length > 40) seen.splice(0, seen.length - 40);
+  let changed = true;
+  if(!isWorkDay(today) && !isDayOff(today) && !state.focus.activeSession){ state.daysOff.dates.push(today); dayOffFlash(true, true); }
+  persist('daysOff');
+  return changed;
+}
+afterRenderHooks.push(function(){ if(typeof state!=='undefined' && state && state.daysOff && autoDayOffCheck() && isDayOff(todayStr())) setTimeout(renderView, 0); });
+function dayOffFlash(on, auto){
+  const d = document.createElement('div');
+  d.className = 'lock-flash is-dayoff'+(on ? '' : ' is-back');
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">'+(on ? '&#127796; Day off' : '&#9728;&#65039; Back to it')+'</div><div class="lf-t">'+(on ? (auto ? 'No alarm today — it’s a rest day.' : 'Rest is part of the plan.') : 'Today counts.')+'</div>';
+  document.body.appendChild(d);
+  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 1900);
+}
+const REST_IDEAS = [
+  ['&#127795;','Get outside.','A long walk, no podcast. Let your head wander.'],
+  ['&#128222;','Call someone you like.','Not a text — an actual call.'],
+  ['&#127859;','Cook something real.','Take your time with it.'],
+  ['&#128164;','Sleep in, guilt-free.','Recovery is where the gains show up.'],
+  ['&#128214;','Read for fun.','Something with no business in it.'],
+  ['&#127947;&#65039;','Move, easy.','A light session or a stretch — nothing heroic.'],
+  ['&#128245;','Phone in another room.','For an hour. See how it feels.'],
+  ['&#127774;','Get some sun.','Ten minutes of daylight does more than you’d think.']
+];
+function restIdeas(n){ const d = Number(todayStr().replace(/-/g,'')), out = []; for(let i=0;i<n;i++) out.push(REST_IDEAS[(d + i*3) % REST_IDEAS.length]); return out; }
+// day off and the weekend: full-screen, minimal, like the minimal locked view (the corner button gives the sidebar back)
+function restFull(){ return ui.restFull!==false; }
+ACTIONS.toggleRestFull = function(){ ui.restFull = !restFull(); renderView(); };
+function restTopHtml(extra){
+  return '<div class="np-top"><span class="np-time" id="liveClock"></span><span style="flex:1"></span>'+(extra||'')+
+    '<button class="lv-btn" data-action="toggleRestFull" title="'+(restFull() ? 'Show the sidebar' : 'Full screen')+'">'+(restFull() ? '&#8690;' : '&#8689;')+'</button></div>';
+}
+function weekDeepMinutes(){ let m = 0; for(let i=0;i<7;i++){ const d = addDays(todayStr(), -i); m += i===0 ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); } return m; }
+// clocked out on the last work day before a day off: the weekend starts now, in the day-off look
+function renderWeekendOffView(elapsed){
+  const today = todayStr(), nw = nextWorkDay(today), wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
+  const ideas = restIdeas(3);
+  return '<div class="np rest dayoff is-weekend'+(restFull() ? ' rest-full' : '')+'">'+
+    '<div class="dayoff-bg"></div>'+
+    restTopHtml()+
+    '<div class="dayoff-in">'+
+      '<div class="dayoff-k">&#127937; Clocked out &middot; day off tomorrow</div>'+
+      '<h1 class="dayoff-h">That’s the week'+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
+      '<div class="dayoff-cards">'+
+        '<div class="dayoff-c"><b>'+fmtHours(deepWorkMinutesTodayLive())+'</b><span>deep work today</span></div>'+
+        '<div class="dayoff-c"><b id="modeElapsed">'+formatElapsed(elapsed)+'</b><span>off the clock</span></div>'+
+        (nw ? '<div class="dayoff-c"><b>'+weekdayShort(nw)+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
+      '</div>'+
+      (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
+      '<div class="dayoff-row">'+
+        (isWindDownTime() ? '<button class="dayoff-back" data-action="openWindDown">&#127769; Wind down</button>' : '')+
+        '<button class="dayoff-back" data-action="clockIn">Clock back in</button>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+function renderDayOffView(){
+  const streak = computeStreak(), nw = nextWorkDay(todayStr());
+  const wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
+  const stat = function(v, k){ return '<div class="rest-s"><b>'+v+'</b><span>'+k+'</span></div>'; };
+  return '<div class="np rest is-dayoff'+(restFull() ? ' rest-full' : '')+'">'+
+    '<div class="np-bg"></div>'+
+    restTopHtml('<button class="lv-btn rest-work" data-action="quickDayOff" title="Turn the day off back off">Work today</button>')+
+    '<div class="np-main">'+
+      '<div class="np-art is-dayoff"><span>&#127796;</span></div>'+
+      '<div class="np-meta">'+
+        '<div class="np-title rest-h">Day off.</div>'+
+        '<div class="rest-stats">'+
+          stat(streak, 'day streak')+
+          stat(fmtHours(weekDeepMinutes()), 'deep work this week')+
+          (nw ? stat(weekdayShort(nw), 'back'+(wake ? ' &middot; '+fmt12Hour(wake) : '')) : '')+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
@@ -20066,6 +20896,7 @@ document.body.addEventListener('click', function(e){
   const a = el.dataset.action;
   const id = el.dataset.id;
   // moving between pages and tabs plays a soft note from the app's scale
+  if(typeof breakBlocks==='function' && breakBlocks(a)){ e.preventDefault(); return; }
   if((a==='nav' && el.dataset.view!==ui.view) || (/Tab$/.test(a) && !el.classList.contains('active') && !el.classList.contains('is-on'))) playNav();
   switch(a){
     case 'nav': {

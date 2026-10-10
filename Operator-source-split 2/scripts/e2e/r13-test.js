@@ -60,7 +60,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('break pop-up: length tiles, a note, Start break', (await p.$$('#breakNoteContent .brk-len')).length===6 && await p.isVisible('#breakNoteInput') && await p.isVisible('.brk-go'));
     await p.click('.brk-len[data-minutes="10"]'); await p.waitForTimeout(200);
     check('picking 10 shows when you\'re back', /Back at/.test(await p.textContent('.brk-back')));
-    await p.click('.brk-chip[data-id="Walk"]'); await p.click('.brk-go'); await p.waitForTimeout(600);
+    await p.click('.brk-chip[data-id="Walk"]'); await p.click('.brk-go'); await p.waitForSelector('.np.is-break #npBreakBar', {timeout:5000}).catch(()=>{}); await p.waitForTimeout(300);
     check('on a break, 10 minutes, note kept', await E("state.focus.activeSession.onBreak") && /Walk/.test(await p.textContent('.np-title')));
     check('the minimal break view shows the timer, not the tasks', await p.isVisible('.np.is-break #npBreakBar') && !(await p.$('.np .np-next')));
     await E("(function(){ const b = document.createElement('button'); b.dataset.action='finishCurrentTask'; document.body.appendChild(b); b.click(); b.remove(); })()"); await p.waitForTimeout(300);
