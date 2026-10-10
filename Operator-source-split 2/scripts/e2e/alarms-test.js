@@ -26,7 +26,8 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   check('wake screen has I\'m up + snooze', await p.isVisible('[data-action="wakeStartDay"]') && await p.isVisible('[data-action="wakeSnooze"]'));
   check('it does not ring twice for the same morning', await E("state.focus.wake.lastFiredTs===localTs('2026-10-07','07:00')"));
   await p.click('[data-action="wakeSnooze"]');
-  check('snooze hides it and schedules a re-ring', !(await p.isVisible('#wakeOverlay')) && await E("!!(state.focus.snooze && state.focus.snooze.wake)"));
+  // round 13: snooze keeps the overlay up as a calm countdown screen (.snz) instead of closing it
+  check('snooze shows the snooze screen and schedules a re-ring', await p.isVisible('#wakeOverlay .snz') && !(await p.isVisible('#wakeOverlay .wk2')) && await E("ui.wakeMode==='snooze' && !!(state.focus.snooze && state.focus.snooze.wake)"));
   await p.clock.runFor(9*60000+3000);
   check('rings again after the snooze', await p.isVisible('#wakeOverlay .wk2'));
   await p.click('[data-action="wakeStartDay"]');
@@ -82,8 +83,9 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   await p.clock.setSystemTime(at(6,15,8)); await E('checkAllAlarms()');
   await p.click('[data-action="wakeStartDay"]');
   await E("ACTIONS.briefSkip()");
-  await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(200); await p.click('.mm-clockin'); await p.waitForTimeout(200);
-  check('Clock in (after Good morning) shows the plan', (await p.textContent('#planOverlay')).includes('Edit reel'));
+  // round 13: Start my morning goes straight to the business preview (no Morning mode / .mm-clockin in between)
+  await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(900);
+  check('Start my morning (after Good morning) shows the plan in the business preview', !(await p.isVisible('#wakeOverlay')) && await p.isVisible('#planOverlay .pr-go') && (await p.textContent('#planOverlay')).includes('Edit reel'));
   await p.click('[data-action="closePlanReveal"]');
   await p.close();
 

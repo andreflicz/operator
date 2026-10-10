@@ -100,7 +100,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await nav('today'); await scan('today');
   await nav('focus'); await scan('focus');
   await nav('business'); for(const t of ['overview','leads','clients','lifecycle','packages','finances']){ await p.click('[data-action="businessTab"][data-tab="'+t+'"]'); await p.waitForTimeout(80); await scan('business/'+t); }
-  await nav('settings'); for(const t of await p.$$eval('[data-action="settingsTab"]', els => els.map(e => e.dataset.tab))){ await p.click('[data-action="settingsTab"][data-tab="'+t+'"]'); await p.waitForTimeout(80); await scan('settings/'+t); }
+  // round 13: settings are 5 groups in the side nav (other settingsTab buttons are in-page alias links)
+  await nav('settings'); for(const t of await p.$$eval('.settings-sidenav [data-action="settingsTab"]', els => els.map(e => e.dataset.tab))){ await p.click('.settings-sidenav [data-action="settingsTab"][data-tab="'+t+'"]'); await p.waitForTimeout(80); await scan('settings/'+t); }
   check('no paragraph-long explanations left on the pages', !chunky.length, chunky);
   check('every page and pop-up rendered without errors', !p.errors.length, p.errors);
   await b.close();

@@ -133,7 +133,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("ui.view='personal'; ui.personalTab='journal'; renderView()"); await p.waitForTimeout(200);
     check('updates are kept out of My Journal', (await p.$$('.journal-entry')).length===1);
     check('the journal has no Updates tab — app updates aren\'t part of the everyday journal', !(await p.$('[data-action="journalMode"][data-id="updates"]')));
-    await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="updates"]'); await p.waitForTimeout(200);
+    await p.click('[data-action="nav"][data-view="settings"]'); await p.click('.settings-sidenav [data-action="settingsTab"][data-tab="system"]'); await p.waitForTimeout(200); // round 13: App updates is a part of the "Connections & Data" group
     await p.selectOption('#updatesRangeSel', 'all'); await p.waitForTimeout(100);
     check('Settings → App updates lists every update', (await p.$$('.upd-card')).length===2);
     check('…in full, with no Read More', (await p.textContent('.upd-card[data-journal-id="e1"] .upd-text')).length > 300 && !(await p.$('.upd-card [data-action="toggleJournalExpand"]')));

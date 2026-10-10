@@ -5,6 +5,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   instrument(process.argv[2], OUT+'/r5.html');
   const b = await launch();
   const NOW = new Date(2026,9,8,15,0).getTime();
+  // round 13: settings are 5 groups in the side nav (display/sound → 'look', business → 'work')
+  const settingsGroup = async (p, grp) => { await p.click('[data-action="nav"][data-view="settings"]'); await p.click('.settings-sidenav [data-action="settingsTab"][data-tab="'+grp+'"]'); await p.waitForTimeout(60); };
   const tasks = {items:[{id:'t1', title:'Edit Nina reel #2', status:'today', priority:'high', clients:['personal']}]};
 
   // ---- locked-in clock ----
@@ -34,7 +36,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.waitForTimeout(400);
     check('switching to dark from settings applies at once', await p.evaluate(() => document.documentElement.getAttribute('data-theme')==='dark' && getComputedStyle(document.body).backgroundColor==='rgb(11, 13, 18)'));
     check('…and is remembered', await p.evaluate(() => JSON.parse(localStorage.getItem('opsdash:profile')).theme)==='dark');
-    await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="display"]');
+    await settingsGroup(p, 'look');
     await p.click('[data-action="setTheme"][data-id="auto"]'); await p.waitForTimeout(300);
     check('Auto at 3 PM (default 7 AM–7 PM) is light', await p.evaluate(() => document.documentElement.getAttribute('data-theme'))==='light');
     check('Auto shows the day / night times to edit', await p.isVisible('#setDayStart') && await p.isVisible('#setNightStart'));
@@ -61,7 +63,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.evaluate(() => { window.fetch = async (u) => ({ ok:true, json: async () => /geocoding/.test(u)
       ? {results:[{name:'Brooklyn', admin1:'New York', country_code:'US', latitude:40.65, longitude:-73.95}]}
       : {current:{temperature_2m:61.4, apparent_temperature:59, weather_code:63, is_day:1, cloud_cover:90, wind_speed_10m:8}, daily:{temperature_2m_max:[66], temperature_2m_min:[52]}} }); });
-    await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="display"]');
+    await settingsGroup(p, 'look');
     await p.fill('#wxQuery', 'Brooklyn'); await p.click('[data-action="wxSearch"]'); await p.waitForTimeout(200);
     await p.click('.wx-result'); await p.waitForTimeout(400);
     const wx = await E("state.settings.weather");
@@ -70,7 +72,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const chip = await p.textContent('.skyp');
     check('…and Today shows it (61°, rain)', /61°/.test(chip) && /rain/i.test(chip), chip);
     // scenes
-    await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="display"]');
+    await settingsGroup(p, 'look');
     check('scene picker shows a live preview of each scene', (await p.$$eval('.scene-thumb', els => els.filter(e => /url\("?data:image/.test(e.style.backgroundImage)).length)) >= 6);
     await p.click('[data-action="setScene"][data-id="city"]'); await p.waitForTimeout(300);
     const sc = await p.evaluate(() => ({has:document.body.classList.contains('has-scene'), bg:(document.getElementById('sceneBg')||{}).width||0, fx:!!document.getElementById('sceneFx'), panel:getComputedStyle(document.querySelector('.card')).backgroundColor}));
@@ -95,7 +97,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="leads"]'); await p.waitForTimeout(200);
     const fit = await p.evaluate(() => { const t = document.querySelector('.crm-car .car-track'); return {sw:t.scrollWidth, cw:t.clientWidth, cols:t.querySelectorAll('.crm-col').length, arrows:[...document.querySelectorAll('.crm-car .car-arrow')].filter(a => getComputedStyle(a).opacity!=='0').length}; });
     check('Grid: every lead stage fits across the screen — no sideways scrolling', fit.cols>=6 && fit.sw <= fit.cw+2 && fit.arrows===0, fit);
-    await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="display"]');
+    await settingsGroup(p, 'look');
+    await p.click('.set-more > summary[data-action="toggleSetMore"]'); await p.waitForTimeout(100); // card layout is folded under "More appearance options" now
     await p.click('[data-action="setCardLayout"][data-id="carousel"]'); await p.waitForTimeout(150);
     await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="leads"]'); await p.waitForTimeout(300);
     const car = await p.evaluate(() => { const w = document.querySelector('.crm-car'), t = w.querySelector('.car-track'); return {threeD:w.classList.contains('is-3d'), over:t.scrollWidth > t.clientWidth, next:w.classList.contains('can-next'), prev:w.classList.contains('can-prev'), fade:t.classList.contains('fade-r'), bar:getComputedStyle(t).scrollbarWidth}; });
@@ -158,10 +161,13 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.click('.journal-entry[data-journal-id="j2"] .journal-text', {button:'right'}); await p.waitForTimeout(100);
     await p.click('#appCtxMenu [data-op="jPin"]'); await p.waitForTimeout(150);
     check('right-click → Pin pins the entry', (await E("state.journal.entries.find(e=>e.id==='j2').pinned"))===true);
+    // the journal page grew (titles, types), so j1 can sit below the fold: scroll it in first, since any scroll closes the menu
+    await p.locator('.journal-entry[data-journal-id="j1"] .journal-text').scrollIntoViewIfNeeded(); await p.waitForTimeout(150);
     await p.click('.journal-entry[data-journal-id="j1"] .journal-text', {button:'right'}); await p.click('#appCtxMenu [data-op="jRemove"]'); await p.waitForTimeout(150);
     check('right-click → Remove removes it…', (await E("state.journal.entries.length"))===1);
     await E("ACTIONS.undoJournalRemove()"); await p.waitForTimeout(100);
     check('…with Undo', (await E("state.journal.entries.length"))===2);
+    await p.locator('.journal-entry[data-journal-id="j1"] .journal-text').scrollIntoViewIfNeeded(); await p.waitForTimeout(150);
     await p.click('.journal-entry[data-journal-id="j1"] .journal-text', {button:'right'}); await p.click('#appCtxMenu [data-op="jEdit"]'); await p.waitForTimeout(150);
     check('right-click → Edit opens the editor', await p.isVisible('#journalEditOverlay:not(.hidden)'));
     await p.keyboard.press('Escape');
@@ -217,7 +223,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const wk = await p.evaluate(() => { const o = document.querySelector('.hq-outreach'); return o ? {text:o.textContent, bars:o.querySelectorAll('.ow-day').length} : null; });
     check('Business overview shows this week\'s outreach (reached, due, streak)', wk && wk.bars===7 && /people reached/.test(wk.text) && /day streak/.test(wk.text) && /Peak Roofing/.test(wk.text), wk && wk.text.slice(0, 120));
     // templates
-    await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="business"]'); await p.waitForTimeout(150);
+    await settingsGroup(p, 'work'); await p.waitForTimeout(150);
     await p.fill('[data-tpl="leadText"]', 'Yo {first}, {me} here'); await p.waitForTimeout(500);
     check('message templates are editable in Settings → Business', (await E("crm().templates.leadText"))==='Yo {first}, {me} here' && (await E("fillTemplate(crm().templates.leadText,'lead',state.business.pipeline[0])"))==='Yo Mike, Andre Flicz here');
     check('no errors', !p.errors.length, p.errors);
