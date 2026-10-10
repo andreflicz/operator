@@ -60,17 +60,20 @@ function wakeArm(){ wakeCfg().armedAt = Date.now(); }
 // Everything for it goes through one queue, retried until it gets through.
 const HELPER_RETRY_MS = [100, 200, 300, 500, 800, 1100];
 let helperChain = Promise.resolve();
-function helperFetch(url, timeoutMs, wantJson){
+// once: a command that must not run twice (start a song). A refused connection is retried, but a
+// request that got through and is just slow to answer is never sent again.
+function helperFetch(url, timeoutMs, wantJson, once){
   const run = async function(){
     for(let i=0;i<=HELPER_RETRY_MS.length;i++){
       const ctl = typeof AbortController!=='undefined' ? new AbortController() : null;
-      const timer = setTimeout(function(){ if(ctl) ctl.abort(); }, timeoutMs||4000);
+      let timedOut = false;
+      const timer = setTimeout(function(){ timedOut = true; if(ctl) ctl.abort(); }, timeoutMs||4000);
       try{
         const res = await fetch(url, {cache:'no-store', signal: ctl ? ctl.signal : undefined});
         clearTimeout(timer);
         if(wantJson){ let j = null; try{ j = await res.json(); }catch(e){} return res.ok ? (j || {}) : null; }
         return res.ok;
-      }catch(e){ clearTimeout(timer); if(i===HELPER_RETRY_MS.length || (wantJson && i>=2)) return wantJson ? null : false; await new Promise(function(r){ setTimeout(r, HELPER_RETRY_MS[i]); }); }
+      }catch(e){ clearTimeout(timer); if(once && timedOut) return !wantJson; if(i===HELPER_RETRY_MS.length || (wantJson && i>=2)) return wantJson ? null : false; await new Promise(function(r){ setTimeout(r, HELPER_RETRY_MS[i]); }); }
     }
     return wantJson ? null : false;
   };
@@ -180,7 +183,7 @@ window.addEventListener('blur', function(){ opFocusPing(0); });
 setTimeout(function(){ opFocusPing(document.hasFocus() ? 1 : 0); }, 1500);
 function hexUtf8(str){ return Array.prototype.map.call(new TextEncoder().encode(String(str||'')), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
 function musicApp(cmd, media){
-  return helperFetch(MUSIC_URL+cmd+(media ? '?k='+(media.k==='playlist'?'playlist':'song')+'&q='+hexUtf8(media.q) : ''), 4000);
+  return helperFetch(MUSIC_URL+cmd+(media ? '?k='+(media.k==='playlist'?'playlist':'song')+'&q='+hexUtf8(media.q) : ''), 4000, false, cmd==='play');
 }
 async function playWakeMedia(media, onFail){
   stopWakeMedia(true);

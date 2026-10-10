@@ -4,6 +4,8 @@ document.body.addEventListener('click', function(e){
   if(!el) return;
   const a = el.dataset.action;
   const id = el.dataset.id;
+  // moving between pages and tabs plays a soft note from the app's scale
+  if((a==='nav' && el.dataset.view!==ui.view) || (/Tab$/.test(a) && !el.classList.contains('active') && !el.classList.contains('is-on'))) playNav();
   switch(a){
     case 'nav': {
       ui.boardReturnTo = null;
@@ -406,11 +408,16 @@ document.body.addEventListener('dragstart', function(e){
   const card = e.target.closest && e.target.closest('[draggable="true"][data-task-id]');
   if(!card) return;
   e.dataTransfer.setData('text/plain', card.dataset.taskId);
+  // where it came from (Now / Up next), so dropping it back on the list clears that slot
+  ui.dragFrom = card.dataset.from || null;
   e.dataTransfer.effectAllowed = 'move';
+  const dt = state.tasks.items.find(function(x){ return x.id===card.dataset.taskId; });
+  const num = card.querySelector('.tl-num, .ko-num');
+  dragGhost(e, dt ? dt.title : '', {num: num ? num.textContent : null, priority: dt && dt.priority, src: card});
   // light up where it can go (Now / Up next / the list) while it's in the air
   document.body.classList.add('is-dragging-task');
 });
-document.body.addEventListener('dragend', function(){ document.body.classList.remove('is-dragging-task'); });
+document.body.addEventListener('dragend', function(){ document.body.classList.remove('is-dragging-task'); setTimeout(function(){ ui.dragFrom = null; }, 0); });
 document.body.addEventListener('dragover', function(e){
   const zone = e.target.closest && e.target.closest('[data-dropzone]');
   if(!zone) return;
@@ -435,6 +442,18 @@ document.body.addEventListener('drop', function(e){
   const newZone = zone.dataset.dropzone;
   const t = state.tasks.items.find(function(x){ return x.id===taskId; });
   if(!t) return;
+  const from = ui.dragFrom; ui.dragFrom = null;
+  playDrop();
+  // out of Now / Up next and back onto the list: that slot empties, the task stays on today's list
+  if(from && (newZone==='today' || newZone==='order')){
+    if(from==='now' && ui.currentTaskId===taskId) releaseCurrentTask();
+    if(from==='next'){ if(state.focus.nextTaskId===taskId) state.focus.nextTaskId = null; if(ui.stagedTaskId===taskId) ui.stagedTaskId = null; persist('focus'); }
+    if(newZone==='order'){ const r = zone.getBoundingClientRect(); reorderLineup(taskId, zone.dataset.id, e.clientY > r.top + r.height/2); return; }
+    renderView(); return;
+  }
+  if(from==='now' && newZone==='next'){ if(ui.currentTaskId===taskId) releaseCurrentTask(); dropOnNext(taskId); return; }
+  if(from==='next' && newZone==='next') return;
+  if(from==='now' && newZone==='current') return;
   // Nothing starts timing from a drop: onto Now (locked in) it asks first; onto Up next it just lines it up.
   if(newZone==='current'){ if(t.status==='backlog'){ t.status = 'today'; persist('tasks'); } stagePendingCurrentTask(taskId); return; }
   if(newZone==='next'){ dropOnNext(taskId); return; }

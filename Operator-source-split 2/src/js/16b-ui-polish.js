@@ -143,6 +143,7 @@ function deleteTasksUndoable(ids){
     ui.selectedTaskIds.delete(id);
   });
   lastDeletedTasks = removed;
+  state.tasks.trash = removed.map(function(r){ return {task:r.task, index:r.index, at:Date.now()}; }).concat(arr(state.tasks.trash)).slice(0, 300);
   persist('tasks'); renderView();
   const label = removed.length===1 ? 'Deleted “'+removed[0].task.title+'”' : 'Deleted '+removed.length+' items';
   showToast(label, {icon:'&#128465;', actionLabel:'Undo', actionAction:'undoDeleteTasks', duration:7000});
@@ -153,9 +154,35 @@ ACTIONS.undoDeleteTasks = function(){
   lastDeletedTasks.slice().sort(function(a,b){ return a.index-b.index; }).forEach(function(r){
     if(state.tasks.items.some(function(t){ return t.id===r.task.id; })) return;
     state.tasks.items.splice(Math.min(r.index, state.tasks.items.length), 0, r.task);
+    state.tasks.trash = arr(state.tasks.trash).filter(function(x){ return x.task.id!==r.task.id; });
   });
   lastDeletedTasks = null;
   const c = document.getElementById('toastContainer'); if(c) c.innerHTML='';
   playTick();
   persist('tasks'); renderView();
 };
+
+// ---- Recently deleted (Focus → Tasks → Deleted) ----
+ACTIONS.restoreDeletedTask = function(el, e, id){
+  const x = arr(state.tasks.trash).find(function(r){ return r.task.id===id; }); if(!x) return;
+  state.tasks.trash = state.tasks.trash.filter(function(r){ return r!==x; });
+  if(!state.tasks.items.some(function(t){ return t.id===id; })) state.tasks.items.splice(Math.min(x.index||0, state.tasks.items.length), 0, x.task);
+  playTaskAdded(); persist('tasks');
+  if(!state.tasks.trash.length && ui.focusTasksSubTab==='deleted') ui.focusTasksSubTab = 'overview';
+  renderView();
+  showToast('“'+x.task.title+'” is back.', {icon:'&#8634;'});
+};
+ACTIONS.emptyDeletedTasks = function(){ state.tasks.trash = []; persist('tasks'); ui.focusTasksSubTab = 'overview'; renderView(); };
+function renderFocusDeletedTab(){
+  const list = arr(state.tasks.trash);
+  return '<div class="section">'+
+    '<div class="section-title">Recently deleted<span class="kpi-sub">'+list.length+'</span>'+tip('Deleted tasks wait here for 30 days. Restore puts one back right where it was.')+
+      (list.length ? '<button class="btn btn-ghost btn-sm" style="margin-left:auto;" data-action="emptyDeletedTasks">Empty</button>' : '')+'</div>'+
+    '<div class="task-list">'+(list.map(function(r){
+      const t = r.task;
+      return '<div class="task-item-v2 trash-row">'+priorityTag(t.priority)+'<span class="task-title" style="flex:1;">'+escapeHtml(t.title)+'</span>'+
+        '<span class="kpi-sub">'+ghlAgoLabel(r.at)+'</span><button class="btn btn-sm trash-restore" data-action="restoreDeletedTask" data-id="'+t.id+'">&#8634; Restore</button></div>';
+    }).join('') || '<div class="empty">Nothing deleted.</div>')+'</div>'+
+  '</div>';
+}
+function ghlAgoLabel(ts){ const m = Math.round((Date.now()-ts)/60000); return m<1 ? 'just now' : m<60 ? m+'m ago' : m<1440 ? Math.round(m/60)+'h ago' : Math.round(m/1440)+'d ago'; }

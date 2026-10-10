@@ -101,6 +101,19 @@ const SFX = {
   night: function(c, o, t){ [130.8, 196, 261.6, 329.6].forEach(function(f, i){ sfxPluck(c, o, t+i*0.16, f, 2.4, 0.05, 'sine'); }); sfxSweep(c, o, t, 392, 196, 1.8, 0.025); },
   wake: function(c, o, t){ [261.6, 392, 523.3, 659.3, 784, 1046.5].forEach(function(f, i){ sfxPluck(c, o, t+i*0.13, f, 2.2, 0.055, i%2 ? 'sine' : 'triangle'); }); sfxSweep(c, o, t, 130.8, 261.6, 1.6, 0.04); }
 };
+// ---- the soft palette: warm sines in one key (C major pentatonic), like Wind down ----
+// Moving around the app walks up and down the scale instead of repeating one blip, so a run of
+// clicks sounds like a little melody. Steps in the rituals (Wind down, Lock in, Good morning)
+// climb one note per step.
+const PENTA = [196, 220, 261.6, 293.7, 329.6, 392, 440, 523.3, 587.3, 659.3, 784];
+let pentaIdx = 5;
+function pentaWalk(){ const moves = [-2, -1, 1, 2]; pentaIdx = Math.max(2, Math.min(PENTA.length-2, pentaIdx + moves[Math.floor(Math.random()*moves.length)])); return PENTA[pentaIdx]; }
+SFX.nav = function(c, o, t){ const f = pentaWalk(); sfxPluck(c, o, t, f, 0.55, 0.04, 'sine'); sfxPluck(c, o, t+0.045, f*1.5, 0.7, 0.018, 'sine'); };
+SFX.lift = function(c, o, t){ sfxSweep(c, o, t, 330, 523.3, 0.16, 0.022); sfxTap(c, o, t, 1800, 0.05); };
+SFX.drop = function(c, o, t){ sfxPluck(c, o, t, 392, 0.45, 0.055, 'sine'); sfxPluck(c, o, t+0.05, 587.3, 0.6, 0.03, 'sine'); sfxTap(c, o, t, 900, 0.08); };
+SFX.lockout = function(c, o, t){ [659.3, 523.3, 392, 261.6].forEach(function(f, i){ sfxPluck(c, o, t+i*0.11, f, 1.2, 0.05, 'sine'); }); sfxSweep(c, o, t, 440, 220, 0.9, 0.025); };
+SFX.deny = function(c, o, t){ sfxPluck(c, o, t, 233.1, 0.22, 0.07, 'triangle'); sfxPluck(c, o, t+0.09, 220, 0.3, 0.06, 'triangle'); };
+function stepSfx(i){ const base = [261.6, 329.6, 392, 523.3, 659.3, 784][Math.max(0, Math.min(5, i||0))]; return function(c, o, t){ sfxPluck(c, o, t, base, 0.9, 0.05, 'sine'); sfxPluck(c, o, t+0.06, base*1.5, 1.1, 0.025, 'sine'); sfxPluck(c, o, t+0.12, base*2, 1.2, 0.012, 'sine'); }; }
 function playSfx(name, classic){ if(soundPack()==='classic'){ if(classic) classic(); return; } sfx(SFX[name]); }
 function playTick(){ playSfx('tick', function(){ tone([1200], 0.08, 0.2); }); }
 function playStartChime(){ playSfx('start', function(){ tone([523,659], 0.18, 0.25); }); }
@@ -115,6 +128,12 @@ function playLockIn(){ playSfx('lockin', function(){ tone([523,659], 0.18, 0.25)
 function playFanfare(){ playSfx('fanfare', function(){ tone([523,659,784], 0.3, 0.3); }); }
 function playPing(){ playSfx('ping', function(){ tone([1200,1500], 0.08, 0.15); }); }
 function playNight(){ playSfx('night', function(){ tone([440,330], 0.3, 0.2); }); }
+function playNav(){ playSfx('nav', null); }
+function playDragLift(){ playSfx('lift', null); }
+function playDrop(){ playSfx('drop', function(){ tone([660], 0.08, 0.15); }); }
+function playLockOut(){ playSfx('lockout', function(){ tone([659,494], 0.16, 0.22); }); }
+function playDeny(){ playSfx('deny', function(){ tone([220,208], 0.12, 0.2); }); }
+function playStep(i){ if(soundPack()==='classic'){ tone([523], 0.08, 0.15); return; } sfx(stepSfx(i)); }
 function playWakeChime(){ playSfx('wake', function(){ tone([659,880], 0.2, 0.25); }); }
 function fmt12Hour(hm){
   if(!hm) return '';

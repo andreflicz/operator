@@ -155,7 +155,7 @@ function ghlPaneHtml(){
     '<div class="gp-body">'+body+'</div>';
 }
 function renderGhlPaneInto(){
-  if(ui.ghlPane && ui.ghlPane.inline){ if(ui.view==='business' && ui.businessTab==='inbox') renderView(); return; }
+  if(ui.ghlPane && ui.ghlPane.inline){ if(ui.view==='convos') renderView(); return; }
   const el = document.getElementById('ghlContent'); if(el) morphInto(el, ghlPaneHtml(), {form:true});
 }
 registerModal('ghlOverlay', renderGhlPaneInto);

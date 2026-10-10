@@ -98,12 +98,12 @@ function focusTasksSubtabsHtml(){
     else if(t.status==='backlog') backlogN++;
   });
   const pill = function(id, label, n){ return '<div class="subtab '+(sub===id?'active':'')+'" data-action="focusTasksSubTab" data-tab="'+id+'">'+label+(n===null?'':' <span style="opacity:.7;">'+n+'</span>')+'</div>'; };
-  return '<div class="subtabs">'+pill('overview', 'Overview', null)+pill('backlog', 'Backlog', backlogN)+pill('videoIdeas', '&#127916; Video Ideas', ideasN)+pill('finished', 'Finished', doneN)+'</div>';
+  return '<div class="subtabs">'+pill('overview', 'Overview', null)+pill('backlog', 'Backlog', backlogN)+pill('videoIdeas', '&#127916; Video Ideas', ideasN)+pill('finished', 'Finished', doneN)+(arr(state.tasks.trash).length ? pill('deleted', '&#128465;', arr(state.tasks.trash).length) : '')+'</div>';
 }
 function renderFocusTasksTab(){
   const sub = ui.focusTasksSubTab || 'overview';
   return '<div class="subtab-panel" data-key="tasks-'+sub+'">'+
-    (sub==='backlog' ? renderFocusBacklogTab() : sub==='videoIdeas' ? renderVideoIdeasTab() : sub==='finished' ? renderFocusFinishedTab() : renderFocusTasksOverview())+
+    (sub==='backlog' ? renderFocusBacklogTab() : sub==='videoIdeas' ? renderVideoIdeasTab() : sub==='finished' ? renderFocusFinishedTab() : sub==='deleted' ? renderFocusDeletedTab() : renderFocusTasksOverview())+
     '</div>';
 }
 function renderVideoIdeasTab(){
@@ -205,8 +205,7 @@ function renderFocusTasksOverview(){
       (carouselOn() ? (function(){ const all = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; })); return carouselWrap(all.map(function(t){ return taskCard(t); }).join(''), 'soon', {w:236, loop:true, count:all.length}); })() : '<div class="task-card-grid">'+backlogPreview.map(function(t){ return taskCard(t); }).join('')+'</div>')+
     '</div>'
   ) : '')+
-  renderOngoingTasksPanel()+
-  renderSocialPanel();
+  renderOngoingTasksPanel();
 }
 function renderFocusBacklogTab(){
   const items = state.tasks.items;
@@ -401,6 +400,7 @@ function toggleTaskActive(id){
 function completeTask(id){
   const t=state.tasks.items.find(function(x){return x.id===id;}); if(!t) return;
   if(justCompletedTaskId===id) return;
+  methodTaskDone(id);
   if(ui.currentTaskId===id) accumulateCurrentTaskTime(id);
   if(t.ongoing){
     if(!Array.isArray(t.ongoingDoneDates)) t.ongoingDoneDates=[];

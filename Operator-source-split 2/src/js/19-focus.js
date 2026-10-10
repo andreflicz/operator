@@ -555,8 +555,8 @@ function reallyConfirmStopFocus(){
   state.focus.lastManualStopAt = endedAt;
   state.focus.lastSessionEndedAt = endedAt;
   if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
-  if(state.modes.active && state.modes.active.linkedFocus){ endMode(); }
-  playStopSound();
+  if(state.modes.active && state.modes.active.linkedFocus){ finishActiveMode(true); }
+  playLockOut(); lockOutFlash(minutes, arr(s.completedTasks).length);
   persist('focus'); renderView();
 }
 function renderStopFocusModal(){
@@ -656,6 +656,7 @@ function addFocusTime(minutes){
 }
 function openBreakNotePrompt(){
   const as = state.focus.activeSession; if(!as || as.onBreak) return;
+  const fb = flowBreakMinutes(); if(fb) ui.breakMinutes = fb;
   const o = document.getElementById('breakNoteOverlay');
   if(!o) return;
   o.classList.remove('hidden');
@@ -687,6 +688,7 @@ function confirmStartBreakMode(){
   as.breakStartedAt = Date.now();
   as.breakEndsAt = breakLen==='open' ? null : Date.now()+breakLen*60000;
   as.frozenElapsedMs = Date.now() - as.startedAt;
+  as.segStart = as.frozenElapsedMs;
   state.modes.active = {type:'break', startedAt:Date.now(), note:note, linkedFocus:true};
   if(ui.currentTaskId){ ui.pausedTaskId = ui.currentTaskId; accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   ui.pendingCurrentTaskId = null;

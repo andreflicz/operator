@@ -19,7 +19,8 @@ function nowNextPanelHtml(opts){
   const explicit = nnExplicitNext();
   let next = explicit;
   if(!next){ const s = nextUpTask(); if(s && s.id!==ui.currentTaskId && !(pend && s.id===pend.id)) next = s; }
-  const title = function(t){ return '<div class="nn-title">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span></div>'; };
+  // the task in each slot can be picked up: onto the list to clear the slot, or across to swap
+  const title = function(t, from){ return '<div class="nn-title nn-drag" draggable="true" data-task-id="'+t.id+'" data-from="'+from+'" title="Drag to move it">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span></div>'; };
   const picker = function(label){ return '<span class="nn-pick-wrap"><button class="btn btn-ghost btn-sm" data-action="toggleNextPicker" data-where="'+where+'">'+label+' &#9662;</button>'+nextPickerHtml(where)+'</span>'; };
   let now = '';
   {
@@ -31,7 +32,7 @@ function nowNextPanelHtml(opts){
             '<button class="btn btn-ghost btn-sm" data-action="nnPendingToNext">Make it next</button>'+
             '<button class="btn btn-ghost btn-sm" data-action="cancelPendingCurrentTask">Cancel</button></div>'
         : cur
-          ? '<div class="nn-row">'+title(cur)+'<span class="nn-timer" id="'+timerId+'">'+formatElapsed(Date.now()-(ui.currentTaskStartedAt||Date.now()))+'</span></div>'+
+          ? '<div class="nn-row">'+title(cur, 'now')+'<span class="nn-timer" id="'+timerId+'">'+formatElapsed(Date.now()-(ui.currentTaskStartedAt||Date.now()))+'</span></div>'+
             '<div class="nn-acts"><button class="btn btn-good btn-sm" data-action="finishCurrentTask">&#10003; Done</button>'+
               '<button class="btn btn-ghost btn-sm" data-action="releaseCurrentTask" title="Stop timing it — it stays on today\'s list">Release</button>'+
               (inS ? '' : '<button class="btn btn-ghost btn-sm" data-action="openLockInChooser" title="Lock in — it counts as deep work">&#128274; Lock in</button>')+'</div>'
@@ -41,7 +42,7 @@ function nowNextPanelHtml(opts){
   const nextCell = '<div class="nn-cell nn-next" data-dropzone="next">'+
     '<div class="nn-k">Up next'+(next && !explicit ? '<span class="nn-sug">suggested</span>' : '')+tip('One task lined up for when you\'re ready. Drag a card here or pick one — it never starts by itself.')+'</div>'+
     (next
-      ? title(next)+
+      ? title(next, 'next')+
         '<div class="nn-acts">'+
           (onBreak ? '' : '<button class="btn btn-primary btn-sm" data-action="nnStartNext" data-id="'+next.id+'">&#9654; '+(cur ? 'Switch to it' : 'Start now')+'</button>')+
           (inS ? '' : '<button class="btn btn-good btn-sm" data-action="nnLockInNext" data-id="'+next.id+'">&#128274; Lock in on it</button>')+

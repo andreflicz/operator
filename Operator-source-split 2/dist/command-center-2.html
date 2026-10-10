@@ -173,12 +173,19 @@
   .client-touch-row{margin-top:auto; padding-top:6px;}
   .client-touch-btn{font-variant-numeric:tabular-nums; min-width:40px; height:26px; padding:0 8px; border-radius:14px; border:1px solid transparent; background:transparent; color:var(--text-faint); font-size:12.5px; display:inline-flex; align-items:center; justify-content:center; gap:5px; cursor:pointer; transition:border-color .12s,color .12s,background .12s;}
   .client-touch-btn:hover{border-color:var(--accent); color:var(--accent); background:var(--accent-dim);}
-  .toast-container{position:fixed; top:20px; right:20px; z-index:200; display:flex; flex-direction:column; gap:8px; pointer-events:none;}
-  .toast{background:var(--panel-2); border:1px solid var(--border); border-radius:12px; padding:10px 14px; box-shadow:0 10px 28px rgba(0,0,0,calc(.35*var(--sh-k))); font-size:12.5px; color:var(--text-dim); display:flex; align-items:center; gap:10px; max-width:280px; pointer-events:auto; opacity:0; transform:translateY(-8px); transition:opacity .18s ease, transform .18s ease;}
-  .toast.show{opacity:1; transform:translateY(0);}
-  .toast-icon{flex-shrink:0; font-size:14px;}
-  .toast-action{margin-left:auto; flex-shrink:0; font-size:12px; color:var(--accent); cursor:pointer; font-weight:600; white-space:nowrap;}
-  .toast-action:hover{text-decoration:underline;}
+  .toast-container{position:fixed; top:18px; right:18px; z-index:200; display:flex; flex-direction:column; gap:8px; pointer-events:none;}
+  .toast{position:relative; display:flex; align-items:flex-start; gap:12px; min-width:240px; max-width:340px; padding:13px 40px 13px 14px; border-radius:16px; pointer-events:auto;
+    background:color-mix(in srgb, var(--panel-2) 82%, transparent); -webkit-backdrop-filter:blur(18px) saturate(1.4); backdrop-filter:blur(18px) saturate(1.4);
+    border:1px solid rgba(var(--ink),.1); box-shadow:0 18px 44px rgba(0,0,0,calc(.42*var(--sh-k))), inset 0 1px 0 rgba(255,255,255,.05);
+    font-size:13px; line-height:1.4; color:var(--text); opacity:0; transform:translateY(-10px) scale(.98); transition:opacity .22s ease, transform .26s cubic-bezier(.2,.9,.3,1.2);}
+  .toast.show{opacity:1; transform:none;}
+  .toast-icon{flex:none; width:30px; height:30px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; font-size:15px; background:rgba(var(--ink),.06);}
+  .toast-body{flex:1; min-width:0; display:flex; flex-direction:column; gap:8px; padding-top:5px;}
+  .toast-msg{color:var(--text);}
+  .toast-action{align-self:flex-start; border:1px solid color-mix(in srgb, var(--accent) 45%, transparent); background:color-mix(in srgb, var(--accent) 14%, transparent); color:var(--accent); font-size:12px; font-weight:700; padding:5px 12px; border-radius:999px; cursor:pointer; transition:background .15s, color .15s;}
+  .toast-action:hover{background:var(--accent); color:#1a1206;}
+  .toast-x{position:absolute; top:9px; right:9px; width:24px; height:24px; border-radius:8px; border:none; background:transparent; color:var(--text-faint); font-size:11px; cursor:pointer; opacity:.7;}
+  .toast-x:hover{opacity:1; background:rgba(var(--ink),.08); color:var(--text);}
   @keyframes stagedPulse{ 0%{ box-shadow:0 0 0 0 rgba(232,162,61,.55); } 70%{ box-shadow:0 0 0 18px rgba(232,162,61,0); } 100%{ box-shadow:0 0 0 0 rgba(232,162,61,0); } }
   .staged-task-card{ border-color:var(--accent) !important; }
   .staged-task-card.just-staged{ animation:stagedPulse 1s ease-out; }
@@ -2263,9 +2270,6 @@
   .ls-brand{ color:#ffc56b; }
   .ls .wd-step.is-on{ border-color:rgba(232,162,61,.65); background:rgba(232,162,61,.13); } .ls .wd-step.is-on span{ background:linear-gradient(160deg, #ffd08a, #e8a23d); color:#1a1206; }
   .ls .wd-chip b{ color:#ffc56b; } .ls .wd-chip:hover{ border-color:rgba(232,162,61,.6); }
-  .ls-now{ border:1px solid rgba(232,162,61,.55); background:linear-gradient(180deg, rgba(232,162,61,.2), rgba(232,162,61,.08)); color:#ffd08a; font-weight:800; font-size:12.5px; letter-spacing:.02em; border-radius:999px; padding:8px 14px; cursor:pointer; white-space:nowrap; box-shadow:0 0 0 0 rgba(232,162,61,.4); transition:transform .15s, box-shadow .2s, background .2s; }
-  .ls-now:hover{ transform:translateY(-1px); background:linear-gradient(180deg, #ffd08a, #e8a23d); color:#1a1206; box-shadow:0 8px 26px rgba(232,162,61,.35); }
-  .ls-sum{ color:rgba(255,255,255,.5); font-size:13px; max-width:340px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .ls .btn-primary{ background:linear-gradient(180deg, #ffd08a, #e8a23d); border:none; color:#1a1206; font-weight:800; }
   .ls-dim{ color:rgba(255,255,255,.5); font-weight:500; }
   /* 1 task */
@@ -2310,9 +2314,6 @@
   .ls-bar-now{ position:absolute; left:0; top:0; bottom:0; background:#e8a23d; border-radius:6px; }
   .ls-bar-add{ position:absolute; top:0; bottom:0; background:repeating-linear-gradient(135deg, rgba(232,162,61,.55) 0 6px, rgba(232,162,61,.25) 6px 12px); animation:lsStripe 1.2s linear infinite; background-size:17px 17px; }
   @keyframes lsStripe{ to{ background-position:17px 0; } }
-  .ls-go{ display:flex; align-items:center; justify-content:center; gap:16px; width:100%; margin-top:26px; padding:22px 26px; border:none; border-radius:22px; cursor:pointer; color:#04140d; background:linear-gradient(180deg, #5fe0ad, #2fae7c); box-shadow:0 20px 60px rgba(63,190,142,.35), inset 0 1px 0 rgba(255,255,255,.4); animation:lsGlow 2.4s ease-in-out infinite; transition:transform .15s; }
-  .ls-go:hover{ transform:translateY(-2px) scale(1.01); }
-  .ls-go-i{ font-size:30px; } .ls-go b{ display:block; font-family:var(--font-display); font-size:28px; font-weight:800; letter-spacing:.08em; text-align:left; } .ls-go small{ display:block; font-size:13px; font-weight:600; opacity:.7; text-align:left; max-width:420px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   @keyframes lsGlow{ 0%,100%{ box-shadow:0 20px 60px rgba(63,190,142,.3), inset 0 1px 0 rgba(255,255,255,.4); } 50%{ box-shadow:0 20px 80px rgba(63,190,142,.55), inset 0 1px 0 rgba(255,255,255,.4); } }
   @media (max-width:640px){ .ls-cols{ grid-template-columns:1fr; } }
   /* the "Locked in" stamp as it starts */
@@ -2324,7 +2325,94 @@
   @keyframes lfRing{ from{ transform:scale(.4); opacity:1; } to{ transform:scale(3.2); opacity:0; } }
   @keyframes lfOut{ 0%,70%{ opacity:1; } 100%{ opacity:0; } }
   @media (prefers-reduced-motion: reduce){ .ls-go, .ls-bar-add{ animation:none; } .lock-flash{ animation-duration:.8s; } }
-  .ls-pick-k{ display:flex; align-items:center; } .ls-notask{ margin-left:auto; border:none; background:transparent; color:rgba(255,255,255,.45); font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:none; cursor:pointer; padding:2px 6px; border-radius:6px; } .ls-notask:hover{ color:#fff; background:rgba(255,255,255,.08); }
+
+  /* ---- dragging: a little pill rides the cursor; the card it came from waits, dimmed ---- */
+  .drag-ghost{ position:fixed; top:-200px; left:-400px; z-index:-1; display:inline-flex; align-items:center; gap:8px; max-width:240px; padding:7px 14px 7px 8px; border-radius:999px;
+    background:linear-gradient(180deg, #2a2418, #1c1812); border:1px solid rgba(232,162,61,.55); color:#fff; font:600 12.5px/1.2 var(--font-body, system-ui); box-shadow:0 10px 28px rgba(0,0,0,.45), 0 0 0 3px rgba(232,162,61,.12); white-space:nowrap; }
+  .drag-ghost span{ overflow:hidden; text-overflow:ellipsis; }
+  .drag-ghost i{ width:10px; height:10px; border-radius:50%; flex:none; box-shadow:0 0 10px currentColor; }
+  .drag-ghost b{ flex:none; min-width:22px; height:22px; padding:0 6px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:11.5px; color:#1a1206; background:linear-gradient(160deg, #ffd08a, #e8a23d); }
+  .is-drag-src{ opacity:.35 !important; outline:1.5px dashed rgba(232,162,61,.6); outline-offset:2px; transform:scale(.98); transition:opacity .15s, transform .15s; }
+  .nn-drag{ cursor:grab; border-radius:10px; transition:background .15s; } .nn-drag:hover{ background:rgba(var(--ink),.04); } .nn-drag:active{ cursor:grabbing; }
+  .th-streak .streak-status{ display:inline-flex; align-items:center; gap:6px; min-width:22px; }
+  .streak-ok{ width:20px; height:20px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:#06120c; background:var(--good); box-shadow:0 0 12px rgba(63,190,142,.45); }
+  .streak-num{ font-variant-numeric:tabular-nums; }
+  /* social panel header */
+  .sp-head{ display:flex; align-items:center; gap:12px; margin-bottom:12px; cursor:pointer; }
+  .sp-icon{ width:38px; height:38px; flex:none; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; font-size:18px;
+    background:linear-gradient(135deg, #f58529 0%, #dd2a7b 45%, #8134af 75%, #515bd4 100%); box-shadow:0 6px 18px rgba(221,42,123,.3); }
+  .sp-head-t{ flex:1; min-width:0; } .sp-title{ font-family:var(--font-display); font-weight:800; font-size:17px; letter-spacing:-.01em; } .sp-sub{ font-size:12px; color:var(--text-faint); }
+  .sp-more{ font-size:12px; font-weight:700; color:var(--text-dim); padding:5px 11px; border-radius:999px; border:1px solid var(--border); transition:all .15s; }
+  .sp-head:hover .sp-more{ color:var(--text); border-color:rgba(var(--ink),.3); }
+  /* sidebar unread badge */
+  .nav-badge{ display:none; margin-left:auto; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:var(--accent); color:#1a1206; font-size:10.5px; font-weight:800; align-items:center; justify-content:center; }
+  .nav-badge.is-on{ display:inline-flex; }
+  .cv-tabs{ margin:6px 0 16px; }
+
+  /* ---- Lock in v2 ---- */
+  .ls-inner{ display:flex; flex-direction:column; justify-content:safe center; }
+  .ls-stage{ width:100%; animation:lsPop .55s cubic-bezier(.2,.9,.25,1.1) both; }
+  @keyframes lsPop{ from{ opacity:0; transform:translateY(18px) scale(.975); } to{ opacity:1; transform:none; } }
+  .ls .wd-title-h{ text-align:center; margin-bottom:22px; }
+  .ls .wd-step.is-locked{ opacity:.32; cursor:not-allowed; }
+  .ls-now{ border:1px solid rgba(232,162,61,.5); background:rgba(232,162,61,.08); color:#ffc56b; font-family:var(--font-display); font-weight:700; font-size:12px; letter-spacing:.2em; text-transform:uppercase; border-radius:999px; padding:9px 16px; cursor:pointer; white-space:nowrap; transition:all .18s; }
+  .ls-now:hover{ background:linear-gradient(180deg, #ffd08a, #e8a23d); color:#1a1206; border-color:transparent; box-shadow:0 8px 26px rgba(232,162,61,.35); transform:translateY(-1px); }
+  .ls .wd-top{ justify-content:flex-end; } .ls .wd-steps{ margin:0 auto; padding-left:120px; }
+  .ls-next{ display:inline-flex; align-items:center; gap:10px; border:none; cursor:pointer; padding:13px 26px; border-radius:999px; font-weight:800; font-size:15px; color:#1a1206; background:linear-gradient(180deg, #ffd08a, #e8a23d); box-shadow:0 10px 30px rgba(232,162,61,.28), inset 0 1px 0 rgba(255,255,255,.4); transition:transform .15s, box-shadow .2s; }
+  .ls-next span{ transition:transform .2s; } .ls-next:hover{ transform:translateY(-1px); box-shadow:0 14px 36px rgba(232,162,61,.4); } .ls-next:hover span{ transform:translateX(4px); }
+  .ls-back{ border-radius:999px !important; padding:12px 20px !important; }
+  /* 1 task */
+  .ls-list{ gap:7px; }
+  .ls-row{ padding:6px 8px 6px 14px; cursor:grab; animation:lsRow .45s cubic-bezier(.2,.9,.3,1.15) both; transition:border-color .18s, background .18s, box-shadow .18s; }
+  @keyframes lsRow{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
+  .ls-row-main{ flex:1; min-width:0; display:flex; align-items:center; gap:10px; background:none; border:none; color:#fff; text-align:left; cursor:pointer; padding:8px 4px; font:inherit; }
+  .ls-slots{ display:inline-flex; gap:4px; flex:none; }
+  .ls-slot{ border:1px solid rgba(255,255,255,.14); background:transparent; color:rgba(255,255,255,.45); font-size:11.5px; font-weight:700; padding:5px 11px; border-radius:999px; cursor:pointer; opacity:0; transition:all .15s; }
+  .ls-row:hover .ls-slot, .ls-slot.is-on{ opacity:1; }
+  .ls-slot:hover{ color:#fff; border-color:rgba(255,255,255,.4); }
+  .ls-slot-now.is-on{ background:#3fbe8e; border-color:#3fbe8e; color:#04140d; box-shadow:0 0 16px rgba(63,190,142,.4); }
+  .ls-slot-next.is-on{ background:rgba(232,162,61,.16); border-color:rgba(232,162,61,.7); color:#ffc56b; }
+  .ls-row.is-now{ border-color:rgba(63,190,142,.6); background:rgba(63,190,142,.09); box-shadow:inset 3px 0 0 #3fbe8e; }
+  .ls-row.is-next{ border-color:rgba(232,162,61,.45); }
+  .ls-row .wd-num{ cursor:grab; }
+  .ls-add{ margin-top:16px; }
+  .ls-pool-h{ display:flex; align-items:center; gap:10px; margin:16px 0 8px; } .ls-search{ flex:1; max-width:260px; margin-left:auto; padding:6px 10px !important; font-size:13px !important; }
+  /* 2 method */
+  .ls-methods{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:16px; }
+  .ls-mcard{ display:flex; flex-direction:column; align-items:flex-start; gap:3px; padding:16px 18px; border-radius:18px; cursor:pointer; text-align:left; color:#fff; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.09); animation:lsRow .45s cubic-bezier(.2,.9,.3,1.15) both; transition:transform .15s, border-color .15s, background .2s, box-shadow .2s; }
+  .ls-mcard b{ font-family:var(--font-display); font-size:17px; font-weight:700; } .ls-mcard span:last-child{ font-size:12px; color:rgba(255,255,255,.5); }
+  .ls-mi{ font-size:20px; margin-bottom:4px; }
+  .ls-mcard:hover{ transform:translateY(-2px); border-color:rgba(232,162,61,.4); }
+  .ls-mcard.is-on{ border-color:rgba(232,162,61,.75); background:linear-gradient(140deg, rgba(232,162,61,.2), rgba(232,162,61,.04)); box-shadow:0 14px 40px rgba(232,162,61,.12); } .ls-mcard.is-on span:last-child{ color:#ffc56b; }
+  .ls-lens{ grid-template-columns:repeat(6, 1fr); gap:8px; }
+  .ls-len{ padding:14px 12px; border-radius:16px; align-items:center; text-align:center; } .ls-len b{ font-size:30px; } .ls-len span{ font-size:10.5px; }
+  .ls-preview{ display:flex; gap:4px; height:42px; align-items:stretch; padding:10px 0; }
+  .ls-preview i{ border-radius:7px; display:flex; align-items:center; justify-content:center; font-style:normal; font-size:14px; color:#ffc56b; animation:lsGrow .7s cubic-bezier(.2,.8,.2,1) both; transform-origin:left; }
+  .lsp-w{ background:linear-gradient(180deg, #ffc56b, #e8a23d); box-shadow:0 0 18px rgba(232,162,61,.25); } .lsp-w.is-grad{ background:linear-gradient(90deg, #e8a23d, #ffd08a 70%, rgba(255,208,138,.4)); }
+  .lsp-r{ background:rgba(63,190,142,.55); } .lsp-more{ background:linear-gradient(90deg, rgba(232,162,61,.45), transparent); } .lsp-flag{ background:transparent; }
+  @keyframes lsGrow{ from{ transform:scaleX(0); opacity:0; } to{ transform:none; opacity:1; } }
+  @media (max-width:760px){ .ls-methods{ grid-template-columns:repeat(2, 1fr); } .ls-lens{ grid-template-columns:repeat(3, 1fr); } .ls .wd-steps{ padding-left:0; } }
+  /* 3 set up */
+  .ls-check{ animation:lsRow .45s cubic-bezier(.2,.9,.3,1.15) both; }
+  .ls-checks.is-denied .ls-check:not(.is-on){ border-color:rgba(255,99,99,.7); background:rgba(255,99,99,.08); } .ls-checks.is-denied .ls-check:not(.is-on) .ls-box{ border-color:#ff6b6b; }
+  .ls-checks.is-shake{ animation:lsShake .5s cubic-bezier(.36,.07,.19,.97) both; }
+  @keyframes lsShake{ 10%, 90%{ transform:translateX(-2px); } 20%, 80%{ transform:translateX(4px); } 30%, 50%, 70%{ transform:translateX(-8px); } 40%, 60%{ transform:translateX(8px); } }
+  .ls-ready.is-denied{ color:#ff8f8f; font-weight:700; }
+  /* 4 why: the big green button, centered */
+  .ls-go-wrap{ display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:34px; }
+  .ls-go{ position:relative; display:inline-flex; align-items:center; justify-content:center; gap:14px; width:min(420px, 100%); padding:26px 34px; border:none; border-radius:999px; cursor:pointer; color:#04140d;
+    background:radial-gradient(120% 140% at 50% 0%, #7ff0c2, #34c58a 55%, #239a6b); box-shadow:0 24px 70px rgba(63,190,142,.38), inset 0 1px 0 rgba(255,255,255,.5), inset 0 -6px 18px rgba(0,60,40,.25); animation:lsGlow 2.4s ease-in-out infinite; transition:transform .15s; }
+  .ls-go:hover{ transform:translateY(-2px) scale(1.02); } .ls-go:active{ transform:scale(.98); }
+  .ls-go b{ font-family:var(--font-display); font-size:34px; font-weight:800; letter-spacing:.12em; }
+  .ls-go-i{ font-size:30px; }
+  .ls-go-ring{ position:absolute; inset:-8px; border-radius:999px; border:2px solid rgba(63,190,142,.45); animation:lsRing 2.4s ease-out infinite; pointer-events:none; }
+  @keyframes lsRing{ 0%{ transform:scale(.96); opacity:.9; } 100%{ transform:scale(1.12); opacity:0; } }
+  .ls-go-sub{ color:rgba(255,255,255,.55); font-size:13.5px; max-width:460px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ls-why .ls-cols{ animation:lsRow .5s both; } .ls-why .ls-bar{ animation:lsRow .5s .08s both; } .ls-go-wrap{ animation:lsPop .6s .16s cubic-bezier(.2,.9,.25,1.1) both; }
+  /* stamps */
+  .lf-m{ font-size:13px; color:#ffc56b; letter-spacing:.06em; animation:lfIn .5s .2s cubic-bezier(.2,.9,.3,1.3) both; }
+  .lock-flash.is-out .lf-ring{ border-color:rgba(232,162,61,.8); } .lock-flash.is-out .lf-k{ text-shadow:0 0 40px rgba(232,162,61,.55); }
+  .ls-now.is-hidden{ visibility:hidden; pointer-events:none; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -2343,6 +2431,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
     <button class="nav-item" data-action="nav" data-view="today"><span class="nav-icon">&#9670;</span><span class="nav-label">Today</span></button>
     <button class="nav-item" data-action="nav" data-view="focus"><span class="nav-icon">&#9201;</span><span class="nav-label">Focus</span></button>
     <button class="nav-item" data-action="nav" data-view="business"><span class="nav-icon">&#9635;</span><span class="nav-label">Business</span></button>
+    <button class="nav-item" data-action="nav" data-view="convos"><span class="nav-icon">&#9993;</span><span class="nav-label">Conversations</span><span class="nav-badge" id="convoBadge"></span></button>
     <button class="nav-item" data-action="nav" data-view="calendar"><span class="nav-icon">&#9638;</span><span class="nav-label">Calendar</span></button>
     <button class="nav-item" data-action="nav" data-view="personal"><span class="nav-icon">&#9679;</span><span class="nav-label">Personal</span></button>
     <button class="nav-item" data-action="nav" data-view="settings"><span class="nav-icon">&#9881;</span><span class="nav-label">Settings</span></button>
@@ -2353,6 +2442,9 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 <div id="toastContainer" class="toast-container"></div>
 <div id="windOverlay" class="overlay hidden wind-overlay">
   <div id="windContent" class="wind-content"></div>
+</div>
+<div id="planOverlay" class="overlay hidden wind-overlay plan-overlay">
+  <div id="planContent" class="wind-content"></div>
 </div>
 <div id="lockSeqOverlay" class="overlay hidden wind-overlay lock-overlay">
   <div id="lockSeqContent" class="wind-content"></div>
@@ -2722,6 +2814,22 @@ const RESET_TARGETS = [
   {id:'boards', label:'Vision & journal boards'}
 ];
 
+
+// Dragging shows a small pill under the cursor (a number or a dot + the name) instead of a
+// see-through screenshot of the whole card; the card it came from dims while it's in the air.
+const DRAG_DOT = {high:'#ff6b6b', med:'#e8a23d', low:'#8a90a2'};
+function dragGhost(e, label, opts){
+  opts = opts || {};
+  if(opts.src){ const src = opts.src; src.classList.add('is-drag-src'); src.addEventListener('dragend', function(){ src.classList.remove('is-drag-src'); }, {once:true}); }
+  if(!e.dataTransfer || !e.dataTransfer.setDragImage) return;
+  const g = document.createElement('div');
+  g.className = 'drag-ghost';
+  g.innerHTML = (opts.num ? '<b>'+escapeHtml(String(opts.num))+'</b>' : '<i style="background:'+(opts.color || DRAG_DOT[opts.priority] || 'var(--accent)')+'"></i>')+'<span>'+escapeHtml(String(label||'').slice(0, 42))+'</span>';
+  document.body.appendChild(g);
+  try{ e.dataTransfer.setDragImage(g, 18, 17); }catch(err){}
+  setTimeout(function(){ if(g.parentNode) g.parentNode.removeChild(g); }, 0);
+  try{ if(typeof playDragLift==='function') playDragLift(); }catch(err){}
+}
 
 // ============ DOM MORPH (in-place re-render) ============
 // Every action re-renders by building an HTML string. Swapping that string in with
@@ -3633,18 +3741,29 @@ function showToast(message, opts){
   const container = document.getElementById('toastContainer');
   if(!container) return;
   clearTimeout(toastHideTimer); clearTimeout(toastRemoveTimer);
-  container.innerHTML = '<div class="toast" id="activeToast">'+
+  container.innerHTML = '<div class="toast'+(opts.actionLabel ? ' has-action' : '')+'" id="activeToast">'+
     '<span class="toast-icon">'+(opts.icon||'&#128276;')+'</span>'+
-    '<span>'+escapeHtml(message)+'</span>'+
-    (opts.actionLabel ? '<span class="toast-action" data-action="'+opts.actionAction+'"'+(opts.actionId ? ' data-id="'+escapeHtml(opts.actionId)+'"' : '')+'>'+escapeHtml(opts.actionLabel)+'</span>' : '')+
+    '<div class="toast-body"><span class="toast-msg">'+escapeHtml(message)+'</span>'+
+    (opts.actionLabel ? '<button class="toast-action" data-action="'+opts.actionAction+'"'+(opts.actionId ? ' data-id="'+escapeHtml(opts.actionId)+'"' : '')+'>'+escapeHtml(opts.actionLabel)+'</button>' : '')+'</div>'+
+    '<button class="toast-x" data-action="dismissToast" title="Dismiss">&#10005;</button>'+
   '</div>';
   const el = document.getElementById('activeToast');
   requestAnimationFrame(function(){ if(el) el.classList.add('show'); });
-  toastHideTimer = setTimeout(function(){
+  const hide = function(){ toastHideTimer = setTimeout(function(){
     if(el) el.classList.remove('show');
-    toastRemoveTimer = setTimeout(function(){ container.innerHTML=''; }, 220);
-  }, opts.duration || 3200);
+    toastRemoveTimer = setTimeout(function(){ if(container.contains(el)) container.innerHTML=''; }, 260);
+  }, opts.duration || 3200); };
+  hide();
+  // hovering keeps it up; leaving starts the clock again
+  if(el){ el.addEventListener('mouseenter', function(){ clearTimeout(toastHideTimer); clearTimeout(toastRemoveTimer); el.classList.add('show'); }); el.addEventListener('mouseleave', hide); }
 }
+function dismissToast(){
+  const el = document.getElementById('activeToast'), container = document.getElementById('toastContainer');
+  clearTimeout(toastHideTimer); clearTimeout(toastRemoveTimer);
+  if(el) el.classList.remove('show');
+  toastRemoveTimer = setTimeout(function(){ if(container) container.innerHTML = ''; }, 220);
+}
+ACTIONS.dismissToast = function(){ dismissToast(); };
 function showLockInToast(){
   showToast("Logged — you're not locked in right now", {icon:'&#128274;', actionLabel:'Lock In', actionAction:'lockInFromToast'});
 }
@@ -3666,6 +3785,8 @@ let pendingBreakMinutes = null;
 function normalizeProfile(p){ p=p||{}; const d=defaultProfile(); Object.keys(d).forEach(function(k){ if(p[k]===undefined) p[k]=d[k]; }); return p; }
 function normalizeTasks(t){
   t=t||{}; t.items = arr(t.items);
+  // Recently deleted: kept 30 days so nothing deleted by accident is gone for good
+  t.trash = arr(t.trash).filter(function(x){ return x && x.task && Date.now()-(x.at||0) < 30*86400000; });
   if(!Array.isArray(t.categories)) t.categories=[
     {id:'general', label:'General', color:'#8A90A2'},
     {id:'video', label:'Video Idea', color:'#c792ea'}
@@ -4091,6 +4212,19 @@ const SFX = {
   night: function(c, o, t){ [130.8, 196, 261.6, 329.6].forEach(function(f, i){ sfxPluck(c, o, t+i*0.16, f, 2.4, 0.05, 'sine'); }); sfxSweep(c, o, t, 392, 196, 1.8, 0.025); },
   wake: function(c, o, t){ [261.6, 392, 523.3, 659.3, 784, 1046.5].forEach(function(f, i){ sfxPluck(c, o, t+i*0.13, f, 2.2, 0.055, i%2 ? 'sine' : 'triangle'); }); sfxSweep(c, o, t, 130.8, 261.6, 1.6, 0.04); }
 };
+// ---- the soft palette: warm sines in one key (C major pentatonic), like Wind down ----
+// Moving around the app walks up and down the scale instead of repeating one blip, so a run of
+// clicks sounds like a little melody. Steps in the rituals (Wind down, Lock in, Good morning)
+// climb one note per step.
+const PENTA = [196, 220, 261.6, 293.7, 329.6, 392, 440, 523.3, 587.3, 659.3, 784];
+let pentaIdx = 5;
+function pentaWalk(){ const moves = [-2, -1, 1, 2]; pentaIdx = Math.max(2, Math.min(PENTA.length-2, pentaIdx + moves[Math.floor(Math.random()*moves.length)])); return PENTA[pentaIdx]; }
+SFX.nav = function(c, o, t){ const f = pentaWalk(); sfxPluck(c, o, t, f, 0.55, 0.04, 'sine'); sfxPluck(c, o, t+0.045, f*1.5, 0.7, 0.018, 'sine'); };
+SFX.lift = function(c, o, t){ sfxSweep(c, o, t, 330, 523.3, 0.16, 0.022); sfxTap(c, o, t, 1800, 0.05); };
+SFX.drop = function(c, o, t){ sfxPluck(c, o, t, 392, 0.45, 0.055, 'sine'); sfxPluck(c, o, t+0.05, 587.3, 0.6, 0.03, 'sine'); sfxTap(c, o, t, 900, 0.08); };
+SFX.lockout = function(c, o, t){ [659.3, 523.3, 392, 261.6].forEach(function(f, i){ sfxPluck(c, o, t+i*0.11, f, 1.2, 0.05, 'sine'); }); sfxSweep(c, o, t, 440, 220, 0.9, 0.025); };
+SFX.deny = function(c, o, t){ sfxPluck(c, o, t, 233.1, 0.22, 0.07, 'triangle'); sfxPluck(c, o, t+0.09, 220, 0.3, 0.06, 'triangle'); };
+function stepSfx(i){ const base = [261.6, 329.6, 392, 523.3, 659.3, 784][Math.max(0, Math.min(5, i||0))]; return function(c, o, t){ sfxPluck(c, o, t, base, 0.9, 0.05, 'sine'); sfxPluck(c, o, t+0.06, base*1.5, 1.1, 0.025, 'sine'); sfxPluck(c, o, t+0.12, base*2, 1.2, 0.012, 'sine'); }; }
 function playSfx(name, classic){ if(soundPack()==='classic'){ if(classic) classic(); return; } sfx(SFX[name]); }
 function playTick(){ playSfx('tick', function(){ tone([1200], 0.08, 0.2); }); }
 function playStartChime(){ playSfx('start', function(){ tone([523,659], 0.18, 0.25); }); }
@@ -4105,6 +4239,12 @@ function playLockIn(){ playSfx('lockin', function(){ tone([523,659], 0.18, 0.25)
 function playFanfare(){ playSfx('fanfare', function(){ tone([523,659,784], 0.3, 0.3); }); }
 function playPing(){ playSfx('ping', function(){ tone([1200,1500], 0.08, 0.15); }); }
 function playNight(){ playSfx('night', function(){ tone([440,330], 0.3, 0.2); }); }
+function playNav(){ playSfx('nav', null); }
+function playDragLift(){ playSfx('lift', null); }
+function playDrop(){ playSfx('drop', function(){ tone([660], 0.08, 0.15); }); }
+function playLockOut(){ playSfx('lockout', function(){ tone([659,494], 0.16, 0.22); }); }
+function playDeny(){ playSfx('deny', function(){ tone([220,208], 0.12, 0.2); }); }
+function playStep(i){ if(soundPack()==='classic'){ tone([523], 0.08, 0.15); return; } sfx(stepSfx(i)); }
 function playWakeChime(){ playSfx('wake', function(){ tone([659,880], 0.2, 0.25); }); }
 function fmt12Hour(hm){
   if(!hm) return '';
@@ -4621,12 +4761,8 @@ function armDelete(scope,id){
 function performDelete(scope, id){
   armed.delete(scope+':'+id);
   if(scope==='task'){
-    state.tasks.items = state.tasks.items.filter(function(x){return x.id!==id;});
-    if(ui.editingTaskId===id) closeTaskEditModal();
-    if(ui.editingVideoIdeaId===id) closeVideoIdeaEditModal();
-    if(ui.currentTaskId===id){ ui.currentTaskId = null; ui.currentTaskStartedAt = null; }
-    if(ui.stagedTaskId===id) ui.stagedTaskId = null;
-    if(ui.pendingCurrentTaskId===id) ui.pendingCurrentTaskId = null;
+    // tasks always go to Recently deleted (with Undo) — never gone for good by accident
+    deleteTasksUndoable([id]); return;
   }
   if(scope==='alarm'){ state.focus.alarms = state.focus.alarms.filter(function(x){return x.id!==id;}); if(ui.editingAlarmId===id) closeAlarmEditModal(); }
   if(scope==='session') state.focus.sessions = state.focus.sessions.filter(function(x){return x.id!==id;});
@@ -5574,6 +5710,7 @@ function deleteTasksUndoable(ids){
     ui.selectedTaskIds.delete(id);
   });
   lastDeletedTasks = removed;
+  state.tasks.trash = removed.map(function(r){ return {task:r.task, index:r.index, at:Date.now()}; }).concat(arr(state.tasks.trash)).slice(0, 300);
   persist('tasks'); renderView();
   const label = removed.length===1 ? 'Deleted “'+removed[0].task.title+'”' : 'Deleted '+removed.length+' items';
   showToast(label, {icon:'&#128465;', actionLabel:'Undo', actionAction:'undoDeleteTasks', duration:7000});
@@ -5584,12 +5721,38 @@ ACTIONS.undoDeleteTasks = function(){
   lastDeletedTasks.slice().sort(function(a,b){ return a.index-b.index; }).forEach(function(r){
     if(state.tasks.items.some(function(t){ return t.id===r.task.id; })) return;
     state.tasks.items.splice(Math.min(r.index, state.tasks.items.length), 0, r.task);
+    state.tasks.trash = arr(state.tasks.trash).filter(function(x){ return x.task.id!==r.task.id; });
   });
   lastDeletedTasks = null;
   const c = document.getElementById('toastContainer'); if(c) c.innerHTML='';
   playTick();
   persist('tasks'); renderView();
 };
+
+// ---- Recently deleted (Focus → Tasks → Deleted) ----
+ACTIONS.restoreDeletedTask = function(el, e, id){
+  const x = arr(state.tasks.trash).find(function(r){ return r.task.id===id; }); if(!x) return;
+  state.tasks.trash = state.tasks.trash.filter(function(r){ return r!==x; });
+  if(!state.tasks.items.some(function(t){ return t.id===id; })) state.tasks.items.splice(Math.min(x.index||0, state.tasks.items.length), 0, x.task);
+  playTaskAdded(); persist('tasks');
+  if(!state.tasks.trash.length && ui.focusTasksSubTab==='deleted') ui.focusTasksSubTab = 'overview';
+  renderView();
+  showToast('“'+x.task.title+'” is back.', {icon:'&#8634;'});
+};
+ACTIONS.emptyDeletedTasks = function(){ state.tasks.trash = []; persist('tasks'); ui.focusTasksSubTab = 'overview'; renderView(); };
+function renderFocusDeletedTab(){
+  const list = arr(state.tasks.trash);
+  return '<div class="section">'+
+    '<div class="section-title">Recently deleted<span class="kpi-sub">'+list.length+'</span>'+tip('Deleted tasks wait here for 30 days. Restore puts one back right where it was.')+
+      (list.length ? '<button class="btn btn-ghost btn-sm" style="margin-left:auto;" data-action="emptyDeletedTasks">Empty</button>' : '')+'</div>'+
+    '<div class="task-list">'+(list.map(function(r){
+      const t = r.task;
+      return '<div class="task-item-v2 trash-row">'+priorityTag(t.priority)+'<span class="task-title" style="flex:1;">'+escapeHtml(t.title)+'</span>'+
+        '<span class="kpi-sub">'+ghlAgoLabel(r.at)+'</span><button class="btn btn-sm trash-restore" data-action="restoreDeletedTask" data-id="'+t.id+'">&#8634; Restore</button></div>';
+    }).join('') || '<div class="empty">Nothing deleted.</div>')+'</div>'+
+  '</div>';
+}
+function ghlAgoLabel(ts){ const m = Math.round((Date.now()-ts)/60000); return m<1 ? 'just now' : m<60 ? m+'m ago' : m<1440 ? Math.round(m/60)+'h ago' : Math.round(m/1440)+'d ago'; }
 
 // ============ TODAY PANELS v2: goals, agenda, week, consistency, your why ============
 function progressBarHtml(pct, color){
@@ -6073,7 +6236,7 @@ function renderTodayHero(greeting){
       businessNameTagHtml()+
       '<div class="th-greet">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
       (p.bigClockOnToday ? '<div id="liveClockBig" class="cal-big-clock th-bigclock"></div>'+skyChipHtml() : '<div class="th-subrow"><div class="th-sub" id="liveClock"></div>'+skyChipHtml()+'</div>')+
-      '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: streak===0 ? 'Hit today\'s standard to start one'+tip('The streak counts days in a row you hit Today\'s Standard — the deep-work target plus your checklist. Rest days you take off don\'t break it.') : (allDone ? '<span style="color:var(--good);">Today\'s in the bag</span>' : 'Hit today\'s standard to keep it')})+'</div>'+
+      '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: (allDone ? '<span class="streak-ok" title="Today\'s standard: done">&#10003;</span>' : '')+tip((streak===0 ? 'Hit today\'s standard to start one. ' : allDone ? 'Today\'s in the bag. ' : 'Hit today\'s standard to keep it going. ')+'The streak counts days in a row you hit Today\'s Standard — the deep-work target plus your checklist. Rest days you take off don\'t break it.')})+'</div>'+
     '</div>'+
     '<div class="th-right">'+
       // in Shooting (or another mode): show it, with its own clock and an End button
@@ -6477,12 +6640,12 @@ function focusTasksSubtabsHtml(){
     else if(t.status==='backlog') backlogN++;
   });
   const pill = function(id, label, n){ return '<div class="subtab '+(sub===id?'active':'')+'" data-action="focusTasksSubTab" data-tab="'+id+'">'+label+(n===null?'':' <span style="opacity:.7;">'+n+'</span>')+'</div>'; };
-  return '<div class="subtabs">'+pill('overview', 'Overview', null)+pill('backlog', 'Backlog', backlogN)+pill('videoIdeas', '&#127916; Video Ideas', ideasN)+pill('finished', 'Finished', doneN)+'</div>';
+  return '<div class="subtabs">'+pill('overview', 'Overview', null)+pill('backlog', 'Backlog', backlogN)+pill('videoIdeas', '&#127916; Video Ideas', ideasN)+pill('finished', 'Finished', doneN)+(arr(state.tasks.trash).length ? pill('deleted', '&#128465;', arr(state.tasks.trash).length) : '')+'</div>';
 }
 function renderFocusTasksTab(){
   const sub = ui.focusTasksSubTab || 'overview';
   return '<div class="subtab-panel" data-key="tasks-'+sub+'">'+
-    (sub==='backlog' ? renderFocusBacklogTab() : sub==='videoIdeas' ? renderVideoIdeasTab() : sub==='finished' ? renderFocusFinishedTab() : renderFocusTasksOverview())+
+    (sub==='backlog' ? renderFocusBacklogTab() : sub==='videoIdeas' ? renderVideoIdeasTab() : sub==='finished' ? renderFocusFinishedTab() : sub==='deleted' ? renderFocusDeletedTab() : renderFocusTasksOverview())+
     '</div>';
 }
 function renderVideoIdeasTab(){
@@ -6584,8 +6747,7 @@ function renderFocusTasksOverview(){
       (carouselOn() ? (function(){ const all = sortByPriorityAndDeadline(items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea; })); return carouselWrap(all.map(function(t){ return taskCard(t); }).join(''), 'soon', {w:236, loop:true, count:all.length}); })() : '<div class="task-card-grid">'+backlogPreview.map(function(t){ return taskCard(t); }).join('')+'</div>')+
     '</div>'
   ) : '')+
-  renderOngoingTasksPanel()+
-  renderSocialPanel();
+  renderOngoingTasksPanel();
 }
 function renderFocusBacklogTab(){
   const items = state.tasks.items;
@@ -6780,6 +6942,7 @@ function toggleTaskActive(id){
 function completeTask(id){
   const t=state.tasks.items.find(function(x){return x.id===id;}); if(!t) return;
   if(justCompletedTaskId===id) return;
+  methodTaskDone(id);
   if(ui.currentTaskId===id) accumulateCurrentTaskTime(id);
   if(t.ongoing){
     if(!Array.isArray(t.ongoingDoneDates)) t.ongoingDoneDates=[];
@@ -6848,7 +7011,8 @@ function nowNextPanelHtml(opts){
   const explicit = nnExplicitNext();
   let next = explicit;
   if(!next){ const s = nextUpTask(); if(s && s.id!==ui.currentTaskId && !(pend && s.id===pend.id)) next = s; }
-  const title = function(t){ return '<div class="nn-title">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span></div>'; };
+  // the task in each slot can be picked up: onto the list to clear the slot, or across to swap
+  const title = function(t, from){ return '<div class="nn-title nn-drag" draggable="true" data-task-id="'+t.id+'" data-from="'+from+'" title="Drag to move it">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span></div>'; };
   const picker = function(label){ return '<span class="nn-pick-wrap"><button class="btn btn-ghost btn-sm" data-action="toggleNextPicker" data-where="'+where+'">'+label+' &#9662;</button>'+nextPickerHtml(where)+'</span>'; };
   let now = '';
   {
@@ -6860,7 +7024,7 @@ function nowNextPanelHtml(opts){
             '<button class="btn btn-ghost btn-sm" data-action="nnPendingToNext">Make it next</button>'+
             '<button class="btn btn-ghost btn-sm" data-action="cancelPendingCurrentTask">Cancel</button></div>'
         : cur
-          ? '<div class="nn-row">'+title(cur)+'<span class="nn-timer" id="'+timerId+'">'+formatElapsed(Date.now()-(ui.currentTaskStartedAt||Date.now()))+'</span></div>'+
+          ? '<div class="nn-row">'+title(cur, 'now')+'<span class="nn-timer" id="'+timerId+'">'+formatElapsed(Date.now()-(ui.currentTaskStartedAt||Date.now()))+'</span></div>'+
             '<div class="nn-acts"><button class="btn btn-good btn-sm" data-action="finishCurrentTask">&#10003; Done</button>'+
               '<button class="btn btn-ghost btn-sm" data-action="releaseCurrentTask" title="Stop timing it — it stays on today\'s list">Release</button>'+
               (inS ? '' : '<button class="btn btn-ghost btn-sm" data-action="openLockInChooser" title="Lock in — it counts as deep work">&#128274; Lock in</button>')+'</div>'
@@ -6870,7 +7034,7 @@ function nowNextPanelHtml(opts){
   const nextCell = '<div class="nn-cell nn-next" data-dropzone="next">'+
     '<div class="nn-k">Up next'+(next && !explicit ? '<span class="nn-sug">suggested</span>' : '')+tip('One task lined up for when you\'re ready. Drag a card here or pick one — it never starts by itself.')+'</div>'+
     (next
-      ? title(next)+
+      ? title(next, 'next')+
         '<div class="nn-acts">'+
           (onBreak ? '' : '<button class="btn btn-primary btn-sm" data-action="nnStartNext" data-id="'+next.id+'">&#9654; '+(cur ? 'Switch to it' : 'Start now')+'</button>')+
           (inS ? '' : '<button class="btn btn-good btn-sm" data-action="nnLockInNext" data-id="'+next.id+'">&#128274; Lock in on it</button>')+
@@ -7521,8 +7685,8 @@ function reallyConfirmStopFocus(){
   state.focus.lastManualStopAt = endedAt;
   state.focus.lastSessionEndedAt = endedAt;
   if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
-  if(state.modes.active && state.modes.active.linkedFocus){ endMode(); }
-  playStopSound();
+  if(state.modes.active && state.modes.active.linkedFocus){ finishActiveMode(true); }
+  playLockOut(); lockOutFlash(minutes, arr(s.completedTasks).length);
   persist('focus'); renderView();
 }
 function renderStopFocusModal(){
@@ -7622,6 +7786,7 @@ function addFocusTime(minutes){
 }
 function openBreakNotePrompt(){
   const as = state.focus.activeSession; if(!as || as.onBreak) return;
+  const fb = flowBreakMinutes(); if(fb) ui.breakMinutes = fb;
   const o = document.getElementById('breakNoteOverlay');
   if(!o) return;
   o.classList.remove('hidden');
@@ -7653,6 +7818,7 @@ function confirmStartBreakMode(){
   as.breakStartedAt = Date.now();
   as.breakEndsAt = breakLen==='open' ? null : Date.now()+breakLen*60000;
   as.frozenElapsedMs = Date.now() - as.startedAt;
+  as.segStart = as.frozenElapsedMs;
   state.modes.active = {type:'break', startedAt:Date.now(), note:note, linkedFocus:true};
   if(ui.currentTaskId){ ui.pausedTaskId = ui.currentTaskId; accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   ui.pendingCurrentTaskId = null;
@@ -8555,7 +8721,7 @@ function checkAwayReturn(){
   if(!last || last.end <= a.endedAt + awayLimitMs() || Date.now()-last.end > APP_ACTIVITY_GAP_MS) return;
   a.shown = true; persist('focus');
   const away = Math.round((Date.now()-a.endedAt)/60000);
-  showToast('You stepped away at '+fmt12Hour(nowHM(new Date(a.endedAt)))+' — your session stopped there ('+fmtDurationLabel(away)+' away, not counted).', {icon:'&#128694;', actionLabel:'I was working — add it back', actionAction:'restoreAwaySession', duration:20000});
+  showToast('Away since '+fmt12Hour(nowHM(new Date(a.endedAt)))+' — '+fmtDurationLabel(away)+' not counted.', {icon:'&#128694;', actionLabel:'Add it back', actionAction:'restoreAwaySession', duration:20000});
 }
 ACTIONS.restoreAwaySession = function(){
   const a = state.focus.awayStop; if(!a) return;
@@ -11529,10 +11695,8 @@ function renderBusiness(){
     '<div class="tab '+(ui.businessTab==='lifecycle'?'active':'')+'" data-action="businessTab" data-tab="lifecycle">Lifecycle</div>'+
     '<div class="tab '+(ui.businessTab==='packages'?'active':'')+'" data-action="businessTab" data-tab="packages">Packages</div>'+
     '<div class="tab '+(ui.businessTab==='finances'?'active':'')+'" data-action="businessTab" data-tab="finances">Finances</div>'+
-    '<div class="tab '+(ui.businessTab==='social'?'active':'')+'" data-action="businessTab" data-tab="social">Social</div>'+
-    '<div class="tab '+(ui.businessTab==='inbox'?'active':'')+'" data-action="businessTab" data-tab="inbox">Inbox'+(inboxUnread() ? '<span class="tab-badge">'+inboxUnread()+'</span>' : '')+'</div>'+
   '</div>'+
-  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : ui.businessTab==='inbox' ? renderInboxTab() : ui.businessTab==='social' ? renderSocialTab() : renderBusinessOverview())+'</div>';
+  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
 }
 // Business → Overview: one card — revenue on top, clients and pipeline side by side.
 function renderBusinessOverview(){
@@ -12674,6 +12838,8 @@ document.addEventListener('dragstart', function(e){
   e.dataTransfer.setData('text/x-crm', card.dataset.crmDrag);
   e.dataTransfer.effectAllowed = 'move';
   card.classList.add('is-dragging');
+  const nm = card.querySelector('.crm-card-name');
+  dragGhost(e, nm ? nm.textContent : '', {color:'#3fbe8e'});
 });
 document.addEventListener('dragend', function(e){
   const card = e.target.closest && e.target.closest('[data-crm-drag]');
@@ -15153,6 +15319,7 @@ function renderViewInner(){
     case 'personal': html = renderPersonal(); break;
     case 'business': html = renderBusiness(); break;
     case 'settings': html = renderSettings(); break;
+    case 'convos': html = renderConversations(); break;
     default: html = renderToday();
   }
   if(lastRenderedView !== ui.view){
@@ -15352,6 +15519,7 @@ function startFocusTicker(){
     const as = state.focus.activeSession;
     if(as && !as.onBreak) tickLiveDeepWork();
     checkBreakTimer();
+    checkMethodTimer();
     if(!as) return;
     if(as.onBreak){
       return;
@@ -15486,17 +15654,20 @@ function wakeArm(){ wakeCfg().armedAt = Date.now(); }
 // Everything for it goes through one queue, retried until it gets through.
 const HELPER_RETRY_MS = [100, 200, 300, 500, 800, 1100];
 let helperChain = Promise.resolve();
-function helperFetch(url, timeoutMs, wantJson){
+// once: a command that must not run twice (start a song). A refused connection is retried, but a
+// request that got through and is just slow to answer is never sent again.
+function helperFetch(url, timeoutMs, wantJson, once){
   const run = async function(){
     for(let i=0;i<=HELPER_RETRY_MS.length;i++){
       const ctl = typeof AbortController!=='undefined' ? new AbortController() : null;
-      const timer = setTimeout(function(){ if(ctl) ctl.abort(); }, timeoutMs||4000);
+      let timedOut = false;
+      const timer = setTimeout(function(){ timedOut = true; if(ctl) ctl.abort(); }, timeoutMs||4000);
       try{
         const res = await fetch(url, {cache:'no-store', signal: ctl ? ctl.signal : undefined});
         clearTimeout(timer);
         if(wantJson){ let j = null; try{ j = await res.json(); }catch(e){} return res.ok ? (j || {}) : null; }
         return res.ok;
-      }catch(e){ clearTimeout(timer); if(i===HELPER_RETRY_MS.length || (wantJson && i>=2)) return wantJson ? null : false; await new Promise(function(r){ setTimeout(r, HELPER_RETRY_MS[i]); }); }
+      }catch(e){ clearTimeout(timer); if(once && timedOut) return !wantJson; if(i===HELPER_RETRY_MS.length || (wantJson && i>=2)) return wantJson ? null : false; await new Promise(function(r){ setTimeout(r, HELPER_RETRY_MS[i]); }); }
     }
     return wantJson ? null : false;
   };
@@ -15606,7 +15777,7 @@ window.addEventListener('blur', function(){ opFocusPing(0); });
 setTimeout(function(){ opFocusPing(document.hasFocus() ? 1 : 0); }, 1500);
 function hexUtf8(str){ return Array.prototype.map.call(new TextEncoder().encode(String(str||'')), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
 function musicApp(cmd, media){
-  return helperFetch(MUSIC_URL+cmd+(media ? '?k='+(media.k==='playlist'?'playlist':'song')+'&q='+hexUtf8(media.q) : ''), 4000);
+  return helperFetch(MUSIC_URL+cmd+(media ? '?k='+(media.k==='playlist'?'playlist':'song')+'&q='+hexUtf8(media.q) : ''), 4000, false, cmd==='play');
 }
 async function playWakeMedia(media, onFail){
   stopWakeMedia(true);
@@ -17210,7 +17381,7 @@ function ghlPaneHtml(){
     '<div class="gp-body">'+body+'</div>';
 }
 function renderGhlPaneInto(){
-  if(ui.ghlPane && ui.ghlPane.inline){ if(ui.view==='business' && ui.businessTab==='inbox') renderView(); return; }
+  if(ui.ghlPane && ui.ghlPane.inline){ if(ui.view==='convos') renderView(); return; }
   const el = document.getElementById('ghlContent'); if(el) morphInto(el, ghlPaneHtml(), {form:true});
 }
 registerModal('ghlOverlay', renderGhlPaneInto);
@@ -17342,6 +17513,7 @@ async function inboxLoad(what, quiet){
         const st = await ghlCall('POST', '/social-media-posting/statistics?'+ghlQ({locationId:g.locationId}), {profileIds:ids});
         s.social = st.results || st;
         socialFeedGoals(s.social);
+        s.socialScope = false;
         g.socialCache = {at:Date.now(), data:s.social};
       }
     }
@@ -17349,7 +17521,8 @@ async function inboxLoad(what, quiet){
     persist('settings');
   }catch(e){ s.err = e.message; if(what==='social' && /403|scope/i.test(e.message)) s.socialScope = true; }
   s.loading[what] = false;
-  if(ui.view==='business' && (ui.businessTab==='inbox' || ui.businessTab==='social')) renderView(); else if(what==='social') renderView(); else notifBadge();
+  if(ui.view==='convos' || what==='social') renderView(); else notifBadge();
+  convoBadge();
 }
 // keep a "followers" goal (e.g. "IG followers") in step with the real number
 function socialFeedGoals(st){
@@ -17366,11 +17539,11 @@ let inboxTimer = null;
 function inboxTick(){
   clearTimeout(inboxTimer);
   inboxTimer = setTimeout(function(){
-    if(ui.view==='business' && ui.businessTab==='inbox' && !document.hidden && ghlOn()){ const s = inboxState(); if(s.mode!=='social') inboxLoad(s.mode, true); }
+    if(ui.view==='convos' && !document.hidden && ghlOn()){ const s = inboxState(); if(s.mode!=='social') inboxLoad(s.mode, true); }
     inboxTick();
   }, 45000);
 }
-ACTIONS.inboxMode = function(el, e, id){ const s = inboxState(); s.mode = id; renderView(); if(!s[id] && !s.loading[id]) inboxLoad(id); };
+ACTIONS.inboxMode = function(el, e, id){ const s = inboxState(); if(s.mode!==id) playNav(); s.mode = id; renderView(); if(id!=='social' && !s[id] && !s.loading[id]) inboxLoad(id); };
 ACTIONS.inboxRefresh = function(){ inboxLoad(inboxState().mode); };
 ACTIONS.inboxOpen = function(el, e, id){
   const r = ghlRecordForContact(id);
@@ -17462,9 +17635,10 @@ function sparkline(series){
   return '<svg class="sc-spark" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><polyline points="'+pts+'"/></svg>';
 }
 function inboxSocialHtml(s){
+  if(!s.social && !s.loading.social && s.err) return '<div class="ib-empty" style="padding:30px;">Couldn\'t get your social numbers from GoHighLevel. <button class="btn btn-ghost btn-sm" data-action="socialRefresh">Try again</button></div>';
   if(s.loading.social && !s.social) return '<div class="gp-loading">Loading your social stats…</div>';
   if(s.socialScope) return '<div class="ib-empty" style="padding:30px;"><div style="font-size:30px;">&#128202;</div><div>GoHighLevel needs two more permissions for this: <code>socialplanner/account.readonly</code> and <code>socialplanner/stat.readonly</code>.</div><div class="kpi-sub" style="margin-top:6px;">Add them to your Private Integration, then Disconnect and Connect again in Settings &rarr; Integrations.</div></div>';
-  if(!s.social) return '<div class="gp-loading">Loading your social stats…</div>';
+  if(!s.social) return '<div class="ib-empty" style="padding:30px;">No social numbers yet. <button class="btn btn-ghost btn-sm" data-action="socialRefresh">Load them</button></div>';
   if(s.social.empty) return '<div class="ib-empty" style="padding:30px;"><div style="font-size:30px;">&#128247;</div>No social accounts connected in GoHighLevel\'s Social Planner yet — connect Instagram, Facebook or TikTok there and they\'ll show up here.</div>';
   const st = s.social, br = st.breakdowns || {}, f = st.platformTotals && st.platformTotals.followers || {};
   const eng = br.engagement || {};
@@ -17481,17 +17655,26 @@ function inboxSocialHtml(s){
 function renderInboxTab(){
   if(!ghlCfg().connected) return '<div class="ib-empty" style="padding:40px;"><div style="font-size:34px;">&#128172;</div><div class="section-title" style="justify-content:center;">Your GoHighLevel inbox, here</div><div class="kpi-sub" style="margin:6px auto 14px;max-width:420px;">Connect GoHighLevel and your conversations, contacts and social stats live in this tab — reply without leaving Operator.</div><button class="btn btn-primary" data-action="goToIntegrations">Connect GoHighLevel</button></div>';
   const s = inboxState();
-  if(s.mode==='social') s.mode = 'chats';
+  if(s.mode==='social') return renderSocialTab();
   if(s[s.mode]==null && !s.loading[s.mode]) setTimeout(function(){ inboxLoad(s.mode); }, 0);
   if(!inboxTimer) inboxTick();
-  const tab = function(id, label, n){ return '<button class="seg-tab'+(s.mode===id?' active':'')+'" data-action="inboxMode" data-id="'+id+'">'+label+(n ? ' <span class="ib-badge">'+n+'</span>' : '')+'</button>'; };
   return '<div class="ib">'+
-    '<div class="ib-bar"><div class="seg-tabs" style="margin:0;">'+tab('chats', '&#128172; Chats', inboxUnread())+tab('contacts', '&#128101; Contacts')+'</div>'+
-      '<span style="flex:1"></span>'+(s.at ? '<span class="kpi-sub">Updated '+ghlAgo(s.at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="inboxRefresh" title="Refresh">&#8635;</button></div>'+
     (s.err ? '<div class="ghl-err">&#9888; '+escapeHtml(s.err)+'</div>' : '')+
     (s.mode==='contacts' ? inboxContactsHtml(s) : inboxChatsHtml(s))+
   '</div>';
 }
+// ---- Conversations: its own place in the sidebar — Chats, Contacts and Social ----
+function renderConversations(){
+  const s = inboxState(), on = ghlCfg().connected;
+  const tab = function(id, label, n){ return '<button class="seg-tab'+(s.mode===id?' active':'')+'" data-action="inboxMode" data-id="'+id+'">'+label+(n ? ' <span class="ib-badge">'+n+'</span>' : '')+'</button>'; };
+  const at = s.mode==='social' ? (ghlCfg().socialCache && ghlCfg().socialCache.at) : s.at;
+  return '<div class="view-header"><div><div class="view-title">Conversations'+tip('Your GoHighLevel chats and contacts, and your social numbers — all in one place.')+'</div></div>'+
+      (on ? '<div class="row" style="gap:8px;align-items:center;">'+(at ? '<span class="kpi-sub">Updated '+ghlAgo(at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="'+(s.mode==='social' ? 'socialRefresh' : 'inboxRefresh')+'" title="Refresh">&#8635;</button></div>' : '')+'</div>'+
+    (on ? '<div class="seg-tabs cv-tabs">'+tab('chats', '&#128172; Chats', inboxUnread())+tab('contacts', '&#128101; Contacts')+tab('social', '&#128202; Social')+'</div>' : '')+
+    '<div class="tab-panel" data-key="convos-'+s.mode+'">'+renderInboxTab()+'</div>';
+}
+function convoBadge(){ const b = document.getElementById('convoBadge'); if(!b) return; const n = inboxUnread(); b.textContent = n ? String(n) : ''; b.classList.toggle('is-on', !!n); }
+afterRenderHooks.push(convoBadge);
 ACTIONS.goToIntegrations = function(){ ui.view = 'settings'; ui.settingsTab = 'integrations'; renderView(); };
 
 // ---- Business → Social, and the Social panel (Focus, locked in, Today) ----
@@ -17503,17 +17686,15 @@ function socialMaybeRefresh(maxAgeMs){
   if(Date.now()-at > maxAgeMs) setTimeout(function(){ inboxLoad('social', true); }, 0);
 }
 function renderSocialTab(){
-  if(!ghlCfg().connected) return renderInboxTab();
   const s = inboxState();
   if(!s.social && g_social()) s.social = g_social();
   socialMaybeRefresh(10*60000);
-  return '<div class="ib"><div class="ib-bar"><div class="section-title" style="margin:0;">Social &middot; last 7 days</div><span style="flex:1"></span>'+
-    (ghlCfg().socialCache ? '<span class="kpi-sub">Updated '+ghlAgo(ghlCfg().socialCache.at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="socialRefresh" title="Refresh">&#8635;</button></div>'+
-    (s.err && s.mode==='social' ? '<div class="ghl-err">&#9888; '+escapeHtml(s.err)+'</div>' : '')+inboxSocialHtml(s)+'</div>';
+  return '<div class="ib">'+(s.err && s.mode==='social' && !s.social ? '<div class="ghl-err">&#9888; '+escapeHtml(s.err)+'</div>' : '')+inboxSocialHtml(s)+'</div>';
 }
 function g_social(){ const g = ghlCfg(); return g.socialCache && g.socialCache.data; }
 ACTIONS.socialRefresh = function(){ inboxLoad('social'); };
-ACTIONS.goToSocial = function(){ ui.view = 'business'; ui.businessTab = 'social'; renderView(); };
+ACTIONS.goToSocial = function(){ ui.view = 'convos'; inboxState().mode = 'social'; renderView(); };
+ACTIONS.goToConvos = function(){ ui.view = 'convos'; renderView(); };
 function renderSocialPanel(){
   if(!ghlOn()) return '';
   socialMaybeRefresh(60*60000);
@@ -17522,7 +17703,10 @@ function renderSocialPanel(){
   const br = d.breakdowns || {}, f = d.platformTotals && d.platformTotals.followers || {};
   const eng = br.engagement || {}, engTotal = Object.keys(eng).reduce(function(a, k){ const x = eng[k]||{}; return a + (Number(x.likes)||0) + (Number(x.comments)||0) + (Number(x.shares)||0); }, 0);
   const tile = function(k, v, ch, extra){ return '<div class="sp-tile"><div class="sp-k">'+k+'</div><div class="sp-v">'+Number(v||0).toLocaleString()+'</div>'+(ch!=null && isFinite(ch) ? '<div class="sc-ch '+(ch>=0?'is-up':'is-down')+'">'+(ch>=0?'&#9650; ':'&#9660; ')+Math.abs(ch).toFixed(ch%1?1:0)+'%</div>' : '')+(extra||'')+'</div>'; };
-  return '<div class="section social-panel"><div class="section-title">Social<span class="kpi-sub" style="margin-left:8px;">last 7 days</span><span class="view-all-link" data-action="goToSocial">More &rarr;</span></div>'+
+  const followers = Object.keys(f).reduce(function(a, k){ return a + (Number(f[k].total)||0); }, 0);
+  return '<div class="section social-panel"><div class="sp-head" data-action="goToSocial" title="Open Social">'+
+      '<span class="sp-icon">&#128241;</span><div class="sp-head-t"><div class="sp-title">Social</div><div class="sp-sub">'+(followers ? followers.toLocaleString()+' followers &middot; ' : '')+'last 7 days</div></div>'+
+      '<span class="sp-more">Open &rarr;</span></div>'+
     '<div class="sp-row">'+
       Object.keys(f).map(function(k){ return tile(escapeHtml(k[0].toUpperCase()+k.slice(1))+' followers', f[k].total, null, sparkline(f[k].series)); }).join('')+
       (br.reach ? tile('Reach', br.reach.total, br.reach.totalChange) : '')+
@@ -17777,7 +17961,7 @@ document.addEventListener('keydown', function(e){
 });
 document.addEventListener('input', function(e){ if(e.target && e.target.id==='windSearch' && ui.wind){ ui.wind.search = e.target.value; clearTimeout(ui._windT); ui._windT = setTimeout(renderWindInto, 120); } });
 // drag a row to reorder
-document.addEventListener('dragstart', function(e){ const r = e.target.closest && e.target.closest('.wd-row'); if(!r || !ui.wind) return; ui.wind.dragId = r.dataset.id; e.dataTransfer.effectAllowed = 'move'; try{ e.dataTransfer.setData('text/plain', 'wind'); }catch(err){} });
+document.addEventListener('dragstart', function(e){ const r = e.target.closest && e.target.closest('.wd-row'); if(!r || !ui.wind) return; ui.wind.dragId = r.dataset.id; e.dataTransfer.effectAllowed = 'move'; try{ e.dataTransfer.setData('text/plain', 'wind'); }catch(err){} const n = r.querySelector('.wd-num'), t = r.querySelector('.wd-title'); dragGhost(e, t ? t.textContent : '', {num: n ? n.textContent : null, src: r}); });
 document.addEventListener('dragover', function(e){ if(ui.wind && ui.wind.dragId && e.target.closest && e.target.closest('.wd-row')) e.preventDefault(); });
 document.addEventListener('drop', function(e){
   const r = e.target.closest && e.target.closest('.wd-row'); if(!r || !ui.wind || !ui.wind.dragId) return;
@@ -17969,40 +18153,90 @@ function renderMorningView(){
 afterRenderHooks.push(function(){ if(typeof state!=='undefined' && state && state.focus && applyNightPlanAuto()) setTimeout(renderView, 0); });
 // ============ LOCK IN: THE SEQUENCE ============
 // The same 1 → 2 → 3 → 4 walk as Wind down, warm instead of night-blue:
-//   1 Task   — what you're knocking out (your lineup, numbered; or add one)
-//   2 Length — 25m / 50m / 90m / 2h / 3h / open-ended, or your own
-//   3 Set up — your prep checklist (phone away…), and the next call if there is one
-//   4 Why    — what you're getting / avoiding, today's deep work so far → LOCK IN
-// "⚡ Lock in now" sits in the corner of every step: it starts right away with what's picked.
-const LOCK_STEPS = [['task','Task'],['length','Length'],['prep','Set up'],['why','Why']];
-const LOCK_LENGTHS = [25, 50, 90, 120, 180];
+//   1 Task   — today's lineup (numbered, drag to reorder): pick Now and Next, add more to today
+//   2 Method — one block of your length, or a way of working (Pomodoro, 52/17, 90/20, Flowtime,
+//              until the task's done)
+//   3 Set up — your checklist; every box has to be ticked to get past it
+//   4 Why    — what you're getting / avoiding, today's deep work → the big LOCK IN
+// The 🔒 Lock in pill in the corner is the one way to skip ahead: it starts right away with what's
+// picked. The timer starts after the "Locked in" stamp, not under it.
+const LOCK_STEPS = [['task','Task'],['method','Method'],['prep','Set up'],['why','Why']];
+const LOCK_METHODS = {
+  block:     {label:'Single block', icon:'&#127919;', sub:'One stretch, your length'},
+  pomodoro:  {label:'Pomodoro', icon:'&#127813;', sub:'25 on · 5 off · ×4', work:25, rest:5, long:15, every:4, rounds:4},
+  '5217':    {label:'52 / 17', icon:'&#9203;', sub:'52 on · 17 off, repeat', work:52, rest:17},
+  ultradian: {label:'90 / 20', icon:'&#127754;', sub:'90 on · 20 off, repeat', work:90, rest:20},
+  flow:      {label:'Flowtime', icon:'&#127744;', sub:'Go till you dip · break ⅕ of it'},
+  done:      {label:'Until it\'s done', icon:'&#9989;', sub:'Ends when the task does'}
+};
+const LOCK_METHOD_ORDER = ['block','pomodoro','5217','ultradian','flow','done'];
 function lockTaskPick(id){ return id ? state.tasks.items.find(function(t){ return t.id===id && t.status!=='done'; }) || null : null; }
+function lockLineup(){ return lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); })); }
 function openLockSeq(opts){
   opts = opts || {};
-  if(state.focus.activeSession) return;
-  const next = nextUpTask();
-  const last = state.focus.lastLockMinutes;
-  ui.lockSeq = {step:opts.step || 'task', taskId:(lockTaskPick(ui.stagedTaskId) || next || {}).id || null,
-    minutes:opts.minutes!==undefined ? opts.minutes : (last===undefined ? 50 : last), custom:false, prep:[], search:''};
+  if(state.focus.activeSession || ui.lockStarting) return;
+  const lineup = lockLineup();
+  const now = lockTaskPick(ui.stagedTaskId) || nextUpTask() || lineup[0] || null;
+  const nextExplicit = lockTaskPick(state.focus.nextTaskId);
+  const next = nextExplicit && (!now || nextExplicit.id!==now.id) ? nextExplicit : lineup.find(function(t){ return !now || t.id!==now.id; }) || null;
+  const last = state.focus.lastLock || {};
+  ui.lockSeq = {step:'task', maxStep:0, nowId:now ? now.id : null, nextId:next ? next.id : null,
+    method: LOCK_METHODS[last.method] ? last.method : 'block',
+    minutes: opts.minutes!==undefined ? opts.minutes : (last.minutes!==undefined ? last.minutes : (state.focus.lastLockMinutes!==undefined ? state.focus.lastLockMinutes : 50)),
+    custom:false, prep:[], search:'', denied:false};
   closeLockInChooser(); hideOverlay('preFocusOverlay');
   showOverlay('lockSeqOverlay'); renderLockSeqInto();
 }
 function closeLockSeq(){ ui.lockSeq = null; hideOverlay('lockSeqOverlay'); }
+function lockStepIndex(id){ return LOCK_STEPS.findIndex(function(s){ return s[0]===id; }); }
+function lockPrepDone(){ const s = ui.lockSeq; return arr(state.focus.prepItems).every(function(x){ return s.prep.indexOf(x.id)>=0; }); }
+// moving forward: never past Set up until every box is ticked
+function lockGoTo(i){
+  const s = ui.lockSeq, cur = lockStepIndex(s.step), prep = lockStepIndex('prep');
+  lockReadForm();
+  if(i > cur && cur>=prep && !lockPrepDone()){ lockDeny(); return; }
+  if(i > prep && cur < prep && !lockPrepDone()) i = prep;
+  if(i > s.maxStep + 1) i = s.maxStep + 1;
+  s.step = LOCK_STEPS[Math.max(0, Math.min(LOCK_STEPS.length-1, i))][0];
+  s.maxStep = Math.max(s.maxStep, lockStepIndex(s.step));
+  s.denied = false;
+  playStep(lockStepIndex(s.step));
+  renderLockSeqInto();
+}
+function lockDeny(){
+  const s = ui.lockSeq; s.denied = true; playDeny(); renderLockSeqInto();
+  const box = document.querySelector('#lockSeqOverlay .ls-checks');
+  if(box){ box.classList.remove('is-shake'); void box.offsetWidth; box.classList.add('is-shake'); }
+}
 ACTIONS.closeLockSeq = function(){ closeLockSeq(); };
-ACTIONS.lockStep = function(el, e, id){ lockReadForm(); ui.lockSeq.step = id; renderLockSeqInto(); };
-ACTIONS.lockNext = function(){ lockReadForm(); const i = LOCK_STEPS.findIndex(function(s){ return s[0]===ui.lockSeq.step; }); ui.lockSeq.step = LOCK_STEPS[Math.min(LOCK_STEPS.length-1, i+1)][0]; renderLockSeqInto(); };
-ACTIONS.lockBack = function(){ lockReadForm(); const i = LOCK_STEPS.findIndex(function(s){ return s[0]===ui.lockSeq.step; }); ui.lockSeq.step = LOCK_STEPS[Math.max(0, i-1)][0]; renderLockSeqInto(); };
-ACTIONS.lockPickTask = function(el, e, id){ ui.lockSeq.taskId = id; playTick(); renderLockSeqInto(); };
-ACTIONS.lockNoTask = function(){ ui.lockSeq.taskId = null; renderLockSeqInto(); };
+ACTIONS.lockStep = function(el, e, id){ lockGoTo(lockStepIndex(id)); };
+ACTIONS.lockNext = function(){ lockGoTo(lockStepIndex(ui.lockSeq.step) + 1); };
+ACTIONS.lockBack = function(){ lockGoTo(lockStepIndex(ui.lockSeq.step) - 1); };
+// step 1: Now / Next, and adding to today's lineup
+ACTIONS.lockSetNow = function(el, e, id){ const s = ui.lockSeq; s.nowId = id; if(s.nextId===id) s.nextId = null; playTick(); renderLockSeqInto(); };
+ACTIONS.lockSetNext = function(el, e, id){ const s = ui.lockSeq; s.nextId = s.nextId===id ? null : id; if(s.nowId===id) s.nowId = null; playTick(); renderLockSeqInto(); };
+ACTIONS.lockAddToday = function(el, e, id){
+  const t = lockTaskPick(id); if(!t) return;
+  t.status = 'today'; state.focus.lineupOrder = arr(state.focus.lineupOrder).filter(function(x){ return x!==id; }).concat([id]);
+  persist('tasks'); persist('focus'); playTaskAdded();
+  if(!ui.lockSeq.nowId) ui.lockSeq.nowId = id;
+  renderLockSeqInto();
+};
 ACTIONS.lockNewTask = function(){
   const inp = document.getElementById('lockNewTask'), title = inp ? inp.value.trim() : ''; if(!title) return;
   const t = {id:uid(), title:title, status:'today', priority:'med', clients:['personal'], client:'personal', createdAt:todayStr()};
-  state.tasks.items.push(t); persist('tasks'); playTaskAdded();
-  ui.lockSeq.taskId = t.id; renderLockSeqInto();
+  state.tasks.items.push(t); state.focus.lineupOrder = arr(state.focus.lineupOrder).concat([t.id]);
+  persist('tasks'); persist('focus'); playTaskAdded();
+  if(!ui.lockSeq.nowId) ui.lockSeq.nowId = t.id;
+  renderLockSeqInto();
+  setTimeout(function(){ const i = document.getElementById('lockNewTask'); if(i) i.focus(); }, 20);
 };
+// step 2: how you'll work
+ACTIONS.lockMethod = function(el, e, id){ const s = ui.lockSeq; if(!LOCK_METHODS[id]) return; s.method = id; playTick(); renderLockSeqInto(); };
 ACTIONS.lockLength = function(el){ const s = ui.lockSeq; s.custom = false; s.minutes = el.dataset.min==='open' ? null : Number(el.dataset.min); playTick(); renderLockSeqInto(); };
 ACTIONS.lockCustom = function(){ ui.lockSeq.custom = true; renderLockSeqInto(); setTimeout(function(){ const i = document.getElementById('lockCustomMin'); if(i){ i.focus(); i.select(); } }, 20); };
-ACTIONS.lockPrep = function(el, e, id){ const p = ui.lockSeq.prep, i = p.indexOf(id); if(i>=0) p.splice(i, 1); else { p.push(id); playTick(); } renderLockSeqInto(); };
+// step 3
+ACTIONS.lockPrep = function(el, e, id){ const s = ui.lockSeq, p = s.prep, i = p.indexOf(id); if(i>=0) p.splice(i, 1); else { p.push(id); playStep(Math.min(5, p.length)); } if(lockPrepDone()) s.denied = false; renderLockSeqInto(); };
 ACTIONS.lockGo = function(){ lockReadForm(); lockGo(); };
 ACTIONS.lockNow = function(){ lockReadForm(); lockGo(); };
 function lockReadForm(){
@@ -18010,25 +18244,99 @@ function lockReadForm(){
   const c = document.getElementById('lockCustomMin');
   if(c && s.custom){ const v = Math.round(Number(c.value)); if(v>0) s.minutes = Math.min(600, v); }
 }
-function lockGo(){
-  const s = ui.lockSeq; if(!s) return;
-  const t = lockTaskPick(s.taskId);
-  if(t && t.status==='backlog'){ t.status = 'today'; persist('tasks'); }
-  ui.stagedTaskId = t ? t.id : null;
-  state.focus.lastLockMinutes = s.minutes || null;
-  closeLockSeq();
-  startFocus(s.minutes || null);
-  if(!state.focus.activeSession) return;
-  playLockIn(); lockFlash(t);
+function lockPlannedMinutes(s){
+  const m = LOCK_METHODS[s.method];
+  if(s.method==='block') return s.minutes || null;
+  if(m.rounds) return m.rounds * m.work;
+  return null;
 }
+function lockGo(){
+  const s = ui.lockSeq; if(!s || ui.lockStarting) return;
+  const t = lockTaskPick(s.nowId), nx = lockTaskPick(s.nextId);
+  [t, nx].forEach(function(x){ if(x && x.status==='backlog'){ x.status = 'today'; } });
+  persist('tasks');
+  if(nx){ state.focus.nextTaskId = nx.id; }
+  state.focus.lastLock = {method:s.method, minutes:s.minutes};
+  state.focus.lastLockMinutes = s.minutes || null;
+  persist('focus');
+  const method = s.method, planned = lockPlannedMinutes(s);
+  closeLockSeq();
+  // the stamp plays first; the clock starts when it's done
+  ui.lockStarting = true;
+  playLockIn(); lockFlash(t, method);
+  setTimeout(function(){
+    ui.lockStarting = false;
+    ui.stagedTaskId = t ? t.id : null;
+    if(nx){ state.focus.nextTaskId = nx.id; }
+    startFocus(planned);
+    const as = state.focus.activeSession; if(!as) return;
+    as.method = {id:method, taskId:t ? t.id : null};
+    as.round = 1; as.segStart = 0;
+    persist('focus'); renderView();
+  }, LOCK_FLASH_MS);
+}
+const LOCK_FLASH_MS = 1500;
 // a short "Locked in" stamp over the page as it starts
-function lockFlash(t){
+function lockFlash(t, method){
+  const m = LOCK_METHODS[method];
   const d = document.createElement('div');
   d.className = 'lock-flash';
-  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#128274; Locked in</div>'+(t ? '<div class="lf-t">'+escapeHtml(t.title)+'</div>' : '');
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#128274; Locked in</div>'+(t ? '<div class="lf-t">'+escapeHtml(t.title)+'</div>' : '')+(m && method!=='block' ? '<div class="lf-m">'+m.icon+' '+m.label+'</div>' : '');
   document.body.appendChild(d);
-  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 1700);
+  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 1900);
 }
+// locking out gets its own stamp: what you just put in
+function lockOutFlash(minutes, done){
+  const d = document.createElement('div');
+  d.className = 'lock-flash is-out';
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#128275; Locked out</div><div class="lf-t">'+fmtDurationLabel(minutes)+' of deep work'+(done ? ' &middot; '+done+' task'+(done===1?'':'s')+' done' : '')+'</div>';
+  document.body.appendChild(d);
+  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 2100);
+}
+// ---- the methods while you're locked in: breaks come and go on their own ----
+function checkMethodTimer(){
+  const as = state.focus && state.focus.activeSession;
+  if(!as || !as.method || as.onBreak) return;
+  const m = LOCK_METHODS[as.method.id]; if(!m || !m.work) return;
+  const worked = Date.now() - as.startedAt;
+  if(worked - (as.segStart||0) < m.work*60000) return;
+  const round = as.round || 1;
+  if(m.rounds && round >= m.rounds) return; // the last round ends the session (Time's up)
+  const rest = m.long && m.every && round % m.every===0 ? m.long : m.rest;
+  methodBreak(rest, m.label+' · break '+round);
+  as.round = round + 1;
+  persist('focus');
+}
+function methodBreak(minutes, note){
+  const as = state.focus.activeSession; if(!as || as.onBreak) return;
+  if(!Array.isArray(as.breaks)) as.breaks = [];
+  as.breaks.push({start:Date.now(), note:note, minutes:minutes, auto:true});
+  as.onBreak = true;
+  as.breakStartedAt = Date.now();
+  as.breakEndsAt = Date.now() + minutes*60000;
+  as.frozenElapsedMs = Date.now() - as.startedAt;
+  as.segStart = as.frozenElapsedMs;
+  state.modes.active = {type:'break', startedAt:Date.now(), note:note, linkedFocus:true};
+  if(ui.currentTaskId){ ui.pausedTaskId = ui.currentTaskId; accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
+  ui.pendingCurrentTaskId = null;
+  playRestSound(); pingWrapper();
+  showToast('Round done — '+minutes+' min break. It ends by itself.', {icon:'&#9749;', duration:7000});
+  try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: '+minutes+' min break'); }catch(e){}
+  persist('focus'); persist('modes'); renderView();
+}
+// Flowtime: the break you take is about a fifth of the stretch you just did
+function flowBreakMinutes(){
+  const as = state.focus.activeSession; if(!as || !as.method || as.method.id!=='flow') return null;
+  const worked = (Date.now() - as.startedAt) - (as.segStart||0);
+  return Math.max(5, Math.min(30, Math.round(worked/60000/5/5)*5));
+}
+// "Until it's done": finishing that task offers to lock out
+function methodTaskDone(id){
+  const as = state.focus.activeSession;
+  if(!as || !as.method || as.method.id!=='done' || as.method.taskId!==id) return;
+  showToast('That\'s the one — done.', {icon:'&#9989;', actionLabel:'Lock out', actionAction:'openStopFocus', duration:12000});
+}
+ACTIONS.openStopFocus = function(){ openStopFocus(); };
 document.addEventListener('keydown', function(e){
   if(!ui.lockSeq || !overlayOpen('lockSeqOverlay')) return;
   if(e.key!=='Enter') return;
@@ -18040,92 +18348,270 @@ document.addEventListener('keydown', function(e){
   if(ui.lockSeq.step==='why') ACTIONS.lockGo(); else ACTIONS.lockNext();
 });
 document.addEventListener('input', function(e){ if(e.target && e.target.id==='lockSearch' && ui.lockSeq){ ui.lockSeq.search = e.target.value; clearTimeout(ui._lockT); ui._lockT = setTimeout(renderLockSeqInto, 120); } });
+// drag to reorder today's lineup inside step 1
+document.addEventListener('dragstart', function(e){
+  const r = e.target.closest && e.target.closest('.ls-row'); if(!r || !ui.lockSeq) return;
+  ui.lockSeq.dragId = r.dataset.id; e.dataTransfer.effectAllowed = 'move';
+  try{ e.dataTransfer.setData('text/x-lock', r.dataset.id); }catch(err){}
+  const n = r.querySelector('.wd-num'), t = r.querySelector('.wd-title');
+  dragGhost(e, t ? t.textContent : '', {num: n ? n.textContent : null, src: r});
+});
+document.addEventListener('dragover', function(e){ if(ui.lockSeq && ui.lockSeq.dragId && e.target.closest && e.target.closest('.ls-row')) e.preventDefault(); });
+document.addEventListener('drop', function(e){
+  const r = e.target.closest && e.target.closest('.ls-row'); if(!r || !ui.lockSeq || !ui.lockSeq.dragId) return;
+  e.preventDefault();
+  const id = ui.lockSeq.dragId, rect = r.getBoundingClientRect(); ui.lockSeq.dragId = null;
+  if(id===r.dataset.id) return;
+  const ids = lockLineup().map(function(t){ return t.id; }).filter(function(x){ return x!==id; });
+  let at = ids.indexOf(r.dataset.id); if(e.clientY > rect.top + rect.height/2) at++;
+  ids.splice(at, 0, id);
+  state.focus.lineupOrder = ids; persist('focus'); playDrop(); renderLockSeqInto();
+});
 
 function lockLenLabel(m){ return m ? (m>=60 ? (m%60 ? Math.floor(m/60)+'h '+(m%60)+'m' : (m/60)+'h') : m+'m') : 'Open'; }
 function lockTaskHtml(){
-  const s = ui.lockSeq, pick = lockTaskPick(s.taskId);
-  const lineup = lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); }));
+  const s = ui.lockSeq, lineup = lockLineup();
   const q = (s.search||'').toLowerCase();
   const pool = sortByPriorityAndDeadline(state.tasks.items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea && (!q || t.title.toLowerCase().indexOf(q)>=0); })).slice(0, 10);
   return '<div class="ls-task">'+
-    '<div class="ls-pick'+(pick?' has-task':'')+'">'+
-      '<div class="ls-pick-k">'+(pick ? 'You\'re locking in on' : 'No task picked')+(pick ? '<button class="ls-notask" data-action="lockNoTask">Just the clock</button>' : '')+'</div>'+
-      '<div class="ls-pick-t">'+(pick ? priorityTag(pick.priority)+'<span>'+escapeHtml(pick.title)+'</span>' : '<span class="ls-dim">Just the clock — pick one below, or go without.</span>')+'</div>'+
+    (lineup.length ? '<ol class="wd-list ls-list">'+lineup.slice(0, 10).map(function(t, i){
+      const isNow = t.id===s.nowId, isNext = t.id===s.nextId;
+      return '<li class="wd-row ls-row'+(isNow?' is-now':'')+(isNext?' is-next':'')+'" draggable="true" data-id="'+t.id+'" style="animation-delay:'+(i*45)+'ms">'+
+        '<span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+
+        '<button class="ls-row-main" data-action="lockSetNow" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span class="wd-title">'+escapeHtml(t.title)+'</span></button>'+
+        '<span class="ls-slots"><button class="ls-slot ls-slot-now'+(isNow?' is-on':'')+'" data-action="lockSetNow" data-id="'+t.id+'">Now</button>'+
+          '<button class="ls-slot ls-slot-next'+(isNext?' is-on':'')+'" data-action="lockSetNext" data-id="'+t.id+'">Next</button></span></li>';
+    }).join('')+'</ol>' : '<div class="wd-empty">Today\'s lineup is empty.</div>')+
+    '<div class="ls-add">'+
+      '<div class="wd-add"><input class="input" id="lockNewTask" placeholder="+ Add a task to today"><button class="btn btn-sm" data-action="lockNewTask">Add</button></div>'+
+      (pool.length || q ? '<div class="ls-pool-h"><span class="wd-k" style="margin:0;">From your list</span><input class="input ls-search" id="lockSearch" placeholder="Search" value="'+escapeHtml(s.search||'')+'"></div>'+
+        '<div class="wd-pool">'+(pool.length ? pool.map(function(t){ return '<button class="wd-chip ls-chip" data-action="lockAddToday" data-id="'+t.id+'" title="Add to today">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span><b>+</b></button>'; }).join('') : '<span class="kpi-sub">No match.</span>')+'</div>' : '')+
     '</div>'+
-    (lineup.length ? '<div class="wd-k">Today\'s lineup</div><ol class="wd-list ls-list">'+lineup.slice(0, 8).map(function(t, i){
-      const on = t.id===s.taskId;
-      return '<li class="wd-row ls-row'+(on?' is-picked':'')+'" data-action="lockPickTask" data-id="'+t.id+'"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="wd-title">'+escapeHtml(t.title)+'</span><span class="ls-tick">'+(on?'&#10003;':'')+'</span></li>';
-    }).join('')+'</ol>' : '')+
-    '<div class="wd-add"><input class="input" id="lockNewTask" placeholder="+ Something new (Enter)"><button class="btn btn-sm" data-action="lockNewTask">Add</button></div>'+
-    (pool.length || q ? '<div class="wd-k" style="margin-top:16px;">From your list</div><input class="input wd-search" id="lockSearch" placeholder="Search…" value="'+escapeHtml(s.search||'')+'">'+
-      '<div class="wd-pool">'+(pool.length ? pool.map(function(t){ return '<button class="wd-chip ls-chip'+(t.id===s.taskId?' is-picked':'')+'" data-action="lockPickTask" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span><b>'+(t.id===s.taskId?'&#10003;':'+')+'</b></button>'; }).join('') : '<span class="kpi-sub">No match.</span>')+'</div>' : '')+
   '</div>';
 }
-function lockLengthHtml(){
-  const s = ui.lockSeq, m = s.minutes;
-  const ends = m ? fmtTimeShort(Date.now() + m*60000) : null;
+function lockPreviewHtml(id){
+  const m = LOCK_METHODS[id];
+  if(id==='block') return '';
+  let segs = [];
+  if(m.rounds){ for(let i=1;i<=m.rounds;i++){ segs.push(['w', m.work]); if(i<m.rounds) segs.push(['r', m.long && i%m.every===0 ? m.long : m.rest]); } }
+  else if(m.work){ for(let i=0;i<3;i++){ segs.push(['w', m.work]); segs.push(['r', m.rest]); } segs.push(['more', m.work*0.6]); }
+  else if(id==='flow') segs = [['w', 70, 'grad'], ['r', 14], ['w', 45, 'grad'], ['r', 9], ['more', 30]];
+  else segs = [['w', 100, 'grad'], ['flag', 6]];
+  const total = segs.reduce(function(a, x){ return a + x[1]; }, 0);
+  return '<div class="ls-preview">'+segs.map(function(x){ return '<i class="lsp-'+x[0]+(x[2]?' is-'+x[2]:'')+'" style="flex:'+(x[1]/total).toFixed(3)+'">'+(x[0]==='flag' ? '&#9873;' : '')+'</i>'; }).join('')+'</div>';
+}
+function lockMethodHtml(){
+  const s = ui.lockSeq, m = s.minutes, planned = lockPlannedMinutes(s);
   const tile = function(v, big, small){ const on = !s.custom && (v==='open' ? !m : m===v); return '<button class="ls-len'+(on?' is-on':'')+'" data-action="lockLength" data-min="'+v+'"><b>'+big+'</b><span>'+small+'</span></button>'; };
-  return '<div class="ls-length">'+
-    '<div class="ls-lens">'+
-      tile(25, '25', 'min · sprint')+tile(50, '50', 'min · classic')+tile(90, '90', 'min · deep')+tile(120, '2', 'hours')+tile(180, '3', 'hours')+tile('open', '&infin;', 'open-ended')+
-    '</div>'+
-    '<div class="ls-custom">'+(s.custom ? '<input class="input ls-custom-in" type="number" min="5" max="600" step="5" id="lockCustomMin" value="'+(m||60)+'"><span>minutes</span>' : '<button class="btn btn-ghost btn-sm" data-action="lockCustom">Custom length…</button>')+'</div>'+
-    '<div class="ls-ends">'+(m ? 'Done at <b>'+ends+'</b> &middot; '+lockLenLabel(m) : 'No finish line — stop when you\'re done.')+'</div>'+
+  let total = planned;
+  const mm = LOCK_METHODS[s.method];
+  if(mm.rounds) total = mm.rounds*mm.work + (mm.rounds-1)*mm.rest;
+  return '<div class="ls-method">'+
+    '<div class="ls-methods">'+LOCK_METHOD_ORDER.map(function(id, i){ const x = LOCK_METHODS[id]; return '<button class="ls-mcard'+(s.method===id?' is-on':'')+'" data-action="lockMethod" data-id="'+id+'" style="animation-delay:'+(i*40)+'ms"><span class="ls-mi">'+x.icon+'</span><b>'+x.label+'</b><span>'+x.sub+'</span></button>'; }).join('')+'</div>'+
+    (s.method==='block' ? '<div class="ls-lens">'+
+        tile(25, '25', 'min')+tile(50, '50', 'min')+tile(90, '90', 'min')+tile(120, '2', 'hours')+tile(180, '3', 'hours')+tile('open', '&infin;', 'open')+
+      '</div>'+
+      '<div class="ls-custom">'+(s.custom ? '<input class="input ls-custom-in" type="number" min="5" max="600" step="5" id="lockCustomMin" value="'+(m||60)+'"><span>min</span>' : '<button class="btn btn-ghost btn-sm" data-action="lockCustom">Custom</button>')+'</div>'
+      : lockPreviewHtml(s.method))+
+    '<div class="ls-ends">'+(total ? 'Done at <b>'+fmtTimeShort(Date.now() + total*60000)+'</b>' : '&nbsp;')+'</div>'+
   '</div>';
 }
 function lockPrepHtml(){
   const s = ui.lockSeq, items = arr(state.focus.prepItems), me = nextMeetingEventToday();
   const ready = items.filter(function(x){ return s.prep.indexOf(x.id)>=0; }).length;
   return '<div class="ls-prep">'+
-    (items.length ? '<div class="ls-checks">'+items.map(function(x){ const on = s.prep.indexOf(x.id)>=0; return '<button class="ls-check'+(on?' is-on':'')+'" data-action="lockPrep" data-id="'+x.id+'"><span class="ls-box">'+(on?'&#10003;':'')+'</span><span>'+escapeHtml(x.label)+'</span></button>'; }).join('')+'</div>'+
-      '<div class="ls-ready'+(ready===items.length?' is-all':'')+'">'+(ready===items.length ? '&#10003; All set.' : ready+' of '+items.length+' ready')+'</div>'
-      : '<div class="wd-empty">No set-up checklist yet — add one in Settings (phone away, water, door shut…).</div>')+
+    (items.length ? '<div class="ls-checks'+(s.denied?' is-denied':'')+'">'+items.map(function(x, i){ const on = s.prep.indexOf(x.id)>=0; return '<button class="ls-check'+(on?' is-on':'')+'" data-action="lockPrep" data-id="'+x.id+'" style="animation-delay:'+(i*60)+'ms"><span class="ls-box">'+(on?'&#10003;':'')+'</span><span>'+escapeHtml(x.label)+'</span></button>'; }).join('')+'</div>'+
+      '<div class="ls-ready'+(ready===items.length?' is-all':'')+(s.denied?' is-denied':'')+'">'+(ready===items.length ? '&#10003; Ready.' : s.denied ? 'Tick every box first.' : ready+' / '+items.length)+'</div>'
+      : '<div class="wd-empty">No checklist yet. <a href="#" data-action="goToFocusSettings">Add one</a></div>')+
     (me ? '<div class="ls-call"><span>&#128222; '+escapeHtml(me.title)+(me.time ? ' at '+fmt12Hour(me.time) : '')+'</span><button class="btn btn-good btn-sm" data-action="joinCall" data-url="'+escapeHtml(me.meetingLink)+'">Join call</button></div>' : '')+
   '</div>';
 }
 function lockWhyHtml(){
-  const s = ui.lockSeq, pick = lockTaskPick(s.taskId);
+  const s = ui.lockSeq, pick = lockTaskPick(s.nowId), mm = LOCK_METHODS[s.method];
   const toward = arr(state.focus.motivations && state.focus.motivations.toward), away = arr(state.focus.motivations && state.focus.motivations.away);
   const target = state.standards.deepWorkTargetMinutes || 180, deep = deepWorkMinutesTodayLive();
-  const after = s.minutes ? deep + s.minutes : null;
+  const planned = lockPlannedMinutes(s), after = planned ? deep + planned : null;
   const pct = Math.min(100, deep/target*100), pct2 = after ? Math.min(100, after/target*100) : pct;
   return '<div class="ls-why">'+
     '<div class="ls-cols">'+
       '<div class="ls-col is-get"><div class="ls-col-k">Getting</div>'+(toward.length ? toward.map(function(m){ return '<div class="ls-m">'+escapeHtml(m.text)+'</div>'; }).join('') : '<div class="ls-dim">Add these in Settings.</div>')+'</div>'+
       '<div class="ls-col is-avoid"><div class="ls-col-k">Avoiding</div>'+(away.length ? away.map(function(m){ return '<div class="ls-m">'+escapeHtml(m.text)+'</div>'; }).join('') : '<div class="ls-dim">Add these in Settings.</div>')+'</div>'+
     '</div>'+
-    '<div class="ls-bar"><div class="ls-bar-k"><span>Deep work today</span><span>'+fmtHours(deep)+(after ? ' &rarr; <b>'+fmtHours(after)+'</b>' : '')+' of '+fmtHours(target)+'</span></div>'+
+    '<div class="ls-bar"><div class="ls-bar-k"><span>Deep work today</span><span>'+fmtHours(deep)+(after ? ' &rarr; <b>'+fmtHours(after)+'</b>' : '')+' / '+fmtHours(target)+'</span></div>'+
       '<div class="ls-bar-t"><i class="ls-bar-now" style="width:'+pct.toFixed(1)+'%"></i><i class="ls-bar-add" style="left:'+pct.toFixed(1)+'%;width:'+Math.max(0, pct2-pct).toFixed(1)+'%"></i></div></div>'+
-    '<button class="ls-go" data-action="lockGo"><span class="ls-go-i">&#128274;</span><span><b>LOCK IN</b><small>'+(pick ? escapeHtml(pick.title)+' &middot; ' : '')+lockLenLabel(s.minutes)+'</small></span></button>'+
+    '<div class="ls-go-wrap"><button class="ls-go" data-action="lockGo"><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>'+
+      '<div class="ls-go-sub">'+(pick ? escapeHtml(pick.title)+' &middot; ' : '')+(s.method==='block' ? lockLenLabel(s.minutes) : mm.label)+'</div></div>'+
   '</div>';
 }
 function lockSeqHtml(){
   const s = ui.lockSeq; if(!s) return '';
-  const i = LOCK_STEPS.findIndex(function(x){ return x[0]===s.step; });
-  const titles = {task:'What are we knocking out?', length:'How long are you in for?', prep:'Set the room up.', why:'Remember why.'};
-  const body = s.step==='length' ? lockLengthHtml() : s.step==='prep' ? lockPrepHtml() : s.step==='why' ? lockWhyHtml() : lockTaskHtml();
-  const pick = lockTaskPick(s.taskId);
+  const i = lockStepIndex(s.step), prep = lockStepIndex('prep');
+  const titles = {task:'What are we knocking out?', method:'How are you working?', prep:'Set the room up.', why:'Remember why.'};
+  const body = s.step==='method' ? lockMethodHtml() : s.step==='prep' ? lockPrepHtml() : s.step==='why' ? lockWhyHtml() : lockTaskHtml();
+  const reachable = function(k){ return k <= s.maxStep + 1 && (k <= prep || lockPrepDone() || k <= i); };
   return '<div class="wd ls">'+
-    '<div class="wd-top"><span class="ls-lock">&#128274;</span><span class="wd-brand ls-brand">Lock in</span>'+
-      '<div class="wd-steps">'+LOCK_STEPS.map(function(x, k){ return '<button class="wd-step'+(k===i?' is-on':'')+(k<i?' is-past':'')+'" data-action="lockStep" data-id="'+x[0]+'"><span>'+(k+1)+'</span>'+x[1]+'</button>'; }).join('')+'</div>'+
-      '<button class="ls-now" data-action="lockNow" title="Start right now with what\'s picked (⌘↵)">&#9889; Lock in now</button>'+
+    '<div class="wd-top">'+
+      '<div class="wd-steps">'+LOCK_STEPS.map(function(x, k){ return '<button class="wd-step'+(k===i?' is-on':'')+(k<i?' is-past':'')+(reachable(k)?'':' is-locked')+'" data-action="lockStep" data-id="'+x[0]+'"'+(reachable(k)?'':' disabled')+'><span>'+(k+1)+'</span>'+x[1]+'</button>'; }).join('')+'</div>'+
+      '<button class="ls-now'+(s.step==='why' ? ' is-hidden' : '')+'" data-action="lockNow" title="Lock in right now with what\'s picked (⌘↵)"'+(s.step==='why' ? ' tabindex="-1"' : '')+'>&#128274; Lock in</button>'+
       '<button class="wd-close" data-action="closeLockSeq" title="Close (Esc)">&#10005;</button></div>'+
-    '<div class="wd-inner" data-key="ls-'+s.step+'"><h2 class="wd-title-h">'+titles[s.step]+'</h2>'+body+'</div>'+
+    '<div class="wd-inner ls-inner" data-key="ls-'+s.step+'"><div class="ls-stage"><h2 class="wd-title-h">'+titles[s.step]+'</h2>'+body+'</div></div>'+
     '<div class="wd-foot">'+
-      (i>0 ? '<button class="btn btn-ghost" data-action="lockBack">&larr; Back</button>' : '<span></span>')+
-      (s.step==='why' ? '<span class="ls-sum">'+(pick ? escapeHtml(pick.title) : 'No task')+' &middot; '+lockLenLabel(s.minutes)+'</span>'
-        : '<span class="row" style="gap:10px;align-items:center;"><span class="ls-sum">'+(pick ? escapeHtml(pick.title) : 'No task')+' &middot; '+lockLenLabel(s.minutes)+'</span><button class="btn btn-primary" data-action="lockNext">Next &rarr;</button></span>')+
+      (i>0 ? '<button class="btn btn-ghost ls-back" data-action="lockBack">&larr; Back</button>' : '<span></span>')+
+      (s.step==='why' ? '<span></span>' : '<button class="ls-next" data-action="lockNext">Next <span>&rarr;</span></button>')+
     '</div>'+
   '</div>';
 }
 function renderLockSeqInto(){ const el = document.getElementById('lockSeqContent'); if(el) morphInto(el, lockSeqHtml(), {form:true}); }
 registerModal('lockSeqOverlay', renderLockSeqInto);
+ACTIONS.goToFocusSettings = function(){ closeLockSeq(); ui.view = 'settings'; ui.settingsTab = 'focus'; renderView(); };
+// ============ GOOD MORNING: THE START-UP ============
+// After "I'm up", the morning builds itself slowly, one piece at a time, with a quiet line of
+// narration typing above it — the time and weather, your note from last night, a line to carry,
+// the vision board, today, your goals, yesterday, a few headlines. Then two ways forward:
+// Start my morning (life first: teeth, breakfast…) or Clock in (the plan of attack, then Lock in).
+// Clock out (Focus / Today) is the other end of the work day.
+
+// ---- a line for the day (chosen by date, so it's the same all day) ----
+const MORNING_QUOTES = [
+  ['We suffer more often in imagination than in reality.', 'Seneca'],
+  ['The impediment to action advances action. What stands in the way becomes the way.', 'Marcus Aurelius'],
+  ['Waste no more time arguing about what a good man should be. Be one.', 'Marcus Aurelius'],
+  ['First say to yourself what you would be; and then do what you have to do.', 'Epictetus'],
+  ['No man is free who is not master of himself.', 'Epictetus'],
+  ['Begin at once to live, and count each separate day as a separate life.', 'Seneca'],
+  ['How we spend our days is, of course, how we spend our lives.', 'Annie Dillard'],
+  ['Amateurs sit and wait for inspiration, the rest of us just get up and go to work.', 'Stephen King'],
+  ['Discipline equals freedom.', 'Jocko Willink'],
+  ['Be so good they can’t ignore you.', 'Steve Martin'],
+  ['Hard choices, easy life. Easy choices, hard life.', 'Jerzy Gregorek'],
+  ['Make each day your masterpiece.', 'John Wooden'],
+  ['Slow is smooth, and smooth is fast.', 'Navy SEAL saying'],
+  ['Small deeds done are better than great deeds planned.', 'Peter Marshall'],
+  ['Well done is better than well said.', 'Benjamin Franklin'],
+  ['Lost time is never found again.', 'Benjamin Franklin'],
+  ['The sun himself is weak when he first rises, and gathers strength and courage as the day gets on.', 'Charles Dickens'],
+  ['Write it on your heart that every day is the best day in the year.', 'Ralph Waldo Emerson'],
+  ['The best time to plant a tree was twenty years ago. The second best time is now.', 'Proverb'],
+  ['Stay hungry. Stay foolish.', 'Steve Jobs'],
+  ['Everything is figureoutable.', 'Marie Forleo'],
+  ['The obstacle is the way.', 'Ryan Holiday'],
+  ['We are what we repeatedly do. Excellence, then, is not an act, but a habit.', 'Will Durant'],
+  ['Motivation is what gets you started. Habit is what keeps you going.', 'Jim Ryun'],
+  ['You could leave life right now. Let that determine what you do and say and think.', 'Marcus Aurelius']
+];
+function quoteOfDay(){
+  const d = new Date(), start = new Date(d.getFullYear(), 0, 0);
+  const day = Math.floor((d - start)/86400000);
+  return MORNING_QUOTES[day % MORNING_QUOTES.length];
+}
+// ---- headlines (through the launcher; hidden when it can't get them) ----
+function morningNewsOn(){ return wakeCfg().news!==false; }
+async function loadMorningNews(){
+  if(!morningNewsOn()) return;
+  const today = todayStr();
+  if(ui.morningNews && ui.morningNews.date===today && (ui.morningNews.items || ui.morningNews.loading)) return;
+  ui.morningNews = {date:today, loading:true, items:null};
+  let items = null;
+  try{
+    const ctl = new AbortController(), tm = setTimeout(function(){ ctl.abort(); }, 9000);
+    const res = await fetch(WAKE_HELPER+'news', {cache:'no-store', signal:ctl.signal}); clearTimeout(tm);
+    if(res.ok){
+      const xml = new DOMParser().parseFromString(await res.text(), 'text/xml');
+      const chan = xml.querySelector('channel > title');
+      const src = chan ? chan.textContent.replace(/\s*[:\-|].*$/, '').trim() : '';
+      items = Array.prototype.slice.call(xml.querySelectorAll('item')).slice(0, 4).map(function(it){
+        const t = it.querySelector('title'), l = it.querySelector('link');
+        return {title:(t ? t.textContent : '').trim(), link:(l ? l.textContent : '').trim(), src:src};
+      }).filter(function(x){ return x.title; });
+    }
+  }catch(e){}
+  ui.morningNews = {date:today, loading:false, items:items && items.length ? items : null};
+  if(ui.morningNews.items && ui.wakeMode==='brief' && overlayOpen('wakeOverlay')){
+    // it arrived after the page started building: give it its moment instead of popping in
+    ui.briefNewsAt = Date.now();
+    renderWakeOverlayInto();
+  }
+}
+ACTIONS.openNewsLink = function(el){ const u = el.dataset.url; if(!/^https?:\/\//.test(u||'')) return; helperFetch(WAKE_HELPER+'open?b=default&u='+hexUtf8(u), 3000).then(function(ok){ if(!ok) window.open(u, '_blank'); }); };
+// ---- the narration: one line at a time, typed out ----
+let briefVoiceTimer = null;
+function briefVoiceRun(){
+  clearInterval(briefVoiceTimer);
+  briefVoiceTimer = setInterval(function(){
+    const el = document.getElementById('brVoice');
+    if(!el || ui.wakeMode!=='brief' || !overlayOpen('wakeOverlay')){ if(!overlayOpen('wakeOverlay')) clearInterval(briefVoiceTimer); return; }
+    const lines = ui.briefLines || [], t = Date.now() - (ui.briefT0||0);
+    let cur = null; lines.forEach(function(l){ if(t >= l.at) cur = l; });
+    const txt = cur ? (ui.briefSkipped ? cur.text : cur.text.slice(0, Math.max(0, Math.floor((t - cur.at)/32)))) : '';
+    if(el.textContent!==txt) el.textContent = txt;
+    const wrap = el.parentNode; if(wrap) wrap.classList.toggle('is-typing', !!cur && txt.length < cur.text.length);
+  }, 32);
+}
+ACTIONS.briefSkip = function(){ ui.wakeIntroDone = true; ui.briefSkipped = true; renderWakeOverlayInto(); };
+
+// ---- Clock in: the plan of attack, then Lock in ----
+function clockIn(){
+  const m = state.modes.active;
+  if(m && (m.morning || (m.type==='offtime' && !m.sleep))) finishActiveMode(true);
+  if(typeof applyNightPlanAuto==='function') applyNightPlanAuto();
+  ui.view = 'today'; renderView();
+  ui.planReveal = {at:Date.now()};
+  showOverlay('planOverlay'); renderPlanRevealInto();
+  playStep(0); setTimeout(function(){ playStep(2); }, 260); setTimeout(function(){ playStep(4); }, 520);
+}
+ACTIONS.clockIn = function(){ clockIn(); };
+ACTIONS.closePlanReveal = function(){ ui.planReveal = null; hideOverlay('planOverlay'); renderView(); };
+ACTIONS.planLockIn = function(el, e, id){ ui.planReveal = null; hideOverlay('planOverlay'); if(id) setNextUp(id); renderView(); openLockInChooser(); };
+function renderPlanReveal(){
+  if(!ui.planReveal) return '';
+  const plan = todaysPlan().filter(function(t){ return t.status!=='done'; }).slice(0, 8), first = plan[0];
+  const today = todayStr();
+  const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
+  const deadlines = state.tasks.items.filter(function(t){ return t.deadline===today && t.status!=='done'; });
+  const line = plan.length ? (plan.length===1 ? 'One thing today.' : plan.length+' things today.')+' First up: '+first.title+'.' : 'Nothing planned yet. Pick your first move.';
+  return '<div class="pr">'+
+    '<div class="pr-top"><span class="pr-badge">&#128339; Clocked in</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
+      '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
+    '<div class="pr-inner">'+
+      '<div class="pr-k">Plan of attack</div>'+
+      '<h2 class="pr-line">'+escapeHtml(line)+'</h2>'+
+      (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(500 + i*220)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">due today</span>' : '')+'</li>'; }).join('')+'</ol>' : '')+
+      ((events.length || deadlines.length) ? '<div class="pr-cal" style="animation-delay:'+(600 + plan.length*220)+'ms">'+events.map(function(e){ return '<span><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</span>'; }).join('')+'</div>' : '')+
+      '<div class="pr-cta" style="animation-delay:'+(800 + plan.length*220)+'ms">'+
+        (first ? '<button class="ls-go pr-go" data-action="planLockIn" data-id="'+first.id+'"><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button><div class="ls-go-sub">on &ldquo;'+escapeHtml(first.title)+'&rdquo;</div>'
+          : '<button class="ls-go pr-go" data-action="planLockIn"><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>')+
+        '<button class="pr-later" data-action="closePlanReveal">Not yet</button>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+function renderPlanRevealInto(){ const el = document.getElementById('planContent'); if(el) morphInto(el, renderPlanReveal()); }
+registerModal('planOverlay', renderPlanRevealInto);
+
+// ---- Clock out: done working for the day ----
+function clockOutFlash(){
+  const d = document.createElement('div');
+  d.className = 'lock-flash is-out is-clock';
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#127937; Clocked out</div><div class="lf-t">'+fmtHours(deepWorkMinutesTodayLive())+' of deep work today</div>';
+  document.body.appendChild(d);
+  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 2100);
+}
+ACTIONS.clockOut = function(){
+  if(state.focus.activeSession){ showToast('Lock out of your session first.', {icon:'&#128274;'}); return; }
+  const prev = state.modes.active ? Object.assign({}, state.modes.active) : null;
+  startMode('offtime', {clockedOut:true, note:'Clocked out'});
+  ui.undoMode = {prev:prev, at:Date.now()};
+  playLockOut(); clockOutFlash();
+  showToast('Done for the day.', {icon:'&#127937;', actionLabel:'Undo', actionAction:'undoQuickMode', duration:6000});
+};
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
   if(!el) return;
   const a = el.dataset.action;
   const id = el.dataset.id;
+  // moving between pages and tabs plays a soft note from the app's scale
+  if((a==='nav' && el.dataset.view!==ui.view) || (/Tab$/.test(a) && !el.classList.contains('active') && !el.classList.contains('is-on'))) playNav();
   switch(a){
     case 'nav': {
       ui.boardReturnTo = null;
@@ -18528,11 +19014,16 @@ document.body.addEventListener('dragstart', function(e){
   const card = e.target.closest && e.target.closest('[draggable="true"][data-task-id]');
   if(!card) return;
   e.dataTransfer.setData('text/plain', card.dataset.taskId);
+  // where it came from (Now / Up next), so dropping it back on the list clears that slot
+  ui.dragFrom = card.dataset.from || null;
   e.dataTransfer.effectAllowed = 'move';
+  const dt = state.tasks.items.find(function(x){ return x.id===card.dataset.taskId; });
+  const num = card.querySelector('.tl-num, .ko-num');
+  dragGhost(e, dt ? dt.title : '', {num: num ? num.textContent : null, priority: dt && dt.priority, src: card});
   // light up where it can go (Now / Up next / the list) while it's in the air
   document.body.classList.add('is-dragging-task');
 });
-document.body.addEventListener('dragend', function(){ document.body.classList.remove('is-dragging-task'); });
+document.body.addEventListener('dragend', function(){ document.body.classList.remove('is-dragging-task'); setTimeout(function(){ ui.dragFrom = null; }, 0); });
 document.body.addEventListener('dragover', function(e){
   const zone = e.target.closest && e.target.closest('[data-dropzone]');
   if(!zone) return;
@@ -18557,6 +19048,18 @@ document.body.addEventListener('drop', function(e){
   const newZone = zone.dataset.dropzone;
   const t = state.tasks.items.find(function(x){ return x.id===taskId; });
   if(!t) return;
+  const from = ui.dragFrom; ui.dragFrom = null;
+  playDrop();
+  // out of Now / Up next and back onto the list: that slot empties, the task stays on today's list
+  if(from && (newZone==='today' || newZone==='order')){
+    if(from==='now' && ui.currentTaskId===taskId) releaseCurrentTask();
+    if(from==='next'){ if(state.focus.nextTaskId===taskId) state.focus.nextTaskId = null; if(ui.stagedTaskId===taskId) ui.stagedTaskId = null; persist('focus'); }
+    if(newZone==='order'){ const r = zone.getBoundingClientRect(); reorderLineup(taskId, zone.dataset.id, e.clientY > r.top + r.height/2); return; }
+    renderView(); return;
+  }
+  if(from==='now' && newZone==='next'){ if(ui.currentTaskId===taskId) releaseCurrentTask(); dropOnNext(taskId); return; }
+  if(from==='next' && newZone==='next') return;
+  if(from==='now' && newZone==='current') return;
   // Nothing starts timing from a drop: onto Now (locked in) it asks first; onto Up next it just lines it up.
   if(newZone==='current'){ if(t.status==='backlog'){ t.status = 'today'; persist('tasks'); } stagePendingCurrentTask(taskId); return; }
   if(newZone==='next'){ dropOnNext(taskId); return; }
@@ -18907,7 +19410,7 @@ afterRenderHooks.push(function(){
 
 // ============ MOVABLE SIDEBAR TABS ============
 // Drag a sidebar tab up or down to put it where you want it; the order is remembered.
-const NAV_VIEWS = ['today', 'focus', 'business', 'calendar', 'personal', 'settings'];
+const NAV_VIEWS = ['today', 'focus', 'business', 'convos', 'calendar', 'personal', 'settings'];
 function navOrder(){
   const saved = arr(state.profile.navOrder).filter(function(v){ return NAV_VIEWS.indexOf(v)>=0; });
   NAV_VIEWS.forEach(function(v){ if(saved.indexOf(v)<0) saved.push(v); });

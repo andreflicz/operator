@@ -240,6 +240,8 @@ document.addEventListener('dragstart', function(e){
   e.dataTransfer.setData('text/x-crm', card.dataset.crmDrag);
   e.dataTransfer.effectAllowed = 'move';
   card.classList.add('is-dragging');
+  const nm = card.querySelector('.crm-card-name');
+  dragGhost(e, nm ? nm.textContent : '', {color:'#3fbe8e'});
 });
 document.addEventListener('dragend', function(e){
   const card = e.target.closest && e.target.closest('[data-crm-drag]');

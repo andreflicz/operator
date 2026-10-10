@@ -1,7 +1,7 @@
 
 // ============ MOVABLE SIDEBAR TABS ============
 // Drag a sidebar tab up or down to put it where you want it; the order is remembered.
-const NAV_VIEWS = ['today', 'focus', 'business', 'calendar', 'personal', 'settings'];
+const NAV_VIEWS = ['today', 'focus', 'business', 'convos', 'calendar', 'personal', 'settings'];
 function navOrder(){
   const saved = arr(state.profile.navOrder).filter(function(v){ return NAV_VIEWS.indexOf(v)>=0; });
   NAV_VIEWS.forEach(function(v){ if(saved.indexOf(v)<0) saved.push(v); });

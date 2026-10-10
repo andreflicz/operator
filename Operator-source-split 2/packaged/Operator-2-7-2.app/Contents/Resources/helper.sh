@@ -175,7 +175,9 @@ wake_respond() {
   case "$REQ_PATH" in
     /music/play*)
       K=$(param k); Q=$(hexdec "$(param q)")
-      [ -n "$Q" ] && play_music "$Q" "${K:-song}" >/dev/null 2>&1 &
+      # the whole job goes to the background with its output closed, so the answer goes back right
+      # away (otherwise the app timed out, asked again, and the song restarted every second or two)
+      if [ -n "$Q" ]; then play_music "$Q" "${K:-song}" >/dev/null 2>&1 </dev/null & fi
       respond 200 '{"ok":true}' ;;
     /music/stop*) stop_music >/dev/null 2>&1 & respond 200 '{"ok":true}' ;;
     /music/finish*) finish_music >/dev/null 2>&1; respond 200 '{"ok":true}' ;;
@@ -216,7 +218,12 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":3}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":4}' ;;
+    /news*)
+      # a few headlines for the Good morning screen (news sites don't let a page fetch them directly)
+      X=$(curl -s -m 6 -A "Mozilla/5.0 (Macintosh) Operator" "https://feeds.npr.org/1001/rss.xml" 2>/dev/null)
+      case "$X" in *"<item"*) ;; *) X=$(curl -s -m 6 -A "Mozilla/5.0 (Macintosh) Operator" "https://feeds.bbci.co.uk/news/rss.xml" 2>/dev/null) ;; esac
+      case "$X" in *"<item"*) respond 200 "$X" 'application/rss+xml; charset=utf-8' ;; *) respond 502 '{"ok":false}' ;; esac ;;
     # only an alarm ever brings Operator to the front — nothing else (an empty or unknown
     # request used to, which pulled the window back over other apps every few seconds)
     /wake|/wake\?*) wake_front >/dev/null 2>&1 & respond 200 '{"ok":true}' ;;

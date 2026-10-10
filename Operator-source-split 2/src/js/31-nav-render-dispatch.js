@@ -28,6 +28,7 @@ function renderViewInner(){
     case 'personal': html = renderPersonal(); break;
     case 'business': html = renderBusiness(); break;
     case 'settings': html = renderSettings(); break;
+    case 'convos': html = renderConversations(); break;
     default: html = renderToday();
   }
   if(lastRenderedView !== ui.view){

@@ -169,3 +169,19 @@ const RESET_TARGETS = [
   {id:'boards', label:'Vision & journal boards'}
 ];
 
+
+// Dragging shows a small pill under the cursor (a number or a dot + the name) instead of a
+// see-through screenshot of the whole card; the card it came from dims while it's in the air.
+const DRAG_DOT = {high:'#ff6b6b', med:'#e8a23d', low:'#8a90a2'};
+function dragGhost(e, label, opts){
+  opts = opts || {};
+  if(opts.src){ const src = opts.src; src.classList.add('is-drag-src'); src.addEventListener('dragend', function(){ src.classList.remove('is-drag-src'); }, {once:true}); }
+  if(!e.dataTransfer || !e.dataTransfer.setDragImage) return;
+  const g = document.createElement('div');
+  g.className = 'drag-ghost';
+  g.innerHTML = (opts.num ? '<b>'+escapeHtml(String(opts.num))+'</b>' : '<i style="background:'+(opts.color || DRAG_DOT[opts.priority] || 'var(--accent)')+'"></i>')+'<span>'+escapeHtml(String(label||'').slice(0, 42))+'</span>';
+  document.body.appendChild(g);
+  try{ e.dataTransfer.setDragImage(g, 18, 17); }catch(err){}
+  setTimeout(function(){ if(g.parentNode) g.parentNode.removeChild(g); }, 0);
+  try{ if(typeof playDragLift==='function') playDragLift(); }catch(err){}
+}

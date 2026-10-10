@@ -13,10 +13,8 @@ function renderBusiness(){
     '<div class="tab '+(ui.businessTab==='lifecycle'?'active':'')+'" data-action="businessTab" data-tab="lifecycle">Lifecycle</div>'+
     '<div class="tab '+(ui.businessTab==='packages'?'active':'')+'" data-action="businessTab" data-tab="packages">Packages</div>'+
     '<div class="tab '+(ui.businessTab==='finances'?'active':'')+'" data-action="businessTab" data-tab="finances">Finances</div>'+
-    '<div class="tab '+(ui.businessTab==='social'?'active':'')+'" data-action="businessTab" data-tab="social">Social</div>'+
-    '<div class="tab '+(ui.businessTab==='inbox'?'active':'')+'" data-action="businessTab" data-tab="inbox">Inbox'+(inboxUnread() ? '<span class="tab-badge">'+inboxUnread()+'</span>' : '')+'</div>'+
   '</div>'+
-  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : ui.businessTab==='inbox' ? renderInboxTab() : ui.businessTab==='social' ? renderSocialTab() : renderBusinessOverview())+'</div>';
+  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
 }
 // Business → Overview: one card — revenue on top, clients and pipeline side by side.
 function renderBusinessOverview(){

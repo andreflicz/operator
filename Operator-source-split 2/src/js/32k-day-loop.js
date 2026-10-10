@@ -74,7 +74,7 @@ document.addEventListener('keydown', function(e){
 });
 document.addEventListener('input', function(e){ if(e.target && e.target.id==='windSearch' && ui.wind){ ui.wind.search = e.target.value; clearTimeout(ui._windT); ui._windT = setTimeout(renderWindInto, 120); } });
 // drag a row to reorder
-document.addEventListener('dragstart', function(e){ const r = e.target.closest && e.target.closest('.wd-row'); if(!r || !ui.wind) return; ui.wind.dragId = r.dataset.id; e.dataTransfer.effectAllowed = 'move'; try{ e.dataTransfer.setData('text/plain', 'wind'); }catch(err){} });
+document.addEventListener('dragstart', function(e){ const r = e.target.closest && e.target.closest('.wd-row'); if(!r || !ui.wind) return; ui.wind.dragId = r.dataset.id; e.dataTransfer.effectAllowed = 'move'; try{ e.dataTransfer.setData('text/plain', 'wind'); }catch(err){} const n = r.querySelector('.wd-num'), t = r.querySelector('.wd-title'); dragGhost(e, t ? t.textContent : '', {num: n ? n.textContent : null, src: r}); });
 document.addEventListener('dragover', function(e){ if(ui.wind && ui.wind.dragId && e.target.closest && e.target.closest('.wd-row')) e.preventDefault(); });
 document.addEventListener('drop', function(e){
   const r = e.target.closest && e.target.closest('.wd-row'); if(!r || !ui.wind || !ui.wind.dragId) return;

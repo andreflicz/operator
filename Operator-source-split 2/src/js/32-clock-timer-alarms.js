@@ -121,6 +121,7 @@ function startFocusTicker(){
     const as = state.focus.activeSession;
     if(as && !as.onBreak) tickLiveDeepWork();
     checkBreakTimer();
+    checkMethodTimer();
     if(!as) return;
     if(as.onBreak){
       return;

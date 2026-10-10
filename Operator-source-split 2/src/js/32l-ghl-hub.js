@@ -33,6 +33,7 @@ async function inboxLoad(what, quiet){
         const st = await ghlCall('POST', '/social-media-posting/statistics?'+ghlQ({locationId:g.locationId}), {profileIds:ids});
         s.social = st.results || st;
         socialFeedGoals(s.social);
+        s.socialScope = false;
         g.socialCache = {at:Date.now(), data:s.social};
       }
     }
@@ -40,7 +41,8 @@ async function inboxLoad(what, quiet){
     persist('settings');
   }catch(e){ s.err = e.message; if(what==='social' && /403|scope/i.test(e.message)) s.socialScope = true; }
   s.loading[what] = false;
-  if(ui.view==='business' && (ui.businessTab==='inbox' || ui.businessTab==='social')) renderView(); else if(what==='social') renderView(); else notifBadge();
+  if(ui.view==='convos' || what==='social') renderView(); else notifBadge();
+  convoBadge();
 }
 // keep a "followers" goal (e.g. "IG followers") in step with the real number
 function socialFeedGoals(st){
@@ -57,11 +59,11 @@ let inboxTimer = null;
 function inboxTick(){
   clearTimeout(inboxTimer);
   inboxTimer = setTimeout(function(){
-    if(ui.view==='business' && ui.businessTab==='inbox' && !document.hidden && ghlOn()){ const s = inboxState(); if(s.mode!=='social') inboxLoad(s.mode, true); }
+    if(ui.view==='convos' && !document.hidden && ghlOn()){ const s = inboxState(); if(s.mode!=='social') inboxLoad(s.mode, true); }
     inboxTick();
   }, 45000);
 }
-ACTIONS.inboxMode = function(el, e, id){ const s = inboxState(); s.mode = id; renderView(); if(!s[id] && !s.loading[id]) inboxLoad(id); };
+ACTIONS.inboxMode = function(el, e, id){ const s = inboxState(); if(s.mode!==id) playNav(); s.mode = id; renderView(); if(id!=='social' && !s[id] && !s.loading[id]) inboxLoad(id); };
 ACTIONS.inboxRefresh = function(){ inboxLoad(inboxState().mode); };
 ACTIONS.inboxOpen = function(el, e, id){
   const r = ghlRecordForContact(id);
@@ -153,9 +155,10 @@ function sparkline(series){
   return '<svg class="sc-spark" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><polyline points="'+pts+'"/></svg>';
 }
 function inboxSocialHtml(s){
+  if(!s.social && !s.loading.social && s.err) return '<div class="ib-empty" style="padding:30px;">Couldn\'t get your social numbers from GoHighLevel. <button class="btn btn-ghost btn-sm" data-action="socialRefresh">Try again</button></div>';
   if(s.loading.social && !s.social) return '<div class="gp-loading">Loading your social stats…</div>';
   if(s.socialScope) return '<div class="ib-empty" style="padding:30px;"><div style="font-size:30px;">&#128202;</div><div>GoHighLevel needs two more permissions for this: <code>socialplanner/account.readonly</code> and <code>socialplanner/stat.readonly</code>.</div><div class="kpi-sub" style="margin-top:6px;">Add them to your Private Integration, then Disconnect and Connect again in Settings &rarr; Integrations.</div></div>';
-  if(!s.social) return '<div class="gp-loading">Loading your social stats…</div>';
+  if(!s.social) return '<div class="ib-empty" style="padding:30px;">No social numbers yet. <button class="btn btn-ghost btn-sm" data-action="socialRefresh">Load them</button></div>';
   if(s.social.empty) return '<div class="ib-empty" style="padding:30px;"><div style="font-size:30px;">&#128247;</div>No social accounts connected in GoHighLevel\'s Social Planner yet — connect Instagram, Facebook or TikTok there and they\'ll show up here.</div>';
   const st = s.social, br = st.breakdowns || {}, f = st.platformTotals && st.platformTotals.followers || {};
   const eng = br.engagement || {};
@@ -172,17 +175,26 @@ function inboxSocialHtml(s){
 function renderInboxTab(){
   if(!ghlCfg().connected) return '<div class="ib-empty" style="padding:40px;"><div style="font-size:34px;">&#128172;</div><div class="section-title" style="justify-content:center;">Your GoHighLevel inbox, here</div><div class="kpi-sub" style="margin:6px auto 14px;max-width:420px;">Connect GoHighLevel and your conversations, contacts and social stats live in this tab — reply without leaving Operator.</div><button class="btn btn-primary" data-action="goToIntegrations">Connect GoHighLevel</button></div>';
   const s = inboxState();
-  if(s.mode==='social') s.mode = 'chats';
+  if(s.mode==='social') return renderSocialTab();
   if(s[s.mode]==null && !s.loading[s.mode]) setTimeout(function(){ inboxLoad(s.mode); }, 0);
   if(!inboxTimer) inboxTick();
-  const tab = function(id, label, n){ return '<button class="seg-tab'+(s.mode===id?' active':'')+'" data-action="inboxMode" data-id="'+id+'">'+label+(n ? ' <span class="ib-badge">'+n+'</span>' : '')+'</button>'; };
   return '<div class="ib">'+
-    '<div class="ib-bar"><div class="seg-tabs" style="margin:0;">'+tab('chats', '&#128172; Chats', inboxUnread())+tab('contacts', '&#128101; Contacts')+'</div>'+
-      '<span style="flex:1"></span>'+(s.at ? '<span class="kpi-sub">Updated '+ghlAgo(s.at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="inboxRefresh" title="Refresh">&#8635;</button></div>'+
     (s.err ? '<div class="ghl-err">&#9888; '+escapeHtml(s.err)+'</div>' : '')+
     (s.mode==='contacts' ? inboxContactsHtml(s) : inboxChatsHtml(s))+
   '</div>';
 }
+// ---- Conversations: its own place in the sidebar — Chats, Contacts and Social ----
+function renderConversations(){
+  const s = inboxState(), on = ghlCfg().connected;
+  const tab = function(id, label, n){ return '<button class="seg-tab'+(s.mode===id?' active':'')+'" data-action="inboxMode" data-id="'+id+'">'+label+(n ? ' <span class="ib-badge">'+n+'</span>' : '')+'</button>'; };
+  const at = s.mode==='social' ? (ghlCfg().socialCache && ghlCfg().socialCache.at) : s.at;
+  return '<div class="view-header"><div><div class="view-title">Conversations'+tip('Your GoHighLevel chats and contacts, and your social numbers — all in one place.')+'</div></div>'+
+      (on ? '<div class="row" style="gap:8px;align-items:center;">'+(at ? '<span class="kpi-sub">Updated '+ghlAgo(at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="'+(s.mode==='social' ? 'socialRefresh' : 'inboxRefresh')+'" title="Refresh">&#8635;</button></div>' : '')+'</div>'+
+    (on ? '<div class="seg-tabs cv-tabs">'+tab('chats', '&#128172; Chats', inboxUnread())+tab('contacts', '&#128101; Contacts')+tab('social', '&#128202; Social')+'</div>' : '')+
+    '<div class="tab-panel" data-key="convos-'+s.mode+'">'+renderInboxTab()+'</div>';
+}
+function convoBadge(){ const b = document.getElementById('convoBadge'); if(!b) return; const n = inboxUnread(); b.textContent = n ? String(n) : ''; b.classList.toggle('is-on', !!n); }
+afterRenderHooks.push(convoBadge);
 ACTIONS.goToIntegrations = function(){ ui.view = 'settings'; ui.settingsTab = 'integrations'; renderView(); };
 
 // ---- Business → Social, and the Social panel (Focus, locked in, Today) ----
@@ -194,17 +206,15 @@ function socialMaybeRefresh(maxAgeMs){
   if(Date.now()-at > maxAgeMs) setTimeout(function(){ inboxLoad('social', true); }, 0);
 }
 function renderSocialTab(){
-  if(!ghlCfg().connected) return renderInboxTab();
   const s = inboxState();
   if(!s.social && g_social()) s.social = g_social();
   socialMaybeRefresh(10*60000);
-  return '<div class="ib"><div class="ib-bar"><div class="section-title" style="margin:0;">Social &middot; last 7 days</div><span style="flex:1"></span>'+
-    (ghlCfg().socialCache ? '<span class="kpi-sub">Updated '+ghlAgo(ghlCfg().socialCache.at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="socialRefresh" title="Refresh">&#8635;</button></div>'+
-    (s.err && s.mode==='social' ? '<div class="ghl-err">&#9888; '+escapeHtml(s.err)+'</div>' : '')+inboxSocialHtml(s)+'</div>';
+  return '<div class="ib">'+(s.err && s.mode==='social' && !s.social ? '<div class="ghl-err">&#9888; '+escapeHtml(s.err)+'</div>' : '')+inboxSocialHtml(s)+'</div>';
 }
 function g_social(){ const g = ghlCfg(); return g.socialCache && g.socialCache.data; }
 ACTIONS.socialRefresh = function(){ inboxLoad('social'); };
-ACTIONS.goToSocial = function(){ ui.view = 'business'; ui.businessTab = 'social'; renderView(); };
+ACTIONS.goToSocial = function(){ ui.view = 'convos'; inboxState().mode = 'social'; renderView(); };
+ACTIONS.goToConvos = function(){ ui.view = 'convos'; renderView(); };
 function renderSocialPanel(){
   if(!ghlOn()) return '';
   socialMaybeRefresh(60*60000);
@@ -213,7 +223,10 @@ function renderSocialPanel(){
   const br = d.breakdowns || {}, f = d.platformTotals && d.platformTotals.followers || {};
   const eng = br.engagement || {}, engTotal = Object.keys(eng).reduce(function(a, k){ const x = eng[k]||{}; return a + (Number(x.likes)||0) + (Number(x.comments)||0) + (Number(x.shares)||0); }, 0);
   const tile = function(k, v, ch, extra){ return '<div class="sp-tile"><div class="sp-k">'+k+'</div><div class="sp-v">'+Number(v||0).toLocaleString()+'</div>'+(ch!=null && isFinite(ch) ? '<div class="sc-ch '+(ch>=0?'is-up':'is-down')+'">'+(ch>=0?'&#9650; ':'&#9660; ')+Math.abs(ch).toFixed(ch%1?1:0)+'%</div>' : '')+(extra||'')+'</div>'; };
-  return '<div class="section social-panel"><div class="section-title">Social<span class="kpi-sub" style="margin-left:8px;">last 7 days</span><span class="view-all-link" data-action="goToSocial">More &rarr;</span></div>'+
+  const followers = Object.keys(f).reduce(function(a, k){ return a + (Number(f[k].total)||0); }, 0);
+  return '<div class="section social-panel"><div class="sp-head" data-action="goToSocial" title="Open Social">'+
+      '<span class="sp-icon">&#128241;</span><div class="sp-head-t"><div class="sp-title">Social</div><div class="sp-sub">'+(followers ? followers.toLocaleString()+' followers &middot; ' : '')+'last 7 days</div></div>'+
+      '<span class="sp-more">Open &rarr;</span></div>'+
     '<div class="sp-row">'+
       Object.keys(f).map(function(k){ return tile(escapeHtml(k[0].toUpperCase()+k.slice(1))+' followers', f[k].total, null, sparkline(f[k].series)); }).join('')+
       (br.reach ? tile('Reach', br.reach.total, br.reach.totalChange) : '')+

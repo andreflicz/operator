@@ -299,7 +299,7 @@ function checkAwayReturn(){
   if(!last || last.end <= a.endedAt + awayLimitMs() || Date.now()-last.end > APP_ACTIVITY_GAP_MS) return;
   a.shown = true; persist('focus');
   const away = Math.round((Date.now()-a.endedAt)/60000);
-  showToast('You stepped away at '+fmt12Hour(nowHM(new Date(a.endedAt)))+' — your session stopped there ('+fmtDurationLabel(away)+' away, not counted).', {icon:'&#128694;', actionLabel:'I was working — add it back', actionAction:'restoreAwaySession', duration:20000});
+  showToast('Away since '+fmt12Hour(nowHM(new Date(a.endedAt)))+' — '+fmtDurationLabel(away)+' not counted.', {icon:'&#128694;', actionLabel:'Add it back', actionAction:'restoreAwaySession', duration:20000});
 }
 ACTIONS.restoreAwaySession = function(){
   const a = state.focus.awayStop; if(!a) return;

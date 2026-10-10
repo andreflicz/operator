@@ -121,18 +121,29 @@ function showToast(message, opts){
   const container = document.getElementById('toastContainer');
   if(!container) return;
   clearTimeout(toastHideTimer); clearTimeout(toastRemoveTimer);
-  container.innerHTML = '<div class="toast" id="activeToast">'+
+  container.innerHTML = '<div class="toast'+(opts.actionLabel ? ' has-action' : '')+'" id="activeToast">'+
     '<span class="toast-icon">'+(opts.icon||'&#128276;')+'</span>'+
-    '<span>'+escapeHtml(message)+'</span>'+
-    (opts.actionLabel ? '<span class="toast-action" data-action="'+opts.actionAction+'"'+(opts.actionId ? ' data-id="'+escapeHtml(opts.actionId)+'"' : '')+'>'+escapeHtml(opts.actionLabel)+'</span>' : '')+
+    '<div class="toast-body"><span class="toast-msg">'+escapeHtml(message)+'</span>'+
+    (opts.actionLabel ? '<button class="toast-action" data-action="'+opts.actionAction+'"'+(opts.actionId ? ' data-id="'+escapeHtml(opts.actionId)+'"' : '')+'>'+escapeHtml(opts.actionLabel)+'</button>' : '')+'</div>'+
+    '<button class="toast-x" data-action="dismissToast" title="Dismiss">&#10005;</button>'+
   '</div>';
   const el = document.getElementById('activeToast');
   requestAnimationFrame(function(){ if(el) el.classList.add('show'); });
-  toastHideTimer = setTimeout(function(){
+  const hide = function(){ toastHideTimer = setTimeout(function(){
     if(el) el.classList.remove('show');
-    toastRemoveTimer = setTimeout(function(){ container.innerHTML=''; }, 220);
-  }, opts.duration || 3200);
+    toastRemoveTimer = setTimeout(function(){ if(container.contains(el)) container.innerHTML=''; }, 260);
+  }, opts.duration || 3200); };
+  hide();
+  // hovering keeps it up; leaving starts the clock again
+  if(el){ el.addEventListener('mouseenter', function(){ clearTimeout(toastHideTimer); clearTimeout(toastRemoveTimer); el.classList.add('show'); }); el.addEventListener('mouseleave', hide); }
 }
+function dismissToast(){
+  const el = document.getElementById('activeToast'), container = document.getElementById('toastContainer');
+  clearTimeout(toastHideTimer); clearTimeout(toastRemoveTimer);
+  if(el) el.classList.remove('show');
+  toastRemoveTimer = setTimeout(function(){ if(container) container.innerHTML = ''; }, 220);
+}
+ACTIONS.dismissToast = function(){ dismissToast(); };
 function showLockInToast(){
   showToast("Logged — you're not locked in right now", {icon:'&#128274;', actionLabel:'Lock In', actionAction:'lockInFromToast'});
 }
@@ -154,6 +165,8 @@ let pendingBreakMinutes = null;
 function normalizeProfile(p){ p=p||{}; const d=defaultProfile(); Object.keys(d).forEach(function(k){ if(p[k]===undefined) p[k]=d[k]; }); return p; }
 function normalizeTasks(t){
   t=t||{}; t.items = arr(t.items);
+  // Recently deleted: kept 30 days so nothing deleted by accident is gone for good
+  t.trash = arr(t.trash).filter(function(x){ return x && x.task && Date.now()-(x.at||0) < 30*86400000; });
   if(!Array.isArray(t.categories)) t.categories=[
     {id:'general', label:'General', color:'#8A90A2'},
     {id:'video', label:'Video Idea', color:'#c792ea'}
