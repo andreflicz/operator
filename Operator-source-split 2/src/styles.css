@@ -2019,13 +2019,10 @@
   .plan-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
   .plan-list li{ display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; background:var(--panel-2); border:1px solid var(--border); font-weight:600; min-width:0; }
   .plan-list li .tag{ flex:none; }
-  .pl-num{ flex:none; width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:12px; font-weight:800; background:var(--panel); border:1px solid var(--border-strong); color:var(--text-dim); }
   .plan-list li.is-first{ border-color:rgba(232,162,61,.55); box-shadow:inset 3px 0 0 var(--accent); }
-  .plan-list li.is-first .pl-num{ background:var(--accent); border-color:var(--accent); color:#1a1206; }
-  .plan-list li.is-done{ opacity:.5; } .plan-list li.is-done .pl-t{ text-decoration:line-through; } .plan-list li.is-done .pl-num{ background:var(--good); border-color:var(--good); color:#06120c; }
+  .plan-list li.is-done{ opacity:.5; } .plan-list li.is-done .pl-t{ text-decoration:line-through; }
   .pl-t{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .plan-list.is-dark li{ background:rgba(255,255,255,.04); border-color:rgba(255,255,255,.08); color:#fff; }
-  .plan-list.is-dark .pl-num{ background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.2); color:rgba(255,255,255,.75); }
   .plan-list.is-dark li.is-first{ background:rgba(232,162,61,.12); }
 
   /* ---- wake ring: last night's note ---- */
@@ -2089,8 +2086,6 @@
   .wd-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
   .wd-row{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); cursor:grab; }
   .wd-row:first-child{ border-color:rgba(232,162,61,.5); background:rgba(232,162,61,.1); }
-  .wd-num{ flex:none; width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; background:rgba(255,255,255,.08); }
-  .wd-row:first-child .wd-num{ background:#e8a23d; color:#1a1206; }
   .wd-title{ flex:1; min-width:0; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .wd-ctl{ border:none; background:transparent; color:rgba(255,255,255,.5); width:26px; height:26px; border-radius:8px; cursor:pointer; }
   .wd-ctl:hover:not([disabled]){ background:rgba(255,255,255,.08); color:#fff; } .wd-ctl[disabled]{ opacity:.25; }
@@ -2154,8 +2149,6 @@
   .th-mode:hover{ color:var(--text); border-color:var(--border-strong); background:rgba(var(--ink),.06); }
   .th-mode:active{ transform:scale(.97); }
   /* ---- Knock these out: numbered ---- */
-  .ko-num{ flex:none; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:11.5px; font-weight:800; background:var(--panel-2); border:1px solid var(--border-strong); color:var(--text-dim); margin-right:2px; }
-  .knock-out-list .task-item-v2:first-child .ko-num{ background:var(--accent); border-color:var(--accent); color:#1a1206; }
   /* ---- Now / Up next: one card, two halves ---- */
   .nn-panel.nn-stack{ gap:0; background:var(--panel); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
   .nn-stack .nn-cell{ border:none; border-radius:0; background:transparent; padding:16px 18px; justify-content:center; gap:8px; }
@@ -2244,3 +2237,13 @@
   .sp-k{ font-size:11.5px; color:var(--text-dim); font-weight:600; }
   .sp-v{ font-family:var(--font-display); font-size:24px; font-weight:800; margin-top:2px; }
   .sp-tile .sc-spark{ height:22px; margin-top:4px; }
+
+  /* ---- numbered lists: an editorial index (01, 02, 03) instead of badges ---- */
+  .ko-num, .pl-num, .wd-num{ flex:none; min-width:30px; font-family:var(--font-display); font-size:21px; font-weight:300; line-height:1; letter-spacing:-.03em; font-variant-numeric:tabular-nums; color:rgba(var(--ink),.26); transition:color .2s; }
+  .ko-num{ margin-right:4px; }
+  .plan-list.is-dark .pl-num, .wd-num{ color:rgba(255,255,255,.3); }
+  .knock-out-list .task-item-v2:hover .ko-num, .plan-list li:hover .pl-num{ color:rgba(var(--ink),.5); }
+  .wd-row:hover .wd-num{ color:rgba(255,255,255,.55); }
+  .knock-out-list .task-item-v2:first-child .ko-num, .plan-list li.is-first .pl-num, .wd-row:first-child .wd-num{ font-weight:600; background:linear-gradient(160deg, #ffd08a, #e8a23d 55%, #c9771f); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .knock-out-list .task-item-v2:first-child{ box-shadow:inset 3px 0 0 var(--accent); }
+  .plan-list li.is-done .pl-num{ color:var(--good); font-size:16px; font-weight:700; }

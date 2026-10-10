@@ -137,7 +137,7 @@ function windPlanHtml(){
   return '<div class="wd-plan">'+
     '<div class="wd-sub">In the order you\'ll do them. #1 is what you lock in on first.</div>'+
     (rows.length ? '<ol class="wd-list">'+rows.map(function(t, i){
-      return '<li class="wd-row" draggable="true" data-id="'+t.id+'"><span class="wd-num">'+(i+1)+'</span>'+priorityTag(t.priority)+'<span class="wd-title">'+escapeHtml(t.title)+'</span>'+
+      return '<li class="wd-row" draggable="true" data-id="'+t.id+'"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="wd-title">'+escapeHtml(t.title)+'</span>'+
         '<button class="wd-ctl" data-action="windMove" data-id="'+t.id+'" data-dir="-1" title="Up"'+(i===0?' disabled':'')+'>&#8593;</button><button class="wd-ctl" data-action="windMove" data-id="'+t.id+'" data-dir="1" title="Down"'+(i===rows.length-1?' disabled':'')+'>&#8595;</button>'+
         '<button class="wd-ctl wd-x" data-action="windRemove" data-id="'+t.id+'" title="Take it off">&#10005;</button></li>';
     }).join('')+'</ol>' : '<div class="wd-empty">Nothing planned yet — add what matters most first.</div>')+
@@ -235,7 +235,7 @@ ACTIONS.morningLockIn = function(el, e, id){
 };
 ACTIONS.morningBriefing = function(){ ui.wakeMode = 'brief'; ui.wakeIntroDone = true; ui.wakeBriefTest = false; showOverlay('wakeOverlay'); renderWakeOverlayInto(); };
 function planListHtml(list, cls){
-  return '<ol class="plan-list '+(cls||'')+'">'+list.map(function(t, i){ const done = t.status==='done'; return '<li class="'+(done?'is-done':'')+(i===0 && !done?' is-first':'')+'"><span class="pl-num">'+(done ? '&#10003;' : i+1)+'</span>'+priorityTag(t.priority)+'<span class="pl-t">'+escapeHtml(t.title)+'</span></li>'; }).join('')+'</ol>';
+  return '<ol class="plan-list '+(cls||'')+'">'+list.map(function(t, i){ const done = t.status==='done'; return '<li class="'+(done?'is-done':'')+(i===0 && !done?' is-first':'')+'"><span class="pl-num">'+(done ? '&#10003;' : String(i+1).padStart(2,'0'))+'</span>'+priorityTag(t.priority)+'<span class="pl-t">'+escapeHtml(t.title)+'</span></li>'; }).join('')+'</ol>';
 }
 function renderMorningView(){
   const active = state.modes.active, p = state.profile;

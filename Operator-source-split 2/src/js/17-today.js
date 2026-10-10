@@ -25,7 +25,7 @@ function focusKnockOutRow(t, num){
   const isPending = ui.pendingCurrentTaskId===t.id;
   return '<div class="task-item-v2'+(isCurrent?' is-current-task':'')+(isPending?' is-pending-task':'')+(justCompletedTaskId===t.id?' just-completed':'')+'" draggable="true" data-task-id="'+t.id+'" title="'+(isCurrent?'This is your current task':(isPending?'Waiting to be confirmed in Next Task':'Click to queue as Next Task'))+'">'+
     '<div style="flex:1;min-width:140px;'+(isCurrent?'':'cursor:pointer;')+'" '+(isCurrent?'':'data-action="stagePendingCurrentTask" data-id="'+t.id+'"')+'>'+
-      '<div class="task-title-row">'+(num ? '<span class="ko-num">'+num+'</span>' : '')+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-ongoing" style="margin-left:6px;">&#128204;</span>':'')+'</div>'+
+      '<div class="task-title-row">'+(num ? '<span class="ko-num">'+String(num).padStart(2,'0')+'</span>' : '')+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-ongoing" style="margin-left:6px;">&#128204;</span>':'')+'</div>'+
       (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     '</div>'+
     clientTagsHtml(t.clients)+
