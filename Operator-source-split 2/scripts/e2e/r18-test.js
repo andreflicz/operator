@@ -76,11 +76,11 @@ async function ctxPage(b, seed, opts){
     await p.addInitScript((seed) => { Object.keys(seed).forEach(k => localStorage.setItem('opsdash:'+k, JSON.stringify(seed[k]))); }, {profile:{name:'Andre'}, focus:{wake:Object.assign({}, WAKE, {voice:true, voiceEngine:'browser'})}});
     await p.goto('file://'+path.resolve(OUT+'/r18.html')); await p.waitForTimeout(400);
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    await E("opSay('Hello there.')"); await p.clock.runFor(2500);
+    await E("opSay('Hello there.'), 1"); await p.clock.runFor(2500);
     check('2.5 s without starting: still waiting (it used to give up after 1.5 s and stay silent)', await E("OV.pending && !OV.broken"));
     await p.clock.runFor(4000); await p.waitForTimeout(50);
     check('one miss doesn’t switch the voice off for the session', !(await E("OV.broken")) && await E("OV.misses")===1);
-    await E("opSay('Again.')"); await p.clock.runFor(6500); await p.waitForTimeout(50);
+    await E("opSay('Again.'), 1"); await p.clock.runFor(6500); await p.waitForTimeout(50);
     check('two misses in a row: captions only', await E("OV.broken"));
     check('no page errors (voice start)', p.errors.length===0, p.errors);
     await ctx.close();
@@ -192,7 +192,7 @@ async function ctxPage(b, seed, opts){
   {
     const p = await newPage(b, OUT+'/r18.html', {profile:{name:'Andre'}, tasks:{items:tasks}, business:{clients, pipeline:[], packages:[{id:'pk1', name:'Growth', price:1500, deliverables:[{id:'d', title:'Reels', weeklyTarget:3}]}]}}, new Date(2026,9,12,10,0).getTime());
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    await p.mouse.click(700, 700, {button:'right'}); await p.waitForTimeout(150);
+    await p.click('.th-greet', {button:'right'}); await p.waitForTimeout(200);
     const menu = await p.textContent('#appCtxMenu');
     check('right-click: short and about where you are (no theme / scene / sky / go-to)', /Lock in/.test(menu) && /New task/.test(menu) && /Minimal view/.test(menu) && !/Theme|Scene|Sky|Cards|Go to/.test(menu), menu);
     await E("ctxClose()");
