@@ -3165,3 +3165,6 @@
   .wi-wk-bars{ height:64px; padding-bottom:0; margin-bottom:18px; } .wi-wk-goal{ margin-bottom:0; }
   #planOverlay .wi-inner{ justify-content:center; } #planOverlay .wi .pr-cta{ margin-top:22px; padding-top:0; }
   .np.rest:not(.rest-full) .np-art{ width:clamp(150px, 20vw, 260px); } .np.rest:not(.rest-full) .np-main{ gap:clamp(24px, 4vw, 50px); }
+
+  /* full-screen views cover the whole window, whatever its width (the page column is capped at 1400px) */
+  body.np-on .np{ position:fixed; inset:0; z-index:40; min-height:0; height:100vh; border-radius:0; overflow-x:hidden; overflow-y:auto; }

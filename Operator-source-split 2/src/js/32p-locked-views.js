@@ -20,6 +20,7 @@ function lockedViewBtnHtml(){
   return '<button class="lv-btn" data-action="toggleLockedView" title="'+(lockedMinimal() ? 'Back to the full view (M)' : 'Minimal view (M)')+'">'+(lockedMinimal() ? '&#9638; Full view' : '&#9673; Minimal')+'</button>';
 }
 // the next thing that will ring today: an alarm, a reminder, tomorrow's wake-up
+function ds2(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function nextRingLabel(){
   const now = Date.now(), today = todayStr(), dow = new Date().getDay();
   let best = null;
@@ -29,7 +30,9 @@ function nextRingLabel(){
     const ts = localTs(today, a.time); if(ts > now && (!best || ts < best.ts)) best = {ts:ts, label:a.label||'Alarm'};
   });
   if(!best && typeof nextWake==='function'){ const w = nextWake(); if(w) best = {ts:w.ts, label:'Wake up'}; }
-  return best ? fmtTimeShort(best.ts)+' &middot; '+escapeHtml(best.label) : '';
+  if(!best) return '';
+  const day = new Date(best.ts), d = ds2(day), when = d===today ? '' : d===addDays(today, 1) ? 'Tomorrow ' : weekdayShort(d)+' ';
+  return when+fmtTimeShort(best.ts)+' &middot; '+escapeHtml(best.label);
 }
 function renderLockedMinimal(){
   const as = state.focus.activeSession, onBreak = !!as.onBreak;
