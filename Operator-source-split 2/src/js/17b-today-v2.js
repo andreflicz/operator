@@ -49,10 +49,13 @@ function dayOffButtonHtml(){
 // Shooting / Off-time sit next to Day off as small pills — hold to start, so a stray click never flips you into a mode.
 // One click starts it; a toast offers Undo for a few seconds (the old hold-to-start looked like it did nothing).
 function holdModeBtnHtml(type, icon, label){
-  return '<button class="th-mode th-mode-'+type+'" data-action="quickMode" data-type="'+type+'" title="Start '+label+' (you can undo)"><span class="th-mode-i">'+icon+'</span><span>'+label+'</span></button>';
+  const on = !!(state.modes.active && state.modes.active.type===type);
+  return '<button class="th-mode th-mode-'+type+(on?' is-on':'')+'" data-action="quickMode" data-type="'+type+'" title="'+(on ? 'End '+label : 'Start '+label+' (you can undo)')+'"><span class="th-mode-i">'+icon+'</span><span>'+(on ? 'End '+label.toLowerCase() : label)+'</span></button>';
 }
 ACTIONS.quickMode = function(el){
   const type = el.dataset.type, prev = state.modes.active ? Object.assign({}, state.modes.active) : null;
+  // the same button ends it once it's running
+  if(prev && prev.type===type){ finishActiveMode(true); playStopSound(); renderView(); showToast((MODE_LABELS[type]||'Mode')+' ended.', {icon:modeIcon(type), duration:3000}); return; }
   if(state.focus.activeSession){ showToast('Stop your session first.', {icon:'&#128274;'}); return; }
   startMode(type);
   ui.undoMode = {prev:prev, at:Date.now()};
@@ -64,6 +67,7 @@ ACTIONS.undoQuickMode = function(){
 };
 ACTIONS.quickDayOff = function(){
   toggleDayOff();
+  dayOffFlash(isDayOff(todayStr()));
   showToast(isDayOff(todayStr()) ? 'Today is a rest day — the streak is safe. Enjoy it.' : 'Back on — today counts.', {icon:'&#127796;', actionLabel:'Undo', actionAction:'quickDayOffUndo', duration:6000});
 };
 ACTIONS.quickDayOffUndo = function(){ toggleDayOff(); clearToasts(); };

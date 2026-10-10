@@ -3097,6 +3097,43 @@
   .chip-more{ opacity:.65; } .chip-more:hover{ opacity:1; }
   .qj2-title{ background:transparent !important; border:none !important; box-shadow:none !important; padding:2px 4px 6px !important; margin:0 0 2px; font-size:15px; font-family:var(--font-display); }
   .qj2-title::placeholder{ color:var(--text-faint, rgba(127,127,127,.55)); font-weight:600; }
+  /* the note's name is its heading — click it and type */
+  .qj3-name{ display:block; width:100%; border:none; outline:none; background:transparent; color:var(--text); font:inherit; font-size:15px; font-weight:800; padding:2px 6px; margin:-2px -6px 1px; border-radius:7px; transition:background .15s; }
+  .qj3-name::placeholder{ color:var(--text); opacity:1; }
+  .qj3-name:hover{ background:rgba(var(--ink),.05); } .qj3-name:focus{ background:rgba(var(--ink),.07); }
+  .qj3-name:focus::placeholder{ opacity:.35; }
+  /* business preview: one screen, the button sized like the rest */
+  #planOverlay .wi{ height:100vh; overflow:hidden; }
+  #planOverlay .wi-inner{ flex:1; min-height:0; display:flex; flex-direction:column; justify-content:flex-start; padding-bottom:20px; }
+  #planOverlay .wi-cols{ flex:1; min-height:0; } #planOverlay .wi-plan{ overflow:hidden; }
+  #planOverlay .wi .pr-cta, .wi .pr-cta{ flex:none; margin-top:16px; gap:6px; }
+  .wi .pr-go{ width:auto !important; padding:13px 34px !important; gap:10px; border-radius:999px; }
+  .wi .pr-go b{ font-size:17px !important; letter-spacing:.14em; } .wi .pr-go .ls-go-i{ font-size:17px; } .wi .pr-go .ls-go-ring{ inset:-5px; }
+  .wi .ls-go-sub{ font-size:12.5px; } .wi .pr-later{ padding:4px 10px; font-size:13px; }
+  @media (max-height:780px){ #planOverlay .wi-row2 .wi-act{ display:none; } #planOverlay .wi-row2{ grid-template-columns:1fr; } }
+  #planOverlay .wi-cols{ flex:none; } #planOverlay .wi .pr-cta{ margin-top:auto; padding-top:16px; }
+  /* ---------- day off ---------- */
+  .dayoff{ position:relative; min-height:calc(100vh - 60px); display:flex; align-items:center; justify-content:center; overflow:hidden; border-radius:28px; animation:npIn .6s ease both; }
+  .dayoff-bg{ position:absolute; inset:-10%; background:radial-gradient(55% 55% at 25% 30%, rgba(63,190,142,.28), transparent 70%), radial-gradient(50% 50% at 80% 70%, rgba(111,195,255,.2), transparent 70%), radial-gradient(40% 40% at 60% 20%, rgba(255,197,107,.14), transparent 70%); filter:blur(30px); }
+  .dayoff-in{ position:relative; width:min(720px, 92%); text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px; padding:40px 0; }
+  .dayoff-k{ font-size:12px; font-weight:800; letter-spacing:.2em; text-transform:uppercase; color:#7ef0c0; }
+  .dayoff-h{ margin:0; font-family:var(--font-display); font-size:clamp(34px, 5vw, 56px); font-weight:800; letter-spacing:-.03em; line-height:1.05; }
+  .dayoff-h span{ background:linear-gradient(90deg, #7ef0c0, #9fd6ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .dayoff-sub{ color:var(--text-dim); font-size:15px; }
+  .dayoff-cards{ display:flex; gap:12px; margin-top:18px; flex-wrap:wrap; justify-content:center; }
+  .dayoff-c{ min-width:180px; padding:16px 20px; border-radius:18px; background:rgba(var(--ink),.04); border:1px solid rgba(var(--ink),.1); display:flex; flex-direction:column; gap:2px; }
+  .dayoff-c b{ font-family:var(--font-display); font-size:28px; } .dayoff-c span{ font-size:12.5px; color:var(--text-dim); }
+  .dayoff-ideas{ width:min(460px, 100%); margin-top:18px; text-align:left; padding:6px 18px; border-radius:18px; background:rgba(var(--ink),.03); border:1px solid rgba(var(--ink),.08); }
+  .dayoff-ideas .br-th span:not(.br-th-i){ color:var(--text-dim); } .dayoff-ideas .br-th-i{ background:rgba(var(--ink),.06); }
+  .dayoff-back{ margin-top:22px; border:1px solid rgba(var(--ink),.18); background:transparent; color:var(--text-dim); border-radius:999px; padding:10px 20px; font-weight:600; cursor:pointer; } .dayoff-back:hover{ color:var(--text); border-color:#7ef0c0; }
+  .lock-flash.is-dayoff .lf-ring{ border-color:rgba(126,240,192,.8); } .lock-flash.is-dayoff .lf-k{ text-shadow:0 0 40px rgba(126,240,192,.6); }
+  .lock-flash.is-dayoff.is-back .lf-ring{ border-color:rgba(255,197,107,.8); }
+  .th-mode.is-on{ border-color:rgba(197,143,255,.6); background:rgba(197,143,255,.14); color:var(--text); }
+
+  .dayoff-row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .dayoff.is-weekend .dayoff-bg{ background:radial-gradient(55% 55% at 25% 30%, rgba(255,170,90,.24), transparent 70%), radial-gradient(50% 50% at 80% 70%, rgba(150,120,255,.2), transparent 70%), radial-gradient(40% 40% at 60% 20%, rgba(63,190,142,.14), transparent 70%); }
+  .dayoff.is-weekend .dayoff-k{ color:#ffc56b; }
+  .dayoff.is-weekend .dayoff-h span{ background:linear-gradient(90deg, #ffc56b, #c3a6ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -6961,24 +6998,17 @@ function cardLayoutSettingsHtml(){
   '</div></div>';
 }
 // ============ TODAY ============
-function renderDayOffView(){
-  const streak = computeStreak();
-  return '<div class="view-header today-header"><div>'+businessNameTagHtml()+'<div class="view-title">Taking today off<span class="sleepy-dots" aria-hidden="true"></span></div><div class="view-sub" id="liveClock"></div></div></div>'+
-  '<div class="day-off-wrap"><div class="card day-off-card" style="border-color:var(--accent); box-shadow:0 0 50px '+hexToRgba(state.profile.accentColor||'#E8A23D',0.16)+';">'+
-    '<div style="margin:4px 0 14px;">'+renderStreakCard(streak, {compact:true, status:'Rest days still count'})+'</div>'+
-    '<div style="max-width:380px;margin:6px 0;font-size:14.5px;color:var(--text-dim);line-height:1.5;">Rest is part of the plan. Nothing else is tracked today — go live your life.</div>'+
-    '<button class="btn" style="border-color:var(--accent);color:var(--accent);margin-top:10px;" data-action="toggleDayOff">Actually, I want to work today</button>'+
-  '</div></div>';
-}
+// renderDayOffView lives in 32p-locked-views.js
 function renderOffTimeView(){
   const active = state.modes.active;
   const elapsed = Date.now() - active.startedAt;
+  if(!active.sleep && typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1))) return renderWeekendOffView(elapsed);
   return '<div class="view-header today-header"><div>'+businessNameTagHtml()+'<div class="view-title">Clocked out.</div><div class="view-sub" id="liveClock"></div></div></div>'+
   '<div class="day-off-wrap"><div class="card day-off-card offtime-card">'+
     '<div style="font-size:40px;">&#127937;</div>'+
     '<div class="hero-num" id="modeElapsed" style="color:var(--strong);">'+formatElapsed(elapsed)+'</div>'+
     '<div class="hero-label" style="color:var(--text-dim);">off the clock &middot; '+fmtHours(deepWorkMinutesTodayLive())+' of deep work today</div>'+
-    '<div style="max-width:380px;margin:16px 0 6px;font-size:14.5px;color:var(--text-dim);line-height:1.5;">The work day is done. Nothing else is tracked while you’re off.</div>'+
+    '<div style="max-width:380px;margin:16px 0 6px;font-size:14.5px;color:var(--text-dim);line-height:1.5;">'+(typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)) ? 'That’s the week. Tomorrow’s a day off — enjoy it.' : 'The work day is done. Nothing else is tracked while you’re off.')+'</div>'+
     '<div class="row" style="gap:8px;justify-content:center;margin-top:10px;">'+
       (isWindDownTime() ? '<button class="btn th-btn-night" data-action="openWindDown">&#127769; Wind down</button>' : '')+
       '<button class="btn" style="border-color:var(--border-strong);color:var(--text);" data-action="clockIn">&#128339; Clock back in</button>'+
@@ -7151,10 +7181,13 @@ function dayOffButtonHtml(){
 // Shooting / Off-time sit next to Day off as small pills — hold to start, so a stray click never flips you into a mode.
 // One click starts it; a toast offers Undo for a few seconds (the old hold-to-start looked like it did nothing).
 function holdModeBtnHtml(type, icon, label){
-  return '<button class="th-mode th-mode-'+type+'" data-action="quickMode" data-type="'+type+'" title="Start '+label+' (you can undo)"><span class="th-mode-i">'+icon+'</span><span>'+label+'</span></button>';
+  const on = !!(state.modes.active && state.modes.active.type===type);
+  return '<button class="th-mode th-mode-'+type+(on?' is-on':'')+'" data-action="quickMode" data-type="'+type+'" title="'+(on ? 'End '+label : 'Start '+label+' (you can undo)')+'"><span class="th-mode-i">'+icon+'</span><span>'+(on ? 'End '+label.toLowerCase() : label)+'</span></button>';
 }
 ACTIONS.quickMode = function(el){
   const type = el.dataset.type, prev = state.modes.active ? Object.assign({}, state.modes.active) : null;
+  // the same button ends it once it's running
+  if(prev && prev.type===type){ finishActiveMode(true); playStopSound(); renderView(); showToast((MODE_LABELS[type]||'Mode')+' ended.', {icon:modeIcon(type), duration:3000}); return; }
   if(state.focus.activeSession){ showToast('Stop your session first.', {icon:'&#128274;'}); return; }
   startMode(type);
   ui.undoMode = {prev:prev, at:Date.now()};
@@ -7166,6 +7199,7 @@ ACTIONS.undoQuickMode = function(){
 };
 ACTIONS.quickDayOff = function(){
   toggleDayOff();
+  dayOffFlash(isDayOff(todayStr()));
   showToast(isDayOff(todayStr()) ? 'Today is a rest day — the streak is safe. Enjoy it.' : 'Back on — today counts.', {icon:'&#127796;', actionLabel:'Undo', actionAction:'quickDayOffUndo', duration:6000});
 };
 ACTIONS.quickDayOffUndo = function(){ toggleDayOff(); clearToasts(); };
@@ -10725,9 +10759,8 @@ function renderQuickJournalModal(){
   const now = new Date();
   if(ui.qjSaved) return '<div class="qj3 is-saved"><div class="qj3-done"><span>&#10003;</span>Saved to your journal</div></div>';
   return '<div class="qj3" data-photo-drop="journal">'+
-    '<div class="qj3-h"><span class="qj3-i">&#128221;</span><div><b>Quick note</b><small>'+now.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+' &middot; '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+(today ? ' &middot; '+today+' today' : '')+'</small></div>'+
+    '<div class="qj3-h"><span class="qj3-i">&#128221;</span><div><input class="qj3-name" id="quickJournalModalTextTitle" placeholder="Quick note" title="Name this note" value="'+escapeHtml(ui.qjTitleDraft||'')+'"><small>'+now.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+' &middot; '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+(today ? ' &middot; '+today+' today' : '')+'</small></div>'+
       '<button class="qj3-x" data-action="closeQuickJournalModal" title="Close (Esc)">&#10005;</button></div>'+
-    '<input class="qj3-title" id="quickJournalModalTextTitle" placeholder="Title (optional)" value="'+escapeHtml(ui.qjTitleDraft||'')+'">'+
     '<textarea class="qj3-text" id="quickJournalModalText" placeholder="'+escapeHtml(ui.qjPrompt||QJ_PROMPTS[0])+'">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
     (arr(ui.journalDraftPhotos).length ? '<div class="qj3-photos">'+arr(ui.journalDraftPhotos).map(function(src, i){ return '<span><img src="'+escapeHtml(blobUrl(src))+'"><button data-action="removeJournalDraftPhoto" data-idx="'+i+'" title="Remove">&times;</button></span>'; }).join('')+'</div>' : '')+
     '<div class="qj3-tags">'+visibleJournalTypes().slice(0, 8).map(function(m){ return '<button class="qj3-tag'+(ui.selectedMood===m.id?' is-on':'')+'" data-action="qjMood" data-id="'+m.id+'" title="'+escapeHtml(m.label)+'">'+m.emoji+'<span>'+escapeHtml(m.label)+'</span></button>'; }).join('')+hiddenTypesChipHtml()+'</div>'+
@@ -20503,7 +20536,7 @@ registerModal('planOverlay', renderPlanRevealInto);
 function clockOutFlash(){
   const d = document.createElement('div');
   d.className = 'lock-flash is-out is-clock';
-  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#127937; Clocked Out</div><div class="lf-t">'+fmtHours(deepWorkMinutesTodayLive())+' of deep work today</div>';
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#127937; Clocked Out</div><div class="lf-t">'+fmtHours(deepWorkMinutesTodayLive())+' of deep work today'+(typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)) ? ' &middot; day off tomorrow' : '')+'</div>';
   document.body.appendChild(d);
   setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 2100);
 }
@@ -20712,6 +20745,86 @@ function focusMusicAfterIntro(delayMs){
   FM.introT = setTimeout(function(){ if(state.focus.activeSession && !FM.playing) focusMusicPlay(Math.floor(Math.random()*FOCUS_TRACKS.length)); }, delayMs||0);
 }
 document.addEventListener('input', function(e){ if(e.target && e.target.id==='breakNoteInput') ui.breakNoteDraft = e.target.value; });
+
+// ---- Day off: a proper rest-day screen, a small moment when it starts or ends, and it turns
+// itself on for the days your wake-up alarm doesn't ring (e.g. Sundays) ----
+function isWorkDay(dateStr){
+  const w = typeof wakeCfg==='function' ? wakeCfg() : null;
+  if(!w || !w.enabled || !arr(w.days).length) return true; // no schedule set → every day can be a work day
+  return arr(w.days).indexOf(dowOf(dateStr))>=0;
+}
+function nextWorkDay(from){ for(let i=1;i<8;i++){ const d = addDays(from, i); if(isWorkDay(d)) return d; } return null; }
+function autoDayOffCheck(){
+  if(!state || !state.daysOff) return false;
+  const today = todayStr(), seen = state.daysOff.autoSeen = arr(state.daysOff.autoSeen);
+  if(seen.indexOf(today)>=0) return false;
+  seen.push(today); if(seen.length > 40) seen.splice(0, seen.length - 40);
+  let changed = true;
+  if(!isWorkDay(today) && !isDayOff(today) && !state.focus.activeSession){ state.daysOff.dates.push(today); dayOffFlash(true, true); }
+  persist('daysOff');
+  return changed;
+}
+afterRenderHooks.push(function(){ if(typeof state!=='undefined' && state && state.daysOff && autoDayOffCheck() && isDayOff(todayStr())) setTimeout(renderView, 0); });
+function dayOffFlash(on, auto){
+  const d = document.createElement('div');
+  d.className = 'lock-flash is-dayoff'+(on ? '' : ' is-back');
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">'+(on ? '&#127796; Day off' : '&#9728;&#65039; Back to it')+'</div><div class="lf-t">'+(on ? (auto ? 'No alarm today — it’s a rest day.' : 'Rest is part of the plan.') : 'Today counts.')+'</div>';
+  document.body.appendChild(d);
+  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 1900);
+}
+const REST_IDEAS = [
+  ['&#127795;','Get outside.','A long walk, no podcast. Let your head wander.'],
+  ['&#128222;','Call someone you like.','Not a text — an actual call.'],
+  ['&#127859;','Cook something real.','Take your time with it.'],
+  ['&#128164;','Sleep in, guilt-free.','Recovery is where the gains show up.'],
+  ['&#128214;','Read for fun.','Something with no business in it.'],
+  ['&#127947;&#65039;','Move, easy.','A light session or a stretch — nothing heroic.'],
+  ['&#128245;','Phone in another room.','For an hour. See how it feels.'],
+  ['&#127774;','Get some sun.','Ten minutes of daylight does more than you’d think.']
+];
+function restIdeas(n){ const d = Number(todayStr().replace(/-/g,'')), out = []; for(let i=0;i<n;i++) out.push(REST_IDEAS[(d + i*3) % REST_IDEAS.length]); return out; }
+// clocked out on the last work day before a day off: the weekend starts now, in the day-off look
+function renderWeekendOffView(elapsed){
+  const today = todayStr(), nw = nextWorkDay(today), wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
+  const ideas = restIdeas(3);
+  return '<div class="dayoff is-weekend">'+
+    '<div class="dayoff-bg"></div>'+
+    '<div class="dayoff-in">'+
+      '<div class="dayoff-k">&#127937; Clocked out &middot; day off tomorrow</div>'+
+      '<h1 class="dayoff-h">That’s the week'+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
+      '<div class="dayoff-sub" id="liveClock"></div>'+
+      '<div class="dayoff-cards">'+
+        '<div class="dayoff-c"><b>'+fmtHours(deepWorkMinutesTodayLive())+'</b><span>deep work today</span></div>'+
+        '<div class="dayoff-c"><b id="modeElapsed">'+formatElapsed(elapsed)+'</b><span>off the clock</span></div>'+
+        (nw ? '<div class="dayoff-c"><b>'+weekdayShort(nw)+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
+      '</div>'+
+      (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
+      '<div class="dayoff-row">'+
+        (isWindDownTime() ? '<button class="dayoff-back" data-action="openWindDown">&#127769; Wind down</button>' : '')+
+        '<button class="dayoff-back" data-action="clockIn">Clock back in</button>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+function renderDayOffView(){
+  const streak = computeStreak(), today = todayStr(), nw = nextWorkDay(today), w = wakeCfg();
+  const wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
+  const ideas = restIdeas(3);
+  return '<div class="dayoff">'+
+    '<div class="dayoff-bg"></div>'+
+    '<div class="dayoff-in">'+
+      '<div class="dayoff-k">&#127796; Day off</div>'+
+      '<h1 class="dayoff-h">Rest is part of the plan'+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
+      '<div class="dayoff-sub" id="liveClock"></div>'+
+      '<div class="dayoff-cards">'+
+        '<div class="dayoff-c"><b>'+streak+'</b><span>day streak — safe today</span></div>'+
+        (nw ? '<div class="dayoff-c"><b>'+weekdayShort(nw)+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
+      '</div>'+
+      (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
+      '<button class="dayoff-back" data-action="quickDayOff">Actually, I’ll work today</button>'+
+    '</div>'+
+  '</div>';
+}
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

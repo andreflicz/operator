@@ -499,7 +499,7 @@ registerModal('planOverlay', renderPlanRevealInto);
 function clockOutFlash(){
   const d = document.createElement('div');
   d.className = 'lock-flash is-out is-clock';
-  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#127937; Clocked Out</div><div class="lf-t">'+fmtHours(deepWorkMinutesTodayLive())+' of deep work today</div>';
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#127937; Clocked Out</div><div class="lf-t">'+fmtHours(deepWorkMinutesTodayLive())+' of deep work today'+(typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)) ? ' &middot; day off tomorrow' : '')+'</div>';
   document.body.appendChild(d);
   setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 2100);
 }

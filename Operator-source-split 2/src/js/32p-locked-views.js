@@ -192,3 +192,83 @@ function focusMusicAfterIntro(delayMs){
   FM.introT = setTimeout(function(){ if(state.focus.activeSession && !FM.playing) focusMusicPlay(Math.floor(Math.random()*FOCUS_TRACKS.length)); }, delayMs||0);
 }
 document.addEventListener('input', function(e){ if(e.target && e.target.id==='breakNoteInput') ui.breakNoteDraft = e.target.value; });
+
+// ---- Day off: a proper rest-day screen, a small moment when it starts or ends, and it turns
+// itself on for the days your wake-up alarm doesn't ring (e.g. Sundays) ----
+function isWorkDay(dateStr){
+  const w = typeof wakeCfg==='function' ? wakeCfg() : null;
+  if(!w || !w.enabled || !arr(w.days).length) return true; // no schedule set → every day can be a work day
+  return arr(w.days).indexOf(dowOf(dateStr))>=0;
+}
+function nextWorkDay(from){ for(let i=1;i<8;i++){ const d = addDays(from, i); if(isWorkDay(d)) return d; } return null; }
+function autoDayOffCheck(){
+  if(!state || !state.daysOff) return false;
+  const today = todayStr(), seen = state.daysOff.autoSeen = arr(state.daysOff.autoSeen);
+  if(seen.indexOf(today)>=0) return false;
+  seen.push(today); if(seen.length > 40) seen.splice(0, seen.length - 40);
+  let changed = true;
+  if(!isWorkDay(today) && !isDayOff(today) && !state.focus.activeSession){ state.daysOff.dates.push(today); dayOffFlash(true, true); }
+  persist('daysOff');
+  return changed;
+}
+afterRenderHooks.push(function(){ if(typeof state!=='undefined' && state && state.daysOff && autoDayOffCheck() && isDayOff(todayStr())) setTimeout(renderView, 0); });
+function dayOffFlash(on, auto){
+  const d = document.createElement('div');
+  d.className = 'lock-flash is-dayoff'+(on ? '' : ' is-back');
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">'+(on ? '&#127796; Day off' : '&#9728;&#65039; Back to it')+'</div><div class="lf-t">'+(on ? (auto ? 'No alarm today — it’s a rest day.' : 'Rest is part of the plan.') : 'Today counts.')+'</div>';
+  document.body.appendChild(d);
+  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 1900);
+}
+const REST_IDEAS = [
+  ['&#127795;','Get outside.','A long walk, no podcast. Let your head wander.'],
+  ['&#128222;','Call someone you like.','Not a text — an actual call.'],
+  ['&#127859;','Cook something real.','Take your time with it.'],
+  ['&#128164;','Sleep in, guilt-free.','Recovery is where the gains show up.'],
+  ['&#128214;','Read for fun.','Something with no business in it.'],
+  ['&#127947;&#65039;','Move, easy.','A light session or a stretch — nothing heroic.'],
+  ['&#128245;','Phone in another room.','For an hour. See how it feels.'],
+  ['&#127774;','Get some sun.','Ten minutes of daylight does more than you’d think.']
+];
+function restIdeas(n){ const d = Number(todayStr().replace(/-/g,'')), out = []; for(let i=0;i<n;i++) out.push(REST_IDEAS[(d + i*3) % REST_IDEAS.length]); return out; }
+// clocked out on the last work day before a day off: the weekend starts now, in the day-off look
+function renderWeekendOffView(elapsed){
+  const today = todayStr(), nw = nextWorkDay(today), wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
+  const ideas = restIdeas(3);
+  return '<div class="dayoff is-weekend">'+
+    '<div class="dayoff-bg"></div>'+
+    '<div class="dayoff-in">'+
+      '<div class="dayoff-k">&#127937; Clocked out &middot; day off tomorrow</div>'+
+      '<h1 class="dayoff-h">That’s the week'+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
+      '<div class="dayoff-sub" id="liveClock"></div>'+
+      '<div class="dayoff-cards">'+
+        '<div class="dayoff-c"><b>'+fmtHours(deepWorkMinutesTodayLive())+'</b><span>deep work today</span></div>'+
+        '<div class="dayoff-c"><b id="modeElapsed">'+formatElapsed(elapsed)+'</b><span>off the clock</span></div>'+
+        (nw ? '<div class="dayoff-c"><b>'+weekdayShort(nw)+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
+      '</div>'+
+      (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
+      '<div class="dayoff-row">'+
+        (isWindDownTime() ? '<button class="dayoff-back" data-action="openWindDown">&#127769; Wind down</button>' : '')+
+        '<button class="dayoff-back" data-action="clockIn">Clock back in</button>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+function renderDayOffView(){
+  const streak = computeStreak(), today = todayStr(), nw = nextWorkDay(today), w = wakeCfg();
+  const wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
+  const ideas = restIdeas(3);
+  return '<div class="dayoff">'+
+    '<div class="dayoff-bg"></div>'+
+    '<div class="dayoff-in">'+
+      '<div class="dayoff-k">&#127796; Day off</div>'+
+      '<h1 class="dayoff-h">Rest is part of the plan'+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
+      '<div class="dayoff-sub" id="liveClock"></div>'+
+      '<div class="dayoff-cards">'+
+        '<div class="dayoff-c"><b>'+streak+'</b><span>day streak — safe today</span></div>'+
+        (nw ? '<div class="dayoff-c"><b>'+weekdayShort(nw)+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
+      '</div>'+
+      (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
+      '<button class="dayoff-back" data-action="quickDayOff">Actually, I’ll work today</button>'+
+    '</div>'+
+  '</div>';
+}
