@@ -260,7 +260,11 @@ function soundSettingsHtml(){
         '<div class="snd-rows">'+tog('lockMusicStop', 'Stop it when I lock out', 'Otherwise it keeps playing', true)+'</div>' : '')+
     '</div>'+
     '<div class="card section"><div class="section-title">&#9728;&#65039; Mornings</div>'+
+      '<div class="snd-pl"><label><b>Morning playlist</b><small>An Apple Music playlist — the play button on Good morning starts it, and it follows your wake-up song by itself</small></label>'+
+        '<div class="snd-music" style="margin-top:8px;"><input class="input" id="sndMorningPl" placeholder="Playlist name in Apple Music" value="'+escapeHtml(p.morningPlaylist && p.morningPlaylist.q || '')+'"><button class="btn btn-sm btn-primary" data-action="sndMorningPlSet">Save</button></div></div>'+
       '<div class="snd-rows">'+
+        tog('morningPlAfterSong', 'Play it after the wake-up song', 'When the song ends, the playlist carries on', true)+
+        tog('focusMusic', 'Focus music after the lock-in intro', 'Quiet tracks keep playing until you lock out', true)+
         tog('dawn', 'Dawn before the alarm', 'A slow chord swells under the sunrise in the last 90 seconds', true)+
         tog('workintro', 'Start work', 'A warm swell when the work intro opens', true)+
       '</div>'+
@@ -295,3 +299,5 @@ ACTIONS.previewSounds = function(){
   const seq = [playTick, playNav, playTaskAdded, playDrop, playPositive, playTaskComplete, playLockIn];
   seq.forEach(function(f, i){ setTimeout(f, i*420); });
 };
+
+ACTIONS.sndMorningPlSet = function(){ const i = document.getElementById('sndMorningPl'), v = i ? i.value.trim() : ''; state.profile.morningPlaylist = v ? {q:v, k:'playlist'} : null; saveSound(); showToast(v ? 'Morning playlist: '+v : 'Morning playlist cleared', {icon:'&#9835;'}); };

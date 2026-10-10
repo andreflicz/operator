@@ -223,7 +223,13 @@ wake_respond() {
     /ping*) respond 200 '{"ok":true,"helper":5}' ;;
     /news*)
       # a few headlines for the Good morning screen (news sites don't let a page fetch them directly)
-      X=$(curl -s -m 6 -A "Mozilla/5.0 (Macintosh) Operator" "https://feeds.npr.org/1001/rss.xml" 2>/dev/null)
+      # ?q=<hex topics> → Google News for your topics (last 2 days); otherwise NPR's top stories
+      NQ=$(hexdec "$(param q)")
+      if [ -n "$NQ" ]; then
+        TQ=$(printf '%s' "$NQ" | awk -F',' '{ out=""; for(i=1;i<=NF;i++){ t=$i; gsub(/^ +| +$/, "", t); if(t=="") continue; if(t ~ / /) t="\"" t "\""; out = out (out=="" ? "" : " OR ") t } print out " when:2d" }')
+        X=$(curl -s -m 6 -G -A "Mozilla/5.0 (Macintosh) Operator" --data-urlencode "q=$TQ" --data-urlencode "hl=en-US" --data-urlencode "gl=US" --data-urlencode "ceid=US:en" "https://news.google.com/rss/search" 2>/dev/null)
+      fi
+      case "$X" in *"<item"*) ;; *) X=$(curl -s -m 6 -A "Mozilla/5.0 (Macintosh) Operator" "https://feeds.npr.org/1001/rss.xml" 2>/dev/null) ;; esac
       case "$X" in *"<item"*) ;; *) X=$(curl -s -m 6 -A "Mozilla/5.0 (Macintosh) Operator" "https://feeds.bbci.co.uk/news/rss.xml" 2>/dev/null) ;; esac
       case "$X" in *"<item"*) respond 200 "$X" 'application/rss+xml; charset=utf-8' ;; *) respond 502 '{"ok":false}' ;; esac ;;
     # only an alarm ever brings Operator to the front — nothing else (an empty or unknown

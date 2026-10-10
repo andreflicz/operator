@@ -247,7 +247,7 @@ function finishWakeMedia(){
     a.loop = false; wakeFinishing = true;
     a.addEventListener('ended', function(){ if(wakeAudio===a) stopWakeMedia(true); wakeFinishing = false; if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); }, {once:true});
   }
-  const pl = typeof morningPlaylist==='function' && state.profile.morningPlaylistAuto!==false ? morningPlaylist() : null;
+  const pl = typeof morningPlaylist==='function' && soundPref('morningPlAfterSong', true) ? morningPlaylist() : null;
   if(wakeMusicApp){ wakeFinishing = true; wakeMusicApp = false; helperFetch(MUSIC_URL+'finish'+(pl ? '?k=playlist&q='+hexUtf8(pl.q) : ''), 4000); }
   else if(a && pl){ a.addEventListener('ended', function(){ musicApp('play', {type:'music', k:'playlist', q:pl.q}); }, {once:true}); }
 }
@@ -426,6 +426,7 @@ function renderWakeSetup(){
     '</div>'+
     '<div class="ws-block grid grid-2">'+
       '<div class="field"><label>Good morning intro</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.intro==='quick'?' active':'')+'" data-action="wakeIntro" data-id="quick">Quick</button><button class="seg-tab'+(w.intro==='cinematic'?' active':'')+'" data-action="wakeIntro" data-id="cinematic">Cinematic</button></div></div>'+
+      '<div class="field"><label>News topics'+tip('Things you care about, separated by commas — e.g. AI, Knicks, marketing. Good morning shows the latest headlines on those. Leave it empty for the top stories.')+'</label><input class="input" data-wake="newsTopics" placeholder="e.g. AI, Knicks, marketing" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
       '<div class="field"><label>Headlines in Good morning</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.news!==false?' active':'')+'" data-action="wakeNews" data-id="on">On</button><button class="seg-tab'+(w.news===false?' active':'')+'" data-action="wakeNews" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+
     '</div>'+
@@ -536,6 +537,7 @@ document.addEventListener('change', function(e){
     }
   }
   else if(key==='snoozeMinutes') w.snoozeMinutes = Number(t.value)||9;
+  else if(key==='newsTopics'){ w.newsTopics = t.value.trim(); ui.morningNews = null; }
   saveWake();
   renderView();
 });

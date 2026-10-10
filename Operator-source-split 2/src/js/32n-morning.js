@@ -66,6 +66,32 @@ const WORK_QUOTES = [
   ['One focused hour beats a distracted day.', ''],
   ['Ship it, then make it better.', '']
 ];
+// for the work preview's second line: starting, procrastination, taking action
+const ACTION_QUOTES = [
+  ['Procrastination is the thief of time.', 'Edward Young'],
+  ['You may delay, but time will not.', 'Benjamin Franklin'],
+  ['The best way out is always through.', 'Robert Frost'],
+  ['Action is the antidote to despair.', 'Joan Baez'],
+  ['Start where you are. Use what you have. Do what you can.', 'Arthur Ashe'],
+  ['If you have to eat two frogs, eat the ugliest one first.', 'Brian Tracy'],
+  ['Inaction breeds doubt and fear. Action breeds confidence and courage.', 'Dale Carnegie'],
+  ['Small daily improvements over time lead to stunning results.', 'Robin Sharma'],
+  ['You can’t build a reputation on what you are going to do.', 'Henry Ford'],
+  ['Lost time is never found again.', 'Benjamin Franklin'],
+  ['The task you’re avoiding is usually the one that moves everything.', ''],
+  ['Two minutes of starting beats two hours of planning.', '']
+];
+// quotes turn over by themselves every so often while a page is up, or on ↻
+const QUOTE_SETS = {morning:function(){ return MORNING_QUOTES; }, work:function(){ return WORK_QUOTES; }, action:function(){ return ACTION_QUOTES; }};
+function quoteFor(kind){ const list = QUOTE_SETS[kind](), off = (ui.qOff && ui.qOff[kind]) || 0; return list[(dayNum() + off) % list.length]; }
+function nextQuote(kind){ ui.qOff = ui.qOff || {}; ui.qOff[kind] = (ui.qOff[kind]||0) + 1; document.querySelectorAll('.qt[data-q="'+kind+'"]').forEach(function(el){
+  const tmp = document.createElement('div'); tmp.innerHTML = quoteHtml(quoteFor(kind), el.dataset.cls||'', kind); const n = tmp.firstChild; n.classList.add('qt-swap'); el.replaceWith(n); }); }
+ACTIONS.nextQuote = function(el, e, id){ nextQuote(id); };
+setInterval(function(){
+  if(typeof ui==='undefined' || !ui) return;
+  if(overlayOpen('wakeOverlay') && ui.wakeMode==='brief' && ui.briefSkipped) nextQuote('morning');
+  if(overlayOpen('planOverlay')){ nextQuote('work'); setTimeout(function(){ nextQuote('action'); }, 9000); }
+}, 45000);
 // small, human things for a good day — three a morning
 const MORNING_THOUGHTS = [
   ['&#127749;', 'Get outside in the first hour.', 'Ten minutes of morning light sets your whole day.'],
@@ -74,6 +100,9 @@ const MORNING_THOUGHTS = [
   ['&#127911;', 'Put on something you love.', 'Music while you get ready changes the whole mood.'],
   ['&#128245;', 'Phone face-down till breakfast is done.', 'The world can wait twenty minutes.'],
   ['&#127859;', 'Make breakfast like it matters.', 'Sit down for it.'],
+  ['&#9749;', 'Make a proper coffee.', 'Or a fresh juice. Take it slow.'],
+  ['&#129367;', 'Think about what you’ll eat today.', 'Decide now and you won’t grab junk later.'],
+  ['&#127807;', 'Open a window.', 'Fresh air before the screen.'],
   ['&#10024;', 'Romanticize it.', 'The coffee, the light, the walk. This is your life — enjoy it.'],
   ['&#128591;', 'Name one thing you’re grateful for.', 'Say it out loud.'],
   ['&#128075;', 'Text someone you love good morning.', 'Takes ten seconds, makes their day.'],
@@ -84,20 +113,26 @@ const MORNING_THOUGHTS = [
   ['&#128588;', 'You don’t have to rush.', 'A calm morning makes a sharp afternoon.']
 ];
 function dayNum(){ const d = new Date(), start = new Date(d.getFullYear(), 0, 0); return Math.floor((d - start)/86400000); }
-function quoteOfDay(){ return MORNING_QUOTES[dayNum() % MORNING_QUOTES.length]; }
-function workQuoteOfDay(){ return WORK_QUOTES[dayNum() % WORK_QUOTES.length]; }
+function quoteOfDay(){ return quoteFor('morning'); }
+function workQuoteOfDay(){ return quoteFor('work'); }
 function thoughtsOfDay(n){ const out = [], len = MORNING_THOUGHTS.length, d = dayNum(); for(let i=0;i<(n||3);i++) out.push(MORNING_THOUGHTS[(d*3 + i*5) % len]); return out.filter(function(x, i, a){ return a.indexOf(x)===i; }); }
-function quoteHtml(q, cls){ return '<figure class="qt '+(cls||'')+'"><span class="qt-mark">&ldquo;</span><blockquote>'+escapeHtml(q[0])+'</blockquote>'+(q[1] ? '<figcaption><span class="qt-rule"></span>'+escapeHtml(q[1])+'</figcaption>' : '')+'</figure>'; }
+function quoteHtml(q, cls, kind){ return '<figure class="qt '+(cls||'')+'"'+(kind ? ' data-q="'+kind+'" data-cls="'+(cls||'')+'"' : '')+'><span class="qt-mark">&ldquo;</span>'+(kind ? '<button class="qt-next" data-action="nextQuote" data-id="'+kind+'" title="Another one">&#8635;</button>' : '')+'<blockquote>'+escapeHtml(q[0])+'</blockquote>'+(q[1] ? '<figcaption><span class="qt-rule"></span>'+escapeHtml(q[1])+'</figcaption>' : '')+'</figure>'; }
 
 // ---- headlines (through the launcher; a public feed reader if the launcher can't) ----
 function morningNewsOn(){ return wakeCfg().news!==false; }
+// your topics ("AI, Knicks, marketing") → headlines about those, from Google News
+function newsTopics(){ return String(wakeCfg().newsTopics||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean).join(', '); }
+function topicsQuery(t){ return t.split(',').map(function(x){ x = x.trim(); return /\s/.test(x) ? '"'+x+'"' : x; }).join(' OR ')+' when:2d'; }
+// Google News titles end in " - Source"; show the source on its own
+function splitSource(n){ const m = / - ([^-]{2,60})$/.exec(n.title); if(m && (!n.src || n.src===m[1])){ n.title = n.title.slice(0, m.index); n.src = m[1]; } return n; }
 function parseRss(text){
   const xml = new DOMParser().parseFromString(text, 'text/xml');
   const chan = xml.querySelector('channel > title');
   const src = chan ? chan.textContent.replace(/\s*[:\-|].*$/, '').trim() : '';
   return Array.prototype.slice.call(xml.querySelectorAll('item')).slice(0, 6).map(function(it){
     const t = it.querySelector('title'), l = it.querySelector('link');
-    return {title:(t ? t.textContent : '').trim(), link:(l ? l.textContent : '').trim(), src:src};
+    const so = it.querySelector('source');
+    return splitSource({title:(t ? t.textContent : '').trim(), link:(l ? l.textContent : '').trim(), src:so ? so.textContent.trim() : src});
   }).filter(function(x){ return x.title; });
 }
 async function fetchWithin(url, ms){
@@ -111,14 +146,16 @@ async function loadMorningNews(){
   ui.morningNews = {date:today, loading:true, items:null};
   let items = null;
   try{
-    const res = await fetchWithin(WAKE_HELPER+'news', 9000);
+    const topics = newsTopics();
+    const res = await fetchWithin(WAKE_HELPER+'news'+(topics ? '?q='+hexUtf8(topics) : ''), 9000);
     if(res && res.ok) items = parseRss(await res.text());
   }catch(e){}
   if(!items || !items.length){
     // an Operator still running last version's launcher has no /news — read the feed another way
     try{
-      const res = await fetchWithin('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://feeds.npr.org/1001/rss.xml'), 8000);
-      if(res && res.ok){ const j = await res.json(); items = arr(j && j.items).slice(0, 6).map(function(x){ return {title:String(x.title||'').trim(), link:String(x.link||''), src:'NPR'}; }).filter(function(x){ return x.title; }); }
+      const topics = newsTopics(), feed = topics ? 'https://news.google.com/rss/search?q='+encodeURIComponent(topicsQuery(topics))+'&hl=en-US&gl=US&ceid=US:en' : 'https://feeds.npr.org/1001/rss.xml';
+      const res = await fetchWithin('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(feed), 8000);
+      if(res && res.ok){ const j = await res.json(); items = arr(j && j.items).slice(0, 6).map(function(x){ return splitSource({title:String(x.title||'').trim(), link:String(x.link||''), src:topics ? '' : 'NPR'}); }).filter(function(x){ return x.title; }); }
     }catch(e){}
   }
   ui.morningNews = {date:today, loading:false, items:items && items.length ? items : null};
@@ -229,11 +266,13 @@ function briefBase(){ return wakeCfg().intro!=='quick' ? 5600 : 3000; }
 // your morning playlist (Apple Music), one click — and it can follow the wake-up song by itself
 function morningPlaylist(){ const m = state.profile.morningPlaylist; return m && m.q ? m : null; }
 function playlistBtnHtml(){
-  const pl = morningPlaylist();
-  return pl ? '<button class="br-pl" data-action="playMorningPlaylist" title="Play '+escapeHtml(pl.q)+' in the Music app">&#9654; '+escapeHtml(pl.q)+'</button>'
-    : '<button class="br-pl is-unset" data-action="setMorningPlaylist" title="Pick a playlist for your mornings">&#9835; Morning playlist</button>';
+  const pl = morningPlaylist(), on = !!ui.plPlaying;
+  return '<button class="plb'+(on?' is-on':'')+(pl?'':' is-unset')+'" data-action="'+(pl ? (on ? 'stopMorningPlaylist' : 'playMorningPlaylist') : 'setMorningPlaylist')+'" title="'+(pl ? (on ? 'Pause' : 'Play '+escapeHtml(pl.q)) : 'Pick a morning playlist')+'">'+
+    '<span class="plb-i">'+(on ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9654;')+'</span><span class="plb-t">'+escapeHtml(pl ? pl.q : 'Morning playlist')+'</span></button>';
 }
-ACTIONS.playMorningPlaylist = function(){ const pl = morningPlaylist(); if(!pl) return; musicApp('play', {type:'music', k:'playlist', q:pl.q}).then(function(ok){ if(!ok) showToast('Couldn\'t start '+pl.q+' — check the name in Settings → Sound.', {icon:'&#9888;'}); }); };
+function plRefresh(){ if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto(); }
+ACTIONS.stopMorningPlaylist = function(){ ui.plPlaying = false; musicApp('pause'); plRefresh(); };
+ACTIONS.playMorningPlaylist = function(){ const pl = morningPlaylist(); if(!pl) return; ui.plPlaying = true; plRefresh(); musicApp('play', {type:'music', k:'playlist', q:pl.q}).then(function(ok){ if(!ok){ ui.plPlaying = false; plRefresh(); showToast('Couldn\'t start '+pl.q+' — Apple Music plays through the Operator app; check the playlist name in Settings → Sound.', {icon:'&#9888;'}); } }); };
 ACTIONS.setMorningPlaylist = function(){
   const v = window.prompt('Which Apple Music playlist should your mornings play? (its exact name)', ''); if(!v || !v.trim()) return;
   state.profile.morningPlaylist = {q:v.trim(), k:'playlist'}; persist('profile');
@@ -277,25 +316,21 @@ function wakeBriefHtml(){
     (nn.headline ? '<div class="br-ln-head">'+escapeHtml(nn.headline)+'</div>' : '')+(nn.morning ? '<div class="br-ln-text">'+escapeHtml(nn.morning)+'</div>' : '')));
   else if(vb && vb.elements.length) colA.push(panel('br-vision', 'br-a-scale', 'And this is what it’s all for.', boardStaticHtml(vb, 'wake-board'), '', ' data-action="wakeBoardToggle" title="Open your vision board"'));
   // column 2: a line to carry, and a few small things for a good day
-  colB.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q)));
+  colB.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
   colB.push(panel('br-thoughts', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+
     thoughtsOfDay(4).map(function(x, i){ return '<div class="br-th" style="--i:'+i+'"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')));
   // column 3: the world, then the day ahead
   if(news){
     const d0 = base + k*gap, late = ui.briefNewsAt ? Math.max(600, d0 - (ui.briefNewsAt - (ui.briefT0||0))) : null;
-    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there.', '<div class="br-k">&#128240; The News'+(news[0].src ? ' <span class="br-src">'+escapeHtml(news[0].src)+'</span>' : '')+'</div>'+
-      news.slice(0, 6).map(function(n, i){ return '<button class="br-news-i'+(i===0?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+escapeHtml(n.title)+'</span><i>&#8599;</i></button>'; }).join(''), late!=null ? ';--late:'+late+'ms' : ''));
+    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there.', '<div class="br-k">&#128240; '+(newsTopics() ? 'Your News <span class="br-src">'+escapeHtml(newsTopics())+'</span>' : 'The News'+(news[0].src ? ' <span class="br-src">'+escapeHtml(news[0].src)+'</span>' : ''))+'</div>'+
+      news.slice(0, 6).map(function(n, i){ return '<button class="br-news-i'+(i===0?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+escapeHtml(n.title)+(n.src && newsTopics() ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; }).join(''), late!=null ? ';--late:'+late+'ms' : ''));
   } else if(morningNewsOn() && ui.morningNews && ui.morningNews.loading){
     colC.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+(base + k*gap)+'ms"><div class="br-k">&#128240; The News</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');
   }
-  const dayBits = [];
-  if(events.length) dayBits.push(events.length===1 ? 'one thing on the calendar' : events.length+' things on the calendar');
-  if(plan.length) dayBits.push(plan.length===1 ? 'one thing planned' : plan.length+' things planned');
-  colC.push(panel('br-day', 'br-a-right', dayBits.length ? 'Later today: '+dayBits.join(', ')+'.' : 'Nothing on the calendar. The day’s yours.',
-    '<div class="br-k">&#128197; The Day Ahead</div>'+
-    (events.length ? '<div class="br-agenda">'+events.slice(0, 3).map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b>'+escapeHtml(e.title)+'</div>'; }).join('')+'</div>' : '')+
-    (plan.length ? '<div class="br-day-plan">'+(plan.length===1 ? 'One thing' : plan.length+' things')+' planned. First up: <b>'+escapeHtml(plan[0].title)+'</b></div>' : '')+
-    (!events.length && !plan.length ? '<div class="br-day-plan">Nothing scheduled. Enjoy it.</div>' : '')));
+  // the day ahead — just the calendar; the work plan waits for the business preview
+  colC.push(panel('br-day', 'br-a-right', events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.',
+    '<div class="br-k">&#128197; Today</div>'+
+    (events.length ? '<div class="br-agenda">'+events.slice(0, 3).map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b>'+escapeHtml(e.title)+'</div>'; }).join('')+'</div>' : '<div class="br-day-plan">Nothing scheduled. Enjoy the morning.</div>')));
   const ctaD = base + k*gap;
   lines.push({at: ctaD - 380, text: 'Get ready to start your day.'});
   ui.briefLines = lines;
@@ -392,7 +427,33 @@ function workStats(){
     {k:'Collected this month', v:money(collected), sub:new Date().toLocaleDateString(undefined, {month:'long'})},
     {k:'Open leads', v:String(open.length), sub: pipe ? money(pipe)+' in the pipeline' : 'In the pipeline'},
     {k:'Deep work yesterday', v:fmtHours(yDeep), sub:'Streak: '+computeStreak()+' day'+(computeStreak()===1?'':'s')}
-  ];
+  ].concat(workSocialStats());
+}
+// followers and new messages, when GoHighLevel is connected (otherwise they simply don't show)
+function workSocialStats(){
+  const out = [];
+  try{
+    const sd = typeof socialData==='function' ? socialData() : null;
+    const f = sd && sd.platformTotals && sd.platformTotals.followers;
+    if(f && Object.keys(f).length){
+      let total = 0, gain = 0;
+      Object.keys(f).forEach(function(k){ const x = f[k]||{}, ser = arr(x.series).map(Number); total += Number(x.total)||0; if(ser.length>1) gain += ser[ser.length-1] - ser[0]; });
+      out.push({k:'Followers', v:total.toLocaleString(), sub:(gain>=0 ? '+' : '')+gain.toLocaleString()+' this week'});
+    }
+    if(typeof ghlCfg==='function' && ghlCfg().connected){ const n = inboxUnread(); out.push({k:'New messages', v:String(n), sub:n ? 'Waiting in Social' : 'Inbox clear', go:'goToConvos'}); }
+  }catch(e){}
+  return out;
+}
+// each active client's health at a glance
+function workClientsHtml(){
+  const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
+  if(!cs.length) return '';
+  const rank = {red:0, yellow:1, green:2};
+  const rows = cs.map(function(c){ return {c:c, h:clientHealthStatus(c)}; }).sort(function(a, b){ return rank[a.h.level] - rank[b.h.level]; }).slice(0, 6);
+  return '<div class="wi-clients"><div class="wi-sec">Clients <span>'+cs.length+' active</span></div><div class="wi-cl-grid">'+rows.map(function(r){
+    const word = r.h.level==='red' ? 'Needs you' : r.h.level==='yellow' ? 'Keep an eye' : 'Healthy';
+    return '<button class="wi-cl is-'+r.h.level+'" data-action="openContact" data-kind="client" data-id="'+r.c.id+'"><i></i><b>'+escapeHtml(crmName('client', r.c))+'</b><span>'+word+'</span></button>';
+  }).join('')+'</div></div>';
 }
 function renderPlanReveal(){
   if(!ui.planReveal) return '';
@@ -412,16 +473,17 @@ function renderPlanReveal(){
     '<div class="wi-inner">'+
       '<div class="wi-k" style="animation-delay:40ms">Work Mode</div>'+
       '<h1 class="wi-h" style="animation-delay:100ms">Let’s get to work'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
-      '<div class="wi-stats">'+stats.map(function(s){ return '<div class="wi-stat" style="'+at(140)+'"><div class="wi-stat-k">'+s.k+'</div><div class="wi-stat-v">'+s.v+'</div>'+(s.pct!=null ? '<div class="wi-bar"><i style="width:'+s.pct.toFixed(1)+'%"></i></div>' : '')+'<div class="wi-stat-s">'+escapeHtml(s.sub)+'</div></div>'; }).join('')+'</div>'+
+      '<div class="wi-stats n'+stats.length+'">'+stats.map(function(s){ return '<div class="wi-stat"'+(s.go ? ' data-action="'+s.go+'"' : '')+' style="'+at(140)+'"><div class="wi-stat-k">'+s.k+'</div><div class="wi-stat-v">'+s.v+'</div>'+(s.pct!=null ? '<div class="wi-bar"><i style="width:'+s.pct.toFixed(1)+'%"></i></div>' : '')+'<div class="wi-stat-s">'+escapeHtml(s.sub)+'</div></div>'; }).join('')+'</div>'+
       '<div class="wi-cols">'+
-        '<div class="wi-plan" style="'+at(300)+'"><div class="wi-sec">Plan of Attack <span>'+(plan.length ? plan.length+(plan.length===1?' thing':' things') : '')+'</span></div>'+
+        '<div class="wi-plan" style="'+at(300)+'"><div class="wi-sec">Plan of Attack <span>'+(plan.length ? plan.length+(plan.length===1?' thing':' things')+' &middot; ' : '')+'aim for '+fmtHours(target)+'</span></div>'+
           (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(d + i*60)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">Due today</span>' : '')+'</li>'; }).join('')+'</ol>'
             : '<div class="wd-empty">Nothing planned yet. Pick your first move in Lock in.</div>')+
           (events.length ? '<div class="wi-cal">'+events.slice(0, 3).map(function(e){ return '<span><b>'+fmt12Hour(e.time)+'</b>'+escapeHtml(e.title)+'</span>'; }).join('')+'</div>' : '')+
         '</div>'+
-        '<div class="wi-side" style="'+at(300)+'">'+(nightNote().work ? '<div class="wi-note"><span>&#127769; You told yourself</span><p>'+escapeHtml(nightNote().work)+'</p></div>' : '')+quoteHtml(q, 'is-work')+
-          '<div class="wi-target"><span>Today’s target</span><b>'+fmtHours(target)+'</b><span>of deep work</span></div></div>'+
+        '<div class="wi-right" style="'+at(300)+'">'+(nightNote().work ? '<div class="wi-note"><span>&#127769; You told yourself</span><p>'+escapeHtml(nightNote().work)+'</p></div>' : '')+
+          '<div class="wi-side">'+quoteHtml(q, 'is-work', 'work')+'</div></div>'+
       '</div>'+
+      '<div class="wi-row2" style="'+at(200)+'">'+workClientsHtml()+'<div class="wi-act">'+quoteHtml(quoteFor('action'), 'is-act', 'action')+'</div></div>'+
       '<div class="pr-cta" style="animation-delay:420ms">'+
         '<button class="ls-go pr-go" data-action="planLockIn"'+(first ? ' data-id="'+first.id+'"' : '')+'><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>'+
         (first ? '<div class="ls-go-sub">First up: '+escapeHtml(first.title)+'</div>' : '')+
