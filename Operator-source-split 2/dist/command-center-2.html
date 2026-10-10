@@ -3635,6 +3635,9 @@
   .pcf-back .pc-attrs{ margin-top:0; }
   .pcf-xp{ font-size:10.5px; color:rgba(255,255,255,.55); }
   .pcf-open{ padding:6px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.07); color:#fff; font:inherit; font-size:12px; font-weight:700; cursor:pointer; } .pcf-open:hover{ background:rgba(255,255,255,.14); }
+  /* the SYSTEM window never blocks the app: only the card takes clicks (the dim behind is just a look) */
+  .sys-win, .sys-win.is-in{ pointer-events:none; } .sys-win .sys-card{ pointer-events:auto; }
+  .sys-win.is-in:not(.is-level){ background:rgba(4,8,18,.25); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';

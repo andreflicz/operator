@@ -68,7 +68,7 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
     const T = new Date(2026,9,12,7,0,5).getTime();
     const p = await newPage(b, OUT+'/r14.html', {profile:{name:'Andre', goalWeight:180}, health:{weightLog:[{date:'2026-09-01',weight:192},{date:'2026-10-11',weight:186}]},
       journal:{entries:[{id:'j1', date:'2026-09-12', timestamp:1, text:'Signed JJS today.', title:'First big client', type:'freeform'}]},
-      focus:{wake:{enabled:true, time:'07:00', days:[0,1,2,3,4,5,6], news:true, newsTopics:'AI', newsSports:'Knicks', newsTech:'Apple'}}}, T);
+      focus:{wake:{enabled:true, time:'07:00', days:[0,1,2,3,4,5,6], news:true, newsTopics:'AI', newsSports:'Knicks', newsTech:'Apple', voice:false}}}, T); // (spoken narration: r16/r17)
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await p.route('http://127.0.0.1:8935/**', r => { const u = r.request().url(); if(u.includes('/news')){ const q = hexDecode((u.split('q=')[1]||'').split('&')[0]) || 'Top'; return r.fulfill({status:200, body:RSS(q), headers:{'Access-Control-Allow-Origin':'*'}}); } return r.fulfill({status:200, body:'{"ok":true}', headers:{'Access-Control-Allow-Origin':'*'}}); });
     await E("fireWake({})"); await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(400);
@@ -80,7 +80,7 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
     const said = await p.textContent('#brVoice');
     check('…and types a word at a time, slowly (not the whole line at once)', said.length > 0 && said.length < L[0].text.length, said);
     await E("briefRevealAll()"); await p.waitForTimeout(1200);
-    check('news: your headlines plus Sports and Tech sections', /AI headline 1/.test(await p.textContent('.br-news')) && /Sports/i.test(await p.textContent('.br-news')) && /Knicks headline/.test(await p.textContent('.br-news')) && /Apple headline/.test(await p.textContent('.br-news')));
+    check('news: your headlines with tech mixed in, and Sports in its own panel', /AI headline 1/.test(await p.textContent('.br-news')) && /Apple headline/.test(await p.textContent('.br-news')) && /Knicks headline/.test(await p.textContent('.br-sports')));
     const you = await p.textContent('.br-you');
     check('"You, lately": streak, workouts, weight, and something you wrote a month ago', /day streak/.test(you) && /workouts this week/.test(you) && /186/.test(you) && /A month ago/i.test(you) && /First big client/.test(you));
     check('one music control in the corner', (await p.$$('.b4-music > *')).length===1);

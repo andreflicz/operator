@@ -11,7 +11,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   let p = await newPage(b, OUT+'/td.html', seed, new Date(2026,9,8,11,0).getTime());
   const E = (code) => p.evaluate(c => window.__op.ev(c), code);
   check('hero with a big Lock In button', await p.isVisible('.today-hero .lockin-cta'));
-  check('Lock In shows what\'s up next (highest priority by default)', (await p.textContent('.lockin-sub')).includes('Send invoice'));
+  check('Lock In shows what\'s up next (highest priority by default)', (await E("nextUpTask().title")).includes('Send invoice') && !(await p.textContent('.lockin-cta')).includes('Up next'));
   await p.click('.lockin-cta');
   check('Lock In opens the Lock In sequence', await p.isVisible('#lockSeqOverlay:not(.hidden)'));
   await p.keyboard.press('Escape');
@@ -23,7 +23,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('[data-action="toggleNextPicker"][data-where="hero"]');
   check('next picker lists today + backlog', (await p.$$('.next-picker .np-row')).length===3);
   await p.click('.next-picker [data-action="pickNextTask"][data-id="t3"]');
-  check('picking a backlog task moves it to today and makes it next', await E("state.tasks.items.find(t=>t.id==='t3').status")==='today' && (await p.textContent('.lockin-sub')).includes('Script hooks'));
+  check('picking a backlog task moves it to today and makes it next', await E("state.tasks.items.find(t=>t.id==='t3').status")==='today' && (await E("nextUpTask().title")).includes('Script hooks'));
   check('next pick is saved', await E("state.focus.nextTaskId")==='t3');
   // take today off: one click, with an Undo right there
   await p.click('[data-action="quickDayOff"]');
@@ -60,7 +60,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('panel subtitles hidden', await p.evaluate(() => [...document.querySelectorAll('.today-panels .section-title > .kpi-sub')].every(e => getComputedStyle(e).display==='none')));
   // next survives a restart
   await p.reload(); await p.waitForTimeout(400);
-  check('next-up survives a reload', (await p.textContent('.lockin-sub')).includes('Edit Nina reel'));
+  check('next-up survives a reload', (await E("nextUpTask().title")).includes('Edit Nina reel'));
   // goals
   await p.click('[data-action="nav"][data-view="personal"]'); await p.click('[data-action="personalTab"][data-tab="goals"]');
   await p.click('#fabAdd');
