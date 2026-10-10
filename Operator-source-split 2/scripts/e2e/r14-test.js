@@ -96,24 +96,7 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
     await p.context().close();
   }
 
-  // ---- Apple Music playlist from a link ----
-  {
-    const p = await newPage(b, OUT+'/r14.html', {profile:{name:'Andre'}});
-    const E = c => p.evaluate(x => window.__op.ev(x), c);
-    const asked = [];
-    await p.route('http://127.0.0.1:8935/**', r => { const u = r.request().url(); asked.push(u);
-      if(u.includes('/music/resolve')) return r.fulfill({status:200, body:'{"ok":true,"name":"Morning Run"}', headers:{'Access-Control-Allow-Origin':'*'}});
-      if(u.includes('/music/pick')) return r.fulfill({status:404, body:'{"ok":false,"error":"not in your library","opened":true}', headers:{'Access-Control-Allow-Origin':'*'}});
-      return r.fulfill({status:200, body:'{"ok":true}', headers:{'Access-Control-Allow-Origin':'*'}}); });
-    await E("setMorningPlaylistFrom('https://music.apple.com/us/playlist/morning-run/pl.u-abc123')"); await p.waitForTimeout(300);
-    check('a pasted link becomes the playlist\'s real name (and the link is kept)', await E("JSON.stringify(state.profile.morningPlaylist)")==JSON.stringify({q:'Morning Run', k:'playlist', url:'https://music.apple.com/us/playlist/morning-run/pl.u-abc123'}));
-    await E("ACTIONS.playMorningPlaylist()"); await p.waitForTimeout(600);
-    const pick = asked.find(u => u.includes('/music/pick'));
-    check('playing asks for the playlist by name, with the link as a backup', !!pick && /k=playlist/.test(pick) && hexDecode(pick.split('q=')[1].split('&')[0])==='Morning Run' && /u=/.test(pick));
-    check('not in your library → an honest note (it opened in Apple Music; add it once)', /isn’t in your library yet/.test(await p.textContent('body')));
-    check('no page errors (playlist)', p.errors.length===0, p.errors);
-    await p.context().close();
-  }
+  // (Apple Music playlists were removed in round 17 — only the wake-up song uses Apple Music now)
 
   // ---- carousels reach the window edges ----
   {

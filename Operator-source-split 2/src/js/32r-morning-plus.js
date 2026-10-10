@@ -31,13 +31,19 @@ function pickGames(list){
   const next = favFirst(list.filter(function(g){ return g.state==='pre'; }).sort(function(a, b){ return a.at - b.at; }));
   return live.slice(0, 1).concat(done.slice(0, live.length ? 1 : 2), next.slice(0, 2)).slice(0, 4);
 }
-async function loadScores(){
-  const today = todayStr();
-  if(ui.scores && ui.scores.date===today && (ui.scores.loading || ui.scores.got)) return;
+// returns a promise, so the voice can wait for the scores when you ask for sports
+function loadScores(force){
+  const today = todayStr(), sc = ui.scores;
+  if(sc && sc.date===today && sc.loading) return ui._scoresP;
+  // a failed fetch (nothing came back) is tried again after a few minutes, or when asked for
+  if(sc && sc.date===today && sc.got && (sc.nfl || sc.nba || (!force && Date.now() - (sc.at||0) < 5*60000))) return Promise.resolve(sc);
   ui.scores = {date:today, loading:true};
-  const r = await Promise.all(SPORTS.map(function(s){ return fetchScoreboard(s.id); }));
-  ui.scores = {date:today, loading:false, got:true, nfl:r[0], nba:r[1]};
-  if(ui.wakeMode==='brief' && overlayOpen('wakeOverlay')) renderWakeOverlayInto();
+  ui._scoresP = Promise.all(SPORTS.map(function(s){ return fetchScoreboard(s.id); })).then(function(r){
+    ui.scores = {date:today, loading:false, got:true, at:Date.now(), nfl:r[0], nba:r[1]};
+    if(ui.wakeMode==='brief' && overlayOpen('wakeOverlay')) renderWakeOverlayInto();
+    return ui.scores;
+  });
+  return ui._scoresP;
 }
 function scoreWhen(g){
   const d = new Date(g.at), today = todayStr(), ds = ds2(d);
@@ -161,7 +167,7 @@ function briefMinimalHtml(){
   const sc = typeof scoresHtml==='function' ? scoresHtml() : '';
   return '<div class="brief brief2 brief4 gmm-wrap bg-'+briefBgClass()+' intro-skipped is-skipped" data-sky="'+phase+'">'+
     '<div class="brief-top"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-      '<span class="b4-music">'+playlistBtnHtml()+'</span><button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
+      '<span class="b4-music">'+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span><button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
     '<h1 class="gmm-hello">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
     '<div class="br-voice"><span class="br-voice-dot"></span><span id="brVoice"></span></div>'+(typeof opAskHtml==='function' ? opAskHtml('brief') : '')+
     '<div class="gmm">'+

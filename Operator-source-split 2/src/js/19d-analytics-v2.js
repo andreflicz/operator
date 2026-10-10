@@ -2,7 +2,7 @@
 // The numbers first: deep work, tasks and fitness for the range you're looking at, side by side.
 // Then the charts (when you work, the last 30 days, apps, time by task). The long history of
 // sessions has its own page — Analytics shows the last few and "All sessions →" opens it, where
-// you can filter, sort, and download it (CSV / JSON) or copy a summary to paste into Claude.
+// you can filter, sort, and download it (CSV / JSON) or copy a plain-text summary.
 
 function rangeDays(r){
   if(r==='today') return [todayStr()];
@@ -138,7 +138,7 @@ function renderSessionsPage(){
   const shown = rows.slice(0, ui.sxShow || 100);
   return '<div class="sx">'+
     '<div class="sx-top"><button class="btn btn-ghost btn-sm" data-action="closeSessionsPage">&larr; Analytics</button><h2>All Sessions</h2>'+
-      '<span class="sx-export"><button class="btn btn-ghost btn-sm" data-action="sxCopy" title="Copy a summary you can paste into Claude">&#10024; Copy for Claude</button><button class="btn btn-ghost btn-sm" data-action="sxCsv">&#11015; CSV</button><button class="btn btn-ghost btn-sm" data-action="sxJson">&#11015; JSON</button></span></div>'+
+      '<span class="sx-export"><button class="btn btn-ghost btn-sm" data-action="sxCopy" title="Copy a plain-text summary">&#10024; Copy summary</button><button class="btn btn-ghost btn-sm" data-action="sxCsv">&#11015; CSV</button><button class="btn btn-ghost btn-sm" data-action="sxJson">&#11015; JSON</button></span></div>'+
     '<div class="sx-filters">'+seg('range', [['7','7 days'],['30','30 days'],['90','90 days'],['all','All']])+
       '<select class="input sx-sel" data-sx="type">'+[['all','All types']].concat(Object.keys(SX_TYPES).filter(function(k){ return k!=='other'; }).map(function(k){ return [k, SX_TYPES[k][0]]; })).map(function(o){ return '<option value="'+o[0]+'"'+(f.type===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
       '<select class="input sx-sel" data-sx="sort">'+[['new','Newest first'],['old','Oldest first'],['long','Longest first'],['short','Shortest first']].map(function(o){ return '<option value="'+o[0]+'"'+(f.sort===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
@@ -165,7 +165,7 @@ ACTIONS.sxCsv = function(){
   sxDownload('operator-sessions-'+todayStr()+'.csv', cols.join(',')+'\n'+rows.map(function(r){ return cols.map(function(c){ return esc(r[c]); }).join(','); }).join('\n'), 'text/csv');
 };
 ACTIONS.sxJson = function(){ sxDownload('operator-sessions-'+todayStr()+'.json', JSON.stringify({exported:new Date().toISOString(), deepWorkTargetMinutes:state.standards.deepWorkTargetMinutes||180, sessions:sxExportRows()}, null, 2), 'application/json'); };
-// a summary written to be pasted into Claude: the totals, the daily pattern, then every entry
+// a plain-text summary: the totals, the daily pattern, then every entry
 ACTIONS.sxCopy = function(){
   const rows = sxExportRows(), f = ui.sx || {};
   const byDay = {}; rows.forEach(function(r){ if(r.type==='Deep work') byDay[r.date] = (byDay[r.date]||0) + r.minutes; });
@@ -177,6 +177,6 @@ ACTIONS.sxCopy = function(){
     'Deep work per day:\n'+days.map(function(d){ return d+': '+byDay[d]+' min'; }).join('\n')+'\n\n'+
     'All entries (date, start–end, type, minutes, method, tasks finished, note):\n'+
     rows.map(function(r){ return [r.date, r.start+(r.end ? '–'+r.end : ''), r.type, r.minutes+' min', r.method, r.tasks_finished, r.note].filter(function(x){ return x!==''; }).join(' | '); }).join('\n');
-  const done = function(){ showToast('Copied '+rows.length+' entries — paste it into Claude.', {icon:'&#10024;'}); };
-  try{ navigator.clipboard.writeText(txt).then(done, function(){ sxDownload('operator-sessions-for-claude.txt', txt, 'text/plain'); }); }catch(e){ sxDownload('operator-sessions-for-claude.txt', txt, 'text/plain'); }
+  const done = function(){ showToast('Copied '+rows.length+' entries.', {icon:'&#10024;'}); };
+  try{ navigator.clipboard.writeText(txt).then(done, function(){ sxDownload('operator-sessions-summary.txt', txt, 'text/plain'); }); }catch(e){ sxDownload('operator-sessions-summary.txt', txt, 'text/plain'); }
 };

@@ -74,13 +74,11 @@ function defaultSettings(){
 }
 const AI_TOOLS = [
   {id:'chatgpt', emoji:'🤖', label:'ChatGPT', url:'https://chat.openai.com', bg:'#10a37f'},
-  {id:'claude', emoji:'✦', label:'Claude', url:'https://claude.ai', bg:'#c15f3c'},
   {id:'gemini', emoji:'✨', label:'Gemini', url:'https://gemini.google.com', bg:'#4285f4'}
 ];
 const QUICK_LINK_DEFS = [
   {key:'files', label:'Files', emoji:'📁', bg:'#5b6472'},
   {key:'ghl', label:'GHL', emoji:'⚡', bg:'#0b6e6e'},
-  {key:'drive', label:'Drive', emoji:'📂', bg:'#3fa1e8'},
   {key:'meta', label:'Meta Ads', emoji:'📣', bg:'#4267ff'}
 ];
 function quickLinksSettings(){ return (state.settings && state.settings.quickLinks) || defaultSettings().quickLinks; }

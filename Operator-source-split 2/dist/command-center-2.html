@@ -3206,13 +3206,6 @@
   .br-mem{ margin-top:10px; padding:10px 12px; border-left:2px solid rgba(255,197,107,.6); background:rgba(255,197,107,.06); border-radius:0 10px 10px 0; }
   .br-mem small{ font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#ffc56b; } .br-mem p{ margin:4px 0 0; font-size:13.5px; line-height:1.45; color:rgba(255,255,255,.85); }
   .br-mem p b{ color:#fff; }
-  /* tall screens: the page sits in the middle as one block instead of stretching to the edges */
-  @media (min-height:950px){
-    .brief4 .brief-inner.b4{ justify-content:center; height:auto; min-height:100vh; }
-    .brief4 .b4-grid{ flex:none; align-items:start; }
-    .brief4 .b4-col > .br-p{ flex:none !important; }
-    .brief4 .br-news{ flex:none; }
-  }
   .brief.bg-sunrise .brief-intro{ background:linear-gradient(180deg, #0f1430 0%, #231f46 45%, #4a3156 75%, #7a4552 100%); }
   .brief.bg-sunrise .bi-glow{ width:110vmin; height:110vmin; background:radial-gradient(circle, rgba(255,180,110,.45), rgba(255,130,90,.14) 45%, transparent 70%); }
 
@@ -3419,6 +3412,229 @@
   .xp-ov, .tn-ov{ display:flex; align-items:center; justify-content:center; }
   .xp-ov.hidden, .tn-ov.hidden{ display:none !important; }
   .quick-journal-fab.jorb, .jorb-core, .jorb-ring{ will-change:transform, opacity; }
+
+  /* ---- round 17: Good morning ---- */
+  /* a fixed frame: the grid takes the space it's given (never more than ~880px tall) and every piece
+     has its place before it appears, so nothing moves when the news or a new quote lands */
+  .brief4 .brief-inner.b4{ justify-content:center; }
+  .brief4 .b4-grid{ flex:1 1 auto; max-height:880px; grid-template-columns:1.15fr 1fr 1.1fr; grid-template-rows:minmax(0, 1.3fr) minmax(0, 1fr); grid-template-areas:"a b c" "a b d"; }
+  .b4-grid > .c-a{ grid-area:a; } .b4-grid > .c-b{ grid-area:b; } .b4-grid > .c-c{ grid-area:c; } .b4-grid > .c-d{ grid-area:d; }
+  .brief4 .b4-grid.no-d{ grid-template-areas:"a b c" "a b c"; }
+  .brief4 .b4-grid.no-c{ grid-template-areas:"a b d" "a b d"; }
+  .brief4 .b4-grid.cols-2{ grid-template-columns:1.15fr 1fr; grid-template-areas:"a b" "a b"; }
+  .brief4 .b4-col > .br-p{ flex:none; }
+  .brief4 .c-a > .br-lastnight, .brief4 .c-a > .br-vision, .brief4 .c-a > .br-you:last-child{ flex:1 1 auto; }
+  .brief4 .c-b > .br-thoughts{ flex:1 1 auto; }
+  .brief4 .c-c > .br-news, .brief4 .c-d > .br-sports{ flex:1 1 auto; }
+  .brief4 .br-sports .gc-grid{ margin-top:10px; }
+  .brief4 .br-sports .br-news-i{ font-size:13.5px; }
+  .br-tag{ display:inline-block; vertical-align:1px; margin-right:7px; padding:1px 7px; border-radius:999px; font-style:normal; font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#9fd8ff; background:rgba(110,190,255,.14); }
+  /* wide monitors: the page uses the width — four columns, a little larger type */
+  @media (min-width:1680px){
+    .brief4 .brief-inner.b4{ max-width:min(1960px, 95vw); }
+    .brief4 .b4-grid{ max-height:920px; grid-template-columns:1.1fr 1fr 1.15fr 1fr; grid-template-rows:minmax(0, 1fr); grid-template-areas:"a b c d"; }
+    .brief4 .b4-grid.no-d{ grid-template-columns:1.15fr 1fr 1.25fr; grid-template-areas:"a b c"; }
+    .brief4 .b4-grid.no-c{ grid-template-columns:1.15fr 1fr 1.25fr; grid-template-areas:"a b d"; }
+    .brief4 .b4-grid.cols-2{ grid-template-areas:"a b"; }
+    .brief4 .br-news-i{ font-size:15px; }
+  }
+  @media (max-width:1000px){ .brief4 .b4-grid, .brief4 .b4-grid.no-d, .brief4 .b4-grid.no-c{ grid-template-columns:1fr 1fr; grid-template-areas:"a b" "a b"; } .brief4 .b4-col.c-c, .brief4 .b4-col.c-d{ display:none; } }
+  /* quotes live in a box of a fixed size: the words scale to fit and who said it always shows */
+  .brief4 .br-quote{ height:clamp(160px, 22vh, 230px); flex:none !important; overflow:hidden !important; justify-content:flex-start; }
+  .br-quote .qt, .wi-side .qt, .wi-act .qt{ display:flex; flex-direction:column; min-height:0; flex:1 1 auto; justify-content:center; }
+  .br-quote .qt blockquote, .wi-side .qt blockquote, .wi-act .qt blockquote{ min-height:0; overflow:hidden; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:5; }
+  .br-quote .qt figcaption, .wi-side .qt figcaption, .wi-act .qt figcaption{ flex:none; margin-top:10px; }
+  .wi-right .wi-side{ flex:none !important; height:clamp(170px, 23vh, 240px); overflow:hidden; }
+  .wi-right .wi-act{ flex:none !important; height:clamp(130px, 17vh, 180px); overflow:hidden; }
+  .wi-act .qt-mark{ height:18px; font-size:40px; }
+  .wi-right{ justify-content:space-between; }
+  /* the voice's mute lives in the top bar now */
+  .op-mute-top{ width:34px; height:34px; border-radius:50%; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.06); color:#fff; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:15px; transition:background .2s, border-color .2s, transform .15s; }
+  .op-mute-top:hover{ background:rgba(255,255,255,.12); transform:scale(1.05); }
+  .op-mute-top.is-off{ opacity:.6; }
+  body.op-speaking .op-mute-top:not(.is-off){ border-color:rgba(120,200,255,.6); box-shadow:0 0 0 3px rgba(120,200,255,.14); }
+  .b4-music{ min-width:34px; justify-content:flex-end; }
+  /* the Focus page's own Minimal button (while locked in) sits in its header */
+  .lv-corner.is-focus{ position:static !important; top:auto !important; right:auto !important; margin-left:auto; align-self:center; }
+  /* the voice picker (alarm settings) */
+  .op-set .seg-tabs{ display:inline-flex; }
+  .op-set select.input{ width:100%; }
+  .op-set-help{ margin-top:8px; font-size:12.5px; line-height:1.5; color:var(--text-dim); }
+  .op-set-help b{ color:var(--text); font-weight:600; }
+  .op-set-warn{ color:var(--warn, #e8a23d); }
+  .op-set-key{ display:flex; align-items:center; gap:8px; margin-bottom:8px; } .op-set-key .input{ flex:1; } .op-set-key span{ font-size:13px; color:var(--text-dim); flex:1; }
+  .op-set-test{ display:flex; align-items:center; gap:12px; margin-top:10px; min-height:32px; }
+  .op-set-cap{ font-size:13px; color:#7cc8ff; font-weight:600; line-height:1.4; }
+  .op-set{ grid-column:1 / -1; }
+  /* the Operator's chips sit on the page, not in a box; the mute sits by Skip on the right */
+  .brief.brief2.brief4 .br-p.br-opbar.br-opbar.br-opbar.br-opbar.br-opbar, .brief.brief2 .br-p.br-opbar.br-opbar.br-opbar{ background:none !important; border:none !important; padding:0 !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; border-radius:0 !important; flex:none; margin-top:2px !important; }
+  .brief4 .brief-top .b4-music{ margin-left:auto !important; margin-right:4px; }
+  .brief4 .brief-top .brief-skipall{ margin-left:6px !important; }
+
+  /* ---- the player card (NBA 2K style) ---- */
+  .wi-stats.n7{ grid-template-columns:repeat(7, 1fr); } .wi-stats.n7 .wi-stat-v{ font-size:21px; }
+  .th-card{ display:flex; align-items:center; justify-content:center; flex:none; }
+  .pc{ --rc:#8fd3ff; position:relative; display:flex; flex-direction:column; align-items:center; width:188px; padding:12px 12px 10px; border-radius:18px; cursor:pointer; overflow:hidden; text-align:center; color:#fff; font:inherit;
+    border:1px solid color-mix(in srgb, var(--rc) 55%, transparent);
+    background:linear-gradient(160deg, color-mix(in srgb, var(--rc) 30%, #12151d) 0%, #10131a 48%, color-mix(in srgb, var(--rc) 16%, #0c0e14) 100%);
+    box-shadow:0 14px 34px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.12), 0 0 0 1px rgba(0,0,0,.3); transition:transform .25s cubic-bezier(.2,.9,.3,1.2), box-shadow .25s; }
+  .pc:hover{ transform:translateY(-3px) rotate(-.6deg); box-shadow:0 20px 44px rgba(0,0,0,.5), 0 0 26px color-mix(in srgb, var(--rc) 30%, transparent), inset 0 1px 0 rgba(255,255,255,.16); }
+  .pc-shine{ position:absolute; inset:-40% -60%; background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,.13) 48%, transparent 56%); transform:translateX(-30%); animation:pcShine 6s ease-in-out infinite; pointer-events:none; }
+  @keyframes pcShine{ 0%, 70%{ transform:translateX(-40%); } 100%{ transform:translateX(40%); } }
+  .pc-top{ position:relative; width:100%; display:flex; justify-content:space-between; align-items:flex-start; }
+  .pc-ovr{ display:flex; flex-direction:column; align-items:center; line-height:1; } .pc-ovr b{ font-family:var(--font-display); font-size:34px; font-weight:800; letter-spacing:-.02em; color:var(--rc); text-shadow:0 0 18px color-mix(in srgb, var(--rc) 45%, transparent); }
+  .pc-ovr small, .pc-rk small{ font-size:9.5px; font-weight:800; letter-spacing:.16em; color:rgba(255,255,255,.6); margin-top:2px; }
+  .pc-rk{ display:flex; flex-direction:column; align-items:center; }
+  .pc-face{ position:relative; width:62px; height:62px; margin:-8px 0 6px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.22), rgba(255,255,255,.04) 60%), color-mix(in srgb, var(--rc) 22%, #151922); border:1px solid rgba(255,255,255,.18); }
+  .pc-face span{ font-family:var(--font-display); font-weight:800; font-size:22px; letter-spacing:.02em; }
+  .pc-name{ position:relative; font-family:var(--font-display); font-weight:800; font-size:16px; letter-spacing:.06em; text-transform:uppercase; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pc-pos{ position:relative; font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--rc); margin-top:1px; }
+  .pc-attrs{ position:relative; display:grid; grid-template-columns:repeat(4, 1fr); gap:4px; width:100%; margin-top:9px; padding-top:8px; border-top:1px solid rgba(255,255,255,.12); }
+  .pc-attrs > span{ display:flex; flex-direction:column; align-items:center; line-height:1.05; }
+  .pc-attrs b{ font-family:var(--font-display); font-size:17px; font-weight:800; color:#fff; } .pc-attrs small{ font-size:9px; font-weight:800; letter-spacing:.12em; color:var(--ac); }
+  .pc-xp{ position:relative; width:100%; margin-top:8px; } .pc-xp i{ display:block; height:4px; border-radius:4px; background:rgba(255,255,255,.12); overflow:hidden; }
+  .pc-xp u{ display:block; height:100%; border-radius:4px; background:linear-gradient(90deg, #4fb4ff, var(--rc)); box-shadow:0 0 8px var(--rc); }
+  .pc-xp small{ display:block; margin-top:4px; font-size:9.5px; color:rgba(255,255,255,.55); letter-spacing:.04em; }
+  .pc.pc-big{ width:250px; padding:18px 16px 14px; border-radius:22px; } .pc-big .pc-ovr b{ font-size:48px; } .pc-big .pc-face{ width:92px; height:92px; } .pc-big .pc-face span{ font-size:32px; } .pc-big .pc-name{ font-size:20px; } .pc-big .pc-attrs b{ font-size:22px; }
+  .pc.tier-0{ --rc:#8fd3ff; }
+  body:not(.theme-dark) .today-hero .pc{ color:#fff; }
+  @media (max-width:1180px){ .th-card{ display:none; } }
+
+  /* ---- [ SYSTEM ] windows, Solo Leveling style ---- */
+  .sys-win{ position:fixed; inset:0; z-index:9000; display:flex; align-items:center; justify-content:center; background:rgba(4,8,18,0); transition:background .3s; pointer-events:none; }
+  .sys-win.is-in{ background:rgba(4,8,18,.55); pointer-events:auto; }
+  .sys-card{ position:relative; width:min(440px, 92vw); padding:22px 24px 18px; border-radius:6px; color:#dff3ff; font-family:var(--font-body);
+    background:linear-gradient(180deg, rgba(10,24,44,.96), rgba(6,14,28,.96)); border:1px solid rgba(110,200,255,.7);
+    box-shadow:0 0 0 1px rgba(110,200,255,.15), 0 0 40px rgba(60,160,255,.35), inset 0 0 30px rgba(60,160,255,.12);
+    opacity:0; transform:scale(.92) translateY(8px); transition:opacity .3s, transform .35s cubic-bezier(.2,.9,.3,1.2); }
+  .sys-card::before, .sys-card::after{ content:''; position:absolute; left:10px; right:10px; height:1px; background:linear-gradient(90deg, transparent, rgba(140,215,255,.9), transparent); }
+  .sys-card::before{ top:6px; } .sys-card::after{ bottom:6px; }
+  .sys-win.is-in .sys-card{ opacity:1; transform:none; } .sys-win.is-out .sys-card{ opacity:0; transform:scale(.97); }
+  .sys-k{ font-size:11px; font-weight:800; letter-spacing:.3em; color:#7fd0ff; text-align:center; text-shadow:0 0 10px rgba(110,200,255,.8); }
+  .sys-title{ margin-top:10px; font-family:var(--font-display); font-size:22px; font-weight:800; text-align:center; letter-spacing:.02em; color:#fff; }
+  .sys-sub{ margin-top:4px; text-align:center; font-size:13px; color:rgba(220,240,255,.7); }
+  .sys-lines{ margin-top:12px; padding:8px 0; border-top:1px solid rgba(110,200,255,.25); border-bottom:1px solid rgba(110,200,255,.25); }
+  .sys-lines div{ display:flex; justify-content:space-between; gap:12px; font-size:13px; padding:3px 0; color:rgba(220,240,255,.85); } .sys-lines b{ color:#7fd0ff; white-space:nowrap; }
+  .sys-gain{ margin-top:12px; text-align:center; font-family:var(--font-display); font-size:38px; font-weight:800; color:#fff; text-shadow:0 0 22px rgba(110,200,255,.9); letter-spacing:-.01em; }
+  .sys-bar{ display:flex; align-items:center; gap:10px; margin-top:8px; } .sys-bar i{ flex:1; height:8px; border-radius:2px; background:rgba(110,200,255,.15); overflow:hidden; border:1px solid rgba(110,200,255,.35); }
+  .sys-bar u{ display:block; height:100%; background:linear-gradient(90deg, #2f8fff, #8fe0ff); box-shadow:0 0 12px rgba(110,200,255,.9); }
+  .sys-bar span{ font-size:12px; font-weight:800; letter-spacing:.1em; color:#7fd0ff; }
+  .sys-lvl{ margin-top:14px; text-align:center; font-family:var(--font-display); font-size:34px; font-weight:900; letter-spacing:.12em; color:#fff; opacity:0; transform:scale(1.6); text-shadow:0 0 24px #4fb4ff, 0 0 48px #4fb4ff; }
+  .sys-lvl small{ display:block; font-size:12px; letter-spacing:.2em; font-weight:700; color:#9fdcff; text-shadow:none; margin-top:2px; }
+  .sys-win.is-leveled .sys-lvl{ animation:sysLvl .7s cubic-bezier(.2,.9,.3,1.3) forwards; }
+  .sys-win.is-leveled .sys-card{ animation:sysPulse 1.2s ease-out; }
+  @keyframes sysLvl{ to{ opacity:1; transform:none; } }
+  @keyframes sysPulse{ 0%{ box-shadow:0 0 0 1px rgba(110,200,255,.15), 0 0 120px rgba(80,180,255,.9); } 100%{ box-shadow:0 0 0 1px rgba(110,200,255,.15), 0 0 40px rgba(60,160,255,.35); } }
+  .sys-ok{ display:block; margin:16px auto 0; padding:7px 28px; border-radius:3px; border:1px solid rgba(110,200,255,.6); background:rgba(60,160,255,.12); color:#dff3ff; font-weight:800; letter-spacing:.2em; cursor:pointer; }
+  .sys-ok:hover{ background:rgba(60,160,255,.25); }
+  .sys-toast{ position:fixed; left:50%; top:62px; z-index:8999; transform:translate(-50%, -12px); opacity:0; pointer-events:none; padding:9px 16px; border-radius:4px; font-size:13px; color:#dff3ff;
+    background:rgba(8,20,38,.94); border:1px solid rgba(110,200,255,.6); box-shadow:0 0 22px rgba(60,160,255,.35); transition:opacity .25s, transform .3s; white-space:nowrap; }
+  .sys-toast.is-in{ opacity:1; transform:translate(-50%, 0); } .sys-toast span{ color:#7fd0ff; font-weight:800; letter-spacing:.14em; font-size:11px; margin-right:6px; } .sys-toast b{ color:#8fe0ff; margin-left:6px; }
+  .sys-quest{ margin-top:10px; padding:10px 12px; border-radius:6px; border:1px solid rgba(110,200,255,.35); background:rgba(20,50,90,.22); color:#dff3ff; }
+  .sys-quest.is-done{ border-color:rgba(126,240,192,.6); }
+  .sys-h{ display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:10.5px; font-weight:800; letter-spacing:.18em; color:#7fd0ff; margin-bottom:6px; } .sys-h em{ font-style:normal; letter-spacing:.06em; color:rgba(220,240,255,.6); font-weight:700; }
+  .sys-quest.is-done .sys-h em{ color:#7ef0c0; }
+  .sys-q{ display:flex; align-items:center; gap:9px; padding:3px 0; font-size:13px; } .sys-q span:nth-child(2){ flex:1; } .sys-q b{ font-size:12px; font-weight:700; color:rgba(220,240,255,.75); }
+  .sys-box{ width:14px; height:14px; border-radius:2px; border:1px solid rgba(110,200,255,.7); display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:#7ef0c0; flex:none; }
+  .sys-q.is-done{ color:rgba(220,240,255,.55); } .sys-q.is-done .sys-box{ border-color:#7ef0c0; background:rgba(126,240,192,.15); }
+  .br-sys{ margin-top:10px; cursor:pointer; } .br-sys-h{ display:flex; align-items:center; gap:8px; font-size:12px; } .br-sys-h span{ font-size:10.5px; font-weight:800; letter-spacing:.2em; color:#7fd0ff; } .br-sys-h em{ margin-left:auto; font-style:normal; font-weight:800; font-size:12px; color:#fff; }
+  .br-sys-bar{ display:block; height:4px; margin:6px 0 0; border-radius:4px; background:rgba(110,200,255,.15); overflow:hidden; } .br-sys-bar u{ display:block; height:100%; background:linear-gradient(90deg, #2f8fff, #8fe0ff); }
+  .br-sys .sys-quest{ margin-top:8px; padding:8px 10px; } .br-sys .sys-q{ font-size:12.5px; padding:2px 0; }
+
+  /* ---- Personal → You ---- */
+  .you{ display:flex; flex-direction:column; gap:16px; }
+  .you-top{ display:flex; gap:22px; align-items:stretch; flex-wrap:wrap; }
+  .you-main{ flex:1; min-width:300px; padding:18px 20px; border-radius:18px; border:1px solid var(--border); background:var(--panel); }
+  .you-main .sys-k{ text-align:left; }
+  .you-lvl{ margin-top:6px; font-family:var(--font-display); font-size:22px; font-weight:700; } .you-lvl b{ font-size:34px; } .you-lvl small{ display:block; font-family:var(--font-body); font-size:12.5px; font-weight:500; color:var(--text-dim); }
+  .you-xpbar{ margin-top:10px; } .you-xpbar i{ display:block; height:8px; border-radius:6px; background:var(--panel-2); overflow:hidden; } .you-xpbar u{ display:block; height:100%; background:linear-gradient(90deg, #2f8fff, #8fe0ff); box-shadow:0 0 10px rgba(110,200,255,.6); }
+  .you-xpbar span{ display:block; margin-top:6px; font-size:12.5px; color:var(--text-dim); }
+  .you-next{ margin-top:10px; font-size:13.5px; color:var(--text-dim); } .you-next b{ color:var(--text); }
+  .you-main .sys-quest{ background:rgba(20,50,90,.18); }
+  body:not(.theme-dark) .you-main .sys-quest{ color:var(--text); }
+  .you-attrs{ display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; }
+  @media (max-width:1100px){ .you-attrs{ grid-template-columns:repeat(2, 1fr); } }
+  .you-attr{ padding:14px 16px; border-radius:16px; border:1px solid var(--border); background:var(--panel); border-top:2px solid var(--ac); }
+  .you-attr-h{ display:flex; align-items:baseline; gap:8px; margin-bottom:8px; } .you-attr-h b{ font-family:var(--font-display); font-size:30px; font-weight:800; color:var(--ac); } .you-attr-h span{ font-weight:700; }
+  .you-sub{ display:grid; grid-template-columns:1fr 54px 26px; align-items:center; gap:2px 8px; padding:4px 0; font-size:12.5px; }
+  .you-sub i{ height:4px; border-radius:4px; background:var(--panel-2); overflow:hidden; } .you-sub u{ display:block; height:100%; background:var(--ac); }
+  .you-sub b{ text-align:right; font-size:12.5px; } .you-sub small{ grid-column:1 / -1; font-size:11px; color:var(--text-faint); margin-top:-2px; }
+  .you-row{ display:grid; grid-template-columns:1fr 1fr 1.2fr; gap:12px; } @media (max-width:1100px){ .you-row{ grid-template-columns:1fr; } }
+  .you-body, .you-ladder, .you-today{ padding:14px 16px; border-radius:16px; border:1px solid var(--border); background:var(--panel); }
+  .you-sec{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); margin:2px 0 8px; } .you-sec:not(:first-child){ margin-top:12px; }
+  .you-bmi{ display:flex; align-items:baseline; gap:8px; } .you-bmi b{ font-family:var(--font-display); font-size:34px; font-weight:800; } .you-bmi span{ color:var(--text-dim); font-size:13px; }
+  .bmi-bar{ position:relative; height:8px; margin-top:10px; border-radius:6px; overflow:visible; } .bmi-bar i{ position:absolute; top:0; bottom:0; } .bmi-bar i.u{ background:#6fc3ff; border-radius:6px 0 0 6px; } .bmi-bar i.h{ background:#3fbe8e; } .bmi-bar i.o{ background:#e8a23d; } .bmi-bar i.ob{ background:#e8636b; border-radius:0 6px 6px 0; }
+  .bmi-bar b{ position:absolute; top:-4px; width:4px; height:16px; margin-left:-2px; border-radius:2px; background:#fff; box-shadow:0 0 0 2px rgba(0,0,0,.4); }
+  .bmi-lab{ position:relative; height:16px; font-size:10.5px; color:var(--text-faint); } .bmi-lab span{ position:absolute; transform:translateX(-50%); top:3px; } .bmi-lab span:nth-child(1){ left:14%; } .bmi-lab span:nth-child(2){ left:40%; } .bmi-lab span:nth-child(3){ left:60%; }
+  .you-note{ margin-top:8px; font-size:12.5px; line-height:1.5; color:var(--text-dim); } .you-note b{ color:var(--text); }
+  .you .xp-step{ display:flex; align-items:center; gap:8px; padding:4px 0; font-size:12.5px; opacity:.55; } .you .xp-step.is-done{ opacity:.8; } .you .xp-step.is-cur{ opacity:1; } .you .xp-step.is-cur b{ color:var(--rc); }
+  .you .xp-step span{ margin-left:auto; color:var(--text-faint); font-size:11.5px; }
+  .you .xp-row{ display:flex; justify-content:space-between; gap:10px; font-size:12.5px; padding:3px 0; } .you .xp-row b{ white-space:nowrap; }
+  .you .xp-how{ margin-top:10px; font-size:11.5px; line-height:1.5; color:var(--text-faint); } .you .xp-empty{ font-size:12.5px; color:var(--text-faint); }
+
+  /* ---- the minimal Focus page (not locked in) ---- */
+  .np-home .np-bg{ background:radial-gradient(55% 55% at 30% 35%, rgba(79,180,255,.22), transparent 70%), radial-gradient(50% 50% at 75% 70%, rgba(232,162,61,.18), transparent 70%), #0a0b12; }
+  .hm-brand{ font-size:12px; font-weight:800; letter-spacing:.32em; color:rgba(255,255,255,.55); }
+  .hm-main{ position:relative; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 6vw 9vh; text-align:center; }
+  .hm-clock{ display:flex; align-items:baseline; gap:10px; line-height:.9; } .hm-clock b{ font-family:var(--font-display); font-weight:300; font-size:clamp(84px, 13vw, 168px); letter-spacing:-.04em; font-variant-numeric:tabular-nums; }
+  .hm-clock span{ font-size:clamp(18px, 2vw, 26px); font-weight:600; color:rgba(255,255,255,.55); }
+  .hm-date{ margin-top:10px; font-size:15px; color:rgba(255,255,255,.6); letter-spacing:.02em; }
+  .hm-greet{ margin-top:6px; font-size:clamp(18px, 2vw, 24px); font-weight:600; color:rgba(255,255,255,.88); }
+  .hm-stats{ display:flex; gap:12px; margin-top:28px; flex-wrap:wrap; justify-content:center; }
+  .hm-s{ display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:130px; padding:12px 18px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:#fff; font:inherit; -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
+  .hm-s b{ font-family:var(--font-display); font-size:22px; font-weight:700; } .hm-s small{ font-size:11.5px; color:rgba(255,255,255,.55); margin-top:2px; }
+  .hm-s i{ display:block; width:100%; height:3px; margin-top:7px; border-radius:3px; background:rgba(255,255,255,.12); overflow:hidden; } .hm-s u{ display:block; height:100%; background:linear-gradient(90deg, #2f8fff, #8fe0ff); }
+  .hm-lvl{ flex-direction:row; gap:10px; cursor:pointer; border-color:color-mix(in srgb, var(--rc) 45%, transparent); } .hm-lvl > span{ display:flex; flex-direction:column; align-items:flex-start; min-width:110px; } .hm-lvl b{ color:var(--rc); }
+  .hm-lvl:hover{ background:rgba(255,255,255,.08); }
+  .hm-go{ position:relative; display:inline-flex; align-items:center; gap:12px; margin-top:34px; padding:18px 46px; border-radius:999px; border:none; cursor:pointer; color:#062016; font:inherit;
+    background:linear-gradient(160deg, #7ef0c0, #3fbe8e); box-shadow:0 14px 40px rgba(63,190,142,.35), inset 0 1px 0 rgba(255,255,255,.5); transition:transform .2s cubic-bezier(.2,.9,.3,1.3), box-shadow .2s; }
+  .hm-go b{ font-family:var(--font-display); font-size:22px; font-weight:800; letter-spacing:.08em; } .hm-go > span:not(.hm-go-ring){ font-size:20px; }
+  .hm-go:hover{ transform:translateY(-2px) scale(1.02); box-shadow:0 18px 50px rgba(63,190,142,.45), inset 0 1px 0 rgba(255,255,255,.5); }
+  .hm-go-ring{ position:absolute; inset:-6px; border-radius:999px; border:1px solid rgba(126,240,192,.45); animation:hmRing 2.8s ease-out infinite; pointer-events:none; }
+  @keyframes hmRing{ 0%{ opacity:.9; transform:scale(.98); } 100%{ opacity:0; transform:scale(1.12); } }
+  .hm-next{ margin-top:14px; font-size:14px; color:rgba(255,255,255,.6); }
+  .hm-btns{ display:flex; gap:10px; margin-top:26px; flex-wrap:wrap; justify-content:center; }
+  .hm-b{ padding:9px 18px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:rgba(255,255,255,.85); font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; transition:background .2s, border-color .2s; }
+  .hm-b:hover{ background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.28); color:#fff; }
+  .hm-main > *{ flex:none; } .hm-stats{ align-items:stretch; } .hm-s{ height:auto; min-height:0; }
+  .np-home .np-top{ padding-right:84px !important; align-items:center !important; }
+  /* talking to the Operator: the mic and a field to type in */
+  .op-talk-wrap{ display:inline-flex; align-items:center; gap:6px; margin-left:4px; }
+  .op-talk{ width:32px; height:32px; border-radius:50%; border:1px solid rgba(120,200,255,.45); background:rgba(80,170,255,.12); color:#fff; cursor:pointer; font-size:14px; display:inline-flex; align-items:center; justify-content:center; transition:transform .15s, background .2s; }
+  .op-talk:hover{ transform:scale(1.06); background:rgba(80,170,255,.22); }
+  .op-talk.is-on{ background:rgba(255,90,110,.25); border-color:rgba(255,120,140,.8); animation:opMic 1.1s ease-in-out infinite; }
+  .op-talk.is-busy{ opacity:.6; }
+  @keyframes opMic{ 0%, 100%{ box-shadow:0 0 0 0 rgba(255,110,130,.45); } 50%{ box-shadow:0 0 0 8px rgba(255,110,130,0); } }
+  .op-type{ width:190px; height:32px; padding:0 12px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:#fff; font:inherit; font-size:13px; outline:none; transition:width .25s, border-color .2s; }
+  .op-type:focus{ width:280px; border-color:rgba(120,200,255,.6); }
+  .op-type::placeholder{ color:rgba(255,255,255,.4); }
+  .hm-talk{ display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:22px; }
+  .hm-cap{ max-width:620px; min-height:22px; font-size:15px; line-height:1.5; color:#bfe6ff; font-weight:500; }
+  /* LOCK IN: just the words, centred — no "Up next" line under it */
+  .lockin-cta{ justify-content:center; padding:22px 20px; }
+  .lockin-cta .lockin-copy{ flex:none; align-items:center; }
+  .lockin-cta .lockin-key{ position:absolute; right:16px; top:50%; transform:translateY(-50%); }
+  .lockin-cta .lockin-title{ font-size:24px; letter-spacing:.06em; }
+  .ls-go-wrap{ display:flex; justify-content:center; padding:6px 0 4px; }
+  .you-how{ margin-top:12px; font-size:12.5px; line-height:1.5; color:var(--text-faint); }
+  .you-sub{ grid-template-columns:1fr 70px 28px; padding:5px 0; }
+  .you-row{ grid-template-columns:1fr 1fr; } .you-main{ display:flex; flex-direction:column; justify-content:center; }
+  /* the card next to LOCK IN: the level on the front, the rest on the back */
+  .pcf{ --rc:#8fd3ff; position:relative; width:168px; height:214px; perspective:900px; }
+  .pcf-face{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:14px; border-radius:18px; overflow:hidden; color:#fff; font:inherit; cursor:pointer; text-align:center;
+    border:1px solid color-mix(in srgb, var(--rc) 55%, transparent); background:linear-gradient(160deg, color-mix(in srgb, var(--rc) 28%, #12151d) 0%, #10131a 52%, color-mix(in srgb, var(--rc) 14%, #0c0e14) 100%);
+    box-shadow:0 14px 34px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.12); backface-visibility:hidden; -webkit-backface-visibility:hidden; transition:transform .6s cubic-bezier(.3,.9,.3,1.05), box-shadow .25s; }
+  .pcf-back{ transform:rotateY(180deg); justify-content:space-between; }
+  .pcf.is-flipped .pcf-front{ transform:rotateY(-180deg); } .pcf.is-flipped .pcf-back{ transform:rotateY(0); }
+  .pcf:hover .pcf-face{ box-shadow:0 18px 40px rgba(0,0,0,.5), 0 0 24px color-mix(in srgb, var(--rc) 28%, transparent), inset 0 1px 0 rgba(255,255,255,.16); }
+  .pcf-k{ position:relative; font-size:10.5px; font-weight:800; letter-spacing:.32em; color:rgba(255,255,255,.55); }
+  .pcf-lvl{ position:relative; font-family:var(--font-display); font-size:76px; font-weight:800; line-height:.95; letter-spacing:-.03em; color:#fff; text-shadow:0 0 28px color-mix(in srgb, var(--rc) 60%, transparent); }
+  .pcf-rank{ position:relative; display:inline-flex; align-items:center; gap:6px; margin-top:4px; font-size:11.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--rc); }
+  .pcf-bar{ position:relative; display:block; width:78%; height:3px; margin-top:12px; border-radius:3px; background:rgba(255,255,255,.12); overflow:hidden; } .pcf-bar u{ display:block; height:100%; background:linear-gradient(90deg, #4fb4ff, var(--rc)); }
+  .pcf-ovr{ display:flex; align-items:baseline; gap:6px; } .pcf-ovr b{ font-family:var(--font-display); font-size:40px; font-weight:800; color:var(--rc); line-height:1; } .pcf-ovr small{ font-size:10px; font-weight:800; letter-spacing:.16em; color:rgba(255,255,255,.6); }
+  .pcf-back .pc-attrs{ margin-top:0; }
+  .pcf-xp{ font-size:10.5px; color:rgba(255,255,255,.55); }
+  .pcf-open{ padding:6px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.07); color:#fff; font:inherit; font-size:12px; font-weight:700; cursor:pointer; } .pcf-open:hover{ background:rgba(255,255,255,.14); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -4640,13 +4856,11 @@ function defaultSettings(){
 }
 const AI_TOOLS = [
   {id:'chatgpt', emoji:'🤖', label:'ChatGPT', url:'https://chat.openai.com', bg:'#10a37f'},
-  {id:'claude', emoji:'✦', label:'Claude', url:'https://claude.ai', bg:'#c15f3c'},
   {id:'gemini', emoji:'✨', label:'Gemini', url:'https://gemini.google.com', bg:'#4285f4'}
 ];
 const QUICK_LINK_DEFS = [
   {key:'files', label:'Files', emoji:'📁', bg:'#5b6472'},
   {key:'ghl', label:'GHL', emoji:'⚡', bg:'#0b6e6e'},
-  {key:'drive', label:'Drive', emoji:'📂', bg:'#3fa1e8'},
   {key:'meta', label:'Meta Ads', emoji:'📣', bg:'#4267ff'}
 ];
 function quickLinksSettings(){ return (state.settings && state.settings.quickLinks) || defaultSettings().quickLinks; }
@@ -4720,7 +4934,7 @@ let state = {
   boards: defaultBoards()
 };
 let ui = {
-  view:'today', healthTab:'workouts', businessTab:'overview', personalTab:'goals', focusTab:'overview', settingsTab:'you',
+  view:'today', healthTab:'workouts', businessTab:'overview', personalTab:'you', focusTab:'overview', settingsTab:'you',
   forms:{task:false, client:false, prospect:false, breakForm:false},
   pendingFocusMinutes: null,
   focusOpenEnded: false,
@@ -5455,12 +5669,7 @@ function soundSettingsHtml(){
         '<div class="snd-rows">'+tog('lockMusicStop', 'Stop it when I lock out', 'Otherwise it keeps playing', true)+'</div>' : '')+
     '</div>'+
     '<div class="card section"><div class="section-title">&#9728;&#65039; Mornings</div>'+
-      '<div class="snd-pl"><label><b>Morning playlist</b><small>An Apple Music playlist — the play button on Good morning starts it, and it follows your wake-up song by itself</small></label>'+
-        '<div class="snd-music" style="margin-top:8px;"><input class="input" id="sndMorningPl" placeholder="Apple Music playlist link, or its exact name" value="'+escapeHtml(p.morningPlaylist && (p.morningPlaylist.url || p.morningPlaylist.q) || '')+'"><button class="btn btn-sm btn-primary" data-action="sndMorningPlSet">Save</button></div></div>'+
-      '<div class="snd-pl" style="margin-top:14px;"><label><b>Playlists 1 · 2 · 3</b><small>The numbered buttons in the music dock (top right). Paste an Apple Music link or a playlist name.</small></label>'+
-        [0,1,2].map(function(i){ const pl = (p.playlists||[])[i]; return '<div class="snd-music" style="margin-top:8px;"><span class="snd-pl-n" style="color:'+(typeof DOCK_COLORS!=='undefined' ? DOCK_COLORS[i] : '#fff')+'">'+(i+1)+'</span><input class="input" id="sndPl'+i+'" placeholder="Playlist '+(i+1)+' — link or name" value="'+escapeHtml(pl ? (pl.url || pl.q) : '')+'"><button class="btn btn-sm btn-primary" data-action="sndPlSet" data-id="'+i+'">Save</button></div>'; }).join('')+'</div>'+
       '<div class="snd-rows">'+
-        tog('morningPlAfterSong', 'Play it after the wake-up song', 'When the song ends, the playlist carries on', true)+
         tog('focusMusic', 'Focus music after the lock-in intro', 'Quiet tracks keep playing until you lock out', true)+
         tog('dawn', 'Dawn before the alarm', 'A slow chord swells under the sunrise in the last 90 seconds', true)+
         tog('workintro', 'Start work', 'A warm swell when the work intro opens', true)+
@@ -5496,10 +5705,6 @@ ACTIONS.previewSounds = function(){
   const seq = [playTick, playNav, playTaskAdded, playDrop, playPositive, playTaskComplete, playLockIn];
   seq.forEach(function(f, i){ setTimeout(f, i*420); });
 };
-
-ACTIONS.sndMorningPlSet = async function(){ const i = document.getElementById('sndMorningPl'), v = i ? i.value.trim() : ''; const pl = await setMorningPlaylistFrom(v); saveSound(); showToast(pl ? 'Morning playlist: '+escapeHtml(pl.q) : 'Morning playlist cleared', {icon:'&#9835;'}); };
-
-ACTIONS.sndPlSet = async function(el, e, id){ const i = Number(id), inp = document.getElementById('sndPl'+i), v = inp ? inp.value.trim() : ''; const pl = v ? await setUserPlaylist(i, v) : null; if(!v){ userPlaylists()[i] = null; persist('profile'); } saveSound(); if(typeof dockRefresh==='function') dockRefresh(); showToast(pl ? 'Playlist '+(i+1)+': '+escapeHtml(pl.q) : 'Playlist '+(i+1)+' cleared', {icon:'&#9835;'}); };
 // ============ CLIENT HELPERS ============
 function clientOptionsHtml(selected){
   const clients = arr(state.business && state.business.clients);
@@ -7452,9 +7657,9 @@ function renderTodayHero(greeting){
       businessNameTagHtml()+
       '<div class="th-greet">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
       (p.bigClockOnToday ? '<div id="liveClockBig" class="cal-big-clock th-bigclock"></div>'+skyChipHtml() : '<div class="th-subrow"><div class="th-sub" id="liveClock"></div>'+skyChipHtml()+'</div>')+
-      (typeof xpChipHtml==='function' ? xpChipHtml() : '')+
       '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: (allDone ? '<span class="streak-ok" title="Today\'s standard: done">&#10003;</span>' : '')+tip((streak===0 ? 'Hit today\'s standard to start one. ' : allDone ? 'Today\'s in the bag. ' : 'Hit today\'s standard to keep it going. ')+'The streak counts days in a row you hit Today\'s Standard — the deep-work target plus your checklist. Rest days you take off don\'t break it.')})+'</div>'+
     '</div>'+
+    (typeof playerCardMiniHtml==='function' ? '<div class="th-card">'+playerCardMiniHtml()+'</div>' : '')+
     '<div class="th-right">'+
       // in Shooting (or another mode): show it, with its own clock and an End button
       ((state.modes.active && (state.modes.active.type!=='offtime' || state.modes.active.clockedOut)) ? '<div class="th-modecard is-'+state.modes.active.type+'">'+
@@ -7464,7 +7669,7 @@ function renderTodayHero(greeting){
         '</div>' : '')+
       '<button class="lockin-cta'+(state.modes.active && state.modes.active.type!=='offtime' ? ' is-secondary' : '')+'" data-action="openLockInChooser" title="Lock in (L)">'+
         '<span class="lockin-icon">&#128274;</span>'+
-        '<span class="lockin-copy"><span class="lockin-title">Lock in</span><span class="lockin-sub">'+(next ? 'Up next: '+escapeHtml(next.title) : 'Start a focus session')+'</span></span>'+
+        '<span class="lockin-copy"><span class="lockin-title">Lock in</span></span>'+
         '<span class="lockin-key">L</span>'+
       '</button>'+
       '<div class="th-actions">'+
@@ -8388,7 +8593,11 @@ function deepWorkMinutesForQualifying(dateStr){
 }
 function renderFocus(){
   const tab = ui.focusTab || 'tasks';
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus'+tip('Manage the work itself — what you\'re on now, what\'s next, the backlog and video ideas. Analytics shows where the time went.')+'</div></div></div>'+
+  // locked in, the Focus page has the same minimal view as Today (M, or the button top right)
+  const locked = !!state.focus.activeSession;
+  if(locked && typeof lockedMinimal==='function' && lockedMinimal()) return renderLockedMinimal();
+  if(!locked && typeof focusMinimalOn==='function' && focusMinimalOn()) return renderFocusMinimal();
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus'+tip('Manage the work itself — what you\'re on now, what\'s next, the backlog and video ideas. Analytics shows where the time went.')+'</div></div>'+(typeof lockedViewBtnHtml==='function' ? '<div class="lv-corner is-focus">'+(locked ? lockedViewBtnHtml() : focusMinimalBtnHtml())+'</div>' : '')+'</div>'+
   '<div class="tabs tabs-with-tools">'+
     '<div class="tab '+(tab==='tasks'?'active':'')+'" data-action="focusMainTab" data-tab="tasks">Tasks</div>'+
     '<div class="tab '+(tab==='analytics'?'active':'')+'" data-action="focusMainTab" data-tab="analytics">Analytics</div>'+
@@ -9533,7 +9742,7 @@ function renderTaskStatsSection(){
 // The numbers first: deep work, tasks and fitness for the range you're looking at, side by side.
 // Then the charts (when you work, the last 30 days, apps, time by task). The long history of
 // sessions has its own page — Analytics shows the last few and "All sessions →" opens it, where
-// you can filter, sort, and download it (CSV / JSON) or copy a summary to paste into Claude.
+// you can filter, sort, and download it (CSV / JSON) or copy a plain-text summary.
 
 function rangeDays(r){
   if(r==='today') return [todayStr()];
@@ -9669,7 +9878,7 @@ function renderSessionsPage(){
   const shown = rows.slice(0, ui.sxShow || 100);
   return '<div class="sx">'+
     '<div class="sx-top"><button class="btn btn-ghost btn-sm" data-action="closeSessionsPage">&larr; Analytics</button><h2>All Sessions</h2>'+
-      '<span class="sx-export"><button class="btn btn-ghost btn-sm" data-action="sxCopy" title="Copy a summary you can paste into Claude">&#10024; Copy for Claude</button><button class="btn btn-ghost btn-sm" data-action="sxCsv">&#11015; CSV</button><button class="btn btn-ghost btn-sm" data-action="sxJson">&#11015; JSON</button></span></div>'+
+      '<span class="sx-export"><button class="btn btn-ghost btn-sm" data-action="sxCopy" title="Copy a plain-text summary">&#10024; Copy summary</button><button class="btn btn-ghost btn-sm" data-action="sxCsv">&#11015; CSV</button><button class="btn btn-ghost btn-sm" data-action="sxJson">&#11015; JSON</button></span></div>'+
     '<div class="sx-filters">'+seg('range', [['7','7 days'],['30','30 days'],['90','90 days'],['all','All']])+
       '<select class="input sx-sel" data-sx="type">'+[['all','All types']].concat(Object.keys(SX_TYPES).filter(function(k){ return k!=='other'; }).map(function(k){ return [k, SX_TYPES[k][0]]; })).map(function(o){ return '<option value="'+o[0]+'"'+(f.type===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
       '<select class="input sx-sel" data-sx="sort">'+[['new','Newest first'],['old','Oldest first'],['long','Longest first'],['short','Shortest first']].map(function(o){ return '<option value="'+o[0]+'"'+(f.sort===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
@@ -9696,7 +9905,7 @@ ACTIONS.sxCsv = function(){
   sxDownload('operator-sessions-'+todayStr()+'.csv', cols.join(',')+'\n'+rows.map(function(r){ return cols.map(function(c){ return esc(r[c]); }).join(','); }).join('\n'), 'text/csv');
 };
 ACTIONS.sxJson = function(){ sxDownload('operator-sessions-'+todayStr()+'.json', JSON.stringify({exported:new Date().toISOString(), deepWorkTargetMinutes:state.standards.deepWorkTargetMinutes||180, sessions:sxExportRows()}, null, 2), 'application/json'); };
-// a summary written to be pasted into Claude: the totals, the daily pattern, then every entry
+// a plain-text summary: the totals, the daily pattern, then every entry
 ACTIONS.sxCopy = function(){
   const rows = sxExportRows(), f = ui.sx || {};
   const byDay = {}; rows.forEach(function(r){ if(r.type==='Deep work') byDay[r.date] = (byDay[r.date]||0) + r.minutes; });
@@ -9708,8 +9917,8 @@ ACTIONS.sxCopy = function(){
     'Deep work per day:\n'+days.map(function(d){ return d+': '+byDay[d]+' min'; }).join('\n')+'\n\n'+
     'All entries (date, start–end, type, minutes, method, tasks finished, note):\n'+
     rows.map(function(r){ return [r.date, r.start+(r.end ? '–'+r.end : ''), r.type, r.minutes+' min', r.method, r.tasks_finished, r.note].filter(function(x){ return x!==''; }).join(' | '); }).join('\n');
-  const done = function(){ showToast('Copied '+rows.length+' entries — paste it into Claude.', {icon:'&#10024;'}); };
-  try{ navigator.clipboard.writeText(txt).then(done, function(){ sxDownload('operator-sessions-for-claude.txt', txt, 'text/plain'); }); }catch(e){ sxDownload('operator-sessions-for-claude.txt', txt, 'text/plain'); }
+  const done = function(){ showToast('Copied '+rows.length+' entries.', {icon:'&#10024;'}); };
+  try{ navigator.clipboard.writeText(txt).then(done, function(){ sxDownload('operator-sessions-summary.txt', txt, 'text/plain'); }); }catch(e){ sxDownload('operator-sessions-summary.txt', txt, 'text/plain'); }
 };
 // ============ PRE-FOCUS MODAL ============
 function renderPreFocusNextTaskCard(){
@@ -11655,12 +11864,13 @@ function renderPersonal(){
   if(ui.personalTab==='vision' || ui.personalTab==='milanote'){ ui.personalTab = 'journal'; ui.journalMode = 'boards'; }
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Personal'+tip('Goals first, then body, then the running log of what\'s on your mind — journal entries and boards, including your vision board.')+'</div></div></div>'+
   '<div class="tabs">'+
+    '<div class="tab '+(ui.personalTab==='you'?'active':'')+'" data-action="personalTab" data-tab="you">You</div>'+
     '<div class="tab '+(ui.personalTab==='goals'?'active':'')+'" data-action="personalTab" data-tab="goals">Goals</div>'+
     '<div class="tab '+(ui.personalTab==='fitness'?'active':'')+'" data-action="personalTab" data-tab="fitness">Health</div>'+
     '<div class="tab '+(ui.personalTab==='journal'?'active':'')+'" data-action="personalTab" data-tab="journal">Journal</div>'+
     '<div class="tab '+(ui.personalTab==='wishlist'?'active':'')+'" data-action="personalTab" data-tab="wishlist">Wish List</div>'+
   '</div>'+
-  '<div class="tab-panel" data-key="personal-'+ui.personalTab+'">'+(ui.personalTab==='goals' ? renderGoalsTab() : ui.personalTab==='fitness' ? renderFitness() : ui.personalTab==='wishlist' ? renderWishlistTab() :  renderJournalTab())+'</div>';
+  '<div class="tab-panel" data-key="personal-'+ui.personalTab+'">'+(ui.personalTab==='you' && typeof renderYouTab==='function' ? renderYouTab() : ui.personalTab==='goals' ? renderGoalsTab() : ui.personalTab==='fitness' ? renderFitness() : ui.personalTab==='wishlist' ? renderWishlistTab() :  renderJournalTab())+'</div>';
 }
 
 
@@ -16369,7 +16579,7 @@ function renderSettings(){
   const sections = {
     integrations: ghlSettingsHtml(),
     updates: '<div class="upd-panel">'+renderUpdatesTab()+'</div>',
-    data: '<div class="section"><div class="section-title">Your Data'+tip(hasCloud ? 'Saved to your Claude account — it follows you back to this artifact.' : 'Saved on this Mac in Operator\'s own storage — export a copy now and then as a backup.')+'</div><div class="card">'+
+    data: '<div class="section"><div class="section-title">Your Data'+tip(hasCloud ? 'Saved to your account — it follows you wherever you open Operator.' : 'Saved on this Mac in Operator\'s own storage — export a copy now and then as a backup.')+'</div><div class="card">'+
         '<div class="row"><button class="btn" data-action="exportData">Export Data (.json)</button>'+
         '<label class="btn" style="cursor:pointer;">Import Data<input type="file" id="importFile" accept=".json" style="display:none;"></label>'+
         deleteResetBtn()+'</div>'+
@@ -16428,7 +16638,6 @@ function renderSettings(){
         '<div class="field"><label>Open links in'+tip('Force Safari opens a new tab with a special link — the first time, choose “Always Allow” when macOS asks, and it\'ll stop needing a second click.')+'</label><select class="input" id="setLinkBrowser"><option value="default" '+((p.linkBrowser||'default')==='default'?'selected':'')+'>System Default</option><option value="safari" '+(p.linkBrowser==='safari'?'selected':'')+'>Force Safari</option></select></div>'+
         '<div class="field"><label>Business files folder (path on this Mac)</label><input class="input" id="setQuickFiles" placeholder="/Users/you/Documents/Business" value="'+escapeHtml(state.settings.quickLinks.businessFilesPath||'')+'"></div>'+
         '<div class="field"><label>GoHighLevel URL</label><input class="input" id="setQuickGhl" value="'+escapeHtml(state.settings.quickLinks.ghlUrl||'')+'"></div>'+
-        '<div class="field"><label>Google Drive URL</label><input class="input" id="setQuickDrive" value="'+escapeHtml(state.settings.quickLinks.driveUrl||'')+'"></div>'+
         '<div class="field"><label>Meta Ads Manager URL</label><input class="input" id="setQuickMeta" value="'+escapeHtml(state.settings.quickLinks.metaAdsUrl||'')+'"></div>'+
       '</div>'+
       '<div class="kind-label" style="margin-top:16px;margin-bottom:10px;">Icons'+tip('Upload your own logo for any of these — it\'s used as the circle icon. Otherwise a plain default is shown.')+'</div>'+
@@ -16501,6 +16710,7 @@ function renderSettings(){
       '<div class="card section"><div class="section-title">Targets — health &amp; deep work</div><div class="grid grid-2">'+
         '<div class="field"><label>Daily calorie target</label><input class="input" type="number" id="setCalories" value="'+p.calorieTarget+'"></div>'+
         '<div class="field"><label>Goal weight</label><input class="input" type="number" step="0.1" id="setGoalWeight" value="'+(p.goalWeight!=null?p.goalWeight:'')+'"></div>'+
+        '<div class="field"><label>Height'+tip('For your Health rating: your BMI, and the healthy and obese lines for your height.')+'</label><div class="row" style="gap:6px;"><input class="input" type="number" min="3" max="8" id="setHeightFt" placeholder="ft" value="'+(p.heightIn ? Math.floor(p.heightIn/12) : '')+'" style="width:80px;"><input class="input" type="number" min="0" max="11" id="setHeightIn" placeholder="in" value="'+(p.heightIn ? p.heightIn%12 : '')+'" style="width:80px;"></div></div>'+
         '<div class="field"><label>Workout days per week (goal)</label><input class="input" type="number" id="setWeeklyWorkout" value="'+p.weeklyWorkoutTarget+'"></div>'+
         '<div class="field"><label>Deep work target per day</label><select class="input" id="setDeepWorkTarget">'+deepWorkOptions.map(function(m){ return '<option value="'+m+'" '+(state.standards.deepWorkTargetMinutes===m?'selected':'')+'>'+fmtDurationLabel(m)+'</option>'; }).join('')+'</select></div>'+
       '</div></div>'+
@@ -16699,6 +16909,8 @@ function saveProfile(){
   const calEl = document.getElementById('setCalories'); if(calEl) state.profile.calorieTarget = Number(calEl.value)||2000;
   const gw = document.getElementById('setGoalWeight');
   if(gw) state.profile.goalWeight = gw.value ? Number(gw.value) : null;
+  const hf = document.getElementById('setHeightFt'), hi = document.getElementById('setHeightIn');
+  if(hf && hf.value!==''){ const tot = Number(hf.value)*12 + (Number(hi && hi.value)||0); state.profile.heightIn = tot >= 36 && tot <= 100 ? tot : state.profile.heightIn; }
   const wwEl = document.getElementById('setWeeklyWorkout'); if(wwEl) state.profile.weeklyWorkoutTarget = Number(wwEl.value)||5;
   const dwEl = document.getElementById('setDeepWorkTarget'); if(dwEl) state.standards.deepWorkTargetMinutes = Number(dwEl.value)||180;
   const doaEl = document.getElementById('setDaysOffAllowed'); if(doaEl) state.standards.daysOffAllowedPerWeek = clamp(Number(doaEl.value),0,6);
@@ -17368,9 +17580,7 @@ function finishWakeMedia(){
     a.loop = false; wakeFinishing = true;
     a.addEventListener('ended', function(){ if(wakeAudio===a) stopWakeMedia(true); wakeFinishing = false; if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); }, {once:true});
   }
-  const pl = typeof morningPlaylist==='function' && soundPref('morningPlAfterSong', true) ? morningPlaylist() : null;
-  if(wakeMusicApp){ wakeFinishing = true; wakeMusicApp = false; helperFetch(MUSIC_URL+'finish'+(pl ? '?k=playlist&q='+hexUtf8(pl.q) : ''), 4000); }
-  else if(a && pl){ a.addEventListener('ended', function(){ musicApp('play', {type:'music', k:'playlist', q:pl.q}); }, {once:true}); }
+  if(wakeMusicApp){ wakeFinishing = true; wakeMusicApp = false; helperFetch(MUSIC_URL+'finish', 4000); }
 }
 ACTIONS.wakeStopMusic = function(){
   const m = wakeCfg().media;
@@ -17463,7 +17673,7 @@ ACTIONS.wakeStartMorning = function(){
   wakeLiftAway(function(){ ui.wakeMode = null; hideOverlay('wakeOverlay'); });
 };
 ACTIONS.wakeBriefDone = function(){ endBriefing(); };
-ACTIONS.wakeVoice = function(el, e, id){ wakeCfg().voice = id==='on'; persist('focus'); if(id!=='on' && typeof opStop==='function') opStop(); renderView(); };
+ACTIONS.wakeVoice = function(el, e, id){ wakeCfg().voice = id==='on'; if(id==='on' && typeof opVoiceChanged==='function'){ OV.helperDown = false; OV.broken = false; } persist('focus'); if(id!=='on' && typeof opStop==='function') opStop(); renderView(); };
 ACTIONS.wakeBriefBg = function(el, e, id){ const w = wakeCfg(); w.briefBg = id; persist('focus'); renderView(); if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); };
 ACTIONS.wakeBriefLockIn = function(el, e, id){ endBriefing(); if(id) setNextUp(id); renderView(); openLockInChooser(); };
 ACTIONS.wakeClockIn = function(){ const t = ui.wakeBriefTest; endBriefing(); if(t){ showToast('Test done — this is where Clock in shows your plan.', {icon:'&#128339;'}); return; } clockIn(); };
@@ -17472,7 +17682,7 @@ function wakeSnooze(){
   const mins = wakeCfg().snoozeMinutes||9;
   const test = wakeRing && wakeRing.test;
   clearInterval(wakeBeepTimer); wakeBeepTimer = null;
-  stopWakeMedia(false);
+  stopWakeMedia(false); ui.snzPlaying = false;
   wakeRing = null;
   state.focus.snooze = {ts:Date.now()+mins*60000, wake:true, test:test};
   persist('focus');
@@ -17563,6 +17773,7 @@ function renderWakeSetup(){
       '<div class="field"><label>Tech & interests'+tip('Anything else you follow — e.g. AI, Apple, marketing, crypto. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
       '<div class="field"><label>Good morning background'+tip('Time of day follows when you\'re up: sunrise colours early, a blue sky later in the morning, golden in the evening, night if it\'s still dark.')+'</label><div class="seg-tabs" style="margin:0;">'+[['auto','Time of day'],['sunrise','Sunrise'],['dark','Dark']].map(function(o){ const on = (w.briefBg||'auto')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefBg" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
       '<div class="field"><label>The Operator’s voice'+tip('Good morning is spoken out loud (the Mac’s own voice), with captions. You can ask it for sports, news, tech or a business brief.')+'</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.voice!==false?' active':'')+'" data-action="wakeVoice" data-id="on">On</button><button class="seg-tab'+(w.voice===false?' active':'')+'" data-action="wakeVoice" data-id="off">Off</button></div></div>'+
+      (w.voice!==false && typeof opVoiceSettingsHtml==='function' ? opVoiceSettingsHtml() : '')+
       '<div class="field"><label>Good morning layout'+tip('Minimal: one big Get to Work button in the middle with the important things around it.')+'</label><div class="seg-tabs" style="margin:0;">'+[['full','Full'],['minimal','Minimal']].map(function(o){ const on = (w.briefLayout||'full')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefLayout" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
       '<div class="field"><label>Headlines in Good morning</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.news!==false?' active':'')+'" data-action="wakeNews" data-id="on">On</button><button class="seg-tab'+(w.news===false?' active':'')+'" data-action="wakeNews" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+
@@ -20363,8 +20574,7 @@ function lockWhyHtml(){
     '</div>'+
     '<div class="ls-bar"><div class="ls-bar-k"><span>Deep work today</span><span>'+fmtHours(deep)+(after ? ' &rarr; <b>'+fmtHours(after)+'</b>' : '')+' / '+fmtHours(target)+'</span></div>'+
       '<div class="ls-bar-t"><i class="ls-bar-now" style="width:'+pct.toFixed(1)+'%"></i><i class="ls-bar-add" style="left:'+pct.toFixed(1)+'%;width:'+Math.max(0, pct2-pct).toFixed(1)+'%"></i></div></div>'+
-    '<div class="ls-go-wrap"><button class="ls-go" data-action="lockGo"><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>'+
-      '<div class="ls-go-sub">'+(pick ? escapeHtml(pick.title)+' &middot; ' : '')+(s.method==='block' ? lockLenLabel(s.minutes) : mm.label)+'</div></div>'+
+    '<div class="ls-go-wrap"><button class="ls-go" data-action="lockGo"><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button></div>'+
   '</div>';
 }
 function lockSeqHtml(){
@@ -20407,6 +20617,17 @@ function wakeGreeting(){ return 'Good morning'; }
 // Quotes: a mix of philosophers, athletes, makers and founders — famous and not. Only lines whose
 // source is solid; lines with no name are our own.
 const MORNING_QUOTES = [
+  ['Ask, and it shall be given you; seek, and ye shall find; knock, and it shall be opened unto you.', 'Jesus, Matthew 7:7'],
+  ['Do not worry about tomorrow, for tomorrow will worry about itself.', 'Jesus, Matthew 6:34'],
+  ['Let your light shine before others.', 'Jesus, Matthew 5:16'],
+  ['With God all things are possible.', 'Jesus, Matthew 19:26'],
+  ['Get busy living, or get busy dying.', 'Stephen King'],
+  ['Don’t quit. Suffer now and live the rest of your life as a champion.', 'Muhammad Ali'],
+  ['Dedication sees dreams come true.', 'Kobe Bryant'],
+  ['Dreams without goals are just dreams.', 'Denzel Washington'],
+  ['I didn’t come this far to only come this far.', 'Tom Brady'],
+  ['Whether you think you can, or you think you can’t — you’re right.', 'Henry Ford'],
+  ['Stay hungry, stay foolish.', 'Steve Jobs'],
   ['At dawn, when you have trouble getting out of bed, tell yourself: “I have to go to work — as a human being.”', 'Marcus Aurelius'],
   ['No man is free who is not master of himself.', 'Epictetus'],
   ['First say to yourself what you would be; and then do what you have to do.', 'Epictetus'],
@@ -20450,6 +20671,18 @@ const MORNING_QUOTES = [
   ['Slow is fine. Stopped is the only thing that isn’t.', '']
 ];
 const WORK_QUOTES = [
+  ['The work works on you more than you work on the work.', 'Alex Hormozi'],
+  ['Stay hungry, stay foolish.', 'Steve Jobs'],
+  ['Quality is more important than quantity. One home run is much better than two doubles.', 'Steve Jobs'],
+  ['Modern problems require modern solutions.', 'Dave Chappelle'],
+  ['Talent wins games, but teamwork and intelligence win championships.', 'Michael Jordan'],
+  ['When something is important enough, you do it even if the odds are not in your favor.', 'Elon Musk'],
+  ['Work like there is someone working 24 hours a day to take it all away from you.', 'Mark Cuban'],
+  ['If you never want to be criticized, for goodness’ sake don’t do anything new.', 'Jeff Bezos'],
+  ['The cowards never started and the weak died along the way. That leaves us.', 'Phil Knight'],
+  ['I’m not a businessman, I’m a business, man.', 'Jay-Z'],
+  ['Who’s gonna carry the boats?', 'David Goggins'],
+  ['Escape competition through authenticity.', 'Naval Ravikant'],
   ['Volume negates luck.', 'Alex Hormozi'],
   ['Make people an offer so good they would feel stupid saying no.', 'Alex Hormozi'],
   ['Real artists ship.', 'Steve Jobs'],
@@ -20474,6 +20707,11 @@ const WORK_QUOTES = [
 ];
 // for the work preview's second line: starting, procrastination, taking action
 const ACTION_QUOTES = [
+  ['Some people want it to happen, some wish it would happen, others make it happen.', 'Michael Jordan'],
+  ['I can’t relate to lazy people. We don’t speak the same language.', 'Kobe Bryant'],
+  ['I like criticism. It makes you strong.', 'LeBron James'],
+  ['Get busy living, or get busy dying.', 'Stephen King'],
+  ['Volume negates luck.', 'Alex Hormozi'],
   ['Procrastination is the thief of time.', 'Edward Young'],
   ['You may delay, but time will not.', 'Benjamin Franklin'],
   ['The best way out is always through.', 'Robert Frost'],
@@ -20569,11 +20807,17 @@ async function fetchNews(topics){
   }
   return items && items.length ? items : null;
 }
-async function loadMorningNews(){
-  if(!morningNewsOn()) return;
+// (returns a promise the voice can wait on when you ask for the news)
+function loadMorningNews(force){
+  if(!morningNewsOn() && !force) return Promise.resolve(null);
+  const today = todayStr();
+  if(ui.morningNews && ui.morningNews.date===today && ui.morningNews.loading) return ui._newsP || Promise.resolve(null);
+  if(ui.morningNews && ui.morningNews.date===today && ui.morningNews.items) return Promise.resolve(ui.morningNews);
+  ui._newsP = loadMorningNewsNow(); return ui._newsP;
+}
+async function loadMorningNewsNow(){
   if(typeof loadScores==='function' && newsSections().some(function(x){ return x.id==='sports'; })) loadScores();
   const today = todayStr();
-  if(ui.morningNews && ui.morningNews.date===today && (ui.morningNews.items || ui.morningNews.loading)) return;
   ui.morningNews = {date:today, loading:true, items:null, sec:{}};
   const secs = newsSections();
   const all = await Promise.all([fetchNews(newsTopics())].concat(secs.map(function(x){ return fetchNews(x.q); })));
@@ -20586,6 +20830,16 @@ async function loadMorningNews(){
     ui.briefNewsAt = Date.now();
     renderWakeOverlayInto();
   }
+  return ui.morningNews;
+}
+// the headlines panel: top stories with tech woven in (two of the news, then one of tech)
+function mixHeadlines(top, tech){
+  const out = [], a = arr(top).slice(), b = arr(tech).slice();
+  while(out.length < 8 && (a.length || b.length)){
+    if(a.length) out.push({n:a.shift()}); if(a.length && out.length < 8) out.push({n:a.shift()});
+    if(b.length && out.length < 8) out.push({n:b.shift(), tech:true});
+  }
+  return out;
 }
 ACTIONS.openNewsLink = function(el){ const u = el.dataset.url; if(!/^https?:\/\//.test(u||'')) return; helperFetch(WAKE_HELPER+'open?b=default&u='+hexUtf8(u), 3000).then(function(ok){ if(!ok) window.open(u, '_blank'); }); };
 
@@ -20673,14 +20927,20 @@ function snoozeHtml(){
       (nn.headline ? '<div class="snz-note">'+escapeHtml(nn.headline)+'</div>' : '')+
     '</div>'+
     '<div class="snz-acts"><button class="dawn-btn" data-action="snoozeUp">&#9728;&#65039; I’m up</button>'+
-      '<button class="snz-music" data-action="snoozeMusic" title="Pause or play whatever music is on">'+(ui.snzMusicPaused ? '&#9654; Play music' : '&#10073;&#10073; Pause music')+'</button></div>'+
+      '<button class="snz-music'+(snoozeMusicOn()?' is-on':'')+'" data-action="snoozeMusic" title="'+(snoozeMusicOn() ? 'Pause the music' : 'Play your wake-up song again')+'">'+(snoozeMusicOn() ? '&#10073;&#10073; Pause music' : '&#9654; Play music')+'</button></div>'+
   '</div>';
 }
 function tickSnooze(){ const el = document.getElementById('snzLeft'), sn = state.focus.snooze; if(el && sn) el.textContent = formatElapsed(Math.max(0, sn.ts - Date.now())); }
-// pause / play the music while snoozing (Apple Music through the launcher, or Operator's own tracks)
+// snoozing stops the wake-up song, so the button starts on "▶ Play music" (it plays the song again);
+// once something is playing it reads "Pause music"
+function snoozeMusicOn(){ return !!(FM.playing || wakeAudio || wakeMusicApp || ui.snzPlaying); }
 ACTIONS.snoozeMusic = function(){
-  if(!ui.snzMusicPaused){ ui.snzMusicPaused = true; ui.snzFm = FM.playing; if(FM.playing) focusMusicStop(); musicApp('pause'); }
-  else { ui.snzMusicPaused = false; if(ui.snzFm) focusMusicPlay(); else musicApp('play'); }
+  if(snoozeMusicOn()){ ui.snzPlaying = false; if(FM.playing) focusMusicStop(); stopWakeMedia(true); }
+  else {
+    const m = wakeCfg().media;
+    if(m){ ui.snzPlaying = true; playWakeMedia(m, function(){ ui.snzPlaying = false; if(ui.wakeMode==='snooze') renderWakeOverlayInto(); }); }
+    else focusMusicPlay();
+  }
   renderWakeOverlayInto();
 };
 ACTIONS.snoozeUp = function(){ state.focus.snooze = null; persist('focus'); wakeImUp(); };
@@ -20692,41 +20952,6 @@ function lastNightSleep(){
   return h ? {minutes:h.minutes, from:h.startedAt, to:h.endedAt} : null;
 }
 function briefBase(){ return wakeCfg().intro!=='quick' ? 4800 : 1800; }
-// your morning playlist (Apple Music), one click — and it can follow the wake-up song by itself
-function morningPlaylist(){ const m = state.profile.morningPlaylist; return m && m.q ? m : null; }
-function playlistBtnHtml(){
-  const pl = morningPlaylist(), on = !!ui.plPlaying;
-  return '<button class="plb'+(on?' is-on':'')+(pl?'':' is-unset')+'" data-action="'+(pl ? (on ? 'stopMorningPlaylist' : 'playMorningPlaylist') : 'setMorningPlaylist')+'" title="'+(pl ? (on ? 'Pause' : 'Play '+escapeHtml(pl.q)) : 'Pick a morning playlist')+'">'+
-    '<span class="plb-i">'+(on ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9654;')+'</span><span class="plb-t">'+escapeHtml(pl ? pl.q : 'Morning playlist')+'</span></button>';
-}
-function plRefresh(){ if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto(); }
-// a playlist link (Apple Music → ••• → Share → Copy Link) or its name; a link is turned into the
-// playlist's real name by the launcher, and kept so Apple Music can open it if it isn't in your library
-async function setPlaylistFrom(v){
-  v = String(v||'').trim();
-  if(!v) return null;
-  let pl = {q:v, k:'playlist'};
-  if(/^(https?|music|itms):\/\//i.test(v)){
-    const url = v.replace(/^(music|itms):\/\//i, 'https://'), slug = appleMusicFromLink(url);
-    pl = {q: slug && !/^pl\./i.test(slug.q) ? slug.q : 'Playlist', k:'playlist', url:url};
-    const r = await fetchWithin(MUSIC_URL+'resolve?u='+hexUtf8(url), 12000);
-    if(r && r.ok){ try{ const j = await r.json(); if(j && j.name) pl.q = j.name; }catch(e){} }
-  }
-  return pl;
-}
-async function setMorningPlaylistFrom(v){
-  const pl = await setPlaylistFrom(v);
-  if(pl && pl.q==='Playlist') pl.q = 'Morning playlist';
-  state.profile.morningPlaylist = pl; persist('profile');
-  return pl;
-}
-// (playing and pausing it lives with the music dock)
-ACTIONS.setMorningPlaylist = async function(){
-  const v = window.prompt('Your morning playlist — paste its Apple Music link (••• → Share → Copy Link), or type its exact name:', ''); if(!v || !v.trim()) return;
-  await setMorningPlaylistFrom(v);
-  if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto();
-  ACTIONS.playMorningPlaylist();
-};
 // you, lately: streak, training, weight, and something you wrote a while back
 function briefMemory(){
   const today = todayStr(), es = arr(state.journal.entries).filter(function(e){ return e.text && e.date < addDays(today, -6); });
@@ -20749,7 +20974,14 @@ function briefYouHtml(){
   const mem = briefMemory();
   const memHtml = mem ? '<div class="br-mem"><small>'+agoLabel(mem.ago)+' you wrote</small><p>'+(mem.e.title ? '<b>'+escapeHtml(mem.e.title)+'</b> ' : '')+escapeHtml(String(mem.e.text).slice(0, 140))+(String(mem.e.text).length > 140 ? '…' : '')+'</p></div>' : '';
   return {voice: mem ? 'And a little something from you, '+agoLabel(mem.ago).toLowerCase()+'.' : 'Here’s where you’re at.',
-    html:'<div class="br-k">&#128100; You, Lately</div><div class="br-you-t">'+tiles.map(function(t){ return '<div><span>'+t[0]+'</span><b>'+t[1]+'</b><small>'+t[2]+'</small></div>'; }).join('')+'</div>'+memHtml};
+    html:'<div class="br-k">&#128100; You, Lately</div><div class="br-you-t">'+tiles.map(function(t){ return '<div><span>'+t[0]+'</span><b>'+t[1]+'</b><small>'+t[2]+'</small></div>'; }).join('')+'</div>'+memHtml+briefSystemHtml()};
+}
+// the SYSTEM's morning line: your level, rank and overall
+function briefSystemHtml(){
+  if(typeof xpSummary!=='function') return '';
+  const x = xpSummary(), r = RANKS[x.rank];
+  return '<div class="br-sys" data-action="openYou" title="Your card"><div class="br-sys-h"><span>[ SYSTEM ]</span><b style="color:'+r.color+'">LVL '+x.level+' &middot; '+escapeHtml(r.name)+'</b><em>OVR '+x.ovr+'</em></div>'+
+    '<i class="br-sys-bar"><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i></div>';
 }
 function wakeBriefHtml(){
   if(typeof briefMinimalOn==='function' && briefMinimalOn()) return briefMinimalHtml();
@@ -20780,7 +21012,7 @@ function wakeBriefHtml(){
   };
   const slept = lastNightSleep();
   // column 1: the weather and the sun (and how you slept), then your note
-  const colA = [], colB = [], colC = [];
+  const colA = [], colB = [], colC = [], colD = [];
   colA.push(panel('br-hero', 'br-a-blur', 'It’s '+timeStr+'.'+(now ? ' '+now.temp+'° and '+wxLabel(now.code).toLowerCase()+' outside.' : '')+(slept ? ' You got '+fmtDurationLabel(slept.minutes)+' of sleep.' : sunLine ? ' '+sunLine : ''),
     '<div class="brh-top"><div class="brh-wx"><span class="brh-i">'+(now ? wxIcon(wxKind(now.code), phase) : SKY_META[phase].icon)+'</span>'+
       '<div>'+(now ? '<div class="brh-t">'+now.temp+'&deg;</div><div class="brh-l">'+escapeHtml(wxLabel(now.code))+(now.hi!=null ? ' <span>&middot; H '+now.hi+'&deg; L '+now.lo+'&deg;</span>' : '')+'</div>' : '<div class="brh-l is-big">'+SKY_META[phase].label+'</div>')+'</div></div>'+
@@ -20796,18 +21028,23 @@ function wakeBriefHtml(){
   colB.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
   colB.push(panel('br-thoughts', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+
     thoughtsOfDay(4).map(function(x, i){ return '<div class="br-th" style="--i:'+i+'"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')));
-  // column 3: the world, then the day ahead
-  if(news){
-    const d0 = tcur, late = ui.briefNewsAt ? Math.max(600, d0 - (ui.briefNewsAt - (ui.briefT0||0))) : null;
-    const sec = (ui.morningNews && ui.morningNews.sec) || {}, secs = newsSections().filter(function(x){ return sec[x.id] || (x.id==='sports' && typeof scoresHtml==='function' && scoresHtml()); });
-    const item = function(n, i, top){ return '<button class="br-news-i'+(top?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+escapeHtml(n.title)+(n.src ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; };
-    colC.push(panel('br-news', 'br-a-rise', secs.length ? 'Here’s what’s happening — the news, '+secs.map(function(x){ return x.label.toLowerCase(); }).join(' and ')+'.' : 'Here’s what’s happening out there.',
-      '<div class="br-k">&#128240; '+(newsTopics() ? 'Your News' : 'Headlines')+'</div>'+
-      news.slice(0, secs.length ? 3 : 6).map(function(n, i){ return item(n, i, i===0); }).join('')+
-      secs.map(function(x){ const sc = x.id==='sports' && typeof scoresHtml==='function' ? scoresHtml() : ''; return '<div class="br-news-sec"><div class="br-news-h">'+x.icon+' '+x.label+'<span>'+escapeHtml(x.q)+'</span></div>'+sc+arr(sec[x.id]).slice(0, sc ? 2 : 3).map(function(n, i){ return item(n, i, false); }).join('')+'</div>'; }).join(''),
-      late!=null ? ';--late:'+late+'ms' : ''));
-  } else if(morningNewsOn() && ui.morningNews && ui.morningNews.loading){
-    colC.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">&#128240; The News</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');
+  // the world: one panel of headlines (the news and tech, mixed), and one just for sports.
+  // While they're loading, a placeholder holds their place so nothing moves when they land.
+  const sec = (ui.morningNews && ui.morningNews.sec) || {}, newsWait = morningNewsOn() && ui.morningNews && ui.morningNews.loading;
+  const late = ui.briefNewsAt ? function(){ return ';--late:'+Math.max(600, tcur - (ui.briefNewsAt - (ui.briefT0||0)))+'ms'; } : function(){ return ''; };
+  const item = function(n, top, tag){ return '<button class="br-news-i'+(top?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+(tag ? '<em class="br-tag">'+tag+'</em>' : '')+escapeHtml(n.title)+(n.src ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; };
+  const waitHtml = function(cls, k){ return '<section class="br-p '+cls+' is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">'+k+'</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>'; };
+  const heads = news ? mixHeadlines(news, arr(sec.tech)) : [];
+  if(heads.length){
+    const lt = late();
+    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there.', '<div class="br-k">&#128240; Headlines</div>'+heads.map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : ''); }).join(''), lt));
+  } else if(newsWait) colC.push(waitHtml('br-news', '&#128240; Headlines'));
+  if(morningNewsOn() && newsSections().some(function(x){ return x.id==='sports'; })){
+    const sc = typeof scoresHtml==='function' ? scoresHtml() : '', sh = arr(sec.sports);
+    if(sc || sh.length){
+      const lt = late();
+      colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports</div>'+sc+sh.slice(0, sc ? 3 : 6).map(function(n){ return item(n, false); }).join(''), lt));
+    } else if(newsWait || (ui.scores && ui.scores.loading)) colD.push(waitHtml('br-sports', '&#127936; Sports'));
   }
   // the day ahead — just the calendar; the work plan waits for the business preview
   colB.push(panel('br-day', 'br-a-right', events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.',
@@ -20828,14 +21065,15 @@ function wakeBriefHtml(){
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner b4">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        '<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : playlistBtnHtml())+'</span>'+
+        '<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
         // one button: Skip takes you straight to the app
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
       '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
       '<div class="br-voice br-p br-a-fade" style="--d:'+(base-700)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
-      (typeof opAskHtml==='function' ? '<div class="br-p br-a-fade" style="--d:'+(base-500)+'ms">'+opAskHtml('brief')+'</div>' : '')+
+      (typeof opAskHtml==='function' ? '<div class="br-p br-opbar br-a-fade" style="--d:'+(base-500)+'ms">'+opAskHtml('brief')+'</div>' : '')+
       // no news column (headlines off) → two columns that fill the width instead of an empty third
-      '<div class="b4-grid'+(colC.length ? '' : ' cols-2')+'"><div class="b4-col">'+colA.join('')+'</div><div class="b4-col">'+colB.join('')+'</div>'+(colC.length ? '<div class="b4-col">'+colC.join('')+'</div>' : '')+'</div>'+
+      // wide screens get four columns (you · today · headlines · sports); otherwise sports sits under headlines
+      '<div class="b4-grid'+(!colC.length && !colD.length ? ' cols-2' : !colD.length ? ' no-d' : !colC.length ? ' no-c' : '')+'"><div class="b4-col c-a">'+colA.join('')+'</div><div class="b4-col c-b">'+colB.join('')+'</div>'+(colC.length ? '<div class="b4-col c-c">'+colC.join('')+'</div>' : '')+(colD.length ? '<div class="b4-col c-d">'+colD.join('')+'</div>' : '')+'</div>'+
       '<div class="brief-cta br-p br-a-rise" data-k="'+k+'" style="--d:'+ctaD+'ms">'+
         '<button class="brief-go brief-morning" data-action="wakeStartMorning">Get to Work &#8594;</button>'+
       '</div>'+
@@ -20861,6 +21099,8 @@ function briefVoiceRun(){
   briefVoiceTimer = setInterval(function(){
     const el = document.getElementById('brVoice');
     if(!el || ui.wakeMode!=='brief' || !overlayOpen('wakeOverlay')){ if(!overlayOpen('wakeOverlay')) clearInterval(briefVoiceTimer); return; }
+    // once you've asked the Operator something (or talked to it), the line is its answer — leave it be
+    if(typeof OV!=='undefined' && OV.idx===999) return;
     const lines = ui.briefLines || [], t = Date.now() - (ui.briefT0||0);
     if(typeof opBriefTick==='function' && opBriefTick(lines, t)) return;
     let cur = null; lines.forEach(function(l){ if(t >= l.at) cur = l; });
@@ -20941,7 +21181,13 @@ function workStats(){
     {k:'Collected this month', v:money(collected), sub:new Date().toLocaleDateString(undefined, {month:'long'})},
     {k:'Open leads', v:String(open.length), sub: pipe ? money(pipe)+' in the pipeline' : 'In the pipeline'},
     {k:'Deep work yesterday', v:fmtHours(yDeep), sub:'Streak: '+computeStreak()+' day'+(computeStreak()===1?'':'s')}
-  ].concat(workSocialStats());
+  ].concat(workSocialStats(), workLevelStat());
+}
+// the game, in the work preview: your level and how far to the next
+function workLevelStat(){
+  if(typeof xpSummary!=='function') return [];
+  const x = xpSummary();
+  return [{k:'Level '+x.level+' &middot; '+RANKS[x.rank].name, v:'OVR '+x.ovr, sub:(x.levelHi - x.total).toLocaleString()+' XP to level '+(x.level+1), pct:x.levelPct*100, go:'openYou'}];
 }
 // followers and new messages, when GoHighLevel is connected (otherwise they simply don't show)
 function workSocialStats(){
@@ -20994,7 +21240,7 @@ function renderPlanReveal(){
   return '<div class="wi">'+
     '<div class="wi-top"><span class="pr-badge">&#128339; Clocked In</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
       (ui.planReveal && ui.planReveal.from==='morning' ? '<button class="wi-back" data-action="backToMorning" title="Back to Good morning">&#8592; Morning</button>' : '')+
-      '<span class="wi-pl">'+playlistBtnHtml()+'</span>'+
+      '<span class="wi-pl">'+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
       '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
     '<div class="wi-inner">'+
       '<div class="wi-k" style="animation-delay:40ms">Work Mode</div>'+
@@ -21018,7 +21264,6 @@ function renderPlanReveal(){
       '</div>'+
       '<div class="pr-cta" style="animation-delay:420ms">'+
         '<button class="ls-go pr-go" data-action="planLockIn"'+(first ? ' data-id="'+first.id+'"' : '')+'><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>'+
-        (first ? '<div class="ls-go-sub">First up: '+escapeHtml(first.title)+'</div>' : '')+
       '</div>'+
     '</div>'+
   '</div>';
@@ -21071,9 +21316,49 @@ ACTIONS.toggleLockedView = function(){
 document.addEventListener('keydown', function(e){
   if(e.key!=='m' && e.key!=='M') return;
   if(e.metaKey || e.ctrlKey || e.altKey || (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) || (e.target && e.target.isContentEditable)) return;
-  if(!state.focus.activeSession || ui.view!=='today' || document.querySelector('.overlay:not(.hidden)')) return;
+  if(document.querySelector('.overlay:not(.hidden)')) return;
+  if(!state.focus.activeSession && ui.view==='focus'){ e.preventDefault(); ACTIONS.toggleFocusMinimal(); return; }
+  if(!state.focus.activeSession || (ui.view!=='today' && ui.view!=='focus')) return;
   e.preventDefault(); ACTIONS.toggleLockedView();
 });
+// ---- the Focus page's own minimal view (when you're not locked in): the clock, your level,
+// your streak, today's deep work, and the buttons — nothing else ----
+function focusMinimalOn(){ return !!state.profile.focusMinimal; }
+ACTIONS.toggleFocusMinimal = function(){
+  const leaving = focusMinimalOn();
+  const go = function(){ state.profile.focusMinimal = !leaving; persist('profile'); playNav(); renderView(); };
+  if(leaving) npLeave(go); else go();
+};
+function focusMinimalBtnHtml(){ return '<button class="lv-btn" data-action="toggleFocusMinimal" title="'+(focusMinimalOn() ? 'Back to the full page (M)' : 'Minimal view (M)')+'">'+(focusMinimalOn() ? '&#9638; Full view' : '&#9673; Minimal')+'</button>'; }
+function renderFocusMinimal(){
+  const name = state.profile.name || '', h = new Date().getHours();
+  const greet = h < 5 ? 'Still up' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const d = new Date(), t = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}), m = /^(.*?)\s*([AP]M)$/i.exec(t);
+  const streak = computeStreak(), deep = deepWorkMinutesTodayLive(), target = state.standards.deepWorkTargetMinutes || 180;
+  const nx = typeof nextUpTask==='function' ? nextUpTask() : null, ring = nextRingLabel();
+  const x = typeof xpSummary==='function' ? xpSummary() : null, r = x ? RANKS[x.rank] : null;
+  return '<div class="np np-home">'+
+    '<div class="np-bg"></div>'+
+    '<div class="np-top"><span class="hm-brand">OPERATOR</span><span style="flex:1"></span>'+focusMinimalBtnHtml()+'</div>'+
+    '<div class="hm-main">'+
+      '<div class="hm-clock"><b id="npClockT">'+(m ? m[1] : t)+'</b><span id="npClockA">'+(m ? m[2] : '')+'</span></div>'+
+      '<div class="hm-date">'+d.toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+(ring ? ' &middot; &#9200; '+ring : '')+'</div>'+
+      '<div class="hm-greet">'+greet+(name ? ', '+escapeHtml(name) : '')+'.</div>'+
+      '<div class="hm-stats">'+
+        (x ? '<button class="hm-s hm-lvl" data-action="openYou" style="--rc:'+r.color+'" title="Your card">'+rankBadgeSvg(x.rank, 34)+'<span><b>LVL '+x.level+'</b><small>'+escapeHtml(r.name)+' &middot; OVR '+x.ovr+'</small><i><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i></span></button>' : '')+
+        '<div class="hm-s"><b>&#128293; '+streak+'</b><small>day streak</small></div>'+
+        '<div class="hm-s"><b>'+fmtHours(deep)+'</b><small>of '+fmtHours(target)+' today</small><i><u style="width:'+Math.min(100, deep/target*100).toFixed(1)+'%"></u></i></div>'+
+      '</div>'+
+      '<button class="hm-go" data-action="openLockInChooser" title="Lock in (L)"><span class="hm-go-ring"></span><span>&#128274;</span><b>LOCK IN</b></button>'+
+      (typeof aiTalkHtml==='function' ? '<div class="hm-talk">'+aiTalkHtml()+'<div class="hm-cap" id="hmCap"></div></div>' : '')+
+      '<div class="hm-btns">'+
+        '<button class="hm-b" data-action="openQuickJournalModal">&#128221; Journal</button>'+
+        '<button class="hm-b" data-action="clockOut">&#127937; Clock out</button>'+
+        '<button class="hm-b" data-action="quickDayOff">&#127796; Day off</button>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
 function lockedViewBtnHtml(){
   return '<button class="lv-btn" data-action="toggleLockedView" title="'+(lockedMinimal() ? 'Back to the full view (M)' : 'Minimal view (M)')+'">'+(lockedMinimal() ? '&#9638; Full view' : '&#9673; Minimal')+'</button>';
 }
@@ -21172,7 +21457,8 @@ function renderLockedMinimal(){
 }
 // full-screen feel: the sidebar and floating buttons step aside in the minimal view
 afterRenderHooks.push(function(){
-  const on = !!(state.focus && state.focus.activeSession && ui.view==='today' && lockedMinimal()) || !!(ui.view==='today' && document.querySelector('#viewRoot .rest-full'));
+  const on = !!(state.focus && state.focus.activeSession && (ui.view==='today' || ui.view==='focus') && lockedMinimal()) || !!(ui.view==='today' && document.querySelector('#viewRoot .rest-full'))
+    || !!(ui.view==='focus' && !(state.focus && state.focus.activeSession) && focusMinimalOn());
   document.body.classList.toggle('np-on', on);
   const brk = !!(state.focus && state.focus.activeSession && state.focus.activeSession.onBreak);
   document.body.classList.toggle('is-on-break', brk);
@@ -21466,91 +21752,22 @@ document.addEventListener('fullscreenchange', function(){ if(!document.fullscree
 ACTIONS.toggleTrueFull = function(){ state.profile.trueFull = !trueFullOn(); persist('profile'); if(!trueFullOn() && TF.want){ TF.want = false; trueFullSet(false); } renderView(); };
 ACTIONS.noop = function(){};
 // ============ MUSIC DOCK ============
-// Always up in the top-right corner, tiny: ▶ plays Operator's own generated tracks; ☀ is your
-// morning playlist; 1 · 2 · 3 are three Apple Music playlists of your choosing (each its own colour).
-// Only one thing plays at a time. In the minimal locked-in view the same controls sit under the timer.
-const DOCK_COLORS = ['#5fd4c4', '#a98bff', '#ff8fb1'];
-const SUN_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="4.3" fill="currentColor"/><path d="M12 2.6v2.3M12 19.1v2.3M2.6 12h2.3M19.1 12h2.3M5.4 5.4l1.6 1.6M17 17l1.6 1.6M5.4 18.6L7 17M17 7l1.6-1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-function userPlaylists(){
-  let p = state.profile.playlists;
-  if(!Array.isArray(p)) p = state.profile.playlists = [null, null, null];
-  while(p.length < 3) p.push(null);
-  return p;
-}
-// what's playing: 'fm' (generated), 'sun' (morning playlist), or 0/1/2 (a numbered playlist)
-function dockSrc(){ if(FM.playing) return 'fm'; return ui.amSrc!=null ? ui.amSrc : null; }
-function musicOn(){ return dockSrc()!=null; }
-function dockSrcName(){
-  const s = dockSrc();
-  if(s==='fm') return FOCUS_TRACKS[FM.idx].name;
-  if(s==='sun'){ const m = morningPlaylist(); return m ? m.q : 'Morning playlist'; }
-  if(s!=null){ const p = userPlaylists()[s]; return p ? p.q : ''; }
-  return '';
-}
-async function playApplePlaylist(pl, src){
-  if(!pl) return false;
-  if(FM.playing) focusMusicStop();
-  ui.amSrc = src; if(src==='sun') ui.plPlaying = true; dockRefresh();
-  const r = await fetchWithin(MUSIC_URL+'pick?k=playlist&q='+hexUtf8(pl.q)+(pl.url ? '&u='+hexUtf8(pl.url) : ''), 12000);
-  if(r && r.ok) return true;
-  if(ui.amSrc===src){ ui.amSrc = null; if(src==='sun') ui.plPlaying = false; }
-  dockRefresh();
-  let j = null; try{ j = r ? await r.json() : null; }catch(e){}
-  if(j && j.opened) showToast('“'+escapeHtml(pl.q)+'” isn’t in your library yet — it’s open in Apple Music now. Tap ＋ Add once, then it plays from here.', {icon:'&#9835;', duration:9000});
-  else if(r) showToast('No playlist called “'+escapeHtml(pl.q)+'” in your library. Paste its link in Settings → Sound instead.', {icon:'&#9888;', duration:7000});
-  else showToast('Apple Music plays through the Operator app — it isn’t reachable right now.', {icon:'&#9888;'});
-  return false;
-}
-function stopAppleMusic(){ if(ui.amSrc!=null){ ui.amSrc = null; ui.plPlaying = false; musicApp('pause'); } }
-// the morning playlist goes through the same path (☀ in the dock, the play button on Good morning)
-ACTIONS.playMorningPlaylist = function(){ return playApplePlaylist(morningPlaylist(), 'sun'); };
-ACTIONS.stopMorningPlaylist = function(){ stopAppleMusic(); dockRefresh(); };
+// Always up in the top-right corner, tiny: ▶ plays Operator's own generated tracks (⏭ skips).
+// That's it — the Apple Music playlists are gone; Apple Music is only for the wake-up song.
+// In the minimal locked-in view the same player sits under the timer.
+function dockSrc(){ return FM.playing ? 'fm' : null; }
+function musicOn(){ return !!FM.playing; }
+function dockSrcName(){ return FM.playing ? FOCUS_TRACKS[FM.idx].name : ''; }
 ACTIONS.dockFm = function(){
-  if(FM.playing){ focusMusicStop(); }
-  else { stopAppleMusic(); focusMusicPlay(); }
+  if(FM.playing) focusMusicStop(); else focusMusicPlay();
   dockRefresh();
 };
-ACTIONS.dockSun = function(){
-  if(dockSrc()==='sun'){ stopAppleMusic(); dockRefresh(); return; }
-  if(!morningPlaylist()){ ACTIONS.setMorningPlaylist(); return; }
-  ACTIONS.playMorningPlaylist();
-};
-async function setUserPlaylist(i, v){
-  const pl = await setPlaylistFrom(v);
-  userPlaylists()[i] = pl; persist('profile');
-  return pl;
-}
-ACTIONS.dockPl = function(el, e, id){
-  const i = Number(id), pl = userPlaylists()[i];
-  if(!pl){ const v = window.prompt('Playlist '+(i+1)+' — paste its Apple Music link (••• → Share → Copy Link), or type its exact name:', ''); if(!v || !v.trim()) return; setUserPlaylist(i, v).then(function(p){ if(p) playApplePlaylist(p, i); dockRefresh(); }); return; }
-  if(dockSrc()===i){ stopAppleMusic(); dockRefresh(); return; }
-  playApplePlaylist(pl, i);
-};
-// right-click a number to change which playlist it plays
-document.addEventListener('contextmenu', function(e){
-  const b = e.target.closest && e.target.closest('[data-action="dockPl"]'); if(!b) return;
-  e.preventDefault(); e.stopPropagation();
-  const i = Number(b.dataset.id), cur = userPlaylists()[i];
-  const v = window.prompt('Playlist '+(i+1)+' — paste an Apple Music link or a name (empty to clear):', cur ? (cur.url || cur.q) : '');
-  if(v===null) return;
-  if(!v.trim()){ userPlaylists()[i] = null; persist('profile'); dockRefresh(); return; }
-  setUserPlaylist(i, v).then(dockRefresh);
-}, true);
-ACTIONS.dockNext = function(){ if(dockSrc()==='fm') ACTIONS.fmNext(); else if(dockSrc()!=null) musicApp('next'); };
-// the third button in the minimal view: music on / off (picks up whatever played last)
-ACTIONS.npMusic = function(){
-  const s = dockSrc();
-  if(s!=null){ ui.lastSrc = s; if(s==='fm') focusMusicStop(); else stopAppleMusic(); dockRefresh(); return; }
-  const last = ui.lastSrc;
-  if(last==='sun' && morningPlaylist()) ACTIONS.playMorningPlaylist();
-  else if(typeof last==='number' && userPlaylists()[last]) playApplePlaylist(userPlaylists()[last], last);
-  else { focusMusicPlay(); dockRefresh(); }
-};
+ACTIONS.dockNext = function(){ if(FM.playing) ACTIONS.fmNext(); };
+// the third button in the minimal view: music on / off
+ACTIONS.npMusic = function(){ ACTIONS.dockFm(); };
 function dockBtnsHtml(){
-  const s = dockSrc(), pls = userPlaylists();
-  return '<button class="md-b md-fm'+(s==='fm'?' is-on':'')+'" data-action="dockFm" title="'+(s==='fm' ? 'Pause' : 'Play Operator’s focus tracks')+'">'+(s==='fm' ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9654;')+'</button>'+
-    '<button class="md-b md-sun'+(s==='sun'?' is-on':'')+(morningPlaylist()?'':' is-unset')+'" data-action="dockSun" title="'+(morningPlaylist() ? (s==='sun' ? 'Pause ' : 'Play ')+escapeHtml(morningPlaylist().q) : 'Pick a morning playlist')+'">'+SUN_SVG+'</button>'+
-    [0,1,2].map(function(i){ const p = pls[i]; return '<button class="md-b md-n'+(s===i?' is-on':'')+(p?'':' is-unset')+'" style="--c:'+DOCK_COLORS[i]+'" data-action="dockPl" data-id="'+i+'" title="'+(p ? (s===i ? 'Pause ' : 'Play ')+escapeHtml(p.q)+' (right-click to change)' : 'Set playlist '+(i+1))+'">'+(i+1)+'</button>'; }).join('');
+  const on = musicOn();
+  return '<button class="md-b md-fm'+(on?' is-on':'')+'" data-action="dockFm" title="'+(on ? 'Pause' : 'Play Operator’s focus tracks')+'">'+(on ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9654;')+'</button>';
 }
 function dockHtml(){
   const name = dockSrcName();
@@ -21559,17 +21776,16 @@ function dockHtml(){
 function npMusicBtnHtml(){ const on = musicOn(); return '<button class="np-c np-music'+(on?' is-on':'')+'" data-action="npMusic" title="'+(on ? 'Pause the music' : 'Music')+'">'+(on ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9835;')+'</button>'; }
 function npMusicRowHtml(){
   const name = dockSrcName();
-  return '<div class="np-mrow"><span class="np-mnow">'+(name ? escapeHtml(name) : 'Music')+'</span>'+(name ? '<button class="md-b md-skip" data-action="dockNext" title="Next">&#9197;</button>' : '')+'<span class="np-msrc">'+dockBtnsHtml()+'</span></div>';
+  return '<div class="np-mrow"><span class="np-mnow">'+(name ? escapeHtml(name) : 'Focus music')+'</span>'+(name ? '<button class="md-b md-skip" data-action="dockNext" title="Next">&#9197;</button>' : '')+'<span class="np-msrc">'+dockBtnsHtml()+'</span></div>';
 }
 function dockRefresh(){
   let d = document.getElementById('musicDock');
   if(!d){ d = document.createElement('div'); d.id = 'musicDock'; d.className = 'md'; document.body.appendChild(d); }
   const h = dockHtml(); if(d._h!==h){ d.innerHTML = h; d._h = h; }
-  const key = String(dockSrc())+'|'+dockSrcName()+'|'+JSON.stringify(userPlaylists().map(function(p){ return p ? p.q : ''; }))+'|'+(morningPlaylist() ? morningPlaylist().q : '');
+  const key = String(dockSrc())+'|'+dockSrcName();
   document.querySelectorAll('.np-mrow, .np-c.np-music').forEach(function(el){ if(el.dataset.k===key) return; const n = el.classList.contains('np-mrow') ? npMusicRowHtml() : npMusicBtnHtml(); const t = document.createElement('div'); t.innerHTML = n; const nn = t.firstChild; nn.dataset.k = key; el.replaceWith(nn); });
   const art = document.querySelector('.np-locked .np-art:not(.is-break)');
   if(art){ const on = musicOn(); art.classList.toggle('is-music', on); const eq = art.querySelector('.np-art-eq'); if(on && !eq) art.insertAdjacentHTML('beforeend', '<span class="np-art-eq wk2-eq"><i></i><i></i><i></i><i></i></span>'); if(!on && eq) eq.remove(); }
-  if(overlayOpen('wakeOverlay') && ui.wakeMode==='brief' && ui._dockKey!==key){ ui._dockKey = key; renderWakeOverlayInto(); }
 }
 // the old player's refresh now refreshes the dock too
 fmRefresh = function(){ dockRefresh(); };
@@ -21607,13 +21823,19 @@ function pickGames(list){
   const next = favFirst(list.filter(function(g){ return g.state==='pre'; }).sort(function(a, b){ return a.at - b.at; }));
   return live.slice(0, 1).concat(done.slice(0, live.length ? 1 : 2), next.slice(0, 2)).slice(0, 4);
 }
-async function loadScores(){
-  const today = todayStr();
-  if(ui.scores && ui.scores.date===today && (ui.scores.loading || ui.scores.got)) return;
+// returns a promise, so the voice can wait for the scores when you ask for sports
+function loadScores(force){
+  const today = todayStr(), sc = ui.scores;
+  if(sc && sc.date===today && sc.loading) return ui._scoresP;
+  // a failed fetch (nothing came back) is tried again after a few minutes, or when asked for
+  if(sc && sc.date===today && sc.got && (sc.nfl || sc.nba || (!force && Date.now() - (sc.at||0) < 5*60000))) return Promise.resolve(sc);
   ui.scores = {date:today, loading:true};
-  const r = await Promise.all(SPORTS.map(function(s){ return fetchScoreboard(s.id); }));
-  ui.scores = {date:today, loading:false, got:true, nfl:r[0], nba:r[1]};
-  if(ui.wakeMode==='brief' && overlayOpen('wakeOverlay')) renderWakeOverlayInto();
+  ui._scoresP = Promise.all(SPORTS.map(function(s){ return fetchScoreboard(s.id); })).then(function(r){
+    ui.scores = {date:today, loading:false, got:true, at:Date.now(), nfl:r[0], nba:r[1]};
+    if(ui.wakeMode==='brief' && overlayOpen('wakeOverlay')) renderWakeOverlayInto();
+    return ui.scores;
+  });
+  return ui._scoresP;
 }
 function scoreWhen(g){
   const d = new Date(g.at), today = todayStr(), ds = ds2(d);
@@ -21737,7 +21959,7 @@ function briefMinimalHtml(){
   const sc = typeof scoresHtml==='function' ? scoresHtml() : '';
   return '<div class="brief brief2 brief4 gmm-wrap bg-'+briefBgClass()+' intro-skipped is-skipped" data-sky="'+phase+'">'+
     '<div class="brief-top"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-      '<span class="b4-music">'+playlistBtnHtml()+'</span><button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
+      '<span class="b4-music">'+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span><button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
     '<h1 class="gmm-hello">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
     '<div class="br-voice"><span class="br-voice-dot"></span><span id="brVoice"></span></div>'+(typeof opAskHtml==='function' ? opAskHtml('brief') : '')+
     '<div class="gmm">'+
@@ -21757,20 +21979,57 @@ ACTIONS.wakeBriefLayout = function(el, e, id){ wakeCfg().briefLayout = id; persi
 // mentions (never reads) the note you left. The blue line is its captions, word for word as it
 // speaks. After that you can ask it for the sports, the news, tech, or a quick business brief —
 // and the brief plays by itself when you go straight from Good morning to work.
-// It's the Mac's own text-to-speech; what it says is put together from your data (no AI service).
-const OV = {speaking:false, pending:false, broken:false, idx:-1, voice:null, cap:null, token:0};
-// (if speech never starts — no voices, or the system blocks it — it switches itself off for the session
-// and the typed captions take over)
-function opVoiceOn(){ return wakeCfg().voice!==false && typeof window.speechSynthesis!=='undefined' && !OV.broken; }
+// One voice, always the same one. Where it comes from (Settings → alarm → The Operator's voice):
+//   "mac"     the Mac's own speech through the Operator app (`say`): your system voice — a Siri voice
+//             or a Premium one sounds far more human than what the browser gets — or one you pick
+//   "eleven"  ElevenLabs, the most natural; the key is saved by the Operator app on this Mac only
+//             (never in Operator's data, exports or backups)
+//   "browser" the browser's built-in voices (what it falls back to when the app can't speak)
+// What it says is put together from your data (no AI service).
+const OV = {speaking:false, pending:false, broken:false, helperDown:false, idx:-1, voice:null, cap:null, token:0, audio:null};
+function opEngine(){ const e = wakeCfg().voiceEngine; return e==='mac' || e==='browser' ? e : 'eleven'; }
+function opUseHelper(){ return opEngine()!=='browser' && !OV.helperDown; }
+function opBrowserOk(){ return typeof window.speechSynthesis!=='undefined' && !OV.broken; }
+// (if nothing can speak — no app, no voices — it switches itself off for the session and the typed captions take over)
+function opVoiceOn(){ return wakeCfg().voice!==false && (opUseHelper() || opBrowserOk()); }
+
+// ---- the browser's voices: one good one, picked the same way every time ----
+// novelty and old robotic voices never get picked
+const OP_VOICE_BAD = /^(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Pipe Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Fred|Junior|Ralph|Kathy|Princess|Deranged|Hysterical|Eddy|Flo|Grandma|Grandpa|Reed|Rocko|Sandy|Shelley)\b/i;
+function opVoiceScore(v){
+  const n = v.name || '', l = String(v.lang||'').replace('_', '-');
+  if(!/^en/i.test(l)) return -999;
+  if(OP_VOICE_BAD.test(n)) return -500;
+  let s = /en-GB/i.test(l) ? 30 : /en-(AU|IE|NZ)/i.test(l) ? 14 : /en-US/i.test(l) ? 10 : 4;
+  if(/Premium/i.test(n)) s += 45; else if(/Natural|Neural/i.test(n)) s += 40; else if(/Enhanced/i.test(n)) s += 32;
+  // a butler: calm, male, British first
+  if(/^(Jamie|Daniel|Oliver|Arthur|Malcolm|Evan|Nathan|Tom|Aaron|Alex)\b/i.test(n) || /UK English Male/i.test(n)) s += 20;
+  if(/^Google/i.test(n)) s += 6;
+  return s;
+}
+function opBrowserVoices(){
+  const vs = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
+  return vs.filter(function(v){ return opVoiceScore(v) > -100; }).sort(function(a, b){ return opVoiceScore(b) - opVoiceScore(a) || a.name.localeCompare(b.name); });
+}
 function opPickVoice(){
   if(OV.voice) return OV.voice;
-  const vs = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
-  const want = ['Daniel', 'Arthur', 'Oliver', 'Google UK English Male', 'Malcolm', 'Alex', 'Aaron', 'Fred'];
-  for(let i=0;i<want.length;i++){ const v = vs.find(function(x){ return x.name.indexOf(want[i])===0; }); if(v){ OV.voice = v; return v; } }
-  OV.voice = vs.find(function(x){ return /en[-_]GB/i.test(x.lang); }) || vs.find(function(x){ return /^en/i.test(x.lang); }) || null;
+  const vs = opBrowserVoices(), want = wakeCfg().browserVoice;
+  OV.voice = (want && vs.find(function(v){ return v.name===want; })) || vs[0] || null;
   return OV.voice;
 }
-if(typeof window.speechSynthesis!=='undefined') speechSynthesis.onvoiceschanged = function(){ OV.voice = null; opPickVoice(); };
+// the voices load a moment after the page does — speaking before then is what gave you two
+// different voices (the system default first, then the one picked). So it waits for them.
+function opVoicesReady(){
+  return new Promise(function(resolve){
+    if(typeof window.speechSynthesis==='undefined') return resolve();
+    if(speechSynthesis.getVoices().length) return resolve();
+    let done = false; const fin = function(){ if(!done){ done = true; resolve(); } };
+    try{ speechSynthesis.addEventListener('voiceschanged', fin, {once:true}); }catch(e){}
+    setTimeout(fin, 1200);
+  });
+}
+if(typeof window.speechSynthesis!=='undefined') try{ speechSynthesis.addEventListener('voiceschanged', function(){ if(!OV.speaking) OV.voice = null; }); }catch(e){}
+
 // written → spoken: degrees, hours and minutes, symbols
 function speakable(t){
   return String(t||'').replace(/&[a-z#0-9]+;/gi, ' ').replace(/(\d+)°/g, '$1 degrees')
@@ -21781,42 +22040,94 @@ function opCaption(txt){
   const el = OV.cap ? document.getElementById(OV.cap) : null;
   if(el && el.textContent!==txt) el.textContent = txt;
 }
+function opTtsUrl(text){
+  const w = wakeCfg(), e = opEngine();
+  return WAKE_HELPER+'tts/say?e='+e+'&v='+hexUtf8(e==='eleven' ? (w.elevenVoice||'') : (w.macVoice||''))+'&t='+hexUtf8(text);
+}
+// warm the next line up while this one is being said, so there's no gap between them
+function opPrefetch(text){ if(!opVoiceOn() || !opUseHelper()) return; try{ fetch(opTtsUrl(speakable(text))).catch(function(){}); }catch(e){} }
+function opStarted(tok, opts){ OV.pending = false; OV.speaking = true; if(opts.onstart) opts.onstart(); opCaption(''); document.body.classList.add('op-speaking'); }
+function opFinished(tok, said){ OV.pending = false; if(tok===OV.token){ OV.speaking = false; OV.audio = null; opCaption(said); document.body.classList.remove('op-speaking'); } }
 // say something; captions follow the words as they're spoken
 function opSay(text, opts){
   opts = opts || {};
   return new Promise(function(resolve){
     if(!opVoiceOn()){ resolve(false); return; }
-    const said = speakable(text), u = new SpeechSynthesisUtterance(said), tok = ++OV.token;
-    const v = opPickVoice(); if(v) u.voice = v;
-    u.rate = 1.0; u.pitch = 0.95; u.volume = 1;
-    OV.cap = opts.cap || 'brVoice';
-    let gotBoundary = false, t0 = 0, est = null;
-    OV.pending = true;
-    const startTimer = setTimeout(function(){ if(OV.pending && tok===OV.token){ OV.pending = false; OV.broken = true; try{ speechSynthesis.cancel(); }catch(e){} resolve(false); } }, 1500);
-    u.onstart = function(){ clearTimeout(startTimer); OV.pending = false; OV.speaking = true; t0 = Date.now(); if(opts.onstart) opts.onstart(); opCaption(''); document.body.classList.add('op-speaking');
-      // some voices don't report word boundaries: follow along by time instead
-      est = setInterval(function(){ if(gotBoundary || tok!==OV.token) return; const words = said.split(' '), n = Math.min(words.length, Math.floor((Date.now()-t0)/330)+1); opCaption(words.slice(0, n).join(' ')); }, 120); };
-    u.onboundary = function(e){ if(tok!==OV.token) return; gotBoundary = true; const end = said.indexOf(' ', e.charIndex + (e.charLength||1)); opCaption(end<0 ? said : said.slice(0, end)); };
-    const done = function(ok){ clearTimeout(startTimer); OV.pending = false; clearInterval(est); if(tok===OV.token){ OV.speaking = false; opCaption(said); document.body.classList.remove('op-speaking'); } resolve(ok); };
-    u.onend = function(){ done(true); };
-    u.onerror = function(e){ if(e && e.error && e.error!=='interrupted' && e.error!=='canceled' && !t0) OV.broken = true; done(false); };
-    speechSynthesis.speak(u);
+    const said = speakable(text), tok = ++OV.token;
+    OV.cap = opts.cap || 'brVoice'; OV.pending = true;
+    if(opUseHelper()) opSayAudio(said, opts, tok, resolve);
+    else opVoicesReady().then(function(){ if(tok!==OV.token){ resolve(false); return; } opSayBrowser(said, opts, tok, resolve); });
   });
 }
-function opStop(){ OV.token++; OV.speaking = false; try{ speechSynthesis.cancel(); }catch(e){} document.body.classList.remove('op-speaking'); }
+// through the Operator app: it hands back the spoken line as audio
+function opSayAudio(said, opts, tok, resolve){
+  const a = new Audio(opTtsUrl(said)), words = said.split(' ');
+  OV.audio = a;
+  let started = false, capT = null, settled = false;
+  const finish = function(ok){ if(settled) return; settled = true; clearTimeout(startT); clearInterval(capT); opFinished(tok, said); resolve(ok); };
+  // the app isn't there (or can't speak): this line and the rest of the session use the browser's voice
+  const fallBack = function(){
+    if(settled) return; settled = true; clearTimeout(startT);
+    try{ a.pause(); a.removeAttribute('src'); }catch(e){}
+    OV.helperDown = true; OV.audio = null;
+    if(tok!==OV.token || !opBrowserOk()){ OV.pending = false; resolve(false); return; }
+    opVoicesReady().then(function(){ if(tok!==OV.token){ OV.pending = false; resolve(false); return; } opSayBrowser(said, opts, tok, resolve); });
+  };
+  const startT = setTimeout(function(){ if(!started) fallBack(); }, opEngine()==='eleven' ? 15000 : 9000);
+  a.addEventListener('playing', function(){
+    if(started || settled) return; started = true; clearTimeout(startT);
+    if(tok!==OV.token){ try{ a.pause(); }catch(e){} finish(false); return; }
+    opStarted(tok, opts);
+    capT = setInterval(function(){
+      if(tok!==OV.token) return;
+      const d = a.duration && isFinite(a.duration) ? a.duration : words.length*0.36;
+      opCaption(words.slice(0, Math.min(words.length, Math.floor(a.currentTime/d*words.length)+1)).join(' '));
+    }, 100);
+  });
+  a.addEventListener('ended', function(){ finish(true); });
+  a.addEventListener('error', function(){ if(started) finish(false); else fallBack(); });
+  const p = a.play(); if(p && p.catch) p.catch(function(){ if(!started) fallBack(); });
+}
+function opSayBrowser(said, opts, tok, resolve){
+  if(!opBrowserOk()){ OV.pending = false; resolve(false); return; }
+  const u = new SpeechSynthesisUtterance(said);
+  const v = opPickVoice(); if(v){ u.voice = v; u.lang = v.lang; }
+  u.rate = 0.98; u.pitch = 1; u.volume = 1;
+  let gotBoundary = false, t0 = 0, est = null;
+  OV.pending = true;
+  const startTimer = setTimeout(function(){ if(OV.pending && tok===OV.token){ OV.pending = false; OV.broken = true; try{ speechSynthesis.cancel(); }catch(e){} resolve(false); } }, 1500);
+  u.onstart = function(){ clearTimeout(startTimer); t0 = Date.now(); opStarted(tok, opts);
+    // some voices don't report word boundaries: follow along by time instead
+    est = setInterval(function(){ if(gotBoundary || tok!==OV.token) return; const words = said.split(' '), n = Math.min(words.length, Math.floor((Date.now()-t0)/330)+1); opCaption(words.slice(0, n).join(' ')); }, 120); };
+  u.onboundary = function(e){ if(tok!==OV.token) return; gotBoundary = true; const end = said.indexOf(' ', e.charIndex + (e.charLength||1)); opCaption(end<0 ? said : said.slice(0, end)); };
+  const done = function(ok){ clearTimeout(startTimer); clearInterval(est); opFinished(tok, said); resolve(ok); };
+  u.onend = function(){ done(true); };
+  u.onerror = function(e){ if(e && e.error && e.error!=='interrupted' && e.error!=='canceled' && !t0) OV.broken = true; done(false); };
+  speechSynthesis.speak(u);
+}
+function opStop(){
+  OV.token++; OV.speaking = false; OV.pending = false;
+  if(OV.audio){ try{ OV.audio.pause(); }catch(e){} OV.audio = null; }
+  try{ speechSynthesis.cancel(); }catch(e){}
+  document.body.classList.remove('op-speaking');
+}
 // unlock speech on the "I'm up" click (browsers want a click before anything talks)
-function opUnlock(){ if(!opVoiceOn()) return; try{ const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); }catch(e){} opPickVoice(); }
+function opUnlock(){
+  if(!opVoiceOn()) return;
+  try{ const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); }catch(e){}
+  opPickVoice();
+}
 
 // ---- Good morning, spoken: one line per piece, each piece appears as it's said ----
+function opBriefLine(lines, i){ const name = state.profile.name || ''; return (i===0 ? 'Good morning'+(name ? ', '+name : '')+'. ' : '')+lines[i].text; }
 function opBriefTick(lines, t){
   if(!opVoiceOn() || ui.briefSkipped || !lines.length) return false;
   if(OV.speaking || OV.pending) return true;
   const next = OV.idx + 1; if(next >= lines.length) return true;
   if(t < lines[next].at) return true;
   OV.idx = next;
-  const name = state.profile.name || '';
-  const text = (next===0 ? 'Good morning'+(name ? ', '+name : '')+'. ' : '')+lines[next].text;
-  opSay(text, {cap:'brVoice', onstart:function(){
+  opSay(opBriefLine(lines, next), {cap:'brVoice', onstart:function(){
+    if(lines[next+1]) opPrefetch(opBriefLine(lines, next+1));
     // bring the matching piece in now if the clock hasn't got there yet
     const now = Date.now() - (ui.briefT0||0), need = lines[next].at + 380 - now;
     if(need > 0){ ui.briefT0 -= need; ui.briefShift = (ui.briefShift||0) + need; renderWakeOverlayInto(); }
@@ -21825,74 +22136,338 @@ function opBriefTick(lines, t){
 }
 function opBriefReset(){ OV.idx = -1; opStop(); }
 
-// ---- what you can ask for ----
-function opSportsScript(){
-  const s = typeof scoresSpoken==='function' ? scoresSpoken() : '';
-  const sec = ui.morningNews && ui.morningNews.sec && ui.morningNews.sec.sports;
-  const hl = arr(sec).slice(0, 2).map(function(n){ return n.title; });
-  if(!s && !hl.length) return 'I don’t have anything from sports yet this morning.';
-  return (s ? s+' ' : '')+(hl.length ? 'In the headlines: '+hl.join('. ')+'.' : '');
+// ---- what you can ask for: short, spoken like a person would say it ----
+const pickOne = function(xs){ return xs[Math.floor(Math.random()*xs.length)]; };
+// a headline, made sayable: no "LIVE:", no "| Source", no trailing source, no shouting
+function sayHeadline(t){
+  return String(t||'').replace(/^(LIVE|WATCH|BREAKING|UPDATE|EXCLUSIVE|OPINION|ANALYSIS)\s*[:|-]\s*/i, '').replace(/\s+[|–—-]\s+[^|–—-]{2,40}$/, '')
+    .replace(/[“”"]/g, '').replace(/\s+/g, ' ').trim().replace(/[.!?:;,]+$/, '');
 }
+function listSay(xs){ return xs.length<=1 ? (xs[0]||'') : xs.slice(0, -1).join(', ')+' and '+xs[xs.length-1]; }
+function gameDaySay(g){
+  const d = new Date(g.at), today = todayStr(), ds = ds2(d), tm = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}).replace(':00', '');
+  if(ds===today) return (d.getHours() >= 17 ? 'tonight at ' : 'today at ')+tm;
+  if(ds===addDays(today, 1)) return (d.getHours() >= 17 ? 'tomorrow night at ' : 'tomorrow at ')+tm;
+  return 'on '+d.toLocaleDateString(undefined, {weekday:'long'});
+}
+// sports: last night's results, then what's coming up (tonight, tomorrow, this week) — your teams first
+function opSportsScript(){
+  const sc = ui.scores || {}, out = [];
+  const favFirst = function(xs){ return xs.filter(isFavGame).concat(xs.filter(function(g){ return !isFavGame(g); })); };
+  SPORTS.forEach(function(s){
+    const list = arr(sc[s.id]);
+    if(!list.length) return;
+    const done = favFirst(list.filter(function(g){ return g.state==='post' && Date.now() - g.at < 3*86400000; }).sort(function(a, b){ return b.at - a.at; }));
+    const live = favFirst(list.filter(function(g){ return g.state==='in'; }));
+    const next = favFirst(list.filter(function(g){ return g.state==='pre'; }).sort(function(a, b){ return a.at - b.at; }));
+    const bits = [];
+    if(live.length){ const g = live[0]; bits.push(g.away.short+' and '+g.home.short+' are going right now — '+g.away.score+' to '+g.home.score+'.'); }
+    done.slice(0, 2).forEach(function(g, i){
+      const w = g.home.win ? g.home : g.away, l = g.home.win ? g.away : g.home;
+      const margin = Math.abs(Number(w.score) - Number(l.score));
+      const verb = margin >= 20 ? 'ran away from' : margin <= 3 ? 'edged' : 'beat';
+      bits.push((i===0 ? (ds2(new Date(g.at))===addDays(todayStr(), -1) ? 'Last night' : 'Most recently')+', the ' : 'And the ')+w.short+' '+verb+' the '+l.short+', '+w.score+' to '+l.score+'.');
+    });
+    const up = next.filter(function(g){ return g.at - Date.now() < 7*86400000; }).slice(0, 2);
+    if(up.length) bits.push((done.length || live.length ? 'Coming up, ' : 'Coming up in the '+s.label+', ')+listSay(up.map(function(g){ return g.away.short+' at '+g.home.short+' '+gameDaySay(g); }))+'.');
+    if(bits.length) out.push((out.length ? 'Over in the '+s.label+'. ' : 'In the '+s.label+'. ')+bits.join(' '));
+  });
+  const hl = arr(ui.morningNews && ui.morningNews.sec && ui.morningNews.sec.sports).slice(0, 1).map(function(n){ return sayHeadline(n.title); });
+  if(!out.length && !hl.length) return 'I couldn’t reach the scores just now. Give me a minute and ask again.';
+  if(!out.length) return 'No games to talk about right now. In the headlines — '+hl[0]+'.';
+  return out.join(' ')+(hl.length ? ' And one more — '+hl[0]+'.' : '');
+}
+// the news: a quick rundown (three stories, under half a minute), like a person telling you
 function opNewsScript(kind){
   const nw = ui.morningNews || {}, list = kind==='tech' ? arr(nw.sec && nw.sec.tech) : arr(nw.items);
-  if(!list.length) return kind==='tech' ? 'Nothing new in tech yet.' : 'The news hasn’t come in yet.';
-  return (kind==='tech' ? 'In tech this morning. ' : 'Here’s the news. ')+list.slice(0, 3).map(function(n){ return n.title; }).join('. ')+'.';
+  const hs = list.map(function(n){ return sayHeadline(n.title); }).filter(function(h){ return h && h.split(' ').length <= 22; }).slice(0, 3);
+  if(!hs.length) return kind==='tech' ? 'Tech’s quiet this morning — nothing worth your time yet.' : 'I couldn’t pull the news just now. I’ll try again in a bit.';
+  if(kind==='tech'){
+    return pickOne(['Here’s what’s moving in tech.', 'Quick one from the tech world.', 'In tech this morning.'])+' '+hs[0]+'.'+
+      (hs[1] ? ' '+pickOne(['Also —', 'Meanwhile,', 'And —'])+' '+hs[1]+'.' : '')+(hs[2] ? ' And finally, '+hs[2]+'.' : '')+' '+pickOne(['That’s tech.', 'That’s the tech side.', 'That’s it from tech.']);
+  }
+  return pickOne(['Here’s your quick rundown.', 'Alright, here’s what’s going on.', 'Quick look at the world this morning.'])+' '+hs[0]+'.'+
+    (hs[1] ? ' '+pickOne(['Also making news —', 'Meanwhile,', 'Elsewhere,'])+' '+hs[1]+'.' : '')+
+    (hs[2] ? ' And '+pickOne(['one more —', 'lastly,', 'finally,'])+' '+hs[2]+'.' : '')+' '+pickOne(['That’s the news.', 'That’s what’s out there.', 'That’s the world this morning.']);
 }
+// business: just what you've got today — then a word to get you going
 function opBusinessScript(){
   const plan = typeof todaysPlan==='function' ? todaysPlan().filter(function(t){ return t.status!=='done'; }) : [];
-  const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
-  const mrr = cs.reduce(function(a, c){ return a + Number(c.mrr||0); }, 0), goal = Number(state.profile.revenueGoalMonthly)||0;
-  const open = arr(state.business.pipeline).filter(leadIsOpen), pipe = open.reduce(function(a, p){ return a + Number(p.value||0); }, 0);
-  const yDeep = deepWorkMinutesFor(addDays(todayStr(), -1));
-  const red = cs.filter(function(c){ return clientHealthStatus(c).level==='red'; }).map(function(c){ return crmName('client', c); });
-  const nn = nightNote();
+  const today = todayStr(), events = state.calendar.events.filter(function(e){ return e.date===today && e.time; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
+  const target = state.standards.deepWorkTargetMinutes || 180, yDeep = deepWorkMinutesFor(addDays(today, -1));
+  const dow = new Date().getDay(), yWork = typeof isWorkDay==='function' ? isWorkDay(addDays(today, -1)) : dow!==1 && dow!==0;
   const parts = [];
-  parts.push(plan.length ? 'You’ve got '+plan.length+' thing'+(plan.length===1?'':'s')+' lined up, starting with '+plan[0].title+'.' : 'Nothing’s lined up yet — pick your first move when you lock in.');
-  if(nn.work) parts.push('You left yourself a note for before you lock in. It’s on the screen.');
-  if(mrr || goal) parts.push('Monthly recurring is '+money(mrr)+(goal ? ', '+Math.round(mrr/goal*100)+' percent of your '+money(goal)+' goal' : '')+'.');
-  if(open.length) parts.push(open.length+' open lead'+(open.length===1?'':'s')+(pipe ? ', '+money(pipe)+' in the pipeline' : '')+'.');
-  if(red.length) parts.push(red.slice(0, 2).join(' and ')+' could use you today.');
-  parts.push(yDeep ? 'Yesterday you put in '+fmtDurationLabel(yDeep)+' of deep work.' : 'No deep work logged yesterday — today’s a clean slate.');
-  parts.push('Let’s get to it.');
+  if(!plan.length) parts.push('Nothing’s lined up yet — pick your first move when you lock in.');
+  else if(plan.length===1) parts.push('Today it’s just one thing: '+plan[0].title+'.');
+  else {
+    const names = plan.slice(0, 3).map(function(t){ return t.title; });
+    parts.push('Today you’ve got '+plan.length+' things. '+(plan.length > 3 ? 'Starting with '+listSay(names)+', plus '+(plan.length-3)+' more.' : listSay(names)+'.'));
+  }
+  if(events.length) parts.push(events.length===1 ? 'And '+events[0].title+' at '+fmt12Hour(events[0].time)+'.' : 'On the calendar: '+listSay(events.slice(0, 2).map(function(e){ return e.title+' at '+fmt12Hour(e.time); }))+'.');
+  if(nightNote().work) parts.push('You left yourself a note, too — it’s on the screen.');
+  let end;
+  if(dow===1) end = 'Let’s start the week strong.';
+  else if(dow===5) end = 'Let’s finish the week strong.';
+  else if(yWork && yDeep < target*0.6) end = pickOne(['Yesterday was a little light, so let’s get more in today.', 'We came up short yesterday. Let’s try to do more work today.']);
+  else if(yWork && yDeep >= target) end = pickOne(['You hit your number yesterday — let’s do it again.', 'Strong day yesterday. Same again.']);
+  else if(dow===0 || dow===6) end = 'Weekend work counts double. Let’s keep it tight.';
+  else if(dow===3) end = 'Middle of the week. Keep the momentum.';
+  else end = pickOne(['Let’s get to it.', 'Let’s have a good one.', 'Let’s make it count.']);
+  parts.push(end);
   return parts.join(' ');
 }
-ACTIONS.opAsk = function(el, e, id){
+// asking: the bits that need fetching are fetched first (it says so if that takes a moment)
+ACTIONS.opAsk = async function(el, e, id){
   opStop(); OV.idx = 999; // the spoken greeting is done once you ask for something
+  const cap = overlayOpen('planOverlay') ? 'wiCap' : 'brVoice';
+  const tok = OV.token;
+  const wait = function(p){ return Promise.race([p, new Promise(function(r){ setTimeout(r, 7000); })]); };
+  if(id==='sports' && typeof loadScores==='function' && !(ui.scores && ui.scores.got && (ui.scores.nfl || ui.scores.nba))){ OV.cap = cap; opCaption('One moment — getting the scores…'); await wait(loadScores(true)); }
+  if((id==='news' || id==='tech' || id==='sports') && !(ui.morningNews && ui.morningNews.items)){ OV.cap = cap; opCaption('One moment…'); await wait(loadMorningNews(true)); }
+  if(id==='tech' && !arr(ui.morningNews && ui.morningNews.sec && ui.morningNews.sec.tech).length){
+    // nothing came through for tech with the morning's news: ask for it on its own
+    const t = newsSections().find(function(x){ return x.id==='tech'; });
+    if(t){ OV.cap = cap; opCaption('One moment…'); const got = await wait(fetchNews(t.q)); if(got && got.length && ui.morningNews){ ui.morningNews.sec = ui.morningNews.sec || {}; ui.morningNews.sec.tech = got; } }
+  }
+  if(tok!==OV.token) return; // you asked for something else meanwhile
   const s = id==='sports' ? opSportsScript() : id==='news' ? opNewsScript('top') : id==='tech' ? opNewsScript('tech') : opBusinessScript();
-  opSay(s, {cap: overlayOpen('planOverlay') ? 'wiCap' : 'brVoice'});
+  if(!opVoiceOn()){ OV.cap = cap; opCaption(s); return; }
+  opSay(s, {cap:cap});
 };
 ACTIONS.opMute = function(){ const w = wakeCfg(); w.voice = w.voice===false; persist('focus'); if(w.voice===false) opStop(); if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto(); };
+// the mute lives in the top bar of Good morning and the work preview
+function opMuteHtml(){
+  const off = wakeCfg().voice===false;
+  return '<button class="op-mute-top'+(off?' is-off':'')+'" data-action="opMute" title="'+(off ? 'Turn the Operator’s voice on' : 'Mute the Operator')+'">'+(off ? '&#128263;' : '&#128266;')+'</button>';
+}
 function opAskHtml(where){
-  if(typeof window.speechSynthesis==='undefined') return '';
-  const on = opVoiceOn();
   const chip = function(id, icon, label){ return '<button class="op-ask" data-action="opAsk" data-id="'+id+'">'+icon+' '+label+'</button>'; };
   return '<div class="op-asks">'+
     '<span class="op-name">The Operator</span>'+
     (where==='work' ? chip('business', '&#128188;', 'Brief me') : chip('sports', '&#127944;', 'Sports')+chip('news', '&#128240;', 'News')+chip('tech', '&#128187;', 'Tech')+chip('business', '&#128188;', 'Business'))+
-    '<button class="op-mute" data-action="opMute" title="'+(on ? 'Mute the voice' : 'Turn the voice on')+'">'+(on ? '&#128266;' : '&#128263;')+'</button></div>';
+    aiTalkHtml()+
+    '</div>';
 }
 // the business brief plays by itself when you go straight from Good morning to work
 function opAutoBusinessBrief(){ if(!opVoiceOn()) return; setTimeout(function(){ if(overlayOpen('planOverlay')) { opStop(); opSay(opBusinessScript(), {cap:'wiCap'}); } }, 900); }
-// ============ XP & RANKS ============
-// The point of all this: a million a year. Nine ranks, few on purpose — each one needs XP *and* an
-// MRR you actually hold (XP alone never gets you there). MRR is the biggest source of XP: every
-// $1k of monthly recurring is worth a lot, and it goes back down if MRR does. New clients and
-// finished videos (side quests) are next. Time, tasks, workouts, shooting and outreach are the
-// everyday base — they pay less once they're your normal (your own recent average sets the bar),
-// a few strong days in a row multiply them, and the first workouts are worth extra.
+
+// ---- choosing the voice (in the alarm settings, under "The Operator's voice") ----
+const ELEVEN_VOICES = [['JBFqnCBsd6RMkjVDRZzb', 'George — British, warm (the butler)'], ['onwK4e9ZLuTAKqWW03F9', 'Daniel — British, crisp'], ['nPczCjzI2devNBz1zQrb', 'Brian — deep, American']];
+function opLoadMacVoices(){
+  if(ui.ttsVoices && ui.ttsVoices.at && Date.now() - ui.ttsVoices.at < 60000) return;
+  ui.ttsVoices = {at:Date.now(), list:(ui.ttsVoices && ui.ttsVoices.list) || null};
+  fetchWithin(WAKE_HELPER+'tts/voices', 6000).then(function(r){ return r && r.ok ? r.json() : null; }).then(function(j){
+    ui.ttsVoices = {at:Date.now(), list: j && Array.isArray(j.voices) ? j.voices : [], down: !j};
+    if(document.getElementById('opVoiceSet')) renderView();
+  }).catch(function(){ ui.ttsVoices = {at:Date.now(), list:[], down:true}; });
+  fetchWithin(WAKE_HELPER+'tts/status', 6000).then(function(r){ return r && r.ok ? r.json() : null; }).then(function(j){ ui.ttsKey = !!(j && j.hasKey); if(document.getElementById('opVoiceSet')) renderView(); }).catch(function(){});
+}
+function opVoiceSettingsHtml(){
+  const w = wakeCfg(), e = opEngine();
+  if(e!=='browser') opLoadMacVoices();
+  const seg = function(id, label){ return '<button class="seg-tab'+(e===id?' active':'')+'" data-action="opEngineSet" data-id="'+id+'">'+label+'</button>'; };
+  // (ElevenLabs is the voice; the Mac's and the browser's are there as backups)
+  let body = '';
+  if(e==='mac'){
+    const vs = (ui.ttsVoices && ui.ttsVoices.list) || [];
+    const best = vs.slice().sort(function(a, b){ return opVoiceScore({name:b.n, lang:b.l}) - opVoiceScore({name:a.n, lang:a.l}); }).filter(function(v){ return opVoiceScore({name:v.n, lang:v.l}) > -100; });
+    body = '<select class="input" id="opMacVoice"><option value="">System voice (Spoken Content)</option>'+best.map(function(v){ return '<option value="'+escapeHtml(v.n)+'"'+(w.macVoice===v.n?' selected':'')+'>'+escapeHtml(v.n)+' &middot; '+escapeHtml(v.l.replace('_', '-'))+'</option>'; }).join('')+'</select>'+
+      '<div class="op-set-help">For a voice that sounds like a person: <b>System Settings → Accessibility → Spoken Content → System voice</b> and pick a Siri voice, or <b>Manage Voices…</b> → English → download <b>Jamie (Premium)</b> or <b>Daniel (Enhanced)</b>. Then choose it here (or leave “System voice”).'+
+      (ui.ttsVoices && ui.ttsVoices.down ? '<br><span class="op-set-warn">The Operator app isn’t answering — open Operator from its icon (the newest version) to use the Mac’s voices.</span>' : '')+'</div>';
+  } else if(e==='eleven'){
+    const known = ELEVEN_VOICES.some(function(v){ return v[0]===w.elevenVoice; });
+    body = (ui.ttsKey ? '<div class="op-set-key"><span>&#128274; Key saved on this Mac</span><button class="btn btn-ghost btn-sm" data-action="opElevenForget">Remove key</button></div>'
+        : '<div class="op-set-key"><input class="input" type="password" id="opElevenKey" placeholder="ElevenLabs API key" autocomplete="off"><button class="btn btn-sm btn-primary" data-action="opElevenSave">Save key</button></div>')+
+      '<select class="input" id="opElevenVoice">'+ELEVEN_VOICES.map(function(v){ return '<option value="'+v[0]+'"'+((w.elevenVoice||ELEVEN_VOICES[0][0])===v[0]?' selected':'')+'>'+v[1]+'</option>'; }).join('')+'<option value="custom"'+(w.elevenVoice && !known ? ' selected' : '')+'>Another voice (paste its ID)…</option></select>'+
+      (w.elevenVoice && !known ? '<input class="input" id="opElevenCustom" value="'+escapeHtml(w.elevenVoice)+'" placeholder="Voice ID" style="margin-top:6px;">' : '')+
+      '<div class="op-set-help">The most natural voice. Get a key at elevenlabs.io (Profile → API keys). It’s saved by the Operator app on this Mac only — not in Operator’s data, exports or backups. Each line is made once and kept for two days.</div>';
+  } else {
+    const vs = opBrowserVoices(), cur = opPickVoice();
+    body = '<select class="input" id="opBrowserVoice">'+(vs.length ? vs.map(function(v){ return '<option value="'+escapeHtml(v.name)+'"'+(cur && cur.name===v.name?' selected':'')+'>'+escapeHtml(v.name)+'</option>'; }).join('') : '<option>No voices found</option>')+'</select>'+
+      '<div class="op-set-help">The browser’s own voices — the simplest, and the most robotic. Premium and Enhanced voices you download on the Mac show up here too.</div>';
+  }
+  return '<div class="field op-set" id="opVoiceSet"><label>Voice</label>'+
+    '<div class="seg-tabs" style="margin:0 0 8px;">'+seg('eleven', 'ElevenLabs')+seg('mac', 'Mac voice')+seg('browser', 'Browser')+'</div>'+body+
+    '<div class="op-set-test"><button class="btn btn-sm" data-action="opTest">&#9654; Test the voice</button><span id="opTestCap" class="op-set-cap"></span></div></div>'+aiKeyHtml();
+}
+function opVoiceChanged(){ OV.voice = null; OV.helperDown = false; OV.broken = false; persist('focus'); }
+ACTIONS.opEngineSet = function(el, e, id){ wakeCfg().voiceEngine = id; opStop(); opVoiceChanged(); ui.ttsVoices = null; renderView(); };
+ACTIONS.opTest = function(){
+  opStop(); opVoiceChanged();
+  const name = state.profile.name || '';
+  const h = new Date().getHours(), greet = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const w = wakeCfg(), was = w.voice; w.voice = true;
+  opSay(greet+(name ? ', '+name : '')+'. Everything’s in order — your plan is set, and the coffee won’t make itself. Ready when you are.', {cap:'opTestCap'}).then(function(ok){
+    w.voice = was;
+    if(!ok) showToast('Couldn’t speak — '+(opEngine()==='browser' ? 'no voice is available.' : 'the Operator app didn’t answer.'), {icon:'&#9888;'});
+    else if(OV.helperDown && opEngine()!=='browser') showToast('The Operator app didn’t answer, so that was the browser’s voice. Open Operator from its icon to use the '+(opEngine()==='eleven' ? 'ElevenLabs' : 'Mac')+' voice.', {icon:'&#9888;', duration:8000});
+  });
+};
+ACTIONS.opElevenSave = function(){
+  const i = document.getElementById('opElevenKey'), v = i ? i.value.trim() : '';
+  if(!v){ if(i) i.focus(); return; }
+  if(i) i.value = '';
+  // straight to the Operator app (it keeps the key in its own file); never into Operator's data
+  fetchWithin(WAKE_HELPER+'tts/key?t='+hexUtf8(v), 6000).then(function(r){
+    if(r && r.ok){ ui.ttsKey = true; showToast('ElevenLabs key saved on this Mac.', {icon:'&#128274;'}); opVoiceChanged(); renderView(); }
+    else showToast('Couldn’t save it — the Operator app isn’t answering. Open Operator from its icon.', {icon:'&#9888;'});
+  });
+};
+ACTIONS.opElevenForget = function(){ fetchWithin(WAKE_HELPER+'tts/forget', 6000).then(function(){ ui.ttsKey = false; renderView(); }); };
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.id) return;
+  const w = wakeCfg();
+  if(t.id==='opMacVoice'){ w.macVoice = t.value; opVoiceChanged(); }
+  else if(t.id==='opBrowserVoice'){ w.browserVoice = t.value; opVoiceChanged(); }
+  else if(t.id==='opElevenVoice'){ if(t.value==='custom'){ w.elevenVoice = w.elevenVoice && !ELEVEN_VOICES.some(function(v){ return v[0]===w.elevenVoice; }) ? w.elevenVoice : 'paste-id'; } else w.elevenVoice = t.value; opVoiceChanged(); renderView(); }
+  else if(t.id==='opElevenCustom'){ w.elevenVoice = t.value.replace(/[^0-9a-zA-Z]/g, ''); opVoiceChanged(); }
+});
+
+// ============ TALK TO THE OPERATOR ============
+// Press the mic (or type), say anything — "what's my day look like", "how am I doing this week",
+// "give me a reason to get up" — and it answers out loud. Your words go to Claude through the
+// Operator app (the API key lives only in the app's own file on this Mac), with a short summary of
+// your day so it knows what it's talking about. It remembers the conversation until you close Operator.
+const AI = {busy:false, listening:false, rec:null, model:null, history:[], hasKey:null};
+function aiContext(){
+  const today = todayStr(), lines = [];
+  const plan = typeof todaysPlan==='function' ? todaysPlan() : [];
+  const left = plan.filter(function(t){ return t.status!=='done'; }), done = plan.filter(function(t){ return t.status==='done'; });
+  const ev = state.calendar.events.filter(function(e){ return e.date===today; });
+  const target = state.standards.deepWorkTargetMinutes || 180;
+  lines.push('Plan today: '+(left.length ? left.map(function(t){ return t.title; }).join('; ') : 'nothing lined up')+(done.length ? ' (done: '+done.map(function(t){ return t.title; }).join('; ')+')' : '')+'.');
+  if(ev.length) lines.push('Calendar: '+ev.map(function(e){ return (e.time ? fmt12Hour(e.time)+' ' : '')+e.title; }).join('; ')+'.');
+  lines.push('Deep work today '+fmtDurationLabel(deepWorkMinutesTodayLive())+' (target '+fmtDurationLabel(target)+'), yesterday '+fmtDurationLabel(deepWorkMinutesFor(addDays(today, -1)))+'. Streak '+computeStreak()+' days.');
+  const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
+  lines.push('Business: MRR '+money(xpMrr())+(state.profile.revenueGoalMonthly ? ' (goal '+money(state.profile.revenueGoalMonthly)+')' : '')+', '+cs.length+' active clients, '+arr(state.business.pipeline).filter(leadIsOpen).length+' open leads.');
+  if(typeof xpSummary==='function'){ const x = xpSummary(); lines.push('Game: level '+x.level+', rank '+x.rank+' "'+RANKS[x.rank].name+'", overall '+x.ovr+' (Business '+x.attrs.BUS.v+', Personal '+x.attrs.PER.v+', Health '+x.attrs.HLT.v+', Discipline '+x.attrs.DIS.v+').'); }
+  const wx = typeof wxNow==='function' ? wxNow() : null; if(wx) lines.push('Weather: '+wx.temp+'° and '+wxLabel(wx.code).toLowerCase()+(wx.hi!=null ? ', high '+wx.hi+'°' : '')+'.');
+  const nw = ui.morningNews; if(nw && nw.items) lines.push('Headlines: '+arr(nw.items).slice(0, 5).map(function(n){ return sayHeadline(n.title); }).join(' | ')+'.');
+  if(nw && nw.sec && nw.sec.tech) lines.push('Tech: '+arr(nw.sec.tech).slice(0, 3).map(function(n){ return sayHeadline(n.title); }).join(' | ')+'.');
+  const sp = typeof scoresSpoken==='function' ? scoresSpoken() : ''; if(sp) lines.push('Sports: '+sp);
+  return lines.join('\n');
+}
+function aiSystem(){
+  const name = state.profile.name || 'the user', now = new Date();
+  return 'You are the Operator — the voice inside '+name+'’s Operator app. Think Jarvis: a calm, sharp, warm butler with a dry wit, '+
+    'completely on '+name+'’s side. He is an entrepreneur building his business, and he wants to stay consistent, stay locked in and not slip into brain fog. '+
+    'Everything you write is spoken out loud: answer in one to four short sentences with a natural rhythm. No lists, no markdown, no emoji, no headings. '+
+    'Be direct and specific to his day; encourage without being cheesy; use his name only now and then. If you don’t know something, say so in a sentence.\n\n'+
+    'It is '+now.toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+', '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'.\n'+
+    'What you know right now:\n'+aiContext();
+}
+async function aiPickModel(){
+  if(AI.model) return AI.model;
+  const r = await fetchWithin(WAKE_HELPER+'ai/models', 15000);
+  if(!r || !r.ok) return null;
+  let j = null; try{ j = await r.json(); }catch(e){}
+  const ids = arr(j && j.data).map(function(m){ return m.id; });
+  // the newest Sonnet (quick enough to talk to, smart enough to be worth it); the newest of anything if none
+  AI.model = ids.find(function(id){ return /sonnet/i.test(id); }) || ids[0] || null;
+  return AI.model;
+}
+async function aiAsk(text, cap){
+  text = String(text||'').trim(); if(!text || AI.busy) return;
+  AI.busy = true; opStop(); OV.idx = 999; OV.cap = cap; opCaption('…');
+  aiUiRefresh();
+  try{
+    const model = await aiPickModel();
+    if(!model){ AI.hasKey = false; opCaption('To talk with me, add an Anthropic API key in Settings → Alarm → The Operator’s voice.'); return; }
+    AI.history.push({role:'user', content:text});
+    AI.history = AI.history.slice(-12);
+    const body = JSON.stringify({model:model, max_tokens:300, system:aiSystem(), messages:AI.history});
+    const r = await fetchWithin(WAKE_HELPER+'ai/chat?b='+hexUtf8(body), 50000);
+    let j = null; try{ j = r ? await r.json() : null; }catch(e){}
+    const reply = j && arr(j.content).filter(function(c){ return c.type==='text'; }).map(function(c){ return c.text; }).join(' ').trim();
+    if(!reply){ AI.history.pop(); opCaption(r && r.status===401 ? 'To talk with me, add an Anthropic API key in Settings → Alarm → The Operator’s voice.' : 'I couldn’t reach my brain just now — '+((j && j.error && j.error.message) || 'the Operator app didn’t answer')+'.'); return; }
+    AI.history.push({role:'assistant', content:reply});
+    if(opVoiceOn()) await opSay(reply, {cap:cap}); else opCaption(reply);
+  } finally { AI.busy = false; aiUiRefresh(); }
+}
+// the mic: Chrome's speech recognition; it stops by itself when you stop talking
+function aiCanHear(){ return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
+function aiListen(cap){
+  if(AI.listening){ try{ AI.rec.stop(); }catch(e){} return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ aiTypeFocus(); return; }
+  opStop();
+  const rec = new SR(); AI.rec = rec;
+  rec.lang = navigator.language || 'en-US'; rec.interimResults = true; rec.continuous = false;
+  let said = '';
+  OV.cap = cap;
+  rec.onstart = function(){ AI.listening = true; opCaption('Listening…'); aiUiRefresh(); };
+  rec.onresult = function(e){ let s = ''; for(let i=0;i<e.results.length;i++) s += e.results[i][0].transcript; said = s; opCaption('“'+s+'”'); };
+  rec.onerror = function(e){ AI.listening = false; aiUiRefresh(); opCaption(e && e.error==='not-allowed' ? 'I need the microphone — allow it when Chrome asks (or type instead).' : e && e.error==='no-speech' ? 'Didn’t catch that.' : 'The mic isn’t working — type instead.'); };
+  rec.onend = function(){ AI.listening = false; aiUiRefresh(); if(said.trim()) aiAsk(said, cap); };
+  try{ rec.start(); }catch(e){ AI.listening = false; aiTypeFocus(); }
+}
+function aiTypeFocus(){ const i = document.querySelector('.op-type'); if(i) i.focus(); }
+function aiUiRefresh(){
+  document.querySelectorAll('.op-talk').forEach(function(b){ b.classList.toggle('is-on', AI.listening); b.classList.toggle('is-busy', AI.busy); });
+}
+function aiCapFor(el){ return overlayOpen('planOverlay') ? 'wiCap' : overlayOpen('wakeOverlay') ? 'brVoice' : 'hmCap'; }
+ACTIONS.opTalk = function(el){ aiListen(aiCapFor(el)); };
+document.addEventListener('keydown', function(e){
+  const t = e.target; if(!t || !t.classList || !t.classList.contains('op-type') || e.key!=='Enter') return;
+  e.preventDefault(); const v = t.value; t.value = ''; aiAsk(v, aiCapFor(t));
+});
+function aiTalkHtml(){
+  return '<span class="op-talk-wrap"><button class="op-talk" data-action="opTalk" title="Talk to the Operator">&#127897;&#65039;</button><input class="op-type" placeholder="Ask the Operator…" autocomplete="off"></span>';
+}
+// the key: straight to the Operator app, never into Operator's data
+ACTIONS.aiKeySave = function(){
+  const i = document.getElementById('aiKey'), v = i ? i.value.trim() : '';
+  if(!v){ if(i) i.focus(); return; }
+  if(i) i.value = '';
+  fetchWithin(WAKE_HELPER+'ai/key?t='+hexUtf8(v), 6000).then(function(r){
+    if(r && r.ok){ AI.hasKey = true; AI.model = null; showToast('Anthropic key saved on this Mac. Say hello.', {icon:'&#128274;'}); renderView(); }
+    else showToast('Couldn’t save it — the Operator app isn’t answering. Open Operator from its icon.', {icon:'&#9888;'});
+  });
+};
+ACTIONS.aiKeyForget = function(){ fetchWithin(WAKE_HELPER+'ai/forget', 6000).then(function(){ AI.hasKey = false; AI.model = null; renderView(); }); };
+function aiKeyHtml(){
+  if(AI.hasKey==null){ AI.hasKey = false; fetchWithin(WAKE_HELPER+'ai/status', 6000).then(function(r){ return r && r.ok ? r.json() : null; }).then(function(j){ AI.hasKey = !!(j && j.hasKey); if(AI.hasKey && document.getElementById('opVoiceSet')) renderView(); }).catch(function(){}); }
+  return '<div class="field op-set"><label>Talk to it'+tip('Press the mic on Good morning, the work preview or the minimal Focus page and just talk. The answers come from Claude; the key is saved by the Operator app on this Mac only — not in Operator’s data, exports or backups.')+'</label>'+
+    (AI.hasKey ? '<div class="op-set-key"><span>&#128274; Anthropic key saved on this Mac</span><button class="btn btn-ghost btn-sm" data-action="aiKeyForget">Remove key</button></div>'
+      : '<div class="op-set-key"><input class="input" type="password" id="aiKey" placeholder="Anthropic API key (sk-ant-…)" autocomplete="off"><button class="btn btn-sm btn-primary" data-action="aiKeySave">Save key</button></div>')+
+    '<div class="op-set-help">Get a key at console.anthropic.com → API keys.</div></div>';
+}
+// ============ XP, LEVELS, RANKS & YOUR CARD ============
+// A game you play by living the right way. Everyone starts at level 0, rank 0 — "Locked In": the
+// point is to stay consistent and not lose yourself to brain fog. Levels are slow on purpose:
+// level L takes 100 × L² XP in total (level 10 is 10,000; level 30 is 90,000).
+// Ranks need three things: the level, the MRR, and the body (your Health score) — you can't
+// rank up on work alone.
+// XP comes from the day (deep work, tasks, workouts — the first ones count big — shooting,
+// outreach), consistency (strong days in a row multiply the day), clients you win, and MRR: every
+// $1k above where you started is worth 800 XP — and it's taken back if MRR drops.
+// Your card (NBA 2K style) rates you 25–100 on four things, and an overall. 100 is you at your very
+// best — the body, the business and the decisions all there at once — so it's meant to be rare:
+//   Business (MRR, clients, time put in, client growth, business content)
+//   Personal (personal content, video ideas, your goals, reflection)
+//   Health (BMI for your height — scales with any weight — and training, how often and how steady)
+//   Discipline (days on target, your streak, how often you lock in)
 const RANKS = [
-  {name:'Recruit',     mrr:0,     xp:0,      color:'#9aa3b5'},
-  {name:'Operator',    mrr:2500,  xp:1500,   color:'#5fd4c4'},
-  {name:'Specialist',  mrr:5000,  xp:5000,   color:'#6fc3ff'},
-  {name:'Closer',      mrr:10000, xp:12000,  color:'#a98bff'},
-  {name:'Captain',     mrr:20000, xp:28000,  color:'#ff8fb1'},
-  {name:'Commander',   mrr:35000, xp:55000,  color:'#ffc56b'},
-  {name:'Director',    mrr:50000, xp:95000,  color:'#ff9a6b'},
-  {name:'Mogul',       mrr:70000, xp:150000, color:'#7ef0c0'},
-  {name:'Millionaire', mrr:83400, xp:230000, color:'#fff2b0'}
+  {name:'Locked In',   level:0,  mrr:0,     health:0,  color:'#8fd3ff', tag:'Entrepreneur mode'},
+  {name:'Operator',    level:5,  mrr:2500,  health:40, color:'#5fd4c4', tag:'Showing up'},
+  {name:'Specialist',  level:10, mrr:5000,  health:50, color:'#6fc3ff', tag:'Good at the thing'},
+  {name:'Closer',      level:16, mrr:10000, health:55, color:'#a98bff', tag:'Deals get done'},
+  {name:'Captain',     level:23, mrr:20000, health:60, color:'#ff8fb1', tag:'Others follow'},
+  {name:'Commander',   level:31, mrr:35000, health:65, color:'#ffc56b', tag:'Runs the field'},
+  {name:'Director',    level:40, mrr:50000, health:70, color:'#ff9a6b', tag:'Built to last'},
+  {name:'Mogul',       level:50, mrr:70000, health:75, color:'#7ef0c0', tag:'Owns the game'},
+  {name:'Millionaire', level:60, mrr:83400, health:80, color:'#fff2b0', tag:'A million a year'}
 ];
-const XP_RATES = {mrrPerK:400, client:300, video:50, hourBase:10, hourAbove:18, longDay:40, outreach:20};
+const XP_RATES = {mrrPerK:800, client:300, video:50, hourBase:10, hourAbove:18, longDay:40, outreach:20};
+function xpForLevel(L){ return 100*L*L; }
+function xpLevelOf(total){ return Math.max(0, Math.floor(Math.sqrt(Math.max(0, total)/100))); }
 function xpMrr(){ return arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); }).reduce(function(a, c){ return a + Number(c.mrr||0); }, 0); }
+// the day the game began (you start at 0 — nothing before it counts), and where MRR stood then
+function xpStart(){
+  const p = state.profile;
+  if(!p.xpStart){ p.xpStart = todayStr(); p.xpMrrBase = xpMrr(); p.xpClientsBase = arr(state.business.clients).map(function(c){ return c.id; }); persist('profile'); }
+  return p.xpStart;
+}
 // your standard: the average deep work over the 14 days before this one (it rises as you do)
 function xpStandardFor(d, deepOf){ let s = 0; for(let i=1;i<=14;i++) s += deepOf(addDays(d, -i)); return s/14; }
 // everything earned on one day, itemised
@@ -21908,9 +22483,10 @@ function xpDay(d, ctx){
   const done = ctx.doneOn[d] || {tasks:0, videos:0};
   if(done.tasks){ let x = 0; for(let i=0;i<done.tasks;i++) x += i<3 ? 12 : i<6 ? 8 : 4; add('tasks', x, done.tasks+' task'+(done.tasks===1?'':'s')+' done'); }
   if(done.videos) add('videos', done.videos*XP_RATES.video, done.videos+' video'+(done.videos===1?'':'s')+' finished');
+  // the body is a big part of this: training pays more than an hour of work
   if(ctx.trained(d)){
     const k = ctx.workoutIndex[d], w = ctx.workoutWeekIndex[d];
-    add('workout', k<=5 ? 120 : w===1 ? 45 : w===2 ? 35 : w===3 ? 25 : 15, k<=5 ? 'Workout #'+k+' — the first few count big' : 'Workout ('+w+(w===1?'st':w===2?'nd':w===3?'rd':'th')+' this week)');
+    add('workout', k<=5 ? 150 : w===1 ? 70 : w===2 ? 60 : w===3 ? 50 : 25, k<=5 ? 'Workout #'+k+' — the first few count big' : 'Workout ('+w+(w===1?'st':w===2?'nd':w===3?'rd':'th')+' this week)');
   }
   const shoot = ctx.shootMin[d]||0; if(shoot) add('shoot', shoot/60*8, fmtDurationLabel(shoot)+' shooting');
   const t = ctx.touches[d]||0; if(t) add('outreach', XP_RATES.outreach + Math.min(30, (t-1)*3), t+' outreach touch'+(t===1?'':'es'));
@@ -21925,27 +22501,22 @@ function xpCtx(){
   state.tasks.items.forEach(function(t){ if(t.status!=='done' || !t.completedAt) return; const o = doneOn[t.completedAt] = doneOn[t.completedAt] || {tasks:0, videos:0}; if(t.isVideoIdea) o.videos++; else o.tasks++; });
   const gym = arr(state.health.gymLog).map(function(g){ return g.date; }).filter(Boolean).sort();
   const gymSet = {}, workoutIndex = {}, workoutWeekIndex = {};
-  gym.forEach(function(d){ if(gymSet[d]) return; gymSet[d] = true; });
-  let k = 0; Object.keys(gymSet).sort().forEach(function(d){ k++; workoutIndex[d] = k; const ws = startOfWeekStr(d); workoutWeekIndex[d] = Object.keys(gymSet).filter(function(x){ return x>=ws && x<=d; }).length; });
+  gym.forEach(function(d){ gymSet[d] = true; });
+  const gymDays = Object.keys(gymSet).sort();
+  let k = 0; gymDays.forEach(function(d){ k++; workoutIndex[d] = k; const ws = startOfWeekStr(d); workoutWeekIndex[d] = gymDays.filter(function(x){ return x>=ws && x<=d; }).length; });
   const shootMin = {}; arr(state.modes.history).forEach(function(m){ if(m.type==='shooting') shootMin[m.date] = (shootMin[m.date]||0) + Number(m.minutes||0); });
   const touches = {};
   ['clients', 'pipeline'].forEach(function(k){ arr(state.business[k]).forEach(function(x){ arr(x.touches).forEach(function(t){ const d = typeof t==='string' ? t : t && t.date; if(d) touches[d] = (touches[d]||0) + 1; }); }); });
+  const jDays = {}; arr(state.journal.entries).forEach(function(e){ if(e.date) jDays[e.date] = true; });
   const deepMemo = {};
-  return {doneOn:doneOn, trained:function(d){ return !!gymSet[d]; }, workoutIndex:workoutIndex, workoutWeekIndex:workoutWeekIndex, shootMin:shootMin, touches:touches,
+  return {doneOn:doneOn, trained:function(d){ return !!gymSet[d]; }, gymDays:gymDays, workoutIndex:workoutIndex, workoutWeekIndex:workoutWeekIndex, shootMin:shootMin, touches:touches,
+    journaled:function(d){ return !!jDays[d]; }, jDays:jDays,
     target: state.standards.deepWorkTargetMinutes || 180,
     deep:function(d){ if(deepMemo[d]==null) deepMemo[d] = d===todayStr() ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); return deepMemo[d]; }};
 }
-// the first day there's anything to count
-function xpFirstDay(){
-  let first = todayStr();
-  arr(state.focus.sessions).forEach(function(s){ if(s.date && s.date < first) first = s.date; });
-  state.tasks.items.forEach(function(t){ if(t.completedAt && t.completedAt < first) first = t.completedAt; });
-  arr(state.health.gymLog).forEach(function(g){ if(g.date && g.date < first) first = g.date; });
-  return first < addDays(todayStr(), -730) ? addDays(todayStr(), -730) : first;
-}
 // past days don't change often: keep them, recount only today (and everything when the data changes)
 let xpCache = {sig:'', days:{}};
-function xpSig(){ return [arr(state.focus.sessions).length, state.tasks.items.filter(function(t){ return t.status==='done'; }).length, arr(state.health.gymLog).length, arr(state.modes.history).length, state.standards.deepWorkTargetMinutes].join('|'); }
+function xpSig(){ return [arr(state.focus.sessions).length, state.tasks.items.filter(function(t){ return t.status==='done'; }).length, arr(state.health.gymLog).length, arr(state.modes.history).length, arr(state.journal.entries).length, state.standards.deepWorkTargetMinutes, state.profile.xpStart].join('|'); }
 // (renders often — the full count is reused for a few seconds unless something changed)
 let xpLast = null;
 function xpSummary(){
@@ -21954,55 +22525,240 @@ function xpSummary(){
   const v = xpSummaryFresh(); xpLast = {sig:sig, mrr:mrrNow, at:Date.now(), v:v}; return v;
 }
 function xpSummaryFresh(){
+  const start = xpStart();
   const sig = xpSig(); if(sig!==xpCache.sig) xpCache = {sig:sig, days:{}};
   const ctx = xpCtx(), today = todayStr();
   let total = 0, week = 0; const ws = startOfWeekStr(today);
-  for(let d = xpFirstDay(); d <= today; d = addDays(d, 1)){
+  for(let d = start; d <= today; d = addDays(d, 1)){
     let items = d===today ? null : xpCache.days[d];
     if(!items){ items = xpDay(d, ctx); if(d!==today) xpCache.days[d] = items; }
     const sum = items.reduce(function(a, x){ return a + x.xp; }, 0);
     total += sum; if(d >= ws) week += sum;
   }
-  const mrr = xpMrr(), clientsEver = arr(state.business.clients).length;
-  const mrrXp = Math.floor(mrr/1000)*XP_RATES.mrrPerK, clientXp = clientsEver*XP_RATES.client;
-  total += mrrXp + clientXp;
+  const p = state.profile, mrr = xpMrr(), base = Number(p.xpMrrBase||0);
+  const won = arr(state.business.clients).filter(function(c){ return arr(p.xpClientsBase).indexOf(c.id) < 0; }).length;
+  const mrrXp = Math.round((mrr - base)/1000*XP_RATES.mrrPerK), clientXp = won*XP_RATES.client;
+  total = Math.max(0, total + mrrXp + clientXp);
   const todayItems = xpDay(today, ctx);
-  // rank = the highest one where you have both the XP and the MRR
-  let rank = 0; RANKS.forEach(function(r, i){ if(total >= r.xp && mrr >= r.mrr) rank = i; });
+  const level = xpLevelOf(total), lo = xpForLevel(level), hi = xpForLevel(level+1);
+  const attrs = xpAttributes(ctx);
+  // rank = the highest one where you have the level, the MRR and the body
+  let rank = 0; RANKS.forEach(function(r, i){ if(level >= r.level && mrr >= r.mrr && attrs.HLT.v >= r.health) rank = i; });
   const next = RANKS[rank+1] || null;
-  const lockedByMrr = !!(next && total >= next.xp && mrr < next.mrr);
-  return {total:total, week:week, today:todayItems, todayXp:todayItems.reduce(function(a, x){ return a + x.xp; }, 0), mrr:mrr, mrrXp:mrrXp, clientXp:clientXp, clientsEver:clientsEver, rank:rank, next:next, lockedByMrr:lockedByMrr,
-    pct: next ? Math.max(0, Math.min(1, (total - RANKS[rank].xp)/(next.xp - RANKS[rank].xp))) : 1};
+  const needs = next ? [level < next.level ? 'level '+next.level : '', mrr < next.mrr ? money(next.mrr)+' MRR' : '', attrs.HLT.v < next.health ? 'Health '+next.health : ''].filter(Boolean) : [];
+  return {total:total, week:week, today:todayItems, todayXp:todayItems.reduce(function(a, x){ return a + x.xp; }, 0),
+    mrr:mrr, mrrBase:base, mrrXp:mrrXp, clientXp:clientXp, won:won, start:start,
+    level:level, levelLo:lo, levelHi:hi, levelPct:(total - lo)/(hi - lo),
+    rank:rank, next:next, needs:needs, attrs:attrs, ovr:attrs.OVR};
 }
+
+// ---- the four ratings (25–99) ----
+const rate99 = function(f){ return Math.round(25 + 75*Math.max(0, Math.min(1, f))); };
+// height in inches (Settings → You); weight from your weigh-ins (lb, or kg if you've set kg)
+function bodyStats(){
+  const p = state.profile, h = Number(p.heightIn)||0;
+  const log = arr(state.health.weightLog).filter(function(w){ return Number(w.weight) > 0; }).sort(function(a, b){ return a.date.localeCompare(b.date); });
+  const w = log.length ? Number(log[log.length-1].weight) : 0, kg = p.weightUnit==='kg';
+  if(!h || !w) return {h:h, w:w, kg:kg, bmi:null};
+  const lb = kg ? w*2.20462 : w, bmi = 703*lb/(h*h);
+  // the lines for your height: where "healthy" ends (BMI 25) and "obese" starts (BMI 30)
+  const at = function(b){ const v = b*h*h/703; return Math.round(kg ? v/2.20462 : v); };
+  return {h:h, w:w, kg:kg, bmi:bmi, healthyMax:at(25), obeseAt:at(30), healthyMin:at(18.5),
+    cls: bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Healthy' : bmi < 30 ? 'Overweight' : bmi < 35 ? 'Obese' : 'Obese (class 2+)'};
+}
+// any weight, any height: the score falls off smoothly the further BMI is from the healthy range
+// (the very top is the lean middle of the healthy range — "the best you've looked", not just "not overweight")
+function bmiFactor(b){ if(b==null) return null; if(b < 18.5) return Math.max(0, 0.85 - (18.5-b)/5); if(b < 20) return 0.9; if(b <= 24) return 1; if(b <= 25) return 0.92; if(b <= 30) return 0.85 - (b-25)*0.07; return Math.max(0, 0.5 - (b-30)*0.05); }
+function xpAttributes(ctx){
+  const today = todayStr(), target = ctx.target;
+  const daysBack = function(n, f){ let c = 0; for(let i=0;i<n;i++) if(f(addDays(today, -i))) c++; return c; };
+  const within = function(d, n){ return d && d > addDays(today, -n) && d <= today; };
+  const tasks = state.tasks.items, cs = arr(state.business.clients);
+  const isPersonal = function(t){ return arr(t.clients).indexOf('personal')>=0 || t.client==='personal'; };
+  const mix = function(parts){ let s = 0, w = 0; parts.forEach(function(p){ if(p[1]==null) return; s += p[0]*p[1]; w += p[0]; }); return w ? s/w : 0; };
+  const sub = function(label, f, note){ return {label:label, v:f==null ? null : rate99(f), note:note||''}; };
+  // business
+  const mrr = xpMrr(), active = cs.filter(function(c){ return clientStageActive(c.stage); }).length;
+  let deep14 = 0; for(let i=1;i<=14;i++) deep14 += ctx.deep(addDays(today, -i)); deep14 /= 14;
+  const newClients = cs.filter(function(c){ return within(c.startDate || c.createdAt, 90); }).length;
+  const bizVids = tasks.filter(function(t){ return t.isVideoIdea && t.status==='done' && within(t.completedAt, 30) && !isPersonal(t); }).length;
+  // (each one at 100 is the best version: a million a year, a full roster, well past your daily target…)
+  const B = [sub('MRR', Math.sqrt(mrr/83400), money(mrr)+' a month'), sub('Clients', active/15, active+' active'), sub('Time put in', deep14/(target*1.33), fmtHours(Math.round(deep14))+' a day lately'),
+    sub('Client growth', newClients/4, newClients+' new in 90 days'), sub('Business content', bizVids/12, bizVids+' posted in 30 days')];
+  // personal
+  const perVids = tasks.filter(function(t){ return t.isVideoIdea && t.status==='done' && within(t.completedAt, 30) && isPersonal(t); }).length;
+  const ideas = tasks.filter(function(t){ return t.isVideoIdea && within(t.createdAt, 30); }).length;
+  const goals = arr(state.goals && state.goals.items).filter(function(g){ return !g.autoTrack; });
+  const goalF = goals.length && typeof goalPct==='function' ? goals.reduce(function(a, g){ return a + (g.done ? 100 : goalPct(g)); }, 0)/goals.length/100 : null;
+  const jd = daysBack(14, ctx.journaled);
+  const P = [sub('Personal content', perVids/12, perVids+' posted in 30 days'), sub('Video ideas', ideas/15, ideas+' new in 30 days'), sub('Your goals', goalF, goals.length ? Math.round(goalF*100)+'% of the way' : 'Add a goal'),
+    sub('Reflection', jd/10, jd+' journal days in 2 weeks')];
+  // health
+  const body = bodyStats(), w28 = ctx.gymDays.filter(function(d){ return within(d, 28); }).length;
+  let steady = 0; for(let i=0;i<4;i++){ const a = addDays(today, -7*(i+1)), b = addDays(today, -7*i); if(ctx.gymDays.filter(function(d){ return d > a && d <= b; }).length >= 4) steady++; }
+  const H = [sub('Body (BMI)', bmiFactor(body.bmi), body.bmi ? body.bmi.toFixed(1)+' · '+body.cls : 'Add height & weight'), sub('Training', w28/20, w28+' workouts in 4 weeks'), sub('Consistency', steady/4, steady+' of 4 weeks with 4+')];
+  // discipline
+  const onTarget = daysBack(14, function(d){ return ctx.deep(d) >= target; }), streak = computeStreak();
+  const lockIns = arr(state.focus.sessions).filter(function(s){ return within(s.date, 14); }).length;
+  const D = [sub('On target', onTarget/13, onTarget+' of 14 days'), sub('Streak', streak/30, streak+' day'+(streak===1?'':'s')), sub('Locking in', lockIns/28, lockIns+' sessions in 2 weeks')];
+  const score = function(list, ws){ return rate99(mix(list.map(function(s, i){ return [ws[i], s.v==null ? null : (s.v-25)/74]; }))); };
+  const out = {
+    BUS:{name:'Business', short:'BUS', v:score(B, [.35, .15, .25, .15, .10]), subs:B, color:'#ffc56b'},
+    PER:{name:'Personal', short:'PER', v:score(P, [.3, .2, .25, .25]), subs:P, color:'#c3a6ff'},
+    HLT:{name:'Health', short:'HLT', v:score(H, [.5, .3, .2]), subs:H, color:'#7ef0c0', body:body},
+    DIS:{name:'Discipline', short:'DIS', v:score(D, [.4, .3, .3]), subs:D, color:'#8fd3ff'}
+  };
+  // 100 overall only when every rating is 100
+  const ovr = .3*out.BUS.v + .3*out.HLT.v + .2*out.DIS.v + .2*out.PER.v;
+  out.OVR = ovr >= 99.999 ? 100 : Math.min(99, Math.floor(ovr));
+  return out;
+}
+
+// ---- the look ----
 function rankBadgeSvg(i, size){
-  const r = RANKS[i], s = size||34, n = i+1;
+  const r = RANKS[i], s = size||34;
   return '<svg class="xp-badge" viewBox="0 0 40 40" width="'+s+'" height="'+s+'" aria-hidden="true"><defs><linearGradient id="xpg'+i+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".45" stop-color="'+r.color+'"/><stop offset="1" stop-color="'+r.color+'" stop-opacity=".55"/></linearGradient></defs>'+
     '<path d="M20 2 L35 10 L35 26 Q35 33 20 38 Q5 33 5 26 L5 10 Z" fill="url(#xpg'+i+')" stroke="rgba(255,255,255,.55)" stroke-width="1"/>'+
-    '<text x="20" y="25" text-anchor="middle" font-size="13" font-weight="800" fill="#10131a" font-family="var(--font-display)">'+n+'</text></svg>';
+    '<text x="20" y="25" text-anchor="middle" font-size="13" font-weight="800" fill="#10131a" font-family="var(--font-display)">'+i+'</text></svg>';
 }
-function xpChipHtml(){
-  const x = xpSummary(), r = RANKS[x.rank];
-  return '<button class="xp-chip" data-action="openXp" style="--rc:'+r.color+'" title="Your rank — click for the breakdown">'+rankBadgeSvg(x.rank, 30)+
-    '<span class="xp-chip-t"><b>'+r.name+'</b><span>'+x.total.toLocaleString()+' XP'+(x.todayXp ? ' · +'+x.todayXp+' today' : '')+'</span>'+
-      '<i class="xp-bar"><u style="width:'+(x.pct*100).toFixed(1)+'%"></u></i>'+
-      (x.next ? '<small>'+(x.lockedByMrr ? '&#128274; '+x.next.name+' needs '+money(x.next.mrr)+' MRR' : (x.next.xp - x.total).toLocaleString()+' XP to '+x.next.name)+'</small>' : '<small>The top. A million a year.</small>')+
-    '</span></button>';
+function initialsOf(n){ const p = String(n||'').trim().split(/\s+/).filter(Boolean); return ((p[0]||'?')[0]+(p[1] ? p[1][0] : '')).toUpperCase(); }
+// the card, NBA 2K style: overall, rank, level, the four ratings, the bar to the next level
+function playerCardHtml(where){
+  const x = xpSummary(), r = RANKS[x.rank], name = state.profile.name || 'You';
+  return '<button class="pc pc-'+(where||'hero')+' tier-'+x.rank+'" data-action="openYou" style="--rc:'+r.color+'" title="Your card — open the overview">'+
+    '<span class="pc-shine"></span>'+
+    '<span class="pc-top"><span class="pc-ovr"><b>'+x.ovr+'</b><small>OVR</small></span><span class="pc-rk">'+rankBadgeSvg(x.rank, 30)+'<small>RANK '+x.rank+'</small></span></span>'+
+    '<span class="pc-face"><span>'+escapeHtml(initialsOf(name))+'</span></span>'+
+    '<span class="pc-name">'+escapeHtml(name)+'</span>'+
+    '<span class="pc-pos">'+escapeHtml(r.name)+' &middot; LVL '+x.level+'</span>'+
+    '<span class="pc-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(function(k){ const a = x.attrs[k]; return '<span style="--ac:'+a.color+'"><b>'+a.v+'</b><small>'+k+'</small></span>'; }).join('')+'</span>'+
+    '<span class="pc-xp"><i><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i><small>'+(x.total - x.levelLo).toLocaleString()+' / '+(x.levelHi - x.levelLo).toLocaleString()+' XP</small></span>'+
+  '</button>';
 }
-ACTIONS.openXp = function(){
-  let o = document.getElementById('xpOverlay');
-  if(!o){ o = document.createElement('div'); o.id = 'xpOverlay'; o.className = 'overlay xp-ov'; o.innerHTML = '<div class="card xp-m" id="xpContent"></div>'; document.body.appendChild(o); o.addEventListener('pointerdown', function(e){ if(e.target===o) o.classList.add('hidden'); }); }
+// next to LOCK IN: the front of the card is just your level (and rank); click and it turns over to
+// the overall, the four ratings and the XP — and "Your card →" for everything else (Personal → You)
+function playerCardMiniHtml(){
   const x = xpSummary(), r = RANKS[x.rank];
-  document.getElementById('xpContent').innerHTML =
-    '<button class="xp-x" data-action="closeXp">&#10005;</button>'+
-    '<div class="xp-hero" style="--rc:'+r.color+'">'+rankBadgeSvg(x.rank, 76)+'<div><div class="xp-k">Rank '+(x.rank+1)+' of '+RANKS.length+'</div><div class="xp-name">'+r.name+'</div><div class="xp-sub">'+x.total.toLocaleString()+' XP &middot; +'+x.week.toLocaleString()+' this week</div></div></div>'+
-    (x.next ? '<div class="xp-next"><i class="xp-bar is-big"><u style="width:'+(x.pct*100).toFixed(1)+'%"></u></i><div>'+(x.lockedByMrr ? '&#128274; You have the XP for <b>'+x.next.name+'</b> — it unlocks at <b>'+money(x.next.mrr)+'</b> MRR (you’re at '+money(x.mrr)+').' : '<b>'+(x.next.xp - x.total).toLocaleString()+' XP</b> and <b>'+money(x.next.mrr)+' MRR</b> to '+x.next.name+'.')+'</div></div>' : '')+
-    '<div class="xp-cols"><div><div class="xp-sec">Today</div>'+(x.today.length ? x.today.map(function(i){ return '<div class="xp-row"><span>'+escapeHtml(i.why)+'</span><b>+'+i.xp+'</b></div>'; }).join('') : '<div class="xp-empty">Nothing yet today.</div>')+
-      '<div class="xp-sec">Always on</div><div class="xp-row"><span>MRR '+money(x.mrr)+' ('+XP_RATES.mrrPerK+' per $1k — goes down if MRR does)</span><b>'+x.mrrXp.toLocaleString()+'</b></div><div class="xp-row"><span>'+x.clientsEver+' client'+(x.clientsEver===1?'':'s')+' won</span><b>'+x.clientXp.toLocaleString()+'</b></div></div>'+
-      '<div><div class="xp-sec">The ladder</div>'+RANKS.map(function(rk, i){ const st = i<x.rank ? 'is-done' : i===x.rank ? 'is-cur' : ''; return '<div class="xp-step '+st+'" style="--rc:'+rk.color+'">'+rankBadgeSvg(i, 22)+'<b>'+rk.name+'</b><span>'+rk.xp.toLocaleString()+' XP &middot; '+(rk.mrr ? money(rk.mrr)+' MRR' : '—')+'</span></div>'; }).join('')+'</div></div>'+
-    '<div class="xp-how"><b>How XP works.</b> MRR is the big one — '+XP_RATES.mrrPerK+' XP for every $1k of monthly recurring, taken back if it drops. Each client won is '+XP_RATES.client+'; each finished video '+XP_RATES.video+'. Time, tasks, workouts, shooting and outreach are the everyday base: deep work is '+XP_RATES.hourBase+' XP an hour up to your normal (your last two weeks) and '+XP_RATES.hourAbove+' above it; the first tasks of the day are worth the most; your first five workouts are 120 each. Strong days in a row multiply the day (up to ×1.28). Ranks need the MRR too — a million a year is the top.</div>';
-  o.classList.remove('hidden');
-};
-ACTIONS.closeXp = function(){ const o = document.getElementById('xpOverlay'); if(o) o.classList.add('hidden'); };
+  return '<div class="pcf'+(ui.pcFlip ? ' is-flipped' : '')+'" style="--rc:'+r.color+'">'+
+    '<button class="pcf-face pcf-front" data-action="pcFlip" title="Turn the card over">'+
+      '<span class="pc-shine"></span><small class="pcf-k">LEVEL</small><b class="pcf-lvl">'+x.level+'</b>'+
+      '<span class="pcf-rank">'+rankBadgeSvg(x.rank, 22)+escapeHtml(r.name)+'</span>'+
+      '<i class="pcf-bar"><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i></button>'+
+    '<div class="pcf-face pcf-back" data-action="pcFlip" title="Turn it back">'+
+      '<span class="pcf-ovr"><b>'+x.ovr+'</b><small>OVR</small></span>'+
+      '<span class="pc-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(function(k){ const a = x.attrs[k]; return '<span style="--ac:'+a.color+'"><b>'+a.v+'</b><small>'+k+'</small></span>'; }).join('')+'</span>'+
+      '<small class="pcf-xp">'+(x.levelHi - x.total).toLocaleString()+' XP to level '+(x.level+1)+'</small>'+
+      '<button class="pcf-open" data-action="openYou">Your card &rarr;</button></div>'+
+  '</div>';
+}
+ACTIONS.pcFlip = function(el){ ui.pcFlip = !ui.pcFlip; const c = el && el.closest('.pcf'); if(c) c.classList.toggle('is-flipped', !!ui.pcFlip); playTick(); };
+// (kept for older callers)
+function xpChipHtml(){ return playerCardHtml('hero'); }
+
+// ---- "You": the overview (Personal → You, or click the card) — the card, your level, the four
+// ratings, your body, the ladder. That's it.
+function renderYouTab(){
+  const x = xpSummary(), r = RANKS[x.rank], body = x.attrs.HLT.body;
+  const attrCard = function(k){ const a = x.attrs[k]; return '<div class="you-attr" style="--ac:'+a.color+'"><div class="you-attr-h"><b>'+a.v+'</b><span>'+a.name+'</span></div>'+
+    a.subs.map(function(s){ return '<div class="you-sub" title="'+escapeHtml(s.note)+'"><span>'+escapeHtml(s.label)+'</span><i><u style="width:'+(s.v==null ? 0 : (s.v-25)/75*100).toFixed(1)+'%"></u></i><b>'+(s.v==null ? '—' : s.v)+'</b></div>'; }).join('')+'</div>'; };
+  return '<div class="you">'+
+    '<div class="you-top">'+playerCardHtml('big')+
+      '<div class="you-main">'+
+        '<div class="you-lvl">Level <b>'+x.level+'</b> <span style="color:'+r.color+'">'+escapeHtml(r.name)+'</span></div>'+
+        '<div class="you-xpbar"><i><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i><span>'+(x.levelHi - x.total).toLocaleString()+' XP to level '+(x.level+1)+' &middot; +'+x.todayXp.toLocaleString()+' today &middot; +'+x.week.toLocaleString()+' this week</span></div>'+
+        (x.next ? '<div class="you-next">Next rank: <b style="color:'+x.next.color+'">'+x.next.name+'</b> — '+(x.needs.length ? 'needs '+x.needs.map(function(n){ return '<b>'+escapeHtml(n)+'</b>'; }).join(', ') : 'yours')+'</div>' : '<div class="you-next">The top. A million a year.</div>')+
+        '<div class="you-how">XP comes from deep work, finished tasks, workouts (they count big), outreach, clients you win and MRR you add — and MRR you lose takes it back. Each level takes more than the last.</div>'+
+      '</div></div>'+
+    '<div class="you-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(attrCard).join('')+'</div>'+
+    '<div class="you-row">'+
+      '<div class="you-body"><div class="you-sec">Your body</div>'+(body.bmi ?
+        '<div class="you-bmi"><b>'+body.bmi.toFixed(1)+'</b><span>BMI &middot; '+body.cls+'</span></div>'+
+        '<div class="you-bmi-scale">'+bmiScaleHtml(body)+'</div>'+
+        '<div class="you-note">At '+Math.floor(body.h/12)+'′'+(body.h%12)+'″: healthy up to <b>'+body.healthyMax+' '+(body.kg?'kg':'lb')+'</b>, obese from <b>'+body.obeseAt+' '+(body.kg?'kg':'lb')+'</b>. You’re at '+body.w+'.</div>'
+        : '<div class="you-note">Add your height (Settings → You) and a weigh-in, and your card rates your body too — ranks need it.</div><button class="btn btn-sm" data-action="goToProfileSettings">Add height</button>')+'</div>'+
+      '<div class="you-ladder"><div class="you-sec">Ranks</div>'+RANKS.map(function(rk, i){ const st = i<x.rank ? 'is-done' : i===x.rank ? 'is-cur' : ''; return '<div class="xp-step '+st+'" style="--rc:'+rk.color+'">'+rankBadgeSvg(i, 20)+'<b>'+rk.name+'</b><span>LVL '+rk.level+(rk.mrr ? ' &middot; '+money(rk.mrr)+' &middot; HLT '+rk.health : '')+'</span></div>'; }).join('')+'</div>'+
+    '</div></div>';
+}
+function bmiScaleHtml(b){
+  const lo = 15, hi = 40, pos = function(v){ return ((Math.max(lo, Math.min(hi, v)) - lo)/(hi - lo)*100).toFixed(1); };
+  return '<div class="bmi-bar"><i style="left:0;width:'+pos(18.5)+'%" class="u"></i><i style="left:'+pos(18.5)+'%;width:'+(pos(25)-pos(18.5))+'%" class="h"></i><i style="left:'+pos(25)+'%;width:'+(pos(30)-pos(25))+'%" class="o"></i><i style="left:'+pos(30)+'%;right:0" class="ob"></i>'+
+    '<b style="left:'+pos(b.bmi)+'%"></b></div><div class="bmi-lab"><span>18.5</span><span>25</span><span>30</span></div>';
+}
+ACTIONS.openYou = function(){ ui.view = 'personal'; ui.personalTab = 'you'; renderView(); };
+ACTIONS.openXp = ACTIONS.openYou;
+ACTIONS.closeXp = function(){};
+
+// ---- the SYSTEM: XP you can see — when you lock out, finish things, level up ----
+function sysSound(kind){
+  if(typeof tone!=='function') return;
+  if(kind==='level'){ [523, 659, 784, 1047].forEach(function(f, i){ setTimeout(function(){ tone([f], 0.22, 0.22); }, i*110); }); setTimeout(function(){ tone([784, 1047, 1319], 0.7, 0.2); }, 480); }
+  else if(kind==='gain') tone([880, 1320], 0.16, 0.12);
+}
+// a "SYSTEM" window: the bar fills from where you were to where you are, like a fight won
+function xpSystemShow(o){
+  const old = document.getElementById('sysWin'); if(old) old.remove();
+  const d = document.createElement('div'); d.id = 'sysWin'; d.className = 'sys-win'+(o.levelUp ? ' is-level' : '');
+  const fromPct = Math.max(0, Math.min(100, o.fromPct*100)), toPct = Math.max(0, Math.min(100, o.toPct*100));
+  d.innerHTML = '<div class="sys-card"><div class="sys-k">[ SYSTEM ]</div>'+
+    '<div class="sys-title">'+o.title+'</div>'+(o.sub ? '<div class="sys-sub">'+o.sub+'</div>' : '')+
+    (o.lines && o.lines.length ? '<div class="sys-lines">'+o.lines.map(function(l){ return '<div><span>'+escapeHtml(l.why)+'</span><b>+'+l.xp+' XP</b></div>'; }).join('')+'</div>' : '')+
+    '<div class="sys-gain">+<span id="sysGainN">0</span> XP</div>'+
+    '<div class="sys-bar"><i><u id="sysBarU" style="width:'+fromPct.toFixed(1)+'%"></u></i><span>LVL '+o.level+'</span></div>'+
+    (o.levelUp ? '<div class="sys-lvl">LEVEL UP<small>You are now level '+o.level+'</small></div>' : '')+
+    '<button class="sys-ok" data-action="sysClose">OK</button></div>';
+  document.body.appendChild(d);
+  requestAnimationFrame(function(){ d.classList.add('is-in'); });
+  // the number counts up while the bar fills
+  const n = d.querySelector('#sysGainN'), u = d.querySelector('#sysBarU'), t0 = Date.now(), dur = 1300;
+  setTimeout(function(){ if(u){ u.style.transition = 'width 1.3s cubic-bezier(.2,.8,.2,1)'; u.style.width = (o.levelUp ? 100 : toPct).toFixed(1)+'%'; } }, 350);
+  if(o.levelUp) setTimeout(function(){ if(u){ u.style.transition = 'none'; u.style.width = '0%'; requestAnimationFrame(function(){ u.style.transition = 'width .8s cubic-bezier(.2,.8,.2,1)'; u.style.width = toPct.toFixed(1)+'%'; }); } d.classList.add('is-leveled'); sysSound('level'); }, 1750);
+  else sysSound('gain');
+  const tick = setInterval(function(){ const k = Math.min(1, (Date.now()-t0-350)/dur); if(n) n.textContent = Math.max(0, Math.round(o.gained*k)).toLocaleString(); if(k>=1) clearInterval(tick); }, 40);
+  clearTimeout(xpSystemShow._t); xpSystemShow._t = setTimeout(function(){ ACTIONS.sysClose(); }, o.levelUp ? 9000 : 6500);
+}
+ACTIONS.sysClose = function(){ const d = document.getElementById('sysWin'); if(!d) return; d.classList.remove('is-in'); d.classList.add('is-out'); setTimeout(function(){ if(d.parentNode) d.remove(); }, 300); };
+// a small one for finishing a task
+function xpToast(gained, why){
+  if(!(gained > 0)) return;
+  let t = document.getElementById('sysToast');
+  if(!t){ t = document.createElement('div'); t.id = 'sysToast'; t.className = 'sys-toast'; document.body.appendChild(t); }
+  t.innerHTML = '<span>[ SYSTEM ]</span> '+escapeHtml(why)+' <b>+'+gained+' XP</b>';
+  t.classList.remove('is-in'); void t.offsetWidth; t.classList.add('is-in');
+  clearTimeout(xpToast._t); xpToast._t = setTimeout(function(){ t.classList.remove('is-in'); }, 2600);
+}
+function sysNote(msg){
+  let t = document.getElementById('sysToast');
+  if(!t){ t = document.createElement('div'); t.id = 'sysToast'; t.className = 'sys-toast'; document.body.appendChild(t); }
+  t.innerHTML = '<span>[ SYSTEM ]</span> '+escapeHtml(msg);
+  t.classList.remove('is-in'); void t.offsetWidth; t.classList.add('is-in');
+  clearTimeout(xpToast._t); xpToast._t = setTimeout(function(){ t.classList.remove('is-in'); }, 3200);
+}
+// What you've already been shown (kept, so a level up is celebrated once). Watching for changes:
+// a lock-out shows the full window (after its own stamp), a finished task a small "+XP", and any
+// level up gets the fanfare.
+function xpSeen(){ const p = state.profile; if(!p.xpSeen || typeof p.xpSeen!=='object') p.xpSeen = {total:0, level:0}; return p.xpSeen; }
+function xpWatch(){
+  if(!state || !state.profile) return;
+  xpStart();
+  const sessions = arr(state.focus.sessions).length, doneN = state.tasks.items.filter(function(t){ return t.status==='done'; }).length, act = !!state.focus.activeSession;
+  if(ui._xpW) ui._xpW.a = act;
+  if(ui._xpW==null){ ui._xpW = {s:sessions, d:doneN, a:act}; const x0 = xpSummary(), seen = xpSeen(); if(!seen.init){ seen.total = x0.total; seen.level = x0.level; seen.init = 1; persist('profile'); } return; }
+  const w = ui._xpW, lockedOut = sessions > w.s, finished = doneN > w.d;
+  w.s = sessions; w.d = doneN;
+  if(!lockedOut && !finished) return;
+  const seen = xpSeen(), before = {total:seen.total, level:seen.level};
+  xpLast = null; const x = xpSummary();
+  const gained = x.total - before.total;
+  seen.total = x.total; seen.level = Math.max(seen.level, x.level); persist('profile');
+  const levelUp = x.level > before.level;
+  if(lockedOut || levelUp){
+    const last = arr(state.focus.sessions).slice(-1)[0];
+    setTimeout(function(){ xpSystemShow({title: lockedOut ? 'Session complete.' : 'Level up.', sub: lockedOut && last ? fmtDurationLabel(last.minutes)+' of deep work logged.' : '',
+      lines:[], gained:Math.max(0, gained), level:x.level, levelUp:levelUp,
+      fromPct: levelUp ? (before.total - xpForLevel(before.level))/(xpForLevel(before.level+1) - xpForLevel(before.level)) : (before.total - x.levelLo)/(x.levelHi - x.levelLo), toPct:x.levelPct}); }, lockedOut ? 2300 : 300);
+  } else if(finished) xpToast(gained, 'Task complete.');
+}
+afterRenderHooks.push(function(){ try{ xpWatch(); }catch(e){} });
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

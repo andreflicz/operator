@@ -35,7 +35,11 @@ function deepWorkMinutesForQualifying(dateStr){
 }
 function renderFocus(){
   const tab = ui.focusTab || 'tasks';
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus'+tip('Manage the work itself — what you\'re on now, what\'s next, the backlog and video ideas. Analytics shows where the time went.')+'</div></div></div>'+
+  // locked in, the Focus page has the same minimal view as Today (M, or the button top right)
+  const locked = !!state.focus.activeSession;
+  if(locked && typeof lockedMinimal==='function' && lockedMinimal()) return renderLockedMinimal();
+  if(!locked && typeof focusMinimalOn==='function' && focusMinimalOn()) return renderFocusMinimal();
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus'+tip('Manage the work itself — what you\'re on now, what\'s next, the backlog and video ideas. Analytics shows where the time went.')+'</div></div>'+(typeof lockedViewBtnHtml==='function' ? '<div class="lv-corner is-focus">'+(locked ? lockedViewBtnHtml() : focusMinimalBtnHtml())+'</div>' : '')+'</div>'+
   '<div class="tabs tabs-with-tools">'+
     '<div class="tab '+(tab==='tasks'?'active':'')+'" data-action="focusMainTab" data-tab="tasks">Tasks</div>'+
     '<div class="tab '+(tab==='analytics'?'active':'')+'" data-action="focusMainTab" data-tab="analytics">Analytics</div>'+

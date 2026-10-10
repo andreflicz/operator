@@ -260,12 +260,7 @@ function soundSettingsHtml(){
         '<div class="snd-rows">'+tog('lockMusicStop', 'Stop it when I lock out', 'Otherwise it keeps playing', true)+'</div>' : '')+
     '</div>'+
     '<div class="card section"><div class="section-title">&#9728;&#65039; Mornings</div>'+
-      '<div class="snd-pl"><label><b>Morning playlist</b><small>An Apple Music playlist — the play button on Good morning starts it, and it follows your wake-up song by itself</small></label>'+
-        '<div class="snd-music" style="margin-top:8px;"><input class="input" id="sndMorningPl" placeholder="Apple Music playlist link, or its exact name" value="'+escapeHtml(p.morningPlaylist && (p.morningPlaylist.url || p.morningPlaylist.q) || '')+'"><button class="btn btn-sm btn-primary" data-action="sndMorningPlSet">Save</button></div></div>'+
-      '<div class="snd-pl" style="margin-top:14px;"><label><b>Playlists 1 · 2 · 3</b><small>The numbered buttons in the music dock (top right). Paste an Apple Music link or a playlist name.</small></label>'+
-        [0,1,2].map(function(i){ const pl = (p.playlists||[])[i]; return '<div class="snd-music" style="margin-top:8px;"><span class="snd-pl-n" style="color:'+(typeof DOCK_COLORS!=='undefined' ? DOCK_COLORS[i] : '#fff')+'">'+(i+1)+'</span><input class="input" id="sndPl'+i+'" placeholder="Playlist '+(i+1)+' — link or name" value="'+escapeHtml(pl ? (pl.url || pl.q) : '')+'"><button class="btn btn-sm btn-primary" data-action="sndPlSet" data-id="'+i+'">Save</button></div>'; }).join('')+'</div>'+
       '<div class="snd-rows">'+
-        tog('morningPlAfterSong', 'Play it after the wake-up song', 'When the song ends, the playlist carries on', true)+
         tog('focusMusic', 'Focus music after the lock-in intro', 'Quiet tracks keep playing until you lock out', true)+
         tog('dawn', 'Dawn before the alarm', 'A slow chord swells under the sunrise in the last 90 seconds', true)+
         tog('workintro', 'Start work', 'A warm swell when the work intro opens', true)+
@@ -301,7 +296,3 @@ ACTIONS.previewSounds = function(){
   const seq = [playTick, playNav, playTaskAdded, playDrop, playPositive, playTaskComplete, playLockIn];
   seq.forEach(function(f, i){ setTimeout(f, i*420); });
 };
-
-ACTIONS.sndMorningPlSet = async function(){ const i = document.getElementById('sndMorningPl'), v = i ? i.value.trim() : ''; const pl = await setMorningPlaylistFrom(v); saveSound(); showToast(pl ? 'Morning playlist: '+escapeHtml(pl.q) : 'Morning playlist cleared', {icon:'&#9835;'}); };
-
-ACTIONS.sndPlSet = async function(el, e, id){ const i = Number(id), inp = document.getElementById('sndPl'+i), v = inp ? inp.value.trim() : ''; const pl = v ? await setUserPlaylist(i, v) : null; if(!v){ userPlaylists()[i] = null; persist('profile'); } saveSound(); if(typeof dockRefresh==='function') dockRefresh(); showToast(pl ? 'Playlist '+(i+1)+': '+escapeHtml(pl.q) : 'Playlist '+(i+1)+' cleared', {icon:'&#9835;'}); };

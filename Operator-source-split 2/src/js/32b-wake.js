@@ -249,9 +249,7 @@ function finishWakeMedia(){
     a.loop = false; wakeFinishing = true;
     a.addEventListener('ended', function(){ if(wakeAudio===a) stopWakeMedia(true); wakeFinishing = false; if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); }, {once:true});
   }
-  const pl = typeof morningPlaylist==='function' && soundPref('morningPlAfterSong', true) ? morningPlaylist() : null;
-  if(wakeMusicApp){ wakeFinishing = true; wakeMusicApp = false; helperFetch(MUSIC_URL+'finish'+(pl ? '?k=playlist&q='+hexUtf8(pl.q) : ''), 4000); }
-  else if(a && pl){ a.addEventListener('ended', function(){ musicApp('play', {type:'music', k:'playlist', q:pl.q}); }, {once:true}); }
+  if(wakeMusicApp){ wakeFinishing = true; wakeMusicApp = false; helperFetch(MUSIC_URL+'finish', 4000); }
 }
 ACTIONS.wakeStopMusic = function(){
   const m = wakeCfg().media;
@@ -344,7 +342,7 @@ ACTIONS.wakeStartMorning = function(){
   wakeLiftAway(function(){ ui.wakeMode = null; hideOverlay('wakeOverlay'); });
 };
 ACTIONS.wakeBriefDone = function(){ endBriefing(); };
-ACTIONS.wakeVoice = function(el, e, id){ wakeCfg().voice = id==='on'; persist('focus'); if(id!=='on' && typeof opStop==='function') opStop(); renderView(); };
+ACTIONS.wakeVoice = function(el, e, id){ wakeCfg().voice = id==='on'; if(id==='on' && typeof opVoiceChanged==='function'){ OV.helperDown = false; OV.broken = false; } persist('focus'); if(id!=='on' && typeof opStop==='function') opStop(); renderView(); };
 ACTIONS.wakeBriefBg = function(el, e, id){ const w = wakeCfg(); w.briefBg = id; persist('focus'); renderView(); if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); };
 ACTIONS.wakeBriefLockIn = function(el, e, id){ endBriefing(); if(id) setNextUp(id); renderView(); openLockInChooser(); };
 ACTIONS.wakeClockIn = function(){ const t = ui.wakeBriefTest; endBriefing(); if(t){ showToast('Test done — this is where Clock in shows your plan.', {icon:'&#128339;'}); return; } clockIn(); };
@@ -353,7 +351,7 @@ function wakeSnooze(){
   const mins = wakeCfg().snoozeMinutes||9;
   const test = wakeRing && wakeRing.test;
   clearInterval(wakeBeepTimer); wakeBeepTimer = null;
-  stopWakeMedia(false);
+  stopWakeMedia(false); ui.snzPlaying = false;
   wakeRing = null;
   state.focus.snooze = {ts:Date.now()+mins*60000, wake:true, test:test};
   persist('focus');
@@ -444,6 +442,7 @@ function renderWakeSetup(){
       '<div class="field"><label>Tech & interests'+tip('Anything else you follow — e.g. AI, Apple, marketing, crypto. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
       '<div class="field"><label>Good morning background'+tip('Time of day follows when you\'re up: sunrise colours early, a blue sky later in the morning, golden in the evening, night if it\'s still dark.')+'</label><div class="seg-tabs" style="margin:0;">'+[['auto','Time of day'],['sunrise','Sunrise'],['dark','Dark']].map(function(o){ const on = (w.briefBg||'auto')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefBg" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
       '<div class="field"><label>The Operator’s voice'+tip('Good morning is spoken out loud (the Mac’s own voice), with captions. You can ask it for sports, news, tech or a business brief.')+'</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.voice!==false?' active':'')+'" data-action="wakeVoice" data-id="on">On</button><button class="seg-tab'+(w.voice===false?' active':'')+'" data-action="wakeVoice" data-id="off">Off</button></div></div>'+
+      (w.voice!==false && typeof opVoiceSettingsHtml==='function' ? opVoiceSettingsHtml() : '')+
       '<div class="field"><label>Good morning layout'+tip('Minimal: one big Get to Work button in the middle with the important things around it.')+'</label><div class="seg-tabs" style="margin:0;">'+[['full','Full'],['minimal','Minimal']].map(function(o){ const on = (w.briefLayout||'full')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefLayout" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
       '<div class="field"><label>Headlines in Good morning</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.news!==false?' active':'')+'" data-action="wakeNews" data-id="on">On</button><button class="seg-tab'+(w.news===false?' active':'')+'" data-action="wakeNews" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+

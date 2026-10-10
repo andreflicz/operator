@@ -24,9 +24,49 @@ ACTIONS.toggleLockedView = function(){
 document.addEventListener('keydown', function(e){
   if(e.key!=='m' && e.key!=='M') return;
   if(e.metaKey || e.ctrlKey || e.altKey || (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) || (e.target && e.target.isContentEditable)) return;
-  if(!state.focus.activeSession || ui.view!=='today' || document.querySelector('.overlay:not(.hidden)')) return;
+  if(document.querySelector('.overlay:not(.hidden)')) return;
+  if(!state.focus.activeSession && ui.view==='focus'){ e.preventDefault(); ACTIONS.toggleFocusMinimal(); return; }
+  if(!state.focus.activeSession || (ui.view!=='today' && ui.view!=='focus')) return;
   e.preventDefault(); ACTIONS.toggleLockedView();
 });
+// ---- the Focus page's own minimal view (when you're not locked in): the clock, your level,
+// your streak, today's deep work, and the buttons — nothing else ----
+function focusMinimalOn(){ return !!state.profile.focusMinimal; }
+ACTIONS.toggleFocusMinimal = function(){
+  const leaving = focusMinimalOn();
+  const go = function(){ state.profile.focusMinimal = !leaving; persist('profile'); playNav(); renderView(); };
+  if(leaving) npLeave(go); else go();
+};
+function focusMinimalBtnHtml(){ return '<button class="lv-btn" data-action="toggleFocusMinimal" title="'+(focusMinimalOn() ? 'Back to the full page (M)' : 'Minimal view (M)')+'">'+(focusMinimalOn() ? '&#9638; Full view' : '&#9673; Minimal')+'</button>'; }
+function renderFocusMinimal(){
+  const name = state.profile.name || '', h = new Date().getHours();
+  const greet = h < 5 ? 'Still up' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const d = new Date(), t = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}), m = /^(.*?)\s*([AP]M)$/i.exec(t);
+  const streak = computeStreak(), deep = deepWorkMinutesTodayLive(), target = state.standards.deepWorkTargetMinutes || 180;
+  const nx = typeof nextUpTask==='function' ? nextUpTask() : null, ring = nextRingLabel();
+  const x = typeof xpSummary==='function' ? xpSummary() : null, r = x ? RANKS[x.rank] : null;
+  return '<div class="np np-home">'+
+    '<div class="np-bg"></div>'+
+    '<div class="np-top"><span class="hm-brand">OPERATOR</span><span style="flex:1"></span>'+focusMinimalBtnHtml()+'</div>'+
+    '<div class="hm-main">'+
+      '<div class="hm-clock"><b id="npClockT">'+(m ? m[1] : t)+'</b><span id="npClockA">'+(m ? m[2] : '')+'</span></div>'+
+      '<div class="hm-date">'+d.toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+(ring ? ' &middot; &#9200; '+ring : '')+'</div>'+
+      '<div class="hm-greet">'+greet+(name ? ', '+escapeHtml(name) : '')+'.</div>'+
+      '<div class="hm-stats">'+
+        (x ? '<button class="hm-s hm-lvl" data-action="openYou" style="--rc:'+r.color+'" title="Your card">'+rankBadgeSvg(x.rank, 34)+'<span><b>LVL '+x.level+'</b><small>'+escapeHtml(r.name)+' &middot; OVR '+x.ovr+'</small><i><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i></span></button>' : '')+
+        '<div class="hm-s"><b>&#128293; '+streak+'</b><small>day streak</small></div>'+
+        '<div class="hm-s"><b>'+fmtHours(deep)+'</b><small>of '+fmtHours(target)+' today</small><i><u style="width:'+Math.min(100, deep/target*100).toFixed(1)+'%"></u></i></div>'+
+      '</div>'+
+      '<button class="hm-go" data-action="openLockInChooser" title="Lock in (L)"><span class="hm-go-ring"></span><span>&#128274;</span><b>LOCK IN</b></button>'+
+      (typeof aiTalkHtml==='function' ? '<div class="hm-talk">'+aiTalkHtml()+'<div class="hm-cap" id="hmCap"></div></div>' : '')+
+      '<div class="hm-btns">'+
+        '<button class="hm-b" data-action="openQuickJournalModal">&#128221; Journal</button>'+
+        '<button class="hm-b" data-action="clockOut">&#127937; Clock out</button>'+
+        '<button class="hm-b" data-action="quickDayOff">&#127796; Day off</button>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
 function lockedViewBtnHtml(){
   return '<button class="lv-btn" data-action="toggleLockedView" title="'+(lockedMinimal() ? 'Back to the full view (M)' : 'Minimal view (M)')+'">'+(lockedMinimal() ? '&#9638; Full view' : '&#9673; Minimal')+'</button>';
 }
@@ -125,7 +165,8 @@ function renderLockedMinimal(){
 }
 // full-screen feel: the sidebar and floating buttons step aside in the minimal view
 afterRenderHooks.push(function(){
-  const on = !!(state.focus && state.focus.activeSession && ui.view==='today' && lockedMinimal()) || !!(ui.view==='today' && document.querySelector('#viewRoot .rest-full'));
+  const on = !!(state.focus && state.focus.activeSession && (ui.view==='today' || ui.view==='focus') && lockedMinimal()) || !!(ui.view==='today' && document.querySelector('#viewRoot .rest-full'))
+    || !!(ui.view==='focus' && !(state.focus && state.focus.activeSession) && focusMinimalOn());
   document.body.classList.toggle('np-on', on);
   const brk = !!(state.focus && state.focus.activeSession && state.focus.activeSession.onBreak);
   document.body.classList.toggle('is-on-break', brk);

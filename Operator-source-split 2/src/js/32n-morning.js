@@ -17,6 +17,17 @@ function wakeGreeting(){ return 'Good morning'; }
 // Quotes: a mix of philosophers, athletes, makers and founders — famous and not. Only lines whose
 // source is solid; lines with no name are our own.
 const MORNING_QUOTES = [
+  ['Ask, and it shall be given you; seek, and ye shall find; knock, and it shall be opened unto you.', 'Jesus, Matthew 7:7'],
+  ['Do not worry about tomorrow, for tomorrow will worry about itself.', 'Jesus, Matthew 6:34'],
+  ['Let your light shine before others.', 'Jesus, Matthew 5:16'],
+  ['With God all things are possible.', 'Jesus, Matthew 19:26'],
+  ['Get busy living, or get busy dying.', 'Stephen King'],
+  ['Don’t quit. Suffer now and live the rest of your life as a champion.', 'Muhammad Ali'],
+  ['Dedication sees dreams come true.', 'Kobe Bryant'],
+  ['Dreams without goals are just dreams.', 'Denzel Washington'],
+  ['I didn’t come this far to only come this far.', 'Tom Brady'],
+  ['Whether you think you can, or you think you can’t — you’re right.', 'Henry Ford'],
+  ['Stay hungry, stay foolish.', 'Steve Jobs'],
   ['At dawn, when you have trouble getting out of bed, tell yourself: “I have to go to work — as a human being.”', 'Marcus Aurelius'],
   ['No man is free who is not master of himself.', 'Epictetus'],
   ['First say to yourself what you would be; and then do what you have to do.', 'Epictetus'],
@@ -60,6 +71,18 @@ const MORNING_QUOTES = [
   ['Slow is fine. Stopped is the only thing that isn’t.', '']
 ];
 const WORK_QUOTES = [
+  ['The work works on you more than you work on the work.', 'Alex Hormozi'],
+  ['Stay hungry, stay foolish.', 'Steve Jobs'],
+  ['Quality is more important than quantity. One home run is much better than two doubles.', 'Steve Jobs'],
+  ['Modern problems require modern solutions.', 'Dave Chappelle'],
+  ['Talent wins games, but teamwork and intelligence win championships.', 'Michael Jordan'],
+  ['When something is important enough, you do it even if the odds are not in your favor.', 'Elon Musk'],
+  ['Work like there is someone working 24 hours a day to take it all away from you.', 'Mark Cuban'],
+  ['If you never want to be criticized, for goodness’ sake don’t do anything new.', 'Jeff Bezos'],
+  ['The cowards never started and the weak died along the way. That leaves us.', 'Phil Knight'],
+  ['I’m not a businessman, I’m a business, man.', 'Jay-Z'],
+  ['Who’s gonna carry the boats?', 'David Goggins'],
+  ['Escape competition through authenticity.', 'Naval Ravikant'],
   ['Volume negates luck.', 'Alex Hormozi'],
   ['Make people an offer so good they would feel stupid saying no.', 'Alex Hormozi'],
   ['Real artists ship.', 'Steve Jobs'],
@@ -84,6 +107,11 @@ const WORK_QUOTES = [
 ];
 // for the work preview's second line: starting, procrastination, taking action
 const ACTION_QUOTES = [
+  ['Some people want it to happen, some wish it would happen, others make it happen.', 'Michael Jordan'],
+  ['I can’t relate to lazy people. We don’t speak the same language.', 'Kobe Bryant'],
+  ['I like criticism. It makes you strong.', 'LeBron James'],
+  ['Get busy living, or get busy dying.', 'Stephen King'],
+  ['Volume negates luck.', 'Alex Hormozi'],
   ['Procrastination is the thief of time.', 'Edward Young'],
   ['You may delay, but time will not.', 'Benjamin Franklin'],
   ['The best way out is always through.', 'Robert Frost'],
@@ -179,11 +207,17 @@ async function fetchNews(topics){
   }
   return items && items.length ? items : null;
 }
-async function loadMorningNews(){
-  if(!morningNewsOn()) return;
+// (returns a promise the voice can wait on when you ask for the news)
+function loadMorningNews(force){
+  if(!morningNewsOn() && !force) return Promise.resolve(null);
+  const today = todayStr();
+  if(ui.morningNews && ui.morningNews.date===today && ui.morningNews.loading) return ui._newsP || Promise.resolve(null);
+  if(ui.morningNews && ui.morningNews.date===today && ui.morningNews.items) return Promise.resolve(ui.morningNews);
+  ui._newsP = loadMorningNewsNow(); return ui._newsP;
+}
+async function loadMorningNewsNow(){
   if(typeof loadScores==='function' && newsSections().some(function(x){ return x.id==='sports'; })) loadScores();
   const today = todayStr();
-  if(ui.morningNews && ui.morningNews.date===today && (ui.morningNews.items || ui.morningNews.loading)) return;
   ui.morningNews = {date:today, loading:true, items:null, sec:{}};
   const secs = newsSections();
   const all = await Promise.all([fetchNews(newsTopics())].concat(secs.map(function(x){ return fetchNews(x.q); })));
@@ -196,6 +230,16 @@ async function loadMorningNews(){
     ui.briefNewsAt = Date.now();
     renderWakeOverlayInto();
   }
+  return ui.morningNews;
+}
+// the headlines panel: top stories with tech woven in (two of the news, then one of tech)
+function mixHeadlines(top, tech){
+  const out = [], a = arr(top).slice(), b = arr(tech).slice();
+  while(out.length < 8 && (a.length || b.length)){
+    if(a.length) out.push({n:a.shift()}); if(a.length && out.length < 8) out.push({n:a.shift()});
+    if(b.length && out.length < 8) out.push({n:b.shift(), tech:true});
+  }
+  return out;
 }
 ACTIONS.openNewsLink = function(el){ const u = el.dataset.url; if(!/^https?:\/\//.test(u||'')) return; helperFetch(WAKE_HELPER+'open?b=default&u='+hexUtf8(u), 3000).then(function(ok){ if(!ok) window.open(u, '_blank'); }); };
 
@@ -283,14 +327,20 @@ function snoozeHtml(){
       (nn.headline ? '<div class="snz-note">'+escapeHtml(nn.headline)+'</div>' : '')+
     '</div>'+
     '<div class="snz-acts"><button class="dawn-btn" data-action="snoozeUp">&#9728;&#65039; I’m up</button>'+
-      '<button class="snz-music" data-action="snoozeMusic" title="Pause or play whatever music is on">'+(ui.snzMusicPaused ? '&#9654; Play music' : '&#10073;&#10073; Pause music')+'</button></div>'+
+      '<button class="snz-music'+(snoozeMusicOn()?' is-on':'')+'" data-action="snoozeMusic" title="'+(snoozeMusicOn() ? 'Pause the music' : 'Play your wake-up song again')+'">'+(snoozeMusicOn() ? '&#10073;&#10073; Pause music' : '&#9654; Play music')+'</button></div>'+
   '</div>';
 }
 function tickSnooze(){ const el = document.getElementById('snzLeft'), sn = state.focus.snooze; if(el && sn) el.textContent = formatElapsed(Math.max(0, sn.ts - Date.now())); }
-// pause / play the music while snoozing (Apple Music through the launcher, or Operator's own tracks)
+// snoozing stops the wake-up song, so the button starts on "▶ Play music" (it plays the song again);
+// once something is playing it reads "Pause music"
+function snoozeMusicOn(){ return !!(FM.playing || wakeAudio || wakeMusicApp || ui.snzPlaying); }
 ACTIONS.snoozeMusic = function(){
-  if(!ui.snzMusicPaused){ ui.snzMusicPaused = true; ui.snzFm = FM.playing; if(FM.playing) focusMusicStop(); musicApp('pause'); }
-  else { ui.snzMusicPaused = false; if(ui.snzFm) focusMusicPlay(); else musicApp('play'); }
+  if(snoozeMusicOn()){ ui.snzPlaying = false; if(FM.playing) focusMusicStop(); stopWakeMedia(true); }
+  else {
+    const m = wakeCfg().media;
+    if(m){ ui.snzPlaying = true; playWakeMedia(m, function(){ ui.snzPlaying = false; if(ui.wakeMode==='snooze') renderWakeOverlayInto(); }); }
+    else focusMusicPlay();
+  }
   renderWakeOverlayInto();
 };
 ACTIONS.snoozeUp = function(){ state.focus.snooze = null; persist('focus'); wakeImUp(); };
@@ -302,41 +352,6 @@ function lastNightSleep(){
   return h ? {minutes:h.minutes, from:h.startedAt, to:h.endedAt} : null;
 }
 function briefBase(){ return wakeCfg().intro!=='quick' ? 4800 : 1800; }
-// your morning playlist (Apple Music), one click — and it can follow the wake-up song by itself
-function morningPlaylist(){ const m = state.profile.morningPlaylist; return m && m.q ? m : null; }
-function playlistBtnHtml(){
-  const pl = morningPlaylist(), on = !!ui.plPlaying;
-  return '<button class="plb'+(on?' is-on':'')+(pl?'':' is-unset')+'" data-action="'+(pl ? (on ? 'stopMorningPlaylist' : 'playMorningPlaylist') : 'setMorningPlaylist')+'" title="'+(pl ? (on ? 'Pause' : 'Play '+escapeHtml(pl.q)) : 'Pick a morning playlist')+'">'+
-    '<span class="plb-i">'+(on ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9654;')+'</span><span class="plb-t">'+escapeHtml(pl ? pl.q : 'Morning playlist')+'</span></button>';
-}
-function plRefresh(){ if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto(); }
-// a playlist link (Apple Music → ••• → Share → Copy Link) or its name; a link is turned into the
-// playlist's real name by the launcher, and kept so Apple Music can open it if it isn't in your library
-async function setPlaylistFrom(v){
-  v = String(v||'').trim();
-  if(!v) return null;
-  let pl = {q:v, k:'playlist'};
-  if(/^(https?|music|itms):\/\//i.test(v)){
-    const url = v.replace(/^(music|itms):\/\//i, 'https://'), slug = appleMusicFromLink(url);
-    pl = {q: slug && !/^pl\./i.test(slug.q) ? slug.q : 'Playlist', k:'playlist', url:url};
-    const r = await fetchWithin(MUSIC_URL+'resolve?u='+hexUtf8(url), 12000);
-    if(r && r.ok){ try{ const j = await r.json(); if(j && j.name) pl.q = j.name; }catch(e){} }
-  }
-  return pl;
-}
-async function setMorningPlaylistFrom(v){
-  const pl = await setPlaylistFrom(v);
-  if(pl && pl.q==='Playlist') pl.q = 'Morning playlist';
-  state.profile.morningPlaylist = pl; persist('profile');
-  return pl;
-}
-// (playing and pausing it lives with the music dock)
-ACTIONS.setMorningPlaylist = async function(){
-  const v = window.prompt('Your morning playlist — paste its Apple Music link (••• → Share → Copy Link), or type its exact name:', ''); if(!v || !v.trim()) return;
-  await setMorningPlaylistFrom(v);
-  if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); if(overlayOpen('planOverlay')) renderPlanRevealInto();
-  ACTIONS.playMorningPlaylist();
-};
 // you, lately: streak, training, weight, and something you wrote a while back
 function briefMemory(){
   const today = todayStr(), es = arr(state.journal.entries).filter(function(e){ return e.text && e.date < addDays(today, -6); });
@@ -359,7 +374,14 @@ function briefYouHtml(){
   const mem = briefMemory();
   const memHtml = mem ? '<div class="br-mem"><small>'+agoLabel(mem.ago)+' you wrote</small><p>'+(mem.e.title ? '<b>'+escapeHtml(mem.e.title)+'</b> ' : '')+escapeHtml(String(mem.e.text).slice(0, 140))+(String(mem.e.text).length > 140 ? '…' : '')+'</p></div>' : '';
   return {voice: mem ? 'And a little something from you, '+agoLabel(mem.ago).toLowerCase()+'.' : 'Here’s where you’re at.',
-    html:'<div class="br-k">&#128100; You, Lately</div><div class="br-you-t">'+tiles.map(function(t){ return '<div><span>'+t[0]+'</span><b>'+t[1]+'</b><small>'+t[2]+'</small></div>'; }).join('')+'</div>'+memHtml};
+    html:'<div class="br-k">&#128100; You, Lately</div><div class="br-you-t">'+tiles.map(function(t){ return '<div><span>'+t[0]+'</span><b>'+t[1]+'</b><small>'+t[2]+'</small></div>'; }).join('')+'</div>'+memHtml+briefSystemHtml()};
+}
+// the SYSTEM's morning line: your level, rank and overall
+function briefSystemHtml(){
+  if(typeof xpSummary!=='function') return '';
+  const x = xpSummary(), r = RANKS[x.rank];
+  return '<div class="br-sys" data-action="openYou" title="Your card"><div class="br-sys-h"><span>[ SYSTEM ]</span><b style="color:'+r.color+'">LVL '+x.level+' &middot; '+escapeHtml(r.name)+'</b><em>OVR '+x.ovr+'</em></div>'+
+    '<i class="br-sys-bar"><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i></div>';
 }
 function wakeBriefHtml(){
   if(typeof briefMinimalOn==='function' && briefMinimalOn()) return briefMinimalHtml();
@@ -390,7 +412,7 @@ function wakeBriefHtml(){
   };
   const slept = lastNightSleep();
   // column 1: the weather and the sun (and how you slept), then your note
-  const colA = [], colB = [], colC = [];
+  const colA = [], colB = [], colC = [], colD = [];
   colA.push(panel('br-hero', 'br-a-blur', 'It’s '+timeStr+'.'+(now ? ' '+now.temp+'° and '+wxLabel(now.code).toLowerCase()+' outside.' : '')+(slept ? ' You got '+fmtDurationLabel(slept.minutes)+' of sleep.' : sunLine ? ' '+sunLine : ''),
     '<div class="brh-top"><div class="brh-wx"><span class="brh-i">'+(now ? wxIcon(wxKind(now.code), phase) : SKY_META[phase].icon)+'</span>'+
       '<div>'+(now ? '<div class="brh-t">'+now.temp+'&deg;</div><div class="brh-l">'+escapeHtml(wxLabel(now.code))+(now.hi!=null ? ' <span>&middot; H '+now.hi+'&deg; L '+now.lo+'&deg;</span>' : '')+'</div>' : '<div class="brh-l is-big">'+SKY_META[phase].label+'</div>')+'</div></div>'+
@@ -406,18 +428,23 @@ function wakeBriefHtml(){
   colB.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
   colB.push(panel('br-thoughts', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+
     thoughtsOfDay(4).map(function(x, i){ return '<div class="br-th" style="--i:'+i+'"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')));
-  // column 3: the world, then the day ahead
-  if(news){
-    const d0 = tcur, late = ui.briefNewsAt ? Math.max(600, d0 - (ui.briefNewsAt - (ui.briefT0||0))) : null;
-    const sec = (ui.morningNews && ui.morningNews.sec) || {}, secs = newsSections().filter(function(x){ return sec[x.id] || (x.id==='sports' && typeof scoresHtml==='function' && scoresHtml()); });
-    const item = function(n, i, top){ return '<button class="br-news-i'+(top?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+escapeHtml(n.title)+(n.src ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; };
-    colC.push(panel('br-news', 'br-a-rise', secs.length ? 'Here’s what’s happening — the news, '+secs.map(function(x){ return x.label.toLowerCase(); }).join(' and ')+'.' : 'Here’s what’s happening out there.',
-      '<div class="br-k">&#128240; '+(newsTopics() ? 'Your News' : 'Headlines')+'</div>'+
-      news.slice(0, secs.length ? 3 : 6).map(function(n, i){ return item(n, i, i===0); }).join('')+
-      secs.map(function(x){ const sc = x.id==='sports' && typeof scoresHtml==='function' ? scoresHtml() : ''; return '<div class="br-news-sec"><div class="br-news-h">'+x.icon+' '+x.label+'<span>'+escapeHtml(x.q)+'</span></div>'+sc+arr(sec[x.id]).slice(0, sc ? 2 : 3).map(function(n, i){ return item(n, i, false); }).join('')+'</div>'; }).join(''),
-      late!=null ? ';--late:'+late+'ms' : ''));
-  } else if(morningNewsOn() && ui.morningNews && ui.morningNews.loading){
-    colC.push('<section class="br-p br-news is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">&#128240; The News</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>');
+  // the world: one panel of headlines (the news and tech, mixed), and one just for sports.
+  // While they're loading, a placeholder holds their place so nothing moves when they land.
+  const sec = (ui.morningNews && ui.morningNews.sec) || {}, newsWait = morningNewsOn() && ui.morningNews && ui.morningNews.loading;
+  const late = ui.briefNewsAt ? function(){ return ';--late:'+Math.max(600, tcur - (ui.briefNewsAt - (ui.briefT0||0)))+'ms'; } : function(){ return ''; };
+  const item = function(n, top, tag){ return '<button class="br-news-i'+(top?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+(tag ? '<em class="br-tag">'+tag+'</em>' : '')+escapeHtml(n.title)+(n.src ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; };
+  const waitHtml = function(cls, k){ return '<section class="br-p '+cls+' is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">'+k+'</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>'; };
+  const heads = news ? mixHeadlines(news, arr(sec.tech)) : [];
+  if(heads.length){
+    const lt = late();
+    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there.', '<div class="br-k">&#128240; Headlines</div>'+heads.map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : ''); }).join(''), lt));
+  } else if(newsWait) colC.push(waitHtml('br-news', '&#128240; Headlines'));
+  if(morningNewsOn() && newsSections().some(function(x){ return x.id==='sports'; })){
+    const sc = typeof scoresHtml==='function' ? scoresHtml() : '', sh = arr(sec.sports);
+    if(sc || sh.length){
+      const lt = late();
+      colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports</div>'+sc+sh.slice(0, sc ? 3 : 6).map(function(n){ return item(n, false); }).join(''), lt));
+    } else if(newsWait || (ui.scores && ui.scores.loading)) colD.push(waitHtml('br-sports', '&#127936; Sports'));
   }
   // the day ahead — just the calendar; the work plan waits for the business preview
   colB.push(panel('br-day', 'br-a-right', events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.',
@@ -438,14 +465,15 @@ function wakeBriefHtml(){
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner b4">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        '<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : playlistBtnHtml())+'</span>'+
+        '<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
         // one button: Skip takes you straight to the app
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
       '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
       '<div class="br-voice br-p br-a-fade" style="--d:'+(base-700)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
-      (typeof opAskHtml==='function' ? '<div class="br-p br-a-fade" style="--d:'+(base-500)+'ms">'+opAskHtml('brief')+'</div>' : '')+
+      (typeof opAskHtml==='function' ? '<div class="br-p br-opbar br-a-fade" style="--d:'+(base-500)+'ms">'+opAskHtml('brief')+'</div>' : '')+
       // no news column (headlines off) → two columns that fill the width instead of an empty third
-      '<div class="b4-grid'+(colC.length ? '' : ' cols-2')+'"><div class="b4-col">'+colA.join('')+'</div><div class="b4-col">'+colB.join('')+'</div>'+(colC.length ? '<div class="b4-col">'+colC.join('')+'</div>' : '')+'</div>'+
+      // wide screens get four columns (you · today · headlines · sports); otherwise sports sits under headlines
+      '<div class="b4-grid'+(!colC.length && !colD.length ? ' cols-2' : !colD.length ? ' no-d' : !colC.length ? ' no-c' : '')+'"><div class="b4-col c-a">'+colA.join('')+'</div><div class="b4-col c-b">'+colB.join('')+'</div>'+(colC.length ? '<div class="b4-col c-c">'+colC.join('')+'</div>' : '')+(colD.length ? '<div class="b4-col c-d">'+colD.join('')+'</div>' : '')+'</div>'+
       '<div class="brief-cta br-p br-a-rise" data-k="'+k+'" style="--d:'+ctaD+'ms">'+
         '<button class="brief-go brief-morning" data-action="wakeStartMorning">Get to Work &#8594;</button>'+
       '</div>'+
@@ -471,6 +499,8 @@ function briefVoiceRun(){
   briefVoiceTimer = setInterval(function(){
     const el = document.getElementById('brVoice');
     if(!el || ui.wakeMode!=='brief' || !overlayOpen('wakeOverlay')){ if(!overlayOpen('wakeOverlay')) clearInterval(briefVoiceTimer); return; }
+    // once you've asked the Operator something (or talked to it), the line is its answer — leave it be
+    if(typeof OV!=='undefined' && OV.idx===999) return;
     const lines = ui.briefLines || [], t = Date.now() - (ui.briefT0||0);
     if(typeof opBriefTick==='function' && opBriefTick(lines, t)) return;
     let cur = null; lines.forEach(function(l){ if(t >= l.at) cur = l; });
@@ -551,7 +581,13 @@ function workStats(){
     {k:'Collected this month', v:money(collected), sub:new Date().toLocaleDateString(undefined, {month:'long'})},
     {k:'Open leads', v:String(open.length), sub: pipe ? money(pipe)+' in the pipeline' : 'In the pipeline'},
     {k:'Deep work yesterday', v:fmtHours(yDeep), sub:'Streak: '+computeStreak()+' day'+(computeStreak()===1?'':'s')}
-  ].concat(workSocialStats());
+  ].concat(workSocialStats(), workLevelStat());
+}
+// the game, in the work preview: your level and how far to the next
+function workLevelStat(){
+  if(typeof xpSummary!=='function') return [];
+  const x = xpSummary();
+  return [{k:'Level '+x.level+' &middot; '+RANKS[x.rank].name, v:'OVR '+x.ovr, sub:(x.levelHi - x.total).toLocaleString()+' XP to level '+(x.level+1), pct:x.levelPct*100, go:'openYou'}];
 }
 // followers and new messages, when GoHighLevel is connected (otherwise they simply don't show)
 function workSocialStats(){
@@ -604,7 +640,7 @@ function renderPlanReveal(){
   return '<div class="wi">'+
     '<div class="wi-top"><span class="pr-badge">&#128339; Clocked In</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
       (ui.planReveal && ui.planReveal.from==='morning' ? '<button class="wi-back" data-action="backToMorning" title="Back to Good morning">&#8592; Morning</button>' : '')+
-      '<span class="wi-pl">'+playlistBtnHtml()+'</span>'+
+      '<span class="wi-pl">'+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
       '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
     '<div class="wi-inner">'+
       '<div class="wi-k" style="animation-delay:40ms">Work Mode</div>'+
@@ -628,7 +664,6 @@ function renderPlanReveal(){
       '</div>'+
       '<div class="pr-cta" style="animation-delay:420ms">'+
         '<button class="ls-go pr-go" data-action="planLockIn"'+(first ? ' data-id="'+first.id+'"' : '')+'><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>'+
-        (first ? '<div class="ls-go-sub">First up: '+escapeHtml(first.title)+'</div>' : '')+
       '</div>'+
     '</div>'+
   '</div>';

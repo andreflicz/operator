@@ -394,8 +394,7 @@ function lockWhyHtml(){
     '</div>'+
     '<div class="ls-bar"><div class="ls-bar-k"><span>Deep work today</span><span>'+fmtHours(deep)+(after ? ' &rarr; <b>'+fmtHours(after)+'</b>' : '')+' / '+fmtHours(target)+'</span></div>'+
       '<div class="ls-bar-t"><i class="ls-bar-now" style="width:'+pct.toFixed(1)+'%"></i><i class="ls-bar-add" style="left:'+pct.toFixed(1)+'%;width:'+Math.max(0, pct2-pct).toFixed(1)+'%"></i></div></div>'+
-    '<div class="ls-go-wrap"><button class="ls-go" data-action="lockGo"><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>'+
-      '<div class="ls-go-sub">'+(pick ? escapeHtml(pick.title)+' &middot; ' : '')+(s.method==='block' ? lockLenLabel(s.minutes) : mm.label)+'</div></div>'+
+    '<div class="ls-go-wrap"><button class="ls-go" data-action="lockGo"><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button></div>'+
   '</div>';
 }
 function lockSeqHtml(){

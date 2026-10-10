@@ -15,6 +15,11 @@ RAMP_PID_FILE="$DATA_DIR/music-ramp.pid"
 FALLBACK_PID_FILE="$DATA_DIR/music-fallback.pid"
 FINISH_PID_FILE="$DATA_DIR/music-finish.pid"
 GHL_KEY_FILE="$DATA_DIR/ghl.key"
+# the Operator's voice: an ElevenLabs key (if you add one) lives only here, mode 600 — never in the app's data
+TTS_KEY_FILE="$DATA_DIR/tts.key"
+TTS_DIR="$DATA_DIR/tts-cache"
+# talking to the Operator: an Anthropic API key, same rules (this file only, mode 600)
+AI_KEY_FILE="$DATA_DIR/ai.key"
 
 hexdec() { printf '%b' "$(printf '%s' "$1" | sed 's/../\\x&/g')"; }
 param() { printf '%s' "$REQ_PATH" | sed -n "s/.*[?&]$1=\([0-9a-zA-Z._-]*\).*/\1/p"; }
@@ -23,6 +28,51 @@ je() { printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' | tr -d '\000-\010
 respond() { # code, body, [content type]
   LEN=$(printf '%s' "$2" | wc -c | tr -d ' ')
   printf 'HTTP/1.1 %s OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: %s\r\nContent-Length: %s\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n%s' "$1" "${3:-application/json; charset=utf-8}" "$LEN" "$2"
+}
+
+# ---------------- the Operator's voice ----------------
+# text → an audio file (cached for two days, so a line is only ever made once)
+#   engine "mac":    the Mac's own speech (`say`) — your system voice (Spoken Content), or a named one
+#   engine "eleven": ElevenLabs, with the key saved in $TTS_KEY_FILE
+tts_file() { # engine, voice, text
+  E="$1"; V="$2"; T="$3"
+  mkdir -p "$TTS_DIR" 2>/dev/null; chmod 700 "$TTS_DIR" 2>/dev/null
+  find "$TTS_DIR" -type f -mtime +2 -delete 2>/dev/null
+  H=$(printf '%s|%s|%s' "$E" "$V" "$T" | shasum 2>/dev/null | cut -c1-32)
+  [ -z "$H" ] && H=$(printf '%s|%s|%s' "$E" "$V" "$T" | md5 -q 2>/dev/null)
+  [ -z "$H" ] && return
+  case "$E" in
+    eleven)
+      F="$TTS_DIR/$H.mp3"; [ -s "$F" ] && { echo "$F"; return; }
+      [ -s "$TTS_KEY_FILE" ] || return
+      case "$V" in ''|*[!0-9a-zA-Z]*) V=JBFqnCBsd6RMkjVDRZzb ;; esac
+      BODY="{\"text\":\"$(je "$T")\",\"model_id\":\"eleven_multilingual_v2\",\"voice_settings\":{\"stability\":0.45,\"similarity_boost\":0.8,\"style\":0.15}}"
+      CODE=$(curl -s --max-time 25 -o "$F.part" -w '%{http_code}' -X POST -H "xi-api-key: $(cat "$TTS_KEY_FILE")" \
+        -H "Content-Type: application/json" -H "Accept: audio/mpeg" --data "$BODY" \
+        "https://api.elevenlabs.io/v1/text-to-speech/$V?output_format=mp3_44100_128" 2>/dev/null)
+      if [ "$CODE" = "200" ] && [ -s "$F.part" ]; then mv "$F.part" "$F"; echo "$F"; else rm -f "$F.part"; fi ;;
+    *)
+      F="$TTS_DIR/$H.wav"; [ -s "$F" ] && { echo "$F"; return; }
+      A="$TTS_DIR/$H.aiff"; TF="$TTS_DIR/$H.txt"
+      printf '%s' "$T" > "$TF"
+      if [ -n "$V" ]; then say -v "$V" -f "$TF" -o "$A" 2>/dev/null || say -f "$TF" -o "$A" 2>/dev/null
+      else say -f "$TF" -o "$A" 2>/dev/null; fi
+      rm -f "$TF"
+      [ -s "$A" ] || return
+      afconvert -f WAVE -d LEI16 "$A" "$F" >/dev/null 2>&1; rm -f "$A"
+      [ -s "$F" ] && echo "$F" ;;
+  esac
+}
+respond_file() { # path, content type — binary-safe (the file goes straight out, never through a variable)
+  LEN=$(wc -c < "$1" | tr -d ' ')
+  printf 'HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: %s\r\nContent-Length: %s\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n' "$2" "$LEN"
+  cat "$1"
+}
+# the English voices `say` knows (name and language), as JSON
+tts_voices() {
+  printf '{"ok":true,"voices":['
+  say -v '?' 2>/dev/null | sed -n -E 's/^(.*[^ ]) +(en[_-][A-Za-z0-9]+) +#.*$/\1	\2/p' | awk -F'\t' 'BEGIN{f=1} { gsub(/\\/, "\\\\", $1); gsub(/"/, "\\\"", $1); if(!f) printf ","; f=0; printf "{\"n\":\"%s\",\"l\":\"%s\"}", $1, $2 }'
+  printf ']}'
 }
 
 # ---------------- wake / music ----------------
@@ -265,7 +315,42 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":8}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":9}' ;;
+    /tts/say*)
+      E=$(param e); V=$(hexdec "$(param v)"); T=$(hexdec "$(param t)")
+      if [ -z "$T" ]; then respond 400 '{"ok":false}'
+      else
+        F=$(tts_file "$E" "$V" "$T")
+        if [ -n "$F" ]; then case "$F" in *.mp3) respond_file "$F" 'audio/mpeg' ;; *) respond_file "$F" 'audio/wav' ;; esac
+        else respond 502 '{"ok":false}'; fi
+      fi ;;
+    /tts/voices*) respond 200 "$(tts_voices)" ;;
+    /ai/chat*|/ai/models*)
+      # the page builds the request; the key is added here and never leaves this Mac except to Anthropic
+      if [ ! -s "$AI_KEY_FILE" ]; then respond 401 '{"error":{"message":"no key saved"}}'
+      else
+        AI_HDR_KEY="x-api-key: $(cat "$AI_KEY_FILE")"
+        case "$REQ_PATH" in
+          /ai/models*) OUT=$(curl -sS --max-time 15 -H "$AI_HDR_KEY" -H "anthropic-version: 2023-06-01" -w '\n%{http_code}' "https://api.anthropic.com/v1/models?limit=100" 2>&1) ;;
+          *) B=$(hexdec "$(param b)")
+             OUT=$(curl -sS --max-time 45 -X POST -H "$AI_HDR_KEY" -H "anthropic-version: 2023-06-01" -H "content-type: application/json" \
+               --data-binary "$B" -w '\n%{http_code}' "https://api.anthropic.com/v1/messages" 2>&1) ;;
+        esac
+        CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
+        case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":{"message":"could not reach Anthropic"}}' ;; esac
+        [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":{"message":"could not reach Anthropic"}}'; }
+        respond "$CODE" "$BODY"
+      fi ;;
+    /ai/key*)
+      T=$(hexdec "$(param t)")
+      if [ -n "$T" ]; then ( umask 077; printf '%s' "$T" > "$AI_KEY_FILE" ); chmod 600 "$AI_KEY_FILE" 2>/dev/null; respond 200 '{"ok":true}'; else respond 400 '{"ok":false}'; fi ;;
+    /ai/forget*) rm -f "$AI_KEY_FILE"; respond 200 '{"ok":true}' ;;
+    /ai/status*) if [ -s "$AI_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
+    /tts/key*)
+      T=$(hexdec "$(param t)")
+      if [ -n "$T" ]; then ( umask 077; printf '%s' "$T" > "$TTS_KEY_FILE" ); chmod 600 "$TTS_KEY_FILE" 2>/dev/null; respond 200 '{"ok":true}'; else respond 400 '{"ok":false}'; fi ;;
+    /tts/forget*) rm -f "$TTS_KEY_FILE"; rm -rf "$TTS_DIR"; respond 200 '{"ok":true}' ;;
+    /tts/status*) if [ -s "$TTS_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
     /sports*)
       # NFL / NBA scores and schedules (ESPN's public scoreboard) for Good morning
       L=$(param l); D=$(param d)

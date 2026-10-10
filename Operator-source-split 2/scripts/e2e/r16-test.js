@@ -30,7 +30,7 @@ const FAKE_SPEECH = () => {
     check('minimal: a clean corner clock (time, date, next alarm)', await p.isVisible('.np-clock #npClockT') && await p.isVisible('#npClockD'));
     check('Pomodoro laid out as blocks: 4 rounds and 3 breaks', (await p.$$('.np-tl i')).length===7 && (await p.$$('.np-tl i.np-tl-r')).length===3 && await p.$('.np-tl i.is-cur')!==null);
     check('the third button is the music; lock out moved to the corner', await p.isVisible('.np-ctl .np-music') && await p.isVisible('.np-top .lv-out[data-action="openStopFocus"]'));
-    check('the player sits under the timer (sources: ▶ ☀ 1 2 3)', (await p.$$('.np-mrow .md-b')).length>=5);
+    check('the player sits under the timer (Operator’s own tracks)', (await p.$$('.np-mrow .md-b')).length>=1);
     check('the top-right dock steps aside in the minimal view', !(await p.isVisible('#musicDock')));
     await p.click('.np-ctl .np-music'); await p.waitForTimeout(300);
     check('♫ starts the music', await E("FM.playing") && /First Light|Still Water|Meadow|Clearwater|Far Lands/.test(await p.textContent('.np-mnow')));
@@ -42,31 +42,13 @@ const FAKE_SPEECH = () => {
     await E("ACTIONS.toggleLockedView()"); await p.waitForTimeout(80);
     check('leaving the minimal view animates out', await p.$('.np.is-leaving')!==null);
     await p.waitForTimeout(600);
-    check('the music dock is in the corner everywhere else', await p.isVisible('#musicDock .md-fm') && (await p.$$('#musicDock .md-n')).length===3 && await p.isVisible('#musicDock .md-sun svg'));
+    check('the music dock is in the corner everywhere else (just ▶ now)', await p.isVisible('#musicDock .md-fm') && (await p.$$('#musicDock .md-n, #musicDock .md-sun')).length===0);
     asked.length = 0;
     await E("musicApp('pause'); musicApp('next'); musicApp('play', {type:'music', k:'song', q:'Sunrise'})"); await p.waitForTimeout(300);
     check('pause / next go to the launcher’s /music/cmd (they silently failed before)', asked.includes('/music/cmd?c=pause') && asked.includes('/music/cmd?c=next'));
     check('…while playing a song still goes to /music/play', asked.some(u => u.startsWith('/music/play?k=song')));
     check('the journal orb is there in the full-screen views too', await E("ACTIONS.toggleLockedView(), true") && (await p.waitForTimeout(500), await p.isVisible('.quick-journal-fab.jorb')));
     check('no page errors (minimal / dock)', p.errors.length===0, p.errors);
-    await p.context().close();
-  }
-
-  // ---- numbered playlists from the dock ----
-  {
-    const asked = [];
-    const p = await newPage(b, OUT+'/r16.html', {profile:{name:'Andre'}});
-    await p.route('http://127.0.0.1:8935/**', r => { const u = r.request().url().replace(/^.*8935/, ''); asked.push(u);
-      if(u.startsWith('/music/resolve')) return r.fulfill({status:200, body:'{"ok":true,"name":"Deep House"}', headers:{'Access-Control-Allow-Origin':'*'}});
-      r.fulfill(ok); });
-    p.on('dialog', d => d.accept('https://music.apple.com/us/playlist/deep-house/pl.u-x1'));
-    await p.click('#musicDock .md-n[data-id="1"]'); await p.waitForTimeout(800);
-    const E = c => p.evaluate(x => window.__op.ev(x), c);
-    check('an empty number asks for a playlist link and remembers its real name', await E("userPlaylists()[1] && userPlaylists()[1].q")==='Deep House');
-    check('…and plays it', asked.some(u => u.startsWith('/music/pick?k=playlist')) && await E("dockSrc()")===1);
-    await p.click('#musicDock .md-n[data-id="1"]'); await p.waitForTimeout(300);
-    check('clicking it again pauses', await E("dockSrc()")===null && asked.includes('/music/cmd?c=pause'));
-    check('no page errors (playlists)', p.errors.length===0, p.errors);
     await p.context().close();
   }
 
@@ -79,7 +61,7 @@ const FAKE_SPEECH = () => {
     await p.addInitScript((seed) => { if(sessionStorage.getItem('s')) return; sessionStorage.setItem('s', '1'); Object.keys(seed).forEach(k => localStorage.setItem('opsdash:'+k, JSON.stringify(seed[k]))); },
       {profile:{name:'Andre', revenueGoalMonthly:20000}, tasks:{items:tasks}, business:{clients:[{id:'c1', name:'JJS', stage:'active', status:'active', mrr:3500}], pipeline:[]},
        journal:{entries:[], capsules:[{id:'k1', text:'Proud of you for sticking with it.', title:'From summer', writtenOn:'2026-06-01', openOn:'2026-10-12', hidden:true}]},
-       focus:{wake:{enabled:true, time:'07:00', days:[0,1,2,3,4,5,6], news:true, newsSports:'Giants, Knicks', intro:'quick', introChosen:true}}});
+       focus:{wake:{enabled:true, time:'07:00', days:[0,1,2,3,4,5,6], news:true, newsSports:'Giants, Knicks', intro:'quick', introChosen:true, voiceEngine:'browser'}}});
     await p.route('http://127.0.0.1:8935/**', r => { const u = r.request().url();
       if(u.includes('/sports')){ const nfl = u.includes('l=nfl'); return r.fulfill({status:200, body:JSON.stringify({events: nfl ? [ev('1','NYG','DAL','24','17','post','2026-10-11T17:00Z'), ev('2','PHI','NYG','','','pre','2026-10-18T17:00Z')] : [ev('3','NYK','BOS','112','104','post','2026-10-11T23:30Z')]}), headers:{'Access-Control-Allow-Origin':'*'}}); }
       if(u.includes('/news')) return r.fulfill({status:200, body:'<?xml version="1.0"?><rss><channel><title>G</title><item><title>Big story - Src</title><link>https://x.com/1</link></item><item><title>Second story - Src</title><link>https://x.com/2</link></item></channel></rss>', headers:{'Access-Control-Allow-Origin':'*'}});
@@ -102,7 +84,7 @@ const FAKE_SPEECH = () => {
     check('"Sports" reads the scores', /NYG beat the DAL, 24 to 17/.test(await p.evaluate(() => window.__said.slice(-1)[0])));
     check('the journal orb shows over Good morning', await p.isVisible('.quick-journal-fab.jorb'));
     await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(1800);
-    check('straight from Good morning to work: the business brief plays by itself', /lined up, starting with Edit JJS reel/.test(await p.evaluate(() => window.__said.slice(-1)[0])));
+    check('straight from Good morning to work: the business brief plays by itself', /Today you’ve got 2 things\. Edit JJS reel and Send proposal\./.test(await p.evaluate(() => window.__said.slice(-1)[0])));
     check('the work preview has "← Morning"', await p.isVisible('#planOverlay .wi-back'));
     await p.click('#planOverlay .wi-back'); await p.waitForTimeout(500);
     check('…and it goes back to Good morning (a sequence)', await E("overlayOpen('wakeOverlay') && ui.wakeMode==='brief'") && !(await E("overlayOpen('planOverlay')")));
@@ -147,30 +129,7 @@ const FAKE_SPEECH = () => {
     await p.context().close();
   }
 
-  // ---- XP & ranks ----
-  {
-    const sessions = [], done = [];
-    for(let i=1;i<=10;i++){ const d = new Date(2026,9,12-i), ds = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'), st = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 9).getTime(); sessions.push({id:'s'+i, date:ds, startedAt:st, endedAt:st+240*60000, minutes:240, type:'deep', completedTasks:[], breaks:[]}); done.push({id:'d'+i, title:'D'+i, status:'done', completedAt:ds, clients:['personal'], priority:'high'}); }
-    const p = await newPage(b, OUT+'/r16.html', {profile:{name:'Andre'}, tasks:{items:done}, focus:{sessions}, health:{gymLog:[{date:'2026-10-12'}], weightLog:[]},
-      business:{clients:[{id:'c1', name:'JJS', stage:'active', status:'active', mrr:1500}], pipeline:[]}}, new Date(2026,9,12,15,0).getTime());
-    const E = c => p.evaluate(x => window.__op.ev(x), c);
-    await p.waitForTimeout(500);
-    const x = JSON.parse(await E("JSON.stringify((function(){ const s = xpSummaryFresh(); return {total:s.total, rank:s.rank, mrrXp:s.mrrXp, today:s.todayXp, locked:s.lockedByMrr, items:s.today.map(i=>i.k)}; })())"));
-    check('MRR is XP: 400 per $1k', x.mrrXp===400);
-    check('the first workouts count big (+120)', x.items.includes('workout') && x.today>=120, x);
-    check('with enough XP but not the MRR, the next rank stays locked', x.total>=1500 ? (x.rank===0 && x.locked) : true, x);
-    await E("state.business.clients[0].mrr = 3000; persist('business'); xpLast = null");
-    const y = JSON.parse(await E("JSON.stringify((function(){ const s = xpSummaryFresh(); return {total:s.total, rank:s.rank, mrrXp:s.mrrXp}; })())"));
-    check('more MRR → more XP, and the rank opens up', y.mrrXp===1200 && (y.total>=1500 ? y.rank===1 : true), y);
-    await E("state.business.clients[0].mrr = 900; xpLast = null");
-    check('MRR going down takes XP back', JSON.parse(await E("JSON.stringify(xpSummaryFresh().mrrXp)"))===0);
-    await E("renderView()"); await p.waitForTimeout(300);
-    check('the rank sits on Today', await p.isVisible('.today-hero .xp-chip'));
-    await p.click('.xp-chip'); await p.waitForTimeout(300);
-    check('…click for today’s XP and the ladder (9 ranks to a million a year)', (await p.$$('#xpContent .xp-step')).length===9 && /Millionaire/.test(await p.textContent('#xpContent')));
-    check('no page errors (XP)', p.errors.length===0, p.errors);
-    await p.context().close();
-  }
+  // (XP & ranks: r17 — the system changed)
 
   await b.close();
   process.exit(report() ? 1 : 0);
