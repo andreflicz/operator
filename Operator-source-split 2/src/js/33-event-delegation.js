@@ -5,6 +5,7 @@ document.body.addEventListener('click', function(e){
   const a = el.dataset.action;
   const id = el.dataset.id;
   // moving between pages and tabs plays a soft note from the app's scale
+  if(typeof breakBlocks==='function' && breakBlocks(a)){ e.preventDefault(); return; }
   if((a==='nav' && el.dataset.view!==ui.view) || (/Tab$/.test(a) && !el.classList.contains('active') && !el.classList.contains('is-on'))) playNav();
   switch(a){
     case 'nav': {

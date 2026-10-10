@@ -184,7 +184,7 @@ function methodLine(st){
   const m = st.m;
   if(m.work){
     const r = 'Round '+(st.onBreak ? st.round-1 : st.round)+(m.rounds ? ' of '+m.rounds : '');
-    if(st.onBreak) return r+' done';
+    if(st.onBreak){ const as = state.focus.activeSession, b = as && as.breaks[as.breaks.length-1]; return b && !b.auto ? 'Round '+st.round+(m.rounds ? ' of '+m.rounds : '')+' paused' : r+' done'; }
     return r+' · '+(st.last ? 'Last round, <b>'+formatElapsed(st.left)+'</b> to go' : 'Break in <b>'+formatElapsed(st.left)+'</b>');
   }
   if(st.id==='flow') return st.onBreak ? 'Resting · back when you\'re ready' : 'In the flow for <b>'+formatElapsed(st.inSeg||0)+'</b> · break earned: <b>'+(st.earned||5)+' min</b>';

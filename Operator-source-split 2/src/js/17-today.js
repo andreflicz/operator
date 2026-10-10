@@ -76,6 +76,7 @@ function renderMiniCalendarStrip(){
   return '<div class="mini-cal-strip" data-action="nav" data-view="calendar" title="Open Calendar">'+cells+'</div>';
 }
 function renderTodayFocusMode(p){
+  if(typeof lockedMinimal==='function' && lockedMinimal()) return renderLockedMinimal();
   const hour = new Date().getHours();
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
   const backlog = state.tasks.items.filter(function(t){ return t.status==='backlog'; }).slice(0,6);
@@ -89,7 +90,7 @@ function renderTodayFocusMode(p){
   return renderFocusQuickLinks()+
   '<div class="locked-in-header">'+
     businessNameTagHtml()+
-    '<div class="locked-in-badge">&#128274; Locked In</div>'+
+    '<div class="locked-in-badge">&#128274; Locked In</div>'+'<div class="lv-corner">'+focusPlayerHtml(false)+lockedViewBtnHtml()+'</div>'+
     '<div class="view-title" style="margin:0;">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
     (state.profile.bigClockOnToday ? (
       '<div id="liveClockBig" class="cal-big-clock" style="font-size:38px;margin-top:6px;"></div>'+

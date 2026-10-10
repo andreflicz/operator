@@ -231,10 +231,10 @@ function lockStartSound(){ const v = state.profile.lockSound; return ['none','ch
 let lockSongPlaying = false;
 function playLockInSong(){
   const k = lockStartSound();
-  if(k==='chill'){ setTimeout(function(){ sfx(SFX.chill); }, 700); return; }
+  if(k==='chill'){ setTimeout(function(){ sfx(SFX.chill); }, 700); if(typeof focusMusicAfterIntro==='function') focusMusicAfterIntro(14500); return; }
   if(k==='music'){ const m = state.profile.lockMusic; if(m && m.q && typeof musicApp==='function'){ musicApp('play', m).then(function(ok){ lockSongPlaying = !!ok; }); } }
 }
-function stopLockInSong(){ if(lockSongPlaying && soundPref('lockMusicStop', true) && typeof musicApp==='function'){ lockSongPlaying = false; musicApp('stop'); } }
+function stopLockInSong(){ if(typeof focusMusicStop==='function'){ clearTimeout(FM.introT); focusMusicStop(); } if(lockSongPlaying && soundPref('lockMusicStop', true) && typeof musicApp==='function'){ lockSongPlaying = false; musicApp('stop'); } }
 
 // ---- Settings → Sound ----
 function soundSettingsHtml(){

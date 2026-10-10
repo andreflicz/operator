@@ -683,23 +683,31 @@ function openBreakNotePrompt(){
   renderBreakNoteModalInto();
 }
 function closeBreakNotePrompt(){ const o=document.getElementById('breakNoteOverlay'); if(o) o.classList.add('hidden'); }
+// The break pop-up: how long (big tiles), an optional note (or one tap on a common reason), and
+// one clear start. It shows when you'll be back.
+const BREAK_REASONS = [['&#9749;','Coffee'],['&#128694;','Walk'],['&#127869;&#65039;','Food'],['&#129496;','Stretch'],['&#128222;','Call']];
 function renderBreakNoteModal(){
-  return '<div class="section-title" style="margin-bottom:8px;">'+modeIcon('break')+' Break Mode</div>'+
-    '<div class="kpi-sub" style="margin-bottom:12px;">What\'s this break for? A quick note helps you see your break patterns later.</div>'+
-    '<input class="input" id="breakNoteInput" placeholder="e.g. Lunch, quick walk, phone call" style="width:100%;">'+
-    '<div class="kind-label" style="margin-top:14px;">How long?</div>'+
-    '<div class="row break-len-row" style="gap:6px;flex-wrap:wrap;">'+[5,10,15,20,30,45,60,'open'].map(function(m){ const on = (ui.breakMinutes==null ? 15 : ui.breakMinutes)===m; return '<button class="btn btn-sm '+(on?'btn-primary':'btn-ghost')+'" data-action="pickBreakMinutes" data-minutes="'+m+'">'+(m==='open'?'No timer':m+' min')+'</button>'; }).join('')+'</div>'+
-    '<div class="kpi-sub" style="margin-top:6px;">'+((ui.breakMinutes==null?15:ui.breakMinutes)==='open' ? 'The break runs until you end it.' : 'Ends by itself after '+(ui.breakMinutes==null?15:ui.breakMinutes)+' min and you\'re back in the session.')+'</div>'+
-    '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
-      '<button class="btn btn-ghost" data-action="closeBreakNotePrompt">Cancel</button>'+
-      '<button class="btn btn-primary" data-action="confirmStartBreakMode">'+modeIcon('break')+' Start Break</button>'+
-    '</div>';
+  const len = ui.breakMinutes==null ? 15 : ui.breakMinutes, as = state.focus.activeSession;
+  const flow = as && as.method && as.method.id==='flow' ? flowBreakMinutes() : null;
+  return '<div class="brk">'+
+    '<button class="brk-x" data-action="closeBreakNotePrompt" title="Cancel (Esc)">&#10005;</button>'+
+    '<div class="brk-i">&#9749;</div>'+
+    '<div class="brk-h">Take a break</div>'+
+    '<div class="brk-s">'+(as ? fmtDurationLabel(Math.floor((Date.now()-as.startedAt)/60000))+' in'+(flow ? ' &middot; you\'ve earned about '+flow+' min' : '') : '')+'</div>'+
+    '<div class="brk-lens">'+[5,10,15,20,30,'open'].map(function(m){ const on = len===m; return '<button class="brk-len'+(on?' is-on':'')+'" data-action="pickBreakMinutes" data-minutes="'+m+'"><b>'+(m==='open'?'&infin;':m)+'</b><span>'+(m==='open'?'open':'min')+'</span></button>'; }).join('')+'</div>'+
+    '<div class="brk-back">'+(len==='open' ? 'No timer — end it whenever you\'re ready' : 'Back at <b>'+fmtTimeShort(Date.now()+len*60000)+'</b>')+'</div>'+
+    '<div class="brk-note"><input class="input" id="breakNoteInput" placeholder="What\'s it for? (optional)" value="'+escapeHtml(ui.breakNoteDraft||'')+'">'+
+      '<div class="brk-chips">'+BREAK_REASONS.map(function(r){ return '<button class="brk-chip" data-action="breakReason" data-id="'+r[1]+'">'+r[0]+' '+r[1]+'</button>'; }).join('')+'</div></div>'+
+    '<button class="brk-go" data-action="confirmStartBreakMode">Start break</button>'+
+  '</div>';
 }
+ACTIONS.breakReason = function(el, e, id){ const i = document.getElementById('breakNoteInput'); if(i){ i.value = id; ui.breakNoteDraft = id; } playTick(); };
 function renderBreakNoteModalInto(){ const el=document.getElementById('breakNoteContent'); if(el) morphInto(el, renderBreakNoteModal(), {form:true}); }
 function confirmStartBreakMode(){
   const as = state.focus.activeSession; if(!as || as.onBreak) { closeBreakNotePrompt(); return; }
   const noteEl = document.getElementById('breakNoteInput');
   const note = noteEl ? noteEl.value.trim() : '';
+  ui.breakNoteDraft = '';
   closeBreakNotePrompt();
   if(!Array.isArray(as.breaks)) as.breaks=[];
   const breakLen = ui.breakMinutes==null ? 15 : ui.breakMinutes;
@@ -713,7 +721,16 @@ function confirmStartBreakMode(){
   if(ui.currentTaskId){ ui.pausedTaskId = ui.currentTaskId; accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   ui.pendingCurrentTaskId = null;
   playRestSound();
+  breakFlash(breakLen==='open' ? null : Date.now()+breakLen*60000, note);
   persist('focus'); persist('modes'); renderView();
+}
+// a calm stamp as the break starts — same family as Locked in / Locked out
+function breakFlash(endsAt, note){
+  const d = document.createElement('div');
+  d.className = 'lock-flash is-break';
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">&#9749; On a break</div><div class="lf-t">'+(endsAt ? 'Back at '+fmtTimeShort(endsAt) : 'No timer')+(note ? ' &middot; '+escapeHtml(note) : '')+'</div>';
+  document.body.appendChild(d);
+  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 1900);
 }
 function endBreakModeFromFocus(){
   const as = state.focus.activeSession; if(!as || !as.onBreak) return;
