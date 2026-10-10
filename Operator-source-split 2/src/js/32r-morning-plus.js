@@ -116,12 +116,13 @@ function openTomorrowNote(){
   let o = document.getElementById('tnOverlay');
   if(!o){ o = document.createElement('div'); o.id = 'tnOverlay'; o.className = 'overlay tn-ov'; o.innerHTML = '<div class="card tn" id="tnContent"></div>'; document.body.appendChild(o); o.addEventListener('pointerdown', function(e){ if(e.target===o) closeTomorrowNote(); }); }
   const target = morningNoteTarget(), nn = nightNote(target);
+  const day = target===addDays(todayStr(), 1) ? 'Tomorrow' : new Date(target+'T12:00').toLocaleDateString(undefined, {weekday:'long'});
   document.getElementById('tnContent').innerHTML =
-    '<div class="tn-h"><div><div class="tn-k">&#127769; For '+(target===addDays(todayStr(), 1) ? 'tomorrow' : weekdayShort(target))+'</div><div class="tn-t">A note to the morning you</div></div><button class="tn-x" data-action="closeTomorrowNote">&#10005;</button></div>'+
-    '<label class="tn-f"><span>Headline<small>Big on the alarm and Good morning</small></span><input class="input" id="tnHead" maxlength="120" placeholder="e.g. Up at 6. Don’t negotiate." value="'+escapeHtml(nn.headline)+'"></label>'+
-    '<label class="tn-f"><span>For the morning<small>On Good morning — the longer version</small></span><textarea class="input" id="tnMorning" rows="3" placeholder="How you want the morning to go…">'+escapeHtml(nn.morning)+'</textarea></label>'+
-    '<label class="tn-f"><span>Before you lock in<small>On the work preview, the first time you clock in</small></span><textarea class="input" id="tnWork" rows="2" placeholder="e.g. Call Mike first. Then the JJS edit.">'+escapeHtml(nn.work)+'</textarea></label>'+
-    '<div class="tn-a"><button class="btn btn-primary" data-action="saveTomorrowNote">Save note</button></div>';
+    '<div class="tn-h"><div><div class="tn-k">&#127769; '+day+' morning</div><div class="tn-t">Leave yourself a note</div></div><button class="tn-x" data-action="closeTomorrowNote">&#10005;</button></div>'+
+    '<div class="tn-f"><div class="tn-l"><b>Headline</b><span>On the alarm and at the top of Good morning</span></div><input class="tn-in" id="tnHead" maxlength="90" placeholder="Up at 6. Don’t negotiate." value="'+escapeHtml(nn.headline)+'"></div>'+
+    '<div class="tn-f"><div class="tn-l"><b>Good morning</b><span>A few words for when you wake up</span></div><textarea class="tn-in" id="tnMorning" rows="2" placeholder="Slow coffee, a walk, then go.">'+escapeHtml(nn.morning)+'</textarea></div>'+
+    '<div class="tn-f"><div class="tn-l"><b>Business message</b><span>On the work page, before you lock in</span></div><textarea class="tn-in" id="tnWork" rows="2" placeholder="Call Mike first. Then the JJS edit.">'+escapeHtml(nn.work)+'</textarea></div>'+
+    '<div class="tn-a"><button class="tn-save" data-action="saveTomorrowNote">Save note</button></div>';
   o.classList.remove('hidden');
   setTimeout(function(){ const i = document.getElementById('tnHead'); if(i) i.focus(); }, 50);
 }
@@ -145,6 +146,7 @@ function tomorrowNoteBtnHtml(cls){ const has = (function(){ const n = nightNote(
 ACTIONS.backToMorning = function(){
   ui.planReveal = null; hideOverlay('planOverlay');
   ui.wakeMode = 'brief'; ui.wakeIntroDone = true; ui.briefSkipped = true; ui.briefT0 = Date.now() - 120000; ui.briefShift = 120000;
+  if(typeof loadScores==='function' && !(ui.scores && ui.scores.got && (ui.scores.nfl || ui.scores.nba))) loadScores(true);
   showOverlay('wakeOverlay'); renderWakeOverlayInto();
 };
 
@@ -160,7 +162,7 @@ function briefMinimalOn(){ return wakeCfg().briefLayout==='minimal'; }
 function briefMinimalHtml(){
   const name = state.profile.name || '', today = todayStr(), now = typeof wxNow==='function' ? wxNow() : null, phase = skyPhase(), win = dayWindow();
   const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
-  const q = quoteOfDay(), nn = nightNote(today), news = ui.morningNews && ui.morningNews.date===today ? ui.morningNews.items : null;
+  const q = quoteOfDay(), nn = nightNote(), news = ui.morningNews && ui.morningNews.date===today ? ui.morningNews.items : null;
   const slept = lastNightSleep(), streak = computeStreak();
   const tile = function(cls, k, html, i){ return '<div class="gmm-t '+cls+'" style="--i:'+i+'"><div class="gmm-k">'+k+'</div>'+html+'</div>'; };
   ui.briefLines = [{at:0, text: (nn.headline ? 'You left yourself a note. ' : '')+'Get ready to start your day.'}];

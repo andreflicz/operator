@@ -1,7 +1,9 @@
 // ============ XP, LEVELS, RANKS & YOUR CARD ============
 // A game you play by living the right way. Everyone starts at level 0, rank 0 — "Locked In": the
-// point is to stay consistent and not lose yourself to brain fog. Levels are slow on purpose:
-// level L takes 100 × L² XP in total (level 10 is 10,000; level 30 is 90,000).
+// point is to stay consistent and not lose yourself to brain fog. Levels are slow on purpose: each
+// one costs 1,000 XP plus 150 for every level you already have — a good week of work for the first,
+// more after that. Every session still moves the bar (20 minutes is about 3 XP); the big jumps come
+// from what changes the business and the body: clients won, MRR added, followers gained, goals done.
 // Ranks need three things: the level, the MRR, and the body (your Health score) — you can't
 // rank up on work alone.
 // XP comes from the day (deep work, tasks, workouts — the first ones count big — shooting,
@@ -15,18 +17,40 @@
 //   Discipline (days on target, your streak, how often you lock in)
 const RANKS = [
   {name:'Locked In',   level:0,  mrr:0,     health:0,  color:'#8fd3ff', tag:'Entrepreneur mode'},
-  {name:'Operator',    level:5,  mrr:2500,  health:40, color:'#5fd4c4', tag:'Showing up'},
-  {name:'Specialist',  level:10, mrr:5000,  health:50, color:'#6fc3ff', tag:'Good at the thing'},
-  {name:'Closer',      level:16, mrr:10000, health:55, color:'#a98bff', tag:'Deals get done'},
-  {name:'Captain',     level:23, mrr:20000, health:60, color:'#ff8fb1', tag:'Others follow'},
-  {name:'Commander',   level:31, mrr:35000, health:65, color:'#ffc56b', tag:'Runs the field'},
-  {name:'Director',    level:40, mrr:50000, health:70, color:'#ff9a6b', tag:'Built to last'},
-  {name:'Mogul',       level:50, mrr:70000, health:75, color:'#7ef0c0', tag:'Owns the game'},
-  {name:'Millionaire', level:60, mrr:83400, health:80, color:'#fff2b0', tag:'A million a year'}
+  {name:'Operator',    level:3,  mrr:2500,  health:40, color:'#5fd4c4', tag:'Showing up'},
+  {name:'Specialist',  level:6,  mrr:5000,  health:50, color:'#6fc3ff', tag:'Good at the thing'},
+  {name:'Closer',      level:10, mrr:10000, health:55, color:'#a98bff', tag:'Deals get done'},
+  {name:'Captain',     level:15, mrr:20000, health:60, color:'#ff8fb1', tag:'Others follow'},
+  {name:'Commander',   level:20, mrr:35000, health:65, color:'#ffc56b', tag:'Runs the field'},
+  {name:'Director',    level:26, mrr:50000, health:70, color:'#ff9a6b', tag:'Built to last'},
+  {name:'Mogul',       level:33, mrr:70000, health:75, color:'#7ef0c0', tag:'Owns the game'},
+  {name:'Millionaire', level:40, mrr:83400, health:80, color:'#fff2b0', tag:'A million a year'}
 ];
-const XP_RATES = {mrrPerK:800, client:300, video:50, hourBase:10, hourAbove:18, longDay:40, outreach:20};
-function xpForLevel(L){ return 100*L*L; }
-function xpLevelOf(total){ return Math.max(0, Math.floor(Math.sqrt(Math.max(0, total)/100))); }
+const XP_RATES = {mrrPerK:800, client:750, follower:1, goal:500, video:50, hourBase:10, hourAbove:18, longDay:40, outreach:20};
+// total XP to reach level L: 1,000 a level plus 150 more for each level before it
+function xpForLevel(L){ return 1000*L + 75*L*(L-1); }
+function xpLevelOf(total){ let L = 0; while(xpForLevel(L+1) <= total) L++; return L; }
+// goals count once they've stayed done for a day (an accidental tick doesn't pay; un-ticking or
+// deleting one takes it away again); periodic ones (this week's workouts…) don't count here
+function xpGoals(){
+  const p = state.profile, seen = (p.xpGoalSeen && typeof p.xpGoalSeen==='object') ? p.xpGoalSeen : (p.xpGoalSeen = {});
+  const now = Date.now(), done = arr(state.goals && state.goals.items).filter(function(g){ return g.done && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g)); });
+  const ids = {}; let changed = false, counted = 0, pending = 0;
+  done.forEach(function(g){ ids[g.id] = 1; if(!seen[g.id]){ seen[g.id] = now; changed = true; } if(now - seen[g.id] >= 86400000) counted++; else pending++; });
+  Object.keys(seen).forEach(function(id){ if(!ids[id]){ delete seen[id]; changed = true; } });
+  if(changed) persist('profile');
+  return {counted:counted, pending:pending};
+}
+// followers you've gained since you started (GoHighLevel / Instagram, when connected)
+function xpFollowersNow(){
+  try{
+    let total = 0, any = false;
+    const sd = typeof socialData==='function' ? socialData() : null, f = sd && sd.platformTotals && sd.platformTotals.followers;
+    if(f) Object.keys(f).forEach(function(k){ const n = Number(f[k] && f[k].total); if(n){ total += n; any = true; } });
+    if(typeof igFollowersTotal==='function'){ const ig = igFollowersTotal(); if(ig!=null){ total = Math.max(total, ig); any = true; } }
+    return any ? total : null;
+  }catch(e){ return null; }
+}
 function xpMrr(){ return arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); }).reduce(function(a, c){ return a + Number(c.mrr||0); }, 0); }
 // the day the game began (you start at 0 — nothing before it counts), and where MRR stood then
 function xpStart(){
@@ -82,7 +106,7 @@ function xpCtx(){
 }
 // past days don't change often: keep them, recount only today (and everything when the data changes)
 let xpCache = {sig:'', days:{}};
-function xpSig(){ return [arr(state.focus.sessions).length, state.tasks.items.filter(function(t){ return t.status==='done'; }).length, arr(state.health.gymLog).length, arr(state.modes.history).length, arr(state.journal.entries).length, state.standards.deepWorkTargetMinutes, state.profile.xpStart].join('|'); }
+function xpSig(){ return [arr(state.focus.sessions).length, state.tasks.items.filter(function(t){ return t.status==='done'; }).length, arr(state.health.gymLog).length, arr(state.modes.history).length, arr(state.journal.entries).length, state.standards.deepWorkTargetMinutes, state.profile.xpStart, arr(state.goals && state.goals.items).filter(function(g){ return g.done; }).length].join('|'); }
 // (renders often — the full count is reused for a few seconds unless something changed)
 let xpLast = null;
 function xpSummary(){
@@ -104,7 +128,10 @@ function xpSummaryFresh(){
   const p = state.profile, mrr = xpMrr(), base = Number(p.xpMrrBase||0);
   const won = arr(state.business.clients).filter(function(c){ return arr(p.xpClientsBase).indexOf(c.id) < 0; }).length;
   const mrrXp = Math.round((mrr - base)/1000*XP_RATES.mrrPerK), clientXp = won*XP_RATES.client;
-  total = Math.max(0, total + mrrXp + clientXp);
+  const goals = xpGoals(), goalXp = goals.counted*XP_RATES.goal;
+  const fNow = xpFollowersNow(); if(fNow!=null && p.xpFollowersBase==null){ p.xpFollowersBase = fNow; persist('profile'); }
+  const followers = fNow!=null && p.xpFollowersBase!=null ? fNow - p.xpFollowersBase : 0, followerXp = Math.round(followers*XP_RATES.follower);
+  total = Math.max(0, total + mrrXp + clientXp + goalXp + followerXp);
   const todayItems = xpDay(today, ctx);
   const level = xpLevelOf(total), lo = xpForLevel(level), hi = xpForLevel(level+1);
   const attrs = xpAttributes(ctx);
@@ -113,7 +140,7 @@ function xpSummaryFresh(){
   const next = RANKS[rank+1] || null;
   const needs = next ? [level < next.level ? 'level '+next.level : '', mrr < next.mrr ? money(next.mrr)+' MRR' : '', attrs.HLT.v < next.health ? 'Health '+next.health : ''].filter(Boolean) : [];
   return {total:total, week:week, today:todayItems, todayXp:todayItems.reduce(function(a, x){ return a + x.xp; }, 0),
-    mrr:mrr, mrrBase:base, mrrXp:mrrXp, clientXp:clientXp, won:won, start:start,
+    mrr:mrr, mrrBase:base, mrrXp:mrrXp, clientXp:clientXp, won:won, start:start, goalXp:goalXp, goals:goals, followers:followers, followerXp:followerXp,
     level:level, levelLo:lo, levelHi:hi, levelPct:(total - lo)/(hi - lo),
     rank:rank, next:next, needs:needs, attrs:attrs, ovr:attrs.OVR};
 }
@@ -147,12 +174,13 @@ function xpAttributes(ctx){
   const mrr = xpMrr(), active = cs.filter(function(c){ return clientStageActive(c.stage); }).length;
   let deep14 = 0; for(let i=1;i<=14;i++) deep14 += ctx.deep(addDays(today, -i)); deep14 /= 14;
   const newClients = cs.filter(function(c){ return within(c.startDate || c.createdAt, 90); }).length;
-  const bizVids = tasks.filter(function(t){ return t.isVideoIdea && t.status==='done' && within(t.completedAt, 30) && !isPersonal(t); }).length;
+  // (posts on your Instagram business account count too, when it's connected)
+  const bizVids = Math.max(tasks.filter(function(t){ return t.isVideoIdea && t.status==='done' && within(t.completedAt, 30) && !isPersonal(t); }).length, (typeof igPostsByRole==='function' && igPostsByRole('business')) || 0);
   // (each one at 100 is the best version: a million a year, a full roster, well past your daily target…)
   const B = [sub('MRR', Math.sqrt(mrr/83400), money(mrr)+' a month'), sub('Clients', active/15, active+' active'), sub('Time put in', deep14/(target*1.33), fmtHours(Math.round(deep14))+' a day lately'),
     sub('Client growth', newClients/4, newClients+' new in 90 days'), sub('Business content', bizVids/12, bizVids+' posted in 30 days')];
   // personal
-  const perVids = tasks.filter(function(t){ return t.isVideoIdea && t.status==='done' && within(t.completedAt, 30) && isPersonal(t); }).length;
+  const perVids = Math.max(tasks.filter(function(t){ return t.isVideoIdea && t.status==='done' && within(t.completedAt, 30) && isPersonal(t); }).length, (typeof igPostsByRole==='function' && igPostsByRole('personal')) || 0);
   const ideas = tasks.filter(function(t){ return t.isVideoIdea && within(t.createdAt, 30); }).length;
   const goals = arr(state.goals && state.goals.items).filter(function(g){ return !g.autoTrack; });
   const goalF = goals.length && typeof goalPct==='function' ? goals.reduce(function(a, g){ return a + (g.done ? 100 : goalPct(g)); }, 0)/goals.length/100 : null;
@@ -221,34 +249,54 @@ ACTIONS.pcFlip = function(el){ ui.pcFlip = !ui.pcFlip; const c = el && el.closes
 // (kept for older callers)
 function xpChipHtml(){ return playerCardHtml('hero'); }
 
-// ---- "You": the overview (Personal → You, or click the card) — the card, your level, the four
-// ratings, your body, the ladder. That's it.
+// ---- "You": the overview (Personal → You, or click the card) — the card, your level and the ranks,
+// then the four ratings and your body side by side. Fits on one screen.
 function renderYouTab(){
   const x = xpSummary(), r = RANKS[x.rank], body = x.attrs.HLT.body;
   const attrCard = function(k){ const a = x.attrs[k]; return '<div class="you-attr" style="--ac:'+a.color+'"><div class="you-attr-h"><b>'+a.v+'</b><span>'+a.name+'</span></div>'+
     a.subs.map(function(s){ return '<div class="you-sub" title="'+escapeHtml(s.note)+'"><span>'+escapeHtml(s.label)+'</span><i><u style="width:'+(s.v==null ? 0 : (s.v-25)/75*100).toFixed(1)+'%"></u></i><b>'+(s.v==null ? '—' : s.v)+'</b></div>'; }).join('')+'</div>'; };
+  const u = body.kg ? 'kg' : 'lb';
   return '<div class="you">'+
     '<div class="you-top">'+playerCardHtml('big')+
       '<div class="you-main">'+
         '<div class="you-lvl">Level <b>'+x.level+'</b> <span style="color:'+r.color+'">'+escapeHtml(r.name)+'</span></div>'+
         '<div class="you-xpbar"><i><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i><span>'+(x.levelHi - x.total).toLocaleString()+' XP to level '+(x.level+1)+' &middot; +'+x.todayXp.toLocaleString()+' today &middot; +'+x.week.toLocaleString()+' this week</span></div>'+
         (x.next ? '<div class="you-next">Next rank: <b style="color:'+x.next.color+'">'+x.next.name+'</b> — '+(x.needs.length ? 'needs '+x.needs.map(function(n){ return '<b>'+escapeHtml(n)+'</b>'; }).join(', ') : 'yours')+'</div>' : '<div class="you-next">The top. A million a year.</div>')+
-        '<div class="you-how">XP comes from deep work, finished tasks, workouts (they count big), outreach, clients you win and MRR you add — and MRR you lose takes it back. Each level takes more than the last.</div>'+
+        // the ranks as one small track
+        '<div class="you-track">'+RANKS.map(function(rk, i){ const st = i<x.rank ? 'is-done' : i===x.rank ? 'is-cur' : ''; return '<span class="you-tr '+st+'" style="--rc:'+rk.color+'" title="'+escapeHtml(rk.name)+' — level '+rk.level+(rk.mrr ? ', '+money(rk.mrr)+' MRR, Health '+rk.health : '')+'">'+rankBadgeSvg(i, 22)+'<small>'+escapeHtml(rk.name)+'</small></span>'; }).join('')+'</div>'+
+        '<button class="you-howbtn" data-action="openXpHow">How leveling works &#8594;</button>'+
       '</div></div>'+
-    '<div class="you-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(attrCard).join('')+'</div>'+
-    '<div class="you-row">'+
+    '<div class="you-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(attrCard).join('')+
       '<div class="you-body"><div class="you-sec">Your body</div>'+(body.bmi ?
         '<div class="you-bmi"><b>'+body.bmi.toFixed(1)+'</b><span>BMI &middot; '+body.cls+'</span></div>'+
-        '<div class="you-bmi-scale">'+bmiScaleHtml(body)+'</div>'+
-        '<div class="you-note">At '+Math.floor(body.h/12)+'′'+(body.h%12)+'″: healthy up to <b>'+body.healthyMax+' '+(body.kg?'kg':'lb')+'</b>, obese from <b>'+body.obeseAt+' '+(body.kg?'kg':'lb')+'</b>. You’re at '+body.w+'.</div>'
-        : '<div class="you-note">Add your height (Settings → You) and a weigh-in, and your card rates your body too — ranks need it.</div><button class="btn btn-sm" data-action="goToProfileSettings">Add height</button>')+'</div>'+
-      '<div class="you-ladder"><div class="you-sec">Ranks</div>'+RANKS.map(function(rk, i){ const st = i<x.rank ? 'is-done' : i===x.rank ? 'is-cur' : ''; return '<div class="xp-step '+st+'" style="--rc:'+rk.color+'">'+rankBadgeSvg(i, 20)+'<b>'+rk.name+'</b><span>LVL '+rk.level+(rk.mrr ? ' &middot; '+money(rk.mrr)+' &middot; HLT '+rk.health : '')+'</span></div>'; }).join('')+'</div>'+
-    '</div></div>';
+        '<div class="you-bmi-scale">'+bmiScaleHtml(body)+'</div>'        : '<div class="you-note">Add your height and weight in Settings → You and your card rates your body too — ranks need it.</div><button class="btn btn-sm" data-action="goToProfileSettings">Add height &amp; weight</button>')+'</div>'+
+    '</div>'+xpChartHtml()+'</div>';
 }
+// the last 30 days of XP, a bar a day — the climb, at a glance
+function xpChartHtml(){
+  const ctx = xpCtx(), today = todayStr(), start = xpStart(), days = [];
+  for(let i=29;i>=0;i--){
+    const d = addDays(today, -i);
+    if(d < start){ days.push({d:d, xp:null}); continue; }
+    const items = (d!==today && xpCache.days[d]) || xpDay(d, ctx);
+    days.push({d:d, xp:items.reduce(function(a, x){ return a + x.xp; }, 0)});
+  }
+  const got = days.filter(function(x){ return x.xp!=null; }), sum = got.reduce(function(a, x){ return a + x.xp; }, 0);
+  const top = Math.max(100, ...got.map(function(x){ return x.xp; })), best = got.reduce(function(b, x){ return !b || x.xp > b.xp ? x : b; }, null);
+  return '<div class="you-chart"><div class="you-chart-h"><span class="you-sec">Last 30 days</span><span><b>'+sum.toLocaleString()+'</b> XP'+(best && best.xp ? ' &middot; best day <b>+'+best.xp+'</b>' : '')+'</span></div>'+
+    '<div class="you-bars">'+days.map(function(x){
+      const h = x.xp==null ? 0 : Math.max(x.xp ? 4 : 2, x.xp/top*100);
+      return '<i class="'+(x.xp==null ? 'is-pre' : '')+(x.d===today ? ' is-today' : '')+'" title="'+escapeHtml(fmtDateShort(x.d))+(x.xp==null ? ' — before you started' : ': +'+x.xp+' XP')+'"><u style="height:'+h.toFixed(1)+'%"></u></i>';
+    }).join('')+'</div></div>';
+}
+// the scale for your height, in pounds (or kg): healthy · overweight · obese, and where you are
 function bmiScaleHtml(b){
-  const lo = 15, hi = 40, pos = function(v){ return ((Math.max(lo, Math.min(hi, v)) - lo)/(hi - lo)*100).toFixed(1); };
-  return '<div class="bmi-bar"><i style="left:0;width:'+pos(18.5)+'%" class="u"></i><i style="left:'+pos(18.5)+'%;width:'+(pos(25)-pos(18.5))+'%" class="h"></i><i style="left:'+pos(25)+'%;width:'+(pos(30)-pos(25))+'%" class="o"></i><i style="left:'+pos(30)+'%;right:0" class="ob"></i>'+
-    '<b style="left:'+pos(b.bmi)+'%"></b></div><div class="bmi-lab"><span>18.5</span><span>25</span><span>30</span></div>';
+  const lo = 15, hi = 40, pos = function(v){ return ((Math.max(lo, Math.min(hi, v)) - lo)/(hi - lo)*100).toFixed(1); }, u = b.kg ? 'kg' : 'lb';
+  return '<div class="bmi-you" style="left:'+pos(b.bmi)+'%"><b>'+b.w+'</b> '+u+'</div>'+
+    '<div class="bmi-bar"><i style="left:0;width:'+pos(18.5)+'%" class="u"></i><i style="left:'+pos(18.5)+'%;width:'+(pos(25)-pos(18.5))+'%" class="h"></i><i style="left:'+pos(25)+'%;width:'+(pos(30)-pos(25))+'%" class="o"></i><i style="left:'+pos(30)+'%;right:0" class="ob"></i>'+
+    '<b style="left:'+pos(b.bmi)+'%"></b></div>'+
+    '<div class="bmi-lab"><span style="left:'+pos(18.5)+'%">'+b.healthyMin+'</span><span style="left:'+pos(25)+'%">'+b.healthyMax+'</span><span style="left:'+pos(30)+'%">'+b.obeseAt+'</span></div>'+
+    '<div class="bmi-legend"><span class="h">Healthy</span><span class="o">Overweight</span><span class="ob">Obese</span></div>';
 }
 ACTIONS.openYou = function(){ ui.view = 'personal'; ui.personalTab = 'you'; renderView(); };
 ACTIONS.openXp = ACTIONS.openYou;
@@ -325,3 +373,32 @@ function xpWatch(){
   } else if(finished) xpToast(gained, 'Task complete.');
 }
 afterRenderHooks.push(function(){ try{ xpWatch(); }catch(e){} });
+
+// ---- how leveling works: its own page (the You tab stays clean) ----
+ACTIONS.openXpHow = function(){
+  let o = document.getElementById('xpHowOverlay');
+  if(!o){ o = document.createElement('div'); o.id = 'xpHowOverlay'; o.className = 'overlay xph-ov'; o.innerHTML = '<div class="card xph" id="xpHowContent"></div>'; document.body.appendChild(o); o.addEventListener('pointerdown', function(e){ if(e.target===o) o.classList.add('hidden'); }); }
+  const row = function(a, b){ return '<div class="xph-r"><span>'+a+'</span><b>'+b+'</b></div>'; };
+  document.getElementById('xpHowContent').innerHTML =
+    '<button class="xph-x" data-action="closeXpHow">&#10005;</button>'+
+    '<div class="xph-k">[ SYSTEM ]</div><h2>How leveling works</h2>'+
+    '<div class="xph-cols">'+
+      '<div><div class="xph-sec">Every day</div>'+
+        row('Deep work', XP_RATES.hourBase+' XP an hour ('+XP_RATES.hourAbove+' above your usual)')+row('Long day (6h+)', '+'+XP_RATES.longDay)+row('Tasks done', '12 · 8 · 4 each')+
+        row('Workout', '150 (first five), then 70 → 25 a week')+row('Shooting', '8 XP an hour')+row('Outreach', 'from '+XP_RATES.outreach)+row('Strong days in a row', 'up to ×1.28')+
+      '</div>'+
+      '<div><div class="xph-sec">The big jumps</div>'+
+        row('Client won', '+'+XP_RATES.client)+row('Every $1k of MRR added', '+'+XP_RATES.mrrPerK+' (lost if it drops)')+row('Follower gained', '+'+XP_RATES.follower)+row('Goal done (stays done a day)', '+'+XP_RATES.goal)+
+        '<div class="xph-sec">Levels</div>'+row('Level 1', xpForLevel(1).toLocaleString()+' XP')+row('Level 5', xpForLevel(5).toLocaleString()+' XP')+row('Level 10', xpForLevel(10).toLocaleString()+' XP')+row('Level 40', xpForLevel(40).toLocaleString()+' XP')+
+      '</div>'+
+      '<div><div class="xph-sec">Ranks need all three</div>'+RANKS.map(function(r, i){ return row('<span style="color:'+r.color+'">'+i+' · '+r.name+'</span>', 'LVL '+r.level+(r.mrr ? ' · '+money(r.mrr)+' · HLT '+r.health : '')); }).join('')+'</div>'+
+    '</div>'+
+    '<div class="xph-sec">Your ratings (25–100)</div><div class="xph-rates">'+
+      '<div><b style="color:#ffc56b">Business</b>MRR, clients, time put in, client growth, business content</div>'+
+      '<div><b style="color:#c3a6ff">Personal</b>Personal content, video ideas, your goals, journaling</div>'+
+      '<div><b style="color:#7ef0c0">Health</b>BMI for your height, training, consistency</div>'+
+      '<div><b style="color:#8fd3ff">Discipline</b>Days on target, streak, locking in</div>'+
+    '</div><div class="xph-foot">100 is you at your best in everything — the overall only hits 100 when all four do.</div>';
+  o.classList.remove('hidden');
+};
+ACTIONS.closeXpHow = function(){ const o = document.getElementById('xpHowOverlay'); if(o) o.classList.add('hidden'); };

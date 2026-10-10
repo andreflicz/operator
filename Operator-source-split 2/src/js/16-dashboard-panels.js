@@ -1,5 +1,14 @@
 // ============ DASHBOARD PANELS (Today) ============
 function renderPersonalStatsPanel(){
+// time worked: the week so far (big), yesterday, and a bar for each day Mon–Sun
+function timeWorkedHtml(yMin, weekMin){
+  const ws = startOfWeekStr(todayStr()), today = todayStr(), days = [];
+  for(let i=0;i<7;i++){ const d = addDays(ws, i); days.push({d:d, m: d===today ? deepWorkMinutesTodayLive() : d > today ? null : deepWorkMinutesFor(d)}); }
+  const target = state.standards.deepWorkTargetMinutes || 180, top = Math.max(target, ...days.map(function(x){ return x.m||0; }));
+  return '<div class="stat-chip-label">Time Worked</div>'+
+    '<div class="tw-top"><div><div class="tw-v">'+fmtDurationLabel(weekMin)+'</div><div class="tw-s">this week &middot; yesterday '+fmtDurationLabel(yMin)+'</div></div>'+
+    '<div class="tw-bars">'+days.map(function(x){ return '<i class="'+(x.d===today?'is-today':'')+(x.m!=null && x.m>=target?' is-hit':'')+(x.m==null?' is-future':'')+'" title="'+weekdayShort(x.d)+(x.m!=null ? ': '+fmtDurationLabel(x.m) : '')+'"><u style="height:'+(x.m ? Math.max(6, x.m/top*100) : 0).toFixed(1)+'%"></u><span>'+weekdayShort(x.d).slice(0,1)+'</span></i>'; }).join('')+'</div></div>';
+}
   const p = state.profile;
   const streak = computeStreak();
   const todayFocusMin = deepWorkMinutesTodayLive();
@@ -17,13 +26,7 @@ function renderPersonalStatsPanel(){
   return '<div class="section">'+
   '<div class="grid grid-3 stat-chip-row">'+
     '<div class="stat-chip" id="statDeepWorkBox">'+deepWorkStatInnerHtml(todayFocusMin)+'</div>'+
-    '<div class="stat-chip">'+
-      '<div class="stat-chip-label">Time Worked</div>'+
-      '<div class="time-worked-rows">'+
-        '<div class="time-worked-row"><span class="time-worked-key">Yesterday</span><span class="time-worked-val">'+fmtDurationLabel(yesterdayFocusMin)+'</span></div>'+
-        '<div class="time-worked-row"><span class="time-worked-key">This week</span><span class="time-worked-val">'+fmtDurationLabel(weekFocusMin)+'</span></div>'+
-      '</div>'+
-    '</div>'+
+    '<div class="stat-chip tw-chip">'+timeWorkedHtml(yesterdayFocusMin, weekFocusMin)+'</div>'+
     '<div class="stat-chip" data-action="goToFinishedTasks" style="cursor:pointer;"><div class="stat-chip-label">Tasks</div><div class="stat-chip-value">'+doneToday.length+'<span class="stat-chip-of"> / '+(doneToday.length+todayTasks.length)+'</span></div><div class="kpi-sub" style="margin-top:6px;">completed today</div></div>'+
   '</div>'+
   '<div class="card" style="text-align:center;margin-top:10px;">'+

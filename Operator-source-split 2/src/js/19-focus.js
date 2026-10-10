@@ -750,7 +750,7 @@ function endBreakModeFromFocus(){
   const actualBreakMs = Date.now() - startedAt;
   as.startedAt += actualBreakMs;
   as.onBreak = false;
-  as.breakEndsAt = null;
+  as.breakEndsAt = null; as.breakOverAt = null; as.breakNudgeAt = null;
   const minutes = Math.max(1, Math.round(actualBreakMs/60000));
   state.modes.history.push({id:uid(), type:'break', date:todayStr(new Date(startedAt)), startedAt:startedAt, endedAt:Date.now(), minutes:minutes, note:lastBreak.note||''});
   state.modes.active = null;

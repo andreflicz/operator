@@ -29,11 +29,11 @@ const FAKE_SPEECH = () => {
     await E("ui.currentTaskId='t0'; startFocus(); state.focus.activeSession.method={id:'pomodoro'}; renderView()"); await p.waitForTimeout(900);
     check('minimal: a clean corner clock (time, date, next alarm)', await p.isVisible('.np-clock #npClockT') && await p.isVisible('#npClockD'));
     check('Pomodoro laid out as blocks: 4 rounds and 3 breaks', (await p.$$('.np-tl i')).length===7 && (await p.$$('.np-tl i.np-tl-r')).length===3 && await p.$('.np-tl i.is-cur')!==null);
-    check('the third button is the music; lock out moved to the corner', await p.isVisible('.np-ctl .np-music') && await p.isVisible('.np-top .lv-out[data-action="openStopFocus"]'));
-    check('the player sits under the timer (Operator’s own tracks)', (await p.$$('.np-mrow .md-b')).length>=1);
+    check('the player: ☕ break · ▶ music (the big one) · ■ lock out', await p.isVisible('.np-ctl .np-music.is-main') && await p.isVisible('.np-ctl .np-out[data-action="openStopFocus"]') && await p.$('.np-top .lv-out')===null);
     check('the top-right dock steps aside in the minimal view', !(await p.isVisible('#musicDock')));
     await p.click('.np-ctl .np-music'); await p.waitForTimeout(300);
     check('♫ starts the music', await E("FM.playing") && /First Light|Still Water|Meadow|Clearwater|Far Lands/.test(await p.textContent('.np-mnow')));
+    check('…and what’s playing shows under it, with ⏭', await p.isVisible('.np-mrow .md-skip'));
     await p.click('.np-ctl .np-music'); await p.waitForTimeout(300);
     check('…and stops it', !(await E("FM.playing")));
     await E("openBreakNotePrompt()"); await p.waitForTimeout(300);

@@ -20,6 +20,8 @@ TTS_KEY_FILE="$DATA_DIR/tts.key"
 TTS_DIR="$DATA_DIR/tts-cache"
 # talking to the Operator: an Anthropic API key, same rules (this file only, mode 600)
 AI_KEY_FILE="$DATA_DIR/ai.key"
+# Instagram (Meta Graph API): the access token, same rules (this file only, mode 600)
+IG_KEY_FILE="$DATA_DIR/ig.key"
 
 hexdec() { printf '%b' "$(printf '%s' "$1" | sed 's/../\\x&/g')"; }
 param() { printf '%s' "$REQ_PATH" | sed -n "s/.*[?&]$1=\([0-9a-zA-Z._-]*\).*/\1/p"; }
@@ -315,7 +317,7 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":9}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":10}' ;;
     /tts/say*)
       E=$(param e); V=$(hexdec "$(param v)"); T=$(hexdec "$(param t)")
       if [ -z "$T" ]; then respond 400 '{"ok":false}'
@@ -341,6 +343,27 @@ wake_respond() {
         [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":{"message":"could not reach Anthropic"}}'; }
         respond "$CODE" "$BODY"
       fi ;;
+    /ig/api*)
+      # read-only Graph API calls for your Instagram stats; the token is added here
+      P=$(hexdec "$(param p)")
+      case "$P" in
+        /*) ;;
+        *) respond 400 '{"error":{"message":"bad path"}}'; return ;;
+      esac
+      case "$P" in *..*|*@*|*" "*) respond 400 '{"error":{"message":"bad path"}}'; return ;; esac
+      if [ ! -s "$IG_KEY_FILE" ]; then respond 401 '{"error":{"message":"no token saved"}}'
+      else
+        OUT=$(curl -sS --max-time 20 -G -w '\n%{http_code}' "https://graph.facebook.com/v21.0$P" --data-urlencode "access_token=$(cat "$IG_KEY_FILE")" 2>&1)
+        CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
+        case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":{"message":"could not reach Instagram"}}' ;; esac
+        [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":{"message":"could not reach Instagram"}}'; }
+        respond "$CODE" "$BODY"
+      fi ;;
+    /ig/key*)
+      T=$(hexdec "$(param t)")
+      if [ -n "$T" ]; then ( umask 077; printf '%s' "$T" > "$IG_KEY_FILE" ); chmod 600 "$IG_KEY_FILE" 2>/dev/null; respond 200 '{"ok":true}'; else respond 400 '{"ok":false}'; fi ;;
+    /ig/forget*) rm -f "$IG_KEY_FILE"; respond 200 '{"ok":true}' ;;
+    /ig/status*) if [ -s "$IG_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
     /ai/key*)
       T=$(hexdec "$(param t)")
       if [ -n "$T" ]; then ( umask 077; printf '%s' "$T" > "$AI_KEY_FILE" ); chmod 600 "$AI_KEY_FILE" 2>/dev/null; respond 200 '{"ok":true}'; else respond 400 '{"ok":false}'; fi ;;

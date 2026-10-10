@@ -144,11 +144,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
       business:{packages:[], pipeline:[{id:'l1',company:'Peak Roofing',stage:'proposal',value:2000,createdAt:'2026-09-20',touchpoints:[]}], clients:[]}}, NOW);
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await p.mouse.click(1200, 600, {button:'right'}); await p.waitForTimeout(100);
-    check('right-click on the page opens Operator\'s own menu', await p.isVisible('#appCtxMenu') && /Theme/.test(await p.textContent('#appCtxMenu')));
-    await p.click('#appCtxMenu [data-op="theme"][data-a="light"]'); await p.waitForTimeout(400);
-    check('…its theme switch works', await p.evaluate(() => document.documentElement.getAttribute('data-theme'))==='light' && !(await p.isVisible('#appCtxMenu')));
-    await p.mouse.click(1200, 600, {button:'right'}); await p.click('#appCtxMenu [data-op="scene"][data-a="space"]'); await p.waitForTimeout(250);
-    check('…and its scene switch', await p.evaluate(() => document.body.getAttribute('data-scene'))==='space');
+    check('right-click on the page opens Operator\'s own menu (short: lock in, new task, note — no theme/scene clutter since round 18)', await p.isVisible('#appCtxMenu') && /Lock in/.test(await p.textContent('#appCtxMenu')) && !/Theme|Scene/.test(await p.textContent('#appCtxMenu')));
+    await p.keyboard.press('Escape'); await E("ctxClose()");
     await p.mouse.click(1200, 600, {button:'right'}); await p.click('#appCtxMenu [data-op="add"][data-a="task"]'); await p.waitForTimeout(150);
     check('…quick add opens the new-task pop-up', await p.isVisible('#addTaskOverlay:not(.hidden)'));
     await p.keyboard.press('Escape');

@@ -23,27 +23,19 @@ function ci(op, label, opts){
 function chip(op, label, opts){ opts = opts || {}; opts.cls = 'ctx-chip'+(opts.cls?' '+opts.cls:''); return ci(op, label, opts); }
 function crow(k, inner){ return '<div class="ctx-row">'+(k?'<span class="ctx-k">'+k+'</span>':'')+'<div class="ctx-chips">'+inner+'</div></div>'; }
 const SEP = '<div class="ctx-sep"></div>';
-// ---- the app menu ----
+// ---- the app menu: short, and about where you are (looks and pages live in Settings / the sidebar) ----
 function appMenuHtml(){
-  const s = state.focus.activeSession, theme = state.profile.theme || 'dark', scene = sceneId(), lay = cardLayout();
+  const s = state.focus.activeSession, v = ui.view;
+  const add = v==='business' ? ci('add', '&#65291; New lead', {a:'lead'})+ci('add', '&#65291; New client', {a:'client'})
+    : v==='calendar' ? ci('add', '&#65291; New event', {a:'event'})
+    : ci('add', '&#65291; New task', {a:'task'})+ci('add', '&#9998; Quick note', {a:'journal'});
   return '<div class="ctx-title">Operator</div>'+
-    crow('Add', chip('add', 'Task', {a:'task'})+chip('add', 'Lead', {a:'lead'})+chip('add', 'Client', {a:'client'})+chip('add', 'Note', {a:'journal'})+chip('add', 'Event', {a:'event'}))+
-    SEP+
-    (s ? ci('stop', '&#9632; Stop &amp; log session')+(s.onBreak ? '' : ci('break', '&#9749; Take a break')) : ci('lockin', '&#128274; Lock in <span class="ctx-kbd">L</span>'))+
-    ci('recap', '&#128202; Day recap')+
+    (s ? (s.onBreak ? ci('backin', '&#128274; Lock back in') : ci('break', '&#9749; Take a break'))+ci('stop', '&#9632; Lock out')
+       : ci('lockin', '&#128274; Lock in <span class="ctx-kbd">L</span>'))+
+    SEP+add+
+    ((v==='today' || v==='focus') ? SEP+ci('minimal', '&#9673; Minimal view <span class="ctx-kbd">M</span>') : '')+
     (selectableView() && selVisibleCards().length ? ci('selAll', '&#9745; Select all tasks <span class="ctx-kbd">&#8984;A</span>') : '')+
-    ci('wake', '&#9200; Wake-up alarm')+ci('wind', '&#127769; Wind down — plan tomorrow')+
-    (ui.view==='today' ? ci('editPage', s ? (ui.lockedEdit ? '&#10003; Done editing' : '&#9998; Edit this page') : (ui.todayEdit ? '&#10003; Done editing' : '&#9998; Edit this page')) : '')+
-    SEP+
-    crow('Go to', ['today','focus','business','calendar','personal'].map(function(v){ return chip('go', v[0].toUpperCase()+v.slice(1), {a:v, on:ui.view===v}); }).join(''))+
-    SEP+
-    crow('Theme', [['dark','Dark'],['light','Light'],['auto','Auto']].map(function(t){ return chip('theme', t[1], {a:t[0], on:theme===t[0]}); }).join(''))+
-    crow('Sky', SKY_LOOKS.map(function(x){ return chip('sky', x[0]==='auto' ? 'Auto' : x[1].replace(/&#\d+;\s*/,''), {a:x[0], on:(state.profile.skyLook||'auto')===x[0]}); }).join(''))+
-    crow('Scene', SCENES.map(function(sc){ return chip('scene', sc.label, {a:sc.id, on:scene===sc.id}); }).join('')+videoWalls().map(function(v){ return chip('scene', '&#9654; '+escapeHtml(v.name), {a:'vid:'+v.id, on:scene==='vid:'+v.id}); }).join(''))+
-    crow('Cards', chip('layout', 'Grid', {a:'grid', on:lay==='grid'})+chip('layout', 'Carousel', {a:'carousel', on:lay==='carousel'}))+
-    SEP+
-    ci('sidebar', state.profile.sidebarCollapsed ? '&#9776; Show the menu' : '&#9776; Hide the menu')+
-    ci('go', '&#9881; Settings', {a:'settings'});
+    (!s && v==='today' ? ci('recap', '&#128202; Day recap') : '');
 }
 // ---- journal entries ----
 function journalMenuHtml(e){
@@ -126,6 +118,8 @@ ACTIONS.ctx = function(el){
     else if(a==='journal'){ ui.view = 'personal'; ui.personalTab = 'journal'; ui.journalMode = 'entries'; renderView(); setTimeout(function(){ const ta = document.getElementById('journalPageText'); if(ta) ta.focus(); }, 30); }
   }
   else if(op==='lockin') openLockInChooser();
+  else if(op==='minimal'){ if(state.focus.activeSession) ACTIONS.toggleLockedView(); else ACTIONS.toggleFocusMinimal(); }
+  else if(op==='backin') endBreakModeFromFocus();
   else if(op==='stop') openStopFocus();
   else if(op==='break') openBreakNotePrompt();
   else if(op==='recap') ACTIONS.openDayRecap();

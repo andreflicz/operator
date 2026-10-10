@@ -19,7 +19,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // ---- Today: lock-in column flush right, quick-access dock out of the hero ----
   const hero = await rect('.today-hero'), right = await rect('.th-right'), dock = await rect('.quick-access-toggle');
   check('lock-in column sits flush with the hero\'s right padding', hero && right && hero.r-right.r <= 30, {hero, right});
-  check('quick-access ☰ moved to the bottom-right stack, clear of the hero', dock && dock.t > hero.b, {dock, hero});
+  check('the quick-links ☰ is gone (round 18)', dock===null, dock);
 
   // ---- page taglines are tips now ----
   for(const v of ['focus','business','calendar','personal']){

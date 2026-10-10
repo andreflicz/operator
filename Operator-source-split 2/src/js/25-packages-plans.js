@@ -1,10 +1,9 @@
 // ============ PACKAGES / PLANS ============
+// your offers, like a pricing page: one card each (the + in the corner adds one)
 function renderPackagesTab(){
   const packages = arr(state.business.packages);
-  return '<div class="card section" style="text-align:center;">'+
-    '<button class="btn btn-good" style="font-size:16px;font-weight:700;padding:14px 36px;box-shadow:0 4px 22px rgba(63,190,142,.4);" data-action="openNewPackageModal">+ Add Package</button>'+
-  '</div>'+
-  '<div class="task-list">'+(packages.map(packageRow).join('') || '<div class="empty">No packages yet — add the plans you offer clients.</div>')+'</div>';
+  if(!packages.length) return '<div class="pk-empty"><div class="pk-empty-i">&#128230;</div><b>Your offers live here.</b><span>Press + (bottom right) to add your first package — what it costs and what the client gets each week.</span></div>';
+  return '<div class="pk-grid">'+packages.map(packageRow).join('')+'</div>';
 }
 function openNewPackageModal(){
   const o = document.getElementById('newPackageOverlay');
@@ -26,16 +25,14 @@ function renderNewPackageModal(){
 function renderNewPackageModalInto(){ const el=document.getElementById('newPackageContent'); if(el) morphInto(el, renderNewPackageModal(), {form:true}); }
 function packageRow(pk){
   const deliverables = arr(pk.deliverables);
-  return '<div class="card" style="margin-bottom:10px;">'+
-    '<div class="row" style="justify-content:space-between;align-items:flex-start;">'+
-      '<div>'+
-        '<div class="task-title">'+escapeHtml(pk.name)+(pk.price ? '<span class="kpi-sub" style="margin-left:8px;">$'+Number(pk.price).toLocaleString()+'</span>' : '')+'</div>'+
-        (pk.description ? '<div class="kpi-sub" style="margin-top:4px;">'+escapeHtml(pk.description)+'</div>' : '')+
-        '<div class="row" style="margin-top:6px;gap:6px;flex-wrap:wrap;">'+(deliverables.length ? deliverables.map(function(d){return '<span class="tag" style="background:var(--good-dim);color:var(--good);">'+escapeHtml(d.title)+' &middot; '+(d.weeklyTarget||1)+'&times;/wk</span>';}).join('') : '<span class="kpi-sub">No deliverables defined yet</span>')+'</div>'+
-      '</div>'+
-      '<button class="btn btn-ghost btn-sm" data-action="openPackageEditModal" data-id="'+pk.id+'">Edit</button>'+
-    '</div>'+
-  '</div>';
+  const onIt = arr(state.business.clients).filter(function(c){ return (c.packageId===pk.id || c.package===pk.id) && clientStageActive(c.stage); }).length;
+  return '<button class="pk-card" data-action="openPackageEditModal" data-id="'+pk.id+'">'+
+    '<div class="pk-name">'+escapeHtml(pk.name)+'</div>'+
+    '<div class="pk-price">'+(pk.price ? '$'+Number(pk.price).toLocaleString()+'<small>/mo</small>' : '<small>No price set</small>')+'</div>'+
+    (pk.description ? '<div class="pk-desc">'+escapeHtml(pk.description)+'</div>' : '')+
+    '<div class="pk-list">'+(deliverables.length ? deliverables.map(function(d){ return '<div><i>&#10003;</i>'+escapeHtml(d.title)+'<span>'+(d.weeklyTarget||1)+'&times;/wk</span></div>'; }).join('') : '<div class="pk-none">No deliverables yet</div>')+'</div>'+
+    '<div class="pk-foot">'+(onIt ? onIt+' client'+(onIt===1?'':'s')+' on it' : 'No clients on it yet')+'<span>Edit &#8594;</span></div>'+
+  '</button>';
 }
 function addPackage(){
   const el = document.getElementById('newPackageName');

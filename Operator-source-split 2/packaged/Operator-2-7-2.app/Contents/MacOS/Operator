@@ -113,11 +113,22 @@ start_helper() { # kind, port → echoes the pid
 # window up (Chrome hands it to the running one) — it doesn't touch the helpers.
 LOCK_FILE="$DATA_DIR/launcher.pid"
 LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null)
+# which Operator is running the helpers (its folder and its helper version): a different copy or an
+# older version hands over to this one — otherwise new features (like saving a voice key) would keep
+# talking to the old helpers and look broken
+MY_VER=$(grep -o '"helper":[0-9]*' "$DIR/Resources/helper.sh" 2>/dev/null | head -1)
+RUN_INFO=$(cat "$DATA_DIR/launcher.info" 2>/dev/null)
 if [ -n "$LOCK_PID" ] && kill -0 "$LOCK_PID" 2>/dev/null && ps -o args= -p "$LOCK_PID" 2>/dev/null | grep -q "MacOS/Operator"; then
-  "$CHROME" --app="file://$HTML_FILE" --user-data-dir="$PROFILE_DIR" >/dev/null 2>&1 &
-  exit 0
+  if [ "$RUN_INFO" = "$DIR|$MY_VER" ]; then
+    "$CHROME" --app="file://$HTML_FILE" --user-data-dir="$PROFILE_DIR" >/dev/null 2>&1 &
+    exit 0
+  fi
+  # take over: stop the old launcher (it clears its own helpers on the way out), then carry on
+  kill "$LOCK_PID" 2>/dev/null
+  n=0; while kill -0 "$LOCK_PID" 2>/dev/null && [ $n -lt 20 ]; do sleep 0.2; n=$((n+1)); done
 fi
 echo $$ > "$LOCK_FILE"
+printf '%s' "$DIR|$MY_VER" > "$DATA_DIR/launcher.info"
 
 # Anything still listening on our ports from an earlier run (an Operator that didn't close
 # cleanly) would block the new helpers — that's what made "Can't reach Operator's GoHighLevel
@@ -184,7 +195,7 @@ cleanup() {
   for port in "$ACTIVITY_PORT" "$WAKE_PORT" "$GHL_PORT"; do free_port "$port"; done
   rm -f "$DATA_DIR/ghl.fifo" "$DATA_DIR/wake.fifo" "$DATA_DIR/activity.fifo" 2>/dev/null
   [ -n "$CAFF_PID" ] && kill "$CAFF_PID" 2>/dev/null
-  rm -f "$LOCK_FILE" 2>/dev/null
+  rm -f "$LOCK_FILE" "$DATA_DIR/launcher.info" 2>/dev/null
 }
 trap cleanup EXIT
 

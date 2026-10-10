@@ -221,12 +221,14 @@ const newsRoute = (asked, extra) => async r => {
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("fireWake({})"); await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(500);
     await E("briefRevealAll()"); await p.waitForTimeout(800);
-    check('a mic and a box to type in, with the Operator', await p.isVisible('.brief4 .op-talk') && await p.isVisible('.brief4 .op-type'));
-    await p.fill('.brief4 .op-type', 'What should I start with?'); await p.press('.brief4 .op-type', 'Enter'); await p.waitForTimeout(1200);
-    check('it answers (here in captions — the voice is off)', /Start with the reel/.test(await p.textContent('#brVoice')));
+    check('a mic with the Operator (no type-in box on the page)', await p.isVisible('.brief4 .op-talk') && await p.$('.brief4 .op-type')===null);
+    await E("aiTypeFocus()"); await p.waitForTimeout(300);
+    check('…its bubble floats over the page (bottom centre), with a reply box', await p.isVisible('#opBub.is-in #opBubInput'));
+    await p.fill('#opBubInput', 'What should I start with?'); await p.press('#opBubInput', 'Enter'); await p.waitForTimeout(1200);
+    check('it answers in the bubble — the page doesn’t move', /Start with the reel/.test(await p.textContent('#opBubText')));
     check('the newest Sonnet is used (picked from the API, not hard-coded)', chatBody && chatBody.model==='model-sonnet-x', chatBody && chatBody.model);
     check('it knows your day (plan, level) and speaks in short spoken sentences', chatBody && /Edit JJS reel/.test(chatBody.system) && /level 0/.test(chatBody.system) && /spoken out loud/.test(chatBody.system) && chatBody.messages.slice(-1)[0].content==='What should I start with?');
-    await p.fill('.brief4 .op-type', 'And after that?'); await p.press('.brief4 .op-type', 'Enter'); await p.waitForTimeout(900);
+    await p.fill('#opBubInput', 'And after that?'); await p.press('#opBubInput', 'Enter'); await p.waitForTimeout(900);
     check('…and remembers the conversation', chatBody && chatBody.messages.length===3 && chatBody.messages[1].role==='assistant');
     // the keys
     await E("endBriefing(); ui.view='settings'; ui.settingsTab='focus'; renderView(); openWakeSetup && openWakeSetup()"); await p.waitForTimeout(300);
@@ -256,7 +258,7 @@ const newsRoute = (asked, extra) => async r => {
     const x = JSON.parse(await E("JSON.stringify((function(){ const s = xpSummaryFresh(); return {total:s.total, level:s.level, rank:s.rank, mrrXp:s.mrrXp, start:s.start, ovr:s.ovr, items:s.today.map(i=>i.k), hlt:s.attrs.HLT.v, todaySum:s.todayXp}; })())"));
     check('everyone starts at 0 — history before the first day doesn’t count, only what you do from here', x.start==='2026-10-12' && x.total===x.todaySum && x.rank===0, x);
     check('rank 0 is "Locked In"', await E("RANKS[0].name")==='Locked In');
-    check('levels get slow: level 10 takes 10,000 XP, level 30 takes 90,000', await E("xpForLevel(10)")===10000 && await E("xpForLevel(30)")===90000);
+    check('levels are slow: level 1 is 1,000 XP (a good week), level 10 is 16,750', await E("xpForLevel(1)")===1000 && await E("xpForLevel(10)")===16750 && await E("xpLevelOf(999)")===0 && await E("xpLevelOf(1000)")===1);
     check('training counts big (first workouts +150)', x.items.includes('workout'), x);
     await E("state.business.clients[0].mrr = 5000; xpLast = null");
     check('MRR you add is XP (800 per $1k above where you started)', JSON.parse(await E("xpSummaryFresh().mrrXp"))===1600);
@@ -275,7 +277,7 @@ const newsRoute = (asked, extra) => async r => {
     check('click: it turns over — overall and the four ratings on the back', await p.$('.today-hero .pcf.is-flipped')!==null && (await p.$$('.today-hero .pcf-back .pc-attrs > span')).length===4 && /OVR/.test(await p.textContent('.today-hero .pcf-back')));
     await p.click('.today-hero .pcf-open'); await p.waitForTimeout(400);
     check('"Your card →" opens Personal → You (the full 2K card)', await E("ui.view==='personal' && ui.personalTab==='you'") && await p.isVisible('.you .pc-big') && (await p.$$('.you-attr')).length===4 && (await p.$$('.you .xp-step')).length===9);
-    check('You shows your body against your height', /healthy up to 174 lb/.test(await p.textContent('.you-body')) && /obese from 209 lb/.test(await p.textContent('.you-body')));
+    check('You shows your body on a scale for your height (174 healthy line, 209 obese line, you at 205)', /174/.test(await p.textContent('.you-body .bmi-lab')) && /209/.test(await p.textContent('.you-body .bmi-lab')) && /205/.test(await p.textContent('.you-body .bmi-you')));
     check('…and stays simple (no daily quest, no wall of XP lines)', await p.$('.you .sys-quest, .you .you-today')===null);
     // SYSTEM windows
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(300);

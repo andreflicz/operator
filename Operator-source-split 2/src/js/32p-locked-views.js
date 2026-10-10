@@ -14,7 +14,11 @@ function npLeave(then){
   const n = document.querySelector('#viewRoot .np');
   if(!n){ then(); return; }
   n.classList.add('is-leaving');
-  setTimeout(then, 340);
+  setTimeout(function(){
+    then();
+    const vr = document.getElementById('viewRoot');
+    if(vr){ vr.classList.remove('vr-in'); void vr.offsetWidth; vr.classList.add('vr-in'); setTimeout(function(){ vr.classList.remove('vr-in'); }, 420); }
+  }, 220);
 }
 ACTIONS.toggleLockedView = function(){
   const leaving = lockedMinimal();
@@ -25,7 +29,7 @@ document.addEventListener('keydown', function(e){
   if(e.key!=='m' && e.key!=='M') return;
   if(e.metaKey || e.ctrlKey || e.altKey || (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) || (e.target && e.target.isContentEditable)) return;
   if(document.querySelector('.overlay:not(.hidden)')) return;
-  if(!state.focus.activeSession && ui.view==='focus'){ e.preventDefault(); ACTIONS.toggleFocusMinimal(); return; }
+  if(!state.focus.activeSession && (ui.view==='focus' || ui.view==='today')){ e.preventDefault(); ACTIONS.toggleFocusMinimal(); return; }
   if(!state.focus.activeSession || (ui.view!=='today' && ui.view!=='focus')) return;
   e.preventDefault(); ACTIONS.toggleLockedView();
 });
@@ -58,7 +62,6 @@ function renderFocusMinimal(){
         '<div class="hm-s"><b>'+fmtHours(deep)+'</b><small>of '+fmtHours(target)+' today</small><i><u style="width:'+Math.min(100, deep/target*100).toFixed(1)+'%"></u></i></div>'+
       '</div>'+
       '<button class="hm-go" data-action="openLockInChooser" title="Lock in (L)"><span class="hm-go-ring"></span><span>&#128274;</span><b>LOCK IN</b></button>'+
-      (typeof aiTalkHtml==='function' ? '<div class="hm-talk">'+aiTalkHtml()+'<div class="hm-cap" id="hmCap"></div></div>' : '')+
       '<div class="hm-btns">'+
         '<button class="hm-b" data-action="openQuickJournalModal">&#128221; Journal</button>'+
         '<button class="hm-b" data-action="clockOut">&#127937; Clock out</button>'+
@@ -129,13 +132,13 @@ function renderLockedMinimal(){
     const total = b.minutes ? b.minutes*60000 : null;
     body = '<div class="np-art is-break"><span>&#9749;</span></div>'+
       '<div class="np-meta">'+
-        '<div class="np-k">On a break</div>'+
-        '<div class="np-title">'+(b.note ? escapeHtml(b.note) : 'Breathe. Stretch. Look away.')+'</div>'+
-        '<div class="np-sub">'+(left!=null ? 'Back at '+fmtTimeShort(as.breakEndsAt) : 'No timer — end it when you\'re ready')+'</div>'+
+        '<div class="np-k">'+(as.breakOverAt ? 'Break’s over' : 'On a break')+'</div>'+
+        '<div class="np-title">'+(as.breakOverAt ? 'Lock back in when you’re back.' : b.note ? escapeHtml(b.note) : 'Breathe. Stretch. Look away.')+'</div>'+
+        '<div class="np-sub">'+(as.breakOverAt ? 'It waits for you — break time isn’t work time.' : left!=null ? 'Back at '+fmtTimeShort(as.breakEndsAt) : 'No timer — end it when you\'re ready')+'</div>'+
         '<div class="np-prog">'+tl+'<div class="np-bar"><i id="npBreakBar" style="width:'+(total && left!=null ? ((1 - left/total)*100).toFixed(1) : 0)+'%"></i></div>'+
           '<div class="np-times"><span id="modeElapsed">'+formatElapsed(Date.now()-(as.breakStartedAt||Date.now()))+'</span><span id="breakRemaining">'+(left!=null ? formatElapsed(left)+' left' : '')+'</span></div></div>'+
         '<div class="np-ctl">'+(as.breakEndsAt ? '<button class="np-c" data-action="extendBreak" data-minutes="5" title="5 more minutes">+5</button>' : '<span class="np-c-sp"></span>')+
-          '<button class="np-c is-main" data-action="endBreakModeFromFocus" title="End the break">&#9654;</button>'+npMusicBtnHtml()+'</div>'+
+          '<button class="np-c is-main is-back" data-action="endBreakModeFromFocus" title="Lock back in">&#128274;</button>'+npMusicBtnHtml()+'</div>'+
         npMusicRowHtml()+
       '</div>';
   } else {
@@ -144,29 +147,32 @@ function renderLockedMinimal(){
       '<div class="np-meta">'+
         '<div class="np-k">'+(m && as.method.id!=='block' ? m.label : 'Locked in')+'</div>'+
         '<div class="np-title">'+(cur ? escapeHtml(cur.title) : 'Deep work')+'</div>'+
-        '<div class="np-sub">'+(st ? '<span id="msLine">'+methodLine(st)+'</span>' : (as.plannedMinutes ? fmtDurationLabel(as.plannedMinutes)+' session' : fmtDurationLabel(deepWorkMinutesTodayLive())+' of deep work today'))+'</div>'+
+        '<div class="np-sub">'+(st ? '<span id="msLine">'+methodLine(st)+'</span>'+(st.id==='flow' && typeof flowTipHtml==='function' ? flowTipHtml() : '') : (as.plannedMinutes ? fmtDurationLabel(as.plannedMinutes)+' session' : fmtDurationLabel(deepWorkMinutesTodayLive())+' of deep work today'))+'</div>'+
         '<div class="np-prog">'+(tl || '<div class="np-bar"><i id="focusProgressBar" style="width:'+pct.toFixed(1)+'%"></i></div>')+
           '<div class="np-times"><span id="focusElapsed">'+formatElapsed(elapsed)+'</span><span>'+(as.plannedMinutes ? 'until '+fmtTimeShort(as.startedAt + as.plannedMinutes*60000) : '')+'</span></div></div>'+
+        // the player: a break on the left, the music in the middle, lock out on the right
         '<div class="np-ctl">'+
           '<button class="np-c" data-action="openBreakNotePrompt" title="Take a break">&#9749;</button>'+
-          (cur ? '<button class="np-c is-main" data-action="finishCurrentTask" title="Done with this task">&#10003;</button>' : '<button class="np-c is-main" data-action="openStopFocus" title="Lock out">&#9632;</button>')+
-          npMusicBtnHtml()+
+          npMusicBtnHtml(true)+
+          '<button class="np-c np-out" data-action="openStopFocus" title="Lock out">&#9632;</button>'+
         '</div>'+
         npMusicRowHtml()+
-        (nx && (!cur || nx.id!==cur.id) ? '<div class="np-next">Up next &middot; '+escapeHtml(nx.title)+'</div>' : '')+
+        // the task you're on (✓ when it's done) and the one after it — small, part of the player
+        ((cur || (nx && (!cur || nx.id!==cur.id))) ? '<div class="np-task">'+
+          (cur ? '<button class="np-task-done" data-action="finishCurrentTask" title="Done with this task">&#10003; Done</button>' : '')+
+          (nx && (!cur || nx.id!==cur.id) ? '<span class="np-next">Next &middot; '+escapeHtml(nx.title)+'</span>' : '')+'</div>' : '')+
       '</div>';
   }
   return '<div class="np np-locked'+(onBreak?' is-break':'')+'">'+
     '<div class="np-bg"></div>'+
-    '<div class="np-top">'+npClockHtml()+'<span style="flex:1"></span>'+
-      '<button class="lv-btn lv-out" data-action="openStopFocus" title="Lock out">&#128275; Lock out</button>'+lockedViewBtnHtml()+'</div>'+
+    '<div class="np-top">'+npClockHtml()+'<span style="flex:1"></span>'+lockedViewBtnHtml()+'</div>'+
     '<div class="np-main">'+body+'</div>'+
   '</div>';
 }
 // full-screen feel: the sidebar and floating buttons step aside in the minimal view
 afterRenderHooks.push(function(){
   const on = !!(state.focus && state.focus.activeSession && (ui.view==='today' || ui.view==='focus') && lockedMinimal()) || !!(ui.view==='today' && document.querySelector('#viewRoot .rest-full'))
-    || !!(ui.view==='focus' && !(state.focus && state.focus.activeSession) && focusMinimalOn());
+    || !!((ui.view==='focus' || ui.view==='today') && !(state.focus && state.focus.activeSession) && focusMinimalOn() && document.querySelector('#viewRoot .np-home'));
   document.body.classList.toggle('np-on', on);
   const brk = !!(state.focus && state.focus.activeSession && state.focus.activeSession.onBreak);
   document.body.classList.toggle('is-on-break', brk);
@@ -312,7 +318,8 @@ function focusMusicStop(){
 }
 function fmRefresh(){ document.querySelectorAll('.fm').forEach(function(el){ el.outerHTML = focusPlayerHtml(el.classList.contains('is-np')); }); }
 ACTIONS.fmToggle = function(){ if(FM.playing) focusMusicStop(); else focusMusicPlay(); };
-ACTIONS.fmNext = function(){ const was = FM.playing; FM.idx = (FM.idx + 1) % FOCUS_TRACKS.length; FM.bar = 0; if(was){ focusMusicStop(); setTimeout(function(){ focusMusicPlay(); }, 900); } else fmRefresh(); };
+// (while it switches tracks it still counts as playing, so the player doesn't blink shut)
+ACTIONS.fmNext = function(){ const was = FM.playing; FM.idx = (FM.idx + 1) % FOCUS_TRACKS.length; FM.bar = 0; if(was){ FM.switching = true; focusMusicStop(); setTimeout(function(){ FM.switching = false; focusMusicPlay(); }, 900); } else fmRefresh(); };
 function focusPlayerHtml(np){
   const tr = FOCUS_TRACKS[FM.idx];
   return '<span class="fm'+(np?' is-np':'')+(FM.playing?' is-on':'')+'">'+

@@ -316,6 +316,8 @@ function wakeImUp(){
   if(typeof opBriefReset==='function') opBriefReset();
   ui.briefT0 = Date.now(); ui.briefShift = 0; ui.briefSkipped = false; ui.briefNewsAt = null; ui.briefLineSeen = 0; ui.dawnTs = null;
   loadMorningNews();
+  // scores that didn't come through last time are asked for again (the sports panel never just vanishes)
+  if(typeof loadScores==='function' && !(ui.scores && ui.scores.got && (ui.scores.nfl || ui.scores.nba))) loadScores(true);
   playWakeChime();
   renderWakeOverlayInto();
   briefVoiceRun();
@@ -565,21 +567,26 @@ function wakeChipHtml(){
   return '<button class="wake-chip'+(nw?'':' is-unset')+'" data-action="openWakeSetup" title="Wake-up alarm">&#9200; '+
     (nw ? fmt12Hour(nw.time)+' '+morningLabel(nw.date) : 'Set wake-up alarm')+'</button>';
 }
-// ---- break timer: breaks end on their own ----
+// ---- break timer: when the time's up it tells you — and waits. You lock back in yourself, so a
+// break that ran long (you stepped away) never turns into "work" you didn't do ----
 function checkBreakTimer(){
   const as = state.focus && state.focus.activeSession;
   if(!as || !as.onBreak || !as.breakEndsAt) return;
   const left = as.breakEndsAt-Date.now();
   const el = document.getElementById('breakRemaining');
-  if(el) el.textContent = left>0 ? formatElapsed(left)+' left' : 'Break over';
-  if(left<=0){
-    as.breakEndsAt = null;
-    endBreakModeFromFocus();
-    playSessionComplete();
-    pingWrapper();
-    const mm = as.method && typeof LOCK_METHODS!=='undefined' ? LOCK_METHODS[as.method.id] : null;
-    showToast(mm && mm.work ? 'Round '+(as.round||2)+(mm.rounds ? ' of '+mm.rounds : '')+'. Back to it.' : 'Break\'s over. Back to it.', {icon:'&#9201;', duration:6000});
-    try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Break is over'); }catch(e){}
+  if(el) el.textContent = left>0 ? formatElapsed(left)+' left' : 'Over '+formatElapsed(-left)+' ago';
+  if(left > 0) return;
+  const mm = as.method && typeof LOCK_METHODS!=='undefined' ? LOCK_METHODS[as.method.id] : null;
+  if(!as.breakOverAt){
+    as.breakOverAt = Date.now(); persist('focus');
+    playSessionComplete(); pingWrapper();
+    showToast(mm && mm.work ? 'Break’s over — lock back in for round '+(as.round||2)+(mm.rounds ? ' of '+mm.rounds : '')+'.' : 'Break’s over — lock back in when you’re back.', {icon:'&#9201;', actionLabel:'Lock back in', actionAction:'endBreakModeFromFocus', duration:20000});
+    try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Break’s over — lock back in'); }catch(e){}
+    renderView();
+  } else if(Date.now() - (as.breakNudgeAt || as.breakOverAt) > 5*60000){
+    as.breakNudgeAt = Date.now();
+    playTick();
+    showToast('Still on break — '+Math.round(-left/60000)+' min over.', {icon:'&#9749;', actionLabel:'Lock back in', actionAction:'endBreakModeFromFocus', duration:10000});
   }
 }
 ACTIONS.extendBreak = function(el){

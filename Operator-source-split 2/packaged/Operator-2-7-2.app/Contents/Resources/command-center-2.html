@@ -3638,6 +3638,281 @@
   /* the SYSTEM window never blocks the app: only the card takes clicks (the dim behind is just a look) */
   .sys-win, .sys-win.is-in{ pointer-events:none; } .sys-win .sys-card{ pointer-events:auto; }
   .sys-win.is-in:not(.is-level){ background:rgba(4,8,18,.25); }
+
+  /* ---- round 18: the Operator's bubble — floats bottom centre, never moves the page ---- */
+  .op-bub{ position:fixed; left:50%; bottom:26px; z-index:9600; width:min(620px, calc(100vw - 32px)); transform:translate(-50%, 14px); opacity:0; pointer-events:none;
+    padding:12px 14px 12px 16px; border-radius:20px; color:#eaf6ff; background:rgba(12,16,28,.86); border:1px solid rgba(120,200,255,.32);
+    box-shadow:0 18px 50px rgba(0,0,0,.45), 0 0 0 1px rgba(0,0,0,.2), 0 0 30px rgba(80,170,255,.12); -webkit-backdrop-filter:blur(16px) saturate(1.2); backdrop-filter:blur(16px) saturate(1.2);
+    transition:opacity .25s ease, transform .35s cubic-bezier(.2,.9,.3,1.1); }
+  .op-bub.is-in{ opacity:1; transform:translate(-50%, 0); pointer-events:auto; }
+  .op-bub-h{ display:flex; align-items:center; gap:8px; font-size:10.5px; letter-spacing:.24em; color:#7fd0ff; }
+  .op-bub-h b{ font-weight:800; } .op-bub-dot{ width:7px; height:7px; border-radius:50%; background:#7fd0ff; box-shadow:0 0 10px #7fd0ff; }
+  body.op-speaking .op-bub-dot{ animation:opDot 1s ease-in-out infinite; } @keyframes opDot{ 50%{ transform:scale(1.5); opacity:.6; } }
+  .op-bub-x{ margin-left:auto; width:24px; height:24px; border-radius:50%; border:none; background:transparent; color:rgba(255,255,255,.5); cursor:pointer; } .op-bub-x:hover{ color:#fff; background:rgba(255,255,255,.08); }
+  .op-bub-t{ margin:6px 0 10px; max-height:30vh; overflow:auto; font-size:15.5px; line-height:1.55; font-weight:500; color:#fff; }
+  .op-bub-t:empty{ display:none; }
+  .op-bub-in{ display:flex; gap:8px; align-items:center; } .op-bub-in .op-type{ flex:1; width:auto; } .op-bub-in .op-type:focus{ width:auto; }
+  /* the mic in the dock */
+  .md-op{ font-size:12px; }
+  .wi-pl{ display:inline-flex; align-items:center; gap:8px; }
+  /* the business message on the work page */
+  .wi-msg{ padding:14px 16px; border-radius:18px; background:linear-gradient(160deg, rgba(232,162,61,.12), rgba(255,255,255,.03)); border:1px solid rgba(232,162,61,.3); }
+  .wi-msg.is-empty{ background:rgba(255,255,255,.03); border-color:rgba(255,255,255,.08); }
+  .wi-msg-h{ display:flex; align-items:center; justify-content:space-between; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#ffc56b; }
+  .wi-msg.is-empty .wi-msg-h{ color:rgba(255,255,255,.5); }
+  .wi-msg-e{ width:26px; height:26px; border-radius:50%; border:none; background:rgba(255,255,255,.06); color:rgba(255,255,255,.7); cursor:pointer; } .wi-msg-e:hover{ background:rgba(255,255,255,.14); color:#fff; }
+  .wi-msg p{ margin:8px 0 0; font-size:16px; line-height:1.5; color:#fff; font-weight:500; } .wi-msg p.wi-msg-none{ font-size:13.5px; color:rgba(255,255,255,.55); font-weight:400; }
+  /* the note for tomorrow: three clean fields */
+  .tn{ width:min(520px, 92vw); padding:22px 24px 20px !important; border-radius:22px !important; }
+  .tn-h{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px; }
+  .tn-k{ font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#ffc56b; } .tn-t{ font-family:var(--font-display); font-size:22px; font-weight:700; margin-top:2px; }
+  .tn-x{ width:30px; height:30px; border-radius:50%; border:none; background:transparent; color:var(--text-dim); cursor:pointer; font-size:14px; } .tn-x:hover{ background:var(--panel-2); color:var(--text); }
+  .tn-f{ display:block; padding:12px 0; border-top:1px solid var(--border); }
+  .tn-l{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:7px; } .tn-l b{ font-size:13.5px; font-weight:700; } .tn-l span{ font-size:11.5px; color:var(--text-faint); text-align:right; }
+  .tn-in{ width:100%; box-sizing:border-box; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:var(--panel-2); color:var(--text); font:inherit; font-size:14.5px; line-height:1.45; resize:none; outline:none; transition:border-color .2s, box-shadow .2s; }
+  .tn-in:focus{ border-color:rgba(232,162,61,.6); box-shadow:0 0 0 3px rgba(232,162,61,.12); }
+  #tnHead.tn-in{ font-size:16px; font-weight:600; }
+  .tn-a{ display:flex; justify-content:flex-end; padding-top:12px; border-top:1px solid var(--border); }
+  .tn-save{ padding:10px 22px; border-radius:999px; border:none; background:linear-gradient(160deg, #ffc56b, #e8a23d); color:#2a1700; font:inherit; font-weight:800; cursor:pointer; } .tn-save:hover{ filter:brightness(1.06); }
+
+  /* ---- the month and the week ---- */
+  .br-intent .bi-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:13px; }
+  .bi-streak{ color:rgba(255,255,255,.85); } .bi-streak b{ font-family:var(--font-display); font-size:20px; color:#fff; }
+  .bi-lvl{ font-size:11px; font-weight:800; letter-spacing:.12em; cursor:pointer; }
+  .br-intent .br-sys-bar{ margin:8px 0 14px; }
+  .br-intent .bi-k{ margin-bottom:6px; }
+  .bi-main small{ display:block; font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#ffc56b; }
+  .bi-main p{ margin:6px 0 0; font-family:'Iowan Old Style', 'New York', Georgia, serif; font-size:clamp(20px, 2.4vh, 26px); line-height:1.35; color:#fff; }
+  .bi-rest{ margin-top:14px; display:flex; flex-direction:column; gap:6px; }
+  .bi-rest div{ font-size:13.5px; color:rgba(255,255,255,.82); line-height:1.4; } .bi-rest span{ display:inline-block; min-width:52px; font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.45); }
+  .bi-empty p{ margin:4px 0 12px; color:rgba(255,255,255,.7); font-size:14px; }
+  .bi-set{ padding:8px 16px; border-radius:999px; border:1px solid rgba(255,197,107,.5); background:rgba(255,197,107,.12); color:#ffc56b; font:inherit; font-weight:700; font-size:13px; cursor:pointer; }
+  .br-sports-none{ margin-top:10px; font-size:13.5px; line-height:1.5; color:rgba(255,255,255,.6); }
+  /* one music button on Good morning: the song's name only on hover */
+  .b4-song{ max-width:34px; overflow:hidden; padding:0 10px !important; gap:10px; transition:max-width .35s cubic-bezier(.2,.9,.3,1.1); white-space:nowrap; }
+  .b4-song:hover{ max-width:280px; }
+  /* the prompt (Calendar, once a month / once a week) */
+  .int-ov{ z-index:9400; background:rgba(4,6,12,.0); transition:background .5s; display:flex; align-items:center; justify-content:center; }
+  .int-ov.is-in{ background:rgba(4,6,12,.82); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
+  .int{ position:relative; width:min(560px, 92vw); padding:34px 34px 26px; border-radius:26px; color:#fff; background:radial-gradient(120% 90% at 50% 0%, rgba(232,162,61,.16), transparent 60%), #10131b; border:1px solid rgba(255,255,255,.1); box-shadow:0 30px 80px rgba(0,0,0,.5);
+    opacity:0; transform:translateY(14px) scale(.98); transition:opacity .4s, transform .5s cubic-bezier(.2,.9,.3,1.1); }
+  .int-ov.is-in .int{ opacity:1; transform:none; }
+  .int-x{ position:absolute; top:14px; right:14px; width:32px; height:32px; border-radius:50%; border:none; background:transparent; color:rgba(255,255,255,.5); cursor:pointer; font-size:14px; } .int-x:hover{ background:rgba(255,255,255,.08); color:#fff; }
+  .int-k{ font-size:11px; font-weight:800; letter-spacing:.22em; text-transform:uppercase; color:#ffc56b; }
+  .int-h{ margin-top:6px; font-family:var(--font-display); font-size:44px; font-weight:800; letter-spacing:-.02em; line-height:1.05; }
+  .int-s{ margin-top:4px; font-size:14px; color:rgba(255,255,255,.6); }
+  .int-fs{ margin-top:22px; display:flex; flex-direction:column; gap:14px; }
+  .int-f{ display:flex; flex-direction:column; gap:6px; } .int-f span{ font-size:13px; font-weight:600; color:rgba(255,255,255,.8); }
+  .int-in{ width:100%; box-sizing:border-box; padding:11px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.05); color:#fff; font:inherit; font-size:15px; outline:none; transition:border-color .2s, box-shadow .2s; }
+  .int-in:focus{ border-color:rgba(255,197,107,.6); box-shadow:0 0 0 3px rgba(255,197,107,.12); } .int-in::placeholder{ color:rgba(255,255,255,.3); }
+  .int-a{ margin-top:22px; display:flex; justify-content:flex-end; }
+  .int-save{ padding:12px 24px; border-radius:999px; border:none; background:linear-gradient(160deg, #ffc56b, #e8a23d); color:#2a1700; font:inherit; font-weight:800; font-size:14.5px; cursor:pointer; } .int-save:hover{ filter:brightness(1.06); }
+  /* cinematic: the month comes up first, then the questions */
+  .int-ov.is-cine .int-k, .int-ov.is-cine .int-h, .int-ov.is-cine .int-s{ opacity:0; animation:intUp .9s cubic-bezier(.2,.9,.3,1) forwards; }
+  .int-ov.is-cine .int-h{ animation-delay:.25s; } .int-ov.is-cine .int-s{ animation-delay:.6s; }
+  .int-ov.is-cine .int-f, .int-ov.is-cine .int-a{ opacity:0; animation:intUp .6s cubic-bezier(.2,.9,.3,1) forwards; animation-delay:calc(1s + var(--i, 3)*.12s); }
+  @keyframes intUp{ from{ opacity:0; transform:translateY(10px); filter:blur(4px); } to{ opacity:1; transform:none; filter:none; } }
+  /* the strip on the Calendar */
+  .int-strip{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin:4px 0 18px; }
+  .int-pill{ display:flex; flex-direction:column; gap:3px; text-align:left; padding:12px 14px; border-radius:14px; border:1px solid var(--border); background:var(--panel); color:var(--text); font:inherit; cursor:pointer; transition:border-color .2s, transform .15s; }
+  .int-pill:hover{ border-color:rgba(232,162,61,.5); transform:translateY(-1px); }
+  .int-pill small{ font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); } .int-pill span{ font-size:14px; font-weight:600; line-height:1.35; }
+  .int-pill.is-empty span{ color:var(--text-faint); font-weight:500; }
+  @media (max-width:760px){ .int-strip{ grid-template-columns:1fr; } }
+  /* Personal → You: one screen — card + status (with the ranks as a track), then ratings and body in one row */
+  .you{ gap:12px; }
+  .you-top{ gap:16px; } .you .pc.pc-big{ width:220px; padding:14px 14px 12px; } .you .pc-big .pc-face{ width:72px; height:72px; } .you .pc-big .pc-ovr b{ font-size:42px; }
+  .you-main{ padding:16px 18px; }
+  .you-track{ display:flex; gap:4px; margin-top:14px; }
+  .you-tr{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 2px; border-radius:10px; opacity:.4; min-width:0; }
+  .you-tr small{ font-size:9.5px; font-weight:700; letter-spacing:.02em; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text-dim); }
+  .you-tr.is-done{ opacity:.75; } .you-tr.is-cur{ opacity:1; background:color-mix(in srgb, var(--rc) 14%, transparent); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--rc) 50%, transparent); } .you-tr.is-cur small{ color:var(--rc); }
+  .you-attrs{ grid-template-columns:repeat(4, 1fr) 1.15fr; gap:10px; }
+  @media (max-width:1250px){ .you-attrs{ grid-template-columns:repeat(3, 1fr); } }
+  .you-attr{ padding:12px 14px; } .you-attr-h b{ font-size:26px; } .you-sub{ padding:3px 0; font-size:12px; grid-template-columns:1fr 46px 24px; }
+  .you-body{ padding:12px 14px; } .you-bmi b{ font-size:26px; } .you-note{ font-size:12px; } .you-fine{ display:block; margin-top:4px; color:var(--text-faint); font-size:11px; }
+  .you-row{ display:none; }
+
+  /* ---- minimal views, round 18 ---- */
+  .th-min{ position:absolute; top:12px; right:14px; z-index:2; padding:4px 10px; border-radius:999px; border:1px solid var(--border); background:transparent; color:var(--text-faint); font:inherit; font-size:11.5px; font-weight:600; cursor:pointer; opacity:.7; transition:opacity .2s, color .2s, border-color .2s; }
+  .th-min:hover{ opacity:1; color:var(--text); border-color:var(--border-strong, var(--border)); }
+  /* leaving a full-screen view: a plain fade out, then the page fades in */
+  .np.is-leaving{ animation:npFade .22s ease forwards !important; }
+  @keyframes npFade{ to{ opacity:0; } }
+  #viewRoot.vr-in > *{ animation:vrIn .35s ease both !important; }
+  @keyframes vrIn{ from{ opacity:0; } to{ opacity:1; } }
+  /* the player: ☕ · ▶ (big) · ■ */
+  .np-ctl .np-c.np-out{ font-size:15px; }
+  .np-ctl .np-c.is-main.np-music{ font-size:22px; }
+  .np-c.is-back{ font-size:24px; }
+  .np-task{ display:flex; align-items:center; gap:10px; margin-top:14px; padding:8px 8px 8px 14px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); max-width:420px; }
+  .np-task-dot{ width:7px; height:7px; border-radius:50%; background:#7ef0c0; box-shadow:0 0 8px #7ef0c0; flex:none; }
+  .np-task-t{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14px; font-weight:600; color:#fff; }
+  .np-task-done{ width:30px; height:30px; border-radius:50%; border:1px solid rgba(126,240,192,.5); background:rgba(126,240,192,.12); color:#7ef0c0; cursor:pointer; font-size:14px; flex:none; transition:background .2s, transform .15s; }
+  .np-task-done:hover{ background:rgba(126,240,192,.28); transform:scale(1.06); }
+  .np-next{ margin-top:8px; font-size:12.5px; color:rgba(255,255,255,.5); }
+  /* Flowtime: room between the two numbers */
+  .ml-sep{ display:inline-block; width:1px; height:12px; margin:0 12px; vertical-align:-1px; background:rgba(255,255,255,.25); }
+  .ms-k .qtip, .np-sub .qtip{ margin-left:6px; }
+  .np-mrow.is-empty{ display:none; }
+  .np-task{ background:none !important; border:none !important; padding:0 !important; gap:14px; margin-top:16px; }
+  .np-task-done{ width:auto !important; height:32px !important; padding:0 14px; border-radius:999px !important; font:inherit; font-size:13px !important; font-weight:700; }
+  .np-task .np-next{ margin:0; font-size:13px; }
+  /* the body: just the numbers, on a scale for your height */
+  .you-bmi-scale{ position:relative; margin-top:26px; }
+  .bmi-you{ position:absolute; top:-22px; transform:translateX(-50%); font-size:11.5px; color:var(--text-dim); white-space:nowrap; } .bmi-you b{ color:var(--text); font-size:13px; }
+  .bmi-lab span{ position:absolute; top:3px; transform:translateX(-50%); font-size:11px; font-weight:600; color:var(--text-dim); } .bmi-lab span:nth-child(n){ left:auto; }
+  .bmi-zones{ display:flex; justify-content:space-between; margin-top:20px; font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+  .bmi-zones .h{ color:#3fbe8e; } .bmi-zones .o{ color:#e8a23d; } .bmi-zones .ob{ color:#e8636b; }
+  .bmi-zones{ position:relative; display:block; height:14px; } .bmi-zones span{ position:absolute; transform:translateX(-50%); white-space:nowrap; }
+  .bmi-legend{ display:flex; gap:12px; margin-top:22px; font-size:11px; font-weight:700; color:var(--text-dim); }
+  .bmi-legend span::before{ content:''; display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; vertical-align:0; }
+  .bmi-legend .h::before{ background:#3fbe8e; } .bmi-legend .o::before{ background:#e8a23d; } .bmi-legend .ob::before{ background:#e8636b; }
+  .bmi-zones{ display:none; }
+  .you-howbtn{ align-self:flex-start; margin-top:12px; padding:0; border:none; background:none; color:var(--text-faint); font:inherit; font-size:12.5px; cursor:pointer; } .you-howbtn:hover{ color:var(--accent); }
+  /* how leveling works */
+  .xph-ov{ z-index:9300; }
+  .xph{ position:relative; width:min(980px, 94vw); max-height:88vh; overflow:auto; padding:26px 28px !important; border-radius:22px !important; }
+  .xph h2{ margin:4px 0 16px; font-family:var(--font-display); font-size:26px; }
+  .xph .xph-k{ font-size:11px; font-weight:800; letter-spacing:.3em; color:#7fd0ff; }
+  .xph-x{ position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%; border:none; background:transparent; color:var(--text-dim); cursor:pointer; } .xph-x:hover{ background:var(--panel-2); color:var(--text); }
+  .xph-cols{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:22px; } @media (max-width:860px){ .xph-cols{ grid-template-columns:1fr; } }
+  .xph-sec{ font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--text-faint); margin:14px 0 6px; } .xph-cols > div > .xph-sec:first-child{ margin-top:0; }
+  .xph-r{ display:flex; justify-content:space-between; gap:10px; padding:5px 0; border-bottom:1px solid var(--border); font-size:13px; } .xph-r b{ font-weight:600; text-align:right; color:var(--text); } .xph-r span{ color:var(--text-dim); }
+  .xph-rates{ display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; } .xph-rates div{ padding:10px 12px; border-radius:12px; background:var(--panel-2); font-size:12.5px; color:var(--text-dim); line-height:1.45; } .xph-rates b{ display:block; font-size:14px; margin-bottom:2px; }
+  .xph-foot{ margin-top:14px; font-size:12.5px; color:var(--text-faint); }
+  /* Good morning: one message, given room */
+  .br-intent{ display:flex; flex-direction:column; }
+  .br-intent .bi-k{ display:flex; align-items:center; justify-content:space-between; }
+  .bi-edit{ width:26px; height:26px; border-radius:50%; border:none; background:transparent; color:rgba(255,255,255,.4); cursor:pointer; font-size:13px; } .bi-edit:hover{ background:rgba(255,255,255,.08); color:#fff; }
+  .bi-one{ flex:1; display:flex; flex-direction:column; justify-content:center; padding:6px 4px 10px; }
+  .bi-one small{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#ffc56b; }
+  .bi-one p{ margin:10px 0 0; font-family:'Iowan Old Style', 'New York', Georgia, serif; font-size:clamp(24px, 3.2vh, 34px); line-height:1.3; color:#fff; text-wrap:balance; }
+  .bi-one.is-empty p{ font-size:clamp(20px, 2.6vh, 26px); color:rgba(255,255,255,.8); margin:0 0 14px; } .bi-one.is-empty .bi-set{ align-self:flex-start; }
+  /* the level HUD, bottom left */
+  .b4-hud{ position:absolute; left:clamp(18px, 2.6vw, 40px); bottom:clamp(16px, 2.4vh, 28px); z-index:4; display:flex; align-items:center; gap:12px; padding:10px 16px 10px 10px; border-radius:16px; cursor:pointer;
+    background:rgba(8,14,28,.55); border:1px solid color-mix(in srgb, var(--rc) 45%, transparent); box-shadow:0 0 24px color-mix(in srgb, var(--rc) 18%, transparent), inset 0 0 18px rgba(80,170,255,.06); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+    opacity:0; animation:hudIn .7s cubic-bezier(.2,.9,.3,1) forwards; animation-delay:calc(var(--shift, 0ms) * 0 + 900ms); }
+  .brief.intro-skipped .b4-hud, .brief.is-skipped .b4-hud{ animation-delay:.2s; }
+  @keyframes hudIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+  .b4-hud-m{ min-width:150px; }
+  .b4-hud-t{ display:flex; align-items:baseline; gap:8px; } .b4-hud-t b{ font-family:var(--font-display); font-size:18px; font-weight:800; letter-spacing:.06em; color:#fff; } .b4-hud-t span{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--rc); }
+  .b4-hud-bar{ display:block; height:5px; margin:6px 0 5px; border-radius:3px; background:rgba(110,200,255,.15); overflow:hidden; border:1px solid rgba(110,200,255,.25); } .b4-hud-bar u{ display:block; height:100%; background:linear-gradient(90deg, #2f8fff, #8fe0ff); box-shadow:0 0 8px rgba(110,200,255,.8); }
+  .b4-hud-s{ display:flex; justify-content:space-between; gap:10px; font-size:11px; color:rgba(220,240,255,.65); }
+  @media (max-width:1100px){ .b4-hud{ display:none; } }
+  /* the level HUD sits in the top bar (no overlap at any width) */
+  .b4-hud{ position:static !important; margin-left:auto; padding:6px 12px 6px 6px !important; border-radius:999px !important; opacity:1 !important; animation:none !important; gap:10px !important; letter-spacing:0; text-transform:none; }
+  .b4-hud .xp-badge{ width:28px; height:28px; }
+  .b4-hud-m{ min-width:170px !important; display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; }
+  .b4-hud-t b{ font-size:14px !important; } .b4-hud-t span{ font-size:10px !important; }
+  .b4-hud-bar{ margin:0 !important; width:90px; } .b4-hud-s span:first-child{ display:none; }
+  .brief4 .brief-top .b4-music{ margin-left:10px !important; }
+  @media (max-width:1100px){ .b4-hud{ display:flex !important; } .b4-hud-bar{ display:none; } }
+  /* the quarter */
+  .bi-q{ margin-top:auto; padding-top:14px; border-top:1px solid rgba(255,255,255,.1); }
+  .bi-q-t{ display:flex; align-items:baseline; gap:10px; } .bi-q-t > b{ font-family:var(--font-display); font-size:22px; font-weight:800; color:#fff; }
+  .bi-q-t span{ font-size:14px; color:rgba(255,255,255,.75); } .bi-q-t span b{ color:#fff; font-size:16px; }
+  .bi-q-t em{ margin-left:auto; font-style:normal; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.45); }
+  .bi-q-bar{ display:block; height:6px; margin:8px 0 6px; border-radius:4px; background:rgba(255,255,255,.1); overflow:hidden; } .bi-q-bar u{ display:block; height:100%; background:linear-gradient(90deg, #ffc56b, #e8a23d); }
+  .bi-q-s{ font-size:12px; color:rgba(255,255,255,.5); }
+  /* You: the body gets more room */
+  .you-attrs{ grid-template-columns:repeat(4, 1fr) 1.45fr !important; }
+  @media (max-width:1250px){ .you-attrs{ grid-template-columns:repeat(2, 1fr) !important; } }
+  .you-body{ padding:14px 18px !important; } .bmi-legend{ gap:16px; flex-wrap:wrap; }
+  /* Good morning top: the level is a quiet line, not a panel */
+  .b4-hud{ background:none !important; border:none !important; box-shadow:none !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; padding:0 !important; opacity:.8 !important; }
+  .b4-hud:hover{ opacity:1 !important; }
+  .b4-hud .xp-badge{ width:20px; height:20px; }
+  .b4-hud-bar{ height:3px !important; border:none !important; background:rgba(255,255,255,.15) !important; width:70px !important; } .b4-hud-bar u{ box-shadow:none !important; }
+  .b4-hud-t b{ font-size:12px !important; letter-spacing:.12em !important; } .b4-hud-t span{ font-size:10px !important; opacity:.9; }
+  .b4-hud-s{ font-size:11px; }
+  /* less crowded up top: the Operator's asks sit to the right of the caption line */
+  .brief4 .brief-hello{ margin-bottom:6px !important; }
+  .brief.brief2.brief4 .br-p.br-opbar.br-opbar.br-opbar.br-opbar.br-opbar{ align-self:flex-end; margin-top:-36px !important; margin-bottom:6px !important; }
+  .brief4 .br-voice{ max-width:calc(100% - 420px); min-height:32px; }
+  .brief4 .op-asks{ gap:6px; } .brief4 .op-ask{ opacity:.8; } .brief4 .op-ask:hover{ opacity:1; }
+  /* Knock these out (locked in): one clean line each */
+  .knock-out-list{ display:flex; flex-direction:column; gap:4px; }
+  .ko-row{ display:grid; grid-template-columns:1fr auto; align-items:center; border-radius:12px; padding:2px 4px 2px 0; transition:background .15s; }
+  .ko-row:hover{ background:var(--panel-2); }
+  .ko-main{ display:flex; align-items:center; gap:10px; min-width:0; padding:9px 10px; cursor:pointer; }
+  .ko-num{ font-family:var(--font-display); font-size:12px; font-weight:700; color:var(--text-faint); width:18px; flex:none; }
+  .ko-pr{ width:7px; height:7px; border-radius:50%; flex:none; background:#e8a23d; } .ko-pr.is-high{ background:#e8636b; } .ko-pr.is-low{ background:#6b7280; }
+  .ko-title{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14.5px; font-weight:600; color:var(--text); }
+  .ko-client{ flex:none; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; color:var(--text-dim); }
+  .ko-state{ flex:none; padding:2px 8px; border-radius:999px; font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; border:1px solid var(--accent); color:var(--accent); }
+  .ko-state.is-now{ border-color:#3fbe8e; color:#3fbe8e; }
+  .ko-row.is-current-task{ background:rgba(63,190,142,.08); box-shadow:inset 3px 0 0 #3fbe8e; }
+  .ko-more{ width:26px; height:26px; border-radius:50%; border:none; background:transparent; color:var(--text-faint); cursor:pointer; transition:transform .2s, color .2s; } .ko-more:hover{ color:var(--text); }
+  .ko-row.is-open .ko-more{ transform:rotate(180deg); } .ko-more-sp{ width:26px; }
+  .ko-notes{ grid-column:1 / -1; margin:0 12px 10px 46px; font-size:13px; line-height:1.5; color:var(--text-dim); white-space:pre-wrap; }
+  /* You: the last 30 days */
+  .you-chart{ padding:14px 18px 12px; border-radius:16px; border:1px solid var(--border); background:var(--panel); }
+  .you-chart-h{ display:flex; justify-content:space-between; align-items:baseline; font-size:12.5px; color:var(--text-dim); } .you-chart-h .you-sec{ margin:0; } .you-chart-h b{ color:var(--text); }
+  .you-bars{ display:flex; align-items:flex-end; gap:5px; height:clamp(90px, 18vh, 180px); margin-top:10px; }
+  .you-bars i{ flex:1; height:100%; display:flex; align-items:flex-end; border-radius:5px; background:color-mix(in srgb, var(--panel-2) 60%, transparent); }
+  .you-bars u{ display:block; width:100%; border-radius:5px; background:linear-gradient(180deg, #8fe0ff, #2f8fff); text-decoration:none; transition:height .6s ease; }
+  .you-bars i.is-pre{ background:transparent; border:1px dashed var(--border); } .you-bars i.is-today u{ background:linear-gradient(180deg, #ffe0a3, #e8a23d); }
+  .you-bars i.is-pre{ border:none; background:transparent; } .you-bars i.is-pre::after{ content:''; display:block; width:100%; height:2px; border-radius:2px; background:var(--border); }
+  .you-bars i{ background:color-mix(in srgb, var(--panel-2) 45%, transparent); }
+  .you-chart{ margin-right:64px; }
+  /* Time worked: the week at a glance */
+  .tw-top{ display:flex; align-items:flex-end; justify-content:space-between; gap:14px; margin-top:4px; }
+  .tw-v{ font-family:var(--font-display); font-size:24px; font-weight:700; line-height:1.1; } .tw-s{ font-size:11.5px; color:var(--text-faint); margin-top:2px; white-space:nowrap; }
+  .tw-bars{ display:flex; align-items:flex-end; gap:5px; height:44px; flex:none; }
+  .tw-bars i{ position:relative; width:10px; height:100%; display:flex; align-items:flex-end; border-radius:4px; background:var(--panel-2); }
+  .tw-bars u{ display:block; width:100%; border-radius:4px; background:color-mix(in srgb, var(--text) 35%, transparent); text-decoration:none; }
+  .tw-bars i.is-hit u{ background:#3fbe8e; } .tw-bars i.is-today u{ background:var(--accent); } .tw-bars i.is-future{ opacity:.4; }
+  .tw-bars span{ position:absolute; bottom:-14px; left:50%; transform:translateX(-50%); font-size:9px; color:var(--text-faint); }
+  .tw-chip{ padding-bottom:20px !important; }
+  .th-min{ top:auto !important; bottom:6px; right:16px; padding:2px 8px; font-size:11px; border-color:transparent; }
+  /* packages: a pricing page */
+  .pk-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:14px; }
+  .pk-card{ display:flex; flex-direction:column; text-align:left; padding:20px 20px 16px; border-radius:20px; border:1px solid var(--border); background:radial-gradient(120% 80% at 0% 0%, rgba(63,190,142,.08), transparent 60%), var(--panel); color:var(--text); font:inherit; cursor:pointer; transition:transform .2s cubic-bezier(.2,.9,.3,1.2), border-color .2s, box-shadow .2s; }
+  .pk-card:hover{ transform:translateY(-3px); border-color:rgba(63,190,142,.45); box-shadow:0 14px 34px rgba(0,0,0,calc(.3*var(--sh-k, 1))); }
+  .pk-name{ font-size:12px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#3fbe8e; }
+  .pk-price{ margin-top:6px; font-family:var(--font-display); font-size:34px; font-weight:800; letter-spacing:-.02em; } .pk-price small{ font-size:14px; font-weight:600; color:var(--text-faint); margin-left:2px; letter-spacing:0; }
+  .pk-desc{ margin-top:6px; font-size:13px; line-height:1.45; color:var(--text-dim); }
+  .pk-list{ margin-top:14px; padding-top:12px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:7px; flex:1; }
+  .pk-list div{ display:flex; align-items:center; gap:8px; font-size:13.5px; } .pk-list i{ font-style:normal; color:#3fbe8e; font-size:12px; } .pk-list span{ margin-left:auto; font-size:11.5px; color:var(--text-faint); }
+  .pk-none{ color:var(--text-faint); font-size:13px; }
+  .pk-foot{ display:flex; justify-content:space-between; margin-top:14px; font-size:12px; color:var(--text-faint); } .pk-foot span{ color:var(--text-dim); opacity:0; transition:opacity .2s; } .pk-card:hover .pk-foot span{ opacity:1; }
+  .pk-empty{ display:flex; flex-direction:column; align-items:center; gap:6px; padding:60px 20px; text-align:center; color:var(--text-dim); } .pk-empty-i{ font-size:34px; } .pk-empty b{ color:var(--text); font-size:16px; } .pk-empty span{ max-width:380px; font-size:13.5px; line-height:1.5; }
+
+  /* light mode, dimmer: grey paper with the lights low (not bright white) */
+  :root[data-theme="light"]{
+    --bg:#B4BAC5; --panel:#C9CED6; --panel-2:#BEC4CD; --border:#A6ADBA;
+    --text:#0F1219; --text-dim:#394153; --text-faint:#5B6477;
+    --border-strong:#949CAB; --pop:#CFD3DA; --pop-border:#A3AAB7; --qtip-border:#949CAB;
+    --glass:rgba(201,206,214,.95); --now-cell:rgba(205,209,216,.85); --chart-grid:#ABB2BE;
+    --night-surface:#BEC2D3; --off-surface:#C3C7CF; --off-btn:#BCC1CA; --off-btn-hover:#B2B8C2; --off-btn-border:#9DA5B2;
+  }
+  :root[data-theme="light"] body.has-scene{ background:#AEB5C1; --panel:rgba(203,208,216,.88); --panel-2:rgba(190,196,205,.9); }
+  :root[data-theme="light"] body.has-scene .sidebar{ background:rgba(196,201,210,.86); }
+  html[data-theme="light"] .md-in{ background:rgba(201,206,214,.85); }
+  /* the journal orb: in the corner when there's no + button (Good morning, the work page) */
+  body:has(#planOverlay:not(.hidden)) .quick-journal-fab.jorb, body:has(#wakeOverlay:not(.hidden)) .quick-journal-fab.jorb{ bottom:28px; transition:none; }
+
+  /* ---- Instagram ---- */
+  .ig-set .ig-found{ display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 10px; }
+  .ig-accs{ display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+  .ig-acc{ display:flex; align-items:center; gap:12px; padding:8px 10px; border-radius:12px; background:var(--panel-2); } .ig-acc-n{ flex:1; font-weight:700; }
+  .ig-connect{ display:flex; align-items:center; gap:16px; padding:18px 20px; margin-bottom:16px; border-radius:18px; border:1px dashed var(--border-strong, var(--border)); background:var(--panel); }
+  .ig-connect-i{ font-size:30px; } .ig-connect > div{ flex:1; display:flex; flex-direction:column; gap:3px; } .ig-connect b{ font-size:15px; } .ig-connect span{ font-size:13px; color:var(--text-dim); line-height:1.45; }
+  .ig-sec{ display:grid; grid-template-columns:repeat(auto-fit, minmax(420px, 1fr)); gap:14px; margin-bottom:16px; }
+  .ig-acct{ padding:18px 20px; border-radius:20px; border:1px solid var(--border); background:radial-gradient(120% 70% at 0% 0%, rgba(225,48,108,.08), transparent 60%), var(--panel); }
+  .ig-h{ display:flex; align-items:center; gap:12px; } .ig-h b{ font-size:16px; } .ig-pic{ width:42px; height:42px; border-radius:50%; object-fit:cover; background:linear-gradient(135deg, #f58529, #dd2a7b, #8134af); flex:none; }
+  .ig-role{ margin-left:8px; padding:2px 8px; border-radius:999px; font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; } .ig-role.is-business{ background:rgba(232,162,61,.15); color:#e8a23d; } .ig-role.is-personal{ background:rgba(195,166,255,.15); color:#c3a6ff; }
+  .ig-stats{ display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; margin-top:16px; }
+  .ig-st{ display:flex; flex-direction:column; gap:2px; } .ig-st b{ font-family:var(--font-display); font-size:22px; font-weight:700; } .ig-st span{ font-size:11px; color:var(--text-faint); }
+  .ig-strip-k{ margin-top:16px; font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); }
+  .ig-strip{ display:grid; grid-template-columns:repeat(30, 1fr); gap:3px; margin-top:6px; } .ig-strip i{ height:14px; border-radius:3px; background:var(--panel-2); } .ig-strip i.is-on{ background:linear-gradient(180deg, #ff6aa6, #dd2a7b); }
+  .ig-top{ display:grid; grid-template-columns:repeat(6, 1fr); gap:6px; margin-top:14px; }
+  .ig-post{ position:relative; aspect-ratio:4/5; border-radius:10px; overflow:hidden; background:var(--panel-2); display:block; }
+  .ig-post img{ width:100%; height:100%; object-fit:cover; display:block; } .ig-noimg{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--text-faint); text-transform:capitalize; }
+  .ig-post-s{ position:absolute; left:0; right:0; bottom:0; padding:14px 6px 5px; font-size:10.5px; color:#fff; background:linear-gradient(180deg, transparent, rgba(0,0,0,.7)); }
+  .ig-foot{ grid-column:1 / -1; display:flex; align-items:center; justify-content:flex-end; gap:8px; font-size:12px; color:var(--text-faint); }
+  .ig-post-s{ white-space:nowrap; font-size:10px; overflow:hidden; text-overflow:ellipsis; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -5194,6 +5469,7 @@ function normalizeHealth(h){ h=h||{}; h.gymLog=arr(h.gymLog); h.weightLog=arr(h.
 function normalizeMeals(m){ m=m||{}; m.library = (Array.isArray(m.library) && m.library.length) ? m.library : defaultMeals().library; return m; }
 function normalizeJournal(j){
   j=j||{}; j.entries=arr(j.entries); if(!Array.isArray(j.capsules)) j.capsules=[];
+  if(!j.intentions || typeof j.intentions!=='object') j.intentions = {months:{}, weeks:{}, prompted:{}};
   if(!Array.isArray(j.types) || !j.types.length) j.types = defaultJournalTypes();
   else {
     const retiredIds = ['idea','win','vent','reflect','tired'];
@@ -6632,6 +6908,15 @@ function renderUpcomingPopoverInto(){ const el=document.getElementById('upcoming
 
 // ============ DASHBOARD PANELS (Today) ============
 function renderPersonalStatsPanel(){
+// time worked: the week so far (big), yesterday, and a bar for each day Mon–Sun
+function timeWorkedHtml(yMin, weekMin){
+  const ws = startOfWeekStr(todayStr()), today = todayStr(), days = [];
+  for(let i=0;i<7;i++){ const d = addDays(ws, i); days.push({d:d, m: d===today ? deepWorkMinutesTodayLive() : d > today ? null : deepWorkMinutesFor(d)}); }
+  const target = state.standards.deepWorkTargetMinutes || 180, top = Math.max(target, ...days.map(function(x){ return x.m||0; }));
+  return '<div class="stat-chip-label">Time Worked</div>'+
+    '<div class="tw-top"><div><div class="tw-v">'+fmtDurationLabel(weekMin)+'</div><div class="tw-s">this week &middot; yesterday '+fmtDurationLabel(yMin)+'</div></div>'+
+    '<div class="tw-bars">'+days.map(function(x){ return '<i class="'+(x.d===today?'is-today':'')+(x.m!=null && x.m>=target?' is-hit':'')+(x.m==null?' is-future':'')+'" title="'+weekdayShort(x.d)+(x.m!=null ? ': '+fmtDurationLabel(x.m) : '')+'"><u style="height:'+(x.m ? Math.max(6, x.m/top*100) : 0).toFixed(1)+'%"></u><span>'+weekdayShort(x.d).slice(0,1)+'</span></i>'; }).join('')+'</div></div>';
+}
   const p = state.profile;
   const streak = computeStreak();
   const todayFocusMin = deepWorkMinutesTodayLive();
@@ -6649,13 +6934,7 @@ function renderPersonalStatsPanel(){
   return '<div class="section">'+
   '<div class="grid grid-3 stat-chip-row">'+
     '<div class="stat-chip" id="statDeepWorkBox">'+deepWorkStatInnerHtml(todayFocusMin)+'</div>'+
-    '<div class="stat-chip">'+
-      '<div class="stat-chip-label">Time Worked</div>'+
-      '<div class="time-worked-rows">'+
-        '<div class="time-worked-row"><span class="time-worked-key">Yesterday</span><span class="time-worked-val">'+fmtDurationLabel(yesterdayFocusMin)+'</span></div>'+
-        '<div class="time-worked-row"><span class="time-worked-key">This week</span><span class="time-worked-val">'+fmtDurationLabel(weekFocusMin)+'</span></div>'+
-      '</div>'+
-    '</div>'+
+    '<div class="stat-chip tw-chip">'+timeWorkedHtml(yesterdayFocusMin, weekFocusMin)+'</div>'+
     '<div class="stat-chip" data-action="goToFinishedTasks" style="cursor:pointer;"><div class="stat-chip-label">Tasks</div><div class="stat-chip-value">'+doneToday.length+'<span class="stat-chip-of"> / '+(doneToday.length+todayTasks.length)+'</span></div><div class="kpi-sub" style="margin-top:6px;">completed today</div></div>'+
   '</div>'+
   '<div class="card" style="text-align:center;margin-top:10px;">'+
@@ -7526,18 +7805,26 @@ function renderOffTimeView(){
     '</div>'+
   '</div></div>';
 }
+// one tidy line per task: number, a priority dot, the title, who it's for. The description is
+// tucked away — ▾ opens it right there.
 function focusKnockOutRow(t, num){
   const isCurrent = ui.currentTaskId===t.id;
   const isPending = ui.pendingCurrentTaskId===t.id;
-  return '<div class="task-item-v2'+(isCurrent?' is-current-task':'')+(isPending?' is-pending-task':'')+(justCompletedTaskId===t.id?' just-completed':'')+'" draggable="true" data-task-id="'+t.id+'" title="'+(isCurrent?'This is your current task':(isPending?'Waiting to be confirmed in Next Task':'Click to queue as Next Task'))+'">'+
-    '<div style="flex:1;min-width:140px;'+(isCurrent?'':'cursor:pointer;')+'" '+(isCurrent?'':'data-action="stagePendingCurrentTask" data-id="'+t.id+'"')+'>'+
-      '<div class="task-title-row">'+(num ? '<span class="ko-num">'+String(num).padStart(2,'0')+'</span>' : '')+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-ongoing" style="margin-left:6px;">&#128204;</span>':'')+'</div>'+
-      (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
+  const open = ui.koOpen && ui.koOpen[t.id];
+  const cl = arr(t.clients).filter(function(c){ return c && c!=='personal'; })[0];
+  const clName = cl ? (typeof clientLabel==='function' ? clientLabel(cl) : (function(){ const c = arr(state.business.clients).find(function(x){ return x.id===cl; }); return c ? (c.business || c.name) : ''; })()) : '';
+  return '<div class="ko-row'+(isCurrent?' is-current-task':'')+(isPending?' is-pending-task':'')+(open?' is-open':'')+(justCompletedTaskId===t.id?' just-completed':'')+'" draggable="true" data-task-id="'+t.id+'">'+
+    '<div class="ko-main"'+(isCurrent?'':' data-action="stagePendingCurrentTask" data-id="'+t.id+'" title="Queue it as next"')+'>'+
+      '<span class="ko-num">'+String(num||'').padStart(2,'0')+'</span><i class="ko-pr is-'+(t.priority||'med')+'"></i>'+
+      '<span class="ko-title">'+escapeHtml(t.title)+'</span>'+
+      (clName ? '<span class="ko-client">'+escapeHtml(clName)+'</span>' : '')+
+      (isCurrent ? '<span class="ko-state is-now">Now</span>' : isPending ? '<span class="ko-state">Queued</span>' : '')+
     '</div>'+
-    clientTagsHtml(t.clients)+
-    (isCurrent ? '<span class="tag tag-good">&#9673; Current</span>' : isPending ? '<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">Queued</span>' : '')+
+    (t.notes ? '<button class="ko-more" data-action="koToggle" data-id="'+t.id+'" title="'+(open ? 'Hide' : 'Show')+' the description">&#9662;</button>' : '<span class="ko-more-sp"></span>')+
+    (t.notes && open ? '<div class="ko-notes">'+escapeHtml(t.notes)+'</div>' : '')+
   '</div>';
 }
+ACTIONS.koToggle = function(el, e, id){ ui.koOpen = ui.koOpen || {}; ui.koOpen[id] = !ui.koOpen[id]; renderView(); };
 function stagePendingCurrentTask(id){
   const as = state.focus.activeSession;
   if(as && as.onBreak) return;
@@ -7590,8 +7877,7 @@ function renderTodayFocusMode(p){
     .concat(arr(todayInfo.events).map(function(e){ const cat=categoryById(e.categoryId); return {label:e.title, kind:'event', id:e.id, color:cat?cat.color:'#8A90A2', time:e.time}; }));
   const activeClients = arr(state.business.clients).filter(function(c){ return c.status==='active'; });
 
-  return renderFocusQuickLinks()+
-  '<div class="locked-in-header">'+
+  return '<div class="locked-in-header">'+
     businessNameTagHtml()+
     '<div class="locked-in-badge">&#128274; Locked In</div>'+'<div class="lv-corner">'+lockedViewBtnHtml()+'</div>'+
     '<div class="view-title" style="margin:0;">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
@@ -7609,6 +7895,8 @@ function renderToday(){
   // left you staring at the "Taking today off" screen. The day stays marked as a rest day.
   if(state.focus.activeSession) return renderTodayFocusMode(p);
   if(isDayOff(todayStr())) return renderDayOffView();
+  // the minimal view (M, or the button on the hero): clock, level, streak, LOCK IN — nothing else
+  if(typeof focusMinimalOn==='function' && focusMinimalOn() && !(state.modes.active && state.modes.active.type==='offtime')) return renderFocusMinimal();
   if(state.modes.active && state.modes.active.type==='offtime') return state.modes.active.sleep ? renderSleepView() : state.modes.active.morning ? renderMorningView() : renderOffTimeView();
   const hour = new Date().getHours();
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
@@ -7634,8 +7922,7 @@ function renderToday(){
       i++;
     }
   }
-  return renderFocusQuickLinks()+
-    renderTodayHero(greeting)+
+  return renderTodayHero(greeting)+
     renderMorningPlanCard()+
     pageEditBtnHtml('toggleTodayEdit', editing)+
     '<div class="today-panels'+(editing?' is-editing':'')+'">'+panelsHtml+'</div>';
@@ -7677,6 +7964,7 @@ function renderTodayHero(greeting){
       '</button>'+
       '<div class="th-actions">'+
         '<button class="th-btn" data-action="toggleNextPicker" data-where="hero"><span class="th-btn-i">&#128204;</span>'+(next ? 'Change next' : 'Pick next')+'</button>'+
+        '<button class="th-btn th-btn-min" data-action="toggleFocusMinimal" title="Minimal view (M)"><span class="th-btn-i">&#9673;</span>Minimal</button>'+
         (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going — sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
         (evening ? '<button class="th-btn th-btn-night" data-action="openWindDown"><span class="th-btn-i">&#127769;</span>Wind down</button>' : '')+
       '</div>'+
@@ -9311,7 +9599,7 @@ function endBreakModeFromFocus(){
   const actualBreakMs = Date.now() - startedAt;
   as.startedAt += actualBreakMs;
   as.onBreak = false;
-  as.breakEndsAt = null;
+  as.breakEndsAt = null; as.breakOverAt = null; as.breakNudgeAt = null;
   const minutes = Math.max(1, Math.round(actualBreakMs/60000));
   state.modes.history.push({id:uid(), type:'break', date:todayStr(new Date(startedAt)), startedAt:startedAt, endedAt:Date.now(), minutes:minutes, note:lastBreak.note||''});
   state.modes.active = null;
@@ -11744,12 +12032,11 @@ document.addEventListener('keydown', function(e){
 });
 ACTIONS.goToClients = function(){ ui.view='business'; ui.businessTab='clients'; renderView(); };
 // ============ PACKAGES / PLANS ============
+// your offers, like a pricing page: one card each (the + in the corner adds one)
 function renderPackagesTab(){
   const packages = arr(state.business.packages);
-  return '<div class="card section" style="text-align:center;">'+
-    '<button class="btn btn-good" style="font-size:16px;font-weight:700;padding:14px 36px;box-shadow:0 4px 22px rgba(63,190,142,.4);" data-action="openNewPackageModal">+ Add Package</button>'+
-  '</div>'+
-  '<div class="task-list">'+(packages.map(packageRow).join('') || '<div class="empty">No packages yet — add the plans you offer clients.</div>')+'</div>';
+  if(!packages.length) return '<div class="pk-empty"><div class="pk-empty-i">&#128230;</div><b>Your offers live here.</b><span>Press + (bottom right) to add your first package — what it costs and what the client gets each week.</span></div>';
+  return '<div class="pk-grid">'+packages.map(packageRow).join('')+'</div>';
 }
 function openNewPackageModal(){
   const o = document.getElementById('newPackageOverlay');
@@ -11771,16 +12058,14 @@ function renderNewPackageModal(){
 function renderNewPackageModalInto(){ const el=document.getElementById('newPackageContent'); if(el) morphInto(el, renderNewPackageModal(), {form:true}); }
 function packageRow(pk){
   const deliverables = arr(pk.deliverables);
-  return '<div class="card" style="margin-bottom:10px;">'+
-    '<div class="row" style="justify-content:space-between;align-items:flex-start;">'+
-      '<div>'+
-        '<div class="task-title">'+escapeHtml(pk.name)+(pk.price ? '<span class="kpi-sub" style="margin-left:8px;">$'+Number(pk.price).toLocaleString()+'</span>' : '')+'</div>'+
-        (pk.description ? '<div class="kpi-sub" style="margin-top:4px;">'+escapeHtml(pk.description)+'</div>' : '')+
-        '<div class="row" style="margin-top:6px;gap:6px;flex-wrap:wrap;">'+(deliverables.length ? deliverables.map(function(d){return '<span class="tag" style="background:var(--good-dim);color:var(--good);">'+escapeHtml(d.title)+' &middot; '+(d.weeklyTarget||1)+'&times;/wk</span>';}).join('') : '<span class="kpi-sub">No deliverables defined yet</span>')+'</div>'+
-      '</div>'+
-      '<button class="btn btn-ghost btn-sm" data-action="openPackageEditModal" data-id="'+pk.id+'">Edit</button>'+
-    '</div>'+
-  '</div>';
+  const onIt = arr(state.business.clients).filter(function(c){ return (c.packageId===pk.id || c.package===pk.id) && clientStageActive(c.stage); }).length;
+  return '<button class="pk-card" data-action="openPackageEditModal" data-id="'+pk.id+'">'+
+    '<div class="pk-name">'+escapeHtml(pk.name)+'</div>'+
+    '<div class="pk-price">'+(pk.price ? '$'+Number(pk.price).toLocaleString()+'<small>/mo</small>' : '<small>No price set</small>')+'</div>'+
+    (pk.description ? '<div class="pk-desc">'+escapeHtml(pk.description)+'</div>' : '')+
+    '<div class="pk-list">'+(deliverables.length ? deliverables.map(function(d){ return '<div><i>&#10003;</i>'+escapeHtml(d.title)+'<span>'+(d.weeklyTarget||1)+'&times;/wk</span></div>'; }).join('') : '<div class="pk-none">No deliverables yet</div>')+'</div>'+
+    '<div class="pk-foot">'+(onIt ? onIt+' client'+(onIt===1?'':'s')+' on it' : 'No clients on it yet')+'<span>Edit &#8594;</span></div>'+
+  '</button>';
 }
 function addPackage(){
   const el = document.getElementById('newPackageName');
@@ -16097,6 +16382,7 @@ function renderCalendar(){
     '<button class="btn" data-action="openUpcomingPopover">&#128197; Upcoming ('+upcoming.length+')</button>'+
     '</div>'+
   '</div>'+
+  (typeof intentStripHtml==='function' ? intentStripHtml() : '')+
   '<div class="section" style="max-width:640px;margin:0 auto 20px;text-align:center;">'+
     '<div id="calendarBigClock" class="cal-big-clock"></div>'+
     '<div id="calendarBigClockDate" class="kpi-sub" style="margin-top:2px;"></div>'+
@@ -16580,7 +16866,7 @@ function renderSettings(){
   const saveBtn = '<button class="btn btn-primary section" data-action="saveProfile">Save Changes</button>';
 
   const sections = {
-    integrations: ghlSettingsHtml(),
+    integrations: ghlSettingsHtml()+(typeof igSettingsHtml==='function' ? igSettingsHtml() : ''),
     updates: '<div class="upd-panel">'+renderUpdatesTab()+'</div>',
     data: '<div class="section"><div class="section-title">Your Data'+tip(hasCloud ? 'Saved to your account — it follows you wherever you open Operator.' : 'Saved on this Mac in Operator\'s own storage — export a copy now and then as a backup.')+'</div><div class="card">'+
         '<div class="row"><button class="btn" data-action="exportData">Export Data (.json)</button>'+
@@ -16637,22 +16923,8 @@ function renderSettings(){
           '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
         '</div>'+
       '</div>'+
-      '<div class="card section" id="quickLinksSettingsAnchor"><div class="section-title">Quick Links'+tip('Your quick-access links — the ☰ button at the bottom right of the Today page.')+'</div><div class="grid grid-2">'+
+      '<div class="card section"><div class="section-title">Links</div><div class="grid grid-2">'+
         '<div class="field"><label>Open links in'+tip('Force Safari opens a new tab with a special link — the first time, choose “Always Allow” when macOS asks, and it\'ll stop needing a second click.')+'</label><select class="input" id="setLinkBrowser"><option value="default" '+((p.linkBrowser||'default')==='default'?'selected':'')+'>System Default</option><option value="safari" '+(p.linkBrowser==='safari'?'selected':'')+'>Force Safari</option></select></div>'+
-        '<div class="field"><label>Business files folder (path on this Mac)</label><input class="input" id="setQuickFiles" placeholder="/Users/you/Documents/Business" value="'+escapeHtml(state.settings.quickLinks.businessFilesPath||'')+'"></div>'+
-        '<div class="field"><label>GoHighLevel URL</label><input class="input" id="setQuickGhl" value="'+escapeHtml(state.settings.quickLinks.ghlUrl||'')+'"></div>'+
-        '<div class="field"><label>Meta Ads Manager URL</label><input class="input" id="setQuickMeta" value="'+escapeHtml(state.settings.quickLinks.metaAdsUrl||'')+'"></div>'+
-      '</div>'+
-      '<div class="kind-label" style="margin-top:16px;margin-bottom:10px;">Icons'+tip('Upload your own logo for any of these — it\'s used as the circle icon. Otherwise a plain default is shown.')+'</div>'+
-      '<div class="row" style="gap:16px;flex-wrap:wrap;">'+
-        QUICK_LINK_DEFS.concat(AI_TOOLS).map(function(t){
-          return '<div style="text-align:center;">'+
-            '<span class="quick-link-circle" style="display:flex;margin:0 auto;">'+quickLinkIconInnerHtml(t.key||t.id, t.emoji, t.bg)+'</span>'+
-            '<div class="kpi-sub" style="margin-top:4px;">'+escapeHtml(t.label)+'</div>'+
-            '<label class="btn btn-ghost btn-sm" style="margin-top:4px;cursor:pointer;">Upload<input type="file" accept="image/*" data-icon-upload="'+(t.key||t.id)+'" style="display:none;"></label>'+
-            (state.settings.quickLinks.icons && state.settings.quickLinks.icons[t.key||t.id] ? '<button class="btn btn-ghost btn-sm" data-action="resetQuickLinkIcon" data-value="'+(t.key||t.id)+'">Reset</button>' : '')+
-          '</div>';
-        }).join('')+
       '</div></div>'+saveBtn,
 
     focus: '<div class="card section"><div class="section-title">App Tracking'+tip('Sees which app (and, in browsers, which website) is in front on this Mac — nothing leaves the machine.')+'</div><div class="grid grid-2">'+
@@ -16714,6 +16986,7 @@ function renderSettings(){
         '<div class="field"><label>Daily calorie target</label><input class="input" type="number" id="setCalories" value="'+p.calorieTarget+'"></div>'+
         '<div class="field"><label>Goal weight</label><input class="input" type="number" step="0.1" id="setGoalWeight" value="'+(p.goalWeight!=null?p.goalWeight:'')+'"></div>'+
         '<div class="field"><label>Height'+tip('For your Health rating: your BMI, and the healthy and obese lines for your height.')+'</label><div class="row" style="gap:6px;"><input class="input" type="number" min="3" max="8" id="setHeightFt" placeholder="ft" value="'+(p.heightIn ? Math.floor(p.heightIn/12) : '')+'" style="width:80px;"><input class="input" type="number" min="0" max="11" id="setHeightIn" placeholder="in" value="'+(p.heightIn ? p.heightIn%12 : '')+'" style="width:80px;"></div></div>'+
+        '<div class="field"><label>Weight now'+tip('Saves a weigh-in for today (it shows in Health and rates your body on your card).')+'</label><input class="input" type="number" step="0.1" id="setWeightNow" placeholder="lb" value="'+(function(){ const l = arr(state.health.weightLog).slice().sort(function(a, b){ return a.date.localeCompare(b.date); }); return l.length ? l[l.length-1].weight : ''; })()+'"></div>'+
         '<div class="field"><label>Workout days per week (goal)</label><input class="input" type="number" id="setWeeklyWorkout" value="'+p.weeklyWorkoutTarget+'"></div>'+
         '<div class="field"><label>Deep work target per day</label><select class="input" id="setDeepWorkTarget">'+deepWorkOptions.map(function(m){ return '<option value="'+m+'" '+(state.standards.deepWorkTargetMinutes===m?'selected':'')+'>'+fmtDurationLabel(m)+'</option>'; }).join('')+'</select></div>'+
       '</div></div>'+
@@ -16913,6 +17186,14 @@ function saveProfile(){
   const gw = document.getElementById('setGoalWeight');
   if(gw) state.profile.goalWeight = gw.value ? Number(gw.value) : null;
   const hf = document.getElementById('setHeightFt'), hi = document.getElementById('setHeightIn');
+  const wn = document.getElementById('setWeightNow');
+  if(wn && wn.value!==''){
+    const v = Number(wn.value), log = arr(state.health.weightLog).slice().sort(function(a, b){ return a.date.localeCompare(b.date); }), last = log[log.length-1];
+    if(v > 40 && v < 800 && (!last || Number(last.weight)!==v)){
+      state.health.weightLog = arr(state.health.weightLog).filter(function(w){ return w.date!==todayStr(); });
+      state.health.weightLog.push({id:uid(), date:todayStr(), weight:v}); persist('health');
+    }
+  }
   if(hf && hf.value!==''){ const tot = Number(hf.value)*12 + (Number(hi && hi.value)||0); state.profile.heightIn = tot >= 36 && tot <= 100 ? tot : state.profile.heightIn; }
   const wwEl = document.getElementById('setWeeklyWorkout'); if(wwEl) state.profile.weeklyWorkoutTarget = Number(wwEl.value)||5;
   const dwEl = document.getElementById('setDeepWorkTarget'); if(dwEl) state.standards.deepWorkTargetMinutes = Number(dwEl.value)||180;
@@ -17650,6 +17931,8 @@ function wakeImUp(){
   if(typeof opBriefReset==='function') opBriefReset();
   ui.briefT0 = Date.now(); ui.briefShift = 0; ui.briefSkipped = false; ui.briefNewsAt = null; ui.briefLineSeen = 0; ui.dawnTs = null;
   loadMorningNews();
+  // scores that didn't come through last time are asked for again (the sports panel never just vanishes)
+  if(typeof loadScores==='function' && !(ui.scores && ui.scores.got && (ui.scores.nfl || ui.scores.nba))) loadScores(true);
   playWakeChime();
   renderWakeOverlayInto();
   briefVoiceRun();
@@ -17899,21 +18182,26 @@ function wakeChipHtml(){
   return '<button class="wake-chip'+(nw?'':' is-unset')+'" data-action="openWakeSetup" title="Wake-up alarm">&#9200; '+
     (nw ? fmt12Hour(nw.time)+' '+morningLabel(nw.date) : 'Set wake-up alarm')+'</button>';
 }
-// ---- break timer: breaks end on their own ----
+// ---- break timer: when the time's up it tells you — and waits. You lock back in yourself, so a
+// break that ran long (you stepped away) never turns into "work" you didn't do ----
 function checkBreakTimer(){
   const as = state.focus && state.focus.activeSession;
   if(!as || !as.onBreak || !as.breakEndsAt) return;
   const left = as.breakEndsAt-Date.now();
   const el = document.getElementById('breakRemaining');
-  if(el) el.textContent = left>0 ? formatElapsed(left)+' left' : 'Break over';
-  if(left<=0){
-    as.breakEndsAt = null;
-    endBreakModeFromFocus();
-    playSessionComplete();
-    pingWrapper();
-    const mm = as.method && typeof LOCK_METHODS!=='undefined' ? LOCK_METHODS[as.method.id] : null;
-    showToast(mm && mm.work ? 'Round '+(as.round||2)+(mm.rounds ? ' of '+mm.rounds : '')+'. Back to it.' : 'Break\'s over. Back to it.', {icon:'&#9201;', duration:6000});
-    try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Break is over'); }catch(e){}
+  if(el) el.textContent = left>0 ? formatElapsed(left)+' left' : 'Over '+formatElapsed(-left)+' ago';
+  if(left > 0) return;
+  const mm = as.method && typeof LOCK_METHODS!=='undefined' ? LOCK_METHODS[as.method.id] : null;
+  if(!as.breakOverAt){
+    as.breakOverAt = Date.now(); persist('focus');
+    playSessionComplete(); pingWrapper();
+    showToast(mm && mm.work ? 'Break’s over — lock back in for round '+(as.round||2)+(mm.rounds ? ' of '+mm.rounds : '')+'.' : 'Break’s over — lock back in when you’re back.', {icon:'&#9201;', actionLabel:'Lock back in', actionAction:'endBreakModeFromFocus', duration:20000});
+    try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Break’s over — lock back in'); }catch(e){}
+    renderView();
+  } else if(Date.now() - (as.breakNudgeAt || as.breakOverAt) > 5*60000){
+    as.breakNudgeAt = Date.now();
+    playTick();
+    showToast('Still on break — '+Math.round(-left/60000)+' min over.', {icon:'&#9749;', actionLabel:'Lock back in', actionAction:'endBreakModeFromFocus', duration:10000});
   }
 }
 ACTIONS.extendBreak = function(el){
@@ -19662,6 +19950,8 @@ function renderConversations(){
   const at = s.mode==='social' ? (ghlCfg().socialCache && ghlCfg().socialCache.at) : s.at;
   return '<div class="view-header"><div><div class="view-title">Social'+tip('Your followers and how your posts are doing, plus your GoHighLevel chats and contacts.')+'</div></div>'+
       (on ? '<div class="row" style="gap:8px;align-items:center;">'+(at ? '<span class="kpi-sub">Updated '+ghlAgo(at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="'+(s.mode==='social' ? 'socialRefresh' : 'inboxRefresh')+'" title="Refresh">&#8635;</button></div>' : '')+'</div>'+
+    // Instagram, straight from Instagram, up top (on the Stats tab, or always when GoHighLevel isn't connected)
+    ((!on || s.mode==='social') && typeof igSectionHtml==='function' ? igSectionHtml() : '')+
     (on ? '<div class="seg-tabs cv-tabs">'+tab('social', '&#128202; Stats')+tab('chats', '&#128172; Chats', inboxUnread())+tab('contacts', '&#128101; Contacts')+'</div>' : '')+
     '<div class="tab-panel" data-key="convos-'+s.mode+'">'+renderInboxTab()+'</div>';
 }
@@ -19823,6 +20113,8 @@ function notifList(){
       add({key:'ghllead:'+l.id, kind:'ghl', level:'info', icon:'&#10024;', title:'New lead: '+l.name, sub:'From GoHighLevel', act:{a:'openProspectEditModal', id:l.id}, sort:3, at:l.at});
     });
   }
+  // the month's and the week's intentions, until they're written
+  if(typeof intentPending==='function') intentPending().forEach(add);
   const dis = notifDismissed();
   return out.filter(function(n){ return dis[n.key]!==today; }).sort(function(a, b){ return a.sort-b.sort || (b.at||0)-(a.at||0); });
 }
@@ -19866,6 +20158,7 @@ ACTIONS.notifOpen = function(el, e, key){
   else if(a.a==='openProspectEditModal') openProspectEditModal(a.id);
   else if(a.a==='openCalItem') openCalItem(a.kind, a.id);
   else if(a.a==='openGhlContact' && ACTIONS.openGhlContact) ACTIONS.openGhlContact(null, null, a.id);
+  else if(a.a==='openIntent' && typeof openIntentForm==='function') openIntentForm(a.id);
 };
 ACTIONS.notifDismiss = function(el, e, key){ notifDismissed()[key] = todayStr(); persist('focus'); notifBadge(); notifRender(); };
 ACTIONS.notifClearAll = function(){ const d = notifDismissed(), t = todayStr(); notifList().forEach(function(n){ d[n.key] = t; }); persist('focus'); notifBadge(); notifRender(); };
@@ -20370,10 +20663,12 @@ function methodLine(st){
     if(st.onBreak){ const as = state.focus.activeSession, b = as && as.breaks[as.breaks.length-1]; return b && !b.auto ? 'Round '+st.round+(m.rounds ? ' of '+m.rounds : '')+' paused' : r+' done'; }
     return r+' · '+(st.last ? 'Last round, <b>'+formatElapsed(st.left)+'</b> to go' : 'Break in <b>'+formatElapsed(st.left)+'</b>');
   }
-  if(st.id==='flow') return st.onBreak ? 'Resting · back when you\'re ready' : 'In the flow for <b>'+formatElapsed(st.inSeg||0)+'</b> · break earned: <b>'+(st.earned||5)+' min</b>';
+  if(st.id==='flow') return st.onBreak ? 'Resting · back when you\'re ready' : 'In the flow <b>'+formatElapsed(st.inSeg||0)+'</b><span class="ml-sep"></span>Break earned <b>'+(st.earned||5)+' min</b>';
   const as = state.focus.activeSession, t = as && lockTaskPick(as.method.taskId);
   return t ? 'Until <b>'+escapeHtml(t.title)+'</b> is done' : 'Until it\'s done';
 }
+const FLOW_HOW = 'Flowtime: there’s no timer. Work as long as your focus holds; when it dips, take a break about a fifth as long as the stretch you just did (5–30 min — 50 minutes earns 10). The longer you stay in it, the bigger the break you’ve earned. When the break ends, you lock back in yourself.';
+function flowTipHtml(){ return typeof tip==='function' ? tip(FLOW_HOW) : ''; }
 function methodStripHtml(as){
   const st = methodState(as); if(!st) return '';
   const m = st.m;
@@ -20389,7 +20684,7 @@ function methodStripHtml(as){
   } else if(m.work && !st.onBreak){
     bar = '<div class="ms-bar"><i class="ms-w is-cur" style="flex:1" data-tip="This round · '+m.work+' min, then '+m.rest+' min off"><u id="msFill" style="width:'+((st.frac||0)*100).toFixed(1)+'%"></u></i></div>';
   }
-  return '<div class="ms'+(st.onBreak?' is-break':'')+'">'+bar+'<div class="ms-line"><span class="ms-k">'+m.icon+' '+m.label+'</span><span id="msLine">'+methodLine(st)+'</span></div>'+
+  return '<div class="ms'+(st.onBreak?' is-break':'')+'">'+bar+'<div class="ms-line"><span class="ms-k">'+m.icon+' '+m.label+(st.id==='flow' ? flowTipHtml() : '')+'</span><span id="msLine">'+methodLine(st)+'</span></div>'+
     (st.id==='flow' && !st.onBreak ? '<button class="btn btn-ghost btn-sm ms-btn" data-action="openBreakNotePrompt">Take my '+(st.earned||5)+' min</button>' : '')+'</div>';
 }
 function tickMethodStrip(){
@@ -20416,7 +20711,7 @@ function methodBreak(minutes, note){
   if(ui.currentTaskId){ ui.pausedTaskId = ui.currentTaskId; accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   ui.pendingCurrentTaskId = null;
   playRestSound(); pingWrapper();
-  showToast('Round done. '+minutes+' min break: stand up, look out a window. It ends by itself.', {icon:'&#9749;', duration:8000});
+  showToast('Round done. '+minutes+' min break: stand up, look out a window. Lock back in when it’s over.', {icon:'&#9749;', duration:8000});
   try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: '+minutes+' min break'); }catch(e){}
   persist('focus'); persist('modes'); renderView();
 }
@@ -20886,10 +21181,17 @@ ACTIONS.dawnUp = function(){
   wakeImUp();
 };
 
+// which morning's note the morning screens show: this morning's — except on a test run, or later in
+// the day once you've already written the next one (then you see what you just wrote, not last night's)
+function briefNoteDate(){
+  const today = todayStr(), t = morningNoteTarget();
+  if(t!==today && ((typeof ui!=='undefined' && ui.wakeBriefTest) || new Date().getHours() >= 12) && morningNotesFor(t).length) return t;
+  return today;
+}
 // ---- the note from last night: a headline (on the alarm), a message for the morning, and one
 // for before work. Older notes were just one line — that line counts as the headline.
 function nightNote(date){
-  const ns = morningNotesFor(date || todayStr()), out = {headline:'', morning:'', work:''};
+  const ns = morningNotesFor(date || briefNoteDate()), out = {headline:'', morning:'', work:''};
   ns.forEach(function(n){
     if(n.headline || n.morning || n.work){ if(n.headline) out.headline = n.headline; if(n.morning) out.morning = n.morning; if(n.work) out.work = n.work; }
     else if(n.text) out.headline = out.headline ? out.headline+' · '+n.text : n.text;
@@ -20954,43 +21256,13 @@ function lastNightSleep(){
   const h = state.modes.history.filter(function(m){ return m.sleep && m.endedAt && Date.now() - m.endedAt < 8*3600000 && m.minutes >= 60; }).sort(function(a, b){ return b.endedAt - a.endedAt; })[0];
   return h ? {minutes:h.minutes, from:h.startedAt, to:h.endedAt} : null;
 }
-function briefBase(){ return wakeCfg().intro!=='quick' ? 4800 : 1800; }
-// you, lately: streak, training, weight, and something you wrote a while back
-function briefMemory(){
-  const today = todayStr(), es = arr(state.journal.entries).filter(function(e){ return e.text && e.date < addDays(today, -6); });
-  if(!es.length) return null;
-  const want = [365, 180, 90, 30, 14, 7];
-  for(let i=0;i<want.length;i++){ const d = addDays(today, -want[i]), hit = es.find(function(e){ return e.date===d; }); if(hit) return {e:hit, ago:want[i]}; }
-  const pinned = es.filter(function(e){ return e.pinned; }), pool = pinned.length ? pinned : es, e = pool[dayNum() % pool.length];
-  return {e:e, ago:Math.round((Date.parse(today) - Date.parse(e.date))/86400000)};
-}
-function agoLabel(n){ return n>=365 ? 'A year ago' : n>=170 ? 'Six months ago' : n>=85 ? 'Three months ago' : n>=28 ? 'A month ago' : n>=14 ? 'Two weeks ago' : n+' days ago'; }
-function briefYouHtml(){
-  const streak = computeStreak(), wk = typeof workoutsThisWeek==='function' ? workoutsThisWeek() : 0, wp = typeof weightProgress==='function' ? weightProgress() : {};
-  const tiles = [['&#128293;', streak, streak===1 ? 'day streak' : 'day streak'], ['&#127947;&#65039;', wk, 'workouts this week']];
-  if(wp.latest!=null) tiles.push(['&#9878;&#65039;', wp.latest, wp.goal!=null ? 'lbs &middot; goal '+wp.goal : 'lbs']);
-  const cap = typeof dueCapsule==='function' ? dueCapsule() : null;
-  if(cap){
-    openCapsule(cap);
-    return {voice:'And a message from you, from '+fmtDateShort(cap.writtenOn)+'.', html:'<div class="br-k">&#9203; From Past You</div><div class="br-cap"><small>Written '+fmtDateShort(cap.writtenOn)+(cap.hidden ? ' — you didn’t know when it would turn up' : '')+'</small>'+(cap.title ? '<b>'+escapeHtml(cap.title)+'</b>' : '')+'<p>'+escapeHtml(cap.text)+'</p></div>'};
-  }
-  const mem = briefMemory();
-  const memHtml = mem ? '<div class="br-mem"><small>'+agoLabel(mem.ago)+' you wrote</small><p>'+(mem.e.title ? '<b>'+escapeHtml(mem.e.title)+'</b> ' : '')+escapeHtml(String(mem.e.text).slice(0, 140))+(String(mem.e.text).length > 140 ? '…' : '')+'</p></div>' : '';
-  return {voice: mem ? 'And a little something from you, '+agoLabel(mem.ago).toLowerCase()+'.' : 'Here’s where you’re at.',
-    html:'<div class="br-k">&#128100; You, Lately</div><div class="br-you-t">'+tiles.map(function(t){ return '<div><span>'+t[0]+'</span><b>'+t[1]+'</b><small>'+t[2]+'</small></div>'; }).join('')+'</div>'+memHtml+briefSystemHtml()};
-}
-// the SYSTEM's morning line: your level, rank and overall
-function briefSystemHtml(){
-  if(typeof xpSummary!=='function') return '';
-  const x = xpSummary(), r = RANKS[x.rank];
-  return '<div class="br-sys" data-action="openYou" title="Your card"><div class="br-sys-h"><span>[ SYSTEM ]</span><b style="color:'+r.color+'">LVL '+x.level+' &middot; '+escapeHtml(r.name)+'</b><em>OVR '+x.ovr+'</em></div>'+
-    '<i class="br-sys-bar"><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i></div>';
-}
+function briefBase(){ return wakeCfg().intro!=='quick' ? 4000 : 1400; }
+// ("You, lately" and "a month ago you wrote" are gone: the month and the week took their place — see 32u)
 function wakeBriefHtml(){
   if(typeof briefMinimalOn==='function' && briefMinimalOn()) return briefMinimalHtml();
   const today = todayStr(), name = state.profile.name || '';
   const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
-  const nn = nightNote(today);
+  const nn = nightNote();
   const q = quoteOfDay();
   const news = ui.morningNews && ui.morningNews.date===today ? ui.morningNews.items : null;
   const now = typeof wxNow==='function' ? wxNow() : null, phase = skyPhase(), win = dayWindow();
@@ -21010,7 +21282,8 @@ function wakeBriefHtml(){
   const panel = function(cls, anim, voice, html, extraStyle, attrs){
     const d = tcur; k++;
     const wms = typeof opVoiceOn==='function' && opVoiceOn() ? 360 : BRIEF_WORD_MS;
-    if(voice){ lines.push({at: d - 380, text: voice}); tcur += Math.max(1500, voice.split(' ').length*wms + 650); } else tcur += 800;
+    // (quicker than before: each line still finishes, with a short breath before the next piece)
+    if(voice){ lines.push({at: d - 380, text: voice}); tcur += Math.max(1100, voice.split(' ').length*wms + 420); } else tcur += 600;
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
   const slept = lastNightSleep();
@@ -21025,8 +21298,9 @@ function wakeBriefHtml(){
   if(nn.headline || nn.morning) colA.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+
     (nn.headline ? '<div class="br-ln-head">'+escapeHtml(nn.headline)+'</div>' : '')+(nn.morning ? '<div class="br-ln-text">'+escapeHtml(nn.morning)+'</div>' : '')));
   else if(vb && vb.elements.length) colA.push(panel('br-vision', 'br-a-scale', 'And this is what it’s all for.', boardStaticHtml(vb, 'wake-board'), '', ' data-action="wakeBoardToggle" title="Open your vision board"'));
-  const you = briefYouHtml();
-  if(you) colA.push(panel('br-you', 'br-a-rise', you.voice, you.html));
+  // the month and the week (or, rarely, a time capsule) — with your streak and level on top
+  const you = typeof briefIntentHtml==='function' ? briefIntentHtml() : null;
+  if(you) colA.push(panel('br-you br-intent', 'br-a-rise', you.voice, you.html));
   // column 2: a line to carry, and a few small things for a good day
   colB.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
   colB.push(panel('br-thoughts', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+
@@ -21048,6 +21322,7 @@ function wakeBriefHtml(){
       const lt = late();
       colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports</div>'+sc+sh.slice(0, sc ? 3 : 6).map(function(n){ return item(n, false); }).join(''), lt));
     } else if(newsWait || (ui.scores && ui.scores.loading)) colD.push(waitHtml('br-sports', '&#127936; Sports'));
+    else colD.push(panel('br-sports', 'br-a-rise', '', '<div class="br-k">&#127936; Sports</div><div class="br-sports-none">No games on the board right now. Ask the Operator for sports — it goes and gets them.</div>'));
   }
   // the day ahead — just the calendar; the work plan waits for the business preview
   colB.push(panel('br-day', 'br-a-right', events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.',
@@ -21068,7 +21343,7 @@ function wakeBriefHtml(){
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner b4">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        '<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
+        (typeof briefHudHtml==='function' ? briefHudHtml() : '')+'<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
         // one button: Skip takes you straight to the app
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
       '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
@@ -21095,7 +21370,7 @@ ACTIONS.wakeIntroSkip = function(){
 };
 // ---- the narration: one line at a time, typed out ----
 let briefVoiceTimer = null;
-const BRIEF_WORD_MS = 190; // a comfortable read: each line finishes before the next piece arrives
+const BRIEF_WORD_MS = 150; // a comfortable read: each line finishes before the next piece arrives
 function briefBuilt(){ const l = ui.briefLines || []; return !!l.length && Date.now() - (ui.briefT0||0) > l[l.length-1].at + 2000; }
 function briefVoiceRun(){
   clearInterval(briefVoiceTimer);
@@ -21229,6 +21504,12 @@ function workWeekHtml(target){
       return '<div class="wi-wk'+(x.d===today?' is-today':'')+(x.m>=target?' is-hit':'')+'" title="'+weekdayShort(x.d)+': '+fmtDurationLabel(x.m)+'"><u style="height:'+Math.max(3, x.m/top*100).toFixed(1)+'%"></u><span>'+weekdayShort(x.d).slice(0,1)+'</span></div>';
     }).join('')+'</div></div>';
 }
+// the business message you left yourself the night before (the "before you lock in" part of the note)
+function workMessageHtml(){
+  const w = nightNote().work;
+  return '<div class="wi-msg'+(w ? '' : ' is-empty')+'"><div class="wi-msg-h"><span>&#128188; Business message</span><button class="wi-msg-e" data-action="openTomorrowNote" title="'+(w ? 'Write tomorrow’s' : 'Write one for tomorrow')+'">&#9998;</button></div>'+
+    (w ? '<p>'+escapeHtml(w)+'</p>' : '<p class="wi-msg-none">Nothing from last night. Leave tomorrow’s when you clock out.</p>')+'</div>';
+}
 function renderPlanReveal(){
   if(!ui.planReveal) return '';
   const plan = todaysPlan().filter(function(t){ return t.status!=='done'; }).slice(0, 6), first = plan[0];
@@ -21243,12 +21524,11 @@ function renderPlanReveal(){
   return '<div class="wi">'+
     '<div class="wi-top"><span class="pr-badge">&#128339; Clocked In</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
       (ui.planReveal && ui.planReveal.from==='morning' ? '<button class="wi-back" data-action="backToMorning" title="Back to Good morning">&#8592; Morning</button>' : '')+
-      '<span class="wi-pl">'+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
+      '<span class="wi-pl">'+(typeof aiTalkHtml==='function' ? aiTalkHtml() : '')+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
       '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
     '<div class="wi-inner">'+
       '<div class="wi-k" style="animation-delay:40ms">Work Mode</div>'+
       '<h1 class="wi-h" style="animation-delay:100ms">Let’s get to work'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
-      (typeof opAskHtml==='function' ? '<div class="wi-op">'+opAskHtml('work')+'<div class="wi-cap" id="wiCap"></div></div>' : '')+
       '<div class="wi-stats n'+stats.length+'">'+stats.map(function(s){ return '<div class="wi-stat"'+(s.go ? ' data-action="'+s.go+'"' : '')+' style="'+at(140)+'"><div class="wi-stat-k">'+s.k+'</div><div class="wi-stat-v">'+s.v+'</div>'+(s.pct!=null ? '<div class="wi-bar"><i style="width:'+s.pct.toFixed(1)+'%"></i></div>' : '')+'<div class="wi-stat-s">'+escapeHtml(s.sub)+'</div></div>'; }).join('')+'</div>'+
       '<div class="wi-cols">'+
         '<div class="wi-col">'+
@@ -21259,10 +21539,10 @@ function renderPlanReveal(){
           '</div>'+
           workClientsHtml()+
         '</div>'+
-        '<div class="wi-col wi-right" style="'+at(300)+'">'+(nightNote().work ? '<div class="wi-note"><span>&#127769; You told yourself</span><p>'+escapeHtml(nightNote().work)+'</p></div>' : '')+
+        // your business message from last night first (or a nudge to write tomorrow's), one quote, your week
+        '<div class="wi-col wi-right" style="'+at(300)+'">'+workMessageHtml()+
           '<div class="wi-side">'+quoteHtml(q, 'is-work', 'work')+'</div>'+
           workWeekHtml(target)+
-          '<div class="wi-act">'+quoteHtml(quoteFor('action'), 'is-act', 'action')+'</div>'+
         '</div>'+
       '</div>'+
       '<div class="pr-cta" style="animation-delay:420ms">'+
@@ -21309,7 +21589,11 @@ function npLeave(then){
   const n = document.querySelector('#viewRoot .np');
   if(!n){ then(); return; }
   n.classList.add('is-leaving');
-  setTimeout(then, 340);
+  setTimeout(function(){
+    then();
+    const vr = document.getElementById('viewRoot');
+    if(vr){ vr.classList.remove('vr-in'); void vr.offsetWidth; vr.classList.add('vr-in'); setTimeout(function(){ vr.classList.remove('vr-in'); }, 420); }
+  }, 220);
 }
 ACTIONS.toggleLockedView = function(){
   const leaving = lockedMinimal();
@@ -21320,7 +21604,7 @@ document.addEventListener('keydown', function(e){
   if(e.key!=='m' && e.key!=='M') return;
   if(e.metaKey || e.ctrlKey || e.altKey || (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) || (e.target && e.target.isContentEditable)) return;
   if(document.querySelector('.overlay:not(.hidden)')) return;
-  if(!state.focus.activeSession && ui.view==='focus'){ e.preventDefault(); ACTIONS.toggleFocusMinimal(); return; }
+  if(!state.focus.activeSession && (ui.view==='focus' || ui.view==='today')){ e.preventDefault(); ACTIONS.toggleFocusMinimal(); return; }
   if(!state.focus.activeSession || (ui.view!=='today' && ui.view!=='focus')) return;
   e.preventDefault(); ACTIONS.toggleLockedView();
 });
@@ -21353,7 +21637,6 @@ function renderFocusMinimal(){
         '<div class="hm-s"><b>'+fmtHours(deep)+'</b><small>of '+fmtHours(target)+' today</small><i><u style="width:'+Math.min(100, deep/target*100).toFixed(1)+'%"></u></i></div>'+
       '</div>'+
       '<button class="hm-go" data-action="openLockInChooser" title="Lock in (L)"><span class="hm-go-ring"></span><span>&#128274;</span><b>LOCK IN</b></button>'+
-      (typeof aiTalkHtml==='function' ? '<div class="hm-talk">'+aiTalkHtml()+'<div class="hm-cap" id="hmCap"></div></div>' : '')+
       '<div class="hm-btns">'+
         '<button class="hm-b" data-action="openQuickJournalModal">&#128221; Journal</button>'+
         '<button class="hm-b" data-action="clockOut">&#127937; Clock out</button>'+
@@ -21424,13 +21707,13 @@ function renderLockedMinimal(){
     const total = b.minutes ? b.minutes*60000 : null;
     body = '<div class="np-art is-break"><span>&#9749;</span></div>'+
       '<div class="np-meta">'+
-        '<div class="np-k">On a break</div>'+
-        '<div class="np-title">'+(b.note ? escapeHtml(b.note) : 'Breathe. Stretch. Look away.')+'</div>'+
-        '<div class="np-sub">'+(left!=null ? 'Back at '+fmtTimeShort(as.breakEndsAt) : 'No timer — end it when you\'re ready')+'</div>'+
+        '<div class="np-k">'+(as.breakOverAt ? 'Break’s over' : 'On a break')+'</div>'+
+        '<div class="np-title">'+(as.breakOverAt ? 'Lock back in when you’re back.' : b.note ? escapeHtml(b.note) : 'Breathe. Stretch. Look away.')+'</div>'+
+        '<div class="np-sub">'+(as.breakOverAt ? 'It waits for you — break time isn’t work time.' : left!=null ? 'Back at '+fmtTimeShort(as.breakEndsAt) : 'No timer — end it when you\'re ready')+'</div>'+
         '<div class="np-prog">'+tl+'<div class="np-bar"><i id="npBreakBar" style="width:'+(total && left!=null ? ((1 - left/total)*100).toFixed(1) : 0)+'%"></i></div>'+
           '<div class="np-times"><span id="modeElapsed">'+formatElapsed(Date.now()-(as.breakStartedAt||Date.now()))+'</span><span id="breakRemaining">'+(left!=null ? formatElapsed(left)+' left' : '')+'</span></div></div>'+
         '<div class="np-ctl">'+(as.breakEndsAt ? '<button class="np-c" data-action="extendBreak" data-minutes="5" title="5 more minutes">+5</button>' : '<span class="np-c-sp"></span>')+
-          '<button class="np-c is-main" data-action="endBreakModeFromFocus" title="End the break">&#9654;</button>'+npMusicBtnHtml()+'</div>'+
+          '<button class="np-c is-main is-back" data-action="endBreakModeFromFocus" title="Lock back in">&#128274;</button>'+npMusicBtnHtml()+'</div>'+
         npMusicRowHtml()+
       '</div>';
   } else {
@@ -21439,29 +21722,32 @@ function renderLockedMinimal(){
       '<div class="np-meta">'+
         '<div class="np-k">'+(m && as.method.id!=='block' ? m.label : 'Locked in')+'</div>'+
         '<div class="np-title">'+(cur ? escapeHtml(cur.title) : 'Deep work')+'</div>'+
-        '<div class="np-sub">'+(st ? '<span id="msLine">'+methodLine(st)+'</span>' : (as.plannedMinutes ? fmtDurationLabel(as.plannedMinutes)+' session' : fmtDurationLabel(deepWorkMinutesTodayLive())+' of deep work today'))+'</div>'+
+        '<div class="np-sub">'+(st ? '<span id="msLine">'+methodLine(st)+'</span>'+(st.id==='flow' && typeof flowTipHtml==='function' ? flowTipHtml() : '') : (as.plannedMinutes ? fmtDurationLabel(as.plannedMinutes)+' session' : fmtDurationLabel(deepWorkMinutesTodayLive())+' of deep work today'))+'</div>'+
         '<div class="np-prog">'+(tl || '<div class="np-bar"><i id="focusProgressBar" style="width:'+pct.toFixed(1)+'%"></i></div>')+
           '<div class="np-times"><span id="focusElapsed">'+formatElapsed(elapsed)+'</span><span>'+(as.plannedMinutes ? 'until '+fmtTimeShort(as.startedAt + as.plannedMinutes*60000) : '')+'</span></div></div>'+
+        // the player: a break on the left, the music in the middle, lock out on the right
         '<div class="np-ctl">'+
           '<button class="np-c" data-action="openBreakNotePrompt" title="Take a break">&#9749;</button>'+
-          (cur ? '<button class="np-c is-main" data-action="finishCurrentTask" title="Done with this task">&#10003;</button>' : '<button class="np-c is-main" data-action="openStopFocus" title="Lock out">&#9632;</button>')+
-          npMusicBtnHtml()+
+          npMusicBtnHtml(true)+
+          '<button class="np-c np-out" data-action="openStopFocus" title="Lock out">&#9632;</button>'+
         '</div>'+
         npMusicRowHtml()+
-        (nx && (!cur || nx.id!==cur.id) ? '<div class="np-next">Up next &middot; '+escapeHtml(nx.title)+'</div>' : '')+
+        // the task you're on (✓ when it's done) and the one after it — small, part of the player
+        ((cur || (nx && (!cur || nx.id!==cur.id))) ? '<div class="np-task">'+
+          (cur ? '<button class="np-task-done" data-action="finishCurrentTask" title="Done with this task">&#10003; Done</button>' : '')+
+          (nx && (!cur || nx.id!==cur.id) ? '<span class="np-next">Next &middot; '+escapeHtml(nx.title)+'</span>' : '')+'</div>' : '')+
       '</div>';
   }
   return '<div class="np np-locked'+(onBreak?' is-break':'')+'">'+
     '<div class="np-bg"></div>'+
-    '<div class="np-top">'+npClockHtml()+'<span style="flex:1"></span>'+
-      '<button class="lv-btn lv-out" data-action="openStopFocus" title="Lock out">&#128275; Lock out</button>'+lockedViewBtnHtml()+'</div>'+
+    '<div class="np-top">'+npClockHtml()+'<span style="flex:1"></span>'+lockedViewBtnHtml()+'</div>'+
     '<div class="np-main">'+body+'</div>'+
   '</div>';
 }
 // full-screen feel: the sidebar and floating buttons step aside in the minimal view
 afterRenderHooks.push(function(){
   const on = !!(state.focus && state.focus.activeSession && (ui.view==='today' || ui.view==='focus') && lockedMinimal()) || !!(ui.view==='today' && document.querySelector('#viewRoot .rest-full'))
-    || !!(ui.view==='focus' && !(state.focus && state.focus.activeSession) && focusMinimalOn());
+    || !!((ui.view==='focus' || ui.view==='today') && !(state.focus && state.focus.activeSession) && focusMinimalOn() && document.querySelector('#viewRoot .np-home'));
   document.body.classList.toggle('np-on', on);
   const brk = !!(state.focus && state.focus.activeSession && state.focus.activeSession.onBreak);
   document.body.classList.toggle('is-on-break', brk);
@@ -21607,7 +21893,8 @@ function focusMusicStop(){
 }
 function fmRefresh(){ document.querySelectorAll('.fm').forEach(function(el){ el.outerHTML = focusPlayerHtml(el.classList.contains('is-np')); }); }
 ACTIONS.fmToggle = function(){ if(FM.playing) focusMusicStop(); else focusMusicPlay(); };
-ACTIONS.fmNext = function(){ const was = FM.playing; FM.idx = (FM.idx + 1) % FOCUS_TRACKS.length; FM.bar = 0; if(was){ focusMusicStop(); setTimeout(function(){ focusMusicPlay(); }, 900); } else fmRefresh(); };
+// (while it switches tracks it still counts as playing, so the player doesn't blink shut)
+ACTIONS.fmNext = function(){ const was = FM.playing; FM.idx = (FM.idx + 1) % FOCUS_TRACKS.length; FM.bar = 0; if(was){ FM.switching = true; focusMusicStop(); setTimeout(function(){ FM.switching = false; focusMusicPlay(); }, 900); } else fmRefresh(); };
 function focusPlayerHtml(np){
   const tr = FOCUS_TRACKS[FM.idx];
   return '<span class="fm'+(np?' is-np':'')+(FM.playing?' is-on':'')+'">'+
@@ -21758,14 +22045,16 @@ ACTIONS.noop = function(){};
 // Always up in the top-right corner, tiny: ▶ plays Operator's own generated tracks (⏭ skips).
 // That's it — the Apple Music playlists are gone; Apple Music is only for the wake-up song.
 // In the minimal locked-in view the same player sits under the timer.
-function dockSrc(){ return FM.playing ? 'fm' : null; }
-function musicOn(){ return !!FM.playing; }
-function dockSrcName(){ return FM.playing ? FOCUS_TRACKS[FM.idx].name : ''; }
+function fmOn(){ return !!(FM.playing || FM.switching); }
+function dockSrc(){ return fmOn() ? 'fm' : null; }
+function musicOn(){ return fmOn(); }
+function dockSrcName(){ return fmOn() ? FOCUS_TRACKS[FM.idx].name : ''; }
 ACTIONS.dockFm = function(){
+  if(FM.switching) return;
   if(FM.playing) focusMusicStop(); else focusMusicPlay();
   dockRefresh();
 };
-ACTIONS.dockNext = function(){ if(FM.playing) ACTIONS.fmNext(); };
+ACTIONS.dockNext = function(){ if(FM.playing && !FM.switching) ACTIONS.fmNext(); };
 // the third button in the minimal view: music on / off
 ACTIONS.npMusic = function(){ ACTIONS.dockFm(); };
 function dockBtnsHtml(){
@@ -21774,19 +22063,24 @@ function dockBtnsHtml(){
 }
 function dockHtml(){
   const name = dockSrcName();
-  return '<div class="md-in'+(musicOn()?' is-playing':'')+'">'+(name ? '<span class="md-now" title="'+escapeHtml(name)+'">'+escapeHtml(name)+'</span><button class="md-b md-skip" data-action="dockNext" title="Next">&#9197;</button>' : '')+dockBtnsHtml()+'</div>';
+  // the Operator's mic sits here too: talk to it from anywhere
+  return '<div class="md-in'+(musicOn()?' is-playing':'')+'">'+(name ? '<span class="md-now" title="'+escapeHtml(name)+'">'+escapeHtml(name)+'</span><button class="md-b md-skip" data-action="dockNext" title="Next">&#9197;</button>' : '')+dockBtnsHtml()+
+    '<button class="md-b md-op op-talk" data-action="opTalk" title="Talk to the Operator">&#127897;&#65039;</button></div>';
 }
-function npMusicBtnHtml(){ const on = musicOn(); return '<button class="np-c np-music'+(on?' is-on':'')+'" data-action="npMusic" title="'+(on ? 'Pause the music' : 'Music')+'">'+(on ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9835;')+'</button>'; }
+// (main: the big middle button of the minimal player — ▶ / ❚❚)
+function npMusicBtnHtml(main){ const on = musicOn(); return '<button class="np-c np-music'+(main?' is-main':'')+(on?' is-on':'')+'" data-action="npMusic" title="'+(on ? 'Pause the music' : 'Play music')+'">'+(on ? (main ? '&#10073;&#10073;' : '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>') : (main ? '&#9654;' : '&#9835;'))+'</button>'; }
+// under the player: what's playing and ⏭ — only while something plays (the big button starts it)
 function npMusicRowHtml(){
   const name = dockSrcName();
-  return '<div class="np-mrow"><span class="np-mnow">'+(name ? escapeHtml(name) : 'Focus music')+'</span>'+(name ? '<button class="md-b md-skip" data-action="dockNext" title="Next">&#9197;</button>' : '')+'<span class="np-msrc">'+dockBtnsHtml()+'</span></div>';
+  if(!name) return '<div class="np-mrow is-empty"></div>';
+  return '<div class="np-mrow"><span class="np-mnow">&#9835; '+escapeHtml(name)+'</span><button class="md-b md-skip" data-action="dockNext" title="Next track">&#9197;</button></div>';
 }
 function dockRefresh(){
   let d = document.getElementById('musicDock');
   if(!d){ d = document.createElement('div'); d.id = 'musicDock'; d.className = 'md'; document.body.appendChild(d); }
   const h = dockHtml(); if(d._h!==h){ d.innerHTML = h; d._h = h; }
   const key = String(dockSrc())+'|'+dockSrcName();
-  document.querySelectorAll('.np-mrow, .np-c.np-music').forEach(function(el){ if(el.dataset.k===key) return; const n = el.classList.contains('np-mrow') ? npMusicRowHtml() : npMusicBtnHtml(); const t = document.createElement('div'); t.innerHTML = n; const nn = t.firstChild; nn.dataset.k = key; el.replaceWith(nn); });
+  document.querySelectorAll('.np-mrow, .np-c.np-music').forEach(function(el){ if(el.dataset.k===key) return; const n = el.classList.contains('np-mrow') ? npMusicRowHtml() : npMusicBtnHtml(el.classList.contains('is-main')); const t = document.createElement('div'); t.innerHTML = n; const nn = t.firstChild; nn.dataset.k = key; el.replaceWith(nn); });
   const art = document.querySelector('.np-locked .np-art:not(.is-break)');
   if(art){ const on = musicOn(); art.classList.toggle('is-music', on); const eq = art.querySelector('.np-art-eq'); if(on && !eq) art.insertAdjacentHTML('beforeend', '<span class="np-art-eq wk2-eq"><i></i><i></i><i></i><i></i></span>'); if(!on && eq) eq.remove(); }
 }
@@ -21911,12 +22205,13 @@ function openTomorrowNote(){
   let o = document.getElementById('tnOverlay');
   if(!o){ o = document.createElement('div'); o.id = 'tnOverlay'; o.className = 'overlay tn-ov'; o.innerHTML = '<div class="card tn" id="tnContent"></div>'; document.body.appendChild(o); o.addEventListener('pointerdown', function(e){ if(e.target===o) closeTomorrowNote(); }); }
   const target = morningNoteTarget(), nn = nightNote(target);
+  const day = target===addDays(todayStr(), 1) ? 'Tomorrow' : new Date(target+'T12:00').toLocaleDateString(undefined, {weekday:'long'});
   document.getElementById('tnContent').innerHTML =
-    '<div class="tn-h"><div><div class="tn-k">&#127769; For '+(target===addDays(todayStr(), 1) ? 'tomorrow' : weekdayShort(target))+'</div><div class="tn-t">A note to the morning you</div></div><button class="tn-x" data-action="closeTomorrowNote">&#10005;</button></div>'+
-    '<label class="tn-f"><span>Headline<small>Big on the alarm and Good morning</small></span><input class="input" id="tnHead" maxlength="120" placeholder="e.g. Up at 6. Don’t negotiate." value="'+escapeHtml(nn.headline)+'"></label>'+
-    '<label class="tn-f"><span>For the morning<small>On Good morning — the longer version</small></span><textarea class="input" id="tnMorning" rows="3" placeholder="How you want the morning to go…">'+escapeHtml(nn.morning)+'</textarea></label>'+
-    '<label class="tn-f"><span>Before you lock in<small>On the work preview, the first time you clock in</small></span><textarea class="input" id="tnWork" rows="2" placeholder="e.g. Call Mike first. Then the JJS edit.">'+escapeHtml(nn.work)+'</textarea></label>'+
-    '<div class="tn-a"><button class="btn btn-primary" data-action="saveTomorrowNote">Save note</button></div>';
+    '<div class="tn-h"><div><div class="tn-k">&#127769; '+day+' morning</div><div class="tn-t">Leave yourself a note</div></div><button class="tn-x" data-action="closeTomorrowNote">&#10005;</button></div>'+
+    '<div class="tn-f"><div class="tn-l"><b>Headline</b><span>On the alarm and at the top of Good morning</span></div><input class="tn-in" id="tnHead" maxlength="90" placeholder="Up at 6. Don’t negotiate." value="'+escapeHtml(nn.headline)+'"></div>'+
+    '<div class="tn-f"><div class="tn-l"><b>Good morning</b><span>A few words for when you wake up</span></div><textarea class="tn-in" id="tnMorning" rows="2" placeholder="Slow coffee, a walk, then go.">'+escapeHtml(nn.morning)+'</textarea></div>'+
+    '<div class="tn-f"><div class="tn-l"><b>Business message</b><span>On the work page, before you lock in</span></div><textarea class="tn-in" id="tnWork" rows="2" placeholder="Call Mike first. Then the JJS edit.">'+escapeHtml(nn.work)+'</textarea></div>'+
+    '<div class="tn-a"><button class="tn-save" data-action="saveTomorrowNote">Save note</button></div>';
   o.classList.remove('hidden');
   setTimeout(function(){ const i = document.getElementById('tnHead'); if(i) i.focus(); }, 50);
 }
@@ -21940,6 +22235,7 @@ function tomorrowNoteBtnHtml(cls){ const has = (function(){ const n = nightNote(
 ACTIONS.backToMorning = function(){
   ui.planReveal = null; hideOverlay('planOverlay');
   ui.wakeMode = 'brief'; ui.wakeIntroDone = true; ui.briefSkipped = true; ui.briefT0 = Date.now() - 120000; ui.briefShift = 120000;
+  if(typeof loadScores==='function' && !(ui.scores && ui.scores.got && (ui.scores.nfl || ui.scores.nba))) loadScores(true);
   showOverlay('wakeOverlay'); renderWakeOverlayInto();
 };
 
@@ -21955,7 +22251,7 @@ function briefMinimalOn(){ return wakeCfg().briefLayout==='minimal'; }
 function briefMinimalHtml(){
   const name = state.profile.name || '', today = todayStr(), now = typeof wxNow==='function' ? wxNow() : null, phase = skyPhase(), win = dayWindow();
   const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
-  const q = quoteOfDay(), nn = nightNote(today), news = ui.morningNews && ui.morningNews.date===today ? ui.morningNews.items : null;
+  const q = quoteOfDay(), nn = nightNote(), news = ui.morningNews && ui.morningNews.date===today ? ui.morningNews.items : null;
   const slept = lastNightSleep(), streak = computeStreak();
   const tile = function(cls, k, html, i){ return '<div class="gmm-t '+cls+'" style="--i:'+i+'"><div class="gmm-k">'+k+'</div>'+html+'</div>'; };
   ui.briefLines = [{at:0, text: (nn.headline ? 'You left yourself a note. ' : '')+'Get ready to start your day.'}];
@@ -22040,9 +22336,37 @@ function speakable(t){
     .replace(/·/g, ',').replace(/\s+/g, ' ').trim();
 }
 function opCaption(txt){
+  if(OV.cap==='opBubText') opBubShow();
   const el = OV.cap ? document.getElementById(OV.cap) : null;
   if(el && el.textContent!==txt) el.textContent = txt;
+  if(OV.cap==='opBubText') opBubHideLater();
 }
+// ---- the Operator's bubble: what it says (and your reply box) floats over the page, bottom centre,
+// so nothing on the page ever moves; it slips away a few seconds after it's done ----
+function opBubShow(){
+  let b = document.getElementById('opBub');
+  if(!b){
+    b = document.createElement('div'); b.id = 'opBub'; b.className = 'op-bub';
+    b.innerHTML = '<div class="op-bub-h"><span class="op-bub-dot"></span><b>OPERATOR</b><button class="op-bub-x" data-action="opBubClose" title="Close">&#10005;</button></div>'+
+      '<div class="op-bub-t" id="opBubText"></div>'+
+      '<div class="op-bub-in"><input class="op-type" id="opBubInput" placeholder="Ask the Operator…" autocomplete="off"><button class="op-talk" data-action="opTalk" title="Talk (mic)">&#127897;&#65039;</button></div>';
+    document.body.appendChild(b);
+    b.addEventListener('mouseenter', function(){ b._hover = true; clearTimeout(opBubHideLater._t); });
+    b.addEventListener('mouseleave', function(){ b._hover = false; opBubHideLater(); });
+  }
+  if(!b.classList.contains('is-in')){ void b.offsetWidth; b.classList.add('is-in'); }
+  return b;
+}
+function opBubHideLater(){
+  clearTimeout(opBubHideLater._t);
+  opBubHideLater._t = setTimeout(function(){
+    const b = document.getElementById('opBub'); if(!b) return;
+    const typing = document.activeElement && document.activeElement.id==='opBubInput' && document.activeElement.value;
+    if(b._hover || typing || OV.speaking || OV.pending || AI.busy || AI.listening){ opBubHideLater(); return; }
+    b.classList.remove('is-in');
+  }, 9000);
+}
+ACTIONS.opBubClose = function(){ opStop(); const b = document.getElementById('opBub'); if(b) b.classList.remove('is-in'); };
 function opTtsUrl(text){
   const w = wakeCfg(), e = opEngine();
   return WAKE_HELPER+'tts/say?e='+e+'&v='+hexUtf8(e==='eleven' ? (w.elevenVoice||'') : (w.macVoice||''))+'&t='+hexUtf8(text);
@@ -22098,8 +22422,9 @@ function opSayBrowser(said, opts, tok, resolve){
   u.rate = 0.98; u.pitch = 1; u.volume = 1;
   let gotBoundary = false, t0 = 0, est = null;
   OV.pending = true;
-  const startTimer = setTimeout(function(){ if(OV.pending && tok===OV.token){ OV.pending = false; OV.broken = true; try{ speechSynthesis.cancel(); }catch(e){} resolve(false); } }, 1500);
-  u.onstart = function(){ clearTimeout(startTimer); t0 = Date.now(); opStarted(tok, opts);
+  // (a voice can take a few seconds to wake up the first time; only give up on it after two misses)
+  const startTimer = setTimeout(function(){ if(OV.pending && tok===OV.token){ OV.pending = false; OV.misses = (OV.misses||0) + 1; if(OV.misses >= 2) OV.broken = true; try{ speechSynthesis.cancel(); }catch(e){} opCaption(said); resolve(false); } }, 6000);
+  u.onstart = function(){ clearTimeout(startTimer); OV.misses = 0; t0 = Date.now(); opStarted(tok, opts);
     // some voices don't report word boundaries: follow along by time instead
     est = setInterval(function(){ if(gotBoundary || tok!==OV.token) return; const words = said.split(' '), n = Math.min(words.length, Math.floor((Date.now()-t0)/330)+1); opCaption(words.slice(0, n).join(' ')); }, 120); };
   u.onboundary = function(e){ if(tok!==OV.token) return; gotBoundary = true; const end = said.indexOf(' ', e.charIndex + (e.charLength||1)); opCaption(end<0 ? said : said.slice(0, end)); };
@@ -22222,7 +22547,7 @@ function opBusinessScript(){
 // asking: the bits that need fetching are fetched first (it says so if that takes a moment)
 ACTIONS.opAsk = async function(el, e, id){
   opStop(); OV.idx = 999; // the spoken greeting is done once you ask for something
-  const cap = overlayOpen('planOverlay') ? 'wiCap' : 'brVoice';
+  const cap = 'opBubText';
   const tok = OV.token;
   const wait = function(p){ return Promise.race([p, new Promise(function(r){ setTimeout(r, 7000); })]); };
   if(id==='sports' && typeof loadScores==='function' && !(ui.scores && ui.scores.got && (ui.scores.nfl || ui.scores.nba))){ OV.cap = cap; opCaption('One moment — getting the scores…'); await wait(loadScores(true)); }
@@ -22246,13 +22571,13 @@ function opMuteHtml(){
 function opAskHtml(where){
   const chip = function(id, icon, label){ return '<button class="op-ask" data-action="opAsk" data-id="'+id+'">'+icon+' '+label+'</button>'; };
   return '<div class="op-asks">'+
-    '<span class="op-name">The Operator</span>'+
+
     (where==='work' ? chip('business', '&#128188;', 'Brief me') : chip('sports', '&#127944;', 'Sports')+chip('news', '&#128240;', 'News')+chip('tech', '&#128187;', 'Tech')+chip('business', '&#128188;', 'Business'))+
     aiTalkHtml()+
     '</div>';
 }
 // the business brief plays by itself when you go straight from Good morning to work
-function opAutoBusinessBrief(){ if(!opVoiceOn()) return; setTimeout(function(){ if(overlayOpen('planOverlay')) { opStop(); opSay(opBusinessScript(), {cap:'wiCap'}); } }, 900); }
+function opAutoBusinessBrief(){ if(!opVoiceOn()) return; setTimeout(function(){ if(overlayOpen('planOverlay')) { opStop(); opSay(opBusinessScript(), {cap:'opBubText'}); } }, 900); }
 
 // ---- choosing the voice (in the alarm settings, under "The Operator's voice") ----
 const ELEVEN_VOICES = [['JBFqnCBsd6RMkjVDRZzb', 'George — British, warm (the butler)'], ['onwK4e9ZLuTAKqWW03F9', 'Daniel — British, crisp'], ['nPczCjzI2devNBz1zQrb', 'Brian — deep, American']];
@@ -22289,7 +22614,7 @@ function opVoiceSettingsHtml(){
     body = '<select class="input" id="opBrowserVoice">'+(vs.length ? vs.map(function(v){ return '<option value="'+escapeHtml(v.name)+'"'+(cur && cur.name===v.name?' selected':'')+'>'+escapeHtml(v.name)+'</option>'; }).join('') : '<option>No voices found</option>')+'</select>'+
       '<div class="op-set-help">The browser’s own voices — the simplest, and the most robotic. Premium and Enhanced voices you download on the Mac show up here too.</div>';
   }
-  return '<div class="field op-set" id="opVoiceSet"><label>Voice</label>'+
+  return '<div class="field op-set" id="opVoiceSet"><label>Voice</label>'+opLauncherLineHtml()+
     '<div class="seg-tabs" style="margin:0 0 8px;">'+seg('eleven', 'ElevenLabs')+seg('mac', 'Mac voice')+seg('browser', 'Browser')+'</div>'+body+
     '<div class="op-set-test"><button class="btn btn-sm" data-action="opTest">&#9654; Test the voice</button><span id="opTestCap" class="op-set-cap"></span></div></div>'+aiKeyHtml();
 }
@@ -22313,7 +22638,7 @@ ACTIONS.opElevenSave = function(){
   // straight to the Operator app (it keeps the key in its own file); never into Operator's data
   fetchWithin(WAKE_HELPER+'tts/key?t='+hexUtf8(v), 6000).then(function(r){
     if(r && r.ok){ ui.ttsKey = true; showToast('ElevenLabs key saved on this Mac.', {icon:'&#128274;'}); opVoiceChanged(); renderView(); }
-    else showToast('Couldn’t save it — the Operator app isn’t answering. Open Operator from its icon.', {icon:'&#9888;'});
+    else opLauncherWhy().then(function(why){ showToast('Couldn’t save the key — '+why, {icon:'&#9888;', duration:10000}); });
   });
 };
 ACTIONS.opElevenForget = function(){ fetchWithin(WAKE_HELPER+'tts/forget', 6000).then(function(){ ui.ttsKey = false; renderView(); }); };
@@ -22404,18 +22729,18 @@ function aiListen(cap){
   rec.onend = function(){ AI.listening = false; aiUiRefresh(); if(said.trim()) aiAsk(said, cap); };
   try{ rec.start(); }catch(e){ AI.listening = false; aiTypeFocus(); }
 }
-function aiTypeFocus(){ const i = document.querySelector('.op-type'); if(i) i.focus(); }
+function aiTypeFocus(){ OV.cap = 'opBubText'; opBubShow(); const i = document.getElementById('opBubInput'); if(i) setTimeout(function(){ i.focus(); }, 60); }
 function aiUiRefresh(){
   document.querySelectorAll('.op-talk').forEach(function(b){ b.classList.toggle('is-on', AI.listening); b.classList.toggle('is-busy', AI.busy); });
 }
-function aiCapFor(el){ return overlayOpen('planOverlay') ? 'wiCap' : overlayOpen('wakeOverlay') ? 'brVoice' : 'hmCap'; }
-ACTIONS.opTalk = function(el){ aiListen(aiCapFor(el)); };
+function aiCapFor(){ return 'opBubText'; }
+ACTIONS.opTalk = function(el){ OV.cap = 'opBubText'; opBubShow(); aiListen('opBubText'); };
 document.addEventListener('keydown', function(e){
   const t = e.target; if(!t || !t.classList || !t.classList.contains('op-type') || e.key!=='Enter') return;
   e.preventDefault(); const v = t.value; t.value = ''; aiAsk(v, aiCapFor(t));
 });
 function aiTalkHtml(){
-  return '<span class="op-talk-wrap"><button class="op-talk" data-action="opTalk" title="Talk to the Operator">&#127897;&#65039;</button><input class="op-type" placeholder="Ask the Operator…" autocomplete="off"></span>';
+  return '<button class="op-talk" data-action="opTalk" title="Talk to the Operator">&#127897;&#65039;</button>';
 }
 // the key: straight to the Operator app, never into Operator's data
 ACTIONS.aiKeySave = function(){
@@ -22424,7 +22749,7 @@ ACTIONS.aiKeySave = function(){
   if(i) i.value = '';
   fetchWithin(WAKE_HELPER+'ai/key?t='+hexUtf8(v), 6000).then(function(r){
     if(r && r.ok){ AI.hasKey = true; AI.model = null; showToast('Anthropic key saved on this Mac. Say hello.', {icon:'&#128274;'}); renderView(); }
-    else showToast('Couldn’t save it — the Operator app isn’t answering. Open Operator from its icon.', {icon:'&#9888;'});
+    else opLauncherWhy().then(function(why){ showToast('Couldn’t save the key — '+why, {icon:'&#9888;', duration:10000}); });
   });
 };
 ACTIONS.aiKeyForget = function(){ fetchWithin(WAKE_HELPER+'ai/forget', 6000).then(function(){ AI.hasKey = false; AI.model = null; renderView(); }); };
@@ -22435,10 +22760,35 @@ function aiKeyHtml(){
       : '<div class="op-set-key"><input class="input" type="password" id="aiKey" placeholder="Anthropic API key (sk-ant-…)" autocomplete="off"><button class="btn btn-sm btn-primary" data-action="aiKeySave">Save key</button></div>')+
     '<div class="op-set-help">Get a key at console.anthropic.com → API keys.</div></div>';
 }
+
+// ---- is the Operator launcher there, and is it the new one? (keys, voices and talking need it) ----
+const OP_HELPER_NEEDS = 10;
+async function opLauncherInfo(){
+  const r = await fetchWithin(WAKE_HELPER+'ping', 3000);
+  if(!r) return {up:false, v:0};
+  let j = null; try{ j = await r.json(); }catch(e){}
+  return {up:true, v:Number(j && j.helper)||0};
+}
+async function opLauncherWhy(){
+  const i = await opLauncherInfo();
+  if(!i.up) return 'the Operator launcher isn’t running. Quit Operator (⌘Q) and open it from its icon in Applications (not from Chrome).';
+  if(i.v < OP_HELPER_NEEDS) return 'an older Operator (launcher v'+i.v+') is still running. Quit Operator fully (⌘Q), make sure only the new Operator app is in Applications, and open it again.';
+  return 'the launcher answered but couldn’t write the key. Try again in a moment.';
+}
+function opLauncherLineHtml(){
+  if(!ui.opLauncher){ ui.opLauncher = {checking:true}; opLauncherInfo().then(function(i){ ui.opLauncher = i; if(document.getElementById('opVoiceSet')) renderView(); }); }
+  const i = ui.opLauncher;
+  if(i.checking) return '';
+  if(!i.up) return '<div class="op-set-warn">&#9888; The Operator launcher isn’t running — quit Operator (⌘Q) and open it from its icon. Keys and voices need it.</div>';
+  if(i.v < OP_HELPER_NEEDS) return '<div class="op-set-warn">&#9888; An older Operator launcher (v'+i.v+') is running. Quit Operator fully (⌘Q) and open the new one — then the keys will save.</div>';
+  return '<div class="op-set-ok">&#10003; Operator launcher v'+i.v+' is running.</div>';
+}
 // ============ XP, LEVELS, RANKS & YOUR CARD ============
 // A game you play by living the right way. Everyone starts at level 0, rank 0 — "Locked In": the
-// point is to stay consistent and not lose yourself to brain fog. Levels are slow on purpose:
-// level L takes 100 × L² XP in total (level 10 is 10,000; level 30 is 90,000).
+// point is to stay consistent and not lose yourself to brain fog. Levels are slow on purpose: each
+// one costs 1,000 XP plus 150 for every level you already have — a good week of work for the first,
+// more after that. Every session still moves the bar (20 minutes is about 3 XP); the big jumps come
+// from what changes the business and the body: clients won, MRR added, followers gained, goals done.
 // Ranks need three things: the level, the MRR, and the body (your Health score) — you can't
 // rank up on work alone.
 // XP comes from the day (deep work, tasks, workouts — the first ones count big — shooting,
@@ -22452,18 +22802,40 @@ function aiKeyHtml(){
 //   Discipline (days on target, your streak, how often you lock in)
 const RANKS = [
   {name:'Locked In',   level:0,  mrr:0,     health:0,  color:'#8fd3ff', tag:'Entrepreneur mode'},
-  {name:'Operator',    level:5,  mrr:2500,  health:40, color:'#5fd4c4', tag:'Showing up'},
-  {name:'Specialist',  level:10, mrr:5000,  health:50, color:'#6fc3ff', tag:'Good at the thing'},
-  {name:'Closer',      level:16, mrr:10000, health:55, color:'#a98bff', tag:'Deals get done'},
-  {name:'Captain',     level:23, mrr:20000, health:60, color:'#ff8fb1', tag:'Others follow'},
-  {name:'Commander',   level:31, mrr:35000, health:65, color:'#ffc56b', tag:'Runs the field'},
-  {name:'Director',    level:40, mrr:50000, health:70, color:'#ff9a6b', tag:'Built to last'},
-  {name:'Mogul',       level:50, mrr:70000, health:75, color:'#7ef0c0', tag:'Owns the game'},
-  {name:'Millionaire', level:60, mrr:83400, health:80, color:'#fff2b0', tag:'A million a year'}
+  {name:'Operator',    level:3,  mrr:2500,  health:40, color:'#5fd4c4', tag:'Showing up'},
+  {name:'Specialist',  level:6,  mrr:5000,  health:50, color:'#6fc3ff', tag:'Good at the thing'},
+  {name:'Closer',      level:10, mrr:10000, health:55, color:'#a98bff', tag:'Deals get done'},
+  {name:'Captain',     level:15, mrr:20000, health:60, color:'#ff8fb1', tag:'Others follow'},
+  {name:'Commander',   level:20, mrr:35000, health:65, color:'#ffc56b', tag:'Runs the field'},
+  {name:'Director',    level:26, mrr:50000, health:70, color:'#ff9a6b', tag:'Built to last'},
+  {name:'Mogul',       level:33, mrr:70000, health:75, color:'#7ef0c0', tag:'Owns the game'},
+  {name:'Millionaire', level:40, mrr:83400, health:80, color:'#fff2b0', tag:'A million a year'}
 ];
-const XP_RATES = {mrrPerK:800, client:300, video:50, hourBase:10, hourAbove:18, longDay:40, outreach:20};
-function xpForLevel(L){ return 100*L*L; }
-function xpLevelOf(total){ return Math.max(0, Math.floor(Math.sqrt(Math.max(0, total)/100))); }
+const XP_RATES = {mrrPerK:800, client:750, follower:1, goal:500, video:50, hourBase:10, hourAbove:18, longDay:40, outreach:20};
+// total XP to reach level L: 1,000 a level plus 150 more for each level before it
+function xpForLevel(L){ return 1000*L + 75*L*(L-1); }
+function xpLevelOf(total){ let L = 0; while(xpForLevel(L+1) <= total) L++; return L; }
+// goals count once they've stayed done for a day (an accidental tick doesn't pay; un-ticking or
+// deleting one takes it away again); periodic ones (this week's workouts…) don't count here
+function xpGoals(){
+  const p = state.profile, seen = (p.xpGoalSeen && typeof p.xpGoalSeen==='object') ? p.xpGoalSeen : (p.xpGoalSeen = {});
+  const now = Date.now(), done = arr(state.goals && state.goals.items).filter(function(g){ return g.done && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g)); });
+  const ids = {}; let changed = false, counted = 0, pending = 0;
+  done.forEach(function(g){ ids[g.id] = 1; if(!seen[g.id]){ seen[g.id] = now; changed = true; } if(now - seen[g.id] >= 86400000) counted++; else pending++; });
+  Object.keys(seen).forEach(function(id){ if(!ids[id]){ delete seen[id]; changed = true; } });
+  if(changed) persist('profile');
+  return {counted:counted, pending:pending};
+}
+// followers you've gained since you started (GoHighLevel / Instagram, when connected)
+function xpFollowersNow(){
+  try{
+    let total = 0, any = false;
+    const sd = typeof socialData==='function' ? socialData() : null, f = sd && sd.platformTotals && sd.platformTotals.followers;
+    if(f) Object.keys(f).forEach(function(k){ const n = Number(f[k] && f[k].total); if(n){ total += n; any = true; } });
+    if(typeof igFollowersTotal==='function'){ const ig = igFollowersTotal(); if(ig!=null){ total = Math.max(total, ig); any = true; } }
+    return any ? total : null;
+  }catch(e){ return null; }
+}
 function xpMrr(){ return arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); }).reduce(function(a, c){ return a + Number(c.mrr||0); }, 0); }
 // the day the game began (you start at 0 — nothing before it counts), and where MRR stood then
 function xpStart(){
@@ -22519,7 +22891,7 @@ function xpCtx(){
 }
 // past days don't change often: keep them, recount only today (and everything when the data changes)
 let xpCache = {sig:'', days:{}};
-function xpSig(){ return [arr(state.focus.sessions).length, state.tasks.items.filter(function(t){ return t.status==='done'; }).length, arr(state.health.gymLog).length, arr(state.modes.history).length, arr(state.journal.entries).length, state.standards.deepWorkTargetMinutes, state.profile.xpStart].join('|'); }
+function xpSig(){ return [arr(state.focus.sessions).length, state.tasks.items.filter(function(t){ return t.status==='done'; }).length, arr(state.health.gymLog).length, arr(state.modes.history).length, arr(state.journal.entries).length, state.standards.deepWorkTargetMinutes, state.profile.xpStart, arr(state.goals && state.goals.items).filter(function(g){ return g.done; }).length].join('|'); }
 // (renders often — the full count is reused for a few seconds unless something changed)
 let xpLast = null;
 function xpSummary(){
@@ -22541,7 +22913,10 @@ function xpSummaryFresh(){
   const p = state.profile, mrr = xpMrr(), base = Number(p.xpMrrBase||0);
   const won = arr(state.business.clients).filter(function(c){ return arr(p.xpClientsBase).indexOf(c.id) < 0; }).length;
   const mrrXp = Math.round((mrr - base)/1000*XP_RATES.mrrPerK), clientXp = won*XP_RATES.client;
-  total = Math.max(0, total + mrrXp + clientXp);
+  const goals = xpGoals(), goalXp = goals.counted*XP_RATES.goal;
+  const fNow = xpFollowersNow(); if(fNow!=null && p.xpFollowersBase==null){ p.xpFollowersBase = fNow; persist('profile'); }
+  const followers = fNow!=null && p.xpFollowersBase!=null ? fNow - p.xpFollowersBase : 0, followerXp = Math.round(followers*XP_RATES.follower);
+  total = Math.max(0, total + mrrXp + clientXp + goalXp + followerXp);
   const todayItems = xpDay(today, ctx);
   const level = xpLevelOf(total), lo = xpForLevel(level), hi = xpForLevel(level+1);
   const attrs = xpAttributes(ctx);
@@ -22550,7 +22925,7 @@ function xpSummaryFresh(){
   const next = RANKS[rank+1] || null;
   const needs = next ? [level < next.level ? 'level '+next.level : '', mrr < next.mrr ? money(next.mrr)+' MRR' : '', attrs.HLT.v < next.health ? 'Health '+next.health : ''].filter(Boolean) : [];
   return {total:total, week:week, today:todayItems, todayXp:todayItems.reduce(function(a, x){ return a + x.xp; }, 0),
-    mrr:mrr, mrrBase:base, mrrXp:mrrXp, clientXp:clientXp, won:won, start:start,
+    mrr:mrr, mrrBase:base, mrrXp:mrrXp, clientXp:clientXp, won:won, start:start, goalXp:goalXp, goals:goals, followers:followers, followerXp:followerXp,
     level:level, levelLo:lo, levelHi:hi, levelPct:(total - lo)/(hi - lo),
     rank:rank, next:next, needs:needs, attrs:attrs, ovr:attrs.OVR};
 }
@@ -22584,12 +22959,13 @@ function xpAttributes(ctx){
   const mrr = xpMrr(), active = cs.filter(function(c){ return clientStageActive(c.stage); }).length;
   let deep14 = 0; for(let i=1;i<=14;i++) deep14 += ctx.deep(addDays(today, -i)); deep14 /= 14;
   const newClients = cs.filter(function(c){ return within(c.startDate || c.createdAt, 90); }).length;
-  const bizVids = tasks.filter(function(t){ return t.isVideoIdea && t.status==='done' && within(t.completedAt, 30) && !isPersonal(t); }).length;
+  // (posts on your Instagram business account count too, when it's connected)
+  const bizVids = Math.max(tasks.filter(function(t){ return t.isVideoIdea && t.status==='done' && within(t.completedAt, 30) && !isPersonal(t); }).length, (typeof igPostsByRole==='function' && igPostsByRole('business')) || 0);
   // (each one at 100 is the best version: a million a year, a full roster, well past your daily target…)
   const B = [sub('MRR', Math.sqrt(mrr/83400), money(mrr)+' a month'), sub('Clients', active/15, active+' active'), sub('Time put in', deep14/(target*1.33), fmtHours(Math.round(deep14))+' a day lately'),
     sub('Client growth', newClients/4, newClients+' new in 90 days'), sub('Business content', bizVids/12, bizVids+' posted in 30 days')];
   // personal
-  const perVids = tasks.filter(function(t){ return t.isVideoIdea && t.status==='done' && within(t.completedAt, 30) && isPersonal(t); }).length;
+  const perVids = Math.max(tasks.filter(function(t){ return t.isVideoIdea && t.status==='done' && within(t.completedAt, 30) && isPersonal(t); }).length, (typeof igPostsByRole==='function' && igPostsByRole('personal')) || 0);
   const ideas = tasks.filter(function(t){ return t.isVideoIdea && within(t.createdAt, 30); }).length;
   const goals = arr(state.goals && state.goals.items).filter(function(g){ return !g.autoTrack; });
   const goalF = goals.length && typeof goalPct==='function' ? goals.reduce(function(a, g){ return a + (g.done ? 100 : goalPct(g)); }, 0)/goals.length/100 : null;
@@ -22658,34 +23034,54 @@ ACTIONS.pcFlip = function(el){ ui.pcFlip = !ui.pcFlip; const c = el && el.closes
 // (kept for older callers)
 function xpChipHtml(){ return playerCardHtml('hero'); }
 
-// ---- "You": the overview (Personal → You, or click the card) — the card, your level, the four
-// ratings, your body, the ladder. That's it.
+// ---- "You": the overview (Personal → You, or click the card) — the card, your level and the ranks,
+// then the four ratings and your body side by side. Fits on one screen.
 function renderYouTab(){
   const x = xpSummary(), r = RANKS[x.rank], body = x.attrs.HLT.body;
   const attrCard = function(k){ const a = x.attrs[k]; return '<div class="you-attr" style="--ac:'+a.color+'"><div class="you-attr-h"><b>'+a.v+'</b><span>'+a.name+'</span></div>'+
     a.subs.map(function(s){ return '<div class="you-sub" title="'+escapeHtml(s.note)+'"><span>'+escapeHtml(s.label)+'</span><i><u style="width:'+(s.v==null ? 0 : (s.v-25)/75*100).toFixed(1)+'%"></u></i><b>'+(s.v==null ? '—' : s.v)+'</b></div>'; }).join('')+'</div>'; };
+  const u = body.kg ? 'kg' : 'lb';
   return '<div class="you">'+
     '<div class="you-top">'+playerCardHtml('big')+
       '<div class="you-main">'+
         '<div class="you-lvl">Level <b>'+x.level+'</b> <span style="color:'+r.color+'">'+escapeHtml(r.name)+'</span></div>'+
         '<div class="you-xpbar"><i><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i><span>'+(x.levelHi - x.total).toLocaleString()+' XP to level '+(x.level+1)+' &middot; +'+x.todayXp.toLocaleString()+' today &middot; +'+x.week.toLocaleString()+' this week</span></div>'+
         (x.next ? '<div class="you-next">Next rank: <b style="color:'+x.next.color+'">'+x.next.name+'</b> — '+(x.needs.length ? 'needs '+x.needs.map(function(n){ return '<b>'+escapeHtml(n)+'</b>'; }).join(', ') : 'yours')+'</div>' : '<div class="you-next">The top. A million a year.</div>')+
-        '<div class="you-how">XP comes from deep work, finished tasks, workouts (they count big), outreach, clients you win and MRR you add — and MRR you lose takes it back. Each level takes more than the last.</div>'+
+        // the ranks as one small track
+        '<div class="you-track">'+RANKS.map(function(rk, i){ const st = i<x.rank ? 'is-done' : i===x.rank ? 'is-cur' : ''; return '<span class="you-tr '+st+'" style="--rc:'+rk.color+'" title="'+escapeHtml(rk.name)+' — level '+rk.level+(rk.mrr ? ', '+money(rk.mrr)+' MRR, Health '+rk.health : '')+'">'+rankBadgeSvg(i, 22)+'<small>'+escapeHtml(rk.name)+'</small></span>'; }).join('')+'</div>'+
+        '<button class="you-howbtn" data-action="openXpHow">How leveling works &#8594;</button>'+
       '</div></div>'+
-    '<div class="you-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(attrCard).join('')+'</div>'+
-    '<div class="you-row">'+
+    '<div class="you-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(attrCard).join('')+
       '<div class="you-body"><div class="you-sec">Your body</div>'+(body.bmi ?
         '<div class="you-bmi"><b>'+body.bmi.toFixed(1)+'</b><span>BMI &middot; '+body.cls+'</span></div>'+
-        '<div class="you-bmi-scale">'+bmiScaleHtml(body)+'</div>'+
-        '<div class="you-note">At '+Math.floor(body.h/12)+'′'+(body.h%12)+'″: healthy up to <b>'+body.healthyMax+' '+(body.kg?'kg':'lb')+'</b>, obese from <b>'+body.obeseAt+' '+(body.kg?'kg':'lb')+'</b>. You’re at '+body.w+'.</div>'
-        : '<div class="you-note">Add your height (Settings → You) and a weigh-in, and your card rates your body too — ranks need it.</div><button class="btn btn-sm" data-action="goToProfileSettings">Add height</button>')+'</div>'+
-      '<div class="you-ladder"><div class="you-sec">Ranks</div>'+RANKS.map(function(rk, i){ const st = i<x.rank ? 'is-done' : i===x.rank ? 'is-cur' : ''; return '<div class="xp-step '+st+'" style="--rc:'+rk.color+'">'+rankBadgeSvg(i, 20)+'<b>'+rk.name+'</b><span>LVL '+rk.level+(rk.mrr ? ' &middot; '+money(rk.mrr)+' &middot; HLT '+rk.health : '')+'</span></div>'; }).join('')+'</div>'+
-    '</div></div>';
+        '<div class="you-bmi-scale">'+bmiScaleHtml(body)+'</div>'        : '<div class="you-note">Add your height and weight in Settings → You and your card rates your body too — ranks need it.</div><button class="btn btn-sm" data-action="goToProfileSettings">Add height &amp; weight</button>')+'</div>'+
+    '</div>'+xpChartHtml()+'</div>';
 }
+// the last 30 days of XP, a bar a day — the climb, at a glance
+function xpChartHtml(){
+  const ctx = xpCtx(), today = todayStr(), start = xpStart(), days = [];
+  for(let i=29;i>=0;i--){
+    const d = addDays(today, -i);
+    if(d < start){ days.push({d:d, xp:null}); continue; }
+    const items = (d!==today && xpCache.days[d]) || xpDay(d, ctx);
+    days.push({d:d, xp:items.reduce(function(a, x){ return a + x.xp; }, 0)});
+  }
+  const got = days.filter(function(x){ return x.xp!=null; }), sum = got.reduce(function(a, x){ return a + x.xp; }, 0);
+  const top = Math.max(100, ...got.map(function(x){ return x.xp; })), best = got.reduce(function(b, x){ return !b || x.xp > b.xp ? x : b; }, null);
+  return '<div class="you-chart"><div class="you-chart-h"><span class="you-sec">Last 30 days</span><span><b>'+sum.toLocaleString()+'</b> XP'+(best && best.xp ? ' &middot; best day <b>+'+best.xp+'</b>' : '')+'</span></div>'+
+    '<div class="you-bars">'+days.map(function(x){
+      const h = x.xp==null ? 0 : Math.max(x.xp ? 4 : 2, x.xp/top*100);
+      return '<i class="'+(x.xp==null ? 'is-pre' : '')+(x.d===today ? ' is-today' : '')+'" title="'+escapeHtml(fmtDateShort(x.d))+(x.xp==null ? ' — before you started' : ': +'+x.xp+' XP')+'"><u style="height:'+h.toFixed(1)+'%"></u></i>';
+    }).join('')+'</div></div>';
+}
+// the scale for your height, in pounds (or kg): healthy · overweight · obese, and where you are
 function bmiScaleHtml(b){
-  const lo = 15, hi = 40, pos = function(v){ return ((Math.max(lo, Math.min(hi, v)) - lo)/(hi - lo)*100).toFixed(1); };
-  return '<div class="bmi-bar"><i style="left:0;width:'+pos(18.5)+'%" class="u"></i><i style="left:'+pos(18.5)+'%;width:'+(pos(25)-pos(18.5))+'%" class="h"></i><i style="left:'+pos(25)+'%;width:'+(pos(30)-pos(25))+'%" class="o"></i><i style="left:'+pos(30)+'%;right:0" class="ob"></i>'+
-    '<b style="left:'+pos(b.bmi)+'%"></b></div><div class="bmi-lab"><span>18.5</span><span>25</span><span>30</span></div>';
+  const lo = 15, hi = 40, pos = function(v){ return ((Math.max(lo, Math.min(hi, v)) - lo)/(hi - lo)*100).toFixed(1); }, u = b.kg ? 'kg' : 'lb';
+  return '<div class="bmi-you" style="left:'+pos(b.bmi)+'%"><b>'+b.w+'</b> '+u+'</div>'+
+    '<div class="bmi-bar"><i style="left:0;width:'+pos(18.5)+'%" class="u"></i><i style="left:'+pos(18.5)+'%;width:'+(pos(25)-pos(18.5))+'%" class="h"></i><i style="left:'+pos(25)+'%;width:'+(pos(30)-pos(25))+'%" class="o"></i><i style="left:'+pos(30)+'%;right:0" class="ob"></i>'+
+    '<b style="left:'+pos(b.bmi)+'%"></b></div>'+
+    '<div class="bmi-lab"><span style="left:'+pos(18.5)+'%">'+b.healthyMin+'</span><span style="left:'+pos(25)+'%">'+b.healthyMax+'</span><span style="left:'+pos(30)+'%">'+b.obeseAt+'</span></div>'+
+    '<div class="bmi-legend"><span class="h">Healthy</span><span class="o">Overweight</span><span class="ob">Obese</span></div>';
 }
 ACTIONS.openYou = function(){ ui.view = 'personal'; ui.personalTab = 'you'; renderView(); };
 ACTIONS.openXp = ACTIONS.openYou;
@@ -22762,6 +23158,296 @@ function xpWatch(){
   } else if(finished) xpToast(gained, 'Task complete.');
 }
 afterRenderHooks.push(function(){ try{ xpWatch(); }catch(e){} });
+
+// ---- how leveling works: its own page (the You tab stays clean) ----
+ACTIONS.openXpHow = function(){
+  let o = document.getElementById('xpHowOverlay');
+  if(!o){ o = document.createElement('div'); o.id = 'xpHowOverlay'; o.className = 'overlay xph-ov'; o.innerHTML = '<div class="card xph" id="xpHowContent"></div>'; document.body.appendChild(o); o.addEventListener('pointerdown', function(e){ if(e.target===o) o.classList.add('hidden'); }); }
+  const row = function(a, b){ return '<div class="xph-r"><span>'+a+'</span><b>'+b+'</b></div>'; };
+  document.getElementById('xpHowContent').innerHTML =
+    '<button class="xph-x" data-action="closeXpHow">&#10005;</button>'+
+    '<div class="xph-k">[ SYSTEM ]</div><h2>How leveling works</h2>'+
+    '<div class="xph-cols">'+
+      '<div><div class="xph-sec">Every day</div>'+
+        row('Deep work', XP_RATES.hourBase+' XP an hour ('+XP_RATES.hourAbove+' above your usual)')+row('Long day (6h+)', '+'+XP_RATES.longDay)+row('Tasks done', '12 · 8 · 4 each')+
+        row('Workout', '150 (first five), then 70 → 25 a week')+row('Shooting', '8 XP an hour')+row('Outreach', 'from '+XP_RATES.outreach)+row('Strong days in a row', 'up to ×1.28')+
+      '</div>'+
+      '<div><div class="xph-sec">The big jumps</div>'+
+        row('Client won', '+'+XP_RATES.client)+row('Every $1k of MRR added', '+'+XP_RATES.mrrPerK+' (lost if it drops)')+row('Follower gained', '+'+XP_RATES.follower)+row('Goal done (stays done a day)', '+'+XP_RATES.goal)+
+        '<div class="xph-sec">Levels</div>'+row('Level 1', xpForLevel(1).toLocaleString()+' XP')+row('Level 5', xpForLevel(5).toLocaleString()+' XP')+row('Level 10', xpForLevel(10).toLocaleString()+' XP')+row('Level 40', xpForLevel(40).toLocaleString()+' XP')+
+      '</div>'+
+      '<div><div class="xph-sec">Ranks need all three</div>'+RANKS.map(function(r, i){ return row('<span style="color:'+r.color+'">'+i+' · '+r.name+'</span>', 'LVL '+r.level+(r.mrr ? ' · '+money(r.mrr)+' · HLT '+r.health : '')); }).join('')+'</div>'+
+    '</div>'+
+    '<div class="xph-sec">Your ratings (25–100)</div><div class="xph-rates">'+
+      '<div><b style="color:#ffc56b">Business</b>MRR, clients, time put in, client growth, business content</div>'+
+      '<div><b style="color:#c3a6ff">Personal</b>Personal content, video ideas, your goals, journaling</div>'+
+      '<div><b style="color:#7ef0c0">Health</b>BMI for your height, training, consistency</div>'+
+      '<div><b style="color:#8fd3ff">Discipline</b>Days on target, streak, locking in</div>'+
+    '</div><div class="xph-foot">100 is you at your best in everything — the overall only hits 100 when all four do.</div>';
+  o.classList.remove('hidden');
+};
+ACTIONS.closeXpHow = function(){ const o = document.getElementById('xpHowOverlay'); if(o) o.classList.add('hidden'); };
+// ============ THE MONTH AND THE WEEK ============
+// A way through the year with good intentions. Each month: one habit to beat, one goal to get done,
+// and a note to yourself. Each week: what makes it a win, one thing to focus on, a note. The Calendar
+// tab asks once a month and once a week with a short cinematic prompt; close it and it waits in the
+// notifications until it's done. Good morning brings them back every day (a different one each
+// morning), so the month and the week stay in front of you as they go on.
+function intentStore(){
+  const j = state.journal;
+  if(!j.intentions || typeof j.intentions!=='object') j.intentions = {};
+  const s = j.intentions;
+  if(!s.months || typeof s.months!=='object') s.months = {};
+  if(!s.weeks || typeof s.weeks!=='object') s.weeks = {};
+  if(!s.prompted || typeof s.prompted!=='object') s.prompted = {};
+  return s;
+}
+function monthKey(d){ return String(d || todayStr()).slice(0, 7); }
+function weekKey(d){ return startOfWeekStr(d || todayStr()); }
+function monthIntent(d){ const m = intentStore().months[monthKey(d)]; return m && (m.habit || m.goal || m.note) ? m : null; }
+function weekIntent(d){ const w = intentStore().weeks[weekKey(d)]; return w && (w.win || w.focus || w.note) ? w : null; }
+function monthName(k){ return new Date(k+'-15T12:00').toLocaleDateString(undefined, {month:'long'}); }
+function weekLabel(k){ const a = new Date(k+'T12:00'), b = new Date(addDays(k, 6)+'T12:00'); return a.toLocaleDateString(undefined, {month:'short', day:'numeric'})+' – '+b.toLocaleDateString(undefined, a.getMonth()===b.getMonth() ? {day:'numeric'} : {month:'short', day:'numeric'}); }
+// what still needs writing (these sit in the notifications until they're done)
+function intentPending(){
+  const out = [], mk = monthKey(), wk = weekKey();
+  if(!monthIntent()) out.push({key:'intent:month:'+mk, kind:'intent', level:'info', icon:'&#127769;', title:'Set your intentions for '+monthName(mk), sub:'A habit to beat, a goal, a note — for the month', act:{a:'openIntent', id:'month'}, sort:2});
+  if(!weekIntent()) out.push({key:'intent:week:'+wk, kind:'intent', level:'info', icon:'&#128197;', title:'Set up this week', sub:weekLabel(wk)+' — what makes it a win?', act:{a:'openIntent', id:'week'}, sort:2});
+  return out;
+}
+const INTENT_FIELDS = {
+  month:[['habit', 'One habit to beat this month', 'e.g. Phone in bed. Snoozing.'], ['goal', 'One goal to get done this month', 'e.g. Sign two new clients.'], ['note', 'A note to yourself for the month', 'Who you want to be by the end of it.']],
+  week:[['win', 'What makes this week a win?', 'e.g. 20 hours of deep work, 4 workouts.'], ['focus', 'The one thing to focus on', 'e.g. Finish the JJS launch.'], ['note', 'A note for the week', 'Anything you want to hear on Monday morning.']]
+};
+// the prompt: a dark screen, the month (or week) comes up big, then the questions
+function openIntentForm(kind, cinematic){
+  kind = kind==='week' ? 'week' : 'month';
+  let o = document.getElementById('intOverlay');
+  if(!o){ o = document.createElement('div'); o.id = 'intOverlay'; o.className = 'overlay int-ov'; o.innerHTML = '<div class="int" id="intContent"></div>'; document.body.appendChild(o); o.addEventListener('pointerdown', function(e){ if(e.target===o) ACTIONS.closeIntent(); }); }
+  const key = kind==='month' ? monthKey() : weekKey(), cur = (kind==='month' ? intentStore().months : intentStore().weeks)[key] || {};
+  const head = kind==='month' ? monthName(key) : 'This week';
+  const sub = kind==='month' ? 'A new month. A new step.' : weekLabel(key)+' · a new step';
+  document.getElementById('intContent').innerHTML =
+    '<button class="int-x" data-action="closeIntent" title="Later (it stays in your notifications)">&#10005;</button>'+
+    '<div class="int-k">'+(kind==='month' ? '&#127769; The month' : '&#128197; The week')+'</div>'+
+    '<div class="int-h">'+escapeHtml(head)+'</div><div class="int-s">'+escapeHtml(sub)+'</div>'+
+    '<div class="int-fs">'+INTENT_FIELDS[kind].map(function(f, i){ return '<label class="int-f" style="--i:'+i+'"><span>'+f[1]+'</span><input class="int-in" id="int_'+f[0]+'" maxlength="140" placeholder="'+escapeHtml(f[2])+'" value="'+escapeHtml(cur[f[0]]||'')+'"></label>'; }).join('')+'</div>'+
+    '<div class="int-a"><button class="int-save" data-action="saveIntent" data-id="'+kind+'">'+(kind==='month' ? 'Start the month' : 'Start the week')+' &#8594;</button></div>';
+  o.dataset.kind = kind;
+  o.classList.toggle('is-cine', !!cinematic);
+  o.classList.remove('hidden'); void o.offsetWidth; o.classList.add('is-in');
+  setTimeout(function(){ const i = document.getElementById('int_'+INTENT_FIELDS[kind][0][0]); if(i) i.focus(); }, cinematic ? 1300 : 120);
+}
+ACTIONS.openIntent = function(el, e, id){ openIntentForm(id || (el && el.dataset.id) || 'month'); };
+ACTIONS.closeIntent = function(){
+  const o = document.getElementById('intOverlay'); if(!o) return;
+  const kind = o.dataset.kind || 'month';
+  intentStore().prompted[kind==='month' ? 'M'+monthKey() : 'W'+weekKey()] = todayStr(); persist('journal');
+  o.classList.remove('is-in'); setTimeout(function(){ o.classList.add('hidden'); }, 260);
+  if(typeof notifBadge==='function') notifBadge();
+};
+ACTIONS.saveIntent = function(el, e, id){
+  const kind = id==='week' ? 'week' : 'month', key = kind==='month' ? monthKey() : weekKey();
+  const rec = {at:Date.now()}; let any = false;
+  INTENT_FIELDS[kind].forEach(function(f){ const i = document.getElementById('int_'+f[0]); const v = i ? i.value.trim() : ''; rec[f[0]] = v; if(v) any = true; });
+  if(!any){ const i = document.getElementById('int_'+INTENT_FIELDS[kind][0][0]); if(i) i.focus(); return; }
+  (kind==='month' ? intentStore().months : intentStore().weeks)[key] = rec;
+  intentStore().prompted[kind==='month' ? 'M'+key : 'W'+key] = todayStr();
+  persist('journal'); playPositive();
+  const o = document.getElementById('intOverlay'); if(o){ o.classList.remove('is-in'); setTimeout(function(){ o.classList.add('hidden'); }, 260); }
+  showToast(kind==='month' ? 'Locked in for '+monthName(key)+'.' : 'This week is set.', {icon:'&#127769;'});
+  if(typeof notifBadge==='function') notifBadge();
+  // the month first, then the week
+  if(kind==='month' && !weekIntent()) setTimeout(function(){ openIntentForm('week', true); }, 700);
+  renderView();
+};
+// the Calendar tab asks (once a month, once a week): month first
+afterRenderHooks.push(function(){
+  if(ui.view!=='calendar' || document.querySelector('.overlay:not(.hidden)')) return;
+  const p = intentStore().prompted, mk = 'M'+monthKey(), wk = 'W'+weekKey();
+  const kind = !monthIntent() && !p[mk] ? 'month' : !weekIntent() && !p[wk] ? 'week' : null;
+  if(!kind || ui._intAsked===kind+(kind==='month' ? mk : wk)) return;
+  ui._intAsked = kind+(kind==='month' ? mk : wk);
+  setTimeout(function(){ if(ui.view==='calendar') openIntentForm(kind, true); }, 450);
+});
+// a strip at the top of the Calendar: the month's and the week's, one click to change them
+function intentStripHtml(){
+  const m = monthIntent(), w = weekIntent();
+  const pill = function(kind, label, val){ return '<button class="int-pill'+(val ? '' : ' is-empty')+'" data-action="openIntent" data-id="'+kind+'"><small>'+label+'</small><span>'+(val ? escapeHtml(val) : 'Set it &#8594;')+'</span></button>'; };
+  return '<div class="int-strip">'+
+    pill('month', monthName(monthKey())+' · goal', m && m.goal)+pill('month', 'Habit to beat', m && m.habit)+pill('week', 'This week', w && (w.focus || w.win))+'</div>';
+}
+// ---- Good morning: the month and the week, a different one each day (a time capsule, when one is
+// due, takes the stage — they're rare). Your streak and level sit on top. ----
+function intentOfDay(){
+  const m = monthIntent() || {}, w = weekIntent() || {};
+  const list = [];
+  if(m.goal) list.push({k:'This month’s goal', v:m.goal, say:'This month’s goal: '+m.goal+'.'});
+  if(w.focus) list.push({k:'This week’s focus', v:w.focus, say:'This week, it’s about '+w.focus+'.'});
+  if(m.habit) list.push({k:'The habit you’re beating', v:m.habit, say:'And remember the habit you’re beating: '+m.habit+'.'});
+  if(w.win) list.push({k:'This week is a win if', v:w.win, say:'This week is a win if '+w.win+'.'});
+  if(m.note) list.push({k:'You told yourself this month', v:m.note, say:'Something you told yourself this month.'});
+  if(w.note) list.push({k:'For the week', v:w.note, say:'A note you left for the week.'});
+  if(!list.length) return null;
+  return list[dayNum() % list.length];
+}
+function briefIntentHtml(){
+  const cap = typeof dueCapsule==='function' ? dueCapsule() : null;
+  if(cap){
+    openCapsule(cap);
+    return {voice:'And a message from you, from '+fmtDateShort(cap.writtenOn)+'.', html:'<div class="br-k bi-k">&#9203; From Past You</div><div class="bi-one"><small>Written '+fmtDateShort(cap.writtenOn)+(cap.title ? ' &middot; '+escapeHtml(cap.title) : '')+'</small><p>'+escapeHtml(cap.text)+'</p></div>'};
+  }
+  // one message a day — the month's goal, the week's focus, the habit you're beating… — big, with room
+  const it = intentOfDay(), m = monthIntent(), mk = monthKey();
+  if(!it) return {voice:'A new month’s a new step — set your intentions when you get a minute.', html:'<div class="br-k bi-k">&#127769; '+escapeHtml(monthName(mk))+'</div><div class="bi-one is-empty"><p>What’s this month about?</p><button class="bi-set" data-action="openIntent" data-id="'+(m ? 'week' : 'month')+'">Set '+(m ? 'this week' : 'the month')+' &#8594;</button></div>'+quarterHtml()};
+  return {voice:it.say, html:'<div class="br-k bi-k">&#127769; '+escapeHtml(monthName(mk))+'<button class="bi-edit" data-action="openIntent" data-id="month" title="Your month and week">&#9998;</button></div>'+
+    '<div class="bi-one"><small>'+escapeHtml(it.k)+'</small><p>'+escapeHtml(it.v)+'</p></div>'+quarterHtml()};
+}
+// the quarter, business-style: how many days are left in this one (and in the year)
+function quarterInfo(d){
+  d = d ? new Date(d+'T12:00') : new Date(); d.setHours(12, 0, 0, 0);
+  const q = Math.floor(d.getMonth()/3), start = new Date(d.getFullYear(), q*3, 1, 12), end = new Date(d.getFullYear(), q*3+3, 1, 12);
+  const day = 86400000, total = Math.round((end - start)/day), left = Math.round((end - d)/day), yEnd = new Date(d.getFullYear()+1, 0, 1, 12);
+  return {q:q+1, year:d.getFullYear(), left:left, total:total, pct:(total - left)/total, yearLeft:Math.round((yEnd - d)/day), nextQ:q===3 ? 'Q1 '+(d.getFullYear()+1) : 'Q'+(q+2)};
+}
+function quarterHtml(){
+  const x = quarterInfo();
+  return '<div class="bi-q"><div class="bi-q-t"><b>Q'+x.q+'</b><span><b>'+x.left+'</b> day'+(x.left===1?'':'s')+' left</span><em>Day '+(x.total - x.left + 1)+' of '+x.total+'</em></div>'+
+    '<i class="bi-q-bar"><u style="width:'+(x.pct*100).toFixed(1)+'%"></u></i>'+
+    (x.q < 4 ? '<div class="bi-q-s">'+x.yearLeft+' days left in '+x.year+'</div>' : '')+'</div>';
+}
+// the HUD on Good morning: your level like a game shows it, bottom left — badge, level, rank, XP, streak
+function briefHudHtml(){
+  if(typeof xpSummary!=='function') return '';
+  const x = xpSummary(), r = RANKS[x.rank], streak = computeStreak();
+  return '<div class="b4-hud" data-action="openYou" title="Your card" style="--rc:'+r.color+'">'+rankBadgeSvg(x.rank, 38)+
+    '<div class="b4-hud-m"><div class="b4-hud-t"><b>LVL '+x.level+'</b><span>'+escapeHtml(r.name)+'</span></div>'+
+    '<i class="b4-hud-bar"><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i>'+
+    '<div class="b4-hud-s"><span>'+(x.total - x.levelLo).toLocaleString()+' / '+(x.levelHi - x.levelLo).toLocaleString()+' XP</span><span>&#128293; '+streak+'</span></div></div></div>';
+}
+// ============ INSTAGRAM ============
+// Your Instagram numbers, straight from Instagram (the Meta Graph API): followers, every post with its
+// likes, comments and reach. Connect once in Settings → Integrations with an access token — the
+// Operator app keeps the token in its own file on this Mac (never in Operator's data, exports or
+// backups). Mark each account Business or Personal and your posts count as business or personal
+// content on your card by themselves; followers you gain count as XP.
+// (Needs an Instagram professional account — Business or Creator — linked to a Facebook Page.)
+function igCfg(){
+  const s = state.settings;
+  if(!s.instagram || typeof s.instagram!=='object') s.instagram = {accounts:[], cache:null};
+  if(!Array.isArray(s.instagram.accounts)) s.instagram.accounts = [];
+  return s.instagram;
+}
+function igOn(){ return igCfg().accounts.length > 0; }
+async function igApi(path){
+  const r = await fetchWithin(WAKE_HELPER+'ig/api?p='+hexUtf8(path), 20000);
+  let j = null; try{ j = r ? await r.json() : null; }catch(e){}
+  if(!r || !r.ok || !j || j.error) throw new Error((j && j.error && j.error.message) || (r ? 'Instagram said no ('+r.status+')' : 'the Operator app isn’t answering'));
+  return j;
+}
+// the Instagram accounts your token can see (through the Facebook Pages they're linked to)
+async function igFindAccounts(){
+  const j = await igApi('/me/accounts?fields=name,instagram_business_account{id,username,followers_count,profile_picture_url}&limit=50');
+  return (j.data || []).map(function(p){ return p.instagram_business_account; }).filter(Boolean).map(function(a){ return {id:a.id, username:a.username, followers:a.followers_count, pic:a.profile_picture_url}; });
+}
+// everything for one account: followers, and the last 30 posts with likes, comments and reach
+async function igLoadAccount(acc){
+  const info = await igApi('/'+acc.id+'?fields=username,followers_count,media_count,profile_picture_url');
+  const media = await igApi('/'+acc.id+'/media?fields=id,caption,media_type,media_product_type,timestamp,like_count,comments_count,permalink,thumbnail_url,media_url&limit=30');
+  const posts = (media.data || []).map(function(m){ return {id:m.id, cap:String(m.caption||'').slice(0, 140), type:m.media_product_type || m.media_type, at:m.timestamp, date:m.timestamp ? ds2(new Date(m.timestamp)) : '', likes:Number(m.like_count)||0, comments:Number(m.comments_count)||0, link:m.permalink, thumb:m.thumbnail_url || (m.media_type!=='VIDEO' ? m.media_url : '')}; });
+  // reach for the newest dozen (each is its own call; older posts keep what they had)
+  await Promise.all(posts.slice(0, 12).map(async function(p){ try{ const ins = await igApi('/'+p.id+'/insights?metric=reach'); const v = (ins.data || [])[0]; if(v && v.values && v.values[0]) p.reach = Number(v.values[0].value)||0; }catch(e){} }));
+  return {username:info.username, followers:Number(info.followers_count)||0, mediaCount:Number(info.media_count)||0, pic:info.profile_picture_url, posts:posts};
+}
+async function igRefresh(quiet){
+  const c = igCfg(); if(!c.accounts.length || ui.igLoading) return;
+  ui.igLoading = true; ui.igErr = null; if(!quiet) renderView();
+  try{
+    const data = {};
+    for(const a of c.accounts){ data[a.id] = await igLoadAccount(a); }
+    c.cache = {at:Date.now(), data:data};
+    // follower history (a point a day) for the trend line
+    c.history = c.history && typeof c.history==='object' ? c.history : {};
+    c.history[todayStr()] = c.accounts.reduce(function(t, a){ return t + ((data[a.id] && data[a.id].followers) || 0); }, 0);
+    persist('settings');
+  }catch(e){ ui.igErr = e.message; }
+  ui.igLoading = false; renderView();
+}
+function igMaybeRefresh(){ const c = igCfg(); if(igOn() && !ui.igLoading && (!c.cache || Date.now() - c.cache.at > 30*60000) && !ui.igTried){ ui.igTried = Date.now(); setTimeout(function(){ igRefresh(true); }, 0); } }
+// for XP: your total followers right now (null when not connected)
+function igFollowersTotal(){ const c = igCfg(); if(!c.cache || !c.cache.data) return null; let t = 0; Object.keys(c.cache.data).forEach(function(k){ t += c.cache.data[k].followers||0; }); return t; }
+// for your card: posts in the last 30 days from your business / personal accounts
+function igPostsByRole(role, days){
+  const c = igCfg(); if(!c.cache || !c.cache.data) return null;
+  const since = addDays(todayStr(), -(days||30)); let n = 0;
+  c.accounts.filter(function(a){ return a.role===role; }).forEach(function(a){ const d = c.cache.data[a.id]; if(d) n += d.posts.filter(function(p){ return p.date > since; }).length; });
+  return n;
+}
+
+// ---- Settings → Integrations ----
+function igSettingsHtml(){
+  const c = igCfg();
+  if(ui.igHasKey==null){ ui.igHasKey = false; fetchWithin(WAKE_HELPER+'ig/status', 5000).then(function(r){ return r && r.ok ? r.json() : null; }).then(function(j){ ui.igHasKey = !!(j && j.hasKey); if(ui.view==='settings') renderView(); }).catch(function(){}); }
+  const acc = function(a){ return '<div class="ig-acc"><span class="ig-acc-n">@'+escapeHtml(a.username)+'</span>'+
+    '<div class="seg-tabs" style="margin:0;">'+['business', 'personal'].map(function(r){ return '<button class="seg-tab'+(a.role===r?' active':'')+'" data-action="igRole" data-id="'+a.id+'" data-role="'+r+'">'+(r==='business' ? 'Business' : 'Personal')+'</button>'; }).join('')+'</div>'+
+    '<button class="btn btn-ghost btn-sm" data-action="igDrop" data-id="'+a.id+'" title="Stop tracking it">&#10005;</button></div>'; };
+  return '<div class="card section ig-set"><div class="section-title">&#128247; Instagram'+tip('Followers and post stats straight from Instagram. Needs an Instagram Business or Creator account linked to a Facebook Page, and an access token from developers.facebook.com (Graph API Explorer → your app → permissions instagram_basic, instagram_manage_insights, pages_show_list, pages_read_engagement → Generate token, then extend it to a long-lived one). The token is saved by the Operator app on this Mac only.')+'</div>'+
+    (ui.igHasKey ? '<div class="op-set-key"><span>&#128274; Token saved on this Mac</span><button class="btn btn-ghost btn-sm" data-action="igFind">'+(c.accounts.length ? 'Find accounts again' : 'Find my accounts')+'</button><button class="btn btn-ghost btn-sm" data-action="igForget">Remove</button></div>'
+      : '<div class="op-set-key"><input class="input" type="password" id="igToken" placeholder="Instagram / Meta access token" autocomplete="off"><button class="btn btn-sm btn-primary" data-action="igSave">Connect</button></div>')+
+    (ui.igFound && ui.igFound.length ? '<div class="ig-found">'+ui.igFound.map(function(a){ const on = c.accounts.some(function(x){ return x.id===a.id; }); return '<button class="btn btn-sm'+(on?' btn-primary':'')+'" data-action="igAdd" data-id="'+a.id+'">'+(on ? '&#10003; ' : '+ ')+'@'+escapeHtml(a.username)+'</button>'; }).join('')+'</div>' : '')+
+    (c.accounts.length ? '<div class="ig-accs">'+c.accounts.map(acc).join('')+'</div><div class="op-set-help">Business posts count as business content on your card, personal posts as personal content.</div>' : '')+
+    (ui.igErr ? '<div class="op-set-warn">&#9888; '+escapeHtml(ui.igErr)+'</div>' : '')+'</div>';
+}
+ACTIONS.igSave = function(){
+  const i = document.getElementById('igToken'), v = i ? i.value.trim() : '';
+  if(!v){ if(i) i.focus(); return; }
+  if(i) i.value = '';
+  fetchWithin(WAKE_HELPER+'ig/key?t='+hexUtf8(v), 6000).then(function(r){
+    if(r && r.ok){ ui.igHasKey = true; renderView(); ACTIONS.igFind(); }
+    else (typeof opLauncherWhy==='function' ? opLauncherWhy() : Promise.resolve('the Operator app isn’t answering.')).then(function(why){ showToast('Couldn’t save the token — '+why, {icon:'&#9888;', duration:10000}); });
+  });
+};
+ACTIONS.igFind = async function(){
+  ui.igErr = null;
+  try{ ui.igFound = await igFindAccounts(); if(!ui.igFound.length) ui.igErr = 'No Instagram Business/Creator accounts on this token — link one to a Facebook Page first.'; }
+  catch(e){ ui.igErr = e.message; }
+  renderView();
+};
+ACTIONS.igAdd = function(el, e, id){
+  const c = igCfg(), a = (ui.igFound || []).find(function(x){ return x.id===id; }); if(!a) return;
+  if(c.accounts.some(function(x){ return x.id===id; })) c.accounts = c.accounts.filter(function(x){ return x.id!==id; });
+  else c.accounts.push({id:a.id, username:a.username, role:c.accounts.some(function(x){ return x.role==='business'; }) ? 'personal' : 'business'});
+  persist('settings'); renderView(); if(c.accounts.length) igRefresh(true);
+};
+ACTIONS.igRole = function(el, e, id){ const a = igCfg().accounts.find(function(x){ return x.id===id; }); if(a){ a.role = el.dataset.role; persist('settings'); renderView(); } };
+ACTIONS.igDrop = function(el, e, id){ const c = igCfg(); c.accounts = c.accounts.filter(function(x){ return x.id!==id; }); persist('settings'); renderView(); };
+ACTIONS.igForget = function(){ fetchWithin(WAKE_HELPER+'ig/forget', 6000).then(function(){ ui.igHasKey = false; renderView(); }); };
+ACTIONS.igRefresh = function(){ igRefresh(); };
+ACTIONS.igConnect = function(){ ui.view = 'settings'; ui.settingsTab = 'integrations'; renderView(); };
+
+// ---- the Social page: Instagram up top ----
+function igSectionHtml(){
+  const c = igCfg();
+  if(!igOn()) return '<div class="ig-connect"><div class="ig-connect-i">&#128247;</div><div><b>Connect Instagram</b><span>Followers, every post’s likes, comments and reach — and your business and personal posts counted on your card by themselves.</span></div><button class="btn btn-primary btn-sm" data-action="igConnect">Connect</button></div>';
+  igMaybeRefresh();
+  if(!c.cache) return '<div class="ig-sec"><div class="gp-loading">'+(ui.igErr ? '&#9888; '+escapeHtml(ui.igErr)+' <button class="btn btn-ghost btn-sm" data-action="igRefresh">Try again</button>' : 'Loading your Instagram…')+'</div></div>';
+  const since30 = addDays(todayStr(), -30), today = todayStr();
+  return '<div class="ig-sec">'+c.accounts.map(function(a){
+    const d = c.cache.data[a.id]; if(!d) return '';
+    const recent = d.posts.filter(function(p){ return p.date > since30; });
+    const avg = function(k){ const xs = recent.filter(function(p){ return p[k]!=null; }); return xs.length ? Math.round(xs.reduce(function(t, p){ return t + p[k]; }, 0)/xs.length) : null; };
+    const days = {}; recent.forEach(function(p){ days[p.date] = (days[p.date]||0) + 1; });
+    const strip = []; for(let i=29;i>=0;i--){ const dd = addDays(today, -i); strip.push('<i class="'+(days[dd] ? 'is-on' : '')+'" title="'+escapeHtml(fmtDateShort(dd))+(days[dd] ? ': '+days[dd]+' post'+(days[dd]===1?'':'s') : '')+'"></i>'); }
+    const top = d.posts.slice(0, 30).sort(function(x, y){ return (y.likes + y.comments*3) - (x.likes + x.comments*3); }).slice(0, 6);
+    const stat = function(k, v){ return '<div class="ig-st"><b>'+(v==null ? '—' : Number(v).toLocaleString())+'</b><span>'+k+'</span></div>'; };
+    return '<div class="ig-acct"><div class="ig-h">'+(d.pic ? '<img class="ig-pic" src="'+escapeHtml(d.pic)+'" alt="">' : '<span class="ig-pic"></span>')+
+        '<div><b>@'+escapeHtml(d.username)+'</b><span class="ig-role is-'+a.role+'">'+(a.role==='business' ? 'Business' : 'Personal')+'</span></div></div>'+
+      '<div class="ig-stats">'+stat('followers', d.followers)+stat('posts · 30 days', recent.length)+stat('avg likes', avg('likes'))+stat('avg comments', avg('comments'))+stat('avg reach', avg('reach'))+'</div>'+
+      '<div class="ig-strip-k">Posting, last 30 days</div><div class="ig-strip">'+strip.join('')+'</div>'+
+      (top.length ? '<div class="ig-top">'+top.map(function(p){ return '<a class="ig-post" href="'+escapeHtml(p.link||'#')+'" target="_blank" rel="noopener" title="'+escapeHtml(p.cap)+'">'+(p.thumb ? '<img src="'+escapeHtml(p.thumb)+'" alt="" loading="lazy">' : '<span class="ig-noimg">'+escapeHtml(String(p.type||'Post').toLowerCase())+'</span>')+'<span class="ig-post-s">&#9829; '+p.likes.toLocaleString()+' &middot; &#128172; '+p.comments.toLocaleString()+'</span></a>'; }).join('')+'</div>' : '')+
+    '</div>';
+  }).join('')+'<div class="ig-foot">Updated '+(typeof ghlAgo==='function' ? ghlAgo(c.cache.at) : new Date(c.cache.at).toLocaleTimeString())+' <button class="btn btn-ghost btn-sm" data-action="igRefresh">'+(ui.igLoading ? 'Refreshing…' : '&#8635; Refresh')+'</button></div></div>';
+}
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
@@ -23388,27 +24074,19 @@ function ci(op, label, opts){
 function chip(op, label, opts){ opts = opts || {}; opts.cls = 'ctx-chip'+(opts.cls?' '+opts.cls:''); return ci(op, label, opts); }
 function crow(k, inner){ return '<div class="ctx-row">'+(k?'<span class="ctx-k">'+k+'</span>':'')+'<div class="ctx-chips">'+inner+'</div></div>'; }
 const SEP = '<div class="ctx-sep"></div>';
-// ---- the app menu ----
+// ---- the app menu: short, and about where you are (looks and pages live in Settings / the sidebar) ----
 function appMenuHtml(){
-  const s = state.focus.activeSession, theme = state.profile.theme || 'dark', scene = sceneId(), lay = cardLayout();
+  const s = state.focus.activeSession, v = ui.view;
+  const add = v==='business' ? ci('add', '&#65291; New lead', {a:'lead'})+ci('add', '&#65291; New client', {a:'client'})
+    : v==='calendar' ? ci('add', '&#65291; New event', {a:'event'})
+    : ci('add', '&#65291; New task', {a:'task'})+ci('add', '&#9998; Quick note', {a:'journal'});
   return '<div class="ctx-title">Operator</div>'+
-    crow('Add', chip('add', 'Task', {a:'task'})+chip('add', 'Lead', {a:'lead'})+chip('add', 'Client', {a:'client'})+chip('add', 'Note', {a:'journal'})+chip('add', 'Event', {a:'event'}))+
-    SEP+
-    (s ? ci('stop', '&#9632; Stop &amp; log session')+(s.onBreak ? '' : ci('break', '&#9749; Take a break')) : ci('lockin', '&#128274; Lock in <span class="ctx-kbd">L</span>'))+
-    ci('recap', '&#128202; Day recap')+
+    (s ? (s.onBreak ? ci('backin', '&#128274; Lock back in') : ci('break', '&#9749; Take a break'))+ci('stop', '&#9632; Lock out')
+       : ci('lockin', '&#128274; Lock in <span class="ctx-kbd">L</span>'))+
+    SEP+add+
+    ((v==='today' || v==='focus') ? SEP+ci('minimal', '&#9673; Minimal view <span class="ctx-kbd">M</span>') : '')+
     (selectableView() && selVisibleCards().length ? ci('selAll', '&#9745; Select all tasks <span class="ctx-kbd">&#8984;A</span>') : '')+
-    ci('wake', '&#9200; Wake-up alarm')+ci('wind', '&#127769; Wind down — plan tomorrow')+
-    (ui.view==='today' ? ci('editPage', s ? (ui.lockedEdit ? '&#10003; Done editing' : '&#9998; Edit this page') : (ui.todayEdit ? '&#10003; Done editing' : '&#9998; Edit this page')) : '')+
-    SEP+
-    crow('Go to', ['today','focus','business','calendar','personal'].map(function(v){ return chip('go', v[0].toUpperCase()+v.slice(1), {a:v, on:ui.view===v}); }).join(''))+
-    SEP+
-    crow('Theme', [['dark','Dark'],['light','Light'],['auto','Auto']].map(function(t){ return chip('theme', t[1], {a:t[0], on:theme===t[0]}); }).join(''))+
-    crow('Sky', SKY_LOOKS.map(function(x){ return chip('sky', x[0]==='auto' ? 'Auto' : x[1].replace(/&#\d+;\s*/,''), {a:x[0], on:(state.profile.skyLook||'auto')===x[0]}); }).join(''))+
-    crow('Scene', SCENES.map(function(sc){ return chip('scene', sc.label, {a:sc.id, on:scene===sc.id}); }).join('')+videoWalls().map(function(v){ return chip('scene', '&#9654; '+escapeHtml(v.name), {a:'vid:'+v.id, on:scene==='vid:'+v.id}); }).join(''))+
-    crow('Cards', chip('layout', 'Grid', {a:'grid', on:lay==='grid'})+chip('layout', 'Carousel', {a:'carousel', on:lay==='carousel'}))+
-    SEP+
-    ci('sidebar', state.profile.sidebarCollapsed ? '&#9776; Show the menu' : '&#9776; Hide the menu')+
-    ci('go', '&#9881; Settings', {a:'settings'});
+    (!s && v==='today' ? ci('recap', '&#128202; Day recap') : '');
 }
 // ---- journal entries ----
 function journalMenuHtml(e){
@@ -23491,6 +24169,8 @@ ACTIONS.ctx = function(el){
     else if(a==='journal'){ ui.view = 'personal'; ui.personalTab = 'journal'; ui.journalMode = 'entries'; renderView(); setTimeout(function(){ const ta = document.getElementById('journalPageText'); if(ta) ta.focus(); }, 30); }
   }
   else if(op==='lockin') openLockInChooser();
+  else if(op==='minimal'){ if(state.focus.activeSession) ACTIONS.toggleLockedView(); else ACTIONS.toggleFocusMinimal(); }
+  else if(op==='backin') endBreakModeFromFocus();
   else if(op==='stop') openStopFocus();
   else if(op==='break') openBreakNotePrompt();
   else if(op==='recap') ACTIONS.openDayRecap();

@@ -11,7 +11,7 @@ function renderSettings(){
   const saveBtn = '<button class="btn btn-primary section" data-action="saveProfile">Save Changes</button>';
 
   const sections = {
-    integrations: ghlSettingsHtml(),
+    integrations: ghlSettingsHtml()+(typeof igSettingsHtml==='function' ? igSettingsHtml() : ''),
     updates: '<div class="upd-panel">'+renderUpdatesTab()+'</div>',
     data: '<div class="section"><div class="section-title">Your Data'+tip(hasCloud ? 'Saved to your account — it follows you wherever you open Operator.' : 'Saved on this Mac in Operator\'s own storage — export a copy now and then as a backup.')+'</div><div class="card">'+
         '<div class="row"><button class="btn" data-action="exportData">Export Data (.json)</button>'+
@@ -68,22 +68,8 @@ function renderSettings(){
           '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
         '</div>'+
       '</div>'+
-      '<div class="card section" id="quickLinksSettingsAnchor"><div class="section-title">Quick Links'+tip('Your quick-access links — the ☰ button at the bottom right of the Today page.')+'</div><div class="grid grid-2">'+
+      '<div class="card section"><div class="section-title">Links</div><div class="grid grid-2">'+
         '<div class="field"><label>Open links in'+tip('Force Safari opens a new tab with a special link — the first time, choose “Always Allow” when macOS asks, and it\'ll stop needing a second click.')+'</label><select class="input" id="setLinkBrowser"><option value="default" '+((p.linkBrowser||'default')==='default'?'selected':'')+'>System Default</option><option value="safari" '+(p.linkBrowser==='safari'?'selected':'')+'>Force Safari</option></select></div>'+
-        '<div class="field"><label>Business files folder (path on this Mac)</label><input class="input" id="setQuickFiles" placeholder="/Users/you/Documents/Business" value="'+escapeHtml(state.settings.quickLinks.businessFilesPath||'')+'"></div>'+
-        '<div class="field"><label>GoHighLevel URL</label><input class="input" id="setQuickGhl" value="'+escapeHtml(state.settings.quickLinks.ghlUrl||'')+'"></div>'+
-        '<div class="field"><label>Meta Ads Manager URL</label><input class="input" id="setQuickMeta" value="'+escapeHtml(state.settings.quickLinks.metaAdsUrl||'')+'"></div>'+
-      '</div>'+
-      '<div class="kind-label" style="margin-top:16px;margin-bottom:10px;">Icons'+tip('Upload your own logo for any of these — it\'s used as the circle icon. Otherwise a plain default is shown.')+'</div>'+
-      '<div class="row" style="gap:16px;flex-wrap:wrap;">'+
-        QUICK_LINK_DEFS.concat(AI_TOOLS).map(function(t){
-          return '<div style="text-align:center;">'+
-            '<span class="quick-link-circle" style="display:flex;margin:0 auto;">'+quickLinkIconInnerHtml(t.key||t.id, t.emoji, t.bg)+'</span>'+
-            '<div class="kpi-sub" style="margin-top:4px;">'+escapeHtml(t.label)+'</div>'+
-            '<label class="btn btn-ghost btn-sm" style="margin-top:4px;cursor:pointer;">Upload<input type="file" accept="image/*" data-icon-upload="'+(t.key||t.id)+'" style="display:none;"></label>'+
-            (state.settings.quickLinks.icons && state.settings.quickLinks.icons[t.key||t.id] ? '<button class="btn btn-ghost btn-sm" data-action="resetQuickLinkIcon" data-value="'+(t.key||t.id)+'">Reset</button>' : '')+
-          '</div>';
-        }).join('')+
       '</div></div>'+saveBtn,
 
     focus: '<div class="card section"><div class="section-title">App Tracking'+tip('Sees which app (and, in browsers, which website) is in front on this Mac — nothing leaves the machine.')+'</div><div class="grid grid-2">'+
@@ -145,6 +131,7 @@ function renderSettings(){
         '<div class="field"><label>Daily calorie target</label><input class="input" type="number" id="setCalories" value="'+p.calorieTarget+'"></div>'+
         '<div class="field"><label>Goal weight</label><input class="input" type="number" step="0.1" id="setGoalWeight" value="'+(p.goalWeight!=null?p.goalWeight:'')+'"></div>'+
         '<div class="field"><label>Height'+tip('For your Health rating: your BMI, and the healthy and obese lines for your height.')+'</label><div class="row" style="gap:6px;"><input class="input" type="number" min="3" max="8" id="setHeightFt" placeholder="ft" value="'+(p.heightIn ? Math.floor(p.heightIn/12) : '')+'" style="width:80px;"><input class="input" type="number" min="0" max="11" id="setHeightIn" placeholder="in" value="'+(p.heightIn ? p.heightIn%12 : '')+'" style="width:80px;"></div></div>'+
+        '<div class="field"><label>Weight now'+tip('Saves a weigh-in for today (it shows in Health and rates your body on your card).')+'</label><input class="input" type="number" step="0.1" id="setWeightNow" placeholder="lb" value="'+(function(){ const l = arr(state.health.weightLog).slice().sort(function(a, b){ return a.date.localeCompare(b.date); }); return l.length ? l[l.length-1].weight : ''; })()+'"></div>'+
         '<div class="field"><label>Workout days per week (goal)</label><input class="input" type="number" id="setWeeklyWorkout" value="'+p.weeklyWorkoutTarget+'"></div>'+
         '<div class="field"><label>Deep work target per day</label><select class="input" id="setDeepWorkTarget">'+deepWorkOptions.map(function(m){ return '<option value="'+m+'" '+(state.standards.deepWorkTargetMinutes===m?'selected':'')+'>'+fmtDurationLabel(m)+'</option>'; }).join('')+'</select></div>'+
       '</div></div>'+
@@ -344,6 +331,14 @@ function saveProfile(){
   const gw = document.getElementById('setGoalWeight');
   if(gw) state.profile.goalWeight = gw.value ? Number(gw.value) : null;
   const hf = document.getElementById('setHeightFt'), hi = document.getElementById('setHeightIn');
+  const wn = document.getElementById('setWeightNow');
+  if(wn && wn.value!==''){
+    const v = Number(wn.value), log = arr(state.health.weightLog).slice().sort(function(a, b){ return a.date.localeCompare(b.date); }), last = log[log.length-1];
+    if(v > 40 && v < 800 && (!last || Number(last.weight)!==v)){
+      state.health.weightLog = arr(state.health.weightLog).filter(function(w){ return w.date!==todayStr(); });
+      state.health.weightLog.push({id:uid(), date:todayStr(), weight:v}); persist('health');
+    }
+  }
   if(hf && hf.value!==''){ const tot = Number(hf.value)*12 + (Number(hi && hi.value)||0); state.profile.heightIn = tot >= 36 && tot <= 100 ? tot : state.profile.heightIn; }
   const wwEl = document.getElementById('setWeeklyWorkout'); if(wwEl) state.profile.weeklyWorkoutTarget = Number(wwEl.value)||5;
   const dwEl = document.getElementById('setDeepWorkTarget'); if(dwEl) state.standards.deepWorkTargetMinutes = Number(dwEl.value)||180;

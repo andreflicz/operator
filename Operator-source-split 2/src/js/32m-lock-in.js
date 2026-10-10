@@ -187,10 +187,12 @@ function methodLine(st){
     if(st.onBreak){ const as = state.focus.activeSession, b = as && as.breaks[as.breaks.length-1]; return b && !b.auto ? 'Round '+st.round+(m.rounds ? ' of '+m.rounds : '')+' paused' : r+' done'; }
     return r+' · '+(st.last ? 'Last round, <b>'+formatElapsed(st.left)+'</b> to go' : 'Break in <b>'+formatElapsed(st.left)+'</b>');
   }
-  if(st.id==='flow') return st.onBreak ? 'Resting · back when you\'re ready' : 'In the flow for <b>'+formatElapsed(st.inSeg||0)+'</b> · break earned: <b>'+(st.earned||5)+' min</b>';
+  if(st.id==='flow') return st.onBreak ? 'Resting · back when you\'re ready' : 'In the flow <b>'+formatElapsed(st.inSeg||0)+'</b><span class="ml-sep"></span>Break earned <b>'+(st.earned||5)+' min</b>';
   const as = state.focus.activeSession, t = as && lockTaskPick(as.method.taskId);
   return t ? 'Until <b>'+escapeHtml(t.title)+'</b> is done' : 'Until it\'s done';
 }
+const FLOW_HOW = 'Flowtime: there’s no timer. Work as long as your focus holds; when it dips, take a break about a fifth as long as the stretch you just did (5–30 min — 50 minutes earns 10). The longer you stay in it, the bigger the break you’ve earned. When the break ends, you lock back in yourself.';
+function flowTipHtml(){ return typeof tip==='function' ? tip(FLOW_HOW) : ''; }
 function methodStripHtml(as){
   const st = methodState(as); if(!st) return '';
   const m = st.m;
@@ -206,7 +208,7 @@ function methodStripHtml(as){
   } else if(m.work && !st.onBreak){
     bar = '<div class="ms-bar"><i class="ms-w is-cur" style="flex:1" data-tip="This round · '+m.work+' min, then '+m.rest+' min off"><u id="msFill" style="width:'+((st.frac||0)*100).toFixed(1)+'%"></u></i></div>';
   }
-  return '<div class="ms'+(st.onBreak?' is-break':'')+'">'+bar+'<div class="ms-line"><span class="ms-k">'+m.icon+' '+m.label+'</span><span id="msLine">'+methodLine(st)+'</span></div>'+
+  return '<div class="ms'+(st.onBreak?' is-break':'')+'">'+bar+'<div class="ms-line"><span class="ms-k">'+m.icon+' '+m.label+(st.id==='flow' ? flowTipHtml() : '')+'</span><span id="msLine">'+methodLine(st)+'</span></div>'+
     (st.id==='flow' && !st.onBreak ? '<button class="btn btn-ghost btn-sm ms-btn" data-action="openBreakNotePrompt">Take my '+(st.earned||5)+' min</button>' : '')+'</div>';
 }
 function tickMethodStrip(){
@@ -233,7 +235,7 @@ function methodBreak(minutes, note){
   if(ui.currentTaskId){ ui.pausedTaskId = ui.currentTaskId; accumulateCurrentTaskTime(ui.currentTaskId); persist('tasks'); }
   ui.pendingCurrentTaskId = null;
   playRestSound(); pingWrapper();
-  showToast('Round done. '+minutes+' min break: stand up, look out a window. It ends by itself.', {icon:'&#9749;', duration:8000});
+  showToast('Round done. '+minutes+' min break: stand up, look out a window. Lock back in when it’s over.', {icon:'&#9749;', duration:8000});
   try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: '+minutes+' min break'); }catch(e){}
   persist('focus'); persist('modes'); renderView();
 }

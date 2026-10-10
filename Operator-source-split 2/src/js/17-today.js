@@ -16,18 +16,26 @@ function renderOffTimeView(){
     '</div>'+
   '</div></div>';
 }
+// one tidy line per task: number, a priority dot, the title, who it's for. The description is
+// tucked away — ▾ opens it right there.
 function focusKnockOutRow(t, num){
   const isCurrent = ui.currentTaskId===t.id;
   const isPending = ui.pendingCurrentTaskId===t.id;
-  return '<div class="task-item-v2'+(isCurrent?' is-current-task':'')+(isPending?' is-pending-task':'')+(justCompletedTaskId===t.id?' just-completed':'')+'" draggable="true" data-task-id="'+t.id+'" title="'+(isCurrent?'This is your current task':(isPending?'Waiting to be confirmed in Next Task':'Click to queue as Next Task'))+'">'+
-    '<div style="flex:1;min-width:140px;'+(isCurrent?'':'cursor:pointer;')+'" '+(isCurrent?'':'data-action="stagePendingCurrentTask" data-id="'+t.id+'"')+'>'+
-      '<div class="task-title-row">'+(num ? '<span class="ko-num">'+String(num).padStart(2,'0')+'</span>' : '')+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-ongoing" style="margin-left:6px;">&#128204;</span>':'')+'</div>'+
-      (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
+  const open = ui.koOpen && ui.koOpen[t.id];
+  const cl = arr(t.clients).filter(function(c){ return c && c!=='personal'; })[0];
+  const clName = cl ? (typeof clientLabel==='function' ? clientLabel(cl) : (function(){ const c = arr(state.business.clients).find(function(x){ return x.id===cl; }); return c ? (c.business || c.name) : ''; })()) : '';
+  return '<div class="ko-row'+(isCurrent?' is-current-task':'')+(isPending?' is-pending-task':'')+(open?' is-open':'')+(justCompletedTaskId===t.id?' just-completed':'')+'" draggable="true" data-task-id="'+t.id+'">'+
+    '<div class="ko-main"'+(isCurrent?'':' data-action="stagePendingCurrentTask" data-id="'+t.id+'" title="Queue it as next"')+'>'+
+      '<span class="ko-num">'+String(num||'').padStart(2,'0')+'</span><i class="ko-pr is-'+(t.priority||'med')+'"></i>'+
+      '<span class="ko-title">'+escapeHtml(t.title)+'</span>'+
+      (clName ? '<span class="ko-client">'+escapeHtml(clName)+'</span>' : '')+
+      (isCurrent ? '<span class="ko-state is-now">Now</span>' : isPending ? '<span class="ko-state">Queued</span>' : '')+
     '</div>'+
-    clientTagsHtml(t.clients)+
-    (isCurrent ? '<span class="tag tag-good">&#9673; Current</span>' : isPending ? '<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">Queued</span>' : '')+
+    (t.notes ? '<button class="ko-more" data-action="koToggle" data-id="'+t.id+'" title="'+(open ? 'Hide' : 'Show')+' the description">&#9662;</button>' : '<span class="ko-more-sp"></span>')+
+    (t.notes && open ? '<div class="ko-notes">'+escapeHtml(t.notes)+'</div>' : '')+
   '</div>';
 }
+ACTIONS.koToggle = function(el, e, id){ ui.koOpen = ui.koOpen || {}; ui.koOpen[id] = !ui.koOpen[id]; renderView(); };
 function stagePendingCurrentTask(id){
   const as = state.focus.activeSession;
   if(as && as.onBreak) return;
@@ -80,8 +88,7 @@ function renderTodayFocusMode(p){
     .concat(arr(todayInfo.events).map(function(e){ const cat=categoryById(e.categoryId); return {label:e.title, kind:'event', id:e.id, color:cat?cat.color:'#8A90A2', time:e.time}; }));
   const activeClients = arr(state.business.clients).filter(function(c){ return c.status==='active'; });
 
-  return renderFocusQuickLinks()+
-  '<div class="locked-in-header">'+
+  return '<div class="locked-in-header">'+
     businessNameTagHtml()+
     '<div class="locked-in-badge">&#128274; Locked In</div>'+'<div class="lv-corner">'+lockedViewBtnHtml()+'</div>'+
     '<div class="view-title" style="margin:0;">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
@@ -99,6 +106,8 @@ function renderToday(){
   // left you staring at the "Taking today off" screen. The day stays marked as a rest day.
   if(state.focus.activeSession) return renderTodayFocusMode(p);
   if(isDayOff(todayStr())) return renderDayOffView();
+  // the minimal view (M, or the button on the hero): clock, level, streak, LOCK IN — nothing else
+  if(typeof focusMinimalOn==='function' && focusMinimalOn() && !(state.modes.active && state.modes.active.type==='offtime')) return renderFocusMinimal();
   if(state.modes.active && state.modes.active.type==='offtime') return state.modes.active.sleep ? renderSleepView() : state.modes.active.morning ? renderMorningView() : renderOffTimeView();
   const hour = new Date().getHours();
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
@@ -124,8 +133,7 @@ function renderToday(){
       i++;
     }
   }
-  return renderFocusQuickLinks()+
-    renderTodayHero(greeting)+
+  return renderTodayHero(greeting)+
     renderMorningPlanCard()+
     pageEditBtnHtml('toggleTodayEdit', editing)+
     '<div class="today-panels'+(editing?' is-editing':'')+'">'+panelsHtml+'</div>';

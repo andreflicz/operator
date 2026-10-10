@@ -61,9 +61,37 @@ function speakable(t){
     .replace(/·/g, ',').replace(/\s+/g, ' ').trim();
 }
 function opCaption(txt){
+  if(OV.cap==='opBubText') opBubShow();
   const el = OV.cap ? document.getElementById(OV.cap) : null;
   if(el && el.textContent!==txt) el.textContent = txt;
+  if(OV.cap==='opBubText') opBubHideLater();
 }
+// ---- the Operator's bubble: what it says (and your reply box) floats over the page, bottom centre,
+// so nothing on the page ever moves; it slips away a few seconds after it's done ----
+function opBubShow(){
+  let b = document.getElementById('opBub');
+  if(!b){
+    b = document.createElement('div'); b.id = 'opBub'; b.className = 'op-bub';
+    b.innerHTML = '<div class="op-bub-h"><span class="op-bub-dot"></span><b>OPERATOR</b><button class="op-bub-x" data-action="opBubClose" title="Close">&#10005;</button></div>'+
+      '<div class="op-bub-t" id="opBubText"></div>'+
+      '<div class="op-bub-in"><input class="op-type" id="opBubInput" placeholder="Ask the Operator…" autocomplete="off"><button class="op-talk" data-action="opTalk" title="Talk (mic)">&#127897;&#65039;</button></div>';
+    document.body.appendChild(b);
+    b.addEventListener('mouseenter', function(){ b._hover = true; clearTimeout(opBubHideLater._t); });
+    b.addEventListener('mouseleave', function(){ b._hover = false; opBubHideLater(); });
+  }
+  if(!b.classList.contains('is-in')){ void b.offsetWidth; b.classList.add('is-in'); }
+  return b;
+}
+function opBubHideLater(){
+  clearTimeout(opBubHideLater._t);
+  opBubHideLater._t = setTimeout(function(){
+    const b = document.getElementById('opBub'); if(!b) return;
+    const typing = document.activeElement && document.activeElement.id==='opBubInput' && document.activeElement.value;
+    if(b._hover || typing || OV.speaking || OV.pending || AI.busy || AI.listening){ opBubHideLater(); return; }
+    b.classList.remove('is-in');
+  }, 9000);
+}
+ACTIONS.opBubClose = function(){ opStop(); const b = document.getElementById('opBub'); if(b) b.classList.remove('is-in'); };
 function opTtsUrl(text){
   const w = wakeCfg(), e = opEngine();
   return WAKE_HELPER+'tts/say?e='+e+'&v='+hexUtf8(e==='eleven' ? (w.elevenVoice||'') : (w.macVoice||''))+'&t='+hexUtf8(text);
@@ -119,8 +147,9 @@ function opSayBrowser(said, opts, tok, resolve){
   u.rate = 0.98; u.pitch = 1; u.volume = 1;
   let gotBoundary = false, t0 = 0, est = null;
   OV.pending = true;
-  const startTimer = setTimeout(function(){ if(OV.pending && tok===OV.token){ OV.pending = false; OV.broken = true; try{ speechSynthesis.cancel(); }catch(e){} resolve(false); } }, 1500);
-  u.onstart = function(){ clearTimeout(startTimer); t0 = Date.now(); opStarted(tok, opts);
+  // (a voice can take a few seconds to wake up the first time; only give up on it after two misses)
+  const startTimer = setTimeout(function(){ if(OV.pending && tok===OV.token){ OV.pending = false; OV.misses = (OV.misses||0) + 1; if(OV.misses >= 2) OV.broken = true; try{ speechSynthesis.cancel(); }catch(e){} opCaption(said); resolve(false); } }, 6000);
+  u.onstart = function(){ clearTimeout(startTimer); OV.misses = 0; t0 = Date.now(); opStarted(tok, opts);
     // some voices don't report word boundaries: follow along by time instead
     est = setInterval(function(){ if(gotBoundary || tok!==OV.token) return; const words = said.split(' '), n = Math.min(words.length, Math.floor((Date.now()-t0)/330)+1); opCaption(words.slice(0, n).join(' ')); }, 120); };
   u.onboundary = function(e){ if(tok!==OV.token) return; gotBoundary = true; const end = said.indexOf(' ', e.charIndex + (e.charLength||1)); opCaption(end<0 ? said : said.slice(0, end)); };
@@ -243,7 +272,7 @@ function opBusinessScript(){
 // asking: the bits that need fetching are fetched first (it says so if that takes a moment)
 ACTIONS.opAsk = async function(el, e, id){
   opStop(); OV.idx = 999; // the spoken greeting is done once you ask for something
-  const cap = overlayOpen('planOverlay') ? 'wiCap' : 'brVoice';
+  const cap = 'opBubText';
   const tok = OV.token;
   const wait = function(p){ return Promise.race([p, new Promise(function(r){ setTimeout(r, 7000); })]); };
   if(id==='sports' && typeof loadScores==='function' && !(ui.scores && ui.scores.got && (ui.scores.nfl || ui.scores.nba))){ OV.cap = cap; opCaption('One moment — getting the scores…'); await wait(loadScores(true)); }
@@ -267,13 +296,13 @@ function opMuteHtml(){
 function opAskHtml(where){
   const chip = function(id, icon, label){ return '<button class="op-ask" data-action="opAsk" data-id="'+id+'">'+icon+' '+label+'</button>'; };
   return '<div class="op-asks">'+
-    '<span class="op-name">The Operator</span>'+
+
     (where==='work' ? chip('business', '&#128188;', 'Brief me') : chip('sports', '&#127944;', 'Sports')+chip('news', '&#128240;', 'News')+chip('tech', '&#128187;', 'Tech')+chip('business', '&#128188;', 'Business'))+
     aiTalkHtml()+
     '</div>';
 }
 // the business brief plays by itself when you go straight from Good morning to work
-function opAutoBusinessBrief(){ if(!opVoiceOn()) return; setTimeout(function(){ if(overlayOpen('planOverlay')) { opStop(); opSay(opBusinessScript(), {cap:'wiCap'}); } }, 900); }
+function opAutoBusinessBrief(){ if(!opVoiceOn()) return; setTimeout(function(){ if(overlayOpen('planOverlay')) { opStop(); opSay(opBusinessScript(), {cap:'opBubText'}); } }, 900); }
 
 // ---- choosing the voice (in the alarm settings, under "The Operator's voice") ----
 const ELEVEN_VOICES = [['JBFqnCBsd6RMkjVDRZzb', 'George — British, warm (the butler)'], ['onwK4e9ZLuTAKqWW03F9', 'Daniel — British, crisp'], ['nPczCjzI2devNBz1zQrb', 'Brian — deep, American']];
@@ -310,7 +339,7 @@ function opVoiceSettingsHtml(){
     body = '<select class="input" id="opBrowserVoice">'+(vs.length ? vs.map(function(v){ return '<option value="'+escapeHtml(v.name)+'"'+(cur && cur.name===v.name?' selected':'')+'>'+escapeHtml(v.name)+'</option>'; }).join('') : '<option>No voices found</option>')+'</select>'+
       '<div class="op-set-help">The browser’s own voices — the simplest, and the most robotic. Premium and Enhanced voices you download on the Mac show up here too.</div>';
   }
-  return '<div class="field op-set" id="opVoiceSet"><label>Voice</label>'+
+  return '<div class="field op-set" id="opVoiceSet"><label>Voice</label>'+opLauncherLineHtml()+
     '<div class="seg-tabs" style="margin:0 0 8px;">'+seg('eleven', 'ElevenLabs')+seg('mac', 'Mac voice')+seg('browser', 'Browser')+'</div>'+body+
     '<div class="op-set-test"><button class="btn btn-sm" data-action="opTest">&#9654; Test the voice</button><span id="opTestCap" class="op-set-cap"></span></div></div>'+aiKeyHtml();
 }
@@ -334,7 +363,7 @@ ACTIONS.opElevenSave = function(){
   // straight to the Operator app (it keeps the key in its own file); never into Operator's data
   fetchWithin(WAKE_HELPER+'tts/key?t='+hexUtf8(v), 6000).then(function(r){
     if(r && r.ok){ ui.ttsKey = true; showToast('ElevenLabs key saved on this Mac.', {icon:'&#128274;'}); opVoiceChanged(); renderView(); }
-    else showToast('Couldn’t save it — the Operator app isn’t answering. Open Operator from its icon.', {icon:'&#9888;'});
+    else opLauncherWhy().then(function(why){ showToast('Couldn’t save the key — '+why, {icon:'&#9888;', duration:10000}); });
   });
 };
 ACTIONS.opElevenForget = function(){ fetchWithin(WAKE_HELPER+'tts/forget', 6000).then(function(){ ui.ttsKey = false; renderView(); }); };
@@ -425,18 +454,18 @@ function aiListen(cap){
   rec.onend = function(){ AI.listening = false; aiUiRefresh(); if(said.trim()) aiAsk(said, cap); };
   try{ rec.start(); }catch(e){ AI.listening = false; aiTypeFocus(); }
 }
-function aiTypeFocus(){ const i = document.querySelector('.op-type'); if(i) i.focus(); }
+function aiTypeFocus(){ OV.cap = 'opBubText'; opBubShow(); const i = document.getElementById('opBubInput'); if(i) setTimeout(function(){ i.focus(); }, 60); }
 function aiUiRefresh(){
   document.querySelectorAll('.op-talk').forEach(function(b){ b.classList.toggle('is-on', AI.listening); b.classList.toggle('is-busy', AI.busy); });
 }
-function aiCapFor(el){ return overlayOpen('planOverlay') ? 'wiCap' : overlayOpen('wakeOverlay') ? 'brVoice' : 'hmCap'; }
-ACTIONS.opTalk = function(el){ aiListen(aiCapFor(el)); };
+function aiCapFor(){ return 'opBubText'; }
+ACTIONS.opTalk = function(el){ OV.cap = 'opBubText'; opBubShow(); aiListen('opBubText'); };
 document.addEventListener('keydown', function(e){
   const t = e.target; if(!t || !t.classList || !t.classList.contains('op-type') || e.key!=='Enter') return;
   e.preventDefault(); const v = t.value; t.value = ''; aiAsk(v, aiCapFor(t));
 });
 function aiTalkHtml(){
-  return '<span class="op-talk-wrap"><button class="op-talk" data-action="opTalk" title="Talk to the Operator">&#127897;&#65039;</button><input class="op-type" placeholder="Ask the Operator…" autocomplete="off"></span>';
+  return '<button class="op-talk" data-action="opTalk" title="Talk to the Operator">&#127897;&#65039;</button>';
 }
 // the key: straight to the Operator app, never into Operator's data
 ACTIONS.aiKeySave = function(){
@@ -445,7 +474,7 @@ ACTIONS.aiKeySave = function(){
   if(i) i.value = '';
   fetchWithin(WAKE_HELPER+'ai/key?t='+hexUtf8(v), 6000).then(function(r){
     if(r && r.ok){ AI.hasKey = true; AI.model = null; showToast('Anthropic key saved on this Mac. Say hello.', {icon:'&#128274;'}); renderView(); }
-    else showToast('Couldn’t save it — the Operator app isn’t answering. Open Operator from its icon.', {icon:'&#9888;'});
+    else opLauncherWhy().then(function(why){ showToast('Couldn’t save the key — '+why, {icon:'&#9888;', duration:10000}); });
   });
 };
 ACTIONS.aiKeyForget = function(){ fetchWithin(WAKE_HELPER+'ai/forget', 6000).then(function(){ AI.hasKey = false; AI.model = null; renderView(); }); };
@@ -455,4 +484,27 @@ function aiKeyHtml(){
     (AI.hasKey ? '<div class="op-set-key"><span>&#128274; Anthropic key saved on this Mac</span><button class="btn btn-ghost btn-sm" data-action="aiKeyForget">Remove key</button></div>'
       : '<div class="op-set-key"><input class="input" type="password" id="aiKey" placeholder="Anthropic API key (sk-ant-…)" autocomplete="off"><button class="btn btn-sm btn-primary" data-action="aiKeySave">Save key</button></div>')+
     '<div class="op-set-help">Get a key at console.anthropic.com → API keys.</div></div>';
+}
+
+// ---- is the Operator launcher there, and is it the new one? (keys, voices and talking need it) ----
+const OP_HELPER_NEEDS = 10;
+async function opLauncherInfo(){
+  const r = await fetchWithin(WAKE_HELPER+'ping', 3000);
+  if(!r) return {up:false, v:0};
+  let j = null; try{ j = await r.json(); }catch(e){}
+  return {up:true, v:Number(j && j.helper)||0};
+}
+async function opLauncherWhy(){
+  const i = await opLauncherInfo();
+  if(!i.up) return 'the Operator launcher isn’t running. Quit Operator (⌘Q) and open it from its icon in Applications (not from Chrome).';
+  if(i.v < OP_HELPER_NEEDS) return 'an older Operator (launcher v'+i.v+') is still running. Quit Operator fully (⌘Q), make sure only the new Operator app is in Applications, and open it again.';
+  return 'the launcher answered but couldn’t write the key. Try again in a moment.';
+}
+function opLauncherLineHtml(){
+  if(!ui.opLauncher){ ui.opLauncher = {checking:true}; opLauncherInfo().then(function(i){ ui.opLauncher = i; if(document.getElementById('opVoiceSet')) renderView(); }); }
+  const i = ui.opLauncher;
+  if(i.checking) return '';
+  if(!i.up) return '<div class="op-set-warn">&#9888; The Operator launcher isn’t running — quit Operator (⌘Q) and open it from its icon. Keys and voices need it.</div>';
+  if(i.v < OP_HELPER_NEEDS) return '<div class="op-set-warn">&#9888; An older Operator launcher (v'+i.v+') is running. Quit Operator fully (⌘Q) and open the new one — then the keys will save.</div>';
+  return '<div class="op-set-ok">&#10003; Operator launcher v'+i.v+' is running.</div>';
 }

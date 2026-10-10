@@ -277,6 +277,7 @@ function normalizeHealth(h){ h=h||{}; h.gymLog=arr(h.gymLog); h.weightLog=arr(h.
 function normalizeMeals(m){ m=m||{}; m.library = (Array.isArray(m.library) && m.library.length) ? m.library : defaultMeals().library; return m; }
 function normalizeJournal(j){
   j=j||{}; j.entries=arr(j.entries); if(!Array.isArray(j.capsules)) j.capsules=[];
+  if(!j.intentions || typeof j.intentions!=='object') j.intentions = {months:{}, weeks:{}, prompted:{}};
   if(!Array.isArray(j.types) || !j.types.length) j.types = defaultJournalTypes();
   else {
     const retiredIds = ['idea','win','vent','reflect','tired'];

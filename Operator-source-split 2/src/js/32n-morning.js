@@ -283,10 +283,17 @@ ACTIONS.dawnUp = function(){
   wakeImUp();
 };
 
+// which morning's note the morning screens show: this morning's — except on a test run, or later in
+// the day once you've already written the next one (then you see what you just wrote, not last night's)
+function briefNoteDate(){
+  const today = todayStr(), t = morningNoteTarget();
+  if(t!==today && ((typeof ui!=='undefined' && ui.wakeBriefTest) || new Date().getHours() >= 12) && morningNotesFor(t).length) return t;
+  return today;
+}
 // ---- the note from last night: a headline (on the alarm), a message for the morning, and one
 // for before work. Older notes were just one line — that line counts as the headline.
 function nightNote(date){
-  const ns = morningNotesFor(date || todayStr()), out = {headline:'', morning:'', work:''};
+  const ns = morningNotesFor(date || briefNoteDate()), out = {headline:'', morning:'', work:''};
   ns.forEach(function(n){
     if(n.headline || n.morning || n.work){ if(n.headline) out.headline = n.headline; if(n.morning) out.morning = n.morning; if(n.work) out.work = n.work; }
     else if(n.text) out.headline = out.headline ? out.headline+' · '+n.text : n.text;
@@ -351,43 +358,13 @@ function lastNightSleep(){
   const h = state.modes.history.filter(function(m){ return m.sleep && m.endedAt && Date.now() - m.endedAt < 8*3600000 && m.minutes >= 60; }).sort(function(a, b){ return b.endedAt - a.endedAt; })[0];
   return h ? {minutes:h.minutes, from:h.startedAt, to:h.endedAt} : null;
 }
-function briefBase(){ return wakeCfg().intro!=='quick' ? 4800 : 1800; }
-// you, lately: streak, training, weight, and something you wrote a while back
-function briefMemory(){
-  const today = todayStr(), es = arr(state.journal.entries).filter(function(e){ return e.text && e.date < addDays(today, -6); });
-  if(!es.length) return null;
-  const want = [365, 180, 90, 30, 14, 7];
-  for(let i=0;i<want.length;i++){ const d = addDays(today, -want[i]), hit = es.find(function(e){ return e.date===d; }); if(hit) return {e:hit, ago:want[i]}; }
-  const pinned = es.filter(function(e){ return e.pinned; }), pool = pinned.length ? pinned : es, e = pool[dayNum() % pool.length];
-  return {e:e, ago:Math.round((Date.parse(today) - Date.parse(e.date))/86400000)};
-}
-function agoLabel(n){ return n>=365 ? 'A year ago' : n>=170 ? 'Six months ago' : n>=85 ? 'Three months ago' : n>=28 ? 'A month ago' : n>=14 ? 'Two weeks ago' : n+' days ago'; }
-function briefYouHtml(){
-  const streak = computeStreak(), wk = typeof workoutsThisWeek==='function' ? workoutsThisWeek() : 0, wp = typeof weightProgress==='function' ? weightProgress() : {};
-  const tiles = [['&#128293;', streak, streak===1 ? 'day streak' : 'day streak'], ['&#127947;&#65039;', wk, 'workouts this week']];
-  if(wp.latest!=null) tiles.push(['&#9878;&#65039;', wp.latest, wp.goal!=null ? 'lbs &middot; goal '+wp.goal : 'lbs']);
-  const cap = typeof dueCapsule==='function' ? dueCapsule() : null;
-  if(cap){
-    openCapsule(cap);
-    return {voice:'And a message from you, from '+fmtDateShort(cap.writtenOn)+'.', html:'<div class="br-k">&#9203; From Past You</div><div class="br-cap"><small>Written '+fmtDateShort(cap.writtenOn)+(cap.hidden ? ' — you didn’t know when it would turn up' : '')+'</small>'+(cap.title ? '<b>'+escapeHtml(cap.title)+'</b>' : '')+'<p>'+escapeHtml(cap.text)+'</p></div>'};
-  }
-  const mem = briefMemory();
-  const memHtml = mem ? '<div class="br-mem"><small>'+agoLabel(mem.ago)+' you wrote</small><p>'+(mem.e.title ? '<b>'+escapeHtml(mem.e.title)+'</b> ' : '')+escapeHtml(String(mem.e.text).slice(0, 140))+(String(mem.e.text).length > 140 ? '…' : '')+'</p></div>' : '';
-  return {voice: mem ? 'And a little something from you, '+agoLabel(mem.ago).toLowerCase()+'.' : 'Here’s where you’re at.',
-    html:'<div class="br-k">&#128100; You, Lately</div><div class="br-you-t">'+tiles.map(function(t){ return '<div><span>'+t[0]+'</span><b>'+t[1]+'</b><small>'+t[2]+'</small></div>'; }).join('')+'</div>'+memHtml+briefSystemHtml()};
-}
-// the SYSTEM's morning line: your level, rank and overall
-function briefSystemHtml(){
-  if(typeof xpSummary!=='function') return '';
-  const x = xpSummary(), r = RANKS[x.rank];
-  return '<div class="br-sys" data-action="openYou" title="Your card"><div class="br-sys-h"><span>[ SYSTEM ]</span><b style="color:'+r.color+'">LVL '+x.level+' &middot; '+escapeHtml(r.name)+'</b><em>OVR '+x.ovr+'</em></div>'+
-    '<i class="br-sys-bar"><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i></div>';
-}
+function briefBase(){ return wakeCfg().intro!=='quick' ? 4000 : 1400; }
+// ("You, lately" and "a month ago you wrote" are gone: the month and the week took their place — see 32u)
 function wakeBriefHtml(){
   if(typeof briefMinimalOn==='function' && briefMinimalOn()) return briefMinimalHtml();
   const today = todayStr(), name = state.profile.name || '';
   const events = state.calendar.events.filter(function(e){ return e.date===today; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
-  const nn = nightNote(today);
+  const nn = nightNote();
   const q = quoteOfDay();
   const news = ui.morningNews && ui.morningNews.date===today ? ui.morningNews.items : null;
   const now = typeof wxNow==='function' ? wxNow() : null, phase = skyPhase(), win = dayWindow();
@@ -407,7 +384,8 @@ function wakeBriefHtml(){
   const panel = function(cls, anim, voice, html, extraStyle, attrs){
     const d = tcur; k++;
     const wms = typeof opVoiceOn==='function' && opVoiceOn() ? 360 : BRIEF_WORD_MS;
-    if(voice){ lines.push({at: d - 380, text: voice}); tcur += Math.max(1500, voice.split(' ').length*wms + 650); } else tcur += 800;
+    // (quicker than before: each line still finishes, with a short breath before the next piece)
+    if(voice){ lines.push({at: d - 380, text: voice}); tcur += Math.max(1100, voice.split(' ').length*wms + 420); } else tcur += 600;
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
   const slept = lastNightSleep();
@@ -422,8 +400,9 @@ function wakeBriefHtml(){
   if(nn.headline || nn.morning) colA.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+
     (nn.headline ? '<div class="br-ln-head">'+escapeHtml(nn.headline)+'</div>' : '')+(nn.morning ? '<div class="br-ln-text">'+escapeHtml(nn.morning)+'</div>' : '')));
   else if(vb && vb.elements.length) colA.push(panel('br-vision', 'br-a-scale', 'And this is what it’s all for.', boardStaticHtml(vb, 'wake-board'), '', ' data-action="wakeBoardToggle" title="Open your vision board"'));
-  const you = briefYouHtml();
-  if(you) colA.push(panel('br-you', 'br-a-rise', you.voice, you.html));
+  // the month and the week (or, rarely, a time capsule) — with your streak and level on top
+  const you = typeof briefIntentHtml==='function' ? briefIntentHtml() : null;
+  if(you) colA.push(panel('br-you br-intent', 'br-a-rise', you.voice, you.html));
   // column 2: a line to carry, and a few small things for a good day
   colB.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
   colB.push(panel('br-thoughts', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+
@@ -445,6 +424,7 @@ function wakeBriefHtml(){
       const lt = late();
       colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports</div>'+sc+sh.slice(0, sc ? 3 : 6).map(function(n){ return item(n, false); }).join(''), lt));
     } else if(newsWait || (ui.scores && ui.scores.loading)) colD.push(waitHtml('br-sports', '&#127936; Sports'));
+    else colD.push(panel('br-sports', 'br-a-rise', '', '<div class="br-k">&#127936; Sports</div><div class="br-sports-none">No games on the board right now. Ask the Operator for sports — it goes and gets them.</div>'));
   }
   // the day ahead — just the calendar; the work plan waits for the business preview
   colB.push(panel('br-day', 'br-a-right', events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.',
@@ -465,7 +445,7 @@ function wakeBriefHtml(){
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner b4">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        '<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
+        (typeof briefHudHtml==='function' ? briefHudHtml() : '')+'<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
         // one button: Skip takes you straight to the app
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
       '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
@@ -492,7 +472,7 @@ ACTIONS.wakeIntroSkip = function(){
 };
 // ---- the narration: one line at a time, typed out ----
 let briefVoiceTimer = null;
-const BRIEF_WORD_MS = 190; // a comfortable read: each line finishes before the next piece arrives
+const BRIEF_WORD_MS = 150; // a comfortable read: each line finishes before the next piece arrives
 function briefBuilt(){ const l = ui.briefLines || []; return !!l.length && Date.now() - (ui.briefT0||0) > l[l.length-1].at + 2000; }
 function briefVoiceRun(){
   clearInterval(briefVoiceTimer);
@@ -626,6 +606,12 @@ function workWeekHtml(target){
       return '<div class="wi-wk'+(x.d===today?' is-today':'')+(x.m>=target?' is-hit':'')+'" title="'+weekdayShort(x.d)+': '+fmtDurationLabel(x.m)+'"><u style="height:'+Math.max(3, x.m/top*100).toFixed(1)+'%"></u><span>'+weekdayShort(x.d).slice(0,1)+'</span></div>';
     }).join('')+'</div></div>';
 }
+// the business message you left yourself the night before (the "before you lock in" part of the note)
+function workMessageHtml(){
+  const w = nightNote().work;
+  return '<div class="wi-msg'+(w ? '' : ' is-empty')+'"><div class="wi-msg-h"><span>&#128188; Business message</span><button class="wi-msg-e" data-action="openTomorrowNote" title="'+(w ? 'Write tomorrow’s' : 'Write one for tomorrow')+'">&#9998;</button></div>'+
+    (w ? '<p>'+escapeHtml(w)+'</p>' : '<p class="wi-msg-none">Nothing from last night. Leave tomorrow’s when you clock out.</p>')+'</div>';
+}
 function renderPlanReveal(){
   if(!ui.planReveal) return '';
   const plan = todaysPlan().filter(function(t){ return t.status!=='done'; }).slice(0, 6), first = plan[0];
@@ -640,12 +626,11 @@ function renderPlanReveal(){
   return '<div class="wi">'+
     '<div class="wi-top"><span class="pr-badge">&#128339; Clocked In</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
       (ui.planReveal && ui.planReveal.from==='morning' ? '<button class="wi-back" data-action="backToMorning" title="Back to Good morning">&#8592; Morning</button>' : '')+
-      '<span class="wi-pl">'+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
+      '<span class="wi-pl">'+(typeof aiTalkHtml==='function' ? aiTalkHtml() : '')+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
       '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
     '<div class="wi-inner">'+
       '<div class="wi-k" style="animation-delay:40ms">Work Mode</div>'+
       '<h1 class="wi-h" style="animation-delay:100ms">Let’s get to work'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
-      (typeof opAskHtml==='function' ? '<div class="wi-op">'+opAskHtml('work')+'<div class="wi-cap" id="wiCap"></div></div>' : '')+
       '<div class="wi-stats n'+stats.length+'">'+stats.map(function(s){ return '<div class="wi-stat"'+(s.go ? ' data-action="'+s.go+'"' : '')+' style="'+at(140)+'"><div class="wi-stat-k">'+s.k+'</div><div class="wi-stat-v">'+s.v+'</div>'+(s.pct!=null ? '<div class="wi-bar"><i style="width:'+s.pct.toFixed(1)+'%"></i></div>' : '')+'<div class="wi-stat-s">'+escapeHtml(s.sub)+'</div></div>'; }).join('')+'</div>'+
       '<div class="wi-cols">'+
         '<div class="wi-col">'+
@@ -656,10 +641,10 @@ function renderPlanReveal(){
           '</div>'+
           workClientsHtml()+
         '</div>'+
-        '<div class="wi-col wi-right" style="'+at(300)+'">'+(nightNote().work ? '<div class="wi-note"><span>&#127769; You told yourself</span><p>'+escapeHtml(nightNote().work)+'</p></div>' : '')+
+        // your business message from last night first (or a nudge to write tomorrow's), one quote, your week
+        '<div class="wi-col wi-right" style="'+at(300)+'">'+workMessageHtml()+
           '<div class="wi-side">'+quoteHtml(q, 'is-work', 'work')+'</div>'+
           workWeekHtml(target)+
-          '<div class="wi-act">'+quoteHtml(quoteFor('action'), 'is-act', 'action')+'</div>'+
         '</div>'+
       '</div>'+
       '<div class="pr-cta" style="animation-delay:420ms">'+

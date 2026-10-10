@@ -214,6 +214,8 @@ function renderConversations(){
   const at = s.mode==='social' ? (ghlCfg().socialCache && ghlCfg().socialCache.at) : s.at;
   return '<div class="view-header"><div><div class="view-title">Social'+tip('Your followers and how your posts are doing, plus your GoHighLevel chats and contacts.')+'</div></div>'+
       (on ? '<div class="row" style="gap:8px;align-items:center;">'+(at ? '<span class="kpi-sub">Updated '+ghlAgo(at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="'+(s.mode==='social' ? 'socialRefresh' : 'inboxRefresh')+'" title="Refresh">&#8635;</button></div>' : '')+'</div>'+
+    // Instagram, straight from Instagram, up top (on the Stats tab, or always when GoHighLevel isn't connected)
+    ((!on || s.mode==='social') && typeof igSectionHtml==='function' ? igSectionHtml() : '')+
     (on ? '<div class="seg-tabs cv-tabs">'+tab('social', '&#128202; Stats')+tab('chats', '&#128172; Chats', inboxUnread())+tab('contacts', '&#128101; Contacts')+'</div>' : '')+
     '<div class="tab-panel" data-key="convos-'+s.mode+'">'+renderInboxTab()+'</div>';
 }
