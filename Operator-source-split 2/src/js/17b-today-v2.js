@@ -17,6 +17,7 @@ function renderTodayHero(greeting){
       businessNameTagHtml()+
       '<div class="th-greet">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
       (p.bigClockOnToday ? '<div id="liveClockBig" class="cal-big-clock th-bigclock"></div>'+skyChipHtml() : '<div class="th-subrow"><div class="th-sub" id="liveClock"></div>'+skyChipHtml()+'</div>')+
+      (typeof xpChipHtml==='function' ? xpChipHtml() : '')+
       '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: (allDone ? '<span class="streak-ok" title="Today\'s standard: done">&#10003;</span>' : '')+tip((streak===0 ? 'Hit today\'s standard to start one. ' : allDone ? 'Today\'s in the bag. ' : 'Hit today\'s standard to keep it going. ')+'The streak counts days in a row you hit Today\'s Standard — the deep-work target plus your checklist. Rest days you take off don\'t break it.')})+'</div>'+
     '</div>'+
     '<div class="th-right">'+

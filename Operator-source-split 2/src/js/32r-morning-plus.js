@@ -108,7 +108,7 @@ function capsuleBarHtml(){
 // ---- the note for tomorrow: one form, three parts, always editable ----
 function openTomorrowNote(){
   let o = document.getElementById('tnOverlay');
-  if(!o){ o = document.createElement('div'); o.id = 'tnOverlay'; o.className = 'overlay tn-ov'; o.innerHTML = '<div class="modal tn" id="tnContent"></div>'; document.body.appendChild(o); o.addEventListener('pointerdown', function(e){ if(e.target===o) closeTomorrowNote(); }); }
+  if(!o){ o = document.createElement('div'); o.id = 'tnOverlay'; o.className = 'overlay tn-ov'; o.innerHTML = '<div class="card tn" id="tnContent"></div>'; document.body.appendChild(o); o.addEventListener('pointerdown', function(e){ if(e.target===o) closeTomorrowNote(); }); }
   const target = morningNoteTarget(), nn = nightNote(target);
   document.getElementById('tnContent').innerHTML =
     '<div class="tn-h"><div><div class="tn-k">&#127769; For '+(target===addDays(todayStr(), 1) ? 'tomorrow' : weekdayShort(target))+'</div><div class="tn-t">A note to the morning you</div></div><button class="tn-x" data-action="closeTomorrowNote">&#10005;</button></div>'+
