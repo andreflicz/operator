@@ -78,15 +78,14 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   // ---- Leads / Clients: stats left, one row of equal-height controls right ----
   await p.click('[data-action="businessTab"][data-tab="leads"]'); await p.waitForTimeout(150);
-  const lc = await p.evaluate(() => ['.crm-toolbar-slim .crm-stats', '.crm-toolbar-slim .crm-tools-btn', '.crm-toolbar-slim .seg-tabs', '.crm-toolbar-slim .crm-add-btn'].map(s => { const r = document.querySelector(s).getBoundingClientRect(); return {s, h:Math.round(r.height), cy:Math.round(r.top+r.height/2)}; }));
+  const lc = await p.evaluate(() => ['.crm-toolbar-slim .crm-stats', '.crm-toolbar-slim .crm-tools-btn', '.crm-toolbar-slim .seg-tabs'].map(s => { const r = document.querySelector(s).getBoundingClientRect(); return {s, h:Math.round(r.height), cy:Math.round(r.top+r.height/2)}; }));
   const ctrls = lc.slice(1);
-  check('Leads: Search & sort, Board/List and + Add are the same height', ctrls.every(c => c.h===ctrls[0].h), lc);
+  check('Leads: Search & sort and Board/List are the same height (adding is the gold +)', ctrls.every(c => c.h===ctrls[0].h), lc);
   check('…and on one line with the stats', lc.every(c => Math.abs(c.cy-lc[0].cy) <= 3), lc);
   await p.click('[data-action="crmToggleTools"][data-kind="lead"]'); await p.waitForTimeout(120);
   check('…search & sort still opens', await p.isVisible('#crmSearch-lead'));
   await p.click('[data-action="businessTab"][data-tab="clients"]'); await p.waitForTimeout(150);
-  const cc = await p.evaluate(() => ['.crm-toolbar-slim .crm-tools-btn', '.crm-toolbar-slim .crm-add-btn'].map(s => { const r = document.querySelector(s).getBoundingClientRect(); return {h:Math.round(r.height), cy:Math.round(r.top+r.height/2)}; }));
-  check('Clients: Search & sort and + Add client line up', cc[0].h===cc[1].h && Math.abs(cc[0].cy-cc[1].cy)<=1, cc);
+  check('Clients: no separate + Add client — the gold + adds one', !(await p.$('.crm-toolbar-slim .crm-add-btn')) && (await p.getAttribute('#fabAdd', 'data-label'))==='Add client');
 
   // ---- wake setup: the how-to text is behind "?" ----
   await E("openWakeSetup()"); await p.waitForTimeout(150);

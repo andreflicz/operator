@@ -86,7 +86,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.click('[data-action="editMasterTarget"][data-id="mrr"]'); await p.fill('#mgEdit-mrr', '20000'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
     check('tap a target to change it in place (saved to Settings)', (await E("state.profile.revenueGoalMonthly"))===20000 && /\$20,000/.test(await p.textContent('.mg-hero')));
     check('older goals still load under Your goals', /Post 3 reels/.test(await p.textContent('.goal-grid')));
-    await p.click('[data-action="toggleForm"][data-form="newGoal"]'); await p.waitForTimeout(100);
+    await p.click('#fabAdd'); await p.waitForTimeout(150);
     await p.fill('#newGoalLabel', '10k IG followers'); await p.fill('#newGoalTarget', '10000'); await p.fill('#newGoalUnit', 'followers'); await p.fill('#newGoalCurrent', '4200');
     await p.click('[data-action="addGoal"]'); await p.waitForTimeout(150);
     check('your own goals take a name, target, unit and where you are now', await E("(g => g && g.current===4200 && g.target===10000 && !g.autoTrack)(state.goals.items.find(g=>g.label==='10k IG followers'))"));

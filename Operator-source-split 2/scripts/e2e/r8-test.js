@@ -31,7 +31,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     add(180.2, 181, 'Firefox');
     await poll(181);
     await p.clock.runFor(400);   // let the notice fade in
-    check('back at the keys: a notice says what happened, with a way to undo', (await p.textContent('#toastContainer')).includes('stepped away') && await p.isVisible('#toastContainer [data-action="restoreAwaySession"]'));
+    check('back at the keys: a notice says what happened, with a way to undo', (await p.textContent('#toastContainer')).includes('Away since') && await p.isVisible('#toastContainer [data-action="restoreAwaySession"]'));
     await p.click('#toastContainer [data-action="restoreAwaySession"]'); await p.waitForTimeout(100);
     check('"I was working" puts the time back', Math.abs((await E("state.focus.activeSession ? state.focus.activeSession.startedAt : 0"))-T0) < 5000 && (await E("state.focus.sessions.filter(x=>x.away).length"))===0);
     check('idle Firefox time isn\'t app time', (await E("appMinutesForDate(todayStr())['Firefox']")) <= 32);
@@ -130,7 +130,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('clicking it opens the vision board big', await p.isVisible('.br-vision-big'));
     await p.click('.br-vision-big .wk2-vision-x'); await p.waitForTimeout(200);
     const brief = await p.textContent('.brief');
-    check('"I\'m up" opens the morning briefing', /Good morning/.test(brief) && /Yesterday/.test(brief) && /Plan of attack/.test(brief) && /Goals/.test(brief) && /Edit JJS reel/.test(brief));
+    check('"I\'m up" opens the morning briefing', /Good morning/.test(brief) && /Yesterday/.test(brief) && /Goals/.test(brief) && await p.isVisible('[data-action="wakeClockIn"]'));
     await p.click('[data-action="wakeBriefDone"]'); await p.waitForTimeout(200);
     check('Let\'s go takes you into the day', !(await p.isVisible('#wakeOverlay:not(.hidden)')) && (await E("ui.view"))==='today');
     check('no errors (wake)', !p.errors.length, p.errors);

@@ -102,7 +102,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const p = await newPage(b, OUT+'/r6.html', {profile:{name:'Andre'}, tasks:{items:many}, dashboardPanels:{order:['personalStats','week','heatmap','why'], enabled:{week:false}}}, NOW);
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     const pills = await p.$$eval('.th-modes .th-mode', e => e.map(x => x.textContent));
-    check('Shooting, Off-time and Day off sit together as one row in the hero', pills.length===3 && /Shooting/.test(pills[0]) && /Off-time/.test(pills[1]) && /Day off/.test(pills[2]), pills);
+    check('Shooting, Off-time and Day off sit together as one row in the hero', pills.length===3 && /Shooting/.test(pills[0]) && /Clock out/.test(pills[1]) && /Day off/.test(pills[2]), pills);
     check('Training is gone from the mode buttons', !(await p.$('[data-type="training"]')) && (await p.$$('.modes-strip')).length===0);
     await p.click('.th-mode-shooting'); await p.waitForTimeout(150);
     check('one click starts Shooting (with Undo)', (await E("state.modes.active && state.modes.active.type"))==='shooting' && await p.isVisible('#toastContainer [data-action="undoQuickMode"]'));

@@ -11,6 +11,9 @@ function instrument(src, out){
 function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 async function launch(){ return chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] }); }
 async function newPage(browser, file, seed, clockAt){
+  // older suites were written for the card lineup; List became the default in round 11 (r11 checks that)
+  seed = Object.assign({}, seed||{}); seed.profile = Object.assign({}, seed.profile||{});
+  if(seed.profile.lineupView===undefined) seed.profile.lineupView = 'cards';
   const ctx = await browser.newContext({ viewport:{width:1400,height:900} });
   const page = await ctx.newPage();
   page.errors = [];

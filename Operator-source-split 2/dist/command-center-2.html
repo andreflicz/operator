@@ -2501,12 +2501,15 @@
   .fab-add{ position:fixed; bottom:24px; right:24px; z-index:61; width:58px; height:58px; border-radius:50%; border:none; padding:0; cursor:pointer; overflow:visible; color:#2a1a04;
     background:radial-gradient(circle at 32% 26%, #fff3c8 0%, #ffd77a 22%, #f0ae3c 55%, #c97a16 100%);
     box-shadow:0 10px 30px rgba(201,122,22,.45), 0 0 0 1px rgba(255,236,180,.55) inset, 0 -6px 14px rgba(120,60,0,.35) inset;
-    animation:fabBreathe 3.6s ease-in-out infinite; transition:transform .35s cubic-bezier(.2,1.4,.4,1), box-shadow .3s; }
-  .fab-add::before{ content:''; position:absolute; inset:-3px; border-radius:50%; padding:2px; background:conic-gradient(from var(--fab-a, 0deg), rgba(255,240,190,0), rgba(255,240,190,.9), rgba(255,180,90,0) 30%, rgba(255,240,190,0)); -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; animation:fabSpin 4s linear infinite; pointer-events:none; }
+    transition:transform .35s cubic-bezier(.2,1.4,.4,1), box-shadow .3s; }
+  .fab-add::before{ content:''; position:absolute; inset:-3px; border-radius:50%; padding:2px; background:conic-gradient(rgba(255,240,190,0), rgba(255,240,190,.9), rgba(255,180,90,0) 30%, rgba(255,240,190,0)); -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; opacity:0; transition:opacity .3s; pointer-events:none; }
+  .fab-add:hover::before{ opacity:1; animation:fabSpin 2.4s linear infinite; }
   .fab-add::after{ content:attr(data-label); position:absolute; right:70px; top:50%; transform:translate(8px, -50%); opacity:0; white-space:nowrap; pointer-events:none; font:700 12.5px/1 var(--font-body, system-ui); color:#fff; padding:8px 12px; border-radius:999px; background:rgba(20,16,10,.88); border:1px solid rgba(255,214,140,.35); box-shadow:0 8px 24px rgba(0,0,0,.35); transition:opacity .2s, transform .25s; }
   .fab-add:hover::after{ opacity:1; transform:translate(0, -50%); }
   .fab-sheen{ position:absolute; inset:0; border-radius:50%; overflow:hidden; pointer-events:none; }
-  .fab-sheen::before{ content:''; position:absolute; top:-20%; left:-60%; width:40%; height:140%; background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.75), rgba(255,255,255,0)); transform:rotate(20deg); animation:fabSheen 4.5s ease-in-out infinite; }
+  .fab-sheen::before{ content:''; position:absolute; top:-20%; left:0; width:40%; height:140%; background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.75), rgba(255,255,255,0)); transform:translateX(-150%) rotate(20deg); }
+  .fab-add:hover .fab-sheen::before{ animation:fabSheen 1.6s ease-in-out infinite; }
+  .fab-add:hover{ animation:fabBreathe 2.2s ease-in-out infinite; }
   .fab-plus{ position:relative; display:block; font-size:32px; font-weight:300; line-height:58px; text-align:center; text-shadow:0 1px 0 rgba(255,245,210,.6); transition:transform .45s cubic-bezier(.2,1.4,.4,1); }
   .fab-add:hover{ transform:translateY(-3px) scale(1.06); box-shadow:0 16px 44px rgba(232,162,61,.6), 0 0 0 1px rgba(255,236,180,.7) inset, 0 -6px 14px rgba(120,60,0,.35) inset, 0 0 40px rgba(255,200,100,.35); }
   .fab-add:hover .fab-plus{ transform:rotate(90deg); }
@@ -2515,10 +2518,9 @@
   .fab-spark.s1{ top:-6px; left:8px; } .fab-spark.s2{ top:10px; right:-8px; width:4px; height:4px; } .fab-spark.s3{ bottom:-4px; left:-6px; width:5px; height:5px; }
   .fab-add:hover .fab-spark{ animation:fabSpark 1.2s ease-out infinite; } .fab-add:hover .fab-spark.s2{ animation-delay:.3s; } .fab-add:hover .fab-spark.s3{ animation-delay:.6s; }
   @keyframes fabBreathe{ 0%,100%{ box-shadow:0 10px 30px rgba(201,122,22,.42), 0 0 0 1px rgba(255,236,180,.55) inset, 0 -6px 14px rgba(120,60,0,.35) inset; } 50%{ box-shadow:0 12px 38px rgba(232,162,61,.62), 0 0 0 1px rgba(255,236,180,.7) inset, 0 -6px 14px rgba(120,60,0,.35) inset, 0 0 26px rgba(255,200,100,.25); } }
-  @keyframes fabSheen{ 0%, 55%{ left:-60%; } 75%, 100%{ left:130%; } }
+  @keyframes fabSheen{ 0%{ transform:translateX(-150%) rotate(20deg); } 60%, 100%{ transform:translateX(330%) rotate(20deg); } }
   @keyframes fabSpark{ 0%{ opacity:0; transform:scale(.3) translate(0,0); } 30%{ opacity:1; transform:scale(1) translate(0,-4px); } 100%{ opacity:0; transform:scale(.4) translate(0,-14px); } }
-  @property --fab-a{ syntax:'<angle>'; initial-value:0deg; inherits:false; }
-  @keyframes fabSpin{ to{ --fab-a:360deg; } }
+  @keyframes fabSpin{ to{ transform:rotate(360deg); } }
   @media (prefers-reduced-motion: reduce){ .fab-add, .fab-add::before, .fab-sheen::before{ animation:none; } }
 
   /* ---- status pill (bottom left) ---- */
@@ -2531,8 +2533,6 @@
   .ap-ring{ width:18px; height:18px; flex:none; transform:rotate(-90deg); }
   .ap-ring-bg{ fill:none; stroke:rgba(var(--ink),.12); stroke-width:3; } .ap-ring-fg{ fill:none; stroke:var(--good); stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset 1s linear; }
   .activity-pill[data-state="break"] .ap-ring-fg{ stroke:#e8a23d; }
-  .activity-pill[data-cat="work"] .ap-dot{ animation:apDot 2.4s ease-in-out infinite; }
-  @keyframes apDot{ 50%{ box-shadow:0 0 14px var(--good); } }
   .ap-menu{ width:290px; border-radius:16px; padding:14px; }
   .ap-status{ padding:12px 14px; border-radius:12px; margin-bottom:12px; background:rgba(63,190,142,.08); border:1px solid rgba(63,190,142,.3); }
   .ap-status.is-break{ background:rgba(232,162,61,.08); border-color:rgba(232,162,61,.35); }
@@ -6293,13 +6293,16 @@ function renderDayOffView(){
 function renderOffTimeView(){
   const active = state.modes.active;
   const elapsed = Date.now() - active.startedAt;
-  return '<div class="view-header today-header"><div>'+businessNameTagHtml()+'<div class="view-title">Off the clock.</div><div class="view-sub" id="liveClock"></div></div></div>'+
+  return '<div class="view-header today-header"><div>'+businessNameTagHtml()+'<div class="view-title">Clocked out.</div><div class="view-sub" id="liveClock"></div></div></div>'+
   '<div class="day-off-wrap"><div class="card day-off-card offtime-card">'+
     '<div style="font-size:40px;">&#127937;</div>'+
     '<div class="hero-num" id="modeElapsed" style="color:var(--strong);">'+formatElapsed(elapsed)+'</div>'+
-    '<div class="hero-label" style="color:var(--text-dim);">off-time'+(active.note?' — '+escapeHtml(active.note):'')+'</div>'+
-    '<div style="max-width:380px;margin:16px 0 6px;font-size:14.5px;color:var(--text-dim);line-height:1.5;">The work day is done. Nothing else is tracked while you’re off — enjoy it.</div>'+
-    '<button class="btn" style="border-color:var(--border-strong);color:var(--text);margin-top:10px;" data-action="endMode">End Off-Time</button>'+
+    '<div class="hero-label" style="color:var(--text-dim);">off the clock &middot; '+fmtHours(deepWorkMinutesTodayLive())+' of deep work today</div>'+
+    '<div style="max-width:380px;margin:16px 0 6px;font-size:14.5px;color:var(--text-dim);line-height:1.5;">The work day is done. Nothing else is tracked while you’re off.</div>'+
+    '<div class="row" style="gap:8px;justify-content:center;margin-top:10px;">'+
+      (isWindDownTime() ? '<button class="btn th-btn-night" data-action="openWindDown">&#127769; Wind down</button>' : '')+
+      '<button class="btn" style="border-color:var(--border-strong);color:var(--text);" data-action="clockIn">&#128339; Clock back in</button>'+
+    '</div>'+
   '</div></div>';
 }
 function focusKnockOutRow(t, num){
@@ -11266,7 +11269,8 @@ function boardStaticHtml(b, cls){
 function fitStaticBoards(root){
   (root||document).querySelectorAll('.board-static').forEach(function(box){
     const w = Number(box.dataset.bw)||1, h = Number(box.dataset.bh)||1;
-    const r = box.getBoundingClientRect(); if(!r.width || !r.height) return;
+    // layout size, not the on-screen box: a panel that's mid-animation (scaled) still fits right
+    const r = {width:box.clientWidth, height:box.clientHeight}; if(!r.width || !r.height) return;
     const s = Math.min(r.width/w, r.height/h, 2);
     const world = box.firstElementChild;
     world.style.transform = 'translate('+Math.round((r.width-w*s)/2)+'px,'+Math.round((r.height-h*s)/2)+'px) scale('+s+')';

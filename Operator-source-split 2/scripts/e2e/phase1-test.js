@@ -6,6 +6,7 @@ const results = [];
 function check(name, ok, info){ results.push((ok?'PASS ':'FAIL ')+name+(info?'  '+JSON.stringify(info):'')); }
 function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 async function newPage(browser, seed, clockAt){
+  seed = Object.assign({}, seed||{}); seed.profile = Object.assign({lineupView:'cards'}, seed.profile||{});
   const ctx = await browser.newContext({ viewport:{width:1400,height:900} });
   const page = await ctx.newPage();
   page.errors = [];
@@ -80,11 +81,9 @@ async function newPage(browser, seed, clockAt){
   await page.evaluate(() => { document.querySelector('[data-action="nav"][data-view="today"]').click(); });
   // drive the real flow: open chooser -> lock in -> stage task -> start
   await page.evaluate(() => { document.body.insertAdjacentHTML('beforeend','<button id="__lk" data-action="openLockInChooser">x</button>'); document.getElementById('__lk').click(); });
-  await page.click('#lockSeqOverlay [data-action="lockPickTask"][data-id="t9"]');
-  await page.click('#lockSeqOverlay [data-action="lockNext"]');
-  await page.click('#lockSeqOverlay [data-action="lockLength"][data-min="open"]');
-  await page.click('#lockSeqOverlay [data-action="lockStep"][data-id="why"]');
-  await page.click('#lockSeqOverlay [data-action="lockGo"]');
+  await page.click('#lockSeqOverlay .ls-row[data-id="t9"] .ls-row-main');
+  await page.click('#lockSeqOverlay .ls-now');
+  await page.waitForTimeout(1800);
   const st = await page.evaluate(() => ({ modes: JSON.parse(localStorage.getItem('opsdash:modes')), focus: JSON.parse(localStorage.getItem('opsdash:focus')) }));
   check('1.2 off-time ended on manual lock-in', !st.modes.active && st.modes.history.some(h=>h.type==='offtime'), st.modes);
   check('1.2 session started', !!st.focus.activeSession);

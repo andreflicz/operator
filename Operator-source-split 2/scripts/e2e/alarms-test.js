@@ -81,8 +81,10 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   check('no stray one-off alarm created', await E("state.focus.alarms.length===0"));
   await p.clock.setSystemTime(at(6,15,8)); await E('checkAllAlarms()');
   await p.click('[data-action="wakeImUp"]');
-  check('the morning briefing shows the plan', (await p.textContent('#wakeOverlay')).includes('Edit reel'));
-  await p.click('[data-action="wakeBriefDone"]');
+  await E("ACTIONS.briefSkip()");
+  await p.click('[data-action="wakeClockIn"]'); await p.waitForTimeout(200);
+  check('Clock in (after Good morning) shows the plan', (await p.textContent('#planOverlay')).includes('Edit reel'));
+  await p.click('[data-action="closePlanReveal"]');
   await p.close();
 
   // --- regular alarms catch up instead of being skipped; task travel/ready alarms ---

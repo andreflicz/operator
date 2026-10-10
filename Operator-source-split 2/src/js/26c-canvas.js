@@ -766,7 +766,8 @@ function boardStaticHtml(b, cls){
 function fitStaticBoards(root){
   (root||document).querySelectorAll('.board-static').forEach(function(box){
     const w = Number(box.dataset.bw)||1, h = Number(box.dataset.bh)||1;
-    const r = box.getBoundingClientRect(); if(!r.width || !r.height) return;
+    // layout size, not the on-screen box: a panel that's mid-animation (scaled) still fits right
+    const r = {width:box.clientWidth, height:box.clientHeight}; if(!r.width || !r.height) return;
     const s = Math.min(r.width/w, r.height/h, 2);
     const world = box.firstElementChild;
     world.style.transform = 'translate('+Math.round((r.width-w*s)/2)+'px,'+Math.round((r.height-h*s)/2)+'px) scale('+s+')';

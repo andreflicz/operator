@@ -67,7 +67,7 @@ const SP = require('./common.js').OUT;
   check('streak card shows 12', (await p.textContent('.streak-card .streak-num')).trim()==='12');
   // events + shoot prep
   await p.click('[data-action="nav"][data-view="calendar"]');
-  await p.click('[data-action="openCalEventModal"]');
+  await p.click('#fabAdd');
   await p.fill('#calEventDate', ds(new Date(2026,9,8)));
   await p.fill('#calEventTime', '08:00'); await p.fill('#calEventTitle', 'Shoot with Nina');
   await p.fill('#calEventLocation', 'Studio 4');
@@ -125,9 +125,11 @@ const SP = require('./common.js').OUT;
   check('the alarm shows last night\'s note', (await p.textContent('#wakeOverlay')).includes('Big shoot day'));
   await p.click('[data-action="wakeImUp"]');
   await E("ui.wakeIntroDone = true; renderWakeOverlayInto();");
-  check('the morning briefing shows plan + note', (await p.textContent('#wakeOverlay')).includes('Big shoot day') && (await p.textContent('#wakeOverlay')).includes('Write hooks'));
+  check('the morning briefing shows the note', (await p.textContent('#wakeOverlay')).includes('Big shoot day'));
   check('plan tasks moved to today, in order', await E("state.tasks.items.filter(t=>state.focus.nightPlan.taskIds.includes(t.id)).every(t=>t.status==='today') && state.focus.lineupOrder[0]==='t1'"));
-  await p.click('[data-action="wakeBriefDone"]');
+  await p.click('[data-action="wakeClockIn"]'); await p.waitForTimeout(200);
+  check('Clock in shows the plan of attack', (await p.textContent('#planOverlay')).includes('Write hooks'));
+  await p.click('[data-action="closePlanReveal"]');
   // old training blocks still load and count (as Other) — nothing recorded is lost
   await E("startMode('training')");
   check('legacy training mode still runs', await E("state.modes.active.type")==='training');
@@ -136,7 +138,7 @@ const SP = require('./common.js').OUT;
   // wish list
   await p.click('[data-action="nav"][data-view="personal"]'); await p.click('[data-action="personalTab"][data-tab="wishlist"]');
   check('FAB = wish list', (await p.getAttribute('#fabAdd','title'))==='Add wish list item');
-  await p.click('[data-action="openWishItem"]');
+  await p.click('#fabAdd');
   await p.fill('#wishName','Sony FX3'); await p.fill('#wishPrice','3899.99'); await p.selectOption('#wishPriority','high'); await p.fill('#wishLink','https://example.com/fx3');
   await p.click('[data-action="saveWishItem"]');
   await p.click('#fabAdd'); await p.fill('#wishName','Mic'); await p.fill('#wishPrice','100'); await p.click('[data-action="saveWishItem"]');
