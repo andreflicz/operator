@@ -29,24 +29,28 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     check('the dawn never says "Still up"', !/Still up/.test(await p.textContent('#wakeOverlay')));
     await p.clock.runFor(6*60000); await p.waitForTimeout(400);
     check('the alarm: Good morning, the time, a quote', await E("ui.wakeMode")==='ring' && /Good morning, Andre/.test(await p.textContent('.wk2-greet')) && await p.isVisible('.wk3-quote .qt blockquote'));
-    check('two buttons: Snooze and Start your day', await p.isVisible('[data-action="wakeSnooze"]') && await p.isVisible('[data-action="wakeStartDay"]') && !(await p.$('[data-action="wakeImUp"]')));
+    // round 13: the get-up button reads "I'm up" (still data-action="wakeStartDay")
+    check('two buttons: Snooze and I\'m up', await p.isVisible('[data-action="wakeSnooze"]') && /I’m up/.test(await p.textContent('[data-action="wakeStartDay"]')) && !(await p.$('[data-action="wakeImUp"]')));
     await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(300);
-    check('Start your day → Good morning, and sleep mode ends', await E("ui.wakeMode")==='brief' && !(await E("state.modes.active && state.modes.active.sleep")));
+    check('I\'m up → Good morning, and sleep mode ends', await E("ui.wakeMode")==='brief' && !(await E("state.modes.active && state.modes.active.sleep")));
     check('only one corner button while it builds (Skip, no ✕)', await p.isVisible('.brief-skipall') && !(await p.$('.brief-x')));
     await p.$eval('[data-action="briefSkip"]', e => e.click()); await p.waitForTimeout(900);
     check('…then the ✕ (and no Skip)', await p.isVisible('.brief-x') && !(await p.$('.brief-skipall')));
     const brief = await p.textContent('#wakeOverlay');
     check('the weather and the sun lead it: temp, sunrise / sunset arc', /58°/.test(await p.textContent('.br-hero')) && await p.isVisible('.br-hero .sun-arc') && /Sunrise/.test(await p.textContent('.br-hero')));
     check('how you slept last night', await p.isVisible('.brh-sleep') && /Slept/.test(await p.textContent('.brh-sleep')));
-    check('human things: a quote, three things for a good day, headlines, the day ahead', await p.isVisible('.br-quote .qt') && (await p.$$('.br-thoughts .br-th')).length===3 && /Fed holds rates steady/.test(brief) && /The Day Ahead/i.test(brief));
+    // round 13: the one-screen brief shows four good-day thoughts (thoughtsOfDay(4)), and "The Day Ahead" is now "Today"
+    check('human things: a quote, four things for a good day, headlines, today', await p.isVisible('.br-quote .qt') && (await p.$$('.br-thoughts .br-th')).length===4 && /Fed holds rates steady/.test(brief) && /Today/.test(await p.textContent('.br-day .br-k')));
     check('no business numbers in Good morning', !/Monthly recurring|Open leads/.test(brief));
     check('it ends on "Get ready to start your day."', await p.textContent('#brVoice')==='Get ready to start your day.');
     check('one way forward: Start my morning', await p.isVisible('[data-action="wakeStartMorning"]') && !(await p.$('[data-action="wakeClockIn"]')));
-    await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(300);
-    check('Morning mode: routine, quote, things for a good day, and Start work', await p.isVisible('.mm-routine') && await p.isVisible('.mm .qt') && (await p.$$('.mm-thoughts .br-th')).length===3 && /Start Work/.test(await p.textContent('.mm-clockin')));
-    await p.click('.mm-clockin'); await p.waitForTimeout(600);
+    // round 13: Start my morning no longer opens Morning mode — Good morning lifts away (520 ms) and
+    // you're clocked in straight to the business preview (#planOverlay)
+    await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(1200);
+    check('Start my morning: Good morning closes, no Morning mode in between', !(await p.isVisible('#wakeOverlay:not(.hidden)')) && !(await E("!!(state.modes.active && state.modes.active.morning)")) && !(await p.$('.mm-clockin')) && await p.isVisible('#planOverlay:not(.hidden)'));
     const wi = await p.textContent('#planOverlay');
-    check('Start work: the work intro with business numbers, a quote and the plan', /Let’s get to work/.test(wi) && /\$3,500/.test(wi) && /Open leads/.test(wi) && await p.isVisible('#planOverlay .qt') && (await p.$$('#planOverlay .pr-row')).length===3);
+    check('the business preview: business numbers, a quote, the plan, the week', /Let’s get to work/.test(wi) && /\$3,500/.test(wi) && /Open leads/.test(wi) && await p.isVisible('#planOverlay .qt') && (await p.$$('#planOverlay .pr-row')).length===3 && (await p.$$('#planOverlay .wi-wk')).length===7);
+    check('…with LOCK IN and a corner ✕ (no "Not yet")', await p.isVisible('#planOverlay .pr-go') && await p.isVisible('#planOverlay .wd-close[data-action="closePlanReveal"]') && !/Not yet/.test(wi));
     await p.click('#planOverlay .pr-go'); await p.waitForTimeout(300);
     check('…and LOCK IN goes straight into the Lock in steps on #1', await p.isVisible('#lockSeqOverlay:not(.hidden)') && await E("ui.lockSeq.nowId")==='t0');
     await E("closeLockSeq()");

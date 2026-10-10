@@ -105,10 +105,10 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     check('your note, a line for today, and the weather', /Call Mike first/.test(brief) && await p.isVisible('.br-quote blockquote') && /54/.test(await p.textContent('.br-hero')));
     check('headlines (through the launcher)', /Fed holds rates steady/.test(brief));
     check('one way forward: Start my morning', await p.isVisible('[data-action="wakeStartMorning"]') && !(await p.$('[data-action="wakeClockIn"]')));
-    await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(300);
-    check('Start my morning: life first — routine, note, no work list', await E("state.modes.active && state.modes.active.morning") && await p.isVisible('.mm-routine') && !(await p.$('.mm .plan-list')));
-    await p.click('.mm-clockin'); await p.waitForTimeout(1600);
-    check('Clock in: the plan of attack, then Lock in', !(await E("state.modes.active")) && await p.isVisible('#planOverlay:not(.hidden) .pr-list') && await p.isVisible('#planOverlay .pr-go'));
+    await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(1200);
+    // round 13: Start my morning no longer opens Morning mode — it clocks you in to the business preview
+    check('Start my morning: Good morning lifts away, no Morning mode', !(await p.isVisible('#wakeOverlay:not(.hidden)')) && !(await E("!!(state.modes.active && state.modes.active.morning)")) && !(await p.$('.mm-routine')));
+    check('…straight to the business preview: plan of attack, then Lock in (✕ to close, no "Not yet")', await p.isVisible('#planOverlay:not(.hidden) .pr-list') && await p.isVisible('#planOverlay .pr-go') && await p.isVisible('#planOverlay .wd-close') && !/Not yet/.test(await p.textContent('#planOverlay')));
     await p.click('#planOverlay .pr-go'); await p.waitForTimeout(250);
     check('…which opens the Lock In sequence on #1', await p.isVisible('#lockSeqOverlay:not(.hidden)'));
     await E("closeLockSeq()");
@@ -142,7 +142,8 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     await p.fill('#newReminderLabel', 'Pay rent'); await p.click('[data-action="remindDay"][data-id="1"]'); await p.press('#newReminderLabel', 'Enter'); await p.waitForTimeout(150);
     check('Reminders: type, pick Tomorrow, Enter', await E("state.focus.reminders.some(r=>r.label==='Pay rent' && r.date==='2026-10-10')"));
     await E("ui.view='settings'; ui.settingsTab='general'; renderView()"); await p.waitForTimeout(150);
-    check('Settings: preferences and the wake-up alarm live in You', await p.isVisible('.settings-nav-item[data-tab="sound"]') && /Wake-up alarm/.test(await p.textContent('#viewRoot')) && await p.isVisible('.settings-nav-item[data-tab="data"]'));
+    // round 13: settings are five groups — Sound lives in "Look & Sound" (look), Data in "Connections & Data" (system)
+    check('Settings: preferences and the wake-up alarm live in You', await p.isVisible('.settings-nav-item.active[data-tab="you"]') && /Wake-up alarm/.test(await p.textContent('#viewRoot')) && await p.isVisible('.settings-nav-item[data-tab="look"]') && await p.isVisible('.settings-nav-item[data-tab="system"]'));
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(150);
     check('Quick journal: a way into the full journal', await p.isVisible('.qj2-open'));
     check('no errors (pages)', !p.errors.length, p.errors);
