@@ -11,7 +11,7 @@ const SCENES = [
   {id:'space', label:'Space'},
   {id:'city', label:'City'},
   {id:'mountains', label:'Mountains'},
-  {id:'tokyo', label:'Tokyo'},
+  {id:'tokyo', label:'Kyoto'},
   {id:'snow', label:'Snow'}
 ];
 function sceneId(){ const id = state.profile.scene || 'minimal'; if(id.indexOf('vid:')===0) return videoWallById(id.slice(4)) ? id : 'minimal'; return SCENES.some(function(s){ return s.id===id; }) ? id : 'minimal'; }
@@ -319,6 +319,7 @@ function sceneTick(x, c, dt, t){
   if(x.birds){ x.birds.next -= dt*1000; if(x.birds.next <= 0){ x.birds.next = 9000 + Math.random()*12000; const y0 = h*(0.15 + Math.random()*0.25); x.birds.list.push({x:-40, y:y0, n:3 + Math.floor(Math.random()*4), v:40 + Math.random()*30, t:0}); }
     c.strokeStyle = isDark(x.phase) ? 'rgba(220,225,240,.5)' : 'rgba(30,40,60,.55)'; c.lineWidth = 1.3;
     x.birds.list = x.birds.list.filter(function(b){ b.x += b.v*dt; b.t += dt; for(let i=0;i<b.n;i++){ const bx = b.x - i*14, by = b.y + i*(i%2 ? 6 : -4), f = Math.sin(b.t*8 + i)*3; c.beginPath(); c.moveTo(bx-6, by-f); c.lineTo(bx, by); c.lineTo(bx+6, by-f); c.stroke(); } return b.x < w + 80; }); }
+  if(x.more) x.more(c, dt, t, w, h);
   if(x.flashAt!=null){ x.flashAt -= dt*1000; if(x.flashAt <= 0){ x.flash = 0.18; x.flashAt = 5000 + Math.random()*9000; } if(x.flash > 0){ c.fillStyle = 'rgba(230,235,255,'+x.flash.toFixed(2)+')'; c.fillRect(0, 0, w, h); x.flash -= dt*0.6; } }
 }
 // ---- mounting & the loop ----
