@@ -17,6 +17,7 @@ const { chromium } = require('playwright');
       {id:'v1', title:'Video idea A', clients:['personal'], client:'personal', priority:'med', status:'backlog', isVideoIdea:true, notes:'vid notes', createdAt:ds}
     ]};
     localStorage.setItem('opsdash:tasks', JSON.stringify(tasks));
+    localStorage.setItem('opsdash:profile', JSON.stringify({lineupView:'cards'}));
   }, ds);
   await page.goto('file://' + path.resolve(file));
   await page.waitForTimeout(500);
