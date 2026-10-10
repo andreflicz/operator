@@ -10,13 +10,14 @@ function lineupOrdered(list){
   const placed = list.filter(function(t){ return pos[t.id]!==undefined; }).sort(function(a, b){ return pos[a.id]-pos[b.id]; });
   return placed.concat(sortByPriorityAndDeadline(list.filter(function(t){ return pos[t.id]===undefined; })));
 }
-function lineupView(){ return state.profile.lineupView==='list' ? 'list' : 'cards'; }
+// the list is the default (it does more: order, Now/Next, drag); cards if you pick them
+function lineupView(){ return state.profile.lineupView==='cards' ? 'cards' : 'list'; }
 ACTIONS.setLineupView = function(el, e, id){ state.profile.lineupView = id==='list' ? 'list' : 'cards'; persist('profile'); renderView(); };
 function lineupToggleHtml(){
   const v = lineupView();
   return '<div class="seg-tabs seg-sm" style="margin:0;">'+
-    '<button class="seg-tab'+(v==='cards'?' active':'')+'" data-action="setLineupView" data-id="cards" title="Cards">&#9638; Cards</button>'+
     '<button class="seg-tab'+(v==='list'?' active':'')+'" data-action="setLineupView" data-id="list" title="A list, in the order you\'ll do them">&#9776; List</button>'+
+    '<button class="seg-tab'+(v==='cards'?' active':'')+'" data-action="setLineupView" data-id="cards" title="Cards">&#9638; Cards</button>'+
   '</div>';
 }
 function lineupListHtml(today){

@@ -508,9 +508,6 @@
   .health-red .health-dot{ background:var(--danger); box-shadow:0 0 8px var(--danger); animation:healthPulse 2s ease-in-out infinite; }
   @keyframes healthPulse{ 0%,100%{opacity:1;} 50%{opacity:.45;} }
   /* context-aware + button */
-  .fab-add{ position:fixed; bottom:24px; right:24px; z-index:61; width:54px; height:54px; border-radius:50%; border:none; background:var(--accent); color:#1a1305; font-size:30px; font-weight:300; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,calc(.45*var(--sh-k))), 0 0 0 1px rgba(255,255,255,.06) inset; transition:transform .15s ease, box-shadow .15s ease, opacity .2s; }
-  .fab-add:hover{ transform:translateY(-2px) rotate(90deg); box-shadow:0 12px 28px rgba(0,0,0,calc(.5*var(--sh-k))), 0 0 18px rgba(232,162,61,.35); }
-  .fab-add:active{ transform:scale(.92); }
   .fab-add.fab-hidden{ opacity:0; pointer-events:none; transform:scale(.8); }
   body[data-view="settings"] .quick-journal-fab{ bottom:24px; }
   /* crosshair cursor */
@@ -2496,6 +2493,123 @@
   .brief2 .br-yday .br-stat{ padding:10px 12px; } .brief2 .br-yday .br-stat-v{ font-size:20px; }
   .brief2 .br-p:not(.brief-top):not(.brief-hello):not(.br-voice):not(.brief-cta){ padding:16px 20px; }
   .brief2 .brief2-cols, .brief2 .brief2-col{ gap:14px; }
+  .wd-row.drop-above{ box-shadow:0 -3px 0 0 #e8a23d; } .wd-row.drop-below{ box-shadow:0 3px 0 0 #e8a23d; }
+  body.is-wind-drag .wd-list{ outline:1.5px dashed rgba(232,162,61,.35); outline-offset:6px; border-radius:16px; }
+  .wd-chip[draggable="true"]{ cursor:grab; }
+
+  /* ---- the universal + : gold, alive ---- */
+  .fab-add{ position:fixed; bottom:24px; right:24px; z-index:61; width:58px; height:58px; border-radius:50%; border:none; padding:0; cursor:pointer; overflow:visible; color:#2a1a04;
+    background:radial-gradient(circle at 32% 26%, #fff3c8 0%, #ffd77a 22%, #f0ae3c 55%, #c97a16 100%);
+    box-shadow:0 10px 30px rgba(201,122,22,.45), 0 0 0 1px rgba(255,236,180,.55) inset, 0 -6px 14px rgba(120,60,0,.35) inset;
+    animation:fabBreathe 3.6s ease-in-out infinite; transition:transform .35s cubic-bezier(.2,1.4,.4,1), box-shadow .3s; }
+  .fab-add::before{ content:''; position:absolute; inset:-3px; border-radius:50%; padding:2px; background:conic-gradient(from var(--fab-a, 0deg), rgba(255,240,190,0), rgba(255,240,190,.9), rgba(255,180,90,0) 30%, rgba(255,240,190,0)); -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; animation:fabSpin 4s linear infinite; pointer-events:none; }
+  .fab-add::after{ content:attr(data-label); position:absolute; right:70px; top:50%; transform:translate(8px, -50%); opacity:0; white-space:nowrap; pointer-events:none; font:700 12.5px/1 var(--font-body, system-ui); color:#fff; padding:8px 12px; border-radius:999px; background:rgba(20,16,10,.88); border:1px solid rgba(255,214,140,.35); box-shadow:0 8px 24px rgba(0,0,0,.35); transition:opacity .2s, transform .25s; }
+  .fab-add:hover::after{ opacity:1; transform:translate(0, -50%); }
+  .fab-sheen{ position:absolute; inset:0; border-radius:50%; overflow:hidden; pointer-events:none; }
+  .fab-sheen::before{ content:''; position:absolute; top:-20%; left:-60%; width:40%; height:140%; background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.75), rgba(255,255,255,0)); transform:rotate(20deg); animation:fabSheen 4.5s ease-in-out infinite; }
+  .fab-plus{ position:relative; display:block; font-size:32px; font-weight:300; line-height:58px; text-align:center; text-shadow:0 1px 0 rgba(255,245,210,.6); transition:transform .45s cubic-bezier(.2,1.4,.4,1); }
+  .fab-add:hover{ transform:translateY(-3px) scale(1.06); box-shadow:0 16px 44px rgba(232,162,61,.6), 0 0 0 1px rgba(255,236,180,.7) inset, 0 -6px 14px rgba(120,60,0,.35) inset, 0 0 40px rgba(255,200,100,.35); }
+  .fab-add:hover .fab-plus{ transform:rotate(90deg); }
+  .fab-add:active{ transform:scale(.92); }
+  .fab-spark{ position:absolute; width:6px; height:6px; border-radius:50%; background:#fff6d8; box-shadow:0 0 8px #ffd77a, 0 0 14px #ffb84a; opacity:0; pointer-events:none; }
+  .fab-spark.s1{ top:-6px; left:8px; } .fab-spark.s2{ top:10px; right:-8px; width:4px; height:4px; } .fab-spark.s3{ bottom:-4px; left:-6px; width:5px; height:5px; }
+  .fab-add:hover .fab-spark{ animation:fabSpark 1.2s ease-out infinite; } .fab-add:hover .fab-spark.s2{ animation-delay:.3s; } .fab-add:hover .fab-spark.s3{ animation-delay:.6s; }
+  @keyframes fabBreathe{ 0%,100%{ box-shadow:0 10px 30px rgba(201,122,22,.42), 0 0 0 1px rgba(255,236,180,.55) inset, 0 -6px 14px rgba(120,60,0,.35) inset; } 50%{ box-shadow:0 12px 38px rgba(232,162,61,.62), 0 0 0 1px rgba(255,236,180,.7) inset, 0 -6px 14px rgba(120,60,0,.35) inset, 0 0 26px rgba(255,200,100,.25); } }
+  @keyframes fabSheen{ 0%, 55%{ left:-60%; } 75%, 100%{ left:130%; } }
+  @keyframes fabSpark{ 0%{ opacity:0; transform:scale(.3) translate(0,0); } 30%{ opacity:1; transform:scale(1) translate(0,-4px); } 100%{ opacity:0; transform:scale(.4) translate(0,-14px); } }
+  @property --fab-a{ syntax:'<angle>'; initial-value:0deg; inherits:false; }
+  @keyframes fabSpin{ to{ --fab-a:360deg; } }
+  @media (prefers-reduced-motion: reduce){ .fab-add, .fab-add::before, .fab-sheen::before{ animation:none; } }
+
+  /* ---- status pill (bottom left) ---- */
+  .activity-pill{ padding:7px 14px 7px 9px; gap:9px; font-weight:600; box-shadow:0 8px 24px rgba(0,0,0,calc(.3*var(--sh-k))); transition:transform .2s, border-color .2s, box-shadow .2s; }
+  .activity-pill:hover{ transform:translateY(-1px); }
+  .activity-pill[data-state="locked"]{ border-color:rgba(63,190,142,.45); box-shadow:0 8px 24px rgba(0,0,0,calc(.3*var(--sh-k))), 0 0 18px rgba(63,190,142,.18); }
+  .activity-pill[data-state="break"]{ border-color:rgba(232,162,61,.5); animation:apBreath 3s ease-in-out infinite; }
+  .activity-pill[data-state="break"] .ap-lock{ color:#ffc56b; }
+  @keyframes apBreath{ 0%,100%{ box-shadow:0 8px 24px rgba(0,0,0,.25), 0 0 0 0 rgba(232,162,61,.0); } 50%{ box-shadow:0 8px 24px rgba(0,0,0,.25), 0 0 22px 2px rgba(232,162,61,.25); } }
+  .ap-ring{ width:18px; height:18px; flex:none; transform:rotate(-90deg); }
+  .ap-ring-bg{ fill:none; stroke:rgba(var(--ink),.12); stroke-width:3; } .ap-ring-fg{ fill:none; stroke:var(--good); stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset 1s linear; }
+  .activity-pill[data-state="break"] .ap-ring-fg{ stroke:#e8a23d; }
+  .activity-pill[data-cat="work"] .ap-dot{ animation:apDot 2.4s ease-in-out infinite; }
+  @keyframes apDot{ 50%{ box-shadow:0 0 14px var(--good); } }
+  .ap-menu{ width:290px; border-radius:16px; padding:14px; }
+  .ap-status{ padding:12px 14px; border-radius:12px; margin-bottom:12px; background:rgba(63,190,142,.08); border:1px solid rgba(63,190,142,.3); }
+  .ap-status.is-break{ background:rgba(232,162,61,.08); border-color:rgba(232,162,61,.35); }
+  .ap-st-k{ font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim); }
+  .ap-st-v{ font-family:var(--font-display); font-size:26px; font-weight:700; font-variant-numeric:tabular-nums; margin:2px 0 8px; } .ap-st-v small{ font-size:12px; color:var(--text-faint); font-weight:500; }
+  .ap-st-acts{ display:flex; gap:6px; } .ap-st-acts .btn{ flex:1; }
+
+  /* ---- Health ---- */
+  .hw-hero{ display:grid; grid-template-columns:auto 1fr; gap:28px; align-items:center; padding:24px 26px; background:linear-gradient(135deg, rgba(232,162,61,.08), transparent 60%), var(--panel); }
+  .hw-k{ font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--text-faint); }
+  .hw-v{ font-family:var(--font-display); font-size:58px; font-weight:300; letter-spacing:-.04em; line-height:1; margin:4px 0 6px; font-variant-numeric:tabular-nums; }
+  .hw-delta{ font-size:13px; color:var(--text-dim); font-weight:600; } .hw-delta.is-down{ color:var(--good); } .hw-delta.is-up{ color:#ff8f8f; }
+  .hw-side{ display:flex; flex-direction:column; gap:14px; min-width:0; }
+  .hw-goal-k{ display:flex; justify-content:space-between; font-size:13px; color:var(--text-dim); margin-bottom:6px; } .hw-goal-k b{ color:var(--text); }
+  .hw-bar{ height:10px; border-radius:6px; background:rgba(var(--ink),.08); overflow:hidden; } .hw-bar i{ display:block; height:100%; border-radius:6px; background:linear-gradient(90deg, #e8a23d, #3fbe8e); }
+  .hw-goal.is-empty{ display:flex; align-items:center; justify-content:space-between; color:var(--text-faint); font-size:13px; }
+  .hw-log{ display:flex; gap:8px; } .hw-log .hw-in{ flex:1; font-size:16px; } .hw-log input[type=date]{ width:150px; }
+  .hw-chart{ padding:18px 18px 10px; } .hw-svg{ width:100%; height:200px; display:block; overflow:visible; }
+  .hw-grid{ stroke:rgba(var(--ink),.07); stroke-width:1; } .hw-ax{ fill:var(--text-faint); font-size:11px; font-family:var(--font-body, system-ui); }
+  .hw-line{ fill:none; stroke:#e8a23d; stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round; vector-effect:non-scaling-stroke; }
+  .hw-dot{ fill:var(--panel); stroke:#e8a23d; stroke-width:2; vector-effect:non-scaling-stroke; } .hw-dot.is-last{ fill:#e8a23d; filter:drop-shadow(0 0 6px rgba(232,162,61,.7)); }
+  .hw-list{ display:flex; flex-direction:column; gap:6px; }
+  .hw-row{ display:flex; align-items:center; gap:14px; padding:11px 16px; border-radius:12px; background:var(--panel); border:1px solid var(--border); }
+  .hw-row-d{ width:110px; color:var(--text-dim); font-size:13px; } .hw-row-v{ font-family:var(--font-display); font-weight:700; font-size:16px; font-variant-numeric:tabular-nums; } .hw-row-v small{ font-size:11px; color:var(--text-faint); font-weight:500; }
+  .hw-chip{ font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:999px; } .hw-chip.is-down{ color:var(--good); background:rgba(63,190,142,.12); } .hw-chip.is-up{ color:#ff8f8f; background:rgba(255,110,110,.1); }
+  .hw-row-x{ margin-left:auto; opacity:0; transition:opacity .15s; } .hw-row:hover .hw-row-x{ opacity:1; }
+  .hc-hero{ display:grid; grid-template-columns:auto 1fr; gap:26px; align-items:center; padding:22px 26px; }
+  .hc-left{ font-size:15px; color:var(--text-dim); margin-bottom:12px; } .hc-left b{ font-family:var(--font-display); font-size:24px; color:var(--text); } .hc-left.is-over b{ color:#ff8f8f; }
+  .hc-k{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); margin-bottom:8px; }
+  .hc-picks{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+  .hc-pick{ display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border-radius:999px; cursor:pointer; background:rgba(var(--ink),.04); border:1px solid var(--border); color:var(--text); font-size:13px; transition:all .15s; }
+  .hc-pick b{ font-size:11.5px; color:var(--text-faint); } .hc-pick:hover{ border-color:var(--accent); transform:translateY(-1px); } .hc-pick:hover b{ color:var(--accent); }
+  .hc-add{ display:flex; gap:8px; align-items:center; }
+  .hc-lib > summary{ cursor:pointer; list-style:none; } .hc-lib > summary::-webkit-details-marker{ display:none; } .hc-lib > summary::before{ content:'\25B8'; margin-right:8px; color:var(--text-faint); transition:transform .2s; display:inline-block; } .hc-lib[open] > summary::before{ transform:rotate(90deg); }
+  @media (max-width:760px){ .hw-hero, .hc-hero{ grid-template-columns:1fr; } }
+  .fit-log{ padding:18px; } .fit-type{ border-radius:14px; } .fit-type.is-on{ box-shadow:0 0 0 1px var(--accent), 0 6px 18px rgba(232,162,61,.2); }
+  .fit-entry{ border-radius:14px; transition:border-color .15s, background .15s; } .fit-entry:hover{ border-color:var(--border-strong); }
+  .fit-entry-i{ width:40px; height:40px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; background:rgba(232,162,61,.1); font-size:19px; flex:none; }
+  .fit-entry-date{ font-size:12.5px; color:var(--text-faint); white-space:nowrap; }
+  .fit-entry-acts{ display:inline-flex; gap:4px; opacity:0; transition:opacity .15s; } .fit-entry:hover .fit-entry-acts{ opacity:1; }
+
+  /* ---- Quick journal ---- */
+  .qj2{ text-align:left !important; padding:18px 20px; }
+  .qj2-head{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .qj2-icon{ width:34px; height:34px; border-radius:11px; display:inline-flex; align-items:center; justify-content:center; font-size:17px; background:linear-gradient(135deg, rgba(126,140,255,.25), rgba(232,162,61,.18)); }
+  .qj2-title{ font-family:var(--font-display); font-weight:700; font-size:16px; display:flex; align-items:center; gap:4px; }
+  .qj2-count{ font-size:11.5px; font-weight:700; color:var(--good); background:rgba(63,190,142,.12); padding:3px 9px; border-radius:999px; }
+  .qj2-open{ margin-left:auto; border:1px solid var(--border); background:transparent; color:var(--text-dim); font-size:12.5px; font-weight:700; padding:6px 12px; border-radius:999px; cursor:pointer; transition:all .15s; }
+  .qj2-open:hover{ color:var(--text); border-color:rgba(var(--ink),.3); }
+  .qj2-text{ width:100%; min-height:96px; resize:vertical; font-size:15px; line-height:1.55; padding:14px 16px; border-radius:14px; background:rgba(var(--ink),.03); transition:border-color .2s, box-shadow .2s, background .2s; }
+  .qj2-text:focus{ background:rgba(var(--ink),.05); border-color:rgba(232,162,61,.5); box-shadow:0 0 0 3px rgba(232,162,61,.12); }
+  .qj2-actions{ margin-top:12px; padding-top:0; border-top:none; }
+
+  /* ---- Reminders composer ---- */
+  .rm-compose{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:8px 8px 8px 14px; border-radius:16px; background:var(--panel); border:1px solid var(--border); transition:border-color .2s, box-shadow .2s; }
+  .rm-compose:focus-within{ border-color:rgba(232,162,61,.5); box-shadow:0 0 0 3px rgba(232,162,61,.1); }
+  .rm-bell{ font-size:16px; }
+  .rm-input{ flex:1; min-width:180px; border:none; background:transparent; color:var(--text); font-size:15px; padding:8px 4px; outline:none; }
+  .rm-chips{ display:inline-flex; gap:4px; }
+  .rm-chip{ border:1px solid var(--border); background:transparent; color:var(--text-dim); font-size:12px; font-weight:700; padding:6px 10px; border-radius:999px; cursor:pointer; }
+  .rm-chip.is-on{ background:rgba(232,162,61,.14); border-color:rgba(232,162,61,.55); color:var(--accent); }
+  .rm-date, .rm-time{ border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text); border-radius:10px; padding:6px 8px; font-size:12.5px; color-scheme:dark; }
+  .rm-add{ border:none; border-radius:12px; padding:9px 18px; font-weight:800; cursor:pointer; color:#1a1206; background:linear-gradient(180deg, #ffd08a, #e8a23d); }
+  .rm-list{ display:flex; flex-direction:column; gap:6px; margin-top:12px; }
+  .rm-row{ display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px; background:var(--panel); border:1px solid var(--border); }
+  .rm-label{ flex:1; min-width:0; font-weight:600; } .rm-when{ font-size:12.5px; color:var(--text-dim); white-space:nowrap; } .rm-row.is-late .rm-when{ color:#ff8f8f; }
+  .rm-done{ width:30px; height:30px; border-radius:50%; border:1.5px solid var(--border-strong); background:transparent; color:transparent; cursor:pointer; font-weight:900; transition:all .15s; }
+  .rm-done:hover{ border-color:var(--good); color:var(--good); background:rgba(63,190,142,.1); }
+
+  /* ---- Settings, compact ---- */
+  .settings-shell.is-compact .settings-content .section{ margin-bottom:14px; }
+  .settings-shell.is-compact .settings-content .card{ padding:16px 18px; }
+  .settings-shell.is-compact .settings-content .section-title{ font-size:14.5px; margin-bottom:10px; }
+  .settings-shell.is-compact .settings-content .grid{ gap:10px 14px; }
+  .settings-shell.is-compact .settings-content .field label{ font-size:11.5px; margin-bottom:4px; }
+  .settings-shell.is-compact .settings-content .task-item-v2{ padding:8px 12px; }
+  .settings-shell.is-compact .settings-nav-item{ padding:9px 12px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -2688,7 +2802,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 </div>
 <input type="file" id="journalPhotoInput" accept="image/*" multiple style="display:none;">
 <button class="btn quick-journal-fab" data-action="openQuickJournalModal" title="Quick Journal">&#128221;</button>
-<button class="fab-add" id="fabAdd" data-action="fabAdd" title="Add">+</button>
+<button class="fab-add" id="fabAdd" data-action="fabAdd" title="Add"><span class="fab-sheen"></span><span class="fab-plus">+</span><i class="fab-spark s1"></i><i class="fab-spark s2"></i><i class="fab-spark s3"></i></button>
 
 <script>
 (function(){
@@ -5512,15 +5626,16 @@ document.addEventListener('drop', function(e){
 });
 function renderJournalPanel(){
   const todaysJournalCount = state.journal.entries.filter(function(e){ return e.date===todayStr(); }).length;
-  return '<div class="section"><div class="card journal-quick-card" data-photo-drop="journal" style="text-align:center;">'+
-    '<div class="kpi-label" style="margin-bottom:8px;">Quick Journal'+tip('Paste or drop images in too.')+'</div>'+
-    '<textarea class="input" id="quickJournalText" placeholder="Anything on your mind — a win, a worry, an idea…" style="width:100%;height:90px;flex-shrink:0;text-align:left;resize:none;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
+  return '<div class="section"><div class="card journal-quick-card qj2" data-photo-drop="journal">'+
+    '<div class="qj2-head"><span class="qj2-icon">&#128221;</span><div class="qj2-title">Quick journal'+tip('Paste or drop images in too.')+'</div>'+
+      (todaysJournalCount ? '<span class="qj2-count">'+todaysJournalCount+' today</span>' : '')+
+      '<button class="qj2-open" data-action="nav" data-view="personal" data-tab="journal">Open journal &rarr;</button></div>'+
+    '<textarea class="input qj2-text" id="quickJournalText" placeholder="Anything on your mind — a win, a worry, an idea…">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
     renderJournalPhotoThumbsRow()+
-    '<div class="journal-compose-actions">'+
+    '<div class="journal-compose-actions qj2-actions">'+
       '<div class="row" style="gap:6px;">'+renderJournalMoodChipsInline()+'<button class="btn btn-ghost btn-sm" data-action="triggerJournalPhotoInput" title="Add photo">&#128247;</button></div>'+
-      '<button class="btn btn-primary" data-action="addJournal" data-target="quickJournalText">Save to Journal</button>'+
+      '<button class="btn btn-primary" data-action="addJournal" data-target="quickJournalText">Save</button>'+
     '</div>'+
-    (todaysJournalCount>0 ? '<div class="row" style="justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="nav" data-view="personal" data-tab="journal">'+todaysJournalCount+' entr'+(todaysJournalCount===1?'y':'ies')+' today</button></div>' : '')+
   '</div></div>';
 }
 function deepWorkStatInnerHtml(mins){
@@ -5747,7 +5862,7 @@ function fabContext(){
     if(ui.personalTab==='journal') return {label:'New journal entry', run:openQuickJournalModal};
     if(ui.personalTab==='wishlist' && typeof openWishItemModal==='function') return {label:'Add wish list item', run:function(){ openWishItemModal(null); }};
     if(ui.personalTab==='fitness') return {label:'Log workout', run:function(){ ui.healthTab='workouts'; renderView(); const el=document.getElementById('gymType'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
-    return {label:'Add goal', run:function(){ const el=document.getElementById('newGoalTitle')||document.querySelector('#viewRoot .tab-panel input'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
+    return {label:'Add goal', run:function(){ ui.forms.newGoal = true; renderView(); setTimeout(function(){ const el = document.getElementById('newGoalLabel'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }, 30); }};
   }
   return null;
 }
@@ -5757,7 +5872,7 @@ afterRenderHooks.push(function(){
   if(!fab) return;
   const c = fabContext();
   fab.classList.toggle('fab-hidden', !c);
-  if(c){ fab.title = c.label; fab.setAttribute('aria-label', c.label); }
+  if(c && fab.dataset.label!==c.label){ fab.title = c.label; fab.setAttribute('aria-label', c.label); fab.dataset.label = c.label; }
 });
 // Crosshair cursor (Settings → Display). A thin accent crosshair everywhere; a filled
 // centre on clickable things; normal I-beam in text fields.
@@ -5943,7 +6058,7 @@ function renderGoalsTab(){
   const formOpen = !!ui.forms.newGoal;
   return '<div class="section">'+masterGoalsHtml(false)+'</div>'+
     '<div class="section">'+
-      '<div class="section-title">Your goals'+tip('For things Operator can\'t see — IG followers, a first sponsor deal, a new camera. You update the number.')+'<button class="btn btn-sm '+(formOpen?'btn-ghost':'btn-good')+'" data-action="toggleForm" data-form="newGoal">'+(formOpen?'Close':'+ Add a goal')+'</button></div>'+
+      '<div class="section-title">Your goals'+tip('For things Operator can\'t see — IG followers, a first sponsor deal, a new camera. You update the number.')+(formOpen ? '<button class="btn btn-sm btn-ghost" data-action="toggleForm" data-form="newGoal">Close</button>' : '')+'</div>'+
       (formOpen ? '<div class="card goal-form">'+
         '<div class="grid grid-2"><div class="field"><label>Goal</label><input class="input" id="newGoalLabel" placeholder="e.g. 10k IG followers"></div>'+
           '<div class="field"><label>By when (optional)</label><input class="input" type="date" id="newGoalDeadline"></div></div>'+
@@ -6735,9 +6850,6 @@ function renderFocusTasksTab(){
 function renderVideoIdeasTab(){
   const videoIdeas = state.tasks.items.filter(function(t){ return t.isVideoIdea && t.status!=='done'; });
   return '<div class="section">'+
-    '<div class="row" style="justify-content:flex-end;margin-bottom:16px;">'+
-      '<button class="btn btn-primary" data-action="openAddVideoIdeaModal">+ Add Video Idea</button>'+
-    '</div>'+
     '<div class="video-idea-grid">'+(videoIdeas.map(videoIdeaCompactCard).join('') || '<div class="empty">No video ideas yet — drop one above whenever inspiration hits.</div>')+'</div>'+
   '</div>';
 }
@@ -6822,7 +6934,7 @@ function renderFocusTasksOverview(){
   return nowNextPanelHtml()+
   renderTaskToolbar(true)+
   '<div class="section" style="margin-bottom:14px;">'+
-    '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('In your order — switch to List and drag rows to set it (otherwise highest priority and closest deadlines first). Drag a card onto Up next to line it up. Drag a box around cards (or ⌘-click) to pick several.')+'<span class="row" style="margin-left:auto;gap:8px;">'+lineupToggleHtml()+'<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button></span></div>'+
+    '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('In your order — switch to List and drag rows to set it (otherwise highest priority and closest deadlines first). Drag a card onto Up next to line it up. Drag a box around cards (or ⌘-click) to pick several.')+'<span class="row" style="margin-left:auto;gap:8px;">'+lineupToggleHtml()+'</span></div>'+
     (listView ? '<div class="task-column tl-wrap" data-dropzone="today">'+lineupListHtml(today)+'</div>' :
     '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236, loop:true, count:today.length}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>')+
   '</div>'+
@@ -6843,7 +6955,6 @@ function renderFocusBacklogTab(){
       '<div class="section-title" style="margin-bottom:0;">The Whole List<span class="kpi-sub">'+backlog.length+'</span>'+tip('Highest priority and closest deadlines first.')+'</div>'+
       '<div class="row" style="gap:8px;">'+
         (!ui.backlogSearchOpen && !hasFilters ? '<button class="btn btn-ghost btn-sm" data-action="toggleBacklogSearch" title="Search Entries">&#128269;</button>' : '')+
-        '<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button>'+
       '</div>'+
     '</div>'+
     (ui.backlogSearchOpen || hasFilters ? (
@@ -7165,13 +7276,14 @@ function lineupOrdered(list){
   const placed = list.filter(function(t){ return pos[t.id]!==undefined; }).sort(function(a, b){ return pos[a.id]-pos[b.id]; });
   return placed.concat(sortByPriorityAndDeadline(list.filter(function(t){ return pos[t.id]===undefined; })));
 }
-function lineupView(){ return state.profile.lineupView==='list' ? 'list' : 'cards'; }
+// the list is the default (it does more: order, Now/Next, drag); cards if you pick them
+function lineupView(){ return state.profile.lineupView==='cards' ? 'cards' : 'list'; }
 ACTIONS.setLineupView = function(el, e, id){ state.profile.lineupView = id==='list' ? 'list' : 'cards'; persist('profile'); renderView(); };
 function lineupToggleHtml(){
   const v = lineupView();
   return '<div class="seg-tabs seg-sm" style="margin:0;">'+
-    '<button class="seg-tab'+(v==='cards'?' active':'')+'" data-action="setLineupView" data-id="cards" title="Cards">&#9638; Cards</button>'+
     '<button class="seg-tab'+(v==='list'?' active':'')+'" data-action="setLineupView" data-id="list" title="A list, in the order you\'ll do them">&#9776; List</button>'+
+    '<button class="seg-tab'+(v==='cards'?' active':'')+'" data-action="setLineupView" data-id="cards" title="Cards">&#9638; Cards</button>'+
   '</div>';
 }
 function lineupListHtml(today){
@@ -7357,11 +7469,16 @@ function renderOngoingTasksPanel(){
     (carouselOn() ? carouselWrap(ongoing.map(function(t){ return taskCard(t); }).join(''), 'ongoing', {w:236, loop:true, count:ongoing.length}) : '<div class="task-card-grid">'+ongoing.map(function(t){ return taskCard(t); }).join('')+'</div>')+
   '</div>';
 }
+function reminderWhen(r){
+  const d = r.date===todayStr() ? 'Today' : r.date===addDays(todayStr(), 1) ? 'Tomorrow' : weekdayShort(r.date)+' '+fmtDateShort(r.date);
+  return d+(r.time ? ' · '+fmt12Hour(r.time) : '');
+}
 function reminderRow(r){
-  return '<div class="task-item-v2">'+
-    '<div style="font-family:var(--font-display);font-weight:700;width:110px;">'+fmtDateShort(r.date)+(r.time?' &middot; '+fmt12Hour(r.time):'')+'</div>'+
-    '<div class="task-title" style="flex:1;">'+escapeHtml(r.label||'Reminder')+'</div>'+
-    '<button class="btn btn-good btn-sm" data-action="dismissReminder" data-id="'+r.id+'">&#10003; Done</button>'+
+  const late = r.date < todayStr() || (r.date===todayStr() && r.time && r.time < nowHM());
+  return '<div class="rm-row'+(late?' is-late':'')+'"><span class="rm-bell">&#128276;</span>'+
+    '<span class="rm-label">'+escapeHtml(r.label||'Reminder')+'</span>'+
+    '<span class="rm-when">'+escapeHtml(reminderWhen(r))+'</span>'+
+    '<button class="rm-done" data-action="dismissReminder" data-id="'+r.id+'" title="Done">&#10003;</button>'+
   '</div>';
 }
 function dismissReminder(id){ state.focus.reminders = state.focus.reminders.filter(function(x){return x.id!==id;}); persist('focus'); renderView(); }
@@ -7399,18 +7516,26 @@ function addReminderOrAlarm(){
 function renderRemindersCard(){
   const upcomingReminders = state.focus.reminders.slice().sort(function(a,b){ return (a.date+String(a.time||'')).localeCompare(b.date+String(b.time||'')); });
   const rows = upcomingReminders.map(reminderRow).join('');
-  return '<div class="section"><div class="section-title">Reminders</div>'+
-    '<div class="card">'+
-      '<div class="row" style="flex-wrap:wrap;align-items:flex-end;">'+
-        '<div class="field" style="flex:1;min-width:160px;"><label>What?</label><input class="input" id="newReminderLabel" placeholder="e.g. Call back the Rivera lead"></div>'+
-        '<div class="field"><label>Date</label><div class="row" style="gap:6px;"><input class="input" type="date" id="newReminderDate" value="'+todayStr()+'" style="width:140px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newReminderDate">&#128197;</button></div></div>'+
-        '<div class="field"><label>Time (optional)</label><input class="input" type="time" id="newReminderTime" style="width:120px;"></div>'+
-        '<button class="btn btn-primary" data-action="addReminder">Add</button>'+
-      '</div>'+
+  const chip = function(n, label){ return '<button class="rm-chip'+(n===0?' is-on':'')+'" data-action="remindDay" data-id="'+n+'">'+label+'</button>'; };
+  return '<div class="section"><div class="section-title">Reminders<span class="kpi-sub">'+upcomingReminders.length+'</span></div>'+
+    '<div class="rm-compose">'+
+      '<span class="rm-bell">&#128276;</span>'+
+      '<input class="rm-input" id="newReminderLabel" placeholder="Remind me to…">'+
+      '<span class="rm-chips">'+chip(0, 'Today')+chip(1, 'Tomorrow')+chip(7, 'Next week')+'</span>'+
+      '<input class="rm-date" type="date" id="newReminderDate" value="'+todayStr()+'" title="Pick a day">'+
+      '<input class="rm-time" type="time" id="newReminderTime" title="Time (optional)">'+
+      '<button class="rm-add" data-action="addReminder">Add</button>'+
     '</div>'+
-    '<div class="task-list" style="margin-top:14px;">'+(rows || '<div class="empty">Nothing set — add a reminder above.</div>')+'</div>'+
+    '<div class="rm-list">'+(rows || '<div class="empty">Nothing coming up.</div>')+'</div>'+
   '</div>';
 }
+ACTIONS.remindDay = function(el, e, id){
+  const d = document.getElementById('newReminderDate'); if(d) d.value = addDays(todayStr(), Number(id)||0);
+  document.querySelectorAll('.rm-chip').forEach(function(c){ c.classList.toggle('is-on', c===el); });
+  playTick();
+};
+document.addEventListener('keydown', function(e){ if(e.key==='Enter' && e.target && e.target.id==='newReminderLabel'){ e.preventDefault(); addReminder(); } });
+document.addEventListener('change', function(e){ if(e.target && e.target.id==='newReminderDate'){ document.querySelectorAll('.rm-chip').forEach(function(c){ c.classList.toggle('is-on', addDays(todayStr(), Number(c.dataset.id))===e.target.value); }); } });
 function renderBreakForm(){
   return '<div class="card" style="margin-top:8px;padding:10px;">'+
     '<div class="row" style="justify-content:center;">'+
@@ -8862,8 +8987,14 @@ function updateActivityPill(){
   el.dataset.cat = cat;
   const notCounting = !!(s && !s.onBreak && cat==='other');
   const siteUnknown = app && BROWSER_APPS.indexOf(activityKey(app))>=0;
-  const lock = s ? (s.onBreak ? '&#9749; on break' : '&#128274; '+fmtDurationLabel(Math.max(0, Math.round((Date.now()-s.startedAt)/60000)))+(notCounting ? ' &middot; not counting' : '')) : '';
-  const html = (app ? '<span class="ap-dot"></span><span class="ap-name">'+escapeHtml(app)+'</span>'+(siteUnknown ? '<span class="ap-warn">?</span>' : '') : '')+(lock ? '<span class="ap-lock'+(app?'':' ap-lock-only')+(notCounting?' is-off':'')+'">'+lock+'</span>' : '');
+  const lock = s ? (s.onBreak ? '&#9749; on break'+(s.breakEndsAt ? ' &middot; '+Math.max(0, Math.ceil((s.breakEndsAt-Date.now())/60000))+'m left' : '') : '&#128274; '+fmtDurationLabel(Math.max(0, Math.round((Date.now()-s.startedAt)/60000)))+(notCounting ? ' &middot; not counting' : '')) : '';
+  el.dataset.state = s ? (s.onBreak ? 'break' : 'locked') : 'free';
+  // a tiny ring: how far through the session (or the break) you are
+  let frac = null;
+  if(s && s.onBreak && s.breakEndsAt && s.breakStartedAt) frac = clamp((Date.now()-s.breakStartedAt)/(s.breakEndsAt-s.breakStartedAt), 0, 1);
+  else if(s && !s.onBreak && s.plannedMinutes) frac = clamp((Date.now()-s.startedAt)/(s.plannedMinutes*60000), 0, 1);
+  const ring = frac==null ? '' : '<svg class="ap-ring" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" class="ap-ring-bg"/><circle cx="10" cy="10" r="8" class="ap-ring-fg" stroke-dasharray="50.27" stroke-dashoffset="'+(50.27*(1-frac)).toFixed(1)+'"/></svg>';
+  const html = ring+(app ? '<span class="ap-dot"></span><span class="ap-name">'+escapeHtml(app)+'</span>'+(siteUnknown ? '<span class="ap-warn">?</span>' : '') : '')+(lock ? '<span class="ap-lock'+(app?'':' ap-lock-only')+(notCounting?' is-off':'')+'">'+lock+'</span>' : '');
   if(el._html!==html){ el.innerHTML = html; el._html = html; }
   el.title = !app ? '' : siteUnknown ? 'Operator can\'t see which website is open in '+app+' — click for how to allow it' : app+' — '+CAT_META[cat].label+(notCounting ? ' · this time isn\'t counted as deep work' : '')+' (click to change)';
 }
@@ -8880,8 +9011,15 @@ function renderPillMenu(){
   if(!m){ m = document.createElement('div'); m.id = 'activityPillMenu'; m.className = 'ap-menu'; document.body.appendChild(m); }
   const app = ui.pillMenu==='__none' ? null : ui.pillMenu;
   const cat = app ? activityCategory(app) : null;
+  const s = state.focus.activeSession;
+  const status = s ? '<div class="ap-status'+(s.onBreak?' is-break':'')+'">'+
+      (s.onBreak ? '<div class="ap-st-k">&#9749; On break</div><div class="ap-st-v">'+(s.breakEndsAt ? formatElapsed(Math.max(0, s.breakEndsAt-Date.now()))+' left' : 'no timer')+'</div>'+
+          '<div class="ap-st-acts">'+(s.breakEndsAt ? '<button class="btn btn-ghost btn-sm" data-action="extendBreak" data-minutes="5">+5 min</button>' : '')+'<button class="btn btn-primary btn-sm" data-action="endBreakModeFromFocus">Back to it</button></div>'
+        : '<div class="ap-st-k">&#128274; Locked in'+(s.method && LOCK_METHODS[s.method.id] && s.method.id!=='block' ? ' &middot; '+LOCK_METHODS[s.method.id].label : '')+'</div><div class="ap-st-v">'+formatElapsed(Date.now()-s.startedAt)+(s.plannedMinutes ? ' <small>of '+fmtDurationLabel(s.plannedMinutes)+'</small>' : '')+'</div>'+
+          '<div class="ap-st-acts"><button class="btn btn-ghost btn-sm" data-action="openBreakNotePrompt">&#9749; Break</button><button class="btn btn-ghost btn-sm" data-action="openStopFocus">Lock out</button></div>')+
+    '</div>' : '';
   const browser = app && BROWSER_APPS.indexOf(activityKey(app))>=0;
-  m.innerHTML = (browser ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div><div class="ap-menu-hint" style="margin-top:0;">Can\'t see which website is open'+
+  m.innerHTML = status+(browser ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div><div class="ap-menu-hint" style="margin-top:0;">Can\'t see which website is open'+
       tip('So it can\'t tell YouTube from work.'+(activityKey(app)==='firefox' ? ' Firefox doesn\'t allow this — Safari, Chrome, Arc, Brave and Edge do.' : ' On your Mac: System Settings → Privacy & Security → Automation → Operator → turn on '+app+'. Then reopen Operator.'))+'</div>'
     : app ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div>'+
       '<div class="ap-menu-k">Is this work?'+tip('Only work apps & sites start an automatic lock-in. Time on “not work” ones while you\'re locked in doesn\'t count as deep work.')+'</div>'+
@@ -9059,6 +9197,12 @@ function checkDistraction(){
   distractionNudged[last.start] = true;
   showToast('You\'re on '+last.app+' — this time won\'t count as deep work.', {icon:'&#128064;', duration:8000});
 }
+// the status card's buttons (Break, Lock out, Back to it…) close it once they've run
+document.addEventListener('click', function(e){
+  const b = e.target.closest && e.target.closest('#activityPillMenu [data-action]');
+  if(!b || b.dataset.action==='pillSetCat') return;
+  setTimeout(function(){ ui.pillMenu = null; renderPillMenu(); updateActivityPill(); }, 0);
+});
 // ============ FITNESS (Health) ============
 function renderFitness(){
   return '<div class="subtabs">'+
@@ -9130,7 +9274,7 @@ function renderWorkouts(){
         '<div><div class="stat-tile-v">'+monthCount+'</div><div class="stat-tile-sub">workouts this month</div></div>'+
       '</div>'+
     '</div>'+
-    '<div class="section"><div class="section-title">Log a workout</div><div class="card fit-log">'+
+    '<div class="section"><div class="section-title">&#128170; Log a workout</div><div class="card fit-log">'+
       '<div class="fit-types">'+workoutTypeChoices().map(function(t){ return '<button class="fit-type'+(sel===t.id?' is-on':'')+'" data-action="fitPickType" data-id="'+escapeHtml(t.id)+'"><span class="fit-type-i">'+t.icon+'</span>'+escapeHtml(t.id)+'</button>'; }).join('')+'</div>'+
       '<div class="fit-row">'+
         '<input class="input" id="gymType" placeholder="…or type it (e.g. Push day)" value="'+escapeHtml(sel)+'" style="flex:1;min-width:180px;">'+
@@ -9149,8 +9293,8 @@ function renderWorkouts(){
           items.map(function(g){
             return '<div class="fit-entry" data-key="gym-'+g.id+'"><span class="fit-entry-i">'+workoutIcon(g.type)+'</span>'+
               '<div class="fit-entry-main"><div class="fit-entry-title">'+escapeHtml(g.type)+(g.duration?' <span class="kpi-sub">&middot; '+fmtDurationLabel(g.duration)+'</span>':'')+'</div>'+(g.notes?'<div class="kpi-sub">'+escapeHtml(g.notes)+'</div>':'')+'</div>'+
-              '<span class="kpi-sub">'+weekdayShort(g.date)+' '+fmtDateShort(g.date)+'</span>'+
-              '<button class="btn btn-ghost btn-sm" data-action="openWorkoutEditModal" data-id="'+g.id+'">Edit</button>'+deleteBtn('gym', g.id)+
+              '<span class="fit-entry-date">'+weekdayShort(g.date)+' '+fmtDateShort(g.date)+'</span>'+
+              '<span class="fit-entry-acts"><button class="btn btn-ghost btn-sm" data-action="openWorkoutEditModal" data-id="'+g.id+'">Edit</button>'+deleteBtn('gym', g.id)+'</span>'+
             '</div>';
           }).join('')+'</div>';
       }).join('') : '<div class="empty">No workouts logged yet — pick one above.</div>')+
@@ -9212,67 +9356,78 @@ function saveEditWorkout(id){
   closeWorkoutEditModal();
   persist('health'); renderView();
 }
+// a soft area chart for the weight trend: gradient fill, the last point called out
+function healthAreaChart(vals, labels){
+  const W = 640, H = 190, P = {l:8, r:46, t:18, b:26};
+  const min = Math.min.apply(null, vals), max = Math.max.apply(null, vals), span = (max-min) || 1;
+  const x = function(i){ return P.l + (vals.length===1 ? 0 : i/(vals.length-1))*(W-P.l-P.r); };
+  const y = function(v){ return P.t + (1-(v-min)/span)*(H-P.t-P.b); };
+  const pts = vals.map(function(v, i){ return x(i).toFixed(1)+','+y(v).toFixed(1); });
+  const line = 'M'+pts.join(' L');
+  const area = line+' L'+x(vals.length-1).toFixed(1)+','+(H-P.b)+' L'+x(0).toFixed(1)+','+(H-P.b)+' Z';
+  const last = vals.length-1;
+  return '<svg class="hw-svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"><defs><linearGradient id="hwGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8a23d" stop-opacity=".38"/><stop offset="1" stop-color="#e8a23d" stop-opacity="0"/></linearGradient></defs>'+
+    [0, .5, 1].map(function(f){ const yy = P.t + f*(H-P.t-P.b); return '<line x1="'+P.l+'" x2="'+(W-P.r)+'" y1="'+yy+'" y2="'+yy+'" class="hw-grid"/><text x="'+(W-P.r+8)+'" y="'+(yy+4)+'" class="hw-ax">'+(max - f*span).toFixed(1)+'</text>'; }).join('')+
+    '<path d="'+area+'" fill="url(#hwGrad)"/><path d="'+line+'" class="hw-line"/>'+
+    vals.map(function(v, i){ return '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(v).toFixed(1)+'" r="'+(i===last?5:2.5)+'" class="hw-dot'+(i===last?' is-last':'')+'"><title>'+escapeHtml(labels[i])+': '+v+'</title></circle>'; }).join('')+
+    '<text x="'+P.l+'" y="'+(H-6)+'" class="hw-ax">'+escapeHtml(labels[0])+'</text><text x="'+(W-P.r)+'" y="'+(H-6)+'" class="hw-ax" text-anchor="end">'+escapeHtml(labels[last])+'</text>'+
+  '</svg>';
+}
 function renderWeight(){
   const log = state.health.weightLog.slice().sort(function(a,b){ return a.date.localeCompare(b.date); });
-  const recent = log.slice(-20);
-  const latest = log[log.length-1];
-  const start = log[0];
+  const recent = log.slice(-30);
+  const latest = log[log.length-1], start = log[0];
   const goal = state.profile.goalWeight;
-  let progressHtml = '';
-  if(latest && goal){
-    const startW = start ? start.weight : latest.weight;
-    const total = startW - goal;
-    const done = startW - latest.weight;
-    const pct = total>0 ? clamp(Math.round((done/total)*100),0,100) : 0;
-    progressHtml = '<div class="card section"><div class="kpi-label">Progress to Goal</div>'+
-      '<div class="progress" style="margin:8px 0;"><div class="progress-bar" style="width:'+pct+'%;background:'+goalColor()+';'+goalGlowStyle(pct)+'"></div></div>'+
-      '<div class="kpi-sub">'+latest.weight+' now &rarr; '+goal+' goal ('+(latest.weight-goal>0 ? (latest.weight-goal).toFixed(1)+' to go' : 'goal reached')+')</div>'+
-    '</div>';
+  const weekAgo = log.filter(function(w){ return w.date <= addDays(todayStr(), -7); }).slice(-1)[0];
+  const delta = latest && weekAgo ? latest.weight - weekAgo.weight : (latest && start && start!==latest ? latest.weight - start.weight : null);
+  const deltaFrom = latest && weekAgo ? 'in a week' : start && latest && start!==latest ? 'since '+fmtDateShort(start.date) : '';
+  let goalHtml = '<div class="hw-goal is-empty"><span>No goal weight yet</span><button class="btn btn-ghost btn-sm" data-action="goToProfileSettings">Set one</button></div>';
+  if(goal){
+    const startW = start ? start.weight : (latest ? latest.weight : goal);
+    const total = startW - goal, done = latest ? startW - latest.weight : 0;
+    const pct = total>0 ? clamp(Math.round(done/total*100), 0, 100) : (latest && latest.weight<=goal ? 100 : 0);
+    const left = latest ? latest.weight - goal : null;
+    goalHtml = '<div class="hw-goal"><div class="hw-goal-k"><span>Goal '+goal+'</span><b>'+(left==null ? '' : left>0 ? left.toFixed(1)+' to go' : 'Reached &#127881;')+'</b></div><div class="hw-bar"><i style="width:'+pct+'%"></i></div></div>';
   }
-  return '<div class="grid grid-2 section">'+
-    '<div class="card"><div class="kpi-label">Latest</div><div class="kpi-value">'+(latest?latest.weight:'—')+'</div></div>'+
-    '<div class="card"><div class="kpi-label">Goal Weight</div><div class="kpi-value">'+(goal!=null?goal:'not set')+'</div><div class="kpi-sub">set it in Settings</div></div>'+
-  '</div>'+
-  progressHtml+
-  '<div class="card section">'+(recent.length>=2 ? svgLineChart(recent.map(function(r){return r.weight;}), recent.map(function(r){return fmtDateShort(r.date);})) : '<div class="empty">Log a couple entries to see a trend line.</div>')+'</div>'+
-  '<div class="card section row">'+
-    '<div class="field"><label>Date</label><div class="row"><input class="input" type="date" id="weightDate" value="'+todayStr()+'"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="weightDate">&#128197;</button></div></div>'+
-    '<div class="field"><label>Weight</label><input class="input" type="number" step="0.1" id="weightValue" style="width:100px;"></div>'+
-    '<button class="btn btn-primary" data-action="addWeight" style="align-self:flex-end;">Log</button>'+
-  '</div>'+
-  '<table class="table"><tr><th>Date</th><th>Weight</th><th></th></tr>'+
-    (log.slice().reverse().slice(0,10).map(function(w){ return '<tr><td>'+fmtDateShort(w.date)+'</td><td>'+w.weight+'</td><td>'+deleteBtn('weight', w.id)+'</td></tr>'; }).join('') || '<tr><td colspan="3" class="empty">Nothing logged yet.</td></tr>')+
-  '</table>';
+  return '<div class="card hw-hero section">'+
+      '<div class="hw-now"><div class="hw-k">Now</div><div class="hw-v">'+(latest ? latest.weight : '—')+'</div>'+
+        (delta!=null ? '<div class="hw-delta '+(delta<0?'is-down':delta>0?'is-up':'')+'">'+(delta<0?'&#9660; ':delta>0?'&#9650; ':'')+Math.abs(delta).toFixed(1)+' '+deltaFrom+'</div>' : '<div class="hw-delta">'+(latest ? 'logged '+fmtDateShort(latest.date) : 'nothing logged yet')+'</div>')+'</div>'+
+      '<div class="hw-side">'+goalHtml+
+        '<div class="hw-log"><input class="input hw-in" type="number" step="0.1" id="weightValue" placeholder="Today\'s weight"><input class="input" type="date" id="weightDate" value="'+todayStr()+'"><button class="btn btn-primary" data-action="addWeight">Log</button></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card hw-chart section">'+(recent.length>=2 ? healthAreaChart(recent.map(function(r){ return r.weight; }), recent.map(function(r){ return fmtDateShort(r.date); })) : '<div class="empty">Log a couple of days to see the trend.</div>')+'</div>'+
+    '<div class="section"><div class="section-title">History</div><div class="hw-list">'+
+      (log.slice().reverse().slice(0, 12).map(function(w, i, arr2){ const prev = arr2[i+1]; const d = prev ? w.weight - prev.weight : null;
+        return '<div class="hw-row"><span class="hw-row-d">'+weekdayShort(w.date)+' '+fmtDateShort(w.date)+'</span><span class="hw-row-v">'+w.weight+'</span>'+
+          (d!=null && d!==0 ? '<span class="hw-chip '+(d<0?'is-down':'is-up')+'">'+(d<0?'&#9660;':'&#9650;')+' '+Math.abs(d).toFixed(1)+'</span>' : '<span></span>')+'<span class="hw-row-x">'+deleteBtn('weight', w.id)+'</span></div>'; }).join('') || '<div class="empty">Nothing logged yet.</div>')+
+    '</div></div>';
 }
+ACTIONS.goToProfileSettings = function(){ ui.view = 'settings'; ui.settingsTab = 'you'; renderView(); setTimeout(function(){ const el = document.getElementById('setGoalWeight'); if(el){ el.scrollIntoView({block:'center', behavior:'smooth'}); el.focus(); } }, 60); };
 function renderCalories(){
   const today = state.health.calorieEntries.filter(function(c){ return c.date===todayStr(); });
   const total = today.reduce(function(a,c){ return a+Number(c.calories||0); },0);
-  const pct = clamp(Math.round((total/(state.profile.calorieTarget||1))*100),0,999);
-  return '<div class="grid grid-2 section">'+
-    '<div class="card"><div class="kpi-label">Today</div><div class="kpi-value">'+total+' <span style="font-size:13px;color:var(--text-faint);">/ '+state.profile.calorieTarget+' cal</span></div>'+
-      '<div class="progress" style="margin-top:8px;"><div class="progress-bar '+(pct>110?'danger':pct>=85?'good':'')+'" style="width:'+clamp(pct,0,100)+'%"></div></div>'+
+  const target = state.profile.calorieTarget || 2000;
+  const pct = clamp(Math.round(total/target*100), 0, 999), left = target - total;
+  const color = pct>110 ? 'var(--danger)' : pct>=85 ? 'var(--good)' : 'var(--accent)';
+  return '<div class="card hc-hero section">'+
+      '<div class="hc-ring">'+svgRing(clamp(pct, 0, 100), 132, color, String(total), 'of '+target)+'</div>'+
+      '<div class="hc-main">'+
+        '<div class="hc-left'+(left<0?' is-over':'')+'">'+(left>=0 ? '<b>'+left+'</b> cal left today' : '<b>'+(-left)+'</b> cal over today')+'</div>'+
+        '<div class="hc-k">Quick add</div>'+
+        '<div class="hc-picks">'+(state.meals.library.map(function(m){ return '<button class="hc-pick" data-action="quickMeal" data-id="'+m.id+'"><span>'+escapeHtml(m.name)+'</span><b>'+m.calories+'</b></button>'; }).join('') || '<span class="kpi-sub">No saved meals yet.</span>')+'</div>'+
+        '<div class="hc-add"><input class="input" id="calName" placeholder="Something else…" style="flex:1;"><input class="input" type="number" id="calAmount" placeholder="cal" style="width:90px;"><button class="btn btn-primary" data-action="addCalorieEntry">Add</button></div>'+
+      '</div>'+
     '</div>'+
-    '<div class="card"><div class="kpi-label">Hungry? Pick One Instead Of Deciding</div><div class="row" style="margin-top:6px;">'+
-      (state.meals.library.map(function(m){ return '<button class="meal-btn" data-action="quickMeal" data-id="'+m.id+'"><span class="mname">'+escapeHtml(m.name)+'</span><span class="mmeta">'+m.calories+' cal</span></button>'; }).join('') || '<div class="empty">No meals saved yet.</div>')+
+    '<div class="section"><div class="section-title">Today<span class="kpi-sub">'+today.length+' item'+(today.length===1?'':'s')+'</span></div><div class="hw-list">'+
+      (today.map(function(c){ return '<div class="hw-row"><span class="hw-row-d" style="flex:1;color:var(--text);">'+escapeHtml(c.name||'Food')+'</span><span class="hw-row-v">'+c.calories+'<small> cal</small></span><span class="hw-row-x">'+deleteBtn('calorie', c.id)+'</span></div>'; }).join('') || '<div class="empty">Nothing logged today yet.</div>')+
     '</div></div>'+
-  '</div>'+
-  '<div class="card section row">'+
-    '<div class="field" style="flex:1;"><label>Custom item</label><input class="input" id="calName" placeholder="What did you eat?"></div>'+
-    '<div class="field"><label>Calories</label><input class="input" type="number" id="calAmount" style="width:100px;"></div>'+
-    '<button class="btn btn-primary" data-action="addCalorieEntry" style="align-self:flex-end;">Add</button>'+
-  '</div>'+
-  '<div class="section"><div class="section-title">Today\'s Log</div><div class="task-list">'+
-    (today.map(function(c){ return '<div class="task-item-v2"><div class="task-title">'+escapeHtml(c.name)+'</div><div class="kpi-sub">'+c.calories+' cal</div>'+deleteBtn('calorie',c.id)+'</div>'; }).join('') || '<div class="empty">Nothing logged today yet.</div>')+
-  '</div></div>'+
-  '<div class="section"><div class="section-title">Meal Library'+tip('Your go-to options — edit them here.')+'</div>'+
-    '<div class="card row" style="margin-bottom:10px;">'+
-      '<div class="field" style="flex:1;"><label>Name</label><input class="input" id="mealName" placeholder="e.g. Turkey chili"></div>'+
-      '<div class="field"><label>Calories</label><input class="input" type="number" id="mealCalories" style="width:100px;"></div>'+
-      '<button class="btn" data-action="addMeal" style="align-self:flex-end;">Add To Library</button>'+
-    '</div>'+
-    '<div class="task-list">'+(state.meals.library.map(function(m){ return '<div class="task-item-v2"><div class="task-title">'+escapeHtml(m.name)+'</div><div class="kpi-sub">'+m.calories+' cal</div>'+deleteBtn('meal', m.id)+'</div>'; }).join('') || '<div class="empty">No meals in your library yet.</div>')+'</div>'+
-  '</div>';
+    '<details class="section hc-lib"'+(ui.mealLibOpen?' open':'')+'><summary class="section-title">Meal library<span class="kpi-sub">'+state.meals.library.length+'</span>'+tip('Your go-to meals — one tap logs them.')+'</summary>'+
+      '<div class="hc-add" style="margin-bottom:10px;"><input class="input" id="mealName" placeholder="e.g. Turkey chili" style="flex:1;"><input class="input" type="number" id="mealCalories" placeholder="cal" style="width:90px;"><button class="btn" data-action="addMeal">Save meal</button></div>'+
+      '<div class="hw-list">'+(state.meals.library.map(function(m){ return '<div class="hw-row"><span class="hw-row-d" style="flex:1;color:var(--text);">'+escapeHtml(m.name)+'</span><span class="hw-row-v">'+m.calories+'<small> cal</small></span><span class="hw-row-x">'+deleteBtn('meal', m.id)+'</span></div>'; }).join('') || '<div class="empty">No meals saved yet.</div>')+'</div>'+
+    '</details>';
 }
+document.addEventListener('toggle', function(e){ if(e.target && e.target.classList && e.target.classList.contains('hc-lib')) ui.mealLibOpen = e.target.open; }, true);
 function addWorkout(){
   const date = document.getElementById('gymDate').value || todayStr();
   const type = document.getElementById('gymType').value.trim();
@@ -10232,7 +10387,6 @@ function renderWishlistTab(){
   const mustTotal = open.filter(function(w){ return w.priority==='high'; }).reduce(function(a,w){ return a+wishPrice(w); },0);
   return '<div class="wish-total card">'+
       '<div><div class="kpi-label">Still to buy</div><div class="wish-total-val">'+fmtMoney(total)+'</div><div class="kpi-sub">'+open.length+' item'+(open.length===1?'':'s')+(mustTotal?' &middot; '+fmtMoney(mustTotal)+' must-haves':'')+'</div></div>'+
-      '<button class="btn btn-primary" data-action="openWishItem">+ Add item</button>'+
     '</div>'+
     '<div class="wish-grid">'+(open.map(wishCard).join('') || '<div class="empty" style="grid-column:1/-1;">Nothing on the list yet.</div>')+'</div>'+
     (bought.length ? '<div class="kind-label" style="margin-top:22px;">Purchased &middot; '+bought.length+'</div><div class="wish-grid">'+bought.map(wishCard).join('')+'</div>' : '');
@@ -13004,7 +13158,6 @@ function crmToolbar(kind, lead){
         '<button class="seg-tab'+(f.view==='board'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="board">Board</button>'+
         '<button class="seg-tab'+(f.view==='list'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="list">List</button>'+
       '</div>'+
-      '<button class="btn btn-primary crm-add-btn" data-action="openNewContact" data-kind="'+kind+'">+ Add '+(kind==='lead'?'lead':'client')+'</button>'+
     '</div>'+
     (f.toolsOpen ? '<div class="crm-toolbar crm-tools-row">'+
       '<input class="input" id="crmSearch-'+kind+'" placeholder="Search '+(kind==='lead'?'leads':'clients')+'…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
@@ -14151,7 +14304,6 @@ function renderClientsHome(){
       return '<div class="crm-toolbar crm-toolbar-slim">'+
           '<span style="flex:1"></span>'+
           crmToolsBtnHtml('client', active)+
-          '<button class="btn btn-primary crm-add-btn" data-action="openNewContact" data-kind="client">+ Add client</button>'+
         '</div>'+
         (f.toolsOpen ? '<div class="crm-toolbar crm-tools-row">'+
           '<input class="input" id="crmSearch-client" placeholder="Search clients…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+
@@ -14477,7 +14629,7 @@ function renderCalendar(){
       '</div>'
     ) : '')+
   '</div>'+
-  '<div class="section" style="max-width:680px;margin:20px auto 0;"><div class="section-title">'+dayLabel+'<button class="btn btn-primary btn-sm" data-action="openCalEventModal">+ Add Event</button></div>'+
+  '<div class="section" style="max-width:680px;margin:20px auto 0;"><div class="section-title">'+dayLabel+'</div>'+
     '<div class="task-list">'+
       selInfo.deadlines.map(function(t){ return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="deadline" data-id="'+t.id+'" title="Open to edit or delete"><span class="tag" style="background:var(--danger-dim);color:var(--danger-text);">Deadline</span><div class="task-title" style="flex:1;'+(t.status==='done'?'text-decoration:line-through;opacity:.6;':'')+'">'+escapeHtml(t.title)+'</div>'+(t.isVideoIdea?'<span class="kpi-sub">&#127916; video idea</span>':'')+'</div>'; }).join('')+
       sortedEvents.map(function(e){ const cat=categoryById(e.categoryId); return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="event" data-id="'+e.id+'" title="Open to edit or delete">'+(e.time?'<div style="font-family:var(--font-display);font-weight:700;width:70px;">'+fmt12Hour(e.time)+'</div>':'')+'<span class="tag" style="background:'+(cat?cat.color:'#8A90A2')+'22;color:'+(cat?cat.color:'#8A90A2')+';">'+(e.isShoot?'&#127916; ':'')+(cat?escapeHtml(cat.label):'Event')+'</span>'+(e.linkedClient?clientTagHtml(e.linkedClient):'')+'<div class="task-title" style="flex:1;">'+escapeHtml(e.title)+(e.location?'<div class="kpi-sub">&#128205; '+escapeHtml(e.location)+'</div>':'')+(arr(e.taskIds).length?'<div class="kpi-sub">'+arr(e.taskIds).length+' task'+(arr(e.taskIds).length===1?'':'s')+'</div>':'')+'</div>'+(e.isShoot && e.date===todayStr() && !(state.modes.active && state.modes.active.type==='shooting') ? '<button class="btn btn-sm shooting-btn-sm" data-action="startShootFromEvent" data-id="'+e.id+'">&#127916; Start shoot</button>' : '')+(e.meetingLink?'<button class="btn btn-good btn-sm" data-action="joinCall" data-url="'+escapeHtml(e.meetingLink)+'">&#128222; Join Call</button>':'')+'<button class="btn btn-ghost btn-sm" data-action="openCalEventModal" data-id="'+e.id+'">Edit</button>'+deleteBtn('calevent', e.id)+'</div>'; }).join('')+
@@ -14938,12 +15090,7 @@ function renderSettings(){
   const sections = {
     integrations: ghlSettingsHtml(),
     updates: '<div class="upd-panel">'+renderUpdatesTab()+'</div>',
-    general: '<div class="card section"><div class="section-title">Preferences</div><div class="grid grid-2">'+
-        '<div class="field"><label>Sound effects</label><div class="row" style="gap:6px;"><select class="input" id="setSound"><option value="modern" '+(p.soundEnabled!==false && p.soundPack!=='classic'?'selected':'')+'>Modern</option><option value="classic" '+(p.soundEnabled!==false && p.soundPack==='classic'?'selected':'')+'>Classic beeps</option><option value="off" '+(p.soundEnabled===false?'selected':'')+'>Off</option></select><button class="btn btn-ghost btn-sm" data-action="previewSounds" title="Hear them">&#9654;</button></div></div>'+
-        '<div class="field"><label>Note field after finishing a task in Focus</label><select class="input" id="setFocusNote"><option value="on" '+(p.focusNotePromptEnabled!==false?'selected':'')+'>Enabled</option><option value="off" '+(p.focusNotePromptEnabled===false?'selected':'')+'>Disabled</option></select></div>'+
-        '<div class="field"><label>Notify when a focus timer ends</label><select class="input" id="setNotifyEnd"><option value="on" '+(p.notifyOnFocusEnd!==false?'selected':'')+'>On</option><option value="off" '+(p.notifyOnFocusEnd===false?'selected':'')+'>Off</option></select></div>'+
-      '</div></div>'+saveBtn+
-      '<div class="section"><div class="section-title">Your Data'+tip(hasCloud ? 'Saved to your Claude account — it follows you back to this artifact.' : 'Saved on this Mac in Operator\'s own storage — export a copy now and then as a backup.')+'</div><div class="card">'+
+    data: '<div class="section"><div class="section-title">Your Data'+tip(hasCloud ? 'Saved to your Claude account — it follows you back to this artifact.' : 'Saved on this Mac in Operator\'s own storage — export a copy now and then as a backup.')+'</div><div class="card">'+
         '<div class="row"><button class="btn" data-action="exportData">Export Data (.json)</button>'+
         '<label class="btn" style="cursor:pointer;">Import Data<input type="file" id="importFile" accept=".json" style="display:none;"></label>'+
         deleteResetBtn()+'</div>'+
@@ -15053,6 +15200,12 @@ function renderSettings(){
         '<div class="field"><label>Name</label><input class="input" id="setName" value="'+escapeHtml(p.name)+'"></div>'+
         '<div class="field"><label>Business name</label><input class="input" id="setBusinessName" value="'+escapeHtml(p.businessName||'')+'" placeholder="e.g. Rivera Media Co."></div>'+
       '</div></div>'+
+      '<div class="card section"><div class="section-title">Preferences</div><div class="grid grid-2">'+
+        '<div class="field"><label>Sound effects</label><div class="row" style="gap:6px;"><select class="input" id="setSound"><option value="modern" '+(p.soundEnabled!==false && p.soundPack!=='classic'?'selected':'')+'>Modern</option><option value="classic" '+(p.soundEnabled!==false && p.soundPack==='classic'?'selected':'')+'>Classic beeps</option><option value="off" '+(p.soundEnabled===false?'selected':'')+'>Off</option></select><button class="btn btn-ghost btn-sm" data-action="previewSounds" title="Hear them">&#9654;</button></div></div>'+
+        '<div class="field"><label>Note field after finishing a task in Focus</label><select class="input" id="setFocusNote"><option value="on" '+(p.focusNotePromptEnabled!==false?'selected':'')+'>Enabled</option><option value="off" '+(p.focusNotePromptEnabled===false?'selected':'')+'>Disabled</option></select></div>'+
+        '<div class="field"><label>Notify when a focus timer ends</label><select class="input" id="setNotifyEnd"><option value="on" '+(p.notifyOnFocusEnd!==false?'selected':'')+'>On</option><option value="off" '+(p.notifyOnFocusEnd===false?'selected':'')+'>Off</option></select></div>'+
+      '</div></div>'+
+      wakeSettingsCardHtml()+
       '<div class="section"><div class="section-title">Why You\'re Doing This</div><div class="card"><div class="grid grid-2">'+
         '<div><div class="kind-label" style="color:var(--good);">Getting</div>'+
           '<div class="task-list">'+(toward.map(function(m){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(m.text)+'</div>'+deleteBtn('motivation', m.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
@@ -15109,18 +15262,19 @@ function renderSettings(){
   };
   const navDefs = [
     {id:'you', label:'You', icon:'&#128100;'},
-    {id:'general', label:'General', icon:'&#9881;'},
     {id:'display', label:'Display', icon:'&#127912;'},
     {id:'focus', label:'Focus &amp; Alarms', icon:'&#9201;'},
     {id:'business', label:'Business', icon:'&#9635;'},
     {id:'calendarJournal', label:'Calendar &amp; Journal', icon:'&#9638;'},
     {id:'integrations', label:'Integrations', icon:'&#128279;'},
+    {id:'data', label:'Data', icon:'&#128190;'},
     {id:'updates', label:'App updates', icon:'&#128227;'}
   ];
-  const tab = ui.settingsTab==='standards' ? 'you' : ui.settingsTab;   // Standards now live under You
+  // Standards and General (preferences) now live under You; export / reset under Data
+  const tab = (ui.settingsTab==='standards' || ui.settingsTab==='general') ? 'you' : ui.settingsTab;
   const active = sections[tab] ? tab : 'you';
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Settings</div></div></div>'+
-  '<div class="settings-shell">'+
+  '<div class="settings-shell is-compact">'+
     '<div class="settings-sidenav">'+navDefs.map(function(n){ return '<button class="settings-nav-item'+(active===n.id?' active':'')+'" data-action="settingsTab" data-tab="'+n.id+'"><span style="margin-right:8px;">'+n.icon+'</span>'+n.label+'</button>'; }).join('')+'</div>'+
     '<div class="settings-content tab-panel" data-key="settings-'+active+'">'+sections[active]+'</div>'+
   '</div>';
@@ -18072,16 +18226,37 @@ document.addEventListener('keydown', function(e){
   if(e.key==='Enter' && e.target && e.target.id==='windNewTask'){ e.preventDefault(); ACTIONS.windNewTask(); }
 });
 document.addEventListener('input', function(e){ if(e.target && e.target.id==='windSearch' && ui.wind){ ui.wind.search = e.target.value; clearTimeout(ui._windT); ui._windT = setTimeout(renderWindInto, 120); } });
-// drag a row to reorder
-document.addEventListener('dragstart', function(e){ const r = e.target.closest && e.target.closest('.wd-row'); if(!r || !ui.wind) return; ui.wind.dragId = r.dataset.id; e.dataTransfer.effectAllowed = 'move'; try{ e.dataTransfer.setData('text/plain', 'wind'); }catch(err){} const n = r.querySelector('.wd-num'), t = r.querySelector('.wd-title'); dragGhost(e, t ? t.textContent : '', {num: n ? n.textContent : null, src: r}); });
-document.addEventListener('dragover', function(e){ if(ui.wind && ui.wind.dragId && e.target.closest && e.target.closest('.wd-row')) e.preventDefault(); });
-document.addEventListener('drop', function(e){
-  const r = e.target.closest && e.target.closest('.wd-row'); if(!r || !ui.wind || !ui.wind.dragId) return;
+// drag a row to reorder — or drag a task in from "From your list" to drop it at that spot
+document.addEventListener('dragstart', function(e){
+  if(!ui.wind) return;
+  const r = e.target.closest && e.target.closest('.wd-row, .wd-chip[data-id]'); if(!r) return;
+  ui.wind.dragId = r.dataset.id; e.dataTransfer.effectAllowed = 'move';
+  try{ e.dataTransfer.setData('text/plain', 'wind'); }catch(err){}
+  const n = r.querySelector('.wd-num'), t = r.querySelector('.wd-title, span');
+  dragGhost(e, t ? t.textContent : '', {num: n ? n.textContent : null, src: r});
+  document.body.classList.add('is-wind-drag');
+});
+function windDropMarks(row, below){ document.querySelectorAll('.wd-row.drop-above, .wd-row.drop-below').forEach(function(x){ if(x!==row){ x.classList.remove('drop-above', 'drop-below'); } }); if(row){ row.classList.toggle('drop-below', below); row.classList.toggle('drop-above', !below); } }
+document.addEventListener('dragover', function(e){
+  if(!ui.wind || !ui.wind.dragId || !e.target.closest) return;
+  const r = e.target.closest('.wd-row'), zone = e.target.closest('.wd-plan');
+  if(!r && !zone) return;
   e.preventDefault();
-  const w = ui.wind, from = w.plan.indexOf(w.dragId), rect = r.getBoundingClientRect();
-  let to = w.plan.indexOf(r.dataset.id); if(e.clientY > rect.top + rect.height/2) to++;
-  if(from<0 || to<0) return;
-  w.plan.splice(from, 1); if(to>from) to--; w.plan.splice(to, 0, w.dragId); w.dragId = null; renderWindInto();
+  if(r){ const rect = r.getBoundingClientRect(); windDropMarks(r, e.clientY > rect.top + rect.height/2); } else windDropMarks(null);
+});
+document.addEventListener('dragend', function(){ windDropMarks(null); document.body.classList.remove('is-wind-drag'); });
+document.addEventListener('drop', function(e){
+  if(!ui.wind || !ui.wind.dragId || !e.target.closest) return;
+  const r = e.target.closest('.wd-row'), zone = e.target.closest('.wd-plan'); if(!r && !zone) return;
+  e.preventDefault(); windDropMarks(null); document.body.classList.remove('is-wind-drag');
+  const w = ui.wind, id = w.dragId; w.dragId = null;
+  const from = w.plan.indexOf(id);
+  if(from>=0) w.plan.splice(from, 1);
+  let to = w.plan.length;
+  if(r && r.dataset.id!==id){ const rect = r.getBoundingClientRect(); to = w.plan.indexOf(r.dataset.id); if(to<0) to = w.plan.length; else if(e.clientY > rect.top + rect.height/2) to++; }
+  else if(r && from>=0) to = from;
+  w.plan.splice(to, 0, id);
+  playDrop(); renderWindInto();
 });
 // ---- the recap: today in numbers ----
 function dayTimelineHtml(date){
@@ -18143,7 +18318,7 @@ function windPlanHtml(){
     '<div class="wd-add"><input class="input" id="windNewTask" placeholder="+ A new task for tomorrow (Enter)"><button class="btn btn-sm" data-action="windNewTask">Add</button></div>'+
     '<div class="wd-k" style="margin-top:16px;">From your list</div>'+
     '<input class="input wd-search" id="windSearch" placeholder="Search…" value="'+escapeHtml(w.search||'')+'">'+
-    '<div class="wd-pool">'+(pool.length ? pool.map(function(t){ return '<button class="wd-chip" data-action="windAdd" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span><b>+</b></button>'; }).join('') : '<span class="kpi-sub">Nothing else on your lists.</span>')+'</div>'+
+    '<div class="wd-pool">'+(pool.length ? pool.map(function(t){ return '<button class="wd-chip" draggable="true" data-action="windAdd" data-id="'+t.id+'" title="Click to add, or drag it into the list">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span><b>+</b></button>'; }).join('') : '<span class="kpi-sub">Nothing else on your lists.</span>')+'</div>'+
   '</div>';
 }
 function windNoteHtml(){

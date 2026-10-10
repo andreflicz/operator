@@ -69,7 +69,7 @@ function renderWorkouts(){
         '<div><div class="stat-tile-v">'+monthCount+'</div><div class="stat-tile-sub">workouts this month</div></div>'+
       '</div>'+
     '</div>'+
-    '<div class="section"><div class="section-title">Log a workout</div><div class="card fit-log">'+
+    '<div class="section"><div class="section-title">&#128170; Log a workout</div><div class="card fit-log">'+
       '<div class="fit-types">'+workoutTypeChoices().map(function(t){ return '<button class="fit-type'+(sel===t.id?' is-on':'')+'" data-action="fitPickType" data-id="'+escapeHtml(t.id)+'"><span class="fit-type-i">'+t.icon+'</span>'+escapeHtml(t.id)+'</button>'; }).join('')+'</div>'+
       '<div class="fit-row">'+
         '<input class="input" id="gymType" placeholder="…or type it (e.g. Push day)" value="'+escapeHtml(sel)+'" style="flex:1;min-width:180px;">'+
@@ -88,8 +88,8 @@ function renderWorkouts(){
           items.map(function(g){
             return '<div class="fit-entry" data-key="gym-'+g.id+'"><span class="fit-entry-i">'+workoutIcon(g.type)+'</span>'+
               '<div class="fit-entry-main"><div class="fit-entry-title">'+escapeHtml(g.type)+(g.duration?' <span class="kpi-sub">&middot; '+fmtDurationLabel(g.duration)+'</span>':'')+'</div>'+(g.notes?'<div class="kpi-sub">'+escapeHtml(g.notes)+'</div>':'')+'</div>'+
-              '<span class="kpi-sub">'+weekdayShort(g.date)+' '+fmtDateShort(g.date)+'</span>'+
-              '<button class="btn btn-ghost btn-sm" data-action="openWorkoutEditModal" data-id="'+g.id+'">Edit</button>'+deleteBtn('gym', g.id)+
+              '<span class="fit-entry-date">'+weekdayShort(g.date)+' '+fmtDateShort(g.date)+'</span>'+
+              '<span class="fit-entry-acts"><button class="btn btn-ghost btn-sm" data-action="openWorkoutEditModal" data-id="'+g.id+'">Edit</button>'+deleteBtn('gym', g.id)+'</span>'+
             '</div>';
           }).join('')+'</div>';
       }).join('') : '<div class="empty">No workouts logged yet — pick one above.</div>')+
@@ -151,67 +151,78 @@ function saveEditWorkout(id){
   closeWorkoutEditModal();
   persist('health'); renderView();
 }
+// a soft area chart for the weight trend: gradient fill, the last point called out
+function healthAreaChart(vals, labels){
+  const W = 640, H = 190, P = {l:8, r:46, t:18, b:26};
+  const min = Math.min.apply(null, vals), max = Math.max.apply(null, vals), span = (max-min) || 1;
+  const x = function(i){ return P.l + (vals.length===1 ? 0 : i/(vals.length-1))*(W-P.l-P.r); };
+  const y = function(v){ return P.t + (1-(v-min)/span)*(H-P.t-P.b); };
+  const pts = vals.map(function(v, i){ return x(i).toFixed(1)+','+y(v).toFixed(1); });
+  const line = 'M'+pts.join(' L');
+  const area = line+' L'+x(vals.length-1).toFixed(1)+','+(H-P.b)+' L'+x(0).toFixed(1)+','+(H-P.b)+' Z';
+  const last = vals.length-1;
+  return '<svg class="hw-svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"><defs><linearGradient id="hwGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8a23d" stop-opacity=".38"/><stop offset="1" stop-color="#e8a23d" stop-opacity="0"/></linearGradient></defs>'+
+    [0, .5, 1].map(function(f){ const yy = P.t + f*(H-P.t-P.b); return '<line x1="'+P.l+'" x2="'+(W-P.r)+'" y1="'+yy+'" y2="'+yy+'" class="hw-grid"/><text x="'+(W-P.r+8)+'" y="'+(yy+4)+'" class="hw-ax">'+(max - f*span).toFixed(1)+'</text>'; }).join('')+
+    '<path d="'+area+'" fill="url(#hwGrad)"/><path d="'+line+'" class="hw-line"/>'+
+    vals.map(function(v, i){ return '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(v).toFixed(1)+'" r="'+(i===last?5:2.5)+'" class="hw-dot'+(i===last?' is-last':'')+'"><title>'+escapeHtml(labels[i])+': '+v+'</title></circle>'; }).join('')+
+    '<text x="'+P.l+'" y="'+(H-6)+'" class="hw-ax">'+escapeHtml(labels[0])+'</text><text x="'+(W-P.r)+'" y="'+(H-6)+'" class="hw-ax" text-anchor="end">'+escapeHtml(labels[last])+'</text>'+
+  '</svg>';
+}
 function renderWeight(){
   const log = state.health.weightLog.slice().sort(function(a,b){ return a.date.localeCompare(b.date); });
-  const recent = log.slice(-20);
-  const latest = log[log.length-1];
-  const start = log[0];
+  const recent = log.slice(-30);
+  const latest = log[log.length-1], start = log[0];
   const goal = state.profile.goalWeight;
-  let progressHtml = '';
-  if(latest && goal){
-    const startW = start ? start.weight : latest.weight;
-    const total = startW - goal;
-    const done = startW - latest.weight;
-    const pct = total>0 ? clamp(Math.round((done/total)*100),0,100) : 0;
-    progressHtml = '<div class="card section"><div class="kpi-label">Progress to Goal</div>'+
-      '<div class="progress" style="margin:8px 0;"><div class="progress-bar" style="width:'+pct+'%;background:'+goalColor()+';'+goalGlowStyle(pct)+'"></div></div>'+
-      '<div class="kpi-sub">'+latest.weight+' now &rarr; '+goal+' goal ('+(latest.weight-goal>0 ? (latest.weight-goal).toFixed(1)+' to go' : 'goal reached')+')</div>'+
-    '</div>';
+  const weekAgo = log.filter(function(w){ return w.date <= addDays(todayStr(), -7); }).slice(-1)[0];
+  const delta = latest && weekAgo ? latest.weight - weekAgo.weight : (latest && start && start!==latest ? latest.weight - start.weight : null);
+  const deltaFrom = latest && weekAgo ? 'in a week' : start && latest && start!==latest ? 'since '+fmtDateShort(start.date) : '';
+  let goalHtml = '<div class="hw-goal is-empty"><span>No goal weight yet</span><button class="btn btn-ghost btn-sm" data-action="goToProfileSettings">Set one</button></div>';
+  if(goal){
+    const startW = start ? start.weight : (latest ? latest.weight : goal);
+    const total = startW - goal, done = latest ? startW - latest.weight : 0;
+    const pct = total>0 ? clamp(Math.round(done/total*100), 0, 100) : (latest && latest.weight<=goal ? 100 : 0);
+    const left = latest ? latest.weight - goal : null;
+    goalHtml = '<div class="hw-goal"><div class="hw-goal-k"><span>Goal '+goal+'</span><b>'+(left==null ? '' : left>0 ? left.toFixed(1)+' to go' : 'Reached &#127881;')+'</b></div><div class="hw-bar"><i style="width:'+pct+'%"></i></div></div>';
   }
-  return '<div class="grid grid-2 section">'+
-    '<div class="card"><div class="kpi-label">Latest</div><div class="kpi-value">'+(latest?latest.weight:'—')+'</div></div>'+
-    '<div class="card"><div class="kpi-label">Goal Weight</div><div class="kpi-value">'+(goal!=null?goal:'not set')+'</div><div class="kpi-sub">set it in Settings</div></div>'+
-  '</div>'+
-  progressHtml+
-  '<div class="card section">'+(recent.length>=2 ? svgLineChart(recent.map(function(r){return r.weight;}), recent.map(function(r){return fmtDateShort(r.date);})) : '<div class="empty">Log a couple entries to see a trend line.</div>')+'</div>'+
-  '<div class="card section row">'+
-    '<div class="field"><label>Date</label><div class="row"><input class="input" type="date" id="weightDate" value="'+todayStr()+'"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="weightDate">&#128197;</button></div></div>'+
-    '<div class="field"><label>Weight</label><input class="input" type="number" step="0.1" id="weightValue" style="width:100px;"></div>'+
-    '<button class="btn btn-primary" data-action="addWeight" style="align-self:flex-end;">Log</button>'+
-  '</div>'+
-  '<table class="table"><tr><th>Date</th><th>Weight</th><th></th></tr>'+
-    (log.slice().reverse().slice(0,10).map(function(w){ return '<tr><td>'+fmtDateShort(w.date)+'</td><td>'+w.weight+'</td><td>'+deleteBtn('weight', w.id)+'</td></tr>'; }).join('') || '<tr><td colspan="3" class="empty">Nothing logged yet.</td></tr>')+
-  '</table>';
+  return '<div class="card hw-hero section">'+
+      '<div class="hw-now"><div class="hw-k">Now</div><div class="hw-v">'+(latest ? latest.weight : '—')+'</div>'+
+        (delta!=null ? '<div class="hw-delta '+(delta<0?'is-down':delta>0?'is-up':'')+'">'+(delta<0?'&#9660; ':delta>0?'&#9650; ':'')+Math.abs(delta).toFixed(1)+' '+deltaFrom+'</div>' : '<div class="hw-delta">'+(latest ? 'logged '+fmtDateShort(latest.date) : 'nothing logged yet')+'</div>')+'</div>'+
+      '<div class="hw-side">'+goalHtml+
+        '<div class="hw-log"><input class="input hw-in" type="number" step="0.1" id="weightValue" placeholder="Today\'s weight"><input class="input" type="date" id="weightDate" value="'+todayStr()+'"><button class="btn btn-primary" data-action="addWeight">Log</button></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card hw-chart section">'+(recent.length>=2 ? healthAreaChart(recent.map(function(r){ return r.weight; }), recent.map(function(r){ return fmtDateShort(r.date); })) : '<div class="empty">Log a couple of days to see the trend.</div>')+'</div>'+
+    '<div class="section"><div class="section-title">History</div><div class="hw-list">'+
+      (log.slice().reverse().slice(0, 12).map(function(w, i, arr2){ const prev = arr2[i+1]; const d = prev ? w.weight - prev.weight : null;
+        return '<div class="hw-row"><span class="hw-row-d">'+weekdayShort(w.date)+' '+fmtDateShort(w.date)+'</span><span class="hw-row-v">'+w.weight+'</span>'+
+          (d!=null && d!==0 ? '<span class="hw-chip '+(d<0?'is-down':'is-up')+'">'+(d<0?'&#9660;':'&#9650;')+' '+Math.abs(d).toFixed(1)+'</span>' : '<span></span>')+'<span class="hw-row-x">'+deleteBtn('weight', w.id)+'</span></div>'; }).join('') || '<div class="empty">Nothing logged yet.</div>')+
+    '</div></div>';
 }
+ACTIONS.goToProfileSettings = function(){ ui.view = 'settings'; ui.settingsTab = 'you'; renderView(); setTimeout(function(){ const el = document.getElementById('setGoalWeight'); if(el){ el.scrollIntoView({block:'center', behavior:'smooth'}); el.focus(); } }, 60); };
 function renderCalories(){
   const today = state.health.calorieEntries.filter(function(c){ return c.date===todayStr(); });
   const total = today.reduce(function(a,c){ return a+Number(c.calories||0); },0);
-  const pct = clamp(Math.round((total/(state.profile.calorieTarget||1))*100),0,999);
-  return '<div class="grid grid-2 section">'+
-    '<div class="card"><div class="kpi-label">Today</div><div class="kpi-value">'+total+' <span style="font-size:13px;color:var(--text-faint);">/ '+state.profile.calorieTarget+' cal</span></div>'+
-      '<div class="progress" style="margin-top:8px;"><div class="progress-bar '+(pct>110?'danger':pct>=85?'good':'')+'" style="width:'+clamp(pct,0,100)+'%"></div></div>'+
+  const target = state.profile.calorieTarget || 2000;
+  const pct = clamp(Math.round(total/target*100), 0, 999), left = target - total;
+  const color = pct>110 ? 'var(--danger)' : pct>=85 ? 'var(--good)' : 'var(--accent)';
+  return '<div class="card hc-hero section">'+
+      '<div class="hc-ring">'+svgRing(clamp(pct, 0, 100), 132, color, String(total), 'of '+target)+'</div>'+
+      '<div class="hc-main">'+
+        '<div class="hc-left'+(left<0?' is-over':'')+'">'+(left>=0 ? '<b>'+left+'</b> cal left today' : '<b>'+(-left)+'</b> cal over today')+'</div>'+
+        '<div class="hc-k">Quick add</div>'+
+        '<div class="hc-picks">'+(state.meals.library.map(function(m){ return '<button class="hc-pick" data-action="quickMeal" data-id="'+m.id+'"><span>'+escapeHtml(m.name)+'</span><b>'+m.calories+'</b></button>'; }).join('') || '<span class="kpi-sub">No saved meals yet.</span>')+'</div>'+
+        '<div class="hc-add"><input class="input" id="calName" placeholder="Something else…" style="flex:1;"><input class="input" type="number" id="calAmount" placeholder="cal" style="width:90px;"><button class="btn btn-primary" data-action="addCalorieEntry">Add</button></div>'+
+      '</div>'+
     '</div>'+
-    '<div class="card"><div class="kpi-label">Hungry? Pick One Instead Of Deciding</div><div class="row" style="margin-top:6px;">'+
-      (state.meals.library.map(function(m){ return '<button class="meal-btn" data-action="quickMeal" data-id="'+m.id+'"><span class="mname">'+escapeHtml(m.name)+'</span><span class="mmeta">'+m.calories+' cal</span></button>'; }).join('') || '<div class="empty">No meals saved yet.</div>')+
+    '<div class="section"><div class="section-title">Today<span class="kpi-sub">'+today.length+' item'+(today.length===1?'':'s')+'</span></div><div class="hw-list">'+
+      (today.map(function(c){ return '<div class="hw-row"><span class="hw-row-d" style="flex:1;color:var(--text);">'+escapeHtml(c.name||'Food')+'</span><span class="hw-row-v">'+c.calories+'<small> cal</small></span><span class="hw-row-x">'+deleteBtn('calorie', c.id)+'</span></div>'; }).join('') || '<div class="empty">Nothing logged today yet.</div>')+
     '</div></div>'+
-  '</div>'+
-  '<div class="card section row">'+
-    '<div class="field" style="flex:1;"><label>Custom item</label><input class="input" id="calName" placeholder="What did you eat?"></div>'+
-    '<div class="field"><label>Calories</label><input class="input" type="number" id="calAmount" style="width:100px;"></div>'+
-    '<button class="btn btn-primary" data-action="addCalorieEntry" style="align-self:flex-end;">Add</button>'+
-  '</div>'+
-  '<div class="section"><div class="section-title">Today\'s Log</div><div class="task-list">'+
-    (today.map(function(c){ return '<div class="task-item-v2"><div class="task-title">'+escapeHtml(c.name)+'</div><div class="kpi-sub">'+c.calories+' cal</div>'+deleteBtn('calorie',c.id)+'</div>'; }).join('') || '<div class="empty">Nothing logged today yet.</div>')+
-  '</div></div>'+
-  '<div class="section"><div class="section-title">Meal Library'+tip('Your go-to options — edit them here.')+'</div>'+
-    '<div class="card row" style="margin-bottom:10px;">'+
-      '<div class="field" style="flex:1;"><label>Name</label><input class="input" id="mealName" placeholder="e.g. Turkey chili"></div>'+
-      '<div class="field"><label>Calories</label><input class="input" type="number" id="mealCalories" style="width:100px;"></div>'+
-      '<button class="btn" data-action="addMeal" style="align-self:flex-end;">Add To Library</button>'+
-    '</div>'+
-    '<div class="task-list">'+(state.meals.library.map(function(m){ return '<div class="task-item-v2"><div class="task-title">'+escapeHtml(m.name)+'</div><div class="kpi-sub">'+m.calories+' cal</div>'+deleteBtn('meal', m.id)+'</div>'; }).join('') || '<div class="empty">No meals in your library yet.</div>')+'</div>'+
-  '</div>';
+    '<details class="section hc-lib"'+(ui.mealLibOpen?' open':'')+'><summary class="section-title">Meal library<span class="kpi-sub">'+state.meals.library.length+'</span>'+tip('Your go-to meals — one tap logs them.')+'</summary>'+
+      '<div class="hc-add" style="margin-bottom:10px;"><input class="input" id="mealName" placeholder="e.g. Turkey chili" style="flex:1;"><input class="input" type="number" id="mealCalories" placeholder="cal" style="width:90px;"><button class="btn" data-action="addMeal">Save meal</button></div>'+
+      '<div class="hw-list">'+(state.meals.library.map(function(m){ return '<div class="hw-row"><span class="hw-row-d" style="flex:1;color:var(--text);">'+escapeHtml(m.name)+'</span><span class="hw-row-v">'+m.calories+'<small> cal</small></span><span class="hw-row-x">'+deleteBtn('meal', m.id)+'</span></div>'; }).join('') || '<div class="empty">No meals saved yet.</div>')+'</div>'+
+    '</details>';
 }
+document.addEventListener('toggle', function(e){ if(e.target && e.target.classList && e.target.classList.contains('hc-lib')) ui.mealLibOpen = e.target.open; }, true);
 function addWorkout(){
   const date = document.getElementById('gymDate').value || todayStr();
   const type = document.getElementById('gymType').value.trim();

@@ -143,11 +143,16 @@ function renderOngoingTasksPanel(){
     (carouselOn() ? carouselWrap(ongoing.map(function(t){ return taskCard(t); }).join(''), 'ongoing', {w:236, loop:true, count:ongoing.length}) : '<div class="task-card-grid">'+ongoing.map(function(t){ return taskCard(t); }).join('')+'</div>')+
   '</div>';
 }
+function reminderWhen(r){
+  const d = r.date===todayStr() ? 'Today' : r.date===addDays(todayStr(), 1) ? 'Tomorrow' : weekdayShort(r.date)+' '+fmtDateShort(r.date);
+  return d+(r.time ? ' · '+fmt12Hour(r.time) : '');
+}
 function reminderRow(r){
-  return '<div class="task-item-v2">'+
-    '<div style="font-family:var(--font-display);font-weight:700;width:110px;">'+fmtDateShort(r.date)+(r.time?' &middot; '+fmt12Hour(r.time):'')+'</div>'+
-    '<div class="task-title" style="flex:1;">'+escapeHtml(r.label||'Reminder')+'</div>'+
-    '<button class="btn btn-good btn-sm" data-action="dismissReminder" data-id="'+r.id+'">&#10003; Done</button>'+
+  const late = r.date < todayStr() || (r.date===todayStr() && r.time && r.time < nowHM());
+  return '<div class="rm-row'+(late?' is-late':'')+'"><span class="rm-bell">&#128276;</span>'+
+    '<span class="rm-label">'+escapeHtml(r.label||'Reminder')+'</span>'+
+    '<span class="rm-when">'+escapeHtml(reminderWhen(r))+'</span>'+
+    '<button class="rm-done" data-action="dismissReminder" data-id="'+r.id+'" title="Done">&#10003;</button>'+
   '</div>';
 }
 function dismissReminder(id){ state.focus.reminders = state.focus.reminders.filter(function(x){return x.id!==id;}); persist('focus'); renderView(); }
@@ -185,18 +190,26 @@ function addReminderOrAlarm(){
 function renderRemindersCard(){
   const upcomingReminders = state.focus.reminders.slice().sort(function(a,b){ return (a.date+String(a.time||'')).localeCompare(b.date+String(b.time||'')); });
   const rows = upcomingReminders.map(reminderRow).join('');
-  return '<div class="section"><div class="section-title">Reminders</div>'+
-    '<div class="card">'+
-      '<div class="row" style="flex-wrap:wrap;align-items:flex-end;">'+
-        '<div class="field" style="flex:1;min-width:160px;"><label>What?</label><input class="input" id="newReminderLabel" placeholder="e.g. Call back the Rivera lead"></div>'+
-        '<div class="field"><label>Date</label><div class="row" style="gap:6px;"><input class="input" type="date" id="newReminderDate" value="'+todayStr()+'" style="width:140px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newReminderDate">&#128197;</button></div></div>'+
-        '<div class="field"><label>Time (optional)</label><input class="input" type="time" id="newReminderTime" style="width:120px;"></div>'+
-        '<button class="btn btn-primary" data-action="addReminder">Add</button>'+
-      '</div>'+
+  const chip = function(n, label){ return '<button class="rm-chip'+(n===0?' is-on':'')+'" data-action="remindDay" data-id="'+n+'">'+label+'</button>'; };
+  return '<div class="section"><div class="section-title">Reminders<span class="kpi-sub">'+upcomingReminders.length+'</span></div>'+
+    '<div class="rm-compose">'+
+      '<span class="rm-bell">&#128276;</span>'+
+      '<input class="rm-input" id="newReminderLabel" placeholder="Remind me to…">'+
+      '<span class="rm-chips">'+chip(0, 'Today')+chip(1, 'Tomorrow')+chip(7, 'Next week')+'</span>'+
+      '<input class="rm-date" type="date" id="newReminderDate" value="'+todayStr()+'" title="Pick a day">'+
+      '<input class="rm-time" type="time" id="newReminderTime" title="Time (optional)">'+
+      '<button class="rm-add" data-action="addReminder">Add</button>'+
     '</div>'+
-    '<div class="task-list" style="margin-top:14px;">'+(rows || '<div class="empty">Nothing set — add a reminder above.</div>')+'</div>'+
+    '<div class="rm-list">'+(rows || '<div class="empty">Nothing coming up.</div>')+'</div>'+
   '</div>';
 }
+ACTIONS.remindDay = function(el, e, id){
+  const d = document.getElementById('newReminderDate'); if(d) d.value = addDays(todayStr(), Number(id)||0);
+  document.querySelectorAll('.rm-chip').forEach(function(c){ c.classList.toggle('is-on', c===el); });
+  playTick();
+};
+document.addEventListener('keydown', function(e){ if(e.key==='Enter' && e.target && e.target.id==='newReminderLabel'){ e.preventDefault(); addReminder(); } });
+document.addEventListener('change', function(e){ if(e.target && e.target.id==='newReminderDate'){ document.querySelectorAll('.rm-chip').forEach(function(c){ c.classList.toggle('is-on', addDays(todayStr(), Number(c.dataset.id))===e.target.value); }); } });
 function renderBreakForm(){
   return '<div class="card" style="margin-top:8px;padding:10px;">'+
     '<div class="row" style="justify-content:center;">'+

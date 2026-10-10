@@ -96,7 +96,7 @@ function fabContext(){
     if(ui.personalTab==='journal') return {label:'New journal entry', run:openQuickJournalModal};
     if(ui.personalTab==='wishlist' && typeof openWishItemModal==='function') return {label:'Add wish list item', run:function(){ openWishItemModal(null); }};
     if(ui.personalTab==='fitness') return {label:'Log workout', run:function(){ ui.healthTab='workouts'; renderView(); const el=document.getElementById('gymType'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
-    return {label:'Add goal', run:function(){ const el=document.getElementById('newGoalTitle')||document.querySelector('#viewRoot .tab-panel input'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
+    return {label:'Add goal', run:function(){ ui.forms.newGoal = true; renderView(); setTimeout(function(){ const el = document.getElementById('newGoalLabel'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }, 30); }};
   }
   return null;
 }
@@ -106,7 +106,7 @@ afterRenderHooks.push(function(){
   if(!fab) return;
   const c = fabContext();
   fab.classList.toggle('fab-hidden', !c);
-  if(c){ fab.title = c.label; fab.setAttribute('aria-label', c.label); }
+  if(c && fab.dataset.label!==c.label){ fab.title = c.label; fab.setAttribute('aria-label', c.label); fab.dataset.label = c.label; }
 });
 // Crosshair cursor (Settings → Display). A thin accent crosshair everywhere; a filled
 // centre on clickable things; normal I-beam in text fields.

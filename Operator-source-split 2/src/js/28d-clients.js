@@ -93,7 +93,6 @@ function renderClientsHome(){
       return '<div class="crm-toolbar crm-toolbar-slim">'+
           '<span style="flex:1"></span>'+
           crmToolsBtnHtml('client', active)+
-          '<button class="btn btn-primary crm-add-btn" data-action="openNewContact" data-kind="client">+ Add client</button>'+
         '</div>'+
         (f.toolsOpen ? '<div class="crm-toolbar crm-tools-row">'+
           '<input class="input" id="crmSearch-client" placeholder="Search clients…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+

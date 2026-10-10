@@ -104,7 +104,7 @@ function renderGoalsTab(){
   const formOpen = !!ui.forms.newGoal;
   return '<div class="section">'+masterGoalsHtml(false)+'</div>'+
     '<div class="section">'+
-      '<div class="section-title">Your goals'+tip('For things Operator can\'t see — IG followers, a first sponsor deal, a new camera. You update the number.')+'<button class="btn btn-sm '+(formOpen?'btn-ghost':'btn-good')+'" data-action="toggleForm" data-form="newGoal">'+(formOpen?'Close':'+ Add a goal')+'</button></div>'+
+      '<div class="section-title">Your goals'+tip('For things Operator can\'t see — IG followers, a first sponsor deal, a new camera. You update the number.')+(formOpen ? '<button class="btn btn-sm btn-ghost" data-action="toggleForm" data-form="newGoal">Close</button>' : '')+'</div>'+
       (formOpen ? '<div class="card goal-form">'+
         '<div class="grid grid-2"><div class="field"><label>Goal</label><input class="input" id="newGoalLabel" placeholder="e.g. 10k IG followers"></div>'+
           '<div class="field"><label>By when (optional)</label><input class="input" type="date" id="newGoalDeadline"></div></div>'+

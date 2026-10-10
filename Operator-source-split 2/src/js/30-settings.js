@@ -13,12 +13,7 @@ function renderSettings(){
   const sections = {
     integrations: ghlSettingsHtml(),
     updates: '<div class="upd-panel">'+renderUpdatesTab()+'</div>',
-    general: '<div class="card section"><div class="section-title">Preferences</div><div class="grid grid-2">'+
-        '<div class="field"><label>Sound effects</label><div class="row" style="gap:6px;"><select class="input" id="setSound"><option value="modern" '+(p.soundEnabled!==false && p.soundPack!=='classic'?'selected':'')+'>Modern</option><option value="classic" '+(p.soundEnabled!==false && p.soundPack==='classic'?'selected':'')+'>Classic beeps</option><option value="off" '+(p.soundEnabled===false?'selected':'')+'>Off</option></select><button class="btn btn-ghost btn-sm" data-action="previewSounds" title="Hear them">&#9654;</button></div></div>'+
-        '<div class="field"><label>Note field after finishing a task in Focus</label><select class="input" id="setFocusNote"><option value="on" '+(p.focusNotePromptEnabled!==false?'selected':'')+'>Enabled</option><option value="off" '+(p.focusNotePromptEnabled===false?'selected':'')+'>Disabled</option></select></div>'+
-        '<div class="field"><label>Notify when a focus timer ends</label><select class="input" id="setNotifyEnd"><option value="on" '+(p.notifyOnFocusEnd!==false?'selected':'')+'>On</option><option value="off" '+(p.notifyOnFocusEnd===false?'selected':'')+'>Off</option></select></div>'+
-      '</div></div>'+saveBtn+
-      '<div class="section"><div class="section-title">Your Data'+tip(hasCloud ? 'Saved to your Claude account — it follows you back to this artifact.' : 'Saved on this Mac in Operator\'s own storage — export a copy now and then as a backup.')+'</div><div class="card">'+
+    data: '<div class="section"><div class="section-title">Your Data'+tip(hasCloud ? 'Saved to your Claude account — it follows you back to this artifact.' : 'Saved on this Mac in Operator\'s own storage — export a copy now and then as a backup.')+'</div><div class="card">'+
         '<div class="row"><button class="btn" data-action="exportData">Export Data (.json)</button>'+
         '<label class="btn" style="cursor:pointer;">Import Data<input type="file" id="importFile" accept=".json" style="display:none;"></label>'+
         deleteResetBtn()+'</div>'+
@@ -128,6 +123,12 @@ function renderSettings(){
         '<div class="field"><label>Name</label><input class="input" id="setName" value="'+escapeHtml(p.name)+'"></div>'+
         '<div class="field"><label>Business name</label><input class="input" id="setBusinessName" value="'+escapeHtml(p.businessName||'')+'" placeholder="e.g. Rivera Media Co."></div>'+
       '</div></div>'+
+      '<div class="card section"><div class="section-title">Preferences</div><div class="grid grid-2">'+
+        '<div class="field"><label>Sound effects</label><div class="row" style="gap:6px;"><select class="input" id="setSound"><option value="modern" '+(p.soundEnabled!==false && p.soundPack!=='classic'?'selected':'')+'>Modern</option><option value="classic" '+(p.soundEnabled!==false && p.soundPack==='classic'?'selected':'')+'>Classic beeps</option><option value="off" '+(p.soundEnabled===false?'selected':'')+'>Off</option></select><button class="btn btn-ghost btn-sm" data-action="previewSounds" title="Hear them">&#9654;</button></div></div>'+
+        '<div class="field"><label>Note field after finishing a task in Focus</label><select class="input" id="setFocusNote"><option value="on" '+(p.focusNotePromptEnabled!==false?'selected':'')+'>Enabled</option><option value="off" '+(p.focusNotePromptEnabled===false?'selected':'')+'>Disabled</option></select></div>'+
+        '<div class="field"><label>Notify when a focus timer ends</label><select class="input" id="setNotifyEnd"><option value="on" '+(p.notifyOnFocusEnd!==false?'selected':'')+'>On</option><option value="off" '+(p.notifyOnFocusEnd===false?'selected':'')+'>Off</option></select></div>'+
+      '</div></div>'+
+      wakeSettingsCardHtml()+
       '<div class="section"><div class="section-title">Why You\'re Doing This</div><div class="card"><div class="grid grid-2">'+
         '<div><div class="kind-label" style="color:var(--good);">Getting</div>'+
           '<div class="task-list">'+(toward.map(function(m){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(m.text)+'</div>'+deleteBtn('motivation', m.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
@@ -184,18 +185,19 @@ function renderSettings(){
   };
   const navDefs = [
     {id:'you', label:'You', icon:'&#128100;'},
-    {id:'general', label:'General', icon:'&#9881;'},
     {id:'display', label:'Display', icon:'&#127912;'},
     {id:'focus', label:'Focus &amp; Alarms', icon:'&#9201;'},
     {id:'business', label:'Business', icon:'&#9635;'},
     {id:'calendarJournal', label:'Calendar &amp; Journal', icon:'&#9638;'},
     {id:'integrations', label:'Integrations', icon:'&#128279;'},
+    {id:'data', label:'Data', icon:'&#128190;'},
     {id:'updates', label:'App updates', icon:'&#128227;'}
   ];
-  const tab = ui.settingsTab==='standards' ? 'you' : ui.settingsTab;   // Standards now live under You
+  // Standards and General (preferences) now live under You; export / reset under Data
+  const tab = (ui.settingsTab==='standards' || ui.settingsTab==='general') ? 'you' : ui.settingsTab;
   const active = sections[tab] ? tab : 'you';
   return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Settings</div></div></div>'+
-  '<div class="settings-shell">'+
+  '<div class="settings-shell is-compact">'+
     '<div class="settings-sidenav">'+navDefs.map(function(n){ return '<button class="settings-nav-item'+(active===n.id?' active':'')+'" data-action="settingsTab" data-tab="'+n.id+'"><span style="margin-right:8px;">'+n.icon+'</span>'+n.label+'</button>'; }).join('')+'</div>'+
     '<div class="settings-content tab-panel" data-key="settings-'+active+'">'+sections[active]+'</div>'+
   '</div>';

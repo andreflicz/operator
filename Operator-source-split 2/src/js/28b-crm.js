@@ -322,7 +322,6 @@ function crmToolbar(kind, lead){
         '<button class="seg-tab'+(f.view==='board'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="board">Board</button>'+
         '<button class="seg-tab'+(f.view==='list'?' active':'')+'" data-action="crmView" data-kind="'+kind+'" data-id="list">List</button>'+
       '</div>'+
-      '<button class="btn btn-primary crm-add-btn" data-action="openNewContact" data-kind="'+kind+'">+ Add '+(kind==='lead'?'lead':'client')+'</button>'+
     '</div>'+
     (f.toolsOpen ? '<div class="crm-toolbar crm-tools-row">'+
       '<input class="input" id="crmSearch-'+kind+'" placeholder="Search '+(kind==='lead'?'leads':'clients')+'…" value="'+escapeHtml(f.q||'')+'" style="flex:1;min-width:180px;">'+

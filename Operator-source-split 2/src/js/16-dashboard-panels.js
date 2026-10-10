@@ -210,15 +210,16 @@ document.addEventListener('drop', function(e){
 });
 function renderJournalPanel(){
   const todaysJournalCount = state.journal.entries.filter(function(e){ return e.date===todayStr(); }).length;
-  return '<div class="section"><div class="card journal-quick-card" data-photo-drop="journal" style="text-align:center;">'+
-    '<div class="kpi-label" style="margin-bottom:8px;">Quick Journal'+tip('Paste or drop images in too.')+'</div>'+
-    '<textarea class="input" id="quickJournalText" placeholder="Anything on your mind — a win, a worry, an idea…" style="width:100%;height:90px;flex-shrink:0;text-align:left;resize:none;">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
+  return '<div class="section"><div class="card journal-quick-card qj2" data-photo-drop="journal">'+
+    '<div class="qj2-head"><span class="qj2-icon">&#128221;</span><div class="qj2-title">Quick journal'+tip('Paste or drop images in too.')+'</div>'+
+      (todaysJournalCount ? '<span class="qj2-count">'+todaysJournalCount+' today</span>' : '')+
+      '<button class="qj2-open" data-action="nav" data-view="personal" data-tab="journal">Open journal &rarr;</button></div>'+
+    '<textarea class="input qj2-text" id="quickJournalText" placeholder="Anything on your mind — a win, a worry, an idea…">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
     renderJournalPhotoThumbsRow()+
-    '<div class="journal-compose-actions">'+
+    '<div class="journal-compose-actions qj2-actions">'+
       '<div class="row" style="gap:6px;">'+renderJournalMoodChipsInline()+'<button class="btn btn-ghost btn-sm" data-action="triggerJournalPhotoInput" title="Add photo">&#128247;</button></div>'+
-      '<button class="btn btn-primary" data-action="addJournal" data-target="quickJournalText">Save to Journal</button>'+
+      '<button class="btn btn-primary" data-action="addJournal" data-target="quickJournalText">Save</button>'+
     '</div>'+
-    (todaysJournalCount>0 ? '<div class="row" style="justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="nav" data-view="personal" data-tab="journal">'+todaysJournalCount+' entr'+(todaysJournalCount===1?'y':'ies')+' today</button></div>' : '')+
   '</div></div>';
 }
 function deepWorkStatInnerHtml(mins){

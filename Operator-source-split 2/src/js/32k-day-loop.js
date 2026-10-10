@@ -73,16 +73,37 @@ document.addEventListener('keydown', function(e){
   if(e.key==='Enter' && e.target && e.target.id==='windNewTask'){ e.preventDefault(); ACTIONS.windNewTask(); }
 });
 document.addEventListener('input', function(e){ if(e.target && e.target.id==='windSearch' && ui.wind){ ui.wind.search = e.target.value; clearTimeout(ui._windT); ui._windT = setTimeout(renderWindInto, 120); } });
-// drag a row to reorder
-document.addEventListener('dragstart', function(e){ const r = e.target.closest && e.target.closest('.wd-row'); if(!r || !ui.wind) return; ui.wind.dragId = r.dataset.id; e.dataTransfer.effectAllowed = 'move'; try{ e.dataTransfer.setData('text/plain', 'wind'); }catch(err){} const n = r.querySelector('.wd-num'), t = r.querySelector('.wd-title'); dragGhost(e, t ? t.textContent : '', {num: n ? n.textContent : null, src: r}); });
-document.addEventListener('dragover', function(e){ if(ui.wind && ui.wind.dragId && e.target.closest && e.target.closest('.wd-row')) e.preventDefault(); });
-document.addEventListener('drop', function(e){
-  const r = e.target.closest && e.target.closest('.wd-row'); if(!r || !ui.wind || !ui.wind.dragId) return;
+// drag a row to reorder — or drag a task in from "From your list" to drop it at that spot
+document.addEventListener('dragstart', function(e){
+  if(!ui.wind) return;
+  const r = e.target.closest && e.target.closest('.wd-row, .wd-chip[data-id]'); if(!r) return;
+  ui.wind.dragId = r.dataset.id; e.dataTransfer.effectAllowed = 'move';
+  try{ e.dataTransfer.setData('text/plain', 'wind'); }catch(err){}
+  const n = r.querySelector('.wd-num'), t = r.querySelector('.wd-title, span');
+  dragGhost(e, t ? t.textContent : '', {num: n ? n.textContent : null, src: r});
+  document.body.classList.add('is-wind-drag');
+});
+function windDropMarks(row, below){ document.querySelectorAll('.wd-row.drop-above, .wd-row.drop-below').forEach(function(x){ if(x!==row){ x.classList.remove('drop-above', 'drop-below'); } }); if(row){ row.classList.toggle('drop-below', below); row.classList.toggle('drop-above', !below); } }
+document.addEventListener('dragover', function(e){
+  if(!ui.wind || !ui.wind.dragId || !e.target.closest) return;
+  const r = e.target.closest('.wd-row'), zone = e.target.closest('.wd-plan');
+  if(!r && !zone) return;
   e.preventDefault();
-  const w = ui.wind, from = w.plan.indexOf(w.dragId), rect = r.getBoundingClientRect();
-  let to = w.plan.indexOf(r.dataset.id); if(e.clientY > rect.top + rect.height/2) to++;
-  if(from<0 || to<0) return;
-  w.plan.splice(from, 1); if(to>from) to--; w.plan.splice(to, 0, w.dragId); w.dragId = null; renderWindInto();
+  if(r){ const rect = r.getBoundingClientRect(); windDropMarks(r, e.clientY > rect.top + rect.height/2); } else windDropMarks(null);
+});
+document.addEventListener('dragend', function(){ windDropMarks(null); document.body.classList.remove('is-wind-drag'); });
+document.addEventListener('drop', function(e){
+  if(!ui.wind || !ui.wind.dragId || !e.target.closest) return;
+  const r = e.target.closest('.wd-row'), zone = e.target.closest('.wd-plan'); if(!r && !zone) return;
+  e.preventDefault(); windDropMarks(null); document.body.classList.remove('is-wind-drag');
+  const w = ui.wind, id = w.dragId; w.dragId = null;
+  const from = w.plan.indexOf(id);
+  if(from>=0) w.plan.splice(from, 1);
+  let to = w.plan.length;
+  if(r && r.dataset.id!==id){ const rect = r.getBoundingClientRect(); to = w.plan.indexOf(r.dataset.id); if(to<0) to = w.plan.length; else if(e.clientY > rect.top + rect.height/2) to++; }
+  else if(r && from>=0) to = from;
+  w.plan.splice(to, 0, id);
+  playDrop(); renderWindInto();
 });
 // ---- the recap: today in numbers ----
 function dayTimelineHtml(date){
@@ -144,7 +165,7 @@ function windPlanHtml(){
     '<div class="wd-add"><input class="input" id="windNewTask" placeholder="+ A new task for tomorrow (Enter)"><button class="btn btn-sm" data-action="windNewTask">Add</button></div>'+
     '<div class="wd-k" style="margin-top:16px;">From your list</div>'+
     '<input class="input wd-search" id="windSearch" placeholder="Search…" value="'+escapeHtml(w.search||'')+'">'+
-    '<div class="wd-pool">'+(pool.length ? pool.map(function(t){ return '<button class="wd-chip" data-action="windAdd" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span><b>+</b></button>'; }).join('') : '<span class="kpi-sub">Nothing else on your lists.</span>')+'</div>'+
+    '<div class="wd-pool">'+(pool.length ? pool.map(function(t){ return '<button class="wd-chip" draggable="true" data-action="windAdd" data-id="'+t.id+'" title="Click to add, or drag it into the list">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span><b>+</b></button>'; }).join('') : '<span class="kpi-sub">Nothing else on your lists.</span>')+'</div>'+
   '</div>';
 }
 function windNoteHtml(){

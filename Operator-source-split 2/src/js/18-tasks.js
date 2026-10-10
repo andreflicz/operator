@@ -109,9 +109,6 @@ function renderFocusTasksTab(){
 function renderVideoIdeasTab(){
   const videoIdeas = state.tasks.items.filter(function(t){ return t.isVideoIdea && t.status!=='done'; });
   return '<div class="section">'+
-    '<div class="row" style="justify-content:flex-end;margin-bottom:16px;">'+
-      '<button class="btn btn-primary" data-action="openAddVideoIdeaModal">+ Add Video Idea</button>'+
-    '</div>'+
     '<div class="video-idea-grid">'+(videoIdeas.map(videoIdeaCompactCard).join('') || '<div class="empty">No video ideas yet — drop one above whenever inspiration hits.</div>')+'</div>'+
   '</div>';
 }
@@ -196,7 +193,7 @@ function renderFocusTasksOverview(){
   return nowNextPanelHtml()+
   renderTaskToolbar(true)+
   '<div class="section" style="margin-bottom:14px;">'+
-    '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('In your order — switch to List and drag rows to set it (otherwise highest priority and closest deadlines first). Drag a card onto Up next to line it up. Drag a box around cards (or ⌘-click) to pick several.')+'<span class="row" style="margin-left:auto;gap:8px;">'+lineupToggleHtml()+'<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button></span></div>'+
+    '<div class="section-title" style="align-items:center;">Today\'s Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('In your order — switch to List and drag rows to set it (otherwise highest priority and closest deadlines first). Drag a card onto Up next to line it up. Drag a box around cards (or ⌘-click) to pick several.')+'<span class="row" style="margin-left:auto;gap:8px;">'+lineupToggleHtml()+'</span></div>'+
     (listView ? '<div class="task-column tl-wrap" data-dropzone="today">'+lineupListHtml(today)+'</div>' :
     '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236, loop:true, count:today.length}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>')+
   '</div>'+
@@ -217,7 +214,6 @@ function renderFocusBacklogTab(){
       '<div class="section-title" style="margin-bottom:0;">The Whole List<span class="kpi-sub">'+backlog.length+'</span>'+tip('Highest priority and closest deadlines first.')+'</div>'+
       '<div class="row" style="gap:8px;">'+
         (!ui.backlogSearchOpen && !hasFilters ? '<button class="btn btn-ghost btn-sm" data-action="toggleBacklogSearch" title="Search Entries">&#128269;</button>' : '')+
-        '<button class="btn btn-primary btn-sm" data-action="openAddTaskModal">+ Add a Task</button>'+
       '</div>'+
     '</div>'+
     (ui.backlogSearchOpen || hasFilters ? (

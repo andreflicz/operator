@@ -38,8 +38,14 @@ function updateActivityPill(){
   el.dataset.cat = cat;
   const notCounting = !!(s && !s.onBreak && cat==='other');
   const siteUnknown = app && BROWSER_APPS.indexOf(activityKey(app))>=0;
-  const lock = s ? (s.onBreak ? '&#9749; on break' : '&#128274; '+fmtDurationLabel(Math.max(0, Math.round((Date.now()-s.startedAt)/60000)))+(notCounting ? ' &middot; not counting' : '')) : '';
-  const html = (app ? '<span class="ap-dot"></span><span class="ap-name">'+escapeHtml(app)+'</span>'+(siteUnknown ? '<span class="ap-warn">?</span>' : '') : '')+(lock ? '<span class="ap-lock'+(app?'':' ap-lock-only')+(notCounting?' is-off':'')+'">'+lock+'</span>' : '');
+  const lock = s ? (s.onBreak ? '&#9749; on break'+(s.breakEndsAt ? ' &middot; '+Math.max(0, Math.ceil((s.breakEndsAt-Date.now())/60000))+'m left' : '') : '&#128274; '+fmtDurationLabel(Math.max(0, Math.round((Date.now()-s.startedAt)/60000)))+(notCounting ? ' &middot; not counting' : '')) : '';
+  el.dataset.state = s ? (s.onBreak ? 'break' : 'locked') : 'free';
+  // a tiny ring: how far through the session (or the break) you are
+  let frac = null;
+  if(s && s.onBreak && s.breakEndsAt && s.breakStartedAt) frac = clamp((Date.now()-s.breakStartedAt)/(s.breakEndsAt-s.breakStartedAt), 0, 1);
+  else if(s && !s.onBreak && s.plannedMinutes) frac = clamp((Date.now()-s.startedAt)/(s.plannedMinutes*60000), 0, 1);
+  const ring = frac==null ? '' : '<svg class="ap-ring" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" class="ap-ring-bg"/><circle cx="10" cy="10" r="8" class="ap-ring-fg" stroke-dasharray="50.27" stroke-dashoffset="'+(50.27*(1-frac)).toFixed(1)+'"/></svg>';
+  const html = ring+(app ? '<span class="ap-dot"></span><span class="ap-name">'+escapeHtml(app)+'</span>'+(siteUnknown ? '<span class="ap-warn">?</span>' : '') : '')+(lock ? '<span class="ap-lock'+(app?'':' ap-lock-only')+(notCounting?' is-off':'')+'">'+lock+'</span>' : '');
   if(el._html!==html){ el.innerHTML = html; el._html = html; }
   el.title = !app ? '' : siteUnknown ? 'Operator can\'t see which website is open in '+app+' — click for how to allow it' : app+' — '+CAT_META[cat].label+(notCounting ? ' · this time isn\'t counted as deep work' : '')+' (click to change)';
 }
@@ -56,8 +62,15 @@ function renderPillMenu(){
   if(!m){ m = document.createElement('div'); m.id = 'activityPillMenu'; m.className = 'ap-menu'; document.body.appendChild(m); }
   const app = ui.pillMenu==='__none' ? null : ui.pillMenu;
   const cat = app ? activityCategory(app) : null;
+  const s = state.focus.activeSession;
+  const status = s ? '<div class="ap-status'+(s.onBreak?' is-break':'')+'">'+
+      (s.onBreak ? '<div class="ap-st-k">&#9749; On break</div><div class="ap-st-v">'+(s.breakEndsAt ? formatElapsed(Math.max(0, s.breakEndsAt-Date.now()))+' left' : 'no timer')+'</div>'+
+          '<div class="ap-st-acts">'+(s.breakEndsAt ? '<button class="btn btn-ghost btn-sm" data-action="extendBreak" data-minutes="5">+5 min</button>' : '')+'<button class="btn btn-primary btn-sm" data-action="endBreakModeFromFocus">Back to it</button></div>'
+        : '<div class="ap-st-k">&#128274; Locked in'+(s.method && LOCK_METHODS[s.method.id] && s.method.id!=='block' ? ' &middot; '+LOCK_METHODS[s.method.id].label : '')+'</div><div class="ap-st-v">'+formatElapsed(Date.now()-s.startedAt)+(s.plannedMinutes ? ' <small>of '+fmtDurationLabel(s.plannedMinutes)+'</small>' : '')+'</div>'+
+          '<div class="ap-st-acts"><button class="btn btn-ghost btn-sm" data-action="openBreakNotePrompt">&#9749; Break</button><button class="btn btn-ghost btn-sm" data-action="openStopFocus">Lock out</button></div>')+
+    '</div>' : '';
   const browser = app && BROWSER_APPS.indexOf(activityKey(app))>=0;
-  m.innerHTML = (browser ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div><div class="ap-menu-hint" style="margin-top:0;">Can\'t see which website is open'+
+  m.innerHTML = status+(browser ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div><div class="ap-menu-hint" style="margin-top:0;">Can\'t see which website is open'+
       tip('So it can\'t tell YouTube from work.'+(activityKey(app)==='firefox' ? ' Firefox doesn\'t allow this — Safari, Chrome, Arc, Brave and Edge do.' : ' On your Mac: System Settings → Privacy & Security → Automation → Operator → turn on '+app+'. Then reopen Operator.'))+'</div>'
     : app ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div>'+
       '<div class="ap-menu-k">Is this work?'+tip('Only work apps & sites start an automatic lock-in. Time on “not work” ones while you\'re locked in doesn\'t count as deep work.')+'</div>'+
@@ -235,3 +248,9 @@ function checkDistraction(){
   distractionNudged[last.start] = true;
   showToast('You\'re on '+last.app+' — this time won\'t count as deep work.', {icon:'&#128064;', duration:8000});
 }
+// the status card's buttons (Break, Lock out, Back to it…) close it once they've run
+document.addEventListener('click', function(e){
+  const b = e.target.closest && e.target.closest('#activityPillMenu [data-action]');
+  if(!b || b.dataset.action==='pillSetCat') return;
+  setTimeout(function(){ ui.pillMenu = null; renderPillMenu(); updateActivityPill(); }, 0);
+});

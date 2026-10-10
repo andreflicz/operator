@@ -12,7 +12,6 @@ function renderWishlistTab(){
   const mustTotal = open.filter(function(w){ return w.priority==='high'; }).reduce(function(a,w){ return a+wishPrice(w); },0);
   return '<div class="wish-total card">'+
       '<div><div class="kpi-label">Still to buy</div><div class="wish-total-val">'+fmtMoney(total)+'</div><div class="kpi-sub">'+open.length+' item'+(open.length===1?'':'s')+(mustTotal?' &middot; '+fmtMoney(mustTotal)+' must-haves':'')+'</div></div>'+
-      '<button class="btn btn-primary" data-action="openWishItem">+ Add item</button>'+
     '</div>'+
     '<div class="wish-grid">'+(open.map(wishCard).join('') || '<div class="empty" style="grid-column:1/-1;">Nothing on the list yet.</div>')+'</div>'+
     (bought.length ? '<div class="kind-label" style="margin-top:22px;">Purchased &middot; '+bought.length+'</div><div class="wish-grid">'+bought.map(wishCard).join('')+'</div>' : '');
