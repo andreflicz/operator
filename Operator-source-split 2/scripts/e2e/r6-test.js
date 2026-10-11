@@ -36,8 +36,9 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.mouse.up(); await p.waitForTimeout(300);
     check('…and the click that follows doesn\'t run it twice', await E("ui.view")==='focus' && !p.errors.length, p.errors);
     const lineup = await p.evaluate(() => { const c = document.querySelector('.task-column.is-car'); const car = c && c.querySelector('.carousel'); const s = c && getComputedStyle(c); return c && {border:s.borderTopStyle, bleed:car.classList.contains('bleed'), loop:car.classList.contains('is-loop'), clones:c.querySelectorAll('.car-clone').length}; });
-    check('Today\'s Lineup is unboxed and runs to the window edges', lineup && lineup.border==='none' && lineup.bleed, lineup);
-    check('a long lineup loops — there\'s no end to hit', lineup && lineup.loop && lineup.clones > 0, lineup);
+    // (round 21: rows stay inside the page like the leads board, and tasks — which are in order — don't loop)
+    check('Today\'s Lineup is unboxed and stays inside the page', lineup && lineup.border==='none' && !lineup.bleed, lineup);
+    check('a lineup is in order — it doesn\'t loop', lineup && !lineup.loop && lineup.clones===0, lineup);
     const tr = '.task-column.is-car .car-track';
     const before = await p.$eval(tr, t => t.scrollLeft);
     const box = await (await p.$(tr)).boundingBox();

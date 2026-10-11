@@ -175,7 +175,8 @@ function igSectionHtml(){
   igMaybeRefresh();
   if(!c.cache) return '<div class="ig-sec"><div class="gp-loading">'+(ui.igErr ? '&#9888; '+escapeHtml(ui.igErr)+' <button class="btn btn-ghost btn-sm" data-action="igRefresh">Try again</button>' : 'Loading your Instagram…')+'</div></div>';
   const since30 = addDays(todayStr(), -30), today = todayStr();
-  return '<div class="ig-sec">'+c.accounts.map(function(a){
+  const read = typeof opRead==='function' ? opRead('social', opFactsSocial, 'Give him your read on his Instagram'+(typeof adsOn==='function' && adsOn() ? ' and his ads' : '')+': what’s working, what isn’t, and what to do next.', {angles:'social'}) : '';
+  return read+'<div class="ig-sec">'+c.accounts.map(function(a){
     const d = c.cache.data[a.id]; if(!d) return '';
     const recent = d.posts.filter(function(p){ return p.date > since30; });
     const avg = function(k){ const xs = recent.filter(function(p){ return p[k]!=null; }); return xs.length ? Math.round(xs.reduce(function(t, p){ return t + p[k]; }, 0)/xs.length) : null; };

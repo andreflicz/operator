@@ -1,7 +1,7 @@
 // ============ FITNESS (Health) ============
 // One page, no tabs: the week of training on top; then Body & Fuel together (your weight and what
-// you're eating go hand in hand) — log a weigh-in or food right there; then the history. Logging a
-// workout (or a weigh-in, or food) is the + in the corner: a small sheet, three taps.
+// you're eating go hand in hand); then the history. No log buttons on the page: logging a workout, a
+// weigh-in or food is the + in the corner — a small sheet, three taps (a go-to meal is one tap here).
 function renderFitness(){
   return '<div class="hl">'+renderWorkoutsHero()+renderBodyFuel()+
     '<div class="hl-cols">'+renderWorkoutHistory()+renderHealthLists()+'</div>'+
@@ -59,7 +59,7 @@ function renderWorkoutsHero(){
   return '<div class="card fit-hero hl-hero section">'+
       '<div class="fit-ring">'+svgRing(target ? clamp(wk/target*100,0,100) : 0, 112, hit ? 'var(--good)' : 'var(--accent)', wk+(target?'/'+target:''), 'this week')+'</div>'+
       '<div class="fit-mid"><div class="hl-k">Training</div><div class="fit-strip">'+strip+'</div>'+
-        '<div class="fit-today">'+(trainedDoneFor(todayStr()) ? '<span class="hl-ok">&#10003; Trained today</span>' : '<span>Not trained yet today</span> <button class="hl-link" data-action="healthLog" data-id="workout">Log one &#8594;</button>')+'</div></div>'+
+        '<div class="fit-today">'+(trainedDoneFor(todayStr()) ? '<span class="hl-ok">&#10003; Trained today</span>' : '<span>No workout yet today</span>')+'</div></div>'+
       '<div class="fit-stats">'+
         '<div><div class="stat-tile-v">'+weeksOnTargetStreak()+'</div><div class="stat-tile-sub">weeks on target</div></div>'+
         '<div><div class="stat-tile-v">'+fmtDurationLabel(weekMins)+'</div><div class="stat-tile-sub">trained this week</div></div>'+
@@ -199,14 +199,14 @@ function renderBodyFuel(){
         (body.bmi ? '<span class="bf-bmi" title="BMI for your height">BMI '+body.bmi.toFixed(1)+'</span>' : '')+'</div>'+
       weightSpark(log.slice(-30).map(function(r){ return Number(r.weight); }))+
       goalHtml+
-      '<div class="bf-log"><input class="input" type="number" step="0.1" id="weightValue" placeholder="'+(loggedToday ? 'Logged today — again?' : 'Today’s weight')+'"><input type="hidden" id="weightDate" value="'+todayStr()+'"><button class="btn btn-primary btn-sm" data-action="addWeight">Log</button></div>'+
+      (loggedToday ? '' : '<div class="bf-hint">Weigh in with the <b>+</b> in the corner</div>')+
     '</div>'+
     '<div class="bf-half bf-fuel">'+
       '<div class="hl-k">Fuel<span class="kpi-sub">'+today.length+' item'+(today.length===1?'':'s')+' today</span></div>'+
       '<div class="bf-fuel-top"><div class="hc-ring">'+svgRing(clamp(pct, 0, 100), 92, color, String(total), 'of '+target)+'</div>'+
         '<div class="hc-left'+(left<0?' is-over':'')+'">'+(left>=0 ? '<b>'+left+'</b> cal left today' : '<b>'+(-left)+'</b> cal over today')+'</div></div>'+
       '<div class="hc-picks">'+(picks.map(function(m){ return '<button class="hc-pick" data-action="quickMeal" data-id="'+m.id+'"><span>'+escapeHtml(m.name)+'</span><b>'+m.calories+'</b></button>'; }).join('') || '<span class="kpi-sub">Save your go-to meals below.</span>')+'</div>'+
-      '<div class="bf-log"><input class="input" id="calName" placeholder="Something else…"><input class="input bf-cal" type="number" id="calAmount" placeholder="cal"><button class="btn btn-sm" data-action="addCalorieEntry">Add</button></div>'+
+
     '</div>'+
   '</div>';
 }

@@ -332,7 +332,7 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":12}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":13}' ;;
     /hello*) printf 'open %s' "$(date +%s)" > "$DATA_DIR/page.state" 2>/dev/null; respond 200 '{"ok":true}' ;;
     /engine*)
       # Operator as its own app (its own Dock icon) or plain Chrome — from the next time it opens

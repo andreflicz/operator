@@ -45,7 +45,7 @@ function analyticsOverviewHtml(r){
       anTile('High priority', openHigh, 'still open', openHigh ? 'var(--danger)' : null)+
       anTile('Ongoing', items.filter(function(t){ return t.ongoing && t.status!=='done'; }).length, 'recurring')+
     '</div></div>'+
-    '<div class="an-card an-fit" data-action="goToFitness" title="Open Health"><div class="an-h"><span class="an-dot" style="background:#7AA2FF"></span>Fitness <small>'+label+'</small><span class="an-link">Log a workout &rarr;</span></div><div class="an-grid">'+
+    '<div class="an-card an-fit" data-action="goToFitness" title="Open Health"><div class="an-h"><span class="an-dot" style="background:#7AA2FF"></span>Fitness <small>'+label+'</small><span class="an-link">Open Health &rarr;</span></div><div class="an-grid">'+
       anTile('Workouts', wk.n, '', '#7AA2FF')+
       anTile('Time', fmtDurationLabel(wk.m), wk.n ? fmtDurationLabel(Math.round(wk.m/wk.n))+' each' : '')+
       anTile('This week', workoutTotals(weekDays(0)).n, (state.profile.weeklyWorkoutTarget ? 'of '+state.profile.weeklyWorkoutTarget+' planned' : ''))+
@@ -90,7 +90,10 @@ function renderFocusAnalyticsTab(){
   else if(r==='week') body = renderAnalyticsWeek(0);
   else if(r==='lastweek') body = renderAnalyticsWeek(-1);
   else body = renderAnalyticsAllTime();
-  return '<div class="subtab-panel" data-key="analytics-'+r+'">'+analyticsOverviewHtml(r)+body+recentSessionsHtml()+'</div>'+
+  // Op's read on the period (a quiet line, made once a day — ↻ for another take)
+  const days = r==='today' ? 7 : r==='alltime' || r==='all' ? 30 : 7, off = r==='lastweek' ? Math.max(0, (new Date().getDay()+6)%7 + 1) : 0;
+  const read = typeof opRead==='function' ? opRead('analytics:'+r, function(){ return opFactsWork(days, off); }, r==='today' ? 'Give him your read on how his work has been going this past week, with today in view.' : r==='lastweek' ? 'Give him your read on last week’s work.' : r==='week' ? 'Give him your read on this week’s work so far.' : 'Give him your read on the last month of work.', {angles:'work', triad:true}) : '';
+  return '<div class="subtab-panel" data-key="analytics-'+r+'">'+read+analyticsOverviewHtml(r)+body+recentSessionsHtml()+'</div>'+
     '<div class="section" style="margin-top:16px;">'+renderManualLogForm()+'</div>';
 }
 

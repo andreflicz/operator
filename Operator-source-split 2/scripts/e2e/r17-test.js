@@ -228,12 +228,14 @@ const newsRoute = (asked, extra) => async r => {
     check('it answers in the bubble — the page doesn’t move', /Start with the reel/.test(await p.textContent('#opBubText')));
     // (round 20: the cheapest model — Claude Haiku 5.5 — with thinking off and low effort for short spoken answers)
     check('the cheapest model is used: Claude Haiku 5.5 (from the API’s list)', chatBody && chatBody.model==='claude-haiku-5-5', chatBody && chatBody.model);
-    check('…with thinking off and low effort (a spoken one-liner)', chatBody && chatBody.thinking && chatBody.thinking.type==='disabled' && chatBody.output_config && chatBody.output_config.effort==='low' && chatBody.max_tokens===300);
-    check('it knows your day (plan, level) and speaks in short spoken sentences', chatBody && /Edit JJS reel/.test(chatBody.system) && /level 0/.test(chatBody.system) && /spoken out loud/.test(chatBody.system) && chatBody.messages.slice(-1)[0].content==='What should I start with?');
+    check('…with thinking off and low effort (a spoken one-liner)', chatBody && chatBody.thinking && chatBody.thinking.type==='disabled' && chatBody.output_config && chatBody.output_config.effort==='low' && chatBody.max_tokens===700);
+    const sysTxt = chatBody ? JSON.stringify(chatBody.system) : '';   // (round 21: Op's personality, then the background)
+    check('it knows your day (plan, level) and speaks in short spoken sentences', chatBody && /Edit JJS reel/.test(sysTxt) && /level 0/.test(sysTxt) && /spoken aloud/.test(sysTxt) && chatBody.messages.slice(-1)[0].content==='What should I start with?');
     await p.fill('#opBubInput', 'And after that?'); await p.press('#opBubInput', 'Enter'); await p.waitForTimeout(900);
     check('…and remembers the conversation', chatBody && chatBody.messages.length===3 && chatBody.messages[1].role==='assistant');
     // the keys
-    await E("endBriefing(); ui.view='settings'; ui.settingsTab='operator'; renderView()"); await p.waitForTimeout(300);
+    // (round 21: once Op has talked, it knows a key is saved — forget it here to see the fields)
+    await E("endBriefing(); AI.hasKey = false; ui.view='settings'; ui.settingsTab='operator'; renderView()"); await p.waitForTimeout(300);
     await E("wakeCfg().voice = true; renderView()"); await p.waitForTimeout(400);
     const hasFields = await p.$('#aiKey')!==null && await p.$('#opElevenKey')!==null;
     check('Settings → Connections & data: an ElevenLabs key and an Anthropic key, each saved by the launcher', hasFields);
@@ -260,7 +262,8 @@ const newsRoute = (asked, extra) => async r => {
     const x = JSON.parse(await E("JSON.stringify((function(){ const s = xpSummaryFresh(); return {total:s.total, level:s.level, rank:s.rank, mrrXp:s.mrrXp, start:s.start, ovr:s.ovr, items:s.today.map(i=>i.k), hlt:s.attrs.HLT.v, todaySum:s.todayXp}; })())"));
     check('everyone starts at 0 — history before the first day doesn’t count, only what you do from here', x.start==='2026-10-12' && x.total===x.todaySum && x.rank===0, x);
     check('rank 0 is "Locked In"', await E("RANKS[0].name")==='Locked In');
-    check('levels are slow: level 1 is 1,000 XP (a good week), level 10 is 16,750', await E("xpForLevel(1)")===1000 && await E("xpForLevel(10)")===16750 && await E("xpLevelOf(999)")===0 && await E("xpLevelOf(1000)")===1);
+    // (round 21: levels like a ranked game — quicker at the start, 100 at the top)
+    check('levels: level 1 is 400 XP, level 10 is 6,700, 100 is the top', await E("xpForLevel(1)")===400 && await E("xpForLevel(10)")===6700 && await E("xpLevelOf(399)")===0 && await E("xpLevelOf(400)")===1 && await E("xpLevelOf(1e9)")===100);
     check('training counts big (first workouts +150)', x.items.includes('workout'), x);
     await E("state.business.clients[0].mrr = 5000; xpLast = null");
     check('MRR you add is XP (800 per $1k above where you started)', JSON.parse(await E("xpSummaryFresh().mrrXp"))===1600);

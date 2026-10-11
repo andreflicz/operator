@@ -106,8 +106,9 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
     await p.setViewportSize({width:2000, height:1000});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("ui.view='focus'; renderView()"); await p.waitForTimeout(700);
-    const g = await p.evaluate(() => { const c = document.querySelector('.carousel.bleed'), v = document.getElementById('viewRoot'), m = v.parentElement; const a = c.getBoundingClientRect(), r = v.getBoundingClientRect(), mm = m.getBoundingClientRect(); return {cl:a.left, cr:a.right, vl:r.left, vr:r.right, ml:mm.left, mr:mm.right - (m.offsetWidth - m.clientWidth)}; });
-    check('carousel rows run past the 1400px column to the window edges', g.cl <= g.ml + 1 && g.cr >= g.mr - 1 && g.vl - g.cl > 100, g);
+    // (round 21: rows stay inside the page column, like the leads board — no card cut at the window edge)
+    const g = await p.evaluate(() => { const c = document.querySelector('.carousel.is-sized'), v = document.getElementById('viewRoot'); const a = c.getBoundingClientRect(), r = v.getBoundingClientRect(); return {cl:a.left, cr:a.right, vl:r.left, vr:r.right}; });
+    check('carousel rows stay inside the page column', g.cl >= g.vl - 1 && g.cr <= g.vr + 1, g);
     check('no page errors (carousels)', p.errors.length===0, p.errors);
     await p.context().close();
   }

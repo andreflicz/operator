@@ -63,7 +63,8 @@ async function ctxPage(b, seed, opts){
     check('Morning & Alarms: the wake-up card and the other alarms', await p.isVisible('#wakeSettingsSection') && await p.isVisible('#alarmsSettingsSection'));
     await E("ui.settingsTab='system'; renderView()"); await p.waitForTimeout(600);
     check('Connections & data → The Operator: the app, the voice keys, the Anthropic key', await p.isVisible('#opAppCard') && await p.isVisible('#opVoiceSet') && await p.isVisible('#aiKey') && (await p.$$('#aiKey')).length===1);
-    check('…with the own-app switch (Operator / Google Chrome)', /Operator/.test(await p.textContent('#opAppCard')) && await p.isVisible('[data-action="opEngineSwitch"][data-id="0"]'));
+    // (round 21: always its own app — no Google Chrome option)
+    check('…always its own app (no Google Chrome option)', /Operator/.test(await p.textContent('#opAppCard')) && await p.$('[data-action="opEngineSwitch"][data-id="0"]')===null);
     await E("openWakeSetup()"); await p.waitForTimeout(300);
     check('the alarm set-up just points to the voice settings', !(await p.$('#wakeSetupContent #opVoiceSet')) && await p.isVisible('#wakeSetupContent [data-action="goToOperatorSettings"]'));
     check('no page errors (settings)', p.errors.length===0, p.errors);
@@ -109,11 +110,12 @@ async function ctxPage(b, seed, opts){
     check('…and it waits in the notifications', await E("notifList().some(n=>n.key==='lvl:1')"));
     await p.click('.you .lvl-up-btn'); await p.waitForTimeout(400);
     check('pressing it: level 1, and the fire', await E("state.profile.xpLevel")===1 && await p.isVisible('#lvlFx') && /LEVEL UP/.test(await p.textContent('#lvlFx')));
-    check('higher levels burn bigger: more rings, a new colour', await E("levelUpFx(12, null); document.querySelectorAll('#lvlFx .lvl-rings i').length")===5 && await E("document.getElementById('lvlFx').className").then(c => /tier-3/.test(c)));
+    check('higher levels burn bigger: more rings, a new colour', await E("levelUpFx(36, null); document.querySelectorAll('#lvlFx .lvl-rings i').length")===6 && await E("document.getElementById('lvlFx').className").then(c => /tier-2/.test(c)));
     await E("document.getElementById('lvlFx').remove()");
     // the gate: level 3 is a rank's level — it needs Health 40 (no height and weight here)
     await E("state.profile.xpLevel = 2; state.business.clients[0].mrr = 6000; persist('business'); xpLast = null; renderView()"); await p.waitForTimeout(300);
-    check('at a rank’s level without the Health: no button — the caution sign', await E("xpSummary().canLevel")===false && /Health 40/.test(await p.textContent('.xp-caution')));
+    // (round 21: nothing gates a level — the rank asks for the MRR and the Health instead)
+    check('a rank’s level without the Health: the level is still yours to claim; the rank waits', await E("xpSummary().canLevel")===true && await E("xpSummary().rank")===0 && await E("xpSummary().needs.some(n => /Health/.test(n))"));
     await p.click('.you-q'); await p.waitForTimeout(300);
     check('? opens the XP guide — its own page, with charts', await p.isVisible('#xpHowOverlay .xpg') && (await p.$$('#xpHowOverlay .xpg-chart')).length>=5 && /Finishing tasks/.test(await p.textContent('#xpHowOverlay')));
     await E("ACTIONS.closeXpHow()");

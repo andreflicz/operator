@@ -193,7 +193,7 @@ function renderSettings(){
     {id:'morning', label:'Morning & Alarms', icon:'&#9200;', parts:[['morning','']]},
     {id:'look', label:'Look & Sound', icon:'&#127912;', parts:[['display','Appearance'],['sound','Sound']]},
     {id:'work', label:'Business & Calendar', icon:'&#9635;', parts:[['business','Business'],['calendarJournal','Calendar & journal']]},
-    {id:'system', label:'Connections & Data', icon:'&#128279;', parts:[['operator','The Operator'],['integrations','Integrations'],['data','Your data'],['updates','App updates']]}
+    {id:'system', label:'Connections & Data', icon:'&#128279;', parts:[['operator','Op &amp; the app'],['integrations','Integrations'],['data','Your data'],['updates','App updates']]}
   ];
   const want = ui.settingsTab==='general' ? 'you' : (ui.settingsTab || 'you');
   const grp = groups.find(function(g){ return g.id===want || g.parts.some(function(x){ return x[0]===want; }); }) || groups[0];

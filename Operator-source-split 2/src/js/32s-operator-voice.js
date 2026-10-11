@@ -9,7 +9,9 @@
 //   "eleven"  ElevenLabs, the most natural; the key is saved by the Operator app on this Mac only
 //             (never in Operator's data, exports or backups)
 //   "browser" the browser's built-in voices (what it falls back to when the app can't speak)
-// What it says is put together from your data (no AI service).
+// What it says is put together from your data; with an Anthropic key, Op (32x-op.js) words it itself.
+// It talks a touch quicker than the voice's natural pace (Speed in the voice settings).
+function opSpeed(){ const v = Number(wakeCfg().voiceSpeed); return v >= 0.9 && v <= 1.3 ? v : 1.1; }
 const OV = {speaking:false, pending:false, broken:false, helperDown:false, idx:-1, voice:null, cap:null, token:0, audio:null};
 function opEngine(){ const e = wakeCfg().voiceEngine; return e==='mac' || e==='browser' ? e : 'eleven'; }
 function opUseHelper(){ return opEngine()!=='browser' && !OV.helperDown; }
@@ -82,7 +84,7 @@ function opBubShow(){
     b = document.createElement('div'); b.id = 'opBub'; b.className = 'op-bub';
     b.innerHTML = '<div class="op-bub-h"><span class="op-bub-dot"></span><b>OPERATOR</b><button class="op-bub-x" data-action="opBubClose" title="Close">&#10005;</button></div>'+
       '<div class="op-bub-t" id="opBubText"></div>'+
-      '<div class="op-bub-in"><input class="op-type" id="opBubInput" placeholder="Ask the Operator…" autocomplete="off"><button class="op-talk" data-action="opTalk" title="Talk (mic)">&#127897;&#65039;</button></div>';
+      '<div class="op-bub-in"><input class="op-type" id="opBubInput" placeholder="Ask Op…" autocomplete="off"><button class="op-talk" data-action="opTalk" title="Talk (mic)">&#127897;&#65039;</button></div>';
     document.body.appendChild(b);
     b.addEventListener('mouseenter', function(){ b._hover = true; clearTimeout(opBubHideLater._t); });
     b.addEventListener('mouseleave', function(){ b._hover = false; opBubHideLater(); });
@@ -165,7 +167,7 @@ function opSayAudio(said, opts, tok, resolve){
     }
     return r.blob().then(function(b){
       if(settled) return;
-      url = URL.createObjectURL(b); a = new Audio(url); OV.audio = a;
+      url = URL.createObjectURL(b); a = new Audio(url); OV.audio = a; a.preservesPitch = true; a.playbackRate = opSpeed();
       a.addEventListener('playing', function(){
         if(started || settled) return; started = true; clearTimeout(startT);
         if(tok!==OV.token){ try{ a.pause(); }catch(e){} finish(false); return; }
@@ -186,14 +188,14 @@ function opSayBrowser(said, opts, tok, resolve){
   if(!opBrowserOk()){ OV.pending = false; resolve(false); return; }
   const u = new SpeechSynthesisUtterance(said);
   const v = opPickVoice(); if(v){ u.voice = v; u.lang = v.lang; }
-  u.rate = 0.98; u.pitch = 1; u.volume = 1;
+  u.rate = 0.98*opSpeed(); u.pitch = 1; u.volume = 1;
   let gotBoundary = false, t0 = 0, est = null;
   OV.pending = true;
   // (a voice can take a few seconds to wake up the first time; only give up on it after two misses)
   const startTimer = setTimeout(function(){ if(OV.pending && tok===OV.token){ OV.pending = false; OV.misses = (OV.misses||0) + 1; if(OV.misses >= 2) OV.broken = true; try{ speechSynthesis.cancel(); }catch(e){} opCaption(said); resolve(false); } }, 6000);
   u.onstart = function(){ clearTimeout(startTimer); OV.misses = 0; t0 = Date.now(); opStarted(tok, opts);
     // some voices don't report word boundaries: follow along by time instead
-    est = setInterval(function(){ if(gotBoundary || tok!==OV.token) return; const words = said.split(' '), n = Math.min(words.length, Math.floor((Date.now()-t0)/330)+1); opCaption(words.slice(0, n).join(' ')); }, 120); };
+    est = setInterval(function(){ if(gotBoundary || tok!==OV.token) return; const words = said.split(' '), n = Math.min(words.length, Math.floor((Date.now()-t0)/(330/opSpeed()))+1); opCaption(words.slice(0, n).join(' ')); }, 120); };
   u.onboundary = function(e){ if(tok!==OV.token) return; gotBoundary = true; const end = said.indexOf(' ', e.charIndex + (e.charLength||1)); opCaption(end<0 ? said : said.slice(0, end)); };
   const done = function(ok){ clearTimeout(startTimer); clearInterval(est); opFinished(tok, said); resolve(ok); };
   u.onend = function(){ done(true); };
@@ -291,8 +293,7 @@ function opNewsScript(kind){
 function opBusinessScript(){
   const plan = typeof todaysPlan==='function' ? todaysPlan().filter(function(t){ return t.status!=='done'; }) : [];
   const today = todayStr(), events = state.calendar.events.filter(function(e){ return e.date===today && e.time; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
-  const target = state.standards.deepWorkTargetMinutes || 180, yDeep = deepWorkMinutesFor(addDays(today, -1));
-  const dow = new Date().getDay(), yWork = typeof isWorkDay==='function' ? isWorkDay(addDays(today, -1)) : dow!==1 && dow!==0;
+  const dow = new Date().getDay();
   const parts = [];
   if(!plan.length) parts.push('Nothing’s lined up yet — pick your first move when you lock in.');
   else if(plan.length===1) parts.push('Today it’s just one thing: '+plan[0].title+'.');
@@ -302,14 +303,12 @@ function opBusinessScript(){
   }
   if(events.length) parts.push(events.length===1 ? 'And '+events[0].title+' at '+fmt12Hour(events[0].time)+'.' : 'On the calendar: '+listSay(events.slice(0, 2).map(function(e){ return e.title+' at '+fmt12Hour(e.time); }))+'.');
   if(nightNote().work) parts.push('You left yourself a note, too — it’s on the screen.');
+  // (no word on yesterday's hours — it's a brief about today, not a report card)
   let end;
   if(dow===1) end = 'Let’s start the week strong.';
   else if(dow===5) end = 'Let’s finish the week strong.';
-  else if(yWork && yDeep < target*0.6) end = pickOne(['Yesterday was a little light, so let’s get more in today.', 'We came up short yesterday. Let’s try to do more work today.']);
-  else if(yWork && yDeep >= target) end = pickOne(['You hit your number yesterday — let’s do it again.', 'Strong day yesterday. Same again.']);
   else if(dow===0 || dow===6) end = 'Weekend work counts double. Let’s keep it tight.';
-  else if(dow===3) end = 'Middle of the week. Keep the momentum.';
-  else end = pickOne(['Let’s get to it.', 'Let’s have a good one.', 'Let’s make it count.']);
+  else end = pickOne(['Let’s get to it.', 'Let’s have a good one.', 'Let’s make it count.', 'Your move.']);
   parts.push(end);
   return parts.join(' ');
 }
@@ -327,7 +326,18 @@ ACTIONS.opAsk = async function(el, e, id){
     if(t){ OV.cap = cap; opCaption('One moment…'); const got = await wait(fetchNews(t.q)); if(got && got.length && ui.morningNews){ ui.morningNews.sec = ui.morningNews.sec || {}; ui.morningNews.sec.tech = got; } }
   }
   if(tok!==OV.token) return; // you asked for something else meanwhile
-  const s = id==='sports' ? opSportsScript() : id==='news' ? opNewsScript('top') : id==='tech' ? opNewsScript('tech') : opBusinessScript();
+  let s = id==='sports' ? opSportsScript() : id==='news' ? opNewsScript('top') : id==='tech' ? opNewsScript('tech') : opBusinessScript();
+  // with a key, Op says it in its own words (same facts, a fresh take each time)
+  if(typeof opComposed==='function' && AI.hasKey===true){
+    OV.cap = cap; opCaption('…');
+    const nw = ui.morningNews || {};
+    const facts = id==='sports' ? s+(arr(nw.sec && nw.sec.sports).length ? '\nSports headlines: '+arr(nw.sec.sports).slice(0, 4).map(function(n){ return sayHeadline(n.title); }).join(' | ') : '')
+      : id==='news' ? arr(nw.items).slice(0, 8).map(function(n){ return '- '+sayHeadline(n.title)+(n.local ? ' (local, '+n.local+')' : ''); }).concat(arr(nw.sec && nw.sec.local).slice(0, 2).map(function(n){ return '- '+sayHeadline(n.title)+' (local)'; })).join('\n')
+      : id==='tech' ? arr(nw.sec && nw.sec.tech).slice(0, 6).map(function(n){ return '- '+sayHeadline(n.title); }).join('\n') : s;
+    const t = await Promise.race([opComposed(id, facts), new Promise(function(r){ setTimeout(r, 12000); })]);
+    if(tok!==OV.token) return;
+    if(t) s = t;
+  }
   if(!opVoiceOn()){ OV.cap = cap; opCaption(s); return; }
   opSay(s, {cap:cap});
 };
@@ -335,7 +345,7 @@ ACTIONS.opMute = function(){ const w = wakeCfg(); w.voice = w.voice===false; per
 // the mute lives in the top bar of Good morning and the work preview
 function opMuteHtml(){
   const off = wakeCfg().voice===false;
-  return '<button class="op-mute-top'+(off?' is-off':'')+'" data-action="opMute" title="'+(off ? 'Turn the Operator’s voice on' : 'Mute the Operator')+'">'+(off ? '&#128263;' : '&#128266;')+'</button>';
+  return '<button class="op-mute-top'+(off?' is-off':'')+'" data-action="opMute" title="'+(off ? 'Turn Op’s voice on' : 'Mute Op')+'">'+(off ? '&#128263;' : '&#128266;')+'</button>';
 }
 function opAskHtml(where){
   const chip = function(id, icon, label){ return '<button class="op-ask" data-action="opAsk" data-id="'+id+'">'+icon+' '+label+'</button>'; };
@@ -346,9 +356,16 @@ function opAskHtml(where){
     '</div>';
 }
 // the business brief plays by itself when you go straight from Good morning to work
-function opAutoBusinessBrief(){ if(!opVoiceOn()) return; setTimeout(function(){ if(overlayOpen('planOverlay')) { opStop(); opSay(opBusinessScript(), {cap:'opBubText'}); } }, 900); }
+function opAutoBusinessBrief(){
+  if(!opVoiceOn()) return;
+  const tok = OV.token;
+  const say = function(t){ if(overlayOpen('planOverlay') && tok===OV.token){ opStop(); opSay(t, {cap:'opBubText'}); } };
+  if(typeof opComposed==='function' && AI.hasKey===true){
+    Promise.race([opComposed('business', opBusinessScript()), new Promise(function(r){ setTimeout(r, 6000); })]).then(function(t){ say(t || opBusinessScript()); });
+  } else setTimeout(function(){ say(opBusinessScript()); }, 900);
+}
 
-// ---- choosing the voice (in the alarm settings, under "The Operator's voice") ----
+// ---- choosing the voice (in the alarm settings, under "Op's voice") ----
 const ELEVEN_VOICES = [['JBFqnCBsd6RMkjVDRZzb', 'George — British, warm (the butler)'], ['onwK4e9ZLuTAKqWW03F9', 'Daniel — British, crisp'], ['nPczCjzI2devNBz1zQrb', 'Brian — deep, American']];
 function opLoadMacVoices(){
   if(ui.ttsVoices && ui.ttsVoices.at && Date.now() - ui.ttsVoices.at < 60000) return;
@@ -385,8 +402,10 @@ function opVoiceSettingsHtml(){
   }
   return '<div class="field op-set" id="opVoiceSet">'+
     '<div class="seg-tabs" style="margin:0 0 8px;">'+seg('eleven', 'ElevenLabs')+seg('mac', 'Mac voice')+seg('browser', 'Browser')+'</div>'+body+
+    '<div class="op-set-speed"><span>Speed</span><div class="seg-tabs" style="margin:0;">'+[[1, 'Natural'], [1.1, 'Brisk'], [1.2, 'Quick']].map(function(o){ return '<button class="seg-tab'+(Math.abs(opSpeed()-o[0]) < .01 ? ' active' : '')+'" data-action="opSpeedSet" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
     '<div class="op-set-test"><button class="btn btn-sm" data-action="opTest">&#9654; Test the voice</button><span id="opTestCap" class="op-set-cap"></span></div></div>';
 }
+ACTIONS.opSpeedSet = function(el, e, id){ wakeCfg().voiceSpeed = Number(id) || 1.1; persist('focus'); renderView(); };
 function opVoiceChanged(){ OV.voice = null; OV.helperDown = false; OV.broken = false; OV.elevenErr = null; persist('focus'); }
 ACTIONS.opEngineSet = function(el, e, id){ wakeCfg().voiceEngine = id; opStop(); opVoiceChanged(); ui.ttsVoices = null; renderView(); };
 ACTIONS.opTest = function(){
@@ -394,7 +413,7 @@ ACTIONS.opTest = function(){
   const name = state.profile.name || '';
   const h = new Date().getHours(), greet = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
   const w = wakeCfg(), was = w.voice; w.voice = true;
-  opSay(greet+(name ? ', '+name : '')+'. Everything’s in order — your plan is set, and the coffee won’t make itself. Ready when you are.', {cap:'opTestCap'}).then(function(ok){
+  opSay(greet+(name ? ', '+name : '')+'. Op here. Everything’s in order — your plan is set, and the coffee won’t make itself. Ready when you are.', {cap:'opTestCap'}).then(function(ok){
     w.voice = was;
     if(opEngine()==='eleven' && OV.elevenErr) showToast((ok ? 'That was the Mac’s voice — ' : 'Couldn’t use ElevenLabs — ')+OV.elevenErr, {icon:'&#9888;', duration:14000});
     else if(!ok) showToast('Couldn’t speak — '+(opEngine()==='browser' ? 'no voice is available.' : 'the Operator app didn’t answer.'), {icon:'&#9888;'});
@@ -421,144 +440,22 @@ document.addEventListener('change', function(e){
   else if(t.id==='opElevenCustom'){ w.elevenVoice = t.value.replace(/[^0-9a-zA-Z]/g, ''); opVoiceChanged(); }
 });
 
-// ============ TALK TO THE OPERATOR ============
-// Press the mic (or type), say anything — "what's my day look like", "how am I doing this week",
-// "give me a reason to get up" — and it answers out loud. Your words go to Claude through the
-// Operator app (the API key lives only in the app's own file on this Mac), with a short summary of
-// your day so it knows what it's talking about. It remembers the conversation until you close Operator.
-const AI = {busy:false, listening:false, rec:null, model:null, history:[], hasKey:null};
-function aiContext(){
-  const today = todayStr(), lines = [];
-  const plan = typeof todaysPlan==='function' ? todaysPlan() : [];
-  const left = plan.filter(function(t){ return t.status!=='done'; }), done = plan.filter(function(t){ return t.status==='done'; });
-  const ev = state.calendar.events.filter(function(e){ return e.date===today; });
-  const target = state.standards.deepWorkTargetMinutes || 180;
-  lines.push('Plan today: '+(left.length ? left.map(function(t){ return t.title; }).join('; ') : 'nothing lined up')+(done.length ? ' (done: '+done.map(function(t){ return t.title; }).join('; ')+')' : '')+'.');
-  if(ev.length) lines.push('Calendar: '+ev.map(function(e){ return (e.time ? fmt12Hour(e.time)+' ' : '')+e.title; }).join('; ')+'.');
-  lines.push('Deep work today '+fmtDurationLabel(deepWorkMinutesTodayLive())+' (target '+fmtDurationLabel(target)+'), yesterday '+fmtDurationLabel(deepWorkMinutesFor(addDays(today, -1)))+'. Streak '+computeStreak()+' days.');
-  const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
-  lines.push('Business: MRR '+money(xpMrr())+(state.profile.revenueGoalMonthly ? ' (goal '+money(state.profile.revenueGoalMonthly)+')' : '')+', '+cs.length+' active clients, '+arr(state.business.pipeline).filter(leadIsOpen).length+' open leads.');
-  if(typeof xpSummary==='function'){ const x = xpSummary(); lines.push('Game: level '+x.level+', rank '+x.rank+' "'+RANKS[x.rank].name+'", overall '+x.ovr+' (Business '+x.attrs.BUS.v+', Personal '+x.attrs.PER.v+', Health '+x.attrs.HLT.v+', Discipline '+x.attrs.DIS.v+').'); }
-  if(typeof tierGoals==='function'){
-    const gl = function(kind){ return tierGoals(kind, periodKey(kind)).map(function(g){ return (g.done ? '[done] ' : '')+g.label; }).join('; '); };
-    const wg = gl('week'), mg = gl('month'), m = periodRec('month', monthKey()) || {};
-    if(wg || mg) lines.push('Check-ins — this week’s goals: '+(wg || 'none set')+'. This month’s goals: '+(mg || 'none set')+(m.habit ? '. Habit he’s beating this month: '+m.habit : '')+'.');
-    const due = checkoutDue(); if(due.length) lines.push('Due: check out of '+due.map(function(c){ return c.kind==='month' ? monthName(c.key) : 'the week'; }).join(' and ')+'.');
-  }
-  if(typeof xpSummary==='function'){ const x = xpSummary(); lines.push('XP: '+x.total.toLocaleString()+' total, '+Math.max(0, x.levelHi - x.total).toLocaleString()+' to level '+(x.level+1)+(x.canLevel ? ' (level up is ready to claim)' : '')+'.'); }
-  const wx = typeof wxNow==='function' ? wxNow() : null; if(wx) lines.push('Weather: '+wx.temp+'° and '+wxLabel(wx.code).toLowerCase()+(wx.hi!=null ? ', high '+wx.hi+'°' : '')+'.');
-  const nw = ui.morningNews; if(nw && nw.items) lines.push('Headlines: '+arr(nw.items).slice(0, 5).map(function(n){ return sayHeadline(n.title); }).join(' | ')+'.');
-  if(nw && nw.sec && nw.sec.tech) lines.push('Tech: '+arr(nw.sec.tech).slice(0, 3).map(function(n){ return sayHeadline(n.title); }).join(' | ')+'.');
-  const sp = typeof scoresSpoken==='function' ? scoresSpoken() : ''; if(sp) lines.push('Sports: '+sp);
-  return lines.join('\n');
-}
-function aiSystem(){
-  const name = state.profile.name || 'the user', now = new Date();
-  return 'You are the Operator — the voice inside '+name+'’s Operator app. Think Jarvis: a calm, sharp, warm butler with a dry wit, '+
-    'completely on '+name+'’s side. He is an entrepreneur building his business, and he wants to stay consistent, stay locked in and not slip into brain fog. '+
-    'Everything you write is spoken out loud: answer in one to four short sentences with a natural rhythm. No lists, no markdown, no emoji, no headings. '+
-    'Be direct and specific to his day; encourage without being cheesy; use his name only now and then. If you don’t know something, say so in a sentence.\n\n'+
-    'It is '+now.toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+', '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'.\n'+
-    'What you know right now:\n'+aiContext();
-}
-async function aiPickModel(){
-  if(AI.model) return AI.model;
-  const r = await fetchWithin(WAKE_HELPER+'ai/models', 15000);
-  if(!r || !r.ok) return null;
-  let j = null; try{ j = await r.json(); }catch(e){}
-  const ids = arr(j && j.data).map(function(m){ return m.id; });
-  // the cheapest: Claude Haiku 5.5 ($0.10 / $0.50 per million tokens — a short spoken answer costs a
-  // fraction of a cent). If the key can't see it: any other Haiku, then a Sonnet, then whatever there is.
-  AI.model = ids.find(function(id){ return id==='claude-haiku-5-5'; }) || ids.find(function(id){ return /haiku/i.test(id); }) || ids.find(function(id){ return /sonnet/i.test(id); }) || ids[0] || null;
-  return AI.model;
-}
-async function aiAsk(text, cap){
-  text = String(text||'').trim(); if(!text || AI.busy) return;
-  AI.busy = true; opStop(); OV.idx = 999; OV.cap = cap; opCaption('…');
-  aiUiRefresh();
-  try{
-    const model = await aiPickModel();
-    if(!model){ AI.hasKey = false; opCaption('To talk with me, add an Anthropic API key in Settings → Connections &amp; data → The Operator.'); return; }
-    AI.history.push({role:'user', content:text});
-    AI.history = AI.history.slice(-12);
-    const req = {model:model, max_tokens:300, system:aiSystem(), messages:AI.history};
-    // Haiku 5.5 thinks by default (billed, and it eats into the 300-token reply): for a spoken one-liner,
-    // no thinking and low effort — cheaper and quicker. (Older models reject these, so only for it.)
-    if(model==='claude-haiku-5-5'){ req.thinking = {type:'disabled'}; req.output_config = {effort:'low'}; }
-    const body = JSON.stringify(req);
-    const r = await fetchWithin(WAKE_HELPER+'ai/chat?b='+hexUtf8(body), 50000);
-    let j = null; try{ j = r ? await r.json() : null; }catch(e){}
-    const reply = j && arr(j.content).filter(function(c){ return c.type==='text'; }).map(function(c){ return c.text; }).join(' ').trim();
-    if(!reply){ AI.history.pop(); opCaption(r && r.status===401 ? 'To talk with me, add an Anthropic API key in Settings → Connections &amp; data → The Operator.' : 'I couldn’t reach my brain just now — '+((j && j.error && j.error.message) || 'the Operator app didn’t answer')+'.'); return; }
-    AI.history.push({role:'assistant', content:reply});
-    if(opVoiceOn()) await opSay(reply, {cap:cap}); else opCaption(reply);
-  } finally { AI.busy = false; aiUiRefresh(); }
-}
-// the mic: Chrome's speech recognition; it stops by itself when you stop talking
-function aiCanHear(){ return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
-function aiListen(cap){
-  if(AI.listening){ try{ AI.rec.stop(); }catch(e){} return; }
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR){ aiTypeFocus(); return; }
-  opStop();
-  const rec = new SR(); AI.rec = rec;
-  rec.lang = navigator.language || 'en-US'; rec.interimResults = true; rec.continuous = false;
-  let said = '';
-  OV.cap = cap;
-  rec.onstart = function(){ AI.listening = true; opCaption('Listening…'); aiUiRefresh(); };
-  rec.onresult = function(e){ let s = ''; for(let i=0;i<e.results.length;i++) s += e.results[i][0].transcript; said = s; opCaption('“'+s+'”'); };
-  rec.onerror = function(e){ AI.listening = false; aiUiRefresh(); opCaption(e && e.error==='not-allowed' ? 'I need the microphone — allow it when Chrome asks (or type instead).' : e && e.error==='no-speech' ? 'Didn’t catch that.' : 'The mic isn’t working — type instead.'); };
-  rec.onend = function(){ AI.listening = false; aiUiRefresh(); if(said.trim()) aiAsk(said, cap); };
-  try{ rec.start(); }catch(e){ AI.listening = false; aiTypeFocus(); }
-}
-function aiTypeFocus(){ OV.cap = 'opBubText'; opBubShow(); const i = document.getElementById('opBubInput'); if(i) setTimeout(function(){ i.focus(); }, 60); }
-function aiUiRefresh(){
-  document.querySelectorAll('.op-talk').forEach(function(b){ b.classList.toggle('is-on', AI.listening); b.classList.toggle('is-busy', AI.busy); });
-}
-function aiCapFor(){ return 'opBubText'; }
-ACTIONS.opTalk = function(el){ OV.cap = 'opBubText'; opBubShow(); aiListen('opBubText'); };
-document.addEventListener('keydown', function(e){
-  const t = e.target; if(!t || !t.classList || !t.classList.contains('op-type') || e.key!=='Enter') return;
-  e.preventDefault(); const v = t.value; t.value = ''; aiAsk(v, aiCapFor(t));
-});
-function aiTalkHtml(){
-  return '<button class="op-talk" data-action="opTalk" title="Talk to the Operator">&#127897;&#65039;</button>';
-}
-// the key: straight to the Operator app, never into Operator's data
-ACTIONS.aiKeySave = function(){
-  const i = document.getElementById('aiKey'), v = i ? i.value.trim() : '';
-  if(!v){ if(i) i.focus(); return; }
-  if(i) i.value = '';
-  fetchWithin(WAKE_HELPER+'ai/key?t='+hexUtf8(v), 6000).then(function(r){
-    if(r && r.ok){ AI.hasKey = true; AI.model = null; showToast('Anthropic key saved on this Mac. Say hello.', {icon:'&#128274;'}); renderView(); }
-    else opLauncherWhy().then(function(why){ showToast('Couldn’t save the key — '+why, {icon:'&#9888;', duration:10000}); });
-  });
-};
-ACTIONS.aiKeyForget = function(){ fetchWithin(WAKE_HELPER+'ai/forget', 6000).then(function(){ AI.hasKey = false; AI.model = null; renderView(); }); };
-function aiKeyHtml(){
-  if(AI.hasKey==null){ AI.hasKey = false; fetchWithin(WAKE_HELPER+'ai/status', 6000).then(function(r){ return r && r.ok ? r.json() : null; }).then(function(j){ AI.hasKey = !!(j && j.hasKey); if(AI.hasKey && (document.getElementById('opVoiceSet') || document.getElementById('opAppCard'))) renderView(); }).catch(function(){}); }
-  return '<div class="field op-set"><label>Talk to it'+tip('Press the mic on Good morning, the work preview or the minimal Focus page and just talk. The answers come from Claude; the key is saved by the Operator app on this Mac only — not in Operator’s data, exports or backups.')+'</label>'+
-    (AI.hasKey ? '<div class="op-set-key"><span>&#128274; Anthropic key saved on this Mac</span><button class="btn btn-ghost btn-sm" data-action="aiKeyForget">Remove key</button></div>'
-      : '<div class="op-set-key"><input class="input" type="password" id="aiKey" placeholder="Anthropic API key (sk-ant-…)" autocomplete="off"><button class="btn btn-sm btn-primary" data-action="aiKeySave">Save key</button></div>')+
-    '<div class="op-set-help">Get a key at console.anthropic.com → API keys.</div></div>';
-}
-
-// ---- Settings → Connections & data → The Operator: its voice, talking to it, and the app itself ----
+// (talking to Op — the AI — lives in 32x-op.js)
+// ---- Settings → Connections & data → Op: the AI, its voice, and the app itself ----
 function operatorSettingsHtml(){
   return operatorAppCardHtml()+
-    '<div class="card section op-settings"><div class="section-title">&#127908; Voice'+tip('Good morning, the work brief and the answers when you talk to it. Turn the voice on or off in the alarm settings (Morning & Alarms).')+'</div>'+
-      opVoiceSettingsHtml()+'</div>'+
-    '<div class="card section op-settings"><div class="section-title">&#128172; Talk to it</div>'+aiKeyHtml().replace('<label>Talk to it', '<label>Anthropic key')+'</div>';
+    (typeof opSettingsHtml==='function' ? opSettingsHtml() : '')+
+    '<div class="card section op-settings"><div class="section-title">&#127908; Op’s voice'+tip('Good morning, the work brief and Op’s answers when you talk to it. Turn the voice on or off in Morning & Alarms.')+'</div>'+
+      opVoiceSettingsHtml()+'</div>';
 }
 // Operator as its own app (its own Dock icon and name) or plain Chrome — from the next time it opens
 function operatorAppCardHtml(){
   if(!ui.opEngine){ ui.opEngine = {checking:true}; fetchWithin(WAKE_HELPER+'engine', 4000).then(function(r){ return r && r.ok ? r.json() : null; }).then(function(j){ ui.opEngine = j || {down:true}; if(document.getElementById('opAppCard')) renderView(); }).catch(function(){ ui.opEngine = {down:true}; }); }
   const e = ui.opEngine;
-  return '<div class="card section op-settings" id="opAppCard"><div class="section-title"><img class="op-app-ico" src="'+((document.querySelector('link[rel=icon]')||{}).href||'')+'" alt=""> The app'+tip('Operator runs on your Chrome. As its own app it has its own name and icon in the Dock and ⌘-Tab, instead of showing up as Google Chrome — same engine, same data.')+'</div>'+
+  // (always its own app — its own name and icon in the Dock and ⌘-Tab; Chrome's engine runs underneath)
+  return '<div class="card section op-settings" id="opAppCard"><div class="section-title"><img class="op-app-ico" src="'+((document.querySelector('link[rel=icon]')||{}).href||'')+'" alt=""> The app'+tip('Operator is its own app: its own name and icon in the Dock and ⌘-Tab. Chrome’s engine runs underneath (your data lives there), but it never shows up as Google Chrome.')+'</div>'+
     opLauncherLineHtml()+
-    (e.checking ? '' : e.down ? '' :
-      '<div class="field"><label>Show as its own app</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(e.on?' active':'')+'" data-action="opEngineSwitch" data-id="1">Operator</button><button class="seg-tab'+(!e.on?' active':'')+'" data-action="opEngineSwitch" data-id="0">Google Chrome</button></div>'+
-      '<div class="op-set-help">'+(e.failed ? '&#9888; Last time it couldn’t open as its own app, so it went back to Chrome. It tries again after Chrome updates — or switch it on here.' : 'Takes effect the next time you open Operator (quit with ⌘Q first).')+'</div></div>')+
+    (!e.checking && !e.down && e.failed ? '<div class="op-set-warn">&#9888; Last time it couldn’t open as its own app and fell back to Chrome. <button class="btn btn-ghost btn-sm" data-action="opEngineSwitch" data-id="1">Try again next launch</button></div>' : '')+
   '</div>';
 }
 ACTIONS.opEngineSwitch = function(el, e, id){

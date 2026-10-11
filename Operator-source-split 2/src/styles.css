@@ -2830,7 +2830,7 @@
   @media (max-width:760px){ .sc-hero-stats{ grid-template-columns:repeat(2, auto); } }
   /* the quick-note popup in the corner */
   #quickJournalOverlay.qj-pop-overlay{ background:transparent !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; align-items:flex-end; justify-content:flex-end; padding:0 84px 92px 0; }
-  #quickJournalOverlay.qj-pop-overlay #quickJournalContent{ width:380px !important; max-width:calc(100vw - 32px) !important; padding:0 !important; overflow:hidden !important; border-radius:22px; box-shadow:0 30px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(var(--ink),.08); animation:qjUp .32s cubic-bezier(.2,.9,.3,1.15) both; transform-origin:100% 100%; }
+  #quickJournalOverlay.qj-pop-overlay #quickJournalContent{ width:380px; max-width:calc(100vw - 32px) !important; padding:0 !important; overflow:hidden !important; border-radius:22px; box-shadow:0 30px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(var(--ink),.08); animation:qjUp .32s cubic-bezier(.2,.9,.3,1.15) both; transform-origin:100% 100%; }
   @keyframes qjUp{ from{ opacity:0; transform:translateY(16px) scale(.94); } }
   .qj3{ display:flex; flex-direction:column; }
   .qj3-h{ display:flex; align-items:center; gap:11px; padding:16px 16px 8px; }
@@ -4329,3 +4329,81 @@ body.lvl-shake #app, body.lvl-shake .app-shell, body.lvl-shake > main{ animation
 .brief4 .br-day .br-content span{ white-space:nowrap; }
 .bd-more{ flex:none; font-size:12px; font-weight:700; color:#ffc56b; margin-top:2px; }
 .bd-more[hidden]{ display:none; }
+/* ================= round 21 ================= */
+/* goals you can rename and delete */
+.tg-row{ display:flex; align-items:center; gap:4px; width:100%; padding:0; border-radius:9px; background:transparent; transition:background .15s; }
+.tg-row:hover{ background:rgba(var(--ink),.05); }
+.tg-hit{ flex:1; min-width:0; display:flex; align-items:center; gap:10px; text-align:left; padding:7px 6px; border:none; background:none; color:var(--text); font:inherit; cursor:pointer; }
+.tg-acts{ display:flex; gap:2px; opacity:0; transition:opacity .15s; }
+.tg-row:hover .tg-acts, .tg-acts:focus-within{ opacity:1; }
+.tg-a{ border:none; background:none; color:var(--text-dim); font:inherit; font-size:12px; padding:4px 6px; border-radius:6px; cursor:pointer; }
+.tg-a:hover{ background:rgba(var(--ink),.08); color:var(--text); }
+.tg-a.is-armed{ color:var(--danger); font-weight:700; opacity:1; }
+.tg-row:has(.is-armed) .tg-acts{ opacity:1; }
+.int-reset{ margin-right:auto; border:none; background:none; color:rgba(255,255,255,.5); font:inherit; font-size:12.5px; cursor:pointer; padding:6px 8px; border-radius:8px; }
+.int-reset:hover{ color:#ffb3b3; background:rgba(255,120,120,.1); }
+.int-a .int-a-xp{ margin-right:0; }
+/* carousels like the leads board: inside the page, a whole number of cards, arrows just outside */
+.carousel.is-sized > .car-track{ scroll-snap-type:x mandatory; -webkit-mask-image:none !important; mask-image:none !important; padding-left:0; padding-right:0; }
+.carousel.is-sized > .car-track > *{ flex:0 0 var(--car-fw, var(--car-w)) !important; width:var(--car-fw, var(--car-w)); max-width:none; scroll-snap-align:start; }
+.carousel.is-sized.is-loop > .car-track{ scroll-snap-type:none; }
+.carousel.is-sized .car-prev{ left:-34px; } .carousel.is-sized .car-next{ right:-34px; }
+@media (max-width:900px){ .carousel.is-sized .car-prev{ left:-14px; } .carousel.is-sized .car-next{ right:-14px; } }
+.bf-hint{ margin-top:auto; font-size:12px; color:var(--text-faint); } .bf-hint b{ color:var(--accent); }
+/* For a Good Day: rows as tall as their words — smaller, nothing cut off with "…" */
+.brief4 .br-goodday .gd-i, .brief2 .br-thoughts .gd-i{ height:auto !important; padding:clamp(7px, 1vh, 10px) 0 !important; align-items:flex-start; }
+.gd-i span:not(.br-th-i){ display:block !important; -webkit-line-clamp:unset !important; overflow:visible !important; }
+.brief4 .br-goodday .gd-i b{ font-size:14.5px; } .brief4 .br-goodday .gd-i span:not(.br-th-i){ font-size:13px; line-height:1.4; }
+.brief4 .br-goodday .br-th-i{ width:30px; height:30px; font-size:15px; margin-top:1px; }
+/* the blue dot's glow isn't clipped: the words are, the dot isn't */
+.brief4 .br-voice{ overflow:visible !important; }
+.brief4 #brVoice{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.hov-tip{ position:fixed; z-index:99999; pointer-events:none; max-width:260px; padding:5px 9px; border-radius:8px; background:var(--pop); border:1px solid var(--pop-border); color:var(--text); font-size:12px; font-weight:600; line-height:1.35; box-shadow:0 8px 24px rgba(0,0,0,.35); opacity:0; transform:translateY(3px); transition:opacity .12s, transform .12s; }
+.hov-tip.is-in{ opacity:1; transform:none; }
+/* the journal pop-out: drag it by the top, pull the corner to size it */
+#quickJournalOverlay.qj-pop-overlay #quickJournalContent{ resize:both; min-width:300px; min-height:260px; max-height:calc(100vh - 24px); display:flex; flex-direction:column; }
+#quickJournalOverlay.qj-pop-overlay #quickJournalContent.is-dragging{ animation:none; box-shadow:0 40px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(var(--ink),.12); }
+#quickJournalContent .qj3{ flex:1 1 auto; min-height:0; }
+#quickJournalContent .qj3-h{ cursor:grab; } #quickJournalContent.is-dragging .qj3-h{ cursor:grabbing; }
+#quickJournalContent .qj3-text{ flex:1 1 auto; min-height:90px; resize:none; }
+.qj3-tags.is-pop{ margin:0 14px 8px; padding:8px; border-radius:14px; background:var(--panel-2); border:1px solid var(--border); box-shadow:0 10px 30px rgba(0,0,0,.3); animation:qjTagsIn .18s ease-out; }
+@keyframes qjTagsIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+.qj3-tagbtn.is-on{ background:rgba(232,162,61,.16); }
+/* This week: the 6-month squares fill their half, the three numbers sit right under them */
+.pg-card .pg-heat{ display:flex; flex-direction:column; justify-content:center; gap:16px; }
+.pg-card .pg-heat .hm-main{ width:100%; display:flex; flex-direction:column; gap:8px; }
+.pg-card .pg-heat .hm-grid{ display:grid; grid-template-columns:repeat(26, minmax(0, 1fr)); gap:3px; width:100%; }
+.pg-card .pg-heat .hm-col{ display:grid; grid-template-rows:repeat(7, auto); gap:3px; }
+.pg-card .pg-heat .hm-grid .hm-cell{ width:100%; height:auto; aspect-ratio:1; border-radius:3px; }
+.pg-card .pg-heat .hm-foot{ display:flex; justify-content:space-between; width:100%; }
+.pg-card .pg-heat .hm-stats{ margin-top:0; padding-top:14px; border-top:1px solid var(--border); }
+.pg-card .pg-heat .hm-stat{ text-align:left; }
+/* Op in Settings */
+.op-persona{ width:100%; min-height:220px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; line-height:1.55; resize:vertical; }
+.op-mem{ display:flex; flex-direction:column; gap:4px; max-height:260px; overflow-y:auto; }
+.op-mem-i{ display:flex; align-items:flex-start; gap:8px; padding:7px 10px; border-radius:9px; background:rgba(var(--ink),.04); font-size:13px; line-height:1.4; }
+.op-mem-i span{ flex:1; }
+.op-mem-x{ border:none; background:none; color:var(--text-faint); cursor:pointer; font-size:11px; padding:2px 4px; border-radius:5px; } .op-mem-x:hover{ color:var(--danger); background:var(--danger-dim); }
+.op-set-speed{ display:flex; align-items:center; gap:10px; margin-top:10px; } .op-set-speed > span{ font-size:12px; color:var(--text-dim); }
+/* Op's reads: a quiet line, not a pop-up */
+.opi{ position:relative; display:flex; align-items:flex-start; gap:12px; margin:0 0 16px; padding:12px 40px 12px 14px; border-radius:14px; border:1px solid rgba(143,211,255,.18); background:linear-gradient(135deg, rgba(143,211,255,.07), rgba(195,166,255,.05)); animation:opiIn .4s ease-out; }
+@keyframes opiIn{ from{ opacity:0; transform:translateY(4px); } to{ opacity:1; transform:none; } }
+.opi-k{ flex:none; margin-top:1px; padding:2px 7px; border-radius:6px; font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#0b1220; background:linear-gradient(135deg, #8fd3ff, #c3a6ff); }
+.opi p{ margin:0; font-size:13.5px; line-height:1.55; color:var(--text); }
+.opi-r{ position:absolute; top:8px; right:8px; width:26px; height:26px; border-radius:50%; border:none; background:transparent; color:var(--text-faint); cursor:pointer; font-size:13px; } .opi-r:hover{ color:var(--text); background:rgba(var(--ink),.06); }
+.opi.is-busy p{ color:var(--text-faint); }
+.opi-dots{ display:inline-flex; gap:4px; } .opi-dots b{ width:5px; height:5px; border-radius:50%; background:currentColor; animation:opiDot 1.2s ease-in-out infinite; } .opi-dots b:nth-child(2){ animation-delay:.15s; } .opi-dots b:nth-child(3){ animation-delay:.3s; }
+@keyframes opiDot{ 0%,100%{ opacity:.25; } 50%{ opacity:1; } }
+html[data-theme="light"] .opi{ border-color:rgba(60,120,200,.2); }
+/* Op's analysis on Analytics: Pattern · Watch · Move */
+.opi.is-rows{ padding-top:14px; padding-bottom:14px; }
+.opi-rows{ display:flex; flex-direction:column; gap:8px; flex:1; min-width:0; }
+.opi-row{ display:grid; grid-template-columns:70px 1fr; gap:10px; align-items:baseline; font-size:13.5px; line-height:1.5; }
+.opi-row b{ font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+.opi-row.is-pattern b{ color:#8fd3ff; } .opi-row.is-watch b{ color:#ffc56b; } .opi-row.is-move b{ color:#7ef0c0; }
+.pg-card .pg-heat .hm-main{ align-items:stretch !important; justify-content:flex-start !important; max-width:none !important; margin:0 !important; padding:0 !important; min-height:0 !important; text-align:left !important; }
+.pg-card .pg-heat .hm-grid{ width:100% !important; }
+.pg-card .pg-heat .hm-foot{ font-size:11.5px; color:var(--text-dim); }
+/* Op's settings: room between the parts */
+#opAiCard .op-set + .op-set{ margin-top:18px; }
+#opAiCard .op-set > label{ font-size:13px; font-weight:700; color:var(--text); margin-bottom:6px; display:flex; align-items:center; gap:6px; }

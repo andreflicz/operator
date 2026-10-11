@@ -27,14 +27,25 @@ function carouselWrap(itemsHtml, key, opts){
     return out;
   };
   const body = loop ? clone('cA')+itemsHtml+clone('cB') : itemsHtml;
-  return '<div class="carousel'+(threeD?' is-3d':'')+(opts.fit?' is-fit':'')+(loop?' is-loop':'')+(opts.bleed!==false?' bleed':'')+(opts.cls?' '+opts.cls:'')+'" data-key="car-'+key+'"'+(opts.w?' style="--car-w:'+opts.w+'px"':'')+'>'+
+  // every row works like the leads board: cards stay inside the page, sized so a whole number of them
+  // fits (none cut at an edge), arrows just outside; a step moves a whole page of cards
+  return '<div class="carousel'+(threeD && opts.fit?' is-3d':'')+(opts.fit?' is-fit':' is-sized')+(loop?' is-loop':'')+(opts.bleed===true?' bleed':'')+(opts.cls?' '+opts.cls:'')+'" data-key="car-'+key+'"'+(opts.w?' style="--car-w:'+opts.w+'px" data-w="'+opts.w+'"':'')+'>'+
     '<button class="car-arrow car-prev" data-action="carouselStep" data-dir="-1" aria-label="Back">&#8249;</button>'+
     '<div class="car-track'+(opts.trackCls?' '+opts.trackCls:'')+'" data-car="'+key+'"'+(loop?' data-loop="1"':'')+'>'+body+'</div>'+
     '<button class="car-arrow car-next" data-action="carouselStep" data-dir="1" aria-label="More">&#8250;</button>'+
   '</div>';
 }
+// a whole number of cards across: each card's width is worked out from the row's width
+function carSize(wrap, track){
+  if(!wrap.classList.contains('is-sized')) return;
+  const cs = getComputedStyle(track), gap = parseFloat(cs.columnGap || cs.gap) || 12;
+  const W = track.clientWidth - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0); if(W < 100) return;
+  const want = Number(wrap.dataset.w) || 240, n = Math.max(1, Math.floor((W + gap)/(want + gap))), fw = Math.floor((W - gap*(n-1))/n);
+  if(wrap._fw!==fw){ wrap._fw = fw; wrap._n = n; wrap.style.setProperty('--car-fw', fw+'px'); if(track.dataset.loop){ track._loopInit = false; } }
+}
 function carUpdate(track){
   const wrap = track.parentElement; if(!wrap) return;
+  carSize(wrap, track);
   if(track.dataset.loop){
     const third = track.scrollWidth/3;
     if(!track._loopInit){ track._loopInit = true; track.scrollLeft = third; }
@@ -82,7 +93,9 @@ let carHookRaf = 0;
 afterRenderHooks.push(function(){ if(!carHookRaf && document.querySelector('.car-track')) carHookRaf = requestAnimationFrame(function(){ carHookRaf = 0; carUpdateAll(); }); });
 ACTIONS.carouselStep = function(el){
   const track = el.parentElement && el.parentElement.querySelector('.car-track'); if(!track) return;
-  track.scrollBy({left:Number(el.dataset.dir) * Math.max(220, track.clientWidth*0.75), behavior:'smooth'});
+  const wrap = el.parentElement, gap = parseFloat(getComputedStyle(track).columnGap) || 12;
+  const page = wrap._fw ? wrap._n*(wrap._fw + gap) : Math.max(220, track.clientWidth*0.75);
+  track.scrollBy({left:Number(el.dataset.dir) * page, behavior:'smooth'});
 };
 ACTIONS.setCardLayout = function(el, e, id){ state.profile.cardLayout = id; persist('profile'); renderView(); };
 function cardLayoutSettingsHtml(){

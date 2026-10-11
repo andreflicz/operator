@@ -17,7 +17,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await p.click('[data-action="nav"][data-view="focus"]'); await p.waitForTimeout(300);
     const clones = await p.evaluate(() => { const t = document.querySelector('.task-column .car-track'); const kids = [...t.children]; return {n:kids.length, cloneCount:kids.filter(k => k.classList.contains('car-clone')).length, real:kids.filter(k => !k.classList.contains('car-clone')).length}; });
-    check('every carousel copy is marked as a copy (only the real cards are live)', clones.cloneCount===12 && clones.real===6, clones);
+    check('the lineup row holds only the real cards (tasks don\'t loop)', clones.cloneCount===0 && clones.real===6, clones);
     const tag = () => p.evaluate(() => { const els = [...document.querySelectorAll('#viewRoot .section, #viewRoot .task-card, #viewRoot .carousel')]; els.forEach((e, i) => e.__keep = i); return els.length; });
     const kept = () => p.evaluate(() => { const els = [...document.querySelectorAll('#viewRoot .section, #viewRoot .task-card, #viewRoot .carousel')]; return {total:els.length, kept:els.filter(e => e.__keep!==undefined).length}; });
     // (Change is there when you're not locked in — locked in, Up next is drag and drop only)
@@ -27,7 +27,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const k1 = await kept();
     check('opening Change only adds the picker — nothing else on the page is rebuilt', k1.kept===before && k1.total===before, {before, k1});
     const arrows = await p.evaluate(() => document.querySelector('.task-column .carousel').className);
-    check('the carousel keeps its arrows/fades through a re-render (no blink)', /can-prev/.test(arrows) && /can-next/.test(arrows), arrows);
+    check('the carousel keeps its arrows through a re-render (no blink)', /can-next/.test(arrows) && /is-sized/.test(arrows), arrows);
     await p.keyboard.press('Escape'); await p.click('.nn-next [data-action="toggleNextPicker"]'); await p.waitForTimeout(150);
     await tag();
     await p.click('.task-column .task-card[data-id="t2"]:not(.car-clone)', {modifiers:['Meta']}); await p.waitForTimeout(200);

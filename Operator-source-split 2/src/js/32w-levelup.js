@@ -8,7 +8,7 @@ const LVL_LINES = ['Built, not given.', 'The work is working.', 'Quietly, then a
   'Stay dangerous.', 'Still hungry.', 'One more rung.', 'Earned in the dark.', 'The standard just moved.', 'This is who you are now.', 'Same you. Higher floor.', 'Not luck. Reps.'];
 // the flame, by how far up you are: ember orange → crimson → blue → violet → emerald → white gold
 const LVL_FIRE = [['#ff9a3c', '#ffd27a', '#ff5a1f'], ['#ff6a3d', '#ffd0a0', '#ff2d55'], ['#4fb7ff', '#d2f0ff', '#2f6bff'], ['#b07bff', '#eadbff', '#7a3dff'], ['#5ff0b4', '#e0fff2', '#16c286'], ['#ffe9a0', '#ffffff', '#ffbf3a']];
-function lvlTier(L){ return Math.min(LVL_FIRE.length - 1, Math.floor(L/4)); }
+function lvlTier(L){ return Math.min(LVL_FIRE.length - 1, Math.floor(L/17)); }
 
 // ---- the button and the caution sign ----
 function levelUpBtnHtml(where){
@@ -134,13 +134,11 @@ document.addEventListener('scroll', function(){ if(lvlVisRaf) return; lvlVisRaf 
 afterRenderHooks.push(function(){ setTimeout(lvlChipVis, 0); });
 function lvlPopHtml(){
   const x = xpSummary(), r = RANKS[x.rank];
-  const nextRank = x.next ? '<div class="lp-next"><span>Next rank</span><b style="color:'+x.next.color+'">'+escapeHtml(x.next.name)+'</b>'+(x.needs.length ? '<small>needs '+escapeHtml(x.needs.join(' · '))+'</small>' : '')+'</div>' : '';
   return '<div class="lp-h">'+rankBadgeSvg(x.rank, 34)+'<div><div class="lp-l">Level <b>'+x.level+'</b></div><div class="lp-r" style="color:'+r.color+'">'+escapeHtml(r.name)+'</div></div><div class="lp-ovr"><b>'+x.ovr+'</b><small>OVR</small></div></div>'+
-    '<div class="lp-bar"><i><u style="width:'+(Math.min(1, x.levelPct)*100).toFixed(1)+'%"></u></i><div class="lp-bar-t"><span>'+Math.min(x.total - x.levelLo, x.levelHi - x.levelLo).toLocaleString()+' / '+(x.levelHi - x.levelLo).toLocaleString()+' XP</span><span>'+(x.canLevel ? 'ready' : x.levelPct >= 1 ? 'maxed' : (x.levelHi - x.total).toLocaleString()+' to go')+'</span></div></div>'+
+    '<div class="lp-bar"><i><u style="width:'+(Math.min(1, x.levelPct)*100).toFixed(1)+'%"></u></i><div class="lp-bar-t"><span>'+Math.min(x.total - x.levelLo, x.levelHi - x.levelLo).toLocaleString()+' / '+(x.levelHi - x.levelLo).toLocaleString()+' XP</span><span>'+(x.maxed ? 'max level' : x.canLevel ? 'ready' : (x.levelHi - x.total).toLocaleString()+' to go')+'</span></div></div>'+
     (x.canLevel ? '<div class="lp-up">'+levelUpBtnHtml('pop')+'</div>' : x.blocked.length ? '<div class="lp-up">'+xpCautionHtml(x)+'</div>' : '')+
     '<div class="lp-stats"><span><b>+'+x.todayXp.toLocaleString()+'</b><small>today</small></span><span><b>+'+x.week.toLocaleString()+'</b><small>this week</small></span><span><b>'+x.total.toLocaleString()+'</b><small>total</small></span></div>'+
     '<div class="lp-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(function(k){ const a = x.attrs[k]; return '<span style="--ac:'+a.color+'"><b>'+a.v+'</b><small>'+k+'</small><i><u style="width:'+((a.v-25)/75*100).toFixed(0)+'%"></u></i></span>'; }).join('')+'</div>'+
-    nextRank+
     '<div class="lp-foot"><button data-action="openYou">Your card &#8594;</button><button data-action="openXpHow">How XP works</button></div>';
 }
 ACTIONS.lvlPop = function(){

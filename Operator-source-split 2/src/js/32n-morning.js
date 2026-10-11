@@ -179,7 +179,7 @@ function goodDayItems(){
 }
 function goodDayReelHtml(){
   const items = goodDayItems(), n = items.length, i = (ui.gdIdx||0) % n;
-  // (looks like the list it always was — four at a time — it just rolls on to the next one every few seconds)
+  // (a list that rolls on to the next one every ten seconds — or move it by hand)
   const row = function(x){ return '<div class="br-th gd-i"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; };
   return '<div class="gd-reel" data-n="'+n+'"><div class="gd-track" style="--i:'+i+'">'+items.concat(items.slice(0, 4)).map(row).join('')+'</div></div>'+
     '<div class="gd-nav"><button class="rl-arr" data-action="gdStep" data-id="-1" title="Back">&#8249;</button><div class="gd-dots">'+items.map(function(_, k){ return '<i class="'+(k===i ? 'on' : '')+'" data-action="gdGo" data-id="'+k+'"></i>'; }).join('')+'</div><button class="rl-arr" data-action="gdStep" data-id="1" title="Next">&#8250;</button></div>';
@@ -189,13 +189,15 @@ function gdShow(i, manual){
   const tr = document.querySelector('#wakeContent .gd-track'); if(!tr) return;
   const n = goodDayItems().length, from = ui.gdIdx||0;
   if(manual) ui.gdHold = Date.now();
-  if(i < 0){ tr.classList.add('no-anim'); tr.style.setProperty('--i', n); void tr.offsetWidth; tr.classList.remove('no-anim'); i = n - 1; }
+  if(i < 0){ tr.classList.add('no-anim'); gdPlace(tr, n); void tr.offsetWidth; tr.classList.remove('no-anim'); i = n - 1; }
   ui.gdIdx = i;
-  tr.classList.remove('no-anim'); tr.style.setProperty('--i', i);
+  tr.classList.remove('no-anim'); gdPlace(tr, i);
   document.querySelectorAll('#wakeContent .gd-dots i').forEach(function(d, k){ d.classList.toggle('on', k===i % n); });
-  if(i >= n) setTimeout(function(){ if(ui.gdIdx!==i) return; ui.gdIdx = 0; tr.classList.add('no-anim'); tr.style.setProperty('--i', 0); void tr.offsetWidth; tr.classList.remove('no-anim'); }, 900);
+  if(i >= n) setTimeout(function(){ if(ui.gdIdx!==i) return; ui.gdIdx = 0; tr.classList.add('no-anim'); gdPlace(tr, 0); void tr.offsetWidth; tr.classList.remove('no-anim'); }, 900);
   return from;
 }
+// rows are as tall as their words (no "…"): the reel slides to wherever row i starts
+function gdPlace(tr, i){ const row = tr.children[i]; tr.style.transform = 'translateY('+(row ? -row.offsetTop : 0)+'px)'; }
 ACTIONS.gdStep = function(el, e, id){ gdShow((ui.gdIdx||0) + Number(id||1), true); playTick(); };
 ACTIONS.gdGo = function(el, e, id){ gdShow(Number(id)||0, true); playTick(); };
 // a swipe on the trackpad (or the wheel, or a drag) moves it too
@@ -217,9 +219,9 @@ document.addEventListener('pointerup', function(e){
 // it rolls on by itself every few seconds while Good morning is up
 setInterval(function(){
   if(ui.wakeMode!=='brief' || typeof overlayOpen!=='function' || !overlayOpen('wakeOverlay')) return;
-  if(ui.gdHold && Date.now() - ui.gdHold < 12000) return;
+  if(ui.gdHold && Date.now() - ui.gdHold < 15000) return;
   gdShow((ui.gdIdx||0) + 1);
-}, 5500);
+}, 10000);
 function dayNum(){ const d = new Date(), start = new Date(d.getFullYear(), 0, 0); return Math.floor((d - start)/86400000); }
 function quoteOfDay(){ return quoteFor('morning'); }
 function workQuoteOfDay(){ return quoteFor('work'); }
@@ -286,6 +288,7 @@ async function localPlace(){
   return '';
 }
 async function fetchLocalNews(){ const c = await localPlace(); if(!c) return null; const items = await fetchNews(c); return items ? {place:c, items:items} : null; }
+function newsMuteWords(){ const w = wakeCfg().newsMute; return String(w==null ? 'Wyoming' : w).split(',').map(function(x){ return x.trim().toLowerCase(); }).filter(Boolean); }
 // (returns a promise the voice can wait on when you ask for the news)
 function loadMorningNews(force){
   if(!morningNewsOn() && !force) return Promise.resolve(null);
@@ -306,6 +309,11 @@ async function loadMorningNewsNow(){
   all.splice(1, 1);
   arr(items).forEach(function(n){ seen[n.title] = 1; });
   secs.forEach(function(x, i){ const list = arr(all[i+1]).filter(function(n){ if(seen[n.title]) return false; seen[n.title] = 1; return true; }); if(list.length) sec[x.id] = list; });
+  // (anything you've hidden — Settings → Morning & Alarms → Hide news about — never shows)
+  const mute = newsMuteWords(), keep = function(n){ const t = (n.title+' '+(n.src||'')).toLowerCase(); return !mute.some(function(w){ return t.indexOf(w) >= 0; }); };
+  if(items) items.splice(0, items.length, ...items.filter(keep));
+  Object.keys(sec).forEach(function(k){ sec[k] = sec[k].filter(keep); if(!sec[k].length) delete sec[k]; });
+  if(local) local.items = arr(local.items).filter(keep);
   if(local) sec.local = arr(local.items).filter(function(n){ if(seen[n.title]) return false; seen[n.title] = 1; return true; }).map(function(n){ n.local = local.place; return n; });
   ui.morningNews = {date:today, loading:false, items:items, sec:sec};
   if(ui.morningNews.items && ui.wakeMode==='brief' && overlayOpen('wakeOverlay')){
@@ -470,7 +478,7 @@ function wakeBriefHtml(){
     const d = tcur; k++;
     const wms = typeof opVoiceOn==='function' && opVoiceOn() ? 250 : BRIEF_WORD_MS;
     // (quicker again: the page builds at reading pace; the voice keeps up by moving to the newest line)
-    if(voice){ lines.push({at: d - 380, text: voice}); tcur += Math.max(900, voice.split(' ').length*wms + 300); } else tcur += 500;
+    if(voice){ lines.push({at: d - 380, text: voice, key:String(cls).split(' ')[0].replace(/^br-/, '')}); tcur += Math.max(900, voice.split(' ').length*wms + 300); } else tcur += 500;
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
   const slept = lastNightSleep();
@@ -529,7 +537,9 @@ function wakeBriefHtml(){
     else colD.push(panel('br-sports', 'br-a-rise', '', '<div class="br-k">&#127936; Sports</div>'+(typeof scoresStatusHtml==='function' ? scoresStatusHtml() : '<div class="br-sports-none">No games on the board right now.</div>')));
   }
   const ctaD = tcur;
-  lines.push({at: ctaD - 380, text: 'Get ready to start your day.'});
+  lines.push({at: ctaD - 380, text: 'Get ready to start your day.', key:'cta'});
+  // Op's own words for them, when it has them (asked for once a morning)
+  if(typeof opBriefRewrite==='function'){ const ai = ui.briefAi && ui.briefAi.date===today ? ui.briefAi.map : {}; lines.forEach(function(l){ if(l.key && ai[l.key]) l.text = ai[l.key]; }); setTimeout(function(){ opBriefRewrite(lines); }, 0); }
   ui.briefLines = lines;
   const shift = ui.briefShift || 0;
   const w = wakeCfg(), song = (wakeFinishing || wakeAudio || wakeMusicApp) && w.media ? mediaName(w.media) : '';
@@ -563,7 +573,7 @@ function wakeBriefHtml(){
 // headlines and Today show as many rows as fit — no half-cut row at the bottom, no empty space under it
 function briefFit(root){
   root = root || document.getElementById('wakeContent'); if(!root) return;
-  root.querySelectorAll('.gd-reel').forEach(function(r){ const h = r.clientHeight; if(h > 150) r.style.setProperty('--gh', Math.floor(h/4)+'px'); });
+  root.querySelectorAll('.gd-track').forEach(function(tr){ gdPlace(tr, ui.gdIdx||0); });
   root.querySelectorAll('.br-news-list, .bd-list').forEach(function(list){
     const items = Array.prototype.slice.call(list.children);
     items.forEach(function(it){ it.classList.remove('is-cut'); });

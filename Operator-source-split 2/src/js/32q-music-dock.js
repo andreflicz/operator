@@ -22,7 +22,7 @@ function dockHtml(){
   const name = dockSrcName();
   // the Operator's mic sits here too: talk to it from anywhere
   return '<div class="md-in'+(musicOn()?' is-playing':'')+'">'+(typeof lvlChipHtml==='function' ? lvlChipHtml() : '')+(name ? '<span class="md-now" title="'+escapeHtml(name)+'">'+escapeHtml(name)+'</span><button class="md-b md-skip" data-action="dockNext" title="Next">&#9197;</button>' : '')+dockBtnsHtml()+
-    '<button class="md-b md-op op-talk" data-action="opTalk" title="Talk to the Operator">&#127897;&#65039;</button></div>';
+    '<button class="md-b md-op op-talk" data-action="opTalk" title="Talk to Op">&#127897;&#65039;</button></div>';
 }
 // (main: the big middle button of the minimal player — ▶ / ❚❚)
 function npMusicBtnHtml(main){ const on = musicOn(); return '<button class="np-c np-music'+(main?' is-main':'')+(on?' is-on':'')+'" data-action="npMusic" title="'+(on ? 'Pause the music' : 'Play music')+'">'+(on ? (main ? '&#10073;&#10073;' : '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>') : (main ? '&#9654;' : '&#9835;'))+'</button>'; }

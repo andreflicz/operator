@@ -357,7 +357,8 @@ function openQuickJournalModal(){
   o.classList.remove('hidden');
   ui.qjPrompt = QJ_PROMPTS[Math.floor(Math.random()*QJ_PROMPTS.length)];
   ui.qjSaved = false;
-  renderQuickJournalModalInto();
+  ui.qjTagsOpen = false;
+  renderQuickJournalModalInto(); qjBoxApply();
   setTimeout(function(){ const t = document.getElementById('quickJournalModalText'); if(t){ t.focus(); t.setSelectionRange(t.value.length, t.value.length); } }, 60);
 }
 function closeQuickJournalModal(){ const o=document.getElementById('quickJournalOverlay'); if(o) o.classList.add('hidden'); }
@@ -370,13 +371,43 @@ function renderQuickJournalModal(){
       '<button class="qj3-x" data-action="closeQuickJournalModal" title="Close (Esc)">&#10005;</button></div>'+
     '<textarea class="qj3-text" id="quickJournalModalText" placeholder="'+escapeHtml(ui.qjPrompt||QJ_PROMPTS[0])+'">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
     (arr(ui.journalDraftPhotos).length ? '<div class="qj3-photos">'+arr(ui.journalDraftPhotos).map(function(src, i){ return '<span><img src="'+escapeHtml(blobUrl(src))+'"><button data-action="removeJournalDraftPhoto" data-idx="'+i+'" title="Remove">&times;</button></span>'; }).join('')+'</div>' : '')+
-    '<div class="qj3-tags">'+visibleJournalTypes().slice(0, 8).map(function(m){ return '<button class="qj3-tag'+(ui.selectedMood===m.id?' is-on':'')+'" data-action="qjMood" data-id="'+m.id+'" title="'+escapeHtml(m.label)+'">'+m.emoji+'<span>'+escapeHtml(m.label)+'</span></button>'; }).join('')+hiddenTypesChipHtml()+'</div>'+
+    // the tags wait behind one button (a small pop-out), so the note gets the room
+    (ui.qjTagsOpen ? '<div class="qj3-tags is-pop">'+visibleJournalTypes().slice(0, 8).map(function(m){ return '<button class="qj3-tag'+(ui.selectedMood===m.id?' is-on':'')+'" data-action="qjMood" data-id="'+m.id+'" title="'+escapeHtml(m.label)+'">'+m.emoji+'<span>'+escapeHtml(m.label)+'</span></button>'; }).join('')+hiddenTypesChipHtml()+'</div>' : '')+
     capsuleBarHtml()+
-    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button><button class="qj3-ph" data-action="triggerJournalPhotoInput" title="Attach a photo">&#128247;</button><button class="qj3-ph'+(ui.qjCapsule?' is-on':'')+'" data-action="qjCapsule" title="Time capsule — send this to future you">&#9203;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
+    '<div class="qj3-f"><button class="qj3-open" data-action="qjOpenJournal">Open journal &rarr;</button>'+
+      (function(){ const m = ui.selectedMood ? journalTypes().find(function(t){ return t.id===ui.selectedMood; }) : null; return '<button class="qj3-ph qj3-tagbtn'+(ui.qjTagsOpen||m?' is-on':'')+'" data-action="qjTags" title="Tag it">'+(m ? m.emoji : '&#127991;&#65039;')+'</button>'; })()+'<button class="qj3-ph" data-action="triggerJournalPhotoInput" title="Attach a photo">&#128247;</button><button class="qj3-ph'+(ui.qjCapsule?' is-on':'')+'" data-action="qjCapsule" title="Time capsule — send this to future you">&#9203;</button><span class="qj3-hint">&#8984;&#8629;</span><button class="btn btn-primary btn-sm" data-action="saveQuickJournal">Save</button></div>'+
   '</div>';
 }
 function renderQuickJournalModalInto(){ const el=document.getElementById('quickJournalContent'); if(el) morphInto(el, renderQuickJournalModal(), {form:true}); }
-ACTIONS.qjMood = function(el, e, id){ ui.selectedMood = ui.selectedMood===id ? null : id; const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; renderQuickJournalModalInto(); };
+ACTIONS.qjMood = function(el, e, id){ ui.selectedMood = ui.selectedMood===id ? null : id; ui.qjTagsOpen = false; const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; renderQuickJournalModalInto(); };
+ACTIONS.qjTags = function(){ ui.qjTagsOpen = !ui.qjTagsOpen; const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; renderQuickJournalModalInto(); };
+// ---- the pop-out moves and resizes: drag it by the top, pull the corner; it opens where you left it ----
+function qjBoxApply(){
+  const c = document.getElementById('quickJournalContent'), b = state.profile.qjBox; if(!c) return;
+  if(b && b.w){ c.style.width = Math.max(300, Math.min(window.innerWidth - 24, b.w))+'px'; c.style.height = Math.max(260, Math.min(window.innerHeight - 24, b.h))+'px'; }
+  else { c.style.width = '380px'; c.style.height = ''; }
+  if(b && b.x!=null){ c.style.position = 'fixed'; c.style.left = Math.max(8, Math.min(window.innerWidth - 120, b.x))+'px'; c.style.top = Math.max(8, Math.min(window.innerHeight - 80, b.y))+'px'; c.style.right = 'auto'; c.style.bottom = 'auto'; }
+}
+let qjDrag = null;
+document.addEventListener('pointerdown', function(e){
+  const h = e.target && e.target.closest && e.target.closest('#quickJournalContent .qj3-h');
+  if(!h || e.target.closest('input, button')) return;
+  const c = document.getElementById('quickJournalContent'), r = c.getBoundingClientRect();
+  qjDrag = {dx:e.clientX - r.left, dy:e.clientY - r.top};
+  c.style.position = 'fixed'; c.style.left = r.left+'px'; c.style.top = r.top+'px'; c.style.right = 'auto'; c.style.bottom = 'auto'; c.classList.add('is-dragging');
+  e.preventDefault();
+});
+document.addEventListener('pointermove', function(e){
+  if(!qjDrag) return; const c = document.getElementById('quickJournalContent'); if(!c) return;
+  c.style.left = Math.max(8, Math.min(window.innerWidth - 120, e.clientX - qjDrag.dx))+'px'; c.style.top = Math.max(8, Math.min(window.innerHeight - 60, e.clientY - qjDrag.dy))+'px';
+});
+document.addEventListener('pointerup', function(){
+  const c = document.getElementById('quickJournalContent');
+  if(qjDrag && c){ c.classList.remove('is-dragging'); const r = c.getBoundingClientRect(); state.profile.qjBox = Object.assign({}, state.profile.qjBox||{}, {x:Math.round(r.left), y:Math.round(r.top)}); persist('profile'); }
+  qjDrag = null;
+  // a resize (the corner) is kept too
+  if(c && !document.getElementById('quickJournalOverlay').classList.contains('hidden')){ const r = c.getBoundingClientRect(), b = state.profile.qjBox || {}; if(Math.abs((b.w||0) - r.width) > 4 || Math.abs((b.h||0) - r.height) > 4){ if(c.style.height || b.w || Math.abs(r.width - 380) > 4){ state.profile.qjBox = Object.assign({}, b, {w:Math.round(r.width), h:Math.round(r.height)}); persist('profile'); } } }
+});
 ACTIONS.qjOpenJournal = function(){ const t = document.getElementById('quickJournalModalText'); if(t) ui.journalDraftText = t.value; closeQuickJournalModal(); ui.view = 'personal'; ui.personalTab = 'journal'; renderView(); };
 document.addEventListener('input', function(e){ if(e.target && e.target.id==='quickJournalModalText') ui.journalDraftText = e.target.value; if(e.target && e.target.id==='quickJournalModalTextTitle') ui.qjTitleDraft = e.target.value; });
 document.addEventListener('keydown', function(e){

@@ -18,6 +18,13 @@
     <string>AppIcon</string>
     <key>CFBundleExecutable</key>
     <string>Operator</string>
+    <key>LSRequiresNativeExecution</key>
+    <true/>
+    <key>LSArchitecturePriority</key>
+    <array>
+        <string>arm64</string>
+        <string>x86_64</string>
+    </array>
     <key>LSMinimumSystemVersion</key>
     <string>10.13</string>
     <key>LSUIElement</key>

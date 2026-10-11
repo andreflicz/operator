@@ -1,11 +1,10 @@
 // ============ XP, LEVELS, RANKS & YOUR CARD ============
 // A game you play by living the right way. Everyone starts at level 0, rank 0 — "Locked In": the
-// point is to stay consistent and not lose yourself to brain fog. Levels are slow on purpose: each
-// one costs 1,000 XP plus 150 for every level you already have — a good week of work for the first,
-// more after that. Every session still moves the bar (20 minutes is about 3 XP); the big jumps come
-// from what changes the business and the body.
-// Ranks need three things: the level, the MRR, and the body (your Health score) — you can't
-// rank up on work alone.
+// point is to stay consistent and not lose yourself to brain fog.
+// Like a ranked game: your level is your account — it only ever goes up, nothing gates it, and it
+// runs to 100. The first levels come quick (400 XP, then 60 more for each one after), the later ones
+// take real time, so it's a journey. Rank is the real thing: it needs the level, the MRR and the body
+// (your Health score) — you can't rank up on work alone.
 // XP comes from:
 //   the day     — deep work, tasks, workouts (the first ones count big), shooting, outreach; strong
 //                 days in a row multiply it
@@ -18,29 +17,29 @@
 // Your card (NBA 2K style) rates you 25–100 on four things, and an overall (see xpAttributes).
 const RANKS = [
   {name:'Locked In',   level:0,  mrr:0,     health:0,  color:'#8fd3ff', tag:'Entrepreneur mode'},
-  {name:'Operator',    level:3,  mrr:2500,  health:40, color:'#5fd4c4', tag:'Showing up'},
-  {name:'Specialist',  level:6,  mrr:5000,  health:50, color:'#6fc3ff', tag:'Good at the thing'},
-  {name:'Closer',      level:10, mrr:10000, health:55, color:'#a98bff', tag:'Deals get done'},
-  {name:'Captain',     level:15, mrr:20000, health:60, color:'#ff8fb1', tag:'Others follow'},
-  {name:'Commander',   level:20, mrr:35000, health:65, color:'#ffc56b', tag:'Runs the field'},
-  {name:'Director',    level:26, mrr:50000, health:70, color:'#ff9a6b', tag:'Built to last'},
-  {name:'Mogul',       level:33, mrr:70000, health:75, color:'#7ef0c0', tag:'Owns the game'},
-  {name:'Millionaire', level:40, mrr:83400, health:80, color:'#fff2b0', tag:'A million a year'}
+  {name:'Operator',    level:5,  mrr:2500,  health:40, color:'#5fd4c4', tag:'Showing up'},
+  {name:'Specialist',  level:12, mrr:5000,  health:50, color:'#6fc3ff', tag:'Good at the thing'},
+  {name:'Closer',      level:20, mrr:10000, health:55, color:'#a98bff', tag:'Deals get done'},
+  {name:'Captain',     level:30, mrr:20000, health:60, color:'#ff8fb1', tag:'Others follow'},
+  {name:'Commander',   level:42, mrr:35000, health:65, color:'#ffc56b', tag:'Runs the field'},
+  {name:'Director',    level:55, mrr:50000, health:70, color:'#ff9a6b', tag:'Built to last'},
+  {name:'Mogul',       level:70, mrr:70000, health:75, color:'#7ef0c0', tag:'Owns the game'},
+  {name:'Millionaire', level:85, mrr:83400, health:80, color:'#fff2b0', tag:'A million a year'}
 ];
 const XP_RATES = {mrrPerK:800, client:750, follower:1, goal:500, video:50, hourBase:10, hourAbove:18, longDay:40, outreach:20};
 const MASTER_XP = {milestone:4000, weekly:100};
-// total XP to reach level L: 1,000 a level plus 150 more for each level before it
-function xpForLevel(L){ return 1000*L + 75*L*(L-1); }
-function xpLevelOf(total){ let L = 0; while(xpForLevel(L+1) <= total) L++; return L; }
-// the level a rank sits at asks for that rank's MRR and Health before you can step onto it
-function xpLevelGate(L){ return RANKS.find(function(r){ return r.level===L && (r.mrr || r.health); }) || null; }
+// total XP to reach level L: 400 for the first, 60 more for each level after (level 100 is the top)
+const LEVEL_MAX = 100;
+function xpForLevel(L){ return 400*L + 30*L*(L-1); }
+function xpLevelOf(total){ let L = 0; while(L < LEVEL_MAX && xpForLevel(L+1) <= total) L++; return L; }
+// (levels aren't gated any more — MRR and Health gate ranks, not levels)
+function xpLevelGate(L){ return null; }
 // the level you've claimed. The first time, you're given what you'd already reached (as far as the
 // gates allow) — after that it only moves when you press Level up.
 function xpClaimedLevel(earned, mrr, health){
   const p = state.profile;
   if(typeof p.xpLevel!=='number'){
-    let L = 0; while(L < earned){ const g = xpLevelGate(L+1); if(g && (mrr < g.mrr || health < g.health)) break; L++; }
-    p.xpLevel = Math.max(L, Math.min(earned, (p.xpSeen && p.xpSeen.level) || 0)); persist('profile');
+    p.xpLevel = earned; persist('profile');
   }
   return p.xpLevel;
 }
@@ -190,22 +189,19 @@ function xpSummaryFresh(){
   const todayItems = xpDay(today, ctx);
   const attrs = xpAttributes(ctx);
   // Levels are claimed, not handed out: XP keeps stacking (nothing you do is ever wasted), and when you
-  // have the XP for the next level — and, at a rank's level, the MRR and the Health it asks for — a
-  // Level up button appears. You press it; it's yours.
-  const earned = xpLevelOf(total), level = xpClaimedLevel(earned, mrr, attrs.HLT.v), lo = xpForLevel(level), hi = xpForLevel(level+1);
-  const gate = xpLevelGate(level+1), gateNeeds = gate ? [mrr < gate.mrr ? money(gate.mrr)+' MRR' : '', attrs.HLT.v < gate.health ? 'Health '+gate.health : ''].filter(Boolean) : [];
-  const pct = Math.min(1, (total - lo)/(hi - lo));
-  const canLevel = total >= hi && !gateNeeds.length;
-  // the caution sign: only when you're close to (or past) the top of the level and something other than
-  // XP is in the way
-  const blocked = gateNeeds.length && pct >= .85 ? gateNeeds : [];
+  // have the XP for the next level a Level up button appears. You press it; it's yours.
+  const earned = xpLevelOf(total), level = Math.min(LEVEL_MAX, xpClaimedLevel(earned, mrr, attrs.HLT.v)), maxed = level >= LEVEL_MAX;
+  const lo = xpForLevel(level), hi = maxed ? lo : xpForLevel(level+1), gate = null;
+  const pct = maxed ? 1 : Math.min(1, (total - lo)/(hi - lo));
+  const canLevel = !maxed && total >= hi;
+  const blocked = [];
   // rank = the highest one where you have the level, the MRR and the body
   let rank = 0; RANKS.forEach(function(r, i){ if(level >= r.level && mrr >= r.mrr && attrs.HLT.v >= r.health) rank = i; });
   const next = RANKS[rank+1] || null;
   const needs = next ? [level < next.level ? 'level '+next.level : '', mrr < next.mrr ? money(next.mrr)+' MRR' : '', attrs.HLT.v < next.health ? 'Health '+next.health : ''].filter(Boolean) : [];
   return {total:total, week:week, today:todayItems, todayXp:todayItems.reduce(function(a, x){ return a + x.xp; }, 0),
     mrr:mrr, mrrBase:base, mrrXp:mrrXp, clientXp:clientXp, won:won, start:start, goalXp:goalXp, goals:goals, ownGoalXp:goals.counted*XP_RATES.goal, checkins:ci, master:ms, followers:followers, followerXp:followerXp,
-    level:level, earned:earned, levelLo:lo, levelHi:hi, levelPct:pct, banked:Math.max(0, total - hi), canLevel:canLevel, blocked:blocked, gate:gate,
+    level:level, earned:earned, levelLo:lo, levelHi:hi, levelPct:pct, banked:Math.max(0, total - hi), canLevel:canLevel, blocked:blocked, gate:gate, maxed:maxed,
     rank:rank, next:next, needs:needs, attrs:attrs, ovr:attrs.OVR};
 }
 
@@ -415,9 +411,10 @@ function renderYouTab(){
         '<div class="you-lvlrow"><div class="you-lvl">Level <b>'+x.level+'</b> <span style="color:'+r.color+'">'+escapeHtml(r.name)+'</span></div>'+
           levelUpBtnHtml('you')+'<button class="you-q" data-action="openXpHow" title="How leveling works — the XP guide">?</button></div>'+
         '<div class="you-xpbar'+(x.levelPct>=1 ? ' is-full' : '')+'"><i><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i><span>'+
-          (x.levelPct>=1 ? '<b>'+(x.total - x.levelLo).toLocaleString()+' XP</b> · level '+(x.level+1)+(x.canLevel ? ' ready' : '')+(x.banked ? ' · +'+x.banked.toLocaleString()+' stacked' : '') : '<b>'+(x.levelHi - x.total).toLocaleString()+' XP</b> to level '+(x.level+1))+'</span>'+xpCautionHtml(x)+'</div>'+
+          (x.maxed ? '<b>Level '+LEVEL_MAX+'</b> — the top. '+x.total.toLocaleString()+' XP' : x.levelPct>=1 ? '<b>'+(x.total - x.levelLo).toLocaleString()+' XP</b> · level '+(x.level+1)+(x.canLevel ? ' ready' : '')+(x.banked ? ' · +'+x.banked.toLocaleString()+' stacked' : '') : '<b>'+(x.levelHi - x.total).toLocaleString()+' XP</b> to level '+(x.level+1))+'</span>'+xpCautionHtml(x)+'</div>'+
         xpChartHtml(x)+
       '</div></div>'+
+    (typeof opRead==='function' ? opRead('card', opFactsCard, 'Give him your read on his card: where he stands, what’s holding him back, and what would move him up fastest.', {angles:'card'}) : '')+
     '<div class="you-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(attrCard).join('')+
       '<div class="you-body"><div class="you-sec">Your body</div>'+(body.bmi ?
         '<div class="you-bmi"><b>'+body.bmi.toFixed(1)+'</b><span>BMI &middot; '+body.cls+'</span></div>'+
@@ -548,11 +545,11 @@ ACTIONS.openXpHow = function(){
   const taskXp = [1,2,3,4,5,6,7,8,9,10].map(function(i){ return i<=3 ? 12 : i<=6 ? 8 : 4; });
   const normal = Math.max(60, std || (st.deepWorkTargetMinutes||180));
   const hourXp = [1,2,3,4,5,6,7,8].map(function(h){ const m = h*60, base = Math.min(m, normal), above = Math.max(0, m - normal); return Math.round(base/60*XP_RATES.hourBase + above/60*XP_RATES.hourAbove + (m>=360 ? XP_RATES.longDay : 0)); });
-  const levelCost = [1,2,3,4,5,6,8,10,15,20,30,40].map(function(L){ return xpForLevel(L) - xpForLevel(L-1); });
+  const LV = [1,2,5,10,20,30,40,50,60,75,90,100], levelCost = LV.map(function(L){ return xpForLevel(L) - xpForLevel(L-1); });
   document.getElementById('xpHowContent').innerHTML =
     '<div class="xpg-top"><button class="xpg-back" data-action="closeXpHow">&larr; Back</button><div class="xph-k">[ SYSTEM ]</div></div>'+
     '<h1>The XP guide</h1>'+
-    '<div class="xph-lead">Do the work, get XP. XP never stops stacking. When you have enough for the next level — and, at a rank’s level, the MRR and Health it asks for — a <b>Level up</b> button appears. Press it.</div>'+
+    '<div class="xph-lead">Do the work, get XP. XP never stops stacking. When you have enough for the next level a <b>Level up</b> button appears — press it. Levels run to '+LEVEL_MAX+' and nothing gates them. <b>Rank</b> is the real climb: it needs the level, the MRR and your Health.</div>'+
     '<div class="xpg-you"><div><small>You</small><b>Level '+x.level+'</b></div><div><small>XP</small><b>'+x.total.toLocaleString()+'</b></div><div><small>Next level at</small><b>'+x.levelHi.toLocaleString()+'</b></div>'+(x.canLevel ? '<div>'+levelUpBtnHtml('guide')+'</div>' : x.blocked.length ? '<div>'+xpCautionHtml(x)+'</div>' : '')+'</div>'+
     '<div class="xpg-sec">Ranks — each one needs the level, the MRR and your Health</div>'+
     '<div class="xph-track">'+RANKS.map(function(rk, i){ const stt = i<x.rank ? 'is-done' : i===x.rank ? 'is-cur' : ''; return '<span class="xph-tr '+stt+'" style="--rc:'+rk.color+'">'+rankBadgeSvg(i, 30)+'<b>'+escapeHtml(rk.name)+'</b><small>LVL '+rk.level+(rk.mrr ? '<br>'+money(rk.mrr)+' · HLT '+rk.health : '')+'</small></span>'; }).join('')+'</div>'+
@@ -568,7 +565,7 @@ ACTIONS.openXpHow = function(){
       '<div class="xpg-card is-wide"><h3>The business</h3><div class="xpg-jumps">'+
         [['Client won', '+'+XP_RATES.client], ['Each $1k of MRR', '+'+XP_RATES.mrrPerK], ['Follower gained', '+'+XP_RATES.follower], ['Outreach, per day', 'from +'+XP_RATES.outreach]].map(function(j){ return '<div><b>'+j[1]+'</b><span>'+j[0]+'</span></div>'; }).join('')+
       '</div><p class="xpg-note">MRR XP is taken back if MRR drops.</p></div>'+
-      '<div class="xpg-card is-wide"><h3>What each level costs</h3><p>1,000 XP for the first, and 150 more for every level after — a good week each, more as you go.</p>'+xpgBars(levelCost, [1,2,3,4,5,6,8,10,15,20,30,40].map(function(L){ return 'L'+L; }), '#ff9a3c')+'</div>'+
+      '<div class="xpg-card is-wide"><h3>What each level costs</h3><p>400 XP for the first, and 60 more for every level after — quick at the start, real time later. Level '+LEVEL_MAX+' (the top) is '+xpForLevel(LEVEL_MAX).toLocaleString()+' XP in all.</p>'+xpgBars(levelCost, LV.map(function(L){ return 'L'+L; }), '#ff9a3c')+'</div>'+
     '</div>'+
     '<div class="xpg-sec">Your ratings — 25 to 100 (100 is you at your best). Each thing counts in one place only.</div><div class="xph-rates">'+
       rate('Business', '#ffc56b', [['MRR', 'what clients pay you a month — 100 at a million a year'], ['Grind', 'real, locked-in work a day over the last 30 days — 6 hours a day, every day, is 100'],

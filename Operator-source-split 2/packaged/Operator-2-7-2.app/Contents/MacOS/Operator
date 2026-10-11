@@ -187,7 +187,8 @@ ENGINE_DIR="$DATA_DIR/Engine"
 ENGINE_APP="$ENGINE_DIR/Operator.app"
 ENGINE_REV=1
 make_engine() {
-  [ -f "$DATA_DIR/engine.off" ] && return 1
+  # (Operator is always its own app now — an old "open in Chrome" choice is cleared)
+  rm -f "$DATA_DIR/engine.off" 2>/dev/null
   command -v plutil >/dev/null 2>&1 && command -v codesign >/dev/null 2>&1 || return 1
   CV=$(defaults read "$CHROME_APP/Contents/Info" CFBundleShortVersionString 2>/dev/null)
   [ -n "$CV" ] || return 1
@@ -225,6 +226,9 @@ WAKE_PID=$(start_helper wake "$WAKE_PORT")
 #    alarms only go off once the window was opened; these flags keep them on time
 #  - autoplay without a click, so wake-up music/sound starts by itself
 #  - no pop-up blocking, so a wake-up YouTube link can open
+#  - the mic: Operator's own window is allowed to listen without Chrome asking every time you tap the
+#    mic (a page opened from a file can't keep a "remember this" answer). Only this window — your
+#    normal Chrome is untouched — and macOS still asks once for microphone access.
 launch_window() { # browser executable, extra flag
   "$1" \
     --app="file://$HTML_FILE" \
@@ -240,6 +244,7 @@ launch_window() { # browser executable, extra flag
     --ignore-gpu-blocklist \
     --enable-gpu-rasterization \
     --enable-zero-copy \
+    --use-fake-ui-for-media-stream \
     $2 \
     > /dev/null 2>&1 &
   CHROME_PID=$!

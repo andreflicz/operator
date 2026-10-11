@@ -100,7 +100,7 @@ function renderClientsHome(){
         '</div>' : '');
     })()+
     '<div class="subtab-panel" data-key="clients-home">'+
-      (active.length ? (carouselOn() ? carouselWrap(active.map(clientCardV2).join(''), 'clients', {w:340, trackCls:'cc2-car', loop:true, count:active.length}) : '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>') : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
+      (active.length ? '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>' : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
       (rest.length ? '<div class="cc2-past"><button class="cc2-past-toggle" data-action="toggleClientsPast">'+(ui.clientsPastOpen?'&#9662;':'&#9656;')+' Paused &amp; past clients ('+rest.length+')</button>'+
         (ui.clientsPastOpen ? '<div class="cc2-grid cc2-grid-sm">'+rest.map(clientCardV2).join('')+'</div>' : '')+'</div>' : '')+
     '</div>';

@@ -137,7 +137,7 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     // (round 20: weight and calories are one Body & Fuel card on the Health page)
     await E("ui.personalTab='fitness'; renderView()"); await p.waitForTimeout(150);
     check('Weight: big number, change and goal progress, trend line', /209.5/.test(await p.textContent('.bf-now')) && /14.5 to go/.test(await p.textContent('.bf-goal')) && await p.isVisible('.bf-spark'));
-    await p.fill('#weightValue', '208.8'); await p.click('[data-action="addWeight"]'); await p.waitForTimeout(150);
+    await E("openHealthSheet('weight')"); await p.fill('#hsWeight', '208.8'); await p.click('[data-action="hsWeight"]'); await p.waitForTimeout(150);   // (round 21: logging is the + sheet)
     check('…logging still works', await E("state.health.weightLog.length")===3);
     await p.waitForTimeout(150);
     await p.click('.hc-pick >> nth=0'); await p.waitForTimeout(150);

@@ -60,6 +60,9 @@ src/
     31-nav-render-dispatch.js
     32-clock-timer-alarms.js
     33-event-delegation.js
+    32x-op.js              Op, the AI: personality (replaceable), memory, tools it can use in the
+                           app, Fast/Smart brain, the mic, and its reads on your numbers (Analytics,
+                           your card, Social, week/month check-in and check-out)
     34-init.js
   tail.html               </script></body></html>
 scripts/

@@ -135,8 +135,9 @@ async function ctxPage(b, seed, opts){
     check('Health is one page: no Workouts/Weight/Calories tabs', (await p.$$('.tab-panel .subtab')).length===0);
     check('…Body & Fuel together in one card (weight, trend, goal; calories ring, go-tos)', await p.isVisible('#bodyFuel .bf-body') && await p.isVisible('#bodyFuel .bf-fuel') && /208.5/.test(await p.textContent('#bodyFuel .bf-now')) && await p.$('#bodyFuel .bf-spark')!==null);
     check('…no "Log a workout" form on the page', await p.$('#viewRoot [data-action="fitLog"]')===null && await p.$('#viewRoot #gymType')===null);
-    await p.fill('#weightValue', '208'); await p.click('#bodyFuel [data-action="addWeight"]'); await p.waitForTimeout(200);
-    check('log a weigh-in right in the card', await E("state.health.weightLog.length")===3);
+    // (round 21: no log buttons on the page — the + sheet does it)
+    await E("openHealthSheet('weight')"); await p.fill('#hsWeight', '208'); await p.click('[data-action="hsWeight"]'); await p.waitForTimeout(200);
+    check('log a weigh-in (the + sheet)', await E("state.health.weightLog.length")===3);
     await p.click('#bodyFuel .hc-pick'); await p.waitForTimeout(200);
     check('one tap logs a go-to meal', await E("state.health.calorieEntries.length")===1 && /1420/.test(await p.textContent('#bodyFuel .hc-left')));
     await p.click('#fabAdd'); await p.waitForTimeout(250);

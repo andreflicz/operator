@@ -90,7 +90,7 @@ function openIntentForm(kind, cinematic){
         F.goals.map(function(ph, i){ const g = gs[i]; return '<div class="int-g'+(g && g.done ? ' is-done' : '')+'"><b>'+(i+1)+'</b><input class="int-in" id="int_goal'+(i ? i+1 : '')+'" maxlength="140" placeholder="'+escapeHtml(ph)+'" value="'+escapeHtml(g ? g.label : '')+'"></div>'; }).join('')+'</div>'+
       F.extra.map(function(f, i){ return '<label class="int-f" style="--i:'+(i+1)+'"><span>'+f[1]+'</span><input class="int-in" id="int_'+f[0]+'" maxlength="140" placeholder="'+escapeHtml(f[2])+'" value="'+escapeHtml(cur[f[0]]||'')+'"></label>'; }).join('')+
     '</div>'+
-    '<div class="int-a"><span class="int-a-xp">Checking in: +'+(kind==='month' ? CHECKIN_XP.monthIn : CHECKIN_XP.weekIn)+' XP</span><button class="int-save" data-action="saveIntent" data-id="'+kind+'">'+(checkedIn(kind, key) ? 'Save' : kind==='month' ? 'Start the month' : 'Start the week')+' &#8594;</button></div>';
+    '<div class="int-a">'+(checkedIn(kind, key) ? '<button class="int-reset" data-action="intentReset" data-id="'+kind+'" title="Delete this '+kind+'’s goals and check-in">Start over</button>' : '')+'<span class="int-a-xp">Checking in: +'+(kind==='month' ? CHECKIN_XP.monthIn : CHECKIN_XP.weekIn)+' XP</span><button class="int-save" data-action="saveIntent" data-id="'+kind+'">'+(checkedIn(kind, key) ? 'Save' : kind==='month' ? 'Start the month' : 'Start the week')+' &#8594;</button></div>';
   o.dataset.kind = kind; o.dataset.mode = 'in';
   overlayIn(o, cinematic);
   setTimeout(function(){ const i = document.getElementById('int_goal'); if(i) i.focus(); }, cinematic ? 1300 : 120);
@@ -123,8 +123,9 @@ ACTIONS.saveIntent = function(el, e, id){
   showToast(kind==='month' ? 'Checked in for '+monthName(key)+'.' : 'Checked in for the week.', {icon:'&#127769;'});
   if(first && typeof xpToast==='function') setTimeout(function(){ xpToast(kind==='month' ? CHECKIN_XP.monthIn : CHECKIN_XP.weekIn, kind==='month' ? 'Month check-in.' : 'Week check-in.'); }, 500);
   if(typeof notifBadge==='function') notifBadge();
-  // the month first, then the week
+  // the month first, then the week — and once you're set, Op's word on the plan
   if(kind==='month' && !checkedIn('week', weekKey())) setTimeout(function(){ openIntentForm('week', true); }, 700);
+  else if(first && typeof opCheckinRemark==='function') opCheckinRemark(kind);
   renderView();
 };
 // ---- check out: what you hit, what you missed, what went well, what you'll fix ----
@@ -185,9 +186,37 @@ ACTIONS.saveCheckout = function(el, e, id){
   } else playPositive();
   if(typeof notifBadge==='function') notifBadge();
   renderView();
+  // Op's read on how it went (spoken if the voice is on)
+  if(typeof opPeriodRemark==='function') opPeriodRemark(kind, key);
   // done with the old one: straight into the new one, if it isn't set yet
   const nk = periodKey(kind);
-  if(nk!==key && !checkedIn(kind, nk)) setTimeout(function(){ openIntentForm(kind, true); }, 4200);
+  if(nk!==key && !checkedIn(kind, nk)) setTimeout(function(){ openIntentForm(kind, true); }, 9000);
+};
+// rename or delete one (deleting asks twice; a checked-out period can still be cleaned up)
+ACTIONS.tierGoalRename = function(el, e, id){
+  const g = arr(state.goals.items).find(function(x){ return x.id===id; }); if(!g) return;
+  const v = prompt('Rename this goal', g.label); if(v==null) return;
+  const t = v.trim(); if(!t) return;
+  g.label = t.slice(0, 140); persist('goals'); renderView();
+};
+ACTIONS.tierGoalDelete = function(el, e, id){
+  const key = 'tgdel:'+id;
+  if(!armed.has(key)){ armed.add(key); renderView(); setTimeout(function(){ if(armed.has(key)){ armed.delete(key); renderView(); } }, 3000); return; }
+  armed.delete(key);
+  state.goals.items = state.goals.items.filter(function(x){ return x.id!==id; }); persist('goals'); playTick(); renderView();
+};
+// start a week (or month) over: its goals, its check-in and its check-out go — like it never happened
+ACTIONS.intentReset = function(el, e, id){
+  const kind = id==='month' ? 'month' : 'week', key = periodKey(kind), k = 'intreset:'+kind;
+  if(!armed.has(k)){ armed.add(k); el.textContent = 'Sure? Tap again'; setTimeout(function(){ armed.delete(k); }, 3000); return; }
+  armed.delete(k);
+  state.goals.items = state.goals.items.filter(function(g){ return !(g.tier===kind && g.pk===key); });
+  delete (kind==='month' ? intentStore().months : intentStore().weeks)[key];
+  delete intentStore().prompted[(kind==='month' ? 'M' : 'W')+key];
+  persist('goals'); persist('journal');
+  openIntentForm(kind);
+  showToast(kind==='month' ? 'The month is a clean slate.' : 'This week is a clean slate.', {icon:'&#129529;'});
+  renderView();
 };
 // tick a weekly / monthly goal off (or back on) from anywhere
 ACTIONS.tierGoalToggle = function(el, e, id){
@@ -229,9 +258,11 @@ afterRenderHooks.push(function(){
 // ---- the week and the month as lists you tick (Calendar strip and the Goals tab) ----
 function tierGoalRowHtml(g){
   const locked = checkedOut(g.tier, g.pk);
-  return '<button class="tg-row'+(g.done ? ' is-done' : '')+(g.missed ? ' is-missed' : '')+'" data-action="tierGoalToggle" data-id="'+g.id+'"'+(locked ? ' title="Checked out — on the record"' : '')+'>'+
-    '<span class="tg-box">'+(g.done ? '&#10003;' : g.missed ? '&#10005;' : '')+'</span><span class="tg-l">'+escapeHtml(g.label)+'</span>'+
-    '<span class="tg-xp">+'+(g.tier==='month' ? CHECKIN_XP.monthGoal : CHECKIN_XP.weekGoal)+'</span></button>';
+  const delArmed = armed.has('tgdel:'+g.id);
+  return '<div class="tg-row'+(g.done ? ' is-done' : '')+(g.missed ? ' is-missed' : '')+'">'+
+    '<button class="tg-hit" data-action="tierGoalToggle" data-id="'+g.id+'"'+(locked ? ' title="Checked out — on the record"' : '')+'><span class="tg-box">'+(g.done ? '&#10003;' : g.missed ? '&#10005;' : '')+'</span><span class="tg-l">'+escapeHtml(g.label)+'</span>'+
+    '<span class="tg-xp">+'+(g.tier==='month' ? CHECKIN_XP.monthGoal : CHECKIN_XP.weekGoal)+'</span></button>'+
+    '<span class="tg-acts"><button class="tg-a" data-action="tierGoalRename" data-id="'+g.id+'" title="Rename">&#9998;</button><button class="tg-a'+(delArmed ? ' is-armed' : '')+'" data-action="tierGoalDelete" data-id="'+g.id+'" title="'+(delArmed ? 'Tap again to delete' : 'Delete')+'">'+(delArmed ? 'Delete?' : '&#10005;')+'</button></span></div>';
 }
 function tierCardHtml(kind, opts){
   opts = opts || {};
