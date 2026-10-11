@@ -33,6 +33,8 @@ function acctWorking(){
   const s = state.focus.activeSession, m = state.modes && state.modes.active;
   if(s) return s.onBreak ? 'break' : 'locked';
   if(m && m.type==='shooting') return 'shooting';
+  // on a work app right now (the Operator app's activity tracking): that's working
+  if(typeof currentForegroundApp==='function' && typeof activityCategory==='function'){ try{ const app = currentForegroundApp(); if(app && activityCategory(app)==='work') return 'moving'; }catch(e){} }
   const d = workDayState();
   if(d.lastProgressAt && Date.now() - d.lastProgressAt < 40*60000) return 'moving';
   if(Date.now() - acctLastSessionEnd() < 20*60000) return 'between';
@@ -95,6 +97,21 @@ function acctTick(){
   return acctPing();
 }
 setInterval(function(){ try{ acctTick(); }catch(e){} }, 30000);
+// ---- and as the day goes on: proud of you when the plan's done, a heads-up when something due today is still open ----
+function opDayMoments(){
+  if(typeof workCfg!=='function' || !workCfg().enabled || !workDayToday() || acctBusy() || acct().pending) return;
+  const d = workDayState(), plan = typeof todaysPlan==='function' ? todaysPlan() : [];
+  if(plan.length >= 2 && !d.planDoneSaid && plan.every(function(t){ return t.status==='done'; })){
+    d.planDoneSaid = Date.now(); persist('focus');
+    opNotify(pickOne(['That’s everything on today’s plan. Proud of you. Take a breath.', 'Plan’s done. Every single thing. That’s how it’s done.', 'All of it, done. Go enjoy that for a minute.']), 'excited');
+    return;
+  }
+  const m = nowMin(); if(m < 14*60 || workPhase()!=='work') return;
+  const t = todayStr(), said = d.dueSaid || (d.dueSaid = {});
+  const due = state.tasks.items.find(function(x){ return x.deadline===t && x.status!=='done' && !said[x.id]; });
+  if(due){ said[due.id] = Date.now(); persist('focus'); opNotify(due.title+' is due today and it’s still open. Want to make it the next thing?', 'concern'); }
+}
+setInterval(function(){ try{ opDayMoments(); }catch(e){} }, 60000);
 // ---- working: a light touch ----
 const ACCT_LIGHT = ['You’re moving. Need anything from me?', 'Quick one: when did you last have water? Grab some.', 'Good pace. Stand up and stretch for a minute, then back at it.',
   'Eyes off the screen for twenty seconds. Look at something far away. Then keep going.', 'You’re in it. Anything I can take off your plate?', 'Check your posture. Shoulders down. Carry on.',
