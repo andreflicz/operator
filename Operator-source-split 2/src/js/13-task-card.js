@@ -200,9 +200,10 @@ function saveEditTask(id){
   if(cdEl) t.countsDeepWork = cdEl.checked;
   t.notes = document.getElementById('editNotes-'+id).value.trim();
   const skillEl = document.getElementById('editSkill-'+id);
-  if(skillEl){ t.skill = skillEl.checked; if(t.skill) t.ongoing = true; }
+  if(skillEl) t.skill = skillEl.checked;
   const ongoingEl = document.getElementById('editOngoing-'+id);
-  t.ongoing = !!(ongoingEl && ongoingEl.checked);
+  // (a skill is always ongoing: it stays on your list)
+  t.ongoing = !!(ongoingEl && ongoingEl.checked) || !!t.skill;
   if(t.ongoing){
     t.ongoingDeadline = t.deadline;
     const ongoingFrequencyEl = document.getElementById('editOngoingFrequency-'+id);

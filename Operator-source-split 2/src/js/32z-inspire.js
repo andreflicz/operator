@@ -97,8 +97,8 @@ function inspAddThought(x, y){
 }
 ACTIONS.inspThoughtDel = function(el, e, id){ const s = inspStore(); s.thoughts = s.thoughts.filter(function(t){ return t.id!==id; }); persist('personal'); inspRender(); };
 document.addEventListener('input', function(e){
-  const ta = e.target; if(!ta || !ta.closest || !ta.closest('#insp .ith')) return;
-  const id = ta.closest('.ith').dataset.thought, t = inspStore().thoughts.find(function(x){ return x.id===id; });
+  const ta = e.target; if(!ta || !ta.closest || !ta.closest('#insp .izt')) return;
+  const id = ta.closest('.izt').dataset.thought, t = inspStore().thoughts.find(function(x){ return x.id===id; });
   if(t){ t.text = ta.value.slice(0, 2000); persist('personal'); }
 });
 // ---- the page ----
@@ -174,8 +174,8 @@ function inspHtml(){
   const picks = inspPicks().map(function(a){ return a.id; });
   const mind = typeof xpSummary==='function' ? (function(){ try{ const sub = xpSummary().attrs.PER.subs.find(function(x){ return x.label==='Mind'; }); return sub ? sub.v : null; }catch(e){ return null; } })() : null;
   const v = ui.inspView || inspHome();
-  const ring = function(val, size){ const r = size/2 - 6, c = 2*Math.PI*r, f = val==null ? 0 : (val-25)/75; return '<svg class="ih-ring" viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'"><defs><linearGradient id="ihG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb3e6"/><stop offset=".5" stop-color="#b8a4ff"/><stop offset="1" stop-color="#8ff0ff"/></linearGradient></defs>'+
-    '<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" class="ih-track"/><circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" class="ih-fill" stroke="url(#ihG)" stroke-dasharray="'+(c*f).toFixed(1)+' '+c.toFixed(1)+'" transform="rotate(-90 '+size/2+' '+size/2+')"/></svg>'; };
+  const ring = function(val, size){ const r = size/2 - 6, c = 2*Math.PI*r, f = val==null ? 0 : (val-25)/75; return '<svg class="izh-ring" viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'"><defs><linearGradient id="ihG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb3e6"/><stop offset=".5" stop-color="#b8a4ff"/><stop offset="1" stop-color="#8ff0ff"/></linearGradient></defs>'+
+    '<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" class="izh-track"/><circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" class="izh-fill" stroke="url(#ihG)" stroke-dasharray="'+(c*f).toFixed(1)+' '+c.toFixed(1)+'" transform="rotate(-90 '+size/2+' '+size/2+')"/></svg>'; };
   const open = ui.inspOpenAct ? inspAct(ui.inspOpenAct) : null;
   const board = ui.inspBoard ? arr(state.boards.boards).find(function(b){ return b.id===ui.inspBoard; }) : null;
   const recent = s.log.slice(-12).reverse();
@@ -183,21 +183,21 @@ function inspHtml(){
     '<div class="insp-stars" style="--px:'+(v.x*0.3).toFixed(1)+'px;--py:'+(v.y*0.3).toFixed(1)+'px"></div>'+
     '<div class="insp-plane" id="inspPlane"><div class="insp-world" id="inspWorld" style="transform:translate('+v.x+'px,'+v.y+'px) scale('+v.z+')">'+
       // the middle: you
-      '<div class="ih" style="left:0;top:0"><div class="ih-glow"></div>'+ring(rate, 200)+
-        '<div class="ih-c"><small>Inspiration</small><b>'+(rate==null ? '&ndash;' : rate)+'</b><span>'+(todayLog.length ? todayLog.length+' today' : 'Nothing yet today')+'</span></div>'+
-        '<button class="ih-log" data-action="inspLogSheet">Log something</button>'+
-        todayLog.slice(-8).map(function(x, i){ const ang = -Math.PI/2 + i*(Math.PI*2/8); return '<i class="ih-stone" style="--x:'+Math.round(Math.cos(ang)*118)+'px;--y:'+Math.round(Math.sin(ang)*118)+'px" title="'+escapeHtml(x.label)+'">'+inspAct(x.act).e+'</i>'; }).join('')+
+      '<div class="izh" style="left:0;top:0"><div class="izh-glow"></div>'+ring(rate, 200)+
+        '<div class="izh-c"><small>Inspiration</small><b>'+(rate==null ? '&ndash;' : rate)+'</b><span>'+(todayLog.length ? todayLog.length+' today' : 'Nothing yet today')+'</span></div>'+
+        '<button class="izh-log" data-action="inspLogSheet">Log something</button>'+
+        todayLog.slice(-8).map(function(x, i){ const ang = -Math.PI/2 + i*(Math.PI*2/8); return '<i class="izh-stone" style="--x:'+Math.round(Math.cos(ang)*118)+'px;--y:'+Math.round(Math.sin(ang)*118)+'px" title="'+escapeHtml(x.label)+'">'+inspAct(x.act).e+'</i>'; }).join('')+
       '</div>'+
       // ideas
       lay.acts.map(function(p){ const a = p.a, did = todayLog.some(function(x){ return x.act===a.id; });
-        return '<button class="ib'+(picks.indexOf(a.id)>=0 ? ' is-pick' : '')+(did ? ' is-did' : '')+(ui.inspOpenAct===a.id ? ' is-open' : '')+' c-'+a.cat+'" data-action="inspOpenAct" data-id="'+a.id+'" style="left:'+p.x+'px;top:'+p.y+'px;--s:'+p.s+'px;--d:'+p.d.toFixed(2)+'s"><span class="ib-e">'+a.e+'</span><span class="ib-l">'+escapeHtml(a.label)+'</span>'+(did ? '<em>&#10003;</em>' : '')+'</button>'; }).join('')+
+        return '<button class="izb'+(picks.indexOf(a.id)>=0 ? ' is-pick' : '')+(did ? ' is-did' : '')+(ui.inspOpenAct===a.id ? ' is-open' : '')+' c-'+a.cat+'" data-action="inspOpenAct" data-id="'+a.id+'" style="left:'+p.x+'px;top:'+p.y+'px;--s:'+p.s+'px;--d:'+p.d.toFixed(2)+'s"><span class="izb-e">'+a.e+'</span><span class="izb-l">'+escapeHtml(a.label)+'</span>'+(did ? '<em>&#10003;</em>' : '')+'</button>'; }).join('')+
       (open ? (function(){ const p = lay.acts.find(function(q){ return q.a.id===open.id; }) || {x:0, y:0};
-        return '<div class="ib-card" style="left:'+p.x+'px;top:'+p.y+'px"><div class="ib-card-e">'+open.e+'</div><b>'+escapeHtml(open.label)+'</b><p>'+escapeHtml(open.why)+'</p>'+
-          '<div class="ib-card-r"><button class="ib-do" data-action="inspLog" data-id="'+open.id+'">I did this</button><button class="ib-x" data-action="inspOpenAct" data-id="'+open.id+'">Later</button></div></div>'; })() : '')+
+        return '<div class="izb-card" style="left:'+p.x+'px;top:'+p.y+'px"><div class="izb-card-e">'+open.e+'</div><b>'+escapeHtml(open.label)+'</b><p>'+escapeHtml(open.why)+'</p>'+
+          '<div class="izb-card-r"><button class="izb-do" data-action="inspLog" data-id="'+open.id+'">I did this</button><button class="izb-x" data-action="inspOpenAct" data-id="'+open.id+'">Later</button></div></div>'; })() : '')+
       // boards
-      lay.boards.map(function(p, i){ return '<div class="ibd'+(i===0 ? ' is-vision' : '')+'" data-action="inspBoard" data-id="'+p.b.id+'" style="left:'+p.x+'px;top:'+p.y+'px;width:'+p.w+'px;height:'+p.h+'px">'+boardStaticHtml(p.b, 'insp-board')+'<span class="ibd-n">'+(i===0 ? '&#9733; ' : '')+escapeHtml(p.b.name)+'</span></div>'; }).join('')+
+      lay.boards.map(function(p, i){ return '<div class="izd'+(i===0 ? ' is-vision' : '')+'" data-action="inspBoard" data-id="'+p.b.id+'" style="left:'+p.x+'px;top:'+p.y+'px;width:'+p.w+'px;height:'+p.h+'px">'+boardStaticHtml(p.b, 'insp-board')+'<span class="izd-n">'+(i===0 ? '&#9733; ' : '')+escapeHtml(p.b.name)+'</span></div>'; }).join('')+
       // thoughts
-      s.thoughts.map(function(t){ return '<div class="ith" data-thought="'+t.id+'" style="left:'+t.x+'px;top:'+t.y+'px;--t:'+t.tint+'"><div class="ith-h" data-drag="'+t.id+'"><span>Thought</span><button data-action="inspThoughtDel" data-id="'+t.id+'" title="Let it go">&#10005;</button></div><textarea placeholder="Write anything…" maxlength="2000">'+escapeHtml(t.text)+'</textarea></div>'; }).join('')+
+      s.thoughts.map(function(t){ return '<div class="izt" data-thought="'+t.id+'" style="left:'+t.x+'px;top:'+t.y+'px;--t:'+t.tint+'"><div class="izt-h" data-drag="'+t.id+'"><span>Thought</span><button data-action="inspThoughtDel" data-id="'+t.id+'" title="Let it go">&#10005;</button></div><textarea placeholder="Write anything…" maxlength="2000">'+escapeHtml(t.text)+'</textarea></div>'; }).join('')+
     '</div></div>'+
     // what stays put
     '<div class="insp-top"><button class="insp-x" data-action="closeInspire" title="Back (Esc)">&#10005;</button><div class="insp-word">Inspiration<small>a place for your mind</small></div>'+
@@ -205,12 +205,12 @@ function inspHtml(){
       '<button class="insp-b" data-action="inspCenter" title="Back to the middle">&#9678;</button>'+
       '<button class="insp-b'+(typeof musicOn==='function' && musicOn() ? ' is-on' : '')+'" data-action="inspMusic" title="'+(typeof musicOn==='function' && musicOn() ? 'Pause the music' : 'Play music')+'">'+(typeof musicOn==='function' && musicOn() ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9835;')+'</button></div>'+
     '<div class="insp-scores"><div><b>'+(rate==null ? '&ndash;' : rate)+'</b><span>Inspiration</span></div>'+(mind!=null ? '<div><b>'+mind+'</b><span>Mind</span></div>' : '')+'<div><b>'+inspStreak()+'</b><span>day streak</span></div></div>'+
-    '<div class="insp-lately"><div class="il-h">Lately</div>'+(recent.length ? recent.map(function(x){ return '<div class="il-r"><span>'+inspAct(x.act).e+'</span><b>'+escapeHtml(x.label)+'</b><small>'+(x.date===t ? fmtTimeShort(x.at) : weekdayShort(x.date))+'</small></div>'; }).join('') : '<div class="il-none">What you log shows up here.</div>')+'</div>'+
+    '<div class="insp-lately"><div class="izl-h">Lately</div>'+(recent.length ? recent.map(function(x){ return '<div class="izl-r"><span>'+inspAct(x.act).e+'</span><b>'+escapeHtml(x.label)+'</b><small>'+(x.date===t ? fmtTimeShort(x.at) : weekdayShort(x.date))+'</small></div>'; }).join('') : '<div class="izl-none">What you log shows up here.</div>')+'</div>'+
     '<div class="insp-hint'+(Date.now() - (ui.inspHintAt||0) > 6500 ? ' is-gone' : '')+'">Drag to wander · scroll to zoom · double-click anywhere to write a thought</div>'+
-    (ui.inspSheet ? '<div class="insp-sheet-bg" data-action="inspLogSheet"></div><div class="insp-sheet"><div class="is-h">What did you do?</div>'+
-      '<div class="is-grid">'+inspActs().map(function(a){ return '<button class="is-a c-'+a.cat+'" data-action="inspLogFromSheet" data-id="'+a.id+'"><span>'+a.e+'</span>'+escapeHtml(a.label)+'</button>'; }).join('')+'</div>'+
-      '<div class="is-more"><input class="input" id="inspMin" type="number" min="0" placeholder="Minutes (optional)"><input class="input" id="inspNote" placeholder="A note (optional): the book, the place, how it felt"></div></div>' : '')+
-    (board ? '<div class="insp-bview" data-action="inspBoardClose">'+boardStaticHtml(board, 'insp-board-big')+'<div class="ibv-n">'+escapeHtml(board.name)+'</div><button class="insp-x ibv-x" data-action="inspBoardClose">&#10005;</button></div>' : '');
+    (ui.inspSheet ? '<div class="insp-sheet-bg" data-action="inspLogSheet"></div><div class="insp-sheet"><div class="izs-h">What did you do?</div>'+
+      '<div class="izs-grid">'+inspActs().map(function(a){ return '<button class="izs-a c-'+a.cat+'" data-action="inspLogFromSheet" data-id="'+a.id+'"><span>'+a.e+'</span>'+escapeHtml(a.label)+'</button>'; }).join('')+'</div>'+
+      '<div class="izs-more"><input class="input" id="inspMin" type="number" min="0" placeholder="Minutes (optional)"><input class="input" id="inspNote" placeholder="A note (optional): the book, the place, how it felt"></div></div>' : '')+
+    (board ? '<div class="insp-bview" data-action="inspBoardClose">'+boardStaticHtml(board, 'insp-board-big')+'<div class="izv-n">'+escapeHtml(board.name)+'</div><button class="insp-x izv-x" data-action="inspBoardClose">&#10005;</button></div>' : '');
 }
 function inspRender(){
   const L = document.getElementById('insp'); if(!L) return;
@@ -237,8 +237,8 @@ function inspBind(L){
   L.addEventListener('pointerdown', function(e){
     if(e.button!==0) return;
     const th = e.target.closest('[data-drag]');
-    if(th){ const t = inspStore().thoughts.find(function(x){ return x.id===th.dataset.drag; }); if(!t) return; drag = {thought:t, el:th.closest('.ith'), sx:e.clientX, sy:e.clientY, ox:t.x, oy:t.y}; e.preventDefault(); return; }
-    if(!e.target.closest('#inspPlane') || e.target.closest('button, textarea, input, .ith, .ibd, .ib-card')) return;
+    if(th){ const t = inspStore().thoughts.find(function(x){ return x.id===th.dataset.drag; }); if(!t) return; drag = {thought:t, el:th.closest('.izt'), sx:e.clientX, sy:e.clientY, ox:t.x, oy:t.y}; e.preventDefault(); return; }
+    if(!e.target.closest('#inspPlane') || e.target.closest('button, textarea, input, .izt, .izd, .izb-card')) return;
     cancelAnimationFrame(glide);
     drag = {sx:e.clientX, sy:e.clientY, ox:ui.inspView.x, oy:ui.inspView.y, lx:e.clientX, ly:e.clientY, lt:performance.now(), vx:0, vy:0};
     L.classList.add('is-panning');
@@ -267,7 +267,7 @@ function inspBind(L){
     v.x = cx - (cx - v.x)*(z/z0); v.y = cy - (cy - v.y)*(z/z0); v.z = z; inspApply(false);
   }, {passive:false});
   L.addEventListener('dblclick', function(e){
-    if(!e.target.closest('#inspPlane') || e.target.closest('button, textarea, .ith, .ibd, .ib, .ih, .ib-card')) return;
+    if(!e.target.closest('#inspPlane') || e.target.closest('button, textarea, .izt, .izd, .izb, .izh, .izb-card')) return;
     const r = L.getBoundingClientRect(), v = ui.inspView;
     inspAddThought((e.clientX - r.width/2 - v.x)/v.z - 110, (e.clientY - r.height/2 - v.y)/v.z - 30);
   });

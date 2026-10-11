@@ -127,7 +127,8 @@ async function ctxPage(b, seed, opts){
     check('Good morning: one message from your month/week, big — not a list', ['Phone in bed', 'Sign two new clients', 'Finish the JJS launch'].includes(one.trim()) && await p.$('.br-intent .bi-rest')===null, one);
     check('no "You, lately" and no "a month ago you wrote"', !/You, Lately|you wrote/i.test(await p.textContent('#wakeContent')));
     check('the quarter: Q4 · 81 days left', /Q4/.test(await p.textContent('.bi-q')) && /81\s*days left/.test(await p.textContent('.bi-q')));
-    check('your level is a quiet HUD in the top bar', await p.isVisible('.brief-top .b4-hud') && /LVL 0/.test(await p.textContent('.brief-top .b4-hud')));
+    // (round 25: the level lives in the top-left panel, which also shows the morning and the vision board)
+    check('your level is in the top-left panel (not the top bar)', !(await p.$('.brief-top .b4-hud')) && /Level 0/.test(await p.textContent('.br-hero .bh-lv')));
     check('sports never just vanishes (no scores, no headlines → it says so)', await p.isVisible('.br-sports') && /Couldn’t reach ESPN|No .* games|Getting the scores/.test(await p.textContent('.br-sports')));
     check('panels come quicker (whole page built in under 11 s)', await E("ui.briefLines[ui.briefLines.length-1].at") < 11000);
     check('no page errors (month / week)', p.errors.length===0, p.errors);

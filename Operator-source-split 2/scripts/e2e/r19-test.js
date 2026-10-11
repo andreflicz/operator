@@ -101,7 +101,7 @@ async function ctxPage(b, seed, opts){
     const subs = await E("JSON.stringify(Object.fromEntries(['BUS','PER','DIS'].map(k=>[k, xpSummary().attrs[k].subs.map(s=>s.label)])))");
     // (round 20: Discipline is standards kept / follow-through / check-ins; Personal drops Reflection; Client growth is Scaling)
     check('Discipline: reliability, consistency (round 25: no Integrity)', /"DIS":\["Reliability","Consistency"\]/.test(subs), subs);
-    check('Personal: content, goals, finances — no “Video ideas”, no Reflection', /"PER":\["Content","Goals","Finances"\]/.test(subs), subs);
+    check('Personal: content, goals, finances, mind — no “Video ideas”, no Reflection', /"PER":\["Content","Goals","Finances","Mind"\]/.test(subs), subs);
     check('clients typed in recently don’t count as Scaling (start dates do)', await E("xpSummary().attrs.BUS.subs.find(s=>s.label==='Scaling').v")===25);
     check('Finances: 40% paid off and a payment this month', /40% paid off/.test(await E("financeRating().note")) && await E("financeRating().f") > .3);
     // XP from the MRR you added (2k → 1,600 XP): the next level is ready, not handed out

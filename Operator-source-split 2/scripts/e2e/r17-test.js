@@ -220,7 +220,8 @@ const newsRoute = (asked, extra) => async r => {
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("fireWake({})"); await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(500);
     await E("briefRevealAll()"); await p.waitForTimeout(800);
-    check('a mic with the Operator (no type-in box on the page)', await p.isVisible('.brief4 .op-talk') && await p.$('.brief4 .op-type')===null);
+    // (round 24: Op is the light: the dot by its words is how you talk to it)
+    check('talk to Op with its light (no type-in box on the page)', await p.isVisible('.brief4 .br-voice-dot[data-action="briefTalk"]') && await p.$('.brief4 .op-type')===null);
     await E("aiTypeFocus()"); await p.waitForTimeout(300);
     check('…its bubble floats over the page (bottom centre), with a reply box', await p.isVisible('#opBub.is-in #opBubInput'));
     await p.fill('#opBubInput', 'What should I start with?'); await p.press('#opBubInput', 'Enter'); await p.waitForTimeout(1200);

@@ -38,6 +38,8 @@ async function ctxPage(b, seed, opts){
   await p.goto('file://'+path.resolve(OUT+'/r25.html')); await p.waitForTimeout(500);
   return p;
 }
+// a computed colour as 0..255 numbers (Chrome writes color-mix results as color(srgb 0..1 …))
+const rgbOf = s => { const n = String(s).match(/[\d.]+/g).map(Number); return /^color\(/.test(s) ? n.slice(0, 3).map(x => x*255) : n.slice(0, 3); };
 const pic = c => 'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200"><rect width="300" height="200" fill="'+c+'"/></svg>');
 const BOARDS = {boards:[
   {id:'v1', kind:'vision', name:'Vision', parentId:null, viewport:{x:0,y:0,zoom:1}, elements:[{id:'i1', type:'image', ref:pic('#f0a'), x:0, y:0, w:300, h:200, z:1}, {id:'n1', type:'note', header:true, color:'#3FBE8E', title:'Mind + Body', body:'', x:320, y:0, w:240, h:80, z:2}]},
@@ -65,7 +67,7 @@ const WORK = {enabled:true, start:'09:00', end:'17:00', days:[0,1,2,3,4,5,6], lu
     await E("ui.briefHeroManual = false; ui.briefHeroAt = 0; briefHeroSet('wx')"); await p.clock.runFor(14000); await p.waitForTimeout(300);
     check('…it moves through them by itself while you read', await E("ui.briefHeroV")==='vision');
     check('the rainbow bubble is on Good morning', await p.isVisible('#inspOrb.is-on'));
-    await p.click('#inspOrb'); await p.waitForTimeout(900);
+    await p.click('#inspOrb', {force:true}); await p.waitForTimeout(900);
     check('…and opens Inspiration over it', await p.isVisible('#insp.is-in') && await E("overlayOpen('wakeOverlay')"));
     await p.keyboard.press('Escape'); await p.waitForTimeout(900);
     check('…Esc brings you back to Good morning', !(await p.$('#insp.is-in')) && await E("overlayOpen('wakeOverlay')"));
@@ -80,9 +82,9 @@ const WORK = {enabled:true, start:'09:00', end:'17:00', days:[0,1,2,3,4,5,6], lu
     check('a mood tag is read off a reply and never shown', await E("JSON.stringify(opMoodSplit('[mood:humor] Got you.'))")==='{"mood":"humor","text":"Got you."}' && await E("opMoodSplit('Plain.').mood")===null);
     await E("OV.cap='opBubText'; opBubShow(); opCaption('Hi')"); await p.waitForTimeout(400);
     const col = async () => p.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--op-c').trim());
-    check('Op is white when it’s just Op (light and bubble)', /#fff(fff)?/i.test(await col()) && await p.evaluate(() => { const c = getComputedStyle(document.getElementById('opBub')).backgroundColor.match(/\d+/g).map(Number); return c[0] > 220 && c[1] > 220 && c[2] > 220; }));
+    check('Op is white when it’s just Op (light and bubble)', /#fff(fff)?/i.test(await col()) && (c => c[0] > 220 && c[1] > 220 && c[2] > 220)(rgbOf(await p.evaluate(() => getComputedStyle(document.getElementById('opBub')).backgroundColor))));
     await E("opMood('stern', Infinity)"); await p.waitForTimeout(900);
-    check('stern: red', /#ff6262/i.test(await col()) && await p.evaluate(() => { const c = getComputedStyle(document.getElementById('opBub')).backgroundColor.match(/\d+/g).map(Number); return c[0] > c[2] + 8; }));
+    check('stern: red', /#ff6262/i.test(await col()) && (c => c[0] > c[2] + 8)(rgbOf(await p.evaluate(() => getComputedStyle(document.getElementById('opBub')).backgroundColor))));
     await E("opMood('concern', 50)"); await p.waitForTimeout(400);
     check('concerned: yellow, and it fades back to white on its own', true);
     await p.waitForTimeout(300);
@@ -219,21 +221,22 @@ const WORK = {enabled:true, start:'09:00', end:'17:00', days:[0,1,2,3,4,5,6], lu
     await E("boardById('j2').category = 'business'");
     await p.click('.nav-item.nav-insp'); await p.waitForTimeout(1000);
     check('Inspiration: full screen, from the sidebar', await p.isVisible('#insp.is-in') && await E("document.body.classList.contains('insp-on')"));
-    check('bubbles of things that clear your head (your places too)', (await p.$$('#insp .ib')).length >= 18 && /Walk to Riverside Park/.test(await p.textContent('#insp')));
-    check('your boards are here, not the business ones', /Vision/.test(await p.textContent('#insp .ibd.is-vision')) && /Ideas for life/.test(await p.textContent('#insp')) && !/Ad strategy/.test(await p.textContent('#insp')));
+    check('bubbles of things that clear your head (your places too)', (await p.$$('#insp .izb')).length >= 18 && /Walk to Riverside Park/.test(await p.textContent('#insp')));
+    check('your boards are here, not the business ones', /Vision/.test(await p.textContent('#insp .izd.is-vision')) && /Ideas for life/.test(await p.textContent('#insp')) && !/Ad strategy/.test(await p.textContent('#insp')));
     check('the music plays while you’re here', await E("FM.playing")===true);
-    await p.click('#insp .ib[data-id="walk"]'); await p.waitForTimeout(500);
-    check('a bubble opens with what and why', await p.isVisible('#insp .ib-card') && /Go for a walk/.test(await p.textContent('#insp .ib-card')));
-    await p.click('#insp .ib-do'); await p.waitForTimeout(500);
-    check('"I did this" logs it', await E("inspStore().log.length")===1 && await p.isVisible('#insp .ih-stone') && /Go for a walk/.test(await p.textContent('#insp .insp-lately')));
-    await p.click('#insp .ih-log'); await p.waitForTimeout(400);
-    await p.fill('#inspNote', 'Atomic Habits, ch. 3'); await p.click('#insp .is-a[data-id="read"]'); await p.waitForTimeout(400);
+    await p.click('#insp .izb[data-id="walk"]', {force:true}); await p.waitForTimeout(500);
+    check('a bubble opens with what and why', await p.isVisible('#insp .izb-card') && /Go for a walk/.test(await p.textContent('#insp .izb-card')));
+    await p.click('#insp .izb-do', {force:true}); await p.waitForTimeout(500);
+    check('"I did this" logs it', await E("inspStore().log.length")===1 && await p.isVisible('#insp .izh-stone') && /Go for a walk/.test(await p.textContent('#insp .insp-lately')));
+    await p.click('#insp .izh-log', {force:true}); await p.waitForTimeout(400);
+    await p.fill('#inspNote', 'Atomic Habits, ch. 3'); await p.click('#insp .izs-a[data-id="read"]'); await p.waitForTimeout(400);
     check('…or log anything from the sheet, with a note', await E("inspStore().log.length")===2 && await E("inspStore().log[1].note")==='Atomic Habits, ch. 3');
     check('Inspiration has a score (only on this page) and feeds Mind on Personal', await E("inspRate()") > 25 && await E("(xpLast=null, xpSummaryFresh().attrs.PER.subs.find(s => s.label==='Mind').v)") > 25 && /Inspiration/.test(await p.textContent('#insp .insp-scores')));
-    const box = await p.evaluate(() => { const r = document.getElementById('insp').getBoundingClientRect(); return {x:r.width/2 + 520, y:r.height/2 + 360}; });
+    // somewhere empty on the plane
+    const box = await p.evaluate(() => { for(let y = 120; y < innerHeight - 120; y += 40) for(let x = 300; x < innerWidth - 300; x += 40){ const el = document.elementFromPoint(x, y); if(el && (el.id==='inspPlane' || el.id==='inspWorld')) return {x, y}; } return {x:innerWidth/2, y:innerHeight - 60}; });
     await p.mouse.dblclick(box.x, box.y); await p.waitForTimeout(400);
-    check('double-click anywhere: a thought you can write', await E("inspStore().thoughts.length")===1 && await p.isVisible('#insp .ith textarea'));
-    await p.fill('#insp .ith textarea', 'Slow mornings.'); await p.waitForTimeout(100);
+    check('double-click anywhere: a thought you can write', await E("inspStore().thoughts.length")===1 && await p.isVisible('#insp .izt textarea'));
+    await p.fill('#insp .izt textarea', 'Slow mornings.'); await p.waitForTimeout(100);
     check('…kept', await E("inspStore().thoughts[0].text")==='Slow mornings.');
     const v0 = await E("ui.inspView.x");
     await p.mouse.move(700, 500); await p.mouse.down(); await p.mouse.move(400, 420, {steps:8}); await p.mouse.up(); await p.waitForTimeout(500);

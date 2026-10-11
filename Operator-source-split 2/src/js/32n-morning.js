@@ -606,7 +606,7 @@ ACTIONS.briefHeroView = function(el, e, id){ ui.briefHeroManual = true; briefHer
 // on its own: the morning first, then the board, then your level, while you read
 setInterval(function(){
   if(ui.briefHeroManual || ui.wakeMode!=='brief' || typeof overlayOpen!=='function' || !overlayOpen('wakeOverlay') || ui.wakeBoardBig) return;
-  if(!briefBuilt()) return;
+  if(!briefBuilt() && !ui.briefSkipped) return;
   const wrap = document.querySelector('#wakeContent .bh-views'); if(!wrap || wrap.matches(':hover')) return;
   const ids = Array.prototype.map.call(document.querySelectorAll('#wakeContent .bh-tab'), function(t){ return t.dataset.id; });
   if(ids.length < 2) return;

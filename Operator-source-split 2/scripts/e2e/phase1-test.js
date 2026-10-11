@@ -77,7 +77,8 @@ async function newPage(browser, seed, clockAt){
 
   // 1.2 manual lock-in from off-time exits cleanly
   page = await newPage(browser, {modes:{active:{type:'offtime', startedAt:Date.now()-3600000}, history:[]}, tasks:{items:[{id:'t9', title:'X', clients:['personal'], client:'personal', priority:'med', status:'today', createdAt:today}]}});
-  await page.evaluate(() => {}); 
+  // (round 24: off-time is full screen; the corner button brings the sidebar back)
+  await page.evaluate(() => window.__op.ev("ui.restFull = false; renderView()"));
   await page.click('[data-action="nav"][data-view="focus"]');
   await page.evaluate(() => { document.querySelector('[data-action="nav"][data-view="today"]').click(); });
   // drive the real flow: open chooser -> lock in -> stage task -> start

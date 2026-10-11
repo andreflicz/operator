@@ -32,7 +32,7 @@ async function ctxPage(b, seed, opts){
     // (round 22: every stat one word, three a rating; one Content stat; no Sleep)
     // (round 23: Content is on both, just called Content)
     check('Business: MRR · Grind · Scaling · Content (no Clients, no "Time put in")', JSON.stringify(subs.BUS)===JSON.stringify(['MRR', 'Grind', 'Scaling', 'Content']), subs.BUS);
-    check('Personal: Content · Goals · Finances (no Reflection)', JSON.stringify(subs.PER)===JSON.stringify(['Content', 'Goals', 'Finances']), subs.PER);
+    check('Personal: Content · Goals · Finances · Mind (no Reflection)', JSON.stringify(subs.PER)===JSON.stringify(['Content', 'Goals', 'Finances', 'Mind']), subs.PER);
     check('Health: Training · Diet · Weight', JSON.stringify(subs.HLT)===JSON.stringify(['Training', 'Diet', 'Weight']), subs.HLT);
     check('Discipline: Reliability · Consistency (no On target, no Streak)', JSON.stringify(subs.DIS)===JSON.stringify(['Reliability', 'Consistency']), subs.DIS);
     const all = [].concat(subs.BUS, subs.PER, subs.HLT, subs.DIS);
@@ -83,7 +83,8 @@ async function ctxPage(b, seed, opts){
     await E("['a','b','c'].forEach(l => state.goals.items.push(newTierGoal('week', weekKey(), l))); tierGoals('week', weekKey()).forEach(g => g.done = true)");
     check('only three weekly goals pay a week (6 ticked → +450)', await E("xpLast=null, xpCheckins().parts.weekGoals")===450);
     await E("ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(300);
-    check('Goals tab: The week & the month, with + add (round 23: it opens the goal sheet)', (await p.$$('.tab-panel .tg-card')).length===2 && await p.isVisible('.tg-card.is-month [data-action="openGoalSheet"]'));
+    // (round 25: no + on the cards; the + in the corner adds a goal)
+    check('Goals tab: The week & the month (adding is the + in the corner)', (await p.$$('.tab-panel .tg-card')).length===2 && !(await p.$('.tg-card [data-action="openGoalSheet"]')));
     check('…and they’re not mixed into "Your goals"', (await p.$$('.tab-panel .goal-card')).length===0);
     check('master goals say what they pay (round 23: scaled to the goal)', /\+[\d,]+ XP/.test(await p.textContent('.mg-wrap')));
     check('no page errors (check in)', p.errors.length===0, p.errors);

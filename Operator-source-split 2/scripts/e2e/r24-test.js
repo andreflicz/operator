@@ -57,12 +57,9 @@ const BOARD = {boards:[{id:'v1', kind:'vision', name:'Vision', parentId:null, vi
     await E("briefRevealAll()"); await p.waitForTimeout(500);
     check('no chips row, no Talk to Op, no speaker up top', !(await p.$('.br-opbar')) && !(await p.$('.br-opgo')) && !(await p.$('.brief-top .op-mute-top')));
     check('the blue light is the one way to talk to Op', await p.isVisible('.br-voice-dot[data-action="briefTalk"]'));
-    check('the vision board itself (not pictures from it), small, top right', await p.isVisible('.brief-top .br-vmini .board-static') && (await p.$$('.br-vmini .bel-image')).length===7 && !(await p.$('.br-vthumb')));
-    const lay = await p.evaluate(() => { const r = x => document.querySelector(x).getBoundingClientRect(); const v = r('.br-vmini'), h = r('.brief-top .b4-hud'), g = r('.b4-grid'), s = r('.brief-skipall'), t = r('.brief-hello');
-      const hit = (a, b) => !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom); return {hud:hit(v, h), skip:hit(v, s), grid:v.bottom < g.top, hello:hit(v, t), height:v.height}; });
-    check('…not on top of the level line, Skip, the greeting or the panels', !lay.hud && !lay.skip && !lay.hello && lay.grid && lay.height <= 120, lay);
-    check('the level line sits by the date, small', await p.evaluate(() => document.querySelector('.b4-hud-l .b4-hud .xp-badge').getBoundingClientRect().width) <= 16);
-    await p.click('.br-vmini'); await p.waitForTimeout(300);
+    // (round 25: the vision board and your level live in the top-left panel now; see r25)
+    check('the vision board itself (not pictures from it)', await p.isVisible('.br-hero .bh-tab[data-id="vision"]') && (await p.$$('.bh-vision .bel-image')).length===7 && !(await p.$('.br-vthumb')));
+    await p.click('.bh-tab[data-id="vision"]'); await p.waitForTimeout(900); await p.click('.bh-board'); await p.waitForTimeout(300);
     check('click it: the whole board, big', await p.isVisible('.br-vision-big'));
     await E("ui.wakeBoardBig = false; renderWakeOverlayInto()");
     check('Get to work: the new button', await p.isVisible('.brief-go.bgo2 .bgo-a svg') && /Get to work/.test(await p.textContent('.brief-go.bgo2')));

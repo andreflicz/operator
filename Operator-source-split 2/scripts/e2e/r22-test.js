@@ -65,7 +65,7 @@ const day = (base, n) => { const d = new Date(base); d.setDate(d.getDate()+n); r
     let h = await fresh();
     const all = JSON.parse(await E("JSON.stringify(['BUS','PER','HLT','DIS'].map(k => xpSummaryFresh().attrs[k].subs.map(s => s.label)))"));
     // (round 23: Content is back on Business too, both just called Content)
-    check('every stat is one word, Content on Business and Personal', all.flat().every(l => !/\s/.test(l)) && all[0][3]==='Content' && all[1][0]==='Content' && all[2].length===3 && all[3].length===3, all);
+    check('every stat is one word, Content on Business and Personal', all.flat().every(l => !/\s/.test(l)) && all[0][3]==='Content' && all[1][0]==='Content' && all[2].length===3 && all[3].length===2, all);
     check('Health: Training · Diet · Weight (no Sleep)', JSON.stringify(h.subs.map(s => s.label))==='["Training","Diet","Weight"]', h.subs.map(s => s.label));
     const h0 = h.v;
     check('at 250 lb and 5′10″ (BMI 35.9) the ceiling is about 60', h.cap >= 55 && h.cap <= 60, h.cap);

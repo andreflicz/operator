@@ -100,8 +100,9 @@ async function ctxPage(b, seed, opts){
     check('Goals: three sections (the big ones, this week & month, your goals)', (await p.$$('.gl .gl-sec')).length>=3 && /The big ones/i.test(await p.textContent('.gl')) && /Your goals/i.test(await p.textContent('.gl')));
     check('the revenue card is minimal: no pill, no pen, a quiet "of $20,000"', !(await p.$('.mg-hero .mg-pen')) && /of \$20,000/.test(await p.textContent('.mg-hero .mg-target')));
     check('losing 50 lbs is a big one: +7,500 XP', /\+7,500 XP/.test(await p.textContent('.gl')) && await E("masterXpFor('weight', 250, 200)")===7500 && await E("masterXpFor('mrr', 0, 10000)")===6000);
-    await p.click('.tg-card.is-week [data-action="openGoalSheet"]'); await p.waitForTimeout(250);
-    check('+ Add a goal opens the sheet (This week picked)', await p.isVisible('#goalSheet:not(.hidden) .gs') && /is-on/.test(await p.getAttribute('.gs-seg button[data-id="week"]', 'class')));
+    // (round 25: no + on the cards; the + in the corner opens the sheet, on This week)
+    await p.click('#fabAdd'); await p.waitForTimeout(250);
+    check('the + opens the goal sheet (This week picked)', await p.isVisible('#goalSheet:not(.hidden) .gs') && /is-on/.test(await p.getAttribute('.gs-seg button[data-id="week"]', 'class')));
     await p.fill('#gsLabel', 'Post three reels'); await p.click('[data-action="gsSave"]'); await p.waitForTimeout(800);
     const g = JSON.parse(await E("JSON.stringify(tierGoals('week', weekKey()).find(g => g.label==='Post three reels'))"));
     check('Op sizes it up: +220 XP, with why', g && g.xp===220 && /real push/.test(g.xpWhy) && !g.xpPending, g);
@@ -114,7 +115,7 @@ async function ctxPage(b, seed, opts){
     await E("const r = intentStore().weeks[weekKey()] = intentStore().weeks[weekKey()] || {}; r.at = Date.now(); r.out = {at:Date.now()}; renderView()"); await p.waitForTimeout(200);
     check('a checked-out week offers Reopen', await p.isVisible('.tg-card.is-week [data-action="tierReopen"]'));
     await p.click('.tg-card.is-week [data-action="tierReopen"]'); await p.waitForTimeout(200);
-    check('…and reopening it lets you add again', !(await E("checkedOut('week', weekKey())")) && await p.isVisible('.tg-card.is-week [data-action="openGoalSheet"]'));
+    check('…and reopening it lets you add again', !(await E("checkedOut('week', weekKey())")) && !(await p.$('.tg-card.is-week [data-action="tierReopen"]')));
     check('no long dashes in the sheet or the goals', !/—/.test(await p.textContent('.gl')));
     check('no page errors (goals)', p.errors.length===0, p.errors);
     await p.context().close();
