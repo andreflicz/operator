@@ -97,9 +97,10 @@ async function ctxPage(b, seed, opts){
       finances:{debts:[{id:'d1', name:'Card', balance:600, originalAmount:1000}], payments:[{id:'p1', debtId:'d1', amount:100, date:'2026-10-05'}], income:[], invoices:[]}}, {clock:MON});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     const subs = await E("JSON.stringify(Object.fromEntries(['BUS','PER','DIS'].map(k=>[k, xpSummary().attrs[k].subs.map(s=>s.label)])))");
-    check('Discipline is just On target and Streak', /"DIS":\["On target","Streak"\]/.test(subs), subs);
-    check('Personal: content, goals, reflection, finances — no “Video ideas”', /"PER":\["Personal content","Your goals","Reflection","Finances"\]/.test(subs), subs);
-    check('clients typed in recently don’t count as client growth (start dates do)', await E("xpSummary().attrs.BUS.subs.find(s=>s.label==='Client growth').v")===25);
+    // (round 20: Discipline is standards kept / follow-through / check-ins; Personal drops Reflection; Client growth is Scaling)
+    check('Discipline: standards kept, follow-through, check-ins', /"DIS":\["Standards kept","Follow-through","Check-ins"\]/.test(subs), subs);
+    check('Personal: content, goals, finances — no “Video ideas”, no Reflection', /"PER":\["Personal content","Goals","Finances"\]/.test(subs), subs);
+    check('clients typed in recently don’t count as Scaling (start dates do)', await E("xpSummary().attrs.BUS.subs.find(s=>s.label==='Scaling').v")===25);
     check('Finances: 40% paid off and a payment this month', /40% paid off/.test(await E("financeRating().note")) && await E("financeRating().f") > .3);
     // XP from the MRR you added (2k → 1,600 XP): the next level is ready, not handed out
     check('XP stacks past the level; the level waits to be claimed', await E("xpSummary().total")>=1000 && await E("xpSummary().level")===0 && await E("xpSummary().canLevel")===true);

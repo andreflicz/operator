@@ -109,10 +109,11 @@ async function ctxPage(b, seed, opts){
     const p = await ctxPage(b, {profile:{name:'Andre'}, tasks:{items:tasks}, focus:{wake:WAKE}}, {clock:MON, route: r => { const u = r.request().url(); if(u.includes('/sports')) return r.fulfill({status:502, headers:CORS, body:'{}'}); if(u.includes('/news')) return r.fulfill({status:200, headers:CORS, body:'<?xml version="1.0"?><rss><channel><item><title>Top story</title><link>https://x.com/1</link></item></channel></rss>'}); r.fulfill(okJ); }});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("ui.view='calendar'; renderView()"); await p.waitForTimeout(1600);
-    check('Calendar asks for the month — cinematic', await p.isVisible('#intOverlay.is-in.is-cine') && /October/.test(await p.textContent('#intContent')) && (await p.$$('#intContent .int-in')).length===3);
+    // (round 20: the month check-in has three goals, a habit and a note)
+    check('Calendar asks for the month — cinematic', await p.isVisible('#intOverlay.is-in.is-cine') && /October/.test(await p.textContent('#intContent')) && (await p.$$('#intContent .int-in')).length===5);
     await p.click('#intOverlay .int-x'); await p.waitForTimeout(400);
     check('close it and it waits in the notifications', await E("notifList().some(n => n.key.indexOf('intent:month:2026-10')===0)"));
-    check('the Calendar has a strip with the month and the week', (await p.$$('.int-strip .int-pill')).length===3);
+    check('the Calendar has a strip with the month and the week', (await p.$$('.int-strip .tg-card')).length===2);
     await E("openIntentForm('month')"); await p.waitForTimeout(300);
     await p.fill('#int_habit', 'Phone in bed'); await p.fill('#int_goal', 'Sign two new clients'); await p.click('[data-action="saveIntent"]'); await p.waitForTimeout(1300);
     check('saving the month brings up the week next', await p.isVisible('#intOverlay.is-in') && /This week/.test(await p.textContent('#intContent')));
@@ -124,7 +125,7 @@ async function ctxPage(b, seed, opts){
     check('no "You, lately" and no "a month ago you wrote"', !/You, Lately|you wrote/i.test(await p.textContent('#wakeContent')));
     check('the quarter: Q4 · 81 days left', /Q4/.test(await p.textContent('.bi-q')) && /81\s*days left/.test(await p.textContent('.bi-q')));
     check('your level is a quiet HUD in the top bar', await p.isVisible('.brief-top .b4-hud') && /LVL 0/.test(await p.textContent('.brief-top .b4-hud')));
-    check('sports never just vanishes (no scores, no headlines → it says so)', await p.isVisible('.br-sports') && /No games/.test(await p.textContent('.br-sports')));
+    check('sports never just vanishes (no scores, no headlines → it says so)', await p.isVisible('.br-sports') && /Couldn’t reach ESPN|No .* games|Getting the scores/.test(await p.textContent('.br-sports')));
     check('panels come quicker (whole page built in under 11 s)', await E("ui.briefLines[ui.briefLines.length-1].at") < 11000);
     check('no page errors (month / week)', p.errors.length===0, p.errors);
     await p.context().close();

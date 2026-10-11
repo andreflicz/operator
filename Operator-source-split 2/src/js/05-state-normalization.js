@@ -383,7 +383,7 @@ function normalizeStandards(s){
     if(!t || typeof t!=='object') s.contentTargets[k] = {n: k==='business' ? 3 : 2, per:'week'};
     else { t.n = Math.max(0, Number(t.n)||0); if(t.per!=='day' && t.per!=='week') t.per = 'week'; }
   });
-  // new clients you're after each month (for Client growth)
+  // new clients you’re after each month (for Scaling)
   if(!s.newClientsPerMonth) s.newClientsPerMonth = 2;
   return s;
 }

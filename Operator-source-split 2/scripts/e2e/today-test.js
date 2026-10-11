@@ -71,6 +71,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('+1 steps reach the goal and mark it achieved', await E("state.goals.items[0].done===true && state.goals.items[0].current===3"));
   // fitness
   await p.click('[data-action="personalTab"][data-tab="fitness"]');
+  await p.click('#fabAdd'); // (round 20: logging lives in the + sheet)
   await p.click('[data-action="fitPickType"][data-id="Run"]');
   await p.click('[data-action="fitPickDur"][data-id="30"]');
   await p.click('[data-action="fitLog"]');

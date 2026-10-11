@@ -63,7 +63,7 @@ const FAKE_SPEECH = () => {
        journal:{entries:[], capsules:[{id:'k1', text:'Proud of you for sticking with it.', title:'From summer', writtenOn:'2026-06-01', openOn:'2026-10-12', hidden:true}]},
        focus:{wake:{enabled:true, time:'07:00', days:[0,1,2,3,4,5,6], news:true, newsSports:'Giants, Knicks', intro:'quick', introChosen:true, voiceEngine:'browser'}}});
     await p.route('http://127.0.0.1:8935/**', r => { const u = r.request().url();
-      if(u.includes('/sports')){ const nfl = u.includes('l=nfl'); return r.fulfill({status:200, body:JSON.stringify({events: nfl ? [ev('1','NYG','DAL','24','17','post','2026-10-11T17:00Z'), ev('2','PHI','NYG','','','pre','2026-10-18T17:00Z')] : [ev('3','NYK','BOS','112','104','post','2026-10-11T23:30Z')]}), headers:{'Access-Control-Allow-Origin':'*'}}); }
+      if(u.includes('/sports')){ const nfl = u.includes('l=nfl'); return r.fulfill({status:200, body:JSON.stringify({events: nfl ? [ev('1','NYG','DAL','24','17','post','2026-10-11T17:00Z'), ev('2','PHI','NYG','','','pre','2026-10-18T17:00Z')] : u.includes('l=nba') ? [ev('3','NYK','BOS','112','104','post','2026-10-11T23:30Z')] : []}), headers:{'Access-Control-Allow-Origin':'*'}}); }
       if(u.includes('/news')) return r.fulfill({status:200, body:'<?xml version="1.0"?><rss><channel><title>G</title><item><title>Big story - Src</title><link>https://x.com/1</link></item><item><title>Second story - Src</title><link>https://x.com/2</link></item></channel></rss>', headers:{'Access-Control-Allow-Origin':'*'}});
       r.fulfill(ok); });
     await p.goto('file://'+require('path').resolve(OUT+'/r16.html')); await p.waitForTimeout(500);

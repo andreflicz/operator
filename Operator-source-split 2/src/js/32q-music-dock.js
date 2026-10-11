@@ -21,7 +21,7 @@ function dockBtnsHtml(){
 function dockHtml(){
   const name = dockSrcName();
   // the Operator's mic sits here too: talk to it from anywhere
-  return '<div class="md-in'+(musicOn()?' is-playing':'')+'">'+(name ? '<span class="md-now" title="'+escapeHtml(name)+'">'+escapeHtml(name)+'</span><button class="md-b md-skip" data-action="dockNext" title="Next">&#9197;</button>' : '')+dockBtnsHtml()+
+  return '<div class="md-in'+(musicOn()?' is-playing':'')+'">'+(typeof lvlChipHtml==='function' ? lvlChipHtml() : '')+(name ? '<span class="md-now" title="'+escapeHtml(name)+'">'+escapeHtml(name)+'</span><button class="md-b md-skip" data-action="dockNext" title="Next">&#9197;</button>' : '')+dockBtnsHtml()+
     '<button class="md-b md-op op-talk" data-action="opTalk" title="Talk to the Operator">&#127897;&#65039;</button></div>';
 }
 // (main: the big middle button of the minimal player — ▶ / ❚❚)

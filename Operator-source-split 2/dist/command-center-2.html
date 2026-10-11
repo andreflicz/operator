@@ -4150,6 +4150,196 @@ body.lvl-shake #app, body.lvl-shake .app-shell, body.lvl-shake > main{ animation
 .meta-how summary{ cursor:pointer; font-weight:700; font-size:13px; color:var(--accent); list-style:none; } .meta-how summary::-webkit-details-marker{ display:none; }
 .meta-how summary::before{ content:'▸ '; } .meta-how[open] summary::before{ content:'▾ '; }
 .meta-how ol{ margin:10px 0 6px; padding-left:20px; font-size:13px; line-height:1.55; color:var(--text-dim); } .meta-how li{ margin-bottom:6px; } .meta-how li b{ color:var(--text); }
+/* ================= round 20 ================= */
+/* Good morning: the sunrise wash is taller than the screen, so as it lifts no edge (and no strip of
+   plain sky) ever shows at the bottom; the page itself only fades in (a scale let the background peek) */
+#wakeOverlay.is-entering::after{ inset:-25vh 0 -25vh 0; }
+@keyframes wkIn{ from{ opacity:0; } to{ opacity:1; } }
+.brief.bg-sunrise::before, .brief.bg-golden::before{ will-change:transform, opacity; }
+.brief4 .br-a-blur{ animation-name:br2Rise !important; }
+/* panel headers: a small note on the right */
+.br-k-n{ margin-left:auto; font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:none; color:rgba(255,255,255,.5); }
+.brief4 .br-k{ display:flex; align-items:center; gap:6px; }
+/* Today: room to breathe — the calendar, what's due, the plan */
+.brief4 .br-day{ display:flex; flex-direction:column; min-height:clamp(150px, 20vh, 230px); }
+.brief4 .c-a > .br-day{ flex:1 1 auto !important; }
+.bd-list{ position:relative; flex:1 1 auto; min-height:0; overflow:hidden; display:flex; flex-direction:column; gap:2px; margin-top:4px; }
+.bd-r{ display:grid; grid-template-columns:76px 1fr; align-items:baseline; gap:10px; padding:clamp(5px, .9vh, 9px) 0; border-top:1px solid rgba(255,255,255,.07); }
+.bd-r:first-child{ border-top:none; }
+.bd-r b{ font-size:13px; font-weight:800; color:#ffc56b; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.bd-r span{ font-size:clamp(15px, 1.9vh, 17px); font-weight:600; color:#fff; line-height:1.35; min-width:0; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.bd-r small{ display:block; font-size:12px; font-weight:500; color:rgba(255,255,255,.5); }
+.bd-r.is-past{ opacity:.5; } .bd-r.is-due b{ color:#ff8a8a; } .bd-r.is-plan b{ color:#8fd3ff; } .bd-r.is-plan span{ font-weight:500; color:rgba(255,255,255,.88); }
+.bd-empty{ font-size:clamp(15px, 1.9vh, 17px); color:rgba(255,255,255,.75); padding:8px 0; }
+.bd-list .is-cut, .br-news-list .is-cut{ display:none !important; }
+/* Headlines: as many as fit */
+.brief4 .br-news{ display:flex; flex-direction:column; }
+.br-news-list{ position:relative; flex:1 1 auto; min-height:0; overflow:hidden; display:flex; flex-direction:column; }
+.br-tag{ font-style:normal; font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; padding:1px 6px; margin-right:7px; border-radius:5px; background:rgba(143,211,255,.16); color:#8fd3ff; vertical-align:1px; }
+/* For a Good Day: the four rows share the panel's height; ‹ › and the dots move it, so does a swipe */
+.brief4 .br-goodday .gd-reel{ flex:1 1 auto; height:auto; min-height:calc(3 * 62px); }
+.gd-reel, .bi-reel{ touch-action:pan-x; cursor:grab; }
+.gd-nav, .bi-nav{ display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px; flex:none; }
+.gd-nav .gd-dots{ margin:0; }
+.gd-dots i, .rl-dots i{ cursor:pointer; }
+.rl-arr{ width:24px; height:24px; border-radius:50%; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:rgba(255,255,255,.75); font-size:16px; line-height:1; padding:0 0 2px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:background .15s, color .15s, transform .15s; }
+.rl-arr:hover{ background:rgba(255,255,255,.14); color:#fff; transform:scale(1.08); }
+.rl-dots{ display:flex; gap:5px; }
+.rl-dots i{ width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.22); transition:background .3s, width .3s; }
+.rl-dots i.on{ width:14px; border-radius:3px; background:#ffc56b; }
+/* the quarter on top, the week and the month swapping underneath */
+.br-intent .bi-qh{ margin:0 0 4px; padding:0 0 12px; border-top:none; border-bottom:1px solid rgba(255,255,255,.1); }
+.bi-qh .bi-q-t{ align-items:center; } .bi-qh .bi-q-t > b{ font-size:24px; } .bi-qh .bi-q-t em{ margin-left:auto; }
+.bi-qh .bi-edit{ margin-left:6px; }
+.bi-qh .bi-q-bar{ margin:8px 0 0; height:5px; }
+.bi-reel{ flex:1 1 auto; display:grid; align-items:center; min-height:0; }
+.bi-slide{ grid-area:1/1; opacity:0; transform:translateY(8px); transition:opacity .6s ease, transform .6s cubic-bezier(.2,.8,.2,1); pointer-events:none; }
+.bi-slide.is-on{ opacity:1; transform:none; pointer-events:auto; }
+.bi-slide.is-done p{ color:rgba(255,255,255,.7); text-decoration:line-through; text-decoration-color:rgba(126,240,192,.6); text-decoration-thickness:2px; }
+.bi-slide.is-done small{ color:#7ef0c0; }
+.bi-foot{ display:flex; align-items:center; gap:10px; flex:none; }
+.bi-foot .bi-nav{ margin:0 0 0 auto; }
+.bi-tally{ display:flex; gap:6px; flex-wrap:wrap; }
+.bi-tally span{ font-size:12px; padding:3px 9px; border-radius:999px; background:rgba(255,255,255,.07); color:rgba(255,255,255,.7); } .bi-tally b{ color:#fff; }
+.br-sports-none{ font-size:14px; line-height:1.5; color:rgba(255,255,255,.75); padding:6px 0; display:flex; flex-direction:column; gap:10px; align-items:flex-start; }
+.br-sports-none.is-wait{ color:rgba(255,255,255,.5); }
+
+/* check in / check out */
+.int{ max-height:calc(100vh - 40px); overflow-y:auto; }
+.int-goals{ gap:8px !important; }
+.int-goals > span{ display:flex; align-items:center; gap:10px; }
+.int-xp{ margin-left:auto; font-style:normal; font-size:11px; font-weight:700; color:#7ef0c0; padding:2px 8px; border-radius:999px; background:rgba(126,240,192,.1); }
+.int-g{ display:flex; align-items:center; gap:10px; }
+.int-g > b{ width:24px; height:24px; flex:none; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; color:#ffc56b; border:1px solid rgba(255,197,107,.4); }
+.int-g.is-done > b{ background:#7ef0c0; border-color:#7ef0c0; color:#0b1a12; }
+.int-a{ align-items:center; gap:14px; }
+.int-a-xp{ margin-right:auto; font-size:12px; color:rgba(255,255,255,.5); }
+.co-list{ display:flex; flex-direction:column; gap:8px; }
+.co-row{ display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); }
+.co-row.is-habit{ border-color:rgba(255,197,107,.3); }
+.co-l{ flex:1; min-width:0; font-size:15px; font-weight:600; color:#fff; } .co-l small{ display:block; font-size:11.5px; font-weight:700; color:#7ef0c0; margin-top:2px; }
+.co-pick{ display:inline-flex; gap:4px; padding:3px; border-radius:999px; background:rgba(0,0,0,.25); }
+.co-b{ border:none; border-radius:999px; padding:6px 12px; font:inherit; font-size:12.5px; font-weight:700; background:transparent; color:rgba(255,255,255,.55); cursor:pointer; transition:background .15s, color .15s; }
+.co-b.is-hit{ background:#7ef0c0; color:#0b1a12; } .co-b.is-miss{ background:rgba(255,120,120,.2); color:#ffb3b3; }
+.co-none{ font-size:14px; color:rgba(255,255,255,.65); line-height:1.5; }
+
+/* the week and the month, as lists you tick (Calendar strip, Goals, Today) */
+.int-strip.tg-strip{ grid-template-columns:1fr 1fr; }
+.tg-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.tg-grid.is-compact{ margin-top:12px; }
+@media (max-width:860px){ .tg-grid, .int-strip.tg-strip{ grid-template-columns:1fr; } }
+.tg-card{ position:relative; padding:14px 16px 12px; border-radius:16px; border:1px solid var(--border); background:var(--panel); overflow:hidden; }
+.tg-card::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--tgc); opacity:.9; }
+.tg-card.is-week{ --tgc:#8fd3ff; } .tg-card.is-month{ --tgc:#ffc56b; }
+.tg-h{ display:flex; align-items:center; gap:8px; }
+.tg-k{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--tgc); }
+.tg-n{ font-size:12px; font-weight:800; color:var(--text); padding:1px 8px; border-radius:999px; background:rgba(var(--ink),.07); }
+.tg-edit, .tg-out{ border:none; background:transparent; color:var(--text-dim); font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; padding:4px 8px; border-radius:8px; }
+.tg-edit:hover{ background:rgba(var(--ink),.06); color:var(--text); }
+.tg-out{ background:var(--tgc); color:#14100a; } .tg-out:hover{ filter:brightness(1.06); }
+.tg-sub{ margin-top:4px; font-size:12.5px; color:var(--text-dim); }
+.tg-list{ display:flex; flex-direction:column; gap:2px; margin-top:8px; }
+.tg-row{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:7px 6px; border:none; border-radius:9px; background:transparent; color:var(--text); font:inherit; cursor:pointer; transition:background .15s; }
+.tg-row:hover{ background:rgba(var(--ink),.05); }
+.tg-box{ width:20px; height:20px; flex:none; border-radius:6px; border:1.5px solid rgba(var(--ink),.25); display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; transition:background .2s, border-color .2s, transform .2s; }
+.tg-row.is-done .tg-box{ background:var(--good); border-color:var(--good); color:#06140e; transform:scale(1.05); }
+.tg-row.is-missed .tg-box{ border-color:rgba(232,99,107,.6); color:var(--danger); }
+.tg-l{ flex:1; min-width:0; font-size:14px; font-weight:600; line-height:1.35; }
+.tg-row.is-done .tg-l{ color:var(--text-dim); text-decoration:line-through; text-decoration-color:rgba(63,190,142,.6); }
+.tg-xp{ font-size:11px; font-weight:800; color:var(--good); opacity:.75; }
+.tg-row.is-done .tg-xp{ opacity:1; }
+.tg-empty{ margin-top:8px; font-size:13px; color:var(--text-faint); }
+.tg-add{ display:flex; gap:8px; margin-top:8px; } .tg-add .input{ flex:1; }
+.tg-hists{ display:flex; flex-wrap:wrap; gap:18px; margin-top:14px; }
+.tg-hists > div > small{ display:block; font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); margin-bottom:6px; }
+.tg-hist{ display:flex; gap:6px; flex-wrap:wrap; }
+.tg-hist span{ position:relative; display:flex; flex-direction:column; align-items:center; min-width:52px; padding:6px 8px; border-radius:10px; border:1px solid var(--border); background:var(--panel); }
+.tg-hist span.is-all{ border-color:rgba(63,190,142,.5); background:var(--good-dim); }
+.tg-hist b{ font-family:var(--font-display); font-size:15px; } .tg-hist small{ font-size:10.5px; color:var(--text-dim); }
+.tg-hist i{ position:absolute; top:1px; right:5px; color:var(--accent); font-style:normal; }
+
+/* Health: one page */
+.hl-k{ display:flex; align-items:center; gap:8px; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); margin-bottom:8px; }
+.hl-k .kpi-sub{ margin-left:auto; letter-spacing:0; text-transform:none; font-weight:500; }
+.hl-ok{ color:var(--good); font-weight:600; }
+.hl-link{ border:none; background:none; padding:0; margin-left:6px; color:var(--accent); font:inherit; font-weight:700; cursor:pointer; }
+.hl-link:hover{ text-decoration:underline; }
+.hl-hero{ background:radial-gradient(ellipse 60% 120% at 0% 0%, rgba(232,162,61,.10), transparent 60%), var(--panel) !important; }
+.hl-hero .fit-mid{ display:flex; flex-direction:column; }
+.bf{ display:grid; grid-template-columns:1fr 1fr; gap:0; padding:0 !important; overflow:hidden; }
+.bf-half{ padding:18px 20px; display:flex; flex-direction:column; gap:10px; min-width:0; }
+.bf-body{ background:radial-gradient(ellipse 80% 100% at 0% 0%, rgba(91,180,229,.09), transparent 65%); }
+.bf-fuel{ border-left:1px solid var(--border); background:radial-gradient(ellipse 80% 100% at 100% 0%, rgba(63,190,142,.08), transparent 65%); }
+.bf-now{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+.bf-now .hw-v{ font-family:var(--font-display); font-size:44px; font-weight:700; line-height:1; letter-spacing:-.02em; }
+.bf-now > small{ font-size:13px; color:var(--text-dim); margin-right:4px; }
+.bf-now .hw-delta{ font-size:12.5px; }
+.bf-bmi{ margin-left:auto; font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:999px; background:rgba(var(--ink),.06); color:var(--text-dim); }
+.bf-spark{ width:100%; height:46px; display:block; }
+.bf-spark-l{ fill:none; stroke:#5BB4E5; stroke-width:2; vector-effect:non-scaling-stroke; stroke-linejoin:round; }
+.bf-spark-d{ fill:#5BB4E5; }
+.bf-goal-k{ display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-dim); margin-bottom:5px; } .bf-goal-k b{ color:var(--text); }
+.bf-log{ display:flex; gap:8px; margin-top:auto; } .bf-log .input{ flex:1; min-width:0; } .bf-log .bf-cal{ flex:none; width:84px; }
+.bf-fuel-top{ display:flex; align-items:center; gap:16px; }
+.bf-fuel-top .hc-left{ font-size:15px; color:var(--text-dim); } .bf-fuel-top .hc-left b{ font-family:var(--font-display); font-size:30px; color:var(--text); margin-right:4px; }
+.bf-fuel-top .hc-left.is-over b{ color:var(--danger); }
+.bf .hc-picks{ display:flex; flex-wrap:wrap; gap:6px; }
+.hl-cols{ display:grid; grid-template-columns:1.4fr 1fr; gap:20px; align-items:start; }
+.hl-side .section{ margin-bottom:16px; }
+@media (max-width:980px){ .bf, .hl-cols{ grid-template-columns:1fr; } .bf-fuel{ border-left:none; border-top:1px solid var(--border); } }
+/* the quick-log sheet (+ on Health) */
+.hs-ov{ z-index:210; }
+.hs{ position:relative; width:min(520px, 100%); padding:22px 22px 20px !important; border-radius:20px !important; animation:hsIn .28s cubic-bezier(.2,.9,.3,1.1); }
+@keyframes hsIn{ from{ opacity:0; transform:translateY(14px) scale(.98); } to{ opacity:1; transform:none; } }
+.hs-x{ color:var(--text-dim) !important; } .hs-x:hover{ background:rgba(var(--ink),.08) !important; color:var(--text) !important; }
+.hs-h{ font-family:var(--font-display); font-size:22px; font-weight:700; margin-bottom:12px; }
+.hs-seg{ display:flex; gap:4px; padding:4px; border-radius:12px; background:rgba(var(--ink),.05); margin-bottom:16px; }
+.hs-seg button{ flex:1; border:none; border-radius:9px; padding:8px 6px; font:inherit; font-size:13px; font-weight:700; background:transparent; color:var(--text-dim); cursor:pointer; transition:background .15s, color .15s; }
+.hs-seg button.is-on{ background:var(--panel-2); color:var(--text); box-shadow:0 1px 0 rgba(var(--ink),.06), 0 4px 14px rgba(0,0,0,.2); }
+.hs-body{ display:flex; flex-direction:column; gap:12px; }
+.hs-body .fit-types{ display:flex; flex-wrap:wrap; gap:6px; }
+.hs-body .fit-durs{ display:flex; gap:4px; flex-wrap:wrap; }
+.hs-row{ display:flex; gap:8px; } .hs-row .input{ flex:1; min-width:0; } .hs-row .input[type=date]{ flex:none; width:150px; } .hs-row .bf-cal{ flex:none; width:90px; }
+.hs-big{ display:flex; align-items:baseline; gap:10px; } .hs-big .input{ flex:1; font-family:var(--font-display); font-size:34px; font-weight:700; padding:12px 16px; } .hs-big span{ font-size:16px; color:var(--text-dim); }
+.hs-go{ width:100%; justify-content:center; padding:12px !important; font-size:15px !important; }
+
+/* your level, always in the corner */
+.md-lvl{ display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 9px 0 5px; border:none; border-radius:999px; background:rgba(var(--ink),.05); color:var(--text); font:inherit; cursor:pointer; transition:background .15s, box-shadow .2s; }
+.md-lvl:hover, .md-lvl.is-open{ background:rgba(var(--ink),.1); }
+.md-lvl b{ font-family:var(--font-display); font-size:13px; font-weight:800; min-width:9px; }
+.md-lvl i{ width:34px; height:3px; border-radius:2px; background:rgba(var(--ink),.12); overflow:hidden; } .md-lvl i u{ display:block; height:100%; background:var(--rc); border-radius:2px; }
+.md-lvl .xp-badge{ flex:none; }
+.md-lvl.is-ready{ box-shadow:0 0 0 1px rgba(255,170,90,.6), 0 0 14px rgba(255,130,60,.35); }
+.md-lvl-f{ font-size:12px; animation:lvlFlick .5s ease-in-out infinite alternate; }
+.lp{ position:fixed; top:52px; right:16px; z-index:61; width:300px; padding:16px; border-radius:18px; background:var(--pop); border:1px solid var(--pop-border); box-shadow:0 18px 50px rgba(0,0,0,.45); opacity:0; transform:translateY(-6px) scale(.98); transform-origin:top right; transition:opacity .18s, transform .2s cubic-bezier(.2,.9,.3,1.2); }
+.lp.is-in{ opacity:1; transform:none; }
+.lp-h{ display:flex; align-items:center; gap:10px; }
+.lp-l{ font-size:14px; color:var(--text-dim); } .lp-l b{ font-family:var(--font-display); font-size:24px; color:var(--text); margin-left:2px; }
+.lp-r{ font-size:12px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+.lp-ovr{ margin-left:auto; text-align:center; } .lp-ovr b{ display:block; font-family:var(--font-display); font-size:22px; line-height:1; } .lp-ovr small{ font-size:9.5px; font-weight:800; letter-spacing:.14em; color:var(--text-dim); }
+.lp-bar{ margin-top:14px; } .lp-bar > i{ display:block; height:6px; border-radius:4px; background:rgba(var(--ink),.08); overflow:hidden; } .lp-bar > i u{ display:block; height:100%; border-radius:4px; background:linear-gradient(90deg, #ffc56b, #ff9a3c); }
+.lp-bar-t{ display:flex; justify-content:space-between; margin-top:6px; font-size:11.5px; color:var(--text-dim); font-variant-numeric:tabular-nums; }
+.lp-up{ margin-top:10px; } .lp-up .xp-caution{ margin-left:0; }
+.lp-stats{ display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; margin-top:12px; }
+.lp-stats span{ padding:7px 8px; border-radius:10px; background:rgba(var(--ink),.04); } .lp-stats b{ display:block; font-family:var(--font-display); font-size:15px; } .lp-stats small{ font-size:10.5px; color:var(--text-dim); }
+.lp-attrs{ display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:8px; }
+.lp-attrs span{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:7px 4px 6px; border-radius:10px; background:rgba(var(--ink),.04); }
+.lp-attrs b{ font-family:var(--font-display); font-size:16px; color:var(--ac); } .lp-attrs small{ font-size:9.5px; font-weight:800; letter-spacing:.12em; color:var(--text-dim); }
+.lp-attrs i{ width:80%; height:2px; border-radius:2px; background:rgba(var(--ink),.08); overflow:hidden; } .lp-attrs i u{ display:block; height:100%; background:var(--ac); }
+.lp-next{ display:flex; flex-wrap:wrap; align-items:baseline; gap:6px; margin-top:12px; font-size:12px; color:var(--text-dim); } .lp-next b{ font-size:13px; } .lp-next small{ width:100%; font-size:11.5px; }
+.lp-foot{ display:flex; justify-content:space-between; margin-top:12px; padding-top:10px; border-top:1px solid var(--pop-border); }
+.lp-foot button{ border:none; background:none; padding:0; font:inherit; font-size:12.5px; font-weight:700; color:var(--accent); cursor:pointer; } .lp-foot button:last-child{ color:var(--text-dim); }
+.md-lvl{ transition:background .15s, box-shadow .2s, opacity .25s, max-width .3s, padding .3s, margin .3s; max-width:120px; overflow:hidden; }
+.md-lvl.is-away{ opacity:0; max-width:0; padding:0; margin-right:-4px; pointer-events:none; }
+.mg-xp{ display:inline-block; margin-left:10px; font-size:11px; font-weight:800; color:var(--good); padding:2px 8px; border-radius:999px; background:var(--good-dim); }
+.mg-card .mg-xp{ margin:6px 0 0; }
+/* column one: Today takes the room; the quarter panel is as tall as what's in it */
+.brief4 .c-a > .br-intent:last-child{ flex:0 1 auto !important; min-height:0; }
+.brief4 .br-intent .bi-reel{ min-height:clamp(70px, 10vh, 120px); }
+.brief4 .br-day .br-content{ flex-wrap:nowrap; overflow:hidden; margin-top:8px; }
+.brief4 .br-day .br-content span{ white-space:nowrap; }
+.bd-more{ flex:none; font-size:12px; font-weight:700; color:#ffc56b; margin-top:2px; }
+.bd-more[hidden]{ display:none; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -5812,7 +6002,7 @@ function normalizeStandards(s){
     if(!t || typeof t!=='object') s.contentTargets[k] = {n: k==='business' ? 3 : 2, per:'week'};
     else { t.n = Math.max(0, Number(t.n)||0); if(t.per!=='day' && t.per!=='week') t.per = 'week'; }
   });
-  // new clients you're after each month (for Client growth)
+  // new clients you’re after each month (for Scaling)
   if(!s.newClientsPerMonth) s.newClientsPerMonth = 2;
   return s;
 }
@@ -7607,7 +7797,7 @@ function fabContext(){
     if(ui.personalTab==='journal') return {label:'New journal entry', run:openQuickJournalModal};
     if(ui.personalTab==='finances') return {label:'Add a debt', run:function(){ ui.forms.debt = true; renderView(); setTimeout(function(){ const el = document.getElementById('debtName'); if(el) el.focus(); }, 60); }};
     if(ui.personalTab==='wishlist' && typeof openWishItemModal==='function') return {label:'Add wish list item', run:function(){ openWishItemModal(null); }};
-    if(ui.personalTab==='fitness') return {label:'Log workout', run:function(){ ui.healthTab='workouts'; renderView(); const el=document.getElementById('gymType'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
+    if(ui.personalTab==='fitness') return {label:'Log a workout, weigh-in or food', run:function(){ openHealthSheet('workout'); }};
     return {label:'Add goal', run:function(){ ui.forms.newGoal = true; renderView(); setTimeout(function(){ const el = document.getElementById('newGoalLabel'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }, 30); }};
   }
   return null;
@@ -7777,7 +7967,7 @@ function goalStatTilesHtml(){
   const mrr = activeMrr(), mrrGoal = state.profile.revenueGoalMonthly||0;
   const w = weightProgress();
   const wk = workoutsThisWeek(), wkT = state.profile.weeklyWorkoutTarget||0;
-  const items = state.goals.items, done = items.filter(function(g){ return g.done; }).length;
+  const items = state.goals.items.filter(function(g){ return !g.tier; }), done = items.filter(function(g){ return g.done; }).length;
   return '<div class="stat-tiles">'+
     statTileHtml('Revenue', '$'+mrr.toLocaleString(), mrrGoal ? 'of $'+mrrGoal.toLocaleString()+'/mo goal' : 'set a goal in Settings', mrrGoal ? mrr/mrrGoal*100 : null, 'var(--good)')+
     (w.goal!=null ? statTileHtml('Weight', w.latest!=null ? w.latest : '—', w.latest!=null ? 'goal '+w.goal+(w.latest!==w.goal?' · '+Math.abs(w.latest-w.goal).toFixed(1)+' to go':'') : 'log your weight', w.pct, 'var(--info)', 'goToWeight') : '')+
@@ -7785,24 +7975,29 @@ function goalStatTilesHtml(){
     statTileHtml('Goals', done+'<span class="stat-tile-of">/'+items.length+'</span>', items.length ? 'achieved' : 'none set yet', items.length ? done/items.length*100 : null, goalColor())+
   '</div>';
 }
-ACTIONS.goToWeight = function(){ ui.view='personal'; ui.personalTab='fitness'; ui.healthTab='weight'; renderView(); };
+ACTIONS.goToWeight = function(){ ui.view='personal'; ui.personalTab='fitness'; renderView(); setTimeout(function(){ const el = document.getElementById('bodyFuel'); if(el) el.scrollIntoView({behavior:'smooth', block:'center'}); }, 60); };
 ACTIONS.goToFitness = function(){ ui.view='personal'; ui.personalTab='fitness'; ui.healthTab='workouts'; renderView(); };
 // Today panel: the master goals at a glance, plus your own open goals.
 function renderGoalsPanel(){
-  const own = state.goals.items.filter(function(g){ return !g.done; }).sort(function(a, b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); }).slice(0, 3);
+  const own = state.goals.items.filter(function(g){ return !g.done && !g.tier; }).sort(function(a, b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); }).slice(0, 3);
   return '<div class="section goals-panel">'+
     masterGoalsHtml(true)+
+    (typeof tierCardHtml==='function' ? '<div class="tg-grid is-compact">'+tierCardHtml('week')+tierCardHtml('month')+'</div>' : '')+
     (own.length ? '<div class="goal-grid" style="margin-top:12px;">'+own.map(function(g){ return goalCardHtml(g, true); }).join('')+'</div>' : '')+
     '<div class="mg-more"><span class="view-all-link" data-action="nav" data-view="personal" data-tab="goals">All goals &rarr;</span></div>'+
   '</div>';
 }
 // Goals tab: the master goals, big — then your own goals for anything the app can't see.
 function renderGoalsTab(){
-  const items = state.goals.items;
+  const items = state.goals.items.filter(function(g){ return !g.tier; });
   const open = items.filter(function(g){ return !g.done; }).sort(function(a, b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); });
   const done = items.filter(function(g){ return g.done; });
   const formOpen = !!ui.forms.newGoal;
+  const wh = typeof tierHistoryHtml==='function' ? tierHistoryHtml('week', 8) : '', mh = typeof tierHistoryHtml==='function' ? tierHistoryHtml('month', 6) : '';
   return '<div class="section">'+masterGoalsHtml(false)+'</div>'+
+    (typeof tierCardHtml==='function' ? '<div class="section"><div class="section-title">The week &amp; the month'+tip('Check in at the start (Calendar asks), tick goals off as you go, check out at the end. A weekly goal hit is +'+CHECKIN_XP.weekGoal+' XP, a monthly one +'+CHECKIN_XP.monthGoal+', and a master goal above is +'+MASTER_XP.milestone.toLocaleString()+'.')+'</div>'+
+      '<div class="tg-grid">'+tierCardHtml('week', {add:true})+tierCardHtml('month', {add:true})+'</div>'+
+      (wh || mh ? '<div class="tg-hists">'+(wh ? '<div><small>Past weeks</small>'+wh+'</div>' : '')+(mh ? '<div><small>Past months</small>'+mh+'</div>' : '')+'</div>' : '')+'</div>' : '')+
     '<div class="section">'+
       '<div class="section-title">Your goals'+tip('For things Operator can\'t see — IG followers, a first sponsor deal, a new camera. You update the number.')+(formOpen ? '<button class="btn btn-sm btn-ghost" data-action="toggleForm" data-form="newGoal">Close</button>' : '')+'</div>'+
       (formOpen ? '<div class="card goal-form">'+
@@ -11250,13 +11445,13 @@ document.addEventListener('click', function(e){
   setTimeout(function(){ ui.pillMenu = null; renderPillMenu(); updateActivityPill(); }, 0);
 });
 // ============ FITNESS (Health) ============
+// One page, no tabs: the week of training on top; then Body & Fuel together (your weight and what
+// you're eating go hand in hand) — log a weigh-in or food right there; then the history. Logging a
+// workout (or a weigh-in, or food) is the + in the corner: a small sheet, three taps.
 function renderFitness(){
-  return '<div class="subtabs">'+
-    '<div class="subtab '+(ui.healthTab==='workouts'?'active':'')+'" data-action="healthTab" data-tab="workouts">Workouts</div>'+
-    '<div class="subtab '+(ui.healthTab==='weight'?'active':'')+'" data-action="healthTab" data-tab="weight">Weight</div>'+
-    '<div class="subtab '+(ui.healthTab==='calories'?'active':'')+'" data-action="healthTab" data-tab="calories">Calories</div>'+
-  '</div>'+
-  (ui.healthTab==='workouts' ? renderWorkouts() : ui.healthTab==='weight' ? renderWeight() : renderCalories());
+  return '<div class="hl">'+renderWorkoutsHero()+renderBodyFuel()+
+    '<div class="hl-cols">'+renderWorkoutHistory()+renderHealthLists()+'</div>'+
+  '</div>';
 }
 const WORKOUT_TYPES = [
   {id:'Lift', icon:'&#127947;&#65039;'}, {id:'Run', icon:'&#127939;'}, {id:'Walk', icon:'&#128694;'}, {id:'Bike', icon:'&#128692;'},
@@ -11293,8 +11488,8 @@ function weeksOnTargetStreak(){
   if(workoutsThisWeek()>=target) n++;
   return n;
 }
-function renderWorkouts(){
-  const log = state.health.gymLog.slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
+function renderWorkoutsHero(){
+  const log = state.health.gymLog;
   const target = state.profile.weeklyWorkoutTarget||0;
   const wk = workoutsThisWeek();
   const ws = startOfWeekStr(todayStr());
@@ -11306,48 +11501,41 @@ function renderWorkouts(){
     return '<div class="fit-day'+(d===todayStr()?' is-today':'')+(done.length?' is-done':'')+(d>todayStr()?' is-future':'')+'" title="'+fmtDateShort(d)+(done.length?': '+escapeHtml(done.map(function(g){ return g.type; }).join(', ')):'')+'">'+
       '<span class="fit-day-dot">'+(done.length ? workoutIcon(done[0].type) : '')+'</span><span class="fit-day-n">'+n+'</span></div>';
   }).join('');
-  const sel = ui.fitType || '', dur = ui.fitDur==null ? 45 : ui.fitDur;
-  const groups = {};
-  log.forEach(function(g){ const k = startOfWeekStr(g.date); (groups[k] = groups[k]||[]).push(g); });
-  const weekLabel = function(k){ return k===ws ? 'This week' : k===addDays(ws,-7) ? 'Last week' : 'Week of '+fmtDateShort(k); };
-  return '<div class="card fit-hero section">'+
-      '<div class="fit-ring">'+svgRing(target ? clamp(wk/target*100,0,100) : 0, 112, wk>=target && target ? 'var(--good)' : 'var(--accent)', wk+(target?'/'+target:''), 'this week')+'</div>'+
-      '<div class="fit-mid"><div class="fit-strip">'+strip+'</div>'+
-        '<div class="fit-today">'+(trainedDoneFor(todayStr()) ? '<span style="color:var(--good);">&#10003; Trained today — counts toward today\'s standard</span>' : 'Not trained yet today')+'</div></div>'+
+  const hit = target && wk>=target;
+  return '<div class="card fit-hero hl-hero section">'+
+      '<div class="fit-ring">'+svgRing(target ? clamp(wk/target*100,0,100) : 0, 112, hit ? 'var(--good)' : 'var(--accent)', wk+(target?'/'+target:''), 'this week')+'</div>'+
+      '<div class="fit-mid"><div class="hl-k">Training</div><div class="fit-strip">'+strip+'</div>'+
+        '<div class="fit-today">'+(trainedDoneFor(todayStr()) ? '<span class="hl-ok">&#10003; Trained today</span>' : '<span>Not trained yet today</span> <button class="hl-link" data-action="healthLog" data-id="workout">Log one &#8594;</button>')+'</div></div>'+
       '<div class="fit-stats">'+
-        '<div><div class="stat-tile-v">'+weeksOnTargetStreak()+'</div><div class="stat-tile-sub">week streak on target</div></div>'+
+        '<div><div class="stat-tile-v">'+weeksOnTargetStreak()+'</div><div class="stat-tile-sub">weeks on target</div></div>'+
         '<div><div class="stat-tile-v">'+fmtDurationLabel(weekMins)+'</div><div class="stat-tile-sub">trained this week</div></div>'+
-        '<div><div class="stat-tile-v">'+monthCount+'</div><div class="stat-tile-sub">workouts this month</div></div>'+
+        '<div><div class="stat-tile-v">'+monthCount+'</div><div class="stat-tile-sub">this month</div></div>'+
       '</div>'+
-    '</div>'+
-    '<div class="section"><div class="section-title">&#128170; Log a workout</div><div class="card fit-log">'+
-      '<div class="fit-types">'+workoutTypeChoices().map(function(t){ return '<button class="fit-type'+(sel===t.id?' is-on':'')+'" data-action="fitPickType" data-id="'+escapeHtml(t.id)+'"><span class="fit-type-i">'+t.icon+'</span>'+escapeHtml(t.id)+'</button>'; }).join('')+'</div>'+
-      '<div class="fit-row">'+
-        '<input class="input" id="gymType" placeholder="…or type it (e.g. Push day)" value="'+escapeHtml(sel)+'" style="flex:1;min-width:180px;">'+
-        '<div class="fit-durs">'+[15,30,45,60,90,120].map(function(m){ return '<button class="fit-dur'+(dur===m?' is-on':'')+'" data-action="fitPickDur" data-id="'+m+'">'+(m<60?m+'m':(m/60)+'h')+'</button>'; }).join('')+'</div>'+
-      '</div>'+
-      '<div class="fit-row">'+
-        '<input class="input" type="date" id="gymDate" value="'+(ui.fitDate||todayStr())+'" style="width:160px;">'+
-        '<input class="input" id="gymNotes" placeholder="Notes (optional) — PRs, how it felt" style="flex:1;min-width:180px;">'+
-        '<button class="btn btn-good fit-log-btn" data-action="fitLog">&#10003; Log workout</button>'+
-      '</div>'+
-    '</div></div>'+
-    '<div class="section"><div class="section-title">History</div>'+
-      (log.length ? Object.keys(groups).sort().reverse().slice(0, 10).map(function(k){
-        const items = groups[k];
-        return '<div class="fit-week"><div class="fit-week-head"><span>'+weekLabel(k)+'</span><span class="kpi-sub">'+items.length+' workout'+(items.length===1?'':'s')+' &middot; '+fmtDurationLabel(items.reduce(function(a,g){ return a+(Number(g.duration)||0); },0))+'</span></div>'+
-          items.map(function(g){
-            return '<div class="fit-entry" data-key="gym-'+g.id+'"><span class="fit-entry-i">'+workoutIcon(g.type)+'</span>'+
-              '<div class="fit-entry-main"><div class="fit-entry-title">'+escapeHtml(g.type)+(g.duration?' <span class="kpi-sub">&middot; '+fmtDurationLabel(g.duration)+'</span>':'')+'</div>'+(g.notes?'<div class="kpi-sub">'+escapeHtml(g.notes)+'</div>':'')+'</div>'+
-              '<span class="fit-entry-date">'+weekdayShort(g.date)+' '+fmtDateShort(g.date)+'</span>'+
-              '<span class="fit-entry-acts"><button class="btn btn-ghost btn-sm" data-action="openWorkoutEditModal" data-id="'+g.id+'">Edit</button>'+deleteBtn('gym', g.id)+'</span>'+
-            '</div>';
-          }).join('')+'</div>';
-      }).join('') : '<div class="empty">No workouts logged yet — pick one above.</div>')+
     '</div>';
 }
-ACTIONS.fitPickType = function(el, e, id){ ui.fitType = ui.fitType===id ? '' : id; renderView(); };
-ACTIONS.fitPickDur = function(el, e, id){ ui.fitDur = Number(id); renderView(); };
+function renderWorkoutHistory(){
+  const log = state.health.gymLog.slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
+  const ws = startOfWeekStr(todayStr()), groups = {};
+  log.forEach(function(g){ const k = startOfWeekStr(g.date); (groups[k] = groups[k]||[]).push(g); });
+  const weekLabel = function(k){ return k===ws ? 'This week' : k===addDays(ws,-7) ? 'Last week' : 'Week of '+fmtDateShort(k); };
+  return '<div class="section hl-hist"><div class="section-title">Workouts</div>'+
+    (log.length ? Object.keys(groups).sort().reverse().slice(0, 6).map(function(k){
+      const items = groups[k];
+      return '<div class="fit-week"><div class="fit-week-head"><span>'+weekLabel(k)+'</span><span class="kpi-sub">'+items.length+' &middot; '+fmtDurationLabel(items.reduce(function(a,g){ return a+(Number(g.duration)||0); },0))+'</span></div>'+
+        items.map(function(g){
+          return '<div class="fit-entry" data-key="gym-'+g.id+'"><span class="fit-entry-i">'+workoutIcon(g.type)+'</span>'+
+            '<div class="fit-entry-main"><div class="fit-entry-title">'+escapeHtml(g.type)+(g.duration?' <span class="kpi-sub">&middot; '+fmtDurationLabel(g.duration)+'</span>':'')+'</div>'+(g.notes?'<div class="kpi-sub">'+escapeHtml(g.notes)+'</div>':'')+'</div>'+
+            '<span class="fit-entry-date">'+weekdayShort(g.date)+' '+fmtDateShort(g.date)+'</span>'+
+            '<span class="fit-entry-acts"><button class="btn btn-ghost btn-sm" data-action="openWorkoutEditModal" data-id="'+g.id+'">Edit</button>'+deleteBtn('gym', g.id)+'</span>'+
+          '</div>';
+        }).join('')+'</div>';
+    }).join('') : '<div class="empty">No workouts yet — the + in the corner logs one.</div>')+
+  '</div>';
+}
+// (older callers)
+function renderWorkouts(){ return renderWorkoutsHero()+renderWorkoutHistory(); }
+ACTIONS.fitPickType = function(el, e, id){ ui.fitType = ui.fitType===id ? '' : id; const t = document.getElementById('gymType'); if(t) t.value = ui.fitType; healthSheetRefresh(); };
+ACTIONS.fitPickDur = function(el, e, id){ ui.fitDur = Number(id); healthSheetRefresh(); };
 ACTIONS.fitLog = function(){
   const typeEl = document.getElementById('gymType');
   const type = (typeEl && typeEl.value.trim()) || ui.fitType;
@@ -11360,7 +11548,7 @@ ACTIONS.fitLog = function(){
   if(typeEl) typeEl.value = '';
   const n = document.getElementById('gymNotes'); if(n) n.value = '';
   playPositive();
-  persist('health'); renderView();
+  persist('health'); closeHealthSheet(); renderView();
   showToast(firstToday ? 'Logged — today\'s training standard is done.' : 'Workout logged.', {icon:workoutIcon(type)});
 };
 function openWorkoutEditModal(id){
@@ -11419,60 +11607,123 @@ function healthAreaChart(vals, labels){
     '<text x="'+P.l+'" y="'+(H-6)+'" class="hw-ax">'+escapeHtml(labels[0])+'</text><text x="'+(W-P.r)+'" y="'+(H-6)+'" class="hw-ax" text-anchor="end">'+escapeHtml(labels[last])+'</text>'+
   '</svg>';
 }
-function renderWeight(){
+// Body & Fuel: one card, two halves — your weight (now, the change, the goal, a little trend line, log
+// it right there) and today's food (the ring, what's left, one-tap go-tos, add anything)
+function weightSpark(vals){
+  if(vals.length < 2) return '';
+  const W = 220, H = 46, min = Math.min.apply(null, vals), max = Math.max.apply(null, vals), span = (max - min) || 1;
+  const pts = vals.map(function(v, i){ return (i/(vals.length-1)*W).toFixed(1)+','+(4 + (1-(v-min)/span)*(H-8)).toFixed(1); });
+  return '<svg class="bf-spark" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"><defs><linearGradient id="bfSg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5BB4E5" stop-opacity=".35"/><stop offset="1" stop-color="#5BB4E5" stop-opacity="0"/></linearGradient></defs>'+
+    '<path d="M'+pts.join(' L')+' L'+W+','+H+' L0,'+H+' Z" fill="url(#bfSg)"/><path d="M'+pts.join(' L')+'" class="bf-spark-l"/><circle cx="'+pts[pts.length-1].split(',')[0]+'" cy="'+pts[pts.length-1].split(',')[1]+'" r="3.2" class="bf-spark-d"/></svg>';
+}
+function renderBodyFuel(){
   const log = state.health.weightLog.slice().sort(function(a,b){ return a.date.localeCompare(b.date); });
-  const recent = log.slice(-30);
-  const latest = log[log.length-1], start = log[0];
-  const goal = state.profile.goalWeight;
+  const latest = log[log.length-1], start = log[0], goal = state.profile.goalWeight;
   const weekAgo = log.filter(function(w){ return w.date <= addDays(todayStr(), -7); }).slice(-1)[0];
   const delta = latest && weekAgo ? latest.weight - weekAgo.weight : (latest && start && start!==latest ? latest.weight - start.weight : null);
-  const deltaFrom = latest && weekAgo ? 'in a week' : start && latest && start!==latest ? 'since '+fmtDateShort(start.date) : '';
-  let goalHtml = '<div class="hw-goal is-empty"><span>No goal weight yet</span><button class="btn btn-ghost btn-sm" data-action="goToProfileSettings">Set one</button></div>';
+  const deltaFrom = latest && weekAgo ? 'this week' : start && latest && start!==latest ? 'since '+fmtDateShort(start.date) : '';
+  let goalHtml = '<button class="hl-link" data-action="goToProfileSettings">Set a goal weight &#8594;</button>';
   if(goal){
-    const startW = start ? start.weight : (latest ? latest.weight : goal);
-    const total = startW - goal, done = latest ? startW - latest.weight : 0;
-    const pct = total>0 ? clamp(Math.round(done/total*100), 0, 100) : (latest && latest.weight<=goal ? 100 : 0);
-    const left = latest ? latest.weight - goal : null;
-    goalHtml = '<div class="hw-goal"><div class="hw-goal-k"><span>Goal '+goal+'</span><b>'+(left==null ? '' : left>0 ? left.toFixed(1)+' to go' : 'Reached &#127881;')+'</b></div><div class="hw-bar"><i style="width:'+pct+'%"></i></div></div>';
+    const startW = start ? start.weight : (latest ? latest.weight : goal), total = startW - goal, done = latest ? startW - latest.weight : 0;
+    const pct = total>0 ? clamp(Math.round(done/total*100), 0, 100) : (latest && latest.weight<=goal ? 100 : 0), left = latest ? latest.weight - goal : null;
+    goalHtml = '<div class="bf-goal"><div class="bf-goal-k"><span>Goal '+goal+'</span><b>'+(left==null ? '' : left>0 ? left.toFixed(1)+' to go' : 'Reached &#127881;')+'</b></div><div class="hw-bar"><i style="width:'+pct+'%"></i></div></div>';
   }
-  return '<div class="card hw-hero section">'+
-      '<div class="hw-now"><div class="hw-k">Now</div><div class="hw-v">'+(latest ? latest.weight : '—')+'</div>'+
-        (delta!=null ? '<div class="hw-delta '+(delta<0?'is-down':delta>0?'is-up':'')+'">'+(delta<0?'&#9660; ':delta>0?'&#9650; ':'')+Math.abs(delta).toFixed(1)+' '+deltaFrom+'</div>' : '<div class="hw-delta">'+(latest ? 'logged '+fmtDateShort(latest.date) : 'nothing logged yet')+'</div>')+'</div>'+
-      '<div class="hw-side">'+goalHtml+
-        '<div class="hw-log"><input class="input hw-in" type="number" step="0.1" id="weightValue" placeholder="Today\'s weight"><input class="input" type="date" id="weightDate" value="'+todayStr()+'"><button class="btn btn-primary" data-action="addWeight">Log</button></div>'+
-      '</div>'+
-    '</div>'+
-    '<div class="card hw-chart section">'+(recent.length>=2 ? healthAreaChart(recent.map(function(r){ return r.weight; }), recent.map(function(r){ return fmtDateShort(r.date); })) : '<div class="empty">Log a couple of days to see the trend.</div>')+'</div>'+
-    '<div class="section"><div class="section-title">History</div><div class="hw-list">'+
-      (log.slice().reverse().slice(0, 12).map(function(w, i, arr2){ const prev = arr2[i+1]; const d = prev ? w.weight - prev.weight : null;
-        return '<div class="hw-row"><span class="hw-row-d">'+weekdayShort(w.date)+' '+fmtDateShort(w.date)+'</span><span class="hw-row-v">'+w.weight+'</span>'+
-          (d!=null && d!==0 ? '<span class="hw-chip '+(d<0?'is-down':'is-up')+'">'+(d<0?'&#9660;':'&#9650;')+' '+Math.abs(d).toFixed(1)+'</span>' : '<span></span>')+'<span class="hw-row-x">'+deleteBtn('weight', w.id)+'</span></div>'; }).join('') || '<div class="empty">Nothing logged yet.</div>')+
-    '</div></div>';
-}
-ACTIONS.goToProfileSettings = function(){ ui.view = 'settings'; ui.settingsTab = 'you'; renderView(); setTimeout(function(){ const el = document.getElementById('setGoalWeight'); if(el){ el.scrollIntoView({block:'center', behavior:'smooth'}); el.focus(); } }, 60); };
-function renderCalories(){
+  const body = typeof bodyStats==='function' ? bodyStats() : {};
+  const loggedToday = latest && latest.date===todayStr();
+  // fuel
   const today = state.health.calorieEntries.filter(function(c){ return c.date===todayStr(); });
   const total = today.reduce(function(a,c){ return a+Number(c.calories||0); },0);
   const target = state.profile.calorieTarget || 2000;
   const pct = clamp(Math.round(total/target*100), 0, 999), left = target - total;
   const color = pct>110 ? 'var(--danger)' : pct>=85 ? 'var(--good)' : 'var(--accent)';
-  return '<div class="card hc-hero section">'+
-      '<div class="hc-ring">'+svgRing(clamp(pct, 0, 100), 132, color, String(total), 'of '+target)+'</div>'+
-      '<div class="hc-main">'+
-        '<div class="hc-left'+(left<0?' is-over':'')+'">'+(left>=0 ? '<b>'+left+'</b> cal left today' : '<b>'+(-left)+'</b> cal over today')+'</div>'+
-        '<div class="hc-k">Quick add</div>'+
-        '<div class="hc-picks">'+(state.meals.library.map(function(m){ return '<button class="hc-pick" data-action="quickMeal" data-id="'+m.id+'"><span>'+escapeHtml(m.name)+'</span><b>'+m.calories+'</b></button>'; }).join('') || '<span class="kpi-sub">No saved meals yet.</span>')+'</div>'+
-        '<div class="hc-add"><input class="input" id="calName" placeholder="Something else…" style="flex:1;"><input class="input" type="number" id="calAmount" placeholder="cal" style="width:90px;"><button class="btn btn-primary" data-action="addCalorieEntry">Add</button></div>'+
-      '</div>'+
+  const picks = state.meals.library.slice().sort(function(a, b){ return (b.uses||0) - (a.uses||0); }).slice(0, 4);
+  return '<div class="card bf section" id="bodyFuel">'+
+    '<div class="bf-half bf-body">'+
+      '<div class="hl-k">Body</div>'+
+      '<div class="bf-now"><span class="hw-v">'+(latest ? latest.weight : '—')+'</span><small>'+(state.profile.weightUnit==='kg' ? 'kg' : 'lbs')+'</small>'+
+        (delta!=null ? '<span class="hw-delta '+(delta<0?'is-down':delta>0?'is-up':'')+'">'+(delta<0?'&#9660; ':delta>0?'&#9650; ':'')+Math.abs(delta).toFixed(1)+' '+deltaFrom+'</span>' : '')+
+        (body.bmi ? '<span class="bf-bmi" title="BMI for your height">BMI '+body.bmi.toFixed(1)+'</span>' : '')+'</div>'+
+      weightSpark(log.slice(-30).map(function(r){ return Number(r.weight); }))+
+      goalHtml+
+      '<div class="bf-log"><input class="input" type="number" step="0.1" id="weightValue" placeholder="'+(loggedToday ? 'Logged today — again?' : 'Today’s weight')+'"><input type="hidden" id="weightDate" value="'+todayStr()+'"><button class="btn btn-primary btn-sm" data-action="addWeight">Log</button></div>'+
     '</div>'+
-    '<div class="section"><div class="section-title">Today<span class="kpi-sub">'+today.length+' item'+(today.length===1?'':'s')+'</span></div><div class="hw-list">'+
-      (today.map(function(c){ return '<div class="hw-row"><span class="hw-row-d" style="flex:1;color:var(--text);">'+escapeHtml(c.name||'Food')+'</span><span class="hw-row-v">'+c.calories+'<small> cal</small></span><span class="hw-row-x">'+deleteBtn('calorie', c.id)+'</span></div>'; }).join('') || '<div class="empty">Nothing logged today yet.</div>')+
+    '<div class="bf-half bf-fuel">'+
+      '<div class="hl-k">Fuel<span class="kpi-sub">'+today.length+' item'+(today.length===1?'':'s')+' today</span></div>'+
+      '<div class="bf-fuel-top"><div class="hc-ring">'+svgRing(clamp(pct, 0, 100), 92, color, String(total), 'of '+target)+'</div>'+
+        '<div class="hc-left'+(left<0?' is-over':'')+'">'+(left>=0 ? '<b>'+left+'</b> cal left today' : '<b>'+(-left)+'</b> cal over today')+'</div></div>'+
+      '<div class="hc-picks">'+(picks.map(function(m){ return '<button class="hc-pick" data-action="quickMeal" data-id="'+m.id+'"><span>'+escapeHtml(m.name)+'</span><b>'+m.calories+'</b></button>'; }).join('') || '<span class="kpi-sub">Save your go-to meals below.</span>')+'</div>'+
+      '<div class="bf-log"><input class="input" id="calName" placeholder="Something else…"><input class="input bf-cal" type="number" id="calAmount" placeholder="cal"><button class="btn btn-sm" data-action="addCalorieEntry">Add</button></div>'+
+    '</div>'+
+  '</div>';
+}
+// under it: today's food and your weigh-ins, small, and the meal library tucked away
+function renderHealthLists(){
+  const log = state.health.weightLog.slice().sort(function(a,b){ return a.date.localeCompare(b.date); });
+  const today = state.health.calorieEntries.filter(function(c){ return c.date===todayStr(); });
+  return '<div class="hl-side">'+
+    '<div class="section"><div class="section-title">Today’s food</div><div class="hw-list">'+
+      (today.map(function(c){ return '<div class="hw-row"><span class="hw-row-d" style="flex:1;color:var(--text);">'+escapeHtml(c.name||'Food')+'</span><span class="hw-row-v">'+c.calories+'<small> cal</small></span><span class="hw-row-x">'+deleteBtn('calorie', c.id)+'</span></div>'; }).join('') || '<div class="empty">Nothing logged today.</div>')+
+    '</div></div>'+
+    '<div class="section"><div class="section-title">Weigh-ins</div><div class="hw-list">'+
+      (log.slice().reverse().slice(0, 6).map(function(w, i, arr2){ const prev = arr2[i+1]; const d = prev ? w.weight - prev.weight : null;
+        return '<div class="hw-row"><span class="hw-row-d">'+weekdayShort(w.date)+' '+fmtDateShort(w.date)+'</span><span class="hw-row-v">'+w.weight+'</span>'+
+          (d!=null && d!==0 ? '<span class="hw-chip '+(d<0?'is-down':'is-up')+'">'+(d<0?'&#9660;':'&#9650;')+' '+Math.abs(d).toFixed(1)+'</span>' : '<span></span>')+'<span class="hw-row-x">'+deleteBtn('weight', w.id)+'</span></div>'; }).join('') || '<div class="empty">No weigh-ins yet.</div>')+
     '</div></div>'+
     '<details class="section hc-lib"'+(ui.mealLibOpen?' open':'')+'><summary class="section-title">Meal library<span class="kpi-sub">'+state.meals.library.length+'</span>'+tip('Your go-to meals — one tap logs them.')+'</summary>'+
       '<div class="hc-add" style="margin-bottom:10px;"><input class="input" id="mealName" placeholder="e.g. Turkey chili" style="flex:1;"><input class="input" type="number" id="mealCalories" placeholder="cal" style="width:90px;"><button class="btn" data-action="addMeal">Save meal</button></div>'+
       '<div class="hw-list">'+(state.meals.library.map(function(m){ return '<div class="hw-row"><span class="hw-row-d" style="flex:1;color:var(--text);">'+escapeHtml(m.name)+'</span><span class="hw-row-v">'+m.calories+'<small> cal</small></span><span class="hw-row-x">'+deleteBtn('meal', m.id)+'</span></div>'; }).join('') || '<div class="empty">No meals saved yet.</div>')+'</div>'+
-    '</details>';
+    '</details>'+
+  '</div>';
 }
+// (older callers — the weight and calories tabs are one card now)
+function renderWeight(){ return renderBodyFuel(); }
+function renderCalories(){ return renderBodyFuel(); }
+ACTIONS.goToProfileSettings = function(){ ui.view = 'settings'; ui.settingsTab = 'you'; renderView(); setTimeout(function(){ const el = document.getElementById('setGoalWeight'); if(el){ el.scrollIntoView({block:'center', behavior:'smooth'}); el.focus(); } }, 60); };
+// ---- the quick-log sheet (the + on Health, or "Log one"): Workout · Weight · Food ----
+function healthSheetHtml(){
+  const k = ui.hlogKind || 'workout', sel = ui.fitType || '', dur = ui.fitDur==null ? 45 : ui.fitDur;
+  const seg = '<div class="hs-seg">'+[['workout', '&#127947;&#65039; Workout'], ['weight', '&#9878;&#65039; Weight'], ['food', '&#129367; Food']].map(function(x){ return '<button class="'+(k===x[0] ? 'is-on' : '')+'" data-action="healthLog" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>';
+  let body = '';
+  if(k==='workout') body =
+    '<div class="fit-types">'+workoutTypeChoices().map(function(t){ return '<button class="fit-type'+(sel===t.id?' is-on':'')+'" data-action="fitPickType" data-id="'+escapeHtml(t.id)+'"><span class="fit-type-i">'+t.icon+'</span>'+escapeHtml(t.id)+'</button>'; }).join('')+'</div>'+
+    '<input class="input hs-in" id="gymType" placeholder="…or type it (e.g. Push day)" value="'+escapeHtml(sel)+'">'+
+    '<div class="fit-durs">'+[15,30,45,60,90,120].map(function(m){ return '<button class="fit-dur'+(dur===m?' is-on':'')+'" data-action="fitPickDur" data-id="'+m+'">'+(m<60?m+'m':(m/60)+'h')+'</button>'; }).join('')+'</div>'+
+    '<div class="hs-row"><input class="input" type="date" id="gymDate" value="'+(ui.fitDate||todayStr())+'"><input class="input" id="gymNotes" placeholder="Notes — PRs, how it felt"></div>'+
+    '<button class="btn btn-good hs-go" data-action="fitLog">&#10003; Log workout</button>';
+  else if(k==='weight') body =
+    '<div class="hs-big"><input class="input" type="number" step="0.1" id="hsWeight" placeholder="'+(latestWeight()!=null ? latestWeight() : 'e.g. 205')+'"><span>'+(state.profile.weightUnit==='kg' ? 'kg' : 'lbs')+'</span></div>'+
+    '<button class="btn btn-primary hs-go" data-action="hsWeight">Log weigh-in</button>';
+  else body =
+    '<div class="hc-picks">'+state.meals.library.map(function(m){ return '<button class="hc-pick" data-action="hsMeal" data-id="'+m.id+'"><span>'+escapeHtml(m.name)+'</span><b>'+m.calories+'</b></button>'; }).join('')+'</div>'+
+    '<div class="hs-row"><input class="input" id="hsFood" placeholder="What did you eat?"><input class="input bf-cal" type="number" id="hsCal" placeholder="cal"></div>'+
+    '<button class="btn btn-primary hs-go" data-action="hsFood">Add</button>';
+  return '<button class="int-x hs-x" data-action="closeHealthSheet" title="Close">&#10005;</button><div class="hs-h">Log it</div>'+seg+'<div class="hs-body">'+body+'</div>';
+}
+function openHealthSheet(kind){
+  ui.hlogKind = kind || ui.hlogKind || 'workout';
+  let o = document.getElementById('healthSheet');
+  if(!o){ o = document.createElement('div'); o.id = 'healthSheet'; o.className = 'overlay hs-ov hidden'; o.innerHTML = '<div class="card hs" id="healthSheetContent"></div>'; document.body.appendChild(o); }
+  o.classList.remove('hidden'); healthSheetRefresh();
+  setTimeout(function(){ const i = document.getElementById(ui.hlogKind==='weight' ? 'hsWeight' : ui.hlogKind==='food' ? 'hsFood' : 'gymType'); if(i && ui.hlogKind!=='workout') i.focus(); }, 60);
+}
+function healthSheetRefresh(){ const c = document.getElementById('healthSheetContent'); if(c && !c.closest('.hidden')) morphInto(c, healthSheetHtml(), {form:true}); }
+function closeHealthSheet(){ const o = document.getElementById('healthSheet'); if(o) o.classList.add('hidden'); }
+ACTIONS.healthLog = function(el, e, id){ openHealthSheet(id); };
+ACTIONS.closeHealthSheet = function(){ closeHealthSheet(); };
+ACTIONS.hsWeight = function(){
+  const v = Number((document.getElementById('hsWeight')||{}).value); if(!v){ const i = document.getElementById('hsWeight'); if(i) i.focus(); return; }
+  state.health.weightLog.push({id:uid(), date:todayStr(), weight:v}); persist('health'); playPositive(); closeHealthSheet(); renderView(); showToast('Weigh-in logged: '+v+'.', {icon:'&#9878;&#65039;'});
+};
+ACTIONS.hsMeal = function(el, e, id){ quickMeal(id); closeHealthSheet(); const m = state.meals.library.find(function(x){ return x.id===id; }); if(m) showToast(m.name+' — '+m.calories+' cal.', {icon:'&#129367;'}); };
+ACTIONS.hsFood = function(){
+  const n = ((document.getElementById('hsFood')||{}).value||'').trim(), c = Number((document.getElementById('hsCal')||{}).value)||0;
+  if(!n || !c){ const i = document.getElementById(!n ? 'hsFood' : 'hsCal'); if(i) i.focus(); return; }
+  state.health.calorieEntries.push({id:uid(), date:todayStr(), name:n, calories:c}); persist('health'); playPositive(); closeHealthSheet(); renderView();
+};
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Enter' || !e.target || !e.target.closest || !e.target.closest('#healthSheet')) return;
+  const b = document.querySelector('#healthSheet .hs-go'); if(b){ e.preventDefault(); b.click(); }
+});
 document.addEventListener('toggle', function(e){ if(e.target && e.target.classList && e.target.classList.contains('hc-lib')) ui.mealLibOpen = e.target.open; }, true);
 function addWorkout(){
   const date = document.getElementById('gymDate').value || todayStr();
@@ -11489,11 +11740,12 @@ function addWeight(){
   const weight = Number(document.getElementById('weightValue').value);
   if(!weight) return;
   state.health.weightLog.push({id:uid(), date:date, weight:weight});
-  persist('health'); renderView();
+  playPositive(); persist('health'); renderView();
 }
 function quickMeal(mealId){
   const m = state.meals.library.find(function(x){ return x.id===mealId; }); if(!m) return;
   state.health.calorieEntries.push({id:uid(), date:todayStr(), name:m.name, calories:m.calories});
+  m.uses = (m.uses||0) + 1; persist('meals');
   persist('health'); renderView();
 }
 function addCalorieEntry(){
@@ -12270,6 +12522,8 @@ function masterGoalDefs(){
       src:'Today\'s Standard', go:null, color:'#FF7A45', color2:'#ffc0a3'}
   ];
 }
+// what reaching it pays (XP — see 32t): the big ones a lot, the weekly rings a little each week
+function masterXpTag(m){ if(typeof MASTER_XP==='undefined') return ''; const big = ['mrr', 'weight', 'streak'].indexOf(m.key)>=0; return '<span class="mg-xp" title="'+(big ? 'XP when you reach it (raise the bar and it pays again)' : 'XP for every week you hit it')+'">+'+(big ? MASTER_XP.milestone.toLocaleString()+' XP' : MASTER_XP.weekly+' XP a week')+'</span>'; }
 function masterPct(m){
   if(m.cur==null || !(m.target>0)) return 0;
   if(m.key==='weight'){
@@ -12304,7 +12558,7 @@ function masterTargetHtml(m){
 function masterHeroHtml(m){
   const pct = masterPct(m);
   return '<div class="mg-hero" style="--mg1:'+m.color+';--mg2:'+m.color2+';">'+
-    '<div class="mg-hero-top"><span class="mg-k">'+m.icon+' '+m.label+'</span>'+masterTargetHtml(m)+'</div>'+
+    '<div class="mg-hero-top"><span class="mg-k">'+m.icon+' '+m.label+'</span>'+masterXpTag(m)+'<span style="flex:1"></span>'+masterTargetHtml(m)+'</div>'+
     '<div class="mg-hero-num"><span class="mg-big">'+m.fmt(m.cur)+'</span><span class="mg-of">'+m.suffix+'</span><span class="mg-pct">'+Math.round(pct)+'%</span></div>'+
     '<div class="mg-bar"><div class="mg-bar-fill" style="width:'+pct.toFixed(1)+'%"></div>'+[25,50,75].map(function(t){ return '<span class="mg-tick'+(pct>=t?' is-past':'')+'" style="left:'+t+'%"></span>'; }).join('')+'</div>'+
     '<div class="mg-hero-foot"><span>'+escapeHtml(masterToGo(m))+'</span><span class="mg-src"'+(m.go?' data-action="'+m.go+'"':'')+'>'+escapeHtml(m.src)+(m.go?' &rarr;':'')+'</span></div>'+
@@ -12318,7 +12572,7 @@ function masterRingHtml(m, compact){
     '</div>'+
     '<div class="mg-card-k">'+m.icon+' '+m.label+'</div>'+
     (compact ? '<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div>'
-      : masterTargetHtml(m)+'<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div><div class="mg-src"'+(m.go?' data-action="'+m.go+'"':'')+'>'+escapeHtml(m.src)+(m.go?' &rarr;':'')+'</div>')+
+      : masterTargetHtml(m)+masterXpTag(m)+'<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div><div class="mg-src"'+(m.go?' data-action="'+m.go+'"':'')+'>'+escapeHtml(m.src)+(m.go?' &rarr;':'')+'</div>')+
   '</div>';
 }
 function masterGoalsHtml(compact){
@@ -17304,7 +17558,7 @@ function renderSettings(){
     standards: '<div class="card section"><div class="section-title">Work'+tip('What a good day of work looks like. The deep work target is what a day needs for your streak; the average is the master goal you\'re building toward — 8 hours of real work a day at your peak.')+'</div><div class="grid grid-2">'+
         '<div class="field"><label>Deep work target per day</label><select class="input" id="setDeepWorkTarget">'+deepWorkOptions.map(function(m){ return '<option value="'+m+'" '+(state.standards.deepWorkTargetMinutes===m?'selected':'')+'>'+fmtDurationLabel(m)+'</option>'; }).join('')+'</select></div>'+
         '<div class="field"><label>Average hours a day (master goal)'+tip('Your peak: the average of real, locked-in work a day over the last two weeks. It\'s a master goal on Personal → Goals and what “Locking in” on your card is rated against.')+'</label><select class="input" id="setAvgHoursTarget">'+[240,300,360,420,480,540,600].map(function(m){ return '<option value="'+m+'" '+(state.standards.avgHoursTargetMinutes===m?'selected':'')+'>'+fmtDurationLabel(m)+'</option>'; }).join('')+'</select></div>'+
-        '<div class="field"><label>New clients a month'+tip('What “Client growth” on your card is rated against: landing this many every month, month after month.')+'</label><input class="input" type="number" min="1" max="30" id="setNewClientsPerMonth" value="'+state.standards.newClientsPerMonth+'"></div>'+
+        '<div class="field"><label>New clients a month'+tip('What “Scaling” on your card is rated against: landing this many every month, month after month.')+'</label><input class="input" type="number" min="1" max="30" id="setNewClientsPerMonth" value="'+state.standards.newClientsPerMonth+'"></div>'+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Content'+tip('How many videos you want out. A content task counts the moment you finish it — the Content tab, Good morning and your card all measure against these.')+'</div><div class="grid grid-2">'+
         [['Business', 'business', 'Videos for the business — clients, ads, the agency.'], ['Personal', 'personal', 'Your own channel — you, your life, your story.']].map(function(x){ const label = x[0]+' videos', key = x[0], note = x[2], ct = state.standards.contentTargets[x[1]]; return ''+
@@ -18312,7 +18566,7 @@ function wakeImUpNow(){
   ui.briefT0 = Date.now(); ui.briefShift = 0; ui.briefSkipped = false; ui.briefNewsAt = null; ui.briefLineSeen = 0; ui.dawnTs = null;
   loadMorningNews();
   // scores that didn't come through last time are asked for again (the sports panel never just vanishes)
-  if(typeof loadScores==='function' && !(ui.scores && ui.scores.got && (ui.scores.nfl || ui.scores.nba))) loadScores(true);
+  if(typeof loadScores==='function' && !(ui.scores && ui.scores.got && ui.scores.ok)) loadScores(true);
   playWakeChime();
   renderWakeOverlayInto();
   briefVoiceRun();
@@ -18375,8 +18629,8 @@ function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : ui
 function renderWakeOverlayInto(){
   const el = document.getElementById('wakeContent'); if(!el) return;
   morphInto(el, renderWakeScreen());
-  requestAnimationFrame(function(){ fitStaticBoards(el); });
-  setTimeout(function(){ fitStaticBoards(el); }, 500);
+  requestAnimationFrame(function(){ fitStaticBoards(el); if(typeof briefFit==='function') briefFit(el); });
+  setTimeout(function(){ fitStaticBoards(el); if(typeof briefFit==='function') briefFit(el); }, 500);
   clearInterval(wakeClockTimer);
   wakeClockTimer = setInterval(function(){
     if(!overlayOpen('wakeOverlay')){ clearInterval(wakeClockTimer); return; }
@@ -18436,6 +18690,8 @@ function renderWakeSetup(){
       '<div class="field"><label>Good morning intro</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.intro==='quick'?' active':'')+'" data-action="wakeIntro" data-id="quick">Quick</button><button class="seg-tab'+(w.intro==='cinematic'?' active':'')+'" data-action="wakeIntro" data-id="cinematic">Cinematic</button></div></div>'+
       '<div class="field"><label>News topics'+tip('Things you care about, separated by commas — e.g. AI, Knicks, marketing. Good morning shows the latest headlines on those. Leave it empty for the top stories.')+'</label><input class="input" data-wake="newsTopics" placeholder="e.g. AI, Knicks, marketing" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
       '<div class="field"><label>Sports'+tip('Teams or leagues for the Sports section — e.g. Knicks, Giants, UFC. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, NFL, UFC" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
+      '<div class="field"><label>Scores'+tip('Which leagues the scoreboard shows: yesterday’s and today’s results and what’s coming up. Your teams (above) go first.')+'</label><div class="seg-tabs" style="margin:0;">'+(typeof SPORTS!=='undefined' ? SPORTS : []).map(function(sp){ const on = arr(w.sportsOff).indexOf(sp.id) < 0; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeLeague" data-id="'+sp.id+'">'+sp.label+'</button>'; }).join('')+'</div></div>'+
+      '<div class="field"><label>Local news'+tip('A few headlines from where you are (the place your weather is set to — Settings → Look & Sound).')+'</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(weatherCfg().newsLocal!==false?' active':'')+'" data-action="wakeLocalNews" data-id="on">'+escapeHtml(weatherCfg().city || (weatherCfg().place && weatherCfg().place!=='My location' ? String(weatherCfg().place).split(',')[0] : 'On'))+'</button><button class="seg-tab'+(weatherCfg().newsLocal===false?' active':'')+'" data-action="wakeLocalNews" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Tech & interests'+tip('Anything else you follow — e.g. AI, Apple, marketing, crypto. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
       '<div class="field"><label>Places you like'+tip('Parks, streets, spots near you — separated by commas. Good morning suggests a walk to one of them now and then.')+'</label><input class="input" data-wake="places" placeholder="e.g. a park, a coffee spot" value="'+escapeHtml(w.places||'')+'"></div>'+
       '<div class="field"><label>Good morning background'+tip('Time of day follows when you\'re up: sunrise colours early, a blue sky later in the morning, golden in the evening, night if it\'s still dark.')+'</label><div class="seg-tabs" style="margin:0;">'+[['auto','Time of day'],['sunrise','Sunrise'],['dark','Dark']].map(function(o){ const on = (w.briefBg||'auto')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefBg" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
@@ -18558,6 +18814,8 @@ document.addEventListener('change', function(e){
   saveWake();
   renderView();
 });
+ACTIONS.wakeLeague = function(el, e, id){ const w = wakeCfg(), off = arr(w.sportsOff).slice(), i = off.indexOf(id); if(i>=0) off.splice(i, 1); else if(off.length < SPORTS.length - 1) off.push(id); w.sportsOff = off; saveWake(); ui.scores = null; renderView(); };
+ACTIONS.wakeLocalNews = function(el, e, id){ ensureWeatherCfg().newsLocal = id!=='off'; persist('settings'); ui.morningNews = null; renderWakeSetupInto(); renderView(); };
 // ---- small pieces shown elsewhere ----
 function wakeChipHtml(){
   const nw = nextWake();
@@ -20542,6 +20800,7 @@ ACTIONS.notifOpen = function(el, e, key){
   else if(a.a==='openCalItem') openCalItem(a.kind, a.id);
   else if(a.a==='openGhlContact' && ACTIONS.openGhlContact) ACTIONS.openGhlContact(null, null, a.id);
   else if(a.a==='openIntent' && typeof openIntentForm==='function') openIntentForm(a.id);
+  else if(a.a==='openCheckout' && ACTIONS.openCheckout) ACTIONS.openCheckout(null, null, a.id);
   else if(a.a==='levelUp' && ACTIONS.levelUp) ACTIONS.levelUp();
 };
 ACTIONS.notifDismiss = function(el, e, key){ notifDismissed()[key] = todayStr(); persist('focus'); notifBadge(); notifRender(); };
@@ -21414,7 +21673,7 @@ const ACTION_QUOTES = [
 const QUOTE_SETS = {morning:function(){ return MORNING_QUOTES; }, work:function(){ return WORK_QUOTES; }, action:function(){ return ACTION_QUOTES; }};
 function quoteFor(kind){ const list = QUOTE_SETS[kind](), off = (ui.qOff && ui.qOff[kind]) || 0; return list[(dayNum() + off) % list.length]; }
 function nextQuote(kind){ ui.qOff = ui.qOff || {}; ui.qOff[kind] = (ui.qOff[kind]||0) + 1; document.querySelectorAll('.qt[data-q="'+kind+'"]').forEach(function(el){
-  const tmp = document.createElement('div'); tmp.innerHTML = quoteHtml(quoteFor(kind), el.dataset.cls||'', kind); const n = tmp.firstChild; n.classList.add('qt-swap'); el.replaceWith(n); }); }
+  const tmp = document.createElement('div'); tmp.innerHTML = quoteHtml(quoteFor(kind), el.dataset.cls||'', kind); const n = tmp.firstChild; n.classList.add('qt-swap'); el.replaceWith(n); }); if(typeof briefFit==='function') requestAnimationFrame(function(){ briefFit(); }); }
 ACTIONS.nextQuote = function(el, e, id){ nextQuote(id); };
 setInterval(function(){
   if(typeof ui==='undefined' || !ui) return;
@@ -21466,18 +21725,44 @@ function goodDayReelHtml(){
   const items = goodDayItems(), n = items.length, i = (ui.gdIdx||0) % n;
   // (looks like the list it always was — four at a time — it just rolls on to the next one every few seconds)
   const row = function(x){ return '<div class="br-th gd-i"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; };
-  return '<div class="gd-reel"><div class="gd-track" style="--i:'+i+'">'+items.concat(items.slice(0, 4)).map(row).join('')+'</div></div>'+
-    '<div class="gd-dots">'+items.map(function(_, k){ return '<i class="'+(k===i ? 'on' : '')+'"></i>'; }).join('')+'</div>';
+  return '<div class="gd-reel" data-n="'+n+'"><div class="gd-track" style="--i:'+i+'">'+items.concat(items.slice(0, 4)).map(row).join('')+'</div></div>'+
+    '<div class="gd-nav"><button class="rl-arr" data-action="gdStep" data-id="-1" title="Back">&#8249;</button><div class="gd-dots">'+items.map(function(_, k){ return '<i class="'+(k===i ? 'on' : '')+'" data-action="gdGo" data-id="'+k+'"></i>'; }).join('')+'</div><button class="rl-arr" data-action="gdStep" data-id="1" title="Next">&#8250;</button></div>';
 }
+// move the reel to row i (wrapping both ways); a manual move holds the auto-roll for a bit
+function gdShow(i, manual){
+  const tr = document.querySelector('#wakeContent .gd-track'); if(!tr) return;
+  const n = goodDayItems().length, from = ui.gdIdx||0;
+  if(manual) ui.gdHold = Date.now();
+  if(i < 0){ tr.classList.add('no-anim'); tr.style.setProperty('--i', n); void tr.offsetWidth; tr.classList.remove('no-anim'); i = n - 1; }
+  ui.gdIdx = i;
+  tr.classList.remove('no-anim'); tr.style.setProperty('--i', i);
+  document.querySelectorAll('#wakeContent .gd-dots i').forEach(function(d, k){ d.classList.toggle('on', k===i % n); });
+  if(i >= n) setTimeout(function(){ if(ui.gdIdx!==i) return; ui.gdIdx = 0; tr.classList.add('no-anim'); tr.style.setProperty('--i', 0); void tr.offsetWidth; tr.classList.remove('no-anim'); }, 900);
+  return from;
+}
+ACTIONS.gdStep = function(el, e, id){ gdShow((ui.gdIdx||0) + Number(id||1), true); playTick(); };
+ACTIONS.gdGo = function(el, e, id){ gdShow(Number(id)||0, true); playTick(); };
+// a swipe on the trackpad (or the wheel, or a drag) moves it too
+let gdWheelAt = 0;
+document.addEventListener('wheel', function(e){
+  const r = e.target && e.target.closest && e.target.closest('#wakeContent .gd-reel, #wakeContent .bi-reel'); if(!r) return;
+  e.preventDefault();
+  const d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX; if(Math.abs(d) < 12 || Date.now() - gdWheelAt < 450) return;
+  gdWheelAt = Date.now();
+  if(r.classList.contains('gd-reel')) gdShow((ui.gdIdx||0) + (d > 0 ? 1 : -1), true); else ACTIONS.biStep(null, null, d > 0 ? 1 : -1);
+}, {passive:false});
+let gdDrag = null;
+document.addEventListener('pointerdown', function(e){ const r = e.target && e.target.closest && e.target.closest('#wakeContent .gd-reel, #wakeContent .bi-reel'); gdDrag = r ? {r:r, x:e.clientX, y:e.clientY} : null; });
+document.addEventListener('pointerup', function(e){
+  if(!gdDrag) return; const g = gdDrag; gdDrag = null;
+  const dx = e.clientX - g.x, dy = e.clientY - g.y, d = Math.abs(dy) > Math.abs(dx) ? -dy : -dx; if(Math.abs(d) < 30) return;
+  if(g.r.classList.contains('gd-reel')) gdShow((ui.gdIdx||0) + (d > 0 ? 1 : -1), true); else ACTIONS.biStep(null, null, d > 0 ? 1 : -1);
+});
 // it rolls on by itself every few seconds while Good morning is up
 setInterval(function(){
   if(ui.wakeMode!=='brief' || typeof overlayOpen!=='function' || !overlayOpen('wakeOverlay')) return;
-  const tr = document.querySelector('#wakeContent .gd-track'); if(!tr) return;
-  const n = goodDayItems().length;
-  ui.gdIdx = (ui.gdIdx||0) + 1;
-  tr.classList.remove('no-anim'); tr.style.setProperty('--i', ui.gdIdx);
-  document.querySelectorAll('#wakeContent .gd-dots i').forEach(function(d, k){ d.classList.toggle('on', k===ui.gdIdx % n); });
-  if(ui.gdIdx >= n) setTimeout(function(){ ui.gdIdx = 0; tr.classList.add('no-anim'); tr.style.setProperty('--i', 0); void tr.offsetWidth; tr.classList.remove('no-anim'); }, 900);
+  if(ui.gdHold && Date.now() - ui.gdHold < 12000) return;
+  gdShow((ui.gdIdx||0) + 1);
 }, 5500);
 function dayNum(){ const d = new Date(), start = new Date(d.getFullYear(), 0, 0); return Math.floor((d - start)/86400000); }
 function quoteOfDay(){ return quoteFor('morning'); }
@@ -21497,7 +21782,7 @@ function parseRss(text){
   const xml = new DOMParser().parseFromString(text, 'text/xml');
   const chan = xml.querySelector('channel > title');
   const src = chan ? chan.textContent.replace(/\s*[:\-|].*$/, '').trim() : '';
-  return Array.prototype.slice.call(xml.querySelectorAll('item')).slice(0, 6).map(function(it){
+  return Array.prototype.slice.call(xml.querySelectorAll('item')).slice(0, 8).map(function(it){
     const t = it.querySelector('title'), l = it.querySelector('link');
     const so = it.querySelector('source');
     return splitSource({title:(t ? t.textContent : '').trim(), link:(l ? l.textContent : '').trim(), src:so ? so.textContent.trim() : src});
@@ -21517,24 +21802,41 @@ function newsSections(){
 async function fetchNews(topics){
   let items = null;
   try{
-    const res = await fetchWithin(WAKE_HELPER+'news'+(topics ? '?q='+hexUtf8(topics) : ''), 9000);
+    const res = await fetchWithin(WAKE_HELPER+'news'+(topics ? '?q='+hexUtf8(topics) : '?t=top'), 9000);
     if(res && res.ok) items = parseRss(await res.text());
   }catch(e){}
   if(!items || !items.length){
     // an Operator still running last version's launcher has no /news — read the feed another way
     try{
-      const feed = topics ? 'https://news.google.com/rss/search?q='+encodeURIComponent(topicsQuery(topics))+'&hl=en-US&gl=US&ceid=US:en' : 'https://feeds.npr.org/1001/rss.xml';
+      const feed = topics ? 'https://news.google.com/rss/search?q='+encodeURIComponent(topicsQuery(topics))+'&hl=en-US&gl=US&ceid=US:en' : 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en';
       const res = await fetchWithin('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(feed), 8000);
-      if(res && res.ok){ const j = await res.json(); items = arr(j && j.items).slice(0, 6).map(function(x){ return splitSource({title:String(x.title||'').trim(), link:String(x.link||''), src:topics ? '' : 'NPR'}); }).filter(function(x){ return x.title; }); }
+      if(res && res.ok){ const j = await res.json(); items = arr(j && j.items).slice(0, 8).map(function(x){ return splitSource({title:String(x.title||'').trim(), link:String(x.link||''), src:''}); }).filter(function(x){ return x.title; }); }
     }catch(e){}
   }
   return items && items.length ? items : null;
 }
+// local news: from where the weather is (Settings → Display) — the town's name, looked up once if all
+// that's saved is "My location"
+async function localPlace(){
+  const w = typeof weatherCfg==='function' ? weatherCfg() : {};
+  if(w.newsLocal===false || !(w.lat!=null && w.lon!=null)) return '';
+  if(w.city && w.cityFor===w.lat+','+w.lon) return w.city;
+  const named = String(w.place||'').trim();
+  if(named && named!=='My location'){ return named.split(',')[0].trim(); }
+  try{
+    const r = await fetchWithin('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+w.lat+'&longitude='+w.lon+'&localityLanguage=en', 6000);
+    if(r && r.ok){ const j = await r.json(), c = j.city || j.locality || ''; if(c){ const cfg = ensureWeatherCfg(); cfg.city = c; cfg.cityFor = w.lat+','+w.lon; persist('settings'); return c; } }
+  }catch(e){}
+  return '';
+}
+async function fetchLocalNews(){ const c = await localPlace(); if(!c) return null; const items = await fetchNews(c); return items ? {place:c, items:items} : null; }
 // (returns a promise the voice can wait on when you ask for the news)
 function loadMorningNews(force){
   if(!morningNewsOn() && !force) return Promise.resolve(null);
   const today = todayStr();
   if(ui.morningNews && ui.morningNews.date===today && ui.morningNews.loading) return ui._newsP || Promise.resolve(null);
+  // (the news is fetched once a day; the scores keep their own clock — a failed try is tried again)
+  if(typeof loadScores==='function' && newsSections().some(function(x){ return x.id==='sports'; })) loadScores();
   if(ui.morningNews && ui.morningNews.date===today && ui.morningNews.items) return Promise.resolve(ui.morningNews);
   ui._newsP = loadMorningNewsNow(); return ui._newsP;
 }
@@ -21543,10 +21845,12 @@ async function loadMorningNewsNow(){
   const today = todayStr();
   ui.morningNews = {date:today, loading:true, items:null, sec:{}};
   const secs = newsSections();
-  const all = await Promise.all([fetchNews(newsTopics())].concat(secs.map(function(x){ return fetchNews(x.q); })));
-  const items = all[0], seen = {}, sec = {};
+  const all = await Promise.all([fetchNews(newsTopics()), fetchLocalNews()].concat(secs.map(function(x){ return fetchNews(x.q); })));
+  const items = all[0], local = all[1], seen = {}, sec = {};
+  all.splice(1, 1);
   arr(items).forEach(function(n){ seen[n.title] = 1; });
   secs.forEach(function(x, i){ const list = arr(all[i+1]).filter(function(n){ if(seen[n.title]) return false; seen[n.title] = 1; return true; }); if(list.length) sec[x.id] = list; });
+  if(local) sec.local = arr(local.items).filter(function(n){ if(seen[n.title]) return false; seen[n.title] = 1; return true; }).map(function(n){ n.local = local.place; return n; });
   ui.morningNews = {date:today, loading:false, items:items, sec:sec};
   if(ui.morningNews.items && ui.wakeMode==='brief' && overlayOpen('wakeOverlay')){
     // it arrived after the page started building: give it its moment instead of popping in
@@ -21556,11 +21860,13 @@ async function loadMorningNewsNow(){
   return ui.morningNews;
 }
 // the headlines panel: top stories with tech woven in (two of the news, then one of tech)
-function mixHeadlines(top, tech){
-  const out = [], a = arr(top).slice(), b = arr(tech).slice();
-  while(out.length < 8 && (a.length || b.length)){
-    if(a.length) out.push({n:a.shift()}); if(a.length && out.length < 8) out.push({n:a.shift()});
-    if(b.length && out.length < 8) out.push({n:b.shift(), tech:true});
+// (and local woven in near the top: the first local story is third, then one every few)
+function mixHeadlines(top, tech, local){
+  const out = [], a = arr(top).slice(), b = arr(tech).slice(), c = arr(local).slice();
+  while(out.length < 10 && (a.length || b.length || c.length)){
+    if(a.length) out.push({n:a.shift()}); if(a.length && out.length < 10) out.push({n:a.shift()});
+    if(c.length && out.length < 10) out.push({n:c.shift(), local:true});
+    if(b.length && out.length < 10) out.push({n:b.shift(), tech:true});
   }
   return out;
 }
@@ -21733,9 +22039,15 @@ function wakeBriefHtml(){
   const cp = typeof contentProgress==='function' ? ['business', 'personal'].map(contentProgress).filter(function(p){ return p.n; }) : [];
   // (wide screens: on top of the headlines; otherwise under the weather, where the month panel has room)
   const todayCol = window.innerWidth >= 1680 ? colC : null;
-  const todayP = (panel('br-day', 'br-a-right', events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.',
-    '<div class="br-k">&#128197; Today</div>'+
-    (events.length ? '<div class="br-agenda">'+events.slice(0, 3).map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b>'+escapeHtml(e.title)+'</div>'; }).join('')+'</div>' : '<div class="br-day-plan">Nothing scheduled. Enjoy the morning.</div>')+
+  // (the work itself — the plan, what's due — waits for the work preview; Good morning is the day around it)
+  const todayVoice = events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.';
+  const row = function(when, what, cls){ return '<div class="bd-r'+(cls ? ' '+cls : '')+'"><b>'+when+'</b><span>'+what+'</span></div>'; };
+  const todayP = (panel('br-day', 'br-a-right', todayVoice,
+    '<div class="br-k">&#128197; Today<span class="br-k-n">'+new Date().toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+'</span></div>'+
+    '<div class="bd-list">'+
+      events.map(function(e){ return row(e.time ? fmt12Hour(e.time) : 'All day', escapeHtml(e.title)+(e.location ? '<small>'+escapeHtml(e.location)+'</small>' : ''), 'is-ev'+(e.time && e.time < nowHM() ? ' is-past' : '')); }).join('')+
+      (!events.length ? '<div class="bd-empty">Nothing scheduled. Enjoy the morning.</div>' : '')+
+    '</div><div class="bd-more" hidden></div>'+
     (cp.length ? '<div class="br-content">'+cp.map(function(p){ return '<span class="'+(p.done >= p.n ? 'is-hit' : '')+'"><b>'+p.done+'/'+p.n+'</b> '+(p.role==='business' ? 'business' : 'personal')+' videos '+p.label+'</span>'; }).join('')+'</div>' : '')));
   if(todayCol) todayCol.push(todayP); else colA.splice(1, 0, todayP);
   // the world: one panel of headlines (the news and tech, mixed), and one just for sports.
@@ -21744,20 +22056,21 @@ function wakeBriefHtml(){
   const late = ui.briefNewsAt ? function(){ return ';--late:'+Math.max(600, tcur - (ui.briefNewsAt - (ui.briefT0||0)))+'ms'; } : function(){ return ''; };
   const item = function(n, top, tag){ return '<button class="br-news-i'+(top?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+(tag ? '<em class="br-tag">'+tag+'</em>' : '')+escapeHtml(n.title)+(n.src ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; };
   const waitHtml = function(cls, k){ return '<section class="br-p '+cls+' is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">'+k+'</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>'; };
-  const heads = news ? mixHeadlines(news, arr(sec.tech)) : [];
+  const heads = news ? mixHeadlines(news, arr(sec.tech), arr(sec.local)) : [];
   if(heads.length){
-    const lt = late();
-    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there.', '<div class="br-k">&#128240; Headlines</div>'+heads.slice(0, 4).map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : ''); }).join(''), lt));
+    const lt = late(), lp = arr(sec.local)[0] && sec.local[0].local;
+    // (as many as fit — the rest are trimmed after it's drawn, so there's no empty space under them)
+    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there'+(lp ? ', and in '+lp : '')+'.', '<div class="br-k">&#128240; Headlines'+(lp ? '<span class="br-k-n">&#128205; '+escapeHtml(lp)+'</span>' : '')+'</div><div class="br-news-list">'+heads.map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : h.local ? 'Local' : ''); }).join('')+'</div>', lt));
   } else if(newsWait) colC.push(waitHtml('br-news', '&#128240; Headlines'));
   if(morningNewsOn() && newsSections().some(function(x){ return x.id==='sports'; })){
     // (on a narrower screen sports shares a column with the headlines: fewer rows, no sports stories)
     const roomy = window.innerWidth >= 1680;
-    const sc = typeof scoresHtml==='function' ? scoresHtml(roomy ? 3 : 2, roomy ? 3 : 1) : '', sh = arr(sec.sports).slice(0, roomy || !sc ? 6 : 0);
+    const sc = typeof scoresHtml==='function' ? scoresHtml(roomy ? 4 : 3, roomy ? 4 : 3) : '', sh = arr(sec.sports).slice(0, roomy || !sc ? 6 : 0);
     if(sc || sh.length){
       const lt = late();
       colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports</div>'+sc+sh.slice(0, sc ? 2 : 6).map(function(n){ return item(n, false); }).join(''), lt));
     } else if(newsWait || (ui.scores && ui.scores.loading)) colD.push(waitHtml('br-sports', '&#127936; Sports'));
-    else colD.push(panel('br-sports', 'br-a-rise', '', '<div class="br-k">&#127936; Sports</div><div class="br-sports-none">No games on the board right now. Ask the Operator for sports — it goes and gets them.</div>'));
+    else colD.push(panel('br-sports', 'br-a-rise', '', '<div class="br-k">&#127936; Sports</div>'+(typeof scoresStatusHtml==='function' ? scoresStatusHtml() : '<div class="br-sports-none">No games on the board right now.</div>')));
   }
   const ctaD = tcur;
   lines.push({at: ctaD - 380, text: 'Get ready to start your day.'});
@@ -21790,6 +22103,29 @@ function wakeBriefHtml(){
     (ui.wakeBoardBig && vb ? '<div class="br-vision-big" data-action="wakeBoardToggle" title="Close">'+boardStaticHtml(vb, 'wake-board')+'<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button></div>' : '')+
   '</div>';
 }
+// fit the panels to the space they have: For a Good Day's four rows share its height, and the
+// headlines and Today show as many rows as fit — no half-cut row at the bottom, no empty space under it
+function briefFit(root){
+  root = root || document.getElementById('wakeContent'); if(!root) return;
+  root.querySelectorAll('.gd-reel').forEach(function(r){ const h = r.clientHeight; if(h > 150) r.style.setProperty('--gh', Math.floor(h/4)+'px'); });
+  root.querySelectorAll('.br-news-list, .bd-list').forEach(function(list){
+    const items = Array.prototype.slice.call(list.children);
+    items.forEach(function(it){ it.classList.remove('is-cut'); });
+    // (layout positions, not screen ones — the panels may still be sliding in)
+    const lim = list.clientHeight + 1, top0 = items.length ? items[0].offsetTop : 0;
+    let cut = false; items.forEach(function(it, i){ if(cut || (i > 0 && it.offsetTop - top0 + it.offsetHeight > lim)){ cut = true; it.classList.add('is-cut'); } });
+    list.classList.toggle('has-more', cut);
+    const more = list.nextElementSibling && list.nextElementSibling.classList.contains('bd-more') ? list.nextElementSibling : null;
+    if(more){ const n = items.filter(function(it){ return it.classList.contains('is-cut'); }).length; more.textContent = n ? '+'+n+' more later today' : ''; more.hidden = !n; }
+  });
+  // the quote: the words step down in size until all of it fits, who said it always shows
+  root.querySelectorAll('.br-quote .qt blockquote').forEach(function(bq){
+    bq.style.fontSize = '';
+    let fs = parseFloat(getComputedStyle(bq).fontSize) || 20, guard = 0;
+    while(bq.scrollHeight > bq.clientHeight + 1 && fs > 13 && guard++ < 16){ fs -= 1; bq.style.fontSize = fs+'px'; }
+  });
+}
+window.addEventListener('resize', function(){ clearTimeout(briefFit._t); briefFit._t = setTimeout(function(){ if(typeof overlayOpen==='function' && overlayOpen('wakeOverlay')) briefFit(); }, 120); });
 // skipping the intro moves the whole schedule up so the page starts building right away
 ACTIONS.wakeIntroSkip = function(){
   if(!ui.wakeIntroDone){
@@ -22494,7 +22830,7 @@ function dockBtnsHtml(){
 function dockHtml(){
   const name = dockSrcName();
   // the Operator's mic sits here too: talk to it from anywhere
-  return '<div class="md-in'+(musicOn()?' is-playing':'')+'">'+(name ? '<span class="md-now" title="'+escapeHtml(name)+'">'+escapeHtml(name)+'</span><button class="md-b md-skip" data-action="dockNext" title="Next">&#9197;</button>' : '')+dockBtnsHtml()+
+  return '<div class="md-in'+(musicOn()?' is-playing':'')+'">'+(typeof lvlChipHtml==='function' ? lvlChipHtml() : '')+(name ? '<span class="md-now" title="'+escapeHtml(name)+'">'+escapeHtml(name)+'</span><button class="md-b md-skip" data-action="dockNext" title="Next">&#9197;</button>' : '')+dockBtnsHtml()+
     '<button class="md-b md-op op-talk" data-action="opTalk" title="Talk to the Operator">&#127897;&#65039;</button></div>';
 }
 // (main: the big middle button of the minimal player — ▶ / ❚❚)
@@ -22523,7 +22859,14 @@ afterRenderHooks.push(function(){ dockRefresh(); document.body.classList.toggle(
 // and the way back from the work preview to Good morning.
 
 // ---- scores ----
-const SPORTS = [{id:'nfl', label:'NFL', icon:'&#127944;'}, {id:'nba', label:'NBA', icon:'&#127936;'}];
+// NFL, NBA, MLB and NHL from ESPN's public scoreboard: yesterday's and today's results, anything live,
+// and what's coming up in the next few days — your teams first. The launcher fetches it (and the page
+// asks ESPN itself at the same time; whichever answers first wins). Waking from sleep the Wi-Fi often
+// isn't back yet, so a failed try is tried again on its own (15 s, 45 s, 2 min, then every 10), and
+// while a game is live the board refreshes every couple of minutes.
+const SPORTS = [{id:'nfl', label:'NFL', icon:'&#127944;', path:'football/nfl'}, {id:'nba', label:'NBA', icon:'&#127936;', path:'basketball/nba'},
+  {id:'mlb', label:'MLB', icon:'&#9918;', path:'baseball/mlb'}, {id:'nhl', label:'NHL', icon:'&#127954;', path:'hockey/nhl'}];
+function sportsOn(){ const off = arr(wakeCfg().sportsOff); return SPORTS.filter(function(s){ return off.indexOf(s.id) < 0; }); }
 function ymdCompact(d){ return d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate()); }
 function parseScoreboard(j, l){
   return arr(j && j.events).map(function(e){
@@ -22534,36 +22877,75 @@ function parseScoreboard(j, l){
     return {l:l, id:e.id, at:Date.parse(e.date), state:st.state, detail:st.shortDetail||'', home:t(home), away:t(away)};
   }).filter(function(g){ return g.home.abbr && g.away.abbr && isFinite(g.at); });
 }
+// the first good answer of several tries
+function firstJson(urls, ms){
+  return new Promise(function(done){
+    let left = urls.length; if(!left) return done(null);
+    urls.forEach(function(u){
+      fetchWithin(u, ms).then(function(r){ return r && r.ok ? r.json() : null; }).catch(function(){ return null; }).then(function(j){
+        if(j && Array.isArray(j.events)){ left = -1; done(j); } else if(--left===0) done(null);
+      });
+    });
+  });
+}
 async function fetchScoreboard(l){
-  const now = Date.now(), range = ymdCompact(new Date(now - 5*86400000))+'-'+ymdCompact(new Date(now + 6*86400000));
-  let j = null;
-  try{ const r = await fetchWithin(WAKE_HELPER+'sports?l='+l+'&d='+range, 9000); if(r && r.ok) j = await r.json(); }catch(e){}
-  if(!j){ try{ const r = await fetchWithin('https://site.api.espn.com/apis/site/v2/sports/'+(l==='nfl' ? 'football' : 'basketball')+'/'+l+'/scoreboard?dates='+range, 9000); if(r && r.ok) j = await r.json(); }catch(e){} }
+  const sp = SPORTS.find(function(x){ return x.id===l; }); if(!sp) return null;
+  const now = Date.now(), range = ymdCompact(new Date(now - 2*86400000))+'-'+ymdCompact(new Date(now + 7*86400000));
+  const espn = 'https://site.api.espn.com/apis/site/v2/sports/'+sp.path+'/scoreboard';
+  let j = await firstJson([WAKE_HELPER+'sports?l='+l+'&d='+range, espn+'?dates='+range+'&limit=200'], 10000);
+  // nothing in that window (or the range isn't understood): today's board, the way ESPN shows it
+  if(!j || !arr(j.events).length){ const k = await firstJson([WAKE_HELPER+'sports?l='+l, espn], 8000); if(k) j = k; }
   return j ? parseScoreboard(j, l) : null;
 }
-function favWords(){ return sectionTopics(wakeCfg().newsSports, 'NFL, NBA').toLowerCase().split(/\s*,\s*/).filter(function(w){ return w && !/^(nfl|nba|football|basketball|sports)$/.test(w); }); }
+function favWords(){ return sectionTopics(wakeCfg().newsSports, 'NFL, NBA').toLowerCase().split(/\s*,\s*/).filter(function(w){ return w && !/^(nfl|nba|mlb|nhl|football|basketball|baseball|hockey|sports)$/.test(w); }); }
 function isFavGame(g){ const ws = favWords(); return ws.some(function(w){ return [g.home.name, g.home.short, g.home.abbr, g.away.name, g.away.short, g.away.abbr].some(function(x){ return String(x).toLowerCase().indexOf(w)>=0; }); }); }
+// which games: live ones, results from yesterday and today, and the week ahead — your teams first
 function pickGames(list){
   const favFirst = function(xs){ return xs.filter(isFavGame).concat(xs.filter(function(g){ return !isFavGame(g); })); };
+  const now = Date.now();
   const live = favFirst(list.filter(function(g){ return g.state==='in'; }));
-  const done = favFirst(list.filter(function(g){ return g.state==='post'; }).sort(function(a, b){ return b.at - a.at; }));
-  const next = favFirst(list.filter(function(g){ return g.state==='pre'; }).sort(function(a, b){ return a.at - b.at; }));
-  return live.slice(0, 1).concat(done.slice(0, live.length ? 1 : 2), next.slice(0, 2)).slice(0, 4);
+  const done = favFirst(list.filter(function(g){ return g.state==='post' && now - g.at < 40*3600000; }).sort(function(a, b){ return b.at - a.at; }));
+  const next = favFirst(list.filter(function(g){ return g.state==='pre' && g.at - now < 7*86400000; }).sort(function(a, b){ return a.at - b.at; }));
+  return live.slice(0, 2).concat(done.slice(0, live.length ? 1 : 2), next.slice(0, 2)).slice(0, 4);
 }
 // returns a promise, so the voice can wait for the scores when you ask for sports
 function loadScores(force){
   const today = todayStr(), sc = ui.scores;
   if(sc && sc.date===today && sc.loading) return ui._scoresP;
-  // a failed fetch (nothing came back) is tried again after a few minutes, or when asked for
-  if(sc && sc.date===today && sc.got && (sc.nfl || sc.nba || (!force && Date.now() - (sc.at||0) < 5*60000))) return Promise.resolve(sc);
-  ui.scores = {date:today, loading:true};
-  ui._scoresP = Promise.all(SPORTS.map(function(s){ return fetchScoreboard(s.id); })).then(function(r){
-    ui.scores = {date:today, loading:false, got:true, at:Date.now(), nfl:r[0], nba:r[1]};
+  if(!force && sc && sc.date===today && sc.got){
+    const age = Date.now() - (sc.at||0), live = SPORTS.some(function(s){ return arr(sc[s.id]).some(function(g){ return g.state==='in'; }); });
+    if(sc.ok ? age < (live ? 2*60000 : 15*60000) : age < [15000, 45000, 120000][Math.min(2, (sc.fails||1)-1)] || (sc.fails > 3 && age < 600000)) return Promise.resolve(sc);
+  }
+  const fails = sc && sc.date===today && !sc.ok ? (sc.fails||0) : 0, keep = sc && sc.date===today && sc.ok ? sc : null;
+  ui.scores = Object.assign({}, keep || {}, {date:today, loading:true});
+  if(!keep && ui.wakeMode==='brief' && overlayOpen('wakeOverlay')) renderWakeOverlayInto();
+  const leagues = sportsOn();
+  ui._scoresP = Promise.all(leagues.map(function(s){ return fetchScoreboard(s.id); })).then(function(r){
+    const out = {date:today, loading:false, got:true, at:Date.now()}; let any = false;
+    leagues.forEach(function(s, i){ out[s.id] = r[i]; if(r[i]) any = true; });
+    out.ok = any; out.fails = any ? 0 : fails + 1;
+    // a failed refresh keeps the last good board
+    ui.scores = !any && keep ? Object.assign({}, keep, {at:Date.now(), stale:true}) : out;
     if(ui.wakeMode==='brief' && overlayOpen('wakeOverlay')) renderWakeOverlayInto();
     return ui.scores;
   });
   return ui._scoresP;
 }
+// tries again by itself while Good morning is up (and keeps a live game current)
+setInterval(function(){
+  if(ui.wakeMode!=='brief' || typeof overlayOpen!=='function' || !overlayOpen('wakeOverlay') || typeof morningNewsOn!=='function' || !morningNewsOn()) return;
+  loadScores();
+  // (the headlines too, if they didn't make it the first time)
+  if(ui.morningNews && !ui.morningNews.items && !ui.morningNews.loading && Date.now() - (ui._newsRetry||0) > 30000){ ui._newsRetry = Date.now(); ui.morningNews = null; loadMorningNews(); }
+}, 10000);
+// when the board is empty: say why, and offer to try again
+function scoresStatusHtml(){
+  const sc = ui.scores;
+  if(!sc || sc.loading) return '<div class="br-sports-none is-wait">Getting the scores&hellip;</div>';
+  if(!sc.ok) return '<div class="br-sports-none">Couldn’t reach ESPN'+(sc.fails > 1 ? ' ('+sc.fails+' tries)' : '')+' — usually the Wi-Fi coming back from sleep. Trying again on its own.<button class="bi-set" data-action="scoresRetry">Try now</button></div>';
+  return '<div class="br-sports-none">No '+sportsOn().map(function(s){ return s.label; }).join(', ')+' games yesterday, today or this coming week.</div>';
+}
+ACTIONS.scoresRetry = function(){ loadScores(true); };
 function scoreWhen(g){
   const d = new Date(g.at), today = todayStr(), ds = ds2(d);
   const day = ds===today ? 'Today' : ds===addDays(today, 1) ? 'Tomorrow' : d.toLocaleDateString(undefined, {weekday:'short'});
@@ -22591,10 +22973,11 @@ function scoresHtml(maxDone, maxNext){
   const sc = ui.scores; if(!sc || !sc.got) return '';
   const done = [], next = [];
   SPORTS.forEach(function(s){ pickGames(sc[s.id] || []).forEach(function(g){ (g.state==='pre' ? next : done).push(g); }); });
+  done.sort(function(a, b){ return (a.state==='in' ? 0 : 1) - (b.state==='in' ? 0 : 1) || b.at - a.at; });
   const favFirst = function(xs){ return xs.filter(isFavGame).concat(xs.filter(function(g){ return !isFavGame(g); })); };
   const d = favFirst(done).slice(0, maxDone||3), n = favFirst(next.sort(function(a, b){ return a.at - b.at; })).slice(0, maxNext||3);
   if(!d.length && !n.length) return '';
-  return '<div class="sb">'+(d.length ? '<div class="sb-h">Results</div>'+d.map(scoreRowHtml).join('') : '')+(n.length ? '<div class="sb-h">Coming up</div>'+n.map(scoreRowHtml).join('') : '')+'</div>';
+  return '<div class="sb">'+(d.length ? '<div class="sb-h">'+(d.some(function(g){ return g.state==='in'; }) ? 'Live &amp; results' : 'Results')+'</div>'+d.map(scoreRowHtml).join('') : '')+(n.length ? '<div class="sb-h">Coming up</div>'+n.map(scoreRowHtml).join('') : '')+'</div>';
 }
 // what the voice can say about it
 function scoresSpoken(){
@@ -23037,7 +23420,7 @@ ACTIONS.opAsk = async function(el, e, id){
   const cap = 'opBubText';
   const tok = OV.token;
   const wait = function(p){ return Promise.race([p, new Promise(function(r){ setTimeout(r, 7000); })]); };
-  if(id==='sports' && typeof loadScores==='function' && !(ui.scores && ui.scores.got && (ui.scores.nfl || ui.scores.nba))){ OV.cap = cap; opCaption('One moment — getting the scores…'); await wait(loadScores(true)); }
+  if(id==='sports' && typeof loadScores==='function' && !(ui.scores && ui.scores.got && ui.scores.ok)){ OV.cap = cap; opCaption('One moment — getting the scores…'); await wait(loadScores(true)); }
   if((id==='news' || id==='tech' || id==='sports') && !(ui.morningNews && ui.morningNews.items)){ OV.cap = cap; opCaption('One moment…'); await wait(loadMorningNews(true)); }
   if(id==='tech' && !arr(ui.morningNews && ui.morningNews.sec && ui.morningNews.sec.tech).length){
     // nothing came through for tech with the morning's news: ask for it on its own
@@ -23157,6 +23540,13 @@ function aiContext(){
   const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
   lines.push('Business: MRR '+money(xpMrr())+(state.profile.revenueGoalMonthly ? ' (goal '+money(state.profile.revenueGoalMonthly)+')' : '')+', '+cs.length+' active clients, '+arr(state.business.pipeline).filter(leadIsOpen).length+' open leads.');
   if(typeof xpSummary==='function'){ const x = xpSummary(); lines.push('Game: level '+x.level+', rank '+x.rank+' "'+RANKS[x.rank].name+'", overall '+x.ovr+' (Business '+x.attrs.BUS.v+', Personal '+x.attrs.PER.v+', Health '+x.attrs.HLT.v+', Discipline '+x.attrs.DIS.v+').'); }
+  if(typeof tierGoals==='function'){
+    const gl = function(kind){ return tierGoals(kind, periodKey(kind)).map(function(g){ return (g.done ? '[done] ' : '')+g.label; }).join('; '); };
+    const wg = gl('week'), mg = gl('month'), m = periodRec('month', monthKey()) || {};
+    if(wg || mg) lines.push('Check-ins — this week’s goals: '+(wg || 'none set')+'. This month’s goals: '+(mg || 'none set')+(m.habit ? '. Habit he’s beating this month: '+m.habit : '')+'.');
+    const due = checkoutDue(); if(due.length) lines.push('Due: check out of '+due.map(function(c){ return c.kind==='month' ? monthName(c.key) : 'the week'; }).join(' and ')+'.');
+  }
+  if(typeof xpSummary==='function'){ const x = xpSummary(); lines.push('XP: '+x.total.toLocaleString()+' total, '+Math.max(0, x.levelHi - x.total).toLocaleString()+' to level '+(x.level+1)+(x.canLevel ? ' (level up is ready to claim)' : '')+'.'); }
   const wx = typeof wxNow==='function' ? wxNow() : null; if(wx) lines.push('Weather: '+wx.temp+'° and '+wxLabel(wx.code).toLowerCase()+(wx.hi!=null ? ', high '+wx.hi+'°' : '')+'.');
   const nw = ui.morningNews; if(nw && nw.items) lines.push('Headlines: '+arr(nw.items).slice(0, 5).map(function(n){ return sayHeadline(n.title); }).join(' | ')+'.');
   if(nw && nw.sec && nw.sec.tech) lines.push('Tech: '+arr(nw.sec.tech).slice(0, 3).map(function(n){ return sayHeadline(n.title); }).join(' | ')+'.');
@@ -23301,18 +23691,19 @@ function opLauncherLineHtml(){
 // point is to stay consistent and not lose yourself to brain fog. Levels are slow on purpose: each
 // one costs 1,000 XP plus 150 for every level you already have — a good week of work for the first,
 // more after that. Every session still moves the bar (20 minutes is about 3 XP); the big jumps come
-// from what changes the business and the body: clients won, MRR added, followers gained, goals done.
+// from what changes the business and the body.
 // Ranks need three things: the level, the MRR, and the body (your Health score) — you can't
 // rank up on work alone.
-// XP comes from the day (deep work, tasks, workouts — the first ones count big — shooting,
-// outreach), consistency (strong days in a row multiply the day), clients you win, and MRR: every
-// $1k above where you started is worth 800 XP — and it's taken back if MRR drops.
-// Your card (NBA 2K style) rates you 25–100 on four things, and an overall. 100 is you at your very
-// best — the body, the business and the decisions all there at once — so it's meant to be rare:
-//   Business (MRR, clients, time put in, client growth, business content)
-//   Personal (personal content, video ideas, your goals, reflection)
-//   Health (BMI for your height — scales with any weight — and training, how often and how steady)
-//   Discipline (days on target, your streak, how often you lock in)
+// XP comes from:
+//   the day     — deep work, tasks, workouts (the first ones count big), shooting, outreach; strong
+//                 days in a row multiply it
+//   goals       — a weekly goal hit +150 (up to three a week), a monthly goal +500 (up to three a
+//                 month), beating the month's habit +250, checking in and out of the week/month (+25/+50,
+//                 +50/+100), a master goal reached +4,000 (MRR, weight, streak — raise the bar and it
+//                 pays again), every finished week you hit a weekly ring +100, your own goals +500
+//   the business — every $1k of MRR above where you started +800 (taken back if it drops), a client won
+//                 +750, followers gained
+// Your card (NBA 2K style) rates you 25–100 on four things, and an overall (see xpAttributes).
 const RANKS = [
   {name:'Locked In',   level:0,  mrr:0,     health:0,  color:'#8fd3ff', tag:'Entrepreneur mode'},
   {name:'Operator',    level:3,  mrr:2500,  health:40, color:'#5fd4c4', tag:'Showing up'},
@@ -23325,6 +23716,7 @@ const RANKS = [
   {name:'Millionaire', level:40, mrr:83400, health:80, color:'#fff2b0', tag:'A million a year'}
 ];
 const XP_RATES = {mrrPerK:800, client:750, follower:1, goal:500, video:50, hourBase:10, hourAbove:18, longDay:40, outreach:20};
+const MASTER_XP = {milestone:4000, weekly:100};
 // total XP to reach level L: 1,000 a level plus 150 more for each level before it
 function xpForLevel(L){ return 1000*L + 75*L*(L-1); }
 function xpLevelOf(total){ let L = 0; while(xpForLevel(L+1) <= total) L++; return L; }
@@ -23340,16 +23732,58 @@ function xpClaimedLevel(earned, mrr, health){
   }
   return p.xpLevel;
 }
-// goals count once they've stayed done for a day (an accidental tick doesn't pay; un-ticking or
-// deleting one takes it away again); periodic ones (this week's workouts…) don't count here
+// your own goals count once they've stayed done for a day (an accidental tick doesn't pay; un-ticking or
+// deleting one takes it away again); periodic ones (this week's workouts…) and the weekly / monthly
+// check-in goals (xpCheckins) don't count here
 function xpGoals(){
   const p = state.profile, seen = (p.xpGoalSeen && typeof p.xpGoalSeen==='object') ? p.xpGoalSeen : (p.xpGoalSeen = {});
-  const now = Date.now(), done = arr(state.goals && state.goals.items).filter(function(g){ return g.done && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g)); });
+  const now = Date.now(), done = arr(state.goals && state.goals.items).filter(function(g){ return g.done && !g.tier && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g)); });
   const ids = {}; let changed = false, counted = 0, pending = 0;
   done.forEach(function(g){ ids[g.id] = 1; if(!seen[g.id]){ seen[g.id] = now; changed = true; } if(now - seen[g.id] >= 86400000) counted++; else pending++; });
   Object.keys(seen).forEach(function(id){ if(!ids[id]){ delete seen[id]; changed = true; } });
   if(changed) persist('profile');
   return {counted:counted, pending:pending};
+}
+// the week and the month (32u): goals hit (three a period at most), the habit beaten, and showing up to
+// check in and out — from the period the game began in
+function xpCheckins(){
+  const parts = {weekGoals:0, monthGoals:0, habits:0, shows:0};
+  if(typeof intentStore!=='function') return {xp:0, parts:parts};
+  const s = intentStore(), start = xpStart(), ws0 = weekKey(start), ms0 = monthKey(start);
+  Object.keys(s.weeks).forEach(function(k){ if(k < ws0) return; const r = s.weeks[k] || {}; if(r.at) parts.shows += CHECKIN_XP.weekIn; if(r.out) parts.shows += CHECKIN_XP.weekOut; });
+  Object.keys(s.months).forEach(function(k){ if(k < ms0) return; const r = s.months[k] || {}; if(r.at) parts.shows += CHECKIN_XP.monthIn; if(r.out){ parts.shows += CHECKIN_XP.monthOut; if(r.out.habit) parts.habits += CHECKIN_XP.habit; } });
+  const per = {};
+  arr(state.goals && state.goals.items).forEach(function(g){
+    if(!g.tier || !g.done || (g.tier==='week' ? g.pk < ws0 : g.pk < ms0)) return;
+    const k = g.tier+g.pk; per[k] = (per[k]||0) + 1; if(per[k] > CHECKIN_XP.maxGoals) return;
+    if(g.tier==='week') parts.weekGoals += CHECKIN_XP.weekGoal; else parts.monthGoals += CHECKIN_XP.monthGoal;
+  });
+  return {xp:parts.weekGoals + parts.monthGoals + parts.habits + parts.shows, parts:parts};
+}
+// master goals (24c): the big milestones pay big, once each — MRR, your weight, your streak. Raise the
+// bar and the next one pays again, as long as it's a real step (not a target nudged to farm it). The
+// weekly rings (workouts, deep work) pay a little for every finished week you hit them.
+function xpMaster(ctx){
+  if(typeof masterGoalDefs!=='function') return {xp:0, hits:0, weeks:0};
+  const p = state.profile, hit = (p.xpMasterHit && typeof p.xpMasterHit==='object') ? p.xpMasterHit : (p.xpMasterHit = {});
+  let changed = false;
+  masterGoalDefs().forEach(function(m){
+    if(['mrr', 'weight', 'streak'].indexOf(m.key) < 0 || m.cur==null || !(m.target > 0) || masterPct(m) < 100) return;
+    const list = hit[m.key] = arr(hit[m.key]), last = list.length ? list[list.length-1] : null, t = Number(m.target);
+    const real = m.key==='mrr' ? t >= 1000 && (last==null || t >= last + 1000)
+      : m.key==='streak' ? t >= 14 && (last==null || t >= last + 7)
+      : m.start!=null && Math.abs(m.start - t) >= 5 && (last==null || Math.abs(last - t) >= 5);
+    if(real && list.indexOf(t) < 0){ list.push(t); changed = true; }
+  });
+  if(changed) persist('profile');
+  const hits = ['mrr', 'weight', 'streak'].reduce(function(a, k){ return a + arr(hit[k]).length; }, 0);
+  const wT = p.weeklyWorkoutTarget || 0, dT = (p.weeklyDeepHoursGoal || Math.round((state.standards.deepWorkTargetMinutes||180)*5/60))*60;
+  let weeks = 0, w = weekKey(xpStart()); if(w < xpStart()) w = addDays(w, 7);
+  for(; addDays(w, 6) < todayStr(); w = addDays(w, 7)){
+    if(wT){ let n = 0; for(let i=0;i<7;i++) if(ctx.trained(addDays(w, i))) n++; if(n >= wT) weeks++; }
+    if(dT){ let m = 0; for(let i=0;i<7;i++) m += ctx.deep(addDays(w, i)); if(m >= dT) weeks++; }
+  }
+  return {xp:hits*MASTER_XP.milestone + weeks*MASTER_XP.weekly, hits:hits, weeks:weeks};
 }
 // followers you've gained since you started (GoHighLevel / Instagram, when connected)
 function xpFollowersNow(){
@@ -23407,16 +23841,15 @@ function xpCtx(){
   const shootMin = {}; arr(state.modes.history).forEach(function(m){ if(m.type==='shooting') shootMin[m.date] = (shootMin[m.date]||0) + Number(m.minutes||0); });
   const touches = {};
   ['clients', 'pipeline'].forEach(function(k){ arr(state.business[k]).forEach(function(x){ arr(x.touches).forEach(function(t){ const d = typeof t==='string' ? t : t && t.date; if(d) touches[d] = (touches[d]||0) + 1; }); }); });
-  const jDays = {}; arr(state.journal.entries).forEach(function(e){ if(e.date) jDays[e.date] = true; });
   const deepMemo = {};
   return {doneOn:doneOn, trained:function(d){ return !!gymSet[d]; }, gymDays:gymDays, workoutIndex:workoutIndex, workoutWeekIndex:workoutWeekIndex, shootMin:shootMin, touches:touches,
-    journaled:function(d){ return !!jDays[d]; }, jDays:jDays,
     target: state.standards.deepWorkTargetMinutes || 180,
     deep:function(d){ if(deepMemo[d]==null) deepMemo[d] = d===todayStr() ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); return deepMemo[d]; }};
 }
 // past days don't change often: keep them, recount only today (and everything when the data changes)
 let xpCache = {sig:'', days:{}};
-function xpSig(){ return [arr(state.focus.sessions).length, state.tasks.items.filter(function(t){ return t.status==='done'; }).length, arr(state.health.gymLog).length, arr(state.modes.history).length, arr(state.journal.entries).length, state.standards.deepWorkTargetMinutes, state.profile.xpStart, arr(state.goals && state.goals.items).filter(function(g){ return g.done; }).length].join('|'); }
+function xpSig(){ return [arr(state.focus.sessions).length, state.tasks.items.filter(function(t){ return t.status==='done'; }).length, arr(state.health.gymLog).length, arr(state.modes.history).length, state.standards.deepWorkTargetMinutes, state.profile.xpStart, arr(state.goals && state.goals.items).filter(function(g){ return g.done; }).length, arr(state.goals && state.goals.items).length, xpIntentSig(), state.profile.weeklyWorkoutTarget, state.profile.revenueGoalMonthly, state.profile.goalWeight, state.profile.streakGoal].join('|'); }
+function xpIntentSig(){ const s = state.journal && state.journal.intentions; if(!s) return ''; let n = 0; ['weeks', 'months'].forEach(function(k){ const o = s[k] || {}; Object.keys(o).forEach(function(x){ if(o[x] && o[x].at) n++; if(o[x] && o[x].out) n += 100 + (o[x].out.habit ? 1000 : 0); }); }); return n; }
 // (renders often — the full count is reused for a few seconds unless something changed)
 let xpLast = null;
 function xpSummary(){
@@ -23438,7 +23871,7 @@ function xpSummaryFresh(){
   const p = state.profile, mrr = xpMrr(), base = Number(p.xpMrrBase||0);
   const won = arr(state.business.clients).filter(function(c){ return arr(p.xpClientsBase).indexOf(c.id) < 0; }).length;
   const mrrXp = Math.round((mrr - base)/1000*XP_RATES.mrrPerK), clientXp = won*XP_RATES.client;
-  const goals = xpGoals(), goalXp = goals.counted*XP_RATES.goal;
+  const goals = xpGoals(), ci = xpCheckins(), ms = xpMaster(ctx), goalXp = goals.counted*XP_RATES.goal + ci.xp + ms.xp;
   const fNow = xpFollowersNow(); if(fNow!=null && p.xpFollowersBase==null){ p.xpFollowersBase = fNow; persist('profile'); }
   const followers = fNow!=null && p.xpFollowersBase!=null ? fNow - p.xpFollowersBase : 0, followerXp = Math.round(followers*XP_RATES.follower);
   total = Math.max(0, total + mrrXp + clientXp + goalXp + followerXp);
@@ -23459,12 +23892,21 @@ function xpSummaryFresh(){
   const next = RANKS[rank+1] || null;
   const needs = next ? [level < next.level ? 'level '+next.level : '', mrr < next.mrr ? money(next.mrr)+' MRR' : '', attrs.HLT.v < next.health ? 'Health '+next.health : ''].filter(Boolean) : [];
   return {total:total, week:week, today:todayItems, todayXp:todayItems.reduce(function(a, x){ return a + x.xp; }, 0),
-    mrr:mrr, mrrBase:base, mrrXp:mrrXp, clientXp:clientXp, won:won, start:start, goalXp:goalXp, goals:goals, followers:followers, followerXp:followerXp,
+    mrr:mrr, mrrBase:base, mrrXp:mrrXp, clientXp:clientXp, won:won, start:start, goalXp:goalXp, goals:goals, ownGoalXp:goals.counted*XP_RATES.goal, checkins:ci, master:ms, followers:followers, followerXp:followerXp,
     level:level, earned:earned, levelLo:lo, levelHi:hi, levelPct:pct, banked:Math.max(0, total - hi), canLevel:canLevel, blocked:blocked, gate:gate,
     rank:rank, next:next, needs:needs, attrs:attrs, ovr:attrs.OVR};
 }
 
-// ---- the four ratings (25–99) ----
+// ---- the four ratings (25–100) ----
+// Each thing is measured once, in one place — nothing counts twice:
+//   Business   — MRR (to a million a year), Grind (hours of real work a day), Scaling (new clients
+//                every month), Business content
+//   Personal   — Personal content, Goals (weekly, monthly, master and your own), Finances (like a
+//                credit score: debt drags it down, paying it off brings it up, debt-free and earning tops it)
+//   Health     — Body (BMI for your height), Training (workouts against your weekly number), Sleep
+//   Discipline — keeping your word: Standards kept (your whole day's standard, day after day),
+//                Follow-through (things with a deadline, done by it), Check-ins (showing up to check in
+//                and out of the week and the month)
 const rate99 = function(f){ return Math.round(25 + 75*Math.max(0, Math.min(1, f))); };
 // height in inches (Settings → You); weight from your weigh-ins (lb, or kg if you've set kg)
 function bodyStats(){
@@ -23481,18 +23923,44 @@ function bodyStats(){
 // any weight, any height: the score falls off smoothly the further BMI is from the healthy range
 // (the very top is the lean middle of the healthy range — "the best you've looked", not just "not overweight")
 function bmiFactor(b){ if(b==null) return null; if(b < 18.5) return Math.max(0, 0.85 - (18.5-b)/5); if(b < 20) return 0.9; if(b <= 24) return 1; if(b <= 25) return 0.92; if(b <= 30) return 0.85 - (b-25)*0.07; return Math.max(0, 0.5 - (b-30)*0.05); }
+// sleep from Sleep mode (the last two weeks): 7½–9 hours is the top
+function sleepStats(){
+  const since = Date.now() - 14*86400000;
+  const nights = arr(state.modes && state.modes.history).filter(function(m){ return m.sleep && m.endedAt && m.endedAt > since && Number(m.minutes) >= 60; });
+  if(!nights.length) return null;
+  const avg = nights.reduce(function(a, m){ return a + Number(m.minutes); }, 0)/nights.length/60;
+  const f = avg >= 7.5 ? (avg <= 9.5 ? 1 : 0.85) : Math.max(0, (avg - 4)/3.5);
+  return {avg:avg, n:nights.length, f:f};
+}
+// the weekly and monthly goals you hit, lately (a period still running only counts what's done)
+function tierHitRate(kind, n){
+  if(typeof tierGoals!=='function') return null;
+  let d = 0, t = 0, k = periodKey(kind);
+  for(let i=0;i<n;i++){ const gs = tierGoals(kind, k), hit = gs.filter(function(g){ return g.done; }).length; d += hit; t += i===0 ? hit : gs.length; k = prevPeriodKey(kind, k); }
+  return t ? d/t : null;
+}
+// showing up to check in and out (the last four weeks, the last two months — from when you started)
+function checkinRate(){
+  if(typeof checkedIn!=='function') return null;
+  const ws0 = weekKey(xpStart()), ms0 = monthKey(xpStart());
+  let got = 0, could = 0, k = weekKey();
+  for(let i=0;i<4;i++){ if(k >= ws0){ could++; if(checkedIn('week', k)) got++; if(i>0){ could++; if(checkedOut('week', k)) got++; } } k = prevPeriodKey('week', k); }
+  k = monthKey();
+  for(let i=0;i<2;i++){ if(k >= ms0){ could++; if(checkedIn('month', k)) got++; if(i>0){ could++; if(checkedOut('month', k)) got++; } } k = prevPeriodKey('month', k); }
+  return could ? {f:got/could, got:got, could:could} : null;
+}
 function xpAttributes(ctx){
-  const today = todayStr(), target = ctx.target;
-  const daysBack = function(n, f){ let c = 0; for(let i=0;i<n;i++) if(f(addDays(today, -i))) c++; return c; };
+  const today = todayStr();
   const within = function(d, n){ return d && d > addDays(today, -n) && d <= today; };
   const tasks = state.tasks.items, cs = arr(state.business.clients);
   const isPersonal = function(t){ return arr(t.clients).indexOf('personal')>=0 || t.client==='personal'; };
   const mix = function(parts){ let s = 0, w = 0; parts.forEach(function(p){ if(p[1]==null) return; s += p[0]*p[1]; w += p[0]; }); return w ? s/w : 0; };
   const sub = function(label, f, note){ return {label:label, v:f==null ? null : rate99(f), note:note||''}; };
   // business
-  const mrr = xpMrr(), active = cs.filter(function(c){ return clientStageActive(c.stage); }).length;
-  let deep14 = 0; for(let i=1;i<=14;i++) deep14 += ctx.deep(addDays(today, -i)); deep14 /= 14;
-  // client growth: landing your number of new clients every month, month after month — each of the last
+  const mrr = xpMrr();
+  // grind: real, locked-in work a day over the last 30 days — 6 hours a day, every day, is 100
+  let deep30 = 0; for(let i=1;i<=30;i++) deep30 += ctx.deep(addDays(today, -i)); deep30 /= 30;
+  // scaling: landing your number of new clients every month, month after month — each of the last
   // three months counts on its own, so one big month can't carry it. (A client counts from its start
   // date — or the day a lead was won — not the day it was typed into Operator.)
   const perMonth = state.standards.newClientsPerMonth || 2;
@@ -23507,30 +23975,42 @@ function xpAttributes(ctx){
     return {f: done/want, note: done+' out in 30 days · aim '+Math.round(want)};
   };
   const bc = contentF('business'), pc = contentF('personal');
-  // (each one at 100 is the best version: a million a year, a full roster, well past your daily target…)
-  const B = [sub('MRR', Math.sqrt(mrr/83400), money(mrr)+' a month'), sub('Clients', active/15, active+' active'), sub('Time put in', deep14/(target*1.33), fmtHours(Math.round(deep14))+' a day lately'),
-    sub('Client growth', growthF, months[0]+' · '+months[1]+' · '+months[2]+' new (last 3 months) · aim '+perMonth+' a month'), sub('Business content', bc.f, bc.note)];
+  const B = [sub('MRR', Math.sqrt(mrr/83400), money(mrr)+' a month · 100 at $83.4k (a million a year)'), sub('Grind', deep30/360, fmtHours(Math.round(deep30))+' of real work a day (30 days) · 6h a day is 100'),
+    sub('Scaling', growthF, months[0]+' · '+months[1]+' · '+months[2]+' new (last 3 months) · aim '+perMonth+' a month'), sub('Business content', bc.f, bc.note)];
   // personal
-  const goals = arr(state.goals && state.goals.items).filter(function(g){ return !g.autoTrack; });
-  const goalF = typeof goalPct==='function' && goals.length ? goals.reduce(function(a, g){ return a + (g.done ? 100 : goalPct(g)); }, 0)/goals.length/100 : 0;
-  const jd = daysBack(14, ctx.journaled);
+  const own = arr(state.goals && state.goals.items).filter(function(g){ return !g.tier && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g)) && g.target > 0; });
+  const ownF = typeof goalPct==='function' && own.length ? own.reduce(function(a, g){ return a + (g.done ? 100 : goalPct(g)); }, 0)/own.length/100 : null;
+  const masters = typeof masterGoalDefs==='function' ? masterGoalDefs().filter(function(m){ return ['mrr', 'weight', 'streak'].indexOf(m.key)>=0 && m.cur!=null && m.target > 0; }) : [];
+  const masterF = masters.length ? masters.reduce(function(a, m){ return a + masterPct(m); }, 0)/masters.length/100 : null;
+  const wkF = tierHitRate('week', 4), moF = tierHitRate('month', 3);
+  const goalsF = (wkF==null && moF==null && masterF==null && ownF==null) ? null : mix([[.35, wkF], [.3, moF], [.2, masterF], [.15, ownF]]);
+  const pct = function(f){ return f==null ? '—' : Math.round(f*100)+'%'; };
   const fin = financeRating();
-  const P = [sub('Personal content', pc.f, pc.note), sub('Your goals', goalF, goals.length ? Math.round(goalF*100)+'% of the way' : 'Set a goal with a number'),
-    sub('Reflection', jd/10, jd+' journal days in 2 weeks'), sub('Finances', fin.f, fin.note)];
+  const P = [sub('Personal content', pc.f, pc.note),
+    sub('Goals', goalsF, goalsF==null ? 'Check in for the week to start' : 'weekly '+pct(wkF)+' · monthly '+pct(moF)+' · master '+pct(masterF)+(ownF!=null ? ' · yours '+pct(ownF) : '')),
+    sub('Finances', fin.f, fin.note)];
   // health
-  const body = bodyStats(), w28 = ctx.gymDays.filter(function(d){ return within(d, 28); }).length;
-  let steady = 0; for(let i=0;i<4;i++){ const a = addDays(today, -7*(i+1)), b = addDays(today, -7*i); if(ctx.gymDays.filter(function(d){ return d > a && d <= b; }).length >= 4) steady++; }
-  const H = [sub('Body (BMI)', bmiFactor(body.bmi), body.bmi ? body.bmi.toFixed(1)+' · '+body.cls : 'Add height & weight'), sub('Training', w28/20, w28+' workouts in 4 weeks'), sub('Consistency', steady/4, steady+' of 4 weeks with 4+')];
-  // discipline
-  const onTarget = daysBack(14, function(d){ return ctx.deep(d) >= target; }), streak = computeStreak();
-  // (kept simple: showing up is hitting your target day after day — the streak says it)
-  const D = [sub('On target', onTarget/13, onTarget+' of 14 days'), sub('Streak', streak/30, streak+' day'+(streak===1?'':'s'))];
-  const score = function(list, ws){ return rate99(mix(list.map(function(s, i){ return [ws[i], s.v==null ? null : (s.v-25)/74]; }))); };
+  const body = bodyStats(), w28 = ctx.gymDays.filter(function(d){ return within(d, 28); }).length, perWk = state.profile.weeklyWorkoutTarget || 4;
+  const sl = sleepStats();
+  const H = [sub('Body (BMI)', bmiFactor(body.bmi), body.bmi ? body.bmi.toFixed(1)+' · '+body.cls : 'Add height & weight'),
+    sub('Training', w28/(perWk*4), w28+' workouts in 4 weeks · aim '+perWk+' a week'),
+    sub('Sleep', sl ? sl.f : null, sl ? fmtHours(Math.round(sl.avg*60))+' a night ('+sl.n+' nights) · 7½–9h is 100' : 'Use Sleep mode at night and it counts')];
+  // discipline: keeping your word
+  let kept = 0, counted = 0;
+  for(let i=0;i<14;i++){ const d = addDays(today, -i); if(isDayOff(d)) continue; const ok = dayStandardsComplete(d); if(i===0 && !ok) continue; counted++; if(ok) kept++; }
+  const streak = computeStreak();
+  const due = tasks.filter(function(t){ return t.deadline && t.deadline < today && t.deadline >= addDays(today, -14); });
+  const onTime = due.filter(function(t){ return t.status==='done' && t.completedAt && t.completedAt <= t.deadline; }).length;
+  const ci = checkinRate();
+  const D = [sub('Standards kept', counted ? kept/counted : null, kept+' of '+counted+' days (2 weeks) · streak '+streak),
+    sub('Follow-through', due.length >= 2 ? onTime/due.length : null, due.length >= 2 ? onTime+' of '+due.length+' deadlines met (2 weeks)' : 'Give tasks a deadline and it counts'),
+    sub('Check-ins', ci ? ci.f : null, ci ? ci.got+' of '+ci.could+' check-ins & check-outs (4 weeks, 2 months)' : 'Check in for the week')];
+  const score = function(list, ws){ return rate99(mix(list.map(function(s, i){ return [ws[i], s.v==null ? null : (s.v-25)/75]; }))); };
   const out = {
-    BUS:{name:'Business', short:'BUS', v:score(B, [.35, .15, .25, .15, .10]), subs:B, color:'#ffc56b'},
-    PER:{name:'Personal', short:'PER', v:score(P, [.3, .25, .2, .25]), subs:P, color:'#c3a6ff'},
-    HLT:{name:'Health', short:'HLT', v:score(H, [.5, .3, .2]), subs:H, color:'#7ef0c0', body:body},
-    DIS:{name:'Discipline', short:'DIS', v:score(D, [.55, .45]), subs:D, color:'#8fd3ff'}
+    BUS:{name:'Business', short:'BUS', v:score(B, [.4, .25, .2, .15]), subs:B, color:'#ffc56b'},
+    PER:{name:'Personal', short:'PER', v:score(P, [.3, .4, .3]), subs:P, color:'#c3a6ff'},
+    HLT:{name:'Health', short:'HLT', v:score(H, [.45, .4, .15]), subs:H, color:'#7ef0c0', body:body},
+    DIS:{name:'Discipline', short:'DIS', v:score(D, [.45, .3, .25]), subs:D, color:'#8fd3ff', streak:streak}
   };
   // 100 overall only when every rating is 100
   const ovr = .3*out.BUS.v + .3*out.HLT.v + .2*out.DIS.v + .2*out.PER.v;
@@ -23550,16 +24030,23 @@ function avgWorkMinutes(n){
   if(!days || live > tot/days){ tot += live; days++; }
   return days ? tot/days : 0;
 }
-// money, simply: how much of your debt is paid off, and whether you're still paying it down (a payment
-// or two a month keeps it up). No debt tracked at all and nothing logged: not rated yet.
+// money, like a credit score (300–850): while you're in debt it sits low and climbs as you pay it down —
+// paid off so far, and paying something every month (slow and steady counts). Debt-free starts high,
+// and earning well on top of that tops it out.
 function financeRating(){
-  const f = state.finances || {}, debts = arr(f.debts);
+  const f = state.finances || {}, debts = arr(f.debts), today = todayStr();
   const orig = debts.reduce(function(a, d){ return a + Number(d.originalAmount||d.balance||0); }, 0), bal = debts.reduce(function(a, d){ return a + Number(d.balance||0); }, 0);
-  const recent = arr(f.payments).filter(function(p){ return p.date && p.date > addDays(todayStr(), -30); }).length;
-  if(!debts.length) return arr(f.income).length ? {f:.8, note:'No debt'} : {f:null, note:'Add your debts in Personal → Finances'};
-  if(bal <= 0) return {f:1, note:'Debt-free'};
-  const paid = orig > 0 ? 1 - bal/orig : 0;
-  return {f: .55*paid + .45*Math.min(1, recent/2), note: Math.round(paid*100)+'% paid off · '+recent+' payment'+(recent===1?'':'s')+' in 30 days'};
+  const pays = arr(f.payments), monthsPaid = [0, 1, 2].filter(function(i){ return pays.some(function(p){ return p.date && p.date > addDays(today, -30*(i+1)) && p.date <= addDays(today, -30*i); }); }).length;
+  const earned = arr(f.income).concat(arr(f.invoices)).filter(function(x){ return x.date && x.date > addDays(today, -30); }).reduce(function(a, x){ return a + Number(x.amount||0); }, 0);
+  const score = function(v){ return Math.round(300 + 550*Math.max(0, Math.min(1, v))); };
+  if(!debts.length && !arr(f.income).length && !arr(f.invoices).length) return {f:null, note:'Add your debts or income in Personal → Finances'};
+  if(bal <= 0){
+    const want = state.profile.revenueGoalMonthly || 10000, inc = Math.max(earned, xpMrr());
+    const v = .8 + .2*Math.min(1, inc/want);
+    return {f:v, score:score(v), note:'Score '+score(v)+' · '+(debts.length ? 'debt-free' : 'no debt')+' · '+money(inc)+' in the last 30 days'};
+  }
+  const paid = orig > 0 ? Math.max(0, 1 - bal/orig) : 0, v = .12 + .38*paid + .3*monthsPaid/3;
+  return {f:v, score:score(v), note:'Score '+score(v)+' · '+Math.round(paid*100)+'% paid off · paid '+monthsPaid+' of the last 3 months'};
 }
 
 // ---- the look ----
@@ -23763,28 +24250,36 @@ ACTIONS.openXpHow = function(){
       '<div class="xpg-card"><h3>Deep work</h3><p>'+XP_RATES.hourBase+' XP an hour up to your normal ('+fmtHours(normal)+' lately), '+XP_RATES.hourAbove+' an hour past it — and +'+XP_RATES.longDay+' for a 6-hour day.</p>'+xpgBars(hourXp, [1,2,3,4,5,6,7,8].map(function(h){ return h+'h'; }), '#8fd3ff', 'XP for a whole day of that much locked-in work.')+'</div>'+
       '<div class="xpg-card"><h3>Workouts</h3><p>Your first five ever count big. After that, the first of each week pays most.</p>'+xpgBars([150, 70, 60, 50, 25], ['first 5', '1st/wk', '2nd', '3rd', '4th+'], '#7ef0c0')+'</div>'+
       '<div class="xpg-card"><h3>Strong days in a row</h3><p>Every day you hit your target in the last week multiplies the day’s XP.</p>'+xpgBars([0,1,2,3,4,5,6,7].map(function(n){ return n < 2 ? 1 : +(1 + .04*n).toFixed(2); }), [0,1,2,3,4,5,6,7].map(String), '#c3a6ff', '×1.28 at seven strong days.')+'</div>'+
-      '<div class="xpg-card is-wide"><h3>The big jumps</h3><div class="xpg-jumps">'+
-        [['Client won', '+'+XP_RATES.client], ['Each $1k of MRR', '+'+XP_RATES.mrrPerK], ['Goal done (stays done a day)', '+'+XP_RATES.goal], ['Follower gained', '+'+XP_RATES.follower], ['Outreach, per day', 'from +'+XP_RATES.outreach]].map(function(j){ return '<div><b>'+j[1]+'</b><span>'+j[0]+'</span></div>'; }).join('')+
+      '<div class="xpg-card is-wide"><h3>Goals — the week, the month, the big ones</h3><p>Check in at the start of the week and the month (Calendar), tick goals off as you go, check out at the end. Weekly goals are a small push, monthly ones a real chunk, and a master goal reached is a level on its own.</p>'+
+        xpgBars([CHECKIN_XP.weekGoal, CHECKIN_XP.monthGoal, CHECKIN_XP.habit, XP_RATES.goal, MASTER_XP.milestone], ['weekly goal', 'monthly goal', 'habit beaten', 'your goal', 'master goal'], '#7ef0c0',
+          'Up to three weekly and three monthly goals pay each time. Checking in / out: +'+CHECKIN_XP.weekIn+' / +'+CHECKIN_XP.weekOut+' a week, +'+CHECKIN_XP.monthIn+' / +'+CHECKIN_XP.monthOut+' a month. Each finished week you hit a weekly ring (workouts, deep work): +'+MASTER_XP.weekly+'. Master goals (MRR, weight, streak) pay again when you raise the bar.')+'</div>'+
+      '<div class="xpg-card is-wide"><h3>The business</h3><div class="xpg-jumps">'+
+        [['Client won', '+'+XP_RATES.client], ['Each $1k of MRR', '+'+XP_RATES.mrrPerK], ['Follower gained', '+'+XP_RATES.follower], ['Outreach, per day', 'from +'+XP_RATES.outreach]].map(function(j){ return '<div><b>'+j[1]+'</b><span>'+j[0]+'</span></div>'; }).join('')+
       '</div><p class="xpg-note">MRR XP is taken back if MRR drops.</p></div>'+
       '<div class="xpg-card is-wide"><h3>What each level costs</h3><p>1,000 XP for the first, and 150 more for every level after — a good week each, more as you go.</p>'+xpgBars(levelCost, [1,2,3,4,5,6,8,10,15,20,30,40].map(function(L){ return 'L'+L; }), '#ff9a3c')+'</div>'+
     '</div>'+
-    '<div class="xpg-sec">Your ratings — 25 to 100 (100 is you at your best)</div><div class="xph-rates">'+
-      rate('Business', '#ffc56b', [['MRR', 'what clients pay you a month — 100 at a million a year'], ['Clients', 'active clients (15 = 100)'], ['Time put in', 'your work a day, against your daily target'],
-        ['Client growth', 'new clients each month against your number ('+(st.newClientsPerMonth||2)+' a month — Settings → Goals & Standards). Each of the last three months counts on its own, so it’s 100 only when you land them every month. A client counts from its start date, not the day you added it.'],
+    '<div class="xpg-sec">Your ratings — 25 to 100 (100 is you at your best). Each thing counts in one place only.</div><div class="xph-rates">'+
+      rate('Business', '#ffc56b', [['MRR', 'what clients pay you a month — 100 at a million a year'], ['Grind', 'real, locked-in work a day over the last 30 days — 6 hours a day, every day, is 100'],
+        ['Scaling', 'new clients each month against your number ('+(st.newClientsPerMonth||2)+' a month — Settings → Goals & Standards). Each of the last three months counts on its own, so it’s 100 only when you land them every month.'],
         ['Business content', 'business videos out against your target']])+
-      rate('Personal', '#c3a6ff', [['Personal content', 'your own videos out against your target'], ['Your goals', 'how far along your own goals are (each one is a number)'], ['Reflection', 'days you journaled in the last two weeks'], ['Finances', 'how much debt is paid off, and paying it down every month']])+
-      rate('Health', '#7ef0c0', [['Body', 'BMI for your height'], ['Training', 'workouts in the last four weeks'], ['Consistency', 'weeks with four or more']])+
-      rate('Discipline', '#8fd3ff', [['On target', 'days you hit your deep work target in the last two weeks'], ['Streak', 'days in a row you kept your standard']])+
+      rate('Personal', '#c3a6ff', [['Personal content', 'your own videos out against your target'], ['Goals', 'weekly and monthly goals you hit, how close your master goals are, and your own goals'], ['Finances', 'like a credit score: debt keeps it low, paying it down every month brings it up, debt-free and earning tops it out']])+
+      rate('Health', '#7ef0c0', [['Body', 'BMI for your height'], ['Training', 'workouts in the last four weeks against your number a week'], ['Sleep', 'hours a night from Sleep mode (7½–9 is 100)']])+
+      rate('Discipline', '#8fd3ff', [['Standards kept', 'days in the last two weeks you kept your whole standard — the work, the training, your own standards (that’s also your streak)'], ['Follow-through', 'things with a deadline, done by the deadline'], ['Check-ins', 'showing up to check in and out of the week and the month']])+
     '</div><div class="xph-foot">The overall only hits 100 when all four do.</div>';
   o.classList.remove('hidden'); o.scrollTop = 0;
 };
 ACTIONS.closeXpHow = function(){ const o = document.getElementById('xpHowOverlay'); if(o) o.classList.add('hidden'); };
-// ============ THE MONTH AND THE WEEK ============
-// A way through the year with good intentions. Each month: one habit to beat, one goal to get done,
-// and a note to yourself. Each week: what makes it a win, one thing to focus on, a note. The Calendar
-// tab asks once a month and once a week with a short cinematic prompt; close it and it waits in the
-// notifications until it's done. Good morning brings them back every day (a different one each
-// morning), so the month and the week stay in front of you as they go on.
+// ============ CHECK IN, CHECK OUT: THE WEEK AND THE MONTH ============
+// Master goals are the long haul. The week and the month are how you get there:
+//  • Check in at the start — up to three goals for the week (or the month), and the one thing to
+//    focus on (or, for the month, the habit you're beating), plus a note to yourself.
+//  • Tick them off as you go (Goals tab, the Calendar strip, Good morning).
+//  • Check out at the end — what you hit, what you missed, what went well, what you'll fix.
+// They're real goals: they live in Goals (This week / This month) and stay there as a record, and
+// they pay XP — a weekly goal a little, a monthly one a decent chunk, and showing up to check in and
+// out pays too (see CHECKIN_XP). The Calendar asks once a week and once a month; close it and it
+// waits in the notifications. Good morning brings them back every day.
+const CHECKIN_XP = {weekGoal:150, monthGoal:500, habit:250, weekIn:25, weekOut:50, monthIn:50, monthOut:100, maxGoals:3};
 function intentStore(){
   const j = state.journal;
   if(!j.intentions || typeof j.intentions!=='object') j.intentions = {};
@@ -23792,110 +24287,289 @@ function intentStore(){
   if(!s.months || typeof s.months!=='object') s.months = {};
   if(!s.weeks || typeof s.weeks!=='object') s.weeks = {};
   if(!s.prompted || typeof s.prompted!=='object') s.prompted = {};
+  // (before check-ins, the month had one goal and the week a "win" written as text: they become goals)
+  if(!s.goalsMoved && state.goals && Array.isArray(state.goals.items)){
+    s.goalsMoved = 1;
+    Object.keys(s.months).forEach(function(k){ const m = s.months[k]; if(m && m.goal && !tierGoals('month', k).length) state.goals.items.push(newTierGoal('month', k, m.goal)); });
+    Object.keys(s.weeks).forEach(function(k){ const w = s.weeks[k]; if(w && w.win && !tierGoals('week', k).length) state.goals.items.push(newTierGoal('week', k, w.win)); });
+    persist('goals'); persist('journal');
+  }
   return s;
 }
 function monthKey(d){ return String(d || todayStr()).slice(0, 7); }
 function weekKey(d){ return startOfWeekStr(d || todayStr()); }
-function monthIntent(d){ const m = intentStore().months[monthKey(d)]; return m && (m.habit || m.goal || m.note) ? m : null; }
-function weekIntent(d){ const w = intentStore().weeks[weekKey(d)]; return w && (w.win || w.focus || w.note) ? w : null; }
+function periodKey(kind, d){ return kind==='month' ? monthKey(d) : weekKey(d); }
+function prevPeriodKey(kind, key){ if(kind==='week') return addDays(key, -7); const p = key.split('-').map(Number); return p[1]===1 ? (p[0]-1)+'-12' : p[0]+'-'+pad2(p[1]-1); }
+function periodEnd(kind, key){ if(kind==='week') return addDays(key, 6); const p = key.split('-').map(Number); return todayStr(new Date(p[0], p[1], 0)); }
 function monthName(k){ return new Date(k+'-15T12:00').toLocaleDateString(undefined, {month:'long'}); }
 function weekLabel(k){ const a = new Date(k+'T12:00'), b = new Date(addDays(k, 6)+'T12:00'); return a.toLocaleDateString(undefined, {month:'short', day:'numeric'})+' – '+b.toLocaleDateString(undefined, a.getMonth()===b.getMonth() ? {day:'numeric'} : {month:'short', day:'numeric'}); }
-// what still needs writing (these sit in the notifications until they're done)
+function periodLabel(kind, key){ return kind==='month' ? monthName(key) : 'the week of '+weekLabel(key); }
+// ---- the goals themselves (state.goals.items with tier 'week' / 'month' and the period they're for) ----
+function newTierGoal(kind, key, label){ return {id:uid(), tier:kind, pk:key, label:String(label||'').slice(0, 140), done:false, missed:false, target:null, current:0, unit:'', deadline:periodEnd(kind, key), autoTrack:null, period:null, start:null, createdAt:todayStr()}; }
+function tierGoals(kind, key){ return arr(state.goals && state.goals.items).filter(function(g){ return g.tier===kind && g.pk===key; }); }
+function periodRec(kind, key){ return (kind==='month' ? intentStore().months : intentStore().weeks)[key] || null; }
+function checkedIn(kind, key){ const r = periodRec(kind, key); return !!((r && r.at) || tierGoals(kind, key).length); }
+function checkedOut(kind, key){ const r = periodRec(kind, key); return !!(r && r.out); }
+// (kept for older callers: "the month / the week has been set")
+function monthIntent(d){ const k = monthKey(d), m = intentStore().months[k]; return checkedIn('month', k) ? (m || {}) : null; }
+function weekIntent(d){ const k = weekKey(d), w = intentStore().weeks[k]; return checkedIn('week', k) ? (w || {}) : null; }
+// Check out: the week from its Sunday until the next Sunday; the month from its last two days until
+// the 10th of the next one. Only a period you checked into has anything to check out of.
+function checkoutDue(){
+  const today = todayStr(), out = [];
+  const wk = weekKey(), wPrev = prevPeriodKey('week', wk);
+  [wPrev, wk].forEach(function(k){ if(today >= periodEnd('week', k) && today <= addDays(periodEnd('week', k), 7) && checkedIn('week', k) && !checkedOut('week', k)) out.push({kind:'week', key:k}); });
+  const mk = monthKey(), mPrev = prevPeriodKey('month', mk);
+  [mPrev, mk].forEach(function(k){ const end = periodEnd('month', k); if(today >= addDays(end, -1) && today <= addDays(end, 10) && checkedIn('month', k) && !checkedOut('month', k)) out.push({kind:'month', key:k}); });
+  return out.sort(function(a, b){ return a.kind===b.kind ? 0 : a.kind==='month' ? -1 : 1; });
+}
+// what still needs doing (these sit in the notifications until they're done)
 function intentPending(){
   const out = [], mk = monthKey(), wk = weekKey();
-  if(!monthIntent()) out.push({key:'intent:month:'+mk, kind:'intent', level:'info', icon:'&#127769;', title:'Set your intentions for '+monthName(mk), sub:'A habit to beat, a goal, a note — for the month', act:{a:'openIntent', id:'month'}, sort:2});
-  if(!weekIntent()) out.push({key:'intent:week:'+wk, kind:'intent', level:'info', icon:'&#128197;', title:'Set up this week', sub:weekLabel(wk)+' — what makes it a win?', act:{a:'openIntent', id:'week'}, sort:2});
+  checkoutDue().forEach(function(c){
+    out.push({key:'checkout:'+c.kind+':'+c.key, kind:'intent', level:'info', icon:c.kind==='month' ? '&#127942;' : '&#9989;', title:'Check out of '+(c.kind==='month' ? monthName(c.key) : 'the week'),
+      sub:(c.kind==='month' ? 'How did '+monthName(c.key)+' go?' : weekLabel(c.key)+' — what did you hit?')+' Collect your XP.', act:{a:'openCheckout', id:c.kind+':'+c.key}, sort:1});
+  });
+  if(!checkedIn('month', mk)) out.push({key:'intent:month:'+mk, kind:'intent', level:'info', icon:'&#127769;', title:'Check in for '+monthName(mk), sub:'Up to three goals and a habit to beat for the month', act:{a:'openIntent', id:'month'}, sort:2});
+  if(!checkedIn('week', wk)) out.push({key:'intent:week:'+wk, kind:'intent', level:'info', icon:'&#128197;', title:'Check in for the week', sub:weekLabel(wk)+' — what makes it a win?', act:{a:'openIntent', id:'week'}, sort:2});
   return out;
 }
 const INTENT_FIELDS = {
-  month:[['habit', 'One habit to beat this month', 'e.g. Phone in bed. Snoozing.'], ['goal', 'One goal to get done this month', 'e.g. Sign two new clients.'], ['note', 'A note to yourself for the month', 'Who you want to be by the end of it.']],
-  week:[['win', 'What makes this week a win?', 'e.g. 20 hours of deep work, 4 workouts.'], ['focus', 'The one thing to focus on', 'e.g. Finish the JJS launch.'], ['note', 'A note for the week', 'Anything you want to hear on Monday morning.']]
+  month:{goals:['e.g. Sign two new clients', 'e.g. Launch the JJS funnel', 'e.g. Down to 200 lbs'], extra:[['habit', 'One habit to beat this month', 'e.g. Phone in bed. Snoozing.'], ['note', 'A note to yourself for the month', 'Who you want to be by the end of it.']]},
+  week:{goals:['e.g. 20 hours of deep work', 'e.g. 4 workouts', 'e.g. Post 3 reels'], extra:[['focus', 'The one thing to focus on', 'e.g. Finish the JJS launch.'], ['note', 'A note for the week', 'Anything you want to hear on Monday morning.']]}
 };
-// the prompt: a dark screen, the month (or week) comes up big, then the questions
-function openIntentForm(kind, cinematic){
-  kind = kind==='week' ? 'week' : 'month';
+function overlayShell(){
   let o = document.getElementById('intOverlay');
   if(!o){ o = document.createElement('div'); o.id = 'intOverlay'; o.className = 'overlay int-ov'; o.innerHTML = '<div class="int" id="intContent"></div>'; document.body.appendChild(o); o.addEventListener('pointerdown', function(e){ if(e.target===o) ACTIONS.closeIntent(); }); }
-  const key = kind==='month' ? monthKey() : weekKey(), cur = (kind==='month' ? intentStore().months : intentStore().weeks)[key] || {};
+  return o;
+}
+function overlayIn(o, cinematic){ o.classList.toggle('is-cine', !!cinematic); o.classList.remove('hidden'); void o.offsetWidth; o.classList.add('is-in'); }
+// ---- check in: a dark screen, the month (or week) comes up big, then the goals ----
+function openIntentForm(kind, cinematic){
+  kind = kind==='week' ? 'week' : 'month';
+  const o = overlayShell();
+  const key = periodKey(kind), cur = periodRec(kind, key) || {}, gs = tierGoals(kind, key), F = INTENT_FIELDS[kind];
   const head = kind==='month' ? monthName(key) : 'This week';
-  const sub = kind==='month' ? 'A new month. A new step.' : weekLabel(key)+' · a new step';
+  const sub = kind==='month' ? 'A new month. Three goals, one habit to beat.' : weekLabel(key)+' · what makes it a win?';
+  const xp = kind==='month' ? '+'+CHECKIN_XP.monthGoal+' XP a goal you hit · +'+CHECKIN_XP.habit+' if you beat the habit' : '+'+CHECKIN_XP.weekGoal+' XP a goal you hit';
   document.getElementById('intContent').innerHTML =
     '<button class="int-x" data-action="closeIntent" title="Later (it stays in your notifications)">&#10005;</button>'+
-    '<div class="int-k">'+(kind==='month' ? '&#127769; The month' : '&#128197; The week')+'</div>'+
+    '<div class="int-k">'+(kind==='month' ? '&#127769; Month check-in' : '&#128197; Week check-in')+'</div>'+
     '<div class="int-h">'+escapeHtml(head)+'</div><div class="int-s">'+escapeHtml(sub)+'</div>'+
-    '<div class="int-fs">'+INTENT_FIELDS[kind].map(function(f, i){ return '<label class="int-f" style="--i:'+i+'"><span>'+f[1]+'</span><input class="int-in" id="int_'+f[0]+'" maxlength="140" placeholder="'+escapeHtml(f[2])+'" value="'+escapeHtml(cur[f[0]]||'')+'"></label>'; }).join('')+'</div>'+
-    '<div class="int-a"><button class="int-save" data-action="saveIntent" data-id="'+kind+'">'+(kind==='month' ? 'Start the month' : 'Start the week')+' &#8594;</button></div>';
-  o.dataset.kind = kind;
-  o.classList.toggle('is-cine', !!cinematic);
-  o.classList.remove('hidden'); void o.offsetWidth; o.classList.add('is-in');
-  setTimeout(function(){ const i = document.getElementById('int_'+INTENT_FIELDS[kind][0][0]); if(i) i.focus(); }, cinematic ? 1300 : 120);
+    '<div class="int-fs">'+
+      '<div class="int-f int-goals" style="--i:0"><span>'+(kind==='month' ? 'Goals for the month' : 'Goals for the week')+'<em class="int-xp">'+xp+'</em></span>'+
+        F.goals.map(function(ph, i){ const g = gs[i]; return '<div class="int-g'+(g && g.done ? ' is-done' : '')+'"><b>'+(i+1)+'</b><input class="int-in" id="int_goal'+(i ? i+1 : '')+'" maxlength="140" placeholder="'+escapeHtml(ph)+'" value="'+escapeHtml(g ? g.label : '')+'"></div>'; }).join('')+'</div>'+
+      F.extra.map(function(f, i){ return '<label class="int-f" style="--i:'+(i+1)+'"><span>'+f[1]+'</span><input class="int-in" id="int_'+f[0]+'" maxlength="140" placeholder="'+escapeHtml(f[2])+'" value="'+escapeHtml(cur[f[0]]||'')+'"></label>'; }).join('')+
+    '</div>'+
+    '<div class="int-a"><span class="int-a-xp">Checking in: +'+(kind==='month' ? CHECKIN_XP.monthIn : CHECKIN_XP.weekIn)+' XP</span><button class="int-save" data-action="saveIntent" data-id="'+kind+'">'+(checkedIn(kind, key) ? 'Save' : kind==='month' ? 'Start the month' : 'Start the week')+' &#8594;</button></div>';
+  o.dataset.kind = kind; o.dataset.mode = 'in';
+  overlayIn(o, cinematic);
+  setTimeout(function(){ const i = document.getElementById('int_goal'); if(i) i.focus(); }, cinematic ? 1300 : 120);
 }
 ACTIONS.openIntent = function(el, e, id){ openIntentForm(id || (el && el.dataset.id) || 'month'); };
+function closeIntentOverlay(){ const o = document.getElementById('intOverlay'); if(!o) return; o.classList.remove('is-in'); setTimeout(function(){ o.classList.add('hidden'); }, 260); }
 ACTIONS.closeIntent = function(){
   const o = document.getElementById('intOverlay'); if(!o) return;
   const kind = o.dataset.kind || 'month';
-  intentStore().prompted[kind==='month' ? 'M'+monthKey() : 'W'+weekKey()] = todayStr(); persist('journal');
-  o.classList.remove('is-in'); setTimeout(function(){ o.classList.add('hidden'); }, 260);
+  if(o.dataset.mode==='in') intentStore().prompted[kind==='month' ? 'M'+monthKey() : 'W'+weekKey()] = todayStr();
+  else intentStore().prompted['O'+(o.dataset.key||'')] = todayStr();
+  persist('journal');
+  closeIntentOverlay();
   if(typeof notifBadge==='function') notifBadge();
 };
 ACTIONS.saveIntent = function(el, e, id){
-  const kind = id==='week' ? 'week' : 'month', key = kind==='month' ? monthKey() : weekKey();
-  const rec = {at:Date.now()}; let any = false;
-  INTENT_FIELDS[kind].forEach(function(f){ const i = document.getElementById('int_'+f[0]); const v = i ? i.value.trim() : ''; rec[f[0]] = v; if(v) any = true; });
-  if(!any){ const i = document.getElementById('int_'+INTENT_FIELDS[kind][0][0]); if(i) i.focus(); return; }
-  (kind==='month' ? intentStore().months : intentStore().weeks)[key] = rec;
+  const kind = id==='week' ? 'week' : 'month', key = periodKey(kind), F = INTENT_FIELDS[kind];
+  const val = function(i){ const n = document.getElementById(i); return n ? n.value.trim() : ''; };
+  const labels = F.goals.map(function(_, i){ return val('int_goal'+(i ? i+1 : '')); });
+  const store = kind==='month' ? intentStore().months : intentStore().weeks, rec = Object.assign({}, store[key] || {});
+  F.extra.forEach(function(f){ rec[f[0]] = val('int_'+f[0]); });
+  if(!labels.some(Boolean) && !F.extra.some(function(f){ return rec[f[0]]; })){ const i = document.getElementById('int_goal'); if(i) i.focus(); return; }
+  // the goals, in order: rename what's there, add what's new, drop what was cleared (unless it's done)
+  const gs = tierGoals(kind, key);
+  labels.forEach(function(l, i){ const g = gs[i]; if(g){ if(l) g.label = l; else if(!g.done) state.goals.items = state.goals.items.filter(function(x){ return x!==g; }); } else if(l) state.goals.items.push(newTierGoal(kind, key, l)); });
+  const first = !rec.at; rec.at = rec.at || Date.now(); store[key] = rec;
   intentStore().prompted[kind==='month' ? 'M'+key : 'W'+key] = todayStr();
-  persist('journal'); playPositive();
-  const o = document.getElementById('intOverlay'); if(o){ o.classList.remove('is-in'); setTimeout(function(){ o.classList.add('hidden'); }, 260); }
-  showToast(kind==='month' ? 'Locked in for '+monthName(key)+'.' : 'This week is set.', {icon:'&#127769;'});
+  persist('journal'); persist('goals'); playPositive();
+  closeIntentOverlay();
+  showToast(kind==='month' ? 'Checked in for '+monthName(key)+'.' : 'Checked in for the week.', {icon:'&#127769;'});
+  if(first && typeof xpToast==='function') setTimeout(function(){ xpToast(kind==='month' ? CHECKIN_XP.monthIn : CHECKIN_XP.weekIn, kind==='month' ? 'Month check-in.' : 'Week check-in.'); }, 500);
   if(typeof notifBadge==='function') notifBadge();
   // the month first, then the week
-  if(kind==='month' && !weekIntent()) setTimeout(function(){ openIntentForm('week', true); }, 700);
+  if(kind==='month' && !checkedIn('week', weekKey())) setTimeout(function(){ openIntentForm('week', true); }, 700);
   renderView();
 };
-// the Calendar tab asks (once a month, once a week): month first
+// ---- check out: what you hit, what you missed, what went well, what you'll fix ----
+function openCheckoutForm(kind, key, cinematic){
+  kind = kind==='month' ? 'month' : 'week'; key = key || periodKey(kind);
+  const o = overlayShell(), rec = periodRec(kind, key) || {}, gs = tierGoals(kind, key);
+  ui.coPick = ui.coPick && ui.coPick.key===kind+key ? ui.coPick : {key:kind+key, v:{}};
+  gs.forEach(function(g){ if(ui.coPick.v[g.id]==null) ui.coPick.v[g.id] = g.done ? 1 : 0; });
+  if(kind==='month' && rec.habit && ui.coPick.v.habit==null) ui.coPick.v.habit = rec.out && rec.out.habit ? 1 : 0;
+  const pick = function(id, on){ return '<span class="co-pick" data-id="'+id+'"><button class="co-b'+(on ? ' is-hit' : '')+'" data-action="coPick" data-id="'+id+'" data-v="1">&#10003; Hit</button><button class="co-b'+(!on ? ' is-miss' : '')+'" data-action="coPick" data-id="'+id+'" data-v="0">Missed</button></span>'; };
+  const xpEach = kind==='month' ? CHECKIN_XP.monthGoal : CHECKIN_XP.weekGoal;
+  document.getElementById('intContent').innerHTML =
+    '<button class="int-x" data-action="closeIntent" title="Later (it stays in your notifications)">&#10005;</button>'+
+    '<div class="int-k">'+(kind==='month' ? '&#127942; Month check-out' : '&#9989; Week check-out')+'</div>'+
+    '<div class="int-h">'+escapeHtml(kind==='month' ? monthName(key) : 'This week')+'</div><div class="int-s">'+escapeHtml(kind==='month' ? 'How did it go? Be honest — it’s only for you.' : weekLabel(key)+' · how did it go?')+'</div>'+
+    '<div class="int-fs">'+
+      (gs.length ? '<div class="co-list">'+gs.map(function(g){ return '<div class="co-row"><span class="co-l">'+escapeHtml(g.label)+'<small>+'+xpEach+' XP</small></span>'+pick(g.id, ui.coPick.v[g.id]===1)+'</div>'; }).join('')+'</div>' : '<div class="co-none">No goals were set for '+escapeHtml(periodLabel(kind, key))+' — check out anyway, and set some for the next one.</div>')+
+      (kind==='month' && rec.habit ? '<div class="co-row is-habit"><span class="co-l">Beat the habit: '+escapeHtml(rec.habit)+'<small>+'+CHECKIN_XP.habit+' XP</small></span>'+pick('habit', ui.coPick.v.habit===1)+'</div>' : '')+
+      '<label class="int-f"><span>What went well?</span><input class="int-in" id="co_well" maxlength="200" placeholder="The win you want to remember." value="'+escapeHtml((rec.out && rec.out.well)||'')+'"></label>'+
+      '<label class="int-f"><span>What will you fix next '+(kind==='month' ? 'month' : 'week')+'?</span><input class="int-in" id="co_fix" maxlength="200" placeholder="One thing. Make it specific." value="'+escapeHtml((rec.out && rec.out.fix)||'')+'"></label>'+
+    '</div>'+
+    '<div class="int-a"><span class="int-a-xp">Checking out: +'+(kind==='month' ? CHECKIN_XP.monthOut : CHECKIN_XP.weekOut)+' XP</span><button class="int-save" data-action="saveCheckout" data-id="'+kind+':'+key+'">Check out &#8594;</button></div>';
+  o.dataset.kind = kind; o.dataset.mode = 'out'; o.dataset.key = kind+':'+key;
+  overlayIn(o, cinematic);
+}
+ACTIONS.openCheckout = function(el, e, id){ const p = String(id || (el && el.dataset.id) || '').split(':'); openCheckoutForm(p[0], p[1]); };
+ACTIONS.coPick = function(el, e, id){
+  if(!ui.coPick) return; ui.coPick.v[id] = Number(el.dataset.v) ? 1 : 0;
+  const row = el.closest('.co-pick'); if(row) row.querySelectorAll('.co-b').forEach(function(b){ const on = Number(b.dataset.v)===ui.coPick.v[id]; b.classList.toggle('is-hit', on && b.dataset.v==='1'); b.classList.toggle('is-miss', on && b.dataset.v==='0'); });
+  playTick();
+};
+ACTIONS.saveCheckout = function(el, e, id){
+  const p = String(id||'').split(':'), kind = p[0]==='month' ? 'month' : 'week', key = p[1];
+  if(!key) return;
+  const before = typeof xpSummary==='function' ? (xpLast = null, xpSummary()) : null;
+  const store = kind==='month' ? intentStore().months : intentStore().weeks, rec = Object.assign({}, store[key] || {});
+  const v = (ui.coPick && ui.coPick.key===kind+key) ? ui.coPick.v : {};
+  const lines = [];
+  const xpEach = kind==='month' ? CHECKIN_XP.monthGoal : CHECKIN_XP.weekGoal;
+  let paid = 0;
+  tierGoals(kind, key).forEach(function(g){
+    const hit = v[g.id]===1;
+    g.done = hit; g.missed = !hit; if(hit && !g.doneAt) g.doneAt = todayStr() > periodEnd(kind, key) ? periodEnd(kind, key) : todayStr();
+    if(hit && paid < CHECKIN_XP.maxGoals){ paid++; lines.push({why:g.label, xp:xpEach}); }
+  });
+  rec.at = rec.at || Date.now();
+  rec.out = {at:Date.now(), well:(document.getElementById('co_well')||{}).value||'', fix:(document.getElementById('co_fix')||{}).value||''};
+  if(kind==='month' && rec.habit){ rec.out.habit = v.habit===1; if(rec.out.habit) lines.push({why:'Beat: '+rec.habit, xp:CHECKIN_XP.habit}); }
+  lines.push({why:kind==='month' ? 'Month check-out' : 'Week check-out', xp:kind==='month' ? CHECKIN_XP.monthOut : CHECKIN_XP.weekOut});
+  store[key] = rec; ui.coPick = null;
+  persist('journal'); persist('goals');
+  closeIntentOverlay();
+  if(before && typeof xpSystemShow==='function'){
+    xpLast = null; const x = xpSummary(), seen = xpSeen(), gained = Math.max(0, x.total - before.total);
+    seen.total = x.total; persist('profile');
+    setTimeout(function(){ xpSystemShow({title:(kind==='month' ? monthName(key) : 'The week')+' — checked out.', sub:lines.length > 1 ? (lines.length-1)+' thing'+(lines.length===2?'':'s')+' hit.' : 'On to the next one.', lines:lines, gained:gained, level:x.level, levelUp:false, ready:x.canLevel,
+      fromPct:(before.total - x.levelLo)/(x.levelHi - x.levelLo), toPct:x.levelPct}); }, 350);
+  } else playPositive();
+  if(typeof notifBadge==='function') notifBadge();
+  renderView();
+  // done with the old one: straight into the new one, if it isn't set yet
+  const nk = periodKey(kind);
+  if(nk!==key && !checkedIn(kind, nk)) setTimeout(function(){ openIntentForm(kind, true); }, 4200);
+};
+// tick a weekly / monthly goal off (or back on) from anywhere
+ACTIONS.tierGoalToggle = function(el, e, id){
+  const g = arr(state.goals.items).find(function(x){ return x.id===id; }); if(!g) return;
+  if(checkedOut(g.tier, g.pk)){ showToast('That '+(g.tier==='month' ? 'month' : 'week')+' is checked out — it’s on the record.', {icon:'&#128274;'}); return; }
+  const before = typeof xpSummary==='function' ? (xpLast = null, xpSummary().total) : 0;
+  g.done = !g.done; g.missed = false; g.doneAt = g.done ? todayStr() : null;
+  persist('goals');
+  if(g.done){ playPositive(); xpLast = null; const x = xpSummary(), gained = x.total - before; if(gained > 0){ xpSeen().total = x.total; persist('profile'); xpToast(gained, (g.tier==='month' ? 'Monthly' : 'Weekly')+' goal hit.'); } }
+  else playTick();
+  renderView();
+};
+ACTIONS.tierGoalAdd = function(el, e, id){
+  const kind = id==='month' ? 'month' : 'week', key = periodKey(kind), inp = document.getElementById('tierAdd-'+kind);
+  const l = inp ? inp.value.trim() : ''; if(!l){ if(inp) inp.focus(); return; }
+  state.goals.items.push(newTierGoal(kind, key, l));
+  const store = kind==='month' ? intentStore().months : intentStore().weeks; if(!store[key]) store[key] = {at:Date.now()};
+  persist('goals'); persist('journal'); playTick(); renderView();
+  setTimeout(function(){ const i = document.getElementById('tierAdd-'+kind); if(i) i.focus(); }, 30);
+};
+document.addEventListener('keydown', function(e){
+  const t = e.target; if(!t || !t.id) return;
+  if(t.id.indexOf('tierAdd-')===0 && e.key==='Enter'){ e.preventDefault(); ACTIONS.tierGoalAdd(null, null, t.id.slice(8)); }
+  else if(t.closest && t.closest('#intOverlay') && e.key==='Enter' && t.classList.contains('int-in')){ e.preventDefault(); const b = document.querySelector('#intOverlay .int-save'); if(b) b.click(); }
+});
+// the Calendar asks: a check-out that's due first, then the month, then the week
 afterRenderHooks.push(function(){
   if(ui.view!=='calendar' || document.querySelector('.overlay:not(.hidden)')) return;
   const p = intentStore().prompted, mk = 'M'+monthKey(), wk = 'W'+weekKey();
-  const kind = !monthIntent() && !p[mk] ? 'month' : !weekIntent() && !p[wk] ? 'week' : null;
-  if(!kind || ui._intAsked===kind+(kind==='month' ? mk : wk)) return;
-  ui._intAsked = kind+(kind==='month' ? mk : wk);
+  const due = checkoutDue().filter(function(c){ return !p['O'+c.kind+':'+c.key]; })[0];
+  const ask = due ? {id:'O'+due.kind+':'+due.key, run:function(){ openCheckoutForm(due.kind, due.key, true); }}
+    : !checkedIn('month', monthKey()) && !p[mk] ? {id:mk, run:function(){ openIntentForm('month', true); }}
+    : !checkedIn('week', weekKey()) && !p[wk] ? {id:wk, run:function(){ openIntentForm('week', true); }} : null;
+  if(!ask || ui._intAsked===ask.id) return;
+  ui._intAsked = ask.id;
   // never on top of something you just opened — it asks again on the next visit
-  setTimeout(function(){ if(ui.view!=='calendar') return; if(document.querySelector('.overlay:not(.hidden):not(#intOverlay)')){ ui._intAsked = null; return; } openIntentForm(kind, true); }, 450);
+  setTimeout(function(){ if(ui.view!=='calendar') return; if(document.querySelector('.overlay:not(.hidden):not(#intOverlay)')){ ui._intAsked = null; return; } ask.run(); }, 450);
 });
-// a strip at the top of the Calendar: the month's and the week's, one click to change them
-function intentStripHtml(){
-  const m = monthIntent(), w = weekIntent();
-  const pill = function(kind, label, val){ return '<button class="int-pill'+(val ? '' : ' is-empty')+'" data-action="openIntent" data-id="'+kind+'"><small>'+label+'</small><span>'+(val ? escapeHtml(val) : 'Set it &#8594;')+'</span></button>'; };
-  return '<div class="int-strip">'+
-    pill('month', monthName(monthKey())+' · goal', m && m.goal)+pill('month', 'Habit to beat', m && m.habit)+pill('week', 'This week', w && (w.focus || w.win))+'</div>';
+// ---- the week and the month as lists you tick (Calendar strip and the Goals tab) ----
+function tierGoalRowHtml(g){
+  const locked = checkedOut(g.tier, g.pk);
+  return '<button class="tg-row'+(g.done ? ' is-done' : '')+(g.missed ? ' is-missed' : '')+'" data-action="tierGoalToggle" data-id="'+g.id+'"'+(locked ? ' title="Checked out — on the record"' : '')+'>'+
+    '<span class="tg-box">'+(g.done ? '&#10003;' : g.missed ? '&#10005;' : '')+'</span><span class="tg-l">'+escapeHtml(g.label)+'</span>'+
+    '<span class="tg-xp">+'+(g.tier==='month' ? CHECKIN_XP.monthGoal : CHECKIN_XP.weekGoal)+'</span></button>';
 }
-// ---- Good morning: the month and the week, a different one each day (a time capsule, when one is
-// due, takes the stage — they're rare). Your streak and level sit on top. ----
-function intentOfDay(){
-  const m = monthIntent() || {}, w = weekIntent() || {};
-  const list = [];
-  if(m.goal) list.push({k:'This month’s goal', v:m.goal, say:'This month’s goal: '+m.goal+'.'});
+function tierCardHtml(kind, opts){
+  opts = opts || {};
+  const key = periodKey(kind), gs = tierGoals(kind, key), rec = periodRec(kind, key) || {}, done = gs.filter(function(g){ return g.done; }).length;
+  const due = checkoutDue().find(function(c){ return c.kind===kind; });
+  const sub = kind==='month' ? (rec.habit ? 'Beating: '+rec.habit : '') : (rec.focus ? 'Focus: '+rec.focus : '');
+  return '<div class="tg-card is-'+kind+'">'+
+    '<div class="tg-h"><span class="tg-k">'+(kind==='month' ? monthName(key) : 'This week')+'</span>'+(gs.length ? '<span class="tg-n">'+done+'/'+gs.length+'</span>' : '')+
+      '<span style="flex:1"></span>'+(due ? '<button class="tg-out" data-action="openCheckout" data-id="'+due.kind+':'+due.key+'">Check out &#8594;</button>' : '<button class="tg-edit" data-action="openIntent" data-id="'+kind+'" title="'+(checkedIn(kind, key) ? 'Edit your check-in' : 'Check in')+'">'+(checkedIn(kind, key) ? '&#9998;' : 'Check in &#8594;')+'</button>')+'</div>'+
+    (sub ? '<div class="tg-sub">'+escapeHtml(sub)+'</div>' : '')+
+    (gs.length ? '<div class="tg-list">'+gs.map(tierGoalRowHtml).join('')+'</div>' : '<div class="tg-empty">'+(kind==='month' ? 'No goals for the month yet.' : 'No goals for the week yet.')+'</div>')+
+    (opts.add && gs.length < 5 && !checkedOut(kind, key) ? '<div class="tg-add"><input class="input" id="tierAdd-'+kind+'" maxlength="140" placeholder="+ Add a '+(kind==='month' ? 'monthly' : 'weekly')+' goal"><button class="btn btn-sm" data-action="tierGoalAdd" data-id="'+kind+'">Add</button></div>' : '')+
+  '</div>';
+}
+// the Calendar: the week and the month, side by side, tick right there
+function intentStripHtml(){ return '<div class="int-strip tg-strip">'+tierCardHtml('week')+tierCardHtml('month')+'</div>'; }
+// past weeks and months, at a glance: how many you hit
+function tierHistoryHtml(kind, n){
+  const out = []; let k = prevPeriodKey(kind, periodKey(kind));
+  for(let i=0;i<n;i++){ const gs = tierGoals(kind, k); if(gs.length || checkedIn(kind, k)) out.push({k:k, gs:gs, out:checkedOut(kind, k)}); k = prevPeriodKey(kind, k); }
+  if(!out.length) return '';
+  return '<div class="tg-hist">'+out.map(function(x){ const d = x.gs.filter(function(g){ return g.done; }).length; return '<span class="'+(x.gs.length && d===x.gs.length ? 'is-all' : '')+'" title="'+escapeHtml(x.gs.map(function(g){ return (g.done ? '✓ ' : '✕ ')+g.label; }).join('\n'))+'"><b>'+d+'/'+x.gs.length+'</b><small>'+(kind==='month' ? monthName(x.k).slice(0, 3) : fmtDateShort(x.k))+'</small>'+(x.out ? '' : '<i title="Not checked out">&bull;</i>')+'</span>'; }).join('')+'</div>';
+}
+// ---- Good morning: the quarter on top, and the week and the month rolling underneath ----
+function intentReelItems(){
+  const mk = monthKey(), wk = weekKey(), m = periodRec('month', mk) || {}, w = periodRec('week', wk) || {}, list = [];
+  const goal = function(g, k){ return {k:k, v:g.label, done:g.done, say:(g.done ? 'Done already: ' : '')+g.label+'.'}; };
+  tierGoals('week', wk).filter(function(g){ return !g.done; }).forEach(function(g){ list.push(goal(g, 'A goal this week')); });
+  if(m.habit) list.push({k:'The habit you’re beating', v:m.habit, say:'Remember the habit you’re beating: '+m.habit+'.'});
+  tierGoals('month', mk).filter(function(g){ return !g.done; }).forEach(function(g){ list.push(goal(g, monthName(mk)+'’s goal')); });
   if(w.focus) list.push({k:'This week’s focus', v:w.focus, say:'This week, it’s about '+w.focus+'.'});
-  if(m.habit) list.push({k:'The habit you’re beating', v:m.habit, say:'And remember the habit you’re beating: '+m.habit+'.'});
-  if(w.win) list.push({k:'This week is a win if', v:w.win, say:'This week is a win if '+w.win+'.'});
+  tierGoals('week', wk).concat(tierGoals('month', mk)).filter(function(g){ return g.done; }).forEach(function(g){ list.push(goal(g, (g.tier==='month' ? 'Hit this month' : 'Hit this week'))); });
   if(m.note) list.push({k:'You told yourself this month', v:m.note, say:'Something you told yourself this month.'});
   if(w.note) list.push({k:'For the week', v:w.note, say:'A note you left for the week.'});
-  if(!list.length) return null;
-  return list[dayNum() % list.length];
+  return list;
 }
+// (kept for older callers: one of them, a different one each day)
+function intentOfDay(){ const l = intentReelItems(); return l.length ? l[dayNum() % l.length] : null; }
 function briefIntentHtml(){
   const cap = typeof dueCapsule==='function' ? dueCapsule() : null;
   if(cap){
     openCapsule(cap);
     return {voice:'And a message from you, from '+fmtDateShort(cap.writtenOn)+'.', html:'<div class="br-k bi-k">&#9203; From Past You</div><div class="bi-one"><small>Written '+fmtDateShort(cap.writtenOn)+(cap.title ? ' &middot; '+escapeHtml(cap.title) : '')+'</small><p>'+escapeHtml(cap.text)+'</p></div>'};
   }
-  // one message a day — the month's goal, the week's focus, the habit you're beating… — big, with room
-  const it = intentOfDay(), m = monthIntent(), mk = monthKey();
-  if(!it) return {voice:'A new month’s a new step — set your intentions when you get a minute.', html:'<div class="br-k bi-k">&#127769; '+escapeHtml(monthName(mk))+'</div><div class="bi-one is-empty"><p>What’s this month about?</p><button class="bi-set" data-action="openIntent" data-id="'+(m ? 'week' : 'month')+'">Set '+(m ? 'this week' : 'the month')+' &#8594;</button></div>'+quarterHtml()};
-  return {voice:it.say, html:'<div class="br-k bi-k">&#127769; '+escapeHtml(monthName(mk))+'<button class="bi-edit" data-action="openIntent" data-id="month" title="Your month and week">&#9998;</button></div>'+
-    '<div class="bi-one"><small>'+escapeHtml(it.k)+'</small><p>'+escapeHtml(it.v)+'</p></div>'+quarterHtml()};
+  const items = intentReelItems(), qh = quarterHeadHtml(), wk = tierGoals('week', weekKey()), mo = tierGoals('month', monthKey());
+  const tally = (wk.length || mo.length) ? '<div class="bi-tally">'+(wk.length ? '<span><b>'+wk.filter(function(g){ return g.done; }).length+'/'+wk.length+'</b> this week</span>' : '')+(mo.length ? '<span><b>'+mo.filter(function(g){ return g.done; }).length+'/'+mo.length+'</b> '+escapeHtml(monthName(monthKey()))+'</span>' : '')+'</div>' : '';
+  if(!items.length) return {voice:'A new step — check in for '+(checkedIn('month', monthKey()) ? 'the week' : 'the month')+' when you get a minute.', html:qh+'<div class="bi-one is-empty"><p>What’s this '+(checkedIn('month', monthKey()) ? 'week' : 'month')+' about?</p><button class="bi-set" data-action="openIntent" data-id="'+(checkedIn('month', monthKey()) ? 'week' : 'month')+'">Check in &#8594;</button></div>'};
+  const n = items.length, i = ((ui.biIdx==null ? dayNum() : ui.biIdx) % n + n) % n;
+  return {voice:items[i].say, html:qh+
+    '<div class="bi-reel'+(n > 1 ? ' is-multi' : '')+'" data-n="'+n+'">'+items.map(function(it, k){ return '<div class="bi-one bi-slide'+(k===i ? ' is-on' : '')+(it.done ? ' is-done' : '')+'"><small>'+(it.done ? '&#10003; ' : '')+escapeHtml(it.k)+'</small><p>'+escapeHtml(it.v)+'</p></div>'; }).join('')+'</div>'+
+    '<div class="bi-foot">'+tally+(n > 1 ? '<span class="bi-nav"><button class="rl-arr" data-action="biStep" data-id="-1" title="Back">&#8249;</button><span class="rl-dots">'+items.map(function(_, k){ return '<i class="'+(k===i ? 'on' : '')+'" data-action="biGo" data-id="'+k+'"></i>'; }).join('')+'</span><button class="rl-arr" data-action="biStep" data-id="1" title="Next">&#8250;</button></span>' : '')+'</div>'};
 }
+function biShow(i){
+  const reel = document.querySelector('#wakeContent .bi-reel'); if(!reel) return;
+  const slides = reel.querySelectorAll('.bi-slide'), n = slides.length; if(!n) return;
+  ui.biIdx = ((i % n) + n) % n;
+  slides.forEach(function(s, k){ s.classList.toggle('is-on', k===ui.biIdx); });
+  document.querySelectorAll('#wakeContent .bi-nav .rl-dots i').forEach(function(d, k){ d.classList.toggle('on', k===ui.biIdx); });
+}
+ACTIONS.biStep = function(el, e, id){ ui.biHold = Date.now(); biShow((ui.biIdx==null ? dayNum() : ui.biIdx) + Number(id||1)); playTick(); };
+ACTIONS.biGo = function(el, e, id){ ui.biHold = Date.now(); biShow(Number(id)||0); playTick(); };
+// it swaps by itself every few seconds (a manual swipe holds it for a while)
+setInterval(function(){
+  if(ui.wakeMode!=='brief' || typeof overlayOpen!=='function' || !overlayOpen('wakeOverlay')) return;
+  if(ui.biHold && Date.now() - ui.biHold < 15000) return;
+  if(document.querySelector('#wakeContent .bi-reel.is-multi')) biShow((ui.biIdx==null ? dayNum() : ui.biIdx) + 1);
+}, 7000);
 // the quarter, business-style: how many days are left in this one (and in the year)
 function quarterInfo(d){
   d = d ? new Date(d+'T12:00') : new Date(); d.setHours(12, 0, 0, 0);
@@ -23903,13 +24577,16 @@ function quarterInfo(d){
   const day = 86400000, total = Math.round((end - start)/day), left = Math.round((end - d)/day), yEnd = new Date(d.getFullYear()+1, 0, 1, 12);
   return {q:q+1, year:d.getFullYear(), left:left, total:total, pct:(total - left)/total, yearLeft:Math.round((yEnd - d)/day), nextQ:q===3 ? 'Q1 '+(d.getFullYear()+1) : 'Q'+(q+2)};
 }
-function quarterHtml(){
+// the panel's head: the quarter, the days left, a thin bar — and ✎ to your check-in
+function quarterHeadHtml(){
   const x = quarterInfo();
-  return '<div class="bi-q"><div class="bi-q-t"><b>Q'+x.q+'</b><span><b>'+x.left+'</b> day'+(x.left===1?'':'s')+' left</span><em>Day '+(x.total - x.left + 1)+' of '+x.total+'</em></div>'+
-    '<i class="bi-q-bar"><u style="width:'+(x.pct*100).toFixed(1)+'%"></u></i>'+
-    (x.q < 4 ? '<div class="bi-q-s">'+x.yearLeft+' days left in '+x.year+'</div>' : '')+'</div>';
+  return '<div class="bi-q bi-qh"><div class="bi-q-t"><b>Q'+x.q+'</b><span><b>'+x.left+'</b> day'+(x.left===1?'':'s')+' left</span><em>Day '+(x.total - x.left + 1)+' of '+x.total+(x.q < 4 ? ' &middot; '+x.yearLeft+' left in '+x.year : '')+'</em>'+
+    '<button class="bi-edit" data-action="openIntent" data-id="'+(checkedIn('week', weekKey()) ? 'month' : 'week')+'" title="Your check-ins">&#9998;</button></div>'+
+    '<i class="bi-q-bar"><u style="width:'+(x.pct*100).toFixed(1)+'%"></u></i></div>';
 }
-// the HUD on Good morning: your level like a game shows it, bottom left — badge, level, rank, XP, streak
+// (older callers)
+function quarterHtml(){ return quarterHeadHtml(); }
+// the HUD on Good morning: your level like a game shows it — badge, level, rank, XP, streak
 function briefHudHtml(){
   if(typeof xpSummary!=='function') return '';
   const x = xpSummary(), r = RANKS[x.rank], streak = computeStreak();
@@ -24225,6 +24902,53 @@ function lvlSound(L, rank){
   setTimeout(function(){ tone([523, 784, 1047], 0.9, 0.22); }, n*95 + 120);
   if(rank) setTimeout(function(){ tone([392, 587, 784, 1175], 1.4, 0.24); }, n*95 + 700);
 }
+
+// ---- your level, always there: a small chip in the top-right corner (next to ▶ and the mic) ----
+// Click it and a minimal card drops down: level and rank, the bar, XP to go, today and this week, the
+// four ratings — and Level up when it's ready. It steps aside on the You page (the card's right there).
+function lvlChipHtml(){
+  if(typeof xpSummary!=='function' || !state || !state.profile) return '';
+  const x = xpSummary(), r = RANKS[x.rank];
+  return '<button class="md-lvl'+(lvlCardInView() ? ' is-away' : '')+(x.canLevel ? ' is-ready' : '')+(ui.lvlPop ? ' is-open' : '')+'" data-action="lvlPop" style="--rc:'+r.color+'" title="Level '+x.level+' · '+escapeHtml(r.name)+'">'+
+    rankBadgeSvg(x.rank, 18)+'<b>'+x.level+'</b><i><u style="width:'+(Math.min(1, x.levelPct)*100).toFixed(1)+'%"></u></i>'+(x.canLevel ? '<span class="md-lvl-f">&#128293;</span>' : '')+'</button>';
+}
+// is your card (or the level card next to LOCK IN) on screen right now? Then the chip steps aside.
+function lvlCardInView(){
+  if(ui.lvlPop) return false;
+  const c = document.querySelector('#viewRoot .pcf, #viewRoot .pc'); if(!c) return false;
+  const r = c.getBoundingClientRect(); return r.bottom > 40 && r.top < window.innerHeight - 40 && r.width > 0;
+}
+function lvlChipVis(){ const ch = document.querySelector('#musicDock .md-lvl'); if(ch) ch.classList.toggle('is-away', lvlCardInView()); }
+let lvlVisRaf = 0;
+document.addEventListener('scroll', function(){ if(lvlVisRaf) return; lvlVisRaf = requestAnimationFrame(function(){ lvlVisRaf = 0; lvlChipVis(); }); }, true);
+afterRenderHooks.push(function(){ setTimeout(lvlChipVis, 0); });
+function lvlPopHtml(){
+  const x = xpSummary(), r = RANKS[x.rank];
+  const nextRank = x.next ? '<div class="lp-next"><span>Next rank</span><b style="color:'+x.next.color+'">'+escapeHtml(x.next.name)+'</b>'+(x.needs.length ? '<small>needs '+escapeHtml(x.needs.join(' · '))+'</small>' : '')+'</div>' : '';
+  return '<div class="lp-h">'+rankBadgeSvg(x.rank, 34)+'<div><div class="lp-l">Level <b>'+x.level+'</b></div><div class="lp-r" style="color:'+r.color+'">'+escapeHtml(r.name)+'</div></div><div class="lp-ovr"><b>'+x.ovr+'</b><small>OVR</small></div></div>'+
+    '<div class="lp-bar"><i><u style="width:'+(Math.min(1, x.levelPct)*100).toFixed(1)+'%"></u></i><div class="lp-bar-t"><span>'+Math.min(x.total - x.levelLo, x.levelHi - x.levelLo).toLocaleString()+' / '+(x.levelHi - x.levelLo).toLocaleString()+' XP</span><span>'+(x.canLevel ? 'ready' : x.levelPct >= 1 ? 'maxed' : (x.levelHi - x.total).toLocaleString()+' to go')+'</span></div></div>'+
+    (x.canLevel ? '<div class="lp-up">'+levelUpBtnHtml('pop')+'</div>' : x.blocked.length ? '<div class="lp-up">'+xpCautionHtml(x)+'</div>' : '')+
+    '<div class="lp-stats"><span><b>+'+x.todayXp.toLocaleString()+'</b><small>today</small></span><span><b>+'+x.week.toLocaleString()+'</b><small>this week</small></span><span><b>'+x.total.toLocaleString()+'</b><small>total</small></span></div>'+
+    '<div class="lp-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(function(k){ const a = x.attrs[k]; return '<span style="--ac:'+a.color+'"><b>'+a.v+'</b><small>'+k+'</small><i><u style="width:'+((a.v-25)/75*100).toFixed(0)+'%"></u></i></span>'; }).join('')+'</div>'+
+    nextRank+
+    '<div class="lp-foot"><button data-action="openYou">Your card &#8594;</button><button data-action="openXpHow">How XP works</button></div>';
+}
+ACTIONS.lvlPop = function(){
+  ui.lvlPop = !ui.lvlPop;
+  let p = document.getElementById('lvlPop');
+  if(!ui.lvlPop){ if(p){ p.classList.remove('is-in'); setTimeout(function(){ if(p && !ui.lvlPop) p.remove(); }, 200); } dockRefresh(); return; }
+  if(!p){ p = document.createElement('div'); p.id = 'lvlPop'; p.className = 'lp'; document.body.appendChild(p); }
+  xpLast = null; p.innerHTML = lvlPopHtml(); dockRefresh();
+  requestAnimationFrame(function(){ p.classList.add('is-in'); });
+  playTick();
+};
+// it closes when you click anywhere else, or go somewhere
+document.addEventListener('pointerdown', function(e){
+  if(!ui.lvlPop) return;
+  if(e.target.closest && (e.target.closest('#lvlPop') || e.target.closest('.md-lvl'))) return;
+  ACTIONS.lvlPop();
+}, true);
+afterRenderHooks.push(function(){ if(ui.lvlPop && ui._lpView!==ui.view+ui.personalTab){ ui._lpView = ui.view+ui.personalTab; if(document.getElementById('lvlPop')) ACTIONS.lvlPop(); } else ui._lpView = ui.view+ui.personalTab; });
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

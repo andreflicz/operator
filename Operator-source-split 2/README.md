@@ -66,7 +66,9 @@ scripts/
   build.py                reassembles src/ -> dist/command-center-2.html
   smoke-test.js            headless-Chromium check: app loads, all 6 nav views render, no JS errors
   e2e/                     Playwright suites per phase — `bash scripts/e2e/run-all.sh`;
-                           click-latency benchmark — `node scripts/e2e/perf.js dist/command-center-2.html`
+                           click-latency benchmark — `node scripts/e2e/perf.js dist/command-center-2.html`;
+                           screenshots of the main screens with a realistic seed —
+                           `node scripts/e2e/shots.js dist/command-center-2.html <outdir> [today,you,goals,health,morning,…]`
 dist/
   command-center-2.html    the built file — copy this into the .app bundle
 packaged/

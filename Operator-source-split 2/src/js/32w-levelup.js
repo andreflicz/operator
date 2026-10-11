@@ -112,3 +112,50 @@ function lvlSound(L, rank){
   setTimeout(function(){ tone([523, 784, 1047], 0.9, 0.22); }, n*95 + 120);
   if(rank) setTimeout(function(){ tone([392, 587, 784, 1175], 1.4, 0.24); }, n*95 + 700);
 }
+
+// ---- your level, always there: a small chip in the top-right corner (next to ▶ and the mic) ----
+// Click it and a minimal card drops down: level and rank, the bar, XP to go, today and this week, the
+// four ratings — and Level up when it's ready. It steps aside on the You page (the card's right there).
+function lvlChipHtml(){
+  if(typeof xpSummary!=='function' || !state || !state.profile) return '';
+  const x = xpSummary(), r = RANKS[x.rank];
+  return '<button class="md-lvl'+(lvlCardInView() ? ' is-away' : '')+(x.canLevel ? ' is-ready' : '')+(ui.lvlPop ? ' is-open' : '')+'" data-action="lvlPop" style="--rc:'+r.color+'" title="Level '+x.level+' · '+escapeHtml(r.name)+'">'+
+    rankBadgeSvg(x.rank, 18)+'<b>'+x.level+'</b><i><u style="width:'+(Math.min(1, x.levelPct)*100).toFixed(1)+'%"></u></i>'+(x.canLevel ? '<span class="md-lvl-f">&#128293;</span>' : '')+'</button>';
+}
+// is your card (or the level card next to LOCK IN) on screen right now? Then the chip steps aside.
+function lvlCardInView(){
+  if(ui.lvlPop) return false;
+  const c = document.querySelector('#viewRoot .pcf, #viewRoot .pc'); if(!c) return false;
+  const r = c.getBoundingClientRect(); return r.bottom > 40 && r.top < window.innerHeight - 40 && r.width > 0;
+}
+function lvlChipVis(){ const ch = document.querySelector('#musicDock .md-lvl'); if(ch) ch.classList.toggle('is-away', lvlCardInView()); }
+let lvlVisRaf = 0;
+document.addEventListener('scroll', function(){ if(lvlVisRaf) return; lvlVisRaf = requestAnimationFrame(function(){ lvlVisRaf = 0; lvlChipVis(); }); }, true);
+afterRenderHooks.push(function(){ setTimeout(lvlChipVis, 0); });
+function lvlPopHtml(){
+  const x = xpSummary(), r = RANKS[x.rank];
+  const nextRank = x.next ? '<div class="lp-next"><span>Next rank</span><b style="color:'+x.next.color+'">'+escapeHtml(x.next.name)+'</b>'+(x.needs.length ? '<small>needs '+escapeHtml(x.needs.join(' · '))+'</small>' : '')+'</div>' : '';
+  return '<div class="lp-h">'+rankBadgeSvg(x.rank, 34)+'<div><div class="lp-l">Level <b>'+x.level+'</b></div><div class="lp-r" style="color:'+r.color+'">'+escapeHtml(r.name)+'</div></div><div class="lp-ovr"><b>'+x.ovr+'</b><small>OVR</small></div></div>'+
+    '<div class="lp-bar"><i><u style="width:'+(Math.min(1, x.levelPct)*100).toFixed(1)+'%"></u></i><div class="lp-bar-t"><span>'+Math.min(x.total - x.levelLo, x.levelHi - x.levelLo).toLocaleString()+' / '+(x.levelHi - x.levelLo).toLocaleString()+' XP</span><span>'+(x.canLevel ? 'ready' : x.levelPct >= 1 ? 'maxed' : (x.levelHi - x.total).toLocaleString()+' to go')+'</span></div></div>'+
+    (x.canLevel ? '<div class="lp-up">'+levelUpBtnHtml('pop')+'</div>' : x.blocked.length ? '<div class="lp-up">'+xpCautionHtml(x)+'</div>' : '')+
+    '<div class="lp-stats"><span><b>+'+x.todayXp.toLocaleString()+'</b><small>today</small></span><span><b>+'+x.week.toLocaleString()+'</b><small>this week</small></span><span><b>'+x.total.toLocaleString()+'</b><small>total</small></span></div>'+
+    '<div class="lp-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(function(k){ const a = x.attrs[k]; return '<span style="--ac:'+a.color+'"><b>'+a.v+'</b><small>'+k+'</small><i><u style="width:'+((a.v-25)/75*100).toFixed(0)+'%"></u></i></span>'; }).join('')+'</div>'+
+    nextRank+
+    '<div class="lp-foot"><button data-action="openYou">Your card &#8594;</button><button data-action="openXpHow">How XP works</button></div>';
+}
+ACTIONS.lvlPop = function(){
+  ui.lvlPop = !ui.lvlPop;
+  let p = document.getElementById('lvlPop');
+  if(!ui.lvlPop){ if(p){ p.classList.remove('is-in'); setTimeout(function(){ if(p && !ui.lvlPop) p.remove(); }, 200); } dockRefresh(); return; }
+  if(!p){ p = document.createElement('div'); p.id = 'lvlPop'; p.className = 'lp'; document.body.appendChild(p); }
+  xpLast = null; p.innerHTML = lvlPopHtml(); dockRefresh();
+  requestAnimationFrame(function(){ p.classList.add('is-in'); });
+  playTick();
+};
+// it closes when you click anywhere else, or go somewhere
+document.addEventListener('pointerdown', function(e){
+  if(!ui.lvlPop) return;
+  if(e.target.closest && (e.target.closest('#lvlPop') || e.target.closest('.md-lvl'))) return;
+  ACTIONS.lvlPop();
+}, true);
+afterRenderHooks.push(function(){ if(ui.lvlPop && ui._lpView!==ui.view+ui.personalTab){ ui._lpView = ui.view+ui.personalTab; if(document.getElementById('lvlPop')) ACTIONS.lvlPop(); } else ui._lpView = ui.view+ui.personalTab; });

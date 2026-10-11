@@ -134,11 +134,12 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     check('Goals: no separate "Add a goal" button — the + does it', !/Add a goal/.test(await p.textContent('#viewRoot')) && await p.getAttribute('#fabAdd', 'data-label')==='Add goal');
     await p.click('#fabAdd'); await p.waitForTimeout(200);
     check('…the gold + opens the goal form', await p.isVisible('#newGoalLabel'));
-    await E("ui.personalTab='fitness'; ui.healthTab='weight'; renderView()"); await p.waitForTimeout(150);
-    check('Weight: big number, change and goal progress, area chart', /209.5/.test(await p.textContent('.hw-now')) && /14.5 to go/.test(await p.textContent('.hw-goal')) && await p.isVisible('.hw-svg'));
+    // (round 20: weight and calories are one Body & Fuel card on the Health page)
+    await E("ui.personalTab='fitness'; renderView()"); await p.waitForTimeout(150);
+    check('Weight: big number, change and goal progress, trend line', /209.5/.test(await p.textContent('.bf-now')) && /14.5 to go/.test(await p.textContent('.bf-goal')) && await p.isVisible('.bf-spark'));
     await p.fill('#weightValue', '208.8'); await p.click('[data-action="addWeight"]'); await p.waitForTimeout(150);
     check('…logging still works', await E("state.health.weightLog.length")===3);
-    await E("ui.healthTab='calories'; renderView()"); await p.waitForTimeout(150);
+    await p.waitForTimeout(150);
     await p.click('.hc-pick >> nth=0'); await p.waitForTimeout(150);
     check('Calories: one tap from the quick picks', await E("state.health.calorieEntries.length")===1 && /left today/.test(await p.textContent('.hc-left')));
     await E("ui.view='calendar'; renderView()"); await p.waitForTimeout(150);

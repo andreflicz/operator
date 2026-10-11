@@ -332,7 +332,7 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":11}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":12}' ;;
     /hello*) printf 'open %s' "$(date +%s)" > "$DATA_DIR/page.state" 2>/dev/null; respond 200 '{"ok":true}' ;;
     /engine*)
       # Operator as its own app (its own Dock icon) or plain Chrome — from the next time it opens
@@ -404,24 +404,28 @@ wake_respond() {
     /tts/forget*) rm -f "$TTS_KEY_FILE"; rm -rf "$TTS_DIR"; respond 200 '{"ok":true}' ;;
     /tts/status*) if [ -s "$TTS_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
     /sports*)
-      # NFL / NBA scores and schedules (ESPN's public scoreboard) for Good morning
+      # NFL / NBA / MLB / NHL scores and schedules (ESPN's public scoreboard) for Good morning
       L=$(param l); D=$(param d)
       case "$L" in
         nfl) SU="https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard" ;;
         nba) SU="https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard" ;;
+        mlb) SU="https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard" ;;
+        nhl) SU="https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard" ;;
         *) respond 404 '{"ok":false}'; return ;;
       esac
-      case "$D" in ''|*[!0-9-]*) ;; *) SU="$SU?dates=$D" ;; esac
-      SB=$(curl -s --max-time 8 "$SU" 2>/dev/null)
-      if [ -n "$SB" ]; then respond 200 "$SB"; else respond 502 '{"ok":false}'; fi ;;
+      case "$D" in ''|*[!0-9-]*) ;; *) SU="$SU?dates=$D&limit=200" ;; esac
+      SB=$(curl -s --compressed --max-time 9 "$SU" 2>/dev/null)
+      case "$SB" in *'"events"'*) respond 200 "$SB" ;; *) respond 502 '{"ok":false}' ;; esac ;;
     /news*)
       # a few headlines for the Good morning screen (news sites don't let a page fetch them directly)
-      # ?q=<hex topics> → Google News for your topics (last 2 days); otherwise NPR's top stories
+      # ?q=<hex topics> → Google News for your topics (last 2 days); otherwise the top stories (Google
+      # News, then NPR, then the BBC)
       NQ=$(hexdec "$(param q)")
       if [ -n "$NQ" ]; then
         TQ=$(printf '%s' "$NQ" | awk -F',' '{ out=""; for(i=1;i<=NF;i++){ t=$i; gsub(/^ +| +$/, "", t); if(t=="") continue; if(t ~ / /) t="\"" t "\""; out = out (out=="" ? "" : " OR ") t } print out " when:2d" }')
         X=$(curl -s -m 6 -G -A "Mozilla/5.0 (Macintosh) Operator" --data-urlencode "q=$TQ" --data-urlencode "hl=en-US" --data-urlencode "gl=US" --data-urlencode "ceid=US:en" "https://news.google.com/rss/search" 2>/dev/null)
       fi
+      if [ -z "$NQ" ]; then X=$(curl -s -m 6 -A "Mozilla/5.0 (Macintosh) Operator" "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en" 2>/dev/null); fi
       case "$X" in *"<item"*) ;; *) X=$(curl -s -m 6 -A "Mozilla/5.0 (Macintosh) Operator" "https://feeds.npr.org/1001/rss.xml" 2>/dev/null) ;; esac
       case "$X" in *"<item"*) ;; *) X=$(curl -s -m 6 -A "Mozilla/5.0 (Macintosh) Operator" "https://feeds.bbci.co.uk/news/rss.xml" 2>/dev/null) ;; esac
       case "$X" in *"<item"*) respond 200 "$X" 'application/rss+xml; charset=utf-8' ;; *) respond 502 '{"ok":false}' ;; esac ;;

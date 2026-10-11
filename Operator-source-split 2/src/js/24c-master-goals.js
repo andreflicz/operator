@@ -30,6 +30,8 @@ function masterGoalDefs(){
       src:'Today\'s Standard', go:null, color:'#FF7A45', color2:'#ffc0a3'}
   ];
 }
+// what reaching it pays (XP — see 32t): the big ones a lot, the weekly rings a little each week
+function masterXpTag(m){ if(typeof MASTER_XP==='undefined') return ''; const big = ['mrr', 'weight', 'streak'].indexOf(m.key)>=0; return '<span class="mg-xp" title="'+(big ? 'XP when you reach it (raise the bar and it pays again)' : 'XP for every week you hit it')+'">+'+(big ? MASTER_XP.milestone.toLocaleString()+' XP' : MASTER_XP.weekly+' XP a week')+'</span>'; }
 function masterPct(m){
   if(m.cur==null || !(m.target>0)) return 0;
   if(m.key==='weight'){
@@ -64,7 +66,7 @@ function masterTargetHtml(m){
 function masterHeroHtml(m){
   const pct = masterPct(m);
   return '<div class="mg-hero" style="--mg1:'+m.color+';--mg2:'+m.color2+';">'+
-    '<div class="mg-hero-top"><span class="mg-k">'+m.icon+' '+m.label+'</span>'+masterTargetHtml(m)+'</div>'+
+    '<div class="mg-hero-top"><span class="mg-k">'+m.icon+' '+m.label+'</span>'+masterXpTag(m)+'<span style="flex:1"></span>'+masterTargetHtml(m)+'</div>'+
     '<div class="mg-hero-num"><span class="mg-big">'+m.fmt(m.cur)+'</span><span class="mg-of">'+m.suffix+'</span><span class="mg-pct">'+Math.round(pct)+'%</span></div>'+
     '<div class="mg-bar"><div class="mg-bar-fill" style="width:'+pct.toFixed(1)+'%"></div>'+[25,50,75].map(function(t){ return '<span class="mg-tick'+(pct>=t?' is-past':'')+'" style="left:'+t+'%"></span>'; }).join('')+'</div>'+
     '<div class="mg-hero-foot"><span>'+escapeHtml(masterToGo(m))+'</span><span class="mg-src"'+(m.go?' data-action="'+m.go+'"':'')+'>'+escapeHtml(m.src)+(m.go?' &rarr;':'')+'</span></div>'+
@@ -78,7 +80,7 @@ function masterRingHtml(m, compact){
     '</div>'+
     '<div class="mg-card-k">'+m.icon+' '+m.label+'</div>'+
     (compact ? '<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div>'
-      : masterTargetHtml(m)+'<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div><div class="mg-src"'+(m.go?' data-action="'+m.go+'"':'')+'>'+escapeHtml(m.src)+(m.go?' &rarr;':'')+'</div>')+
+      : masterTargetHtml(m)+masterXpTag(m)+'<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div><div class="mg-src"'+(m.go?' data-action="'+m.go+'"':'')+'>'+escapeHtml(m.src)+(m.go?' &rarr;':'')+'</div>')+
   '</div>';
 }
 function masterGoalsHtml(compact){

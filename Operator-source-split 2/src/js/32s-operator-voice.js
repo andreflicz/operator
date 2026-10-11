@@ -319,7 +319,7 @@ ACTIONS.opAsk = async function(el, e, id){
   const cap = 'opBubText';
   const tok = OV.token;
   const wait = function(p){ return Promise.race([p, new Promise(function(r){ setTimeout(r, 7000); })]); };
-  if(id==='sports' && typeof loadScores==='function' && !(ui.scores && ui.scores.got && (ui.scores.nfl || ui.scores.nba))){ OV.cap = cap; opCaption('One moment — getting the scores…'); await wait(loadScores(true)); }
+  if(id==='sports' && typeof loadScores==='function' && !(ui.scores && ui.scores.got && ui.scores.ok)){ OV.cap = cap; opCaption('One moment — getting the scores…'); await wait(loadScores(true)); }
   if((id==='news' || id==='tech' || id==='sports') && !(ui.morningNews && ui.morningNews.items)){ OV.cap = cap; opCaption('One moment…'); await wait(loadMorningNews(true)); }
   if(id==='tech' && !arr(ui.morningNews && ui.morningNews.sec && ui.morningNews.sec.tech).length){
     // nothing came through for tech with the morning's news: ask for it on its own
@@ -439,6 +439,13 @@ function aiContext(){
   const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
   lines.push('Business: MRR '+money(xpMrr())+(state.profile.revenueGoalMonthly ? ' (goal '+money(state.profile.revenueGoalMonthly)+')' : '')+', '+cs.length+' active clients, '+arr(state.business.pipeline).filter(leadIsOpen).length+' open leads.');
   if(typeof xpSummary==='function'){ const x = xpSummary(); lines.push('Game: level '+x.level+', rank '+x.rank+' "'+RANKS[x.rank].name+'", overall '+x.ovr+' (Business '+x.attrs.BUS.v+', Personal '+x.attrs.PER.v+', Health '+x.attrs.HLT.v+', Discipline '+x.attrs.DIS.v+').'); }
+  if(typeof tierGoals==='function'){
+    const gl = function(kind){ return tierGoals(kind, periodKey(kind)).map(function(g){ return (g.done ? '[done] ' : '')+g.label; }).join('; '); };
+    const wg = gl('week'), mg = gl('month'), m = periodRec('month', monthKey()) || {};
+    if(wg || mg) lines.push('Check-ins — this week’s goals: '+(wg || 'none set')+'. This month’s goals: '+(mg || 'none set')+(m.habit ? '. Habit he’s beating this month: '+m.habit : '')+'.');
+    const due = checkoutDue(); if(due.length) lines.push('Due: check out of '+due.map(function(c){ return c.kind==='month' ? monthName(c.key) : 'the week'; }).join(' and ')+'.');
+  }
+  if(typeof xpSummary==='function'){ const x = xpSummary(); lines.push('XP: '+x.total.toLocaleString()+' total, '+Math.max(0, x.levelHi - x.total).toLocaleString()+' to level '+(x.level+1)+(x.canLevel ? ' (level up is ready to claim)' : '')+'.'); }
   const wx = typeof wxNow==='function' ? wxNow() : null; if(wx) lines.push('Weather: '+wx.temp+'° and '+wxLabel(wx.code).toLowerCase()+(wx.hi!=null ? ', high '+wx.hi+'°' : '')+'.');
   const nw = ui.morningNews; if(nw && nw.items) lines.push('Headlines: '+arr(nw.items).slice(0, 5).map(function(n){ return sayHeadline(n.title); }).join(' | ')+'.');
   if(nw && nw.sec && nw.sec.tech) lines.push('Tech: '+arr(nw.sec.tech).slice(0, 3).map(function(n){ return sayHeadline(n.title); }).join(' | ')+'.');

@@ -77,7 +77,7 @@ function goalStatTilesHtml(){
   const mrr = activeMrr(), mrrGoal = state.profile.revenueGoalMonthly||0;
   const w = weightProgress();
   const wk = workoutsThisWeek(), wkT = state.profile.weeklyWorkoutTarget||0;
-  const items = state.goals.items, done = items.filter(function(g){ return g.done; }).length;
+  const items = state.goals.items.filter(function(g){ return !g.tier; }), done = items.filter(function(g){ return g.done; }).length;
   return '<div class="stat-tiles">'+
     statTileHtml('Revenue', '$'+mrr.toLocaleString(), mrrGoal ? 'of $'+mrrGoal.toLocaleString()+'/mo goal' : 'set a goal in Settings', mrrGoal ? mrr/mrrGoal*100 : null, 'var(--good)')+
     (w.goal!=null ? statTileHtml('Weight', w.latest!=null ? w.latest : '—', w.latest!=null ? 'goal '+w.goal+(w.latest!==w.goal?' · '+Math.abs(w.latest-w.goal).toFixed(1)+' to go':'') : 'log your weight', w.pct, 'var(--info)', 'goToWeight') : '')+
@@ -85,24 +85,29 @@ function goalStatTilesHtml(){
     statTileHtml('Goals', done+'<span class="stat-tile-of">/'+items.length+'</span>', items.length ? 'achieved' : 'none set yet', items.length ? done/items.length*100 : null, goalColor())+
   '</div>';
 }
-ACTIONS.goToWeight = function(){ ui.view='personal'; ui.personalTab='fitness'; ui.healthTab='weight'; renderView(); };
+ACTIONS.goToWeight = function(){ ui.view='personal'; ui.personalTab='fitness'; renderView(); setTimeout(function(){ const el = document.getElementById('bodyFuel'); if(el) el.scrollIntoView({behavior:'smooth', block:'center'}); }, 60); };
 ACTIONS.goToFitness = function(){ ui.view='personal'; ui.personalTab='fitness'; ui.healthTab='workouts'; renderView(); };
 // Today panel: the master goals at a glance, plus your own open goals.
 function renderGoalsPanel(){
-  const own = state.goals.items.filter(function(g){ return !g.done; }).sort(function(a, b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); }).slice(0, 3);
+  const own = state.goals.items.filter(function(g){ return !g.done && !g.tier; }).sort(function(a, b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); }).slice(0, 3);
   return '<div class="section goals-panel">'+
     masterGoalsHtml(true)+
+    (typeof tierCardHtml==='function' ? '<div class="tg-grid is-compact">'+tierCardHtml('week')+tierCardHtml('month')+'</div>' : '')+
     (own.length ? '<div class="goal-grid" style="margin-top:12px;">'+own.map(function(g){ return goalCardHtml(g, true); }).join('')+'</div>' : '')+
     '<div class="mg-more"><span class="view-all-link" data-action="nav" data-view="personal" data-tab="goals">All goals &rarr;</span></div>'+
   '</div>';
 }
 // Goals tab: the master goals, big — then your own goals for anything the app can't see.
 function renderGoalsTab(){
-  const items = state.goals.items;
+  const items = state.goals.items.filter(function(g){ return !g.tier; });
   const open = items.filter(function(g){ return !g.done; }).sort(function(a, b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); });
   const done = items.filter(function(g){ return g.done; });
   const formOpen = !!ui.forms.newGoal;
+  const wh = typeof tierHistoryHtml==='function' ? tierHistoryHtml('week', 8) : '', mh = typeof tierHistoryHtml==='function' ? tierHistoryHtml('month', 6) : '';
   return '<div class="section">'+masterGoalsHtml(false)+'</div>'+
+    (typeof tierCardHtml==='function' ? '<div class="section"><div class="section-title">The week &amp; the month'+tip('Check in at the start (Calendar asks), tick goals off as you go, check out at the end. A weekly goal hit is +'+CHECKIN_XP.weekGoal+' XP, a monthly one +'+CHECKIN_XP.monthGoal+', and a master goal above is +'+MASTER_XP.milestone.toLocaleString()+'.')+'</div>'+
+      '<div class="tg-grid">'+tierCardHtml('week', {add:true})+tierCardHtml('month', {add:true})+'</div>'+
+      (wh || mh ? '<div class="tg-hists">'+(wh ? '<div><small>Past weeks</small>'+wh+'</div>' : '')+(mh ? '<div><small>Past months</small>'+mh+'</div>' : '')+'</div>' : '')+'</div>' : '')+
     '<div class="section">'+
       '<div class="section-title">Your goals'+tip('For things Operator can\'t see — IG followers, a first sponsor deal, a new camera. You update the number.')+(formOpen ? '<button class="btn btn-sm btn-ghost" data-action="toggleForm" data-form="newGoal">Close</button>' : '')+'</div>'+
       (formOpen ? '<div class="card goal-form">'+

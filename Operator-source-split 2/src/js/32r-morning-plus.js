@@ -4,7 +4,14 @@
 // and the way back from the work preview to Good morning.
 
 // ---- scores ----
-const SPORTS = [{id:'nfl', label:'NFL', icon:'&#127944;'}, {id:'nba', label:'NBA', icon:'&#127936;'}];
+// NFL, NBA, MLB and NHL from ESPN's public scoreboard: yesterday's and today's results, anything live,
+// and what's coming up in the next few days — your teams first. The launcher fetches it (and the page
+// asks ESPN itself at the same time; whichever answers first wins). Waking from sleep the Wi-Fi often
+// isn't back yet, so a failed try is tried again on its own (15 s, 45 s, 2 min, then every 10), and
+// while a game is live the board refreshes every couple of minutes.
+const SPORTS = [{id:'nfl', label:'NFL', icon:'&#127944;', path:'football/nfl'}, {id:'nba', label:'NBA', icon:'&#127936;', path:'basketball/nba'},
+  {id:'mlb', label:'MLB', icon:'&#9918;', path:'baseball/mlb'}, {id:'nhl', label:'NHL', icon:'&#127954;', path:'hockey/nhl'}];
+function sportsOn(){ const off = arr(wakeCfg().sportsOff); return SPORTS.filter(function(s){ return off.indexOf(s.id) < 0; }); }
 function ymdCompact(d){ return d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate()); }
 function parseScoreboard(j, l){
   return arr(j && j.events).map(function(e){
@@ -15,36 +22,75 @@ function parseScoreboard(j, l){
     return {l:l, id:e.id, at:Date.parse(e.date), state:st.state, detail:st.shortDetail||'', home:t(home), away:t(away)};
   }).filter(function(g){ return g.home.abbr && g.away.abbr && isFinite(g.at); });
 }
+// the first good answer of several tries
+function firstJson(urls, ms){
+  return new Promise(function(done){
+    let left = urls.length; if(!left) return done(null);
+    urls.forEach(function(u){
+      fetchWithin(u, ms).then(function(r){ return r && r.ok ? r.json() : null; }).catch(function(){ return null; }).then(function(j){
+        if(j && Array.isArray(j.events)){ left = -1; done(j); } else if(--left===0) done(null);
+      });
+    });
+  });
+}
 async function fetchScoreboard(l){
-  const now = Date.now(), range = ymdCompact(new Date(now - 5*86400000))+'-'+ymdCompact(new Date(now + 6*86400000));
-  let j = null;
-  try{ const r = await fetchWithin(WAKE_HELPER+'sports?l='+l+'&d='+range, 9000); if(r && r.ok) j = await r.json(); }catch(e){}
-  if(!j){ try{ const r = await fetchWithin('https://site.api.espn.com/apis/site/v2/sports/'+(l==='nfl' ? 'football' : 'basketball')+'/'+l+'/scoreboard?dates='+range, 9000); if(r && r.ok) j = await r.json(); }catch(e){} }
+  const sp = SPORTS.find(function(x){ return x.id===l; }); if(!sp) return null;
+  const now = Date.now(), range = ymdCompact(new Date(now - 2*86400000))+'-'+ymdCompact(new Date(now + 7*86400000));
+  const espn = 'https://site.api.espn.com/apis/site/v2/sports/'+sp.path+'/scoreboard';
+  let j = await firstJson([WAKE_HELPER+'sports?l='+l+'&d='+range, espn+'?dates='+range+'&limit=200'], 10000);
+  // nothing in that window (or the range isn't understood): today's board, the way ESPN shows it
+  if(!j || !arr(j.events).length){ const k = await firstJson([WAKE_HELPER+'sports?l='+l, espn], 8000); if(k) j = k; }
   return j ? parseScoreboard(j, l) : null;
 }
-function favWords(){ return sectionTopics(wakeCfg().newsSports, 'NFL, NBA').toLowerCase().split(/\s*,\s*/).filter(function(w){ return w && !/^(nfl|nba|football|basketball|sports)$/.test(w); }); }
+function favWords(){ return sectionTopics(wakeCfg().newsSports, 'NFL, NBA').toLowerCase().split(/\s*,\s*/).filter(function(w){ return w && !/^(nfl|nba|mlb|nhl|football|basketball|baseball|hockey|sports)$/.test(w); }); }
 function isFavGame(g){ const ws = favWords(); return ws.some(function(w){ return [g.home.name, g.home.short, g.home.abbr, g.away.name, g.away.short, g.away.abbr].some(function(x){ return String(x).toLowerCase().indexOf(w)>=0; }); }); }
+// which games: live ones, results from yesterday and today, and the week ahead — your teams first
 function pickGames(list){
   const favFirst = function(xs){ return xs.filter(isFavGame).concat(xs.filter(function(g){ return !isFavGame(g); })); };
+  const now = Date.now();
   const live = favFirst(list.filter(function(g){ return g.state==='in'; }));
-  const done = favFirst(list.filter(function(g){ return g.state==='post'; }).sort(function(a, b){ return b.at - a.at; }));
-  const next = favFirst(list.filter(function(g){ return g.state==='pre'; }).sort(function(a, b){ return a.at - b.at; }));
-  return live.slice(0, 1).concat(done.slice(0, live.length ? 1 : 2), next.slice(0, 2)).slice(0, 4);
+  const done = favFirst(list.filter(function(g){ return g.state==='post' && now - g.at < 40*3600000; }).sort(function(a, b){ return b.at - a.at; }));
+  const next = favFirst(list.filter(function(g){ return g.state==='pre' && g.at - now < 7*86400000; }).sort(function(a, b){ return a.at - b.at; }));
+  return live.slice(0, 2).concat(done.slice(0, live.length ? 1 : 2), next.slice(0, 2)).slice(0, 4);
 }
 // returns a promise, so the voice can wait for the scores when you ask for sports
 function loadScores(force){
   const today = todayStr(), sc = ui.scores;
   if(sc && sc.date===today && sc.loading) return ui._scoresP;
-  // a failed fetch (nothing came back) is tried again after a few minutes, or when asked for
-  if(sc && sc.date===today && sc.got && (sc.nfl || sc.nba || (!force && Date.now() - (sc.at||0) < 5*60000))) return Promise.resolve(sc);
-  ui.scores = {date:today, loading:true};
-  ui._scoresP = Promise.all(SPORTS.map(function(s){ return fetchScoreboard(s.id); })).then(function(r){
-    ui.scores = {date:today, loading:false, got:true, at:Date.now(), nfl:r[0], nba:r[1]};
+  if(!force && sc && sc.date===today && sc.got){
+    const age = Date.now() - (sc.at||0), live = SPORTS.some(function(s){ return arr(sc[s.id]).some(function(g){ return g.state==='in'; }); });
+    if(sc.ok ? age < (live ? 2*60000 : 15*60000) : age < [15000, 45000, 120000][Math.min(2, (sc.fails||1)-1)] || (sc.fails > 3 && age < 600000)) return Promise.resolve(sc);
+  }
+  const fails = sc && sc.date===today && !sc.ok ? (sc.fails||0) : 0, keep = sc && sc.date===today && sc.ok ? sc : null;
+  ui.scores = Object.assign({}, keep || {}, {date:today, loading:true});
+  if(!keep && ui.wakeMode==='brief' && overlayOpen('wakeOverlay')) renderWakeOverlayInto();
+  const leagues = sportsOn();
+  ui._scoresP = Promise.all(leagues.map(function(s){ return fetchScoreboard(s.id); })).then(function(r){
+    const out = {date:today, loading:false, got:true, at:Date.now()}; let any = false;
+    leagues.forEach(function(s, i){ out[s.id] = r[i]; if(r[i]) any = true; });
+    out.ok = any; out.fails = any ? 0 : fails + 1;
+    // a failed refresh keeps the last good board
+    ui.scores = !any && keep ? Object.assign({}, keep, {at:Date.now(), stale:true}) : out;
     if(ui.wakeMode==='brief' && overlayOpen('wakeOverlay')) renderWakeOverlayInto();
     return ui.scores;
   });
   return ui._scoresP;
 }
+// tries again by itself while Good morning is up (and keeps a live game current)
+setInterval(function(){
+  if(ui.wakeMode!=='brief' || typeof overlayOpen!=='function' || !overlayOpen('wakeOverlay') || typeof morningNewsOn!=='function' || !morningNewsOn()) return;
+  loadScores();
+  // (the headlines too, if they didn't make it the first time)
+  if(ui.morningNews && !ui.morningNews.items && !ui.morningNews.loading && Date.now() - (ui._newsRetry||0) > 30000){ ui._newsRetry = Date.now(); ui.morningNews = null; loadMorningNews(); }
+}, 10000);
+// when the board is empty: say why, and offer to try again
+function scoresStatusHtml(){
+  const sc = ui.scores;
+  if(!sc || sc.loading) return '<div class="br-sports-none is-wait">Getting the scores&hellip;</div>';
+  if(!sc.ok) return '<div class="br-sports-none">Couldn’t reach ESPN'+(sc.fails > 1 ? ' ('+sc.fails+' tries)' : '')+' — usually the Wi-Fi coming back from sleep. Trying again on its own.<button class="bi-set" data-action="scoresRetry">Try now</button></div>';
+  return '<div class="br-sports-none">No '+sportsOn().map(function(s){ return s.label; }).join(', ')+' games yesterday, today or this coming week.</div>';
+}
+ACTIONS.scoresRetry = function(){ loadScores(true); };
 function scoreWhen(g){
   const d = new Date(g.at), today = todayStr(), ds = ds2(d);
   const day = ds===today ? 'Today' : ds===addDays(today, 1) ? 'Tomorrow' : d.toLocaleDateString(undefined, {weekday:'short'});
@@ -72,10 +118,11 @@ function scoresHtml(maxDone, maxNext){
   const sc = ui.scores; if(!sc || !sc.got) return '';
   const done = [], next = [];
   SPORTS.forEach(function(s){ pickGames(sc[s.id] || []).forEach(function(g){ (g.state==='pre' ? next : done).push(g); }); });
+  done.sort(function(a, b){ return (a.state==='in' ? 0 : 1) - (b.state==='in' ? 0 : 1) || b.at - a.at; });
   const favFirst = function(xs){ return xs.filter(isFavGame).concat(xs.filter(function(g){ return !isFavGame(g); })); };
   const d = favFirst(done).slice(0, maxDone||3), n = favFirst(next.sort(function(a, b){ return a.at - b.at; })).slice(0, maxNext||3);
   if(!d.length && !n.length) return '';
-  return '<div class="sb">'+(d.length ? '<div class="sb-h">Results</div>'+d.map(scoreRowHtml).join('') : '')+(n.length ? '<div class="sb-h">Coming up</div>'+n.map(scoreRowHtml).join('') : '')+'</div>';
+  return '<div class="sb">'+(d.length ? '<div class="sb-h">'+(d.some(function(g){ return g.state==='in'; }) ? 'Live &amp; results' : 'Results')+'</div>'+d.map(scoreRowHtml).join('') : '')+(n.length ? '<div class="sb-h">Coming up</div>'+n.map(scoreRowHtml).join('') : '')+'</div>';
 }
 // what the voice can say about it
 function scoresSpoken(){

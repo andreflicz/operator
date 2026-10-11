@@ -350,7 +350,7 @@ function wakeImUpNow(){
   ui.briefT0 = Date.now(); ui.briefShift = 0; ui.briefSkipped = false; ui.briefNewsAt = null; ui.briefLineSeen = 0; ui.dawnTs = null;
   loadMorningNews();
   // scores that didn't come through last time are asked for again (the sports panel never just vanishes)
-  if(typeof loadScores==='function' && !(ui.scores && ui.scores.got && (ui.scores.nfl || ui.scores.nba))) loadScores(true);
+  if(typeof loadScores==='function' && !(ui.scores && ui.scores.got && ui.scores.ok)) loadScores(true);
   playWakeChime();
   renderWakeOverlayInto();
   briefVoiceRun();
@@ -413,8 +413,8 @@ function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : ui
 function renderWakeOverlayInto(){
   const el = document.getElementById('wakeContent'); if(!el) return;
   morphInto(el, renderWakeScreen());
-  requestAnimationFrame(function(){ fitStaticBoards(el); });
-  setTimeout(function(){ fitStaticBoards(el); }, 500);
+  requestAnimationFrame(function(){ fitStaticBoards(el); if(typeof briefFit==='function') briefFit(el); });
+  setTimeout(function(){ fitStaticBoards(el); if(typeof briefFit==='function') briefFit(el); }, 500);
   clearInterval(wakeClockTimer);
   wakeClockTimer = setInterval(function(){
     if(!overlayOpen('wakeOverlay')){ clearInterval(wakeClockTimer); return; }
@@ -474,6 +474,8 @@ function renderWakeSetup(){
       '<div class="field"><label>Good morning intro</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.intro==='quick'?' active':'')+'" data-action="wakeIntro" data-id="quick">Quick</button><button class="seg-tab'+(w.intro==='cinematic'?' active':'')+'" data-action="wakeIntro" data-id="cinematic">Cinematic</button></div></div>'+
       '<div class="field"><label>News topics'+tip('Things you care about, separated by commas — e.g. AI, Knicks, marketing. Good morning shows the latest headlines on those. Leave it empty for the top stories.')+'</label><input class="input" data-wake="newsTopics" placeholder="e.g. AI, Knicks, marketing" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
       '<div class="field"><label>Sports'+tip('Teams or leagues for the Sports section — e.g. Knicks, Giants, UFC. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, NFL, UFC" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
+      '<div class="field"><label>Scores'+tip('Which leagues the scoreboard shows: yesterday’s and today’s results and what’s coming up. Your teams (above) go first.')+'</label><div class="seg-tabs" style="margin:0;">'+(typeof SPORTS!=='undefined' ? SPORTS : []).map(function(sp){ const on = arr(w.sportsOff).indexOf(sp.id) < 0; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeLeague" data-id="'+sp.id+'">'+sp.label+'</button>'; }).join('')+'</div></div>'+
+      '<div class="field"><label>Local news'+tip('A few headlines from where you are (the place your weather is set to — Settings → Look & Sound).')+'</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(weatherCfg().newsLocal!==false?' active':'')+'" data-action="wakeLocalNews" data-id="on">'+escapeHtml(weatherCfg().city || (weatherCfg().place && weatherCfg().place!=='My location' ? String(weatherCfg().place).split(',')[0] : 'On'))+'</button><button class="seg-tab'+(weatherCfg().newsLocal===false?' active':'')+'" data-action="wakeLocalNews" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Tech & interests'+tip('Anything else you follow — e.g. AI, Apple, marketing, crypto. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
       '<div class="field"><label>Places you like'+tip('Parks, streets, spots near you — separated by commas. Good morning suggests a walk to one of them now and then.')+'</label><input class="input" data-wake="places" placeholder="e.g. a park, a coffee spot" value="'+escapeHtml(w.places||'')+'"></div>'+
       '<div class="field"><label>Good morning background'+tip('Time of day follows when you\'re up: sunrise colours early, a blue sky later in the morning, golden in the evening, night if it\'s still dark.')+'</label><div class="seg-tabs" style="margin:0;">'+[['auto','Time of day'],['sunrise','Sunrise'],['dark','Dark']].map(function(o){ const on = (w.briefBg||'auto')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefBg" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
@@ -596,6 +598,8 @@ document.addEventListener('change', function(e){
   saveWake();
   renderView();
 });
+ACTIONS.wakeLeague = function(el, e, id){ const w = wakeCfg(), off = arr(w.sportsOff).slice(), i = off.indexOf(id); if(i>=0) off.splice(i, 1); else if(off.length < SPORTS.length - 1) off.push(id); w.sportsOff = off; saveWake(); ui.scores = null; renderView(); };
+ACTIONS.wakeLocalNews = function(el, e, id){ ensureWeatherCfg().newsLocal = id!=='off'; persist('settings'); ui.morningNews = null; renderWakeSetupInto(); renderView(); };
 // ---- small pieces shown elsewhere ----
 function wakeChipHtml(){
   const nw = nextWake();

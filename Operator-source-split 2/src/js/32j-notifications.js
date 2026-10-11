@@ -113,6 +113,7 @@ ACTIONS.notifOpen = function(el, e, key){
   else if(a.a==='openCalItem') openCalItem(a.kind, a.id);
   else if(a.a==='openGhlContact' && ACTIONS.openGhlContact) ACTIONS.openGhlContact(null, null, a.id);
   else if(a.a==='openIntent' && typeof openIntentForm==='function') openIntentForm(a.id);
+  else if(a.a==='openCheckout' && ACTIONS.openCheckout) ACTIONS.openCheckout(null, null, a.id);
   else if(a.a==='levelUp' && ACTIONS.levelUp) ACTIONS.levelUp();
 };
 ACTIONS.notifDismiss = function(el, e, key){ notifDismissed()[key] = todayStr(); persist('focus'); notifBadge(); notifRender(); };
