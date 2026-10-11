@@ -374,6 +374,17 @@ function normalizeStandards(s){
   s.completions=arr(s.completions);
   if(!s.dayOverrides || typeof s.dayOverrides!=='object') s.dayOverrides = {};
   if(s.streakBase===undefined) s.streakBase = null;
+  // what a full day of work looks like at your peak (the "Average hours a day" master goal)
+  if(!s.avgHoursTargetMinutes) s.avgHoursTargetMinutes = 480;
+  // how much content you want out: business and personal, each so many a day or a week
+  if(!s.contentTargets || typeof s.contentTargets!=='object') s.contentTargets = {};
+  ['business', 'personal'].forEach(function(k){
+    const t = s.contentTargets[k];
+    if(!t || typeof t!=='object') s.contentTargets[k] = {n: k==='business' ? 3 : 2, per:'week'};
+    else { t.n = Math.max(0, Number(t.n)||0); if(t.per!=='day' && t.per!=='week') t.per = 'week'; }
+  });
+  // new clients you're after each month (for Client growth)
+  if(!s.newClientsPerMonth) s.newClientsPerMonth = 2;
   return s;
 }
 function normalizeDaysOff(d){ d=d||{}; d.dates=arr(d.dates); return d; }

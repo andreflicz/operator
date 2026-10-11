@@ -87,7 +87,7 @@ function sortByPriorityAndDeadline(list){
 }
 function focusMainTab(el){ ui.focusTab = el.dataset.tab; renderView(); }
 function focusTasksSubTab(el){ ui.focusTasksSubTab = el.dataset.tab; renderView(); }
-// Overview / Backlog / Video Ideas / Finished sit on the same line as Tasks · Analytics,
+// Overview / Backlog / Content / Finished sit on the same line as Tasks · Analytics,
 // so the page opens straight onto what you're on now and what's next.
 function focusTasksSubtabsHtml(){
   const sub = ui.focusTasksSubTab || 'overview';
@@ -98,7 +98,7 @@ function focusTasksSubtabsHtml(){
     else if(t.status==='backlog') backlogN++;
   });
   const pill = function(id, label, n){ return '<div class="subtab '+(sub===id?'active':'')+'" data-action="focusTasksSubTab" data-tab="'+id+'">'+label+(n===null?'':' <span style="opacity:.7;">'+n+'</span>')+'</div>'; };
-  return '<div class="subtabs">'+pill('overview', 'Overview', null)+pill('backlog', 'Backlog', backlogN)+pill('videoIdeas', '&#127916; Video Ideas', ideasN)+pill('finished', 'Finished', doneN)+(arr(state.tasks.trash).length ? pill('deleted', '&#128465;', arr(state.tasks.trash).length) : '')+'</div>';
+  return '<div class="subtabs">'+pill('overview', 'Overview', null)+pill('backlog', 'Backlog', backlogN)+pill('videoIdeas', '&#127916; Content', ideasN)+pill('finished', 'Finished', doneN)+(arr(state.tasks.trash).length ? pill('deleted', '&#128465;', arr(state.tasks.trash).length) : '')+'</div>';
 }
 function renderFocusTasksTab(){
   const sub = ui.focusTasksSubTab || 'overview';
@@ -106,11 +106,55 @@ function renderFocusTasksTab(){
     (sub==='backlog' ? renderFocusBacklogTab() : sub==='videoIdeas' ? renderVideoIdeasTab() : sub==='finished' ? renderFocusFinishedTab() : sub==='deleted' ? renderFocusDeletedTab() : renderFocusTasksOverview())+
     '</div>';
 }
+// ---- Content: business and personal, side by side. A finished content task is a video out —
+// that's the count, against what you set in Settings → Goals & Standards. ----
+function contentRoleOf(t){ return t.contentRole==='business' || t.contentRole==='personal' ? t.contentRole : (arr(t.clients).indexOf('personal')>=0 || t.client==='personal' ? 'personal' : 'business'); }
+function contentTarget(role){ const ct = state.standards.contentTargets && state.standards.contentTargets[role]; return ct || {n:0, per:'week'}; }
+function contentPeriodStart(per){ return per==='day' ? todayStr() : startOfWeekSundayStr(todayStr()); }
+function contentDoneSince(role, from){ return state.tasks.items.filter(function(t){ return t.isVideoIdea && t.status==='done' && t.completedAt && t.completedAt >= from && t.completedAt <= todayStr() && contentRoleOf(t)===role; }); }
+function contentProgress(role){
+  const tg = contentTarget(role), done = contentDoneSince(role, contentPeriodStart(tg.per));
+  return {role:role, n:tg.n, per:tg.per, done:done.length, list:done, label:(tg.per==='day' ? 'today' : 'this week')};
+}
+const CONTENT_ROLES = [['business', 'Business', '#ffc56b', 'For the business — clients, ads, the agency'], ['personal', 'Personal', '#c3a6ff', 'Your own channel — you and your story']];
+function contentRingSvg(p, color){
+  const f = p.n ? Math.min(1, p.done/p.n) : 0, r = 22, c = 2*Math.PI*r;
+  return '<svg class="ct-ring" viewBox="0 0 54 54" width="54" height="54"><circle cx="27" cy="27" r="'+r+'" fill="none" stroke="rgba(var(--ink),.1)" stroke-width="5"/>'+
+    '<circle cx="27" cy="27" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="5" stroke-linecap="round" stroke-dasharray="'+(c*f).toFixed(1)+' '+c.toFixed(1)+'" transform="rotate(-90 27 27)"/>'+
+    '<text x="27" y="31" text-anchor="middle" font-size="13" font-weight="800" fill="currentColor">'+p.done+'</text></svg>';
+}
 function renderVideoIdeasTab(){
-  const videoIdeas = state.tasks.items.filter(function(t){ return t.isVideoIdea && t.status!=='done'; });
-  return '<div class="section">'+
-    '<div class="video-idea-grid">'+(videoIdeas.map(videoIdeaCompactCard).join('') || '<div class="empty">No video ideas yet — drop one above whenever inspiration hits.</div>')+'</div>'+
-  '</div>';
+  const ideas = state.tasks.items.filter(function(t){ return t.isVideoIdea && t.status!=='done'; });
+  return '<div class="ct">'+CONTENT_ROLES.map(function(r){
+    const p = contentProgress(r[0]), mine = ideas.filter(function(t){ return contentRoleOf(t)===r[0]; });
+    const hit = p.n && p.done >= p.n;
+    return '<div class="ct-lane'+(hit ? ' is-hit' : '')+'" style="--lc:'+r[2]+'" data-content-role="'+r[0]+'">'+
+      '<div class="ct-h">'+contentRingSvg(p, r[2])+
+        '<div class="ct-hm"><div class="ct-t">'+r[1]+' content</div>'+
+          '<div class="ct-s">'+(p.n ? '<b>'+p.done+'</b> of '+p.n+' '+p.label+(hit ? ' &middot; done &#10003;' : '') : r[3])+'</div>'+
+          (p.n ? '<div class="ct-dots">'+Array.from({length:Math.min(p.n, 14)}, function(_, i){ return '<i class="'+(i < p.done ? 'on' : '')+'"></i>'; }).join('')+'</div>' : '')+
+        '</div>'+
+        '<button class="ct-add" data-action="openAddContent" data-role="'+r[0]+'" title="Add '+r[1].toLowerCase()+' content">+</button>'+
+      '</div>'+
+      '<div class="ct-list">'+(mine.map(videoIdeaCompactCard).join('') || '<div class="ct-empty">No '+r[1].toLowerCase()+' ideas yet — <button class="ct-link" data-action="openAddContent" data-role="'+r[0]+'">add one</button>.</div>')+'</div>'+
+      (p.list.length ? '<div class="ct-done"><span>Out '+p.label+'</span>'+p.list.slice(0, 6).map(function(t){ return '<em>&#10003; '+escapeHtml(t.title)+'</em>'; }).join('')+'</div>' : '')+
+    '</div>';
+  }).join('')+'</div>';
+}
+ACTIONS.openAddContent = function(el){ ui.newContentRole = el && el.dataset.role==='business' ? 'business' : 'personal'; openAddVideoIdeaModal(); };
+ACTIONS.pickContentRole = function(el){ ui.newContentRole = el.dataset.role; document.querySelectorAll('#videoIdeaContent .ct-role, #videoIdeaEditContent .ct-role').forEach(function(b){ b.classList.toggle('active', b.dataset.role===ui.newContentRole); }); };
+ACTIONS.contentSwapRole = function(el, e, id){
+  const t = state.tasks.items.find(function(x){ return x.id===id; }); if(!t) return;
+  setContentRole(t, contentRoleOf(t)==='business' ? 'personal' : 'business'); persist('tasks'); renderView();
+};
+function setContentRole(t, role){
+  t.contentRole = role;
+  // business content belongs to the business (General) unless it's already for a client; personal is personal
+  if(role==='personal'){ t.clients = ['personal']; t.client = 'personal'; }
+  else if(arr(t.clients).indexOf('personal')>=0 || !arr(t.clients).length){ t.clients = ['general']; t.client = 'general'; }
+}
+function contentRoleSegHtml(cur){
+  return '<div class="field"><label>For</label><div class="seg-tabs" style="margin:0;">'+CONTENT_ROLES.map(function(r){ return '<button class="seg-tab ct-role'+(cur===r[0]?' active':'')+'" data-action="pickContentRole" data-role="'+r[0]+'">'+r[1]+'</button>'; }).join('')+'</div></div>';
 }
 function openAddVideoIdeaModal(){
   const o = document.getElementById('videoIdeaOverlay');
@@ -121,13 +165,14 @@ function openAddVideoIdeaModal(){
 function closeAddVideoIdeaModal(){ const o=document.getElementById('videoIdeaOverlay'); if(o) o.classList.add('hidden'); }
 function renderAddVideoIdeaModal(){
   const types = arr(state.tasks.videoTypes);
-  return '<div class="section-title" style="margin-bottom:14px;">&#127916; Add Video Idea</div>'+
-    '<div class="field"><label>What\'s the idea?</label><input class="input" id="newVideoIdeaTitle" placeholder="e.g. Behind-the-scenes B-roll" style="width:100%;" autofocus></div>'+
+  return '<div class="section-title" style="margin-bottom:14px;">&#127916; New content</div>'+
+    contentRoleSegHtml(ui.newContentRole || 'personal')+
+    '<div class="field" style="margin-top:10px;"><label>What\'s the video?</label><input class="input" id="newVideoIdeaTitle" placeholder="e.g. Behind-the-scenes B-roll" style="width:100%;" autofocus></div>'+
     (types.length ? '<div class="field" style="margin-top:10px;"><label>Type (optional)</label><select class="input" id="newVideoIdeaType" style="width:100%;"><option value="">&mdash; None &mdash;</option>'+types.map(function(vt){ return '<option value="'+vt.id+'">'+escapeHtml(vt.label)+'</option>'; }).join('')+'</select></div>' : '')+
     '<div class="field" style="margin-top:10px;"><label>Notes (optional)</label><textarea class="input" id="newVideoIdeaNotes" placeholder="Any details worth remembering" style="width:100%;min-height:70px;"></textarea></div>'+
     '<div class="row" style="margin-top:20px;justify-content:flex-end;">'+
       '<button class="btn btn-ghost" data-action="closeAddVideoIdeaModal">Cancel</button>'+
-      '<button class="btn btn-primary" data-action="addVideoIdea">+ Add Video Idea</button>'+
+      '<button class="btn btn-primary" data-action="addVideoIdea">+ Add</button>'+
     '</div>';
 }
 function renderAddVideoIdeaModalInto(){ const el=document.getElementById('videoIdeaContent'); if(el) morphInto(el, renderAddVideoIdeaModal(), {form:true}); }
@@ -137,7 +182,9 @@ function addVideoIdea(){
   if(!title) return;
   const typeEl = document.getElementById('newVideoIdeaType');
   const notesEl = document.getElementById('newVideoIdeaNotes');
-  state.tasks.items.push({id:uid(), title:title, client:'personal', clients:['personal'], priority:'med', deadline:null, notes:(notesEl?notesEl.value.trim():''), status:'backlog', ongoing:false, ongoingDeadline:null, ongoingFrequency:null, includeInStandard:false, categoryId:null, isVideoIdea:true, videoType:(typeEl&&typeEl.value?typeEl.value:null), createdAt:todayStr(), completedAt:null});
+  const t = {id:uid(), title:title, client:'personal', clients:['personal'], priority:'med', deadline:null, notes:(notesEl?notesEl.value.trim():''), status:'backlog', ongoing:false, ongoingDeadline:null, ongoingFrequency:null, includeInStandard:false, categoryId:null, isVideoIdea:true, videoType:(typeEl&&typeEl.value?typeEl.value:null), createdAt:todayStr(), completedAt:null};
+  setContentRole(t, ui.newContentRole==='business' ? 'business' : 'personal');
+  state.tasks.items.push(t);
   playTaskAdded();
   closeAddVideoIdeaModal();
   persist('tasks'); renderView();
@@ -155,10 +202,12 @@ function renderVideoIdeaEditModal(){
   const t = state.tasks.items.find(function(x){return x.id===ui.editingVideoIdeaId;});
   if(!t) return '';
   const types = arr(state.tasks.videoTypes);
-  const where = t.status==='today' ? "In the current lineup" : t.status==='done' ? 'Finished' : 'In Video Ideas';
-  return '<div class="section-title" style="margin-bottom:4px;">&#127916; Video Idea</div>'+
+  const where = t.status==='today' ? "In the current lineup" : t.status==='done' ? 'Finished — counts as a video out' : 'In Content';
+  if(ui.newContentRoleFor!==t.id){ ui.newContentRoleFor = t.id; ui.newContentRole = contentRoleOf(t); }
+  return '<div class="section-title" style="margin-bottom:4px;">&#127916; Content</div>'+
     '<div class="kpi-sub" style="margin-bottom:14px;">'+where+'</div>'+
-    '<div class="field"><label>Idea</label><input class="input" id="editVideoTitle-'+t.id+'" value="'+escapeHtml(t.title)+'" style="width:100%;"></div>'+
+    contentRoleSegHtml(ui.newContentRole)+
+    '<div class="field" style="margin-top:10px;"><label>Video</label><input class="input" id="editVideoTitle-'+t.id+'" value=""'+escapeHtml(t.title)+'" style="width:100%;"></div>'+
     (types.length ? '<div class="field" style="margin-top:10px;"><label>Type</label><select class="input" id="editVideoType-'+t.id+'" style="width:100%;"><option value="">&mdash; None &mdash;</option>'+types.map(function(vt){ return '<option value="'+vt.id+'" '+(t.videoType===vt.id?'selected':'')+'>'+escapeHtml(vt.label)+'</option>'; }).join('')+'</select></div>' : '')+
     '<div class="field" style="margin-top:10px;"><label>Due (optional)</label><div class="row"><input class="input" type="date" id="editVideoDeadline-'+t.id+'" value="'+(t.deadline||'')+'"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="editVideoDeadline-'+t.id+'">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="editVideoDeadline-'+t.id+'">Clear</button></div></div>'+
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="editVideoNotes-'+t.id+'" style="width:100%;min-height:90px;" placeholder="Hook, shots, references…">'+escapeHtml(t.notes||'')+'</textarea></div>'+
@@ -181,6 +230,8 @@ function saveVideoIdeaEdit(id){
   if(dlEl) t.deadline = dlEl.value || null;
   const notesEl = document.getElementById('editVideoNotes-'+id);
   if(notesEl) t.notes = notesEl.value.trim();
+  if(ui.newContentRoleFor===id && (ui.newContentRole==='business' || ui.newContentRole==='personal')) setContentRole(t, ui.newContentRole);
+  ui.newContentRoleFor = null;
   closeVideoIdeaEditModal();
   persist('tasks'); renderView();
 }

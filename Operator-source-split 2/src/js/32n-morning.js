@@ -154,8 +154,46 @@ const MORNING_THOUGHTS = [
   ['&#128719;', 'Make your bed.', 'First win of the day.'],
   ['&#9729;&#65039;', 'Look at the sky for a minute.', 'Whatever it’s doing today.'],
   ['&#127939;', 'Move a little.', 'A stretch, a walk, a few push-ups. Wake the body up.'],
-  ['&#128588;', 'You don’t have to rush.', 'A calm morning makes a sharp afternoon.']
+  ['&#128588;', 'You don’t have to rush.', 'A calm morning makes a sharp afternoon.'],
+  ['&#129388;', 'Make a green juice.', 'Greens before anything that comes in a wrapper.'],
+  ['&#128214;', 'Read ten pages.', 'Before anything with a feed.'],
+  ['&#129496;', 'Do nothing for ten minutes.', 'No phone, no music. Let your head settle before you fill it.'],
+  ['&#128296;', 'Stop picturing it. Build it.', 'The life you keep imagining gets made in today’s hours.'],
+  ['&#128509;', 'Go somewhere you haven’t been.', 'A new street, a new park, a coffee spot you’ve walked past. Explore.'],
+  ['&#9728;&#65039;', 'Get the light on your face.', 'Ten minutes outside beats another coffee.']
 ];
+// "For a Good Day": a reel that rolls through the morning — what you're eating, a walk somewhere you
+// like, and the small things — a different set each day
+function goodDayItems(){
+  const out = [], w = wakeCfg(), lib = arr(state.meals && state.meals.library);
+  const go = lib.slice().sort(function(a, b){ return (b.uses||0) - (a.uses||0); }).slice(0, 3).map(function(m){ return m.name; }).filter(Boolean);
+  out.push(['&#129367;', 'Know what you’re eating today.', go.length ? 'Your go-tos: '+go.join(', ')+(state.profile.calorieTarget ? ' · '+Number(state.profile.calorieTarget).toLocaleString()+' cal' : '')+'. Decide now, not when you’re starving.' : 'Breakfast, lunch, dinner — decided before you’re hungry.']);
+  const places = String(w.places||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+  if(places.length) out.push(['&#127795;', 'Walk to '+places[dayNum() % places.length]+'.', 'No phone. Just the walk there and back.']);
+  const len = MORNING_THOUGHTS.length, d = dayNum();
+  for(let i=0; out.length < 9 && i < len; i++){
+    const t = MORNING_THOUGHTS[(d*5 + i*7) % len];
+    if(out.every(function(x){ return x[1]!==t[1]; }) && !/eat today/.test(t[1])) out.push(t);
+  }
+  return out;
+}
+function goodDayReelHtml(){
+  const items = goodDayItems(), n = items.length, i = (ui.gdIdx||0) % n;
+  // (looks like the list it always was — four at a time — it just rolls on to the next one every few seconds)
+  const row = function(x){ return '<div class="br-th gd-i"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; };
+  return '<div class="gd-reel"><div class="gd-track" style="--i:'+i+'">'+items.concat(items.slice(0, 4)).map(row).join('')+'</div></div>'+
+    '<div class="gd-dots">'+items.map(function(_, k){ return '<i class="'+(k===i ? 'on' : '')+'"></i>'; }).join('')+'</div>';
+}
+// it rolls on by itself every few seconds while Good morning is up
+setInterval(function(){
+  if(ui.wakeMode!=='brief' || typeof overlayOpen!=='function' || !overlayOpen('wakeOverlay')) return;
+  const tr = document.querySelector('#wakeContent .gd-track'); if(!tr) return;
+  const n = goodDayItems().length;
+  ui.gdIdx = (ui.gdIdx||0) + 1;
+  tr.classList.remove('no-anim'); tr.style.setProperty('--i', ui.gdIdx);
+  document.querySelectorAll('#wakeContent .gd-dots i').forEach(function(d, k){ d.classList.toggle('on', k===ui.gdIdx % n); });
+  if(ui.gdIdx >= n) setTimeout(function(){ ui.gdIdx = 0; tr.classList.add('no-anim'); tr.style.setProperty('--i', 0); void tr.offsetWidth; tr.classList.remove('no-anim'); }, 900);
+}, 5500);
 function dayNum(){ const d = new Date(), start = new Date(d.getFullYear(), 0, 0); return Math.floor((d - start)/86400000); }
 function quoteOfDay(){ return quoteFor('morning'); }
 function workQuoteOfDay(){ return quoteFor('work'); }
@@ -358,7 +396,7 @@ function lastNightSleep(){
   const h = state.modes.history.filter(function(m){ return m.sleep && m.endedAt && Date.now() - m.endedAt < 8*3600000 && m.minutes >= 60; }).sort(function(a, b){ return b.endedAt - a.endedAt; })[0];
   return h ? {minutes:h.minutes, from:h.startedAt, to:h.endedAt} : null;
 }
-function briefBase(){ return wakeCfg().intro!=='quick' ? 4000 : 1400; }
+function briefBase(){ return wakeCfg().intro!=='quick' ? 3200 : 1100; }
 // ("You, lately" and "a month ago you wrote" are gone: the month and the week took their place — see 32u)
 function wakeBriefHtml(){
   if(typeof briefMinimalOn==='function' && briefMinimalOn()) return briefMinimalHtml();
@@ -383,9 +421,9 @@ function wakeBriefHtml(){
   let k = 0, tcur = base;
   const panel = function(cls, anim, voice, html, extraStyle, attrs){
     const d = tcur; k++;
-    const wms = typeof opVoiceOn==='function' && opVoiceOn() ? 360 : BRIEF_WORD_MS;
-    // (quicker than before: each line still finishes, with a short breath before the next piece)
-    if(voice){ lines.push({at: d - 380, text: voice}); tcur += Math.max(1100, voice.split(' ').length*wms + 420); } else tcur += 600;
+    const wms = typeof opVoiceOn==='function' && opVoiceOn() ? 250 : BRIEF_WORD_MS;
+    // (quicker again: the page builds at reading pace; the voice keeps up by moving to the newest line)
+    if(voice){ lines.push({at: d - 380, text: voice}); tcur += Math.max(900, voice.split(' ').length*wms + 300); } else tcur += 500;
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
   const slept = lastNightSleep();
@@ -405,8 +443,16 @@ function wakeBriefHtml(){
   if(you) colA.push(panel('br-you br-intent', 'br-a-rise', you.voice, you.html));
   // column 2: a line to carry, and a few small things for a good day
   colB.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
-  colB.push(panel('br-thoughts', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+
-    thoughtsOfDay(4).map(function(x, i){ return '<div class="br-th" style="--i:'+i+'"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')));
+  colB.push(panel('br-thoughts br-goodday', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+goodDayReelHtml()));
+  // the day ahead — the calendar, and the content you're after — sits on top of the world's news
+  const cp = typeof contentProgress==='function' ? ['business', 'personal'].map(contentProgress).filter(function(p){ return p.n; }) : [];
+  // (wide screens: on top of the headlines; otherwise under the weather, where the month panel has room)
+  const todayCol = window.innerWidth >= 1680 ? colC : null;
+  const todayP = (panel('br-day', 'br-a-right', events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.',
+    '<div class="br-k">&#128197; Today</div>'+
+    (events.length ? '<div class="br-agenda">'+events.slice(0, 3).map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b>'+escapeHtml(e.title)+'</div>'; }).join('')+'</div>' : '<div class="br-day-plan">Nothing scheduled. Enjoy the morning.</div>')+
+    (cp.length ? '<div class="br-content">'+cp.map(function(p){ return '<span class="'+(p.done >= p.n ? 'is-hit' : '')+'"><b>'+p.done+'/'+p.n+'</b> '+(p.role==='business' ? 'business' : 'personal')+' videos '+p.label+'</span>'; }).join('')+'</div>' : '')));
+  if(todayCol) todayCol.push(todayP); else colA.splice(1, 0, todayP);
   // the world: one panel of headlines (the news and tech, mixed), and one just for sports.
   // While they're loading, a placeholder holds their place so nothing moves when they land.
   const sec = (ui.morningNews && ui.morningNews.sec) || {}, newsWait = morningNewsOn() && ui.morningNews && ui.morningNews.loading;
@@ -416,20 +462,18 @@ function wakeBriefHtml(){
   const heads = news ? mixHeadlines(news, arr(sec.tech)) : [];
   if(heads.length){
     const lt = late();
-    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there.', '<div class="br-k">&#128240; Headlines</div>'+heads.map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : ''); }).join(''), lt));
+    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there.', '<div class="br-k">&#128240; Headlines</div>'+heads.slice(0, 4).map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : ''); }).join(''), lt));
   } else if(newsWait) colC.push(waitHtml('br-news', '&#128240; Headlines'));
   if(morningNewsOn() && newsSections().some(function(x){ return x.id==='sports'; })){
-    const sc = typeof scoresHtml==='function' ? scoresHtml() : '', sh = arr(sec.sports);
+    // (on a narrower screen sports shares a column with the headlines: fewer rows, no sports stories)
+    const roomy = window.innerWidth >= 1680;
+    const sc = typeof scoresHtml==='function' ? scoresHtml(roomy ? 3 : 2, roomy ? 3 : 1) : '', sh = arr(sec.sports).slice(0, roomy || !sc ? 6 : 0);
     if(sc || sh.length){
       const lt = late();
-      colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports</div>'+sc+sh.slice(0, sc ? 3 : 6).map(function(n){ return item(n, false); }).join(''), lt));
+      colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports</div>'+sc+sh.slice(0, sc ? 2 : 6).map(function(n){ return item(n, false); }).join(''), lt));
     } else if(newsWait || (ui.scores && ui.scores.loading)) colD.push(waitHtml('br-sports', '&#127936; Sports'));
     else colD.push(panel('br-sports', 'br-a-rise', '', '<div class="br-k">&#127936; Sports</div><div class="br-sports-none">No games on the board right now. Ask the Operator for sports — it goes and gets them.</div>'));
   }
-  // the day ahead — just the calendar; the work plan waits for the business preview
-  colB.push(panel('br-day', 'br-a-right', events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.',
-    '<div class="br-k">&#128197; Today</div>'+
-    (events.length ? '<div class="br-agenda">'+events.slice(0, 3).map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b>'+escapeHtml(e.title)+'</div>'; }).join('')+'</div>' : '<div class="br-day-plan">Nothing scheduled. Enjoy the morning.</div>')));
   const ctaD = tcur;
   lines.push({at: ctaD - 380, text: 'Get ready to start your day.'});
   ui.briefLines = lines;
@@ -488,15 +532,10 @@ function briefVoiceRun(){
     // a word at a time, at a calm reading pace (it used to type letter by letter, too fast)
     const words = cur ? cur.text.split(' ') : [];
     const txt = cur ? (ui.briefSkipped ? cur.text : words.slice(0, Math.max(0, Math.floor((t - cur.at)/BRIEF_WORD_MS) + 1)).join(' ')) : '';
-    if(el.textContent!==txt) el.textContent = txt;
+    if(typeof capSet==='function') capSet(el, txt); else if(el.textContent!==txt) el.textContent = txt;
     const wrap = el.parentNode; if(wrap) wrap.classList.toggle('is-typing', !!cur && txt.length < cur.text.length);
-    // as the narration reaches each piece, bring it into view if it's below the fold
-    const idx = cur ? lines.indexOf(cur) : -1;
-    if(idx>0 && idx!==ui.briefLineSeen && !ui.briefSkipped){
-      ui.briefLineSeen = idx;
-      const target = document.querySelector('#wakeContent .br-p[data-k="'+idx+'"]');
-      if(target) setTimeout(function(){ target.scrollIntoView({block:'nearest', behavior:'smooth'}); }, 400);
-    }
+    // (it used to scroll each piece into view as it arrived — that's what made the page slide near the
+    // end; the page fits the screen now and stays put)
   }, 120);
 }
 // shows the whole page at once (no narration build-up) — used by tests

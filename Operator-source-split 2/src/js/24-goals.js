@@ -11,12 +11,14 @@ const GOAL_TRACKERS = {
   workouts: {icon:'&#127947;&#65039;', label:'Workouts', unit:'workouts', src:'from Health → Workouts', periods:true, name:function(g){ return fmtGoalNum(g.target)+' workouts '+goalPeriodLabel(g); }},
   hours:    {icon:'&#9201;&#65039;', label:'Hours of deep work', unit:'h', src:'from your locked-in sessions', periods:true, name:function(g){ return fmtGoalNum(g.target)+'h of deep work '+goalPeriodLabel(g); }},
   streak:   {icon:'&#128293;', label:'Days in a row', unit:'days', src:'from your Today\'s Standard streak', name:function(g){ return fmtGoalNum(g.target)+'-day streak'; }},
-  clients:  {icon:'&#129309;', label:'Active clients', unit:'clients', src:'from Business → Clients', name:function(g){ return fmtGoalNum(g.target)+' active clients'; }}
+  clients:  {icon:'&#129309;', label:'Active clients', unit:'clients', src:'from Business → Clients', name:function(g){ return fmtGoalNum(g.target)+' active clients'; }},
+  // your peak: real, locked-in work a day on average (the last two weeks) — never "done", always the bar
+  avghours: {icon:'&#9201;&#65039;', label:'Average hours a day', unit:'h/day', src:'from your locked-in time, averaged over the last two weeks', ongoing:true, name:function(g){ return fmtGoalNum(g.target)+'h a day, on average'; }}
 };
-const GOAL_KINDS = ['mrr', 'weight', 'workouts', 'hours', 'streak', 'clients', 'custom'];
+const GOAL_KINDS = ['mrr', 'weight', 'workouts', 'hours', 'avghours', 'streak', 'clients', 'custom'];
 function goalTracker(g){ return g && g.autoTrack ? GOAL_TRACKERS[g.autoTrack] || null : null; }
 function goalPeriodLabel(g){ return g.period==='week' ? 'a week' : g.period==='month' ? 'a month' : 'in total'; }
-function goalIsPeriodic(g){ const t = goalTracker(g); return !!(t && t.periods && (g.period==='week' || g.period==='month')); }
+function goalIsPeriodic(g){ const t = goalTracker(g); return !!(t && (t.ongoing || (t.periods && (g.period==='week' || g.period==='month')))); }
 function goalRange(g){
   const today = todayStr();
   if(g.period==='week') return [startOfWeekStr(today), today];
@@ -44,6 +46,7 @@ function goalLiveCurrentRaw(g){
     case 'streak': return computeStreak();
     case 'mrr': return activeMrr();
     case 'clients': return arr(state.business.clients).filter(function(c){ return c.status==='active'; }).length;
+    case 'avghours': return typeof avgWorkMinutes==='function' ? Math.round(avgWorkMinutes(14)/6)/10 : 0;
     case 'weight': return latestWeight();
     case 'workouts': { const r = goalRange(g); return sumOverDays(r[0], r[1], function(d){ return workoutDay(d).n; }); }
     case 'hours': { const r = goalRange(g); const today = todayStr(); return Math.round(sumOverDays(r[0], r[1], function(d){ return d===today ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); })/6)/10; }
@@ -100,7 +103,7 @@ function goalFieldsHtml(prefix, kind, g){
   g = g || {};
   const t = GOAL_TRACKERS[kind];
   const v = function(x){ return x!=null && x!=='' ? escapeHtml(String(x)) : ''; };
-  const placeholder = {mrr:String(state.profile.revenueGoalMonthly||10000), weight:String(state.profile.goalWeight||180), workouts:String(state.profile.weeklyWorkoutTarget||4), hours:'20', streak:'30', clients:'10', custom:'10000'}[kind];
+  const placeholder = {mrr:String(state.profile.revenueGoalMonthly||10000), weight:String(state.profile.goalWeight||180), workouts:String(state.profile.weeklyWorkoutTarget||4), hours:'20', avghours:String(Math.round((state.standards.avgHoursTargetMinutes||480)/60)), streak:'30', clients:'10', custom:'10000'}[kind];
   return '<div class="grid grid-3" style="margin-top:12px;">'+
       '<div class="field"><label>Target'+(t ? ' ('+t.unit+')' : '')+'</label><input class="input" type="number" step="any" id="'+prefix+'Target" value="'+v(g.target)+'" placeholder="'+placeholder+'"></div>'+
       (t && t.periods
@@ -118,6 +121,7 @@ function goalNowText(kind){
   if(kind==='weight'){ const w = latestWeight(); return w!=null ? w+' lbs' : 'log your weight'; }
   if(kind==='streak') return computeStreak()+' days';
   if(kind==='clients') return arr(state.business.clients).filter(function(c){ return c.status==='active'; }).length+' active';
+  if(kind==='avghours') return (typeof avgWorkMinutes==='function' ? fmtHours(Math.round(avgWorkMinutes(14))) : '0h')+' a day lately';
   return '';
 }
 function readGoalFields(prefix, kind){
@@ -172,6 +176,8 @@ ACTIONS.newGoalKind = function(el, e, id){ ui.newGoalKind = id; renderView(); };
 function addGoal(){
   const f = readGoalFields('newGoal', 'custom');
   if(!f.label){ showToast('Give it a name — e.g. 10k IG followers.', {icon:'&#127919;'}); return; }
+  // every goal is a number — even "launch the site" is 1 of 1 — so it can be measured
+  if(!(f.target > 0)){ showToast('Give it a number to hit — e.g. 10000 followers, or 1 for a one-time thing.', {icon:'&#127919;'}); const el = document.getElementById('newGoalTarget'); if(el) el.focus(); return; }
   createGoal(f);
 }
 function createGoal(f){
@@ -189,6 +195,7 @@ function goalSuggestions(){
   if(!has('mrr') && state.profile.revenueGoalMonthly) out.push({autoTrack:'mrr', target:state.profile.revenueGoalMonthly, unit:'$/mo'});
   if(!has('weight') && state.profile.goalWeight) out.push({autoTrack:'weight', target:state.profile.goalWeight, unit:'lbs'});
   if(!has('workouts') && state.profile.weeklyWorkoutTarget) out.push({autoTrack:'workouts', target:state.profile.weeklyWorkoutTarget, period:'week', unit:'workouts'});
+  if(!has('avghours')) out.unshift({autoTrack:'avghours', target:Math.round((state.standards.avgHoursTargetMinutes||480)/6)/10, unit:'h/day'});
   if(!has('hours')) out.push({autoTrack:'hours', target:Math.round((state.standards.deepWorkTargetMinutes||180)*5/60), period:'week', unit:'h'});
   if(!has('streak')) out.push({autoTrack:'streak', target:30, unit:'days'});
   return out;

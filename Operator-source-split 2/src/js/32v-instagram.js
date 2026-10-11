@@ -57,6 +57,71 @@ function igPostsByRole(role, days){
   return n;
 }
 
+// ---- Meta Ads (Ads Manager, read-only): what you spent, what it got you — same token ----
+function adsCfg(){ const c = igCfg(); if(!Array.isArray(c.ads)) c.ads = []; return c; }
+function adsOn(){ return adsCfg().ads.length > 0; }
+async function adsFindAccounts(){
+  const j = await igApi('/me/adaccounts?fields=name,account_id,currency,account_status&limit=50');
+  return (j.data || []).map(function(a){ return {id:'act_'+a.account_id, name:a.name || ('Ad account '+a.account_id), currency:a.currency || 'USD', active:a.account_status===1}; });
+}
+// "results": the action that matters most for an agency — leads, then messages, then link clicks
+const ADS_RESULT = [['lead', 'leads'], ['onsite_conversion.lead_grouped', 'leads'], ['onsite_conversion.messaging_conversation_started_7d', 'conversations'], ['purchase', 'purchases'], ['link_click', 'link clicks']];
+function adsResult(actions){ const as = arr(actions); for(const r of ADS_RESULT){ const a = as.find(function(x){ return x.action_type===r[0]; }); if(a) return {n:Number(a.value)||0, label:r[1]}; } return null; }
+async function adsLoad(acc){
+  const f = 'spend,impressions,reach,clicks,ctr,cpc,cpm,actions';
+  const sum = await igApi('/'+acc.id+'/insights?fields='+f+'&date_preset=last_30d');
+  const days = await igApi('/'+acc.id+'/insights?fields=spend,clicks&date_preset=last_30d&time_increment=1&limit=40');
+  const camps = await igApi('/'+acc.id+'/insights?level=campaign&fields=campaign_name,spend,impressions,clicks,ctr,actions&date_preset=last_30d&limit=8');
+  const s0 = (sum.data || [])[0] || {};
+  return {s:{spend:Number(s0.spend)||0, impressions:Number(s0.impressions)||0, reach:Number(s0.reach)||0, clicks:Number(s0.clicks)||0, ctr:Number(s0.ctr)||0, cpc:Number(s0.cpc)||0, cpm:Number(s0.cpm)||0, result:adsResult(s0.actions)},
+    days:(days.data || []).map(function(d){ return {date:d.date_start, spend:Number(d.spend)||0}; }),
+    camps:(camps.data || []).map(function(c){ return {name:c.campaign_name, spend:Number(c.spend)||0, clicks:Number(c.clicks)||0, ctr:Number(c.ctr)||0, result:adsResult(c.actions)}; }).sort(function(a, b){ return b.spend - a.spend; })};
+}
+async function adsRefresh(quiet){
+  const c = adsCfg(); if(!c.ads.length || ui.adsLoading) return;
+  ui.adsLoading = true; ui.adsErr = null; if(!quiet) renderView();
+  try{ const data = {}; for(const a of c.ads){ data[a.id] = await adsLoad(a); } c.adsCache = {at:Date.now(), data:data}; persist('settings'); }
+  catch(e){ ui.adsErr = e.message; }
+  ui.adsLoading = false; renderView();
+}
+ACTIONS.adsFind = async function(){ ui.adsErr = null; try{ ui.adsFound = await adsFindAccounts(); if(!ui.adsFound.length) ui.adsErr = 'No ad accounts on this token — give it the ads_read permission and access to your ad account.'; }catch(e){ ui.adsErr = e.message; } renderView(); };
+ACTIONS.adsAdd = function(el, e, id){
+  const c = adsCfg(), a = (ui.adsFound || []).find(function(x){ return x.id===id; }); if(!a) return;
+  if(c.ads.some(function(x){ return x.id===id; })) c.ads = c.ads.filter(function(x){ return x.id!==id; }); else c.ads.push({id:a.id, name:a.name, currency:a.currency});
+  persist('settings'); renderView(); if(c.ads.length) adsRefresh(true);
+};
+ACTIONS.adsRefresh = function(){ adsRefresh(); };
+function adsMoney(v, cur){ try{ return Number(v).toLocaleString(undefined, {style:'currency', currency:cur||'USD', maximumFractionDigits: v < 100 ? 2 : 0}); }catch(e){ return '$'+Number(v).toFixed(2); } }
+function adsSectionHtml(){
+  const c = adsCfg(); if(!c.ads.length) return '';
+  if(!c.adsCache || Date.now() - c.adsCache.at > 60*60000){ if(!ui.adsLoading && !ui.adsTried){ ui.adsTried = Date.now(); setTimeout(function(){ adsRefresh(true); }, 0); } }
+  if(!c.adsCache) return '<div class="ads-sec"><div class="gp-loading">'+(ui.adsErr ? '&#9888; '+escapeHtml(ui.adsErr)+' <button class="btn btn-ghost btn-sm" data-action="adsRefresh">Try again</button>' : 'Loading your ads…')+'</div></div>';
+  return '<div class="ads-sec">'+c.ads.map(function(a){
+    const d = c.adsCache.data[a.id]; if(!d) return '';
+    const s = d.s, top = Math.max.apply(null, d.days.map(function(x){ return x.spend; }).concat([1]));
+    const st = function(k, v){ return '<div class="ig-st"><b>'+v+'</b><span>'+k+'</span></div>'; };
+    return '<div class="ads-acct"><div class="ig-h"><span class="ads-ic">&#128226;</span><div><b>'+escapeHtml(a.name)+'</b><span class="ig-role">Meta Ads · last 30 days</span></div></div>'+
+      '<div class="ig-stats">'+st('spent', adsMoney(s.spend, a.currency))+(s.result ? st(s.result.label, s.result.n.toLocaleString()) : '')+(s.result && s.result.n ? st('per '+s.result.label.replace(/s$/, ''), adsMoney(s.spend/s.result.n, a.currency)) : '')+
+        st('reach', s.reach.toLocaleString())+st('clicks', s.clicks.toLocaleString())+st('CTR', s.ctr.toFixed(2)+'%')+st('CPM', adsMoney(s.cpm, a.currency))+'</div>'+
+      '<div class="ig-strip-k">Spend a day</div><div class="ads-bars">'+d.days.map(function(x){ return '<i title="'+escapeHtml(fmtDateShort(x.date))+': '+adsMoney(x.spend, a.currency)+'"><u style="height:'+(x.spend/top*100).toFixed(1)+'%"></u></i>'; }).join('')+'</div>'+
+      (d.camps.length ? '<div class="ads-camps">'+d.camps.slice(0, 6).map(function(k){ return '<div class="ads-camp"><span>'+escapeHtml(k.name)+'</span><b>'+adsMoney(k.spend, a.currency)+'</b><em>'+(k.result ? k.result.n.toLocaleString()+' '+k.result.label : k.clicks.toLocaleString()+' clicks')+' · '+k.ctr.toFixed(2)+'% CTR</em></div>'; }).join('')+'</div>' : '<div class="kpi-sub">No campaigns ran in the last 30 days.</div>')+
+    '</div>';
+  }).join('')+'<div class="ig-foot">Updated '+(typeof ghlAgo==='function' ? ghlAgo(c.adsCache.at) : new Date(c.adsCache.at).toLocaleTimeString())+' <button class="btn btn-ghost btn-sm" data-action="adsRefresh">'+(ui.adsLoading ? 'Refreshing…' : '&#8635; Refresh')+'</button></div></div>';
+}
+// the easy, lasting way in: one token from Meta Business Suite that sees your Page, Instagram and ad
+// account and never expires
+const META_HOWTO = [
+  ['Open Meta Business Suite settings', 'business.facebook.com/settings → <b>Users → System users</b> → <b>Add</b> (name it “Operator”, role Admin).'],
+  ['Give it your accounts', '<b>Assign assets</b>: your Facebook Page, your Instagram account and your ad account (view access is enough).'],
+  ['Make the token', '<b>Generate new token</b> → pick your app (no app yet? developers.facebook.com → My Apps → Create app → Business) → expiry <b>Never</b> → tick <b>instagram_basic, instagram_manage_insights, pages_show_list, pages_read_engagement, read_insights, ads_read, business_management</b>.'],
+  ['Paste it here', 'Connect, then <b>Find my accounts</b> and <b>Find ad accounts</b>. Mark each Instagram Business or Personal.']
+];
+function metaHowtoHtml(){
+  return '<details class="meta-how"'+(ui.metaHowOpen ? ' open' : '')+'><summary data-action="metaHowToggle">How to connect — about 5 minutes</summary><ol>'+META_HOWTO.map(function(s){ return '<li><b>'+s[0]+'.</b> '+s[1]+'</li>'; }).join('')+'</ol>'+
+    '<div class="op-set-help">A personal Instagram can’t be read by any app — switch it to a Creator account (free, Settings → Account type) and link it to a Page. Everything here is read-only: Operator can see, never post or spend.</div></details>';
+}
+ACTIONS.metaHowToggle = function(el, e){ e.preventDefault(); ui.metaHowOpen = !ui.metaHowOpen; renderView(); };
+
 // ---- Settings → Integrations ----
 function igSettingsHtml(){
   const c = igCfg();
@@ -64,12 +129,17 @@ function igSettingsHtml(){
   const acc = function(a){ return '<div class="ig-acc"><span class="ig-acc-n">@'+escapeHtml(a.username)+'</span>'+
     '<div class="seg-tabs" style="margin:0;">'+['business', 'personal'].map(function(r){ return '<button class="seg-tab'+(a.role===r?' active':'')+'" data-action="igRole" data-id="'+a.id+'" data-role="'+r+'">'+(r==='business' ? 'Business' : 'Personal')+'</button>'; }).join('')+'</div>'+
     '<button class="btn btn-ghost btn-sm" data-action="igDrop" data-id="'+a.id+'" title="Stop tracking it">&#10005;</button></div>'; };
-  return '<div class="card section ig-set"><div class="section-title">&#128247; Instagram'+tip('Followers and post stats straight from Instagram. Needs an Instagram Business or Creator account linked to a Facebook Page, and an access token from developers.facebook.com (Graph API Explorer → your app → permissions instagram_basic, instagram_manage_insights, pages_show_list, pages_read_engagement → Generate token, then extend it to a long-lived one). The token is saved by the Operator app on this Mac only.')+'</div>'+
+  return '<div class="card section ig-set"><div class="section-title">&#128247; Instagram &amp; Meta Ads'+tip('Followers and post stats straight from Instagram. Needs an Instagram Business or Creator account linked to a Facebook Page, and an access token from developers.facebook.com (Graph API Explorer → your app → permissions instagram_basic, instagram_manage_insights, pages_show_list, pages_read_engagement → Generate token, then extend it to a long-lived one). The token is saved by the Operator app on this Mac only.')+'</div>'+
     (ui.igHasKey ? '<div class="op-set-key"><span>&#128274; Token saved on this Mac</span><button class="btn btn-ghost btn-sm" data-action="igFind">'+(c.accounts.length ? 'Find accounts again' : 'Find my accounts')+'</button><button class="btn btn-ghost btn-sm" data-action="igForget">Remove</button></div>'
       : '<div class="op-set-key"><input class="input" type="password" id="igToken" placeholder="Instagram / Meta access token" autocomplete="off"><button class="btn btn-sm btn-primary" data-action="igSave">Connect</button></div>')+
     (ui.igFound && ui.igFound.length ? '<div class="ig-found">'+ui.igFound.map(function(a){ const on = c.accounts.some(function(x){ return x.id===a.id; }); return '<button class="btn btn-sm'+(on?' btn-primary':'')+'" data-action="igAdd" data-id="'+a.id+'">'+(on ? '&#10003; ' : '+ ')+'@'+escapeHtml(a.username)+'</button>'; }).join('')+'</div>' : '')+
     (c.accounts.length ? '<div class="ig-accs">'+c.accounts.map(acc).join('')+'</div><div class="op-set-help">Business posts count as business content on your card, personal posts as personal content.</div>' : '')+
-    (ui.igErr ? '<div class="op-set-warn">&#9888; '+escapeHtml(ui.igErr)+'</div>' : '')+'</div>';
+    (ui.igErr ? '<div class="op-set-warn">&#9888; '+escapeHtml(ui.igErr)+'</div>' : '')+
+    (ui.igHasKey ? '<div class="ads-set"><div class="row" style="gap:8px;align-items:center;"><b style="font-size:13px;">Ad accounts</b><button class="btn btn-ghost btn-sm" data-action="adsFind">Find ad accounts</button></div>'+
+      (ui.adsFound && ui.adsFound.length ? '<div class="ig-found">'+ui.adsFound.map(function(a){ const on = adsCfg().ads.some(function(x){ return x.id===a.id; }); return '<button class="btn btn-sm'+(on?' btn-primary':'')+'" data-action="adsAdd" data-id="'+a.id+'">'+(on ? '&#10003; ' : '+ ')+escapeHtml(a.name)+'</button>'; }).join('')+'</div>' : '')+
+      (adsCfg().ads.length && !(ui.adsFound && ui.adsFound.length) ? '<div class="kpi-sub">'+adsCfg().ads.map(function(a){ return escapeHtml(a.name); }).join(', ')+'</div>' : '')+
+      (ui.adsErr ? '<div class="op-set-warn">&#9888; '+escapeHtml(ui.adsErr)+'</div>' : '')+'</div>' : '')+
+    metaHowtoHtml()+'</div>';
 }
 ACTIONS.igSave = function(){
   const i = document.getElementById('igToken'), v = i ? i.value.trim() : '';
@@ -101,7 +171,7 @@ ACTIONS.igConnect = function(){ ui.view = 'settings'; ui.settingsTab = 'integrat
 // ---- the Social page: Instagram up top ----
 function igSectionHtml(){
   const c = igCfg();
-  if(!igOn()) return '<div class="ig-connect"><div class="ig-connect-i">&#128247;</div><div><b>Connect Instagram</b><span>Followers, every post’s likes, comments and reach — and your business and personal posts counted on your card by themselves.</span></div><button class="btn btn-primary btn-sm" data-action="igConnect">Connect</button></div>';
+  if(!igOn()) return '<div class="ig-connect"><div class="ig-connect-i">&#128247;</div><div><b>Connect Instagram &amp; Meta Ads</b><span>Followers, every post’s likes, comments and reach, and what your ads spent and brought in — one token from Meta Business Suite, read-only.</span></div><button class="btn btn-primary btn-sm" data-action="igConnect">Connect</button></div>';
   igMaybeRefresh();
   if(!c.cache) return '<div class="ig-sec"><div class="gp-loading">'+(ui.igErr ? '&#9888; '+escapeHtml(ui.igErr)+' <button class="btn btn-ghost btn-sm" data-action="igRefresh">Try again</button>' : 'Loading your Instagram…')+'</div></div>';
   const since30 = addDays(todayStr(), -30), today = todayStr();

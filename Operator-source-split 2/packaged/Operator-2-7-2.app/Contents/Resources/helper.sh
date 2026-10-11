@@ -48,11 +48,19 @@ tts_file() { # engine, voice, text
       F="$TTS_DIR/$H.mp3"; [ -s "$F" ] && { echo "$F"; return; }
       [ -s "$TTS_KEY_FILE" ] || return
       case "$V" in ''|*[!0-9a-zA-Z]*) V=JBFqnCBsd6RMkjVDRZzb ;; esac
-      BODY="{\"text\":\"$(je "$T")\",\"model_id\":\"eleven_multilingual_v2\",\"voice_settings\":{\"stability\":0.45,\"similarity_boost\":0.8,\"style\":0.15}}"
+      BODY="{\"text\":\"$(je "$T")\",\"model_id\":\"eleven_multilingual_v2\",\"voice_settings\":{\"stability\":0.45,\"similarity_boost\":0.8,\"style\":0.15,\"speed\":1.06}}"
       CODE=$(curl -s --max-time 25 -o "$F.part" -w '%{http_code}' -X POST -H "xi-api-key: $(cat "$TTS_KEY_FILE")" \
         -H "Content-Type: application/json" -H "Accept: audio/mpeg" --data "$BODY" \
         "https://api.elevenlabs.io/v1/text-to-speech/$V?output_format=mp3_44100_128" 2>/dev/null)
-      if [ "$CODE" = "200" ] && [ -s "$F.part" ]; then mv "$F.part" "$F"; echo "$F"; else rm -f "$F.part"; fi ;;
+      if [ "$CODE" = "200" ] && [ -s "$F.part" ]; then mv "$F.part" "$F"; rm -f "$TTS_DIR/last.err"; echo "$F"
+      else
+        # keep ElevenLabs' own reason (bad key, missing permission, out of credits…) for the page to show
+        M=$(sed -n 's/.*"message" *: *"\([^"]*\)".*/\1/p' "$F.part" 2>/dev/null | head -1)
+        [ -z "$M" ] && M=$(sed -n 's/.*"status" *: *"\([^"]*\)".*/\1/p' "$F.part" 2>/dev/null | head -1)
+        [ -z "$M" ] && M=$(sed -n 's/.*"detail" *: *"\([^"]*\)".*/\1/p' "$F.part" 2>/dev/null | head -1)
+        printf '%s\t%s' "$CODE" "$M" > "$TTS_DIR/last.err" 2>/dev/null
+        rm -f "$F.part"
+      fi ;;
     *)
       F="$TTS_DIR/$H.wav"; [ -s "$F" ] && { echo "$F"; return; }
       A="$TTS_DIR/$H.aiff"; TF="$TTS_DIR/$H.txt"
@@ -82,7 +90,8 @@ wake_front() {
   caffeinate -u -t 5 >/dev/null 2>&1 &
   # an alarm nobody can hear is no alarm: unmute, and bring a very low volume up
   osascript -e 'set v to output volume of (get volume settings)' -e 'if v < 35 then set volume output volume 50' -e 'set volume without output muted' >/dev/null 2>&1
-  [ -n "$CHROME_PID" ] && osascript -e "tell application \"System Events\" to set frontmost of (first process whose unix id is $CHROME_PID) to true" >/dev/null 2>&1
+  WP="$CHROME_PID"; [ -z "$WP" ] && WP=$(cat "$DATA_DIR/window.pid" 2>/dev/null)
+  case "$WP" in ''|*[!0-9]*) ;; *) osascript -e "tell application \"System Events\" to set frontmost of (first process whose unix id is $WP) to true" >/dev/null 2>&1 ;; esac
 }
 kill_music_jobs() {
   for f in "$RAMP_PID_FILE" "$FALLBACK_PID_FILE" "$FINISH_PID_FILE"; do
@@ -231,6 +240,10 @@ operator_pid() {
   done
 }
 # real macOS full screen for the window (needs Accessibility permission for Operator once)
+window_is_full() {
+  P=$(operator_pid); [ -z "$P" ] && return 1
+  [ "$(osascript -e "tell application \"System Events\" to tell (first process whose unix id is $P) to get value of attribute \"AXFullScreen\" of window 1" 2>/dev/null)" = "true" ]
+}
 window_full() { # 1|0
   P=$(operator_pid); [ -z "$P" ] && { echo "no window"; return 1; }
   V=false; [ "$1" = "1" ] && V=true
@@ -295,6 +308,8 @@ wake_respond() {
       fi ;;
     /window/full*)
       F=$(param f); case "$F" in 1) ;; *) F=0 ;; esac
+      # already full screen (you put it there): say so, and the page won't undo it later
+      if [ "$F" = "1" ] && window_is_full; then respond 200 '{"ok":true,"already":true}'; return; fi
       ERR=$(window_full "$F")
       if [ -z "$ERR" ]; then respond 200 '{"ok":true}'
       else case "$ERR" in *ssistive*|*-1719*|*-25211*|*not\ allowed*) respond 403 '{"ok":false,"error":"accessibility"}' ;; *) respond 500 "{\"ok\":false,\"error\":\"$(je "$ERR")\"}" ;; esac; fi ;;
@@ -317,13 +332,27 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":10}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":11}' ;;
+    /hello*) printf 'open %s' "$(date +%s)" > "$DATA_DIR/page.state" 2>/dev/null; respond 200 '{"ok":true}' ;;
+    /engine*)
+      # Operator as its own app (its own Dock icon) or plain Chrome — from the next time it opens
+      O=$(param on)
+      case "$O" in 0) : > "$DATA_DIR/engine.off" ;; 1) rm -f "$DATA_DIR/engine.off" "$DATA_DIR/engine.failed" ;; esac
+      EO=true; [ -f "$DATA_DIR/engine.off" ] && EO=false
+      EF=false; [ -s "$DATA_DIR/engine.failed" ] && EF=true
+      respond 200 "{\"ok\":true,\"on\":$EO,\"failed\":$EF}" ;;
+    /bye*) printf 'closed %s' "$(date +%s)" > "$DATA_DIR/page.state" 2>/dev/null; respond 200 '{"ok":true}' ;;
     /tts/say*)
       E=$(param e); V=$(hexdec "$(param v)"); T=$(hexdec "$(param t)")
       if [ -z "$T" ]; then respond 400 '{"ok":false}'
       else
         F=$(tts_file "$E" "$V" "$T")
         if [ -n "$F" ]; then case "$F" in *.mp3) respond_file "$F" 'audio/mpeg' ;; *) respond_file "$F" 'audio/wav' ;; esac
+        elif [ "$E" = "eleven" ] && [ ! -s "$TTS_KEY_FILE" ]; then respond 401 '{"ok":false,"code":401,"error":"no key saved"}'
+        elif [ "$E" = "eleven" ] && [ -s "$TTS_DIR/last.err" ]; then
+          EC=$(cut -f1 "$TTS_DIR/last.err"); EM=$(cut -f2- "$TTS_DIR/last.err")
+          case "$EC" in ''|*[!0-9]*) EC=0 ;; esac
+          respond 502 "{\"ok\":false,\"code\":$EC,\"error\":\"$(je "$EM")\"}"
         else respond 502 '{"ok":false}'; fi
       fi ;;
     /tts/voices*) respond 200 "$(tts_voices)" ;;

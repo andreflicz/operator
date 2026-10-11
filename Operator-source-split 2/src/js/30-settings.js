@@ -11,6 +11,10 @@ function renderSettings(){
   const saveBtn = '<button class="btn btn-primary section" data-action="saveProfile">Save Changes</button>';
 
   const sections = {
+    operator: (typeof operatorSettingsHtml==='function' ? operatorSettingsHtml() : '')+
+      '<div class="card section"><div class="section-title">Links</div><div class="grid grid-2">'+
+        '<div class="field"><label>Open links in'+tip('Force Safari opens a new tab with a special link — the first time, choose “Always Allow” when macOS asks, and it\'ll stop needing a second click.')+'</label><select class="input" id="setLinkBrowser"><option value="default" '+((p.linkBrowser||'default')==='default'?'selected':'')+'>System Default</option><option value="safari" '+(p.linkBrowser==='safari'?'selected':'')+'>Force Safari</option></select></div>'+
+      '</div></div>'+saveBtn,
     integrations: ghlSettingsHtml()+(typeof igSettingsHtml==='function' ? igSettingsHtml() : ''),
     updates: '<div class="upd-panel">'+renderUpdatesTab()+'</div>',
     data: '<div class="section"><div class="section-title">Your Data'+tip(hasCloud ? 'Saved to your account — it follows you wherever you open Operator.' : 'Saved on this Mac in Operator\'s own storage — export a copy now and then as a backup.')+'</div><div class="card">'+
@@ -49,30 +53,18 @@ function renderSettings(){
           '</div>';
         }).join('')+'</div>'+
       '</div></div>'+
-      '<div class="section"><div class="section-title">Task Categories'+tip('Give task types their own color — shown as a left border on the card.')+'<div class="row"><input class="input" id="newTaskCatLabel" placeholder="e.g. Video Idea" style="width:160px;"><button class="btn btn-sm" data-action="addTaskCategory">Add</button></div></div>'+
-        '<div class="card">'+
-          '<div class="row" style="margin-bottom:10px;">'+SWATCHES.map(function(sw){ return '<span class="swatch'+(pickedSwatch===sw?' swatch-active':'')+'" style="background:'+sw+';" data-action="pickSwatch" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
-          '<div class="task-list">'+(arr(state.tasks.categories).map(function(c){ return '<div class="task-item-v2">'+
-            '<span class="swatch" style="background:'+c.color+';width:18px;height:18px;cursor:pointer;" data-action="cycleTaskCategoryColor" data-id="'+c.id+'" title="Click to change color"></span>'+
-            '<input class="input" data-task-cat-label="'+c.id+'" value="'+escapeHtml(c.label)+'" style="flex:1;max-width:220px;">'+
+      '',
 
-            deleteBtn('taskcat', c.id)+
-          '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
+    focus: '<div class="card section"><div class="section-title">Locking in</div><div class="grid grid-2">'+
+        '<div class="field"><label>Note field after finishing a task</label><select class="input" id="setFocusNote"><option value="on" '+(p.focusNotePromptEnabled!==false?'selected':'')+'>On</option><option value="off" '+(p.focusNotePromptEnabled===false?'selected':'')+'>Off</option></select></div>'+
+        '<div class="field"><label>Notify when a focus timer ends</label><select class="input" id="setNotifyEnd"><option value="on" '+(p.notifyOnFocusEnd!==false?'selected':'')+'>On</option><option value="off" '+(p.notifyOnFocusEnd===false?'selected':'')+'>Off</option></select></div>'+
+      '</div></div>'+
+      '<div class="section"><div class="section-title">Before-You-Start Reminders'+tip('Shown as a note before every focus session.')+'<div class="row"><input class="input" id="newPrepLabel" placeholder="e.g. Water bottle filled" style="width:200px;"><button class="btn btn-sm" data-action="addPrepItem">Add</button></div></div>'+
+        '<div class="card">'+
+        '<div class="task-list">'+(prepItems.map(function(item){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(item.label)+'</div>'+deleteBtn('prep', item.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet — add one above.</div>')+'</div>'+
         '</div>'+
       '</div>'+
-      '<div class="section"><div class="section-title">&#127916; Video Idea Types'+tip('Optional type tag shown on video idea cards.')+'<div class="row"><input class="input" id="newVideoTypeLabel" placeholder="e.g. Tutorial" style="width:160px;"><button class="btn btn-sm" data-action="addVideoType">Add</button></div></div>'+
-        '<div class="card">'+
-          '<div class="task-list">'+(arr(state.tasks.videoTypes).map(function(vt){ return '<div class="task-item-v2">'+
-            '<input class="input" data-video-type-label="'+vt.id+'" value="'+escapeHtml(vt.label)+'" style="flex:1;max-width:220px;">'+
-            deleteBtn('videotype', vt.id)+
-          '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
-        '</div>'+
-      '</div>'+
-      '<div class="card section"><div class="section-title">Links</div><div class="grid grid-2">'+
-        '<div class="field"><label>Open links in'+tip('Force Safari opens a new tab with a special link — the first time, choose “Always Allow” when macOS asks, and it\'ll stop needing a second click.')+'</label><select class="input" id="setLinkBrowser"><option value="default" '+((p.linkBrowser||'default')==='default'?'selected':'')+'>System Default</option><option value="safari" '+(p.linkBrowser==='safari'?'selected':'')+'>Force Safari</option></select></div>'+
-      '</div></div>'+saveBtn,
-
-    focus: '<div class="card section"><div class="section-title">App Tracking'+tip('Sees which app (and, in browsers, which website) is in front on this Mac — nothing leaves the machine.')+'</div><div class="grid grid-2">'+
+      '<div class="card section"><div class="section-title">App Tracking'+tip('Sees which app (and, in browsers, which website) is in front on this Mac — nothing leaves the machine.')+'</div><div class="grid grid-2">'+
         '<div class="field"><label>Track foreground app</label><select class="input" id="setAppTrackingEnabled"><option value="on" '+(state.settings.appTracking.enabled!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.enabled===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Auto lock-in when steady on work apps</label><select class="input" id="setAppTrackingAutoLockIn"><option value="on" '+(state.settings.appTracking.autoLockIn!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.autoLockIn===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Minutes on one app before auto lock-in</label><input class="input" type="number" min="3" max="120" id="setAppTrackingThreshold" value="'+state.settings.appTracking.thresholdMinutes+'"></div>'+
@@ -82,8 +74,13 @@ function renderSettings(){
         '<div class="field"><label>Day recap ready at'+tip('A small nudge at this time says your recap is ready — what you did, your work habits, and any sessions that started on their own. Open it any time from Today or Analytics.')+'</label><input class="input" type="time" id="setRecapTime" value="'+(state.settings.appTracking.recapTime||'21:30')+'"></div>'+
         '<div class="field"><label>Idle after (seconds without keyboard/mouse)'+tip('Idle time doesn\'t count toward auto lock-in or app time.')+'</label><input class="input" type="number" min="15" max="900" id="setAppTrackingIdle" value="'+state.settings.appTracking.idleSeconds+'"></div>'+
       '</div></div>'+saveBtn+
-      workAppsSettingsHtml()+
-      wakeSettingsCardHtml()+
+      workAppsSettingsHtml(),
+
+    morning: wakeSettingsCardHtml()+
+      '<div class="card section"><div class="section-title">Alarm Sound</div><div class="row">'+
+        ['standard','peaceful','loud'].map(function(s){ return '<button class="btn '+(p.alarmSound===s?'btn-primary':'')+' btn-sm" data-action="pickAlarmSound" data-sound="'+s+'">'+s[0].toUpperCase()+s.slice(1)+'</button>'; }).join('')+
+        '<button class="btn btn-ghost btn-sm" data-action="previewAlarmSound">Preview</button>'+
+      '</div></div>'+
       '<div class="card section" id="alarmsSettingsSection"><div class="section-title">Other alarms</div>'+
         '<div class="row" style="flex-wrap:wrap;align-items:flex-end;">'+
           '<div class="field" style="flex:1;min-width:160px;"><label>What?</label><input class="input" id="newAlarmLabel" placeholder="e.g. Kitchen closes"></div>'+
@@ -95,28 +92,19 @@ function renderSettings(){
           '<button class="btn btn-ghost btn-sm" data-action="requestNotifs">Enable Notifications</button>'+
           '<button class="btn btn-ghost btn-sm" data-action="testAlarmSound">Test Alarm Sound</button>'+
         '</div>'+
-      '</div>'+
-      '<div class="card section"><div class="section-title">Alarm Sound</div><div class="row">'+
-        ['standard','peaceful','loud'].map(function(s){ return '<button class="btn '+(p.alarmSound===s?'btn-primary':'')+' btn-sm" data-action="pickAlarmSound" data-sound="'+s+'">'+s[0].toUpperCase()+s.slice(1)+'</button>'; }).join('')+
-        '<button class="btn btn-ghost btn-sm" data-action="previewAlarmSound">Preview</button>'+
-      '</div></div>'+
-      '<div class="section"><div class="section-title">Before-You-Start Reminders'+tip('Shown as a note before every focus session.')+'<div class="row"><input class="input" id="newPrepLabel" placeholder="e.g. Water bottle filled" style="width:200px;"><button class="btn btn-sm" data-action="addPrepItem">Add</button></div></div>'+
-        '<div class="card">'+
-        '<div class="task-list">'+(prepItems.map(function(item){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(item.label)+'</div>'+deleteBtn('prep', item.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet — add one above.</div>')+'</div>'+
-        '</div>'+
-      '</div>'+
-      '',
+      '</div>',
 
     you: '<div class="card section"><div class="section-title">About you</div><div class="grid grid-2">'+
         '<div class="field"><label>Name</label><input class="input" id="setName" value="'+escapeHtml(p.name)+'"></div>'+
         '<div class="field"><label>Business name</label><input class="input" id="setBusinessName" value="'+escapeHtml(p.businessName||'')+'" placeholder="e.g. Rivera Media Co."></div>'+
       '</div></div>'+
-      '<div class="card section"><div class="section-title">Preferences</div><div class="grid grid-2">'+
-        '<div class="field"><label>Sound</label><button class="btn btn-ghost btn-sm" data-action="settingsTab" data-tab="sound" style="align-self:flex-start;">&#128266; Sound settings &rarr;</button></div>'+
-        '<div class="field"><label>Note field after finishing a task in Focus</label><select class="input" id="setFocusNote"><option value="on" '+(p.focusNotePromptEnabled!==false?'selected':'')+'>Enabled</option><option value="off" '+(p.focusNotePromptEnabled===false?'selected':'')+'>Disabled</option></select></div>'+
-        '<div class="field"><label>Notify when a focus timer ends</label><select class="input" id="setNotifyEnd"><option value="on" '+(p.notifyOnFocusEnd!==false?'selected':'')+'>On</option><option value="off" '+(p.notifyOnFocusEnd===false?'selected':'')+'>Off</option></select></div>'+
+      '<div class="card section"><div class="section-title">Body &amp; health</div><div class="grid grid-2">'+
+        '<div class="field"><label>Daily calorie target</label><input class="input" type="number" id="setCalories" value="'+p.calorieTarget+'"></div>'+
+        '<div class="field"><label>Goal weight</label><input class="input" type="number" step="0.1" id="setGoalWeight" value="'+(p.goalWeight!=null?p.goalWeight:'')+'"></div>'+
+        '<div class="field"><label>Height'+tip('For your Health rating: your BMI, and the healthy and obese lines for your height.')+'</label><div class="row" style="gap:6px;"><input class="input" type="number" min="3" max="8" id="setHeightFt" placeholder="ft" value="'+(p.heightIn ? Math.floor(p.heightIn/12) : '')+'" style="width:80px;"><input class="input" type="number" min="0" max="11" id="setHeightIn" placeholder="in" value="'+(p.heightIn ? p.heightIn%12 : '')+'" style="width:80px;"></div></div>'+
+        '<div class="field"><label>Weight now'+tip('Saves a weigh-in for today (it shows in Health and rates your body on your card).')+'</label><input class="input" type="number" step="0.1" id="setWeightNow" placeholder="lb" value="'+(function(){ const l = arr(state.health.weightLog).slice().sort(function(a, b){ return a.date.localeCompare(b.date); }); return l.length ? l[l.length-1].weight : ''; })()+'"></div>'+
+        '<div class="field"><label>Workout days per week (goal)</label><input class="input" type="number" id="setWeeklyWorkout" value="'+p.weeklyWorkoutTarget+'"></div>'+
       '</div></div>'+
-      wakeSettingsCardHtml()+
       '<div class="section"><div class="section-title">Why You\'re Doing This</div><div class="card"><div class="grid grid-2">'+
         '<div><div class="kind-label" style="color:var(--good);">Getting</div>'+
           '<div class="task-list">'+(toward.map(function(m){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(m.text)+'</div>'+deleteBtn('motivation', m.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
@@ -126,19 +114,20 @@ function renderSettings(){
           '<div class="task-list">'+(away.map(function(m){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(m.text)+'</div>'+deleteBtn('motivation', m.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
           '<div class="row" style="margin-top:8px;"><input class="input" id="newMotivAway" placeholder="e.g. More debt" style="flex:1;min-width:100px;"><button class="btn btn-sm" data-action="addMotivation" data-kind="away">Add</button></div>'+
         '</div>'+
-      '</div></div></div>'+
-      '<div class="card section"><div class="section-title">Targets — health &amp; deep work</div><div class="grid grid-2">'+
-        '<div class="field"><label>Daily calorie target</label><input class="input" type="number" id="setCalories" value="'+p.calorieTarget+'"></div>'+
-        '<div class="field"><label>Goal weight</label><input class="input" type="number" step="0.1" id="setGoalWeight" value="'+(p.goalWeight!=null?p.goalWeight:'')+'"></div>'+
-        '<div class="field"><label>Height'+tip('For your Health rating: your BMI, and the healthy and obese lines for your height.')+'</label><div class="row" style="gap:6px;"><input class="input" type="number" min="3" max="8" id="setHeightFt" placeholder="ft" value="'+(p.heightIn ? Math.floor(p.heightIn/12) : '')+'" style="width:80px;"><input class="input" type="number" min="0" max="11" id="setHeightIn" placeholder="in" value="'+(p.heightIn ? p.heightIn%12 : '')+'" style="width:80px;"></div></div>'+
-        '<div class="field"><label>Weight now'+tip('Saves a weigh-in for today (it shows in Health and rates your body on your card).')+'</label><input class="input" type="number" step="0.1" id="setWeightNow" placeholder="lb" value="'+(function(){ const l = arr(state.health.weightLog).slice().sort(function(a, b){ return a.date.localeCompare(b.date); }); return l.length ? l[l.length-1].weight : ''; })()+'"></div>'+
-        '<div class="field"><label>Workout days per week (goal)</label><input class="input" type="number" id="setWeeklyWorkout" value="'+p.weeklyWorkoutTarget+'"></div>'+
+      '</div></div></div>'+saveBtn,
+
+    standards: '<div class="card section"><div class="section-title">Work'+tip('What a good day of work looks like. The deep work target is what a day needs for your streak; the average is the master goal you\'re building toward — 8 hours of real work a day at your peak.')+'</div><div class="grid grid-2">'+
         '<div class="field"><label>Deep work target per day</label><select class="input" id="setDeepWorkTarget">'+deepWorkOptions.map(function(m){ return '<option value="'+m+'" '+(state.standards.deepWorkTargetMinutes===m?'selected':'')+'>'+fmtDurationLabel(m)+'</option>'; }).join('')+'</select></div>'+
+        '<div class="field"><label>Average hours a day (master goal)'+tip('Your peak: the average of real, locked-in work a day over the last two weeks. It\'s a master goal on Personal → Goals and what “Locking in” on your card is rated against.')+'</label><select class="input" id="setAvgHoursTarget">'+[240,300,360,420,480,540,600].map(function(m){ return '<option value="'+m+'" '+(state.standards.avgHoursTargetMinutes===m?'selected':'')+'>'+fmtDurationLabel(m)+'</option>'; }).join('')+'</select></div>'+
+        '<div class="field"><label>New clients a month'+tip('What “Client growth” on your card is rated against: landing this many every month, month after month.')+'</label><input class="input" type="number" min="1" max="30" id="setNewClientsPerMonth" value="'+state.standards.newClientsPerMonth+'"></div>'+
+      '</div></div>'+
+      '<div class="card section"><div class="section-title">Content'+tip('How many videos you want out. A content task counts the moment you finish it — the Content tab, Good morning and your card all measure against these.')+'</div><div class="grid grid-2">'+
+        [['Business', 'business', 'Videos for the business — clients, ads, the agency.'], ['Personal', 'personal', 'Your own channel — you, your life, your story.']].map(function(x){ const label = x[0]+' videos', key = x[0], note = x[2], ct = state.standards.contentTargets[x[1]]; return ''+
+        '<div class="field"><label>'+label+tip(note)+'</label><div class="row" style="gap:6px;"><input class="input" type="number" min="0" max="50" id="setContent'+key+'N" value="'+ct.n+'" style="width:80px;"><select class="input" id="setContent'+key+'Per"><option value="day" '+(ct.per==='day'?'selected':'')+'>a day</option><option value="week" '+(ct.per==='week'?'selected':'')+'>a week</option></select></div></div>'; }).join('')+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Streak Rules</div><div class="grid grid-2">'+
         '<div class="field"><label>Days off allowed per week'+tip('More than this in any 7-day stretch turns the streak red.')+'</label><input class="input" type="number" min="0" max="6" id="setDaysOffAllowed" value="'+state.standards.daysOffAllowedPerWeek+'"></div>'+
-      '</div>'+
-      '</div>'+saveBtn+
+      '</div>'+'</div>'+saveBtn+
       '<div class="section"><div class="section-title">Daily Standard'+tip('These plus your deep work target must be done for a day to count toward the streak.')+'<div class="row"><input class="input" id="newStandardLabel" placeholder="e.g. Read for 10 minutes" style="width:200px;"><button class="btn btn-sm" data-action="addStandardItem">Add</button></div></div>'+
         '<div class="card">'+
         '<div class="task-list">'+(standardItems.map(function(it){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(it.label)+'</div>'+deleteBtn('standard', it.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet — add one above.</div>')+'</div>'+
@@ -148,7 +137,26 @@ function renderSettings(){
     business: '<div class="card section"><div class="section-title">Business Info</div><div class="grid grid-2">'+
         '<div class="field"><label>Monthly revenue goal</label><input class="input" type="number" id="setRevGoal" value="'+p.revenueGoalMonthly+'"></div>'+
       '</div>'+
-      '</div>'+saveBtn+renderCrmSettings(),
+      '</div>'+saveBtn+renderCrmSettings()+
+      '<div class="section"><div class="section-title">Task Categories'+tip('Give task types their own color — shown as a left border on the card.')+'<div class="row"><input class="input" id="newTaskCatLabel" placeholder="e.g. Video Idea" style="width:160px;"><button class="btn btn-sm" data-action="addTaskCategory">Add</button></div></div>'+
+        '<div class="card">'+
+          '<div class="row" style="margin-bottom:10px;">'+SWATCHES.map(function(sw){ return '<span class="swatch'+(pickedSwatch===sw?' swatch-active':'')+'" style="background:'+sw+';" data-action="pickSwatch" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
+          '<div class="task-list">'+(arr(state.tasks.categories).map(function(c){ return '<div class="task-item-v2">'+
+            '<span class="swatch" style="background:'+c.color+';width:18px;height:18px;cursor:pointer;" data-action="cycleTaskCategoryColor" data-id="'+c.id+'" title="Click to change color"></span>'+
+            '<input class="input" data-task-cat-label="'+c.id+'" value="'+escapeHtml(c.label)+'" style="flex:1;max-width:220px;">'+
+
+            deleteBtn('taskcat', c.id)+
+          '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="section"><div class="section-title">&#127916; Content Types'+tip('Optional type tag on content cards (e.g. Tutorial, Vlog, Ad).')+'<div class="row"><input class="input" id="newVideoTypeLabel" placeholder="e.g. Tutorial" style="width:160px;"><button class="btn btn-sm" data-action="addVideoType">Add</button></div></div>'+
+        '<div class="card">'+
+          '<div class="task-list">'+(arr(state.tasks.videoTypes).map(function(vt){ return '<div class="task-item-v2">'+
+            '<input class="input" data-video-type-label="'+vt.id+'" value="'+escapeHtml(vt.label)+'" style="flex:1;max-width:220px;">'+
+            deleteBtn('videotype', vt.id)+
+          '</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
+        '</div>'+
+      '</div>',
 
     calendarJournal: '<div class="section"><div class="section-title">Calendar Categories'+tip('Rename a category by editing its label — it saves automatically. Deleting one that\'s still in use re-labels those events as “Other”. Auto-alarm rings at the start of every event in that category.')+'<div class="row"><input class="input" id="newCatLabel" placeholder="e.g. Client call" style="width:160px;"><button class="btn btn-sm" data-action="addCalCategory">Add</button></div></div>'+
         '<div class="card">'+
@@ -176,15 +184,18 @@ function renderSettings(){
   };
   sections.sound = soundSettingsHtml();
   // five places instead of nine: related settings live together, each part under its own heading
+  // each thing in one obvious place: who you are, what you're aiming for, how you work, your
+  // mornings, how it looks, the business, and what Operator connects to
   const groups = [
     {id:'you', label:'You', icon:'&#128100;', parts:[['you','']]},
+    {id:'standards', label:'Goals & Standards', icon:'&#127919;', parts:[['standards','']]},
+    {id:'focus', label:'Focus & Lock in', icon:'&#9201;', parts:[['focus','']]},
+    {id:'morning', label:'Morning & Alarms', icon:'&#9200;', parts:[['morning','']]},
     {id:'look', label:'Look & Sound', icon:'&#127912;', parts:[['display','Appearance'],['sound','Sound']]},
-    {id:'focus', label:'Focus & Alarms', icon:'&#9201;', parts:[['focus','']]},
     {id:'work', label:'Business & Calendar', icon:'&#9635;', parts:[['business','Business'],['calendarJournal','Calendar & journal']]},
-    {id:'system', label:'Connections & Data', icon:'&#128279;', parts:[['integrations','Integrations'],['data','Your data'],['updates','App updates']]}
+    {id:'system', label:'Connections & Data', icon:'&#128279;', parts:[['operator','The Operator'],['integrations','Integrations'],['data','Your data'],['updates','App updates']]}
   ];
-  // Standards and General (preferences) live under You
-  const want = (ui.settingsTab==='standards' || ui.settingsTab==='general') ? 'you' : (ui.settingsTab || 'you');
+  const want = ui.settingsTab==='general' ? 'you' : (ui.settingsTab || 'you');
   const grp = groups.find(function(g){ return g.id===want || g.parts.some(function(x){ return x[0]===want; }); }) || groups[0];
   const body = grp.parts.map(function(x){ return '<div class="set-part" id="setPart-'+x[0]+'">'+(grp.parts.length>1 ? '<div class="set-part-h">'+x[1]+'</div>' : '')+sections[x[0]]+'</div>'; }).join('');
   if(want!==grp.id && grp.parts[0][0]!==want){ const target = want; setTimeout(function(){ const el = document.getElementById('setPart-'+target); if(el) el.scrollIntoView({block:'start'}); }, 30); }
@@ -342,6 +353,12 @@ function saveProfile(){
   if(hf && hf.value!==''){ const tot = Number(hf.value)*12 + (Number(hi && hi.value)||0); state.profile.heightIn = tot >= 36 && tot <= 100 ? tot : state.profile.heightIn; }
   const wwEl = document.getElementById('setWeeklyWorkout'); if(wwEl) state.profile.weeklyWorkoutTarget = Number(wwEl.value)||5;
   const dwEl = document.getElementById('setDeepWorkTarget'); if(dwEl) state.standards.deepWorkTargetMinutes = Number(dwEl.value)||180;
+  const ahEl = document.getElementById('setAvgHoursTarget'); if(ahEl) state.standards.avgHoursTargetMinutes = Number(ahEl.value)||480;
+  const ncEl = document.getElementById('setNewClientsPerMonth'); if(ncEl) state.standards.newClientsPerMonth = clamp(Number(ncEl.value)||2, 1, 30);
+  ['Business', 'Personal'].forEach(function(k){
+    const n = document.getElementById('setContent'+k+'N'), per = document.getElementById('setContent'+k+'Per');
+    if(n) state.standards.contentTargets[k.toLowerCase()] = {n: clamp(Number(n.value)||0, 0, 50), per: per && per.value==='day' ? 'day' : 'week'};
+  });
   const doaEl = document.getElementById('setDaysOffAllowed'); if(doaEl) state.standards.daysOffAllowedPerWeek = clamp(Number(doaEl.value),0,6);
   const revEl = document.getElementById('setRevGoal'); if(revEl) state.profile.revenueGoalMonthly = Number(revEl.value)||0;
   const linkBrowserEl = document.getElementById('setLinkBrowser'); if(linkBrowserEl) state.profile.linkBrowser = linkBrowserEl.value;

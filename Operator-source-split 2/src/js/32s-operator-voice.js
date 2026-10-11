@@ -60,10 +60,18 @@ function speakable(t){
     .replace(/(\d+)h (\d+)m\b/g, '$1 hours $2 minutes').replace(/(\d+)h\b/g, '$1 hours').replace(/(\d+)m\b/g, '$1 minutes')
     .replace(/·/g, ',').replace(/\s+/g, ' ').trim();
 }
+// a caption that changes in place: the next line fades in over the last one (it used to blank out
+// and jump) — and the box it lives in never changes size
+function capSet(el, txt){
+  if(!el || el.textContent===txt) return;
+  const was = el.textContent;
+  el.textContent = txt;
+  if(txt && was && txt.indexOf(was)!==0){ el.classList.remove('cap-new'); void el.offsetWidth; el.classList.add('cap-new'); }
+}
 function opCaption(txt){
   if(OV.cap==='opBubText') opBubShow();
   const el = OV.cap ? document.getElementById(OV.cap) : null;
-  if(el && el.textContent!==txt) el.textContent = txt;
+  capSet(el, txt);
   if(OV.cap==='opBubText') opBubHideLater();
 }
 // ---- the Operator's bubble: what it says (and your reply box) floats over the page, bottom centre,
@@ -92,13 +100,27 @@ function opBubHideLater(){
   }, 9000);
 }
 ACTIONS.opBubClose = function(){ opStop(); const b = document.getElementById('opBub'); if(b) b.classList.remove('is-in'); };
+// when ElevenLabs turns a line down (key, plan, credits), the rest of the session uses the Mac's voice
+function opTtsEngine(){ const e = opEngine(); return e==='eleven' && OV.elevenErr ? 'mac' : e; }
+// ElevenLabs' own reason, said plainly
+function opElevenWhy(code, msg){
+  const m = String(msg||'').toLowerCase();
+  if(/no key saved/.test(m)) return 'no ElevenLabs key is saved yet — add it in Settings → Connections & data.';
+  if(/permission/.test(m)) return 'the ElevenLabs key doesn’t have Text to Speech turned on. At elevenlabs.io → Developers → API keys, edit the key and allow Text to Speech (or make a new key).';
+  if(code===402 || /paid|payment|subscription|library voice|upgrade/.test(m)) return 'that voice needs a paid ElevenLabs plan to use through the API (Voice Library voices do). Pick George, Daniel or Brian, or upgrade.';
+  if(code===429 || /quota|credit|limit/.test(m)) return 'your ElevenLabs credits for this month are used up'+(msg ? ' ('+msg+')' : '')+'.';
+  if(code===404 || /voice.*not.*found|not_found/.test(m)) return 'ElevenLabs can’t find that voice ID — check it at elevenlabs.io → Voices.';
+  if(code===401 || /invalid|unauthor|api.key/.test(m)) return 'ElevenLabs didn’t accept the key'+(msg ? ' ('+msg+')' : '')+'. Copy it again from elevenlabs.io → Developers → API keys.';
+  if(!code) return 'the Operator app couldn’t reach ElevenLabs — check the internet.';
+  return 'ElevenLabs said: '+(msg || 'error '+code)+'.';
+}
 function opTtsUrl(text){
-  const w = wakeCfg(), e = opEngine();
+  const w = wakeCfg(), e = opTtsEngine();
   return WAKE_HELPER+'tts/say?e='+e+'&v='+hexUtf8(e==='eleven' ? (w.elevenVoice||'') : (w.macVoice||''))+'&t='+hexUtf8(text);
 }
 // warm the next line up while this one is being said, so there's no gap between them
 function opPrefetch(text){ if(!opVoiceOn() || !opUseHelper()) return; try{ fetch(opTtsUrl(speakable(text))).catch(function(){}); }catch(e){} }
-function opStarted(tok, opts){ OV.pending = false; OV.speaking = true; if(opts.onstart) opts.onstart(); opCaption(''); document.body.classList.add('op-speaking'); }
+function opStarted(tok, opts){ OV.pending = false; OV.speaking = true; if(opts.onstart) opts.onstart(); document.body.classList.add('op-speaking'); }
 function opFinished(tok, said){ OV.pending = false; if(tok===OV.token){ OV.speaking = false; OV.audio = null; opCaption(said); document.body.classList.remove('op-speaking'); } }
 // say something; captions follow the words as they're spoken
 function opSay(text, opts){
@@ -111,34 +133,54 @@ function opSay(text, opts){
     else opVoicesReady().then(function(){ if(tok!==OV.token){ resolve(false); return; } opSayBrowser(said, opts, tok, resolve); });
   });
 }
-// through the Operator app: it hands back the spoken line as audio
+// through the Operator app: it hands back the spoken line as audio (fetched first, so if ElevenLabs
+// says no, we know why — and the Mac's voice takes over instead of silence)
 function opSayAudio(said, opts, tok, resolve){
-  const a = new Audio(opTtsUrl(said)), words = said.split(' ');
-  OV.audio = a;
-  let started = false, capT = null, settled = false;
-  const finish = function(ok){ if(settled) return; settled = true; clearTimeout(startT); clearInterval(capT); opFinished(tok, said); resolve(ok); };
-  // the app isn't there (or can't speak): this line and the rest of the session use the browser's voice
-  const fallBack = function(){
-    if(settled) return; settled = true; clearTimeout(startT);
-    try{ a.pause(); a.removeAttribute('src'); }catch(e){}
-    OV.helperDown = true; OV.audio = null;
-    if(tok!==OV.token || !opBrowserOk()){ OV.pending = false; resolve(false); return; }
+  const words = said.split(' '), eng = opTtsEngine();
+  let started = false, capT = null, settled = false, a = null, url = null;
+  const ctrl = typeof AbortController!=='undefined' ? new AbortController() : null;
+  const cleanup = function(){ clearTimeout(startT); clearInterval(capT); if(url){ try{ URL.revokeObjectURL(url); }catch(e){} url = null; } };
+  const finish = function(ok){ if(settled) return; settled = true; cleanup(); opFinished(tok, said); resolve(ok); };
+  // the app isn't there (or can't speak): this line goes to the next voice down
+  const fallBack = function(down){
+    if(settled) return; settled = true; cleanup();
+    try{ if(ctrl) ctrl.abort(); }catch(e){}
+    try{ if(a){ a.pause(); a.removeAttribute('src'); } }catch(e){}
+    OV.audio = null;
+    if(down) OV.helperDown = true;
+    if(tok!==OV.token){ OV.pending = false; resolve(false); return; }
+    // ElevenLabs said no but the app is fine: the Mac's own voice says it
+    if(!down && eng==="eleven" && OV.elevenErr){ opSayAudio(said, opts, tok, resolve); return; }
+    if(!opBrowserOk()){ OV.pending = false; resolve(false); return; }
     opVoicesReady().then(function(){ if(tok!==OV.token){ OV.pending = false; resolve(false); return; } opSayBrowser(said, opts, tok, resolve); });
   };
-  const startT = setTimeout(function(){ if(!started) fallBack(); }, opEngine()==='eleven' ? 15000 : 9000);
-  a.addEventListener('playing', function(){
-    if(started || settled) return; started = true; clearTimeout(startT);
-    if(tok!==OV.token){ try{ a.pause(); }catch(e){} finish(false); return; }
-    opStarted(tok, opts);
-    capT = setInterval(function(){
-      if(tok!==OV.token) return;
-      const d = a.duration && isFinite(a.duration) ? a.duration : words.length*0.36;
-      opCaption(words.slice(0, Math.min(words.length, Math.floor(a.currentTime/d*words.length)+1)).join(' '));
-    }, 100);
-  });
-  a.addEventListener('ended', function(){ finish(true); });
-  a.addEventListener('error', function(){ if(started) finish(false); else fallBack(); });
-  const p = a.play(); if(p && p.catch) p.catch(function(){ if(!started) fallBack(); });
+  const startT = setTimeout(function(){ if(!started) fallBack(!a); }, eng==='eleven' ? 20000 : 10000);
+  fetch(opTtsUrl(said), ctrl ? {signal:ctrl.signal} : {}).then(function(r){
+    if(settled) return null;
+    if(!r.ok){
+      return r.json().catch(function(){ return null; }).then(function(j){
+        if(eng==='eleven'){ OV.elevenErr = opElevenWhy(r.status===502 ? Number(j && j.code)||0 : r.status, j && j.error); }
+        fallBack(false); return null;
+      });
+    }
+    return r.blob().then(function(b){
+      if(settled) return;
+      url = URL.createObjectURL(b); a = new Audio(url); OV.audio = a;
+      a.addEventListener('playing', function(){
+        if(started || settled) return; started = true; clearTimeout(startT);
+        if(tok!==OV.token){ try{ a.pause(); }catch(e){} finish(false); return; }
+        opStarted(tok, opts);
+        capT = setInterval(function(){
+          if(tok!==OV.token) return;
+          const d = a.duration && isFinite(a.duration) ? a.duration : words.length*0.36;
+          opCaption(words.slice(0, Math.min(words.length, Math.floor(a.currentTime/d*words.length)+1)).join(' '));
+        }, 100);
+      });
+      a.addEventListener('ended', function(){ finish(true); });
+      a.addEventListener('error', function(){ if(started) finish(false); else fallBack(false); });
+      const p = a.play(); if(p && p.catch) p.catch(function(){ if(!started) fallBack(false); });
+    });
+  }).catch(function(){ if(!settled) fallBack(true); });
 }
 function opSayBrowser(said, opts, tok, resolve){
   if(!opBrowserOk()){ OV.pending = false; resolve(false); return; }
@@ -176,8 +218,10 @@ function opBriefLine(lines, i){ const name = state.profile.name || ''; return (i
 function opBriefTick(lines, t){
   if(!opVoiceOn() || ui.briefSkipped || !lines.length) return false;
   if(OV.speaking || OV.pending) return true;
-  const next = OV.idx + 1; if(next >= lines.length) return true;
+  let next = OV.idx + 1; if(next >= lines.length) return true;
   if(t < lines[next].at) return true;
+  // fallen behind the page? say the newest line instead of every one in between
+  while(next + 1 < lines.length && t >= lines[next + 1].at + 600) next++;
   OV.idx = next;
   opSay(opBriefLine(lines, next), {cap:'brVoice', onstart:function(){
     if(lines[next+1]) opPrefetch(opBriefLine(lines, next+1));
@@ -339,11 +383,11 @@ function opVoiceSettingsHtml(){
     body = '<select class="input" id="opBrowserVoice">'+(vs.length ? vs.map(function(v){ return '<option value="'+escapeHtml(v.name)+'"'+(cur && cur.name===v.name?' selected':'')+'>'+escapeHtml(v.name)+'</option>'; }).join('') : '<option>No voices found</option>')+'</select>'+
       '<div class="op-set-help">The browser’s own voices — the simplest, and the most robotic. Premium and Enhanced voices you download on the Mac show up here too.</div>';
   }
-  return '<div class="field op-set" id="opVoiceSet"><label>Voice</label>'+opLauncherLineHtml()+
+  return '<div class="field op-set" id="opVoiceSet">'+
     '<div class="seg-tabs" style="margin:0 0 8px;">'+seg('eleven', 'ElevenLabs')+seg('mac', 'Mac voice')+seg('browser', 'Browser')+'</div>'+body+
-    '<div class="op-set-test"><button class="btn btn-sm" data-action="opTest">&#9654; Test the voice</button><span id="opTestCap" class="op-set-cap"></span></div></div>'+aiKeyHtml();
+    '<div class="op-set-test"><button class="btn btn-sm" data-action="opTest">&#9654; Test the voice</button><span id="opTestCap" class="op-set-cap"></span></div></div>';
 }
-function opVoiceChanged(){ OV.voice = null; OV.helperDown = false; OV.broken = false; persist('focus'); }
+function opVoiceChanged(){ OV.voice = null; OV.helperDown = false; OV.broken = false; OV.elevenErr = null; persist('focus'); }
 ACTIONS.opEngineSet = function(el, e, id){ wakeCfg().voiceEngine = id; opStop(); opVoiceChanged(); ui.ttsVoices = null; renderView(); };
 ACTIONS.opTest = function(){
   opStop(); opVoiceChanged();
@@ -352,7 +396,8 @@ ACTIONS.opTest = function(){
   const w = wakeCfg(), was = w.voice; w.voice = true;
   opSay(greet+(name ? ', '+name : '')+'. Everything’s in order — your plan is set, and the coffee won’t make itself. Ready when you are.', {cap:'opTestCap'}).then(function(ok){
     w.voice = was;
-    if(!ok) showToast('Couldn’t speak — '+(opEngine()==='browser' ? 'no voice is available.' : 'the Operator app didn’t answer.'), {icon:'&#9888;'});
+    if(opEngine()==='eleven' && OV.elevenErr) showToast((ok ? 'That was the Mac’s voice — ' : 'Couldn’t use ElevenLabs — ')+OV.elevenErr, {icon:'&#9888;', duration:14000});
+    else if(!ok) showToast('Couldn’t speak — '+(opEngine()==='browser' ? 'no voice is available.' : 'the Operator app didn’t answer.'), {icon:'&#9888;'});
     else if(OV.helperDown && opEngine()!=='browser') showToast('The Operator app didn’t answer, so that was the browser’s voice. Open Operator from its icon to use the '+(opEngine()==='eleven' ? 'ElevenLabs' : 'Mac')+' voice.', {icon:'&#9888;', duration:8000});
   });
 };
@@ -425,14 +470,14 @@ async function aiAsk(text, cap){
   aiUiRefresh();
   try{
     const model = await aiPickModel();
-    if(!model){ AI.hasKey = false; opCaption('To talk with me, add an Anthropic API key in Settings → Alarm → The Operator’s voice.'); return; }
+    if(!model){ AI.hasKey = false; opCaption('To talk with me, add an Anthropic API key in Settings → Connections &amp; data → The Operator.'); return; }
     AI.history.push({role:'user', content:text});
     AI.history = AI.history.slice(-12);
     const body = JSON.stringify({model:model, max_tokens:300, system:aiSystem(), messages:AI.history});
     const r = await fetchWithin(WAKE_HELPER+'ai/chat?b='+hexUtf8(body), 50000);
     let j = null; try{ j = r ? await r.json() : null; }catch(e){}
     const reply = j && arr(j.content).filter(function(c){ return c.type==='text'; }).map(function(c){ return c.text; }).join(' ').trim();
-    if(!reply){ AI.history.pop(); opCaption(r && r.status===401 ? 'To talk with me, add an Anthropic API key in Settings → Alarm → The Operator’s voice.' : 'I couldn’t reach my brain just now — '+((j && j.error && j.error.message) || 'the Operator app didn’t answer')+'.'); return; }
+    if(!reply){ AI.history.pop(); opCaption(r && r.status===401 ? 'To talk with me, add an Anthropic API key in Settings → Connections &amp; data → The Operator.' : 'I couldn’t reach my brain just now — '+((j && j.error && j.error.message) || 'the Operator app didn’t answer')+'.'); return; }
     AI.history.push({role:'assistant', content:reply});
     if(opVoiceOn()) await opSay(reply, {cap:cap}); else opCaption(reply);
   } finally { AI.busy = false; aiUiRefresh(); }
@@ -479,15 +524,40 @@ ACTIONS.aiKeySave = function(){
 };
 ACTIONS.aiKeyForget = function(){ fetchWithin(WAKE_HELPER+'ai/forget', 6000).then(function(){ AI.hasKey = false; AI.model = null; renderView(); }); };
 function aiKeyHtml(){
-  if(AI.hasKey==null){ AI.hasKey = false; fetchWithin(WAKE_HELPER+'ai/status', 6000).then(function(r){ return r && r.ok ? r.json() : null; }).then(function(j){ AI.hasKey = !!(j && j.hasKey); if(AI.hasKey && document.getElementById('opVoiceSet')) renderView(); }).catch(function(){}); }
+  if(AI.hasKey==null){ AI.hasKey = false; fetchWithin(WAKE_HELPER+'ai/status', 6000).then(function(r){ return r && r.ok ? r.json() : null; }).then(function(j){ AI.hasKey = !!(j && j.hasKey); if(AI.hasKey && (document.getElementById('opVoiceSet') || document.getElementById('opAppCard'))) renderView(); }).catch(function(){}); }
   return '<div class="field op-set"><label>Talk to it'+tip('Press the mic on Good morning, the work preview or the minimal Focus page and just talk. The answers come from Claude; the key is saved by the Operator app on this Mac only — not in Operator’s data, exports or backups.')+'</label>'+
     (AI.hasKey ? '<div class="op-set-key"><span>&#128274; Anthropic key saved on this Mac</span><button class="btn btn-ghost btn-sm" data-action="aiKeyForget">Remove key</button></div>'
       : '<div class="op-set-key"><input class="input" type="password" id="aiKey" placeholder="Anthropic API key (sk-ant-…)" autocomplete="off"><button class="btn btn-sm btn-primary" data-action="aiKeySave">Save key</button></div>')+
     '<div class="op-set-help">Get a key at console.anthropic.com → API keys.</div></div>';
 }
 
+// ---- Settings → Connections & data → The Operator: its voice, talking to it, and the app itself ----
+function operatorSettingsHtml(){
+  return operatorAppCardHtml()+
+    '<div class="card section op-settings"><div class="section-title">&#127908; Voice'+tip('Good morning, the work brief and the answers when you talk to it. Turn the voice on or off in the alarm settings (Morning & Alarms).')+'</div>'+
+      opVoiceSettingsHtml()+'</div>'+
+    '<div class="card section op-settings"><div class="section-title">&#128172; Talk to it</div>'+aiKeyHtml().replace('<label>Talk to it', '<label>Anthropic key')+'</div>';
+}
+// Operator as its own app (its own Dock icon and name) or plain Chrome — from the next time it opens
+function operatorAppCardHtml(){
+  if(!ui.opEngine){ ui.opEngine = {checking:true}; fetchWithin(WAKE_HELPER+'engine', 4000).then(function(r){ return r && r.ok ? r.json() : null; }).then(function(j){ ui.opEngine = j || {down:true}; if(document.getElementById('opAppCard')) renderView(); }).catch(function(){ ui.opEngine = {down:true}; }); }
+  const e = ui.opEngine;
+  return '<div class="card section op-settings" id="opAppCard"><div class="section-title"><img class="op-app-ico" src="'+((document.querySelector('link[rel=icon]')||{}).href||'')+'" alt=""> The app'+tip('Operator runs on your Chrome. As its own app it has its own name and icon in the Dock and ⌘-Tab, instead of showing up as Google Chrome — same engine, same data.')+'</div>'+
+    opLauncherLineHtml()+
+    (e.checking ? '' : e.down ? '' :
+      '<div class="field"><label>Show as its own app</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(e.on?' active':'')+'" data-action="opEngineSwitch" data-id="1">Operator</button><button class="seg-tab'+(!e.on?' active':'')+'" data-action="opEngineSwitch" data-id="0">Google Chrome</button></div>'+
+      '<div class="op-set-help">'+(e.failed ? '&#9888; Last time it couldn’t open as its own app, so it went back to Chrome. It tries again after Chrome updates — or switch it on here.' : 'Takes effect the next time you open Operator (quit with ⌘Q first).')+'</div></div>')+
+  '</div>';
+}
+ACTIONS.opEngineSwitch = function(el, e, id){
+  fetchWithin(WAKE_HELPER+'engine?on='+(id==='1' ? 1 : 0), 4000).then(function(r){ return r && r.ok ? r.json() : null; }).then(function(j){
+    if(j){ ui.opEngine = j; showToast(j.on ? 'Operator opens as its own app from next time (⌘Q, then open it).' : 'Operator opens in Chrome from next time.', {icon:'&#9711;'}); renderView(); }
+    else opLauncherWhy().then(function(why){ showToast('Couldn’t change it — '+why, {icon:'&#9888;', duration:9000}); });
+  });
+};
+
 // ---- is the Operator launcher there, and is it the new one? (keys, voices and talking need it) ----
-const OP_HELPER_NEEDS = 10;
+const OP_HELPER_NEEDS = 11;
 async function opLauncherInfo(){
   const r = await fetchWithin(WAKE_HELPER+'ping', 3000);
   if(!r) return {up:false, v:0};
@@ -501,7 +571,7 @@ async function opLauncherWhy(){
   return 'the launcher answered but couldn’t write the key. Try again in a moment.';
 }
 function opLauncherLineHtml(){
-  if(!ui.opLauncher){ ui.opLauncher = {checking:true}; opLauncherInfo().then(function(i){ ui.opLauncher = i; if(document.getElementById('opVoiceSet')) renderView(); }); }
+  if(!ui.opLauncher){ ui.opLauncher = {checking:true}; opLauncherInfo().then(function(i){ ui.opLauncher = i; if(document.getElementById('opVoiceSet') || document.getElementById('opAppCard')) renderView(); }); }
   const i = ui.opLauncher;
   if(i.checking) return '';
   if(!i.up) return '<div class="op-set-warn">&#9888; The Operator launcher isn’t running — quit Operator (⌘Q) and open it from its icon. Keys and voices need it.</div>';

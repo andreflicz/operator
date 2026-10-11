@@ -135,5 +135,5 @@ function briefHudHtml(){
   return '<div class="b4-hud" data-action="openYou" title="Your card" style="--rc:'+r.color+'">'+rankBadgeSvg(x.rank, 38)+
     '<div class="b4-hud-m"><div class="b4-hud-t"><b>LVL '+x.level+'</b><span>'+escapeHtml(r.name)+'</span></div>'+
     '<i class="b4-hud-bar"><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i>'+
-    '<div class="b4-hud-s"><span>'+(x.total - x.levelLo).toLocaleString()+' / '+(x.levelHi - x.levelLo).toLocaleString()+' XP</span><span>&#128293; '+streak+'</span></div></div></div>';
+    '<div class="b4-hud-s"><span>'+(x.canLevel ? '<em class="b4-hud-up">Level up ready</em>' : x.blocked && x.blocked.length ? '<em class="b4-hud-warn">&#9888; needs '+escapeHtml(x.blocked.join(' & '))+'</em>' : Math.min(x.total - x.levelLo, x.levelHi - x.levelLo).toLocaleString()+' / '+(x.levelHi - x.levelLo).toLocaleString()+' XP')+'</span><span>&#128293; '+streak+'</span></div></div></div>';
 }

@@ -46,10 +46,11 @@ function nowNextPanelHtml(opts){
         '<div class="nn-acts">'+
           (onBreak ? '' : '<button class="btn btn-primary btn-sm" data-action="nnStartNext" data-id="'+next.id+'">&#9654; '+(cur ? 'Switch to it' : 'Start now')+'</button>')+
           (inS ? '' : '<button class="btn btn-good btn-sm" data-action="nnLockInNext" data-id="'+next.id+'">&#128274; Lock in on it</button>')+
-          picker('Change')+
+          // (locked in, Up next is drag and drop only)
+          (inS ? '' : picker('Change'))+
           (explicit ? '<button class="btn btn-ghost btn-sm" data-action="clearStagedTask" title="Clear what\'s next">&#10005;</button>' : '')+
         '</div>'
-      : '<div class="nn-title nn-empty">Nothing lined up</div><div class="nn-acts">'+picker('Pick one')+'<span class="nn-hint">or drag a card here</span></div>')+
+      : '<div class="nn-title nn-empty">Nothing lined up</div><div class="nn-acts">'+(inS ? '<span class="nn-hint">Drag a card here</span>' : picker('Pick one')+'<span class="nn-hint">or drag a card here</span>')+'</div>')+
   '</div>';
   if(opts.stack) return '<div class="nn-panel nn-stack'+(opts.hero?' nn-hero':'')+(inS ? '' : ' is-free')+'" data-key="nn-stack">'+now+nextCell+'</div>';
   return '<div class="nn-panel is-locked'+(inS ? '' : ' is-free')+'" data-key="nn-panel">'+now+nextCell+'</div>';

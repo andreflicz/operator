@@ -23,7 +23,7 @@ function renderNowNextBar(standalone){
       (next ? '<span class="now-next-title">'+escapeHtml(next.title)+'</span>'+
               '<button class="mini-move mini-move-today" data-action="'+(state.focus.activeSession?'setCurrentTask':'stagePendingCurrentTask')+'" data-id="'+next.id+'">'+(cur?'Switch':'Start')+' &rarr;</button>'
             : '<span class="now-next-title now-next-empty">Nothing lined up</span>')+
-      '<button class="mini-move" data-action="toggleNextPicker" data-where="bar" title="Pick what\'s next">Change</button>'+
+      (state.focus.activeSession ? '' : '<button class="mini-move" data-action="toggleNextPicker" data-where="bar" title="Pick what\'s next">Change</button>')+
     '</div>'+
   '</div>'+nextPickerHtml('bar');
 }
@@ -45,8 +45,9 @@ function videoIdeaCompactCard(t){
     (open ? '<div class="vic-body">'+
       (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '<div class="kpi-sub">No notes yet.</div>')+
       '<div class="vic-actions">'+
-        (t.status==='today' ? '<button class="mini-move" data-action="moveTaskToBacklog" data-id="'+t.id+'">&larr; Move back to video ideas</button>'
+        (t.status==='today' ? '<button class="mini-move" data-action="moveTaskToBacklog" data-id="'+t.id+'">&larr; Back to content</button>'
                             : '<button class="mini-move mini-move-today" data-action="pullSpecificFromBacklog" data-id="'+t.id+'">+ Move to today</button>')+
+        '<button class="mini-move" data-action="contentSwapRole" data-id="'+t.id+'">&#8644; '+(contentRoleOf(t)==='business' ? 'Personal' : 'Business')+'</button>'+
         '<button class="mini-move" data-action="openTaskEditModal" data-id="'+t.id+'">Edit</button>'+
         '<button class="mini-move mini-move-danger" data-action="deleteTaskUndoable" data-id="'+t.id+'">Delete</button>'+
       '</div>'+
@@ -82,7 +83,7 @@ function renderAllDeadlinesSection(){
 // Context-aware "+" button (bottom-right): adds whatever the current page is about.
 function fabContext(){
   const v = ui.view;
-  if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='videoIdeas') return {label:'Add video idea', run:openAddVideoIdeaModal};
+  if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='videoIdeas') return {label:'Add content', run:function(){ ui.newContentRole = ui.newContentRole || 'business'; openAddVideoIdeaModal(); }};
   if(v==='focus' || v==='today') return {label:'Add task', run:openAddTaskModal};
   if(v==='business'){
     if(ui.businessTab==='clients' || ui.businessTab==='lifecycle') return {label:'Add client', run:function(){ if(typeof openNewContactModal==='function') openNewContactModal('client'); else { ui.forms.client=true; renderView(); } }};
@@ -94,6 +95,7 @@ function fabContext(){
   if(v==='personal'){
     if(ui.personalTab==='journal' && ui.journalMode==='boards' && typeof canvasAddNote==='function') return {label:'Add note to board', run:function(){ canvasAddNote(); }};
     if(ui.personalTab==='journal') return {label:'New journal entry', run:openQuickJournalModal};
+    if(ui.personalTab==='finances') return {label:'Add a debt', run:function(){ ui.forms.debt = true; renderView(); setTimeout(function(){ const el = document.getElementById('debtName'); if(el) el.focus(); }, 60); }};
     if(ui.personalTab==='wishlist' && typeof openWishItemModal==='function') return {label:'Add wish list item', run:function(){ openWishItemModal(null); }};
     if(ui.personalTab==='fitness') return {label:'Log workout', run:function(){ ui.healthTab='workouts'; renderView(); const el=document.getElementById('gymType'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }};
     return {label:'Add goal', run:function(){ ui.forms.newGoal = true; renderView(); setTimeout(function(){ const el = document.getElementById('newGoalLabel'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }, 30); }};

@@ -231,4 +231,4 @@ function renderWhyPanel(){
       (away.length ? '<div class="why-col why-away"><div class="why-k">Leaving behind</div>'+away.map(function(x){ return '<div class="why-item">'+escapeHtml(x.text)+'</div>'; }).join('')+'</div>' : '')+
     '</div></div>';
 }
-ACTIONS.goToWhySettings = function(){ ui.view='settings'; ui.settingsTab='focus'; renderView(); setTimeout(function(){ const el = document.getElementById('newMotivToward'); if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); } }, 40); };
+ACTIONS.goToWhySettings = function(){ ui.view='settings'; ui.settingsTab='you'; renderView(); setTimeout(function(){ const el = document.getElementById('newMotivToward'); if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); } }, 40); };

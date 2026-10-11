@@ -49,6 +49,7 @@ poll_frontmost() {
     OPF=""
     [ -f "$DATA_DIR/opfocus" ] && OPF=$(cut -d' ' -f1 "$DATA_DIR/opfocus" 2>/dev/null)
     if [ "$APP" = "Google Chrome" ] && [ "$OPF" = "1" ]; then SITE="Operator"; APP_SKIP_URL=1; else APP_SKIP_URL=""; fi
+    [ "$APP" = "Operator" ] && { SITE="Operator"; APP_SKIP_URL=1; }
     case "$APP_SKIP_URL$APP" in
       1*) ;;
       "Google Chrome"|"Brave Browser"|"Microsoft Edge"|"Arc"|"Chromium")
@@ -118,17 +119,40 @@ LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null)
 # talking to the old helpers and look broken
 MY_VER=$(grep -o '"helper":[0-9]*' "$DIR/Resources/helper.sh" 2>/dev/null | head -1)
 RUN_INFO=$(cat "$DATA_DIR/launcher.info" 2>/dev/null)
+# Operator's own Chrome (the main process: no --type=, which only its helpers have)
+operator_chrome() { pgrep -f -- "--user-data-dir=$PROFILE_DIR" 2>/dev/null | while read -r p; do ps -o args= -p "$p" 2>/dev/null | grep -q -- "--type=" || echo "$p"; done | head -1; }
 if [ -n "$LOCK_PID" ] && kill -0 "$LOCK_PID" 2>/dev/null && ps -o args= -p "$LOCK_PID" 2>/dev/null | grep -q "MacOS/Operator"; then
-  if [ "$RUN_INFO" = "$DIR|$MY_VER" ]; then
-    "$CHROME" --app="file://$HTML_FILE" --user-data-dir="$PROFILE_DIR" >/dev/null 2>&1 &
+  if [ "$RUN_INFO" = "$DIR|$MY_VER" ] && [ -n "$(operator_chrome)" ]; then
+    # Chrome hands the window to the one that's running and returns — wait for it, so the
+    # hand-off isn't cut short when this launcher exits (that left the app not opening at all)
+    "$CHROME" --app="file://$HTML_FILE" --user-data-dir="$PROFILE_DIR" >/dev/null 2>&1
     exit 0
   fi
-  # take over: stop the old launcher (it clears its own helpers on the way out), then carry on
+  # an older copy, or a launcher left behind with no window: stop it (it clears its own helpers
+  # on the way out), then carry on as the one running Operator
   kill "$LOCK_PID" 2>/dev/null
-  n=0; while kill -0 "$LOCK_PID" 2>/dev/null && [ $n -lt 20 ]; do sleep 0.2; n=$((n+1)); done
+  n=0; while kill -0 "$LOCK_PID" 2>/dev/null && [ $n -lt 25 ]; do sleep 0.2; n=$((n+1)); done
+  kill -9 "$LOCK_PID" 2>/dev/null
 fi
 echo $$ > "$LOCK_FILE"
 printf '%s' "$DIR|$MY_VER" > "$DATA_DIR/launcher.info"
+# (set up straight away, so even a launcher stopped mid-start clears up after itself)
+POLL_PID=""; SERVE_PID=""; WAKE_PID=""; GHL_PID=""; CAFF_PID=""
+cleanup() {
+  [ -n "$POLL_PID" ] && kill "$POLL_PID" 2>/dev/null
+  [ -n "$SERVE_PID" ] && kill "$SERVE_PID" 2>/dev/null
+  [ -n "$WAKE_PID" ] && kill "$WAKE_PID" 2>/dev/null
+  [ -n "$GHL_PID" ] && kill "$GHL_PID" 2>/dev/null
+  [ -n "$CAFF_PID" ] && kill "$CAFF_PID" 2>/dev/null
+  # a newer Operator that took over owns the ports and the lock now — leave them be
+  if [ "$(cat "$LOCK_FILE" 2>/dev/null)" = "$$" ]; then
+    helper_call wake "GET /music/stop HTTP/1.1"
+    for port in "$ACTIVITY_PORT" "$WAKE_PORT" "$GHL_PORT"; do free_port "$port"; done
+    rm -f "$DATA_DIR/ghl.fifo" "$DATA_DIR/wake.fifo" "$DATA_DIR/activity.fifo" "$LOCK_FILE" "$DATA_DIR/launcher.info" 2>/dev/null
+  fi
+}
+trap cleanup EXIT
+trap 'exit 0' TERM INT HUP
 
 # Anything still listening on our ports from an earlier run (an Operator that didn't close
 # cleanly) would block the new helpers — that's what made "Can't reach Operator's GoHighLevel
@@ -152,30 +176,97 @@ if command -v osascript >/dev/null 2>&1; then
 fi
 SERVE_PID=$(start_helper activity "$ACTIVITY_PORT")
 
+# --- Operator as its own app --------------------------------------------------------------
+# Chrome's --app window shows up in the Dock and ⌘-Tab as "Google Chrome". So Operator makes itself
+# a small app of its own the first time (and again whenever Chrome updates): a copy of Chrome's tiny
+# starter program, named Operator with Operator's icon, that runs your installed Chrome underneath —
+# same engine, same profile, so all your data stays exactly where it is. If that copy ever fails to
+# open a window, Operator goes back to plain Chrome on its own (and Settings can turn it off).
+CHROME_APP="/Applications/Google Chrome.app"
+ENGINE_DIR="$DATA_DIR/Engine"
+ENGINE_APP="$ENGINE_DIR/Operator.app"
+ENGINE_REV=1
+make_engine() {
+  [ -f "$DATA_DIR/engine.off" ] && return 1
+  command -v plutil >/dev/null 2>&1 && command -v codesign >/dev/null 2>&1 || return 1
+  CV=$(defaults read "$CHROME_APP/Contents/Info" CFBundleShortVersionString 2>/dev/null)
+  [ -n "$CV" ] || return 1
+  ENGINE_TAG="$CV|$ENGINE_REV|$MY_VER"
+  [ "$(cat "$DATA_DIR/engine.failed" 2>/dev/null)" = "$ENGINE_TAG" ] && return 1
+  if [ "$(cat "$ENGINE_DIR/version" 2>/dev/null)" = "$ENGINE_TAG" ] && [ -x "$ENGINE_APP/Contents/MacOS/Operator" ]; then return 0; fi
+  rm -rf "$ENGINE_APP" "$ENGINE_DIR/version"
+  mkdir -p "$ENGINE_APP/Contents/MacOS" "$ENGINE_APP/Contents/Resources" || return 1
+  cp "$CHROME_APP/Contents/MacOS/Google Chrome" "$ENGINE_APP/Contents/MacOS/Operator" || return 1
+  ln -s "$CHROME_APP/Contents/Frameworks" "$ENGINE_APP/Contents/Frameworks" || return 1
+  P="$ENGINE_APP/Contents/Info.plist"
+  cp "$CHROME_APP/Contents/Info.plist" "$P" || return 1
+  plutil -convert xml1 "$P" 2>/dev/null
+  plutil -replace CFBundleIdentifier -string "com.local.operator.window" "$P" &&
+  plutil -replace CFBundleName -string "Operator" "$P" &&
+  plutil -replace CFBundleDisplayName -string "Operator" "$P" &&
+  plutil -replace CFBundleExecutable -string "Operator" "$P" &&
+  plutil -replace CFBundleIconFile -string "AppIcon.icns" "$P" || return 1
+  # not a browser, not something Chrome's updater looks after: no link / file handling, no update keys
+  for k in CFBundleIconName CFBundleURLTypes CFBundleDocumentTypes UTExportedTypeDeclarations UTImportedTypeDeclarations \
+           NSUserActivityTypes KSProductID KSUpdateURL KSChannelID KSVersion KSBrandID SUFeedURL; do
+    plutil -remove "$k" "$P" >/dev/null 2>&1
+  done
+  plutil -replace NSMicrophoneUsageDescription -string "Operator listens when you tap the mic to talk to it." "$P" 2>/dev/null
+  cp "$DIR/Resources/AppIcon.icns" "$ENGINE_APP/Contents/Resources/AppIcon.icns" 2>/dev/null
+  codesign --force --sign - "$ENGINE_APP" >/dev/null 2>&1 || codesign --force --sign - "$ENGINE_APP/Contents/MacOS/Operator" >/dev/null 2>&1 || return 1
+  printf '%s' "$ENGINE_TAG" > "$ENGINE_DIR/version"
+}
+
+# The wake helper starts first: the page says hello through it as soon as it opens.
+WAKE_PID=$(start_helper wake "$WAKE_PORT")
+
 # Chrome flags for an app that has to ring on time:
 #  - background windows normally get their timers slowed to ~1/minute, which made
 #    alarms only go off once the window was opened; these flags keep them on time
 #  - autoplay without a click, so wake-up music/sound starts by itself
 #  - no pop-up blocking, so a wake-up YouTube link can open
-"$CHROME" \
-  --app="file://$HTML_FILE" \
-  --user-data-dir="$PROFILE_DIR" \
-  --window-size=1400,900 \
-  --no-first-run \
-  --no-default-browser-check \
-  --autoplay-policy=no-user-gesture-required \
-  --disable-background-timer-throttling \
-  --disable-renderer-backgrounding \
-  --disable-backgrounding-occluded-windows \
-  --disable-popup-blocking \
-  --ignore-gpu-blocklist \
-  --enable-gpu-rasterization \
-  --enable-zero-copy \
-  > /dev/null 2>&1 &
-CHROME_PID=$!
+launch_window() { # browser executable, extra flag
+  "$1" \
+    --app="file://$HTML_FILE" \
+    --user-data-dir="$PROFILE_DIR" \
+    --window-size=1400,900 \
+    --no-first-run \
+    --no-default-browser-check \
+    --autoplay-policy=no-user-gesture-required \
+    --disable-background-timer-throttling \
+    --disable-renderer-backgrounding \
+    --disable-backgrounding-occluded-windows \
+    --disable-popup-blocking \
+    --ignore-gpu-blocklist \
+    --enable-gpu-rasterization \
+    --enable-zero-copy \
+    $2 \
+    > /dev/null 2>&1 &
+  CHROME_PID=$!
+}
+page_said_hello() { # since <epoch seconds>
+  ST=$(cat "$DATA_DIR/page.state" 2>/dev/null); case "$ST" in open\ *) ;; *) return 1 ;; esac
+  [ "${ST#open }" -ge "$1" ] 2>/dev/null
+}
+rm -f "$DATA_DIR/page.state" 2>/dev/null
+T0=$(date +%s)
+if make_engine; then
+  # its own keychain item would mean a password prompt for an ad-hoc app; Operator keeps no passwords in Chrome
+  launch_window "$ENGINE_APP/Contents/MacOS/Operator" "--use-mock-keychain"
+  n=0; while ! page_said_hello "$T0" && [ $n -lt 30 ]; do sleep 0.5; n=$((n+1)); done
+  if ! page_said_hello "$T0"; then
+    # no window from it: back to plain Chrome, and don't try this copy again until Chrome updates
+    kill "$CHROME_PID" 2>/dev/null; sleep 1
+    printf '%s' "$ENGINE_TAG" > "$DATA_DIR/engine.failed"
+    launch_window "$CHROME" ""
+  fi
+else
+  launch_window "$CHROME" ""
+fi
 
 export CHROME_PID PROFILE_DIR
-WAKE_PID=$(start_helper wake "$WAKE_PORT")
+# (the wake helper started before the window did — it finds the window's process here)
+printf '%s' "$CHROME_PID" > "$DATA_DIR/window.pid" 2>/dev/null
 GHL_PID=""
 command -v curl >/dev/null 2>&1 && GHL_PID=$(start_helper ghl "$GHL_PORT")
 # Keep the Mac from idle-sleeping while Operator is open (the display can still turn
@@ -186,28 +277,32 @@ if command -v caffeinate >/dev/null 2>&1; then
   CAFF_PID=$!
 fi
 
-cleanup() {
-  helper_call wake "GET /music/stop HTTP/1.1"
-  [ -n "$POLL_PID" ] && kill "$POLL_PID" 2>/dev/null
-  [ -n "$SERVE_PID" ] && kill "$SERVE_PID" 2>/dev/null
-  [ -n "$WAKE_PID" ] && kill "$WAKE_PID" 2>/dev/null
-  [ -n "$GHL_PID" ] && kill "$GHL_PID" 2>/dev/null
-  for port in "$ACTIVITY_PORT" "$WAKE_PORT" "$GHL_PORT"; do free_port "$port"; done
-  rm -f "$DATA_DIR/ghl.fifo" "$DATA_DIR/wake.fifo" "$DATA_DIR/activity.fifo" 2>/dev/null
-  [ -n "$CAFF_PID" ] && kill "$CAFF_PID" 2>/dev/null
-  rm -f "$LOCK_FILE" "$DATA_DIR/launcher.info" 2>/dev/null
-}
-trap cleanup EXIT
 
 # Stay up while Operator's window is open (any Chrome process using Operator's own profile —
 # even if Chrome handed the window to one that was already running), and keep the helpers
 # alive: if one ever stops, it's started again within a few seconds.
 alive() { [ -n "$1" ] && kill -0 "$1" 2>/dev/null; }
 operator_open() { alive "$CHROME_PID" || pgrep -f -- "--user-data-dir=$PROFILE_DIR" >/dev/null 2>&1; }
-sleep 3
+# (sleeps run in the background and get waited on, so a stop signal is handled at once)
+nap() { sleep "$1" & wait $!; }
+# Closing the window (red ✕) leaves a Mac app's Chrome running with no window — and this launcher
+# with it. The page says goodbye when it closes (and hello when it opens or reloads); after a quiet
+# 12 seconds with no window back, Operator's own Chrome is asked to quit, like ⌘Q.
+window_gone() {
+  ST=$(cat "$DATA_DIR/page.state" 2>/dev/null); case "$ST" in closed\ *) ;; *) return 1 ;; esac
+  AT=${ST#closed }; case "$AT" in ''|*[!0-9]*) return 1 ;; esac
+  [ $(( $(date +%s) - AT )) -ge 12 ]
+}
+nap 3
 while operator_open; do
+  if window_gone; then
+    CP=$(operator_chrome); [ -n "$CP" ] && kill -TERM "$CP" 2>/dev/null
+    rm -f "$DATA_DIR/page.state" 2>/dev/null
+    n=0; while operator_open && [ $n -lt 20 ]; do nap 0.5; n=$((n+1)); done
+    break
+  fi
   if ! alive "$WAKE_PID"; then free_port "$WAKE_PORT"; WAKE_PID=$(start_helper wake "$WAKE_PORT"); fi
   if [ -n "$GHL_PID" ] && ! alive "$GHL_PID"; then free_port "$GHL_PORT"; GHL_PID=$(start_helper ghl "$GHL_PORT"); fi
   if [ -n "$SERVE_PID" ] && ! alive "$SERVE_PID"; then free_port "$ACTIVITY_PORT"; SERVE_PID=$(start_helper activity "$ACTIVITY_PORT"); fi
-  sleep 5
+  nap 5
 done

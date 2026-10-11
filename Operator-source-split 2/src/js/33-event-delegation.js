@@ -31,7 +31,7 @@ document.body.addEventListener('click', function(e){
     case 'settingsTab': ui.settingsTab = el.dataset.tab; renderView(); break;
     case 'goToAlarmSettings': {
       ui.view = 'settings';
-      ui.settingsTab = 'focus';
+      ui.settingsTab = 'morning';
       renderView();
       setTimeout(function(){ const s=document.getElementById('alarmsSettingsSection'); if(s) s.scrollIntoView({behavior:'smooth', block:'start'}); }, 30);
       break;

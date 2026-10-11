@@ -68,6 +68,7 @@ function notifList(){
   }
   // the month's and the week's intentions, until they're written
   if(typeof intentPending==='function') intentPending().forEach(add);
+  if(typeof levelUpPending==='function') levelUpPending().forEach(add);
   const dis = notifDismissed();
   return out.filter(function(n){ return dis[n.key]!==today; }).sort(function(a, b){ return a.sort-b.sort || (b.at||0)-(a.at||0); });
 }
@@ -112,6 +113,7 @@ ACTIONS.notifOpen = function(el, e, key){
   else if(a.a==='openCalItem') openCalItem(a.kind, a.id);
   else if(a.a==='openGhlContact' && ACTIONS.openGhlContact) ACTIONS.openGhlContact(null, null, a.id);
   else if(a.a==='openIntent' && typeof openIntentForm==='function') openIntentForm(a.id);
+  else if(a.a==='levelUp' && ACTIONS.levelUp) ACTIONS.levelUp();
 };
 ACTIONS.notifDismiss = function(el, e, key){ notifDismissed()[key] = todayStr(); persist('focus'); notifBadge(); notifRender(); };
 ACTIONS.notifClearAll = function(){ const d = notifDismissed(), t = todayStr(); notifList().forEach(function(n){ d[n.key] = t; }); persist('focus'); notifBadge(); notifRender(); };

@@ -59,10 +59,23 @@ function gameChipHtml(g){
     '<span class="gc-m">'+side(g.away, scored)+'<span class="gc-at">'+(scored ? '–' : '@')+'</span>'+side(g.home, scored)+'</span>'+
     '<span class="gc-s">'+(g.state==='in' ? '<em class="gc-live"></em>'+escapeHtml(g.detail) : g.state==='post' ? 'Final' : escapeHtml(scoreWhen(g)))+'</span></div>';
 }
-function scoresHtml(){
+// the scoreboard: the last results and what's coming up, a row a game — your teams first and lit
+function scoreRowHtml(g){
+  const fav = isFavGame(g), sp = SPORTS.find(function(s){ return s.id===g.l; }), scored = g.state!=='pre';
+  const team = function(t){ return '<span class="sb-tm'+(scored && t.win ? ' is-win' : '')+'"><b>'+escapeHtml(t.short || t.abbr)+'</b>'+(scored ? '<i>'+escapeHtml(t.score)+'</i>' : '')+'</span>'; };
+  return '<div class="sb-row is-'+g.state+(fav ? ' is-fav' : '')+'" title="'+escapeHtml(g.away.name+' at '+g.home.name)+'">'+
+    '<span class="sb-l">'+(sp ? sp.icon : '')+'</span>'+
+    '<span class="sb-m">'+team(g.away)+team(g.home)+'</span>'+
+    '<span class="sb-s">'+(g.state==='in' ? '<em class="gc-live"></em>'+escapeHtml(g.detail) : g.state==='post' ? 'Final' : escapeHtml(scoreWhen(g)))+'</span></div>';
+}
+function scoresHtml(maxDone, maxNext){
   const sc = ui.scores; if(!sc || !sc.got) return '';
-  const games = []; SPORTS.forEach(function(s){ const list = sc[s.id]; if(list && list.length) games.push.apply(games, pickGames(list).slice(0, 2)); });
-  return games.length ? '<div class="gc-grid">'+games.map(gameChipHtml).join('')+'</div>' : '';
+  const done = [], next = [];
+  SPORTS.forEach(function(s){ pickGames(sc[s.id] || []).forEach(function(g){ (g.state==='pre' ? next : done).push(g); }); });
+  const favFirst = function(xs){ return xs.filter(isFavGame).concat(xs.filter(function(g){ return !isFavGame(g); })); };
+  const d = favFirst(done).slice(0, maxDone||3), n = favFirst(next.sort(function(a, b){ return a.at - b.at; })).slice(0, maxNext||3);
+  if(!d.length && !n.length) return '';
+  return '<div class="sb">'+(d.length ? '<div class="sb-h">Results</div>'+d.map(scoreRowHtml).join('') : '')+(n.length ? '<div class="sb-h">Coming up</div>'+n.map(scoreRowHtml).join('') : '')+'</div>';
 }
 // what the voice can say about it
 function scoresSpoken(){

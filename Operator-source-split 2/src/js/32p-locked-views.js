@@ -440,15 +440,19 @@ async function trueFullSet(on){
   if(!on && TF.via==='web'){ try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){} TF.via = null; return; }
   TF.busy = true;
   let ok = false, why = '';
+  let already = false;
   try{
     const r = await fetchWithin(WAKE_HELPER+'window/full?f='+(on ? 1 : 0), 4000);
-    ok = !!(r && r.ok); if(!ok && r){ try{ why = (await r.json()).error || ''; }catch(e){} }
+    ok = !!(r && r.ok);
+    if(r){ let j = null; try{ j = await r.json(); }catch(e){} if(ok) already = !!(j && j.already); else why = (j && j.error) || ''; }
   }catch(e){}
-  if(ok) TF.via = on ? 'mac' : null;
+  // (if the window was already full screen, it was yours — leaving these screens keeps it that way)
+  if(ok) TF.via = on && !already ? 'mac' : null;
   else if(why==='accessibility') {
     // no launcher (or no permission yet): the browser's own full screen
     try{
-      if(on && !document.fullscreenElement && document.documentElement.requestFullscreen){ await document.documentElement.requestFullscreen({navigationUI:'hide'}); TF.via = 'web'; }
+      const filling = window.innerWidth >= screen.width - 2 && window.innerHeight >= screen.height - 2;
+      if(on && !document.fullscreenElement && !filling && document.documentElement.requestFullscreen){ await document.documentElement.requestFullscreen({navigationUI:'hide'}); TF.via = 'web'; }
       else if(!on && document.fullscreenElement && TF.via==='web'){ await document.exitFullscreen(); TF.via = null; }
     }catch(e){}
     if(on && why==='accessibility' && !TF.warned){ TF.warned = true; showToast('For true full screen, allow Operator in System Settings → Privacy & Security → Accessibility.', {icon:'&#9974;', duration:8000}); }

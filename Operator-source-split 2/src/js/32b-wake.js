@@ -182,6 +182,16 @@ function opFocusPing(f){ helperFetch(WAKE_HELPER+'opfocus?f='+f, 2000); }
 window.addEventListener('focus', function(){ opFocusPing(1); });
 window.addEventListener('blur', function(){ opFocusPing(0); });
 setTimeout(function(){ opFocusPing(document.hasFocus() ? 1 : 0); }, 1500);
+// Hello / goodbye to the launcher: it waits for the hello to know the window opened (or goes back to
+// plain Chrome), and after a goodbye with no window back it quits Operator like ⌘Q — so closing the
+// window with the red ✕ really closes Operator, and opening it again always works.
+(function(){
+  let n = 0;
+  const hello = function(){ fetch(WAKE_HELPER+'hello').catch(function(){ if(++n < 8) setTimeout(hello, 1500); }); };
+  hello();
+  window.addEventListener('pageshow', function(e){ if(e.persisted) hello(); });
+  window.addEventListener('pagehide', function(){ try{ fetch(WAKE_HELPER+'bye', {keepalive:true}).catch(function(){}); }catch(e){} });
+})();
 function hexUtf8(str){ return Array.prototype.map.call(new TextEncoder().encode(String(str||'')), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
 function musicApp(cmd, media){
   // transport controls go through /music/cmd (there is no /music/pause route — pausing silently failed before)
@@ -305,7 +315,20 @@ function stopWakeRing(){
 }
 // "I'm up" stops the alarm and turns the screen into the morning briefing — the day ahead,
 // yesterday in numbers, the goals — then Lock in or Let's go takes you into the day.
+// "I'm up": the alarm lifts away (a soft blur out), then Good morning rises in with a wash of sunrise —
+// the heavy part (building the page) waits until the first frame of that has started, so it never
+// just pops in or stutters
 function wakeImUp(){
+  clearInterval(wakeBeepTimer); wakeBeepTimer = null;
+  const c = document.getElementById('wakeContent'), ov = document.getElementById('wakeOverlay');
+  if(c && ov && !ov.classList.contains('hidden') && ui.wakeMode!=='brief'){
+    c.classList.add('is-waking');
+    setTimeout(function(){ c.classList.remove('is-waking'); wakeImUpNow(); ov.classList.add('is-entering'); setTimeout(function(){ ov.classList.remove('is-entering'); }, 1400); }, 360);
+    return;
+  }
+  wakeImUpNow();
+}
+function wakeImUpNow(){
   const wasTest = wakeRing && wakeRing.test;
   clearInterval(wakeBeepTimer); wakeBeepTimer = null;
   finishWakeMedia();
@@ -442,9 +465,10 @@ function renderWakeSetup(){
       '<div class="field"><label>News topics'+tip('Things you care about, separated by commas — e.g. AI, Knicks, marketing. Good morning shows the latest headlines on those. Leave it empty for the top stories.')+'</label><input class="input" data-wake="newsTopics" placeholder="e.g. AI, Knicks, marketing" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
       '<div class="field"><label>Sports'+tip('Teams or leagues for the Sports section — e.g. Knicks, Giants, UFC. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, NFL, UFC" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
       '<div class="field"><label>Tech & interests'+tip('Anything else you follow — e.g. AI, Apple, marketing, crypto. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
+      '<div class="field"><label>Places you like'+tip('Parks, streets, spots near you — separated by commas. Good morning suggests a walk to one of them now and then.')+'</label><input class="input" data-wake="places" placeholder="e.g. a park, a coffee spot" value="'+escapeHtml(w.places||'')+'"></div>'+
       '<div class="field"><label>Good morning background'+tip('Time of day follows when you\'re up: sunrise colours early, a blue sky later in the morning, golden in the evening, night if it\'s still dark.')+'</label><div class="seg-tabs" style="margin:0;">'+[['auto','Time of day'],['sunrise','Sunrise'],['dark','Dark']].map(function(o){ const on = (w.briefBg||'auto')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefBg" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
       '<div class="field"><label>The Operator’s voice'+tip('Good morning is spoken out loud (the Mac’s own voice), with captions. You can ask it for sports, news, tech or a business brief.')+'</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.voice!==false?' active':'')+'" data-action="wakeVoice" data-id="on">On</button><button class="seg-tab'+(w.voice===false?' active':'')+'" data-action="wakeVoice" data-id="off">Off</button></div></div>'+
-      (w.voice!==false && typeof opVoiceSettingsHtml==='function' ? opVoiceSettingsHtml() : '')+
+      (w.voice!==false ? '<div class="field"><label>Voice &amp; keys</label><button class="btn btn-ghost btn-sm" data-action="goToOperatorSettings" style="align-self:flex-start;">Settings → Connections &amp; data &rarr;</button></div>' : '')+
       '<div class="field"><label>Good morning layout'+tip('Minimal: one big Get to Work button in the middle with the important things around it.')+'</label><div class="seg-tabs" style="margin:0;">'+[['full','Full'],['minimal','Minimal']].map(function(o){ const on = (w.briefLayout||'full')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefLayout" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
       '<div class="field"><label>Headlines in Good morning</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.news!==false?' active':'')+'" data-action="wakeNews" data-id="on">On</button><button class="seg-tab'+(w.news===false?' active':'')+'" data-action="wakeNews" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+
@@ -455,6 +479,7 @@ function renderWakeSetup(){
     '</div>'+
   '</div>';
 }
+ACTIONS.goToOperatorSettings = function(){ if(overlayOpen('wakeSetupOverlay')){ hideOverlay('wakeSetupOverlay'); stopWakeMedia(true); } ui.view = 'settings'; ui.settingsTab = 'operator'; renderView(); };
 function renderWakeSetupInto(){ const el = document.getElementById('wakeSetupContent'); if(el) morphInto(el, renderWakeSetup(), {form:true}); }
 registerModal('wakeSetupOverlay', renderWakeSetupInto);
 function saveWake(){ persist('focus'); renderWakeSetupInto(); }

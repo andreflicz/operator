@@ -1,5 +1,21 @@
 // ============ FINANCES ============
 function renderFinances(){
+  const income = state.finances.income;
+  const thisMonthIncome = income.filter(function(i){ return monthKeyOf(i.date)===thisMonthKey(); }).reduce(function(a,i){ return a+Number(i.amount||0); },0);
+  const thisMonthInvoiced = arr(state.finances.invoices).filter(function(inv){ return monthKeyOf(inv.date)===thisMonthKey(); }).reduce(function(a,inv){ return a+Number(inv.amount||0); },0);
+  const thisMonthTotal = thisMonthIncome + thisMonthInvoiced;
+  const pct = clamp(Math.round((thisMonthTotal/(state.profile.revenueGoalMonthly||1))*100),0,100);
+  return '<div class="grid grid-2 section">'+
+    '<div class="card" style="min-height:118px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">Collected this month</div><div class="kpi-value">$'+thisMonthTotal.toLocaleString()+'</div>'+
+      '<div class="progress" style="margin-top:8px;"><div class="progress-bar" style="width:'+pct+'%;background:'+goalColor()+';'+goalGlowStyle(pct)+'"></div></div>'+
+      '<div class="kpi-sub">of $'+(state.profile.revenueGoalMonthly||0).toLocaleString()+' goal</div>'+
+    '</div>'+
+    '<div class="card fin-move" style="min-height:118px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">Your own money</div><div class="kpi-sub" style="margin:4px 0 10px;">Debts and personal income live in Personal → Finances now.</div><button class="btn btn-sm" data-action="goPersonalFinances" style="align-self:flex-start;">Open Personal → Finances &rarr;</button></div>'+
+  '</div>'+
+  renderInvoicesSection();
+}
+ACTIONS.goPersonalFinances = function(){ ui.view = 'personal'; ui.personalTab = 'finances'; renderView(); };
+function renderPersonalFinances(){
   const debts = state.finances.debts;
   const totalDebt = debts.reduce(function(a,d){ return a+Number(d.balance||0); },0);
   const totalOriginal = debts.reduce(function(a,d){ return a+Number(d.originalAmount||d.balance||0); },0);
@@ -8,12 +24,17 @@ function renderFinances(){
   const thisMonthInvoiced = arr(state.finances.invoices).filter(function(inv){ return monthKeyOf(inv.date)===thisMonthKey(); }).reduce(function(a,inv){ return a+Number(inv.amount||0); },0);
   const thisMonthTotal = thisMonthIncome + thisMonthInvoiced;
   const pct = clamp(Math.round((thisMonthTotal/(state.profile.revenueGoalMonthly||1))*100),0,100);
-  return '<div class="grid grid-3 section">'+
+  const fr = typeof financeRating==='function' ? financeRating() : {f:null, note:''};
+  const paidPct = totalOriginal ? Math.round((totalOriginal-totalDebt)/totalOriginal*100) : 0;
+  const recentPaid = arr(state.finances.payments).filter(function(p){ return p.date && p.date > addDays(todayStr(), -30); }).reduce(function(a, p){ return a + Number(p.amount||0); }, 0);
+  return '<div class="fin-head section">'+
+    '<div class="fin-rate"><b>'+(fr.f==null ? 25 : Math.round(25 + 74*Math.max(0, Math.min(1, fr.f))))+'</b><small>FINANCES</small></div>'+
+    '<div class="fin-hm"><div class="fin-t">'+(debts.length ? (totalDebt>0 ? '$'+totalDebt.toLocaleString()+' to go' : 'Debt-free') : 'Add your debts to start')+'</div>'+
+      (debts.length ? '<div class="fin-bar"><i style="width:'+paidPct+'%"></i></div><div class="kpi-sub">'+paidPct+'% paid off &middot; $'+recentPaid.toLocaleString()+' paid in the last 30 days</div>' : '<div class="kpi-sub">Your card rates how much is paid off, and whether you keep paying it down (a payment or two a month).</div>')+
+    '</div></div>'+
+    '<div class="grid grid-3 section">'+
     '<div class="card" style="min-height:128px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">Total Debt</div><div class="kpi-value" style="color:var(--danger);">$'+totalDebt.toLocaleString()+'</div></div>'+
-    '<div class="card" style="min-height:128px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">This Month</div><div class="kpi-value">$'+thisMonthTotal.toLocaleString()+'</div>'+
-      '<div class="progress" style="margin-top:8px;"><div class="progress-bar" style="width:'+pct+'%;background:'+goalColor()+';'+goalGlowStyle(pct)+'"></div></div>'+
-      '<div class="kpi-sub">of $'+(state.profile.revenueGoalMonthly||0).toLocaleString()+' goal &middot; includes $'+thisMonthInvoiced.toLocaleString()+' invoiced to clients</div>'+
-    '</div>'+
+    '<div class="card" style="min-height:128px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">Income this month</div><div class="kpi-value">$'+thisMonthIncome.toLocaleString()+'</div></div>'+
     '<div class="card" style="min-height:128px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">Paid Off So Far</div><div class="kpi-value" style="color:var(--good);">$'+(totalOriginal-totalDebt).toLocaleString()+'</div></div>'+
   '</div>'+
   '<div class="grid grid-2 section" style="align-items:start;">'+
@@ -40,8 +61,7 @@ function renderFinances(){
       '<button class="btn btn-good btn-sm" style="margin-top:8px;" data-action="addIncome">Add Income</button>'+
     '</div>' : '')+
     '<div class="task-list">'+(income.slice(0,12).map(incomeRow).join('') || '<div class="empty">No income logged. Add one above.</div>')+'</div></div>'+
-  '</div>'+
-  renderInvoicesSection();
+  '</div>';
 }
 function invoicePaid(inv){ return !!inv.attachmentData; }
 function clientInvoicedThisMonth(clientId){

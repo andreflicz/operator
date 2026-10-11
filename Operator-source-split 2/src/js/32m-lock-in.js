@@ -187,7 +187,7 @@ function methodLine(st){
     if(st.onBreak){ const as = state.focus.activeSession, b = as && as.breaks[as.breaks.length-1]; return b && !b.auto ? 'Round '+st.round+(m.rounds ? ' of '+m.rounds : '')+' paused' : r+' done'; }
     return r+' · '+(st.last ? 'Last round, <b>'+formatElapsed(st.left)+'</b> to go' : 'Break in <b>'+formatElapsed(st.left)+'</b>');
   }
-  if(st.id==='flow') return st.onBreak ? 'Resting · back when you\'re ready' : 'In the flow <b>'+formatElapsed(st.inSeg||0)+'</b><span class="ml-sep"></span>Break earned <b>'+(st.earned||5)+' min</b>';
+  if(st.id==='flow') return st.onBreak ? 'Resting · back when you\'re ready' : 'In the flow <b>'+formatElapsed(st.inSeg||0)+'</b><span class="ml-sep"></span>'+(st.earned ? 'Break earned <b>'+st.earned+' min</b>' : 'A break unlocks at <b>20 min</b>');
   const as = state.focus.activeSession, t = as && lockTaskPick(as.method.taskId);
   return t ? 'Until <b>'+escapeHtml(t.title)+'</b> is done' : 'Until it\'s done';
 }
@@ -209,7 +209,7 @@ function methodStripHtml(as){
     bar = '<div class="ms-bar"><i class="ms-w is-cur" style="flex:1" data-tip="This round · '+m.work+' min, then '+m.rest+' min off"><u id="msFill" style="width:'+((st.frac||0)*100).toFixed(1)+'%"></u></i></div>';
   }
   return '<div class="ms'+(st.onBreak?' is-break':'')+'">'+bar+'<div class="ms-line"><span class="ms-k">'+m.icon+' '+m.label+(st.id==='flow' ? flowTipHtml() : '')+'</span><span id="msLine">'+methodLine(st)+'</span></div>'+
-    (st.id==='flow' && !st.onBreak ? '<button class="btn btn-ghost btn-sm ms-btn" data-action="openBreakNotePrompt">Take my '+(st.earned||5)+' min</button>' : '')+'</div>';
+    (st.id==='flow' && !st.onBreak && st.earned ? '<button class="btn btn-ghost btn-sm ms-btn" data-action="openBreakNotePrompt">Take my '+st.earned+' min</button>' : '')+'</div>';
 }
 function tickMethodStrip(){
   const line = document.getElementById('msLine'); if(!line) return;
@@ -243,7 +243,10 @@ function methodBreak(minutes, note){
 function flowBreakMinutes(){
   const as = state.focus.activeSession; if(!as || !as.method || as.method.id!=='flow') return null;
   const worked = (Date.now() - as.startedAt) - (as.segStart||0);
-  return Math.max(5, Math.min(30, Math.round(worked/60000/5/5)*5));
+  // nothing's earned in the first 20 minutes (it used to say "5 min" from minute one); then about a fifth
+  // of the stretch, in fives: 20–37 min → 5, 50 → 10, 2½ hours → 30
+  const min = worked/60000;
+  return min < 20 ? 0 : Math.max(5, Math.min(30, Math.round(min/5/5)*5));
 }
 // "Until it's done": finishing that task offers to lock out
 function methodTaskDone(id){
