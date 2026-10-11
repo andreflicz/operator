@@ -467,8 +467,9 @@ async function aiPickModel(){
   if(!r || !r.ok) return null;
   let j = null; try{ j = await r.json(); }catch(e){}
   const ids = arr(j && j.data).map(function(m){ return m.id; });
-  // the newest Sonnet (quick enough to talk to, smart enough to be worth it); the newest of anything if none
-  AI.model = ids.find(function(id){ return /sonnet/i.test(id); }) || ids[0] || null;
+  // the cheapest: Claude Haiku 5.5 ($0.10 / $0.50 per million tokens — a short spoken answer costs a
+  // fraction of a cent). If the key can't see it: any other Haiku, then a Sonnet, then whatever there is.
+  AI.model = ids.find(function(id){ return id==='claude-haiku-5-5'; }) || ids.find(function(id){ return /haiku/i.test(id); }) || ids.find(function(id){ return /sonnet/i.test(id); }) || ids[0] || null;
   return AI.model;
 }
 async function aiAsk(text, cap){
@@ -480,7 +481,11 @@ async function aiAsk(text, cap){
     if(!model){ AI.hasKey = false; opCaption('To talk with me, add an Anthropic API key in Settings → Connections &amp; data → The Operator.'); return; }
     AI.history.push({role:'user', content:text});
     AI.history = AI.history.slice(-12);
-    const body = JSON.stringify({model:model, max_tokens:300, system:aiSystem(), messages:AI.history});
+    const req = {model:model, max_tokens:300, system:aiSystem(), messages:AI.history};
+    // Haiku 5.5 thinks by default (billed, and it eats into the 300-token reply): for a spoken one-liner,
+    // no thinking and low effort — cheaper and quicker. (Older models reject these, so only for it.)
+    if(model==='claude-haiku-5-5'){ req.thinking = {type:'disabled'}; req.output_config = {effort:'low'}; }
+    const body = JSON.stringify(req);
     const r = await fetchWithin(WAKE_HELPER+'ai/chat?b='+hexUtf8(body), 50000);
     let j = null; try{ j = r ? await r.json() : null; }catch(e){}
     const reply = j && arr(j.content).filter(function(c){ return c.type==='text'; }).map(function(c){ return c.text; }).join(' ').trim();

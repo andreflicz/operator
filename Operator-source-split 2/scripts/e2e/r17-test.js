@@ -214,7 +214,7 @@ const newsRoute = (asked, extra) => async r => {
     const asked = [];
     let chatBody = null;
     const p = await ctxPage(b, {profile:{name:'Andre'}, tasks:{items:tasks}, focus:{wake:WAKE}}, {clock:MON, route:newsRoute(asked, async (u, r) => {
-      if(u.includes('/ai/models')){ await r.fulfill({status:200, headers:CORS, body:JSON.stringify({data:[{id:'model-haiku-x'}, {id:'model-sonnet-x'}]})}); return true; }
+      if(u.includes('/ai/models')){ await r.fulfill({status:200, headers:CORS, body:JSON.stringify({data:[{id:'claude-sonnet-5-5'}, {id:'claude-haiku-4-5'}, {id:'claude-haiku-5-5'}]})}); return true; }
       if(u.includes('/ai/chat')){ chatBody = JSON.parse(hexDecode(u.split('b=')[1])); await r.fulfill({status:200, headers:CORS, body:JSON.stringify({content:[{type:'text', text:'Two things today, Andre. Start with the reel.'}]})}); return true; }
       if(u.includes('/ai/status') || u.includes('/tts/status')){ await r.fulfill({status:200, headers:CORS, body:'{"ok":true,"hasKey":false}'}); return true; }
     })});
@@ -226,7 +226,9 @@ const newsRoute = (asked, extra) => async r => {
     check('…its bubble floats over the page (bottom centre), with a reply box', await p.isVisible('#opBub.is-in #opBubInput'));
     await p.fill('#opBubInput', 'What should I start with?'); await p.press('#opBubInput', 'Enter'); await p.waitForTimeout(1200);
     check('it answers in the bubble — the page doesn’t move', /Start with the reel/.test(await p.textContent('#opBubText')));
-    check('the newest Sonnet is used (picked from the API, not hard-coded)', chatBody && chatBody.model==='model-sonnet-x', chatBody && chatBody.model);
+    // (round 20: the cheapest model — Claude Haiku 5.5 — with thinking off and low effort for short spoken answers)
+    check('the cheapest model is used: Claude Haiku 5.5 (from the API’s list)', chatBody && chatBody.model==='claude-haiku-5-5', chatBody && chatBody.model);
+    check('…with thinking off and low effort (a spoken one-liner)', chatBody && chatBody.thinking && chatBody.thinking.type==='disabled' && chatBody.output_config && chatBody.output_config.effort==='low' && chatBody.max_tokens===300);
     check('it knows your day (plan, level) and speaks in short spoken sentences', chatBody && /Edit JJS reel/.test(chatBody.system) && /level 0/.test(chatBody.system) && /spoken out loud/.test(chatBody.system) && chatBody.messages.slice(-1)[0].content==='What should I start with?');
     await p.fill('#opBubInput', 'And after that?'); await p.press('#opBubInput', 'Enter'); await p.waitForTimeout(900);
     check('…and remembers the conversation', chatBody && chatBody.messages.length===3 && chatBody.messages[1].role==='assistant');
