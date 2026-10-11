@@ -40,7 +40,7 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     check('the weather and the sun lead it: temp, sunrise / sunset arc', /58°/.test(await p.textContent('.br-hero')) && await p.isVisible('.br-hero .sun-arc') && /Sunrise/.test(await p.textContent('.br-hero')));
     check('how you slept last night', await p.isVisible('.brh-sleep') && /Slept/.test(await p.textContent('.brh-sleep')));
     // round 13: the one-screen brief shows four good-day thoughts (thoughtsOfDay(4)), and "The Day Ahead" is now "Today"
-    check('human things: a quote, four things for a good day, headlines, today', await p.isVisible('.br-quote .qt') && (await p.$$('.br-thoughts .br-th')).length===4 && /Fed holds rates steady/.test(brief) && /Today/.test(await p.textContent('.br-day .br-k')));
+    check('human things: a quote, the good-day list (rolling), headlines, today', await p.isVisible('.br-quote .qt') && (await p.$$('.br-thoughts .gd-i')).length>=4 && /Fed holds rates steady/.test(brief) && /Today/.test(await p.textContent('.br-day .br-k')));
     check('no business numbers in Good morning', !/Monthly recurring|Open leads/.test(brief));
     check('it ends on "Get ready to start your day."', await p.textContent('#brVoice')==='Get ready to start your day.');
     check('one way forward: Start my morning', await p.isVisible('[data-action="wakeStartMorning"]') && !(await p.$('[data-action="wakeClockIn"]')));

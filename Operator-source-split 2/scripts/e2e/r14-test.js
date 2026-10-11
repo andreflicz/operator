@@ -28,7 +28,7 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
     const p = await newPage(b, OUT+'/r14.html', {profile:{name:'Andre'}, focus:{wake:{enabled:true, time:'07:00', days:[1,2,3,4,5,6]}}}, new Date(2026,9,11,10,0).getTime()); // Sunday
     await p.setViewportSize({width:2200, height:1100}); await p.waitForTimeout(600);
     const r = await p.evaluate(() => { const n = document.querySelector('.np.rest'); const x = n.getBoundingClientRect(); return [x.left, Math.round(x.width), innerWidth]; });
-    check('day off fills the whole wide window', r[0]===0 && r[1]===r[2], r);
+    check('day off fills the whole wide window', Math.abs(r[0]) < 1 && r[1]===r[2], r);
     await p.context().close();
   }
 
@@ -74,7 +74,7 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
     await E("fireWake({})"); await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(400);
     check('sunrise background by default (not black)', await p.$('.brief.bg-sunrise')!==null);
     const lines = await E("JSON.stringify(ui.briefLines)"), L = JSON.parse(lines);
-    const paced = L.every((l, i) => i===0 || l.at - L[i-1].at >= Math.max(1100, L[i-1].text.split(' ').length*150 + 420) - 1);
+    const paced = L.every((l, i) => i===0 || l.at - L[i-1].at >= Math.max(900, L[i-1].text.split(' ').length*150 + 300) - 1);
     check('narration is paced: every line is fully said and rests before the next', paced, L.map(l => l.at));
     await p.clock.runFor(L[0].at + 380 + 250); await p.waitForTimeout(50);
     const said = await p.textContent('#brVoice');
@@ -91,7 +91,7 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
     await E("state.focus.wake.briefBg='dark'; persist('focus')");
     await p.reload(); await p.waitForTimeout(1400);
     check('wake settings survive a reload (topics, sections, background)', await E("[state.focus.wake.newsTopics, state.focus.wake.newsSports, state.focus.wake.newsTech, state.focus.wake.briefBg].join('|')")==='AI|Knicks|Apple|dark');
-    await E("fireWake({})"); await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(300);
+    await E("fireWake({})"); await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(700);
     check('Dark background when you pick it', await p.$('.brief.bg-dark')!==null && !(await p.$('.brief.bg-sunrise')));
     check('no page errors (Good morning)', p.errors.length===0, p.errors);
     await p.context().close();

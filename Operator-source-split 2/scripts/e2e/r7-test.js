@@ -20,6 +20,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('every carousel copy is marked as a copy (only the real cards are live)', clones.cloneCount===12 && clones.real===6, clones);
     const tag = () => p.evaluate(() => { const els = [...document.querySelectorAll('#viewRoot .section, #viewRoot .task-card, #viewRoot .carousel')]; els.forEach((e, i) => e.__keep = i); return els.length; });
     const kept = () => p.evaluate(() => { const els = [...document.querySelectorAll('#viewRoot .section, #viewRoot .task-card, #viewRoot .carousel')]; return {total:els.length, kept:els.filter(e => e.__keep!==undefined).length}; });
+    // (Change is there when you're not locked in — locked in, Up next is drag and drop only)
+    const sess = await E("JSON.stringify(state.focus.activeSession)"); await E("state.focus.activeSession = null; renderView()"); await p.waitForTimeout(200);
     const before = await tag();
     await p.click('.nn-next [data-action="toggleNextPicker"]'); await p.waitForTimeout(200);
     const k1 = await kept();
@@ -35,6 +37,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('there\'s no Select Multiple button any more', !(await p.$('[data-action="toggleTaskSelectMode"]')));
     await p.keyboard.press('Escape'); await p.waitForTimeout(150);
     check('the floating bar goes when nothing is picked', !(await p.$('#bulkBar')));
+    await E("state.focus.activeSession = "+sess+"; ui.nextPicker = null; renderView()"); await p.waitForTimeout(200);
 
     // ---- Now / Up next ----
     check('locked in: Now and Up next sit side by side', await p.isVisible('.nn-panel.is-locked .nn-now') && await p.isVisible('.nn-panel .nn-next'));

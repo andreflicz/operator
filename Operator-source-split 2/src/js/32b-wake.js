@@ -321,12 +321,22 @@ function stopWakeRing(){
 function wakeImUp(){
   clearInterval(wakeBeepTimer); wakeBeepTimer = null;
   const c = document.getElementById('wakeContent'), ov = document.getElementById('wakeOverlay');
+  // a still copy of the alarm screen lies on top and lifts away while Good morning is already being
+  // built underneath — no waiting, no pop
+  let ghost = null;
   if(c && ov && !ov.classList.contains('hidden') && ui.wakeMode!=='brief'){
-    c.classList.add('is-waking');
-    setTimeout(function(){ c.classList.remove('is-waking'); wakeImUpNow(); ov.classList.add('is-entering'); setTimeout(function(){ ov.classList.remove('is-entering'); }, 1400); }, 360);
-    return;
+    ghost = c.cloneNode(true); ghost.removeAttribute('id'); ghost.classList.add('wk-ghost');
+    ghost.querySelectorAll('[id]').forEach(function(e){ e.removeAttribute('id'); });
+    ghost.querySelectorAll('[data-action]').forEach(function(e){ e.removeAttribute('data-action'); });
+    ov.appendChild(ghost);
   }
   wakeImUpNow();
+  if(ghost){
+    ov.classList.add('is-entering');
+    requestAnimationFrame(function(){ ghost.classList.add('is-going'); });
+    setTimeout(function(){ if(ghost.parentNode) ghost.remove(); }, 450);
+    setTimeout(function(){ ov.classList.remove('is-entering'); }, 1400);
+  }
 }
 function wakeImUpNow(){
   const wasTest = wakeRing && wakeRing.test;

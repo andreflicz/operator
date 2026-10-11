@@ -157,9 +157,10 @@ async function ctxPage(b, seed, opts){
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("fireWake({})"); await p.waitForTimeout(300);
     await E("wakeImUp()");
-    check('I’m up: the alarm lifts away first', await p.$('#wakeContent.is-waking')!==null);
-    await p.clock.runFor(450); await p.waitForTimeout(150);
-    check('…then Good morning rises in with the sunrise wash', await E("ui.wakeMode")==='brief' && await p.$('#wakeOverlay.is-entering')!==null);
+    check('I’m up: the alarm lifts away (a still copy on top)…', await p.$('#wakeOverlay .wk-ghost')!==null);
+    check('…while Good morning is already there underneath, rising in with the sunrise wash', await E("ui.wakeMode")==='brief' && await p.$('#wakeOverlay.is-entering')!==null && await p.$('#wakeContent .brief4')!==null);
+    await p.clock.runFor(600); await p.waitForTimeout(150);
+    check('…and the copy is gone', await p.$('#wakeOverlay .wk-ghost')===null);
     check('no page errors (I’m up)', p.errors.length===0, p.errors);
     await p.context().close();
   }

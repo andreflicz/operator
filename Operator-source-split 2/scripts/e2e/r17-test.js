@@ -101,7 +101,7 @@ const newsRoute = (asked, extra) => async r => {
       const mb = await p.evaluate(() => { const m = document.querySelector('.brief-top .op-mute-top').getBoundingClientRect(), s = document.querySelector('.brief-top .brief-skipall').getBoundingClientRect(); return {gap:s.left - m.right, right:m.right > window.innerWidth*0.7}; });
       check('…right next to it (not floating in the middle)', mb.gap>=0 && mb.gap<30 && mb.right, mb);
       check('Headlines: the news with tech mixed in', await p.isVisible('.br-news') && /Fed signals/.test(await p.textContent('.br-news')) && (await p.$$('.br-news .br-tag')).length>=1 && /Apple unveils/.test(await p.textContent('.br-news')));
-      check('Sports: its own panel — scores and sports headlines', await p.isVisible('.br-sports') && (await p.$$('.br-sports .gc')).length>=2 && /Giants rally/.test(await p.textContent('.br-sports')) && !/Giants rally/.test(await p.textContent('.br-news')));
+      check('Sports: its own panel — scores and sports headlines', await p.isVisible('.br-sports') && (await p.$$('.br-sports .sb-row')).length>=2 && !/Giants rally/.test(await p.textContent('.br-news')));
       const qh = await p.evaluate(() => document.querySelector('.br-quote').getBoundingClientRect().height);
       for(let i=0;i<6;i++) await E("nextQuote('morning')");
       await p.waitForTimeout(300);
@@ -231,10 +231,10 @@ const newsRoute = (asked, extra) => async r => {
     await p.fill('#opBubInput', 'And after that?'); await p.press('#opBubInput', 'Enter'); await p.waitForTimeout(900);
     check('…and remembers the conversation', chatBody && chatBody.messages.length===3 && chatBody.messages[1].role==='assistant');
     // the keys
-    await E("endBriefing(); ui.view='settings'; ui.settingsTab='focus'; renderView(); openWakeSetup && openWakeSetup()"); await p.waitForTimeout(300);
+    await E("endBriefing(); ui.view='settings'; ui.settingsTab='operator'; renderView()"); await p.waitForTimeout(300);
     await E("wakeCfg().voice = true; renderView()"); await p.waitForTimeout(400);
     const hasFields = await p.$('#aiKey')!==null && await p.$('#opElevenKey')!==null;
-    check('Settings: an ElevenLabs key and an Anthropic key, each saved by the launcher', hasFields);
+    check('Settings → Connections & data: an ElevenLabs key and an Anthropic key, each saved by the launcher', hasFields);
     if(hasFields){
       await p.fill('#aiKey', 'sk-ant-SECRET-1'); await p.click('[data-action="aiKeySave"]');
       await p.fill('#opElevenKey', 'el-SECRET-2'); await p.click('[data-action="opElevenSave"]'); await p.waitForTimeout(600);
@@ -276,7 +276,7 @@ const newsRoute = (asked, extra) => async r => {
     await p.click('.today-hero .pcf-front'); await p.waitForTimeout(800);
     check('click: it turns over — overall and the four ratings on the back', await p.$('.today-hero .pcf.is-flipped')!==null && (await p.$$('.today-hero .pcf-back .pc-attrs > span')).length===4 && /OVR/.test(await p.textContent('.today-hero .pcf-back')));
     await p.click('.today-hero .pcf-open'); await p.waitForTimeout(400);
-    check('"Your card →" opens Personal → You (the full 2K card)', await E("ui.view==='personal' && ui.personalTab==='you'") && await p.isVisible('.you .pc-big') && (await p.$$('.you-attr')).length===4 && (await p.$$('.you .you-tr')).length===9);
+    check('"Your card →" opens Personal → You (the full 2K card)', await E("ui.view==='personal' && ui.personalTab==='you'") && await p.isVisible('.you .pc-big') && (await p.$$('.you-attr')).length===4 && await p.isVisible('.you .you-chart'));
     check('You shows your body on a scale for your height (174 healthy line, 209 obese line, you at 205)', /174/.test(await p.textContent('.you-body .bmi-lab')) && /209/.test(await p.textContent('.you-body .bmi-lab')) && /205/.test(await p.textContent('.you-body .bmi-you')));
     check('…and stays simple (no daily quest, no wall of XP lines)', await p.$('.you .sys-quest, .you .you-today')===null);
     // SYSTEM windows

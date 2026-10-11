@@ -124,7 +124,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('notes save when you switch sections', await E("state.business.clients.find(c=>c.id==='c1').notes")==='Loves short hooks');
     await E("closeClientModal ? closeClientModal() : null").catch(()=>{});
     await E("ui.view='settings'; renderView()"); await p.waitForTimeout(400);
-    check('settings: five groups on the left', (await p.$$('.settings-sidenav .settings-nav-item')).length===5);
+    check('settings: seven clear groups on the left', (await p.$$('.settings-sidenav .settings-nav-item')).length===7);
     await E("ui.view='today'; renderView(); openQuickJournalModal()"); await p.waitForTimeout(500);
     await p.fill('#quickJournalModalTextTitle', 'Pitch ideas'); await p.fill('#quickJournalModalText', 'Hook-first openers');
     await E("addJournalEntry('quickJournalModalText')"); await p.waitForTimeout(200);

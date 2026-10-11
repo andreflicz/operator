@@ -38,8 +38,8 @@ async function ctxPage(b, seed, opts){
       return r.fulfill(okJ); }});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     check('an older launcher still running is named as the reason', /older Operator \(launcher v9\)/.test(await E("opLauncherWhy()")));
-    helperV = 10;
-    check('the up-to-date launcher is recognised (v10 is what this version needs)', await E("OP_HELPER_NEEDS")===10 && /couldn’t write/.test(await E("opLauncherWhy()")));
+    helperV = 11;
+    check('the up-to-date launcher is recognised (v11 is what this version needs)', await E("OP_HELPER_NEEDS")===11 && /couldn’t write/.test(await E("opLauncherWhy()")));
     await p.unroute('http://127.0.0.1:8935/**'); await p.route('http://127.0.0.1:8935/**', r => r.abort());
     check('no launcher at all: "isn’t running — open it from its icon"', /isn’t running/.test(await E("opLauncherWhy()")));
     check('no page errors (keys)', p.errors.length===0, p.errors);
@@ -146,7 +146,7 @@ async function ctxPage(b, seed, opts){
     await E("ui.view='personal'; ui.personalTab='you'; renderView()"); await p.waitForTimeout(400);
     check('You: no paragraphs — a "How leveling works" link instead', await p.$('.you .you-how')===null && await p.isVisible('[data-action="openXpHow"]'));
     await p.click('[data-action="openXpHow"]'); await p.waitForTimeout(200);
-    check('…which opens its own page (earning, levels, ranks, ratings)', await p.isVisible('#xpHowOverlay:not(.hidden)') && (await p.$$('#xpHowContent .xph-r')).length>15);
+    check('…which opens its own page (earning, levels, ranks, ratings)', await p.isVisible('#xpHowOverlay:not(.hidden)') && (await p.$$('#xpHowContent .xpg-chart')).length>=5 && /Ranks/.test(await p.textContent('#xpHowContent')));
     await E("ACTIONS.closeXpHow()");
     check('the last 30 days of XP, a bar a day', (await p.$$('.you-bars i')).length===30);
     check('the body panel: numbers on a scale, no wall of text', await p.$('.you-body .you-note')===null && await p.isVisible('.you-body .bmi-legend'));

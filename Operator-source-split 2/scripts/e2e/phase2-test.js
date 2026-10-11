@@ -58,7 +58,7 @@ const SP = require('./common.js').OUT;
   await p.click('#taskCtxMenu [data-op="backlog"]');
   check('moved to backlog', await p.evaluate(() => window.__op.state.tasks.items.find(t=>t.id==='t1').status)==='backlog');
   await p.click('[data-action="focusTasksSubTab"][data-tab="videoIdeas"]');
-  check('FAB = video idea', (await p.getAttribute('#fabAdd','title'))==='Add video idea');
+  check('FAB = add content', (await p.getAttribute('#fabAdd','title'))==='Add content');
   check('video idea compact (no notes shown)', !(await p.isVisible('.video-idea-compact .vic-body')));
   await p.click('.video-idea-compact .vic-head');
   check('video idea expands', await p.isVisible('.video-idea-compact .vic-body'));

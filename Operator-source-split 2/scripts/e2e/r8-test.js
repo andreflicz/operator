@@ -204,7 +204,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
       business:{packages:[], pipeline:[], clients:[{id:'c1',name:'N',business:'Nina Co',status:'active',stage:'active',mrr:2500,createdAt:'2026-09-01',touches:[],touchpoints:[],deliverables:[],journal:[]}]}}, T0);
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await p.click('[data-action="nav"][data-view="settings"]'); await p.waitForTimeout(150);
-    check('Settings opens on You', (await E("ui.settingsTab"))==='you' && /About you/.test(await p.textContent('#viewRoot')) && await p.isVisible('#setName') && /Daily Standard/.test(await p.textContent('#viewRoot')) && /Why You/.test(await p.textContent('#viewRoot')));
+    check('Settings opens on You', (await E("ui.settingsTab"))==='you' && /About you/.test(await p.textContent('#viewRoot')) && await p.isVisible('#setName') && /Why You/.test(await p.textContent('#viewRoot')));
     await p.click('[data-action="settingsTab"][data-tab="system"]'); await p.waitForTimeout(150); // App updates is a part of "Connections & Data" now
     check('App updates open on the latest session', (await p.$$('.upd-card')).length===2);
     await p.selectOption('#updatesRangeSel', '1h'); await p.waitForTimeout(100);
