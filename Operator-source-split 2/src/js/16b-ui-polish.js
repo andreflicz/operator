@@ -95,14 +95,30 @@ function fabContext(){
   if(v==='personal'){
     if(ui.personalTab==='journal' && ui.journalMode==='boards' && typeof canvasAddNote==='function') return {label:'Add note to board', run:function(){ canvasAddNote(); }};
     if(ui.personalTab==='journal') return {label:'New journal entry', run:openQuickJournalModal};
-    if(ui.personalTab==='finances') return {label:'Add a debt', run:function(){ ui.forms.debt = true; renderView(); setTimeout(function(){ const el = document.getElementById('debtName'); if(el) el.focus(); }, 60); }};
+    if(ui.personalTab==='finances'){
+      const form = function(k, id){ return function(){ ui.forms[k] = true; renderView(); setTimeout(function(){ const el = document.getElementById(id); if(el){ el.scrollIntoView({block:'center', behavior:'smooth'}); el.focus(); } }, 60); }; };
+      return {label:'Add to Finances', menu:[['&#128184;', 'An expense', form('expense', 'expName')], ['&#128176;', 'Income', form('income', 'incomeDate')], ['&#128179;', 'A debt', form('debt', 'debtName')]]};
+    }
+    if(ui.personalTab==='growth') return {label:'Add a skill', run:function(){ ui.forms.skill = true; renderView(); setTimeout(function(){ const el = document.getElementById('skillName'); if(el) el.focus(); }, 60); }};
     if(ui.personalTab==='wishlist' && typeof openWishItemModal==='function') return {label:'Add wish list item', run:function(){ openWishItemModal(null); }};
     if(ui.personalTab==='fitness') return {label:'Log a workout, weigh-in or food', run:function(){ openHealthSheet('workout'); }};
     return {label:'Add goal', run:function(){ openGoalSheet('week'); }};
   }
   return null;
 }
-ACTIONS.fabAdd = function(){ const c = fabContext(); if(c) c.run(); };
+// (a page with more than one kind of thing to add gets a small menu above the +)
+ACTIONS.fabAdd = function(){
+  const c = fabContext(); if(!c) return;
+  if(!c.menu){ c.run(); return; }
+  let m = document.getElementById('fabMenu');
+  if(m && m.classList.contains('is-in')){ fabMenuClose(); return; }
+  if(!m){ m = document.createElement('div'); m.id = 'fabMenu'; m.className = 'fab-menu'; document.body.appendChild(m); }
+  m.innerHTML = c.menu.map(function(x, i){ return '<button class="fab-mi" data-action="fabMenuPick" data-id="'+i+'" style="--i:'+i+'"><span>'+x[0]+'</span>'+x[1]+'</button>'; }).join('');
+  ui.fabMenu = c.menu; void m.offsetWidth; m.classList.add('is-in');
+};
+function fabMenuClose(){ const m = document.getElementById('fabMenu'); if(m) m.classList.remove('is-in'); }
+ACTIONS.fabMenuPick = function(el, e, id){ const it = (ui.fabMenu || [])[Number(id)]; fabMenuClose(); if(it) it[2](); };
+document.addEventListener('mousedown', function(e){ if(!e.target.closest || e.target.closest('#fabMenu, #fabAdd')) return; fabMenuClose(); }, true);
 afterRenderHooks.push(function(){
   const fab = document.getElementById('fabAdd');
   if(!fab) return;

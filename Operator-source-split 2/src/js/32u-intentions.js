@@ -146,6 +146,9 @@ function openCheckoutForm(kind, key, cinematic){
       (kind==='month' && rec.habit ? '<div class="co-row is-habit"><span class="co-l">Beat the habit: '+escapeHtml(rec.habit)+'<small>+'+CHECKIN_XP.habit+' XP</small></span>'+pick('habit', ui.coPick.v.habit===1)+'</div>' : '')+
       '<label class="int-f"><span>What went well?</span><input class="int-in" id="co_well" maxlength="200" placeholder="The win you want to remember." value="'+escapeHtml((rec.out && rec.out.well)||'')+'"></label>'+
       '<label class="int-f"><span>What will you fix next '+(kind==='month' ? 'month' : 'week')+'?</span><input class="int-in" id="co_fix" maxlength="200" placeholder="One thing. Make it specific." value="'+escapeHtml((rec.out && rec.out.fix)||'')+'"></label>'+
+      // a message to lock away: sealed in the vault (Personal → Journal → Vault), and it can come back one morning
+      '<label class="int-f co-seal"><span>&#128274; Lock a message away <small>optional</small></span><textarea class="int-in" id="co_seal" maxlength="2000" rows="3" placeholder="Anything you want to say to yourself. It’s sealed and kept in the vault.">'+escapeHtml(ui.coSealDraft||'')+'</textarea></label>'+
+      '<label class="co-seal-back"><input type="checkbox" id="co_seal_back" checked> Bring it back on a morning '+(kind==='month' ? 'three months from now' : 'a month from now')+'</label>'+
     '</div>'+
     '<div class="int-a"><span class="int-a-xp">Checking out: +'+(kind==='month' ? CHECKIN_XP.monthOut : CHECKIN_XP.weekOut)+' XP</span><button class="int-save" data-action="saveCheckout" data-id="'+kind+':'+key+'">Check out &#8594;</button></div>';
   o.dataset.kind = kind; o.dataset.mode = 'out'; o.dataset.key = kind+':'+key;
@@ -173,6 +176,13 @@ ACTIONS.saveCheckout = function(el, e, id){
   });
   rec.at = rec.at || Date.now();
   rec.out = {at:Date.now(), well:(document.getElementById('co_well')||{}).value||'', fix:(document.getElementById('co_fix')||{}).value||''};
+  const seal = ((document.getElementById('co_seal')||{}).value||'').trim();
+  if(seal){
+    const back = !!(document.getElementById('co_seal_back')||{}).checked, label = kind==='month' ? monthName(key) : 'The week of '+fmtDateShort(key);
+    vaultStore().push({id:uid(), kind:kind, key:key, label:label, text:seal.slice(0, 2000), at:Date.now(), back:back});
+    if(back && typeof capsules==='function') capsules().push({id:uid(), text:seal.slice(0, 2000), title:'Sealed at the end of '+(kind==='month' ? monthName(key) : 'the week of '+fmtDateShort(key)), writtenOn:todayStr(), openOn:addDays(todayStr(), kind==='month' ? 91 : 30)});
+    ui.coSealDraft = '';
+  }
   if(kind==='month' && rec.habit){ rec.out.habit = v.habit===1; if(rec.out.habit) lines.push({why:'Beat: '+rec.habit, xp:CHECKIN_XP.habit}); }
   lines.push({why:kind==='month' ? 'Month check-out' : 'Week check-out', xp:kind==='month' ? CHECKIN_XP.monthOut : CHECKIN_XP.weekOut});
   store[key] = rec; ui.coPick = null;
@@ -274,7 +284,7 @@ function tierCardHtml(kind, opts){
       '<span style="flex:1"></span>'+(due ? '<button class="tg-out" data-action="openCheckout" data-id="'+due.kind+':'+due.key+'">Check out &#8594;</button>' : '<button class="tg-edit" data-action="openIntent" data-id="'+kind+'" title="'+(checkedIn(kind, key) ? 'Edit your check-in' : 'Check in')+'">'+(checkedIn(kind, key) ? '&#9998;' : 'Check in &#8594;')+'</button>')+'</div>'+
     (sub ? '<div class="tg-sub">'+escapeHtml(sub)+'</div>' : '')+
     (gs.length ? '<div class="tg-list">'+gs.map(tierGoalRowHtml).join('')+'</div>' : '<div class="tg-empty">'+(kind==='month' ? 'No goals for the month yet.' : 'No goals for the week yet.')+'</div>')+
-    (opts.add==='sheet' ? (checkedOut(kind, key) ? '<div class="tg-addrow"><button class="tg-addbtn" data-action="tierReopen" data-id="'+kind+'">&#8634; Reopen the '+(kind==='month' ? 'month' : 'week')+'</button></div>' : gs.length < 5 ? '<div class="tg-addrow"><button class="tg-addbtn" data-action="openGoalSheet" data-id="'+kind+'" title="Add a '+(kind==='month' ? 'monthly' : 'weekly')+' goal">&#65291;</button></div>' : '') :
+    (opts.add==='sheet' ? (checkedOut(kind, key) ? '<div class="tg-addrow"><button class="tg-addbtn" data-action="tierReopen" data-id="'+kind+'">&#8634; Reopen the '+(kind==='month' ? 'month' : 'week')+'</button></div>' : '') :
      opts.add && gs.length < 5 && !checkedOut(kind, key) ? '<div class="tg-add"><input class="input" id="tierAdd-'+kind+'" maxlength="140" placeholder="+ Add a '+(kind==='month' ? 'monthly' : 'weekly')+' goal"><button class="btn btn-sm" data-action="tierGoalAdd" data-id="'+kind+'">Add</button></div>' : '')+
   '</div>';
 }
@@ -356,3 +366,19 @@ function briefHudHtml(){
     '<i class="b4-hud-bar"><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i>'+
     '<div class="b4-hud-s"><span>'+(x.canLevel ? '<em class="b4-hud-up">Level up ready</em>' : x.blocked && x.blocked.length ? '<em class="b4-hud-warn">&#9888; needs '+escapeHtml(x.blocked.join(' & '))+'</em>' : Math.min(x.total - x.levelLo, x.levelHi - x.levelLo).toLocaleString()+' / '+(x.levelHi - x.levelLo).toLocaleString()+' XP')+'</span><span>&#128293; '+streak+'</span></div></div></div>';
 }
+// ---- the vault: messages you lock away when you close out a week or a month ----
+// Kept sealed (Personal → Journal → Vault); open one to read it. They can also come back to you one
+// morning, as a note from past you.
+function vaultStore(){ const s = intentStore(); if(!Array.isArray(s.vault)) s.vault = []; return s.vault; }
+function vaultHtml(){
+  const v = vaultStore().slice().sort(function(a, b){ return b.at - a.at; }), open = ui.vaultOpen || {};
+  if(!v.length) return '<div class="vault-empty"><div class="vault-empty-i">&#128274;</div><b>Nothing locked away yet.</b><span>When you check out of a week or a month, you can seal a message to yourself. It’s kept here.</span></div>';
+  return '<div class="vault">'+v.map(function(m, i){ const o = !!open[m.id];
+    return '<div class="vault-card'+(o ? ' is-open' : '')+' is-'+m.kind+'" style="--i:'+Math.min(i, 12)+'">'+
+      '<button class="vault-seal" data-action="vaultToggle" data-id="'+m.id+'" title="'+(o ? 'Seal it again' : 'Open it')+'"><span class="vault-wax">'+(m.kind==='month' ? '&#127942;' : '&#9989;')+'</span>'+
+        '<span class="vault-meta"><b>'+escapeHtml(m.label)+'</b><small>Sealed '+fmtDateShort(todayStr(new Date(m.at)))+(m.back ? ' · coming back one morning' : '')+'</small></span><span class="vault-chev">'+(o ? '&#9652;' : '&#9662;')+'</span></button>'+
+      '<div class="vault-body"><div class="vault-text">'+escapeHtml(m.text)+'</div></div>'+
+    '</div>'; }).join('')+'</div>';
+}
+ACTIONS.vaultToggle = function(el, e, id){ ui.vaultOpen = ui.vaultOpen || {}; ui.vaultOpen[id] = !ui.vaultOpen[id]; renderView(); };
+document.addEventListener('input', function(e){ if(e.target && e.target.id==='co_seal') ui.coSealDraft = e.target.value; });

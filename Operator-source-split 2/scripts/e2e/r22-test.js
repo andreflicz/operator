@@ -98,14 +98,14 @@ const day = (base, n) => { const d = new Date(base); d.setDate(d.getDate()+n); r
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     const D = () => E("xpLast=null, JSON.stringify(xpSummaryFresh().attrs.DIS)").then(JSON.parse);
     let d = await D();
-    check('Discipline: Integrity · Reliability · Consistency', JSON.stringify(d.subs.map(s => s.label))==='["Integrity","Reliability","Consistency"]', d.subs.map(s => s.label));
+    check('Discipline: Reliability · Consistency (round 25)', JSON.stringify(d.subs.map(s => s.label))==='["Reliability","Consistency"]', d.subs.map(s => s.label));
     // two weeks ago: nothing. The last two weeks: deep work and a task every day, workouts
     const ss = [], ts = [], gs = [];
     for(let i=1;i<=14;i++){ ss.push("{id:'s"+i+"', date:'"+day(T, -i)+"', minutes:150, type:'deep'}"); ts.push("{id:'t"+i+"', title:'x', status:'done', completedAt:'"+day(T, -i)+"'}"); }
     for(let n=1;n<=14;n++) gs.push("{id:'g"+n+"', date:'"+day(T, -n)+"', type:'Run'}");
     await E("state.focus.sessions.push("+ss.join(',')+"); state.tasks.items.push("+ts.join(',')+"); state.health.gymLog.push("+gs.join(',')+")");
     d = await D();
-    const c = d.subs[2];
+    const c = d.subs[1];
     check('Consistency rates doing all of it, and says it’s trending up', c.v > 60 && c.trend===1 && /Trending up/.test(c.note), c);
     check('Discipline comes up easily once you’re consistent', d.v >= 70, d);
     check('no page errors (discipline)', p.errors.length===0, p.errors);

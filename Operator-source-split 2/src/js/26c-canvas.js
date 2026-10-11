@@ -55,7 +55,7 @@ function boardStripHtml(kind, current){
       const isMaster = master && r.id===master.id;
       return '<button class="board-pill'+(activeRoot && activeRoot.id===r.id?' is-active':'')+(isMaster?' is-master':'')+'" data-action="boardOpen" data-kind="'+kind+'" data-id="'+r.id+'" title="Open '+escapeHtml(r.name)+'">'+
         '<span class="board-pill-thumb">'+(count ? boardStaticHtml(r, 'board-thumb') : '<span class="board-pill-empty">empty</span>')+(isMaster ? '<span class="board-pill-star" title="Your vision board. Shows on Today and when you wake up">&#9733;</span>' : '')+'</span>'+
-        '<span class="board-pill-text"><span class="board-pill-name">'+escapeHtml(r.name)+'</span><span class="board-pill-count">'+(isMaster ? 'vision board &middot; ' : '')+count+' item'+(count===1?'':'s')+'</span></span>'+
+        '<span class="board-pill-text"><span class="board-pill-name">'+escapeHtml(r.name)+'</span><span class="board-pill-count">'+(isMaster ? 'vision board &middot; ' : r.category==='business' ? 'business &middot; ' : '')+count+' item'+(count===1?'':'s')+'</span></span>'+
       '</button>';
     }).join('')+
     (master ? '' : '<button class="board-pill board-pill-new" data-action="boardNewVision"><span class="board-pill-plus">&#9733;</span><span class="board-pill-text"><span class="board-pill-name">Vision board</span><span class="board-pill-count">the one you wake up to</span></span></button>')+
@@ -92,6 +92,8 @@ function renderBoardShell(kind){
         (view ? '<span class="board-title-static">'+escapeHtml(b.name)+'</span>' : '<input class="board-title-input" data-board-rename="'+b.id+'" value="'+escapeHtml(b.name)+'">')+
         (path[0] && masterVisionBoard() && path[0].id===masterVisionBoard().id ? '<span class="board-master-tag" title="Shows on Today and on the wake-up screen">&#9733; Vision board</span>'
           : (!b.parentId && !view ? '<button class="board-tool" data-action="boardMakeMaster" title="Make this the board you wake up to">&#9734; Make it my vision board</button>' : ''))+
+        // (a business board stays off the Inspiration page; your vision board can't be one)
+        (!b.parentId && !(masterVisionBoard() && masterVisionBoard().id===b.id) ? '<button class="board-tool board-cat'+(b.category==='business' ? ' is-on' : '')+'" data-action="boardBizToggle" data-id="'+b.id+'" title="'+(b.category==='business' ? 'A business board: it stays off Inspiration. Click to make it a regular board.' : 'Mark as a business board (kept off Inspiration)')+'">&#128188; '+(b.category==='business' ? 'Business board' : 'Business?')+'</button>' : '')+
       '</div>'+
       '<div class="row" style="gap:6px;position:relative;">'+
         tool('boardBgToggle', '&#127912;', 'Background', ui.boardBgOpen ? ' data-on="1"' : '')+
@@ -553,6 +555,7 @@ document.addEventListener('paste', function(e){
 // ---- toolbar actions ----
 function openBoard(kind, id){ if(cv.editing) finishEditing(); ui.boardIds = ui.boardIds||{}; ui.boardIds[kind] = id; cv.sel.clear(); renderView(); }
 ACTIONS.boardOpen = function(el){ openBoard(el.dataset.kind, el.dataset.id); };
+ACTIONS.boardBizToggle = function(el, e, id){ const b = boardById(id); if(!b) return; b.category = b.category==='business' ? null : 'business'; persist('boards'); renderView(); };
 document.addEventListener('change', function(e){
   const t = e.target; if(!t || !t.dataset) return;
   if(t.dataset.boardPick) openBoard(t.dataset.boardPick, t.value);

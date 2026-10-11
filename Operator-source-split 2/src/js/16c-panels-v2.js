@@ -108,13 +108,14 @@ function renderGoalsTab(){
   const wh = typeof tierHistoryHtml==='function' ? tierHistoryHtml('week', 8) : '', mh = typeof tierHistoryHtml==='function' ? tierHistoryHtml('month', 6) : '';
   const head = function(t, extra){ return '<div class="gl-h"><span>'+t+'</span>'+(extra||'')+'</div>'; };
   return '<div class="gl">'+
-    '<div class="gl-sec">'+head('The big ones', '<button class="gl-new" data-action="openGoalSheet" data-id="long">&#65291; New goal</button>')+masterGoalsHtml(false)+'</div>'+
+    // (no add buttons here: the + in the corner adds a goal of any kind)
+    '<div class="gl-sec">'+head('The big ones')+masterGoalsHtml(false)+'</div>'+
     (typeof tierCardHtml==='function' ? '<div class="gl-sec">'+head('This week &amp; this month')+
       '<div class="tg-grid">'+tierCardHtml('week', {add:'sheet'})+tierCardHtml('month', {add:'sheet'})+'</div>'+
       (wh || mh ? '<div class="tg-hists">'+(wh ? '<div><small>Past weeks</small>'+wh+'</div>' : '')+(mh ? '<div><small>Past months</small>'+mh+'</div>' : '')+'</div>' : '')+'</div>' : '')+
     '<div class="gl-sec">'+head('Your goals', open.length ? '<small class="gl-n">'+open.length+'</small>' : '')+
       '<div class="goal-grid">'+open.map(function(g){ return goalCardHtml(g, false); }).join('')+
-        (open.length ? '' : '<button class="gl-add" data-action="openGoalSheet" data-id="long"><span>&#65291;</span>Something of your own to work toward</button>')+'</div>'+
+        (open.length ? '' : '<div class="gl-none">Nothing of your own yet. The + in the corner adds one.</div>')+'</div>'+
     '</div>'+
     (done.length ? '<div class="gl-sec"><button class="cc2-past-toggle" data-action="toggleForm" data-form="goalsDone">'+(ui.forms.goalsDone?'&#9662;':'&#9656;')+' Achieved ('+done.length+')</button>'+
       (ui.forms.goalsDone ? '<div class="goal-grid" style="margin-top:10px;">'+done.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : '')+'</div>' : '')+

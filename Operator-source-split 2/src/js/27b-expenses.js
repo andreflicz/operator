@@ -109,7 +109,7 @@ function expensesHtml(){
         '<div class="ex-connect-r"><input class="input" id="finToken" placeholder="Paste your SimpleFIN setup token"><button class="btn btn-primary" data-action="finConnect"'+(b.busy ? ' disabled' : '')+'>'+(b.busy ? 'Connecting…' : 'Connect')+'</button></div>'+
         (b.err ? '<div class="ex-err">'+escapeHtml(b.err)+'</div>' : '')+'</div>';
   return '<div class="section ex">'+
-    '<div class="section-title">Expenses<span class="ex-hbtns"><button class="btn btn-sm btn-ghost" data-action="bankCsvPick" title="A CSV statement from your bank’s website">Import statement</button><button class="btn btn-sm" data-action="toggleForm" data-form="expense">'+(ui.forms.expense ? 'Close' : '+ Add expense')+'</button></span></div>'+
+    '<div class="section-title">Expenses<span class="ex-hbtns"><button class="btn btn-sm btn-ghost" data-action="bankCsvPick" title="A CSV statement from your bank’s website">Import statement</button>'+(ui.forms.expense ? '<button class="btn btn-sm" data-action="toggleForm" data-form="expense">Close</button>' : '')+'</span></div>'+
     (ui.forms.expense ? '<div class="card ex-form"><input class="input" id="expName" placeholder="What was it?"><input class="input" type="number" step="0.01" id="expAmount" placeholder="$">'+
       '<select class="input" id="expCat"><option value="">Kind (auto)</option>'+EXP_CATS.map(function(c){ return '<option value="'+c.id+'">'+c.label+'</option>'; }).join('')+'</select>'+
       '<input class="input" type="date" id="expDate" value="'+todayStr()+'"><button class="btn btn-good" data-action="expAdd">Add</button></div>' : '')+

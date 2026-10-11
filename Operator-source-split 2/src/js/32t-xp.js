@@ -279,9 +279,9 @@ function xpSummaryFresh(){
 //              latest week heaviest), then Weight (BMI for your height). Your weight also sets a
 //              ceiling: carrying a lot of extra weight, even perfect training and eating top out around
 //              60 until the weight comes down.
-//   Discipline keeping your word: Integrity (your whole day's standard, day after day),
-//              Reliability (things with a deadline, done by it), Consistency (everything, every week:
-//              the work, training, tasks, food, checking in; and which way it's going)
+//   Discipline keeping your word: Reliability (things with a deadline, done by it) and Consistency
+//              (completing everything, every week: the work, tasks, videos, training, food, goals, the
+//              streak, and Op's check-ins; and which way it's going)
 const rate99 = function(f){ return Math.round(25 + 75*Math.max(0, Math.min(1, f))); };
 // height in inches (Settings → You); weight from your weigh-ins (lb, or kg if you've set kg)
 function bodyStats(){
@@ -340,39 +340,55 @@ function healthCap(b){
 // work days you hit your deep work target, workouts against your number, days you finished something,
 // days you logged food (once you log food at all) and whether you checked in for the week (once you've
 // started checking in). Then which way it's going: the last two weeks against the two before.
+// Consistency: getting it all done, week after week: the work, your tasks, your videos, training (and
+// food once you log it), then the weekly and monthly goals you hit, your streak, and how you've answered
+// when Op checks in. The last two weeks count most, so it can turn around quickly.
 function consistencyStats(ctx){
   const today = todayStr(), perWk = state.profile.weeklyWorkoutTarget || 4, target = ctx.target;
   const foodDays = {}; arr(state.health && state.health.calorieEntries).forEach(function(c){ if(c.date) foodDays[c.date] = 1; });
   const eatLogs = Object.keys(foodDays).length > 0;
   const checks = typeof checkedIn==='function' && typeof intentStore==='function' && Object.keys(intentStore().weeks||{}).length > 0;
+  // videos: what you set for content (a week's worth), or two a week
+  const ct = state.standards.contentTargets || {};
+  const vidWk = ['business', 'personal'].reduce(function(a, r){ const t = ct[r]; return a + (t && t.n ? (t.per==='day' ? t.n*7 : t.n) : 0); }, 0) || 2;
   // from your first day of data (days before you used Operator don't count against you)
   const first = [xpStart()].concat(arr(state.focus.sessions).map(function(x){ return x.date; }), ctx.gymDays, Object.keys(ctx.doneOn)).filter(Boolean).sort()[0];
   const weeks = [];
   for(let k=0;k<4;k++){
-    let workAim = 0, workHit = 0, taskDays = 0, trained = 0, food = 0, days = 0;
+    let workAim = 0, workHit = 0, taskDays = 0, vids = 0, trained = 0, food = 0, days = 0;
     for(let i=0;i<7;i++){
       const d = addDays(today, -(7*k + i));
       if(d < first) continue;
-      const deepHit = ctx.deep(d) >= target, did = !!(ctx.doneOn[d] && (ctx.doneOn[d].tasks || ctx.doneOn[d].videos));
+      const dn = ctx.doneOn[d] || {tasks:0, videos:0};
+      const deepHit = ctx.deep(d) >= target, did = !!(dn.tasks || dn.videos);
       if(ctx.trained(d)) trained++;
       if(foodDays[d]) food++;
+      vids += dn.videos || 0;
       if(d===today && !deepHit && !did) continue;
       days++;
-      if(!isDayOff(d)){ workAim++; if(deepHit) workHit++; if(did) taskDays++; }
+      if(!isDayOff(d)){ workAim++; if(deepHit) workHit++; if(dn.tasks) taskDays++; }
     }
     if(!days){ weeks.push(null); continue; }
-    const aim = Math.min(5, workAim) || 1, parts = [Math.min(1, workHit/aim), Math.min(1, taskDays/aim), Math.min(1, trained/(perWk*Math.min(7, days)/7 || 1))];
+    const aim = Math.min(5, workAim) || 1, span = Math.min(7, days)/7;
+    const parts = [Math.min(1, workHit/aim), Math.min(1, taskDays/aim), Math.min(1, vids/(vidWk*span || 1)), Math.min(1, trained/(perWk*span || 1))];
     if(eatLogs) parts.push(Math.min(1, food/Math.min(7, days)));
     if(checks) parts.push(checkedIn('week', weekKey(addDays(today, -7*k))) ? 1 : 0);
     weeks.push(parts.reduce(function(a, x){ return a + x; }, 0)/parts.length);
   }
   let s = 0, w = 0; [.4, .3, .2, .1].forEach(function(x, k){ if(weeks[k]!=null){ s += x*weeks[k]; w += x; } });
-  if(!w) return null;
+  const daily = w ? s/w : null;
+  // the bigger picture: goals hit, the streak, and Op's check-ins (only the bad ones count against you)
+  const wkF = tierHitRate('week', 4), moF = tierHitRate('month', 3);
+  const streakF = Math.min(1, computeStreak()/21);
+  const acctF = typeof acctScore==='function' ? acctScore() : null;
+  const pieces = [[.55, daily], [.13, wkF], [.1, moF], [.1, streakF], [.12, acctF]];
+  let ps = 0, pw = 0; pieces.forEach(function(p){ if(p[1]==null) return; ps += p[0]*p[1]; pw += p[0]; });
+  if(!pw || (daily==null && acctF==null)) return null;
   const avg = function(a){ const v = a.filter(function(x){ return x!=null; }); return v.length ? v.reduce(function(p, x){ return p + x; }, 0)/v.length : null; };
   const now = avg(weeks.slice(0, 2)), before = avg(weeks.slice(2, 4));
   const trend = now==null || before==null ? 0 : now - before > 0.08 ? 1 : before - now > 0.08 ? -1 : 0;
-  const parts = ['work', 'tasks', 'training'].concat(eatLogs ? ['food'] : [], checks ? ['check-ins'] : []);
-  return {f:s/w, weeks:weeks, trend:trend, parts:parts};
+  const parts = ['work', 'tasks', 'videos', 'training'].concat(eatLogs ? ['food'] : [], ['weekly and monthly goals', 'the streak'], acctF!=null ? ['check-ins'] : []);
+  return {f:ps/pw, weeks:weeks, trend:trend, parts:parts};
 }
 // the weekly and monthly goals you hit, lately (a period still running only counts what's done)
 function tierHitRate(kind, n){
@@ -409,7 +425,7 @@ function xpAttributes(ctx){
   // Content on both: business videos on Business, your own on Personal (both just called Content)
   const bc = contentF('business'), pc = contentF('personal');
   const cNote = function(c, kind){ return c.done+' '+kind+' video'+(c.done===1?'':'s')+' out in 30 days · aim '+Math.round(c.want); };
-  const B = [sub('MRR', Math.sqrt(mrr/83400), money(mrr)+' a month · 100 at $83.4k (a million a year)'), sub('Grind', deep30/360, fmtHours(Math.round(deep30))+' of real work a day (30 days) · 6h a day is 100'),
+  const B = [sub('MRR', Math.sqrt(mrr/83400), money(mrr)+' a month · 100 at $83.4k (a million a year)'), sub('Grind', deep30/360*(typeof acctGrindMult==='function' ? acctGrindMult() : 1), fmtHours(Math.round(deep30))+' of real work a day (30 days) · 6h a day is 100'+(typeof acctGrindMult==='function' && acctGrindMult() < 1 ? ' · check-ins you were caught slacking pull it down' : '')),
     sub('Scaling', growthF, months[0]+' · '+months[1]+' · '+months[2]+' new (last 3 months) · aim '+perMonth+' a month'), sub('Content', bc.done/bc.want, cNote(bc, 'business'))];
   // personal
   const own = arr(state.goals && state.goals.items).filter(function(g){ return !g.tier && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g)) && g.target > 0; });
@@ -429,16 +445,14 @@ function xpAttributes(ctx){
     sub('Diet', dt ? dt.f : null, dt ? dt.onTarget+' of the last 14 days on target, '+dt.logged+' logged · aim '+dt.target.toLocaleString()+' cal' : 'Log what you eat (the + on Health) and it counts'),
     sub('Weight', bmiFactor(body.bmi), body.bmi ? 'BMI '+body.bmi.toFixed(1)+' · '+body.cls : 'Add your height and weight')];
   // discipline: keeping your word
-  let kept = 0, counted = 0;
-  for(let i=0;i<14;i++){ const d = addDays(today, -i); if(isDayOff(d)) continue; const ok = dayStandardsComplete(d); if(i===0 && !ok) continue; counted++; if(ok) kept++; }
   const streak = computeStreak();
   const due = tasks.filter(function(t){ return t.deadline && t.deadline < today && t.deadline >= addDays(today, -30); });
   const onTime = due.filter(function(t){ return t.status==='done' && t.completedAt && t.completedAt <= t.deadline; }).length;
   const cs2 = consistencyStats(ctx);
-  const D = [sub('Integrity', counted ? kept/counted : null, kept+' of '+counted+' days in 2 weeks you kept your whole standard · streak '+streak),
-    sub('Reliability', due.length >= 2 ? onTime/due.length : null, due.length >= 2 ? onTime+' of '+due.length+' deadlines met in 30 days' : 'Give tasks a deadline and it counts'),
+  // (Integrity is gone: keeping your word day after day is what Consistency measures now)
+  const D = [sub('Reliability', due.length >= 2 ? onTime/due.length : null, due.length >= 2 ? onTime+' of '+due.length+' deadlines met in 30 days' : 'Give tasks a deadline and it counts'),
     sub('Consistency', cs2 ? cs2.f : null, cs2 ? (cs2.trend > 0 ? 'Trending up' : cs2.trend < 0 ? 'Trending down' : 'Holding steady')+' · '+cs2.parts.join(', ')+', week by week' : 'Builds as you go')];
-  if(cs2) D[2].trend = cs2.trend;
+  if(cs2) D[1].trend = cs2.trend;
   const score = function(list, ws){ return rate99(mix(list.map(function(s, i){ return [ws[i], s.v==null ? null : (s.v-25)/75]; }))); };
   const out = {
     BUS:{name:'Business', short:'BUS', v:score(B, [.4, .25, .2, .15]), subs:B, color:'#ffc56b'},
@@ -450,8 +464,15 @@ function xpAttributes(ctx){
   const hRaw = score(H, [.45, .37, .18]), cap = healthCap(body.bmi);
   out.HLT.v = Math.min(hRaw, cap); out.HLT.cap = cap < 100 ? cap : null; out.HLT.capped = hRaw > cap;
   // discipline comes up quickly once you're consistent (the curve leans generous)
-  const dMix = mix(D.map(function(x, i){ return [[.35, .25, .4][i], x.v==null ? null : (x.v-25)/75]; }));
+  const dMix = mix(D.map(function(x, i){ return [[.3, .7][i], x.v==null ? null : (x.v-25)/75]; }));
   out.DIS.v = rate99(Math.pow(dMix, 0.8));
+  // Mind (on Personal): what you feed your head (Inspiration, logged on its own page) with your Health and Discipline
+  const inspF = typeof inspScore==='function' ? inspScore() : null;
+  const skF = typeof skillScore==='function' ? skillScore() : null;
+  const mindF = inspF==null && skF==null ? null : mix([[.45, inspF], [.15, skF], [.2, (out.HLT.v-25)/75], [.2, (out.DIS.v-25)/75]]);
+  P.push(sub('Mind', mindF,
+    mindF==null ? 'Log walks, books, meditating, a clean room on Inspiration (and time your skills) and it counts' : (inspF!=null ? 'Inspiration '+rate99(inspF) : 'No Inspiration logged')+(skF!=null ? ' · skills '+rate99(skF) : '')+' · with your Health and Discipline'));
+  out.PER.v = score(P, [.25, .3, .2, .25]);
   // 100 overall only when every rating is 100
   const ovr = .3*out.BUS.v + .3*out.HLT.v + .2*out.DIS.v + .2*out.PER.v;
   out.OVR = ovr >= 99.999 ? 100 : Math.min(99, Math.floor(ovr));
@@ -539,7 +560,7 @@ function renderYouTab(){
   // every rating shows a number (25 is the floor, so nothing reads as blank; faded until there's data)
   const attrCard = function(k){ const a = x.attrs[k]; return '<div class="you-attr" style="--ac:'+a.color+'"><div class="you-attr-h"><b>'+a.v+'</b><span>'+a.name+'</span>'+
       (k==='HLT' && a.cap ? '<em class="you-cap'+(a.capped ? ' is-hit' : '')+'" title="At your weight, Health tops out at '+a.cap+'. It rises as the weight comes down.">max '+a.cap+'</em>' : '')+'</div>'+
-    a.subs.map(function(s){ const v = s.v==null ? 25 : s.v; return '<div class="you-sub'+(s.v==null ? ' is-empty' : '')+'" title="'+escapeHtml(s.note)+'"><span>'+escapeHtml(s.label)+(s.trend ? ' <em class="you-tr '+(s.trend > 0 ? 'is-up' : 'is-down')+'" title="'+(s.trend > 0 ? 'Trending up' : 'Trending down')+'">'+(s.trend > 0 ? '&#9650;' : '&#9660;')+'</em>' : '')+'</span><i><u style="width:'+((v-25)/75*100).toFixed(1)+'%"></u></i><b>'+v+'</b></div>'; }).join('')+'</div>'; };
+    a.subs.map(function(s){ const v = s.v==null ? 25 : s.v; return '<div class="you-sub'+(s.v==null ? ' is-empty' : '')+(s.label==='Mind' ? ' is-link" data-action="openInspire' : '')+'" title="'+escapeHtml(s.note)+(s.label==='Mind' ? ' (open Inspiration)' : '')+'"><span>'+escapeHtml(s.label)+(s.trend ? ' <em class="you-tr '+(s.trend > 0 ? 'is-up' : 'is-down')+'" title="'+(s.trend > 0 ? 'Trending up' : 'Trending down')+'">'+(s.trend > 0 ? '&#9650;' : '&#9660;')+'</em>' : '')+'</span><i><u style="width:'+((v-25)/75*100).toFixed(1)+'%"></u></i><b>'+v+'</b></div>'; }).join('')+'</div>'; };
   return '<div class="you">'+
     '<div class="you-top">'+playerCardHtml('big')+
       '<div class="you-main">'+
@@ -552,6 +573,7 @@ function renderYouTab(){
     (typeof opRead==='function' ? opRead('card', opFactsCard, 'Give him your read on his card: where he stands, what’s holding him back, and what would move him up fastest.', {angles:'card'}) : '')+
     '<div class="you-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(attrCard).join('')+'</div>'+
     youRecentHtml()+
+    (typeof acctLogHtml==='function' ? acctLogHtml() : '')+
   '</div>';
 }
 // the last seven days against the seven before, and your records (bests since you started)
@@ -760,8 +782,8 @@ ACTIONS.openXpHow = function(){
       rate('Personal', '#c3a6ff', [['Content', 'your own videos out against your personal target.'], ['Goals', 'the weekly and monthly goals you hit, how close your master goals are, and your own goals.'], ['Finances', 'like a credit score. Debt keeps it low, paying it down every month brings it up, and debt-free while earning tops it out.']])+
       rate('Health', '#7ef0c0', [['Training', 'workouts against your number a week over the last four weeks, the latest week counting most. A first good week back moves it right away.'], ['Diet', 'days you ate within your calorie target over the last two weeks. Logging counts too: a day you never logged counts for nothing.'],
         ['Weight', 'your BMI for your height. It also sets a ceiling on the whole score: carrying a lot of extra weight, Health tops out around 60 even with perfect training and diet, and the ceiling lifts as the weight comes down.']])+
-      rate('Discipline', '#8fd3ff', [['Integrity', 'days in the last two weeks you kept your whole standard: the work, the training and your own standards. It is also your streak.'], ['Reliability', 'things with a deadline, done by the deadline (last 30 days).'],
-        ['Consistency', 'all of it, every week: work days on target, workouts, days you finished something, food logged and checking in. The latest week counts most, and it shows whether you are trending up or down. Discipline climbs fast once you are consistent.']])+
+      rate('Discipline', '#8fd3ff', [['Reliability', 'things with a deadline, done by the deadline (last 30 days).'],
+        ['Consistency', 'completing everything, every week: work days on target, tasks, videos, workouts, food logged, your weekly check-in, the weekly and monthly goals you hit and your streak. When Op checks in and catches you slacking (or you don’t answer), it comes off here. The latest weeks count most, and it shows whether you are trending up or down.']])+
     '</div><div class="xph-foot">The overall only hits 100 when all four do.</div>';
   o.classList.remove('hidden'); o.scrollTop = 0;
 };

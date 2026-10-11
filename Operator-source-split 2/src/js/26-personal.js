@@ -5,11 +5,12 @@ function renderPersonal(){
   '<div class="tabs">'+
     '<div class="tab '+(ui.personalTab==='you'?'active':'')+'" data-action="personalTab" data-tab="you">You</div>'+
     '<div class="tab '+(ui.personalTab==='goals'?'active':'')+'" data-action="personalTab" data-tab="goals">Goals</div>'+
+    '<div class="tab '+(ui.personalTab==='growth'?'active':'')+'" data-action="personalTab" data-tab="growth">Growth</div>'+
     '<div class="tab '+(ui.personalTab==='fitness'?'active':'')+'" data-action="personalTab" data-tab="fitness">Health</div>'+
     '<div class="tab '+(ui.personalTab==='finances'?'active':'')+'" data-action="personalTab" data-tab="finances">Finances</div>'+
     '<div class="tab '+(ui.personalTab==='journal'?'active':'')+'" data-action="personalTab" data-tab="journal">Journal</div>'+
     '<div class="tab '+(ui.personalTab==='wishlist'?'active':'')+'" data-action="personalTab" data-tab="wishlist">Wish List</div>'+
   '</div>'+
-  '<div class="tab-panel" data-key="personal-'+ui.personalTab+'">'+(ui.personalTab==='you' && typeof renderYouTab==='function' ? renderYouTab() : ui.personalTab==='goals' ? renderGoalsTab() : ui.personalTab==='fitness' ? renderFitness() : ui.personalTab==='finances' ? renderPersonalFinances() : ui.personalTab==='wishlist' ? renderWishlistTab() :  renderJournalTab())+'</div>';
+  '<div class="tab-panel" data-key="personal-'+ui.personalTab+'">'+(ui.personalTab==='you' && typeof renderYouTab==='function' ? renderYouTab() : ui.personalTab==='goals' ? renderGoalsTab() : ui.personalTab==='growth' && typeof growthHtml==='function' ? growthHtml() : ui.personalTab==='fitness' ? renderFitness() : ui.personalTab==='finances' ? renderPersonalFinances() : ui.personalTab==='wishlist' ? renderWishlistTab() :  renderJournalTab())+'</div>';
 }
 

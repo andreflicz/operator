@@ -140,7 +140,8 @@ function checkAllAlarms(){
   const sn = state.focus.snooze;
   if(sn && sn.ts<=now){
     state.focus.snooze = null; changed = true;
-    if(sn.wake) fireWake({test:sn.test, snoozed:!sn.test}); else triggerAlarm(sn.alarm||{label:'Reminder'});
+    if(sn.work && typeof fireWorkAlarm==='function') fireWorkAlarm({snoozed:true});
+    else if(sn.wake) fireWake({test:sn.test, snoozed:!sn.test}); else triggerAlarm(sn.alarm||{label:'Reminder'});
   }
   if(changed){ persist('focus'); if(fired.length) renderView(); }
 }
@@ -409,7 +410,7 @@ function wakeWeatherLine(){
   return now ? wxIcon(wxKind(now.code), skyPhase())+' '+now.temp+'&deg; '+escapeHtml(wxLabel(now.code).toLowerCase())+(now.hi!=null ? ' &middot; high '+now.hi+'&deg;' : '') : '';
 }
 // the alarm, Good morning and the dawn before it are drawn in 32n-morning.js
-function renderWakeScreen(){ return ui.wakeMode==='brief' ? wakeBriefHtml() : ui.wakeMode==='dawn' ? dawnHtml() : ui.wakeMode==='snooze' ? snoozeHtml() : wakeRingHtml(); }
+function renderWakeScreen(){ return ui.wakeMode==='work' && typeof workRingHtml==='function' ? workRingHtml() : ui.wakeMode==='brief' ? wakeBriefHtml() : ui.wakeMode==='dawn' ? dawnHtml() : ui.wakeMode==='snooze' ? snoozeHtml() : wakeRingHtml(); }
 function renderWakeOverlayInto(){
   const el = document.getElementById('wakeContent'); if(!el) return;
   morphInto(el, renderWakeScreen());
@@ -437,7 +438,8 @@ function renderWakeSetup(){
   const nw = nextWake();
   const names = ['S','M','T','W','T','F','S'];
   const sn = state.focus.snooze;
-  return '<div class="wake-setup">'+
+  if(ui.alarmTab==='work' && typeof workSetupHtml==='function') return workSetupHtml();
+  return '<div class="wake-setup">'+(typeof alarmTabsHtml==='function' ? alarmTabsHtml() : '')+
     '<div class="row" style="justify-content:space-between;align-items:flex-start;gap:12px;">'+
       '<div class="section-title" style="margin:0;">&#9200; Wake-up alarm'+tip('Your one daily alarm. It opens the wake screen with your vision board, today\'s plan and your music.')+'</div>'+
       '<label class="ws-switch" title="Turn the daily alarm on/off"><input type="checkbox" data-wake="enabled" '+(w.enabled?'checked':'')+'><span></span></label>'+

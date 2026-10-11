@@ -84,6 +84,7 @@ function aiContext(){
   if(dues.length) lines.push('Deadlines soon: '+dues.map(function(t){ return t.title+' ('+(t.deadline < today ? 'overdue' : t.deadline===today ? 'today' : weekdayShort(t.deadline))+')'; }).join('; ')+'.');
   const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
   lines.push('Business: MRR '+money(xpMrr())+(state.profile.revenueGoalMonthly ? ' (goal '+money(state.profile.revenueGoalMonthly)+')' : '')+'; '+cs.length+' active client'+(cs.length===1?'':'s')+(cs.length ? ' ('+cs.slice(0, 8).map(function(c){ return c.business || c.name; }).join(', ')+')' : '')+'; '+arr(state.business.pipeline).filter(leadIsOpen).length+' open leads.');
+  if(typeof workCfg==='function' && workCfg().enabled){ const w = workCfg(), ph = workPhase(); lines.push('Work hours: '+fmt12Hour(w.start)+' to '+fmt12Hour(w.end)+' (lunch '+fmt12Hour(w.lunch)+', break '+fmt12Hour(w.brk)+'). Right now: '+({before:'before work', work:'work hours', lunch:'lunch', 'break':'his break', after:'after work', off:'not a work day'})[ph]+'.'); }
   const wk = typeof wakeCfg==='function' ? wakeCfg() || {} : {};
   if(wk.places || wk.newsSports || wk.newsTech) lines.push('Him: '+[wk.places ? 'places he likes: '+wk.places : '', wk.newsSports ? 'his teams: '+wk.newsSports : '', wk.newsTech ? 'interests: '+wk.newsTech : ''].filter(Boolean).join('; ')+'.');
   lines.push('Work today so far: '+fmtDurationLabel(deepWorkMinutesTodayLive())+' (his daily target is '+fmtDurationLabel(state.standards.deepWorkTargetMinutes || 180)+'). Streak: '+computeStreak()+' days.');
@@ -129,6 +130,7 @@ const OP_RULES = 'How you work inside the Operator app:\n'+
   '- You can act in the app with your tools. Do it when he asks (or clearly implies it), then confirm in one short sentence. If a date or time is unclear, ask rather than guess. Never claim you did something you didn’t.\n'+
   '- If you don’t know something, say so briefly.\n'+
   '- Never use em dashes or en dashes. Use a comma, a colon or a new sentence instead.\n'+
+  '- You have feelings, but you show them rarely. When one truly fits, start your reply with one tag: [mood:humor] when you’re joking, [mood:excited] when something great happened, [mood:concern] when you’re worried about him, [mood:stern] when you’re getting on him about not working, [mood:sad] when something’s genuinely a shame. Most replies have no tag at all. Never mention the tag.\n'+
   '- Know his business inside out: his clients, what they pay, where each one stands and his notes on them are in the background. Talk about them by name like someone who has been in the room. When he tells you something about a client or a lead, save it on them with add_client_note. When he says he reached out to someone, log it with log_touch.\n'+
   '- Be proactive. When something would help (a client gone quiet, a deadline, a gap in what you know), say it or ask about it. Ask one good question when it helps you understand his business or him better.\n'+
   '- When you notice a way the app itself could serve him better, log it with suggest_improvement (quietly; mention it only if it matters).\n'+
@@ -141,6 +143,7 @@ function aiSystem(){
       (mem.length ? 'What you remember about him:\n'+mem.map(function(m){ return '- '+m.text; }).join('\n')+'\n' : '')+
       '\nIt is '+now.toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric', year:'numeric'})+', '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+' (dates in YYYY-MM-DD: today is '+todayStr()+').\n'+
       (typeof overlayOpen==='function' && overlayOpen('wakeOverlay') && ui.wakeMode==='brief' ? 'Right now he’s on the Good morning screen, just up: keep it light and about him and the morning. Don’t bring up work, the business or his tasks unless he asks or it’s on today’s calendar; that comes after he presses Get to work.\n' : '')+
+      (typeof acctSystemNote==='function' ? acctSystemNote() : '')+
       'Background from the app (use it when it helps; don’t read it out):\n'+aiContext()}
   ];
 }
@@ -178,7 +181,13 @@ async function aiCall(req){
   if(r && r.status===401) AI.hasKey = false;
   return {ok:!!(r && r.ok && j && Array.isArray(j.content)), status:r ? r.status : 0, j:j};
 }
-function aiText(j){ return opNoDash(arr(j && j.content).filter(function(c){ return c.type==='text'; }).map(function(c){ return c.text; }).join(' ').replace(/\s+/g, ' ').trim()); }
+// (a mood tag at the start is taken off here and kept for the reply it came with; see 32x3-op-mood.js)
+function aiText(j){
+  const t = arr(j && j.content).filter(function(c){ return c.type==='text'; }).map(function(c){ return c.text; }).join(' ').replace(/\s+/g, ' ').trim();
+  const ms = typeof opMoodSplit==='function' ? opMoodSplit(t) : {mood:null, text:t};
+  AI.lastMood = ms.mood;
+  return opNoDash(ms.text.trim());
+}
 // no long dashes in anything Op writes (the rules ask for it; this catches a slip)
 function opNoDash(t){ return String(t||'').replace(/(\d)\s*[—–]\s*(\d)/g, '$1 to $2').replace(/\s*[—–]\s*(?=[A-Z])/g, '. ').replace(/\s+[—–]\s+|[—–]/g, ', ').replace(/, ,/g, ','); }
 function aiErrLine(res){
@@ -202,8 +211,9 @@ const OP_TOOLS = [
   {name:'log_touch', description:'Log that he reached out to a client or lead (a text, call, email or meeting).', input_schema:{type:'object', properties:{who:{type:'string'}, type:{type:'string', enum:['text', 'call', 'email', 'meeting', 'other']}, date:OP_DATE}, required:['who'], additionalProperties:false}},
   {name:'suggest_improvement', description:'Log an idea for how the Operator app could serve him better (a feature, a fix, something that got in the way). He sees the list in Settings.', input_schema:{type:'object', properties:{idea:{type:'string'}}, required:['idea'], additionalProperties:false}},
   {name:'lock_in', description:'Start a deep work session (lock in) now, optionally for a number of minutes and on a task by name.', input_schema:{type:'object', properties:{minutes:{type:'integer'}, task:{type:'string'}}, additionalProperties:false}},
+  {name:'settle_checkin', description:'Log his reason for a check-in he never answered (you were told about it), and whether it is a genuine, acceptable reason.', input_schema:{type:'object', properties:{reason:{type:'string'}, acceptable:{type:'boolean'}, why:{type:'string', description:'a few words on your call'}}, required:['reason', 'acceptable'], additionalProperties:false}},
   {name:'start_task', description:'Start timing a task from today’s list (by part of its title) without locking in.', input_schema:{type:'object', properties:{task:{type:'string'}}, required:['task'], additionalProperties:false}},
-  {name:'open_page', description:'Show a page of the app.', input_schema:{type:'object', properties:{page:{type:'string', enum:['today', 'focus', 'analytics', 'business', 'clients', 'leads', 'calendar', 'goals', 'health', 'finances', 'journal', 'card', 'settings']}}, required:['page'], additionalProperties:false}}
+  {name:'open_page', description:'Show a page of the app.', input_schema:{type:'object', properties:{page:{type:'string', enum:['today', 'focus', 'analytics', 'business', 'clients', 'leads', 'calendar', 'goals', 'growth', 'health', 'finances', 'journal', 'card', 'settings', 'inspiration']}}, required:['page'], additionalProperties:false}}
 ];
 // a task by (part of) its title: today's first, then the rest that aren't done
 function opFindTask(q){
@@ -312,6 +322,7 @@ function opRunTool(name, x){
       startFocus(Number(x.minutes) > 0 ? Math.round(Number(x.minutes)) : null); ui.view = 'focus'; ui.opNav = true;
       return 'locked in'+(ui.currentTaskId ? ' on '+((state.tasks.items.find(function(t){ return t.id===ui.currentTaskId; })||{}).title || 'the task') : '');
     }
+    case 'settle_checkin': return typeof acctSettle==='function' ? acctSettle(x) : 'not available';
     case 'start_task': {
       const t = opFindTask(need(x.task, 'task')); if(!t) throw new Error('no task matches "'+x.task+'"');
       if(t.status!=='today'){ t.status = 'today'; persist('tasks'); }
@@ -319,7 +330,8 @@ function opRunTool(name, x){
     }
     case 'open_page': {
       const pg = x.page, go = {today:['today'], focus:['focus'], analytics:['focus', function(){ ui.focusTab = 'analytics'; }], business:['business'], clients:['business', function(){ ui.businessTab = 'clients'; }], leads:['business', function(){ ui.businessTab = 'leads'; }],
-        calendar:['calendar'], goals:['personal', function(){ ui.personalTab = 'goals'; }], health:['personal', function(){ ui.personalTab = 'fitness'; }], finances:['personal', function(){ ui.personalTab = 'finances'; }], journal:['personal', function(){ ui.personalTab = 'journal'; }], card:['personal', function(){ ui.personalTab = 'you'; }], settings:['settings']}[pg];
+        calendar:['calendar'], goals:['personal', function(){ ui.personalTab = 'goals'; }], growth:['personal', function(){ ui.personalTab = 'growth'; }], health:['personal', function(){ ui.personalTab = 'fitness'; }], finances:['personal', function(){ ui.personalTab = 'finances'; }], journal:['personal', function(){ ui.personalTab = 'journal'; }], card:['personal', function(){ ui.personalTab = 'you'; }], settings:['settings']}[pg];
+      if(pg==='inspiration' && typeof openInspire==='function'){ openInspire(); return 'opened Inspiration'; }
       if(!go) throw new Error('unknown page'); ui.view = go[0]; if(go[1]) go[1](); ui.opNav = true; return 'opened '+pg;
     }
   }
@@ -329,6 +341,8 @@ function opRunTool(name, x){
 // ---- talking: say (or type) anything; Op answers out loud, and acts if you asked it to ----
 async function aiAsk(text, cap){
   text = String(text||'').trim(); if(!text || AI.busy) return;
+  // in the middle of a check-in, your answer goes to it (see 32x4-op-checkins.js)
+  if(typeof acctIntercept==='function' && acctIntercept(text, cap)) return;
   AI.busy = true; opStop(); OV.idx = 999; OV.cap = cap; opCaption('…');
   aiUiRefresh();
   let changed = false;
@@ -359,6 +373,8 @@ async function aiAsk(text, cap){
     if(AI.history.length > 16) AI.history = AI.history.slice(-16);
     opMemoryLater();
     if(changed) renderView();
+    if(AI.lastMood && typeof opMood==='function') opMood(AI.lastMood, 9000);
+    if(typeof acctAfterReply==='function') acctAfterReply();
     if(opVoiceOn()) await opSay(reply, {cap:cap}); else opCaption(reply);
     // a question back: the mic opens on its own for the answer (typing still works)
     if(/\?["”’)]*\s*$/.test(reply) && !AI.listening){ setTimeout(function(){ if(!AI.busy && !AI.listening && !(OV.speaking || OV.pending)) aiListen(cap); }, 350); }

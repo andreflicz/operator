@@ -14,7 +14,7 @@ function taskRow(t){
   return '<div class="task-item-v2 '+(t.status==='done'?'done':'')+(selected?' row-selected':'')+'">'+
     selectBoxHtml(t.id, selected)+
     '<div style="flex:1;min-width:140px;">'+
-      '<div class="task-title-row">'+priorityTag(t.priority)+(t.ongoing?'<span class="tag tag-ongoing">Ongoing</span>':'')+'<span class="task-title">'+escapeHtml(t.title)+'</span></div>'+
+      '<div class="task-title-row">'+priorityTag(t.priority)+(t.skill?'<span class="tag tag-skill">Skill</span>':t.ongoing?'<span class="tag tag-ongoing">Ongoing</span>':'')+'<span class="task-title">'+escapeHtml(t.title)+'</span></div>'+
       (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     '</div>'+
     clientTagsHtml(t.clients)+
@@ -166,6 +166,7 @@ function renderTaskEditModal(){
     taskAlarmFieldsHtml('editTask-'+t.id+'-', t)+
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="editNotes-'+t.id+'" style="width:100%;min-height:60px;">'+escapeHtml(t.notes||'')+'</textarea></div>'+
 
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editSkill-'+t.id+'" '+(t.skill?'checked':'')+' style="margin-right:6px;">&#127891; Skill: something you’re building (its time adds up on Personal → Growth)</label>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editOngoing-'+t.id+'" '+(t.ongoing?'checked':'')+' style="margin-right:6px;">&#128204; Ongoing: takes more than a day'+tip('It stays on your list day after day until it\'s actually finished: tick it off for today without closing it. When it\'s due is just the Deadline above.')+'</label>'+
     '<div id="editTaskOngoingExtra-'+t.id+'" style="display:'+(t.ongoing?'block':'none')+';">'+
     '<div class="field" style="margin-top:10px;"><label>How often you work on it (optional)</label><select class="input" id="editOngoingFrequency-'+t.id+'">'+
@@ -198,6 +199,8 @@ function saveEditTask(id){
   const cdEl = document.getElementById('editCountsDeep-'+id);
   if(cdEl) t.countsDeepWork = cdEl.checked;
   t.notes = document.getElementById('editNotes-'+id).value.trim();
+  const skillEl = document.getElementById('editSkill-'+id);
+  if(skillEl){ t.skill = skillEl.checked; if(t.skill) t.ongoing = true; }
   const ongoingEl = document.getElementById('editOngoing-'+id);
   t.ongoing = !!(ongoingEl && ongoingEl.checked);
   if(t.ongoing){

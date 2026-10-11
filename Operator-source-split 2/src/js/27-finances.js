@@ -38,7 +38,7 @@ function renderPersonalFinances(){
     '<div class="card" style="min-height:128px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">Paid Off So Far</div><div class="kpi-value" style="color:var(--good);">$'+(totalOriginal-totalDebt).toLocaleString()+'</div></div>'+
   '</div>'+
   '<div class="grid grid-2 section" style="align-items:start;">'+
-  '<div class="section" style="margin-bottom:0;"><div class="section-title">Debts<button class="btn btn-sm" data-action="toggleForm" data-form="debt">'+(ui.forms.debt?'Close':'+ Add Debt')+'</button></div>'+
+  '<div class="section" style="margin-bottom:0;"><div class="section-title">Debts'+(ui.forms.debt ? '<button class="btn btn-sm" data-action="toggleForm" data-form="debt">Close</button>' : '')+'</div>'+
     (ui.forms.debt ? '<div class="card" style="margin-bottom:10px;">'+
       '<input class="input" id="debtName" placeholder="Name (e.g. Car Loan)" style="width:100%;">'+
       '<div class="grid grid-2" style="margin-top:8px;">'+
@@ -48,8 +48,8 @@ function renderPersonalFinances(){
       '<textarea class="input" id="debtDescription" placeholder="What is this debt for?" style="width:100%;min-height:56px;margin-top:8px;"></textarea>'+
       '<button class="btn btn-primary btn-sm" style="margin-top:8px;" data-action="addDebt">Add Debt</button>'+
     '</div>' : '')+
-    '<div class="task-list">'+(debts.map(debtRow).join('') || '<div class="empty">No debts tracked. Add one above.</div>')+'</div></div>'+
-  '<div class="section" style="margin-bottom:0;"><div class="section-title">Income<button class="btn btn-sm" data-action="toggleForm" data-form="income">'+(ui.forms.income?'Close':'+ Add Income')+'</button></div>'+
+    '<div class="task-list">'+(debts.map(debtRow).join('') || '<div class="empty">No debts tracked. The + in the corner adds one.</div>')+'</div></div>'+
+  '<div class="section" style="margin-bottom:0;"><div class="section-title">Income'+(ui.forms.income ? '<button class="btn btn-sm" data-action="toggleForm" data-form="income">Close</button>' : '')+'</div>'+
     (ui.forms.income ? '<div class="card" style="margin-bottom:10px;">'+
       '<div class="row"><input class="input" type="date" id="incomeDate" value="'+todayStr()+'" style="width:140px;">'+
       '<button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="incomeDate">&#128197;</button>'+
@@ -60,7 +60,7 @@ function renderPersonalFinances(){
       '</div>'+
       '<button class="btn btn-good btn-sm" style="margin-top:8px;" data-action="addIncome">Add Income</button>'+
     '</div>' : '')+
-    '<div class="task-list">'+(income.slice(0,12).map(incomeRow).join('') || '<div class="empty">No income logged. Add one above.</div>')+'</div></div>'+
+    '<div class="task-list">'+(income.slice(0,12).map(incomeRow).join('') || '<div class="empty">No income logged. The + in the corner adds it.</div>')+'</div></div>'+
   '</div>'+
   (typeof expensesHtml==='function' ? expensesHtml() : '');
 }
@@ -131,7 +131,7 @@ function renderInvoicesSection(){
       '<div class="task-list">'+list.map(invoiceRow).join('')+'</div>'+
     '</div>';
   }).join('');
-  return '<div class="section"><div class="section-title">Client Payments &amp; Invoices'+tip('An invoice logged here counts as revenue collected for the month right away. The tax receipt is just your paperwork. Attach it whenever you get to it; nothing is marked paid by hand. Paying off a debt above only lowers its balance. It stays listed until you remove it.')+'<button class="btn btn-sm" data-action="openInvoiceModal">+ Add Invoice</button></div>'+
+  return '<div class="section"><div class="section-title">Client Payments &amp; Invoices'+tip('An invoice logged here counts as revenue collected for the month right away. The tax receipt is just your paperwork. Attach it whenever you get to it; nothing is marked paid by hand. Paying off a debt above only lowers its balance. It stays listed until you remove it.')+'</div>'+
     (retainerClients.length ? '<div class="task-list" style="margin-bottom:14px;">'+retainerClients.map(retainerClientRow).join('')+'</div>' : '')+
     (clientGroups || (invoices.length ? '' : (retainerClients.length ? '' : '<div class="empty">Add a client above, then log invoices as you bill them.</div>')))+
     (noClient.length ? '<div class="card" style="margin-bottom:10px;"><div class="task-title-row" style="margin-bottom:8px;"><span class="task-title">Other</span></div><div class="task-list">'+noClient.map(invoiceRow).join('')+'</div></div>' : '')+
