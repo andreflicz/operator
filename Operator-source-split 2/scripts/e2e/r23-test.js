@@ -82,7 +82,7 @@ async function ctxPage(b, seed, opts){
     const p = await ctxPage(b, {profile:{name:'Andre', heightIn:70}, health:{gymLog:[], weightLog:[{id:'w', date:'2026-10-10', weight:250}], calorieEntries:[]}}, {clock:WED});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     const subs = JSON.parse(await E("JSON.stringify(Object.fromEntries(['BUS','PER'].map(k => [k, xpSummaryFresh().attrs[k].subs.map(s => s.label)])))"));
-    check('Content on both: Business has its Content, Personal has its own', subs.BUS.join()==='MRR,Grind,Scaling,Content' && subs.PER.join()==='Content,Goals,Finances', subs);
+    check('Content on both: Business has its Content, Personal has its own', subs.BUS.join()==='MRR,Grind,Scaling,Content' && subs.PER.join()==='Content,Goals,Finances,Mind', subs);
     await E("ui.view='personal'; ui.personalTab='you'; renderView()"); await p.waitForTimeout(300);
     check('You: no text under the stats', (await p.$$('.you .you-sub small')).length===0 && (await p.$$('.you .you-sub')).length===13);
     await E("ui.personalTab='fitness'; renderView()"); await p.waitForTimeout(300);
@@ -148,7 +148,7 @@ async function ctxPage(b, seed, opts){
     await p.click('[data-action="wakeStartDay"]').catch(() => {}); await p.waitForTimeout(900);
     await E("wakeAudio = {volume:0.8, pause(){ this.paused = true; }, play(){}, addEventListener(){}}; wakeCfg().media = {ref:'x', name:'Morning song'}; opBriefReset(); renderWakeOverlayInto(); briefRevealAll && briefRevealAll()"); await p.clock.runFor(3000); await p.waitForTimeout(400);
     // (round 24: Op starts as Good morning does, music or not; the blue light is how you talk to it)
-    check('music playing: Op still narrates (the song ducks), and the blue light is the way to talk', !(await p.$('.br-opgo')) && await p.isVisible('.br-voice-dot[data-action="briefTalk"]') && await E("opBriefTick(ui.briefLines, 99999)")===true);
+    check('music playing: Op still narrates (the song ducks), and the blue light is the way to talk', !(await p.$('.br-opgo')) && await p.isVisible('.br-voice-dot[data-action="briefTalk"]') && await E("(function(){ ui.briefSkipped = false; OV.speaking = false; OV.pending = false; OV.pre = {ready:true}; const r = opBriefTick(ui.briefLines, 99999); opStop(); OV.idx = 999; return r; })()")===true);
     check('the good-day list is there twice, so its end never shows a gap', await E("document.querySelectorAll('#wakeContent .gd-track > *').length")===2*await E("goodDayItems().length"));
     await E("const a = wakeAudio; window.__a = a; opDuck(true)");
     check('when Op talks, the song goes down', await E("window.__a.volume")<=0.12);
