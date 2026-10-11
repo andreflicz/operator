@@ -596,6 +596,8 @@ document.addEventListener('change', function(e){
   else if(key==='snoozeMinutes') w.snoozeMinutes = Number(t.value)||9;
   else if(key==='newsTopics'){ w.newsTopics = t.value.trim(); ui.morningNews = null; }
   else if(key==='newsSports' || key==='newsTech' || key==='newsMute'){ w[key] = t.value.trim(); ui.morningNews = null; }
+  // (Places you like had no line here, so whatever you typed was gone the next time the page drew)
+  else if(key==='places') w.places = t.value.trim();
   saveWake();
   renderView();
 });

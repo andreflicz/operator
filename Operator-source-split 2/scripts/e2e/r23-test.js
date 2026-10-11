@@ -146,7 +146,8 @@ async function ctxPage(b, seed, opts){
     await E("fireWake({})");
     await p.click('[data-action="wakeStartDay"]').catch(() => {}); await p.waitForTimeout(900);
     await E("wakeAudio = {volume:0.8, pause(){ this.paused = true; }, play(){}, addEventListener(){}}; wakeCfg().media = {ref:'x', name:'Morning song'}; opBriefReset(); renderWakeOverlayInto(); briefRevealAll && briefRevealAll()"); await p.clock.runFor(3000); await p.waitForTimeout(400);
-    check('music playing: Op waits, with a Talk to Op button', await p.isVisible('.br-opgo') && await E("opBriefTick(ui.briefLines, 99999)")===false);
+    // (round 24: Op starts as Good morning does, music or not; the blue light is how you talk to it)
+    check('music playing: Op still narrates (the song ducks), and the blue light is the way to talk', !(await p.$('.br-opgo')) && await p.isVisible('.br-voice-dot[data-action="briefTalk"]') && await E("opBriefTick(ui.briefLines, 99999)")===true);
     check('the good-day list is there twice, so its end never shows a gap', await E("document.querySelectorAll('#wakeContent .gd-track > *').length")===2*await E("goodDayItems().length"));
     await E("const a = wakeAudio; window.__a = a; opDuck(true)");
     check('when Op talks, the song goes down', await E("window.__a.volume")<=0.12);
@@ -154,7 +155,7 @@ async function ctxPage(b, seed, opts){
     check('…and the Music app too, through the Operator app', p.calls.some(c => /music\/duck\?on=1/.test(c)));
     await E("wakeMusicApp = false; opDuck(false)"); await p.clock.runFor(1500); await p.waitForTimeout(200);
     check('…then back up after', p.calls.some(c => /music\/duck\?on=0/.test(c)));
-    await E("AI.hasKey = true"); await p.click('.br-opgo'); await p.waitForTimeout(600);
+    await E("AI.hasKey = true; opStop(); OV.idx = -1"); await p.click('.br-voice-dot', {force:true}); await p.waitForTimeout(600);
     check('Talk to Op: the music stops and Op greets you and asks what you want', !(await E("!!wakeAudio")) && await E("AI.history.some(m => /Where do you want to start/.test(m.content))"));
     check('no page errors (good morning)', p.errors.length===0, p.errors);
     await p.context().close();

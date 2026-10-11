@@ -4624,3 +4624,144 @@ body.is-dragging-task .ct-lane{ transition:border-color .15s, box-shadow .15s; }
 .gs-now{ display:flex; align-items:center; height:38px; padding:0 12px; border-radius:10px; background:rgba(var(--ink),.04); font-size:13.5px; font-weight:600; color:var(--text-dim); }
 .gl .mg-row{ flex-wrap:wrap; }
 .ib-quiet{ margin-top:18px; padding:12px 16px; border-radius:12px; background:rgba(var(--ink),.03); font-size:12.5px; color:var(--text-dim); }
+/* ===== Round 24 ===== */
+/* Op: a small light, bottom-left, always there (the pill that shows what you're on sits beside it) */
+.op-light{ position:fixed; left:236px; bottom:15px; z-index:9550; width:36px; height:36px; padding:0; border:none; background:none; cursor:pointer; border-radius:50%; animation:olFloat 6s ease-in-out infinite; transition:opacity .35s, transform .35s; }
+body.sb-collapsed .op-light{ left:76px; }
+@media (max-width:900px){ .op-light{ left:12px; } }
+.op-light.is-away{ opacity:0; pointer-events:none; transform:scale(.6); }
+.ol-core{ position:absolute; inset:11px; border-radius:50%; background:radial-gradient(circle at 40% 35%, #fff 0, #dff6ff 30%, #8fd3ff 62%, rgba(143,211,255,0) 100%); box-shadow:0 0 10px 2px rgba(143,211,255,.75), 0 0 22px 6px rgba(120,170,255,.35); transition:inset .3s, box-shadow .3s; }
+.ol-halo{ position:absolute; inset:2px; border-radius:50%; background:radial-gradient(circle, rgba(143,211,255,.28), rgba(143,211,255,0) 70%); animation:olBreathe 3.6s ease-in-out infinite; }
+.ol-spark{ position:absolute; left:50%; top:50%; width:3px; height:3px; margin:-1.5px; border-radius:50%; background:#fff; box-shadow:0 0 6px #bfe8ff; animation:olOrbit 4.2s linear infinite; opacity:.85; }
+.op-light:hover .ol-core{ inset:9px; box-shadow:0 0 14px 3px rgba(143,211,255,.9), 0 0 30px 8px rgba(120,170,255,.45); }
+.op-light[data-st="speak"] .ol-core{ inset:8px; animation:olTalk .5s ease-in-out infinite alternate; }
+.op-light[data-st="listen"] .ol-halo{ animation:olRipple 1.2s ease-out infinite; background:radial-gradient(circle, rgba(126,240,192,.45), rgba(126,240,192,0) 70%); }
+.op-light[data-st="listen"] .ol-core{ background:radial-gradient(circle at 40% 35%, #fff 0, #e2fff2 30%, #7ef0c0 62%, rgba(126,240,192,0) 100%); box-shadow:0 0 12px 3px rgba(126,240,192,.8); }
+.op-light[data-st="think"] .ol-spark{ animation-duration:1.4s; }
+@keyframes olFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
+@keyframes olBreathe{ 0%,100%{ transform:scale(.85); opacity:.7; } 50%{ transform:scale(1.15); opacity:1; } }
+@keyframes olOrbit{ from{ transform:rotate(0) translateX(13px) rotate(0); } to{ transform:rotate(360deg) translateX(13px) rotate(-360deg); } }
+@keyframes olTalk{ from{ box-shadow:0 0 10px 2px rgba(143,211,255,.75), 0 0 22px 6px rgba(120,170,255,.35); } to{ box-shadow:0 0 18px 5px rgba(170,225,255,.95), 0 0 38px 12px rgba(120,170,255,.5); } }
+@keyframes olRipple{ from{ transform:scale(.7); opacity:1; } to{ transform:scale(1.6); opacity:0; } }
+@media (prefers-reduced-motion:reduce){ .op-light, .ol-halo, .ol-spark{ animation:none !important; } }
+/* the pill steps over to make room for the light */
+.activity-pill{ left:282px !important; } body.sb-collapsed .activity-pill{ left:122px !important; }
+@media (max-width:900px){ .activity-pill{ left:56px !important; } }
+body.np-on .op-light{ left:136px; bottom:22px; }
+/* what Op says: a small bubble above the light (never over Lock in), scrolls instead of growing */
+.op-bub{ left:236px !important; right:auto !important; bottom:62px !important; width:min(380px, calc(100vw - 32px)) !important; transform:translateY(10px) !important; }
+.op-bub.is-in{ transform:none !important; }
+body.sb-collapsed .op-bub{ left:76px !important; }
+body.np-on .op-bub{ left:26px !important; bottom:70px !important; }
+@media (max-width:900px){ .op-bub{ left:12px !important; } }
+.op-bub-t{ font-size:13.5px !important; line-height:1.5 !important; max-height:6.2em !important; overflow:auto !important; margin:4px 0 8px !important; scroll-behavior:smooth; }
+.op-bub-h b{ font-size:10px; letter-spacing:.18em; }
+.op-bub-in .op-talk{ display:none; }
+.op-light.is-flash .ol-core{ animation:olFlash .7s ease-out; }
+@keyframes olFlash{ 0%{ box-shadow:0 0 30px 12px rgba(190,235,255,1); } 100%{ box-shadow:0 0 10px 2px rgba(143,211,255,.75); } }
+.op-light{ width:42px !important; height:42px !important; bottom:12px !important; }
+.op-light .ol-core{ inset:12px; } .op-light:hover .ol-core{ inset:10px; } .op-light[data-st="speak"] .ol-core{ inset:9px; }
+@keyframes olOrbit{ from{ transform:rotate(0) translateX(15px) rotate(0); } to{ transform:rotate(360deg) translateX(15px) rotate(-360deg); } }
+
+/* ===== Round 24: Good morning ===== */
+/* the greeting, with a few pictures from the vision board beside it */
+.brief4 .br-hrow{ flex:none; display:flex; align-items:center; gap:28px; min-width:0; width:100%; align-self:stretch; }
+.brief4 .br-hrow .brief-hello{ flex:0 1 auto; min-width:0; }
+.brief.brief2.brief4 .br-p.br-vstrip.br-vstrip.br-vstrip.br-vstrip.br-vstrip{ background:none !important; border:none !important; padding:0 !important; margin:0 0 0 auto !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; border-radius:0 !important; }
+.br-vstrip{ margin-left:auto; display:flex; align-items:center; gap:10px; }
+.br-vthumb{ --s:clamp(50px, 7.2vh, 70px); position:relative; flex:none; width:var(--s); height:var(--s); padding:0; border:1px solid rgba(255,255,255,.22); border-radius:15px; overflow:hidden; background:#151826; cursor:zoom-in;
+  box-shadow:0 8px 22px rgba(0,0,0,.28); transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s, border-color .3s; }
+.br-vthumb img{ width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; transition:transform .5s cubic-bezier(.2,.8,.2,1); }
+.br-vthumb:hover{ transform:translateY(-3px); border-color:rgba(255,255,255,.6); box-shadow:0 14px 30px rgba(0,0,0,.4); }
+.br-vthumb:hover img{ transform:scale(1.08); }
+.br-vthumb:focus-visible{ outline:2px solid #ffd27a; outline-offset:2px; }
+@media (max-width:1100px){ .br-vthumb:nth-child(n+4){ display:none; } }
+
+/* one picture, big: to look at, not to edit */
+.br-lightbox{ position:fixed; inset:0; z-index:40; display:grid; place-items:center; background:rgba(6,8,18,.8); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); cursor:zoom-out; animation:brLbIn .3s ease both; }
+.br-lb-fig{ margin:0; display:grid; place-items:center; max-width:min(78vw, 1200px); max-height:76vh; cursor:default; }
+.br-lb-fig img{ display:block; max-width:min(78vw, 1200px); max-height:76vh; object-fit:contain; border-radius:18px; box-shadow:0 30px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.12); animation:brLbImg .42s cubic-bezier(.2,.8,.2,1) both; }
+.br-lb-nav{ position:absolute; top:50%; width:50px; height:50px; margin-top:-25px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.07); color:#fff; font-size:30px; line-height:1; padding:0 0 4px; cursor:pointer; transition:background .2s, transform .2s; }
+.br-lb-nav:hover{ background:rgba(255,255,255,.16); transform:scale(1.06); }
+.br-lb-nav.is-prev{ left:max(20px, 4vw); } .br-lb-nav.is-next{ right:max(20px, 4vw); }
+.br-lb-bar{ position:absolute; left:50%; bottom:max(22px, 4vh); transform:translateX(-50%); display:flex; align-items:center; gap:7px; cursor:default; }
+.br-lb-bar i{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.3); transition:all .25s; }
+.br-lb-bar i.is-on{ width:18px; border-radius:4px; background:#fff; }
+.br-lb-all{ margin-left:14px; height:32px; padding:0 16px; border-radius:999px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:rgba(255,255,255,.85); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
+.br-lb-all:hover{ background:rgba(255,255,255,.14); color:#fff; }
+.br-lb-x{ position:absolute; top:22px; right:24px; width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.07); color:#fff; font-size:15px; cursor:pointer; }
+.br-lb-x:hover{ background:rgba(255,255,255,.16); }
+@keyframes brLbIn{ from{ opacity:0; } to{ opacity:1; } }
+@keyframes brLbImg{ from{ opacity:0; transform:scale(.94) translateY(10px); } to{ opacity:1; transform:none; } }
+
+/* Op's line: the blue light is the way to talk; until the first word, "Op loading" and a bar */
+.brief4 .br-voice{ max-width:min(100%, 980px) !important; }
+.br-voice-dot{ position:relative; padding:0; border:none; cursor:pointer; }
+button.br-voice-dot{ width:11px; height:11px; }
+.br-voice-dot::before{ content:''; position:absolute; inset:-11px; border-radius:50%; }
+.br-voice-dot:hover{ transform:scale(1.35); box-shadow:0 0 18px #7fd4ff, 0 0 40px rgba(127,212,255,.65); }
+.br-voice-dot[data-st="listen"]{ background:#9ff0c9; box-shadow:0 0 14px #9ff0c9, 0 0 30px rgba(159,240,201,.5); animation:none; }
+.br-voice-dot[data-st="listen"]::after{ content:''; position:absolute; inset:-6px; border-radius:50%; border:1.5px solid rgba(159,240,201,.7); animation:brDotRing 1.3s ease-out infinite; }
+.br-voice-dot[data-st="think"]{ animation:brDotThink .9s ease-in-out infinite; }
+@keyframes brDotRing{ from{ transform:scale(.6); opacity:1; } to{ transform:scale(2.2); opacity:0; } }
+@keyframes brDotThink{ 0%,100%{ opacity:.45; } 50%{ opacity:1; } }
+.br-voice-load{ display:none; }
+.br-voice.op-loading .br-voice-load{ display:inline-flex; align-items:center; gap:12px; font-size:12px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(191,230,255,.72); align-self:center; }
+.br-voice.op-loading .br-voice-load b{ color:#bfe6ff; font-weight:800; }
+.br-voice-load i{ position:relative; width:132px; height:3px; border-radius:3px; background:rgba(255,255,255,.12); overflow:hidden; }
+.br-voice-load u{ position:absolute; left:0; top:0; bottom:0; width:0; border-radius:3px; background:linear-gradient(90deg, #7fd4ff, #c3a6ff); box-shadow:0 0 10px rgba(127,212,255,.8); animation:opLoadBar 4.5s cubic-bezier(.15,.7,.2,1) forwards; }
+.br-voice-load u::after{ content:''; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent); animation:opLoadShine 1.2s linear infinite; }
+@keyframes opLoadBar{ 0%{ width:4%; } 60%{ width:72%; } 100%{ width:93%; } }
+@keyframes opLoadShine{ from{ transform:translateX(-100%); } to{ transform:translateX(100%); } }
+.br-voice.op-loading #brVoice, .br-voice.op-loading .br-caret{ display:none; }
+.brief4 #brVoice{ display:block; max-height:2.7em; overflow:hidden; }
+.gmm-wrap #brVoice{ max-height:none; }
+
+/* ask Op: four small icons in the headlines' corner */
+.br-asks{ margin-left:auto; display:inline-flex; align-items:center; gap:2px; margin-right:-6px; }
+.br-k-n + .br-asks, .br-asks + .br-k-n{ margin-left:10px; }
+.br-ask{ width:28px; height:28px; display:grid; place-items:center; padding:0; border:none; border-radius:9px; background:transparent; color:rgba(255,255,255,.5); cursor:pointer; transition:background .2s, color .2s, transform .2s; }
+.br-ask:hover{ background:rgba(255,255,255,.09); color:#bfe6ff; transform:translateY(-1px); }
+.br-ask:active{ transform:scale(.94); }
+.gmm-k{ display:flex; align-items:center; }
+
+/* Get to work: a clean light pill with the arrow in its own warm circle */
+.brief .brief-cta .brief-go.bgo2{ display:inline-flex; align-items:center; gap:18px; height:58px; padding:0 9px 0 30px !important; border-radius:999px !important; border:1px solid rgba(255,255,255,.7);
+  background:linear-gradient(180deg, #fffdf9, #f4ebdd) !important; color:#1a1408 !important; font-family:var(--font-display); font-size:17.5px !important; font-weight:700; letter-spacing:.005em;
+  box-shadow:0 14px 34px rgba(10,8,24,.32), 0 0 0 6px rgba(255,255,255,.07), inset 0 1px 0 #fff !important; overflow:visible; position:relative; transition:transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s; }
+.brief-go.bgo2 .bgo-a{ width:40px; height:40px; border-radius:50%; display:grid; place-items:center; background:linear-gradient(180deg, #ffcf73, #ee9a3a); color:#1a1006; box-shadow:0 4px 12px rgba(238,154,58,.45), inset 0 1px 0 rgba(255,255,255,.5); transition:transform .25s cubic-bezier(.2,.8,.2,1); }
+.brief .brief-cta .brief-go.bgo2:hover{ transform:translateY(-2px); box-shadow:0 20px 44px rgba(10,8,24,.38), 0 0 0 8px rgba(255,255,255,.1), inset 0 1px 0 #fff !important; }
+.brief-go.bgo2:hover .bgo-a{ transform:translateX(3px); }
+.brief-go.bgo2:active{ transform:translateY(0) scale(.98); }
+.brief-go.bgo2::after{ content:''; position:absolute; inset:-1px; border-radius:inherit; pointer-events:none; background:linear-gradient(105deg, transparent 35%, rgba(255,255,255,.75) 50%, transparent 65%) no-repeat; background-size:250% 100%; background-position:120% 0; mix-blend-mode:soft-light; animation:bgoShine 5.5s ease-in-out 1.2s infinite; }
+@keyframes bgoShine{ 0%,70%{ background-position:120% 0; } 100%{ background-position:-120% 0; } }
+/* Good morning's level line: small and quiet, in line with the date */
+.brief .brief-top .b4-hud{ gap:6px !important; opacity:.62 !important; align-self:center; transform:none; }
+.brief .brief-top .b4-hud .xp-badge{ width:14px !important; height:14px !important; }
+.brief .brief-top .b4-hud-m{ min-width:0 !important; gap:7px !important; }
+.brief .brief-top .b4-hud-t{ gap:5px; }
+.brief .brief-top .b4-hud-t b{ font-size:10px !important; letter-spacing:.14em !important; font-weight:700; }
+.brief .brief-top .b4-hud-t span{ font-size:9px !important; letter-spacing:.14em; font-weight:700; }
+.brief .brief-top .b4-hud-bar{ width:42px !important; height:2px !important; }
+.brief .brief-top .b4-hud-s{ font-size:10px !important; }
+.brief4 .br-voice.op-loading{ align-items:center; }
+.brief4 .br-voice.op-loading .br-voice-dot{ margin-top:0; }
+/* the level line, centred over the vision board pictures */
+.brief4 .b4-spacer{ flex:1; }
+.brief4 .br-vcol{ margin-left:auto; display:flex; flex-direction:column; align-items:center; gap:10px; }
+.brief.brief2.brief4 .br-vcol .br-p.br-vstrip.br-vstrip.br-vstrip.br-vstrip.br-vstrip{ margin:0 !important; }
+.brief4 .br-vcol .b4-hud{ margin:0 !important; gap:6px !important; opacity:.62 !important; }
+.brief4 .br-vcol .b4-hud:hover{ opacity:1 !important; }
+.brief4 .br-vcol .b4-hud .xp-badge{ width:14px !important; height:14px !important; }
+.brief4 .br-vcol .b4-hud-m{ min-width:0 !important; gap:7px !important; }
+.brief4 .br-vcol .b4-hud-t{ gap:5px; }
+.brief4 .br-vcol .b4-hud-t b{ font-size:10px !important; letter-spacing:.14em !important; font-weight:700; }
+.brief4 .br-vcol .b4-hud-t span{ font-size:9px !important; letter-spacing:.14em; font-weight:700; }
+.brief4 .br-vcol .b4-hud-bar{ width:42px !important; height:2px !important; }
+.brief4 .br-vcol .b4-hud-s{ font-size:10px !important; }
+/* full-screen pages: the light in the corner, the bubble beside it */
+body.op-ov .op-light{ left:22px !important; }
+body.op-ov .op-bub:not(.is-moved){ left:72px !important; bottom:14px !important; }
+.op-bub-h{ cursor:grab; user-select:none; }
+.op-bub.is-dragging{ transition:none !important; } .op-bub.is-dragging .op-bub-h{ cursor:grabbing; }
+.ex-hbtns{ display:inline-flex; gap:6px; margin-left:auto; }

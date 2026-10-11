@@ -116,3 +116,24 @@ function carouselBleedMeasure(){
 }
 afterRenderHooks.push(carouselBleedMeasure);
 window.addEventListener('resize', function(){ clearTimeout(carouselBleedMeasure.t); carouselBleedMeasure.t = setTimeout(carouselBleedMeasure, 120); });
+// Never a half card: a row re-measures whenever its own space changes (the sidebar folding, a scrollbar
+// appearing, fonts arriving), not just when the window resizes, and after any scroll it settles on a
+// whole card at the left edge.
+const carRO = typeof ResizeObserver!=='undefined' ? new ResizeObserver(function(entries){
+  entries.forEach(function(en){ const t = en.target.querySelector(':scope > .car-track'); if(t){ en.target._fw = null; carUpdate(t); carSettle(t, true); } });
+}) : null;
+afterRenderHooks.push(function(){
+  if(!carRO) return;
+  document.querySelectorAll('.carousel.is-sized').forEach(function(w){ if(!w._ro){ w._ro = true; carRO.observe(w); } });
+});
+function carSettle(track, instant){
+  const wrap = track.parentElement; if(!wrap || !wrap.classList.contains('is-sized') || track.dataset.loop || !wrap._fw) return;
+  const gap = parseFloat(getComputedStyle(track).columnGap) || 12, step = wrap._fw + gap, max = track.scrollWidth - track.clientWidth;
+  let to = Math.round(track.scrollLeft/step)*step; to = Math.max(0, Math.min(max, to));
+  if(Math.abs(to - track.scrollLeft) > 1.5) track.scrollTo({left:to, behavior:instant ? 'auto' : 'smooth'});
+}
+let carSettleT = new WeakMap();
+document.addEventListener('scroll', function(e){
+  const t = e.target; if(!t || !t.classList || !t.classList.contains('car-track')) return;
+  clearTimeout(carSettleT.get(t)); carSettleT.set(t, setTimeout(function(){ carSettle(t, false); }, 160));
+}, {capture:true, passive:true});

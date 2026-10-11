@@ -23,6 +23,10 @@ function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
     calendar:{events:[{id:'e1', date:day(0), time:'13:00', title:'Call with JJS'}, {id:'e2', date:day(0), time:'16:00', title:'Shoot B-roll'}]},
     journal:{entries:[], intentions:{months:{'2026-10':{habit:'Phone in bed', goal:'Sign two new clients', note:'Be the guy', at:1}}, weeks:{[ds(new Date(2026,9,5))]:{win:'20h deep work, 4 workouts', focus:'Finish the JJS launch', at:1}}, prompted:{}}}
   };
+  // a vision board with pictures (made-up gradients standing in for photos)
+  const pic = (a, c, t) => 'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+a+'"/><stop offset="1" stop-color="'+c+'"/></linearGradient></defs><rect width="400" height="300" fill="url(#g)"/><circle cx="300" cy="80" r="46" fill="rgba(255,255,255,.55)"/><text x="30" y="260" font-family="Helvetica" font-size="34" font-weight="700" fill="rgba(255,255,255,.9)">'+t+'</text></svg>');
+  const vis = [['#ff9a6b','#7a3cff','Tokyo'], ['#3fbe8e','#0c4a6e','Body'], ['#ffd27a','#e8613d','Family'], ['#5ec8ff','#1d2b6b','Freedom'], ['#ff6fa8','#4b1d6b','Home'], ['#222','#666','Car'], ['#9fe','#357','Ocean']];
+  seed.boards = {boards:[{id:'v1', kind:'vision', name:'Vision Board', parentId:null, viewport:{x:0,y:0,zoom:1}, elements: vis.map((v, i) => ({id:'i'+i, type:'image', ref:pic(v[0], v[1], v[2]), x:(i%4)*420, y:Math.floor(i/4)*320, w:400, h:300, z:i+1})).concat([{id:'n1', type:'note', header:true, color:'#3FBE8E', title:'Mind + Body', body:'', x:0, y:700, w:240, h:80, z:9}])}], masterId:'v1'};
   const ctx = await b.newContext({viewport:{width:1440, height:900}}); const p = await ctx.newPage(); p.errors = []; p.on('pageerror', e => p.errors.push(e.message));
   await p.clock.install({time:NOW.getTime()});
   await p.addInitScript((seed) => { if(sessionStorage.getItem('s')) return; sessionStorage.setItem('s', '1'); Object.keys(seed).forEach(k => localStorage.setItem('opsdash:'+k, JSON.stringify(seed[k]))); }, seed);
@@ -88,6 +92,7 @@ function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
   await shot('social', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.socRole='business'; socImportCsv('Publish time,Description,Permalink,Post type,Reach,Likes,Comments,Shares,Saves,Followers\\n'+[1,2,3,4,5,6,8,10,13].map(i => '2026-10-'+String(11-i%10).padStart(2,'0')+'T15:00,Reel number '+i+',https://instagram.com/p/x'+i+',Reel,'+(1200+i*300)+','+(80+i*11)+','+(5+i)+',3,9,4210').join('\\n'), 'x.csv'); ui.view='convos'; inboxState().mode='social'; renderView()"); await p.waitForTimeout(700); });
   await shot('goals3', async () => { await E("state.goals.items.push({id:'mf', label:'5k followers', done:false, target:5000, current:0, unit:'followers', autoTrack:'followers', master:true, start:3800, xp:1500, createdAt:'2026-10-01'}); ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(400); await E("[document.scrollingElement, document.getElementById('viewRoot').parentElement].forEach(x => { if(x) x.scrollTop = 200; })"); });
   await shot('goalsheet3', async () => { await E("ui.gsTrack='followers'; openGoalSheet('long')"); });
+  await shot('oplight', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); closeGoalSheet && closeGoalSheet(); ui.view='today'; renderView(); OV.cap='opBubText'; opBubShow(); opCaption('Morning. Three things are lined up today and JJS is due a check-in. Your deep work average is up this week, which is the first time in a while. Want me to lock you in on the JJS launch now, or start with the proposal for Bloom Co?')"); await p.waitForTimeout(500); });
   await shot('guide2', async () => { await E("ACTIONS.openXpHow(); document.getElementById('xpHowOverlay').scrollTop = 1500"); });
   await shot('history', async () => { await E("ACTIONS.openXpHistory()"); });
   await shot('you2', async () => { await E("ACTIONS.closeXpHow(); ui.view='personal'; ui.personalTab='you'; renderView()"); await p.waitForTimeout(300); await E("[document.scrollingElement, document.getElementById('viewRoot').parentElement].forEach(x => { if(x) x.scrollTop = 99999; })"); });
@@ -95,6 +100,11 @@ function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
   await shot('sleepsheet', async () => { await E("openHealthSheet('sleep')"); });
   await E("ACTIONS.closeXpHow()");
   await shot('morning', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.view='today'; renderView(); fireWake({})"); await p.click('[data-action=\"wakeStartDay\"]'); await p.waitForTimeout(900); await E("briefRevealAll()"); await p.clock.runFor(3000); await p.waitForTimeout(900); });
+  await shot('workprev', async () => { await E("ui.briefVis=null; document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.wakeMode=null; clockIn({from:'x', quiet:true}); OV.cap='opBubText'; opBubShow(); opCaption('Alright Andre. Three things today: the JJS launch first, then the Bloom proposal, then edits. JJS is due a check-in too. Want me to lock you in on the launch?')"); await p.waitForTimeout(700); });
+  await E("hideOverlay && hideOverlay('planOverlay')");
+  await shot('morning-lb', async () => { await p.click('.br-vthumb >> nth=1'); await p.waitForTimeout(600); });
+  await shot('morning-load', async () => { await E("ui.briefVis=null; wakeCfg().voice=true; document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); fireWake({})"); await p.click('[data-action=\"wakeStartDay\"]'); await E("OV.pre={ready:false}; ACTIONS.wakeIntroSkip()"); await p.clock.runFor(2500); await p.waitForTimeout(900); });
+  await E("wakeCfg().voice=false");
   console.log('errors:', p.errors);
   await b.close();
 })();

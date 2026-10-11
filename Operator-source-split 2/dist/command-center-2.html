@@ -4635,6 +4635,147 @@ body.is-dragging-task .ct-lane{ transition:border-color .15s, box-shadow .15s; }
 .gs-now{ display:flex; align-items:center; height:38px; padding:0 12px; border-radius:10px; background:rgba(var(--ink),.04); font-size:13.5px; font-weight:600; color:var(--text-dim); }
 .gl .mg-row{ flex-wrap:wrap; }
 .ib-quiet{ margin-top:18px; padding:12px 16px; border-radius:12px; background:rgba(var(--ink),.03); font-size:12.5px; color:var(--text-dim); }
+/* ===== Round 24 ===== */
+/* Op: a small light, bottom-left, always there (the pill that shows what you're on sits beside it) */
+.op-light{ position:fixed; left:236px; bottom:15px; z-index:9550; width:36px; height:36px; padding:0; border:none; background:none; cursor:pointer; border-radius:50%; animation:olFloat 6s ease-in-out infinite; transition:opacity .35s, transform .35s; }
+body.sb-collapsed .op-light{ left:76px; }
+@media (max-width:900px){ .op-light{ left:12px; } }
+.op-light.is-away{ opacity:0; pointer-events:none; transform:scale(.6); }
+.ol-core{ position:absolute; inset:11px; border-radius:50%; background:radial-gradient(circle at 40% 35%, #fff 0, #dff6ff 30%, #8fd3ff 62%, rgba(143,211,255,0) 100%); box-shadow:0 0 10px 2px rgba(143,211,255,.75), 0 0 22px 6px rgba(120,170,255,.35); transition:inset .3s, box-shadow .3s; }
+.ol-halo{ position:absolute; inset:2px; border-radius:50%; background:radial-gradient(circle, rgba(143,211,255,.28), rgba(143,211,255,0) 70%); animation:olBreathe 3.6s ease-in-out infinite; }
+.ol-spark{ position:absolute; left:50%; top:50%; width:3px; height:3px; margin:-1.5px; border-radius:50%; background:#fff; box-shadow:0 0 6px #bfe8ff; animation:olOrbit 4.2s linear infinite; opacity:.85; }
+.op-light:hover .ol-core{ inset:9px; box-shadow:0 0 14px 3px rgba(143,211,255,.9), 0 0 30px 8px rgba(120,170,255,.45); }
+.op-light[data-st="speak"] .ol-core{ inset:8px; animation:olTalk .5s ease-in-out infinite alternate; }
+.op-light[data-st="listen"] .ol-halo{ animation:olRipple 1.2s ease-out infinite; background:radial-gradient(circle, rgba(126,240,192,.45), rgba(126,240,192,0) 70%); }
+.op-light[data-st="listen"] .ol-core{ background:radial-gradient(circle at 40% 35%, #fff 0, #e2fff2 30%, #7ef0c0 62%, rgba(126,240,192,0) 100%); box-shadow:0 0 12px 3px rgba(126,240,192,.8); }
+.op-light[data-st="think"] .ol-spark{ animation-duration:1.4s; }
+@keyframes olFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
+@keyframes olBreathe{ 0%,100%{ transform:scale(.85); opacity:.7; } 50%{ transform:scale(1.15); opacity:1; } }
+@keyframes olOrbit{ from{ transform:rotate(0) translateX(13px) rotate(0); } to{ transform:rotate(360deg) translateX(13px) rotate(-360deg); } }
+@keyframes olTalk{ from{ box-shadow:0 0 10px 2px rgba(143,211,255,.75), 0 0 22px 6px rgba(120,170,255,.35); } to{ box-shadow:0 0 18px 5px rgba(170,225,255,.95), 0 0 38px 12px rgba(120,170,255,.5); } }
+@keyframes olRipple{ from{ transform:scale(.7); opacity:1; } to{ transform:scale(1.6); opacity:0; } }
+@media (prefers-reduced-motion:reduce){ .op-light, .ol-halo, .ol-spark{ animation:none !important; } }
+/* the pill steps over to make room for the light */
+.activity-pill{ left:282px !important; } body.sb-collapsed .activity-pill{ left:122px !important; }
+@media (max-width:900px){ .activity-pill{ left:56px !important; } }
+body.np-on .op-light{ left:136px; bottom:22px; }
+/* what Op says: a small bubble above the light (never over Lock in), scrolls instead of growing */
+.op-bub{ left:236px !important; right:auto !important; bottom:62px !important; width:min(380px, calc(100vw - 32px)) !important; transform:translateY(10px) !important; }
+.op-bub.is-in{ transform:none !important; }
+body.sb-collapsed .op-bub{ left:76px !important; }
+body.np-on .op-bub{ left:26px !important; bottom:70px !important; }
+@media (max-width:900px){ .op-bub{ left:12px !important; } }
+.op-bub-t{ font-size:13.5px !important; line-height:1.5 !important; max-height:6.2em !important; overflow:auto !important; margin:4px 0 8px !important; scroll-behavior:smooth; }
+.op-bub-h b{ font-size:10px; letter-spacing:.18em; }
+.op-bub-in .op-talk{ display:none; }
+.op-light.is-flash .ol-core{ animation:olFlash .7s ease-out; }
+@keyframes olFlash{ 0%{ box-shadow:0 0 30px 12px rgba(190,235,255,1); } 100%{ box-shadow:0 0 10px 2px rgba(143,211,255,.75); } }
+.op-light{ width:42px !important; height:42px !important; bottom:12px !important; }
+.op-light .ol-core{ inset:12px; } .op-light:hover .ol-core{ inset:10px; } .op-light[data-st="speak"] .ol-core{ inset:9px; }
+@keyframes olOrbit{ from{ transform:rotate(0) translateX(15px) rotate(0); } to{ transform:rotate(360deg) translateX(15px) rotate(-360deg); } }
+
+/* ===== Round 24: Good morning ===== */
+/* the greeting, with a few pictures from the vision board beside it */
+.brief4 .br-hrow{ flex:none; display:flex; align-items:center; gap:28px; min-width:0; width:100%; align-self:stretch; }
+.brief4 .br-hrow .brief-hello{ flex:0 1 auto; min-width:0; }
+.brief.brief2.brief4 .br-p.br-vstrip.br-vstrip.br-vstrip.br-vstrip.br-vstrip{ background:none !important; border:none !important; padding:0 !important; margin:0 0 0 auto !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; border-radius:0 !important; }
+.br-vstrip{ margin-left:auto; display:flex; align-items:center; gap:10px; }
+.br-vthumb{ --s:clamp(50px, 7.2vh, 70px); position:relative; flex:none; width:var(--s); height:var(--s); padding:0; border:1px solid rgba(255,255,255,.22); border-radius:15px; overflow:hidden; background:#151826; cursor:zoom-in;
+  box-shadow:0 8px 22px rgba(0,0,0,.28); transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s, border-color .3s; }
+.br-vthumb img{ width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; transition:transform .5s cubic-bezier(.2,.8,.2,1); }
+.br-vthumb:hover{ transform:translateY(-3px); border-color:rgba(255,255,255,.6); box-shadow:0 14px 30px rgba(0,0,0,.4); }
+.br-vthumb:hover img{ transform:scale(1.08); }
+.br-vthumb:focus-visible{ outline:2px solid #ffd27a; outline-offset:2px; }
+@media (max-width:1100px){ .br-vthumb:nth-child(n+4){ display:none; } }
+
+/* one picture, big: to look at, not to edit */
+.br-lightbox{ position:fixed; inset:0; z-index:40; display:grid; place-items:center; background:rgba(6,8,18,.8); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); cursor:zoom-out; animation:brLbIn .3s ease both; }
+.br-lb-fig{ margin:0; display:grid; place-items:center; max-width:min(78vw, 1200px); max-height:76vh; cursor:default; }
+.br-lb-fig img{ display:block; max-width:min(78vw, 1200px); max-height:76vh; object-fit:contain; border-radius:18px; box-shadow:0 30px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.12); animation:brLbImg .42s cubic-bezier(.2,.8,.2,1) both; }
+.br-lb-nav{ position:absolute; top:50%; width:50px; height:50px; margin-top:-25px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.07); color:#fff; font-size:30px; line-height:1; padding:0 0 4px; cursor:pointer; transition:background .2s, transform .2s; }
+.br-lb-nav:hover{ background:rgba(255,255,255,.16); transform:scale(1.06); }
+.br-lb-nav.is-prev{ left:max(20px, 4vw); } .br-lb-nav.is-next{ right:max(20px, 4vw); }
+.br-lb-bar{ position:absolute; left:50%; bottom:max(22px, 4vh); transform:translateX(-50%); display:flex; align-items:center; gap:7px; cursor:default; }
+.br-lb-bar i{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.3); transition:all .25s; }
+.br-lb-bar i.is-on{ width:18px; border-radius:4px; background:#fff; }
+.br-lb-all{ margin-left:14px; height:32px; padding:0 16px; border-radius:999px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:rgba(255,255,255,.85); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
+.br-lb-all:hover{ background:rgba(255,255,255,.14); color:#fff; }
+.br-lb-x{ position:absolute; top:22px; right:24px; width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.07); color:#fff; font-size:15px; cursor:pointer; }
+.br-lb-x:hover{ background:rgba(255,255,255,.16); }
+@keyframes brLbIn{ from{ opacity:0; } to{ opacity:1; } }
+@keyframes brLbImg{ from{ opacity:0; transform:scale(.94) translateY(10px); } to{ opacity:1; transform:none; } }
+
+/* Op's line: the blue light is the way to talk; until the first word, "Op loading" and a bar */
+.brief4 .br-voice{ max-width:min(100%, 980px) !important; }
+.br-voice-dot{ position:relative; padding:0; border:none; cursor:pointer; }
+button.br-voice-dot{ width:11px; height:11px; }
+.br-voice-dot::before{ content:''; position:absolute; inset:-11px; border-radius:50%; }
+.br-voice-dot:hover{ transform:scale(1.35); box-shadow:0 0 18px #7fd4ff, 0 0 40px rgba(127,212,255,.65); }
+.br-voice-dot[data-st="listen"]{ background:#9ff0c9; box-shadow:0 0 14px #9ff0c9, 0 0 30px rgba(159,240,201,.5); animation:none; }
+.br-voice-dot[data-st="listen"]::after{ content:''; position:absolute; inset:-6px; border-radius:50%; border:1.5px solid rgba(159,240,201,.7); animation:brDotRing 1.3s ease-out infinite; }
+.br-voice-dot[data-st="think"]{ animation:brDotThink .9s ease-in-out infinite; }
+@keyframes brDotRing{ from{ transform:scale(.6); opacity:1; } to{ transform:scale(2.2); opacity:0; } }
+@keyframes brDotThink{ 0%,100%{ opacity:.45; } 50%{ opacity:1; } }
+.br-voice-load{ display:none; }
+.br-voice.op-loading .br-voice-load{ display:inline-flex; align-items:center; gap:12px; font-size:12px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(191,230,255,.72); align-self:center; }
+.br-voice.op-loading .br-voice-load b{ color:#bfe6ff; font-weight:800; }
+.br-voice-load i{ position:relative; width:132px; height:3px; border-radius:3px; background:rgba(255,255,255,.12); overflow:hidden; }
+.br-voice-load u{ position:absolute; left:0; top:0; bottom:0; width:0; border-radius:3px; background:linear-gradient(90deg, #7fd4ff, #c3a6ff); box-shadow:0 0 10px rgba(127,212,255,.8); animation:opLoadBar 4.5s cubic-bezier(.15,.7,.2,1) forwards; }
+.br-voice-load u::after{ content:''; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent); animation:opLoadShine 1.2s linear infinite; }
+@keyframes opLoadBar{ 0%{ width:4%; } 60%{ width:72%; } 100%{ width:93%; } }
+@keyframes opLoadShine{ from{ transform:translateX(-100%); } to{ transform:translateX(100%); } }
+.br-voice.op-loading #brVoice, .br-voice.op-loading .br-caret{ display:none; }
+.brief4 #brVoice{ display:block; max-height:2.7em; overflow:hidden; }
+.gmm-wrap #brVoice{ max-height:none; }
+
+/* ask Op: four small icons in the headlines' corner */
+.br-asks{ margin-left:auto; display:inline-flex; align-items:center; gap:2px; margin-right:-6px; }
+.br-k-n + .br-asks, .br-asks + .br-k-n{ margin-left:10px; }
+.br-ask{ width:28px; height:28px; display:grid; place-items:center; padding:0; border:none; border-radius:9px; background:transparent; color:rgba(255,255,255,.5); cursor:pointer; transition:background .2s, color .2s, transform .2s; }
+.br-ask:hover{ background:rgba(255,255,255,.09); color:#bfe6ff; transform:translateY(-1px); }
+.br-ask:active{ transform:scale(.94); }
+.gmm-k{ display:flex; align-items:center; }
+
+/* Get to work: a clean light pill with the arrow in its own warm circle */
+.brief .brief-cta .brief-go.bgo2{ display:inline-flex; align-items:center; gap:18px; height:58px; padding:0 9px 0 30px !important; border-radius:999px !important; border:1px solid rgba(255,255,255,.7);
+  background:linear-gradient(180deg, #fffdf9, #f4ebdd) !important; color:#1a1408 !important; font-family:var(--font-display); font-size:17.5px !important; font-weight:700; letter-spacing:.005em;
+  box-shadow:0 14px 34px rgba(10,8,24,.32), 0 0 0 6px rgba(255,255,255,.07), inset 0 1px 0 #fff !important; overflow:visible; position:relative; transition:transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s; }
+.brief-go.bgo2 .bgo-a{ width:40px; height:40px; border-radius:50%; display:grid; place-items:center; background:linear-gradient(180deg, #ffcf73, #ee9a3a); color:#1a1006; box-shadow:0 4px 12px rgba(238,154,58,.45), inset 0 1px 0 rgba(255,255,255,.5); transition:transform .25s cubic-bezier(.2,.8,.2,1); }
+.brief .brief-cta .brief-go.bgo2:hover{ transform:translateY(-2px); box-shadow:0 20px 44px rgba(10,8,24,.38), 0 0 0 8px rgba(255,255,255,.1), inset 0 1px 0 #fff !important; }
+.brief-go.bgo2:hover .bgo-a{ transform:translateX(3px); }
+.brief-go.bgo2:active{ transform:translateY(0) scale(.98); }
+.brief-go.bgo2::after{ content:''; position:absolute; inset:-1px; border-radius:inherit; pointer-events:none; background:linear-gradient(105deg, transparent 35%, rgba(255,255,255,.75) 50%, transparent 65%) no-repeat; background-size:250% 100%; background-position:120% 0; mix-blend-mode:soft-light; animation:bgoShine 5.5s ease-in-out 1.2s infinite; }
+@keyframes bgoShine{ 0%,70%{ background-position:120% 0; } 100%{ background-position:-120% 0; } }
+/* Good morning's level line: small and quiet, in line with the date */
+.brief .brief-top .b4-hud{ gap:6px !important; opacity:.62 !important; align-self:center; transform:none; }
+.brief .brief-top .b4-hud .xp-badge{ width:14px !important; height:14px !important; }
+.brief .brief-top .b4-hud-m{ min-width:0 !important; gap:7px !important; }
+.brief .brief-top .b4-hud-t{ gap:5px; }
+.brief .brief-top .b4-hud-t b{ font-size:10px !important; letter-spacing:.14em !important; font-weight:700; }
+.brief .brief-top .b4-hud-t span{ font-size:9px !important; letter-spacing:.14em; font-weight:700; }
+.brief .brief-top .b4-hud-bar{ width:42px !important; height:2px !important; }
+.brief .brief-top .b4-hud-s{ font-size:10px !important; }
+.brief4 .br-voice.op-loading{ align-items:center; }
+.brief4 .br-voice.op-loading .br-voice-dot{ margin-top:0; }
+/* the level line, centred over the vision board pictures */
+.brief4 .b4-spacer{ flex:1; }
+.brief4 .br-vcol{ margin-left:auto; display:flex; flex-direction:column; align-items:center; gap:10px; }
+.brief.brief2.brief4 .br-vcol .br-p.br-vstrip.br-vstrip.br-vstrip.br-vstrip.br-vstrip{ margin:0 !important; }
+.brief4 .br-vcol .b4-hud{ margin:0 !important; gap:6px !important; opacity:.62 !important; }
+.brief4 .br-vcol .b4-hud:hover{ opacity:1 !important; }
+.brief4 .br-vcol .b4-hud .xp-badge{ width:14px !important; height:14px !important; }
+.brief4 .br-vcol .b4-hud-m{ min-width:0 !important; gap:7px !important; }
+.brief4 .br-vcol .b4-hud-t{ gap:5px; }
+.brief4 .br-vcol .b4-hud-t b{ font-size:10px !important; letter-spacing:.14em !important; font-weight:700; }
+.brief4 .br-vcol .b4-hud-t span{ font-size:9px !important; letter-spacing:.14em; font-weight:700; }
+.brief4 .br-vcol .b4-hud-bar{ width:42px !important; height:2px !important; }
+.brief4 .br-vcol .b4-hud-s{ font-size:10px !important; }
+/* full-screen pages: the light in the corner, the bubble beside it */
+body.op-ov .op-light{ left:22px !important; }
+body.op-ov .op-bub:not(.is-moved){ left:72px !important; bottom:14px !important; }
+.op-bub-h{ cursor:grab; user-select:none; }
+.op-bub.is-dragging{ transition:none !important; } .op-bub.is-dragging .op-bub-h{ cursor:grabbing; }
+.ex-hbtns{ display:inline-flex; gap:6px; margin-left:auto; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -8535,23 +8676,34 @@ function carouselBleedMeasure(){
 }
 afterRenderHooks.push(carouselBleedMeasure);
 window.addEventListener('resize', function(){ clearTimeout(carouselBleedMeasure.t); carouselBleedMeasure.t = setTimeout(carouselBleedMeasure, 120); });
+// Never a half card: a row re-measures whenever its own space changes (the sidebar folding, a scrollbar
+// appearing, fonts arriving), not just when the window resizes, and after any scroll it settles on a
+// whole card at the left edge.
+const carRO = typeof ResizeObserver!=='undefined' ? new ResizeObserver(function(entries){
+  entries.forEach(function(en){ const t = en.target.querySelector(':scope > .car-track'); if(t){ en.target._fw = null; carUpdate(t); carSettle(t, true); } });
+}) : null;
+afterRenderHooks.push(function(){
+  if(!carRO) return;
+  document.querySelectorAll('.carousel.is-sized').forEach(function(w){ if(!w._ro){ w._ro = true; carRO.observe(w); } });
+});
+function carSettle(track, instant){
+  const wrap = track.parentElement; if(!wrap || !wrap.classList.contains('is-sized') || track.dataset.loop || !wrap._fw) return;
+  const gap = parseFloat(getComputedStyle(track).columnGap) || 12, step = wrap._fw + gap, max = track.scrollWidth - track.clientWidth;
+  let to = Math.round(track.scrollLeft/step)*step; to = Math.max(0, Math.min(max, to));
+  if(Math.abs(to - track.scrollLeft) > 1.5) track.scrollTo({left:to, behavior:instant ? 'auto' : 'smooth'});
+}
+let carSettleT = new WeakMap();
+document.addEventListener('scroll', function(e){
+  const t = e.target; if(!t || !t.classList || !t.classList.contains('car-track')) return;
+  clearTimeout(carSettleT.get(t)); carSettleT.set(t, setTimeout(function(){ carSettle(t, false); }, 160));
+}, {capture:true, passive:true});
 // ============ TODAY ============
 // renderDayOffView lives in 32p-locked-views.js
+// clocked out: full screen and quiet, like the day off (the corner button gives the sidebar back)
 function renderOffTimeView(){
   const active = state.modes.active;
   const elapsed = Date.now() - active.startedAt;
-  if(!active.sleep && typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1))) return renderWeekendOffView(elapsed);
-  return '<div class="view-header today-header"><div>'+businessNameTagHtml()+'<div class="view-title">Clocked out.</div><div class="view-sub" id="liveClock"></div></div></div>'+
-  '<div class="day-off-wrap"><div class="card day-off-card offtime-card">'+
-    '<div style="font-size:40px;">&#127937;</div>'+
-    '<div class="hero-num" id="modeElapsed" style="color:var(--strong);">'+formatElapsed(elapsed)+'</div>'+
-    '<div class="hero-label" style="color:var(--text-dim);">off the clock &middot; '+fmtHours(deepWorkMinutesTodayLive())+' of deep work today</div>'+
-    '<div style="max-width:380px;margin:16px 0 6px;font-size:14.5px;color:var(--text-dim);line-height:1.5;">'+(typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)) ? 'That’s the week. Tomorrow’s a day off: enjoy it.' : 'The work day is done. Nothing else is tracked while you’re off.')+'</div>'+
-    '<div class="row" style="gap:8px;justify-content:center;margin-top:10px;">'+
-      (isWindDownTime() ? '<button class="btn th-btn-night" data-action="openWindDown">&#127769; Wind down</button>' : '')+
-      '<button class="btn" style="border-color:var(--border-strong);color:var(--text);" data-action="clockIn">&#128339; Clock back in</button>'+tomorrowNoteBtnHtml('btn')+
-    '</div>'+
-  '</div></div>';
+  return renderWeekendOffView(elapsed, !active.sleep && typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)));
 }
 // one tidy line per task: number, a priority dot, the title, who it's for. The description is
 // tucked away — ▾ opens it right there.
@@ -14793,11 +14945,12 @@ function expensesHtml(){
         '<button class="ex-link" data-action="finSync"'+(b.busy ? ' disabled' : '')+'>Sync now</button><button class="ex-link is-quiet" data-action="finDisconnect">Disconnect</button></div>'+
       (arr(b.accounts).length ? '<div class="ex-accts">'+b.accounts.map(function(a){ return '<span><b>'+money2(a.balance)+'</b><small>'+escapeHtml(a.name)+(a.org ? ' · '+escapeHtml(a.org) : '')+'</small></span>'; }).join('')+'</div>' : '')
     : '<div class="ex-connect"><div class="ex-connect-t">&#127974; Connect your bank</div>'+
-        '<div class="ex-connect-s">Live balances and every card purchase, in by themselves. Through <b>SimpleFIN Bridge</b> (about $15 a year): connect your banks at bridge.simplefin.org, make a setup token, paste it here. The access stays on this Mac.</div>'+
+        '<div class="ex-connect-s"><b>Free:</b> download a CSV statement from your bank’s website. When it lands in Downloads, Operator adds the purchases by itself (or use Import statement).</div>'+
+        '<div class="ex-connect-s">Or live, with balances: <b>SimpleFIN Bridge</b> (about $15 a year). Connect your banks at bridge.simplefin.org, make a setup token, paste it here. The access stays on this Mac.</div>'+
         '<div class="ex-connect-r"><input class="input" id="finToken" placeholder="Paste your SimpleFIN setup token"><button class="btn btn-primary" data-action="finConnect"'+(b.busy ? ' disabled' : '')+'>'+(b.busy ? 'Connecting…' : 'Connect')+'</button></div>'+
         (b.err ? '<div class="ex-err">'+escapeHtml(b.err)+'</div>' : '')+'</div>';
   return '<div class="section ex">'+
-    '<div class="section-title">Expenses<button class="btn btn-sm" data-action="toggleForm" data-form="expense">'+(ui.forms.expense ? 'Close' : '+ Add expense')+'</button></div>'+
+    '<div class="section-title">Expenses<span class="ex-hbtns"><button class="btn btn-sm btn-ghost" data-action="bankCsvPick" title="A CSV statement from your bank’s website">Import statement</button><button class="btn btn-sm" data-action="toggleForm" data-form="expense">'+(ui.forms.expense ? 'Close' : '+ Add expense')+'</button></span></div>'+
     (ui.forms.expense ? '<div class="card ex-form"><input class="input" id="expName" placeholder="What was it?"><input class="input" type="number" step="0.01" id="expAmount" placeholder="$">'+
       '<select class="input" id="expCat"><option value="">Kind (auto)</option>'+EXP_CATS.map(function(c){ return '<option value="'+c.id+'">'+c.label+'</option>'; }).join('')+'</select>'+
       '<input class="input" type="date" id="expDate" value="'+todayStr()+'"><button class="btn btn-good" data-action="expAdd">Add</button></div>' : '')+
@@ -14807,7 +14960,7 @@ function expensesHtml(){
     '</div>'+
     bankBit+
     (ex.length ? '<div class="ex-list">'+ex.slice().sort(function(a, c){ return c.date.localeCompare(a.date); }).slice(0, ui.expAll ? 300 : 12).map(function(e){ const k = expCat(e.cat);
-      return '<div class="ex-row"><button class="ex-ic" data-action="expCat" data-id="'+e.id+'" title="'+k.label+' (tap to change)">'+k.icon+'</button><span class="ex-n">'+escapeHtml(e.name)+'<small>'+fmtDateShort(e.date)+(e.src==='bank' ? ' · '+escapeHtml(e.account || 'bank') : '')+'</small></span><b>'+'$'+e.amount.toFixed(2)+'</b><button class="ex-x" data-action="expDel" data-id="'+e.id+'" title="Remove">&#10005;</button></div>'; }).join('')+
+      return '<div class="ex-row"><button class="ex-ic" data-action="expCat" data-id="'+e.id+'" title="'+k.label+' (tap to change)">'+k.icon+'</button><span class="ex-n">'+escapeHtml(e.name)+'<small>'+fmtDateShort(e.date)+(e.src==='bank' ? ' · '+escapeHtml(e.account || 'bank') : e.src==='csv' ? ' · statement' : '')+'</small></span><b>'+'$'+e.amount.toFixed(2)+'</b><button class="ex-x" data-action="expDel" data-id="'+e.id+'" title="Remove">&#10005;</button></div>'; }).join('')+
       (ex.length > 12 ? '<button class="ex-more" data-action="expAllToggle">'+(ui.expAll ? 'Show fewer' : 'Show all '+ex.length)+'</button>' : '')+'</div>' : '')+
   '</div>';
 }
@@ -18066,6 +18219,14 @@ function renderSettings(){
         '<div class="field"><label>Weight now'+tip('Saves a weigh-in for today (it shows in Health and rates your body on your card).')+'</label><input class="input" type="number" step="0.1" id="setWeightNow" placeholder="lb" value="'+(function(){ const l = arr(state.health.weightLog).slice().sort(function(a, b){ return a.date.localeCompare(b.date); }); return l.length ? l[l.length-1].weight : ''; })()+'"></div>'+
         '<div class="field"><label>Workout days per week (goal)</label><input class="input" type="number" id="setWeeklyWorkout" value="'+p.weeklyWorkoutTarget+'"></div>'+
       '</div></div>'+
+      // the things that make Operator yours: the same settings as in the alarm's setup, saved as you type
+      (function(){ const w = wakeCfg() || {}; return '<div class="card section" id="setYourWorld"><div class="section-title">Your world'+tip('Good morning and Op use these: walks to places you like, your teams’ scores, the news you care about.')+'</div><div class="grid grid-2">'+
+        '<div class="field"><label>Places you like</label><input class="input" data-wake="places" placeholder="e.g. a park, a coffee spot" value="'+escapeHtml(w.places||'')+'"></div>'+
+        '<div class="field"><label>Your teams</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, Giants, UFC" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
+        '<div class="field"><label>Interests</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
+        '<div class="field"><label>News topics</label><input class="input" data-wake="newsTopics" placeholder="Top stories" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
+        '<div class="field"><label>Hide news about</label><input class="input" data-wake="newsMute" placeholder="e.g. celebrity" value="'+escapeHtml(w.newsMute!=null ? w.newsMute : 'Wyoming')+'"></div>'+
+      '</div></div>'; })()+
       '<div class="section"><div class="section-title">Why You\'re Doing This</div><div class="card"><div class="grid grid-2">'+
         '<div><div class="kind-label" style="color:var(--good);">Getting</div>'+
           '<div class="task-list">'+(toward.map(function(m){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(m.text)+'</div>'+deleteBtn('motivation', m.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
@@ -19334,6 +19495,8 @@ document.addEventListener('change', function(e){
   else if(key==='snoozeMinutes') w.snoozeMinutes = Number(t.value)||9;
   else if(key==='newsTopics'){ w.newsTopics = t.value.trim(); ui.morningNews = null; }
   else if(key==='newsSports' || key==='newsTech' || key==='newsMute'){ w[key] = t.value.trim(); ui.morningNews = null; }
+  // (Places you like had no line here, so whatever you typed was gone the next time the page drew)
+  else if(key==='places') w.places = t.value.trim();
   saveWake();
   renderView();
 });
@@ -22557,7 +22720,6 @@ function wakeBriefHtml(){
       '<div class="brh-sun-row"><span><small>Sunrise</small>'+fmtMinOfDay(win.rise)+'</span><span class="brh-day">'+daylightLabel()+'</span><span><small>Sunset</small>'+fmtMinOfDay(win.set)+'</span></div></div>'));
   if(nn.headline || nn.morning) colA.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+
     (nn.headline ? '<div class="br-ln-head">'+escapeHtml(nn.headline)+'</div>' : '')+(nn.morning ? '<div class="br-ln-text">'+escapeHtml(nn.morning)+'</div>' : '')));
-  else if(vb && vb.elements.length) colA.push(panel('br-vision', 'br-a-scale', 'And this is what it’s all for.', boardStaticHtml(vb, 'wake-board'), '', ' data-action="wakeBoardToggle" title="Open your vision board"'));
   // the month and the week (or, rarely, a time capsule) — with your streak and level on top
   const you = typeof briefIntentHtml==='function' ? briefIntentHtml() : null;
   if(you) colA.push(panel('br-you br-intent', 'br-a-rise', you.voice, you.html));
@@ -22583,13 +22745,15 @@ function wakeBriefHtml(){
   // While they're loading, a placeholder holds their place so nothing moves when they land.
   const sec = (ui.morningNews && ui.morningNews.sec) || {}, newsWait = morningNewsOn() && ui.morningNews && ui.morningNews.loading;
   const late = ui.briefNewsAt ? function(){ return ';--late:'+Math.max(600, tcur - (ui.briefNewsAt - (ui.briefT0||0)))+'ms'; } : function(){ return ''; };
+  // ask Op about sports, the news, tech or the business: small icons in the headlines' corner
+  let asksUsed = false; const asks = function(){ if(asksUsed) return ''; asksUsed = true; return briefAsksHtml(); };
   const item = function(n, top, tag){ return '<button class="br-news-i'+(top?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+(tag ? '<em class="br-tag">'+tag+'</em>' : '')+escapeHtml(n.title)+(n.src ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; };
-  const waitHtml = function(cls, k){ return '<section class="br-p '+cls+' is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">'+k+'</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>'; };
+  const waitHtml = function(cls, k){ return '<section class="br-p '+cls+' is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">'+k+asks()+'</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>'; };
   const heads = news ? mixHeadlines(news, arr(sec.tech), arr(sec.local)) : [];
   if(heads.length){
     const lt = late(), lp = arr(sec.local)[0] && sec.local[0].local;
     // (as many as fit — the rest are trimmed after it's drawn, so there's no empty space under them)
-    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there'+(lp ? ', and in '+lp : '')+'.', '<div class="br-k">&#128240; Headlines'+(lp ? '<span class="br-k-n">&#128205; '+escapeHtml(lp)+'</span>' : '')+'</div><div class="br-news-list">'+heads.map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : h.local ? 'Local' : ''); }).join('')+'</div>', lt));
+    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there'+(lp ? ', and in '+lp : '')+'.', '<div class="br-k">&#128240; Headlines'+(lp ? '<span class="br-k-n">&#128205; '+escapeHtml(lp)+'</span>' : '')+asks()+'</div><div class="br-news-list">'+heads.map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : h.local ? 'Local' : ''); }).join('')+'</div>', lt));
   } else if(newsWait) colC.push(waitHtml('br-news', '&#128240; Headlines'));
   if(morningNewsOn() && newsSections().some(function(x){ return x.id==='sports'; })){
     // (on a narrower screen sports shares a column with the headlines: fewer rows, no sports stories)
@@ -22597,16 +22761,19 @@ function wakeBriefHtml(){
     const sc = typeof scoresHtml==='function' ? scoresHtml(roomy ? 4 : 3, roomy ? 4 : 3) : '', sh = arr(sec.sports).slice(0, roomy || !sc ? 6 : 0);
     if(sc || sh.length){
       const lt = late();
-      colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports</div>'+sc+sh.slice(0, sc ? 2 : 6).map(function(n){ return item(n, false); }).join(''), lt));
+      colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports'+asks()+'</div>'+sc+sh.slice(0, sc ? 2 : 6).map(function(n){ return item(n, false); }).join(''), lt));
     } else if(newsWait || (ui.scores && ui.scores.loading)) colD.push(waitHtml('br-sports', '&#127936; Sports'));
-    else colD.push(panel('br-sports', 'br-a-rise', '', '<div class="br-k">&#127936; Sports</div>'+(typeof scoresStatusHtml==='function' ? scoresStatusHtml() : '<div class="br-sports-none">No games on the board right now.</div>')));
+    else colD.push(panel('br-sports', 'br-a-rise', '', '<div class="br-k">&#127936; Sports'+asks()+'</div>'+(typeof scoresStatusHtml==='function' ? scoresStatusHtml() : '<div class="br-sports-none">No games on the board right now.</div>')));
   }
+  if(!asksUsed){ const t = todayCol ? colC : colA; for(let i = 0; i < t.length; i++){ if(t[i].indexOf('br-day ')>0){ t[i] = t[i].replace('&#128197; Today', '&#128197; Today'+asks()); break; } } }
   const ctaD = tcur;
   lines.push({at: ctaD - 380, text: 'Get ready to start your day.', key:'cta'});
   // Op's own words for them, when it has them (asked for once a morning)
   if(typeof opBriefRewrite==='function'){ const ai = ui.briefAi && ui.briefAi.date===today ? ui.briefAi.map : {}; lines.forEach(function(l){ if(l.key && ai[l.key]) l.text = ai[l.key]; }); setTimeout(function(){ opBriefRewrite(lines); }, 0); }
   ui.briefLines = lines;
   const shift = ui.briefShift || 0;
+  // the level line sits centred over the vision board's pictures (in the top bar when there aren't any)
+  const hud = typeof briefHudHtml==='function' ? briefHudHtml() : '', hudUp = !!briefVisionImgs(vb).length;
   const w = wakeCfg(), song = (wakeFinishing || wakeAudio || wakeMusicApp) && w.media ? mediaName(w.media) : '';
   return '<div class="brief brief2 brief3 brief4 bg-'+briefBgClass()+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
     (cine
@@ -22618,21 +22785,73 @@ function wakeBriefHtml(){
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner b4">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        (typeof briefHudHtml==='function' ? briefHudHtml() : '')+'<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
+        (hudUp ? '<span class="b4-spacer"></span>' : hud)+'<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+'</span>'+
         // one button: Skip takes you straight to the app
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
-      '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
-      '<div class="br-voice br-p br-a-fade" style="--d:'+(base-700)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
-      (typeof opAskHtml==='function' ? '<div class="br-p br-opbar br-a-fade" style="--d:'+(base-500)+'ms">'+(song && opVoiceOn() && !ui.briefOpGo ? '<button class="br-opgo" data-action="briefOpGo" title="The music fades out and Op takes it from here"><span class="br-opgo-dot"></span>Talk to Op</button>' : '')+opAskHtml('brief')+'</div>' : '')+
+      '<div class="br-hrow"><h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+(hudUp ? '<div class="br-vcol">'+hud+briefVisionStripHtml(vb, base-400)+'</div>' : '')+'</div>'+
+      '<div class="br-voice br-p br-a-fade'+(typeof opVoiceOn==='function' && opVoiceOn() && !OV.briefSpoke && OV.idx < 1 && !ui.briefSkipped ? ' op-loading' : '')+'" style="--d:'+(base-700)+'ms"><button class="br-voice-dot" data-action="briefTalk" title="Talk to Op" aria-label="Talk to Op"></button>'+
+        '<span class="br-voice-load"><b>Op</b> loading<i><u></u></i></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
       // no news column (headlines off) → two columns that fill the width instead of an empty third
       // wide screens get four columns (you · today · headlines · sports); otherwise sports sits under headlines
       '<div class="b4-grid'+(!colC.length && !colD.length ? ' cols-2' : !colD.length ? ' no-d' : !colC.length ? ' no-c' : '')+'"><div class="b4-col c-a">'+colA.join('')+'</div><div class="b4-col c-b">'+colB.join('')+'</div>'+(colC.length ? '<div class="b4-col c-c">'+colC.join('')+'</div>' : '')+(colD.length ? '<div class="b4-col c-d">'+colD.join('')+'</div>' : '')+'</div>'+
       '<div class="brief-cta br-p br-a-rise" data-k="'+k+'" style="--d:'+ctaD+'ms">'+
-        '<button class="brief-go brief-morning" data-action="wakeStartMorning">Get to Work &#8594;</button>'+
+        '<button class="brief-go brief-morning bgo2" data-action="wakeStartMorning"><span class="bgo-t">Get to work</span><span class="bgo-a"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span></button>'+
       '</div>'+
     '</div>'+
     (ui.wakeBoardBig && vb ? '<div class="br-vision-big" data-action="wakeBoardToggle" title="Close">'+boardStaticHtml(vb, 'wake-board')+'<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button></div>' : '')+
+    briefLightboxHtml(vb)+
   '</div>';
+}
+// ---- the vision board, small: the pictures from the middle of the board, by the greeting.
+// A click opens one big (to look at, not to edit); the arrows go through the rest.
+function briefVisionImgs(vb){
+  const imgs = vb ? vb.elements.filter(function(e){ return e.type==='image' && e.ref; }) : [];
+  if(!imgs.length) return [];
+  const bb = boardBounds(vb), cx = bb.x + bb.w/2, cy = bb.y + bb.h/2;
+  const d = function(e){ const x = e.x + e.w/2 - cx, y = e.y + (e.h||0)/2 - cy; return x*x + y*y; };
+  return imgs.slice().sort(function(a, b){ return d(a) - d(b); }).slice(0, 5).sort(function(a, b){ return a.x - b.x || a.y - b.y; });
+}
+function briefVisionStripHtml(vb, at){
+  const imgs = briefVisionImgs(vb); if(!imgs.length) return '';
+  return '<div class="br-vstrip br-p br-a-fade" style="--d:'+at+'ms">'+imgs.map(function(e, i){
+    return '<button class="br-vthumb" data-action="briefVisionOpen" data-id="'+i+'" title="Open" style="--i:'+i+'"><img src="'+escapeHtml(blobUrl(e.ref))+'" alt="" draggable="false"></button>';
+  }).join('')+'</div>';
+}
+function briefLightboxHtml(vb){
+  if(ui.briefVis==null) return '';
+  const imgs = briefVisionImgs(vb), i = ui.briefVis; if(!imgs[i]){ ui.briefVis = null; return ''; }
+  const nav = imgs.length > 1;
+  return '<div class="br-lightbox" data-action="briefVisionClose">'+
+    '<figure class="br-lb-fig"><img src="'+escapeHtml(blobUrl(imgs[i].ref))+'" alt="" draggable="false"></figure>'+
+    (nav ? '<button class="br-lb-nav is-prev" data-action="briefVisionStep" data-id="-1" title="Previous">&#8249;</button><button class="br-lb-nav is-next" data-action="briefVisionStep" data-id="1" title="Next">&#8250;</button>' : '')+
+    '<div class="br-lb-bar">'+(nav ? imgs.map(function(e, j){ return '<i class="'+(j===i ? 'is-on' : '')+'"></i>'; }).join('') : '')+
+      '<button class="br-lb-all" data-action="briefVisionAll">Whole board</button></div>'+
+    '<button class="br-lb-x" data-action="briefVisionClose" title="Close">&#10005;</button></div>';
+}
+ACTIONS.briefVisionOpen = function(el, e, id){ ui.briefVis = Number(id) || 0; renderWakeOverlayInto(); };
+ACTIONS.briefVisionClose = function(el, e){ if(e && e.target && e.target.closest('.br-lb-fig img, .br-lb-nav, .br-lb-all')) return; ui.briefVis = null; renderWakeOverlayInto(); };
+ACTIONS.briefVisionStep = function(el, e, id){
+  const n = briefVisionImgs(masterVisionBoard()).length; if(!n) return;
+  ui.briefVis = ((ui.briefVis||0) + Number(id) + n) % n; renderWakeOverlayInto();
+};
+ACTIONS.briefVisionAll = function(){ ui.briefVis = null; ui.wakeBoardBig = true; renderWakeOverlayInto(); };
+document.addEventListener('keydown', function(e){
+  if(ui.briefVis==null || !overlayOpen('wakeOverlay')) return;
+  if(e.key==='Escape'){ e.stopPropagation(); ui.briefVis = null; renderWakeOverlayInto(); }
+  else if(e.key==='ArrowRight' || e.key==='ArrowLeft') ACTIONS.briefVisionStep(null, e, e.key==='ArrowRight' ? 1 : -1);
+}, true);
+// sports, the news, tech, the business: four small line icons (they say what they are on hover)
+function briefAsksHtml(){
+  const ic = {
+    sports:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17M3.5 12h17M6 6c3 2.5 3 9.5 0 12M18 6c-3 2.5-3 9.5 0 12"/>',
+    news:'<rect x="4" y="5" width="13" height="14" rx="2"/><path d="M17 9h2.5a.5.5 0 0 1 .5.5V17a2 2 0 0 1-2 2H6M7.5 9h6M7.5 12.5h6M7.5 16h4"/>',
+    tech:'<rect x="6.5" y="6.5" width="11" height="11" rx="2"/><path d="M10 10h4v4h-4zM9.5 3.5v3M14.5 3.5v3M9.5 17.5v3M14.5 17.5v3M3.5 9.5h3M3.5 14.5h3M17.5 9.5h3M17.5 14.5h3"/>',
+    business:'<rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M3.5 12.5h17"/>'
+  };
+  const label = {sports:'Sports, from Op', news:'The news, from Op', tech:'Tech, from Op', business:'The business, from Op'};
+  return '<span class="br-asks">'+['sports', 'news', 'tech', 'business'].map(function(id){
+    return '<button class="br-ask" data-action="opAsk" data-id="'+id+'" title="'+label[id]+'" aria-label="'+label[id]+'"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+ic[id]+'</svg></button>';
+  }).join('')+'</span>';
 }
 // fit the panels to the space they have: For a Good Day's four rows share its height, and the
 // headlines and Today show as many rows as fit — no half-cut row at the bottom, no empty space under it
@@ -22817,7 +23036,7 @@ function renderPlanReveal(){
   return '<div class="wi">'+
     '<div class="wi-top"><span class="pr-badge">&#128339; Clocked In</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
       (ui.planReveal && ui.planReveal.from==='morning' ? '<button class="wi-back" data-action="backToMorning" title="Back to Good morning">&#8592; Morning</button>' : '')+
-      '<span class="wi-pl">'+(typeof aiTalkHtml==='function' ? aiTalkHtml() : '')+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
+      '<span class="wi-pl"></span>'+
       '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
     '<div class="wi-inner">'+
       '<div class="wi-k" style="animation-delay:40ms">Work Mode</div>'+
@@ -22860,8 +23079,8 @@ ACTIONS.clockOut = function(){
   const prev = state.modes.active ? Object.assign({}, state.modes.active) : null;
   startMode('offtime', {clockedOut:true, note:'Clocked out'});
   ui.undoMode = {prev:prev, at:Date.now()};
-  playLockOut(); clockOutFlash();
-  showToast('Done for the day.', {icon:'&#127937;', actionLabel:'Undo', actionAction:'undoQuickMode', duration:6000});
+  // (no flash, no "done for the day" toast: the clocked-out page says it, and Clock back in undoes it)
+  playLockOut(); ui.restFull = true;
 };
 
 // the vision board fits itself once its entrance has played (it measures wrong while scaled)
@@ -23250,20 +23469,31 @@ function restTopHtml(extra){
     '<button class="lv-btn" data-action="toggleRestFull" title="'+(restFull() ? 'Show the sidebar' : 'Full screen')+'">'+(restFull() ? '&#8690;' : '&#8689;')+'</button></div>';
 }
 function weekDeepMinutes(){ let m = 0; for(let i=0;i<7;i++){ const d = addDays(todayStr(), -i); m += i===0 ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); } return m; }
-// clocked out on the last work day before a day off: the weekend starts now, in the day-off look
-function renderWeekendOffView(elapsed){
+const EVENING_IDEAS = [
+  ['&#127859;','Cook something real.','Take your time with it.'],
+  ['&#128222;','Call someone you like.','Not a text: an actual call.'],
+  ['&#127795;','Go for a walk.','No podcast. Let the day settle.'],
+  ['&#128214;','Read for fun.','Something with no business in it.'],
+  ['&#128245;','Phone in another room.','For an hour. See how it feels.'],
+  ['&#128704;','Shower and reset.','Wash the work day off.']
+];
+// clocked out: the evening's yours. On the last work day before a day off, the weekend starts now.
+function renderWeekendOffView(elapsed, weekend){
+  if(weekend===undefined) weekend = true;
   const today = todayStr(), nw = nextWorkDay(today), wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
-  const ideas = restIdeas(3);
-  return '<div class="np rest dayoff is-weekend'+(restFull() ? ' rest-full' : '')+'">'+
+  const d = Number(today.replace(/-/g, ''));
+  const ideas = weekend ? restIdeas(3) : [0, 1, 2].map(function(i){ return EVENING_IDEAS[(d + i*2) % EVENING_IDEAS.length]; });
+  const name = state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '';
+  return '<div class="np rest dayoff is-clockedout'+(weekend ? ' is-weekend' : '')+(restFull() ? ' rest-full' : '')+'">'+
     '<div class="dayoff-bg"></div>'+
     restTopHtml()+
     '<div class="dayoff-in">'+
-      '<div class="dayoff-k">&#127937; Clocked out &middot; day off tomorrow</div>'+
-      '<h1 class="dayoff-h">That’s the week'+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
+      '<div class="dayoff-k">&#127937; Clocked out'+(weekend ? ' &middot; day off tomorrow' : '')+'</div>'+
+      '<h1 class="dayoff-h">'+(weekend ? 'That’s the week' : 'That’s the day')+name+'.</h1>'+
       '<div class="dayoff-cards">'+
         '<div class="dayoff-c"><b>'+fmtHours(deepWorkMinutesTodayLive())+'</b><span>deep work today</span></div>'+
         '<div class="dayoff-c"><b id="modeElapsed">'+formatElapsed(elapsed)+'</b><span>off the clock</span></div>'+
-        (nw ? '<div class="dayoff-c"><b>'+weekdayShort(nw)+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
+        (nw ? '<div class="dayoff-c"><b>'+(nw===addDays(today, 1) ? 'Tomorrow' : weekdayShort(nw))+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
       '</div>'+
       (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
       '<div class="dayoff-row">'+
@@ -23361,9 +23591,9 @@ function dockBtnsHtml(){
 }
 function dockHtml(){
   const name = dockSrcName();
-  // the Operator's mic sits here too: talk to it from anywhere
+  // (Op isn't up here any more: it's the light in the bottom-left corner)
   return '<div class="md-in'+(musicOn()?' is-playing':'')+'">'+(typeof lvlChipHtml==='function' ? lvlChipHtml() : '')+(name ? '<span class="md-now" title="'+escapeHtml(name)+'">'+escapeHtml(name)+'</span><button class="md-b md-skip" data-action="dockNext" title="Next">&#9197;</button>' : '')+dockBtnsHtml()+
-    '<button class="md-b md-op op-talk" data-action="opTalk" title="Talk to Op">&#127897;&#65039;</button></div>';
+    '</div>';
 }
 // (main: the big middle button of the minimal player — ▶ / ❚❚)
 function npMusicBtnHtml(main){ const on = musicOn(); return '<button class="np-c np-music'+(main?' is-main':'')+(on?' is-on':'')+'" data-action="npMusic" title="'+(on ? 'Pause the music' : 'Play music')+'">'+(on ? (main ? '&#10073;&#10073;' : '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>') : (main ? '&#9654;' : '&#9835;'))+'</button>'; }
@@ -23616,16 +23846,16 @@ function briefMinimalHtml(){
   const sc = typeof scoresHtml==='function' ? scoresHtml() : '';
   return '<div class="brief brief2 brief4 gmm-wrap bg-'+briefBgClass()+' intro-skipped is-skipped" data-sky="'+phase+'">'+
     '<div class="brief-top"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-      '<span class="b4-music">'+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span><button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
+      '<span class="b4-music"></span><button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
     '<h1 class="gmm-hello">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
-    '<div class="br-voice"><span class="br-voice-dot"></span><span id="brVoice"></span></div>'+(typeof opAskHtml==='function' ? opAskHtml('brief') : '')+
+    '<div class="br-voice"><button class="br-voice-dot" data-action="briefTalk" title="Talk to Op" aria-label="Talk to Op"></button><span id="brVoice"></span></div>'+
     '<div class="gmm">'+
       tile('gmm-wx', (now ? wxIcon(wxKind(now.code), phase) : SKY_META[phase].icon)+' Outside', now ? '<b>'+now.temp+'&deg;</b><span>'+escapeHtml(wxLabel(now.code))+(now.hi!=null ? ' · H '+now.hi+'&deg; L '+now.lo+'&deg;' : '')+'</span>' : '<b>'+SKY_META[phase].label+'</b><span>Sunset '+fmtMinOfDay(win.set)+'</span>', 0)+
       tile('gmm-q', '&#10024; For today', '<p>'+escapeHtml(q[0])+'</p>'+(q[1] ? '<small>'+escapeHtml(q[1])+'</small>' : ''), 1)+
       tile('gmm-day', '&#128197; Today', events.length ? events.slice(0, 3).map(function(e){ return '<div class="gmm-ev"><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('') : '<span>Nothing scheduled.</span>', 2)+
       tile('gmm-you', '&#128100; You', '<b>'+streak+'</b><span>day streak'+(slept ? ' · slept '+fmtDurationLabel(slept.minutes) : '')+'</span>'+(nn.headline ? '<div class="gmm-note">&#127769; '+escapeHtml(nn.headline)+'</div>' : ''), 3)+
       '<div class="gmm-c"><button class="gmm-go" data-action="wakeStartMorning"><span class="gmm-go-ring"></span><span class="gmm-go-t">Get to Work</span><span class="gmm-go-s">&#8594;</span></button></div>'+
-      tile('gmm-news', '&#128240; Headlines', news && news.length ? news.slice(0, 3).map(function(n){ return '<button class="gmm-n" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'">'+escapeHtml(n.title)+'</button>'; }).join('') : '<span>'+(morningNewsOn() ? 'Loading…' : 'Headlines are off.')+'</span>', 4)+
+      tile('gmm-news', '&#128240; Headlines'+briefAsksHtml(), news && news.length ? news.slice(0, 3).map(function(n){ return '<button class="gmm-n" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'">'+escapeHtml(n.title)+'</button>'; }).join('') : '<span>'+(morningNewsOn() ? 'Loading…' : 'Headlines are off.')+'</span>', 4)+
       (sc ? tile('gmm-sc', '&#127944; Scores', sc, 5) : '')+
     '</div>'+
   '</div>';
@@ -23710,6 +23940,8 @@ function opCaption(txt){
   if(OV.cap==='opBubText') opBubShow();
   const el = OV.cap ? document.getElementById(OV.cap) : null;
   capSet(el, txt);
+  // (a long answer keeps its newest words in view, in the bubble and on Good morning alike)
+  if(el) el.scrollTop = el.scrollHeight;
   if(OV.cap==='opBubText') opBubHideLater();
 }
 // ---- the Operator's bubble: what it says (and your reply box) floats over the page, bottom centre,
@@ -23718,14 +23950,14 @@ function opBubShow(){
   let b = document.getElementById('opBub');
   if(!b){
     b = document.createElement('div'); b.id = 'opBub'; b.className = 'op-bub';
-    b.innerHTML = '<div class="op-bub-h"><span class="op-bub-dot"></span><b>OPERATOR</b><button class="op-bub-x" data-action="opBubClose" title="Close">&#10005;</button></div>'+
+    b.innerHTML = '<div class="op-bub-h" title="Drag to move"><span class="op-bub-dot"></span><b>OPERATOR</b><button class="op-bub-x" data-action="opBubClose" title="Close">&#10005;</button></div>'+
       '<div class="op-bub-t" id="opBubText"></div>'+
       '<div class="op-bub-in"><input class="op-type" id="opBubInput" placeholder="Ask Op…" autocomplete="off"><button class="op-talk" data-action="opTalk" title="Talk (mic)">&#127897;&#65039;</button></div>';
     document.body.appendChild(b);
     b.addEventListener('mouseenter', function(){ b._hover = true; clearTimeout(opBubHideLater._t); });
     b.addEventListener('mouseleave', function(){ b._hover = false; opBubHideLater(); });
   }
-  if(!b.classList.contains('is-in')){ void b.offsetWidth; b.classList.add('is-in'); }
+  if(!b.classList.contains('is-in')){ if(typeof opBubPlace==='function') opBubPlace(b); void b.offsetWidth; b.classList.add('is-in'); }
   return b;
 }
 function opBubHideLater(){
@@ -23759,7 +23991,7 @@ function opTtsUrl(text){
 // warm the next line up while this one is being said, so there's no gap between them
 function opPrefetch(text){ if(!opVoiceOn() || !opUseHelper()) return; try{ fetch(opTtsUrl(speakable(text))).catch(function(){}); }catch(e){} }
 function opStarted(tok, opts){ OV.pending = false; OV.speaking = true; if(opts.onstart) opts.onstart(); document.body.classList.add('op-speaking'); opDuck(true); }
-function opFinished(tok, said){ OV.pending = false; if(tok===OV.token){ OV.speaking = false; OV.audio = null; opCaption(said); document.body.classList.remove('op-speaking'); opDuck(false); } }
+function opFinished(tok, said){ OV.pending = false; OV.lastEnd = Date.now(); if(tok===OV.token){ OV.speaking = false; OV.audio = null; opCaption(said); document.body.classList.remove('op-speaking'); opDuck(false); } }
 // the music goes down while Op talks and comes back up after (a song playing on the page, or the
 // Music app through the Operator app); a moment's wait between lines so it doesn't pump up and down
 let opDuckT = null, opDucked = false;
@@ -23873,41 +24105,62 @@ function opUnlock(){
 
 // ---- Good morning, spoken: one line per piece, each piece appears as it's said ----
 function opBriefLine(lines, i){ const name = state.profile.name || ''; return (i===0 ? 'Good morning'+(name ? ', '+name : '')+'. ' : '')+lines[i].text; }
+// Op starts as Good morning does: while the first line is being made, the voice line shows
+// "Op loading" with a bar; the first word comes once the greeting is up and the audio is ready.
+// Between lines there's a breath, so each line of blue text has time to come in.
+function opPreload(text){
+  const pre = {text:text, ready:false};
+  if(!opUseHelper()){ pre.ready = true; return pre; }
+  try{ fetch(opTtsUrl(speakable(text))).then(function(r){ pre.ready = true; return r && r.blob ? r.blob() : null; }).catch(function(){ pre.ready = true; }); }catch(e){ pre.ready = true; }
+  return pre;
+}
+function opBriefLoading(on){
+  const v = document.querySelector('#wakeContent .br-voice'); if(v && v.classList.contains('op-loading')!==on) v.classList.toggle('op-loading', on);
+}
 function opBriefTick(lines, t){
-  if(!opVoiceOn() || ui.briefSkipped || !lines.length) return false;
-  // with music still playing, Op stays quiet until you press Talk to Op (the words still type out)
-  if(opMusicPlaying() && OV.idx < 0 && !ui.briefOpGo) return false;
+  if(!opVoiceOn() || ui.briefSkipped || !lines.length){ opBriefLoading(false); return false; }
+  opBriefLoading(!OV.briefSpoke && OV.idx < 1);
   if(OV.speaking || OV.pending) return true;
-  // let the page finish coming in before the first word
-  if(OV.idx < 0 && typeof briefBase==='function' && t < briefBase() + 1500) return true;
+  if(OV.idx < 0){
+    if(!OV.pre) OV.pre = opPreload(opBriefLine(lines, 0));
+    // (the greeting has to be up first; a slow voice gets 7 seconds before the words go without it)
+    if(typeof briefBase==='function' && t < briefBase() + 300) return true;
+    if(!OV.pre.ready && t < briefBase() + 7000) return true;
+  } else if(Date.now() - (OV.lastEnd||0) < 550) return true;
   let next = OV.idx + 1; if(next >= lines.length) return true;
   if(t < lines[next].at) return true;
   // fallen behind the page? say the newest line instead of every one in between
   while(next + 1 < lines.length && t >= lines[next + 1].at + 600) next++;
   OV.idx = next;
   opSay(opBriefLine(lines, next), {cap:'brVoice', onstart:function(){
+    OV.briefSpoke = true; opBriefLoading(false);
     if(lines[next+1]) opPrefetch(opBriefLine(lines, next+1));
     // bring the matching piece in now if the clock hasn't got there yet
     const now = Date.now() - (ui.briefT0||0), need = lines[next].at + 380 - now;
     if(need > 0){ ui.briefT0 -= need; ui.briefShift = (ui.briefShift||0) + need; renderWakeOverlayInto(); }
-  }});
+  }}).then(function(){ OV.briefSpoke = true; opBriefLoading(false); });
   return true;
 }
-function opBriefReset(){ OV.idx = -1; ui.briefOpGo = false; opStop(); }
-// Talk to Op (Good morning): the music fades out, Op says good morning and asks what you want, then
-// listens. No long rundown unless you ask for one.
-ACTIONS.briefOpGo = async function(){
-  ui.briefOpGo = true; OV.idx = 999;
+function opBriefReset(){ OV.idx = -1; OV.pre = null; OV.briefSpoke = false; ui.briefTalked = false; ui.briefVis = null; opStop(); }
+// the blue light on Good morning is how you talk to Op there: the narration stops, the music fades
+// out, Op says good morning (the first time) and asks what you want, then listens. Click it again
+// while it's listening to send; while Op's talking, to cut in.
+ACTIONS.briefTalk = async function(){
+  if(AI.listening){ if(AI.sendNow) AI.sendNow(); return; }
+  OV.idx = 999; OV.briefSpoke = true; opStop(); opBriefLoading(false);
   if(opMusicPlaying()){ stopWakeMedia(false); const m = wakeCfg().media; if(m && m.type==='music') musicApp('stop'); }
   if(typeof renderWakeOverlayInto==='function') renderWakeOverlayInto();
-  const name = (state.profile.name || '').split(' ')[0];
-  let line = 'Good morning'+(name ? ', '+name : '')+'. What do you want to start with?';
-  if(typeof aiWrite==='function' && AI.hasKey===true){
-    const t = await Promise.race([aiWrite('It’s the morning and I just opened the app. Greet me by name in one short spoken sentence, then ask what I want to start with (my day, the business, the news, sports). Two sentences at most, no rundown.', {max:80}), new Promise(function(r){ setTimeout(r, 4000); })]);
-    if(t) line = t;
+  if(!ui.briefTalked && opVoiceOn()){
+    ui.briefTalked = true;
+    const name = (state.profile.name || '').split(' ')[0];
+    let line = 'Good morning'+(name ? ', '+name : '')+'. What do you want to start with?';
+    if(typeof aiWrite==='function' && AI.hasKey===true){
+      const t = await Promise.race([aiWrite('It’s the morning and I just opened the app. Greet me by name in one short spoken sentence, then ask what I want to start with (the news, sports, or just how I’m doing). Nothing about work. Two sentences at most, no rundown.', {max:80}), new Promise(function(r){ setTimeout(r, 4000); })]);
+      if(t) line = t;
+    }
+    if(typeof AI!=='undefined'){ AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16); }
+    await opSay(line, {cap:'brVoice'});
   }
-  if(typeof AI!=='undefined'){ AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16); }
-  await opSay(line, {cap:'brVoice'});
   if(typeof aiListen==='function' && overlayOpen('wakeOverlay')) aiListen('brVoice');
 };
 
@@ -23990,8 +24243,10 @@ function opBusinessScript(){
 }
 // asking: the bits that need fetching are fetched first (it says so if that takes a moment)
 ACTIONS.opAsk = async function(el, e, id){
-  opStop(); OV.idx = 999; // the spoken greeting is done once you ask for something
-  const cap = 'opBubText';
+  opStop(); OV.idx = 999; OV.briefSpoke = true; OV.userCut = true; // the spoken greeting is done once you ask for something
+  if(typeof opBriefLoading==='function') opBriefLoading(false);
+  // (on Good morning the answer is the blue line under the greeting; anywhere else, Op's bubble)
+  const cap = overlayOpen('wakeOverlay') && document.getElementById('brVoice') ? 'brVoice' : 'opBubText';
   const tok = OV.token;
   const wait = function(p){ return Promise.race([p, new Promise(function(r){ setTimeout(r, 7000); })]); };
   if(id==='sports' && typeof loadScores==='function' && !(ui.scores && ui.scores.got && ui.scores.ok)){ OV.cap = cap; opCaption('One moment: getting the scores…'); await wait(loadScores(true)); }
@@ -24028,17 +24283,23 @@ function opAskHtml(where){
   return '<div class="op-asks">'+
 
     (where==='work' ? chip('business', '&#128188;', 'Brief me') : chip('sports', '&#127944;', 'Sports')+chip('news', '&#128240;', 'News')+chip('tech', '&#128187;', 'Tech')+chip('business', '&#128188;', 'Business'))+
-    aiTalkHtml()+
     '</div>';
 }
-// the business brief plays by itself when you go straight from Good morning to work
+// the business brief plays by itself when you go straight from Good morning to work. Op speaks
+// straight away (a short line while the brief is being written), then gives the brief itself.
 function opAutoBusinessBrief(){
   if(!opVoiceOn()) return;
-  const tok = OV.token;
-  const say = function(t){ if(overlayOpen('planOverlay') && tok===OV.token){ opStop(); opSay(t, {cap:'opBubText'}); } };
+  const live = function(){ return overlayOpen('planOverlay') && !AI.listening && !OV.userCut; };
+  OV.userCut = false;
+  const name = (state.profile.name || '').split(' ')[0];
+  const opener = pickOne(['Alright'+(name ? ', '+name : '')+'. Here’s the day.', 'Okay, work mode. Here’s what we’ve got.', 'Let’s get into it.']);
+  let brief = null, said = false;
+  const go = function(t){ if(said || !live()) return; said = true; opSay(t, {cap:'opBubText'}); };
   if(typeof opComposed==='function' && AI.hasKey===true){
-    Promise.race([opComposed('business', opBusinessScript()), new Promise(function(r){ setTimeout(r, 6000); })]).then(function(t){ say(t || opBusinessScript()); });
-  } else setTimeout(function(){ say(opBusinessScript()); }, 900);
+    Promise.race([opComposed('business', opBusinessScript()), new Promise(function(r){ setTimeout(r, 8000); })]).then(function(t){ brief = t || opBusinessScript(); if(!OV.speaking && !OV.pending) go(brief); });
+  } else brief = opBusinessScript();
+  opStop();
+  opSay(opener, {cap:'opBubText'}).then(function(){ if(brief) setTimeout(function(){ go(brief); }, 250); });
 }
 
 // ---- choosing the voice (in the alarm settings, under "Op's voice") ----
@@ -25676,14 +25937,14 @@ function socialConnectHtml(){
   const role = ui.socRole || 'business', sh = ui.socShow;
   const roleSeg = '<div class="soc-role">'+[['business', 'Business account'], ['personal', 'Personal account']].map(function(x){ return '<button class="'+(role===x[0] ? 'is-on' : '')+'" data-action="socRole" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>';
   return '<div class="soc-connect">'+
-    '<div class="soc-h"><b>Your social numbers</b><span>No Meta developer app, no GoHighLevel. Pick one.</span></div>'+roleSeg+
+    '<div class="soc-h"><b>Your social numbers</b><span>No Meta developer app, no GoHighLevel. The CSV is free.</span></div>'+roleSeg+
     '<div class="soc-opts">'+
+      '<div class="soc-opt"><button class="soc-opt-h" data-action="socCsvPick" data-id="'+role+'"><span>&#128196;</span><div><b>Import a CSV</b><small>Free, no connection at all. Meta Business Suite → Insights → Content → Export data. Once it’s in Downloads, Operator picks it up by itself (or click here to choose it).</small></div></button></div>'+
       '<div class="soc-opt'+(sh==='mc' ? ' is-open' : '')+'"><button class="soc-opt-h" data-action="socShow" data-id="mc"><span>&#128202;</span><div><b>Metricool</b><small>Live. Connect Instagram in Metricool, paste your API token. Advanced plan.</small></div></button>'+
         (sh==='mc' ? '<div class="soc-form"><input class="input" id="mcToken" placeholder="API token (Metricool → Account settings → API)"><div class="soc-row"><input class="input" id="mcUser" placeholder="userId"><input class="input" id="mcBlog" placeholder="blogId"></div>'+
           '<div class="soc-row"><input class="input" id="mcName" placeholder="@handle (optional)"><input class="input" type="number" id="mcFollowers" placeholder="Followers now (optional)"></div>'+
           '<div class="soc-hint">userId and blogId are in the address when you open your brand in Metricool (…?blogId=123&userId=456).</div>'+
           '<button class="btn btn-primary" data-action="mcConnect"'+(ui.socBusy ? ' disabled' : '')+'>'+(ui.socBusy ? 'Connecting…' : 'Connect Metricool')+'</button></div>' : '')+'</div>'+
-      '<div class="soc-opt"><button class="soc-opt-h" data-action="socCsvPick" data-id="'+role+'"><span>&#128196;</span><div><b>Import a CSV</b><small>No connection at all. Meta Business Suite → Insights → Content → Export (or a Metricool export), then drop it here.</small></div></button></div>'+
       '<div class="soc-opt is-quiet"><button class="soc-opt-h" data-action="igConnect"><span>&#128279;</span><div><b>Meta directly</b><small>Every post and your ad spend, with a read-only token. More setup.</small></div></button></div>'+
     '</div>'+
     (ui.socErr ? '<div class="soc-err">&#9888; '+escapeHtml(ui.socErr)+'</div>' : '')+
@@ -25702,6 +25963,137 @@ function socialSourcesHtml(){
   (ui.socAdd ? socialConnectHtml() : '')+'</div>';
 }
 ACTIONS.socShowAdd = function(){ ui.socAdd = !ui.socAdd; renderView(); };
+// ============ THE FREE WAY IN: CSV EXPORTS, PICKED UP FROM DOWNLOADS ============
+// No paid service needed. Export your Instagram insights from Meta Business Suite (Insights → Content
+// → Export data) or a statement from your bank's website, and when the file lands in Downloads the
+// Operator app (helper 15+) shows it to the page: insights go to Social, card purchases to Expenses.
+// Anything else in Downloads is left alone. Every import can be undone from its toast.
+
+// ---- which kind of file is it ----
+const BANK_COLS = {date:/^(transaction date|trans\.? date|date|posted date|posting date|post date)$/i, amount:/^(amount|transaction amount|amount \(usd\))$/i,
+  debit:/^(debit|debit amount|withdrawals?|money out)$/i, credit:/^(credit|credit amount|deposits?|money in)$/i,
+  desc:/^(description|payee|merchant|name|memo|details|transaction description|original description)$/i, type:/^(type|transaction type|details)$/i};
+function csvHead(rows){ return (rows[0] || []).map(function(h){ return String(h).replace(/^﻿/, '').trim(); }); }
+function csvKind(rows){
+  const head = csvHead(rows); if(head.length < 2 || rows.length < 2) return null;
+  const has = function(re){ return head.some(function(h){ return re.test(h); }); };
+  // insights have engagement columns; a statement has money columns (a statement never has likes)
+  if(has(/^(likes|reactions|reach|accounts reached|views|plays|impressions|comments|permalink)/i) && has(CSV_COLS.date)) return 'social';
+  if(has(BANK_COLS.date) && (has(BANK_COLS.amount) || has(BANK_COLS.debit)) && has(BANK_COLS.desc)) return 'bank';
+  return null;
+}
+// ---- a bank statement → expenses ----
+function bankDate(s){
+  s = String(s||'').trim();
+  let m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s); if(m) return m[1]+'-'+m[2].padStart(2, '0')+'-'+m[3].padStart(2, '0');
+  m = /^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})$/.exec(s);
+  if(m){ const y = m[3].length===2 ? '20'+m[3] : m[3]; return y+'-'+m[1].padStart(2, '0')+'-'+m[2].padStart(2, '0'); }
+  const t = Date.parse(s); return isFinite(t) ? ds2(new Date(t)) : null;
+}
+function bankNum(s){ const t = String(s||'').replace(/[$,\s]/g, ''); if(!t) return null; const neg = /^\(.*\)$/.test(t) || /^-/.test(t); const v = Number(t.replace(/[()\-+]/g, '')); return isFinite(v) ? (neg ? -v : v) : null; }
+function bankRowsToExpenses(rows, fileName){
+  const head = csvHead(rows), idx = {};
+  Object.keys(BANK_COLS).forEach(function(k){ const i = head.findIndex(function(h){ return BANK_COLS[k].test(h); }); if(i >= 0) idx[k] = i; });
+  if(idx.desc===idx.type) delete idx.type;
+  const body = rows.slice(1).filter(function(r){ return r.length > 1; });
+  const g = function(r, k){ return idx[k]!=null ? String(r[idx[k]]||'').trim() : ''; };
+  // which way round are the amounts? Most banks write purchases as negative; card exports often
+  // write them positive (and payments negative). A file with no negatives at all is the second kind.
+  const anyNeg = idx.amount!=null && body.some(function(r){ const v = bankNum(g(r, 'amount')); return v!=null && v < 0; });
+  const anyPos = idx.amount!=null && body.some(function(r){ const v = bankNum(g(r, 'amount')); return v!=null && v > 0; });
+  const cardStyle = idx.amount!=null && (!anyNeg || (/card|credit|amex|visa|mastercard/i.test(fileName||'') && anyPos && body.filter(function(r){ return bankNum(g(r, 'amount')) > 0; }).length > body.length/2));
+  const out = [];
+  body.forEach(function(r){
+    const date = bankDate(g(r, 'date')); if(!date) return;
+    const name = g(r, 'desc').replace(/\s+/g, ' ').slice(0, 80); if(!name) return;
+    let amt = null;
+    if(idx.debit!=null){ const d = bankNum(g(r, 'debit')); if(d) amt = Math.abs(d); }
+    else if(idx.amount!=null){ const v = bankNum(g(r, 'amount')); if(v==null) return; amt = cardStyle ? (v > 0 ? v : null) : (v < 0 ? -v : null); }
+    if(!amt) return;
+    // money moving between your own accounts, card payments and refunds aren't spending
+    if(/payment thank you|autopay|transfer (to|from)|online transfer|credit card payment|refund|reversal|interest paid/i.test(name+' '+g(r, 'type'))) return;
+    out.push({date:date, amount:Math.round(amt*100)/100, name:name, cat:expGuessCat(name)});
+  });
+  return out;
+}
+function bankImportCsv(text, name){
+  const rows = csvParse(text);
+  if(csvKind(rows)!=='bank'){ showToast('That doesn’t look like a bank statement (it needs date, amount and description columns).', {icon:'&#9888;', duration:7000}); return 0; }
+  const list = bankRowsToExpenses(rows, name), ex = finExpenses(), have = {}, batch = uid();
+  ex.forEach(function(e){ if(e.txId) have[e.txId] = 1; });
+  let added = 0;
+  list.forEach(function(x){
+    const id = 'csv:'+x.date+'|'+x.amount.toFixed(2)+'|'+x.name.toLowerCase();
+    if(have[id]) return; have[id] = 1;
+    ex.push({id:uid(), txId:id, date:x.date, amount:x.amount, name:x.name, cat:x.cat, src:'csv', account:'Statement', batch:batch});
+    added++;
+  });
+  persist('finances'); renderView();
+  showToast(added ? added+' expense'+(added===1?'':'s')+' from '+(name || 'your statement')+'.' : 'Nothing new in '+(name || 'that statement')+'.', added ? {icon:'&#127974;', actionLabel:'Undo', actionAction:'inboxUndoBank', actionId:batch, duration:9000} : {icon:'&#127974;'});
+  return added;
+}
+ACTIONS.inboxUndoBank = function(el, e, id){ state.finances.expenses = finExpenses().filter(function(x){ return x.batch!==id; }); persist('finances'); renderView(); showToast('Taken back out.', {icon:'&#8617;'}); };
+// by hand, from Expenses
+ACTIONS.bankCsvPick = function(){
+  let f = document.getElementById('bankCsvFile');
+  if(!f){ f = document.createElement('input'); f.type = 'file'; f.id = 'bankCsvFile'; f.accept = '.csv,text/csv'; f.style.display = 'none'; document.body.appendChild(f); }
+  f.click();
+};
+document.addEventListener('change', function(e){
+  if(!e.target || e.target.id!=='bankCsvFile' || !e.target.files || !e.target.files[0]) return;
+  const file = e.target.files[0], rd = new FileReader();
+  rd.onload = function(){ bankImportCsv(String(rd.result||''), file.name); e.target.value = ''; };
+  rd.readAsText(file);
+});
+// ---- insights → Social (undo puts back what was there) ----
+function inboxSocial(text, name){
+  const c = igCfg(), csvAcct = c.accounts.find(function(a){ return a.src==='csv'; });
+  const role = (csvAcct && csvAcct.role) || ui.socRole || 'business', id = 'csv-'+role;
+  ui.inboxSocUndo = {id:id, prev:c.csvData && c.csvData[id] ? JSON.parse(JSON.stringify(c.csvData[id])) : null, had:c.accounts.some(function(a){ return a.id===id; })};
+  const was = ui.socRole; ui.socRole = role;
+  const ok = socImportCsv(text, name);
+  ui.socRole = was;
+  if(ok) showToast('Instagram insights from '+name+' are in Social.', {icon:'&#128202;', actionLabel:'Undo', actionAction:'inboxUndoSocial', duration:9000});
+  return ok;
+}
+ACTIONS.inboxUndoSocial = function(){
+  const u = ui.inboxSocUndo; if(!u) return;
+  const c = igCfg();
+  if(u.prev){ c.csvData[u.id] = u.prev; } else if(c.csvData) delete c.csvData[u.id];
+  if(!u.had) c.accounts = c.accounts.filter(function(a){ return a.id!==u.id; });
+  if(c.cache && c.cache.data) delete c.cache.data[u.id];
+  ui.inboxSocUndo = null; persist('settings'); ui.igTried = 0; if(typeof igRefresh==='function') igRefresh(true); renderView();
+};
+// ---- watching Downloads ----
+function inboxSeen(){ const s = state.settings; if(!s.inbox || typeof s.inbox!=='object') s.inbox = {seen:[], since:0}; if(!Array.isArray(s.inbox.seen)) s.inbox.seen = []; return s.inbox; }
+let inboxBusy = false, inboxLast = 0;
+async function inboxScan(){
+  if(inboxBusy || typeof WAKE_HELPER==='undefined') return; inboxBusy = true; inboxLast = Date.now();
+  try{
+    const r = await fetchWithin(WAKE_HELPER+'inbox/list', 6000);
+    if(!r || !r.ok) return; // (an older Operator app: there's no inbox, and that's fine)
+    let j = null; try{ j = await r.json(); }catch(e){}
+    if(!j || !Array.isArray(j.files)) return;
+    const box = inboxSeen();
+    // the very first look only goes back three days (older exports can still be imported by hand)
+    if(!box.since){ box.since = Math.floor(Date.now()/1000) - 3*86400; persist('settings'); }
+    const fresh = j.files.filter(function(f){ return f && f.f && f.m >= box.since && box.seen.indexOf(f.n+'|'+f.m) < 0; }).slice(0, 6);
+    for(let i = 0; i < fresh.length; i++){
+      const f = fresh[i];
+      box.seen.push(f.n+'|'+f.m); if(box.seen.length > 300) box.seen = box.seen.slice(-300);
+      persist('settings');
+      if(f.s > 4000000) continue;
+      const g = await fetchWithin(WAKE_HELPER+'inbox/get?f='+f.f, 10000);
+      if(!g || !g.ok) continue;
+      const text = await g.text(), kind = csvKind(csvParse(text));
+      if(kind==='social') inboxSocial(text, f.n);
+      else if(kind==='bank') bankImportCsv(text, f.n);
+    }
+  } catch(e){} finally { inboxBusy = false; }
+}
+setTimeout(inboxScan, 6000);
+setInterval(function(){ if(document.visibilityState!=='hidden') inboxScan(); }, 4*60000);
+window.addEventListener('focus', function(){ if(Date.now() - inboxLast > 60000) inboxScan(); });
 // ============ LEVEL UP ============
 // XP keeps stacking; levels are claimed. When you have the XP for the next level (and, at a rank's
 // level, the MRR and Health it asks for), a Level up button shows up — on your card, on You, in
@@ -25973,6 +26365,8 @@ function aiContext(){
   if(dues.length) lines.push('Deadlines soon: '+dues.map(function(t){ return t.title+' ('+(t.deadline < today ? 'overdue' : t.deadline===today ? 'today' : weekdayShort(t.deadline))+')'; }).join('; ')+'.');
   const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
   lines.push('Business: MRR '+money(xpMrr())+(state.profile.revenueGoalMonthly ? ' (goal '+money(state.profile.revenueGoalMonthly)+')' : '')+'; '+cs.length+' active client'+(cs.length===1?'':'s')+(cs.length ? ' ('+cs.slice(0, 8).map(function(c){ return c.business || c.name; }).join(', ')+')' : '')+'; '+arr(state.business.pipeline).filter(leadIsOpen).length+' open leads.');
+  const wk = typeof wakeCfg==='function' ? wakeCfg() || {} : {};
+  if(wk.places || wk.newsSports || wk.newsTech) lines.push('Him: '+[wk.places ? 'places he likes: '+wk.places : '', wk.newsSports ? 'his teams: '+wk.newsSports : '', wk.newsTech ? 'interests: '+wk.newsTech : ''].filter(Boolean).join('; ')+'.');
   lines.push('Work today so far: '+fmtDurationLabel(deepWorkMinutesTodayLive())+' (his daily target is '+fmtDurationLabel(state.standards.deepWorkTargetMinutes || 180)+'). Streak: '+computeStreak()+' days.');
   if(typeof tierGoals==='function'){
     const gl = function(kind){ return tierGoals(kind, periodKey(kind)).map(function(g){ return (g.done ? '[done] ' : '')+g.label; }).join('; '); };
@@ -26018,7 +26412,8 @@ const OP_RULES = 'How you work inside the Operator app:\n'+
   '- Never use em dashes or en dashes. Use a comma, a colon or a new sentence instead.\n'+
   '- Know his business inside out: his clients, what they pay, where each one stands and his notes on them are in the background. Talk about them by name like someone who has been in the room. When he tells you something about a client or a lead, save it on them with add_client_note. When he says he reached out to someone, log it with log_touch.\n'+
   '- Be proactive. When something would help (a client gone quiet, a deadline, a gap in what you know), say it or ask about it. Ask one good question when it helps you understand his business or him better.\n'+
-  '- When you notice a way the app itself could serve him better, log it with suggest_improvement (quietly; mention it only if it matters).';
+  '- When you notice a way the app itself could serve him better, log it with suggest_improvement (quietly; mention it only if it matters).\n'+
+  '- You can drive the app. When he says yes to something you offered, or asks for it, do it right away with your tools (open the page, lock in, start the task) and then say one short line. Never just describe what he could click.';
 function aiSystem(){
   const name = state.profile.name || 'the user', now = new Date(), mem = opMemory();
   return [
@@ -26026,6 +26421,7 @@ function aiSystem(){
     {type:'text', text:'The person you work for is '+name+'.\n'+
       (mem.length ? 'What you remember about him:\n'+mem.map(function(m){ return '- '+m.text; }).join('\n')+'\n' : '')+
       '\nIt is '+now.toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric', year:'numeric'})+', '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+' (dates in YYYY-MM-DD: today is '+todayStr()+').\n'+
+      (typeof overlayOpen==='function' && overlayOpen('wakeOverlay') && ui.wakeMode==='brief' ? 'Right now he’s on the Good morning screen, just up: keep it light and about him and the morning. Don’t bring up work, the business or his tasks unless he asks or it’s on today’s calendar; that comes after he presses Get to work.\n' : '')+
       'Background from the app (use it when it helps; don’t read it out):\n'+aiContext()}
   ];
 }
@@ -26086,8 +26482,22 @@ const OP_TOOLS = [
   {name:'add_client_note', description:'Save a note on a client or a lead (what was said, what they want, how it’s going). Use the client’s or lead’s name.', input_schema:{type:'object', properties:{who:{type:'string'}, note:{type:'string'}}, required:['who', 'note'], additionalProperties:false}},
   {name:'log_touch', description:'Log that he reached out to a client or lead (a text, call, email or meeting).', input_schema:{type:'object', properties:{who:{type:'string'}, type:{type:'string', enum:['text', 'call', 'email', 'meeting', 'other']}, date:OP_DATE}, required:['who'], additionalProperties:false}},
   {name:'suggest_improvement', description:'Log an idea for how the Operator app could serve him better (a feature, a fix, something that got in the way). He sees the list in Settings.', input_schema:{type:'object', properties:{idea:{type:'string'}}, required:['idea'], additionalProperties:false}},
+  {name:'lock_in', description:'Start a deep work session (lock in) now, optionally for a number of minutes and on a task by name.', input_schema:{type:'object', properties:{minutes:{type:'integer'}, task:{type:'string'}}, additionalProperties:false}},
+  {name:'start_task', description:'Start timing a task from today’s list (by part of its title) without locking in.', input_schema:{type:'object', properties:{task:{type:'string'}}, required:['task'], additionalProperties:false}},
   {name:'open_page', description:'Show a page of the app.', input_schema:{type:'object', properties:{page:{type:'string', enum:['today', 'focus', 'analytics', 'business', 'clients', 'leads', 'calendar', 'goals', 'health', 'finances', 'journal', 'card', 'settings']}}, required:['page'], additionalProperties:false}}
 ];
+// a task by (part of) its title: today's first, then the rest that aren't done
+function opFindTask(q){
+  const w = String(q||'').toLowerCase().trim(); if(!w) return null;
+  const open = state.tasks.items.filter(function(t){ return t.status!=='done'; });
+  return open.find(function(t){ return t.status==='today' && t.title.toLowerCase().indexOf(w)>=0; }) || open.find(function(t){ return t.title.toLowerCase().indexOf(w)>=0; }) || null;
+}
+// when Op moves you somewhere, the page eases in (and the light gives a little flash)
+afterRenderHooks.push(function(){
+  if(!ui.opNav) return; ui.opNav = false;
+  const vr = document.getElementById('viewRoot'); if(vr){ vr.classList.remove('vr-in'); void vr.offsetWidth; vr.classList.add('vr-in'); setTimeout(function(){ vr.classList.remove('vr-in'); }, 450); }
+  const l = document.getElementById('opLight'); if(l){ l.classList.remove('is-flash'); void l.offsetWidth; l.classList.add('is-flash'); }
+});
 // a client or lead by name (business or person, best match)
 function opFindContact(who){
   const w = String(who||'').toLowerCase().trim(); if(!w) return null;
@@ -26176,10 +26586,22 @@ function opRunTool(name, x){
       if(!s.opIdeas.some(function(i){ return i.text.toLowerCase()===idea.toLowerCase(); })){ s.opIdeas.push({id:uid(), text:idea, at:Date.now()}); if(s.opIdeas.length > 60) s.opIdeas.splice(0, s.opIdeas.length - 60); persist('settings'); }
       return 'logged';
     }
+    case 'lock_in': {
+      if(state.focus.activeSession) return 'already locked in';
+      if(x.task){ const t = opFindTask(x.task); if(t){ if(t.status!=='today'){ t.status = 'today'; persist('tasks'); } ui.currentTaskId = t.id; ui.currentTaskStartedAt = Date.now(); } }
+      if(typeof overlayOpen==='function' && overlayOpen('planOverlay') && typeof hideOverlay==='function'){ ui.planReveal = null; hideOverlay('planOverlay'); }
+      startFocus(Number(x.minutes) > 0 ? Math.round(Number(x.minutes)) : null); ui.view = 'focus'; ui.opNav = true;
+      return 'locked in'+(ui.currentTaskId ? ' on '+((state.tasks.items.find(function(t){ return t.id===ui.currentTaskId; })||{}).title || 'the task') : '');
+    }
+    case 'start_task': {
+      const t = opFindTask(need(x.task, 'task')); if(!t) throw new Error('no task matches "'+x.task+'"');
+      if(t.status!=='today'){ t.status = 'today'; persist('tasks'); }
+      setCurrentTask(t.id); ui.view = 'focus'; ui.opNav = true; return 'timing '+t.title;
+    }
     case 'open_page': {
       const pg = x.page, go = {today:['today'], focus:['focus'], analytics:['focus', function(){ ui.focusTab = 'analytics'; }], business:['business'], clients:['business', function(){ ui.businessTab = 'clients'; }], leads:['business', function(){ ui.businessTab = 'leads'; }],
         calendar:['calendar'], goals:['personal', function(){ ui.personalTab = 'goals'; }], health:['personal', function(){ ui.personalTab = 'fitness'; }], finances:['personal', function(){ ui.personalTab = 'finances'; }], journal:['personal', function(){ ui.personalTab = 'journal'; }], card:['personal', function(){ ui.personalTab = 'you'; }], settings:['settings']}[pg];
-      if(!go) throw new Error('unknown page'); ui.view = go[0]; if(go[1]) go[1](); return 'opened '+pg;
+      if(!go) throw new Error('unknown page'); ui.view = go[0]; if(go[1]) go[1](); ui.opNav = true; return 'opened '+pg;
     }
   }
   throw new Error('unknown tool');
@@ -26219,6 +26641,8 @@ async function aiAsk(text, cap){
     opMemoryLater();
     if(changed) renderView();
     if(opVoiceOn()) await opSay(reply, {cap:cap}); else opCaption(reply);
+    // a question back: the mic opens on its own for the answer (typing still works)
+    if(/\?["”’)]*\s*$/.test(reply) && !AI.listening){ setTimeout(function(){ if(!AI.busy && !AI.listening && !(OV.speaking || OV.pending)) aiListen(cap); }, 350); }
   } finally { AI.busy = false; aiUiRefresh(); }
 }
 // ---- memory that builds itself: a minute after a conversation goes quiet, Op reads it back and keeps
@@ -26529,7 +26953,7 @@ function opBriefRewrite(lines){
   const todo = lines.filter(function(l){ return l.key && !b.asked[l.key] && l.text; });
   if(!todo.length) return;
   todo.forEach(function(l){ b.asked[l.key] = 1; });
-  const task = 'These are the narration lines for my Good morning screen: each one is said out loud as its panel appears. Rewrite each in your voice: keep every fact exactly (times, temperatures, numbers, names), add nothing new, keep each under 24 words, and make them sound fresh rather than templated. Don’t start any with “Good morning” or my name (that’s added). The last line sends me off to start the day.\n'+
+  const task = 'These are the narration lines for my Good morning screen: each one is said out loud as its panel appears. Rewrite each in your voice: keep every fact exactly (times, temperatures, numbers, names), add nothing new, keep each under 24 words, and make them sound fresh rather than templated. Don’t start any with “Good morning” or my name (that’s added). Keep it about the morning, not work: no business, clients, tasks or getting things done, beyond what’s on today’s calendar. The last line sends me off to start the day.\n'+
     'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');
   aiWrite(task, {max:600}).then(function(t){
     if(!t) return;
@@ -26575,6 +26999,80 @@ document.addEventListener('mouseover', function(e){
 }, true);
 document.addEventListener('mousedown', hovHide, true);
 document.addEventListener('scroll', hovHide, true);
+// ============ OP, ALWAYS THERE: A SMALL LIGHT ============
+// Op lives in a little light in the bottom-left corner, next to the pill that shows what you're on.
+// It's always there: it drifts and breathes when it's quiet, brightens while Op talks, ripples while
+// it listens and shimmers while it thinks. Click it to talk (click again to send right away, or to
+// stop Op mid-sentence). What Op says shows in a small bubble just above it, never over the page's
+// buttons, and it scrolls instead of growing when Op says a lot.
+function opLightEnsure(){
+  let l = document.getElementById('opLight');
+  if(!l){
+    l = document.createElement('button'); l.id = 'opLight'; l.className = 'op-light'; l.setAttribute('data-action', 'opLightTap');
+    l.setAttribute('aria-label', 'Op'); l.innerHTML = '<span class="ol-halo"></span><span class="ol-core"></span><span class="ol-spark"></span>';
+    document.body.appendChild(l);
+  }
+  return l;
+}
+function opLightState(){
+  if(typeof AI==='undefined' || typeof OV==='undefined') return;
+  const l = opLightEnsure();
+  const st = AI.listening ? 'listen' : (OV.speaking || OV.pending) ? 'speak' : AI.busy ? 'think' : 'idle';
+  if(l.dataset.st!==st) l.dataset.st = st;
+  l.title = st==='listen' ? 'Listening… click to send' : st==='speak' ? 'Click to stop' : 'Op: click to talk';
+  // Good morning has its own blue light; the corner one steps aside there
+  const gm = typeof overlayOpen==='function' && overlayOpen('wakeOverlay');
+  l.classList.toggle('is-away', !!gm);
+  // (Good morning's blue light shows the same: listening, talking, thinking)
+  document.querySelectorAll('.br-voice-dot').forEach(function(d){ if(d.dataset.st!==st) d.dataset.st = st; });
+  document.body.classList.toggle('op-near-pill', !!document.querySelector('#activityPill:not(.is-hidden)'));
+}
+setInterval(opLightState, 250);
+afterRenderHooks.push(function(){ try{ opLightState(); }catch(e){} });
+ACTIONS.opLightTap = function(){
+  if(AI.listening){ if(AI.sendNow) AI.sendNow(); return; }
+  OV.userCut = true;
+  if(OV.speaking || OV.pending){ opStop(); return; }
+  OV.cap = 'opBubText'; opBubShow(); aiListen('opBubText');
+};
+// full-screen pages (the work preview, Lock in's sequence): the light and the bubble tuck into the
+// bottom-left corner, side by side, away from the page's buttons
+setInterval(function(){
+  const ov = typeof overlayOpen==='function' && (overlayOpen('planOverlay') || overlayOpen('lockSeqOverlay'));
+  if(document.body.classList.contains('op-ov')!==!!ov) document.body.classList.toggle('op-ov', !!ov);
+}, 250);
+// the bubble can be dragged by its top line anywhere it's out of the way; it stays where you put it
+// (double-click the top line to put it back)
+function opBubPlace(b){
+  b = b || document.getElementById('opBub'); if(!b) return;
+  const p = state.focus && state.focus.opBubPos;
+  if(!p){ ['left', 'top', 'bottom'].forEach(function(k){ b.style.removeProperty(k); }); b.classList.remove('is-moved'); return; }
+  const w = b.offsetWidth || 380, h = b.offsetHeight || 150;
+  const x = Math.max(8, Math.min(window.innerWidth - w - 8, p.x * window.innerWidth)), y = Math.max(8, Math.min(window.innerHeight - h - 8, p.y * window.innerHeight));
+  b.style.setProperty('left', x+'px', 'important'); b.style.setProperty('top', y+'px', 'important'); b.style.setProperty('bottom', 'auto', 'important');
+  b.classList.add('is-moved');
+}
+document.addEventListener('mousedown', function(e){
+  const h = e.target.closest && e.target.closest('#opBub .op-bub-h'); if(!h || e.target.closest('button') || e.button!==0) return;
+  const b = document.getElementById('opBub'), r = b.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
+  e.preventDefault(); b.classList.add('is-dragging');
+  const move = function(ev){
+    const x = Math.max(8, Math.min(window.innerWidth - r.width - 8, ev.clientX - dx)), y = Math.max(8, Math.min(window.innerHeight - r.height - 8, ev.clientY - dy));
+    b.style.setProperty('left', x+'px', 'important'); b.style.setProperty('top', y+'px', 'important'); b.style.setProperty('bottom', 'auto', 'important');
+  };
+  const up = function(){
+    document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); b.classList.remove('is-dragging');
+    const nr = b.getBoundingClientRect();
+    if(Math.abs(nr.left - r.left) + Math.abs(nr.top - r.top) < 3) return;
+    state.focus.opBubPos = {x:nr.left / window.innerWidth, y:nr.top / window.innerHeight}; persist('focus'); b.classList.add('is-moved');
+  };
+  document.addEventListener('mousemove', move); document.addEventListener('mouseup', up);
+});
+document.addEventListener('dblclick', function(e){
+  if(!(e.target.closest && e.target.closest('#opBub .op-bub-h'))) return;
+  state.focus.opBubPos = null; persist('focus'); opBubPlace();
+});
+window.addEventListener('resize', function(){ opBubPlace(); });
 // ============ ADDING A GOAL, AND WHAT IT'S WORTH ============
 // One sheet for every kind of goal: this week, this month, or one of your own (long-term, with a number
 // to hit). Op sizes each goal up when you add it and sets its XP, so the XP is consistent and scales with

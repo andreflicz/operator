@@ -50,15 +50,18 @@ async function ctxPage(b, seed, opts){
   {
     const p = await ctxPage(b, {profile:{name:'Andre'}, tasks:{items:tasks}, business:{clients, pipeline:[]}, focus:{wake:WAKE}}, {clock:MON, route: r => r.fulfill(okJ)});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    check('a mic in the corner dock: talk to the Operator from anywhere', await p.isVisible('#musicDock .md-op[data-action="opTalk"]'));
+    // (round 24: Op is a light in the corner now, not a mic in the dock)
+    check('Op is always there: the light in the corner, talk to it from anywhere', await p.isVisible('#opLight[data-action="opLightTap"]'));
     await E("fireWake({})"); await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(500); await E("briefRevealAll()"); await p.waitForTimeout(900);
     const top0 = await p.evaluate(() => document.querySelector('.b4-grid').getBoundingClientRect().top);
-    await p.click('.op-ask[data-id="business"]'); await p.waitForTimeout(700);
+    await p.click('.br-ask[data-id="business"]'); await p.waitForTimeout(700);
     const top1 = await p.evaluate(() => document.querySelector('.b4-grid').getBoundingClientRect().top);
-    check('what the Operator says floats in a bubble (bottom centre) …', await p.isVisible('#opBub.is-in') && /Today you’ve got 2 things/.test(await p.textContent('#opBubText')));
+    // (round 24: on Good morning the answer is the blue line under the greeting; elsewhere, the bubble)
+    check('what the Operator says on Good morning is the blue line …', /Today you’ve got 2 things/.test(await p.textContent('#brVoice')));
     check('… and the page doesn’t move', Math.abs(top0 - top1) < 1, [top0, top1]);
+    await E("OV.cap = 'opBubText'; opBubShow(); opCaption('Hello there.')"); await p.waitForTimeout(300);
     await E("ACTIONS.opBubClose()"); await p.waitForTimeout(400);
-    check('× closes it', !(await p.isVisible('#opBub.is-in')));
+    check('the bubble’s × closes it', !(await p.isVisible('#opBub.is-in')));
     await E("endBriefing()"); await p.waitForTimeout(300);
     await E("ACTIONS.dockFm()"); await p.waitForTimeout(200);
     await E("ACTIONS.dockNext()");

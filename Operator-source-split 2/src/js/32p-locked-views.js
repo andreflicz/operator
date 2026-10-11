@@ -382,20 +382,31 @@ function restTopHtml(extra){
     '<button class="lv-btn" data-action="toggleRestFull" title="'+(restFull() ? 'Show the sidebar' : 'Full screen')+'">'+(restFull() ? '&#8690;' : '&#8689;')+'</button></div>';
 }
 function weekDeepMinutes(){ let m = 0; for(let i=0;i<7;i++){ const d = addDays(todayStr(), -i); m += i===0 ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); } return m; }
-// clocked out on the last work day before a day off: the weekend starts now, in the day-off look
-function renderWeekendOffView(elapsed){
+const EVENING_IDEAS = [
+  ['&#127859;','Cook something real.','Take your time with it.'],
+  ['&#128222;','Call someone you like.','Not a text: an actual call.'],
+  ['&#127795;','Go for a walk.','No podcast. Let the day settle.'],
+  ['&#128214;','Read for fun.','Something with no business in it.'],
+  ['&#128245;','Phone in another room.','For an hour. See how it feels.'],
+  ['&#128704;','Shower and reset.','Wash the work day off.']
+];
+// clocked out: the evening's yours. On the last work day before a day off, the weekend starts now.
+function renderWeekendOffView(elapsed, weekend){
+  if(weekend===undefined) weekend = true;
   const today = todayStr(), nw = nextWorkDay(today), wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
-  const ideas = restIdeas(3);
-  return '<div class="np rest dayoff is-weekend'+(restFull() ? ' rest-full' : '')+'">'+
+  const d = Number(today.replace(/-/g, ''));
+  const ideas = weekend ? restIdeas(3) : [0, 1, 2].map(function(i){ return EVENING_IDEAS[(d + i*2) % EVENING_IDEAS.length]; });
+  const name = state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '';
+  return '<div class="np rest dayoff is-clockedout'+(weekend ? ' is-weekend' : '')+(restFull() ? ' rest-full' : '')+'">'+
     '<div class="dayoff-bg"></div>'+
     restTopHtml()+
     '<div class="dayoff-in">'+
-      '<div class="dayoff-k">&#127937; Clocked out &middot; day off tomorrow</div>'+
-      '<h1 class="dayoff-h">That’s the week'+(state.profile.name ? ', <span>'+escapeHtml(state.profile.name)+'</span>' : '')+'.</h1>'+
+      '<div class="dayoff-k">&#127937; Clocked out'+(weekend ? ' &middot; day off tomorrow' : '')+'</div>'+
+      '<h1 class="dayoff-h">'+(weekend ? 'That’s the week' : 'That’s the day')+name+'.</h1>'+
       '<div class="dayoff-cards">'+
         '<div class="dayoff-c"><b>'+fmtHours(deepWorkMinutesTodayLive())+'</b><span>deep work today</span></div>'+
         '<div class="dayoff-c"><b id="modeElapsed">'+formatElapsed(elapsed)+'</b><span>off the clock</span></div>'+
-        (nw ? '<div class="dayoff-c"><b>'+weekdayShort(nw)+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
+        (nw ? '<div class="dayoff-c"><b>'+(nw===addDays(today, 1) ? 'Tomorrow' : weekdayShort(nw))+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
       '</div>'+
       (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
       '<div class="dayoff-row">'+

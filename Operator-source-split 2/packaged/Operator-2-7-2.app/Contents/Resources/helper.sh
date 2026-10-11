@@ -350,7 +350,7 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":14}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":15}' ;;
     /hello*) printf 'open %s' "$(date +%s)" > "$DATA_DIR/page.state" 2>/dev/null; respond 200 '{"ok":true}' ;;
     /engine*)
       # Operator as its own app (its own Dock icon) or plain Chrome — from the next time it opens
@@ -454,6 +454,32 @@ wake_respond() {
         [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach Metricool"}'; }
         respond "$CODE" "$BODY"
       fi ;;
+    # the free way in: CSV exports you download (Meta Business Suite insights, your bank's statement)
+    # show up in Downloads; the page lists the recent ones and reads the ones it can use. Only .csv
+    # files sitting directly in Downloads, nothing else on the Mac.
+    /inbox/list*)
+      DL="${OP_DOWNLOADS:-$HOME/Downloads}"; OUT=""; N=0
+      for F in $(cd "$DL" 2>/dev/null && ls -t 2>/dev/null | head -n 400 | tr ' ' '\001'); do
+        F=$(printf '%s' "$F" | tr '\001' ' ')
+        case "$F" in *.csv|*.CSV) ;; *) continue ;; esac
+        P="$DL/$F"; [ -f "$P" ] || continue
+        # (GNU stat first: on a Mac it fails and the BSD form answers; the other way round GNU's -f means something else)
+        M=$(stat -c '%Y' "$P" 2>/dev/null || stat -f '%m' "$P" 2>/dev/null); S=$(wc -c < "$P" | tr -d ' ')
+        case "$M" in ''|*[!0-9]*) continue ;; esac
+        [ $(( $(date +%s) - M )) -gt 2592000 ] && continue
+        HX=$(printf '%s' "$F" | od -An -tx1 | tr -d ' \n')
+        OUT="$OUT${OUT:+,}{\"f\":\"$HX\",\"n\":\"$(je "$F")\",\"m\":$M,\"s\":${S:-0}}"
+        N=$((N+1)); [ $N -ge 40 ] && break
+      done
+      respond 200 "{\"ok\":true,\"files\":[$OUT]}" ;;
+    /inbox/get*)
+      DL="${OP_DOWNLOADS:-$HOME/Downloads}"; F=$(hexdec "$(param f)")
+      case "$F" in ''|*/*|.*) respond 400 '{"error":"bad name"}'; return ;; esac
+      case "$F" in *.csv|*.CSV) ;; *) respond 400 '{"error":"not a csv"}'; return ;; esac
+      P="$DL/$F"
+      if [ ! -f "$P" ]; then respond 404 '{"error":"gone"}'
+      elif [ "$(wc -c < "$P" | tr -d ' ')" -gt 4000000 ]; then respond 413 '{"error":"too big"}'
+      else respond 200 "$(cat "$P")" 'text/csv; charset=utf-8'; fi ;;
     /fin/status*) if [ -s "$FIN_KEY_FILE" ]; then respond 200 '{"ok":true,"connected":true}'; else respond 200 '{"ok":true,"connected":false}'; fi ;;
     /ig/status*) if [ -s "$IG_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
     /ai/key*)

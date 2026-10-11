@@ -77,6 +77,8 @@ function opCaption(txt){
   if(OV.cap==='opBubText') opBubShow();
   const el = OV.cap ? document.getElementById(OV.cap) : null;
   capSet(el, txt);
+  // (a long answer keeps its newest words in view, in the bubble and on Good morning alike)
+  if(el) el.scrollTop = el.scrollHeight;
   if(OV.cap==='opBubText') opBubHideLater();
 }
 // ---- the Operator's bubble: what it says (and your reply box) floats over the page, bottom centre,
@@ -85,14 +87,14 @@ function opBubShow(){
   let b = document.getElementById('opBub');
   if(!b){
     b = document.createElement('div'); b.id = 'opBub'; b.className = 'op-bub';
-    b.innerHTML = '<div class="op-bub-h"><span class="op-bub-dot"></span><b>OPERATOR</b><button class="op-bub-x" data-action="opBubClose" title="Close">&#10005;</button></div>'+
+    b.innerHTML = '<div class="op-bub-h" title="Drag to move"><span class="op-bub-dot"></span><b>OPERATOR</b><button class="op-bub-x" data-action="opBubClose" title="Close">&#10005;</button></div>'+
       '<div class="op-bub-t" id="opBubText"></div>'+
       '<div class="op-bub-in"><input class="op-type" id="opBubInput" placeholder="Ask Op…" autocomplete="off"><button class="op-talk" data-action="opTalk" title="Talk (mic)">&#127897;&#65039;</button></div>';
     document.body.appendChild(b);
     b.addEventListener('mouseenter', function(){ b._hover = true; clearTimeout(opBubHideLater._t); });
     b.addEventListener('mouseleave', function(){ b._hover = false; opBubHideLater(); });
   }
-  if(!b.classList.contains('is-in')){ void b.offsetWidth; b.classList.add('is-in'); }
+  if(!b.classList.contains('is-in')){ if(typeof opBubPlace==='function') opBubPlace(b); void b.offsetWidth; b.classList.add('is-in'); }
   return b;
 }
 function opBubHideLater(){
@@ -126,7 +128,7 @@ function opTtsUrl(text){
 // warm the next line up while this one is being said, so there's no gap between them
 function opPrefetch(text){ if(!opVoiceOn() || !opUseHelper()) return; try{ fetch(opTtsUrl(speakable(text))).catch(function(){}); }catch(e){} }
 function opStarted(tok, opts){ OV.pending = false; OV.speaking = true; if(opts.onstart) opts.onstart(); document.body.classList.add('op-speaking'); opDuck(true); }
-function opFinished(tok, said){ OV.pending = false; if(tok===OV.token){ OV.speaking = false; OV.audio = null; opCaption(said); document.body.classList.remove('op-speaking'); opDuck(false); } }
+function opFinished(tok, said){ OV.pending = false; OV.lastEnd = Date.now(); if(tok===OV.token){ OV.speaking = false; OV.audio = null; opCaption(said); document.body.classList.remove('op-speaking'); opDuck(false); } }
 // the music goes down while Op talks and comes back up after (a song playing on the page, or the
 // Music app through the Operator app); a moment's wait between lines so it doesn't pump up and down
 let opDuckT = null, opDucked = false;
@@ -240,41 +242,62 @@ function opUnlock(){
 
 // ---- Good morning, spoken: one line per piece, each piece appears as it's said ----
 function opBriefLine(lines, i){ const name = state.profile.name || ''; return (i===0 ? 'Good morning'+(name ? ', '+name : '')+'. ' : '')+lines[i].text; }
+// Op starts as Good morning does: while the first line is being made, the voice line shows
+// "Op loading" with a bar; the first word comes once the greeting is up and the audio is ready.
+// Between lines there's a breath, so each line of blue text has time to come in.
+function opPreload(text){
+  const pre = {text:text, ready:false};
+  if(!opUseHelper()){ pre.ready = true; return pre; }
+  try{ fetch(opTtsUrl(speakable(text))).then(function(r){ pre.ready = true; return r && r.blob ? r.blob() : null; }).catch(function(){ pre.ready = true; }); }catch(e){ pre.ready = true; }
+  return pre;
+}
+function opBriefLoading(on){
+  const v = document.querySelector('#wakeContent .br-voice'); if(v && v.classList.contains('op-loading')!==on) v.classList.toggle('op-loading', on);
+}
 function opBriefTick(lines, t){
-  if(!opVoiceOn() || ui.briefSkipped || !lines.length) return false;
-  // with music still playing, Op stays quiet until you press Talk to Op (the words still type out)
-  if(opMusicPlaying() && OV.idx < 0 && !ui.briefOpGo) return false;
+  if(!opVoiceOn() || ui.briefSkipped || !lines.length){ opBriefLoading(false); return false; }
+  opBriefLoading(!OV.briefSpoke && OV.idx < 1);
   if(OV.speaking || OV.pending) return true;
-  // let the page finish coming in before the first word
-  if(OV.idx < 0 && typeof briefBase==='function' && t < briefBase() + 1500) return true;
+  if(OV.idx < 0){
+    if(!OV.pre) OV.pre = opPreload(opBriefLine(lines, 0));
+    // (the greeting has to be up first; a slow voice gets 7 seconds before the words go without it)
+    if(typeof briefBase==='function' && t < briefBase() + 300) return true;
+    if(!OV.pre.ready && t < briefBase() + 7000) return true;
+  } else if(Date.now() - (OV.lastEnd||0) < 550) return true;
   let next = OV.idx + 1; if(next >= lines.length) return true;
   if(t < lines[next].at) return true;
   // fallen behind the page? say the newest line instead of every one in between
   while(next + 1 < lines.length && t >= lines[next + 1].at + 600) next++;
   OV.idx = next;
   opSay(opBriefLine(lines, next), {cap:'brVoice', onstart:function(){
+    OV.briefSpoke = true; opBriefLoading(false);
     if(lines[next+1]) opPrefetch(opBriefLine(lines, next+1));
     // bring the matching piece in now if the clock hasn't got there yet
     const now = Date.now() - (ui.briefT0||0), need = lines[next].at + 380 - now;
     if(need > 0){ ui.briefT0 -= need; ui.briefShift = (ui.briefShift||0) + need; renderWakeOverlayInto(); }
-  }});
+  }}).then(function(){ OV.briefSpoke = true; opBriefLoading(false); });
   return true;
 }
-function opBriefReset(){ OV.idx = -1; ui.briefOpGo = false; opStop(); }
-// Talk to Op (Good morning): the music fades out, Op says good morning and asks what you want, then
-// listens. No long rundown unless you ask for one.
-ACTIONS.briefOpGo = async function(){
-  ui.briefOpGo = true; OV.idx = 999;
+function opBriefReset(){ OV.idx = -1; OV.pre = null; OV.briefSpoke = false; ui.briefTalked = false; ui.briefVis = null; opStop(); }
+// the blue light on Good morning is how you talk to Op there: the narration stops, the music fades
+// out, Op says good morning (the first time) and asks what you want, then listens. Click it again
+// while it's listening to send; while Op's talking, to cut in.
+ACTIONS.briefTalk = async function(){
+  if(AI.listening){ if(AI.sendNow) AI.sendNow(); return; }
+  OV.idx = 999; OV.briefSpoke = true; opStop(); opBriefLoading(false);
   if(opMusicPlaying()){ stopWakeMedia(false); const m = wakeCfg().media; if(m && m.type==='music') musicApp('stop'); }
   if(typeof renderWakeOverlayInto==='function') renderWakeOverlayInto();
-  const name = (state.profile.name || '').split(' ')[0];
-  let line = 'Good morning'+(name ? ', '+name : '')+'. What do you want to start with?';
-  if(typeof aiWrite==='function' && AI.hasKey===true){
-    const t = await Promise.race([aiWrite('It’s the morning and I just opened the app. Greet me by name in one short spoken sentence, then ask what I want to start with (my day, the business, the news, sports). Two sentences at most, no rundown.', {max:80}), new Promise(function(r){ setTimeout(r, 4000); })]);
-    if(t) line = t;
+  if(!ui.briefTalked && opVoiceOn()){
+    ui.briefTalked = true;
+    const name = (state.profile.name || '').split(' ')[0];
+    let line = 'Good morning'+(name ? ', '+name : '')+'. What do you want to start with?';
+    if(typeof aiWrite==='function' && AI.hasKey===true){
+      const t = await Promise.race([aiWrite('It’s the morning and I just opened the app. Greet me by name in one short spoken sentence, then ask what I want to start with (the news, sports, or just how I’m doing). Nothing about work. Two sentences at most, no rundown.', {max:80}), new Promise(function(r){ setTimeout(r, 4000); })]);
+      if(t) line = t;
+    }
+    if(typeof AI!=='undefined'){ AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16); }
+    await opSay(line, {cap:'brVoice'});
   }
-  if(typeof AI!=='undefined'){ AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16); }
-  await opSay(line, {cap:'brVoice'});
   if(typeof aiListen==='function' && overlayOpen('wakeOverlay')) aiListen('brVoice');
 };
 
@@ -357,8 +380,10 @@ function opBusinessScript(){
 }
 // asking: the bits that need fetching are fetched first (it says so if that takes a moment)
 ACTIONS.opAsk = async function(el, e, id){
-  opStop(); OV.idx = 999; // the spoken greeting is done once you ask for something
-  const cap = 'opBubText';
+  opStop(); OV.idx = 999; OV.briefSpoke = true; OV.userCut = true; // the spoken greeting is done once you ask for something
+  if(typeof opBriefLoading==='function') opBriefLoading(false);
+  // (on Good morning the answer is the blue line under the greeting; anywhere else, Op's bubble)
+  const cap = overlayOpen('wakeOverlay') && document.getElementById('brVoice') ? 'brVoice' : 'opBubText';
   const tok = OV.token;
   const wait = function(p){ return Promise.race([p, new Promise(function(r){ setTimeout(r, 7000); })]); };
   if(id==='sports' && typeof loadScores==='function' && !(ui.scores && ui.scores.got && ui.scores.ok)){ OV.cap = cap; opCaption('One moment: getting the scores…'); await wait(loadScores(true)); }
@@ -395,17 +420,23 @@ function opAskHtml(where){
   return '<div class="op-asks">'+
 
     (where==='work' ? chip('business', '&#128188;', 'Brief me') : chip('sports', '&#127944;', 'Sports')+chip('news', '&#128240;', 'News')+chip('tech', '&#128187;', 'Tech')+chip('business', '&#128188;', 'Business'))+
-    aiTalkHtml()+
     '</div>';
 }
-// the business brief plays by itself when you go straight from Good morning to work
+// the business brief plays by itself when you go straight from Good morning to work. Op speaks
+// straight away (a short line while the brief is being written), then gives the brief itself.
 function opAutoBusinessBrief(){
   if(!opVoiceOn()) return;
-  const tok = OV.token;
-  const say = function(t){ if(overlayOpen('planOverlay') && tok===OV.token){ opStop(); opSay(t, {cap:'opBubText'}); } };
+  const live = function(){ return overlayOpen('planOverlay') && !AI.listening && !OV.userCut; };
+  OV.userCut = false;
+  const name = (state.profile.name || '').split(' ')[0];
+  const opener = pickOne(['Alright'+(name ? ', '+name : '')+'. Here’s the day.', 'Okay, work mode. Here’s what we’ve got.', 'Let’s get into it.']);
+  let brief = null, said = false;
+  const go = function(t){ if(said || !live()) return; said = true; opSay(t, {cap:'opBubText'}); };
   if(typeof opComposed==='function' && AI.hasKey===true){
-    Promise.race([opComposed('business', opBusinessScript()), new Promise(function(r){ setTimeout(r, 6000); })]).then(function(t){ say(t || opBusinessScript()); });
-  } else setTimeout(function(){ say(opBusinessScript()); }, 900);
+    Promise.race([opComposed('business', opBusinessScript()), new Promise(function(r){ setTimeout(r, 8000); })]).then(function(t){ brief = t || opBusinessScript(); if(!OV.speaking && !OV.pending) go(brief); });
+  } else brief = opBusinessScript();
+  opStop();
+  opSay(opener, {cap:'opBubText'}).then(function(){ if(brief) setTimeout(function(){ go(brief); }, 250); });
 }
 
 // ---- choosing the voice (in the alarm settings, under "Op's voice") ----

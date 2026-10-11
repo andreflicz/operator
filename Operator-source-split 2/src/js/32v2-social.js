@@ -126,14 +126,14 @@ function socialConnectHtml(){
   const role = ui.socRole || 'business', sh = ui.socShow;
   const roleSeg = '<div class="soc-role">'+[['business', 'Business account'], ['personal', 'Personal account']].map(function(x){ return '<button class="'+(role===x[0] ? 'is-on' : '')+'" data-action="socRole" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>';
   return '<div class="soc-connect">'+
-    '<div class="soc-h"><b>Your social numbers</b><span>No Meta developer app, no GoHighLevel. Pick one.</span></div>'+roleSeg+
+    '<div class="soc-h"><b>Your social numbers</b><span>No Meta developer app, no GoHighLevel. The CSV is free.</span></div>'+roleSeg+
     '<div class="soc-opts">'+
+      '<div class="soc-opt"><button class="soc-opt-h" data-action="socCsvPick" data-id="'+role+'"><span>&#128196;</span><div><b>Import a CSV</b><small>Free, no connection at all. Meta Business Suite → Insights → Content → Export data. Once it’s in Downloads, Operator picks it up by itself (or click here to choose it).</small></div></button></div>'+
       '<div class="soc-opt'+(sh==='mc' ? ' is-open' : '')+'"><button class="soc-opt-h" data-action="socShow" data-id="mc"><span>&#128202;</span><div><b>Metricool</b><small>Live. Connect Instagram in Metricool, paste your API token. Advanced plan.</small></div></button>'+
         (sh==='mc' ? '<div class="soc-form"><input class="input" id="mcToken" placeholder="API token (Metricool → Account settings → API)"><div class="soc-row"><input class="input" id="mcUser" placeholder="userId"><input class="input" id="mcBlog" placeholder="blogId"></div>'+
           '<div class="soc-row"><input class="input" id="mcName" placeholder="@handle (optional)"><input class="input" type="number" id="mcFollowers" placeholder="Followers now (optional)"></div>'+
           '<div class="soc-hint">userId and blogId are in the address when you open your brand in Metricool (…?blogId=123&userId=456).</div>'+
           '<button class="btn btn-primary" data-action="mcConnect"'+(ui.socBusy ? ' disabled' : '')+'>'+(ui.socBusy ? 'Connecting…' : 'Connect Metricool')+'</button></div>' : '')+'</div>'+
-      '<div class="soc-opt"><button class="soc-opt-h" data-action="socCsvPick" data-id="'+role+'"><span>&#128196;</span><div><b>Import a CSV</b><small>No connection at all. Meta Business Suite → Insights → Content → Export (or a Metricool export), then drop it here.</small></div></button></div>'+
       '<div class="soc-opt is-quiet"><button class="soc-opt-h" data-action="igConnect"><span>&#128279;</span><div><b>Meta directly</b><small>Every post and your ad spend, with a read-only token. More setup.</small></div></button></div>'+
     '</div>'+
     (ui.socErr ? '<div class="soc-err">&#9888; '+escapeHtml(ui.socErr)+'</div>' : '')+

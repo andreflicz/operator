@@ -116,7 +116,8 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     check('…which opens the Lock In sequence on #1', await p.isVisible('#lockSeqOverlay:not(.hidden)'));
     await E("closeLockSeq()");
     await p.click('[data-action="clockOut"]'); await p.waitForTimeout(250);
-    check('Clock out: done for the day', await E("state.modes.active && state.modes.active.clockedOut") && await p.isVisible('.lock-flash.is-clock') && /Clocked out/.test(await p.textContent('#viewRoot')) && await p.isVisible('.offtime-card [data-action="clockIn"]'));
+    // (round 24: no flash or toast; the clocked-out page is full screen)
+    check('Clock out: done for the day', await E("state.modes.active && state.modes.active.clockedOut") && /Clocked out/.test(await p.textContent('#viewRoot')) && await p.isVisible('.np.rest.is-clockedout [data-action="clockIn"]'));
     check('no errors (morning)', !p.errors.length, p.errors);
     await p.context().close();
   }

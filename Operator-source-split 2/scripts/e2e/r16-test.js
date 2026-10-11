@@ -73,9 +73,9 @@ const FAKE_SPEECH = () => {
     const said = await p.evaluate(() => window.__said.filter(x => x.trim()));
     check('the Operator speaks: good morning, the time', said.length>0 && /^Good morning, Andre\. It’s 7:0\d AM/.test(said[0]), said);
     check('the blue line is its captions', (await p.textContent('#brVoice')).length > 0);
-    check('ask it things: sports, news, tech, business', (await p.$$('.op-asks .op-ask')).length===4);
+    check('ask it things: sports, news, tech, business', (await p.$$('.br-asks .br-ask')).length===4);
     await E("briefRevealAll()"); await p.waitForTimeout(1200);
-    check('Good morning’s button says Get to Work', /Get to Work/.test(await p.textContent('[data-action="wakeStartMorning"]')));
+    check('Good morning’s button says Get to work', /Get to work/i.test(await p.textContent('[data-action="wakeStartMorning"]')));
     check('background follows the time you’re up (not black)', await p.$('.brief.bg-sunrise, .brief.bg-day, .brief.bg-golden, .brief.bg-night')!==null);
     check('scores: last results and what’s next, your teams highlighted', (await p.$$('.sb .sb-row')).length>=2 && /Results|Coming up/.test(await p.textContent('.sb')) && /Giants|NYG/.test(await p.textContent('.sb')), await p.evaluate(() => (document.querySelector('.br-sports')||{}).textContent));
     check('a time capsule turns up: "From Past You"', /From Past You/.test(await p.textContent('.br-you')) && /Proud of you/.test(await p.textContent('.br-you')));

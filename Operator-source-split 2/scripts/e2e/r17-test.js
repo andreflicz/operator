@@ -97,9 +97,8 @@ const newsRoute = (asked, extra) => async r => {
     await E("briefRevealAll()"); await p.clock.runFor(1500); await p.waitForTimeout(1500);
     if(vp.cols===3){
       check('no play button at the top of Good morning', await p.$('.brief4 .plb, .brief4 [data-action="playMorningPlaylist"]')===null);
-      check('the mute sits in the top bar, by Skip', await p.isVisible('.brief-top .op-mute-top') && !(await p.$('.op-asks .op-mute')));
-      const mb = await p.evaluate(() => { const m = document.querySelector('.brief-top .op-mute-top').getBoundingClientRect(), s = document.querySelector('.brief-top .brief-skipall').getBoundingClientRect(); return {gap:s.left - m.right, right:m.right > window.innerWidth*0.7}; });
-      check('…right next to it (not floating in the middle)', mb.gap>=0 && mb.gap<30 && mb.right, mb);
+      // (round 24: no speaker up top: Op is the blue light, and its voice is in Settings)
+      check('no speaker in the top bar', !(await p.$('.brief-top .op-mute-top')) && await p.isVisible('.brief-top .brief-skipall'));
       check('Headlines: the news with tech mixed in', await p.isVisible('.br-news') && /Fed signals/.test(await p.textContent('.br-news')) && (await p.$$('.br-news .br-tag')).length>=1 && /Apple unveils/.test(await p.textContent('.br-news')));
       check('Sports: its own panel — scores and sports headlines', await p.isVisible('.br-sports') && (await p.$$('.br-sports .sb-row')).length>=2 && !/Giants rally/.test(await p.textContent('.br-news')));
       const qh = await p.evaluate(() => document.querySelector('.br-quote').getBoundingClientRect().height);
@@ -138,7 +137,7 @@ const newsRoute = (asked, extra) => async r => {
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("clockIn({from:'morning'})"); await p.waitForTimeout(1200);
     check('work preview: no "First up" under LOCK IN', await p.isVisible('#planOverlay .pr-go') && await p.$('#planOverlay .ls-go-sub')===null);
-    check('the mute is up top in the work preview too', await p.isVisible('#planOverlay .wi-top .op-mute-top'));
+    check('no speaker up top in the work preview either', !(await p.$('#planOverlay .wi-top .op-mute-top')));
     const auth = await p.evaluate(() => Array.from(document.querySelectorAll('#planOverlay .wi-side, #planOverlay .wi-act')).filter(el => el.offsetParent).map(box => { const c = box.querySelector('figcaption'); if(!c) return true; const a = box.getBoundingClientRect(), r = c.getBoundingClientRect(); return r.height > 5 && r.bottom <= a.bottom + 1; }));
     check('every quote box shows who said it (bottom right too)', auth.length>=1 && auth.every(Boolean), auth);
     check('your level is in the work preview', /Level 0/.test(await p.textContent('#planOverlay .wi-stats')));

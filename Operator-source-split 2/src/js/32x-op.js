@@ -84,6 +84,8 @@ function aiContext(){
   if(dues.length) lines.push('Deadlines soon: '+dues.map(function(t){ return t.title+' ('+(t.deadline < today ? 'overdue' : t.deadline===today ? 'today' : weekdayShort(t.deadline))+')'; }).join('; ')+'.');
   const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
   lines.push('Business: MRR '+money(xpMrr())+(state.profile.revenueGoalMonthly ? ' (goal '+money(state.profile.revenueGoalMonthly)+')' : '')+'; '+cs.length+' active client'+(cs.length===1?'':'s')+(cs.length ? ' ('+cs.slice(0, 8).map(function(c){ return c.business || c.name; }).join(', ')+')' : '')+'; '+arr(state.business.pipeline).filter(leadIsOpen).length+' open leads.');
+  const wk = typeof wakeCfg==='function' ? wakeCfg() || {} : {};
+  if(wk.places || wk.newsSports || wk.newsTech) lines.push('Him: '+[wk.places ? 'places he likes: '+wk.places : '', wk.newsSports ? 'his teams: '+wk.newsSports : '', wk.newsTech ? 'interests: '+wk.newsTech : ''].filter(Boolean).join('; ')+'.');
   lines.push('Work today so far: '+fmtDurationLabel(deepWorkMinutesTodayLive())+' (his daily target is '+fmtDurationLabel(state.standards.deepWorkTargetMinutes || 180)+'). Streak: '+computeStreak()+' days.');
   if(typeof tierGoals==='function'){
     const gl = function(kind){ return tierGoals(kind, periodKey(kind)).map(function(g){ return (g.done ? '[done] ' : '')+g.label; }).join('; '); };
@@ -129,7 +131,8 @@ const OP_RULES = 'How you work inside the Operator app:\n'+
   '- Never use em dashes or en dashes. Use a comma, a colon or a new sentence instead.\n'+
   '- Know his business inside out: his clients, what they pay, where each one stands and his notes on them are in the background. Talk about them by name like someone who has been in the room. When he tells you something about a client or a lead, save it on them with add_client_note. When he says he reached out to someone, log it with log_touch.\n'+
   '- Be proactive. When something would help (a client gone quiet, a deadline, a gap in what you know), say it or ask about it. Ask one good question when it helps you understand his business or him better.\n'+
-  '- When you notice a way the app itself could serve him better, log it with suggest_improvement (quietly; mention it only if it matters).';
+  '- When you notice a way the app itself could serve him better, log it with suggest_improvement (quietly; mention it only if it matters).\n'+
+  '- You can drive the app. When he says yes to something you offered, or asks for it, do it right away with your tools (open the page, lock in, start the task) and then say one short line. Never just describe what he could click.';
 function aiSystem(){
   const name = state.profile.name || 'the user', now = new Date(), mem = opMemory();
   return [
@@ -137,6 +140,7 @@ function aiSystem(){
     {type:'text', text:'The person you work for is '+name+'.\n'+
       (mem.length ? 'What you remember about him:\n'+mem.map(function(m){ return '- '+m.text; }).join('\n')+'\n' : '')+
       '\nIt is '+now.toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric', year:'numeric'})+', '+now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+' (dates in YYYY-MM-DD: today is '+todayStr()+').\n'+
+      (typeof overlayOpen==='function' && overlayOpen('wakeOverlay') && ui.wakeMode==='brief' ? 'Right now he’s on the Good morning screen, just up: keep it light and about him and the morning. Don’t bring up work, the business or his tasks unless he asks or it’s on today’s calendar; that comes after he presses Get to work.\n' : '')+
       'Background from the app (use it when it helps; don’t read it out):\n'+aiContext()}
   ];
 }
@@ -197,8 +201,22 @@ const OP_TOOLS = [
   {name:'add_client_note', description:'Save a note on a client or a lead (what was said, what they want, how it’s going). Use the client’s or lead’s name.', input_schema:{type:'object', properties:{who:{type:'string'}, note:{type:'string'}}, required:['who', 'note'], additionalProperties:false}},
   {name:'log_touch', description:'Log that he reached out to a client or lead (a text, call, email or meeting).', input_schema:{type:'object', properties:{who:{type:'string'}, type:{type:'string', enum:['text', 'call', 'email', 'meeting', 'other']}, date:OP_DATE}, required:['who'], additionalProperties:false}},
   {name:'suggest_improvement', description:'Log an idea for how the Operator app could serve him better (a feature, a fix, something that got in the way). He sees the list in Settings.', input_schema:{type:'object', properties:{idea:{type:'string'}}, required:['idea'], additionalProperties:false}},
+  {name:'lock_in', description:'Start a deep work session (lock in) now, optionally for a number of minutes and on a task by name.', input_schema:{type:'object', properties:{minutes:{type:'integer'}, task:{type:'string'}}, additionalProperties:false}},
+  {name:'start_task', description:'Start timing a task from today’s list (by part of its title) without locking in.', input_schema:{type:'object', properties:{task:{type:'string'}}, required:['task'], additionalProperties:false}},
   {name:'open_page', description:'Show a page of the app.', input_schema:{type:'object', properties:{page:{type:'string', enum:['today', 'focus', 'analytics', 'business', 'clients', 'leads', 'calendar', 'goals', 'health', 'finances', 'journal', 'card', 'settings']}}, required:['page'], additionalProperties:false}}
 ];
+// a task by (part of) its title: today's first, then the rest that aren't done
+function opFindTask(q){
+  const w = String(q||'').toLowerCase().trim(); if(!w) return null;
+  const open = state.tasks.items.filter(function(t){ return t.status!=='done'; });
+  return open.find(function(t){ return t.status==='today' && t.title.toLowerCase().indexOf(w)>=0; }) || open.find(function(t){ return t.title.toLowerCase().indexOf(w)>=0; }) || null;
+}
+// when Op moves you somewhere, the page eases in (and the light gives a little flash)
+afterRenderHooks.push(function(){
+  if(!ui.opNav) return; ui.opNav = false;
+  const vr = document.getElementById('viewRoot'); if(vr){ vr.classList.remove('vr-in'); void vr.offsetWidth; vr.classList.add('vr-in'); setTimeout(function(){ vr.classList.remove('vr-in'); }, 450); }
+  const l = document.getElementById('opLight'); if(l){ l.classList.remove('is-flash'); void l.offsetWidth; l.classList.add('is-flash'); }
+});
 // a client or lead by name (business or person, best match)
 function opFindContact(who){
   const w = String(who||'').toLowerCase().trim(); if(!w) return null;
@@ -287,10 +305,22 @@ function opRunTool(name, x){
       if(!s.opIdeas.some(function(i){ return i.text.toLowerCase()===idea.toLowerCase(); })){ s.opIdeas.push({id:uid(), text:idea, at:Date.now()}); if(s.opIdeas.length > 60) s.opIdeas.splice(0, s.opIdeas.length - 60); persist('settings'); }
       return 'logged';
     }
+    case 'lock_in': {
+      if(state.focus.activeSession) return 'already locked in';
+      if(x.task){ const t = opFindTask(x.task); if(t){ if(t.status!=='today'){ t.status = 'today'; persist('tasks'); } ui.currentTaskId = t.id; ui.currentTaskStartedAt = Date.now(); } }
+      if(typeof overlayOpen==='function' && overlayOpen('planOverlay') && typeof hideOverlay==='function'){ ui.planReveal = null; hideOverlay('planOverlay'); }
+      startFocus(Number(x.minutes) > 0 ? Math.round(Number(x.minutes)) : null); ui.view = 'focus'; ui.opNav = true;
+      return 'locked in'+(ui.currentTaskId ? ' on '+((state.tasks.items.find(function(t){ return t.id===ui.currentTaskId; })||{}).title || 'the task') : '');
+    }
+    case 'start_task': {
+      const t = opFindTask(need(x.task, 'task')); if(!t) throw new Error('no task matches "'+x.task+'"');
+      if(t.status!=='today'){ t.status = 'today'; persist('tasks'); }
+      setCurrentTask(t.id); ui.view = 'focus'; ui.opNav = true; return 'timing '+t.title;
+    }
     case 'open_page': {
       const pg = x.page, go = {today:['today'], focus:['focus'], analytics:['focus', function(){ ui.focusTab = 'analytics'; }], business:['business'], clients:['business', function(){ ui.businessTab = 'clients'; }], leads:['business', function(){ ui.businessTab = 'leads'; }],
         calendar:['calendar'], goals:['personal', function(){ ui.personalTab = 'goals'; }], health:['personal', function(){ ui.personalTab = 'fitness'; }], finances:['personal', function(){ ui.personalTab = 'finances'; }], journal:['personal', function(){ ui.personalTab = 'journal'; }], card:['personal', function(){ ui.personalTab = 'you'; }], settings:['settings']}[pg];
-      if(!go) throw new Error('unknown page'); ui.view = go[0]; if(go[1]) go[1](); return 'opened '+pg;
+      if(!go) throw new Error('unknown page'); ui.view = go[0]; if(go[1]) go[1](); ui.opNav = true; return 'opened '+pg;
     }
   }
   throw new Error('unknown tool');
@@ -330,6 +360,8 @@ async function aiAsk(text, cap){
     opMemoryLater();
     if(changed) renderView();
     if(opVoiceOn()) await opSay(reply, {cap:cap}); else opCaption(reply);
+    // a question back: the mic opens on its own for the answer (typing still works)
+    if(/\?["”’)]*\s*$/.test(reply) && !AI.listening){ setTimeout(function(){ if(!AI.busy && !AI.listening && !(OV.speaking || OV.pending)) aiListen(cap); }, 350); }
   } finally { AI.busy = false; aiUiRefresh(); }
 }
 // ---- memory that builds itself: a minute after a conversation goes quiet, Op reads it back and keeps
@@ -640,7 +672,7 @@ function opBriefRewrite(lines){
   const todo = lines.filter(function(l){ return l.key && !b.asked[l.key] && l.text; });
   if(!todo.length) return;
   todo.forEach(function(l){ b.asked[l.key] = 1; });
-  const task = 'These are the narration lines for my Good morning screen: each one is said out loud as its panel appears. Rewrite each in your voice: keep every fact exactly (times, temperatures, numbers, names), add nothing new, keep each under 24 words, and make them sound fresh rather than templated. Don’t start any with “Good morning” or my name (that’s added). The last line sends me off to start the day.\n'+
+  const task = 'These are the narration lines for my Good morning screen: each one is said out loud as its panel appears. Rewrite each in your voice: keep every fact exactly (times, temperatures, numbers, names), add nothing new, keep each under 24 words, and make them sound fresh rather than templated. Don’t start any with “Good morning” or my name (that’s added). Keep it about the morning, not work: no business, clients, tasks or getting things done, beyond what’s on today’s calendar. The last line sends me off to start the day.\n'+
     'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');
   aiWrite(task, {max:600}).then(function(t){
     if(!t) return;

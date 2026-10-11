@@ -104,11 +104,12 @@ function expensesHtml(){
         '<button class="ex-link" data-action="finSync"'+(b.busy ? ' disabled' : '')+'>Sync now</button><button class="ex-link is-quiet" data-action="finDisconnect">Disconnect</button></div>'+
       (arr(b.accounts).length ? '<div class="ex-accts">'+b.accounts.map(function(a){ return '<span><b>'+money2(a.balance)+'</b><small>'+escapeHtml(a.name)+(a.org ? ' · '+escapeHtml(a.org) : '')+'</small></span>'; }).join('')+'</div>' : '')
     : '<div class="ex-connect"><div class="ex-connect-t">&#127974; Connect your bank</div>'+
-        '<div class="ex-connect-s">Live balances and every card purchase, in by themselves. Through <b>SimpleFIN Bridge</b> (about $15 a year): connect your banks at bridge.simplefin.org, make a setup token, paste it here. The access stays on this Mac.</div>'+
+        '<div class="ex-connect-s"><b>Free:</b> download a CSV statement from your bank’s website. When it lands in Downloads, Operator adds the purchases by itself (or use Import statement).</div>'+
+        '<div class="ex-connect-s">Or live, with balances: <b>SimpleFIN Bridge</b> (about $15 a year). Connect your banks at bridge.simplefin.org, make a setup token, paste it here. The access stays on this Mac.</div>'+
         '<div class="ex-connect-r"><input class="input" id="finToken" placeholder="Paste your SimpleFIN setup token"><button class="btn btn-primary" data-action="finConnect"'+(b.busy ? ' disabled' : '')+'>'+(b.busy ? 'Connecting…' : 'Connect')+'</button></div>'+
         (b.err ? '<div class="ex-err">'+escapeHtml(b.err)+'</div>' : '')+'</div>';
   return '<div class="section ex">'+
-    '<div class="section-title">Expenses<button class="btn btn-sm" data-action="toggleForm" data-form="expense">'+(ui.forms.expense ? 'Close' : '+ Add expense')+'</button></div>'+
+    '<div class="section-title">Expenses<span class="ex-hbtns"><button class="btn btn-sm btn-ghost" data-action="bankCsvPick" title="A CSV statement from your bank’s website">Import statement</button><button class="btn btn-sm" data-action="toggleForm" data-form="expense">'+(ui.forms.expense ? 'Close' : '+ Add expense')+'</button></span></div>'+
     (ui.forms.expense ? '<div class="card ex-form"><input class="input" id="expName" placeholder="What was it?"><input class="input" type="number" step="0.01" id="expAmount" placeholder="$">'+
       '<select class="input" id="expCat"><option value="">Kind (auto)</option>'+EXP_CATS.map(function(c){ return '<option value="'+c.id+'">'+c.label+'</option>'; }).join('')+'</select>'+
       '<input class="input" type="date" id="expDate" value="'+todayStr()+'"><button class="btn btn-good" data-action="expAdd">Add</button></div>' : '')+
@@ -118,7 +119,7 @@ function expensesHtml(){
     '</div>'+
     bankBit+
     (ex.length ? '<div class="ex-list">'+ex.slice().sort(function(a, c){ return c.date.localeCompare(a.date); }).slice(0, ui.expAll ? 300 : 12).map(function(e){ const k = expCat(e.cat);
-      return '<div class="ex-row"><button class="ex-ic" data-action="expCat" data-id="'+e.id+'" title="'+k.label+' (tap to change)">'+k.icon+'</button><span class="ex-n">'+escapeHtml(e.name)+'<small>'+fmtDateShort(e.date)+(e.src==='bank' ? ' · '+escapeHtml(e.account || 'bank') : '')+'</small></span><b>'+'$'+e.amount.toFixed(2)+'</b><button class="ex-x" data-action="expDel" data-id="'+e.id+'" title="Remove">&#10005;</button></div>'; }).join('')+
+      return '<div class="ex-row"><button class="ex-ic" data-action="expCat" data-id="'+e.id+'" title="'+k.label+' (tap to change)">'+k.icon+'</button><span class="ex-n">'+escapeHtml(e.name)+'<small>'+fmtDateShort(e.date)+(e.src==='bank' ? ' · '+escapeHtml(e.account || 'bank') : e.src==='csv' ? ' · statement' : '')+'</small></span><b>'+'$'+e.amount.toFixed(2)+'</b><button class="ex-x" data-action="expDel" data-id="'+e.id+'" title="Remove">&#10005;</button></div>'; }).join('')+
       (ex.length > 12 ? '<button class="ex-more" data-action="expAllToggle">'+(ui.expAll ? 'Show fewer' : 'Show all '+ex.length)+'</button>' : '')+'</div>' : '')+
   '</div>';
 }

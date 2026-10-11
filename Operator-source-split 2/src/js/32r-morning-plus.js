@@ -229,16 +229,16 @@ function briefMinimalHtml(){
   const sc = typeof scoresHtml==='function' ? scoresHtml() : '';
   return '<div class="brief brief2 brief4 gmm-wrap bg-'+briefBgClass()+' intro-skipped is-skipped" data-sky="'+phase+'">'+
     '<div class="brief-top"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-      '<span class="b4-music">'+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span><button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
+      '<span class="b4-music"></span><button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
     '<h1 class="gmm-hello">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
-    '<div class="br-voice"><span class="br-voice-dot"></span><span id="brVoice"></span></div>'+(typeof opAskHtml==='function' ? opAskHtml('brief') : '')+
+    '<div class="br-voice"><button class="br-voice-dot" data-action="briefTalk" title="Talk to Op" aria-label="Talk to Op"></button><span id="brVoice"></span></div>'+
     '<div class="gmm">'+
       tile('gmm-wx', (now ? wxIcon(wxKind(now.code), phase) : SKY_META[phase].icon)+' Outside', now ? '<b>'+now.temp+'&deg;</b><span>'+escapeHtml(wxLabel(now.code))+(now.hi!=null ? ' · H '+now.hi+'&deg; L '+now.lo+'&deg;' : '')+'</span>' : '<b>'+SKY_META[phase].label+'</b><span>Sunset '+fmtMinOfDay(win.set)+'</span>', 0)+
       tile('gmm-q', '&#10024; For today', '<p>'+escapeHtml(q[0])+'</p>'+(q[1] ? '<small>'+escapeHtml(q[1])+'</small>' : ''), 1)+
       tile('gmm-day', '&#128197; Today', events.length ? events.slice(0, 3).map(function(e){ return '<div class="gmm-ev"><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('') : '<span>Nothing scheduled.</span>', 2)+
       tile('gmm-you', '&#128100; You', '<b>'+streak+'</b><span>day streak'+(slept ? ' · slept '+fmtDurationLabel(slept.minutes) : '')+'</span>'+(nn.headline ? '<div class="gmm-note">&#127769; '+escapeHtml(nn.headline)+'</div>' : ''), 3)+
       '<div class="gmm-c"><button class="gmm-go" data-action="wakeStartMorning"><span class="gmm-go-ring"></span><span class="gmm-go-t">Get to Work</span><span class="gmm-go-s">&#8594;</span></button></div>'+
-      tile('gmm-news', '&#128240; Headlines', news && news.length ? news.slice(0, 3).map(function(n){ return '<button class="gmm-n" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'">'+escapeHtml(n.title)+'</button>'; }).join('') : '<span>'+(morningNewsOn() ? 'Loading…' : 'Headlines are off.')+'</span>', 4)+
+      tile('gmm-news', '&#128240; Headlines'+briefAsksHtml(), news && news.length ? news.slice(0, 3).map(function(n){ return '<button class="gmm-n" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'">'+escapeHtml(n.title)+'</button>'; }).join('') : '<span>'+(morningNewsOn() ? 'Loading…' : 'Headlines are off.')+'</span>', 4)+
       (sc ? tile('gmm-sc', '&#127944; Scores', sc, 5) : '')+
     '</div>'+
   '</div>';

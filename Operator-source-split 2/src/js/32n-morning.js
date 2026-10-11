@@ -495,7 +495,8 @@ function wakeBriefHtml(){
       '<div class="brh-sun-row"><span><small>Sunrise</small>'+fmtMinOfDay(win.rise)+'</span><span class="brh-day">'+daylightLabel()+'</span><span><small>Sunset</small>'+fmtMinOfDay(win.set)+'</span></div></div>'));
   if(nn.headline || nn.morning) colA.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+
     (nn.headline ? '<div class="br-ln-head">'+escapeHtml(nn.headline)+'</div>' : '')+(nn.morning ? '<div class="br-ln-text">'+escapeHtml(nn.morning)+'</div>' : '')));
-  else if(vb && vb.elements.length) colA.push(panel('br-vision', 'br-a-scale', 'And this is what it’s all for.', boardStaticHtml(vb, 'wake-board'), '', ' data-action="wakeBoardToggle" title="Open your vision board"'));
+  // (a board with pictures shows a few of them by the greeting; one that's only notes still gets its panel)
+  else if(vb && vb.elements.length && !briefVisionImgs(vb).length) colA.push(panel('br-vision', 'br-a-scale', 'And this is what it’s all for.', boardStaticHtml(vb, 'wake-board'), '', ' data-action="wakeBoardToggle" title="Open your vision board"'));
   // the month and the week (or, rarely, a time capsule) — with your streak and level on top
   const you = typeof briefIntentHtml==='function' ? briefIntentHtml() : null;
   if(you) colA.push(panel('br-you br-intent', 'br-a-rise', you.voice, you.html));
@@ -521,13 +522,15 @@ function wakeBriefHtml(){
   // While they're loading, a placeholder holds their place so nothing moves when they land.
   const sec = (ui.morningNews && ui.morningNews.sec) || {}, newsWait = morningNewsOn() && ui.morningNews && ui.morningNews.loading;
   const late = ui.briefNewsAt ? function(){ return ';--late:'+Math.max(600, tcur - (ui.briefNewsAt - (ui.briefT0||0)))+'ms'; } : function(){ return ''; };
+  // ask Op about sports, the news, tech or the business: small icons in the headlines' corner
+  let asksUsed = false; const asks = function(){ if(asksUsed) return ''; asksUsed = true; return briefAsksHtml(); };
   const item = function(n, top, tag){ return '<button class="br-news-i'+(top?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+(tag ? '<em class="br-tag">'+tag+'</em>' : '')+escapeHtml(n.title)+(n.src ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; };
-  const waitHtml = function(cls, k){ return '<section class="br-p '+cls+' is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">'+k+'</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>'; };
+  const waitHtml = function(cls, k){ return '<section class="br-p '+cls+' is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">'+k+asks()+'</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>'; };
   const heads = news ? mixHeadlines(news, arr(sec.tech), arr(sec.local)) : [];
   if(heads.length){
     const lt = late(), lp = arr(sec.local)[0] && sec.local[0].local;
     // (as many as fit — the rest are trimmed after it's drawn, so there's no empty space under them)
-    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there'+(lp ? ', and in '+lp : '')+'.', '<div class="br-k">&#128240; Headlines'+(lp ? '<span class="br-k-n">&#128205; '+escapeHtml(lp)+'</span>' : '')+'</div><div class="br-news-list">'+heads.map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : h.local ? 'Local' : ''); }).join('')+'</div>', lt));
+    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there'+(lp ? ', and in '+lp : '')+'.', '<div class="br-k">&#128240; Headlines'+(lp ? '<span class="br-k-n">&#128205; '+escapeHtml(lp)+'</span>' : '')+asks()+'</div><div class="br-news-list">'+heads.map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : h.local ? 'Local' : ''); }).join('')+'</div>', lt));
   } else if(newsWait) colC.push(waitHtml('br-news', '&#128240; Headlines'));
   if(morningNewsOn() && newsSections().some(function(x){ return x.id==='sports'; })){
     // (on a narrower screen sports shares a column with the headlines: fewer rows, no sports stories)
@@ -535,16 +538,19 @@ function wakeBriefHtml(){
     const sc = typeof scoresHtml==='function' ? scoresHtml(roomy ? 4 : 3, roomy ? 4 : 3) : '', sh = arr(sec.sports).slice(0, roomy || !sc ? 6 : 0);
     if(sc || sh.length){
       const lt = late();
-      colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports</div>'+sc+sh.slice(0, sc ? 2 : 6).map(function(n){ return item(n, false); }).join(''), lt));
+      colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports'+asks()+'</div>'+sc+sh.slice(0, sc ? 2 : 6).map(function(n){ return item(n, false); }).join(''), lt));
     } else if(newsWait || (ui.scores && ui.scores.loading)) colD.push(waitHtml('br-sports', '&#127936; Sports'));
-    else colD.push(panel('br-sports', 'br-a-rise', '', '<div class="br-k">&#127936; Sports</div>'+(typeof scoresStatusHtml==='function' ? scoresStatusHtml() : '<div class="br-sports-none">No games on the board right now.</div>')));
+    else colD.push(panel('br-sports', 'br-a-rise', '', '<div class="br-k">&#127936; Sports'+asks()+'</div>'+(typeof scoresStatusHtml==='function' ? scoresStatusHtml() : '<div class="br-sports-none">No games on the board right now.</div>')));
   }
+  if(!asksUsed){ const t = todayCol ? colC : colA; for(let i = 0; i < t.length; i++){ if(t[i].indexOf('br-day ')>0){ t[i] = t[i].replace('&#128197; Today', '&#128197; Today'+asks()); break; } } }
   const ctaD = tcur;
   lines.push({at: ctaD - 380, text: 'Get ready to start your day.', key:'cta'});
   // Op's own words for them, when it has them (asked for once a morning)
   if(typeof opBriefRewrite==='function'){ const ai = ui.briefAi && ui.briefAi.date===today ? ui.briefAi.map : {}; lines.forEach(function(l){ if(l.key && ai[l.key]) l.text = ai[l.key]; }); setTimeout(function(){ opBriefRewrite(lines); }, 0); }
   ui.briefLines = lines;
   const shift = ui.briefShift || 0;
+  // the level line sits centred over the vision board's pictures (in the top bar when there aren't any)
+  const hud = typeof briefHudHtml==='function' ? briefHudHtml() : '', hudUp = !!briefVisionImgs(vb).length;
   const w = wakeCfg(), song = (wakeFinishing || wakeAudio || wakeMusicApp) && w.media ? mediaName(w.media) : '';
   return '<div class="brief brief2 brief3 brief4 bg-'+briefBgClass()+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
     (cine
@@ -556,21 +562,73 @@ function wakeBriefHtml(){
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner b4">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        (typeof briefHudHtml==='function' ? briefHudHtml() : '')+'<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
+        (hudUp ? '<span class="b4-spacer"></span>' : hud)+'<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+'</span>'+
         // one button: Skip takes you straight to the app
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
-      '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
-      '<div class="br-voice br-p br-a-fade" style="--d:'+(base-700)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
-      (typeof opAskHtml==='function' ? '<div class="br-p br-opbar br-a-fade" style="--d:'+(base-500)+'ms">'+(song && opVoiceOn() && !ui.briefOpGo ? '<button class="br-opgo" data-action="briefOpGo" title="The music fades out and Op takes it from here"><span class="br-opgo-dot"></span>Talk to Op</button>' : '')+opAskHtml('brief')+'</div>' : '')+
+      '<div class="br-hrow"><h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+(hudUp ? '<div class="br-vcol">'+hud+briefVisionStripHtml(vb, base-400)+'</div>' : '')+'</div>'+
+      '<div class="br-voice br-p br-a-fade'+(typeof opVoiceOn==='function' && opVoiceOn() && !OV.briefSpoke && OV.idx < 1 && !ui.briefSkipped ? ' op-loading' : '')+'" style="--d:'+(base-700)+'ms"><button class="br-voice-dot" data-action="briefTalk" title="Talk to Op" aria-label="Talk to Op"></button>'+
+        '<span class="br-voice-load"><b>Op</b> loading<i><u></u></i></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
       // no news column (headlines off) → two columns that fill the width instead of an empty third
       // wide screens get four columns (you · today · headlines · sports); otherwise sports sits under headlines
       '<div class="b4-grid'+(!colC.length && !colD.length ? ' cols-2' : !colD.length ? ' no-d' : !colC.length ? ' no-c' : '')+'"><div class="b4-col c-a">'+colA.join('')+'</div><div class="b4-col c-b">'+colB.join('')+'</div>'+(colC.length ? '<div class="b4-col c-c">'+colC.join('')+'</div>' : '')+(colD.length ? '<div class="b4-col c-d">'+colD.join('')+'</div>' : '')+'</div>'+
       '<div class="brief-cta br-p br-a-rise" data-k="'+k+'" style="--d:'+ctaD+'ms">'+
-        '<button class="brief-go brief-morning" data-action="wakeStartMorning">Get to Work &#8594;</button>'+
+        '<button class="brief-go brief-morning bgo2" data-action="wakeStartMorning"><span class="bgo-t">Get to work</span><span class="bgo-a"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span></button>'+
       '</div>'+
     '</div>'+
     (ui.wakeBoardBig && vb ? '<div class="br-vision-big" data-action="wakeBoardToggle" title="Close">'+boardStaticHtml(vb, 'wake-board')+'<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button></div>' : '')+
+    briefLightboxHtml(vb)+
   '</div>';
+}
+// ---- the vision board, small: the pictures from the middle of the board, by the greeting.
+// A click opens one big (to look at, not to edit); the arrows go through the rest.
+function briefVisionImgs(vb){
+  const imgs = vb ? vb.elements.filter(function(e){ return e.type==='image' && e.ref; }) : [];
+  if(!imgs.length) return [];
+  const bb = boardBounds(vb), cx = bb.x + bb.w/2, cy = bb.y + bb.h/2;
+  const d = function(e){ const x = e.x + e.w/2 - cx, y = e.y + (e.h||0)/2 - cy; return x*x + y*y; };
+  return imgs.slice().sort(function(a, b){ return d(a) - d(b); }).slice(0, 5).sort(function(a, b){ return a.x - b.x || a.y - b.y; });
+}
+function briefVisionStripHtml(vb, at){
+  const imgs = briefVisionImgs(vb); if(!imgs.length) return '';
+  return '<div class="br-vstrip br-p br-a-fade" style="--d:'+at+'ms">'+imgs.map(function(e, i){
+    return '<button class="br-vthumb" data-action="briefVisionOpen" data-id="'+i+'" title="Open" style="--i:'+i+'"><img src="'+escapeHtml(blobUrl(e.ref))+'" alt="" draggable="false"></button>';
+  }).join('')+'</div>';
+}
+function briefLightboxHtml(vb){
+  if(ui.briefVis==null) return '';
+  const imgs = briefVisionImgs(vb), i = ui.briefVis; if(!imgs[i]){ ui.briefVis = null; return ''; }
+  const nav = imgs.length > 1;
+  return '<div class="br-lightbox" data-action="briefVisionClose">'+
+    '<figure class="br-lb-fig"><img src="'+escapeHtml(blobUrl(imgs[i].ref))+'" alt="" draggable="false"></figure>'+
+    (nav ? '<button class="br-lb-nav is-prev" data-action="briefVisionStep" data-id="-1" title="Previous">&#8249;</button><button class="br-lb-nav is-next" data-action="briefVisionStep" data-id="1" title="Next">&#8250;</button>' : '')+
+    '<div class="br-lb-bar">'+(nav ? imgs.map(function(e, j){ return '<i class="'+(j===i ? 'is-on' : '')+'"></i>'; }).join('') : '')+
+      '<button class="br-lb-all" data-action="briefVisionAll">Whole board</button></div>'+
+    '<button class="br-lb-x" data-action="briefVisionClose" title="Close">&#10005;</button></div>';
+}
+ACTIONS.briefVisionOpen = function(el, e, id){ ui.briefVis = Number(id) || 0; renderWakeOverlayInto(); };
+ACTIONS.briefVisionClose = function(el, e){ if(e && e.target && e.target.closest('.br-lb-fig img, .br-lb-nav, .br-lb-all')) return; ui.briefVis = null; renderWakeOverlayInto(); };
+ACTIONS.briefVisionStep = function(el, e, id){
+  const n = briefVisionImgs(masterVisionBoard()).length; if(!n) return;
+  ui.briefVis = ((ui.briefVis||0) + Number(id) + n) % n; renderWakeOverlayInto();
+};
+ACTIONS.briefVisionAll = function(){ ui.briefVis = null; ui.wakeBoardBig = true; renderWakeOverlayInto(); };
+document.addEventListener('keydown', function(e){
+  if(ui.briefVis==null || !overlayOpen('wakeOverlay')) return;
+  if(e.key==='Escape'){ e.stopPropagation(); ui.briefVis = null; renderWakeOverlayInto(); }
+  else if(e.key==='ArrowRight' || e.key==='ArrowLeft') ACTIONS.briefVisionStep(null, e, e.key==='ArrowRight' ? 1 : -1);
+}, true);
+// sports, the news, tech, the business: four small line icons (they say what they are on hover)
+function briefAsksHtml(){
+  const ic = {
+    sports:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17M3.5 12h17M6 6c3 2.5 3 9.5 0 12M18 6c-3 2.5-3 9.5 0 12"/>',
+    news:'<rect x="4" y="5" width="13" height="14" rx="2"/><path d="M17 9h2.5a.5.5 0 0 1 .5.5V17a2 2 0 0 1-2 2H6M7.5 9h6M7.5 12.5h6M7.5 16h4"/>',
+    tech:'<rect x="6.5" y="6.5" width="11" height="11" rx="2"/><path d="M10 10h4v4h-4zM9.5 3.5v3M14.5 3.5v3M9.5 17.5v3M14.5 17.5v3M3.5 9.5h3M3.5 14.5h3M17.5 9.5h3M17.5 14.5h3"/>',
+    business:'<rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M3.5 12.5h17"/>'
+  };
+  const label = {sports:'Sports, from Op', news:'The news, from Op', tech:'Tech, from Op', business:'The business, from Op'};
+  return '<span class="br-asks">'+['sports', 'news', 'tech', 'business'].map(function(id){
+    return '<button class="br-ask" data-action="opAsk" data-id="'+id+'" title="'+label[id]+'" aria-label="'+label[id]+'"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+ic[id]+'</svg></button>';
+  }).join('')+'</span>';
 }
 // fit the panels to the space they have: For a Good Day's four rows share its height, and the
 // headlines and Today show as many rows as fit — no half-cut row at the bottom, no empty space under it
@@ -755,7 +813,7 @@ function renderPlanReveal(){
   return '<div class="wi">'+
     '<div class="wi-top"><span class="pr-badge">&#128339; Clocked In</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
       (ui.planReveal && ui.planReveal.from==='morning' ? '<button class="wi-back" data-action="backToMorning" title="Back to Good morning">&#8592; Morning</button>' : '')+
-      '<span class="wi-pl">'+(typeof aiTalkHtml==='function' ? aiTalkHtml() : '')+(typeof opMuteHtml==='function' ? opMuteHtml() : '')+'</span>'+
+      '<span class="wi-pl"></span>'+
       '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
     '<div class="wi-inner">'+
       '<div class="wi-k" style="animation-delay:40ms">Work Mode</div>'+
@@ -798,8 +856,8 @@ ACTIONS.clockOut = function(){
   const prev = state.modes.active ? Object.assign({}, state.modes.active) : null;
   startMode('offtime', {clockedOut:true, note:'Clocked out'});
   ui.undoMode = {prev:prev, at:Date.now()};
-  playLockOut(); clockOutFlash();
-  showToast('Done for the day.', {icon:'&#127937;', actionLabel:'Undo', actionAction:'undoQuickMode', duration:6000});
+  // (no flash, no "done for the day" toast: the clocked-out page says it, and Clock back in undoes it)
+  playLockOut(); ui.restFull = true;
 };
 
 // the vision board fits itself once its entrance has played (it measures wrong while scaled)
