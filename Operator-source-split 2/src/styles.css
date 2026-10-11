@@ -4667,32 +4667,16 @@ body.np-on .op-bub{ left:26px !important; bottom:70px !important; }
 /* the greeting, with a few pictures from the vision board beside it */
 .brief4 .br-hrow{ flex:none; display:flex; align-items:center; gap:28px; min-width:0; width:100%; align-self:stretch; }
 .brief4 .br-hrow .brief-hello{ flex:0 1 auto; min-width:0; }
-.brief.brief2.brief4 .br-p.br-vstrip.br-vstrip.br-vstrip.br-vstrip.br-vstrip{ background:none !important; border:none !important; padding:0 !important; margin:0 0 0 auto !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; border-radius:0 !important; }
-.br-vstrip{ margin-left:auto; display:flex; align-items:center; gap:10px; }
-.br-vthumb{ --s:clamp(50px, 7.2vh, 70px); position:relative; flex:none; width:var(--s); height:var(--s); padding:0; border:1px solid rgba(255,255,255,.22); border-radius:15px; overflow:hidden; background:#151826; cursor:zoom-in;
-  box-shadow:0 8px 22px rgba(0,0,0,.28); transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s, border-color .3s; }
-.br-vthumb img{ width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; transition:transform .5s cubic-bezier(.2,.8,.2,1); }
-.br-vthumb:hover{ transform:translateY(-3px); border-color:rgba(255,255,255,.6); box-shadow:0 14px 30px rgba(0,0,0,.4); }
-.br-vthumb:hover img{ transform:scale(1.08); }
-.br-vthumb:focus-visible{ outline:2px solid #ffd27a; outline-offset:2px; }
-@media (max-width:1100px){ .br-vthumb:nth-child(n+4){ display:none; } }
-
-/* one picture, big: to look at, not to edit */
-.br-lightbox{ position:fixed; inset:0; z-index:40; display:grid; place-items:center; background:rgba(6,8,18,.8); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); cursor:zoom-out; animation:brLbIn .3s ease both; }
-.br-lb-fig{ margin:0; display:grid; place-items:center; max-width:min(78vw, 1200px); max-height:76vh; cursor:default; }
-.br-lb-fig img{ display:block; max-width:min(78vw, 1200px); max-height:76vh; object-fit:contain; border-radius:18px; box-shadow:0 30px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.12); animation:brLbImg .42s cubic-bezier(.2,.8,.2,1) both; }
-.br-lb-nav{ position:absolute; top:50%; width:50px; height:50px; margin-top:-25px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.07); color:#fff; font-size:30px; line-height:1; padding:0 0 4px; cursor:pointer; transition:background .2s, transform .2s; }
-.br-lb-nav:hover{ background:rgba(255,255,255,.16); transform:scale(1.06); }
-.br-lb-nav.is-prev{ left:max(20px, 4vw); } .br-lb-nav.is-next{ right:max(20px, 4vw); }
-.br-lb-bar{ position:absolute; left:50%; bottom:max(22px, 4vh); transform:translateX(-50%); display:flex; align-items:center; gap:7px; cursor:default; }
-.br-lb-bar i{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.3); transition:all .25s; }
-.br-lb-bar i.is-on{ width:18px; border-radius:4px; background:#fff; }
-.br-lb-all{ margin-left:14px; height:32px; padding:0 16px; border-radius:999px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:rgba(255,255,255,.85); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
-.br-lb-all:hover{ background:rgba(255,255,255,.14); color:#fff; }
-.br-lb-x{ position:absolute; top:22px; right:24px; width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.07); color:#fff; font-size:15px; cursor:pointer; }
-.br-lb-x:hover{ background:rgba(255,255,255,.16); }
-@keyframes brLbIn{ from{ opacity:0; } to{ opacity:1; } }
-@keyframes brLbImg{ from{ opacity:0; transform:scale(.94) translateY(10px); } to{ opacity:1; transform:none; } }
+.brief.brief2.brief4 .br-p.br-vmini.br-vmini.br-vmini.br-vmini.br-vmini{ padding:0 !important; margin:0 !important; background:#0d0f15 !important; border:1px solid rgba(255,255,255,.22) !important; border-radius:14px !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+/* the vision board, small, by the greeting: the real board, about the height of the greeting */
+.br-vmini{ --h:clamp(84px, 11.5vh, 116px); position:relative; flex:none; height:var(--h); width:min(calc(var(--h) * var(--ar)), 440px); display:flex; overflow:hidden; cursor:zoom-in;
+  box-shadow:0 12px 30px rgba(0,0,0,.32); transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s, border-color .3s; }
+.br-vmini .wake-board{ flex:1; border:none; border-radius:0; pointer-events:none; }
+.br-vmini:hover{ transform:translateY(-2px) scale(1.03); box-shadow:0 18px 40px rgba(0,0,0,.42); }
+.brief.brief2.brief4 .br-p.br-vmini.br-vmini.br-vmini.br-vmini.br-vmini:hover{ border-color:rgba(255,255,255,.5) !important; }
+.br-vmini-open{ position:absolute; right:6px; top:6px; width:22px; height:22px; border-radius:7px; display:grid; place-items:center; font-size:12px; color:#fff; background:rgba(0,0,0,.45); opacity:0; transition:opacity .2s; }
+.br-vmini:hover .br-vmini-open{ opacity:1; }
+.br-vmini:focus-visible{ outline:2px solid #ffd27a; outline-offset:3px; }
 
 /* Op's line: the blue light is the way to talk; until the first word, "Op loading" and a bar */
 .brief4 .br-voice{ max-width:min(100%, 980px) !important; }
@@ -4749,7 +4733,6 @@ button.br-voice-dot{ width:11px; height:11px; }
 /* the level line, centred over the vision board pictures */
 .brief4 .b4-spacer{ flex:1; }
 .brief4 .br-vcol{ margin-left:auto; display:flex; flex-direction:column; align-items:center; gap:10px; }
-.brief.brief2.brief4 .br-vcol .br-p.br-vstrip.br-vstrip.br-vstrip.br-vstrip.br-vstrip{ margin:0 !important; }
 .brief4 .br-vcol .b4-hud{ margin:0 !important; gap:6px !important; opacity:.62 !important; }
 .brief4 .br-vcol .b4-hud:hover{ opacity:1 !important; }
 .brief4 .br-vcol .b4-hud .xp-badge{ width:14px !important; height:14px !important; }
@@ -4765,3 +4748,15 @@ body.op-ov .op-bub:not(.is-moved){ left:72px !important; bottom:14px !important;
 .op-bub-h{ cursor:grab; user-select:none; }
 .op-bub.is-dragging{ transition:none !important; } .op-bub.is-dragging .op-bub-h{ cursor:grabbing; }
 .ex-hbtns{ display:inline-flex; gap:6px; margin-left:auto; }
+/* the vision board lives in the top-right corner, beside Skip, hanging down beside the greeting:
+   it takes no height of its own, so the panels keep their room */
+.brief4 .brief-top{ position:relative; z-index:3; }
+.brief4 .brief-top .br-vcol{ position:absolute; right:92px; top:-3px; margin:0; display:flex; flex-direction:column; align-items:center; gap:8px; }
+.brief4 .brief-top .br-vmini{ --h:clamp(92px, 14vh, 140px); }
+.brief4.has-vmini .br-voice{ max-width:calc(100% - 560px) !important; }
+@media (max-width:1250px){ .brief4 .brief-top .br-vmini{ --h:clamp(80px, 11vh, 104px); } .brief4.has-vmini .br-voice{ max-width:calc(100% - 420px) !important; } }
+/* no stacking: the level line sits by the date, the board alone under Skip */
+.brief4 .b4-hud-l{ display:inline-flex; align-items:center; margin-left:14px; padding-left:14px; border-left:1px solid rgba(255,255,255,.14); }
+.brief4 .b4-hud-l .b4-hud{ margin:0 !important; }
+.brief4 .brief-top .br-vcol{ right:0 !important; top:40px !important; }
+.brief4 .brief-top .br-vmini{ --h:clamp(84px, 12.5vh, 118px) !important; }

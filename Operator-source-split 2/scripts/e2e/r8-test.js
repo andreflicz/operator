@@ -129,8 +129,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('the alarm screen: big clock, I\'m up, snooze', await p.isVisible('.wk2-clock') && await p.isVisible('.wk2-up') && await p.isVisible('.wk2-snooze'));
     check('…and no vision board on the alarm screen (it\'s in the briefing now)', !(await p.isVisible('.wk2-vision')));
     await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(400);
-    check('the briefing opens with the vision board', await p.isVisible('.br-vision'));
-    await p.click('.br-vision'); await p.waitForTimeout(200);
+    check('the briefing opens with the vision board', await p.isVisible('.br-vmini'));
+    await p.click('.br-vmini'); await p.waitForTimeout(200);
     check('clicking it opens the vision board big', await p.isVisible('.br-vision-big'));
     await p.click('.br-vision-big .wk2-vision-x'); await p.waitForTimeout(200);
     const brief = await p.textContent('.brief');

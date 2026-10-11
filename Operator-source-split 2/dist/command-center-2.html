@@ -4678,32 +4678,16 @@ body.np-on .op-bub{ left:26px !important; bottom:70px !important; }
 /* the greeting, with a few pictures from the vision board beside it */
 .brief4 .br-hrow{ flex:none; display:flex; align-items:center; gap:28px; min-width:0; width:100%; align-self:stretch; }
 .brief4 .br-hrow .brief-hello{ flex:0 1 auto; min-width:0; }
-.brief.brief2.brief4 .br-p.br-vstrip.br-vstrip.br-vstrip.br-vstrip.br-vstrip{ background:none !important; border:none !important; padding:0 !important; margin:0 0 0 auto !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; border-radius:0 !important; }
-.br-vstrip{ margin-left:auto; display:flex; align-items:center; gap:10px; }
-.br-vthumb{ --s:clamp(50px, 7.2vh, 70px); position:relative; flex:none; width:var(--s); height:var(--s); padding:0; border:1px solid rgba(255,255,255,.22); border-radius:15px; overflow:hidden; background:#151826; cursor:zoom-in;
-  box-shadow:0 8px 22px rgba(0,0,0,.28); transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s, border-color .3s; }
-.br-vthumb img{ width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; transition:transform .5s cubic-bezier(.2,.8,.2,1); }
-.br-vthumb:hover{ transform:translateY(-3px); border-color:rgba(255,255,255,.6); box-shadow:0 14px 30px rgba(0,0,0,.4); }
-.br-vthumb:hover img{ transform:scale(1.08); }
-.br-vthumb:focus-visible{ outline:2px solid #ffd27a; outline-offset:2px; }
-@media (max-width:1100px){ .br-vthumb:nth-child(n+4){ display:none; } }
-
-/* one picture, big: to look at, not to edit */
-.br-lightbox{ position:fixed; inset:0; z-index:40; display:grid; place-items:center; background:rgba(6,8,18,.8); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); cursor:zoom-out; animation:brLbIn .3s ease both; }
-.br-lb-fig{ margin:0; display:grid; place-items:center; max-width:min(78vw, 1200px); max-height:76vh; cursor:default; }
-.br-lb-fig img{ display:block; max-width:min(78vw, 1200px); max-height:76vh; object-fit:contain; border-radius:18px; box-shadow:0 30px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.12); animation:brLbImg .42s cubic-bezier(.2,.8,.2,1) both; }
-.br-lb-nav{ position:absolute; top:50%; width:50px; height:50px; margin-top:-25px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.07); color:#fff; font-size:30px; line-height:1; padding:0 0 4px; cursor:pointer; transition:background .2s, transform .2s; }
-.br-lb-nav:hover{ background:rgba(255,255,255,.16); transform:scale(1.06); }
-.br-lb-nav.is-prev{ left:max(20px, 4vw); } .br-lb-nav.is-next{ right:max(20px, 4vw); }
-.br-lb-bar{ position:absolute; left:50%; bottom:max(22px, 4vh); transform:translateX(-50%); display:flex; align-items:center; gap:7px; cursor:default; }
-.br-lb-bar i{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.3); transition:all .25s; }
-.br-lb-bar i.is-on{ width:18px; border-radius:4px; background:#fff; }
-.br-lb-all{ margin-left:14px; height:32px; padding:0 16px; border-radius:999px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:rgba(255,255,255,.85); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
-.br-lb-all:hover{ background:rgba(255,255,255,.14); color:#fff; }
-.br-lb-x{ position:absolute; top:22px; right:24px; width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.07); color:#fff; font-size:15px; cursor:pointer; }
-.br-lb-x:hover{ background:rgba(255,255,255,.16); }
-@keyframes brLbIn{ from{ opacity:0; } to{ opacity:1; } }
-@keyframes brLbImg{ from{ opacity:0; transform:scale(.94) translateY(10px); } to{ opacity:1; transform:none; } }
+.brief.brief2.brief4 .br-p.br-vmini.br-vmini.br-vmini.br-vmini.br-vmini{ padding:0 !important; margin:0 !important; background:#0d0f15 !important; border:1px solid rgba(255,255,255,.22) !important; border-radius:14px !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+/* the vision board, small, by the greeting: the real board, about the height of the greeting */
+.br-vmini{ --h:clamp(84px, 11.5vh, 116px); position:relative; flex:none; height:var(--h); width:min(calc(var(--h) * var(--ar)), 440px); display:flex; overflow:hidden; cursor:zoom-in;
+  box-shadow:0 12px 30px rgba(0,0,0,.32); transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s, border-color .3s; }
+.br-vmini .wake-board{ flex:1; border:none; border-radius:0; pointer-events:none; }
+.br-vmini:hover{ transform:translateY(-2px) scale(1.03); box-shadow:0 18px 40px rgba(0,0,0,.42); }
+.brief.brief2.brief4 .br-p.br-vmini.br-vmini.br-vmini.br-vmini.br-vmini:hover{ border-color:rgba(255,255,255,.5) !important; }
+.br-vmini-open{ position:absolute; right:6px; top:6px; width:22px; height:22px; border-radius:7px; display:grid; place-items:center; font-size:12px; color:#fff; background:rgba(0,0,0,.45); opacity:0; transition:opacity .2s; }
+.br-vmini:hover .br-vmini-open{ opacity:1; }
+.br-vmini:focus-visible{ outline:2px solid #ffd27a; outline-offset:3px; }
 
 /* Op's line: the blue light is the way to talk; until the first word, "Op loading" and a bar */
 .brief4 .br-voice{ max-width:min(100%, 980px) !important; }
@@ -4760,7 +4744,6 @@ button.br-voice-dot{ width:11px; height:11px; }
 /* the level line, centred over the vision board pictures */
 .brief4 .b4-spacer{ flex:1; }
 .brief4 .br-vcol{ margin-left:auto; display:flex; flex-direction:column; align-items:center; gap:10px; }
-.brief.brief2.brief4 .br-vcol .br-p.br-vstrip.br-vstrip.br-vstrip.br-vstrip.br-vstrip{ margin:0 !important; }
 .brief4 .br-vcol .b4-hud{ margin:0 !important; gap:6px !important; opacity:.62 !important; }
 .brief4 .br-vcol .b4-hud:hover{ opacity:1 !important; }
 .brief4 .br-vcol .b4-hud .xp-badge{ width:14px !important; height:14px !important; }
@@ -4776,6 +4759,18 @@ body.op-ov .op-bub:not(.is-moved){ left:72px !important; bottom:14px !important;
 .op-bub-h{ cursor:grab; user-select:none; }
 .op-bub.is-dragging{ transition:none !important; } .op-bub.is-dragging .op-bub-h{ cursor:grabbing; }
 .ex-hbtns{ display:inline-flex; gap:6px; margin-left:auto; }
+/* the vision board lives in the top-right corner, beside Skip, hanging down beside the greeting:
+   it takes no height of its own, so the panels keep their room */
+.brief4 .brief-top{ position:relative; z-index:3; }
+.brief4 .brief-top .br-vcol{ position:absolute; right:92px; top:-3px; margin:0; display:flex; flex-direction:column; align-items:center; gap:8px; }
+.brief4 .brief-top .br-vmini{ --h:clamp(92px, 14vh, 140px); }
+.brief4.has-vmini .br-voice{ max-width:calc(100% - 560px) !important; }
+@media (max-width:1250px){ .brief4 .brief-top .br-vmini{ --h:clamp(80px, 11vh, 104px); } .brief4.has-vmini .br-voice{ max-width:calc(100% - 420px) !important; } }
+/* no stacking: the level line sits by the date, the board alone under Skip */
+.brief4 .b4-hud-l{ display:inline-flex; align-items:center; margin-left:14px; padding-left:14px; border-left:1px solid rgba(255,255,255,.14); }
+.brief4 .b4-hud-l .b4-hud{ margin:0 !important; }
+.brief4 .brief-top .br-vcol{ right:0 !important; top:40px !important; }
+.brief4 .brief-top .br-vmini{ --h:clamp(84px, 12.5vh, 118px) !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -22772,10 +22767,10 @@ function wakeBriefHtml(){
   if(typeof opBriefRewrite==='function'){ const ai = ui.briefAi && ui.briefAi.date===today ? ui.briefAi.map : {}; lines.forEach(function(l){ if(l.key && ai[l.key]) l.text = ai[l.key]; }); setTimeout(function(){ opBriefRewrite(lines); }, 0); }
   ui.briefLines = lines;
   const shift = ui.briefShift || 0;
-  // the level line sits centred over the vision board's pictures (in the top bar when there aren't any)
-  const hud = typeof briefHudHtml==='function' ? briefHudHtml() : '', hudUp = !!briefVisionImgs(vb).length;
+  // with a vision board: the level line goes by the date (left) and the board hangs alone top right
+  const hud = typeof briefHudHtml==='function' ? briefHudHtml() : '', hudUp = !!(vb && vb.elements.length);
   const w = wakeCfg(), song = (wakeFinishing || wakeAudio || wakeMusicApp) && w.media ? mediaName(w.media) : '';
-  return '<div class="brief brief2 brief3 brief4 bg-'+briefBgClass()+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
+  return '<div class="brief brief2 brief3 brief4'+(hudUp ? ' has-vmini' : '')+' bg-'+briefBgClass()+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
     (cine
       ? '<div class="brief-intro is-cinematic" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div>'+
           '<div class="bi-time">'+timeStr+'</div>'+
@@ -22785,10 +22780,10 @@ function wakeBriefHtml(){
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner b4">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        (hudUp ? '<span class="b4-spacer"></span>' : hud)+'<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+'</span>'+
+        (hudUp ? '<span class="b4-hud-l">'+hud+'</span><span class="b4-spacer"></span><div class="br-vcol">'+briefVisionMiniHtml(vb, base-400)+'</div>' : hud)+'<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+'</span>'+
         // one button: Skip takes you straight to the app
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
-      '<div class="br-hrow"><h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+(hudUp ? '<div class="br-vcol">'+hud+briefVisionStripHtml(vb, base-400)+'</div>' : '')+'</div>'+
+      '<div class="br-hrow"><h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+'</div>'+
       '<div class="br-voice br-p br-a-fade'+(typeof opVoiceOn==='function' && opVoiceOn() && !OV.briefSpoke && OV.idx < 1 && !ui.briefSkipped ? ' op-loading' : '')+'" style="--d:'+(base-700)+'ms"><button class="br-voice-dot" data-action="briefTalk" title="Talk to Op" aria-label="Talk to Op"></button>'+
         '<span class="br-voice-load"><b>Op</b> loading<i><u></u></i></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
       // no news column (headlines off) → two columns that fill the width instead of an empty third
@@ -22799,47 +22794,17 @@ function wakeBriefHtml(){
       '</div>'+
     '</div>'+
     (ui.wakeBoardBig && vb ? '<div class="br-vision-big" data-action="wakeBoardToggle" title="Close">'+boardStaticHtml(vb, 'wake-board')+'<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button></div>' : '')+
-    briefLightboxHtml(vb)+
   '</div>';
 }
-// ---- the vision board, small: the pictures from the middle of the board, by the greeting.
-// A click opens one big (to look at, not to edit); the arrows go through the rest.
-function briefVisionImgs(vb){
-  const imgs = vb ? vb.elements.filter(function(e){ return e.type==='image' && e.ref; }) : [];
-  if(!imgs.length) return [];
-  const bb = boardBounds(vb), cx = bb.x + bb.w/2, cy = bb.y + bb.h/2;
-  const d = function(e){ const x = e.x + e.w/2 - cx, y = e.y + (e.h||0)/2 - cy; return x*x + y*y; };
-  return imgs.slice().sort(function(a, b){ return d(a) - d(b); }).slice(0, 5).sort(function(a, b){ return a.x - b.x || a.y - b.y; });
+// ---- the vision board, small, by the greeting: the whole board as it is (not a few pictures of it),
+// just small enough not to take a panel. A click opens it big.
+function briefVisionMiniHtml(vb, at){
+  if(!vb || !vb.elements.length) return '';
+  const bb = boardBounds(vb); if(!bb) return '';
+  const ar = Math.max(1.3, Math.min(4.2, bb.w / bb.h));
+  return '<div class="br-vmini br-p br-a-fade" role="button" tabindex="0" data-action="wakeBoardToggle" title="Your vision board (click to open it big)" style="--d:'+at+'ms;--ar:'+ar.toFixed(3)+'">'+
+    boardStaticHtml(vb, 'wake-board')+'<span class="br-vmini-open">&#10530;</span></div>';
 }
-function briefVisionStripHtml(vb, at){
-  const imgs = briefVisionImgs(vb); if(!imgs.length) return '';
-  return '<div class="br-vstrip br-p br-a-fade" style="--d:'+at+'ms">'+imgs.map(function(e, i){
-    return '<button class="br-vthumb" data-action="briefVisionOpen" data-id="'+i+'" title="Open" style="--i:'+i+'"><img src="'+escapeHtml(blobUrl(e.ref))+'" alt="" draggable="false"></button>';
-  }).join('')+'</div>';
-}
-function briefLightboxHtml(vb){
-  if(ui.briefVis==null) return '';
-  const imgs = briefVisionImgs(vb), i = ui.briefVis; if(!imgs[i]){ ui.briefVis = null; return ''; }
-  const nav = imgs.length > 1;
-  return '<div class="br-lightbox" data-action="briefVisionClose">'+
-    '<figure class="br-lb-fig"><img src="'+escapeHtml(blobUrl(imgs[i].ref))+'" alt="" draggable="false"></figure>'+
-    (nav ? '<button class="br-lb-nav is-prev" data-action="briefVisionStep" data-id="-1" title="Previous">&#8249;</button><button class="br-lb-nav is-next" data-action="briefVisionStep" data-id="1" title="Next">&#8250;</button>' : '')+
-    '<div class="br-lb-bar">'+(nav ? imgs.map(function(e, j){ return '<i class="'+(j===i ? 'is-on' : '')+'"></i>'; }).join('') : '')+
-      '<button class="br-lb-all" data-action="briefVisionAll">Whole board</button></div>'+
-    '<button class="br-lb-x" data-action="briefVisionClose" title="Close">&#10005;</button></div>';
-}
-ACTIONS.briefVisionOpen = function(el, e, id){ ui.briefVis = Number(id) || 0; renderWakeOverlayInto(); };
-ACTIONS.briefVisionClose = function(el, e){ if(e && e.target && e.target.closest('.br-lb-fig img, .br-lb-nav, .br-lb-all')) return; ui.briefVis = null; renderWakeOverlayInto(); };
-ACTIONS.briefVisionStep = function(el, e, id){
-  const n = briefVisionImgs(masterVisionBoard()).length; if(!n) return;
-  ui.briefVis = ((ui.briefVis||0) + Number(id) + n) % n; renderWakeOverlayInto();
-};
-ACTIONS.briefVisionAll = function(){ ui.briefVis = null; ui.wakeBoardBig = true; renderWakeOverlayInto(); };
-document.addEventListener('keydown', function(e){
-  if(ui.briefVis==null || !overlayOpen('wakeOverlay')) return;
-  if(e.key==='Escape'){ e.stopPropagation(); ui.briefVis = null; renderWakeOverlayInto(); }
-  else if(e.key==='ArrowRight' || e.key==='ArrowLeft') ACTIONS.briefVisionStep(null, e, e.key==='ArrowRight' ? 1 : -1);
-}, true);
 // sports, the news, tech, the business: four small line icons (they say what they are on hover)
 function briefAsksHtml(){
   const ic = {
@@ -22858,6 +22823,7 @@ function briefAsksHtml(){
 function briefFit(root){
   root = root || document.getElementById('wakeContent'); if(!root) return;
   root.querySelectorAll('.gd-track').forEach(function(tr){ gdPlace(tr, ui.gdIdx||0); });
+  if(typeof fitStaticBoards==='function') root.querySelectorAll('.br-vmini').forEach(function(m){ fitStaticBoards(m); });
   root.querySelectorAll('.br-news-list, .bd-list').forEach(function(list){
     const items = Array.prototype.slice.call(list.children);
     items.forEach(function(it){ it.classList.remove('is-cut'); });
@@ -23084,7 +23050,7 @@ ACTIONS.clockOut = function(){
 };
 
 // the vision board fits itself once its entrance has played (it measures wrong while scaled)
-document.addEventListener('animationend', function(e){ if(e.target && e.target.classList && (e.target.classList.contains('br-vision') || e.target.classList.contains('mm-vision'))) fitStaticBoards(e.target); });
+document.addEventListener('animationend', function(e){ if(e.target && e.target.classList && (e.target.classList.contains('br-vision') || e.target.classList.contains('br-vmini') || e.target.classList.contains('mm-vision'))) fitStaticBoards(e.target); });
 // ============ LOCKED IN: THE MINIMAL VIEW, BREAKS, FOCUS MUSIC ============
 // • Minimal view — like a song playing full screen: the task as the "track", the timer as its
 //   progress, the time and your next alarm in the corners. One button switches views; nothing
@@ -24141,7 +24107,7 @@ function opBriefTick(lines, t){
   }}).then(function(){ OV.briefSpoke = true; opBriefLoading(false); });
   return true;
 }
-function opBriefReset(){ OV.idx = -1; OV.pre = null; OV.briefSpoke = false; ui.briefTalked = false; ui.briefVis = null; opStop(); }
+function opBriefReset(){ OV.idx = -1; OV.pre = null; OV.briefSpoke = false; ui.briefTalked = false; opStop(); }
 // the blue light on Good morning is how you talk to Op there: the narration stops, the music fades
 // out, Op says good morning (the first time) and asks what you want, then listens. Click it again
 // while it's listening to send; while Op's talking, to cut in.

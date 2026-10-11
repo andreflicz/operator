@@ -278,7 +278,7 @@ function opBriefTick(lines, t){
   }}).then(function(){ OV.briefSpoke = true; opBriefLoading(false); });
   return true;
 }
-function opBriefReset(){ OV.idx = -1; OV.pre = null; OV.briefSpoke = false; ui.briefTalked = false; ui.briefVis = null; opStop(); }
+function opBriefReset(){ OV.idx = -1; OV.pre = null; OV.briefSpoke = false; ui.briefTalked = false; opStop(); }
 // the blue light on Good morning is how you talk to Op there: the narration stops, the music fades
 // out, Op says good morning (the first time) and asks what you want, then listens. Click it again
 // while it's listening to send; while Op's talking, to cut in.

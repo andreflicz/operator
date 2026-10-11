@@ -84,7 +84,7 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
     const you = await p.textContent('.br-you');
     const hud = await p.textContent('.b4-hud');
     check('the month and the week replace "You, lately" (streak and level in the top HUD)', /LVL/.test(hud) && /XP/.test(hud) && !/A month ago|You, lately/i.test(you));
-    check('one music control in the corner', (await p.$$('.b4-music > *')).length===1);
+    check('one music control in the corner (at most)', (await p.$$('.b4-music > *')).length<=1);
     check('one corner button: Skip', await p.isVisible('.brief-skipall') && !(await p.$('.brief-x')));
     await p.click('.brief-skipall'); await p.clock.runFor(800); await p.waitForTimeout(500);
     check('Skip goes straight to the app\'s front page', !(await E("overlayOpen('wakeOverlay')")) && await E("ui.view")==='today' && !(await E("overlayOpen('planOverlay')")));

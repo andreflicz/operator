@@ -24,7 +24,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('[data-action="nav"][data-view="today"]');
   const running = await p.evaluate(() => document.getAnimations().filter(a => a.playState==='running' && a.effect && a.effect.getTiming().iterations===Infinity).map(a => (a.effect.target && a.effect.target.className || '')+':'+(a.animationName||'')));
   // (the journal orb breathes too — transform/opacity only, on its own layer)
-  check('only the GPU-friendly loops (locked-in glow, the journal orb)', running.every(x => /glowBreath|jorb/.test(x)), running);
+  check('only the GPU-friendly loops (locked-in glow, the journal orb, Op’s light)', running.every(x => /glowBreath|jorb|olFloat|olBreathe|olOrbit/.test(x)), running);
   // click outside saves + closes the task editor
   await E("openTaskEditModal('t1')");
   await p.fill('#editTitle-t1', 'Edit reel v2');

@@ -495,8 +495,6 @@ function wakeBriefHtml(){
       '<div class="brh-sun-row"><span><small>Sunrise</small>'+fmtMinOfDay(win.rise)+'</span><span class="brh-day">'+daylightLabel()+'</span><span><small>Sunset</small>'+fmtMinOfDay(win.set)+'</span></div></div>'));
   if(nn.headline || nn.morning) colA.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+
     (nn.headline ? '<div class="br-ln-head">'+escapeHtml(nn.headline)+'</div>' : '')+(nn.morning ? '<div class="br-ln-text">'+escapeHtml(nn.morning)+'</div>' : '')));
-  // (a board with pictures shows a few of them by the greeting; one that's only notes still gets its panel)
-  else if(vb && vb.elements.length && !briefVisionImgs(vb).length) colA.push(panel('br-vision', 'br-a-scale', 'And this is what it’s all for.', boardStaticHtml(vb, 'wake-board'), '', ' data-action="wakeBoardToggle" title="Open your vision board"'));
   // the month and the week (or, rarely, a time capsule) — with your streak and level on top
   const you = typeof briefIntentHtml==='function' ? briefIntentHtml() : null;
   if(you) colA.push(panel('br-you br-intent', 'br-a-rise', you.voice, you.html));
@@ -549,10 +547,10 @@ function wakeBriefHtml(){
   if(typeof opBriefRewrite==='function'){ const ai = ui.briefAi && ui.briefAi.date===today ? ui.briefAi.map : {}; lines.forEach(function(l){ if(l.key && ai[l.key]) l.text = ai[l.key]; }); setTimeout(function(){ opBriefRewrite(lines); }, 0); }
   ui.briefLines = lines;
   const shift = ui.briefShift || 0;
-  // the level line sits centred over the vision board's pictures (in the top bar when there aren't any)
-  const hud = typeof briefHudHtml==='function' ? briefHudHtml() : '', hudUp = !!briefVisionImgs(vb).length;
+  // with a vision board: the level line goes by the date (left) and the board hangs alone top right
+  const hud = typeof briefHudHtml==='function' ? briefHudHtml() : '', hudUp = !!(vb && vb.elements.length);
   const w = wakeCfg(), song = (wakeFinishing || wakeAudio || wakeMusicApp) && w.media ? mediaName(w.media) : '';
-  return '<div class="brief brief2 brief3 brief4 bg-'+briefBgClass()+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
+  return '<div class="brief brief2 brief3 brief4'+(hudUp ? ' has-vmini' : '')+' bg-'+briefBgClass()+(ui.wakeBoardBig?' board-open':'')+(ui.wakeIntroDone?' intro-skipped':'')+(ui.briefSkipped?' is-skipped':'')+'" data-sky="'+phase+'" style="--shift:'+shift+'ms">'+
     (cine
       ? '<div class="brief-intro is-cinematic" data-action="wakeIntroSkip" title="Click to skip"><div class="bi-glow"></div>'+
           '<div class="bi-time">'+timeStr+'</div>'+
@@ -562,10 +560,10 @@ function wakeBriefHtml(){
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner b4">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        (hudUp ? '<span class="b4-spacer"></span>' : hud)+'<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+'</span>'+
+        (hudUp ? '<span class="b4-hud-l">'+hud+'</span><span class="b4-spacer"></span><div class="br-vcol">'+briefVisionMiniHtml(vb, base-400)+'</div>' : hud)+'<span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+'</span>'+
         // one button: Skip takes you straight to the app
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
-      '<div class="br-hrow"><h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+(hudUp ? '<div class="br-vcol">'+hud+briefVisionStripHtml(vb, base-400)+'</div>' : '')+'</div>'+
+      '<div class="br-hrow"><h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+'</div>'+
       '<div class="br-voice br-p br-a-fade'+(typeof opVoiceOn==='function' && opVoiceOn() && !OV.briefSpoke && OV.idx < 1 && !ui.briefSkipped ? ' op-loading' : '')+'" style="--d:'+(base-700)+'ms"><button class="br-voice-dot" data-action="briefTalk" title="Talk to Op" aria-label="Talk to Op"></button>'+
         '<span class="br-voice-load"><b>Op</b> loading<i><u></u></i></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
       // no news column (headlines off) → two columns that fill the width instead of an empty third
@@ -576,47 +574,17 @@ function wakeBriefHtml(){
       '</div>'+
     '</div>'+
     (ui.wakeBoardBig && vb ? '<div class="br-vision-big" data-action="wakeBoardToggle" title="Close">'+boardStaticHtml(vb, 'wake-board')+'<button class="wk2-vision-x" data-action="wakeBoardToggle">&#10005;</button></div>' : '')+
-    briefLightboxHtml(vb)+
   '</div>';
 }
-// ---- the vision board, small: the pictures from the middle of the board, by the greeting.
-// A click opens one big (to look at, not to edit); the arrows go through the rest.
-function briefVisionImgs(vb){
-  const imgs = vb ? vb.elements.filter(function(e){ return e.type==='image' && e.ref; }) : [];
-  if(!imgs.length) return [];
-  const bb = boardBounds(vb), cx = bb.x + bb.w/2, cy = bb.y + bb.h/2;
-  const d = function(e){ const x = e.x + e.w/2 - cx, y = e.y + (e.h||0)/2 - cy; return x*x + y*y; };
-  return imgs.slice().sort(function(a, b){ return d(a) - d(b); }).slice(0, 5).sort(function(a, b){ return a.x - b.x || a.y - b.y; });
+// ---- the vision board, small, by the greeting: the whole board as it is (not a few pictures of it),
+// just small enough not to take a panel. A click opens it big.
+function briefVisionMiniHtml(vb, at){
+  if(!vb || !vb.elements.length) return '';
+  const bb = boardBounds(vb); if(!bb) return '';
+  const ar = Math.max(1.3, Math.min(4.2, bb.w / bb.h));
+  return '<div class="br-vmini br-p br-a-fade" role="button" tabindex="0" data-action="wakeBoardToggle" title="Your vision board (click to open it big)" style="--d:'+at+'ms;--ar:'+ar.toFixed(3)+'">'+
+    boardStaticHtml(vb, 'wake-board')+'<span class="br-vmini-open">&#10530;</span></div>';
 }
-function briefVisionStripHtml(vb, at){
-  const imgs = briefVisionImgs(vb); if(!imgs.length) return '';
-  return '<div class="br-vstrip br-p br-a-fade" style="--d:'+at+'ms">'+imgs.map(function(e, i){
-    return '<button class="br-vthumb" data-action="briefVisionOpen" data-id="'+i+'" title="Open" style="--i:'+i+'"><img src="'+escapeHtml(blobUrl(e.ref))+'" alt="" draggable="false"></button>';
-  }).join('')+'</div>';
-}
-function briefLightboxHtml(vb){
-  if(ui.briefVis==null) return '';
-  const imgs = briefVisionImgs(vb), i = ui.briefVis; if(!imgs[i]){ ui.briefVis = null; return ''; }
-  const nav = imgs.length > 1;
-  return '<div class="br-lightbox" data-action="briefVisionClose">'+
-    '<figure class="br-lb-fig"><img src="'+escapeHtml(blobUrl(imgs[i].ref))+'" alt="" draggable="false"></figure>'+
-    (nav ? '<button class="br-lb-nav is-prev" data-action="briefVisionStep" data-id="-1" title="Previous">&#8249;</button><button class="br-lb-nav is-next" data-action="briefVisionStep" data-id="1" title="Next">&#8250;</button>' : '')+
-    '<div class="br-lb-bar">'+(nav ? imgs.map(function(e, j){ return '<i class="'+(j===i ? 'is-on' : '')+'"></i>'; }).join('') : '')+
-      '<button class="br-lb-all" data-action="briefVisionAll">Whole board</button></div>'+
-    '<button class="br-lb-x" data-action="briefVisionClose" title="Close">&#10005;</button></div>';
-}
-ACTIONS.briefVisionOpen = function(el, e, id){ ui.briefVis = Number(id) || 0; renderWakeOverlayInto(); };
-ACTIONS.briefVisionClose = function(el, e){ if(e && e.target && e.target.closest('.br-lb-fig img, .br-lb-nav, .br-lb-all')) return; ui.briefVis = null; renderWakeOverlayInto(); };
-ACTIONS.briefVisionStep = function(el, e, id){
-  const n = briefVisionImgs(masterVisionBoard()).length; if(!n) return;
-  ui.briefVis = ((ui.briefVis||0) + Number(id) + n) % n; renderWakeOverlayInto();
-};
-ACTIONS.briefVisionAll = function(){ ui.briefVis = null; ui.wakeBoardBig = true; renderWakeOverlayInto(); };
-document.addEventListener('keydown', function(e){
-  if(ui.briefVis==null || !overlayOpen('wakeOverlay')) return;
-  if(e.key==='Escape'){ e.stopPropagation(); ui.briefVis = null; renderWakeOverlayInto(); }
-  else if(e.key==='ArrowRight' || e.key==='ArrowLeft') ACTIONS.briefVisionStep(null, e, e.key==='ArrowRight' ? 1 : -1);
-}, true);
 // sports, the news, tech, the business: four small line icons (they say what they are on hover)
 function briefAsksHtml(){
   const ic = {
@@ -635,6 +603,7 @@ function briefAsksHtml(){
 function briefFit(root){
   root = root || document.getElementById('wakeContent'); if(!root) return;
   root.querySelectorAll('.gd-track').forEach(function(tr){ gdPlace(tr, ui.gdIdx||0); });
+  if(typeof fitStaticBoards==='function') root.querySelectorAll('.br-vmini').forEach(function(m){ fitStaticBoards(m); });
   root.querySelectorAll('.br-news-list, .bd-list').forEach(function(list){
     const items = Array.prototype.slice.call(list.children);
     items.forEach(function(it){ it.classList.remove('is-cut'); });
@@ -861,4 +830,4 @@ ACTIONS.clockOut = function(){
 };
 
 // the vision board fits itself once its entrance has played (it measures wrong while scaled)
-document.addEventListener('animationend', function(e){ if(e.target && e.target.classList && (e.target.classList.contains('br-vision') || e.target.classList.contains('mm-vision'))) fitStaticBoards(e.target); });
+document.addEventListener('animationend', function(e){ if(e.target && e.target.classList && (e.target.classList.contains('br-vision') || e.target.classList.contains('br-vmini') || e.target.classList.contains('mm-vision'))) fitStaticBoards(e.target); });
