@@ -83,7 +83,7 @@ function renderAllDeadlinesSection(){
 // Context-aware "+" button (bottom-right): adds whatever the current page is about.
 function fabContext(){
   const v = ui.view;
-  if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='videoIdeas') return {label:'Add content', run:function(){ ui.newContentRole = ui.newContentRole || 'business'; openAddVideoIdeaModal(); }};
+  if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='videoIdeas') return {label:'Add a video', run:function(){ openContentSheet(); }};
   if(v==='focus' || v==='today') return {label:'Add task', run:openAddTaskModal};
   if(v==='business'){
     if(ui.businessTab==='clients' || ui.businessTab==='lifecycle') return {label:'Add client', run:function(){ if(typeof openNewContactModal==='function') openNewContactModal('client'); else { ui.forms.client=true; renderView(); } }};
@@ -98,7 +98,7 @@ function fabContext(){
     if(ui.personalTab==='finances') return {label:'Add a debt', run:function(){ ui.forms.debt = true; renderView(); setTimeout(function(){ const el = document.getElementById('debtName'); if(el) el.focus(); }, 60); }};
     if(ui.personalTab==='wishlist' && typeof openWishItemModal==='function') return {label:'Add wish list item', run:function(){ openWishItemModal(null); }};
     if(ui.personalTab==='fitness') return {label:'Log a workout, weigh-in or food', run:function(){ openHealthSheet('workout'); }};
-    return {label:'Add goal', run:function(){ ui.forms.newGoal = true; renderView(); setTimeout(function(){ const el = document.getElementById('newGoalLabel'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }, 30); }};
+    return {label:'Add goal', run:function(){ openGoalSheet('week'); }};
   }
   return null;
 }

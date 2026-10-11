@@ -40,7 +40,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const p = await newPage(b, OUT+'/r15.html', {profile:{name:'Andre'}, tasks:{items:[{id:'t0', title:'Edit reel', status:'today', priority:'high', clients:['personal']}]}});
     await okRoute(p, asked);
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    await E("ui.currentTaskId='t0'; startFocus(); renderView()"); await p.waitForTimeout(500);
+    await E("ui.currentTaskId='t0'; startFocus(); ui.view='focus'; renderView()"); await p.waitForTimeout(500);
     await E("ACTIONS.toggleLockedView()"); await p.waitForTimeout(1000);
     check('minimal view → real full screen', asked.includes('/window/full?f=1'));
     await E("ACTIONS.toggleLockedView()"); await p.waitForTimeout(1000);

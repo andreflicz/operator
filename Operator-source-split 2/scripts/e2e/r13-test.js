@@ -53,7 +53,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   {
     const p = await newPage(b, OUT+'/r13.html', {profile:{name:'Andre'}, tasks:{items:tasks}});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    await E("ui.currentTaskId='t0'; startFocus(); renderView()"); await p.waitForTimeout(600);
+    await E("ui.currentTaskId='t0'; startFocus(); ui.view='focus'; renderView()"); await p.waitForTimeout(600);
     check('locked in', await E("!!state.focus.activeSession"));
     await E("ACTIONS.toggleLockedView()"); await p.waitForTimeout(400);
     check('minimal view: full screen, the task as the title', await p.isVisible('.np') && await E("document.body.classList.contains('np-on')") && /Task 1/.test(await p.textContent('.np-title')));

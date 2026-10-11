@@ -31,7 +31,7 @@ function masterGoalDefs(){
   ];
 }
 // what reaching it pays (XP — see 32t): the big ones a lot, the weekly rings a little each week
-function masterXpTag(m){ if(typeof MASTER_XP==='undefined') return ''; const big = ['mrr', 'weight', 'streak'].indexOf(m.key)>=0; return '<span class="mg-xp" title="'+(big ? 'XP when you reach it (raise the bar and it pays again)' : 'XP for every week you hit it')+'">+'+(big ? MASTER_XP.milestone.toLocaleString()+' XP' : MASTER_XP.weekly+' XP a week')+'</span>'; }
+function masterXpTag(m){ if(typeof MASTER_XP==='undefined') return ''; const big = ['mrr', 'weight', 'streak'].indexOf(m.key)>=0, v = big && typeof masterXpNow==='function' ? masterXpNow(m) : 0; if(big && !v) return ''; return '<span class="mg-xp" title="'+(big ? 'XP when you reach it. The bigger the goal, the more it pays.' : 'XP for every week you hit it')+'">+'+(big ? v.toLocaleString()+' XP' : MASTER_XP.weekly+' XP a week')+'</span>'; }
 function masterPct(m){
   if(m.cur==null || !(m.target>0)) return 0;
   if(m.key==='weight'){
@@ -60,16 +60,16 @@ function masterTargetHtml(m){
   if(ui.editMaster===m.key){
     return '<span class="mg-edit"><input class="input mg-edit-in" id="mgEdit-'+m.key+'" type="number" step="any" value="'+(m.target!=null?m.target:'')+'" placeholder="target"><button class="btn btn-primary btn-sm" data-action="saveMasterTarget" data-id="'+m.key+'">Set</button></span>';
   }
-  return '<button class="mg-target" data-action="editMasterTarget" data-id="'+m.key+'" title="Change the target">'+(m.target>0 || (m.key==='weight' && m.target!=null) ? 'goal '+m.fmt(m.target)+m.suffix : 'set a goal')+' <span class="mg-pen">&#9998;</span></button>';
+  return '<button class="mg-target" data-action="editMasterTarget" data-id="'+m.key+'" title="Change the target">'+(m.target>0 || (m.key==='weight' && m.target!=null) ? 'of '+m.fmt(m.target)+m.suffix : 'set a goal')+'</button>';
 }
 // the money goal, front and center
 function masterHeroHtml(m){
   const pct = masterPct(m);
   return '<div class="mg-hero" style="--mg1:'+m.color+';--mg2:'+m.color2+';">'+
-    '<div class="mg-hero-top"><span class="mg-k">'+m.icon+' '+m.label+'</span>'+masterXpTag(m)+'<span style="flex:1"></span>'+masterTargetHtml(m)+'</div>'+
-    '<div class="mg-hero-num"><span class="mg-big">'+m.fmt(m.cur)+'</span><span class="mg-of">'+m.suffix+'</span><span class="mg-pct">'+Math.round(pct)+'%</span></div>'+
+    '<div class="mg-hero-top"><span class="mg-k">'+m.label+'</span></div>'+
+    '<div class="mg-hero-num"><span class="mg-big">'+m.fmt(m.cur)+'</span><span class="mg-of">'+m.suffix+'</span>'+masterTargetHtml(m)+'<span class="mg-pct">'+Math.round(pct)+'%</span></div>'+
     '<div class="mg-bar"><div class="mg-bar-fill" style="width:'+pct.toFixed(1)+'%"></div>'+[25,50,75].map(function(t){ return '<span class="mg-tick'+(pct>=t?' is-past':'')+'" style="left:'+t+'%"></span>'; }).join('')+'</div>'+
-    '<div class="mg-hero-foot"><span>'+escapeHtml(masterToGo(m))+'</span><span class="mg-src"'+(m.go?' data-action="'+m.go+'"':'')+'>'+escapeHtml(m.src)+(m.go?' &rarr;':'')+'</span></div>'+
+    '<div class="mg-hero-foot"><span>'+escapeHtml(masterToGo(m))+'</span>'+masterXpTag(m)+'</div>'+
   '</div>';
 }
 function masterRingHtml(m, compact){
@@ -78,9 +78,22 @@ function masterRingHtml(m, compact){
     '<div class="mg-ring">'+ringSvg(pct, m.color, m.color2, m.key+(compact?'c':''), compact ? 84 : 112)+
       '<div class="mg-ring-in"><span class="mg-ring-v">'+(m.cur==null ? '–' : m.fmt(m.cur))+'</span>'+(compact ? '' : '<span class="mg-ring-pct">'+(hit ? '&#10003;' : Math.round(pct)+'%')+'</span>')+'</div>'+
     '</div>'+
-    '<div class="mg-card-k">'+m.icon+' '+m.label+'</div>'+
+    '<div class="mg-card-k">'+(compact ? m.icon+' ' : '')+m.label+'</div>'+
     (compact ? '<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div>'
-      : masterTargetHtml(m)+masterXpTag(m)+'<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div><div class="mg-src"'+(m.go?' data-action="'+m.go+'"':'')+'>'+escapeHtml(m.src)+(m.go?' &rarr;':'')+'</div>')+
+      : masterTargetHtml(m)+'<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div>'+masterXpTag(m))+
+  '</div>';
+}
+// a big one you set yourself (followers, MRR, clients…): tracked live like the others, its own ring
+function userMasterRingHtml(g){
+  const t = goalTracker(g) || {icon:'&#127919;', unit:g.unit||''}, cur = goalLiveCurrent(g), pct = goalPct(g), hit = g.done || pct >= 100;
+  const f = function(n){ return n==null ? '–' : (g.autoTrack==='mrr' ? '$' : '')+fmtGoalNum(n)+(g.autoTrack==='avghours' ? 'h' : ''); };
+  const left = cur==null ? '' : g.autoTrack==='weight' ? fmtGoalNum(Math.abs(cur - g.target))+' lbs to go' : g.target - cur > 0 ? f(Math.round((g.target - cur)*10)/10)+' to go' : 'reached';
+  return '<div class="mg-card is-mine'+(hit ? ' is-hit' : '')+'" style="--mg1:#ffc56b;--mg2:#fff0c4;">'+
+    '<div class="mg-ring">'+ringSvg(pct, '#ffc56b', '#fff0c4', 'u'+g.id, 112)+'<div class="mg-ring-in"><span class="mg-ring-v">'+f(cur)+'</span><span class="mg-ring-pct">'+(hit ? '&#10003;' : Math.round(pct)+'%')+'</span></div></div>'+
+    '<div class="mg-card-k">'+escapeHtml(g.label)+'</div>'+
+    '<button class="mg-target" data-action="openGoalEditModal" data-id="'+g.id+'">of '+f(g.target)+(g.autoTrack==='followers' ? ' followers' : g.autoTrack==='weight' ? ' lbs' : '')+'</button>'+
+    '<div class="mg-card-sub">'+escapeHtml(left)+'</div>'+
+    '<span class="mg-xp">+'+goalXpOf(g).toLocaleString()+' XP</span>'+
   '</div>';
 }
 function masterGoalsHtml(compact){
@@ -88,7 +101,8 @@ function masterGoalsHtml(compact){
   // On Today it's one row of rings (the Business panel above already shows MRR big); the Goals
   // tab gets the full hero.
   if(compact) return '<div class="mg-wrap is-compact"><div class="mg-row mg-row-5">'+defs.map(function(m){ return masterRingHtml(m, true); }).join('')+'</div></div>';
-  return '<div class="mg-wrap">'+masterHeroHtml(defs[0])+'<div class="mg-row">'+defs.slice(1).map(function(m){ return masterRingHtml(m, false); }).join('')+'</div></div>';
+  const mine = arr(state.goals && state.goals.items).filter(function(g){ return g.master && !g.tier; });
+  return '<div class="mg-wrap">'+masterHeroHtml(defs[0])+'<div class="mg-row">'+defs.slice(1).map(function(m){ return masterRingHtml(m, false); }).join('')+mine.map(userMasterRingHtml).join('')+'</div></div>';
 }
 ACTIONS.editMasterTarget = function(el, e, id){ ui.editMaster = id; renderView(); setTimeout(function(){ const i = document.getElementById('mgEdit-'+id); if(i){ i.focus(); i.select(); } }, 30); };
 ACTIONS.saveMasterTarget = function(el, e, id){

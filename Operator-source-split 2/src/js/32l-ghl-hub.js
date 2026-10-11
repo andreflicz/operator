@@ -197,9 +197,11 @@ function inboxSocialHtml(s){
   '</div>';
 }
 function renderInboxTab(){
-  if(!ghlCfg().connected) return '<div class="ib-empty" style="padding:40px;"><div style="font-size:34px;">&#128172;</div><div class="section-title" style="justify-content:center;">Your GoHighLevel inbox, here</div><div class="kpi-sub" style="margin:6px auto 14px;max-width:420px;">Connect GoHighLevel and your conversations, contacts and social stats live in this tab. Reply without leaving Operator.</div><button class="btn btn-primary" data-action="goToIntegrations">Connect GoHighLevel</button></div>';
+  // (chats and contacts come from GoHighLevel; your social numbers are above, from elsewhere)
+  if(!ghlCfg().connected) return '<div class="ib-quiet">&#128172; Chats and contacts show here when GoHighLevel is connected. <button class="ex-link" data-action="goToIntegrations">Connect it &#8594;</button></div>';
   const s = inboxState();
-  if(s.mode==='social') return renderSocialTab();
+  // (Stats: your numbers come from Metricool, an imported file or Meta, above. GoHighLevel's aren't used.)
+  if(s.mode==='social') return '';
   if(s[s.mode]==null && !s.loading[s.mode]) setTimeout(function(){ inboxLoad(s.mode); }, 0);
   if(!inboxTimer) inboxTick();
   return '<div class="ib">'+
@@ -213,7 +215,7 @@ function renderConversations(){
   const tab = function(id, label, n){ return '<button class="seg-tab'+(s.mode===id?' active':'')+'" data-action="inboxMode" data-id="'+id+'">'+label+(n ? ' <span class="ib-badge">'+n+'</span>' : '')+'</button>'; };
   const at = s.mode==='social' ? (ghlCfg().socialCache && ghlCfg().socialCache.at) : s.at;
   return '<div class="view-header"><div><div class="view-title">Social'+tip('Your followers and how your posts are doing, plus your GoHighLevel chats and contacts.')+'</div></div>'+
-      (on ? '<div class="row" style="gap:8px;align-items:center;">'+(at ? '<span class="kpi-sub">Updated '+ghlAgo(at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="'+(s.mode==='social' ? 'socialRefresh' : 'inboxRefresh')+'" title="Refresh">&#8635;</button></div>' : '')+'</div>'+
+      (on ? '<div class="row" style="gap:8px;align-items:center;">'+(at ? '<span class="kpi-sub">Updated '+ghlAgo(at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="'+(s.mode==='social' ? 'igRefresh' : 'inboxRefresh')+'" title="Refresh">&#8635;</button></div>' : '')+'</div>'+
     // Instagram, straight from Instagram, up top (on the Stats tab, or always when GoHighLevel isn't connected)
     ((!on || s.mode==='social') && typeof igSectionHtml==='function' ? igSectionHtml()+(typeof adsSectionHtml==='function' ? adsSectionHtml() : '') : '')+
     (on ? '<div class="seg-tabs cv-tabs">'+tab('social', '&#128202; Stats')+tab('chats', '&#128172; Chats', inboxUnread())+tab('contacts', '&#128101; Contacts')+'</div>' : '')+
@@ -242,21 +244,14 @@ ACTIONS.socialRefresh = function(){ inboxLoad('social'); };
 ACTIONS.goToSocial = function(){ ui.view = 'convos'; inboxState().mode = 'social'; renderView(); };
 ACTIONS.goToConvos = function(){ ui.view = 'convos'; renderView(); };
 function renderSocialPanel(){
-  if(!ghlOn()) return '';
-  socialMaybeRefresh(60*60000);
-  const d = socialData();
-  if(!d || d.empty) return '';
-  const br = d.breakdowns || {}, f = d.platformTotals && d.platformTotals.followers || {};
-  const eng = br.engagement || {}, engTotal = Object.keys(eng).reduce(function(a, k){ const x = eng[k]||{}; return a + (Number(x.likes)||0) + (Number(x.comments)||0) + (Number(x.shares)||0); }, 0);
-  const tile = function(k, v, ch, extra){ return '<div class="sp-tile"><div class="sp-k">'+k+'</div><div class="sp-v">'+Number(v||0).toLocaleString()+'</div>'+(ch!=null && isFinite(ch) ? '<div class="sc-ch '+(ch>=0?'is-up':'is-down')+'">'+(ch>=0?'&#9650; ':'&#9660; ')+Math.abs(ch).toFixed(ch%1?1:0)+'%</div>' : '')+(extra||'')+'</div>'; };
-  const followers = Object.keys(f).reduce(function(a, k){ return a + (Number(f[k].total)||0); }, 0);
+  // your social numbers at a glance (from Metricool, an imported file or Meta; not GoHighLevel)
+  const c = typeof igCfg==='function' ? igCfg() : null;
+  if(!c || !c.accounts.length || !c.cache || !c.cache.data) return '';
+  const since = addDays(todayStr(), -7); let fol = 0, posts = 0, likes = 0, comments = 0, reach = 0;
+  c.accounts.forEach(function(a){ const d = c.cache.data[a.id]; if(!d) return; fol += d.followers || 0; arr(d.posts).filter(function(p){ return p.date > since; }).forEach(function(p){ posts++; likes += p.likes||0; comments += p.comments||0; reach += p.reach||0; }); });
+  const tile = function(k, v){ return '<div class="sp-tile"><div class="sp-k">'+k+'</div><div class="sp-v">'+Number(v||0).toLocaleString()+'</div></div>'; };
   return '<div class="section social-panel"><div class="sp-head" data-action="goToSocial" title="Open Social">'+
-      '<span class="sp-icon">&#128241;</span><div class="sp-head-t"><div class="sp-title">Social</div><div class="sp-sub">'+(followers ? followers.toLocaleString()+' followers &middot; ' : '')+'last 7 days</div></div>'+
+      '<span class="sp-icon">&#128241;</span><div class="sp-head-t"><div class="sp-title">Social</div><div class="sp-sub">'+(fol ? fol.toLocaleString()+' followers &middot; ' : '')+'last 7 days</div></div>'+
       '<span class="sp-more">Open &rarr;</span></div>'+
-    '<div class="sp-row">'+
-      Object.keys(f).map(function(k){ return tile(escapeHtml(k[0].toUpperCase()+k.slice(1))+' followers', f[k].total, null, sparkline(f[k].series)); }).join('')+
-      (br.reach ? tile('Reach', br.reach.total, br.reach.totalChange) : '')+
-      (br.impressions ? tile('Impressions', br.impressions.total, br.impressions.totalChange) : '')+
-      (engTotal ? tile('Engagement', engTotal) : '')+
-    '</div></div>';
+    '<div class="sp-row">'+tile('Posts', posts)+tile('Likes', likes)+tile('Comments', comments)+(reach ? tile('Reach', reach) : '')+'</div></div>';
 }

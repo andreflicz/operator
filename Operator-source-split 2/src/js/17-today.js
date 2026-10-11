@@ -77,7 +77,7 @@ function renderMiniCalendarStrip(){
   return '<div class="mini-cal-strip" data-action="nav" data-view="calendar" title="Open Calendar">'+cells+'</div>';
 }
 function renderTodayFocusMode(p){
-  if(typeof lockedMinimal==='function' && lockedMinimal()) return renderLockedMinimal();
+  // (the minimal view lives on Focus only)
   const hour = new Date().getHours();
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
   const backlog = state.tasks.items.filter(function(t){ return t.status==='backlog'; }).slice(0,6);
@@ -90,7 +90,7 @@ function renderTodayFocusMode(p){
 
   return '<div class="locked-in-header">'+
     businessNameTagHtml()+
-    '<div class="locked-in-badge">&#128274; Locked In</div>'+'<div class="lv-corner">'+lockedViewBtnHtml()+'</div>'+
+    '<div class="locked-in-badge">&#128274; Locked In</div>'+
     '<div class="view-title" style="margin:0;">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
     (state.profile.bigClockOnToday ? (
       '<div id="liveClockBig" class="cal-big-clock" style="font-size:38px;margin-top:6px;"></div>'+
@@ -107,7 +107,6 @@ function renderToday(){
   if(state.focus.activeSession) return renderTodayFocusMode(p);
   if(isDayOff(todayStr())) return renderDayOffView();
   // the minimal view (M, or the button on the hero): clock, level, streak, LOCK IN — nothing else
-  if(typeof focusMinimalOn==='function' && focusMinimalOn() && !(state.modes.active && state.modes.active.type==='offtime')) return renderFocusMinimal();
   if(state.modes.active && state.modes.active.type==='offtime') return state.modes.active.sleep ? renderSleepView() : state.modes.active.morning ? renderMorningView() : renderOffTimeView();
   const hour = new Date().getHours();
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';

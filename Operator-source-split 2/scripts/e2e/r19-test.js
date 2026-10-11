@@ -80,8 +80,9 @@ async function ctxPage(b, seed, opts){
     check('“Video Ideas” is now Content', /Content/.test(await p.textContent('.subtabs')) && !/Video Ideas/.test(await p.textContent('.subtabs')));
     check('two lanes: Business content and Personal content, each with its target', (await p.$$('.ct-lane')).length===2 && /0 of 3 this week/.test(await p.textContent('.ct-lane[data-content-role="business"]')) && /0 of 2 this week/.test(await p.textContent('.ct-lane[data-content-role="personal"]')));
     check('each idea sits in its lane', /testimonial/.test(await p.textContent('.ct-lane[data-content-role="business"] .ct-list')) && /Day in the life/.test(await p.textContent('.ct-lane[data-content-role="personal"] .ct-list')));
-    await p.click('.ct-lane[data-content-role="business"] .ct-add'); await p.waitForTimeout(200);
-    await p.fill('#newVideoIdeaTitle', 'Agency ad'); await p.click('[data-action="addVideoIdea"]'); await p.waitForTimeout(200);
+    // (round 23: no + on the lanes; the + in the corner opens the New video sheet)
+    await p.click('#fabAdd'); await p.waitForTimeout(200);
+    await p.fill('#csTitle', 'Agency ad'); await p.click('[data-action="csSave"]'); await p.waitForTimeout(200);
     check('+ in a lane adds business content', await E("(state.tasks.items.find(t=>t.title==='Agency ad')||{}).contentRole")==='business');
     await E("const t=state.tasks.items.find(x=>x.id==='v1'); t.status='done'; t.completedAt=todayStr(); persist('tasks'); renderView()"); await p.waitForTimeout(200);
     check('finishing it counts as a video out (1 of 3)', await E("contentProgress('business').done")===1 && /1 of 3/.test(await p.textContent('.ct-lane[data-content-role="business"]')));

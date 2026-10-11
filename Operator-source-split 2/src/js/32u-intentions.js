@@ -261,7 +261,7 @@ function tierGoalRowHtml(g){
   const delArmed = armed.has('tgdel:'+g.id);
   return '<div class="tg-row'+(g.done ? ' is-done' : '')+(g.missed ? ' is-missed' : '')+'">'+
     '<button class="tg-hit" data-action="tierGoalToggle" data-id="'+g.id+'"'+(locked ? ' title="Checked out: on the record"' : '')+'><span class="tg-box">'+(g.done ? '&#10003;' : g.missed ? '&#10005;' : '')+'</span><span class="tg-l">'+escapeHtml(g.label)+'</span>'+
-    '<span class="tg-xp">+'+(g.tier==='month' ? CHECKIN_XP.monthGoal : CHECKIN_XP.weekGoal)+'</span></button>'+
+    '<span class="tg-xp'+(g.xpPending ? ' is-sizing' : '')+'"'+(g.xpWhy ? ' title="'+escapeHtml(g.xpWhy)+'"' : '')+'>+'+goalXpOf(g)+'</span></button>'+
     '<span class="tg-acts"><button class="tg-a" data-action="tierGoalRename" data-id="'+g.id+'" title="Rename">&#9998;</button><button class="tg-a'+(delArmed ? ' is-armed' : '')+'" data-action="tierGoalDelete" data-id="'+g.id+'" title="'+(delArmed ? 'Tap again to delete' : 'Delete')+'">'+(delArmed ? 'Delete?' : '&#10005;')+'</button></span></div>';
 }
 function tierCardHtml(kind, opts){
@@ -274,7 +274,8 @@ function tierCardHtml(kind, opts){
       '<span style="flex:1"></span>'+(due ? '<button class="tg-out" data-action="openCheckout" data-id="'+due.kind+':'+due.key+'">Check out &#8594;</button>' : '<button class="tg-edit" data-action="openIntent" data-id="'+kind+'" title="'+(checkedIn(kind, key) ? 'Edit your check-in' : 'Check in')+'">'+(checkedIn(kind, key) ? '&#9998;' : 'Check in &#8594;')+'</button>')+'</div>'+
     (sub ? '<div class="tg-sub">'+escapeHtml(sub)+'</div>' : '')+
     (gs.length ? '<div class="tg-list">'+gs.map(tierGoalRowHtml).join('')+'</div>' : '<div class="tg-empty">'+(kind==='month' ? 'No goals for the month yet.' : 'No goals for the week yet.')+'</div>')+
-    (opts.add && gs.length < 5 && !checkedOut(kind, key) ? '<div class="tg-add"><input class="input" id="tierAdd-'+kind+'" maxlength="140" placeholder="+ Add a '+(kind==='month' ? 'monthly' : 'weekly')+' goal"><button class="btn btn-sm" data-action="tierGoalAdd" data-id="'+kind+'">Add</button></div>' : '')+
+    (opts.add==='sheet' ? (checkedOut(kind, key) ? '<div class="tg-addrow"><button class="tg-addbtn" data-action="tierReopen" data-id="'+kind+'">&#8634; Reopen the '+(kind==='month' ? 'month' : 'week')+'</button></div>' : gs.length < 5 ? '<div class="tg-addrow"><button class="tg-addbtn" data-action="openGoalSheet" data-id="'+kind+'" title="Add a '+(kind==='month' ? 'monthly' : 'weekly')+' goal">&#65291;</button></div>' : '') :
+     opts.add && gs.length < 5 && !checkedOut(kind, key) ? '<div class="tg-add"><input class="input" id="tierAdd-'+kind+'" maxlength="140" placeholder="+ Add a '+(kind==='month' ? 'monthly' : 'weekly')+' goal"><button class="btn btn-sm" data-action="tierGoalAdd" data-id="'+kind+'">Add</button></div>' : '')+
   '</div>';
 }
 // the Calendar: the week and the month, side by side, tick right there

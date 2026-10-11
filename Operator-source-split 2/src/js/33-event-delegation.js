@@ -443,6 +443,12 @@ document.body.addEventListener('drop', function(e){
   const newZone = zone.dataset.dropzone;
   const t = state.tasks.items.find(function(x){ return x.id===taskId; });
   if(!t) return;
+  // Content: dropped on the other lane, it moves between business and personal
+  if(newZone.indexOf('role:')===0){
+    ui.dragFrom = null;
+    if(t.isVideoIdea && typeof setContentRole==='function' && contentRoleOf(t)!==newZone.slice(5)){ setContentRole(t, newZone.slice(5)); playDrop(); persist('tasks'); renderView(); showToast('Moved to '+(newZone.slice(5)==='business' ? 'Business' : 'Personal')+' content.', {icon:'&#127916;'}); }
+    return;
+  }
   const from = ui.dragFrom; ui.dragFrom = null;
   playDrop();
   // out of Now / Up next and back onto the list: that slot empties, the task stays on today's list

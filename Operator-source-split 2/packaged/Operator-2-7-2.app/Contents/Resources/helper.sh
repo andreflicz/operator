@@ -22,6 +22,8 @@ TTS_DIR="$DATA_DIR/tts-cache"
 AI_KEY_FILE="$DATA_DIR/ai.key"
 # Instagram (Meta Graph API): the access token, same rules (this file only, mode 600)
 IG_KEY_FILE="$DATA_DIR/ig.key"
+FIN_KEY_FILE="$DATA_DIR/simplefin.url"
+MC_KEY_FILE="$DATA_DIR/metricool.key"
 
 hexdec() { printf '%b' "$(printf '%s' "$1" | sed 's/../\\x&/g')"; }
 param() { printf '%s' "$REQ_PATH" | sed -n "s/.*[?&]$1=\([0-9a-zA-Z._-]*\).*/\1/p"; }
@@ -294,6 +296,22 @@ wake_respond() {
       V=$(param v); case "$V" in ''|*[!0-9]*) V=50 ;; esac; [ "$V" -gt 100 ] && V=100
       osascript -e "tell application \"Music\" to set sound volume to $V" >/dev/null 2>&1
       respond 200 '{"ok":true}' ;;
+    /music/duck*)
+      # Op is talking: the Music app goes down to a quarter (remembering where it was), then back up.
+      # Only when Music is already running (asking it otherwise would open it).
+      if pgrep -xq Music; then
+        DUCK_FILE="$DATA_DIR/music-duck"
+        if [ "$(param on)" = "1" ]; then
+          if [ -f "$RAMP_PID_FILE" ]; then kill "$(cat "$RAMP_PID_FILE")" 2>/dev/null; rm -f "$RAMP_PID_FILE"; fi
+          [ -f "$DUCK_FILE" ] || osascript -e 'tell application "Music" to get sound volume' > "$DUCK_FILE" 2>/dev/null
+          V=$(cat "$DUCK_FILE" 2>/dev/null); case "$V" in ''|*[!0-9]*) V=60 ;; esac
+          osascript -e "tell application \"Music\" to set sound volume to $((V/4))" >/dev/null 2>&1
+        else
+          V=$(cat "$DUCK_FILE" 2>/dev/null); rm -f "$DUCK_FILE"
+          case "$V" in ''|*[!0-9]*) ;; *) osascript -e "tell application \"Music\" to set sound volume to $V" >/dev/null 2>&1 ;; esac
+        fi
+      fi
+      respond 200 '{"ok":true}' ;;
     /music/playlists*) respond 200 "$(playlists_json)" ;;
     /music/pick*)
       # play a playlist or a song from the in-app player (no fade-in, no repeat-one); with a link
@@ -332,7 +350,7 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":13}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":14}' ;;
     /hello*) printf 'open %s' "$(date +%s)" > "$DATA_DIR/page.state" 2>/dev/null; respond 200 '{"ok":true}' ;;
     /engine*)
       # Operator as its own app (its own Dock icon) or plain Chrome — from the next time it opens
@@ -392,6 +410,51 @@ wake_respond() {
       T=$(hexdec "$(param t)")
       if [ -n "$T" ]; then ( umask 077; printf '%s' "$T" > "$IG_KEY_FILE" ); chmod 600 "$IG_KEY_FILE" 2>/dev/null; respond 200 '{"ok":true}'; else respond 400 '{"ok":false}'; fi ;;
     /ig/forget*) rm -f "$IG_KEY_FILE"; respond 200 '{"ok":true}' ;;
+    /fin/claim*)
+      # your bank, live (SimpleFIN Bridge): the setup token you paste is the address of a one-time claim;
+      # claiming it gives back the private access address, which stays in this file on this Mac only
+      T=$(hexdec "$(param t)" | tr -d ' \n\r')
+      CU=$(printf '%s' "$T" | base64 -D 2>/dev/null); [ -z "$CU" ] && CU=$(printf '%s' "$T" | base64 -d 2>/dev/null)
+      case "$CU" in https://*) ;; *) respond 400 '{"ok":false,"error":"That doesn\u2019t look like a SimpleFIN setup token."}'; return ;; esac
+      AU=$(curl -sS --max-time 25 -X POST -H 'Content-Length: 0' "$CU" 2>/dev/null)
+      case "$AU" in
+        https://*) ( umask 077; printf '%s' "$AU" > "$FIN_KEY_FILE" ); chmod 600 "$FIN_KEY_FILE" 2>/dev/null; respond 200 '{"ok":true}' ;;
+        *) respond 502 "{\"ok\":false,\"error\":\"$(je "${AU:-SimpleFIN did not answer}")\"}" ;;
+      esac ;;
+    /fin/accounts*)
+      if [ ! -s "$FIN_KEY_FILE" ]; then respond 401 '{"ok":false,"error":"not connected"}'
+      else
+        S=$(param s); case "$S" in ''|*[!0-9]*) S=$(( $(date +%s) - 2592000 )) ;; esac
+        OUT=$(curl -sS --max-time 45 -w '\n%{http_code}' "$(cat "$FIN_KEY_FILE")/accounts?start-date=$S&pending=1" 2>&1)
+        CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
+        case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"ok":false,"error":"could not reach SimpleFIN"}' ;; esac
+        [ "$CODE" = "000" ] && { CODE=502; BODY='{"ok":false,"error":"could not reach SimpleFIN"}'; }
+        respond "$CODE" "$BODY"
+      fi ;;
+    /fin/forget*) rm -f "$FIN_KEY_FILE"; respond 200 '{"ok":true}' ;;
+    /mc/key*)
+      # Metricool (your social stats through Metricool's own approved connection): the API token and
+      # which account and brand, kept in this file on this Mac only
+      T=$(hexdec "$(param t)"); U=$(param u); B=$(param b)
+      case "$U$B" in ''|*[!0-9]*) respond 400 '{"ok":false,"error":"userId and blogId are numbers"}'; return ;; esac
+      if [ -n "$T" ]; then ( umask 077; printf '%s\n%s\n%s\n' "$T" "$U" "$B" > "$MC_KEY_FILE" ); chmod 600 "$MC_KEY_FILE" 2>/dev/null; respond 200 '{"ok":true}'; else respond 400 '{"ok":false}'; fi ;;
+    /mc/forget*) rm -f "$MC_KEY_FILE"; respond 200 '{"ok":true}' ;;
+    /mc/status*) if [ -s "$MC_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
+    /mc/api*)
+      P=$(hexdec "$(param p)")
+      case "$P" in /v2/*|/admin/*|/stats/*) ;; *) respond 400 '{"error":"bad path"}'; return ;; esac
+      case "$P" in *..*|*@*|*" "*) respond 400 '{"error":"bad path"}'; return ;; esac
+      if [ ! -s "$MC_KEY_FILE" ]; then respond 401 '{"error":"no token saved"}'
+      else
+        MT=$(sed -n 1p "$MC_KEY_FILE"); MU=$(sed -n 2p "$MC_KEY_FILE"); MB=$(sed -n 3p "$MC_KEY_FILE")
+        case "$P" in *\?*) SEP='&' ;; *) SEP='?' ;; esac
+        OUT=$(curl -sS --max-time 30 -H "X-Mc-Auth: $MT" -H "Content-Type: application/json" -w '\n%{http_code}' "https://app.metricool.com/api$P${SEP}userId=$MU&blogId=$MB" 2>&1)
+        CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
+        case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":"could not reach Metricool"}' ;; esac
+        [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach Metricool"}'; }
+        respond "$CODE" "$BODY"
+      fi ;;
+    /fin/status*) if [ -s "$FIN_KEY_FILE" ]; then respond 200 '{"ok":true,"connected":true}'; else respond 200 '{"ok":true,"connected":false}'; fi ;;
     /ig/status*) if [ -s "$IG_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
     /ai/key*)
       T=$(hexdec "$(param t)")

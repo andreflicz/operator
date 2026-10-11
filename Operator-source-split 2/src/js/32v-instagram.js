@@ -25,6 +25,8 @@ async function igFindAccounts(){
 }
 // everything for one account: followers, and the last 30 posts with likes, comments and reach
 async function igLoadAccount(acc){
+  if(socialSrc(acc)==='metricool') return mcLoadAccount(acc);
+  if(socialSrc(acc)==='csv'){ const d = igCfg().csvData && igCfg().csvData[acc.id]; if(!d) throw new Error('that import is gone; import the file again'); return d; }
   const info = await igApi('/'+acc.id+'?fields=username,followers_count,media_count,profile_picture_url');
   const media = await igApi('/'+acc.id+'/media?fields=id,caption,media_type,media_product_type,timestamp,like_count,comments_count,permalink,thumbnail_url,media_url&limit=30');
   const posts = (media.data || []).map(function(m){ return {id:m.id, cap:String(m.caption||'').slice(0, 140), type:m.media_product_type || m.media_type, at:m.timestamp, date:m.timestamp ? ds2(new Date(m.timestamp)) : '', likes:Number(m.like_count)||0, comments:Number(m.comments_count)||0, link:m.permalink, thumb:m.thumbnail_url || (m.media_type!=='VIDEO' ? m.media_url : '')}; });
@@ -169,9 +171,13 @@ ACTIONS.igRefresh = function(){ igRefresh(); };
 ACTIONS.igConnect = function(){ ui.view = 'settings'; ui.settingsTab = 'integrations'; renderView(); };
 
 // ---- the Social page: Instagram up top ----
-function igSectionHtml(){
+// (what's connected sits under the numbers: Metricool, an imported file, or Meta)
+function igSectionHtml(){ return igSectionInner()+(igOn() && typeof socialSourcesHtml==='function' ? socialSourcesHtml() : ''); }
+function igSectionInner(){
   const c = igCfg();
-  if(!igOn()) return '<div class="ig-connect"><div class="ig-connect-i">&#128247;</div><div><b>Connect Instagram &amp; Meta Ads</b><span>Followers, every post’s likes, comments and reach, and what your ads spent and brought in: one token from Meta Business Suite, read-only.</span></div><button class="btn btn-primary btn-sm" data-action="igConnect">Connect</button></div>';
+  if(!igOn()) return socialConnectHtml();
+  if(false) return '<div class="ig-connect"><div class="ig-connect-i">&#128247;</div><div><b>Your social numbers, without touching Meta</b><span>Easiest and safest: connect Instagram, Facebook, TikTok or YouTube inside GoHighLevel’s Social Planner. Operator reads followers, reach and engagement through GoHighLevel (it holds the approved Meta connection), so there’s no developer app and nothing for Meta to flag. Or, if you want every post and your ad spend, connect directly with a read-only token.</span></div>'+
+    (typeof ghlOn==='function' && ghlOn() ? '<button class="btn btn-primary btn-sm" data-action="goToSocial">Open Social</button>' : '')+'<button class="btn btn-ghost btn-sm" data-action="igConnect">Connect directly</button></div>';
   igMaybeRefresh();
   if(!c.cache) return '<div class="ig-sec"><div class="gp-loading">'+(ui.igErr ? '&#9888; '+escapeHtml(ui.igErr)+' <button class="btn btn-ghost btn-sm" data-action="igRefresh">Try again</button>' : 'Loading your Instagram…')+'</div></div>';
   const since30 = addDays(todayStr(), -30), today = todayStr();
@@ -185,7 +191,7 @@ function igSectionHtml(){
     const top = d.posts.slice(0, 30).sort(function(x, y){ return (y.likes + y.comments*3) - (x.likes + x.comments*3); }).slice(0, 6);
     const stat = function(k, v){ return '<div class="ig-st"><b>'+(v==null ? '–' : Number(v).toLocaleString())+'</b><span>'+k+'</span></div>'; };
     return '<div class="ig-acct"><div class="ig-h">'+(d.pic ? '<img class="ig-pic" src="'+escapeHtml(d.pic)+'" alt="">' : '<span class="ig-pic"></span>')+
-        '<div><b>@'+escapeHtml(d.username)+'</b><span class="ig-role is-'+a.role+'">'+(a.role==='business' ? 'Business' : 'Personal')+'</span></div></div>'+
+        '<div><b>'+(/\s/.test(d.username||'') ? '' : '@')+escapeHtml(d.username)+'</b><span class="ig-role is-'+a.role+'">'+(a.role==='business' ? 'Business' : 'Personal')+'</span></div></div>'+
       '<div class="ig-stats">'+stat('followers', d.followers)+stat('posts · 30 days', recent.length)+stat('avg likes', avg('likes'))+stat('avg comments', avg('comments'))+stat('avg reach', avg('reach'))+'</div>'+
       '<div class="ig-strip-k">Posting, last 30 days</div><div class="ig-strip">'+strip.join('')+'</div>'+
       (top.length ? '<div class="ig-top">'+top.map(function(p){ return '<a class="ig-post" href="'+escapeHtml(p.link||'#')+'" target="_blank" rel="noopener" title="'+escapeHtml(p.cap)+'">'+(p.thumb ? '<img src="'+escapeHtml(p.thumb)+'" alt="" loading="lazy">' : '<span class="ig-noimg">'+escapeHtml(String(p.type||'Post').toLowerCase())+'</span>')+'<span class="ig-post-s">&#9829; '+p.likes.toLocaleString()+' &middot; &#128172; '+p.comments.toLocaleString()+'</span></a>'; }).join('')+'</div>' : '')+

@@ -125,7 +125,9 @@ async function pollAppActivity(){
   const idleLimit = Number(st.idleSeconds)||60;
   if(allSamples.length) lastRawSampleAt = Math.max(lastRawSampleAt, allSamples[allSamples.length-1].ts);
   const samples = allSamples.filter(function(s){ return s.idle==null || s.idle < idleLimit; });
-  if(!samples.length){ updateCurrentAppIndicator(); return; }
+  // (all idle: nothing new to count, but the stop checks still have to run, or a session you walked
+  // away from would never end)
+  if(!samples.length){ updateCurrentAppIndicator(); checkAwayFromSession(); checkAutoLockIn(); return; }
   const today = todayStr();
   const byDate = {};
   samples.forEach(function(s){ const d = todayStr(new Date(s.ts)); (byDate[d]=byDate[d]||[]).push(s); });
@@ -284,10 +286,16 @@ function checkAwayFromSession(){
   if(!s || s.onBreak || s.autoStarted) return;
   if(todayStr(new Date(s.startedAt))!==todayStr()) return;
   const from = sessionAwayFrom(s, state.appActivity.todayIntervals, now);
-  if(from==null) return;
-  endSessionForAway(Math.max(from, s.startedAt+60000), now);
+  if(from!=null){ endSessionForAway(Math.max(from, s.startedAt+60000), now); return; }
+  // still at the Mac but not working: on apps you've marked "not work" for the away time, the session
+  // stops where the work stopped. It can be added back. (Apps you haven't sorted yet don't stop it.)
+  const ivs = state.appActivity.todayIntervals, last = ivs[ivs.length-1];
+  if(!last || now - last.end > APP_ACTIVITY_GAP_MS) return;
+  if(activityCategory(last.app)!=='other') return;
+  const lw = Math.max(lastWorkEnd(ivs) || 0, s.startedAt);
+  if(now - lw >= awayLimitMs()) endSessionForAway(Math.max(lw, s.startedAt+60000), now, 'offwork', last.app);
 }
-function endSessionForAway(endAt, now){
+function endSessionForAway(endAt, now, why, app){
   const s = state.focus.activeSession; if(!s || endAt>=now) return;
   const copy = JSON.parse(JSON.stringify(s));
   if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId, endAt); persist('tasks'); }
@@ -296,7 +304,9 @@ function endSessionForAway(endAt, now){
   state.focus.sessions.push({id:id, type:sessionType(s), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endAt, minutes:minutes, completedTasks:arr(s.completedTasks), note:'', autoStopped:true, away:true, reviewed:false});
   state.focus.activeSession = null;
   state.focus.lastSessionEndedAt = endAt;
-  state.focus.awayStop = {sessionId:id, active:copy, endedAt:endAt, at:now, shown:false};
+  state.focus.awayStop = {sessionId:id, active:copy, endedAt:endAt, at:now, shown:false, why:why||'away', app:app||null};
+  // off work apps (you're right here): say so now, with the way to add it back
+  if(why==='offwork'){ state.focus.awayStop.shown = true; showToast('Session stopped: you’ve been on '+(app || 'other apps')+' since '+fmt12Hour(nowHM(new Date(endAt)))+'.', {icon:'&#9209;', actionLabel:'Add it back', actionAction:'restoreAwaySession', duration:20000}); }
   if(state.modes.active && state.modes.active.linkedFocus) endMode();
   persist('focus'); renderView();
 }

@@ -133,7 +133,7 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     await E("ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(150);
     check('Goals: no separate "Add a goal" button — the + does it', !/Add a goal/.test(await p.textContent('#viewRoot')) && await p.getAttribute('#fabAdd', 'data-label')==='Add goal');
     await p.click('#fabAdd'); await p.waitForTimeout(200);
-    check('…the gold + opens the goal form', await p.isVisible('#newGoalLabel'));
+    check('…the gold + opens the goal form (round 23: the goal sheet)', await p.isVisible('#goalSheet:not(.hidden) #gsLabel'));
     // (round 20: weight and calories are one Body & Fuel card on the Health page)
     await E("ui.personalTab='fitness'; renderView()"); await p.waitForTimeout(150);
     check('Weight: big number, change and goal progress, trend line', /209.5/.test(await p.textContent('.bf-now')) && /14.5 to go/.test(await p.textContent('.bf-goal')) && await p.isVisible('.bf-spark'));

@@ -63,7 +63,8 @@ const T0 = new Date(2026,9,8,10,0).getTime();
   // streaming sites never count as work; time on them while locked in doesn't count
   await p.keyboard.press('Escape');
   check('YouTube / Disney+ are not work by default', await E("activityCategory('youtube.com')")==='work' /* set earlier in this test */ && await E("activityCategory('disneyplus.com')")==='other' && await E("activityCategory('netflix.com')")==='other' && await E("activityCategory('studio.youtube.com')")==='work');
-  await E("setActivityCategory('youtube.com','other')");
+  // (round 23: a session also stops after the away time on not-work apps; this one stays under it)
+  await E("setActivityCategory('youtube.com','other'); state.settings.appTracking.awayMinutes = 20");
   await E("state.focus.activeSession = {startedAt:"+(T0+40*60000)+", breaks:[], onBreak:false, completedTasks:[]}; persist('focus')");
   add(40.2, 52, 'Final Cut Pro'); add(52.2, 64, 'Safari', 'youtube.com');
   await poll(64);

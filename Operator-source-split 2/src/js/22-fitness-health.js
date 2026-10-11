@@ -216,17 +216,23 @@ function renderBodyFuel(){
 function renderHealthScore(){
   if(typeof xpSummary!=='function') return '';
   const x = xpSummary(), h = x.attrs.HLT, body = h.body || {};
-  const bar = function(sx){ const v = sx.v==null ? 25 : sx.v; return '<div class="you-sub'+(sx.v==null ? ' is-empty' : '')+'" title="'+escapeHtml(sx.note)+'"><span>'+escapeHtml(sx.label)+'</span><i><u style="width:'+((v-25)/75*100).toFixed(1)+'%"></u></i><b>'+v+'</b></div><div class="hs-note">'+escapeHtml(sx.note)+'</div>'; };
+  // the score as a ring; your weight's ceiling is a notch on it (no words needed)
+  const R = 54, C = 2*Math.PI*R, f = (h.v-25)/75, cf = h.cap ? (h.cap-25)/75 : null;
+  const ang = cf==null ? 0 : cf*2*Math.PI - Math.PI/2, tx = 64 + Math.cos(ang)*R, ty = 64 + Math.sin(ang)*R;
+  const ring = '<svg class="hsc-ring" viewBox="0 0 128 128" width="150" height="150">'+
+    '<circle cx="64" cy="64" r="'+R+'" class="hsc-ring-t"/>'+
+    (cf!=null ? '<circle cx="64" cy="64" r="'+R+'" class="hsc-ring-cap" stroke-dasharray="'+(C*(1-cf)).toFixed(1)+' '+C.toFixed(1)+'" stroke-dashoffset="'+(-C*cf).toFixed(1)+'" transform="rotate(-90 64 64)"/>' : '')+
+    '<circle cx="64" cy="64" r="'+R+'" class="hsc-ring-f" stroke-dasharray="'+(C*Math.max(0.005, f)).toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 64 64)"/>'+
+    (cf!=null ? '<circle cx="'+tx.toFixed(1)+'" cy="'+ty.toFixed(1)+'" r="4.5" class="hsc-ring-n"/>' : '')+
+    '<text x="64" y="70" text-anchor="middle" class="hsc-ring-v">'+h.v+'</text><text x="64" y="88" text-anchor="middle" class="hsc-ring-k">HEALTH</text></svg>';
+  const tile = function(sx){ const v = sx.v==null ? 25 : sx.v; return '<div class="hsc-t'+(sx.v==null ? ' is-empty' : '')+'" title="'+escapeHtml(sx.note)+'"><b>'+v+'</b><span>'+escapeHtml(sx.label)+'</span><i><u style="width:'+((v-25)/75*100).toFixed(1)+'%"></u></i></div>'; };
   return '<div class="card hsc section" id="healthScore">'+
-    '<div class="hsc-l"><div class="hl-k">Your Health score</div>'+
-      '<div class="hsc-v"><b>'+h.v+'</b>'+(h.cap ? '<span class="hsc-cap'+(h.capped ? ' is-hit' : '')+'" title="At your weight the score tops out here. It rises as the weight comes down.">Ceiling '+h.cap+' at your weight</span>' : '')+'</div>'+
-      '<div class="hsc-subs">'+h.subs.map(bar).join('')+'</div>'+
-      '<div class="hsc-how">Training and diet over the last few weeks count most, the latest week heaviest. Your weight sets how high it can go. Ranks need this score.</div></div>'+
-    '<div class="hsc-r">'+
-      '<div class="hsc-box"><div class="hl-k">Weight for your height</div>'+(body.bmi ?
-        '<div class="you-bmi"><b>'+body.bmi.toFixed(1)+'</b><span>BMI &middot; '+body.cls+'</span></div><div class="you-bmi-scale">'+bmiScaleHtml(body)+'</div>' :
-        '<div class="you-note">Add your height in Settings &rarr; You and weigh in with the +, and your score counts your weight too.</div><button class="hl-link" data-action="goToProfileSettings">Add your height &#8594;</button>')+'</div>'+
-    '</div></div>';
+    '<div class="hsc-score">'+ring+(h.cap ? '<div class="hsc-max'+(h.capped ? ' is-hit' : '')+'" title="At your weight Health tops out here. It rises as the weight comes down.">max '+h.cap+'</div>' : '')+'</div>'+
+    '<div class="hsc-tiles">'+h.subs.map(tile).join('')+'</div>'+
+    '<div class="hsc-box">'+(body.bmi ?
+      '<div class="you-bmi"><b>'+body.bmi.toFixed(1)+'</b><span>BMI &middot; '+body.cls+'</span></div><div class="you-bmi-scale">'+bmiScaleHtml(body)+'</div>' :
+      '<button class="hl-link" data-action="goToProfileSettings">Add your height &#8594;</button>')+'</div>'+
+  '</div>';
 }
 // under it: today's food and your weigh-ins, small, and the meal library tucked away
 function renderHealthLists(){

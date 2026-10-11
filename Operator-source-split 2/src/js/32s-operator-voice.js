@@ -71,6 +71,9 @@ function capSet(el, txt){
   if(txt && was && txt.indexOf(was)!==0){ el.classList.remove('cap-new'); void el.offsetWidth; el.classList.add('cap-new'); }
 }
 function opCaption(txt){
+  // whatever Op says always has captions: if the spot it was meant for isn't on screen (a page that
+  // changed, a panel that closed), the words go to the bubble
+  if(OV.cap && OV.cap!=='opBubText' && txt){ const t = document.getElementById(OV.cap); if(!t || !t.getClientRects().length) OV.cap = 'opBubText'; }
   if(OV.cap==='opBubText') opBubShow();
   const el = OV.cap ? document.getElementById(OV.cap) : null;
   capSet(el, txt);
@@ -122,8 +125,28 @@ function opTtsUrl(text){
 }
 // warm the next line up while this one is being said, so there's no gap between them
 function opPrefetch(text){ if(!opVoiceOn() || !opUseHelper()) return; try{ fetch(opTtsUrl(speakable(text))).catch(function(){}); }catch(e){} }
-function opStarted(tok, opts){ OV.pending = false; OV.speaking = true; if(opts.onstart) opts.onstart(); document.body.classList.add('op-speaking'); }
-function opFinished(tok, said){ OV.pending = false; if(tok===OV.token){ OV.speaking = false; OV.audio = null; opCaption(said); document.body.classList.remove('op-speaking'); } }
+function opStarted(tok, opts){ OV.pending = false; OV.speaking = true; if(opts.onstart) opts.onstart(); document.body.classList.add('op-speaking'); opDuck(true); }
+function opFinished(tok, said){ OV.pending = false; if(tok===OV.token){ OV.speaking = false; OV.audio = null; opCaption(said); document.body.classList.remove('op-speaking'); opDuck(false); } }
+// the music goes down while Op talks and comes back up after (a song playing on the page, or the
+// Music app through the Operator app); a moment's wait between lines so it doesn't pump up and down
+let opDuckT = null, opDucked = false;
+function opMusicPlaying(){ return !!((typeof wakeAudio!=='undefined' && wakeAudio) || (typeof wakeMusicApp!=='undefined' && wakeMusicApp) || (typeof wakeFinishing!=='undefined' && wakeFinishing)); }
+function opDuck(on){
+  clearTimeout(opDuckT);
+  if(on){
+    if(opDucked || !opMusicPlaying()) return;
+    opDucked = true;
+    if(wakeAudio){ clearInterval(wakeAudioRamp); wakeAudio._duckFrom = wakeAudio.volume; wakeAudio.volume = Math.min(wakeAudio.volume, 0.12); }
+    if(wakeMusicApp || wakeFinishing) helperFetch(WAKE_HELPER+'music/duck?on=1', 3000);
+    return;
+  }
+  opDuckT = setTimeout(function(){
+    if(!opDucked || OV.speaking || OV.pending) return;
+    opDucked = false;
+    if(wakeAudio && wakeAudio._duckFrom!=null){ const a = wakeAudio, to = a._duckFrom; a._duckFrom = null; const up = setInterval(function(){ if(wakeAudio!==a){ clearInterval(up); return; } a.volume = Math.min(to, a.volume + 0.05); if(a.volume >= to) clearInterval(up); }, 80); }
+    helperFetch(WAKE_HELPER+'music/duck?on=0', 3000);
+  }, 1200);
+}
 // say something; captions follow the words as they're spoken
 function opSay(text, opts){
   opts = opts || {};
@@ -203,7 +226,7 @@ function opSayBrowser(said, opts, tok, resolve){
   speechSynthesis.speak(u);
 }
 function opStop(){
-  OV.token++; OV.speaking = false; OV.pending = false;
+  OV.token++; OV.speaking = false; OV.pending = false; opDuck(false);
   if(OV.audio){ try{ OV.audio.pause(); }catch(e){} OV.audio = null; }
   try{ speechSynthesis.cancel(); }catch(e){}
   document.body.classList.remove('op-speaking');
@@ -219,7 +242,11 @@ function opUnlock(){
 function opBriefLine(lines, i){ const name = state.profile.name || ''; return (i===0 ? 'Good morning'+(name ? ', '+name : '')+'. ' : '')+lines[i].text; }
 function opBriefTick(lines, t){
   if(!opVoiceOn() || ui.briefSkipped || !lines.length) return false;
+  // with music still playing, Op stays quiet until you press Talk to Op (the words still type out)
+  if(opMusicPlaying() && OV.idx < 0 && !ui.briefOpGo) return false;
   if(OV.speaking || OV.pending) return true;
+  // let the page finish coming in before the first word
+  if(OV.idx < 0 && typeof briefBase==='function' && t < briefBase() + 1500) return true;
   let next = OV.idx + 1; if(next >= lines.length) return true;
   if(t < lines[next].at) return true;
   // fallen behind the page? say the newest line instead of every one in between
@@ -233,7 +260,23 @@ function opBriefTick(lines, t){
   }});
   return true;
 }
-function opBriefReset(){ OV.idx = -1; opStop(); }
+function opBriefReset(){ OV.idx = -1; ui.briefOpGo = false; opStop(); }
+// Talk to Op (Good morning): the music fades out, Op says good morning and asks what you want, then
+// listens. No long rundown unless you ask for one.
+ACTIONS.briefOpGo = async function(){
+  ui.briefOpGo = true; OV.idx = 999;
+  if(opMusicPlaying()){ stopWakeMedia(false); const m = wakeCfg().media; if(m && m.type==='music') musicApp('stop'); }
+  if(typeof renderWakeOverlayInto==='function') renderWakeOverlayInto();
+  const name = (state.profile.name || '').split(' ')[0];
+  let line = 'Good morning'+(name ? ', '+name : '')+'. What do you want to start with?';
+  if(typeof aiWrite==='function' && AI.hasKey===true){
+    const t = await Promise.race([aiWrite('It’s the morning and I just opened the app. Greet me by name in one short spoken sentence, then ask what I want to start with (my day, the business, the news, sports). Two sentences at most, no rundown.', {max:80}), new Promise(function(r){ setTimeout(r, 4000); })]);
+    if(t) line = t;
+  }
+  if(typeof AI!=='undefined'){ AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16); }
+  await opSay(line, {cap:'brVoice'});
+  if(typeof aiListen==='function' && overlayOpen('wakeOverlay')) aiListen('brVoice');
+};
 
 // ---- what you can ask for: short, spoken like a person would say it ----
 const pickOne = function(xs){ return xs[Math.floor(Math.random()*xs.length)]; };

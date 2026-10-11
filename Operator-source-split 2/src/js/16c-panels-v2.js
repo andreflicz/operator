@@ -41,7 +41,7 @@ function goalCardHtml(g, compact){
   const num = function(n){ return n==null ? '–' : unit==='$/mo' ? '$'+fmtGoalNum(n) : fmtGoalNum(n, unit); };
   const unitTail = unit && unit!=='$/mo' && !/^\$/.test(unit) ? ' '+escapeHtml(unit) : unit==='$/mo' ? '/mo' : '';
   return '<div class="goal-card'+(g.done?' is-done':'')+(t?' is-tracked':'')+(reachedNow?' is-hit':'')+'" data-key="goal-'+g.id+'">'+
-    '<div class="goal-card-head">'+(t ? '<span class="goal-icon">'+t.icon+'</span>' : '')+'<span class="goal-card-title" data-action="openGoalEditModal" data-id="'+g.id+'">'+escapeHtml(goalTitle(g))+'</span>'+goalDaysLeftChip(g)+'</div>'+
+    '<div class="goal-card-head">'+(t ? '<span class="goal-icon">'+t.icon+'</span>' : '')+'<span class="goal-card-title" data-action="openGoalEditModal" data-id="'+g.id+'">'+escapeHtml(goalTitle(g))+'</span>'+goalDaysLeftChip(g)+(!t && typeof goalXpOf==='function' ? '<span class="goal-xp'+(g.xpPending ? ' is-sizing' : '')+'"'+(g.xpWhy ? ' title="'+escapeHtml(g.xpWhy)+'"' : '')+'>+'+goalXpOf(g).toLocaleString()+'</span>' : '')+'</div>'+
     (hasTracker ? progressBarHtml(pct)+'<div class="goal-card-nums"><b>'+num(current)+'</b> / '+num(g.target)+unitTail+
         (periodic ? ' <span class="kpi-sub">'+(g.period==='week'?'this week':'this month')+'</span>' : '')+
         (g.autoTrack==='weight' && g.start!=null ? ' <span class="kpi-sub">from '+fmtGoalNum(g.start)+'</span>' : '')+
@@ -98,32 +98,27 @@ function renderGoalsPanel(){
   '</div>';
 }
 // Goals tab: the master goals, big — then your own goals for anything the app can't see.
+// Goals, organized: the big ones (live from your numbers), this week and this month (you tick them),
+// then your own long-term goals. Adding any of them is the + (or "New goal"): a small sheet, and Op sizes
+// each goal up and sets what it's worth.
 function renderGoalsTab(){
-  const items = state.goals.items.filter(function(g){ return !g.tier; });
+  const items = state.goals.items.filter(function(g){ return !g.tier && !g.master; });
   const open = items.filter(function(g){ return !g.done; }).sort(function(a, b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); });
   const done = items.filter(function(g){ return g.done; });
-  const formOpen = !!ui.forms.newGoal;
   const wh = typeof tierHistoryHtml==='function' ? tierHistoryHtml('week', 8) : '', mh = typeof tierHistoryHtml==='function' ? tierHistoryHtml('month', 6) : '';
-  return '<div class="section">'+masterGoalsHtml(false)+'</div>'+
-    (typeof tierCardHtml==='function' ? '<div class="section"><div class="section-title">The week &amp; the month'+tip('Check in at the start (Calendar asks), tick goals off as you go, check out at the end. A weekly goal hit is +'+CHECKIN_XP.weekGoal+' XP, a monthly one +'+CHECKIN_XP.monthGoal+', and a master goal above is +'+MASTER_XP.milestone.toLocaleString()+'.')+'</div>'+
-      '<div class="tg-grid">'+tierCardHtml('week', {add:true})+tierCardHtml('month', {add:true})+'</div>'+
+  const head = function(t, extra){ return '<div class="gl-h"><span>'+t+'</span>'+(extra||'')+'</div>'; };
+  return '<div class="gl">'+
+    '<div class="gl-sec">'+head('The big ones', '<button class="gl-new" data-action="openGoalSheet" data-id="long">&#65291; New goal</button>')+masterGoalsHtml(false)+'</div>'+
+    (typeof tierCardHtml==='function' ? '<div class="gl-sec">'+head('This week &amp; this month')+
+      '<div class="tg-grid">'+tierCardHtml('week', {add:'sheet'})+tierCardHtml('month', {add:'sheet'})+'</div>'+
       (wh || mh ? '<div class="tg-hists">'+(wh ? '<div><small>Past weeks</small>'+wh+'</div>' : '')+(mh ? '<div><small>Past months</small>'+mh+'</div>' : '')+'</div>' : '')+'</div>' : '')+
-    '<div class="section">'+
-      '<div class="section-title">Your goals'+tip('For things Operator can\'t see: IG followers, a first sponsor deal, a new camera. You update the number.')+(formOpen ? '<button class="btn btn-sm btn-ghost" data-action="toggleForm" data-form="newGoal">Close</button>' : '')+'</div>'+
-      (formOpen ? '<div class="card goal-form">'+
-        '<div class="grid grid-2"><div class="field"><label>Goal</label><input class="input" id="newGoalLabel" placeholder="e.g. 10k IG followers"></div>'+
-          '<div class="field"><label>By when (optional)</label><input class="input" type="date" id="newGoalDeadline"></div></div>'+
-        '<div class="grid grid-3" style="margin-top:10px;">'+
-          '<div class="field"><label>Target</label><input class="input" type="number" step="any" id="newGoalTarget" placeholder="10000"></div>'+
-          '<div class="field"><label>Unit</label><input class="input" id="newGoalUnit" placeholder="followers"></div>'+
-          '<div class="field"><label>Where you are now</label><input class="input" type="number" step="any" id="newGoalCurrent" placeholder="0"></div>'+
-        '</div>'+
-        '<div class="row" style="margin-top:12px;justify-content:flex-end;"><button class="btn btn-good" data-action="addGoal">+ Add goal</button></div>'+
-      '</div>' : '')+
-      (open.length ? '<div class="goal-grid">'+open.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : (formOpen ? '' : '<div class="empty">Nothing here yet. Add one for anything you track yourself.</div>'))+
+    '<div class="gl-sec">'+head('Your goals', open.length ? '<small class="gl-n">'+open.length+'</small>' : '')+
+      '<div class="goal-grid">'+open.map(function(g){ return goalCardHtml(g, false); }).join('')+
+        (open.length ? '' : '<button class="gl-add" data-action="openGoalSheet" data-id="long"><span>&#65291;</span>Something of your own to work toward</button>')+'</div>'+
     '</div>'+
-    (done.length ? '<div class="section"><button class="cc2-past-toggle" data-action="toggleForm" data-form="goalsDone">'+(ui.forms.goalsDone?'&#9662;':'&#9656;')+' Achieved ('+done.length+')</button>'+
-      (ui.forms.goalsDone ? '<div class="goal-grid" style="margin-top:10px;">'+done.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : '')+'</div>' : '');
+    (done.length ? '<div class="gl-sec"><button class="cc2-past-toggle" data-action="toggleForm" data-form="goalsDone">'+(ui.forms.goalsDone?'&#9662;':'&#9656;')+' Achieved ('+done.length+')</button>'+
+      (ui.forms.goalsDone ? '<div class="goal-grid" style="margin-top:10px;">'+done.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : '')+'</div>' : '')+
+  '</div>';
 }
 // ---- agenda: today's timeline ----
 function agendaItems(){

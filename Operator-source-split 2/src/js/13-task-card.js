@@ -59,7 +59,7 @@ function finishedTaskRow(t){
       (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     '</div>'+
     '<span class="kpi-sub">'+(t.completedAt ? fmtDateShort(t.completedAt) : (isOngoingDoneToday(t) ? 'Today &middot; resets tomorrow' : ''))+'</span>'+
-    '<button class="btn btn-ghost btn-sm" data-action="undoTask" data-id="'+t.id+'" title="Move back to Today">&#8634; Undo</button>'+
+    // (no Undo button on every row: right-click a finished task to bring it back)
   '</div>';
 }
 function daysInProgress(t){

@@ -223,9 +223,9 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     check('…and it\'s on your leads, linked to GHL', await E("state.business.pipeline.some(l=>l.name==='Tony B' && !!l.ghlContactId)"));
     await p.click('[data-action="inboxMode"][data-id="social"]'); await p.waitForTimeout(900);
     const soc = await p.textContent('#viewRoot');
-    check('Social tab: followers, reach, impressions from GHL', /4,382/.test(soc) && /12,840/.test(soc) && /30,410/.test(soc));
-    check('asks GHL with your profile ids', calls.some(c => c.path.startsWith('/social-media-posting/statistics') && c.body && c.body.profileIds[0]==='p1'));
-    check('an "IG followers" goal follows the real number', await E("state.goals.items[0].current")===4382);
+    // (round 23: GoHighLevel's social numbers aren't used; Metricool, a CSV or Meta instead)
+    check('Social tab: no GoHighLevel numbers, your own sources instead', !/30,410/.test(soc) && /Metricool/.test(soc));
+    await E("ui.socRole='business'; socImportCsv('Publish time,Description,Likes,Comments,Followers\\n2026-10-08T12:00,A reel,90,7,4382', 'x.csv')"); await p.waitForTimeout(300);
     await E("ui.view='focus'; ui.focusMainTab='tasks'; renderView()"); await p.waitForTimeout(300);
     check('Social isn\'t on Focus → Tasks any more', !(await p.isVisible('.social-panel')));
     await E("startFocus(null); ui.view='today'; renderView()"); await p.waitForTimeout(300);

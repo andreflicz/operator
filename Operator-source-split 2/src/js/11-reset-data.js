@@ -5,7 +5,7 @@ function resetPart(id){
   if(id==='journal'){ state.journal={entries:[]}; persist('journal'); }
   if(id==='goals'){ state.goals={items:[]}; persist('goals'); }
   if(id==='health'){ state.health={gymLog:[],weightLog:[],calorieEntries:[]}; persist('health'); }
-  if(id==='finances'){ state.finances={debts:[],payments:[],income:[],invoices:[]}; persist('finances'); }
+  if(id==='finances'){ state.finances={debts:[],payments:[],income:[],invoices:[],expenses:[],bank:{}}; persist('finances'); }
   if(id==='business'){ state.business={pipeline:[],clients:[]}; persist('business'); }
   if(id==='calendarEvents'){ state.calendar.events=[]; persist('calendar'); }
   if(id==='standardsHistory'){ state.standards.completions=[]; persist('standards'); }

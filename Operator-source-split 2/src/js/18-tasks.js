@@ -128,20 +128,20 @@ function renderVideoIdeasTab(){
   return '<div class="ct">'+CONTENT_ROLES.map(function(r){
     const p = contentProgress(r[0]), mine = ideas.filter(function(t){ return contentRoleOf(t)===r[0]; });
     const hit = p.n && p.done >= p.n;
-    return '<div class="ct-lane'+(hit ? ' is-hit' : '')+'" style="--lc:'+r[2]+'" data-content-role="'+r[0]+'">'+
+    // (drag a video from one lane to the other to move it between business and personal)
+    return '<div class="ct-lane'+(hit ? ' is-hit' : '')+'" style="--lc:'+r[2]+'" data-content-role="'+r[0]+'" data-dropzone="role:'+r[0]+'">'+
       '<div class="ct-h">'+contentRingSvg(p, r[2])+
         '<div class="ct-hm"><div class="ct-t">'+r[1]+' content</div>'+
           '<div class="ct-s">'+(p.n ? '<b>'+p.done+'</b> of '+p.n+' '+p.label+(hit ? ' &middot; done &#10003;' : '') : r[3])+'</div>'+
           (p.n ? '<div class="ct-dots">'+Array.from({length:Math.min(p.n, 14)}, function(_, i){ return '<i class="'+(i < p.done ? 'on' : '')+'"></i>'; }).join('')+'</div>' : '')+
         '</div>'+
-        '<button class="ct-add" data-action="openAddContent" data-role="'+r[0]+'" title="Add '+r[1].toLowerCase()+' content">+</button>'+
       '</div>'+
-      '<div class="ct-list">'+(mine.map(videoIdeaCompactCard).join('') || '<div class="ct-empty">No '+r[1].toLowerCase()+' ideas yet: <button class="ct-link" data-action="openAddContent" data-role="'+r[0]+'">add one</button>.</div>')+'</div>'+
-      (p.list.length ? '<div class="ct-done"><span>Out '+p.label+'</span>'+p.list.slice(0, 6).map(function(t){ return '<em>&#10003; '+escapeHtml(t.title)+'</em>'; }).join('')+'</div>' : '')+
+      '<div class="ct-list">'+(mine.map(videoIdeaCompactCard).join('') || '<div class="ct-empty">No '+r[1].toLowerCase()+' ideas yet. Drop one here, or the + in the corner.</div>')+'</div>'+
+      (p.list.length ? '<div class="ct-done"><span>Out '+p.label+'</span>'+p.list.slice(0, 6).map(function(t){ return '<em draggable="true" data-task-id="'+t.id+'" title="Drag to the other side to move it">&#10003; '+escapeHtml(t.title)+'</em>'; }).join('')+'</div>' : '')+
     '</div>';
   }).join('')+'</div>';
 }
-ACTIONS.openAddContent = function(el){ ui.newContentRole = el && el.dataset.role==='business' ? 'business' : 'personal'; openAddVideoIdeaModal(); };
+ACTIONS.openAddContent = function(el){ openContentSheet(el && el.dataset.role); };
 ACTIONS.pickContentRole = function(el){ ui.newContentRole = el.dataset.role; document.querySelectorAll('#videoIdeaContent .ct-role, #videoIdeaEditContent .ct-role').forEach(function(b){ b.classList.toggle('active', b.dataset.role===ui.newContentRole); }); };
 ACTIONS.contentSwapRole = function(el, e, id){
   const t = state.tasks.items.find(function(x){ return x.id===id; }); if(!t) return;

@@ -33,7 +33,7 @@ function appMenuHtml(){
     (s ? (s.onBreak ? ci('backin', '&#128274; Lock back in') : ci('break', '&#9749; Take a break'))+ci('stop', '&#9632; Lock out')
        : ci('lockin', '&#128274; Lock in <span class="ctx-kbd">L</span>'))+
     SEP+add+
-    ((v==='today' || v==='focus') ? SEP+ci('minimal', '&#9673; Minimal view <span class="ctx-kbd">M</span>') : '')+
+    (v==='focus' && (typeof focusHomePage!=='function' || focusHomePage()) ? SEP+ci('minimal', '&#9673; Minimal view <span class="ctx-kbd">M</span>') : '')+
     (selectableView() && selVisibleCards().length ? ci('selAll', '&#9745; Select all tasks <span class="ctx-kbd">&#8984;A</span>') : '')+
     (!s && v==='today' ? ci('recap', '&#128202; Day recap') : '');
 }

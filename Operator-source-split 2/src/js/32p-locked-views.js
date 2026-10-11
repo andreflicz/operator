@@ -29,8 +29,9 @@ document.addEventListener('keydown', function(e){
   if(e.key!=='m' && e.key!=='M') return;
   if(e.metaKey || e.ctrlKey || e.altKey || (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) || (e.target && e.target.isContentEditable)) return;
   if(document.querySelector('.overlay:not(.hidden)')) return;
-  if(!state.focus.activeSession && (ui.view==='focus' || ui.view==='today')){ e.preventDefault(); ACTIONS.toggleFocusMinimal(); return; }
-  if(!state.focus.activeSession || (ui.view!=='today' && ui.view!=='focus')) return;
+  // the minimal view is a Focus page thing (the first page: Tasks → Overview)
+  if(ui.view!=='focus' || (typeof focusHomePage==='function' && !focusHomePage() && !lockedMinimal() && !focusMinimalOn())) return;
+  if(!state.focus.activeSession){ e.preventDefault(); ACTIONS.toggleFocusMinimal(); return; }
   e.preventDefault(); ACTIONS.toggleLockedView();
 });
 // ---- the Focus page's own minimal view (when you're not locked in): the clock, your level,
@@ -171,8 +172,8 @@ function renderLockedMinimal(){
 }
 // full-screen feel: the sidebar and floating buttons step aside in the minimal view
 afterRenderHooks.push(function(){
-  const on = !!(state.focus && state.focus.activeSession && (ui.view==='today' || ui.view==='focus') && lockedMinimal()) || !!(ui.view==='today' && document.querySelector('#viewRoot .rest-full'))
-    || !!((ui.view==='focus' || ui.view==='today') && !(state.focus && state.focus.activeSession) && focusMinimalOn() && document.querySelector('#viewRoot .np-home'));
+  const on = !!(state.focus && state.focus.activeSession && ui.view==='focus' && lockedMinimal()) || !!(ui.view==='today' && document.querySelector('#viewRoot .rest-full'))
+    || !!(ui.view==='focus' && !(state.focus && state.focus.activeSession) && focusMinimalOn() && document.querySelector('#viewRoot .np-home'));
   document.body.classList.toggle('np-on', on);
   const brk = !!(state.focus && state.focus.activeSession && state.focus.activeSession.onBreak);
   document.body.classList.toggle('is-on-break', brk);

@@ -11,11 +11,12 @@ const GOAL_TRACKERS = {
   workouts: {icon:'&#127947;&#65039;', label:'Workouts', unit:'workouts', src:'from Health → Workouts', periods:true, name:function(g){ return fmtGoalNum(g.target)+' workouts '+goalPeriodLabel(g); }},
   hours:    {icon:'&#9201;&#65039;', label:'Hours of deep work', unit:'h', src:'from your locked-in sessions', periods:true, name:function(g){ return fmtGoalNum(g.target)+'h of deep work '+goalPeriodLabel(g); }},
   streak:   {icon:'&#128293;', label:'Days in a row', unit:'days', src:'from your Today\'s Standard streak', name:function(g){ return fmtGoalNum(g.target)+'-day streak'; }},
+  followers:{icon:'&#128200;', label:'Followers', unit:'followers', src:'from your social numbers (Metricool, an import or Meta)', name:function(g){ return fmtGoalNum(g.target)+' followers'; }},
   clients:  {icon:'&#129309;', label:'Active clients', unit:'clients', src:'from Business → Clients', name:function(g){ return fmtGoalNum(g.target)+' active clients'; }},
   // your peak: real, locked-in work a day on average (the last two weeks) — never "done", always the bar
   avghours: {icon:'&#9201;&#65039;', label:'Average hours a day', unit:'h/day', src:'from your locked-in time, averaged over the last two weeks', ongoing:true, name:function(g){ return fmtGoalNum(g.target)+'h a day, on average'; }}
 };
-const GOAL_KINDS = ['mrr', 'weight', 'workouts', 'hours', 'avghours', 'streak', 'clients', 'custom'];
+const GOAL_KINDS = ['mrr', 'weight', 'followers', 'workouts', 'hours', 'avghours', 'streak', 'clients', 'custom'];
 function goalTracker(g){ return g && g.autoTrack ? GOAL_TRACKERS[g.autoTrack] || null : null; }
 function goalPeriodLabel(g){ return g.period==='week' ? 'a week' : g.period==='month' ? 'a month' : 'in total'; }
 function goalIsPeriodic(g){ const t = goalTracker(g); return !!(t && (t.ongoing || (t.periods && (g.period==='week' || g.period==='month')))); }
@@ -48,6 +49,7 @@ function goalLiveCurrentRaw(g){
     case 'clients': return arr(state.business.clients).filter(function(c){ return c.status==='active'; }).length;
     case 'avghours': return typeof avgWorkMinutes==='function' ? Math.round(avgWorkMinutes(14)/6)/10 : 0;
     case 'weight': return latestWeight();
+    case 'followers': return typeof xpFollowersNow==='function' ? xpFollowersNow() : null;
     case 'workouts': { const r = goalRange(g); return sumOverDays(r[0], r[1], function(d){ return workoutDay(d).n; }); }
     case 'hours': { const r = goalRange(g); const today = todayStr(); return Math.round(sumOverDays(r[0], r[1], function(d){ return d===today ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); })/6)/10; }
     default: return Number(g.current)||0;
@@ -61,6 +63,8 @@ function goalPct(g){
     if(cur==null || g.start==null || Number(g.start)===Number(g.target)) return cur!=null && goalReached(g) ? 100 : 0;
     return clamp((g.start-cur)/(g.start-g.target)*100, 0, 100);
   }
+  // a big one you set (followers, MRR, clients…): measured from where you were when you set it
+  if(g.master && g.start!=null && Number(g.target) > Number(g.start)) return cur==null ? 0 : clamp((cur-g.start)/(g.target-g.start)*100, 0, 100);
   return clamp(cur/g.target*100, 0, 100);
 }
 function goalReached(g){

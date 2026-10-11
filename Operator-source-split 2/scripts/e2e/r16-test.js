@@ -26,7 +26,7 @@ const FAKE_SPEECH = () => {
     const p = await newPage(b, OUT+'/r16.html', {profile:{name:'Andre', lockedView:'minimal'}, tasks:{items:tasks}});
     await p.route('http://127.0.0.1:8935/**', r => { asked.push(r.request().url().replace(/^.*8935/, '')); r.fulfill(ok); });
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    await E("ui.currentTaskId='t0'; startFocus(); state.focus.activeSession.method={id:'pomodoro'}; renderView()"); await p.waitForTimeout(900);
+    await E("ui.currentTaskId='t0'; startFocus(); ui.view='focus'; state.focus.activeSession.method={id:'pomodoro'}; renderView()"); await p.waitForTimeout(900);
     check('minimal: a clean corner clock (time, date, next alarm)', await p.isVisible('.np-clock #npClockT') && await p.isVisible('#npClockD'));
     check('Pomodoro laid out as blocks: 4 rounds and 3 breaks', (await p.$$('.np-tl i')).length===7 && (await p.$$('.np-tl i.np-tl-r')).length===3 && await p.$('.np-tl i.is-cur')!==null);
     check('the player: ☕ break · ▶ music (the big one) · ■ lock out', await p.isVisible('.np-ctl .np-music.is-main') && await p.isVisible('.np-ctl .np-out[data-action="openStopFocus"]') && await p.$('.np-top .lv-out')===null);

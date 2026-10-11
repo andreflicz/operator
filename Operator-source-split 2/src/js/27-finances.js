@@ -61,7 +61,8 @@ function renderPersonalFinances(){
       '<button class="btn btn-good btn-sm" style="margin-top:8px;" data-action="addIncome">Add Income</button>'+
     '</div>' : '')+
     '<div class="task-list">'+(income.slice(0,12).map(incomeRow).join('') || '<div class="empty">No income logged. Add one above.</div>')+'</div></div>'+
-  '</div>';
+  '</div>'+
+  (typeof expensesHtml==='function' ? expensesHtml() : '');
 }
 function invoicePaid(inv){ return !!inv.attachmentData; }
 function clientInvoicedThisMonth(clientId){

@@ -30,12 +30,13 @@ async function ctxPage(b, seed, opts){
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     const subs = JSON.parse(await E("JSON.stringify(Object.fromEntries(['BUS','PER','HLT','DIS'].map(k => [k, xpSummaryFresh().attrs[k].subs.map(s => s.label)])))"));
     // (round 22: every stat one word, three a rating; one Content stat; no Sleep)
-    check('Business: MRR · Grind · Scaling (no Clients, no "Time put in")', JSON.stringify(subs.BUS)===JSON.stringify(['MRR', 'Grind', 'Scaling']), subs.BUS);
+    // (round 23: Content is on both, just called Content)
+    check('Business: MRR · Grind · Scaling · Content (no Clients, no "Time put in")', JSON.stringify(subs.BUS)===JSON.stringify(['MRR', 'Grind', 'Scaling', 'Content']), subs.BUS);
     check('Personal: Content · Goals · Finances (no Reflection)', JSON.stringify(subs.PER)===JSON.stringify(['Content', 'Goals', 'Finances']), subs.PER);
     check('Health: Training · Diet · Weight', JSON.stringify(subs.HLT)===JSON.stringify(['Training', 'Diet', 'Weight']), subs.HLT);
     check('Discipline: Integrity · Reliability · Consistency (no On target, no Streak)', JSON.stringify(subs.DIS)===JSON.stringify(['Integrity', 'Reliability', 'Consistency']), subs.DIS);
     const all = [].concat(subs.BUS, subs.PER, subs.HLT, subs.DIS);
-    check('…and no stat appears twice', new Set(all).size===all.length);
+    check('…and no stat appears twice in a rating', ['BUS','PER','HLT','DIS'].every(k => new Set(subs[k]).size===subs[k].length));
     const inDebt = JSON.parse(await E("JSON.stringify(financeRating())"));
     check('Finances reads like a credit score — in debt, half paid, paying: mid', inDebt.score > 500 && inDebt.score < 740 && /Score \d{3}/.test(inDebt.note), inDebt);
     await E("state.finances.payments = []");
@@ -82,9 +83,9 @@ async function ctxPage(b, seed, opts){
     await E("['a','b','c'].forEach(l => state.goals.items.push(newTierGoal('week', weekKey(), l))); tierGoals('week', weekKey()).forEach(g => g.done = true)");
     check('only three weekly goals pay a week (6 ticked → +450)', await E("xpLast=null, xpCheckins().parts.weekGoals")===450);
     await E("ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(300);
-    check('Goals tab: The week & the month, with + add', (await p.$$('.tab-panel .tg-card')).length===2 && await p.isVisible('#tierAdd-month'));
+    check('Goals tab: The week & the month, with + add (round 23: it opens the goal sheet)', (await p.$$('.tab-panel .tg-card')).length===2 && await p.isVisible('.tg-card.is-month [data-action="openGoalSheet"]'));
     check('…and they’re not mixed into "Your goals"', (await p.$$('.tab-panel .goal-card')).length===0);
-    check('master goals say what they pay', /\+4,000 XP/.test(await p.textContent('.mg-wrap')));
+    check('master goals say what they pay (round 23: scaled to the goal)', /\+[\d,]+ XP/.test(await p.textContent('.mg-wrap')));
     check('no page errors (check in)', p.errors.length===0, p.errors);
     await p.context().close();
   }
@@ -117,7 +118,8 @@ async function ctxPage(b, seed, opts){
   {
     const p = await ctxPage(b, {profile:{name:'Andre', revenueGoalMonthly:5000, xpStart:'2026-10-13', xpMrrBase:5000}, business:{clients:[{id:'a', name:'A', stage:'active', status:'active', mrr:6000}]}}, {clock:WED});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    check('MRR goal reached: +4,000', await E("xpLast=null, xpSummaryFresh().master.hits")===1 && await E("xpMaster(xpCtx()).xp")===4000);
+    // (round 23: master goals pay by size, 2,000 at least)
+    check('MRR goal reached: pays (2,000 at least)', await E("xpLast=null, xpSummaryFresh().master.hits")===1 && await E("xpMaster(xpCtx()).xp")===2000);
     await E("state.profile.revenueGoalMonthly = 5500");
     check('…nudging the target up a little doesn’t pay again', await E("xpLast=null, xpSummaryFresh().master.hits")===1);
     await E("state.profile.revenueGoalMonthly = 6000");

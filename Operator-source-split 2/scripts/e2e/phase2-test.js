@@ -58,7 +58,7 @@ const SP = require('./common.js').OUT;
   await p.click('#taskCtxMenu [data-op="backlog"]');
   check('moved to backlog', await p.evaluate(() => window.__op.state.tasks.items.find(t=>t.id==='t1').status)==='backlog');
   await p.click('[data-action="focusTasksSubTab"][data-tab="videoIdeas"]');
-  check('FAB = add content', (await p.getAttribute('#fabAdd','title'))==='Add content');
+  check('FAB = add content (round 23: "Add a video")', (await p.getAttribute('#fabAdd','title'))==='Add a video');
   check('video idea compact (no notes shown)', !(await p.isVisible('.video-idea-compact .vic-body')));
   await p.click('.video-idea-compact .vic-head');
   check('video idea expands', await p.isVisible('.video-idea-compact .vic-body'));
@@ -70,8 +70,9 @@ const SP = require('./common.js').OUT;
   check('undo restores', await p.evaluate(() => window.__op.state.tasks.items.some(t=>t.id==='v1')));
   // FAB on video ideas opens add video idea modal
   await p.click('#fabAdd');
-  check('FAB opens video idea modal', await p.isVisible('#videoIdeaOverlay:not(.hidden)'));
-  await p.click('[data-action="closeAddVideoIdeaModal"]');
+  // (round 23: the + opens the New video sheet)
+  check('FAB opens video idea modal', await p.isVisible('#contentSheet:not(.hidden)'));
+  await p.click('[data-action="closeContentSheet"]');
   // view all deadlines
   await p.click('[data-action="nav"][data-view="today"]');
   await p.click('[data-action="goToDeadlines"]');

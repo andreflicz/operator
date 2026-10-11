@@ -181,7 +181,7 @@ function goodDayReelHtml(){
   const items = goodDayItems(), n = items.length, i = (ui.gdIdx||0) % n;
   // (a list that rolls on to the next one every ten seconds — or move it by hand)
   const row = function(x){ return '<div class="br-th gd-i"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; };
-  return '<div class="gd-reel" data-n="'+n+'"><div class="gd-track" style="--i:'+i+'">'+items.concat(items.slice(0, 4)).map(row).join('')+'</div></div>'+
+  return '<div class="gd-reel" data-n="'+n+'"><div class="gd-track" style="--i:'+i+'">'+items.concat(items).map(row).join('')+'</div></div>'+
     '<div class="gd-nav"><button class="rl-arr" data-action="gdStep" data-id="-1" title="Back">&#8249;</button><div class="gd-dots">'+items.map(function(_, k){ return '<i class="'+(k===i ? 'on' : '')+'" data-action="gdGo" data-id="'+k+'"></i>'; }).join('')+'</div><button class="rl-arr" data-action="gdStep" data-id="1" title="Next">&#8250;</button></div>';
 }
 // move the reel to row i (wrapping both ways); a manual move holds the auto-roll for a bit
@@ -189,7 +189,10 @@ function gdShow(i, manual){
   const tr = document.querySelector('#wakeContent .gd-track'); if(!tr) return;
   const n = goodDayItems().length, from = ui.gdIdx||0;
   if(manual) ui.gdHold = Date.now();
+  // (the list is there twice, so however tall the panel is, the end never shows an empty gap; past the
+  // first copy it quietly jumps back to the same spot in the first)
   if(i < 0){ tr.classList.add('no-anim'); gdPlace(tr, n); void tr.offsetWidth; tr.classList.remove('no-anim'); i = n - 1; }
+  if(i > n){ const at = ((from % n) + n) % n; tr.classList.add('no-anim'); gdPlace(tr, at); void tr.offsetWidth; tr.classList.remove('no-anim'); i = at + 1; }
   ui.gdIdx = i;
   tr.classList.remove('no-anim'); gdPlace(tr, i);
   document.querySelectorAll('#wakeContent .gd-dots i').forEach(function(d, k){ d.classList.toggle('on', k===i % n); });
@@ -558,7 +561,7 @@ function wakeBriefHtml(){
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
       '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
       '<div class="br-voice br-p br-a-fade" style="--d:'+(base-700)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
-      (typeof opAskHtml==='function' ? '<div class="br-p br-opbar br-a-fade" style="--d:'+(base-500)+'ms">'+opAskHtml('brief')+'</div>' : '')+
+      (typeof opAskHtml==='function' ? '<div class="br-p br-opbar br-a-fade" style="--d:'+(base-500)+'ms">'+(song && opVoiceOn() && !ui.briefOpGo ? '<button class="br-opgo" data-action="briefOpGo" title="The music fades out and Op takes it from here"><span class="br-opgo-dot"></span>Talk to Op</button>' : '')+opAskHtml('brief')+'</div>' : '')+
       // no news column (headlines off) → two columns that fill the width instead of an empty third
       // wide screens get four columns (you · today · headlines · sports); otherwise sports sits under headlines
       '<div class="b4-grid'+(!colC.length && !colD.length ? ' cols-2' : !colD.length ? ' no-d' : !colC.length ? ' no-c' : '')+'"><div class="b4-col c-a">'+colA.join('')+'</div><div class="b4-col c-b">'+colB.join('')+'</div>'+(colC.length ? '<div class="b4-col c-c">'+colC.join('')+'</div>' : '')+(colD.length ? '<div class="b4-col c-d">'+colD.join('')+'</div>' : '')+'</div>'+

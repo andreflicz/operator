@@ -33,13 +33,15 @@ function qualifyingSessions(){ return state.focus.sessions.filter(function(s){ r
 function deepWorkMinutesForQualifying(dateStr){
   return qualifyingSessions().filter(function(s){ return s.date===dateStr; }).reduce(function(a,s){ return a+s.minutes; },0);
 }
+// the first Focus page (Tasks → Overview): the only place the Minimal button (and M) lives
+function focusHomePage(){ return ui.view==='focus' && ui.focusTab!=='analytics' && (ui.focusTasksSubTab || 'overview')==='overview'; }
 function renderFocus(){
   const tab = ui.focusTab || 'tasks';
   // locked in, the Focus page has the same minimal view as Today (M, or the button top right)
   const locked = !!state.focus.activeSession;
   if(locked && typeof lockedMinimal==='function' && lockedMinimal()) return renderLockedMinimal();
   if(!locked && typeof focusMinimalOn==='function' && focusMinimalOn()) return renderFocusMinimal();
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus'+tip('Manage the work itself: what you\'re on now, what\'s next, the backlog and video ideas. Analytics shows where the time went.')+'</div></div>'+(typeof lockedViewBtnHtml==='function' ? '<div class="lv-corner is-focus">'+(locked ? lockedViewBtnHtml() : focusMinimalBtnHtml())+'</div>' : '')+'</div>'+
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus'+tip('Manage the work itself: what you\'re on now, what\'s next, the backlog and video ideas. Analytics shows where the time went.')+(typeof lockedViewBtnHtml==='function' && focusHomePage() ? '<span class="lv-corner is-focus">'+(locked ? lockedViewBtnHtml() : focusMinimalBtnHtml())+'</span>' : '')+'</div></div></div>'+
   '<div class="tabs tabs-with-tools">'+
     '<div class="tab '+(tab==='tasks'?'active':'')+'" data-action="focusMainTab" data-tab="tasks">Tasks</div>'+
     '<div class="tab '+(tab==='analytics'?'active':'')+'" data-action="focusMainTab" data-tab="analytics">Analytics</div>'+

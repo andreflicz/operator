@@ -64,7 +64,8 @@ const day = (base, n) => { const d = new Date(base); d.setDate(d.getDate()+n); r
     const fresh = () => E("xpLast=null, JSON.stringify(xpSummaryFresh().attrs.HLT)").then(JSON.parse);
     let h = await fresh();
     const all = JSON.parse(await E("JSON.stringify(['BUS','PER','HLT','DIS'].map(k => xpSummaryFresh().attrs[k].subs.map(s => s.label)))"));
-    check('every stat is one word, three to a rating, one Content stat', all.every(r => r.length===3) && all.flat().every(l => !/\s/.test(l)) && all.flat().filter(l => /content/i.test(l)).length===1 && all[1][0]==='Content', all);
+    // (round 23: Content is back on Business too, both just called Content)
+    check('every stat is one word, Content on Business and Personal', all.flat().every(l => !/\s/.test(l)) && all[0][3]==='Content' && all[1][0]==='Content' && all[2].length===3 && all[3].length===3, all);
     check('Health: Training · Diet · Weight (no Sleep)', JSON.stringify(h.subs.map(s => s.label))==='["Training","Diet","Weight"]', h.subs.map(s => s.label));
     const h0 = h.v;
     check('at 250 lb and 5′10″ (BMI 35.9) the ceiling is about 60', h.cap >= 55 && h.cap <= 60, h.cap);
@@ -83,7 +84,7 @@ const day = (base, n) => { const d = new Date(base); d.setDate(d.getDate()+n); r
     check('…at a healthy weight the same month is a high score', h.v >= 85 && !h.cap, h.v);
     // the page
     await E("ui.view='personal'; ui.personalTab='fitness'; renderView()"); await p.waitForTimeout(300);
-    check('Health shows your score, the four parts and the BMI scale (moved from You)', await p.isVisible('#healthScore') && await p.isVisible('#healthScore .you-bmi-scale') && (await p.$$('#healthScore .you-sub')).length===3);
+    check('Health shows your score, the four parts and the BMI scale (moved from You)', await p.isVisible('#healthScore') && await p.isVisible('#healthScore .you-bmi-scale') && (await p.$$('#healthScore .hsc-t')).length===3);
     check('…the weight card is called Weight, not Body', /Weight/.test(await p.textContent('#bodyFuel .bf-body .hl-k')));
     await E("openHealthSheet('food')"); await p.waitForTimeout(200);
     check('no sleep anywhere: not in the + sheet, not on Health', (await p.$$('#healthSheet .hs-seg button')).length===3 && !/sleep/i.test(await p.textContent('#healthScore')));
@@ -117,7 +118,8 @@ const day = (base, n) => { const d = new Date(base); d.setDate(d.getDate()+n); r
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("ui.view='personal'; ui.personalTab='you'; renderView()"); await p.waitForTimeout(300);
     check('You: no "Your body" panel any more', !(await p.$('.you .you-body')) && !/Your body/.test(await p.textContent('.you')));
-    check('…every stat says what it is underneath', (await p.$$('.you .you-sub small')).length===12);
+    // (round 23: no text under the stats; it's in the guide and on hover)
+    check('…every stat explains itself on hover (no text under it)', (await p.$$('.you .you-sub small')).length===0 && (await p.$$('.you .you-sub[title]')).length===13);
     check('…the last 7 days against the week before, and your records', await p.isVisible('.you-recent .yr-tiles') && (await p.$$('.yr-t')).length >= 5 && /longest day of deep work/.test(await p.textContent('.yr-recs')) && /5\.0h/.test(await p.textContent('.yr-recs')));
     await p.click('.you-q'); await p.waitForTimeout(200);
     const guide = await p.textContent('#xpHowContent');

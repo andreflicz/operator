@@ -91,11 +91,32 @@ function aiContext(){
     lines.push('This week’s goals: '+(wg || 'none set')+(w.focus ? ' (focus: '+w.focus+')' : '')+'. This month’s goals: '+(mg || 'none set')+(m.habit ? ' (habit he’s beating: '+m.habit+')' : '')+'.');
     const due = checkoutDue(); if(due.length) lines.push('He still has to check out of '+due.map(function(c){ return c.kind==='month' ? monthName(c.key) : 'last week'; }).join(' and ')+'.');
   }
+  const book = opClientBook(); if(book) lines.push(book);
+  const ex = arr(state.finances && state.finances.expenses).filter(function(e){ return monthKeyOf(e.date)===thisMonthKey(); });
+  if(ex.length){ const by = {}; ex.forEach(function(e){ by[e.cat] = (by[e.cat]||0) + e.amount; }); lines.push('Spending this month: '+money(ex.reduce(function(a, e){ return a + e.amount; }, 0))+' ('+Object.keys(by).sort(function(a, b){ return by[b]-by[a]; }).slice(0, 4).map(function(k){ return k+' '+money(by[k]); }).join(', ')+').'); }
+  const accts = arr(state.finances && state.finances.bank && state.finances.bank.accounts); if(accts.length) lines.push('Bank balances: '+accts.map(function(a){ return a.name+' '+money(a.balance); }).join(', ')+'.');
   if(typeof xpSummary==='function'){ const x = xpSummary(); lines.push('His card: level '+x.level+', rank "'+RANKS[x.rank].name+'", overall '+x.ovr+' (Business '+x.attrs.BUS.v+', Personal '+x.attrs.PER.v+', Health '+x.attrs.HLT.v+', Discipline '+x.attrs.DIS.v+')'+(x.canLevel ? '; a level up is waiting to be claimed' : '')+'.'); }
   const wx = typeof wxNow==='function' ? wxNow() : null; if(wx) lines.push('Weather: '+wx.temp+'° and '+wxLabel(wx.code).toLowerCase()+(wx.hi!=null ? ', high '+wx.hi+'°' : '')+'.');
   const nw = ui.morningNews; if(nw && nw.items) lines.push('Headlines: '+arr(nw.items).slice(0, 5).map(function(n){ return sayHeadline(n.title); }).join(' | ')+'.');
   const sp = typeof scoresSpoken==='function' ? scoresSpoken() : ''; if(sp) lines.push('Sports: '+sp);
   return lines.join('\n');
+}
+// his book of business, in depth: every active client (what they pay, where they are, when he last
+// reached out, his notes on them) and the open leads, so Op talks like it knows the business
+function opClientBook(){
+  const today = todayStr(), cut = function(t, n){ t = String(t||'').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n-1)+'…' : t; };
+  const last = function(kind, x){ const d = typeof crmLastTouch==='function' ? crmLastTouch(kind, x) : null; return d ? (d===today ? 'today' : daysAgoFrom(d)+'d ago') : 'never'; };
+  const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
+  const out = [];
+  if(cs.length) out.push('Clients in depth:\n'+cs.slice(0, 14).map(function(c){
+    const notes = [c.notes].concat(arr(c.journal).slice(-3).map(function(j){ return (j.date ? j.date+': ' : '')+j.text; })).filter(Boolean).map(function(t){ return cut(t, 220); });
+    const pk = typeof packageById==='function' && c.packageId ? packageById(c.packageId) : null;
+    return '- '+(c.business || c.name)+(c.business && c.name && c.name!==c.business ? ' ('+c.name+')' : '')+': '+money(Number(c.mrr||0))+'/mo'+(pk ? ', '+pk.name : '')+(c.startDate ? ', since '+c.startDate : '')+', last touch '+last('client', c)+
+      (c.followUp && c.followUp.date ? ', follow-up '+c.followUp.date+(c.followUp.note ? ' ('+cut(c.followUp.note, 60)+')' : '') : '')+(notes.length ? '. Notes: '+notes.join(' | ') : '. No notes yet');
+  }).join('\n'));
+  const ls = arr(state.business.pipeline).filter(function(l){ return !/won|lost/.test(String(l.stage||'')); }).slice(0, 10);
+  if(ls.length) out.push('Open leads:\n'+ls.map(function(l){ return '- '+crmName('lead', l)+': stage '+(l.stage||'new')+(Number(l.value) ? ', worth '+money(Number(l.value)) : '')+', last touch '+last('lead', l)+(l.notes ? '. Notes: '+cut(l.notes, 180) : ''); }).join('\n'));
+  return out.join('\n');
 }
 // how Op talks inside the app (kept apart from the personality, which you can replace)
 const OP_RULES = 'How you work inside the Operator app:\n'+
@@ -105,7 +126,10 @@ const OP_RULES = 'How you work inside the Operator app:\n'+
   '- Get to know him. When he tells you something worth keeping (goals, preferences, people, projects, decisions, how he likes things) save it with the remember tool, quietly. Use what you remember naturally.\n'+
   '- You can act in the app with your tools. Do it when he asks (or clearly implies it), then confirm in one short sentence. If a date or time is unclear, ask rather than guess. Never claim you did something you didn’t.\n'+
   '- If you don’t know something, say so briefly.\n'+
-  '- Never use em dashes or en dashes. Use a comma, a colon or a new sentence instead.';
+  '- Never use em dashes or en dashes. Use a comma, a colon or a new sentence instead.\n'+
+  '- Know his business inside out: his clients, what they pay, where each one stands and his notes on them are in the background. Talk about them by name like someone who has been in the room. When he tells you something about a client or a lead, save it on them with add_client_note. When he says he reached out to someone, log it with log_touch.\n'+
+  '- Be proactive. When something would help (a client gone quiet, a deadline, a gap in what you know), say it or ask about it. Ask one good question when it helps you understand his business or him better.\n'+
+  '- When you notice a way the app itself could serve him better, log it with suggest_improvement (quietly; mention it only if it matters).';
 function aiSystem(){
   const name = state.profile.name || 'the user', now = new Date(), mem = opMemory();
   return [
@@ -168,10 +192,21 @@ const OP_TOOLS = [
   {name:'set_reminder', description:'Set a reminder that pops up at a date and time.', input_schema:{type:'object', properties:{label:{type:'string'}, date:OP_DATE, time:{type:'string', description:'HH:MM, 24-hour'}}, required:['label', 'date'], additionalProperties:false}},
   {name:'log_workout', description:'Log a workout.', input_schema:{type:'object', properties:{type:{type:'string', description:'e.g. Lift, Run, Push day'}, minutes:{type:'integer'}, date:OP_DATE}, required:['type'], additionalProperties:false}},
   {name:'log_weight', description:'Log a weigh-in (in the user’s unit).', input_schema:{type:'object', properties:{weight:{type:'number'}, date:OP_DATE}, required:['weight'], additionalProperties:false}},
-  {name:'add_goal', description:'Add a goal for this week or this month.', input_schema:{type:'object', properties:{period:{type:'string', enum:['week', 'month']}, label:{type:'string'}}, required:['period', 'label'], additionalProperties:false}},
+  {name:'add_goal', description:'Add a goal: for this week, this month, or long-term. A long-term goal can be tracked live by the app (track: followers, weight, mrr, clients, streak, avghours) with a target number; otherwise it is his own number to update.', input_schema:{type:'object', properties:{period:{type:'string', enum:['week', 'month', 'long']}, label:{type:'string'}, track:{type:'string', enum:['followers', 'weight', 'mrr', 'clients', 'streak', 'avghours', 'none']}, target:{type:'number'}}, required:['period', 'label'], additionalProperties:false}},
   {name:'complete_goal', description:'Tick off one of this week’s or this month’s goals.', input_schema:{type:'object', properties:{period:{type:'string', enum:['week', 'month']}, label_contains:{type:'string'}}, required:['period', 'label_contains'], additionalProperties:false}},
+  {name:'add_client_note', description:'Save a note on a client or a lead (what was said, what they want, how it’s going). Use the client’s or lead’s name.', input_schema:{type:'object', properties:{who:{type:'string'}, note:{type:'string'}}, required:['who', 'note'], additionalProperties:false}},
+  {name:'log_touch', description:'Log that he reached out to a client or lead (a text, call, email or meeting).', input_schema:{type:'object', properties:{who:{type:'string'}, type:{type:'string', enum:['text', 'call', 'email', 'meeting', 'other']}, date:OP_DATE}, required:['who'], additionalProperties:false}},
+  {name:'suggest_improvement', description:'Log an idea for how the Operator app could serve him better (a feature, a fix, something that got in the way). He sees the list in Settings.', input_schema:{type:'object', properties:{idea:{type:'string'}}, required:['idea'], additionalProperties:false}},
   {name:'open_page', description:'Show a page of the app.', input_schema:{type:'object', properties:{page:{type:'string', enum:['today', 'focus', 'analytics', 'business', 'clients', 'leads', 'calendar', 'goals', 'health', 'finances', 'journal', 'card', 'settings']}}, required:['page'], additionalProperties:false}}
 ];
+// a client or lead by name (business or person, best match)
+function opFindContact(who){
+  const w = String(who||'').toLowerCase().trim(); if(!w) return null;
+  const all = arr(state.business.clients).map(function(c){ return {kind:'client', x:c}; }).concat(arr(state.business.pipeline).map(function(l){ return {kind:'lead', x:l}; }));
+  const names = function(h){ return [h.x.business, h.x.name, h.x.company].filter(Boolean).map(function(n){ return String(n).toLowerCase(); }); };
+  return all.find(function(h){ return names(h).some(function(n){ return n===w; }); })
+    || all.find(function(h){ return names(h).some(function(n){ return n.indexOf(w)>=0 || w.indexOf(n)>=0; }); }) || null;
+}
 const isYmd = function(s){ return /^\d{4}-\d{2}-\d{2}$/.test(String(s||'')); }, isHm = function(s){ return /^\d{2}:\d{2}$/.test(String(s||'')); };
 function opRunTool(name, x){
   x = x || {};
@@ -211,6 +246,14 @@ function opRunTool(name, x){
       state.health.weightLog.push({id:uid(), date:x.date || todayStr(), weight:w}); persist('health'); return 'weigh-in logged';
     }
     case 'add_goal': {
+      if(x.period==='long'){
+        const tr = x.track && x.track!=='none' && GOAL_TRACKERS[x.track] ? x.track : null, target = Number(x.target);
+        if(!(target > 0)) throw new Error('a long-term goal needs a target number');
+        const now = tr ? goalLiveCurrentRaw({autoTrack:tr}) : 0;
+        const g = {id:uid(), label:String(need(x.label, 'label')).slice(0, 140), done:false, target:target, current:0, unit:tr ? GOAL_TRACKERS[tr].unit : '', deadline:null, autoTrack:tr, master:!!tr, start:tr ? now : null, createdAt:todayStr()};
+        if(tr) g.xp = trackedGoalXp(tr, now, target); else { g.xpPending = true; setTimeout(function(){ opRateGoal(g); }, 0); }
+        state.goals.items.push(g); persist('goals'); return 'added "'+g.label+'"'+(tr ? ', tracked live, worth '+g.xp+' XP' : '');
+      }
       const kind = x.period==='month' ? 'month' : 'week', key = periodKey(kind);
       state.goals.items.push(newTierGoal(kind, key, String(need(x.label, 'label'))));
       const store = kind==='month' ? intentStore().months : intentStore().weeks; if(!store[key]) store[key] = {at:Date.now()};
@@ -221,6 +264,28 @@ function opRunTool(name, x){
       const g = tierGoals(kind, periodKey(kind)).find(function(g){ return g.label.toLowerCase().indexOf(w) >= 0; });
       if(!g) throw new Error('no '+kind+' goal matches "'+w+'"'); if(g.done) return 'already done';
       g.done = true; g.missed = false; g.doneAt = todayStr(); persist('goals'); return 'ticked off: '+g.label;
+    }
+    case 'add_client_note': {
+      const hit = opFindContact(need(x.who, 'who')); if(!hit) throw new Error('no client or lead matches "'+x.who+'"');
+      const note = String(need(x.note, 'note')).trim().slice(0, 1000);
+      if(hit.kind==='client'){ if(!Array.isArray(hit.x.journal)) hit.x.journal = []; hit.x.journal.push({id:uid(), date:todayStr(), text:note, createdAt:new Date().toISOString(), by:'op'}); }
+      else hit.x.notes = (hit.x.notes ? hit.x.notes+'\n' : '')+todayStr()+': '+note;
+      if(typeof crmTimeline==='function') crmTimeline(hit.x, 'note', 'Op noted: '+note.slice(0, 120));
+      persist('business'); return 'noted on '+crmName(hit.kind, hit.x);
+    }
+    case 'log_touch': {
+      const hit = opFindContact(need(x.who, 'who')); if(!hit) throw new Error('no client or lead matches "'+x.who+'"');
+      if(x.date && !isYmd(x.date)) throw new Error('date must be YYYY-MM-DD');
+      const tp = {id:uid(), type:x.type || 'other', date:x.date || todayStr(), note:'', ts:Date.now()};
+      if(!Array.isArray(hit.x.touchpoints)) hit.x.touchpoints = []; hit.x.touchpoints.push(tp);
+      if(hit.kind==='client'){ if(!Array.isArray(hit.x.touches)) hit.x.touches = []; hit.x.touches.push(tp.date); }
+      persist('business'); return 'logged a '+tp.type+' with '+crmName(hit.kind, hit.x);
+    }
+    case 'suggest_improvement': {
+      const s = state.settings; if(!Array.isArray(s.opIdeas)) s.opIdeas = [];
+      const idea = String(need(x.idea, 'idea')).trim().slice(0, 400);
+      if(!s.opIdeas.some(function(i){ return i.text.toLowerCase()===idea.toLowerCase(); })){ s.opIdeas.push({id:uid(), text:idea, at:Date.now()}); if(s.opIdeas.length > 60) s.opIdeas.splice(0, s.opIdeas.length - 60); persist('settings'); }
+      return 'logged';
     }
     case 'open_page': {
       const pg = x.page, go = {today:['today'], focus:['focus'], analytics:['focus', function(){ ui.focusTab = 'analytics'; }], business:['business'], clients:['business', function(){ ui.businessTab = 'clients'; }], leads:['business', function(){ ui.businessTab = 'leads'; }],
@@ -262,10 +327,49 @@ async function aiAsk(text, cap){
     // (the conversation carries the last few exchanges; the tool steps aren't needed again)
     AI.history.push({role:'user', content:text}, {role:'assistant', content:reply});
     if(AI.history.length > 16) AI.history = AI.history.slice(-16);
+    opMemoryLater();
     if(changed) renderView();
     if(opVoiceOn()) await opSay(reply, {cap:cap}); else opCaption(reply);
   } finally { AI.busy = false; aiUiRefresh(); }
 }
+// ---- memory that builds itself: a minute after a conversation goes quiet, Op reads it back and keeps
+// anything worth knowing next time (on top of what it saves with the remember tool as it goes) ----
+let opMemT = null, opMemFrom = 0;
+function opMemoryLater(){ clearTimeout(opMemT); opMemT = setTimeout(opMemoryDistill, 60000); }
+async function opMemoryDistill(){
+  const convo = AI.history.slice(opMemFrom); if(convo.filter(function(m){ return m.role==='user'; }).length < 1) return;
+  opMemFrom = AI.history.length;
+  try{
+    const model = await aiPickModel(); if(!model) return;
+    const mem = opMemory().map(function(m){ return '- '+m.text; }).join('\n') || '(nothing yet)';
+    const res = await aiCall({model:model, max_tokens:300, system:'You keep the long-term memory for Op, an assistant inside a productivity app. Reply with only a JSON array of strings.',
+      messages:[{role:'user', content:'What Op already remembers about the user:\n'+mem+'\n\nThe conversation:\n'+convo.map(function(m){ return (m.role==='user' ? 'User: ' : 'Op: ')+(typeof m.content==='string' ? m.content : ''); }).join('\n')+
+        '\n\nList up to 4 new, lasting facts worth remembering (goals, preferences, people, clients, projects, decisions, how he likes things), each one short and in third person. Leave out anything already remembered, small talk and things that only matter today. If there is nothing, reply [].'}]});
+    if(!res.ok) return;
+    const t = aiText(res.j), m = /\[[\s\S]*\]/.exec(t); if(!m) return;
+    const facts = JSON.parse(m[0]); if(!Array.isArray(facts)) return;
+    facts.slice(0, 4).forEach(function(f){ if(typeof f==='string' && f.trim()) try{ opRunTool('remember', {fact:f}); }catch(e){} });
+  }catch(e){}
+}
+// ---- a question a day: when you're around and not locked in, Op asks one thing that helps it know the
+// business (or you) better. It sits in the bubble; answer by typing or the mic, or ignore it ----
+function opQuestionDue(){
+  const p = state.profile;
+  if(AI.hasKey!==true || AI.busy || p.opAskedOn===todayStr()) return false;
+  if(state.focus.activeSession || (state.modes && state.modes.active) || document.querySelector('.overlay:not(.hidden)')) return false;
+  if(['today', 'focus', 'business'].indexOf(ui.view) < 0 || (typeof OV!=='undefined' && (OV.speaking || OV.pending))) return false;
+  return new Date().getHours() >= 9 && new Date().getHours() < 21;
+}
+async function opAskQuestion(){
+  if(!opQuestionDue()) return;
+  state.profile.opAskedOn = todayStr(); persist('profile');
+  const q = await aiWrite('Ask me one short, specific question that would help you understand my business or me better and fill a gap in what you know (a client with no notes, a lead going nowhere, a goal you don’t understand, how I like to work). One sentence, no preamble, nothing else.', {max:120});
+  if(!q || document.querySelector('.overlay:not(.hidden)') || state.focus.activeSession) return;
+  AI.history.push({role:'assistant', content:q}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
+  OV.cap = 'opBubText'; opBubShow(); opCaption(q);
+}
+setInterval(function(){ if(state && state.profile && opQuestionDue() && Date.now() - (ui._opActiveAt || 0) > 40000) opAskQuestion(); }, 60000);
+document.addEventListener('pointerdown', function(){ ui._opActiveAt = Date.now(); }, true);
 // one-off writing in Op's voice (briefs, rundowns, reads): no tools, no conversation
 async function aiWrite(task, opts){
   opts = opts || {};
@@ -374,12 +478,14 @@ function opSettingsHtml(){
     '<div class="field op-set"><label>What Op remembers <span class="kpi-sub">'+mem.length+'</span></label>'+
       (mem.length ? '<div class="op-mem">'+mem.slice().reverse().map(function(m){ return '<div class="op-mem-i"><span>'+escapeHtml(m.text)+'</span><button class="op-mem-x" data-action="opMemDel" data-id="'+m.id+'" title="Forget this">&#10005;</button></div>'; }).join('')+'</div><button class="btn btn-ghost btn-sm" data-action="opMemClear" style="margin-top:6px;">Forget everything</button>'
         : '<div class="op-set-help">Nothing yet. Tell Op about yourself, your business and how you like things. It keeps what matters.</div>')+'</div>'+
+    (arr(state.settings.opIdeas).length ? '<div class="field op-set"><label>Op’s ideas for the app <span class="kpi-sub">'+state.settings.opIdeas.length+'</span></label><div class="op-mem">'+state.settings.opIdeas.slice().reverse().map(function(m){ return '<div class="op-mem-i"><span>'+escapeHtml(m.text)+'</span><button class="op-mem-x" data-action="opIdeaDel" data-id="'+m.id+'" title="Clear">&#10005;</button></div>'; }).join('')+'</div></div>' : '')+
   '</div>';
 }
 ACTIONS.opBrainSet = function(el, e, id){ state.settings.opBrain = id==='smart' ? 'smart' : 'fast'; AI.model = null; persist('settings'); renderView(); };
 ACTIONS.opPersonaSave = function(){ const t = document.getElementById('opPersona'); if(!t) return; const v = t.value.trim(); state.settings.opPersona = v && v!==OP_PERSONA_DEFAULT.trim() ? v.slice(0, 40000) : ''; persist('settings'); showToast('Op’s personality is saved.', {icon:'&#129302;'}); renderView(); };
 ACTIONS.opPersonaReset = function(){ state.settings.opPersona = ''; persist('settings'); renderView(); };
 ACTIONS.opPersonaUpload = function(){ const f = document.getElementById('opPersonaFile'); if(f) f.click(); };
+ACTIONS.opIdeaDel = function(el, e, id){ state.settings.opIdeas = arr(state.settings.opIdeas).filter(function(m){ return m.id!==id; }); persist('settings'); renderView(); };
 ACTIONS.opMemDel = function(el, e, id){ state.profile.opMemory = opMemory().filter(function(m){ return m.id!==id; }); persist('profile'); renderView(); };
 ACTIONS.opMemClear = function(el){ if(!armed.has('opmem')){ armed.add('opmem'); el.textContent = 'Sure? Tap again'; setTimeout(function(){ armed.delete('opmem'); }, 3000); return; } armed.delete('opmem'); state.profile.opMemory = []; persist('profile'); renderView(); };
 document.addEventListener('change', function(e){

@@ -128,7 +128,33 @@ function lvlCardInView(){
   const c = document.querySelector('#viewRoot .pcf, #viewRoot .pc'); if(!c) return false;
   const r = c.getBoundingClientRect(); return r.bottom > 40 && r.top < window.innerHeight - 40 && r.width > 0;
 }
-function lvlChipVis(){ const ch = document.querySelector('#musicDock .md-lvl'); if(ch) ch.classList.toggle('is-away', lvlCardInView()); }
+// It also steps back when nothing's happening: it shows for a few seconds after you get XP (or open a
+// page), whenever a level up is waiting, and when the mouse comes near the corner; otherwise it fades
+// out of the way. In the minimal views it's gone altogether.
+let lvlShowUntil = Date.now() + 8000, lvlLastTotal = null, lvlNear = false;
+function lvlChipIdle(){
+  if(ui.lvlPop || lvlNear) return false;
+  const x = typeof xpSummary==='function' ? xpSummary() : null;
+  if(x && x.canLevel) return false;
+  return Date.now() > lvlShowUntil;
+}
+// On Focus it stays put but compact: the badge and the level, no bar.
+function lvlChipVis(){ const ch = document.querySelector('#musicDock .md-lvl'); if(ch){ const f = ui.view==='focus'; ch.classList.toggle('is-away', lvlCardInView()); ch.classList.toggle('is-compact', f && !ui.lvlPop); ch.classList.toggle('is-idle', !f && lvlChipIdle()); } }
+function lvlChipWake(ms){ lvlShowUntil = Math.max(lvlShowUntil, Date.now() + (ms || 6000)); lvlChipVis(); }
+afterRenderHooks.push(function(){
+  if(typeof xpSummary!=='function' || !state || !state.profile) return;
+  const t = xpSummary().total;
+  if(lvlLastTotal!=null && t!==lvlLastTotal) lvlChipWake(9000);
+  if(ui._lvlView!==ui.view){ ui._lvlView = ui.view; lvlChipWake(5000); }
+  lvlLastTotal = t;
+});
+setInterval(function(){ lvlChipVis(); }, 1500);
+let lvlMoveT = 0;
+document.addEventListener('mousemove', function(e){
+  if(lvlMoveT) return; lvlMoveT = setTimeout(function(){ lvlMoveT = 0; }, 120);
+  const near = e.clientX > window.innerWidth - 300 && e.clientY < 110;
+  if(near!==lvlNear){ lvlNear = near; lvlChipVis(); }
+}, {passive:true});
 let lvlVisRaf = 0;
 document.addEventListener('scroll', function(){ if(lvlVisRaf) return; lvlVisRaf = requestAnimationFrame(function(){ lvlVisRaf = 0; lvlChipVis(); }); }, true);
 afterRenderHooks.push(function(){ setTimeout(lvlChipVis, 0); });

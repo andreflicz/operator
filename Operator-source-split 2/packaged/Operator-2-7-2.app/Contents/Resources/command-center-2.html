@@ -4469,6 +4469,172 @@ html[data-theme="light"] .opi{ border-color:rgba(60,120,200,.2); }
 .xh-i b{ color:var(--text); font-weight:700; font-variant-numeric:tabular-nums; } .xh-i b.is-neg{ color:var(--danger); }
 .xh-more{ display:block; margin:6px auto 30px; }
 .you-recent{ align-items:start; }
+/* ===== Round 23 ===== */
+/* the level chip: fades out of the way when nothing's happening; gone in the minimal views */
+.md-lvl.is-idle{ opacity:0; max-width:0; padding:0; margin-right:-4px; pointer-events:none; }
+body.np-on #musicDock .md-lvl{ display:none !important; }
+/* Minimal / Full view: next to the page title on Focus (out of the corner), bottom-left in the minimal views */
+.view-title .lv-corner.is-focus{ position:static !important; display:inline-flex !important; margin:0 0 0 12px !important; vertical-align:middle; }
+.view-title .lv-corner.is-focus .lv-btn{ height:26px; padding:0 11px; font-size:11.5px; }
+body.np-on .np .np-top .lv-btn{ position:fixed; left:26px; bottom:24px; z-index:45; height:30px; opacity:.6; transition:opacity .2s; }
+body.np-on .np .np-top .lv-btn:hover{ opacity:1; }
+/* minimal views don't scroll */
+body.np-on .np{ overflow:hidden !important; }
+body.np-on, body.np-on .main, body.np-on #viewRoot{ overflow:hidden !important; }
+.md-lvl.is-compact i{ display:none; } .md-lvl.is-compact{ padding-right:8px; }
+/* Health score: a ring (the ceiling is a notch on it), three numbers, the BMI scale. No explaining text. */
+.hsc{ display:grid !important; grid-template-columns:auto 1fr 1.1fr !important; align-items:center; gap:28px !important; padding:22px 26px !important; }
+@media (max-width:1100px){ .hsc{ grid-template-columns:auto 1fr !important; } .hsc .hsc-box{ grid-column:1 / -1; } }
+.hsc-score{ display:flex; flex-direction:column; align-items:center; gap:6px; }
+.hsc-ring-t{ fill:none; stroke:rgba(var(--ink),.07); stroke-width:9; }
+.hsc-ring-cap{ fill:none; stroke:repeating-linear-gradient(0deg, transparent, transparent); stroke:rgba(255,197,107,.16); stroke-width:9; }
+.hsc-ring-f{ fill:none; stroke:#7ef0c0; stroke-width:9; stroke-linecap:round; filter:drop-shadow(0 0 6px rgba(126,240,192,.35)); }
+.hsc-ring-n{ fill:#ffc56b; stroke:var(--panel); stroke-width:2; }
+.hsc-ring-v{ font-family:var(--font-display); font-size:38px; font-weight:800; fill:var(--text); }
+.hsc-ring-k{ font-size:9px; font-weight:800; letter-spacing:.2em; fill:var(--text-faint); }
+.hsc-max{ font-size:11.5px; font-weight:800; letter-spacing:.06em; color:var(--text-dim); } .hsc-max.is-hit{ color:#ffc56b; }
+.hsc-tiles{ display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; }
+.hsc-t{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:16px 10px 14px; border-radius:14px; background:rgba(var(--ink),.035); text-align:center; }
+.hsc-t b{ font-family:var(--font-display); font-size:30px; font-weight:800; line-height:1; color:#7ef0c0; }
+.hsc-t span{ font-size:12px; font-weight:700; color:var(--text-dim); letter-spacing:.04em; }
+.hsc-t i{ width:70%; height:3px; margin-top:6px; border-radius:3px; background:rgba(var(--ink),.08); overflow:hidden; } .hsc-t i u{ display:block; height:100%; background:#7ef0c0; }
+.hsc-t.is-empty{ opacity:.45; }
+.hsc .hsc-box{ padding:12px 16px; border-radius:14px; background:rgba(var(--ink),.035); }
+.hsc .hsc-box .you-bmi-scale{ margin-top:30px; }
+.you-cap{ background:none !important; border:none !important; padding:0 !important; font-size:11px !important; color:var(--text-faint) !important; }
+.you-cap.is-hit{ color:#ffc56b !important; }
+.yr-vs{ font-weight:600; letter-spacing:.08em; color:var(--text-faint); opacity:.7; margin-left:6px; }
+.yr-t small{ font-weight:700; }
+/* Goals, organized: three sections with quiet headers */
+.gl{ display:flex; flex-direction:column; gap:30px; }
+.gl-h{ display:flex; align-items:center; gap:10px; margin-bottom:14px; font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--text-faint); }
+.gl-h .gl-n{ font-size:11px; color:var(--text-dim); letter-spacing:0; }
+.gl-new{ margin-left:auto; height:32px; padding:0 16px; border-radius:999px; border:1px solid rgba(232,162,61,.45); background:rgba(232,162,61,.1); color:#ffc56b; font:inherit; font-size:12.5px; font-weight:700; letter-spacing:0; text-transform:none; cursor:pointer; transition:background .15s; }
+.gl-new:hover{ background:rgba(232,162,61,.2); }
+.gl-add{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-height:120px; border-radius:16px; border:1px dashed rgba(var(--ink),.16); background:transparent; color:var(--text-dim); font:inherit; font-size:13px; font-weight:600; cursor:pointer; transition:border-color .15s, color .15s, background .15s; }
+.gl-add span{ font-size:22px; color:var(--text-faint); } .gl-add:hover{ border-color:rgba(232,162,61,.5); color:var(--text); background:rgba(232,162,61,.04); }
+.goal-xp{ margin-left:auto; flex:none; font-size:11px; font-weight:800; color:var(--good); }
+.goal-xp.is-sizing, .tg-xp.is-sizing{ opacity:.45; animation:opiDot 1.2s ease-in-out infinite; }
+.tg-addrow{ margin-top:8px; }
+.tg-addbtn{ width:100%; padding:9px 12px; border-radius:10px; border:1px dashed rgba(var(--ink),.14); background:transparent; color:var(--text-dim); font:inherit; font-size:12.5px; font-weight:600; text-align:left; cursor:pointer; transition:border-color .15s, color .15s; }
+.tg-addbtn:hover{ border-color:rgba(232,162,61,.5); color:var(--text); }
+/* the master goals, minimal: no pills, no pens. The target is a quiet "of $20,000/mo" you can click */
+.gl .mg-target{ border:none !important; background:none !important; padding:0 !important; margin:0 0 0 10px; font-size:14px; font-weight:600; color:var(--text-faint); border-radius:0; }
+.gl .mg-target:hover{ color:var(--text); }
+.gl .mg-hero-num{ display:flex; align-items:baseline; }
+.gl .mg-hero-num .mg-pct{ margin-left:auto; }
+.gl .mg-card .mg-target{ margin:4px 0 0; font-size:12px; }
+.gl .mg-xp{ background:none !important; padding:0 !important; margin:0 0 0 auto; font-size:11px; color:var(--text-faint); font-weight:700; }
+.gl .mg-card .mg-xp{ margin:4px 0 0; display:block; }
+.gl .mg-hero-foot{ display:flex; align-items:center; }
+/* the add-a-goal sheet */
+.gs-ov{ z-index:210; }
+.gs{ position:relative; width:min(560px, 100%); padding:24px 24px 20px !important; border-radius:22px !important; animation:hsIn .28s cubic-bezier(.2,.9,.3,1.1); }
+.gs-h{ font-family:var(--font-display); font-size:24px; font-weight:700; margin-bottom:14px; }
+.gs-seg{ display:flex; gap:4px; padding:4px; border-radius:12px; background:rgba(var(--ink),.05); margin-bottom:18px; }
+.gs-seg button{ flex:1; border:none; border-radius:9px; padding:9px 6px; font:inherit; font-size:13px; font-weight:700; background:transparent; color:var(--text-dim); cursor:pointer; transition:background .15s, color .15s; }
+.gs-seg button.is-on{ background:var(--panel-2); color:var(--text); box-shadow:0 1px 0 rgba(var(--ink),.06), 0 4px 14px rgba(0,0,0,.2); }
+.gs-body{ display:flex; flex-direction:column; gap:12px; }
+.gs-label{ font-family:var(--font-display); font-size:20px !important; font-weight:600; padding:14px 16px !important; }
+.gs-row{ display:grid; grid-template-columns:1fr 1fr .8fr 1.2fr; gap:8px; }
+.gs-row label{ display:flex; flex-direction:column; gap:4px; } .gs-row label span{ font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); }
+.gs-row .input{ min-width:0; } .gs-row .input.is-bad{ border-color:var(--danger); }
+.gs-note{ font-size:12.5px; color:var(--text-dim); }
+.gs-foot{ display:flex; align-items:center; gap:14px; margin-top:18px; }
+.gs-xp{ font-size:12px; font-weight:700; color:var(--text-faint); }
+.gs-go{ margin-left:auto; padding:11px 24px !important; font-size:14px !important; }
+.gs-row{ grid-template-columns:repeat(4, minmax(0, 1fr)) !important; } .gs-row .input{ width:100% !important; box-sizing:border-box; }
+/* Good morning: Talk to Op (when music is playing) */
+.br-opgo{ display:inline-flex; align-items:center; gap:9px; height:36px; padding:0 18px; margin-right:10px; border-radius:999px; border:1px solid rgba(143,211,255,.45); background:linear-gradient(135deg, rgba(143,211,255,.18), rgba(195,166,255,.14)); color:#fff; font:inherit; font-size:13.5px; font-weight:700; cursor:pointer; box-shadow:0 0 24px rgba(143,211,255,.25); transition:transform .15s, box-shadow .2s; }
+.br-opgo:hover{ transform:translateY(-1px); box-shadow:0 0 34px rgba(143,211,255,.4); }
+.br-opgo-dot{ width:9px; height:9px; border-radius:50%; background:#8fd3ff; box-shadow:0 0 10px #8fd3ff; animation:opiDot 1.6s ease-in-out infinite; }
+.br-opbar{ display:flex; align-items:center; flex-wrap:wrap; }
+/* "Saved to your journal": always dead centre in the box */
+#quickJournalContent .qj3.is-saved{ height:100%; min-height:200px; display:flex !important; align-items:center; justify-content:center; padding:0 !important; }
+#quickJournalContent .qj3.is-saved .qj3-done{ margin:0 !important; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+/* carousel arrows get their own room at each end of the row: never cut by the page edge, never over a card */
+.carousel.is-sized{ padding-left:44px; padding-right:44px; }
+.carousel.is-sized .car-prev{ left:0 !important; } .carousel.is-sized .car-next{ right:0 !important; }
+@media (max-width:900px){ .carousel.is-sized{ padding-left:40px; padding-right:40px; } .carousel.is-sized .car-prev{ left:0 !important; } .carousel.is-sized .car-next{ right:0 !important; } }
+/* Expenses (and the bank, live) */
+.ex-form{ display:grid; grid-template-columns:2fr 1fr 1.2fr 1.1fr auto; gap:8px; margin-bottom:12px; }
+.ex-top{ display:grid; grid-template-columns:220px 1fr; gap:24px; align-items:center; padding:18px 20px !important; }
+@media (max-width:900px){ .ex-top{ grid-template-columns:1fr; } .ex-form{ grid-template-columns:1fr 1fr; } }
+.ex-total small{ display:block; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); }
+.ex-total b{ display:block; font-family:var(--font-display); font-size:36px; font-weight:800; margin:4px 0; }
+.ex-total span{ font-size:12px; color:var(--text-dim); } .ex-total span.is-up{ color:var(--danger); } .ex-total span.is-down{ color:var(--good); }
+.ex-cats{ display:flex; flex-direction:column; gap:7px; }
+.ex-c{ display:grid; grid-template-columns:150px 1fr 70px; align-items:center; gap:10px; font-size:13px; }
+.ex-c i{ height:6px; border-radius:6px; background:rgba(var(--ink),.06); overflow:hidden; } .ex-c u{ display:block; height:100%; border-radius:6px; background:linear-gradient(90deg, #ff9a6b, #ffc56b); }
+.ex-c b{ text-align:right; font-variant-numeric:tabular-nums; }
+.ex-bank{ display:flex; align-items:center; gap:10px; margin:12px 2px 6px; font-size:12.5px; color:var(--text-dim); }
+.ex-dot{ width:8px; height:8px; border-radius:50%; background:var(--good); box-shadow:0 0 8px var(--good); } .ex-dot.is-err{ background:#ffc56b; box-shadow:0 0 8px #ffc56b; }
+.ex-link{ border:none; background:none; padding:0; font:inherit; font-size:12.5px; font-weight:700; color:var(--accent); cursor:pointer; } .ex-link.is-quiet{ color:var(--text-faint); margin-left:auto; }
+.ex-accts{ display:flex; flex-wrap:wrap; gap:10px; margin:4px 0 12px; }
+.ex-accts span{ display:flex; flex-direction:column; padding:10px 14px; border-radius:12px; background:rgba(var(--ink),.035); }
+.ex-accts b{ font-family:var(--font-display); font-size:18px; } .ex-accts small{ font-size:11.5px; color:var(--text-dim); }
+.ex-connect{ margin:12px 0; padding:16px 18px; border-radius:16px; border:1px dashed rgba(var(--ink),.16); }
+.ex-connect-t{ font-weight:700; margin-bottom:4px; } .ex-connect-s{ font-size:12.5px; color:var(--text-dim); line-height:1.5; margin-bottom:10px; }
+.ex-connect-r{ display:flex; gap:8px; } .ex-connect-r .input{ flex:1; min-width:0; }
+.ex-err{ margin-top:8px; font-size:12.5px; color:#ffc56b; }
+.ex-list{ display:flex; flex-direction:column; gap:4px; }
+.ex-row{ display:grid; grid-template-columns:36px 1fr auto 26px; align-items:center; gap:10px; padding:8px 10px; border-radius:12px; background:rgba(var(--ink),.025); }
+.ex-ic{ width:32px; height:32px; border-radius:10px; border:none; background:rgba(var(--ink),.05); font-size:16px; cursor:pointer; }
+.ex-n{ display:flex; flex-direction:column; font-size:13.5px; min-width:0; } .ex-n small{ font-size:11.5px; color:var(--text-faint); }
+.ex-row b{ font-variant-numeric:tabular-nums; }
+.ex-x{ border:none; background:none; color:var(--text-faint); cursor:pointer; font-size:11px; border-radius:6px; padding:3px; } .ex-x:hover{ color:var(--danger); background:var(--danger-dim); }
+.ex-more{ align-self:center; margin-top:6px; border:none; background:none; color:var(--accent); font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; }
+.tg-addbtn{ text-align:center !important; font-size:15px !important; padding:6px 12px !important; }
+/* the new-video sheet */
+.cs-types{ display:flex; flex-wrap:wrap; gap:6px; }
+.cs-type{ padding:6px 12px; border-radius:999px; border:1px solid var(--border); background:transparent; color:var(--text-dim); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
+.cs-type.is-on{ border-color:rgba(232,162,61,.6); color:var(--text); background:rgba(232,162,61,.1); }
+.cs-notes{ resize:vertical; min-height:56px; }
+/* content lanes take a drop */
+.ct-lane.drop-hover{ border-color:var(--lc, var(--accent)) !important; box-shadow:0 0 0 2px var(--lc, var(--accent)) inset; }
+body.is-dragging-task .ct-lane{ transition:border-color .15s, box-shadow .15s; }
+.ct-done em[draggable="true"]{ cursor:grab; }
+/* goal sheet, tidied */
+.gs-row{ grid-template-columns:repeat(3, minmax(0, 1fr)) !important; }
+.gs-by{ display:flex; align-items:center; gap:10px; }
+.gs-by span{ font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); }
+.gs-by .input{ width:auto !important; flex:none; }
+.gs-by em{ font-style:normal; font-size:11.5px; color:var(--text-faint); }
+.gs input[type=date]{ color-scheme:dark; } html[data-theme="light"] .gs input[type=date]{ color-scheme:light; }
+.gs-have{ display:flex; flex-wrap:wrap; gap:6px; }
+.gs-have span{ padding:5px 11px; border-radius:999px; background:rgba(var(--ink),.05); font-size:12px; color:var(--text-dim); }
+.gs-have span.is-done{ color:var(--good); }
+.gs .gs-xp{ opacity:.8; }
+/* social: connect Metricool, import a CSV, or Meta directly */
+.soc-connect{ margin-bottom:18px; padding:18px 20px; border-radius:18px; border:1px solid var(--border); background:var(--panel); }
+.soc-h{ display:flex; flex-direction:column; gap:2px; margin-bottom:12px; } .soc-h b{ font-size:16px; } .soc-h span{ font-size:12.5px; color:var(--text-dim); }
+.soc-role{ display:inline-flex; gap:4px; padding:4px; border-radius:12px; background:rgba(var(--ink),.05); margin-bottom:12px; }
+.soc-role button{ border:none; border-radius:9px; padding:7px 14px; font:inherit; font-size:12.5px; font-weight:700; background:transparent; color:var(--text-dim); cursor:pointer; }
+.soc-role button.is-on{ background:var(--panel-2); color:var(--text); }
+.soc-opts{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+@media (max-width:1000px){ .soc-opts{ grid-template-columns:1fr; } }
+.soc-opt{ border-radius:14px; border:1px solid var(--border); background:rgba(var(--ink),.025); }
+.soc-opt.is-open{ grid-column:1 / -1; border-color:rgba(143,211,255,.4); }
+.soc-opt.is-quiet{ opacity:.75; }
+.soc-opt-h{ display:flex; gap:12px; align-items:flex-start; width:100%; padding:14px 16px; border:none; background:none; color:var(--text); font:inherit; text-align:left; cursor:pointer; }
+.soc-opt-h > span{ font-size:22px; } .soc-opt-h b{ display:block; font-size:14px; } .soc-opt-h small{ display:block; font-size:12px; color:var(--text-dim); line-height:1.45; margin-top:2px; }
+.soc-form{ display:flex; flex-direction:column; gap:8px; padding:0 16px 16px; }
+.soc-row{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.soc-hint{ font-size:11.5px; color:var(--text-faint); }
+.soc-err{ margin-top:10px; font-size:12.5px; color:#ffc56b; }
+.soc-srcs{ display:flex; flex-direction:column; gap:6px; margin:10px 0 18px; }
+.soc-src{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:8px 12px; border-radius:12px; background:rgba(var(--ink),.03); font-size:12.5px; }
+.soc-src-k{ font-weight:700; color:var(--text-dim); }
+.soc-src-f{ display:inline-flex; gap:6px; align-items:center; } .soc-src-f .input{ width:110px; padding:5px 8px; }
+.soc-x{ margin-left:auto; }
+/* goal sheet: track it live */
+.gs-trk{ display:flex; flex-wrap:wrap; gap:6px; }
+.gs-trk button{ padding:6px 12px; border-radius:999px; border:1px solid var(--border); background:transparent; color:var(--text-dim); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
+.gs-trk button.is-on{ border-color:rgba(232,162,61,.6); color:var(--text); background:rgba(232,162,61,.1); }
+.gs-row.is-2{ grid-template-columns:repeat(2, minmax(0, 1fr)) !important; }
+.gs-now{ display:flex; align-items:center; height:38px; padding:0 12px; border-radius:10px; background:rgba(var(--ink),.04); font-size:13.5px; font-weight:600; color:var(--text-dim); }
+.gl .mg-row{ flex-wrap:wrap; }
+.ib-quiet{ margin-top:18px; padding:12px 16px; border-radius:12px; background:rgba(var(--ink),.03); font-size:12.5px; color:var(--text-dim); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -6038,7 +6204,7 @@ function normalizeJournal(j){
   return j;
 }
 function normalizeFinances(f){
-  f=f||{}; f.debts=arr(f.debts); f.payments=arr(f.payments); f.income=arr(f.income); f.invoices=arr(f.invoices);
+  f=f||{}; f.debts=arr(f.debts); f.payments=arr(f.payments); f.income=arr(f.income); f.invoices=arr(f.invoices); f.expenses=arr(f.expenses); if(!f.bank || typeof f.bank!=="object") f.bank = {};
   f.invoices.forEach(function(inv){
     if(inv.status===undefined) inv.status='unpaid';
     if(inv.attachmentName===undefined) inv.attachmentName=null;
@@ -7074,7 +7240,7 @@ function resetPart(id){
   if(id==='journal'){ state.journal={entries:[]}; persist('journal'); }
   if(id==='goals'){ state.goals={items:[]}; persist('goals'); }
   if(id==='health'){ state.health={gymLog:[],weightLog:[],calorieEntries:[]}; persist('health'); }
-  if(id==='finances'){ state.finances={debts:[],payments:[],income:[],invoices:[]}; persist('finances'); }
+  if(id==='finances'){ state.finances={debts:[],payments:[],income:[],invoices:[],expenses:[],bank:{}}; persist('finances'); }
   if(id==='business'){ state.business={pipeline:[],clients:[]}; persist('business'); }
   if(id==='calendarEvents'){ state.calendar.events=[]; persist('calendar'); }
   if(id==='standardsHistory'){ state.standards.completions=[]; persist('standards'); }
@@ -7200,7 +7366,7 @@ function finishedTaskRow(t){
       (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     '</div>'+
     '<span class="kpi-sub">'+(t.completedAt ? fmtDateShort(t.completedAt) : (isOngoingDoneToday(t) ? 'Today &middot; resets tomorrow' : ''))+'</span>'+
-    '<button class="btn btn-ghost btn-sm" data-action="undoTask" data-id="'+t.id+'" title="Move back to Today">&#8634; Undo</button>'+
+    // (no Undo button on every row: right-click a finished task to bring it back)
   '</div>';
 }
 function daysInProgress(t){
@@ -7912,7 +8078,7 @@ function renderAllDeadlinesSection(){
 // Context-aware "+" button (bottom-right): adds whatever the current page is about.
 function fabContext(){
   const v = ui.view;
-  if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='videoIdeas') return {label:'Add content', run:function(){ ui.newContentRole = ui.newContentRole || 'business'; openAddVideoIdeaModal(); }};
+  if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='videoIdeas') return {label:'Add a video', run:function(){ openContentSheet(); }};
   if(v==='focus' || v==='today') return {label:'Add task', run:openAddTaskModal};
   if(v==='business'){
     if(ui.businessTab==='clients' || ui.businessTab==='lifecycle') return {label:'Add client', run:function(){ if(typeof openNewContactModal==='function') openNewContactModal('client'); else { ui.forms.client=true; renderView(); } }};
@@ -7927,7 +8093,7 @@ function fabContext(){
     if(ui.personalTab==='finances') return {label:'Add a debt', run:function(){ ui.forms.debt = true; renderView(); setTimeout(function(){ const el = document.getElementById('debtName'); if(el) el.focus(); }, 60); }};
     if(ui.personalTab==='wishlist' && typeof openWishItemModal==='function') return {label:'Add wish list item', run:function(){ openWishItemModal(null); }};
     if(ui.personalTab==='fitness') return {label:'Log a workout, weigh-in or food', run:function(){ openHealthSheet('workout'); }};
-    return {label:'Add goal', run:function(){ ui.forms.newGoal = true; renderView(); setTimeout(function(){ const el = document.getElementById('newGoalLabel'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); } }, 30); }};
+    return {label:'Add goal', run:function(){ openGoalSheet('week'); }};
   }
   return null;
 }
@@ -8060,7 +8226,7 @@ function goalCardHtml(g, compact){
   const num = function(n){ return n==null ? '–' : unit==='$/mo' ? '$'+fmtGoalNum(n) : fmtGoalNum(n, unit); };
   const unitTail = unit && unit!=='$/mo' && !/^\$/.test(unit) ? ' '+escapeHtml(unit) : unit==='$/mo' ? '/mo' : '';
   return '<div class="goal-card'+(g.done?' is-done':'')+(t?' is-tracked':'')+(reachedNow?' is-hit':'')+'" data-key="goal-'+g.id+'">'+
-    '<div class="goal-card-head">'+(t ? '<span class="goal-icon">'+t.icon+'</span>' : '')+'<span class="goal-card-title" data-action="openGoalEditModal" data-id="'+g.id+'">'+escapeHtml(goalTitle(g))+'</span>'+goalDaysLeftChip(g)+'</div>'+
+    '<div class="goal-card-head">'+(t ? '<span class="goal-icon">'+t.icon+'</span>' : '')+'<span class="goal-card-title" data-action="openGoalEditModal" data-id="'+g.id+'">'+escapeHtml(goalTitle(g))+'</span>'+goalDaysLeftChip(g)+(!t && typeof goalXpOf==='function' ? '<span class="goal-xp'+(g.xpPending ? ' is-sizing' : '')+'"'+(g.xpWhy ? ' title="'+escapeHtml(g.xpWhy)+'"' : '')+'>+'+goalXpOf(g).toLocaleString()+'</span>' : '')+'</div>'+
     (hasTracker ? progressBarHtml(pct)+'<div class="goal-card-nums"><b>'+num(current)+'</b> / '+num(g.target)+unitTail+
         (periodic ? ' <span class="kpi-sub">'+(g.period==='week'?'this week':'this month')+'</span>' : '')+
         (g.autoTrack==='weight' && g.start!=null ? ' <span class="kpi-sub">from '+fmtGoalNum(g.start)+'</span>' : '')+
@@ -8117,32 +8283,27 @@ function renderGoalsPanel(){
   '</div>';
 }
 // Goals tab: the master goals, big — then your own goals for anything the app can't see.
+// Goals, organized: the big ones (live from your numbers), this week and this month (you tick them),
+// then your own long-term goals. Adding any of them is the + (or "New goal"): a small sheet, and Op sizes
+// each goal up and sets what it's worth.
 function renderGoalsTab(){
-  const items = state.goals.items.filter(function(g){ return !g.tier; });
+  const items = state.goals.items.filter(function(g){ return !g.tier && !g.master; });
   const open = items.filter(function(g){ return !g.done; }).sort(function(a, b){ return (a.deadline||'9999').localeCompare(b.deadline||'9999'); });
   const done = items.filter(function(g){ return g.done; });
-  const formOpen = !!ui.forms.newGoal;
   const wh = typeof tierHistoryHtml==='function' ? tierHistoryHtml('week', 8) : '', mh = typeof tierHistoryHtml==='function' ? tierHistoryHtml('month', 6) : '';
-  return '<div class="section">'+masterGoalsHtml(false)+'</div>'+
-    (typeof tierCardHtml==='function' ? '<div class="section"><div class="section-title">The week &amp; the month'+tip('Check in at the start (Calendar asks), tick goals off as you go, check out at the end. A weekly goal hit is +'+CHECKIN_XP.weekGoal+' XP, a monthly one +'+CHECKIN_XP.monthGoal+', and a master goal above is +'+MASTER_XP.milestone.toLocaleString()+'.')+'</div>'+
-      '<div class="tg-grid">'+tierCardHtml('week', {add:true})+tierCardHtml('month', {add:true})+'</div>'+
+  const head = function(t, extra){ return '<div class="gl-h"><span>'+t+'</span>'+(extra||'')+'</div>'; };
+  return '<div class="gl">'+
+    '<div class="gl-sec">'+head('The big ones', '<button class="gl-new" data-action="openGoalSheet" data-id="long">&#65291; New goal</button>')+masterGoalsHtml(false)+'</div>'+
+    (typeof tierCardHtml==='function' ? '<div class="gl-sec">'+head('This week &amp; this month')+
+      '<div class="tg-grid">'+tierCardHtml('week', {add:'sheet'})+tierCardHtml('month', {add:'sheet'})+'</div>'+
       (wh || mh ? '<div class="tg-hists">'+(wh ? '<div><small>Past weeks</small>'+wh+'</div>' : '')+(mh ? '<div><small>Past months</small>'+mh+'</div>' : '')+'</div>' : '')+'</div>' : '')+
-    '<div class="section">'+
-      '<div class="section-title">Your goals'+tip('For things Operator can\'t see: IG followers, a first sponsor deal, a new camera. You update the number.')+(formOpen ? '<button class="btn btn-sm btn-ghost" data-action="toggleForm" data-form="newGoal">Close</button>' : '')+'</div>'+
-      (formOpen ? '<div class="card goal-form">'+
-        '<div class="grid grid-2"><div class="field"><label>Goal</label><input class="input" id="newGoalLabel" placeholder="e.g. 10k IG followers"></div>'+
-          '<div class="field"><label>By when (optional)</label><input class="input" type="date" id="newGoalDeadline"></div></div>'+
-        '<div class="grid grid-3" style="margin-top:10px;">'+
-          '<div class="field"><label>Target</label><input class="input" type="number" step="any" id="newGoalTarget" placeholder="10000"></div>'+
-          '<div class="field"><label>Unit</label><input class="input" id="newGoalUnit" placeholder="followers"></div>'+
-          '<div class="field"><label>Where you are now</label><input class="input" type="number" step="any" id="newGoalCurrent" placeholder="0"></div>'+
-        '</div>'+
-        '<div class="row" style="margin-top:12px;justify-content:flex-end;"><button class="btn btn-good" data-action="addGoal">+ Add goal</button></div>'+
-      '</div>' : '')+
-      (open.length ? '<div class="goal-grid">'+open.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : (formOpen ? '' : '<div class="empty">Nothing here yet. Add one for anything you track yourself.</div>'))+
+    '<div class="gl-sec">'+head('Your goals', open.length ? '<small class="gl-n">'+open.length+'</small>' : '')+
+      '<div class="goal-grid">'+open.map(function(g){ return goalCardHtml(g, false); }).join('')+
+        (open.length ? '' : '<button class="gl-add" data-action="openGoalSheet" data-id="long"><span>&#65291;</span>Something of your own to work toward</button>')+'</div>'+
     '</div>'+
-    (done.length ? '<div class="section"><button class="cc2-past-toggle" data-action="toggleForm" data-form="goalsDone">'+(ui.forms.goalsDone?'&#9662;':'&#9656;')+' Achieved ('+done.length+')</button>'+
-      (ui.forms.goalsDone ? '<div class="goal-grid" style="margin-top:10px;">'+done.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : '')+'</div>' : '');
+    (done.length ? '<div class="gl-sec"><button class="cc2-past-toggle" data-action="toggleForm" data-form="goalsDone">'+(ui.forms.goalsDone?'&#9662;':'&#9656;')+' Achieved ('+done.length+')</button>'+
+      (ui.forms.goalsDone ? '<div class="goal-grid" style="margin-top:10px;">'+done.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : '')+'</div>' : '')+
+  '</div>';
 }
 // ---- agenda: today's timeline ----
 function agendaItems(){
@@ -8453,7 +8614,7 @@ function renderMiniCalendarStrip(){
   return '<div class="mini-cal-strip" data-action="nav" data-view="calendar" title="Open Calendar">'+cells+'</div>';
 }
 function renderTodayFocusMode(p){
-  if(typeof lockedMinimal==='function' && lockedMinimal()) return renderLockedMinimal();
+  // (the minimal view lives on Focus only)
   const hour = new Date().getHours();
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
   const backlog = state.tasks.items.filter(function(t){ return t.status==='backlog'; }).slice(0,6);
@@ -8466,7 +8627,7 @@ function renderTodayFocusMode(p){
 
   return '<div class="locked-in-header">'+
     businessNameTagHtml()+
-    '<div class="locked-in-badge">&#128274; Locked In</div>'+'<div class="lv-corner">'+lockedViewBtnHtml()+'</div>'+
+    '<div class="locked-in-badge">&#128274; Locked In</div>'+
     '<div class="view-title" style="margin:0;">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
     (state.profile.bigClockOnToday ? (
       '<div id="liveClockBig" class="cal-big-clock" style="font-size:38px;margin-top:6px;"></div>'+
@@ -8483,7 +8644,6 @@ function renderToday(){
   if(state.focus.activeSession) return renderTodayFocusMode(p);
   if(isDayOff(todayStr())) return renderDayOffView();
   // the minimal view (M, or the button on the hero): clock, level, streak, LOCK IN — nothing else
-  if(typeof focusMinimalOn==='function' && focusMinimalOn() && !(state.modes.active && state.modes.active.type==='offtime')) return renderFocusMinimal();
   if(state.modes.active && state.modes.active.type==='offtime') return state.modes.active.sleep ? renderSleepView() : state.modes.active.morning ? renderMorningView() : renderOffTimeView();
   const hour = new Date().getHours();
   const greeting = hour<5 ? 'Still up' : hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
@@ -8551,7 +8711,6 @@ function renderTodayHero(greeting){
       '</button>'+
       '<div class="th-actions">'+
         '<button class="th-btn" data-action="toggleNextPicker" data-where="hero"><span class="th-btn-i">&#128204;</span>'+(next ? 'Change next' : 'Pick next')+'</button>'+
-        '<button class="th-btn th-btn-min" data-action="toggleFocusMinimal" title="Minimal view (M)"><span class="th-btn-i">&#9673;</span>Minimal</button>'+
         (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going: sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
         (evening ? '<button class="th-btn th-btn-night" data-action="openWindDown"><span class="th-btn-i">&#127769;</span>Wind down</button>' : '')+
       '</div>'+
@@ -8979,20 +9138,20 @@ function renderVideoIdeasTab(){
   return '<div class="ct">'+CONTENT_ROLES.map(function(r){
     const p = contentProgress(r[0]), mine = ideas.filter(function(t){ return contentRoleOf(t)===r[0]; });
     const hit = p.n && p.done >= p.n;
-    return '<div class="ct-lane'+(hit ? ' is-hit' : '')+'" style="--lc:'+r[2]+'" data-content-role="'+r[0]+'">'+
+    // (drag a video from one lane to the other to move it between business and personal)
+    return '<div class="ct-lane'+(hit ? ' is-hit' : '')+'" style="--lc:'+r[2]+'" data-content-role="'+r[0]+'" data-dropzone="role:'+r[0]+'">'+
       '<div class="ct-h">'+contentRingSvg(p, r[2])+
         '<div class="ct-hm"><div class="ct-t">'+r[1]+' content</div>'+
           '<div class="ct-s">'+(p.n ? '<b>'+p.done+'</b> of '+p.n+' '+p.label+(hit ? ' &middot; done &#10003;' : '') : r[3])+'</div>'+
           (p.n ? '<div class="ct-dots">'+Array.from({length:Math.min(p.n, 14)}, function(_, i){ return '<i class="'+(i < p.done ? 'on' : '')+'"></i>'; }).join('')+'</div>' : '')+
         '</div>'+
-        '<button class="ct-add" data-action="openAddContent" data-role="'+r[0]+'" title="Add '+r[1].toLowerCase()+' content">+</button>'+
       '</div>'+
-      '<div class="ct-list">'+(mine.map(videoIdeaCompactCard).join('') || '<div class="ct-empty">No '+r[1].toLowerCase()+' ideas yet: <button class="ct-link" data-action="openAddContent" data-role="'+r[0]+'">add one</button>.</div>')+'</div>'+
-      (p.list.length ? '<div class="ct-done"><span>Out '+p.label+'</span>'+p.list.slice(0, 6).map(function(t){ return '<em>&#10003; '+escapeHtml(t.title)+'</em>'; }).join('')+'</div>' : '')+
+      '<div class="ct-list">'+(mine.map(videoIdeaCompactCard).join('') || '<div class="ct-empty">No '+r[1].toLowerCase()+' ideas yet. Drop one here, or the + in the corner.</div>')+'</div>'+
+      (p.list.length ? '<div class="ct-done"><span>Out '+p.label+'</span>'+p.list.slice(0, 6).map(function(t){ return '<em draggable="true" data-task-id="'+t.id+'" title="Drag to the other side to move it">&#10003; '+escapeHtml(t.title)+'</em>'; }).join('')+'</div>' : '')+
     '</div>';
   }).join('')+'</div>';
 }
-ACTIONS.openAddContent = function(el){ ui.newContentRole = el && el.dataset.role==='business' ? 'business' : 'personal'; openAddVideoIdeaModal(); };
+ACTIONS.openAddContent = function(el){ openContentSheet(el && el.dataset.role); };
 ACTIONS.pickContentRole = function(el){ ui.newContentRole = el.dataset.role; document.querySelectorAll('#videoIdeaContent .ct-role, #videoIdeaEditContent .ct-role').forEach(function(b){ b.classList.toggle('active', b.dataset.role===ui.newContentRole); }); };
 ACTIONS.contentSwapRole = function(el, e, id){
   const t = state.tasks.items.find(function(x){ return x.id===id; }); if(!t) return;
@@ -9521,13 +9680,15 @@ function qualifyingSessions(){ return state.focus.sessions.filter(function(s){ r
 function deepWorkMinutesForQualifying(dateStr){
   return qualifyingSessions().filter(function(s){ return s.date===dateStr; }).reduce(function(a,s){ return a+s.minutes; },0);
 }
+// the first Focus page (Tasks → Overview): the only place the Minimal button (and M) lives
+function focusHomePage(){ return ui.view==='focus' && ui.focusTab!=='analytics' && (ui.focusTasksSubTab || 'overview')==='overview'; }
 function renderFocus(){
   const tab = ui.focusTab || 'tasks';
   // locked in, the Focus page has the same minimal view as Today (M, or the button top right)
   const locked = !!state.focus.activeSession;
   if(locked && typeof lockedMinimal==='function' && lockedMinimal()) return renderLockedMinimal();
   if(!locked && typeof focusMinimalOn==='function' && focusMinimalOn()) return renderFocusMinimal();
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus'+tip('Manage the work itself: what you\'re on now, what\'s next, the backlog and video ideas. Analytics shows where the time went.')+'</div></div>'+(typeof lockedViewBtnHtml==='function' ? '<div class="lv-corner is-focus">'+(locked ? lockedViewBtnHtml() : focusMinimalBtnHtml())+'</div>' : '')+'</div>'+
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus'+tip('Manage the work itself: what you\'re on now, what\'s next, the backlog and video ideas. Analytics shows where the time went.')+(typeof lockedViewBtnHtml==='function' && focusHomePage() ? '<span class="lv-corner is-focus">'+(locked ? lockedViewBtnHtml() : focusMinimalBtnHtml())+'</span>' : '')+'</div></div></div>'+
   '<div class="tabs tabs-with-tools">'+
     '<div class="tab '+(tab==='tasks'?'active':'')+'" data-action="focusMainTab" data-tab="tasks">Tasks</div>'+
     '<div class="tab '+(tab==='analytics'?'active':'')+'" data-action="focusMainTab" data-tab="analytics">Analytics</div>'+
@@ -11131,7 +11292,9 @@ async function pollAppActivity(){
   const idleLimit = Number(st.idleSeconds)||60;
   if(allSamples.length) lastRawSampleAt = Math.max(lastRawSampleAt, allSamples[allSamples.length-1].ts);
   const samples = allSamples.filter(function(s){ return s.idle==null || s.idle < idleLimit; });
-  if(!samples.length){ updateCurrentAppIndicator(); return; }
+  // (all idle: nothing new to count, but the stop checks still have to run, or a session you walked
+  // away from would never end)
+  if(!samples.length){ updateCurrentAppIndicator(); checkAwayFromSession(); checkAutoLockIn(); return; }
   const today = todayStr();
   const byDate = {};
   samples.forEach(function(s){ const d = todayStr(new Date(s.ts)); (byDate[d]=byDate[d]||[]).push(s); });
@@ -11290,10 +11453,16 @@ function checkAwayFromSession(){
   if(!s || s.onBreak || s.autoStarted) return;
   if(todayStr(new Date(s.startedAt))!==todayStr()) return;
   const from = sessionAwayFrom(s, state.appActivity.todayIntervals, now);
-  if(from==null) return;
-  endSessionForAway(Math.max(from, s.startedAt+60000), now);
+  if(from!=null){ endSessionForAway(Math.max(from, s.startedAt+60000), now); return; }
+  // still at the Mac but not working: on apps you've marked "not work" for the away time, the session
+  // stops where the work stopped. It can be added back. (Apps you haven't sorted yet don't stop it.)
+  const ivs = state.appActivity.todayIntervals, last = ivs[ivs.length-1];
+  if(!last || now - last.end > APP_ACTIVITY_GAP_MS) return;
+  if(activityCategory(last.app)!=='other') return;
+  const lw = Math.max(lastWorkEnd(ivs) || 0, s.startedAt);
+  if(now - lw >= awayLimitMs()) endSessionForAway(Math.max(lw, s.startedAt+60000), now, 'offwork', last.app);
 }
-function endSessionForAway(endAt, now){
+function endSessionForAway(endAt, now, why, app){
   const s = state.focus.activeSession; if(!s || endAt>=now) return;
   const copy = JSON.parse(JSON.stringify(s));
   if(ui.currentTaskId){ accumulateCurrentTaskTime(ui.currentTaskId, endAt); persist('tasks'); }
@@ -11302,7 +11471,9 @@ function endSessionForAway(endAt, now){
   state.focus.sessions.push({id:id, type:sessionType(s), date:todayStr(new Date(s.startedAt)), startedAt:s.startedAt, endedAt:endAt, minutes:minutes, completedTasks:arr(s.completedTasks), note:'', autoStopped:true, away:true, reviewed:false});
   state.focus.activeSession = null;
   state.focus.lastSessionEndedAt = endAt;
-  state.focus.awayStop = {sessionId:id, active:copy, endedAt:endAt, at:now, shown:false};
+  state.focus.awayStop = {sessionId:id, active:copy, endedAt:endAt, at:now, shown:false, why:why||'away', app:app||null};
+  // off work apps (you're right here): say so now, with the way to add it back
+  if(why==='offwork'){ state.focus.awayStop.shown = true; showToast('Session stopped: you’ve been on '+(app || 'other apps')+' since '+fmt12Hour(nowHM(new Date(endAt)))+'.', {icon:'&#9209;', actionLabel:'Add it back', actionAction:'restoreAwaySession', duration:20000}); }
   if(state.modes.active && state.modes.active.linkedFocus) endMode();
   persist('focus'); renderView();
 }
@@ -11807,17 +11978,23 @@ function renderBodyFuel(){
 function renderHealthScore(){
   if(typeof xpSummary!=='function') return '';
   const x = xpSummary(), h = x.attrs.HLT, body = h.body || {};
-  const bar = function(sx){ const v = sx.v==null ? 25 : sx.v; return '<div class="you-sub'+(sx.v==null ? ' is-empty' : '')+'" title="'+escapeHtml(sx.note)+'"><span>'+escapeHtml(sx.label)+'</span><i><u style="width:'+((v-25)/75*100).toFixed(1)+'%"></u></i><b>'+v+'</b></div><div class="hs-note">'+escapeHtml(sx.note)+'</div>'; };
+  // the score as a ring; your weight's ceiling is a notch on it (no words needed)
+  const R = 54, C = 2*Math.PI*R, f = (h.v-25)/75, cf = h.cap ? (h.cap-25)/75 : null;
+  const ang = cf==null ? 0 : cf*2*Math.PI - Math.PI/2, tx = 64 + Math.cos(ang)*R, ty = 64 + Math.sin(ang)*R;
+  const ring = '<svg class="hsc-ring" viewBox="0 0 128 128" width="150" height="150">'+
+    '<circle cx="64" cy="64" r="'+R+'" class="hsc-ring-t"/>'+
+    (cf!=null ? '<circle cx="64" cy="64" r="'+R+'" class="hsc-ring-cap" stroke-dasharray="'+(C*(1-cf)).toFixed(1)+' '+C.toFixed(1)+'" stroke-dashoffset="'+(-C*cf).toFixed(1)+'" transform="rotate(-90 64 64)"/>' : '')+
+    '<circle cx="64" cy="64" r="'+R+'" class="hsc-ring-f" stroke-dasharray="'+(C*Math.max(0.005, f)).toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 64 64)"/>'+
+    (cf!=null ? '<circle cx="'+tx.toFixed(1)+'" cy="'+ty.toFixed(1)+'" r="4.5" class="hsc-ring-n"/>' : '')+
+    '<text x="64" y="70" text-anchor="middle" class="hsc-ring-v">'+h.v+'</text><text x="64" y="88" text-anchor="middle" class="hsc-ring-k">HEALTH</text></svg>';
+  const tile = function(sx){ const v = sx.v==null ? 25 : sx.v; return '<div class="hsc-t'+(sx.v==null ? ' is-empty' : '')+'" title="'+escapeHtml(sx.note)+'"><b>'+v+'</b><span>'+escapeHtml(sx.label)+'</span><i><u style="width:'+((v-25)/75*100).toFixed(1)+'%"></u></i></div>'; };
   return '<div class="card hsc section" id="healthScore">'+
-    '<div class="hsc-l"><div class="hl-k">Your Health score</div>'+
-      '<div class="hsc-v"><b>'+h.v+'</b>'+(h.cap ? '<span class="hsc-cap'+(h.capped ? ' is-hit' : '')+'" title="At your weight the score tops out here. It rises as the weight comes down.">Ceiling '+h.cap+' at your weight</span>' : '')+'</div>'+
-      '<div class="hsc-subs">'+h.subs.map(bar).join('')+'</div>'+
-      '<div class="hsc-how">Training and diet over the last few weeks count most, the latest week heaviest. Your weight sets how high it can go. Ranks need this score.</div></div>'+
-    '<div class="hsc-r">'+
-      '<div class="hsc-box"><div class="hl-k">Weight for your height</div>'+(body.bmi ?
-        '<div class="you-bmi"><b>'+body.bmi.toFixed(1)+'</b><span>BMI &middot; '+body.cls+'</span></div><div class="you-bmi-scale">'+bmiScaleHtml(body)+'</div>' :
-        '<div class="you-note">Add your height in Settings &rarr; You and weigh in with the +, and your score counts your weight too.</div><button class="hl-link" data-action="goToProfileSettings">Add your height &#8594;</button>')+'</div>'+
-    '</div></div>';
+    '<div class="hsc-score">'+ring+(h.cap ? '<div class="hsc-max'+(h.capped ? ' is-hit' : '')+'" title="At your weight Health tops out here. It rises as the weight comes down.">max '+h.cap+'</div>' : '')+'</div>'+
+    '<div class="hsc-tiles">'+h.subs.map(tile).join('')+'</div>'+
+    '<div class="hsc-box">'+(body.bmi ?
+      '<div class="you-bmi"><b>'+body.bmi.toFixed(1)+'</b><span>BMI &middot; '+body.cls+'</span></div><div class="you-bmi-scale">'+bmiScaleHtml(body)+'</div>' :
+      '<button class="hl-link" data-action="goToProfileSettings">Add your height &#8594;</button>')+'</div>'+
+  '</div>';
 }
 // under it: today's food and your weigh-ins, small, and the meal library tucked away
 function renderHealthLists(){
@@ -12344,14 +12521,20 @@ document.addEventListener('keydown', function(e){
     else if(e.key==='Escape'){ e.preventDefault(); closeQuickJournalModal(); }
   }
 });
+function qjHoldSize(){ const c = document.getElementById('quickJournalContent'); if(c){ const r = c.getBoundingClientRect(); if(r.height) c.style.height = Math.round(r.height)+'px'; } }
+function qjScrollSnap(){ return [document.scrollingElement, document.querySelector('.main'), document.getElementById('viewRoot') && document.getElementById('viewRoot').parentElement].map(function(x){ return x ? [x, x.scrollTop] : null; }); }
+function qjScrollRestore(sc){ requestAnimationFrame(function(){ sc.forEach(function(p){ if(p && p[0].scrollTop!==p[1]) p[0].scrollTop = p[1]; }); }); }
 function saveQuickJournal(){
   const t = document.getElementById('quickJournalModalText');
   if(!t || !t.value.trim()){ if(t){ t.focus(); t.classList.remove('is-shake'); void t.offsetWidth; t.classList.add('is-shake'); } return; }
-  if(ui.qjCapsule){ if(!capsuleSaveFromModal()) return; ui.qjSaved = 'capsule'; renderQuickJournalModalInto(); setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; }, 1200); return; }
+  if(ui.qjCapsule){ qjHoldSize(); if(!capsuleSaveFromModal()) return; ui.qjSaved = 'capsule'; renderQuickJournalModalInto(); setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; }, 1200); return; }
+  // (the box keeps its size while it says "Saved", so nothing jumps; the page behind stays exactly where it was)
+  qjHoldSize();
+  const sc = qjScrollSnap();
   addJournalEntry('quickJournalModalText');
   ui.qjTitleDraft = '';
-  ui.qjSaved = true; renderQuickJournalModalInto();
-  setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; }, 900);
+  ui.qjSaved = true; renderQuickJournalModalInto(); qjScrollRestore(sc);
+  setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; qjBoxApply(); qjScrollRestore(sc); }, 900);
 }
 
 
@@ -12478,11 +12661,12 @@ const GOAL_TRACKERS = {
   workouts: {icon:'&#127947;&#65039;', label:'Workouts', unit:'workouts', src:'from Health → Workouts', periods:true, name:function(g){ return fmtGoalNum(g.target)+' workouts '+goalPeriodLabel(g); }},
   hours:    {icon:'&#9201;&#65039;', label:'Hours of deep work', unit:'h', src:'from your locked-in sessions', periods:true, name:function(g){ return fmtGoalNum(g.target)+'h of deep work '+goalPeriodLabel(g); }},
   streak:   {icon:'&#128293;', label:'Days in a row', unit:'days', src:'from your Today\'s Standard streak', name:function(g){ return fmtGoalNum(g.target)+'-day streak'; }},
+  followers:{icon:'&#128200;', label:'Followers', unit:'followers', src:'from your social numbers (Metricool, an import or Meta)', name:function(g){ return fmtGoalNum(g.target)+' followers'; }},
   clients:  {icon:'&#129309;', label:'Active clients', unit:'clients', src:'from Business → Clients', name:function(g){ return fmtGoalNum(g.target)+' active clients'; }},
   // your peak: real, locked-in work a day on average (the last two weeks) — never "done", always the bar
   avghours: {icon:'&#9201;&#65039;', label:'Average hours a day', unit:'h/day', src:'from your locked-in time, averaged over the last two weeks', ongoing:true, name:function(g){ return fmtGoalNum(g.target)+'h a day, on average'; }}
 };
-const GOAL_KINDS = ['mrr', 'weight', 'workouts', 'hours', 'avghours', 'streak', 'clients', 'custom'];
+const GOAL_KINDS = ['mrr', 'weight', 'followers', 'workouts', 'hours', 'avghours', 'streak', 'clients', 'custom'];
 function goalTracker(g){ return g && g.autoTrack ? GOAL_TRACKERS[g.autoTrack] || null : null; }
 function goalPeriodLabel(g){ return g.period==='week' ? 'a week' : g.period==='month' ? 'a month' : 'in total'; }
 function goalIsPeriodic(g){ const t = goalTracker(g); return !!(t && (t.ongoing || (t.periods && (g.period==='week' || g.period==='month')))); }
@@ -12515,6 +12699,7 @@ function goalLiveCurrentRaw(g){
     case 'clients': return arr(state.business.clients).filter(function(c){ return c.status==='active'; }).length;
     case 'avghours': return typeof avgWorkMinutes==='function' ? Math.round(avgWorkMinutes(14)/6)/10 : 0;
     case 'weight': return latestWeight();
+    case 'followers': return typeof xpFollowersNow==='function' ? xpFollowersNow() : null;
     case 'workouts': { const r = goalRange(g); return sumOverDays(r[0], r[1], function(d){ return workoutDay(d).n; }); }
     case 'hours': { const r = goalRange(g); const today = todayStr(); return Math.round(sumOverDays(r[0], r[1], function(d){ return d===today ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); })/6)/10; }
     default: return Number(g.current)||0;
@@ -12528,6 +12713,8 @@ function goalPct(g){
     if(cur==null || g.start==null || Number(g.start)===Number(g.target)) return cur!=null && goalReached(g) ? 100 : 0;
     return clamp((g.start-cur)/(g.start-g.target)*100, 0, 100);
   }
+  // a big one you set (followers, MRR, clients…): measured from where you were when you set it
+  if(g.master && g.start!=null && Number(g.target) > Number(g.start)) return cur==null ? 0 : clamp((cur-g.start)/(g.target-g.start)*100, 0, 100);
   return clamp(cur/g.target*100, 0, 100);
 }
 function goalReached(g){
@@ -12717,7 +12904,7 @@ function masterGoalDefs(){
   ];
 }
 // what reaching it pays (XP — see 32t): the big ones a lot, the weekly rings a little each week
-function masterXpTag(m){ if(typeof MASTER_XP==='undefined') return ''; const big = ['mrr', 'weight', 'streak'].indexOf(m.key)>=0; return '<span class="mg-xp" title="'+(big ? 'XP when you reach it (raise the bar and it pays again)' : 'XP for every week you hit it')+'">+'+(big ? MASTER_XP.milestone.toLocaleString()+' XP' : MASTER_XP.weekly+' XP a week')+'</span>'; }
+function masterXpTag(m){ if(typeof MASTER_XP==='undefined') return ''; const big = ['mrr', 'weight', 'streak'].indexOf(m.key)>=0, v = big && typeof masterXpNow==='function' ? masterXpNow(m) : 0; if(big && !v) return ''; return '<span class="mg-xp" title="'+(big ? 'XP when you reach it. The bigger the goal, the more it pays.' : 'XP for every week you hit it')+'">+'+(big ? v.toLocaleString()+' XP' : MASTER_XP.weekly+' XP a week')+'</span>'; }
 function masterPct(m){
   if(m.cur==null || !(m.target>0)) return 0;
   if(m.key==='weight'){
@@ -12746,16 +12933,16 @@ function masterTargetHtml(m){
   if(ui.editMaster===m.key){
     return '<span class="mg-edit"><input class="input mg-edit-in" id="mgEdit-'+m.key+'" type="number" step="any" value="'+(m.target!=null?m.target:'')+'" placeholder="target"><button class="btn btn-primary btn-sm" data-action="saveMasterTarget" data-id="'+m.key+'">Set</button></span>';
   }
-  return '<button class="mg-target" data-action="editMasterTarget" data-id="'+m.key+'" title="Change the target">'+(m.target>0 || (m.key==='weight' && m.target!=null) ? 'goal '+m.fmt(m.target)+m.suffix : 'set a goal')+' <span class="mg-pen">&#9998;</span></button>';
+  return '<button class="mg-target" data-action="editMasterTarget" data-id="'+m.key+'" title="Change the target">'+(m.target>0 || (m.key==='weight' && m.target!=null) ? 'of '+m.fmt(m.target)+m.suffix : 'set a goal')+'</button>';
 }
 // the money goal, front and center
 function masterHeroHtml(m){
   const pct = masterPct(m);
   return '<div class="mg-hero" style="--mg1:'+m.color+';--mg2:'+m.color2+';">'+
-    '<div class="mg-hero-top"><span class="mg-k">'+m.icon+' '+m.label+'</span>'+masterXpTag(m)+'<span style="flex:1"></span>'+masterTargetHtml(m)+'</div>'+
-    '<div class="mg-hero-num"><span class="mg-big">'+m.fmt(m.cur)+'</span><span class="mg-of">'+m.suffix+'</span><span class="mg-pct">'+Math.round(pct)+'%</span></div>'+
+    '<div class="mg-hero-top"><span class="mg-k">'+m.label+'</span></div>'+
+    '<div class="mg-hero-num"><span class="mg-big">'+m.fmt(m.cur)+'</span><span class="mg-of">'+m.suffix+'</span>'+masterTargetHtml(m)+'<span class="mg-pct">'+Math.round(pct)+'%</span></div>'+
     '<div class="mg-bar"><div class="mg-bar-fill" style="width:'+pct.toFixed(1)+'%"></div>'+[25,50,75].map(function(t){ return '<span class="mg-tick'+(pct>=t?' is-past':'')+'" style="left:'+t+'%"></span>'; }).join('')+'</div>'+
-    '<div class="mg-hero-foot"><span>'+escapeHtml(masterToGo(m))+'</span><span class="mg-src"'+(m.go?' data-action="'+m.go+'"':'')+'>'+escapeHtml(m.src)+(m.go?' &rarr;':'')+'</span></div>'+
+    '<div class="mg-hero-foot"><span>'+escapeHtml(masterToGo(m))+'</span>'+masterXpTag(m)+'</div>'+
   '</div>';
 }
 function masterRingHtml(m, compact){
@@ -12764,9 +12951,22 @@ function masterRingHtml(m, compact){
     '<div class="mg-ring">'+ringSvg(pct, m.color, m.color2, m.key+(compact?'c':''), compact ? 84 : 112)+
       '<div class="mg-ring-in"><span class="mg-ring-v">'+(m.cur==null ? '–' : m.fmt(m.cur))+'</span>'+(compact ? '' : '<span class="mg-ring-pct">'+(hit ? '&#10003;' : Math.round(pct)+'%')+'</span>')+'</div>'+
     '</div>'+
-    '<div class="mg-card-k">'+m.icon+' '+m.label+'</div>'+
+    '<div class="mg-card-k">'+(compact ? m.icon+' ' : '')+m.label+'</div>'+
     (compact ? '<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div>'
-      : masterTargetHtml(m)+masterXpTag(m)+'<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div><div class="mg-src"'+(m.go?' data-action="'+m.go+'"':'')+'>'+escapeHtml(m.src)+(m.go?' &rarr;':'')+'</div>')+
+      : masterTargetHtml(m)+'<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div>'+masterXpTag(m))+
+  '</div>';
+}
+// a big one you set yourself (followers, MRR, clients…): tracked live like the others, its own ring
+function userMasterRingHtml(g){
+  const t = goalTracker(g) || {icon:'&#127919;', unit:g.unit||''}, cur = goalLiveCurrent(g), pct = goalPct(g), hit = g.done || pct >= 100;
+  const f = function(n){ return n==null ? '–' : (g.autoTrack==='mrr' ? '$' : '')+fmtGoalNum(n)+(g.autoTrack==='avghours' ? 'h' : ''); };
+  const left = cur==null ? '' : g.autoTrack==='weight' ? fmtGoalNum(Math.abs(cur - g.target))+' lbs to go' : g.target - cur > 0 ? f(Math.round((g.target - cur)*10)/10)+' to go' : 'reached';
+  return '<div class="mg-card is-mine'+(hit ? ' is-hit' : '')+'" style="--mg1:#ffc56b;--mg2:#fff0c4;">'+
+    '<div class="mg-ring">'+ringSvg(pct, '#ffc56b', '#fff0c4', 'u'+g.id, 112)+'<div class="mg-ring-in"><span class="mg-ring-v">'+f(cur)+'</span><span class="mg-ring-pct">'+(hit ? '&#10003;' : Math.round(pct)+'%')+'</span></div></div>'+
+    '<div class="mg-card-k">'+escapeHtml(g.label)+'</div>'+
+    '<button class="mg-target" data-action="openGoalEditModal" data-id="'+g.id+'">of '+f(g.target)+(g.autoTrack==='followers' ? ' followers' : g.autoTrack==='weight' ? ' lbs' : '')+'</button>'+
+    '<div class="mg-card-sub">'+escapeHtml(left)+'</div>'+
+    '<span class="mg-xp">+'+goalXpOf(g).toLocaleString()+' XP</span>'+
   '</div>';
 }
 function masterGoalsHtml(compact){
@@ -12774,7 +12974,8 @@ function masterGoalsHtml(compact){
   // On Today it's one row of rings (the Business panel above already shows MRR big); the Goals
   // tab gets the full hero.
   if(compact) return '<div class="mg-wrap is-compact"><div class="mg-row mg-row-5">'+defs.map(function(m){ return masterRingHtml(m, true); }).join('')+'</div></div>';
-  return '<div class="mg-wrap">'+masterHeroHtml(defs[0])+'<div class="mg-row">'+defs.slice(1).map(function(m){ return masterRingHtml(m, false); }).join('')+'</div></div>';
+  const mine = arr(state.goals && state.goals.items).filter(function(g){ return g.master && !g.tier; });
+  return '<div class="mg-wrap">'+masterHeroHtml(defs[0])+'<div class="mg-row">'+defs.slice(1).map(function(m){ return masterRingHtml(m, false); }).join('')+mine.map(userMasterRingHtml).join('')+'</div></div>';
 }
 ACTIONS.editMasterTarget = function(el, e, id){ ui.editMaster = id; renderView(); setTimeout(function(){ const i = document.getElementById('mgEdit-'+id); if(i){ i.focus(); i.select(); } }, 30); };
 ACTIONS.saveMasterTarget = function(el, e, id){
@@ -14225,7 +14426,8 @@ function renderPersonalFinances(){
       '<button class="btn btn-good btn-sm" style="margin-top:8px;" data-action="addIncome">Add Income</button>'+
     '</div>' : '')+
     '<div class="task-list">'+(income.slice(0,12).map(incomeRow).join('') || '<div class="empty">No income logged. Add one above.</div>')+'</div></div>'+
-  '</div>';
+  '</div>'+
+  (typeof expensesHtml==='function' ? expensesHtml() : '');
 }
 function invoicePaid(inv){ return !!inv.attachmentData; }
 function clientInvoicedThisMonth(clientId){
@@ -14485,6 +14687,132 @@ function addIncome(){
   persist('finances'); renderView();
 }
 
+// ============ EXPENSES, AND YOUR BANK, LIVE ============
+// Personal → Finances gets Expenses: what went out this month, by kind, and every one of them. They come
+// in by themselves once your bank is connected (SimpleFIN Bridge: you connect your banks there, paste the
+// setup token here once, and the Operator app keeps the private access on this Mac, never in Operator's
+// data). You can add one by hand too. Money coming in stays under Income.
+const EXP_CATS = [
+  {id:'food', label:'Food', icon:'&#127828;', re:/restaurant|cafe|coffee|starbucks|dunkin|mcdonald|chipotle|burger|pizza|taco|wendy|subway|doordash|uber ?eats|grubhub|postmates|kitchen|grill|bar\b|deli|bakery|chick-fil|panera|sushi/i},
+  {id:'groceries', label:'Groceries', icon:'&#128722;', re:/grocery|whole foods|trader joe|kroger|safeway|aldi|publix|wegmans|costco|walmart|target|h-e-b|heb\b|market/i},
+  {id:'transport', label:'Transport', icon:'&#128663;', re:/uber|lyft|shell|chevron|exxon|mobil|bp\b|gas|fuel|parking|toll|transit|mta|metro|airline|delta|united|american air|southwest/i},
+  {id:'subs', label:'Subscriptions', icon:'&#128257;', re:/netflix|spotify|apple\.com|icloud|google|youtube|hulu|disney|amazon prime|adobe|notion|openai|anthropic|chatgpt|canva|gohighlevel|highlevel|zoom|slack|subscription|patreon/i},
+  {id:'bills', label:'Bills', icon:'&#128161;', re:/rent|mortgage|electric|utility|water|internet|comcast|xfinity|verizon|at&t|t-mobile|insurance|geico|progressive|state farm|loan|payment to/i},
+  {id:'shopping', label:'Shopping', icon:'&#128717;', re:/amazon|amzn|ebay|etsy|best buy|apple store|nike|zara|h&m|shop|store/i},
+  {id:'health', label:'Health', icon:'&#128170;', re:/gym|fitness|pharmacy|cvs|walgreens|doctor|dental|clinic|equinox|planet fitness/i},
+  {id:'other', label:'Other', icon:'&#128184;', re:null}
+];
+function expCat(id){ return EXP_CATS.find(function(c){ return c.id===id; }) || EXP_CATS[EXP_CATS.length-1]; }
+function expGuessCat(text){ const t = String(text||''); const c = EXP_CATS.find(function(c){ return c.re && c.re.test(t); }); return c ? c.id : 'other'; }
+function finBank(){ const f = state.finances; if(!f.bank || typeof f.bank!=='object') f.bank = {}; return f.bank; }
+function finExpenses(){ const f = state.finances; if(!Array.isArray(f.expenses)) f.expenses = []; return f.expenses; }
+// ---- the bank ----
+ACTIONS.finConnect = async function(){
+  const i = document.getElementById('finToken'), t = i ? i.value.trim() : '';
+  if(!t){ if(i) i.focus(); return; }
+  const b = finBank(); b.busy = true; b.err = null; renderView();
+  const r = await fetchWithin(WAKE_HELPER+'fin/claim?t='+hexUtf8(t), 30000);
+  let j = null; try{ j = r ? await r.json() : null; }catch(e){}
+  b.busy = false;
+  if(!r){ b.err = 'The Operator app isn’t answering. Open Operator from its icon and try again.'; renderView(); return; }
+  if(!r.ok || !j || !j.ok){ b.err = (j && j.error) || 'SimpleFIN didn’t take that token. Make a new one and paste it right away (each works once).'; renderView(); return; }
+  b.connected = true; b.lastSync = 0; persist('finances'); showToast('Your bank is connected. Pulling in the last 60 days…', {icon:'&#127974;'});
+  finSync(true);
+};
+ACTIONS.finSync = function(){ finSync(true); };
+ACTIONS.finDisconnect = async function(el){
+  if(!armed.has('findis')){ armed.add('findis'); el.textContent = 'Sure? Tap again'; setTimeout(function(){ armed.delete('findis'); }, 3000); return; }
+  armed.delete('findis');
+  await fetchWithin(WAKE_HELPER+'fin/forget', 6000);
+  const b = finBank(); b.connected = false; b.accounts = []; b.lastSync = 0; persist('finances'); renderView();
+};
+async function finSync(loud){
+  const b = finBank(); if(b.busy) return;
+  b.busy = true; if(loud) renderView();
+  // first time: 60 days back; after that, a week of overlap so late-posting charges are caught
+  const since = Math.floor((b.lastSync ? b.lastSync - 7*86400000 : Date.now() - 60*86400000)/1000);
+  const r = await fetchWithin(WAKE_HELPER+'fin/accounts?s='+since, 50000);
+  let j = null; try{ j = r ? await r.json() : null; }catch(e){}
+  b.busy = false;
+  if(!r || !r.ok || !j || !Array.isArray(j.accounts)){
+    if(r && r.status===401){ b.connected = false; }
+    b.err = !r ? 'The Operator app isn’t answering.' : r.status===401 ? 'Not connected.' : 'Couldn’t reach your bank just now ('+((j && (j.error || (arr(j.errors)[0]))) || r.status)+').';
+    persist('finances'); if(loud) renderView(); return;
+  }
+  b.err = arr(j.errors).length ? String(j.errors[0]) : null;
+  b.connected = true;
+  b.accounts = j.accounts.map(function(a){ return {id:a.id, name:a.name, org:(a.org && (a.org.name || a.org.domain)) || '', balance:Number(a.balance), at:Number(a['balance-date'])*1000 || Date.now()}; });
+  const ex = finExpenses(), have = {}; ex.forEach(function(e){ if(e.txId) have[e.txId] = e; });
+  let added = 0;
+  j.accounts.forEach(function(a){
+    arr(a.transactions).forEach(function(t){
+      const amt = Number(t.amount); if(!(amt < 0) || t.pending) return;
+      const id = a.id+':'+t.id; if(have[id]) return;
+      const name = String(t.payee || t.description || t.memo || 'Card purchase').replace(/\s+/g, ' ').trim().slice(0, 80);
+      const when = Number(t.transacted_at || t.posted) * 1000;
+      ex.push({id:uid(), txId:id, date:todayStr(new Date(when || Date.now())), amount:Math.round(-amt*100)/100, name:name, cat:expGuessCat(name+' '+(t.description||'')), src:'bank', account:a.name});
+      added++;
+    });
+  });
+  b.lastSync = Date.now();
+  persist('finances');
+  if(loud || added) renderView();
+  if(loud) showToast(added ? added+' new expense'+(added===1?'':'s')+' from your bank.' : 'Up to date with your bank.', {icon:'&#127974;'});
+}
+// on its own: when Finances opens (if it's been a few hours) and every few hours while the app is open
+afterRenderHooks.push(function(){
+  const b = state.finances && finBank(); if(!b || !b.connected || b.busy) return;
+  if(ui.view==='personal' && ui.personalTab==='finances' && Date.now() - (b.lastSync||0) > 3*3600000) finSync(false);
+});
+setInterval(function(){ const b = state && state.finances && finBank(); if(b && b.connected && !b.busy && Date.now() - (b.lastSync||0) > 6*3600000) finSync(false); }, 15*60000);
+// ---- by hand ----
+ACTIONS.expAdd = function(){
+  const v = function(id){ const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const name = v('expName'), amt = Number(v('expAmount'));
+  if(!name || !(amt > 0)){ const el = document.getElementById(!name ? 'expName' : 'expAmount'); if(el) el.focus(); return; }
+  finExpenses().push({id:uid(), date:v('expDate') || todayStr(), amount:Math.round(amt*100)/100, name:name.slice(0, 80), cat:v('expCat') || expGuessCat(name), src:'manual'});
+  ui.forms.expense = false; persist('finances'); playTick(); renderView();
+};
+ACTIONS.expCat = function(el, e, id){
+  const x = finExpenses().find(function(z){ return z.id===id; }); if(!x) return;
+  const i = EXP_CATS.findIndex(function(c){ return c.id===x.cat; });
+  x.cat = EXP_CATS[(i + 1) % EXP_CATS.length].id; persist('finances'); renderView();
+};
+ACTIONS.expDel = function(el, e, id){ state.finances.expenses = finExpenses().filter(function(z){ return z.id!==id; }); persist('finances'); renderView(); };
+// ---- the section ----
+function expensesHtml(){
+  const b = finBank(), ex = finExpenses(), mk = thisMonthKey();
+  const month = ex.filter(function(e){ return monthKeyOf(e.date)===mk; });
+  const total = month.reduce(function(a, e){ return a + e.amount; }, 0);
+  const last = ex.filter(function(e){ return monthKeyOf(e.date)===monthKeyOf(addDays(todayStr().slice(0, 8)+'01', -1)); }).reduce(function(a, e){ return a + e.amount; }, 0);
+  const by = {}; month.forEach(function(e){ by[e.cat] = (by[e.cat]||0) + e.amount; });
+  const cats = Object.keys(by).sort(function(a, c){ return by[c] - by[a]; }), top = Math.max(1, ...cats.map(function(c){ return by[c]; }));
+  const money2 = function(n){ return '$'+Math.round(n).toLocaleString(); };
+  const bankBit = b.connected
+    ? '<div class="ex-bank"><span class="ex-dot'+(b.err ? ' is-err' : '')+'"></span><span>'+(b.busy ? 'Syncing…' : b.lastSync ? 'Synced '+timeAgoShort(b.lastSync) : 'Connected')+(b.err ? ' · '+escapeHtml(b.err) : '')+'</span>'+
+        '<button class="ex-link" data-action="finSync"'+(b.busy ? ' disabled' : '')+'>Sync now</button><button class="ex-link is-quiet" data-action="finDisconnect">Disconnect</button></div>'+
+      (arr(b.accounts).length ? '<div class="ex-accts">'+b.accounts.map(function(a){ return '<span><b>'+money2(a.balance)+'</b><small>'+escapeHtml(a.name)+(a.org ? ' · '+escapeHtml(a.org) : '')+'</small></span>'; }).join('')+'</div>' : '')
+    : '<div class="ex-connect"><div class="ex-connect-t">&#127974; Connect your bank</div>'+
+        '<div class="ex-connect-s">Live balances and every card purchase, in by themselves. Through <b>SimpleFIN Bridge</b> (about $15 a year): connect your banks at bridge.simplefin.org, make a setup token, paste it here. The access stays on this Mac.</div>'+
+        '<div class="ex-connect-r"><input class="input" id="finToken" placeholder="Paste your SimpleFIN setup token"><button class="btn btn-primary" data-action="finConnect"'+(b.busy ? ' disabled' : '')+'>'+(b.busy ? 'Connecting…' : 'Connect')+'</button></div>'+
+        (b.err ? '<div class="ex-err">'+escapeHtml(b.err)+'</div>' : '')+'</div>';
+  return '<div class="section ex">'+
+    '<div class="section-title">Expenses<button class="btn btn-sm" data-action="toggleForm" data-form="expense">'+(ui.forms.expense ? 'Close' : '+ Add expense')+'</button></div>'+
+    (ui.forms.expense ? '<div class="card ex-form"><input class="input" id="expName" placeholder="What was it?"><input class="input" type="number" step="0.01" id="expAmount" placeholder="$">'+
+      '<select class="input" id="expCat"><option value="">Kind (auto)</option>'+EXP_CATS.map(function(c){ return '<option value="'+c.id+'">'+c.label+'</option>'; }).join('')+'</select>'+
+      '<input class="input" type="date" id="expDate" value="'+todayStr()+'"><button class="btn btn-good" data-action="expAdd">Add</button></div>' : '')+
+    '<div class="ex-top card">'+
+      '<div class="ex-total"><small>Spent this month</small><b>'+money2(total)+'</b>'+(last ? '<span class="'+(total > last ? 'is-up' : 'is-down')+'">'+money2(last)+' last month</span>' : '')+'</div>'+
+      '<div class="ex-cats">'+(cats.length ? cats.map(function(c){ const k = expCat(c); return '<div class="ex-c"><span>'+k.icon+' '+k.label+'</span><i><u style="width:'+(by[c]/top*100).toFixed(1)+'%"></u></i><b>'+money2(by[c])+'</b></div>'; }).join('') : '<div class="kpi-sub">Nothing yet this month.</div>')+'</div>'+
+    '</div>'+
+    bankBit+
+    (ex.length ? '<div class="ex-list">'+ex.slice().sort(function(a, c){ return c.date.localeCompare(a.date); }).slice(0, ui.expAll ? 300 : 12).map(function(e){ const k = expCat(e.cat);
+      return '<div class="ex-row"><button class="ex-ic" data-action="expCat" data-id="'+e.id+'" title="'+k.label+' (tap to change)">'+k.icon+'</button><span class="ex-n">'+escapeHtml(e.name)+'<small>'+fmtDateShort(e.date)+(e.src==='bank' ? ' · '+escapeHtml(e.account || 'bank') : '')+'</small></span><b>'+'$'+e.amount.toFixed(2)+'</b><button class="ex-x" data-action="expDel" data-id="'+e.id+'" title="Remove">&#10005;</button></div>'; }).join('')+
+      (ex.length > 12 ? '<button class="ex-more" data-action="expAllToggle">'+(ui.expAll ? 'Show fewer' : 'Show all '+ex.length)+'</button>' : '')+'</div>' : '')+
+  '</div>';
+}
+ACTIONS.expAllToggle = function(){ ui.expAll = !ui.expAll; renderView(); };
+function timeAgoShort(ts){ const m = Math.round((Date.now() - ts)/60000); return m < 1 ? 'just now' : m < 60 ? m+'m ago' : m < 1440 ? Math.round(m/60)+'h ago' : Math.round(m/1440)+'d ago'; }
 // ============ BUSINESS ============
 function nextStageLabel(stage){
   const idx = STAGE_ORDER.indexOf(stage);
@@ -20768,9 +21096,11 @@ function inboxSocialHtml(s){
   '</div>';
 }
 function renderInboxTab(){
-  if(!ghlCfg().connected) return '<div class="ib-empty" style="padding:40px;"><div style="font-size:34px;">&#128172;</div><div class="section-title" style="justify-content:center;">Your GoHighLevel inbox, here</div><div class="kpi-sub" style="margin:6px auto 14px;max-width:420px;">Connect GoHighLevel and your conversations, contacts and social stats live in this tab. Reply without leaving Operator.</div><button class="btn btn-primary" data-action="goToIntegrations">Connect GoHighLevel</button></div>';
+  // (chats and contacts come from GoHighLevel; your social numbers are above, from elsewhere)
+  if(!ghlCfg().connected) return '<div class="ib-quiet">&#128172; Chats and contacts show here when GoHighLevel is connected. <button class="ex-link" data-action="goToIntegrations">Connect it &#8594;</button></div>';
   const s = inboxState();
-  if(s.mode==='social') return renderSocialTab();
+  // (Stats: your numbers come from Metricool, an imported file or Meta, above. GoHighLevel's aren't used.)
+  if(s.mode==='social') return '';
   if(s[s.mode]==null && !s.loading[s.mode]) setTimeout(function(){ inboxLoad(s.mode); }, 0);
   if(!inboxTimer) inboxTick();
   return '<div class="ib">'+
@@ -20784,7 +21114,7 @@ function renderConversations(){
   const tab = function(id, label, n){ return '<button class="seg-tab'+(s.mode===id?' active':'')+'" data-action="inboxMode" data-id="'+id+'">'+label+(n ? ' <span class="ib-badge">'+n+'</span>' : '')+'</button>'; };
   const at = s.mode==='social' ? (ghlCfg().socialCache && ghlCfg().socialCache.at) : s.at;
   return '<div class="view-header"><div><div class="view-title">Social'+tip('Your followers and how your posts are doing, plus your GoHighLevel chats and contacts.')+'</div></div>'+
-      (on ? '<div class="row" style="gap:8px;align-items:center;">'+(at ? '<span class="kpi-sub">Updated '+ghlAgo(at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="'+(s.mode==='social' ? 'socialRefresh' : 'inboxRefresh')+'" title="Refresh">&#8635;</button></div>' : '')+'</div>'+
+      (on ? '<div class="row" style="gap:8px;align-items:center;">'+(at ? '<span class="kpi-sub">Updated '+ghlAgo(at)+'</span>' : '')+'<button class="btn btn-ghost btn-sm" data-action="'+(s.mode==='social' ? 'igRefresh' : 'inboxRefresh')+'" title="Refresh">&#8635;</button></div>' : '')+'</div>'+
     // Instagram, straight from Instagram, up top (on the Stats tab, or always when GoHighLevel isn't connected)
     ((!on || s.mode==='social') && typeof igSectionHtml==='function' ? igSectionHtml()+(typeof adsSectionHtml==='function' ? adsSectionHtml() : '') : '')+
     (on ? '<div class="seg-tabs cv-tabs">'+tab('social', '&#128202; Stats')+tab('chats', '&#128172; Chats', inboxUnread())+tab('contacts', '&#128101; Contacts')+'</div>' : '')+
@@ -20813,23 +21143,16 @@ ACTIONS.socialRefresh = function(){ inboxLoad('social'); };
 ACTIONS.goToSocial = function(){ ui.view = 'convos'; inboxState().mode = 'social'; renderView(); };
 ACTIONS.goToConvos = function(){ ui.view = 'convos'; renderView(); };
 function renderSocialPanel(){
-  if(!ghlOn()) return '';
-  socialMaybeRefresh(60*60000);
-  const d = socialData();
-  if(!d || d.empty) return '';
-  const br = d.breakdowns || {}, f = d.platformTotals && d.platformTotals.followers || {};
-  const eng = br.engagement || {}, engTotal = Object.keys(eng).reduce(function(a, k){ const x = eng[k]||{}; return a + (Number(x.likes)||0) + (Number(x.comments)||0) + (Number(x.shares)||0); }, 0);
-  const tile = function(k, v, ch, extra){ return '<div class="sp-tile"><div class="sp-k">'+k+'</div><div class="sp-v">'+Number(v||0).toLocaleString()+'</div>'+(ch!=null && isFinite(ch) ? '<div class="sc-ch '+(ch>=0?'is-up':'is-down')+'">'+(ch>=0?'&#9650; ':'&#9660; ')+Math.abs(ch).toFixed(ch%1?1:0)+'%</div>' : '')+(extra||'')+'</div>'; };
-  const followers = Object.keys(f).reduce(function(a, k){ return a + (Number(f[k].total)||0); }, 0);
+  // your social numbers at a glance (from Metricool, an imported file or Meta; not GoHighLevel)
+  const c = typeof igCfg==='function' ? igCfg() : null;
+  if(!c || !c.accounts.length || !c.cache || !c.cache.data) return '';
+  const since = addDays(todayStr(), -7); let fol = 0, posts = 0, likes = 0, comments = 0, reach = 0;
+  c.accounts.forEach(function(a){ const d = c.cache.data[a.id]; if(!d) return; fol += d.followers || 0; arr(d.posts).filter(function(p){ return p.date > since; }).forEach(function(p){ posts++; likes += p.likes||0; comments += p.comments||0; reach += p.reach||0; }); });
+  const tile = function(k, v){ return '<div class="sp-tile"><div class="sp-k">'+k+'</div><div class="sp-v">'+Number(v||0).toLocaleString()+'</div></div>'; };
   return '<div class="section social-panel"><div class="sp-head" data-action="goToSocial" title="Open Social">'+
-      '<span class="sp-icon">&#128241;</span><div class="sp-head-t"><div class="sp-title">Social</div><div class="sp-sub">'+(followers ? followers.toLocaleString()+' followers &middot; ' : '')+'last 7 days</div></div>'+
+      '<span class="sp-icon">&#128241;</span><div class="sp-head-t"><div class="sp-title">Social</div><div class="sp-sub">'+(fol ? fol.toLocaleString()+' followers &middot; ' : '')+'last 7 days</div></div>'+
       '<span class="sp-more">Open &rarr;</span></div>'+
-    '<div class="sp-row">'+
-      Object.keys(f).map(function(k){ return tile(escapeHtml(k[0].toUpperCase()+k.slice(1))+' followers', f[k].total, null, sparkline(f[k].series)); }).join('')+
-      (br.reach ? tile('Reach', br.reach.total, br.reach.totalChange) : '')+
-      (br.impressions ? tile('Impressions', br.impressions.total, br.impressions.totalChange) : '')+
-      (engTotal ? tile('Engagement', engTotal) : '')+
-    '</div></div>';
+    '<div class="sp-row">'+tile('Posts', posts)+tile('Likes', likes)+tile('Comments', comments)+(reach ? tile('Reach', reach) : '')+'</div></div>';
 }
 
 // ============ NOTE FOR THE MORNING ============
@@ -21920,7 +22243,7 @@ function goodDayReelHtml(){
   const items = goodDayItems(), n = items.length, i = (ui.gdIdx||0) % n;
   // (a list that rolls on to the next one every ten seconds — or move it by hand)
   const row = function(x){ return '<div class="br-th gd-i"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; };
-  return '<div class="gd-reel" data-n="'+n+'"><div class="gd-track" style="--i:'+i+'">'+items.concat(items.slice(0, 4)).map(row).join('')+'</div></div>'+
+  return '<div class="gd-reel" data-n="'+n+'"><div class="gd-track" style="--i:'+i+'">'+items.concat(items).map(row).join('')+'</div></div>'+
     '<div class="gd-nav"><button class="rl-arr" data-action="gdStep" data-id="-1" title="Back">&#8249;</button><div class="gd-dots">'+items.map(function(_, k){ return '<i class="'+(k===i ? 'on' : '')+'" data-action="gdGo" data-id="'+k+'"></i>'; }).join('')+'</div><button class="rl-arr" data-action="gdStep" data-id="1" title="Next">&#8250;</button></div>';
 }
 // move the reel to row i (wrapping both ways); a manual move holds the auto-roll for a bit
@@ -21928,7 +22251,10 @@ function gdShow(i, manual){
   const tr = document.querySelector('#wakeContent .gd-track'); if(!tr) return;
   const n = goodDayItems().length, from = ui.gdIdx||0;
   if(manual) ui.gdHold = Date.now();
+  // (the list is there twice, so however tall the panel is, the end never shows an empty gap; past the
+  // first copy it quietly jumps back to the same spot in the first)
   if(i < 0){ tr.classList.add('no-anim'); gdPlace(tr, n); void tr.offsetWidth; tr.classList.remove('no-anim'); i = n - 1; }
+  if(i > n){ const at = ((from % n) + n) % n; tr.classList.add('no-anim'); gdPlace(tr, at); void tr.offsetWidth; tr.classList.remove('no-anim'); i = at + 1; }
   ui.gdIdx = i;
   tr.classList.remove('no-anim'); gdPlace(tr, i);
   document.querySelectorAll('#wakeContent .gd-dots i').forEach(function(d, k){ d.classList.toggle('on', k===i % n); });
@@ -22297,7 +22623,7 @@ function wakeBriefHtml(){
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
       '<h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+
       '<div class="br-voice br-p br-a-fade" style="--d:'+(base-700)+'ms"><span class="br-voice-dot"></span><span id="brVoice"></span><span class="br-caret"></span></div>'+
-      (typeof opAskHtml==='function' ? '<div class="br-p br-opbar br-a-fade" style="--d:'+(base-500)+'ms">'+opAskHtml('brief')+'</div>' : '')+
+      (typeof opAskHtml==='function' ? '<div class="br-p br-opbar br-a-fade" style="--d:'+(base-500)+'ms">'+(song && opVoiceOn() && !ui.briefOpGo ? '<button class="br-opgo" data-action="briefOpGo" title="The music fades out and Op takes it from here"><span class="br-opgo-dot"></span>Talk to Op</button>' : '')+opAskHtml('brief')+'</div>' : '')+
       // no news column (headlines off) → two columns that fill the width instead of an empty third
       // wide screens get four columns (you · today · headlines · sports); otherwise sports sits under headlines
       '<div class="b4-grid'+(!colC.length && !colD.length ? ' cols-2' : !colD.length ? ' no-d' : !colC.length ? ' no-c' : '')+'"><div class="b4-col c-a">'+colA.join('')+'</div><div class="b4-col c-b">'+colB.join('')+'</div>'+(colC.length ? '<div class="b4-col c-c">'+colC.join('')+'</div>' : '')+(colD.length ? '<div class="b4-col c-d">'+colD.join('')+'</div>' : '')+'</div>'+
@@ -22571,8 +22897,9 @@ document.addEventListener('keydown', function(e){
   if(e.key!=='m' && e.key!=='M') return;
   if(e.metaKey || e.ctrlKey || e.altKey || (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) || (e.target && e.target.isContentEditable)) return;
   if(document.querySelector('.overlay:not(.hidden)')) return;
-  if(!state.focus.activeSession && (ui.view==='focus' || ui.view==='today')){ e.preventDefault(); ACTIONS.toggleFocusMinimal(); return; }
-  if(!state.focus.activeSession || (ui.view!=='today' && ui.view!=='focus')) return;
+  // the minimal view is a Focus page thing (the first page: Tasks → Overview)
+  if(ui.view!=='focus' || (typeof focusHomePage==='function' && !focusHomePage() && !lockedMinimal() && !focusMinimalOn())) return;
+  if(!state.focus.activeSession){ e.preventDefault(); ACTIONS.toggleFocusMinimal(); return; }
   e.preventDefault(); ACTIONS.toggleLockedView();
 });
 // ---- the Focus page's own minimal view (when you're not locked in): the clock, your level,
@@ -22713,8 +23040,8 @@ function renderLockedMinimal(){
 }
 // full-screen feel: the sidebar and floating buttons step aside in the minimal view
 afterRenderHooks.push(function(){
-  const on = !!(state.focus && state.focus.activeSession && (ui.view==='today' || ui.view==='focus') && lockedMinimal()) || !!(ui.view==='today' && document.querySelector('#viewRoot .rest-full'))
-    || !!((ui.view==='focus' || ui.view==='today') && !(state.focus && state.focus.activeSession) && focusMinimalOn() && document.querySelector('#viewRoot .np-home'));
+  const on = !!(state.focus && state.focus.activeSession && ui.view==='focus' && lockedMinimal()) || !!(ui.view==='today' && document.querySelector('#viewRoot .rest-full'))
+    || !!(ui.view==='focus' && !(state.focus && state.focus.activeSession) && focusMinimalOn() && document.querySelector('#viewRoot .np-home'));
   document.body.classList.toggle('np-on', on);
   const brk = !!(state.focus && state.focus.activeSession && state.focus.activeSession.onBreak);
   document.body.classList.toggle('is-on-break', brk);
@@ -23377,6 +23704,9 @@ function capSet(el, txt){
   if(txt && was && txt.indexOf(was)!==0){ el.classList.remove('cap-new'); void el.offsetWidth; el.classList.add('cap-new'); }
 }
 function opCaption(txt){
+  // whatever Op says always has captions: if the spot it was meant for isn't on screen (a page that
+  // changed, a panel that closed), the words go to the bubble
+  if(OV.cap && OV.cap!=='opBubText' && txt){ const t = document.getElementById(OV.cap); if(!t || !t.getClientRects().length) OV.cap = 'opBubText'; }
   if(OV.cap==='opBubText') opBubShow();
   const el = OV.cap ? document.getElementById(OV.cap) : null;
   capSet(el, txt);
@@ -23428,8 +23758,28 @@ function opTtsUrl(text){
 }
 // warm the next line up while this one is being said, so there's no gap between them
 function opPrefetch(text){ if(!opVoiceOn() || !opUseHelper()) return; try{ fetch(opTtsUrl(speakable(text))).catch(function(){}); }catch(e){} }
-function opStarted(tok, opts){ OV.pending = false; OV.speaking = true; if(opts.onstart) opts.onstart(); document.body.classList.add('op-speaking'); }
-function opFinished(tok, said){ OV.pending = false; if(tok===OV.token){ OV.speaking = false; OV.audio = null; opCaption(said); document.body.classList.remove('op-speaking'); } }
+function opStarted(tok, opts){ OV.pending = false; OV.speaking = true; if(opts.onstart) opts.onstart(); document.body.classList.add('op-speaking'); opDuck(true); }
+function opFinished(tok, said){ OV.pending = false; if(tok===OV.token){ OV.speaking = false; OV.audio = null; opCaption(said); document.body.classList.remove('op-speaking'); opDuck(false); } }
+// the music goes down while Op talks and comes back up after (a song playing on the page, or the
+// Music app through the Operator app); a moment's wait between lines so it doesn't pump up and down
+let opDuckT = null, opDucked = false;
+function opMusicPlaying(){ return !!((typeof wakeAudio!=='undefined' && wakeAudio) || (typeof wakeMusicApp!=='undefined' && wakeMusicApp) || (typeof wakeFinishing!=='undefined' && wakeFinishing)); }
+function opDuck(on){
+  clearTimeout(opDuckT);
+  if(on){
+    if(opDucked || !opMusicPlaying()) return;
+    opDucked = true;
+    if(wakeAudio){ clearInterval(wakeAudioRamp); wakeAudio._duckFrom = wakeAudio.volume; wakeAudio.volume = Math.min(wakeAudio.volume, 0.12); }
+    if(wakeMusicApp || wakeFinishing) helperFetch(WAKE_HELPER+'music/duck?on=1', 3000);
+    return;
+  }
+  opDuckT = setTimeout(function(){
+    if(!opDucked || OV.speaking || OV.pending) return;
+    opDucked = false;
+    if(wakeAudio && wakeAudio._duckFrom!=null){ const a = wakeAudio, to = a._duckFrom; a._duckFrom = null; const up = setInterval(function(){ if(wakeAudio!==a){ clearInterval(up); return; } a.volume = Math.min(to, a.volume + 0.05); if(a.volume >= to) clearInterval(up); }, 80); }
+    helperFetch(WAKE_HELPER+'music/duck?on=0', 3000);
+  }, 1200);
+}
 // say something; captions follow the words as they're spoken
 function opSay(text, opts){
   opts = opts || {};
@@ -23509,7 +23859,7 @@ function opSayBrowser(said, opts, tok, resolve){
   speechSynthesis.speak(u);
 }
 function opStop(){
-  OV.token++; OV.speaking = false; OV.pending = false;
+  OV.token++; OV.speaking = false; OV.pending = false; opDuck(false);
   if(OV.audio){ try{ OV.audio.pause(); }catch(e){} OV.audio = null; }
   try{ speechSynthesis.cancel(); }catch(e){}
   document.body.classList.remove('op-speaking');
@@ -23525,7 +23875,11 @@ function opUnlock(){
 function opBriefLine(lines, i){ const name = state.profile.name || ''; return (i===0 ? 'Good morning'+(name ? ', '+name : '')+'. ' : '')+lines[i].text; }
 function opBriefTick(lines, t){
   if(!opVoiceOn() || ui.briefSkipped || !lines.length) return false;
+  // with music still playing, Op stays quiet until you press Talk to Op (the words still type out)
+  if(opMusicPlaying() && OV.idx < 0 && !ui.briefOpGo) return false;
   if(OV.speaking || OV.pending) return true;
+  // let the page finish coming in before the first word
+  if(OV.idx < 0 && typeof briefBase==='function' && t < briefBase() + 1500) return true;
   let next = OV.idx + 1; if(next >= lines.length) return true;
   if(t < lines[next].at) return true;
   // fallen behind the page? say the newest line instead of every one in between
@@ -23539,7 +23893,23 @@ function opBriefTick(lines, t){
   }});
   return true;
 }
-function opBriefReset(){ OV.idx = -1; opStop(); }
+function opBriefReset(){ OV.idx = -1; ui.briefOpGo = false; opStop(); }
+// Talk to Op (Good morning): the music fades out, Op says good morning and asks what you want, then
+// listens. No long rundown unless you ask for one.
+ACTIONS.briefOpGo = async function(){
+  ui.briefOpGo = true; OV.idx = 999;
+  if(opMusicPlaying()){ stopWakeMedia(false); const m = wakeCfg().media; if(m && m.type==='music') musicApp('stop'); }
+  if(typeof renderWakeOverlayInto==='function') renderWakeOverlayInto();
+  const name = (state.profile.name || '').split(' ')[0];
+  let line = 'Good morning'+(name ? ', '+name : '')+'. What do you want to start with?';
+  if(typeof aiWrite==='function' && AI.hasKey===true){
+    const t = await Promise.race([aiWrite('It’s the morning and I just opened the app. Greet me by name in one short spoken sentence, then ask what I want to start with (my day, the business, the news, sports). Two sentences at most, no rundown.', {max:80}), new Promise(function(r){ setTimeout(r, 4000); })]);
+    if(t) line = t;
+  }
+  if(typeof AI!=='undefined'){ AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16); }
+  await opSay(line, {cap:'brVoice'});
+  if(typeof aiListen==='function' && overlayOpen('wakeOverlay')) aiListen('brVoice');
+};
 
 // ---- what you can ask for: short, spoken like a person would say it ----
 const pickOne = function(xs){ return xs[Math.floor(Math.random()*xs.length)]; };
@@ -23871,11 +24241,11 @@ function xpClaimedLevel(earned, mrr, health){
 function xpGoals(){
   const p = state.profile, seen = (p.xpGoalSeen && typeof p.xpGoalSeen==='object') ? p.xpGoalSeen : (p.xpGoalSeen = {});
   const now = Date.now(), done = arr(state.goals && state.goals.items).filter(function(g){ return g.done && !g.tier && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g)); });
-  const ids = {}; let changed = false, counted = 0, pending = 0;
-  done.forEach(function(g){ ids[g.id] = 1; if(!seen[g.id]){ seen[g.id] = now; changed = true; } if(now - seen[g.id] >= 86400000) counted++; else pending++; });
+  const ids = {}; let changed = false, counted = 0, pending = 0, xp = 0;
+  done.forEach(function(g){ ids[g.id] = 1; if(!seen[g.id]){ seen[g.id] = now; changed = true; } if(now - seen[g.id] >= 86400000){ counted++; xp += goalXpOf(g); } else pending++; });
   Object.keys(seen).forEach(function(id){ if(!ids[id]){ delete seen[id]; changed = true; } });
   if(changed) persist('profile');
-  return {counted:counted, pending:pending};
+  return {counted:counted, pending:pending, xp:xp};
 }
 // the week and the month (32u): goals hit (three a period at most), the habit beaten, and showing up to
 // check in and out — from the period the game began in
@@ -23889,7 +24259,7 @@ function xpCheckins(){
   arr(state.goals && state.goals.items).forEach(function(g){
     if(!g.tier || !g.done || (g.tier==='week' ? g.pk < ws0 : g.pk < ms0)) return;
     const k = g.tier+g.pk; per[k] = (per[k]||0) + 1; if(per[k] > CHECKIN_XP.maxGoals) return;
-    if(g.tier==='week') parts.weekGoals += CHECKIN_XP.weekGoal; else parts.monthGoals += CHECKIN_XP.monthGoal;
+    if(g.tier==='week') parts.weekGoals += goalXpOf(g); else parts.monthGoals += goalXpOf(g);
   });
   return {xp:parts.weekGoals + parts.monthGoals + parts.habits + parts.shows, parts:parts};
 }
@@ -23910,20 +24280,44 @@ function xpMaster(ctx){
   });
   if(changed) persist('profile');
   const hits = ['mrr', 'weight', 'streak'].reduce(function(a, k){ return a + arr(hit[k]).length; }, 0);
+  let bigXp = 0; ['mrr', 'weight', 'streak'].forEach(function(k){ arr(hit[k]).forEach(function(t, i){ bigXp += masterXpFor(k, i ? hit[k][i-1] : masterBase(k), t); }); });
   const wT = p.weeklyWorkoutTarget || 0, dT = (p.weeklyDeepHoursGoal || Math.round((state.standards.deepWorkTargetMinutes||180)*5/60))*60;
   let weeks = 0, w = weekKey(xpStart()); if(w < xpStart()) w = addDays(w, 7);
   for(; addDays(w, 6) < todayStr(); w = addDays(w, 7)){
     if(wT){ let n = 0; for(let i=0;i<7;i++) if(ctx.trained(addDays(w, i))) n++; if(n >= wT) weeks++; }
     if(dT){ let m = 0; for(let i=0;i<7;i++) m += ctx.deep(addDays(w, i)); if(m >= dT) weeks++; }
   }
-  return {xp:hits*MASTER_XP.milestone + weeks*MASTER_XP.weekly, hits:hits, weeks:weeks};
+  return {xp:bigXp + weeks*MASTER_XP.weekly, hits:hits, weeks:weeks, bigXp:bigXp};
+}
+// What a master goal is worth scales with how big it is (so it's consistent, and a big one levels you up
+// a lot): weight 150 XP a pound you set out to lose (or gain), MRR 600 XP for every $1k of growth, a streak
+// 100 XP a day. At least 2,000 (1,500 for a streak), at most 20,000. Raising the bar pays for the step.
+function masterBase(k){
+  if(k==='weight') return typeof firstWeight==='function' ? firstWeight() : null;
+  if(k==='mrr') return Number(state.profile.xpMrrBase || 0);
+  return 0;
+}
+function masterXpFor(k, from, t){
+  t = Number(t); from = from==null ? null : Number(from);
+  if(k==='weight') return Math.min(20000, Math.max(2000, Math.round(Math.abs((from==null ? t : from) - t)*150/50)*50));
+  if(k==='mrr') return Math.min(20000, Math.max(2000, Math.round((t - (from||0))/1000*600/50)*50));
+  return Math.min(15000, Math.max(1500, Math.round((t - (from||0))*100)));
+}
+// what the master goal on screen pays when you reach it
+function masterXpNow(m){
+  const hit = (state.profile.xpMasterHit || {})[m.key], list = arr(hit), last = list.length ? list[list.length-1] : masterBase(m.key);
+  return m.target > 0 ? masterXpFor(m.key, m.key==='weight' ? (list.length ? last : m.start) : last, m.target) : 0;
+}
+// a goal's own XP: Op sizes each one up when you add it (see 32y); until then, the usual amount
+function goalXpOf(g){
+  if(g && Number(g.xp) > 0) return Number(g.xp);
+  return g && g.tier==='week' ? CHECKIN_XP.weekGoal : g && g.tier==='month' ? CHECKIN_XP.monthGoal : XP_RATES.goal;
 }
 // followers you've gained since you started (GoHighLevel / Instagram, when connected)
 function xpFollowersNow(){
   try{
     let total = 0, any = false;
-    const sd = typeof socialData==='function' ? socialData() : null, f = sd && sd.platformTotals && sd.platformTotals.followers;
-    if(f) Object.keys(f).forEach(function(k){ const n = Number(f[k] && f[k].total); if(n){ total += n; any = true; } });
+    // (from Metricool, an imported file or Meta; GoHighLevel's numbers aren't used)
     if(typeof igFollowersTotal==='function'){ const ig = igFollowersTotal(); if(ig!=null){ total = Math.max(total, ig); any = true; } }
     return any ? total : null;
   }catch(e){ return null; }
@@ -24012,9 +24406,12 @@ function xpSummaryFresh(){
   const p = state.profile, mrr = xpMrr(), base = Number(p.xpMrrBase||0);
   const won = arr(state.business.clients).filter(function(c){ return arr(p.xpClientsBase).indexOf(c.id) < 0; }).length;
   const mrrXp = Math.round((mrr - base)/1000*XP_RATES.mrrPerK), clientXp = won*XP_RATES.client;
-  const goals = xpGoals(), ci = xpCheckins(), ms = xpMaster(ctx), goalXp = goals.counted*XP_RATES.goal + ci.xp + ms.xp;
+  const goals = xpGoals(), ci = xpCheckins(), ms = xpMaster(ctx), goalXp = goals.xp + ci.xp + ms.xp;
+  // (followers come from a new place since round 23: start counting gains from here, nothing taken away)
+  if(p.xpFollowersSrc!==2){ p.xpFollowersKept = Math.max(0, Number(p.xpFollowersKept||0) + (p.xpFollowersBase!=null && p.xpFollowersLast!=null ? Math.max(0, p.xpFollowersLast - p.xpFollowersBase) : 0)); p.xpFollowersBase = null; p.xpFollowersSrc = 2; persist('profile'); }
   const fNow = xpFollowersNow(); if(fNow!=null && p.xpFollowersBase==null){ p.xpFollowersBase = fNow; persist('profile'); }
-  const followers = fNow!=null && p.xpFollowersBase!=null ? fNow - p.xpFollowersBase : 0, followerXp = Math.round(followers*XP_RATES.follower);
+  if(fNow!=null && p.xpFollowersLast!==fNow){ p.xpFollowersLast = fNow; persist('profile'); }
+  const followers = (fNow!=null && p.xpFollowersBase!=null ? fNow - p.xpFollowersBase : 0) + Number(p.xpFollowersKept||0), followerXp = Math.round(followers*XP_RATES.follower);
   total = Math.max(0, total + mrrXp + clientXp + goalXp + followerXp);
   const todayItems = xpDay(today, ctx);
   const attrs = xpAttributes(ctx);
@@ -24030,17 +24427,17 @@ function xpSummaryFresh(){
   const next = RANKS[rank+1] || null;
   const needs = next ? [level < next.level ? 'level '+next.level : '', mrr < next.mrr ? money(next.mrr)+' MRR' : '', attrs.HLT.v < next.health ? 'Health '+next.health : ''].filter(Boolean) : [];
   return {total:total, week:week, today:todayItems, todayXp:todayItems.reduce(function(a, x){ return a + x.xp; }, 0),
-    mrr:mrr, mrrBase:base, mrrXp:mrrXp, clientXp:clientXp, won:won, start:start, goalXp:goalXp, goals:goals, ownGoalXp:goals.counted*XP_RATES.goal, checkins:ci, master:ms, followers:followers, followerXp:followerXp,
+    mrr:mrr, mrrBase:base, mrrXp:mrrXp, clientXp:clientXp, won:won, start:start, goalXp:goalXp, goals:goals, ownGoalXp:goals.xp, checkins:ci, master:ms, followers:followers, followerXp:followerXp,
     level:level, earned:earned, levelLo:lo, levelHi:hi, levelPct:pct, banked:Math.max(0, total - hi), canLevel:canLevel, blocked:blocked, gate:gate, maxed:maxed,
     rank:rank, next:next, needs:needs, attrs:attrs, ovr:attrs.OVR};
 }
 
 // ---- the four ratings (25 to 100) ----
 // Each thing is measured once, in one place. Nothing counts twice:
-// Every stat is one word, and every rating has three:
+// Every stat is one word:
 //   Business   MRR (to a million a year), Grind (hours of real work a day), Scaling (new clients
-//              every month)
-//   Personal   Content (business and personal videos together), Goals (weekly, monthly, master and
+//              every month), Content (business videos)
+//   Personal   Content (your own videos), Goals (weekly, monthly, master and
 //              your own), Finances (like a credit score: debt drags it down, paying it off brings it up,
 //              debt-free and earning tops it)
 //   Health     what you've been doing lately counts most: Training and Diet (the last few weeks, the
@@ -24174,11 +24571,11 @@ function xpAttributes(ctx){
     const want = tg && tg.n ? (tg.per==='day' ? tg.n*30 : tg.n*30/7) : 12;
     return {done:done, want:want};
   };
-  // one Content stat: business and personal videos together, against both targets together
-  const bc = contentF('business'), pc = contentF('personal'), cDone = bc.done + pc.done, cWant = bc.want + pc.want;
-  const content = {f:cDone/cWant, note:cDone+' videos out in 30 days ('+bc.done+' business, '+pc.done+' personal) · aim '+Math.round(cWant)};
+  // Content on both: business videos on Business, your own on Personal (both just called Content)
+  const bc = contentF('business'), pc = contentF('personal');
+  const cNote = function(c, kind){ return c.done+' '+kind+' video'+(c.done===1?'':'s')+' out in 30 days · aim '+Math.round(c.want); };
   const B = [sub('MRR', Math.sqrt(mrr/83400), money(mrr)+' a month · 100 at $83.4k (a million a year)'), sub('Grind', deep30/360, fmtHours(Math.round(deep30))+' of real work a day (30 days) · 6h a day is 100'),
-    sub('Scaling', growthF, months[0]+' · '+months[1]+' · '+months[2]+' new (last 3 months) · aim '+perMonth+' a month')];
+    sub('Scaling', growthF, months[0]+' · '+months[1]+' · '+months[2]+' new (last 3 months) · aim '+perMonth+' a month'), sub('Content', bc.done/bc.want, cNote(bc, 'business'))];
   // personal
   const own = arr(state.goals && state.goals.items).filter(function(g){ return !g.tier && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g)) && g.target > 0; });
   const ownF = typeof goalPct==='function' && own.length ? own.reduce(function(a, g){ return a + (g.done ? 100 : goalPct(g)); }, 0)/own.length/100 : null;
@@ -24188,7 +24585,7 @@ function xpAttributes(ctx){
   const goalsF = (wkF==null && moF==null && masterF==null && ownF==null) ? null : mix([[.35, wkF], [.3, moF], [.2, masterF], [.15, ownF]]);
   const pct = function(f){ return f==null ? 'none yet' : Math.round(f*100)+'%'; };
   const fin = financeRating();
-  const P = [sub('Content', content.f, content.note),
+  const P = [sub('Content', pc.done/pc.want, cNote(pc, 'personal')),
     sub('Goals', goalsF, goalsF==null ? 'Check in for the week to start' : 'weekly '+pct(wkF)+' · monthly '+pct(moF)+' · master '+pct(masterF)+(ownF!=null ? ' · yours '+pct(ownF) : '')),
     sub('Finances', fin.f, fin.note)];
   // health: what you've done lately counts most, and your weight sets the ceiling
@@ -24209,7 +24606,7 @@ function xpAttributes(ctx){
   if(cs2) D[2].trend = cs2.trend;
   const score = function(list, ws){ return rate99(mix(list.map(function(s, i){ return [ws[i], s.v==null ? null : (s.v-25)/75]; }))); };
   const out = {
-    BUS:{name:'Business', short:'BUS', v:score(B, [.45, .3, .25]), subs:B, color:'#ffc56b'},
+    BUS:{name:'Business', short:'BUS', v:score(B, [.4, .25, .2, .15]), subs:B, color:'#ffc56b'},
     PER:{name:'Personal', short:'PER', v:score(P, [.3, .4, .3]), subs:P, color:'#c3a6ff'},
     HLT:{name:'Health', short:'HLT', v:0, subs:H, color:'#7ef0c0', body:body},
     DIS:{name:'Discipline', short:'DIS', v:0, subs:D, color:'#8fd3ff', streak:streak}
@@ -24306,8 +24703,8 @@ function renderYouTab(){
   const x = xpSummary(), r = RANKS[x.rank];
   // every rating shows a number (25 is the floor, so nothing reads as blank; faded until there's data)
   const attrCard = function(k){ const a = x.attrs[k]; return '<div class="you-attr" style="--ac:'+a.color+'"><div class="you-attr-h"><b>'+a.v+'</b><span>'+a.name+'</span>'+
-      (k==='HLT' && a.cap ? '<em class="you-cap'+(a.capped ? ' is-hit' : '')+'" title="At your weight, Health tops out at '+a.cap+'. It rises as the weight comes down.">ceiling '+a.cap+'</em>' : '')+'</div>'+
-    a.subs.map(function(s){ const v = s.v==null ? 25 : s.v; return '<div class="you-sub'+(s.v==null ? ' is-empty' : '')+'"><span>'+escapeHtml(s.label)+(s.trend ? ' <i class="you-tr '+(s.trend > 0 ? 'is-up' : 'is-down')+'">'+(s.trend > 0 ? '&#9650;' : '&#9660;')+'</i>' : '')+'</span><i><u style="width:'+((v-25)/75*100).toFixed(1)+'%"></u></i><b>'+v+'</b><small>'+escapeHtml(s.note)+'</small></div>'; }).join('')+'</div>'; };
+      (k==='HLT' && a.cap ? '<em class="you-cap'+(a.capped ? ' is-hit' : '')+'" title="At your weight, Health tops out at '+a.cap+'. It rises as the weight comes down.">max '+a.cap+'</em>' : '')+'</div>'+
+    a.subs.map(function(s){ const v = s.v==null ? 25 : s.v; return '<div class="you-sub'+(s.v==null ? ' is-empty' : '')+'" title="'+escapeHtml(s.note)+'"><span>'+escapeHtml(s.label)+(s.trend ? ' <em class="you-tr '+(s.trend > 0 ? 'is-up' : 'is-down')+'" title="'+(s.trend > 0 ? 'Trending up' : 'Trending down')+'">'+(s.trend > 0 ? '&#9650;' : '&#9660;')+'</em>' : '')+'</span><i><u style="width:'+((v-25)/75*100).toFixed(1)+'%"></u></i><b>'+v+'</b></div>'; }).join('')+'</div>'; };
   return '<div class="you">'+
     '<div class="you-top">'+playerCardHtml('big')+
       '<div class="you-main">'+
@@ -24354,13 +24751,13 @@ function youRecentHtml(){
   const y = youRecent(), n = y.now, b = y.before;
   const tile = function(v, label, prev, fmt){
     const f = fmt || function(z){ return Math.round(z).toLocaleString(); }, dlt = v - prev;
-    return '<div class="yr-t"><b>'+f(v)+'</b><span>'+label+'</span><small class="'+(dlt > 0 ? 'is-up' : dlt < 0 ? 'is-down' : '')+'">'+(dlt > 0 ? '&#9650; ' : dlt < 0 ? '&#9660; ' : '')+(dlt ? f(Math.abs(dlt)) : 'same')+' vs the week before</small></div>';
+    return '<div class="yr-t"><b>'+f(v)+'</b><span>'+label+'</span><small class="'+(dlt > 0 ? 'is-up' : dlt < 0 ? 'is-down' : '')+'">'+(dlt > 0 ? '&#9650; ' : dlt < 0 ? '&#9660; ' : '')+(dlt ? f(Math.abs(dlt)) : '&middot;')+'</small></div>';
   };
   const hrs = function(z){ return (z/60).toFixed(1)+'h'; };
   const rc = function(v, label, when){ return '<div class="yr-r"><b>'+v+'</b><span>'+label+'</span>'+(when ? '<small>'+escapeHtml(when)+'</small>' : '')+'</div>'; };
   const r = y.rec;
   return '<div class="you-recent">'+
-    '<div class="yr-sec"><div class="you-sec">The last 7 days</div><div class="yr-tiles">'+
+    '<div class="yr-sec"><div class="you-sec">The last 7 days <span class="yr-vs">vs the 7 before</span></div><div class="yr-tiles">'+
       tile(n.xp, 'XP earned', b.xp)+tile(n.deep, 'deep work', b.deep, hrs)+tile(n.workouts, 'workouts', b.workouts)+tile(n.tasks, 'tasks done', b.tasks)+tile(n.reach, 'reach-outs', b.reach)+
       (n.gold || b.gold ? tile(n.gold, '8-hour days', b.gold) : '')+'</div></div>'+
     '<div class="yr-sec"><div class="you-sec">Your records</div><div class="yr-recs">'+
@@ -24513,9 +24910,9 @@ ACTIONS.openXpHow = function(){
       '<div class="xpg-card"><h3>Finishing tasks</h3><p>The more you get done in a day, the more each one pays: the first is worth 5, the tenth 23, and they top out at 25 each. Up to '+XP_RATES.taskMax+' a day count.</p>'+xpgBars(taskXp, taskXp.map(function(_, i){ return '#'+(i+1); }), '#ffc56b', 'Ten tasks in a day: '+xpTasks(10)+' XP. Twenty: '+xpTasks(20)+'. Each content video finished: +'+XP_RATES.video+'.')+'</div>'+
       '<div class="xpg-card"><h3>Workouts</h3><p>Your first five ever pay big to get you going. After that the first one each week pays the most, and every one still counts.</p>'+xpgBars([150, 70, 60, 50, 25], ['first 5', '1st a week', '2nd', '3rd', '4th+'], '#7ef0c0')+'</div>'+
       '<div class="xpg-card"><h3>Strong days in a row</h3><p>Every day in the last week you hit your deep work target ('+fmtHours(st.deepWorkTargetMinutes||180)+') makes the whole day pay more. Two strong days starts it.</p>'+xpgBars([0,1,2,3,4,5,6,7].map(function(n){ return n < 2 ? 1 : +(1 + .04*n).toFixed(2); }), [0,1,2,3,4,5,6,7].map(String), '#c3a6ff', 'Seven strong days: every XP that day is worth 1.28 times as much.')+'</div>'+
-      '<div class="xpg-card is-wide"><h3>Goals: the week, the month, the big ones</h3><p>Check in at the start of the week and the month (the Calendar asks), tick the goals off as you go, then check out at the end. A weekly goal is a small push, a monthly goal is a real chunk, beating the habit you picked for the month is worth as much as a monthly goal, and a master goal is a level on its own.</p>'+
-        xpgBars([CHECKIN_XP.weekGoal, CHECKIN_XP.monthGoal, CHECKIN_XP.habit, XP_RATES.goal, MASTER_XP.milestone], ['weekly goal', 'monthly goal', 'habit beaten', 'your own goal', 'master goal'], '#7ef0c0',
-          'Up to three weekly and three monthly goals pay each time. Checking in and out pays +'+CHECKIN_XP.weekIn+' and +'+CHECKIN_XP.weekOut+' a week, +'+CHECKIN_XP.monthIn+' and +'+CHECKIN_XP.monthOut+' a month. Every finished week you hit a weekly ring (workouts or deep work) pays +'+MASTER_XP.weekly+'. Master goals (MRR, weight, streak) pay again when you raise the bar.')+'</div>'+
+      '<div class="xpg-card is-wide"><h3>Goals: the week, the month, the big ones</h3><p>Check in at the start of the week and the month (the Calendar asks), tick the goals off as you go, then check out at the end. Every goal is worth what it takes: when you add one, Op sizes it up and sets its XP (a weekly goal 75 to 300, a monthly one 250 to 1,000, your own long-term goals 200 to 10,000). Master goals scale with how big they are: 150 XP for every pound you set out to lose, 600 for every $1k of MRR growth, 100 for every day of a streak. Losing 50 pounds is 7,500 XP.</p>'+
+        xpgBars([CHECKIN_XP.weekGoal, CHECKIN_XP.monthGoal, CHECKIN_XP.habit, masterXpFor('mrr', 0, 10000), masterXpFor('weight', 50, 0)], ['weekly goal', 'monthly goal', 'habit beaten', '$10k MRR more', 'lose 50 lb'], '#7ef0c0',
+          'Typical values. Up to three weekly and three monthly goals pay each time. Checking in and out pays +'+CHECKIN_XP.weekIn+' and +'+CHECKIN_XP.weekOut+' a week, +'+CHECKIN_XP.monthIn+' and +'+CHECKIN_XP.monthOut+' a month. Every finished week you hit a weekly ring (workouts or deep work) pays +'+MASTER_XP.weekly+'. Master goals (MRR, weight, streak) pay again when you raise the bar.')+'</div>'+
       '<div class="xpg-card is-wide"><h3>The business</h3><div class="xpg-jumps">'+
         [['A client won', '+'+XP_RATES.client.toLocaleString()], ['Each $1k of MRR', '+'+XP_RATES.mrrPerK], ['Each follower gained', '+'+XP_RATES.follower], ['Reaching out, a day', '+'+XP_RATES.outreach+' to +'+(XP_RATES.outreach + XP_RATES.outreachEach*(XP_RATES.outreachMax-1))]].map(function(j){ return '<div><b>'+j[1]+'</b><span>'+j[0]+'</span></div>'; }).join('')+
       '</div><p class="xpg-note">MRR XP counts from where you started and comes back off if MRR drops. Reaching out is every touch you log on a client or a lead: the &#128075; button, Text, Email or Call from their card, or a meeting on the calendar linked to them. The first one in a day pays '+XP_RATES.outreach+' and each one after pays '+XP_RATES.outreachEach+' more, up to '+XP_RATES.outreachMax+' a day.</p></div>'+
@@ -24523,8 +24920,9 @@ ACTIONS.openXpHow = function(){
     '</div>'+
     '<div class="xpg-sec">Your ratings, 25 to 100 (100 is you at your best). Each thing counts in one place only.</div><div class="xph-rates">'+
       rate('Business', '#ffc56b', [['MRR', 'what clients pay you a month. 100 is a million a year.'], ['Grind', 'real, locked-in work a day over the last 30 days. Six hours a day, every day, is 100.'],
-        ['Scaling', 'new clients each month against your number ('+(st.newClientsPerMonth||2)+' a month, set in Settings, Goals & Standards). Each of the last three months counts on its own, so it only hits 100 when you land them every month.']])+
-      rate('Personal', '#c3a6ff', [['Content', 'every video you put out, business and personal together, against your targets for both.'], ['Goals', 'the weekly and monthly goals you hit, how close your master goals are, and your own goals.'], ['Finances', 'like a credit score. Debt keeps it low, paying it down every month brings it up, and debt-free while earning tops it out.']])+
+        ['Scaling', 'new clients each month against your number ('+(st.newClientsPerMonth||2)+' a month, set in Settings, Goals & Standards). Each of the last three months counts on its own, so it only hits 100 when you land them every month.'],
+        ['Content', 'business videos out against your business target.']])+
+      rate('Personal', '#c3a6ff', [['Content', 'your own videos out against your personal target.'], ['Goals', 'the weekly and monthly goals you hit, how close your master goals are, and your own goals.'], ['Finances', 'like a credit score. Debt keeps it low, paying it down every month brings it up, and debt-free while earning tops it out.']])+
       rate('Health', '#7ef0c0', [['Training', 'workouts against your number a week over the last four weeks, the latest week counting most. A first good week back moves it right away.'], ['Diet', 'days you ate within your calorie target over the last two weeks. Logging counts too: a day you never logged counts for nothing.'],
         ['Weight', 'your BMI for your height. It also sets a ceiling on the whole score: carrying a lot of extra weight, Health tops out around 60 even with perfect training and diet, and the ceiling lifts as the weight comes down.']])+
       rate('Discipline', '#8fd3ff', [['Integrity', 'days in the last two weeks you kept your whole standard: the work, the training and your own standards. It is also your streak.'], ['Reliability', 'things with a deadline, done by the deadline (last 30 days).'],
@@ -24547,13 +24945,13 @@ function xpLedger(){
     arr(state.goals && state.goals.items).forEach(function(g){
       if(!g.tier || !g.done || (g.tier==='week' ? g.pk < ws0 : g.pk < ms0)) return;
       const kk = g.tier+g.pk; per[kk] = (per[kk]||0) + 1; if(per[kk] > CHECKIN_XP.maxGoals) return;
-      out.push({d:g.doneAt || g.pk, why:(g.tier==='week' ? 'Weekly goal: ' : 'Monthly goal: ')+g.label, xp:g.tier==='week' ? CHECKIN_XP.weekGoal : CHECKIN_XP.monthGoal, k:'goal'});
+      out.push({d:g.doneAt || g.pk, why:(g.tier==='week' ? 'Weekly goal: ' : 'Monthly goal: ')+g.label, xp:goalXpOf(g), k:'goal'});
     });
   }
   const seen = p.xpGoalSeen || {};
-  arr(state.goals && state.goals.items).forEach(function(g){ if(g.done && !g.tier && seen[g.id] && Date.now() - seen[g.id] >= 86400000 && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g))) out.push({d:g.doneAt || todayStr(new Date(seen[g.id])), why:'Your goal: '+(g.label || g.name || 'a goal'), xp:XP_RATES.goal, k:'goal'}); });
+  arr(state.goals && state.goals.items).forEach(function(g){ if(g.done && !g.tier && seen[g.id] && Date.now() - seen[g.id] >= 86400000 && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g))) out.push({d:g.doneAt || todayStr(new Date(seen[g.id])), why:'Your goal: '+(g.label || g.name || 'a goal'), xp:goalXpOf(g), k:'goal'}); });
   const hit = p.xpMasterHit || {};
-  ['mrr', 'weight', 'streak'].forEach(function(key){ arr(hit[key]).forEach(function(t){ ongoing.push({why:'Master goal reached: '+(key==='mrr' ? money(t)+' MRR' : key==='weight' ? t+' '+(p.weightUnit==='kg' ? 'kg' : 'lb') : t+'-day streak'), xp:MASTER_XP.milestone}); }); });
+  ['mrr', 'weight', 'streak'].forEach(function(key){ arr(hit[key]).forEach(function(t, i){ ongoing.push({why:'Master goal reached: '+(key==='mrr' ? money(t)+' MRR' : key==='weight' ? t+' '+(p.weightUnit==='kg' ? 'kg' : 'lb') : t+'-day streak'), xp:masterXpFor(key, i ? hit[key][i-1] : masterBase(key), t)}); }); });
   if(x.master && x.master.weeks) ongoing.push({why:x.master.weeks+' week'+(x.master.weeks===1?'':'s')+' you hit a weekly ring', xp:x.master.weeks*MASTER_XP.weekly});
   if(x.mrrXp) ongoing.push({why:'MRR: '+money(x.mrrBase)+' when you started, '+money(x.mrr)+' now', xp:x.mrrXp});
   if(x.followerXp) ongoing.push({why:x.followers.toLocaleString()+' followers gained', xp:x.followerXp});
@@ -24855,7 +25253,7 @@ function tierGoalRowHtml(g){
   const delArmed = armed.has('tgdel:'+g.id);
   return '<div class="tg-row'+(g.done ? ' is-done' : '')+(g.missed ? ' is-missed' : '')+'">'+
     '<button class="tg-hit" data-action="tierGoalToggle" data-id="'+g.id+'"'+(locked ? ' title="Checked out: on the record"' : '')+'><span class="tg-box">'+(g.done ? '&#10003;' : g.missed ? '&#10005;' : '')+'</span><span class="tg-l">'+escapeHtml(g.label)+'</span>'+
-    '<span class="tg-xp">+'+(g.tier==='month' ? CHECKIN_XP.monthGoal : CHECKIN_XP.weekGoal)+'</span></button>'+
+    '<span class="tg-xp'+(g.xpPending ? ' is-sizing' : '')+'"'+(g.xpWhy ? ' title="'+escapeHtml(g.xpWhy)+'"' : '')+'>+'+goalXpOf(g)+'</span></button>'+
     '<span class="tg-acts"><button class="tg-a" data-action="tierGoalRename" data-id="'+g.id+'" title="Rename">&#9998;</button><button class="tg-a'+(delArmed ? ' is-armed' : '')+'" data-action="tierGoalDelete" data-id="'+g.id+'" title="'+(delArmed ? 'Tap again to delete' : 'Delete')+'">'+(delArmed ? 'Delete?' : '&#10005;')+'</button></span></div>';
 }
 function tierCardHtml(kind, opts){
@@ -24868,7 +25266,8 @@ function tierCardHtml(kind, opts){
       '<span style="flex:1"></span>'+(due ? '<button class="tg-out" data-action="openCheckout" data-id="'+due.kind+':'+due.key+'">Check out &#8594;</button>' : '<button class="tg-edit" data-action="openIntent" data-id="'+kind+'" title="'+(checkedIn(kind, key) ? 'Edit your check-in' : 'Check in')+'">'+(checkedIn(kind, key) ? '&#9998;' : 'Check in &#8594;')+'</button>')+'</div>'+
     (sub ? '<div class="tg-sub">'+escapeHtml(sub)+'</div>' : '')+
     (gs.length ? '<div class="tg-list">'+gs.map(tierGoalRowHtml).join('')+'</div>' : '<div class="tg-empty">'+(kind==='month' ? 'No goals for the month yet.' : 'No goals for the week yet.')+'</div>')+
-    (opts.add && gs.length < 5 && !checkedOut(kind, key) ? '<div class="tg-add"><input class="input" id="tierAdd-'+kind+'" maxlength="140" placeholder="+ Add a '+(kind==='month' ? 'monthly' : 'weekly')+' goal"><button class="btn btn-sm" data-action="tierGoalAdd" data-id="'+kind+'">Add</button></div>' : '')+
+    (opts.add==='sheet' ? (checkedOut(kind, key) ? '<div class="tg-addrow"><button class="tg-addbtn" data-action="tierReopen" data-id="'+kind+'">&#8634; Reopen the '+(kind==='month' ? 'month' : 'week')+'</button></div>' : gs.length < 5 ? '<div class="tg-addrow"><button class="tg-addbtn" data-action="openGoalSheet" data-id="'+kind+'" title="Add a '+(kind==='month' ? 'monthly' : 'weekly')+' goal">&#65291;</button></div>' : '') :
+     opts.add && gs.length < 5 && !checkedOut(kind, key) ? '<div class="tg-add"><input class="input" id="tierAdd-'+kind+'" maxlength="140" placeholder="+ Add a '+(kind==='month' ? 'monthly' : 'weekly')+' goal"><button class="btn btn-sm" data-action="tierGoalAdd" data-id="'+kind+'">Add</button></div>' : '')+
   '</div>';
 }
 // the Calendar: the week and the month, side by side, tick right there
@@ -24976,6 +25375,8 @@ async function igFindAccounts(){
 }
 // everything for one account: followers, and the last 30 posts with likes, comments and reach
 async function igLoadAccount(acc){
+  if(socialSrc(acc)==='metricool') return mcLoadAccount(acc);
+  if(socialSrc(acc)==='csv'){ const d = igCfg().csvData && igCfg().csvData[acc.id]; if(!d) throw new Error('that import is gone; import the file again'); return d; }
   const info = await igApi('/'+acc.id+'?fields=username,followers_count,media_count,profile_picture_url');
   const media = await igApi('/'+acc.id+'/media?fields=id,caption,media_type,media_product_type,timestamp,like_count,comments_count,permalink,thumbnail_url,media_url&limit=30');
   const posts = (media.data || []).map(function(m){ return {id:m.id, cap:String(m.caption||'').slice(0, 140), type:m.media_product_type || m.media_type, at:m.timestamp, date:m.timestamp ? ds2(new Date(m.timestamp)) : '', likes:Number(m.like_count)||0, comments:Number(m.comments_count)||0, link:m.permalink, thumb:m.thumbnail_url || (m.media_type!=='VIDEO' ? m.media_url : '')}; });
@@ -25120,9 +25521,13 @@ ACTIONS.igRefresh = function(){ igRefresh(); };
 ACTIONS.igConnect = function(){ ui.view = 'settings'; ui.settingsTab = 'integrations'; renderView(); };
 
 // ---- the Social page: Instagram up top ----
-function igSectionHtml(){
+// (what's connected sits under the numbers: Metricool, an imported file, or Meta)
+function igSectionHtml(){ return igSectionInner()+(igOn() && typeof socialSourcesHtml==='function' ? socialSourcesHtml() : ''); }
+function igSectionInner(){
   const c = igCfg();
-  if(!igOn()) return '<div class="ig-connect"><div class="ig-connect-i">&#128247;</div><div><b>Connect Instagram &amp; Meta Ads</b><span>Followers, every post’s likes, comments and reach, and what your ads spent and brought in: one token from Meta Business Suite, read-only.</span></div><button class="btn btn-primary btn-sm" data-action="igConnect">Connect</button></div>';
+  if(!igOn()) return socialConnectHtml();
+  if(false) return '<div class="ig-connect"><div class="ig-connect-i">&#128247;</div><div><b>Your social numbers, without touching Meta</b><span>Easiest and safest: connect Instagram, Facebook, TikTok or YouTube inside GoHighLevel’s Social Planner. Operator reads followers, reach and engagement through GoHighLevel (it holds the approved Meta connection), so there’s no developer app and nothing for Meta to flag. Or, if you want every post and your ad spend, connect directly with a read-only token.</span></div>'+
+    (typeof ghlOn==='function' && ghlOn() ? '<button class="btn btn-primary btn-sm" data-action="goToSocial">Open Social</button>' : '')+'<button class="btn btn-ghost btn-sm" data-action="igConnect">Connect directly</button></div>';
   igMaybeRefresh();
   if(!c.cache) return '<div class="ig-sec"><div class="gp-loading">'+(ui.igErr ? '&#9888; '+escapeHtml(ui.igErr)+' <button class="btn btn-ghost btn-sm" data-action="igRefresh">Try again</button>' : 'Loading your Instagram…')+'</div></div>';
   const since30 = addDays(todayStr(), -30), today = todayStr();
@@ -25136,13 +25541,167 @@ function igSectionHtml(){
     const top = d.posts.slice(0, 30).sort(function(x, y){ return (y.likes + y.comments*3) - (x.likes + x.comments*3); }).slice(0, 6);
     const stat = function(k, v){ return '<div class="ig-st"><b>'+(v==null ? '–' : Number(v).toLocaleString())+'</b><span>'+k+'</span></div>'; };
     return '<div class="ig-acct"><div class="ig-h">'+(d.pic ? '<img class="ig-pic" src="'+escapeHtml(d.pic)+'" alt="">' : '<span class="ig-pic"></span>')+
-        '<div><b>@'+escapeHtml(d.username)+'</b><span class="ig-role is-'+a.role+'">'+(a.role==='business' ? 'Business' : 'Personal')+'</span></div></div>'+
+        '<div><b>'+(/\s/.test(d.username||'') ? '' : '@')+escapeHtml(d.username)+'</b><span class="ig-role is-'+a.role+'">'+(a.role==='business' ? 'Business' : 'Personal')+'</span></div></div>'+
       '<div class="ig-stats">'+stat('followers', d.followers)+stat('posts · 30 days', recent.length)+stat('avg likes', avg('likes'))+stat('avg comments', avg('comments'))+stat('avg reach', avg('reach'))+'</div>'+
       '<div class="ig-strip-k">Posting, last 30 days</div><div class="ig-strip">'+strip.join('')+'</div>'+
       (top.length ? '<div class="ig-top">'+top.map(function(p){ return '<a class="ig-post" href="'+escapeHtml(p.link||'#')+'" target="_blank" rel="noopener" title="'+escapeHtml(p.cap)+'">'+(p.thumb ? '<img src="'+escapeHtml(p.thumb)+'" alt="" loading="lazy">' : '<span class="ig-noimg">'+escapeHtml(String(p.type||'Post').toLowerCase())+'</span>')+'<span class="ig-post-s">&#9829; '+p.likes.toLocaleString()+' &middot; &#128172; '+p.comments.toLocaleString()+'</span></a>'; }).join('')+'</div>' : '')+
     '</div>';
   }).join('')+'<div class="ig-foot">Updated '+(typeof ghlAgo==='function' ? ghlAgo(c.cache.at) : new Date(c.cache.at).toLocaleTimeString())+' <button class="btn btn-ghost btn-sm" data-action="igRefresh">'+(ui.igLoading ? 'Refreshing…' : '&#8635; Refresh')+'</button></div></div>';
 }
+// ============ SOCIAL INSIGHTS, WITHOUT META OR GOHIGHLEVEL ============
+// Two ways in, neither touches your Meta account:
+//  • Metricool: connect Instagram (and the rest) inside Metricool, which has its own approved Meta
+//    connection. Operator reads your posts and their numbers through Metricool's API with your token
+//    (Metricool's Advanced plan). The token stays in the Operator app's file on this Mac.
+//  • A CSV: export your content insights (Meta Business Suite → Insights → Content → Export, or a
+//    Metricool export) and drop the file in. Nothing to connect at all.
+// Either way it lands in the same place as before (32v): your posts, likes, comments, reach, the posting
+// strip, Op's read, business vs personal content on your card, followers for XP.
+const MC_ID = 'metricool';
+function socialSrc(a){ return (a && a.src) || 'meta'; }
+// ---- Metricool ----
+async function mcApi(path){
+  const r = await fetchWithin(WAKE_HELPER+'mc/api?p='+hexUtf8(path), 30000);
+  let j = null; try{ j = r ? await r.json() : null; }catch(e){}
+  if(!r || !r.ok || !j) throw new Error((j && (j.error && (j.error.message || j.error) || j.message)) || (r ? 'Metricool said no ('+r.status+')' : 'the Operator app isn’t answering'));
+  return j;
+}
+const socNum = function(){ for(let i=0;i<arguments.length;i++){ const v = Number(arguments[i]); if(arguments[i]!=null && arguments[i]!=='' && isFinite(v)) return v; } return null; };
+function mcWhen(m){
+  const d = (m.publishedAt && (m.publishedAt.dateTime || m.publishedAt)) || m.created || m.date || m.publicationDate || m.timestamp;
+  const t = typeof d==='number' ? (d < 1e12 ? d*1000 : d) : Date.parse(String(d||''));
+  return isFinite(t) ? new Date(t) : null;
+}
+function mcPost(m){
+  const when = mcWhen(m);
+  return {id:String(m.postId || m.id || m.url || m.permalink || Math.random()), cap:String(m.content || m.text || m.caption || m.description || '').slice(0, 140), type:String(m.type || m.mediaType || m.postType || ''),
+    at:when ? when.toISOString() : '', date:when ? ds2(when) : '', likes:socNum(m.likes, m.likeCount, m.reactions) || 0, comments:socNum(m.comments, m.commentsCount, m.commentCount) || 0,
+    reach:socNum(m.reach, m.reachTotal), views:socNum(m.views, m.videoViews, m.plays, m.impressions, m.impressionsTotal), saves:socNum(m.saved, m.saves), shares:socNum(m.shares, m.shared),
+    link:m.url || m.permalink || '', thumb:m.imageUrl || m.thumbnailUrl || m.image || m.picture || ''};
+}
+async function mcLoadAccount(a){
+  const f = function(d){ return ds2(d)+'T00:00:00'; };
+  const j = await mcApi('/v2/analytics/posts/instagram?from='+encodeURIComponent(f(new Date(Date.now() - 60*86400000)))+'&to='+encodeURIComponent(f(new Date(Date.now() + 86400000))));
+  const list = Array.isArray(j) ? j : Array.isArray(j.data) ? j.data : Array.isArray(j.posts) ? j.posts : [];
+  const posts = list.map(mcPost).filter(function(p){ return p.date; }).sort(function(x, y){ return y.date.localeCompare(x.date); });
+  const fol = socNum(j.followers, j.followersCount, list[0] && list[0].followers);
+  return {username:a.username || 'Instagram (Metricool)', followers:fol!=null ? fol : (Number(a.followers) || 0), pic:'', posts:posts};
+}
+ACTIONS.mcConnect = async function(){
+  const v = function(id){ const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const t = v('mcToken'), u = v('mcUser').replace(/\D/g, ''), b = v('mcBlog').replace(/\D/g, '');
+  if(!t || !u || !b){ const el = document.getElementById(!t ? 'mcToken' : !u ? 'mcUser' : 'mcBlog'); if(el) el.focus(); return; }
+  ui.socErr = null; ui.socBusy = true; renderView();
+  const r = await fetchWithin(WAKE_HELPER+'mc/key?t='+hexUtf8(t)+'&u='+u+'&b='+b, 8000);
+  if(!r || !r.ok){ ui.socBusy = false; ui.socErr = r ? 'The Operator app didn’t take that.' : 'The Operator app isn’t answering. Open Operator from its icon.'; renderView(); return; }
+  const c = igCfg(), role = ui.socRole || 'business';
+  c.accounts = c.accounts.filter(function(a){ return a.id!==MC_ID; });
+  c.accounts.push({id:MC_ID, src:'metricool', role:role, username:v('mcName') || 'Instagram', followers:Number(v('mcFollowers')) || 0});
+  persist('settings'); ui.socBusy = false; ui.igTried = 0;
+  await igRefresh(false);
+  if(ui.igErr){ ui.socErr = ui.igErr; c.accounts = c.accounts.filter(function(a){ return a.id!==MC_ID; }); persist('settings'); renderView(); }
+  else showToast('Metricool is connected.', {icon:'&#128202;'});
+};
+// ---- a CSV export ----
+function csvParse(text){
+  const rows = [], s = String(text||'').replace(/^﻿/, ''); let row = [], cell = '', q = false;
+  for(let i=0;i<s.length;i++){
+    const ch = s[i];
+    if(q){ if(ch==='"'){ if(s[i+1]==='"'){ cell += '"'; i++; } else q = false; } else cell += ch; continue; }
+    if(ch==='"') q = true; else if(ch===',' || ch===';' || ch==='\t'){ row.push(cell); cell = ''; } else if(ch==='\n' || ch==='\r'){ if(ch==='\r' && s[i+1]==='\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; } else cell += ch;
+  }
+  if(cell || row.length){ row.push(cell); rows.push(row); }
+  return rows.filter(function(r){ return r.some(function(c){ return String(c).trim(); }); });
+}
+// which column is which (Meta Business Suite and Metricool name them differently)
+const CSV_COLS = {date:/^(publish(ed)? ?time|date|published|created|post date|fecha)/i, cap:/^(description|text|caption|title|content|post)$/i, link:/^(permalink|url|link|post link)/i, type:/^(post type|type|media type|format)/i,
+  likes:/^(likes|reactions|like count)/i, comments:/^(comments|comment count)/i, shares:/^(shares|shared)/i, saves:/^(saves|saved)/i, reach:/^(reach|accounts reached)/i, views:/^(views|plays|impressions|video views)/i, followers:/^(followers|follower count|followers count)/i};
+function csvToPosts(rows){
+  if(rows.length < 2) return {posts:[], followers:null};
+  const head = rows[0].map(function(h){ return String(h).trim(); }), idx = {};
+  Object.keys(CSV_COLS).forEach(function(k){ const i = head.findIndex(function(h){ return CSV_COLS[k].test(h); }); if(i >= 0) idx[k] = i; });
+  if(idx.date==null) return {posts:[], followers:null, err:'That file has no date column. Export Content insights from Meta Business Suite (or Metricool) and try again.'};
+  let fol = null;
+  const posts = rows.slice(1).map(function(r, n){
+    const g = function(k){ return idx[k]!=null ? String(r[idx[k]]||'').trim() : ''; }, nn = function(k){ const v = Number(g(k).replace(/[^\d.-]/g, '')); return g(k) && isFinite(v) ? v : null; };
+    const t = Date.parse(g('date')); if(!isFinite(t)) return null;
+    if(nn('followers')!=null) fol = Math.max(fol || 0, nn('followers'));
+    return {id:'csv'+n+'-'+t, cap:g('cap').slice(0, 140), type:g('type'), at:new Date(t).toISOString(), date:ds2(new Date(t)), likes:nn('likes')||0, comments:nn('comments')||0, shares:nn('shares'), saves:nn('saves'), reach:nn('reach'), views:nn('views'), link:g('link'), thumb:''};
+  }).filter(Boolean).sort(function(x, y){ return y.date.localeCompare(x.date); }).slice(0, 400);
+  return {posts:posts, followers:fol};
+}
+ACTIONS.socCsvPick = function(el){
+  ui.socRole = (el && el.dataset.id) || ui.socRole || 'business';
+  let f = document.getElementById('socCsvFile');
+  if(!f){ f = document.createElement('input'); f.type = 'file'; f.id = 'socCsvFile'; f.accept = '.csv,text/csv'; f.style.display = 'none'; document.body.appendChild(f); }
+  f.click();
+};
+document.addEventListener('change', function(e){
+  if(!e.target || e.target.id!=='socCsvFile' || !e.target.files || !e.target.files[0]) return;
+  const file = e.target.files[0], rd = new FileReader();
+  rd.onload = function(){ socImportCsv(String(rd.result||''), file.name); e.target.value = ''; };
+  rd.readAsText(file);
+});
+function socImportCsv(text, name){
+  const out = csvToPosts(csvParse(text));
+  if(!out.posts.length){ ui.socErr = out.err || 'Couldn’t find any posts in '+(name || 'that file')+'.'; renderView(); return false; }
+  const c = igCfg(), role = ui.socRole || 'business', id = 'csv-'+role;
+  if(!c.csvData || typeof c.csvData!=='object') c.csvData = {};
+  const prev = c.csvData[id], seen = {};
+  // a newer export adds to what you had (same post, newest numbers win)
+  const merged = out.posts.concat(prev ? prev.posts : []).filter(function(p){ const k = p.date+'|'+p.cap.slice(0, 40); if(seen[k]) return false; seen[k] = 1; return true; }).slice(0, 400);
+  c.csvData[id] = {username:role==='business' ? 'Business account' : 'Personal account', followers:out.followers!=null ? out.followers : (prev ? prev.followers : 0), pic:'', posts:merged, at:Date.now()};
+  if(!c.accounts.some(function(a){ return a.id===id; })) c.accounts.push({id:id, src:'csv', role:role});
+  ui.socErr = null; persist('settings'); ui.igTried = 0; igRefresh(true);
+  showToast(out.posts.length+' posts imported.', {icon:'&#128202;'});
+  return true;
+}
+ACTIONS.socFollowersSet = function(el, e, id){
+  const i = document.getElementById('socFol-'+id), n = Number(i && i.value); if(!(n >= 0)) return;
+  const c = igCfg(), a = c.accounts.find(function(x){ return x.id===id; }); if(!a) return;
+  a.followers = n; if(c.csvData && c.csvData[id]) c.csvData[id].followers = n;
+  if(c.cache && c.cache.data && c.cache.data[id]) c.cache.data[id].followers = n;
+  persist('settings'); renderView();
+};
+ACTIONS.socRemove = function(el, e, id){
+  const c = igCfg(); c.accounts = c.accounts.filter(function(a){ return a.id!==id; });
+  if(c.csvData) delete c.csvData[id]; if(c.cache && c.cache.data) delete c.cache.data[id];
+  if(id===MC_ID) fetchWithin(WAKE_HELPER+'mc/forget', 5000);
+  persist('settings'); renderView();
+};
+ACTIONS.socRole = function(el, e, id){ ui.socRole = id; renderView(); };
+ACTIONS.socShow = function(el, e, id){ ui.socShow = ui.socShow===id ? null : id; renderView(); };
+// ---- how you connect: Metricool, or a file, or (still there) Meta directly ----
+function socialConnectHtml(){
+  const role = ui.socRole || 'business', sh = ui.socShow;
+  const roleSeg = '<div class="soc-role">'+[['business', 'Business account'], ['personal', 'Personal account']].map(function(x){ return '<button class="'+(role===x[0] ? 'is-on' : '')+'" data-action="socRole" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>';
+  return '<div class="soc-connect">'+
+    '<div class="soc-h"><b>Your social numbers</b><span>No Meta developer app, no GoHighLevel. Pick one.</span></div>'+roleSeg+
+    '<div class="soc-opts">'+
+      '<div class="soc-opt'+(sh==='mc' ? ' is-open' : '')+'"><button class="soc-opt-h" data-action="socShow" data-id="mc"><span>&#128202;</span><div><b>Metricool</b><small>Live. Connect Instagram in Metricool, paste your API token. Advanced plan.</small></div></button>'+
+        (sh==='mc' ? '<div class="soc-form"><input class="input" id="mcToken" placeholder="API token (Metricool → Account settings → API)"><div class="soc-row"><input class="input" id="mcUser" placeholder="userId"><input class="input" id="mcBlog" placeholder="blogId"></div>'+
+          '<div class="soc-row"><input class="input" id="mcName" placeholder="@handle (optional)"><input class="input" type="number" id="mcFollowers" placeholder="Followers now (optional)"></div>'+
+          '<div class="soc-hint">userId and blogId are in the address when you open your brand in Metricool (…?blogId=123&userId=456).</div>'+
+          '<button class="btn btn-primary" data-action="mcConnect"'+(ui.socBusy ? ' disabled' : '')+'>'+(ui.socBusy ? 'Connecting…' : 'Connect Metricool')+'</button></div>' : '')+'</div>'+
+      '<div class="soc-opt"><button class="soc-opt-h" data-action="socCsvPick" data-id="'+role+'"><span>&#128196;</span><div><b>Import a CSV</b><small>No connection at all. Meta Business Suite → Insights → Content → Export (or a Metricool export), then drop it here.</small></div></button></div>'+
+      '<div class="soc-opt is-quiet"><button class="soc-opt-h" data-action="igConnect"><span>&#128279;</span><div><b>Meta directly</b><small>Every post and your ad spend, with a read-only token. More setup.</small></div></button></div>'+
+    '</div>'+
+    (ui.socErr ? '<div class="soc-err">&#9888; '+escapeHtml(ui.socErr)+'</div>' : '')+
+  '</div>';
+}
+// under your numbers: where they come from, update a CSV, set followers by hand for a source that doesn't send them
+function socialSourcesHtml(){
+  const c = igCfg(); if(!c.accounts.length) return '';
+  return '<div class="soc-srcs">'+c.accounts.map(function(a){
+    const s = socialSrc(a), d = c.cache && c.cache.data && c.cache.data[a.id];
+    return '<div class="soc-src"><span class="soc-src-k">'+(s==='metricool' ? '&#128202; Metricool' : s==='csv' ? '&#128196; Imported' : '&#128279; Meta')+' &middot; '+(a.role==='business' ? 'Business' : 'Personal')+'</span>'+
+      (s!=='meta' ? '<span class="soc-src-f"><input class="input" type="number" id="socFol-'+a.id+'" value="'+((d && d.followers) || a.followers || '')+'" placeholder="followers"><button class="btn btn-ghost btn-sm" data-action="socFollowersSet" data-id="'+a.id+'">Set</button></span>' : '')+
+      (s==='csv' ? '<button class="btn btn-ghost btn-sm" data-action="socCsvPick" data-id="'+a.role+'">Import a newer file</button>' : '')+
+      '<button class="btn btn-ghost btn-sm soc-x" data-action="socRemove" data-id="'+a.id+'">Remove</button></div>';
+  }).join('')+'<button class="btn btn-ghost btn-sm" data-action="socShowAdd">&#65291; Another account</button>'+
+  (ui.socAdd ? socialConnectHtml() : '')+'</div>';
+}
+ACTIONS.socShowAdd = function(){ ui.socAdd = !ui.socAdd; renderView(); };
 // ============ LEVEL UP ============
 // XP keeps stacking; levels are claimed. When you have the XP for the next level (and, at a rank's
 // level, the MRR and Health it asks for), a Level up button shows up — on your card, on You, in
@@ -25273,7 +25832,33 @@ function lvlCardInView(){
   const c = document.querySelector('#viewRoot .pcf, #viewRoot .pc'); if(!c) return false;
   const r = c.getBoundingClientRect(); return r.bottom > 40 && r.top < window.innerHeight - 40 && r.width > 0;
 }
-function lvlChipVis(){ const ch = document.querySelector('#musicDock .md-lvl'); if(ch) ch.classList.toggle('is-away', lvlCardInView()); }
+// It also steps back when nothing's happening: it shows for a few seconds after you get XP (or open a
+// page), whenever a level up is waiting, and when the mouse comes near the corner; otherwise it fades
+// out of the way. In the minimal views it's gone altogether.
+let lvlShowUntil = Date.now() + 8000, lvlLastTotal = null, lvlNear = false;
+function lvlChipIdle(){
+  if(ui.lvlPop || lvlNear) return false;
+  const x = typeof xpSummary==='function' ? xpSummary() : null;
+  if(x && x.canLevel) return false;
+  return Date.now() > lvlShowUntil;
+}
+// On Focus it stays put but compact: the badge and the level, no bar.
+function lvlChipVis(){ const ch = document.querySelector('#musicDock .md-lvl'); if(ch){ const f = ui.view==='focus'; ch.classList.toggle('is-away', lvlCardInView()); ch.classList.toggle('is-compact', f && !ui.lvlPop); ch.classList.toggle('is-idle', !f && lvlChipIdle()); } }
+function lvlChipWake(ms){ lvlShowUntil = Math.max(lvlShowUntil, Date.now() + (ms || 6000)); lvlChipVis(); }
+afterRenderHooks.push(function(){
+  if(typeof xpSummary!=='function' || !state || !state.profile) return;
+  const t = xpSummary().total;
+  if(lvlLastTotal!=null && t!==lvlLastTotal) lvlChipWake(9000);
+  if(ui._lvlView!==ui.view){ ui._lvlView = ui.view; lvlChipWake(5000); }
+  lvlLastTotal = t;
+});
+setInterval(function(){ lvlChipVis(); }, 1500);
+let lvlMoveT = 0;
+document.addEventListener('mousemove', function(e){
+  if(lvlMoveT) return; lvlMoveT = setTimeout(function(){ lvlMoveT = 0; }, 120);
+  const near = e.clientX > window.innerWidth - 300 && e.clientY < 110;
+  if(near!==lvlNear){ lvlNear = near; lvlChipVis(); }
+}, {passive:true});
 let lvlVisRaf = 0;
 document.addEventListener('scroll', function(){ if(lvlVisRaf) return; lvlVisRaf = requestAnimationFrame(function(){ lvlVisRaf = 0; lvlChipVis(); }); }, true);
 afterRenderHooks.push(function(){ setTimeout(lvlChipVis, 0); });
@@ -25395,11 +25980,32 @@ function aiContext(){
     lines.push('This week’s goals: '+(wg || 'none set')+(w.focus ? ' (focus: '+w.focus+')' : '')+'. This month’s goals: '+(mg || 'none set')+(m.habit ? ' (habit he’s beating: '+m.habit+')' : '')+'.');
     const due = checkoutDue(); if(due.length) lines.push('He still has to check out of '+due.map(function(c){ return c.kind==='month' ? monthName(c.key) : 'last week'; }).join(' and ')+'.');
   }
+  const book = opClientBook(); if(book) lines.push(book);
+  const ex = arr(state.finances && state.finances.expenses).filter(function(e){ return monthKeyOf(e.date)===thisMonthKey(); });
+  if(ex.length){ const by = {}; ex.forEach(function(e){ by[e.cat] = (by[e.cat]||0) + e.amount; }); lines.push('Spending this month: '+money(ex.reduce(function(a, e){ return a + e.amount; }, 0))+' ('+Object.keys(by).sort(function(a, b){ return by[b]-by[a]; }).slice(0, 4).map(function(k){ return k+' '+money(by[k]); }).join(', ')+').'); }
+  const accts = arr(state.finances && state.finances.bank && state.finances.bank.accounts); if(accts.length) lines.push('Bank balances: '+accts.map(function(a){ return a.name+' '+money(a.balance); }).join(', ')+'.');
   if(typeof xpSummary==='function'){ const x = xpSummary(); lines.push('His card: level '+x.level+', rank "'+RANKS[x.rank].name+'", overall '+x.ovr+' (Business '+x.attrs.BUS.v+', Personal '+x.attrs.PER.v+', Health '+x.attrs.HLT.v+', Discipline '+x.attrs.DIS.v+')'+(x.canLevel ? '; a level up is waiting to be claimed' : '')+'.'); }
   const wx = typeof wxNow==='function' ? wxNow() : null; if(wx) lines.push('Weather: '+wx.temp+'° and '+wxLabel(wx.code).toLowerCase()+(wx.hi!=null ? ', high '+wx.hi+'°' : '')+'.');
   const nw = ui.morningNews; if(nw && nw.items) lines.push('Headlines: '+arr(nw.items).slice(0, 5).map(function(n){ return sayHeadline(n.title); }).join(' | ')+'.');
   const sp = typeof scoresSpoken==='function' ? scoresSpoken() : ''; if(sp) lines.push('Sports: '+sp);
   return lines.join('\n');
+}
+// his book of business, in depth: every active client (what they pay, where they are, when he last
+// reached out, his notes on them) and the open leads, so Op talks like it knows the business
+function opClientBook(){
+  const today = todayStr(), cut = function(t, n){ t = String(t||'').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n-1)+'…' : t; };
+  const last = function(kind, x){ const d = typeof crmLastTouch==='function' ? crmLastTouch(kind, x) : null; return d ? (d===today ? 'today' : daysAgoFrom(d)+'d ago') : 'never'; };
+  const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
+  const out = [];
+  if(cs.length) out.push('Clients in depth:\n'+cs.slice(0, 14).map(function(c){
+    const notes = [c.notes].concat(arr(c.journal).slice(-3).map(function(j){ return (j.date ? j.date+': ' : '')+j.text; })).filter(Boolean).map(function(t){ return cut(t, 220); });
+    const pk = typeof packageById==='function' && c.packageId ? packageById(c.packageId) : null;
+    return '- '+(c.business || c.name)+(c.business && c.name && c.name!==c.business ? ' ('+c.name+')' : '')+': '+money(Number(c.mrr||0))+'/mo'+(pk ? ', '+pk.name : '')+(c.startDate ? ', since '+c.startDate : '')+', last touch '+last('client', c)+
+      (c.followUp && c.followUp.date ? ', follow-up '+c.followUp.date+(c.followUp.note ? ' ('+cut(c.followUp.note, 60)+')' : '') : '')+(notes.length ? '. Notes: '+notes.join(' | ') : '. No notes yet');
+  }).join('\n'));
+  const ls = arr(state.business.pipeline).filter(function(l){ return !/won|lost/.test(String(l.stage||'')); }).slice(0, 10);
+  if(ls.length) out.push('Open leads:\n'+ls.map(function(l){ return '- '+crmName('lead', l)+': stage '+(l.stage||'new')+(Number(l.value) ? ', worth '+money(Number(l.value)) : '')+', last touch '+last('lead', l)+(l.notes ? '. Notes: '+cut(l.notes, 180) : ''); }).join('\n'));
+  return out.join('\n');
 }
 // how Op talks inside the app (kept apart from the personality, which you can replace)
 const OP_RULES = 'How you work inside the Operator app:\n'+
@@ -25409,7 +26015,10 @@ const OP_RULES = 'How you work inside the Operator app:\n'+
   '- Get to know him. When he tells you something worth keeping (goals, preferences, people, projects, decisions, how he likes things) save it with the remember tool, quietly. Use what you remember naturally.\n'+
   '- You can act in the app with your tools. Do it when he asks (or clearly implies it), then confirm in one short sentence. If a date or time is unclear, ask rather than guess. Never claim you did something you didn’t.\n'+
   '- If you don’t know something, say so briefly.\n'+
-  '- Never use em dashes or en dashes. Use a comma, a colon or a new sentence instead.';
+  '- Never use em dashes or en dashes. Use a comma, a colon or a new sentence instead.\n'+
+  '- Know his business inside out: his clients, what they pay, where each one stands and his notes on them are in the background. Talk about them by name like someone who has been in the room. When he tells you something about a client or a lead, save it on them with add_client_note. When he says he reached out to someone, log it with log_touch.\n'+
+  '- Be proactive. When something would help (a client gone quiet, a deadline, a gap in what you know), say it or ask about it. Ask one good question when it helps you understand his business or him better.\n'+
+  '- When you notice a way the app itself could serve him better, log it with suggest_improvement (quietly; mention it only if it matters).';
 function aiSystem(){
   const name = state.profile.name || 'the user', now = new Date(), mem = opMemory();
   return [
@@ -25472,10 +26081,21 @@ const OP_TOOLS = [
   {name:'set_reminder', description:'Set a reminder that pops up at a date and time.', input_schema:{type:'object', properties:{label:{type:'string'}, date:OP_DATE, time:{type:'string', description:'HH:MM, 24-hour'}}, required:['label', 'date'], additionalProperties:false}},
   {name:'log_workout', description:'Log a workout.', input_schema:{type:'object', properties:{type:{type:'string', description:'e.g. Lift, Run, Push day'}, minutes:{type:'integer'}, date:OP_DATE}, required:['type'], additionalProperties:false}},
   {name:'log_weight', description:'Log a weigh-in (in the user’s unit).', input_schema:{type:'object', properties:{weight:{type:'number'}, date:OP_DATE}, required:['weight'], additionalProperties:false}},
-  {name:'add_goal', description:'Add a goal for this week or this month.', input_schema:{type:'object', properties:{period:{type:'string', enum:['week', 'month']}, label:{type:'string'}}, required:['period', 'label'], additionalProperties:false}},
+  {name:'add_goal', description:'Add a goal: for this week, this month, or long-term. A long-term goal can be tracked live by the app (track: followers, weight, mrr, clients, streak, avghours) with a target number; otherwise it is his own number to update.', input_schema:{type:'object', properties:{period:{type:'string', enum:['week', 'month', 'long']}, label:{type:'string'}, track:{type:'string', enum:['followers', 'weight', 'mrr', 'clients', 'streak', 'avghours', 'none']}, target:{type:'number'}}, required:['period', 'label'], additionalProperties:false}},
   {name:'complete_goal', description:'Tick off one of this week’s or this month’s goals.', input_schema:{type:'object', properties:{period:{type:'string', enum:['week', 'month']}, label_contains:{type:'string'}}, required:['period', 'label_contains'], additionalProperties:false}},
+  {name:'add_client_note', description:'Save a note on a client or a lead (what was said, what they want, how it’s going). Use the client’s or lead’s name.', input_schema:{type:'object', properties:{who:{type:'string'}, note:{type:'string'}}, required:['who', 'note'], additionalProperties:false}},
+  {name:'log_touch', description:'Log that he reached out to a client or lead (a text, call, email or meeting).', input_schema:{type:'object', properties:{who:{type:'string'}, type:{type:'string', enum:['text', 'call', 'email', 'meeting', 'other']}, date:OP_DATE}, required:['who'], additionalProperties:false}},
+  {name:'suggest_improvement', description:'Log an idea for how the Operator app could serve him better (a feature, a fix, something that got in the way). He sees the list in Settings.', input_schema:{type:'object', properties:{idea:{type:'string'}}, required:['idea'], additionalProperties:false}},
   {name:'open_page', description:'Show a page of the app.', input_schema:{type:'object', properties:{page:{type:'string', enum:['today', 'focus', 'analytics', 'business', 'clients', 'leads', 'calendar', 'goals', 'health', 'finances', 'journal', 'card', 'settings']}}, required:['page'], additionalProperties:false}}
 ];
+// a client or lead by name (business or person, best match)
+function opFindContact(who){
+  const w = String(who||'').toLowerCase().trim(); if(!w) return null;
+  const all = arr(state.business.clients).map(function(c){ return {kind:'client', x:c}; }).concat(arr(state.business.pipeline).map(function(l){ return {kind:'lead', x:l}; }));
+  const names = function(h){ return [h.x.business, h.x.name, h.x.company].filter(Boolean).map(function(n){ return String(n).toLowerCase(); }); };
+  return all.find(function(h){ return names(h).some(function(n){ return n===w; }); })
+    || all.find(function(h){ return names(h).some(function(n){ return n.indexOf(w)>=0 || w.indexOf(n)>=0; }); }) || null;
+}
 const isYmd = function(s){ return /^\d{4}-\d{2}-\d{2}$/.test(String(s||'')); }, isHm = function(s){ return /^\d{2}:\d{2}$/.test(String(s||'')); };
 function opRunTool(name, x){
   x = x || {};
@@ -25515,6 +26135,14 @@ function opRunTool(name, x){
       state.health.weightLog.push({id:uid(), date:x.date || todayStr(), weight:w}); persist('health'); return 'weigh-in logged';
     }
     case 'add_goal': {
+      if(x.period==='long'){
+        const tr = x.track && x.track!=='none' && GOAL_TRACKERS[x.track] ? x.track : null, target = Number(x.target);
+        if(!(target > 0)) throw new Error('a long-term goal needs a target number');
+        const now = tr ? goalLiveCurrentRaw({autoTrack:tr}) : 0;
+        const g = {id:uid(), label:String(need(x.label, 'label')).slice(0, 140), done:false, target:target, current:0, unit:tr ? GOAL_TRACKERS[tr].unit : '', deadline:null, autoTrack:tr, master:!!tr, start:tr ? now : null, createdAt:todayStr()};
+        if(tr) g.xp = trackedGoalXp(tr, now, target); else { g.xpPending = true; setTimeout(function(){ opRateGoal(g); }, 0); }
+        state.goals.items.push(g); persist('goals'); return 'added "'+g.label+'"'+(tr ? ', tracked live, worth '+g.xp+' XP' : '');
+      }
       const kind = x.period==='month' ? 'month' : 'week', key = periodKey(kind);
       state.goals.items.push(newTierGoal(kind, key, String(need(x.label, 'label'))));
       const store = kind==='month' ? intentStore().months : intentStore().weeks; if(!store[key]) store[key] = {at:Date.now()};
@@ -25525,6 +26153,28 @@ function opRunTool(name, x){
       const g = tierGoals(kind, periodKey(kind)).find(function(g){ return g.label.toLowerCase().indexOf(w) >= 0; });
       if(!g) throw new Error('no '+kind+' goal matches "'+w+'"'); if(g.done) return 'already done';
       g.done = true; g.missed = false; g.doneAt = todayStr(); persist('goals'); return 'ticked off: '+g.label;
+    }
+    case 'add_client_note': {
+      const hit = opFindContact(need(x.who, 'who')); if(!hit) throw new Error('no client or lead matches "'+x.who+'"');
+      const note = String(need(x.note, 'note')).trim().slice(0, 1000);
+      if(hit.kind==='client'){ if(!Array.isArray(hit.x.journal)) hit.x.journal = []; hit.x.journal.push({id:uid(), date:todayStr(), text:note, createdAt:new Date().toISOString(), by:'op'}); }
+      else hit.x.notes = (hit.x.notes ? hit.x.notes+'\n' : '')+todayStr()+': '+note;
+      if(typeof crmTimeline==='function') crmTimeline(hit.x, 'note', 'Op noted: '+note.slice(0, 120));
+      persist('business'); return 'noted on '+crmName(hit.kind, hit.x);
+    }
+    case 'log_touch': {
+      const hit = opFindContact(need(x.who, 'who')); if(!hit) throw new Error('no client or lead matches "'+x.who+'"');
+      if(x.date && !isYmd(x.date)) throw new Error('date must be YYYY-MM-DD');
+      const tp = {id:uid(), type:x.type || 'other', date:x.date || todayStr(), note:'', ts:Date.now()};
+      if(!Array.isArray(hit.x.touchpoints)) hit.x.touchpoints = []; hit.x.touchpoints.push(tp);
+      if(hit.kind==='client'){ if(!Array.isArray(hit.x.touches)) hit.x.touches = []; hit.x.touches.push(tp.date); }
+      persist('business'); return 'logged a '+tp.type+' with '+crmName(hit.kind, hit.x);
+    }
+    case 'suggest_improvement': {
+      const s = state.settings; if(!Array.isArray(s.opIdeas)) s.opIdeas = [];
+      const idea = String(need(x.idea, 'idea')).trim().slice(0, 400);
+      if(!s.opIdeas.some(function(i){ return i.text.toLowerCase()===idea.toLowerCase(); })){ s.opIdeas.push({id:uid(), text:idea, at:Date.now()}); if(s.opIdeas.length > 60) s.opIdeas.splice(0, s.opIdeas.length - 60); persist('settings'); }
+      return 'logged';
     }
     case 'open_page': {
       const pg = x.page, go = {today:['today'], focus:['focus'], analytics:['focus', function(){ ui.focusTab = 'analytics'; }], business:['business'], clients:['business', function(){ ui.businessTab = 'clients'; }], leads:['business', function(){ ui.businessTab = 'leads'; }],
@@ -25566,10 +26216,49 @@ async function aiAsk(text, cap){
     // (the conversation carries the last few exchanges; the tool steps aren't needed again)
     AI.history.push({role:'user', content:text}, {role:'assistant', content:reply});
     if(AI.history.length > 16) AI.history = AI.history.slice(-16);
+    opMemoryLater();
     if(changed) renderView();
     if(opVoiceOn()) await opSay(reply, {cap:cap}); else opCaption(reply);
   } finally { AI.busy = false; aiUiRefresh(); }
 }
+// ---- memory that builds itself: a minute after a conversation goes quiet, Op reads it back and keeps
+// anything worth knowing next time (on top of what it saves with the remember tool as it goes) ----
+let opMemT = null, opMemFrom = 0;
+function opMemoryLater(){ clearTimeout(opMemT); opMemT = setTimeout(opMemoryDistill, 60000); }
+async function opMemoryDistill(){
+  const convo = AI.history.slice(opMemFrom); if(convo.filter(function(m){ return m.role==='user'; }).length < 1) return;
+  opMemFrom = AI.history.length;
+  try{
+    const model = await aiPickModel(); if(!model) return;
+    const mem = opMemory().map(function(m){ return '- '+m.text; }).join('\n') || '(nothing yet)';
+    const res = await aiCall({model:model, max_tokens:300, system:'You keep the long-term memory for Op, an assistant inside a productivity app. Reply with only a JSON array of strings.',
+      messages:[{role:'user', content:'What Op already remembers about the user:\n'+mem+'\n\nThe conversation:\n'+convo.map(function(m){ return (m.role==='user' ? 'User: ' : 'Op: ')+(typeof m.content==='string' ? m.content : ''); }).join('\n')+
+        '\n\nList up to 4 new, lasting facts worth remembering (goals, preferences, people, clients, projects, decisions, how he likes things), each one short and in third person. Leave out anything already remembered, small talk and things that only matter today. If there is nothing, reply [].'}]});
+    if(!res.ok) return;
+    const t = aiText(res.j), m = /\[[\s\S]*\]/.exec(t); if(!m) return;
+    const facts = JSON.parse(m[0]); if(!Array.isArray(facts)) return;
+    facts.slice(0, 4).forEach(function(f){ if(typeof f==='string' && f.trim()) try{ opRunTool('remember', {fact:f}); }catch(e){} });
+  }catch(e){}
+}
+// ---- a question a day: when you're around and not locked in, Op asks one thing that helps it know the
+// business (or you) better. It sits in the bubble; answer by typing or the mic, or ignore it ----
+function opQuestionDue(){
+  const p = state.profile;
+  if(AI.hasKey!==true || AI.busy || p.opAskedOn===todayStr()) return false;
+  if(state.focus.activeSession || (state.modes && state.modes.active) || document.querySelector('.overlay:not(.hidden)')) return false;
+  if(['today', 'focus', 'business'].indexOf(ui.view) < 0 || (typeof OV!=='undefined' && (OV.speaking || OV.pending))) return false;
+  return new Date().getHours() >= 9 && new Date().getHours() < 21;
+}
+async function opAskQuestion(){
+  if(!opQuestionDue()) return;
+  state.profile.opAskedOn = todayStr(); persist('profile');
+  const q = await aiWrite('Ask me one short, specific question that would help you understand my business or me better and fill a gap in what you know (a client with no notes, a lead going nowhere, a goal you don’t understand, how I like to work). One sentence, no preamble, nothing else.', {max:120});
+  if(!q || document.querySelector('.overlay:not(.hidden)') || state.focus.activeSession) return;
+  AI.history.push({role:'assistant', content:q}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
+  OV.cap = 'opBubText'; opBubShow(); opCaption(q);
+}
+setInterval(function(){ if(state && state.profile && opQuestionDue() && Date.now() - (ui._opActiveAt || 0) > 40000) opAskQuestion(); }, 60000);
+document.addEventListener('pointerdown', function(){ ui._opActiveAt = Date.now(); }, true);
 // one-off writing in Op's voice (briefs, rundowns, reads): no tools, no conversation
 async function aiWrite(task, opts){
   opts = opts || {};
@@ -25678,12 +26367,14 @@ function opSettingsHtml(){
     '<div class="field op-set"><label>What Op remembers <span class="kpi-sub">'+mem.length+'</span></label>'+
       (mem.length ? '<div class="op-mem">'+mem.slice().reverse().map(function(m){ return '<div class="op-mem-i"><span>'+escapeHtml(m.text)+'</span><button class="op-mem-x" data-action="opMemDel" data-id="'+m.id+'" title="Forget this">&#10005;</button></div>'; }).join('')+'</div><button class="btn btn-ghost btn-sm" data-action="opMemClear" style="margin-top:6px;">Forget everything</button>'
         : '<div class="op-set-help">Nothing yet. Tell Op about yourself, your business and how you like things. It keeps what matters.</div>')+'</div>'+
+    (arr(state.settings.opIdeas).length ? '<div class="field op-set"><label>Op’s ideas for the app <span class="kpi-sub">'+state.settings.opIdeas.length+'</span></label><div class="op-mem">'+state.settings.opIdeas.slice().reverse().map(function(m){ return '<div class="op-mem-i"><span>'+escapeHtml(m.text)+'</span><button class="op-mem-x" data-action="opIdeaDel" data-id="'+m.id+'" title="Clear">&#10005;</button></div>'; }).join('')+'</div></div>' : '')+
   '</div>';
 }
 ACTIONS.opBrainSet = function(el, e, id){ state.settings.opBrain = id==='smart' ? 'smart' : 'fast'; AI.model = null; persist('settings'); renderView(); };
 ACTIONS.opPersonaSave = function(){ const t = document.getElementById('opPersona'); if(!t) return; const v = t.value.trim(); state.settings.opPersona = v && v!==OP_PERSONA_DEFAULT.trim() ? v.slice(0, 40000) : ''; persist('settings'); showToast('Op’s personality is saved.', {icon:'&#129302;'}); renderView(); };
 ACTIONS.opPersonaReset = function(){ state.settings.opPersona = ''; persist('settings'); renderView(); };
 ACTIONS.opPersonaUpload = function(){ const f = document.getElementById('opPersonaFile'); if(f) f.click(); };
+ACTIONS.opIdeaDel = function(el, e, id){ state.settings.opIdeas = arr(state.settings.opIdeas).filter(function(m){ return m.id!==id; }); persist('settings'); renderView(); };
 ACTIONS.opMemDel = function(el, e, id){ state.profile.opMemory = opMemory().filter(function(m){ return m.id!==id; }); persist('profile'); renderView(); };
 ACTIONS.opMemClear = function(el){ if(!armed.has('opmem')){ armed.add('opmem'); el.textContent = 'Sure? Tap again'; setTimeout(function(){ armed.delete('opmem'); }, 3000); return; } armed.delete('opmem'); state.profile.opMemory = []; persist('profile'); renderView(); };
 document.addEventListener('change', function(e){
@@ -25884,6 +26575,179 @@ document.addEventListener('mouseover', function(e){
 }, true);
 document.addEventListener('mousedown', hovHide, true);
 document.addEventListener('scroll', hovHide, true);
+// ============ ADDING A GOAL, AND WHAT IT'S WORTH ============
+// One sheet for every kind of goal: this week, this month, or one of your own (long-term, with a number
+// to hit). Op sizes each goal up when you add it and sets its XP, so the XP is consistent and scales with
+// how hard the goal really is: a weekly goal 75 to 300, a monthly one 250 to 1,000, your own 200 to
+// 10,000. Without a key it's the usual amount (150 / 500 / 500). Master goals scale by their size (32t).
+const GOAL_XP_BAND = {week:[75, 300, 150], month:[250, 1000, 500], long:[200, 10000, 500]};
+function openGoalSheet(kind){
+  ui.gsKind = kind==='month' || kind==='long' ? kind : 'week';
+  let o = document.getElementById('goalSheet');
+  if(!o){ o = document.createElement('div'); o.id = 'goalSheet'; o.className = 'overlay gs-ov hidden'; o.innerHTML = '<div class="card gs" id="goalSheetContent"></div>'; document.body.appendChild(o); }
+  o.classList.remove('hidden'); goalSheetRefresh();
+  setTimeout(function(){ const i = document.getElementById('gsLabel'); if(i) i.focus(); }, 60);
+}
+function closeGoalSheet(){ const o = document.getElementById('goalSheet'); if(o) o.classList.add('hidden'); }
+// it closes when you go somewhere else
+afterRenderHooks.push(function(){ const k = ui.view+'|'+(ui.personalTab||''); if(ui._gsView && ui._gsView!==k) closeGoalSheet(); ui._gsView = k; });
+function goalSheetRefresh(){ const c = document.getElementById('goalSheetContent'); if(c) morphInto(c, goalSheetHtml(), {form:true}); }
+function goalSheetHtml(){
+  const k = ui.gsKind || 'week', band = GOAL_XP_BAND[k];
+  const key = k==='long' ? null : periodKey(k), gs = key ? tierGoals(k, key) : [];
+  const full = key && gs.length >= 5, locked = key && checkedOut(k, key);
+  const seg = '<div class="gs-seg">'+[['week', 'This week'], ['month', monthName(monthKey())], ['long', 'Long-term']].map(function(x){ return '<button class="'+(k===x[0] ? 'is-on' : '')+'" data-action="gsKind" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>';
+  let body = '<input class="input gs-label" id="gsLabel" maxlength="140" placeholder="'+(k==='week' ? 'e.g. 20 hours of deep work' : k==='month' ? 'e.g. Sign two new clients' : 'e.g. 10k Instagram followers')+'">';
+  // long-term: one the app tracks live (followers, weight, MRR…), or a number of your own
+  const trk = ui.gsTrack || 'own', T = trk!=='own' ? GOAL_TRACKERS[trk] : null;
+  if(k==='long') body = '<div class="gs-trk">'+GS_TRACK.map(function(x){ return '<button class="'+(trk===x ? 'is-on' : '')+'" data-action="gsTrack" data-id="'+x+'">'+(x==='own' ? '&#9998; Your own number' : GOAL_TRACKERS[x].icon+' '+GOAL_TRACKERS[x].label)+'</button>'; }).join('')+'</div>'+body;
+  if(k==='long' && T){
+    const now = goalLiveCurrentRaw({autoTrack:trk});
+    body += '<div class="gs-row is-2"><label><span>Target ('+T.unit+')</span><input class="input" type="number" step="any" id="gsTarget" placeholder="'+(trk==='weight' ? '190' : trk==='followers' ? '10000' : trk==='mrr' ? '20000' : '10')+'"></label>'+
+      '<label><span>Right now</span><div class="gs-now">'+(now==null ? (trk==='followers' ? 'Connect your social numbers first' : 'Nothing logged yet') : fmtGoalNum(now)+' '+escapeHtml(T.unit))+'</div></label></div>'+
+      '<label class="gs-by"><span>By when</span><input class="input" type="date" id="gsDeadline"><em>optional</em></label>';
+  }
+  else if(k==='long') body +=
+    '<div class="gs-row"><label><span>Target</span><input class="input" type="number" step="any" id="gsTarget" placeholder="10000"></label>'+
+    '<label><span>Unit</span><input class="input" id="gsUnit" placeholder="followers"></label>'+
+    '<label><span>Where you are</span><input class="input" type="number" step="any" id="gsCurrent" placeholder="0"></label></div>'+
+    '<label class="gs-by"><span>By when</span><input class="input" type="date" id="gsDeadline"><em>optional</em></label>';
+  const note = locked ? 'This '+(k==='month' ? 'month' : 'week')+' is checked out. Reopen it to add more.' : full ? 'That’s five already. Finish one first.' : '';
+  const have = k!=='long' && gs.length ? '<div class="gs-have">'+gs.map(function(g){ return '<span class="'+(g.done ? 'is-done' : '')+'">'+(g.done ? '&#10003; ' : '')+escapeHtml(g.label)+'</span>'; }).join('')+'</div>' : '';
+  return '<button class="int-x hs-x" data-action="closeGoalSheet" title="Close">&#10005;</button>'+
+    '<div class="gs-h">New goal</div>'+seg+
+    '<div class="gs-body">'+body+have+(note ? '<div class="gs-note">'+escapeHtml(note)+'</div>' : '')+'</div>'+
+    '<div class="gs-foot"><span class="gs-xp" title="'+(k==='long' && (ui.gsTrack||'own')!=='own' ? 'The bigger the goal, the more it pays' : 'Op sizes it up when you add it')+'">&#9733; '+(k==='long' && (ui.gsTrack||'own')!=='own' ? 'Pays by size: 1,500 to 20,000 XP' : band[0].toLocaleString()+' to '+band[1].toLocaleString()+' XP')+'</span>'+
+      '<button class="btn btn-primary gs-go" data-action="gsSave"'+(locked || full ? ' disabled' : '')+'>Add goal</button></div>';
+}
+ACTIONS.openGoalSheet = function(el, e, id){ openGoalSheet(id); };
+ACTIONS.closeGoalSheet = function(){ closeGoalSheet(); };
+ACTIONS.gsKind = function(el, e, id){
+  const l = (document.getElementById('gsLabel')||{}).value || '';
+  ui.gsKind = id; goalSheetRefresh();
+  const i = document.getElementById('gsLabel'); if(i){ i.value = l; i.focus(); }
+};
+const GS_TRACK = ['own', 'followers', 'weight', 'mrr', 'clients', 'streak', 'avghours'];
+ACTIONS.gsTrack = function(el, e, id){ const l = (document.getElementById('gsLabel')||{}).value || ''; ui.gsTrack = id; goalSheetRefresh(); const i = document.getElementById('gsLabel'); if(i) i.value = l; };
+// what a big tracked goal is worth: by how big it is (the same scale as the built-in big ones)
+function trackedGoalXp(kind, from, to){
+  const d = Math.abs(Number(to) - Number(from||0)), cl = function(v, lo, hi){ return Math.round(Math.min(hi, Math.max(lo, v))/50)*50; };
+  if(kind==='weight') return cl(d*150, 2000, 20000);
+  if(kind==='mrr') return cl(d/1000*600, 2000, 20000);
+  if(kind==='followers') return cl(d*0.5, 1500, 20000);
+  if(kind==='clients') return cl(d*1500, 1500, 20000);
+  if(kind==='streak') return cl(d*100, 1500, 15000);
+  if(kind==='avghours') return cl(d*1500, 1500, 15000);
+  return 2000;
+}
+ACTIONS.gsSave = function(){
+  const k = ui.gsKind || 'week', v = function(id){ const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const tracked = k==='long' && ui.gsTrack && ui.gsTrack!=='own';
+  let label = v('gsLabel'); if(!label && !tracked){ const i = document.getElementById('gsLabel'); if(i) i.focus(); return; }
+  let g;
+  if(k==='long' && ui.gsTrack && ui.gsTrack!=='own'){
+    const kind = ui.gsTrack, target = Number(v('gsTarget'));
+    if(!(target > 0)){ const t = document.getElementById('gsTarget'); if(t){ t.focus(); t.classList.add('is-bad'); } return; }
+    const now = goalLiveCurrentRaw({autoTrack:kind});
+    label = label || GOAL_TRACKERS[kind].name({target:target, period:'all'});
+    g = {id:uid(), label:label, done:false, target:target, current:0, unit:GOAL_TRACKERS[kind].unit, deadline:v('gsDeadline') || null, autoTrack:kind, master:true, start:now, createdAt:todayStr()};
+    g.xp = trackedGoalXp(kind, now, target);
+    state.goals.items.push(g);
+    persist('goals'); playPositive(); closeGoalSheet(); renderView();
+    showToast('A new big one: '+label+' (+'+g.xp.toLocaleString()+' XP when you get there).', {icon:'&#127942;'});
+    return;
+  }
+  if(k==='long'){
+    const target = Number(v('gsTarget'));
+    if(!(target > 0)){ const t = document.getElementById('gsTarget'); if(t){ t.focus(); t.classList.add('is-bad'); } showToast('Give it a number to hit (1 for a one-time thing).', {icon:'&#127919;'}); return; }
+    const cur = Number(v('gsCurrent'));
+    g = {id:uid(), label:label, done:false, target:target, current:isNaN(cur) ? 0 : cur, unit:v('gsUnit'), deadline:v('gsDeadline') || null, autoTrack:null, createdAt:todayStr()};
+    state.goals.items.push(g);
+  } else {
+    const key = periodKey(k);
+    if(checkedOut(k, key) || tierGoals(k, key).length >= 5) return;
+    g = newTierGoal(k, key, label);
+    state.goals.items.push(g);
+    const store = k==='month' ? intentStore().months : intentStore().weeks; if(!store[key]) store[key] = {at:Date.now()};
+    persist('journal');
+  }
+  g.xpPending = true;
+  persist('goals'); playPositive(); closeGoalSheet(); renderView();
+  opRateGoal(g);
+};
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Enter' || !e.target || !e.target.closest || !e.target.closest('#goalSheet')) return;
+  e.preventDefault(); ACTIONS.gsSave();
+});
+// Op sizes a goal up: how hard it is for him, right now, given what he's doing. A number in the band.
+async function opRateGoal(g){
+  const k = g.tier || 'long', band = GOAL_XP_BAND[k];
+  let xp = null, why = '';
+  try{
+    if(typeof aiWrite==='function'){
+      const ask = 'Size up this goal for XP in my app. '+(k==='week' ? 'It is a goal for this week.' : k==='month' ? 'It is a goal for this month.' : 'It is a long-term goal'+(g.deadline ? ' by '+g.deadline : '')+'.')+
+        ' Goal: "'+g.label+'"'+(g.target ? ' (target '+g.target+(g.unit ? ' '+g.unit : '')+(g.current ? ', starting at '+g.current : '')+')' : '')+'.'+
+        ' Judge how hard it is for me given what you know (my numbers, my business, my habits). XP range: '+band[0]+' to '+band[1]+', a typical one is about '+band[2]+'. Easy or vague goals sit low, real stretches high.'+
+        ' Reply with only JSON: {"xp": number, "why": "one short sentence"}.';
+      const t = await aiWrite(ask, {max:160});
+      const m = t && /\{[\s\S]*\}/.exec(t);
+      if(m){ const j = JSON.parse(m[0]); if(Number(j.xp) > 0){ xp = Math.round(Math.min(band[1], Math.max(band[0], Number(j.xp)))/5)*5; why = String(j.why||'').slice(0, 160); } }
+    }
+  }catch(e){}
+  const live = state.goals.items.find(function(x){ return x.id===g.id; }); if(!live) return;
+  delete live.xpPending;
+  if(xp){ live.xp = xp; live.xpWhy = why ? opNoDash(why) : ''; }
+  persist('goals'); if(typeof xpLast!=='undefined') xpLast = null; renderView();
+  if(xp && typeof sysNote==='function') sysNote('Op sized it up: '+live.label+' is worth +'+xp.toLocaleString()+' XP.');
+}
+// reopen a week or month you checked out of (by accident, or too early): the goals come back to life
+ACTIONS.tierReopen = function(el, e, id){
+  const kind = id==='month' ? 'month' : 'week', key = periodKey(kind), rec = periodRec(kind, key);
+  if(!rec || !rec.out) return;
+  delete rec.out;
+  tierGoals(kind, key).forEach(function(g){ if(g.missed){ g.missed = false; } });
+  delete intentStore().prompted['O'+kind+':'+key];
+  persist('journal'); persist('goals'); if(typeof xpLast!=='undefined') xpLast = null; playTick(); renderView();
+  showToast('The '+kind+' is open again.', {icon:'&#8634;'});
+};
+// ---- a new video (Content): the same kind of sheet. Business or personal, what it is, a type if you
+// use them, a note. The + in the corner is the only way in (no buttons on the lanes) ----
+function openContentSheet(role){
+  ui.csRole = role==='personal' ? 'personal' : role==='business' ? 'business' : (ui.csRole || 'business');
+  let o = document.getElementById('contentSheet');
+  if(!o){ o = document.createElement('div'); o.id = 'contentSheet'; o.className = 'overlay gs-ov hidden'; o.innerHTML = '<div class="card gs" id="contentSheetContent"></div>'; document.body.appendChild(o); }
+  o.classList.remove('hidden'); contentSheetRefresh();
+  setTimeout(function(){ const i = document.getElementById('csTitle'); if(i) i.focus(); }, 60);
+}
+function closeContentSheet(){ const o = document.getElementById('contentSheet'); if(o) o.classList.add('hidden'); }
+function contentSheetRefresh(){ const c = document.getElementById('contentSheetContent'); if(c) morphInto(c, contentSheetHtml(), {form:true}); }
+function contentSheetHtml(){
+  const r = ui.csRole || 'business', types = arr(state.tasks.videoTypes);
+  return '<button class="int-x hs-x" data-action="closeContentSheet" title="Close">&#10005;</button>'+
+    '<div class="gs-h">New video</div>'+
+    '<div class="gs-seg">'+[['business', 'Business'], ['personal', 'Personal']].map(function(x){ return '<button class="'+(r===x[0] ? 'is-on' : '')+'" data-action="csRole" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>'+
+    '<div class="gs-body"><input class="input gs-label" id="csTitle" maxlength="140" placeholder="'+(r==='business' ? 'e.g. Client results reel' : 'e.g. Day in the life')+'">'+
+      (types.length ? '<div class="cs-types">'+types.map(function(vt){ return '<button class="cs-type'+(ui.csType===vt.id ? ' is-on' : '')+'" data-action="csType" data-id="'+vt.id+'">'+escapeHtml(vt.label)+'</button>'; }).join('')+'</div>' : '')+
+      '<textarea class="input cs-notes" id="csNotes" rows="2" placeholder="Notes (optional)"></textarea></div>'+
+    '<div class="gs-foot"><span class="gs-xp">&#127916; '+(r==='business' ? 'Counts toward Business content' : 'Counts toward Personal content')+'</span><button class="btn btn-primary gs-go" data-action="csSave">Add video</button></div>';
+}
+ACTIONS.closeContentSheet = function(){ closeContentSheet(); };
+ACTIONS.csRole = function(el, e, id){ const t = (document.getElementById('csTitle')||{}).value || '', n = (document.getElementById('csNotes')||{}).value || ''; ui.csRole = id; contentSheetRefresh(); const i = document.getElementById('csTitle'); if(i){ i.value = t; i.focus(); } const nn = document.getElementById('csNotes'); if(nn) nn.value = n; };
+ACTIONS.csType = function(el, e, id){ const t = (document.getElementById('csTitle')||{}).value || '', n = (document.getElementById('csNotes')||{}).value || ''; ui.csType = ui.csType===id ? null : id; contentSheetRefresh(); const i = document.getElementById('csTitle'); if(i) i.value = t; const nn = document.getElementById('csNotes'); if(nn) nn.value = n; };
+ACTIONS.csSave = function(){
+  const ti = document.getElementById('csTitle'), title = ti ? ti.value.trim() : ''; if(!title){ if(ti) ti.focus(); return; }
+  const notes = ((document.getElementById('csNotes')||{}).value || '').trim();
+  const t = {id:uid(), title:title.slice(0, 200), client:'personal', clients:['personal'], priority:'med', deadline:null, notes:notes, status:'backlog', ongoing:false, ongoingDeadline:null, ongoingFrequency:null, includeInStandard:false, categoryId:null, isVideoIdea:true, videoType:ui.csType || null, createdAt:todayStr()};
+  setContentRole(t, ui.csRole==='personal' ? 'personal' : 'business');
+  state.tasks.items.push(t); ui.csType = null;
+  if(typeof playTaskAdded==='function') playTaskAdded();
+  closeContentSheet(); persist('tasks'); renderView();
+};
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Enter' || !e.target || e.target.id!=='csTitle') return;
+  e.preventDefault(); ACTIONS.csSave();
+});
+afterRenderHooks.push(function(){ const k = ui.view+'|'+(ui.focusTasksSubTab||''); if(ui._csView && ui._csView!==k) closeContentSheet(); ui._csView = k; });
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
@@ -26329,6 +27193,12 @@ document.body.addEventListener('drop', function(e){
   const newZone = zone.dataset.dropzone;
   const t = state.tasks.items.find(function(x){ return x.id===taskId; });
   if(!t) return;
+  // Content: dropped on the other lane, it moves between business and personal
+  if(newZone.indexOf('role:')===0){
+    ui.dragFrom = null;
+    if(t.isVideoIdea && typeof setContentRole==='function' && contentRoleOf(t)!==newZone.slice(5)){ setContentRole(t, newZone.slice(5)); playDrop(); persist('tasks'); renderView(); showToast('Moved to '+(newZone.slice(5)==='business' ? 'Business' : 'Personal')+' content.', {icon:'&#127916;'}); }
+    return;
+  }
   const from = ui.dragFrom; ui.dragFrom = null;
   playDrop();
   // out of Now / Up next and back onto the list: that slot empties, the task stays on today's list
@@ -26520,7 +27390,7 @@ function appMenuHtml(){
     (s ? (s.onBreak ? ci('backin', '&#128274; Lock back in') : ci('break', '&#9749; Take a break'))+ci('stop', '&#9632; Lock out')
        : ci('lockin', '&#128274; Lock in <span class="ctx-kbd">L</span>'))+
     SEP+add+
-    ((v==='today' || v==='focus') ? SEP+ci('minimal', '&#9673; Minimal view <span class="ctx-kbd">M</span>') : '')+
+    (v==='focus' && (typeof focusHomePage!=='function' || focusHomePage()) ? SEP+ci('minimal', '&#9673; Minimal view <span class="ctx-kbd">M</span>') : '')+
     (selectableView() && selVisibleCards().length ? ci('selAll', '&#9745; Select all tasks <span class="ctx-kbd">&#8984;A</span>') : '')+
     (!s && v==='today' ? ci('recap', '&#128202; Day recap') : '');
 }

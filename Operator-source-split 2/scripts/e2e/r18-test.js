@@ -167,7 +167,7 @@ async function ctxPage(b, seed, opts){
   {
     const p = await newPage(b, OUT+'/r18.html', {profile:{name:'Andre', lockedView:'minimal'}, tasks:{items:tasks}, business:{clients, pipeline:[]}}, new Date(2026,9,12,10,0).getTime());
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    await E("ui.currentTaskId='t0'; startFocus(); state.focus.activeSession.method={id:'flow'}; renderView()"); await p.waitForTimeout(700);
+    await E("ui.currentTaskId='t0'; startFocus(); ui.view='focus'; state.focus.activeSession.method={id:'flow'}; renderView()"); await p.waitForTimeout(700);
     check('the player: ☕ · ▶ (big) · ■ — lock out is one button, in the player', await p.isVisible('.np-ctl .np-music.is-main') && await p.isVisible('.np-ctl .np-out') && await p.$('.np-top .lv-out')===null);
     check('✓ Done for the task you’re on, and what’s next', await p.isVisible('.np-task .np-task-done') && /Next · Send proposal/.test(await p.textContent('.np-task')));
     check('Flowtime: spaced, with a ? that explains it', await p.$('.np-sub .ml-sep')!==null && await p.$('.np-sub .qtip')!==null && /a fifth as long/.test(await p.getAttribute('.np-sub .qtip', 'data-tip')));
@@ -180,13 +180,16 @@ async function ctxPage(b, seed, opts){
     await E("ACTIONS.toggleLockedView()"); await p.waitForTimeout(100);
     check('leaving the minimal view: a plain fade', await p.$('.np.is-leaving')!==null);
     await p.waitForTimeout(500);
+    // (round 23: the minimal view is on Focus; the knock-out list lives on Today)
+    await E("ui.view='today'; renderView()"); await p.waitForTimeout(300);
     check('Knock these out: one tidy line each — number, title, the client', (await p.$$('.knock-out-list .ko-row')).length===2 && /JJS Fitness/.test(await p.textContent('.knock-out-list')) && await p.$('.knock-out-list .ko-notes')===null);
     await p.click('.ko-row [data-action="koToggle"]'); await p.waitForTimeout(200);
     check('…▾ opens the description', /Cut to 30s/.test(await p.textContent('.knock-out-list .ko-notes')));
     await E("reallyConfirmStopFocus(); ui.view='today'; renderView()"); await p.waitForTimeout(400);
-    check('Today has a Minimal button with the others', await p.isVisible('.th-actions .th-btn-min'));
-    await p.click('.th-actions .th-btn-min'); await p.waitForTimeout(500);
-    check('…and Today goes minimal: clock, level, streak, LOCK IN', await p.isVisible('#viewRoot .np-home .hm-go'));
+    // (round 23: the minimal view lives on the first Focus page only)
+    check('Today has no Minimal button (it’s on Focus)', !(await p.$('.th-actions .th-btn-min')));
+    await E("ui.view='focus'; renderView()"); await p.waitForTimeout(300); await p.click('.view-title .lv-btn'); await p.waitForTimeout(500);
+    check('…and Focus goes minimal: clock, level, streak, LOCK IN', await p.isVisible('#viewRoot .np-home .hm-go'));
     await E("ACTIONS.toggleFocusMinimal()"); await p.waitForTimeout(500);
     check('no page errors (minimal)', p.errors.length===0, p.errors);
     await p.context().close();
@@ -198,7 +201,7 @@ async function ctxPage(b, seed, opts){
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await p.click('.th-greet', {button:'right'}); await p.waitForTimeout(200);
     const menu = await p.textContent('#appCtxMenu');
-    check('right-click: short and about where you are (no theme / scene / sky / go-to)', /Lock in/.test(menu) && /New task/.test(menu) && /Minimal view/.test(menu) && !/Theme|Scene|Sky|Cards|Go to/.test(menu), menu);
+    check('right-click: short and about where you are (no theme / scene / sky / go-to)', /Lock in/.test(menu) && /New task/.test(menu) && !/Minimal view/.test(menu) && !/Theme|Scene|Sky|Cards|Go to/.test(menu), menu);
     await E("ctxClose()");
     check('the ☰ quick-links are gone (page and Settings)', await p.$('.quick-access-dock, .quick-access-toggle')===null && !(await E("ui.view='settings'; ui.settingsTab='display'; renderView(); !!document.getElementById('setQuickFiles')")));
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(300);
@@ -227,7 +230,7 @@ async function ctxPage(b, seed, opts){
       return r.fulfill(okJ); }});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("ui.view='convos'; renderView()"); await p.waitForTimeout(300);
-    check('Social: a Connect Instagram card when it isn’t connected', await p.isVisible('.ig-connect'));
+    check('Social: a way to connect your numbers when nothing is (round 23: Metricool, a CSV or Meta)', await p.isVisible('.soc-connect'));
     await E("ui.view='settings'; ui.settingsTab='integrations'; renderView()"); await p.waitForTimeout(400);
     await p.fill('#igToken', 'EAAB-SECRET-IG'); await p.click('[data-action="igSave"]'); await p.waitForTimeout(800);
     check('the token goes to the launcher', asked.some(u => u.startsWith('/ig/key?t=') && hexDecode(u.split('t=')[1])==='EAAB-SECRET-IG'));

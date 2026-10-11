@@ -416,14 +416,20 @@ document.addEventListener('keydown', function(e){
     else if(e.key==='Escape'){ e.preventDefault(); closeQuickJournalModal(); }
   }
 });
+function qjHoldSize(){ const c = document.getElementById('quickJournalContent'); if(c){ const r = c.getBoundingClientRect(); if(r.height) c.style.height = Math.round(r.height)+'px'; } }
+function qjScrollSnap(){ return [document.scrollingElement, document.querySelector('.main'), document.getElementById('viewRoot') && document.getElementById('viewRoot').parentElement].map(function(x){ return x ? [x, x.scrollTop] : null; }); }
+function qjScrollRestore(sc){ requestAnimationFrame(function(){ sc.forEach(function(p){ if(p && p[0].scrollTop!==p[1]) p[0].scrollTop = p[1]; }); }); }
 function saveQuickJournal(){
   const t = document.getElementById('quickJournalModalText');
   if(!t || !t.value.trim()){ if(t){ t.focus(); t.classList.remove('is-shake'); void t.offsetWidth; t.classList.add('is-shake'); } return; }
-  if(ui.qjCapsule){ if(!capsuleSaveFromModal()) return; ui.qjSaved = 'capsule'; renderQuickJournalModalInto(); setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; }, 1200); return; }
+  if(ui.qjCapsule){ qjHoldSize(); if(!capsuleSaveFromModal()) return; ui.qjSaved = 'capsule'; renderQuickJournalModalInto(); setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; }, 1200); return; }
+  // (the box keeps its size while it says "Saved", so nothing jumps; the page behind stays exactly where it was)
+  qjHoldSize();
+  const sc = qjScrollSnap();
   addJournalEntry('quickJournalModalText');
   ui.qjTitleDraft = '';
-  ui.qjSaved = true; renderQuickJournalModalInto();
-  setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; }, 900);
+  ui.qjSaved = true; renderQuickJournalModalInto(); qjScrollRestore(sc);
+  setTimeout(function(){ closeQuickJournalModal(); ui.qjSaved = false; qjBoxApply(); qjScrollRestore(sc); }, 900);
 }
 
 

@@ -63,9 +63,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('next-up survives a reload', (await E("nextUpTask().title")).includes('Edit Nina reel'));
   // goals
   await p.click('[data-action="nav"][data-view="personal"]'); await p.click('[data-action="personalTab"][data-tab="goals"]');
-  await p.click('#fabAdd');
-  await p.fill('#newGoalLabel', 'Post 3 reels'); await p.fill('#newGoalTarget', '3'); await p.fill('#newGoalUnit', 'reels');
-  await p.click('[data-action="addGoal"]');
+  // (round 23: the + opens the goal sheet; Long-term is a goal of your own)
+  await p.click('#fabAdd'); await p.click('[data-action="gsKind"][data-id="long"]');
+  await p.fill('#gsLabel', 'Post 3 reels'); await p.fill('#gsTarget', '3'); await p.fill('#gsUnit', 'reels');
+  await p.click('[data-action="gsSave"]'); await p.waitForTimeout(150);
   check('goal card added', (await p.$$('.goal-card')).length===1);
   for(let i=0;i<3;i++) await p.click('.goal-card [data-action="goalStep"][data-delta="1"]');
   check('+1 steps reach the goal and mark it achieved', await E("state.goals.items[0].done===true && state.goals.items[0].current===3"));

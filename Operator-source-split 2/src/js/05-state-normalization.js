@@ -290,7 +290,7 @@ function normalizeJournal(j){
   return j;
 }
 function normalizeFinances(f){
-  f=f||{}; f.debts=arr(f.debts); f.payments=arr(f.payments); f.income=arr(f.income); f.invoices=arr(f.invoices);
+  f=f||{}; f.debts=arr(f.debts); f.payments=arr(f.payments); f.income=arr(f.income); f.invoices=arr(f.invoices); f.expenses=arr(f.expenses); if(!f.bank || typeof f.bank!=="object") f.bank = {};
   f.invoices.forEach(function(inv){
     if(inv.status===undefined) inv.status='unpaid';
     if(inv.attachmentName===undefined) inv.attachmentName=null;
