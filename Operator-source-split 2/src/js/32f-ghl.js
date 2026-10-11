@@ -33,7 +33,7 @@ async function ghlFetchOnce(url){
     try{ return await fetch(url, {cache:'no-store'}); }
     catch(e){
       if(i >= GHL_RETRY_MS.length){
-        const err = new Error('Can\'t reach Operator\'s GoHighLevel connection on this Mac. Quit Operator completely (⌘Q) and open it again from the Operator app — if an older Operator window was still open, the new connection never started.');
+        const err = new Error('Can\'t reach Operator\'s GoHighLevel connection on this Mac. Quit Operator completely (⌘Q) and open it again from the Operator app. If an older Operator window was still open, the new connection never started.');
         err.noHelper = true; throw err;
       }
       await ghlSleep(GHL_RETRY_MS[i]);
@@ -46,7 +46,7 @@ function ghlFetch(url){
     const text = await res.text(); let json = null; try{ json = JSON.parse(text); }catch(e){}
     if(!res.ok){
       const msg = json && (json.message || json.error || json.msg);
-      const err = new Error(res.status===401 ? 'GoHighLevel didn\'t accept the key (401) — check it and its scopes.' : res.status===403 ? 'Not allowed (403) — the key is missing a scope for this.' : (Array.isArray(msg) ? msg.join(', ') : msg) || ('GoHighLevel said '+res.status));
+      const err = new Error(res.status===401 ? 'GoHighLevel didn\'t accept the key (401). Check it and its scopes.' : res.status===403 ? 'Not allowed (403): the key is missing a scope for this.' : (Array.isArray(msg) ? msg.join(', ') : msg) || ('GoHighLevel said '+res.status));
       err.status = res.status; throw err;
     }
     await ghlSleep(40); // a breath before the next request
@@ -109,7 +109,7 @@ ACTIONS.ghlConnect = async function(){
     ghlAutoMap();
     persist('settings');
     ui.ghlBusy = null; renderView();
-    showToast('Connected to GoHighLevel — '+g.pipelines.length+' pipeline'+(g.pipelines.length===1?'':'s')+' found. Check the stage matches, then Sync now.', {icon:'&#9989;', duration:6000});
+    showToast('Connected to GoHighLevel: '+g.pipelines.length+' pipeline'+(g.pipelines.length===1?'':'s')+' found. Check the stage matches, then Sync now.', {icon:'&#9989;', duration:6000});
   }catch(e){ ui.ghlBusy = null; ui.ghlError = e.message; renderView(); }
 };
 ACTIONS.ghlDisconnect = async function(){
@@ -142,7 +142,7 @@ async function ghlSync(manual){
     g.lastSync = Date.now(); g.lastResult = out;
     persist('settings'); persist('business'); persist('calendar');
     ui.ghlBusy = null; renderView();
-    if(manual) showToast('GoHighLevel synced — '+ghlResultLine(out)+'.', {icon:'&#128260;', duration:5000});
+    if(manual) showToast('GoHighLevel synced: '+ghlResultLine(out)+'.', {icon:'&#128260;', duration:5000});
   }catch(e){
     ui.ghlBusy = null; ui.ghlError = e.message; g.lastError = {at:Date.now(), msg:e.message}; persist('settings');
     if(manual) renderView();
@@ -194,7 +194,7 @@ async function ghlPullOpportunities(g, out, contacts){
             if(!Array.isArray(x.stageHistory)) x.stageHistory = [];
             x.stageHistory.push(x.stage);
             const from = crmStage('lead', x.stage), to = crmStage('lead', mapped);
-            x.stage = mapped; crmTimeline(x, 'stage', (from?from.label:'—')+' → '+to.label+' (in GoHighLevel)');
+            x.stage = mapped; crmTimeline(x, 'stage', (from?from.label:'–')+' → '+to.label+' (in GoHighLevel)');
             if(to.kind==='won' && !x.convertedClientId) convertProspectToClient(x);
             out.movedLeads++;
           }
@@ -326,11 +326,11 @@ function ghlSettingsHtml(){
     return '<div class="section"><div class="card ghl-card">'+head+
       '<ol class="ghl-steps">'+
         '<li>In GoHighLevel, open the sub-account &rarr; <b>Settings &rarr; Private Integrations</b> &rarr; <b>Create new integration</b>.</li>'+
-        '<li>Give it these scopes: <code>contacts.readonly</code> <code>contacts.write</code> <code>opportunities.readonly</code> <code>opportunities.write</code> <code>calendars.readonly</code> <code>calendars/events.readonly</code> <code>conversations.readonly</code> <code>conversations.write</code> <code>conversations/message.readonly</code> <code>conversations/message.write</code> <code>locations.readonly</code> — and for social stats, <code>socialplanner/account.readonly</code> <code>socialplanner/stat.readonly</code>.</li>'+
+        '<li>Give it these scopes: <code>contacts.readonly</code> <code>contacts.write</code> <code>opportunities.readonly</code> <code>opportunities.write</code> <code>calendars.readonly</code> <code>calendars/events.readonly</code> <code>conversations.readonly</code> <code>conversations.write</code> <code>conversations/message.readonly</code> <code>conversations/message.write</code> <code>locations.readonly</code>And for social stats, <code>socialplanner/account.readonly</code> <code>socialplanner/stat.readonly</code>.</li>'+
         '<li>Copy the key it shows you, and your <b>Location ID</b> (Settings &rarr; Business Profile, or the part of the URL after <code>/location/</code>).</li>'+
       '</ol>'+bridge+
       '<div class="grid grid-2" style="margin-top:12px;">'+
-        '<div class="field"><label>Private Integration key'+tip('Saved on this Mac by the Operator app — not in Operator\'s data, exports or backups.')+'</label><input class="input" type="password" id="ghlKey" placeholder="pit-…" autocomplete="off"></div>'+
+        '<div class="field"><label>Private Integration key'+tip('Saved on this Mac by the Operator app, not in Operator\'s data, exports or backups.')+'</label><input class="input" type="password" id="ghlKey" placeholder="pit-…" autocomplete="off"></div>'+
         '<div class="field"><label>Location ID</label><input class="input" id="ghlLoc" value="'+escapeHtml(g.locationId||'')+'" placeholder="e.g. ve9EPM428h8vShlRW1KT" autocomplete="off"></div>'+
       '</div>'+err+
       '<div class="row" style="margin-top:12px;justify-content:flex-end;gap:10px;">'+busy+'<button class="btn btn-primary" data-action="ghlConnect"'+(ui.ghlBusy?' disabled':'')+'>Connect</button></div>'+
@@ -346,7 +346,7 @@ function ghlSettingsHtml(){
       return '<div class="ghl-map-row"><span class="ghl-map-k">'+escapeHtml(st.name)+'</span><span class="kpi-sub">&rarr;</span><select class="input" data-ghl-stage="'+escapeHtml(st.id)+'">'+crmStages('lead').map(function(s){ return '<option value="'+s.id+'"'+(g.stageMap[st.id]===s.id?' selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select></div>';
     }).join('')+'</div>' : '')+
     '<div class="ghl-toggles">'+toggle('syncCalendar', 'Bring in appointments (next 2 weeks)')+toggle('syncMessages', 'Messages: count what you send as touches, and show new ones in the bell')+toggle('pushStages', 'Send stage changes back to GHL')+toggle('pushNewLeads', 'Send leads you add in Operator (and their detail changes) to GHL')+toggle('autoSync', 'Keep in sync on its own (every 3 min while Operator is open)')+'</div>'+
-    '<div class="kpi-sub" style="margin-top:8px;">Open any lead or client and hit <b>&#128172; GoHighLevel</b> to text, email, add notes and tasks, and see their appointments — right here. Added scopes since you connected? Messages need <code>conversations/message.write</code> and editing contacts needs <code>contacts.write</code>.</div>'+
+    '<div class="kpi-sub" style="margin-top:8px;">Open any lead or client and hit <b>&#128172; GoHighLevel</b> to text, email, add notes and tasks, and see their appointments: right here. Added scopes since you connected? Messages need <code>conversations/message.write</code> and editing contacts needs <code>contacts.write</code>.</div>'+
     '<div class="row" style="margin-top:14px;justify-content:space-between;gap:10px;">'+
       '<button class="btn btn-ghost btn-sm" data-action="ghlDisconnect">Disconnect</button>'+
       '<span class="row" style="gap:10px;">'+busy+'<button class="btn btn-primary" data-action="ghlSyncNow"'+(ui.ghlBusy?' disabled':'')+'>&#128260; Sync now</button></span>'+

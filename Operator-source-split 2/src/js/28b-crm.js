@@ -130,7 +130,7 @@ function logTouch(kind, id, type, date, note){
   if(!Array.isArray(x.touchpoints)) x.touchpoints = [];
   x.touchpoints.push(tp);
   if(kind==='client'){ if(!Array.isArray(x.touches)) x.touches=[]; x.touches.push(date); }
-  if(x.followUp && x.followUp.date && date >= x.followUp.date){ crmTimeline(x, 'followup', 'Followed up'+(x.followUp.note?' — '+x.followUp.note:'')); x.followUp = null; }
+  if(x.followUp && x.followUp.date && date >= x.followUp.date){ crmTimeline(x, 'followup', 'Followed up'+(x.followUp.note?' · '+x.followUp.note:'')); x.followUp = null; }
   x.lastTouchType = type;
   crm().lastTouchType = type;
   lastTouchLogged = {kind:kind, id:id, tpId:tp.id, date:date};
@@ -177,7 +177,7 @@ function touchButtonsHtml(kind, x){
   const last = touchTypeById(x.lastTouchType || crm().lastTouchType);
   const touched = crmLastTouch(kind, x)===todayStr();
   return '<div class="touch-btns'+(touched?' is-touched':'')+'">'+
-    '<button class="touch-log-btn" data-action="quickTouch" data-kind="'+kind+'" data-id="'+x.id+'" title="'+(touched?'Touched today — log another ':'Log a ')+last.label.toLowerCase()+' (today)">'+(touched?'&#10003;':last.icon)+'</button>'+
+    '<button class="touch-log-btn" data-action="quickTouch" data-kind="'+kind+'" data-id="'+x.id+'" title="'+(touched?'Touched today: log another ':'Log a ')+last.label.toLowerCase()+' (today)">'+(touched?'&#10003;':last.icon)+'</button>'+
     '<button class="touch-more-btn" data-action="toggleTouchMenu" data-kind="'+kind+'" data-id="'+x.id+'" title="Log a call, text, DM, email…">&#8964;</button>'+
   '</div>';
 }
@@ -189,7 +189,7 @@ function setStage(kind, id, stageId, opts){
   const from = crmStage(kind, x.stage);
   if(kind==='lead'){ if(!Array.isArray(x.stageHistory)) x.stageHistory=[]; x.stageHistory.push(x.stage); }
   x.stage = stageId;
-  crmTimeline(x, 'stage', (from?from.label:'—')+' → '+st.label);
+  crmTimeline(x, 'stage', (from?from.label:'–')+' → '+st.label);
   if(kind==='lead' && typeof ghlPushStage==='function') ghlPushStage(x);
   if(kind==='client'){ syncClientStatus(x); if(!x.lifecycle) x.lifecycle = {checks:{}, enteredAt:{}}; x.lifecycle.enteredAt[stageId] = Date.now(); }
   let newClientId = null;
@@ -214,7 +214,7 @@ function openLostReason(id){ ui.lostLeadId = id; showOverlay('lostReasonOverlay'
 function renderLostReason(){
   const p = crmFind('lead', ui.lostLeadId); if(!p) return '';
   return '<div class="section-title" style="margin-bottom:4px;">Mark '+escapeHtml(crmName('lead',p))+' as lost</div>'+
-    '<div class="kpi-sub" style="margin-bottom:12px;">Optional — why didn\'t it close?</div>'+
+    '<div class="kpi-sub" style="margin-bottom:12px;">Optional: why didn\'t it close?</div>'+
     '<div class="row" style="gap:6px;margin-bottom:10px;">'+['Price','Timing','Went elsewhere','No response','Not a fit'].map(function(r){ return '<span class="chip" data-action="pickLostReason" data-id="'+escapeHtml(r)+'">'+r+'</span>'; }).join('')+'</div>'+
     '<input class="input" id="lostReasonInput" placeholder="Reason (optional)" style="width:100%;">'+
     '<div class="row" style="margin-top:16px;justify-content:flex-end;"><button class="btn btn-ghost" data-action="cancelLost">Cancel</button><button class="btn btn-danger" data-action="confirmLost">Mark lost</button></div>';
@@ -391,7 +391,7 @@ function renderCrmBoard(kind){
     return '<div class="crm-col'+(closed?' is-closed':'')+'" data-crm-drop="'+kind+':'+st.id+'" data-key="col-'+kind+'-'+st.id+'">'+
       '<div class="crm-col-head"><span class="crm-col-dot" style="background:'+st.color+'"></span><span class="crm-col-title">'+escapeHtml(st.label)+'</span><span class="crm-col-count">'+items.length+'</span>'+(total?'<span class="kpi-sub" style="margin-left:auto;">$'+total.toLocaleString()+'</span>':'')+'</div>'+
       '<div class="crm-col-body">'+shown.map(function(x){ return crmCard(kind, x); }).join('')+
-        (items.length>shown.length ? '<div class="kpi-sub" style="text-align:center;padding:6px;">+'+(items.length-shown.length)+' more — use List view</div>' : '')+
+        (items.length>shown.length ? '<div class="kpi-sub" style="text-align:center;padding:6px;">+'+(items.length-shown.length)+' more: use List view</div>' : '')+
         (!items.length ? '<div class="crm-col-empty">Drop here</div>' : '')+
       '</div>'+
     '</div>';
@@ -409,8 +409,8 @@ function renderCrmList(kind){
       return '<div class="crm-row '+overdueLevel(n)+'" data-key="row-'+x.id+'">'+
         '<span class="crm-row-name" data-action="openContact" data-kind="'+kind+'" data-id="'+x.id+'"><b>'+escapeHtml(crmName(kind,x))+'</b>'+(crmSubName(kind,x)?' <span class="kpi-sub">'+escapeHtml(crmSubName(kind,x))+'</span>':'')+'</span>'+
         '<span><select class="input input-sm" data-crm-stage="'+kind+':'+x.id+'">'+crmStages(kind).map(function(s){ return '<option value="'+s.id+'" '+(x.stage===s.id?'selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select></span>'+
-        '<span class="kpi-sub">'+(src?src.emoji+' '+src.label:'—')+'</span>'+
-        '<span>'+(Number(kind==='lead'?x.value:x.mrr) ? '$'+Number(kind==='lead'?x.value:x.mrr).toLocaleString() : '—')+'</span>'+
+        '<span class="kpi-sub">'+(src?src.emoji+' '+src.label:'–')+'</span>'+
+        '<span>'+(Number(kind==='lead'?x.value:x.mrr) ? '$'+Number(kind==='lead'?x.value:x.mrr).toLocaleString() : '–')+'</span>'+
         '<span class="kpi-sub">'+(lt ? relativeDayLabel(lt) : 'never')+'</span>'+
         '<span class="crm-due '+overdueLevel(n)+'">'+(crmTracked(kind,x) ? dueLabel(n, kind, x) : (st?st.label:''))+'</span>'+
         '<span>'+(crmTracked(kind,x) ? touchButtonsHtml(kind,x) : '')+'</span>'+
@@ -724,7 +724,7 @@ function renderNewContact(){
       '<div class="field"><label>'+(kind==='lead'?'Est. value ($)':'Monthly retainer ($)')+'</label><input class="input" type="number" id="ncValue"></div>'+
       '<div class="field"><label>Stage</label><select class="input" id="ncStage">'+stages.map(function(s){ return '<option value="'+s.id+'" '+(kind==='client'&&s.id==='onboarding'?'selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select></div>'+
     '</div>'+
-    (kind==='client' ? '<div class="field" style="margin-top:10px;"><label>Client cycle (the playbook they\'ll follow)</label><select class="input" id="ncCycle"><option value="">No cycle</option>'+cycles().map(function(x){ return '<option value="'+x.id+'" '+(crm().defaultCycleId===x.id?'selected':'')+'>'+escapeHtml(x.name)+' — '+x.steps.map(function(s){ return s.label; }).join(' → ')+'</option>'; }).join('')+'</select></div>' : '')+
+    (kind==='client' ? '<div class="field" style="margin-top:10px;"><label>Client cycle (the playbook they\'ll follow)</label><select class="input" id="ncCycle"><option value="">No cycle</option>'+cycles().map(function(x){ return '<option value="'+x.id+'" '+(crm().defaultCycleId===x.id?'selected':'')+'>'+escapeHtml(x.name)+': '+x.steps.map(function(s){ return s.label; }).join(' → ')+'</option>'; }).join('')+'</select></div>' : '')+
     '<div class="field" style="margin-top:10px;"><label>Source</label><div class="row" style="gap:6px;">'+LEAD_SOURCES.map(function(s){ return '<span class="chip'+(ui.newContactSource===s.id?' active':'')+'" data-action="ncSource" data-id="'+s.id+'">'+s.emoji+' '+s.label+'</span>'; }).join('')+'</div></div>'+
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="ncNotes" style="width:100%;min-height:60px;"></textarea></div>'+
     '<div class="row" style="margin-top:18px;justify-content:flex-end;"><button class="btn btn-ghost" data-action="closeNewContact">Cancel</button><button class="btn btn-primary" data-action="saveNewContact">Add '+(kind==='lead'?'lead':'client')+'</button></div>';
@@ -780,14 +780,14 @@ function renderCrmSettings(){
     }).join('')+'</div>'+
     '<div class="row" style="margin-top:8px;"><input class="input input-sm" id="newStage-'+kind+'" placeholder="New stage name" style="width:200px;"><button class="btn btn-sm" data-action="addStage" data-kind="'+kind+'">Add stage</button></div>';
   };
-  return '<div class="card section"><div class="section-title">Reach-out cadence'+tip('How often to touch base — each contact can override it. A client goes red once a touch is due. Deliverables: green on pace, yellow when behind but you\'ve done some this week, red when behind with none.')+'</div><div class="grid grid-3">'+
+  return '<div class="card section"><div class="section-title">Reach-out cadence'+tip('How often to touch base: each contact can override it. A client goes red once a touch is due. Deliverables: green on pace, yellow when behind but you\'ve done some this week, red when behind with none.')+'</div><div class="grid grid-3">'+
       '<div class="field"><label>New leads: every (days)</label><input class="input" type="number" min="1" id="setLeadCadence" value="'+c.leadCadenceDays+'"></div>'+
       '<div class="field"><label>Clients: every (days)</label><input class="input" type="number" min="1" id="setClientCadence" value="'+c.clientCadenceDays+'"></div>'+
       '<div class="field"><label>Daily "reach out" reminder</label><div class="row" style="gap:6px;"><input type="checkbox" id="setTouchReminder" '+(c.dailyReminder.enabled?'checked':'')+'><input class="input" type="time" id="setTouchReminderTime" value="'+c.dailyReminder.time+'" style="width:120px;"></div></div>'+
     '</div></div>'+
     messageTemplatesHtml()+
     '<div class="card section"><div class="section-title">Lead stages</div>'+stageEditor('lead')+'</div>'+
-    '<div class="card section"><div class="section-title">Client cycles'+tip('Your playbooks — steps with calls, forms, videos and to-dos.')+'</div><button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">&#9881; Edit client cycles</button></div>'+
+    '<div class="card section"><div class="section-title">Client cycles'+tip('Your playbooks: steps with calls, forms, videos and to-dos.')+'</div><button class="btn btn-primary btn-sm" data-action="openLifecycleEditor">&#9881; Edit client cycles</button></div>'+
     '<div class="card section"><div class="section-title">Client statuses</div>'+stageEditor('client')+'</div>';
 }
 function saveCrmSettingsFields(){

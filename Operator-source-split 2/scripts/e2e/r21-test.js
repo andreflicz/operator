@@ -138,7 +138,7 @@ async function ctxPage(b, seed, opts){
   {
     const p = await ctxPage(b, {profile:{name:'Andre', xpStart:'2026-10-01', xpLevel:4}, business:{clients:[]}, goals:{items:[{id:'g1', tier:'week', pk:'2026-10-12', label:'Test goal'}, {id:'g2', tier:'week', pk:'2026-10-12', label:'Another'}]}, journal:{entries:[], intentions:{weeks:{'2026-10-12':{at:1}}, months:{}, prompted:{}, goalsMoved:1}}}, {clock:WED});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    check('levels: 400 XP for the first, 60 more each after; 100 is the top', await E("xpForLevel(1)")===400 && await E("xpForLevel(2)")===860 && await E("xpLevelOf(1e9)")===100);
+    check('levels: 1,500 XP for the first, each one after costs more; 100 is the top (round 22)', await E("xpForLevel(1)")===1500 && await E("xpForLevel(2)")===4100 && await E("xpLevelOf(1e9)")===100);
     await E("state.profile.xpMrrBase = 0; xpLast = null");
     await E("state.profile.xpMasterHit = {streak:[30]}; xpLast = null");   // (a master goal's 4,000 XP: plenty for level 5)
     const x = JSON.parse(await E("JSON.stringify((function(){ const s = xpSummaryFresh(); return {level:s.level, canLevel:s.canLevel, blocked:s.blocked, rank:s.rank, mrr:s.mrr, needs:s.needs}; })())"));

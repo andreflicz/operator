@@ -85,7 +85,7 @@ function skyChipHtml(){
 function weatherSettingsHtml(){
   const w = weatherCfg(), now = wxNow(), u = wxUnits();
   const results = ui.wxResults || null;
-  return '<div class="section"><div class="section-title">Weather &amp; sky'+tip('Shows what it looks like outside — morning, golden hour, night — plus the live weather, on Today and in the Sky scene. Auto theme follows the real sunrise and sunset here.')+'</div><div class="card">'+
+  return '<div class="section"><div class="section-title">Weather &amp; sky'+tip('Shows what it looks like outside (morning, golden hour, night) plus the live weather, on Today and in the Sky scene. Auto theme follows the real sunrise and sunset here.')+'</div><div class="card">'+
     (wxHasPlace()
       ? '<div class="row" style="gap:10px;align-items:center;flex-wrap:wrap;"><span class="wx-place">&#128205; '+escapeHtml(w.place||'My location')+'</span>'+
           (now ? '<span class="kpi-sub">'+now.temp+'&deg;'+u.toUpperCase()+' &middot; '+escapeHtml(wxLabel(now.code))+'</span>' : '<span class="kpi-sub">Fetching the weather…</span>')+
@@ -94,7 +94,7 @@ function weatherSettingsHtml(){
           '<button class="btn btn-ghost btn-sm" data-action="wxChange">Change</button></div>'
       : '')+
     (!wxHasPlace() || ui.wxEditing
-      ? '<div class="row" style="gap:8px;flex-wrap:wrap;'+(wxHasPlace()?'margin-top:12px;':'')+'"><input class="input" id="wxQuery" placeholder="Search a city — e.g. Brooklyn" style="flex:1;min-width:200px;" value="'+escapeHtml(ui.wxQuery||'')+'">'+
+      ? '<div class="row" style="gap:8px;flex-wrap:wrap;'+(wxHasPlace()?'margin-top:12px;':'')+'"><input class="input" id="wxQuery" placeholder="Search a city, e.g. Brooklyn" style="flex:1;min-width:200px;" value="'+escapeHtml(ui.wxQuery||'')+'">'+
           '<button class="btn btn-sm" data-action="wxSearch">Find</button><button class="btn btn-ghost btn-sm" data-action="wxUseMyLocation">&#128205; Use my location</button></div>'+
         (results ? (results.length ? '<div class="wx-results">'+results.map(function(r, i){ return '<button class="wx-result" data-action="wxPick" data-id="'+i+'">'+escapeHtml(r.label)+'</button>'; }).join('')+'</div>' : '<div class="kpi-sub" style="margin-top:8px;">No places found.</div>') : '')+
         (ui.wxError ? '<div class="kpi-sub" style="margin-top:8px;color:var(--danger-text);">'+escapeHtml(ui.wxError)+'</div>' : '')
@@ -110,7 +110,7 @@ ACTIONS.wxSearch = async function(){
     const res = await fetch(GEO_URL+'?name='+encodeURIComponent(ui.wxQuery)+'&count=6&language=en&format=json');
     const j = await res.json();
     ui.wxResults = (j.results||[]).map(function(r){ return {lat:r.latitude, lon:r.longitude, label:[r.name, r.admin1, r.country_code||r.country].filter(Boolean).join(', '), place:r.name+(r.admin1 && r.admin1!==r.name ? ', '+r.admin1 : '')}; });
-  }catch(e){ ui.wxResults = null; ui.wxError = 'Couldn\'t reach the weather service — check the internet connection.'; }
+  }catch(e){ ui.wxResults = null; ui.wxError = 'Couldn\'t reach the weather service. Check the internet connection.'; }
   renderView();
 };
 document.addEventListener('keydown', function(e){ if(e.key==='Enter' && e.target && e.target.id==='wxQuery'){ e.preventDefault(); ACTIONS.wxSearch(); } });
@@ -124,9 +124,9 @@ function setWeatherPlace(lat, lon, place){
 }
 ACTIONS.wxPick = function(el, e, id){ const r = (ui.wxResults||[])[Number(id)]; if(r) setWeatherPlace(r.lat, r.lon, r.place); };
 ACTIONS.wxUseMyLocation = function(){
-  if(!navigator.geolocation){ ui.wxError = 'Location isn\'t available here — search for your city instead.'; renderView(); return; }
+  if(!navigator.geolocation){ ui.wxError = 'Location isn\'t available here. Search for your city instead.'; renderView(); return; }
   navigator.geolocation.getCurrentPosition(function(pos){ setWeatherPlace(pos.coords.latitude, pos.coords.longitude, 'My location'); },
-    function(){ ui.wxError = 'Location was blocked — search for your city instead.'; renderView(); }, {timeout:10000, maximumAge:3600000});
+    function(){ ui.wxError = 'Location was blocked. Search for your city instead.'; renderView(); }, {timeout:10000, maximumAge:3600000});
 };
 ACTIONS.wxUnits = function(el, e, id){ const w = ensureWeatherCfg(); w.units = id; w.current = null; persist('settings'); renderView(); refreshWeather(true); };
 document.addEventListener('change', function(e){ if(e.target && e.target.id==='setSkyChip'){ state.profile.skyChip = e.target.checked; persist('profile'); } });

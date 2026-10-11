@@ -61,7 +61,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('copy link toast', (await p.textContent('#toastContainer')).includes('Link copied'));
   // schedule the onboarding call
   await p.click('.lc-card [data-action="lcSchedule"]');
-  check('schedule opens event editor prefilled', (await p.inputValue('#calEventTitle')).includes('Onboarding call / meeting — Zed Media') && (await p.inputValue('#calEventLinkedClient'))===zid);
+  check('schedule opens event editor prefilled', (await p.inputValue('#calEventTitle')).includes('Onboarding call / meeting · Zed Media') && (await p.inputValue('#calEventLinkedClient'))===zid);
   await p.fill('#calEventDate', '2026-10-09'); await p.fill('#calEventTime', '10:00'); await p.click('[data-action="saveCalEvent"]');
   check('item shows scheduled date', (await p.textContent('.lc-card')).includes('Oct 9'));
   check('event linked to client', (await E("state.calendar.events.some(e=>e.linkedClient==='"+zid+"' && e.time==='10:00')")));

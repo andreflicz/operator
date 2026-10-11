@@ -145,7 +145,7 @@ function dismissToast(){
 }
 ACTIONS.dismissToast = function(){ dismissToast(); };
 function showLockInToast(){
-  showToast("Logged — you're not locked in right now", {icon:'&#128274;', actionLabel:'Lock In', actionAction:'lockInFromToast'});
+  showToast("Logged: you're not locked in right now", {icon:'&#128274;', actionLabel:'Lock In', actionAction:'lockInFromToast'});
 }
 function lockInFromToast(){
   const container = document.getElementById('toastContainer');

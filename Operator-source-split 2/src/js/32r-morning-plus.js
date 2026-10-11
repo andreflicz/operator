@@ -87,7 +87,7 @@ setInterval(function(){
 function scoresStatusHtml(){
   const sc = ui.scores;
   if(!sc || sc.loading) return '<div class="br-sports-none is-wait">Getting the scores&hellip;</div>';
-  if(!sc.ok) return '<div class="br-sports-none">Couldn’t reach ESPN'+(sc.fails > 1 ? ' ('+sc.fails+' tries)' : '')+' — usually the Wi-Fi coming back from sleep. Trying again on its own.<button class="bi-set" data-action="scoresRetry">Try now</button></div>';
+  if(!sc.ok) return '<div class="br-sports-none">Couldn’t reach ESPN'+(sc.fails > 1 ? ' ('+sc.fails+' tries)' : '')+': usually the Wi-Fi coming back from sleep. Trying again on its own.<button class="bi-set" data-action="scoresRetry">Try now</button></div>';
   return '<div class="br-sports-none">No '+sportsOn().map(function(s){ return s.label; }).join(', ')+' games yesterday, today or this coming week.</div>';
 }
 ACTIONS.scoresRetry = function(){ loadScores(true); };
@@ -165,8 +165,8 @@ ACTIONS.qjCapsuleWhen = function(el, e, id){ ui.qjCapsule = id; if(id==='random'
 document.addEventListener('change', function(e){ if(e.target && e.target.id==='qjCapsuleDate'){ ui.qjCapsuleDate = e.target.value || null; ui.qjCapsule = e.target.value ? 'date' : 'random'; } });
 function capsuleBarHtml(){
   if(!ui.qjCapsule) return '';
-  return '<div class="qj3-cap"><span>&#9203; For future you —</span>'+
-    '<button class="qj3-capb'+(ui.qjCapsule==='random'?' is-on':'')+'" data-action="qjCapsuleWhen" data-id="random" title="Some morning in the next year — you won\'t know when">Surprise me</button>'+
+  return '<div class="qj3-cap"><span>&#9203; For future you, </span>'+
+    '<button class="qj3-capb'+(ui.qjCapsule==='random'?' is-on':'')+'" data-action="qjCapsuleWhen" data-id="random" title="Some morning in the next year: you won\'t know when">Surprise me</button>'+
     '<input type="date" class="qj3-capd" id="qjCapsuleDate" min="'+addDays(todayStr(), 1)+'" value="'+escapeHtml(ui.qjCapsuleDate||'')+'" title="Or pick the day">'+
   '</div>';
 }
@@ -197,7 +197,7 @@ ACTIONS.saveTomorrowNote = function(){
   const head = v('tnHead'), morning = v('tnMorning'), work = v('tnWork');
   if(head || morning || work) addMorningNote(head, {morning:morning, work:work});
   persist('focus'); closeTomorrowNote();
-  showToast(head || morning || work ? 'Saved — it’ll be waiting for you.' : 'Note cleared.', {icon:'&#127769;'});
+  showToast(head || morning || work ? 'Saved: it’ll be waiting for you.' : 'Note cleared.', {icon:'&#127769;'});
   renderView();
 };
 function tomorrowNoteBtnHtml(cls){ const has = (function(){ const n = nightNote(morningNoteTarget()); return !!(n.headline || n.morning || n.work); })(); return '<button class="'+(cls||'dayoff-back')+'" data-action="openTomorrowNote">&#9998; '+(has ? 'Edit tomorrow’s note' : 'Note for tomorrow')+'</button>'; }
@@ -234,7 +234,7 @@ function briefMinimalHtml(){
     '<div class="br-voice"><span class="br-voice-dot"></span><span id="brVoice"></span></div>'+(typeof opAskHtml==='function' ? opAskHtml('brief') : '')+
     '<div class="gmm">'+
       tile('gmm-wx', (now ? wxIcon(wxKind(now.code), phase) : SKY_META[phase].icon)+' Outside', now ? '<b>'+now.temp+'&deg;</b><span>'+escapeHtml(wxLabel(now.code))+(now.hi!=null ? ' · H '+now.hi+'&deg; L '+now.lo+'&deg;' : '')+'</span>' : '<b>'+SKY_META[phase].label+'</b><span>Sunset '+fmtMinOfDay(win.set)+'</span>', 0)+
-      tile('gmm-q', '&#10024; For today', '<p>'+escapeHtml(q[0])+'</p>'+(q[1] ? '<small>— '+escapeHtml(q[1])+'</small>' : ''), 1)+
+      tile('gmm-q', '&#10024; For today', '<p>'+escapeHtml(q[0])+'</p>'+(q[1] ? '<small>'+escapeHtml(q[1])+'</small>' : ''), 1)+
       tile('gmm-day', '&#128197; Today', events.length ? events.slice(0, 3).map(function(e){ return '<div class="gmm-ev"><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('') : '<span>Nothing scheduled.</span>', 2)+
       tile('gmm-you', '&#128100; You', '<b>'+streak+'</b><span>day streak'+(slept ? ' · slept '+fmtDurationLabel(slept.minutes) : '')+'</span>'+(nn.headline ? '<div class="gmm-note">&#127769; '+escapeHtml(nn.headline)+'</div>' : ''), 3)+
       '<div class="gmm-c"><button class="gmm-go" data-action="wakeStartMorning"><span class="gmm-go-ring"></span><span class="gmm-go-t">Get to Work</span><span class="gmm-go-s">&#8594;</span></button></div>'+

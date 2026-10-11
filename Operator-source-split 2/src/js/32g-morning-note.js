@@ -27,7 +27,7 @@ ACTIONS.saveMorningNote = function(el){
   box.value = '';
   playJournalSound();
   renderView();
-  showToast('Saved for '+morningLabel(morningNoteTarget())+' — it\'ll be the first thing you see.', {icon:'&#127769;'});
+  showToast('Saved for '+morningLabel(morningNoteTarget())+': it\'ll be the first thing you see.', {icon:'&#127769;'});
 };
 ACTIONS.removeMorningNote = function(el, e, id){ state.focus.morningNotes = morningNotes().filter(function(n){ return n.id!==id; }); persist('focus'); renderView(); };
 document.addEventListener('keydown', function(e){

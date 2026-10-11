@@ -33,7 +33,7 @@ function rootBoards(){
   return arr(state.boards.boards).filter(function(b){ return !b.parentId && (!m || b.id!==m.id); });
 }
 const BOARD_KIND_META = {
-  journal:{icon:'&#128204;', title:'Boards', sub:'Your vision board — the one you wake up to — and every other board: moodboards, plans, shoot ideas, journal pages. Bring old Milanote boards in with Import.'}
+  journal:{icon:'&#128204;', title:'Boards', sub:'Your vision board, the one you wake up to, and every other board: moodboards, plans, shoot ideas, journal pages. Bring old Milanote boards in with Import.'}
 };
 function createBoard(kind, name, parentId){
   const b = {id:uid(), name:name||'Untitled board', kind:kind, parentId:parentId||null, elements:[], viewport:{x:60, y:40, zoom:1}, createdAt:Date.now()};
@@ -54,13 +54,13 @@ function boardStripHtml(kind, current){
       const count = r.elements.length;
       const isMaster = master && r.id===master.id;
       return '<button class="board-pill'+(activeRoot && activeRoot.id===r.id?' is-active':'')+(isMaster?' is-master':'')+'" data-action="boardOpen" data-kind="'+kind+'" data-id="'+r.id+'" title="Open '+escapeHtml(r.name)+'">'+
-        '<span class="board-pill-thumb">'+(count ? boardStaticHtml(r, 'board-thumb') : '<span class="board-pill-empty">empty</span>')+(isMaster ? '<span class="board-pill-star" title="Your vision board — shows on Today and when you wake up">&#9733;</span>' : '')+'</span>'+
+        '<span class="board-pill-thumb">'+(count ? boardStaticHtml(r, 'board-thumb') : '<span class="board-pill-empty">empty</span>')+(isMaster ? '<span class="board-pill-star" title="Your vision board. Shows on Today and when you wake up">&#9733;</span>' : '')+'</span>'+
         '<span class="board-pill-text"><span class="board-pill-name">'+escapeHtml(r.name)+'</span><span class="board-pill-count">'+(isMaster ? 'vision board &middot; ' : '')+count+' item'+(count===1?'':'s')+'</span></span>'+
       '</button>';
     }).join('')+
     (master ? '' : '<button class="board-pill board-pill-new" data-action="boardNewVision"><span class="board-pill-plus">&#9733;</span><span class="board-pill-text"><span class="board-pill-name">Vision board</span><span class="board-pill-count">the one you wake up to</span></span></button>')+
     '<button class="board-pill board-pill-new board-pill-mini" data-action="boardNew" data-kind="'+kind+'" title="New board"><span class="board-pill-plus">+</span></button>'+
-    '<button class="board-pill board-pill-new board-pill-mini" data-action="boardImport" title="Import boards — a Milanote export, .md or images"><span class="board-pill-plus">&#11014;</span></button>'+
+    '<button class="board-pill board-pill-new board-pill-mini" data-action="boardImport" title="Import boards: a Milanote export, .md or images"><span class="board-pill-plus">&#11014;</span></button>'+
   '</div>';
 }
 function renderBoardShell(kind){
@@ -102,13 +102,13 @@ function renderBoardShell(kind){
     '</div>'+
     (view ? '' : '<div class="board-toolbar">'+
       tool('boardAddNote','&#128221;','Note (or double-click the board)')+
-      tool('boardAddLabel','&#127991;&#65039;','Label — a card with a colored title')+
+      tool('boardAddLabel','&#127991;&#65039;','Label: a card with a colored title')+
       tool('boardAddList','&#9776;','List')+
       tool('boardAddImage','&#128444;&#65039;','Image (or paste / drop one)')+
       tool('boardAddImageUrl','&#128279;','Image from a link')+
       tool('boardAddNested','&#128450;&#65039;','Board inside this one')+
-      tool('boardAddLine','&#9585;','Line — click the start, then the end', cv.lineDraw && !cv.lineDraw.arrow ? ' data-on="1"' : '')+
-      tool('boardAddArrow','&#10140;','Arrow — click the start, then where it points', cv.lineDraw && cv.lineDraw.arrow ? ' data-on="1"' : '')+
+      tool('boardAddLine','&#9585;','Line: click the start, then the end', cv.lineDraw && !cv.lineDraw.arrow ? ' data-on="1"' : '')+
+      tool('boardAddArrow','&#10140;','Arrow: click the start, then where it points', cv.lineDraw && cv.lineDraw.arrow ? ' data-on="1"' : '')+
       '<span class="board-tool-sep"></span>'+
       BOARD_COLORS.map(function(c){ return '<button class="board-swatch" data-action="boardColor" data-kind="'+kind+'" data-id="'+c+'" style="background:'+c+'" title="Color selected"'+(selCount?'':' disabled')+'></button>'; }).join('')+
       '<span class="board-tool-sep"></span>'+
@@ -568,7 +568,7 @@ ACTIONS.boardMakeMaster = function(){
   const root = boardPath(b)[0];
   state.boards.masterId = root.id;
   persist('boards'); playPositive(); renderView();
-  showToast('“'+root.name+'” is your vision board now — it shows on Today and when your alarm goes off.', {icon:'&#9733;'});
+  showToast('“'+root.name+'” is your vision board now. It shows on Today and when your alarm goes off.', {icon:'&#9733;'});
 };
 ACTIONS.boardToggleView = function(el){
   if(cv.editing) finishEditing();

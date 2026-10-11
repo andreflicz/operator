@@ -191,7 +191,7 @@ function methodLine(st){
   const as = state.focus.activeSession, t = as && lockTaskPick(as.method.taskId);
   return t ? 'Until <b>'+escapeHtml(t.title)+'</b> is done' : 'Until it\'s done';
 }
-const FLOW_HOW = 'Flowtime: there’s no timer. Work as long as your focus holds; when it dips, take a break about a fifth as long as the stretch you just did (5–30 min — 50 minutes earns 10). The longer you stay in it, the bigger the break you’ve earned. When the break ends, you lock back in yourself.';
+const FLOW_HOW = 'Flowtime: there’s no timer. Work as long as your focus holds; when it dips, take a break about a fifth as long as the stretch you just did (5–30 min, 50 minutes earns 10). The longer you stay in it, the bigger the break you’ve earned. When the break ends, you lock back in yourself.';
 function flowTipHtml(){ return typeof tip==='function' ? tip(FLOW_HOW) : ''; }
 function methodStripHtml(as){
   const st = methodState(as); if(!st) return '';
@@ -252,7 +252,7 @@ function flowBreakMinutes(){
 function methodTaskDone(id){
   const as = state.focus.activeSession;
   if(!as || !as.method || as.method.id!=='done' || as.method.taskId!==id) return;
-  showToast('That\'s the one — done.', {icon:'&#9989;', actionLabel:'Lock out', actionAction:'openStopFocus', duration:12000});
+  showToast('That\'s the one: done.', {icon:'&#9989;', actionLabel:'Lock out', actionAction:'openStopFocus', duration:12000});
 }
 ACTIONS.openStopFocus = function(){ openStopFocus(); };
 document.addEventListener('keydown', function(e){

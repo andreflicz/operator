@@ -73,6 +73,11 @@ function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
   await shot('checkin', async () => { await E("openIntentForm('month')"); await p.waitForTimeout(400); });
   await E("ACTIONS.closeIntent()");
   await shot('guide', async () => { await E("ui.view='personal'; ui.personalTab='you'; renderView(); ACTIONS.openXpHow()"); });
+  await shot('guide2', async () => { await E("ACTIONS.openXpHow(); document.getElementById('xpHowOverlay').scrollTop = 1500"); });
+  await shot('history', async () => { await E("ACTIONS.openXpHistory()"); });
+  await shot('you2', async () => { await E("ACTIONS.closeXpHow(); ui.view='personal'; ui.personalTab='you'; renderView()"); await p.waitForTimeout(300); await E("[document.scrollingElement, document.getElementById('viewRoot').parentElement].forEach(x => { if(x) x.scrollTop = 99999; })"); });
+  await shot('health2', async () => { await E("ui.view='personal'; ui.personalTab='fitness'; renderView()"); await p.waitForTimeout(300); await E("document.getElementById('healthScore').scrollIntoView({block:'center'})"); });
+  await shot('sleepsheet', async () => { await E("openHealthSheet('sleep')"); });
   await E("ACTIONS.closeXpHow()");
   await shot('morning', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.view='today'; renderView(); fireWake({})"); await p.click('[data-action=\"wakeStartDay\"]'); await p.waitForTimeout(900); await E("briefRevealAll()"); await p.clock.runFor(3000); await p.waitForTimeout(900); });
   console.log('errors:', p.errors);

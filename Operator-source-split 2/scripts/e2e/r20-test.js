@@ -29,10 +29,11 @@ async function ctxPage(b, seed, opts){
     const p = await ctxPage(b, {profile:{name:'Andre', heightIn:70}, finances:{debts:[{id:'d', name:'Card', balance:5000, originalAmount:10000}], payments:[{id:'p1', date:'2026-10-01', amount:200}, {id:'p2', date:'2026-09-05', amount:200}], income:[]}}, {clock:WED});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     const subs = JSON.parse(await E("JSON.stringify(Object.fromEntries(['BUS','PER','HLT','DIS'].map(k => [k, xpSummaryFresh().attrs[k].subs.map(s => s.label)])))"));
-    check('Business: MRR · Grind · Scaling · Business content (no Clients, no "Time put in")', JSON.stringify(subs.BUS)===JSON.stringify(['MRR', 'Grind', 'Scaling', 'Business content']), subs.BUS);
-    check('Personal: Personal content · Goals · Finances (no Reflection)', JSON.stringify(subs.PER)===JSON.stringify(['Personal content', 'Goals', 'Finances']), subs.PER);
-    check('Health: Body · Training · Sleep (no Consistency)', JSON.stringify(subs.HLT)===JSON.stringify(['Body (BMI)', 'Training', 'Sleep']), subs.HLT);
-    check('Discipline: Standards kept · Follow-through · Check-ins (no On target, no Streak)', JSON.stringify(subs.DIS)===JSON.stringify(['Standards kept', 'Follow-through', 'Check-ins']), subs.DIS);
+    // (round 22: every stat one word, three a rating; one Content stat; no Sleep)
+    check('Business: MRR · Grind · Scaling (no Clients, no "Time put in")', JSON.stringify(subs.BUS)===JSON.stringify(['MRR', 'Grind', 'Scaling']), subs.BUS);
+    check('Personal: Content · Goals · Finances (no Reflection)', JSON.stringify(subs.PER)===JSON.stringify(['Content', 'Goals', 'Finances']), subs.PER);
+    check('Health: Training · Diet · Weight', JSON.stringify(subs.HLT)===JSON.stringify(['Training', 'Diet', 'Weight']), subs.HLT);
+    check('Discipline: Integrity · Reliability · Consistency (no On target, no Streak)', JSON.stringify(subs.DIS)===JSON.stringify(['Integrity', 'Reliability', 'Consistency']), subs.DIS);
     const all = [].concat(subs.BUS, subs.PER, subs.HLT, subs.DIS);
     check('…and no stat appears twice', new Set(all).size===all.length);
     const inDebt = JSON.parse(await E("JSON.stringify(financeRating())"));
@@ -45,8 +46,6 @@ async function ctxPage(b, seed, opts){
     check('…debt-free and earning: top of the scale', free.score >= 840, free);
     await E("state.finances = {debts:[], payments:[], income:[]}");
     check('…nothing entered: not rated (no free points)', await E("financeRating().f")===null);
-    await E("state.modes.history.push({sleep:true, endedAt:Date.now()-3600000, minutes:480})");
-    check('Sleep comes from Sleep mode (8h → 100)', await E("xpSummaryFresh().attrs.HLT.subs[2].v")===100);
     await E("ui.view='personal'; ui.personalTab='you'; renderView(); ACTIONS.openXpHow()"); await p.waitForTimeout(200);
     const guide = await p.textContent('#xpHowContent');
     check('the guide explains Grind, Scaling, check-ins and master goals', /Grind/.test(guide) && /Scaling/.test(guide) && /check out/i.test(guide) && /master goal/i.test(guide) && !/Reflection/.test(guide));

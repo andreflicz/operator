@@ -2,7 +2,7 @@
 // your offers, like a pricing page: one card each (the + in the corner adds one)
 function renderPackagesTab(){
   const packages = arr(state.business.packages);
-  if(!packages.length) return '<div class="pk-empty"><div class="pk-empty-i">&#128230;</div><b>Your offers live here.</b><span>Press + (bottom right) to add your first package — what it costs and what the client gets each week.</span></div>';
+  if(!packages.length) return '<div class="pk-empty"><div class="pk-empty-i">&#128230;</div><b>Your offers live here.</b><span>Press + (bottom right) to add your first package: what it costs and what the client gets each week.</span></div>';
   return '<div class="pk-grid">'+packages.map(packageRow).join('')+'</div>';
 }
 function openNewPackageModal(){
@@ -70,7 +70,7 @@ function renderPackageEditModal(){
       '<div class="field"><label>Price (optional)</label><input class="input" type="number" id="editPackagePrice-'+pk.id+'" value="'+(pk.price||'')+'"></div>'+
       '<div class="field"><label>Description (optional)</label><input class="input" id="editPackageDesc-'+pk.id+'" value="'+escapeHtml(pk.description||'')+'"></div>'+
     '</div>'+
-    '<div class="section-title" style="margin-top:16px;margin-bottom:8px;">Deliverables'+tip('Set a weekly pace instead of a monthly total — e.g. “Reels” at 3×/week.')+'</div>'+
+    '<div class="section-title" style="margin-top:16px;margin-bottom:8px;">Deliverables'+tip('Set a weekly pace instead of a monthly total, e.g. “Reels” at 3×/week.')+'</div>'+
     '<div class="task-list" style="margin-bottom:10px;">'+(deliverables.map(function(d){
       return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(d.title)+'</div>'+
         '<div class="row" style="gap:4px;align-items:center;"><input class="input" type="number" min="1" data-action-input="packageDeliverableTarget" data-id="'+pk.id+'" data-did="'+d.id+'" value="'+(d.weeklyTarget||1)+'" style="width:56px;text-align:center;"><span class="kpi-sub">&times;/week</span></div>'+

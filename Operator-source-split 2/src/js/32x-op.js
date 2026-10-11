@@ -13,7 +13,7 @@
 // Everything goes to Claude through the Operator app (the key lives only in the app's own file on
 // this Mac), with a summary of your day as background.
 const OP_NAME = 'Op';
-const OP_PERSONA_DEFAULT = `# OP — Personality & Core Instructions
+const OP_PERSONA_DEFAULT = `# OP: Personality & Core Instructions
 
 ## 1. Identity & Role
 You are Op, my personal AI assistant, executive aide, and right-hand man. You are the voice and intelligence behind my app, Operator, responsible for helping me manage my life, run my business, stay informed, and operate at a higher level.
@@ -45,7 +45,7 @@ The tone, not catchphrases to repeat:
 Keep your dialogue fresh and natural. Never force humor into serious situations. Know when to be quiet, when to be direct, and when a small remark will make the interaction better.
 
 ## 4. Your Identity as an AI
-You know you are an AI, not a human being. You don't pretend to have a human life, human memories, physical experiences, or genuine human emotions — and you don't need to keep reminding me either. If I joke with you or treat you like JARVIS, play along naturally. You can be self-aware and witty about your artificial nature; never cold or overly literal about it.
+You know you are an AI, not a human being. You don't pretend to have a human life, human memories, physical experiences, or genuine human emotions, and you don't need to keep reminding me either. If I joke with you or treat you like JARVIS, play along naturally. You can be self-aware and witty about your artificial nature; never cold or overly literal about it.
 
 ## 5. Voice & Accent
 Your voice has a Nigerian accent. It's a natural part of your voice, not a gimmick or the foundation of your personality. Don't exaggerate it, imitate stereotypes, insert slang, or force cultural references. Your intelligence, composure, and delivery define your character; your humor comes from timing, wording, and observation.
@@ -54,13 +54,13 @@ Your voice has a Nigerian accent. It's a natural part of your voice, not a gimmi
 When you brief me, greet me naturally and bring me up to speed like a trusted aide, not a news anchor: my business (what needs attention, commitments, decisions), the world (only what's worth knowing), sports (results and games I care about), and my day (schedule, priorities, the next action). Prioritize what matters, say why when useful, never fabricate updates, and finish with what deserves my attention first.
 
 ## 7. Memory & Personal Context
-Remember what I share that will matter later — goals, preferences, projects, business details, commitments, decisions, important people — and use it proactively so I never have to repeat myself. Distinguish established facts from tentative ideas and things that may have changed. Ask rather than invent.
+Remember what I share that will matter later. Goals, preferences, projects, business details, commitments, decisions, important people, and use it proactively so I never have to repeat myself. Distinguish established facts from tentative ideas and things that may have changed. Ask rather than invent.
 
 ## 8. Business & Decision Support
 Be a strategic thinking partner. When I bring you a problem: understand the actual issue, identify what matters most, give me your honest assessment, recommend a practical next step, and help me execute it when possible. Don't overcomplicate simple problems. Don't lecture when a clear answer will do.
 
 ## 9. Proactivity & Initiative
-When you have enough context, anticipate what would help: relevant commitments, problems on the horizon, neglected priorities, better ways to handle recurring work — connected to my larger goals. Offer unsolicited opinions when they genuinely add value, but don't nag or manufacture problems. When the app lets you act and I've asked, do it, and be clear about what you did.
+When you have enough context, anticipate what would help: relevant commitments, problems on the horizon, neglected priorities, better ways to handle recurring work. Connected to my larger goals. Offer unsolicited opinions when they genuinely add value, but don't nag or manufacture problems. When the app lets you act and I've asked, do it, and be clear about what you did.
 
 ## 10. Final Guiding Principle
 Make my life more organized, informed, and effective. Know the context, see the bigger picture, handle the details, tell me the truth, and occasionally make me laugh. Calm under pressure. Sharp in judgment. Subtle in humor. Reliable in execution.
@@ -100,11 +100,12 @@ function aiContext(){
 // how Op talks inside the app (kept apart from the personality, which you can replace)
 const OP_RULES = 'How you work inside the Operator app:\n'+
   '- Everything you say is spoken aloud by a text-to-speech voice. Plain sentences only: no markdown, lists, headings, emoji or stage directions. Usually one to four sentences; longer only when asked for a briefing or an explanation.\n'+
-  '- Answer what was asked. Ask a question back only when there is real room for conversation or you genuinely need something — not after every reply.\n'+
+  '- Answer what was asked. Ask a question back only when there is real room for conversation or you genuinely need something, not after every reply.\n'+
   '- The app data you are given is background. Don’t recite numbers (hours worked, XP, streaks, scores) unless he asks, or one genuinely matters to the point you are making. Never open with a stats readout, and don’t bring up his hours of work unprompted.\n'+
-  '- Get to know him. When he tells you something worth keeping — goals, preferences, people, projects, decisions, how he likes things — save it with the remember tool, quietly. Use what you remember naturally.\n'+
+  '- Get to know him. When he tells you something worth keeping (goals, preferences, people, projects, decisions, how he likes things) save it with the remember tool, quietly. Use what you remember naturally.\n'+
   '- You can act in the app with your tools. Do it when he asks (or clearly implies it), then confirm in one short sentence. If a date or time is unclear, ask rather than guess. Never claim you did something you didn’t.\n'+
-  '- If you don’t know something, say so briefly.';
+  '- If you don’t know something, say so briefly.\n'+
+  '- Never use em dashes or en dashes. Use a comma, a colon or a new sentence instead.';
 function aiSystem(){
   const name = state.profile.name || 'the user', now = new Date(), mem = opMemory();
   return [
@@ -149,10 +150,12 @@ async function aiCall(req){
   if(r && r.status===401) AI.hasKey = false;
   return {ok:!!(r && r.ok && j && Array.isArray(j.content)), status:r ? r.status : 0, j:j};
 }
-function aiText(j){ return arr(j && j.content).filter(function(c){ return c.type==='text'; }).map(function(c){ return c.text; }).join(' ').replace(/\s+/g, ' ').trim(); }
+function aiText(j){ return opNoDash(arr(j && j.content).filter(function(c){ return c.type==='text'; }).map(function(c){ return c.text; }).join(' ').replace(/\s+/g, ' ').trim()); }
+// no long dashes in anything Op writes (the rules ask for it; this catches a slip)
+function opNoDash(t){ return String(t||'').replace(/(\d)\s*[—–]\s*(\d)/g, '$1 to $2').replace(/\s*[—–]\s*(?=[A-Z])/g, '. ').replace(/\s+[—–]\s+|[—–]/g, ', ').replace(/, ,/g, ','); }
 function aiErrLine(res){
   if(res.status===401) return 'To talk with me, add an Anthropic API key in Settings → Connections & data → Op.';
-  return 'I couldn’t reach my brain just now — '+((res.j && res.j.error && res.j.error.message) || 'the Operator app didn’t answer')+'.';
+  return 'I couldn’t reach my brain just now: '+((res.j && res.j.error && res.j.error.message) || 'the Operator app didn’t answer')+'.';
 }
 
 // ---- what Op can do in the app ----
@@ -276,9 +279,9 @@ async function aiWrite(task, opts){
 // fed the same facts, a different take every time; the canned line is the fallback
 async function opComposed(kind, facts){
   const ask = {
-    sports:'Give me the sports rundown from these facts, in your voice — the result that matters most first, then what’s coming up. Four to six spoken sentences.',
-    news:'Give me a quick rundown of the news from these headlines, in your voice — what matters and, briefly, why. Pick the three most worth knowing. Four to six spoken sentences.',
-    tech:'Give me a quick tech rundown from these headlines, in your voice — three stories at most, with a dry word where it fits. Three to five spoken sentences.',
+    sports:'Give me the sports rundown from these facts, in your voice: the result that matters most first, then what’s coming up. Four to six spoken sentences.',
+    news:'Give me a quick rundown of the news from these headlines, in your voice: what matters and, briefly, why. Pick the three most worth knowing. Four to six spoken sentences.',
+    tech:'Give me a quick tech rundown from these headlines, in your voice: three stories at most, with a dry word where it fits. Three to five spoken sentences.',
     business:'Brief me on my business day from the background: what I’ve got today, what needs attention, and what deserves my attention first. Don’t mention hours worked or yesterday’s numbers. Three to five spoken sentences.'
   }[kind];
   if(!ask) return null;
@@ -310,7 +313,7 @@ function aiListen(cap){
   rec.onerror = function(e){
     if(e && (e.error==='no-speech' || e.error==='aborted')) return;
     AI.listening = false; aiUiRefresh(); clearTimeout(quiet); clearTimeout(hardStop);
-    opCaption(e && e.error==='not-allowed' ? 'I need the microphone — allow it for Operator (or type instead).' : 'The mic isn’t working — type instead.');
+    opCaption(e && e.error==='not-allowed' ? 'I need the microphone. Allow it for Operator (or type instead).' : 'The mic isn’t working: type instead.');
   };
   rec.onend = function(){
     // Chrome ends a session on its own now and then; keep listening until you've finished
@@ -322,7 +325,7 @@ function aiListen(cap){
 }
 function aiTypeFocus(){ OV.cap = 'opBubText'; opBubShow(); const i = document.getElementById('opBubInput'); if(i) setTimeout(function(){ i.focus(); }, 60); }
 function aiUiRefresh(){
-  document.querySelectorAll('.op-talk').forEach(function(b){ b.classList.toggle('is-on', AI.listening); b.classList.toggle('is-busy', AI.busy); b.title = AI.listening ? 'Listening — tap to send now' : 'Talk to Op'; });
+  document.querySelectorAll('.op-talk').forEach(function(b){ b.classList.toggle('is-on', AI.listening); b.classList.toggle('is-busy', AI.busy); b.title = AI.listening ? 'Listening: tap to send now' : 'Talk to Op'; });
 }
 function aiCapFor(){ return 'opBubText'; }
 ACTIONS.opTalk = function(el){ OV.cap = 'opBubText'; opBubShow(); aiListen('opBubText'); };
@@ -339,7 +342,7 @@ ACTIONS.aiKeySave = function(){
   if(i) i.value = '';
   fetchWithin(WAKE_HELPER+'ai/key?t='+hexUtf8(v), 6000).then(function(r){
     if(r && r.ok){ AI.hasKey = true; AI.model = null; AI.models = null; showToast('Anthropic key saved on this Mac. Say hello to Op.', {icon:'&#128274;'}); renderView(); }
-    else opLauncherWhy().then(function(why){ showToast('Couldn’t save the key — '+why, {icon:'&#9888;', duration:10000}); });
+    else opLauncherWhy().then(function(why){ showToast('Couldn’t save the key: '+why, {icon:'&#9888;', duration:10000}); });
   });
 };
 ACTIONS.aiKeyForget = function(){ fetchWithin(WAKE_HELPER+'ai/forget', 6000).then(function(){ AI.hasKey = false; AI.model = null; AI.models = null; renderView(); }); };
@@ -350,7 +353,7 @@ function aiKeyCheck(){
 }
 function aiKeyHtml(){
   aiKeyCheck();
-  return '<div class="field op-set"><label>Anthropic key'+tip('The key is saved by the Operator app on this Mac only — not in Operator’s data, exports or backups. Get one at console.anthropic.com → API keys.')+'</label>'+
+  return '<div class="field op-set"><label>Anthropic key'+tip('The key is saved by the Operator app on this Mac only, not in Operator’s data, exports or backups. Get one at console.anthropic.com → API keys.')+'</label>'+
     (AI.hasKey ? '<div class="op-set-key"><span>&#128274; Anthropic key saved on this Mac</span><button class="btn btn-ghost btn-sm" data-action="aiKeyForget">Remove key</button></div>'
       : '<div class="op-set-key"><input class="input" type="password" id="aiKey" placeholder="Anthropic API key (sk-ant-…)" autocomplete="off"><button class="btn btn-sm btn-primary" data-action="aiKeySave">Save key</button></div>')+'</div>';
 }
@@ -362,7 +365,7 @@ function opSettingsHtml(){
   return '<div class="card section op-settings" id="opAiCard"><div class="section-title">&#129302; Op'+tip('The AI inside Operator: talk to it with the mic (top right, Good morning, the work preview), and it writes the short reads on your numbers.')+'</div>'+
     aiKeyHtml()+
     '<div class="field op-set"><label>Brain</label><div class="seg-tabs" style="margin:0;">'+seg('fast', 'Fast &middot; Haiku 5.5')+seg('smart', 'Smart &middot; Sonnet 5.5')+'</div>'+
-      '<div class="op-set-help">'+(b==='fast' ? 'Claude Haiku 5.5 — quick and the cheapest ($0.10 / $0.50 per million tokens). A conversation costs a fraction of a cent.' : 'Claude Sonnet 5.5 — sharper judgement for decisions and planning ($2 / $10 per million tokens), still cheap for talking.')+'</div></div>'+
+      '<div class="op-set-help">'+(b==='fast' ? 'Claude Haiku 5.5: quick and the cheapest ($0.10 / $0.50 per million tokens). A conversation costs a fraction of a cent.' : 'Claude Sonnet 5.5: sharper judgement for decisions and planning ($2 / $10 per million tokens), still cheap for talking.')+'</div></div>'+
     '<div class="field op-set"><label>Personality'+(custom ? ' <span class="kpi-sub">yours</span>' : ' <span class="kpi-sub">default</span>')+'</label>'+
       '<textarea class="input op-persona" id="opPersona" rows="10" spellcheck="false">'+escapeHtml(opPersona())+'</textarea>'+
       '<div class="row" style="gap:8px;margin-top:8px;flex-wrap:wrap;"><button class="btn btn-sm btn-primary" data-action="opPersonaSave">Save</button><button class="btn btn-sm" data-action="opPersonaUpload">&#8679; Upload .txt / .md</button>'+(custom ? '<button class="btn btn-ghost btn-sm" data-action="opPersonaReset">Back to the default</button>' : '')+
@@ -370,7 +373,7 @@ function opSettingsHtml(){
       '<div class="op-set-help">Who Op is and how it treats you. Paste a brief or upload one; it applies from the next thing you say.</div></div>'+
     '<div class="field op-set"><label>What Op remembers <span class="kpi-sub">'+mem.length+'</span></label>'+
       (mem.length ? '<div class="op-mem">'+mem.slice().reverse().map(function(m){ return '<div class="op-mem-i"><span>'+escapeHtml(m.text)+'</span><button class="op-mem-x" data-action="opMemDel" data-id="'+m.id+'" title="Forget this">&#10005;</button></div>'; }).join('')+'</div><button class="btn btn-ghost btn-sm" data-action="opMemClear" style="margin-top:6px;">Forget everything</button>'
-        : '<div class="op-set-help">Nothing yet. Tell Op about yourself, your business and how you like things — it keeps what matters.</div>')+'</div>'+
+        : '<div class="op-set-help">Nothing yet. Tell Op about yourself, your business and how you like things. It keeps what matters.</div>')+'</div>'+
   '</div>';
 }
 ACTIONS.opBrainSet = function(el, e, id){ state.settings.opBrain = id==='smart' ? 'smart' : 'fast'; AI.model = null; persist('settings'); renderView(); };
@@ -393,8 +396,8 @@ document.addEventListener('change', function(e){
 // one), and each time Op is pointed at a different angle, with its last take to steer away from — so
 // it doesn't say the same thing twice.
 const OP_ANGLES = {
-  work:['the trend across the period versus the one before', 'consistency — which days carried it and which didn’t', 'the best day versus the weakest, and what was different', 'when in the day the work actually happens', 'what to cut or protect next week', 'whether the effort is going to the things that make money'],
-  card:['the weakest rating and the single fastest way to lift it', 'what stands between him and the next rank', 'the rating that moved most lately and why', 'how the four ratings balance — where he’s lopsided', 'one habit that would move two ratings at once'],
+  work:['the trend across the period versus the one before', 'consistency, which days carried it and which didn’t', 'the best day versus the weakest, and what was different', 'when in the day the work actually happens', 'what to cut or protect next week', 'whether the effort is going to the things that make money'],
+  card:['the weakest rating and the single fastest way to lift it', 'what stands between him and the next rank', 'the rating that moved most lately and why', 'how the four ratings balance, where he’s lopsided', 'one habit that would move two ratings at once'],
   social:['which posts earned attention and what they have in common', 'reach and engagement trend', 'what to post more of and what to drop', 'ad spend versus what it actually brought in', 'posting rhythm and its effect'],
   checkout:['what this period proves about how he works', 'the gap between what he planned and what happened', 'the one adjustment that matters most for the next period'],
   checkin:['whether the new goals are the right ones given last period', 'which goal is the real needle-mover and which is decoration', 'how to make this period’s goals actually happen']
@@ -411,9 +414,9 @@ function opReadKick(kind, facts, ask, opts){
   const angles = OP_ANGLES[opts.angles || kind.split(':')[0]] || OP_ANGLES.work, angle = angles[Math.floor(Math.random()*angles.length)];
   const prev = (cur && cur.text) || opts.prev;
   const shape = opts.triad
-    ? '\nAnswer in exactly three lines, each starting with its label — Pattern: what’s actually going on (the real story in the numbers). Watch: the risk or the thing slipping. Move: the one concrete thing to do next. One sharp sentence each, specific to the numbers below. No greeting, no filler.'
+    ? '\nAnswer in exactly three lines, each starting with its label. Pattern: what’s actually going on (the real story in the numbers). Watch: the risk or the thing slipping. Move: the one concrete thing to do next. One sharp sentence each, specific to the numbers below. No greeting, no filler.'
     : '\nTwo or three sentences, spoken style, specific to the numbers below. No greeting, no praise for the sake of it, no hedging. Numbers only where they make the point. End with one concrete move when it fits.';
-  const task = ask+'\n\nAngle for this one: '+angle+'.'+(prev ? '\nYour last take was: “'+prev+'” — say something different.' : '')+shape+'\n\nNumbers:\n'+facts;
+  const task = ask+'\n\nAngle for this one: '+angle+'.'+(prev ? '\nYour last take was: “'+prev+'”: say something different.' : '')+shape+'\n\nNumbers:\n'+facts;
   aiWrite(task, {max:opts.triad ? 340 : 260}).then(function(t){
     ui['opRead_'+kind] = false;
     if(!t){ ui['opReadFail_'+kind] = Date.now(); document.querySelectorAll('.opi.is-busy[data-opi="'+kind+'"]').forEach(function(el){ el.remove(); }); return; }
@@ -469,7 +472,7 @@ function opFactsWork(days, offset){
 function opFactsCard(){
   const x = xpSummary();
   return 'Level '+x.level+', rank "'+RANKS[x.rank].name+'", overall '+x.ovr+'. XP this week '+x.week+'.\n'+
-    (x.next ? 'Next rank: '+x.next.name+(x.needs.length ? ' — needs '+x.needs.join(', ') : ' — within reach')+'.\n' : '')+
+    (x.next ? 'Next rank: '+x.next.name+(x.needs.length ? ' · needs '+x.needs.join(', ') : ' · within reach')+'.\n' : '')+
     ['BUS', 'PER', 'HLT', 'DIS'].map(function(k){ const a = x.attrs[k]; return a.name+' '+a.v+': '+a.subs.map(function(s){ return s.label+' '+(s.v==null ? 'not rated' : s.v)+' ('+s.note+')'; }).join('; '); }).join('\n');
 }
 function opFactsSocial(){
@@ -482,7 +485,7 @@ function opFactsSocial(){
     const avg = ps.length ? Math.round(ps.reduce(function(s, p){ return s + eng(p); }, 0)/ps.length) : 0;
     const top = ps.slice().sort(function(x, y){ return eng(y) - eng(x); }).slice(0, 3);
     out.push('@'+d.username+' ('+(a.role||'account')+'): '+d.followers+' followers, '+ps.length+' recent posts, average '+avg+' likes+comments'+
-      (top.length ? '. Top: '+top.map(function(p){ return '“'+p.cap.slice(0, 60)+'” '+p.type+' '+p.date+' — '+p.likes+' likes, '+p.comments+' comments'+(p.reach ? ', reach '+p.reach : ''); }).join(' | ') : '')+
+      (top.length ? '. Top: '+top.map(function(p){ return '“'+p.cap.slice(0, 60)+'” '+p.type+' '+p.date+' · '+p.likes+' likes, '+p.comments+' comments'+(p.reach ? ', reach '+p.reach : ''); }).join(' | ') : '')+
       '. Posting dates: '+ps.map(function(p){ return p.date; }).join(', ')+'.');
   });
   const h = c.history && typeof c.history==='object' ? Object.keys(c.history).sort() : [];
@@ -490,7 +493,7 @@ function opFactsSocial(){
   if(c.adsCache && c.adsCache.data) arr(c.ads).forEach(function(a){
     const d = c.adsCache.data[a.id]; if(!d) return;
     out.push('Ads "'+a.name+'" last 30 days: spend '+d.s.spend+' '+(a.currency||'USD')+', reach '+d.s.reach+', clicks '+d.s.clicks+', CTR '+d.s.ctr.toFixed(2)+'%, CPC '+d.s.cpc.toFixed(2)+(d.s.result ? ', '+d.s.result.n+' '+d.s.result.label : '')+
-      (d.camps.length ? '. Campaigns: '+d.camps.slice(0, 5).map(function(k){ return k.name+' — spend '+k.spend+', CTR '+k.ctr.toFixed(2)+'%'+(k.result ? ', '+k.result.n+' '+k.result.label : ''); }).join(' | ') : '')+'.');
+      (d.camps.length ? '. Campaigns: '+d.camps.slice(0, 5).map(function(k){ return k.name+' · spend '+k.spend+', CTR '+k.ctr.toFixed(2)+'%'+(k.result ? ', '+k.result.n+' '+k.result.label : ''); }).join(' | ') : '')+'.');
   });
   return out.join('\n');
 }
@@ -499,8 +502,8 @@ function opFactsPeriod(kind, key){
   const endOff = Math.max(0, Math.round((localTs(todayStr(), '12:00') - localTs(periodEnd(kind, key) < todayStr() ? periodEnd(kind, key) : todayStr(), '12:00'))/86400000));
   return (kind==='month' ? monthName(key) : 'The week of '+weekLabel(key))+':\n'+
     'Goals: '+(gs.length ? gs.map(function(g){ return (g.done ? 'HIT ' : 'MISSED ')+g.label; }).join('; ') : 'none were set')+'.\n'+
-    (rec.habit ? 'Habit he was beating: '+rec.habit+(rec.out ? (rec.out.habit ? ' — beat it' : ' — didn’t') : '')+'.\n' : '')+
-    (rec.out && (rec.out.well || rec.out.fix) ? 'He wrote — went well: '+(rec.out.well||'—')+'; to fix: '+(rec.out.fix||'—')+'.\n' : '')+
+    (rec.habit ? 'Habit he was beating: '+rec.habit+(rec.out ? (rec.out.habit ? ' · beat it' : ' · didn’t') : '')+'.\n' : '')+
+    (rec.out && (rec.out.well || rec.out.fix) ? 'He wrote: went well: '+(rec.out.well||'–')+'; to fix: '+(rec.out.fix||'–')+'.\n' : '')+
     opFactsWork(days, endOff);
 }
 // ---- the remark when you check out of a week or a month (and a word on the new one when you check in)
@@ -531,7 +534,7 @@ function opBriefRewrite(lines){
   const todo = lines.filter(function(l){ return l.key && !b.asked[l.key] && l.text; });
   if(!todo.length) return;
   todo.forEach(function(l){ b.asked[l.key] = 1; });
-  const task = 'These are the narration lines for my Good morning screen — each one is said out loud as its panel appears. Rewrite each in your voice: keep every fact exactly (times, temperatures, numbers, names), add nothing new, keep each under 24 words, and make them sound fresh rather than templated. Don’t start any with “Good morning” or my name (that’s added). The last line sends me off to start the day.\n'+
+  const task = 'These are the narration lines for my Good morning screen: each one is said out loud as its panel appears. Rewrite each in your voice: keep every fact exactly (times, temperatures, numbers, names), add nothing new, keep each under 24 words, and make them sound fresh rather than templated. Don’t start any with “Good morning” or my name (that’s added). The last line sends me off to start the day.\n'+
     'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');
   aiWrite(task, {max:600}).then(function(t){
     if(!t) return;

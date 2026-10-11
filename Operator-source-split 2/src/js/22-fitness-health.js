@@ -1,9 +1,10 @@
 // ============ FITNESS (Health) ============
-// One page, no tabs: the week of training on top; then Body & Fuel together (your weight and what
-// you're eating go hand in hand); then the history. No log buttons on the page: logging a workout, a
-// weigh-in or food is the + in the corner — a small sheet, three taps (a go-to meal is one tap here).
+// One page, no tabs: the week of training on top; then Weight & Fuel together (your weight and what
+// you're eating go hand in hand); then your Health score (what counts toward it, your weight on the
+// BMI scale); then the history. No log buttons on the page: logging a workout, a
+// weigh-in or food is the + in the corner, a small sheet, three taps (a go-to meal is one tap).
 function renderFitness(){
-  return '<div class="hl">'+renderWorkoutsHero()+renderBodyFuel()+
+  return '<div class="hl">'+renderWorkoutsHero()+renderBodyFuel()+renderHealthScore()+
     '<div class="hl-cols">'+renderWorkoutHistory()+renderHealthLists()+'</div>'+
   '</div>';
 }
@@ -83,7 +84,7 @@ function renderWorkoutHistory(){
             '<span class="fit-entry-acts"><button class="btn btn-ghost btn-sm" data-action="openWorkoutEditModal" data-id="'+g.id+'">Edit</button>'+deleteBtn('gym', g.id)+'</span>'+
           '</div>';
         }).join('')+'</div>';
-    }).join('') : '<div class="empty">No workouts yet — the + in the corner logs one.</div>')+
+    }).join('') : '<div class="empty">No workouts yet: the + in the corner logs one.</div>')+
   '</div>';
 }
 // (older callers)
@@ -103,7 +104,7 @@ ACTIONS.fitLog = function(){
   const n = document.getElementById('gymNotes'); if(n) n.value = '';
   playPositive();
   persist('health'); closeHealthSheet(); renderView();
-  showToast(firstToday ? 'Logged — today\'s training standard is done.' : 'Workout logged.', {icon:workoutIcon(type)});
+  showToast(firstToday ? 'Logged: today\'s training standard is done.' : 'Workout logged.', {icon:workoutIcon(type)});
 };
 function openWorkoutEditModal(id){
   ui.editingWorkoutId = id;
@@ -193,8 +194,8 @@ function renderBodyFuel(){
   const picks = state.meals.library.slice().sort(function(a, b){ return (b.uses||0) - (a.uses||0); }).slice(0, 4);
   return '<div class="card bf section" id="bodyFuel">'+
     '<div class="bf-half bf-body">'+
-      '<div class="hl-k">Body</div>'+
-      '<div class="bf-now"><span class="hw-v">'+(latest ? latest.weight : '—')+'</span><small>'+(state.profile.weightUnit==='kg' ? 'kg' : 'lbs')+'</small>'+
+      '<div class="hl-k">Weight</div>'+
+      '<div class="bf-now"><span class="hw-v">'+(latest ? latest.weight : '&middot;&middot;&middot;')+'</span><small>'+(state.profile.weightUnit==='kg' ? 'kg' : 'lbs')+'</small>'+
         (delta!=null ? '<span class="hw-delta '+(delta<0?'is-down':delta>0?'is-up':'')+'">'+(delta<0?'&#9660; ':delta>0?'&#9650; ':'')+Math.abs(delta).toFixed(1)+' '+deltaFrom+'</span>' : '')+
         (body.bmi ? '<span class="bf-bmi" title="BMI for your height">BMI '+body.bmi.toFixed(1)+'</span>' : '')+'</div>'+
       weightSpark(log.slice(-30).map(function(r){ return Number(r.weight); }))+
@@ -210,6 +211,23 @@ function renderBodyFuel(){
     '</div>'+
   '</div>';
 }
+// your Health score, up close: the three things that make it, and where your weight sits on the scale
+// for your height (and the ceiling it puts on the score)
+function renderHealthScore(){
+  if(typeof xpSummary!=='function') return '';
+  const x = xpSummary(), h = x.attrs.HLT, body = h.body || {};
+  const bar = function(sx){ const v = sx.v==null ? 25 : sx.v; return '<div class="you-sub'+(sx.v==null ? ' is-empty' : '')+'" title="'+escapeHtml(sx.note)+'"><span>'+escapeHtml(sx.label)+'</span><i><u style="width:'+((v-25)/75*100).toFixed(1)+'%"></u></i><b>'+v+'</b></div><div class="hs-note">'+escapeHtml(sx.note)+'</div>'; };
+  return '<div class="card hsc section" id="healthScore">'+
+    '<div class="hsc-l"><div class="hl-k">Your Health score</div>'+
+      '<div class="hsc-v"><b>'+h.v+'</b>'+(h.cap ? '<span class="hsc-cap'+(h.capped ? ' is-hit' : '')+'" title="At your weight the score tops out here. It rises as the weight comes down.">Ceiling '+h.cap+' at your weight</span>' : '')+'</div>'+
+      '<div class="hsc-subs">'+h.subs.map(bar).join('')+'</div>'+
+      '<div class="hsc-how">Training and diet over the last few weeks count most, the latest week heaviest. Your weight sets how high it can go. Ranks need this score.</div></div>'+
+    '<div class="hsc-r">'+
+      '<div class="hsc-box"><div class="hl-k">Weight for your height</div>'+(body.bmi ?
+        '<div class="you-bmi"><b>'+body.bmi.toFixed(1)+'</b><span>BMI &middot; '+body.cls+'</span></div><div class="you-bmi-scale">'+bmiScaleHtml(body)+'</div>' :
+        '<div class="you-note">Add your height in Settings &rarr; You and weigh in with the +, and your score counts your weight too.</div><button class="hl-link" data-action="goToProfileSettings">Add your height &#8594;</button>')+'</div>'+
+    '</div></div>';
+}
 // under it: today's food and your weigh-ins, small, and the meal library tucked away
 function renderHealthLists(){
   const log = state.health.weightLog.slice().sort(function(a,b){ return a.date.localeCompare(b.date); });
@@ -223,7 +241,7 @@ function renderHealthLists(){
         return '<div class="hw-row"><span class="hw-row-d">'+weekdayShort(w.date)+' '+fmtDateShort(w.date)+'</span><span class="hw-row-v">'+w.weight+'</span>'+
           (d!=null && d!==0 ? '<span class="hw-chip '+(d<0?'is-down':'is-up')+'">'+(d<0?'&#9660;':'&#9650;')+' '+Math.abs(d).toFixed(1)+'</span>' : '<span></span>')+'<span class="hw-row-x">'+deleteBtn('weight', w.id)+'</span></div>'; }).join('') || '<div class="empty">No weigh-ins yet.</div>')+
     '</div></div>'+
-    '<details class="section hc-lib"'+(ui.mealLibOpen?' open':'')+'><summary class="section-title">Meal library<span class="kpi-sub">'+state.meals.library.length+'</span>'+tip('Your go-to meals — one tap logs them.')+'</summary>'+
+    '<details class="section hc-lib"'+(ui.mealLibOpen?' open':'')+'><summary class="section-title">Meal library<span class="kpi-sub">'+state.meals.library.length+'</span>'+tip('Your go-to meals: one tap logs them.')+'</summary>'+
       '<div class="hc-add" style="margin-bottom:10px;"><input class="input" id="mealName" placeholder="e.g. Turkey chili" style="flex:1;"><input class="input" type="number" id="mealCalories" placeholder="cal" style="width:90px;"><button class="btn" data-action="addMeal">Save meal</button></div>'+
       '<div class="hw-list">'+(state.meals.library.map(function(m){ return '<div class="hw-row"><span class="hw-row-d" style="flex:1;color:var(--text);">'+escapeHtml(m.name)+'</span><span class="hw-row-v">'+m.calories+'<small> cal</small></span><span class="hw-row-x">'+deleteBtn('meal', m.id)+'</span></div>'; }).join('') || '<div class="empty">No meals saved yet.</div>')+'</div>'+
     '</details>'+
@@ -242,7 +260,7 @@ function healthSheetHtml(){
     '<div class="fit-types">'+workoutTypeChoices().map(function(t){ return '<button class="fit-type'+(sel===t.id?' is-on':'')+'" data-action="fitPickType" data-id="'+escapeHtml(t.id)+'"><span class="fit-type-i">'+t.icon+'</span>'+escapeHtml(t.id)+'</button>'; }).join('')+'</div>'+
     '<input class="input hs-in" id="gymType" placeholder="…or type it (e.g. Push day)" value="'+escapeHtml(sel)+'">'+
     '<div class="fit-durs">'+[15,30,45,60,90,120].map(function(m){ return '<button class="fit-dur'+(dur===m?' is-on':'')+'" data-action="fitPickDur" data-id="'+m+'">'+(m<60?m+'m':(m/60)+'h')+'</button>'; }).join('')+'</div>'+
-    '<div class="hs-row"><input class="input" type="date" id="gymDate" value="'+(ui.fitDate||todayStr())+'"><input class="input" id="gymNotes" placeholder="Notes — PRs, how it felt"></div>'+
+    '<div class="hs-row"><input class="input" type="date" id="gymDate" value="'+(ui.fitDate||todayStr())+'"><input class="input" id="gymNotes" placeholder="Notes: PRs, how it felt"></div>'+
     '<button class="btn btn-good hs-go" data-action="fitLog">&#10003; Log workout</button>';
   else if(k==='weight') body =
     '<div class="hs-big"><input class="input" type="number" step="0.1" id="hsWeight" placeholder="'+(latestWeight()!=null ? latestWeight() : 'e.g. 205')+'"><span>'+(state.profile.weightUnit==='kg' ? 'kg' : 'lbs')+'</span></div>'+
@@ -268,7 +286,7 @@ ACTIONS.hsWeight = function(){
   const v = Number((document.getElementById('hsWeight')||{}).value); if(!v){ const i = document.getElementById('hsWeight'); if(i) i.focus(); return; }
   state.health.weightLog.push({id:uid(), date:todayStr(), weight:v}); persist('health'); playPositive(); closeHealthSheet(); renderView(); showToast('Weigh-in logged: '+v+'.', {icon:'&#9878;&#65039;'});
 };
-ACTIONS.hsMeal = function(el, e, id){ quickMeal(id); closeHealthSheet(); const m = state.meals.library.find(function(x){ return x.id===id; }); if(m) showToast(m.name+' — '+m.calories+' cal.', {icon:'&#129367;'}); };
+ACTIONS.hsMeal = function(el, e, id){ quickMeal(id); closeHealthSheet(); const m = state.meals.library.find(function(x){ return x.id===id; }); if(m) showToast(m.name+', '+m.calories+' cal.', {icon:'&#129367;'}); };
 ACTIONS.hsFood = function(){
   const n = ((document.getElementById('hsFood')||{}).value||'').trim(), c = Number((document.getElementById('hsCal')||{}).value)||0;
   if(!n || !c){ const i = document.getElementById(!n ? 'hsFood' : 'hsCal'); if(i) i.focus(); return; }

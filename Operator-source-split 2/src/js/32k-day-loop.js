@@ -147,7 +147,7 @@ function windRecapHtml(){
     '<div class="wd-k">When you worked</div>'+dayTimelineHtml(d)+
     '<div class="wd-cols">'+
       '<div><div class="wd-k">Done today</div>'+(done.length ? '<ul class="wd-done">'+done.slice(0, 8).map(function(t){ return '<li>&#10003; '+escapeHtml(t.title)+'</li>'; }).join('')+(done.length>8 ? '<li class="kpi-sub">+'+(done.length-8)+' more</li>' : '')+'</ul>' : '<div class="kpi-sub">Nothing ticked off today.</div>')+
-        (left ? '<div class="kpi-sub" style="margin-top:8px;">'+left+' still on today\'s list — carry them into tomorrow\'s plan.</div>' : '')+'</div>'+
+        (left ? '<div class="kpi-sub" style="margin-top:8px;">'+left+' still on today\'s list. Carry them into tomorrow\'s plan.</div>' : '')+'</div>'+
       '<div><div class="wd-k">Tomorrow</div>'+((tomEvents.length || tomDue.length) ? '<div class="wd-tom">'+tomEvents.map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('')+tomDue.map(function(t){ return '<div><b class="is-due">Due</b> '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '<div class="kpi-sub">Nothing on the calendar yet.</div>')+'</div>'+
     '</div>'+
     (typeof recapPendingCount==='function' && recapPendingCount() ? '<button class="btn btn-ghost btn-sm" style="margin-top:14px;" data-action="openDayRecap">Review today\'s sessions ('+recapPendingCount()+' to check)</button>' : '')+
@@ -164,7 +164,7 @@ function windPlanHtml(){
       return '<li class="wd-row" draggable="true" data-id="'+t.id+'"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="wd-title">'+escapeHtml(t.title)+'</span>'+
         '<button class="wd-ctl" data-action="windMove" data-id="'+t.id+'" data-dir="-1" title="Up"'+(i===0?' disabled':'')+'>&#8593;</button><button class="wd-ctl" data-action="windMove" data-id="'+t.id+'" data-dir="1" title="Down"'+(i===rows.length-1?' disabled':'')+'>&#8595;</button>'+
         '<button class="wd-ctl wd-x" data-action="windRemove" data-id="'+t.id+'" title="Take it off">&#10005;</button></li>';
-    }).join('')+'</ol>' : '<div class="wd-empty">Nothing planned yet — add what matters most first.</div>')+
+    }).join('')+'</ol>' : '<div class="wd-empty">Nothing planned yet. Add what matters most first.</div>')+
     '<div class="wd-add"><input class="input" id="windNewTask" placeholder="+ A new task for tomorrow (Enter)"><button class="btn btn-sm" data-action="windNewTask">Add</button></div>'+
     '<div class="wd-k" style="margin-top:16px;">From your list</div>'+
     '<input class="input wd-search" id="windSearch" placeholder="Search…" value="'+escapeHtml(w.search||'')+'">'+
@@ -175,7 +175,7 @@ function windNoteHtml(){
   const w = ui.wind, notes = morningNotesFor(w.target);
   return '<div class="wd-note">'+
     '<div class="wd-sub">Three short lines for tomorrow-you.</div>'+
-    (notes.length ? '<div class="wd-notes">'+notes.map(function(n){ return '<div class="wd-note-item"><div><b>'+escapeHtml(n.headline!=null ? n.headline||'—' : n.text)+'</b>'+(n.morning ? '<span>☀️ '+escapeHtml(n.morning)+'</span>' : '')+(n.work ? '<span>💼 '+escapeHtml(n.work)+'</span>' : '')+'</div><button class="mn-x" data-action="removeMorningNote" data-id="'+n.id+'" title="Remove">&#10005;</button></div>'; }).join('')+'</div>' : '')+
+    (notes.length ? '<div class="wd-notes">'+notes.map(function(n){ return '<div class="wd-note-item"><div><b>'+escapeHtml(n.headline!=null ? n.headline||'–' : n.text)+'</b>'+(n.morning ? '<span>☀️ '+escapeHtml(n.morning)+'</span>' : '')+(n.work ? '<span>💼 '+escapeHtml(n.work)+'</span>' : '')+'</div><button class="mn-x" data-action="removeMorningNote" data-id="'+n.id+'" title="Remove">&#10005;</button></div>'; }).join('')+'</div>' : '')+
     '<div class="wd-nf"><label><span>&#9200; The headline</span><small>Big on your alarm screen</small></label><input class="input wd-nf-head" id="windNote" placeholder="e.g. Big shoot day. Up and at it."></div>'+
     '<div class="wd-nf"><label><span>&#9728;&#65039; When you wake up</span><small>In Good morning</small></label><textarea class="input" id="windNoteMorning" rows="2" placeholder="e.g. Coffee, a walk, then straight into it."></textarea></div>'+
     '<div class="wd-nf"><label><span>&#128188; Before you start work</span><small>Right before you lock in</small></label><textarea class="input" id="windNoteWork" rows="2" placeholder="e.g. Finish the JJS edit before you touch email."></textarea></div>'+
@@ -184,7 +184,7 @@ function windNoteHtml(){
 function windAlarmHtml(){
   const w = ui.wind, wk = wakeCfg(), base = wakeBaseTimeFor(w.target);
   return '<div class="wd-alarm">'+
-    '<div class="wd-sub">'+(base ? 'Usual: '+fmt12Hour(base)+'. Changing it here only changes '+morningLabel(w.target)+'.' : 'No daily alarm that day — set one here.')+'</div>'+
+    '<div class="wd-sub">'+(base ? 'Usual: '+fmt12Hour(base)+'. Changing it here only changes '+morningLabel(w.target)+'.' : 'No daily alarm that day. Set one here.')+'</div>'+
     (w.noAlarm ? '<div class="wd-noalarm">No alarm '+morningLabel(w.target)+'</div>' : '<input class="ws-time wd-time" type="time" id="windAlarm" value="'+escapeHtml(w.alarm||'')+'">')+
     '<div class="row" style="gap:8px;justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="windNoAlarm">'+(w.noAlarm ? 'Set an alarm' : 'No alarm '+morningLabel(w.target))+'</button>'+
       '<button class="btn btn-ghost btn-sm" data-action="openWakeSetup">Sound &amp; music</button></div>'+
@@ -194,7 +194,7 @@ function windAlarmHtml(){
 function windHtml(){
   const w = ui.wind; if(!w) return '';
   const i = WIND_STEPS.findIndex(function(s){ return s[0]===w.step; });
-  const titles = {recap:'Here\'s how today went.', plan:'Plan of attack — '+morningLabel(w.target)+'.', note:'A note for the morning.', alarm:'Wake up '+morningLabel(w.target)+' at…'};
+  const titles = {recap:'Here\'s how today went.', plan:'Plan of attack: '+morningLabel(w.target)+'.', note:'A note for the morning.', alarm:'Wake up '+morningLabel(w.target)+' at…'};
   const body = w.step==='plan' ? windPlanHtml() : w.step==='note' ? windNoteHtml() : w.step==='alarm' ? windAlarmHtml() : windRecapHtml();
   return '<div class="wd">'+
     '<div class="wd-top"><span class="wd-moon">&#127769;</span><span class="wd-brand">Wind down</span>'+
@@ -203,7 +203,7 @@ function windHtml(){
     '<div class="wd-inner" data-key="wd-'+w.step+'"><h2 class="wd-title-h">'+titles[w.step]+'</h2>'+body+'</div>'+
     '<div class="wd-foot">'+
       (i>0 ? '<button class="btn btn-ghost" data-action="windBack">&larr; Back</button>' : '<span></span>')+
-      (w.step==='alarm' ? '<span class="row" style="gap:8px;"><button class="btn btn-ghost" data-action="windSaveOnly">Save — not sleeping yet</button><button class="btn wd-sleep" data-action="windGoToSleep">&#127769; Go to sleep</button></span>'
+      (w.step==='alarm' ? '<span class="row" style="gap:8px;"><button class="btn btn-ghost" data-action="windSaveOnly">Save, not sleeping yet</button><button class="btn wd-sleep" data-action="windGoToSleep">&#127769; Go to sleep</button></span>'
         : '<button class="btn btn-primary" data-action="windNext">Next &rarr;</button>')+
     '</div>'+
   '</div>';

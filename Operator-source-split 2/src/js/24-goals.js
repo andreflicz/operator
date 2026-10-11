@@ -114,7 +114,7 @@ function goalFieldsHtml(prefix, kind, g){
     '</div>'+
     (!t ? '<div class="grid grid-2" style="margin-top:10px;"><div class="field"><label>Where you are now</label><input class="input" type="number" step="any" id="'+prefix+'Current" value="'+v(g.current)+'" placeholder="0"></div></div>' : '')+
     '<div class="field" style="margin-top:10px;"><label>Name it (optional)</label><input class="input" id="'+prefix+'Label" value="'+v(g.label)+'" placeholder="'+(t ? escapeHtml(t.name({target:Number(placeholder), period:g.period||'week'})) : 'e.g. 10k IG followers')+'" style="width:100%;"></div>'+
-    (t ? '<div class="kpi-sub" style="margin-top:8px;">&#9889; Fills in by itself '+escapeHtml(t.src)+'.</div>' : '<div class="kpi-sub" style="margin-top:8px;">For things Operator can\'t see — you update the number yourself.</div>');
+    (t ? '<div class="kpi-sub" style="margin-top:8px;">&#9889; Fills in by itself '+escapeHtml(t.src)+'.</div>' : '<div class="kpi-sub" style="margin-top:8px;">For things Operator can\'t see: you update the number yourself.</div>');
 }
 function goalNowText(kind){
   if(kind==='mrr') return '$'+fmtGoalNum(activeMrr())+'/mo';
@@ -175,9 +175,9 @@ function saveEditGoal(id){
 ACTIONS.newGoalKind = function(el, e, id){ ui.newGoalKind = id; renderView(); };
 function addGoal(){
   const f = readGoalFields('newGoal', 'custom');
-  if(!f.label){ showToast('Give it a name — e.g. 10k IG followers.', {icon:'&#127919;'}); return; }
+  if(!f.label){ showToast('Give it a name, e.g. 10k IG followers.', {icon:'&#127919;'}); return; }
   // every goal is a number — even "launch the site" is 1 of 1 — so it can be measured
-  if(!(f.target > 0)){ showToast('Give it a number to hit — e.g. 10000 followers, or 1 for a one-time thing.', {icon:'&#127919;'}); const el = document.getElementById('newGoalTarget'); if(el) el.focus(); return; }
+  if(!(f.target > 0)){ showToast('Give it a number to hit, e.g. 10000 followers, or 1 for a one-time thing.', {icon:'&#127919;'}); const el = document.getElementById('newGoalTarget'); if(el) el.focus(); return; }
   createGoal(f);
 }
 function createGoal(f){

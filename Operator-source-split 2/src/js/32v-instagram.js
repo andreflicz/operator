@@ -84,7 +84,7 @@ async function adsRefresh(quiet){
   catch(e){ ui.adsErr = e.message; }
   ui.adsLoading = false; renderView();
 }
-ACTIONS.adsFind = async function(){ ui.adsErr = null; try{ ui.adsFound = await adsFindAccounts(); if(!ui.adsFound.length) ui.adsErr = 'No ad accounts on this token — give it the ads_read permission and access to your ad account.'; }catch(e){ ui.adsErr = e.message; } renderView(); };
+ACTIONS.adsFind = async function(){ ui.adsErr = null; try{ ui.adsFound = await adsFindAccounts(); if(!ui.adsFound.length) ui.adsErr = 'No ad accounts on this token. Give it the ads_read permission and access to your ad account.'; }catch(e){ ui.adsErr = e.message; } renderView(); };
 ACTIONS.adsAdd = function(el, e, id){
   const c = adsCfg(), a = (ui.adsFound || []).find(function(x){ return x.id===id; }); if(!a) return;
   if(c.ads.some(function(x){ return x.id===id; })) c.ads = c.ads.filter(function(x){ return x.id!==id; }); else c.ads.push({id:a.id, name:a.name, currency:a.currency});
@@ -117,8 +117,8 @@ const META_HOWTO = [
   ['Paste it here', 'Connect, then <b>Find my accounts</b> and <b>Find ad accounts</b>. Mark each Instagram Business or Personal.']
 ];
 function metaHowtoHtml(){
-  return '<details class="meta-how"'+(ui.metaHowOpen ? ' open' : '')+'><summary data-action="metaHowToggle">How to connect — about 5 minutes</summary><ol>'+META_HOWTO.map(function(s){ return '<li><b>'+s[0]+'.</b> '+s[1]+'</li>'; }).join('')+'</ol>'+
-    '<div class="op-set-help">A personal Instagram can’t be read by any app — switch it to a Creator account (free, Settings → Account type) and link it to a Page. Everything here is read-only: Operator can see, never post or spend.</div></details>';
+  return '<details class="meta-how"'+(ui.metaHowOpen ? ' open' : '')+'><summary data-action="metaHowToggle">How to connect: about 5 minutes</summary><ol>'+META_HOWTO.map(function(s){ return '<li><b>'+s[0]+'.</b> '+s[1]+'</li>'; }).join('')+'</ol>'+
+    '<div class="op-set-help">A personal Instagram can’t be read by any app. Switch it to a Creator account (free, Settings → Account type) and link it to a Page. Everything here is read-only: Operator can see, never post or spend.</div></details>';
 }
 ACTIONS.metaHowToggle = function(el, e){ e.preventDefault(); ui.metaHowOpen = !ui.metaHowOpen; renderView(); };
 
@@ -147,12 +147,12 @@ ACTIONS.igSave = function(){
   if(i) i.value = '';
   fetchWithin(WAKE_HELPER+'ig/key?t='+hexUtf8(v), 6000).then(function(r){
     if(r && r.ok){ ui.igHasKey = true; renderView(); ACTIONS.igFind(); }
-    else (typeof opLauncherWhy==='function' ? opLauncherWhy() : Promise.resolve('the Operator app isn’t answering.')).then(function(why){ showToast('Couldn’t save the token — '+why, {icon:'&#9888;', duration:10000}); });
+    else (typeof opLauncherWhy==='function' ? opLauncherWhy() : Promise.resolve('the Operator app isn’t answering.')).then(function(why){ showToast('Couldn’t save the token: '+why, {icon:'&#9888;', duration:10000}); });
   });
 };
 ACTIONS.igFind = async function(){
   ui.igErr = null;
-  try{ ui.igFound = await igFindAccounts(); if(!ui.igFound.length) ui.igErr = 'No Instagram Business/Creator accounts on this token — link one to a Facebook Page first.'; }
+  try{ ui.igFound = await igFindAccounts(); if(!ui.igFound.length) ui.igErr = 'No Instagram Business/Creator accounts on this token. Link one to a Facebook Page first.'; }
   catch(e){ ui.igErr = e.message; }
   renderView();
 };
@@ -171,7 +171,7 @@ ACTIONS.igConnect = function(){ ui.view = 'settings'; ui.settingsTab = 'integrat
 // ---- the Social page: Instagram up top ----
 function igSectionHtml(){
   const c = igCfg();
-  if(!igOn()) return '<div class="ig-connect"><div class="ig-connect-i">&#128247;</div><div><b>Connect Instagram &amp; Meta Ads</b><span>Followers, every post’s likes, comments and reach, and what your ads spent and brought in — one token from Meta Business Suite, read-only.</span></div><button class="btn btn-primary btn-sm" data-action="igConnect">Connect</button></div>';
+  if(!igOn()) return '<div class="ig-connect"><div class="ig-connect-i">&#128247;</div><div><b>Connect Instagram &amp; Meta Ads</b><span>Followers, every post’s likes, comments and reach, and what your ads spent and brought in: one token from Meta Business Suite, read-only.</span></div><button class="btn btn-primary btn-sm" data-action="igConnect">Connect</button></div>';
   igMaybeRefresh();
   if(!c.cache) return '<div class="ig-sec"><div class="gp-loading">'+(ui.igErr ? '&#9888; '+escapeHtml(ui.igErr)+' <button class="btn btn-ghost btn-sm" data-action="igRefresh">Try again</button>' : 'Loading your Instagram…')+'</div></div>';
   const since30 = addDays(todayStr(), -30), today = todayStr();
@@ -183,7 +183,7 @@ function igSectionHtml(){
     const days = {}; recent.forEach(function(p){ days[p.date] = (days[p.date]||0) + 1; });
     const strip = []; for(let i=29;i>=0;i--){ const dd = addDays(today, -i); strip.push('<i class="'+(days[dd] ? 'is-on' : '')+'" title="'+escapeHtml(fmtDateShort(dd))+(days[dd] ? ': '+days[dd]+' post'+(days[dd]===1?'':'s') : '')+'"></i>'); }
     const top = d.posts.slice(0, 30).sort(function(x, y){ return (y.likes + y.comments*3) - (x.likes + x.comments*3); }).slice(0, 6);
-    const stat = function(k, v){ return '<div class="ig-st"><b>'+(v==null ? '—' : Number(v).toLocaleString())+'</b><span>'+k+'</span></div>'; };
+    const stat = function(k, v){ return '<div class="ig-st"><b>'+(v==null ? '–' : Number(v).toLocaleString())+'</b><span>'+k+'</span></div>'; };
     return '<div class="ig-acct"><div class="ig-h">'+(d.pic ? '<img class="ig-pic" src="'+escapeHtml(d.pic)+'" alt="">' : '<span class="ig-pic"></span>')+
         '<div><b>@'+escapeHtml(d.username)+'</b><span class="ig-role is-'+a.role+'">'+(a.role==='business' ? 'Business' : 'Personal')+'</span></div></div>'+
       '<div class="ig-stats">'+stat('followers', d.followers)+stat('posts · 30 days', recent.length)+stat('avg likes', avg('likes'))+stat('avg comments', avg('comments'))+stat('avg reach', avg('reach'))+'</div>'+

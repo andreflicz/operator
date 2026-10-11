@@ -99,8 +99,8 @@ async function ctxPage(b, seed, opts){
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     const subs = await E("JSON.stringify(Object.fromEntries(['BUS','PER','DIS'].map(k=>[k, xpSummary().attrs[k].subs.map(s=>s.label)])))");
     // (round 20: Discipline is standards kept / follow-through / check-ins; Personal drops Reflection; Client growth is Scaling)
-    check('Discipline: standards kept, follow-through, check-ins', /"DIS":\["Standards kept","Follow-through","Check-ins"\]/.test(subs), subs);
-    check('Personal: content, goals, finances — no “Video ideas”, no Reflection', /"PER":\["Personal content","Goals","Finances"\]/.test(subs), subs);
+    check('Discipline: integrity, reliability, consistency (round 22)', /"DIS":\["Integrity","Reliability","Consistency"\]/.test(subs), subs);
+    check('Personal: content, goals, finances — no “Video ideas”, no Reflection', /"PER":\["Content","Goals","Finances"\]/.test(subs), subs);
     check('clients typed in recently don’t count as Scaling (start dates do)', await E("xpSummary().attrs.BUS.subs.find(s=>s.label==='Scaling').v")===25);
     check('Finances: 40% paid off and a payment this month', /40% paid off/.test(await E("financeRating().note")) && await E("financeRating().f") > .3);
     // XP from the MRR you added (2k → 1,600 XP): the next level is ready, not handed out
@@ -113,7 +113,7 @@ async function ctxPage(b, seed, opts){
     check('higher levels burn bigger: more rings, a new colour', await E("levelUpFx(36, null); document.querySelectorAll('#lvlFx .lvl-rings i').length")===6 && await E("document.getElementById('lvlFx').className").then(c => /tier-2/.test(c)));
     await E("document.getElementById('lvlFx').remove()");
     // the gate: level 3 is a rank's level — it needs Health 40 (no height and weight here)
-    await E("state.profile.xpLevel = 2; state.business.clients[0].mrr = 6000; persist('business'); xpLast = null; renderView()"); await p.waitForTimeout(300);
+    await E("state.profile.xpLevel = 2; state.business.clients[0].mrr = 12000; persist('business'); xpLast = null; renderView()"); await p.waitForTimeout(300);
     // (round 21: nothing gates a level — the rank asks for the MRR and the Health instead)
     check('a rank’s level without the Health: the level is still yours to claim; the rank waits', await E("xpSummary().canLevel")===true && await E("xpSummary().rank")===0 && await E("xpSummary().needs.some(n => /Health/.test(n))"));
     await p.click('.you-q'); await p.waitForTimeout(300);

@@ -17,7 +17,7 @@ function renderTodayHero(greeting){
       businessNameTagHtml()+
       '<div class="th-greet">'+greeting+', '+escapeHtml(p.name)+'.</div>'+
       (p.bigClockOnToday ? '<div id="liveClockBig" class="cal-big-clock th-bigclock"></div>'+skyChipHtml() : '<div class="th-subrow"><div class="th-sub" id="liveClock"></div>'+skyChipHtml()+'</div>')+
-      '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: (allDone ? '<span class="streak-ok" title="Today\'s standard: done">&#10003;</span>' : '')+tip((streak===0 ? 'Hit today\'s standard to start one. ' : allDone ? 'Today\'s in the bag. ' : 'Hit today\'s standard to keep it going. ')+'The streak counts days in a row you hit Today\'s Standard — the deep-work target plus your checklist. Rest days you take off don\'t break it.')})+'</div>'+
+      '<div class="th-streak">'+renderStreakCard(streak, {compact:true, ticked:ticked, editable:true, status: (allDone ? '<span class="streak-ok" title="Today\'s standard: done">&#10003;</span>' : '')+tip((streak===0 ? 'Hit today\'s standard to start one. ' : allDone ? 'Today\'s in the bag. ' : 'Hit today\'s standard to keep it going. ')+'The streak counts days in a row you hit Today\'s Standard: the deep-work target plus your checklist. Rest days you take off don\'t break it.')})+'</div>'+
     '</div>'+
     (typeof playerCardMiniHtml==='function' ? '<div class="th-card">'+playerCardMiniHtml()+'</div>' : '')+
     '<div class="th-right">'+
@@ -35,7 +35,7 @@ function renderTodayHero(greeting){
       '<div class="th-actions">'+
         '<button class="th-btn" data-action="toggleNextPicker" data-where="hero"><span class="th-btn-i">&#128204;</span>'+(next ? 'Change next' : 'Pick next')+'</button>'+
         '<button class="th-btn th-btn-min" data-action="toggleFocusMinimal" title="Minimal view (M)"><span class="th-btn-i">&#9673;</span>Minimal</button>'+
-        (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going — sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
+        (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going: sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
         (evening ? '<button class="th-btn th-btn-night" data-action="openWindDown"><span class="th-btn-i">&#127769;</span>Wind down</button>' : '')+
       '</div>'+
       '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+'<button class="th-mode th-mode-offtime" data-action="clockOut" title="Done working for the day"><span class="th-mode-i">&#127937;</span><span>Clock out</span></button>'+dayOffButtonHtml()+'</div>'+
@@ -75,7 +75,7 @@ ACTIONS.quickDayOff = function(){
 ACTIONS.quickDayOffNow = function(){
   toggleDayOff();
   dayOffFlash(isDayOff(todayStr()));
-  showToast(isDayOff(todayStr()) ? 'Today is a rest day — the streak is safe. Enjoy it.' : 'Back on — today counts.', {icon:'&#127796;', actionLabel:'Undo', actionAction:'quickDayOffUndo', duration:6000});
+  showToast(isDayOff(todayStr()) ? 'Today is a rest day: the streak is safe. Enjoy it.' : 'Back on: today counts.', {icon:'&#127796;', actionLabel:'Undo', actionAction:'quickDayOffUndo', duration:6000});
 };
 ACTIONS.quickDayOffUndo = function(){ toggleDayOff(); clearToasts(); };
 let holdTimer = null, holdEl = null;
@@ -88,7 +88,7 @@ document.addEventListener('pointerdown', function(e){
     const kind = el.dataset.hold;
     el.classList.remove('holding'); el.classList.add('held');
     holdTimer = null; holdEl = null;
-    if(kind==='dayoff') setTimeout(function(){ toggleDayOff(); showToast('Today is a rest day — the streak is safe. Enjoy it.', {icon:'&#127796;'}); }, 180);
+    if(kind==='dayoff') setTimeout(function(){ toggleDayOff(); showToast('Today is a rest day: the streak is safe. Enjoy it.', {icon:'&#127796;'}); }, 180);
     else if(kind==='mode') setTimeout(function(){ startMode(el.dataset.type); }, 180);
   }, 900);
 });
@@ -158,7 +158,7 @@ function openTaskMenu(t, x, y){
     (t.status!=='done' && !isNext ? item('next', '&#128204; Make it next up') : '')+
     item('edit', '&#9998; Edit…')+
     (t.status==='done' ? item('undo', '&#8634; Back to today')
-      : t.ongoing ? (isOngoingDoneToday(t) ? item('undo', '&#8634; Undo — done for today') : item('done', '&#10003; Mark done for today'))
+      : t.ongoing ? (isOngoingDoneToday(t) ? item('undo', '&#8634; Undo: done for today') : item('done', '&#10003; Mark done for today'))
       : item('done', '&#10003; Mark done'))+
     (t.status==='backlog' ? item('today', '&rarr; Move to today') : t.status==='today' ? item('backlog', '&larr; Move back to '+(t.isVideoIdea?'video ideas':'backlog')) : '')+
     '<div class="ctx-sep"></div>'+

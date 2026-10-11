@@ -56,7 +56,7 @@ ACTIONS.setSkyLook = function(el, e, id){
 };
 function skyLookSettingsHtml(){
   const cur = (state.profile.skyLook || 'auto');
-  return '<div class="section"><div class="section-title">Sky look'+tip('The color of the sky in the Today header, the Sky scene and the wake screen. Follow the sun, or keep one look all day — like Sunset.')+'</div><div class="card">'+
+  return '<div class="section"><div class="section-title">Sky look'+tip('The color of the sky in the Today header, the Sky scene and the wake screen. Follow the sun, or keep one look all day, like Sunset.')+'</div><div class="card">'+
     '<div class="seg-tabs" style="margin:0;flex-wrap:wrap;">'+SKY_LOOKS.map(function(x){ return '<button class="seg-tab'+(cur===x[0]?' active':'')+'" data-action="setSkyLook" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>'+
   '</div></div>';
 }
@@ -94,7 +94,7 @@ function themeSettingsHtml(){
   const w = dayWindow(), real = w.real, loc = weatherCfg();
   const opt = function(id, label){ return '<button class="seg-tab'+(t===id?' active':'')+'" data-action="setTheme" data-id="'+id+'">'+label+'</button>'; };
   return '<div class="section"><div class="section-title">Theme'+tip('Auto is light while the sun is up and dark after sunset. It follows the real sunrise and sunset once a weather location is set; otherwise the times you pick here.')+'</div><div class="card">'+
-    '<div class="seg-tabs" style="margin:0;">'+opt('dark','&#127769; Dark')+opt('light','&#9728;&#65039; Light')+opt('auto','&#127763; Auto — day &amp; night')+'</div>'+
+    '<div class="seg-tabs" style="margin:0;">'+opt('dark','&#127769; Dark')+opt('light','&#9728;&#65039; Light')+opt('auto','&#127763; Auto: day &amp; night')+'</div>'+
     (t==='auto' ? (real
       ? '<div class="kpi-sub" style="margin-top:10px;">Light from sunrise ('+fmtMinOfDay(w.rise)+') to sunset ('+fmtMinOfDay(w.set)+')'+(loc.place ? ' in '+escapeHtml(loc.place) : '')+'.</div>'
       : '<div class="row" style="gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center;"><span class="kpi-sub">Light from</span><input class="input" type="time" id="setDayStart" value="'+(state.profile.dayStart||'07:00')+'" style="width:130px;"><span class="kpi-sub">to</span><input class="input" type="time" id="setNightStart" value="'+(state.profile.nightStart||'19:00')+'" style="width:130px;"></div>')

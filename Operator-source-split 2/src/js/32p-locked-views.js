@@ -134,7 +134,7 @@ function renderLockedMinimal(){
       '<div class="np-meta">'+
         '<div class="np-k">'+(as.breakOverAt ? 'Break’s over' : 'On a break')+'</div>'+
         '<div class="np-title">'+(as.breakOverAt ? 'Lock back in when you’re back.' : b.note ? escapeHtml(b.note) : 'Breathe. Stretch. Look away.')+'</div>'+
-        '<div class="np-sub">'+(as.breakOverAt ? 'It waits for you — break time isn’t work time.' : left!=null ? 'Back at '+fmtTimeShort(as.breakEndsAt) : 'No timer — end it when you\'re ready')+'</div>'+
+        '<div class="np-sub">'+(as.breakOverAt ? 'It waits for you. Break time isn’t work time.' : left!=null ? 'Back at '+fmtTimeShort(as.breakEndsAt) : 'No timer: end it when you\'re ready')+'</div>'+
         '<div class="np-prog">'+tl+'<div class="np-bar"><i id="npBreakBar" style="width:'+(total && left!=null ? ((1 - left/total)*100).toFixed(1) : 0)+'%"></i></div>'+
           '<div class="np-times"><span id="modeElapsed">'+formatElapsed(Date.now()-(as.breakStartedAt||Date.now()))+'</span><span id="breakRemaining">'+(left!=null ? formatElapsed(left)+' left' : '')+'</span></div></div>'+
         '<div class="np-ctl">'+(as.breakEndsAt ? '<button class="np-c" data-action="extendBreak" data-minutes="5" title="5 more minutes">+5</button>' : '<span class="np-c-sp"></span>')+
@@ -193,7 +193,7 @@ const BREAK_FROZEN = ['setCurrentTask','stagePendingCurrentTask','confirmPending
 function onBreakNow(){ const as = state.focus && state.focus.activeSession; return !!(as && as.onBreak); }
 function breakBlocks(action){
   if(!onBreakNow() || BREAK_FROZEN.indexOf(action)<0) return false;
-  showToast('You\'re on a break — the tasks wait until you\'re back.', {icon:'&#9749;', duration:2600});
+  showToast('You\'re on a break: the tasks wait until you\'re back.', {icon:'&#9749;', duration:2600});
   return true;
 }
 // no dragging tasks around, and no task right-click menu, while on a break
@@ -358,17 +358,17 @@ afterRenderHooks.push(function(){ if(typeof state!=='undefined' && state && stat
 function dayOffFlash(on, auto){
   const d = document.createElement('div');
   d.className = 'lock-flash is-dayoff'+(on ? '' : ' is-back');
-  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">'+(on ? '&#127796; Day off' : '&#9728;&#65039; Back to it')+'</div><div class="lf-t">'+(on ? (auto ? 'No alarm today — it’s a rest day.' : 'Rest is part of the plan.') : 'Today counts.')+'</div>';
+  d.innerHTML = '<div class="lf-ring"></div><div class="lf-k">'+(on ? '&#127796; Day off' : '&#9728;&#65039; Back to it')+'</div><div class="lf-t">'+(on ? (auto ? 'No alarm today. It’s a rest day.' : 'Rest is part of the plan.') : 'Today counts.')+'</div>';
   document.body.appendChild(d);
   setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 1900);
 }
 const REST_IDEAS = [
   ['&#127795;','Get outside.','A long walk, no podcast. Let your head wander.'],
-  ['&#128222;','Call someone you like.','Not a text — an actual call.'],
+  ['&#128222;','Call someone you like.','Not a text: an actual call.'],
   ['&#127859;','Cook something real.','Take your time with it.'],
   ['&#128164;','Sleep in, guilt-free.','Recovery is where the gains show up.'],
   ['&#128214;','Read for fun.','Something with no business in it.'],
-  ['&#127947;&#65039;','Move, easy.','A light session or a stretch — nothing heroic.'],
+  ['&#127947;&#65039;','Move, easy.','A light session or a stretch: nothing heroic.'],
   ['&#128245;','Phone in another room.','For an hour. See how it feels.'],
   ['&#127774;','Get some sun.','Ten minutes of daylight does more than you’d think.']
 ];

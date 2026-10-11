@@ -15,7 +15,7 @@ const FMT_WEEKDAY = new Intl.DateTimeFormat(undefined,{weekday:'short'});
 const FMT_TIME = new Intl.DateTimeFormat(undefined,{hour:'numeric', minute:'2-digit'});
 const fmtMemo = {md:{}, wd:{}};
 function fmtDateShort(s){
-  if(!s) return '—';
+  if(!s) return '–';
   if(fmtMemo.md[s]) return fmtMemo.md[s];
   const parts = s.split('-').map(Number);
   return (fmtMemo.md[s] = FMT_MONTH_DAY.format(new Date(parts[0], parts[1]-1, parts[2])));
@@ -131,17 +131,17 @@ const SWATCHES = ['#E8A23D','#8fdcff','#3FBE8E','#E8636B','#b39ddb','#f48fb1','#
 const PANEL_DEFS = [
   {id:'personalStats', label:'Streak & Personal Stats (includes Standard)'},
   {id:'business', label:'Business Snapshot'},
-  {id:'clientHub', label:'Clients — health, deliverables, next steps & who to reach out to'},
+  {id:'clientHub', label:'Clients: health, deliverables, next steps & who to reach out to'},
   {id:'goals', label:'Goals'},
   {id:'journal', label:'Journal'},
   {id:'focusMini', label:'Focus'},
   {id:'calendarMini', label:'Calendar'},
   {id:'tasks', label:"Today's Tasks"},
   {id:'vision', label:'Vision Board'},
-  {id:'agenda', label:'Today — timeline of events, deadlines & alarms'},
-  {id:'week', label:'This Week & Consistency — deep work per day + 6-month heatmap'},
+  {id:'agenda', label:'Today: timeline of events, deadlines & alarms'},
+  {id:'week', label:'This Week & Consistency: deep work per day + 6-month heatmap'},
   {id:'why', label:'Your Why'},
-  {id:'social', label:'Social — followers, reach, engagement'}
+  {id:'social', label:'Social: followers, reach, engagement'}
 ];
 const SMALL_PANELS = ['focusMini', 'calendarMini']; // journal is full-width now that it sits near the top
 const MOODS = [

@@ -101,7 +101,7 @@ ACTIONS.setCardLayout = function(el, e, id){ state.profile.cardLayout = id; pers
 function cardLayoutSettingsHtml(){
   const cur = cardLayout();
   const opt = function(id, label){ return '<button class="seg-tab'+(cur===id?' active':'')+'" data-action="setCardLayout" data-id="'+id+'">'+label+'</button>'; };
-  return '<div class="section"><div class="section-title">Card layout'+tip('Carousel lines up leads, clients and tasks in a sliding row — cards tilt and fade toward the edges, with arrows to move. Grid keeps them in rows; the leads board then stretches to fit the screen.')+'</div><div class="card">'+
+  return '<div class="section"><div class="section-title">Card layout'+tip('Carousel lines up leads, clients and tasks in a sliding row. Cards tilt and fade toward the edges, with arrows to move. Grid keeps them in rows; the leads board then stretches to fit the screen.')+'</div><div class="card">'+
     '<div class="seg-tabs" style="margin:0;">'+opt('grid', '&#9638; Grid')+opt('carousel', '&#10697; Carousel')+'</div>'+
   '</div></div>';
 }

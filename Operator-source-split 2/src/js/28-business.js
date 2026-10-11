@@ -261,7 +261,7 @@ function clientHealthCause(status){ const rank = {good:0, warn:1, danger:2}; ret
 function clientHealthReason(c, status){
   if(status.level==='green') return status.hasDeliverables ? (arr(c.deliverables).every(function(d){ return !d.recurring || deliverableWeekCount(d) >= (d.weeklyTarget||1); }) ? 'done for the week' : 'ahead of the week') : 'in touch';
   if(clientHealthCause(status)==='care') return clientCareTier(c).label.toLowerCase();
-  if(status.level==='yellow') return 'right on the curve — get ahead';
+  if(status.level==='yellow') return 'right on the curve: get ahead';
   return 'behind on deliverables';
 }
 function clientHealthLabel(status){
@@ -314,7 +314,7 @@ function clientCareTier(c){
   if(last && daysAgoFrom(last)<=0) return {cls:'tag-good', label:'Touched today'};
   const cad = crmCadence('client', c);
   const over = daysAgoFrom(addDays(base, cad));
-  if(over < 0) return {cls:'tag-good', label: last ? 'In touch' : 'New — no touch yet'};
+  if(over < 0) return {cls:'tag-good', label: last ? 'In touch' : 'New: no touch yet'};
   // due (or overdue) for a touch = red: reach out
   return {cls:'tag-danger', label: over===0 ? 'Touch due today' : last ? 'No touch in '+daysAgoFrom(last)+'d' : 'Touch overdue '+over+'d'};
 }
@@ -411,7 +411,7 @@ function renderClientModal(){
   if(sec==='overview') body = clientCardFrontHtml(c);
   else if(sec==='plan') body = '<div class="cm-h">Plan &amp; deliverables<span class="kpi-sub">'+pendingCount+' pending this week</span></div>'+
     '<div class="plan-block">'+renderClientPackageField(c, true)+
-      '<div class="task-list plan-delivs">'+(deliverables.map(function(d){return deliverableRow(c.id,d);}).join('') || '<div class="empty">No deliverables yet — pick a package above, or add a one-off.</div>')+'</div>'+
+      '<div class="task-list plan-delivs">'+(deliverables.map(function(d){return deliverableRow(c.id,d);}).join('') || '<div class="empty">No deliverables yet. Pick a package above, or add a one-off.</div>')+'</div>'+
       '<span class="plan-add" data-action="openCustomDeliverableDrawer" data-id="'+c.id+'">&#43; Add a one-off deliverable</span></div>';
   else if(sec==='contact') body = '<div class="cm-h">Contact &amp; touchpoints</div>'+
     '<div class="cm-grp"><div class="client-name-edit"><input class="client-name-input" data-client-field="business" data-id="'+c.id+'" value="'+escapeHtml(c.business||'')+'" placeholder="Business name" title="Click to rename">'+
@@ -438,7 +438,7 @@ function renderClientModal(){
 }
 // ---- the card face: just the things you glance at ----
 function clientTenureLabel(c){
-  const since = c.startDate || c.createdAt; if(!since) return '—';
+  const since = c.startDate || c.createdAt; if(!since) return '–';
   const d = Math.max(0, daysAgoFrom(since));
   if(d < 14) return d+' day'+(d===1?'':'s');
   if(d < 60) return Math.round(d/7)+' weeks';
@@ -454,8 +454,8 @@ function clientCardFrontHtml(c){
   return '<div class="cf">'+
     '<div class="cf-facts">'+
       '<div class="cf-fact"><span class="cf-k">Working together</span><span class="cf-v">'+clientTenureLabel(c)+'</span>'+((c.startDate||c.createdAt) ? '<span class="cf-s">since '+fmtDateShort(c.startDate||c.createdAt)+'</span>' : '')+'</div>'+
-      '<div class="cf-fact"><span class="cf-k">How we got them</span><span class="cf-v">'+(src ? src.emoji+' '+escapeHtml(src.label) : '—')+'</span></div>'+
-      '<div class="cf-fact"><span class="cf-k">Monthly</span><span class="cf-v">'+(Number(c.mrr) ? '$'+Number(c.mrr).toLocaleString() : '—')+'</span>'+(st ? '<span class="cf-s">'+escapeHtml(st.label)+'</span>' : '')+'</div>'+
+      '<div class="cf-fact"><span class="cf-k">How we got them</span><span class="cf-v">'+(src ? src.emoji+' '+escapeHtml(src.label) : '–')+'</span></div>'+
+      '<div class="cf-fact"><span class="cf-k">Monthly</span><span class="cf-v">'+(Number(c.mrr) ? '$'+Number(c.mrr).toLocaleString() : '–')+'</span>'+(st ? '<span class="cf-s">'+escapeHtml(st.label)+'</span>' : '')+'</div>'+
     '</div>'+
     '<div class="cf-sec"><div class="cf-sec-k">Plan &amp; deliverables</div>'+
       '<div class="cf-plan">'+(pkg ? '<span class="cf-plan-name">'+escapeHtml(pkg.name)+'</span>'+(pkg.price ? '<span class="kpi-sub">$'+Number(pkg.price).toLocaleString()+'/mo</span>' : '') : '<span class="kpi-sub">No plan assigned</span>')+'</div>'+
@@ -467,7 +467,7 @@ function clientCardFrontHtml(c){
         oneOff.map(function(d){ return '<div class="cf-deliv"><span class="cf-deliv-t">'+escapeHtml(d.title)+'</span><span class="cf-deliv-n kpi-sub">one-off'+(d.dueDate ? ' &middot; due '+fmtDateShort(d.dueDate) : '')+'</span></div>'; }).join('')+
       '</div>' : '<div class="kpi-sub" style="margin-top:6px;">No deliverables yet.</div>')+
     '</div>'+
-    '<div class="cf-sec"><div class="cf-sec-k">Notes</div>'+(c.notes ? '<div class="cf-notes">'+escapeHtml(c.notes)+'</div>' : '<div class="kpi-sub">No notes yet — add some in Notes.</div>')+'</div>'+
+    '<div class="cf-sec"><div class="cf-sec-k">Notes</div>'+(c.notes ? '<div class="cf-notes">'+escapeHtml(c.notes)+'</div>' : '<div class="kpi-sub">No notes yet. Add some in Notes.</div>')+'</div>'+
   '</div>';
 }
 ACTIONS.clientFlip = function(el, e, id){ ACTIONS.clientSec(el, e, id==='back' ? 'plan' : 'overview'); };
@@ -519,7 +519,7 @@ function renderClientPackageField(c, inline){
   let body;
   if(picking){
     if(!packages.length){
-      body = '<div class="kpi-sub">No packages yet — add one in Business &rarr; Packages first.</div><button class="btn btn-ghost btn-sm" style="margin-top:8px;" data-action="cancelPickPackage">Cancel</button>';
+      body = '<div class="kpi-sub">No packages yet. Add one in Business &rarr; Packages first.</div><button class="btn btn-ghost btn-sm" style="margin-top:8px;" data-action="cancelPickPackage">Cancel</button>';
     } else {
       body = '<div class="row"><select class="input" id="clientPackageSelect" style="flex:1;">'+
           packages.map(function(pk){ return '<option value="'+pk.id+'" '+(c.packageId===pk.id?'selected':'')+'>'+escapeHtml(pk.name)+' ('+arr(pk.deliverables).length+' deliverables)</option>'; }).join('')+
@@ -612,7 +612,7 @@ function deliverableRow(clientId, d){
     return '<div class="task-item-v2">'+
       '<div style="flex:1;min-width:100px;">'+recurringDeliverableRowHtml(clientId, d, false)+'</div>'+
       '<span class="tag" style="background:var(--good-dim);color:var(--good);">'+(target>1?target+'&times;/week':'Weekly')+'</span>'+
-      '<button class="btn btn-ghost btn-sm" data-action="removeDeliverable" data-client="'+clientId+'" data-id="'+d.id+'" title="'+(d.fromPackage?"Doesn't apply to this client — won't affect the package":'Remove')+'">Remove</button>'+
+      '<button class="btn btn-ghost btn-sm" data-action="removeDeliverable" data-client="'+clientId+'" data-id="'+d.id+'" title="'+(d.fromPackage?"Doesn't apply to this client. Won't affect the package":'Remove')+'">Remove</button>'+
     '</div>';
   }
   const overdue = d.status!=='done' && d.dueDate && d.dueDate<todayStr();
@@ -623,7 +623,7 @@ function deliverableRow(clientId, d){
     (d.fromPackage ? '<span class="tag" style="background:var(--good-dim);color:var(--good);">Package</span>' : '')+
     (dueThisWeek ? '<span class="tag tag-med">This week</span>' : '')+
     (d.dueDate ? '<span class="kpi-sub" style="color:'+(overdue?'var(--danger)':'var(--text-faint)')+';">Due '+fmtDateShort(d.dueDate)+'</span>' : '')+
-    '<button class="btn btn-ghost btn-sm" data-action="removeDeliverable" data-client="'+clientId+'" data-id="'+d.id+'" title="'+(d.fromPackage?"Doesn't apply to this client — won't affect the package":'Remove')+'">Remove</button>'+
+    '<button class="btn btn-ghost btn-sm" data-action="removeDeliverable" data-client="'+clientId+'" data-id="'+d.id+'" title="'+(d.fromPackage?"Doesn't apply to this client. Won't affect the package":'Remove')+'">Remove</button>'+
   '</div>';
 }
 function addDeliverable(clientId){
@@ -637,7 +637,7 @@ function addDeliverable(clientId){
   const deliverable = {id:uid(), title:title, dueDate:dueDate, status:'pending', linkedTaskId:null};
   if(linkTask){
     const taskId = uid();
-    state.tasks.items.push({id:taskId, title:title+' — '+(c.business||c.name||'Client'), client:c.id, clients:[c.id], priority:'med', deadline:dueDate, notes:'Deliverable for '+(c.business||c.name||'client'), status:'backlog', createdAt:todayStr(), completedAt:null});
+    state.tasks.items.push({id:taskId, title:title+' · '+(c.business||c.name||'Client'), client:c.id, clients:[c.id], priority:'med', deadline:dueDate, notes:'Deliverable for '+(c.business||c.name||'client'), status:'backlog', createdAt:todayStr(), completedAt:null});
     deliverable.linkedTaskId = taskId;
     persist('tasks');
   }
@@ -687,7 +687,7 @@ function prospectRow(p){
       '<span class="tag stage-'+p.stage+'" '+(nsl?'data-action="advanceStage" data-id="'+p.id+'" style="cursor:pointer;" title="Click to move to '+nsl+'"':'')+'>'+STAGE_LABELS[p.stage]+'</span>'+
       (src ? '<span class="tag" style="background:'+src.color+'22;color:'+src.color+';">'+src.emoji+' '+escapeHtml(src.label)+'</span>' : '<span></span>')+
       '<div class="lead-value">$'+Number(p.value||0).toLocaleString()+'</div>'+
-      '<div class="lead-followup kpi-sub">'+(p.nextFollowUp?fmtDateShort(p.nextFollowUp):'—')+'</div>'+
+      '<div class="lead-followup kpi-sub">'+(p.nextFollowUp?fmtDateShort(p.nextFollowUp):'–')+'</div>'+
       (canUndo ? '<button class="btn btn-ghost btn-sm" data-action="undoStage" data-id="'+p.id+'" title="Undo last stage change" style="padding:4px 6px;">&#8630;</button>' : '<span></span>')+
     '</div>'+
     (p.stage==='closed' ? (p.convertedClientId ?
@@ -815,7 +815,7 @@ function convertProspectToClient(p){
   const tps = arr(p.touchpoints).map(function(t){ return Object.assign({}, t); });
   state.business.clients.push({id:clientId, name:p.name, business:p.company, phone:p.phone||'', email:p.email||'', leadSource:p.leadSource||null, mrr:p.value||0, billingDay:1, status:'active', stage:'onboarding', notes:p.notes||'', deliverables:[], journal:[],
     touchpoints:tps, touches:tps.map(function(t){ return t.date; }), files:arr(p.files).map(function(f){ return Object.assign({}, f); }),
-    timeline:arr(p.timeline).map(function(t){ return Object.assign({}, t); }).concat([{id:uid(), ts:Date.now(), type:'stage', text:'Won — converted from lead'}]),
+    timeline:arr(p.timeline).map(function(t){ return Object.assign({}, t); }).concat([{id:uid(), ts:Date.now(), type:'stage', text:'Won: converted from lead'}]),
     lifecycle:{checks:{}, enteredAt:{}, events:{}, links:{}},
     cadenceDays:null, fromLeadId:p.id, startDate:todayStr(), createdAt:todayStr()});
   p.convertedClientId = clientId;

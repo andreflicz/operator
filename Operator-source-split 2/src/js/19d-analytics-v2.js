@@ -115,7 +115,7 @@ function sessionRowHtml(x){
   return '<div class="sx-row" data-action="editTimeBlock" data-kind="'+x.kind+'" data-id="'+x.id+'">'+
     '<span class="sx-date"><b>'+fmtDateShort(x.date)+'</b><small>'+(x.start ? fmtTimeShort(x.start)+(x.end ? ' – '+fmtTimeShort(x.end) : '') : '')+'</small></span>'+
     '<span class="sx-type" style="--c:'+t[1]+'"><i></i>'+t[0]+(x.method ? ' <em>'+escapeHtml(x.method)+'</em>' : '')+(x.manual ? ' <em>manual</em>' : '')+'</span>'+
-    '<span class="sx-what">'+(x.tasks.length ? '&#10003; '+x.tasks.map(escapeHtml).join(', ') : x.note ? escapeHtml(x.note) : '<span class="kpi-sub">—</span>')+'</span>'+
+    '<span class="sx-what">'+(x.tasks.length ? '&#10003; '+x.tasks.map(escapeHtml).join(', ') : x.note ? escapeHtml(x.note) : '<span class="kpi-sub"> · </span>')+'</span>'+
     '<span class="sx-len">'+fmtDurationLabel(x.minutes)+'</span>'+
   '</div>';
 }

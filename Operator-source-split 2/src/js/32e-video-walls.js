@@ -43,7 +43,7 @@ function videoWallMount(id){
   videoWallSrc(v).then(function(url){
     if(VW.id!==id || !VW.video) { if(url && url.indexOf('blob:')===0) URL.revokeObjectURL(url); return; }
     videoWallRelease(); VW.url = url;
-    if(!url){ showToast('That video couldn\'t be loaded — try adding it again.', {icon:'&#127902;'}); return; }
+    if(!url){ showToast('That video couldn\'t be loaded. Try adding it again.', {icon:'&#127902;'}); return; }
     VW.video.src = url;
     videoWallPlayPause();
   });
@@ -89,7 +89,7 @@ async function addVideoWallFile(file){
   if(!file || !(file.type||'').match(/^video\//)){ showToast('Pick a video file (.mp4, .mov or .webm).', {icon:'&#127902;'}); return; }
   const key = 'vw'+uid();
   try{ await blobTx('readwrite', function(store){ return store.put(file, key); }); }
-  catch(e){ showToast('Couldn\'t save that video — the disk may be full.', {icon:'&#9888;'}); return; }
+  catch(e){ showToast('Couldn\'t save that video: the disk may be full.', {icon:'&#9888;'}); return; }
   const url = URL.createObjectURL(file);
   const thumb = await videoWallThumb(url); URL.revokeObjectURL(url);
   const v = {id:uid(), name:videoWallName(file.name), src:'vidb:'+key, thumb:thumb, size:file.size};
@@ -135,7 +135,7 @@ function videoWallCardsHtml(cur){
 }
 function videoWallAddHtml(){
   return '<div class="vw-add">'+
-    '<span class="kind-label" style="margin:0;">Video wallpaper'+tip('Real footage behind the app — space, Tokyo at night, a skyline in the rain. Free 4K loops: pexels.com/videos or mixkit.co (search "tokyo night", "space", "shanghai"). Download one, then add it here. Short loops (10–60s, 1080p) are smoothest.')+'</span>'+
+    '<span class="kind-label" style="margin:0;">Video wallpaper'+tip('Real footage behind the app. Space, Tokyo at night, a skyline in the rain. Free 4K loops: pexels.com/videos or mixkit.co (search "tokyo night", "space", "shanghai"). Download one, then add it here. Short loops (10–60s, 1080p) are smoothest.')+'</span>'+
     '<button class="btn btn-ghost btn-sm" data-action="videoWallPickFile">&#127902; Add a video file</button>'+
     '<button class="btn btn-ghost btn-sm" data-action="videoWallLink">&#128279; From a link</button>'+
     '<input type="file" id="videoWallFile" accept="video/*" hidden>'+

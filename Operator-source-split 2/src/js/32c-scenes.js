@@ -411,7 +411,7 @@ function paintSceneThumb(id){
 }
 function sceneSettingsHtml(){
   const cur = sceneId();
-  return '<div class="section"><div class="section-title">Scene'+tip('A living background behind the app — it follows the real time of day (Sky also shows the live weather). Minimal keeps it clean and straight to the point. Scenes pause whenever Operator isn\'t the window in front.')+'</div><div class="card">'+
+  return '<div class="section"><div class="section-title">Scene'+tip('A living background behind the app. It follows the real time of day (Sky also shows the live weather). Minimal keeps it clean and straight to the point. Scenes pause whenever Operator isn\'t the window in front.')+'</div><div class="card">'+
     '<div class="scene-grid">'+SCENES.map(function(s){
       const th = sceneThumb(s.id);
       return '<button class="scene-card'+(cur===s.id?' is-on':'')+'" data-action="setScene" data-id="'+s.id+'" data-thumb="'+s.id+'">'+
@@ -420,7 +420,7 @@ function sceneSettingsHtml(){
     }).join('')+videoWallCardsHtml(cur)+'</div>'+
     videoWallAddHtml()+
     '<div class="scene-motion"><span>Full screen'+tip('Good morning, the work preview, the minimal locked-in view, breaks and day off take the whole display (real macOS full screen through the Operator launcher). Off keeps them in the window.')+'</span><div class="seg">'+[['on','On'],['off','Off']].map(function(m){ const on = (state.profile.trueFull!==false)===(m[0]==='on'); return '<button class="seg-b'+(on?' is-on':'')+'" data-action="'+(on ? 'noop' : 'toggleTrueFull')+'">'+m[1]+'</button>'; }).join('')+'</div></div>'+
-    (SCENE_DEFS[cur] ? '<div class="scene-motion"><span>Motion'+tip('Off keeps the picture still (fastest) — it still fades from morning to day to dusk to night. Calm moves the clouds, stars and snow gently. Smooth is twice the frame rate.')+'</span><div class="seg">'+[['off','Off'],['calm','Calm'],['smooth','Smooth']].map(function(m){ return '<button class="seg-b'+(sceneMotion()===m[0]?' is-on':'')+'" data-action="setSceneMotion" data-id="'+m[0]+'">'+m[1]+'</button>'; }).join('')+'</div></div>' : '')+
+    (SCENE_DEFS[cur] ? '<div class="scene-motion"><span>Motion'+tip('Off keeps the picture still (fastest). It still fades from morning to day to dusk to night. Calm moves the clouds, stars and snow gently. Smooth is twice the frame rate.')+'</span><div class="seg">'+[['off','Off'],['calm','Calm'],['smooth','Smooth']].map(function(m){ return '<button class="seg-b'+(sceneMotion()===m[0]?' is-on':'')+'" data-action="setSceneMotion" data-id="'+m[0]+'">'+m[1]+'</button>'; }).join('')+'</div></div>' : '')+
   '</div></div>';
 }
 function setScene(id){ state.profile.scene = id; persist('profile'); sceneMount(); renderView(); }

@@ -44,7 +44,7 @@ function lockedEditing(){ return !!ui.lockedEdit; }
 function saveLockedLayout(order){ state.profile.lockedLayout = {order:order}; persist('profile'); renderView(); }
 // A quiet pencil in the corner (it only lights up on hover) — or right-click the page → Edit this page.
 function pageEditBtnHtml(action, on){
-  return '<div class="ll-bar"><button class="ll-btn'+(on?' is-on':'')+'" data-action="'+action+'" title="'+(on?'Done editing':'Edit this page — move, hide or add sections')+'">'+(on ? '&#10003; Done' : '&#9998;')+'</button></div>';
+  return '<div class="ll-bar"><button class="ll-btn'+(on?' is-on':'')+'" data-action="'+action+'" title="'+(on?'Done editing':'Edit this page. Move, hide or add sections')+'">'+(on ? '&#10003; Done' : '&#9998;')+'</button></div>';
 }
 function lockedLayoutToolbarHtml(){ return pageEditBtnHtml('toggleLockedEdit', lockedEditing()); }
 function lockedBlocksHtml(c){
@@ -88,7 +88,7 @@ ACTIONS.lockedReset = function(){ state.profile.lockedLayout = null; persist('pr
 
 // ---- Today (not locked in): the same editing, on the Today panels ----
 function todayEditing(){ return !!ui.todayEdit; }
-function panelLabel(pid){ const d = PANEL_DEFS.find(function(x){ return x.id===pid; }); return d ? d.label.split(' — ')[0].split(' (')[0] : pid; }
+function panelLabel(pid){ const d = PANEL_DEFS.find(function(x){ return x.id===pid; }); return d ? d.label.split(': ')[0].split(' (')[0] : pid; }
 function todayEditWrap(pid, inner, idx, count){
   return '<div class="ll-block is-editing" data-key="te-'+pid+'">'+
     '<div class="ll-head"><span class="ll-name">'+escapeHtml(panelLabel(pid))+'</span>'+

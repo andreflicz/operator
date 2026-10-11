@@ -165,7 +165,7 @@ function weekStackChart(days, selected){
     }
     const isSel = d===selected;
     out += '<g class="wk-bar'+(isSel?' is-selected':'')+(t?'':' is-future')+'" data-action="analyticsPickDay" data-id="'+d+'">'+
-      '<title>'+weekdayShort(d)+' '+fmtDateShort(d)+(t?' — '+fmtDurationLabel(t.total)+' ('+TIME_TYPES.map(function(tt){ return tt.label+' '+fmtDurationLabel(t[tt.id]); }).join(', ')+')':'')+'</title>'+
+      '<title>'+weekdayShort(d)+' '+fmtDateShort(d)+(t?' · '+fmtDurationLabel(t.total)+' ('+TIME_TYPES.map(function(tt){ return tt.label+' '+fmtDurationLabel(t[tt.id]); }).join(', ')+')':'')+'</title>'+
       '<rect x="'+(i*gap+2).toFixed(1)+'" y="0" width="'+(gap-4).toFixed(1)+'" height="'+h+'" fill="'+(isSel?'rgba(232,162,61,.08)':'transparent')+'" rx="6"/>'+
       (t && !t.total ? '<rect x="'+x.toFixed(1)+'" y="'+(h-padB-2)+'" width="'+barW.toFixed(1)+'" height="2" style="fill:var(--border)"/>' : '')+
       segs+
@@ -241,7 +241,7 @@ function dayDetailHtml(dateStr){
       return '<div class="mode-tile"><span class="mode-tile-dot" style="background:'+tt.color+'"></span><div class="mode-tile-val">'+fmtDurationLabel(t[tt.id])+'</div><div class="mode-tile-label">'+tt.label+'</div></div>';
     }).join('')+'</div>'+
     '<div class="grid grid-2" style="margin-top:14px;">'+
-      '<div class="card"><div class="kind-label" style="margin-top:0;">Top Tasks</div>'+(taskRows.length ? barList(taskRows, function(r){ return taskCountsAsDeepWork(r.key)?'var(--accent)':'#8A90A2'; }, function(r){ const tk = state.tasks.items.find(function(x){ return x.id===r.key; }); return tk ? tk.title : 'Deleted task'; }) : '<div class="kpi-sub">No task timing yet — set a Current task while locked in.</div>')+
+      '<div class="card"><div class="kind-label" style="margin-top:0;">Top Tasks</div>'+(taskRows.length ? barList(taskRows, function(r){ return taskCountsAsDeepWork(r.key)?'var(--accent)':'#8A90A2'; }, function(r){ const tk = state.tasks.items.find(function(x){ return x.id===r.key; }); return tk ? tk.title : 'Deleted task'; }) : '<div class="kpi-sub">No task timing yet. Set a Current task while locked in.</div>')+
         (finished.length ? '<div class="kind-label">Finished</div><div class="kpi-sub" style="line-height:1.6;">'+finished.map(function(x){ return '&#10003; '+escapeHtml(x.title); }).join('<br>')+'</div>' : '')+'</div>'+
       '<div class="card"><div class="kind-label" style="margin-top:0;">Clients</div>'+(clientRows.length ? barList(clientRows, function(){ return 'var(--info)'; }, function(r){ return clientLabel(r.key); }) : '<div class="kpi-sub">Nothing attributed to clients.</div>')+
         '<div class="kind-label">Apps &middot; all day'+(locked && Object.keys(locked).length ? ' <span style="text-transform:none;letter-spacing:0;font-weight:500;">(locked-in part in brackets)</span>' : '')+'</div>'+(appRows.length ? barList(appRows, function(r){ return locked && locked[r.key] ? 'var(--accent)' : '#5b6472'; }, function(r){ return r.key+(locked && locked[r.key] ? ' ('+fmtDurationLabel(locked[r.key])+')' : ''); }) : '<div class="kpi-sub">No app activity recorded.</div>')+'</div>'+
@@ -303,7 +303,7 @@ function renderAnalyticsToday(){
   if(as && !as.onBreak && sessionType(as)==='deep') addSpan(as.startedAt, Date.now());
   const nowH = new Date().getHours();
   const strip = '<div class="hour-strip">'+hours.map(function(m,h){
-    return '<div class="hour-cell'+(h===nowH?' is-now':'')+'" title="'+(h%12||12)+(h<12?'am':'pm')+' — '+Math.round(m)+'m deep work"><span style="height:'+Math.min(100,Math.round(m/60*100))+'%"></span></div>';
+    return '<div class="hour-cell'+(h===nowH?' is-now':'')+'" title="'+(h%12||12)+(h<12?'am':'pm')+' – '+Math.round(m)+'m deep work"><span style="height:'+Math.min(100,Math.round(m/60*100))+'%"></span></div>';
   }).join('')+'</div><div class="hour-strip-labels"><span>12a</span><span>6a</span><span>12p</span><span>6p</span><span>11p</span></div>';
   return '<div class="card analytics-hero"><div class="kpi-label">Deep work by hour</div>'+strip+'</div>'+
     '<div class="section" style="margin-top:16px;">'+dayDetailHtml(today)+'</div>';
@@ -316,7 +316,7 @@ function renderFitnessStatsSection(){
   const wk = workoutTotals(weekDays(0)), last30 = []; for(let i=29;i>=0;i--) last30.push(addDays(todayStr(), -i));
   const m30 = workoutTotals(last30);
   const tile = function(label, v, sub){ return '<div class="card" style="text-align:center;"><div class="kpi-label">'+label+'</div><div class="kpi-value" style="color:var(--train);">'+v+'</div>'+(sub?'<div class="kpi-sub">'+sub+'</div>':'')+'</div>'; };
-  return '<div class="section"><div class="section-title">Fitness'+tip('From the workouts you log in Personal → Health — enter how long each one took and it lands here.')+'<span class="view-all-link" data-action="goToFitness">Log a workout &rarr;</span></div><div class="grid grid-4">'+
+  return '<div class="section"><div class="section-title">Fitness'+tip('From the workouts you log in Personal → Health. Enter how long each one took and it lands here.')+'<span class="view-all-link" data-action="goToFitness">Log a workout &rarr;</span></div><div class="grid grid-4">'+
       tile('Total Workouts', all.n, dates.length ? 'since '+fmtDateShort(dates.sort()[0]) : 'none logged yet')+
       tile('Time Working Out', fmtDurationLabel(all.m), all.n ? fmtDurationLabel(Math.round(all.m/all.n))+' per workout' : '')+
       tile('This Week', wk.n, fmtDurationLabel(wk.m))+

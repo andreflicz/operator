@@ -8,9 +8,9 @@
 //  · Calendar events linked to a client or lead log a "meeting" touch on their own once they start.
 //  · The week at a glance on the Business overview: who you touched, who's due, your reach-out streak.
 const DEFAULT_TEMPLATES = {
-  leadText:'Hey {first}! {me} here — just checking in. Any questions on what we talked about?',
-  clientText:'Hey {first}, quick check-in from {me} — how\'s everything going on your end?',
-  leadEmailSubject:'Quick follow-up', leadEmailBody:'Hi {first},\n\nJust following up on our conversation — happy to answer any questions.\n\nBest,\n{me}',
+  leadText:'Hey {first}! {me} here, just checking in. Any questions on what we talked about?',
+  clientText:'Hey {first}, quick check-in from {me}: how\'s everything going on your end?',
+  leadEmailSubject:'Quick follow-up', leadEmailBody:'Hi {first},\n\nJust following up on our conversation. Happy to answer any questions.\n\nBest,\n{me}',
   clientEmailSubject:'Checking in', clientEmailBody:'Hi {first},\n\nWanted to check in and see how everything\'s going.\n\nBest,\n{me}'
 };
 function crmTemplates(){ const c = crm(); if(!c.templates || typeof c.templates!=='object') c.templates = {}; Object.keys(DEFAULT_TEMPLATES).forEach(function(k){ if(typeof c.templates[k]!=='string') c.templates[k] = DEFAULT_TEMPLATES[k]; }); return c.templates; }
@@ -22,7 +22,7 @@ function fillTemplate(tpl, kind, x){
 function setFollowUp(kind, id, date, note){
   const x = crmFind(kind, id); if(!x) return;
   x.followUp = date ? {date:date, note:(note||'').trim(), set:Date.now()} : null;
-  crmTimeline(x, 'followup', date ? 'Follow-up set for '+fmtDateShort(date)+(note ? ' — '+note.trim() : '') : 'Follow-up cleared');
+  crmTimeline(x, 'followup', date ? 'Follow-up set for '+fmtDateShort(date)+(note ? ' · '+note.trim() : '') : 'Follow-up cleared');
   persist('business'); renderView(); if(typeof rerenderContactModal==='function') rerenderContactModal();
 }
 function followUpMenuHtml(kind, x){
@@ -69,7 +69,7 @@ function followUpFormHtml(kind, x){
   const fu = x.followUp;
   return '<div class="kind-label">Follow up'+tip('Pick a day (and why). It replaces the usual rhythm until you touch base on or after that day.')+'</div>'+
     '<div class="fu-card">'+(fu
-      ? '<span class="fu-when">&#128204; '+escapeHtml(fmtDateShort(fu.date))+' ('+weekdayShort(fu.date)+')'+(fu.note ? ' — '+escapeHtml(fu.note) : '')+'</span><span style="flex:1"></span><button class="btn btn-ghost btn-sm" data-action="fuOpen" data-kind="'+kind+'" data-id="'+x.id+'">Change</button><button class="btn btn-ghost btn-sm" data-action="fuClearBtn" data-kind="'+kind+'" data-id="'+x.id+'">Clear</button>'
+      ? '<span class="fu-when">&#128204; '+escapeHtml(fmtDateShort(fu.date))+' ('+weekdayShort(fu.date)+')'+(fu.note ? ' · '+escapeHtml(fu.note) : '')+'</span><span style="flex:1"></span><button class="btn btn-ghost btn-sm" data-action="fuOpen" data-kind="'+kind+'" data-id="'+x.id+'">Change</button><button class="btn btn-ghost btn-sm" data-action="fuClearBtn" data-kind="'+kind+'" data-id="'+x.id+'">Clear</button>'
       : ['1','3','7'].map(function(d){ return '<button class="btn btn-ghost btn-sm" data-action="fuOpen" data-kind="'+kind+'" data-id="'+x.id+'" data-days="'+d+'">'+(d==='1'?'Tomorrow':d==='3'?'In 3 days':'Next week')+'</button>'; }).join('')+'<button class="btn btn-ghost btn-sm" data-action="fuOpen" data-kind="'+kind+'" data-id="'+x.id+'" data-days="0">Pick a day…</button>')+
     '</div>';
 }
@@ -110,8 +110,8 @@ function messageTemplatesHtml(){
   return '<div class="card section"><div class="section-title">Message templates'+tip('Used by Text and Email (right-click a client or lead, or the ⌄ next to the touch button). {first} = their first name, {name} = the business, {me} = you, {note} = the follow-up reason.')+'</div>'+
     '<div class="grid grid-2">'+f('leadText', 'Text to a lead', 3)+f('clientText', 'Text to a client', 3)+'</div>'+
     '<div class="grid grid-2" style="margin-top:8px;">'+
-      '<div>'+f('leadEmailSubject', 'Email to a lead — subject')+f('leadEmailBody', 'Email to a lead', 5)+'</div>'+
-      '<div>'+f('clientEmailSubject', 'Email to a client — subject')+f('clientEmailBody', 'Email to a client', 5)+'</div>'+
+      '<div>'+f('leadEmailSubject', 'Email to a lead: subject')+f('leadEmailBody', 'Email to a lead', 5)+'</div>'+
+      '<div>'+f('clientEmailSubject', 'Email to a client: subject')+f('clientEmailBody', 'Email to a client', 5)+'</div>'+
     '</div></div>';
 }
 let tplSaveT = 0;

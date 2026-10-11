@@ -148,7 +148,7 @@ function yesterdayStandardsFixupHtml(){
   const fix = yesterdayStandardsFixup();
   if(!fix) return '';
   return '<div class="card" style="text-align:center;border-color:var(--accent);margin-top:10px;">'+
-    '<div class="kpi-label" style="margin-bottom:6px;">Looks like you did the work yesterday — just missing this:'+tip('Tap it to confirm and restore yesterday to your streak.')+'</div>'+
+    '<div class="kpi-label" style="margin-bottom:6px;">Looks like you did the work yesterday, just missing this:'+tip('Tap it to confirm and restore yesterday to your streak.')+'</div>'+
     '<div class="row" style="justify-content:center;">'+
       fix.missing.map(function(it){ return '<span class="chip" data-action="toggleStandard" data-id="'+it.id+'" data-date="'+fix.date+'">'+escapeHtml(it.label)+'</span>'; }).join('')+
     '</div>'+
@@ -214,7 +214,7 @@ function renderStreakWeekDots(){
     const status = isBreakDay(d) ? 'broken' : dayVisualStatus(d);
     const off = isDayOff(d) && status!=='worked';
     const cls = 'streak-dot streak-dot-'+(off?'off':status)+(d===today?' is-today':'');
-    const title = weekdayShort(d)+' · '+(status==='worked'?'standard met':status==='broken'?'streak broke':off?'day off':status==='failed'?'missed':status==='future'?'upcoming':'—');
+    const title = weekdayShort(d)+' · '+(status==='worked'?'standard met':status==='broken'?'streak broke':off?'day off':status==='failed'?'missed':status==='future'?'upcoming':'–');
     return '<div class="streak-day" title="'+escapeHtml(title)+'"><span class="'+cls+'">'+(status==='worked'?'&#10003;':status==='broken'?'&#10005;':'')+'</span><span class="streak-day-letter">'+weekdayShort(d).slice(0,1)+'</span></div>';
   }).join('')+'</div>';
 }

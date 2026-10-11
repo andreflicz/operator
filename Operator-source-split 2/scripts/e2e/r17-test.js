@@ -263,7 +263,8 @@ const newsRoute = (asked, extra) => async r => {
     check('everyone starts at 0 — history before the first day doesn’t count, only what you do from here', x.start==='2026-10-12' && x.total===x.todaySum && x.rank===0, x);
     check('rank 0 is "Locked In"', await E("RANKS[0].name")==='Locked In');
     // (round 21: levels like a ranked game — quicker at the start, 100 at the top)
-    check('levels: level 1 is 400 XP, level 10 is 6,700, 100 is the top', await E("xpForLevel(1)")===400 && await E("xpForLevel(10)")===6700 && await E("xpLevelOf(399)")===0 && await E("xpLevelOf(400)")===1 && await E("xpLevelOf(1e9)")===100);
+    // (round 22: levels cost a lot more: level 1 is about a client won)
+    check('levels: level 1 is 1,500 XP, level 2 is 4,100, 100 is the top', await E("xpForLevel(1)")===1500 && await E("xpForLevel(2)")===4100 && await E("xpLevelOf(1499)")===0 && await E("xpLevelOf(1500)")===1 && await E("xpLevelOf(1e9)")===100);
     check('training counts big (first workouts +150)', x.items.includes('workout'), x);
     await E("state.business.clients[0].mrr = 5000; xpLast = null");
     check('MRR you add is XP (800 per $1k above where you started)', JSON.parse(await E("xpSummaryFresh().mrrXp"))===1600);
@@ -282,7 +283,10 @@ const newsRoute = (asked, extra) => async r => {
     check('click: it turns over — overall and the four ratings on the back', await p.$('.today-hero .pcf.is-flipped')!==null && (await p.$$('.today-hero .pcf-back .pc-attrs > span')).length===4 && /OVR/.test(await p.textContent('.today-hero .pcf-back')));
     await p.click('.today-hero .pcf-open'); await p.waitForTimeout(400);
     check('"Your card →" opens Personal → You (the full 2K card)', await E("ui.view==='personal' && ui.personalTab==='you'") && await p.isVisible('.you .pc-big') && (await p.$$('.you-attr')).length===4 && await p.isVisible('.you .you-chart'));
-    check('You shows your body on a scale for your height (174 healthy line, 209 obese line, you at 205)', /174/.test(await p.textContent('.you-body .bmi-lab')) && /209/.test(await p.textContent('.you-body .bmi-lab')) && /205/.test(await p.textContent('.you-body .bmi-you')));
+    // (round 22: the body scale lives on Health now)
+    await E("ui.personalTab='fitness'; renderView()"); await p.waitForTimeout(200);
+    check('Health shows your weight on a scale for your height (174 healthy line, 209 obese line, you at 205)', /174/.test(await p.textContent('#healthScore .bmi-lab')) && /209/.test(await p.textContent('#healthScore .bmi-lab')) && /205/.test(await p.textContent('#healthScore .bmi-you')));
+    await E("ui.personalTab='you'; renderView()"); await p.waitForTimeout(200);
     check('…and stays simple (no daily quest, no wall of XP lines)', await p.$('.you .sys-quest, .you .you-today')===null);
     // SYSTEM windows
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(300);

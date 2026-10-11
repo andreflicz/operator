@@ -1,20 +1,23 @@
 // ============ XP, LEVELS, RANKS & YOUR CARD ============
-// A game you play by living the right way. Everyone starts at level 0, rank 0 — "Locked In": the
+// A game you play by living the right way. Everyone starts at level 0, rank 0 ("Locked In"): the
 // point is to stay consistent and not lose yourself to brain fog.
-// Like a ranked game: your level is your account — it only ever goes up, nothing gates it, and it
-// runs to 100. The first levels come quick (400 XP, then 60 more for each one after), the later ones
-// take real time, so it's a journey. Rank is the real thing: it needs the level, the MRR and the body
-// (your Health score) — you can't rank up on work alone.
+// Like a ranked game: your level is your account. It only goes up, nothing gates it, and it runs to
+// 100. Levels cost a lot: level 1 is about a client won, level 2 about two more, and every level after
+// costs more than the last, so the top is years of locked-in living. Rank is the real thing: it needs
+// the level, the MRR and your Health score, so you can't rank up on work alone.
 // XP comes from:
-//   the day     — deep work, tasks, workouts (the first ones count big), shooting, outreach; strong
-//                 days in a row multiply it
-//   goals       — a weekly goal hit +150 (up to three a week), a monthly goal +500 (up to three a
-//                 month), beating the month's habit +250, checking in and out of the week/month (+25/+50,
-//                 +50/+100), a master goal reached +4,000 (MRR, weight, streak — raise the bar and it
-//                 pays again), every finished week you hit a weekly ring +100, your own goals +500
-//   the business — every $1k of MRR above where you started +800 (taken back if it drops), a client won
-//                 +750, followers gained
-// Your card (NBA 2K style) rates you 25–100 on four things, and an overall (see xpAttributes).
+//   the day      deep work (8 hours is the gold standard: every hour pays more than the one before,
+//                with extra for going past your normal), tasks (each one pays more than the last that
+//                day), workouts (the first ones count big), shooting, outreach; strong days in a row
+//                multiply it
+//   goals        a weekly goal hit +150 (up to three a week), a monthly goal +500 (up to three a
+//                month), beating the month's habit +500, checking in and out of the week and month
+//                (+25/+50, +50/+100), a master goal reached +4,000 (MRR, weight, streak; raise the
+//                bar and it pays again), every finished week you hit a weekly ring +100, your own
+//                goals +500
+//   the business every $1k of MRR above where you started +800 (taken back if it drops), a client
+//                won +1,000, +1 a follower gained
+// Your card (NBA 2K style) rates you 25 to 100 on four things, and an overall (see xpAttributes).
 const RANKS = [
   {name:'Locked In',   level:0,  mrr:0,     health:0,  color:'#8fd3ff', tag:'Entrepreneur mode'},
   {name:'Operator',    level:5,  mrr:2500,  health:40, color:'#5fd4c4', tag:'Showing up'},
@@ -26,20 +29,44 @@ const RANKS = [
   {name:'Mogul',       level:70, mrr:70000, health:75, color:'#7ef0c0', tag:'Owns the game'},
   {name:'Millionaire', level:85, mrr:83400, health:80, color:'#fff2b0', tag:'A million a year'}
 ];
-const XP_RATES = {mrrPerK:800, client:750, follower:1, goal:500, video:50, hourBase:10, hourAbove:18, longDay:40, outreach:20};
+const XP_RATES = {mrrPerK:800, client:1000, follower:1, goal:500, video:50, longDay:40, goldDay:100, outreach:10, outreachEach:6, outreachMax:15, taskMax:20};
 const MASTER_XP = {milestone:4000, weekly:100};
-// total XP to reach level L: 400 for the first, 60 more for each level after (level 100 is the top)
+// deep work: 8 hours a day is the gold standard. Hour 1 pays 10, each hour after pays 2.5 more (hour 8
+// pays 27.5, 150 for the full eight), past 8 it's 15 an hour. On top: +8 an hour for the time past
+// your own normal, +40 at 6 hours and +100 when you hit the full 8.
+const DEEP_GOLD = 480;
+function deepHourRate(h){ return h < 8 ? 10 + 2.5*h : 15; }
+function xpDeep(min, normal){
+  let xp = 0;
+  for(let h = 0; h*60 < min; h++) xp += deepHourRate(h)*Math.min(60, min - h*60)/60;
+  const above = normal > 0 ? Math.max(0, min - normal) : 0;
+  xp += above/60*8;
+  return {xp:xp, above:above};
+}
+// tasks: the more you finish in a day, the more each one pays (5, 7, 9 … up to 25 a task), counted
+// up to 20 a day
+function taskXpAt(i){ return Math.min(25, 3 + 2*i); }
+function xpTasks(n){ let x = 0; for(let i=1;i<=Math.min(n, XP_RATES.taskMax);i++) x += taskXpAt(i); return x; }
+// total XP to reach level L. Level 1 is 1,500 (about a client won), level 2 is 4,100, and each one
+// after costs more: level 5 is about 15k, 20 about 115k, 50 about 440k, 100 about 1.2M.
 const LEVEL_MAX = 100;
-function xpForLevel(L){ return 400*L + 30*L*(L-1); }
+function xpForLevel(L){ return L <= 0 ? 0 : Math.round(1500*Math.pow(L, 1.45)/50)*50; }
 function xpLevelOf(total){ let L = 0; while(L < LEVEL_MAX && xpForLevel(L+1) <= total) L++; return L; }
-// (levels aren't gated any more — MRR and Health gate ranks, not levels)
+// (levels aren't gated: MRR and Health gate ranks, not levels)
 function xpLevelGate(L){ return null; }
 // the level you've claimed. The first time, you're given what you'd already reached (as far as the
 // gates allow) — after that it only moves when you press Level up.
 function xpClaimedLevel(earned, mrr, health){
   const p = state.profile;
   if(typeof p.xpLevel!=='number'){
-    p.xpLevel = earned; persist('profile');
+    p.xpLevel = earned; p.xpCurve = 2; persist('profile');
+  }
+  // levels got steeper (round 22): a level claimed on the old, cheaper curve comes back down to what
+  // your XP pays for now. Nothing earned is lost, it just buys less.
+  if(p.xpCurve!==2){
+    p.xpCurve = 2; p.xpLevel = Math.min(p.xpLevel, earned); p.xpReadyFor = null;
+    if(p.xpSeen && typeof p.xpSeen==='object') p.xpSeen.level = p.xpLevel;
+    persist('profile');
   }
   return p.xpLevel;
 }
@@ -121,24 +148,25 @@ function xpDay(d, ctx){
   const add = function(k, xp, why){ if(xp) items.push({k:k, xp:Math.round(xp), why:why}); };
   const deep = ctx.deep(d), std = xpStandardFor(d, ctx.deep);
   if(deep){
-    const base = Math.min(deep, std), above = Math.max(0, deep - std);
-    add('time', base/60*XP_RATES.hourBase + above/60*XP_RATES.hourAbove, fmtDurationLabel(deep)+' of deep work'+(above>0 && std>0 ? ' ('+fmtDurationLabel(above)+' above your normal)' : ''));
-    if(deep >= 360) add('long', XP_RATES.longDay, 'Long day (6h+)');
+    const dx = xpDeep(deep, std);
+    add('time', dx.xp, fmtDurationLabel(deep)+' of deep work'+(dx.above>0 && std>0 ? ' ('+fmtDurationLabel(dx.above)+' past your normal)' : ''));
+    if(deep >= DEEP_GOLD) add('gold', XP_RATES.goldDay, 'The gold standard: 8 hours');
+    else if(deep >= 360) add('long', XP_RATES.longDay, 'Long day (6 hours or more)');
   }
   const done = ctx.doneOn[d] || {tasks:0, videos:0};
-  if(done.tasks){ let x = 0; for(let i=0;i<done.tasks;i++) x += i<3 ? 12 : i<6 ? 8 : 4; add('tasks', x, done.tasks+' task'+(done.tasks===1?'':'s')+' done'); }
+  if(done.tasks) add('tasks', xpTasks(done.tasks), done.tasks+' task'+(done.tasks===1?'':'s')+' done');
   if(done.videos) add('videos', done.videos*XP_RATES.video, done.videos+' video'+(done.videos===1?'':'s')+' finished');
   // the body is a big part of this: training pays more than an hour of work
   if(ctx.trained(d)){
     const k = ctx.workoutIndex[d], w = ctx.workoutWeekIndex[d];
-    add('workout', k<=5 ? 150 : w===1 ? 70 : w===2 ? 60 : w===3 ? 50 : 25, k<=5 ? 'Workout #'+k+' — the first few count big' : 'Workout ('+w+(w===1?'st':w===2?'nd':w===3?'rd':'th')+' this week)');
+    add('workout', k<=5 ? 150 : w===1 ? 70 : w===2 ? 60 : w===3 ? 50 : 25, k<=5 ? 'Workout #'+k+' (your first five count big)' : 'Workout, '+w+(w===1?'st':w===2?'nd':w===3?'rd':'th')+' this week');
   }
   const shoot = ctx.shootMin[d]||0; if(shoot) add('shoot', shoot/60*8, fmtDurationLabel(shoot)+' shooting');
-  const t = ctx.touches[d]||0; if(t) add('outreach', XP_RATES.outreach + Math.min(30, (t-1)*3), t+' outreach touch'+(t===1?'':'es'));
+  const t = ctx.touches[d]||0; if(t) add('outreach', XP_RATES.outreach + XP_RATES.outreachEach*(Math.min(t, XP_RATES.outreachMax) - 1), t+' reach-out'+(t===1?'':'s')+' to clients and leads');
   // consistency: strong days in the last week multiply the day's effort
   let strong = 0; for(let i=0;i<7;i++) if(ctx.deep(addDays(d, -i)) >= ctx.target) strong++;
   const mult = 1 + 0.04*strong, base = items.reduce(function(a, x){ return a + x.xp; }, 0);
-  if(strong >= 2 && base) items.push({k:'streak', xp:Math.round(base*(mult-1)), why:'×'+mult.toFixed(2)+' — '+strong+' strong days this week'});
+  if(strong >= 2 && base) items.push({k:'streak', xp:Math.round(base*(mult-1)), why:'×'+mult.toFixed(2)+' for '+strong+' strong days this week'});
   return items;
 }
 function xpCtx(){
@@ -151,7 +179,13 @@ function xpCtx(){
   let k = 0; gymDays.forEach(function(d){ k++; workoutIndex[d] = k; const ws = startOfWeekStr(d); workoutWeekIndex[d] = gymDays.filter(function(x){ return x>=ws && x<=d; }).length; });
   const shootMin = {}; arr(state.modes.history).forEach(function(m){ if(m.type==='shooting') shootMin[m.date] = (shootMin[m.date]||0) + Number(m.minutes||0); });
   const touches = {};
-  ['clients', 'pipeline'].forEach(function(k){ arr(state.business[k]).forEach(function(x){ arr(x.touches).forEach(function(t){ const d = typeof t==='string' ? t : t && t.date; if(d) touches[d] = (touches[d]||0) + 1; }); }); });
+  // every reach-out you log on a client or a lead (the 👋 / Text / Email / Call buttons, and meetings
+  // linked to them on the calendar). Older clients only kept the dates, so those count when there's
+  // no touchpoint list.
+  ['clients', 'pipeline'].forEach(function(k){ arr(state.business[k]).forEach(function(x){
+    const list = arr(x.touchpoints).length ? arr(x.touchpoints) : arr(x.touches);
+    list.forEach(function(t){ const d = typeof t==='string' ? t : t && t.date; if(d) touches[d] = (touches[d]||0) + 1; });
+  }); });
   const deepMemo = {};
   return {doneOn:doneOn, trained:function(d){ return !!gymSet[d]; }, gymDays:gymDays, workoutIndex:workoutIndex, workoutWeekIndex:workoutWeekIndex, shootMin:shootMin, touches:touches,
     target: state.standards.deepWorkTargetMinutes || 180,
@@ -159,7 +193,8 @@ function xpCtx(){
 }
 // past days don't change often: keep them, recount only today (and everything when the data changes)
 let xpCache = {sig:'', days:{}};
-function xpSig(){ return [arr(state.focus.sessions).length, state.tasks.items.filter(function(t){ return t.status==='done'; }).length, arr(state.health.gymLog).length, arr(state.modes.history).length, state.standards.deepWorkTargetMinutes, state.profile.xpStart, arr(state.goals && state.goals.items).filter(function(g){ return g.done; }).length, arr(state.goals && state.goals.items).length, xpIntentSig(), state.profile.weeklyWorkoutTarget, state.profile.revenueGoalMonthly, state.profile.goalWeight, state.profile.streakGoal].join('|'); }
+function xpSig(){ return [arr(state.focus.sessions).length, state.tasks.items.filter(function(t){ return t.status==='done'; }).length, arr(state.health.gymLog).length, arr(state.modes.history).length, state.standards.deepWorkTargetMinutes, state.profile.xpStart, arr(state.goals && state.goals.items).filter(function(g){ return g.done; }).length, arr(state.goals && state.goals.items).length, xpIntentSig(), state.profile.weeklyWorkoutTarget, state.profile.revenueGoalMonthly, state.profile.goalWeight, state.profile.streakGoal, xpTouchSig(), arr(state.health.calorieEntries).length, arr(state.health.weightLog).length, state.profile.calorieTarget, state.profile.heightIn].join('|'); }
+function xpTouchSig(){ let n = 0; ['clients', 'pipeline'].forEach(function(k){ arr(state.business[k]).forEach(function(x){ n += arr(x.touchpoints).length + arr(x.touches).length; }); }); return n; }
 function xpIntentSig(){ const s = state.journal && state.journal.intentions; if(!s) return ''; let n = 0; ['weeks', 'months'].forEach(function(k){ const o = s[k] || {}; Object.keys(o).forEach(function(x){ if(o[x] && o[x].at) n++; if(o[x] && o[x].out) n += 100 + (o[x].out.habit ? 1000 : 0); }); }); return n; }
 // (renders often — the full count is reused for a few seconds unless something changed)
 let xpLast = null;
@@ -205,16 +240,21 @@ function xpSummaryFresh(){
     rank:rank, next:next, needs:needs, attrs:attrs, ovr:attrs.OVR};
 }
 
-// ---- the four ratings (25–100) ----
-// Each thing is measured once, in one place — nothing counts twice:
-//   Business   — MRR (to a million a year), Grind (hours of real work a day), Scaling (new clients
-//                every month), Business content
-//   Personal   — Personal content, Goals (weekly, monthly, master and your own), Finances (like a
-//                credit score: debt drags it down, paying it off brings it up, debt-free and earning tops it)
-//   Health     — Body (BMI for your height), Training (workouts against your weekly number), Sleep
-//   Discipline — keeping your word: Standards kept (your whole day's standard, day after day),
-//                Follow-through (things with a deadline, done by it), Check-ins (showing up to check in
-//                and out of the week and the month)
+// ---- the four ratings (25 to 100) ----
+// Each thing is measured once, in one place. Nothing counts twice:
+// Every stat is one word, and every rating has three:
+//   Business   MRR (to a million a year), Grind (hours of real work a day), Scaling (new clients
+//              every month)
+//   Personal   Content (business and personal videos together), Goals (weekly, monthly, master and
+//              your own), Finances (like a credit score: debt drags it down, paying it off brings it up,
+//              debt-free and earning tops it)
+//   Health     what you've been doing lately counts most: Training and Diet (the last few weeks, the
+//              latest week heaviest), then Weight (BMI for your height). Your weight also sets a
+//              ceiling: carrying a lot of extra weight, even perfect training and eating top out around
+//              60 until the weight comes down.
+//   Discipline keeping your word: Integrity (your whole day's standard, day after day),
+//              Reliability (things with a deadline, done by it), Consistency (everything, every week:
+//              the work, training, tasks, food, checking in; and which way it's going)
 const rate99 = function(f){ return Math.round(25 + 75*Math.max(0, Math.min(1, f))); };
 // height in inches (Settings → You); weight from your weigh-ins (lb, or kg if you've set kg)
 function bodyStats(){
@@ -231,14 +271,81 @@ function bodyStats(){
 // any weight, any height: the score falls off smoothly the further BMI is from the healthy range
 // (the very top is the lean middle of the healthy range — "the best you've looked", not just "not overweight")
 function bmiFactor(b){ if(b==null) return null; if(b < 18.5) return Math.max(0, 0.85 - (18.5-b)/5); if(b < 20) return 0.9; if(b <= 24) return 1; if(b <= 25) return 0.92; if(b <= 30) return 0.85 - (b-25)*0.07; return Math.max(0, 0.5 - (b-30)*0.05); }
-// sleep from Sleep mode (the last two weeks): 7½–9 hours is the top
-function sleepStats(){
-  const since = Date.now() - 14*86400000;
-  const nights = arr(state.modes && state.modes.history).filter(function(m){ return m.sleep && m.endedAt && m.endedAt > since && Number(m.minutes) >= 60; });
-  if(!nights.length) return null;
-  const avg = nights.reduce(function(a, m){ return a + Number(m.minutes); }, 0)/nights.length/60;
-  const f = avg >= 7.5 ? (avg <= 9.5 ? 1 : 0.85) : Math.max(0, (avg - 4)/3.5);
-  return {avg:avg, n:nights.length, f:f};
+// diet: the last two weeks of food against your calorie target (this week counts double). A day on
+// target (80% to 110%) is full marks; a bit over or a half-logged day counts some; a day you didn't log
+// counts nothing. Today only counts once you've logged something.
+function dietStats(){
+  const ents = arr(state.health && state.health.calorieEntries);
+  if(!ents.length) return null;
+  const today = todayStr(), target = Number(state.profile.calorieTarget) || 2000, per = {};
+  ents.forEach(function(c){ if(c.date) per[c.date] = (per[c.date]||0) + Number(c.calories||0); });
+  let s = 0, w = 0, logged = 0, onT = 0;
+  for(let i=0;i<14;i++){
+    const d = addDays(today, -i), tot = per[d] || 0, wt = i < 7 ? 1 : 0.5;
+    if(i===0 && !tot) continue;
+    const r = tot/target;
+    let f = !tot ? 0 : r < 0.5 ? (i===0 ? 1 : 0.5) : r < 0.8 ? (i===0 ? 1 : 0.85) : r <= 1.1 ? 1 : r <= 1.25 ? 0.6 : 0.25;
+    if(tot){ logged++; if(r >= 0.8 && r <= 1.1) onT++; }
+    s += f*wt; w += wt;
+  }
+  return w ? {f:s/w, logged:logged, onTarget:onT, target:target} : null;
+}
+// training: workouts against your number a week, the last four weeks, the latest week counting most
+// (40%, 30%, 20%, 10%). A first good week back moves it straight away.
+function trainingStats(ctx){
+  const today = todayStr(), perWk = state.profile.weeklyWorkoutTarget || 4, wk = [0, 0, 0, 0];
+  ctx.gymDays.forEach(function(d){ for(let k=0;k<4;k++) if(d > addDays(today, -7*(k+1)) && d <= addDays(today, -7*k)) wk[k]++; });
+  const f = [.4, .3, .2, .1].reduce(function(a, x, k){ return a + x*Math.min(1, wk[k]/perWk); }, 0);
+  return {f:f, weeks:wk, perWk:perWk, n:wk.reduce(function(a, x){ return a + x; }, 0)};
+}
+// the most your Health can be at your weight: no limit in the healthy range, then it comes down,
+// about 78 at BMI 30, 60 at 35, 52 at 40, 45 past that
+function healthCap(b){
+  if(b==null) return 100;
+  if(b < 18.5) return Math.max(70, Math.round(100 - (18.5-b)*12));
+  if(b <= 25) return 100;
+  if(b <= 30) return Math.round(100 - (b-25)*4.4);
+  if(b <= 35) return Math.round(78 - (b-30)*3.6);
+  if(b <= 40) return Math.round(60 - (b-35)*1.6);
+  return Math.max(45, Math.round(52 - (b-40)*1.4));
+}
+// consistency: doing all of it, every week. For each of the last four weeks (the latest counts most):
+// work days you hit your deep work target, workouts against your number, days you finished something,
+// days you logged food (once you log food at all) and whether you checked in for the week (once you've
+// started checking in). Then which way it's going: the last two weeks against the two before.
+function consistencyStats(ctx){
+  const today = todayStr(), perWk = state.profile.weeklyWorkoutTarget || 4, target = ctx.target;
+  const foodDays = {}; arr(state.health && state.health.calorieEntries).forEach(function(c){ if(c.date) foodDays[c.date] = 1; });
+  const eatLogs = Object.keys(foodDays).length > 0;
+  const checks = typeof checkedIn==='function' && typeof intentStore==='function' && Object.keys(intentStore().weeks||{}).length > 0;
+  // from your first day of data (days before you used Operator don't count against you)
+  const first = [xpStart()].concat(arr(state.focus.sessions).map(function(x){ return x.date; }), ctx.gymDays, Object.keys(ctx.doneOn)).filter(Boolean).sort()[0];
+  const weeks = [];
+  for(let k=0;k<4;k++){
+    let workAim = 0, workHit = 0, taskDays = 0, trained = 0, food = 0, days = 0;
+    for(let i=0;i<7;i++){
+      const d = addDays(today, -(7*k + i));
+      if(d < first) continue;
+      const deepHit = ctx.deep(d) >= target, did = !!(ctx.doneOn[d] && (ctx.doneOn[d].tasks || ctx.doneOn[d].videos));
+      if(ctx.trained(d)) trained++;
+      if(foodDays[d]) food++;
+      if(d===today && !deepHit && !did) continue;
+      days++;
+      if(!isDayOff(d)){ workAim++; if(deepHit) workHit++; if(did) taskDays++; }
+    }
+    if(!days){ weeks.push(null); continue; }
+    const aim = Math.min(5, workAim) || 1, parts = [Math.min(1, workHit/aim), Math.min(1, taskDays/aim), Math.min(1, trained/(perWk*Math.min(7, days)/7 || 1))];
+    if(eatLogs) parts.push(Math.min(1, food/Math.min(7, days)));
+    if(checks) parts.push(checkedIn('week', weekKey(addDays(today, -7*k))) ? 1 : 0);
+    weeks.push(parts.reduce(function(a, x){ return a + x; }, 0)/parts.length);
+  }
+  let s = 0, w = 0; [.4, .3, .2, .1].forEach(function(x, k){ if(weeks[k]!=null){ s += x*weeks[k]; w += x; } });
+  if(!w) return null;
+  const avg = function(a){ const v = a.filter(function(x){ return x!=null; }); return v.length ? v.reduce(function(p, x){ return p + x; }, 0)/v.length : null; };
+  const now = avg(weeks.slice(0, 2)), before = avg(weeks.slice(2, 4));
+  const trend = now==null || before==null ? 0 : now - before > 0.08 ? 1 : before - now > 0.08 ? -1 : 0;
+  const parts = ['work', 'tasks', 'training'].concat(eatLogs ? ['food'] : [], checks ? ['check-ins'] : []);
+  return {f:s/w, weeks:weeks, trend:trend, parts:parts};
 }
 // the weekly and monthly goals you hit, lately (a period still running only counts what's done)
 function tierHitRate(kind, n){
@@ -246,16 +353,6 @@ function tierHitRate(kind, n){
   let d = 0, t = 0, k = periodKey(kind);
   for(let i=0;i<n;i++){ const gs = tierGoals(kind, k), hit = gs.filter(function(g){ return g.done; }).length; d += hit; t += i===0 ? hit : gs.length; k = prevPeriodKey(kind, k); }
   return t ? d/t : null;
-}
-// showing up to check in and out (the last four weeks, the last two months — from when you started)
-function checkinRate(){
-  if(typeof checkedIn!=='function') return null;
-  const ws0 = weekKey(xpStart()), ms0 = monthKey(xpStart());
-  let got = 0, could = 0, k = weekKey();
-  for(let i=0;i<4;i++){ if(k >= ws0){ could++; if(checkedIn('week', k)) got++; if(i>0){ could++; if(checkedOut('week', k)) got++; } } k = prevPeriodKey('week', k); }
-  k = monthKey();
-  for(let i=0;i<2;i++){ if(k >= ms0){ could++; if(checkedIn('month', k)) got++; if(i>0){ could++; if(checkedOut('month', k)) got++; } } k = prevPeriodKey('month', k); }
-  return could ? {f:got/could, got:got, could:could} : null;
 }
 function xpAttributes(ctx){
   const today = todayStr();
@@ -280,11 +377,13 @@ function xpAttributes(ctx){
     const tg = state.standards.contentTargets && state.standards.contentTargets[role];
     const done = Math.max(tasks.filter(function(t){ return t.isVideoIdea && t.status==='done' && within(t.completedAt, 30) && (typeof contentRoleOf==='function' ? contentRoleOf(t)===role : (role==='personal')===isPersonal(t)); }).length, (typeof igPostsByRole==='function' && igPostsByRole(role)) || 0);
     const want = tg && tg.n ? (tg.per==='day' ? tg.n*30 : tg.n*30/7) : 12;
-    return {f: done/want, note: done+' out in 30 days · aim '+Math.round(want)};
+    return {done:done, want:want};
   };
-  const bc = contentF('business'), pc = contentF('personal');
+  // one Content stat: business and personal videos together, against both targets together
+  const bc = contentF('business'), pc = contentF('personal'), cDone = bc.done + pc.done, cWant = bc.want + pc.want;
+  const content = {f:cDone/cWant, note:cDone+' videos out in 30 days ('+bc.done+' business, '+pc.done+' personal) · aim '+Math.round(cWant)};
   const B = [sub('MRR', Math.sqrt(mrr/83400), money(mrr)+' a month · 100 at $83.4k (a million a year)'), sub('Grind', deep30/360, fmtHours(Math.round(deep30))+' of real work a day (30 days) · 6h a day is 100'),
-    sub('Scaling', growthF, months[0]+' · '+months[1]+' · '+months[2]+' new (last 3 months) · aim '+perMonth+' a month'), sub('Business content', bc.f, bc.note)];
+    sub('Scaling', growthF, months[0]+' · '+months[1]+' · '+months[2]+' new (last 3 months) · aim '+perMonth+' a month')];
   // personal
   const own = arr(state.goals && state.goals.items).filter(function(g){ return !g.tier && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g)) && g.target > 0; });
   const ownF = typeof goalPct==='function' && own.length ? own.reduce(function(a, g){ return a + (g.done ? 100 : goalPct(g)); }, 0)/own.length/100 : null;
@@ -292,34 +391,40 @@ function xpAttributes(ctx){
   const masterF = masters.length ? masters.reduce(function(a, m){ return a + masterPct(m); }, 0)/masters.length/100 : null;
   const wkF = tierHitRate('week', 4), moF = tierHitRate('month', 3);
   const goalsF = (wkF==null && moF==null && masterF==null && ownF==null) ? null : mix([[.35, wkF], [.3, moF], [.2, masterF], [.15, ownF]]);
-  const pct = function(f){ return f==null ? '—' : Math.round(f*100)+'%'; };
+  const pct = function(f){ return f==null ? 'none yet' : Math.round(f*100)+'%'; };
   const fin = financeRating();
-  const P = [sub('Personal content', pc.f, pc.note),
+  const P = [sub('Content', content.f, content.note),
     sub('Goals', goalsF, goalsF==null ? 'Check in for the week to start' : 'weekly '+pct(wkF)+' · monthly '+pct(moF)+' · master '+pct(masterF)+(ownF!=null ? ' · yours '+pct(ownF) : '')),
     sub('Finances', fin.f, fin.note)];
-  // health
-  const body = bodyStats(), w28 = ctx.gymDays.filter(function(d){ return within(d, 28); }).length, perWk = state.profile.weeklyWorkoutTarget || 4;
-  const sl = sleepStats();
-  const H = [sub('Body (BMI)', bmiFactor(body.bmi), body.bmi ? body.bmi.toFixed(1)+' · '+body.cls : 'Add height & weight'),
-    sub('Training', w28/(perWk*4), w28+' workouts in 4 weeks · aim '+perWk+' a week'),
-    sub('Sleep', sl ? sl.f : null, sl ? fmtHours(Math.round(sl.avg*60))+' a night ('+sl.n+' nights) · 7½–9h is 100' : 'Use Sleep mode at night and it counts')];
+  // health: what you've done lately counts most, and your weight sets the ceiling
+  const body = bodyStats(), tr = trainingStats(ctx), dt = dietStats();
+  const H = [sub('Training', tr.f, tr.n+' workout'+(tr.n===1?'':'s')+' in 4 weeks, '+tr.weeks[0]+' in the last 7 days · aim '+tr.perWk+' a week'),
+    sub('Diet', dt ? dt.f : null, dt ? dt.onTarget+' of the last 14 days on target, '+dt.logged+' logged · aim '+dt.target.toLocaleString()+' cal' : 'Log what you eat (the + on Health) and it counts'),
+    sub('Weight', bmiFactor(body.bmi), body.bmi ? 'BMI '+body.bmi.toFixed(1)+' · '+body.cls : 'Add your height and weight')];
   // discipline: keeping your word
   let kept = 0, counted = 0;
   for(let i=0;i<14;i++){ const d = addDays(today, -i); if(isDayOff(d)) continue; const ok = dayStandardsComplete(d); if(i===0 && !ok) continue; counted++; if(ok) kept++; }
   const streak = computeStreak();
-  const due = tasks.filter(function(t){ return t.deadline && t.deadline < today && t.deadline >= addDays(today, -14); });
+  const due = tasks.filter(function(t){ return t.deadline && t.deadline < today && t.deadline >= addDays(today, -30); });
   const onTime = due.filter(function(t){ return t.status==='done' && t.completedAt && t.completedAt <= t.deadline; }).length;
-  const ci = checkinRate();
-  const D = [sub('Standards kept', counted ? kept/counted : null, kept+' of '+counted+' days (2 weeks) · streak '+streak),
-    sub('Follow-through', due.length >= 2 ? onTime/due.length : null, due.length >= 2 ? onTime+' of '+due.length+' deadlines met (2 weeks)' : 'Give tasks a deadline and it counts'),
-    sub('Check-ins', ci ? ci.f : null, ci ? ci.got+' of '+ci.could+' check-ins & check-outs (4 weeks, 2 months)' : 'Check in for the week')];
+  const cs2 = consistencyStats(ctx);
+  const D = [sub('Integrity', counted ? kept/counted : null, kept+' of '+counted+' days in 2 weeks you kept your whole standard · streak '+streak),
+    sub('Reliability', due.length >= 2 ? onTime/due.length : null, due.length >= 2 ? onTime+' of '+due.length+' deadlines met in 30 days' : 'Give tasks a deadline and it counts'),
+    sub('Consistency', cs2 ? cs2.f : null, cs2 ? (cs2.trend > 0 ? 'Trending up' : cs2.trend < 0 ? 'Trending down' : 'Holding steady')+' · '+cs2.parts.join(', ')+', week by week' : 'Builds as you go')];
+  if(cs2) D[2].trend = cs2.trend;
   const score = function(list, ws){ return rate99(mix(list.map(function(s, i){ return [ws[i], s.v==null ? null : (s.v-25)/75]; }))); };
   const out = {
-    BUS:{name:'Business', short:'BUS', v:score(B, [.4, .25, .2, .15]), subs:B, color:'#ffc56b'},
+    BUS:{name:'Business', short:'BUS', v:score(B, [.45, .3, .25]), subs:B, color:'#ffc56b'},
     PER:{name:'Personal', short:'PER', v:score(P, [.3, .4, .3]), subs:P, color:'#c3a6ff'},
-    HLT:{name:'Health', short:'HLT', v:score(H, [.45, .4, .15]), subs:H, color:'#7ef0c0', body:body},
-    DIS:{name:'Discipline', short:'DIS', v:score(D, [.45, .3, .25]), subs:D, color:'#8fd3ff', streak:streak}
+    HLT:{name:'Health', short:'HLT', v:0, subs:H, color:'#7ef0c0', body:body},
+    DIS:{name:'Discipline', short:'DIS', v:0, subs:D, color:'#8fd3ff', streak:streak}
   };
+  // Health can't go past what your weight allows
+  const hRaw = score(H, [.45, .37, .18]), cap = healthCap(body.bmi);
+  out.HLT.v = Math.min(hRaw, cap); out.HLT.cap = cap < 100 ? cap : null; out.HLT.capped = hRaw > cap;
+  // discipline comes up quickly once you're consistent (the curve leans generous)
+  const dMix = mix(D.map(function(x, i){ return [[.35, .25, .4][i], x.v==null ? null : (x.v-25)/75]; }));
+  out.DIS.v = rate99(Math.pow(dMix, 0.8));
   // 100 overall only when every rating is 100
   const ovr = .3*out.BUS.v + .3*out.HLT.v + .2*out.DIS.v + .2*out.PER.v;
   out.OVR = ovr >= 99.999 ? 100 : Math.min(99, Math.floor(ovr));
@@ -368,7 +473,7 @@ function initialsOf(n){ const p = String(n||'').trim().split(/\s+/).filter(Boole
 // the card, NBA 2K style: overall, rank, level, the four ratings, the bar to the next level
 function playerCardHtml(where){
   const x = xpSummary(), r = RANKS[x.rank], name = state.profile.name || 'You';
-  return '<button class="pc pc-'+(where||'hero')+' tier-'+x.rank+'" data-action="openYou" style="--rc:'+r.color+'" title="Your card — open the overview">'+
+  return '<button class="pc pc-'+(where||'hero')+' tier-'+x.rank+'" data-action="openYou" style="--rc:'+r.color+'" title="Your card: open the overview">'+
     '<span class="pc-shine"></span>'+
     '<span class="pc-top"><span class="pc-ovr"><b>'+x.ovr+'</b><small>OVR</small></span><span class="pc-rk">'+rankBadgeSvg(x.rank, 30)+'<small>RANK '+x.rank+'</small></span></span>'+
     '<span class="pc-face"><span>'+escapeHtml(initialsOf(name))+'</span></span>'+
@@ -398,28 +503,78 @@ ACTIONS.pcFlip = function(el){ ui.pcFlip = !ui.pcFlip; const c = el && el.closes
 // (kept for older callers)
 function xpChipHtml(){ return playerCardHtml('hero'); }
 
-// ---- "You": the overview (Personal → You, or click the card) — the card and your level with the last
-// 30 days of XP beside it, then the four ratings and your body. Ranks and the rules live in the guide (?).
+// ---- "You": the overview (Personal → You, or click the card). The card and your level with the last
+// 30 days of XP beside it, your read from Op, the four ratings with what makes each one, then the last
+// seven days against the seven before and your records. Ranks, the rules and your XP history live in
+// the guide (?). Your weight on the BMI scale lives on Health.
 function renderYouTab(){
-  const x = xpSummary(), r = RANKS[x.rank], body = x.attrs.HLT.body;
-  // every rating shows a number — 25 is the floor, so nothing reads as blank (faded until there's data)
-  const attrCard = function(k){ const a = x.attrs[k]; return '<div class="you-attr" style="--ac:'+a.color+'"><div class="you-attr-h"><b>'+a.v+'</b><span>'+a.name+'</span></div>'+
-    a.subs.map(function(s){ const v = s.v==null ? 25 : s.v; return '<div class="you-sub'+(s.v==null ? ' is-empty' : '')+'" title="'+escapeHtml(s.note)+'"><span>'+escapeHtml(s.label)+'</span><i><u style="width:'+((v-25)/75*100).toFixed(1)+'%"></u></i><b>'+v+'</b></div>'; }).join('')+'</div>'; };
+  const x = xpSummary(), r = RANKS[x.rank];
+  // every rating shows a number (25 is the floor, so nothing reads as blank; faded until there's data)
+  const attrCard = function(k){ const a = x.attrs[k]; return '<div class="you-attr" style="--ac:'+a.color+'"><div class="you-attr-h"><b>'+a.v+'</b><span>'+a.name+'</span>'+
+      (k==='HLT' && a.cap ? '<em class="you-cap'+(a.capped ? ' is-hit' : '')+'" title="At your weight, Health tops out at '+a.cap+'. It rises as the weight comes down.">ceiling '+a.cap+'</em>' : '')+'</div>'+
+    a.subs.map(function(s){ const v = s.v==null ? 25 : s.v; return '<div class="you-sub'+(s.v==null ? ' is-empty' : '')+'"><span>'+escapeHtml(s.label)+(s.trend ? ' <i class="you-tr '+(s.trend > 0 ? 'is-up' : 'is-down')+'">'+(s.trend > 0 ? '&#9650;' : '&#9660;')+'</i>' : '')+'</span><i><u style="width:'+((v-25)/75*100).toFixed(1)+'%"></u></i><b>'+v+'</b><small>'+escapeHtml(s.note)+'</small></div>'; }).join('')+'</div>'; };
   return '<div class="you">'+
     '<div class="you-top">'+playerCardHtml('big')+
       '<div class="you-main">'+
         '<div class="you-lvlrow"><div class="you-lvl">Level <b>'+x.level+'</b> <span style="color:'+r.color+'">'+escapeHtml(r.name)+'</span></div>'+
-          levelUpBtnHtml('you')+'<button class="you-q" data-action="openXpHow" title="How leveling works — the XP guide">?</button></div>'+
+          levelUpBtnHtml('you')+'<button class="you-q" data-action="openXpHow" title="How XP works, ranks and your XP history">?</button></div>'+
         '<div class="you-xpbar'+(x.levelPct>=1 ? ' is-full' : '')+'"><i><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i><span>'+
-          (x.maxed ? '<b>Level '+LEVEL_MAX+'</b> — the top. '+x.total.toLocaleString()+' XP' : x.levelPct>=1 ? '<b>'+(x.total - x.levelLo).toLocaleString()+' XP</b> · level '+(x.level+1)+(x.canLevel ? ' ready' : '')+(x.banked ? ' · +'+x.banked.toLocaleString()+' stacked' : '') : '<b>'+(x.levelHi - x.total).toLocaleString()+' XP</b> to level '+(x.level+1))+'</span>'+xpCautionHtml(x)+'</div>'+
+          (x.maxed ? '<b>Level '+LEVEL_MAX+'</b>, the top. '+x.total.toLocaleString()+' XP' : x.levelPct>=1 ? '<b>'+(x.total - x.levelLo).toLocaleString()+' XP</b> · level '+(x.level+1)+(x.canLevel ? ' ready' : '')+(x.banked ? ' · +'+x.banked.toLocaleString()+' stacked' : '') : '<b>'+(x.levelHi - x.total).toLocaleString()+' XP</b> to level '+(x.level+1))+'</span>'+xpCautionHtml(x)+'</div>'+
         xpChartHtml(x)+
       '</div></div>'+
     (typeof opRead==='function' ? opRead('card', opFactsCard, 'Give him your read on his card: where he stands, what’s holding him back, and what would move him up fastest.', {angles:'card'}) : '')+
-    '<div class="you-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(attrCard).join('')+
-      '<div class="you-body"><div class="you-sec">Your body</div>'+(body.bmi ?
-        '<div class="you-bmi"><b>'+body.bmi.toFixed(1)+'</b><span>BMI &middot; '+body.cls+'</span></div>'+
-        '<div class="you-bmi-scale">'+bmiScaleHtml(body)+'</div>'        : '<div class="you-note">Add your height and weight in Settings → You and your card rates your body too — ranks need it.</div><button class="btn btn-sm" data-action="goToProfileSettings">Add height &amp; weight</button>')+'</div>'+
-    '</div></div>';
+    '<div class="you-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(attrCard).join('')+'</div>'+
+    youRecentHtml()+
+  '</div>';
+}
+// the last seven days against the seven before, and your records (bests since you started)
+function youRecent(){
+  const ctx = xpCtx(), today = todayStr(), start = xpStart();
+  const span = function(a, b){ // days a..b ago (a < b), inclusive of a, exclusive of b
+    const o = {xp:0, deep:0, workouts:0, tasks:0, reach:0, gold:0};
+    for(let i=a;i<b;i++){
+      const d = addDays(today, -i), dm = ctx.deep(d), dn = ctx.doneOn[d] || {tasks:0, videos:0};
+      o.deep += dm; if(dm >= DEEP_GOLD) o.gold++;
+      if(ctx.trained(d)) o.workouts++;
+      o.tasks += dn.tasks + dn.videos; o.reach += ctx.touches[d] || 0;
+      if(d >= start){ const it = (d!==today && xpCache.days[d]) || xpDay(d, ctx); o.xp += it.reduce(function(p, x){ return p + x.xp; }, 0); }
+    }
+    return o;
+  };
+  const now = span(0, 7), before = span(7, 14);
+  // records: everything since your first day of data
+  const first = [start].concat(arr(state.focus.sessions).map(function(s){ return s.date; }), ctx.gymDays).filter(Boolean).sort()[0] || today;
+  const rec = {xp:null, deep:null, tasks:null, weekWorkouts:0, reachDay:null};
+  for(let d = first, n = 0; d <= today && n < 1200; d = addDays(d, 1), n++){
+    const dm = ctx.deep(d), dn = ctx.doneOn[d] || {tasks:0, videos:0}, t = dn.tasks + dn.videos;
+    if(dm && (!rec.deep || dm > rec.deep.v)) rec.deep = {v:dm, d:d};
+    if(t && (!rec.tasks || t > rec.tasks.v)) rec.tasks = {v:t, d:d};
+    if(d >= start){ const it = (d!==today && xpCache.days[d]) || xpDay(d, ctx), sum = it.reduce(function(p, x){ return p + x.xp; }, 0); if(sum && (!rec.xp || sum > rec.xp.v)) rec.xp = {v:sum, d:d}; }
+  }
+  const wk = {}; ctx.gymDays.forEach(function(d){ const k = startOfWeekStr(d); wk[k] = (wk[k]||0) + 1; });
+  Object.keys(wk).forEach(function(k){ if(wk[k] > rec.weekWorkouts) rec.weekWorkouts = wk[k]; });
+  return {now:now, before:before, rec:rec, streak:computeStreak()};
+}
+function youRecentHtml(){
+  const y = youRecent(), n = y.now, b = y.before;
+  const tile = function(v, label, prev, fmt){
+    const f = fmt || function(z){ return Math.round(z).toLocaleString(); }, dlt = v - prev;
+    return '<div class="yr-t"><b>'+f(v)+'</b><span>'+label+'</span><small class="'+(dlt > 0 ? 'is-up' : dlt < 0 ? 'is-down' : '')+'">'+(dlt > 0 ? '&#9650; ' : dlt < 0 ? '&#9660; ' : '')+(dlt ? f(Math.abs(dlt)) : 'same')+' vs the week before</small></div>';
+  };
+  const hrs = function(z){ return (z/60).toFixed(1)+'h'; };
+  const rc = function(v, label, when){ return '<div class="yr-r"><b>'+v+'</b><span>'+label+'</span>'+(when ? '<small>'+escapeHtml(when)+'</small>' : '')+'</div>'; };
+  const r = y.rec;
+  return '<div class="you-recent">'+
+    '<div class="yr-sec"><div class="you-sec">The last 7 days</div><div class="yr-tiles">'+
+      tile(n.xp, 'XP earned', b.xp)+tile(n.deep, 'deep work', b.deep, hrs)+tile(n.workouts, 'workouts', b.workouts)+tile(n.tasks, 'tasks done', b.tasks)+tile(n.reach, 'reach-outs', b.reach)+
+      (n.gold || b.gold ? tile(n.gold, '8-hour days', b.gold) : '')+'</div></div>'+
+    '<div class="yr-sec"><div class="you-sec">Your records</div><div class="yr-recs">'+
+      rc(r.xp ? '+'+r.xp.v.toLocaleString() : '0', 'best day of XP', r.xp ? fmtDateShort(r.xp.d) : '')+
+      rc(r.deep ? hrs(r.deep.v) : '0h', 'longest day of deep work', r.deep ? fmtDateShort(r.deep.d) : '')+
+      rc(r.tasks ? r.tasks.v : 0, 'most tasks in a day', r.tasks ? fmtDateShort(r.tasks.d) : '')+
+      rc(r.weekWorkouts, 'most workouts in a week', '')+
+      rc(y.streak, 'day streak right now', '')+
+    '</div></div></div>';
 }
 ACTIONS.youHelp = function(){ ui.youHelp = !ui.youHelp; renderView(); };
 // the last 30 days of XP, a bar a day — the climb, at a glance (today and this week in its header)
@@ -440,7 +595,7 @@ function xpChartHtml(x){
       '<span class="you-cstats">'+stat('+'+x.todayXp.toLocaleString(), 'today', 'is-today')+stat('+'+x.week.toLocaleString(), 'this week')+stat(sum.toLocaleString(), '30 days')+(best && best.xp ? stat('+'+best.xp.toLocaleString(), 'best day') : '')+'</span></div>'+
     '<div class="you-bars">'+days.map(function(x){
       const h = x.xp==null ? 0 : Math.max(x.xp ? 4 : 2, x.xp/top*100);
-      return '<i class="'+(x.xp==null ? 'is-pre' : '')+(x.d===today ? ' is-today' : '')+(x.d >= ws ? ' is-week' : '')+'" title="'+escapeHtml(fmtDateShort(x.d))+(x.xp==null ? ' — before you started' : ': +'+x.xp+' XP')+'"><u style="height:'+h.toFixed(1)+'%"></u></i>';
+      return '<i class="'+(x.xp==null ? 'is-pre' : '')+(x.d===today ? ' is-today' : '')+(x.d >= ws ? ' is-week' : '')+'" title="'+escapeHtml(fmtDateShort(x.d))+(x.xp==null ? ' · before you started' : ': +'+x.xp+' XP')+'"><u style="height:'+h.toFixed(1)+'%"></u></i>';
     }).join('')+'</div></div>';
 }
 // the scale for your height, in pounds (or kg): healthy · overweight · obese, and where you are
@@ -532,49 +687,113 @@ afterRenderHooks.push(function(){ try{ xpWatch(); }catch(e){} });
 
 // ---- how leveling works: its own page (the You tab stays clean) ----
 // a small bar chart for the guide: one bar per value, the value on top, a label under
-function xpgBars(vals, labels, color, note){
-  const top = Math.max.apply(null, vals.concat([1]));
-  return '<div class="xpg-chart" style="--bc:'+color+'"><div class="xpg-bars">'+vals.map(function(v, i){ return '<div class="xpg-b"><em>'+(typeof v==='number' ? v.toLocaleString() : v)+'</em><i><u style="height:'+(v/top*100).toFixed(1)+'%"></u></i><small>'+labels[i]+'</small></div>'; }).join('')+'</div>'+(note ? '<div class="xpg-note">'+note+'</div>' : '')+'</div>';
+function xpgBars(vals, labels, color, note, sqrt){
+  const f = sqrt ? Math.sqrt : function(v){ return v; }, top = f(Math.max.apply(null, vals.concat([1])));
+  return '<div class="xpg-chart" style="--bc:'+color+'"><div class="xpg-bars">'+vals.map(function(v, i){ return '<div class="xpg-b"><em>'+(typeof v==='number' ? v.toLocaleString() : v)+'</em><i><u style="height:'+(f(v)/top*100).toFixed(1)+'%"></u></i><small>'+labels[i]+'</small></div>'; }).join('')+'</div>'+(note ? '<div class="xpg-note">'+note+'</div>' : '')+'</div>';
 }
-ACTIONS.openXpHow = function(){
+function xpHowOverlay(){
   let o = document.getElementById('xpHowOverlay');
   if(!o){ o = document.createElement('div'); o.id = 'xpHowOverlay'; o.className = 'overlay xph-ov xpg-page'; o.innerHTML = '<div class="xpg" id="xpHowContent"></div>'; document.body.appendChild(o); }
+  return o;
+}
+ACTIONS.openXpHow = function(){
+  const o = xpHowOverlay();
   const x = xpSummary(), st = state.standards, std = Math.round(xpStandardFor(todayStr(), xpCtx().deep));
   const rate = function(name, color, items){ return '<div class="xph-rate"><b style="color:'+color+'">'+name+'</b>'+items.map(function(it){ return '<div><span>'+it[0]+'</span>'+it[1]+'</div>'; }).join('')+'</div>'; };
   // the numbers behind the charts (the same rules the game uses)
-  const taskXp = [1,2,3,4,5,6,7,8,9,10].map(function(i){ return i<=3 ? 12 : i<=6 ? 8 : 4; });
-  const normal = Math.max(60, std || (st.deepWorkTargetMinutes||180));
-  const hourXp = [1,2,3,4,5,6,7,8].map(function(h){ const m = h*60, base = Math.min(m, normal), above = Math.max(0, m - normal); return Math.round(base/60*XP_RATES.hourBase + above/60*XP_RATES.hourAbove + (m>=360 ? XP_RATES.longDay : 0)); });
-  const LV = [1,2,5,10,20,30,40,50,60,75,90,100], levelCost = LV.map(function(L){ return xpForLevel(L) - xpForLevel(L-1); });
+  const taskXp = [1,2,3,4,5,6,7,8,9,10,11,12].map(taskXpAt);
+  const hourXp = [1,2,3,4,5,6,7,8,9,10].map(function(h){ const m = h*60; return Math.round(xpDeep(m, 0).xp + (m >= DEEP_GOLD ? XP_RATES.goldDay : m >= 360 ? XP_RATES.longDay : 0)); });
+  const LV = [1,2,3,5,10,20,30,50,70,85,100], levelAt = LV.map(xpForLevel);
+  const k = function(n){ return n >= 1e6 ? (n/1e6).toFixed(2).replace(/\.?0+$/, '')+'M' : n >= 1e4 ? Math.round(n/1000)+'k' : n.toLocaleString(); };
   document.getElementById('xpHowContent').innerHTML =
-    '<div class="xpg-top"><button class="xpg-back" data-action="closeXpHow">&larr; Back</button><div class="xph-k">[ SYSTEM ]</div></div>'+
-    '<h1>The XP guide</h1>'+
-    '<div class="xph-lead">Do the work, get XP. XP never stops stacking. When you have enough for the next level a <b>Level up</b> button appears — press it. Levels run to '+LEVEL_MAX+' and nothing gates them. <b>Rank</b> is the real climb: it needs the level, the MRR and your Health.</div>'+
-    '<div class="xpg-you"><div><small>You</small><b>Level '+x.level+'</b></div><div><small>XP</small><b>'+x.total.toLocaleString()+'</b></div><div><small>Next level at</small><b>'+x.levelHi.toLocaleString()+'</b></div>'+(x.canLevel ? '<div>'+levelUpBtnHtml('guide')+'</div>' : x.blocked.length ? '<div>'+xpCautionHtml(x)+'</div>' : '')+'</div>'+
-    '<div class="xpg-sec">Ranks — each one needs the level, the MRR and your Health</div>'+
+    '<div class="xpg-top"><button class="xpg-back" data-action="closeXpHow">&larr; Back</button><div class="xph-k">[ SYSTEM ]</div><button class="xpg-hist-btn" data-action="openXpHistory">&#128220; Your XP history</button></div>'+
+    '<h1>How XP works</h1>'+
+    '<div class="xph-lead">Everything you do to lock in pays XP, and XP never goes away. When you have enough for the next level, a <b>Level up</b> button shows up and you press it to claim it. Levels go to '+LEVEL_MAX+' and they get expensive fast. <b>Rank</b> is the real climb: on top of the level it needs the MRR and the Health score, so the business and your body both have to come with you.</div>'+
+    '<div class="xpg-you"><div><small>You</small><b>Level '+x.level+'</b></div><div><small>Total XP</small><b>'+x.total.toLocaleString()+'</b></div><div><small>Level '+(x.level+1)+' at</small><b>'+x.levelHi.toLocaleString()+'</b></div>'+(x.canLevel ? '<div>'+levelUpBtnHtml('guide')+'</div>' : '')+'</div>'+
+    '<div class="xpg-sec">Ranks. Each one needs the level, the MRR and the Health score.</div>'+
     '<div class="xph-track">'+RANKS.map(function(rk, i){ const stt = i<x.rank ? 'is-done' : i===x.rank ? 'is-cur' : ''; return '<span class="xph-tr '+stt+'" style="--rc:'+rk.color+'">'+rankBadgeSvg(i, 30)+'<b>'+escapeHtml(rk.name)+'</b><small>LVL '+rk.level+(rk.mrr ? '<br>'+money(rk.mrr)+' · HLT '+rk.health : '')+'</small></span>'; }).join('')+'</div>'+
-    '<div class="xpg-sec">How XP comes in</div>'+
+    '<div class="xpg-sec">Where XP comes from</div>'+
     '<div class="xpg-grid">'+
-      '<div class="xpg-card"><h3>Finishing tasks</h3><p>The first three of the day pay the most, then it tapers — finish what matters first.</p>'+xpgBars(taskXp, taskXp.map(function(_, i){ return '#'+(i+1); }), '#ffc56b', 'Ten tasks in a day: '+taskXp.reduce(function(a, b){ return a+b; }, 0)+' XP. Each content video finished: +'+XP_RATES.video+'.')+'</div>'+
-      '<div class="xpg-card"><h3>Deep work</h3><p>'+XP_RATES.hourBase+' XP an hour up to your normal ('+fmtHours(normal)+' lately), '+XP_RATES.hourAbove+' an hour past it — and +'+XP_RATES.longDay+' for a 6-hour day.</p>'+xpgBars(hourXp, [1,2,3,4,5,6,7,8].map(function(h){ return h+'h'; }), '#8fd3ff', 'XP for a whole day of that much locked-in work.')+'</div>'+
-      '<div class="xpg-card"><h3>Workouts</h3><p>Your first five ever count big. After that, the first of each week pays most.</p>'+xpgBars([150, 70, 60, 50, 25], ['first 5', '1st/wk', '2nd', '3rd', '4th+'], '#7ef0c0')+'</div>'+
-      '<div class="xpg-card"><h3>Strong days in a row</h3><p>Every day you hit your target in the last week multiplies the day’s XP.</p>'+xpgBars([0,1,2,3,4,5,6,7].map(function(n){ return n < 2 ? 1 : +(1 + .04*n).toFixed(2); }), [0,1,2,3,4,5,6,7].map(String), '#c3a6ff', '×1.28 at seven strong days.')+'</div>'+
-      '<div class="xpg-card is-wide"><h3>Goals — the week, the month, the big ones</h3><p>Check in at the start of the week and the month (Calendar), tick goals off as you go, check out at the end. Weekly goals are a small push, monthly ones a real chunk, and a master goal reached is a level on its own.</p>'+
-        xpgBars([CHECKIN_XP.weekGoal, CHECKIN_XP.monthGoal, CHECKIN_XP.habit, XP_RATES.goal, MASTER_XP.milestone], ['weekly goal', 'monthly goal', 'habit beaten', 'your goal', 'master goal'], '#7ef0c0',
-          'Up to three weekly and three monthly goals pay each time. Checking in / out: +'+CHECKIN_XP.weekIn+' / +'+CHECKIN_XP.weekOut+' a week, +'+CHECKIN_XP.monthIn+' / +'+CHECKIN_XP.monthOut+' a month. Each finished week you hit a weekly ring (workouts, deep work): +'+MASTER_XP.weekly+'. Master goals (MRR, weight, streak) pay again when you raise the bar.')+'</div>'+
+      '<div class="xpg-card"><h3>Deep work</h3><p>Eight hours a day is the gold standard: treat it like a 9 to 5. Every hour pays more than the one before it, so the back half of a long day is where the XP is. Past your own normal ('+fmtHours(std || st.deepWorkTargetMinutes || 180)+' a day lately) each hour pays 8 extra. Six hours pays a +'+XP_RATES.longDay+' bonus, the full eight +'+XP_RATES.goldDay+'.</p>'+xpgBars(hourXp, [1,2,3,4,5,6,7,8,9,10].map(function(h){ return h+'h'; }), '#8fd3ff', 'XP for a whole day of that much locked-in work (before the bonus for going past your normal).')+'</div>'+
+      '<div class="xpg-card"><h3>Finishing tasks</h3><p>The more you get done in a day, the more each one pays: the first is worth 5, the tenth 23, and they top out at 25 each. Up to '+XP_RATES.taskMax+' a day count.</p>'+xpgBars(taskXp, taskXp.map(function(_, i){ return '#'+(i+1); }), '#ffc56b', 'Ten tasks in a day: '+xpTasks(10)+' XP. Twenty: '+xpTasks(20)+'. Each content video finished: +'+XP_RATES.video+'.')+'</div>'+
+      '<div class="xpg-card"><h3>Workouts</h3><p>Your first five ever pay big to get you going. After that the first one each week pays the most, and every one still counts.</p>'+xpgBars([150, 70, 60, 50, 25], ['first 5', '1st a week', '2nd', '3rd', '4th+'], '#7ef0c0')+'</div>'+
+      '<div class="xpg-card"><h3>Strong days in a row</h3><p>Every day in the last week you hit your deep work target ('+fmtHours(st.deepWorkTargetMinutes||180)+') makes the whole day pay more. Two strong days starts it.</p>'+xpgBars([0,1,2,3,4,5,6,7].map(function(n){ return n < 2 ? 1 : +(1 + .04*n).toFixed(2); }), [0,1,2,3,4,5,6,7].map(String), '#c3a6ff', 'Seven strong days: every XP that day is worth 1.28 times as much.')+'</div>'+
+      '<div class="xpg-card is-wide"><h3>Goals: the week, the month, the big ones</h3><p>Check in at the start of the week and the month (the Calendar asks), tick the goals off as you go, then check out at the end. A weekly goal is a small push, a monthly goal is a real chunk, beating the habit you picked for the month is worth as much as a monthly goal, and a master goal is a level on its own.</p>'+
+        xpgBars([CHECKIN_XP.weekGoal, CHECKIN_XP.monthGoal, CHECKIN_XP.habit, XP_RATES.goal, MASTER_XP.milestone], ['weekly goal', 'monthly goal', 'habit beaten', 'your own goal', 'master goal'], '#7ef0c0',
+          'Up to three weekly and three monthly goals pay each time. Checking in and out pays +'+CHECKIN_XP.weekIn+' and +'+CHECKIN_XP.weekOut+' a week, +'+CHECKIN_XP.monthIn+' and +'+CHECKIN_XP.monthOut+' a month. Every finished week you hit a weekly ring (workouts or deep work) pays +'+MASTER_XP.weekly+'. Master goals (MRR, weight, streak) pay again when you raise the bar.')+'</div>'+
       '<div class="xpg-card is-wide"><h3>The business</h3><div class="xpg-jumps">'+
-        [['Client won', '+'+XP_RATES.client], ['Each $1k of MRR', '+'+XP_RATES.mrrPerK], ['Follower gained', '+'+XP_RATES.follower], ['Outreach, per day', 'from +'+XP_RATES.outreach]].map(function(j){ return '<div><b>'+j[1]+'</b><span>'+j[0]+'</span></div>'; }).join('')+
-      '</div><p class="xpg-note">MRR XP is taken back if MRR drops.</p></div>'+
-      '<div class="xpg-card is-wide"><h3>What each level costs</h3><p>400 XP for the first, and 60 more for every level after — quick at the start, real time later. Level '+LEVEL_MAX+' (the top) is '+xpForLevel(LEVEL_MAX).toLocaleString()+' XP in all.</p>'+xpgBars(levelCost, LV.map(function(L){ return 'L'+L; }), '#ff9a3c')+'</div>'+
+        [['A client won', '+'+XP_RATES.client.toLocaleString()], ['Each $1k of MRR', '+'+XP_RATES.mrrPerK], ['Each follower gained', '+'+XP_RATES.follower], ['Reaching out, a day', '+'+XP_RATES.outreach+' to +'+(XP_RATES.outreach + XP_RATES.outreachEach*(XP_RATES.outreachMax-1))]].map(function(j){ return '<div><b>'+j[1]+'</b><span>'+j[0]+'</span></div>'; }).join('')+
+      '</div><p class="xpg-note">MRR XP counts from where you started and comes back off if MRR drops. Reaching out is every touch you log on a client or a lead: the &#128075; button, Text, Email or Call from their card, or a meeting on the calendar linked to them. The first one in a day pays '+XP_RATES.outreach+' and each one after pays '+XP_RATES.outreachEach+' more, up to '+XP_RATES.outreachMax+' a day.</p></div>'+
+      '<div class="xpg-card is-wide"><h3>What it takes to level</h3><p>Level 1 is about one client won. Level 2 is about two more on top of that. From there each level costs more than the last: a strong week is roughly 3,000 to 4,000 XP, so the early levels come in weeks, the middle ones in months, and level '+LEVEL_MAX+' is years of living like this.</p>'+xpgBars(levelAt, LV.map(function(L){ return 'L'+L; }), '#ff9a3c', 'Total XP needed to reach each level. Level '+LEVEL_MAX+' is '+xpForLevel(LEVEL_MAX).toLocaleString()+' XP in all.', true).replace(/<em>([\d,]+)<\/em>/g, function(m, n){ return '<em>'+k(Number(n.replace(/,/g, '')))+'</em>'; })+'</div>'+
     '</div>'+
-    '<div class="xpg-sec">Your ratings — 25 to 100 (100 is you at your best). Each thing counts in one place only.</div><div class="xph-rates">'+
-      rate('Business', '#ffc56b', [['MRR', 'what clients pay you a month — 100 at a million a year'], ['Grind', 'real, locked-in work a day over the last 30 days — 6 hours a day, every day, is 100'],
-        ['Scaling', 'new clients each month against your number ('+(st.newClientsPerMonth||2)+' a month — Settings → Goals & Standards). Each of the last three months counts on its own, so it’s 100 only when you land them every month.'],
-        ['Business content', 'business videos out against your target']])+
-      rate('Personal', '#c3a6ff', [['Personal content', 'your own videos out against your target'], ['Goals', 'weekly and monthly goals you hit, how close your master goals are, and your own goals'], ['Finances', 'like a credit score: debt keeps it low, paying it down every month brings it up, debt-free and earning tops it out']])+
-      rate('Health', '#7ef0c0', [['Body', 'BMI for your height'], ['Training', 'workouts in the last four weeks against your number a week'], ['Sleep', 'hours a night from Sleep mode (7½–9 is 100)']])+
-      rate('Discipline', '#8fd3ff', [['Standards kept', 'days in the last two weeks you kept your whole standard — the work, the training, your own standards (that’s also your streak)'], ['Follow-through', 'things with a deadline, done by the deadline'], ['Check-ins', 'showing up to check in and out of the week and the month']])+
+    '<div class="xpg-sec">Your ratings, 25 to 100 (100 is you at your best). Each thing counts in one place only.</div><div class="xph-rates">'+
+      rate('Business', '#ffc56b', [['MRR', 'what clients pay you a month. 100 is a million a year.'], ['Grind', 'real, locked-in work a day over the last 30 days. Six hours a day, every day, is 100.'],
+        ['Scaling', 'new clients each month against your number ('+(st.newClientsPerMonth||2)+' a month, set in Settings, Goals & Standards). Each of the last three months counts on its own, so it only hits 100 when you land them every month.']])+
+      rate('Personal', '#c3a6ff', [['Content', 'every video you put out, business and personal together, against your targets for both.'], ['Goals', 'the weekly and monthly goals you hit, how close your master goals are, and your own goals.'], ['Finances', 'like a credit score. Debt keeps it low, paying it down every month brings it up, and debt-free while earning tops it out.']])+
+      rate('Health', '#7ef0c0', [['Training', 'workouts against your number a week over the last four weeks, the latest week counting most. A first good week back moves it right away.'], ['Diet', 'days you ate within your calorie target over the last two weeks. Logging counts too: a day you never logged counts for nothing.'],
+        ['Weight', 'your BMI for your height. It also sets a ceiling on the whole score: carrying a lot of extra weight, Health tops out around 60 even with perfect training and diet, and the ceiling lifts as the weight comes down.']])+
+      rate('Discipline', '#8fd3ff', [['Integrity', 'days in the last two weeks you kept your whole standard: the work, the training and your own standards. It is also your streak.'], ['Reliability', 'things with a deadline, done by the deadline (last 30 days).'],
+        ['Consistency', 'all of it, every week: work days on target, workouts, days you finished something, food logged and checking in. The latest week counts most, and it shows whether you are trending up or down. Discipline climbs fast once you are consistent.']])+
     '</div><div class="xph-foot">The overall only hits 100 when all four do.</div>';
   o.classList.remove('hidden'); o.scrollTop = 0;
 };
+// ---- your XP history: every day you've played and everything that paid, newest first ----
+// one-off XP (clients, goals, check-ins, master goals) with the day it landed; the running things
+// (MRR, followers, weekly rings) as one line each
+function xpLedger(){
+  const x = xpSummary(), p = state.profile, start = xpStart(), out = [], ongoing = [];
+  const ws0 = weekKey(start), ms0 = monthKey(start);
+  arr(state.business.clients).filter(function(c){ return arr(p.xpClientsBase).indexOf(c.id) < 0; }).forEach(function(c){ out.push({d:c.startDate || c.createdAt || start, why:'Client won: '+(c.business || c.name || 'a client'), xp:XP_RATES.client, k:'client'}); });
+  if(typeof intentStore==='function'){
+    const s = intentStore();
+    Object.keys(s.weeks).forEach(function(k){ if(k < ws0) return; const r = s.weeks[k] || {}; if(r.at) out.push({d:k, why:'Checked in for the week', xp:CHECKIN_XP.weekIn, k:'checkin'}); if(r.out) out.push({d:periodEnd('week', k), why:'Checked out of the week', xp:CHECKIN_XP.weekOut, k:'checkin'}); });
+    Object.keys(s.months).forEach(function(k){ if(k < ms0) return; const r = s.months[k] || {}; if(r.at) out.push({d:k+'-01', why:'Checked in for '+monthName(k), xp:CHECKIN_XP.monthIn, k:'checkin'}); if(r.out){ out.push({d:periodEnd('month', k), why:'Checked out of '+monthName(k), xp:CHECKIN_XP.monthOut, k:'checkin'}); if(r.out.habit) out.push({d:periodEnd('month', k), why:'Beat the habit: '+(r.habit || 'the month’s habit'), xp:CHECKIN_XP.habit, k:'goal'}); } });
+    const per = {};
+    arr(state.goals && state.goals.items).forEach(function(g){
+      if(!g.tier || !g.done || (g.tier==='week' ? g.pk < ws0 : g.pk < ms0)) return;
+      const kk = g.tier+g.pk; per[kk] = (per[kk]||0) + 1; if(per[kk] > CHECKIN_XP.maxGoals) return;
+      out.push({d:g.doneAt || g.pk, why:(g.tier==='week' ? 'Weekly goal: ' : 'Monthly goal: ')+g.label, xp:g.tier==='week' ? CHECKIN_XP.weekGoal : CHECKIN_XP.monthGoal, k:'goal'});
+    });
+  }
+  const seen = p.xpGoalSeen || {};
+  arr(state.goals && state.goals.items).forEach(function(g){ if(g.done && !g.tier && seen[g.id] && Date.now() - seen[g.id] >= 86400000 && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g))) out.push({d:g.doneAt || todayStr(new Date(seen[g.id])), why:'Your goal: '+(g.label || g.name || 'a goal'), xp:XP_RATES.goal, k:'goal'}); });
+  const hit = p.xpMasterHit || {};
+  ['mrr', 'weight', 'streak'].forEach(function(key){ arr(hit[key]).forEach(function(t){ ongoing.push({why:'Master goal reached: '+(key==='mrr' ? money(t)+' MRR' : key==='weight' ? t+' '+(p.weightUnit==='kg' ? 'kg' : 'lb') : t+'-day streak'), xp:MASTER_XP.milestone}); }); });
+  if(x.master && x.master.weeks) ongoing.push({why:x.master.weeks+' week'+(x.master.weeks===1?'':'s')+' you hit a weekly ring', xp:x.master.weeks*MASTER_XP.weekly});
+  if(x.mrrXp) ongoing.push({why:'MRR: '+money(x.mrrBase)+' when you started, '+money(x.mrr)+' now', xp:x.mrrXp});
+  if(x.followerXp) ongoing.push({why:x.followers.toLocaleString()+' followers gained', xp:x.followerXp});
+  out.forEach(function(e){ if(e.d < start) e.d = start; });
+  return {events:out, ongoing:ongoing};
+}
+ACTIONS.openXpHistory = function(){
+  const o = xpHowOverlay(), x = xpSummary(), ctx = xpCtx(), today = todayStr(), start = xpStart(), L = xpLedger();
+  const n = ui.xhN || 30, byDay = {};
+  L.events.forEach(function(e){ (byDay[e.d] = byDay[e.d] || []).push(e); });
+  // the totals by where it came from
+  const src = {}, addS = function(k, v){ if(v) src[k] = (src[k]||0) + v; };
+  const names = {time:'Deep work', gold:'Deep work', long:'Deep work', tasks:'Tasks', videos:'Content', workout:'Workouts', shoot:'Shooting', outreach:'Reaching out', streak:'Strong-day bonus', client:'Clients won', goal:'Goals', checkin:'Check-ins'};
+  const days = [];
+  for(let d = today; d >= start; d = addDays(d, -1)){
+    const it = (d!==today && xpCache.days[d]) || xpDay(d, ctx);
+    it.forEach(function(i){ addS(names[i.k] || 'Other', i.xp); });
+    const ev = byDay[d] || []; ev.forEach(function(e){ addS(names[e.k] || 'Other', e.xp); });
+    const sum = it.concat(ev).reduce(function(a, i){ return a + i.xp; }, 0);
+    if(sum) days.push({d:d, items:it.concat(ev), sum:sum});
+  }
+  L.ongoing.forEach(function(e){ addS(/MRR/.test(e.why) ? 'MRR' : /follower/.test(e.why) ? 'Followers' : 'Master goals', e.xp); });
+  const srcKeys = Object.keys(src).sort(function(a, b){ return src[b] - src[a]; }), top = Math.max(1, ...srcKeys.map(function(k){ return src[k]; }));
+  const line = function(i){ return '<div class="xh-i"><span>'+escapeHtml(i.why)+'</span><b class="'+(i.xp < 0 ? 'is-neg' : '')+'">'+(i.xp < 0 ? '' : '+')+i.xp.toLocaleString()+'</b></div>'; };
+  document.getElementById('xpHowContent').innerHTML =
+    '<div class="xpg-top"><button class="xpg-back" data-action="openXpHow">&larr; How XP works</button><div class="xph-k">[ SYSTEM ]</div></div>'+
+    '<h1>Your XP history</h1>'+
+    '<div class="xpg-you"><div><small>Total XP</small><b>'+x.total.toLocaleString()+'</b></div><div><small>Since</small><b>'+fmtDateShort(start)+'</b></div><div><small>Days with XP</small><b>'+days.length+'</b></div><div><small>This week</small><b>+'+x.week.toLocaleString()+'</b></div></div>'+
+    '<div class="xpg-sec">Where it came from</div>'+
+    '<div class="xh-src">'+srcKeys.map(function(k){ return '<div class="xh-s"><span>'+k+'</span><i><u style="width:'+(src[k]/top*100).toFixed(1)+'%"></u></i><b>'+src[k].toLocaleString()+'</b></div>'; }).join('')+'</div>'+
+    (L.ongoing.length ? '<div class="xpg-sec">Running totals</div><div class="xh-day"><div class="xh-items">'+L.ongoing.map(line).join('')+'</div></div>' : '')+
+    '<div class="xpg-sec">Day by day</div>'+
+    (days.length ? days.slice(0, n).map(function(dd){ return '<div class="xh-day"><div class="xh-dh"><span>'+(dd.d===today ? 'Today' : weekdayShort(dd.d)+' '+fmtDateShort(dd.d))+'</span><b>+'+dd.sum.toLocaleString()+' XP</b></div><div class="xh-items">'+dd.items.map(line).join('')+'</div></div>'; }).join('') : '<div class="empty">Nothing yet. Lock in and it starts here.</div>')+
+    (days.length > n ? '<button class="btn xh-more" data-action="xpHistMore">Show older days ('+(days.length - n)+' more)</button>' : '');
+  o.classList.remove('hidden'); if(!ui._xhKeep) o.scrollTop = 0; ui._xhKeep = false;
+};
+ACTIONS.xpHistMore = function(){ ui.xhN = (ui.xhN || 30) + 60; ui._xhKeep = true; ACTIONS.openXpHistory(); };
 ACTIONS.closeXpHow = function(){ const o = document.getElementById('xpHowOverlay'); if(o) o.classList.add('hidden'); };

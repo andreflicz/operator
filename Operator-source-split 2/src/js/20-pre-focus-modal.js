@@ -5,7 +5,7 @@ function renderPreFocusNextTaskCard(){
     return '<div class="task-card current-task-card staged-task-card" style="margin-bottom:14px;align-items:center;justify-content:center;text-align:center;padding:12px 16px;">'+
       '<div class="ctb-label">&#128204; This starts the moment you lock in</div>'+
       '<div class="task-card-title" style="font-size:16px;margin-top:4px;">'+escapeHtml(st.title)+'</div>'+
-      '<button class="btn btn-ghost btn-sm" style="margin-top:8px;" data-action="clearStagedTaskFromPreFocus">Not this one — clear it</button>'+
+      '<button class="btn btn-ghost btn-sm" style="margin-top:8px;" data-action="clearStagedTaskFromPreFocus">Not this one: clear it</button>'+
     '</div>';
   }
   if(ui.preFocusPicking){
@@ -24,7 +24,7 @@ function renderPreFocusNextTaskCard(){
   }
   return '<div class="task-card current-task-card" style="margin-bottom:14px;align-items:center;justify-content:center;text-align:center;padding:12px 16px;">'+
     '<div class="ctb-label">Next Task</div>'+
-    '<div class="ctb-empty">Nothing lined up — nothing will start automatically.</div>'+
+    '<div class="ctb-empty">Nothing lined up. Nothing will start automatically.</div>'+
     '<div class="row" style="margin-top:8px;justify-content:center;gap:8px;">'+
       '<button class="btn btn-ghost btn-sm" data-action="openPreFocusPick">Pick Existing</button>'+
       '<button class="btn btn-ghost btn-sm" data-action="addTaskFromPreFocus">+ New Task</button>'+
@@ -69,7 +69,7 @@ function renderPreFocusWhyStep(){
       '<div><div class="kind-label" style="color:var(--good);">Getting</div>'+(toward.map(function(m){ return '<div class="motiv-toward">+ '+escapeHtml(m.text)+'</div>'; }).join('') || '<div class="kpi-sub">Add these in Settings.</div>')+'</div>'+
       '<div><div class="kind-label" style="color:var(--danger);">Avoiding</div>'+(away.map(function(m){ return '<div class="motiv-away">&minus; '+escapeHtml(m.text)+'</div>'; }).join('') || '<div class="kpi-sub">Add these in Settings.</div>')+'</div>'+
     '</div>'+
-    (function(){ const me = nextMeetingEventToday(); return me ? '<div class="row" style="justify-content:center;margin-top:14px;"><button class="btn btn-good btn-sm" data-action="joinCall" data-url="'+escapeHtml(me.meetingLink)+'">&#128222; Join Call — '+escapeHtml(me.title)+(me.time?' at '+fmt12Hour(me.time):'')+'</button></div>' : ''; })()+
+    (function(){ const me = nextMeetingEventToday(); return me ? '<div class="row" style="justify-content:center;margin-top:14px;"><button class="btn btn-good btn-sm" data-action="joinCall" data-url="'+escapeHtml(me.meetingLink)+'">&#128222; Join Call: '+escapeHtml(me.title)+(me.time?' at '+fmt12Hour(me.time):'')+'</button></div>' : ''; })()+
     '<div class="row" style="margin-top:22px;justify-content:space-between;">'+
       '<button class="btn btn-ghost" data-action="preFocusBackToStart">&larr; Back</button>'+
       '<button class="btn btn-primary" data-action="confirmStartFocus">&#128274; Start '+(ui.pendingFocusMinutes?fmtDurationLabel(ui.pendingFocusMinutes):'Session')+'</button>'+
@@ -94,7 +94,7 @@ function renderLockInCard(){
   }
   const meetingEvent = nextMeetingEventToday();
   return '<div class="card" style="text-align:center;padding:28px 20px;width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:220px;">'+
-    (meetingEvent ? '<button class="btn btn-good btn-sm" style="margin-bottom:12px;" data-action="joinCall" data-url="'+escapeHtml(meetingEvent.meetingLink)+'">&#128222; Join Call — '+escapeHtml(meetingEvent.title)+(meetingEvent.time?' at '+fmt12Hour(meetingEvent.time):'')+'</button>' : '')+
+    (meetingEvent ? '<button class="btn btn-good btn-sm" style="margin-bottom:12px;" data-action="joinCall" data-url="'+escapeHtml(meetingEvent.meetingLink)+'">&#128222; Join Call: '+escapeHtml(meetingEvent.title)+(meetingEvent.time?' at '+fmt12Hour(meetingEvent.time):'')+'</button>' : '')+
     '<button class="btn btn-good lock-in-btn" data-action="openLockInChooser">&#128274; LOCK IN</button>'+
     '<div class="mode-btn-row">'+
       '<button class="btn shooting-btn" data-action="startMode" data-type="shooting">&#127916; SHOOTING</button>'+

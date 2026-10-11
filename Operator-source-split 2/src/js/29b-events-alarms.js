@@ -60,9 +60,9 @@ function eventStartTs(ev){ return ev.time ? localTs(ev.date, ev.time) : null; }
 function syncEventExtraAlarms(ev){
   const start = eventStartTs(ev);
   const at = function(ts){ const d = new Date(ts); return [todayStr(d), nowHM(d)]; };
-  if(ev.readyTime) upsertEventAlarm(ev, 'ready', ev.date, ev.readyTime, 'Start getting ready — '+ev.title);
+  if(ev.readyTime) upsertEventAlarm(ev, 'ready', ev.date, ev.readyTime, 'Start getting ready: '+ev.title);
   else upsertEventAlarm(ev, 'ready', null);
-  if(start && ev.travelMinutes>0){ const x = at(start-ev.travelMinutes*60000); upsertEventAlarm(ev, 'leave', x[0], x[1], 'Time to leave — '+ev.title+(ev.location?' ('+ev.location+')':'')); }
+  if(start && ev.travelMinutes>0){ const x = at(start-ev.travelMinutes*60000); upsertEventAlarm(ev, 'leave', x[0], x[1], 'Time to leave: '+ev.title+(ev.location?' ('+ev.location+')':'')); }
   else upsertEventAlarm(ev, 'leave', null);
   if(start && ev.remindBefore>0){ const y = at(start-ev.remindBefore*60000); upsertEventAlarm(ev, 'remind', y[0], y[1], ev.title+' in '+fmtDurationLabel(ev.remindBefore)); }
   else upsertEventAlarm(ev, 'remind', null);
@@ -150,7 +150,7 @@ ACTIONS.taskToReminder = function(el, e, id){
   persist('focus');
   closeTaskEditModal();
   deleteTasksUndoable([t.id]);
-  showToast('Turned into a reminder'+(r.time?' — mini alarm at '+fmt12Hour(r.time):''), {icon:'&#128276;', actionLabel:'Undo', actionAction:'undoTaskToReminder', duration:7000});
+  showToast('Turned into a reminder'+(r.time?' · mini alarm at '+fmt12Hour(r.time):''), {icon:'&#128276;', actionLabel:'Undo', actionAction:'undoTaskToReminder', duration:7000});
   lastTaskToReminder = r.id;
 };
 ACTIONS.undoTaskToReminder = function(){
@@ -205,7 +205,7 @@ function renderNightPlanModal(){
     '<div class="field" style="margin-top:12px;"><label>Note to wake up to</label><textarea class="input" id="nightPlanNote" style="width:100%;min-height:70px;" placeholder="What matters tomorrow, and why.">'+escapeHtml(d.note||'')+'</textarea></div>'+
     '<div class="field night-wake-field" style="margin-top:12px;"><label>&#9200; Wake up '+morningLabel(d.date)+' at</label>'+
       '<div class="row" style="gap:10px;align-items:center;flex-wrap:wrap;"><input class="input ws-time ws-time-sm" type="time" id="nightPlanAlarm" value="'+escapeHtml(d.alarmTime||'')+'">'+
-      '<span class="kpi-sub">'+(base ? 'Usual: '+fmt12Hour(base)+' ('+wakeDaysLabel(wakeCfg().days)+'). A different time here only changes '+morningLabel(d.date)+'.' : 'No daily alarm that day — set a time to wake up '+morningLabel(d.date)+'.')+'</span>'+
+      '<span class="kpi-sub">'+(base ? 'Usual: '+fmt12Hour(base)+' ('+wakeDaysLabel(wakeCfg().days)+'). A different time here only changes '+morningLabel(d.date)+'.' : 'No daily alarm that day. Set a time to wake up '+morningLabel(d.date)+'.')+'</span>'+
       '<button class="btn btn-ghost btn-sm" data-action="openWakeSetup">Alarm settings &amp; music</button></div></div>'+
     '<div class="row" style="margin-top:18px;justify-content:space-between;">'+
       (state.focus.nightPlan ? '<button class="btn btn-ghost btn-sm mini-move-danger" data-action="clearNightPlan">Clear plan</button>' : '<span></span>')+
@@ -252,7 +252,7 @@ ACTIONS.saveNightPlan = function(){
   playPositive();
   persist('focus'); renderView();
   const t = wakeTimeFor(d.date);
-  showToast('Plan saved for '+morningLabel(d.date)+(t?' — alarm '+fmt12Hour(t):''), {icon:'&#127769;'});
+  showToast('Plan saved for '+morningLabel(d.date)+(t?' · alarm '+fmt12Hour(t):''), {icon:'&#127769;'});
 };
 ACTIONS.clearNightPlan = function(){
   const np = state.focus.nightPlan;

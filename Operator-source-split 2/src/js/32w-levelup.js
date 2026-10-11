@@ -18,7 +18,7 @@ function levelUpBtnHtml(where){
 function xpCautionHtml(x){
   x = x || xpSummary(); if(!x.blocked || !x.blocked.length) return '';
   const full = x.levelPct >= 1;
-  return '<span class="xp-caution" title="'+(full ? 'Your XP for this level is full — it keeps stacking. ' : 'Almost at the top of this level. ')+'Level '+(x.level+1)+' needs '+x.blocked.join(' and ')+'.">&#9888; '+(full ? 'Maxed · needs ' : 'Next needs ')+escapeHtml(x.blocked.join(' & '))+'</span>';
+  return '<span class="xp-caution" title="'+(full ? 'Your XP for this level is full. It keeps stacking. ' : 'Almost at the top of this level. ')+'Level '+(x.level+1)+' needs '+x.blocked.join(' and ')+'.">&#9888; '+(full ? 'Maxed · needs ' : 'Next needs ')+escapeHtml(x.blocked.join(' & '))+'</span>';
 }
 // in the notifications, until you claim it
 function levelUpPending(){

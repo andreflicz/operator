@@ -32,7 +32,7 @@ function updateEntries(){
 }
 function updateCopyText(e){ return fmtDateShort(e.date)+(e.timestamp ? ' · '+fmtTimeShort(e.timestamp) : '')+'\n'+(e.text||''); }
 function copyToClipboard(text, what){
-  const done = function(){ showToast((what||'Copied')+' — ready to paste', {icon:'&#128203;', duration:1600}); };
+  const done = function(){ showToast((what||'Copied')+' · ready to paste', {icon:'&#128203;', duration:1600}); };
   if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(function(){ if(fallbackCopy(text)) done(); });
   else if(fallbackCopy(text)) done();
 }
@@ -77,7 +77,7 @@ function renderUpdatesTab(){
   const picker = '<select class="input" id="updatesTypeSel" style="max-width:220px;">'+types.map(function(t){ return '<option value="'+escapeHtml(t.id)+'"'+(t.id===typeId?' selected':'')+'>'+escapeHtml((t.emoji||'')+' '+t.label)+'</option>'; }).join('')+'</select>';
   if(!typeId){
     return '<div class="card upd-empty"><div style="font-size:28px;">&#128227;</div><div class="section-title" style="justify-content:center;margin:6px 0;">Updates</div>'+
-      '<div class="kpi-sub" style="margin:0 auto 14px;">Which journal type are they filed under?'+tip('Notes about changes to the app live here — each in full, with one-click copy — and stay out of your journal.')+'</div>'+
+      '<div class="kpi-sub" style="margin:0 auto 14px;">Which journal type are they filed under?'+tip('Notes about changes to the app live here (each in full, with one-click copy) and stay out of your journal.')+'</div>'+
       '<div class="row" style="justify-content:center;gap:8px;flex-wrap:wrap;">'+picker+'<button class="btn btn-good btn-sm" data-action="createUpdatesType">+ Make an "Updates" type</button></div></div>';
   }
   const list = updateEntries(), r = updatesRange();

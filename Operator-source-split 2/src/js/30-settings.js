@@ -13,24 +13,24 @@ function renderSettings(){
   const sections = {
     operator: (typeof operatorSettingsHtml==='function' ? operatorSettingsHtml() : '')+
       '<div class="card section"><div class="section-title">Links</div><div class="grid grid-2">'+
-        '<div class="field"><label>Open links in'+tip('Force Safari opens a new tab with a special link — the first time, choose “Always Allow” when macOS asks, and it\'ll stop needing a second click.')+'</label><select class="input" id="setLinkBrowser"><option value="default" '+((p.linkBrowser||'default')==='default'?'selected':'')+'>System Default</option><option value="safari" '+(p.linkBrowser==='safari'?'selected':'')+'>Force Safari</option></select></div>'+
+        '<div class="field"><label>Open links in'+tip('Force Safari opens a new tab with a special link: the first time, choose “Always Allow” when macOS asks, and it\'ll stop needing a second click.')+'</label><select class="input" id="setLinkBrowser"><option value="default" '+((p.linkBrowser||'default')==='default'?'selected':'')+'>System Default</option><option value="safari" '+(p.linkBrowser==='safari'?'selected':'')+'>Force Safari</option></select></div>'+
       '</div></div>'+saveBtn,
     integrations: ghlSettingsHtml()+(typeof igSettingsHtml==='function' ? igSettingsHtml() : ''),
     updates: '<div class="upd-panel">'+renderUpdatesTab()+'</div>',
-    data: '<div class="section"><div class="section-title">Your Data'+tip(hasCloud ? 'Saved to your account — it follows you wherever you open Operator.' : 'Saved on this Mac in Operator\'s own storage — export a copy now and then as a backup.')+'</div><div class="card">'+
+    data: '<div class="section"><div class="section-title">Your Data'+tip(hasCloud ? 'Saved to your account. It follows you wherever you open Operator.' : 'Saved on this Mac in Operator\'s own storage. Export a copy now and then as a backup.')+'</div><div class="card">'+
         '<div class="row"><button class="btn" data-action="exportData">Export Data (.json)</button>'+
         '<label class="btn" style="cursor:pointer;">Import Data<input type="file" id="importFile" accept=".json" style="display:none;"></label>'+
         deleteResetBtn()+'</div>'+
         '<textarea class="input" id="exportArea" style="width:100%;min-height:80px;margin-top:10px;display:none;" readonly></textarea>'+
       '</div></div>'+
-      '<div class="section"><div class="section-title">Reset Specific Data'+tip('Handy while testing — clears just that part and leaves everything else alone.')+'</div><div class="card">'+
+      '<div class="section"><div class="section-title">Reset Specific Data'+tip('Handy while testing. Clears just that part and leaves everything else alone.')+'</div><div class="card">'+
         '<div class="task-list">'+RESET_TARGETS.map(function(t){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+t.label+'</div>'+resetPartBtn(t)+'</div>'; }).join('')+'</div>'+
       '</div></div>',
 
     display: themeSettingsHtml()+sceneSettingsHtml()+weatherSettingsHtml()+
       // the finer appearance choices wait behind one row instead of filling the page
       '<details class="set-more"'+(ui.setMoreOpen?' open':'')+'><summary data-action="toggleSetMore">More appearance options <span>Sky look, card layout, accent color, header, cursor</span></summary>'+
-      skyLookSettingsHtml()+cardLayoutSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent — it won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
+      skyLookSettingsHtml()+cardLayoutSettingsHtml()+'<div class="section"><div class="section-title">Accent color'+tip('Recolors the UI accent. It won\'t change MRR, pipeline, debt or goal colors.')+'</div><div class="card">'+
         '<div class="row">'+SWATCHES.map(function(sw){ return '<span class="swatch '+(p.accentColor===sw?'sel':'')+'" style="background:'+sw+';" data-action="pickThemeColor" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Today Header Style</div>'+
@@ -61,17 +61,17 @@ function renderSettings(){
       '</div></div>'+
       '<div class="section"><div class="section-title">Before-You-Start Reminders'+tip('Shown as a note before every focus session.')+'<div class="row"><input class="input" id="newPrepLabel" placeholder="e.g. Water bottle filled" style="width:200px;"><button class="btn btn-sm" data-action="addPrepItem">Add</button></div></div>'+
         '<div class="card">'+
-        '<div class="task-list">'+(prepItems.map(function(item){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(item.label)+'</div>'+deleteBtn('prep', item.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet — add one above.</div>')+'</div>'+
+        '<div class="task-list">'+(prepItems.map(function(item){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(item.label)+'</div>'+deleteBtn('prep', item.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet: add one above.</div>')+'</div>'+
         '</div>'+
       '</div>'+
-      '<div class="card section"><div class="section-title">App Tracking'+tip('Sees which app (and, in browsers, which website) is in front on this Mac — nothing leaves the machine.')+'</div><div class="grid grid-2">'+
+      '<div class="card section"><div class="section-title">App Tracking'+tip('Sees which app (and, in browsers, which website) is in front on this Mac. Nothing leaves the machine.')+'</div><div class="grid grid-2">'+
         '<div class="field"><label>Track foreground app</label><select class="input" id="setAppTrackingEnabled"><option value="on" '+(state.settings.appTracking.enabled!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.enabled===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Auto lock-in when steady on work apps</label><select class="input" id="setAppTrackingAutoLockIn"><option value="on" '+(state.settings.appTracking.autoLockIn!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.autoLockIn===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Minutes on one app before auto lock-in</label><input class="input" type="number" min="3" max="120" id="setAppTrackingThreshold" value="'+state.settings.appTracking.thresholdMinutes+'"></div>'+
-        '<div class="field"><label>Stop any session after (minutes away)'+tip('No keyboard or mouse for this long — or the Mac asleep — and the session stops at the last moment you were active, so only active time counts. Coming back, you can add the time back if you were working away from the keys.')+'</label><input class="input" type="number" min="3" max="120" id="setAppTrackingAway" value="'+(state.settings.appTracking.awayMinutes||10)+'"></div>'+
+        '<div class="field"><label>Stop any session after (minutes away)'+tip('No keyboard or mouse for this long, or the Mac asleep, and the session stops at the last moment you were active, so only active time counts. Coming back, you can add the time back if you were working away from the keys.')+'</label><input class="input" type="number" min="3" max="120" id="setAppTrackingAway" value="'+(state.settings.appTracking.awayMinutes||10)+'"></div>'+
         '<div class="field"><label>Minutes off work apps before ending an auto session'+tip('For sessions Operator started on its own: how long on non-work apps before it ends them.')+'</label><input class="input" type="number" min="1" max="60" id="setAppTrackingGrace" value="'+state.settings.appTracking.graceMinutes+'"></div>'+
         '<div class="field"><label>Cooldown after you lock out (minutes)'+tip('Auto lock-in stays off this long after you stop a session yourself.')+'</label><input class="input" type="number" min="0" max="240" id="setAppTrackingCooldown" value="'+state.settings.appTracking.cooldownMinutes+'"></div>'+
-        '<div class="field"><label>Day recap ready at'+tip('A small nudge at this time says your recap is ready — what you did, your work habits, and any sessions that started on their own. Open it any time from Today or Analytics.')+'</label><input class="input" type="time" id="setRecapTime" value="'+(state.settings.appTracking.recapTime||'21:30')+'"></div>'+
+        '<div class="field"><label>Day recap ready at'+tip('A small nudge at this time says your recap is ready: what you did, your work habits, and any sessions that started on their own. Open it any time from Today or Analytics.')+'</label><input class="input" type="time" id="setRecapTime" value="'+(state.settings.appTracking.recapTime||'21:30')+'"></div>'+
         '<div class="field"><label>Idle after (seconds without keyboard/mouse)'+tip('Idle time doesn\'t count toward auto lock-in or app time.')+'</label><input class="input" type="number" min="15" max="900" id="setAppTrackingIdle" value="'+state.settings.appTracking.idleSeconds+'"></div>'+
       '</div></div>'+saveBtn+
       workAppsSettingsHtml(),
@@ -116,13 +116,13 @@ function renderSettings(){
         '</div>'+
       '</div></div></div>'+saveBtn,
 
-    standards: '<div class="card section"><div class="section-title">Work'+tip('What a good day of work looks like. The deep work target is what a day needs for your streak; the average is the master goal you\'re building toward — 8 hours of real work a day at your peak.')+'</div><div class="grid grid-2">'+
+    standards: '<div class="card section"><div class="section-title">Work'+tip('What a good day of work looks like. The deep work target is what a day needs for your streak; the average is the master goal you\'re building toward, 8 hours of real work a day at your peak.')+'</div><div class="grid grid-2">'+
         '<div class="field"><label>Deep work target per day</label><select class="input" id="setDeepWorkTarget">'+deepWorkOptions.map(function(m){ return '<option value="'+m+'" '+(state.standards.deepWorkTargetMinutes===m?'selected':'')+'>'+fmtDurationLabel(m)+'</option>'; }).join('')+'</select></div>'+
         '<div class="field"><label>Average hours a day (master goal)'+tip('Your peak: the average of real, locked-in work a day over the last two weeks. It\'s a master goal on Personal → Goals and what “Locking in” on your card is rated against.')+'</label><select class="input" id="setAvgHoursTarget">'+[240,300,360,420,480,540,600].map(function(m){ return '<option value="'+m+'" '+(state.standards.avgHoursTargetMinutes===m?'selected':'')+'>'+fmtDurationLabel(m)+'</option>'; }).join('')+'</select></div>'+
         '<div class="field"><label>New clients a month'+tip('What “Scaling” on your card is rated against: landing this many every month, month after month.')+'</label><input class="input" type="number" min="1" max="30" id="setNewClientsPerMonth" value="'+state.standards.newClientsPerMonth+'"></div>'+
       '</div></div>'+
-      '<div class="card section"><div class="section-title">Content'+tip('How many videos you want out. A content task counts the moment you finish it — the Content tab, Good morning and your card all measure against these.')+'</div><div class="grid grid-2">'+
-        [['Business', 'business', 'Videos for the business — clients, ads, the agency.'], ['Personal', 'personal', 'Your own channel — you, your life, your story.']].map(function(x){ const label = x[0]+' videos', key = x[0], note = x[2], ct = state.standards.contentTargets[x[1]]; return ''+
+      '<div class="card section"><div class="section-title">Content'+tip('How many videos you want out. A content task counts the moment you finish it: the Content tab, Good morning and your card all measure against these.')+'</div><div class="grid grid-2">'+
+        [['Business', 'business', 'Videos for the business: clients, ads, the agency.'], ['Personal', 'personal', 'Your own channel: you, your life, your story.']].map(function(x){ const label = x[0]+' videos', key = x[0], note = x[2], ct = state.standards.contentTargets[x[1]]; return ''+
         '<div class="field"><label>'+label+tip(note)+'</label><div class="row" style="gap:6px;"><input class="input" type="number" min="0" max="50" id="setContent'+key+'N" value="'+ct.n+'" style="width:80px;"><select class="input" id="setContent'+key+'Per"><option value="day" '+(ct.per==='day'?'selected':'')+'>a day</option><option value="week" '+(ct.per==='week'?'selected':'')+'>a week</option></select></div></div>'; }).join('')+
       '</div></div>'+
       '<div class="card section"><div class="section-title">Streak Rules</div><div class="grid grid-2">'+
@@ -130,7 +130,7 @@ function renderSettings(){
       '</div>'+'</div>'+saveBtn+
       '<div class="section"><div class="section-title">Daily Standard'+tip('These plus your deep work target must be done for a day to count toward the streak.')+'<div class="row"><input class="input" id="newStandardLabel" placeholder="e.g. Read for 10 minutes" style="width:200px;"><button class="btn btn-sm" data-action="addStandardItem">Add</button></div></div>'+
         '<div class="card">'+
-        '<div class="task-list">'+(standardItems.map(function(it){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(it.label)+'</div>'+deleteBtn('standard', it.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet — add one above.</div>')+'</div>'+
+        '<div class="task-list">'+(standardItems.map(function(it){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(it.label)+'</div>'+deleteBtn('standard', it.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet: add one above.</div>')+'</div>'+
         '</div>'+
       '</div>',
 
@@ -138,7 +138,7 @@ function renderSettings(){
         '<div class="field"><label>Monthly revenue goal</label><input class="input" type="number" id="setRevGoal" value="'+p.revenueGoalMonthly+'"></div>'+
       '</div>'+
       '</div>'+saveBtn+renderCrmSettings()+
-      '<div class="section"><div class="section-title">Task Categories'+tip('Give task types their own color — shown as a left border on the card.')+'<div class="row"><input class="input" id="newTaskCatLabel" placeholder="e.g. Video Idea" style="width:160px;"><button class="btn btn-sm" data-action="addTaskCategory">Add</button></div></div>'+
+      '<div class="section"><div class="section-title">Task Categories'+tip('Give task types their own color. Shown as a left border on the card.')+'<div class="row"><input class="input" id="newTaskCatLabel" placeholder="e.g. Video Idea" style="width:160px;"><button class="btn btn-sm" data-action="addTaskCategory">Add</button></div></div>'+
         '<div class="card">'+
           '<div class="row" style="margin-bottom:10px;">'+SWATCHES.map(function(sw){ return '<span class="swatch'+(pickedSwatch===sw?' swatch-active':'')+'" style="background:'+sw+';" data-action="pickSwatch" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
           '<div class="task-list">'+(arr(state.tasks.categories).map(function(c){ return '<div class="task-item-v2">'+
@@ -158,13 +158,13 @@ function renderSettings(){
         '</div>'+
       '</div>',
 
-    calendarJournal: '<div class="section"><div class="section-title">Calendar Categories'+tip('Rename a category by editing its label — it saves automatically. Deleting one that\'s still in use re-labels those events as “Other”. Auto-alarm rings at the start of every event in that category.')+'<div class="row"><input class="input" id="newCatLabel" placeholder="e.g. Client call" style="width:160px;"><button class="btn btn-sm" data-action="addCalCategory">Add</button></div></div>'+
+    calendarJournal: '<div class="section"><div class="section-title">Calendar Categories'+tip('Rename a category by editing its label. It saves automatically. Deleting one that\'s still in use re-labels those events as “Other”. Auto-alarm rings at the start of every event in that category.')+'<div class="row"><input class="input" id="newCatLabel" placeholder="e.g. Client call" style="width:160px;"><button class="btn btn-sm" data-action="addCalCategory">Add</button></div></div>'+
         '<div class="card">'+
           '<div class="row" style="margin-bottom:10px;">'+SWATCHES.map(function(sw){ return '<span class="swatch" style="background:'+sw+';" data-action="pickSwatch" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
           '<div class="task-list">'+(categories.map(function(c){ return '<div class="task-item-v2"><span class="cal-dot" style="background:'+c.color+';width:12px;height:12px;"></span><input class="input" data-cal-cat-label="'+c.id+'" value="'+escapeHtml(c.label)+'" style="flex:1;max-width:220px;"><label class="row" style="font-size:11.5px;color:var(--text-dim);white-space:nowrap;"><input type="checkbox" data-cal-cat-autoremind="'+c.id+'" '+(c.autoRemind?'checked':'')+' style="margin-right:4px;">Auto-alarm</label>'+deleteBtn('calcat', c.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
         '</div>'+
       '</div>'+
-      '<div class="section"><div class="section-title">Journal Types'+tip('Add your own moods/types — pick a color, an emoji and a name. “Starred” is built in for the glow effect and can\'t be removed.')+'</div>'+
+      '<div class="section"><div class="section-title">Journal Types'+tip('Add your own moods/types. Pick a color, an emoji and a name. “Starred” is built in for the glow effect and can\'t be removed.')+'</div>'+
         '<div class="card">'+
           '<div class="row" style="margin-bottom:10px;">'+
             '<input class="input" id="newJournalTypeEmoji" placeholder="&#128077;" maxlength="4" style="width:56px;text-align:center;">'+
@@ -209,7 +209,7 @@ ACTIONS.toggleSetMore = function(el, e){ e.preventDefault(); ui.setMoreOpen = !u
 
 function deleteResetBtn(){
   const key='reset:all';
-  if(armed.has(key)) return '<button class="btn btn-danger" data-action="confirmReset">Confirm Reset — Erases Everything</button>';
+  if(armed.has(key)) return '<button class="btn btn-danger" data-action="confirmReset">Confirm Reset: Erases Everything</button>';
   return '<button class="btn btn-ghost" data-action="armReset">Reset All Data</button>';
 }
 function pickSwatch(color){ pickedSwatch = color; renderView(); }
@@ -412,7 +412,7 @@ async function exportData(){
     URL.revokeObjectURL(url);
   }catch(e){}
   const area = document.getElementById('exportArea');
-  if(area){ area.style.display='block'; area.value = data.length > 400000 ? data.slice(0,400000)+'\n… (truncated here — the downloaded file is complete)' : data; }
+  if(area){ area.style.display='block'; area.value = data.length > 400000 ? data.slice(0,400000)+'\n… (truncated here, the downloaded file is complete)' : data; }
 }
 function normalizeAll(){
   state.profile = normalizeProfile(state.profile);

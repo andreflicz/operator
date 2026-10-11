@@ -380,7 +380,7 @@ ACTIONS.wakeBriefDone = function(){ endBriefing(); };
 ACTIONS.wakeVoice = function(el, e, id){ wakeCfg().voice = id==='on'; if(id==='on' && typeof opVoiceChanged==='function'){ OV.helperDown = false; OV.broken = false; } persist('focus'); if(id!=='on' && typeof opStop==='function') opStop(); renderView(); };
 ACTIONS.wakeBriefBg = function(el, e, id){ const w = wakeCfg(); w.briefBg = id; persist('focus'); renderView(); if(overlayOpen('wakeOverlay')) renderWakeOverlayInto(); };
 ACTIONS.wakeBriefLockIn = function(el, e, id){ endBriefing(); if(id) setNextUp(id); renderView(); openLockInChooser(); };
-ACTIONS.wakeClockIn = function(){ const t = ui.wakeBriefTest; endBriefing(); if(t){ showToast('Test done — this is where Clock in shows your plan.', {icon:'&#128339;'}); return; } clockIn(); };
+ACTIONS.wakeClockIn = function(){ const t = ui.wakeBriefTest; endBriefing(); if(t){ showToast('Test done: this is where Clock in shows your plan.', {icon:'&#128339;'}); return; } clockIn(); };
 ACTIONS.wakeBoardToggle = function(){ ui.wakeBoardBig = !ui.wakeBoardBig; renderWakeOverlayInto(); };
 function wakeSnooze(){
   const mins = wakeCfg().snoozeMinutes||9;
@@ -396,7 +396,7 @@ function wakeSnooze(){
 ACTIONS.wakeImUp = function(){ wakeImUp(); };
 ACTIONS.wakeStartDay = function(){ if(typeof opUnlock==='function') opUnlock(); wakeImUp(); };
 ACTIONS.wakeSnooze = function(){ wakeSnooze(); };
-ACTIONS.wakePlayMusic = function(){ const w = wakeCfg(); if(w.media) playWakeMedia(w.media, function(){ showToast('Couldn\'t play that — try uploading the song file instead.', {icon:'&#9888;'}); }); clearInterval(wakeBeepTimer); if(wakeRing){ wakeRing.mediaFailed = false; renderWakeOverlayInto(); } };
+ACTIONS.wakePlayMusic = function(){ const w = wakeCfg(); if(w.media) playWakeMedia(w.media, function(){ showToast('Couldn\'t play that. Try uploading the song file instead.', {icon:'&#9888;'}); }); clearInterval(wakeBeepTimer); if(wakeRing){ wakeRing.mediaFailed = false; renderWakeOverlayInto(); } };
 function upcomingNightPlan(){ const np = state.focus.nightPlan; return (np && np.date>=todayStr()) ? np : null; }
 function wakeTodayPlan(){
   const np = upcomingNightPlan(), today = todayStr();
@@ -439,7 +439,7 @@ function renderWakeSetup(){
   const sn = state.focus.snooze;
   return '<div class="wake-setup">'+
     '<div class="row" style="justify-content:space-between;align-items:flex-start;gap:12px;">'+
-      '<div class="section-title" style="margin:0;">&#9200; Wake-up alarm'+tip('Your one daily alarm — it opens the wake screen with your vision board, today\'s plan and your music.')+'</div>'+
+      '<div class="section-title" style="margin:0;">&#9200; Wake-up alarm'+tip('Your one daily alarm. It opens the wake screen with your vision board, today\'s plan and your music.')+'</div>'+
       '<label class="ws-switch" title="Turn the daily alarm on/off"><input type="checkbox" data-wake="enabled" '+(w.enabled?'checked':'')+'><span></span></label>'+
     '</div>'+
     '<div class="ws-main'+(w.enabled?'':' is-off')+'">'+
@@ -447,9 +447,9 @@ function renderWakeSetup(){
       '<div class="ws-days">'+names.map(function(n, d){ return '<button class="ws-day'+(w.days.indexOf(d)>=0?' is-on':'')+'" data-action="wakeDay" data-id="'+d+'" title="'+['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d]+'">'+n+'</button>'; }).join('')+'</div>'+
       '<div class="kpi-sub">'+(w.enabled ? fmt12Hour(w.time)+' '+wakeDaysLabel(w.days) : 'Daily alarm is off')+'</div>'+
     '</div>'+
-    '<div class="ws-next">'+(nw ? 'Next ring: <b>'+fmt12Hour(nw.time)+' '+morningLabel(nw.date)+'</b> ('+weekdayShort(nw.date)+') &middot; in '+untilLabel(nw.ts)+(nw.override?' &middot; one-time change':'') : 'Nothing will ring — turn the alarm on or set a time below.')+(sn && sn.wake ? '<br>'+(sn.test?'Test':'Snooze')+' ringing at '+fmt12Hour(nowHM(new Date(sn.ts))) : '')+'</div>'+
+    '<div class="ws-next">'+(nw ? 'Next ring: <b>'+fmt12Hour(nw.time)+' '+morningLabel(nw.date)+'</b> ('+weekdayShort(nw.date)+') &middot; in '+untilLabel(nw.ts)+(nw.override?' &middot; one-time change':'') : 'Nothing will ring. Turn the alarm on or set a time below.')+(sn && sn.wake ? '<br>'+(sn.test?'Test':'Snooze')+' ringing at '+fmt12Hour(nowHM(new Date(sn.ts))) : '')+'</div>'+
     '<div class="ws-block">'+
-      '<div class="kind-label">Just for '+morningLabel(od)+' ('+weekdayShort(od)+')'+tip('Change the time — or skip the alarm — for this one morning. Your daily alarm stays the same.')+'</div>'+
+      '<div class="kind-label">Just for '+morningLabel(od)+' ('+weekdayShort(od)+')'+tip('Change the time, or skip the alarm, for this one morning. Your daily alarm stays the same.')+'</div>'+
       '<div class="row" style="gap:8px;flex-wrap:wrap;">'+
         '<input class="input" type="time" data-wake="overrideTime" value="'+(eff||'')+'" style="width:130px;">'+
         '<button class="btn btn-ghost btn-sm'+(ov && ov.off?' is-active':'')+'" data-action="wakeSkip">No alarm that morning</button>'+
@@ -458,7 +458,7 @@ function renderWakeSetup(){
       (ov || !base ? '<div class="kpi-sub" style="margin-top:4px;">'+(ov ? (ov.off ? 'No alarm '+morningLabel(od)+'.' : 'Changed to '+fmt12Hour(ov.time)+' for '+morningLabel(od)+' only.') : 'No alarm usually that day.')+'</div>' : '')+
     '</div>'+
     '<div class="ws-block">'+
-      '<div class="kind-label">Alarm sound'+tip('Pick a tone, or Music to wake up to a song or playlist — the music plays instead of the tone. If the music ever can\'t start, your tone rings instead, so you still wake up.')+'</div>'+
+      '<div class="kind-label">Alarm sound'+tip('Pick a tone, or Music to wake up to a song or playlist: the music plays instead of the tone. If the music ever can\'t start, your tone rings instead, so you still wake up.')+'</div>'+
       '<div class="ws-sounds">'+[['peaceful','&#127808;','Peaceful'],['standard','&#128276;','Standard'],['loud','&#128226;','Loud']].map(function(x){ const on = !wakeUsesMusic(w) && wakeBeepSound(w)===x[0]; return '<button class="ws-sound'+(on?' is-on':'')+'" data-action="wakeSound" data-id="'+x[0]+'"><span class="ws-sound-i">'+x[1]+'</span>'+x[2]+'</button>'; }).join('')+
         '<button class="ws-sound ws-sound-music'+(wakeUsesMusic(w) || ui.wakeMusicOpen ? ' is-on' : '')+'" data-action="wakeUseMusic"><span class="ws-sound-i">&#9835;</span>Music</button>'+
       '</div>'+
@@ -472,22 +472,22 @@ function renderWakeSetup(){
     '</div>'+
     '<div class="ws-block grid grid-2">'+
       '<div class="field"><label>Good morning intro</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.intro==='quick'?' active':'')+'" data-action="wakeIntro" data-id="quick">Quick</button><button class="seg-tab'+(w.intro==='cinematic'?' active':'')+'" data-action="wakeIntro" data-id="cinematic">Cinematic</button></div></div>'+
-      '<div class="field"><label>News topics'+tip('Things you care about, separated by commas — e.g. AI, Knicks, marketing. Good morning shows the latest headlines on those. Leave it empty for the top stories.')+'</label><input class="input" data-wake="newsTopics" placeholder="e.g. AI, Knicks, marketing" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
-      '<div class="field"><label>Sports'+tip('Teams or leagues for the Sports section — e.g. Knicks, Giants, UFC. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, NFL, UFC" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
+      '<div class="field"><label>News topics'+tip('Things you care about, separated by commas, e.g. AI, Knicks, marketing. Good morning shows the latest headlines on those. Leave it empty for the top stories.')+'</label><input class="input" data-wake="newsTopics" placeholder="e.g. AI, Knicks, marketing" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
+      '<div class="field"><label>Sports'+tip('Teams or leagues for the Sports section, e.g. Knicks, Giants, UFC. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, NFL, UFC" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
       '<div class="field"><label>Scores'+tip('Which leagues the scoreboard shows: yesterday’s and today’s results and what’s coming up. Your teams (above) go first.')+'</label><div class="seg-tabs" style="margin:0;">'+(typeof SPORTS!=='undefined' ? SPORTS : []).map(function(sp){ const on = arr(w.sportsOff).indexOf(sp.id) < 0; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeLeague" data-id="'+sp.id+'">'+sp.label+'</button>'; }).join('')+'</div></div>'+
-      '<div class="field"><label>Local news'+tip('A few headlines from where you are (the place your weather is set to — Settings → Look & Sound).')+'</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(weatherCfg().newsLocal!==false?' active':'')+'" data-action="wakeLocalNews" data-id="on">'+escapeHtml(weatherCfg().city || (weatherCfg().place && weatherCfg().place!=='My location' ? String(weatherCfg().place).split(',')[0] : 'On'))+'</button><button class="seg-tab'+(weatherCfg().newsLocal===false?' active':'')+'" data-action="wakeLocalNews" data-id="off">Off</button></div></div>'+
+      '<div class="field"><label>Local news'+tip('A few headlines from where you are (the place your weather is set to, Settings → Look & Sound).')+'</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(weatherCfg().newsLocal!==false?' active':'')+'" data-action="wakeLocalNews" data-id="on">'+escapeHtml(weatherCfg().city || (weatherCfg().place && weatherCfg().place!=='My location' ? String(weatherCfg().place).split(',')[0] : 'On'))+'</button><button class="seg-tab'+(weatherCfg().newsLocal===false?' active':'')+'" data-action="wakeLocalNews" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Hide news about'+tip('Words or places you never want in your headlines, separated by commas.')+'</label><input class="input" data-wake="newsMute" placeholder="e.g. Wyoming, celebrity" value="'+escapeHtml(w.newsMute!=null ? w.newsMute : 'Wyoming')+'"></div>'+
-      '<div class="field"><label>Tech & interests'+tip('Anything else you follow — e.g. AI, Apple, marketing, crypto. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
-      '<div class="field"><label>Places you like'+tip('Parks, streets, spots near you — separated by commas. Good morning suggests a walk to one of them now and then.')+'</label><input class="input" data-wake="places" placeholder="e.g. a park, a coffee spot" value="'+escapeHtml(w.places||'')+'"></div>'+
+      '<div class="field"><label>Tech & interests'+tip('Anything else you follow, e.g. AI, Apple, marketing, crypto. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
+      '<div class="field"><label>Places you like'+tip('Parks, streets, spots near you. Separated by commas. Good morning suggests a walk to one of them now and then.')+'</label><input class="input" data-wake="places" placeholder="e.g. a park, a coffee spot" value="'+escapeHtml(w.places||'')+'"></div>'+
       '<div class="field"><label>Good morning background'+tip('Time of day follows when you\'re up: sunrise colours early, a blue sky later in the morning, golden in the evening, night if it\'s still dark.')+'</label><div class="seg-tabs" style="margin:0;">'+[['auto','Time of day'],['sunrise','Sunrise'],['dark','Dark']].map(function(o){ const on = (w.briefBg||'auto')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefBg" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
-      '<div class="field"><label>Op’s voice'+tip('Op speaks Good morning out loud, with captions — ask it for sports, news, tech or a business brief, or just talk to it.')+'</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.voice!==false?' active':'')+'" data-action="wakeVoice" data-id="on">On</button><button class="seg-tab'+(w.voice===false?' active':'')+'" data-action="wakeVoice" data-id="off">Off</button></div></div>'+
+      '<div class="field"><label>Op’s voice'+tip('Op speaks Good morning out loud, with captions. Ask it for sports, news, tech or a business brief, or just talk to it.')+'</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.voice!==false?' active':'')+'" data-action="wakeVoice" data-id="on">On</button><button class="seg-tab'+(w.voice===false?' active':'')+'" data-action="wakeVoice" data-id="off">Off</button></div></div>'+
       (w.voice!==false ? '<div class="field"><label>Voice &amp; keys</label><button class="btn btn-ghost btn-sm" data-action="goToOperatorSettings" style="align-self:flex-start;">Settings → Connections &amp; data &rarr;</button></div>' : '')+
       '<div class="field"><label>Good morning layout'+tip('Minimal: one big Get to Work button in the middle with the important things around it.')+'</label><div class="seg-tabs" style="margin:0;">'+[['full','Full'],['minimal','Minimal']].map(function(o){ const on = (w.briefLayout||'full')===o[0]; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeBriefLayout" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
       '<div class="field"><label>Headlines in Good morning</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.news!==false?' active':'')+'" data-action="wakeNews" data-id="on">On</button><button class="seg-tab'+(w.news===false?' active':'')+'" data-action="wakeNews" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Snooze length</label><select class="input" data-wake="snoozeMinutes">'+[5,9,10,15,20].map(function(m){ return '<option value="'+m+'" '+(w.snoozeMinutes===m?'selected':'')+'>'+m+' minutes</option>'; }).join('')+'</select></div>'+
     '</div>'+
     '<div class="row" style="margin-top:18px;justify-content:space-between;gap:8px;flex-wrap:wrap;">'+
-      '<div class="row" style="gap:8px;"><button class="btn btn-ghost btn-sm" data-action="wakeTestSoon" title="Rings in one minute — switch to another app to check it comes up on its own">&#128276; Test: ring in 1 min</button><button class="btn btn-ghost btn-sm" data-action="wakeTestNow">Preview wake screen</button></div>'+
+      '<div class="row" style="gap:8px;"><button class="btn btn-ghost btn-sm" data-action="wakeTestSoon" title="Rings in one minute. Switch to another app to check it comes up on its own">&#128276; Test: ring in 1 min</button><button class="btn btn-ghost btn-sm" data-action="wakeTestNow">Preview wake screen</button></div>'+
       '<button class="btn btn-primary" data-action="closeWakeSetup">Done</button>'+
     '</div>'+
   '</div>';
@@ -519,7 +519,7 @@ ACTIONS.wakePreviewMusic = function(){
   if(wakeAudio || wakeMusicApp){ stopWakeMedia(true); renderWakeSetupInto(); return; }
   const w = wakeCfg(); if(!w.media) return;
   playWakeMedia(Object.assign({}, w.media, {preview:true}), function(){
-    showToast(w.media.type==='music' ? 'Apple Music plays through the Operator app — open Operator from its icon (not the file in a browser).' : 'Couldn\'t play that here.', {icon:'&#9888;', duration:7000});
+    showToast(w.media.type==='music' ? 'Apple Music plays through the Operator app. Open Operator from its icon (not the file in a browser).' : 'Couldn\'t play that here.', {icon:'&#9888;', duration:7000});
   }).then(renderWakeSetupInto);
 };
 // Music source picker in the setup: Apple Music (by name or link), a song file, or a link.
@@ -527,9 +527,9 @@ function wakeMusicPickerHtml(w){
   const src = ui.wakeSrc || (w.media ? (w.media.type==='music' ? 'music' : w.media.ref ? 'upload' : 'link') : 'music');
   const kind = ui.wakeMusicKind || (w.media && w.media.type==='music' ? w.media.k : 'song');
   const tab = function(id, label){ return '<button class="seg-tab'+(src===id?' active':'')+'" data-action="wakeMusicSource" data-id="'+id+'">'+label+'</button>'; };
-  const help = src==='music' ? 'Plays from your Apple Music library through the Music app — no ads, and the volume fades up. The first time, macOS asks to let Operator control Music: click OK (do it now with Test, so it never asks in the morning).'
+  const help = src==='music' ? 'Plays from your Apple Music library through the Music app. No ads, and the volume fades up. The first time, macOS asks to let Operator control Music: click OK (do it now with Test, so it never asks in the morning).'
     : src==='upload' ? 'Plays right on the wake screen and fades in.'
-    : 'Opens and plays by itself. YouTube may play an ad first — Apple Music or a song file start instantly.';
+    : 'Opens and plays by itself. YouTube may play an ad first. Apple Music or a song file start instantly.';
   return '<div class="ws-src-row"><div class="seg-tabs ws-src" style="margin:0;">'+tab('music','&#63743; Apple Music')+tab('upload','&#11014; Song file')+tab('link','&#128279; Link')+'</div>'+tip(help)+'</div>'+
     (src==='music' ? '<div class="row" style="gap:8px;flex-wrap:wrap;">'+
         '<input class="input" id="wakeMusicQuery" placeholder="Song or playlist name (or an Apple Music link)" value="'+escapeHtml(w.media && w.media.type==='music' ? w.media.q : '')+'" style="flex:1;min-width:220px;">'+
@@ -552,13 +552,13 @@ ACTIONS.wakeSetAppleMusic = function(){
   w.media = fromLink || {type:'music', q:v, k: ui.wakeMusicKind || 'song'};
   w.useMusic = true;
   saveWake();
-  showToast('Wake-up music: '+mediaName(w.media)+' (Apple Music) — hit Test to hear it', {icon:'&#9835;', duration:5000});
+  showToast('Wake-up music: '+mediaName(w.media)+' (Apple Music): hit Test to hear it', {icon:'&#9835;', duration:5000});
 };
 ACTIONS.wakeTestNow = function(){ hideOverlay('wakeSetupOverlay'); stopWakeMedia(true); fireWake({test:true}); };
 ACTIONS.wakeTestSoon = function(){
   state.focus.snooze = {ts:Date.now()+60000, wake:true, test:true};
   persist('focus'); renderWakeSetupInto();
-  showToast('Test alarm rings at '+fmt12Hour(nowHM(new Date(Date.now()+60000)))+' — switch to another app if you want to see it pop up.', {icon:'&#128276;', duration:6000});
+  showToast('Test alarm rings at '+fmt12Hour(nowHM(new Date(Date.now()+60000)))+': switch to another app if you want to see it pop up.', {icon:'&#128276;', duration:6000});
 };
 document.addEventListener('change', function(e){
   const t = e.target;
@@ -620,13 +620,13 @@ function checkBreakTimer(){
   if(!as.breakOverAt){
     as.breakOverAt = Date.now(); persist('focus');
     playSessionComplete(); pingWrapper();
-    showToast(mm && mm.work ? 'Break’s over — lock back in for round '+(as.round||2)+(mm.rounds ? ' of '+mm.rounds : '')+'.' : 'Break’s over — lock back in when you’re back.', {icon:'&#9201;', actionLabel:'Lock back in', actionAction:'endBreakModeFromFocus', duration:20000});
-    try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Break’s over — lock back in'); }catch(e){}
+    showToast(mm && mm.work ? 'Break’s over: lock back in for round '+(as.round||2)+(mm.rounds ? ' of '+mm.rounds : '')+'.' : 'Break’s over: lock back in when you’re back.', {icon:'&#9201;', actionLabel:'Lock back in', actionAction:'endBreakModeFromFocus', duration:20000});
+    try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Break’s over. Lock back in'); }catch(e){}
     renderView();
   } else if(Date.now() - (as.breakNudgeAt || as.breakOverAt) > 5*60000){
     as.breakNudgeAt = Date.now();
     playTick();
-    showToast('Still on break — '+Math.round(-left/60000)+' min over.', {icon:'&#9749;', actionLabel:'Lock back in', actionAction:'endBreakModeFromFocus', duration:10000});
+    showToast('Still on break: '+Math.round(-left/60000)+' min over.', {icon:'&#9749;', actionLabel:'Lock back in', actionAction:'endBreakModeFromFocus', duration:10000});
   }
 }
 ACTIONS.extendBreak = function(el){
@@ -657,8 +657,8 @@ function taskAlarmPlan(t){
   const at = function(ts){ const d = new Date(ts); return {date:todayStr(d), time:nowHM(d)}; };
   const out = [];
   const travel = Number(al.travel)||0, ready = Number(al.ready)||0;
-  if(ready>0) out.push(Object.assign({kind:'ready', label:'Start getting ready — '+t.title}, at(start-(travel+ready)*60000)));
-  if(travel>0) out.push(Object.assign({kind:'leave', label:'Time to leave — '+t.title}, at(start-travel*60000)));
+  if(ready>0) out.push(Object.assign({kind:'ready', label:'Start getting ready: '+t.title}, at(start-(travel+ready)*60000)));
+  if(travel>0) out.push(Object.assign({kind:'leave', label:'Time to leave: '+t.title}, at(start-travel*60000)));
   if(al.on) out.push(Object.assign({kind:'at', label:t.title}, at(start)));
   return out;
 }
@@ -674,7 +674,7 @@ function syncTaskAlarms(t){
 function taskAlarmFieldsHtml(prefix, t){
   const al = (t && t.alarm) || {};
   return '<div class="task-alarm-box">'+
-    '<label class="row" style="gap:6px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="'+prefix+'AlarmOn" '+(al.on?'checked':'')+'>&#9200; Alarm at the deadline time'+tip('Needs a deadline time. Add travel and get-ready minutes for extra alarms — e.g. 9:00 AM, 60 min travel, 60 min to get ready → up at 7:00, leave at 8:00.')+'</label>'+
+    '<label class="row" style="gap:6px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="'+prefix+'AlarmOn" '+(al.on?'checked':'')+'>&#9200; Alarm at the deadline time'+tip('Needs a deadline time. Add travel and get-ready minutes for extra alarms, e.g. 9:00 AM, 60 min travel, 60 min to get ready → up at 7:00, leave at 8:00.')+'</label>'+
     '<div class="row" style="gap:10px;margin-top:8px;flex-wrap:wrap;align-items:center;">'+
       '<span class="kpi-sub">Travel</span><input class="input" type="number" min="0" step="5" id="'+prefix+'AlarmTravel" value="'+(al.travel||'')+'" placeholder="0" style="width:74px;"><span class="kpi-sub">min</span>'+
       '<span class="kpi-sub" style="margin-left:6px;">Get ready</span><input class="input" type="number" min="0" step="5" id="'+prefix+'AlarmReady" value="'+(al.ready||'')+'" placeholder="0" style="width:74px;"><span class="kpi-sub">min</span>'+

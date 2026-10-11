@@ -116,7 +116,7 @@ function contentProgress(role){
   const tg = contentTarget(role), done = contentDoneSince(role, contentPeriodStart(tg.per));
   return {role:role, n:tg.n, per:tg.per, done:done.length, list:done, label:(tg.per==='day' ? 'today' : 'this week')};
 }
-const CONTENT_ROLES = [['business', 'Business', '#ffc56b', 'For the business — clients, ads, the agency'], ['personal', 'Personal', '#c3a6ff', 'Your own channel — you and your story']];
+const CONTENT_ROLES = [['business', 'Business', '#ffc56b', 'For the business: clients, ads, the agency'], ['personal', 'Personal', '#c3a6ff', 'Your own channel: you and your story']];
 function contentRingSvg(p, color){
   const f = p.n ? Math.min(1, p.done/p.n) : 0, r = 22, c = 2*Math.PI*r;
   return '<svg class="ct-ring" viewBox="0 0 54 54" width="54" height="54"><circle cx="27" cy="27" r="'+r+'" fill="none" stroke="rgba(var(--ink),.1)" stroke-width="5"/>'+
@@ -136,7 +136,7 @@ function renderVideoIdeasTab(){
         '</div>'+
         '<button class="ct-add" data-action="openAddContent" data-role="'+r[0]+'" title="Add '+r[1].toLowerCase()+' content">+</button>'+
       '</div>'+
-      '<div class="ct-list">'+(mine.map(videoIdeaCompactCard).join('') || '<div class="ct-empty">No '+r[1].toLowerCase()+' ideas yet — <button class="ct-link" data-action="openAddContent" data-role="'+r[0]+'">add one</button>.</div>')+'</div>'+
+      '<div class="ct-list">'+(mine.map(videoIdeaCompactCard).join('') || '<div class="ct-empty">No '+r[1].toLowerCase()+' ideas yet: <button class="ct-link" data-action="openAddContent" data-role="'+r[0]+'">add one</button>.</div>')+'</div>'+
       (p.list.length ? '<div class="ct-done"><span>Out '+p.label+'</span>'+p.list.slice(0, 6).map(function(t){ return '<em>&#10003; '+escapeHtml(t.title)+'</em>'; }).join('')+'</div>' : '')+
     '</div>';
   }).join('')+'</div>';
@@ -202,7 +202,7 @@ function renderVideoIdeaEditModal(){
   const t = state.tasks.items.find(function(x){return x.id===ui.editingVideoIdeaId;});
   if(!t) return '';
   const types = arr(state.tasks.videoTypes);
-  const where = t.status==='today' ? "In the current lineup" : t.status==='done' ? 'Finished — counts as a video out' : 'In Content';
+  const where = t.status==='today' ? "In the current lineup" : t.status==='done' ? 'Finished: counts as a video out' : 'In Content';
   if(ui.newContentRoleFor!==t.id){ ui.newContentRoleFor = t.id; ui.newContentRole = contentRoleOf(t); }
   return '<div class="section-title" style="margin-bottom:4px;">&#127916; Content</div>'+
     '<div class="kpi-sub" style="margin-bottom:14px;">'+where+'</div>'+
@@ -244,7 +244,7 @@ function renderFocusTasksOverview(){
   return nowNextPanelHtml()+
   renderTaskToolbar(true)+
   '<div class="section" style="margin-bottom:14px;">'+
-    '<div class="section-title" style="align-items:center;">Current Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('In your order — switch to List and drag rows to set it (otherwise highest priority and closest deadlines first). Drag a card onto Up next to line it up. Drag a box around cards (or ⌘-click) to pick several.')+'<span class="row" style="margin-left:auto;gap:8px;">'+lineupToggleHtml()+'</span></div>'+
+    '<div class="section-title" style="align-items:center;">Current Lineup <span class="kpi-sub">'+today.length+'</span>'+tip('In your order. Switch to List and drag rows to set it (otherwise highest priority and closest deadlines first). Drag a card onto Up next to line it up. Drag a box around cards (or ⌘-click) to pick several.')+'<span class="row" style="margin-left:auto;gap:8px;">'+lineupToggleHtml()+'</span></div>'+
     (listView ? '<div class="task-column tl-wrap" data-dropzone="today">'+lineupListHtml(today)+'</div>' :
     '<div class="task-column fixed-size'+(carouselOn() && today.length?' is-car':'')+'" data-dropzone="today">'+(today.length && carouselOn() ? carouselWrap(today.map(function(t){ return taskCard(t); }).join(''), 'lineup', {w:236}) : '<div class="task-card-grid">'+(today.map(function(t){ return taskCard(t); }).join('') || '<div class="empty">Nothing lined up yet. Drag a card here, or add one above.</div>')+'</div>')+'</div>')+
   '</div>'+
@@ -321,7 +321,7 @@ function renderFocusFinishedTab(){
   '</div>'+
   '<div class="section">'+
     '<div class="section-title">Everything Knocked Out<span class="kpi-sub">'+doneEarlier.length+' more</span></div>'+
-    '<div class="task-list">'+(doneEarlier.slice(0, listLimit('finished')).map(finishedTaskRow).join('') || '<div class="empty">Nothing else yet — it all starts today.</div>')+moreLoader('finished', doneEarlier.length - listLimit('finished'))+'</div>'+
+    '<div class="task-list">'+(doneEarlier.slice(0, listLimit('finished')).map(finishedTaskRow).join('') || '<div class="empty">Nothing else yet. It all starts today.</div>')+moreLoader('finished', doneEarlier.length - listLimit('finished'))+'</div>'+
   '</div>';
 }
 function openAddTaskModal(){
@@ -341,7 +341,7 @@ function renderAddTaskModal(){
     '<div class="field" style="margin-top:10px;"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="newTaskDeadline"><input class="input" type="time" id="newTaskDeadlineTime" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="newTaskDeadline">Today</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskDeadline" title="Remove deadline">Clear</button></div></div>'+
     taskAlarmFieldsHtml('newTask', null)+
     '<div class="field" style="margin-top:10px;"><label>Notes (optional)</label><textarea class="input" id="newTaskNotes" placeholder="Any details worth remembering" style="width:100%;min-height:60px;"></textarea></div>'+
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskOngoing" style="margin-right:6px;">&#128204; Ongoing — takes more than a day'+tip('It stays on your list day after day until it\'s actually finished: tick it off for today without closing it. When it\'s due is just the Deadline above.')+'</label>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskOngoing" style="margin-right:6px;">&#128204; Ongoing: takes more than a day'+tip('It stays on your list day after day until it\'s actually finished: tick it off for today without closing it. When it\'s due is just the Deadline above.')+'</label>'+
     '<div id="newTaskOngoingExtra" style="display:none;">'+
     '<div class="field" style="margin-top:10px;"><label>How often you work on it (optional)</label><select class="input" id="newTaskOngoingFrequency"><option value="">&mdash;</option><option value="daily">Daily</option><option value="few">A few times a week</option><option value="weekly">Weekly</option></select></div>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="newTaskIncludeStandard" style="margin-right:6px;">Include in Today\'s Standard</label>'+
@@ -456,7 +456,7 @@ function completeTask(id){
     justCompletedTaskId = id;
     persist('tasks'); renderView();
     setTimeout(function(){ if(justCompletedTaskId===id){ justCompletedTaskId=null; renderView(); } }, 950);
-    showToast('Nice — logged for today. Resets tomorrow.', {icon:'&#128204;'});
+    showToast('Nice: logged for today. Resets tomorrow.', {icon:'&#128204;'});
     return;
   }
   playTaskComplete();

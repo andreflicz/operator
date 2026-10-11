@@ -219,7 +219,7 @@ function checkAutoLockIn(){
       const s = state.focus.activeSession;
       if(s){ s.autoStarted = true; s.startedAt = from; s.autoApp = last.app; }
       persist('focus'); renderView();
-      showToast('Locked in automatically — on '+last.app+' since '+fmt12Hour(nowHM(new Date(from))), {icon:'&#128274;'});
+      showToast('Locked in automatically: on '+last.app+' since '+fmt12Hour(nowHM(new Date(from))), {icon:'&#128274;'});
     }
     return;
   }
@@ -249,7 +249,7 @@ function autoEndFocusSession(endAt){
   if(state.modes.active && state.modes.active.linkedFocus){ endMode(); }
   playStopSound();
   persist('focus'); renderView();
-  showToast('Session ended — you moved off work apps at '+fmt12Hour(nowHM(new Date(endedAt)))+' ('+fmtDurationLabel(minutes)+' logged)', {icon:'&#9209;'});
+  showToast('Session ended: you moved off work apps at '+fmt12Hour(nowHM(new Date(endedAt)))+' ('+fmtDurationLabel(minutes)+' logged)', {icon:'&#9209;'});
 }
 // ---- only active time counts ----
 // A session — even one you started yourself — stops at the last moment you were active once
@@ -310,7 +310,7 @@ function checkAwayReturn(){
   if(!last || last.end <= a.endedAt + awayLimitMs() || Date.now()-last.end > APP_ACTIVITY_GAP_MS) return;
   a.shown = true; persist('focus');
   const away = Math.round((Date.now()-a.endedAt)/60000);
-  showToast('Away since '+fmt12Hour(nowHM(new Date(a.endedAt)))+' — '+fmtDurationLabel(away)+' not counted.', {icon:'&#128694;', actionLabel:'Add it back', actionAction:'restoreAwaySession', duration:20000});
+  showToast('Away since '+fmt12Hour(nowHM(new Date(a.endedAt)))+' · '+fmtDurationLabel(away)+' not counted.', {icon:'&#128694;', actionLabel:'Add it back', actionAction:'restoreAwaySession', duration:20000});
 }
 ACTIONS.restoreAwaySession = function(){
   const a = state.focus.awayStop; if(!a) return;
@@ -320,7 +320,7 @@ ACTIONS.restoreAwaySession = function(){
   state.focus.awayStop = null;
   clearToasts();
   persist('focus'); renderView();
-  showToast('Added back — the session runs from '+fmt12Hour(nowHM(new Date(state.focus.activeSession.startedAt)))+'.', {icon:'&#128274;'});
+  showToast('Added back: the session runs from '+fmt12Hour(nowHM(new Date(state.focus.activeSession.startedAt)))+'.', {icon:'&#128274;'});
 };
 function startAppActivityPolling(){
   pollAppActivity();

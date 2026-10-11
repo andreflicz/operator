@@ -115,7 +115,7 @@ function ghlPaneHtml(){
     body = '<div class="gp-thread" id="ghlThread">'+(msgs.length ? msgs.map(function(m){
         const out = /out/i.test(m.direction||'');
         return '<div class="gp-msg '+(out?'is-out':'is-in')+'"><div class="gp-bubble">'+escapeHtml(m.body || m.subject || (ghlMsgType(m)==='Call' ? 'Call' : ''))+'</div><div class="gp-meta">'+ghlMsgType(m)+' &middot; '+ghlWhen(m.dateAdded)+'</div></div>';
-      }).join('') : '<div class="gp-loading">No messages yet — say hi.</div>')+'</div>'+
+      }).join('') : '<div class="gp-loading">No messages yet: say hi.</div>')+'</div>'+
       '<div class="gp-compose">'+
         '<div class="seg-tabs seg-sm" style="margin:0;"><button class="seg-tab'+(p.channel==='SMS'?' active':'')+'" data-action="ghlChannel" data-id="SMS">Text</button><button class="seg-tab'+(p.channel==='Email'?' active':'')+'" data-action="ghlChannel" data-id="Email">Email</button></div>'+
         (p.channel==='Email' ? '<input class="input" id="ghlSubject" placeholder="Subject" value="'+escapeHtml(ghlDraft('ghlSubject'))+'">' : '')+

@@ -38,7 +38,7 @@ function goalCardHtml(g, compact){
   const periodic = goalIsPeriodic(g), reachedNow = periodic && goalReached(g);
   const armedNow = armed.has('goalcomplete:'+g.id);
   const unit = t ? t.unit : (g.unit||'');
-  const num = function(n){ return n==null ? '—' : unit==='$/mo' ? '$'+fmtGoalNum(n) : fmtGoalNum(n, unit); };
+  const num = function(n){ return n==null ? '–' : unit==='$/mo' ? '$'+fmtGoalNum(n) : fmtGoalNum(n, unit); };
   const unitTail = unit && unit!=='$/mo' && !/^\$/.test(unit) ? ' '+escapeHtml(unit) : unit==='$/mo' ? '/mo' : '';
   return '<div class="goal-card'+(g.done?' is-done':'')+(t?' is-tracked':'')+(reachedNow?' is-hit':'')+'" data-key="goal-'+g.id+'">'+
     '<div class="goal-card-head">'+(t ? '<span class="goal-icon">'+t.icon+'</span>' : '')+'<span class="goal-card-title" data-action="openGoalEditModal" data-id="'+g.id+'">'+escapeHtml(goalTitle(g))+'</span>'+goalDaysLeftChip(g)+'</div>'+
@@ -80,7 +80,7 @@ function goalStatTilesHtml(){
   const items = state.goals.items.filter(function(g){ return !g.tier; }), done = items.filter(function(g){ return g.done; }).length;
   return '<div class="stat-tiles">'+
     statTileHtml('Revenue', '$'+mrr.toLocaleString(), mrrGoal ? 'of $'+mrrGoal.toLocaleString()+'/mo goal' : 'set a goal in Settings', mrrGoal ? mrr/mrrGoal*100 : null, 'var(--good)')+
-    (w.goal!=null ? statTileHtml('Weight', w.latest!=null ? w.latest : '—', w.latest!=null ? 'goal '+w.goal+(w.latest!==w.goal?' · '+Math.abs(w.latest-w.goal).toFixed(1)+' to go':'') : 'log your weight', w.pct, 'var(--info)', 'goToWeight') : '')+
+    (w.goal!=null ? statTileHtml('Weight', w.latest!=null ? w.latest : '–', w.latest!=null ? 'goal '+w.goal+(w.latest!==w.goal?' · '+Math.abs(w.latest-w.goal).toFixed(1)+' to go':'') : 'log your weight', w.pct, 'var(--info)', 'goToWeight') : '')+
     statTileHtml('Workouts', wk+(wkT?'<span class="stat-tile-of">/'+wkT+'</span>':''), 'this week', wkT ? wk/wkT*100 : null, 'var(--accent)', 'goToFitness')+
     statTileHtml('Goals', done+'<span class="stat-tile-of">/'+items.length+'</span>', items.length ? 'achieved' : 'none set yet', items.length ? done/items.length*100 : null, goalColor())+
   '</div>';
@@ -109,7 +109,7 @@ function renderGoalsTab(){
       '<div class="tg-grid">'+tierCardHtml('week', {add:true})+tierCardHtml('month', {add:true})+'</div>'+
       (wh || mh ? '<div class="tg-hists">'+(wh ? '<div><small>Past weeks</small>'+wh+'</div>' : '')+(mh ? '<div><small>Past months</small>'+mh+'</div>' : '')+'</div>' : '')+'</div>' : '')+
     '<div class="section">'+
-      '<div class="section-title">Your goals'+tip('For things Operator can\'t see — IG followers, a first sponsor deal, a new camera. You update the number.')+(formOpen ? '<button class="btn btn-sm btn-ghost" data-action="toggleForm" data-form="newGoal">Close</button>' : '')+'</div>'+
+      '<div class="section-title">Your goals'+tip('For things Operator can\'t see: IG followers, a first sponsor deal, a new camera. You update the number.')+(formOpen ? '<button class="btn btn-sm btn-ghost" data-action="toggleForm" data-form="newGoal">Close</button>' : '')+'</div>'+
       (formOpen ? '<div class="card goal-form">'+
         '<div class="grid grid-2"><div class="field"><label>Goal</label><input class="input" id="newGoalLabel" placeholder="e.g. 10k IG followers"></div>'+
           '<div class="field"><label>By when (optional)</label><input class="input" type="date" id="newGoalDeadline"></div></div>'+
@@ -120,7 +120,7 @@ function renderGoalsTab(){
         '</div>'+
         '<div class="row" style="margin-top:12px;justify-content:flex-end;"><button class="btn btn-good" data-action="addGoal">+ Add goal</button></div>'+
       '</div>' : '')+
-      (open.length ? '<div class="goal-grid">'+open.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : (formOpen ? '' : '<div class="empty">Nothing here yet — add one for anything you track yourself.</div>'))+
+      (open.length ? '<div class="goal-grid">'+open.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : (formOpen ? '' : '<div class="empty">Nothing here yet. Add one for anything you track yourself.</div>'))+
     '</div>'+
     (done.length ? '<div class="section"><button class="cc2-past-toggle" data-action="toggleForm" data-form="goalsDone">'+(ui.forms.goalsDone?'&#9662;':'&#9656;')+' Achieved ('+done.length+')</button>'+
       (ui.forms.goalsDone ? '<div class="goal-grid" style="margin-top:10px;">'+done.map(function(g){ return goalCardHtml(g, false); }).join('')+'</div>' : '')+'</div>' : '');
@@ -151,7 +151,7 @@ function renderAgendaPanel(){
     '</div>';
   }).join('');
   return '<div class="section agenda-panel"><div class="section-title">Today<span class="view-all-link" data-action="nav" data-view="calendar">Calendar &rarr;</span></div>'+
-    '<div class="card ag-card">'+(items.length ? rows+(nowPlaced?'':'<div class="ag-now"><span>now</span></div>') : '<div class="empty" style="padding:10px;">Nothing scheduled — a clean day to get work done.</div>')+'</div></div>';
+    '<div class="card ag-card">'+(items.length ? rows+(nowPlaced?'':'<div class="ag-now"><span>now</span></div>') : '<div class="empty" style="padding:10px;">Nothing scheduled: a clean day to get work done.</div>')+'</div></div>';
 }
 // ---- this week: deep work per day ----
 function renderWeekPanel(){
@@ -213,9 +213,9 @@ function heatBlockHtml(){
       '<div class="hm-main"><div class="hm-grid">'+cols+'</div>'+
         '<div class="hm-foot"><span>Last 6 months'+tip('Darker = more deep work that day. Outlined days hit the standard.')+'</span><span class="hm-legend">less <span class="hm-cell hm-1"></span><span class="hm-cell hm-2"></span><span class="hm-cell hm-3"></span><span class="hm-cell hm-4"></span> more</span></div></div>'+
       '<div class="hm-stats">'+
-        stat(counted ? Math.round(hit/counted*100)+'%' : '—', 'days the standard was hit')+
+        stat(counted ? Math.round(hit/counted*100)+'%' : '–', 'days the standard was hit')+
         stat(best+'d', 'longest run on target')+
-        stat(worked ? fmtHours(Math.round(totalMin/worked)) : '—', 'average on days you worked')+
+        stat(worked ? fmtHours(Math.round(totalMin/worked)) : '–', 'average on days you worked')+
       '</div>';
 }
 // This week's bars and the 6-month heatmap, side by side in one panel.

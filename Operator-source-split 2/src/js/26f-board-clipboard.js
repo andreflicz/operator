@@ -20,7 +20,7 @@ function boardCopy(cut, clipboardEvent){
   if(clipboardEvent && clipboardEvent.clipboardData){ clipboardEvent.clipboardData.setData('text/plain', text); clipboardEvent.preventDefault(); }
   else { try{ if(navigator.clipboard) navigator.clipboard.writeText(text).catch(function(){}); }catch(err){} }
   if(cut) ACTIONS.boardDelete();
-  showToast((cut ? 'Cut ' : 'Copied ')+els.length+' card'+(els.length===1?'':'s')+' — open any board and paste (⌘V)', {icon:'&#128203;', duration:2200});
+  showToast((cut ? 'Cut ' : 'Copied ')+els.length+' card'+(els.length===1?'':'s')+': open any board and paste (⌘V)', {icon:'&#128203;', duration:2200});
   return true;
 }
 function elBox(x){ return x.type==='line' ? {l:Math.min(x.x1, x.x2), t:Math.min(x.y1, x.y2), r:Math.max(x.x1, x.x2), b:Math.max(x.y1, x.y2)} : {l:x.x, t:x.y, r:x.x+(x.w||0), b:x.y+(x.h||0)}; }

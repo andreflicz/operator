@@ -8,7 +8,7 @@
 // they pay XP — a weekly goal a little, a monthly one a decent chunk, and showing up to check in and
 // out pays too (see CHECKIN_XP). The Calendar asks once a week and once a month; close it and it
 // waits in the notifications. Good morning brings them back every day.
-const CHECKIN_XP = {weekGoal:150, monthGoal:500, habit:250, weekIn:25, weekOut:50, monthIn:50, monthOut:100, maxGoals:3};
+const CHECKIN_XP = {weekGoal:150, monthGoal:500, habit:500, weekIn:25, weekOut:50, monthIn:50, monthOut:100, maxGoals:3};
 function intentStore(){
   const j = state.journal;
   if(!j.intentions || typeof j.intentions!=='object') j.intentions = {};
@@ -57,10 +57,10 @@ function intentPending(){
   const out = [], mk = monthKey(), wk = weekKey();
   checkoutDue().forEach(function(c){
     out.push({key:'checkout:'+c.kind+':'+c.key, kind:'intent', level:'info', icon:c.kind==='month' ? '&#127942;' : '&#9989;', title:'Check out of '+(c.kind==='month' ? monthName(c.key) : 'the week'),
-      sub:(c.kind==='month' ? 'How did '+monthName(c.key)+' go?' : weekLabel(c.key)+' — what did you hit?')+' Collect your XP.', act:{a:'openCheckout', id:c.kind+':'+c.key}, sort:1});
+      sub:(c.kind==='month' ? 'How did '+monthName(c.key)+' go?' : weekLabel(c.key)+': what did you hit?')+' Collect your XP.', act:{a:'openCheckout', id:c.kind+':'+c.key}, sort:1});
   });
   if(!checkedIn('month', mk)) out.push({key:'intent:month:'+mk, kind:'intent', level:'info', icon:'&#127769;', title:'Check in for '+monthName(mk), sub:'Up to three goals and a habit to beat for the month', act:{a:'openIntent', id:'month'}, sort:2});
-  if(!checkedIn('week', wk)) out.push({key:'intent:week:'+wk, kind:'intent', level:'info', icon:'&#128197;', title:'Check in for the week', sub:weekLabel(wk)+' — what makes it a win?', act:{a:'openIntent', id:'week'}, sort:2});
+  if(!checkedIn('week', wk)) out.push({key:'intent:week:'+wk, kind:'intent', level:'info', icon:'&#128197;', title:'Check in for the week', sub:weekLabel(wk)+': what makes it a win?', act:{a:'openIntent', id:'week'}, sort:2});
   return out;
 }
 const INTENT_FIELDS = {
@@ -140,9 +140,9 @@ function openCheckoutForm(kind, key, cinematic){
   document.getElementById('intContent').innerHTML =
     '<button class="int-x" data-action="closeIntent" title="Later (it stays in your notifications)">&#10005;</button>'+
     '<div class="int-k">'+(kind==='month' ? '&#127942; Month check-out' : '&#9989; Week check-out')+'</div>'+
-    '<div class="int-h">'+escapeHtml(kind==='month' ? monthName(key) : 'This week')+'</div><div class="int-s">'+escapeHtml(kind==='month' ? 'How did it go? Be honest — it’s only for you.' : weekLabel(key)+' · how did it go?')+'</div>'+
+    '<div class="int-h">'+escapeHtml(kind==='month' ? monthName(key) : 'This week')+'</div><div class="int-s">'+escapeHtml(kind==='month' ? 'How did it go? Be honest: it’s only for you.' : weekLabel(key)+' · how did it go?')+'</div>'+
     '<div class="int-fs">'+
-      (gs.length ? '<div class="co-list">'+gs.map(function(g){ return '<div class="co-row"><span class="co-l">'+escapeHtml(g.label)+'<small>+'+xpEach+' XP</small></span>'+pick(g.id, ui.coPick.v[g.id]===1)+'</div>'; }).join('')+'</div>' : '<div class="co-none">No goals were set for '+escapeHtml(periodLabel(kind, key))+' — check out anyway, and set some for the next one.</div>')+
+      (gs.length ? '<div class="co-list">'+gs.map(function(g){ return '<div class="co-row"><span class="co-l">'+escapeHtml(g.label)+'<small>+'+xpEach+' XP</small></span>'+pick(g.id, ui.coPick.v[g.id]===1)+'</div>'; }).join('')+'</div>' : '<div class="co-none">No goals were set for '+escapeHtml(periodLabel(kind, key))+': check out anyway, and set some for the next one.</div>')+
       (kind==='month' && rec.habit ? '<div class="co-row is-habit"><span class="co-l">Beat the habit: '+escapeHtml(rec.habit)+'<small>+'+CHECKIN_XP.habit+' XP</small></span>'+pick('habit', ui.coPick.v.habit===1)+'</div>' : '')+
       '<label class="int-f"><span>What went well?</span><input class="int-in" id="co_well" maxlength="200" placeholder="The win you want to remember." value="'+escapeHtml((rec.out && rec.out.well)||'')+'"></label>'+
       '<label class="int-f"><span>What will you fix next '+(kind==='month' ? 'month' : 'week')+'?</span><input class="int-in" id="co_fix" maxlength="200" placeholder="One thing. Make it specific." value="'+escapeHtml((rec.out && rec.out.fix)||'')+'"></label>'+
@@ -181,7 +181,7 @@ ACTIONS.saveCheckout = function(el, e, id){
   if(before && typeof xpSystemShow==='function'){
     xpLast = null; const x = xpSummary(), seen = xpSeen(), gained = Math.max(0, x.total - before.total);
     seen.total = x.total; persist('profile');
-    setTimeout(function(){ xpSystemShow({title:(kind==='month' ? monthName(key) : 'The week')+' — checked out.', sub:lines.length > 1 ? (lines.length-1)+' thing'+(lines.length===2?'':'s')+' hit.' : 'On to the next one.', lines:lines, gained:gained, level:x.level, levelUp:false, ready:x.canLevel,
+    setTimeout(function(){ xpSystemShow({title:(kind==='month' ? monthName(key) : 'The week')+' · checked out.', sub:lines.length > 1 ? (lines.length-1)+' thing'+(lines.length===2?'':'s')+' hit.' : 'On to the next one.', lines:lines, gained:gained, level:x.level, levelUp:false, ready:x.canLevel,
       fromPct:(before.total - x.levelLo)/(x.levelHi - x.levelLo), toPct:x.levelPct}); }, 350);
   } else playPositive();
   if(typeof notifBadge==='function') notifBadge();
@@ -221,7 +221,7 @@ ACTIONS.intentReset = function(el, e, id){
 // tick a weekly / monthly goal off (or back on) from anywhere
 ACTIONS.tierGoalToggle = function(el, e, id){
   const g = arr(state.goals.items).find(function(x){ return x.id===id; }); if(!g) return;
-  if(checkedOut(g.tier, g.pk)){ showToast('That '+(g.tier==='month' ? 'month' : 'week')+' is checked out — it’s on the record.', {icon:'&#128274;'}); return; }
+  if(checkedOut(g.tier, g.pk)){ showToast('That '+(g.tier==='month' ? 'month' : 'week')+' is checked out. It’s on the record.', {icon:'&#128274;'}); return; }
   const before = typeof xpSummary==='function' ? (xpLast = null, xpSummary().total) : 0;
   g.done = !g.done; g.missed = false; g.doneAt = g.done ? todayStr() : null;
   persist('goals');
@@ -260,7 +260,7 @@ function tierGoalRowHtml(g){
   const locked = checkedOut(g.tier, g.pk);
   const delArmed = armed.has('tgdel:'+g.id);
   return '<div class="tg-row'+(g.done ? ' is-done' : '')+(g.missed ? ' is-missed' : '')+'">'+
-    '<button class="tg-hit" data-action="tierGoalToggle" data-id="'+g.id+'"'+(locked ? ' title="Checked out — on the record"' : '')+'><span class="tg-box">'+(g.done ? '&#10003;' : g.missed ? '&#10005;' : '')+'</span><span class="tg-l">'+escapeHtml(g.label)+'</span>'+
+    '<button class="tg-hit" data-action="tierGoalToggle" data-id="'+g.id+'"'+(locked ? ' title="Checked out: on the record"' : '')+'><span class="tg-box">'+(g.done ? '&#10003;' : g.missed ? '&#10005;' : '')+'</span><span class="tg-l">'+escapeHtml(g.label)+'</span>'+
     '<span class="tg-xp">+'+(g.tier==='month' ? CHECKIN_XP.monthGoal : CHECKIN_XP.weekGoal)+'</span></button>'+
     '<span class="tg-acts"><button class="tg-a" data-action="tierGoalRename" data-id="'+g.id+'" title="Rename">&#9998;</button><button class="tg-a'+(delArmed ? ' is-armed' : '')+'" data-action="tierGoalDelete" data-id="'+g.id+'" title="'+(delArmed ? 'Tap again to delete' : 'Delete')+'">'+(delArmed ? 'Delete?' : '&#10005;')+'</button></span></div>';
 }
@@ -309,7 +309,7 @@ function briefIntentHtml(){
   }
   const items = intentReelItems(), qh = quarterHeadHtml(), wk = tierGoals('week', weekKey()), mo = tierGoals('month', monthKey());
   const tally = (wk.length || mo.length) ? '<div class="bi-tally">'+(wk.length ? '<span><b>'+wk.filter(function(g){ return g.done; }).length+'/'+wk.length+'</b> this week</span>' : '')+(mo.length ? '<span><b>'+mo.filter(function(g){ return g.done; }).length+'/'+mo.length+'</b> '+escapeHtml(monthName(monthKey()))+'</span>' : '')+'</div>' : '';
-  if(!items.length) return {voice:'A new step — check in for '+(checkedIn('month', monthKey()) ? 'the week' : 'the month')+' when you get a minute.', html:qh+'<div class="bi-one is-empty"><p>What’s this '+(checkedIn('month', monthKey()) ? 'week' : 'month')+' about?</p><button class="bi-set" data-action="openIntent" data-id="'+(checkedIn('month', monthKey()) ? 'week' : 'month')+'">Check in &#8594;</button></div>'};
+  if(!items.length) return {voice:'A new step. Check in for '+(checkedIn('month', monthKey()) ? 'the week' : 'the month')+' when you get a minute.', html:qh+'<div class="bi-one is-empty"><p>What’s this '+(checkedIn('month', monthKey()) ? 'week' : 'month')+' about?</p><button class="bi-set" data-action="openIntent" data-id="'+(checkedIn('month', monthKey()) ? 'week' : 'month')+'">Check in &#8594;</button></div>'};
   const n = items.length, i = ((ui.biIdx==null ? dayNum() : ui.biIdx) % n + n) % n;
   return {voice:items[i].say, html:qh+
     '<div class="bi-reel'+(n > 1 ? ' is-multi' : '')+'" data-n="'+n+'">'+items.map(function(it, k){ return '<div class="bi-one bi-slide'+(k===i ? ' is-on' : '')+(it.done ? ' is-done' : '')+'"><small>'+(it.done ? '&#10003; ' : '')+escapeHtml(it.k)+'</small><p>'+escapeHtml(it.v)+'</p></div>'; }).join('')+'</div>'+

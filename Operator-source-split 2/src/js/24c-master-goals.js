@@ -45,7 +45,7 @@ function masterToGo(m){
   if(!(m.target>0)) return 'set a target';
   if(m.key==='weight'){ const d = Math.abs(m.cur-m.target); return masterPct(m)>=100 || d<0.05 ? 'reached' : fmtGoalNum(d)+' lbs to go'; }
   const left = m.target-m.cur;
-  if(left<=0) return m.key==='mrr' ? 'reached — raise the bar' : 'hit';
+  if(left<=0) return m.key==='mrr' ? 'reached: raise the bar' : 'hit';
   return m.fmt(Math.round(left*10)/10)+(m.key==='mrr'?'/mo':'')+' to go';
 }
 function ringSvg(pct, c1, c2, id, size){
@@ -76,7 +76,7 @@ function masterRingHtml(m, compact){
   const pct = masterPct(m), hit = pct>=100;
   return '<div class="mg-card'+(hit?' is-hit':'')+(compact?' is-compact':'')+'"'+(compact?' data-action="nav" data-view="personal" data-tab="goals" title="Goals"':'')+' style="--mg1:'+m.color+';--mg2:'+m.color2+';">'+
     '<div class="mg-ring">'+ringSvg(pct, m.color, m.color2, m.key+(compact?'c':''), compact ? 84 : 112)+
-      '<div class="mg-ring-in"><span class="mg-ring-v">'+(m.cur==null ? '—' : m.fmt(m.cur))+'</span>'+(compact ? '' : '<span class="mg-ring-pct">'+(hit ? '&#10003;' : Math.round(pct)+'%')+'</span>')+'</div>'+
+      '<div class="mg-ring-in"><span class="mg-ring-v">'+(m.cur==null ? '–' : m.fmt(m.cur))+'</span>'+(compact ? '' : '<span class="mg-ring-pct">'+(hit ? '&#10003;' : Math.round(pct)+'%')+'</span>')+'</div>'+
     '</div>'+
     '<div class="mg-card-k">'+m.icon+' '+m.label+'</div>'+
     (compact ? '<div class="mg-card-sub">'+escapeHtml(masterToGo(m))+'</div>'

@@ -14,7 +14,7 @@ function clientColor(c){
   return 'hsl('+(Math.abs(h)%360)+',42%,40%)';
 }
 // Health is color only (the card edge and a ring round the initials); hover for the why.
-function clientHealthTitle(c){ const hs = clientHealthStatus(c); return clientHealthLabel(hs)+' — '+clientHealthReason(c, hs); }
+function clientHealthTitle(c){ const hs = clientHealthStatus(c); return clientHealthLabel(hs)+' · '+clientHealthReason(c, hs); }
 function clientAvatarHtml(c, small, withHealth){
   const hs = withHealth ? clientHealthStatus(c) : null;
   return '<span class="cc2-avatar'+(small?' cc2-avatar-sm':'')+(hs?' ring-'+hs.level:'')+'" style="background:'+clientColor(c)+'"'+(hs?' title="'+escapeHtml(clientHealthTitle(c))+'"':'')+'>'+escapeHtml(clientInitials(c))+'</span>';
@@ -44,7 +44,7 @@ function clientDelivRowsHtml(c, compact){
   }).join('')+'</div>';
 }
 function clientNextTouchHtml(c){
-  if(!crmTracked('client', c)) return '<span class="kpi-sub">—</span>';
+  if(!crmTracked('client', c)) return '<span class="kpi-sub"> · </span>';
   const n = crmOverdueDays('client', c);
   return '<span class="crm-due '+overdueLevel(n)+'">'+dueLabel(n, 'client', c)+'</span>';
 }
@@ -100,7 +100,7 @@ function renderClientsHome(){
         '</div>' : '');
     })()+
     '<div class="subtab-panel" data-key="clients-home">'+
-      (active.length ? '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>' : '<div class="empty">'+(q?'No clients match.':'No active clients yet — add one, or win a lead.')+'</div>')+
+      (active.length ? '<div class="cc2-grid">'+active.map(clientCardV2).join('')+'</div>' : '<div class="empty">'+(q?'No clients match.':'No active clients yet. Add one, or win a lead.')+'</div>')+
       (rest.length ? '<div class="cc2-past"><button class="cc2-past-toggle" data-action="toggleClientsPast">'+(ui.clientsPastOpen?'&#9662;':'&#9656;')+' Paused &amp; past clients ('+rest.length+')</button>'+
         (ui.clientsPastOpen ? '<div class="cc2-grid cc2-grid-sm">'+rest.map(clientCardV2).join('')+'</div>' : '')+'</div>' : '')+
     '</div>';
@@ -143,7 +143,7 @@ function clientNextStepHtml(c){
   const open = st.checklist.filter(function(it){ return !lcItemDone(c, st, it); });
   return '<div class="hub-step"><span class="tag" style="background:'+st.color+'22;color:'+st.color+';">'+escapeHtml(st.label)+'</span>'+
     (open.length ? lcItemHtml(c, st, open[0], true)+(open.length>1?'<span class="kpi-sub" style="cursor:pointer;" data-action="openContact" data-kind="client" data-id="'+c.id+'">+'+(open.length-1)+'</span>':'')
-                 : '<span class="kpi-sub">step done &mdash; move them on</span>')+
+                 : '<span class="kpi-sub">step done, move them on</span>')+
   '</div>';
 }
 function renderClientHubPanel(){

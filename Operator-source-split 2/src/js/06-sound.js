@@ -272,7 +272,7 @@ function soundSettingsHtml(){
 function saveSound(){ persist('profile'); if(typeof renderView==='function') renderView(); }
 ACTIONS.sndPack = function(el, e, id){ const p = state.profile; p.soundEnabled = id!=='off'; if(id!=='off') p.soundPack = id; saveSound(); if(id!=='off') playPositive(); };
 ACTIONS.sndLockSound = function(el, e, id){ state.profile.lockSound = id; saveSound(); };
-ACTIONS.sndPreviewLock = function(){ playLockIn(); const k = lockStartSound(); if(k==='chill') setTimeout(function(){ sfx(SFX.chill); }, 700); else if(k==='music'){ const m = state.profile.lockMusic; if(m && m.q) musicApp('play', m).then(function(ok){ if(!ok) showToast('Music plays through the Operator app — open Operator from its icon.', {icon:'&#9888;'}); }); } };
+ACTIONS.sndPreviewLock = function(){ playLockIn(); const k = lockStartSound(); if(k==='chill') setTimeout(function(){ sfx(SFX.chill); }, 700); else if(k==='music'){ const m = state.profile.lockMusic; if(m && m.q) musicApp('play', m).then(function(ok){ if(!ok) showToast('Music plays through the Operator app. Open Operator from its icon.', {icon:'&#9888;'}); }); } };
 ACTIONS.sndLockKind = function(el, e, id){ ui.sndLockKind = id; const m = state.profile.lockMusic; if(m){ m.k = id; saveSound(); } else renderView(); };
 ACTIONS.sndLockSet = function(){
   const i = document.getElementById('sndLockQuery'), v = i ? i.value.trim() : ''; if(!v){ if(i) i.focus(); return; }

@@ -47,7 +47,7 @@ function updateActivityPill(){
   const ring = frac==null ? '' : '<svg class="ap-ring" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" class="ap-ring-bg"/><circle cx="10" cy="10" r="8" class="ap-ring-fg" stroke-dasharray="50.27" stroke-dashoffset="'+(50.27*(1-frac)).toFixed(1)+'"/></svg>';
   const html = ring+(app ? '<span class="ap-dot"></span><span class="ap-name">'+escapeHtml(app)+'</span>'+(siteUnknown ? '<span class="ap-warn">?</span>' : '') : '')+(lock ? '<span class="ap-lock'+(app?'':' ap-lock-only')+(notCounting?' is-off':'')+'">'+lock+'</span>' : '');
   if(el._html!==html){ el.innerHTML = html; el._html = html; }
-  el.title = !app ? '' : siteUnknown ? 'Operator can\'t see which website is open in '+app+' — click for how to allow it' : app+' — '+CAT_META[cat].label+(notCounting ? ' · this time isn\'t counted as deep work' : '')+' (click to change)';
+  el.title = !app ? '' : siteUnknown ? 'Operator can\'t see which website is open in '+app+': click for how to allow it' : app+' · '+CAT_META[cat].label+(notCounting ? ' · this time isn\'t counted as deep work' : '')+' (click to change)';
 }
 setInterval(function(){ try{ if(state && state.settings) updateActivityPill(); }catch(e){} }, 5000);
 afterRenderHooks.push(function(){ updateActivityPill(); document.body.classList.toggle('sb-collapsed', !!state.profile.sidebarCollapsed); });
@@ -71,7 +71,7 @@ function renderPillMenu(){
     '</div>' : '';
   const browser = app && BROWSER_APPS.indexOf(activityKey(app))>=0;
   m.innerHTML = status+(browser ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div><div class="ap-menu-hint" style="margin-top:0;">Can\'t see which website is open'+
-      tip('So it can\'t tell YouTube from work.'+(activityKey(app)==='firefox' ? ' Firefox doesn\'t allow this — Safari, Chrome, Arc, Brave and Edge do.' : ' On your Mac: System Settings → Privacy & Security → Automation → Operator → turn on '+app+'. Then reopen Operator.'))+'</div>'
+      tip('So it can\'t tell YouTube from work.'+(activityKey(app)==='firefox' ? ' Firefox doesn\'t allow this. Safari, Chrome, Arc, Brave and Edge do.' : ' On your Mac: System Settings → Privacy & Security → Automation → Operator → turn on '+app+'. Then reopen Operator.'))+'</div>'
     : app ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div>'+
       '<div class="ap-menu-k">Is this work?'+tip('Only work apps & sites start an automatic lock-in. Time on “not work” ones while you\'re locked in doesn\'t count as deep work.')+'</div>'+
       '<div class="ap-seg">'+['work','other'].map(function(c){ return '<button class="ap-seg-btn'+(cat===c?' is-on':'')+'" data-action="pillSetCat" data-id="'+c+'">'+CAT_META[c].label+'</button>'; }).join('')+'</div>'+
@@ -107,7 +107,7 @@ function workAppsSettingsHtml(){
       const c = activityCategory(x.name);
       return '<div class="wa-row" data-key="wa-'+escapeHtml(x.name)+'"><span class="wa-dot" style="background:'+CAT_META[c].color+'"></span><span class="wa-name">'+escapeHtml(x.name)+'</span><span class="kpi-sub">'+(x.minutes?fmtDurationLabel(x.minutes)+' / 2 wks':'')+'</span>'+
         '<span class="ap-seg">'+['work','other'].map(function(k){ return '<button class="ap-seg-btn'+(c===k?' is-on':'')+'" data-action="setWorkApp" data-name="'+escapeHtml(x.name)+'" data-id="'+k+'">'+CAT_META[k].label+'</button>'; }).join('')+'</span></div>';
-    }).join('') || '<div class="empty">Nothing tracked yet — apps and sites show up here as you use them.</div>')+'</div>'+
+    }).join('') || '<div class="empty">Nothing tracked yet. Apps and sites show up here as you use them.</div>')+'</div>'+
     '<div class="row" style="gap:8px;margin-top:10px;"><input class="input" id="newWorkApp" placeholder="Add an app or site (e.g. Final Cut Pro, figma.com)" style="flex:1;"><button class="btn btn-sm" data-action="addWorkApp">Add as work</button></div>'+
   '</div>';
 }
@@ -157,7 +157,7 @@ function renderRecap(){
       stat(fmtHours(deep), 'deep work &middot; '+Math.round(deep/target*100)+'% of goal', deep>=target?'is-good':'')+
       stat(sessions.length, 'session'+(sessions.length===1?'':'s')+(longest?' &middot; longest '+fmtDurationLabel(longest):''))+
       stat(tasksDone.length, 'task'+(tasksDone.length===1?'':'s')+' done')+
-      stat(first ? fmt12Hour(nowHM(new Date(first.startedAt))) : '—', 'first lock-in')+
+      stat(first ? fmt12Hour(nowHM(new Date(first.startedAt))) : '–', 'first lock-in')+
     '</div>'+
     recapTimelineHtml(date, sessions)+
     ((workMin || otherMin) ? '<div class="rc-split"><div class="rc-split-bar"><span style="width:'+(workMin/Math.max(1,workMin+otherMin)*100)+'%"></span></div>'+
@@ -173,7 +173,7 @@ function renderRecap(){
         '<span style="flex:1"></span>'+
         (s.auto && !s.reviewed ? '<button class="mini-move mini-move-today" data-action="recapApprove" data-id="'+s.id+'">&#10003; Keep</button>' : (s.auto ? '<span class="kpi-sub">kept</span>' : ''))+
         '<button class="mini-move" data-action="recapEdit" data-id="'+s.id+'">Edit</button>'+
-        '<button class="mini-move mini-move-danger" data-action="recapDiscard" data-id="'+s.id+'" title="Wasn\'t real work — remove it">&#10005;</button>'+
+        '<button class="mini-move mini-move-danger" data-action="recapDiscard" data-id="'+s.id+'" title="Wasn\'t real work: remove it">&#10005;</button>'+
       '</div>';
     }).join('')+'</div>' : '<div class="kpi-sub">No locked-in sessions this day.</div>')+
     '<div class="row" style="justify-content:space-between;margin-top:18px;gap:8px;flex-wrap:wrap;">'+
@@ -209,7 +209,7 @@ function maybeShowRecap(){
   const rt = (state.settings.appTracking && state.settings.appTracking.recapTime) || '21:30';
   if(!seen[yest] && !recapNudged[yest] && recapNeeded(yest) && new Date().getHours()>=5){
     recapNudged[yest] = true;
-    showToast('Yesterday has sessions that started on their own — want to check them?', {icon:'&#128202;', actionLabel:'Open recap', actionAction:'openRecapYesterday', duration:15000});
+    showToast('Yesterday has sessions that started on their own. Want to check them?', {icon:'&#128202;', actionLabel:'Open recap', actionAction:'openRecapYesterday', duration:15000});
     return;
   }
   if(!seen[today] && !recapNudged[today] && nowHM()>=rt && sessionsOn(today).length){
@@ -246,7 +246,7 @@ function checkDistraction(){
   const from = Math.max(last.start, s.startedAt);
   if(last.end-from < 2*60000 || distractionNudged[last.start]) return;
   distractionNudged[last.start] = true;
-  showToast('You\'re on '+last.app+' — this time won\'t count as deep work.', {icon:'&#128064;', duration:8000});
+  showToast('You\'re on '+last.app+': this time won\'t count as deep work.', {icon:'&#128064;', duration:8000});
 }
 // the status card's buttons (Break, Lock out, Back to it…) close it once they've run
 document.addEventListener('click', function(e){

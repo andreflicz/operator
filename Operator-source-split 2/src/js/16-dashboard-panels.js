@@ -114,7 +114,7 @@ function renderTodayTasksPanel(){
           '<div class="task-title-row">'+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span></div>'+
           '<button class="mini-move mini-move-today" data-action="pullSpecificFromBacklog" data-id="'+t.id+'" style="margin-left:auto;">+ Today</button>'+
         '</div>';
-      }).join('')+'</div>' : '<div class="empty">Backlog is empty — switch to New Task.</div>'
+      }).join('')+'</div>' : '<div class="empty">Backlog is empty. Switch to New Task.</div>'
     ))+
   '</div>';
 
@@ -218,7 +218,7 @@ function renderJournalPanel(){
       (todaysJournalCount ? '<span class="qj2-count">'+todaysJournalCount+' today</span>' : '')+
       '<button class="qj2-open" data-action="nav" data-view="personal" data-tab="journal">Open journal &rarr;</button></div>'+
     '<input class="input je-title-in qj2-title" id="quickJournalTextTitle" placeholder="Title (optional)">'+
-    '<textarea class="input qj2-text" id="quickJournalText" placeholder="Anything on your mind — a win, a worry, an idea…">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
+    '<textarea class="input qj2-text" id="quickJournalText" placeholder="Anything on your mind: a win, a worry, an idea…">'+escapeHtml(ui.journalDraftText||'')+'</textarea>'+
     renderJournalPhotoThumbsRow()+
     '<div class="journal-compose-actions qj2-actions">'+
       '<div class="row" style="gap:6px;">'+renderJournalMoodChipsInline()+'<button class="btn btn-ghost btn-sm" data-action="triggerJournalPhotoInput" title="Add photo">&#128247;</button></div>'+
@@ -233,17 +233,17 @@ function deepWorkChipHtml(idAttr){
   const target = state.standards.deepWorkTargetMinutes || 180;
   const mins = deepWorkMinutesTodayLive();
   const pct = mins/target;
-  return '<span class="chip chip-auto js-deepwork-chip" id="'+idAttr+'" '+(pct>=1?'style="background:var(--good);border-color:var(--good);color:#062230;"':'style="border-color:var(--good);color:var(--good);"')+' title="Auto-tracked from Focus — log time there to change it">'+fmtHours(mins)+' / '+fmtHours(target)+' deep work ('+fmtDurationLabel(mins)+')</span>';
+  return '<span class="chip chip-auto js-deepwork-chip" id="'+idAttr+'" '+(pct>=1?'style="background:var(--good);border-color:var(--good);color:#062230;"':'style="border-color:var(--good);color:var(--good);"')+' title="Auto-tracked from Focus. Log time there to change it">'+fmtHours(mins)+' / '+fmtHours(target)+' deep work ('+fmtDurationLabel(mins)+')</span>';
 }
 function trainedChipHtml(){
   const done = trainedDoneFor(todayStr());
-  return '<span class="chip chip-auto" '+(done?'style="background:var(--good);border-color:var(--good);color:#062230;"':'style="border-color:var(--good);color:var(--good);"')+' title="Auto-tracked — log a workout on the Fitness page to satisfy this" data-action="nav" data-view="personal" data-tab="fitness">&#127939; '+(done?'Trained today':'Trained')+'</span>';
+  return '<span class="chip chip-auto" '+(done?'style="background:var(--good);border-color:var(--good);color:#062230;"':'style="border-color:var(--good);color:var(--good);"')+' title="Auto-tracked: log a workout on the Fitness page to satisfy this" data-action="nav" data-view="personal" data-tab="fitness">&#127939; '+(done?'Trained today':'Trained')+'</span>';
 }
 function ongoingStandardTasksHtml(){
   const tasks = arr(state.tasks.items).filter(function(t){ return t.ongoing && t.includeInStandard && t.status!=='done'; });
   return tasks.map(function(t){
     const done = isOngoingDoneToday(t);
-    return '<span class="chip '+(done?'active':'')+'" data-action="'+(done?'undoTask':'completeTask')+'" data-id="'+t.id+'" title="Ongoing standard task — knocks it out for today only">'+escapeHtml(t.title)+'</span>';
+    return '<span class="chip '+(done?'active':'')+'" data-action="'+(done?'undoTask':'completeTask')+'" data-id="'+t.id+'" title="Ongoing standard task. Knocks it out for today only">'+escapeHtml(t.title)+'</span>';
   }).join('');
 }
 function renderStandardsWidget(){
@@ -319,7 +319,7 @@ function clientTouchControlHtml(c){
   const touches = manualTouchesThisWeek(c);
   return '<div class="row" style="align-items:center;gap:4px;">'+
     (touches>0 ? '<button class="icon-btn-sm" data-action="undoClientTouch" data-id="'+c.id+'" title="Undo last touch">&#8630;</button>' : '')+
-    '<button class="client-touch-btn" data-action="logClientTouch" data-id="'+c.id+'" title="'+touches+' touch'+(touches===1?'':'es')+' logged this week — tap to log one">&#128075;<span>'+touches+'</span></button>'+
+    '<button class="client-touch-btn" data-action="logClientTouch" data-id="'+c.id+'" title="'+touches+' touch'+(touches===1?'':'es')+' logged this week. Tap to log one">&#128075;<span>'+touches+'</span></button>'+
   '</div>';
 }
 function renderClientHealthCard(c){
@@ -338,7 +338,7 @@ function renderClientHealthCard(c){
         '<span class="kpi-sub" style="color:var(--text);">'+escapeHtml(d.title)+'</span>'+
         '<span style="font-weight:700;color:'+paceColor+';">'+weekCount+'/'+weekTarget+'<span class="kpi-sub" style="font-weight:400;"> this week &middot; '+delivPaceWord(d)+'</span></span>'+
       '</div>';
-    }).join('')+'</div>' : '<div class="kpi-sub" style="margin-top:2px;">No weekly deliverables — assign a package on their card.</div>')+
+    }).join('')+'</div>' : '<div class="kpi-sub" style="margin-top:2px;">No weekly deliverables. Assign a package on their card.</div>')+
     '<div class="row client-touch-row" style="justify-content:flex-end;align-items:center;">'+
       clientTouchControlHtml(c)+
     '</div>'+

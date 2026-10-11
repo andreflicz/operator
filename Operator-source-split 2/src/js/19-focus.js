@@ -39,7 +39,7 @@ function renderFocus(){
   const locked = !!state.focus.activeSession;
   if(locked && typeof lockedMinimal==='function' && lockedMinimal()) return renderLockedMinimal();
   if(!locked && typeof focusMinimalOn==='function' && focusMinimalOn()) return renderFocusMinimal();
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus'+tip('Manage the work itself — what you\'re on now, what\'s next, the backlog and video ideas. Analytics shows where the time went.')+'</div></div>'+(typeof lockedViewBtnHtml==='function' ? '<div class="lv-corner is-focus">'+(locked ? lockedViewBtnHtml() : focusMinimalBtnHtml())+'</div>' : '')+'</div>'+
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Focus'+tip('Manage the work itself: what you\'re on now, what\'s next, the backlog and video ideas. Analytics shows where the time went.')+'</div></div>'+(typeof lockedViewBtnHtml==='function' ? '<div class="lv-corner is-focus">'+(locked ? lockedViewBtnHtml() : focusMinimalBtnHtml())+'</div>' : '')+'</div>'+
   '<div class="tabs tabs-with-tools">'+
     '<div class="tab '+(tab==='tasks'?'active':'')+'" data-action="focusMainTab" data-tab="tasks">Tasks</div>'+
     '<div class="tab '+(tab==='analytics'?'active':'')+'" data-action="focusMainTab" data-tab="analytics">Analytics</div>'+
@@ -71,7 +71,7 @@ function renderFocusQuickLinks(){
         '<a class="quick-link-item" draggable="false" data-action="aiButtonPress" href="'+escapeHtml(lastToolUrl)+'" target="_blank" rel="noopener" title="Click to open '+escapeHtml(lastTool.label)+'. Hold to switch AI.">'+
           '<span class="quick-link-circle">'+quickLinkIconInnerHtml(lastTool.id, lastTool.emoji, lastTool.bg)+'</span>'+
           '<span class="quick-link-label">'+escapeHtml(lastTool.label)+'</span>'+
-          (AI_TOOLS.length>1 ? '<span class="quick-link-multi-badge" title="'+AI_TOOLS.length+' AI tools — hold to switch">'+AI_TOOLS.length+'</span>' : '')+
+          (AI_TOOLS.length>1 ? '<span class="quick-link-multi-badge" title="'+AI_TOOLS.length+' AI tools: hold to switch">'+AI_TOOLS.length+'</span>' : '')+
         '</a>'+
       '</div>'+
       '</div>'+
@@ -125,7 +125,7 @@ function renderActiveFocusHero(big){
     '</div>'+
     '<div class="card knock-out-card" style="flex:'+(big?'1.8':'1.4')+';min-width:260px;">'+
       '<div class="section-title" style="margin-bottom:8px;">Knock These Out</div>'+
-      '<div class="task-list knock-out-list">'+(visibleTasks.map(function(t, i){ return focusKnockOutRow(t, i+1); }).join('') || '<div class="empty">Nothing queued for today — add one from Tasks.</div>')+'</div>'+
+      '<div class="task-list knock-out-list">'+(visibleTasks.map(function(t, i){ return focusKnockOutRow(t, i+1); }).join('') || '<div class="empty">Nothing queued for today. Add one from Tasks.</div>')+'</div>'+
       (overflowCount>0 ? '<div class="row" style="justify-content:center;margin-top:8px;"><button class="btn btn-ghost btn-sm" data-action="goToFocusToday">See all '+todayTasksForSession.length+' tasks</button></div>' : '')+
     '</div>';
 }
@@ -149,7 +149,7 @@ function ongoingFrequencyLabel(freq){
 function renderOngoingTasksPanel(){
   const ongoing = state.tasks.items.filter(function(t){ return t.ongoing && t.status!=='done'; });
   if(!ongoing.length) return '';
-  return '<div class="section"><div class="section-title">Ongoing'+tip('Ongoing tasks stay live until they\'re actually done — check one off for today and it comes back tomorrow.')+'</div>'+
+  return '<div class="section"><div class="section-title">Ongoing'+tip('Ongoing tasks stay live until they\'re actually done. Check one off for today and it comes back tomorrow.')+'</div>'+
     (carouselOn() ? carouselWrap(ongoing.map(function(t){ return taskCard(t); }).join(''), 'ongoing', {w:236}) : '<div class="task-card-grid">'+ongoing.map(function(t){ return taskCard(t); }).join('')+'</div>')+
   '</div>';
 }
@@ -277,7 +277,7 @@ function renderSessionHistory(){
         '<div class="task-title">'+fmtDurationLabel(s.minutes)+(sessionType(s)!=='deep'?' &middot; '+sessionType(s):'')+(s.manual?' &middot; manual':'')+'</div>'+
         (titles.length ? '<div class="task-notes">Finished: '+titles.map(escapeHtml).join(', ')+'</div>' : '')+
         '</div><span class="kpi-sub">Edit</span></div>';
-    }).join('') || '<div class="empty">No sessions logged yet — start one above.</div>')+
+    }).join('') || '<div class="empty">No sessions logged yet. Start one above.</div>')+
   '</div></div>';
 }
 function stasisMinutesForDate(dateStr){
@@ -333,7 +333,7 @@ function renderFocusAnalytics(){
     '<div class="hero-card" style="text-align:center;"><div class="hero-num" style="color:var(--text-faint);">'+fmtDurationLabel(stasisAllTime)+'</div><div class="hero-label">All-Time Stasis</div></div>'+
   '</div></div>'+
   '<div class="section" style="max-width:300px;margin:0 auto;"><div class="stat-chip" style="text-align:center;"><div class="stat-chip-label">Deep Work, Last 7 Days</div><div class="stat-chip-value">'+fmtDurationLabel(last7Minutes)+'</div></div></div>'+
-  '<div class="section"><div class="section-title">Today\'s Breakdown'+tip('For reference — the totals above are what matter.')+'</div><div class="grid grid-5">'+
+  '<div class="section"><div class="section-title">Today\'s Breakdown'+tip('For reference: the totals above are what matter.')+'</div><div class="grid grid-5">'+
     '<div class="card" style="text-align:center;"><div class="kpi-label">Deep Work</div><div class="kpi-value" style="color:var(--accent);">'+fmtDurationLabel(todayMinutes)+'</div></div>'+
     '<div class="card" style="text-align:center;"><div class="kpi-label">Break Mode</div><div class="kpi-value" style="color:var(--info);">'+fmtDurationLabel(breakToday)+'</div></div>'+
     '<div class="card" style="text-align:center;"><div class="kpi-label">Shooting Mode</div><div class="kpi-value" style="color:var(--shoot);">'+fmtDurationLabel(shootToday)+'</div></div>'+
@@ -346,7 +346,7 @@ function renderFocusAnalytics(){
     '<div class="card"><div class="kpi-label">Longest Session</div><div class="kpi-value">'+fmtDurationLabel(longestSession)+'</div></div>'+
     '<div class="card"><div class="kpi-label">Days With A Session</div><div class="kpi-value">'+daysWithSession+'</div></div>'+
   '</div>'+
-  '<div class="card section"><div class="kpi-label">Best Time Block'+tip('Based on all your logged deep work.')+'</div><div class="kpi-value">'+(bestBucket?bestBucket.label:'—')+'</div></div>'+
+  '<div class="card section"><div class="kpi-label">Best Time Block'+tip('Based on all your logged deep work.')+'</div><div class="kpi-value">'+(bestBucket?bestBucket.label:'–')+'</div></div>'+
   '<div class="section"><div class="section-title">When You Work</div><div class="card">'+svgBarChart(buckets.map(function(b){return b.minutes;}), buckets.map(function(b){return b.label;}))+'</div></div>'+
   '<div class="section"><div class="section-title">Deep Work, Last 30 Days</div><div class="card">'+svgBarChart(minutesByDay, last30.map(function(d){return fmtDateShort(d).slice(0,3);}), {max:state.standards.deepWorkTargetMinutes})+'</div></div>'+
   renderMostUsedAppsSection()+
@@ -387,7 +387,7 @@ function renderTimeByTaskSection(){
         '<div class="task-title-row">'+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-personal">&#128204; Ongoing</span>':'')+'</div>'+
         '<span class="kpi-value" style="font-size:15px;">'+fmtDurationLabel(t.trackedMinutes)+'</span>'+
       '</div>';
-    }).join('') || '<div class="empty">No time tracked on individual tasks yet — set a task as Current from the Tasks page, Focus tab, or Today dashboard to start timing it.</div>')+
+    }).join('') || '<div class="empty">No time tracked on individual tasks yet. Set a task as Current from the Tasks page, Focus tab, or Today dashboard to start timing it.</div>')+
   '</div></div>';
 }
 function timeBlockLabel(m){
@@ -463,9 +463,9 @@ function renderAlarmEditModal(){
       '<div class="field"><label>Time</label><input class="input" type="time" id="editAlarmTime-'+a.id+'" value="'+a.time+'"></div>'+
       '<div class="field"><label>Label</label><input class="input" id="editAlarmLabel-'+a.id+'" value="'+escapeHtml(a.label||'')+'"></div>'+
     '</div>'+
-    '<div class="field" style="margin-top:10px;"><label>Note to show when it goes off (optional)</label><textarea class="input" id="editAlarmNote-'+a.id+'" style="width:100%;min-height:60px;" placeholder="Written the night before — what matters today.">'+escapeHtml(a.wakeNote||'')+'</textarea></div>'+
+    '<div class="field" style="margin-top:10px;"><label>Note to show when it goes off (optional)</label><textarea class="input" id="editAlarmNote-'+a.id+'" style="width:100%;min-height:60px;" placeholder="Written the night before: what matters today.">'+escapeHtml(a.wakeNote||'')+'</textarea></div>'+
     '<div class="field" style="margin-top:10px;"><label>Song or YouTube link (optional)</label><input class="input" id="editAlarmMedia-'+a.id+'" value="'+escapeHtml(a.mediaUrl||'')+'" placeholder="https://…"></div>'+
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editAlarmWake-'+a.id+'" '+(a.wake?'checked':'')+' style="margin-right:6px;">Wake-up alarm — also show last night\'s plan</label>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editAlarmWake-'+a.id+'" '+(a.wake?'checked':'')+' style="margin-right:6px;">Wake-up alarm: also show last night\'s plan</label>'+
     '<div class="row" style="margin-top:20px;justify-content:space-between;">'+
       deleteBtn('alarm', a.id)+
       '<div class="row">'+
@@ -603,7 +603,7 @@ function renderStopFocusModal(){
     (upcomingDeadlines.length ? '<div class="kind-label">Upcoming Deadlines</div><div class="task-list">'+upcomingDeadlines.map(function(t){ return '<div class="task-item-v2"><span class="tag" style="background:var(--danger-dim);color:var(--danger-text);">'+fmtDateShort(t.deadline)+'</span><div class="task-title" style="flex:1;">'+escapeHtml(t.title)+'</div></div>'; }).join('')+'</div>' : '')+
     '<div class="kpi-sub" style="margin-top:10px;">'+backlogCount+' more item'+(backlogCount===1?'':'s')+' waiting in your backlog.</div>'+
     '<div class="section-title" style="margin-top:18px;margin-bottom:8px;">Finished This Session</div>'+
-    (completed.length ? '<div class="task-list">'+completed.map(function(t){ return '<div class="task-item-v2" style="border-color:var(--good);"><div class="task-title" style="color:var(--good);">&#10003; '+escapeHtml(t.title)+'</div></div>'; }).join('')+'</div>' : '<div class="empty">Nothing marked complete yet — still time to knock one out before you stop.</div>')+
+    (completed.length ? '<div class="task-list">'+completed.map(function(t){ return '<div class="task-item-v2" style="border-color:var(--good);"><div class="task-title" style="color:var(--good);">&#10003; '+escapeHtml(t.title)+'</div></div>'; }).join('')+'</div>' : '<div class="empty">Nothing marked complete yet. Still time to knock one out before you stop.</div>')+
     '<div class="row" style="margin-top:22px;justify-content:flex-end;">'+
       '<button class="btn btn-ghost" data-action="cancelStopFocus">Keep Going</button>'+
       '<button class="btn btn-danger" data-action="requestStopConfirm">Stop &amp; Log</button>'+
@@ -694,7 +694,7 @@ const BREAK_REASONS = [['&#9749;','Coffee'],['&#128694;','Walk'],['&#127869;&#65
 function breakRhythmNote(){
   const st = typeof methodState==='function' ? methodState() : null;
   if(!st || !st.m.work || st.onBreak) return '';
-  return '<div class="brk-warn"><b>Heads up — this isn’t one of your '+escapeHtml(st.m.label)+' breaks.</b> It pauses round '+st.round+' and breaks the rhythm. Your next planned break is in '+formatElapsed(st.left)+'.</div>';
+  return '<div class="brk-warn"><b>Heads up: this isn’t one of your '+escapeHtml(st.m.label)+' breaks.</b> It pauses round '+st.round+' and breaks the rhythm. Your next planned break is in '+formatElapsed(st.left)+'.</div>';
 }
 function renderBreakNoteModal(){
   const len = ui.breakMinutes==null ? 15 : ui.breakMinutes, as = state.focus.activeSession;
@@ -706,7 +706,7 @@ function renderBreakNoteModal(){
     '<div class="brk-s">'+(as ? fmtDurationLabel(Math.floor((Date.now()-as.startedAt)/60000))+' in'+(flow ? ' &middot; you\'ve earned about '+flow+' min' : '') : '')+'</div>'+
     breakRhythmNote()+
     '<div class="brk-lens">'+[5,10,15,20,30,'open'].map(function(m){ const on = len===m; return '<button class="brk-len'+(on?' is-on':'')+'" data-action="pickBreakMinutes" data-minutes="'+m+'"><b>'+(m==='open'?'&infin;':m)+'</b><span>'+(m==='open'?'open':'min')+'</span></button>'; }).join('')+'</div>'+
-    '<div class="brk-back">'+(len==='open' ? 'No timer — end it whenever you\'re ready' : 'Back at <b>'+fmtTimeShort(Date.now()+len*60000)+'</b>')+'</div>'+
+    '<div class="brk-back">'+(len==='open' ? 'No timer: end it whenever you\'re ready' : 'Back at <b>'+fmtTimeShort(Date.now()+len*60000)+'</b>')+'</div>'+
     '<div class="brk-note"><input class="input" id="breakNoteInput" placeholder="What\'s it for? (optional)" value="'+escapeHtml(ui.breakNoteDraft||'')+'">'+
       '<div class="brk-chips">'+BREAK_REASONS.map(function(r){ return '<button class="brk-chip" data-action="breakReason" data-id="'+r[1]+'">'+r[0]+' '+r[1]+'</button>'; }).join('')+'</div></div>'+
     '<button class="brk-go" data-action="confirmStartBreakMode">Start break</button>'+

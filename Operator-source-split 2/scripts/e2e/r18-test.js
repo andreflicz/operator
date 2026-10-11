@@ -150,7 +150,10 @@ async function ctxPage(b, seed, opts){
     check('…which opens its own page (earning, levels, ranks, ratings)', await p.isVisible('#xpHowOverlay:not(.hidden)') && (await p.$$('#xpHowContent .xpg-chart')).length>=5 && /Ranks/.test(await p.textContent('#xpHowContent')));
     await E("ACTIONS.closeXpHow()");
     check('the last 30 days of XP, a bar a day', (await p.$$('.you-bars i')).length===30);
-    check('the body panel: numbers on a scale, no wall of text', await p.$('.you-body .you-note')===null && await p.isVisible('.you-body .bmi-legend'));
+    // (round 22: the body scale moved to Health)
+    await E("ui.personalTab='fitness'; renderView()"); await p.waitForTimeout(200);
+    check('the weight scale (on Health): numbers on a scale, no wall of text', await p.$('#healthScore .hsc-box .you-note')===null && await p.isVisible('#healthScore .bmi-legend'));
+    await E("ui.personalTab='you'; renderView()"); await p.waitForTimeout(200);
     await E("ui.view='settings'; ui.settingsTab='focus'; renderView()"); await p.waitForTimeout(300);
     const where = await E("!!document.getElementById('setWeightNow')") ? 'focus' : 'you';
     if(where==='you'){ await E("ui.settingsTab='you'; renderView()"); await p.waitForTimeout(300); }

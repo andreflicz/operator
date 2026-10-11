@@ -9,7 +9,7 @@ function renderOffTimeView(){
     '<div style="font-size:40px;">&#127937;</div>'+
     '<div class="hero-num" id="modeElapsed" style="color:var(--strong);">'+formatElapsed(elapsed)+'</div>'+
     '<div class="hero-label" style="color:var(--text-dim);">off the clock &middot; '+fmtHours(deepWorkMinutesTodayLive())+' of deep work today</div>'+
-    '<div style="max-width:380px;margin:16px 0 6px;font-size:14.5px;color:var(--text-dim);line-height:1.5;">'+(typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)) ? 'That’s the week. Tomorrow’s a day off — enjoy it.' : 'The work day is done. Nothing else is tracked while you’re off.')+'</div>'+
+    '<div style="max-width:380px;margin:16px 0 6px;font-size:14.5px;color:var(--text-dim);line-height:1.5;">'+(typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)) ? 'That’s the week. Tomorrow’s a day off: enjoy it.' : 'The work day is done. Nothing else is tracked while you’re off.')+'</div>'+
     '<div class="row" style="gap:8px;justify-content:center;margin-top:10px;">'+
       (isWindDownTime() ? '<button class="btn th-btn-night" data-action="openWindDown">&#127769; Wind down</button>' : '')+
       '<button class="btn" style="border-color:var(--border-strong);color:var(--text);" data-action="clockIn">&#128339; Clock back in</button>'+tomorrowNoteBtnHtml('btn')+

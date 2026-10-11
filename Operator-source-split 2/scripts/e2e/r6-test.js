@@ -53,7 +53,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.waitForTimeout(1500);   // the done-for-today animation settles
     await p.click('.task-card:not(.car-clone)[data-id="t1x"] .card-more');
     const items2 = await p.$$eval('#taskCtxMenu .ctx-item', e => e.map(x => x.textContent.trim()));
-    check('…then offers Undo', items2.some(t => /Undo — done for today/.test(t)), items2);
+    check('…then offers Undo', items2.some(t => /Undo: done for today/.test(t)), items2);
     await p.keyboard.press('Escape');
     // desktop-style selecting: drag a box across empty space
     await p.evaluate(() => { document.querySelector('.carousel').scrollIntoView({block:'center'}); const t = document.querySelector('.task-column .car-track'); t.scrollLeft = t.scrollWidth/3; });

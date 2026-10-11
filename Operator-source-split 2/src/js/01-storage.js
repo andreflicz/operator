@@ -46,7 +46,7 @@ function persistNow(key){
 function persistFailed(){
   if(Date.now()-persistWarnedAt > 15000 && typeof showToast==='function'){
     persistWarnedAt = Date.now();
-    showToast("Couldn't save — browser storage is full. Export your data from Settings.", {icon:'&#9888;', duration:6000});
+    showToast("Couldn't save: browser storage is full. Export your data from Settings.", {icon:'&#9888;', duration:6000});
   }
 }
 async function persistOld(key){
@@ -54,7 +54,7 @@ async function persistOld(key){
   // A failed write used to be silent — the change looked saved but vanished on reload.
   if(!ok && Date.now()-persistWarnedAt > 15000 && typeof showToast==='function'){
     persistWarnedAt = Date.now();
-    showToast("Couldn't save — browser storage is full. Export your data from Settings.", {icon:'&#9888;', duration:6000});
+    showToast("Couldn't save: browser storage is full. Export your data from Settings.", {icon:'&#9888;', duration:6000});
   }
   return ok;
 }

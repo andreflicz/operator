@@ -159,7 +159,7 @@ function inboxSocialHtml(s){
   if(s.loading.social && !s.social) return '<div class="gp-loading">Loading your social stats…</div>';
   if(s.socialScope) return '<div class="ib-empty" style="padding:30px;"><div style="font-size:30px;">&#128202;</div><div>GoHighLevel needs two more permissions for this: <code>socialplanner/account.readonly</code> and <code>socialplanner/stat.readonly</code>.</div><div class="kpi-sub" style="margin-top:6px;">Add them to your Private Integration, then Disconnect and Connect again in Settings &rarr; Integrations.</div></div>';
   if(!s.social) return '<div class="ib-empty" style="padding:30px;">No social numbers yet. <button class="btn btn-ghost btn-sm" data-action="socialRefresh">Load them</button></div>';
-  if(s.social.empty) return '<div class="ib-empty" style="padding:30px;"><div style="font-size:30px;">&#128247;</div>No social accounts connected in GoHighLevel\'s Social Planner yet — connect Instagram, Facebook or TikTok there and they\'ll show up here.</div>';
+  if(s.social.empty) return '<div class="ib-empty" style="padding:30px;"><div style="font-size:30px;">&#128247;</div>No social accounts connected in GoHighLevel\'s Social Planner yet. Connect Instagram, Facebook or TikTok there and they\'ll show up here.</div>';
   const st = s.social, br = st.breakdowns || {}, f = st.platformTotals && st.platformTotals.followers || {};
   const eng = br.engagement || {};
   const sum = function(o, key){ return Object.keys(o).reduce(function(a, k){ const x = o[k]||{}; return a + (Number(x[key])||0); }, 0); };
@@ -180,8 +180,8 @@ function inboxSocialHtml(s){
       '<div class="sc-hero-stats">'+
         '<div><b>'+reach.toLocaleString()+'</b><span>Reach</span></div>'+
         '<div><b>'+engTotal.toLocaleString()+'</b><span>Engagements</span></div>'+
-        '<div><b>'+(reach ? pct(engTotal/reach) : '—')+'</b><span>Engagement rate</span></div>'+
-        '<div><b>'+(posts ? Math.round(reach/posts).toLocaleString() : '—')+'</b><span>Reach per post</span></div>'+
+        '<div><b>'+(reach ? pct(engTotal/reach) : '–')+'</b><span>Engagement rate</span></div>'+
+        '<div><b>'+(posts ? Math.round(reach/posts).toLocaleString() : '–')+'</b><span>Reach per post</span></div>'+
       '</div>'+
     '</div>'+
     // each platform
@@ -197,7 +197,7 @@ function inboxSocialHtml(s){
   '</div>';
 }
 function renderInboxTab(){
-  if(!ghlCfg().connected) return '<div class="ib-empty" style="padding:40px;"><div style="font-size:34px;">&#128172;</div><div class="section-title" style="justify-content:center;">Your GoHighLevel inbox, here</div><div class="kpi-sub" style="margin:6px auto 14px;max-width:420px;">Connect GoHighLevel and your conversations, contacts and social stats live in this tab — reply without leaving Operator.</div><button class="btn btn-primary" data-action="goToIntegrations">Connect GoHighLevel</button></div>';
+  if(!ghlCfg().connected) return '<div class="ib-empty" style="padding:40px;"><div style="font-size:34px;">&#128172;</div><div class="section-title" style="justify-content:center;">Your GoHighLevel inbox, here</div><div class="kpi-sub" style="margin:6px auto 14px;max-width:420px;">Connect GoHighLevel and your conversations, contacts and social stats live in this tab. Reply without leaving Operator.</div><button class="btn btn-primary" data-action="goToIntegrations">Connect GoHighLevel</button></div>';
   const s = inboxState();
   if(s.mode==='social') return renderSocialTab();
   if(s[s.mode]==null && !s.loading[s.mode]) setTimeout(function(){ inboxLoad(s.mode); }, 0);

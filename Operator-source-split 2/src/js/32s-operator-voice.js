@@ -107,13 +107,13 @@ function opTtsEngine(){ const e = opEngine(); return e==='eleven' && OV.elevenEr
 // ElevenLabs' own reason, said plainly
 function opElevenWhy(code, msg){
   const m = String(msg||'').toLowerCase();
-  if(/no key saved/.test(m)) return 'no ElevenLabs key is saved yet — add it in Settings → Connections & data.';
+  if(/no key saved/.test(m)) return 'no ElevenLabs key is saved yet. Add it in Settings → Connections & data.';
   if(/permission/.test(m)) return 'the ElevenLabs key doesn’t have Text to Speech turned on. At elevenlabs.io → Developers → API keys, edit the key and allow Text to Speech (or make a new key).';
   if(code===402 || /paid|payment|subscription|library voice|upgrade/.test(m)) return 'that voice needs a paid ElevenLabs plan to use through the API (Voice Library voices do). Pick George, Daniel or Brian, or upgrade.';
   if(code===429 || /quota|credit|limit/.test(m)) return 'your ElevenLabs credits for this month are used up'+(msg ? ' ('+msg+')' : '')+'.';
-  if(code===404 || /voice.*not.*found|not_found/.test(m)) return 'ElevenLabs can’t find that voice ID — check it at elevenlabs.io → Voices.';
+  if(code===404 || /voice.*not.*found|not_found/.test(m)) return 'ElevenLabs can’t find that voice ID. Check it at elevenlabs.io → Voices.';
   if(code===401 || /invalid|unauthor|api.key/.test(m)) return 'ElevenLabs didn’t accept the key'+(msg ? ' ('+msg+')' : '')+'. Copy it again from elevenlabs.io → Developers → API keys.';
-  if(!code) return 'the Operator app couldn’t reach ElevenLabs — check the internet.';
+  if(!code) return 'the Operator app couldn’t reach ElevenLabs. Check the internet.';
   return 'ElevenLabs said: '+(msg || 'error '+code)+'.';
 }
 function opTtsUrl(text){
@@ -260,7 +260,7 @@ function opSportsScript(){
     const live = favFirst(list.filter(function(g){ return g.state==='in'; }));
     const next = favFirst(list.filter(function(g){ return g.state==='pre'; }).sort(function(a, b){ return a.at - b.at; }));
     const bits = [];
-    if(live.length){ const g = live[0]; bits.push(g.away.short+' and '+g.home.short+' are going right now — '+g.away.score+' to '+g.home.score+'.'); }
+    if(live.length){ const g = live[0]; bits.push(g.away.short+' and '+g.home.short+' are going right now: '+g.away.score+' to '+g.home.score+'.'); }
     done.slice(0, 2).forEach(function(g, i){
       const w = g.home.win ? g.home : g.away, l = g.home.win ? g.away : g.home;
       const margin = Math.abs(Number(w.score) - Number(l.score));
@@ -273,21 +273,21 @@ function opSportsScript(){
   });
   const hl = arr(ui.morningNews && ui.morningNews.sec && ui.morningNews.sec.sports).slice(0, 1).map(function(n){ return sayHeadline(n.title); });
   if(!out.length && !hl.length) return 'I couldn’t reach the scores just now. Give me a minute and ask again.';
-  if(!out.length) return 'No games to talk about right now. In the headlines — '+hl[0]+'.';
-  return out.join(' ')+(hl.length ? ' And one more — '+hl[0]+'.' : '');
+  if(!out.length) return 'No games to talk about right now. In the headlines: '+hl[0]+'.';
+  return out.join(' ')+(hl.length ? ' And one more: '+hl[0]+'.' : '');
 }
 // the news: a quick rundown (three stories, under half a minute), like a person telling you
 function opNewsScript(kind){
   const nw = ui.morningNews || {}, list = kind==='tech' ? arr(nw.sec && nw.sec.tech) : arr(nw.items);
   const hs = list.map(function(n){ return sayHeadline(n.title); }).filter(function(h){ return h && h.split(' ').length <= 22; }).slice(0, 3);
-  if(!hs.length) return kind==='tech' ? 'Tech’s quiet this morning — nothing worth your time yet.' : 'I couldn’t pull the news just now. I’ll try again in a bit.';
+  if(!hs.length) return kind==='tech' ? 'Tech’s quiet this morning. Nothing worth your time yet.' : 'I couldn’t pull the news just now. I’ll try again in a bit.';
   if(kind==='tech'){
     return pickOne(['Here’s what’s moving in tech.', 'Quick one from the tech world.', 'In tech this morning.'])+' '+hs[0]+'.'+
-      (hs[1] ? ' '+pickOne(['Also —', 'Meanwhile,', 'And —'])+' '+hs[1]+'.' : '')+(hs[2] ? ' And finally, '+hs[2]+'.' : '')+' '+pickOne(['That’s tech.', 'That’s the tech side.', 'That’s it from tech.']);
+      (hs[1] ? ' '+pickOne(['Also: ', 'Meanwhile,', 'And: '])+' '+hs[1]+'.' : '')+(hs[2] ? ' And finally, '+hs[2]+'.' : '')+' '+pickOne(['That’s tech.', 'That’s the tech side.', 'That’s it from tech.']);
   }
   return pickOne(['Here’s your quick rundown.', 'Alright, here’s what’s going on.', 'Quick look at the world this morning.'])+' '+hs[0]+'.'+
-    (hs[1] ? ' '+pickOne(['Also making news —', 'Meanwhile,', 'Elsewhere,'])+' '+hs[1]+'.' : '')+
-    (hs[2] ? ' And '+pickOne(['one more —', 'lastly,', 'finally,'])+' '+hs[2]+'.' : '')+' '+pickOne(['That’s the news.', 'That’s what’s out there.', 'That’s the world this morning.']);
+    (hs[1] ? ' '+pickOne(['Also making news: ', 'Meanwhile,', 'Elsewhere,'])+' '+hs[1]+'.' : '')+
+    (hs[2] ? ' And '+pickOne(['one more: ', 'lastly,', 'finally,'])+' '+hs[2]+'.' : '')+' '+pickOne(['That’s the news.', 'That’s what’s out there.', 'That’s the world this morning.']);
 }
 // business: just what you've got today — then a word to get you going
 function opBusinessScript(){
@@ -295,14 +295,14 @@ function opBusinessScript(){
   const today = todayStr(), events = state.calendar.events.filter(function(e){ return e.date===today && e.time; }).sort(function(a, c){ return (a.time||'').localeCompare(c.time||''); });
   const dow = new Date().getDay();
   const parts = [];
-  if(!plan.length) parts.push('Nothing’s lined up yet — pick your first move when you lock in.');
+  if(!plan.length) parts.push('Nothing’s lined up yet. Pick your first move when you lock in.');
   else if(plan.length===1) parts.push('Today it’s just one thing: '+plan[0].title+'.');
   else {
     const names = plan.slice(0, 3).map(function(t){ return t.title; });
     parts.push('Today you’ve got '+plan.length+' things. '+(plan.length > 3 ? 'Starting with '+listSay(names)+', plus '+(plan.length-3)+' more.' : listSay(names)+'.'));
   }
   if(events.length) parts.push(events.length===1 ? 'And '+events[0].title+' at '+fmt12Hour(events[0].time)+'.' : 'On the calendar: '+listSay(events.slice(0, 2).map(function(e){ return e.title+' at '+fmt12Hour(e.time); }))+'.');
-  if(nightNote().work) parts.push('You left yourself a note, too — it’s on the screen.');
+  if(nightNote().work) parts.push('You left yourself a note, too. It’s on the screen.');
   // (no word on yesterday's hours — it's a brief about today, not a report card)
   let end;
   if(dow===1) end = 'Let’s start the week strong.';
@@ -318,7 +318,7 @@ ACTIONS.opAsk = async function(el, e, id){
   const cap = 'opBubText';
   const tok = OV.token;
   const wait = function(p){ return Promise.race([p, new Promise(function(r){ setTimeout(r, 7000); })]); };
-  if(id==='sports' && typeof loadScores==='function' && !(ui.scores && ui.scores.got && ui.scores.ok)){ OV.cap = cap; opCaption('One moment — getting the scores…'); await wait(loadScores(true)); }
+  if(id==='sports' && typeof loadScores==='function' && !(ui.scores && ui.scores.got && ui.scores.ok)){ OV.cap = cap; opCaption('One moment: getting the scores…'); await wait(loadScores(true)); }
   if((id==='news' || id==='tech' || id==='sports') && !(ui.morningNews && ui.morningNews.items)){ OV.cap = cap; opCaption('One moment…'); await wait(loadMorningNews(true)); }
   if(id==='tech' && !arr(ui.morningNews && ui.morningNews.sec && ui.morningNews.sec.tech).length){
     // nothing came through for tech with the morning's news: ask for it on its own
@@ -366,7 +366,7 @@ function opAutoBusinessBrief(){
 }
 
 // ---- choosing the voice (in the alarm settings, under "Op's voice") ----
-const ELEVEN_VOICES = [['JBFqnCBsd6RMkjVDRZzb', 'George — British, warm (the butler)'], ['onwK4e9ZLuTAKqWW03F9', 'Daniel — British, crisp'], ['nPczCjzI2devNBz1zQrb', 'Brian — deep, American']];
+const ELEVEN_VOICES = [['JBFqnCBsd6RMkjVDRZzb', 'George: British, warm (the butler)'], ['onwK4e9ZLuTAKqWW03F9', 'Daniel: British, crisp'], ['nPczCjzI2devNBz1zQrb', 'Brian: deep, American']];
 function opLoadMacVoices(){
   if(ui.ttsVoices && ui.ttsVoices.at && Date.now() - ui.ttsVoices.at < 60000) return;
   ui.ttsVoices = {at:Date.now(), list:(ui.ttsVoices && ui.ttsVoices.list) || null};
@@ -387,18 +387,18 @@ function opVoiceSettingsHtml(){
     const best = vs.slice().sort(function(a, b){ return opVoiceScore({name:b.n, lang:b.l}) - opVoiceScore({name:a.n, lang:a.l}); }).filter(function(v){ return opVoiceScore({name:v.n, lang:v.l}) > -100; });
     body = '<select class="input" id="opMacVoice"><option value="">System voice (Spoken Content)</option>'+best.map(function(v){ return '<option value="'+escapeHtml(v.n)+'"'+(w.macVoice===v.n?' selected':'')+'>'+escapeHtml(v.n)+' &middot; '+escapeHtml(v.l.replace('_', '-'))+'</option>'; }).join('')+'</select>'+
       '<div class="op-set-help">For a voice that sounds like a person: <b>System Settings → Accessibility → Spoken Content → System voice</b> and pick a Siri voice, or <b>Manage Voices…</b> → English → download <b>Jamie (Premium)</b> or <b>Daniel (Enhanced)</b>. Then choose it here (or leave “System voice”).'+
-      (ui.ttsVoices && ui.ttsVoices.down ? '<br><span class="op-set-warn">The Operator app isn’t answering — open Operator from its icon (the newest version) to use the Mac’s voices.</span>' : '')+'</div>';
+      (ui.ttsVoices && ui.ttsVoices.down ? '<br><span class="op-set-warn">The Operator app isn’t answering. Open Operator from its icon (the newest version) to use the Mac’s voices.</span>' : '')+'</div>';
   } else if(e==='eleven'){
     const known = ELEVEN_VOICES.some(function(v){ return v[0]===w.elevenVoice; });
     body = (ui.ttsKey ? '<div class="op-set-key"><span>&#128274; Key saved on this Mac</span><button class="btn btn-ghost btn-sm" data-action="opElevenForget">Remove key</button></div>'
         : '<div class="op-set-key"><input class="input" type="password" id="opElevenKey" placeholder="ElevenLabs API key" autocomplete="off"><button class="btn btn-sm btn-primary" data-action="opElevenSave">Save key</button></div>')+
       '<select class="input" id="opElevenVoice">'+ELEVEN_VOICES.map(function(v){ return '<option value="'+v[0]+'"'+((w.elevenVoice||ELEVEN_VOICES[0][0])===v[0]?' selected':'')+'>'+v[1]+'</option>'; }).join('')+'<option value="custom"'+(w.elevenVoice && !known ? ' selected' : '')+'>Another voice (paste its ID)…</option></select>'+
       (w.elevenVoice && !known ? '<input class="input" id="opElevenCustom" value="'+escapeHtml(w.elevenVoice)+'" placeholder="Voice ID" style="margin-top:6px;">' : '')+
-      '<div class="op-set-help">The most natural voice. Get a key at elevenlabs.io (Profile → API keys). It’s saved by the Operator app on this Mac only — not in Operator’s data, exports or backups. Each line is made once and kept for two days.</div>';
+      '<div class="op-set-help">The most natural voice. Get a key at elevenlabs.io (Profile → API keys). It’s saved by the Operator app on this Mac only, not in Operator’s data, exports or backups. Each line is made once and kept for two days.</div>';
   } else {
     const vs = opBrowserVoices(), cur = opPickVoice();
     body = '<select class="input" id="opBrowserVoice">'+(vs.length ? vs.map(function(v){ return '<option value="'+escapeHtml(v.name)+'"'+(cur && cur.name===v.name?' selected':'')+'>'+escapeHtml(v.name)+'</option>'; }).join('') : '<option>No voices found</option>')+'</select>'+
-      '<div class="op-set-help">The browser’s own voices — the simplest, and the most robotic. Premium and Enhanced voices you download on the Mac show up here too.</div>';
+      '<div class="op-set-help">The browser’s own voices: the simplest, and the most robotic. Premium and Enhanced voices you download on the Mac show up here too.</div>';
   }
   return '<div class="field op-set" id="opVoiceSet">'+
     '<div class="seg-tabs" style="margin:0 0 8px;">'+seg('eleven', 'ElevenLabs')+seg('mac', 'Mac voice')+seg('browser', 'Browser')+'</div>'+body+
@@ -413,10 +413,10 @@ ACTIONS.opTest = function(){
   const name = state.profile.name || '';
   const h = new Date().getHours(), greet = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
   const w = wakeCfg(), was = w.voice; w.voice = true;
-  opSay(greet+(name ? ', '+name : '')+'. Op here. Everything’s in order — your plan is set, and the coffee won’t make itself. Ready when you are.', {cap:'opTestCap'}).then(function(ok){
+  opSay(greet+(name ? ', '+name : '')+'. Op here. Everything’s in order: your plan is set, and the coffee won’t make itself. Ready when you are.', {cap:'opTestCap'}).then(function(ok){
     w.voice = was;
-    if(opEngine()==='eleven' && OV.elevenErr) showToast((ok ? 'That was the Mac’s voice — ' : 'Couldn’t use ElevenLabs — ')+OV.elevenErr, {icon:'&#9888;', duration:14000});
-    else if(!ok) showToast('Couldn’t speak — '+(opEngine()==='browser' ? 'no voice is available.' : 'the Operator app didn’t answer.'), {icon:'&#9888;'});
+    if(opEngine()==='eleven' && OV.elevenErr) showToast((ok ? 'That was the Mac’s voice: ' : 'Couldn’t use ElevenLabs: ')+OV.elevenErr, {icon:'&#9888;', duration:14000});
+    else if(!ok) showToast('Couldn’t speak: '+(opEngine()==='browser' ? 'no voice is available.' : 'the Operator app didn’t answer.'), {icon:'&#9888;'});
     else if(OV.helperDown && opEngine()!=='browser') showToast('The Operator app didn’t answer, so that was the browser’s voice. Open Operator from its icon to use the '+(opEngine()==='eleven' ? 'ElevenLabs' : 'Mac')+' voice.', {icon:'&#9888;', duration:8000});
   });
 };
@@ -427,7 +427,7 @@ ACTIONS.opElevenSave = function(){
   // straight to the Operator app (it keeps the key in its own file); never into Operator's data
   fetchWithin(WAKE_HELPER+'tts/key?t='+hexUtf8(v), 6000).then(function(r){
     if(r && r.ok){ ui.ttsKey = true; showToast('ElevenLabs key saved on this Mac.', {icon:'&#128274;'}); opVoiceChanged(); renderView(); }
-    else opLauncherWhy().then(function(why){ showToast('Couldn’t save the key — '+why, {icon:'&#9888;', duration:10000}); });
+    else opLauncherWhy().then(function(why){ showToast('Couldn’t save the key: '+why, {icon:'&#9888;', duration:10000}); });
   });
 };
 ACTIONS.opElevenForget = function(){ fetchWithin(WAKE_HELPER+'tts/forget', 6000).then(function(){ ui.ttsKey = false; renderView(); }); };
@@ -461,7 +461,7 @@ function operatorAppCardHtml(){
 ACTIONS.opEngineSwitch = function(el, e, id){
   fetchWithin(WAKE_HELPER+'engine?on='+(id==='1' ? 1 : 0), 4000).then(function(r){ return r && r.ok ? r.json() : null; }).then(function(j){
     if(j){ ui.opEngine = j; showToast(j.on ? 'Operator opens as its own app from next time (⌘Q, then open it).' : 'Operator opens in Chrome from next time.', {icon:'&#9711;'}); renderView(); }
-    else opLauncherWhy().then(function(why){ showToast('Couldn’t change it — '+why, {icon:'&#9888;', duration:9000}); });
+    else opLauncherWhy().then(function(why){ showToast('Couldn’t change it: '+why, {icon:'&#9888;', duration:9000}); });
   });
 };
 
@@ -483,7 +483,7 @@ function opLauncherLineHtml(){
   if(!ui.opLauncher){ ui.opLauncher = {checking:true}; opLauncherInfo().then(function(i){ ui.opLauncher = i; if(document.getElementById('opVoiceSet') || document.getElementById('opAppCard')) renderView(); }); }
   const i = ui.opLauncher;
   if(i.checking) return '';
-  if(!i.up) return '<div class="op-set-warn">&#9888; The Operator launcher isn’t running — quit Operator (⌘Q) and open it from its icon. Keys and voices need it.</div>';
-  if(i.v < OP_HELPER_NEEDS) return '<div class="op-set-warn">&#9888; An older Operator launcher (v'+i.v+') is running. Quit Operator fully (⌘Q) and open the new one — then the keys will save.</div>';
+  if(!i.up) return '<div class="op-set-warn">&#9888; The Operator launcher isn’t running. Quit Operator (⌘Q) and open it from its icon. Keys and voices need it.</div>';
+  if(i.v < OP_HELPER_NEEDS) return '<div class="op-set-warn">&#9888; An older Operator launcher (v'+i.v+') is running. Quit Operator fully (⌘Q) and open the new one, then the keys will save.</div>';
   return '<div class="op-set-ok">&#10003; Operator launcher v'+i.v+' is running.</div>';
 }

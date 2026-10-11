@@ -26,16 +26,16 @@ function notifList(){
     arr(c.deliverables).forEach(function(d){
       if(d.recurring){
         if(deliverablePaceStatus(d)==='danger') add({key:'pace:'+c.id+':'+d.id+':'+thisWeekKey(), kind:'client', level:'danger', icon:'&#127916;',
-          title:name+' — '+d.title+' behind', sub:deliverableWeekCount(d)+' of '+(d.weeklyTarget||1)+' this week', act:{a:'openClientModal', id:c.id}, sort:1});
+          title:name+' · '+d.title+' behind', sub:deliverableWeekCount(d)+' of '+(d.weeklyTarget||1)+' this week', act:{a:'openClientModal', id:c.id}, sort:1});
       } else if(d.status!=='done' && d.dueDate && d.dueDate<=tomorrow){
-        add({key:'deliv:'+c.id+':'+d.id, kind:'client', level: d.dueDate<today ? 'danger' : 'warn', icon:'&#128230;', title:name+' — '+d.title,
+        add({key:'deliv:'+c.id+':'+d.id, kind:'client', level: d.dueDate<today ? 'danger' : 'warn', icon:'&#128230;', title:name+' · '+d.title,
           sub: d.dueDate<today ? 'Deliverable overdue' : d.dueDate===today ? 'Deliverable due today' : 'Deliverable due tomorrow', act:{a:'openClientModal', id:c.id}, sort:1});
       }
     });
     const care = clientCareTier(c);
     if(care.cls==='tag-danger') add({key:'care:'+c.id+':'+today, kind:'client', level:'warn', icon:'&#128075;', title:'Check in with '+name, sub:care.label, act:{a:'openClientModal', id:c.id}, sort:2});
     if(Number(c.mrr)>0 && typeof clientInvoicedThisMonth==='function' && !clientInvoicedThisMonth(c.id) && new Date().getDate() >= (c.billingDay||1))
-      add({key:'inv:'+c.id+':'+thisMonthKey(), kind:'client', level:'warn', icon:'&#128176;', title:'Invoice '+name, sub:'$'+Number(c.mrr).toLocaleString()+' retainer — billing day passed', act:{a:'openClientModal', id:c.id}, sort:2});
+      add({key:'inv:'+c.id+':'+thisMonthKey(), kind:'client', level:'warn', icon:'&#128176;', title:'Invoice '+name, sub:'$'+Number(c.mrr).toLocaleString()+' retainer: billing day passed', act:{a:'openClientModal', id:c.id}, sort:2});
   });
   // leads
   arr(state.business.pipeline).forEach(function(x){
@@ -93,7 +93,7 @@ function notifPanelHtml(list){
           '<button class="nt-main" data-action="notifOpen" data-id="'+escapeHtml(n.key)+'"><span class="nt-i">'+n.icon+'</span><span class="nt-txt"><span class="nt-t">'+escapeHtml(n.title)+'</span><span class="nt-s">'+escapeHtml(n.sub||'')+'</span></span></button>'+
           '<button class="nt-dismiss" data-action="notifDismiss" data-id="'+escapeHtml(n.key)+'" title="Hide for today">&#10005;</button></div>';
       }).join('')+'</div>';
-    }).join('') : '<div class="nt-empty"><div style="font-size:26px;">&#10024;</div>All clear — nothing needs you right now.</div>');
+    }).join('') : '<div class="nt-empty"><div style="font-size:26px;">&#10024;</div>All clear: nothing needs you right now.</div>');
 }
 function notifRender(list){ const el = document.getElementById('notifPanel'); if(el) morphInto(el, notifPanelHtml(list || notifList())); }
 ACTIONS.toggleNotifs = function(){

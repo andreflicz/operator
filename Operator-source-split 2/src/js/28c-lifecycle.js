@@ -118,7 +118,7 @@ function setClientStep(c, stepId, opts){
   c.cycleStepId = st.id; c.cycleDone = false;
   c.lifecycle.enteredAt[st.id] = Date.now();
   c.lifecycle.lastStep[cy.id] = st.id;
-  crmTimeline(c, 'stage', cy.name+': '+(from?from.label:'—')+' → '+st.label);
+  crmTimeline(c, 'stage', cy.name+': '+(from?from.label:'–')+' → '+st.label);
   if(!(opts && opts.quiet)) playTick();
 }
 function assignCycle(c, cycleId){
@@ -172,7 +172,7 @@ function renderClientLifecycle(c){
   const picker = '<select class="input input-sm lc-cycle-select" data-cycle-assign="'+c.id+'" title="Which cycle this client follows">'+
     '<option value="">No cycle</option>'+cycles().map(function(x){ return '<option value="'+x.id+'" '+(c.cycleId===x.id?'selected':'')+'>'+escapeHtml(x.name)+'</option>'; }).join('')+'</select>';
   const head = '<div class="row" style="justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;">'+
-      '<div class="row" style="gap:8px;align-items:center;"><div class="kind-label" style="margin:0;">Client cycle'+tip('The playbook this client follows — you\'ll see each step\'s calls, forms and videos as you go.')+'</div>'+picker+'</div>'+
+      '<div class="row" style="gap:8px;align-items:center;"><div class="kind-label" style="margin:0;">Client cycle'+tip('The playbook this client follows: you\'ll see each step\'s calls, forms and videos as you go.')+'</div>'+picker+'</div>'+
       '<button class="mini-move" data-action="openLifecycleEditor" data-cycle="'+(c.cycleId||'')+'">&#9881; Edit cycles</button>'+
     '</div>';
   if(!cy){
@@ -203,7 +203,7 @@ function renderClientLifecycle(c){
       '</div>'+
       (prog.total ? '<div class="progress" style="margin:8px 0 10px;"><div class="progress-bar'+(allDone?' good':'')+'" style="width:'+Math.round(prog.done/prog.total*100)+'%"></div></div>' : '')+
       (prog.total ? '<div class="lc-checklist">'+st.checklist.map(function(it){ return lcItemHtml(c, st, it, false); }).join('')+'</div>'
-        : '<div class="kpi-sub">Nothing on this step yet — <span class="mini-move mini-move-today" data-action="openLifecycleEditor" data-cycle="'+cy.id+'">add items</span>.</div>')+
+        : '<div class="kpi-sub">Nothing on this step yet, <span class="mini-move mini-move-today" data-action="openLifecycleEditor" data-cycle="'+cy.id+'">add items</span>.</div>')+
       '<div class="row" style="justify-content:space-between;margin-top:12px;gap:8px;">'+
         '<div class="row" style="gap:6px;">'+
           (prev ? '<button class="btn btn-ghost btn-sm" data-action="lcGoStep" data-id="'+c.id+'" data-step="'+prev.id+'">&larr; '+escapeHtml(prev.label)+'</button>' : '')+
@@ -236,7 +236,7 @@ document.addEventListener('change', function(e){
     playSessionComplete();
     const idx = cycleStepIndex(c), cy = clientCycle(c);
     const nx = cy && idx>=0 && idx<cy.steps.length-1 ? cy.steps[idx+1] : null;
-    showToast(crmName('client',c)+': '+prog.step.label+' done'+(nx?' — next up: '+nx.label:' — finish the cycle'), {icon:'&#9989;'});
+    showToast(crmName('client',c)+': '+prog.step.label+' done'+(nx?' · next up: '+nx.label:' · finish the cycle'), {icon:'&#9989;'});
   } else if(t.checked) playTick();
   persist('business'); renderView(); rerenderContactModal();
 });
@@ -249,7 +249,7 @@ ACTIONS.lcCopyLink = function(el){
   // Synchronous copy inside the click is the most reliable; the async clipboard API is only
   // a backup (it can wait on a permission prompt and never confirm).
   if(!fallbackCopy(u)){ try{ navigator.clipboard.writeText(u); }catch(err){} }
-  showToast('Link copied — paste it to your client', {icon:'&#128203;', duration:2200});
+  showToast('Link copied: paste it to your client', {icon:'&#128203;', duration:2200});
 };
 function fallbackCopy(text){
   const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0';
@@ -264,7 +264,7 @@ ACTIONS.lcSchedule = function(el){
   const st = cy.steps.find(function(s){ return s.id===p[1]; }); const it = st && st.checklist.find(function(x){ return x.id===p[2]; }); if(!it) return;
   ui.lcScheduleRef = ref;
   openCalEventModal();
-  const title = document.getElementById('calEventTitle'); if(title) title.value = it.text+' — '+crmName('client', c);
+  const title = document.getElementById('calEventTitle'); if(title) title.value = it.text+' · '+crmName('client', c);
   const linked = document.getElementById('calEventLinkedClient'); if(linked) linked.value = c.id;
   const call = arr(state.calendar.categories).find(function(x){ return x.id==='call'; }); const cat = document.getElementById('calEventCategory'); if(call && cat) cat.value = call.id;
   const date = document.getElementById('calEventDate'); if(date) date.focus();
@@ -286,7 +286,7 @@ ACTIONS.lcToTasks = function(el){
     const ref = lcRef(c, st, it);
     if(lcItemDone(c, st, it) || state.tasks.items.some(function(t){ return t.lifecycleRef===ref; })) return;
     const link = (c.lifecycle.links && c.lifecycle.links[ref]) || it.link;
-    state.tasks.items.push({id:uid(), title:it.text+' — '+crmName('client',c), client:c.id, clients:[c.id], priority:'med', deadline:null, notes:st.label+' step for '+crmName('client',c)+(link?'\n'+link:''), status:'backlog', createdAt:todayStr(), completedAt:null, lifecycleRef:ref});
+    state.tasks.items.push({id:uid(), title:it.text+' · '+crmName('client',c), client:c.id, clients:[c.id], priority:'med', deadline:null, notes:st.label+' step for '+crmName('client',c)+(link?'\n'+link:''), status:'backlog', createdAt:todayStr(), completedAt:null, lifecycleRef:ref});
     added++;
   });
   if(added){ playTaskAdded(); showToast(added+' item'+(added===1?'':'s')+' added to your backlog', {icon:'&#9745;'}); }
@@ -326,7 +326,7 @@ function renderClientStepsPanel(){
 function renderCycleBoard(){
   const f = crmUi('client');
   const cy = cycleById(f.cycleId) || cycles()[0];
-  if(!cy) return '<div class="empty">No cycles yet — <span class="mini-move mini-move-today" data-action="openLifecycleEditor">create one</span>.</div>';
+  if(!cy) return '<div class="empty">No cycles yet, <span class="mini-move mini-move-today" data-action="openLifecycleEditor">create one</span>.</div>';
   const list = crmFiltered('client').filter(function(c){ return c.cycleId===cy.id; });
   const cols = cy.steps.map(function(s){ return {id:s.id, label:s.label, color:s.color, items:list.filter(function(c){ return !c.cycleDone && c.cycleStepId===s.id; })}; })
     .concat([{id:'__done', label:'Done', color:'#3FBE8E', items:list.filter(function(c){ return c.cycleDone; }), closed:true}]);
@@ -378,7 +378,7 @@ function renderLifecycleEditor(){
   const cy = cycleById(ui.editingCycleId);
   const usage = {}; crmList('client').forEach(function(c){ if(c.cycleId) usage[c.cycleId] = (usage[c.cycleId]||0)+1; });
   const stepCount = {}; crmList('client').forEach(function(c){ if(c.cycleStepId && !c.cycleDone) stepCount[c.cycleStepId] = (stepCount[c.cycleStepId]||0)+1; });
-  return '<div class="section-title" style="margin-bottom:14px;">Client cycles'+tip('Build a playbook for each kind of client. Every step lists what to do — calls to book, forms and videos to send, to-dos. Save a link on an item once and it\'s ready to copy for every client.')+'</div>'+
+  return '<div class="section-title" style="margin-bottom:14px;">Client cycles'+tip('Build a playbook for each kind of client. Every step lists what to do. Calls to book, forms and videos to send, to-dos. Save a link on an item once and it\'s ready to copy for every client.')+'</div>'+
     '<div class="cy-tabs">'+all.map(function(x){ return '<button class="cy-tab'+(cy && x.id===cy.id?' active':'')+'" data-action="cyPick" data-id="'+x.id+'" style="--cy:'+x.color+'"><span class="crm-col-dot" style="background:'+x.color+'"></span>'+escapeHtml(x.name)+'<span class="kpi-sub">'+(usage[x.id]||0)+'</span></button>'; }).join('')+
       '<button class="cy-tab cy-tab-add" data-action="cyNew">+ New cycle</button></div>'+
     (!cy ? '<div class="empty">No cycles yet.</div>' :
@@ -424,7 +424,7 @@ function renderLifecycleEditor(){
     }).join('')+'</div>'+
     '<div class="row" style="margin-top:14px;gap:8px;"><input class="input" id="cyNewStep" placeholder="New step, e.g. Kick-off" style="flex:1;"><button class="btn btn-primary btn-sm" data-action="cyStepAdd" data-id="'+cy.id+'">+ Add step</button></div>'+
     '<div class="row kpi-sub" style="margin-top:10px;gap:6px;align-items:center;">When a client finishes this cycle, move Onboarding clients to'+
-      '<select class="input input-sm" data-cy-finish="'+cy.id+'"><option value="">— leave status as is</option>'+crmStages('client').map(function(s){ return '<option value="'+s.id+'" '+(cy.finishStage===s.id?'selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select></div>')+
+      '<select class="input input-sm" data-cy-finish="'+cy.id+'"><option value="">Leave status as is</option>'+crmStages('client').map(function(s){ return '<option value="'+s.id+'" '+(cy.finishStage===s.id?'selected':'')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select></div>')+
     '<div class="row" style="margin-top:18px;justify-content:flex-end;"><button class="btn btn-primary" data-action="closeLifecycleEditor">Done</button></div>';
 }
 function renderLifecycleEditorInto(){ const el=document.getElementById('lifecycleContent'); if(el) morphInto(el, renderLifecycleEditor(), {form:true}); }

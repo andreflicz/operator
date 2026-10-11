@@ -26,14 +26,14 @@ function lineupListHtml(today){
   return '<ol class="tl-list">'+today.map(function(t, i){
     const isNow = ui.currentTaskId===t.id, isNext = !isNow && nextId===t.id, doneToday = isOngoingDoneToday(t);
     const selected = ui.selectedTaskIds.has(t.id);
-    return '<li class="tl-row'+(isNow?' is-now':'')+(isNext?' is-next':'')+(doneToday?' is-done':'')+(selected?' row-selected':'')+(justCompletedTaskId===t.id?' just-completed':'')+'" draggable="true" data-task-id="'+t.id+'" data-dropzone="order" data-id="'+t.id+'" data-action="openTaskEditModal" title="Open — right-click for more">'+
+    return '<li class="tl-row'+(isNow?' is-now':'')+(isNext?' is-next':'')+(doneToday?' is-done':'')+(selected?' row-selected':'')+(justCompletedTaskId===t.id?' just-completed':'')+'" draggable="true" data-task-id="'+t.id+'" data-dropzone="order" data-id="'+t.id+'" data-action="openTaskEditModal" title="Open: right-click for more">'+
       '<span class="tl-grip" title="Drag to reorder">&#8942;&#8942;</span>'+
       '<span class="tl-num">'+(i+1)+'</span>'+
       '<span class="tl-main">'+priorityTag(t.priority)+'<span class="tl-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-ongoing">&#128204;</span>':'')+'</span>'+
       clientTagsHtml(t.clients)+
       (t.deadline ? deadlineTag(t) : '')+
       (isNow ? '<span class="tl-badge is-now">Now</span>' : isNext ? '<span class="tl-badge">Up next</span>' : '')+
-      '<button class="card-more" data-action="taskMenuBtn" data-id="'+t.id+'" title="More — or right-click">&#8943;</button>'+
+      '<button class="card-more" data-action="taskMenuBtn" data-id="'+t.id+'" title="More, or right-click">&#8943;</button>'+
     '</li>';
   }).join('')+'</ol>';
 }

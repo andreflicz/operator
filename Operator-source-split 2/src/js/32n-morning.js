@@ -26,9 +26,9 @@ const MORNING_QUOTES = [
   ['Dedication sees dreams come true.', 'Kobe Bryant'],
   ['Dreams without goals are just dreams.', 'Denzel Washington'],
   ['I didn’t come this far to only come this far.', 'Tom Brady'],
-  ['Whether you think you can, or you think you can’t — you’re right.', 'Henry Ford'],
+  ['Whether you think you can, or you think you can’t: you’re right.', 'Henry Ford'],
   ['Stay hungry, stay foolish.', 'Steve Jobs'],
-  ['At dawn, when you have trouble getting out of bed, tell yourself: “I have to go to work — as a human being.”', 'Marcus Aurelius'],
+  ['At dawn, when you have trouble getting out of bed, tell yourself: “I have to go to work. As a human being.”', 'Marcus Aurelius'],
   ['No man is free who is not master of himself.', 'Epictetus'],
   ['First say to yourself what you would be; and then do what you have to do.', 'Epictetus'],
   ['It is not that we have a short time to live, but that we waste a lot of it.', 'Seneca'],
@@ -43,11 +43,11 @@ const MORNING_QUOTES = [
   ['The sun himself is weak when he first rises, and gathers strength and courage as the day gets on.', 'Charles Dickens'],
   ['Write it on your heart that every day is the best day in the year.', 'Ralph Waldo Emerson'],
   ['Rest at the end, not in the middle.', 'Kobe Bryant'],
-  ['Everything negative — pressure, challenges — is all an opportunity for me to rise.', 'Kobe Bryant'],
+  ['Everything negative (pressure, challenges) is all an opportunity for me to rise.', 'Kobe Bryant'],
   ['You are in danger of living a life so comfortable and soft that you will die without ever realizing your true potential.', 'David Goggins'],
   ['Discipline equals freedom.', 'Jocko Willink'],
   ['Hard choices, easy life. Easy choices, hard life.', 'Jerzy Gregorek'],
-  ['Inspiration is for amateurs — the rest of us just show up and get to work.', 'Chuck Close'],
+  ['Inspiration is for amateurs: the rest of us just show up and get to work.', 'Chuck Close'],
   ['What you do every day matters more than what you do once in a while.', 'Gretchen Rubin'],
   ['Keep hammering.', 'Cameron Hanes'],
   ['The best time to plant a tree was twenty years ago. The second best time is now.', 'Proverb'],
@@ -147,7 +147,7 @@ const MORNING_THOUGHTS = [
   ['&#9749;', 'Make a proper coffee.', 'Or a fresh juice. Take it slow.'],
   ['&#129367;', 'Think about what you’ll eat today.', 'Decide now and you won’t grab junk later.'],
   ['&#127807;', 'Open a window.', 'Fresh air before the screen.'],
-  ['&#10024;', 'Romanticize it.', 'The coffee, the light, the walk. This is your life — enjoy it.'],
+  ['&#10024;', 'Romanticize it.', 'The coffee, the light, the walk. This is your life: enjoy it.'],
   ['&#128591;', 'Name one thing you’re grateful for.', 'Say it out loud.'],
   ['&#128075;', 'Text someone you love good morning.', 'Takes ten seconds, makes their day.'],
   ['&#127788;&#65039;', 'Five slow breaths.', 'Before you look at a screen.'],
@@ -167,7 +167,7 @@ const MORNING_THOUGHTS = [
 function goodDayItems(){
   const out = [], w = wakeCfg(), lib = arr(state.meals && state.meals.library);
   const go = lib.slice().sort(function(a, b){ return (b.uses||0) - (a.uses||0); }).slice(0, 3).map(function(m){ return m.name; }).filter(Boolean);
-  out.push(['&#129367;', 'Know what you’re eating today.', go.length ? 'Your go-tos: '+go.join(', ')+(state.profile.calorieTarget ? ' · '+Number(state.profile.calorieTarget).toLocaleString()+' cal' : '')+'. Decide now, not when you’re starving.' : 'Breakfast, lunch, dinner — decided before you’re hungry.']);
+  out.push(['&#129367;', 'Know what you’re eating today.', go.length ? 'Your go-tos: '+go.join(', ')+(state.profile.calorieTarget ? ' · '+Number(state.profile.calorieTarget).toLocaleString()+' cal' : '')+'. Decide now, not when you’re starving.' : 'Breakfast, lunch, dinner. Decided before you’re hungry.']);
   const places = String(w.places||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
   if(places.length) out.push(['&#127795;', 'Walk to '+places[dayNum() % places.length]+'.', 'No phone. Just the walk there and back.']);
   const len = MORNING_THOUGHTS.length, d = dayNum();
