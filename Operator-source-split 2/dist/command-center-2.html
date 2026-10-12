@@ -30232,7 +30232,7 @@ inspToolsHtml = function(){
   return '<div class="insp-tools">'+b('inspToolThought', '&#9998;', 'Thought')+b('inspToolWish', '&#10022;', 'Wish')+b('inspToolWords', '&#10077;', 'Words')+b('inspBreathe', '&#10061;', 'Breathe')+b('inspSky', '&#9790;', sky)+
     '<span class="izk-wrap">'+b('inspDrift', '&#8776;', 'Drift'+(w ? ' &middot; '+INSP_WINDS[w][1] : ''), w > 0 || ui.inspWindOpen)+
       (ui.inspWindOpen ? '<span class="izk-wind"><small>The wind</small>'+INSP_WINDS.map(function(x, i){ return '<button class="izw-s'+(i===w ? ' is-on' : '')+'" data-action="inspWindSet" data-id="'+x[0]+'"><i style="--n:'+i+'"></i>'+x[1]+'</button>'; }).join('')+'</span>' : '')+'</span>'+
-    b('inspBreezeAway', IW.away ? '&#127808;' : '&#127811;', IW.away ? 'Bring them back' : 'Breeze away', IW.away)+'</div>';
+    b('inspBreezeAway', IW.away ? '&#127808;' : '&#127811;', IW.away ? 'Return' : 'Breeze', IW.away)+'</div>';
 };
 
 // ---- a sandbox that goes on forever: scroll to wander, pinch to lean in a little ----

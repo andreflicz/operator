@@ -142,7 +142,7 @@ async function ctxPage(b, seed, opts){
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("AI.hasKey=true; openInspire()"); await p.waitForTimeout(1600);
     const tools = await p.$$eval('#insp .insp-tools .izk', e => e.map(x => x.textContent));
-    check('one Drift effect (Stream is gone) and a Breeze away button', !tools.some(t => /Stream/.test(t)) && tools.some(t => /Drift/.test(t)) && tools.some(t => /Breeze away/.test(t)), tools);
+    check('one Drift effect (Stream is gone) and a Breeze away button', !tools.some(t => /Stream/.test(t)) && tools.some(t => /Drift/.test(t)) && tools.some(t => /Breeze/.test(t)), tools);
     const pos = () => p.$$eval('#inspWorld .izb', e => e.slice(0, 6).map(x => x.style.transform));
     const a = await pos(); await p.clock.runFor(1500); await p.waitForTimeout(300); const c = await pos();
     check('the bubbles are always moving, even in calm air', a.length && a.some((t, i) => t && t!==c[i]), [a[0], c[0]]);
@@ -155,10 +155,10 @@ async function ctxPage(b, seed, opts){
     check('…and the bubbles breeze across with it', await E("IW.off['"+id0+"']||0") - o0 > 60);
     await p.click('#insp [data-action="inspBreezeAway"]'); await p.clock.runFor(2500); await p.waitForTimeout(300);
     const ops = await p.$$eval('#inspWorld .izb', e => e.map(x => Number(x.style.opacity || 1)));
-    check('Breeze away blows them all off (gone, with a whoosh)', ops.length && ops.every(o => o < 0.05) && /Bring them back/.test(await p.textContent('#insp .insp-tools')));
+    check('Breeze away blows them all off (gone, with a whoosh)', ops.length && ops.every(o => o < 0.05) && /Return/.test(await p.textContent('#insp .insp-tools')));
     await p.click('#insp [data-action="inspBreezeAway"]'); await p.clock.runFor(6000); await p.waitForTimeout(400);
     const back = await p.$$eval('#inspWorld .izb:not(.is-behind)', e => e.filter(x => Number(x.style.opacity || 1) > 0.5).length);
-    check('…and Bring them back floats them in again', back > 5 && await E("!IW.away"), back);
+    check('…and Return floats them in again', back > 5 && await E("!IW.away"), back);
     await E("inspStore().wind='calm'; inspRender()");
     // a plane you wander: scroll pans; a pinch only leans in a little
     const v0 = JSON.parse(await E("JSON.stringify(ui.inspView)"));
