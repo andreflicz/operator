@@ -106,6 +106,9 @@ function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
   await shot('inspire-wind', async () => { await E("inspStore().wind='wind'; ui.inspWindOpen=true; inspRender()"); await p.clock.runFor(4000); await p.waitForTimeout(900); });
   await shot('inspire-away', async () => { await E("ui.inspWindOpen=false; ACTIONS.inspBreezeAway()"); await p.clock.runFor(1200); await p.waitForTimeout(500); });
   await E("ACTIONS.inspBreezeAway(); inspStore().wind='calm'; inspRender()");
+  await shot('inspire-reset', async () => { await E("ACTIONS.inspResetOpen()"); await p.waitForTimeout(700); });
+  await shot('inspire-resetrun', async () => { await E("resetStart('walk', 15); inspRender()"); await p.waitForTimeout(700); });
+  await E("state.profile.inspReset=null; inspRender()");
   await shot('inspire-card', async () => { await E("ACTIONS.inspOpenAct(null, null, 'walk')"); await p.waitForTimeout(700); });
   await shot('inspire-sheet', async () => { await E("ui.inspOpenAct=null; ACTIONS.inspLogSheet()"); await p.waitForTimeout(700); });
   await shot('inspire-zoom', async () => { await E("ui.inspSheet=false; ui.inspView={x:-300,y:80,z:0.5}; inspRender()"); await p.waitForTimeout(900); });

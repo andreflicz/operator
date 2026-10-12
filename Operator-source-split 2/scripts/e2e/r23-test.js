@@ -219,7 +219,7 @@ async function ctxPage(b, seed, opts){
     check('Content lanes: no + or "add" buttons on them', !(await p.$('.ct-add')) && !(await p.$('.ct-lane [data-action="openAddContent"]')));
     await p.dragAndDrop('.ct-lane[data-content-role="personal"] [data-task-id="v1"]', '.ct-lane[data-content-role="business"]'); await p.waitForTimeout(300);
     check('drag a video from Personal to Business and it moves', await E("contentRoleOf(state.tasks.items.find(t => t.id==='v1'))")==='business');
-    await p.click('#fabAdd'); await p.waitForTimeout(300); await p.click('#addPick .ap-tile >> nth=0'); await p.waitForTimeout(300);   // (round 26: the + asks first)
+    await p.click('#fabAdd'); await p.waitForTimeout(300); await p.click('#addPick .ap-tile:has-text("video idea")'); await p.waitForTimeout(300);   // (round 26: the + asks first)
     check('the + opens a New video sheet (Business or Personal)', await p.isVisible('#contentSheet:not(.hidden) #csTitle') && (await p.$$('#contentSheet .gs-seg button')).length===2);
     await p.click('#contentSheet [data-action="csRole"][data-id="personal"]'); await p.fill('#csTitle', 'Day in the life'); await p.click('[data-action="csSave"]'); await p.waitForTimeout(200);
     check('…and adds it to the right lane', await E("contentRoleOf(state.tasks.items.find(t => t.title==='Day in the life'))")==='personal');

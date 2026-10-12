@@ -144,7 +144,7 @@ const SP = require('./common.js').OUT;
   check('legacy training minutes fold into Other', await E("dayModeTotals(todayStr()).other")>=await E("modeMinutesFor(todayStr(),'training')"));
   // wish list
   await p.click('[data-action="nav"][data-view="personal"]'); await p.click('[data-action="personalTab"][data-tab="wishlist"]');
-  check('FAB = wish list', (await p.getAttribute('#fabAdd','title'))==='Add wish list item');
+  check('FAB = wish list', (await p.getAttribute('#fabAdd','aria-label'))==='Add wish list item');
   await p.click('#fabAdd');
   await p.fill('#wishName','Sony FX3'); await p.fill('#wishPrice','3899.99'); await p.selectOption('#wishPriority','high'); await p.fill('#wishLink','https://example.com/fx3');
   await p.click('[data-action="saveWishItem"]');

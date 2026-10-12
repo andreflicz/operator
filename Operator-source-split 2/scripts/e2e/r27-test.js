@@ -198,21 +198,17 @@ async function ctxPage(b, seed, opts){
     check('“Not for me” hides an idea', await E("inspHidden().indexOf('clean')>=0") && !(await p.$('#insp .izb[data-id="clean"]')));
     await E("ACTIONS.inspUnhideAct(null, null, 'clean')"); await p.waitForTimeout(200);
     check('…and it can come back', !!(await p.$('#insp .izb[data-id="clean"]')));
-    await p.click('#insp .izl-min'); await p.waitForTimeout(200);
+    await p.click('#insp .izl-min'); await p.waitForTimeout(700);   // (round 28: it sinks out first)
     check('the panel folds away (and opens again)', !(await p.$('#insp .insp-lately')) && !!(await p.$('#insp .insp-lately-min')));
-    await p.click('#insp .insp-lately-min'); await p.waitForTimeout(200);
+    await p.click('#insp .insp-lately-min'); await p.waitForTimeout(500);
     check('…', !!(await p.$('#insp .insp-lately')));
-    await p.click('#insp [data-action="inspStream"]'); await p.waitForTimeout(400);
-    check('Stream: the ideas drift across the sky', (await p.$$('#insp .insp-stream .izb.is-stream')).length >= 28 && !(await p.$('#insp .insp-world .izb')));
-    await E("(() => { const b = Array.from(document.querySelectorAll('#insp .insp-stream .izb')).find(x => { const r = x.getBoundingClientRect(); return r.left > 0 && r.right < innerWidth; }); b.click(); })()"); await p.waitForTimeout(300);
-    check('…tap one and its card opens in the middle', !!(await p.$('#insp .izb-card.is-float')));
-    await E("ui.inspOpenAct = null; ACTIONS.inspStream()"); await p.waitForTimeout(200);
+    // (round 28: Stream became Drift's wind; r28 covers it)
     check('a music player with the track’s name', /Cloud Nine|Lullaby|Glasshouse|Tide|Aurora|Moonwater|Night Rain|Lagoon/.test(await p.textContent('#insp .insp-mp')));
     check('more music like Tide: Moonwater, Night Rain, Lagoon', await E("['Moonwater','Night Rain','Lagoon'].every(n => FOCUS_TRACKS.some(t => t.name===n && t.dream))") && await E("typeof fmDream('rain')==='function' && typeof fmDream('lagoon')==='function' && typeof fmDream('swell')==='function'"));
     const tr0 = await E("FOCUS_TRACKS[FM.idx].name"); await p.click('#insp .insp-mp [data-action="inspNext"]'); await p.waitForTimeout(1200);
     check('…next track', await E("FOCUS_TRACKS[FM.idx].name")!==tr0 && await E("FOCUS_TRACKS[FM.idx].dream===true"));
-    await E("aboutYou().building = 'a studio by the sea'; inspWhisper()"); await p.waitForTimeout(200);
-    check('now and then a quiet line drifts by', !!(await p.$('#insp .insp-whisper')) && await E("inspWhisperLines().some(l => /a studio by the sea/.test(l))"));
+    await E("aboutYou().building = 'a studio by the sea'; ui._inspWordsAt = 0; inspWords()"); await p.waitForTimeout(200);
+    check('now and then a quiet line drifts by (round 28: words on the sky)', !!(await p.$('.insp-words')) && await E("inspWhisperLines().some(l => /a studio by the sea/.test(l))"));
     check('no page errors (inspiration)', p.errors.length===0, p.errors);
     await p.context().close();
   }

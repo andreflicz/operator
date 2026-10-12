@@ -216,6 +216,86 @@ async function ctxPage(b, seed, opts){
     await p.context().close();
   }
 
+  // ---- Inspiration polish: words every ~45s, its own sounds and volume, search when logging, popping and folding ----
+  {
+    const p = await ctxPage(b, base, {clock:NOW + 3*3600000});
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await E("const s = inspStore(); s.log.push({id:'lg1', act:'walk', label:'Go for a walk', at:Date.now()-3600000, date:todayStr()}, {id:'lg2', act:'read', label:'Read', at:Date.now()-1800000, date:todayStr()}); persist('personal'); openInspire()"); await p.waitForTimeout(800);
+    await p.clock.runFor(15000); await p.waitForTimeout(400);
+    check('a few words surface on the sky (no author, no quote marks)', await p.$('.insp-words') && !/[“”—]/.test(await p.textContent('.insp-words')), await p.evaluate(() => (document.querySelector('.insp-words')||{}).textContent));
+    check('…word by word, in a quiet spot (never the middle)', (await p.$$('.insp-words span')).length >= 3 && await p.evaluate(() => { const r = document.querySelector('.insp-words').getBoundingClientRect(), cx = innerWidth/2, cy = innerHeight/2; return !(r.left < cx && r.right > cx && r.top < cy && r.bottom > cy); }));
+    await p.clock.runFor(11000); await p.waitForTimeout(400);
+    check('…and dissolve after a while', !(await p.$('.insp-words')));
+    await p.clock.runFor(36000); await p.waitForTimeout(400);
+    check('…about every 45 seconds', !!(await p.$('.insp-words')));
+    // sounds
+    await p.click('#insp [data-action="inspSfxOpen"]'); await p.waitForTimeout(200);
+    check('Inspiration has its own sound choices: Chimes, Glass, Droplets, Soft keys, Off', (await p.$$eval('#insp .izk-sfx .isx-s', e => e.map(x => x.textContent))).join()==='Chimes,Glass,Droplets,Soft keys,Off');
+    await p.click('#insp .izk-sfx [data-id="drops"]'); await p.waitForTimeout(150);
+    await p.fill('#insp [data-insp-vol]', '40'); await p.dispatchEvent('#insp [data-insp-vol]', 'input'); await p.clock.runFor(400); await p.waitForTimeout(150);
+    check('…the sound and its volume are saved (apart from the music)', await E("inspSfxStyle()")==='drops' && Math.abs(await E("inspSfxVol()") - 0.4) < 0.01 && await E("fmVolume()") > 0.5);
+    await E("ACTIONS.inspSfxSet(null, null, 'off')");
+    check('…Off means no effects', !(await E("inspSfxOn()")));
+    await E("ACTIONS.inspSfxSet(null, null, 'chimes')");
+    // search
+    await E("ui.inspSfxOpen=false; ACTIONS.inspLogSheet()"); await p.waitForTimeout(300);
+    check('logging something has a search box, ready to type', await p.isVisible('#inspFind') && await p.evaluate(() => document.activeElement && document.activeElement.id==='inspFind'));
+    await p.keyboard.type('wal'); await p.waitForTimeout(150);
+    const vis = await p.$$eval('#insp .izs-grid .izs-a:not(.is-hidden)', e => e.map(x => x.textContent.trim()));
+    check('…type "wal" and the walk is right there', vis.length >= 1 && vis.every(t => /wal/i.test(t)) && vis.some(t => /walk/i.test(t)), vis);
+    const n0 = await E("inspStore().log.length");
+    await p.keyboard.press('Enter'); await p.waitForTimeout(300);
+    check('…Enter logs it', await E("inspStore().log.length")===n0 + 1);
+    // letting go
+    await E("ui.inspSheet=false; inspRender()"); await p.waitForTimeout(300);
+    const stones = (await p.$$('#inspWorld .izh-stone')).length;
+    await E("ACTIONS.inspLogDel(document.querySelector('#insp .izl-r'), null, 'lg1')"); await p.waitForTimeout(120);
+    check('removing a logged thing pops its bubble off the ring around the middle', await p.$('.insp-pop') && await p.$('#inspWorld .izh-stone.is-pop'));
+    check('…and its row folds away (no jump)', await p.$('#insp .izl-r.is-fold'));
+    await p.waitForTimeout(700);
+    check('…then it’s gone', (await p.$$('#inspWorld .izh-stone')).length===stones - 1 && !(await E("inspStore().log.some(x => x.id==='lg1')")));
+    await p.click('#insp [data-action="inspPanelToggle"]'); await p.waitForTimeout(120);
+    check('folding "This week" away: the panel sinks out instead of jumping', await p.$('#insp .insp-lately.is-leaving'));
+    await p.waitForTimeout(600);
+    check('…and the small pill rises in its place', await p.isVisible('#insp .insp-lately-min') && !(await p.$('#insp .insp-lately')));
+    await p.click('#insp .insp-lately-min'); await p.waitForTimeout(500);
+    check('…opening it again rises back', await p.isVisible('#insp .insp-lately'));
+    check('Settings → Look & Sound has Inspiration’s sounds too', /Inspiration/.test(await E("soundSettingsHtml()")) && /data-insp-vol/.test(await E("soundSettingsHtml()")));
+    check('no page errors (Inspiration polish)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
+  // ---- limbo: Reset on Inspiration, and Op giving you a way out ----
+  {
+    const p = await ctxPage(b, Object.assign({}, base, {profile:{name:'Andre', about:{reset:'cooking, cleaning'}}}), {clock:NOW + 3*3600000});
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await E("openInspire()"); await p.waitForTimeout(700);
+    check('Inspiration has "Stuck? Reset" by the middle', await p.isVisible('#insp .izh-reset'));
+    await p.click('#insp .izh-reset'); await p.waitForTimeout(300);
+    const resets = await p.$$eval('#insp .irs-t b', e => e.map(x => x.textContent));
+    check('…your resets first (what you told Op), then cook, clean, a walk, a shower', resets[0]==='Cooking' && resets.some(t => /walk/i.test(t)) && resets.some(t => /shower/i.test(t)) && resets.some(t => /Clean/.test(t)), resets);
+    await p.click('#insp .irs-min [data-id="10"]'); await p.waitForTimeout(150);
+    await p.click('#insp .irs-t:has-text("walk")'); await p.waitForTimeout(300);
+    check('picking one starts it on a gentle timer', await p.isVisible('#insp .irc') && /Go for a walk/.test(await p.textContent('#insp .irc')) && /10:00|9:5/.test(await p.textContent('#ircLeft')));
+    check('…Op knows you’re on it', /doing a reset: Go for a walk/.test(await E("aiContext()")));
+    await p.click('#insp .irc [data-action="inspResetDone"]'); await p.waitForTimeout(300);
+    check('“I’m back” logs it and offers the way back: Lock in for 25', await E("inspStore().log.slice(-1)[0].act")==='walk' && await p.isVisible('#insp .irc.is-done [data-action="inspResetLockIn"]'));
+    await p.click('#insp [data-action="inspResetLockIn"]'); await p.waitForTimeout(900);
+    check('…which opens the lock-in for 25 minutes', await E("overlayOpen('lockSeqOverlay') && ui.lockSeq && ui.lockSeq.minutes===25") && !(await E("inspOpenNow()")));
+    await E("closeLockSeq()");
+    // the time runs out while you're away from Inspiration: Op's there
+    await E("resetStart('clean', 5); closeInspire()"); await p.waitForTimeout(200);
+    await p.clock.runFor(5*60000 + 2000); await p.waitForTimeout(400);
+    check('when the time’s up and you’re away, Op asks to lock you in', await p.isVisible('#opBub.is-in') && /lock/i.test(await p.textContent('#opBubText')) && await E("inspStore().log.slice(-1)[0].act")==='clean');
+    // Op knows the pattern, and has a tool for it
+    check('Op knows your resets and how to handle limbo (pushy, graceful)', /His resets/.test(await E("aiContext()")) && /pushy but graceful/.test(await E("aiContext()")) && /cooking/i.test(await E("limboResetLine()")));
+    check('Op can start a reset for you', await E("OP_TOOLS.some(t => t.name==='start_reset')") && /started: A long hot shower/.test(await E("opRunTool('start_reset', {idea:'shower', minutes:10})")));
+    check('a check-in answer that sounds like limbo gets a way out, not just a scolding', await E("limboSays('honestly I just dont feel like it today')") && !(await E("limboSays('I was at the dentist')")) && /stuck in between/.test(await E("limboFallback()")));
+    check('the check-in’s judge is told to give a reset in limbo', /sounds like limbo/.test(await E("acctJudge.toString()")));
+    check('no page errors (limbo)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
   await b.close();
   process.exit(report() ? 1 : 0);
 })();

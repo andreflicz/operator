@@ -112,7 +112,7 @@ const SP = require('./common.js').OUT;
   // clients tab board
   await p.click('[data-action="businessTab"][data-tab="clients"]');
   check('clients tab shows client cards', (await p.$$('.cc2')).length>=1);
-  check('FAB = add client', (await p.getAttribute('#fabAdd','title'))==='Add client');
+  check('FAB = add client', (await p.getAttribute('#fabAdd','aria-label'))==='Add client');
   await p.click('#fabAdd'); await p.fill('#ncName','Zed'); await p.fill('#ncCompany','Zed Media'); await p.fill('#ncValue','900'); await p.click('[data-action="saveNewContact"]');
   check('new client created', (await E("state.business.clients.some(c=>c.business==='Zed Media' && c.stage==='onboarding' && c.status==='active')")));
   // round 13: a new client opens on its Plan section; the lifecycle moved to its own "Client cycle" section

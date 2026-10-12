@@ -200,7 +200,7 @@ const WORK = {enabled:true, start:'09:00', end:'17:00', days:[0,1,2,3,4,5,6], lu
     await E("state.focus.taskSegments = [{id:'s1', taskId:'t1', start:Date.now()-3*86400000, end:Date.now()-3*86400000+50*60000, date:addDays(todayStr(), -3)}]; ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='skills'; renderView()"); await p.waitForTimeout(300);
     check('Focus → Training Skills (round 26; was Personal → Growth): your skills and the time on them', /Edit JJS reel/.test(await p.textContent('.gr-skills')) && /50m this week/.test(await p.textContent('.gr-skills')));
     check('…which counts toward Mind', await E("skillScore()") > 0);
-    await p.click('#fabAdd'); await p.waitForTimeout(300); await p.click('#addPick .ap-tile >> nth=0'); await p.waitForTimeout(300); await p.fill('#skillName', 'Meta ads'); await p.click('[data-action="skillAdd"]'); await p.waitForTimeout(200);
+    await p.click('#fabAdd'); await p.waitForTimeout(300); await p.click('#addPick .ap-tile:has-text("training skill")'); await p.waitForTimeout(300); await p.fill('#skillName', 'Meta ads'); await p.click('[data-action="skillAdd"]'); await p.waitForTimeout(200);
     check('…the + adds a skill', await E("state.tasks.items.some(t => t.skill && t.title==='Meta ads')"));
     // the vault
     await E("openCheckoutForm('week', weekKey())"); await p.waitForTimeout(400);

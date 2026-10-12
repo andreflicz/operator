@@ -49,16 +49,16 @@ const SP = require('./common.js').OUT;
   await p.waitForTimeout(300);
   check('journal thumbs load from IndexedDB', await p.evaluate(() => [...document.querySelectorAll('.journal-entry .journal-photo-thumb')].every(i => i.src.startsWith('blob:') && i.naturalWidth>1)));
   check('save button spacing row', await p.isVisible('.journal-compose-actions'));
-  check('FAB = journal on journal tab', (await p.getAttribute('#fabAdd','title'))==='New journal entry');
+  check('FAB = journal on journal tab', (await p.getAttribute('#fabAdd','aria-label'))==='New journal entry');
   // Focus tasks: mini move controls + compact video ideas
   await p.click('[data-action="nav"][data-view="focus"]');
-  check('FAB = add something (round 26: a task, a skill or a video idea)', (await p.getAttribute('#fabAdd','title'))==='Add something');
+  check('FAB = add something (round 26: a task, a skill or a video idea)', (await p.getAttribute('#fabAdd','aria-label'))==='Add something');
   check('card actions tucked into the ⋯ menu', await p.isVisible('.task-card[data-id="t1"] .card-more') && (await p.$$('.task-card .mini-move-row')).length===0);
   await p.click('.task-card[data-id="t1"] .card-more');
   await p.click('#taskCtxMenu [data-op="backlog"]');
   check('moved to backlog', await p.evaluate(() => window.__op.state.tasks.items.find(t=>t.id==='t1').status)==='backlog');
   await p.click('[data-action="focusTasksSubTab"][data-tab="videoIdeas"]');
-  check('FAB = add something on Content too (round 26: it asks first)', (await p.getAttribute('#fabAdd','title'))==='Add something');
+  check('FAB = add something on Content too (round 26: it asks first)', (await p.getAttribute('#fabAdd','aria-label'))==='Add something');
   check('video idea compact (no notes shown)', !(await p.isVisible('.video-idea-compact .vic-body')));
   await p.click('.video-idea-compact .vic-head');
   check('video idea expands', await p.isVisible('.video-idea-compact .vic-body'));
@@ -71,7 +71,8 @@ const SP = require('./common.js').OUT;
   // FAB on video ideas opens add video idea modal
   await p.click('#fabAdd');
   // (round 26: the + asks first, in a pop-up; on Content the video idea is the first tile)
-  await p.waitForTimeout(300); await p.click('#addPick .ap-tile >> nth=0'); await p.waitForTimeout(300);
+  await p.waitForTimeout(300); await p.click('#addPick .ap-tile:has-text("video idea")'); await p.waitForTimeout(300);
+  // (round 28: the menu is always Task, Video idea, Skill)
   // (round 23: the + opens the New video sheet)
   check('FAB opens video idea modal', await p.isVisible('#contentSheet:not(.hidden)'));
   await p.click('[data-action="closeContentSheet"]');

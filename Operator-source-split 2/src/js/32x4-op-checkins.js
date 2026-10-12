@@ -195,13 +195,14 @@ async function acctJudge(e){
         'You just checked in on me during work hours and I wasn’t working. '+acctFactsLine(e.facts)+' I said: “'+e.excuse+'”.\n'+
         'Decide if that’s a genuine, acceptable reason (sick, an emergency, family, an appointment, something that truly couldn’t wait, or real work for the business away from the app, like a client call, a shoot or a meeting) or an excuse (tired, distracted, scrolling, didn’t feel like it, putting it off, no reason).\n'+
         'Business right now: '+money(k.mrr)+' a month'+(k.goal ? ' against a goal of '+money(k.goal) : '')+', '+k.clients+' active clients, '+k.newC+' new in the last 30 days, '+k.leads+' open leads.\n'+
-        'Then say what you’d say to me, spoken, two to four sentences. If it’s a real reason: be understanding, tell me to get back to it when I can. If it’s an excuse: put it on me, be direct, remind me what’s at stake with my real numbers (a business that isn’t growing is dying), tell me to get to work, and offer to lock me in. Never talk about logging, recording or the word excuse.\n'+
+        'Then say what you’d say to me, spoken, two to four sentences. If it’s a real reason: be understanding, tell me to get back to it when I can. If it’s an excuse: put it on me, be direct, remind me what’s at stake with my real numbers (a business that isn’t growing is dying), tell me to get to work, and offer to lock me in. If it sounds like limbo (drained, stuck, no motivation, half doing nothing, pulled toward bad habits) it still isn’t acceptable, but don’t just scold: give me a way out, one reset from my list'+(typeof limboResetLine==='function' ? ' ('+limboResetLine()+')' : '')+', named, time-boxed, then straight back to work, and ask if you should start it. Never talk about logging, recording or the word excuse.\n'+
         'Reply with JSON only: {"acceptable": true or false, "why": "a few words on why", "reply": "what you say"}'}]}), new Promise(function(r){ setTimeout(function(){ r(null); }, 15000); })]) : null;
       if(res && res.ok){ const t = aiText(res.j), m = /\{[\s\S]*\}/.exec(t); if(m){ const j = JSON.parse(m[0]); verdict = !!j.acceptable; reply = String(j.reply||''); why = String(j.why||''); } }
     }catch(err){}
   }
   const a = acct(); if(!a.pending || a.pending.id!==e.id) return;
   if(verdict===null){ verdict = false; why = 'Not judged (no AI): change it if it was real'; }
+  if(!reply && !verdict && typeof limboSays==='function' && limboSays(e.excuse) && typeof limboFallback==='function') reply = limboFallback();
   if(!reply) reply = verdict ? 'Fair enough. Get back to it when you can.' : 'That’s on you. '+acctStakesLine()+' Want me to lock you in on '+(e.facts.next || 'the next thing')+'?';
   e.status = verdict ? 'excused' : 'fault'; e.why = opNoDash(why).slice(0, 160); e.reply = reply; e.settledAt = Date.now();
   a.pending = null; acctSchedule(); persist('focus'); acctRescore();

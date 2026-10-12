@@ -5387,7 +5387,7 @@ body.np-on .quick-journal-fab.jorb, body.op-ov .quick-journal-fab.jorb{ right:28
 .izl-r{ position:relative; } .izl-x{ margin-left:6px; width:20px; height:20px; border:none; border-radius:50%; background:transparent; color:rgba(255,255,255,.35); font-size:10px; cursor:pointer; opacity:0; transition:opacity .2s, background .2s; }
 .izl-r:hover .izl-x{ opacity:1; } .izl-x:hover{ background:rgba(255,255,255,.12); color:#fff; }
 .izs-hid{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:12px; } .izs-hid small{ font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.45); margin-right:4px; }
-.izs-h{ border:1px dashed rgba(255,255,255,.25); background:transparent; color:rgba(255,255,255,.75); border-radius:999px; padding:4px 10px; font:inherit; font-size:12px; cursor:pointer; } .izs-h:hover{ color:#fff; border-style:solid; }
+button.izs-h{ border:1px dashed rgba(255,255,255,.25); background:transparent; color:rgba(255,255,255,.75); border-radius:999px; padding:4px 10px; font:inherit; font-size:12px; cursor:pointer; } button.izs-h:hover{ color:#fff; border-style:solid; }
 /* the music: a small player that says what's playing */
 .insp-mp{ display:inline-flex; align-items:center; gap:4px; height:42px; padding:0 6px; border-radius:999px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff; -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
 .insp-mp.is-on{ background:rgba(255,255,255,.12); }
@@ -5496,6 +5496,82 @@ html[data-op-mood="stern"] .op-bub-t .cw:last-child, html[data-op-mood="concern"
 .rc-task-menu button{ text-align:left; padding:7px 10px; border:none; border-radius:8px; background:transparent; color:var(--text); font:inherit; font-size:13px; cursor:pointer; }
 .rc-task-menu button:hover{ background:rgba(255,255,255,.07); }
 .rc-task-menu em{ padding:8px 10px; color:var(--text-dim); font-size:12.5px; }
+
+/* ============ R28 Inspiration: words, sounds, search, letting go ============ */
+.insp-words{ position:fixed; z-index:9001; transform:translate(-50%, -50%); max-width:min(440px, 34vw); text-align:center; pointer-events:none; font-family:'Iowan Old Style', Georgia, serif; font-style:italic; font-size:clamp(18px, 1.55vw, 24px); line-height:1.45; color:rgba(255,250,255,.92); text-shadow:0 0 26px rgba(200,170,255,.5), 0 2px 14px rgba(0,0,0,.3); animation:iwDrift 10.5s ease-in-out forwards; }
+.insp-words span{ display:inline-block; opacity:0; animation:iwWord 1.4s cubic-bezier(.2,.7,.2,1) forwards; }
+.insp-words.is-out span{ animation:iwWordOut 2s ease-in forwards; }
+.insp-words.is-out span:nth-child(odd){ animation-duration:1.6s; }
+@keyframes iwWord{ from{ opacity:0; filter:blur(10px); transform:translateY(8px) scale(.96); } to{ opacity:1; filter:blur(0); transform:none; } }
+@keyframes iwWordOut{ from{ opacity:1; filter:blur(0); transform:none; } to{ opacity:0; filter:blur(12px); transform:translateY(-12px); } }
+@keyframes iwDrift{ from{ translate:0 6px; } to{ translate:0 -18px; } }
+@media (prefers-reduced-motion:reduce){ .insp-words, .insp-words span{ animation-duration:.01s !important; } }
+/* a pop: a ring, droplets flying out */
+.insp-pop{ position:fixed; z-index:9002; width:0; height:0; pointer-events:none; }
+.insp-pop .ip-ring{ position:absolute; left:-18px; top:-18px; width:36px; height:36px; border-radius:50%; border:2px solid rgba(220,235,255,.85); animation:ipRing .55s cubic-bezier(.2,.8,.2,1) forwards; }
+.insp-pop.is-big .ip-ring{ left:-50px; top:-50px; width:100px; height:100px; }
+.insp-pop .ip-drop{ position:absolute; left:-3px; top:-3px; width:6px; height:6px; border-radius:50%; background:radial-gradient(circle at 35% 35%, #fff, rgba(190,215,255,.8)); animation:ipDrop .7s cubic-bezier(.2,.8,.3,1) forwards; }
+@keyframes ipRing{ from{ transform:scale(.6); opacity:1; } to{ transform:scale(1.8); opacity:0; } }
+@keyframes ipDrop{ from{ transform:translate(0,0) scale(1); opacity:1; } to{ transform:translate(var(--x), calc(var(--y) + 14px)) scale(.3); opacity:0; } }
+.izh-stone.is-pop{ animation:ipStone .32s cubic-bezier(.3,1.4,.4,1) forwards !important; }
+@keyframes ipStone{ 0%{ transform:translate(var(--x), var(--y)) scale(1); opacity:1; } 45%{ transform:translate(var(--x), var(--y)) scale(1.45); opacity:1; } 100%{ transform:translate(var(--x), var(--y)) scale(.1); opacity:0; } }
+#inspWorld .izb.is-pop{ transition:transform .3s cubic-bezier(.3,1.4,.4,1), opacity .25s ease .1s !important; scale:1.25; opacity:0 !important; }
+/* a row in "This week" folds away */
+.izl-r.is-fold{ overflow:hidden; opacity:0; padding-top:0; padding-bottom:0; border-top-color:transparent; filter:blur(4px); transform:translateX(16px); transition:height .42s cubic-bezier(.4,0,.2,1), opacity .3s ease, padding .42s ease, filter .3s ease, transform .42s ease, border-color .3s; }
+/* the panel sinks out of sight and rises back */
+.insp-lately.is-leaving{ animation:izlOut .42s cubic-bezier(.5,0,.75,0) forwards; pointer-events:none; }
+.insp-lately.is-arriving{ animation:izlIn .6s cubic-bezier(.2,.8,.2,1); }
+.insp-lately-min.is-leaving{ animation:izlPillOut .26s ease forwards; pointer-events:none; }
+.insp-lately-min.is-arriving{ animation:izlPillIn .5s cubic-bezier(.2,.8,.2,1.2); }
+@keyframes izlOut{ to{ opacity:0; transform:translateY(26px) scale(.94); filter:blur(8px); } }
+@keyframes izlIn{ from{ opacity:0; transform:translateY(26px) scale(.94); filter:blur(8px); } }
+@keyframes izlPillOut{ to{ opacity:0; transform:scale(.85); filter:blur(4px); } }
+@keyframes izlPillIn{ from{ opacity:0; transform:translateY(10px) scale(.85); filter:blur(4px); } }
+/* sounds panel */
+.izk-sfx{ min-width:230px; }
+.isx-styles{ display:flex; flex-wrap:wrap; gap:4px; }
+.isx-s{ padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:transparent; color:rgba(255,255,255,.8); font:inherit; font-size:12px; font-weight:600; cursor:pointer; }
+.isx-s:hover{ background:rgba(255,255,255,.08); }
+.isx-s.is-on{ background:linear-gradient(90deg, rgba(255,214,242,.25), rgba(196,245,255,.2)); border-color:rgba(255,255,255,.3); color:#fff; }
+.isx-vol{ display:flex; align-items:center; gap:8px; margin-top:10px; font-size:12px; }
+.isx-vol input{ flex:1; accent-color:#c9b6ff; }
+.isx-vol b{ min-width:36px; text-align:right; font-weight:700; color:rgba(255,255,255,.75); }
+.isx-vol.is-off{ opacity:.4; }
+.izk-sfx em{ display:block; margin-top:8px; font-size:11px; font-style:normal; color:rgba(255,255,255,.45); }
+.snd .isx-s{ color:var(--text); border-color:var(--border); }
+.snd .isx-s.is-on{ background:var(--accent); color:#1a1305; border-color:var(--accent); }
+.snd .isx-vol b{ color:var(--text-dim); }
+.snd .isx-vol input{ accent-color:var(--accent); }
+/* search while logging */
+.izs-find{ display:flex; align-items:center; gap:8px; margin:4px 0 12px; padding:0 12px; height:42px; border-radius:12px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); }
+.izs-find:focus-within{ border-color:rgba(201,182,255,.6); box-shadow:0 0 0 3px rgba(201,182,255,.15); }
+.izs-find span{ opacity:.6; font-size:14px; }
+.izs-find input{ flex:1; border:none; outline:none; background:transparent; color:#fff; font:inherit; font-size:14.5px; }
+.izs-find input::placeholder{ color:rgba(255,255,255,.4); }
+.izs-a.is-hidden{ display:none; }
+.izs-grid.is-none::after{ content:'Nothing like that yet.'; grid-column:1 / -1; padding:10px 4px; color:rgba(255,255,255,.5); font-size:13px; }
+
+/* ============ R28 limbo: Reset ============ */
+.izh-reset{ position:absolute; top:calc(100% + 64px); left:50%; transform:translateX(-50%); white-space:nowrap; padding:6px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.05); color:rgba(255,255,255,.78); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); transition:background .2s, color .2s, border-color .2s; }
+.izh-reset:hover{ background:rgba(255,255,255,.12); color:#fff; border-color:rgba(255,255,255,.35); }
+.irs-sub{ margin:-4px 0 14px; font-size:14px; line-height:1.5; color:rgba(255,255,255,.7); max-width:52ch; }
+.irs-grid{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; }
+.irs-t{ --c:#c9bbff; display:flex; flex-direction:column; align-items:center; gap:6px; padding:16px 10px 14px; border-radius:18px; border:1px solid rgba(255,255,255,.14); background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.14), color-mix(in srgb, var(--c) 14%, transparent)); color:#fff; font:inherit; cursor:pointer; animation:irsIn .5s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i) * 50ms); transition:transform .2s, border-color .2s, box-shadow .2s; }
+.irs-t:hover{ transform:translateY(-2px); border-color:rgba(255,255,255,.35); box-shadow:0 0 30px color-mix(in srgb, var(--c) 30%, transparent); }
+.irs-t.c-mind{ --c:#c9a8ff; } .irs-t.c-move{ --c:#7ff0c9; } .irs-t.c-home{ --c:#ffcf8a; } .irs-t.c-people{ --c:#ff9fcf; } .irs-t.c-unplug{ --c:#8fd8ff; }
+.irs-e{ font-size:30px; line-height:1; } .irs-t b{ font-size:13.5px; font-weight:700; text-align:center; } .irs-t small{ font-size:11.5px; color:rgba(255,255,255,.55); }
+@keyframes irsIn{ from{ opacity:0; transform:translateY(10px) scale(.96); } }
+.irs-min{ display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:14px; }
+.irs-min small{ font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.5); margin-right:4px; }
+.irc{ position:absolute; left:50%; bottom:96px; transform:translateX(-50%); z-index:6; display:flex; align-items:center; gap:12px; padding:10px 10px 10px 12px; border-radius:20px; background:rgba(22,18,44,.8); border:1px solid rgba(255,255,255,.16); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); box-shadow:0 18px 50px rgba(0,0,0,.35), 0 0 40px rgba(180,160,255,.15); animation:ircIn .6s cubic-bezier(.2,.8,.2,1); }
+@keyframes ircIn{ from{ opacity:0; transform:translate(-50%, 16px) scale(.95); filter:blur(6px); } }
+.irc-ring{ position:relative; width:40px; height:40px; flex:none; } .irc-ring i{ position:absolute; inset:0; display:grid; place-items:center; font-style:normal; font-size:17px; }
+.irc-tr{ fill:none; stroke:rgba(255,255,255,.12); stroke-width:3; } .irc-fl{ fill:none; stroke:#c9b6ff; stroke-width:3; stroke-linecap:round; transition:stroke-dasharray 1s linear; }
+.irc-e{ font-size:26px; padding:0 4px; }
+.irc-m{ display:flex; flex-direction:column; min-width:150px; } .irc-m b{ font-size:14.5px; color:#fff; } .irc-m small{ font-size:12px; color:rgba(255,255,255,.6); font-variant-numeric:tabular-nums; }
+.irc-go{ padding:9px 16px; border-radius:999px; border:none; background:linear-gradient(90deg, #ffd6f2, #d0c4ff, #c4f5ff); color:#1b1430; font:inherit; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; }
+.irc.is-done .irc-go{ background:linear-gradient(90deg, #3fbe8e, #7ff0c9); color:#06281b; }
+.irc-x{ padding:8px 10px; border-radius:999px; border:none; background:transparent; color:rgba(255,255,255,.6); font:inherit; font-size:12.5px; cursor:pointer; } .irc-x:hover{ color:#fff; background:rgba(255,255,255,.08); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -28512,13 +28588,14 @@ async function acctJudge(e){
         'You just checked in on me during work hours and I wasn’t working. '+acctFactsLine(e.facts)+' I said: “'+e.excuse+'”.\n'+
         'Decide if that’s a genuine, acceptable reason (sick, an emergency, family, an appointment, something that truly couldn’t wait, or real work for the business away from the app, like a client call, a shoot or a meeting) or an excuse (tired, distracted, scrolling, didn’t feel like it, putting it off, no reason).\n'+
         'Business right now: '+money(k.mrr)+' a month'+(k.goal ? ' against a goal of '+money(k.goal) : '')+', '+k.clients+' active clients, '+k.newC+' new in the last 30 days, '+k.leads+' open leads.\n'+
-        'Then say what you’d say to me, spoken, two to four sentences. If it’s a real reason: be understanding, tell me to get back to it when I can. If it’s an excuse: put it on me, be direct, remind me what’s at stake with my real numbers (a business that isn’t growing is dying), tell me to get to work, and offer to lock me in. Never talk about logging, recording or the word excuse.\n'+
+        'Then say what you’d say to me, spoken, two to four sentences. If it’s a real reason: be understanding, tell me to get back to it when I can. If it’s an excuse: put it on me, be direct, remind me what’s at stake with my real numbers (a business that isn’t growing is dying), tell me to get to work, and offer to lock me in. If it sounds like limbo (drained, stuck, no motivation, half doing nothing, pulled toward bad habits) it still isn’t acceptable, but don’t just scold: give me a way out, one reset from my list'+(typeof limboResetLine==='function' ? ' ('+limboResetLine()+')' : '')+', named, time-boxed, then straight back to work, and ask if you should start it. Never talk about logging, recording or the word excuse.\n'+
         'Reply with JSON only: {"acceptable": true or false, "why": "a few words on why", "reply": "what you say"}'}]}), new Promise(function(r){ setTimeout(function(){ r(null); }, 15000); })]) : null;
       if(res && res.ok){ const t = aiText(res.j), m = /\{[\s\S]*\}/.exec(t); if(m){ const j = JSON.parse(m[0]); verdict = !!j.acceptable; reply = String(j.reply||''); why = String(j.why||''); } }
     }catch(err){}
   }
   const a = acct(); if(!a.pending || a.pending.id!==e.id) return;
   if(verdict===null){ verdict = false; why = 'Not judged (no AI): change it if it was real'; }
+  if(!reply && !verdict && typeof limboSays==='function' && limboSays(e.excuse) && typeof limboFallback==='function') reply = limboFallback();
   if(!reply) reply = verdict ? 'Fair enough. Get back to it when you can.' : 'That’s on you. '+acctStakesLine()+' Want me to lock you in on '+(e.facts.next || 'the next thing')+'?';
   e.status = verdict ? 'excused' : 'fault'; e.why = opNoDash(why).slice(0, 160); e.reply = reply; e.settledAt = Date.now();
   a.pending = null; acctSchedule(); persist('focus'); acctRescore();
@@ -30300,6 +30377,296 @@ function recapTaskHtml(s){
   return '<span class="rc-task">'+(s.taskTitle ? '<button class="rc-task-b is-set" data-action="recapTaskOpen" data-id="'+s.id+'" title="Change the task">&#10003; '+escapeHtml(s.taskTitle)+'</button>' : '<button class="rc-task-b" data-action="recapTaskOpen" data-id="'+s.id+'" title="Put this time on a task">+ Task</button>')+
     (ui.recapTaskFor===s.id ? '<span class="rc-task-menu">'+(recapTaskList().map(function(t){ return '<button data-action="recapSetTask" data-sid="'+s.id+'" data-tid="'+t.id+'">'+escapeHtml(t.title)+'</button>'; }).join('') || '<em>No open tasks</em>')+'</span>' : '')+'</span>';
 }
+// ============ INSPIRATION, ROUND 28: WORDS, SOUNDS, SEARCH, AND LETTING GO GENTLY ============
+// Words: about every 45 seconds a few words surface somewhere quiet on the sky (never on top of the middle
+// or the toolbar), come into focus, drift a little and dissolve. No author, no quote marks, just words.
+// Sounds: Inspiration's effects (taps, chimes, letting go, the wind, a bubble popping) have their own
+// sound and their own volume, apart from the music: Chimes, Glass, Droplets, Soft keys or Off.
+// Change it from Inspiration's toolbar or Settings → Look & Sound.
+// Logging something has a search: type "wa" and Walk is right there.
+// Letting go is fluid: a logged thing pops off the ring around the middle, a row in "This week" folds
+// away, and the panel itself sinks out of sight (and rises back) instead of jumping between sizes.
+
+// ---- the sound ----
+const INSP_SFX = [['chimes', 'Chimes'], ['glass', 'Glass'], ['drops', 'Droplets'], ['soft', 'Soft keys'], ['off', 'Off']];
+function inspSfxCfg(){ const p = state.profile; if(!p.inspSfx || typeof p.inspSfx!=='object') p.inspSfx = {}; return p.inspSfx; }
+function inspSfxStyle(){ const s = inspSfxCfg().style; return INSP_SFX.some(function(x){ return x[0]===s; }) ? s : 'chimes'; }
+function inspSfxVol(){ const v = Number(inspSfxCfg().vol); return isFinite(v) && inspSfxCfg().vol!=null ? Math.max(0, Math.min(1, v)) : 0.8; }
+function inspSfxOn(){ return inspSfxStyle()!=='off' && inspSfxVol() > 0 && !(typeof soundPref==='function' && !soundPref('ui', true)) && state.profile.soundEnabled!==false; }
+function inspOut(ctx){ const g = ctx.createGain(); g.gain.value = inspSfxVol()*1.25; g.connect(sfxOut(ctx)); return g; }
+// one note in the chosen sound
+function inspNote(ctx, out, t, midi, vol){
+  const st = inspSfxStyle(), f = fmHz(midi);
+  if(st==='glass'){ fmKey(ctx, out, t, f*2, 1.4, vol*1.6); return; }
+  if(st==='soft'){ fmKey(ctx, out, t, f/2, 2.2, vol*2.2); return; }
+  if(st==='drops'){
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine';
+    o.frequency.setValueAtTime(f*1.6, t); o.frequency.exponentialRampToValueAtTime(f*0.9, t + 0.12);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol*2.4, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+    o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.4); return;
+  }
+  fmBell(ctx, out, t, f, vol);
+}
+inspChime = function(k){
+  try{ if(!inspSfxOn()) return; const ctx = getAudioCtx(); if(!ctx) return; const out = inspOut(ctx), notes = [72, 74, 76, 79, 81, 84, 86];
+    for(let i=0;i<(k||1);i++) inspNote(ctx, out, ctx.currentTime + i*0.11, notes[Math.floor(Math.random()*notes.length)], 0.022); }catch(e){}
+};
+inspLetGoChime = function(){
+  try{ if(!inspSfxOn()) return; const ctx = getAudioCtx(); if(!ctx) return; const out = inspOut(ctx);
+    [84, 79, 76, 72].forEach(function(m, i){ inspNote(ctx, out, ctx.currentTime + i*0.09, m, 0.016 - i*0.002); }); }catch(e){}
+};
+if(typeof inspWhoosh==='function') inspWhoosh = (function(base){ return function(level){ if(!inspSfxOn()) return; return base((level||1)*inspSfxVol()*1.25); }; })(inspWhoosh);
+// a bubble popping: a quick bright tick and a little shimmer after it
+function inspPopSound(){
+  try{ if(!inspSfxOn()) return; const ctx = getAudioCtx(); if(!ctx) return; const out = inspOut(ctx), t = ctx.currentTime;
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine';
+    o.frequency.setValueAtTime(1400, t); o.frequency.exponentialRampToValueAtTime(420, t + 0.06);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.09, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+    o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.1);
+    inspNote(ctx, out, t + 0.05, 88, 0.008); inspNote(ctx, out, t + 0.12, 91, 0.006);
+  }catch(e){}
+}
+ACTIONS.inspSfxSet = function(el, e, id){ inspSfxCfg().style = id; persist('profile'); inspChime(2); if(typeof inspOpenNow==='function' && inspOpenNow()) inspRender(); else renderView(); };
+ACTIONS.inspSfxOpen = function(){ ui.inspSfxOpen = !ui.inspSfxOpen; ui.inspWindOpen = false; inspRender(); };
+document.addEventListener('input', function(e){
+  const t = e.target; if(!t || !t.matches || !t.matches('[data-insp-vol]')) return;
+  inspSfxCfg().vol = Number(t.value)/100; clearTimeout(ui._inspVolT); ui._inspVolT = setTimeout(function(){ persist('profile'); inspChime(1); }, 250);
+  document.querySelectorAll('[data-insp-vol-v]').forEach(function(x){ x.textContent = t.value+'%'; });
+  document.querySelectorAll('[data-insp-vol]').forEach(function(x){ if(x!==t) x.value = t.value; });
+});
+function inspSfxControlsHtml(){
+  const st = inspSfxStyle(), v = Math.round(inspSfxVol()*100);
+  return '<div class="isx-styles">'+INSP_SFX.map(function(x){ return '<button class="isx-s'+(x[0]===st ? ' is-on' : '')+'" data-action="inspSfxSet" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>'+
+    '<div class="isx-vol'+(st==='off' ? ' is-off' : '')+'"><span>&#128264;</span><input type="range" min="0" max="100" step="5" data-insp-vol value="'+v+'"><b data-insp-vol-v>'+v+'%</b></div>';
+}
+// in Inspiration's toolbar: a Sounds button with its own little panel
+inspToolsHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    const btn = '<span class="izk-wrap"><button class="izk'+(ui.inspSfxOpen ? ' is-on' : '')+'" data-action="inspSfxOpen"><span>&#127925;</span>Sounds</button>'+
+      (ui.inspSfxOpen ? '<span class="izk-wind izk-sfx"><small>Sound effects</small>'+inspSfxControlsHtml()+'<em>The music has its own player, top right.</em></span>' : '')+'</span>';
+    return h.replace(/<\/div>$/, btn+'</div>');
+  };
+})(inspToolsHtml);
+// and in Settings → Look & Sound
+soundSettingsHtml = (function(base){
+  return function(){
+    return base.apply(this, arguments).replace(/<\/div>$/, '<div class="card section"><div class="snd-h"><div><div class="section-title" style="margin:0;">&#10024; Inspiration</div><div class="kpi-sub">The taps, chimes and pops on Inspiration, apart from the music.</div></div><button class="btn btn-ghost btn-sm" data-action="inspSfxPreview">&#9654; Hear it</button></div>'+inspSfxControlsHtml()+'</div></div>');
+  };
+})(soundSettingsHtml);
+ACTIONS.inspSfxPreview = function(){ inspChime(3); setTimeout(inspPopSound, 600); setTimeout(inspLetGoChime, 1100); };
+
+// ---- words on the sky, about every 45 seconds ----
+const INSP_WORD_SLOTS = [[12, 24], [62, 22], [16, 70], [64, 72], [38, 14], [40, 80]];   // [left%, top%] away from the middle and the toolbar
+inspWhisper = function(){};   // (the old one sat on the page and blinked out when the page redrew)
+function inspWords(){
+  if(!inspOpenNow() || ui.inspBreath || document.querySelector('.insp-words')) return;
+  const lines = inspWhisperLines(); if(!lines.length) return;
+  let t = lines[Math.floor(Math.random()*lines.length)]; if(t===ui._inspLastWhisper) t = lines[(lines.indexOf(t) + 1) % lines.length]; ui._inspLastWhisper = t;
+  t = String(t).replace(/^["“]|["”]$/g, '').replace(/\s+[—-]\s+[A-Z][\w .]+$/, '');
+  let slot = Math.floor(Math.random()*INSP_WORD_SLOTS.length); if(slot===ui._inspWordSlot) slot = (slot + 1) % INSP_WORD_SLOTS.length; ui._inspWordSlot = slot;
+  const w = document.createElement('div'); w.className = 'insp-words';
+  w.style.left = INSP_WORD_SLOTS[slot][0]+'%'; w.style.top = INSP_WORD_SLOTS[slot][1]+'%';
+  t.split(/\s+/).forEach(function(word, i){ const s = document.createElement('span'); s.textContent = word; s.style.animationDelay = (0.25 + i*0.11).toFixed(2)+'s'; w.appendChild(s); w.appendChild(document.createTextNode(' ')); });
+  document.body.appendChild(w);
+  setTimeout(function(){ w.classList.add('is-out'); }, 8200);
+  setTimeout(function(){ if(w.parentNode) w.parentNode.removeChild(w); }, 10600);
+}
+setInterval(function(){ try{ if(typeof inspOpenNow==='function' && inspOpenNow() && Date.now() - (ui.inspOpenedAt||0) > 12000 && Date.now() - (ui._inspWordsAt||0) > 44000){ ui._inspWordsAt = Date.now(); inspWords(); } }catch(e){} }, 3000);
+closeInspire = (function(base){ return function(){ document.querySelectorAll('.insp-words').forEach(function(w){ w.classList.add('is-out'); setTimeout(function(){ if(w.parentNode) w.parentNode.removeChild(w); }, 900); }); ui.inspSfxOpen = false; return base.apply(this, arguments); }; })(closeInspire);
+
+// ---- search when logging ----
+inspHtml = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    if(ui.inspSheet) h = h.replace('<div class="izs-h">What did you do?</div>', '<div class="izs-h">What did you do?</div><div class="izs-find"><span>&#128269;</span><input id="inspFind" placeholder="Search: walk, read, gym…" autocomplete="off" value="'+escapeHtml(ui.inspFind||'')+'"></div>');
+    return h;
+  };
+})(inspHtml);
+function inspFindApply(){
+  const i = document.getElementById('inspFind'); if(!i) return;
+  const q = i.value.trim().toLowerCase(); ui.inspFind = i.value;
+  let n = 0;
+  document.querySelectorAll('#insp .izs-grid .izs-a').forEach(function(b){ const hit = !q || b.textContent.toLowerCase().indexOf(q) >= 0; b.classList.toggle('is-hidden', !hit); if(hit) n++; });
+  const g = document.querySelector('#insp .izs-grid'); if(g) g.classList.toggle('is-none', n===0);
+}
+document.addEventListener('input', function(e){ if(e.target && e.target.id==='inspFind') inspFindApply(); });
+document.addEventListener('keydown', function(e){
+  if(!e.target || e.target.id!=='inspFind' || e.key!=='Enter') return;
+  const first = document.querySelector('#insp .izs-grid .izs-a:not(.is-hidden)'); if(first){ e.preventDefault(); first.click(); }
+});
+ACTIONS.inspLogSheet = (function(base){ return function(){ ui.inspFind = ''; base.apply(this, arguments); if(ui.inspSheet) setTimeout(function(){ const i = document.getElementById('inspFind'); if(i) i.focus(); inspFindApply(); }, 60); }; })(ACTIONS.inspLogSheet);
+
+// ---- letting go, fluidly ----
+// a logged thing pops off the ring around the middle (and its row folds away)
+function inspPopStone(logId){
+  const s = inspStore(), t = todayStr(), today = s.log.filter(function(x){ return x.date===t; }).slice(-8), k = today.findIndex(function(x){ return x.id===logId; });
+  if(k < 0) return false;
+  const stone = document.querySelectorAll('#inspWorld .izh-stone')[k]; if(!stone) return false;
+  const r = stone.getBoundingClientRect(), b = document.createElement('div'); b.className = 'insp-pop'; b.style.left = (r.left + r.width/2)+'px'; b.style.top = (r.top + r.height/2)+'px';
+  b.innerHTML = '<i class="ip-ring"></i>'+[0,1,2,3,4,5,6,7,8,9].map(function(i){ const a = i/10*Math.PI*2 + Math.random()*0.4, d = 26 + Math.random()*22; return '<i class="ip-drop" style="--x:'+Math.round(Math.cos(a)*d)+'px;--y:'+Math.round(Math.sin(a)*d)+'px"></i>'; }).join('');
+  document.body.appendChild(b); setTimeout(function(){ if(b.parentNode) b.parentNode.removeChild(b); }, 900);
+  stone.classList.add('is-pop');
+  return true;
+}
+function inspFoldRow(row, then){
+  if(!row){ then(); return; }
+  row.style.height = row.offsetHeight+'px'; void row.offsetHeight;
+  row.classList.add('is-fold'); row.style.height = '0px';
+  setTimeout(then, 460);
+}
+ACTIONS.inspLogDel = function(el, e, id){
+  const popped = inspPopStone(id);
+  if(popped) inspPopSound(); else inspLetGoChime();
+  inspFoldRow(el && el.closest('.izl-r'), function(){ const s = inspStore(); s.log = s.log.filter(function(x){ return x.id!==id; }); persist('personal'); try{ xpLast = null; }catch(err){} inspRender(); });
+};
+ACTIONS.inspUndo = (function(base){ return function(el, e, id){ if(inspPopStone(id)) inspPopSound(); const self = this, args = arguments; setTimeout(function(){ base.apply(self, args); }, 320); }; })(ACTIONS.inspUndo);
+// "Not for me": the bubble pops instead of fading
+ACTIONS.inspHideAct = function(el, e, id){
+  const b = document.querySelector('#insp .izb[data-id="'+id+'"]');
+  ui.inspOpenAct = null;
+  if(b){ const r = b.getBoundingClientRect(), p = document.createElement('div'); p.className = 'insp-pop is-big'; p.style.left = (r.left + r.width/2)+'px'; p.style.top = (r.top + r.height/2)+'px';
+    p.innerHTML = '<i class="ip-ring"></i>'+[0,1,2,3,4,5,6,7,8,9,10,11].map(function(i){ const a = i/12*Math.PI*2 + Math.random()*0.3, d = 60 + Math.random()*40; return '<i class="ip-drop" style="--x:'+Math.round(Math.cos(a)*d)+'px;--y:'+Math.round(Math.sin(a)*d)+'px"></i>'; }).join('');
+    document.body.appendChild(p); setTimeout(function(){ if(p.parentNode) p.parentNode.removeChild(p); }, 1000); b.classList.add('is-pop'); }
+  inspPopSound();
+  setTimeout(function(){ const h = inspHidden(); if(h.indexOf(id) < 0) h.push(id); persist('personal'); ui._inspScatter = null; inspRender(); }, 360);
+};
+// the "This week" panel sinks out of sight (and rises back) instead of jumping between sizes
+ACTIONS.inspPanelToggle = function(){
+  const s = inspStore();
+  if(!s.panelMin){
+    const p = document.querySelector('#insp .insp-lately');
+    if(p){ p.classList.add('is-leaving'); inspLetGoChime(); setTimeout(function(){ s.panelMin = true; persist('personal'); inspRender(); const m = document.querySelector('#insp .insp-lately-min'); if(m){ m.classList.add('is-arriving'); setTimeout(function(){ m.classList.remove('is-arriving'); }, 600); } }, 420); return; }
+    s.panelMin = true;
+  } else {
+    const m = document.querySelector('#insp .insp-lately-min');
+    if(m) m.classList.add('is-leaving');
+    inspChime(2);
+    setTimeout(function(){ s.panelMin = false; persist('personal'); inspRender(); const p = document.querySelector('#insp .insp-lately'); if(p){ p.classList.add('is-arriving'); setTimeout(function(){ p.classList.remove('is-arriving'); }, 700); } }, m ? 260 : 0);
+    return;
+  }
+  persist('personal'); inspRender();
+};
+// ============ LIMBO: NOT WORKING, NOT RESTING, WORK STILL ON YOU ============
+// Some days you're in between: you don't feel like working, you don't feel like anything good, and the
+// pressure's still there. The way out is usually small and easy: cook a meal, clean up, a walk, a shower.
+// Inspiration has a Reset for exactly that: pick one, it runs on a gentle timer, you come back, it's
+// logged, and the next step is right there: lock in for 25.
+// Op knows this about you. When he checks on your work and you're stuck (not a real reason, just limbo),
+// he stays on you but gives you a way out: one reset, named, time-boxed, then straight back to it. He can
+// start the reset for you, and when it's over he's there to get you locked in.
+
+const RESET_MIN = {walk:15, bath:10, clean:15, cook:25, mealprep:30, stretch:10, sun:10, meditate:10, nature:20, call:10, listen:10, cozy:15};
+// your resets: what you told Op resets you, then the classics (cook, clean, a walk, a shower), then what you log most
+function resetActs(){
+  const out = [], seen = {}, add = function(a){ if(a && !seen[a.id] && (typeof inspHidden!=='function' || inspHidden().indexOf(a.id) < 0)){ seen[a.id] = 1; out.push(a); } };
+  (typeof aboutResetActs==='function' ? aboutResetActs() : []).forEach(add);
+  ['cook', 'clean', 'walk', 'bath'].forEach(function(id){ add(INSP_ACTS.find(function(a){ return a.id===id; })); });
+  const n = {}; inspStore().log.slice(-200).forEach(function(x){ n[x.act] = (n[x.act]||0) + 1; });
+  Object.keys(n).sort(function(a, b){ return n[b] - n[a]; }).forEach(function(id){ if(out.length < 6) add(inspActs().find(function(a){ return a.id===id; })); });
+  ['stretch', 'sun', 'meditate'].forEach(function(id){ if(out.length < 6) add(INSP_ACTS.find(function(a){ return a.id===id; })); });
+  return out.slice(0, 6);
+}
+function resetMinutes(a){ return RESET_MIN[a.id] || 15; }
+function resetNow(){ const r = state.profile.inspReset; return r && r.date===todayStr() ? r : null; }
+function resetLeftMs(r){ return Math.max(0, r.start + r.min*60000 - Date.now()); }
+function resetStart(id, min){
+  const a = inspActs().find(function(x){ return x.id===id; }) || INSP_ACTS.find(function(x){ return x.id===id; }); if(!a) return null;
+  state.profile.inspReset = {id:a.id, label:a.label, e:a.e, min:Math.max(5, Math.min(60, Number(min) || resetMinutes(a))), start:Date.now(), date:todayStr()};
+  persist('profile'); ui.inspResetSheet = false;
+  if(typeof inspChime==='function') inspChime(3);
+  return state.profile.inspReset;
+}
+// done (back early, or the time's up): it's logged, and the way back to work is right there
+function resetFinish(){
+  const r = resetNow(); if(!r || r.doneAt) return;
+  r.doneAt = Date.now(); const mins = Math.max(1, Math.round((r.doneAt - r.start)/60000));
+  if(typeof inspLogAct==='function') inspLogAct(r.id, {min:mins, note:'A reset'});
+  persist('profile');
+  if(typeof inspChime==='function') inspChime(2);
+  if(typeof inspRipple==='function') inspRipple();
+}
+ACTIONS.inspResetOpen = function(){ ui.inspResetSheet = !ui.inspResetSheet; ui.inspSheet = false; inspRender(); };
+ACTIONS.inspResetMin = function(el, e, id){ ui.inspResetMinPick = Number(id); inspRender(); };
+ACTIONS.inspResetGo = function(el, e, id){ resetStart(id, ui.inspResetMinPick); ui.inspResetMinPick = null; inspRender(); };
+ACTIONS.inspResetDone = function(){ resetFinish(); inspRender(); };
+ACTIONS.inspResetCancel = function(){ state.profile.inspReset = null; persist('profile'); if(typeof inspLetGoChime==='function') inspLetGoChime(); inspRender(); };
+ACTIONS.inspResetDismiss = function(){ const r = resetNow(); if(r) r.dismissed = true; persist('profile'); inspRender(); };
+ACTIONS.inspResetLockIn = function(){
+  const r = resetNow(); if(r) r.dismissed = true; persist('profile');
+  if(typeof closeInspire==='function') closeInspire();
+  setTimeout(function(){ if(typeof openLockSeq==='function') openLockSeq({minutes:25}); }, 350);
+};
+function resetSheetHtml(){
+  const acts = resetActs(), pick = ui.inspResetMinPick;
+  return '<div class="insp-sheet-bg" data-action="inspResetOpen"></div><div class="insp-sheet irs">'+
+    '<div class="izs-h">Stuck in between?</div><p class="irs-sub">Not working, not resting, and it’s still on you. Do one easy thing for your head, then get back to it.</p>'+
+    '<div class="irs-grid">'+acts.map(function(a, i){ return '<button class="irs-t c-'+a.cat+'" data-action="inspResetGo" data-id="'+a.id+'" style="--i:'+i+'"><span class="irs-e">'+a.e+'</span><b>'+escapeHtml(a.label)+'</b><small>'+(pick || resetMinutes(a))+' min</small></button>'; }).join('')+'</div>'+
+    '<div class="irs-min"><small>How long</small>'+[['', 'Its own'], ['10', '10 min'], ['15', '15'], ['20', '20'], ['30', '30']].map(function(m){ return '<button class="isx-s'+((pick ? String(pick) : '')===m[0] ? ' is-on' : '')+'" data-action="inspResetMin" data-id="'+m[0]+'">'+m[1]+'</button>'; }).join('')+'</div>'+
+  '</div>';
+}
+function resetCardHtml(){
+  const r = resetNow(); if(!r || r.dismissed) return '';
+  if(r.doneAt) return '<div class="irc is-done"><span class="irc-e">'+r.e+'</span><div class="irc-m"><b>Feel a little lighter?</b><small>'+escapeHtml(r.label)+' &middot; logged</small></div>'+
+    '<button class="irc-go" data-action="inspResetLockIn">&#128274; Lock in for 25</button><button class="irc-x" data-action="inspResetDismiss" title="In a bit">In a bit</button></div>';
+  const left = resetLeftMs(r), pct = 1 - left/(r.min*60000), C = 2*Math.PI*17;
+  return '<div class="irc"><span class="irc-ring"><svg viewBox="0 0 40 40" width="40" height="40"><circle cx="20" cy="20" r="17" class="irc-tr"/><circle cx="20" cy="20" r="17" class="irc-fl" stroke-dasharray="'+(C*pct).toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 20 20)"/></svg><i>'+r.e+'</i></span>'+
+    '<div class="irc-m"><b>'+escapeHtml(r.label)+'</b><small><span id="ircLeft">'+fmtClockLeft(left)+'</span> left &middot; then back to it</small></div>'+
+    '<button class="irc-go" data-action="inspResetDone">I’m back</button><button class="irc-x" data-action="inspResetCancel" title="Cancel">&#10005;</button></div>';
+}
+function fmtClockLeft(ms){ const s = Math.ceil(ms/1000), m = Math.floor(s/60); return m+':'+String(s % 60).padStart(2, '0'); }
+inspHtml = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    h = h.replace('<button class="izh-log" data-action="inspLogSheet">Log something</button>', '<button class="izh-log" data-action="inspLogSheet">Log something</button><button class="izh-reset" data-action="inspResetOpen">&#8635; Stuck? Reset</button>');
+    return h+resetCardHtml()+(ui.inspResetSheet ? resetSheetHtml() : '');
+  };
+})(inspHtml);
+// the clock, and what happens when the time's up
+setInterval(function(){
+  const r = resetNow(); if(!r || r.doneAt || r.dismissed) return;
+  const left = resetLeftMs(r), el = document.getElementById('ircLeft');
+  if(el) el.textContent = fmtClockLeft(left);
+  if(left > 0) return;
+  resetFinish();
+  if(typeof inspOpenNow==='function' && inspOpenNow()){ inspRender(); return; }
+  // you left Inspiration to go do it: Op's there when the time's up
+  if(state.focus.activeSession) return;
+  const line = pickOne(['That’s your '+r.label.toLowerCase()+' done. Feel better? Let’s lock in for 25. Want me to start it?', 'Time’s up on the reset. You’ve got the head for it now: 25 minutes, locked in. Should I start it?', 'Good. That was the easy part. Now 25 minutes on the real thing. Want me to lock you in?']);
+  AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
+  OV.cap = 'opBubText'; opBubShow(); if(opVoiceOn()) opSay(line, {cap:'opBubText'}); else opCaption(line);
+}, 1000);
+
+// ---- Op knows about limbo ----
+function limboResetLine(){ return resetActs().slice(0, 5).map(function(a){ return a.label.toLowerCase()+' ('+resetMinutes(a)+' min)'; }).join(', '); }
+const LIMBO_RE = /\b(don.?t feel like|not feeling it|no motivation|unmotivated|can.?t focus|can.?t get (going|started)|stuck|drained|burn(ed|t) out|tired|exhausted|lazy|bored|meh|scroll|tiktok|instagram|youtube|procrastinat|putting it off|in a funk|out of it|limbo)\b/i;
+function limboSays(text){ return LIMBO_RE.test(String(text||'')); }
+aiContext = (function(base){
+  return function(){
+    const r = resetNow();
+    return base.apply(this, arguments)+'\nHis resets (easy things that clear his head and get him back to work; he often forgets them): '+limboResetLine()+'.'+
+      ' He sometimes ends up in limbo: not working, not resting, pulled toward bad habits, with the pressure of work still on him. When that happens, or when you check on his work and he’s stuck without a real reason, be pushy but graceful: name one reset from his list with a time box, then a firm way back (lock in for 25). Offer to start it with start_reset.'+
+      (r && !r.doneAt ? ' Right now he’s doing a reset: '+r.label+', '+Math.ceil(resetLeftMs(r)/60000)+' minutes left.' : r && r.doneAt && Date.now() - r.doneAt < 30*60000 ? ' He just finished a reset ('+r.label+'). Now is the moment to get him locked in.' : '');
+  };
+})(aiContext);
+OP_TOOLS.push({name:'start_reset', description:'Start a short reset for him on the Inspiration page (cooking, cleaning, a walk, a shower or another of his resets) with a gentle timer. When it ends, you get him back to work. Use it when he’s in limbo and says yes to a reset.', input_schema:{type:'object', properties:{idea:{type:'string', description:'which reset, in plain words, e.g. walk, shower, clean, cook'}, minutes:{type:'integer', description:'how long, 5 to 60'}}, required:['idea']}});
+function resetFind(words){
+  const w = String(words||'').toLowerCase(), all = resetActs().concat(inspActs());
+  const syn = {shower:'bath', bath:'bath', cook:'cook', cooking:'cook', meal:'cook', clean:'clean', cleaning:'clean', tidy:'clean', walk:'walk', stroll:'walk', stretch:'stretch', yoga:'stretch', sun:'sun', meditate:'meditate'};
+  const k = Object.keys(syn).find(function(x){ return w.indexOf(x) >= 0; });
+  return (k && all.find(function(a){ return a.id===syn[k]; })) || all.find(function(a){ return a.label.toLowerCase().indexOf(w) >= 0 || w.indexOf(a.label.toLowerCase()) >= 0; }) || null;
+}
+opRunTool = (function(base){
+  return function(name, x){
+    if(name!=='start_reset') return base.apply(this, arguments);
+    const a = resetFind(x && x.idea); if(!a) throw new Error('no reset like "'+(x && x.idea)+'"; his resets: '+limboResetLine());
+    const r = resetStart(a.id, x && x.minutes);
+    if(typeof openInspire==='function' && !(typeof inspOpenNow==='function' && inspOpenNow())) openInspire(); else inspRender();
+    return 'started: '+r.label+' for '+r.min+' minutes (it’s on his Inspiration page with a timer)';
+  };
+})(opRunTool);
+// no AI key: a check-in answer that sounds like limbo still gets a way out (used by the check-in's judge)
+function limboFallback(){ const a = resetActs()[0]; return a ? 'Sounds like you’re stuck in between. Here’s the way out: '+a.label.toLowerCase()+', '+resetMinutes(a)+' minutes, then we lock in for 25. Want me to start it?' : ''; }
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

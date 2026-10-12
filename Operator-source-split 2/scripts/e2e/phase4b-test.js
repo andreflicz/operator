@@ -108,7 +108,7 @@ const SP = require('./common.js').OUT;
   await p.click('[data-action="journalMode"][data-id="boards"]');
   await p.click('[data-action="boardNew"][data-kind="journal"]');
   check('journal board created (same engine)', (await E("cvBoard().kind"))==='journal' && await p.isVisible('#boardHost'));
-  check('FAB adds note on journal board', (await p.getAttribute('#fabAdd','title'))==='Add note to board');
+  check('FAB adds note on journal board', (await p.getAttribute('#fabAdd','aria-label'))==='Add note to board');
   await p.click('#fabAdd');
   check('journal note added', (await els()).length===1);
   await p.click('[data-action="journalMode"][data-id="entries"]');
