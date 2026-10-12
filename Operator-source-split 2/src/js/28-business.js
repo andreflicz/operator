@@ -47,6 +47,7 @@ function renderBusinessOverview(){
         return '<div class="biz-mcol'+(i===5?' is-now':'')+'" title="'+m.label+': $'+m.v.toLocaleString()+'"><div class="biz-mbar-wrap"><div class="biz-mbar" style="height:'+Math.max(m.v?4:0, m.v/maxV*100)+'%"></div></div><span>'+m.label+'</span></div>';
       }).join('')+'</div></div>'+
     '</div>'+
+    opReadBiz()+
     '<div class="hq-cols">'+
       '<div class="hq-col">'+
         '<div class="hq-col-head" data-action="businessTab" data-tab="clients"><span>Clients</span><span class="hq-count">'+active.length+'</span><span class="view-all-link">All &rarr;</span></div>'+

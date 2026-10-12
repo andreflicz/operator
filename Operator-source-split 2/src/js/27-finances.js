@@ -37,6 +37,7 @@ function renderPersonalFinances(){
     '<div class="card" style="min-height:128px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">Income this month</div><div class="kpi-value">$'+thisMonthIncome.toLocaleString()+'</div></div>'+
     '<div class="card" style="min-height:128px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">Paid Off So Far</div><div class="kpi-value" style="color:var(--good);">$'+(totalOriginal-totalDebt).toLocaleString()+'</div></div>'+
   '</div>'+
+  opReadMoney()+
   '<div class="grid grid-2 section" style="align-items:start;">'+
   '<div class="section" style="margin-bottom:0;"><div class="section-title">Debts</div>'+
     '<div class="task-list">'+(debts.map(debtRow).join('') || '<div class="empty">No debts tracked. The + in the corner adds one.</div>')+'</div></div>'+

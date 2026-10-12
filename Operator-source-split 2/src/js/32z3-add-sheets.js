@@ -84,12 +84,9 @@ function focusAddMenu(){
   const items = {
     task:['&#9989;', 'A task', function(){ openAddTaskModal(); }, 'Something to get done'],
     skill:['&#127919;', 'A training skill', function(){ openSkillSheet(); }, 'Something you’re getting better at'],
-    video:['&#127916;', 'A video idea', function(){ openContentSheet(); }, 'Business or your own channel'],
-    event:['&#128197;', 'An event', function(){ openCalEventModal(); }, 'A call, a shoot, a block of time'],
-    goal:['&#127942;', 'A goal', function(){ openGoalSheet('week'); }, 'For the week, the month or longer'],
-    journal:['&#9997;&#65039;', 'A journal entry', function(){ openQuickJournalModal(); }, 'Whatever’s on your mind']
+    video:['&#127916;', 'A video idea', function(){ openContentSheet(); }, 'Business or your own channel']
   };
   const sub = ui.view==='focus' && ui.focusTab!=='analytics' ? ui.focusTasksSubTab : '';
-  const order = sub==='skills' ? ['skill', 'task', 'video', 'event', 'goal', 'journal'] : sub==='videoIdeas' ? ['video', 'task', 'skill', 'event', 'goal', 'journal'] : ['task', 'skill', 'video', 'event', 'goal', 'journal'];
+  const order = sub==='skills' ? ['skill', 'task', 'video'] : sub==='videoIdeas' ? ['video', 'task', 'skill'] : ['task', 'skill', 'video'];
   return order.map(function(k){ return items[k]; });
 }

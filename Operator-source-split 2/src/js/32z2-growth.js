@@ -23,6 +23,7 @@ function trainingSkillsHtml(){
   return '<div class="gr">'+
     '<div class="gr-top"><div class="gr-top-t"><span class="gr-top-ic">&#127919;</span><div><b>Training Skills</b><small>What you’re getting better at. Time it like any task; it adds up here and counts toward Mind.</small></div></div>'+
       (sk.length ? '<div class="gr-top-n"><b>'+fmtDurationLabel(total)+'</b><small>this week</small></div>' : '')+'</div>'+
+    (sk.length ? opReadSkills() : '')+
     (sk.length ? '<div class="gr-skills">'+sk.map(function(x){ const wk = skillMinutes(x.id, 7), on = ui.currentTaskId===x.id, aim = Number(x.skillGoal)||0;
       return '<div class="gr-skill'+(on ? ' is-on' : '')+'"><div class="gr-sk-h">'+(aim ? ring(wk/aim) : '<span class="gr-sk-ic">&#127919;</span>')+'<div class="gr-sk-tt"><b>'+escapeHtml(x.title)+'</b><small>'+(on ? '<span class="gr-live">&#9679; training now</span>' : aim ? fmtDurationLabel(wk)+' of '+fmtDurationLabel(aim)+' this week' : fmtDurationLabel(wk)+' this week')+'</small></div></div>'+
         bars(x.id)+

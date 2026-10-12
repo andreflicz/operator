@@ -48,6 +48,7 @@ function renderCalendar(){
     '</div>'+
   '</div>'+
   (typeof intentStripHtml==='function' ? intentStripHtml() : '')+
+  '<div class="opi-wrap">'+opReadWeek()+'</div>'+
   '<div class="section" style="max-width:640px;margin:0 auto 20px;text-align:center;">'+
     '<div id="calendarBigClock" class="cal-big-clock"></div>'+
     '<div id="calendarBigClockDate" class="kpi-sub" style="margin-top:2px;"></div>'+

@@ -109,6 +109,7 @@ function renderGoalsTab(){
   const head = function(t, extra){ return '<div class="gl-h"><span>'+t+'</span>'+(extra||'')+'</div>'; };
   return '<div class="gl">'+
     // (no add buttons here: the + in the corner adds a goal of any kind)
+    opReadGoals()+
     '<div class="gl-sec">'+head('The big ones')+masterGoalsHtml(false)+'</div>'+
     (typeof tierCardHtml==='function' ? '<div class="gl-sec">'+head('This week &amp; this month')+
       '<div class="tg-grid">'+tierCardHtml('week', {add:'sheet'})+tierCardHtml('month', {add:'sheet'})+'</div>'+

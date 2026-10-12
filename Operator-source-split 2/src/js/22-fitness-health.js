@@ -10,7 +10,7 @@ function renderFitness(){
   const tabs = '<div class="sub-pills">'+[['overview', 'Overview'], ['body', 'Weight &amp; fuel'], ['training', 'Training']].map(function(t){ return '<button class="sub-pill'+(sub===t[0] ? ' is-on' : '')+'" data-action="healthSub" data-id="'+t[0]+'">'+t[1]+'</button>'; }).join('')+'</div>';
   const body = sub==='body' ? renderBodyFuel()+'<div class="hl-cols is-one">'+renderHealthLists()+'</div>'
     : sub==='training' ? renderWorkoutsHero()+'<div class="hl-cols is-one">'+renderWorkoutHistory()+'</div>'
-    : renderHealthScore()+renderBodyFuel()+renderWorkoutsHero();
+    : renderHealthScore()+opReadHealth()+renderBodyFuel()+renderWorkoutsHero();
   return '<div class="hl">'+tabs+'<div class="subtab-panel" data-key="health-'+sub+'">'+body+'</div></div>';
 }
 ACTIONS.healthSub = function(el, e, id){ ui.healthSub = id; renderView(); };
