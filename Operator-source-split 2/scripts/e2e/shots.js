@@ -132,6 +132,7 @@ function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
   await shot('board', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.view='personal'; ui.personalTab='journal'; ui.journalMode='boards'; renderView()"); await p.waitForTimeout(900); });
   await shot('board-full', async () => { await E("ui.boardFull = 'journal'; renderView()"); await p.waitForTimeout(900); });
   await E("ui.boardFull = false");
+  await shot('settings-you', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.view='settings'; ui.settingsTab='you'; renderView()"); await p.waitForTimeout(500); await E("document.getElementById('setYourWorld').scrollIntoView({block:'start'})"); await p.waitForTimeout(300); });
   await shot('health-body', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.view='personal'; ui.personalTab='fitness'; ui.healthSub='body'; renderView()"); await p.waitForTimeout(400); });
   await shot('health-train', async () => { await E("ui.healthSub='training'; renderView()"); await p.waitForTimeout(400); });
   await E("ui.healthSub='overview'");

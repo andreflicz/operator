@@ -106,13 +106,7 @@ function renderSettings(){
         '<div class="field"><label>Workout days per week (goal)</label><input class="input" type="number" id="setWeeklyWorkout" value="'+p.weeklyWorkoutTarget+'"></div>'+
       '</div></div>'+
       // the things that make Operator yours: the same settings as in the alarm's setup, saved as you type
-      (function(){ const w = wakeCfg() || {}; return '<div class="card section" id="setYourWorld"><div class="section-title">Your world'+tip('Good morning and Op use these: walks to places you like, your teams’ scores, the news you care about.')+'</div><div class="grid grid-2">'+
-        '<div class="field"><label>Places you like</label><input class="input" data-wake="places" placeholder="e.g. a park, a coffee spot" value="'+escapeHtml(w.places||'')+'"></div>'+
-        '<div class="field"><label>Your teams</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, Giants, UFC" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
-        '<div class="field"><label>Interests</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
-        '<div class="field"><label>News topics</label><input class="input" data-wake="newsTopics" placeholder="Top stories" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
-        '<div class="field"><label>Hide news about</label><input class="input" data-wake="newsMute" placeholder="e.g. celebrity" value="'+escapeHtml(w.newsMute!=null ? w.newsMute : 'Wyoming')+'"></div>'+
-      '</div></div>'; })()+
+      (typeof yourWorldHtml==='function' ? yourWorldHtml() : '')+
       '<div class="section"><div class="section-title">Why You\'re Doing This</div><div class="card"><div class="grid grid-2">'+
         '<div><div class="kind-label" style="color:var(--good);">Getting</div>'+
           '<div class="task-list">'+(toward.map(function(m){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(m.text)+'</div>'+deleteBtn('motivation', m.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+

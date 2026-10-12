@@ -37,7 +37,7 @@ function inspStore(){
 // your places (Settings → You) become walks of their own
 function inspActs(){
   const places = String((typeof wakeCfg==='function' && wakeCfg() && wakeCfg().places) || '').split(',').map(function(x){ return x.trim(); }).filter(Boolean).slice(0, 4);
-  return INSP_ACTS.concat(places.map(function(pl, i){ return {id:'place'+i, e:'&#128205;', label:'Walk to '+pl, cat:'move', pts:2, why:'One of your places.', place:pl}; }));
+  return INSP_ACTS.concat(places.map(function(pl, i){ return {id:'place'+i, e:'&#128205;', label:'Walk to '+pl, cat:'move', pts:2, why:'One of your places.', place:pl}; }), typeof aboutResetActs==='function' ? aboutResetActs() : []);
 }
 function inspAct(id){ return inspActs().find(function(a){ return a.id===id; }) || INSP_ACTS[0]; }
 // ---- the score: Inspiration (0..1) over the last two weeks ----

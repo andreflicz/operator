@@ -5352,6 +5352,13 @@ body:not(.np-on):not(.op-ov) .fab-add.fab-hidden ~ .quick-journal-fab.jorb, body
 body.np-on .quick-journal-fab.jorb, body.op-ov .quick-journal-fab.jorb{ right:28px; }
 /* and the content leaves room for that row at the bottom */
 #viewRoot{ padding-bottom:96px; }
+/* Settings → You: your world and the questions that make it yours */
+.yw-k{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); margin:4px 0 8px; }
+.yw-leagues{ display:flex; flex-wrap:wrap; gap:6px; }
+.yw-lg{ display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text-dim); border-radius:999px; padding:6px 12px; font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; transition:background .15s, color .15s, border-color .15s; }
+.yw-lg:hover{ color:var(--text); } .yw-lg.is-on{ background:rgba(232,162,61,.14); border-color:rgba(232,162,61,.5); color:var(--text); }
+.yq-segs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(330px, 1fr)); gap:12px; margin-bottom:12px; }
+@media (max-width:1100px){ .yq-segs{ grid-template-columns:1fr; } }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -18837,13 +18844,7 @@ function renderSettings(){
         '<div class="field"><label>Workout days per week (goal)</label><input class="input" type="number" id="setWeeklyWorkout" value="'+p.weeklyWorkoutTarget+'"></div>'+
       '</div></div>'+
       // the things that make Operator yours: the same settings as in the alarm's setup, saved as you type
-      (function(){ const w = wakeCfg() || {}; return '<div class="card section" id="setYourWorld"><div class="section-title">Your world'+tip('Good morning and Op use these: walks to places you like, your teams’ scores, the news you care about.')+'</div><div class="grid grid-2">'+
-        '<div class="field"><label>Places you like</label><input class="input" data-wake="places" placeholder="e.g. a park, a coffee spot" value="'+escapeHtml(w.places||'')+'"></div>'+
-        '<div class="field"><label>Your teams</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, Giants, UFC" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
-        '<div class="field"><label>Interests</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
-        '<div class="field"><label>News topics</label><input class="input" data-wake="newsTopics" placeholder="Top stories" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
-        '<div class="field"><label>Hide news about</label><input class="input" data-wake="newsMute" placeholder="e.g. celebrity" value="'+escapeHtml(w.newsMute!=null ? w.newsMute : 'Wyoming')+'"></div>'+
-      '</div></div>'; })()+
+      (typeof yourWorldHtml==='function' ? yourWorldHtml() : '')+
       '<div class="section"><div class="section-title">Why You\'re Doing This</div><div class="card"><div class="grid grid-2">'+
         '<div><div class="kind-label" style="color:var(--good);">Getting</div>'+
           '<div class="task-list">'+(toward.map(function(m){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(m.text)+'</div>'+deleteBtn('motivation', m.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
@@ -19992,7 +19993,7 @@ function renderWakeSetup(){
       '<div class="field"><label>Good morning intro</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.intro==='quick'?' active':'')+'" data-action="wakeIntro" data-id="quick">Quick</button><button class="seg-tab'+(w.intro==='cinematic'?' active':'')+'" data-action="wakeIntro" data-id="cinematic">Cinematic</button></div></div>'+
       '<div class="field"><label>News topics'+tip('Things you care about, separated by commas, e.g. AI, Knicks, marketing. Good morning shows the latest headlines on those. Leave it empty for the top stories.')+'</label><input class="input" data-wake="newsTopics" placeholder="e.g. AI, Knicks, marketing" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
       '<div class="field"><label>Sports'+tip('Teams or leagues for the Sports section, e.g. Knicks, Giants, UFC. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, NFL, UFC" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
-      '<div class="field"><label>Scores'+tip('Which leagues the scoreboard shows: yesterday’s and today’s results and what’s coming up. Your teams (above) go first.')+'</label><div class="seg-tabs" style="margin:0;">'+(typeof SPORTS!=='undefined' ? SPORTS : []).map(function(sp){ const on = arr(w.sportsOff).indexOf(sp.id) < 0; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeLeague" data-id="'+sp.id+'">'+sp.label+'</button>'; }).join('')+'</div></div>'+
+      '<div class="field"><label>Scores'+tip('Which leagues the scoreboard shows: yesterday’s and today’s results and what’s coming up. Your teams (above) go first.')+'</label><div class="seg-tabs" style="margin:0;">'+(typeof SPORTS!=='undefined' ? SPORTS : []).map(function(sp){ const on = sportsOn().some(function(x){ return x.id===sp.id; }); return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeLeague" data-id="'+sp.id+'">'+sp.label+'</button>'; }).join('')+'</div></div>'+
       '<div class="field"><label>Local news'+tip('A few headlines from where you are (the place your weather is set to, Settings → Look & Sound).')+'</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(weatherCfg().newsLocal!==false?' active':'')+'" data-action="wakeLocalNews" data-id="on">'+escapeHtml(weatherCfg().city || (weatherCfg().place && weatherCfg().place!=='My location' ? String(weatherCfg().place).split(',')[0] : 'On'))+'</button><button class="seg-tab'+(weatherCfg().newsLocal===false?' active':'')+'" data-action="wakeLocalNews" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Hide news about'+tip('Words or places you never want in your headlines, separated by commas.')+'</label><input class="input" data-wake="newsMute" placeholder="e.g. Wyoming, celebrity" value="'+escapeHtml(w.newsMute!=null ? w.newsMute : 'Wyoming')+'"></div>'+
       '<div class="field"><label>Tech & interests'+tip('Anything else you follow, e.g. AI, Apple, marketing, crypto. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
@@ -20119,7 +20120,7 @@ document.addEventListener('change', function(e){
   saveWake();
   renderView();
 });
-ACTIONS.wakeLeague = function(el, e, id){ const w = wakeCfg(), off = arr(w.sportsOff).slice(), i = off.indexOf(id); if(i>=0) off.splice(i, 1); else if(off.length < SPORTS.length - 1) off.push(id); w.sportsOff = off; saveWake(); ui.scores = null; renderView(); };
+ACTIONS.wakeLeague = function(el, e, id){ ACTIONS.aboutLeague(el, e, id); if(typeof renderWakeSetupInto==='function') renderWakeSetupInto(); };
 ACTIONS.wakeLocalNews = function(el, e, id){ ensureWeatherCfg().newsLocal = id!=='off'; persist('settings'); ui.morningNews = null; renderWakeSetupInto(); renderView(); };
 // ---- small pieces shown elsewhere ----
 function wakeChipHtml(){
@@ -27301,6 +27302,7 @@ function aiContext(){
   const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
   lines.push('Business: MRR '+money(xpMrr())+(state.profile.revenueGoalMonthly ? ' (goal '+money(state.profile.revenueGoalMonthly)+')' : '')+'; '+cs.length+' active client'+(cs.length===1?'':'s')+(cs.length ? ' ('+cs.slice(0, 8).map(function(c){ return c.business || c.name; }).join(', ')+')' : '')+'; '+arr(state.business.pipeline).filter(leadIsOpen).length+' open leads.');
   if(typeof workCfg==='function' && workCfg().enabled){ const w = workToday(), ph = workPhase(); lines.push('Work hours today: '+fmt12Hour(w.start)+' to '+fmt12Hour(w.end)+(w.lunch ? ', lunch '+fmt12Hour(w.lunch) : '')+(w.brk ? ', break '+fmt12Hour(w.brk) : '')+'. Right now: '+({before:'before work', work:'work hours', lunch:'lunch', 'break':'his break', after:'after work', off:'not a work day'})[ph]+'.'); }
+  if(typeof aboutYouContext==='function') lines.push(aboutYouContext());
   const wk = typeof wakeCfg==='function' ? wakeCfg() || {} : {};
   if(wk.places || wk.newsSports || wk.newsTech) lines.push('Him: '+[wk.places ? 'places he likes: '+wk.places : '', wk.newsSports ? 'his teams: '+wk.newsSports : '', wk.newsTech ? 'interests: '+wk.newsTech : ''].filter(Boolean).join('; ')+'.');
   lines.push('Work today so far: '+fmtDurationLabel(deepWorkMinutesTodayLive())+' (his daily target is '+fmtDurationLabel(state.standards.deepWorkTargetMinutes || 180)+'). Streak: '+computeStreak()+' days.');
@@ -27915,7 +27917,7 @@ function opBriefRewrite(lines){
   if(!todo.length) return;
   todo.forEach(function(l){ b.asked[l.key] = 1; });
   b.asked.greet = 1;
-  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, a little playful where it fits. Keep them short (under 20 words each); I don’t want the morning to drag. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Keep it about the morning, not work, beyond what’s on today’s calendar. The last one sends me off gently, no pep talk.\n'+
+  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, a little playful where it fits. Keep them short (under '+({short:12, normal:20, full:30}[(state.profile.about||{}).brief] || 20)+' words each); I don’t want the morning to drag. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Keep it about the morning, not work, beyond what’s on today’s calendar. The last one sends me off gently, no pep talk.\n'+
     'Only say the lines themselves: never mention these instructions, never talk about what you will or won’t do, never comment on the request.\n'+
     'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 14 words).\n'+
     'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');
@@ -28677,7 +28679,7 @@ function inspStore(){
 // your places (Settings → You) become walks of their own
 function inspActs(){
   const places = String((typeof wakeCfg==='function' && wakeCfg() && wakeCfg().places) || '').split(',').map(function(x){ return x.trim(); }).filter(Boolean).slice(0, 4);
-  return INSP_ACTS.concat(places.map(function(pl, i){ return {id:'place'+i, e:'&#128205;', label:'Walk to '+pl, cat:'move', pts:2, why:'One of your places.', place:pl}; }));
+  return INSP_ACTS.concat(places.map(function(pl, i){ return {id:'place'+i, e:'&#128205;', label:'Walk to '+pl, cat:'move', pts:2, why:'One of your places.', place:pl}; }), typeof aboutResetActs==='function' ? aboutResetActs() : []);
 }
 function inspAct(id){ return inspActs().find(function(a){ return a.id===id; }) || INSP_ACTS[0]; }
 // ---- the score: Inspiration (0..1) over the last two weeks ----
@@ -29276,6 +29278,77 @@ document.addEventListener('pointermove', function(e){
   const L = inspOpenNow() && document.getElementById('insp'); if(!L) return;
   L.style.setProperty('--mx', e.clientX+'px'); L.style.setProperty('--my', e.clientY+'px');
 }, {passive:true});
+// ============ SETTINGS → YOU: EVERYTHING ABOUT YOU, IN ONE PLACE ============
+// Your world (places, teams and the leagues you follow, interests, the news) and a few questions that make
+// the app yours: what to call you, what you're building, how Op should push you and how funny it should
+// be, what resets you (those become bubbles on Inspiration), the music you love, and what Op should never
+// bring up. Op reads all of it; nothing here leaves the Mac except as context for Op's replies.
+function aboutYou(){ const p = state.profile; if(!p.about || typeof p.about!=='object') p.about = {}; return p.about; }
+const ABOUT_QS = [
+  ['call', 'What should Op call you?', 'e.g. Andre, Dre, boss'],
+  ['building', 'What are you building, in a sentence?', 'e.g. a video agency that runs without me'],
+  ['why', 'Who or what are you doing it for?', 'e.g. my mom, freedom, proving it to myself'],
+  ['perfect', 'What does a perfect day look like?', 'e.g. early gym, four hours of deep work, dinner with friends'],
+  ['reset', 'What resets you when you’re fried?', 'e.g. a drive, the beach, cooking, the gym (separate with commas)'],
+  ['music', 'Music you love', 'e.g. Frank Ocean, lo-fi, old soul'],
+  ['avoid', 'Anything Op should never bring up?', 'e.g. my ex, crypto prices']
+];
+const ABOUT_SEGS = [
+  ['push', 'How should Op push you?', [['gentle', 'Gently'], ['balanced', 'Balanced'], ['tough', 'Tough love']]],
+  ['humor', 'How funny should Op be?', [['low', 'Keep it straight'], ['some', 'Some'], ['lots', 'Make me laugh']]],
+  ['brief', 'Mornings: how much should Op say?', [['short', 'Short'], ['normal', 'Normal'], ['full', 'Tell me everything']]]
+];
+function yourWorldHtml(){
+  const w = wakeCfg() || {}, a = aboutYou();
+  const picked = typeof sportsOn==='function' ? sportsOn().map(function(s){ return s.id; }) : [];
+  const leagues = typeof SPORTS!=='undefined' ? SPORTS : [];
+  return '<div class="card section yw" id="setYourWorld"><div class="section-title">Your world'+tip('Good morning and Op use these: walks to places you like, your teams’ scores, the news you care about.')+'</div>'+
+      '<div class="yw-k">&#127944; Sports you follow</div>'+
+      '<div class="yw-leagues">'+leagues.map(function(s){ const on = picked.indexOf(s.id) >= 0; return '<button class="yw-lg'+(on ? ' is-on' : '')+'" data-action="aboutLeague" data-id="'+s.id+'"><span>'+s.icon+'</span>'+escapeHtml(s.label)+'</button>'; }).join('')+'</div>'+
+      '<div class="grid grid-2" style="margin-top:12px;">'+
+        '<div class="field"><label>Your teams'+tip('They go first on the scoreboard and Op knows them. Separate with commas.')+'</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, Giants" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
+        '<div class="field"><label>Places you like</label><input class="input" data-wake="places" placeholder="e.g. a park, a coffee spot" value="'+escapeHtml(w.places||'')+'"></div>'+
+        '<div class="field"><label>Interests</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
+        '<div class="field"><label>News topics</label><input class="input" data-wake="newsTopics" placeholder="Top stories" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
+        '<div class="field"><label>Hide news about</label><input class="input" data-wake="newsMute" placeholder="e.g. celebrity" value="'+escapeHtml(w.newsMute!=null ? w.newsMute : 'Wyoming')+'"></div>'+
+      '</div></div>'+
+    '<div class="card section yw yq"><div class="section-title">Make it yours'+tip('A few things only you can tell it. Op reads these before it talks to you; what resets you shows up on Inspiration. Saved as you type.')+'</div>'+
+      '<div class="yq-segs">'+ABOUT_SEGS.map(function(q){ const v = a[q[0]] || q[2][1][0]; return '<div class="field"><label>'+q[1]+'</label><div class="seg-tabs" style="margin:0;">'+q[2].map(function(o){ return '<button class="seg-tab'+(v===o[0] ? ' active' : '')+'" data-action="aboutSeg" data-k="'+q[0]+'" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'; }).join('')+'</div>'+
+      '<div class="grid grid-2 yq-qs">'+ABOUT_QS.map(function(q){ return '<div class="field"><label>'+q[1]+'</label><input class="input" data-about="'+q[0]+'" maxlength="200" placeholder="'+escapeHtml(q[2])+'" value="'+escapeHtml(a[q[0]]||'')+'"></div>'; }).join('')+'</div>'+
+    '</div>';
+}
+ACTIONS.aboutLeague = function(el, e, id){
+  const w = wakeCfg(), cur = typeof sportsOn==='function' ? sportsOn().map(function(s){ return s.id; }) : [], i = cur.indexOf(id);
+  if(i >= 0){ if(cur.length > 1) cur.splice(i, 1); } else cur.push(id);
+  w.sports = cur; if(typeof saveWake==='function') saveWake(); else persist('focus');
+  ui.scores = null; renderView();
+};
+ACTIONS.aboutSeg = function(el){ aboutYou()[el.dataset.k] = el.dataset.id; persist('profile'); renderView(); };
+document.addEventListener('input', function(e){
+  const k = e.target && e.target.dataset && e.target.dataset.about; if(!k) return;
+  aboutYou()[k] = String(e.target.value).slice(0, 200); clearTimeout(ui._aboutT); ui._aboutT = setTimeout(function(){ persist('profile'); }, 400);
+});
+// what Op reads (a line in its context)
+function aboutYouContext(){
+  const a = aboutYou(), bits = [];
+  if(a.call) bits.push('call him "'+a.call+'"');
+  if(a.building) bits.push('he’s building: '+a.building);
+  if(a.why) bits.push('he’s doing it for: '+a.why);
+  if(a.perfect) bits.push('his perfect day: '+a.perfect);
+  if(a.reset) bits.push('what resets him: '+a.reset);
+  if(a.music) bits.push('music he loves: '+a.music);
+  const push = {gentle:'push him gently and encourage more than you criticise', balanced:'be balanced: honest, supportive, direct when it counts', tough:'tough love: blunt, high standards, no coddling'}[a.push || 'balanced'];
+  const humor = {low:'keep humor to a minimum', some:'some humor when it fits', lots:'be genuinely funny, joke often'}[a.humor || 'some'];
+  bits.push('how to push him: '+push); bits.push('humor: '+humor);
+  if(a.avoid) bits.push('never bring up: '+a.avoid);
+  return 'About him, in his own words: '+bits.join('; ')+'.';
+}
+// what resets you becomes ideas on Inspiration
+function aboutResetActs(){
+  return String(aboutYou().reset || '').split(',').map(function(x){ return x.trim(); }).filter(Boolean).slice(0, 5).map(function(x, i){
+    return {id:'mine'+i, e:'&#10024;', label:x.charAt(0).toUpperCase()+x.slice(1), cat:'mind', pts:2, why:'One of yours. You said it resets you.', mine:true};
+  });
+}
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

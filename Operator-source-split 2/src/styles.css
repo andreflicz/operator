@@ -5341,3 +5341,10 @@ body:not(.np-on):not(.op-ov) .fab-add.fab-hidden ~ .quick-journal-fab.jorb, body
 body.np-on .quick-journal-fab.jorb, body.op-ov .quick-journal-fab.jorb{ right:28px; }
 /* and the content leaves room for that row at the bottom */
 #viewRoot{ padding-bottom:96px; }
+/* Settings → You: your world and the questions that make it yours */
+.yw-k{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); margin:4px 0 8px; }
+.yw-leagues{ display:flex; flex-wrap:wrap; gap:6px; }
+.yw-lg{ display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text-dim); border-radius:999px; padding:6px 12px; font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; transition:background .15s, color .15s, border-color .15s; }
+.yw-lg:hover{ color:var(--text); } .yw-lg.is-on{ background:rgba(232,162,61,.14); border-color:rgba(232,162,61,.5); color:var(--text); }
+.yq-segs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(330px, 1fr)); gap:12px; margin-bottom:12px; }
+@media (max-width:1100px){ .yq-segs{ grid-template-columns:1fr; } }

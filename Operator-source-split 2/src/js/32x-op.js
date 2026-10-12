@@ -94,6 +94,7 @@ function aiContext(){
   const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
   lines.push('Business: MRR '+money(xpMrr())+(state.profile.revenueGoalMonthly ? ' (goal '+money(state.profile.revenueGoalMonthly)+')' : '')+'; '+cs.length+' active client'+(cs.length===1?'':'s')+(cs.length ? ' ('+cs.slice(0, 8).map(function(c){ return c.business || c.name; }).join(', ')+')' : '')+'; '+arr(state.business.pipeline).filter(leadIsOpen).length+' open leads.');
   if(typeof workCfg==='function' && workCfg().enabled){ const w = workToday(), ph = workPhase(); lines.push('Work hours today: '+fmt12Hour(w.start)+' to '+fmt12Hour(w.end)+(w.lunch ? ', lunch '+fmt12Hour(w.lunch) : '')+(w.brk ? ', break '+fmt12Hour(w.brk) : '')+'. Right now: '+({before:'before work', work:'work hours', lunch:'lunch', 'break':'his break', after:'after work', off:'not a work day'})[ph]+'.'); }
+  if(typeof aboutYouContext==='function') lines.push(aboutYouContext());
   const wk = typeof wakeCfg==='function' ? wakeCfg() || {} : {};
   if(wk.places || wk.newsSports || wk.newsTech) lines.push('Him: '+[wk.places ? 'places he likes: '+wk.places : '', wk.newsSports ? 'his teams: '+wk.newsSports : '', wk.newsTech ? 'interests: '+wk.newsTech : ''].filter(Boolean).join('; ')+'.');
   lines.push('Work today so far: '+fmtDurationLabel(deepWorkMinutesTodayLive())+' (his daily target is '+fmtDurationLabel(state.standards.deepWorkTargetMinutes || 180)+'). Streak: '+computeStreak()+' days.');
@@ -708,7 +709,7 @@ function opBriefRewrite(lines){
   if(!todo.length) return;
   todo.forEach(function(l){ b.asked[l.key] = 1; });
   b.asked.greet = 1;
-  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, a little playful where it fits. Keep them short (under 20 words each); I don’t want the morning to drag. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Keep it about the morning, not work, beyond what’s on today’s calendar. The last one sends me off gently, no pep talk.\n'+
+  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, a little playful where it fits. Keep them short (under '+({short:12, normal:20, full:30}[(state.profile.about||{}).brief] || 20)+' words each); I don’t want the morning to drag. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Keep it about the morning, not work, beyond what’s on today’s calendar. The last one sends me off gently, no pep talk.\n'+
     'Only say the lines themselves: never mention these instructions, never talk about what you will or won’t do, never comment on the request.\n'+
     'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 14 words).\n'+
     'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');
