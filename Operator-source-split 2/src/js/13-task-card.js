@@ -14,7 +14,7 @@ function taskRow(t){
   return '<div class="task-item-v2 '+(t.status==='done'?'done':'')+(selected?' row-selected':'')+'">'+
     selectBoxHtml(t.id, selected)+
     '<div style="flex:1;min-width:140px;">'+
-      '<div class="task-title-row">'+priorityTag(t.priority)+(t.skill?'<span class="tag tag-skill">Skill</span>':t.ongoing?'<span class="tag tag-ongoing">Ongoing</span>':'')+'<span class="task-title">'+escapeHtml(t.title)+'</span></div>'+
+      '<div class="task-title-row">'+taskTags(t)+(t.ongoing && !t.skill?'<span class="tag tag-ongoing">Ongoing</span>':'')+'<span class="task-title">'+escapeHtml(t.title)+'</span></div>'+
       (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     '</div>'+
     clientTagsHtml(t.clients)+
@@ -37,13 +37,13 @@ function taskCard(t){
   const isStaged = !state.focus.activeSession && ui.stagedTaskId===t.id;
   const cat = t.categoryId ? taskCategoryById(t.categoryId) : null;
   const whiteAccent = t.isVideoIdea===true;
-  return '<div class="task-card '+(t.status==='done'?'done':'')+(t.ongoing?' ongoing-task-card':'')+(selected?' card-selected':'')+(isCurrent?' current-task-active':'')+(pending?' just-completed':'')+(isStaged?' staged-task-card':'')+(whiteAccent?' video-idea-card':'')+'" data-action="'+(ui.taskSelectMode?'toggleTaskSelect':'openTaskEditModal')+'" data-id="'+t.id+'" style="cursor:pointer;'+(cat && !whiteAccent?'border-left:3px solid '+cat.color+';':'')+'" '+(draggable?'draggable="true" data-task-id="'+t.id+'"':'')+'>'+
-    '<div class="row" style="justify-content:space-between;">'+(ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+(t.isVideoIdea?'':priorityTag(t.priority))+(isCurrent?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">'+currentTaskLabel()+'</span>':'')+(isStaged?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">&#128204; Up Next</span>':'')+(t.ongoing?'<span class="tag tag-ongoing">&#128204; Ongoing</span>':'')+(doneToday?'<span class="tag tag-good">&#10003; Done today</span>':'')+(ui.taskSelectMode?'':'<button class="card-more" data-action="taskMenuBtn" data-id="'+t.id+'" title="More, or right-click the card" aria-label="More actions">&#8943;</button>')+'</div>'+
+  return '<div class="task-card '+(t.status==='done'?'done':'')+(t.ongoing?' ongoing-task-card':'')+(selected?' card-selected':'')+(isCurrent?' current-task-active':'')+(pending?' just-completed':'')+(isStaged?' staged-task-card':'')+(whiteAccent?' video-idea-card':'')+(t.skill?' skill-card':'')+'" data-action="'+(ui.taskSelectMode?'toggleTaskSelect':'openTaskEditModal')+'" data-id="'+t.id+'" style="cursor:pointer;'+(cat && !whiteAccent?'border-left:3px solid '+cat.color+';':'')+'" '+(draggable?'draggable="true" data-task-id="'+t.id+'"':'')+'>'+
+    '<div class="row" style="justify-content:space-between;">'+(ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+(t.isVideoIdea?'':taskTags(t))+(isCurrent?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">'+currentTaskLabel()+'</span>':'')+(isStaged?'<span class="tag" style="border:1px solid var(--accent);color:var(--accent);background:transparent;">&#128204; Up Next</span>':'')+(t.ongoing && !t.skill?'<span class="tag tag-ongoing">&#128204; Ongoing</span>':'')+(doneToday?'<span class="tag tag-good">&#10003; Done today</span>':'')+(ui.taskSelectMode?'':'<button class="card-more" data-action="taskMenuBtn" data-id="'+t.id+'" title="More, or right-click the card" aria-label="More actions">&#8943;</button>')+'</div>'+
     '<div class="task-card-title">'+escapeHtml(t.title)+'</div>'+
     (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     (t.isVideoIdea && t.videoType ? '<div style="margin-top:2px;"><span class="tag" style="background:rgba(var(--ink),.1);color:var(--text);">'+escapeHtml((taskVideoTypeById(t.videoType)||{}).label||'')+'</span></div>' : '')+
     (cat ? '<div style="margin-top:4px;">'+taskCategoryTagHtml(t)+'</div>' : '')+
-    (t.ongoing ? '<div class="ongoing-days-pill" style="align-self:flex-start;">'+daysInProgress(t)+' day'+(daysInProgress(t)===1?'':'s')+' in progress</div>' : '')+
+    (t.skill ? '<div class="skill-week-pill">'+fmtDurationLabel(typeof skillMinutes==='function' ? skillMinutes(t.id, 7) : 0)+' trained this week'+(Number(t.skillGoal) ? ' of '+fmtDurationLabel(Number(t.skillGoal)) : '')+'</div>' : t.ongoing ? '<div class="ongoing-days-pill" style="align-self:flex-start;">'+daysInProgress(t)+' day'+(daysInProgress(t)===1?'':'s')+' in progress</div>' : '')+
     '<div class="row" style="justify-content:space-between;margin-top:auto;padding-top:6px;">'+
       clientTagsHtml(t.clients)+
       (t.deadline ? deadlineTag(t) : '')+
@@ -55,7 +55,7 @@ function finishedTaskRow(t){
   return '<div class="finished-row'+(selected?' row-selected':'')+(t.isVideoIdea?' video-idea-card':'')+'" draggable="true" data-task-id="'+t.id+'">'+
     (ui.taskSelectMode?selectBoxHtml(t.id, selected):'')+
     '<div style="min-width:0;flex:1;">'+
-      '<div class="task-title-row">'+priorityTag(t.priority)+'<span class="task-title" style="text-decoration:line-through;opacity:.7;">'+escapeHtml(t.title)+'</span></div>'+
+      '<div class="task-title-row">'+taskTags(t)+'<span class="task-title" style="text-decoration:line-through;opacity:.7;">'+escapeHtml(t.title)+'</span></div>'+
       (t.notes ? '<div class="task-notes">'+escapeHtml(t.notes)+'</div>' : '')+
     '</div>'+
     '<span class="kpi-sub">'+(t.completedAt ? fmtDateShort(t.completedAt) : (isOngoingDoneToday(t) ? 'Today &middot; resets tomorrow' : ''))+'</span>'+
@@ -166,7 +166,7 @@ function renderTaskEditModal(){
     taskAlarmFieldsHtml('editTask-'+t.id+'-', t)+
     '<div class="field" style="margin-top:10px;"><label>Notes</label><textarea class="input" id="editNotes-'+t.id+'" style="width:100%;min-height:60px;">'+escapeHtml(t.notes||'')+'</textarea></div>'+
 
-    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editSkill-'+t.id+'" '+(t.skill?'checked':'')+' style="margin-right:6px;">&#127891; Skill: something you’re building (its time adds up on Personal → Growth)</label>'+
+    '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editSkill-'+t.id+'" '+(t.skill?'checked':'')+' style="margin-right:6px;">&#127919; Training skill: something you’re building (its time adds up on Focus → Tasks → Training Skills)</label>'+
     '<label class="row" style="margin-top:10px;font-size:12.5px;color:var(--text-dim);"><input type="checkbox" id="editOngoing-'+t.id+'" '+(t.ongoing?'checked':'')+' style="margin-right:6px;">&#128204; Ongoing: takes more than a day'+tip('It stays on your list day after day until it\'s actually finished: tick it off for today without closing it. When it\'s due is just the Deadline above.')+'</label>'+
     '<div id="editTaskOngoingExtra-'+t.id+'" style="display:'+(t.ongoing?'block':'none')+';">'+
     '<div class="field" style="margin-top:10px;"><label>How often you work on it (optional)</label><select class="input" id="editOngoingFrequency-'+t.id+'">'+

@@ -73,7 +73,7 @@ function renderAllDeadlinesSection(){
       const overdue = t.deadline < todayStr();
       return '<div class="task-item-v2 cal-item-clickable" data-action="openCalItem" data-kind="deadline" data-id="'+t.id+'">'+
         '<div style="width:86px;font-family:var(--font-display);font-weight:700;color:'+(overdue?'var(--danger)':'var(--text)')+';">'+fmtDateShort(t.deadline)+(t.deadlineTime?'<div class="kpi-sub">'+fmt12Hour(t.deadlineTime)+'</div>':'')+'</div>'+
-        (t.isVideoIdea ? '' : priorityTag(t.priority))+
+        (t.isVideoIdea ? '' : taskTags(t))+
         '<div class="task-title" style="flex:1;">'+escapeHtml(t.title)+'</div>'+
         clientTagsHtml(t.clients)+
         (overdue ? '<span class="tag tag-danger">Overdue</span>' : '')+
@@ -84,6 +84,8 @@ function renderAllDeadlinesSection(){
 function fabContext(){
   const v = ui.view;
   if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='videoIdeas') return {label:'Add a video', run:function(){ openContentSheet(); }};
+  if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='skills') return {label:'Add a training skill', run:function(){ openSkillSheet(); }};
+  if(v==='focus' && ui.focusTab!=='analytics') return {label:'Add something', menu:focusAddMenu()};
   if(v==='focus' || v==='today') return {label:'Add task', run:openAddTaskModal};
   if(v==='business'){
     if(ui.businessTab==='clients' || ui.businessTab==='lifecycle') return {label:'Add client', run:function(){ if(typeof openNewContactModal==='function') openNewContactModal('client'); else { ui.forms.client=true; renderView(); } }};
@@ -95,11 +97,7 @@ function fabContext(){
   if(v==='personal'){
     if(ui.personalTab==='journal' && ui.journalMode==='boards' && typeof canvasAddNote==='function') return {label:'Add note to board', run:function(){ canvasAddNote(); }};
     if(ui.personalTab==='journal') return {label:'New journal entry', run:openQuickJournalModal};
-    if(ui.personalTab==='finances'){
-      const form = function(k, id){ return function(){ ui.forms[k] = true; renderView(); setTimeout(function(){ const el = document.getElementById(id); if(el){ el.scrollIntoView({block:'center', behavior:'smooth'}); el.focus(); } }, 60); }; };
-      return {label:'Add to Finances', menu:[['&#128184;', 'An expense', form('expense', 'expName')], ['&#128176;', 'Income', form('income', 'incomeDate')], ['&#128179;', 'A debt', form('debt', 'debtName')]]};
-    }
-    if(ui.personalTab==='growth') return {label:'Add a skill', run:function(){ ui.forms.skill = true; renderView(); setTimeout(function(){ const el = document.getElementById('skillName'); if(el) el.focus(); }, 60); }};
+    if(ui.personalTab==='finances') return {label:'Add to Finances', menu:[['&#128184;', 'An expense', function(){ openFinSheet('expense'); }, 'Money out'], ['&#128176;', 'Income', function(){ openFinSheet('income'); }, 'Money in'], ['&#128179;', 'A debt', function(){ openFinSheet('debt'); }, 'Something you owe']]};
     if(ui.personalTab==='wishlist' && typeof openWishItemModal==='function') return {label:'Add wish list item', run:function(){ openWishItemModal(null); }};
     if(ui.personalTab==='fitness') return {label:'Log a workout, weigh-in or food', run:function(){ openHealthSheet('workout'); }};
     return {label:'Add goal', run:function(){ openGoalSheet('week'); }};
@@ -113,10 +111,10 @@ ACTIONS.fabAdd = function(){
   let m = document.getElementById('fabMenu');
   if(m && m.classList.contains('is-in')){ fabMenuClose(); return; }
   if(!m){ m = document.createElement('div'); m.id = 'fabMenu'; m.className = 'fab-menu'; document.body.appendChild(m); }
-  m.innerHTML = c.menu.map(function(x, i){ return '<button class="fab-mi" data-action="fabMenuPick" data-id="'+i+'" style="--i:'+i+'"><span>'+x[0]+'</span>'+x[1]+'</button>'; }).join('');
-  ui.fabMenu = c.menu; void m.offsetWidth; m.classList.add('is-in');
+  m.innerHTML = '<div class="fab-mh">'+escapeHtml(c.label)+'</div>'+c.menu.map(function(x, i){ return '<button class="fab-mi" data-action="fabMenuPick" data-id="'+i+'" style="--i:'+i+'"><span class="fab-mi-e">'+x[0]+'</span><span class="fab-mi-t"><b>'+x[1]+'</b>'+(x[3] ? '<small>'+x[3]+'</small>' : '')+'</span></button>'; }).join('');
+  ui.fabMenu = c.menu; void m.offsetWidth; m.classList.add('is-in'); const fb = document.getElementById('fabAdd'); if(fb) fb.classList.add('is-open');
 };
-function fabMenuClose(){ const m = document.getElementById('fabMenu'); if(m) m.classList.remove('is-in'); }
+function fabMenuClose(){ const m = document.getElementById('fabMenu'); if(m) m.classList.remove('is-in'); const fb = document.getElementById('fabAdd'); if(fb) fb.classList.remove('is-open'); }
 ACTIONS.fabMenuPick = function(el, e, id){ const it = (ui.fabMenu || [])[Number(id)]; fabMenuClose(); if(it) it[2](); };
 document.addEventListener('mousedown', function(e){ if(!e.target.closest || e.target.closest('#fabMenu, #fabAdd')) return; fabMenuClose(); }, true);
 afterRenderHooks.push(function(){
@@ -124,7 +122,7 @@ afterRenderHooks.push(function(){
   if(!fab) return;
   const c = fabContext();
   fab.classList.toggle('fab-hidden', !c);
-  if(c && fab.dataset.label!==c.label){ fab.title = c.label; fab.setAttribute('aria-label', c.label); fab.dataset.label = c.label; }
+  if(c && fab.dataset.label!==c.label){ fab.removeAttribute('title'); fab.setAttribute('aria-label', c.label); fab.dataset.label = c.label; }
 });
 // Crosshair cursor (Settings → Display). A thin accent crosshair everywhere; a filled
 // centre on clickable things; normal I-beam in text fields.
@@ -198,7 +196,7 @@ function renderFocusDeletedTab(){
       (list.length ? '<button class="btn btn-ghost btn-sm" style="margin-left:auto;" data-action="emptyDeletedTasks">Empty</button>' : '')+'</div>'+
     '<div class="task-list">'+(list.map(function(r){
       const t = r.task;
-      return '<div class="task-item-v2 trash-row">'+priorityTag(t.priority)+'<span class="task-title" style="flex:1;">'+escapeHtml(t.title)+'</span>'+
+      return '<div class="task-item-v2 trash-row">'+taskTags(t)+'<span class="task-title" style="flex:1;">'+escapeHtml(t.title)+'</span>'+
         '<span class="kpi-sub">'+ghlAgoLabel(r.at)+'</span><button class="btn btn-sm trash-restore" data-action="restoreDeletedTask" data-id="'+t.id+'">&#8634; Restore</button></div>';
     }).join('') || '<div class="empty">Nothing deleted.</div>')+'</div>'+
   '</div>';

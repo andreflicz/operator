@@ -32,7 +32,7 @@ function renderPreFocusNextTaskCard(){
   '</div>';
 }
 function preFocusPickResultsHtml(candidates){
-  return candidates.map(function(t){ return '<div class="task-item-v2" data-action="stageExistingTaskFromPreFocus" data-id="'+t.id+'" style="cursor:pointer;padding:6px 8px;">'+priorityTag(t.priority)+'<span class="task-title" style="flex:1;font-size:13px;">'+escapeHtml(t.title)+'</span>'+(t.status==='backlog'?'<span class="kpi-sub">backlog</span>':'')+'</div>'; }).join('') || '<div class="empty" style="padding:10px;">Nothing matches.</div>';
+  return candidates.map(function(t){ return '<div class="task-item-v2" data-action="stageExistingTaskFromPreFocus" data-id="'+t.id+'" style="cursor:pointer;padding:6px 8px;">'+taskTags(t)+'<span class="task-title" style="flex:1;font-size:13px;">'+escapeHtml(t.title)+'</span>'+(t.status==='backlog'?'<span class="kpi-sub">backlog</span>':'')+'</div>'; }).join('') || '<div class="empty" style="padding:10px;">Nothing matches.</div>';
 }
 function updatePreFocusPickResults(){
   const q = (ui.preFocusPickSearch||'').trim().toLowerCase();

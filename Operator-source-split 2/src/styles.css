@@ -5040,3 +5040,97 @@ body.np-on .op-light{ bottom:12px !important; }
 .hl-cols.is-one{ grid-template-columns:1fr !important; }
 :root[data-theme="light"] .sub-pills, :root[data-theme="light"] .seg-tabs, :root[data-theme="light"] .subtabs{ background:rgba(0,0,0,.035) !important; box-shadow:inset 0 1px 2px rgba(0,0,0,.08); }
 :root[data-theme="light"] .sub-pill.is-on, :root[data-theme="light"] .seg-tab.active, :root[data-theme="light"] .subtab.active{ background:#fff !important; border-color:rgba(0,0,0,.08) !important; box-shadow:0 2px 8px rgba(0,0,0,.08) !important; }
+
+/* ===================== R26: add sheets, the + menu, training skills ===================== */
+:root{ --skill:#46e3d2; --skill-2:#5aa8ff; --skill-rgb:70,227,210; }
+/* every pop-up that holds a card: a soft blurred room behind it, the card rising in */
+.overlay:has(> .card){ -webkit-backdrop-filter:blur(7px) saturate(1.1); backdrop-filter:blur(7px) saturate(1.1); }
+.overlay > .card{ border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.04) inset; animation:hsIn .28s cubic-bezier(.2,.9,.3,1.1); }
+.as{ width:min(500px, 100%); }
+.as-h{ display:flex; align-items:center; gap:14px; margin:0 34px 16px 0; }
+.as-h .hs-h{ margin:0; }
+.as-ic{ flex:none; width:46px; height:46px; border-radius:14px; display:grid; place-items:center; font-size:22px; background:linear-gradient(135deg, rgba(var(--accent-rgb, 232,162,61),.22), rgba(var(--accent-rgb, 232,162,61),.06)); border:1px solid rgba(var(--accent-rgb, 232,162,61),.3); }
+#skillSheet .as-ic{ background:linear-gradient(135deg, rgba(var(--skill-rgb),.25), rgba(90,168,255,.12)); border-color:rgba(var(--skill-rgb),.4); }
+.as-sub{ font-size:12.5px; color:var(--text-dim); margin-top:3px; line-height:1.4; }
+.as-money{ position:relative; align-items:center; }
+.as-money .as-cur{ position:absolute; left:16px; top:50%; transform:translateY(-50%); font-family:var(--font-display); font-size:28px; font-weight:600; color:var(--text-faint); pointer-events:none; }
+.as-money .input{ padding-left:42px !important; }
+.as-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+.as-chip{ border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text-dim); border-radius:999px; padding:6px 11px; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; transition:background .15s, color .15s, border-color .15s, transform .15s; }
+.as-chip:hover{ color:var(--text); border-color:var(--border-strong, rgba(255,255,255,.2)); transform:translateY(-1px); }
+.as-chip.is-on{ background:rgba(var(--accent-rgb, 232,162,61),.16); border-color:rgba(var(--accent-rgb, 232,162,61),.55); color:var(--text); }
+.as-chips.is-quiet .as-chip{ font-size:12px; padding:5px 10px; }
+.as-note{ align-self:center; font-size:11.5px; color:var(--text-faint); }
+.as-lbl{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); margin-bottom:-4px; }
+.as-name{ font-size:17px !important; font-weight:600; padding:12px 14px !important; }
+.hs-in{ width:100%; }
+textarea.hs-in{ resize:vertical; min-height:56px; }
+.as-skill-go, .gr-go{ background:linear-gradient(135deg, var(--skill), var(--skill-2)) !important; color:#04211f !important; border:none !important; font-weight:700 !important; box-shadow:0 8px 24px rgba(var(--skill-rgb),.25); }
+.as-skill-go:hover, .gr-go:hover{ filter:brightness(1.08); }
+
+/* the + menu: a small card of choices above the button */
+.fab-menu{ right:26px; bottom:96px; gap:6px; padding:10px; border-radius:20px; background:rgba(22,24,32,.9); border:1px solid var(--border-strong, rgba(255,255,255,.12)); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); box-shadow:0 24px 60px rgba(0,0,0,.45); align-items:stretch; min-width:250px;
+  opacity:0; transform:translateY(10px) scale(.97); transform-origin:bottom right; transition:opacity .2s ease, transform .28s cubic-bezier(.2,.9,.3,1.15); }
+.fab-menu.is-in{ opacity:1; transform:none; }
+.fab-mh{ font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--text-faint); padding:4px 8px 6px; }
+.fab-mi{ height:auto; padding:9px 12px 9px 9px; border-radius:14px; border:1px solid transparent; background:transparent; box-shadow:none; gap:12px; text-align:left; }
+.fab-mi:hover{ background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.06); }
+.fab-mi .fab-mi-e{ flex:none; width:38px; height:38px; border-radius:12px; display:grid; place-items:center; font-size:19px; background:rgba(255,255,255,.06); transition:transform .25s cubic-bezier(.2,1.4,.4,1); }
+.fab-mi:hover .fab-mi-e{ transform:scale(1.08) rotate(-4deg); }
+.fab-mi-t{ display:flex; flex-direction:column; gap:1px; font-size:14px; }
+.fab-mi-t b{ font-weight:700; } .fab-mi-t small{ font-size:11.5px; font-weight:500; color:var(--text-dim); }
+.fab-add.is-open .fab-plus{ transform:rotate(45deg) !important; }
+[data-theme="light"] .fab-menu{ background:rgba(255,255,255,.94); }
+[data-theme="light"] .fab-mi .fab-mi-e{ background:rgba(0,0,0,.05); }
+
+/* a training skill looks like one wherever it shows up */
+.tag-skill{ background:linear-gradient(135deg, rgba(var(--skill-rgb),.2), rgba(90,168,255,.14)) !important; color:var(--skill) !important; border:1px solid rgba(var(--skill-rgb),.45) !important; font-weight:700; }
+[data-theme="light"] .tag-skill{ color:#0d8f84 !important; }
+.task-card.skill-card{ border-left:3px solid var(--skill) !important; background:linear-gradient(160deg, rgba(var(--skill-rgb),.07), transparent 55%), var(--panel); box-shadow:0 0 0 1px rgba(var(--skill-rgb),.12) inset; }
+.task-card.skill-card:hover{ box-shadow:0 0 0 1px rgba(var(--skill-rgb),.3) inset, 0 10px 28px rgba(var(--skill-rgb),.1); }
+.current-task-card:has(.tag-skill){ box-shadow:0 0 0 1px rgba(var(--skill-rgb),.35) inset, 0 0 40px rgba(var(--skill-rgb),.08); }
+.tl-row:has(.tag-skill), .wd-row:has(.tag-skill), .pr-row:has(.tag-skill), .np-row:has(.tag-skill), .task-item-v2:has(.tag-skill){ box-shadow:inset 3px 0 0 var(--skill); }
+.ls-chip:has(.tag-skill), .wd-chip:has(.tag-skill){ border-color:rgba(var(--skill-rgb),.45) !important; background:rgba(var(--skill-rgb),.07) !important; }
+.ls-row:has(.tag-skill){ box-shadow:inset 3px 0 0 var(--skill); border-radius:10px; }
+.nn-title:has(.tag-skill) > span:last-child{ color:var(--skill); }
+.subtab.is-skill.active{ color:var(--skill) !important; box-shadow:0 0 0 1px rgba(var(--skill-rgb),.4) inset, 0 4px 14px rgba(var(--skill-rgb),.12) !important; }
+
+/* Focus → Tasks → Training Skills */
+.gr-top{ display:flex; align-items:center; gap:16px; padding:16px 20px; margin-bottom:16px; border-radius:20px; border:1px solid rgba(var(--skill-rgb),.25); background:radial-gradient(120% 140% at 0% 0%, rgba(var(--skill-rgb),.12), transparent 60%), var(--panel); }
+.gr-top-t{ display:flex; align-items:center; gap:14px; flex:1; min-width:0; }
+.gr-top-ic{ width:44px; height:44px; flex:none; border-radius:14px; display:grid; place-items:center; font-size:22px; background:rgba(var(--skill-rgb),.14); border:1px solid rgba(var(--skill-rgb),.35); }
+.gr-top-t b{ display:block; font-family:var(--font-display); font-size:19px; font-weight:700; } .gr-top-t small{ display:block; font-size:12.5px; color:var(--text-dim); margin-top:2px; }
+.gr-top-n{ text-align:right; } .gr-top-n b{ display:block; font-family:var(--font-display); font-size:26px; font-weight:700; color:var(--skill); } .gr-top-n small{ font-size:11.5px; color:var(--text-dim); }
+.gr-skill{ border-color:rgba(var(--skill-rgb),.18); background:linear-gradient(170deg, rgba(var(--skill-rgb),.06), transparent 50%), var(--panel); }
+.gr-skill.is-on{ border-color:rgba(var(--skill-rgb),.6); box-shadow:0 0 0 1px rgba(var(--skill-rgb),.25), 0 12px 34px rgba(var(--skill-rgb),.14); }
+.gr-sk-h{ gap:12px; }
+.gr-sk-ic{ width:46px; height:46px; flex:none; border-radius:50%; display:grid; place-items:center; font-size:20px; background:rgba(var(--skill-rgb),.1); }
+.gr-sk-tt{ display:flex; flex-direction:column; min-width:0; } .gr-sk-tt b{ font-size:15.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .gr-sk-tt small{ font-size:12px; color:var(--text-dim); }
+.gr-live{ margin:0; color:var(--skill); }
+.gr-ring{ flex:none; } .gr-ring-t{ fill:none; stroke:rgba(var(--ink),.1); stroke-width:5; } .gr-ring-f{ fill:none; stroke:var(--skill); stroke-width:5; stroke-linecap:round; filter:drop-shadow(0 0 4px rgba(var(--skill-rgb),.5)); }
+.gr-bars u{ background:linear-gradient(180deg, var(--skill), var(--skill-2)); }
+.gr-bars i:last-child u{ background:linear-gradient(180deg, #b9fff6, var(--skill)); }
+.gr-sk-n{ font-size:11.5px; }
+.gr-empty{ display:flex; flex-direction:column; align-items:center; gap:6px; padding:44px 20px; border-radius:20px; border:1px dashed rgba(var(--skill-rgb),.3); text-align:center; }
+.gr-empty > span{ font-size:34px; } .gr-empty b{ font-size:16px; } .gr-empty small{ font-size:13px; color:var(--text-dim); margin-bottom:8px; }
+
+/* Inspiration: the week, at a glance */
+.izl-week{ display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; margin-bottom:12px; }
+.izl-w{ display:flex; flex-direction:column; align-items:center; gap:1px; padding:7px 4px 6px; border-radius:12px; background:rgba(255,255,255,.05); }
+.izl-w span{ font-size:15px; } .izl-w b{ font-size:16px; font-weight:700; line-height:1.1; } .izl-w small{ font-size:10px; color:rgba(255,255,255,.55); }
+.izl-w.is-zero{ opacity:.45; }
+.insp-lately{ max-height:min(52vh, 420px); }
+.as input[type=number]::-webkit-inner-spin-button, .as input[type=number]::-webkit-outer-spin-button, .hs input[type=number]::-webkit-inner-spin-button, .hs input[type=number]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
+.as input[type=number], .hs input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
+.fab-add.is-open::after{ opacity:0 !important; }
+.skill-week-pill{ align-self:flex-start; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:999px; color:var(--skill); background:rgba(var(--skill-rgb),.1); border:1px solid rgba(var(--skill-rgb),.25); }
+/* the older add pop-ups, brought in line with the sheets */
+.overlay > .card .field > label{ font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); margin-bottom:6px; display:block; }
+.overlay > .card .input{ border-radius:11px; transition:border-color .15s, box-shadow .15s; }
+.overlay > .card .input:focus{ box-shadow:0 0 0 3px rgba(232,162,61,.16); }
+.overlay > .card .as-h{ margin-right:30px; }
+.pri-seg{ margin:0; }
+.pri-seg button{ display:inline-flex; align-items:center; justify-content:center; gap:7px; }
+.pri-seg button i{ width:8px; height:8px; border-radius:50%; background:currentColor; opacity:.8; }
+.pri-seg .pri-low i{ background:#7fb4ff; } .pri-seg .pri-med i{ background:#f2b84b; } .pri-seg .pri-high i{ background:#ff6b6b; }
+.pri-seg button.pri-high.is-on{ color:#ff8a8a; } .pri-seg button.pri-low.is-on{ color:#9cc6ff; } .pri-seg button.pri-med.is-on{ color:#f6c66a; }

@@ -99,3 +99,6 @@ function remapConvertedLeadRefs(){
   if(cal) persist('calendar');
   return tasks || cal;
 }
+// the tags in front of a task's title: a training skill gets its own badge (and its own colour wherever
+// it shows), everything else its priority
+function taskTags(t){ return t && t.skill ? '<span class="tag tag-skill" title="Training skill">&#127919; Skill</span>' : priorityTag(t && t.priority); }

@@ -82,7 +82,7 @@ ACTIONS.expAdd = function(){
   const name = v('expName'), amt = Number(v('expAmount'));
   if(!name || !(amt > 0)){ const el = document.getElementById(!name ? 'expName' : 'expAmount'); if(el) el.focus(); return; }
   finExpenses().push({id:uid(), date:v('expDate') || todayStr(), amount:Math.round(amt*100)/100, name:name.slice(0, 80), cat:v('expCat') || expGuessCat(name), src:'manual'});
-  ui.forms.expense = false; persist('finances'); playTick(); renderView();
+  ui.forms.expense = false; closeFinSheet(); persist('finances'); playPositive(); renderView(); showToast(name.slice(0, 40)+', $'+(Math.round(amt*100)/100).toFixed(2)+'.', {icon:'&#128184;'});
 };
 ACTIONS.expCat = function(el, e, id){
   const x = finExpenses().find(function(z){ return z.id===id; }); if(!x) return;
@@ -109,10 +109,7 @@ function expensesHtml(){
         '<div class="ex-connect-r"><input class="input" id="finToken" placeholder="Paste your SimpleFIN setup token"><button class="btn btn-primary" data-action="finConnect"'+(b.busy ? ' disabled' : '')+'>'+(b.busy ? 'Connecting…' : 'Connect')+'</button></div>'+
         (b.err ? '<div class="ex-err">'+escapeHtml(b.err)+'</div>' : '')+'</div>';
   return '<div class="section ex">'+
-    '<div class="section-title">Expenses<span class="ex-hbtns"><button class="btn btn-sm btn-ghost" data-action="bankCsvPick" title="A CSV statement from your bank’s website">Import statement</button>'+(ui.forms.expense ? '<button class="btn btn-sm" data-action="toggleForm" data-form="expense">Close</button>' : '')+'</span></div>'+
-    (ui.forms.expense ? '<div class="card ex-form"><input class="input" id="expName" placeholder="What was it?"><input class="input" type="number" step="0.01" id="expAmount" placeholder="$">'+
-      '<select class="input" id="expCat"><option value="">Kind (auto)</option>'+EXP_CATS.map(function(c){ return '<option value="'+c.id+'">'+c.label+'</option>'; }).join('')+'</select>'+
-      '<input class="input" type="date" id="expDate" value="'+todayStr()+'"><button class="btn btn-good" data-action="expAdd">Add</button></div>' : '')+
+    '<div class="section-title">Expenses<span class="ex-hbtns"><button class="btn btn-sm btn-ghost" data-action="bankCsvPick" title="A CSV statement from your bank’s website">Import statement</button></span></div>'+
     '<div class="ex-top card">'+
       '<div class="ex-total"><small>Spent this month</small><b>'+money2(total)+'</b>'+(last ? '<span class="'+(total > last ? 'is-up' : 'is-down')+'">'+money2(last)+' last month</span>' : '')+'</div>'+
       '<div class="ex-cats">'+(cats.length ? cats.map(function(c){ const k = expCat(c); return '<div class="ex-c"><span>'+k.icon+' '+k.label+'</span><i><u style="width:'+(by[c]/top*100).toFixed(1)+'%"></u></i><b>'+money2(by[c])+'</b></div>'; }).join('') : '<div class="kpi-sub">Nothing yet this month.</div>')+'</div>'+

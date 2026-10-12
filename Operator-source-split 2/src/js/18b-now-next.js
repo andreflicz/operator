@@ -20,7 +20,7 @@ function nowNextPanelHtml(opts){
   let next = explicit;
   if(!next){ const s = nextUpTask(); if(s && s.id!==ui.currentTaskId && !(pend && s.id===pend.id)) next = s; }
   // the task in each slot can be picked up: onto the list to clear the slot, or across to swap
-  const title = function(t, from){ return '<div class="nn-title nn-drag" draggable="true" data-task-id="'+t.id+'" data-from="'+from+'" title="Drag to move it">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span></div>'; };
+  const title = function(t, from){ return '<div class="nn-title nn-drag" draggable="true" data-task-id="'+t.id+'" data-from="'+from+'" title="Drag to move it">'+taskTags(t)+'<span>'+escapeHtml(t.title)+'</span></div>'; };
   const picker = function(label){ return '<span class="nn-pick-wrap"><button class="btn btn-ghost btn-sm" data-action="toggleNextPicker" data-where="'+where+'">'+label+' &#9662;</button>'+nextPickerHtml(where)+'</span>'; };
   let now = '';
   {

@@ -824,7 +824,7 @@ function renderPlanReveal(){
       '<div class="wi-cols">'+
         '<div class="wi-col">'+
           '<div class="wi-plan" style="'+at(300)+'"><div class="wi-sec">Plan of Attack <span>'+(plan.length ? plan.length+(plan.length===1?' thing':' things')+' &middot; ' : '')+'aim for '+fmtHours(target)+'</span></div>'+
-            (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(d + i*60)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">Due today</span>' : '')+'</li>'; }).join('')+'</ol>'
+            (plan.length ? '<ol class="pr-list">'+plan.map(function(t, i){ return '<li class="pr-row'+(i===0?' is-first':'')+'" style="animation-delay:'+(d + i*60)+'ms"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+taskTags(t)+'<span class="pr-t">'+escapeHtml(t.title)+'</span>'+(t.deadline===today ? '<span class="pr-due">Due today</span>' : '')+'</li>'; }).join('')+'</ol>'
               : '<div class="wd-empty">Nothing planned yet. Pick your first move in Lock in.</div>')+
             (events.length ? '<div class="wi-cal">'+events.slice(0, 3).map(function(e){ return '<span><b>'+fmt12Hour(e.time)+'</b>'+escapeHtml(e.title)+'</span>'; }).join('')+'</div>' : '')+
           '</div>'+

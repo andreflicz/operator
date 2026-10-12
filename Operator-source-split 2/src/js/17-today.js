@@ -40,7 +40,7 @@ function confirmPendingCurrentTask(){
   setCurrentTask(id);
 }
 function focusModeBacklogRow(t){
-  return '<div class="task-item-v2"><div style="flex:1;min-width:100px;"><div class="task-title-row">'+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span></div></div>'+
+  return '<div class="task-item-v2"><div style="flex:1;min-width:100px;"><div class="task-title-row">'+taskTags(t)+'<span class="task-title">'+escapeHtml(t.title)+'</span></div></div>'+
     '<button class="mini-move mini-move-today" data-action="promoteTask" data-id="'+t.id+'" title="Move to Today">+ Today</button>'+
   '</div>';
 }

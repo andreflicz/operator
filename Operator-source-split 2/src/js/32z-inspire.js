@@ -178,7 +178,7 @@ function inspHtml(){
     '<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" class="izh-track"/><circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" class="izh-fill" stroke="url(#ihG)" stroke-dasharray="'+(c*f).toFixed(1)+' '+c.toFixed(1)+'" transform="rotate(-90 '+size/2+' '+size/2+')"/></svg>'; };
   const open = ui.inspOpenAct ? inspAct(ui.inspOpenAct) : null;
   const board = ui.inspBoard ? arr(state.boards.boards).find(function(b){ return b.id===ui.inspBoard; }) : null;
-  const recent = s.log.slice(-12).reverse();
+  const recent = s.log.slice(-7).reverse();
   return '<div class="insp-sky" style="--px:'+(v.x*0.12).toFixed(1)+'px;--py:'+(v.y*0.12).toFixed(1)+'px"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i></div>'+
     '<div class="insp-stars" style="--px:'+(v.x*0.3).toFixed(1)+'px;--py:'+(v.y*0.3).toFixed(1)+'px"></div>'+
     '<div class="insp-plane" id="inspPlane"><div class="insp-world" id="inspWorld" style="transform:translate('+v.x+'px,'+v.y+'px) scale('+v.z+')">'+
@@ -205,7 +205,7 @@ function inspHtml(){
       '<button class="insp-b" data-action="inspCenter" title="Back to the middle">&#9678;</button>'+
       '<button class="insp-b'+(typeof musicOn==='function' && musicOn() ? ' is-on' : '')+'" data-action="inspMusic" title="'+(typeof musicOn==='function' && musicOn() ? 'Pause the music' : 'Play music')+'">'+(typeof musicOn==='function' && musicOn() ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9835;')+'</button></div>'+
     '<div class="insp-scores"><div><b>'+(rate==null ? '&ndash;' : rate)+'</b><span>Inspiration</span></div>'+(mind!=null ? '<div><b>'+mind+'</b><span>Mind</span></div>' : '')+'<div><b>'+inspStreak()+'</b><span>day streak</span></div></div>'+
-    '<div class="insp-lately"><div class="izl-h">Lately</div>'+(recent.length ? recent.map(function(x){ return '<div class="izl-r"><span>'+inspAct(x.act).e+'</span><b>'+escapeHtml(x.label)+'</b><small>'+(x.date===t ? fmtTimeShort(x.at) : weekdayShort(x.date))+'</small></div>'; }).join('') : '<div class="izl-none">What you log shows up here.</div>')+'</div>'+
+    '<div class="insp-lately"><div class="izl-h">This week</div><div class="izl-week">'+(typeof lifeWeek==='function' ? lifeWeek() : []).map(function(k){ return '<div class="izl-w'+(k.n ? '' : ' is-zero')+'" title="'+k.label+(k.min ? ', '+fmtDurationLabel(k.min) : '')+'"><span>'+k.e+'</span><b>'+k.n+'</b><small>'+k.label+'</small></div>'; }).join('')+'</div><div class="izl-h">Lately</div>'+(recent.length ? recent.map(function(x){ return '<div class="izl-r"><span>'+inspAct(x.act).e+'</span><b>'+escapeHtml(x.label)+'</b><small>'+(x.date===t ? fmtTimeShort(x.at) : weekdayShort(x.date))+'</small></div>'; }).join('') : '<div class="izl-none">What you log shows up here.</div>')+'</div>'+
     '<div class="insp-hint'+(Date.now() - (ui.inspHintAt||0) > 6500 ? ' is-gone' : '')+'">Drag to wander · scroll to zoom · double-click anywhere to write a thought</div>'+
     (ui.inspSheet ? '<div class="insp-sheet-bg" data-action="inspLogSheet"></div><div class="insp-sheet"><div class="izs-h">What did you do?</div>'+
       '<div class="izs-grid">'+inspActs().map(function(a){ return '<button class="izs-a c-'+a.cat+'" data-action="inspLogFromSheet" data-id="'+a.id+'"><span>'+a.e+'</span>'+escapeHtml(a.label)+'</button>'; }).join('')+'</div>'+

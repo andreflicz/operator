@@ -111,7 +111,7 @@ function renderTodayTasksPanel(){
     ) : (
       backlog.length ? '<div class="task-list">'+backlog.map(function(t){
         return '<div class="task-item-v2" data-action="pullSpecificFromBacklog" data-id="'+t.id+'" style="cursor:pointer;">'+
-          '<div class="task-title-row">'+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span></div>'+
+          '<div class="task-title-row">'+taskTags(t)+'<span class="task-title">'+escapeHtml(t.title)+'</span></div>'+
           '<button class="mini-move mini-move-today" data-action="pullSpecificFromBacklog" data-id="'+t.id+'" style="margin-left:auto;">+ Today</button>'+
         '</div>';
       }).join('')+'</div>' : '<div class="empty">Backlog is empty. Switch to New Task.</div>'

@@ -222,7 +222,7 @@ const OP_TOOLS = [
   {name:'lock_in', description:'Start a deep work session (lock in) now, optionally for a number of minutes and on a task by name.', input_schema:{type:'object', properties:{minutes:{type:'integer'}, task:{type:'string'}}, additionalProperties:false}},
   {name:'settle_checkin', description:'Log his reason for a check-in he never answered (you were told about it), and whether it is a genuine, acceptable reason.', input_schema:{type:'object', properties:{reason:{type:'string'}, acceptable:{type:'boolean'}, why:{type:'string', description:'a few words on your call'}}, required:['reason', 'acceptable'], additionalProperties:false}},
   {name:'start_task', description:'Start timing a task from today’s list (by part of its title) without locking in.', input_schema:{type:'object', properties:{task:{type:'string'}}, required:['task'], additionalProperties:false}},
-  {name:'open_page', description:'Show a page of the app.', input_schema:{type:'object', properties:{page:{type:'string', enum:['today', 'focus', 'analytics', 'business', 'clients', 'leads', 'calendar', 'goals', 'growth', 'health', 'finances', 'journal', 'card', 'settings', 'inspiration']}}, required:['page'], additionalProperties:false}}
+  {name:'open_page', description:'Show a page of the app.', input_schema:{type:'object', properties:{page:{type:'string', enum:['today', 'focus', 'analytics', 'business', 'clients', 'leads', 'calendar', 'goals', 'growth', 'skills', 'health', 'finances', 'journal', 'card', 'settings', 'inspiration']}}, required:['page'], additionalProperties:false}}
 ];
 // a task by (part of) its title: today's first, then the rest that aren't done
 function opFindTask(q){
@@ -339,7 +339,7 @@ function opRunTool(name, x){
     }
     case 'open_page': {
       const pg = x.page, go = {today:['today'], focus:['focus'], analytics:['focus', function(){ ui.focusTab = 'analytics'; }], business:['business'], clients:['business', function(){ ui.businessTab = 'clients'; }], leads:['business', function(){ ui.businessTab = 'leads'; }],
-        calendar:['calendar'], goals:['personal', function(){ ui.personalTab = 'goals'; }], growth:['personal', function(){ ui.personalTab = 'growth'; }], health:['personal', function(){ ui.personalTab = 'fitness'; }], finances:['personal', function(){ ui.personalTab = 'finances'; }], journal:['personal', function(){ ui.personalTab = 'journal'; }], card:['personal', function(){ ui.personalTab = 'you'; }], settings:['settings']}[pg];
+        calendar:['calendar'], goals:['personal', function(){ ui.personalTab = 'goals'; }], growth:['focus', function(){ ui.focusTab = 'tasks'; ui.focusTasksSubTab = 'skills'; }], skills:['focus', function(){ ui.focusTab = 'tasks'; ui.focusTasksSubTab = 'skills'; }], health:['personal', function(){ ui.personalTab = 'fitness'; }], finances:['personal', function(){ ui.personalTab = 'finances'; }], journal:['personal', function(){ ui.personalTab = 'journal'; }], card:['personal', function(){ ui.personalTab = 'you'; }], settings:['settings']}[pg];
       if(pg==='inspiration' && typeof openInspire==='function'){ openInspire(); return 'opened Inspiration'; }
       if(!go) throw new Error('unknown page'); ui.view = go[0]; if(go[1]) go[1](); ui.opNav = true; return 'opened '+pg;
     }

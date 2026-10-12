@@ -309,7 +309,7 @@ function lockTaskHtml(){
       const isNow = t.id===s.nowId, isNext = t.id===s.nextId;
       return '<li class="wd-row ls-row'+(isNow?' is-now':'')+(isNext?' is-next':'')+'" draggable="true" data-id="'+t.id+'" style="animation-delay:'+(i*45)+'ms">'+
         '<span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+
-        '<button class="ls-row-main" data-action="lockSetNow" data-id="'+t.id+'">'+priorityTag(t.priority)+'<span class="wd-title">'+escapeHtml(t.title)+'</span></button>'+
+        '<button class="ls-row-main" data-action="lockSetNow" data-id="'+t.id+'">'+taskTags(t)+'<span class="wd-title">'+escapeHtml(t.title)+'</span></button>'+
         '<span class="ls-slots"><button class="ls-slot ls-slot-now'+(isNow?' is-on':'')+'" data-action="lockSetNow" data-id="'+t.id+'">Now</button>'+
           '<button class="ls-slot ls-slot-next'+(isNext?' is-on':'')+'" data-action="lockSetNext" data-id="'+t.id+'">Next</button></span>'+
         '<span class="ls-moves"><button class="wd-ctl" data-action="lockMove" data-id="'+t.id+'" data-dir="-1" title="Move up"'+(i===0?' disabled':'')+'>&#8593;</button>'+
@@ -318,7 +318,7 @@ function lockTaskHtml(){
     '<div class="ls-add">'+
       '<div class="wd-add"><input class="input" id="lockNewTask" placeholder="+ Add a task to today"><button class="btn btn-sm" data-action="lockNewTask">Add</button></div>'+
       (pool.length || q ? '<div class="ls-pool-h"><span class="wd-k" style="margin:0;">From your list</span><input class="input ls-search" id="lockSearch" placeholder="Search" value="'+escapeHtml(s.search||'')+'"></div>'+
-        '<div class="wd-pool">'+(pool.length ? pool.map(function(t){ return '<button class="wd-chip ls-chip" data-action="lockAddToday" data-id="'+t.id+'" title="Add to today">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span><b>+</b></button>'; }).join('') : '<span class="kpi-sub">No match.</span>')+'</div>' : '')+
+        '<div class="wd-pool">'+(pool.length ? pool.map(function(t){ return '<button class="wd-chip ls-chip" data-action="lockAddToday" data-id="'+t.id+'" title="Add to today">'+taskTags(t)+'<span>'+escapeHtml(t.title)+'</span><b>+</b></button>'; }).join('') : '<span class="kpi-sub">No match.</span>')+'</div>' : '')+
     '</div>'+
   '</div>';
 }

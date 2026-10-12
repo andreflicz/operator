@@ -40,7 +40,7 @@ function renderCurrentTaskCard(big, gridMode, heroFit){
   if(big){
     return '<div class="task-card current-task-card has-task" data-dropzone="current" data-task-id="'+t.id+'" style="'+sizeStyle+'flex-direction:row;align-items:center;gap:20px;">'+
       '<div style="flex:1;min-width:0;">'+
-        '<div class="row" style="gap:8px;"><span class="ctb-label">'+currentTaskLabel()+'</span>'+priorityTag(t.priority)+'</div>'+
+        '<div class="row" style="gap:8px;"><span class="ctb-label">'+currentTaskLabel()+'</span>'+taskTags(t)+'</div>'+
         '<div class="task-card-title" style="font-size:19px;margin-top:4px;">'+escapeHtml(t.title)+'</div>'+
         (t.trackedMinutes ? '<div class="kpi-sub">'+fmtDurationLabel(t.trackedMinutes)+' tracked total</div>' : '')+
       '</div>'+
@@ -53,7 +53,7 @@ function renderCurrentTaskCard(big, gridMode, heroFit){
   }
   if(heroFit){
     return '<div class="task-card current-task-card has-task" data-dropzone="current" data-task-id="'+t.id+'" style="'+sizeStyle+'align-items:center;text-align:center;gap:10px;">'+
-      '<div class="row" style="gap:8px;justify-content:center;">'+priorityTag(t.priority)+'<span class="ctb-label">'+currentTaskLabel()+'</span></div>'+
+      '<div class="row" style="gap:8px;justify-content:center;">'+taskTags(t)+'<span class="ctb-label">'+currentTaskLabel()+'</span></div>'+
       '<div class="task-card-title" style="font-size:20px;">'+escapeHtml(t.title)+'</div>'+
       '<div class="ctb-timer" id="currentTaskElapsed" style="font-size:32px;">'+formatElapsed(Date.now()-ui.currentTaskStartedAt)+'</div>'+
       (t.trackedMinutes ? '<div class="kpi-sub">'+fmtDurationLabel(t.trackedMinutes)+' tracked total</div>' : '')+
@@ -64,7 +64,7 @@ function renderCurrentTaskCard(big, gridMode, heroFit){
     '</div>';
   }
   return '<div class="task-card current-task-card has-task" data-dropzone="current" data-task-id="'+t.id+'" style="'+sizeStyle+'">'+
-    '<div class="row" style="justify-content:space-between;">'+priorityTag(t.priority)+'<span class="ctb-label">'+currentTaskLabel()+'</span></div>'+
+    '<div class="row" style="justify-content:space-between;">'+taskTags(t)+'<span class="ctb-label">'+currentTaskLabel()+'</span></div>'+
     '<div class="task-card-title">'+escapeHtml(t.title)+'</div>'+
     '<div class="ctb-timer" id="currentTaskElapsed">'+formatElapsed(Date.now()-ui.currentTaskStartedAt)+'</div>'+
     (t.trackedMinutes ? '<div class="kpi-sub">'+fmtDurationLabel(t.trackedMinutes)+' tracked total</div>' : '')+
@@ -91,19 +91,20 @@ function focusTasksSubTab(el){ ui.focusTasksSubTab = el.dataset.tab; renderView(
 // so the page opens straight onto what you're on now and what's next.
 function focusTasksSubtabsHtml(){
   const sub = ui.focusTasksSubTab || 'overview';
-  let backlogN = 0, ideasN = 0, doneN = 0;
+  let backlogN = 0, ideasN = 0, doneN = 0, skillN = 0;
   state.tasks.items.forEach(function(t){
+    if(t.skill && t.status!=='done') skillN++;
     if(t.status==='done') doneN++;
     else if(t.isVideoIdea) ideasN++;
     else if(t.status==='backlog') backlogN++;
   });
   const pill = function(id, label, n){ return '<div class="subtab '+(sub===id?'active':'')+'" data-action="focusTasksSubTab" data-tab="'+id+'">'+label+(n===null?'':' <span style="opacity:.7;">'+n+'</span>')+'</div>'; };
-  return '<div class="subtabs">'+pill('overview', 'Overview', null)+pill('backlog', 'Backlog', backlogN)+pill('videoIdeas', '&#127916; Content', ideasN)+pill('finished', 'Finished', doneN)+(arr(state.tasks.trash).length ? pill('deleted', '&#128465;', arr(state.tasks.trash).length) : '')+'</div>';
+  return '<div class="subtabs">'+pill('overview', 'Overview', null)+pill('backlog', 'Backlog', backlogN)+pill('videoIdeas', '&#127916; Content', ideasN)+'<div class="subtab is-skill '+(sub==='skills'?'active':'')+'" data-action="focusTasksSubTab" data-tab="skills">&#127919; Training Skills'+(skillN ? ' <span style="opacity:.7;">'+skillN+'</span>' : '')+'</div>'+pill('finished', 'Finished', doneN)+(arr(state.tasks.trash).length ? pill('deleted', '&#128465;', arr(state.tasks.trash).length) : '')+'</div>';
 }
 function renderFocusTasksTab(){
   const sub = ui.focusTasksSubTab || 'overview';
   return '<div class="subtab-panel" data-key="tasks-'+sub+'">'+
-    (sub==='backlog' ? renderFocusBacklogTab() : sub==='videoIdeas' ? renderVideoIdeasTab() : sub==='finished' ? renderFocusFinishedTab() : sub==='deleted' ? renderFocusDeletedTab() : renderFocusTasksOverview())+
+    (sub==='backlog' ? renderFocusBacklogTab() : sub==='videoIdeas' ? renderVideoIdeasTab() : sub==='skills' ? trainingSkillsHtml() : sub==='finished' ? renderFocusFinishedTab() : sub==='deleted' ? renderFocusDeletedTab() : renderFocusTasksOverview())+
     '</div>';
 }
 // ---- Content: business and personal, side by side. A finished content task is a video out —
@@ -333,10 +334,10 @@ function openAddTaskModal(){
 }
 function closeAddTaskModal(){ const o=document.getElementById('addTaskOverlay'); if(o) o.classList.add('hidden'); }
 function renderAddTaskModal(){
-  return '<div class="section-title" style="margin-bottom:14px;">Add a Task</div>'+
-    '<div class="field"><label>What needs to get done?</label><input class="input" id="newTaskTitle" placeholder="e.g. Edit the testimonial video" style="width:100%;"></div>'+
+  return '<div class="as-h"><span class="as-ic">&#9989;</span><div><div class="hs-h">Add a task</div><div class="as-sub">Today, or the backlog for later.</div></div></div>'+
+    '<div class="field"><label>What needs to get done?</label><input class="input as-name" id="newTaskTitle" placeholder="e.g. Edit the testimonial video" style="width:100%;"></div>'+
     '<div class="field" style="margin-top:10px;"><label>Client(s) / Lead(s)</label>'+clientChipPickerHtml(ui.newTaskClients, 'toggleNewClientChip')+'</div>'+
-    '<div class="field" style="margin-top:10px;"><label>Priority</label><select class="input" id="newTaskPriority"><option value="low">Low</option><option value="med" selected>Medium</option><option value="high">High</option></select></div>'+
+    '<div class="field" style="margin-top:10px;"><label>Priority</label><input type="hidden" id="newTaskPriority" value="med"><div class="hs-seg pri-seg">'+[['low', 'Low'], ['med', 'Medium'], ['high', 'High']].map(function(x){ return '<button type="button" class="pri-'+x[0]+(x[0]==='med' ? ' is-on' : '')+'" data-action="newTaskPri" data-id="'+x[0]+'"><i></i>'+x[1]+'</button>'; }).join('')+'</div></div>'+
     '<div class="field" style="margin-top:10px;"><label>Category (optional)</label><select class="input" id="newTaskCategory"><option value="">&mdash; None &mdash;</option>'+arr(state.tasks.categories).map(function(c){ return '<option value="'+c.id+'">'+escapeHtml(c.label)+'</option>'; }).join('')+'</select></div>'+
     '<div class="field" style="margin-top:10px;"><label>Deadline (optional)</label><div class="row"><input class="input" type="date" id="newTaskDeadline"><input class="input" type="time" id="newTaskDeadlineTime" title="Time (optional)" style="width:110px;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="newTaskDeadline">&#128197;</button><button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="newTaskDeadline">Today</button><button class="btn btn-ghost btn-sm" data-action="clearField" data-target="newTaskDeadline" title="Remove deadline">Clear</button></div></div>'+
     taskAlarmFieldsHtml('newTask', null)+
@@ -495,3 +496,4 @@ function undoTask(id){
 function promoteTask(id){ const t=state.tasks.items.find(function(x){return x.id===id;}); if(t){ t.status='today'; persist('tasks'); renderView(); } }
 function demoteTask(id){ const t=state.tasks.items.find(function(x){return x.id===id;}); if(t){ t.status='backlog'; persist('tasks'); renderView(); } }
 
+ACTIONS.newTaskPri = function(el, e, id){ const h = document.getElementById('newTaskPriority'); if(h) h.value = id; el.parentNode.querySelectorAll('button').forEach(function(b){ b.classList.toggle('is-on', b===el); }); };

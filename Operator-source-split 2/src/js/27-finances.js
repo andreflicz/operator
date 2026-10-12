@@ -38,28 +38,9 @@ function renderPersonalFinances(){
     '<div class="card" style="min-height:128px;display:flex;flex-direction:column;justify-content:center;"><div class="kpi-label">Paid Off So Far</div><div class="kpi-value" style="color:var(--good);">$'+(totalOriginal-totalDebt).toLocaleString()+'</div></div>'+
   '</div>'+
   '<div class="grid grid-2 section" style="align-items:start;">'+
-  '<div class="section" style="margin-bottom:0;"><div class="section-title">Debts'+(ui.forms.debt ? '<button class="btn btn-sm" data-action="toggleForm" data-form="debt">Close</button>' : '')+'</div>'+
-    (ui.forms.debt ? '<div class="card" style="margin-bottom:10px;">'+
-      '<input class="input" id="debtName" placeholder="Name (e.g. Car Loan)" style="width:100%;">'+
-      '<div class="grid grid-2" style="margin-top:8px;">'+
-        '<input class="input" id="debtCreditor" placeholder="Who it\'s from">'+
-        '<input class="input" type="number" id="debtAmount" placeholder="Balance owed">'+
-      '</div>'+
-      '<textarea class="input" id="debtDescription" placeholder="What is this debt for?" style="width:100%;min-height:56px;margin-top:8px;"></textarea>'+
-      '<button class="btn btn-primary btn-sm" style="margin-top:8px;" data-action="addDebt">Add Debt</button>'+
-    '</div>' : '')+
+  '<div class="section" style="margin-bottom:0;"><div class="section-title">Debts</div>'+
     '<div class="task-list">'+(debts.map(debtRow).join('') || '<div class="empty">No debts tracked. The + in the corner adds one.</div>')+'</div></div>'+
-  '<div class="section" style="margin-bottom:0;"><div class="section-title">Income'+(ui.forms.income ? '<button class="btn btn-sm" data-action="toggleForm" data-form="income">Close</button>' : '')+'</div>'+
-    (ui.forms.income ? '<div class="card" style="margin-bottom:10px;">'+
-      '<div class="row"><input class="input" type="date" id="incomeDate" value="'+todayStr()+'" style="width:140px;">'+
-      '<button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="incomeDate">&#128197;</button>'+
-      '<button class="btn btn-ghost btn-sm" data-action="setFieldToday" data-target="incomeDate">Today</button></div>'+
-      '<div class="grid grid-2" style="margin-top:8px;">'+
-        '<input class="input" id="incomeSource" placeholder="Source">'+
-        '<input class="input" type="number" id="incomeAmount" placeholder="Amount">'+
-      '</div>'+
-      '<button class="btn btn-good btn-sm" style="margin-top:8px;" data-action="addIncome">Add Income</button>'+
-    '</div>' : '')+
+  '<div class="section" style="margin-bottom:0;"><div class="section-title">Income</div>'+
     '<div class="task-list">'+(income.slice(0,12).map(incomeRow).join('') || '<div class="empty">No income logged. The + in the corner adds it.</div>')+'</div></div>'+
   '</div>'+
   (typeof expensesHtml==='function' ? expensesHtml() : '');
@@ -276,9 +257,9 @@ function addDebt(){
   const balance = Number(document.getElementById('debtAmount').value);
   const creditor = document.getElementById('debtCreditor').value.trim();
   const description = document.getElementById('debtDescription').value.trim();
-  if(!name || !balance) return;
+  if(!name || !balance){ const el = document.getElementById(!name ? 'debtName' : 'debtAmount'); if(el) el.focus(); return; }
   state.finances.debts.push({id:uid(), name:name, balance:balance, originalAmount:balance, creditor:creditor, description:description});
-  ui.forms.debt = false;
+  ui.forms.debt = false; closeFinSheet(); playPositive();
   persist('finances'); renderView();
 }
 function openLogPaymentModal(debtId){
@@ -315,9 +296,9 @@ function addIncome(){
   const date = document.getElementById('incomeDate').value || todayStr();
   const source = document.getElementById('incomeSource').value.trim();
   const amount = Number(document.getElementById('incomeAmount').value);
-  if(!amount) return;
+  if(!amount){ const el = document.getElementById('incomeAmount'); if(el) el.focus(); return; }
   state.finances.income.push({id:uid(), date:date, source:source||'Income', amount:amount});
-  ui.forms.income = false;
+  ui.forms.income = false; closeFinSheet();
   playPositive();
   persist('finances'); renderView();
 }

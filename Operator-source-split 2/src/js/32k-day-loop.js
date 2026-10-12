@@ -161,14 +161,14 @@ function windPlanHtml(){
   return '<div class="wd-plan">'+
     '<div class="wd-sub">In the order you\'ll do them. #1 is what you lock in on first.</div>'+
     (rows.length ? '<ol class="wd-list">'+rows.map(function(t, i){
-      return '<li class="wd-row" draggable="true" data-id="'+t.id+'"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+priorityTag(t.priority)+'<span class="wd-title">'+escapeHtml(t.title)+'</span>'+
+      return '<li class="wd-row" draggable="true" data-id="'+t.id+'"><span class="wd-num">'+String(i+1).padStart(2,'0')+'</span>'+taskTags(t)+'<span class="wd-title">'+escapeHtml(t.title)+'</span>'+
         '<button class="wd-ctl" data-action="windMove" data-id="'+t.id+'" data-dir="-1" title="Up"'+(i===0?' disabled':'')+'>&#8593;</button><button class="wd-ctl" data-action="windMove" data-id="'+t.id+'" data-dir="1" title="Down"'+(i===rows.length-1?' disabled':'')+'>&#8595;</button>'+
         '<button class="wd-ctl wd-x" data-action="windRemove" data-id="'+t.id+'" title="Take it off">&#10005;</button></li>';
     }).join('')+'</ol>' : '<div class="wd-empty">Nothing planned yet. Add what matters most first.</div>')+
     '<div class="wd-add"><input class="input" id="windNewTask" placeholder="+ A new task for tomorrow (Enter)"><button class="btn btn-sm" data-action="windNewTask">Add</button></div>'+
     '<div class="wd-k" style="margin-top:16px;">From your list</div>'+
     '<input class="input wd-search" id="windSearch" placeholder="Search…" value="'+escapeHtml(w.search||'')+'">'+
-    '<div class="wd-pool">'+(pool.length ? pool.map(function(t){ return '<button class="wd-chip" draggable="true" data-action="windAdd" data-id="'+t.id+'" title="Click to add, or drag it into the list">'+priorityTag(t.priority)+'<span>'+escapeHtml(t.title)+'</span><b>+</b></button>'; }).join('') : '<span class="kpi-sub">Nothing else on your lists.</span>')+'</div>'+
+    '<div class="wd-pool">'+(pool.length ? pool.map(function(t){ return '<button class="wd-chip" draggable="true" data-action="windAdd" data-id="'+t.id+'" title="Click to add, or drag it into the list">'+taskTags(t)+'<span>'+escapeHtml(t.title)+'</span><b>+</b></button>'; }).join('') : '<span class="kpi-sub">Nothing else on your lists.</span>')+'</div>'+
   '</div>';
 }
 function windNoteHtml(){
@@ -261,7 +261,7 @@ ACTIONS.morningLockIn = function(el, e, id){
 };
 ACTIONS.morningBriefing = function(){ ui.wakeMode = 'brief'; ui.wakeIntroDone = true; ui.briefSkipped = true; ui.briefShift = 0; ui.briefT0 = Date.now() - 1e7; ui.wakeBriefTest = false; loadMorningNews(); showOverlay('wakeOverlay'); renderWakeOverlayInto(); briefVoiceRun(); };
 function planListHtml(list, cls){
-  return '<ol class="plan-list '+(cls||'')+'">'+list.map(function(t, i){ const done = t.status==='done'; return '<li class="'+(done?'is-done':'')+(i===0 && !done?' is-first':'')+'"><span class="pl-num">'+(done ? '&#10003;' : String(i+1).padStart(2,'0'))+'</span>'+priorityTag(t.priority)+'<span class="pl-t">'+escapeHtml(t.title)+'</span></li>'; }).join('')+'</ol>';
+  return '<ol class="plan-list '+(cls||'')+'">'+list.map(function(t, i){ const done = t.status==='done'; return '<li class="'+(done?'is-done':'')+(i===0 && !done?' is-first':'')+'"><span class="pl-num">'+(done ? '&#10003;' : String(i+1).padStart(2,'0'))+'</span>'+taskTags(t)+'<span class="pl-t">'+escapeHtml(t.title)+'</span></li>'; }).join('')+'</ol>';
 }
 // Morning mode is life first — the routine, last night's note, the vision — and no work on the
 // screen until you Clock in (then the plan of attack shows up).

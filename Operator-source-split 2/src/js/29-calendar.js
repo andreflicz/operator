@@ -98,7 +98,7 @@ function renderCalEventModal(){
   const e = editing || {date:(ui.calendarSelectedDate||todayStr()), time:'', title:'', categoryId:(categories[0]?categories[0].id:''), meetingLink:''};
   const defaultCat = categoryById(e.categoryId);
   const wantsAlarm = editing ? !!e.alarmId : !!(defaultCat && defaultCat.autoRemind);
-  return '<div class="section-title" style="margin-bottom:14px;">'+(editing?'Edit Event':'Add Event')+'</div>'+
+  return '<div class="as-h"><span class="as-ic">&#128197;</span><div><div class="hs-h">'+(editing?'Edit event':'Add an event')+'</div><div class="as-sub">A call, a shoot, a block of time.</div></div></div>'+
     '<div class="field"><label>Date</label><div class="row" style="gap:6px;"><input class="input" type="date" id="calEventDate" value="'+(e.date||todayStr())+'" style="width:100%;"><button class="btn btn-ghost btn-sm" data-action="openDatePicker" data-target="calEventDate">&#128197;</button></div></div>'+
     '<div class="field" style="margin-top:10px;"><label>Time (optional)</label><input class="input" type="time" id="calEventTime" value="'+(e.time||'')+'" style="width:100%;"></div>'+
     '<div class="field" style="margin-top:10px;"><label>What is it?</label><input class="input" id="calEventTitle" value="'+escapeHtml(e.title||'')+'" placeholder="Shoot with Nina, client call, etc." style="width:100%;"></div>'+

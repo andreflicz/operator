@@ -386,7 +386,7 @@ function renderTimeByTaskSection(){
   return '<div class="section"><div class="section-title">Time By Task'+tip('Time tracked while a task is your Current task.')+'</div><div class="task-list">'+
     (tracked.map(function(t){
       return '<div class="task-item-v2">'+
-        '<div class="task-title-row">'+priorityTag(t.priority)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-personal">&#128204; Ongoing</span>':'')+'</div>'+
+        '<div class="task-title-row">'+taskTags(t)+'<span class="task-title">'+escapeHtml(t.title)+'</span>'+(t.ongoing?'<span class="tag tag-personal">&#128204; Ongoing</span>':'')+'</div>'+
         '<span class="kpi-value" style="font-size:15px;">'+fmtDurationLabel(t.trackedMinutes)+'</span>'+
       '</div>';
     }).join('') || '<div class="empty">No time tracked on individual tasks yet. Set a task as Current from the Tasks page, Focus tab, or Today dashboard to start timing it.</div>')+
