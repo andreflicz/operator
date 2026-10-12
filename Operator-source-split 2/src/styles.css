@@ -5156,3 +5156,85 @@ textarea.hs-in{ resize:vertical; min-height:56px; }
 @keyframes apIn{ from{ opacity:0; transform:translateY(8px) scale(.97); } to{ opacity:1; transform:none; } }
 @media (max-width:620px){ .ap-grid, .ap-grid.is-many{ grid-template-columns:repeat(2, 1fr); } }
 .opi-wrap{ margin:0 0 4px; } .opi-wrap:empty{ display:none; } .opi-wrap .opi{ margin-left:0; margin-right:0; }
+
+/* ===================== R26: Inspiration, dreamier ===================== */
+/* aurora ribbons, slow and soft, over the sky */
+.insp-aurora{ position:absolute; inset:0; pointer-events:none; overflow:hidden; mix-blend-mode:screen; opacity:.55; }
+.insp-aurora i{ position:absolute; left:-30%; width:160%; height:38%; top:8%; border-radius:50%; filter:blur(60px); background:linear-gradient(90deg, transparent, rgba(120,255,214,.32), rgba(150,140,255,.34), rgba(255,140,220,.22), transparent); transform:rotate(-8deg); animation:inspAur 38s ease-in-out infinite alternate; }
+.insp-aurora i + i{ top:46%; height:30%; opacity:.7; background:linear-gradient(90deg, transparent, rgba(255,190,140,.22), rgba(120,200,255,.3), rgba(190,150,255,.26), transparent); transform:rotate(6deg); animation-duration:46s; animation-direction:alternate-reverse; }
+@keyframes inspAur{ 0%{ transform:translateX(-6%) rotate(-8deg) scaleY(.9); } 50%{ transform:translateX(4%) rotate(-3deg) scaleY(1.15); } 100%{ transform:translateX(8%) rotate(-10deg) scaleY(.95); } }
+/* soft lights that rise and fade, like dust in sun */
+.insp-bokeh{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.insp-bokeh i{ position:absolute; bottom:-60px; left:calc(var(--i) * 10% + 3%); width:calc(10px + var(--i) * 3px); height:calc(10px + var(--i) * 3px); border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.85), rgba(255,220,255,.25) 45%, transparent 70%); filter:blur(1px); opacity:0;
+  animation:inspRise calc(18s + var(--i) * 2.3s) linear infinite; animation-delay:calc(var(--i) * -3.7s); }
+@keyframes inspRise{ 0%{ transform:translate(0, 0) scale(.6); opacity:0; } 12%{ opacity:.55; } 50%{ transform:translate(30px, -55vh) scale(1); } 85%{ opacity:.35; } 100%{ transform:translate(-20px, -110vh) scale(.7); opacity:0; } }
+/* the light that follows you */
+.insp-glow{ position:absolute; inset:0; pointer-events:none; background:radial-gradient(260px 260px at var(--mx, 50%) var(--my, 50%), rgba(255,240,255,.09), transparent 70%); mix-blend-mode:screen; }
+/* skies */
+.insp[data-sky="aurora"]{ background:#061418; }
+.insp[data-sky="aurora"] .insp-sky .b1{ background:radial-gradient(circle, #34e6b0, transparent 65%); } .insp[data-sky="aurora"] .insp-sky .b2{ background:radial-gradient(circle, #6b5cff, transparent 65%); } .insp[data-sky="aurora"] .insp-sky .b3{ background:radial-gradient(circle, #1ec8ff, transparent 65%); } .insp[data-sky="aurora"] .insp-sky .b4{ background:radial-gradient(circle, #b6ff8a, transparent 65%); }
+.insp[data-sky="aurora"] .insp-aurora{ opacity:.85; }
+.insp[data-sky="deep"]{ background:#030a1c; }
+.insp[data-sky="deep"] .insp-sky .b1{ background:radial-gradient(circle, #2a6dff, transparent 65%); } .insp[data-sky="deep"] .insp-sky .b2{ background:radial-gradient(circle, #13c2c2, transparent 65%); } .insp[data-sky="deep"] .insp-sky .b3{ background:radial-gradient(circle, #4b2bd6, transparent 65%); } .insp[data-sky="deep"] .insp-sky .b4{ background:radial-gradient(circle, #8ff0ff, transparent 65%); }
+.insp[data-sky="deep"] .insp-aurora{ opacity:.3; }
+.insp[data-sky="candy"]{ background:#1d1030; }
+.insp[data-sky="candy"] .insp-sky .b1{ background:radial-gradient(circle, #ff9ad5, transparent 65%); } .insp[data-sky="candy"] .insp-sky .b2{ background:radial-gradient(circle, #ffc3a0, transparent 65%); } .insp[data-sky="candy"] .insp-sky .b3{ background:radial-gradient(circle, #b9a3ff, transparent 65%); } .insp[data-sky="candy"] .insp-sky .b4{ background:radial-gradient(circle, #9ff0ff, transparent 65%); }
+.insp[data-sky="candy"] .insp-sky i{ opacity:.7; }
+.insp[data-sky="gold"]{ background:#1a0e10; }
+.insp[data-sky="gold"] .insp-sky .b1{ background:radial-gradient(circle, #ff9f4a, transparent 65%); } .insp[data-sky="gold"] .insp-sky .b2{ background:radial-gradient(circle, #ff5e7a, transparent 65%); } .insp[data-sky="gold"] .insp-sky .b3{ background:radial-gradient(circle, #ffd36b, transparent 65%); } .insp[data-sky="gold"] .insp-sky .b4{ background:radial-gradient(circle, #c58bff, transparent 65%); }
+.insp .insp-sky i{ transition:background 1.2s ease; }
+/* the sandbox bar */
+.insp-tools{ position:absolute; left:50%; bottom:22px; transform:translateX(-50%); display:flex; gap:4px; padding:6px; border-radius:20px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); box-shadow:0 16px 40px rgba(0,0,0,.3); transition:opacity .6s ease; }
+.izk{ display:flex; flex-direction:column; align-items:center; gap:2px; min-width:62px; padding:7px 10px 6px; border:none; border-radius:14px; background:transparent; color:rgba(255,255,255,.75); font:inherit; font-size:11px; font-weight:600; cursor:pointer; transition:background .2s, color .2s, transform .2s; }
+.izk span{ font-size:17px; line-height:1.2; }
+.izk:hover{ background:rgba(255,255,255,.1); color:#fff; transform:translateY(-2px); }
+.izk.is-on{ background:rgba(255,255,255,.16); color:#fff; box-shadow:0 0 18px rgba(200,180,255,.35); }
+.insp-hint{ bottom:96px; }
+/* a wish: a little star with a name */
+.izw{ position:absolute; transform:translate(-50%, -50%); display:flex; flex-direction:column; align-items:center; gap:6px; --c:hsl(var(--h), 100%, 82%); }
+.izw-star{ position:relative; width:46px; height:46px; display:grid; place-items:center; cursor:grab; }
+.izw-star::before{ content:''; position:absolute; inset:-16px; border-radius:50%; background:radial-gradient(circle, color-mix(in srgb, var(--c) 55%, transparent), transparent 65%); animation:izwPulse 3.6s ease-in-out infinite; }
+.izw-star i{ width:16px; height:16px; background:#fff; clip-path:polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); box-shadow:0 0 12px #fff; filter:drop-shadow(0 0 8px var(--c)); animation:izwTwinkle 2.8s ease-in-out infinite; }
+@keyframes izwPulse{ 50%{ transform:scale(1.25); opacity:.7; } }
+@keyframes izwTwinkle{ 50%{ transform:scale(.8) rotate(20deg); } }
+.izw-t{ width:180px; text-align:center; border:none; outline:none; background:transparent; color:var(--c); font:inherit; font-family:var(--font-display); font-size:15px; font-weight:500; letter-spacing:.01em; text-shadow:0 0 14px color-mix(in srgb, var(--c) 60%, transparent); user-select:text; }
+.izw-t::placeholder{ color:rgba(255,255,255,.4); font-style:italic; }
+.izw-x, .izq-x{ position:absolute; top:-6px; right:-6px; width:22px; height:22px; border:none; border-radius:50%; background:rgba(0,0,0,.35); color:rgba(255,255,255,.6); font-size:10px; cursor:pointer; opacity:0; transition:opacity .2s; }
+.izw:hover .izw-x, .izq:hover .izq-x{ opacity:1; }
+.izw-x{ top:0; right:58px; }
+/* words worth keeping */
+.izq{ position:absolute; width:260px; padding:18px 20px 14px; border-radius:22px; cursor:grab; color:#fff; background:linear-gradient(160deg, rgba(255,255,255,.14), rgba(255,255,255,.04)); border:1px solid rgba(255,255,255,.22); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:0 20px 50px rgba(20,0,60,.35), 0 0 40px rgba(200,170,255,.12); animation:izqIn .9s cubic-bezier(.2,.8,.2,1) both, izqFloat 9s ease-in-out infinite 1s; }
+.izq p{ margin:0; font-family:Georgia, 'Times New Roman', serif; font-style:italic; font-size:17px; line-height:1.45; }
+.izq small{ display:block; margin-top:10px; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.55); }
+@keyframes izqIn{ from{ opacity:0; filter:blur(10px); transform:scale(.94); } to{ opacity:1; filter:none; transform:none; } }
+@keyframes izqFloat{ 50%{ transform:translateY(-8px); } }
+/* a tap: a ring of light and a few sparks */
+.insp-bloom{ position:fixed; z-index:9020; width:0; height:0; pointer-events:none; }
+.insp-bloom .ib-ring{ position:absolute; left:-60px; top:-60px; width:120px; height:120px; border-radius:50%; border:1.5px solid rgba(255,255,255,.7); box-shadow:0 0 30px rgba(220,200,255,.6), inset 0 0 20px rgba(220,200,255,.4); animation:ibRing 1.3s cubic-bezier(.2,.8,.2,1) forwards; }
+.insp-bloom .ib-dot{ position:absolute; left:-3px; top:-3px; width:6px; height:6px; border-radius:50%; background:#fff; box-shadow:0 0 10px #fff, 0 0 18px #c8b4ff; animation:ibDot 1.2s ease-out forwards; animation-delay:var(--d); }
+@keyframes ibRing{ from{ transform:scale(.1); opacity:1; } to{ transform:scale(1.6); opacity:0; } }
+@keyframes ibDot{ from{ transform:translate(0, 0) scale(1); opacity:1; } to{ transform:translate(var(--x), var(--y)) scale(.2); opacity:0; } }
+/* breathe */
+.insp-breath{ position:fixed; inset:0; z-index:9030; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:26px; color:#fff; background:radial-gradient(circle at 50% 45%, rgba(40,20,90,.55), rgba(5,4,16,.9)); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); opacity:0; transition:opacity .6s ease; }
+.insp-breath.is-in{ opacity:1; }
+.ibr-orb{ position:relative; width:220px; height:220px; --dur:4s; }
+.ibr-orb i{ position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 40% 35%, rgba(255,255,255,.9), rgba(200,170,255,.55) 35%, rgba(120,220,255,.25) 65%, transparent 72%); filter:blur(2px); transform:scale(.55); transition:transform var(--dur) cubic-bezier(.45,0,.55,1), opacity var(--dur) ease; }
+.ibr-orb i:nth-child(2){ inset:-40px; opacity:.35; filter:blur(24px); }
+.ibr-orb i:nth-child(3){ inset:-90px; opacity:.18; filter:blur(50px); }
+.ibr-orb.is-in i, .ibr-orb.is-hold i{ transform:scale(1); }
+.ibr-orb.is-out i{ transform:scale(.55); }
+.ibr-t{ font-family:var(--font-display); font-size:30px; font-weight:400; letter-spacing:.02em; }
+.ibr-n{ font-size:13px; letter-spacing:.2em; color:rgba(255,255,255,.55); }
+.ibr-done{ margin-top:10px; padding:10px 22px; border-radius:999px; border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.08); color:#fff; font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; }
+.ibr-done:hover{ background:rgba(255,255,255,.16); }
+/* drift: everything but the sky fades away */
+.insp.is-drift .insp-top > :not(.insp-x), .insp.is-drift .insp-scores, .insp.is-drift .insp-lately, .insp.is-drift .insp-hint{ opacity:0; pointer-events:none; transition:opacity 1.2s ease; }
+.insp.is-drift .insp-tools{ opacity:.2; } .insp.is-drift .insp-tools:hover{ opacity:1; }
+.insp.is-drift .izb{ opacity:.5; transition:opacity 1.2s ease; }
+.insp-top > *, .insp-scores, .insp-lately{ transition:opacity .8s ease; }
+@media (prefers-reduced-motion: reduce){ .insp-aurora i, .insp-bokeh i, .izq, .izw-star::before, .izw-star i{ animation:none !important; } }
+.insp:not(.is-in) .insp-aurora i, .insp:not(.is-in) .insp-bokeh i{ animation-play-state:paused; }
+.insp-tools{ bottom:16px; padding:5px; gap:2px; border-radius:18px; }
+.izk{ min-width:56px; padding:5px 8px 5px; font-size:10.5px; border-radius:13px; }
+.izk span{ font-size:15px; }
+.insp-hint{ bottom:84px; }

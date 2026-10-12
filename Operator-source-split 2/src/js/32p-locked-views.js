@@ -246,6 +246,7 @@ function fmBell(ctx, out, t, freq, vol){
   g.connect(out);
 }
 function fmBar(ctx, out, t, tr, bar){
+  const dream = fmDream(tr.style); if(dream) return dream(ctx, out, t, tr, bar);
   const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length];
   if(tr.style==='lofi'){
     padChord(ctx, out, t, ch, len*0.35, len*0.45, len*0.6, tr.soft ? 0.018 : 0.022);

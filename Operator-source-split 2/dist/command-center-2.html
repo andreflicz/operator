@@ -5167,6 +5167,88 @@ textarea.hs-in{ resize:vertical; min-height:56px; }
 @keyframes apIn{ from{ opacity:0; transform:translateY(8px) scale(.97); } to{ opacity:1; transform:none; } }
 @media (max-width:620px){ .ap-grid, .ap-grid.is-many{ grid-template-columns:repeat(2, 1fr); } }
 .opi-wrap{ margin:0 0 4px; } .opi-wrap:empty{ display:none; } .opi-wrap .opi{ margin-left:0; margin-right:0; }
+
+/* ===================== R26: Inspiration, dreamier ===================== */
+/* aurora ribbons, slow and soft, over the sky */
+.insp-aurora{ position:absolute; inset:0; pointer-events:none; overflow:hidden; mix-blend-mode:screen; opacity:.55; }
+.insp-aurora i{ position:absolute; left:-30%; width:160%; height:38%; top:8%; border-radius:50%; filter:blur(60px); background:linear-gradient(90deg, transparent, rgba(120,255,214,.32), rgba(150,140,255,.34), rgba(255,140,220,.22), transparent); transform:rotate(-8deg); animation:inspAur 38s ease-in-out infinite alternate; }
+.insp-aurora i + i{ top:46%; height:30%; opacity:.7; background:linear-gradient(90deg, transparent, rgba(255,190,140,.22), rgba(120,200,255,.3), rgba(190,150,255,.26), transparent); transform:rotate(6deg); animation-duration:46s; animation-direction:alternate-reverse; }
+@keyframes inspAur{ 0%{ transform:translateX(-6%) rotate(-8deg) scaleY(.9); } 50%{ transform:translateX(4%) rotate(-3deg) scaleY(1.15); } 100%{ transform:translateX(8%) rotate(-10deg) scaleY(.95); } }
+/* soft lights that rise and fade, like dust in sun */
+.insp-bokeh{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.insp-bokeh i{ position:absolute; bottom:-60px; left:calc(var(--i) * 10% + 3%); width:calc(10px + var(--i) * 3px); height:calc(10px + var(--i) * 3px); border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.85), rgba(255,220,255,.25) 45%, transparent 70%); filter:blur(1px); opacity:0;
+  animation:inspRise calc(18s + var(--i) * 2.3s) linear infinite; animation-delay:calc(var(--i) * -3.7s); }
+@keyframes inspRise{ 0%{ transform:translate(0, 0) scale(.6); opacity:0; } 12%{ opacity:.55; } 50%{ transform:translate(30px, -55vh) scale(1); } 85%{ opacity:.35; } 100%{ transform:translate(-20px, -110vh) scale(.7); opacity:0; } }
+/* the light that follows you */
+.insp-glow{ position:absolute; inset:0; pointer-events:none; background:radial-gradient(260px 260px at var(--mx, 50%) var(--my, 50%), rgba(255,240,255,.09), transparent 70%); mix-blend-mode:screen; }
+/* skies */
+.insp[data-sky="aurora"]{ background:#061418; }
+.insp[data-sky="aurora"] .insp-sky .b1{ background:radial-gradient(circle, #34e6b0, transparent 65%); } .insp[data-sky="aurora"] .insp-sky .b2{ background:radial-gradient(circle, #6b5cff, transparent 65%); } .insp[data-sky="aurora"] .insp-sky .b3{ background:radial-gradient(circle, #1ec8ff, transparent 65%); } .insp[data-sky="aurora"] .insp-sky .b4{ background:radial-gradient(circle, #b6ff8a, transparent 65%); }
+.insp[data-sky="aurora"] .insp-aurora{ opacity:.85; }
+.insp[data-sky="deep"]{ background:#030a1c; }
+.insp[data-sky="deep"] .insp-sky .b1{ background:radial-gradient(circle, #2a6dff, transparent 65%); } .insp[data-sky="deep"] .insp-sky .b2{ background:radial-gradient(circle, #13c2c2, transparent 65%); } .insp[data-sky="deep"] .insp-sky .b3{ background:radial-gradient(circle, #4b2bd6, transparent 65%); } .insp[data-sky="deep"] .insp-sky .b4{ background:radial-gradient(circle, #8ff0ff, transparent 65%); }
+.insp[data-sky="deep"] .insp-aurora{ opacity:.3; }
+.insp[data-sky="candy"]{ background:#1d1030; }
+.insp[data-sky="candy"] .insp-sky .b1{ background:radial-gradient(circle, #ff9ad5, transparent 65%); } .insp[data-sky="candy"] .insp-sky .b2{ background:radial-gradient(circle, #ffc3a0, transparent 65%); } .insp[data-sky="candy"] .insp-sky .b3{ background:radial-gradient(circle, #b9a3ff, transparent 65%); } .insp[data-sky="candy"] .insp-sky .b4{ background:radial-gradient(circle, #9ff0ff, transparent 65%); }
+.insp[data-sky="candy"] .insp-sky i{ opacity:.7; }
+.insp[data-sky="gold"]{ background:#1a0e10; }
+.insp[data-sky="gold"] .insp-sky .b1{ background:radial-gradient(circle, #ff9f4a, transparent 65%); } .insp[data-sky="gold"] .insp-sky .b2{ background:radial-gradient(circle, #ff5e7a, transparent 65%); } .insp[data-sky="gold"] .insp-sky .b3{ background:radial-gradient(circle, #ffd36b, transparent 65%); } .insp[data-sky="gold"] .insp-sky .b4{ background:radial-gradient(circle, #c58bff, transparent 65%); }
+.insp .insp-sky i{ transition:background 1.2s ease; }
+/* the sandbox bar */
+.insp-tools{ position:absolute; left:50%; bottom:22px; transform:translateX(-50%); display:flex; gap:4px; padding:6px; border-radius:20px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); box-shadow:0 16px 40px rgba(0,0,0,.3); transition:opacity .6s ease; }
+.izk{ display:flex; flex-direction:column; align-items:center; gap:2px; min-width:62px; padding:7px 10px 6px; border:none; border-radius:14px; background:transparent; color:rgba(255,255,255,.75); font:inherit; font-size:11px; font-weight:600; cursor:pointer; transition:background .2s, color .2s, transform .2s; }
+.izk span{ font-size:17px; line-height:1.2; }
+.izk:hover{ background:rgba(255,255,255,.1); color:#fff; transform:translateY(-2px); }
+.izk.is-on{ background:rgba(255,255,255,.16); color:#fff; box-shadow:0 0 18px rgba(200,180,255,.35); }
+.insp-hint{ bottom:96px; }
+/* a wish: a little star with a name */
+.izw{ position:absolute; transform:translate(-50%, -50%); display:flex; flex-direction:column; align-items:center; gap:6px; --c:hsl(var(--h), 100%, 82%); }
+.izw-star{ position:relative; width:46px; height:46px; display:grid; place-items:center; cursor:grab; }
+.izw-star::before{ content:''; position:absolute; inset:-16px; border-radius:50%; background:radial-gradient(circle, color-mix(in srgb, var(--c) 55%, transparent), transparent 65%); animation:izwPulse 3.6s ease-in-out infinite; }
+.izw-star i{ width:16px; height:16px; background:#fff; clip-path:polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); box-shadow:0 0 12px #fff; filter:drop-shadow(0 0 8px var(--c)); animation:izwTwinkle 2.8s ease-in-out infinite; }
+@keyframes izwPulse{ 50%{ transform:scale(1.25); opacity:.7; } }
+@keyframes izwTwinkle{ 50%{ transform:scale(.8) rotate(20deg); } }
+.izw-t{ width:180px; text-align:center; border:none; outline:none; background:transparent; color:var(--c); font:inherit; font-family:var(--font-display); font-size:15px; font-weight:500; letter-spacing:.01em; text-shadow:0 0 14px color-mix(in srgb, var(--c) 60%, transparent); user-select:text; }
+.izw-t::placeholder{ color:rgba(255,255,255,.4); font-style:italic; }
+.izw-x, .izq-x{ position:absolute; top:-6px; right:-6px; width:22px; height:22px; border:none; border-radius:50%; background:rgba(0,0,0,.35); color:rgba(255,255,255,.6); font-size:10px; cursor:pointer; opacity:0; transition:opacity .2s; }
+.izw:hover .izw-x, .izq:hover .izq-x{ opacity:1; }
+.izw-x{ top:0; right:58px; }
+/* words worth keeping */
+.izq{ position:absolute; width:260px; padding:18px 20px 14px; border-radius:22px; cursor:grab; color:#fff; background:linear-gradient(160deg, rgba(255,255,255,.14), rgba(255,255,255,.04)); border:1px solid rgba(255,255,255,.22); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:0 20px 50px rgba(20,0,60,.35), 0 0 40px rgba(200,170,255,.12); animation:izqIn .9s cubic-bezier(.2,.8,.2,1) both, izqFloat 9s ease-in-out infinite 1s; }
+.izq p{ margin:0; font-family:Georgia, 'Times New Roman', serif; font-style:italic; font-size:17px; line-height:1.45; }
+.izq small{ display:block; margin-top:10px; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.55); }
+@keyframes izqIn{ from{ opacity:0; filter:blur(10px); transform:scale(.94); } to{ opacity:1; filter:none; transform:none; } }
+@keyframes izqFloat{ 50%{ transform:translateY(-8px); } }
+/* a tap: a ring of light and a few sparks */
+.insp-bloom{ position:fixed; z-index:9020; width:0; height:0; pointer-events:none; }
+.insp-bloom .ib-ring{ position:absolute; left:-60px; top:-60px; width:120px; height:120px; border-radius:50%; border:1.5px solid rgba(255,255,255,.7); box-shadow:0 0 30px rgba(220,200,255,.6), inset 0 0 20px rgba(220,200,255,.4); animation:ibRing 1.3s cubic-bezier(.2,.8,.2,1) forwards; }
+.insp-bloom .ib-dot{ position:absolute; left:-3px; top:-3px; width:6px; height:6px; border-radius:50%; background:#fff; box-shadow:0 0 10px #fff, 0 0 18px #c8b4ff; animation:ibDot 1.2s ease-out forwards; animation-delay:var(--d); }
+@keyframes ibRing{ from{ transform:scale(.1); opacity:1; } to{ transform:scale(1.6); opacity:0; } }
+@keyframes ibDot{ from{ transform:translate(0, 0) scale(1); opacity:1; } to{ transform:translate(var(--x), var(--y)) scale(.2); opacity:0; } }
+/* breathe */
+.insp-breath{ position:fixed; inset:0; z-index:9030; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:26px; color:#fff; background:radial-gradient(circle at 50% 45%, rgba(40,20,90,.55), rgba(5,4,16,.9)); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); opacity:0; transition:opacity .6s ease; }
+.insp-breath.is-in{ opacity:1; }
+.ibr-orb{ position:relative; width:220px; height:220px; --dur:4s; }
+.ibr-orb i{ position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 40% 35%, rgba(255,255,255,.9), rgba(200,170,255,.55) 35%, rgba(120,220,255,.25) 65%, transparent 72%); filter:blur(2px); transform:scale(.55); transition:transform var(--dur) cubic-bezier(.45,0,.55,1), opacity var(--dur) ease; }
+.ibr-orb i:nth-child(2){ inset:-40px; opacity:.35; filter:blur(24px); }
+.ibr-orb i:nth-child(3){ inset:-90px; opacity:.18; filter:blur(50px); }
+.ibr-orb.is-in i, .ibr-orb.is-hold i{ transform:scale(1); }
+.ibr-orb.is-out i{ transform:scale(.55); }
+.ibr-t{ font-family:var(--font-display); font-size:30px; font-weight:400; letter-spacing:.02em; }
+.ibr-n{ font-size:13px; letter-spacing:.2em; color:rgba(255,255,255,.55); }
+.ibr-done{ margin-top:10px; padding:10px 22px; border-radius:999px; border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.08); color:#fff; font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; }
+.ibr-done:hover{ background:rgba(255,255,255,.16); }
+/* drift: everything but the sky fades away */
+.insp.is-drift .insp-top > :not(.insp-x), .insp.is-drift .insp-scores, .insp.is-drift .insp-lately, .insp.is-drift .insp-hint{ opacity:0; pointer-events:none; transition:opacity 1.2s ease; }
+.insp.is-drift .insp-tools{ opacity:.2; } .insp.is-drift .insp-tools:hover{ opacity:1; }
+.insp.is-drift .izb{ opacity:.5; transition:opacity 1.2s ease; }
+.insp-top > *, .insp-scores, .insp-lately{ transition:opacity .8s ease; }
+@media (prefers-reduced-motion: reduce){ .insp-aurora i, .insp-bokeh i, .izq, .izw-star::before, .izw-star i{ animation:none !important; } }
+.insp:not(.is-in) .insp-aurora i, .insp:not(.is-in) .insp-bokeh i{ animation-play-state:paused; }
+.insp-tools{ bottom:16px; padding:5px; gap:2px; border-radius:18px; }
+.izk{ min-width:56px; padding:5px 8px 5px; font-size:10.5px; border-radius:13px; }
+.izk span{ font-size:15px; }
+.insp-hint{ bottom:84px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -23918,6 +24000,7 @@ function fmBell(ctx, out, t, freq, vol){
   g.connect(out);
 }
 function fmBar(ctx, out, t, tr, bar){
+  const dream = fmDream(tr.style); if(dream) return dream(ctx, out, t, tr, bar);
   const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length];
   if(tr.style==='lofi'){
     padChord(ctx, out, t, ch, len*0.35, len*0.45, len*0.6, tr.soft ? 0.018 : 0.022);
@@ -28449,19 +28532,21 @@ function openInspire(){
   let L = document.getElementById('insp');
   if(!L){ L = document.createElement('div'); L.id = 'insp'; L.className = 'insp'; document.body.appendChild(L); inspBind(L); }
   ui.inspOpen = true; ui.inspSheet = false; ui.inspOpenAct = null;
+  L.setAttribute('data-sky', inspSandStore().sky || 'dusk');
   if(!ui.inspView) ui.inspView = inspHome();
   try{ xpLast = null; }catch(e){}
   inspRender();
   void L.offsetWidth; L.classList.add('is-in');
   document.body.classList.add('insp-on');
   // music while you're here (yours stays on if it was already playing)
-  if(typeof focusMusicPlay==='function' && !(typeof musicOn==='function' && musicOn()) && !(typeof opMusicPlaying==='function' && opMusicPlaying())){ try{ focusMusicPlay(); ui.inspMusic = true; }catch(e){} }
+  if(typeof focusMusicPlay==='function' && !(typeof musicOn==='function' && musicOn()) && !(typeof opMusicPlaying==='function' && opMusicPlaying())){ try{ inspPlayDream(); ui.inspMusic = true; }catch(e){} }
   if(typeof trueFullSet==='function' && typeof trueFullOn==='function' && trueFullOn()) try{ trueFullSet(true); }catch(e){}
   ui.inspHintAt = Date.now();
   setTimeout(function(){ const h = document.querySelector('#insp .insp-hint'); if(h) h.classList.add('is-gone'); }, 6500);
 }
 function closeInspire(){
   const L = document.getElementById('insp'); if(!L) return;
+  if(ui.inspBreath) ACTIONS.inspBreatheEnd(); if(ui.inspDrift) inspDriftStop();
   L.classList.remove('is-in'); ui.inspOpen = false; document.body.classList.remove('insp-on');
   if(ui.inspMusic && typeof focusMusicStop==='function'){ focusMusicStop(); ui.inspMusic = false; }
   if(typeof trueFullSet==='function' && typeof wantTrueFull==='function' && !wantTrueFull()) try{ trueFullSet(false); }catch(e){}
@@ -28481,6 +28566,8 @@ document.addEventListener('keydown', function(e){
   if(!inspOpenNow() || e.key!=='Escape') return;
   if(e.target && /TEXTAREA|INPUT/.test(e.target.tagName)){ e.target.blur(); return; }
   e.stopPropagation();
+  if(ui.inspBreath){ ACTIONS.inspBreatheEnd(); return; }
+  if(ui.inspDrift){ inspDriftStop(); return; }
   if(ui.inspBoard){ ui.inspBoard = null; inspRender(); } else if(ui.inspSheet || ui.inspOpenAct){ ui.inspSheet = false; ui.inspOpenAct = null; inspRender(); } else closeInspire();
 }, true);
 // the boards that belong here: your vision board first, then the rest that aren't business
@@ -28509,7 +28596,7 @@ function inspLayout(){
   return out;
 }
 // the first look: everything around you, and your vision board, on the screen at once
-function inspHome(){ const h = window.innerHeight || 900, z = Math.max(0.55, Math.min(1, h/1150)); return {x:0, y:Math.round(125*z), z:z}; }
+function inspHome(){ const h = window.innerHeight || 900, z = Math.max(0.55, Math.min(1, h/1240)); return {x:0, y:Math.round(125*z), z:z}; }
 function inspHtml(){
   const s = inspStore(), lay = inspLayout(), rate = inspRate(), t = todayStr();
   const todayLog = s.log.filter(function(x){ return x.date===t; });
@@ -28522,7 +28609,7 @@ function inspHtml(){
   const board = ui.inspBoard ? arr(state.boards.boards).find(function(b){ return b.id===ui.inspBoard; }) : null;
   const recent = s.log.slice(-7).reverse();
   return '<div class="insp-sky" style="--px:'+(v.x*0.12).toFixed(1)+'px;--py:'+(v.y*0.12).toFixed(1)+'px"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i></div>'+
-    '<div class="insp-stars" style="--px:'+(v.x*0.3).toFixed(1)+'px;--py:'+(v.y*0.3).toFixed(1)+'px"></div>'+
+    '<div class="insp-stars" style="--px:'+(v.x*0.3).toFixed(1)+'px;--py:'+(v.y*0.3).toFixed(1)+'px"></div>'+inspFxHtml()+
     '<div class="insp-plane" id="inspPlane"><div class="insp-world" id="inspWorld" style="transform:translate('+v.x+'px,'+v.y+'px) scale('+v.z+')">'+
       // the middle: you
       '<div class="izh" style="left:0;top:0"><div class="izh-glow"></div>'+ring(rate, 200)+
@@ -28538,6 +28625,8 @@ function inspHtml(){
           '<div class="izb-card-r"><button class="izb-do" data-action="inspLog" data-id="'+open.id+'">I did this</button><button class="izb-x" data-action="inspOpenAct" data-id="'+open.id+'">Later</button></div></div>'; })() : '')+
       // boards
       lay.boards.map(function(p, i){ return '<div class="izd'+(i===0 ? ' is-vision' : '')+'" data-action="inspBoard" data-id="'+p.b.id+'" style="left:'+p.x+'px;top:'+p.y+'px;width:'+p.w+'px;height:'+p.h+'px">'+boardStaticHtml(p.b, 'insp-board')+'<span class="izd-n">'+(i===0 ? '&#9733; ' : '')+escapeHtml(p.b.name)+'</span></div>'; }).join('')+
+      // wishes and words
+      inspSandHtml()+
       // thoughts
       s.thoughts.map(function(t){ return '<div class="izt" data-thought="'+t.id+'" style="left:'+t.x+'px;top:'+t.y+'px;--t:'+t.tint+'"><div class="izt-h" data-drag="'+t.id+'"><span>Thought</span><button data-action="inspThoughtDel" data-id="'+t.id+'" title="Let it go">&#10005;</button></div><textarea placeholder="Write anything…" maxlength="2000">'+escapeHtml(t.text)+'</textarea></div>'; }).join('')+
     '</div></div>'+
@@ -28548,7 +28637,8 @@ function inspHtml(){
       '<button class="insp-b'+(typeof musicOn==='function' && musicOn() ? ' is-on' : '')+'" data-action="inspMusic" title="'+(typeof musicOn==='function' && musicOn() ? 'Pause the music' : 'Play music')+'">'+(typeof musicOn==='function' && musicOn() ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9835;')+'</button></div>'+
     '<div class="insp-scores"><div><b>'+(rate==null ? '&ndash;' : rate)+'</b><span>Inspiration</span></div>'+(mind!=null ? '<div><b>'+mind+'</b><span>Mind</span></div>' : '')+'<div><b>'+inspStreak()+'</b><span>day streak</span></div></div>'+
     '<div class="insp-lately"><div class="izl-h">This week</div><div class="izl-week">'+(typeof lifeWeek==='function' ? lifeWeek() : []).map(function(k){ return '<div class="izl-w'+(k.n ? '' : ' is-zero')+'" title="'+k.label+(k.min ? ', '+fmtDurationLabel(k.min) : '')+'"><span>'+k.e+'</span><b>'+k.n+'</b><small>'+k.label+'</small></div>'; }).join('')+'</div><div class="izl-h">Lately</div>'+(recent.length ? recent.map(function(x){ return '<div class="izl-r"><span>'+inspAct(x.act).e+'</span><b>'+escapeHtml(x.label)+'</b><small>'+(x.date===t ? fmtTimeShort(x.at) : weekdayShort(x.date))+'</small></div>'; }).join('') : '<div class="izl-none">What you log shows up here.</div>')+'</div>'+
-    '<div class="insp-hint'+(Date.now() - (ui.inspHintAt||0) > 6500 ? ' is-gone' : '')+'">Drag to wander · scroll to zoom · double-click anywhere to write a thought</div>'+
+    inspToolsHtml()+
+    '<div class="insp-hint'+(Date.now() - (ui.inspHintAt||0) > 6500 ? ' is-gone' : '')+'">Drag to wander · scroll to zoom · tap the sky · double-click to write a thought</div>'+
     (ui.inspSheet ? '<div class="insp-sheet-bg" data-action="inspLogSheet"></div><div class="insp-sheet"><div class="izs-h">What did you do?</div>'+
       '<div class="izs-grid">'+inspActs().map(function(a){ return '<button class="izs-a c-'+a.cat+'" data-action="inspLogFromSheet" data-id="'+a.id+'"><span>'+a.e+'</span>'+escapeHtml(a.label)+'</button>'; }).join('')+'</div>'+
       '<div class="izs-more"><input class="input" id="inspMin" type="number" min="0" placeholder="Minutes (optional)"><input class="input" id="inspNote" placeholder="A note (optional): the book, the place, how it felt"></div></div>' : '')+
@@ -28579,10 +28669,11 @@ function inspBind(L){
   L.addEventListener('pointerdown', function(e){
     if(e.button!==0) return;
     const th = e.target.closest('[data-drag]');
-    if(th){ const t = inspStore().thoughts.find(function(x){ return x.id===th.dataset.drag; }); if(!t) return; drag = {thought:t, el:th.closest('.izt'), sx:e.clientX, sy:e.clientY, ox:t.x, oy:t.y}; e.preventDefault(); return; }
-    if(!e.target.closest('#inspPlane') || e.target.closest('button, textarea, input, .izt, .izd, .izb-card')) return;
+    if(th && !e.target.closest('button')){ const t = inspFindItem(th.dataset.drag); if(!t) return; drag = {thought:t, el:th.closest('.izt, .izw, .izq'), sx:e.clientX, sy:e.clientY, ox:t.x, oy:t.y}; e.preventDefault(); return; }
+    if(!e.target.closest('#inspPlane') || e.target.closest('button, textarea, input, .izt, .izd, .izb-card, .izw, .izq')) return;
     cancelAnimationFrame(glide);
-    drag = {sx:e.clientX, sy:e.clientY, ox:ui.inspView.x, oy:ui.inspView.y, lx:e.clientX, ly:e.clientY, lt:performance.now(), vx:0, vy:0};
+    if(ui.inspDrift) inspDriftStop();
+    drag = {sx:e.clientX, sy:e.clientY, ox:ui.inspView.x, oy:ui.inspView.y, lx:e.clientX, ly:e.clientY, lt:performance.now(), t0:performance.now(), vx:0, vy:0};
     L.classList.add('is-panning');
   });
   window.addEventListener('pointermove', function(e){
@@ -28596,6 +28687,8 @@ function inspBind(L){
     if(!drag) return;
     if(drag.thought){ persist('personal'); drag = null; return; }
     L.classList.remove('is-panning');
+    // a tap (not a drag) on the open sky: a bloom of light and a chime
+    if(Math.abs(drag.lx - drag.sx) < 5 && Math.abs(drag.ly - drag.sy) < 5 && performance.now() - drag.t0 < 400){ inspBloom(drag.sx, drag.sy); drag = null; return; }
     // a little glide, like water
     let vx = drag.vx*16, vy = drag.vy*16; drag = null;
     const step = function(){ vx *= 0.92; vy *= 0.92; if(Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) return; ui.inspView.x += vx; ui.inspView.y += vy; inspApply(false); glide = requestAnimationFrame(step); };
@@ -28609,7 +28702,7 @@ function inspBind(L){
     v.x = cx - (cx - v.x)*(z/z0); v.y = cy - (cy - v.y)*(z/z0); v.z = z; inspApply(false);
   }, {passive:false});
   L.addEventListener('dblclick', function(e){
-    if(!e.target.closest('#inspPlane') || e.target.closest('button, textarea, .izt, .izd, .izb, .izh, .izb-card')) return;
+    if(!e.target.closest('#inspPlane') || e.target.closest('button, textarea, input, .izt, .izd, .izb, .izh, .izb-card, .izw, .izq')) return;
     const r = L.getBoundingClientRect(), v = ui.inspView;
     inspAddThought((e.clientX - r.width/2 - v.x)/v.z - 110, (e.clientY - r.height/2 - v.y)/v.z - 30);
   });
@@ -28761,6 +28854,178 @@ function focusAddMenu(){
   const order = sub==='skills' ? ['skill', 'task', 'video'] : sub==='videoIdeas' ? ['video', 'task', 'skill'] : ['task', 'skill', 'video'];
   return order.map(function(k){ return items[k]; });
 }
+// ============ INSPIRATION, DREAMIER: MORE MUSIC AND A SANDBOX ============
+// Five more tracks, made to float (they join the focus playlist; Inspiration opens on one of them), and
+// things to play with on the plane: wishes (little stars you name), words worth keeping (a card of old
+// wisdom, never a feed), a breathing orb, skies to drift under, Drift (everything else fades and the
+// plane slowly wanders on its own) and a soft bloom of light and a chime wherever you tap.
+
+// ---- the music ----
+FOCUS_TRACKS.push(
+  {name:'Cloud Nine', style:'swell', dream:true, bpm:46, prog:[[50,57,62,64,69],[47,54,59,62,66],[43,50,55,59,64],[45,52,57,61,64]], scale:[74,76,78,81,83,86], hiss:0.002},
+  {name:'Lullaby', style:'musicbox', dream:true, bpm:70, prog:[[48,55,60,64],[45,52,57,60],[41,48,53,57],[43,50,55,59]], fig:[0,2,1,3,2,1,3,2], hiss:0},
+  {name:'Glasshouse', style:'glass', dream:true, bpm:62, prog:[[45,52,57,64],[41,48,57,60],[43,50,55,62],[40,47,55,59]], scale:[69,71,72,74,76,79,81,84], hiss:0.001},
+  {name:'Tide', style:'ocean', dream:true, bpm:40, prog:[[38,45,50,54],[43,50,55,59],[40,47,52,55],[36,43,48,52]], scale:[62,66,69,71,74], hiss:0},
+  {name:'Aurora', style:'swell', dream:true, bpm:44, prog:[[51,58,63,67,70],[48,55,60,63,67],[44,51,56,60,63],[46,53,58,62,65]], scale:[75,77,79,82,84,87], hiss:0.002}
+);
+function fmNoiseBuf(ctx){
+  if(FM.noiseBuf && FM.noiseBuf.sampleRate===ctx.sampleRate) return FM.noiseBuf;
+  const len = Math.floor(ctx.sampleRate*4), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+  let last = 0; for(let i=0;i<len;i++){ last = (last + (Math.random()*2-1)*0.08)*0.985; d[i] = last*3; }  // brown-ish: soft, like water
+  FM.noiseBuf = buf; return buf;
+}
+// a wave: soft noise that swells in and draws back over the bar
+function fmWave(ctx, out, t, len, vol){
+  const src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+  src.buffer = fmNoiseBuf(ctx); src.loop = true; f.type = 'lowpass'; f.frequency.setValueAtTime(380, t); f.frequency.linearRampToValueAtTime(1300, t + len*0.45); f.frequency.linearRampToValueAtTime(320, t + len);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + len*0.45); g.gain.exponentialRampToValueAtTime(0.0001, t + len*1.05);
+  src.connect(f); f.connect(g); g.connect(out); src.start(t, Math.random()*3); src.stop(t + len*1.1);
+}
+function fmDream(style){
+  if(style==='swell') return function(ctx, out, t, tr, bar){
+    const len = 60/tr.bpm*4, ch = tr.prog[bar % tr.prog.length];
+    padChord(ctx, out, t, ch.map(fmHz), len*0.55, len*0.25, len*1.1, 0.02);
+    padChord(ctx, out, t + len*0.2, ch.slice(2).map(function(m){ return fmHz(m + 12); }), len*0.6, len*0.1, len, 0.006);
+    if(bar && fmRand() < 0.6) fmBell(ctx, out, t + len*(0.3 + fmRand()*0.5), fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), 0.012);
+  };
+  if(style==='musicbox') return function(ctx, out, t, tr, bar){
+    const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length], step = len/tr.fig.length;
+    padChord(ctx, out, t, ch.slice(0, 3).map(fmHz), len*0.4, len*0.3, len*0.6, 0.011);
+    tr.fig.forEach(function(n, i){ if(bar===0 && i > 3) return; if((bar + i) % 7===6) return; fmBell(ctx, out, t + i*step + (i%2 ? step*0.06 : 0), fmHz(ch[n % ch.length] + 24), 0.016 - (i%2 ? 0.004 : 0)); });
+  };
+  if(style==='glass') return function(ctx, out, t, tr, bar){
+    const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length];
+    padChord(ctx, out, t, ch.map(fmHz), len*0.5, len*0.2, len*0.8, 0.013);
+    const k = bar===0 ? 2 : 3 + Math.floor(fmRand()*3);
+    for(let i=0;i<k;i++) fmKey(ctx, out, t + beat*(i*(4/k)) + fmRand()*0.12, fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), beat*2.5, 0.035);
+  };
+  if(style==='ocean') return function(ctx, out, t, tr, bar){
+    const len = 60/tr.bpm*4, ch = tr.prog[bar % tr.prog.length];
+    fmWave(ctx, out, t, len, 0.05);
+    padChord(ctx, out, t, ch.map(fmHz), len*0.5, len*0.2, len, 0.014);
+    if(bar % 2===1) fmKey(ctx, out, t + len*0.35, fmHz(ch[0] + 12), len*1.2, 0.05);
+    if(bar > 1 && fmRand() < 0.45) fmBell(ctx, out, t + len*(0.5 + fmRand()*0.3), fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), 0.01);
+  };
+  return null;
+}
+// Inspiration starts on one of the floaty ones
+function inspPlayDream(){
+  const ids = FOCUS_TRACKS.map(function(tr, i){ return tr.dream ? i : -1; }).filter(function(i){ return i >= 0; });
+  if(typeof focusMusicPlay==='function') focusMusicPlay(ids[Math.floor(Math.random()*ids.length)]);
+}
+
+// ---- the sandbox ----
+const INSP_WORDS = [
+  ['What you seek is seeking you.', 'Rumi'], ['Be like a tree and let the dead leaves drop.', 'Rumi'], ['Sell your cleverness and buy bewilderment.', 'Rumi'],
+  ['The happiness of your life depends upon the quality of your thoughts.', 'Marcus Aurelius'], ['Very little is needed to make a happy life.', 'Marcus Aurelius'], ['The soul becomes dyed with the colour of its thoughts.', 'Marcus Aurelius'],
+  ['Nature does not hurry, yet everything is accomplished.', 'Lao Tzu'], ['The journey of a thousand miles begins with one step.', 'Lao Tzu'],
+  ['Go confidently in the direction of your dreams. Live the life you have imagined.', 'Thoreau'], ['I took a walk in the woods and came out taller than the trees.', 'Thoreau'],
+  ['Adopt the pace of nature: her secret is patience.', 'Emerson'], ['Do not go where the path may lead; go instead where there is no path and leave a trail.', 'Emerson'],
+  ['Let everything happen to you: beauty and terror. Just keep going. No feeling is final.', 'Rilke'],
+  ['Keep your face always toward the sunshine, and shadows will fall behind you.', 'Whitman'],
+  ['We suffer more often in imagination than in reality.', 'Seneca'], ['Luck is what happens when preparation meets opportunity.', 'Seneca']
+];
+const INSP_SKIES = [['dusk', 'Dusk'], ['aurora', 'Aurora'], ['deep', 'Deep sea'], ['candy', 'Cotton candy'], ['gold', 'Golden hour']];
+const INSP_STAR_HUES = [48, 320, 200, 270, 160];
+function inspSandStore(){ const s = inspStore(); if(!Array.isArray(s.wishes)) s.wishes = []; if(!Array.isArray(s.quotes)) s.quotes = []; return s; }
+function inspCenterPt(spread){ const v = ui.inspView || inspHome(); return {x:Math.round(-v.x/v.z + (Math.random()-0.5)*(spread||260)), y:Math.round(-v.y/v.z + (Math.random()-0.5)*(spread||260)*0.6)}; }
+// anything you can move on the plane: a thought, a wish or some words
+function inspFindItem(id){ const s = inspSandStore(); return s.thoughts.find(function(x){ return x.id===id; }) || s.wishes.find(function(x){ return x.id===id; }) || s.quotes.find(function(x){ return x.id===id; }); }
+function inspSandHtml(){
+  const s = inspSandStore();
+  return s.wishes.map(function(w){ return '<div class="izw" data-wish="'+w.id+'" style="left:'+w.x+'px;top:'+w.y+'px;--h:'+w.hue+'"><span class="izw-star" data-drag="'+w.id+'" title="Drag me"><i></i></span><input class="izw-t" value="'+escapeHtml(w.text)+'" placeholder="Make a wish…" maxlength="120"><button class="izw-x" data-action="inspWishDel" data-id="'+w.id+'" title="Let it go">&#10005;</button></div>'; }).join('')+
+    s.quotes.map(function(q){ return '<div class="izq" data-drag="'+q.id+'" style="left:'+q.x+'px;top:'+q.y+'px"><p>'+escapeHtml(q.q)+'</p><small>'+escapeHtml(q.by)+'</small><button class="izq-x" data-action="inspQuoteDel" data-id="'+q.id+'" title="Let it go">&#10005;</button></div>'; }).join('');
+}
+function inspToolsHtml(){
+  const sky = (INSP_SKIES.find(function(x){ return x[0]===(inspSandStore().sky || 'dusk'); }) || INSP_SKIES[0])[1];
+  const b = function(act, ic, label, on){ return '<button class="izk'+(on ? ' is-on' : '')+'" data-action="'+act+'"><span>'+ic+'</span>'+label+'</button>'; };
+  return '<div class="insp-tools">'+b('inspToolThought', '&#9998;', 'Thought')+b('inspToolWish', '&#10022;', 'Wish')+b('inspToolWords', '&#10077;', 'Words')+b('inspBreathe', '&#10061;', 'Breathe')+b('inspSky', '&#9790;', sky)+b('inspDrift', '&#8776;', 'Drift', !!ui.inspDrift)+'</div>';
+}
+function inspFxHtml(){
+  return '<div class="insp-aurora"><i></i><i></i></div><div class="insp-bokeh">'+[0,1,2,3,4,5,6,7,8,9].map(function(i){ return '<i style="--i:'+i+'"></i>'; }).join('')+'</div><div class="insp-glow"></div>';
+}
+ACTIONS.inspToolThought = function(){ const p = inspCenterPt(); inspAddThought(p.x - 110, p.y - 30); };
+ACTIONS.inspToolWish = function(){
+  const s = inspSandStore(), p = inspCenterPt(), w = {id:uid(), x:p.x, y:p.y, text:'', hue:INSP_STAR_HUES[s.wishes.length % INSP_STAR_HUES.length], at:Date.now()};
+  s.wishes.push(w); persist('personal'); inspRender(); inspChime(2);
+  setTimeout(function(){ const i = document.querySelector('#insp [data-wish="'+w.id+'"] input'); if(i) i.focus(); }, 40);
+};
+ACTIONS.inspToolWords = function(){
+  const s = inspSandStore(), have = s.quotes.map(function(q){ return q.q; }), pool = INSP_WORDS.filter(function(w){ return have.indexOf(w[0]) < 0; });
+  const w = (pool.length ? pool : INSP_WORDS)[Math.floor(Math.random()*(pool.length || INSP_WORDS.length))], p = inspCenterPt(320);
+  s.quotes.push({id:uid(), x:p.x - 130, y:p.y - 40, q:w[0], by:w[1], at:Date.now()}); persist('personal'); inspRender(); inspChime(1);
+};
+ACTIONS.inspWishDel = function(el, e, id){ const s = inspSandStore(); s.wishes = s.wishes.filter(function(x){ return x.id!==id; }); persist('personal'); inspRender(); };
+ACTIONS.inspQuoteDel = function(el, e, id){ const s = inspSandStore(); s.quotes = s.quotes.filter(function(x){ return x.id!==id; }); persist('personal'); inspRender(); };
+document.addEventListener('input', function(e){
+  const i = e.target; if(!i || !i.closest || !i.closest('#insp .izw')) return;
+  const w = inspSandStore().wishes.find(function(x){ return x.id===i.closest('.izw').dataset.wish; }); if(w){ w.text = i.value.slice(0, 120); persist('personal'); }
+});
+ACTIONS.inspSky = function(){
+  const s = inspSandStore(), i = INSP_SKIES.findIndex(function(x){ return x[0]===(s.sky || 'dusk'); });
+  s.sky = INSP_SKIES[(i + 1) % INSP_SKIES.length][0]; persist('personal');
+  const L = document.getElementById('insp'); if(L) L.setAttribute('data-sky', s.sky);
+  inspRender();
+};
+// ---- a chime and a bloom of light wherever you tap the sky ----
+function inspChime(k){
+  try{ if(typeof soundPref==='function' && !soundPref('ui', true)) return; const ctx = getAudioCtx(); if(!ctx) return; const out = sfxOut(ctx), notes = [72, 74, 76, 79, 81, 84, 86];
+    for(let i=0;i<(k||1);i++) fmBell(ctx, out, ctx.currentTime + i*0.11, fmHz(notes[Math.floor(Math.random()*notes.length)]), 0.022); }catch(e){}
+}
+function inspBloom(cx, cy){
+  const L = document.getElementById('insp'); if(!L) return;
+  const b = document.createElement('div'); b.className = 'insp-bloom'; b.style.left = cx+'px'; b.style.top = cy+'px';
+  b.innerHTML = '<i class="ib-ring"></i>'+[0,1,2,3,4,5,6,7].map(function(i){ const a = i/8*Math.PI*2 + Math.random()*0.5, d = 40 + Math.random()*50; return '<i class="ib-dot" style="--x:'+Math.round(Math.cos(a)*d)+'px;--y:'+Math.round(Math.sin(a)*d)+'px;--d:'+(Math.random()*0.15).toFixed(2)+'s"></i>'; }).join('');
+  document.body.appendChild(b); setTimeout(function(){ if(b.parentNode) b.parentNode.removeChild(b); }, 1500);
+  inspChime(1);
+}
+// ---- breathe: in for four, hold for four, out for six; a minute or more counts as meditating ----
+const BREATH = [['Breathe in', 4], ['Hold', 4], ['Breathe out', 6]];
+ACTIONS.inspBreathe = function(){
+  const L = document.getElementById('insp'); if(!L || document.getElementById('inspBreath')) return;
+  const o = document.createElement('div'); o.id = 'inspBreath'; o.className = 'insp-breath';
+  o.innerHTML = '<div class="ibr-orb"><i></i><i></i><i></i></div><div class="ibr-t">Breathe in</div><div class="ibr-n"></div><button class="ibr-done" data-action="inspBreatheEnd">I’m done</button>';
+  document.body.appendChild(o); void o.offsetWidth; o.classList.add('is-in');
+  ui.inspBreath = {start:Date.now()};
+  let k = 0;
+  const step = function(){
+    if(!ui.inspBreath) return;
+    const ph = BREATH[k % 3], t = o.querySelector('.ibr-t'), orb = o.querySelector('.ibr-orb');
+    t.textContent = ph[0]; orb.className = 'ibr-orb is-'+(k % 3===0 ? 'in' : k % 3===1 ? 'hold' : 'out'); orb.style.setProperty('--dur', ph[1]+'s');
+    const s = Math.floor((Date.now() - ui.inspBreath.start)/1000); o.querySelector('.ibr-n').textContent = Math.floor(s/60)+':'+String(s % 60).padStart(2, '0');
+    k++; ui.inspBreath.t = setTimeout(step, ph[1]*1000);
+  };
+  step();
+  ui.inspBreath.clock = setInterval(function(){ const n = o.querySelector('.ibr-n'); if(n && ui.inspBreath){ const s = Math.floor((Date.now() - ui.inspBreath.start)/1000); n.textContent = Math.floor(s/60)+':'+String(s % 60).padStart(2, '0'); } }, 1000);
+};
+ACTIONS.inspBreatheEnd = function(){
+  const o = document.getElementById('inspBreath'), b = ui.inspBreath; if(!b) return;
+  clearTimeout(b.t); clearInterval(b.clock); ui.inspBreath = null;
+  const min = Math.round((Date.now() - b.start)/60000);
+  if(o){ o.classList.remove('is-in'); setTimeout(function(){ if(o.parentNode) o.parentNode.removeChild(o); }, 600); }
+  if(min >= 1){ inspLogAct('meditate', {min:min, note:'Breathing, on Inspiration'}); inspRender(); showToast('&#129496; '+min+' minute'+(min===1 ? '' : 's')+' of breathing. Logged.', {icon:'&#10024;'}); }
+};
+// ---- drift: the rest fades, the sky slowly wanders, nothing asks anything of you ----
+ACTIONS.inspDrift = function(){ ui.inspDrift ? inspDriftStop() : inspDriftStart(); };
+function inspDriftStart(){
+  const L = document.getElementById('insp'); if(!L) return;
+  ui.inspDrift = {base:{x:ui.inspView.x, y:ui.inspView.y}, t0:performance.now()}; L.classList.add('is-drift');
+  const tick = function(now){
+    if(!ui.inspDrift || !inspOpenNow()) return;
+    const s = (now - ui.inspDrift.t0)/1000;
+    ui.inspView.x = ui.inspDrift.base.x + Math.sin(s/9)*140 - Math.sin(s/23)*90;
+    ui.inspView.y = ui.inspDrift.base.y + Math.cos(s/11)*70;
+    inspApply(false); ui.inspDrift.raf = requestAnimationFrame(tick);
+  };
+  ui.inspDrift.raf = requestAnimationFrame(tick);
+  inspRender();
+}
+function inspDriftStop(){ const L = document.getElementById('insp'); if(ui.inspDrift) cancelAnimationFrame(ui.inspDrift.raf); ui.inspDrift = null; if(L) L.classList.remove('is-drift'); inspRender(); }
+// the soft light that follows you around the sky
+document.addEventListener('pointermove', function(e){
+  const L = inspOpenNow() && document.getElementById('insp'); if(!L) return;
+  L.style.setProperty('--mx', e.clientX+'px'); L.style.setProperty('--my', e.clientY+'px');
+}, {passive:true});
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

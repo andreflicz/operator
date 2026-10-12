@@ -107,19 +107,21 @@ function openInspire(){
   let L = document.getElementById('insp');
   if(!L){ L = document.createElement('div'); L.id = 'insp'; L.className = 'insp'; document.body.appendChild(L); inspBind(L); }
   ui.inspOpen = true; ui.inspSheet = false; ui.inspOpenAct = null;
+  L.setAttribute('data-sky', inspSandStore().sky || 'dusk');
   if(!ui.inspView) ui.inspView = inspHome();
   try{ xpLast = null; }catch(e){}
   inspRender();
   void L.offsetWidth; L.classList.add('is-in');
   document.body.classList.add('insp-on');
   // music while you're here (yours stays on if it was already playing)
-  if(typeof focusMusicPlay==='function' && !(typeof musicOn==='function' && musicOn()) && !(typeof opMusicPlaying==='function' && opMusicPlaying())){ try{ focusMusicPlay(); ui.inspMusic = true; }catch(e){} }
+  if(typeof focusMusicPlay==='function' && !(typeof musicOn==='function' && musicOn()) && !(typeof opMusicPlaying==='function' && opMusicPlaying())){ try{ inspPlayDream(); ui.inspMusic = true; }catch(e){} }
   if(typeof trueFullSet==='function' && typeof trueFullOn==='function' && trueFullOn()) try{ trueFullSet(true); }catch(e){}
   ui.inspHintAt = Date.now();
   setTimeout(function(){ const h = document.querySelector('#insp .insp-hint'); if(h) h.classList.add('is-gone'); }, 6500);
 }
 function closeInspire(){
   const L = document.getElementById('insp'); if(!L) return;
+  if(ui.inspBreath) ACTIONS.inspBreatheEnd(); if(ui.inspDrift) inspDriftStop();
   L.classList.remove('is-in'); ui.inspOpen = false; document.body.classList.remove('insp-on');
   if(ui.inspMusic && typeof focusMusicStop==='function'){ focusMusicStop(); ui.inspMusic = false; }
   if(typeof trueFullSet==='function' && typeof wantTrueFull==='function' && !wantTrueFull()) try{ trueFullSet(false); }catch(e){}
@@ -139,6 +141,8 @@ document.addEventListener('keydown', function(e){
   if(!inspOpenNow() || e.key!=='Escape') return;
   if(e.target && /TEXTAREA|INPUT/.test(e.target.tagName)){ e.target.blur(); return; }
   e.stopPropagation();
+  if(ui.inspBreath){ ACTIONS.inspBreatheEnd(); return; }
+  if(ui.inspDrift){ inspDriftStop(); return; }
   if(ui.inspBoard){ ui.inspBoard = null; inspRender(); } else if(ui.inspSheet || ui.inspOpenAct){ ui.inspSheet = false; ui.inspOpenAct = null; inspRender(); } else closeInspire();
 }, true);
 // the boards that belong here: your vision board first, then the rest that aren't business
@@ -167,7 +171,7 @@ function inspLayout(){
   return out;
 }
 // the first look: everything around you, and your vision board, on the screen at once
-function inspHome(){ const h = window.innerHeight || 900, z = Math.max(0.55, Math.min(1, h/1150)); return {x:0, y:Math.round(125*z), z:z}; }
+function inspHome(){ const h = window.innerHeight || 900, z = Math.max(0.55, Math.min(1, h/1240)); return {x:0, y:Math.round(125*z), z:z}; }
 function inspHtml(){
   const s = inspStore(), lay = inspLayout(), rate = inspRate(), t = todayStr();
   const todayLog = s.log.filter(function(x){ return x.date===t; });
@@ -180,7 +184,7 @@ function inspHtml(){
   const board = ui.inspBoard ? arr(state.boards.boards).find(function(b){ return b.id===ui.inspBoard; }) : null;
   const recent = s.log.slice(-7).reverse();
   return '<div class="insp-sky" style="--px:'+(v.x*0.12).toFixed(1)+'px;--py:'+(v.y*0.12).toFixed(1)+'px"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i></div>'+
-    '<div class="insp-stars" style="--px:'+(v.x*0.3).toFixed(1)+'px;--py:'+(v.y*0.3).toFixed(1)+'px"></div>'+
+    '<div class="insp-stars" style="--px:'+(v.x*0.3).toFixed(1)+'px;--py:'+(v.y*0.3).toFixed(1)+'px"></div>'+inspFxHtml()+
     '<div class="insp-plane" id="inspPlane"><div class="insp-world" id="inspWorld" style="transform:translate('+v.x+'px,'+v.y+'px) scale('+v.z+')">'+
       // the middle: you
       '<div class="izh" style="left:0;top:0"><div class="izh-glow"></div>'+ring(rate, 200)+
@@ -196,6 +200,8 @@ function inspHtml(){
           '<div class="izb-card-r"><button class="izb-do" data-action="inspLog" data-id="'+open.id+'">I did this</button><button class="izb-x" data-action="inspOpenAct" data-id="'+open.id+'">Later</button></div></div>'; })() : '')+
       // boards
       lay.boards.map(function(p, i){ return '<div class="izd'+(i===0 ? ' is-vision' : '')+'" data-action="inspBoard" data-id="'+p.b.id+'" style="left:'+p.x+'px;top:'+p.y+'px;width:'+p.w+'px;height:'+p.h+'px">'+boardStaticHtml(p.b, 'insp-board')+'<span class="izd-n">'+(i===0 ? '&#9733; ' : '')+escapeHtml(p.b.name)+'</span></div>'; }).join('')+
+      // wishes and words
+      inspSandHtml()+
       // thoughts
       s.thoughts.map(function(t){ return '<div class="izt" data-thought="'+t.id+'" style="left:'+t.x+'px;top:'+t.y+'px;--t:'+t.tint+'"><div class="izt-h" data-drag="'+t.id+'"><span>Thought</span><button data-action="inspThoughtDel" data-id="'+t.id+'" title="Let it go">&#10005;</button></div><textarea placeholder="Write anything…" maxlength="2000">'+escapeHtml(t.text)+'</textarea></div>'; }).join('')+
     '</div></div>'+
@@ -206,7 +212,8 @@ function inspHtml(){
       '<button class="insp-b'+(typeof musicOn==='function' && musicOn() ? ' is-on' : '')+'" data-action="inspMusic" title="'+(typeof musicOn==='function' && musicOn() ? 'Pause the music' : 'Play music')+'">'+(typeof musicOn==='function' && musicOn() ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9835;')+'</button></div>'+
     '<div class="insp-scores"><div><b>'+(rate==null ? '&ndash;' : rate)+'</b><span>Inspiration</span></div>'+(mind!=null ? '<div><b>'+mind+'</b><span>Mind</span></div>' : '')+'<div><b>'+inspStreak()+'</b><span>day streak</span></div></div>'+
     '<div class="insp-lately"><div class="izl-h">This week</div><div class="izl-week">'+(typeof lifeWeek==='function' ? lifeWeek() : []).map(function(k){ return '<div class="izl-w'+(k.n ? '' : ' is-zero')+'" title="'+k.label+(k.min ? ', '+fmtDurationLabel(k.min) : '')+'"><span>'+k.e+'</span><b>'+k.n+'</b><small>'+k.label+'</small></div>'; }).join('')+'</div><div class="izl-h">Lately</div>'+(recent.length ? recent.map(function(x){ return '<div class="izl-r"><span>'+inspAct(x.act).e+'</span><b>'+escapeHtml(x.label)+'</b><small>'+(x.date===t ? fmtTimeShort(x.at) : weekdayShort(x.date))+'</small></div>'; }).join('') : '<div class="izl-none">What you log shows up here.</div>')+'</div>'+
-    '<div class="insp-hint'+(Date.now() - (ui.inspHintAt||0) > 6500 ? ' is-gone' : '')+'">Drag to wander · scroll to zoom · double-click anywhere to write a thought</div>'+
+    inspToolsHtml()+
+    '<div class="insp-hint'+(Date.now() - (ui.inspHintAt||0) > 6500 ? ' is-gone' : '')+'">Drag to wander · scroll to zoom · tap the sky · double-click to write a thought</div>'+
     (ui.inspSheet ? '<div class="insp-sheet-bg" data-action="inspLogSheet"></div><div class="insp-sheet"><div class="izs-h">What did you do?</div>'+
       '<div class="izs-grid">'+inspActs().map(function(a){ return '<button class="izs-a c-'+a.cat+'" data-action="inspLogFromSheet" data-id="'+a.id+'"><span>'+a.e+'</span>'+escapeHtml(a.label)+'</button>'; }).join('')+'</div>'+
       '<div class="izs-more"><input class="input" id="inspMin" type="number" min="0" placeholder="Minutes (optional)"><input class="input" id="inspNote" placeholder="A note (optional): the book, the place, how it felt"></div></div>' : '')+
@@ -237,10 +244,11 @@ function inspBind(L){
   L.addEventListener('pointerdown', function(e){
     if(e.button!==0) return;
     const th = e.target.closest('[data-drag]');
-    if(th){ const t = inspStore().thoughts.find(function(x){ return x.id===th.dataset.drag; }); if(!t) return; drag = {thought:t, el:th.closest('.izt'), sx:e.clientX, sy:e.clientY, ox:t.x, oy:t.y}; e.preventDefault(); return; }
-    if(!e.target.closest('#inspPlane') || e.target.closest('button, textarea, input, .izt, .izd, .izb-card')) return;
+    if(th && !e.target.closest('button')){ const t = inspFindItem(th.dataset.drag); if(!t) return; drag = {thought:t, el:th.closest('.izt, .izw, .izq'), sx:e.clientX, sy:e.clientY, ox:t.x, oy:t.y}; e.preventDefault(); return; }
+    if(!e.target.closest('#inspPlane') || e.target.closest('button, textarea, input, .izt, .izd, .izb-card, .izw, .izq')) return;
     cancelAnimationFrame(glide);
-    drag = {sx:e.clientX, sy:e.clientY, ox:ui.inspView.x, oy:ui.inspView.y, lx:e.clientX, ly:e.clientY, lt:performance.now(), vx:0, vy:0};
+    if(ui.inspDrift) inspDriftStop();
+    drag = {sx:e.clientX, sy:e.clientY, ox:ui.inspView.x, oy:ui.inspView.y, lx:e.clientX, ly:e.clientY, lt:performance.now(), t0:performance.now(), vx:0, vy:0};
     L.classList.add('is-panning');
   });
   window.addEventListener('pointermove', function(e){
@@ -254,6 +262,8 @@ function inspBind(L){
     if(!drag) return;
     if(drag.thought){ persist('personal'); drag = null; return; }
     L.classList.remove('is-panning');
+    // a tap (not a drag) on the open sky: a bloom of light and a chime
+    if(Math.abs(drag.lx - drag.sx) < 5 && Math.abs(drag.ly - drag.sy) < 5 && performance.now() - drag.t0 < 400){ inspBloom(drag.sx, drag.sy); drag = null; return; }
     // a little glide, like water
     let vx = drag.vx*16, vy = drag.vy*16; drag = null;
     const step = function(){ vx *= 0.92; vy *= 0.92; if(Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) return; ui.inspView.x += vx; ui.inspView.y += vy; inspApply(false); glide = requestAnimationFrame(step); };
@@ -267,7 +277,7 @@ function inspBind(L){
     v.x = cx - (cx - v.x)*(z/z0); v.y = cy - (cy - v.y)*(z/z0); v.z = z; inspApply(false);
   }, {passive:false});
   L.addEventListener('dblclick', function(e){
-    if(!e.target.closest('#inspPlane') || e.target.closest('button, textarea, .izt, .izd, .izb, .izh, .izb-card')) return;
+    if(!e.target.closest('#inspPlane') || e.target.closest('button, textarea, input, .izt, .izd, .izb, .izh, .izb-card, .izw, .izq')) return;
     const r = L.getBoundingClientRect(), v = ui.inspView;
     inspAddThought((e.clientX - r.width/2 - v.x)/v.z - 110, (e.clientY - r.height/2 - v.y)/v.z - 30);
   });
