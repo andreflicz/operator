@@ -55,8 +55,10 @@ const T0 = new Date(2026,9,8,10,0).getTime();
   check('keep all marks them reviewed', await E("state.focus.sessions.every(s=>!s.auto || s.reviewed)") && !(await p.isVisible('#recapOverlay')));
   // recap pops up the next morning when yesterday has unchecked auto sessions
   await E("state.focus.sessions.push({id:'old', type:'deep', date:addDays(todayStr(),-1), startedAt:Date.now()-86400000, endedAt:Date.now()-86400000+3600000, minutes:60, completedTasks:[], auto:true, reviewed:false}); delete state.focus.recapSeen[addDays(todayStr(),-1)]; maybeShowRecap()");
-  check('yesterday\'s unchecked sessions get a note (not a pop-up)', !(await p.isVisible('#recapOverlay:not(.hidden)')) && (await p.textContent('#toastContainer')).includes('Yesterday'));
-  await p.click('#toastContainer [data-action="openRecapYesterday"]');
+  // (round 30: one SYSTEM window, "review your work", instead of a note per day)
+  await E("state.focus.revPop = null; sysRevTick()"); await p.waitForTimeout(400);
+  check('yesterday\'s unchecked sessions bring up the review window (not the recap itself)', !(await p.isVisible('#recapOverlay:not(.hidden)')) && /Review your work/.test(await p.textContent('#sysRev')));
+  await p.click('#sysRev .sys-rev-go'); await p.waitForTimeout(300);
   check('the note opens yesterday\'s recap', await p.isVisible('#recapOverlay') && (await p.textContent('#recapOverlay')).includes('Yesterday'));
   await p.click('#recapOverlay [data-action="recapDiscard"][data-id="old"]');
   check('discard removes a session (undo available)', !(await E("state.focus.sessions.some(s=>s.id==='old')")) && (await p.textContent('#toastContainer')).includes('Undo'));

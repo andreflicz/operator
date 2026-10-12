@@ -238,7 +238,7 @@ setInterval(function(){
 
 // ---- action mode: when he does things, you see them here ----
 function opfAction(text){
-  if(!OPF.open){ opfOpen({auto:true}); }
+  if(!OPF.open){ opfOpen({auto:true}); if(!AI.busy) opfAutoClose(); }
   const box = document.getElementById('opfActs');
   if(box){ const c = document.createElement('div'); c.className = 'opf-act'; c.dataset.at = Date.now(); c.innerHTML = '<span>&#10003;</span>'+escapeHtml(text.charAt(0).toUpperCase()+text.slice(1)); box.appendChild(c); }
   if(typeof opChatLog==='function') opChatLog('act', text.charAt(0).toUpperCase()+text.slice(1));

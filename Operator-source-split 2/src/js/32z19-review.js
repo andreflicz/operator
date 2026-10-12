@@ -87,7 +87,7 @@ maybeShowRecap = function(){
   if(state.focus.activeSession || document.querySelector('.overlay:not(.hidden)')) return;
   const seen = state.focus.recapSeen || {}, today = todayStr();
   const rt = (state.settings.appTracking && state.settings.appTracking.recapTime) || '21:30';
-  if(!seen[today] && !recapNudged[today] && nowHM() >= rt && sessionsOn(today).length && !reviewPending().n){
+  if(!seen[today] && !recapNudged[today] && nowHM() >= rt && sessionsOn(today).length){
     recapNudged[today] = true;
     showToast('Your day recap is ready.', {icon:'&#128202;', actionLabel:'Open', actionAction:'openRecapToday', duration:15000});
   }

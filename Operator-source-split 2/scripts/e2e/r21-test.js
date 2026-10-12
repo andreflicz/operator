@@ -66,7 +66,7 @@ async function ctxPage(b, seed, opts){
     check('…the personality you uploaded leads the system prompt, then how it talks in the app', first && /Call me boss/.test(first.system[0].text) && /spoken aloud/.test(first.system[0].text) && /don’t bring up his hours/.test(first.system[0].text));
     check('it did it: the task is on today’s list', await E("state.tasks.items.some(t => t.title==='Call the accountant' && t.status==='today')"));
     check('…and it remembered something about you', await E("state.profile.opMemory.some(m => /6am/.test(m.text))"));
-    check('…then said so in its own words', /Done, sir/.test(await p.textContent('#opBubText')));
+    check('…then said so in its own words', /Done, sir/.test(await E("opChat().filter(e => e.r==='op').map(e => e.t).join(' ')")));   // (round 30: doing things opens his full screen, so it's said there)
     await E("aiAsk('What should I do first?', 'opBubText')"); await p.waitForTimeout(800);
     const second = log[log.length-1];
     check('what it remembers goes into the next conversation', /Trains at 6am/.test(second.system[1].text));

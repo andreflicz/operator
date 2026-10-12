@@ -5661,6 +5661,136 @@ html[data-op-mood="stern"] .op-bub-t .cw:last-child, html[data-op-mood="concern"
 .ocl-typing i:nth-child(2){ animation-delay:.15s; } .ocl-typing i:nth-child(3){ animation-delay:.3s; }
 @keyframes oclDot{ 0%,100%{ opacity:.3; transform:none; } 50%{ opacity:1; transform:translateY(-2px); } }
 .ocl-empty{ margin:auto; color:rgba(21,23,29,.45); font-size:12.5px; }
+
+/* ---- round 30: Operator, full screen (the white plane) ---- */
+.opf{ position:fixed; inset:0; z-index:9400; overflow:hidden; background:#f6f7fb; color:#1b1e2a; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .55s ease, visibility 0s linear .55s; font-family:var(--font-body); cursor:text; }
+.opf.is-in{ opacity:1; visibility:visible; pointer-events:auto; transition:opacity .55s ease; }
+body.opf-on #opBub, body.opf-on #opLight, body.opf-on .quick-journal-fab, body.opf-on #fabAdd{ visibility:hidden !important; }
+.opf-sky{ position:absolute; inset:-20%; background:
+  radial-gradient(38% 32% at 28% 30%, #ffffff, transparent 70%),
+  radial-gradient(34% 30% at 72% 62%, color-mix(in srgb, var(--op-c) 26%, #eef1ff), transparent 72%),
+  radial-gradient(46% 38% at 50% 105%, rgba(222,228,255,.95), transparent 70%),
+  radial-gradient(30% 26% at 85% 18%, rgba(255,240,250,.9), transparent 70%),
+  linear-gradient(180deg, #fdfdff 0%, #f3f4fa 60%, #eceef7 100%);
+  animation:opfDrift 46s ease-in-out infinite alternate; transition:background 1.2s; }
+@keyframes opfDrift{ to{ transform:translate(3%, -2.5%) scale(1.06) rotate(1.5deg); } }
+.opf-floor{ position:absolute; left:-60%; right:-60%; bottom:-6%; height:62%; transform:perspective(520px) rotateX(72deg); transform-origin:50% 100%;
+  background-image:linear-gradient(rgba(120,130,175,.13) 1px, transparent 1px), linear-gradient(90deg, rgba(120,130,175,.13) 1px, transparent 1px); background-size:90px 90px;
+  -webkit-mask-image:linear-gradient(to top, #000 0%, rgba(0,0,0,.6) 40%, transparent 85%); mask-image:linear-gradient(to top, #000 0%, rgba(0,0,0,.6) 40%, transparent 85%);
+  animation:opfFloor 30s linear infinite; pointer-events:none; }
+@keyframes opfFloor{ to{ background-position:0 90px, 0 0; } }
+.opf-core{ position:absolute; left:50%; top:44%; width:58vmin; height:58vmin; transform:translate(-50%, -50%); border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle, #fff 0%, color-mix(in srgb, var(--op-c) 30%, #f4f6ff) 30%, color-mix(in srgb, var(--op-glow2) 70%, transparent) 52%, transparent 70%);
+  filter:blur(14px); opacity:.95; animation:opfBreath 7s ease-in-out infinite; transition:background 1s; }
+@keyframes opfBreath{ 0%,100%{ transform:translate(-50%, -50%) scale(.94); opacity:.85; } 50%{ transform:translate(-50%, -50%) scale(1.04); opacity:1; } }
+.opf.is-live .opf-core{ animation-duration:1.9s; }
+.opf.is-listen .opf-core{ animation:opfListen 1.4s ease-in-out infinite; }
+@keyframes opfListen{ 0%,100%{ transform:translate(-50%, -50%) scale(.98); } 50%{ transform:translate(-50%, -50%) scale(1.08); } }
+.opf.is-think .opf-core{ animation-duration:3.2s; filter:blur(18px) hue-rotate(20deg); }
+.opf-motes{ position:absolute; inset:0; pointer-events:none; }
+.opf-mote{ position:absolute; width:4px; height:4px; border-radius:50%; background:#fff; box-shadow:0 0 10px 3px rgba(255,255,255,.95), 0 0 3px 1px color-mix(in srgb, var(--op-c) 40%, rgba(150,165,255,.6)); opacity:0; animation:opfMote linear infinite; }
+@keyframes opfMote{ 0%{ opacity:0; translate:0 30px; } 15%{ opacity:.9; } 85%{ opacity:.6; } 100%{ opacity:0; translate:24px -160px; } }
+.opf-top{ position:absolute; left:0; right:0; top:0; display:flex; align-items:center; gap:16px; padding:18px 22px; z-index:3; cursor:default; }
+.opf-x{ width:38px; height:38px; border-radius:50%; border:1px solid rgba(30,35,60,.12); background:rgba(255,255,255,.6); color:#3a3f55; font-size:14px; cursor:pointer; backdrop-filter:blur(8px); }
+.opf-x:hover{ background:#fff; }
+.opf-name{ font-size:11px; font-weight:800; letter-spacing:.42em; color:color-mix(in srgb, var(--op-ink) 80%, #9aa0b8); }
+.opf-modes{ margin-left:auto; display:flex; gap:4px; padding:4px; border-radius:999px; background:rgba(255,255,255,.55); border:1px solid rgba(30,35,60,.08); backdrop-filter:blur(10px); }
+.opf-m{ border:0; background:transparent; padding:7px 14px; border-radius:999px; font:inherit; font-size:12.5px; font-weight:700; color:#6a7088; cursor:pointer; }
+.opf-m.is-on{ background:#fff; color:#1b1e2a; box-shadow:0 2px 10px rgba(40,50,90,.08); }
+.opf-mute{ padding:7px 10px; }
+.opf-mic{ position:absolute; left:50%; bottom:34px; width:64px; height:64px; margin-left:-32px; border-radius:50%; border:1px solid rgba(255,255,255,.9); cursor:pointer; z-index:3;
+  background:radial-gradient(circle at 40% 35%, #fff, color-mix(in srgb, var(--op-c) 35%, #e8ecff) 70%); box-shadow:0 10px 40px color-mix(in srgb, var(--op-glow) 60%, rgba(120,140,220,.35)), inset 0 0 18px rgba(255,255,255,.9); transition:transform .3s; }
+.opf-mic:hover{ transform:scale(1.06); }
+.opf-mic span{ position:absolute; inset:-10px; border-radius:50%; border:1px solid color-mix(in srgb, var(--op-c) 50%, rgba(140,155,230,.5)); opacity:0; }
+.opf.is-listen .opf-mic span{ animation:opfRing 1.3s ease-out infinite; }
+@keyframes opfRing{ from{ transform:scale(.8); opacity:.9; } to{ transform:scale(1.5); opacity:0; } }
+.opf-hint{ position:absolute; left:0; right:0; bottom:112px; text-align:center; font-family:'Iowan Old Style', Georgia, serif; font-style:italic; font-size:17px; color:rgba(40,45,70,.45); pointer-events:none; transition:opacity 1.2s; }
+.opf.hint-gone .opf-hint, .opf[data-mode="chat"] .opf-hint{ opacity:0; }
+.opf-plane{ position:absolute; inset:0; z-index:2; }
+.opf[data-mode="chat"] .opf-plane{ display:none; }
+.opf-w{ position:absolute; max-width:min(420px, 44vw); font-family:'Iowan Old Style', Georgia, serif; line-height:1.4; transition:opacity 2s ease, filter 2s ease, transform 2.4s ease; cursor:default; }
+.opf-op{ font-size:23px; color:#1a1d2b; text-shadow:0 0 28px #fff, 0 0 2px rgba(255,255,255,.9); }
+.opf-op:empty::before{ content:'…'; color:rgba(30,35,60,.35); }
+.opf-me{ font-size:18px; font-style:italic; color:rgba(35,40,65,.55); }
+.opf-me.is-wait{ animation:opMeWait 1.6s ease-in-out infinite; }
+.opf-w.is-old{ opacity:.42; filter:blur(.4px); }
+.opf-w.is-gone{ opacity:0; filter:blur(6px); transform:translateY(-18px); }
+.opf-w .cw{ animation-duration:.45s; }
+.opf-in{ position:absolute; z-index:3; }
+.opf-type{ width:min(420px, 60vw); border:0; outline:0; background:transparent; font-family:'Iowan Old Style', Georgia, serif; font-style:italic; font-size:18px; color:#262a3d; caret-color:color-mix(in srgb, var(--op-c) 60%, #6a78ff); border-bottom:1px solid rgba(40,50,90,.15); padding:4px 0; }
+.opf-type::placeholder{ color:rgba(40,45,70,.3); }
+.opf-acts{ position:absolute; left:50%; top:78px; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:8px; z-index:3; pointer-events:none; }
+.opf-act{ display:flex; gap:8px; align-items:center; padding:8px 16px; border-radius:999px; background:rgba(255,255,255,.82); border:1px solid color-mix(in srgb, var(--op-c) 40%, rgba(40,50,90,.1)); box-shadow:0 8px 30px rgba(60,70,120,.1); font-size:13.5px; font-weight:600; color:#262a3d; animation:opfActIn .5s cubic-bezier(.2,.9,.3,1.2) both; transition:opacity .9s, transform .9s; }
+.opf-act span{ color:#2fb27a; font-weight:900; }
+.opf-act.is-gone{ opacity:0; transform:translateY(-10px); }
+@keyframes opfActIn{ from{ opacity:0; transform:translateY(10px) scale(.94); } to{ opacity:1; transform:none; } }
+/* chat: everything, in order (a terminal on the plane) */
+.opf-chat{ position:absolute; left:50%; top:76px; bottom:118px; width:min(780px, calc(100vw - 32px)); transform:translateX(-50%); z-index:2; display:none; flex-direction:column; cursor:default;
+  font-family:ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size:13.5px; line-height:1.6; color:#20232f; }
+.opf[data-mode="chat"] .opf-chat{ display:flex; }
+.opf-log{ flex:1; overflow-y:auto; padding:18px 22px 6px; border-radius:18px 18px 0 0; background:rgba(255,255,255,.62); border:1px solid rgba(30,35,60,.07); border-bottom:0; backdrop-filter:blur(14px); }
+.opf-log::-webkit-scrollbar{ width:5px; } .opf-log::-webkit-scrollbar-thumb{ background:rgba(0,0,0,.12); border-radius:4px; }
+.opc-day{ margin:14px 0 6px; font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:rgba(30,35,60,.35); }
+.opc-me{ display:flex; gap:10px; margin:12px 0 6px; padding:7px 12px; border-radius:8px; background:rgba(30,35,60,.055); color:#3b4055; white-space:pre-wrap; }
+.opc-gt, .opf-gt{ color:rgba(30,35,60,.4); font-weight:700; }
+.opc-op{ display:flex; gap:10px; margin:6px 0; white-space:pre-wrap; }
+.opc-dot{ flex:none; width:8px; height:8px; margin-top:7px; border-radius:50%; background:color-mix(in srgb, var(--op-c) 70%, #8a93b8); box-shadow:0 0 8px var(--op-glow); }
+.opc-act{ display:flex; gap:8px; margin:-2px 0 6px 18px; color:#5b6178; font-size:12.5px; }
+.opc-l{ color:rgba(30,35,60,.35); }
+.opc-empty{ margin:40px auto; max-width:440px; text-align:center; color:rgba(30,35,60,.45); font-family:var(--font-body); }
+.opf-live{ display:flex; gap:10px; padding:2px 22px 8px; background:rgba(255,255,255,.62); border-left:1px solid rgba(30,35,60,.07); border-right:1px solid rgba(30,35,60,.07); backdrop-filter:blur(14px); white-space:pre-wrap; }
+.opf-live:has(.opf-live-t:empty){ display:none; }
+.opf-live-t.is-me{ color:#6a7088; font-style:italic; }
+.opf.is-think .opf-live:has(.opf-live-t:empty){ display:flex; }
+.opf.is-think .opf-live-t:empty::before{ content:'✻ Thinking…'; color:color-mix(in srgb, var(--op-c) 55%, #8a93b8); animation:opMeWait 1.4s ease-in-out infinite; }
+.opf-prompt{ display:flex; gap:10px; align-items:flex-start; padding:12px 22px 14px; border-radius:0 0 18px 18px; background:#fff; border:1px solid rgba(30,35,60,.1); box-shadow:0 14px 40px rgba(60,70,120,.08); }
+.opf-prompt textarea{ flex:1; resize:none; border:0; outline:0; background:transparent; font:inherit; color:#1b1e2a; line-height:1.6; max-height:160px; }
+
+/* the bubble's chat log shows what Op did, too */
+.ocl-act{ align-self:flex-start; margin:-2px 0 2px 10px; font-size:12px; color:rgba(21,23,29,.6); }
+.ocl-act::before{ content:'✓ '; color:#2fb27a; font-weight:900; }
+
+/* ---- round 30: review your work (the SYSTEM window) ---- */
+.sys-rev{ z-index:9300; }
+.sys-rev.is-in{ background:rgba(4,8,18,.35); }
+.sys-rev-n{ display:flex; align-items:baseline; justify-content:center; gap:8px; margin:16px 0 4px; }
+.sys-rev-n b{ font-family:var(--font-display); font-size:44px; line-height:1; color:#fff; text-shadow:0 0 24px rgba(110,200,255,.8); }
+.sys-rev-n span{ font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:#7fd0ff; }
+.sys-rev-acts{ display:flex; justify-content:center; gap:10px; }
+.sys-rev-acts .sys-ok{ margin:14px 0 0; }
+.sys-rev-later{ border-color:rgba(110,200,255,.25) !important; background:transparent !important; color:rgba(220,240,255,.6) !important; }
+.sys-rev-time{ height:2px; margin:16px -24px -18px; background:rgba(110,200,255,.12); overflow:hidden; border-radius:0 0 6px 6px; }
+.sys-rev-time i{ display:block; height:100%; width:100%; background:linear-gradient(90deg, #7fd0ff, #b4e6ff); box-shadow:0 0 10px rgba(110,200,255,.8); }
+.sys-rev.is-in .sys-card{ animation:sysPulse 1.2s ease-out; }
+
+/* ---- round 30: your projected self ---- */
+.pj-tease{ display:flex; align-items:center; gap:14px; width:100%; margin:6px 0 4px; padding:14px 18px; border-radius:16px; border:1px solid color-mix(in srgb, var(--rc) 45%, transparent); background:linear-gradient(100deg, color-mix(in srgb, var(--rc) 14%, transparent), transparent 70%); color:var(--text); font:inherit; text-align:left; cursor:pointer; }
+.pj-tease span{ flex:1; display:flex; flex-direction:column; gap:2px; } .pj-tease small{ color:var(--text-faint); font-size:12px; } .pj-tease b{ font-size:15.5px; }
+.pj-tease em{ font-style:normal; font-weight:700; color:var(--rc); }
+.pj-now{ border-radius:16px; border:1px solid var(--border); background:var(--panel); overflow:hidden; }
+.pj-row{ display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:10px; padding:10px 18px; border-top:1px solid var(--border); align-items:center; }
+.pj-row:first-child{ border-top:0; }
+.pj-row span{ color:var(--text-dim); font-size:13px; } .pj-row b{ font-size:14.5px; }
+.pj-head b{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--text-faint); }
+.pj-row b.is-ok{ color:#5cf0b0; } .pj-row b.is-behind{ color:#ffb36b; }
+.pj-line{ display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:14px; }
+.pj-card{ border-radius:18px; padding:16px 18px; border:1px solid color-mix(in srgb, var(--rc) 35%, var(--border)); background:linear-gradient(170deg, color-mix(in srgb, var(--rc) 10%, var(--panel)), var(--panel) 60%); }
+.pj-when{ display:flex; justify-content:space-between; align-items:baseline; } .pj-when b{ font-size:15px; } .pj-when span{ font-size:12px; color:var(--text-faint); }
+.pj-body{ display:flex; gap:14px; margin-top:12px; }
+.pj-fig{ flex:none; width:74px; height:126px; filter:drop-shadow(0 6px 16px color-mix(in srgb, var(--rc) 35%, transparent)); }
+.pj-stats{ flex:1; display:flex; flex-direction:column; gap:4px; }
+.pj-rank{ display:flex; gap:8px; align-items:center; margin-bottom:4px; } .pj-rank b{ display:block; color:var(--rc); font-size:14.5px; } .pj-rank small{ color:var(--text-faint); font-size:12px; }
+.pj-kv{ display:flex; justify-content:space-between; font-size:12.5px; } .pj-kv span{ color:var(--text-faint); }
+.pj-look, .pj-life{ margin-top:12px; font-size:13px; line-height:1.55; color:var(--text-dim); }
+.pj-look small, .pj-life small{ display:block; margin-bottom:3px; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--rc); font-weight:800; }
+.pj-ranks{ display:flex; flex-direction:column; gap:10px; }
+.pj-rk{ display:flex; gap:14px; padding:14px 18px; border-radius:16px; border:1px solid var(--border); background:var(--panel); }
+.pj-rk.is-you{ border-color:color-mix(in srgb, var(--rc) 60%, transparent); box-shadow:0 0 0 1px color-mix(in srgb, var(--rc) 30%, transparent), 0 10px 30px color-mix(in srgb, var(--rc) 12%, transparent); }
+.pj-rk-h{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; } .pj-rk-h b{ color:var(--rc); font-size:15px; } .pj-rk-h span{ font-size:12px; color:var(--text-faint); }
+.pj-rk-h em{ font-style:normal; font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; padding:2px 8px; border-radius:999px; background:color-mix(in srgb, var(--rc) 20%, transparent); color:var(--rc); }
+.pj-rk p{ margin:6px 0 0; font-size:13.5px; line-height:1.55; color:var(--text-dim); }
+.pj-math{ margin:22px 0 10px; padding:14px 18px; border-radius:14px; border:1px dashed var(--border); font-size:12.5px; line-height:1.6; color:var(--text-faint); }
+.opf[data-mode="chat"] .opf-acts{ display:none; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -28057,15 +28187,16 @@ function aiListen(cap){
   opStop();
   const rec = new SR(); AI.rec = rec;
   rec.lang = navigator.language || 'en-US'; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 1;
-  let finals = '', interim = '', quiet = null, sent = false, hardStop = null, cancelled = false;
+  let finals = '', interim = '', quiet = null, sent = false, hardStop = null, cancelled = false, started = false, tries = 0;
   const said = function(){ return (finals+' '+interim).replace(/\s+/g, ' ').trim(); };
   const send = function(){ if(sent) return; sent = true; clearTimeout(quiet); clearTimeout(hardStop); try{ rec.stop(); }catch(e){} };
   AI.sendNow = send;
   // closing Op (the ✕) drops what it heard and stops listening for good: no restart, nothing sent
   AI.cancelListen = function(){ cancelled = true; sent = true; clearTimeout(quiet); clearTimeout(hardStop); AI.listening = false; AI.sendNow = null; try{ rec.abort(); }catch(e){ try{ rec.stop(); }catch(e2){} } aiUiRefresh(); };
-  const armQuiet = function(){ clearTimeout(quiet); quiet = setTimeout(send, 2100); };
+  // (round 30: a breath longer before it sends, so a pause mid-thought doesn't cut you off)
+  const armQuiet = function(){ clearTimeout(quiet); quiet = setTimeout(send, 2500); };
   OV.cap = cap;
-  rec.onstart = function(){ if(cancelled){ try{ rec.abort(); }catch(e){} return; } AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, 60000); };
+  rec.onstart = function(){ if(cancelled){ try{ rec.abort(); }catch(e){} return; } started = true; AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, 60000); };
   rec.onresult = function(e){
     interim = '';
     for(let i = e.resultIndex; i < e.results.length; i++){ const t = e.results[i][0].transcript; if(e.results[i].isFinal) finals += ' '+t; else interim += t; }
@@ -28073,17 +28204,26 @@ function aiListen(cap){
   };
   rec.onerror = function(e){
     if(e && (e.error==='no-speech' || e.error==='aborted')) return;
+    // (the mic was still busy, e.g. the "Hey Operator" ear letting go: try again in a moment)
+    if(e && e.error==='audio-capture' && !started && tries < 2) return;
     AI.listening = false; aiUiRefresh(); clearTimeout(quiet); clearTimeout(hardStop);
     opCaption(e && e.error==='not-allowed' ? 'I need the microphone. Allow it for Operator (or type instead).' : 'The mic isn’t working: type instead.');
   };
   rec.onend = function(){
     // Chrome ends a session on its own now and then; keep listening until you've finished
+    // (words it was still making out when the session ended are kept, not dropped)
+    if(interim){ finals += ' '+interim; interim = ''; }
     if(!sent && !cancelled && AI.listening){ try{ rec.start(); return; }catch(e){} }
+    // it never got the mic: try again (twice at most) before giving up
+    if(!started && !sent && !cancelled && tries < 2){ tries++; setTimeout(function(){ if(cancelled) return; try{ rec.start(); }catch(e){ AI.listening = false; aiTypeFocus(); } }, 400); return; }
     AI.listening = false; AI.sendNow = null; AI.cancelListen = null; clearTimeout(quiet); clearTimeout(hardStop); aiUiRefresh();
     if(cancelled) return;
     const s = said(); if(s) aiAsk(s, cap); else opCaption('Didn’t catch that.');
   };
-  try{ rec.start(); }catch(e){ AI.listening = false; aiTypeFocus(); }
+  // the "Hey Operator" ear lets go of the mic first
+  const heyWas = typeof HW!=='undefined' && HW.on; if(heyWas && typeof heyStop==='function') heyStop();
+  const go = function(){ if(cancelled) return; try{ rec.start(); }catch(e){ AI.listening = false; aiTypeFocus(); } };
+  if(heyWas) setTimeout(go, 300); else go();
 }
 // listening on its own (after Op asks something): not for a while after you've closed it
 function aiAutoListen(cap){ if(Date.now() - (AI.closedAt||0) < 120000 || AI.listening || AI.busy) return; aiListen(cap); }
@@ -30906,6 +31046,9 @@ const HW = {rec:null, on:false, t:0, fails:0, blocked:false, hitAt:0};
 function heyOpOn(){ return state.profile.heyOp!==false && typeof aiCanHear==='function' && aiCanHear(); }
 function heyQuietNow(){
   const m = state.modes && state.modes.active;
+  // (round 30: and not right after Op speaks or while his question waits: the mic is for your answer)
+  if(OV.lastEnd && Date.now() - OV.lastEnd < 9000) return true;
+  if(OV.qDuck) return true;
   return AI.listening || AI.busy || OV.speaking || OV.pending || document.hidden || !document.hasFocus() || (m && m.sleep) || (typeof inspBreathOn!=='undefined' && ui.inspBreath);
 }
 function heyStart(){
@@ -31444,6 +31587,861 @@ setInterval(function(){
     opChatDraw();
   }catch(e){}
 }, 300);
+// ============ OP RUNS THE APP, AND STAYS ON YOU ALL DAY (round 30) ============
+// Op can do almost anything you can in the app now: finish, reopen, change, delete and reorder tasks,
+// say what's next, put follow-ups on clients and leads, add a lead and move it along, write in the
+// journal, log food, add video ideas, start a break, open the lock-out, play the music, set your alarm,
+// clock in and out, open any page. Two things stay yours: Social, and anything with real consequences
+// out in the world (sending messages, posting, paying, moving money).
+// He's also your accountability partner all day, not only in work hours: every hour or so, when you're
+// not locked in, he presses you. One thing at a time, the thing that matters now (never your list read
+// back), and now and then something older that's still hanging, like a note from a client log.
+
+// ---- what he's told about how to use it ----
+aiSystem = (function(base){
+  return function(){
+    const s = base.apply(this, arguments);
+    if(Array.isArray(s)) s.push({type:'text', text:
+      'More on how you work (round 30):\n'+
+      '- You can run most of the app for him with your tools: finish, reopen, edit, delete and reorder tasks, set what’s next, set follow-ups on clients and leads, add a lead and move it along, write journal entries, log food, weight and workouts, add video ideas, start a break, open the lock-out, play or stop the music, set his wake-up alarm, clock in or out, open any page or your own full screen. Do it when he asks or clearly agrees, then say it in a few words. Never touch Social, and never send messages, post, pay or move money: he does those himself.\n'+
+      '- When you bring up what’s on his plate, bring up ONE thing: what matters right now. Never read his list back or list his tasks unless he asks for the list. Keep it current and relevant; now and then it’s fine to raise something older that’s still hanging (a client who said something worth following up, a lead gone quiet).\n'+
+      '- You are his accountability partner all day, not only in work hours. Press him: ask what he’s doing, hold him to what he said he’d do, call it when he’s drifting, and offer to do the thing for him (lock him in, start the task, set the reminder). Pushy, with grace and humor, never preachy.'});
+    return s;
+  };
+})(aiSystem);
+
+// ---- the tools ----
+const OPC_TASK = {type:'string', description:'part of the task’s title'};
+OP_TOOLS.push(
+  {name:'complete_task', description:'Mark a task done (by part of its title).', input_schema:{type:'object', properties:{task:OPC_TASK}, required:['task'], additionalProperties:false}},
+  {name:'reopen_task', description:'Bring a finished task back (by part of its title).', input_schema:{type:'object', properties:{task:OPC_TASK, list:{type:'string', enum:['today', 'later']}}, required:['task'], additionalProperties:false}},
+  {name:'update_task', description:'Change a task: its title, deadline, priority, notes, or move it between today and later (the backlog).', input_schema:{type:'object', properties:{task:OPC_TASK, title:{type:'string'}, deadline:{type:'string', description:'YYYY-MM-DD, or "none" to clear it'}, priority:{type:'string', enum:['low', 'med', 'high']}, list:{type:'string', enum:['today', 'later']}, notes:{type:'string'}}, required:['task'], additionalProperties:false}},
+  {name:'delete_task', description:'Delete a task (only when he clearly asks). He gets an Undo.', input_schema:{type:'object', properties:{task:OPC_TASK}, required:['task'], additionalProperties:false}},
+  {name:'arrange_tasks', description:'Put today’s tasks in an order (first = do it first). List titles or parts of titles; anything left out keeps its place after them. Tasks named that aren’t on today get pulled onto today.', input_schema:{type:'object', properties:{order:{type:'array', items:{type:'string'}}}, required:['order'], additionalProperties:false}},
+  {name:'set_next_task', description:'Make a task the next one up (pulled onto today if needed).', input_schema:{type:'object', properties:{task:OPC_TASK}, required:['task'], additionalProperties:false}},
+  {name:'done_reminder', description:'Mark one of his reminders done (by part of its label).', input_schema:{type:'object', properties:{label_contains:{type:'string'}}, required:['label_contains'], additionalProperties:false}},
+  {name:'set_follow_up', description:'Set (or clear, with date "none") a follow-up reminder on a client or lead.', input_schema:{type:'object', properties:{who:{type:'string'}, date:{type:'string', description:'YYYY-MM-DD or "none"'}, note:{type:'string'}}, required:['who', 'date'], additionalProperties:false}},
+  {name:'add_lead', description:'Add a lead to the pipeline.', input_schema:{type:'object', properties:{name:{type:'string'}, company:{type:'string'}, value:{type:'number', description:'what they’d pay a month'}, note:{type:'string'}, follow_up:OP_DATE}, required:['name'], additionalProperties:false}},
+  {name:'move_lead', description:'Move a lead to a stage of the pipeline.', input_schema:{type:'object', properties:{who:{type:'string'}, stage:{type:'string', enum:PIPELINE_STAGES.slice()}}, required:['who', 'stage'], additionalProperties:false}},
+  {name:'add_journal', description:'Write an entry in his journal (his words, or a note he asked you to keep).', input_schema:{type:'object', properties:{text:{type:'string'}, title:{type:'string'}}, required:['text'], additionalProperties:false}},
+  {name:'log_food', description:'Log something he ate, with its calories (estimate sensibly if he doesn’t say).', input_schema:{type:'object', properties:{name:{type:'string'}, calories:{type:'integer'}, date:OP_DATE}, required:['name', 'calories'], additionalProperties:false}},
+  {name:'add_video_idea', description:'Add a content video idea.', input_schema:{type:'object', properties:{title:{type:'string'}, notes:{type:'string'}}, required:['title'], additionalProperties:false}},
+  {name:'take_break', description:'Start a break in his locked-in session.', input_schema:{type:'object', properties:{minutes:{type:'integer'}}, additionalProperties:false}},
+  {name:'lock_out', description:'Open the lock-out for his session (he confirms it).', input_schema:{type:'object', properties:{}, additionalProperties:false}},
+  {name:'clock', description:'Clock him in for the work day, or out (clocking out starts the wind-down).', input_schema:{type:'object', properties:{action:{type:'string', enum:['in', 'out']}}, required:['action'], additionalProperties:false}},
+  {name:'music', description:'Play, stop or skip the app’s music.', input_schema:{type:'object', properties:{action:{type:'string', enum:['play', 'stop', 'next']}}, required:['action'], additionalProperties:false}},
+  {name:'set_wake_alarm', description:'Set his wake-up alarm time (and turn it on or off).', input_schema:{type:'object', properties:{time:{type:'string', description:'HH:MM, 24-hour'}, on:{type:'boolean'}}, additionalProperties:false}}
+);
+// (more pages to open)
+(function(){ const t = OP_TOOLS.find(function(x){ return x.name==='open_page'; }); if(t) ['recap', 'xp', 'projected', 'operator', 'notifications'].forEach(function(p){ t.input_schema.properties.page.enum.push(p); }); })();
+// the ones that change things (these are what Op's full screen shows him doing)
+const OP_ACTION_TOOLS = ['add_task', 'add_event', 'set_reminder', 'log_workout', 'log_weight', 'add_goal', 'complete_goal', 'add_client_note', 'log_touch', 'complete_task', 'reopen_task', 'update_task', 'delete_task', 'arrange_tasks', 'set_next_task', 'done_reminder', 'set_follow_up', 'add_lead', 'move_lead', 'add_journal', 'log_food', 'add_video_idea', 'set_wake_alarm'];
+const OP_NAV_TOOLS = ['open_page', 'lock_in', 'start_task', 'start_reset', 'take_break', 'lock_out', 'clock'];
+function opcFindAny(q){
+  const w = String(q||'').toLowerCase().trim(); if(!w) return null;
+  return opFindTask(w) || state.tasks.items.find(function(t){ return t.title.toLowerCase().indexOf(w) >= 0; }) || null;
+}
+function opcNeedTask(q){ const t = opFindTask(q); if(!t) throw new Error('no open task matches "'+q+'"'); return t; }
+const opcYmd = function(s){ return /^\d{4}-\d{2}-\d{2}$/.test(String(s||'')); };
+opRunTool = (function(base){
+  return function(name, x){
+    x = x || {};
+    switch(name){
+      case 'complete_task': {
+        const t = opcNeedTask(x.task);
+        completeTask(t.id);
+        return 'done: '+t.title;
+      }
+      case 'reopen_task': {
+        const w = String(x.task||'').toLowerCase();
+        const t = state.tasks.items.filter(function(t){ return t.status==='done' && t.title.toLowerCase().indexOf(w) >= 0; }).sort(function(a, b){ return String(b.completedAt||'').localeCompare(String(a.completedAt||'')); })[0];
+        if(!t) throw new Error('no finished task matches "'+x.task+'"');
+        t.status = x.list==='later' ? 'backlog' : 'today'; t.completedAt = null; persist('tasks');
+        return 'reopened: '+t.title+' ('+(t.status==='today' ? 'today' : 'later')+')';
+      }
+      case 'update_task': {
+        const t = opcNeedTask(x.task), did = [];
+        if(x.title){ t.title = String(x.title).slice(0, 200); did.push('renamed'); }
+        if(x.deadline){ if(x.deadline==='none'){ t.deadline = null; did.push('no deadline'); } else { if(!opcYmd(x.deadline)) throw new Error('deadline must be YYYY-MM-DD'); t.deadline = x.deadline; did.push('due '+x.deadline); } }
+        if(x.priority){ t.priority = x.priority; did.push(x.priority+' priority'); }
+        if(x.notes!=null){ t.notes = String(x.notes).slice(0, 2000); did.push('notes'); }
+        if(x.list){ if(x.list==='later'){ if(ui.currentTaskId===t.id) accumulateCurrentTaskTime(t.id); t.status = 'backlog'; } else t.status = 'today'; did.push(x.list==='later' ? 'moved to later' : 'on today'); }
+        persist('tasks'); return t.title+': '+(did.join(', ') || 'nothing changed');
+      }
+      case 'delete_task': {
+        const t = opcFindAny(x.task); if(!t) throw new Error('no task matches "'+x.task+'"');
+        const i = state.tasks.items.indexOf(t); state.tasks.items.splice(i, 1);
+        if(ui.currentTaskId===t.id) ui.currentTaskId = null;
+        ui._opDeleted = {t:t, i:i}; persist('tasks');
+        setTimeout(function(){ showToast('Op deleted “'+t.title+'”.', {icon:'&#128465;', actionLabel:'Undo', actionAction:'opUndoDelete', duration:12000}); }, 200);
+        return 'deleted: '+t.title;
+      }
+      case 'arrange_tasks': {
+        const order = arr(x.order), ids = [];
+        order.forEach(function(q){ const t = opFindTask(q); if(t && ids.indexOf(t.id) < 0){ if(t.status!=='today') t.status = 'today'; ids.push(t.id); } });
+        if(!ids.length) throw new Error('none of those match an open task');
+        const rest = lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today' && ids.indexOf(t.id) < 0; })).map(function(t){ return t.id; });
+        state.focus.lineupOrder = ids.concat(rest);
+        const np = state.focus.nightPlan; if(np && np.date===todayStr()) np.taskIds = ids.concat(arr(np.taskIds).filter(function(id){ return ids.indexOf(id) < 0; }));
+        persist('tasks'); persist('focus');
+        return 'today, in order: '+state.focus.lineupOrder.map(function(id){ return (state.tasks.items.find(function(t){ return t.id===id; }) || {}).title; }).filter(Boolean).join('; ');
+      }
+      case 'set_next_task': {
+        const t = opcNeedTask(x.task); if(t.status!=='today'){ t.status = 'today'; persist('tasks'); }
+        state.focus.nextTaskId = t.id;
+        const o = arr(state.focus.lineupOrder).filter(function(id){ return id!==t.id; }); const cur = ui.currentTaskId ? o.indexOf(ui.currentTaskId) : -1; o.splice(cur + 1, 0, t.id); state.focus.lineupOrder = o;
+        persist('focus'); return 'up next: '+t.title;
+      }
+      case 'done_reminder': {
+        const w = String(x.label_contains||'').toLowerCase(), r = arr(state.focus.reminders).find(function(r){ return !r.done && String(r.label||'').toLowerCase().indexOf(w) >= 0; });
+        if(!r) throw new Error('no open reminder matches "'+x.label_contains+'"');
+        r.done = true; persist('focus'); return 'done: '+r.label;
+      }
+      case 'set_follow_up': {
+        const hit = opFindContact(x.who); if(!hit) throw new Error('no client or lead matches "'+x.who+'"');
+        if(x.date!=='none' && !opcYmd(x.date)) throw new Error('date must be YYYY-MM-DD or "none"');
+        setFollowUp(hit.kind, hit.x.id, x.date==='none' ? null : x.date, x.note || '');
+        return x.date==='none' ? 'follow-up cleared on '+crmName(hit.kind, hit.x) : 'follow-up with '+crmName(hit.kind, hit.x)+' on '+x.date;
+      }
+      case 'add_lead': {
+        if(x.follow_up && !opcYmd(x.follow_up)) throw new Error('follow_up must be YYYY-MM-DD');
+        const l = {id:uid(), name:String(x.name||'').slice(0, 120), company:String(x.company||'').slice(0, 120), trade:'', phone:'', value:Number(x.value)||0, nextFollowUp:null, leadSource:null, stage:'lead', notes:x.note ? todayStr()+': '+String(x.note).slice(0, 1000) : '', createdAt:todayStr()};
+        if(x.follow_up) l.followUp = {date:x.follow_up, note:'', set:Date.now()};
+        state.business.pipeline.push(l); persist('business'); return 'lead added: '+(l.company || l.name);
+      }
+      case 'move_lead': {
+        const hit = opFindContact(x.who); if(!hit || hit.kind!=='lead') throw new Error('no lead matches "'+x.who+'"');
+        if(PIPELINE_STAGES.indexOf(x.stage) < 0) throw new Error('unknown stage');
+        hit.x.stage = x.stage; if(typeof crmTimeline==='function') crmTimeline(hit.x, 'stage', 'Op moved it to '+x.stage);
+        persist('business'); return crmName('lead', hit.x)+' is now at '+x.stage;
+      }
+      case 'add_journal': {
+        const e = {id:uid(), date:todayStr(), timestamp:Date.now(), text:String(x.text||'').slice(0, 6000), title:String(x.title||'').slice(0, 120), type:'freeform', mood:null, pinned:false, photos:[]};
+        if(!e.text) throw new Error('missing text');
+        state.journal.entries.push(e); persist('journal'); return 'in the journal';
+      }
+      case 'log_food': {
+        const c = Math.round(Number(x.calories)); if(!(c > 0)) throw new Error('calories must be a number');
+        if(x.date && !opcYmd(x.date)) throw new Error('date must be YYYY-MM-DD');
+        state.health.calorieEntries.push({id:uid(), date:x.date || todayStr(), name:String(x.name||'Food').slice(0, 80), calories:c}); persist('health');
+        const tot = state.health.calorieEntries.filter(function(e){ return e.date===(x.date || todayStr()); }).reduce(function(a, e){ return a + (Number(e.calories)||0); }, 0);
+        return 'logged '+c+' cal ('+tot+' today)';
+      }
+      case 'add_video_idea': {
+        const t = {id:uid(), title:String(x.title||'').slice(0, 200), client:'personal', clients:['personal'], priority:'med', deadline:null, notes:String(x.notes||''), status:'backlog', ongoing:false, ongoingDeadline:null, ongoingFrequency:null, includeInStandard:false, categoryId:null, isVideoIdea:true, videoType:null, createdAt:todayStr(), completedAt:null};
+        if(!t.title) throw new Error('missing title');
+        state.tasks.items.push(t); persist('tasks'); return 'video idea added: '+t.title;
+      }
+      case 'take_break': {
+        if(!state.focus.activeSession) return 'he isn’t locked in';
+        if(state.focus.activeSession.onBreak) return 'already on a break';
+        startBreak(Number(x.minutes) > 0 ? Math.round(Number(x.minutes)) : 10); return 'break started';
+      }
+      case 'lock_out': {
+        if(!state.focus.activeSession) return 'he isn’t locked in';
+        setTimeout(function(){ if(ACTIONS.openStopFocus) ACTIONS.openStopFocus(); }, 400); return 'the lock-out is open for him to confirm';
+      }
+      case 'clock': {
+        if(x.action==='in'){ setTimeout(function(){ if(ACTIONS.clockIn) ACTIONS.clockIn(); }, 300); return 'clocking in'; }
+        if(state.focus.activeSession) return 'he has to lock out first';
+        setTimeout(function(){ if(ACTIONS.clockOut) ACTIONS.clockOut(); }, 300); return 'clocking out (wind-down)';
+      }
+      case 'music': {
+        if(x.action==='stop'){ if(typeof focusMusicStop==='function') focusMusicStop(); return 'music off'; }
+        if(x.action==='next'){ if(ACTIONS.mctlNext) ACTIONS.mctlNext(); return 'next track'; }
+        if(typeof focusMusicPlay==='function') focusMusicPlay(); return 'music on';
+      }
+      case 'set_wake_alarm': {
+        const w = wakeCfg();
+        if(x.time){ if(!/^\d{2}:\d{2}$/.test(x.time)) throw new Error('time must be HH:MM'); w.time = x.time; }
+        if(x.on!=null) w.enabled = !!x.on; else if(x.time) w.enabled = true;
+        persist('focus'); return 'alarm '+(w.enabled ? 'on for '+fmt12Hour(w.time) : 'off');
+      }
+      case 'open_page': {
+        if(x.page==='recap'){ setTimeout(function(){ if(typeof openDayRecap==='function') openDayRecap(); }, 300); return 'opened the recap'; }
+        if(x.page==='xp'){ setTimeout(function(){ ACTIONS.openXpHow(); }, 300); return 'opened How XP works'; }
+        if(x.page==='projected'){ setTimeout(function(){ if(ACTIONS.openProjected) ACTIONS.openProjected(); }, 300); return 'opened his projected self'; }
+        if(x.page==='operator'){ setTimeout(function(){ if(typeof opfOpen==='function') opfOpen(); }, 300); return 'opened your full screen'; }
+        if(x.page==='notifications'){ setTimeout(function(){ if(!ui.notifOpen) ACTIONS.toggleNotifs(); }, 300); return 'opened notifications'; }
+        break;
+      }
+    }
+    return base.apply(this, arguments);
+  };
+})(opRunTool);
+ACTIONS.opUndoDelete = function(){ const d = ui._opDeleted; if(!d) return; state.tasks.items.splice(Math.min(d.i, state.tasks.items.length), 0, d.t); ui._opDeleted = null; persist('tasks'); renderView(); showToast('Back: '+d.t.title, {icon:'&#8617;'}); };
+
+// ---- what he knows: the rest of the open tasks (by name, to find them), and what clients said lately ----
+const OPC_CUE = /\b(send|call|text|email|follow|invoice|pay|paid|owe|waiting|wants?|needs?|asked|promised|by (?:mon|tue|wed|thu|fri|sat|sun|tomorrow|next|end)|deadline|contract|proposal|deliver|due|renew|cancel|raise|upsell|referr)/i;
+function opClientCues(){
+  const out = [], cut = addDays(todayStr(), -21);
+  arr(state.business.clients).filter(function(c){ return typeof clientStageActive!=='function' || clientStageActive(c.stage); }).forEach(function(c){
+    arr(c.journal).filter(function(j){ return j.date >= cut && OPC_CUE.test(j.text||''); }).slice(-2).forEach(function(j){ out.push({who:c.business || c.name, date:j.date, text:String(j.text).replace(/\s+/g, ' ').slice(0, 220)}); });
+  });
+  arr(state.business.pipeline).filter(function(l){ return !l.convertedClientId && l.stage!=='lost' && l.stage!=='closed'; }).forEach(function(l){
+    String(l.notes||'').split('\n').filter(function(n){ const m = /^(\d{4}-\d{2}-\d{2}):/.exec(n); return m && m[1] >= cut && OPC_CUE.test(n); }).slice(-2).forEach(function(n){ out.push({who:l.company || l.name, date:n.slice(0, 10), text:n.slice(12, 232)}); });
+  });
+  return out.sort(function(a, b){ return b.date.localeCompare(a.date); });
+}
+aiContext = (function(base){
+  return function(){
+    let s = base.apply(this, arguments);
+    const later = state.tasks.items.filter(function(t){ return t.status==='backlog'; }).slice(-25).map(function(t){ return t.title; });
+    if(later.length) s += '\nOther open tasks, not on today (so you can find them by name; don’t read these out): '+later.join('; ')+'.';
+    const cues = opClientCues().slice(0, 8);
+    if(cues.length) s += '\nFrom his client logs lately (bring one up only when it’s relevant or it’s been hanging): '+cues.map(function(c){ return c.who+' ('+c.date+'): '+c.text; }).join(' | ');
+    return s;
+  };
+})(aiContext);
+// a client log note can be a nudge too (one a day at most, and only a fresh one)
+opNudgeItems = (function(base){
+  return function(){
+    const out = base.apply(this, arguments), s = typeof opNudgeStore==='function' ? opNudgeStore() : {said:[]};
+    if(!s.said.some(function(id){ return /^cl:/.test(id); })){
+      const c = opClientCues().find(function(c){ return c.date >= addDays(todayStr(), -7); });
+      if(c) out.push({id:'cl:'+c.who+':'+c.date, w:1, short:'what '+c.who+' said', fact:'In his notes on '+c.who+' from '+fmtDateShort(c.date)+': "'+c.text+'". It may need a follow-up.'});
+    }
+    return out;
+  };
+})(opNudgeItems);
+
+// ---- pressing you, all day ----
+// how hard: Settings → Op (Light, Normal, Hard, Off). Normal is about every hour and a half.
+const OPP_GAP = {light:[150, 40], normal:[85, 25], hard:[50, 15]};
+function opPressLevel(){ const v = state.profile.opPress; return v==='off' || v==='light' || v==='hard' ? v : 'normal'; }
+function opPressStore(){ const f = state.focus, t = todayStr(); if(!f.opPress || f.opPress.date!==t) f.opPress = {date:t, n:0, last:0, next:0, kinds:[]}; return f.opPress; }
+function opPressGap(){ const g = OPP_GAP[opPressLevel()] || OPP_GAP.normal; return (g[0] + (Math.random()*2 - 1)*g[1])*60000; }
+function opPressHours(){
+  const w = typeof wakeCfg==='function' ? wakeCfg() : {}, hm = function(s){ const p = String(s||'').split(':'); return (+p[0])*60 + (+p[1] || 0); };
+  return {from:w.enabled && w.time ? hm(w.time) + 60 : 9*60 + 30, to:22*60};
+}
+function opPressDue(){
+  if(opPressLevel()==='off' || !state || !state.focus) return false;
+  if(AI.busy || AI.listening || OV.speaking || OV.pending) return false;
+  const m = state.modes && state.modes.active;
+  if(m && (m.sleep || m.type==='shooting' || m.clockedOut)) return false;
+  if(state.focus.activeSession) return false;                       // (locked in: his quick taps cover that)
+  if(typeof workToday==='function'){ const w = workToday(); if(w.enabled && w.checkins && workPhase()==='work') return false; }   // (work-hours check-ins have it)
+  if(typeof acct==='function' && acct().pending) return false;
+  if(document.querySelector('.overlay:not(.hidden)') || (typeof inspOpenNow==='function' && inspOpenNow() && ui.inspReset)) return false;
+  const h = opPressHours(), mm = nowMin(); if(mm < h.from || mm >= h.to) return false;
+  const s = opPressStore(); if(s.n >= 9) return false;
+  if(Date.now() - Math.max(OV.lastEnd||0, ui._opActiveAt||0, AI.lastAskAt||0) < 18*60000) return false;
+  if(!s.next){ s.next = Date.now() + opPressGap()*0.5; persist('focus'); return false; }
+  return Date.now() >= s.next;
+}
+// the one thing worth raising now (or, every third time, something older that's still hanging)
+function opPressThing(s){
+  const today = todayStr(), plan = typeof todaysPlan==='function' ? todaysPlan().filter(function(t){ return t.status!=='done'; }) : [];
+  const over = state.tasks.items.filter(function(t){ return t.status!=='done' && t.deadline && t.deadline < today; })[0];
+  const dueT = state.tasks.items.filter(function(t){ return t.status!=='done' && t.deadline===today; })[0];
+  const fu = typeof followUpsDue==='function' ? followUpsDue(today)[0] : null;
+  const old = (s.n % 3===2) ? (function(){
+    const cue = opClientCues()[0]; if(cue) return 'From his notes on '+cue.who+' ('+fmtDateShort(cue.date)+'): "'+cue.text+'"';
+    const stale = state.tasks.items.filter(function(t){ return t.status==='backlog' && !t.isVideoIdea && t.createdAt && t.createdAt < addDays(today, -10); })[0];
+    return stale ? 'A task that’s been sitting since '+fmtDateShort(stale.createdAt)+': "'+stale.title+'"' : null;
+  })() : null;
+  return old || (over ? 'Overdue since '+fmtDateShort(over.deadline)+': "'+over.title+'"' : dueT ? 'Due today: "'+dueT.title+'"' : fu ? 'A follow-up with '+fu.name+(fu.late ? ' that’s late' : ' for today')+(fu.note ? ' ('+fu.note+')' : '') : plan[0] ? 'First thing on today’s plan: "'+plan[0].title+'"' : null);
+}
+function opPressFacts(){
+  const dw = typeof deepWorkMinutesTodayLive==='function' ? deepWorkMinutesTodayLive() : 0, target = state.standards.deepWorkTargetMinutes || 180;
+  const plan = typeof todaysPlan==='function' ? todaysPlan() : [], done = plan.filter(function(t){ return t.status==='done'; }).length;
+  return {dw:dw, target:target, done:done, total:plan.length, now:nowHM()};
+}
+async function opPress(force){
+  if(!force && !opPressDue()) return false;
+  const s = opPressStore(), f = opPressFacts(), thing = opPressThing(s), mm = nowMin(), evening = mm >= 18*60;
+  s.n++; s.last = Date.now(); s.next = Date.now() + opPressGap(); persist('focus');
+  const name = (state.profile.name || '').split(' ')[0];
+  // without a key: a plain, pointed line
+  let line = evening ? pickOne(['Day’s winding down. What did you actually get done today?', 'Be straight with me: was today a good one? What got done?'])
+    : !f.dw ? pickOne([(name ? name+', it' : 'It')+'’s '+fmt12Hour(f.now)+' and you haven’t locked in once. What’s going on?', 'Nothing on the board yet today. What’s the holdup?', 'You’ve been quiet. What are you doing right now?'])
+    : f.dw < f.target ? pickOne(['You’ve got '+fmtDurationLabel(f.dw)+' in. What’s the next block?', fmtDurationLabel(f.dw)+' so far. Want me to lock you in for the next one?'])
+    : pickOne(['You hit your hours today. Proud of you. What else is on your mind?', 'Target’s done. Anything you want to knock out while you’re hot?']);
+  if(AI.hasKey===true && typeof aiWrite==='function'){
+    const last = arr(s.kinds).slice(-1)[0];
+    const t = await Promise.race([aiWrite('You’re his accountability partner and you’re pressing him right now (he isn’t locked in). '+
+      'It’s '+fmt12Hour(f.now)+'. Deep work today: '+(f.dw ? fmtDurationLabel(f.dw) : 'none')+' of his '+fmtDurationLabel(f.target)+' target. '+(f.total ? f.done+' of '+f.total+' things on today’s plan done. ' : '')+
+      (thing ? 'One thing you could raise, if it fits: '+thing+'. ' : '')+(last ? 'Last time you pressed him you went with: '+last+'. Do something different. ' : '')+
+      'Say one or two short spoken sentences: '+(evening ? 'ask how the day really went and what got done.' : 'call out what’s real (pushy, with grace or humor), raise that one thing only if it fits, never list anything,')+
+      ' and end with a direct question (what he’s doing right now, when he’s starting, or if you should lock him in).', {max:110}), new Promise(function(r){ setTimeout(r, 8000); })]);
+    if(t) line = t;
+  }
+  if(AI.busy || AI.listening || OV.speaking || OV.pending || state.focus.activeSession) return false;
+  s.kinds = arr(s.kinds).concat([line.slice(0, 80)]).slice(-4); persist('focus');
+  ui._opPressAt = Date.now();
+  AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
+  if(!f.dw && !evening && typeof opMood==='function') opMood('concern', 20000);
+  OV.cap = 'opBubText'; opBubShow();
+  if(opVoiceOn()) opSay(line, {cap:'opBubText'}); else opCaption(line);
+  return true;
+}
+setInterval(function(){ try{ if(opPressDue()) opPress(); }catch(e){} }, 60000);
+aiContext = (function(base){ return function(){ const at = ui._opPressAt; return base.apply(this, arguments)+(at && Date.now() - at < 20*60000 ? '\nYou just pressed him about what he’s doing. If he says he’s about to start something, offer to lock him in or start the task, and do it when he agrees. If he makes an excuse, call it, gently, and hold the line. If he’s genuinely resting or living his life, let him.' : ''); }; })(aiContext);
+// (asking him something counts as Op being active: a press doesn't land right on top of a conversation)
+aiAsk = (function(base){ return function(){ AI.lastAskAt = Date.now(); return base.apply(this, arguments); }; })(aiAsk);
+// Settings → Op: how hard he presses
+ACTIONS.opPressSet = function(el, e, id){ state.profile.opPress = id; persist('profile'); renderView(); };
+if(typeof operatorSettingsHtml==='function') operatorSettingsHtml = (function(base){
+  return function(){
+    const v = opPressLevel(), b = function(k, l){ return '<button class="seg-tab'+(v===k ? ' active' : '')+'" data-action="opPressSet" data-id="'+k+'">'+l+'</button>'; };
+    return base.apply(this, arguments)+'<div class="card section op-settings"><div class="snd-h"><div><div class="section-title" style="margin:0;">&#128170; How hard Op presses you</div><div class="kpi-sub">All day, when you’re not locked in.</div></div>'+
+      '<div class="seg-tabs seg-sm" style="margin:0;">'+b('off', 'Off')+b('light', 'Light')+b('normal', 'Normal')+b('hard', 'Hard')+'</div></div></div>';
+  };
+})(operatorSettingsHtml);
+// ============ OPERATOR, FULL SCREEN (round 30) ============
+// Op, in person: a white plane that goes on forever, soft and dreamy like Inspiration, but this one is
+// him. Knowledge, will, accountability. It's white, and it takes his color as he feels things (the
+// same colors as his light). You can't move it; you don't need to. Click anywhere and write, and he
+// answers right there, because he's everywhere here. Or just talk. Old words drift off on their own.
+// "Chat" is the same conversation in order, every word, like a terminal: what you said, what he said,
+// and what he did. When Op gets to work in the app (finishing a task, setting a follow-up), this is
+// where it shows: he opens it, you watch it happen, and it slips away again when he's done.
+
+const OPF = {open:false, auto:false, touched:false, n:0, cur:null, me:null, slot:0, mode:'plane'};
+function opfIsOpen(){ return OPF.open; }
+function opfMode(){ return state.profile.opfMode==='chat' ? 'chat' : 'plane'; }
+function opfEl(){
+  let el = document.getElementById('opFull');
+  if(el) return el;
+  el = document.createElement('div'); el.id = 'opFull'; el.className = 'opf';
+  let motes = ''; for(let i = 0; i < 34; i++) motes += '<i class="opf-mote" style="left:'+(Math.random()*100).toFixed(1)+'%;top:'+(20 + Math.random()*80).toFixed(1)+'%;animation-duration:'+(9 + Math.random()*14).toFixed(1)+'s;animation-delay:-'+(Math.random()*20).toFixed(1)+'s;transform:scale('+(0.5 + Math.random()).toFixed(2)+')"></i>';
+  el.innerHTML = '<div class="opf-sky"></div><div class="opf-floor"></div><div class="opf-core"></div><div class="opf-motes">'+motes+'</div>'+
+    '<div class="opf-plane" id="opfPlane"></div>'+
+    '<div class="opf-chat" id="opfChat"><div class="opf-log" id="opfLog"></div><div class="opf-live" id="opfLiveRow"><span class="opc-dot"></span><div class="opf-live-t" id="opfLive"></div></div>'+
+      '<div class="opf-prompt"><span class="opf-gt">&gt;</span><textarea id="opfInput" rows="1" placeholder="Talk to Op…" autocomplete="off"></textarea></div></div>'+
+    '<div class="opf-acts" id="opfActs"></div>'+
+    '<div class="opf-top"><button class="opf-x" data-action="opfClose" aria-label="Back to the app">&#10005;</button><div class="opf-name">OPERATOR</div>'+
+      '<div class="opf-modes"><button class="opf-m" data-action="opfSetMode" data-id="plane">Plane</button><button class="opf-m" data-action="opfSetMode" data-id="chat">Chat</button>'+
+      '<button class="opf-m opf-mute" data-action="opMuteToggle" aria-label="Mute Op"></button></div></div>'+
+    '<button class="opf-mic" data-action="opfTalk" aria-label="Talk to Op"><span></span></button>'+
+    '<div class="opf-hint">Click anywhere and write. Or just talk.</div>';
+  document.body.appendChild(el);
+  el.addEventListener('pointerdown', opfPointer);
+  return el;
+}
+function opfSync(){
+  const el = document.getElementById('opFull'); if(!el) return;
+  const m = opfMode(); el.dataset.mode = m;
+  el.querySelectorAll('.opf-m[data-id]').forEach(function(b){ b.classList.toggle('is-on', b.dataset.id===m); });
+  const mu = el.querySelector('.opf-mute'); if(mu){ const on = typeof opMuted==='function' && opMuted(); mu.innerHTML = on ? '&#128263;' : '&#128264;'; mu.classList.toggle('is-on', on); }
+  el.classList.toggle('is-live', !!(OV.speaking || OV.pending));
+  el.classList.toggle('is-listen', !!AI.listening);
+  el.classList.toggle('is-think', !!AI.busy && !(OV.speaking || OV.pending));
+}
+function opfOpen(opts){
+  opts = opts || {};
+  const el = opfEl();
+  OPF.auto = !!opts.auto && !OPF.open; OPF.touched = false;
+  if(!OPF.open){ OPF.open = true; document.body.classList.add('opf-on'); void el.offsetWidth; el.classList.add('is-in'); el.classList.remove('hint-gone'); setTimeout(function(){ el.classList.add('hint-gone'); }, 6500); }
+  const b = document.getElementById('opBub'); if(b){ b.classList.remove('is-in'); }
+  opfSync(); opfChatDraw(true);
+  if(opfMode()==='chat' && !opts.auto) setTimeout(function(){ const i = document.getElementById('opfInput'); if(i) i.focus(); }, 80);
+}
+function opfClose(){
+  const el = document.getElementById('opFull'); if(!el || !OPF.open) return;
+  OPF.open = false; OPF.auto = false; OPF.cur = null; OPF.me = null;
+  el.classList.remove('is-in'); document.body.classList.remove('opf-on');
+  // whatever he was saying carries on in the bubble
+  if(OV.speaking || OV.pending || AI.busy){ OV.cap = 'opBubText'; opBubShow(); }
+}
+ACTIONS.opfOpen = function(){ opfOpen(); };
+ACTIONS.opfClose = function(){ opfClose(); };
+ACTIONS.opfSetMode = function(el, e, id){ state.profile.opfMode = id==='chat' ? 'chat' : 'plane'; persist('profile'); OPF.touched = true; opfSync(); opfChatDraw(true); if(id==='chat') setTimeout(function(){ const i = document.getElementById('opfInput'); if(i) i.focus(); }, 60); };
+ACTIONS.opfTalk = function(){ OPF.touched = true; if(AI.listening){ if(AI.sendNow) AI.sendNow(); return; } AI.typedAt = 0; OV.cap = 'opBubText'; aiListen('opBubText'); };
+document.addEventListener('keydown', function(e){
+  if(!OPF.open) return;
+  OPF.touched = true;
+  if(e.key==='Escape'){ const a = document.activeElement; if(a && a.classList && a.classList.contains('opf-type') && a.value){ a.value = ''; return; } if(a && a.closest && a.closest('.opf-in')){ a.closest('.opf-in').remove(); return; } e.stopPropagation(); opfClose(); return; }
+  // on the plane, just start typing: the words appear somewhere and he's listening
+  if(opfMode()==='plane' && e.key.length===1 && !e.metaKey && !e.ctrlKey && !e.altKey){
+    const a = document.activeElement; if(a && (a.tagName==='INPUT' || a.tagName==='TEXTAREA')) return;
+    const s = opfSlot(); opfInputAt(s.x, s.y);   // (focused now, so this very key lands in it)
+  }
+}, true);
+
+// ---- the plane: write anywhere ----
+function opfPointer(e){
+  OPF.touched = true;
+  if(opfMode()!=='plane') return;
+  if(e.target.closest('.opf-top, .opf-mic, .opf-in, .opf-w, .opf-acts')) return;
+  e.preventDefault();
+  opfInputAt(e.clientX, e.clientY);
+}
+function opfInputAt(x, y){
+  const p = document.getElementById('opfPlane'); if(!p) return null;
+  p.querySelectorAll('.opf-in').forEach(function(n){ if(!n.querySelector('input').value) n.remove(); });
+  const w = document.createElement('div'); w.className = 'opf-in';
+  const left = Math.max(24, Math.min(window.innerWidth - 360, x - 10)), top = Math.max(80, Math.min(window.innerHeight - 160, y - 16));
+  w.style.left = left+'px'; w.style.top = top+'px';
+  w.innerHTML = '<input class="opf-type" placeholder="…" autocomplete="off" spellcheck="false">';
+  p.appendChild(w);
+  const inp = w.querySelector('input');
+  inp.addEventListener('keydown', function(ev){
+    if(ev.key!=='Enter') return; ev.preventDefault();
+    const v = inp.value.trim(); if(!v) return;
+    const at = {x:parseFloat(w.style.left), y:parseFloat(w.style.top)}; w.remove();
+    opfSend(v, at);
+  });
+  inp.focus();
+  return inp;
+}
+// free spots on the plane, around the middle, so lines don't land on each other
+function opfSlot(){
+  const W = window.innerWidth, H = window.innerHeight;
+  const spots = [[0.14, 0.24], [0.56, 0.2], [0.2, 0.58], [0.6, 0.52], [0.36, 0.38], [0.1, 0.74], [0.58, 0.72], [0.34, 0.16]];
+  const taken = Array.prototype.map.call(document.querySelectorAll('#opfPlane .opf-w:not(.is-gone)'), function(n){ return n.getBoundingClientRect(); });
+  for(let k = 0; k < spots.length; k++){
+    const s = spots[(OPF.slot + k) % spots.length], x = s[0]*W, y = s[1]*H;
+    if(!taken.some(function(r){ return x < r.right + 30 && x + 360 > r.left - 30 && y < r.bottom + 30 && y + 90 > r.top - 30; })){ OPF.slot = (OPF.slot + k + 1) % spots.length; return {x:x, y:y}; }
+  }
+  OPF.slot = (OPF.slot + 1) % spots.length; const s = spots[OPF.slot]; return {x:s[0]*W, y:s[1]*H};
+}
+function opfWord(cls, x, y){
+  const p = document.getElementById('opfPlane'); const n = document.createElement('div');
+  n.className = 'opf-w '+cls; n.id = 'opfR'+(++OPF.n); n.dataset.at = Date.now();
+  n.style.left = Math.max(24, Math.min(window.innerWidth - 420, x))+'px'; n.style.top = Math.max(76, Math.min(window.innerHeight - 140, y))+'px';
+  p.appendChild(n);
+  // (only so many on the plane at once: the oldest go first)
+  const all = p.querySelectorAll('.opf-w'); if(all.length > 14) for(let i = 0; i < all.length - 14; i++) opfFade(all[i], true);
+  return n;
+}
+function opfFade(n, now){ if(!n || n.classList.contains('is-gone')) return; n.classList.add('is-gone'); setTimeout(function(){ if(n.parentNode) n.remove(); }, now ? 900 : 2400); }
+// what you wrote stays where you wrote it; his answer comes in just under it
+function opfSend(text, at){
+  OPF.touched = true;
+  if(opfMode()==='chat'){ AI.typedAt = Date.now(); OV.cap = 'opfLive'; aiAsk(text, 'opfLive'); return; }
+  const me = opfWord('opf-me', at.x, at.y); capSet(me, text);
+  const r = me.getBoundingClientRect(), below = r.bottom + 12 + 90 < window.innerHeight;
+  const op = opfWord('opf-op', at.x + 8, below ? r.bottom + 12 : r.top - 100);
+  op.textContent = ''; OPF.cur = op; OPF.me = null;
+  AI.typedAt = 0;
+  aiAsk(text, op.id);
+}
+// a line from him with nowhere set for it: under what you just said, or a free spot
+function opfOpLine(){
+  if(opfMode()==='chat') return 'opfLive';
+  const c = OPF.cur;
+  if(c && c.parentNode && !c.classList.contains('is-gone') && (!c.textContent || c.textContent==='…')) return c.id;
+  const me = OPF.me && OPF.me.parentNode ? OPF.me : null;
+  let pos;
+  if(me){ const r = me.getBoundingClientRect(); pos = {x:r.left + 8, y:r.bottom + 12}; OPF.me = null; }
+  else pos = opfSlot();
+  const n = opfWord('opf-op', pos.x, pos.y); OPF.cur = n; return n.id;
+}
+// you talking: your words show where you'll see them
+function opfMe(text, wait){
+  if(opfMode()==='chat'){ const l = document.getElementById('opfLive'); if(l){ l.classList.toggle('is-me', true); capSet(l, wait ? '' : text); l.dataset.wait = wait ? '1' : ''; } return; }
+  let me = OPF.me && OPF.me.parentNode ? OPF.me : null;
+  if(!me){ const s = opfSlot(); me = opfWord('opf-me', s.x, s.y); OPF.me = me; }
+  me.classList.toggle('is-wait', !!wait);
+  if(wait){ me.textContent = 'Listening…'; return; }
+  capSet(me, text);
+}
+// old words drift off
+setInterval(function(){
+  if(!OPF.open) return;
+  const now = Date.now();
+  document.querySelectorAll('#opfPlane .opf-w').forEach(function(n){
+    const age = now - Number(n.dataset.at||now);
+    if(n===OPF.cur && (OV.speaking || OV.pending || AI.busy)) return;
+    if(age > 150000) opfFade(n); else if(age > 70000) n.classList.add('is-old');
+  });
+  document.querySelectorAll('#opfActs .opf-act').forEach(function(n){ if(now - Number(n.dataset.at||now) > 9000) opfFade(n); });
+}, 3000);
+
+// ---- chat: everything, in order ----
+const OPFC = {sig:''};
+function opfChatDraw(force){
+  if(!OPF.open || opfMode()!=='chat') return;
+  const box = document.getElementById('opfLog'); if(!box) return;
+  const L = typeof opChat==='function' ? opChat() : [];
+  const sig = L.length+'|'+(L.length ? L[L.length-1].at : 0);
+  if(sig===OPFC.sig && !force) return; OPFC.sig = sig;
+  const near = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+  let h = '', day = '';
+  L.slice(-300).forEach(function(e){
+    const d = typeof opChatDay==='function' ? opChatDay(e.at) : ''; if(d!==day){ day = d; h += '<div class="opc-day">'+d+'</div>'; }
+    if(e.r==='me') h += '<div class="opc-me"><span class="opc-gt">&gt;</span><span>'+escapeHtml(e.t)+'</span></div>';
+    else if(e.r==='act') h += '<div class="opc-act"><span class="opc-l">&#9151;</span><span>'+escapeHtml(e.t)+'</span></div>';
+    else h += '<div class="opc-op"><span class="opc-dot"></span><span>'+escapeHtml(e.t)+'</span></div>';
+  });
+  box.innerHTML = h || '<div class="opc-empty">This is everything you and Op say to each other, in order. Type below, or talk.</div>';
+  // (the live line steps aside once what it said is in the log)
+  const live = document.getElementById('opfLive'), last = L[L.length-1];
+  if(live && last && last.r==='op' && !(OV.speaking || OV.pending || AI.busy) && speakable(live.textContent.trim())===speakable(last.t)) live.textContent = '';
+  if(near || force) box.scrollTop = box.scrollHeight;
+}
+document.addEventListener('keydown', function(e){
+  const t = e.target; if(!t || t.id!=='opfInput' || e.key!=='Enter' || e.shiftKey) return;
+  e.preventDefault(); const v = t.value.trim(); if(!v) return; t.value = ''; t.style.height = '';
+  const live = document.getElementById('opfLive'); if(live){ live.textContent = ''; live.classList.remove('is-me'); }
+  opfSend(v, null);
+});
+document.addEventListener('input', function(e){ if(e.target && e.target.id==='opfInput'){ const t = e.target; t.style.height = 'auto'; t.style.height = Math.min(160, t.scrollHeight)+'px'; } });
+
+// ---- where his words go while this is open ----
+opCaption = (function(base){
+  return function(txt){
+    if(OPF.open && (OV.cap==='opBubText' || OV.cap==='opfLive' || /^opfR/.test(OV.cap||''))){
+      if(txt==='Listening…'){ opfMe('', true); return; }
+      if(/^“[\s\S]*”$/.test(String(txt||'')) && AI.listening){ opfMe(String(txt).slice(1, -1)); return; }
+      if(OV.cap==='opBubText') OV.cap = opfOpLine();
+      if(OV.cap==='opfLive'){ const l = document.getElementById('opfLive'); if(l && l.classList.contains('is-me')){ l.classList.remove('is-me'); l.textContent = ''; } }
+    }
+    const r = base.apply(this, arguments);
+    if(OPF.open && OV.cap && OV.cap!=='opBubText'){ const el = document.getElementById(OV.cap); if(el && OV.cap==='opfLive'){ const box = document.getElementById('opfLog'); if(box) box.scrollTop = box.scrollHeight; } }
+    return r;
+  };
+})(opCaption);
+opSay = (function(base){
+  return function(text, opts){
+    opts = opts || {};
+    if(OPF.open && opts.cap==='opBubText'){ opts = Object.assign({}, opts, {cap:opfOpLine()}); if(!opVoiceOn()){ OV.cap = opts.cap; opCaption(text); } }
+    return base(text, opts);
+  };
+})(opSay);
+aiAsk = (function(base){
+  return function(text, cap){
+    if(OPF.open && cap==='opBubText'){ if(OPF.me && OPF.me.parentNode) OPF.me.classList.remove('is-wait'); cap = opfOpLine(); }
+    if(OPF.open && opfMode()==='chat' && cap==='opfLive'){ const live = document.getElementById('opfLive'); if(live){ live.classList.remove('is-me'); live.textContent = ''; } }
+    return Promise.resolve(base.call(this, text, cap)).then(function(r){
+      opfChatDraw(true);
+      if(OPF.open && OPF.auto) opfAutoClose();
+      if(OPF.navClose){ OPF.navClose = false; setTimeout(opfClose, 500); }
+      return r;
+    });
+  };
+})(aiAsk);
+// his lines that weren't answers (presses, nudges) go in the log once they've settled
+const OPFS = {txt:'', since:0, logged:''};
+setInterval(function(){
+  try{
+    opfSync();
+    if(!OPF.open) return;
+    const el = OV.cap && OV.cap!=='opBubText' ? document.getElementById(OV.cap) : null, t = el && /^opf/.test(el.id) ? el.textContent.trim() : '';
+    if(t!==OPFS.txt){ OPFS.txt = t; OPFS.since = Date.now(); }
+    else if(t && t!==OPFS.logged && t!=='…' && !OV.speaking && !OV.pending && !AI.busy && !el.classList.contains('opf-me') && !el.classList.contains('is-me') && Date.now() - OPFS.since > 900){ OPFS.logged = t; if(typeof opChatLog==='function') opChatLog('op', t); }
+    opfChatDraw();
+  }catch(e){}
+}, 300);
+// (the bubble's words, when Op runs things from there, keep pointing at the bubble)
+
+// ---- action mode: when he does things, you see them here ----
+function opfAction(text){
+  if(!OPF.open){ opfOpen({auto:true}); if(!AI.busy) opfAutoClose(); }
+  const box = document.getElementById('opfActs');
+  if(box){ const c = document.createElement('div'); c.className = 'opf-act'; c.dataset.at = Date.now(); c.innerHTML = '<span>&#10003;</span>'+escapeHtml(text.charAt(0).toUpperCase()+text.slice(1)); box.appendChild(c); }
+  if(typeof opChatLog==='function') opChatLog('act', text.charAt(0).toUpperCase()+text.slice(1));
+  if(typeof tone==='function') try{ tone([988, 1319], 0.12, 0.06); }catch(e){}
+}
+function opfAutoClose(){
+  const wait = setInterval(function(){
+    if(!OPF.open || OPF.touched){ clearInterval(wait); return; }
+    if(OV.speaking || OV.pending || AI.busy || AI.listening) return;
+    clearInterval(wait);
+    setTimeout(function(){ if(OPF.open && OPF.auto && !OPF.touched && !AI.listening && !(OV.speaking || OV.pending)) opfClose(); }, 2600);
+  }, 300);
+}
+opRunTool = (function(base){
+  return function(name){
+    const out = base.apply(this, arguments);
+    try{
+      if(OP_ACTION_TOOLS.indexOf(name) >= 0) opfAction(String(out));
+      else if(OP_NAV_TOOLS.indexOf(name) >= 0 && OPF.open && !(name==='open_page' && arguments[1] && arguments[1].page==='operator')) OPF.navClose = true;
+    }catch(e){}
+    return out;
+  };
+})(opRunTool);
+
+// ---- the way in: a button on his bubble, a right-click on his light ----
+opBubShow = (function(base){
+  return function(){
+    const b = base.apply(this, arguments);
+    if(b && !b.querySelector('.op-bub-full')){ const ics = b.querySelector('.op-bub-ics'); if(ics){ const f = document.createElement('button'); f.className = 'op-bub-ic op-bub-full'; f.setAttribute('data-action', 'opfOpen'); f.setAttribute('aria-label', 'Op, full screen'); f.innerHTML = '&#10530;'; ics.insertBefore(f, ics.firstChild); } }
+    if(OPF.open && b) b.classList.remove('is-in');
+    return b;
+  };
+})(opBubShow);
+document.addEventListener('contextmenu', function(e){ if(e.target.closest && e.target.closest('#opLight')){ e.preventDefault(); opfOpen(); } });
+// (the mute button here and in the bubble stay in step)
+ACTIONS.opMuteToggle = (function(base){ return function(){ const r = base.apply(this, arguments); opfSync(); return r; }; })(ACTIONS.opMuteToggle);
+// ============ WORK TO REVIEW: ONE NOTICE, THE SYSTEM WAY (round 30) ============
+// Sessions that start on their own (auto lock-in) need a quick look in the recap: was that really work,
+// and on what. They used to come up one at a time; now it's one line in the bell, "Review 3 sessions",
+// and a SYSTEM window (the same look as leveling up) that pops up in the middle with a sound, counts
+// down, and closes itself after 30 seconds if you leave it. It comes back when there's more to review,
+// or a few hours later if it's still waiting. Never while you're locked in or asleep.
+
+function reviewPending(){
+  const t = todayStr(), y = addDays(t, -1);
+  const on = function(d){ return typeof sessionsOn==='function' ? sessionsOn(d).filter(function(s){ return s.auto && !s.reviewed; }).length : 0; };
+  const ny = on(y), nt = on(t);
+  return {n:ny + nt, date:ny ? y : t};
+}
+// the bell: one line for all of them
+notifList = (function(base){
+  return function(){
+    const out = base.apply(this, arguments), r = reviewPending();
+    if(r.n){
+      const key = 'review:'+todayStr()+':'+r.n, dis = notifDismissed();
+      if(dis[key]!==todayStr()) out.unshift({key:key, kind:'review', level:'warn', icon:'&#128202;', title:'You need to review '+r.n+' session'+(r.n===1 ? '' : 's'), sub:'Work that started on its own. Keep it, or put it on a task.', act:{a:'openReview'}, sort:0});
+    }
+    return out;
+  };
+})(notifList);
+notifPanelHtml = (function(base){
+  return function(list){
+    let h = base.apply(this, arguments);
+    const items = arr(list).filter(function(n){ return n.kind==='review'; }); if(!items.length) return h;
+    const g = '<div class="nt-group"><div class="nt-k">Review</div>'+items.map(function(n){
+      return '<div class="nt-item is-'+n.level+'" data-key="np-'+escapeHtml(n.key)+'"><button class="nt-main" data-action="notifOpen" data-id="'+escapeHtml(n.key)+'"><span class="nt-i">'+n.icon+'</span><span class="nt-txt"><span class="nt-t">'+escapeHtml(n.title)+'</span><span class="nt-s">'+escapeHtml(n.sub)+'</span></span></button><button class="nt-dismiss" data-action="notifDismiss" data-id="'+escapeHtml(n.key)+'" title="Hide for today">&#10005;</button></div>';
+    }).join('')+'</div>';
+    // (right under the header; and no "all clear" when this is the only thing)
+    h = h.replace(/<div class="nt-empty">[\s\S]*$/, '');
+    const at = h.indexOf('</div>', h.indexOf('nt-head')) + 6;
+    return h.slice(0, at)+g+h.slice(at);
+  };
+})(notifPanelHtml);
+ACTIONS.notifOpen = (function(base){
+  return function(el, e, key){
+    if(/^review:/.test(String(key||''))){ ui.notifOpen = false; const p = document.getElementById('notifPanel'); if(p) p.hidden = true; ACTIONS.openReview(); return; }
+    return base.apply(this, arguments);
+  };
+})(ACTIONS.notifOpen);
+ACTIONS.openReview = function(){
+  ACTIONS.sysRevClose();
+  const r = reviewPending();
+  if(r.date!==todayStr() && ACTIONS.openRecapYesterday) ACTIONS.openRecapYesterday(); else if(ACTIONS.openRecapToday) ACTIONS.openRecapToday(); else if(typeof openDayRecap==='function') openDayRecap();
+};
+
+// ---- the SYSTEM window ----
+function sysRevSound(){
+  if(typeof tone!=='function') return;
+  [784, 988].forEach(function(f, i){ setTimeout(function(){ tone([f], 0.16, 0.16); }, i*120); });
+  setTimeout(function(){ tone([659, 988, 1319], 0.5, 0.14); }, 280);
+}
+function sysRevShow(n){
+  const old = document.getElementById('sysRev'); if(old) old.remove();
+  const d = document.createElement('div'); d.id = 'sysRev'; d.className = 'sys-win sys-rev';
+  d.innerHTML = '<div class="sys-card"><div class="sys-k">[ SYSTEM ]</div>'+
+    '<div class="sys-title">Review your work</div>'+
+    '<div class="sys-sub">'+n+' session'+(n===1 ? '' : 's')+' started on '+(n===1 ? 'its' : 'their')+' own. Confirm '+(n===1 ? 'it' : 'them')+' so the record stays honest.</div>'+
+    '<div class="sys-rev-n"><b>'+n+'</b><span>to review</span></div>'+
+    '<div class="sys-rev-acts"><button class="sys-ok sys-rev-go" data-action="openReview">Review now</button><button class="sys-ok sys-rev-later" data-action="sysRevClose">Later</button></div>'+
+    '<div class="sys-rev-time"><i id="sysRevBar"></i></div></div>';
+  document.body.appendChild(d);
+  requestAnimationFrame(function(){ d.classList.add('is-in'); const b = document.getElementById('sysRevBar'); if(b){ b.style.transition = 'width 30s linear'; b.style.width = '0%'; } });
+  sysRevSound();
+  clearTimeout(sysRevShow._t); sysRevShow._t = setTimeout(function(){ ACTIONS.sysRevClose(); }, 30000);
+}
+ACTIONS.sysRevClose = function(){ clearTimeout(sysRevShow._t); const d = document.getElementById('sysRev'); if(!d) return; d.classList.remove('is-in'); d.classList.add('is-out'); setTimeout(function(){ if(d.parentNode) d.remove(); }, 320); };
+// when it comes up: something new to review, or still waiting a few hours later
+function sysRevDue(){
+  if(!state || !state.focus) return 0;
+  const r = reviewPending(); if(!r.n) return 0;
+  const m = state.modes && state.modes.active;
+  if(state.focus.activeSession || (m && m.sleep) || document.hidden) return 0;
+  if(document.querySelector('.overlay:not(.hidden)') || document.getElementById('sysWin') || document.getElementById('sysRev') || (typeof opfIsOpen==='function' && opfIsOpen())) return 0;
+  const h = new Date().getHours(); if(h < 7 || h >= 23) return 0;
+  const s = state.focus.revPop || {};
+  if(r.n > (s.n||0) && Date.now() - (s.at||0) > 20*60000) return r.n;
+  if(Date.now() - (s.at||0) > 3*3600000) return r.n;
+  return 0;
+}
+function sysRevTick(){ const n = sysRevDue(); if(!n) return; state.focus.revPop = {at:Date.now(), n:n}; persist('focus'); sysRevShow(n); }
+// (it replaces the old one-by-one notes; the evening "recap is ready" stays, once)
+maybeShowRecap = function(){
+  if(state.focus.activeSession || document.querySelector('.overlay:not(.hidden)')) return;
+  const seen = state.focus.recapSeen || {}, today = todayStr();
+  const rt = (state.settings.appTracking && state.settings.appTracking.recapTime) || '21:30';
+  if(!seen[today] && !recapNudged[today] && nowHM() >= rt && sessionsOn(today).length){
+    recapNudged[today] = true;
+    showToast('Your day recap is ready.', {icon:'&#128202;', actionLabel:'Open', actionAction:'openRecapToday', duration:15000});
+  }
+};
+setInterval(function(){ try{ sysRevTick(); }catch(e){} }, 60000);
+setTimeout(function(){ try{ sysRevTick(); }catch(e){} }, 9000);
+// ============ YOUR PROJECTED SELF (round 30) ============
+// Who you'd be if you lived locked in every single day from the day this started: eight hours of deep
+// work, eating right, training, the weight coming off at a healthy pace, your number of new clients
+// signed every month (and your price creeping up as you get better at it). It plays your character
+// forward with the game's own rules: the XP and level, the MRR and what that is a year, the clients,
+// your weight and Health, the rank. Next to it, where you actually are, so you can see the gap.
+// Each rank comes with how that life probably looks (where you live, what you drive, how you travel,
+// what you've done for your people), and with a key Op writes it for you, from your numbers.
+// It starts the day you first open this version (for someone new: the day they get the app).
+
+function projBase(){
+  const p = state.profile;
+  if(!p.proj || !p.proj.start){
+    const x = xpSummary(), b = bodyStats();
+    p.proj = {start:todayStr(), at:Date.now(), xp:x.total, level:x.level, mrr:xpMrr(), clients:projClientsNow(), w:b.w || null, h:b.h || null, kg:!!b.kg, health:x.attrs.HLT.v};
+    persist('profile');
+  }
+  // (height and weight added later: the body starts from the first weigh-in after)
+  if(p.proj.w==null){ const b = bodyStats(); if(b.w && b.h){ p.proj.w = b.w; p.proj.h = b.h; p.proj.kg = !!b.kg; persist('profile'); } }
+  return p.proj;
+}
+function pjMoney(n){ return n >= 1e6 ? '$'+(n/1e6).toFixed(n >= 1e7 ? 1 : 2).replace(/\.?0+$/, '')+'M' : money(n); }
+function projClientsNow(){ return arr(state.business.clients).filter(function(c){ return typeof clientStageActive!=='function' || clientStageActive(c.stage); }).length; }
+function projAssume(){
+  const paying = arr(state.business.clients).filter(function(c){ return Number(c.mrr) > 0; });
+  const avg = paying.length ? paying.reduce(function(a, c){ return a + Number(c.mrr); }, 0)/paying.length : 1000;
+  return {hours:8, days:5.5, perMonth:Number(state.standards.newClientsPerMonth) || 2, price:Math.round(avg/50)*50 || 1000, growth:0.02, top:2.5, loss:0.0075};
+}
+// a locked-in week and month, in XP, by the game's own rules
+function projWeekXp(){
+  const day = (xpDeep(480, 0).xp + XP_RATES.goldDay)*1.28 + xpTasks(8) + (XP_RATES.outreach*3 + XP_RATES.outreachEach*3);
+  return day*5.5 + 205 + 3*CHECKIN_XP.weekGoal + CHECKIN_XP.weekIn + CHECKIN_XP.weekOut + 2*MASTER_XP.weekly;
+}
+function projMonthXp(){ return 3*CHECKIN_XP.monthGoal + CHECKIN_XP.monthIn + CHECKIN_XP.monthOut + CHECKIN_XP.habit; }
+function projGoalWeight(b){
+  const g = Number(state.profile.goalWeight);
+  if(g > 0) return g;
+  if(b.h){ const lb = 23*b.h*b.h/703; return Math.round(b.kg ? lb/2.20462 : lb); }
+  return Math.round(b.w*0.88);
+}
+// you, d days after the start, locked in the whole way
+function projAt(d){
+  const s = projBase(), A = projAssume(), months = d/30.44, weeks = d/7;
+  // clients and money: your number every month, each one at a price that creeps up as you get better
+  let mrr = s.mrr, added = 0; const full = Math.floor(months);
+  const priceAt = function(m){ return A.price*Math.min(A.top, Math.pow(1 + A.growth, m)); };
+  for(let m = 1; m <= full; m++){ mrr += A.perMonth*priceAt(m); added += A.perMonth; }
+  const frac = months - full; if(frac > 0){ const k = Math.floor(A.perMonth*frac); mrr += k*priceAt(full + 1); added += k; }
+  mrr = Math.round(mrr/50)*50;
+  const xp = Math.round(s.xp + projWeekXp()*weeks + projMonthXp()*full + added*XP_RATES.client + Math.max(0, mrr - s.mrr)/1000*XP_RATES.mrrPerK);
+  const level = Math.min(LEVEL_MAX, xpLevelOf(xp));
+  // the body: about 0.75% a week (never more than 2 lb), down to a healthy weight, and held there
+  let w = s.w, bmi = null;
+  if(w){
+    const goal = projGoalWeight({w:s.w, h:s.h, kg:s.kg}), cap = s.kg ? 0.9 : 2;
+    for(let i = 0; i < Math.floor(weeks) && w > goal; i++) w = Math.max(goal, w - Math.min(cap, w*A.loss));
+    w = Math.round(w);
+    if(s.h){ const lb = s.kg ? w*2.20462 : w; bmi = 703*lb/(s.h*s.h); }
+  }
+  const top = Math.min(94, healthCap(bmi)), health = Math.round(s.health + (top - s.health)*(1 - Math.exp(-weeks/6)));
+  let rank = 0; RANKS.forEach(function(rk, i){ if(level >= rk.level && mrr >= rk.mrr && health >= rk.health) rank = i; });
+  const bus = Math.round(25 + 75*(0.45*Math.min(1, Math.sqrt(mrr/83400)) + 0.55*Math.min(1, weeks/8)));
+  const ovr = Math.round((bus + health + Math.min(96, 60 + weeks*3) + Math.min(90, 55 + weeks*2))/4);
+  return {d:d, date:addDays(s.start, d), mrr:mrr, year:mrr*12, clients:s.clients + added, xp:xp, level:level, w:w, bmi:bmi, health:health, rank:rank, hours:Math.round(A.hours*A.days*weeks), ovr:ovr, weeks:weeks};
+}
+function projNow(){
+  const x = xpSummary(), b = bodyStats(), s = projBase();
+  const hrs = Math.round(arr(state.focus.sessions).filter(function(z){ return z.date >= s.start; }).reduce(function(a, z){ return a + (Number(z.minutes)||0); }, 0)/60);
+  return {level:x.level, rank:x.rank, mrr:xpMrr(), clients:projClientsNow(), w:b.w || null, bmi:b.bmi, health:x.attrs.HLT.v, hours:hrs, ovr:x.ovr, xp:x.total};
+}
+const PROJ_MARKS = [[30, 'In a month'], [91, 'In 3 months'], [182, 'In 6 months'], [365, 'In a year'], [730, 'In 2 years'], [1826, 'In 5 years']];
+
+// ---- how each rank lives (Op writes his own version from your life, with a key) ----
+const RANK_LIFE = [
+  'Still at your parents’ place, and not because you want to be. Whatever comes in goes straight back out: a card that lives near its limit, bills paid late, every train fare counted. No car. Weekends are quiet because plans cost money, and if you’re honest you’re closer to the edge than you like to say. The one thing you own outright is your hours, and that’s exactly where this starts.',
+  'Rent’s covered, just. Your own room or a first place with a roommate, paying your way. The debt stops growing. A used car or a monthly pass, and for the first time a little left at the end of the month. People start asking what you do.',
+  'Your own apartment, nothing crazy, but yours. A reliable car with a payment you don’t sweat. The debt shrinks every month. You eat out without checking the price first, take a real trip once a year, and cover one of your mom’s bills now and then.',
+  'Six figures. A nice place in a good part of town, a car you actually wanted, and the debt’s gone. You fly when you feel like it, you pick up the check, and your mom finally stops worrying about you. You start investing instead of just saving.',
+  'A high-rise with a view. A car people turn their heads for, and a small team doing what you used to do yourself. Several trips a year, good seats, good hotels. You’re covering your mom’s rent so she can cut her hours. Your money works while you sleep.',
+  'A place you own with two nice cars in the garage. First class is just how you fly now. Your mom works because she wants to, not because she has to, and the family knows who to call. The people around you changed: builders, owners, people who move.',
+  'You bought your mom a house. A penthouse waits for you at home while you go country to country on the best flights, working from wherever you land. The company runs without you in the room. Your body is part of it now: a trainer, a chef, sleep dialed in.',
+  'Real estate, investments, a team of teams. More than one home and a car for every mood. You fly the whole family out and never look at the bill. You fund other people’s dreams now, and your name opens doors before you knock.',
+  'A million a year. A high-rise waiting at home while you’re overseas, a driver, the best table anywhere you go, and nothing on your calendar you didn’t choose. Your mom is retired in the house you bought her, your people are set for life, and you’re in the best shape you’ve ever been in. Free.'
+];
+function projRankLife(i){ const r = state.profile.rankLife; return (r && Array.isArray(r.list) && r.list[i]) || RANK_LIFE[i]; }
+// how you'd look: a line from the numbers (Op writes a better one with a key)
+function projLook(pt, i){
+  if(!pt.w) return 'Add your height and weight in Settings and this shows the body too.';
+  const b = pt.bmi, wk = pt.weeks;
+  if(i < 0 || wk < 1) return 'Where you are today.';
+  if(b!=null && b < 25 && wk >= 26) return 'Lean and athletic: definition in your arms and shoulders, a tight waist, clear skin, and the kind of posture people notice when you walk in.';
+  if(b!=null && b < 25) return 'In the healthy range and getting sharper every week: your face leaner, clothes fitting how they’re supposed to, strength showing.';
+  if(b!=null && b < 30) return 'Noticeably slimmer. Your face is sharper, your clothes hang looser, and you move easier. The strength is starting to show through.';
+  return 'Lighter and stronger than you are right now, the weight coming off steadily, more energy every week.';
+}
+function projFigure(pt, color){
+  const b = pt.bmi!=null ? pt.bmi : 26, f = Math.max(0, Math.min(1, (b - 19)/20)), m = Math.max(0, Math.min(1, pt.weeks/30));
+  const sw = 21 + m*4 + f*5, ww = 11 + f*17, hw = 13 + f*10, aw = 5 + f*3 + m*1.5;
+  const c = 50;
+  return '<svg class="pj-fig" viewBox="0 0 100 170" aria-hidden="true"><defs><linearGradient id="pjg'+pt.d+'" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="'+color+'" stop-opacity=".55"/></linearGradient></defs>'+
+    '<g fill="url(#pjg'+pt.d+')" stroke="'+color+'" stroke-opacity=".6" stroke-width="1.2">'+
+    '<circle cx="50" cy="17" r="11"/>'+
+    '<path d="M'+(c-sw)+' 38 Q'+c+' 30 '+(c+sw)+' 38 L'+(c+ww+2)+' 74 Q'+(c+hw)+' 92 '+(c+hw)+' 96 L'+(c-hw)+' 96 Q'+(c-hw)+' 92 '+(c-ww-2)+' 74 Z"/>'+
+    '<path d="M'+(c-sw)+' 39 Q'+(c-sw-aw)+' 66 '+(c-sw-aw*0.6)+' 92 L'+(c-sw+aw*0.4)+' 92 Q'+(c-sw+2)+' 66 '+(c-sw+aw)+' 46 Z"/>'+
+    '<path d="M'+(c+sw)+' 39 Q'+(c+sw+aw)+' 66 '+(c+sw+aw*0.6)+' 92 L'+(c+sw-aw*0.4)+' 92 Q'+(c+sw-2)+' 66 '+(c+sw-aw)+' 46 Z"/>'+
+    '<path d="M'+(c-hw)+' 96 L'+(c-hw*0.55)+' 162 L'+(c-2)+' 162 L'+c+' 104 L'+(c+2)+' 162 L'+(c+hw*0.55)+' 162 L'+(c+hw)+' 96 Z"/>'+
+    '</g></svg>';
+}
+// ---- the page ----
+function projCard(pt, label, ai, i){
+  const rk = RANKS[pt.rank], u = projBase().kg ? 'kg' : 'lb';
+  return '<div class="pj-card" style="--rc:'+rk.color+'"><div class="pj-when"><b>'+label+'</b><span>'+fmtDateShort(pt.date)+'</span></div>'+
+    '<div class="pj-body">'+projFigure(pt, rk.color)+'<div class="pj-stats">'+
+      '<div class="pj-rank">'+rankBadgeSvg(pt.rank, 30)+'<div><b>'+escapeHtml(rk.name)+'</b><small>Level '+pt.level+'</small></div></div>'+
+      '<div class="pj-kv"><span>MRR</span><b>'+pjMoney(pt.mrr)+'</b></div><div class="pj-kv"><span>A year</span><b>'+pjMoney(pt.year)+'</b></div>'+
+      '<div class="pj-kv"><span>Clients</span><b>'+pt.clients+'</b></div>'+(pt.w ? '<div class="pj-kv"><span>Weight</span><b>'+pt.w+' '+u+'</b></div>' : '')+
+      '<div class="pj-kv"><span>Health</span><b>'+pt.health+'</b></div><div class="pj-kv"><span>Deep work</span><b>'+pt.hours.toLocaleString()+'h</b></div></div></div>'+
+    '<div class="pj-look"><small>How you’d look</small>'+escapeHtml((ai && ai.looks && ai.looks[i]) || projLook(pt, i))+'</div>'+
+    '<div class="pj-life"><small>How you live</small>'+escapeHtml((ai && ai.lives && ai.lives[i]) || projRankLife(pt.rank))+'</div></div>';
+}
+ACTIONS.openProjected = function(){
+  const o = xpHowOverlay(), s = projBase(), A = projAssume(), day = Math.max(0, Math.round((localTs(todayStr(), '12:00') - localTs(s.start, '12:00'))/86400000));
+  const want = projAt(day), now = projNow(), marks = PROJ_MARKS.map(function(m){ return projAt(m[0]); });
+  const ai = state.profile.projAi && state.profile.projAi.key===projAiKey(marks) ? state.profile.projAi : null;
+  const u = s.kg ? 'kg' : 'lb';
+  const row = function(k, a, b, fmt, lowerBetter){ const ok = a==null || b==null ? null : lowerBetter ? b <= a : b >= a; return '<div class="pj-row"><span>'+k+'</span><b>'+(a==null ? '–' : fmt(a))+'</b><b class="'+(ok==null ? '' : ok ? 'is-ok' : 'is-behind')+'">'+(b==null ? '–' : fmt(b))+'</b></div>'; };
+  const id = function(v){ return String(v); };
+  document.getElementById('xpHowContent').innerHTML =
+    '<div class="xpg-top"><button class="xpg-back" data-action="openXpHow">&larr; How XP works</button><div class="xph-k">[ SYSTEM ]</div>'+(AI.hasKey===true ? '<button class="xpg-hist-btn" data-action="projAiWrite">&#10024; '+(ai ? 'Have Op rewrite it' : 'Have Op write it for you')+'</button>' : '')+'</div>'+
+    '<h1>Your projected self</h1>'+
+    '<div class="xph-lead">If you lived locked in every day from <b>'+fmtDateShort(s.start)+'</b>: '+A.hours+' hours of deep work a day, eating right and training, your weight coming down at a healthy pace, '+A.perMonth+' new client'+(A.perMonth===1 ? '' : 's')+' every month. This is who that makes you.</div>'+
+    '<div class="xpg-sec">Today, day '+day+'</div>'+
+    '<div class="pj-now"><div class="pj-row pj-head"><span></span><b>Locked in</b><b>You</b></div>'+
+      row('Rank', want.rank, now.rank, function(i){ return RANKS[i].name; })+row('Level', want.level, now.level, id)+row('MRR', want.mrr, now.mrr, money)+row('Clients', want.clients, now.clients, id)+
+      (want.w ? row('Weight', want.w, now.w, function(v){ return v+' '+u; }, true) : '')+row('Health', want.health, now.health, id)+row('Deep work since', want.hours, now.hours, function(v){ return v+'h'; })+'</div>'+
+    '<div class="xpg-sec">Where it goes</div>'+
+    '<div class="pj-line">'+marks.map(function(pt, i){ return projCard(pt, PROJ_MARKS[i][1], ai, i); }).join('')+'</div>'+
+    '<div class="xpg-sec">How each rank lives</div>'+
+    '<div class="pj-ranks">'+RANKS.map(function(rk, i){ return '<div class="pj-rk'+(i===now.rank ? ' is-you' : '')+'" style="--rc:'+rk.color+'">'+rankBadgeSvg(i, 34)+'<div><div class="pj-rk-h"><b>'+escapeHtml(rk.name)+'</b><span>'+(rk.mrr ? pjMoney(rk.mrr*12)+' a year' : 'Starting out')+'</span>'+(i===now.rank ? '<em>You are here</em>' : '')+'</div><p>'+escapeHtml(projRankLife(i))+'</p></div></div>'; }).join('')+'</div>'+
+    '<div class="pj-math"><b>The math.</b> The game’s own XP rules, played forward: a gold day of deep work every work day (5.5 a week) with the strong-day bonus, 8 tasks a day, a few touches of outreach, four workouts a week, three weekly and three monthly goals, the check-ins, the rings. '+A.perMonth+' new clients a month at '+money(A.price)+' (your average), the price creeping up 2% a month as you get better (to 2.5 times what you charge now, at most), nobody lost. Weight down about 0.75% a week (never more than '+(s.kg ? '0.9 kg' : '2 lb')+') to '+(state.profile.goalWeight ? 'your goal' : 'a healthy weight for your height')+', then held. Health climbs toward what your body allows. Rank needs the level, the MRR and the Health, same as the real thing.</div>';
+  o.classList.remove('hidden'); o.scrollTop = 0;
+};
+// ---- Op writes it: how you'd look and how you'd live at each point, and each rank, for you ----
+function projAiKey(marks){ return projBase().start+'|'+marks.map(function(m){ return m.rank+':'+Math.round(m.mrr/1000); }).join(','); }
+function projJson(t){ const a = String(t||''), i = a.indexOf('{'), j = a.lastIndexOf('}'); if(i < 0 || j < i) return null; try{ return JSON.parse(a.slice(i, j + 1)); }catch(e){ return null; } }
+ACTIONS.projAiWrite = async function(){
+  if(AI.hasKey!==true || typeof aiWrite!=='function') return;
+  const marks = PROJ_MARKS.map(function(m){ return projAt(m[0]); }), s = projBase(), u = s.kg ? 'kg' : 'lb';
+  showToast('Op’s writing it…', {icon:'&#10024;'});
+  const about = typeof aboutYouContext==='function' ? aboutYouContext() : '';
+  const facts = marks.map(function(pt, i){ return PROJ_MARKS[i][1]+': rank '+RANKS[pt.rank].name+', '+money(pt.mrr)+' a month ('+money(pt.year)+' a year), '+pt.clients+' clients'+(pt.w ? ', '+pt.w+' '+u+(pt.bmi ? ' (BMI '+pt.bmi.toFixed(1)+')' : '') : '')+', Health '+pt.health+'/100, '+Math.round(pt.weeks)+' weeks of training and eating right'; }).join('\n');
+  const t = await aiWrite('Write his projected self: who he becomes if he lives locked in every day from today. Here is the projection:\n'+facts+'\n\nAbout him: '+about+
+    '\n\nReturn only JSON: {"looks":[6 strings],"lives":[6 strings],"ranks":[9 strings]}. "looks": for each point, one or two sentences on how he probably looks then (from the weight, BMI and months of training). "lives": for each point, three or four sentences on how his life probably is at that income: where he lives, what he drives, how he travels, what he’s done for his family (his mom especially), his days, who’s around him. Grounded in the money: modest early, then big. "ranks": for each of these ranks in order ('+RANKS.map(function(r){ return r.name+' ('+(r.mrr ? money(r.mrr*12)+'/yr' : 'starting out')+')'; }).join(', ')+'), three sentences on how someone at that rank lives. The first rank is honest about being broke: living with his parents, debt, no car, counting fares, not much of a life yet. The top ranks: countries on the best flights, a high-rise waiting at home, more than one nice car, he bought his mom a house and she doesn’t have to work. Second person ("you"), present tense, vivid and specific, no slurs or crude language, no markdown.', {max:1800});
+  const j = projJson(t);
+  if(!j){ showToast('Op couldn’t write it just now. Try again in a bit.', {icon:'&#9888;&#65039;'}); return; }
+  const fix = function(a, n){ return Array.isArray(a) ? a.slice(0, n).map(function(x){ return opNoDash(String(x||'')).slice(0, 700); }) : null; };
+  state.profile.projAi = {key:projAiKey(marks), at:Date.now(), looks:fix(j.looks, 6), lives:fix(j.lives, 6)};
+  if(Array.isArray(j.ranks) && j.ranks.length >= 9) state.profile.rankLife = {at:Date.now(), list:fix(j.ranks, 9)};
+  persist('profile');
+  const o = document.getElementById('xpHowOverlay'); if(o && !o.classList.contains('hidden')) ACTIONS.openProjected();
+};
+// ---- the way in: How XP works shows a glimpse, and the top bar a button ----
+ACTIONS.openXpHow = (function(base){
+  return function(){
+    const r = base.apply(this, arguments);
+    try{
+      const c = document.getElementById('xpHowContent'), yr = projAt(365), rk = RANKS[yr.rank];
+      const top = c.querySelector('.xpg-top'); if(top && !top.querySelector('[data-action="openProjected"]')){ const b = document.createElement('button'); b.className = 'xpg-hist-btn'; b.setAttribute('data-action', 'openProjected'); b.innerHTML = '&#128302; Projected self'; top.appendChild(b); }
+      const you = c.querySelector('.xpg-you');
+      if(you && !c.querySelector('.pj-tease')){
+        const t = document.createElement('button'); t.className = 'pj-tease'; t.setAttribute('data-action', 'openProjected'); t.style.setProperty('--rc', rk.color);
+        t.innerHTML = rankBadgeSvg(yr.rank, 40)+'<span><small>&#128302; Your projected self, a year from '+fmtDateShort(projBase().start)+', locked in</small><b>'+escapeHtml(rk.name)+' · Level '+yr.level+' · '+pjMoney(yr.mrr)+'/mo · '+yr.clients+' clients</b></span><em>See it &#8594;</em>';
+        you.parentNode.insertBefore(t, you.nextSibling);
+      }
+    }catch(e){}
+    return r;
+  };
+})(ACTIONS.openXpHow);
+// (the clock starts the day this arrives)
+setTimeout(function(){ try{ if(state && state.profile) projBase(); }catch(e){} }, 3000);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

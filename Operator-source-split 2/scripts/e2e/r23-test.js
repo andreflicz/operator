@@ -133,7 +133,7 @@ async function ctxPage(b, seed, opts){
     check('…and keeps ideas for the app (in Settings)', await E("state.settings.opIdeas[0].text")==='Show client birthdays');
     await E("AI.hasKey = true; AI.history = [{role:'user', content:'I like to train before work. Also JJS wants more reels.'}, {role:'assistant', content:'Noted.'}]; opMemFrom = 0"); await E("opMemoryDistill()"); await p.waitForTimeout(300);
     check('memory builds itself after a conversation', await E("opMemory().some(m => /train before work/.test(m.text)) && opMemory().some(m => /more reels/.test(m.text))"));
-    await E("OV.cap = 'brVoice'; opCaption('Something said where no caption box is open')"); await p.waitForTimeout(200);
+    await E("opfClose(); OV.cap = 'brVoice'; opCaption('Something said where no caption box is open')");   // (round 30: Op's tools opened his full screen; back to the app first) await p.waitForTimeout(200);
     check('whatever Op says has captions: no box on screen → the bubble', await p.isVisible('#opBub.is-in') && /no caption box/.test(await p.textContent('#opBubText')));
     check('no page errors (op)', p.errors.length===0, p.errors);
     await p.context().close();
