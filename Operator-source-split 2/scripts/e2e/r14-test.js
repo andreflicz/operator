@@ -27,8 +27,7 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
   {
     const p = await newPage(b, OUT+'/r14.html', {profile:{name:'Andre'}, focus:{wake:{enabled:true, time:'07:00', days:[1,2,3,4,5,6]}}}, new Date(2026,9,11,10,0).getTime()); // Sunday
     await p.setViewportSize({width:2200, height:1100}); await p.waitForTimeout(600);
-    const r = await p.evaluate(() => { const n = document.querySelector('.np.rest'); const x = n.getBoundingClientRect(); return [x.left, Math.round(x.width), innerWidth]; });
-    check('day off fills the whole wide window', Math.abs(r[0]) < 1 && r[1]===r[2], r);
+    check('a rest day is plain Today (round 27: no Day off screen)', !(await p.$('.np.rest')) && await p.isVisible('.today-hero'));
     await p.context().close();
   }
 

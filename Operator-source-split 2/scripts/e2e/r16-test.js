@@ -119,9 +119,10 @@ const FAKE_SPEECH = () => {
     const cap = JSON.parse(await E("JSON.stringify(state.journal.capsules.slice(-1)[0])"));
     check('…sealed for a surprise morning (1–12 months out), not in the journal yet', cap && cap.text==='Did you keep going?' && cap.openOn > '2026-11-08' && cap.openOn <= '2027-10-10' && !(await E("state.journal.entries.some(e => e.text==='Did you keep going?')")), cap);
     await p.waitForTimeout(1300);
+    // round 27: clocking out starts the wind-down; the note opens from Good morning's ✎ (or here)
     await E("ACTIONS.clockOut()"); await p.waitForTimeout(600);
-    check('clocked out before a day off: "Note for tomorrow" is right there', await p.isVisible('.np.rest [data-action="openTomorrowNote"]'));
-    await p.click('.np.rest [data-action="openTomorrowNote"]'); await p.waitForTimeout(300);
+    check('clocking out starts the wind-down', await p.isVisible('#windOverlay:not(.hidden)'));
+    await E("hideOverlay('windOverlay'); openTomorrowNote()"); await p.waitForTimeout(300);
     await p.fill('#tnHead', 'Rest. Then Monday.'); await p.fill('#tnMorning', 'Slow coffee, long walk.'); await p.fill('#tnWork', 'Call Mike first.');
     await p.click('[data-action="saveTomorrowNote"]'); await p.waitForTimeout(300);
     const nn = JSON.parse(await E("JSON.stringify(nightNote(morningNoteTarget()))"));

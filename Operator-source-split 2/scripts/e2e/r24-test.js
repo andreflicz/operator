@@ -106,10 +106,11 @@ const BOARD = {boards:[{id:'v1', kind:'vision', name:'Vision', parentId:null, vi
     const p = await ctxPage(b, {profile:{name:'Andre'}, focus:{wake:Object.assign({}, WAKE, {voice:false})}}, {clock:new Date(2026,9,14,18,0,5).getTime()});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(200);
-    await p.click('[data-action="clockOut"]'); await p.waitForTimeout(400);
+    await p.click('[data-action="clockOut"]'); await p.waitForTimeout(600);
+    await E("ACTIONS.windDone()"); await p.waitForTimeout(300); // (round 27: clocking out starts with the wind-down)
     check('clock out: no "done for the day" toast, no flash', !/Done for the day/.test(await p.evaluate(() => document.body.innerText)) && !(await p.$('.lock-flash.is-clock')));
     check('…a full-screen clocked-out page', await p.isVisible('#viewRoot .np.rest.is-clockedout.rest-full') && await E("document.body.classList.contains('np-on')") && /That’s the day/.test(await p.textContent('.dayoff-h')));
-    await p.click('.dayoff-back[data-action="clockIn"]'); await p.waitForTimeout(400);
+    await p.click('[data-action="clockIn"]'); await p.waitForTimeout(400);
     check('…Clock back in still works', !(await E("!!(state.modes.active && state.modes.active.clockedOut)")));
     await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); showOverlay('wakeSetupOverlay'); renderWakeSetupInto()"); await p.waitForTimeout(200);
     await p.fill('#wakeSetupContent [data-wake="places"]', 'Riverside Park, Blue Bottle'); await p.dispatchEvent('#wakeSetupContent [data-wake="places"]', 'change'); await p.waitForTimeout(200);

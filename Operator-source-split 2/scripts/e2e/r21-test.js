@@ -23,7 +23,7 @@ function aiRoute(log, opts){
       if(Array.isArray(last.content) && last.content.some(c => c.type==='tool_result')) return reply('Done, sir. It’s on today’s list, and I’ve made a note of the gym thing.');
       if(body.tools && /add a task/i.test(text)) return r.fulfill({status:200, headers:CORS, body:JSON.stringify({stop_reason:'tool_use', content:[{type:'text', text:'On it.'},
         {type:'tool_use', id:'t1', name:'add_task', input:{title:'Call the accountant', list:'today'}}, {type:'tool_use', id:'t2', name:'remember', input:{fact:'Trains at 6am before work.'}}]})});
-      if(/narration lines/.test(text)){ const keys = (text.split('\n\n').pop()||'').split('\n').map(l => l.split(':')[0]).filter(Boolean); return reply(keys.map(k => k+': OP-LINE '+k+'.').join('\n')); }
+      if(/lines you’ll say out loud/.test(text)){ const keys = (text.split('\n\n').pop()||'').split('\n').map(l => l.split(':')[0]).filter(Boolean); return reply(keys.map(k => k+': OP-LINE '+k+'.').join('\n')); }
       if(/Numbers:/.test(text) && /Pattern:/.test(text)) return reply('Pattern: READ '+log.length+' Tuesday carried the week.\nWatch: Thursday slipped to zero.\nMove: Block 9 to 12 tomorrow.');
       if(/Numbers:/.test(text)) return reply('READ '+(log.filter(b => !b.tools).length)+': Tuesday carried the week; protect your mornings.');
       if(/rundown|Brief me/.test(text)) return reply('OP-RUNDOWN: the Giants won and that is what matters.');
@@ -129,7 +129,7 @@ async function ctxPage(b, seed, opts){
     await E("ACTIONS.sysClose(); document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'))");
     await E("fireWake({})"); await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(1500);
     await E("renderWakeOverlayInto()"); await p.waitForTimeout(300);
-    check('Good morning: Op rewrites the narration in its own words (same facts)', log.some(x => /narration lines/.test(x.messages[0].content)) && await E("ui.briefLines.some(l => /OP-LINE/.test(l.text))"));
+    check('Good morning: Op rewrites the narration in its own words (same facts)', log.some(x => /lines you’ll say out loud/.test(x.messages[0].content)) && await E("ui.briefLines.some(l => /OP-LINE/.test(l.text))"));
     check('no page errors (reads)', p.errors.length===0, p.errors);
     await p.context().close();
   }

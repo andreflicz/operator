@@ -100,7 +100,7 @@ async function ctxPage(b, seed, opts){
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     const subs = await E("JSON.stringify(Object.fromEntries(['BUS','PER','DIS'].map(k=>[k, xpSummary().attrs[k].subs.map(s=>s.label)])))");
     // (round 20: Discipline is standards kept / follow-through / check-ins; Personal drops Reflection; Client growth is Scaling)
-    check('Discipline: reliability, consistency (round 25: no Integrity)', /"DIS":\["Reliability","Consistency"\]/.test(subs), subs);
+    check('Discipline: reliability, consistency, action (round 27)', /"DIS":\["Reliability","Consistency","Action"\]/.test(subs), subs);
     check('Personal: content, goals, finances, mind — no “Video ideas”, no Reflection', /"PER":\["Content","Goals","Finances","Mind"\]/.test(subs), subs);
     check('clients typed in recently don’t count as Scaling (start dates do)', await E("xpSummary().attrs.BUS.subs.find(s=>s.label==='Scaling').v")===25);
     check('Finances: 40% paid off and a payment this month', /40% paid off/.test(await E("financeRating().note")) && await E("financeRating().f") > .3);
@@ -144,8 +144,8 @@ async function ctxPage(b, seed, opts){
     check(vw.width+': For a Good Day rolls (a reel of the morning, four at a time)', (await p.$$('.gd-reel .gd-i')).length >= 8 && await p.isVisible('.gd-dots'));
     const i0 = await E("ui.gdIdx||0"); await p.clock.runFor(5600); await p.waitForTimeout(200);
     check(vw.width+': …and it moves on by itself', await E("ui.gdIdx||0")!==i0);
-    check(vw.width+': Today has its own room — '+(wide ? 'on top of the headlines' : 'under the weather'), await p.$(wide ? '.c-c .br-day' : '.c-a .br-day')!==null && /Call with JJS/.test(await p.textContent('.br-day')));
-    check(vw.width+': sports is a scoreboard — results and what’s coming up', (await p.$$('.br-sports .sb-row')).length>=2 && /Results/.test(await p.textContent('.br-sports')) && /Coming up/.test(await p.textContent('.br-sports')));
+    check(vw.width+': Today has its own room — '+'under the weather (round 27: always the first column)', await p.$('.c-a .br-day')!==null && /Call with JJS/.test(await p.textContent('.br-day')));
+    check(vw.width+': sports is a scoreboard — results and what’s coming up', (await p.$$('.br-sports .sb-row')).length>=2 && /results/i.test(await p.textContent('.br-sports')) && /coming up/i.test(await p.textContent('.br-sports')));
     const box = await p.evaluate(() => { const v = document.querySelector('.brief4 .br-voice'); return v ? v.getBoundingClientRect().height : 0; });
     await E("document.getElementById('brVoice').textContent = 'A much longer line of narration that would have wrapped onto a second line and pushed every panel below it down the page'");
     const box2 = await p.evaluate(() => document.querySelector('.brief4 .br-voice').getBoundingClientRect().height);

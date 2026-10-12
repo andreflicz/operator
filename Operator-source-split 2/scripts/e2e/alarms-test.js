@@ -41,7 +41,7 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   p = await newPage(b, OUT+'/al.html', {focus:{wake:{enabled:true, time:'07:00', days:[1,2,3,4,5,6]}}}, at(1,0));
   E = (code) => p.evaluate(c => window.__op.ev(c), code);
   check('at 1 AM "tomorrow" means this morning', await E("wakeTargetDate()==='2026-10-07'"));
-  await p.click('[data-action="openWindDown"]');
+  await E("openWindDown()"); await p.waitForTimeout(200);   // (round 27: the wind-down opens from Clock out)
   await p.click('#windOverlay [data-action="windStep"][data-id="alarm"]');
   await p.click('#windOverlay [data-action="openWakeSetup"]');
   check('wind down (at 1 AM) opens the wake-up alarm setup', await p.isVisible('#wakeSetupOverlay .ws-time'));
@@ -77,7 +77,7 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   await p.click('#windOverlay [data-action="windStep"][data-id="alarm"]');
   check('wind down pre-fills tomorrow\'s wake time', (await p.inputValue('#windAlarm'))==='07:00');
   await p.fill('#windAlarm', '06:15');
-  await p.click('#windOverlay [data-action="windSaveOnly"]');
+  await p.click('#windOverlay [data-action="windDone"]');   // (round 27: Done)
   check('night plan sets a one-morning wake time', await E("const o=state.focus.wake.override; o && o.date==='2026-10-08' && o.time==='06:15'"));
   check('no stray one-off alarm created', await E("state.focus.alarms.length===0"));
   await p.clock.setSystemTime(at(6,15,8)); await E('checkAllAlarms()');

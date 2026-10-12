@@ -65,7 +65,7 @@ const day = (base, n) => { const d = new Date(base); d.setDate(d.getDate()+n); r
     let h = await fresh();
     const all = JSON.parse(await E("JSON.stringify(['BUS','PER','HLT','DIS'].map(k => xpSummaryFresh().attrs[k].subs.map(s => s.label)))"));
     // (round 23: Content is back on Business too, both just called Content)
-    check('every stat is one word, Content on Business and Personal', all.flat().every(l => !/\s/.test(l)) && all[0][3]==='Content' && all[1][0]==='Content' && all[2].length===3 && all[3].length===2, all);
+    check('every stat is one word, Content on Business and Personal', all.flat().every(l => !/\s/.test(l)) && all[0][3]==='Content' && all[1][0]==='Content' && all[2].length===3 && all[3].length===3, all);
     check('Health: Training · Diet · Weight (no Sleep)', JSON.stringify(h.subs.map(s => s.label))==='["Training","Diet","Weight"]', h.subs.map(s => s.label));
     const h0 = h.v;
     check('at 250 lb and 5′10″ (BMI 35.9) the ceiling is about 60', h.cap >= 55 && h.cap <= 60, h.cap);
@@ -98,7 +98,7 @@ const day = (base, n) => { const d = new Date(base); d.setDate(d.getDate()+n); r
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     const D = () => E("xpLast=null, JSON.stringify(xpSummaryFresh().attrs.DIS)").then(JSON.parse);
     let d = await D();
-    check('Discipline: Reliability · Consistency (round 25)', JSON.stringify(d.subs.map(s => s.label))==='["Reliability","Consistency"]', d.subs.map(s => s.label));
+    check('Discipline: Reliability · Consistency · Action (round 27)', JSON.stringify(d.subs.map(s => s.label))==='["Reliability","Consistency","Action"]', d.subs.map(s => s.label));
     // two weeks ago: nothing. The last two weeks: deep work and a task every day, workouts
     const ss = [], ts = [], gs = [];
     for(let i=1;i<=14;i++){ ss.push("{id:'s"+i+"', date:'"+day(T, -i)+"', minutes:150, type:'deep'}"); ts.push("{id:'t"+i+"', title:'x', status:'done', completedAt:'"+day(T, -i)+"'}"); }
@@ -119,7 +119,7 @@ const day = (base, n) => { const d = new Date(base); d.setDate(d.getDate()+n); r
     await E("ui.view='personal'; ui.personalTab='you'; renderView()"); await p.waitForTimeout(300);
     check('You: no "Your body" panel any more', !(await p.$('.you .you-body')) && !/Your body/.test(await p.textContent('.you')));
     // (round 23: no text under the stats; it's in the guide and on hover)
-    check('…every stat explains itself on hover (no text under it)', (await p.$$('.you .you-sub small')).length===0 && (await p.$$('.you .you-sub[title]')).length===13);
+    check('…every stat explains itself on hover (no text under it)', (await p.$$('.you .you-sub small')).length===0 && (await p.$$('.you .you-sub[title]')).length===14);
     check('…the last 7 days against the week before, and your records', await p.isVisible('.you-recent .yr-tiles') && (await p.$$('.yr-t')).length >= 5 && /longest day of deep work/.test(await p.textContent('.yr-recs')) && /5\.0h/.test(await p.textContent('.yr-recs')));
     await p.click('.you-q'); await p.waitForTimeout(200);
     const guide = await p.textContent('#xpHowContent');

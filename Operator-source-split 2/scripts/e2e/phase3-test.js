@@ -99,8 +99,8 @@ const SP = require('./common.js').OUT;
   check('task became reminder with time', await E("!!state.focus.reminders.find(r=>r.fromTaskId==='t3' && r.time==='22:30')") && await E("!state.tasks.items.some(t=>t.id==='t3')"));
   // night plan
   await p.click('[data-action="nav"][data-view="today"]');
-  check('wind down shown at 9pm', await p.isVisible('[data-action="openWindDown"]'));
-  await p.click('[data-action="openWindDown"]');
+  check('clock out shown at 9pm (round 27: it starts the wind-down)', await p.isVisible('.today-hero [data-action="clockOut"]'));
+  await p.click('.today-hero [data-action="clockOut"]'); await p.waitForTimeout(700);
   check('wind down opens on the recap', await p.isVisible('#windOverlay:not(.hidden) .wd-steps'));
   await p.click('#windOverlay [data-action="windNext"]');
   await E("ui.wind.plan = []; renderWindInto();");

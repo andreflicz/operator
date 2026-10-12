@@ -157,7 +157,7 @@ const newsRoute = (asked, extra) => async r => {
     await E("ui.view='focus'; renderView()"); await p.waitForTimeout(400);
     check('Focus (not locked in) has a Minimal button', await p.isVisible('.lv-corner.is-focus [data-action="toggleFocusMinimal"]'));
     await p.click('[data-action="toggleFocusMinimal"]'); await p.waitForTimeout(700);
-    check('minimal: the clock, your level, your streak, LOCK IN and a few buttons', await p.isVisible('.np-home .hm-clock #npClockT') && await p.isVisible('.np-home .hm-lvl') && /day streak/.test(await p.textContent('.np-home')) && await p.isVisible('.np-home .hm-go') && (await p.$$('.np-home .hm-b')).length===3);
+    check('minimal: the clock, your level, your streak, LOCK IN and a few buttons', await p.isVisible('.np-home .hm-clock #npClockT') && await p.isVisible('.np-home .hm-lvl') && /day streak/.test(await p.textContent('.np-home')) && await p.isVisible('.np-home .hm-go') && (await p.$$('.np-home .hm-b')).length===2);
     check('…and nothing under LOCK IN but space', !/Up next/.test(await p.textContent('.np-home')));
     check('…full screen (the sidebar steps aside)', await E("document.body.classList.contains('np-on')") && asked.includes('/window/full?f=1'));
     await p.keyboard.press('m'); await p.waitForTimeout(800);

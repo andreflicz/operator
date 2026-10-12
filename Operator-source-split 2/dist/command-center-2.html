@@ -3195,7 +3195,8 @@
   .rest-s span{ font-size:12.5px; color:rgba(255,255,255,.6); }
   .rest-work{ font-size:12.5px; font-weight:600; padding:0 14px; width:auto !important; }
   body.np-on .np.rest.rest-full{ border-radius:0; }
-  @media (prefers-reduced-motion:reduce){ .np.is-dayoff .np-bg{ animation:none; } }
+  .np.rest .dayoff-bg{ animation:restDrift 26s ease-in-out infinite alternate; }
+  @media (prefers-reduced-motion:reduce){ .np.is-dayoff .np-bg, .np.rest .dayoff-bg{ animation:none; } }
 
   .wi-wk-bars{ height:64px; padding-bottom:0; margin-bottom:18px; } .wi-wk-goal{ margin-bottom:0; }
   #planOverlay .wi-inner{ justify-content:center; } #planOverlay .wi .pr-cta{ margin-top:22px; padding-top:0; }
@@ -25754,8 +25755,8 @@ function xpAttributes(ctx){
   const months = [newIn(0, 30), newIn(30, 60), newIn(60, 90)];
   // (round 27) this month counts most; hitting your standard every month is the top, and going over it
   // supercharges the whole Business rating a little
-  const mF = months.map(function(n){ return Math.min(1.5, n/perMonth); });
-  const growthRaw = .5*mF[0] + .3*mF[1] + .2*mF[2], growthF = Math.min(1, growthRaw), superF = Math.max(0, growthRaw - 1);
+  const mF = months.map(function(n){ return Math.min(1, n/perMonth); });
+  const growthF = .5*mF[0] + .3*mF[1] + .2*mF[2], superF = Math.max(0, Math.min(1.5, months[0]/perMonth) - 1);
   // content: what's out against what you set (Settings → Goals & Standards); Instagram posts count too
   const contentF = function(role){
     const tg = state.standards.contentTargets && state.standards.contentTargets[role];

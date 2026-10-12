@@ -197,13 +197,13 @@ async function ctxPage(b, seed, opts){
   {
     const p = await ctxPage(b, base, {clock:at(18, 5)});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    check('five more tracks, made to float', await E("FOCUS_TRACKS.filter(t => t.dream).length")===5 && await E("FOCUS_TRACKS.some(t => t.name==='Cloud Nine') && FOCUS_TRACKS.some(t => t.name==='Tide')"));
+    check('five more tracks, made to float (more since)', await E("FOCUS_TRACKS.filter(t => t.dream).length")>=5 && await E("FOCUS_TRACKS.some(t => t.name==='Cloud Nine') && FOCUS_TRACKS.some(t => t.name==='Tide')"));
     check('…each has its own sound', await E("['swell','musicbox','glass','ocean'].every(s => typeof fmDream(s)==='function') && fmDream('lofi')===null"));
     await E("openInspire()"); await p.waitForTimeout(900);
     check('Inspiration opens on one of the dreamy tracks', await E("FM.playing && FOCUS_TRACKS[FM.idx].dream===true"));
     check('the sky has aurora, rising lights and a glow that follows you', !!(await p.$('#insp .insp-aurora')) && (await p.$$('#insp .insp-bokeh i')).length===10 && !!(await p.$('#insp .insp-glow')));
     const tools = await p.$$eval('#insp .izk', els => els.map(e => e.textContent.trim()));
-    check('a sandbox bar: Thought, Wish, Words, Breathe, the sky, Drift', JSON.stringify(tools)==='["✎Thought","✦Wish","❝Words","❍Breathe","☾Dusk","≈Drift"]', tools);
+    check('a sandbox bar: Thought, Wish, Words, Breathe, the sky, Drift', JSON.stringify(tools)==='["✎Thought","✦Wish","❝Words","❍Breathe","☾Dusk","〰Stream","≈Drift"]', tools);
     check('the week (reading, meditating, walks…) lives here now', /This week/.test(await p.textContent('#insp .insp-lately')) && (await p.$$('#insp .izl-w')).length===6);
     await p.click('#insp [data-action="inspToolWish"]'); await p.waitForTimeout(300);
     await p.keyboard.type('A house by the ocean'); await p.waitForTimeout(100);

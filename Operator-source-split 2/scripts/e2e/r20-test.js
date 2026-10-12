@@ -31,10 +31,10 @@ async function ctxPage(b, seed, opts){
     const subs = JSON.parse(await E("JSON.stringify(Object.fromEntries(['BUS','PER','HLT','DIS'].map(k => [k, xpSummaryFresh().attrs[k].subs.map(s => s.label)])))"));
     // (round 22: every stat one word, three a rating; one Content stat; no Sleep)
     // (round 23: Content is on both, just called Content)
-    check('Business: MRR · Grind · Scaling · Content (no Clients, no "Time put in")', JSON.stringify(subs.BUS)===JSON.stringify(['MRR', 'Grind', 'Scaling', 'Content']), subs.BUS);
+    check('Business: MRR · Focus · Scaling · Content (round 27: Grind is Focus)', JSON.stringify(subs.BUS)===JSON.stringify(['MRR', 'Focus', 'Scaling', 'Content']), subs.BUS);
     check('Personal: Content · Goals · Finances · Mind (no Reflection)', JSON.stringify(subs.PER)===JSON.stringify(['Content', 'Goals', 'Finances', 'Mind']), subs.PER);
     check('Health: Training · Diet · Weight', JSON.stringify(subs.HLT)===JSON.stringify(['Training', 'Diet', 'Weight']), subs.HLT);
-    check('Discipline: Reliability · Consistency (no On target, no Streak)', JSON.stringify(subs.DIS)===JSON.stringify(['Reliability', 'Consistency']), subs.DIS);
+    check('Discipline: Reliability · Consistency · Action (round 27)', JSON.stringify(subs.DIS)===JSON.stringify(['Reliability', 'Consistency', 'Action']), subs.DIS);
     const all = [].concat(subs.BUS, subs.PER, subs.HLT, subs.DIS);
     check('…and no stat appears twice in a rating', ['BUS','PER','HLT','DIS'].every(k => new Set(subs[k]).size===subs[k].length));
     const inDebt = JSON.parse(await E("JSON.stringify(financeRating())"));
@@ -49,7 +49,7 @@ async function ctxPage(b, seed, opts){
     check('…nothing entered: not rated (no free points)', await E("financeRating().f")===null);
     await E("ui.view='personal'; ui.personalTab='you'; renderView(); ACTIONS.openXpHow()"); await p.waitForTimeout(200);
     const guide = await p.textContent('#xpHowContent');
-    check('the guide explains Grind, Scaling, check-ins and master goals', /Grind/.test(guide) && /Scaling/.test(guide) && /check out/i.test(guide) && /master goal/i.test(guide) && !/Reflection/.test(guide));
+    check('the guide explains Focus, Scaling, check-ins and master goals', /Focus/.test(guide) && /Scaling/.test(guide) && /check out/i.test(guide) && /master goal/i.test(guide) && !/Reflection/.test(guide));
     check('no page errors (ratings)', p.errors.length===0, p.errors);
     await p.context().close();
   }
@@ -212,10 +212,10 @@ async function ctxPage(b, seed, opts){
     check('…top stories ask for the top (not one radio network)', seen.some(u => /\/news\?t=top/.test(u)));
     check('…as many as fit — nothing half-cut, no big gap under them', await p.evaluate(() => { const l = document.querySelector('.br-news-list'); const vis = [...l.children].filter(c => !c.classList.contains('is-cut')); const last = vis[vis.length-1]; return vis.length >= 4 && l.getBoundingClientRect().bottom - last.getBoundingClientRect().bottom < 60; }));
     check('sports that can’t be reached says so (and offers to try now)', /Couldn’t reach ESPN/.test(await p.textContent('.br-sports')) && await p.isVisible('.br-sports [data-action="scoresRetry"]'));
-    check('…it asks for MLB and NHL too, not just NFL/NBA', ['nfl', 'nba', 'mlb', 'nhl'].every(l => seen.some(u => u.includes('/sports?l='+l))));
+    check('…it asks for the leagues you follow (NFL and NBA by default; round 27: no baseball unless you pick it)', ['nfl', 'nba'].every(l => seen.some(u => u.includes('/sports?l='+l))) && !seen.some(u => u.includes('/sports?l=mlb')));
     sportsFail = false;
     await p.clock.runFor(21000); await p.waitForTimeout(800);
-    check('…and tries again on its own: the scores show up (yesterday’s result, tonight’s game)', (await p.$$('.br-sports .sb-row')).length>=2 && /Giants/.test(await p.textContent('.br-sports')) && /Yankees|Red Sox/.test(await p.textContent('.br-sports')), await p.textContent('.br-sports'));
+    check('…and tries again on its own: the scores show up (yesterday’s result, tonight’s game)', (await p.$$('.br-sports .sb-row')).length>=1 && /Giants/.test(await p.textContent('.br-sports')), await p.textContent('.br-sports'));
     check('no strip of plain sky at the bottom while it rises in (the wash covers the whole screen)', await p.evaluate(() => { const st = [...document.styleSheets].flatMap(s => { try{ return [...s.cssRules]; }catch(e){ return []; } }).filter(r => r.selectorText==='#wakeOverlay.is-entering::after'); return st.some(r => /-25vh/.test(r.style.inset || r.style.top)); }));
     check('no page errors (Good morning)', p.errors.length===0, p.errors);
     await p.context().close();

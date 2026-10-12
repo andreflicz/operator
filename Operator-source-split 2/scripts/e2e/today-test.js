@@ -25,12 +25,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('.next-picker [data-action="pickNextTask"][data-id="t3"]');
   check('picking a backlog task moves it to today and makes it next', await E("state.tasks.items.find(t=>t.id==='t3').status")==='today' && (await E("nextUpTask().title")).includes('Script hooks'));
   check('next pick is saved', await E("state.focus.nextTaskId")==='t3');
-  // take today off: one click, with an Undo right there
-  await p.click('[data-action="quickDayOff"]');
-  check('one click takes the day off', await E("isDayOff(todayStr())"));
-  check('…with an Undo', await p.isVisible('#toastContainer [data-action="quickDayOffUndo"]'));
-  await p.click('#toastContainer [data-action="quickDayOffUndo"]');
-  check('undo puts the day back', !(await E("isDayOff(todayStr())")));
+  // round 27: no Day off button; rest days come from your work schedule
+  check('no Day off button (rest days come from your schedule)', !(await p.$('[data-action="quickDayOff"]')) && !(await E("isDayOff(todayStr())")));
   // right-click a task
   await p.click('[data-action="nav"][data-view="focus"]'); await p.click('[data-action="focusMainTab"][data-tab="tasks"]');
   await p.click('[data-task-id="t1"]', {button:'right'});

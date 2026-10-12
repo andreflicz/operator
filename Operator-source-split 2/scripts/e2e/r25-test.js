@@ -164,9 +164,9 @@ const WORK = {enabled:true, start:'09:00', end:'17:00', days:[0,1,2,3,4,5,6], lu
     check('lunch: no check-in', !(await E("!!acct().pending")));
     // the log
     await p.clock.setFixedTime(at(13, 30));
-    await E("ui.view='personal'; ui.personalTab='you'; renderView()"); await p.waitForTimeout(300);
+    await E("ui.view='focus'; ui.focusTab='analytics'; renderView()"); await p.waitForTimeout(300); // (round 27: the log moved to Focus → Analytics)
     const rows = await p.$$('.acl-r');
-    check('every check-in is logged on You, colour-coded', rows.length >= 5 && await p.$('.acl-r.is-fault') && await p.$('.acl-r.is-excused') && await p.$('.acl-r.is-working'));
+    check('every check-in is logged, colour-coded', rows.length >= 5 && await p.$('.acl-r.is-fault') && await p.$('.acl-r.is-excused') && await p.$('.acl-r.is-working'));
     const s0 = await E("acctScore()");
     await p.click('.acl-r.is-fault .acl-v'); await p.waitForTimeout(300);
     check('…and a verdict can be changed later (it stops counting)', !(await p.$('.acl-r.is-fault')) && await E("acctScore()") > s0);

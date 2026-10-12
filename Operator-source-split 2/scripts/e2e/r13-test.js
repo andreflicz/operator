@@ -72,24 +72,15 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.context().close();
   }
 
-  // ---- day off: automatic from the alarm days, full screen, flash both ways ----
+  // ---- rest days: automatic from the alarm days; round 27 removed the Day off screen, so it's just Today ----
   {
     const wake = {wake:{enabled:true, time:'07:00', days:[1,2,3,4,5,6]}};
     const p = await newPage(b, OUT+'/r13.html', {profile:{name:'Andre'}, focus:wake}, new Date(2026,9,11,10,0).getTime()); // Sunday
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await p.waitForTimeout(900);
-    check('Sunday (no alarm that day) → day off automatically', await E("isDayOff(todayStr())") && await p.isVisible('.np.rest.is-dayoff'));
-    check('minimal: "Day off." and a few stats', /Day off\./.test(await p.textContent('.rest-h')) && (await p.$$('.rest-s')).length>=2 && !/Rest is part of the plan/.test(await p.textContent('#viewRoot')));
-    check('full screen by default (sidebar steps aside)', await E("document.body.classList.contains('np-on')"));
-    await p.click('[data-action="toggleRestFull"]'); await p.waitForTimeout(300);
-    check('the corner button gives the sidebar back', !(await E("document.body.classList.contains('np-on')")) && await p.isVisible('.np.rest'));
-    await p.click('[data-action="quickDayOff"]'); await p.waitForTimeout(500); // (the day off fades out first)
-    check('turning it off plays a flash', await p.$('.lock-flash.is-dayoff')!==null);
-    await p.waitForTimeout(400);
-    check('…and today counts again', !(await E("isDayOff(todayStr())")) && !(await p.$('.np.rest')));
-    await E("renderView()"); await p.waitForTimeout(300);
-    check('it doesn\'t switch itself back on the same day', !(await E("isDayOff(todayStr())")));
-    check('no page errors on the day off', p.errors.length===0, p.errors);
+    check('Sunday (no alarm that day) is a rest day', await E("isDayOff(todayStr())"));
+    check('…but there is no Day off screen or button', !(await p.$('.np.rest.is-dayoff')) && !(await p.$('[data-action="quickDayOff"]')) && await p.isVisible('.today-hero'));
+    check('no page errors on the rest day', p.errors.length===0, p.errors);
     await p.context().close();
   }
   {
@@ -97,7 +88,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await p.waitForTimeout(500);
     check('Saturday is a work day', !(await E("isDayOff(todayStr())")));
-    await E("ACTIONS.clockOut()"); await p.waitForTimeout(500);
+    await E("ACTIONS.clockOut()"); await p.waitForTimeout(600);
+    await E("ACTIONS.windDone()"); await p.waitForTimeout(300);
     check('clocking out before a day off → the full-screen weekend view', await p.isVisible('.np.rest.is-weekend') && /That’s the week/.test(await p.textContent('.dayoff-h')) && await E("document.body.classList.contains('np-on')"));
     await E("ui.view='today'; renderView()");
     await p.click('[data-action="clockIn"]').catch(()=>{}); await p.waitForTimeout(500);

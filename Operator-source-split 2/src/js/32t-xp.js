@@ -416,8 +416,8 @@ function xpAttributes(ctx){
   const months = [newIn(0, 30), newIn(30, 60), newIn(60, 90)];
   // (round 27) this month counts most; hitting your standard every month is the top, and going over it
   // supercharges the whole Business rating a little
-  const mF = months.map(function(n){ return Math.min(1.5, n/perMonth); });
-  const growthRaw = .5*mF[0] + .3*mF[1] + .2*mF[2], growthF = Math.min(1, growthRaw), superF = Math.max(0, growthRaw - 1);
+  const mF = months.map(function(n){ return Math.min(1, n/perMonth); });
+  const growthF = .5*mF[0] + .3*mF[1] + .2*mF[2], superF = Math.max(0, Math.min(1.5, months[0]/perMonth) - 1);
   // content: what's out against what you set (Settings → Goals & Standards); Instagram posts count too
   const contentF = function(role){
     const tg = state.standards.contentTargets && state.standards.contentTargets[role];

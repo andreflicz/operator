@@ -145,12 +145,12 @@ async function newPage(browser, seed, clockAt){
       {id:'s0', date:'2026-10-03', startedAt:+new Date(2026,9,3,9), endedAt:+new Date(2026,9,3,10), minutes:60, completedTasks:[]}
     ]}
   }, sat);
-  // round 13: the day-off view is the minimal full-screen ".np.rest.is-dayoff" with heading "Day off."
-  check('1.3 day-off view before midnight', await page.isVisible('#viewRoot .np.rest.is-dayoff') && (await page.textContent('#viewRoot')).includes('Day off.'));
+  // round 27: there's no Day off screen any more; a rest day just shows Today (the streak stays safe)
+  check('1.3 rest day before midnight: plain Today, no day-off screen', await page.evaluate(() => window.__op.ev("isDayOff(todayStr())")) && !(await page.$('#viewRoot .is-dayoff')) && /Saturday/.test(await page.textContent('#viewRoot')));
   await page.clock.runFor(15000);
   await page.waitForTimeout(100);
   const txt = await page.textContent('#viewRoot');
-  check('1.3 rolled over to Sunday without interaction', !txt.includes('Day off.') && !(await page.$('#viewRoot .is-dayoff')) && /Sunday/.test(txt), txt.slice(0,160));
+  check('1.3 rolled over to Sunday without interaction', !(await page.$('#viewRoot .is-dayoff')) && /Sunday/.test(txt), txt.slice(0,160));
   const week = await page.evaluate(() => { const v=document.querySelector('.tw-chip .tw-v'), s=document.querySelector('.tw-chip .tw-s'); return [v&&v.textContent, s&&s.textContent, document.querySelector('.tw-bars i')&&document.querySelector('.tw-bars i').title]; });
   check('1.3 week resets on Sunday (0m on Sunday)', week[0]==='0m' && /this week/.test(week[1]) && /^Sun/.test(week[2]), week);
   check('no page errors (rollover)', page.errors.length===0, page.errors);

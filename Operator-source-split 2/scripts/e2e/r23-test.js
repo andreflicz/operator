@@ -82,9 +82,9 @@ async function ctxPage(b, seed, opts){
     const p = await ctxPage(b, {profile:{name:'Andre', heightIn:70}, health:{gymLog:[], weightLog:[{id:'w', date:'2026-10-10', weight:250}], calorieEntries:[]}}, {clock:WED});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     const subs = JSON.parse(await E("JSON.stringify(Object.fromEntries(['BUS','PER'].map(k => [k, xpSummaryFresh().attrs[k].subs.map(s => s.label)])))"));
-    check('Content on both: Business has its Content, Personal has its own', subs.BUS.join()==='MRR,Grind,Scaling,Content' && subs.PER.join()==='Content,Goals,Finances,Mind', subs);
+    check('Content on both: Business has its Content, Personal has its own', subs.BUS.join()==='MRR,Focus,Scaling,Content' && subs.PER.join()==='Content,Goals,Finances,Mind', subs);
     await E("ui.view='personal'; ui.personalTab='you'; renderView()"); await p.waitForTimeout(300);
-    check('You: no text under the stats', (await p.$$('.you .you-sub small')).length===0 && (await p.$$('.you .you-sub')).length===13);
+    check('You: no text under the stats', (await p.$$('.you .you-sub small')).length===0 && (await p.$$('.you .you-sub')).length===14);
     await E("ui.personalTab='fitness'; renderView()"); await p.waitForTimeout(300);
     check('Health score: a ring, three numbers, the BMI scale, no explaining text', await p.isVisible('#healthScore .hsc-ring') && (await p.$$('#healthScore .hsc-t')).length===3 && !(await p.$('#healthScore .hs-note, #healthScore .hsc-how')));
     check('…the ceiling is a notch on the ring and a quiet "max"', await p.$('#healthScore .hsc-ring-n')!==null && /max \d+/.test(await p.textContent('#healthScore .hsc-max')));
