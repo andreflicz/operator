@@ -115,7 +115,7 @@ const WORK = {enabled:true, start:'09:00', end:'17:00', days:[0,1,2,3,4,5,6], lu
     check('the alarm settings have a Work tab: hours, lunch, a break, check-ins', await p.isVisible('.ws-work [data-work="start"]') && await p.isVisible('.ws-work [data-work="end"]') && await p.isVisible('.ws-work [data-work="lunch"]') && /Op checks in on you/.test(await p.textContent('.ws-work')));
     await p.fill('.ws-work [data-work="end"]', '18:00'); await p.dispatchEvent('.ws-work [data-work="end"]', 'change'); await p.waitForTimeout(200);
     check('…saved', await E("workCfg().end")==='18:00');
-    check('Op knows your hours', /Work hours: 9:00 AM to 6:00 PM/.test(await E("aiContext()")));
+    check('Op knows your hours', /Work hours today: 9:00 AM to 6:00 PM/.test(await E("aiContext()")));
     check('no page errors (work alarm)', p.errors.length===0, p.errors);
     await p.context().close();
   }
@@ -156,7 +156,8 @@ const WORK = {enabled:true, start:'09:00', end:'17:00', days:[0,1,2,3,4,5,6], lu
     await E("acct().nextAt = Date.now() - 1000; acctTick()"); await p.waitForTimeout(200);
     check('just locked in: Op leaves you alone (first 45 minutes)', await E("acct().nextAt") > await E("Date.now()") && await E("acct().log.slice(-1)[0].status")==='nudged');
     await E("state.focus.activeSession.startedAt = Date.now() - 50*60000; acct().nextAt = Date.now() - 1000; acctTick()"); await p.waitForTimeout(800);
-    check('locked in a while: a light touch (working, logged green)', await E("acct().log.slice(-1)[0].status")==='working' && !(await E("!!acct().pending")));
+    check('locked in a while: a light touch (working, logged green; round 27: Op waits for a reply)', await E("acct().log.slice(-1)[0].status")==='working' && await E("acct().pending && acct().pending.stage")==='light');
+    await E("acct().pending = null");
     await E("state.focus.activeSession = null; startMode('shooting', {}); " + due); await p.waitForTimeout(200);
     check('Shooting mode: no check-in', !(await E("!!acct().pending")));
     await E("finishActiveMode(true)");
@@ -179,7 +180,7 @@ const WORK = {enabled:true, start:'09:00', end:'17:00', days:[0,1,2,3,4,5,6], lu
     const p = await ctxPage(b, Object.assign({}, base, {focus:{wake:{voice:false}}}), {clock:at(10)});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     const subs = JSON.parse(await E("xpLast=null; JSON.stringify(Object.fromEntries(Object.entries(xpSummaryFresh().attrs).filter(([k]) => k.length===3 && k!=='OVR').map(([k, a]) => [k, a.subs.map(s => s.label)])))"));
-    check('Discipline: Reliability and Consistency (no Integrity)', JSON.stringify(subs.DIS)==='["Reliability","Consistency"]', subs.DIS);
+    check('Discipline: Reliability, Consistency and Action (no Integrity)', JSON.stringify(subs.DIS)==='["Reliability","Consistency","Action"]', subs.DIS);
     check('Personal: Content, Goals, Finances and Mind', JSON.stringify(subs.PER)==='["Content","Goals","Finances","Mind"]', subs.PER);
     check('Consistency is completing everything: videos, goals and the streak are in it', /videos/.test(await E("xpSummaryFresh().attrs.DIS.subs[1].note || ''")) || true);
     await E("ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(300);
