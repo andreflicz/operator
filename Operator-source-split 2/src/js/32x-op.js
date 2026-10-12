@@ -467,15 +467,16 @@ function aiListen(cap){
   opStop();
   const rec = new SR(); AI.rec = rec;
   rec.lang = navigator.language || 'en-US'; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 1;
-  let finals = '', interim = '', quiet = null, sent = false, hardStop = null, cancelled = false;
+  let finals = '', interim = '', quiet = null, sent = false, hardStop = null, cancelled = false, started = false, tries = 0;
   const said = function(){ return (finals+' '+interim).replace(/\s+/g, ' ').trim(); };
   const send = function(){ if(sent) return; sent = true; clearTimeout(quiet); clearTimeout(hardStop); try{ rec.stop(); }catch(e){} };
   AI.sendNow = send;
   // closing Op (the ✕) drops what it heard and stops listening for good: no restart, nothing sent
   AI.cancelListen = function(){ cancelled = true; sent = true; clearTimeout(quiet); clearTimeout(hardStop); AI.listening = false; AI.sendNow = null; try{ rec.abort(); }catch(e){ try{ rec.stop(); }catch(e2){} } aiUiRefresh(); };
-  const armQuiet = function(){ clearTimeout(quiet); quiet = setTimeout(send, 2100); };
+  // (round 30: a breath longer before it sends, so a pause mid-thought doesn't cut you off)
+  const armQuiet = function(){ clearTimeout(quiet); quiet = setTimeout(send, 2500); };
   OV.cap = cap;
-  rec.onstart = function(){ if(cancelled){ try{ rec.abort(); }catch(e){} return; } AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, 60000); };
+  rec.onstart = function(){ if(cancelled){ try{ rec.abort(); }catch(e){} return; } started = true; AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, 60000); };
   rec.onresult = function(e){
     interim = '';
     for(let i = e.resultIndex; i < e.results.length; i++){ const t = e.results[i][0].transcript; if(e.results[i].isFinal) finals += ' '+t; else interim += t; }
@@ -483,17 +484,26 @@ function aiListen(cap){
   };
   rec.onerror = function(e){
     if(e && (e.error==='no-speech' || e.error==='aborted')) return;
+    // (the mic was still busy, e.g. the "Hey Operator" ear letting go: try again in a moment)
+    if(e && e.error==='audio-capture' && !started && tries < 2) return;
     AI.listening = false; aiUiRefresh(); clearTimeout(quiet); clearTimeout(hardStop);
     opCaption(e && e.error==='not-allowed' ? 'I need the microphone. Allow it for Operator (or type instead).' : 'The mic isn’t working: type instead.');
   };
   rec.onend = function(){
     // Chrome ends a session on its own now and then; keep listening until you've finished
+    // (words it was still making out when the session ended are kept, not dropped)
+    if(interim){ finals += ' '+interim; interim = ''; }
     if(!sent && !cancelled && AI.listening){ try{ rec.start(); return; }catch(e){} }
+    // it never got the mic: try again (twice at most) before giving up
+    if(!started && !sent && !cancelled && tries < 2){ tries++; setTimeout(function(){ if(cancelled) return; try{ rec.start(); }catch(e){ AI.listening = false; aiTypeFocus(); } }, 400); return; }
     AI.listening = false; AI.sendNow = null; AI.cancelListen = null; clearTimeout(quiet); clearTimeout(hardStop); aiUiRefresh();
     if(cancelled) return;
     const s = said(); if(s) aiAsk(s, cap); else opCaption('Didn’t catch that.');
   };
-  try{ rec.start(); }catch(e){ AI.listening = false; aiTypeFocus(); }
+  // the "Hey Operator" ear lets go of the mic first
+  const heyWas = typeof HW!=='undefined' && HW.on; if(heyWas && typeof heyStop==='function') heyStop();
+  const go = function(){ if(cancelled) return; try{ rec.start(); }catch(e){ AI.listening = false; aiTypeFocus(); } };
+  if(heyWas) setTimeout(go, 300); else go();
 }
 // listening on its own (after Op asks something): not for a while after you've closed it
 function aiAutoListen(cap){ if(Date.now() - (AI.closedAt||0) < 120000 || AI.listening || AI.busy) return; aiListen(cap); }

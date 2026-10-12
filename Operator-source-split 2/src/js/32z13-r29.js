@@ -137,6 +137,9 @@ const HW = {rec:null, on:false, t:0, fails:0, blocked:false, hitAt:0};
 function heyOpOn(){ return state.profile.heyOp!==false && typeof aiCanHear==='function' && aiCanHear(); }
 function heyQuietNow(){
   const m = state.modes && state.modes.active;
+  // (round 30: and not right after Op speaks or while his question waits: the mic is for your answer)
+  if(OV.lastEnd && Date.now() - OV.lastEnd < 9000) return true;
+  if(OV.qDuck) return true;
   return AI.listening || AI.busy || OV.speaking || OV.pending || document.hidden || !document.hasFocus() || (m && m.sleep) || (typeof inspBreathOn!=='undefined' && ui.inspBreath);
 }
 function heyStart(){
