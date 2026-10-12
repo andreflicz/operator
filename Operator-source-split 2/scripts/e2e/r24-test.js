@@ -49,7 +49,7 @@ const BOARD = {boards:[{id:'v1', kind:'vision', name:'Vision', parentId:null, vi
     await E("OV.pre = {ready:false}"); await p.clock.runFor(1600); await p.waitForTimeout(300);
     check('Op is loading as Good morning opens: "Op loading" with a bar, no words yet', await p.isVisible('.br-voice.op-loading .br-voice-load') && !(await E("window.__says.length")));
     await E("OV.pre.ready = true"); await p.clock.runFor(800); await p.waitForTimeout(300);
-    check('…then it speaks: the first line, right away', await E("window.__says.length")>=1 && /^Good morning, Andre\./.test(await E("window.__says[0]")));
+    check('…then it speaks: the first line, right away (round 26: a greeting with some personality, by name)', await E("window.__says.length")>=1 && /Andre/.test(await E("window.__says[0]")));
     await p.clock.runFor(400); await p.waitForTimeout(200);
     check('…and the bar goes', !(await p.$('.br-voice.op-loading')));
     check('music or not, Op narrates (no Talk to Op gate)', await E("(function(){ const was = wakeAudio; wakeAudio = {volume:1}; OV.speaking = false; OV.pending = false; const r = opBriefTick(ui.briefLines, 1e7); wakeAudio = was; return r; })()")===true);
@@ -87,6 +87,9 @@ const BOARD = {boards:[{id:'v1', kind:'vision', name:'Vision', parentId:null, vi
     await E("window.__says = []; document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); clockIn({from:'morning', quiet:true})"); await p.waitForTimeout(150);
     check('work mode: Op speaks right away (no waiting on the brief)', await E("window.__says.length")>=1 && await E("window.__says[0][1]")==='opBubText');
     await p.waitForTimeout(800);
+    // (round 26: it asks first, and gives the rundown only on a yes)
+    check('…then asks if you want the rundown', await E("window.__says.some(s => /rundown|run through the day|walk you through today/.test(s[0]))") && !(await E("window.__says.some(s => /Edit JJS reel/.test(s[0]))")));
+    await E("AI.hasKey = false; opRundownYes('yeah go ahead')"); await p.waitForTimeout(300);
     check('…then gives the brief', await E("window.__says.some(s => /Edit JJS reel/.test(s[0]))"));
     await E("OV.cap = 'opBubText'; opBubShow(); opCaption('One two three four five six seven eight nine ten.')"); await p.waitForTimeout(500);
     const ov = await p.evaluate(() => { const a = document.getElementById('opBub').getBoundingClientRect(), g = document.querySelector('#planOverlay .pr-go').getBoundingClientRect(); return !(a.right < g.left || a.left > g.right || a.bottom < g.top || a.top > g.bottom); });

@@ -102,7 +102,7 @@ async function ctxPage(b, seed, opts){
     await E("endBriefing(); clockIn({})"); await p.waitForTimeout(900);
     check('the work page: your business message', /Close the JJS upsell first/.test(await p.textContent('#planOverlay .wi-msg')));
     check('…and one quote (the second one made way for it)', (await p.$$('#planOverlay .wi-side')).length===1 && (await p.$$('#planOverlay .wi-act')).length===0);
-    check('the journal orb sits in the corner on the work page (no + there)', await p.evaluate(() => getComputedStyle(document.querySelector('.quick-journal-fab.jorb')).bottom)==='28px');
+    check('the journal orb sits in the corner on the work page (no + there)', await p.evaluate(() => getComputedStyle(document.querySelector('.quick-journal-fab.jorb')).bottom)==='10px');   // (round 26: level with Op's light)
     check('no page errors (notes)', p.errors.length===0, p.errors);
     await p.context().close();
   }

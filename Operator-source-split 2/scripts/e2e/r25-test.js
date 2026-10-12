@@ -189,17 +189,17 @@ const WORK = {enabled:true, start:'09:00', end:'17:00', days:[0,1,2,3,4,5,6], lu
     await E("typeof closeGoalSheet==='function' && closeGoalSheet(); ui.view='personal'; ui.personalTab='finances'; renderView()"); await p.waitForTimeout(300);
     check('Finances: no + Add Debt / + Add Income / + Add expense', !/\+ Add Debt|\+ Add Income|\+ Add expense/.test(await p.textContent('#viewRoot')));
     await p.click('#fabAdd'); await p.waitForTimeout(400);
-    check('…the + offers a small menu (expense, income, debt)', (await p.$$('#fabMenu.is-in .fab-mi')).length===3);
-    await p.click('#fabMenu .fab-mi >> nth=0'); await p.waitForTimeout(300);
-    check('…and opens the right form', await p.isVisible('#expName'));
+    check('…the + offers a small menu (expense, income, debt)', (await p.$$('#addPick:not(.hidden) .ap-tile')).length===3);   // (round 26: a pop-up of tiles)
+    await p.click('#addPick .ap-tile >> nth=0'); await p.waitForTimeout(300);
+    check('…and opens the right form', await p.isVisible('#expName')); await E("closeFinSheet()");
     // skills
     await E("openTaskEditModal('t1')"); await p.waitForTimeout(300);
     await p.check('#editSkill-t1'); await E("saveEditTask('t1')"); await p.waitForTimeout(200);
     check('any task can be a skill (and stays on your list like an ongoing one)', await E("state.tasks.items.find(t => t.id==='t1').skill===true && state.tasks.items.find(t => t.id==='t1').ongoing===true"));
-    await E("state.focus.taskSegments = [{id:'s1', taskId:'t1', start:Date.now()-3*86400000, end:Date.now()-3*86400000+50*60000, date:addDays(todayStr(), -3)}]; ui.view='personal'; ui.personalTab='growth'; renderView()"); await p.waitForTimeout(300);
-    check('Personal → Growth: your skills and the time on them', /Edit JJS reel/.test(await p.textContent('.gr-skills')) && /50m this week/.test(await p.textContent('.gr-skills')));
+    await E("state.focus.taskSegments = [{id:'s1', taskId:'t1', start:Date.now()-3*86400000, end:Date.now()-3*86400000+50*60000, date:addDays(todayStr(), -3)}]; ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='skills'; renderView()"); await p.waitForTimeout(300);
+    check('Focus → Training Skills (round 26; was Personal → Growth): your skills and the time on them', /Edit JJS reel/.test(await p.textContent('.gr-skills')) && /50m this week/.test(await p.textContent('.gr-skills')));
     check('…which counts toward Mind', await E("skillScore()") > 0);
-    await p.click('#fabAdd'); await p.waitForTimeout(200); await p.fill('#skillName', 'Meta ads'); await p.click('[data-action="skillAdd"]'); await p.waitForTimeout(200);
+    await p.click('#fabAdd'); await p.waitForTimeout(300); await p.click('#addPick .ap-tile >> nth=0'); await p.waitForTimeout(300); await p.fill('#skillName', 'Meta ads'); await p.click('[data-action="skillAdd"]'); await p.waitForTimeout(200);
     check('…the + adds a skill', await E("state.tasks.items.some(t => t.skill && t.title==='Meta ads')"));
     // the vault
     await E("openCheckoutForm('week', weekKey())"); await p.waitForTimeout(400);

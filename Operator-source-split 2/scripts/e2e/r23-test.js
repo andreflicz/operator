@@ -201,7 +201,7 @@ async function ctxPage(b, seed, opts){
     check('your bank’s card purchases come in as expenses (not income, not pending)', ex.length===4 && ex.every(e => e.src==='bank') && !ex.some(e => /Payroll|Pending/.test(e.name)), ex.map(e => e.name));
     check('…sorted into kinds', ex.find(e => e.name==='Chipotle').cat==='food' && ex.find(e => e.name==='Shell').cat==='transport' && ex.find(e => e.name==='Spotify').cat==='subs' && ex.find(e => e.name==='Whole Foods').cat==='groceries');
     check('…the balance shows, and syncing again adds nothing twice', /\$4,211/.test(await p.textContent('.ex')) && (await E("finSync(false).then(() => state.finances.expenses.length)"))===4);
-    await E("ui.forms.expense = true; renderView()"); await p.fill('#expName', 'Haircut'); await p.fill('#expAmount', '35'); await p.click('[data-action="expAdd"]'); await p.waitForTimeout(150);
+    await E("openFinSheet('expense')"); await p.fill('#expName', 'Haircut'); await p.fill('#expAmount', '35'); await p.click('[data-action="expAdd"]'); await p.waitForTimeout(150);
     check('add one by hand too', await E("state.finances.expenses.some(e => e.name==='Haircut' && e.amount===35)"));
     check('Op knows the spending', /Spending this month/.test(await E("aiContext()")));
     check('no long dashes in Expenses', !/—/.test(await p.textContent('.ex')));
@@ -219,7 +219,7 @@ async function ctxPage(b, seed, opts){
     check('Content lanes: no + or "add" buttons on them', !(await p.$('.ct-add')) && !(await p.$('.ct-lane [data-action="openAddContent"]')));
     await p.dragAndDrop('.ct-lane[data-content-role="personal"] [data-task-id="v1"]', '.ct-lane[data-content-role="business"]'); await p.waitForTimeout(300);
     check('drag a video from Personal to Business and it moves', await E("contentRoleOf(state.tasks.items.find(t => t.id==='v1'))")==='business');
-    await p.click('#fabAdd'); await p.waitForTimeout(200);
+    await p.click('#fabAdd'); await p.waitForTimeout(300); await p.click('#addPick .ap-tile >> nth=0'); await p.waitForTimeout(300);   // (round 26: the + asks first)
     check('the + opens a New video sheet (Business or Personal)', await p.isVisible('#contentSheet:not(.hidden) #csTitle') && (await p.$$('#contentSheet .gs-seg button')).length===2);
     await p.click('#contentSheet [data-action="csRole"][data-id="personal"]'); await p.fill('#csTitle', 'Day in the life'); await p.click('[data-action="csSave"]'); await p.waitForTimeout(200);
     check('…and adds it to the right lane', await E("contentRoleOf(state.tasks.items.find(t => t.title==='Day in the life'))")==='personal');

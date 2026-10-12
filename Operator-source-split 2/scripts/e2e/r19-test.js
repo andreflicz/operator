@@ -81,7 +81,7 @@ async function ctxPage(b, seed, opts){
     check('two lanes: Business content and Personal content, each with its target', (await p.$$('.ct-lane')).length===2 && /0 of 3 this week/.test(await p.textContent('.ct-lane[data-content-role="business"]')) && /0 of 2 this week/.test(await p.textContent('.ct-lane[data-content-role="personal"]')));
     check('each idea sits in its lane', /testimonial/.test(await p.textContent('.ct-lane[data-content-role="business"] .ct-list')) && /Day in the life/.test(await p.textContent('.ct-lane[data-content-role="personal"] .ct-list')));
     // (round 23: no + on the lanes; the + in the corner opens the New video sheet)
-    await p.click('#fabAdd'); await p.waitForTimeout(200);
+    await p.click('#fabAdd'); await p.waitForTimeout(300); await p.click('#addPick .ap-tile >> nth=0'); await p.waitForTimeout(300);   // (round 26: the + asks first)
     await p.fill('#csTitle', 'Agency ad'); await p.click('[data-action="csSave"]'); await p.waitForTimeout(200);
     check('+ in a lane adds business content', await E("(state.tasks.items.find(t=>t.title==='Agency ad')||{}).contentRole")==='business');
     await E("const t=state.tasks.items.find(x=>x.id==='v1'); t.status='done'; t.completedAt=todayStr(); persist('tasks'); renderView()"); await p.waitForTimeout(200);
