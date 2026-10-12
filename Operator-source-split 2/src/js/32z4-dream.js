@@ -12,6 +12,18 @@ FOCUS_TRACKS.push(
   {name:'Tide', style:'ocean', dream:true, bpm:40, prog:[[38,45,50,54],[43,50,55,59],[40,47,52,55],[36,43,48,52]], scale:[62,66,69,71,74], hiss:0},
   {name:'Aurora', style:'swell', dream:true, bpm:44, prog:[[51,58,63,67,70],[48,55,60,63,67],[44,51,56,60,63],[46,53,58,62,65]], scale:[75,77,79,82,84,87], hiss:0.002}
 );
+// two for work: the same warm sound as the rest of the app, with a steady pulse under it to keep you moving
+FOCUS_TRACKS.push(
+  {name:'Momentum', style:'drive', work:true, bpm:88, prog:[[45,52,57,60,64],[41,48,53,57,60],[43,50,55,59,62],[40,47,52,55,59]], arp:[0,2,4,2,3,4,2,1], hiss:0.003},
+  {name:'Flow State', style:'pulse', work:true, bpm:80, prog:[[50,57,60,65],[46,53,57,62],[43,50,55,58],[45,52,55,60]], scale:[69,72,74,76,79,81], hiss:0.002}
+);
+// a soft kick: a sine that drops fast, more felt than heard
+function fmKick(ctx, out, t, vol){
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = 'sine'; o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.18);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.32);
+  o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.35);
+}
 function fmNoiseBuf(ctx){
   if(FM.noiseBuf && FM.noiseBuf.sampleRate===ctx.sampleRate) return FM.noiseBuf;
   const len = Math.floor(ctx.sampleRate*4), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
@@ -43,6 +55,21 @@ function fmDream(style){
     const k = bar===0 ? 2 : 3 + Math.floor(fmRand()*3);
     for(let i=0;i<k;i++) fmKey(ctx, out, t + beat*(i*(4/k)) + fmRand()*0.12, fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), beat*2.5, 0.035);
   };
+  if(style==='drive') return function(ctx, out, t, tr, bar){
+    const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length], step = beat/2;
+    padChord(ctx, out, t, ch.slice(1).map(fmHz), len*0.3, len*0.4, len*0.5, 0.013);
+    fmKey(ctx, out, t, fmHz(ch[0] - 12), len*0.9, 0.07);
+    if(bar > 0){ fmKick(ctx, out, t, 0.11); fmKick(ctx, out, t + beat*2, 0.09); if(bar % 2) fmKick(ctx, out, t + beat*3.5, 0.05); }
+    for(let i=0;i<8;i++) sfxTap(ctx, out, t + i*step + step*0.5, 5200, i % 2 ? 0.012 : 0.008);
+    if(bar > 1) tr.arp.forEach(function(n, i){ if((bar + i) % 6===5) return; fmKey(ctx, out, t + i*step + (i%2 ? 0.012 : 0), fmHz(ch[n % ch.length] + 12), step*2.4, 0.03 - (i%2 ? 0.008 : 0)); });
+  };
+  if(style==='pulse') return function(ctx, out, t, tr, bar){
+    const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length];
+    fmKey(ctx, out, t, fmHz(ch[0] - 12), len, 0.08);
+    [0, 1.5, 2.5].forEach(function(b, i){ if(bar===0 && i) return; ch.slice(1).forEach(function(m, k){ fmKey(ctx, out, t + beat*b + k*0.018, fmHz(m), beat*1.6, 0.03); }); });
+    if(bar > 0){ fmKick(ctx, out, t, 0.08); fmKick(ctx, out, t + beat*2.5, 0.06); for(let i=0;i<4;i++) sfxTap(ctx, out, t + beat*i + beat*0.5, 6000, 0.01); }
+    if(bar > 2 && fmRand() < 0.6) fmBell(ctx, out, t + beat*(1 + Math.floor(fmRand()*3)), fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), 0.012);
+  };
   if(style==='ocean') return function(ctx, out, t, tr, bar){
     const len = 60/tr.bpm*4, ch = tr.prog[bar % tr.prog.length];
     fmWave(ctx, out, t, len, 0.05);
@@ -51,6 +78,14 @@ function fmDream(style){
     if(bar > 1 && fmRand() < 0.45) fmBell(ctx, out, t + len*(0.5 + fmRand()*0.3), fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), 0.01);
   };
   return null;
+}
+// work mode (Get to work from Good morning, or the work alarm): one of the work tracks, unless music's already on
+function workMusicPlay(){
+  if(typeof soundPref==='function' && !soundPref('workMusic', true)) return;
+  if(typeof musicOn==='function' && musicOn()) return;
+  if(typeof opMusicPlaying==='function' && opMusicPlaying()) return;
+  const ids = FOCUS_TRACKS.map(function(tr, i){ return tr.work ? i : -1; }).filter(function(i){ return i >= 0; });
+  if(typeof focusMusicPlay==='function' && ids.length) focusMusicPlay(ids[Math.floor(Math.random()*ids.length)]);
 }
 // Inspiration starts on one of the floaty ones
 function inspPlayDream(){

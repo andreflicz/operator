@@ -106,7 +106,7 @@ function opBubHideLater(){
     b.classList.remove('is-in');
   }, 9000);
 }
-ACTIONS.opBubClose = function(){ opStop(); const b = document.getElementById('opBub'); if(b) b.classList.remove('is-in'); };
+ACTIONS.opBubClose = function(){ AI.closedAt = Date.now(); OV.userCut = true; if(AI.cancelListen) AI.cancelListen(); opStop(); const b = document.getElementById('opBub'); if(b) b.classList.remove('is-in'); };
 // when ElevenLabs turns a line down (key, plan, credits), the rest of the session uses the Mac's voice
 function opTtsEngine(){ const e = opEngine(); return e==='eleven' && OV.elevenErr ? 'mac' : e; }
 // ElevenLabs' own reason, said plainly
@@ -136,7 +136,8 @@ function opMusicPlaying(){ return !!((typeof wakeAudio!=='undefined' && wakeAudi
 function opDuck(on){
   clearTimeout(opDuckT);
   if(on){
-    if(opDucked || !opMusicPlaying()) return;
+    if(!opDucked && typeof FM!=='undefined' && FM.playing && FM.bus){ try{ const c = getAudioCtx(), g = FM.bus.g.gain; g.cancelScheduledValues(c.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), c.currentTime); g.exponentialRampToValueAtTime(Math.max(0.0002, fmVolume()*0.3), c.currentTime + 0.4); FM.ducked = true; }catch(e){} }
+    if(opDucked || !opMusicPlaying()){ if(FM && FM.ducked) opDucked = true; return; }
     opDucked = true;
     if(wakeAudio){ clearInterval(wakeAudioRamp); wakeAudio._duckFrom = wakeAudio.volume; wakeAudio.volume = Math.min(wakeAudio.volume, 0.12); }
     if(wakeMusicApp || wakeFinishing) helperFetch(WAKE_HELPER+'music/duck?on=1', 3000);
@@ -145,6 +146,7 @@ function opDuck(on){
   opDuckT = setTimeout(function(){
     if(!opDucked || OV.speaking || OV.pending) return;
     opDucked = false;
+    if(typeof FM!=='undefined' && FM.ducked){ FM.ducked = false; try{ if(FM.playing && FM.bus){ const c = getAudioCtx(), g = FM.bus.g.gain; g.cancelScheduledValues(c.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), c.currentTime); g.exponentialRampToValueAtTime(Math.max(0.0002, fmVolume()), c.currentTime + 1.2); } }catch(e){} }
     if(wakeAudio && wakeAudio._duckFrom!=null){ const a = wakeAudio, to = a._duckFrom; a._duckFrom = null; const up = setInterval(function(){ if(wakeAudio!==a){ clearInterval(up); return; } a.volume = Math.min(to, a.volume + 0.05); if(a.volume >= to) clearInterval(up); }, 80); }
     helperFetch(WAKE_HELPER+'music/duck?on=0', 3000);
   }, 1200);
@@ -443,7 +445,7 @@ function opAutoBusinessBrief(){
     const line = g+' '+ask;
     ui.opRundownAsked = Date.now();
     AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
-    opSay(line, {cap:'opBubText'}).then(function(){ if(overlayOpen('planOverlay') && !AI.listening && !OV.userCut && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiListen('opBubText'); }, 300); });
+    opSay(line, {cap:'opBubText'}).then(function(){ if(overlayOpen('planOverlay') && !AI.listening && !OV.userCut && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiAutoListen('opBubText'); }, 300); });
   };
   // a quick greeting right away (the AI one if it's back in time)
   if(typeof opGreet==='function') opGreet('work').then(say); else say('Alright.');

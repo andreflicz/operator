@@ -407,6 +407,22 @@ function renderWeekendOffView(elapsed, weekend){
     '</div>'+
   '</div>';
 }
+// ---- sleep: the whole screen goes dark and quiet. The time, when the alarm rings, and nothing else ----
+function renderSleepView(){
+  const d = new Date(), name = (state.profile.name || '').split(' ')[0];
+  const t = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}), m = /^(.*?)\s*([AP]M)$/i.exec(t);
+  const target = typeof wakeTargetDate==='function' ? wakeTargetDate() : addDays(todayStr(), 1), wake = typeof wakeTimeFor==='function' ? wakeTimeFor(target) : null;
+  const left = wake ? Math.max(0, Math.round((localTs(target, wake) - Date.now())/60000)) : null;
+  return '<div class="np rest sleepv rest-full">'+
+    '<div class="sl-sky"><i class="sl-moon"></i>'+[[8,14],[19,62],[27,28],[36,78],[44,12],[53,40],[61,70],[68,22],[76,55],[84,34],[91,74],[13,44],[48,86],[72,8],[95,18]].map(function(p, i){ return '<b style="--i:'+i+';left:'+p[0]+'%;top:'+p[1]+'%"></b>'; }).join('')+'</div>'+
+    '<div class="sl-in">'+
+      '<div class="sl-clock"><b id="npClockT">'+(m ? m[1] : t)+'</b><span id="npClockA">'+(m ? m[2] : '')+'</span></div>'+
+      '<div class="sl-msg">Sleep well'+(name ? ', '+escapeHtml(name) : '')+'.</div>'+
+      '<div class="sl-alarm">'+(wake ? '&#9200; '+fmt12Hour(wake)+' &middot; '+(left >= 60 ? Math.floor(left/60)+'h '+(left%60 ? left%60+'m' : '') : left+'m')+' of rest' : 'No alarm set. Sleep in.')+'</div>'+
+    '</div>'+
+    '<button class="sl-up" data-action="endMode" title="End sleep">I’m up</button>'+
+  '</div>';
+}
 // ---- true full screen: Good morning, the work preview and the full-screen views take the whole
 // display, not just the window. The launcher puts the window into real macOS full screen (no
 // "press Esc" bubble; macOS asks once for Accessibility permission); without it, Chrome's own.

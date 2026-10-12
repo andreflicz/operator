@@ -93,7 +93,7 @@ function renderFocusAnalyticsTab(){
   // Op's read on the period (a quiet line, made once a day — ↻ for another take)
   const days = r==='today' ? 7 : r==='alltime' || r==='all' ? 30 : 7, off = r==='lastweek' ? Math.max(0, (new Date().getDay()+6)%7 + 1) : 0;
   const read = typeof opRead==='function' ? opRead('analytics:'+r, function(){ return opFactsWork(days, off); }, r==='today' ? 'Give him your read on how his work has been going this past week, with today in view.' : r==='lastweek' ? 'Give him your read on last week’s work.' : r==='week' ? 'Give him your read on this week’s work so far.' : 'Give him your read on the last month of work.', {angles:'work', triad:true}) : '';
-  return '<div class="subtab-panel" data-key="analytics-'+r+'">'+read+analyticsOverviewHtml(r)+body+recentSessionsHtml()+'</div>'+
+  return '<div class="subtab-panel" data-key="analytics-'+r+'">'+read+analyticsOverviewHtml(r)+body+recentSessionsHtml()+(typeof acctLogHtml==='function' ? acctLogHtml() : '')+'</div>'+
     '<div class="section" style="margin-top:16px;">'+renderManualLogForm()+'</div>';
 }
 

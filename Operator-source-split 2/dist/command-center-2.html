@@ -5295,11 +5295,36 @@ body.np-on .op-bub:not(.is-moved){ left:22px !important; }
 .brief4 .c-d > .br-sports, .brief4 .c-c > .br-sports{ flex:1 1 auto; }
 .br-sports .sb-scroll{ flex:1 1 0; min-height:60px; overflow-y:auto; margin:6px -6px 0 0; padding-right:6px; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.18) transparent;
   -webkit-mask-image:linear-gradient(180deg, #000 calc(100% - 26px), transparent); mask-image:linear-gradient(180deg, #000 calc(100% - 26px), transparent); padding-bottom:22px; }
-.br-sports .sb-h{ position:sticky; top:0; z-index:1; display:flex; align-items:center; gap:6px; padding:6px 0 4px; margin:4px 0 2px; background:linear-gradient(180deg, rgba(40,30,70,.96) 70%, rgba(40,30,70,0)); }
+.br-sports .sb-h{ display:flex; align-items:center; gap:6px; padding:8px 0 3px; margin:2px 0 0; }
 .br-sports .sb-h span{ font-weight:700; color:rgba(255,255,255,.35); letter-spacing:0; }
 .sb-chips{ display:flex; gap:4px; flex-wrap:wrap; margin-top:8px; }
 .sb-chip{ border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.04); color:rgba(255,255,255,.65); border-radius:999px; padding:4px 10px; font:inherit; font-size:11.5px; font-weight:700; cursor:pointer; transition:background .15s, color .15s; }
 .sb-chip:hover{ color:#fff; } .sb-chip.is-on{ background:rgba(255,197,107,.18); border-color:rgba(255,197,107,.5); color:#fff; }
+/* check-ins: productivity at that moment, 1 to 5, and what you said back */
+.acl-p{ display:inline-flex; gap:3px; margin-left:8px; vertical-align:middle; }
+.acl-p i{ width:7px; height:7px; border-radius:50%; background:rgba(var(--ink),.14); }
+.acl-p i.is-on{ background:linear-gradient(160deg, #7ef0c0, #3fbe8e); box-shadow:0 0 6px rgba(63,190,142,.45); }
+.acl-avg{ margin-left:auto; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--text-dim); text-transform:none; letter-spacing:0; }
+.acl-avg b{ color:var(--text); font-size:13px; } .acl-avg .acl-p{ margin:0; }
+.acl-e small{ display:block; font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); font-style:normal; margin-bottom:2px; }
+/* sleep: dark, slow, almost nothing */
+.np.sleepv{ position:fixed; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; background:radial-gradient(120% 90% at 50% 110%, #0d1430 0%, #05060f 55%, #020208 100%); color:#dfe4ff; overflow:hidden; }
+.sl-sky{ position:absolute; inset:0; pointer-events:none; }
+.sl-sky b{ position:absolute; width:2px; height:2px; border-radius:50%; background:#fff; opacity:.0; left:calc(8% + var(--i) * 7.4%); top:calc(10% + (var(--i) * 37 % 60) * 1%); animation:slTw calc(5s + var(--i) * .7s) ease-in-out infinite; animation-delay:calc(var(--i) * -1.3s); }
+@keyframes slTw{ 0%,100%{ opacity:.08; } 50%{ opacity:.6; } }
+.sl-moon{ position:absolute; right:14%; top:16%; width:70px; height:70px; border-radius:50%; background:radial-gradient(circle at 38% 38%, #f6f1dc, #cfc7a6 60%, #9e9677); box-shadow:0 0 60px rgba(246,241,220,.18), 0 0 140px rgba(140,160,255,.12); opacity:.75; animation:slMoon 14s ease-in-out infinite; }
+@keyframes slMoon{ 50%{ transform:translateY(-6px); box-shadow:0 0 80px rgba(246,241,220,.24), 0 0 160px rgba(140,160,255,.16); } }
+.sl-in{ position:relative; text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px; animation:slIn 2.4s ease both; }
+@keyframes slIn{ from{ opacity:0; transform:translateY(8px); filter:blur(6px); } to{ opacity:1; transform:none; filter:none; } }
+.sl-clock{ display:flex; align-items:baseline; gap:10px; font-family:var(--font-display); font-weight:300; color:rgba(223,228,255,.82); }
+.sl-clock b{ font-size:clamp(96px, 15vw, 190px); font-weight:300; letter-spacing:-.04em; line-height:1; }
+.sl-clock span{ font-size:clamp(20px, 2.4vw, 30px); color:rgba(223,228,255,.45); }
+.sl-msg{ font-size:clamp(18px, 1.8vw, 24px); color:rgba(223,228,255,.62); font-weight:400; }
+.sl-alarm{ font-size:13.5px; letter-spacing:.06em; color:rgba(223,228,255,.38); }
+.sl-up{ position:absolute; bottom:28px; left:50%; transform:translateX(-50%); border:none; background:none; color:rgba(223,228,255,.22); font:inherit; font-size:13px; font-weight:600; letter-spacing:.1em; cursor:pointer; transition:color .3s; }
+.sl-up:hover{ color:rgba(223,228,255,.7); }
+body.np-on:has(.np.sleepv) .op-light{ opacity:.35; }
+body.np-on:has(.np.sleepv) .quick-journal-fab, body.np-on:has(.np.sleepv) #musicDock{ display:none !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -9261,6 +9286,7 @@ document.addEventListener('scroll', function(e){
 function renderOffTimeView(){
   const active = state.modes.active;
   const elapsed = Date.now() - active.startedAt;
+  if(active.sleep) return renderSleepView();
   return renderWeekendOffView(elapsed, !active.sleep && typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)));
 }
 // one tidy line per task: number, a priority dot, the title, who it's for. The description is
@@ -11636,7 +11662,7 @@ function renderFocusAnalyticsTab(){
   // Op's read on the period (a quiet line, made once a day — ↻ for another take)
   const days = r==='today' ? 7 : r==='alltime' || r==='all' ? 30 : 7, off = r==='lastweek' ? Math.max(0, (new Date().getDay()+6)%7 + 1) : 0;
   const read = typeof opRead==='function' ? opRead('analytics:'+r, function(){ return opFactsWork(days, off); }, r==='today' ? 'Give him your read on how his work has been going this past week, with today in view.' : r==='lastweek' ? 'Give him your read on last week’s work.' : r==='week' ? 'Give him your read on this week’s work so far.' : 'Give him your read on the last month of work.', {angles:'work', triad:true}) : '';
-  return '<div class="subtab-panel" data-key="analytics-'+r+'">'+read+analyticsOverviewHtml(r)+body+recentSessionsHtml()+'</div>'+
+  return '<div class="subtab-panel" data-key="analytics-'+r+'">'+read+analyticsOverviewHtml(r)+body+recentSessionsHtml()+(typeof acctLogHtml==='function' ? acctLogHtml() : '')+'</div>'+
     '<div class="section" style="margin-top:16px;">'+renderManualLogForm()+'</div>';
 }
 
@@ -23724,6 +23750,8 @@ function clockIn(opts){
   if(!opts.quiet) playWorkIntro();
   if(typeof workDayState==='function'){ workDayState().clockedInAt = Date.now(); persist('focus'); }
   if((opts.from==='morning' || opts.from==='workalarm') && typeof opAutoBusinessBrief==='function') opAutoBusinessBrief();
+  // and some music for the work, once the intro's played
+  if((opts.from==='morning' || opts.from==='workalarm') && typeof workMusicPlay==='function') setTimeout(workMusicPlay, opts.quiet ? 300 : 2600);
 }
 ACTIONS.clockIn = function(){ clockIn(); };
 ACTIONS.closePlanReveal = function(){ ui.planReveal = null; hideOverlay('planOverlay'); renderView(); };
@@ -24272,6 +24300,22 @@ function renderWeekendOffView(elapsed, weekend){
     '</div>'+
   '</div>';
 }
+// ---- sleep: the whole screen goes dark and quiet. The time, when the alarm rings, and nothing else ----
+function renderSleepView(){
+  const d = new Date(), name = (state.profile.name || '').split(' ')[0];
+  const t = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}), m = /^(.*?)\s*([AP]M)$/i.exec(t);
+  const target = typeof wakeTargetDate==='function' ? wakeTargetDate() : addDays(todayStr(), 1), wake = typeof wakeTimeFor==='function' ? wakeTimeFor(target) : null;
+  const left = wake ? Math.max(0, Math.round((localTs(target, wake) - Date.now())/60000)) : null;
+  return '<div class="np rest sleepv rest-full">'+
+    '<div class="sl-sky"><i class="sl-moon"></i>'+[0,1,2,3,4,5,6,7,8,9,10,11].map(function(i){ return '<b style="--i:'+i+'"></b>'; }).join('')+'</div>'+
+    '<div class="sl-in">'+
+      '<div class="sl-clock"><b id="npClockT">'+(m ? m[1] : t)+'</b><span id="npClockA">'+(m ? m[2] : '')+'</span></div>'+
+      '<div class="sl-msg">Sleep well'+(name ? ', '+escapeHtml(name) : '')+'.</div>'+
+      '<div class="sl-alarm">'+(wake ? '&#9200; '+fmt12Hour(wake)+' &middot; '+(left >= 60 ? Math.floor(left/60)+'h '+(left%60 ? left%60+'m' : '') : left+'m')+' of rest' : 'No alarm set. Sleep in.')+'</div>'+
+    '</div>'+
+    '<button class="sl-up" data-action="endMode" title="End sleep">I’m up</button>'+
+  '</div>';
+}
 // ---- true full screen: Good morning, the work preview and the full-screen views take the whole
 // display, not just the window. The launcher puts the window into real macOS full screen (no
 // "press Esc" bubble; macOS asks once for Accessibility permission); without it, Chrome's own.
@@ -24746,7 +24790,7 @@ function opBubHideLater(){
     b.classList.remove('is-in');
   }, 9000);
 }
-ACTIONS.opBubClose = function(){ opStop(); const b = document.getElementById('opBub'); if(b) b.classList.remove('is-in'); };
+ACTIONS.opBubClose = function(){ AI.closedAt = Date.now(); OV.userCut = true; if(AI.cancelListen) AI.cancelListen(); opStop(); const b = document.getElementById('opBub'); if(b) b.classList.remove('is-in'); };
 // when ElevenLabs turns a line down (key, plan, credits), the rest of the session uses the Mac's voice
 function opTtsEngine(){ const e = opEngine(); return e==='eleven' && OV.elevenErr ? 'mac' : e; }
 // ElevenLabs' own reason, said plainly
@@ -24776,7 +24820,8 @@ function opMusicPlaying(){ return !!((typeof wakeAudio!=='undefined' && wakeAudi
 function opDuck(on){
   clearTimeout(opDuckT);
   if(on){
-    if(opDucked || !opMusicPlaying()) return;
+    if(!opDucked && typeof FM!=='undefined' && FM.playing && FM.bus){ try{ const c = getAudioCtx(), g = FM.bus.g.gain; g.cancelScheduledValues(c.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), c.currentTime); g.exponentialRampToValueAtTime(Math.max(0.0002, fmVolume()*0.3), c.currentTime + 0.4); FM.ducked = true; }catch(e){} }
+    if(opDucked || !opMusicPlaying()){ if(FM && FM.ducked) opDucked = true; return; }
     opDucked = true;
     if(wakeAudio){ clearInterval(wakeAudioRamp); wakeAudio._duckFrom = wakeAudio.volume; wakeAudio.volume = Math.min(wakeAudio.volume, 0.12); }
     if(wakeMusicApp || wakeFinishing) helperFetch(WAKE_HELPER+'music/duck?on=1', 3000);
@@ -24785,6 +24830,7 @@ function opDuck(on){
   opDuckT = setTimeout(function(){
     if(!opDucked || OV.speaking || OV.pending) return;
     opDucked = false;
+    if(typeof FM!=='undefined' && FM.ducked){ FM.ducked = false; try{ if(FM.playing && FM.bus){ const c = getAudioCtx(), g = FM.bus.g.gain; g.cancelScheduledValues(c.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), c.currentTime); g.exponentialRampToValueAtTime(Math.max(0.0002, fmVolume()), c.currentTime + 1.2); } }catch(e){} }
     if(wakeAudio && wakeAudio._duckFrom!=null){ const a = wakeAudio, to = a._duckFrom; a._duckFrom = null; const up = setInterval(function(){ if(wakeAudio!==a){ clearInterval(up); return; } a.volume = Math.min(to, a.volume + 0.05); if(a.volume >= to) clearInterval(up); }, 80); }
     helperFetch(WAKE_HELPER+'music/duck?on=0', 3000);
   }, 1200);
@@ -25083,7 +25129,7 @@ function opAutoBusinessBrief(){
     const line = g+' '+ask;
     ui.opRundownAsked = Date.now();
     AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
-    opSay(line, {cap:'opBubText'}).then(function(){ if(overlayOpen('planOverlay') && !AI.listening && !OV.userCut && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiListen('opBubText'); }, 300); });
+    opSay(line, {cap:'opBubText'}).then(function(){ if(overlayOpen('planOverlay') && !AI.listening && !OV.userCut && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiAutoListen('opBubText'); }, 300); });
   };
   // a quick greeting right away (the AI one if it's back in time)
   if(typeof opGreet==='function') opGreet('work').then(say); else say('Alright.');
@@ -25797,7 +25843,6 @@ function renderYouTab(){
     (typeof opRead==='function' ? opRead('card', opFactsCard, 'Give him your read on his card: where he stands, what’s holding him back, and what would move him up fastest.', {angles:'card'}) : '')+
     '<div class="you-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(attrCard).join('')+'</div>'+
     youRecentHtml()+
-    (typeof acctLogHtml==='function' ? acctLogHtml() : '')+
   '</div>';
 }
 // the last seven days against the seven before, and your records (bests since you started)
@@ -27527,7 +27572,7 @@ async function aiAsk(text, cap){
     if(typeof acctAfterReply==='function') acctAfterReply();
     if(opVoiceOn()) await opSay(reply, {cap:cap}); else opCaption(reply);
     // a question back: the mic opens on its own for the answer (typing still works)
-    if(/\?["”’)]*\s*$/.test(reply) && !AI.listening){ setTimeout(function(){ if(!AI.busy && !AI.listening && !(OV.speaking || OV.pending)) aiListen(cap); }, 350); }
+    if(/\?["”’)]*\s*$/.test(reply) && !AI.listening){ setTimeout(function(){ if(!AI.busy && !AI.listening && !(OV.speaking || OV.pending)) aiAutoListen(cap); }, 350); }
   } finally { AI.busy = false; aiUiRefresh(); }
 }
 // ---- memory that builds itself: a minute after a conversation goes quiet, Op reads it back and keeps
@@ -27600,13 +27645,15 @@ function aiListen(cap){
   opStop();
   const rec = new SR(); AI.rec = rec;
   rec.lang = navigator.language || 'en-US'; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 1;
-  let finals = '', interim = '', quiet = null, sent = false, hardStop = null;
+  let finals = '', interim = '', quiet = null, sent = false, hardStop = null, cancelled = false;
   const said = function(){ return (finals+' '+interim).replace(/\s+/g, ' ').trim(); };
   const send = function(){ if(sent) return; sent = true; clearTimeout(quiet); clearTimeout(hardStop); try{ rec.stop(); }catch(e){} };
   AI.sendNow = send;
+  // closing Op (the ✕) drops what it heard and stops listening for good: no restart, nothing sent
+  AI.cancelListen = function(){ cancelled = true; sent = true; clearTimeout(quiet); clearTimeout(hardStop); AI.listening = false; AI.sendNow = null; try{ rec.abort(); }catch(e){ try{ rec.stop(); }catch(e2){} } aiUiRefresh(); };
   const armQuiet = function(){ clearTimeout(quiet); quiet = setTimeout(send, 2100); };
   OV.cap = cap;
-  rec.onstart = function(){ AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, 60000); };
+  rec.onstart = function(){ if(cancelled){ try{ rec.abort(); }catch(e){} return; } AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, 60000); };
   rec.onresult = function(e){
     interim = '';
     for(let i = e.resultIndex; i < e.results.length; i++){ const t = e.results[i][0].transcript; if(e.results[i].isFinal) finals += ' '+t; else interim += t; }
@@ -27619,12 +27666,15 @@ function aiListen(cap){
   };
   rec.onend = function(){
     // Chrome ends a session on its own now and then; keep listening until you've finished
-    if(!sent && AI.listening){ try{ rec.start(); return; }catch(e){} }
-    AI.listening = false; AI.sendNow = null; clearTimeout(quiet); clearTimeout(hardStop); aiUiRefresh();
+    if(!sent && !cancelled && AI.listening){ try{ rec.start(); return; }catch(e){} }
+    AI.listening = false; AI.sendNow = null; AI.cancelListen = null; clearTimeout(quiet); clearTimeout(hardStop); aiUiRefresh();
+    if(cancelled) return;
     const s = said(); if(s) aiAsk(s, cap); else opCaption('Didn’t catch that.');
   };
   try{ rec.start(); }catch(e){ AI.listening = false; aiTypeFocus(); }
 }
+// listening on its own (after Op asks something): not for a while after you've closed it
+function aiAutoListen(cap){ if(Date.now() - (AI.closedAt||0) < 120000 || AI.listening || AI.busy) return; aiListen(cap); }
 function aiTypeFocus(){ OV.cap = 'opBubText'; opBubShow(); const i = document.getElementById('opBubInput'); if(i) setTimeout(function(){ i.focus(); }, 60); }
 function aiUiRefresh(){
   document.querySelectorAll('.op-talk').forEach(function(b){ b.classList.toggle('is-on', AI.listening); b.classList.toggle('is-busy', AI.busy); b.title = AI.listening ? 'Listening: tap to send now' : 'Talk to Op'; });
@@ -28031,9 +28081,19 @@ async function opGreet(kind, extra){
 //     reminds you what's at stake, and it costs you on Consistency and Grind;
 //   no answer at all is worse, and Op doesn't forget: it brings it up the next time you talk.
 // Never at lunch, on a break, in Shooting mode, or in the first stretch after you lock in.
-// Every check-in is kept, colour-coded, and you can change a verdict later (Personal → You).
+// Every check-in is kept, colour-coded, with how productive you were right then (1 to 5) and what you said back
+// (your response); you can change a verdict later (Focus → Analytics → Check-ins with Op).
+// Op always expects a word back: even when you're working it asks, and it notes what you said.
 const ACCT_PACE = {light:[120, 180], normal:[75, 120], strict:[45, 75]};
-const ACCT_LABEL = {working:'Working', nudged:'Got to it', excused:'Excused', fault:'Excuse', noanswer:'No answer', pending:'Asking…'};
+const ACCT_LABEL = {working:'Working', nudged:'Got to it', excused:'Fair reason', fault:'Not good enough', noanswer:'No answer', pending:'Asking…'};
+// how productive you were at that moment, 1 to 5: locked in is a 5; getting things done a 4; between things a
+// 3; not working but with something to show for the day a 2; nothing at all a 1 (nudged a little by the day so far)
+function acctProd(st, f){
+  let p = st==='locked' ? 5 : st==='moving' ? 4 : st==='between' ? 3 : st==='break' ? 3 : (f && (f.dw >= 30 || f.done)) ? 2 : 1;
+  if(f && f.inMin > 60 && st!=='locked'){ const pace = f.dw / Math.max(1, f.inMin); if(pace > 0.5 && p < 5) p++; else if(pace < 0.1 && p > 1 && st!=='moving') p--; }
+  return Math.max(1, Math.min(5, p));
+}
+function acctProdDots(n){ n = Number(n)||0; if(!n) return ''; let h = '<span class="acl-p" title="Productivity '+n+' of 5">'; for(let i=1;i<=5;i++) h += '<i class="'+(i<=n ? 'is-on' : '')+'"></i>'; return h+'</span>'; }
 function acct(){
   const f = state.focus;
   if(!f.acct || typeof f.acct!=='object') f.acct = {log:[]};
@@ -28141,20 +28201,23 @@ const ACCT_LIGHT = ['You’re moving. Need anything from me?', 'Quick one: when 
   'Nice work so far. Whatever you’re doing, keep doing it.', 'Open a window if you can. Fresh air helps. Keep going.'];
 async function acctLight(st){
   const a = acct(), f = acctFacts();
-  a.log.push({id:uid(), at:Date.now(), date:todayStr(), status:'working', facts:f, note:st==='locked' ? 'Locked in' : 'Getting things done'});
-  acctTrim(); acctSchedule();
+  const e = {id:uid(), at:Date.now(), date:todayStr(), status:'working', facts:f, prod:acctProd(st, f), note:st==='locked' ? 'Locked in' : 'Getting things done'};
+  a.log.push(e); acctTrim(); acctSchedule();
+  a.pending = {id:e.id, stage:'light', at:Date.now()}; persist('focus');
   let line = ACCT_LIGHT[Math.floor(Math.random()*ACCT_LIGHT.length)];
   if(AI.hasKey===true && typeof aiWrite==='function'){
     const t = await Promise.race([aiWrite('You’re checking in on me during work hours and I’m working ('+(st==='locked' ? 'locked in for '+Math.round((Date.now()-state.focus.activeSession.startedAt)/60000)+' minutes' : 'getting things done')+'). Say one short, warm thing: ask if I need anything, or remind me of one small thing that makes working better (water, a stretch, posture, eyes off the screen, a snack, fresh air). Vary it, no stats, one or two sentences.', {max:80}), new Promise(function(r){ setTimeout(r, 6000); })]);
     if(t) line = t;
   }
-  if(acctBusy()) return;
-  acctSay(line, /\?\s*$/.test(line) && st!=='locked');
+  if(acctBusy()){ if(acct().pending && acct().pending.id===e.id) acct().pending = null; return; }
+  // (it always wants a word back, so a light one ends on a question too)
+  if(!/\?\s*$/.test(line)) line += ' '+pickOne(['How’s it going?', 'How are you feeling about today?', 'Anything you need?', 'What are you on right now?']);
+  acctSay(line, true);
 }
 // ---- not working: are you there? ----
 function acctPing(){
   const a = acct(), f = acctFacts();
-  const e = {id:uid(), at:Date.now(), date:todayStr(), status:'pending', facts:f};
+  const e = {id:uid(), at:Date.now(), date:todayStr(), status:'pending', facts:f, prod:acctProd(acctWorking(), f)};
   a.log.push(e); acctTrim();
   a.pending = {id:e.id, stage:'ping', at:Date.now()};
   persist('focus');
@@ -28168,7 +28231,7 @@ function acctSay(text, listen){
   if(typeof OV==='undefined') return;
   OV.cap = 'opBubText'; opBubShow();
   AI.history.push({role:'assistant', content:text}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
-  const after = function(){ if(listen && !AI.listening && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiListen('opBubText'); }, 300); };
+  const after = function(){ if(listen && !AI.listening && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiAutoListen('opBubText'); }, 300); };
   if(opVoiceOn()) opSay(text, {cap:'opBubText'}).then(after); else { opCaption(text); after(); }
 }
 // your answer, while a check-in is going: it goes here instead of the usual conversation
@@ -28176,9 +28239,10 @@ function acctIntercept(text){
   const a = acct(), p = a.pending; if(!p) return false;
   const e = a.log.find(function(x){ return x.id===p.id; });
   if(!e){ a.pending = null; return false; }
+  if(p.stage==='light'){ e.response = String(text).slice(0, 400); a.pending = null; persist('focus'); return false; }
   AI.history.push({role:'user', content:text}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
   if(p.stage==='ping'){ p.stage = 'why'; p.at = Date.now(); persist('focus'); acctAsk(e); return true; }
-  if(p.stage==='why'){ p.stage = 'judging'; p.at = Date.now(); e.excuse = String(text).slice(0, 400); persist('focus'); acctJudge(e); return true; }
+  if(p.stage==='why'){ p.stage = 'judging'; p.at = Date.now(); e.excuse = e.response = String(text).slice(0, 400); persist('focus'); acctJudge(e); return true; }
   return true;
 }
 async function acctAsk(e){
@@ -28224,6 +28288,7 @@ async function acctJudge(e){
 function acctPendingTick(){
   const a = acct(), p = a.pending, e = a.log.find(function(x){ return x.id===p.id; });
   if(!e){ a.pending = null; return; }
+  if(p.stage==='light'){ if(Date.now() - p.at > 3*60000){ a.pending = null; e.note = (e.note ? e.note+' · ' : '')+'no reply'; persist('focus'); } return; }
   const s = state.focus.activeSession;
   if(s && !s.onBreak && p.stage!=='judging'){
     e.status = 'nudged'; e.note = 'Locked in after Op checked'; e.settledAt = Date.now(); a.pending = null; acctSchedule(); persist('focus');
@@ -28252,7 +28317,7 @@ function acctAfterReply(){ const ids = AI.acctRaising || []; if(!ids.length) ret
 function acctSettle(input){
   const o = acctOwed(); const e = o[o.length-1];
   if(!e) return 'There’s no unanswered check-in to settle.';
-  e.excuse = String(input && input.reason || '').slice(0, 400); e.why = String(input && input.why || '').slice(0, 160);
+  e.excuse = e.response = String(input && input.reason || '').slice(0, 400); e.why = String(input && input.why || '').slice(0, 160);
   if(input && input.acceptable) e.status = 'excused';
   e.settledAt = Date.now(); persist('focus');
   if(ui.view==='personal') renderView();
@@ -28277,14 +28342,16 @@ function acctLogHtml(){
   const a = acct(), list = a.log.filter(function(x){ return x.status!=='pending'; }).slice(-40).reverse();
   const w = typeof workCfg==='function' ? workCfg() : {};
   const faults = a.log.filter(function(x){ return (x.status==='fault' || x.status==='noanswer') && x.date >= addDays(todayStr(), -14); }).length;
-  return '<div class="section acl"><div class="section-title">Check-ins with Op'+tip('During your work hours Op looks in on you. Real reasons are let go; excuses and no answer count against Consistency and Grind for two weeks. Tap a verdict to change it.')+
+  const recent = a.log.filter(function(x){ return x.prod && x.date >= addDays(todayStr(), -6); }), avg = recent.length ? recent.reduce(function(s, x){ return s + x.prod; }, 0)/recent.length : null;
+  return '<div class="section acl"><div class="section-title">Check-ins with Op'+tip('During your work hours Op looks in on you and notes how productive you were right then (1 to 5) and what you said back. Fair reasons are let go; ones that aren’t good enough, and no answer, count against Consistency and Focus for two weeks. Tap a verdict to change it.')+
+      (avg!=null ? '<span class="acl-avg" title="Average productivity at check-ins, last 7 days">'+acctProdDots(Math.round(avg))+'<b>'+avg.toFixed(1)+'</b> this week</span>' : '')+
       '<span class="acl-sum">'+(faults ? faults+' against you in 2 weeks' : list.length ? 'Clean for two weeks' : '')+'</span></div>'+
     (!w.enabled || !w.checkins ? '<div class="acl-off">Op checks in during your work hours. <button class="ex-link" data-action="openWorkSetup">Set your work hours</button></div>' : '')+
     (list.length ? '<div class="acl-list">'+list.map(function(x){
       const canFlip = x.status==='fault' || x.status==='excused' || x.status==='noanswer';
-      return '<div class="acl-r is-'+x.status+'"><i class="acl-dot"></i><div class="acl-m"><div class="acl-t"><b>'+(x.date===todayStr() ? 'Today' : weekdayShort(x.date)+' '+fmtDateShort(x.date))+' · '+fmtTimeShort(x.at)+'</b>'+
+      return '<div class="acl-r is-'+x.status+'"><i class="acl-dot"></i><div class="acl-m"><div class="acl-t"><b>'+(x.date===todayStr() ? 'Today' : weekdayShort(x.date)+' '+fmtDateShort(x.date))+' · '+fmtTimeShort(x.at)+'</b>'+acctProdDots(x.prod)+
         (canFlip ? '<button class="acl-v" data-action="acctFlip" data-id="'+x.id+'" title="Change the verdict">'+ACCT_LABEL[x.status]+'</button>' : '<span class="acl-v">'+(ACCT_LABEL[x.status]||x.status)+'</span>')+'</div>'+
-        (x.excuse ? '<div class="acl-e">“'+escapeHtml(x.excuse)+'”</div>' : '')+
+        ((x.response || x.excuse) ? '<div class="acl-e"><small>Response</small>“'+escapeHtml(x.response || x.excuse)+'”</div>' : '')+
         (x.why ? '<div class="acl-w">'+escapeHtml(x.why)+'</div>' : x.note ? '<div class="acl-w">'+escapeHtml(x.note)+'</div>' : '')+
       '</div></div>';
     }).join('')+'</div>' : '<div class="acl-empty">Nothing yet. Op starts checking in during your work hours.</div>')+
@@ -28990,6 +29057,18 @@ FOCUS_TRACKS.push(
   {name:'Tide', style:'ocean', dream:true, bpm:40, prog:[[38,45,50,54],[43,50,55,59],[40,47,52,55],[36,43,48,52]], scale:[62,66,69,71,74], hiss:0},
   {name:'Aurora', style:'swell', dream:true, bpm:44, prog:[[51,58,63,67,70],[48,55,60,63,67],[44,51,56,60,63],[46,53,58,62,65]], scale:[75,77,79,82,84,87], hiss:0.002}
 );
+// two for work: the same warm sound as the rest of the app, with a steady pulse under it to keep you moving
+FOCUS_TRACKS.push(
+  {name:'Momentum', style:'drive', work:true, bpm:88, prog:[[45,52,57,60,64],[41,48,53,57,60],[43,50,55,59,62],[40,47,52,55,59]], arp:[0,2,4,2,3,4,2,1], hiss:0.003},
+  {name:'Flow State', style:'pulse', work:true, bpm:80, prog:[[50,57,60,65],[46,53,57,62],[43,50,55,58],[45,52,55,60]], scale:[69,72,74,76,79,81], hiss:0.002}
+);
+// a soft kick: a sine that drops fast, more felt than heard
+function fmKick(ctx, out, t, vol){
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = 'sine'; o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.18);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.32);
+  o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.35);
+}
 function fmNoiseBuf(ctx){
   if(FM.noiseBuf && FM.noiseBuf.sampleRate===ctx.sampleRate) return FM.noiseBuf;
   const len = Math.floor(ctx.sampleRate*4), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
@@ -29021,6 +29100,21 @@ function fmDream(style){
     const k = bar===0 ? 2 : 3 + Math.floor(fmRand()*3);
     for(let i=0;i<k;i++) fmKey(ctx, out, t + beat*(i*(4/k)) + fmRand()*0.12, fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), beat*2.5, 0.035);
   };
+  if(style==='drive') return function(ctx, out, t, tr, bar){
+    const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length], step = beat/2;
+    padChord(ctx, out, t, ch.slice(1).map(fmHz), len*0.3, len*0.4, len*0.5, 0.013);
+    fmKey(ctx, out, t, fmHz(ch[0] - 12), len*0.9, 0.07);
+    if(bar > 0){ fmKick(ctx, out, t, 0.11); fmKick(ctx, out, t + beat*2, 0.09); if(bar % 2) fmKick(ctx, out, t + beat*3.5, 0.05); }
+    for(let i=0;i<8;i++) sfxTap(ctx, out, t + i*step + step*0.5, 5200, i % 2 ? 0.012 : 0.008);
+    if(bar > 1) tr.arp.forEach(function(n, i){ if((bar + i) % 6===5) return; fmKey(ctx, out, t + i*step + (i%2 ? 0.012 : 0), fmHz(ch[n % ch.length] + 12), step*2.4, 0.03 - (i%2 ? 0.008 : 0)); });
+  };
+  if(style==='pulse') return function(ctx, out, t, tr, bar){
+    const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length];
+    fmKey(ctx, out, t, fmHz(ch[0] - 12), len, 0.08);
+    [0, 1.5, 2.5].forEach(function(b, i){ if(bar===0 && i) return; ch.slice(1).forEach(function(m, k){ fmKey(ctx, out, t + beat*b + k*0.018, fmHz(m), beat*1.6, 0.03); }); });
+    if(bar > 0){ fmKick(ctx, out, t, 0.08); fmKick(ctx, out, t + beat*2.5, 0.06); for(let i=0;i<4;i++) sfxTap(ctx, out, t + beat*i + beat*0.5, 6000, 0.01); }
+    if(bar > 2 && fmRand() < 0.6) fmBell(ctx, out, t + beat*(1 + Math.floor(fmRand()*3)), fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), 0.012);
+  };
   if(style==='ocean') return function(ctx, out, t, tr, bar){
     const len = 60/tr.bpm*4, ch = tr.prog[bar % tr.prog.length];
     fmWave(ctx, out, t, len, 0.05);
@@ -29029,6 +29123,14 @@ function fmDream(style){
     if(bar > 1 && fmRand() < 0.45) fmBell(ctx, out, t + len*(0.5 + fmRand()*0.3), fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), 0.01);
   };
   return null;
+}
+// work mode (Get to work from Good morning, or the work alarm): one of the work tracks, unless music's already on
+function workMusicPlay(){
+  if(typeof soundPref==='function' && !soundPref('workMusic', true)) return;
+  if(typeof musicOn==='function' && musicOn()) return;
+  if(typeof opMusicPlaying==='function' && opMusicPlaying()) return;
+  const ids = FOCUS_TRACKS.map(function(tr, i){ return tr.work ? i : -1; }).filter(function(i){ return i >= 0; });
+  if(typeof focusMusicPlay==='function' && ids.length) focusMusicPlay(ids[Math.floor(Math.random()*ids.length)]);
 }
 // Inspiration starts on one of the floaty ones
 function inspPlayDream(){

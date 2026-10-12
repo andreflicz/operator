@@ -730,6 +730,8 @@ function clockIn(opts){
   if(!opts.quiet) playWorkIntro();
   if(typeof workDayState==='function'){ workDayState().clockedInAt = Date.now(); persist('focus'); }
   if((opts.from==='morning' || opts.from==='workalarm') && typeof opAutoBusinessBrief==='function') opAutoBusinessBrief();
+  // and some music for the work, once the intro's played
+  if((opts.from==='morning' || opts.from==='workalarm') && typeof workMusicPlay==='function') setTimeout(workMusicPlay, opts.quiet ? 300 : 2600);
 }
 ACTIONS.clockIn = function(){ clockIn(); };
 ACTIONS.closePlanReveal = function(){ ui.planReveal = null; hideOverlay('planOverlay'); renderView(); };

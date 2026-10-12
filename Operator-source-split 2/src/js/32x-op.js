@@ -391,7 +391,7 @@ async function aiAsk(text, cap){
     if(typeof acctAfterReply==='function') acctAfterReply();
     if(opVoiceOn()) await opSay(reply, {cap:cap}); else opCaption(reply);
     // a question back: the mic opens on its own for the answer (typing still works)
-    if(/\?["”’)]*\s*$/.test(reply) && !AI.listening){ setTimeout(function(){ if(!AI.busy && !AI.listening && !(OV.speaking || OV.pending)) aiListen(cap); }, 350); }
+    if(/\?["”’)]*\s*$/.test(reply) && !AI.listening){ setTimeout(function(){ if(!AI.busy && !AI.listening && !(OV.speaking || OV.pending)) aiAutoListen(cap); }, 350); }
   } finally { AI.busy = false; aiUiRefresh(); }
 }
 // ---- memory that builds itself: a minute after a conversation goes quiet, Op reads it back and keeps
@@ -464,13 +464,15 @@ function aiListen(cap){
   opStop();
   const rec = new SR(); AI.rec = rec;
   rec.lang = navigator.language || 'en-US'; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 1;
-  let finals = '', interim = '', quiet = null, sent = false, hardStop = null;
+  let finals = '', interim = '', quiet = null, sent = false, hardStop = null, cancelled = false;
   const said = function(){ return (finals+' '+interim).replace(/\s+/g, ' ').trim(); };
   const send = function(){ if(sent) return; sent = true; clearTimeout(quiet); clearTimeout(hardStop); try{ rec.stop(); }catch(e){} };
   AI.sendNow = send;
+  // closing Op (the ✕) drops what it heard and stops listening for good: no restart, nothing sent
+  AI.cancelListen = function(){ cancelled = true; sent = true; clearTimeout(quiet); clearTimeout(hardStop); AI.listening = false; AI.sendNow = null; try{ rec.abort(); }catch(e){ try{ rec.stop(); }catch(e2){} } aiUiRefresh(); };
   const armQuiet = function(){ clearTimeout(quiet); quiet = setTimeout(send, 2100); };
   OV.cap = cap;
-  rec.onstart = function(){ AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, 60000); };
+  rec.onstart = function(){ if(cancelled){ try{ rec.abort(); }catch(e){} return; } AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, 60000); };
   rec.onresult = function(e){
     interim = '';
     for(let i = e.resultIndex; i < e.results.length; i++){ const t = e.results[i][0].transcript; if(e.results[i].isFinal) finals += ' '+t; else interim += t; }
@@ -483,12 +485,15 @@ function aiListen(cap){
   };
   rec.onend = function(){
     // Chrome ends a session on its own now and then; keep listening until you've finished
-    if(!sent && AI.listening){ try{ rec.start(); return; }catch(e){} }
-    AI.listening = false; AI.sendNow = null; clearTimeout(quiet); clearTimeout(hardStop); aiUiRefresh();
+    if(!sent && !cancelled && AI.listening){ try{ rec.start(); return; }catch(e){} }
+    AI.listening = false; AI.sendNow = null; AI.cancelListen = null; clearTimeout(quiet); clearTimeout(hardStop); aiUiRefresh();
+    if(cancelled) return;
     const s = said(); if(s) aiAsk(s, cap); else opCaption('Didn’t catch that.');
   };
   try{ rec.start(); }catch(e){ AI.listening = false; aiTypeFocus(); }
 }
+// listening on its own (after Op asks something): not for a while after you've closed it
+function aiAutoListen(cap){ if(Date.now() - (AI.closedAt||0) < 120000 || AI.listening || AI.busy) return; aiListen(cap); }
 function aiTypeFocus(){ OV.cap = 'opBubText'; opBubShow(); const i = document.getElementById('opBubInput'); if(i) setTimeout(function(){ i.focus(); }, 60); }
 function aiUiRefresh(){
   document.querySelectorAll('.op-talk').forEach(function(b){ b.classList.toggle('is-on', AI.listening); b.classList.toggle('is-busy', AI.busy); b.title = AI.listening ? 'Listening: tap to send now' : 'Talk to Op'; });

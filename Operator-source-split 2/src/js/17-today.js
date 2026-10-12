@@ -4,6 +4,7 @@
 function renderOffTimeView(){
   const active = state.modes.active;
   const elapsed = Date.now() - active.startedAt;
+  if(active.sleep) return renderSleepView();
   return renderWeekendOffView(elapsed, !active.sleep && typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)));
 }
 // one tidy line per task: number, a priority dot, the title, who it's for. The description is

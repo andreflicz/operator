@@ -573,7 +573,6 @@ function renderYouTab(){
     (typeof opRead==='function' ? opRead('card', opFactsCard, 'Give him your read on his card: where he stands, what’s holding him back, and what would move him up fastest.', {angles:'card'}) : '')+
     '<div class="you-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(attrCard).join('')+'</div>'+
     youRecentHtml()+
-    (typeof acctLogHtml==='function' ? acctLogHtml() : '')+
   '</div>';
 }
 // the last seven days against the seven before, and your records (bests since you started)

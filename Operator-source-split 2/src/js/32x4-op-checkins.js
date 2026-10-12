@@ -8,9 +8,19 @@
 //     reminds you what's at stake, and it costs you on Consistency and Grind;
 //   no answer at all is worse, and Op doesn't forget: it brings it up the next time you talk.
 // Never at lunch, on a break, in Shooting mode, or in the first stretch after you lock in.
-// Every check-in is kept, colour-coded, and you can change a verdict later (Personal → You).
+// Every check-in is kept, colour-coded, with how productive you were right then (1 to 5) and what you said back
+// (your response); you can change a verdict later (Focus → Analytics → Check-ins with Op).
+// Op always expects a word back: even when you're working it asks, and it notes what you said.
 const ACCT_PACE = {light:[120, 180], normal:[75, 120], strict:[45, 75]};
-const ACCT_LABEL = {working:'Working', nudged:'Got to it', excused:'Excused', fault:'Excuse', noanswer:'No answer', pending:'Asking…'};
+const ACCT_LABEL = {working:'Working', nudged:'Got to it', excused:'Fair reason', fault:'Not good enough', noanswer:'No answer', pending:'Asking…'};
+// how productive you were at that moment, 1 to 5: locked in is a 5; getting things done a 4; between things a
+// 3; not working but with something to show for the day a 2; nothing at all a 1 (nudged a little by the day so far)
+function acctProd(st, f){
+  let p = st==='locked' ? 5 : st==='moving' ? 4 : st==='between' ? 3 : st==='break' ? 3 : (f && (f.dw >= 30 || f.done)) ? 2 : 1;
+  if(f && f.inMin > 60 && st!=='locked'){ const pace = f.dw / Math.max(1, f.inMin); if(pace > 0.5 && p < 5) p++; else if(pace < 0.1 && p > 1 && st!=='moving') p--; }
+  return Math.max(1, Math.min(5, p));
+}
+function acctProdDots(n){ n = Number(n)||0; if(!n) return ''; let h = '<span class="acl-p" title="Productivity '+n+' of 5">'; for(let i=1;i<=5;i++) h += '<i class="'+(i<=n ? 'is-on' : '')+'"></i>'; return h+'</span>'; }
 function acct(){
   const f = state.focus;
   if(!f.acct || typeof f.acct!=='object') f.acct = {log:[]};
@@ -118,20 +128,23 @@ const ACCT_LIGHT = ['You’re moving. Need anything from me?', 'Quick one: when 
   'Nice work so far. Whatever you’re doing, keep doing it.', 'Open a window if you can. Fresh air helps. Keep going.'];
 async function acctLight(st){
   const a = acct(), f = acctFacts();
-  a.log.push({id:uid(), at:Date.now(), date:todayStr(), status:'working', facts:f, note:st==='locked' ? 'Locked in' : 'Getting things done'});
-  acctTrim(); acctSchedule();
+  const e = {id:uid(), at:Date.now(), date:todayStr(), status:'working', facts:f, prod:acctProd(st, f), note:st==='locked' ? 'Locked in' : 'Getting things done'};
+  a.log.push(e); acctTrim(); acctSchedule();
+  a.pending = {id:e.id, stage:'light', at:Date.now()}; persist('focus');
   let line = ACCT_LIGHT[Math.floor(Math.random()*ACCT_LIGHT.length)];
   if(AI.hasKey===true && typeof aiWrite==='function'){
     const t = await Promise.race([aiWrite('You’re checking in on me during work hours and I’m working ('+(st==='locked' ? 'locked in for '+Math.round((Date.now()-state.focus.activeSession.startedAt)/60000)+' minutes' : 'getting things done')+'). Say one short, warm thing: ask if I need anything, or remind me of one small thing that makes working better (water, a stretch, posture, eyes off the screen, a snack, fresh air). Vary it, no stats, one or two sentences.', {max:80}), new Promise(function(r){ setTimeout(r, 6000); })]);
     if(t) line = t;
   }
-  if(acctBusy()) return;
-  acctSay(line, /\?\s*$/.test(line) && st!=='locked');
+  if(acctBusy()){ if(acct().pending && acct().pending.id===e.id) acct().pending = null; return; }
+  // (it always wants a word back, so a light one ends on a question too)
+  if(!/\?\s*$/.test(line)) line += ' '+pickOne(['How’s it going?', 'How are you feeling about today?', 'Anything you need?', 'What are you on right now?']);
+  acctSay(line, true);
 }
 // ---- not working: are you there? ----
 function acctPing(){
   const a = acct(), f = acctFacts();
-  const e = {id:uid(), at:Date.now(), date:todayStr(), status:'pending', facts:f};
+  const e = {id:uid(), at:Date.now(), date:todayStr(), status:'pending', facts:f, prod:acctProd(acctWorking(), f)};
   a.log.push(e); acctTrim();
   a.pending = {id:e.id, stage:'ping', at:Date.now()};
   persist('focus');
@@ -145,7 +158,7 @@ function acctSay(text, listen){
   if(typeof OV==='undefined') return;
   OV.cap = 'opBubText'; opBubShow();
   AI.history.push({role:'assistant', content:text}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
-  const after = function(){ if(listen && !AI.listening && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiListen('opBubText'); }, 300); };
+  const after = function(){ if(listen && !AI.listening && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiAutoListen('opBubText'); }, 300); };
   if(opVoiceOn()) opSay(text, {cap:'opBubText'}).then(after); else { opCaption(text); after(); }
 }
 // your answer, while a check-in is going: it goes here instead of the usual conversation
@@ -153,9 +166,10 @@ function acctIntercept(text){
   const a = acct(), p = a.pending; if(!p) return false;
   const e = a.log.find(function(x){ return x.id===p.id; });
   if(!e){ a.pending = null; return false; }
+  if(p.stage==='light'){ e.response = String(text).slice(0, 400); a.pending = null; persist('focus'); return false; }
   AI.history.push({role:'user', content:text}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
   if(p.stage==='ping'){ p.stage = 'why'; p.at = Date.now(); persist('focus'); acctAsk(e); return true; }
-  if(p.stage==='why'){ p.stage = 'judging'; p.at = Date.now(); e.excuse = String(text).slice(0, 400); persist('focus'); acctJudge(e); return true; }
+  if(p.stage==='why'){ p.stage = 'judging'; p.at = Date.now(); e.excuse = e.response = String(text).slice(0, 400); persist('focus'); acctJudge(e); return true; }
   return true;
 }
 async function acctAsk(e){
@@ -201,6 +215,7 @@ async function acctJudge(e){
 function acctPendingTick(){
   const a = acct(), p = a.pending, e = a.log.find(function(x){ return x.id===p.id; });
   if(!e){ a.pending = null; return; }
+  if(p.stage==='light'){ if(Date.now() - p.at > 3*60000){ a.pending = null; e.note = (e.note ? e.note+' · ' : '')+'no reply'; persist('focus'); } return; }
   const s = state.focus.activeSession;
   if(s && !s.onBreak && p.stage!=='judging'){
     e.status = 'nudged'; e.note = 'Locked in after Op checked'; e.settledAt = Date.now(); a.pending = null; acctSchedule(); persist('focus');
@@ -229,7 +244,7 @@ function acctAfterReply(){ const ids = AI.acctRaising || []; if(!ids.length) ret
 function acctSettle(input){
   const o = acctOwed(); const e = o[o.length-1];
   if(!e) return 'There’s no unanswered check-in to settle.';
-  e.excuse = String(input && input.reason || '').slice(0, 400); e.why = String(input && input.why || '').slice(0, 160);
+  e.excuse = e.response = String(input && input.reason || '').slice(0, 400); e.why = String(input && input.why || '').slice(0, 160);
   if(input && input.acceptable) e.status = 'excused';
   e.settledAt = Date.now(); persist('focus');
   if(ui.view==='personal') renderView();
@@ -254,14 +269,16 @@ function acctLogHtml(){
   const a = acct(), list = a.log.filter(function(x){ return x.status!=='pending'; }).slice(-40).reverse();
   const w = typeof workCfg==='function' ? workCfg() : {};
   const faults = a.log.filter(function(x){ return (x.status==='fault' || x.status==='noanswer') && x.date >= addDays(todayStr(), -14); }).length;
-  return '<div class="section acl"><div class="section-title">Check-ins with Op'+tip('During your work hours Op looks in on you. Real reasons are let go; excuses and no answer count against Consistency and Grind for two weeks. Tap a verdict to change it.')+
+  const recent = a.log.filter(function(x){ return x.prod && x.date >= addDays(todayStr(), -6); }), avg = recent.length ? recent.reduce(function(s, x){ return s + x.prod; }, 0)/recent.length : null;
+  return '<div class="section acl"><div class="section-title">Check-ins with Op'+tip('During your work hours Op looks in on you and notes how productive you were right then (1 to 5) and what you said back. Fair reasons are let go; ones that aren’t good enough, and no answer, count against Consistency and Focus for two weeks. Tap a verdict to change it.')+
+      (avg!=null ? '<span class="acl-avg" title="Average productivity at check-ins, last 7 days">'+acctProdDots(Math.round(avg))+'<b>'+avg.toFixed(1)+'</b> this week</span>' : '')+
       '<span class="acl-sum">'+(faults ? faults+' against you in 2 weeks' : list.length ? 'Clean for two weeks' : '')+'</span></div>'+
     (!w.enabled || !w.checkins ? '<div class="acl-off">Op checks in during your work hours. <button class="ex-link" data-action="openWorkSetup">Set your work hours</button></div>' : '')+
     (list.length ? '<div class="acl-list">'+list.map(function(x){
       const canFlip = x.status==='fault' || x.status==='excused' || x.status==='noanswer';
-      return '<div class="acl-r is-'+x.status+'"><i class="acl-dot"></i><div class="acl-m"><div class="acl-t"><b>'+(x.date===todayStr() ? 'Today' : weekdayShort(x.date)+' '+fmtDateShort(x.date))+' · '+fmtTimeShort(x.at)+'</b>'+
+      return '<div class="acl-r is-'+x.status+'"><i class="acl-dot"></i><div class="acl-m"><div class="acl-t"><b>'+(x.date===todayStr() ? 'Today' : weekdayShort(x.date)+' '+fmtDateShort(x.date))+' · '+fmtTimeShort(x.at)+'</b>'+acctProdDots(x.prod)+
         (canFlip ? '<button class="acl-v" data-action="acctFlip" data-id="'+x.id+'" title="Change the verdict">'+ACCT_LABEL[x.status]+'</button>' : '<span class="acl-v">'+(ACCT_LABEL[x.status]||x.status)+'</span>')+'</div>'+
-        (x.excuse ? '<div class="acl-e">“'+escapeHtml(x.excuse)+'”</div>' : '')+
+        ((x.response || x.excuse) ? '<div class="acl-e"><small>Response</small>“'+escapeHtml(x.response || x.excuse)+'”</div>' : '')+
         (x.why ? '<div class="acl-w">'+escapeHtml(x.why)+'</div>' : x.note ? '<div class="acl-w">'+escapeHtml(x.note)+'</div>' : '')+
       '</div></div>';
     }).join('')+'</div>' : '<div class="acl-empty">Nothing yet. Op starts checking in during your work hours.</div>')+

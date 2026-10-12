@@ -5289,3 +5289,28 @@ body.np-on .op-bub:not(.is-moved){ left:22px !important; }
 .sb-chips{ display:flex; gap:4px; flex-wrap:wrap; margin-top:8px; }
 .sb-chip{ border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.04); color:rgba(255,255,255,.65); border-radius:999px; padding:4px 10px; font:inherit; font-size:11.5px; font-weight:700; cursor:pointer; transition:background .15s, color .15s; }
 .sb-chip:hover{ color:#fff; } .sb-chip.is-on{ background:rgba(255,197,107,.18); border-color:rgba(255,197,107,.5); color:#fff; }
+/* check-ins: productivity at that moment, 1 to 5, and what you said back */
+.acl-p{ display:inline-flex; gap:3px; margin-left:8px; vertical-align:middle; }
+.acl-p i{ width:7px; height:7px; border-radius:50%; background:rgba(var(--ink),.14); }
+.acl-p i.is-on{ background:linear-gradient(160deg, #7ef0c0, #3fbe8e); box-shadow:0 0 6px rgba(63,190,142,.45); }
+.acl-avg{ margin-left:auto; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--text-dim); text-transform:none; letter-spacing:0; }
+.acl-avg b{ color:var(--text); font-size:13px; } .acl-avg .acl-p{ margin:0; }
+.acl-e small{ display:block; font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); font-style:normal; margin-bottom:2px; }
+/* sleep: dark, slow, almost nothing */
+.np.sleepv{ position:fixed; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; background:radial-gradient(120% 90% at 50% 110%, #0d1430 0%, #05060f 55%, #020208 100%); color:#dfe4ff; overflow:hidden; }
+.sl-sky{ position:absolute; inset:0; pointer-events:none; }
+.sl-sky b{ position:absolute; width:2px; height:2px; border-radius:50%; background:#fff; opacity:0; animation:slTw calc(5s + var(--i) * .7s) ease-in-out infinite; animation-delay:calc(var(--i) * -1.3s); }
+@keyframes slTw{ 0%,100%{ opacity:.08; } 50%{ opacity:.6; } }
+.sl-moon{ position:absolute; right:14%; top:16%; width:70px; height:70px; border-radius:50%; background:radial-gradient(circle at 38% 38%, #f6f1dc, #cfc7a6 60%, #9e9677); box-shadow:0 0 60px rgba(246,241,220,.18), 0 0 140px rgba(140,160,255,.12); opacity:.75; animation:slMoon 14s ease-in-out infinite; }
+@keyframes slMoon{ 50%{ transform:translateY(-6px); box-shadow:0 0 80px rgba(246,241,220,.24), 0 0 160px rgba(140,160,255,.16); } }
+.sl-in{ position:relative; text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px; animation:slIn 2.4s ease both; }
+@keyframes slIn{ from{ opacity:0; transform:translateY(8px); filter:blur(6px); } to{ opacity:1; transform:none; filter:none; } }
+.sl-clock{ display:flex; align-items:baseline; gap:10px; font-family:var(--font-display); font-weight:300; color:rgba(223,228,255,.82); }
+.sl-clock b{ font-size:clamp(96px, 15vw, 190px); font-weight:300; letter-spacing:-.04em; line-height:1; }
+.sl-clock span{ font-size:clamp(20px, 2.4vw, 30px); color:rgba(223,228,255,.45); }
+.sl-msg{ font-size:clamp(18px, 1.8vw, 24px); color:rgba(223,228,255,.62); font-weight:400; }
+.sl-alarm{ font-size:13.5px; letter-spacing:.06em; color:rgba(223,228,255,.38); }
+.sl-up{ position:absolute; bottom:28px; left:50%; transform:translateX(-50%); border:none; background:none; color:rgba(223,228,255,.22); font:inherit; font-size:13px; font-weight:600; letter-spacing:.1em; cursor:pointer; transition:color .3s; }
+.sl-up:hover{ color:rgba(223,228,255,.7); }
+body.np-on:has(.np.sleepv) .op-light{ opacity:.35; }
+body.np-on:has(.np.sleepv) .quick-journal-fab, body.np-on:has(.np.sleepv) #musicDock{ display:none !important; }

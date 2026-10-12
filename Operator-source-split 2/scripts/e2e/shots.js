@@ -127,6 +127,8 @@ function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
   await shot('clockout-wind', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); state.focus.activeSession=null; ui.view='today'; renderView(); ACTIONS.clockOut()"); await p.waitForTimeout(1400); });
   await shot('clockout-tomorrow', async () => { await E("workCfg().enabled = true; ui.wind.step='alarm'; ui.wind.workStart='09:00'; ui.wind.workEnd='17:00'; ui.wind.noWork=false; renderWindInto()"); await p.waitForTimeout(500); });
   await shot('clockout-day', async () => { await E("ACTIONS.windDone()"); await p.waitForTimeout(900); });
+  await shot('sleep', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.view='today'; startMode('offtime', {sleep:true, note:'Sleep'}); renderView()"); await p.waitForTimeout(2600); });
+  await E("if(state.modes.active && state.modes.active.sleep) endMode()");
   await shot('health-body', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.view='personal'; ui.personalTab='fitness'; ui.healthSub='body'; renderView()"); await p.waitForTimeout(400); });
   await shot('health-train', async () => { await E("ui.healthSub='training'; renderView()"); await p.waitForTimeout(400); });
   await E("ui.healthSub='overview'");
