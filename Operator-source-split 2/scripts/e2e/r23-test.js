@@ -157,7 +157,7 @@ async function ctxPage(b, seed, opts){
     await E("wakeMusicApp = false; opDuck(false)"); await p.clock.runFor(1500); await p.waitForTimeout(200);
     check('…then back up after', p.calls.some(c => /music\/duck\?on=0/.test(c)));
     await E("AI.hasKey = true; opStop(); OV.idx = -1"); await p.click('.br-voice-dot', {force:true}); await p.waitForTimeout(600);
-    check('Talk to Op: the music stops and Op greets you and asks what you want', !(await E("!!wakeAudio")) && await E("AI.history.some(m => /Where do you want to start/.test(m.content))"));
+    check('Talk to Op: the music goes down (round 28: it no longer stops) and Op greets you and asks what you want', (!(await E("!!wakeAudio")) || await E("window.__a.volume") <= 0.12) && await E("AI.history.some(m => /Where do you want to start/.test(m.content))"));
     check('no page errors (good morning)', p.errors.length===0, p.errors);
     await p.context().close();
   }

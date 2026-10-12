@@ -86,7 +86,7 @@ function focusAddMenu(){
     skill:['&#127919;', 'A training skill', function(){ openSkillSheet(); }, 'Something you’re getting better at'],
     video:['&#127916;', 'A video idea', function(){ openContentSheet(); }, 'Business or your own channel']
   };
-  const sub = ui.view==='focus' && ui.focusTab!=='analytics' ? ui.focusTasksSubTab : '';
-  const order = sub==='skills' ? ['skill', 'task', 'video'] : sub==='videoIdeas' ? ['video', 'task', 'skill'] : ['task', 'skill', 'video'];
+  // (round 28: always the same order: a task, a video idea, a skill)
+  const order = ['task', 'video', 'skill'];
   return order.map(function(k){ return items[k]; });
 }

@@ -217,11 +217,15 @@ function checkAutoLockIn(){
     const elapsedMin = (last.end-from)/60000;
     if(elapsedMin >= (st.thresholdMinutes||12) && autoLockInMeta.intervalStart!==from){
       autoLockInMeta = {app:last.app, intervalStart:from};
+      // (round 28) an auto lock-in never puts you on a task: not the last one, not the one lined up.
+      // The time's logged; put it on a task in the recap if you want.
+      const staged = ui.stagedTaskId; ui.stagedTaskId = null; ui.currentTaskId = null; ui.currentTaskStartedAt = null;
       startFocus(null);
+      ui.stagedTaskId = staged;
       const s = state.focus.activeSession;
-      if(s){ s.autoStarted = true; s.startedAt = from; s.autoApp = last.app; }
+      if(s){ s.autoStarted = true; s.startedAt = from; s.autoApp = last.app; s.noTask = true; }
       persist('focus'); renderView();
-      showToast('Locked in automatically: on '+last.app+' since '+fmt12Hour(nowHM(new Date(from))), {icon:'&#128274;'});
+      showToast('Locked in automatically: on '+last.app+' since '+fmt12Hour(nowHM(new Date(from)))+'. No task picked: add one in your recap if you like.', {icon:'&#128274;'});
     }
     return;
   }

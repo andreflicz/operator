@@ -170,6 +170,7 @@ function renderRecap(){
         '<span class="rc-sess-time">'+fmt12Hour(nowHM(new Date(s.startedAt)))+' – '+fmt12Hour(nowHM(new Date(s.endedAt)))+'</span>'+
         '<span class="rc-sess-len">'+fmtDurationLabel(s.minutes||0)+'</span>'+
         (s.auto ? '<span class="tag">auto'+(s.app?' &middot; '+escapeHtml(s.app):'')+'</span>' : '<span class="tag tag-good">you</span>')+
+        (typeof recapTaskHtml==='function' ? recapTaskHtml(s) : '')+
         '<span style="flex:1"></span>'+
         (s.auto && !s.reviewed ? '<button class="mini-move mini-move-today" data-action="recapApprove" data-id="'+s.id+'">&#10003; Keep</button>' : (s.auto ? '<span class="kpi-sub">kept</span>' : ''))+
         '<button class="mini-move" data-action="recapEdit" data-id="'+s.id+'">Edit</button>'+

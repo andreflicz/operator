@@ -161,8 +161,8 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   await m.click('[data-action="wakeStartDay"]'); await m.waitForTimeout(300);
   check('"I\'m up" lets the song play out instead of cutting it off', calls.some(c => c==='/music/finish') && !calls.some(c => c==='/music/stop'), calls);
   check('…and the briefing has the vision board', (await m.textContent('#wakeOverlay')).includes('Mind + Body'));
-  await m.click('[data-action="wakeStopMusic"]'); await m.waitForTimeout(300);
-  check('the little ■ on the briefing stops it right away', calls.some(c => c==='/music/stop'), calls);
+  await m.click('#wakeContent .mctl [data-action="mctlToggle"]'); await m.waitForTimeout(300);
+  check('the player on the briefing stops it right away (round 28)', calls.some(c => c==='/music/stop'), calls);
   await M("endBriefing()");
   // if the Operator app isn't there to play it, the alarm sound steps in
   await m.unroute('http://127.0.0.1:8935/**');

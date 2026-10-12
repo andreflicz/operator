@@ -65,7 +65,7 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(400);
     check('"I\'m up" lets the song finish (no stop)', calls.includes('/music/finish') && !calls.includes('/music/stop'), calls);
     check('it opens with a big "Good morning", like a phone starting up', await p.isVisible('.brief-intro .bi-word') && /Good morning/.test(await p.textContent('.bi-word')));
-    check('last night\'s note is up top in the briefing', (await p.textContent('.br-lastnight')).includes('Call Mike first'));
+    check('last night\'s note is up top in the briefing (round 28: the first slide of the reel)', (await p.textContent('.bi-slide.is-night')).includes('Call Mike first'));
     // round 13: one-screen brief — column 1 shows last night's note OR the vision board, not both
     check('with a note, the note takes the vision board\'s spot (one screen)', !(await p.$('.br-vision')));
     await E("ACTIONS.wakeBoardToggle()"); await p.waitForTimeout(200);
@@ -74,10 +74,10 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     check('…centered on what\'s on it (even far from the origin)', off < 3, off);
     await E("ACTIONS.wakeBoardToggle()"); await p.waitForTimeout(150);
     // the old floating .brief-music pill became the song chip in the brief's top bar
-    check('a little chip shows the song is still playing', await p.isVisible('.b4-song') && (await p.textContent('.b4-song')).includes('Morning Run'));
+    check('the player shows the song still playing, by name (round 28)', await p.isVisible('.b4-music .mctl') && (await p.textContent('.b4-music .mctl')).includes('Morning Run'));
     await E("ACTIONS.wakeIntroSkip()"); await p.waitForTimeout(100);
     check('the intro can be skipped', !(await p.isVisible('.brief-intro')) && await p.isVisible('.brief.intro-skipped'));
-    await p.click('[data-action="wakeStopMusic"]'); await p.waitForTimeout(200);
+    await p.click('.b4-music .mctl [data-action="mctlToggle"]'); await p.waitForTimeout(200);
     check('■ stops the music right away', calls.includes('/music/stop'));
     check('no errors (wake)', !p.errors.length, p.errors);
     await p.context().close();

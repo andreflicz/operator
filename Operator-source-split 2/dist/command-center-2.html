@@ -5439,11 +5439,12 @@ html[data-theme="light"] .mctl-ls, html[data-theme="light"] .mctl-wi{ color:rgba
 /* Good morning bottom-left (round 28): the reel gets the room it needs and Today gives a little back;
    one slide at a time (the old one is gone before the next comes in, so they never sit on top of each other) */
 .brief4 .c-a > .br-intent:last-child{ flex:0 0 auto !important; }
-.brief4 .c-a > .br-day{ flex:1 1 0 !important; min-height:150px; }
+.brief4 .c-a > .br-day{ flex:1 1 0 !important; min-height:165px; }
 .br-intent .bi-one{ padding:4px 2px 6px; }
 .br-intent .bi-one p{ margin-top:6px; }
 .br-intent .bi-qh{ padding:0 0 9px; margin:0 0 2px; }
-.brief4 .br-intent .bi-reel{ min-height:clamp(74px, 9.4vh, 124px); }
+.brief4 .br-intent .bi-reel{ min-height:clamp(62px, 7.6vh, 124px); }
+@media (max-height:980px){ .br-intent .bi-qh .bi-q-t > b{ font-size:19px; } .br-intent .bi-qh{ padding-bottom:6px; } .br-intent .bi-one p{ font-size:clamp(18px, 2.3vh, 26px); } .br-intent .bi-sub{ -webkit-line-clamp:1; } }
 .bi-slide{ transition:opacity .32s ease, transform .5s cubic-bezier(.2,.8,.2,1); }
 .bi-slide.is-on{ transition-delay:.3s; }
 .br-intent .bi-one p{ font-size:clamp(20px, 2.6vh, 28px); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
@@ -5486,6 +5487,15 @@ html[data-op-mood="stern"] .op-bub-t .cw:last-child, html[data-op-mood="concern"
 .insp.is-alive #inspWorld .izb.is-behind{ z-index:0; pointer-events:none; }
 .insp.is-alive #inspWorld .izh, .insp.is-alive #inspWorld .izd, .insp.is-alive #inspWorld .izt, .insp.is-alive #inspWorld .izw, .insp.is-alive #inspWorld .izq, .insp.is-alive #inspWorld .izb-card{ z-index:2; }
 .insp.is-alive #inspWorld .izb-card{ z-index:4; }
+/* recap: put an auto lock-in on a task */
+.rc-task{ position:relative; display:inline-flex; margin-left:6px; }
+.rc-task-b{ padding:3px 10px; border-radius:999px; border:1px dashed rgba(255,255,255,.25); background:transparent; color:var(--text-dim); font:inherit; font-size:12px; font-weight:600; cursor:pointer; }
+.rc-task-b:hover{ border-color:var(--accent); color:var(--text); }
+.rc-task-b.is-set{ border-style:solid; border-color:rgba(126,240,192,.35); color:#7ef0c0; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rc-task-menu{ position:absolute; top:calc(100% + 6px); left:0; z-index:20; display:flex; flex-direction:column; min-width:220px; max-height:240px; overflow:auto; padding:6px; border-radius:12px; background:var(--card, #171a24); border:1px solid var(--border); box-shadow:0 14px 40px rgba(0,0,0,.35); }
+.rc-task-menu button{ text-align:left; padding:7px 10px; border:none; border-radius:8px; background:transparent; color:var(--text); font:inherit; font-size:13px; cursor:pointer; }
+.rc-task-menu button:hover{ background:rgba(255,255,255,.07); }
+.rc-task-menu em{ padding:8px 10px; color:var(--text-dim); font-size:12.5px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -5679,7 +5689,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 </div>
 <input type="file" id="journalPhotoInput" accept="image/*" multiple style="display:none;">
 <button class="quick-journal-fab jorb" data-action="openQuickJournalModal" title="Journal: a quick note"><span class="jorb-core"></span><span class="jorb-shine"></span><span class="jorb-ring"></span></button>
-<button class="fab-add" id="fabAdd" data-action="fabAdd" title="Add"><span class="fab-sheen"></span><span class="fab-plus">+</span><i class="fab-spark s1"></i><i class="fab-spark s2"></i><i class="fab-spark s3"></i></button>
+<button class="fab-add" id="fabAdd" data-action="fabAdd" aria-label="Add"><span class="fab-sheen"></span><span class="fab-plus">+</span><i class="fab-spark s1"></i><i class="fab-spark s2"></i><i class="fab-spark s3"></i></button>
 
 <script>
 (function(){
@@ -8972,7 +8982,8 @@ ACTIONS.fabAdd = function(){
 function addPickHtml(){
   const list = ui.fabMenu || [];
   return '<button class="int-x hs-x" data-action="addSheetClose" title="Close">&#10005;</button>'+
-    '<div class="as-h"><span class="as-ic">&#10010;</span><div><div class="hs-h">'+escapeHtml(ui.fabMenuLabel || 'Add something')+'</div><div class="as-sub">What do you want to add?</div></div></div>'+
+    // (round 28: no "Add something" header: the choices are the pop-up)
+    (ui.fabMenuLabel && ui.fabMenuLabel!=='Add something' ? '<div class="as-h"><span class="as-ic">&#10010;</span><div><div class="hs-h">'+escapeHtml(ui.fabMenuLabel)+'</div></div></div>' : '')+
     '<div class="ap-grid'+(list.length > 3 ? ' is-many' : '')+'">'+list.map(function(x, i){ return '<button class="ap-tile" data-action="fabMenuPick" data-id="'+i+'" style="--i:'+i+'"><span class="ap-e">'+x[0]+'</span><b>'+x[1]+'</b>'+(x[3] ? '<small>'+x[3]+'</small>' : '')+'</button>'; }).join('')+'</div>';
 }
 function fabMenuClose(){ const m = document.getElementById('fabMenu'); if(m) m.classList.remove('is-in'); const fb = document.getElementById('fabAdd'); if(fb) fb.classList.remove('is-open'); }
@@ -8983,7 +8994,8 @@ afterRenderHooks.push(function(){
   if(!fab) return;
   const c = fabContext();
   fab.classList.toggle('fab-hidden', !c);
-  if(c && fab.dataset.label!==c.label){ fab.title = c.label; fab.setAttribute('aria-label', c.label); fab.dataset.label = c.label; }
+  // (round 28: no hover tooltip on the +; screen readers still get the label)
+  if(c && fab.dataset.label!==c.label){ fab.removeAttribute('title'); fab.setAttribute('aria-label', c.label); fab.dataset.label = c.label; }
 });
 // Crosshair cursor (Settings → Display). A thin accent crosshair everywhere; a filled
 // centre on clickable things; normal I-beam in text fields.
@@ -12283,11 +12295,15 @@ function checkAutoLockIn(){
     const elapsedMin = (last.end-from)/60000;
     if(elapsedMin >= (st.thresholdMinutes||12) && autoLockInMeta.intervalStart!==from){
       autoLockInMeta = {app:last.app, intervalStart:from};
+      // (round 28) an auto lock-in never puts you on a task: not the last one, not the one lined up.
+      // The time's logged; put it on a task in the recap if you want.
+      const staged = ui.stagedTaskId; ui.stagedTaskId = null; ui.currentTaskId = null; ui.currentTaskStartedAt = null;
       startFocus(null);
+      ui.stagedTaskId = staged;
       const s = state.focus.activeSession;
-      if(s){ s.autoStarted = true; s.startedAt = from; s.autoApp = last.app; }
+      if(s){ s.autoStarted = true; s.startedAt = from; s.autoApp = last.app; s.noTask = true; }
       persist('focus'); renderView();
-      showToast('Locked in automatically: on '+last.app+' since '+fmt12Hour(nowHM(new Date(from))), {icon:'&#128274;'});
+      showToast('Locked in automatically: on '+last.app+' since '+fmt12Hour(nowHM(new Date(from)))+'. No task picked: add one in your recap if you like.', {icon:'&#128274;'});
     }
     return;
   }
@@ -12575,6 +12591,7 @@ function renderRecap(){
         '<span class="rc-sess-time">'+fmt12Hour(nowHM(new Date(s.startedAt)))+' – '+fmt12Hour(nowHM(new Date(s.endedAt)))+'</span>'+
         '<span class="rc-sess-len">'+fmtDurationLabel(s.minutes||0)+'</span>'+
         (s.auto ? '<span class="tag">auto'+(s.app?' &middot; '+escapeHtml(s.app):'')+'</span>' : '<span class="tag tag-good">you</span>')+
+        (typeof recapTaskHtml==='function' ? recapTaskHtml(s) : '')+
         '<span style="flex:1"></span>'+
         (s.auto && !s.reviewed ? '<button class="mini-move mini-move-today" data-action="recapApprove" data-id="'+s.id+'">&#10003; Keep</button>' : (s.auto ? '<span class="kpi-sub">kept</span>' : ''))+
         '<button class="mini-move" data-action="recapEdit" data-id="'+s.id+'">Edit</button>'+
@@ -29266,8 +29283,8 @@ function focusAddMenu(){
     skill:['&#127919;', 'A training skill', function(){ openSkillSheet(); }, 'Something you’re getting better at'],
     video:['&#127916;', 'A video idea', function(){ openContentSheet(); }, 'Business or your own channel']
   };
-  const sub = ui.view==='focus' && ui.focusTab!=='analytics' ? ui.focusTasksSubTab : '';
-  const order = sub==='skills' ? ['skill', 'task', 'video'] : sub==='videoIdeas' ? ['video', 'task', 'skill'] : ['task', 'skill', 'video'];
+  // (round 28: always the same order: a task, a video idea, a skill)
+  const order = ['task', 'video', 'skill'];
   return order.map(function(k){ return items[k]; });
 }
 // ============ INSPIRATION, DREAMIER: MORE MUSIC AND A SANDBOX ============
@@ -30200,6 +30217,88 @@ async function inspAiRefresh(){
     a.date = today; persist('personal');
     if(typeof inspOpenNow==='function' && inspOpenNow()) inspRender();
   }catch(e){} finally { a.busy = false; }
+}
+// ============ OP HAS YOUR BACK: THE THINGS YOU SAID YOU'D DO ============
+// A reminder you set, a follow-up with a client, a task due today or already late: Op brings it up out
+// loud, like an assistant who's watching your back. One thing at a time, said plainly, ending on whether
+// you want help with it (set a time, draft the message, put it on today). A few times a day at most,
+// never while you're locked in or asleep, never the same thing twice in a day. The mic opens for your answer.
+// Also: the recap lets you put an auto lock-in on a task (auto lock-in never picks one for you).
+
+function opNudgeItems(){
+  const today = todayStr(), out = [];
+  (typeof followUpsDue==='function' ? followUpsDue(today) : []).forEach(function(f){
+    out.push({id:'fu:'+f.kind+':'+(f.x && f.x.id)+':'+f.date, w:f.late ? 3 : 2, short:'follow up with '+f.name,
+      fact:'He set a follow-up with '+f.name+(f.late ? ' for '+f.date+', and it still hasn’t happened' : ' for today')+(f.note ? ' (his note: "'+f.note+'")' : '')+'.'});
+  });
+  arr(state.focus.reminders).filter(function(r){ return r.date && r.date <= today && !r.done; }).forEach(function(r){
+    if(r.time && r.date===today && localTs(r.date, r.time) > Date.now()) return;  // (not yet: it'll ring on time)
+    out.push({id:'rm:'+r.id, w:r.date < today ? 3 : 2, short:r.label, fact:'He set himself a reminder: "'+r.label+'"'+(r.date < today ? ' (it was for '+fmtDateShort(r.date)+' and is still open)' : r.time ? ' (it went off at '+fmt12Hour(r.time)+')' : ' (for today)')+'.'});
+  });
+  state.tasks.items.filter(function(t){ return t.status!=='done' && t.deadline && t.deadline <= today; }).forEach(function(t){
+    out.push({id:'td:'+t.id+':'+today, w:t.deadline < today ? 3 : 1, short:t.title, fact:'A task '+(t.deadline < today ? 'that was due '+fmtDateShort(t.deadline)+' and is overdue' : 'due today')+': "'+t.title+'".'});
+  });
+  return out.sort(function(a, b){ return b.w - a.w; });
+}
+function opNudgeStore(){ const p = state.profile, t = todayStr(); if(!p.opNudge || p.opNudge.date!==t) p.opNudge = {date:t, n:0, last:0, said:[]}; return p.opNudge; }
+function opNudgeNext(){ const s = opNudgeStore(); return opNudgeItems().find(function(x){ return s.said.indexOf(x.id) < 0; }) || null; }
+function opNudgeDue(){
+  if(!state || !state.profile || AI.busy || AI.listening || (typeof OV!=='undefined' && (OV.speaking || OV.pending))) return false;
+  const m = state.modes && state.modes.active;
+  if(state.focus.activeSession || (m && (m.sleep || m.type==='shooting'))) return false;
+  if(document.querySelector('.overlay:not(.hidden)') || (typeof inspOpenNow==='function' && inspOpenNow())) return false;
+  const h = new Date().getHours(); if(h < 9 || h >= 21) return false;
+  const s = opNudgeStore(); if(s.n >= 3 || Date.now() - s.last < 100*60000) return false;
+  if(Date.now() - (ui._opActiveAt || 0) < 40000) return false;
+  return !!opNudgeNext();
+}
+async function opNudge(force){
+  if(!force && !opNudgeDue()) return false;
+  const it = opNudgeNext(); if(!it) return false;
+  const s = opNudgeStore(); s.n++; s.last = Date.now(); s.said.push(it.id); persist('profile');
+  let line = pickOne(['Quick one: ', 'Hey, before I forget: ', 'One thing: '])+it.short.charAt(0).toUpperCase()+it.short.slice(1)+(it.w >= 3 ? ' is still hanging.' : ' is on for today.')+' Want me to help you get it done?';
+  if(AI.hasKey===true && typeof aiWrite==='function'){
+    const t = await Promise.race([aiWrite('You noticed something I said I’d do and haven’t done yet. '+it.fact+'\nBring it up out loud, like a sharp assistant who has my back: one or two short spoken sentences. Name it plainly, say why it matters if it does, and end by asking if I want your help with it (set a time, draft the message, put it on today, or just mark it done). Don’t nag, don’t guilt, don’t mention reminders or the app.', {max:140}), new Promise(function(r){ setTimeout(r, 9000); })]);
+    if(t) line = t;
+  }
+  if(state.focus.activeSession) return false;
+  AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
+  OV.cap = 'opBubText'; opBubShow();
+  if(opVoiceOn()) opSay(line, {cap:'opBubText'}); else opCaption(line);
+  return true;
+}
+setInterval(function(){ try{ if(opNudgeDue()) opNudge(); }catch(e){} }, 60000);
+// what Op knows when you answer
+aiContext = (function(base){ return function(){ const s = state.profile.opNudge, last = s && s.said.length ? opNudgeItems().find(function(x){ return x.id===s.said[s.said.length-1]; }) : null;
+  return base.apply(this, arguments)+(last && Date.now() - s.last < 20*60000 ? '\nYou just brought this up with him: '+last.fact+' If he says yes, help with it right away using your tools (a reminder at a set time, add it to today, draft the message). If he says it’s done, take his word and drop it.' : ''); }; })(aiContext);
+// the daily question is said out loud too (and the mic opens for the answer); something you said
+// you'd do comes first
+opAskQuestion = async function(){
+  if(!opQuestionDue() || opNudgeNext()) return;
+  state.profile.opAskedOn = todayStr(); persist('profile');
+  const q = await aiWrite('Ask me one short, specific question that would help you understand my business or me better and fill a gap in what you know (a client with no notes, a lead going nowhere, a goal you don’t understand, how I like to work). One sentence, no preamble, nothing else.', {max:120});
+  if(!q || document.querySelector('.overlay:not(.hidden)') || state.focus.activeSession) return;
+  AI.history.push({role:'assistant', content:q}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
+  OV.cap = 'opBubText'; opBubShow();
+  if(opVoiceOn()) opSay(q, {cap:'opBubText'}); else opCaption(q);
+};
+
+// ---- the recap: put an auto lock-in on a task, if you want ----
+function recapTaskList(){ return state.tasks.items.filter(function(t){ return t.status!=='done' && !t.skill; }).sort(function(a, b){ return (a.status==='today' ? 0 : 1) - (b.status==='today' ? 0 : 1); }).slice(0, 8); }
+ACTIONS.recapTaskOpen = function(el, e, id){ ui.recapTaskFor = ui.recapTaskFor===id ? null : id; renderView(); if(typeof renderRecapInto==='function') try{ renderRecapInto(); }catch(e2){} };
+ACTIONS.recapSetTask = function(el){
+  const sid = el.dataset.sid, tid = el.dataset.tid;
+  const s = state.focus.sessions.find(function(x){ return x.id===sid; }), t = state.tasks.items.find(function(x){ return x.id===tid; });
+  if(!s || !t) return;
+  if(s.taskId && s.taskId!==tid){ const o = state.tasks.items.find(function(x){ return x.id===s.taskId; }); if(o) o.trackedMinutes = Math.max(0, (o.trackedMinutes||0) - (s.minutes||0)); }
+  if(s.taskId!==tid) t.trackedMinutes = (t.trackedMinutes||0) + (s.minutes||0);
+  s.taskId = tid; s.taskTitle = t.title; s.reviewed = true; ui.recapTaskFor = null;
+  persist('focus'); persist('tasks'); playTick(); renderView(); if(typeof renderRecapInto==='function') try{ renderRecapInto(); }catch(e){}
+};
+function recapTaskHtml(s){
+  if(!s.auto) return '';
+  return '<span class="rc-task">'+(s.taskTitle ? '<button class="rc-task-b is-set" data-action="recapTaskOpen" data-id="'+s.id+'" title="Change the task">&#10003; '+escapeHtml(s.taskTitle)+'</button>' : '<button class="rc-task-b" data-action="recapTaskOpen" data-id="'+s.id+'" title="Put this time on a task">+ Task</button>')+
+    (ui.recapTaskFor===s.id ? '<span class="rc-task-menu">'+(recapTaskList().map(function(t){ return '<button data-action="recapSetTask" data-sid="'+s.id+'" data-tid="'+t.id+'">'+escapeHtml(t.title)+'</button>'; }).join('') || '<em>No open tasks</em>')+'</span>' : '')+'</span>';
 }
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){

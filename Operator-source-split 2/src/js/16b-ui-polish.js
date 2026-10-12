@@ -112,7 +112,8 @@ ACTIONS.fabAdd = function(){
 function addPickHtml(){
   const list = ui.fabMenu || [];
   return '<button class="int-x hs-x" data-action="addSheetClose" title="Close">&#10005;</button>'+
-    '<div class="as-h"><span class="as-ic">&#10010;</span><div><div class="hs-h">'+escapeHtml(ui.fabMenuLabel || 'Add something')+'</div><div class="as-sub">What do you want to add?</div></div></div>'+
+    // (round 28: no "Add something" header: the choices are the pop-up)
+    (ui.fabMenuLabel && ui.fabMenuLabel!=='Add something' ? '<div class="as-h"><span class="as-ic">&#10010;</span><div><div class="hs-h">'+escapeHtml(ui.fabMenuLabel)+'</div></div></div>' : '')+
     '<div class="ap-grid'+(list.length > 3 ? ' is-many' : '')+'">'+list.map(function(x, i){ return '<button class="ap-tile" data-action="fabMenuPick" data-id="'+i+'" style="--i:'+i+'"><span class="ap-e">'+x[0]+'</span><b>'+x[1]+'</b>'+(x[3] ? '<small>'+x[3]+'</small>' : '')+'</button>'; }).join('')+'</div>';
 }
 function fabMenuClose(){ const m = document.getElementById('fabMenu'); if(m) m.classList.remove('is-in'); const fb = document.getElementById('fabAdd'); if(fb) fb.classList.remove('is-open'); }
@@ -123,7 +124,8 @@ afterRenderHooks.push(function(){
   if(!fab) return;
   const c = fabContext();
   fab.classList.toggle('fab-hidden', !c);
-  if(c && fab.dataset.label!==c.label){ fab.title = c.label; fab.setAttribute('aria-label', c.label); fab.dataset.label = c.label; }
+  // (round 28: no hover tooltip on the +; screen readers still get the label)
+  if(c && fab.dataset.label!==c.label){ fab.removeAttribute('title'); fab.setAttribute('aria-label', c.label); fab.dataset.label = c.label; }
 });
 // Crosshair cursor (Settings → Display). A thin accent crosshair everywhere; a filled
 // centre on clickable things; normal I-beam in text fields.

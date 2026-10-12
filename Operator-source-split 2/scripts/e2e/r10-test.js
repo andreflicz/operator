@@ -48,7 +48,7 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(300);
     check('cinematic intro (setting) plays', await p.isVisible('.brief-intro.is-cinematic'));
     check('the plan lined itself up: #1 is up next', await E("state.focus.lineupOrder[0]")==='e' && await E("state.focus.nextTaskId")==='e' && await E("state.tasks.items.find(t=>t.id==='e').status")==='today');
-    const h = await p.$('.br-lastnight');
+    const h = await p.$('.br-intent'); // (round 28: last night's note is a slide in the reel)
     await p.waitForTimeout(4500);
     check('briefing doesn\'t pop in twice (same nodes after the intro)', await h.evaluate(n => n.isConnected));
     const brief = await p.textContent('#wakeOverlay');
