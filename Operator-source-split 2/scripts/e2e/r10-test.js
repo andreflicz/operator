@@ -163,7 +163,7 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     const vp = await E("JSON.stringify(boardById('v1').viewport)");
     await p.mouse.move(hb.x+10, hb.y+10); await p.mouse.down(); await p.mouse.move(hb.x+hb.width*0.8, hb.y+hb.height*0.45, {steps:8}); await p.mouse.up();
     check('drag on empty space draws a selection box', (await E("Array.from(cv.sel).sort().join(',')")).includes('n1,n2') && vp===await E("JSON.stringify(boardById('v1').viewport)"));
-    await p.mouse.dblclick(hb.x+hb.width-60, hb.y+hb.height-60); await p.waitForTimeout(200);
+    await p.mouse.dblclick(hb.x+hb.width-300, hb.y+hb.height-160); await p.waitForTimeout(200); // (clear of the + and the journal orb)
     await p.keyboard.type('Hello board'); await p.mouse.click(hb.x+20, hb.y+hb.height-20); await p.waitForTimeout(200);
     const nn = await E("JSON.stringify(boardById('v1').elements.find(e=>e.body==='Hello board')||null)");
     check('double-click opens a text box right there', nn!=='null');
