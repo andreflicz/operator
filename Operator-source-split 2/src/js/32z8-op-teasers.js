@@ -104,4 +104,5 @@ opSay = (function(base){
     });
   };
 })(opSay);
-aiAutoListen = (function(base){ return function(cap){ if(Date.now() - (AI.autoAt||0) < 2500) return; AI.autoAt = Date.now(); return base(cap); }; })(aiAutoListen);
+// (the same question can't open the mic twice; a new question always can)
+aiAutoListen = (function(base){ return function(cap){ const el = document.getElementById(cap || 'opBubText'), t = el ? el.textContent : ''; if(t && t===AI.autoTxt && Date.now() - (AI.autoAt||0) < 3000) return; AI.autoAt = Date.now(); AI.autoTxt = t; return base(cap); }; })(aiAutoListen);

@@ -30106,7 +30106,8 @@ opSay = (function(base){
     });
   };
 })(opSay);
-aiAutoListen = (function(base){ return function(cap){ if(Date.now() - (AI.autoAt||0) < 2500) return; AI.autoAt = Date.now(); return base(cap); }; })(aiAutoListen);
+// (the same question can't open the mic twice; a new question always can)
+aiAutoListen = (function(base){ return function(cap){ const el = document.getElementById(cap || 'opBubText'), t = el ? el.textContent : ''; if(t && t===AI.autoTxt && Date.now() - (AI.autoAt||0) < 3000) return; AI.autoAt = Date.now(); AI.autoTxt = t; return base(cap); }; })(aiAutoListen);
 // ============ INSPIRATION, ROUND 28: WIND ============
 // The bubbles are alive: each one wanders around its spot on its own little path, all the time.
 // Drift is the one effect now (Stream is gone): set the wind, from Calm to Gale, and the same bubbles
@@ -30667,6 +30668,11 @@ opRunTool = (function(base){
 })(opRunTool);
 // no AI key: a check-in answer that sounds like limbo still gets a way out (used by the check-in's judge)
 function limboFallback(){ const a = resetActs()[0]; return a ? 'Sounds like you’re stuck in between. Here’s the way out: '+a.label.toLowerCase()+', '+resetMinutes(a)+' minutes, then we lock in for 25. Want me to start it?' : ''; }
+// Esc closes whatever small panel is open (the wind, sounds, Reset) before it closes Inspiration
+window.addEventListener('keydown', function(e){
+  if(e.key!=='Escape' || typeof inspOpenNow!=='function' || !inspOpenNow()) return;
+  if(ui.inspWindOpen || ui.inspSfxOpen || ui.inspResetSheet){ e.stopPropagation(); e.preventDefault(); ui.inspWindOpen = false; ui.inspSfxOpen = false; ui.inspResetSheet = false; inspRender(); }
+}, true);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

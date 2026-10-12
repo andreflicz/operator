@@ -203,7 +203,7 @@ async function ctxPage(b, seed, opts){
     check('Inspiration opens on one of the dreamy tracks', await E("FM.playing && FOCUS_TRACKS[FM.idx].dream===true"));
     check('the sky has aurora, rising lights and a glow that follows you', !!(await p.$('#insp .insp-aurora')) && (await p.$$('#insp .insp-bokeh i')).length===10 && !!(await p.$('#insp .insp-glow')));
     const tools = await p.$$eval('#insp .izk', els => els.map(e => e.textContent.trim()));
-    check('a sandbox bar: Thought, Wish, Words, Breathe, the sky, Drift', JSON.stringify(tools)==='["✎Thought","✦Wish","❝Words","❍Breathe","☾Dusk","〰Stream","≈Drift"]', tools);
+    check('a sandbox bar: Thought, Wish, Words, Breathe, the sky, Drift (round 28: plus Breeze and Sounds)', JSON.stringify(tools)==='["✎Thought","✦Wish","❝Words","❍Breathe","☾Dusk","≈Drift","🍃Breeze","🎵Sounds"]', tools);
     check('the week (reading, meditating, walks…) lives here now', /This week/.test(await p.textContent('#insp .insp-lately')) && (await p.$$('#insp .izl-w')).length===6);
     await p.click('#insp [data-action="inspToolWish"]'); await p.waitForTimeout(300);
     await p.keyboard.type('A house by the ocean'); await p.waitForTimeout(100);
@@ -219,11 +219,14 @@ async function ctxPage(b, seed, opts){
     check('the sky changes (and remembers)', await E("document.getElementById('insp').getAttribute('data-sky')")==='aurora' && await E("inspSandStore().sky")==='aurora' && /Aurora/.test(await p.textContent('#insp .insp-tools')));
     await p.mouse.click(1000, 140); await p.waitForTimeout(150);
     check('tap the sky: a bloom of light', !!(await p.$('.insp-bloom')));
-    await p.click('#insp [data-action="inspDrift"]'); await p.waitForTimeout(600);
-    const d0 = await E("ui.inspView.x"); await p.waitForTimeout(700);
-    check('Drift: the rest fades and the sky wanders on its own', await E("document.getElementById('insp').classList.contains('is-drift')") && Math.abs(await E("ui.inspView.x") - d0) > 0.5);
+    // (round 28: Drift is the wind now)
+    await p.click('#insp [data-action="inspDrift"]'); await p.waitForTimeout(300);
+    check('Drift: set the wind and the bubbles breeze across', await p.isVisible('#insp .izk-wind'));
     await p.keyboard.press('Escape'); await p.waitForTimeout(200);
-    check('…Esc stops drifting (and keeps you here)', !(await E("!!ui.inspDrift")) && !!(await p.$('#insp.is-in')));
+    check('…Esc closes the wind panel and keeps you here', !(await p.$('#insp .izk-wind')) && !!(await p.$('#insp.is-in')));
+    await p.click('#insp [data-action="inspDrift"]'); await p.waitForTimeout(200); await p.click('#insp .izk-wind [data-id="breeze"]'); await p.waitForTimeout(200);
+    check('…the wind is set', await E("inspStore().wind")==='breeze');
+    await E("inspStore().wind='calm'");
     await p.click('#insp [data-action="inspBreathe"]'); await p.waitForTimeout(300);
     check('Breathe: a breathing orb, full screen', await p.isVisible('#inspBreath .ibr-orb') && /Breathe in/.test(await p.textContent('#inspBreath')));
     await p.clock.runFor(4200); await p.waitForTimeout(100);

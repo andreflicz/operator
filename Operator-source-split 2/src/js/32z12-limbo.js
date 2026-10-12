@@ -118,3 +118,8 @@ opRunTool = (function(base){
 })(opRunTool);
 // no AI key: a check-in answer that sounds like limbo still gets a way out (used by the check-in's judge)
 function limboFallback(){ const a = resetActs()[0]; return a ? 'Sounds like you’re stuck in between. Here’s the way out: '+a.label.toLowerCase()+', '+resetMinutes(a)+' minutes, then we lock in for 25. Want me to start it?' : ''; }
+// Esc closes whatever small panel is open (the wind, sounds, Reset) before it closes Inspiration
+window.addEventListener('keydown', function(e){
+  if(e.key!=='Escape' || typeof inspOpenNow!=='function' || !inspOpenNow()) return;
+  if(ui.inspWindOpen || ui.inspSfxOpen || ui.inspResetSheet){ e.stopPropagation(); e.preventDefault(); ui.inspWindOpen = false; ui.inspSfxOpen = false; ui.inspResetSheet = false; inspRender(); }
+}, true);
