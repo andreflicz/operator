@@ -17,7 +17,7 @@
 const MORPH_SKIP_ATTRS = { 'data-selected': true };
 // Classes scripts add at runtime (carousel arrows and edge fades). A re-render keeps them so
 // nothing blinks off for a frame; the carousel's own update corrects them right after.
-const MORPH_STICKY_CLASSES = ['can-prev', 'can-next', 'fade-l', 'fade-r', 'car-over'];
+const MORPH_STICKY_CLASSES = ['can-prev', 'can-next', 'fade-l', 'fade-r', 'car-over', 'is-moving'];
 const MORPH_FIELDS = 'input,textarea,select';
 function withStickyClasses(oldN, value){
   let v = value;

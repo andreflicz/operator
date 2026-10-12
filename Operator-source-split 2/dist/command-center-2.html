@@ -5145,6 +5145,27 @@ textarea.hs-in{ resize:vertical; min-height:56px; }
 .pri-seg button i{ width:8px; height:8px; border-radius:50%; background:currentColor; opacity:.8; }
 .pri-seg .pri-low i{ background:#7fb4ff; } .pri-seg .pri-med i{ background:#f2b84b; } .pri-seg .pri-high i{ background:#ff6b6b; }
 .pri-seg button.pri-high.is-on{ color:#ff8a8a; } .pri-seg button.pri-low.is-on{ color:#9cc6ff; } .pri-seg button.pri-med.is-on{ color:#f6c66a; }
+/* the week and the month: the same pencil on both (a small dot when it wants a check-in or a check-out) */
+.tg-edit{ position:relative; }
+.tg-edit.is-due::after{ content:''; position:absolute; top:3px; right:3px; width:6px; height:6px; border-radius:50%; background:var(--tgc, var(--accent)); box-shadow:0 0 6px var(--tgc, var(--accent)); }
+/* sized carousels: a soft fade at the edges while you swipe (cards never look sliced) */
+.carousel.is-sized > .car-track.is-moving.fade-l.fade-r{ -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%) !important; mask-image:linear-gradient(90deg, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%) !important; }
+.carousel.is-sized > .car-track.is-moving.fade-l:not(.fade-r){ -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 48px) !important; mask-image:linear-gradient(90deg, transparent 0, #000 48px) !important; }
+.carousel.is-sized > .car-track.is-moving.fade-r:not(.fade-l){ -webkit-mask-image:linear-gradient(90deg, #000 calc(100% - 48px), transparent 100%) !important; mask-image:linear-gradient(90deg, #000 calc(100% - 48px), transparent 100%) !important; }
+.ctx-item.ctx-strong{ font-weight:700; color:var(--text); }
+/* the + chooser: a pop-up of big tiles */
+.as.is-addPick{ width:min(560px, 100%); }
+.ap-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+.ap-grid.is-many{ grid-template-columns:repeat(3, 1fr); }
+.ap-tile{ display:flex; flex-direction:column; align-items:flex-start; gap:4px; text-align:left; padding:16px 14px 14px; border-radius:16px; border:1px solid var(--border); background:linear-gradient(160deg, rgba(var(--ink),.05), rgba(var(--ink),.015)); color:var(--text); font:inherit; cursor:pointer;
+  animation:apIn .32s cubic-bezier(.2,.9,.3,1.15) both; animation-delay:calc(var(--i) * 35ms); transition:transform .18s, border-color .18s, background .18s, box-shadow .18s; }
+.ap-tile:hover{ transform:translateY(-2px); border-color:rgba(232,162,61,.45); background:linear-gradient(160deg, rgba(232,162,61,.12), rgba(var(--ink),.02)); box-shadow:0 12px 30px rgba(0,0,0,.28); }
+.ap-tile .ap-e{ width:42px; height:42px; border-radius:13px; display:grid; place-items:center; font-size:21px; background:rgba(var(--ink),.07); margin-bottom:6px; transition:transform .25s cubic-bezier(.2,1.4,.4,1); }
+.ap-tile:hover .ap-e{ transform:scale(1.08) rotate(-5deg); }
+.ap-tile b{ font-size:14.5px; font-weight:700; } .ap-tile small{ font-size:11.5px; color:var(--text-dim); line-height:1.35; }
+
+@keyframes apIn{ from{ opacity:0; transform:translateY(8px) scale(.97); } to{ opacity:1; transform:none; } }
+@media (max-width:620px){ .ap-grid, .ap-grid.is-many{ grid-template-columns:repeat(2, 1fr); } }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -5637,7 +5658,7 @@ function dragGhost(e, label, opts){
 const MORPH_SKIP_ATTRS = { 'data-selected': true };
 // Classes scripts add at runtime (carousel arrows and edge fades). A re-render keeps them so
 // nothing blinks off for a frame; the carousel's own update corrects them right after.
-const MORPH_STICKY_CLASSES = ['can-prev', 'can-next', 'fade-l', 'fade-r', 'car-over'];
+const MORPH_STICKY_CLASSES = ['can-prev', 'can-next', 'fade-l', 'fade-r', 'car-over', 'is-moving'];
 const MORPH_FIELDS = 'input,textarea,select';
 function withStickyClasses(oldN, value){
   let v = value;
@@ -8596,10 +8617,7 @@ function renderAllDeadlinesSection(){
 // Context-aware "+" button (bottom-right): adds whatever the current page is about.
 function fabContext(){
   const v = ui.view;
-  if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='videoIdeas') return {label:'Add a video', run:function(){ openContentSheet(); }};
-  if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='skills') return {label:'Add a training skill', run:function(){ openSkillSheet(); }};
-  if(v==='focus' && ui.focusTab!=='analytics') return {label:'Add something', menu:focusAddMenu()};
-  if(v==='focus' || v==='today') return {label:'Add task', run:openAddTaskModal};
+  if(v==='focus' || v==='today') return {label:'Add something', menu:focusAddMenu()};
   if(v==='business'){
     if(ui.businessTab==='clients' || ui.businessTab==='lifecycle') return {label:'Add client', run:function(){ if(typeof openNewContactModal==='function') openNewContactModal('client'); else { ui.forms.client=true; renderView(); } }};
     if(ui.businessTab==='packages') return {label:'Add package', run:openNewPackageModal};
@@ -8621,21 +8639,25 @@ function fabContext(){
 ACTIONS.fabAdd = function(){
   const c = fabContext(); if(!c) return;
   if(!c.menu){ c.run(); return; }
-  let m = document.getElementById('fabMenu');
-  if(m && m.classList.contains('is-in')){ fabMenuClose(); return; }
-  if(!m){ m = document.createElement('div'); m.id = 'fabMenu'; m.className = 'fab-menu'; document.body.appendChild(m); }
-  m.innerHTML = '<div class="fab-mh">'+escapeHtml(c.label)+'</div>'+c.menu.map(function(x, i){ return '<button class="fab-mi" data-action="fabMenuPick" data-id="'+i+'" style="--i:'+i+'"><span class="fab-mi-e">'+x[0]+'</span><span class="fab-mi-t"><b>'+x[1]+'</b>'+(x[3] ? '<small>'+x[3]+'</small>' : '')+'</span></button>'; }).join('');
-  ui.fabMenu = c.menu; void m.offsetWidth; m.classList.add('is-in'); const fb = document.getElementById('fabAdd'); if(fb) fb.classList.add('is-open');
+  // more than one kind of thing to add: a pop-up asks which first (like every other add sheet)
+  ui.fabMenu = c.menu; ui.fabMenuLabel = c.label;
+  addSheetOpen('addPick', addPickHtml);
 };
+function addPickHtml(){
+  const list = ui.fabMenu || [];
+  return '<button class="int-x hs-x" data-action="addSheetClose" title="Close">&#10005;</button>'+
+    '<div class="as-h"><span class="as-ic">&#10010;</span><div><div class="hs-h">'+escapeHtml(ui.fabMenuLabel || 'Add something')+'</div><div class="as-sub">What do you want to add?</div></div></div>'+
+    '<div class="ap-grid'+(list.length > 3 ? ' is-many' : '')+'">'+list.map(function(x, i){ return '<button class="ap-tile" data-action="fabMenuPick" data-id="'+i+'" style="--i:'+i+'"><span class="ap-e">'+x[0]+'</span><b>'+x[1]+'</b>'+(x[3] ? '<small>'+x[3]+'</small>' : '')+'</button>'; }).join('')+'</div>';
+}
 function fabMenuClose(){ const m = document.getElementById('fabMenu'); if(m) m.classList.remove('is-in'); const fb = document.getElementById('fabAdd'); if(fb) fb.classList.remove('is-open'); }
-ACTIONS.fabMenuPick = function(el, e, id){ const it = (ui.fabMenu || [])[Number(id)]; fabMenuClose(); if(it) it[2](); };
+ACTIONS.fabMenuPick = function(el, e, id){ const it = (ui.fabMenu || [])[Number(id)]; fabMenuClose(); if(typeof addSheetClose==='function') addSheetClose('addPick'); if(it) it[2](); };
 document.addEventListener('mousedown', function(e){ if(!e.target.closest || e.target.closest('#fabMenu, #fabAdd')) return; fabMenuClose(); }, true);
 afterRenderHooks.push(function(){
   const fab = document.getElementById('fabAdd');
   if(!fab) return;
   const c = fabContext();
   fab.classList.toggle('fab-hidden', !c);
-  if(c && fab.dataset.label!==c.label){ fab.removeAttribute('title'); fab.setAttribute('aria-label', c.label); fab.dataset.label = c.label; }
+  if(c && fab.dataset.label!==c.label){ fab.title = c.label; fab.setAttribute('aria-label', c.label); fab.dataset.label = c.label; }
 });
 // Crosshair cursor (Settings → Display). A thin accent crosshair everywhere; a filled
 // centre on clickable things; normal I-beam in text fields.
@@ -9020,6 +9042,9 @@ let carRaf = 0, carPending = new Set();
 document.addEventListener('scroll', function(e){
   const t = e.target; if(!t || !t.classList || !t.classList.contains('car-track')) return;
   carPending.add(t);
+  // while it's moving, the cards fade out at the edges instead of being sliced off
+  if(!t.classList.contains('is-moving')) t.classList.add('is-moving');
+  clearTimeout(t._movT); t._movT = setTimeout(function(){ t.classList.remove('is-moving'); }, 220);
   if(!carRaf) carRaf = requestAnimationFrame(function(){ carRaf = 0; carPending.forEach(carUpdate); carPending.clear(); });
 }, {capture:true, passive:true});
 window.addEventListener('resize', function(){ requestAnimationFrame(carUpdateAll); });
@@ -9374,8 +9399,9 @@ function openTaskMenu(t, x, y){
   const m = document.createElement('div');
   m.id = 'taskCtxMenu'; m.className = 'ctx-menu'; m.dataset.id = t.id; m.dataset.at = Date.now();
   m.innerHTML = '<div class="ctx-title">'+escapeHtml(t.title)+'</div>'+
-    (t.status!=='done' ? item('start', inSession ? '&#9654; Start timing now' : '&#128274; Lock in on this') : '')+
-    (t.status!=='done' && !isNext ? item('next', '&#128204; Make it next up') : '')+
+    (t.status!=='done' && ui.currentTaskId!==t.id ? item('now', '&#9654; Put it on Now', ' ctx-strong') : '')+
+    (t.status!=='done' && !isNext && ui.currentTaskId!==t.id ? item('next', '&#9197; Make it Up next') : '')+
+    (t.status!=='done' && !inSession ? item('start', '&#128274; Lock in on this') : '')+
     item('edit', '&#9998; Edit…')+
     (t.status==='done' ? item('undo', '&#8634; Back to today')
       : t.ongoing ? (isOngoingDoneToday(t) ? item('undo', '&#8634; Undo: done for today') : item('done', '&#10003; Mark done for today'))
@@ -9419,6 +9445,7 @@ ACTIONS.taskCtx = function(el, e, id){
     if(t.status!=='today'){ t.status = 'today'; persist('tasks'); }
     if(state.focus.activeSession) setCurrentTask(t.id); else { setNextUp(t.id); renderView(); openLockInChooser(); }
   }
+  else if(op==='now'){ if(t.status!=='today'){ t.status = 'today'; persist('tasks'); } setCurrentTask(t.id); playTick(); showToast('On Now: '+t.title.slice(0, 50)+'.', {icon:'&#9654;'}); }
   else if(op==='next'){ if(t.status==='backlog') t.status = 'today'; setNextUp(t.id); playTick(); save(); }
   else if(op==='edit') openTaskEditModal(t.id);
   else if(op==='done') completeTask(t.id);
@@ -26130,7 +26157,7 @@ function tierCardHtml(kind, opts){
   const sub = kind==='month' ? (rec.habit ? 'Beating: '+rec.habit : '') : (rec.focus ? 'Focus: '+rec.focus : '');
   return '<div class="tg-card is-'+kind+'">'+
     '<div class="tg-h"><span class="tg-k">'+(kind==='month' ? monthName(key) : 'This week')+'</span>'+(gs.length ? '<span class="tg-n">'+done+'/'+gs.length+'</span>' : '')+
-      '<span style="flex:1"></span>'+(due ? '<button class="tg-out" data-action="openCheckout" data-id="'+due.kind+':'+due.key+'">Check out &#8594;</button>' : '<button class="tg-edit" data-action="openIntent" data-id="'+kind+'" title="'+(checkedIn(kind, key) ? 'Edit your check-in' : 'Check in')+'">'+(checkedIn(kind, key) ? '&#9998;' : 'Check in &#8594;')+'</button>')+'</div>'+
+      '<span style="flex:1"></span>'+(due ? '<button class="tg-edit is-due" data-action="openCheckout" data-id="'+due.kind+':'+due.key+'" title="Check out of '+(kind==='month' ? monthName(due.key) : 'the week')+'">&#9998;</button>' : '<button class="tg-edit'+(checkedIn(kind, key) ? '' : ' is-due')+'" data-action="openIntent" data-id="'+kind+'" title="'+(checkedIn(kind, key) ? 'Edit your check-in' : 'Check in')+'">&#9998;</button>')+'</div>'+
     (sub ? '<div class="tg-sub">'+escapeHtml(sub)+'</div>' : '')+
     (gs.length ? '<div class="tg-list">'+gs.map(tierGoalRowHtml).join('')+'</div>' : '<div class="tg-empty">'+(kind==='month' ? 'No goals for the month yet.' : 'No goals for the week yet.')+'</div>')+
     (opts.add==='sheet' ? (checkedOut(kind, key) ? '<div class="tg-addrow"><button class="tg-addbtn" data-action="tierReopen" data-id="'+kind+'">&#8634; Reopen the '+(kind==='month' ? 'month' : 'week')+'</button></div>' : '') :
@@ -28566,10 +28593,10 @@ ACTIONS.skillStart = function(el, e, id){ const t = state.tasks.items.find(funct
 // their old ids, so the same add functions do the work (and close the sheet when they're done).
 function addSheetOpen(id, htmlFn, focusId){
   let o = document.getElementById(id);
-  if(!o){ o = document.createElement('div'); o.id = id; o.className = 'overlay hs-ov as-ov hidden'; o.innerHTML = '<div class="card hs as" id="'+id+'Content"></div>'; document.body.appendChild(o); }
+  if(!o){ o = document.createElement('div'); o.id = id; o.className = 'overlay hs-ov as-ov hidden'; o.innerHTML = '<div class="card hs as is-'+id+'" id="'+id+'Content"></div>'; document.body.appendChild(o); }
   o._html = htmlFn; o.classList.remove('hidden');
   addSheetRefresh(id);
-  setTimeout(function(){ const i = document.getElementById(focusId); if(i) i.focus(); }, 60);
+  if(focusId) setTimeout(function(){ const i = document.getElementById(focusId); if(i) i.focus(); }, 60);
 }
 function addSheetRefresh(id){ const o = document.getElementById(id), c = document.getElementById(id+'Content'); if(o && c && !o.classList.contains('hidden') && o._html) morphInto(c, o._html(), {form:true}); }
 function addSheetClose(id){ const o = document.getElementById(id); if(o) o.classList.add('hidden'); }
@@ -28641,13 +28668,19 @@ ACTIONS.openSkillSheet = function(){ openSkillSheet(); };
 ACTIONS.skillIdea = function(el, e, id){ const i = document.getElementById('skillName'); if(i){ i.value = id; i.focus(); } };
 ACTIONS.skillGoalPick = function(el, e, id){ ui.skillGoal = Number(id); document.querySelectorAll('#skillSheet .as-goals .fit-dur').forEach(function(b){ b.classList.toggle('is-on', Number(b.dataset.id)===ui.skillGoal); }); };
 
-// ---- the + on Focus: what do you want to add? ----
+// ---- the + on Focus and Today: first, what do you want to add? (what the page is showing goes first) ----
 function focusAddMenu(){
-  return [
-    ['&#9989;', 'A task', function(){ openAddTaskModal(); }, 'Something to get done'],
-    ['&#127916;', 'A video idea', function(){ openContentSheet(); }, 'Business or your own channel'],
-    ['&#127919;', 'A training skill', function(){ openSkillSheet(); }, 'Something you’re getting better at']
-  ];
+  const items = {
+    task:['&#9989;', 'A task', function(){ openAddTaskModal(); }, 'Something to get done'],
+    skill:['&#127919;', 'A training skill', function(){ openSkillSheet(); }, 'Something you’re getting better at'],
+    video:['&#127916;', 'A video idea', function(){ openContentSheet(); }, 'Business or your own channel'],
+    event:['&#128197;', 'An event', function(){ openCalEventModal(); }, 'A call, a shoot, a block of time'],
+    goal:['&#127942;', 'A goal', function(){ openGoalSheet('week'); }, 'For the week, the month or longer'],
+    journal:['&#9997;&#65039;', 'A journal entry', function(){ openQuickJournalModal(); }, 'Whatever’s on your mind']
+  };
+  const sub = ui.view==='focus' && ui.focusTab!=='analytics' ? ui.focusTasksSubTab : '';
+  const order = sub==='skills' ? ['skill', 'task', 'video', 'event', 'goal', 'journal'] : sub==='videoIdeas' ? ['video', 'task', 'skill', 'event', 'goal', 'journal'] : ['task', 'skill', 'video', 'event', 'goal', 'journal'];
+  return order.map(function(k){ return items[k]; });
 }
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){

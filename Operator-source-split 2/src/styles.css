@@ -5134,3 +5134,24 @@ textarea.hs-in{ resize:vertical; min-height:56px; }
 .pri-seg button i{ width:8px; height:8px; border-radius:50%; background:currentColor; opacity:.8; }
 .pri-seg .pri-low i{ background:#7fb4ff; } .pri-seg .pri-med i{ background:#f2b84b; } .pri-seg .pri-high i{ background:#ff6b6b; }
 .pri-seg button.pri-high.is-on{ color:#ff8a8a; } .pri-seg button.pri-low.is-on{ color:#9cc6ff; } .pri-seg button.pri-med.is-on{ color:#f6c66a; }
+/* the week and the month: the same pencil on both (a small dot when it wants a check-in or a check-out) */
+.tg-edit{ position:relative; }
+.tg-edit.is-due::after{ content:''; position:absolute; top:3px; right:3px; width:6px; height:6px; border-radius:50%; background:var(--tgc, var(--accent)); box-shadow:0 0 6px var(--tgc, var(--accent)); }
+/* sized carousels: a soft fade at the edges while you swipe (cards never look sliced) */
+.carousel.is-sized > .car-track.is-moving.fade-l.fade-r{ -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%) !important; mask-image:linear-gradient(90deg, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%) !important; }
+.carousel.is-sized > .car-track.is-moving.fade-l:not(.fade-r){ -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 48px) !important; mask-image:linear-gradient(90deg, transparent 0, #000 48px) !important; }
+.carousel.is-sized > .car-track.is-moving.fade-r:not(.fade-l){ -webkit-mask-image:linear-gradient(90deg, #000 calc(100% - 48px), transparent 100%) !important; mask-image:linear-gradient(90deg, #000 calc(100% - 48px), transparent 100%) !important; }
+.ctx-item.ctx-strong{ font-weight:700; color:var(--text); }
+/* the + chooser: a pop-up of big tiles */
+.as.is-addPick{ width:min(560px, 100%); }
+.ap-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+.ap-grid.is-many{ grid-template-columns:repeat(3, 1fr); }
+.ap-tile{ display:flex; flex-direction:column; align-items:flex-start; gap:4px; text-align:left; padding:16px 14px 14px; border-radius:16px; border:1px solid var(--border); background:linear-gradient(160deg, rgba(var(--ink),.05), rgba(var(--ink),.015)); color:var(--text); font:inherit; cursor:pointer;
+  animation:apIn .32s cubic-bezier(.2,.9,.3,1.15) both; animation-delay:calc(var(--i) * 35ms); transition:transform .18s, border-color .18s, background .18s, box-shadow .18s; }
+.ap-tile:hover{ transform:translateY(-2px); border-color:rgba(232,162,61,.45); background:linear-gradient(160deg, rgba(232,162,61,.12), rgba(var(--ink),.02)); box-shadow:0 12px 30px rgba(0,0,0,.28); }
+.ap-tile .ap-e{ width:42px; height:42px; border-radius:13px; display:grid; place-items:center; font-size:21px; background:rgba(var(--ink),.07); margin-bottom:6px; transition:transform .25s cubic-bezier(.2,1.4,.4,1); }
+.ap-tile:hover .ap-e{ transform:scale(1.08) rotate(-5deg); }
+.ap-tile b{ font-size:14.5px; font-weight:700; } .ap-tile small{ font-size:11.5px; color:var(--text-dim); line-height:1.35; }
+
+@keyframes apIn{ from{ opacity:0; transform:translateY(8px) scale(.97); } to{ opacity:1; transform:none; } }
+@media (max-width:620px){ .ap-grid, .ap-grid.is-many{ grid-template-columns:repeat(2, 1fr); } }

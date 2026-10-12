@@ -83,10 +83,7 @@ function renderAllDeadlinesSection(){
 // Context-aware "+" button (bottom-right): adds whatever the current page is about.
 function fabContext(){
   const v = ui.view;
-  if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='videoIdeas') return {label:'Add a video', run:function(){ openContentSheet(); }};
-  if(v==='focus' && ui.focusTab!=='analytics' && ui.focusTasksSubTab==='skills') return {label:'Add a training skill', run:function(){ openSkillSheet(); }};
-  if(v==='focus' && ui.focusTab!=='analytics') return {label:'Add something', menu:focusAddMenu()};
-  if(v==='focus' || v==='today') return {label:'Add task', run:openAddTaskModal};
+  if(v==='focus' || v==='today') return {label:'Add something', menu:focusAddMenu()};
   if(v==='business'){
     if(ui.businessTab==='clients' || ui.businessTab==='lifecycle') return {label:'Add client', run:function(){ if(typeof openNewContactModal==='function') openNewContactModal('client'); else { ui.forms.client=true; renderView(); } }};
     if(ui.businessTab==='packages') return {label:'Add package', run:openNewPackageModal};
@@ -108,21 +105,25 @@ function fabContext(){
 ACTIONS.fabAdd = function(){
   const c = fabContext(); if(!c) return;
   if(!c.menu){ c.run(); return; }
-  let m = document.getElementById('fabMenu');
-  if(m && m.classList.contains('is-in')){ fabMenuClose(); return; }
-  if(!m){ m = document.createElement('div'); m.id = 'fabMenu'; m.className = 'fab-menu'; document.body.appendChild(m); }
-  m.innerHTML = '<div class="fab-mh">'+escapeHtml(c.label)+'</div>'+c.menu.map(function(x, i){ return '<button class="fab-mi" data-action="fabMenuPick" data-id="'+i+'" style="--i:'+i+'"><span class="fab-mi-e">'+x[0]+'</span><span class="fab-mi-t"><b>'+x[1]+'</b>'+(x[3] ? '<small>'+x[3]+'</small>' : '')+'</span></button>'; }).join('');
-  ui.fabMenu = c.menu; void m.offsetWidth; m.classList.add('is-in'); const fb = document.getElementById('fabAdd'); if(fb) fb.classList.add('is-open');
+  // more than one kind of thing to add: a pop-up asks which first (like every other add sheet)
+  ui.fabMenu = c.menu; ui.fabMenuLabel = c.label;
+  addSheetOpen('addPick', addPickHtml);
 };
+function addPickHtml(){
+  const list = ui.fabMenu || [];
+  return '<button class="int-x hs-x" data-action="addSheetClose" title="Close">&#10005;</button>'+
+    '<div class="as-h"><span class="as-ic">&#10010;</span><div><div class="hs-h">'+escapeHtml(ui.fabMenuLabel || 'Add something')+'</div><div class="as-sub">What do you want to add?</div></div></div>'+
+    '<div class="ap-grid'+(list.length > 3 ? ' is-many' : '')+'">'+list.map(function(x, i){ return '<button class="ap-tile" data-action="fabMenuPick" data-id="'+i+'" style="--i:'+i+'"><span class="ap-e">'+x[0]+'</span><b>'+x[1]+'</b>'+(x[3] ? '<small>'+x[3]+'</small>' : '')+'</button>'; }).join('')+'</div>';
+}
 function fabMenuClose(){ const m = document.getElementById('fabMenu'); if(m) m.classList.remove('is-in'); const fb = document.getElementById('fabAdd'); if(fb) fb.classList.remove('is-open'); }
-ACTIONS.fabMenuPick = function(el, e, id){ const it = (ui.fabMenu || [])[Number(id)]; fabMenuClose(); if(it) it[2](); };
+ACTIONS.fabMenuPick = function(el, e, id){ const it = (ui.fabMenu || [])[Number(id)]; fabMenuClose(); if(typeof addSheetClose==='function') addSheetClose('addPick'); if(it) it[2](); };
 document.addEventListener('mousedown', function(e){ if(!e.target.closest || e.target.closest('#fabMenu, #fabAdd')) return; fabMenuClose(); }, true);
 afterRenderHooks.push(function(){
   const fab = document.getElementById('fabAdd');
   if(!fab) return;
   const c = fabContext();
   fab.classList.toggle('fab-hidden', !c);
-  if(c && fab.dataset.label!==c.label){ fab.removeAttribute('title'); fab.setAttribute('aria-label', c.label); fab.dataset.label = c.label; }
+  if(c && fab.dataset.label!==c.label){ fab.title = c.label; fab.setAttribute('aria-label', c.label); fab.dataset.label = c.label; }
 });
 // Crosshair cursor (Settings → Display). A thin accent crosshair everywhere; a filled
 // centre on clickable things; normal I-beam in text fields.

@@ -281,7 +281,7 @@ function tierCardHtml(kind, opts){
   const sub = kind==='month' ? (rec.habit ? 'Beating: '+rec.habit : '') : (rec.focus ? 'Focus: '+rec.focus : '');
   return '<div class="tg-card is-'+kind+'">'+
     '<div class="tg-h"><span class="tg-k">'+(kind==='month' ? monthName(key) : 'This week')+'</span>'+(gs.length ? '<span class="tg-n">'+done+'/'+gs.length+'</span>' : '')+
-      '<span style="flex:1"></span>'+(due ? '<button class="tg-out" data-action="openCheckout" data-id="'+due.kind+':'+due.key+'">Check out &#8594;</button>' : '<button class="tg-edit" data-action="openIntent" data-id="'+kind+'" title="'+(checkedIn(kind, key) ? 'Edit your check-in' : 'Check in')+'">'+(checkedIn(kind, key) ? '&#9998;' : 'Check in &#8594;')+'</button>')+'</div>'+
+      '<span style="flex:1"></span>'+(due ? '<button class="tg-edit is-due" data-action="openCheckout" data-id="'+due.kind+':'+due.key+'" title="Check out of '+(kind==='month' ? monthName(due.key) : 'the week')+'">&#9998;</button>' : '<button class="tg-edit'+(checkedIn(kind, key) ? '' : ' is-due')+'" data-action="openIntent" data-id="'+kind+'" title="'+(checkedIn(kind, key) ? 'Edit your check-in' : 'Check in')+'">&#9998;</button>')+'</div>'+
     (sub ? '<div class="tg-sub">'+escapeHtml(sub)+'</div>' : '')+
     (gs.length ? '<div class="tg-list">'+gs.map(tierGoalRowHtml).join('')+'</div>' : '<div class="tg-empty">'+(kind==='month' ? 'No goals for the month yet.' : 'No goals for the week yet.')+'</div>')+
     (opts.add==='sheet' ? (checkedOut(kind, key) ? '<div class="tg-addrow"><button class="tg-addbtn" data-action="tierReopen" data-id="'+kind+'">&#8634; Reopen the '+(kind==='month' ? 'month' : 'week')+'</button></div>' : '') :

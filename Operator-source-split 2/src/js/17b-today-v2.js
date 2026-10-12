@@ -153,8 +153,9 @@ function openTaskMenu(t, x, y){
   const m = document.createElement('div');
   m.id = 'taskCtxMenu'; m.className = 'ctx-menu'; m.dataset.id = t.id; m.dataset.at = Date.now();
   m.innerHTML = '<div class="ctx-title">'+escapeHtml(t.title)+'</div>'+
-    (t.status!=='done' ? item('start', inSession ? '&#9654; Start timing now' : '&#128274; Lock in on this') : '')+
-    (t.status!=='done' && !isNext ? item('next', '&#128204; Make it next up') : '')+
+    (t.status!=='done' && ui.currentTaskId!==t.id ? item('now', '&#9654; Put it on Now', ' ctx-strong') : '')+
+    (t.status!=='done' && !isNext && ui.currentTaskId!==t.id ? item('next', '&#9197; Make it Up next') : '')+
+    (t.status!=='done' && !inSession ? item('start', '&#128274; Lock in on this') : '')+
     item('edit', '&#9998; Edit…')+
     (t.status==='done' ? item('undo', '&#8634; Back to today')
       : t.ongoing ? (isOngoingDoneToday(t) ? item('undo', '&#8634; Undo: done for today') : item('done', '&#10003; Mark done for today'))
@@ -198,6 +199,7 @@ ACTIONS.taskCtx = function(el, e, id){
     if(t.status!=='today'){ t.status = 'today'; persist('tasks'); }
     if(state.focus.activeSession) setCurrentTask(t.id); else { setNextUp(t.id); renderView(); openLockInChooser(); }
   }
+  else if(op==='now'){ if(t.status!=='today'){ t.status = 'today'; persist('tasks'); } setCurrentTask(t.id); playTick(); showToast('On Now: '+t.title.slice(0, 50)+'.', {icon:'&#9654;'}); }
   else if(op==='next'){ if(t.status==='backlog') t.status = 'today'; setNextUp(t.id); playTick(); save(); }
   else if(op==='edit') openTaskEditModal(t.id);
   else if(op==='done') completeTask(t.id);

@@ -68,6 +68,9 @@ let carRaf = 0, carPending = new Set();
 document.addEventListener('scroll', function(e){
   const t = e.target; if(!t || !t.classList || !t.classList.contains('car-track')) return;
   carPending.add(t);
+  // while it's moving, the cards fade out at the edges instead of being sliced off
+  if(!t.classList.contains('is-moving')) t.classList.add('is-moving');
+  clearTimeout(t._movT); t._movT = setTimeout(function(){ t.classList.remove('is-moving'); }, 220);
   if(!carRaf) carRaf = requestAnimationFrame(function(){ carRaf = 0; carPending.forEach(carUpdate); carPending.clear(); });
 }, {capture:true, passive:true});
 window.addEventListener('resize', function(){ requestAnimationFrame(carUpdateAll); });

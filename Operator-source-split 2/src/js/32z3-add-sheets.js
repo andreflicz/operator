@@ -4,10 +4,10 @@
 // their old ids, so the same add functions do the work (and close the sheet when they're done).
 function addSheetOpen(id, htmlFn, focusId){
   let o = document.getElementById(id);
-  if(!o){ o = document.createElement('div'); o.id = id; o.className = 'overlay hs-ov as-ov hidden'; o.innerHTML = '<div class="card hs as" id="'+id+'Content"></div>'; document.body.appendChild(o); }
+  if(!o){ o = document.createElement('div'); o.id = id; o.className = 'overlay hs-ov as-ov hidden'; o.innerHTML = '<div class="card hs as is-'+id+'" id="'+id+'Content"></div>'; document.body.appendChild(o); }
   o._html = htmlFn; o.classList.remove('hidden');
   addSheetRefresh(id);
-  setTimeout(function(){ const i = document.getElementById(focusId); if(i) i.focus(); }, 60);
+  if(focusId) setTimeout(function(){ const i = document.getElementById(focusId); if(i) i.focus(); }, 60);
 }
 function addSheetRefresh(id){ const o = document.getElementById(id), c = document.getElementById(id+'Content'); if(o && c && !o.classList.contains('hidden') && o._html) morphInto(c, o._html(), {form:true}); }
 function addSheetClose(id){ const o = document.getElementById(id); if(o) o.classList.add('hidden'); }
@@ -79,11 +79,17 @@ ACTIONS.openSkillSheet = function(){ openSkillSheet(); };
 ACTIONS.skillIdea = function(el, e, id){ const i = document.getElementById('skillName'); if(i){ i.value = id; i.focus(); } };
 ACTIONS.skillGoalPick = function(el, e, id){ ui.skillGoal = Number(id); document.querySelectorAll('#skillSheet .as-goals .fit-dur').forEach(function(b){ b.classList.toggle('is-on', Number(b.dataset.id)===ui.skillGoal); }); };
 
-// ---- the + on Focus: what do you want to add? ----
+// ---- the + on Focus and Today: first, what do you want to add? (what the page is showing goes first) ----
 function focusAddMenu(){
-  return [
-    ['&#9989;', 'A task', function(){ openAddTaskModal(); }, 'Something to get done'],
-    ['&#127916;', 'A video idea', function(){ openContentSheet(); }, 'Business or your own channel'],
-    ['&#127919;', 'A training skill', function(){ openSkillSheet(); }, 'Something you’re getting better at']
-  ];
+  const items = {
+    task:['&#9989;', 'A task', function(){ openAddTaskModal(); }, 'Something to get done'],
+    skill:['&#127919;', 'A training skill', function(){ openSkillSheet(); }, 'Something you’re getting better at'],
+    video:['&#127916;', 'A video idea', function(){ openContentSheet(); }, 'Business or your own channel'],
+    event:['&#128197;', 'An event', function(){ openCalEventModal(); }, 'A call, a shoot, a block of time'],
+    goal:['&#127942;', 'A goal', function(){ openGoalSheet('week'); }, 'For the week, the month or longer'],
+    journal:['&#9997;&#65039;', 'A journal entry', function(){ openQuickJournalModal(); }, 'Whatever’s on your mind']
+  };
+  const sub = ui.view==='focus' && ui.focusTab!=='analytics' ? ui.focusTasksSubTab : '';
+  const order = sub==='skills' ? ['skill', 'task', 'video', 'event', 'goal', 'journal'] : sub==='videoIdeas' ? ['video', 'task', 'skill', 'event', 'goal', 'journal'] : ['task', 'skill', 'video', 'event', 'goal', 'journal'];
+  return order.map(function(k){ return items[k]; });
 }
