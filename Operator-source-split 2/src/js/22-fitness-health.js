@@ -3,11 +3,17 @@
 // you're eating go hand in hand); then your Health score (what counts toward it, your weight on the
 // BMI scale); then the history. No log buttons on the page: logging a workout, a
 // weigh-in or food is the + in the corner, a small sheet, three taps (a go-to meal is one tap).
+// Health: Overview (your Health score with Training, Diet and Weight up top, then weight & fuel, then
+// training), and a tab each for Weight & fuel and Training
 function renderFitness(){
-  return '<div class="hl">'+renderWorkoutsHero()+renderBodyFuel()+renderHealthScore()+
-    '<div class="hl-cols">'+renderWorkoutHistory()+renderHealthLists()+'</div>'+
-  '</div>';
+  const sub = ['overview', 'body', 'training'].indexOf(ui.healthSub)>=0 ? ui.healthSub : 'overview';
+  const tabs = '<div class="sub-pills">'+[['overview', 'Overview'], ['body', 'Weight &amp; fuel'], ['training', 'Training']].map(function(t){ return '<button class="sub-pill'+(sub===t[0] ? ' is-on' : '')+'" data-action="healthSub" data-id="'+t[0]+'">'+t[1]+'</button>'; }).join('')+'</div>';
+  const body = sub==='body' ? renderBodyFuel()+'<div class="hl-cols is-one">'+renderHealthLists()+'</div>'
+    : sub==='training' ? renderWorkoutsHero()+'<div class="hl-cols is-one">'+renderWorkoutHistory()+'</div>'
+    : renderHealthScore()+renderBodyFuel()+renderWorkoutsHero();
+  return '<div class="hl">'+tabs+'<div class="subtab-panel" data-key="health-'+sub+'">'+body+'</div></div>';
 }
+ACTIONS.healthSub = function(el, e, id){ ui.healthSub = id; renderView(); };
 const WORKOUT_TYPES = [
   {id:'Lift', icon:'&#127947;&#65039;'}, {id:'Run', icon:'&#127939;'}, {id:'Walk', icon:'&#128694;'}, {id:'Bike', icon:'&#128692;'},
   {id:'Yoga', icon:'&#129496;'}, {id:'Sports', icon:'&#9917;'}, {id:'Swim', icon:'&#127946;'}, {id:'Boxing', icon:'&#129354;'}

@@ -454,6 +454,8 @@ function lastNightSleep(){
   const h = state.modes.history.filter(function(m){ return m.sleep && m.endedAt && Date.now() - m.endedAt < 8*3600000 && m.minutes >= 60; }).sort(function(a, b){ return b.endedAt - a.endedAt; })[0];
   return h ? {minutes:h.minutes, from:h.startedAt, to:h.endedAt} : null;
 }
+// the usual lines, said a little differently each day (Op rewrites them in its own words when it can)
+function brVary(key, xs){ const d = Number(todayStr().replace(/-/g, '')); return xs[(d + key.length*7) % xs.length]; }
 function briefBase(){ return wakeCfg().intro!=='quick' ? 3200 : 1100; }
 // ("You, lately" and "a month ago you wrote" are gone: the month and the week took their place — see 32u)
 function wakeBriefHtml(){
@@ -499,8 +501,8 @@ function wakeBriefHtml(){
   const you = typeof briefIntentHtml==='function' ? briefIntentHtml() : null;
   if(you) colA.push(panel('br-you br-intent', 'br-a-rise', you.voice, you.html));
   // column 2: a line to carry, and a few small things for a good day
-  colB.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
-  colB.push(panel('br-thoughts br-goodday', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+goodDayReelHtml()));
+  colB.push(panel('br-quote', 'br-a-words', brVary('quote', ['Something to carry with you.', 'A line worth keeping in your pocket today.', 'Here’s one to chew on with your coffee.', 'A little something for the back of your mind.']), '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
+  colB.push(panel('br-thoughts br-goodday', 'br-a-rise', brVary('goodday', ['A few things for a good day.', 'Some small wins, if you want them.', 'A few easy ones to start the day right.', 'Little things that make a day better.']), '<div class="br-k">&#127807; For a Good Day</div>'+goodDayReelHtml()));
   // the day ahead — the calendar, and the content you're after — sits on top of the world's news
   const cp = typeof contentProgress==='function' ? ['business', 'personal'].map(contentProgress).filter(function(p){ return p.n; }) : [];
   // (wide screens: on top of the headlines; otherwise under the weather, where the month panel has room)
@@ -542,7 +544,7 @@ function wakeBriefHtml(){
   }
   if(!asksUsed){ const t = todayCol ? colC : colA; for(let i = 0; i < t.length; i++){ if(t[i].indexOf('br-day ')>0){ t[i] = t[i].replace('&#128197; Today', '&#128197; Today'+asks()); break; } } }
   const ctaD = tcur;
-  lines.push({at: ctaD - 380, text: 'Get ready to start your day.', key:'cta'});
+  lines.push({at: ctaD - 380, text: brVary('cta', ['Get ready to start your day.', 'Whenever you’re ready, the day’s yours.', 'Take your time. Get to it when you’re ready.', 'That’s the morning. Take it at your pace.']), key:'cta'});
   // Op's own words for them, when it has them (asked for once a morning)
   if(typeof opBriefRewrite==='function'){ const ai = ui.briefAi && ui.briefAi.date===today ? ui.briefAi.map : {}; lines.forEach(function(l){ if(l.key && ai[l.key]) l.text = ai[l.key]; }); setTimeout(function(){ opBriefRewrite(lines); }, 0); }
   ui.briefLines = lines;

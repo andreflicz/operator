@@ -241,7 +241,14 @@ function opUnlock(){
 }
 
 // ---- Good morning, spoken: one line per piece, each piece appears as it's said ----
-function opBriefLine(lines, i){ const name = state.profile.name || ''; return (i===0 ? 'Good morning'+(name ? ', '+name : '')+'. ' : '')+lines[i].text; }
+// the first line opens with a greeting: Op's own for today (written with the narration) or one with some personality
+function opBriefGreeting(){
+  const ai = ui.briefAi && ui.briefAi.date===todayStr() && ui.briefAi.map && ui.briefAi.map.greet;
+  if(ai) return ai;
+  if(!ui.briefGreetFb && typeof opGreetFallback==='function') ui.briefGreetFb = opGreetFallback('morning');
+  return ui.briefGreetFb || ('Good morning'+(state.profile.name ? ', '+state.profile.name : '')+'.');
+}
+function opBriefLine(lines, i){ return (i===0 ? opBriefGreeting()+' ' : '')+lines[i].text; }
 // Op starts as Good morning does: while the first line is being made, the voice line shows
 // "Op loading" with a bar; the first word comes once the greeting is up and the audio is ready.
 // Between lines there's a breath, so each line of blue text has time to come in.
@@ -278,7 +285,7 @@ function opBriefTick(lines, t){
   }}).then(function(){ OV.briefSpoke = true; opBriefLoading(false); });
   return true;
 }
-function opBriefReset(){ OV.idx = -1; OV.pre = null; OV.briefSpoke = false; ui.briefTalked = false; ui.briefHeroV = null; ui.briefHeroManual = false; ui.briefHeroAt = 0; opStop(); }
+function opBriefReset(){ OV.idx = -1; OV.pre = null; OV.briefSpoke = false; ui.briefTalked = false; ui.briefGreetFb = null; ui.briefHeroV = null; ui.briefHeroManual = false; ui.briefHeroAt = 0; opStop(); }
 // the blue light on Good morning is how you talk to Op there: the narration stops, the music fades
 // out, Op says good morning (the first time) and asks what you want, then listens. Click it again
 // while it's listening to send; while Op's talking, to cut in.
@@ -289,10 +296,10 @@ ACTIONS.briefTalk = async function(){
   if(typeof renderWakeOverlayInto==='function') renderWakeOverlayInto();
   if(!ui.briefTalked && opVoiceOn()){
     ui.briefTalked = true;
-    const name = (state.profile.name || '').split(' ')[0];
-    let line = 'Good morning'+(name ? ', '+name : '')+'. What do you want to start with?';
+    // (a different greeting every time, then what you'd like to talk about: never a rundown)
+    let line = (typeof opGreetFallback==='function' ? opGreetFallback('morning') : 'Good morning.')+' '+pickOne(['What do you want to start with?', 'What do you want to start with: the news, the games, or just coffee talk?', 'What do you want to start with this morning?']);
     if(typeof aiWrite==='function' && AI.hasKey===true){
-      const t = await Promise.race([aiWrite('It’s the morning and I just opened the app. Greet me by name in one short spoken sentence, then ask what I want to start with (the news, sports, or just how I’m doing). Nothing about work. Two sentences at most, no rundown.', {max:80}), new Promise(function(r){ setTimeout(r, 4000); })]);
+      const t = await Promise.race([aiWrite('It’s the morning and I just opened the app. Greet me by name with personality (wit or warmth, never the same as before), then ask what I want to start with: the news, sports, or just how I’m doing. Nothing about work. Two sentences at most, no rundown.', {max:90}), new Promise(function(r){ setTimeout(r, 4000); })]);
       if(t) line = t;
     }
     if(typeof AI!=='undefined'){ AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16); }
@@ -424,19 +431,33 @@ function opAskHtml(where){
 }
 // the business brief plays by itself when you go straight from Good morning to work. Op speaks
 // straight away (a short line while the brief is being written), then gives the brief itself.
+// straight from Good morning (or the work alarm) to work: Op says hello and asks if you want the rundown,
+// instead of reading it out every time. Say yes and you get it; anything else, it lets you be.
 function opAutoBusinessBrief(){
   if(!opVoiceOn()) return;
-  const live = function(){ return overlayOpen('planOverlay') && !AI.listening && !OV.userCut; };
   OV.userCut = false;
-  const name = (state.profile.name || '').split(' ')[0];
-  const opener = pickOne(['Alright'+(name ? ', '+name : '')+'. Here’s the day.', 'Okay, work mode. Here’s what we’ve got.', 'Let’s get into it.']);
-  let brief = null, said = false;
-  const go = function(t){ if(said || !live()) return; said = true; opSay(t, {cap:'opBubText'}); };
-  if(typeof opComposed==='function' && AI.hasKey===true){
-    Promise.race([opComposed('business', opBusinessScript()), new Promise(function(r){ setTimeout(r, 8000); })]).then(function(t){ brief = t || opBusinessScript(); if(!OV.speaking && !OV.pending) go(brief); });
-  } else brief = opBusinessScript();
+  const ask = pickOne(['Want the rundown, or are you good?', 'Want me to run through the day, or do you already know the drill?', 'Need the rundown, or are we winging it?', 'Should I walk you through today, or are you set?']);
   opStop();
-  opSay(opener, {cap:'opBubText'}).then(function(){ if(brief) setTimeout(function(){ go(brief); }, 250); });
+  const say = function(g){
+    if(!overlayOpen('planOverlay') || OV.userCut || AI.listening) return;
+    const line = g+' '+ask;
+    ui.opRundownAsked = Date.now();
+    AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
+    opSay(line, {cap:'opBubText'}).then(function(){ if(overlayOpen('planOverlay') && !AI.listening && !OV.userCut && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiListen('opBubText'); }, 300); });
+  };
+  // a quick greeting right away (the AI one if it's back in time)
+  if(typeof opGreet==='function') opGreet('work').then(say); else say('Alright.');
+}
+// a yes to the rundown: with a key, Op tells it its own way (it has the day in front of it); without, the usual brief
+function opRundownYes(text){
+  if(!ui.opRundownAsked || Date.now() - ui.opRundownAsked > 3*60000) return false;
+  ui.opRundownAsked = 0;
+  if(!/^\s*(yes|yeah|yep|yup|sure|ok|okay|go|go ahead|please|do it|hit me|run it|rundown|let'?s hear it)\b/i.test(text)){
+    if(AI.hasKey===true) return false;
+    OV.cap = 'opBubText'; opCaption(pickOne(['Fair enough. I’ll be here.', 'Say less. I’m around if you need me.', 'Got it. Holler if you need me.'])); return true;
+  }
+  if(AI.hasKey===true) return false;
+  OV.cap = 'opBubText'; opBubShow(); opSay(opBusinessScript(), {cap:'opBubText'}); return true;
 }
 
 // ---- choosing the voice (in the alarm settings, under "Op's voice") ----

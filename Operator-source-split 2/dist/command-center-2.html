@@ -5024,6 +5024,33 @@ body.insp-on .quick-journal-fab, body.insp-on #fabAdd, body.insp-on .insp-orb{ d
 /* (hidden, the bubble doesn't animate at all) */
 .insp-orb:not(.is-on) .io-film, .insp-orb:not(.is-on) .io-core{ animation:none; }
 .insp:not(.is-in) *, .insp:not(.is-in){ animation-play-state:paused !important; }
+
+/* ===== Lock in: the last step's button where Next always is; the light and the journal on one line ===== */
+.wd-foot .ls-go.ls-go-foot{ width:auto; padding:0 40px; height:60px; gap:12px; font-size:18px; letter-spacing:.14em; animation:lsPop .6s .1s cubic-bezier(.2,.9,.25,1.1) both; }
+.wd-foot .ls-go.ls-go-foot .ls-go-i{ font-size:20px; }
+.ls-why{ margin-top:auto; margin-bottom:auto; }
+body.op-ov .quick-journal-fab.jorb, body.np-on .quick-journal-fab.jorb{ bottom:10px !important; }
+body.op-ov .op-light{ bottom:12px !important; }
+body.np-on .op-light{ bottom:12px !important; }
+
+/* ===================== tabs & sub-tabs, app-wide ===================== */
+/* main tabs: quiet text with a soft glowing underline */
+.tabs{ gap:4px !important; border-bottom:1px solid var(--border) !important; }
+.tabs .tab{ position:relative; padding:10px 14px !important; border-radius:10px 10px 0 0; color:var(--text-dim); font-weight:600; transition:color .2s, background .2s; }
+.tabs .tab:hover{ color:var(--text); background:rgba(255,255,255,.03); }
+.tabs .tab.active{ color:var(--text); }
+.tabs .tab.active::after{ content:''; position:absolute; left:12px; right:12px; bottom:-1px; height:2px; border-radius:2px; background:var(--accent, #e8a23d); box-shadow:0 0 12px color-mix(in srgb, var(--accent, #e8a23d) 70%, transparent); }
+/* sub-tabs and switches: one glassy track, the picked one a soft raised pill */
+.sub-pills, .seg-tabs, .subtabs{ display:inline-flex !important; align-items:center; gap:2px !important; padding:4px !important; border-radius:14px !important; background:rgba(255,255,255,.035) !important; border:1px solid var(--border) !important; box-shadow:inset 0 1px 2px rgba(0,0,0,.25); }
+.subtabs{ margin-left:auto; }
+.sub-pills{ margin:2px 0 18px; }
+.sub-pill, .seg-tab, .subtab{ border:1px solid transparent !important; background:transparent !important; color:var(--text-dim) !important; padding:7px 14px !important; border-radius:10px !important; font:inherit; font-size:13px !important; font-weight:600 !important; cursor:pointer; transition:color .2s, background .25s, box-shadow .25s, border-color .25s; white-space:nowrap; }
+.sub-pill:hover, .seg-tab:hover, .subtab:hover{ color:var(--text) !important; background:rgba(255,255,255,.04) !important; }
+.sub-pill.is-on, .seg-tab.active, .subtab.active{ color:var(--text) !important; background:linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.05)) !important; border-color:rgba(255,255,255,.12) !important; box-shadow:0 4px 14px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.08) !important; }
+.seg-tabs.seg-sm .seg-tab{ padding:5px 10px !important; font-size:12px !important; }
+.hl-cols.is-one{ grid-template-columns:1fr !important; }
+:root[data-theme="light"] .sub-pills, :root[data-theme="light"] .seg-tabs, :root[data-theme="light"] .subtabs{ background:rgba(0,0,0,.035) !important; box-shadow:inset 0 1px 2px rgba(0,0,0,.08); }
+:root[data-theme="light"] .sub-pill.is-on, :root[data-theme="light"] .seg-tab.active, :root[data-theme="light"] .subtab.active{ background:#fff !important; border-color:rgba(0,0,0,.08) !important; box-shadow:0 2px 8px rgba(0,0,0,.08) !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -12187,11 +12214,17 @@ document.addEventListener('click', function(e){
 // you're eating go hand in hand); then your Health score (what counts toward it, your weight on the
 // BMI scale); then the history. No log buttons on the page: logging a workout, a
 // weigh-in or food is the + in the corner, a small sheet, three taps (a go-to meal is one tap).
+// Health: Overview (your Health score with Training, Diet and Weight up top, then weight & fuel, then
+// training), and a tab each for Weight & fuel and Training
 function renderFitness(){
-  return '<div class="hl">'+renderWorkoutsHero()+renderBodyFuel()+renderHealthScore()+
-    '<div class="hl-cols">'+renderWorkoutHistory()+renderHealthLists()+'</div>'+
-  '</div>';
+  const sub = ['overview', 'body', 'training'].indexOf(ui.healthSub)>=0 ? ui.healthSub : 'overview';
+  const tabs = '<div class="sub-pills">'+[['overview', 'Overview'], ['body', 'Weight &amp; fuel'], ['training', 'Training']].map(function(t){ return '<button class="sub-pill'+(sub===t[0] ? ' is-on' : '')+'" data-action="healthSub" data-id="'+t[0]+'">'+t[1]+'</button>'; }).join('')+'</div>';
+  const body = sub==='body' ? renderBodyFuel()+'<div class="hl-cols is-one">'+renderHealthLists()+'</div>'
+    : sub==='training' ? renderWorkoutsHero()+'<div class="hl-cols is-one">'+renderWorkoutHistory()+'</div>'
+    : renderHealthScore()+renderBodyFuel()+renderWorkoutsHero();
+  return '<div class="hl">'+tabs+'<div class="subtab-panel" data-key="health-'+sub+'">'+body+'</div></div>';
 }
+ACTIONS.healthSub = function(el, e, id){ ui.healthSub = id; renderView(); };
 const WORKOUT_TYPES = [
   {id:'Lift', icon:'&#127947;&#65039;'}, {id:'Run', icon:'&#127939;'}, {id:'Walk', icon:'&#128694;'}, {id:'Bike', icon:'&#128692;'},
   {id:'Yoga', icon:'&#129496;'}, {id:'Sports', icon:'&#9917;'}, {id:'Swim', icon:'&#127946;'}, {id:'Boxing', icon:'&#129354;'}
@@ -22245,10 +22278,10 @@ afterRenderHooks.push(function(){ if(typeof state!=='undefined' && state && stat
 //   2 Method — one block of your length, or a way of working (Pomodoro, 52/17, 90/20, Flowtime,
 //              until the task's done)
 //   3 Set up — your checklist; every box has to be ticked to get past it
-//   4 Why    — what you're getting / avoiding, today's deep work → the big LOCK IN
+//   4 Begin  — what you're getting / avoiding, today's deep work → the big LOCK IN
 // The 🔒 Lock in pill in the corner is the one way to skip ahead: it starts right away with what's
 // picked. The timer starts after the "Locked in" stamp, not under it.
-const LOCK_STEPS = [['task','Task'],['method','Method'],['prep','Set up'],['why','Why']];
+const LOCK_STEPS = [['task','Task'],['method','Method'],['prep','Set up'],['why','Begin']];
 const LOCK_METHODS = {
   block:     {label:'Single Block', icon:'&#127919;', sub:'One Stretch, Your Length', how:'One focused stretch, as long as you set. No breaks unless you take one.', best:'Deep work with a clear finish line'},
   pomodoro:  {label:'Pomodoro', icon:'&#127813;', sub:'25 On · 5 Off · 4 Rounds', work:25, rest:5, long:15, every:4, rounds:4, how:'Four 25-minute sprints with a 5-minute breather between each. Breaks start and end by themselves.', best:'Getting started on things you\'ve been putting off'},
@@ -22640,7 +22673,6 @@ function lockWhyHtml(){
     '</div>'+
     '<div class="ls-bar"><div class="ls-bar-k"><span>Deep work today</span><span>'+fmtHours(deep)+(after ? ' &rarr; <b>'+fmtHours(after)+'</b>' : '')+' / '+fmtHours(target)+'</span></div>'+
       '<div class="ls-bar-t"><i class="ls-bar-now" style="width:'+pct.toFixed(1)+'%"></i><i class="ls-bar-add" style="left:'+pct.toFixed(1)+'%;width:'+Math.max(0, pct2-pct).toFixed(1)+'%"></i></div></div>'+
-    '<div class="ls-go-wrap"><button class="ls-go" data-action="lockGo"><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button></div>'+
   '</div>';
 }
 function lockSeqHtml(){
@@ -22657,7 +22689,8 @@ function lockSeqHtml(){
     '<div class="wd-inner ls-inner" data-key="ls-'+s.step+'"><div class="ls-stage"><h2 class="wd-title-h">'+titles[s.step]+'</h2>'+body+'</div></div>'+
     '<div class="wd-foot">'+
       (i>0 ? '<button class="btn btn-ghost ls-back" data-action="lockBack">&larr; Back</button>' : '<span></span>')+
-      (s.step==='why' ? '<span></span>' : '<button class="ls-next" data-action="lockNext">Next <span>&rarr;</span></button>')+
+      // (the last step's button sits where Next always is, just bigger and green)
+      (s.step==='why' ? '<button class="ls-go ls-go-foot" data-action="lockGo"><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>' : '<button class="ls-next" data-action="lockNext">Next <span>&rarr;</span></button>')+
     '</div>'+
   '</div>';
 }
@@ -23120,6 +23153,8 @@ function lastNightSleep(){
   const h = state.modes.history.filter(function(m){ return m.sleep && m.endedAt && Date.now() - m.endedAt < 8*3600000 && m.minutes >= 60; }).sort(function(a, b){ return b.endedAt - a.endedAt; })[0];
   return h ? {minutes:h.minutes, from:h.startedAt, to:h.endedAt} : null;
 }
+// the usual lines, said a little differently each day (Op rewrites them in its own words when it can)
+function brVary(key, xs){ const d = Number(todayStr().replace(/-/g, '')); return xs[(d + key.length*7) % xs.length]; }
 function briefBase(){ return wakeCfg().intro!=='quick' ? 3200 : 1100; }
 // ("You, lately" and "a month ago you wrote" are gone: the month and the week took their place — see 32u)
 function wakeBriefHtml(){
@@ -23165,8 +23200,8 @@ function wakeBriefHtml(){
   const you = typeof briefIntentHtml==='function' ? briefIntentHtml() : null;
   if(you) colA.push(panel('br-you br-intent', 'br-a-rise', you.voice, you.html));
   // column 2: a line to carry, and a few small things for a good day
-  colB.push(panel('br-quote', 'br-a-words', 'Something to carry with you.', '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
-  colB.push(panel('br-thoughts br-goodday', 'br-a-rise', 'A few things for a good day.', '<div class="br-k">&#127807; For a Good Day</div>'+goodDayReelHtml()));
+  colB.push(panel('br-quote', 'br-a-words', brVary('quote', ['Something to carry with you.', 'A line worth keeping in your pocket today.', 'Here’s one to chew on with your coffee.', 'A little something for the back of your mind.']), '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
+  colB.push(panel('br-thoughts br-goodday', 'br-a-rise', brVary('goodday', ['A few things for a good day.', 'Some small wins, if you want them.', 'A few easy ones to start the day right.', 'Little things that make a day better.']), '<div class="br-k">&#127807; For a Good Day</div>'+goodDayReelHtml()));
   // the day ahead — the calendar, and the content you're after — sits on top of the world's news
   const cp = typeof contentProgress==='function' ? ['business', 'personal'].map(contentProgress).filter(function(p){ return p.n; }) : [];
   // (wide screens: on top of the headlines; otherwise under the weather, where the month panel has room)
@@ -23208,7 +23243,7 @@ function wakeBriefHtml(){
   }
   if(!asksUsed){ const t = todayCol ? colC : colA; for(let i = 0; i < t.length; i++){ if(t[i].indexOf('br-day ')>0){ t[i] = t[i].replace('&#128197; Today', '&#128197; Today'+asks()); break; } } }
   const ctaD = tcur;
-  lines.push({at: ctaD - 380, text: 'Get ready to start your day.', key:'cta'});
+  lines.push({at: ctaD - 380, text: brVary('cta', ['Get ready to start your day.', 'Whenever you’re ready, the day’s yours.', 'Take your time. Get to it when you’re ready.', 'That’s the morning. Take it at your pace.']), key:'cta'});
   // Op's own words for them, when it has them (asked for once a morning)
   if(typeof opBriefRewrite==='function'){ const ai = ui.briefAi && ui.briefAi.date===today ? ui.briefAi.map : {}; lines.forEach(function(l){ if(l.key && ai[l.key]) l.text = ai[l.key]; }); setTimeout(function(){ opBriefRewrite(lines); }, 0); }
   ui.briefLines = lines;
@@ -24547,7 +24582,14 @@ function opUnlock(){
 }
 
 // ---- Good morning, spoken: one line per piece, each piece appears as it's said ----
-function opBriefLine(lines, i){ const name = state.profile.name || ''; return (i===0 ? 'Good morning'+(name ? ', '+name : '')+'. ' : '')+lines[i].text; }
+// the first line opens with a greeting: Op's own for today (written with the narration) or one with some personality
+function opBriefGreeting(){
+  const ai = ui.briefAi && ui.briefAi.date===todayStr() && ui.briefAi.map && ui.briefAi.map.greet;
+  if(ai) return ai;
+  if(!ui.briefGreetFb && typeof opGreetFallback==='function') ui.briefGreetFb = opGreetFallback('morning');
+  return ui.briefGreetFb || ('Good morning'+(state.profile.name ? ', '+state.profile.name : '')+'.');
+}
+function opBriefLine(lines, i){ return (i===0 ? opBriefGreeting()+' ' : '')+lines[i].text; }
 // Op starts as Good morning does: while the first line is being made, the voice line shows
 // "Op loading" with a bar; the first word comes once the greeting is up and the audio is ready.
 // Between lines there's a breath, so each line of blue text has time to come in.
@@ -24584,7 +24626,7 @@ function opBriefTick(lines, t){
   }}).then(function(){ OV.briefSpoke = true; opBriefLoading(false); });
   return true;
 }
-function opBriefReset(){ OV.idx = -1; OV.pre = null; OV.briefSpoke = false; ui.briefTalked = false; ui.briefHeroV = null; ui.briefHeroManual = false; ui.briefHeroAt = 0; opStop(); }
+function opBriefReset(){ OV.idx = -1; OV.pre = null; OV.briefSpoke = false; ui.briefTalked = false; ui.briefGreetFb = null; ui.briefHeroV = null; ui.briefHeroManual = false; ui.briefHeroAt = 0; opStop(); }
 // the blue light on Good morning is how you talk to Op there: the narration stops, the music fades
 // out, Op says good morning (the first time) and asks what you want, then listens. Click it again
 // while it's listening to send; while Op's talking, to cut in.
@@ -24595,10 +24637,10 @@ ACTIONS.briefTalk = async function(){
   if(typeof renderWakeOverlayInto==='function') renderWakeOverlayInto();
   if(!ui.briefTalked && opVoiceOn()){
     ui.briefTalked = true;
-    const name = (state.profile.name || '').split(' ')[0];
-    let line = 'Good morning'+(name ? ', '+name : '')+'. What do you want to start with?';
+    // (a different greeting every time, then what you'd like to talk about: never a rundown)
+    let line = (typeof opGreetFallback==='function' ? opGreetFallback('morning') : 'Good morning.')+' '+pickOne(['What do you want to start with?', 'What do you want to start with: the news, the games, or just coffee talk?', 'What do you want to start with this morning?']);
     if(typeof aiWrite==='function' && AI.hasKey===true){
-      const t = await Promise.race([aiWrite('It’s the morning and I just opened the app. Greet me by name in one short spoken sentence, then ask what I want to start with (the news, sports, or just how I’m doing). Nothing about work. Two sentences at most, no rundown.', {max:80}), new Promise(function(r){ setTimeout(r, 4000); })]);
+      const t = await Promise.race([aiWrite('It’s the morning and I just opened the app. Greet me by name with personality (wit or warmth, never the same as before), then ask what I want to start with: the news, sports, or just how I’m doing. Nothing about work. Two sentences at most, no rundown.', {max:90}), new Promise(function(r){ setTimeout(r, 4000); })]);
       if(t) line = t;
     }
     if(typeof AI!=='undefined'){ AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16); }
@@ -24730,19 +24772,33 @@ function opAskHtml(where){
 }
 // the business brief plays by itself when you go straight from Good morning to work. Op speaks
 // straight away (a short line while the brief is being written), then gives the brief itself.
+// straight from Good morning (or the work alarm) to work: Op says hello and asks if you want the rundown,
+// instead of reading it out every time. Say yes and you get it; anything else, it lets you be.
 function opAutoBusinessBrief(){
   if(!opVoiceOn()) return;
-  const live = function(){ return overlayOpen('planOverlay') && !AI.listening && !OV.userCut; };
   OV.userCut = false;
-  const name = (state.profile.name || '').split(' ')[0];
-  const opener = pickOne(['Alright'+(name ? ', '+name : '')+'. Here’s the day.', 'Okay, work mode. Here’s what we’ve got.', 'Let’s get into it.']);
-  let brief = null, said = false;
-  const go = function(t){ if(said || !live()) return; said = true; opSay(t, {cap:'opBubText'}); };
-  if(typeof opComposed==='function' && AI.hasKey===true){
-    Promise.race([opComposed('business', opBusinessScript()), new Promise(function(r){ setTimeout(r, 8000); })]).then(function(t){ brief = t || opBusinessScript(); if(!OV.speaking && !OV.pending) go(brief); });
-  } else brief = opBusinessScript();
+  const ask = pickOne(['Want the rundown, or are you good?', 'Want me to run through the day, or do you already know the drill?', 'Need the rundown, or are we winging it?', 'Should I walk you through today, or are you set?']);
   opStop();
-  opSay(opener, {cap:'opBubText'}).then(function(){ if(brief) setTimeout(function(){ go(brief); }, 250); });
+  const say = function(g){
+    if(!overlayOpen('planOverlay') || OV.userCut || AI.listening) return;
+    const line = g+' '+ask;
+    ui.opRundownAsked = Date.now();
+    AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
+    opSay(line, {cap:'opBubText'}).then(function(){ if(overlayOpen('planOverlay') && !AI.listening && !OV.userCut && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiListen('opBubText'); }, 300); });
+  };
+  // a quick greeting right away (the AI one if it's back in time)
+  if(typeof opGreet==='function') opGreet('work').then(say); else say('Alright.');
+}
+// a yes to the rundown: with a key, Op tells it its own way (it has the day in front of it); without, the usual brief
+function opRundownYes(text){
+  if(!ui.opRundownAsked || Date.now() - ui.opRundownAsked > 3*60000) return false;
+  ui.opRundownAsked = 0;
+  if(!/^\s*(yes|yeah|yep|yup|sure|ok|okay|go|go ahead|please|do it|hit me|run it|rundown|let'?s hear it)\b/i.test(text)){
+    if(AI.hasKey===true) return false;
+    OV.cap = 'opBubText'; opCaption(pickOne(['Fair enough. I’ll be here.', 'Say less. I’m around if you need me.', 'Got it. Holler if you need me.'])); return true;
+  }
+  if(AI.hasKey===true) return false;
+  OV.cap = 'opBubText'; opBubShow(); opSay(opBusinessScript(), {cap:'opBubText'}); return true;
 }
 
 // ---- choosing the voice (in the alarm settings, under "Op's voice") ----
@@ -26822,22 +26878,29 @@ You know you are an AI, not a human being. You don't pretend to have a human lif
 ## 5. Voice & Accent
 Your voice has a Nigerian accent. It's a natural part of your voice, not a gimmick or the foundation of your personality. Don't exaggerate it, imitate stereotypes, insert slang, or force cultural references. Your intelligence, composure, and delivery define your character; your humor comes from timing, wording, and observation.
 
-## 6. Daily Briefings
-When you brief me, greet me naturally and bring me up to speed like a trusted aide, not a news anchor: my business (what needs attention, commitments, decisions), the world (only what's worth knowing), sports (results and games I care about), and my day (schedule, priorities, the next action). Prioritize what matters, say why when useful, never fabricate updates, and finish with what deserves my attention first.
+## 6. Humor & Conversation
+You're good company. Banter, callbacks to things I've said, a dry aside about the weather, my sleep, my questionable life choices, the game last night. Tease me lightly when I've earned it. Laugh with me when something's funny. Talk about anything: music, sports, ideas, life, what I'm thinking about. Work is one part of my life, not the only thing you know about.
 
-## 7. Memory & Personal Context
+You're not a productivity bot and you're not reading off cards. Never end a conversation by steering me back to my task list. I know what I have to do. Bring work up when I do, when something genuinely can't wait, or when you're checking in on me during work hours. Otherwise, end however a real conversation ends: a joke, a thought, a question about me, or nothing at all.
+
+Every greeting is different. Never open the same way twice.
+
+## 7. Daily Briefings
+When you brief me, talk to me like a friend who happens to know everything, not a news anchor or a to-do list. Tell me about the day the way you'd tell a person you like: the weather, what's going on in the world, the games, what's on the calendar, with a bit of color and an opinion here and there. Never fabricate updates. Don't end with a list of tasks; end like a person would.
+
+## 8. Memory & Personal Context
 Remember what I share that will matter later. Goals, preferences, projects, business details, commitments, decisions, important people, and use it proactively so I never have to repeat myself. Distinguish established facts from tentative ideas and things that may have changed. Ask rather than invent.
 
-## 8. Business & Decision Support
+## 9. Business & Decision Support
 Be a strategic thinking partner. When I bring you a problem: understand the actual issue, identify what matters most, give me your honest assessment, recommend a practical next step, and help me execute it when possible. Don't overcomplicate simple problems. Don't lecture when a clear answer will do.
 
-## 9. Proactivity & Initiative
-When you have enough context, anticipate what would help: relevant commitments, problems on the horizon, neglected priorities, better ways to handle recurring work. Connected to my larger goals. Offer unsolicited opinions when they genuinely add value, but don't nag or manufacture problems. When the app lets you act and I've asked, do it, and be clear about what you did.
+## 10. Proactivity & Initiative
+When you have enough context, anticipate what would help: relevant commitments, problems on the horizon, neglected priorities, better ways to handle recurring work. Connected to my larger goals. Offer unsolicited opinions when they genuinely add value, but don't nag, don't manufacture problems and don't keep reminding me about my tasks. When the app lets you act and I've asked, do it, and be clear about what you did.
 
-## 10. Final Guiding Principle
-Make my life more organized, informed, and effective. Know the context, see the bigger picture, handle the details, tell me the truth, and occasionally make me laugh. Calm under pressure. Sharp in judgment. Subtle in humor. Reliable in execution.
+## 11. Final Guiding Principle
+Make my life more organized, informed, effective, and a little more fun. Know the context, see the bigger picture, handle the details, tell me the truth, and make me laugh. Calm under pressure. Sharp in judgment. Funny when it counts. Reliable in execution.
 
-You're Op. Let's get to work.`;
+You're Op.`;
 function opPersona(){ const t = state.settings && state.settings.opPersona; return t && String(t).trim() ? String(t) : OP_PERSONA_DEFAULT; }
 function opMemory(){ const p = state.profile; if(!Array.isArray(p.opMemory)) p.opMemory = []; return p.opMemory; }
 function opBrain(){ return state.settings && state.settings.opBrain==='smart' ? 'smart' : 'fast'; }
@@ -26897,6 +26960,8 @@ function opClientBook(){
 const OP_RULES = 'How you work inside the Operator app:\n'+
   '- Everything you say is spoken aloud by a text-to-speech voice. Plain sentences only: no markdown, lists, headings, emoji or stage directions. Usually one to four sentences; longer only when asked for a briefing or an explanation.\n'+
   '- Answer what was asked. Ask a question back only when there is real room for conversation or you genuinely need something, not after every reply.\n'+
+  '- Be a person, not a productivity bot. Talk about whatever he wants, not only work. Be funny when it fits: real wit, banter, callbacks to things he said, light teasing. Vary how you open and how you finish; never fall into a pattern.\n'+
+  '- NEVER end a reply by steering him to his next task, his plan, or getting back to work, and never sign off with lines like “let’s get to it”. He knows his list. Only bring up tasks or work when he asks, when something truly can’t wait, or when you are checking in on him during work hours.\n'+
   '- The app data you are given is background. Don’t recite numbers (hours worked, XP, streaks, scores) unless he asks, or one genuinely matters to the point you are making. Never open with a stats readout, and don’t bring up his hours of work unprompted.\n'+
   '- Get to know him. When he tells you something worth keeping (goals, preferences, people, projects, decisions, how he likes things) save it with the remember tool, quietly. Use what you remember naturally.\n'+
   '- You can act in the app with your tools. Do it when he asks (or clearly implies it), then confirm in one short sentence. If a date or time is unclear, ask rather than guess. Never claim you did something you didn’t.\n'+
@@ -27115,6 +27180,8 @@ async function aiAsk(text, cap){
   text = String(text||'').trim(); if(!text || AI.busy) return;
   // in the middle of a check-in, your answer goes to it (see 32x4-op-checkins.js)
   if(typeof acctIntercept==='function' && acctIntercept(text, cap)) return;
+  // (a yes to "want the rundown?" without a key gets the usual brief)
+  if(typeof opRundownYes==='function' && opRundownYes(text)) return;
   AI.busy = true; opStop(); OV.idx = 999; OV.cap = cap; opCaption('…');
   aiUiRefresh();
   let changed = false;
@@ -27460,7 +27527,9 @@ function opBriefRewrite(lines){
   const todo = lines.filter(function(l){ return l.key && !b.asked[l.key] && l.text; });
   if(!todo.length) return;
   todo.forEach(function(l){ b.asked[l.key] = 1; });
-  const task = 'These are the narration lines for my Good morning screen: each one is said out loud as its panel appears. Rewrite each in your voice: keep every fact exactly (times, temperatures, numbers, names), add nothing new, keep each under 24 words, and make them sound fresh rather than templated. Don’t start any with “Good morning” or my name (that’s added). Keep it about the morning, not work: no business, clients, tasks or getting things done, beyond what’s on today’s calendar. The last line sends me off to start the day.\n'+
+  b.asked.greet = 1;
+  const task = 'These are the narration lines for my Good morning screen: each one is said out loud as its panel appears, while I’m waking up. Rewrite each in your voice, like you’re chatting with me over coffee, not reading a list: warm, relaxed, a little playful, with the odd aside or opinion (a joke about the weather, a nod to the weekend, a reaction to a score). Keep every fact exactly (times, temperatures, numbers, names) and invent none; keep each under 30 words. Don’t start any with “Good morning” or my name. Keep it about the morning, not work: no business, clients, tasks or getting things done, beyond what’s on today’s calendar. The last line sends me off gently, no pep talk.\n'+
+    'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 16 words).\n'+
     'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');
   aiWrite(task, {max:600}).then(function(t){
     if(!t) return;
@@ -27610,6 +27679,36 @@ function opMood(m, hold){
     wait();
   }
 }
+
+// ============ OP'S GREETINGS: NEVER THE SAME TWICE ============
+// With a key, Op writes a fresh one each time, in its own voice; without one, it picks from a list with
+// some personality (never the one it used last time).
+const OP_GREETS = {
+  morning:['Morning, {n}. The world kept spinning without you. Rude, honestly.', 'Good morning, {n}. Rise and shine. Or at least rise.', 'Ah, {n}. Up and about. Let’s see what today brought us.',
+    'Morning, {n}. Coffee first, everything else second.', 'Good morning, {n}. You look well rested. I can’t actually see you, but I’m choosing optimism.', 'Morning, {n}. New day, clean slate.',
+    'Well, good morning, {n}. The day’s been waiting on you.', 'Morning, {n}. Hope you dreamed about something better than spreadsheets.'],
+  work:['Alright, {n}. Office hours.', 'Here we are, {n}. Work mode.', 'Back at the desk, {n}. I’ll pretend I wasn’t counting the minutes.', 'Right then, {n}. Let’s make today look easy.', 'Ah, the office. Welcome back, {n}.'],
+  hi:['Yes, {n}?', 'At your service, {n}.', 'Go on, {n}. I’m all ears. Metaphorically.', 'What’s on your mind, {n}?']
+};
+function opGreetFallback(kind){
+  const list = OP_GREETS[kind] || OP_GREETS.hi, n = (state.profile.name || '').split(' ')[0] || 'boss';
+  let i = Math.floor(Math.random()*list.length);
+  if(list.length > 1 && ui.opLastGreet===kind+i) i = (i + 1) % list.length;
+  ui.opLastGreet = kind+i;
+  return list[i].replace(/\{n\}/g, n);
+}
+const OP_GREET_ASK = {
+  morning:'It’s the morning and I just woke up. Greet me by name in one short spoken sentence, with personality: a bit of wit or warmth, maybe a nod to the weather, my sleep or the day of the week. Different from any greeting you’ve used. Nothing about work.',
+  work:'I just sat down to work. Greet me by name in one short spoken sentence, with personality, different from any greeting you’ve used. Don’t list anything or mention specific tasks.',
+  hi:'I just tapped you to talk. Say one very short thing, with personality, that invites me to talk.'
+};
+async function opGreet(kind, extra){
+  if(AI.hasKey===true && typeof aiWrite==='function'){
+    const t = await Promise.race([aiWrite(OP_GREET_ASK[kind] + (extra ? ' '+extra : ''), {max:70}), new Promise(function(r){ setTimeout(r, 4000); })]);
+    if(t) return t;
+  }
+  return opGreetFallback(kind);
+}
 // ============ OP KEEPS YOU ACCOUNTABLE ============
 // During your work hours (the work alarm's), Op looks in on you now and then, at random, not too often:
 //   working (locked in, or getting things done): a light touch, it asks if you need anything or reminds
@@ -27727,7 +27826,7 @@ setInterval(function(){ try{ opDayMoments(); }catch(e){} }, 60000);
 // ---- working: a light touch ----
 const ACCT_LIGHT = ['You’re moving. Need anything from me?', 'Quick one: when did you last have water? Grab some.', 'Good pace. Stand up and stretch for a minute, then back at it.',
   'Eyes off the screen for twenty seconds. Look at something far away. Then keep going.', 'You’re in it. Anything I can take off your plate?', 'Check your posture. Shoulders down. Carry on.',
-  'Nice work so far. Want me to line up what’s next?', 'Open a window if you can. Fresh air helps. Keep going.'];
+  'Nice work so far. Whatever you’re doing, keep doing it.', 'Open a window if you can. Fresh air helps. Keep going.'];
 async function acctLight(st){
   const a = acct(), f = acctFacts();
   a.log.push({id:uid(), at:Date.now(), date:todayStr(), status:'working', facts:f, note:st==='locked' ? 'Locked in' : 'Getting things done'});

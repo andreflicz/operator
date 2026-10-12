@@ -42,7 +42,8 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     // round 13: the one-screen brief shows four good-day thoughts (thoughtsOfDay(4)), and "The Day Ahead" is now "Today"
     check('human things: a quote, the good-day list (rolling), headlines, today', await p.isVisible('.br-quote .qt') && (await p.$$('.br-thoughts .gd-i')).length>=4 && /Fed holds rates steady/.test(brief) && /Today/.test(await p.textContent('.br-day .br-k')));
     check('no business numbers in Good morning', !/Monthly recurring|Open leads/.test(brief));
-    check('it ends on "Get ready to start your day."', await p.textContent('#brVoice')==='Get ready to start your day.');
+    // (round 26: the closing line varies by the day)
+    check('it ends on the send-off line', await p.textContent('#brVoice')===await p.evaluate(() => window.__op.ev("ui.briefLines[ui.briefLines.length-1].text")));
     check('one way forward: Start my morning', await p.isVisible('[data-action="wakeStartMorning"]') && !(await p.$('[data-action="wakeClockIn"]')));
     // round 13: Start my morning no longer opens Morning mode — Good morning lifts away (520 ms) and
     // you're clocked in straight to the business preview (#planOverlay)

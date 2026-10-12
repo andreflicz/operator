@@ -115,7 +115,7 @@ setInterval(function(){ try{ opDayMoments(); }catch(e){} }, 60000);
 // ---- working: a light touch ----
 const ACCT_LIGHT = ['You’re moving. Need anything from me?', 'Quick one: when did you last have water? Grab some.', 'Good pace. Stand up and stretch for a minute, then back at it.',
   'Eyes off the screen for twenty seconds. Look at something far away. Then keep going.', 'You’re in it. Anything I can take off your plate?', 'Check your posture. Shoulders down. Carry on.',
-  'Nice work so far. Want me to line up what’s next?', 'Open a window if you can. Fresh air helps. Keep going.'];
+  'Nice work so far. Whatever you’re doing, keep doing it.', 'Open a window if you can. Fresh air helps. Keep going.'];
 async function acctLight(st){
   const a = acct(), f = acctFacts();
   a.log.push({id:uid(), at:Date.now(), date:todayStr(), status:'working', facts:f, note:st==='locked' ? 'Locked in' : 'Getting things done'});

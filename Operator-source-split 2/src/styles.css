@@ -5013,3 +5013,30 @@ body.insp-on .quick-journal-fab, body.insp-on #fabAdd, body.insp-on .insp-orb{ d
 /* (hidden, the bubble doesn't animate at all) */
 .insp-orb:not(.is-on) .io-film, .insp-orb:not(.is-on) .io-core{ animation:none; }
 .insp:not(.is-in) *, .insp:not(.is-in){ animation-play-state:paused !important; }
+
+/* ===== Lock in: the last step's button where Next always is; the light and the journal on one line ===== */
+.wd-foot .ls-go.ls-go-foot{ width:auto; padding:0 40px; height:60px; gap:12px; font-size:18px; letter-spacing:.14em; animation:lsPop .6s .1s cubic-bezier(.2,.9,.25,1.1) both; }
+.wd-foot .ls-go.ls-go-foot .ls-go-i{ font-size:20px; }
+.ls-why{ margin-top:auto; margin-bottom:auto; }
+body.op-ov .quick-journal-fab.jorb, body.np-on .quick-journal-fab.jorb{ bottom:10px !important; }
+body.op-ov .op-light{ bottom:12px !important; }
+body.np-on .op-light{ bottom:12px !important; }
+
+/* ===================== tabs & sub-tabs, app-wide ===================== */
+/* main tabs: quiet text with a soft glowing underline */
+.tabs{ gap:4px !important; border-bottom:1px solid var(--border) !important; }
+.tabs .tab{ position:relative; padding:10px 14px !important; border-radius:10px 10px 0 0; color:var(--text-dim); font-weight:600; transition:color .2s, background .2s; }
+.tabs .tab:hover{ color:var(--text); background:rgba(255,255,255,.03); }
+.tabs .tab.active{ color:var(--text); }
+.tabs .tab.active::after{ content:''; position:absolute; left:12px; right:12px; bottom:-1px; height:2px; border-radius:2px; background:var(--accent, #e8a23d); box-shadow:0 0 12px color-mix(in srgb, var(--accent, #e8a23d) 70%, transparent); }
+/* sub-tabs and switches: one glassy track, the picked one a soft raised pill */
+.sub-pills, .seg-tabs, .subtabs{ display:inline-flex !important; align-items:center; gap:2px !important; padding:4px !important; border-radius:14px !important; background:rgba(255,255,255,.035) !important; border:1px solid var(--border) !important; box-shadow:inset 0 1px 2px rgba(0,0,0,.25); }
+.subtabs{ margin-left:auto; }
+.sub-pills{ margin:2px 0 18px; }
+.sub-pill, .seg-tab, .subtab{ border:1px solid transparent !important; background:transparent !important; color:var(--text-dim) !important; padding:7px 14px !important; border-radius:10px !important; font:inherit; font-size:13px !important; font-weight:600 !important; cursor:pointer; transition:color .2s, background .25s, box-shadow .25s, border-color .25s; white-space:nowrap; }
+.sub-pill:hover, .seg-tab:hover, .subtab:hover{ color:var(--text) !important; background:rgba(255,255,255,.04) !important; }
+.sub-pill.is-on, .seg-tab.active, .subtab.active{ color:var(--text) !important; background:linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.05)) !important; border-color:rgba(255,255,255,.12) !important; box-shadow:0 4px 14px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.08) !important; }
+.seg-tabs.seg-sm .seg-tab{ padding:5px 10px !important; font-size:12px !important; }
+.hl-cols.is-one{ grid-template-columns:1fr !important; }
+:root[data-theme="light"] .sub-pills, :root[data-theme="light"] .seg-tabs, :root[data-theme="light"] .subtabs{ background:rgba(0,0,0,.035) !important; box-shadow:inset 0 1px 2px rgba(0,0,0,.08); }
+:root[data-theme="light"] .sub-pill.is-on, :root[data-theme="light"] .seg-tab.active, :root[data-theme="light"] .subtab.active{ background:#fff !important; border-color:rgba(0,0,0,.08) !important; box-shadow:0 2px 8px rgba(0,0,0,.08) !important; }

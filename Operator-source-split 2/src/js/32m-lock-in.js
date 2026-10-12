@@ -4,10 +4,10 @@
 //   2 Method — one block of your length, or a way of working (Pomodoro, 52/17, 90/20, Flowtime,
 //              until the task's done)
 //   3 Set up — your checklist; every box has to be ticked to get past it
-//   4 Why    — what you're getting / avoiding, today's deep work → the big LOCK IN
+//   4 Begin  — what you're getting / avoiding, today's deep work → the big LOCK IN
 // The 🔒 Lock in pill in the corner is the one way to skip ahead: it starts right away with what's
 // picked. The timer starts after the "Locked in" stamp, not under it.
-const LOCK_STEPS = [['task','Task'],['method','Method'],['prep','Set up'],['why','Why']];
+const LOCK_STEPS = [['task','Task'],['method','Method'],['prep','Set up'],['why','Begin']];
 const LOCK_METHODS = {
   block:     {label:'Single Block', icon:'&#127919;', sub:'One Stretch, Your Length', how:'One focused stretch, as long as you set. No breaks unless you take one.', best:'Deep work with a clear finish line'},
   pomodoro:  {label:'Pomodoro', icon:'&#127813;', sub:'25 On · 5 Off · 4 Rounds', work:25, rest:5, long:15, every:4, rounds:4, how:'Four 25-minute sprints with a 5-minute breather between each. Breaks start and end by themselves.', best:'Getting started on things you\'ve been putting off'},
@@ -399,7 +399,6 @@ function lockWhyHtml(){
     '</div>'+
     '<div class="ls-bar"><div class="ls-bar-k"><span>Deep work today</span><span>'+fmtHours(deep)+(after ? ' &rarr; <b>'+fmtHours(after)+'</b>' : '')+' / '+fmtHours(target)+'</span></div>'+
       '<div class="ls-bar-t"><i class="ls-bar-now" style="width:'+pct.toFixed(1)+'%"></i><i class="ls-bar-add" style="left:'+pct.toFixed(1)+'%;width:'+Math.max(0, pct2-pct).toFixed(1)+'%"></i></div></div>'+
-    '<div class="ls-go-wrap"><button class="ls-go" data-action="lockGo"><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button></div>'+
   '</div>';
 }
 function lockSeqHtml(){
@@ -416,7 +415,8 @@ function lockSeqHtml(){
     '<div class="wd-inner ls-inner" data-key="ls-'+s.step+'"><div class="ls-stage"><h2 class="wd-title-h">'+titles[s.step]+'</h2>'+body+'</div></div>'+
     '<div class="wd-foot">'+
       (i>0 ? '<button class="btn btn-ghost ls-back" data-action="lockBack">&larr; Back</button>' : '<span></span>')+
-      (s.step==='why' ? '<span></span>' : '<button class="ls-next" data-action="lockNext">Next <span>&rarr;</span></button>')+
+      // (the last step's button sits where Next always is, just bigger and green)
+      (s.step==='why' ? '<button class="ls-go ls-go-foot" data-action="lockGo"><span class="ls-go-ring"></span><span class="ls-go-i">&#128274;</span><b>LOCK IN</b></button>' : '<button class="ls-next" data-action="lockNext">Next <span>&rarr;</span></button>')+
     '</div>'+
   '</div>';
 }

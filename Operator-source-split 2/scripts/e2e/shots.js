@@ -105,6 +105,14 @@ function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
   await E("closeIntentOverlay()");
   await shot('vault', async () => { await E("if(!vaultStore().length){ vaultStore().push({id:'v1', kind:'week', key:addDays(todayStr(),-7), label:'The week of Oct 5', text:'You did the hard thing this week. Remember how it felt to finish the JJS launch on time.', at:Date.now()-86400000*3, back:true}, {id:'v2', kind:'month', key:'2026-09', label:'September', text:'September was messy. October is the month you stop negotiating with yourself.', at:Date.now()-86400000*11, back:false}); ui.vaultOpen={v1:true}; } ui.view='personal'; ui.personalTab='journal'; ui.journalMode='vault'; renderView()"); await p.waitForTimeout(800); });
   await E("ui.journalMode='entries'");
+  await shot('lockseq', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); state.focus.prepItems=[]; openLockSeq(); ui.lockSeq.maxStep=3; lockGoTo(3)"); await p.waitForTimeout(900); });
+  await shot('lockseq1', async () => { await E("lockGoTo(1)"); await p.waitForTimeout(700); });
+  await E("closeLockSeq()");
+  await shot('lockmin', async () => { await E("state.profile.lockedView='minimal'; state.focus.activeSession = {startedAt: Date.now()-1800000, plannedMinutes:50, completedTasks:[], breaks:[], onBreak:false, completeFired:false}; ui.view='focus'; renderView()"); await p.waitForTimeout(900); });
+  await E("state.focus.activeSession=null; state.profile.lockedView='full'; ui.view='today'; renderView()");
+  await shot('health-body', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.view='personal'; ui.personalTab='fitness'; ui.healthSub='body'; renderView()"); await p.waitForTimeout(400); });
+  await shot('health-train', async () => { await E("ui.healthSub='training'; renderView()"); await p.waitForTimeout(400); });
+  await E("ui.healthSub='overview'");
   await shot('workset', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.alarmTab='work'; workCfg().enabled=true; openWakeSetup()"); await p.waitForTimeout(500); });
   await E("hideOverlay('wakeSetupOverlay'); ui.alarmTab='wake'");
   await shot('workring', async () => { await E("fireWorkAlarm({test:true})"); await p.waitForTimeout(900); });
