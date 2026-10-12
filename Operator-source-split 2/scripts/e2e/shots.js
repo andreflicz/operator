@@ -103,6 +103,9 @@ function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
   await shot('fabmenu', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.view='personal'; ui.personalTab='finances'; renderView()"); await p.waitForTimeout(300); await p.click('#fabAdd'); await p.waitForTimeout(500); });
   await E("fabMenuClose()");
   await shot('inspire', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); const s = inspStore(); if(!s.log.length){ ['walk','read','meditate','clean','mealprep'].forEach((a, i) => s.log.push({id:'il'+i, act:a, label:inspAct(a).label, at:Date.now()-i*86400000/2, date:addDays(todayStr(), -Math.floor(i/2))})); s.thoughts.push({id:'th1', x:260, y:-420, text:'Morning walks before the phone. That is the whole trick.', tint:'#ffd1e8'}); } openInspire()"); await p.waitForTimeout(1600); });
+  await shot('inspire-wind', async () => { await E("inspStore().wind='wind'; ui.inspWindOpen=true; inspRender()"); await p.clock.runFor(4000); await p.waitForTimeout(900); });
+  await shot('inspire-away', async () => { await E("ui.inspWindOpen=false; ACTIONS.inspBreezeAway()"); await p.clock.runFor(1200); await p.waitForTimeout(500); });
+  await E("ACTIONS.inspBreezeAway(); inspStore().wind='calm'; inspRender()");
   await shot('inspire-card', async () => { await E("ACTIONS.inspOpenAct(null, null, 'walk')"); await p.waitForTimeout(700); });
   await shot('inspire-sheet', async () => { await E("ui.inspOpenAct=null; ACTIONS.inspLogSheet()"); await p.waitForTimeout(700); });
   await shot('inspire-zoom', async () => { await E("ui.inspSheet=false; ui.inspView={x:-300,y:80,z:0.5}; inspRender()"); await p.waitForTimeout(900); });
@@ -160,7 +163,7 @@ function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
   await shot('sleepsheet', async () => { await E("openHealthSheet('sleep')"); });
   await E("ACTIONS.closeXpHow()");
   await shot('morning', async () => { await E("state.focus.morningNotes=[{id:'nn1', forDate:todayStr(), text:'', headline:'Up at 6. Don’t negotiate.', morning:'Slow coffee, then the JJS edit before anything else.'}]; document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.view='today'; renderView(); fireWake({})"); await p.click('[data-action=\"wakeStartDay\"]'); await p.waitForTimeout(900); await E("briefRevealAll()"); await p.clock.runFor(3000); await p.waitForTimeout(900); });
-  if(process.env.MEASURE) console.log('MEASURE', await E("JSON.stringify([...document.querySelectorAll('#wakeContent .c-c > section, #wakeContent .c-d > section, #wakeContent .brs-split > div')].map(x => [x.className.split(' ').slice(1,3).join(' '), Math.round(x.getBoundingClientRect().height), x.scrollHeight]))"));
+  if(process.env.MEASURE) console.log('MEASURE', await E("JSON.stringify(ui.briefLines.map(l => l.key+': '+l.text))"));
   await shot('workprev', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.wakeMode=null; clockIn({from:'x', quiet:true}); OV.cap='opBubText'; opBubShow(); opCaption('Alright Andre. Three things today: the JJS launch first, then the Bloom proposal, then edits. JJS is due a check-in too. Want me to lock you in on the launch?')"); await p.waitForTimeout(700); });
   await E("hideOverlay && hideOverlay('planOverlay')");
   await shot('morning-vision', async () => { await E("briefHeroSet('vision')"); await p.waitForTimeout(1000); });

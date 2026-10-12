@@ -27,12 +27,14 @@ function sportsTeaseFacts(){
   picks.sort(function(a, b){ return b.rank - a.rank; });
   return {busy:busy, picks:picks, soon:soon};
 }
+function teaseFavSide(g){ const ws = favWords(); const hit = function(t){ return ws.some(function(w){ return [t.name, t.short, t.abbr].some(function(x){ return String(x||'').toLowerCase().indexOf(w) >= 0; }); }); }; return hit(g.home) ? g.home : hit(g.away) ? g.away : null; }
 function teaseGameLine(p){
-  const g = p.g;
-  if(g.state==='in') return 'the '+g.away.short+' and '+g.home.short+' are going right now, '+g.away.score+' to '+g.home.score;
+  const g = p.g, mine = p.fav ? teaseFavSide(g) : null;
+  if(g.state==='in') return (mine ? 'your '+mine.short+' are playing right now' : 'the '+g.away.short+' and '+g.home.short+' are going right now')+', '+g.away.score+' to '+g.home.score;
   const w = g.home.win ? g.home : g.away, l = g.home.win ? g.away : g.home;
+  if(mine && mine===l) return 'your '+l.short+' '+teasePick('l'+g.id, ['fell to', 'lost to', 'came up short against'])+' the '+w.short+', '+w.score+' to '+l.score+(p.ot ? ' in overtime' : '');
   const verb = p.margin <= 3 ? teasePick('v1'+g.id, ['edged', 'squeaked past', 'just got by']) : p.margin <= 10 ? teasePick('v2'+g.id, ['beat', 'got past', 'took down']) : teasePick('v3'+g.id, ['ran past', 'rolled', 'handled']);
-  return 'the '+w.short+' '+verb+' the '+l.short+', '+w.score+' to '+l.score+(p.ot ? ' in overtime' : '');
+  return (mine ? 'your ' : 'the ')+w.short+' '+verb+' the '+l.short+', '+w.score+' to '+l.score+(p.ot ? ' in overtime' : '');
 }
 function teaseShort(){ const b = (state.profile.about||{}).brief; return b==='short' ? 1 : b==='full' ? 3 : 2; }
 // one or two sentences about sports, and what to offer more of
@@ -42,7 +44,9 @@ function sportsTease(){
   if(f.busy.length){ const b = f.busy.sort(function(a, c){ return c.n - a.n; })[0]; parts.push((b.n >= 7 ? 'The '+b.league+' was packed last night' : 'A busy night in the '+b.league)+'.'); }
   const picks = f.picks.slice(0, Math.min(2, n));
   if(picks.length){
-    parts.push((f.busy.length ? (picks[0].fav ? 'Yours: ' : 'Best of it: ') : (picks[0].fav ? 'Your game: ' : 'The one worth knowing: '))+picks.map(teaseGameLine).join(', and ')+'.');
+    const cap = function(t){ return t.charAt(0).toUpperCase()+t.slice(1); };
+    parts.push((picks[0].fav ? '' : f.busy.length ? 'Best of it: ' : 'The one worth knowing: ')+(picks[0].fav ? cap(teaseGameLine(picks[0])) : teaseGameLine(picks[0]))+'.');
+    if(picks[1]) parts.push((picks[1].fav ? 'And ' : picks[0].fav ? 'Elsewhere, ' : 'And ')+teaseGameLine(picks[1])+'.');
     picks.forEach(function(p){ topics.push(p.fav ? 'the '+(p.g.home.win ? p.g.home : p.g.away).short+' game' : 'that '+p.g.away.short+'–'+p.g.home.short+' game'); });
   }
   if(f.soon.length && parts.length < 2){ const s = f.soon[0].g; parts.push('The '+(isFavGame(s) && favWords().some(function(w){ return s.home.name.toLowerCase().indexOf(w)>=0; }) ? s.home.short : s.away.short)+' play '+scoreWhen(s).replace('Today', 'today').replace('Tomorrow', 'tomorrow')+'.'); }
@@ -76,8 +80,9 @@ function teaseOffer(){
   const opts = [];
   if(s) opts.push(s.topics[0]); if(n) opts.push(n.topics[0]==='the news' ? 'the news' : 'that '+n.topics[0]+' story');
   ui.briefOffer = {at:Date.now(), date:todayStr(), sports:s, news:n};
-  const q = opts.length > 1 ? 'Want more on '+opts[0]+' or '+opts[1]+'?' : 'Want more on '+opts[0]+'?';
-  return q+' '+teasePick('offer', ['Just say.', 'Or we can skip it.', 'Say the word.', 'Or not, your call.']);
+  const q = opts.length > 1 ? 'want more on '+opts[0]+' or '+opts[1]+'?' : 'want more on '+opts[0]+'?';
+  // (it ends on the question, so the mic opens for the answer)
+  return teasePick('offer', ['That’s the quick version. Do you ', 'That’s the gist. Do you ', 'Anyway, that’s the morning. Do you ', 'That’s all the headlines you need. Do you '])+q;
 }
 // what Op knows when you answer
 function teaseContext(){

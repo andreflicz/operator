@@ -5452,3 +5452,26 @@ html[data-theme="light"] .mctl-ls, html[data-theme="light"] .mctl-wi{ color:rgba
 .op-bub-t{ text-shadow:0 0 18px rgba(255,255,255,.05); }
 html[data-op-mood="stern"] .op-bub-t .cw:last-child, html[data-op-mood="concern"] .op-bub-t .cw:last-child{ animation-name:cwIn, cwGlow; animation-duration:.55s, 1.6s; }
 @keyframes cwGlow{ 0%{ text-shadow:0 0 14px currentColor; } 100%{ text-shadow:none; } }
+
+/* ============ R28 Inspiration: wind ============ */
+.insp.is-alive #inspWorld .izb{ animation:none; will-change:transform, opacity; transition:box-shadow .4s, border-color .4s; }
+.insp.is-alive #inspWorld .izb:hover{ z-index:3; }
+.insp #inspWorld .izb-card{ will-change:transform; }
+.izk-wrap{ position:relative; display:inline-flex; }
+.izk-wind{ position:absolute; bottom:calc(100% + 10px); left:50%; transform:translateX(-50%); display:flex; flex-direction:column; gap:4px; min-width:150px; padding:10px; border-radius:16px; background:rgba(22,18,40,.78); border:1px solid rgba(255,255,255,.14); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); box-shadow:0 18px 50px rgba(0,0,0,.35); animation:izkIn .35s cubic-bezier(.2,.8,.2,1); z-index:5; }
+@keyframes izkIn{ from{ opacity:0; transform:translate(-50%, 8px); } }
+.izk-wind small{ font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.5); padding:0 6px 4px; }
+.izw-s{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; border:none; background:transparent; color:rgba(255,255,255,.82); font:inherit; font-size:13px; font-weight:600; cursor:pointer; text-align:left; transition:background .15s; }
+.izw-s:hover{ background:rgba(255,255,255,.08); }
+.izw-s.is-on{ background:linear-gradient(90deg, rgba(255,214,242,.22), rgba(196,245,255,.16)); color:#fff; }
+.izw-s i{ position:relative; width:26px; height:10px; flex:none; }
+.izw-s i::before, .izw-s i::after{ content:''; position:absolute; left:0; height:2px; border-radius:2px; background:linear-gradient(90deg, transparent, #cfe8ff); animation:izwGust calc(2.4s - var(--n) * .5s) linear infinite; width:calc(8px + var(--n) * 6px); }
+.izw-s i::before{ top:2px; } .izw-s i::after{ top:7px; animation-delay:-.6s; }
+.izw-s:first-of-type i::before, .izw-s:first-of-type i::after{ animation:none; left:6px; width:12px; opacity:.5; }
+@keyframes izwGust{ from{ transform:translateX(-6px); opacity:0; } 30%{ opacity:1; } to{ transform:translateX(22px); opacity:0; } }
+.insp.is-away .insp-hint{ opacity:0; }
+/* bubbles travel under the hub, the boards and anything you wrote */
+.insp.is-alive #inspWorld .izb{ z-index:1; }
+.insp.is-alive #inspWorld .izb.is-behind{ z-index:0; pointer-events:none; }
+.insp.is-alive #inspWorld .izh, .insp.is-alive #inspWorld .izd, .insp.is-alive #inspWorld .izt, .insp.is-alive #inspWorld .izw, .insp.is-alive #inspWorld .izq, .insp.is-alive #inspWorld .izb-card{ z-index:2; }
+.insp.is-alive #inspWorld .izb-card{ z-index:4; }
