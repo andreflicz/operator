@@ -5314,3 +5314,30 @@ body.np-on .op-bub:not(.is-moved){ left:22px !important; }
 .sl-up:hover{ color:rgba(223,228,255,.7); }
 body.np-on:has(.np.sleepv) .op-light{ opacity:.35; }
 body.np-on:has(.np.sleepv) .quick-journal-fab, body.np-on:has(.np.sleepv) #musicDock{ display:none !important; }
+/* Personal → You: one page, no scrolling. Everything sized to fit the window */
+.you{ display:flex; flex-direction:column; gap:10px; }
+.you > *{ margin-top:0 !important; margin-bottom:0 !important; }
+.you-top{ gap:14px; flex-wrap:nowrap; }
+.you .pc.pc-big{ width:196px; padding:12px 12px 10px; } .you .pc-big .pc-face{ width:58px; height:58px; } .you .pc-big .pc-face span{ font-size:24px; } .you .pc-big .pc-ovr b{ font-size:36px; }
+.you-main{ min-width:0; flex:1; }
+.you .you-chart{ margin-top:8px; } .you .you-bars{ height:min(110px, 12vh) !important; }
+.you .opi{ margin:0; padding-top:9px; padding-bottom:9px; }
+.you .opi p{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.you-attr{ padding:10px 14px; } .you-attr-h{ margin-bottom:4px; } .you-attr-h b{ font-size:24px; } .you-sub{ padding:2px 0; }
+.you-recent{ margin-top:0; gap:10px; align-items:stretch; }
+.you-recent .yr-sec{ padding:12px 14px; }
+.yr-tiles{ gap:8px; } .yr-t{ padding:8px 10px; } .yr-t b{ font-size:20px; }
+.yr-r{ padding:4px 0; }
+@media (max-height:820px){ .you .you-bars{ height:64px !important; } .you .pc.pc-big{ width:176px; } .you-attr-h b{ font-size:21px; } }
+.you .you-main .you-bars{ min-height:0 !important; flex:none !important; } .you .you-main .you-chart{ flex:none; margin-top:10px; padding-top:8px; }
+/* full-screen board: nothing floats over its toolbar (the music + level pill steps away); Op's light in the corner */
+body.board-full #musicDock, body.board-full .md-pop, body.board-full .lvl-pop{ display:none !important; }
+body.board-full .op-light{ left:22px !important; } body.board-full .op-bub:not(.is-moved){ left:22px !important; }
+/* pages that end at the bottom-right corner leave room for the + and the journal orb */
+.you-recent .yr-sec:last-child{ padding-right:84px; }
+/* the journal orb sits beside the + (one row along the bottom), not stacked over the page's right edge */
+.quick-journal-fab.jorb{ bottom:30px; right:94px; }
+body:not(.np-on):not(.op-ov) .fab-add.fab-hidden ~ .quick-journal-fab.jorb, body:not(.np-on):not(.op-ov):not(:has(.fab-add:not(.fab-hidden))) .quick-journal-fab.jorb{ right:28px; }
+body.np-on .quick-journal-fab.jorb, body.op-ov .quick-journal-fab.jorb{ right:28px; }
+/* and the content leaves room for that row at the bottom */
+#viewRoot{ padding-bottom:96px; }

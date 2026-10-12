@@ -5310,7 +5310,7 @@ body.np-on .op-bub:not(.is-moved){ left:22px !important; }
 /* sleep: dark, slow, almost nothing */
 .np.sleepv{ position:fixed; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; background:radial-gradient(120% 90% at 50% 110%, #0d1430 0%, #05060f 55%, #020208 100%); color:#dfe4ff; overflow:hidden; }
 .sl-sky{ position:absolute; inset:0; pointer-events:none; }
-.sl-sky b{ position:absolute; width:2px; height:2px; border-radius:50%; background:#fff; opacity:.0; left:calc(8% + var(--i) * 7.4%); top:calc(10% + (var(--i) * 37 % 60) * 1%); animation:slTw calc(5s + var(--i) * .7s) ease-in-out infinite; animation-delay:calc(var(--i) * -1.3s); }
+.sl-sky b{ position:absolute; width:2px; height:2px; border-radius:50%; background:#fff; opacity:0; animation:slTw calc(5s + var(--i) * .7s) ease-in-out infinite; animation-delay:calc(var(--i) * -1.3s); }
 @keyframes slTw{ 0%,100%{ opacity:.08; } 50%{ opacity:.6; } }
 .sl-moon{ position:absolute; right:14%; top:16%; width:70px; height:70px; border-radius:50%; background:radial-gradient(circle at 38% 38%, #f6f1dc, #cfc7a6 60%, #9e9677); box-shadow:0 0 60px rgba(246,241,220,.18), 0 0 140px rgba(140,160,255,.12); opacity:.75; animation:slMoon 14s ease-in-out infinite; }
 @keyframes slMoon{ 50%{ transform:translateY(-6px); box-shadow:0 0 80px rgba(246,241,220,.24), 0 0 160px rgba(140,160,255,.16); } }
@@ -5325,6 +5325,33 @@ body.np-on .op-bub:not(.is-moved){ left:22px !important; }
 .sl-up:hover{ color:rgba(223,228,255,.7); }
 body.np-on:has(.np.sleepv) .op-light{ opacity:.35; }
 body.np-on:has(.np.sleepv) .quick-journal-fab, body.np-on:has(.np.sleepv) #musicDock{ display:none !important; }
+/* Personal → You: one page, no scrolling. Everything sized to fit the window */
+.you{ display:flex; flex-direction:column; gap:10px; }
+.you > *{ margin-top:0 !important; margin-bottom:0 !important; }
+.you-top{ gap:14px; flex-wrap:nowrap; }
+.you .pc.pc-big{ width:196px; padding:12px 12px 10px; } .you .pc-big .pc-face{ width:58px; height:58px; } .you .pc-big .pc-face span{ font-size:24px; } .you .pc-big .pc-ovr b{ font-size:36px; }
+.you-main{ min-width:0; flex:1; }
+.you .you-chart{ margin-top:8px; } .you .you-bars{ height:min(110px, 12vh) !important; }
+.you .opi{ margin:0; padding-top:9px; padding-bottom:9px; }
+.you .opi p{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.you-attr{ padding:10px 14px; } .you-attr-h{ margin-bottom:4px; } .you-attr-h b{ font-size:24px; } .you-sub{ padding:2px 0; }
+.you-recent{ margin-top:0; gap:10px; align-items:stretch; }
+.you-recent .yr-sec{ padding:12px 14px; }
+.yr-tiles{ gap:8px; } .yr-t{ padding:8px 10px; } .yr-t b{ font-size:20px; }
+.yr-r{ padding:4px 0; }
+@media (max-height:820px){ .you .you-bars{ height:64px !important; } .you .pc.pc-big{ width:176px; } .you-attr-h b{ font-size:21px; } }
+.you .you-main .you-bars{ min-height:0 !important; flex:none !important; } .you .you-main .you-chart{ flex:none; margin-top:10px; padding-top:8px; }
+/* full-screen board: nothing floats over its toolbar (the music + level pill steps away); Op's light in the corner */
+body.board-full #musicDock, body.board-full .md-pop, body.board-full .lvl-pop{ display:none !important; }
+body.board-full .op-light{ left:22px !important; } body.board-full .op-bub:not(.is-moved){ left:22px !important; }
+/* pages that end at the bottom-right corner leave room for the + and the journal orb */
+.you-recent .yr-sec:last-child{ padding-right:84px; }
+/* the journal orb sits beside the + (one row along the bottom), not stacked over the page's right edge */
+.quick-journal-fab.jorb{ bottom:30px; right:94px; }
+body:not(.np-on):not(.op-ov) .fab-add.fab-hidden ~ .quick-journal-fab.jorb, body:not(.np-on):not(.op-ov):not(:has(.fab-add:not(.fab-hidden))) .quick-journal-fab.jorb{ right:28px; }
+body.np-on .quick-journal-fab.jorb, body.op-ov .quick-journal-fab.jorb{ right:28px; }
+/* and the content leaves room for that row at the bottom */
+#viewRoot{ padding-bottom:96px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -24307,7 +24334,7 @@ function renderSleepView(){
   const target = typeof wakeTargetDate==='function' ? wakeTargetDate() : addDays(todayStr(), 1), wake = typeof wakeTimeFor==='function' ? wakeTimeFor(target) : null;
   const left = wake ? Math.max(0, Math.round((localTs(target, wake) - Date.now())/60000)) : null;
   return '<div class="np rest sleepv rest-full">'+
-    '<div class="sl-sky"><i class="sl-moon"></i>'+[0,1,2,3,4,5,6,7,8,9,10,11].map(function(i){ return '<b style="--i:'+i+'"></b>'; }).join('')+'</div>'+
+    '<div class="sl-sky"><i class="sl-moon"></i>'+[[8,14],[19,62],[27,28],[36,78],[44,12],[53,40],[61,70],[68,22],[76,55],[84,34],[91,74],[13,44],[48,86],[72,8],[95,18]].map(function(p, i){ return '<b style="--i:'+i+';left:'+p[0]+'%;top:'+p[1]+'%"></b>'; }).join('')+'</div>'+
     '<div class="sl-in">'+
       '<div class="sl-clock"><b id="npClockT">'+(m ? m[1] : t)+'</b><span id="npClockA">'+(m ? m[2] : '')+'</span></div>'+
       '<div class="sl-msg">Sleep well'+(name ? ', '+escapeHtml(name) : '')+'.</div>'+
@@ -25890,8 +25917,7 @@ function youRecentHtml(){
       rc(r.xp ? '+'+r.xp.v.toLocaleString() : '0', 'best day of XP', r.xp ? fmtDateShort(r.xp.d) : '')+
       rc(r.deep ? hrs(r.deep.v) : '0h', 'longest day of deep work', r.deep ? fmtDateShort(r.deep.d) : '')+
       rc(r.tasks ? r.tasks.v : 0, 'most tasks in a day', r.tasks ? fmtDateShort(r.tasks.d) : '')+
-      rc(r.weekWorkouts, 'most workouts in a week', '')+
-      rc(y.streak, 'day streak right now', '')+
+
     '</div></div></div>';
 }
 ACTIONS.youHelp = function(){ ui.youHelp = !ui.youHelp; renderView(); };

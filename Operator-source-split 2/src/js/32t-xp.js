@@ -620,8 +620,7 @@ function youRecentHtml(){
       rc(r.xp ? '+'+r.xp.v.toLocaleString() : '0', 'best day of XP', r.xp ? fmtDateShort(r.xp.d) : '')+
       rc(r.deep ? hrs(r.deep.v) : '0h', 'longest day of deep work', r.deep ? fmtDateShort(r.deep.d) : '')+
       rc(r.tasks ? r.tasks.v : 0, 'most tasks in a day', r.tasks ? fmtDateShort(r.tasks.d) : '')+
-      rc(r.weekWorkouts, 'most workouts in a week', '')+
-      rc(y.streak, 'day streak right now', '')+
+
     '</div></div></div>';
 }
 ACTIONS.youHelp = function(){ ui.youHelp = !ui.youHelp; renderView(); };
