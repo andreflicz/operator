@@ -71,7 +71,7 @@ const FAKE_SPEECH = () => {
     await E("fireWake({})"); await p.click('[data-action="wakeStartDay"]');
     await p.clock.runFor(3000); await p.waitForTimeout(1500);
     const said = await p.evaluate(() => window.__said.filter(x => x.trim()));
-    check('the Operator speaks: good morning, the time', said.length>0 && /^Good morning, Andre\. It’s 7:0\d AM/.test(said[0]), said);
+    check('the Operator speaks: a greeting by name (round 26: different every time), then the time', said.length>0 && /Andre/.test(said[0]) && /It’s 7:0\d AM/.test(said[0]), said);
     check('the blue line is its captions', (await p.textContent('#brVoice')).length > 0);
     check('ask it things: sports, news, tech, business', (await p.$$('.br-asks .br-ask')).length===4);
     await E("briefRevealAll()"); await p.waitForTimeout(1200);
@@ -84,7 +84,10 @@ const FAKE_SPEECH = () => {
     check('"Sports" reads the scores', /NYG beat the DAL, 24 to 17/.test(await p.evaluate(() => window.__said.slice(-1)[0])));
     check('the journal orb shows over Good morning', await p.isVisible('.quick-journal-fab.jorb'));
     await p.click('[data-action="wakeStartMorning"]'); await p.waitForTimeout(1800);
-    check('straight from Good morning to work: the business brief plays by itself', /Today you’ve got 2 things\. Edit JJS reel and Send proposal\./.test(await p.evaluate(() => window.__said.slice(-1)[0])));
+    // (round 26: Op asks if you want the rundown, and gives it on a yes)
+    check('straight from Good morning to work: Op asks if you want the rundown', /rundown|run through the day|walk you through today/.test(await p.evaluate(() => window.__said.slice(-1)[0])));
+    await p.evaluate(() => window.__op.ev("AI.hasKey = false; opRundownYes('yes')")); await p.waitForTimeout(600);
+    check('…and on a yes, the business brief', /Today you’ve got 2 things\. Edit JJS reel and Send proposal\./.test(await p.evaluate(() => window.__said.slice(-1)[0])));
     check('the work preview has "← Morning"', await p.isVisible('#planOverlay .wi-back'));
     await p.click('#planOverlay .wi-back'); await p.waitForTimeout(500);
     check('…and it goes back to Good morning (a sequence)', await E("overlayOpen('wakeOverlay') && ui.wakeMode==='brief'") && !(await E("overlayOpen('planOverlay')")));
