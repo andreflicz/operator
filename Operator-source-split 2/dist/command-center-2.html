@@ -25712,7 +25712,10 @@ function xpAttributes(ctx){
   const perMonth = state.standards.newClientsPerMonth || 2;
   const newIn = function(a, b){ return cs.filter(function(c){ const sd = c.startDate || (c.fromLeadId ? c.createdAt : null); return sd && sd > addDays(today, -b) && sd <= addDays(today, -a); }).length; };
   const months = [newIn(0, 30), newIn(30, 60), newIn(60, 90)];
-  const growthF = months.reduce(function(a, n){ return a + Math.min(1, n/perMonth); }, 0)/3;
+  // (round 27) this month counts most; hitting your standard every month is the top, and going over it
+  // supercharges the whole Business rating a little
+  const mF = months.map(function(n){ return Math.min(1.5, n/perMonth); });
+  const growthRaw = .5*mF[0] + .3*mF[1] + .2*mF[2], growthF = Math.min(1, growthRaw), superF = Math.max(0, growthRaw - 1);
   // content: what's out against what you set (Settings → Goals & Standards); Instagram posts count too
   const contentF = function(role){
     const tg = state.standards.contentTargets && state.standards.contentTargets[role];
@@ -25723,8 +25726,8 @@ function xpAttributes(ctx){
   // Content on both: business videos on Business, your own on Personal (both just called Content)
   const bc = contentF('business'), pc = contentF('personal');
   const cNote = function(c, kind){ return c.done+' '+kind+' video'+(c.done===1?'':'s')+' out in 30 days · aim '+Math.round(c.want); };
-  const B = [sub('MRR', Math.sqrt(mrr/83400), money(mrr)+' a month · 100 at $83.4k (a million a year)'), sub('Grind', deep30/360*(typeof acctGrindMult==='function' ? acctGrindMult() : 1), fmtHours(Math.round(deep30))+' of real work a day (30 days) · 6h a day is 100'+(typeof acctGrindMult==='function' && acctGrindMult() < 1 ? ' · check-ins you were caught slacking pull it down' : '')),
-    sub('Scaling', growthF, months[0]+' · '+months[1]+' · '+months[2]+' new (last 3 months) · aim '+perMonth+' a month'), sub('Content', bc.done/bc.want, cNote(bc, 'business'))];
+  const B = [sub('MRR', Math.sqrt(mrr/83400), money(mrr)+' a month · 100 at $83.4k (a million a year)'), sub('Focus', deep30/360*(typeof acctGrindMult==='function' ? acctGrindMult() : 1), fmtHours(Math.round(deep30))+' of real work a day (30 days) · 6h a day is 100'+(typeof acctGrindMult==='function' && acctGrindMult() < 1 ? ' · check-ins you were caught slacking pull it down' : '')),
+    sub('Scaling', growthF, (superF > 0 ? '&#9889; Supercharged · ' : '')+months[0]+' new this month (aim '+perMonth+'), then '+months[1]+' and '+months[2]+' the two before'), sub('Content', bc.done/bc.want, cNote(bc, 'business'))];
   // personal
   const own = arr(state.goals && state.goals.items).filter(function(g){ return !g.tier && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g)) && g.target > 0; });
   const ownF = typeof goalPct==='function' && own.length ? own.reduce(function(a, g){ return a + (g.done ? 100 : goalPct(g)); }, 0)/own.length/100 : null;
@@ -25747,13 +25750,25 @@ function xpAttributes(ctx){
   const due = tasks.filter(function(t){ return t.deadline && t.deadline < today && t.deadline >= addDays(today, -30); });
   const onTime = due.filter(function(t){ return t.status==='done' && t.completedAt && t.completedAt <= t.deadline; }).length;
   const cs2 = consistencyStats(ctx);
+  // action: doing what you said you'd do. Tasks and video ideas finished in the last 30 days, against what's
+  // sitting on the list, and nothing left to rot (a task open more than two weeks, a video idea more than three)
+  const act = (function(){
+    const items = tasks.filter(function(t){ return !t.ongoing && !t.skill; });
+    const done30 = items.filter(function(t){ return t.status==='done' && within(t.completedAt, 30); }).length;
+    const open = items.filter(function(t){ return t.status!=='done'; });
+    const rot = open.filter(function(t){ return t.createdAt && t.createdAt <= addDays(today, t.isVideoIdea ? -21 : -14); }).length;
+    if(done30 + open.length < 3) return null;
+    const f = .6*(done30/(done30 + open.length)) + .4*(1 - rot/Math.max(1, open.length));
+    return {f:f, done:done30, open:open.length, rot:rot};
+  })();
   // (Integrity is gone: keeping your word day after day is what Consistency measures now)
   const D = [sub('Reliability', due.length >= 2 ? onTime/due.length : null, due.length >= 2 ? onTime+' of '+due.length+' deadlines met in 30 days' : 'Give tasks a deadline and it counts'),
-    sub('Consistency', cs2 ? cs2.f : null, cs2 ? (cs2.trend > 0 ? 'Trending up' : cs2.trend < 0 ? 'Trending down' : 'Holding steady')+' · '+cs2.parts.join(', ')+', week by week' : 'Builds as you go')];
+    sub('Consistency', cs2 ? cs2.f : null, cs2 ? (cs2.trend > 0 ? 'Trending up' : cs2.trend < 0 ? 'Trending down' : 'Holding steady')+' · '+cs2.parts.join(', ')+', week by week' : 'Builds as you go'),
+    sub('Action', act ? act.f : null, act ? act.done+' tasks and videos finished in 30 days · '+act.open+' open'+(act.rot ? ' · '+act.rot+' sitting too long' : ', nothing rotting') : 'Finish what you put on the list and it counts')];
   if(cs2) D[1].trend = cs2.trend;
   const score = function(list, ws){ return rate99(mix(list.map(function(s, i){ return [ws[i], s.v==null ? null : (s.v-25)/75]; }))); };
   const out = {
-    BUS:{name:'Business', short:'BUS', v:score(B, [.4, .25, .2, .15]), subs:B, color:'#ffc56b'},
+    BUS:{name:'Business', short:'BUS', v:Math.min(99, score(B, [.4, .25, .2, .15]) + Math.round(Math.min(.5, superF)*12)), subs:B, color:'#ffc56b', supercharged:superF > 0},
     PER:{name:'Personal', short:'PER', v:score(P, [.3, .4, .3]), subs:P, color:'#c3a6ff'},
     HLT:{name:'Health', short:'HLT', v:0, subs:H, color:'#7ef0c0', body:body},
     DIS:{name:'Discipline', short:'DIS', v:0, subs:D, color:'#8fd3ff', streak:streak}
@@ -25762,7 +25777,7 @@ function xpAttributes(ctx){
   const hRaw = score(H, [.45, .37, .18]), cap = healthCap(body.bmi);
   out.HLT.v = Math.min(hRaw, cap); out.HLT.cap = cap < 100 ? cap : null; out.HLT.capped = hRaw > cap;
   // discipline comes up quickly once you're consistent (the curve leans generous)
-  const dMix = mix(D.map(function(x, i){ return [[.3, .7][i], x.v==null ? null : (x.v-25)/75]; }));
+  const dMix = mix(D.map(function(x, i){ return [[.25, .45, .3][i], x.v==null ? null : (x.v-25)/75]; }));
   out.DIS.v = rate99(Math.pow(dMix, 0.8));
   // Mind (on Personal): what you feed your head (Inspiration, logged on its own page) with your Health and Discipline
   const inspF = typeof inspScore==='function' ? inspScore() : null;
@@ -26072,14 +26087,21 @@ ACTIONS.openXpHow = function(){
       '<div class="xpg-card is-wide"><h3>What it takes to level</h3><p>Level 1 is about one client won. Level 2 is about two more on top of that. From there each level costs more than the last: a strong week is roughly 3,000 to 4,000 XP, so the early levels come in weeks, the middle ones in months, and level '+LEVEL_MAX+' is years of living like this.</p>'+xpgBars(levelAt, LV.map(function(L){ return 'L'+L; }), '#ff9a3c', 'Total XP needed to reach each level. Level '+LEVEL_MAX+' is '+xpForLevel(LEVEL_MAX).toLocaleString()+' XP in all.', true).replace(/<em>([\d,]+)<\/em>/g, function(m, n){ return '<em>'+k(Number(n.replace(/,/g, '')))+'</em>'; })+'</div>'+
     '</div>'+
     '<div class="xpg-sec">Your ratings, 25 to 100 (100 is you at your best). Each thing counts in one place only.</div><div class="xph-rates">'+
-      rate('Business', '#ffc56b', [['MRR', 'what clients pay you a month. 100 is a million a year.'], ['Grind', 'real, locked-in work a day over the last 30 days. Six hours a day, every day, is 100.'],
-        ['Scaling', 'new clients each month against your number ('+(st.newClientsPerMonth||2)+' a month, set in Settings, Goals & Standards). Each of the last three months counts on its own, so it only hits 100 when you land them every month.'],
+      rate('Business', '#ffc56b', [['MRR', 'what clients pay you a month. 100 is a million a year.'], ['Focus', 'real, locked-in work a day over the last 30 days. Six hours a day, every day, is 100. Check-ins Op catches you slacking on take a little off.'],
+        ['Scaling', 'getting clients, every month. Your standard is '+(st.newClientsPerMonth||2)+' a month (Settings, Goals & Standards). This month counts most (half), the two before it the rest, so hitting your number every month is 100. Go over it and it’s supercharged: the extra lifts your whole Business rating.'],
         ['Content', 'business videos out against your business target.']])+
-      rate('Personal', '#c3a6ff', [['Content', 'your own videos out against your personal target.'], ['Goals', 'the weekly and monthly goals you hit, how close your master goals are, and your own goals.'], ['Finances', 'like a credit score. Debt keeps it low, paying it down every month brings it up, and debt-free while earning tops it out.']])+
+      rate('Personal', '#c3a6ff', [['Content', 'your own videos out against your personal target.'], ['Goals', 'the weekly and monthly goals you hit, how close your master goals are, and your own goals.'], ['Finances', 'like a credit score. Debt keeps it low, paying it down every month brings it up, and debt-free while earning well tops it out.'],
+        ['Mind', 'how well you look after your head. It mixes your Inspiration score (most of it), the time on your Training Skills, and your Health and Discipline. Tap Mind on your card to open Inspiration.']])+
       rate('Health', '#7ef0c0', [['Training', 'workouts against your number a week over the last four weeks, the latest week counting most. A first good week back moves it right away.'], ['Diet', 'days you ate within your calorie target over the last two weeks. Logging counts too: a day you never logged counts for nothing.'],
         ['Weight', 'your BMI for your height. It also sets a ceiling on the whole score: carrying a lot of extra weight, Health tops out around 60 even with perfect training and diet, and the ceiling lifts as the weight comes down.']])+
       rate('Discipline', '#8fd3ff', [['Reliability', 'things with a deadline, done by the deadline (last 30 days).'],
-        ['Consistency', 'completing everything, every week: work days on target, tasks, videos, workouts, food logged, your weekly check-in, the weekly and monthly goals you hit and your streak. When Op checks in and catches you slacking (or you don’t answer), it comes off here. The latest weeks count most, and it shows whether you are trending up or down.']])+
+        ['Consistency', 'completing everything, every week: work days on target, tasks, videos, workouts, food logged, your weekly check-in, the goals you hit and your streak. The latest weeks count most. When Op checks in and catches you slacking, or you don’t answer, it comes off here.'],
+        ['Action', 'saying what you’ll do and doing it. The tasks and video ideas you finished in the last 30 days against what’s open, and nothing left to rot: a task sitting more than two weeks, or a video idea more than three, pulls it down.']])+
+    '</div>'+
+    '<div class="xpg-sec">The scores behind the scores</div><div class="xpg-grid">'+
+      '<div class="xpg-card"><h3>Inspiration</h3><p>Lives on the Inspiration page only. Log the things that clear your head (a walk, a book, ten minutes of breathing, a clean room, somewhere new) and it climbs. Over two weeks it looks at three things: how much (a walk, reading or meditating count double), how many days you did something, and how varied it was. It feeds Mind.</p></div>'+
+      '<div class="xpg-card"><h3>Check-ins with Op</h3><p>During your work hours Op looks in now and then and notes how productive you were right then, 1 to 5, and what you said back. A fair reason is let go; one that isn’t good enough, or no answer, counts against Consistency and Focus for two weeks, fading as it ages. They’re all on Focus, Analytics.</p></div>'+
+      '<div class="xpg-card is-wide"><h3>How a goal’s size sets its XP</h3><p>When you add a goal, Op reads it and judges what it really takes: how much effort, over how long, and how far it is from what you usually do. A small weekly goal (post three videos) lands near the bottom, around 75 to 100. A heavy week (20 hours of deep work and four workouts) is near the top, around 250 to 300. A monthly goal runs 250 to 1,000 (sign two new clients is up there). Your own long-term goals run 200 to 10,000, and master goals scale with the number: 150 XP for every pound, 600 for every $1k of MRR. Without a key, a goal gets the usual amount for its kind. You see the XP on the goal before you start, and you can ask Op to size it again.</p></div>'+
     '</div><div class="xph-foot">The overall only hits 100 when all four do.</div>';
   o.classList.remove('hidden'); o.scrollTop = 0;
 };
@@ -28106,7 +28128,7 @@ async function opGreet(kind, extra){
 //   not working: it asks if you're there (concerned, yellow) and the mic opens; you answer, it lays out
 //     where the day stands and asks why; you give your reason, and Op (the AI) decides if it's a real one.
 //     A real reason is logged and let go. An excuse is a fault: Op gets on you (red), puts it on you and
-//     reminds you what's at stake, and it costs you on Consistency and Grind;
+//     reminds you what's at stake, and it costs you on Consistency and Focus;
 //   no answer at all is worse, and Op doesn't forget: it brings it up the next time you talk.
 // Never at lunch, on a break, in Shooting mode, or in the first stretch after you lock in.
 // Every check-in is kept, colour-coded, with how productive you were right then (1 to 5) and what you said back

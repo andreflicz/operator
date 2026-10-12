@@ -5,7 +5,7 @@
 //   not working: it asks if you're there (concerned, yellow) and the mic opens; you answer, it lays out
 //     where the day stands and asks why; you give your reason, and Op (the AI) decides if it's a real one.
 //     A real reason is logged and let go. An excuse is a fault: Op gets on you (red), puts it on you and
-//     reminds you what's at stake, and it costs you on Consistency and Grind;
+//     reminds you what's at stake, and it costs you on Consistency and Focus;
 //   no answer at all is worse, and Op doesn't forget: it brings it up the next time you talk.
 // Never at lunch, on a break, in Shooting mode, or in the first stretch after you lock in.
 // Every check-in is kept, colour-coded, with how productive you were right then (1 to 5) and what you said back
