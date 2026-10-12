@@ -65,7 +65,7 @@ inspToolsHtml = (function(base){
   return function(){
     const h = base.apply(this, arguments);
     const btn = '<span class="izk-wrap"><button class="izk'+(ui.inspSfxOpen ? ' is-on' : '')+'" data-action="inspSfxOpen"><span>&#127925;</span>Sounds</button>'+
-      (ui.inspSfxOpen ? '<span class="izk-wind izk-sfx"><small>Sound effects</small>'+inspSfxControlsHtml()+'<em>The music has its own player, top right.</em></span>' : '')+'</span>';
+      (ui.inspSfxOpen ? '<span class="izk-wind izk-sfx"><small>Sound effects</small>'+inspSfxControlsHtml()+'</span>' : '')+'</span>';
     return h.replace(/<\/div>$/, btn+'</div>');
   };
 })(inspToolsHtml);

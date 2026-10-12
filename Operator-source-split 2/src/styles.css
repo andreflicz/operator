@@ -5561,3 +5561,54 @@ html[data-op-mood="stern"] .op-bub-t .cw:last-child, html[data-op-mood="concern"
 .irc-go{ padding:9px 16px; border-radius:999px; border:none; background:linear-gradient(90deg, #ffd6f2, #d0c4ff, #c4f5ff); color:#1b1430; font:inherit; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; }
 .irc.is-done .irc-go{ background:linear-gradient(90deg, #3fbe8e, #7ff0c9); color:#06281b; }
 .irc-x{ padding:8px 10px; border-radius:999px; border:none; background:transparent; color:rgba(255,255,255,.6); font:inherit; font-size:12.5px; cursor:pointer; } .irc-x:hover{ color:#fff; background:rgba(255,255,255,.08); }
+
+/* ============ R29 ============ */
+/* the + has no hover label anywhere (it sat right over the journal button) */
+.fab-add::after, .fab-add:hover::after{ content:none !important; display:none !important; }
+/* the recap rises in, already drawn */
+#recapOverlay.is-opening #recapContent{ animation:rcOpen .48s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes rcOpen{ from{ opacity:0; transform:translateY(14px) scale(.98); } }
+/* sleep: I'm up · Good morning */
+.sl-btns{ position:absolute; bottom:26px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:14px; }
+.sl-btns .sl-up{ position:static; transform:none; padding:8px 14px; border-radius:999px; color:rgba(223,228,255,.32); transition:color .3s, background .3s; }
+.sl-btns .sl-up:hover{ color:rgba(223,228,255,.85); background:rgba(223,228,255,.06); }
+.sl-dot{ color:rgba(223,228,255,.18); }
+/* Inspiration R29: words behind the bubbles */
+.izw-layer{ position:absolute; left:0; top:0; width:0; height:0; z-index:0; }
+.izwd{ position:absolute; transform:translate(-50%, -50%); width:max-content; max-width:440px; text-align:center; font-family:'Iowan Old Style', Georgia, serif; font-style:italic; font-size:24px; line-height:1.45; color:rgba(255,250,255,.9); text-shadow:0 0 26px rgba(200,170,255,.45), 0 2px 12px rgba(0,0,0,.25); cursor:pointer; will-change:opacity, transform; animation:izwdLine 13s cubic-bezier(.4,0,.2,1) forwards; }
+.izwd span{ display:inline-block; opacity:0; animation:izwdWord 1.2s ease-out forwards; }
+.izwd.is-gone{ animation:izwdOut 2.2s ease-in forwards; }
+@keyframes izwdLine{ from{ translate:0 8px; } to{ translate:0 -26px; } }
+@keyframes izwdWord{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+@keyframes izwdOut{ from{ opacity:1; } to{ opacity:0; translate:0 -34px; } }
+.izwd-keep{ display:inline-block; margin-left:8px; vertical-align:middle; padding:3px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.06); color:rgba(255,255,255,.8); font:600 11px/1.2 var(--font-body, system-ui); font-style:normal; opacity:0; transform:translateY(2px); transition:opacity .25s, transform .25s, background .2s; cursor:pointer; }
+.izwd:hover .izwd-keep, .izwd.is-kept .izwd-keep{ opacity:1; transform:none; }
+.izwd-keep:hover{ background:rgba(255,255,255,.14); }
+.izwd.is-kept{ text-shadow:0 0 30px rgba(255,190,230,.7), 0 2px 12px rgba(0,0,0,.25); }
+@media (prefers-reduced-motion:reduce){ .izwd, .izwd span{ animation-duration:.01s !important; } }
+/* catch it: want to, more like this */
+.izb.is-want::after{ content:'\2605  Want to'; position:absolute; top:-8px; padding:2px 9px; border-radius:999px; font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#2a1a04; background:linear-gradient(90deg, #ffe7a6, #ffc56b); white-space:nowrap; }
+.izb.is-want{ border-color:rgba(255,214,140,.7); box-shadow:0 0 34px rgba(255,197,107,.35), inset 0 -8px 20px rgba(255,197,107,.2); }
+.izb.is-keep{ border-color:rgba(255,255,255,.7); box-shadow:0 0 60px rgba(220,200,255,.55), inset 0 -8px 20px rgba(220,200,255,.3); z-index:3 !important; }
+.izb.is-dragging{ cursor:grabbing; z-index:5 !important; box-shadow:0 26px 60px rgba(0,0,0,.4), 0 0 40px rgba(220,200,255,.4); transition:none !important; }
+#inspWorld .izb{ cursor:grab; }
+.izb-want{ padding:8px 14px; border-radius:999px; border:1px solid rgba(255,214,140,.45); background:rgba(255,197,107,.1); color:#ffd89a; font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; }
+.izb-want.is-on{ background:linear-gradient(90deg, #ffe7a6, #ffc56b); color:#2a1a04; border-color:transparent; }
+.izb-taste{ display:flex; justify-content:center; gap:14px; margin-top:8px; }
+.izb-like{ border:none; background:none; color:rgba(255,190,225,.75); font:inherit; font-size:12px; cursor:pointer; padding:2px 4px; }
+.izb-like.is-on{ color:#ffb6dd; font-weight:700; }
+.izb-taste .izb-hide{ margin:0; position:static; }
+.izk-one{ position:absolute; left:50%; bottom:96px; transform:translateX(-50%); z-index:4; pointer-events:none; font-family:'Iowan Old Style', Georgia, serif; font-style:italic; font-size:18px; color:rgba(255,250,255,.75); animation:izkOne 1.6s ease .8s both; }
+@keyframes izkOne{ from{ opacity:0; filter:blur(6px); } }
+/* the panel: what you want to do */
+.izl-wants{ display:flex; flex-direction:column; gap:2px; margin-bottom:10px; }
+.izl-want{ display:flex; align-items:center; gap:8px; padding:6px 0; font-size:13px; border-top:1px solid rgba(255,255,255,.06); }
+.izl-want b{ flex:1; font-weight:600; } .izl-want span{ width:20px; text-align:center; }
+.izl-wd, .izl-wx{ width:24px; height:24px; border-radius:50%; border:none; background:rgba(255,255,255,.06); color:rgba(255,255,255,.7); font-size:11px; cursor:pointer; }
+.izl-wd:hover{ background:#7ff0c9; color:#06281b; } .izl-wx:hover{ background:rgba(255,255,255,.15); color:#fff; }
+/* undo "Not for me" */
+.insp-undo{ position:fixed; left:50%; bottom:150px; transform:translateX(-50%); z-index:9004; display:flex; align-items:center; gap:12px; padding:9px 10px 9px 16px; border-radius:999px; background:rgba(22,18,44,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:13px; -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:0 14px 40px rgba(0,0,0,.35); animation:ircIn .45s cubic-bezier(.2,.8,.2,1); }
+.insp-undo button{ padding:6px 14px; border-radius:999px; border:none; background:linear-gradient(90deg, #ffd6f2, #d0c4ff, #c4f5ff); color:#1b1430; font:inherit; font-weight:800; font-size:12.5px; cursor:pointer; }
+.insp-undo.is-out{ opacity:0; transform:translate(-50%, 10px); transition:opacity .35s, transform .35s; }
+.izq-keep{ position:absolute; top:8px; right:34px; width:22px; height:22px; border-radius:50%; border:none; background:transparent; color:rgba(255,255,255,.45); cursor:pointer; font-size:13px; }
+.izq-keep:hover, .izq-keep.is-on{ color:#ffb6dd; }

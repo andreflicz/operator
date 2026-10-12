@@ -78,7 +78,7 @@ function teaseOffer(){
   const s = sportsTease(), n = newsTease();
   if(!s && !n) return null;
   const opts = [];
-  if(s) opts.push(s.topics[0]); if(n) opts.push(n.topics[0]==='the news' ? 'the news' : 'that '+n.topics[0]+' story');
+  if(s) opts.push(s.topics[0]); if(n) opts.push(n.topics[0]==='the news' || n.topics[0]==='that story' ? n.topics[0] : 'that '+n.topics[0]+' story');
   ui.briefOffer = {at:Date.now(), date:todayStr(), sports:s, news:n};
   const q = opts.length > 1 ? 'want more on '+opts[0]+' or '+opts[1]+'?' : 'want more on '+opts[0]+'?';
   // (it ends on the question, so the mic opens for the answer)

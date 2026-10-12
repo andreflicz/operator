@@ -130,7 +130,7 @@ function checkAllAlarms(){
       const t = wakeTimeFor(days[i]); if(!t) continue;
       const ts = localTs(days[i], t);
       if(ts>now) continue;
-      if(ts>w.lastFiredTs && ts>=w.armedAt-1000 && now-ts<=WAKE_GRACE_MS){ w.lastFiredTs = ts; changed = true; fireWake({}); }
+      if(ts>w.lastFiredTs && ts>=w.armedAt-1000 && now-ts<=WAKE_GRACE_MS){ w.lastFiredTs = ts; changed = true; fireWake({scheduled:true}); }
       break;
     }
     if(w.override && w.override.date<todayStr()){ w.override = null; changed = true; }

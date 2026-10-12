@@ -34,7 +34,7 @@ fmVolume = function(){ return fmVolumeFull()*(FM.soft ? 0.32 : 1); };
 function fmRamp(sec){
   const ctx = getAudioCtx(); if(!ctx || !FM.playing || !FM.bus) return;
   const g = FM.bus.g.gain; g.cancelScheduledValues(ctx.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), ctx.currentTime);
-  g.exponentialRampToValueAtTime(Math.max(0.0002, FM.ducked ? fmVolume()*0.3 : fmVolume()), ctx.currentTime + (sec||1.5));
+  g.exponentialRampToValueAtTime(Math.max(0.0002, FM.ducked ? fmVolume()*0.12 : fmVolume()), ctx.currentTime + (sec||1.5));
 }
 function musicSoft(on){ on = !!on; if(FM.soft===on) return; FM.soft = on; fmRamp(2); }
 function fmTrackIds(key){ return FOCUS_TRACKS.map(function(tr, i){ return tr[key] ? i : -1; }).filter(function(i){ return i >= 0; }); }

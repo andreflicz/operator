@@ -162,10 +162,10 @@ function opMusicPlaying(){ return !!((typeof wakeAudio!=='undefined' && wakeAudi
 function opDuck(on){
   clearTimeout(opDuckT);
   if(on){
-    if(!opDucked && typeof FM!=='undefined' && FM.playing && FM.bus){ try{ const c = getAudioCtx(), g = FM.bus.g.gain; g.cancelScheduledValues(c.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), c.currentTime); g.exponentialRampToValueAtTime(Math.max(0.0002, fmVolume()*0.3), c.currentTime + 0.4); FM.ducked = true; }catch(e){} }
+    if(!opDucked && typeof FM!=='undefined' && FM.playing && FM.bus){ try{ const c = getAudioCtx(), g = FM.bus.g.gain; g.cancelScheduledValues(c.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), c.currentTime); g.exponentialRampToValueAtTime(Math.max(0.0002, fmVolume()*0.12), c.currentTime + 0.35); FM.ducked = true; }catch(e){} }
     if(opDucked || !opMusicPlaying()){ if(FM && FM.ducked) opDucked = true; return; }
     opDucked = true;
-    if(wakeAudio){ clearInterval(wakeAudioRamp); wakeAudio._duckFrom = wakeAudio.volume; wakeAudio.volume = Math.min(wakeAudio.volume, 0.12); }
+    if(wakeAudio){ clearInterval(wakeAudioRamp); wakeAudio._duckFrom = wakeAudio.volume; wakeAudio.volume = Math.min(wakeAudio.volume, 0.06); }
     if(wakeMusicApp || wakeFinishing) helperFetch(WAKE_HELPER+'music/duck?on=1', 3000);
     return;
   }
@@ -305,6 +305,7 @@ function opBriefTick(lines, t){
   while(next + 1 < lines.length && t >= lines[next + 1].at + 600) next++;
   OV.idx = next;
   opSay(opBriefLine(lines, next), {cap:'brVoice', noListen: next < lines.length - 1, onstart:function(){
+    if(lines[next].key==='news' && ui.briefNewsBig && typeof opMood==='function') opMood('concern', 15000);   // (big news: it shows)
     OV.briefSpoke = true; opBriefLoading(false);
     if(lines[next+1]) opPrefetch(opBriefLine(lines, next+1));
     // bring the matching piece in now if the clock hasn't got there yet

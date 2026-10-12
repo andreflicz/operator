@@ -53,7 +53,7 @@ const OP_GREET_ASK = {
 };
 async function opGreet(kind, extra){
   if(AI.hasKey===true && typeof aiWrite==='function'){
-    const t = await Promise.race([aiWrite(OP_GREET_ASK[kind] + (extra ? ' '+extra : ''), {max:70}), new Promise(function(r){ setTimeout(r, 4000); })]);
+    const t = await Promise.race([aiWrite(OP_GREET_ASK[kind] + (extra ? ' '+extra : ''), {max:70}), new Promise(function(r){ setTimeout(r, kind==='work' ? 2200 : 4000); })]);   // (round 29: work mode speaks up sooner)
     if(t) return t;
   }
   return opGreetFallback(kind);

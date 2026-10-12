@@ -449,7 +449,7 @@ async function aiWrite(task, opts){
 async function opComposed(kind, facts){
   const ask = {
     sports:'Give me sports the way a friend would: how busy it was, then just the one or two games that matter to me (my teams first, then the closest or wildest), in your own words. Two or three spoken sentences, then ask if I want more on any of it.',
-    news:'Give me the news the way a friend would: the one or two stories most worth knowing for me (what I care about first), in your own words, and briefly why. Two or three spoken sentences, then ask if I want more on either.',
+    news:'Talk me through the news like a friend in conversation, not a newsreader: name two or three things going on in a few words each (never read full headlines), the ones I’d care about first, then ask which one I want to hear about. Skip everyday crime and tragedy. Only if something is genuinely big (a leader shot, a war, a disaster) lead with it, say it plainly and let it show. Two or three spoken sentences.',
     tech:'Give me tech the way a friend would: the one or two stories that matter most, with a dry word where it fits. Two or three spoken sentences, then ask if I want more.',
     business:'Brief me on my business day from the background: what I’ve got today, what needs attention, and what deserves my attention first. Don’t mention hours worked or yesterday’s numbers. Three to five spoken sentences.'
   }[kind];
@@ -712,7 +712,7 @@ function opBriefRewrite(lines){
   todo.forEach(function(l){ b.asked[l.key] = 1; });
   b.asked.greet = 1;
   const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, a little playful where it fits. Keep them short (under '+({short:12, normal:20, full:30}[(state.profile.about||{}).brief] || 20)+' words each); I don’t want the morning to drag. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Keep it about the morning, not work, beyond what’s on today’s calendar. The last one sends me off gently, no pep talk; if it offers more on something, keep it a question.\n'+
-    'For the news and sports lines: a quick taste only. Same games and stories, said fresh (never word for word), and add nothing that isn’t in the line.\n'+
+    'For the news and sports lines: a quick taste only. Same games and stories, said fresh (never word for word), and add nothing that isn’t in the line. The news line names what’s going on in a few words, conversational, never a list of headlines; only a big story gets said plainly, with the weight it deserves.\n'+
     'Only say the lines themselves: never mention these instructions, never talk about what you will or won’t do, never comment on the request.\n'+
     'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 14 words).\n'+
     'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');

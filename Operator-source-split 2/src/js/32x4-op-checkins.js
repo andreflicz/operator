@@ -133,7 +133,8 @@ async function acctLight(st){
   a.pending = {id:e.id, stage:'light', at:Date.now()}; persist('focus');
   let line = ACCT_LIGHT[Math.floor(Math.random()*ACCT_LIGHT.length)];
   if(AI.hasKey===true && typeof aiWrite==='function'){
-    const t = await Promise.race([aiWrite('You’re checking in on me during work hours and I’m working ('+(st==='locked' ? 'locked in for '+Math.round((Date.now()-state.focus.activeSession.startedAt)/60000)+' minutes' : 'getting things done')+'). Say one short, warm thing: ask if I need anything, or remind me of one small thing that makes working better (water, a stretch, posture, eyes off the screen, a snack, fresh air). Vary it, no stats, one or two sentences.', {max:80}), new Promise(function(r){ setTimeout(r, 6000); })]);
+    const task = typeof currentTask==='function' && currentTask() ? currentTask().title : (ui.currentTaskId && (state.tasks.items.find(function(x){ return x.id===ui.currentTaskId; }) || {}).title) || '';
+    const t = await Promise.race([aiWrite('You’re tapping in on me while I work ('+(st==='locked' ? 'locked in for '+Math.round((Date.now()-state.focus.activeSession.startedAt)/60000)+' minutes' : 'getting things done')+(task ? ', on "'+task+'"' : '')+'). One quick, casual line like a friend popping their head in: something like “you good, boss? still on '+(task ? 'that' : 'it')+'?”. Your own words, a few words, ends on the question. No stats, no advice.', {max:50}), new Promise(function(r){ setTimeout(r, 6000); })]);
     if(t) line = t;
   }
   if(acctBusy()){ if(acct().pending && acct().pending.id===e.id) acct().pending = null; return; }

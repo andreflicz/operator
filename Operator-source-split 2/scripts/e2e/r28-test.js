@@ -81,7 +81,7 @@ async function ctxPage(b, seed, opts){
     const L = JSON.parse(await E("JSON.stringify(ui.briefLines.map(l => [l.key, l.text]))"));
     const line = k => (L.find(x => x[0]===k) || [])[1] || '';
     check('sports is a taste: your team first, the score, no full rundown', /Your Giants/.test(line('sports')) && /24 to 21/.test(line('sports')) && line('sports').split(/[.!?]/).filter(s => s.trim()).length <= 3, line('sports'));
-    check('the news is one or two stories', /Fed holds rates/.test(line('news')) && line('news').split(/[.!?]/).filter(s => s.trim()).length <= 3, line('news'));
+    check('the news is a few words on what’s going on (round 29: no headlines read out)', /going on in|news in|bits in/i.test(line('news')) && /tech/.test(line('news')) && !/Fed holds rates/.test(line('news')), line('news'));
     check('the last line offers more and ends on the question (the mic opens for it)', /Giants game/.test(line('offer')) && /\?$/.test(line('offer')), line('offer'));
     check('Op knows what it offered when you answer', /offered more on/.test(await E("aiContext()")));
     check('the Good morning offer is the same all morning (no new wording every redraw)', await E("teaseOffer()")===await E("teaseOffer()"));
@@ -155,7 +155,7 @@ async function ctxPage(b, seed, opts){
     check('…and the bubbles breeze across with it', await E("IW.off['"+id0+"']||0") - o0 > 60);
     await p.click('#insp [data-action="inspBreezeAway"]'); await p.clock.runFor(2500); await p.waitForTimeout(300);
     const ops = await p.$$eval('#inspWorld .izb', e => e.map(x => Number(x.style.opacity || 1)));
-    check('Breeze away blows them all off (gone, with a whoosh)', ops.length && ops.every(o => o < 0.05) && /Return/.test(await p.textContent('#insp .insp-tools')));
+    check('Breeze blows them all off but one (round 29: the one for now stays)', ops.length && ops.filter(o => o < 0.05).length >= ops.length - 1 && /Return/.test(await p.textContent('#insp .insp-tools')));
     await p.click('#insp [data-action="inspBreezeAway"]'); await p.clock.runFor(6000); await p.waitForTimeout(400);
     const back = await p.$$eval('#inspWorld .izb:not(.is-behind)', e => e.filter(x => Number(x.style.opacity || 1) > 0.5).length);
     check('…and Return floats them in again', back > 5 && await E("!IW.away"), back);
@@ -222,15 +222,15 @@ async function ctxPage(b, seed, opts){
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("const s = inspStore(); s.log.push({id:'lg1', act:'walk', label:'Go for a walk', at:Date.now()-3600000, date:todayStr()}, {id:'lg2', act:'read', label:'Read', at:Date.now()-1800000, date:todayStr()}); persist('personal'); openInspire()"); await p.waitForTimeout(800);
     await p.clock.runFor(15000); await p.waitForTimeout(400);
-    check('a few words surface on the sky (no author, no quote marks)', await p.$('.insp-words') && !/[“”—]/.test(await p.textContent('.insp-words')), await p.evaluate(() => (document.querySelector('.insp-words')||{}).textContent));
-    check('…word by word, in a quiet spot (never the middle)', (await p.$$('.insp-words span')).length >= 3 && await p.evaluate(() => { const r = document.querySelector('.insp-words').getBoundingClientRect(), cx = innerWidth/2, cy = innerHeight/2; return !(r.left < cx && r.right > cx && r.top < cy && r.bottom > cy); }));
-    await p.clock.runFor(11000); await p.waitForTimeout(400);
-    check('…and dissolve after a while', !(await p.$('.insp-words')));
+    check('a few words surface on the sky, behind the bubbles (no author, no quote marks)', await p.$('#inspWorld .izw-layer .izwd') && !/[“”—]/.test(await p.evaluate(() => document.querySelector('.izwd').dataset.text)), await p.evaluate(() => (document.querySelector('.izwd')||{}).textContent));
+    check('…word by word, in a quiet spot (never the middle)', (await p.$$('.izwd span')).length >= 3 && await p.evaluate(() => { const r = document.querySelector('.izwd').getBoundingClientRect(), cx = innerWidth/2, cy = innerHeight/2; return !(r.left < cx && r.right > cx && r.top < cy && r.bottom > cy); }));
+    await p.clock.runFor(14000); await p.waitForTimeout(400);
+    check('…and dissolve after a while', !(await p.$('.izwd')));
     await p.clock.runFor(36000); await p.waitForTimeout(400);
-    check('…about every 45 seconds', !!(await p.$('.insp-words')));
+    check('…about every 45 seconds', !!(await p.$('.izwd')));
     // sounds
     await p.click('#insp [data-action="inspSfxOpen"]'); await p.waitForTimeout(200);
-    check('Inspiration has its own sound choices: Chimes, Glass, Droplets, Soft keys, Off', (await p.$$eval('#insp .izk-sfx .isx-s', e => e.map(x => x.textContent))).join()==='Chimes,Glass,Droplets,Soft keys,Off');
+    check('Inspiration has its own sound choices: Chimes, Glass, Droplets, Soft keys, Off', (await p.$$eval('#insp .izk-sfx .isx-s', e => e.map(x => x.textContent))).join()==='Chimes,Glass,Droplets,Soft keys,Shuffle,Off');
     await p.click('#insp .izk-sfx [data-id="drops"]'); await p.waitForTimeout(150);
     await p.fill('#insp [data-insp-vol]', '40'); await p.dispatchEvent('#insp [data-insp-vol]', 'input'); await p.clock.runFor(400); await p.waitForTimeout(150);
     check('…the sound and its volume are saved (apart from the music)', await E("inspSfxStyle()")==='drops' && Math.abs(await E("inspSfxVol()") - 0.4) < 0.01 && await E("fmVolume()") > 0.5);

@@ -65,7 +65,7 @@ async function ctxPage(b, seed, opts){
     check('Edit wind-down opens it again (at the plan)', await E("overlayOpen('windOverlay') && ui.wind.step==='plan'"));
     await E("ACTIONS.windGoToSleep()"); await p.waitForTimeout(600);
     check('Going to sleep: the full-screen sleep view', !!(await p.$('.np.sleepv')) && /Sleep well, Andre/.test(await p.textContent('.np.sleepv')) && /7:00 AM/.test(await p.textContent('.np.sleepv')));
-    check('…nothing else on it but the time, the alarm and “I’m up”', (await p.$$('.np.sleepv button')).length===1);
+    check('…nothing else on it but the time, the alarm and “I’m up” (round 29: and Good morning)', (await p.$$('.np.sleepv button')).length===2);
     await p.click('.np.sleepv .sl-up'); await p.waitForTimeout(400);
     check('“I’m up” ends sleep', !(await E("state.modes.active && state.modes.active.sleep")));
     check('no page errors (clock out)', p.errors.length===0, p.errors);
@@ -208,7 +208,7 @@ async function ctxPage(b, seed, opts){
     const tr0 = await E("FOCUS_TRACKS[FM.idx].name"); await p.click('#insp .insp-mp [data-action="inspNext"]'); await p.waitForTimeout(1200);
     check('…next track', await E("FOCUS_TRACKS[FM.idx].name")!==tr0 && await E("FOCUS_TRACKS[FM.idx].dream===true"));
     await E("aboutYou().building = 'a studio by the sea'; ui._inspWordsAt = 0; inspWords()"); await p.waitForTimeout(200);
-    check('now and then a quiet line drifts by (round 28: words on the sky)', !!(await p.$('.insp-words')) && await E("inspWhisperLines().some(l => /a studio by the sea/.test(l))"));
+    check('now and then a quiet line drifts by (round 28: words on the sky)', !!(await p.$('.izwd, .insp-words')) && await E("inspWhisperLines().some(l => /a studio by the sea/.test(l))"));
     check('no page errors (inspiration)', p.errors.length===0, p.errors);
     await p.context().close();
   }

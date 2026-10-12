@@ -420,7 +420,8 @@ function renderSleepView(){
       '<div class="sl-msg">Sleep well'+(name ? ', '+escapeHtml(name) : '')+'.</div>'+
       '<div class="sl-alarm">'+(wake ? '&#9200; '+fmt12Hour(wake)+' &middot; '+(left >= 60 ? Math.floor(left/60)+'h '+(left%60 ? left%60+'m' : '') : left+'m')+' of rest' : 'No alarm set. Sleep in.')+'</div>'+
     '</div>'+
-    '<button class="sl-up" data-action="endMode" title="End sleep">I’m up</button>'+
+    // (round 29) up, not working yet: your sleep's logged and the morning's alarm stands down. Or straight into Good morning
+    '<div class="sl-btns"><button class="sl-up" data-action="sleepUp" title="Mark that you’re up (not working yet)">I’m up</button><span class="sl-dot">&middot;</span><button class="sl-up" data-action="sleepGoodMorning" title="Start Good morning">Good morning &rarr;</button></div>'+
   '</div>';
 }
 // ---- true full screen: Good morning, the work preview and the full-screen views take the whole
