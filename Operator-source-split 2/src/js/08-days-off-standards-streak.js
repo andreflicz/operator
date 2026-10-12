@@ -1,5 +1,12 @@
 // ============ DAYS OFF / STANDARD / STREAK ============
-function isDayOff(dateStr){ return state.daysOff.dates.indexOf(dateStr)>=0; }
+// a rest day: one you marked before (old data), or a day your schedule doesn't work (the work days in the work
+// alarm when it's on, otherwise the wake-up alarm's days). Rest days never break the streak.
+function isDayOff(dateStr){
+  if(state.daysOff.dates.indexOf(dateStr)>=0) return true;
+  const w = typeof workCfg==='function' ? workCfg() : null;
+  if(w && w.enabled && arr(w.days).length) return !(w.override && w.override.date===dateStr && !w.override.off) && (arr(w.days).indexOf(dowOf(dateStr))<0 || !!(w.override && w.override.date===dateStr && w.override.off));
+  return typeof isWorkDay==='function' ? !isWorkDay(dateStr) : false;
+}
 function toggleDayOff(){
   const d = todayStr();
   const idx = state.daysOff.dates.indexOf(d);
@@ -203,7 +210,6 @@ function dayVisualStatusRaw(dateStr){
   return notWorkedCount > maxOff ? 'failed' : 'neutral';
 }
 function isBreakDay(dateStr){
-  if(dateStr > todayStr()) return false;
   return dayVisualStatus(dateStr)==='failed' && dayVisualStatus(addDays(dateStr,-1))!=='failed';
 }
 // Compact week strip for the streak card: one dot per day (3 back, today, 3 ahead).

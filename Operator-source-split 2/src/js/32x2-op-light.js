@@ -37,7 +37,7 @@ ACTIONS.opLightTap = function(){
 // full-screen pages (the work preview, Lock in's sequence): the light and the bubble tuck into the
 // bottom-left corner, side by side, away from the page's buttons
 setInterval(function(){
-  const ov = typeof overlayOpen==='function' && (overlayOpen('planOverlay') || overlayOpen('lockSeqOverlay'));
+  const ov = typeof overlayOpen==='function' && (overlayOpen('planOverlay') || overlayOpen('lockSeqOverlay') || overlayOpen('windOverlay'));
   if(document.body.classList.contains('op-ov')!==!!ov) document.body.classList.toggle('op-ov', !!ov);
 }, 250);
 // the bubble can be dragged by its top line anywhere it's out of the way; it stays where you put it

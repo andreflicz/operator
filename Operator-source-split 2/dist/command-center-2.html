@@ -5249,6 +5249,26 @@ textarea.hs-in{ resize:vertical; min-height:56px; }
 .izk{ min-width:56px; padding:5px 8px 5px; font-size:10.5px; border-radius:13px; }
 .izk span{ font-size:15px; }
 .insp-hint{ bottom:84px; }
+
+/* ===================== R27 ===================== */
+/* full-screen pages (clocked out, minimal views): Op's light in the corner, the full-screen toggle beside it */
+body.np-on .op-light{ left:22px !important; }
+body.np-on .np .np-top .lv-btn{ left:72px; bottom:17px; }
+body.np-on .op-bub:not(.is-moved){ left:22px !important; }
+/* That's the day: Clock back in leads */
+.dayoff-back.is-main{ background:rgba(126,240,192,.12); border-color:rgba(126,240,192,.45); color:var(--text); }
+/* wind-down → Tomorrow: wake up and work, side by side */
+.wd-tomorrow{ display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:780px; margin:6px auto 0; }
+@media (max-width:760px){ .wd-tomorrow{ grid-template-columns:1fr; } }
+.wd-card{ display:flex; flex-direction:column; align-items:center; gap:10px; padding:22px 20px 18px; border-radius:22px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); text-align:center; }
+.wd-card.is-off{ justify-content:center; color:rgba(255,255,255,.65); font-size:13.5px; }
+.wd-card .wd-sub, .wd-card .wd-sound{ margin:0; font-size:12.5px; }
+.wd-card-b{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:auto; }
+.wd-work-k{ font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.6); }
+.wd-card .wd-time{ font-size:40px !important; max-width:100%; }
+.wd-work-h{ display:flex; flex-direction:column; align-items:center; gap:2px; }
+.wd-work-h span{ font-size:12px; color:rgba(255,255,255,.5); }
+.wd-card .wd-time.is-sm{ font-size:28px !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -7437,7 +7457,14 @@ function remapConvertedLeadRefs(){
 // it shows), everything else its priority
 function taskTags(t){ return t && t.skill ? '<span class="tag tag-skill" title="Training skill">&#127919; Skill</span>' : priorityTag(t && t.priority); }
 // ============ DAYS OFF / STANDARD / STREAK ============
-function isDayOff(dateStr){ return state.daysOff.dates.indexOf(dateStr)>=0; }
+// a rest day: one you marked before (old data), or a day your schedule doesn't work (the work days in the work
+// alarm when it's on, otherwise the wake-up alarm's days). Rest days never break the streak.
+function isDayOff(dateStr){
+  if(state.daysOff.dates.indexOf(dateStr)>=0) return true;
+  const w = typeof workCfg==='function' ? workCfg() : null;
+  if(w && w.enabled && arr(w.days).length) return !(w.override && w.override.date===dateStr && !w.override.off) && (arr(w.days).indexOf(dowOf(dateStr))<0 || !!(w.override && w.override.date===dateStr && w.override.off));
+  return typeof isWorkDay==='function' ? !isWorkDay(dateStr) : false;
+}
 function toggleDayOff(){
   const d = todayStr();
   const idx = state.daysOff.dates.indexOf(d);
@@ -7641,7 +7668,6 @@ function dayVisualStatusRaw(dateStr){
   return notWorkedCount > maxOff ? 'failed' : 'neutral';
 }
 function isBreakDay(dateStr){
-  if(dateStr > todayStr()) return false;
   return dayVisualStatus(dateStr)==='failed' && dayVisualStatus(addDays(dateStr,-1))!=='failed';
 }
 // Compact week strip for the streak card: one dot per day (3 back, today, 3 ahead).
@@ -9199,7 +9225,7 @@ document.addEventListener('scroll', function(e){
   clearTimeout(carSettleT.get(t)); carSettleT.set(t, setTimeout(function(){ carSettle(t, false); }, 160));
 }, {capture:true, passive:true});
 // ============ TODAY ============
-// renderDayOffView lives in 32p-locked-views.js
+// (the Day off screen is gone: round 27)
 // clocked out: full screen and quiet, like the day off (the corner button gives the sidebar back)
 function renderOffTimeView(){
   const active = state.modes.active;
@@ -9295,7 +9321,6 @@ function renderToday(){
   // A session you started yourself always wins, even on a day off — otherwise locking in
   // left you staring at the "Taking today off" screen. The day stays marked as a rest day.
   if(state.focus.activeSession) return renderTodayFocusMode(p);
-  if(isDayOff(todayStr())) return renderDayOffView();
   // the minimal view (M, or the button on the hero): clock, level, streak, LOCK IN — nothing else
   if(state.modes.active && state.modes.active.type==='offtime') return state.modes.active.sleep ? renderSleepView() : state.modes.active.morning ? renderMorningView() : renderOffTimeView();
   const hour = new Date().getHours();
@@ -9364,10 +9389,9 @@ function renderTodayHero(greeting){
       '</button>'+
       '<div class="th-actions">'+
         '<button class="th-btn" data-action="toggleNextPicker" data-where="hero"><span class="th-btn-i">&#128204;</span>'+(next ? 'Change next' : 'Pick next')+'</button>'+
-        (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going: sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
-        (evening ? '<button class="th-btn th-btn-night" data-action="openWindDown"><span class="th-btn-i">&#127769;</span>Wind down</button>' : '')+
+        (true ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going: sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
       '</div>'+
-      '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+'<button class="th-mode th-mode-offtime" data-action="clockOut" title="Done working for the day"><span class="th-mode-i">&#127937;</span><span>Clock out</span></button>'+dayOffButtonHtml()+'</div>'+
+      '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+'<button class="th-mode th-mode-offtime" data-action="clockOut" title="Done working for the day: wind down, then that’s the day"><span class="th-mode-i">&#127937;</span><span>Clock out</span></button></div>'+
       nextPickerHtml('hero')+
     '</div>'+
   '</div>';
@@ -12282,7 +12306,7 @@ function sessionsOn(date){ return state.focus.sessions.filter(function(s){ retur
 function recapNeeded(date){ return sessionsOn(date).some(function(s){ return s.auto && !s.reviewed; }); }
 function openDayRecap(date){ ui.recapDate = date || todayStr(); showOverlay('recapOverlay'); renderRecapInto(); }
 // The recap button opens yesterday's recap if it still has sessions to check, else today's.
-function recapDefaultDate(){ const y = addDays(todayStr(), -1); return recapNeeded(y) ? y : todayStr(); }
+function recapDefaultDate(){ const y = addDays(todayStr(), -1); return (typeof workDayDate==='function' && workDayDate()===y) || recapNeeded(y) ? y : todayStr(); }
 function recapPendingCount(){ return [todayStr(), addDays(todayStr(), -1)].reduce(function(n, d){ return n + sessionsOn(d).filter(function(s){ return s.auto && !s.reviewed; }).length; }, 0); }
 ACTIONS.openDayRecap = function(el){ openDayRecap((el && el.dataset && el.dataset.date) || recapDefaultDate()); };
 ACTIONS.openRecapToday = function(){ clearToasts(); openDayRecap(todayStr()); };
@@ -20123,7 +20147,7 @@ ACTIONS.wakeOpenIn = function(el, e, id){ wakeCfg().openIn = id; saveWake(); };
 // already started), and Next takes you to the work page, the same one Good morning's Get to work opens.
 // Your work hours, lunch and a break live with it: Op keeps to them (lunch and breaks are yours, and
 // it's only during work hours that it checks in on you).
-const WORK_DEFAULT = {enabled:false, start:'09:00', end:'17:00', days:[1,2,3,4,5], lunch:'12:30', lunchMin:45, brk:'15:30', brkMin:15, checkins:true, pace:'normal', sound:'standard'};
+const WORK_DEFAULT = {enabled:false, start:'09:00', end:'17:00', days:[1,2,3,4,5], lunch:'12:30', lunchMin:45, lunchOn:true, brk:'15:30', brkMin:15, brkOn:true, checkins:true, pace:'normal', sound:'standard'};
 function workCfg(){
   const f = state.focus;
   if(!f.work || typeof f.work!=='object') f.work = {};
@@ -20132,12 +20156,22 @@ function workCfg(){
   if(!Array.isArray(w.days)) w.days = WORK_DEFAULT.days.slice();
   return w;
 }
+// today's hours: your usual ones, or the ones you set for tomorrow while winding down the night before.
+// Lunch and the break only count when they're switched on.
+function workHoursFor(date){
+  const w = workCfg(), o = w.override && w.override.date===date ? w.override : null;
+  const h = Object.assign({}, w, o ? {start:o.start || w.start, end:o.end || w.end} : {});
+  if(w.lunchOn===false) h.lunch = ''; if(w.brkOn===false) h.brk = '';
+  if(o && o.off) h.off = true;
+  return h;
+}
+function workToday(){ return workHoursFor(todayStr()); }
 function hmMin(hm){ const m = /^(\d{1,2}):(\d{2})/.exec(hm||''); return m ? Number(m[1])*60 + Number(m[2]) : null; }
 function nowMin(){ const d = new Date(); return d.getHours()*60 + d.getMinutes(); }
-function workDayToday(){ const t = todayStr(), w = workCfg(); return arr(w.days).indexOf(dowOf(t))>=0 && !(typeof isDayOff==='function' && isDayOff(t)); }
+function workDayToday(){ const t = todayStr(), w = workCfg(), h = workHoursFor(t); if(h.off) return false; if(w.override && w.override.date===t && !w.override.off) return true; return arr(w.days).indexOf(dowOf(t))>=0; }
 // where in the work day you are: off (not a work day / no hours), before, work, lunch, break, after
 function workPhase(){
-  const w = workCfg(); if(!w.enabled || !workDayToday()) return 'off';
+  const w = workToday(); if(!w.enabled || !workDayToday()) return 'off';
   const m = nowMin(), s = hmMin(w.start), e = hmMin(w.end), l = hmMin(w.lunch), b = hmMin(w.brk);
   if(s==null || e==null) return 'off';
   if(m < s) return 'before'; if(m >= e) return 'after';
@@ -20147,7 +20181,7 @@ function workPhase(){
 }
 // minutes of work hours gone by today (lunch and the break don't count)
 function workMinutesElapsed(){
-  const w = workCfg(), m = nowMin(), s = hmMin(w.start), e = hmMin(w.end); if(s==null || e==null || m <= s) return 0;
+  const w = workToday(), m = nowMin(), s = hmMin(w.start), e = hmMin(w.end); if(s==null || e==null || m <= s) return 0;
   let n = Math.min(m, e) - s;
   [[hmMin(w.lunch), Number(w.lunchMin)||0], [hmMin(w.brk), Number(w.brkMin)||0]].forEach(function(x){ if(x[0]==null) return; n -= Math.max(0, Math.min(Math.min(m, e), x[0] + x[1]) - x[0]); });
   return Math.max(0, n);
@@ -20169,7 +20203,7 @@ function fireWorkAlarm(opts){
   try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Time to work'); }catch(e){}
 }
 function workRingHtml(){
-  const w = workCfg(), name = state.profile.name || '';
+  const w = workToday(), name = state.profile.name || '';
   const plan = typeof todaysPlan==='function' ? todaysPlan().filter(function(t){ return t.status!=='done'; }) : [];
   return '<div class="wk2 wk3 wkw" data-sky="'+(typeof skyLook==='function' ? skyLook() : 'day')+'">'+
     '<div class="wk2-aura"><i></i><i></i><i></i></div>'+
@@ -20197,7 +20231,7 @@ ACTIONS.workSnooze = function(){
 };
 // ---- watching the clock: the alarm, lunch, the break, the end of the day ----
 function checkWorkAlarm(){
-  const w = workCfg(); if(!w.enabled || !workDayToday()) return;
+  const w = workToday(); if(!w.enabled || !workDayToday()) return;
   const d = workDayState(), m = nowMin(), s = hmMin(w.start), e = hmMin(w.end);
   if(s==null) return;
   // the alarm: once, at the start (or within an hour after, if the app wasn't open)
@@ -20256,8 +20290,8 @@ function workSetupHtml(){
       '<div class="kpi-sub">'+(w.enabled ? 'Rings at '+fmt12Hour(w.start)+' '+(typeof wakeDaysLabel==='function' ? wakeDaysLabel(w.days) : '') : 'The work alarm is off')+'</div>'+
     '</div>'+
     '<div class="ws-block grid grid-2">'+
-      '<div class="field"><label>Lunch</label><div class="row" style="gap:6px;"><input class="input" type="time" data-work="lunch" value="'+(w.lunch||'')+'" style="width:130px;">'+mins('lunchMin', [30, 45, 60, 90])+'</div></div>'+
-      '<div class="field"><label>Break</label><div class="row" style="gap:6px;"><input class="input" type="time" data-work="brk" value="'+(w.brk||'')+'" style="width:130px;">'+mins('brkMin', [10, 15, 20, 30])+'</div></div>'+
+      '<div class="field"><label>Lunch<label class="ws-switch ws-mini" title="Lunch on/off"><input type="checkbox" data-work="lunchOn" '+(w.lunchOn!==false?'checked':'')+'><span></span></label></label>'+(w.lunchOn!==false ? '<div class="row" style="gap:6px;"><input class="input" type="time" data-work="lunch" value="'+(w.lunch||'')+'" style="width:130px;">'+mins('lunchMin', [30, 45, 60, 90])+'</div>' : '<div class="kpi-sub">No set lunch</div>')+'</div>'+
+      '<div class="field"><label>Break<label class="ws-switch ws-mini" title="Break on/off"><input type="checkbox" data-work="brkOn" '+(w.brkOn!==false?'checked':'')+'><span></span></label></label>'+(w.brkOn!==false ? '<div class="row" style="gap:6px;"><input class="input" type="time" data-work="brk" value="'+(w.brk||'')+'" style="width:130px;">'+mins('brkMin', [10, 15, 20, 30])+'</div>' : '<div class="kpi-sub">No set break</div>')+'</div>'+
       '<div class="field"><label>Op checks in on you'+tip('During work hours (not at lunch, on a break, in Shooting, or right after you lock in), Op looks in now and then. Working: it asks if you need anything. Not working: it wants to know why.')+'</label>'+seg('checkins', [[true, 'On'], [false, 'Off']])+'</div>'+
       '<div class="field"><label>How often</label>'+seg('pace', [['light', 'Now and then'], ['normal', 'Normal'], ['strict', 'Strict']])+'</div>'+
       '<div class="field"><label>Alarm sound</label>'+seg('sound', [['peaceful', 'Peaceful'], ['standard', 'Standard'], ['loud', 'Loud']])+'</div>'+
@@ -20275,6 +20309,7 @@ document.addEventListener('change', function(e){
   const t = e.target, key = t && t.dataset && t.dataset.work; if(!key) return;
   const w = workCfg();
   if(key==='enabled') w.enabled = t.checked;
+  else if(key==='lunchOn' || key==='brkOn') w[key] = t.checked;
   else if(key==='lunchMin' || key==='brkMin') w[key] = Number(t.value) || 0;
   else w[key] = t.value;
   // (turning it on, or moving the start, after today's start time doesn't ring it straight away)
@@ -22174,6 +22209,11 @@ setTimeout(function(){ try{ notifPrune(); }catch(e){} }, 5000);
 // The plan you make at night lines itself up the next day — nothing to click.
 
 // ---------- wind down ----------
+// the work day you're closing: after midnight (before 4 AM) it's still yesterday's. The numbers stay on the
+// dates they happened (nothing past midnight gets moved back), the recap is just about the right day.
+function workDayDate(){ return new Date().getHours() < 4 ? addDays(todayStr(), -1) : todayStr(); }
+function workDayName(d){ return new Date(d+'T12:00').toLocaleDateString('en-US', {weekday:'long'}); }
+function deepWorkOn(d){ return d===todayStr() ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); }
 function windTarget(){ return typeof wakeTargetDate==='function' ? wakeTargetDate() : addDays(todayStr(), 1); }
 function windTask(id){ return state.tasks.items.find(function(t){ return t.id===id && t.status!=='done'; }) || null; }
 function openWindDown(step){
@@ -22181,14 +22221,16 @@ function openWindDown(step){
   const np = state.focus.nightPlan && state.focus.nightPlan.date===target ? state.focus.nightPlan : null;
   let plan = np ? arr(np.taskIds).filter(windTask) : [];
   if(!plan.length) plan = lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); })).slice(0, 6).map(function(t){ return t.id; });
-  ui.wind = {step:step || 'recap', plan:plan, target:target, search:'', alarm:(wakeTimeFor(target) || ''), noAlarm:false};
+  const wh = typeof workHoursFor==='function' ? workHoursFor(target) : null, wc = typeof workCfg==='function' ? workCfg() : null;
+  const works = !!(wc && (wc.override && wc.override.date===target ? !wc.override.off : arr(wc.days).indexOf(dowOf(target))>=0));
+  ui.wind = {step:step || 'recap', plan:plan, target:target, search:'', alarm:(wakeTimeFor(target) || ''), noAlarm:false, workStart:wh ? wh.start : '', workEnd:wh ? wh.end : '', noWork:!works};
   ui.windDownOpen = false;
   showOverlay('windOverlay'); renderWindInto(); playNight();
 }
 ACTIONS.openWindDown = function(el){ openWindDown(el && el.dataset && el.dataset.step); };
 ACTIONS.closeWindDown = function(){ windSave(false); ui.wind = null; hideOverlay('windOverlay'); renderView(); };
 ACTIONS.windStep = function(el, e, id){ windReadForm(); ui.wind.step = id; renderWindInto(); };
-const WIND_STEPS = [['recap','Today'],['plan','Plan of attack'],['note','Note'],['alarm','Alarm']];
+const WIND_STEPS = [['recap','Today'],['plan','Plan of attack'],['note','Note'],['alarm','Tomorrow']];
 ACTIONS.windNext = function(){ windReadForm(); const i = WIND_STEPS.findIndex(function(s){ return s[0]===ui.wind.step; }); ui.wind.step = WIND_STEPS[Math.min(WIND_STEPS.length-1, i+1)][0]; renderWindInto(); };
 ACTIONS.windBack = function(){ windReadForm(); const i = WIND_STEPS.findIndex(function(s){ return s[0]===ui.wind.step; }); ui.wind.step = WIND_STEPS[Math.max(0, i-1)][0]; renderWindInto(); };
 function windReadForm(){
@@ -22199,6 +22241,8 @@ function windReadForm(){
     [n, nm, nw].forEach(function(x){ if(x) x.value = ''; });
   }
   const a = document.getElementById('windAlarm'); if(a) w.alarm = a.value;
+  const ws = document.getElementById('windWorkStart'), we = document.getElementById('windWorkEnd');
+  if(ws) w.workStart = ws.value; if(we) w.workEnd = we.value;
 }
 // save the plan + alarm (and optionally go to sleep)
 function windSave(sleep){
@@ -22213,6 +22257,13 @@ function windSave(sleep){
     else if(want===base) wk.override = null;
     else wk.override = {date:w.target, time:want};
     wakeArm();
+  }
+  // tomorrow's work hours: only that day changes (your usual hours stay as they are)
+  if(typeof workCfg==='function' && workCfg().enabled){
+    const wc = workCfg(), usual = arr(wc.days).indexOf(dowOf(w.target))>=0;
+    if(w.noWork) wc.override = usual ? {date:w.target, off:true} : null;
+    else if(!usual || w.workStart!==wc.start || w.workEnd!==wc.end) wc.override = {date:w.target, start:w.workStart || wc.start, end:w.workEnd || wc.end};
+    else wc.override = null;
   }
   persist('focus');
   if(sleep){
@@ -22237,6 +22288,9 @@ ACTIONS.windNewTask = function(){
   setTimeout(function(){ const i = document.getElementById('windNewTask'); if(i) i.focus(); }, 20);
 };
 ACTIONS.windNoAlarm = function(){ windReadForm(); ui.wind.noAlarm = !ui.wind.noAlarm; renderWindInto(); };
+ACTIONS.windNoWork = function(){ windReadForm(); ui.wind.noWork = !ui.wind.noWork; renderWindInto(); };
+// done: the plan, the note and tomorrow are saved, and the clocked-out page takes over (That's the day)
+ACTIONS.windDone = function(){ windSave(false); ui.wind = null; hideOverlay('windOverlay'); ui.restFull = true; renderView(); playTick(); };
 document.addEventListener('keydown', function(e){
   if(e.key==='Enter' && e.target && e.target.id==='windNewTask'){ e.preventDefault(); ACTIONS.windNewTask(); }
 });
@@ -22283,8 +22337,8 @@ function dayTimelineHtml(date){
   return '<div class="wd-tl"><div class="wd-tl-track">'+blocks+live+'</div><div class="wd-tl-axis"><span>6a</span><span>9a</span><span>12p</span><span>3p</span><span>6p</span><span>9p</span><span>12a</span></div></div>';
 }
 function windRecapHtml(){
-  const d = todayStr(), target = state.standards.deepWorkTargetMinutes || 180;
-  const deep = deepWorkMinutesTodayLive(), pct = Math.min(100, deep/target*100);
+  const d = workDayDate(), late = d!==todayStr(), target = state.standards.deepWorkTargetMinutes || 180;
+  const deep = deepWorkOn(d), pct = Math.min(100, deep/target*100);
   const done = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===d; });
   const sess = sessionsOn(d), longest = sess.reduce(function(m, s){ return Math.max(m, s.minutes||0); }, 0);
   const wk = typeof workoutDay==='function' ? workoutDay(d) : {n:0, m:0};
@@ -22303,7 +22357,7 @@ function windRecapHtml(){
       '<div class="wd-stats">'+
         '<div class="wd-stat"><b>'+done.length+'</b><span>tasks done</span></div>'+
         '<div class="wd-stat"><b>'+sess.length+'</b><span>session'+(sess.length===1?'':'s')+(longest ? ' · longest '+fmtDurationLabel(longest) : '')+'</span></div>'+
-        '<div class="wd-stat'+(std?' is-good':'')+'"><b>'+(std ? '&#10003;' : '&#10005;')+'</b><span>today\'s standard</span></div>'+
+        '<div class="wd-stat'+(std?' is-good':'')+'"><b>'+(std ? '&#10003;' : '&#10005;')+'</b><span>'+(late ? workDayName(d)+'\'s' : 'today\'s')+' standard</span></div>'+
         '<div class="wd-stat"><b>'+streak+'</b><span>day streak</span></div>'+
         (wk.n ? '<div class="wd-stat is-good"><b>'+wk.n+'</b><span>workout'+(wk.n===1?'':'s')+(wk.m ? ' · '+fmtDurationLabel(wk.m) : '')+'</span></div>' : '')+
         ((delivs || touches) ? '<div class="wd-stat"><b>'+(delivs+touches)+'</b><span>client moves ('+delivs+' delivered, '+touches+' touches)</span></div>' : '')+
@@ -22311,7 +22365,7 @@ function windRecapHtml(){
     '</div>'+
     '<div class="wd-k">When you worked</div>'+dayTimelineHtml(d)+
     '<div class="wd-cols">'+
-      '<div><div class="wd-k">Done today</div>'+(done.length ? '<ul class="wd-done">'+done.slice(0, 8).map(function(t){ return '<li>&#10003; '+escapeHtml(t.title)+'</li>'; }).join('')+(done.length>8 ? '<li class="kpi-sub">+'+(done.length-8)+' more</li>' : '')+'</ul>' : '<div class="kpi-sub">Nothing ticked off today.</div>')+
+      '<div><div class="wd-k">'+(late ? 'Done '+workDayName(d) : 'Done today')+'</div>'+(done.length ? '<ul class="wd-done">'+done.slice(0, 8).map(function(t){ return '<li>&#10003; '+escapeHtml(t.title)+'</li>'; }).join('')+(done.length>8 ? '<li class="kpi-sub">+'+(done.length-8)+' more</li>' : '')+'</ul>' : '<div class="kpi-sub">Nothing ticked off.</div>')+
         (left ? '<div class="kpi-sub" style="margin-top:8px;">'+left+' still on today\'s list. Carry them into tomorrow\'s plan.</div>' : '')+'</div>'+
       '<div><div class="wd-k">Tomorrow</div>'+((tomEvents.length || tomDue.length) ? '<div class="wd-tom">'+tomEvents.map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('')+tomDue.map(function(t){ return '<div><b class="is-due">Due</b> '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '<div class="kpi-sub">Nothing on the calendar yet.</div>')+'</div>'+
     '</div>'+
@@ -22347,19 +22401,25 @@ function windNoteHtml(){
   '</div>';
 }
 function windAlarmHtml(){
-  const w = ui.wind, wk = wakeCfg(), base = wakeBaseTimeFor(w.target);
-  return '<div class="wd-alarm">'+
-    '<div class="wd-sub">'+(base ? 'Usual: '+fmt12Hour(base)+'. Changing it here only changes '+morningLabel(w.target)+'.' : 'No daily alarm that day. Set one here.')+'</div>'+
-    (w.noAlarm ? '<div class="wd-noalarm">No alarm '+morningLabel(w.target)+'</div>' : '<input class="ws-time wd-time" type="time" id="windAlarm" value="'+escapeHtml(w.alarm||'')+'">')+
-    '<div class="row" style="gap:8px;justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="windNoAlarm">'+(w.noAlarm ? 'Set an alarm' : 'No alarm '+morningLabel(w.target))+'</button>'+
-      '<button class="btn btn-ghost btn-sm" data-action="openWakeSetup">Sound &amp; music</button></div>'+
+  const w = ui.wind, wk = wakeCfg(), base = wakeBaseTimeFor(w.target), wc = typeof workCfg==='function' ? workCfg() : null;
+  const wake = '<div class="wd-card">'+
+    '<div class="wd-work-k">&#9200; Wake up</div>'+
+    (w.noAlarm ? '<div class="wd-noalarm">No alarm</div>' : '<input class="ws-time wd-time" type="time" id="windAlarm" value="'+escapeHtml(w.alarm||'')+'">')+
+    '<div class="wd-sub">'+(base ? 'Usual: '+fmt12Hour(base)+'. This only changes '+morningLabel(w.target)+'.' : 'No daily alarm that day.')+'</div>'+
     '<div class="wd-sound">'+(wakeUsesMusic(wk) ? '&#9835; '+escapeHtml(mediaName(wk.media)) : '&#128276; '+wakeBeepSound(wk)[0].toUpperCase()+wakeBeepSound(wk).slice(1)+' tone')+'</div>'+
+    '<div class="wd-card-b"><button class="btn btn-ghost btn-sm" data-action="windNoAlarm">'+(w.noAlarm ? 'Set an alarm' : 'No alarm')+'</button><button class="btn btn-ghost btn-sm" data-action="openWakeSetup">Sound &amp; music</button></div>'+
   '</div>';
+  const work = !wc || !wc.enabled ? '<div class="wd-card is-off"><div class="wd-work-k">&#128188; Work</div><span>Your work hours aren’t set up yet.</span><div class="wd-card-b"><button class="btn btn-ghost btn-sm" data-action="openWorkSetup">Set them up</button></div></div>'
+    : '<div class="wd-card"><div class="wd-work-k">&#128188; Work</div>'+
+        (w.noWork ? '<div class="wd-noalarm">Not working</div>' : '<div class="wd-work-h"><input class="ws-time wd-time is-sm" type="time" id="windWorkStart" value="'+escapeHtml(w.workStart||'')+'"><span>to</span><input class="ws-time wd-time is-sm" type="time" id="windWorkEnd" value="'+escapeHtml(w.workEnd||'')+'"></div>')+
+        '<div class="wd-sub">Op checks in during these hours.</div>'+
+        '<div class="wd-card-b"><button class="btn btn-ghost btn-sm" data-action="windNoWork">'+(w.noWork ? 'I’m working' : 'Not working '+morningLabel(w.target))+'</button></div></div>';
+  return '<div class="wd-tomorrow">'+wake+work+'</div>';
 }
 function windHtml(){
   const w = ui.wind; if(!w) return '';
   const i = WIND_STEPS.findIndex(function(s){ return s[0]===w.step; });
-  const titles = {recap:'Here\'s how today went.', plan:'Plan of attack: '+morningLabel(w.target)+'.', note:'A note for the morning.', alarm:'Wake up '+morningLabel(w.target)+' at…'};
+  const titles = {recap:workDayDate()===todayStr() ? 'Here\'s how today went.' : 'Here\'s how '+workDayName(workDayDate())+' went.', plan:'Plan of attack: '+morningLabel(w.target)+'.', note:'A note for the morning.', alarm:'Tomorrow, sorted.'};
   const body = w.step==='plan' ? windPlanHtml() : w.step==='note' ? windNoteHtml() : w.step==='alarm' ? windAlarmHtml() : windRecapHtml();
   return '<div class="wd">'+
     '<div class="wd-top"><span class="wd-moon">&#127769;</span><span class="wd-brand">Wind down</span>'+
@@ -22368,7 +22428,7 @@ function windHtml(){
     '<div class="wd-inner" data-key="wd-'+w.step+'"><h2 class="wd-title-h">'+titles[w.step]+'</h2>'+body+'</div>'+
     '<div class="wd-foot">'+
       (i>0 ? '<button class="btn btn-ghost" data-action="windBack">&larr; Back</button>' : '<span></span>')+
-      (w.step==='alarm' ? '<span class="row" style="gap:8px;"><button class="btn btn-ghost" data-action="windSaveOnly">Save, not sleeping yet</button><button class="btn wd-sleep" data-action="windGoToSleep">&#127769; Go to sleep</button></span>'
+      (w.step==='alarm' ? '<span class="row" style="gap:8px;"><button class="btn btn-ghost" data-action="windGoToSleep" title="Saves it all and goes quiet until the alarm">&#127769; Going to sleep</button><button class="btn wd-sleep" data-action="windDone">&#10003; Done</button></span>'
         : '<button class="btn btn-primary" data-action="windNext">Next &rarr;</button>')+
     '</div>'+
   '</div>';
@@ -23748,6 +23808,8 @@ ACTIONS.clockOut = function(){
   ui.undoMode = {prev:prev, at:Date.now()};
   // (no flash, no "done for the day" toast: the clocked-out page says it, and Clock back in undoes it)
   playLockOut(); ui.restFull = true;
+  // round 27: clocking out IS winding down: the steps first (today, tomorrow's plan, a note, tomorrow), then That's the day
+  if(typeof openWindDown==='function') setTimeout(function(){ if(state.modes.active && state.modes.active.clockedOut) openWindDown('recap'); }, 350);
 };
 
 // the vision board fits itself once its entrance has played (it measures wrong while scaled)
@@ -23820,7 +23882,6 @@ function renderFocusMinimal(){
       '<div class="hm-btns">'+
         '<button class="hm-b" data-action="openQuickJournalModal">&#128221; Journal</button>'+
         '<button class="hm-b" data-action="clockOut">&#127937; Clock out</button>'+
-        '<button class="hm-b" data-action="quickDayOff">&#127796; Day off</button>'+
       '</div>'+
     '</div>'+
   '</div>';
@@ -24100,17 +24161,7 @@ function isWorkDay(dateStr){
   return arr(w.days).indexOf(dowOf(dateStr))>=0;
 }
 function nextWorkDay(from){ for(let i=1;i<8;i++){ const d = addDays(from, i); if(isWorkDay(d)) return d; } return null; }
-function autoDayOffCheck(){
-  if(!state || !state.daysOff) return false;
-  const today = todayStr(), seen = state.daysOff.autoSeen = arr(state.daysOff.autoSeen);
-  if(seen.indexOf(today)>=0) return false;
-  seen.push(today); if(seen.length > 40) seen.splice(0, seen.length - 40);
-  let changed = true;
-  if(!isWorkDay(today) && !isDayOff(today) && !state.focus.activeSession){ state.daysOff.dates.push(today); dayOffFlash(true, true); }
-  persist('daysOff');
-  return changed;
-}
-afterRenderHooks.push(function(){ if(typeof state!=='undefined' && state && state.daysOff && autoDayOffCheck() && isDayOff(todayStr())) setTimeout(renderView, 0); });
+// (round 27: no Day off mode any more; days your schedule doesn't work are rest days on their own: see isDayOff)
 function dayOffFlash(on, auto){
   const d = document.createElement('div');
   d.className = 'lock-flash is-dayoff'+(on ? '' : ' is-back');
@@ -24159,39 +24210,19 @@ function renderWeekendOffView(elapsed, weekend){
       '<div class="dayoff-k">&#127937; Clocked out'+(weekend ? ' &middot; day off tomorrow' : '')+'</div>'+
       '<h1 class="dayoff-h">'+(weekend ? 'That’s the week' : 'That’s the day')+name+'.</h1>'+
       '<div class="dayoff-cards">'+
-        '<div class="dayoff-c"><b>'+fmtHours(deepWorkMinutesTodayLive())+'</b><span>deep work today</span></div>'+
+        '<div class="dayoff-c"><b>'+fmtHours(deepWorkOn(workDayDate()))+'</b><span>deep work '+(workDayDate()!==today ? workDayName(workDayDate()) : 'today')+'</span></div>'+
         '<div class="dayoff-c"><b id="modeElapsed">'+formatElapsed(elapsed)+'</b><span>off the clock</span></div>'+
         (nw ? '<div class="dayoff-c"><b>'+(nw===addDays(today, 1) ? 'Tomorrow' : weekdayShort(nw))+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
       '</div>'+
       (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
       '<div class="dayoff-row">'+
-        (isWindDownTime() ? '<button class="dayoff-back" data-action="openWindDown">&#127769; Wind down</button>' : '')+
-        '<button class="dayoff-back" data-action="clockIn">Clock back in</button>'+tomorrowNoteBtnHtml()+
+        '<button class="dayoff-back is-main" data-action="clockIn">Clock back in</button>'+
+        '<button class="dayoff-back" data-action="openWindDown" data-step="plan">&#127769; Edit wind-down</button>'+
+        '<button class="dayoff-back" data-action="openWindDown" data-step="alarm" title="Your alarm and work hours for tomorrow">&#9200; Tomorrow'+(wake ? ' &middot; '+fmt12Hour(wake) : '')+'</button>'+
       '</div>'+
     '</div>'+
   '</div>';
 }
-function renderDayOffView(){
-  const streak = computeStreak(), nw = nextWorkDay(todayStr());
-  const wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
-  const stat = function(v, k){ return '<div class="rest-s"><b>'+v+'</b><span>'+k+'</span></div>'; };
-  return '<div class="np rest is-dayoff'+(restFull() ? ' rest-full' : '')+'">'+
-    '<div class="np-bg"></div>'+
-    restTopHtml(tomorrowNoteBtnHtml('lv-btn rest-work')+'<button class="lv-btn rest-work" data-action="quickDayOff" title="Turn the day off back off">Work today</button>')+
-    '<div class="np-main">'+
-      '<div class="np-art is-dayoff"><span>&#127796;</span></div>'+
-      '<div class="np-meta">'+
-        '<div class="np-title rest-h">Day off.</div>'+
-        '<div class="rest-stats">'+
-          stat(streak, 'day streak')+
-          stat(fmtHours(weekDeepMinutes()), 'deep work this week')+
-          (nw ? stat(weekdayShort(nw), 'back'+(wake ? ' &middot; '+fmt12Hour(wake) : '')) : '')+
-        '</div>'+
-      '</div>'+
-    '</div>'+
-  '</div>';
-}
-
 // ---- true full screen: Good morning, the work preview and the full-screen views take the whole
 // display, not just the window. The launcher puts the window into real macOS full screen (no
 // "press Esc" bubble; macOS asks once for Accessibility permission); without it, Chrome's own.
@@ -27109,7 +27140,7 @@ function aiContext(){
   if(dues.length) lines.push('Deadlines soon: '+dues.map(function(t){ return t.title+' ('+(t.deadline < today ? 'overdue' : t.deadline===today ? 'today' : weekdayShort(t.deadline))+')'; }).join('; ')+'.');
   const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
   lines.push('Business: MRR '+money(xpMrr())+(state.profile.revenueGoalMonthly ? ' (goal '+money(state.profile.revenueGoalMonthly)+')' : '')+'; '+cs.length+' active client'+(cs.length===1?'':'s')+(cs.length ? ' ('+cs.slice(0, 8).map(function(c){ return c.business || c.name; }).join(', ')+')' : '')+'; '+arr(state.business.pipeline).filter(leadIsOpen).length+' open leads.');
-  if(typeof workCfg==='function' && workCfg().enabled){ const w = workCfg(), ph = workPhase(); lines.push('Work hours: '+fmt12Hour(w.start)+' to '+fmt12Hour(w.end)+' (lunch '+fmt12Hour(w.lunch)+', break '+fmt12Hour(w.brk)+'). Right now: '+({before:'before work', work:'work hours', lunch:'lunch', 'break':'his break', after:'after work', off:'not a work day'})[ph]+'.'); }
+  if(typeof workCfg==='function' && workCfg().enabled){ const w = workToday(), ph = workPhase(); lines.push('Work hours today: '+fmt12Hour(w.start)+' to '+fmt12Hour(w.end)+(w.lunch ? ', lunch '+fmt12Hour(w.lunch) : '')+(w.brk ? ', break '+fmt12Hour(w.brk) : '')+'. Right now: '+({before:'before work', work:'work hours', lunch:'lunch', 'break':'his break', after:'after work', off:'not a work day'})[ph]+'.'); }
   const wk = typeof wakeCfg==='function' ? wakeCfg() || {} : {};
   if(wk.places || wk.newsSports || wk.newsTech) lines.push('Him: '+[wk.places ? 'places he likes: '+wk.places : '', wk.newsSports ? 'his teams: '+wk.newsSports : '', wk.newsTech ? 'interests: '+wk.newsTech : ''].filter(Boolean).join('; ')+'.');
   lines.push('Work today so far: '+fmtDurationLabel(deepWorkMinutesTodayLive())+' (his daily target is '+fmtDurationLabel(state.standards.deepWorkTargetMinutes || 180)+'). Streak: '+computeStreak()+' days.');
@@ -27804,7 +27835,7 @@ ACTIONS.opLightTap = function(){
 // full-screen pages (the work preview, Lock in's sequence): the light and the bubble tuck into the
 // bottom-left corner, side by side, away from the page's buttons
 setInterval(function(){
-  const ov = typeof overlayOpen==='function' && (overlayOpen('planOverlay') || overlayOpen('lockSeqOverlay'));
+  const ov = typeof overlayOpen==='function' && (overlayOpen('planOverlay') || overlayOpen('lockSeqOverlay') || overlayOpen('windOverlay'));
   if(document.body.classList.contains('op-ov')!==!!ov) document.body.classList.toggle('op-ov', !!ov);
 }, 250);
 // the bubble can be dragged by its top line anywhere it's out of the way; it stays where you put it
@@ -27942,7 +27973,7 @@ function acctWorking(){
   return 'idle';
 }
 function acctFacts(){
-  const w = workCfg(), plan = typeof todaysPlan==='function' ? todaysPlan() : [];
+  const w = workToday(), plan = typeof todaysPlan==='function' ? todaysPlan() : [];
   const left = plan.filter(function(t){ return t.status!=='done'; });
   const d = workDayState();
   return {start:w.start, now:nowHM(), inMin:workMinutesElapsed(), dw:deepWorkMinutesTodayLive(), done:plan.length - left.length, total:plan.length, doneAll:acctDoneToday(),
@@ -27976,7 +28007,7 @@ function acctTick(){
   acctProgressTick();
   const a = acct();
   if(a.pending) return acctPendingTick();
-  const w = workCfg();
+  const w = workToday();
   if(!w.enabled || !w.checkins || workPhase()!=='work') return;
   // the first look of the day comes a while after you start
   if(!a.nextAt || a.nextDate!==todayStr()){

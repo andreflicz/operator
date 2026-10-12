@@ -41,7 +41,7 @@ function acctWorking(){
   return 'idle';
 }
 function acctFacts(){
-  const w = workCfg(), plan = typeof todaysPlan==='function' ? todaysPlan() : [];
+  const w = workToday(), plan = typeof todaysPlan==='function' ? todaysPlan() : [];
   const left = plan.filter(function(t){ return t.status!=='done'; });
   const d = workDayState();
   return {start:w.start, now:nowHM(), inMin:workMinutesElapsed(), dw:deepWorkMinutesTodayLive(), done:plan.length - left.length, total:plan.length, doneAll:acctDoneToday(),
@@ -75,7 +75,7 @@ function acctTick(){
   acctProgressTick();
   const a = acct();
   if(a.pending) return acctPendingTick();
-  const w = workCfg();
+  const w = workToday();
   if(!w.enabled || !w.checkins || workPhase()!=='work') return;
   // the first look of the day comes a while after you start
   if(!a.nextAt || a.nextDate!==todayStr()){

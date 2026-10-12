@@ -34,10 +34,9 @@ function renderTodayHero(greeting){
       '</button>'+
       '<div class="th-actions">'+
         '<button class="th-btn" data-action="toggleNextPicker" data-where="hero"><span class="th-btn-i">&#128204;</span>'+(next ? 'Change next' : 'Pick next')+'</button>'+
-        (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going: sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
-        (evening ? '<button class="th-btn th-btn-night" data-action="openWindDown"><span class="th-btn-i">&#127769;</span>Wind down</button>' : '')+
+        (true ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going: sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
       '</div>'+
-      '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+'<button class="th-mode th-mode-offtime" data-action="clockOut" title="Done working for the day"><span class="th-mode-i">&#127937;</span><span>Clock out</span></button>'+dayOffButtonHtml()+'</div>'+
+      '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+'<button class="th-mode th-mode-offtime" data-action="clockOut" title="Done working for the day: wind down, then that’s the day"><span class="th-mode-i">&#127937;</span><span>Clock out</span></button></div>'+
       nextPickerHtml('hero')+
     '</div>'+
   '</div>';

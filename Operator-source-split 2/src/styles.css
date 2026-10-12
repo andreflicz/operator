@@ -5238,3 +5238,23 @@ textarea.hs-in{ resize:vertical; min-height:56px; }
 .izk{ min-width:56px; padding:5px 8px 5px; font-size:10.5px; border-radius:13px; }
 .izk span{ font-size:15px; }
 .insp-hint{ bottom:84px; }
+
+/* ===================== R27 ===================== */
+/* full-screen pages (clocked out, minimal views): Op's light in the corner, the full-screen toggle beside it */
+body.np-on .op-light{ left:22px !important; }
+body.np-on .np .np-top .lv-btn{ left:72px; bottom:17px; }
+body.np-on .op-bub:not(.is-moved){ left:22px !important; }
+/* That's the day: Clock back in leads */
+.dayoff-back.is-main{ background:rgba(126,240,192,.12); border-color:rgba(126,240,192,.45); color:var(--text); }
+/* wind-down → Tomorrow: wake up and work, side by side */
+.wd-tomorrow{ display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:780px; margin:6px auto 0; }
+@media (max-width:760px){ .wd-tomorrow{ grid-template-columns:1fr; } }
+.wd-card{ display:flex; flex-direction:column; align-items:center; gap:10px; padding:22px 20px 18px; border-radius:22px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); text-align:center; }
+.wd-card.is-off{ justify-content:center; color:rgba(255,255,255,.65); font-size:13.5px; }
+.wd-card .wd-sub, .wd-card .wd-sound{ margin:0; font-size:12.5px; }
+.wd-card-b{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:auto; }
+.wd-work-k{ font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.6); }
+.wd-card .wd-time{ font-size:40px !important; max-width:100%; }
+.wd-work-h{ display:flex; flex-direction:column; align-items:center; gap:2px; }
+.wd-work-h span{ font-size:12px; color:rgba(255,255,255,.5); }
+.wd-card .wd-time.is-sm{ font-size:28px !important; }

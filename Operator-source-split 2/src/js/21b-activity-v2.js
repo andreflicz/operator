@@ -119,7 +119,7 @@ function sessionsOn(date){ return state.focus.sessions.filter(function(s){ retur
 function recapNeeded(date){ return sessionsOn(date).some(function(s){ return s.auto && !s.reviewed; }); }
 function openDayRecap(date){ ui.recapDate = date || todayStr(); showOverlay('recapOverlay'); renderRecapInto(); }
 // The recap button opens yesterday's recap if it still has sessions to check, else today's.
-function recapDefaultDate(){ const y = addDays(todayStr(), -1); return recapNeeded(y) ? y : todayStr(); }
+function recapDefaultDate(){ const y = addDays(todayStr(), -1); return (typeof workDayDate==='function' && workDayDate()===y) || recapNeeded(y) ? y : todayStr(); }
 function recapPendingCount(){ return [todayStr(), addDays(todayStr(), -1)].reduce(function(n, d){ return n + sessionsOn(d).filter(function(s){ return s.auto && !s.reviewed; }).length; }, 0); }
 ACTIONS.openDayRecap = function(el){ openDayRecap((el && el.dataset && el.dataset.date) || recapDefaultDate()); };
 ACTIONS.openRecapToday = function(){ clearToasts(); openDayRecap(todayStr()); };

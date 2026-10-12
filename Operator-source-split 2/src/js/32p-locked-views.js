@@ -66,7 +66,6 @@ function renderFocusMinimal(){
       '<div class="hm-btns">'+
         '<button class="hm-b" data-action="openQuickJournalModal">&#128221; Journal</button>'+
         '<button class="hm-b" data-action="clockOut">&#127937; Clock out</button>'+
-        '<button class="hm-b" data-action="quickDayOff">&#127796; Day off</button>'+
       '</div>'+
     '</div>'+
   '</div>';
@@ -346,17 +345,7 @@ function isWorkDay(dateStr){
   return arr(w.days).indexOf(dowOf(dateStr))>=0;
 }
 function nextWorkDay(from){ for(let i=1;i<8;i++){ const d = addDays(from, i); if(isWorkDay(d)) return d; } return null; }
-function autoDayOffCheck(){
-  if(!state || !state.daysOff) return false;
-  const today = todayStr(), seen = state.daysOff.autoSeen = arr(state.daysOff.autoSeen);
-  if(seen.indexOf(today)>=0) return false;
-  seen.push(today); if(seen.length > 40) seen.splice(0, seen.length - 40);
-  let changed = true;
-  if(!isWorkDay(today) && !isDayOff(today) && !state.focus.activeSession){ state.daysOff.dates.push(today); dayOffFlash(true, true); }
-  persist('daysOff');
-  return changed;
-}
-afterRenderHooks.push(function(){ if(typeof state!=='undefined' && state && state.daysOff && autoDayOffCheck() && isDayOff(todayStr())) setTimeout(renderView, 0); });
+// (round 27: no Day off mode any more; days your schedule doesn't work are rest days on their own: see isDayOff)
 function dayOffFlash(on, auto){
   const d = document.createElement('div');
   d.className = 'lock-flash is-dayoff'+(on ? '' : ' is-back');
@@ -405,39 +394,19 @@ function renderWeekendOffView(elapsed, weekend){
       '<div class="dayoff-k">&#127937; Clocked out'+(weekend ? ' &middot; day off tomorrow' : '')+'</div>'+
       '<h1 class="dayoff-h">'+(weekend ? 'That’s the week' : 'That’s the day')+name+'.</h1>'+
       '<div class="dayoff-cards">'+
-        '<div class="dayoff-c"><b>'+fmtHours(deepWorkMinutesTodayLive())+'</b><span>deep work today</span></div>'+
+        '<div class="dayoff-c"><b>'+fmtHours(deepWorkOn(workDayDate()))+'</b><span>deep work '+(workDayDate()!==today ? workDayName(workDayDate()) : 'today')+'</span></div>'+
         '<div class="dayoff-c"><b id="modeElapsed">'+formatElapsed(elapsed)+'</b><span>off the clock</span></div>'+
         (nw ? '<div class="dayoff-c"><b>'+(nw===addDays(today, 1) ? 'Tomorrow' : weekdayShort(nw))+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
       '</div>'+
       (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
       '<div class="dayoff-row">'+
-        (isWindDownTime() ? '<button class="dayoff-back" data-action="openWindDown">&#127769; Wind down</button>' : '')+
-        '<button class="dayoff-back" data-action="clockIn">Clock back in</button>'+tomorrowNoteBtnHtml()+
+        '<button class="dayoff-back is-main" data-action="clockIn">Clock back in</button>'+
+        '<button class="dayoff-back" data-action="openWindDown" data-step="plan">&#127769; Edit wind-down</button>'+
+        '<button class="dayoff-back" data-action="openWindDown" data-step="alarm" title="Your alarm and work hours for tomorrow">&#9200; Tomorrow'+(wake ? ' &middot; '+fmt12Hour(wake) : '')+'</button>'+
       '</div>'+
     '</div>'+
   '</div>';
 }
-function renderDayOffView(){
-  const streak = computeStreak(), nw = nextWorkDay(todayStr());
-  const wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
-  const stat = function(v, k){ return '<div class="rest-s"><b>'+v+'</b><span>'+k+'</span></div>'; };
-  return '<div class="np rest is-dayoff'+(restFull() ? ' rest-full' : '')+'">'+
-    '<div class="np-bg"></div>'+
-    restTopHtml(tomorrowNoteBtnHtml('lv-btn rest-work')+'<button class="lv-btn rest-work" data-action="quickDayOff" title="Turn the day off back off">Work today</button>')+
-    '<div class="np-main">'+
-      '<div class="np-art is-dayoff"><span>&#127796;</span></div>'+
-      '<div class="np-meta">'+
-        '<div class="np-title rest-h">Day off.</div>'+
-        '<div class="rest-stats">'+
-          stat(streak, 'day streak')+
-          stat(fmtHours(weekDeepMinutes()), 'deep work this week')+
-          (nw ? stat(weekdayShort(nw), 'back'+(wake ? ' &middot; '+fmt12Hour(wake) : '')) : '')+
-        '</div>'+
-      '</div>'+
-    '</div>'+
-  '</div>';
-}
-
 // ---- true full screen: Good morning, the work preview and the full-screen views take the whole
 // display, not just the window. The launcher puts the window into real macOS full screen (no
 // "press Esc" bubble; macOS asks once for Accessibility permission); without it, Chrome's own.

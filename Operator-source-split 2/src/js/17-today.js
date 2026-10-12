@@ -1,5 +1,5 @@
 // ============ TODAY ============
-// renderDayOffView lives in 32p-locked-views.js
+// (the Day off screen is gone: round 27)
 // clocked out: full screen and quiet, like the day off (the corner button gives the sidebar back)
 function renderOffTimeView(){
   const active = state.modes.active;
@@ -95,7 +95,6 @@ function renderToday(){
   // A session you started yourself always wins, even on a day off — otherwise locking in
   // left you staring at the "Taking today off" screen. The day stays marked as a rest day.
   if(state.focus.activeSession) return renderTodayFocusMode(p);
-  if(isDayOff(todayStr())) return renderDayOffView();
   // the minimal view (M, or the button on the hero): clock, level, streak, LOCK IN — nothing else
   if(state.modes.active && state.modes.active.type==='offtime') return state.modes.active.sleep ? renderSleepView() : state.modes.active.morning ? renderMorningView() : renderOffTimeView();
   const hour = new Date().getHours();

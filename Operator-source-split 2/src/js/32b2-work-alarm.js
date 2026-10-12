@@ -3,7 +3,7 @@
 // already started), and Next takes you to the work page, the same one Good morning's Get to work opens.
 // Your work hours, lunch and a break live with it: Op keeps to them (lunch and breaks are yours, and
 // it's only during work hours that it checks in on you).
-const WORK_DEFAULT = {enabled:false, start:'09:00', end:'17:00', days:[1,2,3,4,5], lunch:'12:30', lunchMin:45, brk:'15:30', brkMin:15, checkins:true, pace:'normal', sound:'standard'};
+const WORK_DEFAULT = {enabled:false, start:'09:00', end:'17:00', days:[1,2,3,4,5], lunch:'12:30', lunchMin:45, lunchOn:true, brk:'15:30', brkMin:15, brkOn:true, checkins:true, pace:'normal', sound:'standard'};
 function workCfg(){
   const f = state.focus;
   if(!f.work || typeof f.work!=='object') f.work = {};
@@ -12,12 +12,22 @@ function workCfg(){
   if(!Array.isArray(w.days)) w.days = WORK_DEFAULT.days.slice();
   return w;
 }
+// today's hours: your usual ones, or the ones you set for tomorrow while winding down the night before.
+// Lunch and the break only count when they're switched on.
+function workHoursFor(date){
+  const w = workCfg(), o = w.override && w.override.date===date ? w.override : null;
+  const h = Object.assign({}, w, o ? {start:o.start || w.start, end:o.end || w.end} : {});
+  if(w.lunchOn===false) h.lunch = ''; if(w.brkOn===false) h.brk = '';
+  if(o && o.off) h.off = true;
+  return h;
+}
+function workToday(){ return workHoursFor(todayStr()); }
 function hmMin(hm){ const m = /^(\d{1,2}):(\d{2})/.exec(hm||''); return m ? Number(m[1])*60 + Number(m[2]) : null; }
 function nowMin(){ const d = new Date(); return d.getHours()*60 + d.getMinutes(); }
-function workDayToday(){ const t = todayStr(), w = workCfg(); return arr(w.days).indexOf(dowOf(t))>=0 && !(typeof isDayOff==='function' && isDayOff(t)); }
+function workDayToday(){ const t = todayStr(), w = workCfg(), h = workHoursFor(t); if(h.off) return false; if(w.override && w.override.date===t && !w.override.off) return true; return arr(w.days).indexOf(dowOf(t))>=0; }
 // where in the work day you are: off (not a work day / no hours), before, work, lunch, break, after
 function workPhase(){
-  const w = workCfg(); if(!w.enabled || !workDayToday()) return 'off';
+  const w = workToday(); if(!w.enabled || !workDayToday()) return 'off';
   const m = nowMin(), s = hmMin(w.start), e = hmMin(w.end), l = hmMin(w.lunch), b = hmMin(w.brk);
   if(s==null || e==null) return 'off';
   if(m < s) return 'before'; if(m >= e) return 'after';
@@ -27,7 +37,7 @@ function workPhase(){
 }
 // minutes of work hours gone by today (lunch and the break don't count)
 function workMinutesElapsed(){
-  const w = workCfg(), m = nowMin(), s = hmMin(w.start), e = hmMin(w.end); if(s==null || e==null || m <= s) return 0;
+  const w = workToday(), m = nowMin(), s = hmMin(w.start), e = hmMin(w.end); if(s==null || e==null || m <= s) return 0;
   let n = Math.min(m, e) - s;
   [[hmMin(w.lunch), Number(w.lunchMin)||0], [hmMin(w.brk), Number(w.brkMin)||0]].forEach(function(x){ if(x[0]==null) return; n -= Math.max(0, Math.min(Math.min(m, e), x[0] + x[1]) - x[0]); });
   return Math.max(0, n);
@@ -49,7 +59,7 @@ function fireWorkAlarm(opts){
   try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Time to work'); }catch(e){}
 }
 function workRingHtml(){
-  const w = workCfg(), name = state.profile.name || '';
+  const w = workToday(), name = state.profile.name || '';
   const plan = typeof todaysPlan==='function' ? todaysPlan().filter(function(t){ return t.status!=='done'; }) : [];
   return '<div class="wk2 wk3 wkw" data-sky="'+(typeof skyLook==='function' ? skyLook() : 'day')+'">'+
     '<div class="wk2-aura"><i></i><i></i><i></i></div>'+
@@ -77,7 +87,7 @@ ACTIONS.workSnooze = function(){
 };
 // ---- watching the clock: the alarm, lunch, the break, the end of the day ----
 function checkWorkAlarm(){
-  const w = workCfg(); if(!w.enabled || !workDayToday()) return;
+  const w = workToday(); if(!w.enabled || !workDayToday()) return;
   const d = workDayState(), m = nowMin(), s = hmMin(w.start), e = hmMin(w.end);
   if(s==null) return;
   // the alarm: once, at the start (or within an hour after, if the app wasn't open)
@@ -136,8 +146,8 @@ function workSetupHtml(){
       '<div class="kpi-sub">'+(w.enabled ? 'Rings at '+fmt12Hour(w.start)+' '+(typeof wakeDaysLabel==='function' ? wakeDaysLabel(w.days) : '') : 'The work alarm is off')+'</div>'+
     '</div>'+
     '<div class="ws-block grid grid-2">'+
-      '<div class="field"><label>Lunch</label><div class="row" style="gap:6px;"><input class="input" type="time" data-work="lunch" value="'+(w.lunch||'')+'" style="width:130px;">'+mins('lunchMin', [30, 45, 60, 90])+'</div></div>'+
-      '<div class="field"><label>Break</label><div class="row" style="gap:6px;"><input class="input" type="time" data-work="brk" value="'+(w.brk||'')+'" style="width:130px;">'+mins('brkMin', [10, 15, 20, 30])+'</div></div>'+
+      '<div class="field"><label>Lunch<label class="ws-switch ws-mini" title="Lunch on/off"><input type="checkbox" data-work="lunchOn" '+(w.lunchOn!==false?'checked':'')+'><span></span></label></label>'+(w.lunchOn!==false ? '<div class="row" style="gap:6px;"><input class="input" type="time" data-work="lunch" value="'+(w.lunch||'')+'" style="width:130px;">'+mins('lunchMin', [30, 45, 60, 90])+'</div>' : '<div class="kpi-sub">No set lunch</div>')+'</div>'+
+      '<div class="field"><label>Break<label class="ws-switch ws-mini" title="Break on/off"><input type="checkbox" data-work="brkOn" '+(w.brkOn!==false?'checked':'')+'><span></span></label></label>'+(w.brkOn!==false ? '<div class="row" style="gap:6px;"><input class="input" type="time" data-work="brk" value="'+(w.brk||'')+'" style="width:130px;">'+mins('brkMin', [10, 15, 20, 30])+'</div>' : '<div class="kpi-sub">No set break</div>')+'</div>'+
       '<div class="field"><label>Op checks in on you'+tip('During work hours (not at lunch, on a break, in Shooting, or right after you lock in), Op looks in now and then. Working: it asks if you need anything. Not working: it wants to know why.')+'</label>'+seg('checkins', [[true, 'On'], [false, 'Off']])+'</div>'+
       '<div class="field"><label>How often</label>'+seg('pace', [['light', 'Now and then'], ['normal', 'Normal'], ['strict', 'Strict']])+'</div>'+
       '<div class="field"><label>Alarm sound</label>'+seg('sound', [['peaceful', 'Peaceful'], ['standard', 'Standard'], ['loud', 'Loud']])+'</div>'+
@@ -155,6 +165,7 @@ document.addEventListener('change', function(e){
   const t = e.target, key = t && t.dataset && t.dataset.work; if(!key) return;
   const w = workCfg();
   if(key==='enabled') w.enabled = t.checked;
+  else if(key==='lunchOn' || key==='brkOn') w[key] = t.checked;
   else if(key==='lunchMin' || key==='brkMin') w[key] = Number(t.value) || 0;
   else w[key] = t.value;
   // (turning it on, or moving the start, after today's start time doesn't ring it straight away)

@@ -9,6 +9,11 @@
 // The plan you make at night lines itself up the next day — nothing to click.
 
 // ---------- wind down ----------
+// the work day you're closing: after midnight (before 4 AM) it's still yesterday's. The numbers stay on the
+// dates they happened (nothing past midnight gets moved back), the recap is just about the right day.
+function workDayDate(){ return new Date().getHours() < 4 ? addDays(todayStr(), -1) : todayStr(); }
+function workDayName(d){ return new Date(d+'T12:00').toLocaleDateString('en-US', {weekday:'long'}); }
+function deepWorkOn(d){ return d===todayStr() ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); }
 function windTarget(){ return typeof wakeTargetDate==='function' ? wakeTargetDate() : addDays(todayStr(), 1); }
 function windTask(id){ return state.tasks.items.find(function(t){ return t.id===id && t.status!=='done'; }) || null; }
 function openWindDown(step){
@@ -16,14 +21,16 @@ function openWindDown(step){
   const np = state.focus.nightPlan && state.focus.nightPlan.date===target ? state.focus.nightPlan : null;
   let plan = np ? arr(np.taskIds).filter(windTask) : [];
   if(!plan.length) plan = lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); })).slice(0, 6).map(function(t){ return t.id; });
-  ui.wind = {step:step || 'recap', plan:plan, target:target, search:'', alarm:(wakeTimeFor(target) || ''), noAlarm:false};
+  const wh = typeof workHoursFor==='function' ? workHoursFor(target) : null, wc = typeof workCfg==='function' ? workCfg() : null;
+  const works = !!(wc && (wc.override && wc.override.date===target ? !wc.override.off : arr(wc.days).indexOf(dowOf(target))>=0));
+  ui.wind = {step:step || 'recap', plan:plan, target:target, search:'', alarm:(wakeTimeFor(target) || ''), noAlarm:false, workStart:wh ? wh.start : '', workEnd:wh ? wh.end : '', noWork:!works};
   ui.windDownOpen = false;
   showOverlay('windOverlay'); renderWindInto(); playNight();
 }
 ACTIONS.openWindDown = function(el){ openWindDown(el && el.dataset && el.dataset.step); };
 ACTIONS.closeWindDown = function(){ windSave(false); ui.wind = null; hideOverlay('windOverlay'); renderView(); };
 ACTIONS.windStep = function(el, e, id){ windReadForm(); ui.wind.step = id; renderWindInto(); };
-const WIND_STEPS = [['recap','Today'],['plan','Plan of attack'],['note','Note'],['alarm','Alarm']];
+const WIND_STEPS = [['recap','Today'],['plan','Plan of attack'],['note','Note'],['alarm','Tomorrow']];
 ACTIONS.windNext = function(){ windReadForm(); const i = WIND_STEPS.findIndex(function(s){ return s[0]===ui.wind.step; }); ui.wind.step = WIND_STEPS[Math.min(WIND_STEPS.length-1, i+1)][0]; renderWindInto(); };
 ACTIONS.windBack = function(){ windReadForm(); const i = WIND_STEPS.findIndex(function(s){ return s[0]===ui.wind.step; }); ui.wind.step = WIND_STEPS[Math.max(0, i-1)][0]; renderWindInto(); };
 function windReadForm(){
@@ -34,6 +41,8 @@ function windReadForm(){
     [n, nm, nw].forEach(function(x){ if(x) x.value = ''; });
   }
   const a = document.getElementById('windAlarm'); if(a) w.alarm = a.value;
+  const ws = document.getElementById('windWorkStart'), we = document.getElementById('windWorkEnd');
+  if(ws) w.workStart = ws.value; if(we) w.workEnd = we.value;
 }
 // save the plan + alarm (and optionally go to sleep)
 function windSave(sleep){
@@ -48,6 +57,13 @@ function windSave(sleep){
     else if(want===base) wk.override = null;
     else wk.override = {date:w.target, time:want};
     wakeArm();
+  }
+  // tomorrow's work hours: only that day changes (your usual hours stay as they are)
+  if(typeof workCfg==='function' && workCfg().enabled){
+    const wc = workCfg(), usual = arr(wc.days).indexOf(dowOf(w.target))>=0;
+    if(w.noWork) wc.override = usual ? {date:w.target, off:true} : null;
+    else if(!usual || w.workStart!==wc.start || w.workEnd!==wc.end) wc.override = {date:w.target, start:w.workStart || wc.start, end:w.workEnd || wc.end};
+    else wc.override = null;
   }
   persist('focus');
   if(sleep){
@@ -72,6 +88,9 @@ ACTIONS.windNewTask = function(){
   setTimeout(function(){ const i = document.getElementById('windNewTask'); if(i) i.focus(); }, 20);
 };
 ACTIONS.windNoAlarm = function(){ windReadForm(); ui.wind.noAlarm = !ui.wind.noAlarm; renderWindInto(); };
+ACTIONS.windNoWork = function(){ windReadForm(); ui.wind.noWork = !ui.wind.noWork; renderWindInto(); };
+// done: the plan, the note and tomorrow are saved, and the clocked-out page takes over (That's the day)
+ACTIONS.windDone = function(){ windSave(false); ui.wind = null; hideOverlay('windOverlay'); ui.restFull = true; renderView(); playTick(); };
 document.addEventListener('keydown', function(e){
   if(e.key==='Enter' && e.target && e.target.id==='windNewTask'){ e.preventDefault(); ACTIONS.windNewTask(); }
 });
@@ -118,8 +137,8 @@ function dayTimelineHtml(date){
   return '<div class="wd-tl"><div class="wd-tl-track">'+blocks+live+'</div><div class="wd-tl-axis"><span>6a</span><span>9a</span><span>12p</span><span>3p</span><span>6p</span><span>9p</span><span>12a</span></div></div>';
 }
 function windRecapHtml(){
-  const d = todayStr(), target = state.standards.deepWorkTargetMinutes || 180;
-  const deep = deepWorkMinutesTodayLive(), pct = Math.min(100, deep/target*100);
+  const d = workDayDate(), late = d!==todayStr(), target = state.standards.deepWorkTargetMinutes || 180;
+  const deep = deepWorkOn(d), pct = Math.min(100, deep/target*100);
   const done = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===d; });
   const sess = sessionsOn(d), longest = sess.reduce(function(m, s){ return Math.max(m, s.minutes||0); }, 0);
   const wk = typeof workoutDay==='function' ? workoutDay(d) : {n:0, m:0};
@@ -138,7 +157,7 @@ function windRecapHtml(){
       '<div class="wd-stats">'+
         '<div class="wd-stat"><b>'+done.length+'</b><span>tasks done</span></div>'+
         '<div class="wd-stat"><b>'+sess.length+'</b><span>session'+(sess.length===1?'':'s')+(longest ? ' · longest '+fmtDurationLabel(longest) : '')+'</span></div>'+
-        '<div class="wd-stat'+(std?' is-good':'')+'"><b>'+(std ? '&#10003;' : '&#10005;')+'</b><span>today\'s standard</span></div>'+
+        '<div class="wd-stat'+(std?' is-good':'')+'"><b>'+(std ? '&#10003;' : '&#10005;')+'</b><span>'+(late ? workDayName(d)+'\'s' : 'today\'s')+' standard</span></div>'+
         '<div class="wd-stat"><b>'+streak+'</b><span>day streak</span></div>'+
         (wk.n ? '<div class="wd-stat is-good"><b>'+wk.n+'</b><span>workout'+(wk.n===1?'':'s')+(wk.m ? ' · '+fmtDurationLabel(wk.m) : '')+'</span></div>' : '')+
         ((delivs || touches) ? '<div class="wd-stat"><b>'+(delivs+touches)+'</b><span>client moves ('+delivs+' delivered, '+touches+' touches)</span></div>' : '')+
@@ -146,7 +165,7 @@ function windRecapHtml(){
     '</div>'+
     '<div class="wd-k">When you worked</div>'+dayTimelineHtml(d)+
     '<div class="wd-cols">'+
-      '<div><div class="wd-k">Done today</div>'+(done.length ? '<ul class="wd-done">'+done.slice(0, 8).map(function(t){ return '<li>&#10003; '+escapeHtml(t.title)+'</li>'; }).join('')+(done.length>8 ? '<li class="kpi-sub">+'+(done.length-8)+' more</li>' : '')+'</ul>' : '<div class="kpi-sub">Nothing ticked off today.</div>')+
+      '<div><div class="wd-k">'+(late ? 'Done '+workDayName(d) : 'Done today')+'</div>'+(done.length ? '<ul class="wd-done">'+done.slice(0, 8).map(function(t){ return '<li>&#10003; '+escapeHtml(t.title)+'</li>'; }).join('')+(done.length>8 ? '<li class="kpi-sub">+'+(done.length-8)+' more</li>' : '')+'</ul>' : '<div class="kpi-sub">Nothing ticked off.</div>')+
         (left ? '<div class="kpi-sub" style="margin-top:8px;">'+left+' still on today\'s list. Carry them into tomorrow\'s plan.</div>' : '')+'</div>'+
       '<div><div class="wd-k">Tomorrow</div>'+((tomEvents.length || tomDue.length) ? '<div class="wd-tom">'+tomEvents.map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('')+tomDue.map(function(t){ return '<div><b class="is-due">Due</b> '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '<div class="kpi-sub">Nothing on the calendar yet.</div>')+'</div>'+
     '</div>'+
@@ -182,19 +201,25 @@ function windNoteHtml(){
   '</div>';
 }
 function windAlarmHtml(){
-  const w = ui.wind, wk = wakeCfg(), base = wakeBaseTimeFor(w.target);
-  return '<div class="wd-alarm">'+
-    '<div class="wd-sub">'+(base ? 'Usual: '+fmt12Hour(base)+'. Changing it here only changes '+morningLabel(w.target)+'.' : 'No daily alarm that day. Set one here.')+'</div>'+
-    (w.noAlarm ? '<div class="wd-noalarm">No alarm '+morningLabel(w.target)+'</div>' : '<input class="ws-time wd-time" type="time" id="windAlarm" value="'+escapeHtml(w.alarm||'')+'">')+
-    '<div class="row" style="gap:8px;justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="windNoAlarm">'+(w.noAlarm ? 'Set an alarm' : 'No alarm '+morningLabel(w.target))+'</button>'+
-      '<button class="btn btn-ghost btn-sm" data-action="openWakeSetup">Sound &amp; music</button></div>'+
+  const w = ui.wind, wk = wakeCfg(), base = wakeBaseTimeFor(w.target), wc = typeof workCfg==='function' ? workCfg() : null;
+  const wake = '<div class="wd-card">'+
+    '<div class="wd-work-k">&#9200; Wake up</div>'+
+    (w.noAlarm ? '<div class="wd-noalarm">No alarm</div>' : '<input class="ws-time wd-time" type="time" id="windAlarm" value="'+escapeHtml(w.alarm||'')+'">')+
+    '<div class="wd-sub">'+(base ? 'Usual: '+fmt12Hour(base)+'. This only changes '+morningLabel(w.target)+'.' : 'No daily alarm that day.')+'</div>'+
     '<div class="wd-sound">'+(wakeUsesMusic(wk) ? '&#9835; '+escapeHtml(mediaName(wk.media)) : '&#128276; '+wakeBeepSound(wk)[0].toUpperCase()+wakeBeepSound(wk).slice(1)+' tone')+'</div>'+
+    '<div class="wd-card-b"><button class="btn btn-ghost btn-sm" data-action="windNoAlarm">'+(w.noAlarm ? 'Set an alarm' : 'No alarm')+'</button><button class="btn btn-ghost btn-sm" data-action="openWakeSetup">Sound &amp; music</button></div>'+
   '</div>';
+  const work = !wc || !wc.enabled ? '<div class="wd-card is-off"><div class="wd-work-k">&#128188; Work</div><span>Your work hours aren’t set up yet.</span><div class="wd-card-b"><button class="btn btn-ghost btn-sm" data-action="openWorkSetup">Set them up</button></div></div>'
+    : '<div class="wd-card"><div class="wd-work-k">&#128188; Work</div>'+
+        (w.noWork ? '<div class="wd-noalarm">Not working</div>' : '<div class="wd-work-h"><input class="ws-time wd-time is-sm" type="time" id="windWorkStart" value="'+escapeHtml(w.workStart||'')+'"><span>to</span><input class="ws-time wd-time is-sm" type="time" id="windWorkEnd" value="'+escapeHtml(w.workEnd||'')+'"></div>')+
+        '<div class="wd-sub">Op checks in during these hours.</div>'+
+        '<div class="wd-card-b"><button class="btn btn-ghost btn-sm" data-action="windNoWork">'+(w.noWork ? 'I’m working' : 'Not working '+morningLabel(w.target))+'</button></div></div>';
+  return '<div class="wd-tomorrow">'+wake+work+'</div>';
 }
 function windHtml(){
   const w = ui.wind; if(!w) return '';
   const i = WIND_STEPS.findIndex(function(s){ return s[0]===w.step; });
-  const titles = {recap:'Here\'s how today went.', plan:'Plan of attack: '+morningLabel(w.target)+'.', note:'A note for the morning.', alarm:'Wake up '+morningLabel(w.target)+' at…'};
+  const titles = {recap:workDayDate()===todayStr() ? 'Here\'s how today went.' : 'Here\'s how '+workDayName(workDayDate())+' went.', plan:'Plan of attack: '+morningLabel(w.target)+'.', note:'A note for the morning.', alarm:'Tomorrow, sorted.'};
   const body = w.step==='plan' ? windPlanHtml() : w.step==='note' ? windNoteHtml() : w.step==='alarm' ? windAlarmHtml() : windRecapHtml();
   return '<div class="wd">'+
     '<div class="wd-top"><span class="wd-moon">&#127769;</span><span class="wd-brand">Wind down</span>'+
@@ -203,7 +228,7 @@ function windHtml(){
     '<div class="wd-inner" data-key="wd-'+w.step+'"><h2 class="wd-title-h">'+titles[w.step]+'</h2>'+body+'</div>'+
     '<div class="wd-foot">'+
       (i>0 ? '<button class="btn btn-ghost" data-action="windBack">&larr; Back</button>' : '<span></span>')+
-      (w.step==='alarm' ? '<span class="row" style="gap:8px;"><button class="btn btn-ghost" data-action="windSaveOnly">Save, not sleeping yet</button><button class="btn wd-sleep" data-action="windGoToSleep">&#127769; Go to sleep</button></span>'
+      (w.step==='alarm' ? '<span class="row" style="gap:8px;"><button class="btn btn-ghost" data-action="windGoToSleep" title="Saves it all and goes quiet until the alarm">&#127769; Going to sleep</button><button class="btn wd-sleep" data-action="windDone">&#10003; Done</button></span>'
         : '<button class="btn btn-primary" data-action="windNext">Next &rarr;</button>')+
     '</div>'+
   '</div>';

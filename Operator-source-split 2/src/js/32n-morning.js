@@ -860,6 +860,8 @@ ACTIONS.clockOut = function(){
   ui.undoMode = {prev:prev, at:Date.now()};
   // (no flash, no "done for the day" toast: the clocked-out page says it, and Clock back in undoes it)
   playLockOut(); ui.restFull = true;
+  // round 27: clocking out IS winding down: the steps first (today, tomorrow's plan, a note, tomorrow), then That's the day
+  if(typeof openWindDown==='function') setTimeout(function(){ if(state.modes.active && state.modes.active.clockedOut) openWindDown('recap'); }, 350);
 };
 
 // the vision board fits itself once its entrance has played (it measures wrong while scaled)
