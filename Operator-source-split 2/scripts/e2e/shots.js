@@ -99,6 +99,8 @@ function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
   await shot('inspire-sheet', async () => { await E("ui.inspOpenAct=null; ACTIONS.inspLogSheet()"); await p.waitForTimeout(700); });
   await shot('inspire-zoom', async () => { await E("ui.inspSheet=false; ui.inspView={x:-300,y:80,z:0.5}; inspRender()"); await p.waitForTimeout(900); });
   await shot('inspire-sand', async () => { await E("ui.inspSheet=false; ui.inspOpenAct=null; ui.inspView=inspHome(); const s = inspSandStore(); if(!s.wishes.length){ s.wishes.push({id:'w1', x:-260, y:-300, text:'A house by the ocean', hue:200}, {id:'w2', x:330, y:250, text:'Take Mom to Japan', hue:320}); s.quotes.push({id:'q1', x:-760, y:-120, q:'Nature does not hurry, yet everything is accomplished.', by:'Lao Tzu'}); } inspRender()"); await p.waitForTimeout(1200); });
+  await shot('inspire-stream', async () => { await E("ACTIONS.inspStream(); inspStore().panelMin = true; inspRender()"); await p.waitForTimeout(1500); });
+  await E("inspStore().stream = false; inspStore().panelMin = false; inspRender()");
   await shot('inspire-sky', async () => { await E("ACTIONS.inspSky()"); await p.waitForTimeout(1600); });
   await shot('inspire-breath', async () => { await E("ACTIONS.inspBreathe()"); await p.waitForTimeout(2500); });
   await E("if(ui.inspBreath) ACTIONS.inspBreatheEnd(); ui.inspView=null; closeInspire()");

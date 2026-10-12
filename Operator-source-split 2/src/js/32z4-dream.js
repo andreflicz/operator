@@ -118,7 +118,7 @@ function inspSandHtml(){
 function inspToolsHtml(){
   const sky = (INSP_SKIES.find(function(x){ return x[0]===(inspSandStore().sky || 'dusk'); }) || INSP_SKIES[0])[1];
   const b = function(act, ic, label, on){ return '<button class="izk'+(on ? ' is-on' : '')+'" data-action="'+act+'"><span>'+ic+'</span>'+label+'</button>'; };
-  return '<div class="insp-tools">'+b('inspToolThought', '&#9998;', 'Thought')+b('inspToolWish', '&#10022;', 'Wish')+b('inspToolWords', '&#10077;', 'Words')+b('inspBreathe', '&#10061;', 'Breathe')+b('inspSky', '&#9790;', sky)+b('inspDrift', '&#8776;', 'Drift', !!ui.inspDrift)+'</div>';
+  return '<div class="insp-tools">'+b('inspToolThought', '&#9998;', 'Thought')+b('inspToolWish', '&#10022;', 'Wish')+b('inspToolWords', '&#10077;', 'Words')+b('inspBreathe', '&#10061;', 'Breathe')+b('inspSky', '&#9790;', sky)+b('inspStream', '&#12336;', 'Stream', typeof inspStreamOn==='function' && inspStreamOn())+b('inspDrift', '&#8776;', 'Drift', !!ui.inspDrift)+'</div>';
 }
 function inspFxHtml(){
   return '<div class="insp-aurora"><i></i><i></i></div><div class="insp-bokeh">'+[0,1,2,3,4,5,6,7,8,9].map(function(i){ return '<i style="--i:'+i+'"></i>'; }).join('')+'</div><div class="insp-glow"></div>';
