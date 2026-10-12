@@ -5572,6 +5572,95 @@ html[data-op-mood="stern"] .op-bub-t .cw:last-child, html[data-op-mood="concern"
 .irc-go{ padding:9px 16px; border-radius:999px; border:none; background:linear-gradient(90deg, #ffd6f2, #d0c4ff, #c4f5ff); color:#1b1430; font:inherit; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; }
 .irc.is-done .irc-go{ background:linear-gradient(90deg, #3fbe8e, #7ff0c9); color:#06281b; }
 .irc-x{ padding:8px 10px; border-radius:999px; border:none; background:transparent; color:rgba(255,255,255,.6); font:inherit; font-size:12.5px; cursor:pointer; } .irc-x:hover{ color:#fff; background:rgba(255,255,255,.08); }
+
+/* ============ R29 ============ */
+/* the + has no hover label anywhere (it sat right over the journal button) */
+.fab-add::after, .fab-add:hover::after{ content:none !important; display:none !important; }
+/* the recap rises in, already drawn */
+#recapOverlay.is-opening #recapContent{ animation:rcOpen .48s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes rcOpen{ from{ opacity:0; transform:translateY(14px) scale(.98); } }
+/* sleep: I'm up · Good morning */
+.sl-btns{ position:absolute; bottom:26px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:14px; }
+.sl-btns .sl-up{ position:static; transform:none; padding:8px 14px; border-radius:999px; color:rgba(223,228,255,.32); transition:color .3s, background .3s; }
+.sl-btns .sl-up:hover{ color:rgba(223,228,255,.85); background:rgba(223,228,255,.06); }
+.sl-dot{ color:rgba(223,228,255,.18); }
+/* Inspiration R29: words behind the bubbles */
+.izw-layer{ position:absolute; left:0; top:0; width:0; height:0; z-index:0; }
+.izwd{ position:absolute; transform:translate(-50%, -50%); width:max-content; max-width:440px; text-align:center; font-family:'Iowan Old Style', Georgia, serif; font-style:italic; font-size:24px; line-height:1.45; color:rgba(255,250,255,.9); text-shadow:0 0 26px rgba(200,170,255,.45), 0 2px 12px rgba(0,0,0,.25); cursor:pointer; will-change:opacity, transform; animation:izwdLine 13s cubic-bezier(.4,0,.2,1) forwards; }
+.izwd span{ display:inline-block; opacity:0; animation:izwdWord 1.2s ease-out forwards; }
+.izwd.is-gone{ animation:izwdOut 2.2s ease-in forwards; }
+@keyframes izwdLine{ from{ translate:0 8px; } to{ translate:0 -26px; } }
+@keyframes izwdWord{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+@keyframes izwdOut{ from{ opacity:1; } to{ opacity:0; translate:0 -34px; } }
+.izwd-keep{ display:inline-block; margin-left:8px; vertical-align:middle; padding:3px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.06); color:rgba(255,255,255,.8); font:600 11px/1.2 var(--font-body, system-ui); font-style:normal; opacity:0; transform:translateY(2px); transition:opacity .25s, transform .25s, background .2s; cursor:pointer; }
+.izwd:hover .izwd-keep, .izwd.is-kept .izwd-keep{ opacity:1; transform:none; }
+.izwd-keep:hover{ background:rgba(255,255,255,.14); }
+.izwd.is-kept{ text-shadow:0 0 30px rgba(255,190,230,.7), 0 2px 12px rgba(0,0,0,.25); }
+@media (prefers-reduced-motion:reduce){ .izwd, .izwd span{ animation-duration:.01s !important; } }
+/* catch it: want to, more like this */
+.izb.is-want::after{ content:'\2605  Want to'; position:absolute; top:-8px; padding:2px 9px; border-radius:999px; font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#2a1a04; background:linear-gradient(90deg, #ffe7a6, #ffc56b); white-space:nowrap; }
+.izb.is-want{ border-color:rgba(255,214,140,.7); box-shadow:0 0 34px rgba(255,197,107,.35), inset 0 -8px 20px rgba(255,197,107,.2); }
+.izb.is-keep{ border-color:rgba(255,255,255,.7); box-shadow:0 0 60px rgba(220,200,255,.55), inset 0 -8px 20px rgba(220,200,255,.3); z-index:3 !important; }
+.izb.is-dragging{ cursor:grabbing; z-index:5 !important; box-shadow:0 26px 60px rgba(0,0,0,.4), 0 0 40px rgba(220,200,255,.4); transition:none !important; }
+#inspWorld .izb{ cursor:grab; }
+.izb-want{ padding:8px 14px; border-radius:999px; border:1px solid rgba(255,214,140,.45); background:rgba(255,197,107,.1); color:#ffd89a; font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; }
+.izb-want.is-on{ background:linear-gradient(90deg, #ffe7a6, #ffc56b); color:#2a1a04; border-color:transparent; }
+.izb-taste{ display:flex; justify-content:center; gap:14px; margin-top:8px; }
+.izb-like{ border:none; background:none; color:rgba(255,190,225,.75); font:inherit; font-size:12px; cursor:pointer; padding:2px 4px; }
+.izb-like.is-on{ color:#ffb6dd; font-weight:700; }
+.izb-taste .izb-hide{ margin:0; position:static; }
+.izk-one{ position:absolute; left:50%; bottom:96px; transform:translateX(-50%); z-index:4; pointer-events:none; font-family:'Iowan Old Style', Georgia, serif; font-style:italic; font-size:18px; color:rgba(255,250,255,.75); animation:izkOne 1.6s ease .8s both; }
+@keyframes izkOne{ from{ opacity:0; filter:blur(6px); } }
+/* the panel: what you want to do */
+.izl-wants{ display:flex; flex-direction:column; gap:2px; margin-bottom:10px; }
+.izl-want{ display:flex; align-items:center; gap:8px; padding:6px 0; font-size:13px; border-top:1px solid rgba(255,255,255,.06); }
+.izl-want b{ flex:1; font-weight:600; } .izl-want span{ width:20px; text-align:center; }
+.izl-wd, .izl-wx{ width:24px; height:24px; border-radius:50%; border:none; background:rgba(255,255,255,.06); color:rgba(255,255,255,.7); font-size:11px; cursor:pointer; }
+.izl-wd:hover{ background:#7ff0c9; color:#06281b; } .izl-wx:hover{ background:rgba(255,255,255,.15); color:#fff; }
+/* undo "Not for me" */
+.insp-undo{ position:fixed; left:50%; bottom:150px; transform:translateX(-50%); z-index:9004; display:flex; align-items:center; gap:12px; padding:9px 10px 9px 16px; border-radius:999px; background:rgba(22,18,44,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:13px; -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:0 14px 40px rgba(0,0,0,.35); animation:ircIn .45s cubic-bezier(.2,.8,.2,1); }
+.insp-undo button{ padding:6px 14px; border-radius:999px; border:none; background:linear-gradient(90deg, #ffd6f2, #d0c4ff, #c4f5ff); color:#1b1430; font:inherit; font-weight:800; font-size:12.5px; cursor:pointer; }
+.insp-undo.is-out{ opacity:0; transform:translate(-50%, 10px); transition:opacity .35s, transform .35s; }
+.izq-keep{ position:absolute; top:8px; right:34px; width:22px; height:22px; border-radius:50%; border:none; background:transparent; color:rgba(255,255,255,.45); cursor:pointer; font-size:13px; }
+.izq-keep:hover, .izq-keep.is-on{ color:#ffb6dd; }
+
+/* ---- round 29: Op's chat box (steady size, your line, the log, mute) ---- */
+.cw{ animation-duration:.4s; }
+.br-voice .cw{ animation-duration:.28s; }
+.op-bub-t{ height:4.5em !important; max-height:4.5em !important; scroll-behavior:auto !important; }
+.op-bub-t:empty{ display:block !important; }
+.op-bub-t.cap-new{ animation:none !important; }
+.op-bub-ics{ margin-left:auto; display:flex; gap:2px; align-items:center; }
+.op-bub-ics + .op-bub-x{ margin-left:0 !important; }
+.op-bub-ic{ width:24px; height:24px; border-radius:8px; border:0; background:transparent; color:inherit; opacity:.5; cursor:pointer; font-size:12.5px; line-height:1; display:grid; place-items:center; padding:0; transition:opacity .2s, background .2s; letter-spacing:0; }
+.op-bub-ic:hover{ opacity:1; background:rgba(0,0,0,.06); }
+.op-bub-ic.is-on{ opacity:1; background:rgba(0,0,0,.07); }
+.op-bub-me{ margin:6px 0 0 18%; text-align:right; font-size:12.5px; line-height:1.45; color:rgba(21,23,29,.6); max-height:2.9em; overflow:hidden; }
+.op-bub-me:empty{ display:none; }
+.op-bub-me::before{ content:'You  '; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; font-weight:700; opacity:.55; }
+.op-bub-me.is-wait{ font-style:italic; animation:opMeWait 1.6s ease-in-out infinite; }
+.op-bub-me.is-wait::before{ content:''; }
+@keyframes opMeWait{ 0%,100%{ opacity:.45; } 50%{ opacity:.9; } }
+.op-bub-me .cw{ animation-duration:.35s; }
+.op-bub-log{ display:none; }
+.op-bub.is-log{ width:min(440px, calc(100vw - 32px)) !important; }
+.op-bub.is-log .op-bub-log{ display:flex; flex-direction:column; gap:6px; height:min(46vh, 380px); overflow-y:auto; margin:8px -6px 8px; padding:4px 6px; overscroll-behavior:contain; }
+.op-bub-log > :first-child{ margin-top:auto; }
+.op-bub-log::-webkit-scrollbar{ width:4px; } .op-bub-log::-webkit-scrollbar-thumb{ background:rgba(0,0,0,.15); border-radius:4px; }
+.op-bub.is-log .op-bub-me{ display:none; }
+.op-bub.is-log:not(.is-live) .op-bub-t{ display:none !important; }
+.op-bub.is-log .op-bub-t{ height:auto !important; max-height:5.2em !important; }
+.ocl-day{ align-self:center; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; font-weight:700; color:rgba(21,23,29,.4); margin:8px 0 2px; }
+.ocl-m{ max-width:86%; padding:7px 11px; border-radius:14px; font-size:13px; line-height:1.45; white-space:pre-wrap; overflow-wrap:anywhere; color:#15171d; }
+.ocl-me{ align-self:flex-end; background:rgba(21,23,29,.07); border-bottom-right-radius:5px; }
+.ocl-op{ align-self:flex-start; background:color-mix(in srgb, var(--op-c, #7fd0ff) 16%, #fff); border:1px solid color-mix(in srgb, var(--op-c, #7fd0ff) 30%, transparent); border-bottom-left-radius:5px; }
+.ocl-m.is-new{ animation:oclIn .35s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes oclIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+.ocl-typing{ display:flex; gap:4px; padding:10px 12px; }
+.ocl-typing i{ width:5px; height:5px; border-radius:50%; background:rgba(21,23,29,.45); animation:oclDot 1.1s ease-in-out infinite; }
+.ocl-typing i:nth-child(2){ animation-delay:.15s; } .ocl-typing i:nth-child(3){ animation-delay:.3s; }
+@keyframes oclDot{ 0%,100%{ opacity:.3; transform:none; } 50%{ opacity:1; transform:translateY(-2px); } }
+.ocl-empty{ margin:auto; color:rgba(21,23,29,.45); font-size:12.5px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -19867,7 +19956,7 @@ function checkAllAlarms(){
       const t = wakeTimeFor(days[i]); if(!t) continue;
       const ts = localTs(days[i], t);
       if(ts>now) continue;
-      if(ts>w.lastFiredTs && ts>=w.armedAt-1000 && now-ts<=WAKE_GRACE_MS){ w.lastFiredTs = ts; changed = true; fireWake({}); }
+      if(ts>w.lastFiredTs && ts>=w.armedAt-1000 && now-ts<=WAKE_GRACE_MS){ w.lastFiredTs = ts; changed = true; fireWake({scheduled:true}); }
       break;
     }
     if(w.override && w.override.date<todayStr()){ w.override = null; changed = true; }
@@ -24579,7 +24668,8 @@ function renderSleepView(){
       '<div class="sl-msg">Sleep well'+(name ? ', '+escapeHtml(name) : '')+'.</div>'+
       '<div class="sl-alarm">'+(wake ? '&#9200; '+fmt12Hour(wake)+' &middot; '+(left >= 60 ? Math.floor(left/60)+'h '+(left%60 ? left%60+'m' : '') : left+'m')+' of rest' : 'No alarm set. Sleep in.')+'</div>'+
     '</div>'+
-    '<button class="sl-up" data-action="endMode" title="End sleep">I’m up</button>'+
+    // (round 29) up, not working yet: your sleep's logged and the morning's alarm stands down. Or straight into Good morning
+    '<div class="sl-btns"><button class="sl-up" data-action="sleepUp" title="Mark that you’re up (not working yet)">I’m up</button><span class="sl-dot">&middot;</span><button class="sl-up" data-action="sleepGoodMorning" title="Start Good morning">Good morning &rarr;</button></div>'+
   '</div>';
 }
 // ---- true full screen: Good morning, the work preview and the full-screen views take the whole
@@ -25048,6 +25138,8 @@ function opCaption(txt){
 }
 // ---- the Operator's bubble: what it says (and your reply box) floats over the page, bottom centre,
 // so nothing on the page ever moves; it slips away a few seconds after it's done ----
+// (round 29) the words show a beat ahead of the voice, so they never trail it (a little more on Good morning)
+function opCapLead(){ return OV.cap==='opBubText' ? 2 : 3; }
 function opBubShow(){
   let b = document.getElementById('opBub');
   if(!b){
@@ -25112,10 +25204,10 @@ function opMusicPlaying(){ return !!((typeof wakeAudio!=='undefined' && wakeAudi
 function opDuck(on){
   clearTimeout(opDuckT);
   if(on){
-    if(!opDucked && typeof FM!=='undefined' && FM.playing && FM.bus){ try{ const c = getAudioCtx(), g = FM.bus.g.gain; g.cancelScheduledValues(c.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), c.currentTime); g.exponentialRampToValueAtTime(Math.max(0.0002, fmVolume()*0.3), c.currentTime + 0.4); FM.ducked = true; }catch(e){} }
+    if(!opDucked && typeof FM!=='undefined' && FM.playing && FM.bus){ try{ const c = getAudioCtx(), g = FM.bus.g.gain; g.cancelScheduledValues(c.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), c.currentTime); g.exponentialRampToValueAtTime(Math.max(0.0002, fmVolume()*0.12), c.currentTime + 0.35); FM.ducked = true; }catch(e){} }
     if(opDucked || !opMusicPlaying()){ if(FM && FM.ducked) opDucked = true; return; }
     opDucked = true;
-    if(wakeAudio){ clearInterval(wakeAudioRamp); wakeAudio._duckFrom = wakeAudio.volume; wakeAudio.volume = Math.min(wakeAudio.volume, 0.12); }
+    if(wakeAudio){ clearInterval(wakeAudioRamp); wakeAudio._duckFrom = wakeAudio.volume; wakeAudio.volume = Math.min(wakeAudio.volume, 0.06); }
     if(wakeMusicApp || wakeFinishing) helperFetch(WAKE_HELPER+'music/duck?on=1', 3000);
     return;
   }
@@ -25178,7 +25270,7 @@ function opSayAudio(said, opts, tok, resolve){
         capT = setInterval(function(){
           if(tok!==OV.token) return;
           const d = a.duration && isFinite(a.duration) ? a.duration : words.length*0.36;
-          opCaption(words.slice(0, Math.min(words.length, Math.floor(a.currentTime/d*words.length)+1)).join(' '));
+          opCaption(words.slice(0, Math.min(words.length, Math.floor(a.currentTime/d*words.length)+opCapLead())).join(' '));
         }, 100);
       });
       a.addEventListener('ended', function(){ finish(true); });
@@ -25198,7 +25290,7 @@ function opSayBrowser(said, opts, tok, resolve){
   const startTimer = setTimeout(function(){ if(OV.pending && tok===OV.token){ OV.pending = false; OV.misses = (OV.misses||0) + 1; if(OV.misses >= 2) OV.broken = true; try{ speechSynthesis.cancel(); }catch(e){} opCaption(said); resolve(false); } }, 6000);
   u.onstart = function(){ clearTimeout(startTimer); OV.misses = 0; t0 = Date.now(); opStarted(tok, opts);
     // some voices don't report word boundaries: follow along by time instead
-    est = setInterval(function(){ if(gotBoundary || tok!==OV.token) return; const words = said.split(' '), n = Math.min(words.length, Math.floor((Date.now()-t0)/(330/opSpeed()))+1); opCaption(words.slice(0, n).join(' ')); }, 120); };
+    est = setInterval(function(){ if(gotBoundary || tok!==OV.token) return; const words = said.split(' '), n = Math.min(words.length, Math.floor((Date.now()-t0)/(330/opSpeed()))+opCapLead()); opCaption(words.slice(0, n).join(' ')); }, 120); };
   u.onboundary = function(e){ if(tok!==OV.token) return; gotBoundary = true; const end = said.indexOf(' ', e.charIndex + (e.charLength||1)); opCaption(end<0 ? said : said.slice(0, end)); };
   const done = function(ok){ clearTimeout(startTimer); clearInterval(est); opFinished(tok, said); resolve(ok); };
   u.onend = function(){ done(true); };
@@ -25255,6 +25347,7 @@ function opBriefTick(lines, t){
   while(next + 1 < lines.length && t >= lines[next + 1].at + 600) next++;
   OV.idx = next;
   opSay(opBriefLine(lines, next), {cap:'brVoice', noListen: next < lines.length - 1, onstart:function(){
+    if(lines[next].key==='news' && ui.briefNewsBig && typeof opMood==='function') opMood('concern', 15000);   // (big news: it shows)
     OV.briefSpoke = true; opBriefLoading(false);
     if(lines[next+1]) opPrefetch(opBriefLine(lines, next+1));
     // bring the matching piece in now if the clock hasn't got there yet
@@ -27866,7 +27959,7 @@ async function aiAsk(text, cap){
     const msgs = AI.history.concat([{role:'user', content:text}]);
     let reply = '';
     for(let round = 0; round < 5; round++){
-      const res = await aiCall({model:model, max_tokens:700, system:aiSystem(), tools:OP_TOOLS, messages:msgs});
+      const res = await aiCall({model:model, max_tokens:(typeof opTextMode==='function' && opTextMode()) ? 1400 : 700, system:aiSystem(), tools:OP_TOOLS, messages:msgs});
       if(!res.ok){ opCaption(aiErrLine(res)); return; }
       const j = res.j;
       if(j.stop_reason==='refusal'){ reply = 'I’ll have to sit that one out.'; break; }
@@ -27946,7 +28039,7 @@ async function aiWrite(task, opts){
 async function opComposed(kind, facts){
   const ask = {
     sports:'Give me sports the way a friend would: how busy it was, then just the one or two games that matter to me (my teams first, then the closest or wildest), in your own words. Two or three spoken sentences, then ask if I want more on any of it.',
-    news:'Give me the news the way a friend would: the one or two stories most worth knowing for me (what I care about first), in your own words, and briefly why. Two or three spoken sentences, then ask if I want more on either.',
+    news:'Talk me through the news like a friend in conversation, not a newsreader: name two or three things going on in a few words each (never read full headlines), the ones I’d care about first, then ask which one I want to hear about. Skip everyday crime and tragedy. Only if something is genuinely big (a leader shot, a war, a disaster) lead with it, say it plainly and let it show. Two or three spoken sentences.',
     tech:'Give me tech the way a friend would: the one or two stories that matter most, with a dry word where it fits. Two or three spoken sentences, then ask if I want more.',
     business:'Brief me on my business day from the background: what I’ve got today, what needs attention, and what deserves my attention first. Don’t mention hours worked or yesterday’s numbers. Three to five spoken sentences.'
   }[kind];
@@ -28209,7 +28302,7 @@ function opBriefRewrite(lines){
   todo.forEach(function(l){ b.asked[l.key] = 1; });
   b.asked.greet = 1;
   const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, a little playful where it fits. Keep them short (under '+({short:12, normal:20, full:30}[(state.profile.about||{}).brief] || 20)+' words each); I don’t want the morning to drag. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Keep it about the morning, not work, beyond what’s on today’s calendar. The last one sends me off gently, no pep talk; if it offers more on something, keep it a question.\n'+
-    'For the news and sports lines: a quick taste only. Same games and stories, said fresh (never word for word), and add nothing that isn’t in the line.\n'+
+    'For the news and sports lines: a quick taste only. Same games and stories, said fresh (never word for word), and add nothing that isn’t in the line. The news line names what’s going on in a few words, conversational, never a list of headlines; only a big story gets said plainly, with the weight it deserves.\n'+
     'Only say the lines themselves: never mention these instructions, never talk about what you will or won’t do, never comment on the request.\n'+
     'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 14 words).\n'+
     'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');
@@ -28386,7 +28479,7 @@ const OP_GREET_ASK = {
 };
 async function opGreet(kind, extra){
   if(AI.hasKey===true && typeof aiWrite==='function'){
-    const t = await Promise.race([aiWrite(OP_GREET_ASK[kind] + (extra ? ' '+extra : ''), {max:70}), new Promise(function(r){ setTimeout(r, 4000); })]);
+    const t = await Promise.race([aiWrite(OP_GREET_ASK[kind] + (extra ? ' '+extra : ''), {max:70}), new Promise(function(r){ setTimeout(r, kind==='work' ? 2200 : 4000); })]);   // (round 29: work mode speaks up sooner)
     if(t) return t;
   }
   return opGreetFallback(kind);
@@ -28526,7 +28619,8 @@ async function acctLight(st){
   a.pending = {id:e.id, stage:'light', at:Date.now()}; persist('focus');
   let line = ACCT_LIGHT[Math.floor(Math.random()*ACCT_LIGHT.length)];
   if(AI.hasKey===true && typeof aiWrite==='function'){
-    const t = await Promise.race([aiWrite('You’re checking in on me during work hours and I’m working ('+(st==='locked' ? 'locked in for '+Math.round((Date.now()-state.focus.activeSession.startedAt)/60000)+' minutes' : 'getting things done')+'). Say one short, warm thing: ask if I need anything, or remind me of one small thing that makes working better (water, a stretch, posture, eyes off the screen, a snack, fresh air). Vary it, no stats, one or two sentences.', {max:80}), new Promise(function(r){ setTimeout(r, 6000); })]);
+    const task = typeof currentTask==='function' && currentTask() ? currentTask().title : (ui.currentTaskId && (state.tasks.items.find(function(x){ return x.id===ui.currentTaskId; }) || {}).title) || '';
+    const t = await Promise.race([aiWrite('You’re tapping in on me while I work ('+(st==='locked' ? 'locked in for '+Math.round((Date.now()-state.focus.activeSession.startedAt)/60000)+' minutes' : 'getting things done')+(task ? ', on "'+task+'"' : '')+'). One quick, casual line like a friend popping their head in: something like “you good, boss? still on '+(task ? 'that' : 'it')+'?”. Your own words, a few words, ends on the question. No stats, no advice.', {max:50}), new Promise(function(r){ setTimeout(r, 6000); })]);
     if(t) line = t;
   }
   if(acctBusy()){ if(acct().pending && acct().pending.id===e.id) acct().pending = null; return; }
@@ -29868,7 +29962,7 @@ fmVolume = function(){ return fmVolumeFull()*(FM.soft ? 0.32 : 1); };
 function fmRamp(sec){
   const ctx = getAudioCtx(); if(!ctx || !FM.playing || !FM.bus) return;
   const g = FM.bus.g.gain; g.cancelScheduledValues(ctx.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), ctx.currentTime);
-  g.exponentialRampToValueAtTime(Math.max(0.0002, FM.ducked ? fmVolume()*0.3 : fmVolume()), ctx.currentTime + (sec||1.5));
+  g.exponentialRampToValueAtTime(Math.max(0.0002, FM.ducked ? fmVolume()*0.12 : fmVolume()), ctx.currentTime + (sec||1.5));
 }
 function musicSoft(on){ on = !!on; if(FM.soft===on) return; FM.soft = on; fmRamp(2); }
 function fmTrackIds(key){ return FOCUS_TRACKS.map(function(tr, i){ return tr[key] ? i : -1; }).filter(function(i){ return i >= 0; }); }
@@ -30080,7 +30174,7 @@ function teaseOffer(){
   const s = sportsTease(), n = newsTease();
   if(!s && !n) return null;
   const opts = [];
-  if(s) opts.push(s.topics[0]); if(n) opts.push(n.topics[0]==='the news' ? 'the news' : 'that '+n.topics[0]+' story');
+  if(s) opts.push(s.topics[0]); if(n) opts.push(n.topics[0]==='the news' || n.topics[0]==='that story' ? n.topics[0] : 'that '+n.topics[0]+' story');
   ui.briefOffer = {at:Date.now(), date:todayStr(), sports:s, news:n};
   const q = opts.length > 1 ? 'want more on '+opts[0]+' or '+opts[1]+'?' : 'want more on '+opts[0]+'?';
   // (it ends on the question, so the mic opens for the answer)
@@ -30445,7 +30539,7 @@ inspToolsHtml = (function(base){
   return function(){
     const h = base.apply(this, arguments);
     const btn = '<span class="izk-wrap"><button class="izk'+(ui.inspSfxOpen ? ' is-on' : '')+'" data-action="inspSfxOpen"><span>&#127925;</span>Sounds</button>'+
-      (ui.inspSfxOpen ? '<span class="izk-wind izk-sfx"><small>Sound effects</small>'+inspSfxControlsHtml()+'<em>The music has its own player, top right.</em></span>' : '')+'</span>';
+      (ui.inspSfxOpen ? '<span class="izk-wind izk-sfx"><small>Sound effects</small>'+inspSfxControlsHtml()+'</span>' : '')+'</span>';
     return h.replace(/<\/div>$/, btn+'</div>');
   };
 })(inspToolsHtml);
@@ -30673,6 +30767,683 @@ window.addEventListener('keydown', function(e){
   if(e.key!=='Escape' || typeof inspOpenNow!=='function' || !inspOpenNow()) return;
   if(ui.inspWindOpen || ui.inspSfxOpen || ui.inspResetSheet){ e.stopPropagation(); e.preventDefault(); ui.inspWindOpen = false; ui.inspSfxOpen = false; ui.inspResetSheet = false; inspRender(); }
 }, true);
+// ============ ROUND 29 ============
+
+// ---- the recap opens already drawn (it used to show an empty window, then fill in with a jump) ----
+openDayRecap = function(date){
+  ui.recapDate = date || todayStr();
+  renderRecapInto();
+  const o = document.getElementById('recapOverlay');
+  if(o){ o.classList.add('is-opening'); showOverlay('recapOverlay'); setTimeout(function(){ o.classList.remove('is-opening'); }, 520); }
+};
+
+// ---- Inspiration sounds: Shuffle picks a different one every time ----
+INSP_SFX.splice(INSP_SFX.length - 1, 0, ['random', 'Shuffle']);
+inspNote = (function(base){
+  const kinds = ['chimes', 'glass', 'drops', 'soft'];
+  return function(ctx, out, t, midi, vol){
+    if(inspSfxStyle()!=='random') return base.apply(this, arguments);
+    const cfg = inspSfxCfg(), was = cfg.style;
+    cfg.style = kinds[Math.floor(Math.random()*kinds.length)];
+    try{ return base.apply(this, arguments); } finally { cfg.style = was; }
+  };
+})(inspNote);
+
+// ---- Op taps in while you're locked in: a quick "you good? still on it?" (any time you're locked in,
+// not only in work hours), about every 45 to 70 minutes, never in the first half hour, never if he just did ----
+function opTapTask(){ const id = ui.currentTaskId; const t = id && state.tasks.items.find(function(x){ return x.id===id; }); return t ? t.title : ''; }
+function opTapDue(){
+  const s = state.focus.activeSession; if(!s || s.onBreak || !opVoiceOn()) return false;
+  if(AI.busy || AI.listening || OV.speaking || OV.pending || document.querySelector('.overlay:not(.hidden)')) return false;
+  if(Date.now() - s.startedAt < 32*60000) return false;
+  const last = Math.max(s.tapAt || 0, (typeof acct==='function' && acct().log.length ? acct().log[acct().log.length-1].at : 0));
+  if(!s.tapGap) s.tapGap = (45 + Math.random()*25)*60000;
+  return Date.now() - last > s.tapGap && Date.now() - (ui._opActiveAt || 0) > 60000;
+}
+async function opTap(){
+  const s = state.focus.activeSession; if(!s) return;
+  s.tapAt = Date.now(); s.tapGap = (45 + Math.random()*25)*60000; persist('focus');
+  const task = opTapTask();
+  let line = task ? pickOne(['You good, boss? Still on '+task+'?', 'Quick one: how’s '+task+' coming along?', 'Still locked in on '+task+'? Need anything?']) : pickOne(['You good, boss? Still in it?', 'Quick check: how’s it going in there?', 'Still locked in? Need anything?']);
+  if(AI.hasKey===true && typeof aiWrite==='function'){
+    const t = await Promise.race([aiWrite('I’m locked in working'+(task ? ' on "'+task+'"' : '')+', '+Math.round((Date.now()-s.startedAt)/60000)+' minutes in. Pop your head in like a friend: one very short casual question, like “you good, boss? still on '+(task ? 'that' : 'it')+'?”. Your own words, a few words, ends on the question.', {max:40}), new Promise(function(r){ setTimeout(r, 5000); })]);
+    if(t) line = t;
+  }
+  if(!state.focus.activeSession || AI.listening || OV.speaking) return;
+  if(!/\?["”’)]*\s*$/.test(line)) line = line.replace(/[.!]*\s*$/, '')+'. You good?';   // (it always asks)
+  AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
+  OV.cap = 'opBubText'; opBubShow(); opSay(line, {cap:'opBubText'});
+}
+setInterval(function(){ try{ if(opTapDue()) opTap(); }catch(e){} }, 60000);
+
+// ---- Good morning: your wake-up song is the morning's music. The app's own track only comes in when
+// there's no song set (an alarm tone), or when you press play yourself ----
+gmHandoff = (function(base){ return function(){ if(typeof wakeUsesMusic==='function' && wakeUsesMusic(wakeCfg())) return; return base.apply(this, arguments); }; })(gmHandoff);
+// a question waiting on you in the bubble keeps the music down until you answer (or it goes)
+setInterval(function(){
+  try{
+    const b = document.getElementById('opBub'), t = b && b.classList.contains('is-in') ? (document.getElementById('opBubText')||{}).textContent || '' : '';
+    const waiting = /\?["”’)]*\s*$/.test(t.trim()) && Date.now() - (OV.lastEnd||0) < 30000;
+    if(waiting && !OV.qDuck){ OV.qDuck = true; opDuck(true); }
+    else if(!waiting && OV.qDuck){ OV.qDuck = false; if(!AI.listening && !OV.speaking) opDuck(false); }
+  }catch(e){}
+}, 700);
+// (and nothing brings the music back up while a question's waiting or the mic's open)
+opDuck = (function(base){ return function(on){ if(!on && (OV.qDuck || AI.listening)) return; return base.apply(this, arguments); }; })(opDuck);
+
+// ---- the news, like a friend would say it: what's going on in a few words; only something genuinely big
+// gets real time (and Op sounds like it). Everyday crime and tragedy don't make it in. ----
+const NEWS_BIG = /\b(assassinat\w*|shot (?:dead|at|and|in|while)|was shot|is shot|gets shot|shooting|killed|dies|died|death toll|war\b|invades?|invasion|missile|airstrikes?|terror\w*|earthquake|tsunami|hurricane|wildfire|evacuat\w*|state of emergency|martial law|coup|nuclear|pandemic|outbreak|resigns|impeach\w*|collapse[sd]?|market crash|plunge[sd]?)\b/i;
+const NEWS_WHO = /\b(president|prime minister|pope|king|queen|chancellor|leader|nation|nationwide|country|world|global|thousands|hundreds|dozens|millions|u\.?s\.?|america|europe|china|russia)\b/i;
+function newsIsBig(n){ const t = sayHeadline(n.title||''); return NEWS_BIG.test(t) && NEWS_WHO.test(t); }
+newsTease = function(){
+  const nw = ui.morningNews; if(!nw || !nw.items) return null;
+  const sec = nw.sec || {}, top = arr(nw.items), words = teaseInterestWords();
+  const big = top.slice(0, 6).find(newsIsBig);
+  ui.briefNewsBig = !!big;
+  if(big){
+    const h = sayHeadline(big.title).replace(/[.!?]+$/, '');
+    return {text:'Something you should know: '+h+'.', big:true, topics:['that story'], facts:['- '+h+' (big)'].concat(top.slice(0, 6).filter(function(n){ return n!==big; }).map(function(n){ return '- '+sayHeadline(n.title); }))};
+  }
+  const cats = [];
+  if(arr(sec.tech).length) cats.push('tech'); if(arr(sec.business).length) cats.push('business'); if(top.length) cats.push('the world'); if(arr(sec.local).length) cats.push('around town');
+  if(!cats.length) return null;
+  const all = top.concat(arr(sec.tech), arr(sec.business));
+  const mine = words.find(function(w){ return all.some(function(n){ return (n.title||'').toLowerCase().indexOf(w) >= 0; }); });
+  const list = cats.length > 1 ? cats.slice(0, -1).join(', ')+' and '+cats[cats.length-1] : cats[0];
+  const text = teasePick('newsA', ['A bit going on in '+list+', nothing wild.', 'Some news in '+list+'. Nothing that can’t wait.', 'Little bits in '+list+'. Quiet morning, mostly.'])+(mine ? ' There’s some '+mine.replace(/^\w/, function(c){ return c.toUpperCase(); })+' stuff you’d like.' : '');
+  return {text:text, topics:['the news'], facts:all.slice(0, 8).map(function(n){ return '- '+sayHeadline(n.title); })};
+};
+
+// ---- up before the alarm ----
+// "I'm up" on the sleep screen: your sleep's logged (bed to now) and the morning's alarm stands down.
+// "Good morning →": the same, then Good morning opens (quietly, no ringing).
+function wakeStandDown(){
+  const nw = typeof nextWake==='function' ? nextWake() : null, w = wakeCfg();
+  if(nw && nw.ts - Date.now() < 10*3600000){ w.lastFiredTs = Math.max(w.lastFiredTs||0, nw.ts); try{ dawnDismissedTs = nw.ts; }catch(e){} persist('focus'); return nw; }
+  return null;
+}
+function sleepUpNow(){
+  const m = state.modes.active, wasSleep = !!(m && m.sleep), started = m && m.startedAt;
+  const nw = wakeStandDown();
+  if(wasSleep) endMode();
+  const mins = wasSleep && started ? Math.round((Date.now() - started)/60000) : 0;
+  return {mins:mins, alarm:nw};
+}
+ACTIONS.sleepUp = function(){
+  const r = sleepUpNow();
+  ui.view = 'today'; renderView();
+  showToast('Morning.'+(r.mins >= 60 ? ' You slept '+fmtDurationLabel(r.mins)+'.' : '')+(r.alarm ? ' I let the '+fmt12Hour(r.alarm.time)+' alarm go.' : ''), {icon:'&#9728;&#65039;', actionLabel:'Good morning', actionAction:'sleepGoodMorning', duration:9000});
+};
+ACTIONS.sleepGoodMorning = function(){
+  sleepUpNow(); clearToasts && clearToasts();
+  // Good morning, without the ring: straight to the briefing
+  wakeRing = {startedAt:Date.now(), test:false, snoozed:false, mediaFailed:false, silent:true};
+  ui.wakeMode = 'ring'; closeOtherOverlaysForWake(); showOverlay('wakeOverlay');
+  wakeImUpNow();
+};
+// already up and using the app when the alarm comes round: it doesn't ring; a quiet note offers Good morning instead
+function lastInputAt(){ return ui._lastInputAt || 0; }
+['pointerdown', 'keydown', 'wheel'].forEach(function(ev){ document.addEventListener(ev, function(){ ui._lastInputAt = Date.now(); }, {capture:true, passive:true}); });
+fireWake = (function(base){
+  return function(opts){
+    opts = opts || {};
+    const m = state.modes.active;
+    if(opts.scheduled && !(m && m.sleep) && Date.now() - lastInputAt() < 15*60000){
+      showToast('Morning. You were already up, so I let the alarm go.', {icon:'&#9728;&#65039;', actionLabel:'Good morning', actionAction:'sleepGoodMorning', duration:15000});
+      return;
+    }
+    return base.apply(this, arguments);
+  };
+})(fireWake);
+
+// ---- "Op" / "Operator" / "Hey Operator": say it and he's listening ----
+// While the app is in front and Op's quiet, it listens for its name (only that: nothing is sent anywhere
+// until you've said it). "Hey Operator" → a soft chime and the mic opens; "Operator, what's on today?" → asked
+// straight away. Off in Settings → Connections & data → Op. Never during sleep.
+const HEY_RE = /^(?:hey|hi|yo|ok|okay)?[\s,]*(?:op|opp|operator|operater)\b[\s,.!?]*(.*)$/i;
+const HW = {rec:null, on:false, t:0, fails:0, blocked:false, hitAt:0};
+function heyOpOn(){ return state.profile.heyOp!==false && typeof aiCanHear==='function' && aiCanHear(); }
+function heyQuietNow(){
+  const m = state.modes && state.modes.active;
+  return AI.listening || AI.busy || OV.speaking || OV.pending || document.hidden || !document.hasFocus() || (m && m.sleep) || (typeof inspBreathOn!=='undefined' && ui.inspBreath);
+}
+function heyStart(){
+  if(HW.on || HW.blocked || !heyOpOn() || heyQuietNow()) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if(!SR) return;
+  const rec = new SR(); rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1; rec.lang = navigator.language || 'en-US';
+  HW.rec = rec; HW.on = true;
+  rec.onresult = function(e){
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const r = e.results[i], t = String(r[0].transcript||'').trim(), m = HEY_RE.exec(t);
+      HW.fails = 0;
+      if(!m) continue;
+      // "operator" or "hey op" is enough on its own; a bare "op" waits for the end of the phrase (fewer false starts)
+      if(!r.isFinal && !/operat|hey|yo/i.test(t)) continue;
+      heyHeard(r.isFinal ? m[1] : ''); return;
+    }
+  };
+  rec.onerror = function(e){ if(e && (e.error==='not-allowed' || e.error==='service-not-allowed')) HW.blocked = true; else HW.fails++; };
+  rec.onend = function(){ HW.on = false; HW.rec = null; };
+  try{ rec.start(); }catch(e){ HW.on = false; HW.rec = null; }
+}
+function heyStop(){ if(HW.rec){ const r = HW.rec; HW.rec = null; HW.on = false; try{ r.abort(); }catch(e){ try{ r.stop(); }catch(e2){} } } }
+function heyHeard(rest){
+  if(Date.now() - HW.hitAt < 2500) return; HW.hitAt = Date.now();
+  heyStop();
+  AI.closedAt = 0; OV.userCut = false; ui._opActiveAt = Date.now();
+  if(typeof inspChime==='function'){ try{ const ctx = getAudioCtx(); if(ctx) fmBell(ctx, sfxOut(ctx), ctx.currentTime, fmHz(84), 0.03); }catch(e){} }
+  if(typeof opLightPulse==='function') try{ opLightPulse(); }catch(e){}
+  OV.cap = 'opBubText'; opBubShow();
+  rest = String(rest||'').trim();
+  if(rest.split(/\s+/).length >= 2) setTimeout(function(){ aiAsk(rest, 'opBubText'); }, 120);
+  else { opCaption(pickOne(['Yeah?', 'I’m here.', 'Go ahead.', 'What’s up?'])); setTimeout(function(){ if(!AI.listening) aiListen('opBubText'); }, 300); }
+}
+// keep it running when it should be, and out of the way when it shouldn't
+setInterval(function(){
+  try{
+    if(!heyOpOn() || heyQuietNow()){ heyStop(); return; }
+    if(HW.fails > 12){ HW.fails = 0; HW.t = Date.now() + 30000; }   // (offline or the mic's busy: back off a bit)
+    if(!HW.on && Date.now() > HW.t) heyStart();
+  }catch(e){}
+}, 1500);
+ACTIONS.heyOpToggle = function(){ state.profile.heyOp = state.profile.heyOp===false; persist('profile'); if(state.profile.heyOp===false) heyStop(); renderView(); };
+operatorSettingsHtml = (function(base){
+  return function(){
+    const on = state.profile.heyOp!==false;
+    return base.apply(this, arguments)+'<div class="card section op-settings"><div class="snd-h"><div><div class="section-title" style="margin:0;">&#128483;&#65039; “Hey Operator”</div><div class="kpi-sub">Say “Op” or “Hey Operator” to talk.'+(HW.blocked ? ' <b>Allow the mic for Operator.</b>' : '')+'</div></div>'+
+      '<label class="ws-switch"><input type="checkbox" data-action="heyOpToggle" '+(on ? 'checked' : '')+'><span></span></label></div></div>';
+  };
+})(operatorSettingsHtml);
+// ============ INSPIRATION, ROUND 29 ============
+// - Words live on the sky now, behind the bubbles: they come into focus, drift a little and fade, smooth
+//   (the page redrawing can't cut them off any more). Tap one to keep it in your journal (tagged Inspiration).
+// - Catch a bubble as it drifts and keep it: "Want to" stops it in place, marks it, and lists it in the panel.
+// - "Not for me" can be undone right there, and "More like this" tells Op what you like (his ideas follow).
+// - Pick bubbles up and put them where you want them; they stay there.
+// - Breeze: a gust from the left lifts everything away, all but the one idea for right now, which floats
+//   up beside you ("one thing, for now"). Return brings them all back, somewhere new.
+
+function inspWants(){ const s = inspStore(); if(!Array.isArray(s.wants)) s.wants = []; return s.wants; }
+function inspLikes(){ const s = inspStore(); if(!Array.isArray(s.likes)) s.likes = []; return s.likes; }
+function inspPosStore(){ const s = inspStore(); if(!s.pos || typeof s.pos!=='object') s.pos = {}; return s.pos; }
+
+// ---- where they sit: your own spots win, and Return shuffles the rest ----
+inspScatter = (function(base){
+  return function(acts){
+    const seed = inspStore().seed || 0;
+    let out;
+    if(!seed) out = base(acts);
+    else {
+      const key = acts.map(function(a){ return a.id; }).join(',')+'#'+seed;
+      if(ui._inspScatter && ui._inspScatter.key===key) out = ui._inspScatter.out;
+      else {
+        const rnd = inspRand(acts.length*7919 + 17 + seed*104729), placed = [];
+        out = [];
+        acts.forEach(function(a, i){
+          const s = 104 + Math.round(rnd()*30); let best = null;
+          for(let tries = 0; tries < 160; tries++){
+            const r = 270 + Math.min(900, i*34)*(0.55 + rnd()*0.6), ang = rnd()*Math.PI*2, x = Math.round(Math.cos(ang)*r*1.55), y = Math.round(Math.sin(ang)*r*0.78);
+            if(Math.abs(x) < 300 && y < -330 && y > -720) continue;
+            if(Math.hypot(x, y*1.15) < 330) continue;
+            let ok = true; for(let k = 0; k < placed.length; k++){ const q = placed[k]; if(Math.hypot(q.x - x, q.y - y) < (q.s + s)/2 + 46){ ok = false; break; } }
+            if(ok){ best = {x:x, y:y}; break; }
+          }
+          if(!best){ const ang = i*2.39996; best = {x:Math.round(Math.cos(ang)*(1300 + i*12)), y:Math.round(Math.sin(ang)*(620 + i*6))}; }
+          placed.push({x:best.x, y:best.y, s:s}); out.push({a:a, x:best.x, y:best.y, s:s, d:(rnd()*7).toFixed(2)*1, t:(6 + rnd()*6).toFixed(1)*1});
+        });
+        ui._inspScatter = {key:key, out:out};
+      }
+    }
+    const pos = inspPosStore(), likes = inspLikes();
+    return out.map(function(p){ const q = pos[p.a.id]; return q || likes.indexOf(p.a.id) >= 0 ? Object.assign({}, p, q ? {x:q.x, y:q.y} : {}, likes.indexOf(p.a.id) >= 0 ? {s:Math.round(p.s*1.12)} : {}) : p; });
+  };
+})(inspScatter);
+
+// ---- the engine, again: drag, wants, and the new breeze ----
+IW.keep = null;
+inspWindTick = function(now){
+  IW.raf = 0;
+  const L = document.getElementById('insp'); if(!L || !L.classList.contains('is-in')){ IW.last = 0; return; }
+  const dt = IW.last ? Math.min(0.1, (now - IW.last)/1000) : 0; IW.last = now;
+  const t = now/1000, speed = INSP_WINDS[inspWind()][2], f = inspField(), wants = inspWants();
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  L.querySelectorAll('#inspWorld .izb').forEach(function(el){
+    const id = el.dataset.id; if(!id || el._drag) return;
+    const x0 = parseFloat(el.style.left) || 0, y0 = parseFloat(el.style.top) || 0;
+    const h = inspHash(id), want = wants.indexOf(id) >= 0, held = ui.inspOpenAct===id || el.matches(':hover') || want;
+    el.classList.toggle('is-want', want);
+    // the gust: it reaches the left side first; each bubble lifts, tilts and sails off to the right
+    const keep = IW.away && IW.keep===id;
+    let g = 0;
+    if(IW.away && !keep){ const lag = Math.max(0, Math.min(1, (x0 - f.min)/f.w))*650; g = Math.max(0, Math.min(1, (now - IW.awayAt - lag)/1100)); }
+    if(!held && !reduce && !keep){ IW.off[id] = (IW.off[id] || 0) + (speed*(0.75 + h*0.5) + g*g*1500)*dt; }
+    let off = IW.off[id] || 0;
+    const r = IW.ret[id]; if(r){ const k = Math.min(1, Math.max(0, (now - r.t0)/r.dur)), e = 1 - Math.pow(1 - k, 3); off += r.from*(1 - e); if(k >= 1) delete IW.ret[id]; }
+    let wx = x0 + off; if(!IW.away){ wx = ((wx - f.min) % f.w + f.w) % f.w + f.min; }
+    const amp = reduce ? 0 : 1, lift = speed ? 1 + speed/40 : 1;
+    let dx = wx - x0 + amp*(Math.sin(t*(0.31 + h*0.2) + h*20)*14 + Math.sin(t*(0.13 + h*0.07) + h*7)*10);
+    let dy = amp*(Math.cos(t*(0.27 + h*0.18) + h*11)*12*lift + Math.sin(t*(0.11 + h*0.05) + h*3)*9*lift) - g*g*(140 + h*120);
+    let sc = 1 - g*0.18, rot = amp*Math.sin(t*0.4 + h*9)*(2 + speed/30) + g*(12 + h*14);
+    // the one that stays: it floats up beside you, a little bigger
+    const kp = IW.keepAt && IW.keep===id ? IW.keepAt : null;
+    if(kp){ const k = Math.min(1, (now - kp.t0)/1600), ease = 1 - Math.pow(1 - k, 3), ee = IW.away ? ease : 1 - ease; dx = dx*(1 - ee) + (kp.x - x0)*ee; dy = dy*(1 - ee) + (kp.y - y0)*ee; sc = 1 + 0.16*ee;
+      if(!IW.away && k >= 1){ IW.keepAt = null; IW.keep = null; } }
+    el.classList.toggle('is-keep', !!(IW.away && keep));
+    el._dx = dx; el._dy = dy;
+    el.style.transform = 'translate3d('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px,0) rotate('+rot.toFixed(2)+'deg)'+(sc!==1 ? ' scale('+sc.toFixed(3)+')' : '');
+    let op = 1;
+    if(speed > 0 && !IW.away && !held){ const d = Math.min(wx - f.min, f.max - wx); op = Math.max(0, Math.min(1, d/260)); }
+    // (they fade only once they're well on their way, not on the spot)
+    if(IW.away && !keep) op = Math.max(0, 1 - Math.max(0, (off - 380)/520));
+    if(r && !IW.away) op = Math.min(op, Math.min(1, Math.max(0, (now - r.t0)/900)));
+    const px = x0 + dx, py = y0 + dy;
+    const nearHub = Math.hypot(px, py*1.15) < 300 ? 1 - Math.max(0, (Math.hypot(px, py*1.15) - 230)/70) : 0;
+    const nearBoard = Math.abs(px) < 300 && py < -400 && py > -700 ? 1 : 0;
+    const behind = keep ? 0 : Math.max(nearHub, nearBoard);
+    if(behind > 0) op = Math.min(op, 1 - behind*0.8);
+    el.classList.toggle('is-behind', behind > 0.5);
+    el.style.opacity = op < 0.999 ? op.toFixed(3) : '';
+    el.style.pointerEvents = op < 0.15 ? 'none' : '';
+    if(ui.inspOpenAct===id){ const c = L.querySelector('#inspWorld .izb-card'); if(c) c.style.transform = 'translate3d('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px,0)'; }
+  });
+  IW.raf = requestAnimationFrame(inspWindTick);
+};
+// Breeze: everything but the one for right now; Return: all back, in a new arrangement
+function inspKeepId(){
+  const wants = inspWants(), t = todayStr(), did = inspStore().log.filter(function(x){ return x.date===t; }).map(function(x){ return x.act; });
+  const ids = Array.prototype.map.call(document.querySelectorAll('#inspWorld .izb'), function(b){ return b.dataset.id; });
+  const pick = wants.find(function(id){ return ids.indexOf(id) >= 0; }) || (typeof inspPicks==='function' ? inspPicks().map(function(a){ return a.id; }).find(function(id){ return ids.indexOf(id) >= 0 && did.indexOf(id) < 0; }) : null);
+  return pick || ids[0] || null;
+}
+ACTIONS.inspBreezeAway = function(){
+  const L = document.getElementById('insp');
+  if(!IW.away){
+    IW.away = true; IW.awayAt = performance.now(); ui.inspOpenAct = null;
+    IW.keep = inspKeepId(); IW.keepAt = IW.keep ? {t0:performance.now(), x:330, y:-30} : null;
+    inspWhoosh(1); if(L) L.classList.add('is-away');
+  } else {
+    IW.away = false; const now = performance.now();
+    if(IW.keepAt) IW.keepAt.t0 = now;
+    // somewhere new: a fresh arrangement (the spots you chose stay yours)
+    const s = inspStore(); s.seed = (s.seed || 0) + 1; persist('personal'); ui._inspScatter = null;
+    IW.off = {}; IW.ret = {};
+    inspRender();
+    const f = inspField();
+    document.querySelectorAll('#inspWorld .izb').forEach(function(el, i){
+      const id = el.dataset.id; if(!id || id===IW.keep) return;
+      const x0 = parseFloat(el.style.left) || 0;
+      IW.ret[id] = {from:-(x0 - f.min + 420 + inspHash(id)*500), t0:now + i*60, dur:3000 + inspHash(id+'r')*1500};
+    });
+    if(L) L.classList.remove('is-away');
+    if(typeof inspChime==='function') inspChime(3);
+  }
+  inspRender();
+};
+
+// ---- the card: Want to, More like this, I did this ----
+inspHtml = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    const open = ui.inspOpenAct, wants = inspWants(), likes = inspLikes();
+    if(open){
+      const w = wants.indexOf(open) >= 0, l = likes.indexOf(open) >= 0;
+      h = h.replace(/<button class="izb-x" data-action="inspOpenAct" data-id="([^"]+)">Later<\/button>/, '<button class="izb-want'+(w ? ' is-on' : '')+'" data-action="inspWant" data-id="$1">'+(w ? '&#9733; Want to' : '&#9734; Want to')+'</button><button class="izb-x" data-action="inspOpenAct" data-id="$1">Later</button>');
+      h = h.replace(/<button class="izb-hide" data-action="inspHideAct" data-id="([^"]+)">Not for me<\/button>/, '<span class="izb-taste"><button class="izb-like'+(l ? ' is-on' : '')+'" data-action="inspLike" data-id="$1">'+(l ? '&#9829; You like this' : '&#9825; More like this')+'</button><button class="izb-hide" data-action="inspHideAct" data-id="$1">Not for me</button></span>');
+    }
+    // the words layer, behind the bubbles (the page redrawing leaves it alone)
+    h = h.replace(/(<div class="insp-world" id="inspWorld"[^>]*>)/, '$1<div class="izw-layer" data-morph-ignore="words"></div>');
+    // what you want to do, at the top of the panel
+    if(wants.length && h.indexOf('<div class="izl-h">This week</div>') >= 0){
+      const rows = wants.map(function(id){ const a = inspActs().find(function(x){ return x.id===id; }); return a ? '<div class="izl-want"><span>'+a.e+'</span><b>'+escapeHtml(a.label)+'</b><button class="izl-wd" data-action="inspWantDone" data-id="'+id+'" title="Did it">&#10003;</button><button class="izl-wx" data-action="inspWant" data-id="'+id+'" title="Not anymore">&#10005;</button></div>' : ''; }).join('');
+      h = h.replace('<div class="izl-h">This week</div>', '<div class="izl-h">Want to</div><div class="izl-wants">'+rows+'</div><div class="izl-h">This week</div>');
+    }
+    if(IW.away && IW.keep) h += '<div class="izk-one">One thing, for now.</div>';
+    return h;
+  };
+})(inspHtml);
+ACTIONS.inspWant = function(el, e, id){
+  const w = inspWants(), i = w.indexOf(id);
+  if(i >= 0) w.splice(i, 1); else { w.push(id); if(typeof inspChime==='function') inspChime(2); }
+  persist('personal'); inspRender();
+};
+ACTIONS.inspWantDone = function(el, e, id){ const w = inspWants(), i = w.indexOf(id); if(i >= 0) w.splice(i, 1); inspLogAct(id); if(typeof inspRipple==='function') inspRipple(); if(typeof inspChime==='function') inspChime(3); persist('personal'); inspRender(); };
+inspLogAct = (function(base){ return function(id){ const w = inspWants(), i = w.indexOf(id); if(i >= 0) w.splice(i, 1); return base.apply(this, arguments); }; })(inspLogAct);
+ACTIONS.inspLike = function(el, e, id){
+  const l = inspLikes(), i = l.indexOf(id);
+  if(i >= 0) l.splice(i, 1); else { l.push(id); if(typeof inspChime==='function') inspChime(2); }
+  persist('personal'); inspRender();
+};
+// "Not for me" can be undone right away
+ACTIONS.inspHideAct = (function(base){
+  return function(el, e, id){
+    base.apply(this, arguments);
+    const a = inspActs().find(function(x){ return x.id===id; });
+    let p = document.getElementById('inspUndo'); if(p) p.remove();
+    p = document.createElement('div'); p.id = 'inspUndo'; p.className = 'insp-undo';
+    p.innerHTML = '<span>'+(a ? a.e+' ' : '')+'Hidden'+(a ? ': '+escapeHtml(a.label) : '')+'</span><button data-action="inspUndoHide" data-id="'+id+'">Undo</button>';
+    document.body.appendChild(p); clearTimeout(ui._inspUndoT);
+    ui._inspUndoT = setTimeout(function(){ p.classList.add('is-out'); setTimeout(function(){ if(p.parentNode) p.remove(); }, 400); }, 7000);
+  };
+})(ACTIONS.inspHideAct);
+ACTIONS.inspUndoHide = function(el, e, id){ const p = document.getElementById('inspUndo'); if(p) p.remove(); ACTIONS.inspUnhideAct(el, e, id); };
+closeInspire = (function(base){ return function(){ const p = document.getElementById('inspUndo'); if(p) p.remove(); return base.apply(this, arguments); }; })(closeInspire);
+// what you like and pass on shapes Op's ideas
+inspAiFacts = (function(base){ return function(){ const l = inspLikes().map(function(id){ const a = inspActs().find(function(x){ return x.id===id; }); return a ? a.label : ''; }).filter(Boolean);
+  return base.apply(this, arguments)+(l.length ? '\nIdeas he wants more like: '+l.join(', ')+'.' : '')+(inspWants().length ? '\nIdeas he’s saved to do: '+inspWants().map(function(id){ const a = inspActs().find(function(x){ return x.id===id; }); return a ? a.label : ''; }).filter(Boolean).join(', ')+'.' : ''); }; })(inspAiFacts);
+
+// ---- pick a bubble up and put it where you want it ----
+(function(){
+  let d = null;
+  document.addEventListener('pointerdown', function(e){
+    const b = e.target.closest && e.target.closest('#inspWorld .izb'); if(!b || e.button!==0) return;
+    d = {el:b, id:b.dataset.id, sx:e.clientX, sy:e.clientY, dx0:b._dx || 0, dy0:b._dy || 0, moved:false};
+  }, true);
+  window.addEventListener('pointermove', function(e){
+    if(!d) return;
+    const z = (ui.inspView || {z:1}).z, mx = (e.clientX - d.sx)/z, my = (e.clientY - d.sy)/z;
+    if(!d.moved && Math.hypot(mx, my) < 6) return;
+    if(!d.moved){ d.moved = true; d.el._drag = true; d.el.classList.add('is-dragging'); ui.inspOpenAct = null; }
+    d.x = d.dx0 + mx; d.y = d.dy0 + my;
+    d.el.style.transform = 'translate3d('+d.x.toFixed(1)+'px,'+d.y.toFixed(1)+'px,0) scale(1.08)';
+  });
+  window.addEventListener('pointerup', function(){
+    if(!d) return; const x = d; d = null;
+    if(!x.moved) return;
+    ui._inspDragAt = Date.now();
+    const nx = Math.round((parseFloat(x.el.style.left) || 0) + x.x), ny = Math.round((parseFloat(x.el.style.top) || 0) + x.y);
+    inspPosStore()[x.id] = {x:nx, y:ny}; IW.off[x.id] = 0; delete IW.ret[x.id];
+    x.el.style.left = nx+'px'; x.el.style.top = ny+'px'; x.el._drag = false; x.el.classList.remove('is-dragging');
+    persist('personal'); if(typeof inspChime==='function') inspChime(1);
+    inspRender();
+  });
+})();
+ACTIONS.inspOpenAct = (function(base){ return function(){ if(Date.now() - (ui._inspDragAt||0) < 350) return; return base.apply(this, arguments); }; })(ACTIONS.inspOpenAct);
+
+// ---- words on the sky, behind the bubbles; tap one to keep it ----
+function inspWordsLayer(){ return document.querySelector('#inspWorld .izw-layer'); }
+inspWords = function(){
+  if(!inspOpenNow() || ui.inspBreath) return;
+  const layer = inspWordsLayer(); if(!layer || layer.querySelector('.izwd:not(.is-gone)')) return;
+  const lines = inspWhisperLines(); if(!lines.length) return;
+  let t = lines[Math.floor(Math.random()*lines.length)]; if(t===ui._inspLastWhisper) t = lines[(lines.indexOf(t) + 1) % lines.length]; ui._inspLastWhisper = t;
+  t = String(t).replace(/^["“]|["”]$/g, '').replace(/\s+[—-]\s+[A-Z][\w .]+$/, '');
+  let slot = Math.floor(Math.random()*INSP_WORD_SLOTS.length); if(slot===ui._inspWordSlot) slot = (slot + 1) % INSP_WORD_SLOTS.length; ui._inspWordSlot = slot;
+  const v = ui.inspView || inspHome(), W = window.innerWidth, H = window.innerHeight;
+  const sx = INSP_WORD_SLOTS[slot][0]/100*W, sy = INSP_WORD_SLOTS[slot][1]/100*H;
+  const w = document.createElement('div'); w.className = 'izwd'; w.dataset.text = t;
+  w.style.left = Math.round((sx - W/2 - v.x)/v.z)+'px'; w.style.top = Math.round((sy - H/2 - v.y)/v.z)+'px';
+  t.split(/\s+/).forEach(function(word, i){ const s = document.createElement('span'); s.textContent = word; s.style.animationDelay = (0.35 + i*0.09).toFixed(2)+'s'; w.appendChild(s); w.appendChild(document.createTextNode(' ')); });
+  const k = document.createElement('button'); k.className = 'izwd-keep'; k.setAttribute('data-action', 'inspKeepWords'); k.innerHTML = '&#9825; Keep'; w.appendChild(k);
+  layer.appendChild(w);
+  setTimeout(function(){ w.classList.add('is-gone'); }, 11000);
+  setTimeout(function(){ if(w.parentNode) w.parentNode.removeChild(w); }, 13200);
+};
+function journalTypeEnsure(id, emoji, label, color){
+  const j = state.journal; if(!Array.isArray(j.types) || !j.types.length) j.types = defaultJournalTypes();
+  if(!j.types.some(function(x){ return x.id===id; })) j.types.push({id:id, emoji:emoji, label:label, color:color});
+}
+function inspKeepText(text, by){
+  journalTypeEnsure('inspiration', '✨', 'Inspiration', '#c9b6ff');
+  state.journal.entries.push({id:uid(), date:todayStr(), timestamp:Date.now(), text:String(text||'')+(by ? '\n\n'+by : ''), title:'✨ Inspiration', type:'freeform', mood:'inspiration', pinned:false, photos:[]});
+  persist('journal');
+}
+ACTIONS.inspKeepWords = function(el){
+  const w = el.closest('.izwd'); if(!w || w.classList.contains('is-kept')) return;
+  inspKeepText(w.dataset.text); w.classList.add('is-kept'); el.innerHTML = '&#9829; Kept';
+  if(typeof inspChime==='function') inspChime(2);
+};
+// the Words cards keep too
+inspSandHtml = (function(base){ return function(){ return base.apply(this, arguments).replace(/<button class="izq-x" data-action="inspQuoteDel" data-id="([^"]+)"/g, '<button class="izq-keep" data-action="inspKeepQuote" data-id="$1" title="Keep it in your journal">&#9825;</button><button class="izq-x" data-action="inspQuoteDel" data-id="$1"'); }; })(inspSandHtml);
+ACTIONS.inspKeepQuote = function(el, e, id){ const q = inspSandStore().quotes.find(function(x){ return x.id===id; }); if(!q) return; inspKeepText(q.q, q.by ? '— '+q.by : ''); el.innerHTML = '&#9829;'; el.classList.add('is-on'); if(typeof inspChime==='function') inspChime(2); };
+// ============ OP NEVER GETS STUCK (round 29) ============
+// Op used to go quiet for good after some lines (one said on Inspiration, then you left): a voice that
+// never reported it had finished, a mic that never closed, or a reply that never came left him "busy",
+// and every check-in, nudge and tap waits until he isn't. Now nothing holds him longer than it should:
+// a line that runs well past its length is let go (its words stay in the bubble), and so is a mic or a
+// reply that hangs. And tapping his light (or closing the bubble) only cuts what he's saying now; it
+// doesn't stop the mic opening on his next question.
+const OPS = {busySince:0, listenSince:0, lastT:-1, stillSince:0};
+opSay = (function(base){
+  return function(text, opts){
+    opts = opts || {};
+    OV.sayAt = Date.now(); OV.sayText = speakable(text);
+    // (a new line from Op is a new moment: an earlier "stop" was for the last one)
+    if(opts.cap==='opBubText' && OV.userCut && Date.now() - (OV.userCutAt||0) > 1500) OV.userCut = false;
+    return base(text, opts);
+  };
+})(opSay);
+// when you cut Op off, it's remembered as *when*
+ACTIONS.opLightTap = (function(base){ return function(){ const r = base.apply(this, arguments); if(OV.userCut) OV.userCutAt = Date.now(); return r; }; })(ACTIONS.opLightTap);
+ACTIONS.opBubClose = (function(base){ return function(){ const r = base.apply(this, arguments); OV.userCutAt = Date.now(); return r; }; })(ACTIONS.opBubClose);
+// whenever Op starts talking into the bubble, the bubble is up
+opStarted = (function(base){ return function(tok, opts){ const r = base.apply(this, arguments); if(OV.cap==='opBubText' && typeof opBubShow==='function') opBubShow(); return r; }; })(opStarted);
+function opLineLimit(){ const n = String(OV.sayText||'').split(/\s+/).length; return Math.max(20000, n*700/Math.max(0.5, opSpeed()) + 15000); }
+function opSteadyTick(){
+  const now = Date.now();
+  // a line that should have ended a while ago
+  if((OV.speaking || OV.pending) && OV.sayAt && now - OV.sayAt > opLineLimit()){
+    const a = OV.audio, moving = a && !a.paused && !a.ended && a.currentTime!==OPS.lastT;
+    OPS.lastT = a ? a.currentTime : -1;
+    if(!moving){
+      const said = OV.sayText;
+      try{ if(a) a.pause(); }catch(e){}
+      try{ speechSynthesis.cancel(); }catch(e){}
+      OV.audio = null; OV.speaking = false; OV.pending = false; OV.token++; OV.lastEnd = now; OV.sayAt = 0;
+      document.body.classList.remove('op-speaking');
+      if(typeof opDuck==='function') opDuck(false);
+      if(said && OV.cap==='opBubText'){ const el = document.getElementById('opBubText'); if(el && !el.textContent) capSet(el, said); if(typeof opBubHideLater==='function') opBubHideLater(); }
+    }
+  }
+  // a mic that's been open far longer than anyone talks
+  if(AI.listening){ if(!OPS.listenSince) OPS.listenSince = now; else if(now - OPS.listenSince > 80000){ OPS.listenSince = 0; if(AI.cancelListen) AI.cancelListen(); else { AI.listening = false; AI.sendNow = null; } if(typeof aiUiRefresh==='function') aiUiRefresh(); } }
+  else OPS.listenSince = 0;
+  // a reply that never came back (each call gives up at 55s; five rounds of tools at most)
+  if(AI.busy){ if(!OPS.busySince) OPS.busySince = now; else if(now - OPS.busySince > 300000){ OPS.busySince = 0; AI.busy = false; if(typeof aiUiRefresh==='function') aiUiRefresh(); } }
+  else OPS.busySince = 0;
+}
+setInterval(function(){ try{ opSteadyTick(); }catch(e){} }, 2000);
+// leaving Inspiration (or any full-screen page) puts a bubble that's up back where it belongs
+closeInspire = (function(base){ return function(){ const r = base.apply(this, arguments); const b = document.getElementById('opBub'); if(b && typeof opBubPlace==='function') opBubPlace(b); return r; }; })(closeInspire);
+// ============ OP'S CHAT BOX (round 29) ============
+// The bubble is a proper little chat now. His words keep a steady box (no more the panel jumping and
+// re-drawing as he talks: only the new words pop in). What you say stays on screen in its own line, with
+// the same pop-in, instead of vanishing the moment he starts thinking. A speaker turns his voice off
+// (he answers in text), and the clock opens every conversation you've had with him, by day.
+// Type to him and it's a normal chat: any question, any topic, answered in text and as long as it needs.
+
+// ---- the words: keep what didn't change, pop in only what's new ----
+capSet = (function(base){
+  return function(el, txt){
+    if(!el) return;
+    txt = txt==null ? '' : String(txt);
+    const was = el.textContent;
+    if(was===txt) return;
+    if(!txt || !was || txt.indexOf(was)===0) return base(el, txt);
+    const nodes = Array.prototype.slice.call(el.childNodes);
+    const clean = nodes.every(function(n){ return n.nodeType===3 ? !/\S/.test(n.nodeValue) : (n.nodeType===1 && n.classList.contains('cw')); });
+    if(clean){
+      const toks = txt.split(/(\s+)/).filter(Boolean);
+      let i = 0; while(i < nodes.length && i < toks.length && nodes[i].textContent===toks[i]) i++;
+      if(i > 0){
+        for(let j = nodes.length - 1; j >= i; j--) el.removeChild(nodes[j]);
+        capWords(el, toks.slice(i).join(''), toks.length - i > 6);
+        return;
+      }
+    }
+    return base(el, txt);
+  };
+})(capSet);
+
+// ---- the log: every conversation, kept (your words and his) ----
+function opChat(){ const f = state.focus; if(!Array.isArray(f.opChat)) f.opChat = []; return f.opChat; }
+const OPC_SKIP = /^(…|\.\.\.|Listening…|One moment…|One moment: getting the scores…|Didn’t catch that\.)$/;
+function opChatLog(r, t){
+  t = String(t||'').replace(/\s+/g, ' ').trim(); if(!t || t.length < 2 || OPC_SKIP.test(t) || /^“/.test(t)) return;
+  const L = opChat();
+  // (the same line twice in a row, as shown and then as spoken, is one line)
+  const same = function(e){ return e.r===r && speakable(e.t)===speakable(t); };
+  if(L.length && same(L[L.length - 1])) return;
+  L.push({r:r, t:t.slice(0, 4000), at:Date.now()});
+  if(L.length > 600) L.splice(0, L.length - 600);
+  persist('focus');
+}
+function opMuted(){ return !!(state.focus && state.focus.opMuted); }
+// typing to him (in the last few minutes) means a chat in text
+function opTextMode(){ return opMuted() || !!(AI.typedAt && Date.now() - AI.typedAt < 180000); }
+
+// ---- his voice: off when muted, and quiet for the replies to what you typed ----
+opVoiceOn = (function(base){ return function(){ if(opMuted()) return false; if(AI.busy && AI.typedAt && Date.now() - AI.typedAt < 180000) return false; return base.apply(this, arguments); }; })(opVoiceOn);
+opSay = (function(base){
+  return function(text, opts){
+    opts = opts || {};
+    // (a new line from Op that isn't an answer: your last words step aside)
+    if(opts.cap==='opBubText' && !AI.busy && !AI.listening) opMeSet('');
+    // muted: the bubble still gets the words
+    if(opts.cap==='opBubText' && !opVoiceOn()){ OV.cap = 'opBubText'; opCaption(text); }
+    return base(text, opts);
+  };
+})(opSay);
+aiSystem = (function(base){
+  return function(){
+    const s = base.apply(this, arguments);
+    if(opTextMode() && Array.isArray(s)) s.push({type:'text', text:'Right now he is typing to you in the chat box and your reply shows as text (it is not spoken). Talk like a normal chat: any topic is fine (general questions, ideas, explanations, advice, writing), answered as fully as the question needs. Still plain text with no markdown symbols; short paragraphs are fine.'});
+    return s;
+  };
+})(aiSystem);
+// your words: shown and kept
+aiAsk = (function(base){
+  return function(text, cap){
+    const t = String(text||'').trim();
+    if(t && !AI.busy){ opMeSet(t); opChatLog('me', t); }
+    const last0 = AI.history[AI.history.length - 1];
+    return Promise.resolve(base.apply(this, arguments)).then(function(r){
+      const last = AI.history[AI.history.length - 1];
+      if(last && last!==last0 && last.role==='assistant') opChatLog('op', last.content);
+      opChatDraw();
+      return r;
+    });
+  };
+})(aiAsk);
+// talking (not typing) puts him back on voice
+aiListen = (function(base){ return function(){ AI.typedAt = 0; return base.apply(this, arguments); }; })(aiListen);
+aiAutoListen = (function(base){ return function(){ if(opTextMode()) return; return base.apply(this, arguments); }; })(aiAutoListen);
+document.addEventListener('keydown', function(e){
+  const t = e.target; if(!t || !t.classList || !t.classList.contains('op-type') || e.key!=='Enter' || !t.value.trim()) return;
+  AI.typedAt = Date.now();
+  if(t.id==='opBubInput') opChatOpen(true);
+}, true);
+// starting to type while the mic is open: the mic steps aside
+document.addEventListener('focusin', function(e){ if(e.target && e.target.id==='opBubInput' && AI.listening && AI.cancelListen) AI.cancelListen(); });
+
+// ---- the bubble: your line, his line, the log, the buttons ----
+function opMeEl(){ return document.getElementById('opBubMe'); }
+function opMeSet(t, wait){
+  const el = opMeEl(); if(!el) return;
+  el.classList.toggle('is-wait', !!wait);
+  if(wait){ el.textContent = t; return; }
+  capSet(el, t || '');
+  el.scrollTop = el.scrollHeight;
+}
+function opBubIcons(){
+  const b = document.getElementById('opBub'); if(!b) return;
+  const m = b.querySelector('.op-bub-mute'), l = b.querySelector('.op-bub-logb');
+  if(m){ m.innerHTML = opMuted() ? '&#128263;' : '&#128264;'; m.classList.toggle('is-on', opMuted()); m.setAttribute('aria-label', opMuted() ? 'Turn Op’s voice on' : 'Mute Op'); }
+  if(l){ l.classList.toggle('is-on', b.classList.contains('is-log')); }
+}
+opBubShow = (function(base){
+  return function(){
+    const pre = document.getElementById('opBub'), wasIn = !!(pre && pre.classList.contains('is-in'));
+    const b = base.apply(this, arguments);
+    if(b && !b.querySelector('.op-bub-mute')){
+      const x = b.querySelector('.op-bub-x');
+      const add = document.createElement('span'); add.className = 'op-bub-ics';
+      add.innerHTML = '<button class="op-bub-ic op-bub-logb" data-action="opChatToggle" aria-label="Your chats with Op">&#128338;</button><button class="op-bub-ic op-bub-mute" data-action="opMuteToggle" aria-label="Mute Op"></button>';
+      x.parentNode.insertBefore(add, x);
+      const t = document.getElementById('opBubText');
+      const log = document.createElement('div'); log.className = 'op-bub-log'; log.id = 'opBubLog'; t.parentNode.insertBefore(log, t);
+      const me = document.createElement('div'); me.className = 'op-bub-me'; me.id = 'opBubMe'; t.parentNode.insertBefore(me, t);
+      opBubIcons();
+    }
+    // (a fresh bubble starts clean, unless you're mid-conversation)
+    if(!wasIn && !AI.listening && !AI.busy) opMeSet('');
+    return b;
+  };
+})(opBubShow);
+// Op listening / hearing you: it goes in your line (his question stays put)
+opCaption = (function(base){
+  return function(txt){
+    if(OV.cap==='opBubText' && opMeEl()){
+      if(txt==='Listening…'){ opBubShow(); opMeSet('Listening…', true); if(typeof opBubHideLater==='function') opBubHideLater(); return; }
+      if(/^“[\s\S]*”$/.test(String(txt||'')) && AI.listening){ opBubShow(); opMeSet(String(txt).slice(1, -1)); if(typeof opBubHideLater==='function') opBubHideLater(); return; }
+    }
+    return base.apply(this, arguments);
+  };
+})(opCaption);
+// (an open chat doesn't slip away on its own)
+opBubHideLater = (function(base){ return function(){ const b = document.getElementById('opBub'); if(b && b.classList.contains('is-log')){ clearTimeout(opBubHideLater._t); return; } return base.apply(this, arguments); }; })(opBubHideLater);
+// tapping his light while he's muted opens the chat to type
+ACTIONS.opLightTap = (function(base){
+  return function(){
+    if(opMuted() && !AI.listening && !(OV.speaking || OV.pending)){ OV.cap = 'opBubText'; opBubShow(); opChatOpen(true); const i = document.getElementById('opBubInput'); if(i) setTimeout(function(){ i.focus(); }, 60); return; }
+    return base.apply(this, arguments);
+  };
+})(ACTIONS.opLightTap);
+ACTIONS.opMuteToggle = function(){
+  state.focus.opMuted = !opMuted(); persist('focus');
+  if(opMuted() && (OV.speaking || OV.pending)){ const t = OV.sayText; opStop(); if(t){ OV.cap = 'opBubText'; opCaption(t); } }
+  opBubIcons();
+  showToast(opMuted() ? 'Op’s voice is off. He answers in text.' : 'Op’s voice is back on.');
+};
+function opChatOpen(on){
+  const b = document.getElementById('opBub'); if(!b) return;
+  b.classList.toggle('is-log', !!on);
+  OPCD.sig = ''; opChatDraw();
+  opBubIcons();
+  if(typeof opBubPlace==='function') opBubPlace(b);
+  if(!on && typeof opBubHideLater==='function') opBubHideLater();
+}
+ACTIONS.opChatToggle = function(){ const b = document.getElementById('opBub'); opChatOpen(!(b && b.classList.contains('is-log'))); };
+
+// ---- the log, drawn ----
+const OPCD = {sig:'', n:0};
+function opChatDay(ts){
+  const d = new Date(ts), k = todayStr(d), t = todayStr();
+  if(k===t) return 'Today';
+  if(k===addDays(t, -1)) return 'Yesterday';
+  return d.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'});
+}
+function opChatDraw(){
+  const b = document.getElementById('opBub'), box = document.getElementById('opBubLog');
+  if(!b || !box) return;
+  const live = !!(OV.speaking || OV.pending);
+  b.classList.toggle('is-live', live);
+  if(!b.classList.contains('is-log')) return;
+  const L = opChat(), think = AI.busy && !live;
+  const sig = L.length+'|'+(L.length ? L[L.length-1].at : 0)+'|'+think;
+  if(sig===OPCD.sig) return;
+  const grew = L.length > OPCD.n && OPCD.sig!=='';
+  OPCD.sig = sig; OPCD.n = L.length;
+  const near = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
+  let h = '', day = '';
+  L.forEach(function(e, i){
+    const d = opChatDay(e.at); if(d!==day){ day = d; h += '<div class="ocl-day">'+d+'</div>'; }
+    h += '<div class="ocl-m ocl-'+e.r+(grew && i===L.length-1 ? ' is-new' : '')+'">'+escapeHtml(e.t)+'</div>';
+  });
+  if(think) h += '<div class="ocl-m ocl-op ocl-typing"><i></i><i></i><i></i></div>';
+  box.innerHTML = h || '<div class="ocl-empty">Say anything, or type it below.</div>';
+  if(near || grew || !OPCD.drawn){ box.scrollTop = box.scrollHeight; OPCD.drawn = true; }
+}
+// his lines that weren't answers (check-ins, nudges, taps) go in the log once they've settled
+const OPCS = {txt:'', since:0, logged:''};
+setInterval(function(){
+  try{
+    const el = document.getElementById('opBubText'), t = el ? el.textContent.trim() : '';
+    if(t!==OPCS.txt){ OPCS.txt = t; OPCS.since = Date.now(); }
+    else if(t && t!==OPCS.logged && !OV.speaking && !OV.pending && !AI.busy && Date.now() - OPCS.since > 900){ OPCS.logged = t; opChatLog('op', t); }
+    opChatDraw();
+  }catch(e){}
+}, 300);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

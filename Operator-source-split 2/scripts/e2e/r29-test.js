@@ -18,7 +18,7 @@ function helperRoute(calls){
     if(u.includes('/ai/models')) return r.fulfill({status:200, headers:CORS, body:JSON.stringify({data:[{id:'claude-haiku-5-5'}]})});
     if(u.includes('/ai/chat')){
       const bm = /[?&]b=([0-9a-f]+)/.exec(u), body = (r.request().postData() || '')+(bm ? Buffer.from(bm[1], 'hex').toString() : '');
-      const text = /Inspiration page/.test(body) ? JSON.stringify({ideas:[{e:'🌊', label:'Sunset at the pier', why:'You said the water resets you.', cat:'move'}, {e:'📞', label:'Call your mom', why:'Ten minutes. She’s why.', cat:'people'}], whispers:['The agency that runs without you is getting closer.']}) : 'Noted.';
+      const text = /filling my Inspiration page/.test(body) ? JSON.stringify({ideas:[{e:'🌊', label:'Sunset at the pier', why:'You said the water resets you.', cat:'move'}, {e:'📞', label:'Call your mom', why:'Ten minutes. She’s why.', cat:'people'}], whispers:['The agency that runs without you is getting closer.']}) : 'Noted.';
       return r.fulfill({status:200, headers:CORS, body:JSON.stringify({stop_reason:'end_turn', content:[{type:'text', text:text}]})});
     }
     if(u.includes('/sports')){
@@ -207,6 +207,45 @@ async function ctxPage(b, seed, opts){
     await p.clock.runFor(84000); await p.waitForTimeout(100);
     check('a mic that never closes is let go', await E("AI.listening===false"));
     check('no page errors (Inspiration)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
+  // ---- Op's chat box: steady size, your words stay, mute, the log, typing is a chat ----
+  {
+    const p = await ctxPage(b, base);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await E("AI.hasKey = true; OV.cap = 'opBubText'; opBubShow(); opCaption('Hi.')"); await p.waitForTimeout(400);
+    check('the bubble has a mute and a chats button, and a line for you', !!(await p.$('#opBub .op-bub-mute')) && !!(await p.$('#opBub .op-bub-logb')) && !!(await p.$('#opBub #opBubMe')));
+    const h1 = await E("document.getElementById('opBubText').getBoundingClientRect().height");
+    await E("opCaption('Alright boss, here is a much longer line that runs onto a second and maybe a third line in the box.')"); await p.waitForTimeout(200);
+    const h2 = await E("document.getElementById('opBubText').getBoundingClientRect().height");
+    check('his text box keeps one size as the words come (no morphing)', Math.abs(h1 - h2) < 1 && h1 > 30, [h1, h2]);
+    await E("opCaption('Hey Andre how are you'); window.__w = document.querySelectorAll('#opBubText .cw')[1]; opCaption('Hey Andre how was it')");
+    check('…a changed word swaps in; the rest stay put (not redrawn)', await E("document.querySelectorAll('#opBubText .cw')[1]===window.__w && document.getElementById('opBubText').textContent==='Hey Andre how was it'"));
+    await E("opCaption('What’s up?'); AI.listening = true; opCaption('Listening…')");
+    check('listening: his question stays, “Listening…” is in your line', await E("document.getElementById('opBubText').textContent==='What’s up?' && /Listening/.test(document.getElementById('opBubMe').textContent)"));
+    await E("opCaption('“so I was”')"); await E("opCaption('“so I was thinking”')");
+    check('…what you say shows in your line, new words popping in', await E("document.getElementById('opBubMe').textContent==='so I was thinking' && document.querySelectorAll('#opBubMe .cw').length===4"));
+    await E("AI.listening = false; aiAsk('so I was thinking about the trip', 'opBubText')"); await p.waitForTimeout(1500);
+    check('…and it stays there while he answers', await E("document.getElementById('opBubMe').textContent==='so I was thinking about the trip'") && /Noted/.test(await p.textContent('#opBubText')), [await E("document.getElementById('opBubMe').textContent"), await p.textContent('#opBubText')]);
+    check('both sides are kept in the chat log', await E("opChat().slice(-2).map(e => e.r).join()==='me,op'"));
+    // typing = a chat in text
+    p.calls.length = 0;
+    await p.fill('#opBubInput', 'what is the capital of Portugal'); await p.press('#opBubInput', 'Enter'); await p.waitForTimeout(1500);
+    const body = p.calls.filter(u => u.includes('/ai/chat')).map(u => { const m = /[?&]b=([0-9a-f]+)/.exec(u); return m ? Buffer.from(m[1], 'hex').toString() : ''; }).join(' ');
+    check('typing opens the chat, with your history', await E("document.getElementById('opBub').classList.contains('is-log')") && (await p.$$('#opBubLog .ocl-me')).length >= 2 && (await p.$$('#opBubLog .ocl-op')).length >= 2, await E("JSON.stringify(opChat())"));
+    check('…and he answers like a normal chat (any topic, in text, room to answer fully)', /typing to you in the chat box/.test(body) && /"max_tokens":1400/.test(body) && await E("opTextMode() && !opVoiceOn()"));
+    check('…the log is grouped by day', /Today/.test(await p.textContent('#opBubLog .ocl-day')));
+    await p.click('#opBub .op-bub-logb'); await p.waitForTimeout(200);
+    check('the clock closes the chat again', !(await E("document.getElementById('opBub').classList.contains('is-log')")));
+    await p.click('#opBub .op-bub-mute'); await p.waitForTimeout(200);
+    check('mute: his voice is off (saved), and he says so in text', await E("state.focus.opMuted===true && !opVoiceOn()") && /voice is off/.test(await p.textContent('body')));
+    await E("AI.typedAt = 0; opSay('Still on the reel?', {cap:'opBubText'})"); await p.waitForTimeout(300);
+    check('…muted, his lines still show in the bubble', /Still on the reel\?/.test(await p.textContent('#opBubText')));
+    await E("document.getElementById('opBub').classList.remove('is-in'); ACTIONS.opLightTap()"); await p.waitForTimeout(300);
+    check('…and tapping his light opens the chat to type (no mic)', await E("document.getElementById('opBub').classList.contains('is-log') && document.activeElement.id==='opBubInput' && !AI.listening"));
+    check('Good morning’s words run a beat ahead of the voice', await E("OV.cap = 'brVoice'; opCapLead()")===3);
+    check('no page errors (chat)', p.errors.length===0, p.errors);
     await p.context().close();
   }
 

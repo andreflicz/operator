@@ -228,7 +228,7 @@ const newsRoute = (asked, extra) => async r => {
     check('it answers in the bubble — the page doesn’t move', /Start with the reel/.test(await p.textContent('#opBubText')));
     // (round 20: the cheapest model — Claude Haiku 5.5 — with thinking off and low effort for short spoken answers)
     check('the cheapest model is used: Claude Haiku 5.5 (from the API’s list)', chatBody && chatBody.model==='claude-haiku-5-5', chatBody && chatBody.model);
-    check('…with thinking off and low effort (a spoken one-liner)', chatBody && chatBody.thinking && chatBody.thinking.type==='disabled' && chatBody.output_config && chatBody.output_config.effort==='low' && chatBody.max_tokens===700);
+    check('…with thinking off and low effort (a spoken one-liner)', chatBody && chatBody.thinking && chatBody.thinking.type==='disabled' && chatBody.output_config && chatBody.output_config.effort==='low' && chatBody.max_tokens===1400);   // (round 29: a typed message is a chat, with room to answer fully)
     const sysTxt = chatBody ? JSON.stringify(chatBody.system) : '';   // (round 21: Op's personality, then the background)
     check('it knows your day (plan, level) and speaks in short spoken sentences', chatBody && /Edit JJS reel/.test(sysTxt) && /level 0/.test(sysTxt) && /spoken aloud/.test(sysTxt) && chatBody.messages.slice(-1)[0].content==='What should I start with?');
     await p.fill('#opBubInput', 'And after that?'); await p.press('#opBubInput', 'Enter'); await p.waitForTimeout(900);

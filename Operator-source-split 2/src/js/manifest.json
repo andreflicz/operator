@@ -105,6 +105,7 @@
   "32z13-r29.js",
   "32z14-insp-r29.js",
   "32z15-op-steady.js",
+  "32z16-op-chat.js",
   "33-event-delegation.js",
   "33b-overlay-dismiss.js",
   "33c-context-menu.js",

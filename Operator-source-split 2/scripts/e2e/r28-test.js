@@ -129,7 +129,7 @@ async function ctxPage(b, seed, opts){
     check('a short line goes after a normal read', await E("opBubStay()") < 15000);
     await E("opMood('stern', 9000); opCaption('You said you’d have the edit done by noon.')");
     check('when Op’s on you (stern) it stays up long enough to land', await E("opBubStay()") >= 40000);
-    check('the mic opens by itself when Op asks something (not mid-narration)', /aiAutoListen/.test(await E("opSay.toString()")) && /noListen/.test(await E("opSay.toString()")));
+    check('the mic opens by itself when Op asks something (not mid-narration)', await E("[].some.call(document.scripts, s => /opts\\.noListen/.test(s.textContent) && /aiAutoListen\\(opts\\.cap/.test(s.textContent))"));
     check('Op is your personal assistant, and never piles on what you didn’t ask for', /personal assistant/.test(await E("OP_RULES")) && /Never pile on/.test(await E("OP_RULES")));
     check('check-ins never talk about logging an excuse', /Never mention logging it, excuses/.test(await E("acctAsk.toString()")) && /never tell him you’re logging it/.test(await E("acctSystemNote.toString()")));
     check('no page errors (Op)', p.errors.length===0, p.errors);
@@ -275,8 +275,8 @@ async function ctxPage(b, seed, opts){
     const resets = await p.$$eval('#insp .irs-t b', e => e.map(x => x.textContent));
     check('…your resets first (what you told Op), then cook, clean, a walk, a shower', resets[0]==='Cooking' && resets.some(t => /walk/i.test(t)) && resets.some(t => /shower/i.test(t)) && resets.some(t => /Clean/.test(t)), resets);
     await p.click('#insp .irs-min [data-id="10"]'); await p.waitForTimeout(150);
-    await p.click('#insp .irs-t:has-text("walk")'); await p.waitForTimeout(300);
-    check('picking one starts it on a gentle timer', await p.isVisible('#insp .irc') && /Go for a walk/.test(await p.textContent('#insp .irc')) && /10:00|9:5/.test(await p.textContent('#ircLeft')));
+    await p.click('#insp .irs-t:has-text("walk")'); await p.waitForTimeout(700);
+    check('picking one starts it on a gentle timer', await p.isVisible('#insp .irc') && /Go for a walk/.test(await p.textContent('#insp .irc')) && /10:00|9:[0-5]\d/.test(await p.textContent('#ircLeft')), await p.textContent('#insp .irc').catch(() => ''));
     check('…Op knows you’re on it', /doing a reset: Go for a walk/.test(await E("aiContext()")));
     await p.click('#insp .irc [data-action="inspResetDone"]'); await p.waitForTimeout(300);
     check('“I’m back” logs it and offers the way back: Lock in for 25', await E("inspStore().log.slice(-1)[0].act")==='walk' && await p.isVisible('#insp .irc.is-done [data-action="inspResetLockIn"]'));

@@ -369,7 +369,7 @@ async function aiAsk(text, cap){
     const msgs = AI.history.concat([{role:'user', content:text}]);
     let reply = '';
     for(let round = 0; round < 5; round++){
-      const res = await aiCall({model:model, max_tokens:700, system:aiSystem(), tools:OP_TOOLS, messages:msgs});
+      const res = await aiCall({model:model, max_tokens:(typeof opTextMode==='function' && opTextMode()) ? 1400 : 700, system:aiSystem(), tools:OP_TOOLS, messages:msgs});
       if(!res.ok){ opCaption(aiErrLine(res)); return; }
       const j = res.j;
       if(j.stop_reason==='refusal'){ reply = 'I’ll have to sit that one out.'; break; }

@@ -98,6 +98,8 @@ function opCaption(txt){
 }
 // ---- the Operator's bubble: what it says (and your reply box) floats over the page, bottom centre,
 // so nothing on the page ever moves; it slips away a few seconds after it's done ----
+// (round 29) the words show a beat ahead of the voice, so they never trail it (a little more on Good morning)
+function opCapLead(){ return OV.cap==='opBubText' ? 2 : 3; }
 function opBubShow(){
   let b = document.getElementById('opBub');
   if(!b){
@@ -228,7 +230,7 @@ function opSayAudio(said, opts, tok, resolve){
         capT = setInterval(function(){
           if(tok!==OV.token) return;
           const d = a.duration && isFinite(a.duration) ? a.duration : words.length*0.36;
-          opCaption(words.slice(0, Math.min(words.length, Math.floor(a.currentTime/d*words.length)+1)).join(' '));
+          opCaption(words.slice(0, Math.min(words.length, Math.floor(a.currentTime/d*words.length)+opCapLead())).join(' '));
         }, 100);
       });
       a.addEventListener('ended', function(){ finish(true); });
@@ -248,7 +250,7 @@ function opSayBrowser(said, opts, tok, resolve){
   const startTimer = setTimeout(function(){ if(OV.pending && tok===OV.token){ OV.pending = false; OV.misses = (OV.misses||0) + 1; if(OV.misses >= 2) OV.broken = true; try{ speechSynthesis.cancel(); }catch(e){} opCaption(said); resolve(false); } }, 6000);
   u.onstart = function(){ clearTimeout(startTimer); OV.misses = 0; t0 = Date.now(); opStarted(tok, opts);
     // some voices don't report word boundaries: follow along by time instead
-    est = setInterval(function(){ if(gotBoundary || tok!==OV.token) return; const words = said.split(' '), n = Math.min(words.length, Math.floor((Date.now()-t0)/(330/opSpeed()))+1); opCaption(words.slice(0, n).join(' ')); }, 120); };
+    est = setInterval(function(){ if(gotBoundary || tok!==OV.token) return; const words = said.split(' '), n = Math.min(words.length, Math.floor((Date.now()-t0)/(330/opSpeed()))+opCapLead()); opCaption(words.slice(0, n).join(' ')); }, 120); };
   u.onboundary = function(e){ if(tok!==OV.token) return; gotBoundary = true; const end = said.indexOf(' ', e.charIndex + (e.charLength||1)); opCaption(end<0 ? said : said.slice(0, end)); };
   const done = function(ok){ clearTimeout(startTimer); clearInterval(est); opFinished(tok, said); resolve(ok); };
   u.onend = function(){ done(true); };

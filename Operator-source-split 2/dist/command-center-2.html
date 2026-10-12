@@ -5623,6 +5623,44 @@ html[data-op-mood="stern"] .op-bub-t .cw:last-child, html[data-op-mood="concern"
 .insp-undo.is-out{ opacity:0; transform:translate(-50%, 10px); transition:opacity .35s, transform .35s; }
 .izq-keep{ position:absolute; top:8px; right:34px; width:22px; height:22px; border-radius:50%; border:none; background:transparent; color:rgba(255,255,255,.45); cursor:pointer; font-size:13px; }
 .izq-keep:hover, .izq-keep.is-on{ color:#ffb6dd; }
+
+/* ---- round 29: Op's chat box (steady size, your line, the log, mute) ---- */
+.cw{ animation-duration:.4s; }
+.br-voice .cw{ animation-duration:.28s; }
+.op-bub-t{ height:4.5em !important; max-height:4.5em !important; scroll-behavior:auto !important; }
+.op-bub-t:empty{ display:block !important; }
+.op-bub-t.cap-new{ animation:none !important; }
+.op-bub-ics{ margin-left:auto; display:flex; gap:2px; align-items:center; }
+.op-bub-ics + .op-bub-x{ margin-left:0 !important; }
+.op-bub-ic{ width:24px; height:24px; border-radius:8px; border:0; background:transparent; color:inherit; opacity:.5; cursor:pointer; font-size:12.5px; line-height:1; display:grid; place-items:center; padding:0; transition:opacity .2s, background .2s; letter-spacing:0; }
+.op-bub-ic:hover{ opacity:1; background:rgba(0,0,0,.06); }
+.op-bub-ic.is-on{ opacity:1; background:rgba(0,0,0,.07); }
+.op-bub-me{ margin:6px 0 0 18%; text-align:right; font-size:12.5px; line-height:1.45; color:rgba(21,23,29,.6); max-height:2.9em; overflow:hidden; }
+.op-bub-me:empty{ display:none; }
+.op-bub-me::before{ content:'You  '; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; font-weight:700; opacity:.55; }
+.op-bub-me.is-wait{ font-style:italic; animation:opMeWait 1.6s ease-in-out infinite; }
+.op-bub-me.is-wait::before{ content:''; }
+@keyframes opMeWait{ 0%,100%{ opacity:.45; } 50%{ opacity:.9; } }
+.op-bub-me .cw{ animation-duration:.35s; }
+.op-bub-log{ display:none; }
+.op-bub.is-log{ width:min(440px, calc(100vw - 32px)) !important; }
+.op-bub.is-log .op-bub-log{ display:flex; flex-direction:column; gap:6px; height:min(46vh, 380px); overflow-y:auto; margin:8px -6px 8px; padding:4px 6px; overscroll-behavior:contain; }
+.op-bub-log > :first-child{ margin-top:auto; }
+.op-bub-log::-webkit-scrollbar{ width:4px; } .op-bub-log::-webkit-scrollbar-thumb{ background:rgba(0,0,0,.15); border-radius:4px; }
+.op-bub.is-log .op-bub-me{ display:none; }
+.op-bub.is-log:not(.is-live) .op-bub-t{ display:none !important; }
+.op-bub.is-log .op-bub-t{ height:auto !important; max-height:5.2em !important; }
+.ocl-day{ align-self:center; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; font-weight:700; color:rgba(21,23,29,.4); margin:8px 0 2px; }
+.ocl-m{ max-width:86%; padding:7px 11px; border-radius:14px; font-size:13px; line-height:1.45; white-space:pre-wrap; overflow-wrap:anywhere; color:#15171d; }
+.ocl-me{ align-self:flex-end; background:rgba(21,23,29,.07); border-bottom-right-radius:5px; }
+.ocl-op{ align-self:flex-start; background:color-mix(in srgb, var(--op-c, #7fd0ff) 16%, #fff); border:1px solid color-mix(in srgb, var(--op-c, #7fd0ff) 30%, transparent); border-bottom-left-radius:5px; }
+.ocl-m.is-new{ animation:oclIn .35s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes oclIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+.ocl-typing{ display:flex; gap:4px; padding:10px 12px; }
+.ocl-typing i{ width:5px; height:5px; border-radius:50%; background:rgba(21,23,29,.45); animation:oclDot 1.1s ease-in-out infinite; }
+.ocl-typing i:nth-child(2){ animation-delay:.15s; } .ocl-typing i:nth-child(3){ animation-delay:.3s; }
+@keyframes oclDot{ 0%,100%{ opacity:.3; transform:none; } 50%{ opacity:1; transform:translateY(-2px); } }
+.ocl-empty{ margin:auto; color:rgba(21,23,29,.45); font-size:12.5px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -25100,6 +25138,8 @@ function opCaption(txt){
 }
 // ---- the Operator's bubble: what it says (and your reply box) floats over the page, bottom centre,
 // so nothing on the page ever moves; it slips away a few seconds after it's done ----
+// (round 29) the words show a beat ahead of the voice, so they never trail it (a little more on Good morning)
+function opCapLead(){ return OV.cap==='opBubText' ? 2 : 3; }
 function opBubShow(){
   let b = document.getElementById('opBub');
   if(!b){
@@ -25230,7 +25270,7 @@ function opSayAudio(said, opts, tok, resolve){
         capT = setInterval(function(){
           if(tok!==OV.token) return;
           const d = a.duration && isFinite(a.duration) ? a.duration : words.length*0.36;
-          opCaption(words.slice(0, Math.min(words.length, Math.floor(a.currentTime/d*words.length)+1)).join(' '));
+          opCaption(words.slice(0, Math.min(words.length, Math.floor(a.currentTime/d*words.length)+opCapLead())).join(' '));
         }, 100);
       });
       a.addEventListener('ended', function(){ finish(true); });
@@ -25250,7 +25290,7 @@ function opSayBrowser(said, opts, tok, resolve){
   const startTimer = setTimeout(function(){ if(OV.pending && tok===OV.token){ OV.pending = false; OV.misses = (OV.misses||0) + 1; if(OV.misses >= 2) OV.broken = true; try{ speechSynthesis.cancel(); }catch(e){} opCaption(said); resolve(false); } }, 6000);
   u.onstart = function(){ clearTimeout(startTimer); OV.misses = 0; t0 = Date.now(); opStarted(tok, opts);
     // some voices don't report word boundaries: follow along by time instead
-    est = setInterval(function(){ if(gotBoundary || tok!==OV.token) return; const words = said.split(' '), n = Math.min(words.length, Math.floor((Date.now()-t0)/(330/opSpeed()))+1); opCaption(words.slice(0, n).join(' ')); }, 120); };
+    est = setInterval(function(){ if(gotBoundary || tok!==OV.token) return; const words = said.split(' '), n = Math.min(words.length, Math.floor((Date.now()-t0)/(330/opSpeed()))+opCapLead()); opCaption(words.slice(0, n).join(' ')); }, 120); };
   u.onboundary = function(e){ if(tok!==OV.token) return; gotBoundary = true; const end = said.indexOf(' ', e.charIndex + (e.charLength||1)); opCaption(end<0 ? said : said.slice(0, end)); };
   const done = function(ok){ clearTimeout(startTimer); clearInterval(est); opFinished(tok, said); resolve(ok); };
   u.onend = function(){ done(true); };
@@ -27919,7 +27959,7 @@ async function aiAsk(text, cap){
     const msgs = AI.history.concat([{role:'user', content:text}]);
     let reply = '';
     for(let round = 0; round < 5; round++){
-      const res = await aiCall({model:model, max_tokens:700, system:aiSystem(), tools:OP_TOOLS, messages:msgs});
+      const res = await aiCall({model:model, max_tokens:(typeof opTextMode==='function' && opTextMode()) ? 1400 : 700, system:aiSystem(), tools:OP_TOOLS, messages:msgs});
       if(!res.ok){ opCaption(aiErrLine(res)); return; }
       const j = res.j;
       if(j.stop_reason==='refusal'){ reply = 'I’ll have to sit that one out.'; break; }
@@ -31205,6 +31245,205 @@ function opSteadyTick(){
 setInterval(function(){ try{ opSteadyTick(); }catch(e){} }, 2000);
 // leaving Inspiration (or any full-screen page) puts a bubble that's up back where it belongs
 closeInspire = (function(base){ return function(){ const r = base.apply(this, arguments); const b = document.getElementById('opBub'); if(b && typeof opBubPlace==='function') opBubPlace(b); return r; }; })(closeInspire);
+// ============ OP'S CHAT BOX (round 29) ============
+// The bubble is a proper little chat now. His words keep a steady box (no more the panel jumping and
+// re-drawing as he talks: only the new words pop in). What you say stays on screen in its own line, with
+// the same pop-in, instead of vanishing the moment he starts thinking. A speaker turns his voice off
+// (he answers in text), and the clock opens every conversation you've had with him, by day.
+// Type to him and it's a normal chat: any question, any topic, answered in text and as long as it needs.
+
+// ---- the words: keep what didn't change, pop in only what's new ----
+capSet = (function(base){
+  return function(el, txt){
+    if(!el) return;
+    txt = txt==null ? '' : String(txt);
+    const was = el.textContent;
+    if(was===txt) return;
+    if(!txt || !was || txt.indexOf(was)===0) return base(el, txt);
+    const nodes = Array.prototype.slice.call(el.childNodes);
+    const clean = nodes.every(function(n){ return n.nodeType===3 ? !/\S/.test(n.nodeValue) : (n.nodeType===1 && n.classList.contains('cw')); });
+    if(clean){
+      const toks = txt.split(/(\s+)/).filter(Boolean);
+      let i = 0; while(i < nodes.length && i < toks.length && nodes[i].textContent===toks[i]) i++;
+      if(i > 0){
+        for(let j = nodes.length - 1; j >= i; j--) el.removeChild(nodes[j]);
+        capWords(el, toks.slice(i).join(''), toks.length - i > 6);
+        return;
+      }
+    }
+    return base(el, txt);
+  };
+})(capSet);
+
+// ---- the log: every conversation, kept (your words and his) ----
+function opChat(){ const f = state.focus; if(!Array.isArray(f.opChat)) f.opChat = []; return f.opChat; }
+const OPC_SKIP = /^(…|\.\.\.|Listening…|One moment…|One moment: getting the scores…|Didn’t catch that\.)$/;
+function opChatLog(r, t){
+  t = String(t||'').replace(/\s+/g, ' ').trim(); if(!t || t.length < 2 || OPC_SKIP.test(t) || /^“/.test(t)) return;
+  const L = opChat();
+  // (the same line twice in a row, as shown and then as spoken, is one line)
+  const same = function(e){ return e.r===r && speakable(e.t)===speakable(t); };
+  if(L.length && same(L[L.length - 1])) return;
+  L.push({r:r, t:t.slice(0, 4000), at:Date.now()});
+  if(L.length > 600) L.splice(0, L.length - 600);
+  persist('focus');
+}
+function opMuted(){ return !!(state.focus && state.focus.opMuted); }
+// typing to him (in the last few minutes) means a chat in text
+function opTextMode(){ return opMuted() || !!(AI.typedAt && Date.now() - AI.typedAt < 180000); }
+
+// ---- his voice: off when muted, and quiet for the replies to what you typed ----
+opVoiceOn = (function(base){ return function(){ if(opMuted()) return false; if(AI.busy && AI.typedAt && Date.now() - AI.typedAt < 180000) return false; return base.apply(this, arguments); }; })(opVoiceOn);
+opSay = (function(base){
+  return function(text, opts){
+    opts = opts || {};
+    // (a new line from Op that isn't an answer: your last words step aside)
+    if(opts.cap==='opBubText' && !AI.busy && !AI.listening) opMeSet('');
+    // muted: the bubble still gets the words
+    if(opts.cap==='opBubText' && !opVoiceOn()){ OV.cap = 'opBubText'; opCaption(text); }
+    return base(text, opts);
+  };
+})(opSay);
+aiSystem = (function(base){
+  return function(){
+    const s = base.apply(this, arguments);
+    if(opTextMode() && Array.isArray(s)) s.push({type:'text', text:'Right now he is typing to you in the chat box and your reply shows as text (it is not spoken). Talk like a normal chat: any topic is fine (general questions, ideas, explanations, advice, writing), answered as fully as the question needs. Still plain text with no markdown symbols; short paragraphs are fine.'});
+    return s;
+  };
+})(aiSystem);
+// your words: shown and kept
+aiAsk = (function(base){
+  return function(text, cap){
+    const t = String(text||'').trim();
+    if(t && !AI.busy){ opMeSet(t); opChatLog('me', t); }
+    const last0 = AI.history[AI.history.length - 1];
+    return Promise.resolve(base.apply(this, arguments)).then(function(r){
+      const last = AI.history[AI.history.length - 1];
+      if(last && last!==last0 && last.role==='assistant') opChatLog('op', last.content);
+      opChatDraw();
+      return r;
+    });
+  };
+})(aiAsk);
+// talking (not typing) puts him back on voice
+aiListen = (function(base){ return function(){ AI.typedAt = 0; return base.apply(this, arguments); }; })(aiListen);
+aiAutoListen = (function(base){ return function(){ if(opTextMode()) return; return base.apply(this, arguments); }; })(aiAutoListen);
+document.addEventListener('keydown', function(e){
+  const t = e.target; if(!t || !t.classList || !t.classList.contains('op-type') || e.key!=='Enter' || !t.value.trim()) return;
+  AI.typedAt = Date.now();
+  if(t.id==='opBubInput') opChatOpen(true);
+}, true);
+// starting to type while the mic is open: the mic steps aside
+document.addEventListener('focusin', function(e){ if(e.target && e.target.id==='opBubInput' && AI.listening && AI.cancelListen) AI.cancelListen(); });
+
+// ---- the bubble: your line, his line, the log, the buttons ----
+function opMeEl(){ return document.getElementById('opBubMe'); }
+function opMeSet(t, wait){
+  const el = opMeEl(); if(!el) return;
+  el.classList.toggle('is-wait', !!wait);
+  if(wait){ el.textContent = t; return; }
+  capSet(el, t || '');
+  el.scrollTop = el.scrollHeight;
+}
+function opBubIcons(){
+  const b = document.getElementById('opBub'); if(!b) return;
+  const m = b.querySelector('.op-bub-mute'), l = b.querySelector('.op-bub-logb');
+  if(m){ m.innerHTML = opMuted() ? '&#128263;' : '&#128264;'; m.classList.toggle('is-on', opMuted()); m.setAttribute('aria-label', opMuted() ? 'Turn Op’s voice on' : 'Mute Op'); }
+  if(l){ l.classList.toggle('is-on', b.classList.contains('is-log')); }
+}
+opBubShow = (function(base){
+  return function(){
+    const pre = document.getElementById('opBub'), wasIn = !!(pre && pre.classList.contains('is-in'));
+    const b = base.apply(this, arguments);
+    if(b && !b.querySelector('.op-bub-mute')){
+      const x = b.querySelector('.op-bub-x');
+      const add = document.createElement('span'); add.className = 'op-bub-ics';
+      add.innerHTML = '<button class="op-bub-ic op-bub-logb" data-action="opChatToggle" aria-label="Your chats with Op">&#128338;</button><button class="op-bub-ic op-bub-mute" data-action="opMuteToggle" aria-label="Mute Op"></button>';
+      x.parentNode.insertBefore(add, x);
+      const t = document.getElementById('opBubText');
+      const log = document.createElement('div'); log.className = 'op-bub-log'; log.id = 'opBubLog'; t.parentNode.insertBefore(log, t);
+      const me = document.createElement('div'); me.className = 'op-bub-me'; me.id = 'opBubMe'; t.parentNode.insertBefore(me, t);
+      opBubIcons();
+    }
+    // (a fresh bubble starts clean, unless you're mid-conversation)
+    if(!wasIn && !AI.listening && !AI.busy) opMeSet('');
+    return b;
+  };
+})(opBubShow);
+// Op listening / hearing you: it goes in your line (his question stays put)
+opCaption = (function(base){
+  return function(txt){
+    if(OV.cap==='opBubText' && opMeEl()){
+      if(txt==='Listening…'){ opBubShow(); opMeSet('Listening…', true); if(typeof opBubHideLater==='function') opBubHideLater(); return; }
+      if(/^“[\s\S]*”$/.test(String(txt||'')) && AI.listening){ opBubShow(); opMeSet(String(txt).slice(1, -1)); if(typeof opBubHideLater==='function') opBubHideLater(); return; }
+    }
+    return base.apply(this, arguments);
+  };
+})(opCaption);
+// (an open chat doesn't slip away on its own)
+opBubHideLater = (function(base){ return function(){ const b = document.getElementById('opBub'); if(b && b.classList.contains('is-log')){ clearTimeout(opBubHideLater._t); return; } return base.apply(this, arguments); }; })(opBubHideLater);
+// tapping his light while he's muted opens the chat to type
+ACTIONS.opLightTap = (function(base){
+  return function(){
+    if(opMuted() && !AI.listening && !(OV.speaking || OV.pending)){ OV.cap = 'opBubText'; opBubShow(); opChatOpen(true); const i = document.getElementById('opBubInput'); if(i) setTimeout(function(){ i.focus(); }, 60); return; }
+    return base.apply(this, arguments);
+  };
+})(ACTIONS.opLightTap);
+ACTIONS.opMuteToggle = function(){
+  state.focus.opMuted = !opMuted(); persist('focus');
+  if(opMuted() && (OV.speaking || OV.pending)){ const t = OV.sayText; opStop(); if(t){ OV.cap = 'opBubText'; opCaption(t); } }
+  opBubIcons();
+  showToast(opMuted() ? 'Op’s voice is off. He answers in text.' : 'Op’s voice is back on.');
+};
+function opChatOpen(on){
+  const b = document.getElementById('opBub'); if(!b) return;
+  b.classList.toggle('is-log', !!on);
+  OPCD.sig = ''; opChatDraw();
+  opBubIcons();
+  if(typeof opBubPlace==='function') opBubPlace(b);
+  if(!on && typeof opBubHideLater==='function') opBubHideLater();
+}
+ACTIONS.opChatToggle = function(){ const b = document.getElementById('opBub'); opChatOpen(!(b && b.classList.contains('is-log'))); };
+
+// ---- the log, drawn ----
+const OPCD = {sig:'', n:0};
+function opChatDay(ts){
+  const d = new Date(ts), k = todayStr(d), t = todayStr();
+  if(k===t) return 'Today';
+  if(k===addDays(t, -1)) return 'Yesterday';
+  return d.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'});
+}
+function opChatDraw(){
+  const b = document.getElementById('opBub'), box = document.getElementById('opBubLog');
+  if(!b || !box) return;
+  const live = !!(OV.speaking || OV.pending);
+  b.classList.toggle('is-live', live);
+  if(!b.classList.contains('is-log')) return;
+  const L = opChat(), think = AI.busy && !live;
+  const sig = L.length+'|'+(L.length ? L[L.length-1].at : 0)+'|'+think;
+  if(sig===OPCD.sig) return;
+  const grew = L.length > OPCD.n && OPCD.sig!=='';
+  OPCD.sig = sig; OPCD.n = L.length;
+  const near = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
+  let h = '', day = '';
+  L.forEach(function(e, i){
+    const d = opChatDay(e.at); if(d!==day){ day = d; h += '<div class="ocl-day">'+d+'</div>'; }
+    h += '<div class="ocl-m ocl-'+e.r+(grew && i===L.length-1 ? ' is-new' : '')+'">'+escapeHtml(e.t)+'</div>';
+  });
+  if(think) h += '<div class="ocl-m ocl-op ocl-typing"><i></i><i></i><i></i></div>';
+  box.innerHTML = h || '<div class="ocl-empty">Say anything, or type it below.</div>';
+  if(near || grew || !OPCD.drawn){ box.scrollTop = box.scrollHeight; OPCD.drawn = true; }
+}
+// his lines that weren't answers (check-ins, nudges, taps) go in the log once they've settled
+const OPCS = {txt:'', since:0, logged:''};
+setInterval(function(){
+  try{
+    const el = document.getElementById('opBubText'), t = el ? el.textContent.trim() : '';
+    if(t!==OPCS.txt){ OPCS.txt = t; OPCS.since = Date.now(); }
+    else if(t && t!==OPCS.logged && !OV.speaking && !OV.pending && !AI.busy && Date.now() - OPCS.since > 900){ OPCS.logged = t; opChatLog('op', t); }
+    opChatDraw();
+  }catch(e){}
+}, 300);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
