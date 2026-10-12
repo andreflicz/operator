@@ -10,8 +10,15 @@
 // isn't back yet, so a failed try is tried again on its own (15 s, 45 s, 2 min, then every 10), and
 // while a game is live the board refreshes every couple of minutes.
 const SPORTS = [{id:'nfl', label:'NFL', icon:'&#127944;', path:'football/nfl'}, {id:'nba', label:'NBA', icon:'&#127936;', path:'basketball/nba'},
-  {id:'mlb', label:'MLB', icon:'&#9918;', path:'baseball/mlb'}, {id:'nhl', label:'NHL', icon:'&#127954;', path:'hockey/nhl'}];
-function sportsOn(){ const off = arr(wakeCfg().sportsOff); return SPORTS.filter(function(s){ return off.indexOf(s.id) < 0; }); }
+  {id:'mlb', label:'MLB', icon:'&#9918;', path:'baseball/mlb'}, {id:'nhl', label:'NHL', icon:'&#127954;', path:'hockey/nhl'},
+  {id:'ncaaf', label:'College football', icon:'&#127944;', path:'football/college-football'}, {id:'ncaab', label:'College hoops', icon:'&#127936;', path:'basketball/mens-college-basketball'},
+  {id:'wnba', label:'WNBA', icon:'&#127936;', path:'basketball/wnba'}, {id:'mls', label:'MLS', icon:'&#9917;', path:'soccer/usa.1'}, {id:'epl', label:'Premier League', icon:'&#9917;', path:'soccer/eng.1'}];
+// the leagues you follow (Settings → You → Sports): NFL and NBA unless you pick others
+function sportsOn(){
+  const w = wakeCfg(), pick = Array.isArray(w.sports) ? w.sports : ['nfl', 'nba'];
+  const on = SPORTS.filter(function(s){ return pick.indexOf(s.id) >= 0; });
+  return on.length ? on : SPORTS.slice(0, 1);
+}
 function ymdCompact(d){ return d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate()); }
 function parseScoreboard(j, l){
   return arr(j && j.events).map(function(e){
@@ -35,7 +42,7 @@ function firstJson(urls, ms){
 }
 async function fetchScoreboard(l){
   const sp = SPORTS.find(function(x){ return x.id===l; }); if(!sp) return null;
-  const now = Date.now(), range = ymdCompact(new Date(now - 2*86400000))+'-'+ymdCompact(new Date(now + 7*86400000));
+  const now = Date.now(), range = ymdCompact(new Date(now - 3*86400000))+'-'+ymdCompact(new Date(now + 7*86400000));
   const espn = 'https://site.api.espn.com/apis/site/v2/sports/'+sp.path+'/scoreboard';
   let j = await firstJson([WAKE_HELPER+'sports?l='+l+'&d='+range, espn+'?dates='+range+'&limit=200'], 10000);
   // nothing in that window (or the range isn't understood): today's board, the way ESPN shows it
@@ -114,6 +121,28 @@ function scoreRowHtml(g){
     '<span class="sb-m">'+team(g.away)+team(g.home)+'</span>'+
     '<span class="sb-s">'+(g.state==='in' ? '<em class="gc-live"></em>'+escapeHtml(g.detail) : g.state==='post' ? 'Final' : escapeHtml(scoreWhen(g)))+'</span></div>';
 }
+// the whole board, to scroll through: live games, then the results (newest day first), then what's coming
+// up, day by day. Your teams first in every group; the chips on top pick a league.
+function scoresBoardHtml(){
+  const sc = ui.scores; if(!sc || !sc.got) return '';
+  const on = sportsOn(), f = on.some(function(s){ return s.id===ui.sportsFilter; }) ? ui.sportsFilter : 'all';
+  const all = [], now = Date.now();
+  on.forEach(function(s){ if(f==='all' || f===s.id) arr(sc[s.id]).forEach(function(g){ if(g.state==='in' || (g.state==='post' && now - g.at < 4*86400000) || (g.state==='pre' && g.at - now < 8*86400000)) all.push(g); }); });
+  if(!all.length && f==='all') return '';
+  const favFirst = function(xs){ return xs.filter(isFavGame).concat(xs.filter(function(g){ return !isFavGame(g); })); };
+  const dayKey = function(g){ return ds2(new Date(g.at)); }, today = todayStr();
+  const dayName = function(d){ return d===today ? 'Today' : d===addDays(today, -1) ? 'Yesterday' : d===addDays(today, 1) ? 'Tomorrow' : new Date(d+'T12:00').toLocaleDateString(undefined, {weekday:'long', month:'short', day:'numeric'}); };
+  const groups = [];
+  const live = favFirst(all.filter(function(g){ return g.state==='in'; }));
+  if(live.length) groups.push(['Live', live]);
+  const past = {}, next = {};
+  all.forEach(function(g){ if(g.state==='post') (past[dayKey(g)] = past[dayKey(g)] || []).push(g); else if(g.state==='pre') (next[dayKey(g)] = next[dayKey(g)] || []).push(g); });
+  Object.keys(past).sort().reverse().forEach(function(d){ groups.push([dayName(d)+' · results', favFirst(past[d].sort(function(a, b){ return b.at - a.at; }))]); });
+  Object.keys(next).sort().forEach(function(d){ groups.push([dayName(d)+' · coming up', favFirst(next[d].sort(function(a, b){ return a.at - b.at; }))]); });
+  const chips = on.length > 1 ? '<div class="sb-chips">'+[['all', 'All']].concat(on.map(function(s){ return [s.id, s.label]; })).map(function(c){ return '<button class="sb-chip'+(f===c[0] ? ' is-on' : '')+'" data-action="sportsFilter" data-id="'+c[0]+'">'+c[1]+'</button>'; }).join('')+'</div>' : '';
+  return chips+'<div class="sb sb-scroll">'+(groups.length ? groups.map(function(g){ return '<div class="sb-h">'+escapeHtml(g[0])+' <span>'+g[1].length+'</span></div>'+g[1].map(scoreRowHtml).join(''); }).join('') : '<div class="br-sports-none">Nothing in this league this week.</div>')+'</div>';
+}
+ACTIONS.sportsFilter = function(el, e, id){ ui.sportsFilter = id; if(typeof renderWakeOverlayInto==='function') renderWakeOverlayInto(); };
 function scoresHtml(maxDone, maxNext){
   const sc = ui.scores; if(!sc || !sc.got) return '';
   const done = [], next = [];

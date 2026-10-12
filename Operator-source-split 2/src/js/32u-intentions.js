@@ -370,14 +370,23 @@ function briefHudHtml(){
 // Kept sealed (Personal → Journal → Vault); open one to read it. They can also come back to you one
 // morning, as a note from past you.
 function vaultStore(){ const s = intentStore(); if(!Array.isArray(s.vault)) s.vault = []; return s.vault; }
+// the vault holds the time capsules from the journal too: the ones that have come back can be read; the rest
+// stay sealed until their morning (a surprise one doesn't even say when)
+function vaultItems(){
+  const sealed = vaultStore(), texts = {}; sealed.forEach(function(m){ texts[m.text] = 1; });
+  const caps = typeof capsules==='function' ? capsules().filter(function(c){ return !texts[c.text]; }).map(function(c){
+    return {id:'cap:'+c.id, kind:'capsule', label:c.title || 'A note to future you', text:c.text, at:localTs(c.writtenOn, '12:00'), locked:!c.openedOn, openOn:c.openOn, hidden:!!c.hidden, written:c.writtenOn};
+  }) : [];
+  return sealed.concat(caps).sort(function(a, b){ return b.at - a.at; });
+}
 function vaultHtml(){
-  const v = vaultStore().slice().sort(function(a, b){ return b.at - a.at; }), open = ui.vaultOpen || {};
-  if(!v.length) return '<div class="vault-empty"><div class="vault-empty-i">&#128274;</div><b>Nothing locked away yet.</b><span>When you check out of a week or a month, you can seal a message to yourself. It’s kept here.</span></div>';
+  const v = vaultItems(), open = ui.vaultOpen || {};
+  if(!v.length) return '<div class="vault-empty"><div class="vault-empty-i">&#128274;</div><b>Nothing locked away yet.</b><span>When you check out of a week or a month, you can seal a message to yourself. Time capsules from the journal live here too.</span></div>';
   return '<div class="vault">'+v.map(function(m, i){ const o = !!open[m.id];
-    return '<div class="vault-card'+(o ? ' is-open' : '')+' is-'+m.kind+'" style="--i:'+Math.min(i, 12)+'">'+
-      '<button class="vault-seal" data-action="vaultToggle" data-id="'+m.id+'" title="'+(o ? 'Seal it again' : 'Open it')+'"><span class="vault-wax">'+(m.kind==='month' ? '&#127942;' : '&#9989;')+'</span>'+
-        '<span class="vault-meta"><b>'+escapeHtml(m.label)+'</b><small>Sealed '+fmtDateShort(todayStr(new Date(m.at)))+(m.back ? ' · coming back one morning' : '')+'</small></span><span class="vault-chev">'+(o ? '&#9652;' : '&#9662;')+'</span></button>'+
-      '<div class="vault-body"><div class="vault-text">'+escapeHtml(m.text)+'</div></div>'+
+    return '<div class="vault-card'+(o ? ' is-open' : '')+(m.locked ? ' is-locked' : '')+' is-'+m.kind+'" style="--i:'+Math.min(i, 12)+'">'+
+      '<button class="vault-seal" data-action="vaultToggle" data-id="'+m.id+'" title="'+(m.locked ? 'Still sealed' : o ? 'Seal it again' : 'Open it')+'"><span class="vault-wax">'+(m.kind==='capsule' ? (m.locked ? '&#9203;' : '&#128140;') : m.kind==='month' ? '&#127942;' : '&#9989;')+'</span>'+
+        '<span class="vault-meta"><b>'+escapeHtml(m.label)+'</b><small>'+(m.kind==='capsule' ? 'Time capsule · written '+fmtDateShort(m.written)+(m.locked ? (m.hidden ? ' · opens one morning, you won’t know when' : ' · opens '+fmtDateShort(m.openOn)) : ' · opened') : 'Sealed '+fmtDateShort(todayStr(new Date(m.at)))+(m.back ? ' · coming back one morning' : ''))+'</small></span><span class="vault-chev">'+(m.locked ? '&#128274;' : o ? '&#9652;' : '&#9662;')+'</span></button>'+
+      '<div class="vault-body"><div class="vault-text">'+(m.locked ? '<i class="vault-locked">Still sealed. It opens itself when its morning comes.</i>' : escapeHtml(m.text))+'</div></div>'+
     '</div>'; }).join('')+'</div>';
 }
 ACTIONS.vaultToggle = function(el, e, id){ ui.vaultOpen = ui.vaultOpen || {}; ui.vaultOpen[id] = !ui.vaultOpen[id]; renderView(); };

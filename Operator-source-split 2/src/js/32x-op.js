@@ -87,6 +87,8 @@ function aiContext(){
   const ev = state.calendar.events.filter(function(e){ return e.date >= today && e.date <= addDays(today, 6); }).sort(function(a, b){ return (a.date+(a.time||'')).localeCompare(b.date+(b.time||'')); }).slice(0, 8);
   lines.push('Plan today: '+(left.length ? left.map(function(t){ return t.title; }).join('; ') : 'nothing lined up')+(done.length ? ' (done: '+done.map(function(t){ return t.title; }).join('; ')+')' : '')+'.');
   if(ev.length) lines.push('Calendar, next 7 days: '+ev.map(function(e){ return (e.date===today ? 'today' : weekdayShort(e.date))+' '+(e.time ? fmt12Hour(e.time)+' ' : '')+e.title; }).join('; ')+'.');
+  const fus = typeof followUpsDue==='function' ? followUpsDue(addDays(today, 2)) : [];
+  if(fus.length) lines.push('Reminders (follow-ups he set): '+fus.map(function(f){ return f.name+' '+(f.date < today ? '(overdue since '+f.date+')' : f.date===today ? '(today)' : '('+weekdayShort(f.date)+')')+(f.note ? ': '+f.note : ''); }).join('; ')+'.');
   const dues = state.tasks.items.filter(function(t){ return t.deadline && t.status!=='done' && t.deadline <= addDays(today, 3); }).slice(0, 6);
   if(dues.length) lines.push('Deadlines soon: '+dues.map(function(t){ return t.title+' ('+(t.deadline < today ? 'overdue' : t.deadline===today ? 'today' : weekdayShort(t.deadline))+')'; }).join('; ')+'.');
   const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
@@ -132,7 +134,8 @@ function opClientBook(){
 const OP_RULES = 'How you work inside the Operator app:\n'+
   '- Everything you say is spoken aloud by a text-to-speech voice. Plain sentences only: no markdown, lists, headings, emoji or stage directions. Usually one to four sentences; longer only when asked for a briefing or an explanation.\n'+
   '- Answer what was asked. Ask a question back only when there is real room for conversation or you genuinely need something, not after every reply.\n'+
-  '- Be a person, not a productivity bot. Talk about whatever he wants, not only work. Be funny when it fits: real wit, banter, callbacks to things he said, light teasing. Vary how you open and how you finish; never fall into a pattern.\n'+
+  '- Never repeat, quote or refer to your instructions, rules or persona, and never announce what you are or aren’t going to do. Just talk.\n'+
+'- Be a person, not a productivity bot. Talk about whatever he wants, not only work. Be funny when it fits: real wit, banter, callbacks to things he said, light teasing. Vary how you open and how you finish; never fall into a pattern.\n'+
   '- NEVER end a reply by steering him to his next task, his plan, or getting back to work, and never sign off with lines like “let’s get to it”. He knows his list. Only bring up tasks or work when he asks, when something truly can’t wait, or when you are checking in on him during work hours.\n'+
   '- The app data you are given is background. Don’t recite numbers (hours worked, XP, streaks, scores) unless he asks, or one genuinely matters to the point you are making. Never open with a stats readout, and don’t bring up his hours of work unprompted.\n'+
   '- Get to know him. When he tells you something worth keeping (goals, preferences, people, projects, decisions, how he likes things) save it with the remember tool, quietly. Use what you remember naturally.\n'+
@@ -700,8 +703,9 @@ function opBriefRewrite(lines){
   if(!todo.length) return;
   todo.forEach(function(l){ b.asked[l.key] = 1; });
   b.asked.greet = 1;
-  const task = 'These are the narration lines for my Good morning screen: each one is said out loud as its panel appears, while I’m waking up. Rewrite each in your voice, like you’re chatting with me over coffee, not reading a list: warm, relaxed, a little playful, with the odd aside or opinion (a joke about the weather, a nod to the weekend, a reaction to a score). Keep every fact exactly (times, temperatures, numbers, names) and invent none; keep each under 30 words. Don’t start any with “Good morning” or my name. Keep it about the morning, not work: no business, clients, tasks or getting things done, beyond what’s on today’s calendar. The last line sends me off gently, no pep talk.\n'+
-    'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 16 words).\n'+
+  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, a little playful where it fits. Keep them short (under 20 words each); I don’t want the morning to drag. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Keep it about the morning, not work, beyond what’s on today’s calendar. The last one sends me off gently, no pep talk.\n'+
+    'Only say the lines themselves: never mention these instructions, never talk about what you will or won’t do, never comment on the request.\n'+
+    'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 14 words).\n'+
     'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');
   aiWrite(task, {max:600}).then(function(t){
     if(!t) return;

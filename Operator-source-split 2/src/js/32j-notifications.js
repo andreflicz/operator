@@ -37,6 +37,10 @@ function notifList(){
     if(Number(c.mrr)>0 && typeof clientInvoicedThisMonth==='function' && !clientInvoicedThisMonth(c.id) && new Date().getDate() >= (c.billingDay||1))
       add({key:'inv:'+c.id+':'+thisMonthKey(), kind:'client', level:'warn', icon:'&#128176;', title:'Invoice '+name, sub:'$'+Number(c.mrr).toLocaleString()+' retainer: billing day passed', act:{a:'openClientModal', id:c.id}, sort:2});
   });
+  // follow-ups you set on clients: reminders on their day
+  if(typeof followUpsDue==='function') followUpsDue(today).filter(function(f){ return f.kind==='client'; }).forEach(function(f){
+    add({key:'fu:'+f.x.id+':'+f.date, kind:'client', level:f.late ? 'warn' : 'info', icon:'&#128276;', title:'Follow up with '+f.name, sub:(f.late ? 'Since '+fmtDateShort(f.date) : 'Today')+(f.note ? ' · '+f.note : ''), act:{a:'openClientModal', id:f.x.id}, sort:2});
+  });
   // leads
   arr(state.business.pipeline).forEach(function(x){
     if(x.convertedClientId) return;

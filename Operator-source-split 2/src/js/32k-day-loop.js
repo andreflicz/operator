@@ -227,9 +227,9 @@ function windHtml(){
       '<button class="wd-close" data-action="closeWindDown" title="Close (your plan is kept)">&#10005;</button></div>'+
     '<div class="wd-inner" data-key="wd-'+w.step+'"><h2 class="wd-title-h">'+titles[w.step]+'</h2>'+body+'</div>'+
     '<div class="wd-foot">'+
-      (i>0 ? '<button class="btn btn-ghost" data-action="windBack">&larr; Back</button>' : '<span></span>')+
-      (w.step==='alarm' ? '<span class="row" style="gap:8px;"><button class="btn btn-ghost" data-action="windGoToSleep" title="Saves it all and goes quiet until the alarm">&#127769; Going to sleep</button><button class="btn wd-sleep" data-action="windDone">&#10003; Done</button></span>'
-        : '<button class="btn btn-primary" data-action="windNext">Next &rarr;</button>')+
+      (i>0 ? '<button class="wd-back" data-action="windBack"><span>&larr;</span>Back</button>' : '<span></span>')+
+      (w.step==='alarm' ? '<span class="wd-foot-r"><button class="wd-alt" data-action="windGoToSleep" title="Saves it all and goes quiet until the alarm">&#127769; Going to sleep</button><button class="wd-go" data-action="windDone"><span class="wd-go-glow"></span>&#10003; Done</button></span>'
+        : '<button class="wd-go" data-action="windNext"><span class="wd-go-glow"></span>Next<span class="wd-go-a">&rarr;</span></button>')+
     '</div>'+
   '</div>';
 }

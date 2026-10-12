@@ -502,19 +502,22 @@ function wakeBriefHtml(){
   if(you) colA.push(panel('br-you br-intent', 'br-a-rise', you.voice, you.html));
   // column 2: a line to carry, and a few small things for a good day
   colB.push(panel('br-quote', 'br-a-words', brVary('quote', ['Something to carry with you.', 'A line worth keeping in your pocket today.', 'Here’s one to chew on with your coffee.', 'A little something for the back of your mind.']), '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
-  colB.push(panel('br-thoughts br-goodday', 'br-a-rise', brVary('goodday', ['A few things for a good day.', 'Some small wins, if you want them.', 'A few easy ones to start the day right.', 'Little things that make a day better.']), '<div class="br-k">&#127807; For a Good Day</div>'+goodDayReelHtml()));
+  colB.push(panel('br-thoughts br-goodday', 'br-a-rise', '', '<div class="br-k">&#127807; For a Good Day</div>'+goodDayReelHtml()));
   // the day ahead — the calendar, and the content you're after — sits on top of the world's news
   const cp = typeof contentProgress==='function' ? ['business', 'personal'].map(contentProgress).filter(function(p){ return p.n; }) : [];
   // (wide screens: on top of the headlines; otherwise under the weather, where the month panel has room)
-  const todayCol = window.innerWidth >= 1680 ? colC : null;
+  const todayCol = null;   // (round 27: Today stays under the weather on every screen, so that column never ends early)
   // (the work itself — the plan, what's due — waits for the work preview; Good morning is the day around it)
-  const todayVoice = events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.';
+  const rems = typeof followUpsDue==='function' ? followUpsDue(today) : [];
+  const remVoice = rems.length ? (rems.length===1 ? ' And a reminder: follow up with '+rems[0].name+'.' : ' And '+rems.length+' follow-ups to make.') : '';
+  const todayVoice = (events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : rems.length ? 'Nothing on the calendar.' : 'Nothing on the calendar. The day’s yours.')+remVoice;
   const row = function(when, what, cls){ return '<div class="bd-r'+(cls ? ' '+cls : '')+'"><b>'+when+'</b><span>'+what+'</span></div>'; };
   const todayP = (panel('br-day', 'br-a-right', todayVoice,
     '<div class="br-k">&#128197; Today<span class="br-k-n">'+new Date().toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+'</span></div>'+
     '<div class="bd-list">'+
       events.map(function(e){ return row(e.time ? fmt12Hour(e.time) : 'All day', escapeHtml(e.title)+(e.location ? '<small>'+escapeHtml(e.location)+'</small>' : ''), 'is-ev'+(e.time && e.time < nowHM() ? ' is-past' : '')); }).join('')+
-      (!events.length ? '<div class="bd-empty">Nothing scheduled. Enjoy the morning.</div>' : '')+
+      rems.map(function(r){ return row('&#128276;', 'Follow up with '+escapeHtml(r.name)+(r.note ? '<small>'+escapeHtml(r.note)+'</small>' : r.late ? '<small>since '+fmtDateShort(r.date)+'</small>' : ''), 'is-rem'); }).join('')+
+      (!events.length && !rems.length ? '<div class="bd-empty">Nothing scheduled. Enjoy the morning.</div>' : '')+
     '</div><div class="bd-more" hidden></div>'+
     (cp.length ? '<div class="br-content">'+cp.map(function(p){ return '<span class="'+(p.done >= p.n ? 'is-hit' : '')+'"><b>'+p.done+'/'+p.n+'</b> '+(p.role==='business' ? 'business' : 'personal')+' videos '+p.label+'</span>'; }).join('')+'</div>' : '')));
   if(todayCol) todayCol.push(todayP); else colA.splice(1, 0, todayP);
@@ -535,7 +538,7 @@ function wakeBriefHtml(){
   if(morningNewsOn() && newsSections().some(function(x){ return x.id==='sports'; })){
     // (on a narrower screen sports shares a column with the headlines: fewer rows, no sports stories)
     const roomy = window.innerWidth >= 1680;
-    const sc = typeof scoresHtml==='function' ? scoresHtml(roomy ? 4 : 3, roomy ? 4 : 3) : '', sh = arr(sec.sports).slice(0, roomy || !sc ? 6 : 0);
+    const sc = typeof scoresBoardHtml==='function' ? scoresBoardHtml() : '', sh = arr(sec.sports).slice(0, sc ? 0 : 6);
     if(sc || sh.length){
       const lt = late();
       colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports'+asks()+'</div>'+sc+sh.slice(0, sc ? 2 : 6).map(function(n){ return item(n, false); }).join(''), lt));

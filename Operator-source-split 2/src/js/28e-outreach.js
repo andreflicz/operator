@@ -19,6 +19,17 @@ function fillTemplate(tpl, kind, x){
   return String(tpl||'').replace(/\{first\}/g, person.split(/\s+/)[0] || 'there').replace(/\{name\}/g, crmName(kind, x)).replace(/\{me\}/g, (state.profile.name||'').trim()).replace(/\{note\}/g, x.followUp && x.followUp.note || '');
 }
 // ---- follow-ups ----
+// A follow-up is just a reminder: on its day (and until you do it) it shows in Good morning's Today, in the
+// notifications, and Op knows about it. Talking to them (a text, a call, a touch) clears it.
+function followUpsDue(date){
+  date = date || todayStr();
+  const out = [];
+  ['client', 'lead'].forEach(function(kind){ arr(crmList(kind)).forEach(function(x){
+    if(kind==='lead' && x.convertedClientId) return;
+    if(x.followUp && x.followUp.date && x.followUp.date <= date) out.push({kind:kind, x:x, name:crmName(kind, x), date:x.followUp.date, note:x.followUp.note || '', late:x.followUp.date < date});
+  }); });
+  return out.sort(function(a, b){ return a.date.localeCompare(b.date); });
+}
 function setFollowUp(kind, id, date, note){
   const x = crmFind(kind, id); if(!x) return;
   x.followUp = date ? {date:date, note:(note||'').trim(), set:Date.now()} : null;
