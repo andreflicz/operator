@@ -77,7 +77,7 @@ const FAKE_SPEECH = () => {
     await E("briefRevealAll()"); await p.waitForTimeout(1200);
     check('Good morning’s button says Get to work', /Get to work/i.test(await p.textContent('[data-action="wakeStartMorning"]')));
     check('background follows the time you’re up (not black)', await p.$('.brief.bg-sunrise, .brief.bg-day, .brief.bg-golden, .brief.bg-night')!==null);
-    check('scores: last results and what’s next, your teams highlighted', (await p.$$('.sb .sb-row')).length>=2 && /Results|Coming up/.test(await p.textContent('.sb')) && /Giants|NYG/.test(await p.textContent('.sb')), await p.evaluate(() => (document.querySelector('.br-sports')||{}).textContent));
+    check('scores: last results and what’s next, your teams highlighted', (await p.$$('.sb .sb-row')).length>=2 && /results|coming up/i.test(await p.textContent('.sb')) && /Giants|NYG/.test(await p.textContent('.sb')), await p.evaluate(() => (document.querySelector('.br-sports')||{}).textContent));
     check('a time capsule turns up: "From Past You"', /From Past You/.test(await p.textContent('.br-you')) && /Proud of you/.test(await p.textContent('.br-you')));
     check('…and goes into the journal', await E("state.journal.entries.some(e => e.capsuleFrom==='2026-06-01')") && await E("state.journal.capsules[0].openedOn")==='2026-10-12');
     await p.click('[data-action="opAsk"][data-id="sports"]'); await p.waitForTimeout(700);

@@ -2183,7 +2183,7 @@
   .sky-chip.sky-text::before{ content:'·'; color:var(--text-faint); margin-right:2px; }
   .sky-chip.sky-text b{ color:var(--text-dim); font-weight:600; }
   .sky-chip.sky-text .sky-chip-i{ font-size:1em; }
-  .th-modes{ display:grid !important; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:8px; width:100%; }
+  .th-modes{ display:grid !important; grid-auto-flow:column; grid-auto-columns:1fr; gap:8px; margin-top:8px; width:100%; }
   .th-mode{ display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:7px 10px; border-radius:12px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text-dim); font-size:12.5px; font-weight:600; cursor:pointer; font-family:var(--font-body); transition:background .15s, color .15s, border-color .15s; }
   .th-mode:hover{ color:var(--text); border-color:var(--border-strong); background:rgba(var(--ink),.06); }
   .th-mode:active{ transform:scale(.97); }
@@ -3195,7 +3195,8 @@
   .rest-s span{ font-size:12.5px; color:rgba(255,255,255,.6); }
   .rest-work{ font-size:12.5px; font-weight:600; padding:0 14px; width:auto !important; }
   body.np-on .np.rest.rest-full{ border-radius:0; }
-  @media (prefers-reduced-motion:reduce){ .np.is-dayoff .np-bg{ animation:none; } }
+  .np.rest .dayoff-bg{ animation:restDrift 26s ease-in-out infinite alternate; }
+  @media (prefers-reduced-motion:reduce){ .np.is-dayoff .np-bg, .np.rest .dayoff-bg{ animation:none; } }
 
   .wi-wk-bars{ height:64px; padding-bottom:0; margin-bottom:18px; } .wi-wk-goal{ margin-bottom:0; }
   #planOverlay .wi-inner{ justify-content:center; } #planOverlay .wi .pr-cta{ margin-top:22px; padding-top:0; }
@@ -5249,6 +5250,158 @@ textarea.hs-in{ resize:vertical; min-height:56px; }
 .izk{ min-width:56px; padding:5px 8px 5px; font-size:10.5px; border-radius:13px; }
 .izk span{ font-size:15px; }
 .insp-hint{ bottom:84px; }
+
+/* ===================== R27 ===================== */
+/* full-screen pages (clocked out, minimal views): Op's light in the corner, the full-screen toggle beside it */
+body.np-on .op-light{ left:22px !important; }
+body.np-on .np .np-top .lv-btn{ left:72px; bottom:17px; }
+body.np-on .op-bub:not(.is-moved){ left:22px !important; }
+/* That's the day: Clock back in leads */
+.dayoff-back.is-main{ background:rgba(126,240,192,.12); border-color:rgba(126,240,192,.45); color:var(--text); }
+/* wind-down → Tomorrow: wake up and work, side by side */
+.wd-tomorrow{ display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:780px; margin:6px auto 0; }
+@media (max-width:760px){ .wd-tomorrow{ grid-template-columns:1fr; } }
+.wd-card{ display:flex; flex-direction:column; align-items:center; gap:10px; padding:22px 20px 18px; border-radius:22px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); text-align:center; }
+.wd-card.is-off{ justify-content:center; color:rgba(255,255,255,.65); font-size:13.5px; }
+.wd-card .wd-sub, .wd-card .wd-sound{ margin:0; font-size:12.5px; }
+.wd-card-b{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:auto; }
+.wd-card-b .btn{ border-radius:999px; padding:6px 14px; font-size:12px; font-weight:600; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); color:rgba(255,255,255,.78); transition:background .15s, border-color .15s, color .15s; }
+.wd-card-b .btn:hover{ background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.22); color:#fff; }
+.wd-work-k{ font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.6); }
+.wd-card .wd-time{ font-size:40px !important; max-width:100%; }
+.wd-work-h{ display:flex; flex-direction:column; align-items:center; gap:2px; }
+.wd-work-h span{ font-size:12px; color:rgba(255,255,255,.5); }
+.wd-card .wd-time.is-sm{ font-size:28px !important; }
+/* wind-down: the footer buttons, night-blue and soft */
+.wd-foot{ max-width:760px; padding:18px 28px 30px; }
+.wd-foot-r{ display:flex; align-items:center; gap:14px; }
+.wd-back{ display:inline-flex; align-items:center; gap:8px; height:44px; padding:0 18px 0 14px; border-radius:999px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.03); color:rgba(255,255,255,.62); font:inherit; font-size:14px; font-weight:600; cursor:pointer; transition:color .2s, background .2s, border-color .2s; }
+.wd-back span{ transition:transform .25s cubic-bezier(.2,1.4,.4,1); }
+.wd-back:hover{ color:#fff; background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.2); } .wd-back:hover span{ transform:translateX(-3px); }
+.wd-alt{ height:44px; padding:0 4px; border:none; background:none; color:rgba(200,205,255,.7); font:inherit; font-size:14px; font-weight:600; cursor:pointer; text-decoration:underline; text-decoration-color:rgba(200,205,255,.25); text-underline-offset:5px; transition:color .2s, text-decoration-color .2s; }
+.wd-alt:hover{ color:#fff; text-decoration-color:rgba(255,255,255,.6); }
+.wd-go{ position:relative; display:inline-flex; align-items:center; gap:10px; height:50px; padding:0 30px; border-radius:999px; border:1px solid rgba(190,198,255,.55); background:linear-gradient(180deg, rgba(150,160,255,.95), rgba(104,116,255,.95)); color:#0a0b1c; font:inherit; font-size:15.5px; font-weight:800; letter-spacing:.01em; cursor:pointer; overflow:hidden;
+  box-shadow:0 10px 30px rgba(100,112,255,.35), 0 0 0 1px rgba(255,255,255,.15) inset; transition:transform .2s cubic-bezier(.2,1.2,.4,1), box-shadow .25s; }
+.wd-go:hover{ transform:translateY(-2px); box-shadow:0 16px 40px rgba(100,112,255,.5), 0 0 0 1px rgba(255,255,255,.25) inset; }
+.wd-go:active{ transform:scale(.97); }
+.wd-go-a{ transition:transform .25s cubic-bezier(.2,1.4,.4,1); } .wd-go:hover .wd-go-a{ transform:translateX(4px); }
+.wd-go-glow{ position:absolute; inset:0; background:linear-gradient(105deg, transparent 30%, rgba(255,255,255,.4) 50%, transparent 70%); transform:translateX(-120%); pointer-events:none; }
+.wd-go:hover .wd-go-glow{ animation:wdSheen 1.1s ease forwards; }
+@keyframes wdSheen{ to{ transform:translateX(120%); } }
+/* the vault: time capsules still waiting for their morning */
+.vault-card.is-locked .vault-seal{ opacity:.78; }
+.vault-card.is-capsule .vault-wax{ background:linear-gradient(160deg, rgba(160,140,255,.35), rgba(110,170,255,.25)); }
+.vault-locked{ color:var(--text-dim); font-style:italic; }
+.bd-r.is-rem b{ color:#ffcf5a; } .bd-r.is-rem span{ color:var(--text); }
+/* Good morning sports: the whole board, scrolling inside its panel (it fills the column, no empty space) */
+.brief4 .br-sports{ display:flex; flex-direction:column; min-height:0; overflow:hidden; }
+.brief4 .c-d > .br-sports, .brief4 .c-c > .br-sports{ flex:1 1 auto; }
+.br-sports .sb-scroll{ flex:1 1 0; min-height:60px; overflow-y:auto; margin:6px -6px 0 0; padding-right:6px; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.18) transparent;
+  -webkit-mask-image:linear-gradient(180deg, #000 calc(100% - 26px), transparent); mask-image:linear-gradient(180deg, #000 calc(100% - 26px), transparent); padding-bottom:22px; }
+.br-sports .sb-h{ display:flex; align-items:center; gap:6px; padding:8px 0 3px; margin:2px 0 0; }
+.br-sports .sb-h span{ font-weight:700; color:rgba(255,255,255,.35); letter-spacing:0; }
+.sb-chips{ display:flex; gap:4px; flex-wrap:wrap; margin-top:8px; }
+.sb-chip{ border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.04); color:rgba(255,255,255,.65); border-radius:999px; padding:4px 10px; font:inherit; font-size:11.5px; font-weight:700; cursor:pointer; transition:background .15s, color .15s; }
+.sb-chip:hover{ color:#fff; } .sb-chip.is-on{ background:rgba(255,197,107,.18); border-color:rgba(255,197,107,.5); color:#fff; }
+/* check-ins: productivity at that moment, 1 to 5, and what you said back */
+.acl-p{ display:inline-flex; gap:3px; margin-left:8px; vertical-align:middle; }
+.acl-p i{ width:7px; height:7px; border-radius:50%; background:rgba(var(--ink),.14); }
+.acl-p i.is-on{ background:linear-gradient(160deg, #7ef0c0, #3fbe8e); box-shadow:0 0 6px rgba(63,190,142,.45); }
+.acl-avg{ margin-left:auto; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--text-dim); text-transform:none; letter-spacing:0; }
+.acl-avg b{ color:var(--text); font-size:13px; } .acl-avg .acl-p{ margin:0; }
+.acl-e small{ display:block; font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); font-style:normal; margin-bottom:2px; }
+/* sleep: dark, slow, almost nothing */
+.np.sleepv{ position:fixed; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; background:radial-gradient(120% 90% at 50% 110%, #0d1430 0%, #05060f 55%, #020208 100%); color:#dfe4ff; overflow:hidden; }
+.sl-sky{ position:absolute; inset:0; pointer-events:none; }
+.sl-sky b{ position:absolute; width:2px; height:2px; border-radius:50%; background:#fff; opacity:0; animation:slTw calc(5s + var(--i) * .7s) ease-in-out infinite; animation-delay:calc(var(--i) * -1.3s); }
+@keyframes slTw{ 0%,100%{ opacity:.08; } 50%{ opacity:.6; } }
+.sl-moon{ position:absolute; right:14%; top:16%; width:70px; height:70px; border-radius:50%; background:radial-gradient(circle at 38% 38%, #f6f1dc, #cfc7a6 60%, #9e9677); box-shadow:0 0 60px rgba(246,241,220,.18), 0 0 140px rgba(140,160,255,.12); opacity:.75; animation:slMoon 14s ease-in-out infinite; }
+@keyframes slMoon{ 50%{ transform:translateY(-6px); box-shadow:0 0 80px rgba(246,241,220,.24), 0 0 160px rgba(140,160,255,.16); } }
+.sl-in{ position:relative; text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px; animation:slIn 2.4s ease both; }
+@keyframes slIn{ from{ opacity:0; transform:translateY(8px); filter:blur(6px); } to{ opacity:1; transform:none; filter:none; } }
+.sl-clock{ display:flex; align-items:baseline; gap:10px; font-family:var(--font-display); font-weight:300; color:rgba(223,228,255,.82); }
+.sl-clock b{ font-size:clamp(96px, 15vw, 190px); font-weight:300; letter-spacing:-.04em; line-height:1; }
+.sl-clock span{ font-size:clamp(20px, 2.4vw, 30px); color:rgba(223,228,255,.45); }
+.sl-msg{ font-size:clamp(18px, 1.8vw, 24px); color:rgba(223,228,255,.62); font-weight:400; }
+.sl-alarm{ font-size:13.5px; letter-spacing:.06em; color:rgba(223,228,255,.38); }
+.sl-up{ position:absolute; bottom:28px; left:50%; transform:translateX(-50%); border:none; background:none; color:rgba(223,228,255,.22); font:inherit; font-size:13px; font-weight:600; letter-spacing:.1em; cursor:pointer; transition:color .3s; }
+.sl-up:hover{ color:rgba(223,228,255,.7); }
+body.np-on:has(.np.sleepv) .op-light{ opacity:.35; }
+body.np-on:has(.np.sleepv) .quick-journal-fab, body.np-on:has(.np.sleepv) #musicDock{ display:none !important; }
+/* Personal → You: one page, no scrolling. Everything sized to fit the window */
+.you{ display:flex; flex-direction:column; gap:10px; }
+.you > *{ margin-top:0 !important; margin-bottom:0 !important; }
+.you-top{ gap:14px; flex-wrap:nowrap; }
+.you .pc.pc-big{ width:196px; padding:12px 12px 10px; } .you .pc-big .pc-face{ width:58px; height:58px; } .you .pc-big .pc-face span{ font-size:24px; } .you .pc-big .pc-ovr b{ font-size:36px; }
+.you-main{ min-width:0; flex:1; }
+.you .you-chart{ margin-top:8px; } .you .you-bars{ height:min(110px, 12vh) !important; }
+.you .opi{ margin:0; padding-top:9px; padding-bottom:9px; }
+.you .opi p{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.you-attr{ padding:10px 14px; } .you-attr-h{ margin-bottom:4px; } .you-attr-h b{ font-size:24px; } .you-sub{ padding:2px 0; }
+.you-recent{ margin-top:0; gap:10px; align-items:stretch; }
+.you-recent .yr-sec{ padding:12px 14px; }
+.yr-tiles{ gap:8px; } .yr-t{ padding:8px 10px; } .yr-t b{ font-size:20px; }
+.yr-r{ padding:4px 0; }
+@media (max-height:820px){ .you .you-bars{ height:64px !important; } .you .pc.pc-big{ width:176px; } .you-attr-h b{ font-size:21px; } }
+.you .you-main .you-bars{ min-height:0 !important; flex:none !important; } .you .you-main .you-chart{ flex:none; margin-top:10px; padding-top:8px; }
+/* full-screen board: nothing floats over its toolbar (the music + level pill steps away); Op's light in the corner */
+body.board-full #musicDock, body.board-full .md-pop, body.board-full .lvl-pop{ display:none !important; }
+body.board-full .op-light{ left:22px !important; } body.board-full .op-bub:not(.is-moved){ left:22px !important; }
+/* pages that end at the bottom-right corner leave room for the + and the journal orb */
+.you-recent .yr-sec:last-child{ padding-right:84px; }
+/* the journal orb sits beside the + (one row along the bottom), not stacked over the page's right edge */
+.quick-journal-fab.jorb{ bottom:30px; right:94px; }
+body:not(.np-on):not(.op-ov) .fab-add.fab-hidden ~ .quick-journal-fab.jorb, body:not(.np-on):not(.op-ov):not(:has(.fab-add:not(.fab-hidden))) .quick-journal-fab.jorb{ right:28px; }
+body.np-on .quick-journal-fab.jorb, body.op-ov .quick-journal-fab.jorb{ right:28px; }
+/* and the content leaves room for that row at the bottom */
+#viewRoot{ padding-bottom:96px; }
+/* Settings → You: your world and the questions that make it yours */
+.yw-k{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); margin:4px 0 8px; }
+.yw-leagues{ display:flex; flex-wrap:wrap; gap:6px; }
+.yw-lg{ display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text-dim); border-radius:999px; padding:6px 12px; font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; transition:background .15s, color .15s, border-color .15s; }
+.yw-lg:hover{ color:var(--text); } .yw-lg.is-on{ background:rgba(232,162,61,.14); border-color:rgba(232,162,61,.5); color:var(--text); }
+.yq-segs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(330px, 1fr)); gap:12px; margin-bottom:12px; }
+@media (max-width:1100px){ .yq-segs{ grid-template-columns:1fr; } }
+
+/* ===================== R27: Inspiration, more of it ===================== */
+/* Stream: ideas float across the sky, left to right, forever */
+.insp-stream{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+.insp-stream .izb.is-stream{ position:absolute; left:0; margin:0; pointer-events:auto; animation-name:izStream, inspFloat; animation-timing-function:linear, ease-in-out; animation-iteration-count:infinite, infinite; will-change:transform; }
+@keyframes izStream{ from{ transform:translateX(-18vw); } to{ transform:translateX(112vw); } }
+.insp-stream .izb.is-stream:hover{ animation-play-state:paused, paused; }
+.insp.is-drift .insp-stream .izb{ opacity:.5; }
+.izb-card.is-float{ position:absolute; left:50%; top:50%; margin:0; translate:-50% -50%; z-index:30; }
+.izb-hide{ display:block; margin:10px auto 0; border:none; background:none; color:rgba(255,255,255,.45); font:inherit; font-size:11.5px; font-weight:600; cursor:pointer; text-decoration:underline; text-underline-offset:3px; text-decoration-color:rgba(255,255,255,.2); }
+.izb-hide:hover{ color:rgba(255,255,255,.8); }
+/* letting go: it rises, blurs and fades like a breath */
+.is-vanish{ animation:izVanish .72s cubic-bezier(.3,.1,.3,1) forwards !important; pointer-events:none !important; }
+@keyframes izVanish{ 0%{ opacity:1; filter:blur(0); } 60%{ opacity:.45; filter:blur(4px) brightness(1.4); } 100%{ opacity:0; filter:blur(14px) brightness(1.8); transform:translateY(-34px) scale(1.12); } }
+.izb.is-vanish, .izw.is-vanish{ animation:izVanishB .72s cubic-bezier(.3,.1,.3,1) forwards !important; }
+@keyframes izVanishB{ to{ opacity:0; filter:blur(14px) brightness(1.8); scale:1.25; translate:0 -34px; } }
+/* the panel folds away */
+.izl-min{ position:absolute; top:8px; right:8px; width:24px; height:24px; border:none; border-radius:50%; background:rgba(255,255,255,.06); color:rgba(255,255,255,.6); font:inherit; font-size:14px; line-height:1; cursor:pointer; }
+.izl-min:hover{ background:rgba(255,255,255,.14); color:#fff; }
+.insp-lately{ position:absolute; }
+.insp-lately-min{ position:absolute; left:26px; bottom:84px; display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 14px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(22,17,48,.6); color:rgba(255,255,255,.8); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+.insp-lately-min b{ color:#fff; } .insp-lately-min:hover{ background:rgba(40,32,80,.7); }
+.izl-r{ position:relative; } .izl-x{ margin-left:6px; width:20px; height:20px; border:none; border-radius:50%; background:transparent; color:rgba(255,255,255,.35); font-size:10px; cursor:pointer; opacity:0; transition:opacity .2s, background .2s; }
+.izl-r:hover .izl-x{ opacity:1; } .izl-x:hover{ background:rgba(255,255,255,.12); color:#fff; }
+.izs-hid{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:12px; } .izs-hid small{ font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.45); margin-right:4px; }
+.izs-h{ border:1px dashed rgba(255,255,255,.25); background:transparent; color:rgba(255,255,255,.75); border-radius:999px; padding:4px 10px; font:inherit; font-size:12px; cursor:pointer; } .izs-h:hover{ color:#fff; border-style:solid; }
+/* the music: a small player that says what's playing */
+.insp-mp{ display:inline-flex; align-items:center; gap:4px; height:42px; padding:0 6px; border-radius:999px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff; -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+.insp-mp.is-on{ background:rgba(255,255,255,.12); }
+.insp-mp-b{ width:32px; height:32px; flex:none; display:grid; place-items:center; border:none; border-radius:50%; background:transparent; color:#fff; font-size:12px; cursor:pointer; transition:background .2s; }
+.insp-mp-b:hover{ background:rgba(255,255,255,.14); }
+.insp-mp-b .wk2-eq{ transform:none; height:14px; } .insp-mp-b .wk2-eq i{ background:#ffd9a8; }
+.insp-mp-n{ min-width:64px; max-width:140px; padding:0 4px; font-size:13px; font-weight:600; letter-spacing:.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:rgba(255,255,255,.88); }
+.insp-mp-b.is-next{ font-size:11px; color:rgba(255,255,255,.7); }
+/* whispers */
+.insp-whisper{ position:absolute; left:50%; transform:translateX(-50%); z-index:4; max-width:min(640px, 80vw); text-align:center; pointer-events:none; font-family:Georgia, 'Times New Roman', serif; font-style:italic; font-size:clamp(17px, 1.6vw, 22px); color:rgba(255,248,255,.9); text-shadow:0 0 22px rgba(200,170,255,.55), 0 2px 12px rgba(0,0,0,.35); animation:izWhisper 11s ease-in-out forwards; }
+@keyframes izWhisper{ 0%{ opacity:0; filter:blur(8px); translate:0 10px; } 18%{ opacity:1; filter:blur(0); translate:0 0; } 78%{ opacity:1; filter:blur(0); } 100%{ opacity:0; filter:blur(10px); translate:0 -14px; } }
+.insp.is-drift .insp-whisper{ color:#fff; }
+.insp.is-stream .izd, .insp.is-stream .izt, .insp.is-stream .izw, .insp.is-stream .izq{ opacity:.35; transition:opacity .8s ease; }
+.insp.is-stream .izd:hover, .insp.is-stream .izt:hover, .insp.is-stream .izw:hover, .insp.is-stream .izq:hover{ opacity:1; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -7437,7 +7590,14 @@ function remapConvertedLeadRefs(){
 // it shows), everything else its priority
 function taskTags(t){ return t && t.skill ? '<span class="tag tag-skill" title="Training skill">&#127919; Skill</span>' : priorityTag(t && t.priority); }
 // ============ DAYS OFF / STANDARD / STREAK ============
-function isDayOff(dateStr){ return state.daysOff.dates.indexOf(dateStr)>=0; }
+// a rest day: one you marked before (old data), or a day your schedule doesn't work (the work days in the work
+// alarm when it's on, otherwise the wake-up alarm's days). Rest days never break the streak.
+function isDayOff(dateStr){
+  if(state.daysOff.dates.indexOf(dateStr)>=0) return true;
+  const w = typeof workCfg==='function' ? workCfg() : null;
+  if(w && w.enabled && arr(w.days).length) return !(w.override && w.override.date===dateStr && !w.override.off) && (arr(w.days).indexOf(dowOf(dateStr))<0 || !!(w.override && w.override.date===dateStr && w.override.off));
+  return typeof isWorkDay==='function' ? !isWorkDay(dateStr) : false;
+}
 function toggleDayOff(){
   const d = todayStr();
   const idx = state.daysOff.dates.indexOf(d);
@@ -7641,7 +7801,6 @@ function dayVisualStatusRaw(dateStr){
   return notWorkedCount > maxOff ? 'failed' : 'neutral';
 }
 function isBreakDay(dateStr){
-  if(dateStr > todayStr()) return false;
   return dayVisualStatus(dateStr)==='failed' && dayVisualStatus(addDays(dateStr,-1))!=='failed';
 }
 // Compact week strip for the streak card: one dot per day (3 back, today, 3 ahead).
@@ -9199,11 +9358,12 @@ document.addEventListener('scroll', function(e){
   clearTimeout(carSettleT.get(t)); carSettleT.set(t, setTimeout(function(){ carSettle(t, false); }, 160));
 }, {capture:true, passive:true});
 // ============ TODAY ============
-// renderDayOffView lives in 32p-locked-views.js
+// (the Day off screen is gone: round 27)
 // clocked out: full screen and quiet, like the day off (the corner button gives the sidebar back)
 function renderOffTimeView(){
   const active = state.modes.active;
   const elapsed = Date.now() - active.startedAt;
+  if(active.sleep) return renderSleepView();
   return renderWeekendOffView(elapsed, !active.sleep && typeof isWorkDay==='function' && !isWorkDay(addDays(todayStr(), 1)));
 }
 // one tidy line per task: number, a priority dot, the title, who it's for. The description is
@@ -9295,7 +9455,6 @@ function renderToday(){
   // A session you started yourself always wins, even on a day off — otherwise locking in
   // left you staring at the "Taking today off" screen. The day stays marked as a rest day.
   if(state.focus.activeSession) return renderTodayFocusMode(p);
-  if(isDayOff(todayStr())) return renderDayOffView();
   // the minimal view (M, or the button on the hero): clock, level, streak, LOCK IN — nothing else
   if(state.modes.active && state.modes.active.type==='offtime') return state.modes.active.sleep ? renderSleepView() : state.modes.active.morning ? renderMorningView() : renderOffTimeView();
   const hour = new Date().getHours();
@@ -9364,10 +9523,9 @@ function renderTodayHero(greeting){
       '</button>'+
       '<div class="th-actions">'+
         '<button class="th-btn" data-action="toggleNextPicker" data-where="hero"><span class="th-btn-i">&#128204;</span>'+(next ? 'Change next' : 'Pick next')+'</button>'+
-        (!evening ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going: sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
-        (evening ? '<button class="th-btn th-btn-night" data-action="openWindDown"><span class="th-btn-i">&#127769;</span>Wind down</button>' : '')+
+        (true ? (function(){ const n = recapPendingCount(); return '<button class="th-btn" data-action="openDayRecap" title="How the day is going: sessions, tasks, apps"><span class="th-btn-i">&#128202;</span>Recap'+(n?'<span class="th-badge">'+n+'</span>':'')+'</button>'; })() : '')+
       '</div>'+
-      '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+'<button class="th-mode th-mode-offtime" data-action="clockOut" title="Done working for the day"><span class="th-mode-i">&#127937;</span><span>Clock out</span></button>'+dayOffButtonHtml()+'</div>'+
+      '<div class="th-modes">'+holdModeBtnHtml('shooting', '&#127916;', 'Shooting')+'<button class="th-mode th-mode-offtime" data-action="clockOut" title="Done working for the day: wind down, then that’s the day"><span class="th-mode-i">&#127937;</span><span>Clock out</span></button></div>'+
       nextPickerHtml('hero')+
     '</div>'+
   '</div>';
@@ -11581,7 +11739,7 @@ function renderFocusAnalyticsTab(){
   // Op's read on the period (a quiet line, made once a day — ↻ for another take)
   const days = r==='today' ? 7 : r==='alltime' || r==='all' ? 30 : 7, off = r==='lastweek' ? Math.max(0, (new Date().getDay()+6)%7 + 1) : 0;
   const read = typeof opRead==='function' ? opRead('analytics:'+r, function(){ return opFactsWork(days, off); }, r==='today' ? 'Give him your read on how his work has been going this past week, with today in view.' : r==='lastweek' ? 'Give him your read on last week’s work.' : r==='week' ? 'Give him your read on this week’s work so far.' : 'Give him your read on the last month of work.', {angles:'work', triad:true}) : '';
-  return '<div class="subtab-panel" data-key="analytics-'+r+'">'+read+analyticsOverviewHtml(r)+body+recentSessionsHtml()+'</div>'+
+  return '<div class="subtab-panel" data-key="analytics-'+r+'">'+read+analyticsOverviewHtml(r)+body+recentSessionsHtml()+(typeof acctLogHtml==='function' ? acctLogHtml() : '')+'</div>'+
     '<div class="section" style="margin-top:16px;">'+renderManualLogForm()+'</div>';
 }
 
@@ -12282,7 +12440,7 @@ function sessionsOn(date){ return state.focus.sessions.filter(function(s){ retur
 function recapNeeded(date){ return sessionsOn(date).some(function(s){ return s.auto && !s.reviewed; }); }
 function openDayRecap(date){ ui.recapDate = date || todayStr(); showOverlay('recapOverlay'); renderRecapInto(); }
 // The recap button opens yesterday's recap if it still has sessions to check, else today's.
-function recapDefaultDate(){ const y = addDays(todayStr(), -1); return recapNeeded(y) ? y : todayStr(); }
+function recapDefaultDate(){ const y = addDays(todayStr(), -1); return (typeof workDayDate==='function' && workDayDate()===y) || recapNeeded(y) ? y : todayStr(); }
 function recapPendingCount(){ return [todayStr(), addDays(todayStr(), -1)].reduce(function(n, d){ return n + sessionsOn(d).filter(function(s){ return s.auto && !s.reviewed; }).length; }, 0); }
 ACTIONS.openDayRecap = function(el){ openDayRecap((el && el.dataset && el.dataset.date) || recapDefaultDate()); };
 ACTIONS.openRecapToday = function(){ clearToasts(); openDayRecap(todayStr()); };
@@ -17933,6 +18091,17 @@ function fillTemplate(tpl, kind, x){
   return String(tpl||'').replace(/\{first\}/g, person.split(/\s+/)[0] || 'there').replace(/\{name\}/g, crmName(kind, x)).replace(/\{me\}/g, (state.profile.name||'').trim()).replace(/\{note\}/g, x.followUp && x.followUp.note || '');
 }
 // ---- follow-ups ----
+// A follow-up is just a reminder: on its day (and until you do it) it shows in Good morning's Today, in the
+// notifications, and Op knows about it. Talking to them (a text, a call, a touch) clears it.
+function followUpsDue(date){
+  date = date || todayStr();
+  const out = [];
+  ['client', 'lead'].forEach(function(kind){ arr(crmList(kind)).forEach(function(x){
+    if(kind==='lead' && x.convertedClientId) return;
+    if(x.followUp && x.followUp.date && x.followUp.date <= date) out.push({kind:kind, x:x, name:crmName(kind, x), date:x.followUp.date, note:x.followUp.note || '', late:x.followUp.date < date});
+  }); });
+  return out.sort(function(a, b){ return a.date.localeCompare(b.date); });
+}
 function setFollowUp(kind, id, date, note){
   const x = crmFind(kind, id); if(!x) return;
   x.followUp = date ? {date:date, note:(note||'').trim(), set:Date.now()} : null;
@@ -18718,13 +18887,7 @@ function renderSettings(){
         '<div class="field"><label>Workout days per week (goal)</label><input class="input" type="number" id="setWeeklyWorkout" value="'+p.weeklyWorkoutTarget+'"></div>'+
       '</div></div>'+
       // the things that make Operator yours: the same settings as in the alarm's setup, saved as you type
-      (function(){ const w = wakeCfg() || {}; return '<div class="card section" id="setYourWorld"><div class="section-title">Your world'+tip('Good morning and Op use these: walks to places you like, your teams’ scores, the news you care about.')+'</div><div class="grid grid-2">'+
-        '<div class="field"><label>Places you like</label><input class="input" data-wake="places" placeholder="e.g. a park, a coffee spot" value="'+escapeHtml(w.places||'')+'"></div>'+
-        '<div class="field"><label>Your teams</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, Giants, UFC" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
-        '<div class="field"><label>Interests</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
-        '<div class="field"><label>News topics</label><input class="input" data-wake="newsTopics" placeholder="Top stories" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
-        '<div class="field"><label>Hide news about</label><input class="input" data-wake="newsMute" placeholder="e.g. celebrity" value="'+escapeHtml(w.newsMute!=null ? w.newsMute : 'Wyoming')+'"></div>'+
-      '</div></div>'; })()+
+      (typeof yourWorldHtml==='function' ? yourWorldHtml() : '')+
       '<div class="section"><div class="section-title">Why You\'re Doing This</div><div class="card"><div class="grid grid-2">'+
         '<div><div class="kind-label" style="color:var(--good);">Getting</div>'+
           '<div class="task-list">'+(toward.map(function(m){ return '<div class="task-item-v2"><div class="task-title" style="flex:1;">'+escapeHtml(m.text)+'</div>'+deleteBtn('motivation', m.id)+'</div>'; }).join('') || '<div class="empty">Nothing yet.</div>')+'</div>'+
@@ -19873,7 +20036,7 @@ function renderWakeSetup(){
       '<div class="field"><label>Good morning intro</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(w.intro==='quick'?' active':'')+'" data-action="wakeIntro" data-id="quick">Quick</button><button class="seg-tab'+(w.intro==='cinematic'?' active':'')+'" data-action="wakeIntro" data-id="cinematic">Cinematic</button></div></div>'+
       '<div class="field"><label>News topics'+tip('Things you care about, separated by commas, e.g. AI, Knicks, marketing. Good morning shows the latest headlines on those. Leave it empty for the top stories.')+'</label><input class="input" data-wake="newsTopics" placeholder="e.g. AI, Knicks, marketing" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
       '<div class="field"><label>Sports'+tip('Teams or leagues for the Sports section, e.g. Knicks, Giants, UFC. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, NFL, UFC" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
-      '<div class="field"><label>Scores'+tip('Which leagues the scoreboard shows: yesterday’s and today’s results and what’s coming up. Your teams (above) go first.')+'</label><div class="seg-tabs" style="margin:0;">'+(typeof SPORTS!=='undefined' ? SPORTS : []).map(function(sp){ const on = arr(w.sportsOff).indexOf(sp.id) < 0; return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeLeague" data-id="'+sp.id+'">'+sp.label+'</button>'; }).join('')+'</div></div>'+
+      '<div class="field"><label>Scores'+tip('Which leagues the scoreboard shows: yesterday’s and today’s results and what’s coming up. Your teams (above) go first.')+'</label><div class="seg-tabs" style="margin:0;">'+(typeof SPORTS!=='undefined' ? SPORTS : []).map(function(sp){ const on = sportsOn().some(function(x){ return x.id===sp.id; }); return '<button class="seg-tab'+(on?' active':'')+'" data-action="wakeLeague" data-id="'+sp.id+'">'+sp.label+'</button>'; }).join('')+'</div></div>'+
       '<div class="field"><label>Local news'+tip('A few headlines from where you are (the place your weather is set to, Settings → Look & Sound).')+'</label><div class="seg-tabs" style="margin:0;"><button class="seg-tab'+(weatherCfg().newsLocal!==false?' active':'')+'" data-action="wakeLocalNews" data-id="on">'+escapeHtml(weatherCfg().city || (weatherCfg().place && weatherCfg().place!=='My location' ? String(weatherCfg().place).split(',')[0] : 'On'))+'</button><button class="seg-tab'+(weatherCfg().newsLocal===false?' active':'')+'" data-action="wakeLocalNews" data-id="off">Off</button></div></div>'+
       '<div class="field"><label>Hide news about'+tip('Words or places you never want in your headlines, separated by commas.')+'</label><input class="input" data-wake="newsMute" placeholder="e.g. Wyoming, celebrity" value="'+escapeHtml(w.newsMute!=null ? w.newsMute : 'Wyoming')+'"></div>'+
       '<div class="field"><label>Tech & interests'+tip('Anything else you follow, e.g. AI, Apple, marketing, crypto. Leave it empty to hide the section.')+'</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
@@ -20000,7 +20163,7 @@ document.addEventListener('change', function(e){
   saveWake();
   renderView();
 });
-ACTIONS.wakeLeague = function(el, e, id){ const w = wakeCfg(), off = arr(w.sportsOff).slice(), i = off.indexOf(id); if(i>=0) off.splice(i, 1); else if(off.length < SPORTS.length - 1) off.push(id); w.sportsOff = off; saveWake(); ui.scores = null; renderView(); };
+ACTIONS.wakeLeague = function(el, e, id){ ACTIONS.aboutLeague(el, e, id); if(typeof renderWakeSetupInto==='function') renderWakeSetupInto(); };
 ACTIONS.wakeLocalNews = function(el, e, id){ ensureWeatherCfg().newsLocal = id!=='off'; persist('settings'); ui.morningNews = null; renderWakeSetupInto(); renderView(); };
 // ---- small pieces shown elsewhere ----
 function wakeChipHtml(){
@@ -20123,7 +20286,7 @@ ACTIONS.wakeOpenIn = function(el, e, id){ wakeCfg().openIn = id; saveWake(); };
 // already started), and Next takes you to the work page, the same one Good morning's Get to work opens.
 // Your work hours, lunch and a break live with it: Op keeps to them (lunch and breaks are yours, and
 // it's only during work hours that it checks in on you).
-const WORK_DEFAULT = {enabled:false, start:'09:00', end:'17:00', days:[1,2,3,4,5], lunch:'12:30', lunchMin:45, brk:'15:30', brkMin:15, checkins:true, pace:'normal', sound:'standard'};
+const WORK_DEFAULT = {enabled:false, start:'09:00', end:'17:00', days:[1,2,3,4,5], lunch:'12:30', lunchMin:45, lunchOn:true, brk:'15:30', brkMin:15, brkOn:true, checkins:true, pace:'normal', sound:'standard'};
 function workCfg(){
   const f = state.focus;
   if(!f.work || typeof f.work!=='object') f.work = {};
@@ -20132,12 +20295,22 @@ function workCfg(){
   if(!Array.isArray(w.days)) w.days = WORK_DEFAULT.days.slice();
   return w;
 }
+// today's hours: your usual ones, or the ones you set for tomorrow while winding down the night before.
+// Lunch and the break only count when they're switched on.
+function workHoursFor(date){
+  const w = workCfg(), o = w.override && w.override.date===date ? w.override : null;
+  const h = Object.assign({}, w, o ? {start:o.start || w.start, end:o.end || w.end} : {});
+  if(w.lunchOn===false) h.lunch = ''; if(w.brkOn===false) h.brk = '';
+  if(o && o.off) h.off = true;
+  return h;
+}
+function workToday(){ return workHoursFor(todayStr()); }
 function hmMin(hm){ const m = /^(\d{1,2}):(\d{2})/.exec(hm||''); return m ? Number(m[1])*60 + Number(m[2]) : null; }
 function nowMin(){ const d = new Date(); return d.getHours()*60 + d.getMinutes(); }
-function workDayToday(){ const t = todayStr(), w = workCfg(); return arr(w.days).indexOf(dowOf(t))>=0 && !(typeof isDayOff==='function' && isDayOff(t)); }
+function workDayToday(){ const t = todayStr(), w = workCfg(), h = workHoursFor(t); if(h.off) return false; if(w.override && w.override.date===t && !w.override.off) return true; return arr(w.days).indexOf(dowOf(t))>=0; }
 // where in the work day you are: off (not a work day / no hours), before, work, lunch, break, after
 function workPhase(){
-  const w = workCfg(); if(!w.enabled || !workDayToday()) return 'off';
+  const w = workToday(); if(!w.enabled || !workDayToday()) return 'off';
   const m = nowMin(), s = hmMin(w.start), e = hmMin(w.end), l = hmMin(w.lunch), b = hmMin(w.brk);
   if(s==null || e==null) return 'off';
   if(m < s) return 'before'; if(m >= e) return 'after';
@@ -20147,7 +20320,7 @@ function workPhase(){
 }
 // minutes of work hours gone by today (lunch and the break don't count)
 function workMinutesElapsed(){
-  const w = workCfg(), m = nowMin(), s = hmMin(w.start), e = hmMin(w.end); if(s==null || e==null || m <= s) return 0;
+  const w = workToday(), m = nowMin(), s = hmMin(w.start), e = hmMin(w.end); if(s==null || e==null || m <= s) return 0;
   let n = Math.min(m, e) - s;
   [[hmMin(w.lunch), Number(w.lunchMin)||0], [hmMin(w.brk), Number(w.brkMin)||0]].forEach(function(x){ if(x[0]==null) return; n -= Math.max(0, Math.min(Math.min(m, e), x[0] + x[1]) - x[0]); });
   return Math.max(0, n);
@@ -20169,7 +20342,7 @@ function fireWorkAlarm(opts){
   try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: Time to work'); }catch(e){}
 }
 function workRingHtml(){
-  const w = workCfg(), name = state.profile.name || '';
+  const w = workToday(), name = state.profile.name || '';
   const plan = typeof todaysPlan==='function' ? todaysPlan().filter(function(t){ return t.status!=='done'; }) : [];
   return '<div class="wk2 wk3 wkw" data-sky="'+(typeof skyLook==='function' ? skyLook() : 'day')+'">'+
     '<div class="wk2-aura"><i></i><i></i><i></i></div>'+
@@ -20197,7 +20370,7 @@ ACTIONS.workSnooze = function(){
 };
 // ---- watching the clock: the alarm, lunch, the break, the end of the day ----
 function checkWorkAlarm(){
-  const w = workCfg(); if(!w.enabled || !workDayToday()) return;
+  const w = workToday(); if(!w.enabled || !workDayToday()) return;
   const d = workDayState(), m = nowMin(), s = hmMin(w.start), e = hmMin(w.end);
   if(s==null) return;
   // the alarm: once, at the start (or within an hour after, if the app wasn't open)
@@ -20256,8 +20429,8 @@ function workSetupHtml(){
       '<div class="kpi-sub">'+(w.enabled ? 'Rings at '+fmt12Hour(w.start)+' '+(typeof wakeDaysLabel==='function' ? wakeDaysLabel(w.days) : '') : 'The work alarm is off')+'</div>'+
     '</div>'+
     '<div class="ws-block grid grid-2">'+
-      '<div class="field"><label>Lunch</label><div class="row" style="gap:6px;"><input class="input" type="time" data-work="lunch" value="'+(w.lunch||'')+'" style="width:130px;">'+mins('lunchMin', [30, 45, 60, 90])+'</div></div>'+
-      '<div class="field"><label>Break</label><div class="row" style="gap:6px;"><input class="input" type="time" data-work="brk" value="'+(w.brk||'')+'" style="width:130px;">'+mins('brkMin', [10, 15, 20, 30])+'</div></div>'+
+      '<div class="field"><label>Lunch<label class="ws-switch ws-mini" title="Lunch on/off"><input type="checkbox" data-work="lunchOn" '+(w.lunchOn!==false?'checked':'')+'><span></span></label></label>'+(w.lunchOn!==false ? '<div class="row" style="gap:6px;"><input class="input" type="time" data-work="lunch" value="'+(w.lunch||'')+'" style="width:130px;">'+mins('lunchMin', [30, 45, 60, 90])+'</div>' : '<div class="kpi-sub">No set lunch</div>')+'</div>'+
+      '<div class="field"><label>Break<label class="ws-switch ws-mini" title="Break on/off"><input type="checkbox" data-work="brkOn" '+(w.brkOn!==false?'checked':'')+'><span></span></label></label>'+(w.brkOn!==false ? '<div class="row" style="gap:6px;"><input class="input" type="time" data-work="brk" value="'+(w.brk||'')+'" style="width:130px;">'+mins('brkMin', [10, 15, 20, 30])+'</div>' : '<div class="kpi-sub">No set break</div>')+'</div>'+
       '<div class="field"><label>Op checks in on you'+tip('During work hours (not at lunch, on a break, in Shooting, or right after you lock in), Op looks in now and then. Working: it asks if you need anything. Not working: it wants to know why.')+'</label>'+seg('checkins', [[true, 'On'], [false, 'Off']])+'</div>'+
       '<div class="field"><label>How often</label>'+seg('pace', [['light', 'Now and then'], ['normal', 'Normal'], ['strict', 'Strict']])+'</div>'+
       '<div class="field"><label>Alarm sound</label>'+seg('sound', [['peaceful', 'Peaceful'], ['standard', 'Standard'], ['loud', 'Loud']])+'</div>'+
@@ -20275,6 +20448,7 @@ document.addEventListener('change', function(e){
   const t = e.target, key = t && t.dataset && t.dataset.work; if(!key) return;
   const w = workCfg();
   if(key==='enabled') w.enabled = t.checked;
+  else if(key==='lunchOn' || key==='brkOn') w[key] = t.checked;
   else if(key==='lunchMin' || key==='brkMin') w[key] = Number(t.value) || 0;
   else w[key] = t.value;
   // (turning it on, or moving the start, after today's start time doesn't ring it straight away)
@@ -22068,6 +22242,10 @@ function notifList(){
     if(Number(c.mrr)>0 && typeof clientInvoicedThisMonth==='function' && !clientInvoicedThisMonth(c.id) && new Date().getDate() >= (c.billingDay||1))
       add({key:'inv:'+c.id+':'+thisMonthKey(), kind:'client', level:'warn', icon:'&#128176;', title:'Invoice '+name, sub:'$'+Number(c.mrr).toLocaleString()+' retainer: billing day passed', act:{a:'openClientModal', id:c.id}, sort:2});
   });
+  // follow-ups you set on clients: reminders on their day
+  if(typeof followUpsDue==='function') followUpsDue(today).filter(function(f){ return f.kind==='client'; }).forEach(function(f){
+    add({key:'fu:'+f.x.id+':'+f.date, kind:'client', level:f.late ? 'warn' : 'info', icon:'&#128276;', title:'Follow up with '+f.name, sub:(f.late ? 'Since '+fmtDateShort(f.date) : 'Today')+(f.note ? ' · '+f.note : ''), act:{a:'openClientModal', id:f.x.id}, sort:2});
+  });
   // leads
   arr(state.business.pipeline).forEach(function(x){
     if(x.convertedClientId) return;
@@ -22174,6 +22352,11 @@ setTimeout(function(){ try{ notifPrune(); }catch(e){} }, 5000);
 // The plan you make at night lines itself up the next day — nothing to click.
 
 // ---------- wind down ----------
+// the work day you're closing: after midnight (before 4 AM) it's still yesterday's. The numbers stay on the
+// dates they happened (nothing past midnight gets moved back), the recap is just about the right day.
+function workDayDate(){ return new Date().getHours() < 4 ? addDays(todayStr(), -1) : todayStr(); }
+function workDayName(d){ return new Date(d+'T12:00').toLocaleDateString('en-US', {weekday:'long'}); }
+function deepWorkOn(d){ return d===todayStr() ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); }
 function windTarget(){ return typeof wakeTargetDate==='function' ? wakeTargetDate() : addDays(todayStr(), 1); }
 function windTask(id){ return state.tasks.items.find(function(t){ return t.id===id && t.status!=='done'; }) || null; }
 function openWindDown(step){
@@ -22181,14 +22364,16 @@ function openWindDown(step){
   const np = state.focus.nightPlan && state.focus.nightPlan.date===target ? state.focus.nightPlan : null;
   let plan = np ? arr(np.taskIds).filter(windTask) : [];
   if(!plan.length) plan = lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); })).slice(0, 6).map(function(t){ return t.id; });
-  ui.wind = {step:step || 'recap', plan:plan, target:target, search:'', alarm:(wakeTimeFor(target) || ''), noAlarm:false};
+  const wh = typeof workHoursFor==='function' ? workHoursFor(target) : null, wc = typeof workCfg==='function' ? workCfg() : null;
+  const works = !!(wc && (wc.override && wc.override.date===target ? !wc.override.off : arr(wc.days).indexOf(dowOf(target))>=0));
+  ui.wind = {step:step || 'recap', plan:plan, target:target, search:'', alarm:(wakeTimeFor(target) || ''), noAlarm:false, workStart:wh ? wh.start : '', workEnd:wh ? wh.end : '', noWork:!works};
   ui.windDownOpen = false;
   showOverlay('windOverlay'); renderWindInto(); playNight();
 }
 ACTIONS.openWindDown = function(el){ openWindDown(el && el.dataset && el.dataset.step); };
 ACTIONS.closeWindDown = function(){ windSave(false); ui.wind = null; hideOverlay('windOverlay'); renderView(); };
 ACTIONS.windStep = function(el, e, id){ windReadForm(); ui.wind.step = id; renderWindInto(); };
-const WIND_STEPS = [['recap','Today'],['plan','Plan of attack'],['note','Note'],['alarm','Alarm']];
+const WIND_STEPS = [['recap','Today'],['plan','Plan of attack'],['note','Note'],['alarm','Tomorrow']];
 ACTIONS.windNext = function(){ windReadForm(); const i = WIND_STEPS.findIndex(function(s){ return s[0]===ui.wind.step; }); ui.wind.step = WIND_STEPS[Math.min(WIND_STEPS.length-1, i+1)][0]; renderWindInto(); };
 ACTIONS.windBack = function(){ windReadForm(); const i = WIND_STEPS.findIndex(function(s){ return s[0]===ui.wind.step; }); ui.wind.step = WIND_STEPS[Math.max(0, i-1)][0]; renderWindInto(); };
 function windReadForm(){
@@ -22199,6 +22384,8 @@ function windReadForm(){
     [n, nm, nw].forEach(function(x){ if(x) x.value = ''; });
   }
   const a = document.getElementById('windAlarm'); if(a) w.alarm = a.value;
+  const ws = document.getElementById('windWorkStart'), we = document.getElementById('windWorkEnd');
+  if(ws) w.workStart = ws.value; if(we) w.workEnd = we.value;
 }
 // save the plan + alarm (and optionally go to sleep)
 function windSave(sleep){
@@ -22213,6 +22400,13 @@ function windSave(sleep){
     else if(want===base) wk.override = null;
     else wk.override = {date:w.target, time:want};
     wakeArm();
+  }
+  // tomorrow's work hours: only that day changes (your usual hours stay as they are)
+  if(typeof workCfg==='function' && workCfg().enabled){
+    const wc = workCfg(), usual = arr(wc.days).indexOf(dowOf(w.target))>=0;
+    if(w.noWork) wc.override = usual ? {date:w.target, off:true} : null;
+    else if(!usual || w.workStart!==wc.start || w.workEnd!==wc.end) wc.override = {date:w.target, start:w.workStart || wc.start, end:w.workEnd || wc.end};
+    else wc.override = null;
   }
   persist('focus');
   if(sleep){
@@ -22237,6 +22431,9 @@ ACTIONS.windNewTask = function(){
   setTimeout(function(){ const i = document.getElementById('windNewTask'); if(i) i.focus(); }, 20);
 };
 ACTIONS.windNoAlarm = function(){ windReadForm(); ui.wind.noAlarm = !ui.wind.noAlarm; renderWindInto(); };
+ACTIONS.windNoWork = function(){ windReadForm(); ui.wind.noWork = !ui.wind.noWork; renderWindInto(); };
+// done: the plan, the note and tomorrow are saved, and the clocked-out page takes over (That's the day)
+ACTIONS.windDone = function(){ windSave(false); ui.wind = null; hideOverlay('windOverlay'); ui.restFull = true; renderView(); playTick(); };
 document.addEventListener('keydown', function(e){
   if(e.key==='Enter' && e.target && e.target.id==='windNewTask'){ e.preventDefault(); ACTIONS.windNewTask(); }
 });
@@ -22283,8 +22480,8 @@ function dayTimelineHtml(date){
   return '<div class="wd-tl"><div class="wd-tl-track">'+blocks+live+'</div><div class="wd-tl-axis"><span>6a</span><span>9a</span><span>12p</span><span>3p</span><span>6p</span><span>9p</span><span>12a</span></div></div>';
 }
 function windRecapHtml(){
-  const d = todayStr(), target = state.standards.deepWorkTargetMinutes || 180;
-  const deep = deepWorkMinutesTodayLive(), pct = Math.min(100, deep/target*100);
+  const d = workDayDate(), late = d!==todayStr(), target = state.standards.deepWorkTargetMinutes || 180;
+  const deep = deepWorkOn(d), pct = Math.min(100, deep/target*100);
   const done = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===d; });
   const sess = sessionsOn(d), longest = sess.reduce(function(m, s){ return Math.max(m, s.minutes||0); }, 0);
   const wk = typeof workoutDay==='function' ? workoutDay(d) : {n:0, m:0};
@@ -22303,7 +22500,7 @@ function windRecapHtml(){
       '<div class="wd-stats">'+
         '<div class="wd-stat"><b>'+done.length+'</b><span>tasks done</span></div>'+
         '<div class="wd-stat"><b>'+sess.length+'</b><span>session'+(sess.length===1?'':'s')+(longest ? ' · longest '+fmtDurationLabel(longest) : '')+'</span></div>'+
-        '<div class="wd-stat'+(std?' is-good':'')+'"><b>'+(std ? '&#10003;' : '&#10005;')+'</b><span>today\'s standard</span></div>'+
+        '<div class="wd-stat'+(std?' is-good':'')+'"><b>'+(std ? '&#10003;' : '&#10005;')+'</b><span>'+(late ? workDayName(d)+'\'s' : 'today\'s')+' standard</span></div>'+
         '<div class="wd-stat"><b>'+streak+'</b><span>day streak</span></div>'+
         (wk.n ? '<div class="wd-stat is-good"><b>'+wk.n+'</b><span>workout'+(wk.n===1?'':'s')+(wk.m ? ' · '+fmtDurationLabel(wk.m) : '')+'</span></div>' : '')+
         ((delivs || touches) ? '<div class="wd-stat"><b>'+(delivs+touches)+'</b><span>client moves ('+delivs+' delivered, '+touches+' touches)</span></div>' : '')+
@@ -22311,7 +22508,7 @@ function windRecapHtml(){
     '</div>'+
     '<div class="wd-k">When you worked</div>'+dayTimelineHtml(d)+
     '<div class="wd-cols">'+
-      '<div><div class="wd-k">Done today</div>'+(done.length ? '<ul class="wd-done">'+done.slice(0, 8).map(function(t){ return '<li>&#10003; '+escapeHtml(t.title)+'</li>'; }).join('')+(done.length>8 ? '<li class="kpi-sub">+'+(done.length-8)+' more</li>' : '')+'</ul>' : '<div class="kpi-sub">Nothing ticked off today.</div>')+
+      '<div><div class="wd-k">'+(late ? 'Done '+workDayName(d) : 'Done today')+'</div>'+(done.length ? '<ul class="wd-done">'+done.slice(0, 8).map(function(t){ return '<li>&#10003; '+escapeHtml(t.title)+'</li>'; }).join('')+(done.length>8 ? '<li class="kpi-sub">+'+(done.length-8)+' more</li>' : '')+'</ul>' : '<div class="kpi-sub">Nothing ticked off.</div>')+
         (left ? '<div class="kpi-sub" style="margin-top:8px;">'+left+' still on today\'s list. Carry them into tomorrow\'s plan.</div>' : '')+'</div>'+
       '<div><div class="wd-k">Tomorrow</div>'+((tomEvents.length || tomDue.length) ? '<div class="wd-tom">'+tomEvents.map(function(e){ return '<div><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b> '+escapeHtml(e.title)+'</div>'; }).join('')+tomDue.map(function(t){ return '<div><b class="is-due">Due</b> '+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '<div class="kpi-sub">Nothing on the calendar yet.</div>')+'</div>'+
     '</div>'+
@@ -22347,19 +22544,25 @@ function windNoteHtml(){
   '</div>';
 }
 function windAlarmHtml(){
-  const w = ui.wind, wk = wakeCfg(), base = wakeBaseTimeFor(w.target);
-  return '<div class="wd-alarm">'+
-    '<div class="wd-sub">'+(base ? 'Usual: '+fmt12Hour(base)+'. Changing it here only changes '+morningLabel(w.target)+'.' : 'No daily alarm that day. Set one here.')+'</div>'+
-    (w.noAlarm ? '<div class="wd-noalarm">No alarm '+morningLabel(w.target)+'</div>' : '<input class="ws-time wd-time" type="time" id="windAlarm" value="'+escapeHtml(w.alarm||'')+'">')+
-    '<div class="row" style="gap:8px;justify-content:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" data-action="windNoAlarm">'+(w.noAlarm ? 'Set an alarm' : 'No alarm '+morningLabel(w.target))+'</button>'+
-      '<button class="btn btn-ghost btn-sm" data-action="openWakeSetup">Sound &amp; music</button></div>'+
+  const w = ui.wind, wk = wakeCfg(), base = wakeBaseTimeFor(w.target), wc = typeof workCfg==='function' ? workCfg() : null;
+  const wake = '<div class="wd-card">'+
+    '<div class="wd-work-k">&#9200; Wake up</div>'+
+    (w.noAlarm ? '<div class="wd-noalarm">No alarm</div>' : '<input class="ws-time wd-time" type="time" id="windAlarm" value="'+escapeHtml(w.alarm||'')+'">')+
+    '<div class="wd-sub">'+(base ? 'Usual: '+fmt12Hour(base)+'. This only changes '+morningLabel(w.target)+'.' : 'No daily alarm that day.')+'</div>'+
     '<div class="wd-sound">'+(wakeUsesMusic(wk) ? '&#9835; '+escapeHtml(mediaName(wk.media)) : '&#128276; '+wakeBeepSound(wk)[0].toUpperCase()+wakeBeepSound(wk).slice(1)+' tone')+'</div>'+
+    '<div class="wd-card-b"><button class="btn btn-ghost btn-sm" data-action="windNoAlarm">'+(w.noAlarm ? 'Set an alarm' : 'No alarm')+'</button><button class="btn btn-ghost btn-sm" data-action="openWakeSetup">Sound &amp; music</button></div>'+
   '</div>';
+  const work = !wc || !wc.enabled ? '<div class="wd-card is-off"><div class="wd-work-k">&#128188; Work</div><span>Your work hours aren’t set up yet.</span><div class="wd-card-b"><button class="btn btn-ghost btn-sm" data-action="openWorkSetup">Set them up</button></div></div>'
+    : '<div class="wd-card"><div class="wd-work-k">&#128188; Work</div>'+
+        (w.noWork ? '<div class="wd-noalarm">Not working</div>' : '<div class="wd-work-h"><input class="ws-time wd-time is-sm" type="time" id="windWorkStart" value="'+escapeHtml(w.workStart||'')+'"><span>to</span><input class="ws-time wd-time is-sm" type="time" id="windWorkEnd" value="'+escapeHtml(w.workEnd||'')+'"></div>')+
+        '<div class="wd-sub">Op checks in during these hours.</div>'+
+        '<div class="wd-card-b"><button class="btn btn-ghost btn-sm" data-action="windNoWork">'+(w.noWork ? 'I’m working' : 'Not working '+morningLabel(w.target))+'</button></div></div>';
+  return '<div class="wd-tomorrow">'+wake+work+'</div>';
 }
 function windHtml(){
   const w = ui.wind; if(!w) return '';
   const i = WIND_STEPS.findIndex(function(s){ return s[0]===w.step; });
-  const titles = {recap:'Here\'s how today went.', plan:'Plan of attack: '+morningLabel(w.target)+'.', note:'A note for the morning.', alarm:'Wake up '+morningLabel(w.target)+' at…'};
+  const titles = {recap:workDayDate()===todayStr() ? 'Here\'s how today went.' : 'Here\'s how '+workDayName(workDayDate())+' went.', plan:'Plan of attack: '+morningLabel(w.target)+'.', note:'A note for the morning.', alarm:'Tomorrow, sorted.'};
   const body = w.step==='plan' ? windPlanHtml() : w.step==='note' ? windNoteHtml() : w.step==='alarm' ? windAlarmHtml() : windRecapHtml();
   return '<div class="wd">'+
     '<div class="wd-top"><span class="wd-moon">&#127769;</span><span class="wd-brand">Wind down</span>'+
@@ -22367,9 +22570,9 @@ function windHtml(){
       '<button class="wd-close" data-action="closeWindDown" title="Close (your plan is kept)">&#10005;</button></div>'+
     '<div class="wd-inner" data-key="wd-'+w.step+'"><h2 class="wd-title-h">'+titles[w.step]+'</h2>'+body+'</div>'+
     '<div class="wd-foot">'+
-      (i>0 ? '<button class="btn btn-ghost" data-action="windBack">&larr; Back</button>' : '<span></span>')+
-      (w.step==='alarm' ? '<span class="row" style="gap:8px;"><button class="btn btn-ghost" data-action="windSaveOnly">Save, not sleeping yet</button><button class="btn wd-sleep" data-action="windGoToSleep">&#127769; Go to sleep</button></span>'
-        : '<button class="btn btn-primary" data-action="windNext">Next &rarr;</button>')+
+      (i>0 ? '<button class="wd-back" data-action="windBack"><span>&larr;</span>Back</button>' : '<span></span>')+
+      (w.step==='alarm' ? '<span class="wd-foot-r"><button class="wd-alt" data-action="windGoToSleep" title="Saves it all and goes quiet until the alarm">&#127769; Going to sleep</button><button class="wd-go" data-action="windDone"><span class="wd-go-glow"></span>&#10003; Done</button></span>'
+        : '<button class="wd-go" data-action="windNext"><span class="wd-go-glow"></span>Next<span class="wd-go-a">&rarr;</span></button>')+
     '</div>'+
   '</div>';
 }
@@ -23390,19 +23593,22 @@ function wakeBriefHtml(){
   if(you) colA.push(panel('br-you br-intent', 'br-a-rise', you.voice, you.html));
   // column 2: a line to carry, and a few small things for a good day
   colB.push(panel('br-quote', 'br-a-words', brVary('quote', ['Something to carry with you.', 'A line worth keeping in your pocket today.', 'Here’s one to chew on with your coffee.', 'A little something for the back of your mind.']), '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
-  colB.push(panel('br-thoughts br-goodday', 'br-a-rise', brVary('goodday', ['A few things for a good day.', 'Some small wins, if you want them.', 'A few easy ones to start the day right.', 'Little things that make a day better.']), '<div class="br-k">&#127807; For a Good Day</div>'+goodDayReelHtml()));
+  colB.push(panel('br-thoughts br-goodday', 'br-a-rise', '', '<div class="br-k">&#127807; For a Good Day</div>'+goodDayReelHtml()));
   // the day ahead — the calendar, and the content you're after — sits on top of the world's news
   const cp = typeof contentProgress==='function' ? ['business', 'personal'].map(contentProgress).filter(function(p){ return p.n; }) : [];
   // (wide screens: on top of the headlines; otherwise under the weather, where the month panel has room)
-  const todayCol = window.innerWidth >= 1680 ? colC : null;
+  const todayCol = null;   // (round 27: Today stays under the weather on every screen, so that column never ends early)
   // (the work itself — the plan, what's due — waits for the work preview; Good morning is the day around it)
-  const todayVoice = events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : 'Nothing on the calendar. The day’s yours.';
+  const rems = typeof followUpsDue==='function' ? followUpsDue(today) : [];
+  const remVoice = rems.length ? (rems.length===1 ? ' And a reminder: follow up with '+rems[0].name+'.' : ' And '+rems.length+' follow-ups to make.') : '';
+  const todayVoice = (events.length ? (events.length===1 ? 'One thing on the calendar later.' : events.length+' things on the calendar later.') : rems.length ? 'Nothing on the calendar.' : 'Nothing on the calendar. The day’s yours.')+remVoice;
   const row = function(when, what, cls){ return '<div class="bd-r'+(cls ? ' '+cls : '')+'"><b>'+when+'</b><span>'+what+'</span></div>'; };
   const todayP = (panel('br-day', 'br-a-right', todayVoice,
     '<div class="br-k">&#128197; Today<span class="br-k-n">'+new Date().toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+'</span></div>'+
     '<div class="bd-list">'+
       events.map(function(e){ return row(e.time ? fmt12Hour(e.time) : 'All day', escapeHtml(e.title)+(e.location ? '<small>'+escapeHtml(e.location)+'</small>' : ''), 'is-ev'+(e.time && e.time < nowHM() ? ' is-past' : '')); }).join('')+
-      (!events.length ? '<div class="bd-empty">Nothing scheduled. Enjoy the morning.</div>' : '')+
+      rems.map(function(r){ return row('&#128276;', 'Follow up with '+escapeHtml(r.name)+(r.note ? '<small>'+escapeHtml(r.note)+'</small>' : r.late ? '<small>since '+fmtDateShort(r.date)+'</small>' : ''), 'is-rem'); }).join('')+
+      (!events.length && !rems.length ? '<div class="bd-empty">Nothing scheduled. Enjoy the morning.</div>' : '')+
     '</div><div class="bd-more" hidden></div>'+
     (cp.length ? '<div class="br-content">'+cp.map(function(p){ return '<span class="'+(p.done >= p.n ? 'is-hit' : '')+'"><b>'+p.done+'/'+p.n+'</b> '+(p.role==='business' ? 'business' : 'personal')+' videos '+p.label+'</span>'; }).join('')+'</div>' : '')));
   if(todayCol) todayCol.push(todayP); else colA.splice(1, 0, todayP);
@@ -23423,7 +23629,7 @@ function wakeBriefHtml(){
   if(morningNewsOn() && newsSections().some(function(x){ return x.id==='sports'; })){
     // (on a narrower screen sports shares a column with the headlines: fewer rows, no sports stories)
     const roomy = window.innerWidth >= 1680;
-    const sc = typeof scoresHtml==='function' ? scoresHtml(roomy ? 4 : 3, roomy ? 4 : 3) : '', sh = arr(sec.sports).slice(0, roomy || !sc ? 6 : 0);
+    const sc = typeof scoresBoardHtml==='function' ? scoresBoardHtml() : '', sh = arr(sec.sports).slice(0, sc ? 0 : 6);
     if(sc || sh.length){
       const lt = late();
       colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports'+asks()+'</div>'+sc+sh.slice(0, sc ? 2 : 6).map(function(n){ return item(n, false); }).join(''), lt));
@@ -23615,6 +23821,8 @@ function clockIn(opts){
   if(!opts.quiet) playWorkIntro();
   if(typeof workDayState==='function'){ workDayState().clockedInAt = Date.now(); persist('focus'); }
   if((opts.from==='morning' || opts.from==='workalarm') && typeof opAutoBusinessBrief==='function') opAutoBusinessBrief();
+  // and some music for the work, once the intro's played
+  if((opts.from==='morning' || opts.from==='workalarm') && typeof workMusicPlay==='function') setTimeout(workMusicPlay, opts.quiet ? 300 : 2600);
 }
 ACTIONS.clockIn = function(){ clockIn(); };
 ACTIONS.closePlanReveal = function(){ ui.planReveal = null; hideOverlay('planOverlay'); renderView(); };
@@ -23748,6 +23956,8 @@ ACTIONS.clockOut = function(){
   ui.undoMode = {prev:prev, at:Date.now()};
   // (no flash, no "done for the day" toast: the clocked-out page says it, and Clock back in undoes it)
   playLockOut(); ui.restFull = true;
+  // round 27: clocking out IS winding down: the steps first (today, tomorrow's plan, a note, tomorrow), then That's the day
+  if(typeof openWindDown==='function') setTimeout(function(){ if(state.modes.active && state.modes.active.clockedOut) openWindDown('recap'); }, 350);
 };
 
 // the vision board fits itself once its entrance has played (it measures wrong while scaled)
@@ -23820,7 +24030,6 @@ function renderFocusMinimal(){
       '<div class="hm-btns">'+
         '<button class="hm-b" data-action="openQuickJournalModal">&#128221; Journal</button>'+
         '<button class="hm-b" data-action="clockOut">&#127937; Clock out</button>'+
-        '<button class="hm-b" data-action="quickDayOff">&#127796; Day off</button>'+
       '</div>'+
     '</div>'+
   '</div>';
@@ -24100,17 +24309,7 @@ function isWorkDay(dateStr){
   return arr(w.days).indexOf(dowOf(dateStr))>=0;
 }
 function nextWorkDay(from){ for(let i=1;i<8;i++){ const d = addDays(from, i); if(isWorkDay(d)) return d; } return null; }
-function autoDayOffCheck(){
-  if(!state || !state.daysOff) return false;
-  const today = todayStr(), seen = state.daysOff.autoSeen = arr(state.daysOff.autoSeen);
-  if(seen.indexOf(today)>=0) return false;
-  seen.push(today); if(seen.length > 40) seen.splice(0, seen.length - 40);
-  let changed = true;
-  if(!isWorkDay(today) && !isDayOff(today) && !state.focus.activeSession){ state.daysOff.dates.push(today); dayOffFlash(true, true); }
-  persist('daysOff');
-  return changed;
-}
-afterRenderHooks.push(function(){ if(typeof state!=='undefined' && state && state.daysOff && autoDayOffCheck() && isDayOff(todayStr())) setTimeout(renderView, 0); });
+// (round 27: no Day off mode any more; days your schedule doesn't work are rest days on their own: see isDayOff)
 function dayOffFlash(on, auto){
   const d = document.createElement('div');
   d.className = 'lock-flash is-dayoff'+(on ? '' : ' is-back');
@@ -24159,39 +24358,35 @@ function renderWeekendOffView(elapsed, weekend){
       '<div class="dayoff-k">&#127937; Clocked out'+(weekend ? ' &middot; day off tomorrow' : '')+'</div>'+
       '<h1 class="dayoff-h">'+(weekend ? 'That’s the week' : 'That’s the day')+name+'.</h1>'+
       '<div class="dayoff-cards">'+
-        '<div class="dayoff-c"><b>'+fmtHours(deepWorkMinutesTodayLive())+'</b><span>deep work today</span></div>'+
+        '<div class="dayoff-c"><b>'+fmtHours(deepWorkOn(workDayDate()))+'</b><span>deep work '+(workDayDate()!==today ? workDayName(workDayDate()) : 'today')+'</span></div>'+
         '<div class="dayoff-c"><b id="modeElapsed">'+formatElapsed(elapsed)+'</b><span>off the clock</span></div>'+
         (nw ? '<div class="dayoff-c"><b>'+(nw===addDays(today, 1) ? 'Tomorrow' : weekdayShort(nw))+'</b><span>back to work'+(wake ? ' &middot; alarm '+fmt12Hour(wake) : '')+'</span></div>' : '')+
       '</div>'+
       (ideas.length ? '<div class="dayoff-ideas">'+ideas.map(function(x){ return '<div class="br-th"><span class="br-th-i">'+x[0]+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>'; }).join('')+'</div>' : '')+
       '<div class="dayoff-row">'+
-        (isWindDownTime() ? '<button class="dayoff-back" data-action="openWindDown">&#127769; Wind down</button>' : '')+
-        '<button class="dayoff-back" data-action="clockIn">Clock back in</button>'+tomorrowNoteBtnHtml()+
+        '<button class="dayoff-back is-main" data-action="clockIn">Clock back in</button>'+
+        '<button class="dayoff-back" data-action="openWindDown" data-step="plan">&#127769; Edit wind-down</button>'+
+        '<button class="dayoff-back" data-action="openWindDown" data-step="alarm" title="Your alarm and work hours for tomorrow">&#9200; Tomorrow'+(wake ? ' &middot; '+fmt12Hour(wake) : '')+'</button>'+
       '</div>'+
     '</div>'+
   '</div>';
 }
-function renderDayOffView(){
-  const streak = computeStreak(), nw = nextWorkDay(todayStr());
-  const wake = nw && typeof wakeTimeFor==='function' ? wakeTimeFor(nw) : null;
-  const stat = function(v, k){ return '<div class="rest-s"><b>'+v+'</b><span>'+k+'</span></div>'; };
-  return '<div class="np rest is-dayoff'+(restFull() ? ' rest-full' : '')+'">'+
-    '<div class="np-bg"></div>'+
-    restTopHtml(tomorrowNoteBtnHtml('lv-btn rest-work')+'<button class="lv-btn rest-work" data-action="quickDayOff" title="Turn the day off back off">Work today</button>')+
-    '<div class="np-main">'+
-      '<div class="np-art is-dayoff"><span>&#127796;</span></div>'+
-      '<div class="np-meta">'+
-        '<div class="np-title rest-h">Day off.</div>'+
-        '<div class="rest-stats">'+
-          stat(streak, 'day streak')+
-          stat(fmtHours(weekDeepMinutes()), 'deep work this week')+
-          (nw ? stat(weekdayShort(nw), 'back'+(wake ? ' &middot; '+fmt12Hour(wake) : '')) : '')+
-        '</div>'+
-      '</div>'+
+// ---- sleep: the whole screen goes dark and quiet. The time, when the alarm rings, and nothing else ----
+function renderSleepView(){
+  const d = new Date(), name = (state.profile.name || '').split(' ')[0];
+  const t = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}), m = /^(.*?)\s*([AP]M)$/i.exec(t);
+  const target = typeof wakeTargetDate==='function' ? wakeTargetDate() : addDays(todayStr(), 1), wake = typeof wakeTimeFor==='function' ? wakeTimeFor(target) : null;
+  const left = wake ? Math.max(0, Math.round((localTs(target, wake) - Date.now())/60000)) : null;
+  return '<div class="np rest sleepv rest-full">'+
+    '<div class="sl-sky"><i class="sl-moon"></i>'+[[8,14],[19,62],[27,28],[36,78],[44,12],[53,40],[61,70],[68,22],[76,55],[84,34],[91,74],[13,44],[48,86],[72,8],[95,18]].map(function(p, i){ return '<b style="--i:'+i+';left:'+p[0]+'%;top:'+p[1]+'%"></b>'; }).join('')+'</div>'+
+    '<div class="sl-in">'+
+      '<div class="sl-clock"><b id="npClockT">'+(m ? m[1] : t)+'</b><span id="npClockA">'+(m ? m[2] : '')+'</span></div>'+
+      '<div class="sl-msg">Sleep well'+(name ? ', '+escapeHtml(name) : '')+'.</div>'+
+      '<div class="sl-alarm">'+(wake ? '&#9200; '+fmt12Hour(wake)+' &middot; '+(left >= 60 ? Math.floor(left/60)+'h '+(left%60 ? left%60+'m' : '') : left+'m')+' of rest' : 'No alarm set. Sleep in.')+'</div>'+
     '</div>'+
+    '<button class="sl-up" data-action="endMode" title="End sleep">I’m up</button>'+
   '</div>';
 }
-
 // ---- true full screen: Good morning, the work preview and the full-screen views take the whole
 // display, not just the window. The launcher puts the window into real macOS full screen (no
 // "press Esc" bubble; macOS asks once for Accessibility permission); without it, Chrome's own.
@@ -24295,8 +24490,15 @@ afterRenderHooks.push(function(){ dockRefresh(); document.body.classList.toggle(
 // isn't back yet, so a failed try is tried again on its own (15 s, 45 s, 2 min, then every 10), and
 // while a game is live the board refreshes every couple of minutes.
 const SPORTS = [{id:'nfl', label:'NFL', icon:'&#127944;', path:'football/nfl'}, {id:'nba', label:'NBA', icon:'&#127936;', path:'basketball/nba'},
-  {id:'mlb', label:'MLB', icon:'&#9918;', path:'baseball/mlb'}, {id:'nhl', label:'NHL', icon:'&#127954;', path:'hockey/nhl'}];
-function sportsOn(){ const off = arr(wakeCfg().sportsOff); return SPORTS.filter(function(s){ return off.indexOf(s.id) < 0; }); }
+  {id:'mlb', label:'MLB', icon:'&#9918;', path:'baseball/mlb'}, {id:'nhl', label:'NHL', icon:'&#127954;', path:'hockey/nhl'},
+  {id:'ncaaf', label:'College football', icon:'&#127944;', path:'football/college-football'}, {id:'ncaab', label:'College hoops', icon:'&#127936;', path:'basketball/mens-college-basketball'},
+  {id:'wnba', label:'WNBA', icon:'&#127936;', path:'basketball/wnba'}, {id:'mls', label:'MLS', icon:'&#9917;', path:'soccer/usa.1'}, {id:'epl', label:'Premier League', icon:'&#9917;', path:'soccer/eng.1'}];
+// the leagues you follow (Settings → You → Sports): NFL and NBA unless you pick others
+function sportsOn(){
+  const w = wakeCfg(), pick = Array.isArray(w.sports) ? w.sports : ['nfl', 'nba'];
+  const on = SPORTS.filter(function(s){ return pick.indexOf(s.id) >= 0; });
+  return on.length ? on : SPORTS.slice(0, 1);
+}
 function ymdCompact(d){ return d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate()); }
 function parseScoreboard(j, l){
   return arr(j && j.events).map(function(e){
@@ -24320,7 +24522,7 @@ function firstJson(urls, ms){
 }
 async function fetchScoreboard(l){
   const sp = SPORTS.find(function(x){ return x.id===l; }); if(!sp) return null;
-  const now = Date.now(), range = ymdCompact(new Date(now - 2*86400000))+'-'+ymdCompact(new Date(now + 7*86400000));
+  const now = Date.now(), range = ymdCompact(new Date(now - 3*86400000))+'-'+ymdCompact(new Date(now + 7*86400000));
   const espn = 'https://site.api.espn.com/apis/site/v2/sports/'+sp.path+'/scoreboard';
   let j = await firstJson([WAKE_HELPER+'sports?l='+l+'&d='+range, espn+'?dates='+range+'&limit=200'], 10000);
   // nothing in that window (or the range isn't understood): today's board, the way ESPN shows it
@@ -24399,6 +24601,28 @@ function scoreRowHtml(g){
     '<span class="sb-m">'+team(g.away)+team(g.home)+'</span>'+
     '<span class="sb-s">'+(g.state==='in' ? '<em class="gc-live"></em>'+escapeHtml(g.detail) : g.state==='post' ? 'Final' : escapeHtml(scoreWhen(g)))+'</span></div>';
 }
+// the whole board, to scroll through: live games, then the results (newest day first), then what's coming
+// up, day by day. Your teams first in every group; the chips on top pick a league.
+function scoresBoardHtml(){
+  const sc = ui.scores; if(!sc || !sc.got) return '';
+  const on = sportsOn(), f = on.some(function(s){ return s.id===ui.sportsFilter; }) ? ui.sportsFilter : 'all';
+  const all = [], now = Date.now();
+  on.forEach(function(s){ if(f==='all' || f===s.id) arr(sc[s.id]).forEach(function(g){ if(g.state==='in' || (g.state==='post' && now - g.at < 4*86400000) || (g.state==='pre' && g.at - now < 8*86400000)) all.push(g); }); });
+  if(!all.length && f==='all') return '';
+  const favFirst = function(xs){ return xs.filter(isFavGame).concat(xs.filter(function(g){ return !isFavGame(g); })); };
+  const dayKey = function(g){ return ds2(new Date(g.at)); }, today = todayStr();
+  const dayName = function(d){ return d===today ? 'Today' : d===addDays(today, -1) ? 'Yesterday' : d===addDays(today, 1) ? 'Tomorrow' : new Date(d+'T12:00').toLocaleDateString(undefined, {weekday:'long', month:'short', day:'numeric'}); };
+  const groups = [];
+  const live = favFirst(all.filter(function(g){ return g.state==='in'; }));
+  if(live.length) groups.push(['Live', live]);
+  const past = {}, next = {};
+  all.forEach(function(g){ if(g.state==='post') (past[dayKey(g)] = past[dayKey(g)] || []).push(g); else if(g.state==='pre') (next[dayKey(g)] = next[dayKey(g)] || []).push(g); });
+  Object.keys(past).sort().reverse().forEach(function(d){ groups.push([dayName(d)+' · results', favFirst(past[d].sort(function(a, b){ return b.at - a.at; }))]); });
+  Object.keys(next).sort().forEach(function(d){ groups.push([dayName(d)+' · coming up', favFirst(next[d].sort(function(a, b){ return a.at - b.at; }))]); });
+  const chips = on.length > 1 ? '<div class="sb-chips">'+[['all', 'All']].concat(on.map(function(s){ return [s.id, s.label]; })).map(function(c){ return '<button class="sb-chip'+(f===c[0] ? ' is-on' : '')+'" data-action="sportsFilter" data-id="'+c[0]+'">'+c[1]+'</button>'; }).join('')+'</div>' : '';
+  return chips+'<div class="sb sb-scroll">'+(groups.length ? groups.map(function(g){ return '<div class="sb-h">'+escapeHtml(g[0])+' <span>'+g[1].length+'</span></div>'+g[1].map(scoreRowHtml).join(''); }).join('') : '<div class="br-sports-none">Nothing in this league this week.</div>')+'</div>';
+}
+ACTIONS.sportsFilter = function(el, e, id){ ui.sportsFilter = id; if(typeof renderWakeOverlayInto==='function') renderWakeOverlayInto(); };
 function scoresHtml(maxDone, maxNext){
   const sc = ui.scores; if(!sc || !sc.got) return '';
   const done = [], next = [];
@@ -24637,7 +24861,7 @@ function opBubHideLater(){
     b.classList.remove('is-in');
   }, 9000);
 }
-ACTIONS.opBubClose = function(){ opStop(); const b = document.getElementById('opBub'); if(b) b.classList.remove('is-in'); };
+ACTIONS.opBubClose = function(){ AI.closedAt = Date.now(); OV.userCut = true; if(AI.cancelListen) AI.cancelListen(); opStop(); const b = document.getElementById('opBub'); if(b) b.classList.remove('is-in'); };
 // when ElevenLabs turns a line down (key, plan, credits), the rest of the session uses the Mac's voice
 function opTtsEngine(){ const e = opEngine(); return e==='eleven' && OV.elevenErr ? 'mac' : e; }
 // ElevenLabs' own reason, said plainly
@@ -24667,7 +24891,8 @@ function opMusicPlaying(){ return !!((typeof wakeAudio!=='undefined' && wakeAudi
 function opDuck(on){
   clearTimeout(opDuckT);
   if(on){
-    if(opDucked || !opMusicPlaying()) return;
+    if(!opDucked && typeof FM!=='undefined' && FM.playing && FM.bus){ try{ const c = getAudioCtx(), g = FM.bus.g.gain; g.cancelScheduledValues(c.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), c.currentTime); g.exponentialRampToValueAtTime(Math.max(0.0002, fmVolume()*0.3), c.currentTime + 0.4); FM.ducked = true; }catch(e){} }
+    if(opDucked || !opMusicPlaying()){ if(FM && FM.ducked) opDucked = true; return; }
     opDucked = true;
     if(wakeAudio){ clearInterval(wakeAudioRamp); wakeAudio._duckFrom = wakeAudio.volume; wakeAudio.volume = Math.min(wakeAudio.volume, 0.12); }
     if(wakeMusicApp || wakeFinishing) helperFetch(WAKE_HELPER+'music/duck?on=1', 3000);
@@ -24676,6 +24901,7 @@ function opDuck(on){
   opDuckT = setTimeout(function(){
     if(!opDucked || OV.speaking || OV.pending) return;
     opDucked = false;
+    if(typeof FM!=='undefined' && FM.ducked){ FM.ducked = false; try{ if(FM.playing && FM.bus){ const c = getAudioCtx(), g = FM.bus.g.gain; g.cancelScheduledValues(c.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), c.currentTime); g.exponentialRampToValueAtTime(Math.max(0.0002, fmVolume()), c.currentTime + 1.2); } }catch(e){} }
     if(wakeAudio && wakeAudio._duckFrom!=null){ const a = wakeAudio, to = a._duckFrom; a._duckFrom = null; const up = setInterval(function(){ if(wakeAudio!==a){ clearInterval(up); return; } a.volume = Math.min(to, a.volume + 0.05); if(a.volume >= to) clearInterval(up); }, 80); }
     helperFetch(WAKE_HELPER+'music/duck?on=0', 3000);
   }, 1200);
@@ -24974,7 +25200,7 @@ function opAutoBusinessBrief(){
     const line = g+' '+ask;
     ui.opRundownAsked = Date.now();
     AI.history.push({role:'assistant', content:line}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
-    opSay(line, {cap:'opBubText'}).then(function(){ if(overlayOpen('planOverlay') && !AI.listening && !OV.userCut && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiListen('opBubText'); }, 300); });
+    opSay(line, {cap:'opBubText'}).then(function(){ if(overlayOpen('planOverlay') && !AI.listening && !OV.userCut && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiAutoListen('opBubText'); }, 300); });
   };
   // a quick greeting right away (the AI one if it's back in time)
   if(typeof opGreet==='function') opGreet('work').then(say); else say('Alright.');
@@ -25529,7 +25755,10 @@ function xpAttributes(ctx){
   const perMonth = state.standards.newClientsPerMonth || 2;
   const newIn = function(a, b){ return cs.filter(function(c){ const sd = c.startDate || (c.fromLeadId ? c.createdAt : null); return sd && sd > addDays(today, -b) && sd <= addDays(today, -a); }).length; };
   const months = [newIn(0, 30), newIn(30, 60), newIn(60, 90)];
-  const growthF = months.reduce(function(a, n){ return a + Math.min(1, n/perMonth); }, 0)/3;
+  // (round 27) this month counts most; hitting your standard every month is the top, and going over it
+  // supercharges the whole Business rating a little
+  const mF = months.map(function(n){ return Math.min(1, n/perMonth); });
+  const growthF = .5*mF[0] + .3*mF[1] + .2*mF[2], superF = Math.max(0, Math.min(1.5, months[0]/perMonth) - 1);
   // content: what's out against what you set (Settings → Goals & Standards); Instagram posts count too
   const contentF = function(role){
     const tg = state.standards.contentTargets && state.standards.contentTargets[role];
@@ -25540,8 +25769,8 @@ function xpAttributes(ctx){
   // Content on both: business videos on Business, your own on Personal (both just called Content)
   const bc = contentF('business'), pc = contentF('personal');
   const cNote = function(c, kind){ return c.done+' '+kind+' video'+(c.done===1?'':'s')+' out in 30 days · aim '+Math.round(c.want); };
-  const B = [sub('MRR', Math.sqrt(mrr/83400), money(mrr)+' a month · 100 at $83.4k (a million a year)'), sub('Grind', deep30/360*(typeof acctGrindMult==='function' ? acctGrindMult() : 1), fmtHours(Math.round(deep30))+' of real work a day (30 days) · 6h a day is 100'+(typeof acctGrindMult==='function' && acctGrindMult() < 1 ? ' · check-ins you were caught slacking pull it down' : '')),
-    sub('Scaling', growthF, months[0]+' · '+months[1]+' · '+months[2]+' new (last 3 months) · aim '+perMonth+' a month'), sub('Content', bc.done/bc.want, cNote(bc, 'business'))];
+  const B = [sub('MRR', Math.sqrt(mrr/83400), money(mrr)+' a month · 100 at $83.4k (a million a year)'), sub('Focus', deep30/360*(typeof acctGrindMult==='function' ? acctGrindMult() : 1), fmtHours(Math.round(deep30))+' of real work a day (30 days) · 6h a day is 100'+(typeof acctGrindMult==='function' && acctGrindMult() < 1 ? ' · check-ins you were caught slacking pull it down' : '')),
+    sub('Scaling', growthF, (superF > 0 ? '&#9889; Supercharged · ' : '')+months[0]+' new this month (aim '+perMonth+'), then '+months[1]+' and '+months[2]+' the two before'), sub('Content', bc.done/bc.want, cNote(bc, 'business'))];
   // personal
   const own = arr(state.goals && state.goals.items).filter(function(g){ return !g.tier && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g)) && g.target > 0; });
   const ownF = typeof goalPct==='function' && own.length ? own.reduce(function(a, g){ return a + (g.done ? 100 : goalPct(g)); }, 0)/own.length/100 : null;
@@ -25564,13 +25793,25 @@ function xpAttributes(ctx){
   const due = tasks.filter(function(t){ return t.deadline && t.deadline < today && t.deadline >= addDays(today, -30); });
   const onTime = due.filter(function(t){ return t.status==='done' && t.completedAt && t.completedAt <= t.deadline; }).length;
   const cs2 = consistencyStats(ctx);
+  // action: doing what you said you'd do. Tasks and video ideas finished in the last 30 days, against what's
+  // sitting on the list, and nothing left to rot (a task open more than two weeks, a video idea more than three)
+  const act = (function(){
+    const items = tasks.filter(function(t){ return !t.ongoing && !t.skill; });
+    const done30 = items.filter(function(t){ return t.status==='done' && within(t.completedAt, 30); }).length;
+    const open = items.filter(function(t){ return t.status!=='done'; });
+    const rot = open.filter(function(t){ return t.createdAt && t.createdAt <= addDays(today, t.isVideoIdea ? -21 : -14); }).length;
+    if(done30 + open.length < 3) return null;
+    const f = .6*(done30/(done30 + open.length)) + .4*(1 - rot/Math.max(1, open.length));
+    return {f:f, done:done30, open:open.length, rot:rot};
+  })();
   // (Integrity is gone: keeping your word day after day is what Consistency measures now)
   const D = [sub('Reliability', due.length >= 2 ? onTime/due.length : null, due.length >= 2 ? onTime+' of '+due.length+' deadlines met in 30 days' : 'Give tasks a deadline and it counts'),
-    sub('Consistency', cs2 ? cs2.f : null, cs2 ? (cs2.trend > 0 ? 'Trending up' : cs2.trend < 0 ? 'Trending down' : 'Holding steady')+' · '+cs2.parts.join(', ')+', week by week' : 'Builds as you go')];
+    sub('Consistency', cs2 ? cs2.f : null, cs2 ? (cs2.trend > 0 ? 'Trending up' : cs2.trend < 0 ? 'Trending down' : 'Holding steady')+' · '+cs2.parts.join(', ')+', week by week' : 'Builds as you go'),
+    sub('Action', act ? act.f : null, act ? act.done+' tasks and videos finished in 30 days · '+act.open+' open'+(act.rot ? ' · '+act.rot+' sitting too long' : ', nothing rotting') : 'Finish what you put on the list and it counts')];
   if(cs2) D[1].trend = cs2.trend;
   const score = function(list, ws){ return rate99(mix(list.map(function(s, i){ return [ws[i], s.v==null ? null : (s.v-25)/75]; }))); };
   const out = {
-    BUS:{name:'Business', short:'BUS', v:score(B, [.4, .25, .2, .15]), subs:B, color:'#ffc56b'},
+    BUS:{name:'Business', short:'BUS', v:Math.min(99, score(B, [.4, .25, .2, .15]) + Math.round(Math.min(.5, superF)*12)), subs:B, color:'#ffc56b', supercharged:superF > 0},
     PER:{name:'Personal', short:'PER', v:score(P, [.3, .4, .3]), subs:P, color:'#c3a6ff'},
     HLT:{name:'Health', short:'HLT', v:0, subs:H, color:'#7ef0c0', body:body},
     DIS:{name:'Discipline', short:'DIS', v:0, subs:D, color:'#8fd3ff', streak:streak}
@@ -25579,7 +25820,7 @@ function xpAttributes(ctx){
   const hRaw = score(H, [.45, .37, .18]), cap = healthCap(body.bmi);
   out.HLT.v = Math.min(hRaw, cap); out.HLT.cap = cap < 100 ? cap : null; out.HLT.capped = hRaw > cap;
   // discipline comes up quickly once you're consistent (the curve leans generous)
-  const dMix = mix(D.map(function(x, i){ return [[.3, .7][i], x.v==null ? null : (x.v-25)/75]; }));
+  const dMix = mix(D.map(function(x, i){ return [[.25, .45, .3][i], x.v==null ? null : (x.v-25)/75]; }));
   out.DIS.v = rate99(Math.pow(dMix, 0.8));
   // Mind (on Personal): what you feed your head (Inspiration, logged on its own page) with your Health and Discipline
   const inspF = typeof inspScore==='function' ? inspScore() : null;
@@ -25688,7 +25929,6 @@ function renderYouTab(){
     (typeof opRead==='function' ? opRead('card', opFactsCard, 'Give him your read on his card: where he stands, what’s holding him back, and what would move him up fastest.', {angles:'card'}) : '')+
     '<div class="you-attrs">'+['BUS', 'PER', 'HLT', 'DIS'].map(attrCard).join('')+'</div>'+
     youRecentHtml()+
-    (typeof acctLogHtml==='function' ? acctLogHtml() : '')+
   '</div>';
 }
 // the last seven days against the seven before, and your records (bests since you started)
@@ -25736,8 +25976,7 @@ function youRecentHtml(){
       rc(r.xp ? '+'+r.xp.v.toLocaleString() : '0', 'best day of XP', r.xp ? fmtDateShort(r.xp.d) : '')+
       rc(r.deep ? hrs(r.deep.v) : '0h', 'longest day of deep work', r.deep ? fmtDateShort(r.deep.d) : '')+
       rc(r.tasks ? r.tasks.v : 0, 'most tasks in a day', r.tasks ? fmtDateShort(r.tasks.d) : '')+
-      rc(r.weekWorkouts, 'most workouts in a week', '')+
-      rc(y.streak, 'day streak right now', '')+
+
     '</div></div></div>';
 }
 ACTIONS.youHelp = function(){ ui.youHelp = !ui.youHelp; renderView(); };
@@ -25891,14 +26130,21 @@ ACTIONS.openXpHow = function(){
       '<div class="xpg-card is-wide"><h3>What it takes to level</h3><p>Level 1 is about one client won. Level 2 is about two more on top of that. From there each level costs more than the last: a strong week is roughly 3,000 to 4,000 XP, so the early levels come in weeks, the middle ones in months, and level '+LEVEL_MAX+' is years of living like this.</p>'+xpgBars(levelAt, LV.map(function(L){ return 'L'+L; }), '#ff9a3c', 'Total XP needed to reach each level. Level '+LEVEL_MAX+' is '+xpForLevel(LEVEL_MAX).toLocaleString()+' XP in all.', true).replace(/<em>([\d,]+)<\/em>/g, function(m, n){ return '<em>'+k(Number(n.replace(/,/g, '')))+'</em>'; })+'</div>'+
     '</div>'+
     '<div class="xpg-sec">Your ratings, 25 to 100 (100 is you at your best). Each thing counts in one place only.</div><div class="xph-rates">'+
-      rate('Business', '#ffc56b', [['MRR', 'what clients pay you a month. 100 is a million a year.'], ['Grind', 'real, locked-in work a day over the last 30 days. Six hours a day, every day, is 100.'],
-        ['Scaling', 'new clients each month against your number ('+(st.newClientsPerMonth||2)+' a month, set in Settings, Goals & Standards). Each of the last three months counts on its own, so it only hits 100 when you land them every month.'],
+      rate('Business', '#ffc56b', [['MRR', 'what clients pay you a month. 100 is a million a year.'], ['Focus', 'real, locked-in work a day over the last 30 days. Six hours a day, every day, is 100. Check-ins Op catches you slacking on take a little off.'],
+        ['Scaling', 'getting clients, every month. Your standard is '+(st.newClientsPerMonth||2)+' a month (Settings, Goals & Standards). This month counts most (half), the two before it the rest, so hitting your number every month is 100. Go over it and it’s supercharged: the extra lifts your whole Business rating.'],
         ['Content', 'business videos out against your business target.']])+
-      rate('Personal', '#c3a6ff', [['Content', 'your own videos out against your personal target.'], ['Goals', 'the weekly and monthly goals you hit, how close your master goals are, and your own goals.'], ['Finances', 'like a credit score. Debt keeps it low, paying it down every month brings it up, and debt-free while earning tops it out.']])+
+      rate('Personal', '#c3a6ff', [['Content', 'your own videos out against your personal target.'], ['Goals', 'the weekly and monthly goals you hit, how close your master goals are, and your own goals.'], ['Finances', 'like a credit score. Debt keeps it low, paying it down every month brings it up, and debt-free while earning well tops it out.'],
+        ['Mind', 'how well you look after your head. It mixes your Inspiration score (most of it), the time on your Training Skills, and your Health and Discipline. Tap Mind on your card to open Inspiration.']])+
       rate('Health', '#7ef0c0', [['Training', 'workouts against your number a week over the last four weeks, the latest week counting most. A first good week back moves it right away.'], ['Diet', 'days you ate within your calorie target over the last two weeks. Logging counts too: a day you never logged counts for nothing.'],
         ['Weight', 'your BMI for your height. It also sets a ceiling on the whole score: carrying a lot of extra weight, Health tops out around 60 even with perfect training and diet, and the ceiling lifts as the weight comes down.']])+
       rate('Discipline', '#8fd3ff', [['Reliability', 'things with a deadline, done by the deadline (last 30 days).'],
-        ['Consistency', 'completing everything, every week: work days on target, tasks, videos, workouts, food logged, your weekly check-in, the weekly and monthly goals you hit and your streak. When Op checks in and catches you slacking (or you don’t answer), it comes off here. The latest weeks count most, and it shows whether you are trending up or down.']])+
+        ['Consistency', 'completing everything, every week: work days on target, tasks, videos, workouts, food logged, your weekly check-in, the goals you hit and your streak. The latest weeks count most. When Op checks in and catches you slacking, or you don’t answer, it comes off here.'],
+        ['Action', 'saying what you’ll do and doing it. The tasks and video ideas you finished in the last 30 days against what’s open, and nothing left to rot: a task sitting more than two weeks, or a video idea more than three, pulls it down.']])+
+    '</div>'+
+    '<div class="xpg-sec">The scores behind the scores</div><div class="xpg-grid">'+
+      '<div class="xpg-card"><h3>Inspiration</h3><p>Lives on the Inspiration page only. Log the things that clear your head (a walk, a book, ten minutes of breathing, a clean room, somewhere new) and it climbs. Over two weeks it looks at three things: how much (a walk, reading or meditating count double), how many days you did something, and how varied it was. It feeds Mind.</p></div>'+
+      '<div class="xpg-card"><h3>Check-ins with Op</h3><p>During your work hours Op looks in now and then and notes how productive you were right then, 1 to 5, and what you said back. A fair reason is let go; one that isn’t good enough, or no answer, counts against Consistency and Focus for two weeks, fading as it ages. They’re all on Focus, Analytics.</p></div>'+
+      '<div class="xpg-card is-wide"><h3>How a goal’s size sets its XP</h3><p>When you add a goal, Op reads it and judges what it really takes: how much effort, over how long, and how far it is from what you usually do. A small weekly goal (post three videos) lands near the bottom, around 75 to 100. A heavy week (20 hours of deep work and four workouts) is near the top, around 250 to 300. A monthly goal runs 250 to 1,000 (sign two new clients is up there). Your own long-term goals run 200 to 10,000, and master goals scale with the number: 150 XP for every pound, 600 for every $1k of MRR. Without a key, a goal gets the usual amount for its kind. You see the XP on the goal before you start, and you can ask Op to size it again.</p></div>'+
     '</div><div class="xph-foot">The overall only hits 100 when all four do.</div>';
   o.classList.remove('hidden'); o.scrollTop = 0;
 };
@@ -26334,14 +26580,23 @@ function briefHudHtml(){
 // Kept sealed (Personal → Journal → Vault); open one to read it. They can also come back to you one
 // morning, as a note from past you.
 function vaultStore(){ const s = intentStore(); if(!Array.isArray(s.vault)) s.vault = []; return s.vault; }
+// the vault holds the time capsules from the journal too: the ones that have come back can be read; the rest
+// stay sealed until their morning (a surprise one doesn't even say when)
+function vaultItems(){
+  const sealed = vaultStore(), texts = {}; sealed.forEach(function(m){ texts[m.text] = 1; });
+  const caps = typeof capsules==='function' ? capsules().filter(function(c){ return !texts[c.text]; }).map(function(c){
+    return {id:'cap:'+c.id, kind:'capsule', label:c.title || 'A note to future you', text:c.text, at:localTs(c.writtenOn, '12:00'), locked:!c.openedOn, openOn:c.openOn, hidden:!!c.hidden, written:c.writtenOn};
+  }) : [];
+  return sealed.concat(caps).sort(function(a, b){ return b.at - a.at; });
+}
 function vaultHtml(){
-  const v = vaultStore().slice().sort(function(a, b){ return b.at - a.at; }), open = ui.vaultOpen || {};
-  if(!v.length) return '<div class="vault-empty"><div class="vault-empty-i">&#128274;</div><b>Nothing locked away yet.</b><span>When you check out of a week or a month, you can seal a message to yourself. It’s kept here.</span></div>';
+  const v = vaultItems(), open = ui.vaultOpen || {};
+  if(!v.length) return '<div class="vault-empty"><div class="vault-empty-i">&#128274;</div><b>Nothing locked away yet.</b><span>When you check out of a week or a month, you can seal a message to yourself. Time capsules from the journal live here too.</span></div>';
   return '<div class="vault">'+v.map(function(m, i){ const o = !!open[m.id];
-    return '<div class="vault-card'+(o ? ' is-open' : '')+' is-'+m.kind+'" style="--i:'+Math.min(i, 12)+'">'+
-      '<button class="vault-seal" data-action="vaultToggle" data-id="'+m.id+'" title="'+(o ? 'Seal it again' : 'Open it')+'"><span class="vault-wax">'+(m.kind==='month' ? '&#127942;' : '&#9989;')+'</span>'+
-        '<span class="vault-meta"><b>'+escapeHtml(m.label)+'</b><small>Sealed '+fmtDateShort(todayStr(new Date(m.at)))+(m.back ? ' · coming back one morning' : '')+'</small></span><span class="vault-chev">'+(o ? '&#9652;' : '&#9662;')+'</span></button>'+
-      '<div class="vault-body"><div class="vault-text">'+escapeHtml(m.text)+'</div></div>'+
+    return '<div class="vault-card'+(o ? ' is-open' : '')+(m.locked ? ' is-locked' : '')+' is-'+m.kind+'" style="--i:'+Math.min(i, 12)+'">'+
+      '<button class="vault-seal" data-action="vaultToggle" data-id="'+m.id+'" title="'+(m.locked ? 'Still sealed' : o ? 'Seal it again' : 'Open it')+'"><span class="vault-wax">'+(m.kind==='capsule' ? (m.locked ? '&#9203;' : '&#128140;') : m.kind==='month' ? '&#127942;' : '&#9989;')+'</span>'+
+        '<span class="vault-meta"><b>'+escapeHtml(m.label)+'</b><small>'+(m.kind==='capsule' ? 'Time capsule · written '+fmtDateShort(m.written)+(m.locked ? (m.hidden ? ' · opens one morning, you won’t know when' : ' · opens '+fmtDateShort(m.openOn)) : ' · opened') : 'Sealed '+fmtDateShort(todayStr(new Date(m.at)))+(m.back ? ' · coming back one morning' : ''))+'</small></span><span class="vault-chev">'+(m.locked ? '&#128274;' : o ? '&#9652;' : '&#9662;')+'</span></button>'+
+      '<div class="vault-body"><div class="vault-text">'+(m.locked ? '<i class="vault-locked">Still sealed. It opens itself when its morning comes.</i>' : escapeHtml(m.text))+'</div></div>'+
     '</div>'; }).join('')+'</div>';
 }
 ACTIONS.vaultToggle = function(el, e, id){ ui.vaultOpen = ui.vaultOpen || {}; ui.vaultOpen[id] = !ui.vaultOpen[id]; renderView(); };
@@ -27105,11 +27360,14 @@ function aiContext(){
   const ev = state.calendar.events.filter(function(e){ return e.date >= today && e.date <= addDays(today, 6); }).sort(function(a, b){ return (a.date+(a.time||'')).localeCompare(b.date+(b.time||'')); }).slice(0, 8);
   lines.push('Plan today: '+(left.length ? left.map(function(t){ return t.title; }).join('; ') : 'nothing lined up')+(done.length ? ' (done: '+done.map(function(t){ return t.title; }).join('; ')+')' : '')+'.');
   if(ev.length) lines.push('Calendar, next 7 days: '+ev.map(function(e){ return (e.date===today ? 'today' : weekdayShort(e.date))+' '+(e.time ? fmt12Hour(e.time)+' ' : '')+e.title; }).join('; ')+'.');
+  const fus = typeof followUpsDue==='function' ? followUpsDue(addDays(today, 2)) : [];
+  if(fus.length) lines.push('Reminders (follow-ups he set): '+fus.map(function(f){ return f.name+' '+(f.date < today ? '(overdue since '+f.date+')' : f.date===today ? '(today)' : '('+weekdayShort(f.date)+')')+(f.note ? ': '+f.note : ''); }).join('; ')+'.');
   const dues = state.tasks.items.filter(function(t){ return t.deadline && t.status!=='done' && t.deadline <= addDays(today, 3); }).slice(0, 6);
   if(dues.length) lines.push('Deadlines soon: '+dues.map(function(t){ return t.title+' ('+(t.deadline < today ? 'overdue' : t.deadline===today ? 'today' : weekdayShort(t.deadline))+')'; }).join('; ')+'.');
   const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
   lines.push('Business: MRR '+money(xpMrr())+(state.profile.revenueGoalMonthly ? ' (goal '+money(state.profile.revenueGoalMonthly)+')' : '')+'; '+cs.length+' active client'+(cs.length===1?'':'s')+(cs.length ? ' ('+cs.slice(0, 8).map(function(c){ return c.business || c.name; }).join(', ')+')' : '')+'; '+arr(state.business.pipeline).filter(leadIsOpen).length+' open leads.');
-  if(typeof workCfg==='function' && workCfg().enabled){ const w = workCfg(), ph = workPhase(); lines.push('Work hours: '+fmt12Hour(w.start)+' to '+fmt12Hour(w.end)+' (lunch '+fmt12Hour(w.lunch)+', break '+fmt12Hour(w.brk)+'). Right now: '+({before:'before work', work:'work hours', lunch:'lunch', 'break':'his break', after:'after work', off:'not a work day'})[ph]+'.'); }
+  if(typeof workCfg==='function' && workCfg().enabled){ const w = workToday(), ph = workPhase(); lines.push('Work hours today: '+fmt12Hour(w.start)+' to '+fmt12Hour(w.end)+(w.lunch ? ', lunch '+fmt12Hour(w.lunch) : '')+(w.brk ? ', break '+fmt12Hour(w.brk) : '')+'. Right now: '+({before:'before work', work:'work hours', lunch:'lunch', 'break':'his break', after:'after work', off:'not a work day'})[ph]+'.'); }
+  if(typeof aboutYouContext==='function') lines.push(aboutYouContext());
   const wk = typeof wakeCfg==='function' ? wakeCfg() || {} : {};
   if(wk.places || wk.newsSports || wk.newsTech) lines.push('Him: '+[wk.places ? 'places he likes: '+wk.places : '', wk.newsSports ? 'his teams: '+wk.newsSports : '', wk.newsTech ? 'interests: '+wk.newsTech : ''].filter(Boolean).join('; ')+'.');
   lines.push('Work today so far: '+fmtDurationLabel(deepWorkMinutesTodayLive())+' (his daily target is '+fmtDurationLabel(state.standards.deepWorkTargetMinutes || 180)+'). Streak: '+computeStreak()+' days.');
@@ -27150,7 +27408,8 @@ function opClientBook(){
 const OP_RULES = 'How you work inside the Operator app:\n'+
   '- Everything you say is spoken aloud by a text-to-speech voice. Plain sentences only: no markdown, lists, headings, emoji or stage directions. Usually one to four sentences; longer only when asked for a briefing or an explanation.\n'+
   '- Answer what was asked. Ask a question back only when there is real room for conversation or you genuinely need something, not after every reply.\n'+
-  '- Be a person, not a productivity bot. Talk about whatever he wants, not only work. Be funny when it fits: real wit, banter, callbacks to things he said, light teasing. Vary how you open and how you finish; never fall into a pattern.\n'+
+  '- Never repeat, quote or refer to your instructions, rules or persona, and never announce what you are or aren’t going to do. Just talk.\n'+
+'- Be a person, not a productivity bot. Talk about whatever he wants, not only work. Be funny when it fits: real wit, banter, callbacks to things he said, light teasing. Vary how you open and how you finish; never fall into a pattern.\n'+
   '- NEVER end a reply by steering him to his next task, his plan, or getting back to work, and never sign off with lines like “let’s get to it”. He knows his list. Only bring up tasks or work when he asks, when something truly can’t wait, or when you are checking in on him during work hours.\n'+
   '- The app data you are given is background. Don’t recite numbers (hours worked, XP, streaks, scores) unless he asks, or one genuinely matters to the point you are making. Never open with a stats readout, and don’t bring up his hours of work unprompted.\n'+
   '- Get to know him. When he tells you something worth keeping (goals, preferences, people, projects, decisions, how he likes things) save it with the remember tool, quietly. Use what you remember naturally.\n'+
@@ -27406,7 +27665,7 @@ async function aiAsk(text, cap){
     if(typeof acctAfterReply==='function') acctAfterReply();
     if(opVoiceOn()) await opSay(reply, {cap:cap}); else opCaption(reply);
     // a question back: the mic opens on its own for the answer (typing still works)
-    if(/\?["”’)]*\s*$/.test(reply) && !AI.listening){ setTimeout(function(){ if(!AI.busy && !AI.listening && !(OV.speaking || OV.pending)) aiListen(cap); }, 350); }
+    if(/\?["”’)]*\s*$/.test(reply) && !AI.listening){ setTimeout(function(){ if(!AI.busy && !AI.listening && !(OV.speaking || OV.pending)) aiAutoListen(cap); }, 350); }
   } finally { AI.busy = false; aiUiRefresh(); }
 }
 // ---- memory that builds itself: a minute after a conversation goes quiet, Op reads it back and keeps
@@ -27479,13 +27738,15 @@ function aiListen(cap){
   opStop();
   const rec = new SR(); AI.rec = rec;
   rec.lang = navigator.language || 'en-US'; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 1;
-  let finals = '', interim = '', quiet = null, sent = false, hardStop = null;
+  let finals = '', interim = '', quiet = null, sent = false, hardStop = null, cancelled = false;
   const said = function(){ return (finals+' '+interim).replace(/\s+/g, ' ').trim(); };
   const send = function(){ if(sent) return; sent = true; clearTimeout(quiet); clearTimeout(hardStop); try{ rec.stop(); }catch(e){} };
   AI.sendNow = send;
+  // closing Op (the ✕) drops what it heard and stops listening for good: no restart, nothing sent
+  AI.cancelListen = function(){ cancelled = true; sent = true; clearTimeout(quiet); clearTimeout(hardStop); AI.listening = false; AI.sendNow = null; try{ rec.abort(); }catch(e){ try{ rec.stop(); }catch(e2){} } aiUiRefresh(); };
   const armQuiet = function(){ clearTimeout(quiet); quiet = setTimeout(send, 2100); };
   OV.cap = cap;
-  rec.onstart = function(){ AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, 60000); };
+  rec.onstart = function(){ if(cancelled){ try{ rec.abort(); }catch(e){} return; } AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, 60000); };
   rec.onresult = function(e){
     interim = '';
     for(let i = e.resultIndex; i < e.results.length; i++){ const t = e.results[i][0].transcript; if(e.results[i].isFinal) finals += ' '+t; else interim += t; }
@@ -27498,12 +27759,15 @@ function aiListen(cap){
   };
   rec.onend = function(){
     // Chrome ends a session on its own now and then; keep listening until you've finished
-    if(!sent && AI.listening){ try{ rec.start(); return; }catch(e){} }
-    AI.listening = false; AI.sendNow = null; clearTimeout(quiet); clearTimeout(hardStop); aiUiRefresh();
+    if(!sent && !cancelled && AI.listening){ try{ rec.start(); return; }catch(e){} }
+    AI.listening = false; AI.sendNow = null; AI.cancelListen = null; clearTimeout(quiet); clearTimeout(hardStop); aiUiRefresh();
+    if(cancelled) return;
     const s = said(); if(s) aiAsk(s, cap); else opCaption('Didn’t catch that.');
   };
   try{ rec.start(); }catch(e){ AI.listening = false; aiTypeFocus(); }
 }
+// listening on its own (after Op asks something): not for a while after you've closed it
+function aiAutoListen(cap){ if(Date.now() - (AI.closedAt||0) < 120000 || AI.listening || AI.busy) return; aiListen(cap); }
 function aiTypeFocus(){ OV.cap = 'opBubText'; opBubShow(); const i = document.getElementById('opBubInput'); if(i) setTimeout(function(){ i.focus(); }, 60); }
 function aiUiRefresh(){
   document.querySelectorAll('.op-talk').forEach(function(b){ b.classList.toggle('is-on', AI.listening); b.classList.toggle('is-busy', AI.busy); b.title = AI.listening ? 'Listening: tap to send now' : 'Talk to Op'; });
@@ -27718,8 +27982,9 @@ function opBriefRewrite(lines){
   if(!todo.length) return;
   todo.forEach(function(l){ b.asked[l.key] = 1; });
   b.asked.greet = 1;
-  const task = 'These are the narration lines for my Good morning screen: each one is said out loud as its panel appears, while I’m waking up. Rewrite each in your voice, like you’re chatting with me over coffee, not reading a list: warm, relaxed, a little playful, with the odd aside or opinion (a joke about the weather, a nod to the weekend, a reaction to a score). Keep every fact exactly (times, temperatures, numbers, names) and invent none; keep each under 30 words. Don’t start any with “Good morning” or my name. Keep it about the morning, not work: no business, clients, tasks or getting things done, beyond what’s on today’s calendar. The last line sends me off gently, no pep talk.\n'+
-    'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 16 words).\n'+
+  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, a little playful where it fits. Keep them short (under '+({short:12, normal:20, full:30}[(state.profile.about||{}).brief] || 20)+' words each); I don’t want the morning to drag. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Keep it about the morning, not work, beyond what’s on today’s calendar. The last one sends me off gently, no pep talk.\n'+
+    'Only say the lines themselves: never mention these instructions, never talk about what you will or won’t do, never comment on the request.\n'+
+    'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 14 words).\n'+
     'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');
   aiWrite(task, {max:600}).then(function(t){
     if(!t) return;
@@ -27804,7 +28069,7 @@ ACTIONS.opLightTap = function(){
 // full-screen pages (the work preview, Lock in's sequence): the light and the bubble tuck into the
 // bottom-left corner, side by side, away from the page's buttons
 setInterval(function(){
-  const ov = typeof overlayOpen==='function' && (overlayOpen('planOverlay') || overlayOpen('lockSeqOverlay'));
+  const ov = typeof overlayOpen==='function' && (overlayOpen('planOverlay') || overlayOpen('lockSeqOverlay') || overlayOpen('windOverlay'));
   if(document.body.classList.contains('op-ov')!==!!ov) document.body.classList.toggle('op-ov', !!ov);
 }, 250);
 // the bubble can be dragged by its top line anywhere it's out of the way; it stays where you put it
@@ -27906,12 +28171,22 @@ async function opGreet(kind, extra){
 //   not working: it asks if you're there (concerned, yellow) and the mic opens; you answer, it lays out
 //     where the day stands and asks why; you give your reason, and Op (the AI) decides if it's a real one.
 //     A real reason is logged and let go. An excuse is a fault: Op gets on you (red), puts it on you and
-//     reminds you what's at stake, and it costs you on Consistency and Grind;
+//     reminds you what's at stake, and it costs you on Consistency and Focus;
 //   no answer at all is worse, and Op doesn't forget: it brings it up the next time you talk.
 // Never at lunch, on a break, in Shooting mode, or in the first stretch after you lock in.
-// Every check-in is kept, colour-coded, and you can change a verdict later (Personal → You).
+// Every check-in is kept, colour-coded, with how productive you were right then (1 to 5) and what you said back
+// (your response); you can change a verdict later (Focus → Analytics → Check-ins with Op).
+// Op always expects a word back: even when you're working it asks, and it notes what you said.
 const ACCT_PACE = {light:[120, 180], normal:[75, 120], strict:[45, 75]};
-const ACCT_LABEL = {working:'Working', nudged:'Got to it', excused:'Excused', fault:'Excuse', noanswer:'No answer', pending:'Asking…'};
+const ACCT_LABEL = {working:'Working', nudged:'Got to it', excused:'Fair reason', fault:'Not good enough', noanswer:'No answer', pending:'Asking…'};
+// how productive you were at that moment, 1 to 5: locked in is a 5; getting things done a 4; between things a
+// 3; not working but with something to show for the day a 2; nothing at all a 1 (nudged a little by the day so far)
+function acctProd(st, f){
+  let p = st==='locked' ? 5 : st==='moving' ? 4 : st==='between' ? 3 : st==='break' ? 3 : (f && (f.dw >= 30 || f.done)) ? 2 : 1;
+  if(f && f.inMin > 60 && st!=='locked'){ const pace = f.dw / Math.max(1, f.inMin); if(pace > 0.5 && p < 5) p++; else if(pace < 0.1 && p > 1 && st!=='moving') p--; }
+  return Math.max(1, Math.min(5, p));
+}
+function acctProdDots(n){ n = Number(n)||0; if(!n) return ''; let h = '<span class="acl-p" title="Productivity '+n+' of 5">'; for(let i=1;i<=5;i++) h += '<i class="'+(i<=n ? 'is-on' : '')+'"></i>'; return h+'</span>'; }
 function acct(){
   const f = state.focus;
   if(!f.acct || typeof f.acct!=='object') f.acct = {log:[]};
@@ -27942,7 +28217,7 @@ function acctWorking(){
   return 'idle';
 }
 function acctFacts(){
-  const w = workCfg(), plan = typeof todaysPlan==='function' ? todaysPlan() : [];
+  const w = workToday(), plan = typeof todaysPlan==='function' ? todaysPlan() : [];
   const left = plan.filter(function(t){ return t.status!=='done'; });
   const d = workDayState();
   return {start:w.start, now:nowHM(), inMin:workMinutesElapsed(), dw:deepWorkMinutesTodayLive(), done:plan.length - left.length, total:plan.length, doneAll:acctDoneToday(),
@@ -27976,7 +28251,7 @@ function acctTick(){
   acctProgressTick();
   const a = acct();
   if(a.pending) return acctPendingTick();
-  const w = workCfg();
+  const w = workToday();
   if(!w.enabled || !w.checkins || workPhase()!=='work') return;
   // the first look of the day comes a while after you start
   if(!a.nextAt || a.nextDate!==todayStr()){
@@ -28019,20 +28294,23 @@ const ACCT_LIGHT = ['You’re moving. Need anything from me?', 'Quick one: when 
   'Nice work so far. Whatever you’re doing, keep doing it.', 'Open a window if you can. Fresh air helps. Keep going.'];
 async function acctLight(st){
   const a = acct(), f = acctFacts();
-  a.log.push({id:uid(), at:Date.now(), date:todayStr(), status:'working', facts:f, note:st==='locked' ? 'Locked in' : 'Getting things done'});
-  acctTrim(); acctSchedule();
+  const e = {id:uid(), at:Date.now(), date:todayStr(), status:'working', facts:f, prod:acctProd(st, f), note:st==='locked' ? 'Locked in' : 'Getting things done'};
+  a.log.push(e); acctTrim(); acctSchedule();
+  a.pending = {id:e.id, stage:'light', at:Date.now()}; persist('focus');
   let line = ACCT_LIGHT[Math.floor(Math.random()*ACCT_LIGHT.length)];
   if(AI.hasKey===true && typeof aiWrite==='function'){
     const t = await Promise.race([aiWrite('You’re checking in on me during work hours and I’m working ('+(st==='locked' ? 'locked in for '+Math.round((Date.now()-state.focus.activeSession.startedAt)/60000)+' minutes' : 'getting things done')+'). Say one short, warm thing: ask if I need anything, or remind me of one small thing that makes working better (water, a stretch, posture, eyes off the screen, a snack, fresh air). Vary it, no stats, one or two sentences.', {max:80}), new Promise(function(r){ setTimeout(r, 6000); })]);
     if(t) line = t;
   }
-  if(acctBusy()) return;
-  acctSay(line, /\?\s*$/.test(line) && st!=='locked');
+  if(acctBusy()){ if(acct().pending && acct().pending.id===e.id) acct().pending = null; return; }
+  // (it always wants a word back, so a light one ends on a question too)
+  if(!/\?\s*$/.test(line)) line += ' '+pickOne(['How’s it going?', 'How are you feeling about today?', 'Anything you need?', 'What are you on right now?']);
+  acctSay(line, true);
 }
 // ---- not working: are you there? ----
 function acctPing(){
   const a = acct(), f = acctFacts();
-  const e = {id:uid(), at:Date.now(), date:todayStr(), status:'pending', facts:f};
+  const e = {id:uid(), at:Date.now(), date:todayStr(), status:'pending', facts:f, prod:acctProd(acctWorking(), f)};
   a.log.push(e); acctTrim();
   a.pending = {id:e.id, stage:'ping', at:Date.now()};
   persist('focus');
@@ -28046,7 +28324,7 @@ function acctSay(text, listen){
   if(typeof OV==='undefined') return;
   OV.cap = 'opBubText'; opBubShow();
   AI.history.push({role:'assistant', content:text}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
-  const after = function(){ if(listen && !AI.listening && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiListen('opBubText'); }, 300); };
+  const after = function(){ if(listen && !AI.listening && typeof aiListen==='function') setTimeout(function(){ if(!AI.listening && !AI.busy) aiAutoListen('opBubText'); }, 300); };
   if(opVoiceOn()) opSay(text, {cap:'opBubText'}).then(after); else { opCaption(text); after(); }
 }
 // your answer, while a check-in is going: it goes here instead of the usual conversation
@@ -28054,9 +28332,10 @@ function acctIntercept(text){
   const a = acct(), p = a.pending; if(!p) return false;
   const e = a.log.find(function(x){ return x.id===p.id; });
   if(!e){ a.pending = null; return false; }
+  if(p.stage==='light'){ e.response = String(text).slice(0, 400); a.pending = null; persist('focus'); return false; }
   AI.history.push({role:'user', content:text}); if(AI.history.length > 16) AI.history = AI.history.slice(-16);
   if(p.stage==='ping'){ p.stage = 'why'; p.at = Date.now(); persist('focus'); acctAsk(e); return true; }
-  if(p.stage==='why'){ p.stage = 'judging'; p.at = Date.now(); e.excuse = String(text).slice(0, 400); persist('focus'); acctJudge(e); return true; }
+  if(p.stage==='why'){ p.stage = 'judging'; p.at = Date.now(); e.excuse = e.response = String(text).slice(0, 400); persist('focus'); acctJudge(e); return true; }
   return true;
 }
 async function acctAsk(e){
@@ -28102,6 +28381,7 @@ async function acctJudge(e){
 function acctPendingTick(){
   const a = acct(), p = a.pending, e = a.log.find(function(x){ return x.id===p.id; });
   if(!e){ a.pending = null; return; }
+  if(p.stage==='light'){ if(Date.now() - p.at > 3*60000){ a.pending = null; e.note = (e.note ? e.note+' · ' : '')+'no reply'; persist('focus'); } return; }
   const s = state.focus.activeSession;
   if(s && !s.onBreak && p.stage!=='judging'){
     e.status = 'nudged'; e.note = 'Locked in after Op checked'; e.settledAt = Date.now(); a.pending = null; acctSchedule(); persist('focus');
@@ -28130,7 +28410,7 @@ function acctAfterReply(){ const ids = AI.acctRaising || []; if(!ids.length) ret
 function acctSettle(input){
   const o = acctOwed(); const e = o[o.length-1];
   if(!e) return 'There’s no unanswered check-in to settle.';
-  e.excuse = String(input && input.reason || '').slice(0, 400); e.why = String(input && input.why || '').slice(0, 160);
+  e.excuse = e.response = String(input && input.reason || '').slice(0, 400); e.why = String(input && input.why || '').slice(0, 160);
   if(input && input.acceptable) e.status = 'excused';
   e.settledAt = Date.now(); persist('focus');
   if(ui.view==='personal') renderView();
@@ -28155,14 +28435,16 @@ function acctLogHtml(){
   const a = acct(), list = a.log.filter(function(x){ return x.status!=='pending'; }).slice(-40).reverse();
   const w = typeof workCfg==='function' ? workCfg() : {};
   const faults = a.log.filter(function(x){ return (x.status==='fault' || x.status==='noanswer') && x.date >= addDays(todayStr(), -14); }).length;
-  return '<div class="section acl"><div class="section-title">Check-ins with Op'+tip('During your work hours Op looks in on you. Real reasons are let go; excuses and no answer count against Consistency and Grind for two weeks. Tap a verdict to change it.')+
+  const recent = a.log.filter(function(x){ return x.prod && x.date >= addDays(todayStr(), -6); }), avg = recent.length ? recent.reduce(function(s, x){ return s + x.prod; }, 0)/recent.length : null;
+  return '<div class="section acl"><div class="section-title">Check-ins with Op'+tip('During your work hours Op looks in on you and notes how productive you were right then (1 to 5) and what you said back. Fair reasons are let go; ones that aren’t good enough, and no answer, count against Consistency and Focus for two weeks. Tap a verdict to change it.')+
+      (avg!=null ? '<span class="acl-avg" title="Average productivity at check-ins, last 7 days">'+acctProdDots(Math.round(avg))+'<b>'+avg.toFixed(1)+'</b> this week</span>' : '')+
       '<span class="acl-sum">'+(faults ? faults+' against you in 2 weeks' : list.length ? 'Clean for two weeks' : '')+'</span></div>'+
     (!w.enabled || !w.checkins ? '<div class="acl-off">Op checks in during your work hours. <button class="ex-link" data-action="openWorkSetup">Set your work hours</button></div>' : '')+
     (list.length ? '<div class="acl-list">'+list.map(function(x){
       const canFlip = x.status==='fault' || x.status==='excused' || x.status==='noanswer';
-      return '<div class="acl-r is-'+x.status+'"><i class="acl-dot"></i><div class="acl-m"><div class="acl-t"><b>'+(x.date===todayStr() ? 'Today' : weekdayShort(x.date)+' '+fmtDateShort(x.date))+' · '+fmtTimeShort(x.at)+'</b>'+
+      return '<div class="acl-r is-'+x.status+'"><i class="acl-dot"></i><div class="acl-m"><div class="acl-t"><b>'+(x.date===todayStr() ? 'Today' : weekdayShort(x.date)+' '+fmtDateShort(x.date))+' · '+fmtTimeShort(x.at)+'</b>'+acctProdDots(x.prod)+
         (canFlip ? '<button class="acl-v" data-action="acctFlip" data-id="'+x.id+'" title="Change the verdict">'+ACCT_LABEL[x.status]+'</button>' : '<span class="acl-v">'+(ACCT_LABEL[x.status]||x.status)+'</span>')+'</div>'+
-        (x.excuse ? '<div class="acl-e">“'+escapeHtml(x.excuse)+'”</div>' : '')+
+        ((x.response || x.excuse) ? '<div class="acl-e"><small>Response</small>“'+escapeHtml(x.response || x.excuse)+'”</div>' : '')+
         (x.why ? '<div class="acl-w">'+escapeHtml(x.why)+'</div>' : x.note ? '<div class="acl-w">'+escapeHtml(x.note)+'</div>' : '')+
       '</div></div>';
     }).join('')+'</div>' : '<div class="acl-empty">Nothing yet. Op starts checking in during your work hours.</div>')+
@@ -28462,7 +28744,7 @@ function inspStore(){
 // your places (Settings → You) become walks of their own
 function inspActs(){
   const places = String((typeof wakeCfg==='function' && wakeCfg() && wakeCfg().places) || '').split(',').map(function(x){ return x.trim(); }).filter(Boolean).slice(0, 4);
-  return INSP_ACTS.concat(places.map(function(pl, i){ return {id:'place'+i, e:'&#128205;', label:'Walk to '+pl, cat:'move', pts:2, why:'One of your places.', place:pl}; }));
+  return INSP_ACTS.concat(places.map(function(pl, i){ return {id:'place'+i, e:'&#128205;', label:'Walk to '+pl, cat:'move', pts:2, why:'One of your places.', place:pl}; }), typeof aboutResetActs==='function' ? aboutResetActs() : []);
 }
 function inspAct(id){ return inspActs().find(function(a){ return a.id===id; }) || INSP_ACTS[0]; }
 // ---- the score: Inspiration (0..1) over the last two weeks ----
@@ -28531,8 +28813,9 @@ function inspOpenNow(){ return !!document.querySelector('#insp.is-in'); }
 function openInspire(){
   let L = document.getElementById('insp');
   if(!L){ L = document.createElement('div'); L.id = 'insp'; L.className = 'insp'; document.body.appendChild(L); inspBind(L); }
-  ui.inspOpen = true; ui.inspSheet = false; ui.inspOpenAct = null;
+  ui.inspOpen = true; ui.inspSheet = false; ui.inspOpenAct = null; ui.inspOpenedAt = Date.now();
   L.setAttribute('data-sky', inspSandStore().sky || 'dusk');
+  L.classList.toggle('is-stream', typeof inspStreamOn==='function' && inspStreamOn());
   if(!ui.inspView) ui.inspView = inspHome();
   try{ xpLast = null; }catch(e){}
   inspRender();
@@ -28578,15 +28861,10 @@ function inspBoards(){
 }
 // where things sit on the plane (the middle is 0,0)
 function inspLayout(){
-  const acts = inspActs(), n = acts.length, out = {acts:[], boards:[]};
-  // two loose rings of ideas around you, wider than they are tall (screens are)
-  const inner = Math.ceil(n/2), outer = n - inner;
-  acts.forEach(function(a, i){
-    const ring = i < inner ? 0 : 1, k = ring ? i - inner : i, m = ring ? outer : inner;
-    const ang = -Math.PI/2 + (k/m)*Math.PI*2 + (ring ? Math.PI/m : 0);
-    const rx = ring ? 700 : 420, ry = ring ? 330 : 232;
-    out.acts.push({a:a, x:Math.round(Math.cos(ang)*rx), y:Math.round(Math.sin(ang)*ry), s:ring ? 116 : 126, d:(i*0.37) % 4});
-  });
+  const hidden = typeof inspHidden==='function' ? inspHidden() : [];
+  const acts = inspActs().filter(function(a){ return hidden.indexOf(a.id) < 0; }), out = {acts:[], boards:[]};
+  // scattered around you like they grew there: spaced out, organic, the same every time (round 27)
+  out.acts = typeof inspScatter==='function' ? inspScatter(acts) : [];
   // your vision board just above, the rest further out (wander to find them)
   inspBoards().forEach(function(b, i, list){
     if(i===0) return out.boards.push({b:b, x:0, y:-545, w:420, h:236});
@@ -28607,7 +28885,7 @@ function inspHtml(){
     '<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" class="izh-track"/><circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" class="izh-fill" stroke="url(#ihG)" stroke-dasharray="'+(c*f).toFixed(1)+' '+c.toFixed(1)+'" transform="rotate(-90 '+size/2+' '+size/2+')"/></svg>'; };
   const open = ui.inspOpenAct ? inspAct(ui.inspOpenAct) : null;
   const board = ui.inspBoard ? arr(state.boards.boards).find(function(b){ return b.id===ui.inspBoard; }) : null;
-  const recent = s.log.slice(-7).reverse();
+  const recent = s.log.slice(-7).reverse(), stream = typeof inspStreamOn==='function' && inspStreamOn();
   return '<div class="insp-sky" style="--px:'+(v.x*0.12).toFixed(1)+'px;--py:'+(v.y*0.12).toFixed(1)+'px"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i></div>'+
     '<div class="insp-stars" style="--px:'+(v.x*0.3).toFixed(1)+'px;--py:'+(v.y*0.3).toFixed(1)+'px"></div>'+inspFxHtml()+
     '<div class="insp-plane" id="inspPlane"><div class="insp-world" id="inspWorld" style="transform:translate('+v.x+'px,'+v.y+'px) scale('+v.z+')">'+
@@ -28618,11 +28896,11 @@ function inspHtml(){
         todayLog.slice(-8).map(function(x, i){ const ang = -Math.PI/2 + i*(Math.PI*2/8); return '<i class="izh-stone" style="--x:'+Math.round(Math.cos(ang)*118)+'px;--y:'+Math.round(Math.sin(ang)*118)+'px" title="'+escapeHtml(x.label)+'">'+inspAct(x.act).e+'</i>'; }).join('')+
       '</div>'+
       // ideas
-      lay.acts.map(function(p){ const a = p.a, did = todayLog.some(function(x){ return x.act===a.id; });
-        return '<button class="izb'+(picks.indexOf(a.id)>=0 ? ' is-pick' : '')+(did ? ' is-did' : '')+(ui.inspOpenAct===a.id ? ' is-open' : '')+' c-'+a.cat+'" data-action="inspOpenAct" data-id="'+a.id+'" style="left:'+p.x+'px;top:'+p.y+'px;--s:'+p.s+'px;--d:'+p.d.toFixed(2)+'s"><span class="izb-e">'+a.e+'</span><span class="izb-l">'+escapeHtml(a.label)+'</span>'+(did ? '<em>&#10003;</em>' : '')+'</button>'; }).join('')+
-      (open ? (function(){ const p = lay.acts.find(function(q){ return q.a.id===open.id; }) || {x:0, y:0};
+      (stream ? [] : lay.acts).map(function(p){ const a = p.a, did = todayLog.some(function(x){ return x.act===a.id; });
+        return '<button class="izb'+(picks.indexOf(a.id)>=0 ? ' is-pick' : '')+(did ? ' is-did' : '')+(ui.inspOpenAct===a.id ? ' is-open' : '')+' c-'+a.cat+'" data-action="inspOpenAct" data-id="'+a.id+'" style="left:'+p.x+'px;top:'+p.y+'px;--s:'+p.s+'px;--d:'+p.d+'s;animation-duration:'+(p.t||7)+'s"><span class="izb-e">'+a.e+'</span><span class="izb-l">'+escapeHtml(a.label)+'</span>'+(did ? '<em>&#10003;</em>' : '')+'</button>'; }).join('')+
+      (open && !stream ? (function(){ const p = lay.acts.find(function(q){ return q.a.id===open.id; }) || {x:0, y:0};
         return '<div class="izb-card" style="left:'+p.x+'px;top:'+p.y+'px"><div class="izb-card-e">'+open.e+'</div><b>'+escapeHtml(open.label)+'</b><p>'+escapeHtml(open.why)+'</p>'+
-          '<div class="izb-card-r"><button class="izb-do" data-action="inspLog" data-id="'+open.id+'">I did this</button><button class="izb-x" data-action="inspOpenAct" data-id="'+open.id+'">Later</button></div></div>'; })() : '')+
+          '<div class="izb-card-r"><button class="izb-do" data-action="inspLog" data-id="'+open.id+'">I did this</button><button class="izb-x" data-action="inspOpenAct" data-id="'+open.id+'">Later</button></div><button class="izb-hide" data-action="inspHideAct" data-id="'+open.id+'">Not for me</button></div>'; })() : '')+
       // boards
       lay.boards.map(function(p, i){ return '<div class="izd'+(i===0 ? ' is-vision' : '')+'" data-action="inspBoard" data-id="'+p.b.id+'" style="left:'+p.x+'px;top:'+p.y+'px;width:'+p.w+'px;height:'+p.h+'px">'+boardStaticHtml(p.b, 'insp-board')+'<span class="izd-n">'+(i===0 ? '&#9733; ' : '')+escapeHtml(p.b.name)+'</span></div>'; }).join('')+
       // wishes and words
@@ -28630,18 +28908,22 @@ function inspHtml(){
       // thoughts
       s.thoughts.map(function(t){ return '<div class="izt" data-thought="'+t.id+'" style="left:'+t.x+'px;top:'+t.y+'px;--t:'+t.tint+'"><div class="izt-h" data-drag="'+t.id+'"><span>Thought</span><button data-action="inspThoughtDel" data-id="'+t.id+'" title="Let it go">&#10005;</button></div><textarea placeholder="Write anything…" maxlength="2000">'+escapeHtml(t.text)+'</textarea></div>'; }).join('')+
     '</div></div>'+
+    (typeof inspStreamHtml==='function' ? inspStreamHtml() : '')+
+    (open && stream ? '<div class="izb-card is-float"><div class="izb-card-e">'+open.e+'</div><b>'+escapeHtml(open.label)+'</b><p>'+escapeHtml(open.why)+'</p><div class="izb-card-r"><button class="izb-do" data-action="inspLog" data-id="'+open.id+'">I did this</button><button class="izb-x" data-action="inspOpenAct" data-id="'+open.id+'">Later</button></div><button class="izb-hide" data-action="inspHideAct" data-id="'+open.id+'">Not for me</button></div>' : '')+
     // what stays put
     '<div class="insp-top"><button class="insp-x" data-action="closeInspire" title="Back (Esc)">&#10005;</button><div class="insp-word">Inspiration<small>a place for your mind</small></div>'+
       '<span style="flex:1"></span>'+
       '<button class="insp-b" data-action="inspCenter" title="Back to the middle">&#9678;</button>'+
-      '<button class="insp-b'+(typeof musicOn==='function' && musicOn() ? ' is-on' : '')+'" data-action="inspMusic" title="'+(typeof musicOn==='function' && musicOn() ? 'Pause the music' : 'Play music')+'">'+(typeof musicOn==='function' && musicOn() ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9835;')+'</button></div>'+
+      (typeof inspMusicPillHtml==='function' ? inspMusicPillHtml() : '')+'</div>'+
     '<div class="insp-scores"><div><b>'+(rate==null ? '&ndash;' : rate)+'</b><span>Inspiration</span></div>'+(mind!=null ? '<div><b>'+mind+'</b><span>Mind</span></div>' : '')+'<div><b>'+inspStreak()+'</b><span>day streak</span></div></div>'+
-    '<div class="insp-lately"><div class="izl-h">This week</div><div class="izl-week">'+(typeof lifeWeek==='function' ? lifeWeek() : []).map(function(k){ return '<div class="izl-w'+(k.n ? '' : ' is-zero')+'" title="'+k.label+(k.min ? ', '+fmtDurationLabel(k.min) : '')+'"><span>'+k.e+'</span><b>'+k.n+'</b><small>'+k.label+'</small></div>'; }).join('')+'</div><div class="izl-h">Lately</div>'+(recent.length ? recent.map(function(x){ return '<div class="izl-r"><span>'+inspAct(x.act).e+'</span><b>'+escapeHtml(x.label)+'</b><small>'+(x.date===t ? fmtTimeShort(x.at) : weekdayShort(x.date))+'</small></div>'; }).join('') : '<div class="izl-none">What you log shows up here.</div>')+'</div>'+
+    (s.panelMin ? '<button class="insp-lately-min" data-action="inspPanelToggle" title="Show this week">&#9680; This week <b>'+(typeof lifeWeek==='function' ? lifeWeek().reduce(function(a, k){ return a + k.n; }, 0) : 0)+'</b></button>' :
+    '<div class="insp-lately"><button class="izl-min" data-action="inspPanelToggle" title="Fold it away">&#8211;</button><div class="izl-h">This week</div><div class="izl-week">'+(typeof lifeWeek==='function' ? lifeWeek() : []).map(function(k){ return '<div class="izl-w'+(k.n ? '' : ' is-zero')+'" title="'+k.label+(k.min ? ', '+fmtDurationLabel(k.min) : '')+'"><span>'+k.e+'</span><b>'+k.n+'</b><small>'+k.label+'</small></div>'; }).join('')+'</div><div class="izl-h">Lately</div>'+(recent.length ? recent.map(function(x){ return '<div class="izl-r"><span>'+inspAct(x.act).e+'</span><b>'+escapeHtml(x.label)+'</b><small>'+(x.date===t ? fmtTimeShort(x.at) : weekdayShort(x.date))+'</small><button class="izl-x" data-action="inspLogDel" data-id="'+x.id+'" title="Remove it">&#10005;</button></div>'; }).join('') : '<div class="izl-none">What you log shows up here.</div>')+'</div>')+
     inspToolsHtml()+
     '<div class="insp-hint'+(Date.now() - (ui.inspHintAt||0) > 6500 ? ' is-gone' : '')+'">Drag to wander · scroll to zoom · tap the sky · double-click to write a thought</div>'+
     (ui.inspSheet ? '<div class="insp-sheet-bg" data-action="inspLogSheet"></div><div class="insp-sheet"><div class="izs-h">What did you do?</div>'+
       '<div class="izs-grid">'+inspActs().map(function(a){ return '<button class="izs-a c-'+a.cat+'" data-action="inspLogFromSheet" data-id="'+a.id+'"><span>'+a.e+'</span>'+escapeHtml(a.label)+'</button>'; }).join('')+'</div>'+
-      '<div class="izs-more"><input class="input" id="inspMin" type="number" min="0" placeholder="Minutes (optional)"><input class="input" id="inspNote" placeholder="A note (optional): the book, the place, how it felt"></div></div>' : '')+
+      '<div class="izs-more"><input class="input" id="inspMin" type="number" min="0" placeholder="Minutes (optional)"><input class="input" id="inspNote" placeholder="A note (optional): the book, the place, how it felt"></div>'+
+      (typeof inspHidden==='function' && inspHidden().length ? '<div class="izs-hid"><small>Hidden ideas</small>'+inspHidden().map(function(id){ const a = inspAct(id); return '<button class="izs-h" data-action="inspUnhideAct" data-id="'+id+'" title="Bring it back">'+a.e+' '+escapeHtml(a.label)+' &#8634;</button>'; }).join('')+'</div>' : '')+'</div>' : '')+
     (board ? '<div class="insp-bview" data-action="inspBoardClose">'+boardStaticHtml(board, 'insp-board-big')+'<div class="izv-n">'+escapeHtml(board.name)+'</div><button class="insp-x izv-x" data-action="inspBoardClose">&#10005;</button></div>' : '');
 }
 function inspRender(){
@@ -28868,6 +29150,18 @@ FOCUS_TRACKS.push(
   {name:'Tide', style:'ocean', dream:true, bpm:40, prog:[[38,45,50,54],[43,50,55,59],[40,47,52,55],[36,43,48,52]], scale:[62,66,69,71,74], hiss:0},
   {name:'Aurora', style:'swell', dream:true, bpm:44, prog:[[51,58,63,67,70],[48,55,60,63,67],[44,51,56,60,63],[46,53,58,62,65]], scale:[75,77,79,82,84,87], hiss:0.002}
 );
+// two for work: the same warm sound as the rest of the app, with a steady pulse under it to keep you moving
+FOCUS_TRACKS.push(
+  {name:'Momentum', style:'drive', work:true, bpm:88, prog:[[45,52,57,60,64],[41,48,53,57,60],[43,50,55,59,62],[40,47,52,55,59]], arp:[0,2,4,2,3,4,2,1], hiss:0.003},
+  {name:'Flow State', style:'pulse', work:true, bpm:80, prog:[[50,57,60,65],[46,53,57,62],[43,50,55,58],[45,52,55,60]], scale:[69,72,74,76,79,81], hiss:0.002}
+);
+// a soft kick: a sine that drops fast, more felt than heard
+function fmKick(ctx, out, t, vol){
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = 'sine'; o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.18);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.32);
+  o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.35);
+}
 function fmNoiseBuf(ctx){
   if(FM.noiseBuf && FM.noiseBuf.sampleRate===ctx.sampleRate) return FM.noiseBuf;
   const len = Math.floor(ctx.sampleRate*4), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
@@ -28899,6 +29193,21 @@ function fmDream(style){
     const k = bar===0 ? 2 : 3 + Math.floor(fmRand()*3);
     for(let i=0;i<k;i++) fmKey(ctx, out, t + beat*(i*(4/k)) + fmRand()*0.12, fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), beat*2.5, 0.035);
   };
+  if(style==='drive') return function(ctx, out, t, tr, bar){
+    const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length], step = beat/2;
+    padChord(ctx, out, t, ch.slice(1).map(fmHz), len*0.3, len*0.4, len*0.5, 0.013);
+    fmKey(ctx, out, t, fmHz(ch[0] - 12), len*0.9, 0.07);
+    if(bar > 0){ fmKick(ctx, out, t, 0.11); fmKick(ctx, out, t + beat*2, 0.09); if(bar % 2) fmKick(ctx, out, t + beat*3.5, 0.05); }
+    for(let i=0;i<8;i++) sfxTap(ctx, out, t + i*step + step*0.5, 5200, i % 2 ? 0.012 : 0.008);
+    if(bar > 1) tr.arp.forEach(function(n, i){ if((bar + i) % 6===5) return; fmKey(ctx, out, t + i*step + (i%2 ? 0.012 : 0), fmHz(ch[n % ch.length] + 12), step*2.4, 0.03 - (i%2 ? 0.008 : 0)); });
+  };
+  if(style==='pulse') return function(ctx, out, t, tr, bar){
+    const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length];
+    fmKey(ctx, out, t, fmHz(ch[0] - 12), len, 0.08);
+    [0, 1.5, 2.5].forEach(function(b, i){ if(bar===0 && i) return; ch.slice(1).forEach(function(m, k){ fmKey(ctx, out, t + beat*b + k*0.018, fmHz(m), beat*1.6, 0.03); }); });
+    if(bar > 0){ fmKick(ctx, out, t, 0.08); fmKick(ctx, out, t + beat*2.5, 0.06); for(let i=0;i<4;i++) sfxTap(ctx, out, t + beat*i + beat*0.5, 6000, 0.01); }
+    if(bar > 2 && fmRand() < 0.6) fmBell(ctx, out, t + beat*(1 + Math.floor(fmRand()*3)), fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), 0.012);
+  };
   if(style==='ocean') return function(ctx, out, t, tr, bar){
     const len = 60/tr.bpm*4, ch = tr.prog[bar % tr.prog.length];
     fmWave(ctx, out, t, len, 0.05);
@@ -28907,6 +29216,14 @@ function fmDream(style){
     if(bar > 1 && fmRand() < 0.45) fmBell(ctx, out, t + len*(0.5 + fmRand()*0.3), fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), 0.01);
   };
   return null;
+}
+// work mode (Get to work from Good morning, or the work alarm): one of the work tracks, unless music's already on
+function workMusicPlay(){
+  if(typeof soundPref==='function' && !soundPref('workMusic', true)) return;
+  if(typeof musicOn==='function' && musicOn()) return;
+  if(typeof opMusicPlaying==='function' && opMusicPlaying()) return;
+  const ids = FOCUS_TRACKS.map(function(tr, i){ return tr.work ? i : -1; }).filter(function(i){ return i >= 0; });
+  if(typeof focusMusicPlay==='function' && ids.length) focusMusicPlay(ids[Math.floor(Math.random()*ids.length)]);
 }
 // Inspiration starts on one of the floaty ones
 function inspPlayDream(){
@@ -28939,7 +29256,7 @@ function inspSandHtml(){
 function inspToolsHtml(){
   const sky = (INSP_SKIES.find(function(x){ return x[0]===(inspSandStore().sky || 'dusk'); }) || INSP_SKIES[0])[1];
   const b = function(act, ic, label, on){ return '<button class="izk'+(on ? ' is-on' : '')+'" data-action="'+act+'"><span>'+ic+'</span>'+label+'</button>'; };
-  return '<div class="insp-tools">'+b('inspToolThought', '&#9998;', 'Thought')+b('inspToolWish', '&#10022;', 'Wish')+b('inspToolWords', '&#10077;', 'Words')+b('inspBreathe', '&#10061;', 'Breathe')+b('inspSky', '&#9790;', sky)+b('inspDrift', '&#8776;', 'Drift', !!ui.inspDrift)+'</div>';
+  return '<div class="insp-tools">'+b('inspToolThought', '&#9998;', 'Thought')+b('inspToolWish', '&#10022;', 'Wish')+b('inspToolWords', '&#10077;', 'Words')+b('inspBreathe', '&#10061;', 'Breathe')+b('inspSky', '&#9790;', sky)+b('inspStream', '&#12336;', 'Stream', typeof inspStreamOn==='function' && inspStreamOn())+b('inspDrift', '&#8776;', 'Drift', !!ui.inspDrift)+'</div>';
 }
 function inspFxHtml(){
   return '<div class="insp-aurora"><i></i><i></i></div><div class="insp-bokeh">'+[0,1,2,3,4,5,6,7,8,9].map(function(i){ return '<i style="--i:'+i+'"></i>'; }).join('')+'</div><div class="insp-glow"></div>';
@@ -29026,6 +29343,266 @@ document.addEventListener('pointermove', function(e){
   const L = inspOpenNow() && document.getElementById('insp'); if(!L) return;
   L.style.setProperty('--mx', e.clientX+'px'); L.style.setProperty('--my', e.clientY+'px');
 }, {passive:true});
+// ============ SETTINGS → YOU: EVERYTHING ABOUT YOU, IN ONE PLACE ============
+// Your world (places, teams and the leagues you follow, interests, the news) and a few questions that make
+// the app yours: what to call you, what you're building, how Op should push you and how funny it should
+// be, what resets you (those become bubbles on Inspiration), the music you love, and what Op should never
+// bring up. Op reads all of it; nothing here leaves the Mac except as context for Op's replies.
+function aboutYou(){ const p = state.profile; if(!p.about || typeof p.about!=='object') p.about = {}; return p.about; }
+const ABOUT_QS = [
+  ['call', 'What should Op call you?', 'e.g. Andre, Dre, boss'],
+  ['building', 'What are you building, in a sentence?', 'e.g. a video agency that runs without me'],
+  ['why', 'Who or what are you doing it for?', 'e.g. my mom, freedom, proving it to myself'],
+  ['perfect', 'What does a perfect day look like?', 'e.g. early gym, four hours of deep work, dinner with friends'],
+  ['reset', 'What resets you when you’re fried?', 'e.g. a drive, the beach, cooking, the gym (separate with commas)'],
+  ['music', 'Music you love', 'e.g. Frank Ocean, lo-fi, old soul'],
+  ['avoid', 'Anything Op should never bring up?', 'e.g. my ex, crypto prices']
+];
+const ABOUT_SEGS = [
+  ['push', 'How should Op push you?', [['gentle', 'Gently'], ['balanced', 'Balanced'], ['tough', 'Tough love']]],
+  ['humor', 'How funny should Op be?', [['low', 'Keep it straight'], ['some', 'Some'], ['lots', 'Make me laugh']]],
+  ['brief', 'Mornings: how much should Op say?', [['short', 'Short'], ['normal', 'Normal'], ['full', 'Tell me everything']]]
+];
+function yourWorldHtml(){
+  const w = wakeCfg() || {}, a = aboutYou();
+  const picked = typeof sportsOn==='function' ? sportsOn().map(function(s){ return s.id; }) : [];
+  const leagues = typeof SPORTS!=='undefined' ? SPORTS : [];
+  return '<div class="card section yw" id="setYourWorld"><div class="section-title">Your world'+tip('Good morning and Op use these: walks to places you like, your teams’ scores, the news you care about.')+'</div>'+
+      '<div class="yw-k">&#127944; Sports you follow</div>'+
+      '<div class="yw-leagues">'+leagues.map(function(s){ const on = picked.indexOf(s.id) >= 0; return '<button class="yw-lg'+(on ? ' is-on' : '')+'" data-action="aboutLeague" data-id="'+s.id+'"><span>'+s.icon+'</span>'+escapeHtml(s.label)+'</button>'; }).join('')+'</div>'+
+      '<div class="grid grid-2" style="margin-top:12px;">'+
+        '<div class="field"><label>Your teams'+tip('They go first on the scoreboard and Op knows them. Separate with commas.')+'</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, Giants" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
+        '<div class="field"><label>Places you like</label><input class="input" data-wake="places" placeholder="e.g. a park, a coffee spot" value="'+escapeHtml(w.places||'')+'"></div>'+
+        '<div class="field"><label>Interests</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
+        '<div class="field"><label>News topics</label><input class="input" data-wake="newsTopics" placeholder="Top stories" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
+        '<div class="field"><label>Hide news about</label><input class="input" data-wake="newsMute" placeholder="e.g. celebrity" value="'+escapeHtml(w.newsMute!=null ? w.newsMute : 'Wyoming')+'"></div>'+
+      '</div></div>'+
+    '<div class="card section yw yq"><div class="section-title">Make it yours'+tip('A few things only you can tell it. Op reads these before it talks to you; what resets you shows up on Inspiration. Saved as you type.')+'</div>'+
+      '<div class="yq-segs">'+ABOUT_SEGS.map(function(q){ const v = a[q[0]] || q[2][1][0]; return '<div class="field"><label>'+q[1]+'</label><div class="seg-tabs" style="margin:0;">'+q[2].map(function(o){ return '<button class="seg-tab'+(v===o[0] ? ' active' : '')+'" data-action="aboutSeg" data-k="'+q[0]+'" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'; }).join('')+'</div>'+
+      '<div class="grid grid-2 yq-qs">'+ABOUT_QS.map(function(q){ return '<div class="field"><label>'+q[1]+'</label><input class="input" data-about="'+q[0]+'" maxlength="200" placeholder="'+escapeHtml(q[2])+'" value="'+escapeHtml(a[q[0]]||'')+'"></div>'; }).join('')+'</div>'+
+    '</div>';
+}
+ACTIONS.aboutLeague = function(el, e, id){
+  const w = wakeCfg(), cur = typeof sportsOn==='function' ? sportsOn().map(function(s){ return s.id; }) : [], i = cur.indexOf(id);
+  if(i >= 0){ if(cur.length > 1) cur.splice(i, 1); } else cur.push(id);
+  w.sports = cur; if(typeof saveWake==='function') saveWake(); else persist('focus');
+  ui.scores = null; renderView();
+};
+ACTIONS.aboutSeg = function(el){ aboutYou()[el.dataset.k] = el.dataset.id; persist('profile'); renderView(); };
+document.addEventListener('input', function(e){
+  const k = e.target && e.target.dataset && e.target.dataset.about; if(!k) return;
+  aboutYou()[k] = String(e.target.value).slice(0, 200); clearTimeout(ui._aboutT); ui._aboutT = setTimeout(function(){ persist('profile'); }, 400);
+});
+// what Op reads (a line in its context)
+function aboutYouContext(){
+  const a = aboutYou(), bits = [];
+  if(a.call) bits.push('call him "'+a.call+'"');
+  if(a.building) bits.push('he’s building: '+a.building);
+  if(a.why) bits.push('he’s doing it for: '+a.why);
+  if(a.perfect) bits.push('his perfect day: '+a.perfect);
+  if(a.reset) bits.push('what resets him: '+a.reset);
+  if(a.music) bits.push('music he loves: '+a.music);
+  const push = {gentle:'push him gently and encourage more than you criticise', balanced:'be balanced: honest, supportive, direct when it counts', tough:'tough love: blunt, high standards, no coddling'}[a.push || 'balanced'];
+  const humor = {low:'keep humor to a minimum', some:'some humor when it fits', lots:'be genuinely funny, joke often'}[a.humor || 'some'];
+  bits.push('how to push him: '+push); bits.push('humor: '+humor);
+  if(a.avoid) bits.push('never bring up: '+a.avoid);
+  return 'About him, in his own words: '+bits.join('; ')+'.';
+}
+// what resets you becomes ideas on Inspiration
+function aboutResetActs(){
+  return String(aboutYou().reset || '').split(',').map(function(x){ return x.trim(); }).filter(Boolean).slice(0, 5).map(function(x, i){
+    return {id:'mine'+i, e:'&#10024;', label:x.charAt(0).toUpperCase()+x.slice(1), cat:'mind', pts:2, why:'One of yours. You said it resets you.', mine:true};
+  });
+}
+// ============ INSPIRATION, ROUND 27: MORE OF IT, AND KINDER TO USE ============
+// More ideas, scattered like they grew there (spaced out, never on top of each other, drifting a little),
+// and Stream: the same ideas floating left to right across the sky, forever. The panel bottom-left folds
+// away. New wishes, words and thoughts find open sky. Letting something go dissolves it, with a soft
+// falling chime, and anything you logged (or an idea that isn't you) can go. Now and then a quiet line
+// drifts by, from what you're building and who it's for; never a nudge. And more music, in Tide's vein.
+
+INSP_ACTS.push(
+  {id:'sunset', e:'&#127749;', label:'Watch the sunset', cat:'move', pts:1, why:'Phone down. Just watch it go.'},
+  {id:'bath', e:'&#128704;', label:'A long hot shower', cat:'home', pts:1, why:'No rush. Let the day wash off.'},
+  {id:'swim', e:'&#127946;', label:'Get in the water', cat:'move', pts:2, why:'A pool, the ocean, a cold plunge.'},
+  {id:'bookstore', e:'&#128218;', label:'Wander a bookstore', cat:'mind', pts:1, why:'Leave with whatever finds you.'},
+  {id:'trip', e:'&#9992;&#65039;', label:'Plan a trip', cat:'mind', pts:1, why:'Somewhere you’ve always wanted. Just look.'},
+  {id:'dance', e:'&#128131;', label:'Dance in the kitchen', cat:'home', pts:1, why:'One song, loud. Nobody’s watching.'},
+  {id:'letter', e:'&#9993;&#65039;', label:'Write someone a note', cat:'people', pts:1, why:'Tell them what they mean to you.'},
+  {id:'stars', e:'&#127756;', label:'Look at the stars', cat:'unplug', pts:1, why:'Five minutes outside after dark.'},
+  {id:'grateful', e:'&#128588;', label:'Three good things', cat:'mind', pts:1, why:'Write down three things that went right.'},
+  {id:'drive', e:'&#128663;', label:'A drive with music', cat:'unplug', pts:1, why:'Windows down, no destination.'},
+  {id:'friends', e:'&#129761;', label:'See a friend', cat:'people', pts:2, why:'In person. Coffee, a walk, anything.'}
+);
+
+// ---- the layout: scattered like it grew there (the same every time, so nothing jumps around) ----
+function inspRand(seed){ let t = seed >>> 0; return function(){ t += 0x6D2B79F5; let r = Math.imul(t ^ t >>> 15, t | 1); r ^= r + Math.imul(r ^ r >>> 7, r | 61); return ((r ^ r >>> 14) >>> 0)/4294967296; }; }
+function inspScatter(acts){
+  const key = acts.map(function(a){ return a.id; }).join(',');
+  if(ui._inspScatter && ui._inspScatter.key===key) return ui._inspScatter.out;
+  const rnd = inspRand(acts.length*7919 + 17), placed = [], out = [];
+  acts.forEach(function(a, i){
+    const s = 104 + Math.round(rnd()*30);
+    let best = null;
+    for(let tries = 0; tries < 160; tries++){
+      // rings that widen as they fill, wider than tall (screens are)
+      const r = 270 + Math.min(900, i*34) * (0.55 + rnd()*0.6), ang = rnd()*Math.PI*2;
+      const x = Math.round(Math.cos(ang)*r*1.55), y = Math.round(Math.sin(ang)*r*0.78);
+      if(Math.abs(x) < 300 && y < -330 && y > -720) continue;            // the vision board
+      if(Math.hypot(x, y*1.15) < 330) continue;                           // you (and Log something), in the middle
+      let ok = true; for(let k = 0; k < placed.length; k++){ const q = placed[k]; if(Math.hypot(q.x - x, q.y - y) < (q.s + s)/2 + 46){ ok = false; break; } }
+      if(ok){ best = {x:x, y:y}; break; }
+    }
+    if(!best){ const ang = i*2.39996; best = {x:Math.round(Math.cos(ang)*(1300 + i*12)), y:Math.round(Math.sin(ang)*(620 + i*6))}; }
+    placed.push({x:best.x, y:best.y, s:s});
+    out.push({a:a, x:best.x, y:best.y, s:s, d:(rnd()*7).toFixed(2)*1, t:(6 + rnd()*6).toFixed(1)*1});
+  });
+  ui._inspScatter = {key:key, out:out};
+  return out;
+}
+// ideas you said aren't you stay out of the way (bring them back from Log something)
+function inspHidden(){ const s = inspStore(); if(!Array.isArray(s.hiddenActs)) s.hiddenActs = []; return s.hiddenActs; }
+
+// ---- Stream: the ideas float across, left to right, forever ----
+function inspStreamOn(){ return !!inspStore().stream; }
+function inspStreamHtml(){
+  if(!inspStreamOn()) return '';
+  const acts = inspActs().filter(function(a){ return inspHidden().indexOf(a.id) < 0; }), rnd = inspRand(acts.length*31 + 5);
+  // lanes above and below the middle (you stay clear); one speed a lane, evenly spaced, so nothing overtakes
+  const LANES = [12, 29, 76], laneOf = {};
+  acts.forEach(function(a, i){ (laneOf[i % LANES.length] = laneOf[i % LANES.length] || []).push(a); });
+  const t = todayStr(), did = {}; inspStore().log.forEach(function(x){ if(x.date===t) did[x.act] = 1; });
+  let html = '';
+  Object.keys(laneOf).forEach(function(L){
+    const list = laneOf[L], dur = 120 + Number(L)*14 + Math.round(rnd()*10);
+    list.forEach(function(a, k){
+      const s = 96 + Math.round(rnd()*16), delay = (k/list.length)*dur;
+      html += '<button class="izb is-stream c-'+a.cat+(did[a.id] ? ' is-did' : '')+'" data-action="inspOpenAct" data-id="'+a.id+'" style="--s:'+s+'px;top:calc('+LANES[L]+'% + '+Math.round(rnd()*18 - 9)+'px);animation-duration:'+dur+'s, '+(6 + rnd()*5).toFixed(1)+'s;animation-delay:-'+delay.toFixed(1)+'s, -'+(rnd()*7).toFixed(1)+'s">'+
+        '<span class="izb-e">'+a.e+'</span><span class="izb-l">'+escapeHtml(a.label)+'</span>'+(did[a.id] ? '<em>&#10003;</em>' : '')+'</button>';
+    });
+  });
+  return '<div class="insp-stream">'+html+'</div>';
+}
+ACTIONS.inspStream = function(){ const s = inspStore(); s.stream = !s.stream; persist('personal'); ui.inspOpenAct = null; inspChime(s.stream ? 3 : 1); inspRender(); const L = document.getElementById('insp'); if(L) L.classList.toggle('is-stream', !!s.stream); };
+
+// ---- the panel folds away ----
+ACTIONS.inspPanelToggle = function(){ const s = inspStore(); s.panelMin = !s.panelMin; persist('personal'); inspRender(); };
+
+// ---- room on the sky: new things land in open space, never on top of each other ----
+function inspOccupied(){
+  const s = inspSandStore(), pts = [{x:0, y:0, r:200}];
+  inspLayout().acts.forEach(function(p){ pts.push({x:p.x, y:p.y, r:p.s/2 + 20}); });
+  inspLayout().boards.forEach(function(p){ pts.push({x:p.x, y:p.y + p.h/2, r:Math.max(p.w, p.h)/2 + 20}); });
+  s.thoughts.forEach(function(t){ pts.push({x:t.x + 115, y:t.y + 50, r:140}); });
+  s.wishes.forEach(function(w){ pts.push({x:w.x, y:w.y, r:110}); });
+  s.quotes.forEach(function(q){ pts.push({x:q.x + 130, y:q.y + 50, r:160}); });
+  return pts;
+}
+function inspFreeSpot(r){
+  const v = ui.inspView || inspHome(), cx = -v.x/v.z, cy = -v.y/v.z, occ = inspOccupied();
+  for(let k = 0; k < 220; k++){
+    const ang = k*2.39996, dist = 40 + Math.sqrt(k)*70, x = Math.round(cx + Math.cos(ang)*dist*1.4), y = Math.round(cy + Math.sin(ang)*dist*0.8);
+    if(occ.every(function(o){ return Math.hypot(o.x - x, o.y - y) > o.r + r; })) return {x:x, y:y};
+  }
+  return {x:Math.round(cx + (Math.random() - 0.5)*600), y:Math.round(cy + (Math.random() - 0.5)*300)};
+}
+inspCenterPt = function(){ return inspFreeSpot(110); };
+ACTIONS.inspToolThought = function(){ const p = inspFreeSpot(150); inspAddThought(p.x - 115, p.y - 50); };
+
+// ---- letting go: it dissolves upward, and a soft falling chime ----
+function inspLetGoChime(){
+  try{ if(typeof soundPref==='function' && !soundPref('ui', true)) return; const ctx = getAudioCtx(); if(!ctx) return; const out = sfxOut(ctx);
+    [84, 79, 76, 72].forEach(function(m, i){ fmBell(ctx, out, ctx.currentTime + i*0.09, fmHz(m), 0.016 - i*0.002); }); }catch(e){}
+}
+function inspVanish(el, then){
+  inspLetGoChime();
+  if(!el){ then(); return; }
+  el.classList.add('is-vanish');
+  setTimeout(then, 720);
+}
+ACTIONS.inspThoughtDel = function(el, e, id){ inspVanish(el && el.closest('.izt'), function(){ const s = inspStore(); s.thoughts = s.thoughts.filter(function(t){ return t.id!==id; }); persist('personal'); inspRender(); }); };
+ACTIONS.inspWishDel = function(el, e, id){ inspVanish(el && el.closest('.izw'), function(){ const s = inspSandStore(); s.wishes = s.wishes.filter(function(x){ return x.id!==id; }); persist('personal'); inspRender(); }); };
+ACTIONS.inspQuoteDel = function(el, e, id){ inspVanish(el && el.closest('.izq'), function(){ const s = inspSandStore(); s.quotes = s.quotes.filter(function(x){ return x.id!==id; }); persist('personal'); inspRender(); }); };
+ACTIONS.inspLogDel = function(el, e, id){ inspVanish(el && el.closest('.izl-r'), function(){ const s = inspStore(); s.log = s.log.filter(function(x){ return x.id!==id; }); persist('personal'); try{ xpLast = null; }catch(err){} inspRender(); }); };
+ACTIONS.inspHideAct = function(el, e, id){
+  const b = document.querySelector('#insp .izb[data-id="'+id+'"]');
+  ui.inspOpenAct = null;
+  inspVanish(b, function(){ const h = inspHidden(); if(h.indexOf(id) < 0) h.push(id); persist('personal'); ui._inspScatter = null; inspRender(); });
+};
+ACTIONS.inspUnhideAct = function(el, e, id){ const s = inspStore(); s.hiddenActs = inspHidden().filter(function(x){ return x!==id; }); persist('personal'); ui._inspScatter = null; inspChime(2); inspRender(); };
+
+// ---- whispers: now and then a quiet line drifts across, about what it's all for ----
+const INSP_WHISPERS = ['Good things are slow, and then they’re sudden.', 'You’re allowed to enjoy the way there.', 'Rest is part of the work.', 'Everything you want is on the other side of a lot of quiet hours.',
+  'Some of the best days haven’t happened yet.', 'Breathe. There’s time.', 'Small, every day, adds up to everything.', 'Look how far you’ve already come.', 'Keep a little room for wonder.'];
+function inspWhisperLines(){
+  const a = typeof aboutYou==='function' ? aboutYou() : {}, out = INSP_WHISPERS.slice();
+  if(a.building) out.push(a.building.replace(/\.$/, '')+'. One quiet hour at a time.');
+  if(a.why) out.push('Remember who it’s for: '+a.why.replace(/\.$/, '')+'.');
+  if(a.perfect) out.push('A perfect day: '+a.perfect.replace(/\.$/, '')+'. You’re building toward it.');
+  const vb = typeof masterVisionBoard==='function' ? masterVisionBoard() : null;
+  if(vb && vb.elements && vb.elements.length) out.push('Your vision board isn’t a wish. It’s a direction.', 'Everything on that board is closer than it looks.');
+  try{ if(typeof masterGoalDefs==='function') masterGoalDefs().slice(0, 3).forEach(function(m){ if(m.label) out.push(m.label+'. Step by step.'); }); }catch(e){}
+  return out;
+}
+function inspWhisper(){
+  const L = document.getElementById('insp'); if(!L || !inspOpenNow() || ui.inspBreath || document.querySelector('#insp .insp-whisper')) return;
+  const lines = inspWhisperLines(); let t = lines[Math.floor(Math.random()*lines.length)];
+  if(t===ui._inspLastWhisper) t = lines[(lines.indexOf(t) + 1) % lines.length]; ui._inspLastWhisper = t;
+  const w = document.createElement('div'); w.className = 'insp-whisper'; w.textContent = t;
+  w.style.top = (18 + Math.random()*10)+'%';
+  L.appendChild(w); setTimeout(function(){ if(w.parentNode) w.parentNode.removeChild(w); }, 11000);
+}
+setInterval(function(){ try{ if(typeof inspOpenNow==='function' && inspOpenNow() && Date.now() - (ui.inspOpenedAt||0) > 20000 && Math.random() < 0.55) inspWhisper(); }catch(e){} }, 30000);
+
+// ---- the music: a small player with the track's name ----
+function inspMusicPillHtml(){
+  const on = typeof musicOn==='function' && musicOn(), tr = FOCUS_TRACKS[FM.idx] || {};
+  return '<div class="insp-mp'+(on ? ' is-on' : '')+'">'+
+    '<button class="insp-mp-b" data-action="inspMusic" title="'+(on ? 'Pause' : 'Play')+'">'+(on ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9654;')+'</button>'+
+    '<span class="insp-mp-n" id="inspTrack">'+escapeHtml(tr.name || 'Music')+'</span>'+
+    '<button class="insp-mp-b is-next" data-action="inspNext" title="Next track">&#9197;</button></div>';
+}
+ACTIONS.inspNext = function(){
+  const dream = FOCUS_TRACKS.map(function(t, i){ return t.dream ? i : -1; }).filter(function(i){ return i >= 0; });
+  const at = dream.indexOf(FM.idx), next = dream.length ? dream[(at + 1) % dream.length] : (FM.idx + 1) % FOCUS_TRACKS.length;
+  const was = typeof musicOn==='function' && musicOn();
+  if(was){ FM.switching = true; focusMusicStop(); setTimeout(function(){ FM.switching = false; focusMusicPlay(next); ui.inspMusic = true; inspRender(); }, 700); }
+  else { FM.idx = next; FM.bar = 0; focusMusicPlay(next); ui.inspMusic = true; setTimeout(inspRender, 60); }
+};
+setInterval(function(){ const n = document.getElementById('inspTrack'); if(n && FOCUS_TRACKS[FM.idx] && n.textContent!==FOCUS_TRACKS[FM.idx].name) n.textContent = FOCUS_TRACKS[FM.idx].name; }, 1500);
+
+// ---- more music, in Tide's vein ----
+FOCUS_TRACKS.push(
+  {name:'Moonwater', style:'ocean', dream:true, bpm:38, prog:[[41,48,53,57],[38,45,50,57],[43,50,55,58],[36,43,48,55]], scale:[65,69,72,74,77], hiss:0},
+  {name:'Night Rain', style:'rain', dream:true, bpm:52, prog:[[45,52,57,60],[41,48,53,60],[48,55,60,64],[43,50,55,62]], scale:[69,72,74,76,79,81], hiss:0},
+  {name:'Lagoon', style:'lagoon', dream:true, bpm:58, prog:[[50,57,62,66],[47,54,59,62],[43,50,55,62],[45,52,57,61]], fig:[0,2,3,2,1,3,2,1], hiss:0}
+);
+// rain: a soft hiss that comes and goes, slow piano notes falling through it
+function fmRain(ctx, out, t, len, vol){
+  const src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+  const n = Math.floor(ctx.sampleRate*2), buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
+  for(let i=0;i<n;i++) d[i] = (Math.random()*2 - 1)*(Math.random() < 0.02 ? 1 : 0.35);
+  src.buffer = buf; src.loop = true; f.type = 'bandpass'; f.frequency.value = 2600 + Math.random()*900; f.Q.value = 0.5;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + len*0.3); g.gain.setValueAtTime(vol, t + len*0.75); g.gain.exponentialRampToValueAtTime(0.0001, t + len*1.08);
+  src.connect(f); f.connect(g); g.connect(out); src.start(t); src.stop(t + len*1.1);
+}
+const fmDreamBase = fmDream;
+fmDream = function(style){
+  if(style==='rain') return function(ctx, out, t, tr, bar){
+    const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length];
+    fmRain(ctx, out, t, len, 0.02);
+    padChord(ctx, out, t, ch.map(fmHz), len*0.5, len*0.25, len*0.9, 0.012);
+    const k = bar===0 ? 1 : 2 + Math.floor(fmRand()*2);
+    for(let i=0;i<k;i++) fmKey(ctx, out, t + beat*(i*1.5 + fmRand()*0.4), fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), beat*3, 0.04);
+  };
+  if(style==='lagoon') return function(ctx, out, t, tr, bar){
+    const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length], step = len/tr.fig.length;
+    fmWave(ctx, out, t, len, 0.035);
+    padChord(ctx, out, t, ch.slice(0, 3).map(fmHz), len*0.5, len*0.2, len*0.8, 0.011);
+    tr.fig.forEach(function(n, i){ if(bar===0 && i > 3) return; fmKey(ctx, out, t + i*step + (i%2 ? 0.02 : 0), fmHz(ch[n % ch.length] + 12), step*4, 0.032 - (i%2 ? 0.008 : 0)); });
+  };
+  return fmDreamBase(style);
+};
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
