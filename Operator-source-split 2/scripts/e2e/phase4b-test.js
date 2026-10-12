@@ -20,7 +20,7 @@ const SP = require('./common.js').OUT;
   await p.dblclick(nsel+' .bel-body');
   await p.keyboard.press('Meta+A'); await p.keyboard.press('Control+A');
   await p.keyboard.type('Lock in daily');
-  await p.mouse.click(1300, 860); // background click ends editing
+  await p.mouse.click(1100, 760); // background click ends editing (clear of the journal orb by the +)
   await p.waitForTimeout(100);
   check('edit note text', (await E("cvBoard().elements.find(e=>e.id==='"+note.id+"').body"))==='Lock in daily', await E("cvBoard().elements.find(e=>e.id==='"+note.id+"').body"));
   // drag the note

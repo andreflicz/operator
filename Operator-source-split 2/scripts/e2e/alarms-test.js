@@ -68,8 +68,9 @@ const at = (h, m, day) => new Date(2026, 9, day||7, h, m, 0).getTime(); // Wed 7
   // --- night plan changes the wake alarm for that morning; evening card merges sleep ---
   p = await newPage(b, OUT+'/al.html', {focus:{wake:{enabled:true, time:'07:00', days:[1,2,3,4,5,6]}}, tasks:{items:[{id:'t1', title:'Edit reel', status:'backlog', clients:['personal'], client:'personal', priority:'med'}]}}, at(22,0));
   E = (code) => p.evaluate(c => window.__op.ev(c), code);
-  check('wind down is one button (evenings)', await p.isVisible('[data-action="openWindDown"]'));
-  await p.click('[data-action="openWindDown"]');
+  // round 27: no separate Wind down button; clocking out starts it
+  check('no separate Wind down button (Clock out starts it)', !(await p.isVisible('.today-hero [data-action="openWindDown"]')));
+  await E("openWindDown()"); await p.waitForTimeout(300);
   check('wind down walks today → plan → note → alarm', (await p.$$('#windOverlay .wd-step')).length===4);
   check('no wake chip in the hero', (await p.$$('.today-hero .wake-chip')).length===0);
   await p.click('#windOverlay [data-action="windStep"][data-id="plan"]');

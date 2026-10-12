@@ -117,8 +117,9 @@ const SP = require('./common.js').OUT;
   check('wake alarm set for that morning', await E("const o=state.focus.wake.override; o && o.time==='05:45' && o.date==='"+np.date+"'"));
   // sleep mode — straight in, no crowded recap popup
   check('no recap popup on sleep', !(await p.isVisible('#recapOverlay:not(.hidden)')));
-  check('sleep view', (await p.textContent('#viewRoot')).includes('Sleep mode') && await p.isVisible('.sleep-card'));
-  check('sleep shows next alarm 5:45', (await p.textContent('.sleep-card')).includes('5:45'));
+  // round 27: sleep is a full-screen, super-minimal view (clock, a line, the alarm)
+  check('sleep view', await p.isVisible('.np.sleepv') && /Sleep well/.test(await p.textContent('.np.sleepv')));
+  check('sleep shows next alarm 5:45', (await p.textContent('.np.sleepv')).includes('5:45'));
   check('auto lock-in blocked in sleep', await E("autoLockInBlockedReason()")==='mode');
   // morning: alarm fires with plan
   await p.clock.setSystemTime(new Date(2026,9,8,5,45,10));

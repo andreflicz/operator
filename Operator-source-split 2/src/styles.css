@@ -2172,7 +2172,7 @@
   .sky-chip.sky-text::before{ content:'·'; color:var(--text-faint); margin-right:2px; }
   .sky-chip.sky-text b{ color:var(--text-dim); font-weight:600; }
   .sky-chip.sky-text .sky-chip-i{ font-size:1em; }
-  .th-modes{ display:grid !important; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:8px; width:100%; }
+  .th-modes{ display:grid !important; grid-auto-flow:column; grid-auto-columns:1fr; gap:8px; margin-top:8px; width:100%; }
   .th-mode{ display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:7px 10px; border-radius:12px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text-dim); font-size:12.5px; font-weight:600; cursor:pointer; font-family:var(--font-body); transition:background .15s, color .15s, border-color .15s; }
   .th-mode:hover{ color:var(--text); border-color:var(--border-strong); background:rgba(var(--ink),.06); }
   .th-mode:active{ transform:scale(.97); }
@@ -5254,6 +5254,8 @@ body.np-on .op-bub:not(.is-moved){ left:22px !important; }
 .wd-card.is-off{ justify-content:center; color:rgba(255,255,255,.65); font-size:13.5px; }
 .wd-card .wd-sub, .wd-card .wd-sound{ margin:0; font-size:12.5px; }
 .wd-card-b{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:auto; }
+.wd-card-b .btn{ border-radius:999px; padding:6px 14px; font-size:12px; font-weight:600; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); color:rgba(255,255,255,.78); transition:background .15s, border-color .15s, color .15s; }
+.wd-card-b .btn:hover{ background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.22); color:#fff; }
 .wd-work-k{ font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.6); }
 .wd-card .wd-time{ font-size:40px !important; max-width:100%; }
 .wd-work-h{ display:flex; flex-direction:column; align-items:center; gap:2px; }
