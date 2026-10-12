@@ -169,8 +169,13 @@ async function ctxPage(b, seed, opts){
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("const pr = intentStore().prompted; pr['M'+monthKey()] = 1; pr['W'+weekKey()] = 1; checkoutDue().forEach(c => pr['O'+c.kind+':'+c.key] = 1); ui._intAsked = 'x'; ui.view='calendar'; renderView()"); await p.waitForTimeout(800);
     await E("document.querySelectorAll('.int-ov').forEach(o => { o.classList.add('hidden'); o.classList.remove('is-in'); })");
-    check('Calendar: the week and the month both have a pencil (no “Check out” button)', (await p.$$('.tg-strip .tg-edit')).length===2 && !(await p.$('.tg-strip .tg-out')));
-    check('…the pencils look the same (✎)', JSON.stringify(await p.$$eval('.tg-strip .tg-edit', els => els.map(e => e.textContent)))==='["✎","✎"]');
+    // (round 31: the week and the month share one card on the Calendar; flip between them)
+    const pens = [await p.$eval('.cx-tierbody .tg-edit', e => e.textContent)];
+    check('Calendar: the week and the month both have a pencil (no “Check out” button)', !!(await p.$('.cx-tierbody .tg-card.is-week .tg-edit')) && !(await p.$('.cx-tierbody .tg-out')));
+    await E("ui.cxTier = 'month'; renderView()"); await p.waitForTimeout(200);
+    pens.push(await p.$eval('.cx-tierbody .tg-edit', e => e.textContent));
+    check('…the pencils look the same (✎)', JSON.stringify(pens)==='["✎","✎"]' && !!(await p.$('.cx-tierbody .tg-card.is-month')));
+    await E("ui.cxTier = 'week'"); 
     await p.waitForTimeout(800);
     await E("renderView()"); await p.waitForTimeout(200);
     check('Op’s read on the week ahead (Calendar)', !!(await p.$('.opi-wrap .opi')));
@@ -203,7 +208,8 @@ async function ctxPage(b, seed, opts){
     check('Inspiration opens on one of the dreamy tracks', await E("FM.playing && FOCUS_TRACKS[FM.idx].dream===true"));
     check('the sky has aurora, rising lights and a glow that follows you', !!(await p.$('#insp .insp-aurora')) && (await p.$$('#insp .insp-bokeh i')).length===10 && !!(await p.$('#insp .insp-glow')));
     const tools = await p.$$eval('#insp .izk', els => els.map(e => e.textContent.trim()));
-    check('a sandbox bar: Thought, Wish, Words, Breathe, the sky, Drift (round 28: plus Breeze and Sounds)', JSON.stringify(tools)==='["✎Thought","✦Wish","❝Words","❍Breathe","☾Dusk","≈Drift","🍃Breeze","🎵Sounds"]', tools);
+    // (round 31: Breathe and the sky moved into the + in the middle)
+    check('a sandbox bar: Thought, Wish, Words, a +, Drift, Breeze, Sounds', JSON.stringify(tools)==='["✎Thought","✦Wish","❝Words","≈Drift","🍃Breeze","🎵Sounds"]' && !!(await p.$('#insp .izk-plus')), tools);
     check('the week (reading, meditating, walks…) lives here now', /This week/.test(await p.textContent('#insp .insp-lately')) && (await p.$$('#insp .izl-w')).length===6);
     await p.click('#insp [data-action="inspToolWish"]'); await p.waitForTimeout(300);
     await p.keyboard.type('A house by the ocean'); await p.waitForTimeout(100);
@@ -215,7 +221,8 @@ async function ctxPage(b, seed, opts){
     const qx = await E("inspSandStore().quotes[0].x"); const qb = await p.$('#insp .izq'); const bb = await qb.boundingBox();
     await p.mouse.move(bb.x + 40, bb.y + 20); await p.mouse.down(); await p.mouse.move(bb.x + 140, bb.y + 60, {steps:6}); await p.mouse.up(); await p.waitForTimeout(200);
     check('…you can move them anywhere', await E("inspSandStore().quotes[0].x") > qx + 50);
-    await p.click('#insp [data-action="inspSky"]'); await p.waitForTimeout(300);
+    await p.click('#insp .izk-plus'); await p.waitForTimeout(200);   // (round 31: the sky is in the + menu)
+    await p.click('#insp .izk-plusmenu [data-action="inspSky"]'); await p.waitForTimeout(300);
     check('the sky changes (and remembers)', await E("document.getElementById('insp').getAttribute('data-sky')")==='aurora' && await E("inspSandStore().sky")==='aurora' && /Aurora/.test(await p.textContent('#insp .insp-tools')));
     await p.mouse.click(1000, 140); await p.waitForTimeout(150);
     check('tap the sky: a bloom of light', !!(await p.$('.insp-bloom')));
@@ -227,7 +234,8 @@ async function ctxPage(b, seed, opts){
     await p.click('#insp [data-action="inspDrift"]'); await p.waitForTimeout(200); await p.click('#insp .izk-wind [data-id="breeze"]'); await p.waitForTimeout(200);
     check('…the wind is set', await E("inspStore().wind")==='breeze');
     await E("inspStore().wind='calm'");
-    await p.click('#insp [data-action="inspBreathe"]'); await p.waitForTimeout(300);
+    await p.click('#insp .izk-plus'); await p.waitForTimeout(200);   // (round 31: Breathe is in the + menu)
+    await p.click('#insp .izk-plusmenu [data-action="inspBreathe"]'); await p.waitForTimeout(300);
     check('Breathe: a breathing orb, full screen', await p.isVisible('#inspBreath .ibr-orb') && /Breathe in/.test(await p.textContent('#inspBreath')));
     await p.clock.runFor(4200); await p.waitForTimeout(100);
     check('…in, then hold, then out', /Hold/.test(await p.textContent('#inspBreath .ibr-t')));

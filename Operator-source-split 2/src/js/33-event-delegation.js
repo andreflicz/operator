@@ -30,10 +30,8 @@ document.body.addEventListener('click', function(e){
     case 'businessTab': ui.businessTab = el.dataset.tab; renderView(); break;
     case 'settingsTab': ui.settingsTab = el.dataset.tab; renderView(); break;
     case 'goToAlarmSettings': {
-      ui.view = 'settings';
-      ui.settingsTab = 'morning';
-      renderView();
-      setTimeout(function(){ const s=document.getElementById('alarmsSettingsSection'); if(s) s.scrollIntoView({behavior:'smooth', block:'start'}); }, 30);
+      // (round 31: alarms live on the Calendar)
+      ui.view = 'calendar'; renderView();
       break;
     }
     case 'personalTab': ui.personalTab = el.dataset.tab; renderView(); break;

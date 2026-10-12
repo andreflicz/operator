@@ -125,8 +125,9 @@ const SP = require('./common.js').OUT;
   await p.screenshot({path:SP+'/p4-leads.png'});
   // settings: stages + cadence
   // round 13: settings are grouped — Business lives under the "Business & Calendar" group (tab "work")
-  await p.click('[data-action="nav"][data-view="settings"]'); await p.click('[data-action="settingsTab"][data-tab="work"]');
-  check('business settings shown in the work group', await p.isVisible('#setPart-business #newStage-lead'));
+  // (round 31: the business setup moved to Business → Setup)
+  await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="setup"]');
+  check('business settings shown in Business → Setup', await p.isVisible('.biz-setup #newStage-lead'));
   await p.fill('#newStage-lead', 'Follow-up'); await p.click('[data-action="addStage"][data-kind="lead"]');
   check('stage added before Won', (await E("crmStages('lead').map(s=>s.label).join('|')")).includes('Proposal sent|Follow-up|Won'));
   await p.fill('[data-stage-label="lead:lead"]', 'Fresh'); await p.press('[data-stage-label="lead:lead"]','Tab');

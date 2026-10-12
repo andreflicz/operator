@@ -52,16 +52,18 @@ async function ctxPage(b, seed, opts){
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("ui.view='settings'; ui.settingsTab='you'; renderView()"); await p.waitForTimeout(200);
     const navs = await p.$$eval('.settings-nav-item', e => e.map(x => x.textContent.trim()));
-    check('Settings: You · Goals & Standards · Focus & Lock in · Morning & Alarms · Look & Sound · Business & Calendar · Connections & Data', navs.length===7 && /Goals & Standards/.test(navs.join()) && /Morning & Alarms/.test(navs.join()), navs);
+    // (round 31: alarms moved to the Calendar; Colors & Labels and Op have their own tabs)
+    check('Settings: You · Goals & Standards · Focus & Lock in · Look & Sound · Colors & Labels · Op · Connections & Data', navs.length===7 && /Goals & Standards/.test(navs.join()) && /Colors & Labels/.test(navs.join()) && !/Morning & Alarms/.test(navs.join()), navs);
     check('You: about you, body & health, why — once (the alarm card isn’t here twice)', await p.isVisible('#setHeightFt') && (await p.$$('#wakeSettingsSection')).length===0);
     await E("ui.settingsTab='standards'; renderView()"); await p.waitForTimeout(200);
     check('Goals & Standards: average hours a day, new clients a month, content targets', await p.isVisible('#setAvgHoursTarget') && await p.isVisible('#setNewClientsPerMonth') && await p.isVisible('#setContentBusinessN') && await p.isVisible('#setContentPersonalPer'));
     await p.fill('#setContentBusinessN', '5'); await p.selectOption('#setContentBusinessPer', 'week'); await p.fill('#setContentPersonalN', '1'); await p.selectOption('#setContentPersonalPer', 'day');
     await p.click('[data-action="saveProfile"]'); await p.waitForTimeout(200);
     check('…and they save', await E("JSON.stringify(state.standards.contentTargets)")==='{"business":{"n":5,"per":"week"},"personal":{"n":1,"per":"day"}}');
-    await E("ui.settingsTab='morning'; renderView()"); await p.waitForTimeout(200);
-    check('Morning & Alarms: the wake-up card and the other alarms', await p.isVisible('#wakeSettingsSection') && await p.isVisible('#alarmsSettingsSection'));
-    await E("ui.settingsTab='system'; renderView()"); await p.waitForTimeout(600);
+    // (round 31: alarms and mornings live on the Calendar; Op has his own Settings tab)
+    await E("ui.view='calendar'; renderView(); document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'))"); await p.waitForTimeout(200);
+    check('Calendar: the wake-up alarm and the other alarms', await p.isVisible('.cx-al.is-wake') && await p.isVisible('.cx-addal'));
+    await E("ui.view='settings'; ui.settingsTab='op'; renderView()"); await p.waitForTimeout(600);
     check('Connections & data → The Operator: the app, the voice keys, the Anthropic key', await p.isVisible('#opAppCard') && await p.isVisible('#opVoiceSet') && await p.isVisible('#aiKey') && (await p.$$('#aiKey')).length===1);
     // (round 21: always its own app — no Google Chrome option)
     check('…always its own app (no Google Chrome option)', /Operator/.test(await p.textContent('#opAppCard')) && await p.$('[data-action="opEngineSwitch"][data-id="0"]')===null);

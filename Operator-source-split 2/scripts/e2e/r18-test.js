@@ -116,7 +116,7 @@ async function ctxPage(b, seed, opts){
     check('Calendar asks for the month — cinematic', await p.isVisible('#intOverlay.is-in.is-cine') && /October/.test(await p.textContent('#intContent')) && (await p.$$('#intContent .int-in')).length===5);
     await p.click('#intOverlay .int-x'); await p.waitForTimeout(400);
     check('close it and it waits in the notifications', await E("notifList().some(n => n.key.indexOf('intent:month:2026-10')===0)"));
-    check('the Calendar has a strip with the month and the week', (await p.$$('.int-strip .tg-card')).length===2);
+    check('the Calendar has the week and the month (one card, flip between them)', !!(await p.$('.cx-tier .cx-seg2')) && (await p.$$('.cx-tierbody .tg-card')).length===1);   // (round 31)
     await E("openIntentForm('month')"); await p.waitForTimeout(300);
     await p.fill('#int_habit', 'Phone in bed'); await p.fill('#int_goal', 'Sign two new clients'); await p.click('[data-action="saveIntent"]'); await p.waitForTimeout(1300);
     check('saving the month brings up the week next', await p.isVisible('#intOverlay.is-in') && /This week/.test(await p.textContent('#intContent')));

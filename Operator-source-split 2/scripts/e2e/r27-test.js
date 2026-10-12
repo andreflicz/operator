@@ -208,7 +208,7 @@ async function ctxPage(b, seed, opts){
     const tr0 = await E("FOCUS_TRACKS[FM.idx].name"); await p.click('#insp .insp-mp [data-action="inspNext"]'); await p.waitForTimeout(1200);
     check('…next track', await E("FOCUS_TRACKS[FM.idx].name")!==tr0 && await E("FOCUS_TRACKS[FM.idx].dream===true"));
     await E("aboutYou().building = 'a studio by the sea'; ui._inspWordsAt = 0; inspWords()"); await p.waitForTimeout(200);
-    check('now and then a quiet line drifts by (round 28: words on the sky)', !!(await p.$('.izwd, .insp-words')) && await E("inspWhisperLines().some(l => /a studio by the sea/.test(l))"));
+    check('now and then a quiet line drifts by (round 28: words on the sky)', !!(await p.$('.izwd, .insp-words')) && await E("inspWhisperLines().length > 40 && !inspWhisperLines().some(l => /step by step/i.test(l))"));   // (round 31: words about life, not the to-do list)
     check('no page errors (inspiration)', p.errors.length===0, p.errors);
     await p.context().close();
   }

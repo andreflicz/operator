@@ -183,13 +183,16 @@ async function ctxPage(b, seed, opts){
     await p.mouse.move(bb.x + bb.width/2, bb.y + bb.height/2); await p.mouse.down(); await p.mouse.move(bb.x + bb.width/2 + 120, bb.y + bb.height/2 + 40, {steps:8}); await p.mouse.up(); await p.waitForTimeout(300);
     await p.waitForTimeout(400);
     const bb2 = await (await p.$('#inspWorld .izb[data-id="'+did+'"]')).boundingBox();
-    check('you can pick a bubble up and put it somewhere else (it stays)', !!(await E("inspPosStore()['"+did+"']")) && Math.abs((bb2.x - bb.x) - 120) < 45 && Math.abs((bb2.y - bb.y) - 40) < 45, [bb.x, bb2.x, bb.y, bb2.y]);
+    // (round 31: dropped on a Want to it joins it, and nothing is left under the middle, so it may settle a little off the spot)
+    check('you can pick a bubble up and put it somewhere else (it stays)', !!(await E("inspPosStore()['"+did+"']")) && Math.hypot(bb2.x - bb.x, bb2.y - bb.y) > 40, [bb.x, bb2.x, bb.y, bb2.y]);
     check('…without opening its card', !(await E("ui.inspOpenAct")));
     // breeze and return
+    const wantsNow = await E("inspWants().filter(id => document.querySelector('#inspWorld .izb[data-id=\"'+id+'\"]'))");
     await E("ACTIONS.inspBreezeAway()"); await p.clock.runFor(3500); await p.waitForTimeout(300);
     const kept = await p.$$eval('#inspWorld .izb', e => e.filter(x => Number(x.style.opacity || 1) > 0.5).map(x => x.dataset.id));
-    check('Breeze: a gust lifts everything away but one', kept.length===1 && !!(await p.$('#inspWorld .izb.is-keep')), kept);
-    check('…“One thing, for now.”', /One thing, for now/.test(await p.textContent('#insp')));
+    // (round 31: Breeze clears the sky; only your Want to's stay)
+    check('Breeze: a gust lifts everything away (your Want to’s stay)', kept.every(id => wantsNow.includes(id)) && kept.length===wantsNow.length, [kept, wantsNow]);
+    check('…“A clear sky.”', /A clear sky/.test(await p.textContent('#insp')));
     const seed0 = await E("inspStore().seed||0");
     await E("ACTIONS.inspBreezeAway()"); await p.clock.runFor(6000); await p.waitForTimeout(400);
     check('Return brings them all back, in a new arrangement (your own spots stay)', await E("inspStore().seed")===seed0 + 1 && (await p.$$eval('#inspWorld .izb', e => e.filter(x => Number(x.style.opacity || 1) > 0.5).length)) > 5 && await E("parseFloat(document.querySelector('#inspWorld .izb[data-id=\""+did+"\"]').style.left)")===await E("(inspPosStore()['"+did+"']||{}).x"));

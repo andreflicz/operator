@@ -112,7 +112,7 @@ const WORK = {enabled:true, start:'09:00', end:'17:00', days:[0,1,2,3,4,5,6], lu
     await p.clock.setFixedTime(at(15, 35)); check('the break, too', await E("workPhase()")==='break');
     await p.clock.setFixedTime(at(10, 0));
     await E("openWakeSetup(); ACTIONS.alarmTab(null, null, 'work')"); await p.waitForTimeout(300);
-    check('the alarm settings have a Work tab: hours, lunch, a break, check-ins', await p.isVisible('.ws-work [data-work="start"]') && await p.isVisible('.ws-work [data-work="end"]') && await p.isVisible('.ws-work [data-work="lunch"]') && /Op checks in on you/.test(await p.textContent('.ws-work')));
+    check('the alarm settings have a Work tab: hours, lunch, a break (check-ins moved to Op)', await p.isVisible('.ws-work [data-work="start"]') && await p.isVisible('.ws-work [data-work="end"]') && await p.isVisible('.ws-work [data-work="lunch"]') && !/Op checks in on you/.test(await p.textContent('.ws-work')) && /Op checks in on you/.test(await E("operatorSettingsHtml()")));   // (round 31: check-ins are an Op setting)
     await p.fill('.ws-work [data-work="end"]', '18:00'); await p.dispatchEvent('.ws-work [data-work="end"]', 'change'); await p.waitForTimeout(200);
     check('…saved', await E("workCfg().end")==='18:00');
     check('Op knows your hours', /Work hours today: 9:00 AM to 6:00 PM/.test(await E("aiContext()")));

@@ -70,15 +70,18 @@ async function ctxPage(b, seed, opts){
     await p.click('[data-action="saveIntent"]'); await p.waitForTimeout(600);
     check('three weekly goals', await E("tierGoals('week', weekKey()).length")===3);
     check('…and nothing left in the notifications', !(await E("notifList().some(n => n.kind==='intent')")));
-    check('the Calendar shows the week and the month as lists you tick', (await p.$$('.tg-strip .tg-card')).length===2 && (await p.$$('.tg-strip .tg-row')).length===5);
+    // (round 31: the Calendar shows the week and the month in one card, flip between them)
+    await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); ui.cxTier = 'week'; renderView()"); await p.waitForTimeout(200);
+    check('the Calendar shows the week and the month as lists you tick', (await p.$$('.cx-tierbody .tg-card.is-week .tg-row')).length===3 && /This month/.test(await p.textContent('.cx-seg2')));
     const x0 = await E("xpLast=null, xpSummaryFresh().total");
-    await p.click('.tg-strip .tg-card.is-week .tg-row >> nth=0'); await p.waitForTimeout(300);
+    await p.click('.cx-tierbody .tg-card.is-week .tg-row >> nth=0'); await p.waitForTimeout(300);
     const x1 = await E("xpLast=null, xpSummaryFresh().total");
     check('a weekly goal hit: +150 XP', x1 - x0===150, [x0, x1]);
-    await p.click('.tg-strip .tg-card.is-month .tg-row >> nth=0'); await p.waitForTimeout(300);
+    await p.click('.cx-seg2 [data-id="month"]'); await p.waitForTimeout(300);
+    await p.click('.cx-tierbody .tg-card.is-month .tg-row >> nth=0'); await p.waitForTimeout(300);
     const x2 = await E("xpLast=null, xpSummaryFresh().total");
     check('a monthly goal hit: +500 XP', x2 - x1===500, [x1, x2]);
-    await p.click('.tg-strip .tg-card.is-month .tg-row >> nth=0'); await p.waitForTimeout(300);
+    await p.click('.cx-tierbody .tg-card.is-month .tg-row >> nth=0'); await p.waitForTimeout(300);
     check('un-tick it and it’s taken back', await E("xpLast=null, xpSummaryFresh().total")===x1);
     await E("['a','b','c'].forEach(l => state.goals.items.push(newTierGoal('week', weekKey(), l))); tierGoals('week', weekKey()).forEach(g => g.done = true)");
     check('only three weekly goals pay a week (6 ticked → +450)', await E("xpLast=null, xpCheckins().parts.weekGoals")===450);

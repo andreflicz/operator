@@ -148,8 +148,10 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     check('Reminders: type, pick Tomorrow, Enter', await E("state.focus.reminders.some(r=>r.label==='Pay rent' && r.date==='2026-10-10')"));
     await E("ui.view='settings'; ui.settingsTab='general'; renderView()"); await p.waitForTimeout(150);
     // round 13: settings are five groups — Sound lives in "Look & Sound" (look), Data in "Connections & Data" (system)
-    await p.evaluate(() => window.__op.ev("ui.settingsTab='morning'; renderView()")); await p.waitForTimeout(150);
-    check('Settings: the wake-up alarm has its own place (Morning & Alarms)', await p.isVisible('.settings-nav-item.active[data-tab="morning"]') && /Wake-up alarm/.test(await p.textContent('#viewRoot')) && await p.isVisible('.settings-nav-item[data-tab="look"]') && await p.isVisible('.settings-nav-item[data-tab="system"]'));
+    // (round 31: the wake-up alarm lives on the Calendar)
+    check('Settings: Look & Sound and Connections & Data, no Morning & Alarms', await p.isVisible('.settings-nav-item[data-tab="look"]') && await p.isVisible('.settings-nav-item[data-tab="system"]') && !(await p.$('.settings-nav-item[data-tab="morning"]')));
+    await E("ui.view='calendar'; renderView(); document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'))"); await p.waitForTimeout(150);
+    check('…the wake-up alarm has its own place on the Calendar', await p.isVisible('.cx-al.is-wake') && /Wake up/.test(await p.textContent('.cx-alarms')));
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(150);
     check('Quick journal: a way into the full journal', await p.isVisible('.qj2-open'));
     check('no errors (pages)', !p.errors.length, p.errors);

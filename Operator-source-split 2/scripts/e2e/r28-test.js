@@ -173,7 +173,8 @@ async function ctxPage(b, seed, opts){
     if(process.env.DBG) console.log('DBG', await E("JSON.stringify(inspStore().ai)"), p.calls.filter(u => /ai/.test(u)));
     check('Op writes ideas for you from what it knows (once a day)', await E("inspStore().ai && inspStore().ai.date===todayStr() && inspStore().ai.ideas.length===2"));
     check('…they float with the rest', /Sunset at the pier/.test(await p.textContent('#inspWorld')));
-    check('…with quiet lines that drift by', await E("inspWhisperLines().some(l => /runs without you/.test(l))"));
+    // (round 31: the sky's words are about life, not what you're building)
+    check('…with quiet lines that drift by (about life, not work)', await E("inspWhisperLines().length > 40 && !inspWhisperLines().some(l => /runs without you/.test(l))"));
     check('…built from you: what resets you and what you’re building', p.calls.length > 0 && await E("/the water/.test(inspAiFacts()) && /video agency/.test(inspAiFacts())"));
     check('no page errors (Inspiration)', p.errors.length===0, p.errors);
     await p.context().close();
@@ -270,8 +271,10 @@ async function ctxPage(b, seed, opts){
     const p = await ctxPage(b, Object.assign({}, base, {profile:{name:'Andre', about:{reset:'cooking, cleaning'}}}), {clock:NOW + 3*3600000});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("openInspire()"); await p.waitForTimeout(700);
-    check('Inspiration has "Stuck? Reset" by the middle', await p.isVisible('#insp .izh-reset'));
-    await p.click('#insp .izh-reset'); await p.waitForTimeout(300);
+    // (round 31: Reset lives in the + menu)
+    await p.click('#insp .izk-plus'); await p.waitForTimeout(200);
+    check('Inspiration has Reset (in the + menu)', await p.isVisible('#insp .izk-plusmenu [data-action="inspResetOpen"]'));
+    await p.click('#insp .izk-plusmenu [data-action="inspResetOpen"]'); await p.waitForTimeout(300);
     const resets = await p.$$eval('#insp .irs-t b', e => e.map(x => x.textContent));
     check('…your resets first (what you told Op), then cook, clean, a walk, a shower', resets[0]==='Cooking' && resets.some(t => /walk/i.test(t)) && resets.some(t => /shower/i.test(t)) && resets.some(t => /Clean/.test(t)), resets);
     await p.click('#insp .irs-min [data-id="10"]'); await p.waitForTimeout(150);

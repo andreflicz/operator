@@ -136,10 +136,8 @@ function renderSettings(){
         '</div>'+
       '</div>',
 
-    business: '<div class="card section"><div class="section-title">Business Info</div><div class="grid grid-2">'+
-        '<div class="field"><label>Monthly revenue goal</label><input class="input" type="number" id="setRevGoal" value="'+p.revenueGoalMonthly+'"></div>'+
-      '</div>'+
-      '</div>'+saveBtn+renderCrmSettings()+
+    // (round 31: the revenue goal lives in Goals, and the business setup on the Business page)
+    business: ''+
       '<div class="section"><div class="section-title">Task Categories'+tip('Give task types their own color. Shown as a left border on the card.')+'<div class="row"><input class="input" id="newTaskCatLabel" placeholder="e.g. Video Idea" style="width:160px;"><button class="btn btn-sm" data-action="addTaskCategory">Add</button></div></div>'+
         '<div class="card">'+
           '<div class="row" style="margin-bottom:10px;">'+SWATCHES.map(function(sw){ return '<span class="swatch'+(pickedSwatch===sw?' swatch-active':'')+'" style="background:'+sw+';" data-action="pickSwatch" data-color="'+sw+'"></span>'; }).join('')+'</div>'+
@@ -185,6 +183,8 @@ function renderSettings(){
       '</div>'
   };
   sections.sound = soundSettingsHtml();
+  // (round 31) every color and label on one screen: task categories, content types, calendar categories, journal types
+  sections.colors = '<div class="set-colors">'+sections.business+sections.calendarJournal+'</div>';
   // five places instead of nine: related settings live together, each part under its own heading
   // each thing in one obvious place: who you are, what you're aiming for, how you work, your
   // mornings, how it looks, the business, and what Operator connects to
@@ -192,12 +192,14 @@ function renderSettings(){
     {id:'you', label:'You', icon:'&#128100;', parts:[['you','']]},
     {id:'standards', label:'Goals & Standards', icon:'&#127919;', parts:[['standards','']]},
     {id:'focus', label:'Focus & Lock in', icon:'&#9201;', parts:[['focus','']]},
-    {id:'morning', label:'Morning & Alarms', icon:'&#9200;', parts:[['morning','']]},
     {id:'look', label:'Look & Sound', icon:'&#127912;', parts:[['display','Appearance'],['sound','Sound']]},
-    {id:'work', label:'Business & Calendar', icon:'&#9635;', parts:[['business','Business'],['calendarJournal','Calendar & journal']]},
-    {id:'system', label:'Connections & Data', icon:'&#128279;', parts:[['operator','Op &amp; the app'],['integrations','Integrations'],['data','Your data'],['updates','App updates']]}
+    {id:'work', label:'Colors & Labels', icon:'&#127752;', parts:[['colors','']]},
+    {id:'op', label:'Op', icon:'&#9673;', parts:[['operator','']]},
+    {id:'system', label:'Connections & Data', icon:'&#128279;', parts:[['integrations','Integrations'],['data','Your data'],['updates','App updates']]}
   ];
-  const want = ui.settingsTab==='general' ? 'you' : (ui.settingsTab || 'you');
+  // (alarms and mornings moved to the Calendar)
+  if(ui.settingsTab==='morning'){ ui.settingsTab = 'you'; setTimeout(function(){ ui.view = 'calendar'; renderView(); if(typeof openWakeSetup==='function') openWakeSetup(); }, 0); }
+  const want = ui.settingsTab==='general' ? 'you' : ui.settingsTab==='business' || ui.settingsTab==='calendarJournal' ? 'colors' : (ui.settingsTab || 'you');
   const grp = groups.find(function(g){ return g.id===want || g.parts.some(function(x){ return x[0]===want; }); }) || groups[0];
   const body = grp.parts.map(function(x){ return '<div class="set-part" id="setPart-'+x[0]+'">'+(grp.parts.length>1 ? '<div class="set-part-h">'+x[1]+'</div>' : '')+sections[x[0]]+'</div>'; }).join('');
   if(want!==grp.id && grp.parts[0][0]!==want){ const target = want; setTimeout(function(){ const el = document.getElementById('setPart-'+target); if(el) el.scrollIntoView({block:'start'}); }, 30); }
