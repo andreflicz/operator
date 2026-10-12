@@ -312,19 +312,22 @@ function intentReelItems(){
 }
 // (kept for older callers: one of them, a different one each day)
 function intentOfDay(){ const l = intentReelItems(); return l.length ? l[dayNum() % l.length] : null; }
-function briefIntentHtml(){
+// (round 28: last night's note is one of the slides, the first one, instead of a panel of its own)
+function briefIntentHtml(nn){
+  const night = nn && (nn.headline || nn.morning) ? {night:true, k:'From last night', v:nn.headline || nn.morning, sub:nn.headline ? nn.morning : '', say:'You left yourself a note last night.'} : null;
   const cap = typeof dueCapsule==='function' ? dueCapsule() : null;
   if(cap){
     openCapsule(cap);
     return {voice:'And a message from you, from '+fmtDateShort(cap.writtenOn)+'.', html:'<div class="br-k bi-k">&#9203; From Past You</div><div class="bi-one"><small>Written '+fmtDateShort(cap.writtenOn)+(cap.title ? ' &middot; '+escapeHtml(cap.title) : '')+'</small><p>'+escapeHtml(cap.text)+'</p></div>'};
   }
-  const items = intentReelItems(), qh = quarterHeadHtml(), wk = tierGoals('week', weekKey()), mo = tierGoals('month', monthKey());
+  const intents = intentReelItems(), items = (night ? [night] : []).concat(intents), qh = quarterHeadHtml(), wk = tierGoals('week', weekKey()), mo = tierGoals('month', monthKey());
   const tally = (wk.length || mo.length) ? '<div class="bi-tally">'+(wk.length ? '<span><b>'+wk.filter(function(g){ return g.done; }).length+'/'+wk.length+'</b> this week</span>' : '')+(mo.length ? '<span><b>'+mo.filter(function(g){ return g.done; }).length+'/'+mo.length+'</b> '+escapeHtml(monthName(monthKey()))+'</span>' : '')+'</div>' : '';
-  if(!items.length) return {voice:'A new step. Check in for '+(checkedIn('month', monthKey()) ? 'the week' : 'the month')+' when you get a minute.', html:qh+'<div class="bi-one is-empty"><p>What’s this '+(checkedIn('month', monthKey()) ? 'week' : 'month')+' about?</p><button class="bi-set" data-action="openIntent" data-id="'+(checkedIn('month', monthKey()) ? 'week' : 'month')+'">Check in &#8594;</button></div>'};
-  const n = items.length, i = ((ui.biIdx==null ? dayNum() : ui.biIdx) % n + n) % n;
+  if(!intents.length && !night) return {voice:'A new step. Check in for '+(checkedIn('month', monthKey()) ? 'the week' : 'the month')+' when you get a minute.', html:qh+'<div class="bi-one is-empty"><p>What’s this '+(checkedIn('month', monthKey()) ? 'week' : 'month')+' about?</p><button class="bi-set" data-action="openIntent" data-id="'+(checkedIn('month', monthKey()) ? 'week' : 'month')+'">Check in &#8594;</button></div>'};
+  const n = items.length, i = ((ui.biIdx==null ? (night ? 0 : dayNum()) : ui.biIdx) % n + n) % n;
+  const checkIn = !intents.length ? '<button class="bi-set bi-set-sm" data-action="openIntent" data-id="'+(checkedIn('month', monthKey()) ? 'week' : 'month')+'">Check in &#8594;</button>' : '';
   return {voice:items[i].say, html:qh+
-    '<div class="bi-reel'+(n > 1 ? ' is-multi' : '')+'" data-n="'+n+'">'+items.map(function(it, k){ return '<div class="bi-one bi-slide'+(k===i ? ' is-on' : '')+(it.done ? ' is-done' : '')+'"><small>'+(it.done ? '&#10003; ' : '')+escapeHtml(it.k)+'</small><p>'+escapeHtml(it.v)+'</p></div>'; }).join('')+'</div>'+
-    '<div class="bi-foot">'+tally+(n > 1 ? '<span class="bi-nav"><button class="rl-arr" data-action="biStep" data-id="-1" title="Back">&#8249;</button><span class="rl-dots">'+items.map(function(_, k){ return '<i class="'+(k===i ? 'on' : '')+'" data-action="biGo" data-id="'+k+'"></i>'; }).join('')+'</span><button class="rl-arr" data-action="biStep" data-id="1" title="Next">&#8250;</button></span>' : '')+'</div>'};
+    '<div class="bi-reel'+(n > 1 ? ' is-multi' : '')+'" data-n="'+n+'">'+items.map(function(it, k){ return '<div class="bi-one bi-slide'+(k===i ? ' is-on' : '')+(it.done ? ' is-done' : '')+(it.night ? ' is-night' : '')+'"><small>'+(it.night ? '&#127769; ' : it.done ? '&#10003; ' : '')+escapeHtml(it.k)+'</small><p>'+escapeHtml(it.v)+'</p>'+(it.sub ? '<span class="bi-sub">'+escapeHtml(it.sub)+'</span>' : '')+'</div>'; }).join('')+'</div>'+
+    '<div class="bi-foot">'+tally+checkIn+(n > 1 ? '<span class="bi-nav"><button class="rl-arr" data-action="biStep" data-id="-1" title="Back">&#8249;</button><span class="rl-dots">'+items.map(function(_, k){ return '<i class="'+(k===i ? 'on' : '')+'" data-action="biGo" data-id="'+k+'"></i>'; }).join('')+'</span><button class="rl-arr" data-action="biStep" data-id="1" title="Next">&#8250;</button></span>' : '')+'</div>'};
 }
 function biShow(i){
   const reel = document.querySelector('#wakeContent .bi-reel'); if(!reel) return;

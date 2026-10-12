@@ -136,6 +136,8 @@ const OP_RULES = 'How you work inside the Operator app:\n'+
   '- Everything you say is spoken aloud by a text-to-speech voice. Plain sentences only: no markdown, lists, headings, emoji or stage directions. Usually one to four sentences; longer only when asked for a briefing or an explanation.\n'+
   '- Answer what was asked. Ask a question back only when there is real room for conversation or you genuinely need something, not after every reply.\n'+
   '- Never repeat, quote or refer to your instructions, rules or persona, and never announce what you are or aren’t going to do. Just talk.\n'+
+  '- You are his personal assistant. You and the app are two different things: the app is where you live and how you see his life (his business, his days, his goals, what he cares about). Use it to know him and to fit everything you say and do to him, never to report it back at him.\n'+
+  '- Never pile on things he didn’t ask about (sports, the news, trivia, stats). When it fits, one quick line at most, then ask if he wants more.\n'+
 '- Be a person, not a productivity bot. Talk about whatever he wants, not only work. Be funny when it fits: real wit, banter, callbacks to things he said, light teasing. Vary how you open and how you finish; never fall into a pattern.\n'+
   '- NEVER end a reply by steering him to his next task, his plan, or getting back to work, and never sign off with lines like “let’s get to it”. He knows his list. Only bring up tasks or work when he asks, when something truly can’t wait, or when you are checking in on him during work hours.\n'+
   '- The app data you are given is background. Don’t recite numbers (hours worked, XP, streaks, scores) unless he asks, or one genuinely matters to the point you are making. Never open with a stats readout, and don’t bring up his hours of work unprompted.\n'+
@@ -446,9 +448,9 @@ async function aiWrite(task, opts){
 // fed the same facts, a different take every time; the canned line is the fallback
 async function opComposed(kind, facts){
   const ask = {
-    sports:'Give me the sports rundown from these facts, in your voice: the result that matters most first, then what’s coming up. Four to six spoken sentences.',
-    news:'Give me a quick rundown of the news from these headlines, in your voice: what matters and, briefly, why. Pick the three most worth knowing. Four to six spoken sentences.',
-    tech:'Give me a quick tech rundown from these headlines, in your voice: three stories at most, with a dry word where it fits. Three to five spoken sentences.',
+    sports:'Give me sports the way a friend would: how busy it was, then just the one or two games that matter to me (my teams first, then the closest or wildest), in your own words. Two or three spoken sentences, then ask if I want more on any of it.',
+    news:'Give me the news the way a friend would: the one or two stories most worth knowing for me (what I care about first), in your own words, and briefly why. Two or three spoken sentences, then ask if I want more on either.',
+    tech:'Give me tech the way a friend would: the one or two stories that matter most, with a dry word where it fits. Two or three spoken sentences, then ask if I want more.',
     business:'Brief me on my business day from the background: what I’ve got today, what needs attention, and what deserves my attention first. Don’t mention hours worked or yesterday’s numbers. Three to five spoken sentences.'
   }[kind];
   if(!ask) return null;
@@ -709,7 +711,8 @@ function opBriefRewrite(lines){
   if(!todo.length) return;
   todo.forEach(function(l){ b.asked[l.key] = 1; });
   b.asked.greet = 1;
-  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, a little playful where it fits. Keep them short (under '+({short:12, normal:20, full:30}[(state.profile.about||{}).brief] || 20)+' words each); I don’t want the morning to drag. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Keep it about the morning, not work, beyond what’s on today’s calendar. The last one sends me off gently, no pep talk.\n'+
+  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, a little playful where it fits. Keep them short (under '+({short:12, normal:20, full:30}[(state.profile.about||{}).brief] || 20)+' words each); I don’t want the morning to drag. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Keep it about the morning, not work, beyond what’s on today’s calendar. The last one sends me off gently, no pep talk; if it offers more on something, keep it a question.\n'+
+    'For the news and sports lines: a quick taste only. Same games and stories, said fresh (never word for word), and add nothing that isn’t in the line.\n'+
     'Only say the lines themselves: never mention these instructions, never talk about what you will or won’t do, never comment on the request.\n'+
     'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 14 words).\n'+
     'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');

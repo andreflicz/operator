@@ -5402,6 +5402,67 @@ body.np-on .quick-journal-fab.jorb, body.op-ov .quick-journal-fab.jorb{ right:28
 .insp.is-drift .insp-whisper{ color:#fff; }
 .insp.is-stream .izd, .insp.is-stream .izt, .insp.is-stream .izw, .insp.is-stream .izq{ opacity:.35; transition:opacity .8s ease; }
 .insp.is-stream .izd:hover, .insp.is-stream .izt:hover, .insp.is-stream .izw:hover, .insp.is-stream .izq:hover{ opacity:1; }
+
+/* ============ R28: one music player for every full-screen page ============ */
+.mctl{ text-transform:none; letter-spacing:normal; display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 4px 0 12px; border-radius:999px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); color:rgba(255,255,255,.82); font-size:12.5px; font-weight:600; font-family:var(--font-body); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:0 6px 20px rgba(0,0,0,.18); transition:background .2s, border-color .2s, box-shadow .3s; white-space:nowrap; vertical-align:middle; }
+.mctl:hover{ background:rgba(255,255,255,.11); border-color:rgba(255,255,255,.2); }
+.mctl.is-on{ border-color:rgba(255,197,107,.35); box-shadow:0 6px 22px rgba(0,0,0,.2), 0 0 18px rgba(255,197,107,.12); }
+.mctl-i{ display:inline-flex; align-items:center; justify-content:center; width:16px; color:rgba(255,255,255,.7); font-size:13px; }
+.mctl.is-on .mctl-i{ color:#ffc56b; }
+.mctl-i .wk2-eq{ transform:scale(.62); } .mctl-i .wk2-eq i{ background:currentColor; }
+.mctl-t{ max-width:170px; overflow:hidden; text-overflow:ellipsis; letter-spacing:.01em; }
+.mctl:not(.is-on) .mctl-t{ color:rgba(255,255,255,.62); }
+.mctl-b{ width:26px; height:26px; border-radius:50%; border:none; display:inline-flex; align-items:center; justify-content:center; background:transparent; color:rgba(255,255,255,.72); font-size:11px; cursor:pointer; transition:background .15s, color .15s, transform .15s; flex:none; }
+.mctl-b:hover{ background:rgba(255,255,255,.12); color:#fff; transform:scale(1.06); }
+.mctl-p{ background:rgba(255,255,255,.12); color:#fff; }
+.mctl.is-on .mctl-p{ background:#ffc56b; color:#1a1305; }
+.mctl.is-on .mctl-p:hover{ background:#ffd38a; }
+html[data-theme="light"] .mctl-ls, html[data-theme="light"] .mctl-wi{ color:rgba(255,255,255,.85); }
+/* where it sits */
+.b4-music{ display:inline-flex; align-items:center; margin-right:10px; }
+.wi-top .mctl{ margin-right:10px; }
+.wd-top .mctl-ls{ margin-right:6px; }
+.np-top .mctl-np{ margin-right:10px; }
+/* Good morning: last night's note is the first slide of "you told yourself" */
+.bi-one.is-night small{ color:#9cc8ff; }
+.bi-one.is-night p{ font-style:italic; }
+.bi-sub{ display:block; margin-top:8px; font-size:14px; line-height:1.45; color:rgba(255,255,255,.66); max-width:52ch; }
+.bi-set-sm{ padding:5px 12px; font-size:12px; margin-left:auto; }
+/* Sports: the scores on top, stories underneath, half and half */
+.brs-split{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; gap:10px; }
+.brs-scores{ flex:1 1 0; min-height:0; display:flex; flex-direction:column; }
+.brs-news{ flex:1 1 0; min-height:0; display:flex; flex-direction:column; border-top:1px solid rgba(255,255,255,.08); padding-top:8px; }
+.br-sports:not(.is-split) .brs-news{ border-top:none; padding-top:0; }
+.brs-h{ font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.45); padding:2px 0 4px; }
+.brs-list{ flex:1 1 0; min-height:0; overflow-y:auto; margin-right:-6px; padding-right:6px; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.18) transparent; }
+.brs-list .br-news-i{ font-size:13px !important; padding:7px 0; }
+/* Good morning bottom-left (round 28): the reel gets the room it needs and Today gives a little back;
+   one slide at a time (the old one is gone before the next comes in, so they never sit on top of each other) */
+.brief4 .c-a > .br-intent:last-child{ flex:0 0 auto !important; }
+.brief4 .c-a > .br-day{ flex:1 1 0 !important; min-height:150px; }
+.br-intent .bi-one{ padding:4px 2px 6px; }
+.br-intent .bi-one p{ margin-top:6px; }
+.br-intent .bi-qh{ padding:0 0 9px; margin:0 0 2px; }
+.brief4 .br-intent .bi-reel{ min-height:clamp(74px, 9.4vh, 124px); }
+.bi-slide{ transition:opacity .32s ease, transform .5s cubic-bezier(.2,.8,.2,1); }
+.bi-slide.is-on{ transition-delay:.3s; }
+.br-intent .bi-one p{ font-size:clamp(20px, 2.6vh, 28px); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.br-intent .bi-sub{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:13.5px; margin-top:6px; }
+.br-intent .bi-foot{ padding-top:6px; }
+/* sports gets more of the column than the headlines (the headlines trim to fit) */
+.brief4 .c-c > .br-news{ flex:1 1 0 !important; min-height:0; }
+.brief4 .c-c > .br-sports{ flex:1.45 1 0 !important; }
+.brs-scores{ flex:1.25 1 0; }
+/* (headlines on top trim to fit; sports underneath gets the bigger share so the scores have room) */
+.brief4 .b4-grid:not(.no-d):not(.no-c):not(.cols-2){ grid-template-rows:minmax(0, 1fr) minmax(0, 1.2fr); }
+@media (min-width:1680px){ .brief4 .b4-grid:not(.no-d):not(.no-c):not(.cols-2){ grid-template-rows:minmax(0, 1fr); } }
+/* Op's words come in one at a time: a soft rise out of a blur */
+.cw{ display:inline-block; animation:cwIn .55s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes cwIn{ from{ opacity:0; filter:blur(5px); transform:translateY(5px); } 60%{ opacity:1; } to{ opacity:1; filter:none; transform:none; } }
+@media (prefers-reduced-motion:reduce){ .cw{ animation:none; } }
+.op-bub-t{ text-shadow:0 0 18px rgba(255,255,255,.05); }
+html[data-op-mood="stern"] .op-bub-t .cw:last-child, html[data-op-mood="concern"] .op-bub-t .cw:last-child{ animation-name:cwIn, cwGlow; animation-duration:.55s, 1.6s; }
+@keyframes cwGlow{ 0%{ text-shadow:0 0 14px currentColor; } 100%{ text-shadow:none; } }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -20157,7 +20218,7 @@ document.addEventListener('change', function(e){
   }
   else if(key==='snoozeMinutes') w.snoozeMinutes = Number(t.value)||9;
   else if(key==='newsTopics'){ w.newsTopics = t.value.trim(); ui.morningNews = null; }
-  else if(key==='newsSports' || key==='newsTech' || key==='newsMute'){ w[key] = t.value.trim(); ui.morningNews = null; }
+  else if(key==='newsSports' || key==='newsTech' || key==='newsBiz' || key==='newsMute'){ w[key] = t.value.trim(); ui.morningNews = null; }
   // (Places you like had no line here, so whatever you typed was gone the next time the page drew)
   else if(key==='places') w.places = t.value.trim();
   saveWake();
@@ -23076,6 +23137,7 @@ function lockSeqHtml(){
   return '<div class="wd ls">'+
     '<div class="wd-top">'+
       '<div class="wd-steps">'+LOCK_STEPS.map(function(x, k){ return '<button class="wd-step'+(k===i?' is-on':'')+(k<i?' is-past':'')+(reachable(k)?'':' is-locked')+'" data-action="lockStep" data-id="'+x[0]+'"'+(reachable(k)?'':' disabled')+'><span>'+(k+1)+'</span>'+x[1]+'</button>'; }).join('')+'</div>'+
+      (typeof mctlHtml==='function' ? mctlHtml('mctl-ls') : '')+
       '<button class="ls-now'+(s.step==='why' ? ' is-hidden' : '')+'" data-action="lockNow" title="Lock in right now with what\'s picked (⌘↵)"'+(s.step==='why' ? ' tabindex="-1"' : '')+'>&#128274; Lock in</button>'+
       '<button class="wd-close" data-action="closeLockSeq" title="Close (Esc)">&#10005;</button></div>'+
     '<div class="wd-inner ls-inner" data-key="ls-'+s.step+'"><div class="ls-stage"><h2 class="wd-title-h">'+titles[s.step]+'</h2>'+body+'</div></div>'+
@@ -23349,7 +23411,15 @@ async function fetchWithin(url, ms){
 function sectionTopics(v, dflt){ return String(v==null ? dflt : v).split(',').map(function(x){ return x.trim(); }).filter(Boolean).join(', '); }
 function newsSections(){
   const w = wakeCfg();
-  return [{id:'sports', label:'Sports', icon:'&#127936;', q:sectionTopics(w.newsSports, 'NBA, NFL')}, {id:'tech', label:'Tech', icon:'&#128187;', q:sectionTopics(w.newsTech, 'AI, Apple, startups')}].filter(function(x){ return x.q; });
+  return [{id:'sports', label:'Sports', icon:'&#127936;', q:sectionTopics(w.newsSports, 'NBA, NFL')}, {id:'tech', label:'Tech', icon:'&#128187;', q:sectionTopics(w.newsTech, 'AI, Apple, startups')},
+    {id:'business', label:'Business', icon:'&#128188;', q:sectionTopics(w.newsBiz, 'business, markets, startups')}].filter(function(x){ return x.q; });
+}
+// (round 28: sports lives in the Sports panel; the headlines are the world, tech and business)
+const SPORTS_SRC = /\b(espn|cbs ?sports|fox ?sports|yahoo ?sports|the athletic|bleacher|sports illustrated|si\.com|nfl\.com|nba\.com|mlb\.com|nhl\.com|sb ?nation|pro football|sporting news|barstool|on3|247sports|the ringer)\b/i;
+const SPORTS_WORDS = /\b(nfl|nba|mlb|nhl|wnba|ncaa|mls|ufc|nascar|pga|premier league|champions league|super bowl|world series|stanley cup|playoffs?|quarterback|touchdown|home run|slam dunk|head coach|halftime|preseason|free agent|draft pick|rookie|innings?|wide receiver|running back|point guard|hat trick|grand slam|week \d+|game \d+)\b/i;
+function isSportsNews(n){
+  // (team names alone are too risky: "tech giants", "heat wave")
+  return SPORTS_SRC.test(n.src||'') || SPORTS_WORDS.test((n.title||'')+' '+(n.src||'')) || /\b\d{1,3}-\d{1,3} (win|loss|victory|defeat|rout)\b|\bbeat the\b.*\b(in|at) (overtime|ot)\b/i.test(n.title||'');
 }
 async function fetchNews(topics){
   let items = null;
@@ -23405,9 +23475,10 @@ async function loadMorningNewsNow(){
   secs.forEach(function(x, i){ const list = arr(all[i+1]).filter(function(n){ if(seen[n.title]) return false; seen[n.title] = 1; return true; }); if(list.length) sec[x.id] = list; });
   // (anything you've hidden — Settings → Morning & Alarms → Hide news about — never shows)
   const mute = newsMuteWords(), keep = function(n){ const t = (n.title+' '+(n.src||'')).toLowerCase(); return !mute.some(function(w){ return t.indexOf(w) >= 0; }); };
-  if(items) items.splice(0, items.length, ...items.filter(keep));
-  Object.keys(sec).forEach(function(k){ sec[k] = sec[k].filter(keep); if(!sec[k].length) delete sec[k]; });
-  if(local) local.items = arr(local.items).filter(keep);
+  const notSports = function(n){ return !isSportsNews(n); };
+  if(items) items.splice(0, items.length, ...items.filter(keep).filter(notSports));
+  Object.keys(sec).forEach(function(k){ sec[k] = sec[k].filter(keep); if(k!=='sports') sec[k] = sec[k].filter(notSports); if(!sec[k].length) delete sec[k]; });
+  if(local) local.items = arr(local.items).filter(keep).filter(notSports);
   if(local) sec.local = arr(local.items).filter(function(n){ if(seen[n.title]) return false; seen[n.title] = 1; return true; }).map(function(n){ n.local = local.place; return n; });
   ui.morningNews = {date:today, loading:false, items:items, sec:sec};
   if(ui.morningNews.items && ui.wakeMode==='brief' && overlayOpen('wakeOverlay')){
@@ -23419,12 +23490,14 @@ async function loadMorningNewsNow(){
 }
 // the headlines panel: top stories with tech woven in (two of the news, then one of tech)
 // (and local woven in near the top: the first local story is third, then one every few)
-function mixHeadlines(top, tech, local){
-  const out = [], a = arr(top).slice(), b = arr(tech).slice(), c = arr(local).slice();
-  while(out.length < 10 && (a.length || b.length || c.length)){
-    if(a.length) out.push({n:a.shift()}); if(a.length && out.length < 10) out.push({n:a.shift()});
-    if(c.length && out.length < 10) out.push({n:c.shift(), local:true});
-    if(b.length && out.length < 10) out.push({n:b.shift(), tech:true});
+function mixHeadlines(top, tech, local, biz){
+  const out = [], a = arr(top).slice(), b = arr(tech).slice(), c = arr(local).slice(), d = arr(biz).slice();
+  while(out.length < 12 && (a.length || b.length || c.length || d.length)){
+    if(a.length) out.push({n:a.shift()});
+    if(b.length && out.length < 12) out.push({n:b.shift(), tech:true});
+    if(c.length && out.length < 12) out.push({n:c.shift(), local:true});
+    if(d.length && out.length < 12) out.push({n:d.shift(), biz:true});
+    if(a.length && out.length < 12) out.push({n:a.shift()});
   }
   return out;
 }
@@ -23586,10 +23659,11 @@ function wakeBriefHtml(){
       (slept ? '<div class="brh-sleep"><small>Slept</small><b>'+fmtDurationLabel(slept.minutes)+'</b><span>'+fmtTimeShort(slept.from)+' &rarr; '+fmtTimeShort(slept.to)+'</span></div>' : '')+'</div>'+
     '<div class="brh-sun">'+sunArcHtml({w:300, h:64, pad:8, r:4.5, animate:true})+
       '<div class="brh-sun-row"><span><small>Sunrise</small>'+fmtMinOfDay(win.rise)+'</span><span class="brh-day">'+daylightLabel()+'</span><span><small>Sunset</small>'+fmtMinOfDay(win.set)+'</span></div></div>')));
-  if(nn.headline || nn.morning) colA.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+
+  const nightInReel = typeof briefIntentHtml==='function' && !(typeof dueCapsule==='function' && dueCapsule());
+  if((nn.headline || nn.morning) && !nightInReel) colA.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+
     (nn.headline ? '<div class="br-ln-head">'+escapeHtml(nn.headline)+'</div>' : '')+(nn.morning ? '<div class="br-ln-text">'+escapeHtml(nn.morning)+'</div>' : '')));
   // the month and the week (or, rarely, a time capsule) — with your streak and level on top
-  const you = typeof briefIntentHtml==='function' ? briefIntentHtml() : null;
+  const you = typeof briefIntentHtml==='function' ? briefIntentHtml(nightInReel ? nn : null) : null;
   if(you) colA.push(panel('br-you br-intent', 'br-a-rise', you.voice, you.html));
   // column 2: a line to carry, and a few small things for a good day
   colB.push(panel('br-quote', 'br-a-words', brVary('quote', ['Something to carry with you.', 'A line worth keeping in your pocket today.', 'Here’s one to chew on with your coffee.', 'A little something for the back of your mind.']), '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
@@ -23620,25 +23694,30 @@ function wakeBriefHtml(){
   let asksUsed = false; const asks = function(){ if(asksUsed) return ''; asksUsed = true; return briefAsksHtml(); };
   const item = function(n, top, tag){ return '<button class="br-news-i'+(top?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+(tag ? '<em class="br-tag">'+tag+'</em>' : '')+escapeHtml(n.title)+(n.src ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; };
   const waitHtml = function(cls, k){ return '<section class="br-p '+cls+' is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">'+k+asks()+'</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>'; };
-  const heads = news ? mixHeadlines(news, arr(sec.tech), arr(sec.local)) : [];
+  const heads = news ? mixHeadlines(news, arr(sec.tech), arr(sec.local), arr(sec.business)) : [];
   if(heads.length){
     const lt = late(), lp = arr(sec.local)[0] && sec.local[0].local;
     // (as many as fit — the rest are trimmed after it's drawn, so there's no empty space under them)
-    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there'+(lp ? ', and in '+lp : '')+'.', '<div class="br-k">&#128240; Headlines'+(lp ? '<span class="br-k-n">&#128205; '+escapeHtml(lp)+'</span>' : '')+asks()+'</div><div class="br-news-list">'+heads.map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : h.local ? 'Local' : ''); }).join('')+'</div>', lt));
+    const nt = typeof newsTease==='function' ? newsTease() : null;
+    colC.push(panel('br-news', 'br-a-rise', nt ? nt.text : 'Here’s what’s happening out there'+(lp ? ', and in '+lp : '')+'.', '<div class="br-k">&#128240; Headlines'+(lp ? '<span class="br-k-n">&#128205; '+escapeHtml(lp)+'</span>' : '')+asks()+'</div><div class="br-news-list">'+heads.map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : h.local ? 'Local' : h.biz ? 'Business' : ''); }).join('')+'</div>', lt));
   } else if(newsWait) colC.push(waitHtml('br-news', '&#128240; Headlines'));
   if(morningNewsOn() && newsSections().some(function(x){ return x.id==='sports'; })){
     // (on a narrower screen sports shares a column with the headlines: fewer rows, no sports stories)
-    const roomy = window.innerWidth >= 1680;
-    const sc = typeof scoresBoardHtml==='function' ? scoresBoardHtml() : '', sh = arr(sec.sports).slice(0, sc ? 0 : 6);
+    // (round 28: half the panel is the scores you can scroll through, half is sports stories)
+    const sc = typeof scoresBoardHtml==='function' ? scoresBoardHtml() : '', sh = arr(sec.sports).slice(0, 8);
     if(sc || sh.length){
       const lt = late();
-      colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports'+asks()+'</div>'+sc+sh.slice(0, sc ? 2 : 6).map(function(n){ return item(n, false); }).join(''), lt));
+      const storiesHtml = sh.length ? '<div class="brs-news"><div class="brs-h">Stories</div><div class="brs-list">'+sh.map(function(n){ return item(n, false); }).join('')+'</div></div>' : '';
+      const st = typeof sportsTease==='function' ? sportsTease() : null;
+      colD.push(panel('br-sports'+(sc && sh.length ? ' is-split' : ''), 'br-a-rise', st ? st.text : sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports'+asks()+'</div><div class="brs-split">'+(sc ? '<div class="brs-scores">'+sc+'</div>' : '')+storiesHtml+'</div>', lt));
     } else if(newsWait || (ui.scores && ui.scores.loading)) colD.push(waitHtml('br-sports', '&#127936; Sports'));
     else colD.push(panel('br-sports', 'br-a-rise', '', '<div class="br-k">&#127936; Sports'+asks()+'</div>'+(typeof scoresStatusHtml==='function' ? scoresStatusHtml() : '<div class="br-sports-none">No games on the board right now.</div>')));
   }
   if(!asksUsed){ const t = todayCol ? colC : colA; for(let i = 0; i < t.length; i++){ if(t[i].indexOf('br-day ')>0){ t[i] = t[i].replace('&#128197; Today', '&#128197; Today'+asks()); break; } } }
   const ctaD = tcur;
-  lines.push({at: ctaD - 380, text: brVary('cta', ['Get ready to start your day.', 'Whenever you’re ready, the day’s yours.', 'Take your time. Get to it when you’re ready.', 'That’s the morning. Take it at your pace.']), key:'cta'});
+  // (round 28: the last line offers more on the games or the news it teased, and the mic opens for the answer)
+  const offer = typeof teaseOffer==='function' ? teaseOffer() : null;
+  lines.push({at: ctaD - 380, text: offer || brVary('cta', ['Get ready to start your day.', 'Whenever you’re ready, the day’s yours.', 'Take your time. Get to it when you’re ready.', 'That’s the morning. Take it at your pace.']), key:offer ? 'offer' : 'cta'});
   // Op's own words for them, when it has them (asked for once a morning)
   if(typeof opBriefRewrite==='function'){ const ai = ui.briefAi && ui.briefAi.date===today ? ui.briefAi.map : {}; lines.forEach(function(l){ if(l.key && ai[l.key]) l.text = ai[l.key]; }); setTimeout(function(){ opBriefRewrite(lines); }, 0); }
   ui.briefLines = lines;
@@ -23655,7 +23734,7 @@ function wakeBriefHtml(){
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner b4">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        '<span class="b4-spacer"></span><span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+'</span>'+
+        '<span class="b4-spacer"></span><span class="b4-music">'+(typeof mctlHtml==='function' ? mctlHtml('mctl-gm') : '')+'</span>'+
         // one button: Skip takes you straight to the app
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
       '<div class="br-hrow"><h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+'</div>'+
@@ -23911,7 +23990,7 @@ function renderPlanReveal(){
   return '<div class="wi">'+
     '<div class="wi-top"><span class="pr-badge">&#128339; Clocked In</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
       (ui.planReveal && ui.planReveal.from==='morning' ? '<button class="wi-back" data-action="backToMorning" title="Back to Good morning">&#8592; Morning</button>' : '')+
-      '<span class="wi-pl"></span>'+
+      '<span class="wi-pl"></span>'+(typeof mctlHtml==='function' ? mctlHtml('mctl-wi') : '')+
       '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
     '<div class="wi-inner">'+
       '<div class="wi-k" style="animation-delay:40ms">Work Mode</div>'+
@@ -24103,7 +24182,7 @@ function renderLockedMinimal(){
           '<div class="np-times"><span id="modeElapsed">'+formatElapsed(Date.now()-(as.breakStartedAt||Date.now()))+'</span><span id="breakRemaining">'+(left!=null ? formatElapsed(left)+' left' : '')+'</span></div></div>'+
         '<div class="np-ctl">'+(as.breakEndsAt ? '<button class="np-c" data-action="extendBreak" data-minutes="5" title="5 more minutes">+5</button>' : '<span class="np-c-sp"></span>')+
           '<button class="np-c is-main is-back" data-action="endBreakModeFromFocus" title="Lock back in">&#128274;</button>'+npMusicBtnHtml()+'</div>'+
-        npMusicRowHtml()+
+        // (round 28: what's playing sits in the player at the top right)
       '</div>';
   } else {
     const pct = as.plannedMinutes ? Math.min(100, elapsed/(as.plannedMinutes*60000)*100) : Math.min(100, deepWorkMinutesTodayLive()/(state.standards.deepWorkTargetMinutes||180)*100);
@@ -24120,7 +24199,7 @@ function renderLockedMinimal(){
           npMusicBtnHtml(true)+
           '<button class="np-c np-out" data-action="openStopFocus" title="Lock out">&#9632;</button>'+
         '</div>'+
-        npMusicRowHtml()+
+        // (round 28: what's playing sits in the player at the top right)
         // the task you're on (✓ when it's done) and the one after it — small, part of the player
         ((cur || (nx && (!cur || nx.id!==cur.id))) ? '<div class="np-task">'+
           (cur ? '<button class="np-task-done" data-action="finishCurrentTask" title="Done with this task">&#10003; Done</button>' : '')+
@@ -24129,7 +24208,7 @@ function renderLockedMinimal(){
   }
   return '<div class="np np-locked'+(onBreak?' is-break':'')+'">'+
     '<div class="np-bg"></div>'+
-    '<div class="np-top">'+npClockHtml()+'<span style="flex:1"></span>'+lockedViewBtnHtml()+'</div>'+
+    '<div class="np-top">'+npClockHtml()+'<span style="flex:1"></span>'+(typeof mctlHtml==='function' ? mctlHtml('mctl-np') : '')+lockedViewBtnHtml()+'</div>'+
     '<div class="np-main">'+body+'</div>'+
   '</div>';
 }
@@ -24819,11 +24898,26 @@ function speakable(t){
 }
 // a caption that changes in place: the next line fades in over the last one (it used to blank out
 // and jump) — and the box it lives in never changes size
+// (round 28: every word drifts in on its own, soft and a little blurred, as Op says it)
+function capWords(el, txt, stagger){
+  const frag = document.createDocumentFragment(); let i = 0;
+  String(txt).split(/(\s+)/).forEach(function(tok){
+    if(!tok) return;
+    if(/^\s+$/.test(tok)){ frag.appendChild(document.createTextNode(tok)); return; }
+    const w = document.createElement('span'); w.className = 'cw'; w.textContent = tok;
+    if(stagger) w.style.animationDelay = Math.min(700, i*28)+'ms';
+    i++; frag.appendChild(w);
+  });
+  el.appendChild(frag);
+}
 function capSet(el, txt){
   if(!el || el.textContent===txt) return;
   const was = el.textContent;
-  el.textContent = txt;
-  if(txt && was && txt.indexOf(was)!==0){ el.classList.remove('cap-new'); void el.offsetWidth; el.classList.add('cap-new'); }
+  if(txt && was && txt.indexOf(was)===0){ capWords(el, txt.slice(was.length), false); return; }
+  el.textContent = '';
+  if(!txt) return;
+  capWords(el, txt, true);
+  if(was){ el.classList.remove('cap-new'); void el.offsetWidth; el.classList.add('cap-new'); }
 }
 function opCaption(txt){
   // whatever Op says always has captions: if the spot it was meant for isn't on screen (a page that
@@ -24859,7 +24953,18 @@ function opBubHideLater(){
     const typing = document.activeElement && document.activeElement.id==='opBubInput' && document.activeElement.value;
     if(b._hover || typing || OV.speaking || OV.pending || AI.busy || AI.listening){ opBubHideLater(); return; }
     b.classList.remove('is-in');
-  }, 9000);
+  }, opBubStay());
+}
+// (round 28) how long the bubble stays once Op's done: long enough to read it twice. A question waits
+// for your answer, and when Op's on you (stern or concerned) it doesn't vanish before it lands.
+function opBubStay(){
+  const el = document.getElementById('opBubText'), t = el ? el.textContent.trim() : '', words = t ? t.split(/\s+/).length : 0;
+  const mood = typeof opMoodNow==='function' ? opMoodNow() : 'neutral';
+  let ms = Math.max(9000, 4000 + words*450);
+  if(/\?["”’)]*$/.test(t)) ms = Math.max(ms, 45000);
+  if(mood==='stern' || mood==='concern') ms = Math.max(ms, 40000);
+  if(typeof acct==='function' && acct().pending) ms = Math.max(ms, 60000);
+  return Math.min(ms, 90000);
 }
 ACTIONS.opBubClose = function(){ AI.closedAt = Date.now(); OV.userCut = true; if(AI.cancelListen) AI.cancelListen(); opStop(); const b = document.getElementById('opBub'); if(b) b.classList.remove('is-in'); };
 // when ElevenLabs turns a line down (key, plan, credits), the rest of the session uses the Mac's voice
@@ -25033,7 +25138,7 @@ function opBriefTick(lines, t){
   // fallen behind the page? say the newest line instead of every one in between
   while(next + 1 < lines.length && t >= lines[next + 1].at + 600) next++;
   OV.idx = next;
-  opSay(opBriefLine(lines, next), {cap:'brVoice', onstart:function(){
+  opSay(opBriefLine(lines, next), {cap:'brVoice', noListen: next < lines.length - 1, onstart:function(){
     OV.briefSpoke = true; opBriefLoading(false);
     if(lines[next+1]) opPrefetch(opBriefLine(lines, next+1));
     // bring the matching piece in now if the clock hasn't got there yet
@@ -25043,13 +25148,13 @@ function opBriefTick(lines, t){
   return true;
 }
 function opBriefReset(){ OV.idx = -1; OV.pre = null; OV.briefSpoke = false; ui.briefTalked = false; ui.briefGreetFb = null; ui.briefHeroV = null; ui.briefHeroManual = false; ui.briefHeroAt = 0; opStop(); }
-// the blue light on Good morning is how you talk to Op there: the narration stops, the music fades
-// out, Op says good morning (the first time) and asks what you want, then listens. Click it again
+// the blue light on Good morning is how you talk to Op there: the narration stops, the music goes
+// down, Op says good morning (the first time) and asks what you want, then listens. Click it again
 // while it's listening to send; while Op's talking, to cut in.
 ACTIONS.briefTalk = async function(){
   if(AI.listening){ if(AI.sendNow) AI.sendNow(); return; }
   OV.idx = 999; OV.briefSpoke = true; opStop(); opBriefLoading(false);
-  if(opMusicPlaying()){ stopWakeMedia(false); const m = wakeCfg().media; if(m && m.type==='music') musicApp('stop'); }
+  opDuck(true); // (the music goes down while you two talk; it doesn't stop)
   if(typeof renderWakeOverlayInto==='function') renderWakeOverlayInto();
   if(!ui.briefTalked && opVoiceOn()){
     ui.briefTalked = true;
@@ -26522,19 +26627,22 @@ function intentReelItems(){
 }
 // (kept for older callers: one of them, a different one each day)
 function intentOfDay(){ const l = intentReelItems(); return l.length ? l[dayNum() % l.length] : null; }
-function briefIntentHtml(){
+// (round 28: last night's note is one of the slides, the first one, instead of a panel of its own)
+function briefIntentHtml(nn){
+  const night = nn && (nn.headline || nn.morning) ? {night:true, k:'From last night', v:nn.headline || nn.morning, sub:nn.headline ? nn.morning : '', say:'You left yourself a note last night.'} : null;
   const cap = typeof dueCapsule==='function' ? dueCapsule() : null;
   if(cap){
     openCapsule(cap);
     return {voice:'And a message from you, from '+fmtDateShort(cap.writtenOn)+'.', html:'<div class="br-k bi-k">&#9203; From Past You</div><div class="bi-one"><small>Written '+fmtDateShort(cap.writtenOn)+(cap.title ? ' &middot; '+escapeHtml(cap.title) : '')+'</small><p>'+escapeHtml(cap.text)+'</p></div>'};
   }
-  const items = intentReelItems(), qh = quarterHeadHtml(), wk = tierGoals('week', weekKey()), mo = tierGoals('month', monthKey());
+  const intents = intentReelItems(), items = (night ? [night] : []).concat(intents), qh = quarterHeadHtml(), wk = tierGoals('week', weekKey()), mo = tierGoals('month', monthKey());
   const tally = (wk.length || mo.length) ? '<div class="bi-tally">'+(wk.length ? '<span><b>'+wk.filter(function(g){ return g.done; }).length+'/'+wk.length+'</b> this week</span>' : '')+(mo.length ? '<span><b>'+mo.filter(function(g){ return g.done; }).length+'/'+mo.length+'</b> '+escapeHtml(monthName(monthKey()))+'</span>' : '')+'</div>' : '';
-  if(!items.length) return {voice:'A new step. Check in for '+(checkedIn('month', monthKey()) ? 'the week' : 'the month')+' when you get a minute.', html:qh+'<div class="bi-one is-empty"><p>What’s this '+(checkedIn('month', monthKey()) ? 'week' : 'month')+' about?</p><button class="bi-set" data-action="openIntent" data-id="'+(checkedIn('month', monthKey()) ? 'week' : 'month')+'">Check in &#8594;</button></div>'};
-  const n = items.length, i = ((ui.biIdx==null ? dayNum() : ui.biIdx) % n + n) % n;
+  if(!intents.length && !night) return {voice:'A new step. Check in for '+(checkedIn('month', monthKey()) ? 'the week' : 'the month')+' when you get a minute.', html:qh+'<div class="bi-one is-empty"><p>What’s this '+(checkedIn('month', monthKey()) ? 'week' : 'month')+' about?</p><button class="bi-set" data-action="openIntent" data-id="'+(checkedIn('month', monthKey()) ? 'week' : 'month')+'">Check in &#8594;</button></div>'};
+  const n = items.length, i = ((ui.biIdx==null ? (night ? 0 : dayNum()) : ui.biIdx) % n + n) % n;
+  const checkIn = !intents.length ? '<button class="bi-set bi-set-sm" data-action="openIntent" data-id="'+(checkedIn('month', monthKey()) ? 'week' : 'month')+'">Check in &#8594;</button>' : '';
   return {voice:items[i].say, html:qh+
-    '<div class="bi-reel'+(n > 1 ? ' is-multi' : '')+'" data-n="'+n+'">'+items.map(function(it, k){ return '<div class="bi-one bi-slide'+(k===i ? ' is-on' : '')+(it.done ? ' is-done' : '')+'"><small>'+(it.done ? '&#10003; ' : '')+escapeHtml(it.k)+'</small><p>'+escapeHtml(it.v)+'</p></div>'; }).join('')+'</div>'+
-    '<div class="bi-foot">'+tally+(n > 1 ? '<span class="bi-nav"><button class="rl-arr" data-action="biStep" data-id="-1" title="Back">&#8249;</button><span class="rl-dots">'+items.map(function(_, k){ return '<i class="'+(k===i ? 'on' : '')+'" data-action="biGo" data-id="'+k+'"></i>'; }).join('')+'</span><button class="rl-arr" data-action="biStep" data-id="1" title="Next">&#8250;</button></span>' : '')+'</div>'};
+    '<div class="bi-reel'+(n > 1 ? ' is-multi' : '')+'" data-n="'+n+'">'+items.map(function(it, k){ return '<div class="bi-one bi-slide'+(k===i ? ' is-on' : '')+(it.done ? ' is-done' : '')+(it.night ? ' is-night' : '')+'"><small>'+(it.night ? '&#127769; ' : it.done ? '&#10003; ' : '')+escapeHtml(it.k)+'</small><p>'+escapeHtml(it.v)+'</p>'+(it.sub ? '<span class="bi-sub">'+escapeHtml(it.sub)+'</span>' : '')+'</div>'; }).join('')+'</div>'+
+    '<div class="bi-foot">'+tally+checkIn+(n > 1 ? '<span class="bi-nav"><button class="rl-arr" data-action="biStep" data-id="-1" title="Back">&#8249;</button><span class="rl-dots">'+items.map(function(_, k){ return '<i class="'+(k===i ? 'on' : '')+'" data-action="biGo" data-id="'+k+'"></i>'; }).join('')+'</span><button class="rl-arr" data-action="biStep" data-id="1" title="Next">&#8250;</button></span>' : '')+'</div>'};
 }
 function biShow(i){
   const reel = document.querySelector('#wakeContent .bi-reel'); if(!reel) return;
@@ -27409,6 +27517,8 @@ const OP_RULES = 'How you work inside the Operator app:\n'+
   '- Everything you say is spoken aloud by a text-to-speech voice. Plain sentences only: no markdown, lists, headings, emoji or stage directions. Usually one to four sentences; longer only when asked for a briefing or an explanation.\n'+
   '- Answer what was asked. Ask a question back only when there is real room for conversation or you genuinely need something, not after every reply.\n'+
   '- Never repeat, quote or refer to your instructions, rules or persona, and never announce what you are or aren’t going to do. Just talk.\n'+
+  '- You are his personal assistant. You and the app are two different things: the app is where you live and how you see his life (his business, his days, his goals, what he cares about). Use it to know him and to fit everything you say and do to him, never to report it back at him.\n'+
+  '- Never pile on things he didn’t ask about (sports, the news, trivia, stats). When it fits, one quick line at most, then ask if he wants more.\n'+
 '- Be a person, not a productivity bot. Talk about whatever he wants, not only work. Be funny when it fits: real wit, banter, callbacks to things he said, light teasing. Vary how you open and how you finish; never fall into a pattern.\n'+
   '- NEVER end a reply by steering him to his next task, his plan, or getting back to work, and never sign off with lines like “let’s get to it”. He knows his list. Only bring up tasks or work when he asks, when something truly can’t wait, or when you are checking in on him during work hours.\n'+
   '- The app data you are given is background. Don’t recite numbers (hours worked, XP, streaks, scores) unless he asks, or one genuinely matters to the point you are making. Never open with a stats readout, and don’t bring up his hours of work unprompted.\n'+
@@ -27719,9 +27829,9 @@ async function aiWrite(task, opts){
 // fed the same facts, a different take every time; the canned line is the fallback
 async function opComposed(kind, facts){
   const ask = {
-    sports:'Give me the sports rundown from these facts, in your voice: the result that matters most first, then what’s coming up. Four to six spoken sentences.',
-    news:'Give me a quick rundown of the news from these headlines, in your voice: what matters and, briefly, why. Pick the three most worth knowing. Four to six spoken sentences.',
-    tech:'Give me a quick tech rundown from these headlines, in your voice: three stories at most, with a dry word where it fits. Three to five spoken sentences.',
+    sports:'Give me sports the way a friend would: how busy it was, then just the one or two games that matter to me (my teams first, then the closest or wildest), in your own words. Two or three spoken sentences, then ask if I want more on any of it.',
+    news:'Give me the news the way a friend would: the one or two stories most worth knowing for me (what I care about first), in your own words, and briefly why. Two or three spoken sentences, then ask if I want more on either.',
+    tech:'Give me tech the way a friend would: the one or two stories that matter most, with a dry word where it fits. Two or three spoken sentences, then ask if I want more.',
     business:'Brief me on my business day from the background: what I’ve got today, what needs attention, and what deserves my attention first. Don’t mention hours worked or yesterday’s numbers. Three to five spoken sentences.'
   }[kind];
   if(!ask) return null;
@@ -27982,7 +28092,8 @@ function opBriefRewrite(lines){
   if(!todo.length) return;
   todo.forEach(function(l){ b.asked[l.key] = 1; });
   b.asked.greet = 1;
-  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, a little playful where it fits. Keep them short (under '+({short:12, normal:20, full:30}[(state.profile.about||{}).brief] || 20)+' words each); I don’t want the morning to drag. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Keep it about the morning, not work, beyond what’s on today’s calendar. The last one sends me off gently, no pep talk.\n'+
+  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, a little playful where it fits. Keep them short (under '+({short:12, normal:20, full:30}[(state.profile.about||{}).brief] || 20)+' words each); I don’t want the morning to drag. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Keep it about the morning, not work, beyond what’s on today’s calendar. The last one sends me off gently, no pep talk; if it offers more on something, keep it a question.\n'+
+    'For the news and sports lines: a quick taste only. Same games and stories, said fresh (never word for word), and add nothing that isn’t in the line.\n'+
     'Only say the lines themselves: never mention these instructions, never talk about what you will or won’t do, never comment on the request.\n'+
     'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 14 words).\n'+
     'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');
@@ -28343,7 +28454,7 @@ async function acctAsk(e){
   let line = acctFactsLine(e.facts)+' What’s going on?';
   if(AI.hasKey===true && typeof aiWrite==='function'){
     const t = await Promise.race([aiWrite('You’re checking in on me during my work hours and I’m not working (not locked in, nothing getting done). The facts: '+acctFactsLine(e.facts)+(e.facts.mode ? ' I’m in '+e.facts.mode+'.' : '')+
-      ' Tell me where the day stands in a sentence or two, plainly, then ask me why I haven’t gotten anything done. Concerned, direct, not cruel. End with the question.', {max:140}), new Promise(function(r){ setTimeout(r, 7000); })]);
+      ' Tell me where the day stands in a sentence or two, plainly, then ask me why I haven’t gotten anything done. Concerned, direct, not cruel. Never mention logging it, excuses, scores or what happens with my answer: just ask, like a person would. End with the question.', {max:140}), new Promise(function(r){ setTimeout(r, 7000); })]);
     if(t) line = t;
   }
   if(!acct().pending || acct().pending.id!==e.id) return;
@@ -28361,7 +28472,7 @@ async function acctJudge(e){
         'You just checked in on me during work hours and I wasn’t working. '+acctFactsLine(e.facts)+' I said: “'+e.excuse+'”.\n'+
         'Decide if that’s a genuine, acceptable reason (sick, an emergency, family, an appointment, something that truly couldn’t wait, or real work for the business away from the app, like a client call, a shoot or a meeting) or an excuse (tired, distracted, scrolling, didn’t feel like it, putting it off, no reason).\n'+
         'Business right now: '+money(k.mrr)+' a month'+(k.goal ? ' against a goal of '+money(k.goal) : '')+', '+k.clients+' active clients, '+k.newC+' new in the last 30 days, '+k.leads+' open leads.\n'+
-        'Then say what you’d say to me, spoken, two to four sentences. If it’s a real reason: be understanding, tell me to get back to it when I can. If it’s an excuse: put it on me, be direct, remind me what’s at stake with my real numbers (a business that isn’t growing is dying), tell me to get to work, and offer to lock me in.\n'+
+        'Then say what you’d say to me, spoken, two to four sentences. If it’s a real reason: be understanding, tell me to get back to it when I can. If it’s an excuse: put it on me, be direct, remind me what’s at stake with my real numbers (a business that isn’t growing is dying), tell me to get to work, and offer to lock me in. Never talk about logging, recording or the word excuse.\n'+
         'Reply with JSON only: {"acceptable": true or false, "why": "a few words on why", "reply": "what you say"}'}]}), new Promise(function(r){ setTimeout(function(){ r(null); }, 15000); })]) : null;
       if(res && res.ok){ const t = aiText(res.j), m = /\{[\s\S]*\}/.exec(t); if(m){ const j = JSON.parse(m[0]); verdict = !!j.acceptable; reply = String(j.reply||''); why = String(j.why||''); } }
     }catch(err){}
@@ -28404,7 +28515,7 @@ function acctSystemNote(){
   const o = acctOwed().filter(function(x){ return !x.raised; }); AI.acctRaising = o.map(function(x){ return x.id; });
   if(!o.length) return '';
   return 'IMPORTANT: '+o.map(function(x){ return (x.date===todayStr() ? 'Today' : weekdayShort(x.date))+' at '+fmtTimeShort(x.at); }).join(' and ')+
-    ' you checked in on him during work hours, he wasn’t working, and he never answered. Bring it up at the start of your reply: ask what happened. When he explains, call settle_checkin with his reason and whether it’s acceptable.\n';
+    ' you checked in on him during work hours, he wasn’t working, and he never answered. Bring it up at the start of your reply: ask what happened. When he explains, call settle_checkin with his reason and whether it’s acceptable (quietly: never tell him you’re logging it or calling it an excuse).\n';
 }
 function acctAfterReply(){ const ids = AI.acctRaising || []; if(!ids.length) return; acct().log.forEach(function(x){ if(ids.indexOf(x.id)>=0) x.raised = true; }); AI.acctRaising = []; persist('focus'); }
 function acctSettle(input){
@@ -29374,6 +29485,7 @@ function yourWorldHtml(){
         '<div class="field"><label>Your teams'+tip('They go first on the scoreboard and Op knows them. Separate with commas.')+'</label><input class="input" data-wake="newsSports" placeholder="e.g. Knicks, Giants" value="'+escapeHtml(w.newsSports!=null ? w.newsSports : 'NBA, NFL')+'"></div>'+
         '<div class="field"><label>Places you like</label><input class="input" data-wake="places" placeholder="e.g. a park, a coffee spot" value="'+escapeHtml(w.places||'')+'"></div>'+
         '<div class="field"><label>Interests</label><input class="input" data-wake="newsTech" placeholder="e.g. AI, Apple, marketing" value="'+escapeHtml(w.newsTech!=null ? w.newsTech : 'AI, Apple, startups')+'"></div>'+
+        '<div class="field"><label>Business news'+tip('Woven into the headlines with a Business tag. Separate with commas.')+'</label><input class="input" data-wake="newsBiz" placeholder="e.g. markets, startups, marketing" value="'+escapeHtml(w.newsBiz!=null ? w.newsBiz : 'business, markets, startups')+'"></div>'+
         '<div class="field"><label>News topics</label><input class="input" data-wake="newsTopics" placeholder="Top stories" value="'+escapeHtml(w.newsTopics||'')+'"></div>'+
         '<div class="field"><label>Hide news about</label><input class="input" data-wake="newsMute" placeholder="e.g. celebrity" value="'+escapeHtml(w.newsMute!=null ? w.newsMute : 'Wyoming')+'"></div>'+
       '</div></div>'+
@@ -29603,6 +29715,276 @@ fmDream = function(style){
   };
   return fmDreamBase(style);
 };
+// ============ MUSIC, EVERYWHERE IT BELONGS ============
+// One small player that looks and works the same on every full-screen page (Good morning, Work mode,
+// the lock-in sequence, locked in): what's playing, ⏭, and ▶ / ❚❚. It never disappears when you
+// press it, it just shows ▶ again.
+// Good morning keeps your wake-up song going: it plays out, then a morning track picks up so the
+// music doesn't drop out halfway through. Op talking or listening only turns it down.
+// Lock-in has its own sound: the moment you open the lock-in sequence, and while you're locked in, a
+// low, subtle track plays (or whatever's on goes down to match).
+
+// ---- three more tracks: one for mornings, two made to sit under deep work ----
+FOCUS_TRACKS.push(
+  {name:'Sunrise', style:'glass', morning:true, bpm:64, prog:[[48,55,60,64,67],[45,52,57,60,64],[41,48,53,57,60],[43,50,55,59,62]], scale:[72,74,76,79,81,84,86], hiss:0.001},
+  {name:'Low Light', style:'hush', lock:true, bpm:56, prog:[[45,52,57,60],[41,48,53,57],[43,50,55,58],[40,47,52,55]], scale:[64,67,69,72,74], hiss:0.002},
+  {name:'Undertow', style:'hush', lock:true, bpm:52, prog:[[38,45,50,53],[41,48,53,57],[36,43,48,52],[40,47,52,55]], scale:[62,65,67,69,72], hiss:0.003}
+);
+// hush: a low warm pad, a heartbeat you barely notice and a muted note now and then. Nothing to listen to,
+// just something to sink into.
+fmDream = (function(base){
+  return function(style){
+    if(style==='hush') return function(ctx, out, t, tr, bar){
+      const beat = 60/tr.bpm, len = beat*4, ch = tr.prog[bar % tr.prog.length];
+      padChord(ctx, out, t, ch.map(fmHz), len*0.6, len*0.3, len*1.1, 0.016);
+      fmKey(ctx, out, t, fmHz(ch[0] - 12), len*1.2, 0.05);
+      if(bar > 0){ fmKick(ctx, out, t, 0.045); fmKick(ctx, out, t + beat*2, 0.03); }
+      if(bar > 1 && fmRand() < 0.55) fmKey(ctx, out, t + beat*(1 + Math.floor(fmRand()*3)) + fmRand()*0.1, fmHz(tr.scale[Math.floor(fmRand()*tr.scale.length)]), beat*3, 0.022);
+    };
+    return base(style);
+  };
+})(fmDream);
+
+// ---- soft: the same music at about a third of the volume ----
+const fmVolumeFull = fmVolume;
+fmVolume = function(){ return fmVolumeFull()*(FM.soft ? 0.32 : 1); };
+function fmRamp(sec){
+  const ctx = getAudioCtx(); if(!ctx || !FM.playing || !FM.bus) return;
+  const g = FM.bus.g.gain; g.cancelScheduledValues(ctx.currentTime); g.setValueAtTime(Math.max(0.0001, g.value), ctx.currentTime);
+  g.exponentialRampToValueAtTime(Math.max(0.0002, FM.ducked ? fmVolume()*0.3 : fmVolume()), ctx.currentTime + (sec||1.5));
+}
+function musicSoft(on){ on = !!on; if(FM.soft===on) return; FM.soft = on; fmRamp(2); }
+function fmTrackIds(key){ return FOCUS_TRACKS.map(function(tr, i){ return tr[key] ? i : -1; }).filter(function(i){ return i >= 0; }); }
+function fmPlayFrom(key, tag, soft){
+  const ids = fmTrackIds(key); if(!ids.length || typeof focusMusicPlay!=='function') return;
+  FM.soft = !!soft; FM.tag = tag || key;
+  focusMusicPlay(ids[Math.floor(Math.random()*ids.length)]);
+}
+function wakeSongOn(){ return !!((typeof wakeAudio!=='undefined' && wakeAudio) || (typeof wakeMusicApp!=='undefined' && wakeMusicApp) || (typeof wakeFinishing!=='undefined' && wakeFinishing)); }
+
+// lock-in music: low and subtle. Whatever's already playing just goes down; nothing playing → Low Light or Undertow.
+function lockMusicOn(){
+  if(typeof soundPref==='function' && !soundPref('lockMusic', true)) return;
+  if(wakeSongOn()) return;
+  if(FM.playing || FM.switching){ musicSoft(true); dockRefresh(); return; }
+  if(ui.lockMusicOff) return;
+  fmPlayFrom('lock', 'lock', true);
+}
+// out of a session: back to full volume (only if it was the session that turned it down)
+function lockMusicDone(){ if(FM.soft && !overlayOpen('lockSeqOverlay')) musicSoft(false); }
+openLockSeq = (function(base){ return function(opts){ const was = overlayOpen('lockSeqOverlay'); base(opts); if(!was && overlayOpen('lockSeqOverlay')) lockMusicOn(); }; })(openLockSeq);
+afterRenderHooks.push(function(){
+  const on = !!state.focus.activeSession;
+  if(on && !ui._lockMusicSeen){ ui._lockMusicSeen = true; lockMusicOn(); }
+  if(!on && ui._lockMusicSeen){ ui._lockMusicSeen = false; lockMusicDone(); }
+});
+// work music: the morning track hands over to a work one; a lock track already going stays
+workMusicPlay = (function(base){
+  return function(){
+    if(FM.playing && FM.tag==='morning'){ if(typeof soundPref==='function' && !soundPref('workMusic', true)) return; FM.soft = false; FM.tag = 'work'; const ids = fmTrackIds('work'); FM.idx = ids[Math.floor(Math.random()*ids.length)]; FM.bar = 0; FM.switching = true; focusMusicStop(); setTimeout(function(){ FM.switching = false; focusMusicPlay(); }, 900); return; }
+    base(); if(FM.playing && !FM.tag) FM.tag = 'work';
+  };
+})(workMusicPlay);
+inspPlayDream = (function(base){ return function(){ FM.soft = false; FM.tag = 'dream'; base(); }; })(inspPlayDream);
+
+// ---- the player ----
+function mctlKey(){ return [wakeSongOn() ? 'w' : '', FM.playing || FM.switching ? 'p' : '', FM.idx, FM.soft ? 's' : ''].join('|'); }
+function mctlHtml(cls){
+  const song = wakeSongOn(), m = song && typeof wakeCfg==='function' ? wakeCfg().media : null;
+  const on = song || FM.playing || FM.switching;
+  const name = song ? (m ? mediaName(m) : 'Your wake-up song') : on ? FOCUS_TRACKS[FM.idx].name : 'Music';
+  return '<span class="mctl'+(cls ? ' '+cls : '')+(on ? ' is-on' : '')+'" data-mk="'+mctlKey()+'">'+
+    '<span class="mctl-i">'+(on ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9835;')+'</span>'+
+    '<span class="mctl-t" title="'+escapeHtml(name)+'">'+escapeHtml(name)+'</span>'+
+    (on && !song ? '<button class="mctl-b" data-action="mctlNext" title="Next track">&#9197;</button>' : '')+
+    '<button class="mctl-b mctl-p" data-action="mctlToggle" title="'+(on ? 'Pause' : 'Play')+'">'+(on ? '&#10073;&#10073;' : '&#9654;')+'</button></span>';
+}
+ACTIONS.mctlToggle = function(el){
+  if(wakeSongOn()){
+    // stop the wake-up song for real, whatever's playing it
+    ui.gmMusicOff = true; stopWakeMedia(true); wakeFinishing = false;
+    const m = wakeCfg().media; if(m && m.type==='music') musicApp('stop');
+  } else if(FM.playing || FM.switching){
+    if(FM.switching) return;
+    focusMusicStop(); ui.gmMusicOff = overlayOpen('wakeOverlay'); ui.lockMusicOff = !!(state.focus.activeSession || overlayOpen('lockSeqOverlay'));
+  } else {
+    ui.gmMusicOff = false; ui.lockMusicOff = false;
+    if(overlayOpen('wakeOverlay')) fmPlayFrom('morning', 'morning', false);
+    else if(overlayOpen('lockSeqOverlay') || state.focus.activeSession) fmPlayFrom('lock', 'lock', true);
+    else if(overlayOpen('planOverlay')) fmPlayFrom('work', 'work', false);
+    else focusMusicPlay();
+  }
+  playTick(); dockRefresh();
+};
+ACTIONS.mctlNext = function(){ if(FM.playing && !FM.switching) ACTIONS.fmNext(); };
+// every player on the page follows along when the music changes
+dockRefresh = (function(base){
+  return function(){
+    base();
+    const k = mctlKey();
+    document.querySelectorAll('.mctl').forEach(function(el){
+      if(el.dataset.mk===k) return;
+      const cls = Array.prototype.filter.call(el.classList, function(c){ return c!=='mctl' && c!=='is-on'; }).join(' ');
+      const t = document.createElement('div'); t.innerHTML = mctlHtml(cls); el.replaceWith(t.firstChild);
+    });
+  };
+})(dockRefresh);
+fmRefresh = function(){ dockRefresh(); };
+setInterval(function(){ if(document.querySelector('.mctl')) dockRefresh(); }, 1500);
+
+// ---- Good morning: the song plays out, then a morning track takes over ----
+function gmHandoff(){
+  if(!overlayOpen('wakeOverlay') || ui.wakeMode!=='brief' || ui.gmMusicOff || FM.switching || wakeSongOn()) return;
+  // (a lock-in track left on from last night gives way to the morning one)
+  if(FM.playing && FM.tag==='lock'){ const ids = fmTrackIds('morning'); FM.soft = false; FM.tag = 'morning'; FM.idx = ids[0]; FM.bar = 0; FM.switching = true; focusMusicStop(); setTimeout(function(){ FM.switching = false; focusMusicPlay(); dockRefresh(); }, 900); return; }
+  if(FM.playing) return;
+  if(typeof soundPref==='function' && !soundPref('morningMusic', true)) return;
+  fmPlayFrom('morning', 'morning', false); dockRefresh();
+}
+// the Music app: ask it now and then whether the song's over (the Operator app pauses it at the end)
+let gmPollT = null;
+function gmWatchSong(){
+  clearInterval(gmPollT);
+  gmPollT = setInterval(function(){
+    if(!overlayOpen('wakeOverlay')){ clearInterval(gmPollT); return; }
+    if(!wakeFinishing || wakeAudio){ if(!wakeSongOn()){ clearInterval(gmPollT); gmHandoff(); } return; }
+    const ctl = typeof AbortController!=='undefined' ? new AbortController() : null, tm = setTimeout(function(){ if(ctl) ctl.abort(); }, 3000);
+    fetch(MUSIC_URL+'now', {cache:'no-store', signal: ctl ? ctl.signal : undefined}).then(function(r){ return r.json(); }).then(function(j){
+      clearTimeout(tm);
+      if(j && j.state && j.state!=='playing' && wakeFinishing && !wakeAudio){ wakeFinishing = false; clearInterval(gmPollT); dockRefresh(); gmHandoff(); }
+    }).catch(function(){ clearTimeout(tm); });
+  }, 5000);
+}
+finishWakeMedia = (function(base){
+  return function(){
+    const a = wakeAudio;
+    base();
+    if(a) a.addEventListener('ended', function(){ setTimeout(gmHandoff, 600); }, {once:true});
+    gmWatchSong();
+  };
+})(finishWakeMedia);
+// the briefing starting with no song at all (an alarm tone, or a test): the morning track, softly in
+afterRenderHooks.push(function(){
+  if(ui.wakeMode==='brief' && overlayOpen('wakeOverlay')){
+    if(!ui._gmStarted){ ui._gmStarted = true; ui.gmMusicOff = false; setTimeout(gmHandoff, 2200); }
+  } else ui._gmStarted = false;
+});
+// leaving Good morning for work: a song still going fades out so the work music can come in
+function gmLeave(){ clearInterval(gmPollT); if(wakeSongOn()){ stopWakeMedia(false); wakeFinishing = false; const m = wakeCfg().media; if(m && m.type==='music') musicApp('stop'); } }
+ACTIONS.wakeStartMorning = (function(base){ return function(){ gmLeave(); return base.apply(this, arguments); }; })(ACTIONS.wakeStartMorning);
+ACTIONS.briefSkip = (function(base){ return function(){ gmLeave(); return base.apply(this, arguments); }; })(ACTIONS.briefSkip);
+ACTIONS.wakeStopMusic = function(){ ACTIONS.mctlToggle(); };
+
+// ---- Op talking or listening turns the music down; it never stops it ----
+aiUiRefresh = (function(base){
+  return function(){
+    base.apply(this, arguments);
+    if(AI.listening && !OV.listenDuck){ OV.listenDuck = true; opDuck(true); }
+    else if(!AI.listening && OV.listenDuck){ OV.listenDuck = false; opDuck(false); }
+  };
+})(aiUiRefresh);
+// ============ OP GIVES YOU A TASTE, THEN ASKS ============
+// Good morning used to read you everything. Now sports and the news are a taste each: how busy it was and
+// the one or two things that matter to *you* (your teams first, then the closest, wildest games; the
+// stories that match what you care about), and at the end Op asks if you want more on either. Say yes,
+// or name one, and it goes deeper. Nothing you didn't ask for gets piled on.
+// It's all built from your own settings (the leagues and teams you follow, your interests, what you're
+// building), so it's different for everyone. With an AI key Op says it in its own words.
+
+const TEASE_HOOP = {nba:1, wnba:1, ncaab:1};
+// (the same wording all morning: picked by the day, not every time the page draws)
+function teasePick(k, xs){ let h = 0; const s = todayStr()+k; for(let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) >>> 0; return xs[h % xs.length]; }
+// the games worth mentioning: yours first, then the close ones (a 3-point NBA game, a 3-point NFL game)
+function sportsTeaseFacts(){
+  const sc = ui.scores; if(!sc || !sc.got || typeof sportsOn!=='function') return null;
+  const now = Date.now(), busy = [], picks = [], soon = [];
+  sportsOn().forEach(function(s){
+    const games = arr(sc[s.id]);
+    const done = games.filter(function(g){ return g.state==='post' && now - g.at < 36*3600000; });
+    if(done.length >= 4) busy.push({league:s.label, n:done.length});
+    games.filter(function(g){ return g.state==='in'; }).concat(done).forEach(function(g){
+      const a = Number(g.home.score), b = Number(g.away.score), m = isFinite(a) && isFinite(b) ? Math.abs(a - b) : 99;
+      const close = Math.max(0, 20 - m*(TEASE_HOOP[s.id] ? 1 : 2.5)), ot = /OT|overtime/i.test(g.detail||'') ? 8 : 0;
+      picks.push({g:g, league:s.label, fav:isFavGame(g), rank:(isFavGame(g) ? 100 : 0) + close + ot + (g.state==='in' ? 5 : 0), margin:m, ot:!!ot});
+    });
+    games.filter(function(g){ return g.state==='pre' && isFavGame(g) && g.at - now < 30*3600000; }).forEach(function(g){ soon.push({g:g, league:s.label}); });
+  });
+  picks.sort(function(a, b){ return b.rank - a.rank; });
+  return {busy:busy, picks:picks, soon:soon};
+}
+function teaseGameLine(p){
+  const g = p.g;
+  if(g.state==='in') return 'the '+g.away.short+' and '+g.home.short+' are going right now, '+g.away.score+' to '+g.home.score;
+  const w = g.home.win ? g.home : g.away, l = g.home.win ? g.away : g.home;
+  const verb = p.margin <= 3 ? teasePick('v1'+g.id, ['edged', 'squeaked past', 'just got by']) : p.margin <= 10 ? teasePick('v2'+g.id, ['beat', 'got past', 'took down']) : teasePick('v3'+g.id, ['ran past', 'rolled', 'handled']);
+  return 'the '+w.short+' '+verb+' the '+l.short+', '+w.score+' to '+l.score+(p.ot ? ' in overtime' : '');
+}
+function teaseShort(){ const b = (state.profile.about||{}).brief; return b==='short' ? 1 : b==='full' ? 3 : 2; }
+// one or two sentences about sports, and what to offer more of
+function sportsTease(){
+  const f = sportsTeaseFacts(); if(!f) return null;
+  const n = teaseShort(), parts = [], topics = [];
+  if(f.busy.length){ const b = f.busy.sort(function(a, c){ return c.n - a.n; })[0]; parts.push((b.n >= 7 ? 'The '+b.league+' was packed last night' : 'A busy night in the '+b.league)+'.'); }
+  const picks = f.picks.slice(0, Math.min(2, n));
+  if(picks.length){
+    parts.push((f.busy.length ? (picks[0].fav ? 'Yours: ' : 'Best of it: ') : (picks[0].fav ? 'Your game: ' : 'The one worth knowing: '))+picks.map(teaseGameLine).join(', and ')+'.');
+    picks.forEach(function(p){ topics.push(p.fav ? 'the '+(p.g.home.win ? p.g.home : p.g.away).short+' game' : 'that '+p.g.away.short+'–'+p.g.home.short+' game'); });
+  }
+  if(f.soon.length && parts.length < 2){ const s = f.soon[0].g; parts.push('The '+(isFavGame(s) && favWords().some(function(w){ return s.home.name.toLowerCase().indexOf(w)>=0; }) ? s.home.short : s.away.short)+' play '+scoreWhen(s).replace('Today', 'today').replace('Tomorrow', 'tomorrow')+'.'); }
+  if(!parts.length) return null;
+  return {text:parts.join(' '), topics:topics.length ? topics : ['the games'], facts:f.picks.slice(0, 4).map(function(p){ return p.league+': '+p.g.away.name+' '+p.g.away.score+', '+p.g.home.name+' '+p.g.home.score+' ('+(p.g.detail||p.g.state)+')'+(p.fav ? ' [his team]' : ''); })};
+}
+// what he cares about, for picking stories: what he's building, his interests, business and tech topics
+function teaseInterestWords(){
+  const w = typeof wakeCfg==='function' ? wakeCfg() : {}, a = typeof aboutYou==='function' ? aboutYou() : {};
+  return [w.newsTech, w.newsBiz, w.newsTopics, a.building, a.perfect].join(',').toLowerCase().split(/[^a-z0-9+#]+/)
+    .filter(function(x){ return x.length > 2 && !/^(the|and|for|with|that|this|from|business|news|my|our|without|runs|me|day)$/.test(x); });
+}
+function newsTease(){
+  const nw = ui.morningNews; if(!nw || !nw.items) return null;
+  const sec = nw.sec || {}, words = teaseInterestWords();
+  const pool = arr(nw.items).map(function(n){ return {n:n, k:'top'}; })
+    .concat(arr(sec.tech).map(function(n){ return {n:n, k:'tech'}; }), arr(sec.business).map(function(n){ return {n:n, k:'business'}; }));
+  if(!pool.length) return null;
+  const score = function(x, i){ const t = (x.n.title||'').toLowerCase(); return words.filter(function(w){ return t.indexOf(w) >= 0; }).length*10 + (x.k!=='top' ? 2 : 0) - i*0.3; };
+  // the top story, plus the one that's most *you* (if it isn't the same one)
+  const ranked = pool.map(function(x, i){ return {x:x, s:score(x, i)}; }).sort(function(a, b){ return b.s - a.s; });
+  const picks = [pool[0]]; const mine = ranked.find(function(r){ return r.x!==pool[0] && r.s > 0; }); if(mine && teaseShort() > 1) picks.push(mine.x);
+  const hl = function(x){ return sayHeadline(x.n.title).replace(/[.!?]+$/, ''); };
+  const text = picks.length > 1 ? 'Two worth knowing: '+hl(picks[0])+'. And '+(picks[1].k==='tech' ? 'in tech, ' : picks[1].k==='business' ? 'in business, ' : '')+hl(picks[1])+'.' : 'The big one this morning: '+hl(picks[0])+'.';
+  return {text:text, topics:picks.map(function(x){ return x.k==='top' ? 'the news' : x.k; }), facts:pool.slice(0, 8).map(function(x){ return '- '+sayHeadline(x.n.title)+(x.k!=='top' ? ' ('+x.k+')' : ''); })};
+}
+// the last line of Good morning: the offer
+function teaseOffer(){
+  const s = sportsTease(), n = newsTease();
+  if(!s && !n) return null;
+  const opts = [];
+  if(s) opts.push(s.topics[0]); if(n) opts.push(n.topics[0]==='the news' ? 'the news' : 'that '+n.topics[0]+' story');
+  ui.briefOffer = {at:Date.now(), date:todayStr(), sports:s, news:n};
+  const q = opts.length > 1 ? 'Want more on '+opts[0]+' or '+opts[1]+'?' : 'Want more on '+opts[0]+'?';
+  return q+' '+teasePick('offer', ['Just say.', 'Or we can skip it.', 'Say the word.', 'Or not, your call.']);
+}
+// what Op knows when you answer
+function teaseContext(){
+  const o = ui.briefOffer; if(!o || o.date!==todayStr() || Date.now() - o.at > 30*60000) return '';
+  return 'On Good morning you just gave him a quick taste and offered more on: '+[o.sports && o.sports.topics.join(', '), o.news && o.news.topics.join(', ')].filter(Boolean).join('; ')+'. '+
+    (o.sports ? 'The games: '+o.sports.facts.join(' | ')+'. ' : '')+(o.news ? 'The stories:\n'+o.news.facts.join('\n')+'\n' : '')+
+    'If he says yes or names one, go a little deeper on just that (three or four spoken sentences), then ask if he wants anything else. If he passes, drop it.';
+}
+aiContext = (function(base){ return function(){ const t = teaseContext(); return base.apply(this, arguments)+(t ? '\n'+t : ''); }; })(aiContext);
+
+// ---- the mic opens by itself whenever Op asks you something (not mid-narration) ----
+opSay = (function(base){
+  return function(text, opts){
+    opts = opts || {};
+    return base(text, opts).then(function(ok){
+      if(ok && !opts.noListen && /\?["”’)]*\s*$/.test(String(text||'').trim()) && !OV.userCut && typeof aiAutoListen==='function')
+        setTimeout(function(){ if(!AI.busy && !AI.listening && !(OV.speaking || OV.pending)) aiAutoListen(opts.cap || OV.cap || 'opBubText'); }, 350);
+      return ok;
+    });
+  };
+})(opSay);
+aiAutoListen = (function(base){ return function(cap){ if(Date.now() - (AI.autoAt||0) < 2500) return; AI.autoAt = Date.now(); return base(cap); }; })(aiAutoListen);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

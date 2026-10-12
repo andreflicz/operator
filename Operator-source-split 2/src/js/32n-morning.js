@@ -258,7 +258,15 @@ async function fetchWithin(url, ms){
 function sectionTopics(v, dflt){ return String(v==null ? dflt : v).split(',').map(function(x){ return x.trim(); }).filter(Boolean).join(', '); }
 function newsSections(){
   const w = wakeCfg();
-  return [{id:'sports', label:'Sports', icon:'&#127936;', q:sectionTopics(w.newsSports, 'NBA, NFL')}, {id:'tech', label:'Tech', icon:'&#128187;', q:sectionTopics(w.newsTech, 'AI, Apple, startups')}].filter(function(x){ return x.q; });
+  return [{id:'sports', label:'Sports', icon:'&#127936;', q:sectionTopics(w.newsSports, 'NBA, NFL')}, {id:'tech', label:'Tech', icon:'&#128187;', q:sectionTopics(w.newsTech, 'AI, Apple, startups')},
+    {id:'business', label:'Business', icon:'&#128188;', q:sectionTopics(w.newsBiz, 'business, markets, startups')}].filter(function(x){ return x.q; });
+}
+// (round 28: sports lives in the Sports panel; the headlines are the world, tech and business)
+const SPORTS_SRC = /\b(espn|cbs ?sports|fox ?sports|yahoo ?sports|the athletic|bleacher|sports illustrated|si\.com|nfl\.com|nba\.com|mlb\.com|nhl\.com|sb ?nation|pro football|sporting news|barstool|on3|247sports|the ringer)\b/i;
+const SPORTS_WORDS = /\b(nfl|nba|mlb|nhl|wnba|ncaa|mls|ufc|nascar|pga|premier league|champions league|super bowl|world series|stanley cup|playoffs?|quarterback|touchdown|home run|slam dunk|head coach|halftime|preseason|free agent|draft pick|rookie|innings?|wide receiver|running back|point guard|hat trick|grand slam|week \d+|game \d+)\b/i;
+function isSportsNews(n){
+  // (team names alone are too risky: "tech giants", "heat wave")
+  return SPORTS_SRC.test(n.src||'') || SPORTS_WORDS.test((n.title||'')+' '+(n.src||'')) || /\b\d{1,3}-\d{1,3} (win|loss|victory|defeat|rout)\b|\bbeat the\b.*\b(in|at) (overtime|ot)\b/i.test(n.title||'');
 }
 async function fetchNews(topics){
   let items = null;
@@ -314,9 +322,10 @@ async function loadMorningNewsNow(){
   secs.forEach(function(x, i){ const list = arr(all[i+1]).filter(function(n){ if(seen[n.title]) return false; seen[n.title] = 1; return true; }); if(list.length) sec[x.id] = list; });
   // (anything you've hidden — Settings → Morning & Alarms → Hide news about — never shows)
   const mute = newsMuteWords(), keep = function(n){ const t = (n.title+' '+(n.src||'')).toLowerCase(); return !mute.some(function(w){ return t.indexOf(w) >= 0; }); };
-  if(items) items.splice(0, items.length, ...items.filter(keep));
-  Object.keys(sec).forEach(function(k){ sec[k] = sec[k].filter(keep); if(!sec[k].length) delete sec[k]; });
-  if(local) local.items = arr(local.items).filter(keep);
+  const notSports = function(n){ return !isSportsNews(n); };
+  if(items) items.splice(0, items.length, ...items.filter(keep).filter(notSports));
+  Object.keys(sec).forEach(function(k){ sec[k] = sec[k].filter(keep); if(k!=='sports') sec[k] = sec[k].filter(notSports); if(!sec[k].length) delete sec[k]; });
+  if(local) local.items = arr(local.items).filter(keep).filter(notSports);
   if(local) sec.local = arr(local.items).filter(function(n){ if(seen[n.title]) return false; seen[n.title] = 1; return true; }).map(function(n){ n.local = local.place; return n; });
   ui.morningNews = {date:today, loading:false, items:items, sec:sec};
   if(ui.morningNews.items && ui.wakeMode==='brief' && overlayOpen('wakeOverlay')){
@@ -328,12 +337,14 @@ async function loadMorningNewsNow(){
 }
 // the headlines panel: top stories with tech woven in (two of the news, then one of tech)
 // (and local woven in near the top: the first local story is third, then one every few)
-function mixHeadlines(top, tech, local){
-  const out = [], a = arr(top).slice(), b = arr(tech).slice(), c = arr(local).slice();
-  while(out.length < 10 && (a.length || b.length || c.length)){
-    if(a.length) out.push({n:a.shift()}); if(a.length && out.length < 10) out.push({n:a.shift()});
-    if(c.length && out.length < 10) out.push({n:c.shift(), local:true});
-    if(b.length && out.length < 10) out.push({n:b.shift(), tech:true});
+function mixHeadlines(top, tech, local, biz){
+  const out = [], a = arr(top).slice(), b = arr(tech).slice(), c = arr(local).slice(), d = arr(biz).slice();
+  while(out.length < 12 && (a.length || b.length || c.length || d.length)){
+    if(a.length) out.push({n:a.shift()});
+    if(b.length && out.length < 12) out.push({n:b.shift(), tech:true});
+    if(c.length && out.length < 12) out.push({n:c.shift(), local:true});
+    if(d.length && out.length < 12) out.push({n:d.shift(), biz:true});
+    if(a.length && out.length < 12) out.push({n:a.shift()});
   }
   return out;
 }
@@ -495,10 +506,11 @@ function wakeBriefHtml(){
       (slept ? '<div class="brh-sleep"><small>Slept</small><b>'+fmtDurationLabel(slept.minutes)+'</b><span>'+fmtTimeShort(slept.from)+' &rarr; '+fmtTimeShort(slept.to)+'</span></div>' : '')+'</div>'+
     '<div class="brh-sun">'+sunArcHtml({w:300, h:64, pad:8, r:4.5, animate:true})+
       '<div class="brh-sun-row"><span><small>Sunrise</small>'+fmtMinOfDay(win.rise)+'</span><span class="brh-day">'+daylightLabel()+'</span><span><small>Sunset</small>'+fmtMinOfDay(win.set)+'</span></div></div>')));
-  if(nn.headline || nn.morning) colA.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+
+  const nightInReel = typeof briefIntentHtml==='function' && !(typeof dueCapsule==='function' && dueCapsule());
+  if((nn.headline || nn.morning) && !nightInReel) colA.push(panel('br-lastnight', 'br-a-blur', 'You left yourself a note last night.', '<div class="br-k">&#127769; From Last Night</div>'+
     (nn.headline ? '<div class="br-ln-head">'+escapeHtml(nn.headline)+'</div>' : '')+(nn.morning ? '<div class="br-ln-text">'+escapeHtml(nn.morning)+'</div>' : '')));
   // the month and the week (or, rarely, a time capsule) — with your streak and level on top
-  const you = typeof briefIntentHtml==='function' ? briefIntentHtml() : null;
+  const you = typeof briefIntentHtml==='function' ? briefIntentHtml(nightInReel ? nn : null) : null;
   if(you) colA.push(panel('br-you br-intent', 'br-a-rise', you.voice, you.html));
   // column 2: a line to carry, and a few small things for a good day
   colB.push(panel('br-quote', 'br-a-words', brVary('quote', ['Something to carry with you.', 'A line worth keeping in your pocket today.', 'Here’s one to chew on with your coffee.', 'A little something for the back of your mind.']), '<div class="br-k">&#10024; For Today</div>'+quoteHtml(q, '', 'morning')));
@@ -529,25 +541,30 @@ function wakeBriefHtml(){
   let asksUsed = false; const asks = function(){ if(asksUsed) return ''; asksUsed = true; return briefAsksHtml(); };
   const item = function(n, top, tag){ return '<button class="br-news-i'+(top?' is-top':'')+'" data-action="openNewsLink" data-url="'+escapeHtml(n.link)+'"><span>'+(tag ? '<em class="br-tag">'+tag+'</em>' : '')+escapeHtml(n.title)+(n.src ? '<small>'+escapeHtml(n.src)+'</small>' : '')+'</span><i>&#8599;</i></button>'; };
   const waitHtml = function(cls, k){ return '<section class="br-p '+cls+' is-loading br-a-fade" style="--d:'+tcur+'ms"><div class="br-k">'+k+asks()+'</div><div class="br-news-wait"><i></i><i></i><i></i></div></section>'; };
-  const heads = news ? mixHeadlines(news, arr(sec.tech), arr(sec.local)) : [];
+  const heads = news ? mixHeadlines(news, arr(sec.tech), arr(sec.local), arr(sec.business)) : [];
   if(heads.length){
     const lt = late(), lp = arr(sec.local)[0] && sec.local[0].local;
     // (as many as fit — the rest are trimmed after it's drawn, so there's no empty space under them)
-    colC.push(panel('br-news', 'br-a-rise', 'Here’s what’s happening out there'+(lp ? ', and in '+lp : '')+'.', '<div class="br-k">&#128240; Headlines'+(lp ? '<span class="br-k-n">&#128205; '+escapeHtml(lp)+'</span>' : '')+asks()+'</div><div class="br-news-list">'+heads.map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : h.local ? 'Local' : ''); }).join('')+'</div>', lt));
+    const nt = typeof newsTease==='function' ? newsTease() : null;
+    colC.push(panel('br-news', 'br-a-rise', nt ? nt.text : 'Here’s what’s happening out there'+(lp ? ', and in '+lp : '')+'.', '<div class="br-k">&#128240; Headlines'+(lp ? '<span class="br-k-n">&#128205; '+escapeHtml(lp)+'</span>' : '')+asks()+'</div><div class="br-news-list">'+heads.map(function(h, i){ return item(h.n, i===0, h.tech ? 'Tech' : h.local ? 'Local' : h.biz ? 'Business' : ''); }).join('')+'</div>', lt));
   } else if(newsWait) colC.push(waitHtml('br-news', '&#128240; Headlines'));
   if(morningNewsOn() && newsSections().some(function(x){ return x.id==='sports'; })){
     // (on a narrower screen sports shares a column with the headlines: fewer rows, no sports stories)
-    const roomy = window.innerWidth >= 1680;
-    const sc = typeof scoresBoardHtml==='function' ? scoresBoardHtml() : '', sh = arr(sec.sports).slice(0, sc ? 0 : 6);
+    // (round 28: half the panel is the scores you can scroll through, half is sports stories)
+    const sc = typeof scoresBoardHtml==='function' ? scoresBoardHtml() : '', sh = arr(sec.sports).slice(0, 8);
     if(sc || sh.length){
       const lt = late();
-      colD.push(panel('br-sports', 'br-a-rise', sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports'+asks()+'</div>'+sc+sh.slice(0, sc ? 2 : 6).map(function(n){ return item(n, false); }).join(''), lt));
+      const storiesHtml = sh.length ? '<div class="brs-news"><div class="brs-h">Stories</div><div class="brs-list">'+sh.map(function(n){ return item(n, false); }).join('')+'</div></div>' : '';
+      const st = typeof sportsTease==='function' ? sportsTease() : null;
+      colD.push(panel('br-sports'+(sc && sh.length ? ' is-split' : ''), 'br-a-rise', st ? st.text : sc ? 'And the scores, plus what’s coming up.' : 'And the latest in sports.', '<div class="br-k">&#127936; Sports'+asks()+'</div><div class="brs-split">'+(sc ? '<div class="brs-scores">'+sc+'</div>' : '')+storiesHtml+'</div>', lt));
     } else if(newsWait || (ui.scores && ui.scores.loading)) colD.push(waitHtml('br-sports', '&#127936; Sports'));
     else colD.push(panel('br-sports', 'br-a-rise', '', '<div class="br-k">&#127936; Sports'+asks()+'</div>'+(typeof scoresStatusHtml==='function' ? scoresStatusHtml() : '<div class="br-sports-none">No games on the board right now.</div>')));
   }
   if(!asksUsed){ const t = todayCol ? colC : colA; for(let i = 0; i < t.length; i++){ if(t[i].indexOf('br-day ')>0){ t[i] = t[i].replace('&#128197; Today', '&#128197; Today'+asks()); break; } } }
   const ctaD = tcur;
-  lines.push({at: ctaD - 380, text: brVary('cta', ['Get ready to start your day.', 'Whenever you’re ready, the day’s yours.', 'Take your time. Get to it when you’re ready.', 'That’s the morning. Take it at your pace.']), key:'cta'});
+  // (round 28: the last line offers more on the games or the news it teased, and the mic opens for the answer)
+  const offer = typeof teaseOffer==='function' ? teaseOffer() : null;
+  lines.push({at: ctaD - 380, text: offer || brVary('cta', ['Get ready to start your day.', 'Whenever you’re ready, the day’s yours.', 'Take your time. Get to it when you’re ready.', 'That’s the morning. Take it at your pace.']), key:offer ? 'offer' : 'cta'});
   // Op's own words for them, when it has them (asked for once a morning)
   if(typeof opBriefRewrite==='function'){ const ai = ui.briefAi && ui.briefAi.date===today ? ui.briefAi.map : {}; lines.forEach(function(l){ if(l.key && ai[l.key]) l.text = ai[l.key]; }); setTimeout(function(){ opBriefRewrite(lines); }, 0); }
   ui.briefLines = lines;
@@ -564,7 +581,7 @@ function wakeBriefHtml(){
     '<div class="brief-grid-bg"></div>'+
     '<div class="brief-inner b4">'+
       '<div class="brief-top br-p br-a-fade" style="--d:'+(base-1300)+'ms"><span class="brief-brand">OPERATOR</span><span class="brief-dot"></span><span>'+new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</span>'+
-        '<span class="b4-spacer"></span><span class="b4-music">'+(song ? '<span class="b4-song"><span class="wk2-eq"><i></i><i></i><i></i><i></i></span>'+escapeHtml(song)+'<button class="b4-stop" data-action="wakeStopMusic" title="Stop">&#9632;</button></span>' : '')+'</span>'+
+        '<span class="b4-spacer"></span><span class="b4-music">'+(typeof mctlHtml==='function' ? mctlHtml('mctl-gm') : '')+'</span>'+
         // one button: Skip takes you straight to the app
         '<button class="brief-skipall" data-action="briefSkip" title="Skip to the app">Skip &#9197;</button></div>'+
       '<div class="br-hrow"><h1 class="brief-hello br-p br-a-blur" style="--d:'+(base-1000)+'ms">Good morning'+(name ? ', <span>'+escapeHtml(name)+'</span>' : '')+'.</h1>'+'</div>'+
@@ -820,7 +837,7 @@ function renderPlanReveal(){
   return '<div class="wi">'+
     '<div class="wi-top"><span class="pr-badge">&#128339; Clocked In</span><span class="pr-time">'+new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+'</span>'+
       (ui.planReveal && ui.planReveal.from==='morning' ? '<button class="wi-back" data-action="backToMorning" title="Back to Good morning">&#8592; Morning</button>' : '')+
-      '<span class="wi-pl"></span>'+
+      '<span class="wi-pl"></span>'+(typeof mctlHtml==='function' ? mctlHtml('mctl-wi') : '')+
       '<button class="wd-close" data-action="closePlanReveal" title="Close">&#10005;</button></div>'+
     '<div class="wi-inner">'+
       '<div class="wi-k" style="animation-delay:40ms">Work Mode</div>'+

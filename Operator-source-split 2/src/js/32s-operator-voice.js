@@ -64,11 +64,26 @@ function speakable(t){
 }
 // a caption that changes in place: the next line fades in over the last one (it used to blank out
 // and jump) — and the box it lives in never changes size
+// (round 28: every word drifts in on its own, soft and a little blurred, as Op says it)
+function capWords(el, txt, stagger){
+  const frag = document.createDocumentFragment(); let i = 0;
+  String(txt).split(/(\s+)/).forEach(function(tok){
+    if(!tok) return;
+    if(/^\s+$/.test(tok)){ frag.appendChild(document.createTextNode(tok)); return; }
+    const w = document.createElement('span'); w.className = 'cw'; w.textContent = tok;
+    if(stagger) w.style.animationDelay = Math.min(700, i*28)+'ms';
+    i++; frag.appendChild(w);
+  });
+  el.appendChild(frag);
+}
 function capSet(el, txt){
   if(!el || el.textContent===txt) return;
   const was = el.textContent;
-  el.textContent = txt;
-  if(txt && was && txt.indexOf(was)!==0){ el.classList.remove('cap-new'); void el.offsetWidth; el.classList.add('cap-new'); }
+  if(txt && was && txt.indexOf(was)===0){ capWords(el, txt.slice(was.length), false); return; }
+  el.textContent = '';
+  if(!txt) return;
+  capWords(el, txt, true);
+  if(was){ el.classList.remove('cap-new'); void el.offsetWidth; el.classList.add('cap-new'); }
 }
 function opCaption(txt){
   // whatever Op says always has captions: if the spot it was meant for isn't on screen (a page that
@@ -104,7 +119,18 @@ function opBubHideLater(){
     const typing = document.activeElement && document.activeElement.id==='opBubInput' && document.activeElement.value;
     if(b._hover || typing || OV.speaking || OV.pending || AI.busy || AI.listening){ opBubHideLater(); return; }
     b.classList.remove('is-in');
-  }, 9000);
+  }, opBubStay());
+}
+// (round 28) how long the bubble stays once Op's done: long enough to read it twice. A question waits
+// for your answer, and when Op's on you (stern or concerned) it doesn't vanish before it lands.
+function opBubStay(){
+  const el = document.getElementById('opBubText'), t = el ? el.textContent.trim() : '', words = t ? t.split(/\s+/).length : 0;
+  const mood = typeof opMoodNow==='function' ? opMoodNow() : 'neutral';
+  let ms = Math.max(9000, 4000 + words*450);
+  if(/\?["”’)]*$/.test(t)) ms = Math.max(ms, 45000);
+  if(mood==='stern' || mood==='concern') ms = Math.max(ms, 40000);
+  if(typeof acct==='function' && acct().pending) ms = Math.max(ms, 60000);
+  return Math.min(ms, 90000);
 }
 ACTIONS.opBubClose = function(){ AI.closedAt = Date.now(); OV.userCut = true; if(AI.cancelListen) AI.cancelListen(); opStop(); const b = document.getElementById('opBub'); if(b) b.classList.remove('is-in'); };
 // when ElevenLabs turns a line down (key, plan, credits), the rest of the session uses the Mac's voice
@@ -278,7 +304,7 @@ function opBriefTick(lines, t){
   // fallen behind the page? say the newest line instead of every one in between
   while(next + 1 < lines.length && t >= lines[next + 1].at + 600) next++;
   OV.idx = next;
-  opSay(opBriefLine(lines, next), {cap:'brVoice', onstart:function(){
+  opSay(opBriefLine(lines, next), {cap:'brVoice', noListen: next < lines.length - 1, onstart:function(){
     OV.briefSpoke = true; opBriefLoading(false);
     if(lines[next+1]) opPrefetch(opBriefLine(lines, next+1));
     // bring the matching piece in now if the clock hasn't got there yet
@@ -288,13 +314,13 @@ function opBriefTick(lines, t){
   return true;
 }
 function opBriefReset(){ OV.idx = -1; OV.pre = null; OV.briefSpoke = false; ui.briefTalked = false; ui.briefGreetFb = null; ui.briefHeroV = null; ui.briefHeroManual = false; ui.briefHeroAt = 0; opStop(); }
-// the blue light on Good morning is how you talk to Op there: the narration stops, the music fades
-// out, Op says good morning (the first time) and asks what you want, then listens. Click it again
+// the blue light on Good morning is how you talk to Op there: the narration stops, the music goes
+// down, Op says good morning (the first time) and asks what you want, then listens. Click it again
 // while it's listening to send; while Op's talking, to cut in.
 ACTIONS.briefTalk = async function(){
   if(AI.listening){ if(AI.sendNow) AI.sendNow(); return; }
   OV.idx = 999; OV.briefSpoke = true; opStop(); opBriefLoading(false);
-  if(opMusicPlaying()){ stopWakeMedia(false); const m = wakeCfg().media; if(m && m.type==='music') musicApp('stop'); }
+  opDuck(true); // (the music goes down while you two talk; it doesn't stop)
   if(typeof renderWakeOverlayInto==='function') renderWakeOverlayInto();
   if(!ui.briefTalked && opVoiceOn()){
     ui.briefTalked = true;

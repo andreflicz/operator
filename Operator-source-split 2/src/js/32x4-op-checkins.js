@@ -177,7 +177,7 @@ async function acctAsk(e){
   let line = acctFactsLine(e.facts)+' What’s going on?';
   if(AI.hasKey===true && typeof aiWrite==='function'){
     const t = await Promise.race([aiWrite('You’re checking in on me during my work hours and I’m not working (not locked in, nothing getting done). The facts: '+acctFactsLine(e.facts)+(e.facts.mode ? ' I’m in '+e.facts.mode+'.' : '')+
-      ' Tell me where the day stands in a sentence or two, plainly, then ask me why I haven’t gotten anything done. Concerned, direct, not cruel. End with the question.', {max:140}), new Promise(function(r){ setTimeout(r, 7000); })]);
+      ' Tell me where the day stands in a sentence or two, plainly, then ask me why I haven’t gotten anything done. Concerned, direct, not cruel. Never mention logging it, excuses, scores or what happens with my answer: just ask, like a person would. End with the question.', {max:140}), new Promise(function(r){ setTimeout(r, 7000); })]);
     if(t) line = t;
   }
   if(!acct().pending || acct().pending.id!==e.id) return;
@@ -195,7 +195,7 @@ async function acctJudge(e){
         'You just checked in on me during work hours and I wasn’t working. '+acctFactsLine(e.facts)+' I said: “'+e.excuse+'”.\n'+
         'Decide if that’s a genuine, acceptable reason (sick, an emergency, family, an appointment, something that truly couldn’t wait, or real work for the business away from the app, like a client call, a shoot or a meeting) or an excuse (tired, distracted, scrolling, didn’t feel like it, putting it off, no reason).\n'+
         'Business right now: '+money(k.mrr)+' a month'+(k.goal ? ' against a goal of '+money(k.goal) : '')+', '+k.clients+' active clients, '+k.newC+' new in the last 30 days, '+k.leads+' open leads.\n'+
-        'Then say what you’d say to me, spoken, two to four sentences. If it’s a real reason: be understanding, tell me to get back to it when I can. If it’s an excuse: put it on me, be direct, remind me what’s at stake with my real numbers (a business that isn’t growing is dying), tell me to get to work, and offer to lock me in.\n'+
+        'Then say what you’d say to me, spoken, two to four sentences. If it’s a real reason: be understanding, tell me to get back to it when I can. If it’s an excuse: put it on me, be direct, remind me what’s at stake with my real numbers (a business that isn’t growing is dying), tell me to get to work, and offer to lock me in. Never talk about logging, recording or the word excuse.\n'+
         'Reply with JSON only: {"acceptable": true or false, "why": "a few words on why", "reply": "what you say"}'}]}), new Promise(function(r){ setTimeout(function(){ r(null); }, 15000); })]) : null;
       if(res && res.ok){ const t = aiText(res.j), m = /\{[\s\S]*\}/.exec(t); if(m){ const j = JSON.parse(m[0]); verdict = !!j.acceptable; reply = String(j.reply||''); why = String(j.why||''); } }
     }catch(err){}
@@ -238,7 +238,7 @@ function acctSystemNote(){
   const o = acctOwed().filter(function(x){ return !x.raised; }); AI.acctRaising = o.map(function(x){ return x.id; });
   if(!o.length) return '';
   return 'IMPORTANT: '+o.map(function(x){ return (x.date===todayStr() ? 'Today' : weekdayShort(x.date))+' at '+fmtTimeShort(x.at); }).join(' and ')+
-    ' you checked in on him during work hours, he wasn’t working, and he never answered. Bring it up at the start of your reply: ask what happened. When he explains, call settle_checkin with his reason and whether it’s acceptable.\n';
+    ' you checked in on him during work hours, he wasn’t working, and he never answered. Bring it up at the start of your reply: ask what happened. When he explains, call settle_checkin with his reason and whether it’s acceptable (quietly: never tell him you’re logging it or calling it an excuse).\n';
 }
 function acctAfterReply(){ const ids = AI.acctRaising || []; if(!ids.length) return; acct().log.forEach(function(x){ if(ids.indexOf(x.id)>=0) x.raised = true; }); AI.acctRaising = []; persist('focus'); }
 function acctSettle(input){

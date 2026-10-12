@@ -5391,3 +5391,64 @@ body.np-on .quick-journal-fab.jorb, body.op-ov .quick-journal-fab.jorb{ right:28
 .insp.is-drift .insp-whisper{ color:#fff; }
 .insp.is-stream .izd, .insp.is-stream .izt, .insp.is-stream .izw, .insp.is-stream .izq{ opacity:.35; transition:opacity .8s ease; }
 .insp.is-stream .izd:hover, .insp.is-stream .izt:hover, .insp.is-stream .izw:hover, .insp.is-stream .izq:hover{ opacity:1; }
+
+/* ============ R28: one music player for every full-screen page ============ */
+.mctl{ text-transform:none; letter-spacing:normal; display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 4px 0 12px; border-radius:999px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); color:rgba(255,255,255,.82); font-size:12.5px; font-weight:600; font-family:var(--font-body); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:0 6px 20px rgba(0,0,0,.18); transition:background .2s, border-color .2s, box-shadow .3s; white-space:nowrap; vertical-align:middle; }
+.mctl:hover{ background:rgba(255,255,255,.11); border-color:rgba(255,255,255,.2); }
+.mctl.is-on{ border-color:rgba(255,197,107,.35); box-shadow:0 6px 22px rgba(0,0,0,.2), 0 0 18px rgba(255,197,107,.12); }
+.mctl-i{ display:inline-flex; align-items:center; justify-content:center; width:16px; color:rgba(255,255,255,.7); font-size:13px; }
+.mctl.is-on .mctl-i{ color:#ffc56b; }
+.mctl-i .wk2-eq{ transform:scale(.62); } .mctl-i .wk2-eq i{ background:currentColor; }
+.mctl-t{ max-width:170px; overflow:hidden; text-overflow:ellipsis; letter-spacing:.01em; }
+.mctl:not(.is-on) .mctl-t{ color:rgba(255,255,255,.62); }
+.mctl-b{ width:26px; height:26px; border-radius:50%; border:none; display:inline-flex; align-items:center; justify-content:center; background:transparent; color:rgba(255,255,255,.72); font-size:11px; cursor:pointer; transition:background .15s, color .15s, transform .15s; flex:none; }
+.mctl-b:hover{ background:rgba(255,255,255,.12); color:#fff; transform:scale(1.06); }
+.mctl-p{ background:rgba(255,255,255,.12); color:#fff; }
+.mctl.is-on .mctl-p{ background:#ffc56b; color:#1a1305; }
+.mctl.is-on .mctl-p:hover{ background:#ffd38a; }
+html[data-theme="light"] .mctl-ls, html[data-theme="light"] .mctl-wi{ color:rgba(255,255,255,.85); }
+/* where it sits */
+.b4-music{ display:inline-flex; align-items:center; margin-right:10px; }
+.wi-top .mctl{ margin-right:10px; }
+.wd-top .mctl-ls{ margin-right:6px; }
+.np-top .mctl-np{ margin-right:10px; }
+/* Good morning: last night's note is the first slide of "you told yourself" */
+.bi-one.is-night small{ color:#9cc8ff; }
+.bi-one.is-night p{ font-style:italic; }
+.bi-sub{ display:block; margin-top:8px; font-size:14px; line-height:1.45; color:rgba(255,255,255,.66); max-width:52ch; }
+.bi-set-sm{ padding:5px 12px; font-size:12px; margin-left:auto; }
+/* Sports: the scores on top, stories underneath, half and half */
+.brs-split{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; gap:10px; }
+.brs-scores{ flex:1 1 0; min-height:0; display:flex; flex-direction:column; }
+.brs-news{ flex:1 1 0; min-height:0; display:flex; flex-direction:column; border-top:1px solid rgba(255,255,255,.08); padding-top:8px; }
+.br-sports:not(.is-split) .brs-news{ border-top:none; padding-top:0; }
+.brs-h{ font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.45); padding:2px 0 4px; }
+.brs-list{ flex:1 1 0; min-height:0; overflow-y:auto; margin-right:-6px; padding-right:6px; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.18) transparent; }
+.brs-list .br-news-i{ font-size:13px !important; padding:7px 0; }
+/* Good morning bottom-left (round 28): the reel gets the room it needs and Today gives a little back;
+   one slide at a time (the old one is gone before the next comes in, so they never sit on top of each other) */
+.brief4 .c-a > .br-intent:last-child{ flex:0 0 auto !important; }
+.brief4 .c-a > .br-day{ flex:1 1 0 !important; min-height:150px; }
+.br-intent .bi-one{ padding:4px 2px 6px; }
+.br-intent .bi-one p{ margin-top:6px; }
+.br-intent .bi-qh{ padding:0 0 9px; margin:0 0 2px; }
+.brief4 .br-intent .bi-reel{ min-height:clamp(74px, 9.4vh, 124px); }
+.bi-slide{ transition:opacity .32s ease, transform .5s cubic-bezier(.2,.8,.2,1); }
+.bi-slide.is-on{ transition-delay:.3s; }
+.br-intent .bi-one p{ font-size:clamp(20px, 2.6vh, 28px); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.br-intent .bi-sub{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:13.5px; margin-top:6px; }
+.br-intent .bi-foot{ padding-top:6px; }
+/* sports gets more of the column than the headlines (the headlines trim to fit) */
+.brief4 .c-c > .br-news{ flex:1 1 0 !important; min-height:0; }
+.brief4 .c-c > .br-sports{ flex:1.45 1 0 !important; }
+.brs-scores{ flex:1.25 1 0; }
+/* (headlines on top trim to fit; sports underneath gets the bigger share so the scores have room) */
+.brief4 .b4-grid:not(.no-d):not(.no-c):not(.cols-2){ grid-template-rows:minmax(0, 1fr) minmax(0, 1.2fr); }
+@media (min-width:1680px){ .brief4 .b4-grid:not(.no-d):not(.no-c):not(.cols-2){ grid-template-rows:minmax(0, 1fr); } }
+/* Op's words come in one at a time: a soft rise out of a blur */
+.cw{ display:inline-block; animation:cwIn .55s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes cwIn{ from{ opacity:0; filter:blur(5px); transform:translateY(5px); } 60%{ opacity:1; } to{ opacity:1; filter:none; transform:none; } }
+@media (prefers-reduced-motion:reduce){ .cw{ animation:none; } }
+.op-bub-t{ text-shadow:0 0 18px rgba(255,255,255,.05); }
+html[data-op-mood="stern"] .op-bub-t .cw:last-child, html[data-op-mood="concern"] .op-bub-t .cw:last-child{ animation-name:cwIn, cwGlow; animation-duration:.55s, 1.6s; }
+@keyframes cwGlow{ 0%{ text-shadow:0 0 14px currentColor; } 100%{ text-shadow:none; } }

@@ -139,7 +139,7 @@ function renderLockedMinimal(){
           '<div class="np-times"><span id="modeElapsed">'+formatElapsed(Date.now()-(as.breakStartedAt||Date.now()))+'</span><span id="breakRemaining">'+(left!=null ? formatElapsed(left)+' left' : '')+'</span></div></div>'+
         '<div class="np-ctl">'+(as.breakEndsAt ? '<button class="np-c" data-action="extendBreak" data-minutes="5" title="5 more minutes">+5</button>' : '<span class="np-c-sp"></span>')+
           '<button class="np-c is-main is-back" data-action="endBreakModeFromFocus" title="Lock back in">&#128274;</button>'+npMusicBtnHtml()+'</div>'+
-        npMusicRowHtml()+
+        // (round 28: what's playing sits in the player at the top right)
       '</div>';
   } else {
     const pct = as.plannedMinutes ? Math.min(100, elapsed/(as.plannedMinutes*60000)*100) : Math.min(100, deepWorkMinutesTodayLive()/(state.standards.deepWorkTargetMinutes||180)*100);
@@ -156,7 +156,7 @@ function renderLockedMinimal(){
           npMusicBtnHtml(true)+
           '<button class="np-c np-out" data-action="openStopFocus" title="Lock out">&#9632;</button>'+
         '</div>'+
-        npMusicRowHtml()+
+        // (round 28: what's playing sits in the player at the top right)
         // the task you're on (✓ when it's done) and the one after it — small, part of the player
         ((cur || (nx && (!cur || nx.id!==cur.id))) ? '<div class="np-task">'+
           (cur ? '<button class="np-task-done" data-action="finishCurrentTask" title="Done with this task">&#10003; Done</button>' : '')+
@@ -165,7 +165,7 @@ function renderLockedMinimal(){
   }
   return '<div class="np np-locked'+(onBreak?' is-break':'')+'">'+
     '<div class="np-bg"></div>'+
-    '<div class="np-top">'+npClockHtml()+'<span style="flex:1"></span>'+lockedViewBtnHtml()+'</div>'+
+    '<div class="np-top">'+npClockHtml()+'<span style="flex:1"></span>'+(typeof mctlHtml==='function' ? mctlHtml('mctl-np') : '')+lockedViewBtnHtml()+'</div>'+
     '<div class="np-main">'+body+'</div>'+
   '</div>';
 }
