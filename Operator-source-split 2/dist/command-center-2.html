@@ -6527,6 +6527,11 @@ body.sb-collapsed .ap-menu{ left:69px; }
 .th-mix .th-wx{ margin-top:10px; }
 .th-wx .skyp{ height:38px; padding:0 16px; }
 .op-bub:not(.is-in){ transition-duration:.2s !important; }
+.sw.is-row .sw-edit{ right:auto; left:12px; top:auto; bottom:6px; }
+/* the Cockpit is a night screen in both themes: it keeps the dark palette */
+.np.is-cockpit{ --text:#f3f5fb; --text-dim:rgba(235,240,255,.62); --text-faint:rgba(235,240,255,.4); --ink:255,255,255; --border:rgba(255,255,255,.1); color:#f3f5fb; }
+/* Op's light on a light page: a soft rim so it reads */
+html[data-theme="light"] .th-op.is-hello .th-op-o, :root[data-theme="light"] .th-op.is-hello .th-op-o{ box-shadow:0 0 0 1px rgba(90,110,220,.35), 0 0 12px color-mix(in srgb, var(--op-c) 60%, #8fa0ff); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -24719,9 +24724,9 @@ function wakeBriefHtml(){
   let k = 0, tcur = base;
   const panel = function(cls, anim, voice, html, extraStyle, attrs){
     const d = tcur; k++;
-    const wms = typeof opVoiceOn==='function' && opVoiceOn() ? 250 : BRIEF_WORD_MS;
+    const voiceOn = typeof opVoiceOn==='function' && opVoiceOn(), wms = voiceOn ? 250 : BRIEF_WORD_MS;
     // (quicker again: the page builds at reading pace; the voice keeps up by moving to the newest line)
-    if(voice){ lines.push({at: d - 380, text: voice, key:String(cls).split(' ')[0].replace(/^br-/, '')}); tcur += Math.min(1500, Math.max(650, voice.split(' ').length*wms*0.55 + 200)); } else tcur += 320;
+    if(voice){ lines.push({at: d - 380, text: voice, key:String(cls).split(' ')[0].replace(/^br-/, '')}); tcur += voiceOn ? Math.min(1500, Math.max(650, voice.split(' ').length*wms*0.55 + 200)) : Math.max(900, voice.split(' ').length*wms + 300); } else tcur += voiceOn ? 320 : 500;
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
   const slept = lastNightSleep();
@@ -35027,7 +35032,7 @@ function autoWorkMsFrom(ivs, from){
   return ms;
 }
 function autoThresholdMin(){
-  const st = state.settings.appTracking || {}, base = Math.max(5, Number(st.thresholdMinutes)||12);
+  const st = state.settings.appTracking || {}, base = Math.max(1, Number(st.thresholdMinutes)||12);
   const ph = typeof workPhase==='function' ? workPhase() : 'off';
   return ph==='work' || ph==='off' ? base : Math.round(base*1.75);
 }
@@ -35197,13 +35202,15 @@ checkAutoLockIn = (function(){
 })();
 
 // ---- auto lock-out: a session ends where the work stopped ----
-// Any deep-work session, yours or automatic: once there's been no work-app activity for a while
-// (3 minutes for an automatic one, your "away" time, 10 by default, for one you started), it stops
-// at the last moment you were on a work app. Sitting in Operator, Firefox or anything else doesn't
-// keep it going, and neither does a Mac left on. The real part is kept, the rest never counted, and
+// Any deep-work session, yours or automatic: once there's been no work activity for a while (3
+// minutes for an automatic one, your "away" time, 10 by default, for one you started), it stops at
+// the last moment you were working. Sitting in Operator or Finder doesn't keep it going, and neither
+// does a Mac left on. The real part is kept, the rest never counted, and
 // "Add it back" is there if you were working away from the keys.
-function lastWorkActivityEnd(ivs, since){
-  for(let i = ivs.length - 1; i >= 0; i--){ const iv = ivs[i]; if(iv.end < since) break; if(activityCategory(iv.app)==='work') return iv.end; }
+// (a session you started yourself also counts apps you haven't sorted, like a browser it can't see
+// into: you might well be working there. Operator, Finder and not-work apps don't count for either.)
+function lastWorkActivityEnd(ivs, since, loose){
+  for(let i = ivs.length - 1; i >= 0; i--){ const iv = ivs[i]; if(iv.end < since) break; const c = activityCategory(iv.app); if(c==='work' || (loose && c==='unsorted')) return iv.end; }
   return null;
 }
 checkAwayFromSession = (function(base){
@@ -35216,7 +35223,7 @@ checkAwayFromSession = (function(base){
     if(!lastRawSampleAt || Date.now() - lastRawSampleAt > 90000) return;   // the tracker has to be running
     if(todayStr(new Date(s.startedAt))!==todayStr()) return;
     const now = Date.now(), ivs = state.appActivity.todayIntervals;
-    const lw = Math.max(lastWorkActivityEnd(ivs, s.startedAt) || 0, s.startedAt);
+    const lw = Math.max(lastWorkActivityEnd(ivs, s.startedAt, !s.autoStarted) || 0, s.startedAt);
     const limit = s.autoStarted ? Math.max(3, Number(st.graceMinutes)||3)*60000 : awayLimitMs();
     if(now - lw < limit) return;
     const last = ivs[ivs.length-1], app = last && now - last.end <= APP_ACTIVITY_GAP_MS ? last.app : null;
@@ -35301,7 +35308,7 @@ opBriefRewrite = function(lines){
   if(!todo.length) return;
   todo.forEach(function(l){ b.asked[l.key] = 1; });
   b.asked.greet = 1;
-  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, your humor where it fits. Keep them SHORT: under 12 words each. I don’t want the morning to drag or to be told everything. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Nothing about work beyond what’s on today’s calendar.\n'+
+  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, your humor where it fits. Keep them SHORT: under 12 words each. I don’t want the morning to drag or to be told everything. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. It’s about the morning, not work: nothing beyond what’s on today’s calendar.\n'+
     'For the news and sports lines: the gist only, then ask if I want to hear more (end that line with the question). Sports: name my teams if they played, otherwise generalize (“Yesterday was NFL Sunday”). News: a few words on what’s going on, never a list; only a genuinely big story gets said plainly.\n'+
     'Only say the lines themselves: never mention these instructions or comment on the request.\n'+
     'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 10 words).\n'+

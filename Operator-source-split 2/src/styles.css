@@ -6516,3 +6516,8 @@ body.sb-collapsed .ap-menu{ left:69px; }
 .th-mix .th-wx{ margin-top:10px; }
 .th-wx .skyp{ height:38px; padding:0 16px; }
 .op-bub:not(.is-in){ transition-duration:.2s !important; }
+.sw.is-row .sw-edit{ right:auto; left:12px; top:auto; bottom:6px; }
+/* the Cockpit is a night screen in both themes: it keeps the dark palette */
+.np.is-cockpit{ --text:#f3f5fb; --text-dim:rgba(235,240,255,.62); --text-faint:rgba(235,240,255,.4); --ink:255,255,255; --border:rgba(255,255,255,.1); color:#f3f5fb; }
+/* Op's light on a light page: a soft rim so it reads */
+html[data-theme="light"] .th-op.is-hello .th-op-o, :root[data-theme="light"] .th-op.is-hello .th-op-o{ box-shadow:0 0 0 1px rgba(90,110,220,.35), 0 0 12px color-mix(in srgb, var(--op-c) 60%, #8fa0ff); }

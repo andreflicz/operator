@@ -182,7 +182,7 @@ async function ctxPage(b, seed, opts){
     await E("endBreakModeFromFocus(); renderView()"); await p.waitForTimeout(200);
     check('locking back in ends it', !(await E("state.focus.activeSession.onBreak")) && !(await E("state.focus.activeSession.breakOverAt")));
     await E("ACTIONS.toggleLockedView()"); await p.waitForTimeout(100);
-    check('leaving the minimal view: a plain fade', await p.$('.np.is-leaving')!==null);
+    check('leaving the minimal view: through the dark veil (round 35)', await p.$('.fs-veil')!==null);
     await p.waitForTimeout(500);
     // (round 23: the minimal view is on Focus; the knock-out list lives on Today)
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(300);

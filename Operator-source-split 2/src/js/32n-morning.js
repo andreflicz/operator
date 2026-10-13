@@ -492,9 +492,9 @@ function wakeBriefHtml(){
   let k = 0, tcur = base;
   const panel = function(cls, anim, voice, html, extraStyle, attrs){
     const d = tcur; k++;
-    const wms = typeof opVoiceOn==='function' && opVoiceOn() ? 250 : BRIEF_WORD_MS;
+    const voiceOn = typeof opVoiceOn==='function' && opVoiceOn(), wms = voiceOn ? 250 : BRIEF_WORD_MS;
     // (quicker again: the page builds at reading pace; the voice keeps up by moving to the newest line)
-    if(voice){ lines.push({at: d - 380, text: voice, key:String(cls).split(' ')[0].replace(/^br-/, '')}); tcur += Math.min(1500, Math.max(650, voice.split(' ').length*wms*0.55 + 200)); } else tcur += 320;
+    if(voice){ lines.push({at: d - 380, text: voice, key:String(cls).split(' ')[0].replace(/^br-/, '')}); tcur += voiceOn ? Math.min(1500, Math.max(650, voice.split(' ').length*wms*0.55 + 200)) : Math.max(900, voice.split(' ').length*wms + 300); } else tcur += voiceOn ? 320 : 500;
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
   const slept = lastNightSleep();

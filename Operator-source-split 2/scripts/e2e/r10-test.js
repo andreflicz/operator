@@ -37,7 +37,9 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     await p.fill('#windNote', 'Call Mike first. No phone till 10.');
     await p.click('#windOverlay [data-action="windNext"]'); await p.waitForTimeout(200);
     check('alarm step shows tomorrow\'s time', (await p.inputValue('#windAlarm'))==='07:00');
-    await p.click('#windOverlay [data-action="windGoToSleep"]'); await p.waitForTimeout(300);
+    // (round 35: the wind-down ends on Done; going to sleep is its own button after it)
+    await p.click('#windOverlay [data-action="windDone"]'); await p.waitForTimeout(300);
+    await p.evaluate(() => window.__op.ev("ACTIONS.startSleepMode()")); await p.waitForTimeout(300);
     check('plan saved in order for tomorrow', await E("JSON.stringify(state.focus.nightPlan.taskIds)")==='["e","a"]' && await E("state.focus.nightPlan.date")==='2026-10-10');
     check('the note is waiting for the morning', await E("morningNotesFor('2026-10-10').some(n=>/Call Mike first/.test(n.text))"));
     check('going to sleep goes straight to Sleep mode', await E("state.modes.active && state.modes.active.sleep") && !(await p.isVisible('#recapOverlay:not(.hidden)')) && !(await p.isVisible('#windOverlay:not(.hidden)')));

@@ -41,7 +41,7 @@ const FAKE_SPEECH = () => {
     check('a break mid-Pomodoro warns that it breaks the rhythm', /isn’t one of your Pomodoro breaks/.test(await p.textContent('#breakNoteContent')));
     await E("closeBreakNotePrompt()");
     await E("ACTIONS.toggleLockedView()"); await p.waitForTimeout(80);
-    check('leaving the minimal view animates out', await p.$('.np.is-leaving')!==null);
+    check('leaving the minimal view goes through the dark veil (round 35)', await p.$('.fs-veil')!==null);
     await p.waitForTimeout(600);
     check('the music dock is in the corner everywhere else (just ▶ now)', await p.isVisible('#musicDock .md-fm') && (await p.$$('#musicDock .md-n, #musicDock .md-sun')).length===0);
     asked.length = 0;

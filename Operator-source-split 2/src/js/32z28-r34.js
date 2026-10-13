@@ -251,7 +251,7 @@ function autoWorkMsFrom(ivs, from){
   return ms;
 }
 function autoThresholdMin(){
-  const st = state.settings.appTracking || {}, base = Math.max(5, Number(st.thresholdMinutes)||12);
+  const st = state.settings.appTracking || {}, base = Math.max(1, Number(st.thresholdMinutes)||12);
   const ph = typeof workPhase==='function' ? workPhase() : 'off';
   return ph==='work' || ph==='off' ? base : Math.round(base*1.75);
 }

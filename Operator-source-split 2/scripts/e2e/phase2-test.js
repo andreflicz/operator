@@ -15,7 +15,7 @@ const SP = require('./common.js').OUT;
   let p = await newPage(b, SP+'/t.html', seed);
   const order = await p.evaluate(() => window.__op.state.dashboardPanels.order);
   check('journal raised under streak', order.filter(x=>x!=='vision' && x!=='agenda')[1]==='journal', order);
-  check('streak card rendered', await p.isVisible('.streak-card .streak-num'));
+  check('streak card rendered', await p.isVisible('.sw-streak b'));
   check('today hero', await p.isVisible('.today-hero .lockin-cta'));
   check('client health color-coded', await p.isVisible('.hub-card.hl-red .cc2-avatar.ring-red'));
   await p.screenshot({path:SP+'/p2-today.png', fullPage:false});

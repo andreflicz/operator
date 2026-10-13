@@ -54,12 +54,12 @@ async function ctxPage(b, seed, opts){
     await E("ui.wind.step='alarm'; renderWindInto()"); await p.waitForTimeout(200);
     check('Tomorrow: the alarm and your work hours, side by side', !!(await p.$('#windOverlay #windAlarm')) && !!(await p.$('#windOverlay #windWorkStart')) && !!(await p.$('#windOverlay #windWorkEnd')));
     await p.fill('#windWorkStart', '10:00'); await p.fill('#windWorkEnd', '18:30');
-    check('…the footer: Back, Going to sleep, Done (no old buttons)', !!(await p.$('#windOverlay .wd-back')) && !!(await p.$('#windOverlay [data-action="windGoToSleep"]')) && !!(await p.$('#windOverlay .wd-go[data-action="windDone"]')));
+    check('…the footer: Back and Done (round 35: sleep moved to That’s the day)', !!(await p.$('#windOverlay .wd-back')) && !(await p.$('#windOverlay [data-action="windGoToSleep"]')) && !!(await p.$('#windOverlay .wd-go[data-action="windDone"]')));
     await p.click('#windOverlay [data-action="windDone"]'); await p.waitForTimeout(700);
     check('Done: the wind-down closes and That’s the day takes over', !(await E("overlayOpen('windOverlay')")) && /That’s the day/.test(await p.textContent('#viewRoot')));
     check('…tomorrow’s hours are set for tomorrow only', await E("workHoursFor('2026-10-14').start")==='10:00' && await E("workHoursFor('2026-10-14').end")==='18:30' && await E("workCfg().start")==='09:00');
     const btns = await p.$$eval('.dayoff-row button', els => els.map(e => e.textContent.trim()));
-    check('That’s the day: Clock back in, Edit wind-down, Tomorrow', btns.length===3 && /Clock back in/.test(btns[0]) && /Edit wind-down/.test(btns[1]) && /Tomorrow/.test(btns[2]), btns);
+    check('That’s the day: Clock back in, Edit wind-down, and sleep (Tmrw + the alarm)', btns.length===3 && /Clock back in/.test(btns[0]) && /Edit wind-down/.test(btns[1]) && /Tmrw \d|Go to sleep/.test(btns[2]), btns);
     check('…Op’s light sits in the corner (not off to the right)', await E("parseInt(getComputedStyle(document.querySelector('.op-light')).left)") <= 30);
     await p.click('.dayoff-row [data-step="plan"]'); await p.waitForTimeout(400);
     check('Edit wind-down opens it again (at the plan)', await E("overlayOpen('windOverlay') && ui.wind.step==='plan'"));

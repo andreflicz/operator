@@ -101,13 +101,15 @@ checkAutoLockIn = (function(){
 })();
 
 // ---- auto lock-out: a session ends where the work stopped ----
-// Any deep-work session, yours or automatic: once there's been no work-app activity for a while
-// (3 minutes for an automatic one, your "away" time, 10 by default, for one you started), it stops
-// at the last moment you were on a work app. Sitting in Operator, Firefox or anything else doesn't
-// keep it going, and neither does a Mac left on. The real part is kept, the rest never counted, and
+// Any deep-work session, yours or automatic: once there's been no work activity for a while (3
+// minutes for an automatic one, your "away" time, 10 by default, for one you started), it stops at
+// the last moment you were working. Sitting in Operator or Finder doesn't keep it going, and neither
+// does a Mac left on. The real part is kept, the rest never counted, and
 // "Add it back" is there if you were working away from the keys.
-function lastWorkActivityEnd(ivs, since){
-  for(let i = ivs.length - 1; i >= 0; i--){ const iv = ivs[i]; if(iv.end < since) break; if(activityCategory(iv.app)==='work') return iv.end; }
+// (a session you started yourself also counts apps you haven't sorted, like a browser it can't see
+// into: you might well be working there. Operator, Finder and not-work apps don't count for either.)
+function lastWorkActivityEnd(ivs, since, loose){
+  for(let i = ivs.length - 1; i >= 0; i--){ const iv = ivs[i]; if(iv.end < since) break; const c = activityCategory(iv.app); if(c==='work' || (loose && c==='unsorted')) return iv.end; }
   return null;
 }
 checkAwayFromSession = (function(base){
@@ -120,7 +122,7 @@ checkAwayFromSession = (function(base){
     if(!lastRawSampleAt || Date.now() - lastRawSampleAt > 90000) return;   // the tracker has to be running
     if(todayStr(new Date(s.startedAt))!==todayStr()) return;
     const now = Date.now(), ivs = state.appActivity.todayIntervals;
-    const lw = Math.max(lastWorkActivityEnd(ivs, s.startedAt) || 0, s.startedAt);
+    const lw = Math.max(lastWorkActivityEnd(ivs, s.startedAt, !s.autoStarted) || 0, s.startedAt);
     const limit = s.autoStarted ? Math.max(3, Number(st.graceMinutes)||3)*60000 : awayLimitMs();
     if(now - lw < limit) return;
     const last = ivs[ivs.length-1], app = last && now - last.end <= APP_ACTIVITY_GAP_MS ? last.app : null;
@@ -205,7 +207,7 @@ opBriefRewrite = function(lines){
   if(!todo.length) return;
   todo.forEach(function(l){ b.asked[l.key] = 1; });
   b.asked.greet = 1;
-  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, your humor where it fits. Keep them SHORT: under 12 words each. I don’t want the morning to drag or to be told everything. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Nothing about work beyond what’s on today’s calendar.\n'+
+  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, your humor where it fits. Keep them SHORT: under 12 words each. I don’t want the morning to drag or to be told everything. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. It’s about the morning, not work: nothing beyond what’s on today’s calendar.\n'+
     'For the news and sports lines: the gist only, then ask if I want to hear more (end that line with the question). Sports: name my teams if they played, otherwise generalize (“Yesterday was NFL Sunday”). News: a few words on what’s going on, never a list; only a genuinely big story gets said plainly.\n'+
     'Only say the lines themselves: never mention these instructions or comment on the request.\n'+
     'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 10 words).\n'+
