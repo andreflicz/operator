@@ -82,7 +82,7 @@ function thOpText(){
 function thOpKick(force){
   if(typeof aiWrite!=='function' || AI.hasKey===false) return;
   const k = thOpKey();
-  if(!force && ui.thOp && ui.thOp.k===k && (ui.thOp.text || ui.thOp.busy)) return;
+  if(!force && ui.thOp && ui.thOp.k===k) return;   // (one try per part of the day: a failed call doesn't retry on every render)
   ui.thOp = {k:k, busy:true};
   const dw = deepWorkMinutesTodayLive(), target = state.standards.deepWorkTargetMinutes || 180, nx = typeof nextUpTask==='function' ? nextUpTask() : null;
   const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today'; }).length, done = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); }).length;

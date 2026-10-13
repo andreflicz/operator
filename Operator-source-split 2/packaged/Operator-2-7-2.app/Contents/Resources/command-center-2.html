@@ -6125,7 +6125,7 @@ body.opf-on #opBub, body.opf-on #opLight, body.opf-on .quick-journal-fab, body.o
 .cx-peek{ font-size:11px; padding:2px 7px; }
 /* Op's screen (round 32): the journal stays, a scoreboard, a status line, a chat you can read, some color */
 body.opf-on .quick-journal-fab{ visibility:visible !important; z-index:9460 !important; }
-body.opf-on #quickJournalOverlay{ z-index:9500; }
+body.opf-on #quickJournalOverlay{ z-index:9500 !important; }
 .opf-acc{ position:absolute; left:22px; top:84px; width:276px; max-height:calc(100vh - 120px); overflow-y:auto; z-index:3; cursor:default; padding:16px 16px 14px; border-radius:20px; background:rgba(255,255,255,.74); border:1px solid rgba(30,35,60,.08); box-shadow:0 18px 50px rgba(60,70,120,.10); backdrop-filter:blur(16px); color:#1b1e2a; font-size:13px; animation:opfAccIn .7s cubic-bezier(.2,.8,.2,1) both .15s; }
 .opf-acc:empty{ display:none; }
 @keyframes opfAccIn{ from{ opacity:0; transform:translateX(-14px); } }
@@ -6223,7 +6223,6 @@ html[data-theme="light"] .md-volpop{ background:rgba(255,255,255,.9); border-col
 @keyframes opfOrbRing{ from{ transform:scale(1); opacity:.75; } to{ transform:scale(2.3); opacity:0; } }
 .opf.is-think .opf-orb b{ animation:opfOrbThink 2.2s ease-in-out infinite; }
 @keyframes opfOrbThink{ 0%,100%{ transform:scale(.95); filter:brightness(1); } 50%{ transform:scale(1); filter:brightness(1.15) saturate(1.3); } }
-.opf[data-mode="chat"] .opf-orb{ display:none; }
 @media (prefers-reduced-motion:reduce){ .opf-orb b, .opf-orb-r{ animation:none !important; } }
 /* Business overview on one screen (round 32) */
 .hq{ gap:18px; }
@@ -6250,6 +6249,289 @@ html[data-theme="light"] .md-volpop{ background:rgba(255,255,255,.9); border-col
 .cx-agenda{ max-height:none; }
 .cx-ag-more{ align-self:flex-start; border:0; background:transparent; color:var(--text-dim); font:inherit; font-size:12.5px; font-weight:700; padding:4px 6px; cursor:pointer; border-radius:8px; }
 .cx-ag-more:hover{ color:var(--text); background:rgba(var(--ink),.05); }
+/* ============ round 33 ============ */
+/* clocks: six faces, one setting */
+.ck{ position:relative; display:inline-flex; align-items:center; justify-content:center; padding:0; border:0; background:transparent; color:inherit; cursor:pointer; flex:none; width:86px; height:86px; transition:transform .25s cubic-bezier(.2,.8,.2,1); --ckc:#8fd3ff; }
+.ck:hover{ transform:scale(1.04); }
+.ck svg{ width:100%; height:100%; overflow:visible; }
+.ck.is-swap svg{ animation:ckSwap .55s cubic-bezier(.2,.8,.2,1); }
+@keyframes ckSwap{ from{ opacity:0; transform:scale(.8) rotate(-30deg); filter:blur(4px); } }
+.ck-track{ fill:none; stroke:rgba(var(--ink),.12); stroke-width:5; stroke-linecap:round; }
+.ck-ring svg{ transform:rotate(-90deg); }
+.ck-arc{ fill:none; stroke:var(--ckc); stroke-width:5; stroke-linecap:round; stroke-dasharray:60; stroke-dashoffset:60; transition:stroke-dashoffset .9s linear; filter:drop-shadow(0 0 6px var(--ckc)); }
+.ck-trail{ fill:none; stroke:var(--ckc); stroke-width:4; stroke-linecap:round; opacity:.35; }
+.ck-orb{ transition:transform .9s cubic-bezier(.4,0,.2,1); }
+.ck-dot{ fill:#fff; filter:drop-shadow(0 0 6px var(--ckc)) drop-shadow(0 0 2px var(--ckc)); }
+.ck-hub{ fill:var(--ckc); }
+.ck-face{ fill:rgba(var(--ink),.04); stroke:rgba(var(--ink),.12); stroke-width:1.5; }
+.ck-tick{ stroke:rgba(var(--ink),.3); stroke-width:1.6; stroke-linecap:round; } .ck-tick.is-q{ stroke:rgba(var(--ink),.6); stroke-width:2.6; }
+.ck-h, .ck-m, .ck-s{ stroke-linecap:round; transform-origin:60px 60px; transition:transform .5s cubic-bezier(.4,1.6,.5,1); }
+.ck-h{ stroke:var(--text); stroke-width:5; } .ck-m{ stroke:var(--text); stroke-width:3.2; } .ck-s{ stroke:var(--ckc); stroke-width:1.6; filter:drop-shadow(0 0 3px var(--ckc)); }
+.ck-daypath{ fill:none; stroke:url(#none); stroke:#ffc56b; stroke-width:5; stroke-linecap:round; stroke-dasharray:100; stroke-dashoffset:100; transition:stroke-dashoffset 1s; }
+.ck-sun{ fill:#ffd27a; filter:drop-shadow(0 0 6px #ffc56b); transition:cx 1s, cy 1s; } .ck-sun.is-moon{ fill:#dfe7ff; filter:drop-shadow(0 0 6px #9fb7ff); }
+.ck-d{ fill:rgba(var(--ink),.16); transition:fill .3s, r .3s; } .ck-d.is-on{ fill:color-mix(in srgb, var(--ckc) 70%, transparent); } .ck-d.is-now{ fill:#fff; filter:drop-shadow(0 0 4px var(--ckc)); } .ck-d.is-min{ fill:#ffc56b; }
+.ck-core{ fill:var(--ckc); filter:drop-shadow(0 0 10px var(--ckc)); }
+.ck-p{ fill:none; stroke:var(--ckc); stroke-width:2; opacity:0; transform-origin:60px 60px; }
+.ck-p.is-go{ animation:ckPing .95s ease-out; } .ck-p2.is-go{ animation:ckPing2 2.6s ease-out; }
+@keyframes ckPing{ from{ transform:scale(.6); opacity:.9; } to{ transform:scale(2.4); opacity:0; } }
+@keyframes ckPing2{ from{ transform:scale(.6); opacity:.7; stroke-width:4; } to{ transform:scale(2.9); opacity:0; stroke-width:1; } }
+.ck-in{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
+.ck-t{ font-family:var(--font-display); font-weight:700; font-size:22%; } .ck-d8{ font-size:11px; color:var(--text-dim); }
+.calx .cx-face{ width:84px; height:84px; }
+.ck-panel{ display:flex; justify-content:center; padding:18px !important; }
+.ck.ck-big{ width:210px; height:210px; } .ck-big .ck-t{ font-size:34px; } .ck-big .ck-d8{ font-size:12.5px; margin-top:2px; }
+.wk-ck{ display:flex !important; align-items:center; justify-content:center; gap:22px; }
+.ck.ck-wake{ width:clamp(90px, 11vw, 140px); height:clamp(90px, 11vw, 140px); --ckc:#ffd9a0; }
+.ck-picks{ display:grid; grid-template-columns:repeat(6, minmax(0, 1fr)); gap:10px; margin-top:12px; }
+.ck-pick{ display:flex; flex-direction:column; align-items:center; gap:8px; padding:12px 6px 10px; border-radius:14px; border:1px solid var(--border); background:transparent; color:var(--text-dim); font:inherit; font-size:12px; cursor:pointer; transition:border-color .15s, background .15s, color .15s; }
+.ck-pick:hover{ color:var(--text); border-color:rgba(var(--ink),.25); } .ck-pick.is-on{ color:var(--text); border-color:var(--accent); background:rgba(var(--accent-rgb, 232,162,61),.08); }
+.ck.ck-mini{ width:54px; height:54px; cursor:inherit; } .ck-mini:hover{ transform:none; }
+@media (max-width:760px){ .ck-picks{ grid-template-columns:repeat(3, 1fr); } }
+@media (prefers-reduced-motion:reduce){ .ck *{ transition:none !important; animation:none !important; } }
+/* the Calendar never scrolls */
+.calx{ height:calc(100vh - 168px); }
+@media (min-width:981px){ main:has(.calx), #viewRoot:has(.calx){ overflow:hidden !important; } }
+/* the alarm cards: every alarm looks like the masters */
+.cx-al.is-other:not(.is-off){ border-color:rgba(143,211,255,.25); }
+.cx-al.is-other .cx-al-main b{ font-size:20px; }
+.cx-alarms .cx-others, .cx-gm, .cx-snd{ display:none !important; }
+.al-emo .as-chip{ font-size:16px; padding:5px 9px; }
+/* Op's screen: one conversation, his light on top */
+.opf-chat{ display:flex !important; top:72px; }
+.opf-chat .opf-orb{ position:relative; left:auto; top:auto; margin:4px auto 18px; width:88px; height:88px; flex:none; pointer-events:auto; cursor:pointer; }
+.opf-chat .opf-orb::after{ content:'Tap to talk'; position:absolute; left:50%; top:calc(100% + 8px); transform:translateX(-50%); white-space:nowrap; font-size:11px; font-weight:700; letter-spacing:.06em; color:color-mix(in srgb, var(--op-c) 40%, #8a90a8); opacity:0; transition:opacity .2s; }
+.opf-chat .opf-orb:hover::after{ opacity:1; }
+.opf.is-listen .opf-chat .opf-orb::after{ content:'Listening… tap to send'; opacity:1; }
+.opf-plane, .opf-acts{ display:none !important; }
+.opf-log{ border-radius:18px 18px 0 0; }
+.opf-core{ top:20%; width:46vmin; height:46vmin; }
+/* Op's colour on everything from him */
+.op-tip{ border-color:color-mix(in srgb, var(--op-c) 35%, rgba(143,160,255,.3)); background:linear-gradient(90deg, color-mix(in srgb, var(--op-c) 14%, rgba(143,160,255,.08)), color-mix(in srgb, var(--op-c) 5%, transparent)); transition:border-color 1.4s, background 1.4s; }
+.op-tip-o{ background:radial-gradient(circle at 35% 35%, #fff, color-mix(in srgb, var(--op-c) 60%, #8fa0ff) 60%, color-mix(in srgb, var(--op-c) 50%, #6a5cff)); box-shadow:0 0 10px color-mix(in srgb, var(--op-c) 70%, #8fa0ff); animation:opTipBreath 4s ease-in-out infinite; }
+@keyframes opTipBreath{ 50%{ transform:scale(1.25); box-shadow:0 0 16px color-mix(in srgb, var(--op-c) 80%, #8fa0ff); } }
+.op-tip-t{ transition:opacity .35s, filter .35s; }
+.op-tip.is-busy .op-tip-t{ opacity:.45; filter:blur(1px); }
+.opi{ border-color:color-mix(in srgb, var(--op-c) 30%, rgba(143,211,255,.2)) !important; background:linear-gradient(135deg, color-mix(in srgb, var(--op-c) 10%, rgba(143,211,255,.06)), rgba(195,166,255,.04)) !important; transition:border-color 1.4s, background 1.4s; }
+.opi-k{ background:color-mix(in srgb, var(--op-c) 25%, rgba(143,160,255,.2)) !important; }
+/* smoother page and tab changes */
+#viewRoot.r33-in > *{ animation:r33In .32s ease-out backwards; }
+@keyframes r33In{ from{ opacity:0; } }
+@media (prefers-reduced-motion:reduce){ #viewRoot.r33-in > *{ animation:none; } }
+.ck-analog .ck-in{ inset:auto; top:calc(100% + 10px); left:50%; transform:translateX(-50%); white-space:nowrap; }
+.ck-panel:has(.ck-analog){ padding-bottom:64px !important; }
+/* the locked-in timer styles (round 33) */
+.np-art.tm{ border:0; padding:0; cursor:pointer; background:radial-gradient(circle at 50% 40%, rgba(255,255,255,.07), transparent 70%) !important; box-shadow:none !important; position:relative; color:#fff; --tmc:var(--accent); }
+.np-art[data-action="timerNext"]{ cursor:pointer; }
+.np-art.tm svg{ position:absolute; inset:6%; width:88%; height:88%; overflow:visible; }
+.np-art.tm.is-swap svg{ animation:ckSwap .55s cubic-bezier(.2,.8,.2,1); }
+.tm-in{ position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; pointer-events:none; }
+.tm-in i{ font-style:normal; font-size:.55em; line-height:1; } .tm-in b{ font-family:var(--font-display); font-size:clamp(18px, 2.4vw, 28px); font-weight:700; letter-spacing:.02em; font-variant-numeric:tabular-nums; }
+.tm-track{ fill:none; stroke:rgba(255,255,255,.12); stroke-width:5; }
+.tm-arc{ fill:none; stroke:var(--tmc); stroke-width:6; stroke-linecap:round; stroke-dasharray:100; stroke-dashoffset:100; transform:rotate(-90deg); transform-origin:60px 60px; transition:stroke-dashoffset 1s linear; filter:drop-shadow(0 0 8px var(--tmc)); }
+.tm-arc.is-thin{ stroke-width:3; opacity:.8; }
+.tm-orb{ transition:transform .95s cubic-bezier(.4,0,.2,1); } .tm-dot{ fill:#fff; filter:drop-shadow(0 0 8px var(--tmc)) drop-shadow(0 0 3px #fff); }
+.tm-d{ fill:rgba(255,255,255,.14); transition:fill .4s; } .tm-d.is-on{ fill:color-mix(in srgb, var(--tmc) 80%, transparent); } .tm-d.is-now{ fill:#fff; filter:drop-shadow(0 0 5px var(--tmc)); animation:tmBlink 2s ease-in-out infinite; }
+@keyframes tmBlink{ 50%{ opacity:.35; } }
+.tm-b{ fill:color-mix(in srgb, var(--tmc) 22%, transparent); stroke:color-mix(in srgb, var(--tmc) 50%, transparent); stroke-width:1; transform-origin:60px 60px; animation:tmBreathe 8s ease-in-out infinite; }
+.tm-b2{ animation-delay:-.4s; } .tm-b3{ animation-delay:-.8s; fill:color-mix(in srgb, var(--tmc) 45%, transparent); }
+@keyframes tmBreathe{ 0%,100%{ transform:scale(.8); } 50%{ transform:scale(1.6); } }
+.tm-water{ fill:color-mix(in srgb, var(--tmc) 55%, transparent); transition:d .9s; }
+.tm-picks{ display:grid; grid-template-columns:repeat(6, minmax(0, 1fr)); gap:10px; margin-top:8px; }
+.tm-mini{ width:54px; height:54px; display:block; --tmc:var(--accent); } .tm-mini svg{ width:100%; height:100%; }
+.tm-mini .tm-track{ stroke:rgba(var(--ink),.15); } .tm-mini .tm-arc{ stroke-dashoffset:35; } .tm-mini .tm-d:nth-child(-n+24){ fill:var(--tmc); } .tm-mini .tm-water{ d:path('M 0 64 Q 30 58 60 64 T 120 64 L 120 130 L 0 130 Z'); }
+.tm-cover{ fill:linear-gradient(0,0,0); fill:color-mix(in srgb, var(--accent) 35%, rgba(var(--ink),.08)); }
+@media (prefers-reduced-motion:reduce){ .tm-b, .tm-d.is-now{ animation:none; } }
+/* the Minutes face, and the clock in the corner (round 33) */
+.ck-mn{ fill:rgba(var(--ink),.12); transition:fill .8s, opacity .8s; }
+.ck-mn.is-left{ fill:var(--ckc); filter:drop-shadow(0 0 2px var(--ckc)); }
+.ck-mn.is-now{ fill:#fff; animation:ckMinNow 2s ease-in-out infinite; }
+@keyframes ckMinNow{ 50%{ opacity:.3; } }
+.md-ck{ display:inline-flex; align-items:center; gap:6px; padding:0 8px 0 2px; margin-right:2px; border-right:1px solid rgba(var(--ink),.1); }
+.md-ck b{ font-family:var(--font-display); font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.ck.ck-dock{ width:24px; height:24px; } .ck-dock:hover{ transform:scale(1.15); }
+.ck-dock .ck-in{ display:none; }
+.ck-dock-sw{ display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-dim); cursor:pointer; }
+.ck-picks{ grid-template-columns:repeat(7, minmax(0, 1fr)); }
+/* Op and the app pill, one thing (round 33): his light is the left end of a white capsule that shows
+   what you're on; all in his colours */
+.activity-pill{ left:229px !important; bottom:12px !important; min-height:42px; padding:6px 16px 6px 54px !important; z-index:9540 !important;
+  background:linear-gradient(90deg, color-mix(in srgb, var(--op-c) 16%, rgba(255,255,255,.96)), rgba(255,255,255,.92)) !important;
+  border:1px solid color-mix(in srgb, var(--op-c) 45%, rgba(20,24,40,.12)) !important; color:#1b1e2a !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.28), 0 0 22px color-mix(in srgb, var(--op-glow) 55%, transparent) !important;
+  -webkit-backdrop-filter:blur(14px) !important; backdrop-filter:blur(14px) !important; transition:border-color 1.4s, box-shadow 1.4s, background 1.4s, opacity .25s, transform .25s !important; }
+body.sb-collapsed .activity-pill{ left:69px !important; }
+@media (max-width:900px){ .activity-pill{ left:5px !important; } }
+.activity-pill .ap-name{ color:#1b1e2a; }
+.activity-pill .ap-dot{ width:7px; height:7px; background:color-mix(in srgb, var(--op-c) 55%, #8d9bff) !important; box-shadow:0 0 8px color-mix(in srgb, var(--op-c) 70%, #8d9bff) !important; }
+.activity-pill[data-cat="other"] .ap-dot{ background:transparent !important; box-shadow:inset 0 0 0 1.5px #c0c4d4 !important; }
+.activity-pill[data-cat="unsorted"] .ap-dot, .activity-pill[data-cat="neutral"] .ap-dot{ background:#c0c4d4 !important; box-shadow:none !important; }
+.activity-pill .ap-lock{ color:color-mix(in srgb, var(--op-ink) 80%, #3a3f55) !important; border-left-color:rgba(20,24,40,.12) !important; font-weight:700; }
+.activity-pill .ap-lock.is-off{ color:#b4434a !important; }
+.activity-pill .ap-warn{ background:rgba(20,24,40,.08) !important; color:#3a3f55 !important; }
+.activity-pill .ap-ring-bg{ stroke:rgba(20,24,40,.1) !important; } .activity-pill .ap-ring-fg{ stroke:color-mix(in srgb, var(--op-c) 60%, #6c78ff) !important; }
+.activity-pill[data-state="locked"], .activity-pill[data-state="break"]{ border-color:color-mix(in srgb, var(--op-c) 55%, rgba(20,24,40,.14)) !important; animation:none; }
+.activity-pill:hover{ transform:translateY(-1px); }
+/* (the light sits in the capsule's left end, on top) */
+body.op-near-pill .op-light{ z-index:9560; }
+
+/* ===================== Round 34 ===================== */
+/* Today hero: business name, Op's line, the time, the streak + week card, the weather across the bottom */
+.th-left.th-mix{ gap:8px; min-width:0; flex:1 1 420px; }
+.th-biz{ font-family:var(--font-display); font-size:30px; font-weight:700; letter-spacing:-.01em; line-height:1.1; }
+.th-op{ display:inline-flex; align-items:center; gap:9px; align-self:flex-start; max-width:100%; padding:6px 12px 6px 9px; border-radius:999px; font-size:14px; line-height:1.35; color:var(--text);
+  border:1px solid color-mix(in srgb, var(--op-c) 38%, rgba(143,160,255,.3)); background:linear-gradient(90deg, color-mix(in srgb, var(--op-c) 16%, rgba(143,160,255,.09)), color-mix(in srgb, var(--op-c) 4%, transparent)); transition:border-color 1.4s, background 1.4s; }
+.th-op-o{ width:11px; height:11px; flex:none; border-radius:50%; background:radial-gradient(circle at 35% 35%, #fff, color-mix(in srgb, var(--op-c) 60%, #8fa0ff) 60%, color-mix(in srgb, var(--op-c) 50%, #6a5cff)); box-shadow:0 0 10px color-mix(in srgb, var(--op-c) 70%, #8fa0ff); animation:opTipBreath 4s ease-in-out infinite; }
+.th-op-t{ transition:opacity .35s, filter .35s; }
+.th-op.is-busy .th-op-t{ opacity:.45; filter:blur(1px); }
+.th-op.is-new .th-op-t{ animation:r33In .5s ease-out; }
+.th-op-r{ border:0; background:none; color:var(--text-dim); cursor:pointer; font-size:13px; padding:0 0 0 2px; opacity:.6; }
+.th-op-r:hover{ opacity:1; }
+.th-mix .th-sub{ font-size:13px; color:var(--text-dim); }
+.th-mix .th-streak{ margin-top:4px; }
+.th-wx .skyp{ display:flex; width:100%; justify-content:space-between; gap:14px; height:34px; padding:0 14px; box-sizing:border-box; }
+.th-wx .skyp-hl, .th-wx .skyp-left{ color:var(--text-dim); font-variant-numeric:tabular-nums; }
+.skyp-hl, .skyp-left{ display:none; }
+.th-wx .skyp-hl, .th-wx .skyp-left{ display:inline; }
+.th-wx .skyp-sun{ flex:none; }
+@media (max-width:760px){ .th-biz{ font-size:24px; } .th-wx .skyp-left{ display:none; } }
+
+/* the streak + time worked card: the week as the streak's circles, each ring the hours that day */
+.sw{ position:relative; display:flex; align-items:center; gap:18px; flex-wrap:wrap; padding:10px 14px; border-radius:14px; background:rgba(var(--ink),.02); border:1px solid var(--border); }
+.sw-l{ display:flex; flex-direction:column; gap:4px; min-width:120px; }
+.sw-streak{ display:flex; align-items:center; gap:8px; }
+.sw-streak > b{ font-family:var(--font-display); font-size:30px; font-weight:800; line-height:1; color:var(--text); }
+.sw-streak > span:not(.sw-flame):not(.streak-ok){ font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; line-height:1.15; color:var(--text-dim); }
+.sw-flame{ font-size:20px; filter:grayscale(1) opacity(.45); transition:filter .4s; }
+.sw.is-hot .sw-flame{ filter:none; }
+.sw-tw{ display:flex; flex-direction:column; }
+.sw-tw b{ font-size:15px; font-weight:700; font-variant-numeric:tabular-nums; }
+.sw-tw span{ font-size:11px; color:var(--text-dim); }
+.sw-days{ display:flex; gap:8px; flex:1; justify-content:space-between; min-width:280px; }
+.sw-day{ display:flex; flex-direction:column; align-items:center; gap:3px; }
+.sw-c{ position:relative; width:36px; height:36px; display:grid; place-items:center; }
+.sw-c svg{ position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg); }
+.sw-tr{ fill:none; stroke:rgba(var(--ink),.1); stroke-width:3; }
+.sw-ar{ fill:none; stroke:#e8a23d; stroke-width:3; stroke-linecap:round; transition:stroke-dasharray .8s ease; }
+.sw-day.is-hit .sw-ar{ stroke:var(--good); }
+.sw-c b{ position:relative; font-size:11px; font-weight:700; color:var(--text-dim); }
+.sw-day.is-worked .sw-c{ border-radius:50%; background:color-mix(in srgb, var(--good) 16%, transparent); }
+.sw-day.is-worked .sw-c b{ color:var(--good); font-size:13px; }
+.sw-day.is-failed .sw-c b, .sw-day.is-broken .sw-c b{ color:var(--danger); }
+.sw-day.is-off .sw-c{ opacity:.55; }
+.sw-day.is-future{ opacity:.4; }
+.sw-day.is-today .sw-c::after{ content:''; position:absolute; inset:-4px; border-radius:50%; border:1.5px solid color-mix(in srgb, var(--accent) 70%, transparent); }
+.sw-h{ font-size:10.5px; color:var(--text-dim); font-variant-numeric:tabular-nums; min-height:13px; }
+.sw-edit{ position:absolute; top:6px; right:8px; }
+.sw-x{ display:flex; gap:10px; flex:1 1 100%; border-top:1px solid var(--border); padding-top:10px; }
+.sw-k{ flex:1; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; cursor:default; }
+.sw-k[data-action]{ cursor:pointer; }
+.sw-k span{ font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim); }
+.sw-k b{ font-size:17px; font-weight:700; font-variant-numeric:tabular-nums; }
+.sw-k b small, .sw-k > small{ font-size:11px; font-weight:500; color:var(--text-dim); }
+.sw-bar{ display:block; flex:1 1 60px; height:5px; border-radius:3px; background:rgba(var(--ink),.08); overflow:hidden; align-self:center; }
+.sw-bar u{ display:block; height:100%; background:linear-gradient(90deg, #e8a23d, var(--good)); border-radius:3px; transition:width .8s ease; }
+
+/* Settings: Today & locked in */
+.ls-picks{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; margin-top:8px; }
+.ls-pick{ display:flex; flex-direction:column; align-items:flex-start; gap:4px; text-align:left; padding:12px; border-radius:14px; border:1px solid var(--border); background:rgba(var(--ink),.02); color:var(--text); cursor:pointer; transition:border-color .2s, background .2s; }
+.ls-pick.is-on{ border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, transparent); }
+.ls-pick small{ font-size:11.5px; color:var(--text-dim); line-height:1.35; }
+.ls-mini{ display:flex; gap:5px; width:100%; height:38px; margin-bottom:4px; }
+.ls-mini i{ border-radius:6px; background:rgba(var(--ink),.08); }
+.ls-mini.is-player i:nth-child(1){ width:38px; } .ls-mini.is-player i:nth-child(2){ flex:1; } .ls-mini.is-player i:nth-child(3){ display:none; }
+.ls-mini.is-cockpit i{ flex:1; } .ls-mini.is-cockpit i:nth-child(1){ border-radius:50%; flex:none; width:38px; }
+
+/* Cockpit: timer, task and the day, three columns */
+.np.is-cockpit .np-main{ width:min(1180px, 94vw); }
+.ckp{ display:grid; grid-template-columns:minmax(220px, .9fr) minmax(260px, 1.2fr) minmax(260px, 1.1fr); gap:28px; align-items:center; width:100%; }
+.ckp-timer{ display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; }
+.ckp-timer .np-art.tm{ width:min(260px, 26vw); height:min(260px, 26vw); }
+.ckp-k{ font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); }
+.ckp-sub{ font-size:13px; color:var(--text-dim); }
+.ckp-hide{ display:none; }
+.ckp-cap{ font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); margin-bottom:8px; }
+.ckp-title{ font-family:var(--font-display); font-size:clamp(24px, 2.6vw, 34px); font-weight:700; line-height:1.15; letter-spacing:-.01em; }
+.ckp-done{ margin-top:12px; border:1px solid color-mix(in srgb, var(--good) 50%, transparent); background:color-mix(in srgb, var(--good) 12%, transparent); color:var(--good); border-radius:999px; padding:6px 14px; font-weight:600; cursor:pointer; }
+.ckp-q{ display:flex; flex-direction:column; gap:6px; }
+.ckp-qi{ display:flex; align-items:center; gap:10px; font-size:14px; color:var(--text-dim); }
+.ckp-qi span{ width:20px; height:20px; border-radius:50%; display:grid; place-items:center; font-size:11px; font-weight:700; background:rgba(var(--ink),.07); flex:none; }
+.ckp-qi.is-next{ color:var(--text); }
+.ckp-ctl{ display:flex; gap:14px; align-items:center; margin-top:22px; }
+.ckp-day{ padding:18px; border-radius:18px; background:rgba(var(--ink),.035); border:1px solid rgba(var(--ink),.08); }
+.ckp-row{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin:8px 0 6px; font-size:13px; color:var(--text-dim); }
+.ckp-row b{ color:var(--text); font-size:16px; font-variant-numeric:tabular-nums; }
+.ckp-row b small{ font-size:11px; color:var(--text-dim); font-weight:500; }
+.ckp-ev{ font-size:13px !important; text-align:right; }
+.ckp-day .sw{ padding:8px 0 0; border:0; background:none; flex-direction:column; align-items:stretch; gap:8px; }
+.ckp-day .sw-days{ min-width:0; gap:4px; }
+.ckp-day .sw-c{ width:30px; height:30px; }
+.ckp-day .sw-edit{ display:none; }
+@media (max-width:900px){ .ckp{ grid-template-columns:1fr; gap:18px; } .ckp-timer .np-art.tm{ width:180px; height:180px; } }
+
+/* the activity pill: one circle (the category color is the timer ring) */
+.ap-ring.is-cat{ width:20px; height:20px; }
+.activity-pill .ap-ring.is-cat .ap-ring-fg{ stroke:var(--good) !important; }
+.activity-pill .ap-ring.is-cat .ap-ring-bg{ stroke:color-mix(in srgb, var(--good) 22%, transparent) !important; }
+.activity-pill[data-cat="other"] .ap-ring.is-cat .ap-ring-fg{ stroke:var(--danger) !important; }
+.activity-pill[data-cat="other"] .ap-ring.is-cat .ap-ring-bg{ stroke:color-mix(in srgb, var(--danger) 22%, transparent) !important; }
+.activity-pill[data-cat="unsorted"] .ap-ring.is-cat .ap-ring-fg, .activity-pill[data-cat="neutral"] .ap-ring.is-cat .ap-ring-fg{ stroke:color-mix(in srgb, var(--op-c) 55%, #8d9bff) !important; }
+.activity-pill[data-cat="unsorted"] .ap-ring.is-cat .ap-ring-bg, .activity-pill[data-cat="neutral"] .ap-ring.is-cat .ap-ring-bg{ stroke:rgba(141,155,255,.22) !important; }
+.activity-pill[data-state="break"] .ap-ring.is-cat .ap-ring-fg{ stroke:#e8a23d !important; }
+.activity-pill[data-state="break"] .ap-ring.is-cat .ap-ring-bg{ stroke:rgba(232,162,61,.22) !important; }
+.activity-pill[data-cat="work"] .ap-ring.is-cat{ filter:drop-shadow(0 0 3px color-mix(in srgb, var(--good) 60%, transparent)); }
+/* (its menu: above everything near it, sitting on the white pill) */
+.ap-menu{ z-index:9600 !important; left:229px; bottom:62px; }
+body.sb-collapsed .ap-menu{ left:69px; }
+@media (max-width:900px){ .ap-menu{ left:5px; } }
+.ckp-day .sw-x{ display:none; }
+.rc-xp-held{ background:rgba(232,162,61,.14); color:#e8a23d; }
+
+/* ===================== Round 35 ===================== */
+/* the stats row: one compact card under the hero */
+.sw-wrap{ margin:0; }
+.sw.is-row{ flex-wrap:nowrap; gap:22px; padding:14px 20px; border-radius:16px; background:var(--panel); }
+.sw.is-row .sw-days{ min-width:0; max-width:420px; }
+.sw.is-row .sw-k{ flex:0 0 auto; display:flex; flex-direction:column; align-items:flex-start; gap:5px; padding-left:22px; border-left:1px solid var(--border); min-width:130px; }
+.sw.is-row .sw-k b{ font-size:20px; }
+.sw.is-row .sw-k .sw-bar{ flex:none; width:100%; }
+.sw-edit{ opacity:0; transition:opacity .2s; }
+.sw:hover .sw-edit{ opacity:1; }
+@media (max-width:1100px){ .sw.is-row{ flex-wrap:wrap; } .sw.is-row .sw-k{ border-left:0; padding-left:0; } }
+/* the hero without the streak: name, Op, the time, the weather across the bottom */
+.th-left.th-mix{ justify-content:center; }
+.th-mix .th-wx{ margin-top:6px; }
+/* full-screen changes go through black, never through the app behind */
+.fs-veil{ position:fixed; inset:0; z-index:2147483000; background:#05060c; opacity:1; pointer-events:none; }
+.fs-veil.is-on{ opacity:1; }
+.fs-veil.is-out{ transition:opacity .38s ease; opacity:0; pointer-events:none; }
+.np{ animation-name:npInDark !important; }
+@keyframes npInDark{ from{ filter:brightness(0); } }
+.np.is-leaving{ animation:npOutDark .2s ease forwards !important; }
+@keyframes npOutDark{ to{ filter:brightness(0); } }
+/* Op's hello under the business name: his light, then the words, in his color */
+.th-op.is-hello{ padding:0; border:0; background:none; gap:12px; align-items:center; font-family:var(--font-display); font-size:28px; font-weight:600; letter-spacing:-.01em; line-height:1.15; }
+.th-op.is-hello .th-op-o{ width:14px; height:14px; }
+.th-op.is-hello .th-op-t{ color:var(--text); text-shadow:0 0 22px color-mix(in srgb, var(--op-c) 35%, transparent); }
+.th-op.is-hello .th-op-t i{ font-style:normal; display:inline-block; }
+.th-op.is-hello .th-op-t.is-in i{ animation:opHelloIn .55s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i) * 90ms + 120ms); }
+@keyframes opHelloIn{ from{ opacity:0; filter:blur(6px); transform:translateY(4px); } }
+.th-biz{ font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-family:inherit; }
+@media (max-width:760px){ .th-op.is-hello{ font-size:22px; } }
+/* the hero: name side, the card dead center, the buttons side */
+@media (min-width:1181px){
+  .today-hero{ display:grid !important; grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr); align-items:center; column-gap:28px; }
+  .today-hero > .th-left{ min-width:0; }
+  .today-hero > .th-card{ justify-self:center; }
+  .today-hero > .th-right{ justify-self:end; width:100%; max-width:400px; }
+}
+.th-mix .th-wx{ margin-top:10px; }
+.th-wx .skyp{ height:38px; padding:0 16px; }
+.op-bub:not(.is-in){ transition-duration:.2s !important; }
+.sw.is-row .sw-edit{ right:auto; left:12px; top:auto; bottom:6px; }
+/* the Cockpit is a night screen in both themes: it keeps the dark palette */
+.np.is-cockpit{ --text:#f3f5fb; --text-dim:rgba(235,240,255,.62); --text-faint:rgba(235,240,255,.4); --ink:255,255,255; --border:rgba(255,255,255,.1); color:#f3f5fb; }
+/* Op's light on a light page: a soft rim so it reads */
+html[data-theme="light"] .th-op.is-hello .th-op-o, :root[data-theme="light"] .th-op.is-hello .th-op-o{ box-shadow:0 0 0 1px rgba(90,110,220,.35), 0 0 12px color-mix(in srgb, var(--op-c) 60%, #8fa0ff); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -24442,9 +24724,9 @@ function wakeBriefHtml(){
   let k = 0, tcur = base;
   const panel = function(cls, anim, voice, html, extraStyle, attrs){
     const d = tcur; k++;
-    const wms = typeof opVoiceOn==='function' && opVoiceOn() ? 250 : BRIEF_WORD_MS;
+    const voiceOn = typeof opVoiceOn==='function' && opVoiceOn(), wms = voiceOn ? 250 : BRIEF_WORD_MS;
     // (quicker again: the page builds at reading pace; the voice keeps up by moving to the newest line)
-    if(voice){ lines.push({at: d - 380, text: voice, key:String(cls).split(' ')[0].replace(/^br-/, '')}); tcur += Math.max(900, voice.split(' ').length*wms + 300); } else tcur += 500;
+    if(voice){ lines.push({at: d - 380, text: voice, key:String(cls).split(' ')[0].replace(/^br-/, '')}); tcur += voiceOn ? Math.min(1500, Math.max(650, voice.split(' ').length*wms*0.55 + 200)) : Math.max(900, voice.split(' ').length*wms + 300); } else tcur += voiceOn ? 320 : 500;
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
   const slept = lastNightSleep();
@@ -33498,7 +33780,8 @@ function cxRibbonHtml(){
 }
 function cxNowCardHtml(){
   return '<section class="cx-card cx-now" style="--i:0">'+
-    '<div class="cx-clock"><svg class="cx-ring" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54"/><circle id="cxRingArc" cx="60" cy="60" r="54" pathLength="60" style="stroke-dashoffset:'+(60 - new Date().getSeconds())+'"/></svg>'+
+    // (round 33: the face is a clock style you can change by tapping it; the minute ring is the first)
+    '<div class="cx-clock">'+(typeof clockFaceHtml==='function' ? clockFaceHtml('cx-face') : '')+
       '<div class="cx-clock-t"><div id="calendarBigClock" class="cx-time"></div><div id="calendarBigClockDate" class="cx-date"></div></div></div>'+
     '<div class="cx-sub">Your day</div>'+cxRibbonHtml()+
   '</section>';
@@ -33510,11 +33793,9 @@ function cxAlarmsBodyHtml(){
   return '<div class="cx-alarms">'+
     '<div class="cx-al is-wake'+(wk.enabled ? '' : ' is-off')+'"><span class="cx-al-i">&#9728;&#65039;</span><button class="cx-al-main" data-action="cxAlarmSetup" data-id="wake"><small>Wake up'+(nw && nw.override ? ' &middot; just tomorrow' : '')+'</small><b>'+fmt12Hour(nw && wk.enabled ? nw.time : wk.time || '07:00')+'</b><span>'+(typeof wakeDaysLabel==='function' ? wakeDaysLabel(wk.days || []) : '')+'</span></button>'+cxSwitch(!!wk.enabled, 'cxWakeToggle', 'Wake-up alarm')+'</div>'+
     '<div class="cx-al is-work'+(w.enabled ? '' : ' is-off')+'"><span class="cx-al-i">&#128188;</span><button class="cx-al-main" data-action="cxAlarmSetup" data-id="work"><small>Work hours</small><b>'+fmt12Hour(w.start)+' &ndash; '+fmt12Hour(w.end)+'</b><span>'+(typeof wakeDaysLabel==='function' ? wakeDaysLabel(w.days || []) : '')+(w.lunchOn!==false ? ' &middot; lunch '+fmt12Hour(w.lunch) : '')+'</span></button>'+cxSwitch(!!w.enabled, 'cxWorkToggle', 'Work alarm')+'</div>'+
-    // (Good morning's setup lives behind the wake-up alarm now)
-    '<button class="cx-gm" data-action="cxAlarmSetup" data-id="wake"><span>&#127749;</span><b>Good morning</b><em>'+[wk.voice!==false ? 'Op speaks' : 'quiet', wk.news ? 'the news' : '', wk.useMusic ? 'a wake-up song' : ''].filter(Boolean).join(' &middot; ')+'</em><i>&#8250;</i></button>'+
-    (others.length ? '<div class="cx-sub" style="margin-top:6px;">Other alarms</div>' : '')+
-    '<div class="cx-others">'+others.map(function(a){ return '<div class="cx-o'+(a.enabled ? '' : ' is-off')+'"><b>'+fmt12Hour(a.time)+'</b><span>'+escapeHtml(a.label || 'Alarm')+(a.date ? ' <em>'+fmtDateShort(a.date)+'</em>' : '')+'</span><button class="cx-o-t" data-action="toggleAlarmEnabled" data-id="'+a.id+'">'+(a.enabled ? 'On' : 'Off')+'</button><button class="cx-o-x" data-action="openAlarmEditModal" data-id="'+a.id+'" title="Edit">&#9998;</button></div>'; }).join('')+'</div>'+
-    '<div class="cx-snd"><span>Sound</span>'+['peaceful', 'standard', 'loud'].map(function(s){ return '<button class="cx-chip'+(p.alarmSound===s ? ' is-on' : '')+'" data-action="pickAlarmSound" data-sound="'+s+'">'+s[0].toUpperCase()+s.slice(1)+'</button>'; }).join('')+'<button class="cx-chip" data-action="previewAlarmSound" title="Hear it" aria-label="Hear it">&#9654;</button></div>'+
+    // (round 33: every other alarm looks the same as the two masters: its emoji, the time, the days,
+    // a switch, and a tap opens it. The sound and Good morning live inside each alarm's own setup.)
+    others.map(function(a){ return '<div class="cx-al is-other'+(a.enabled ? '' : ' is-off')+'"><span class="cx-al-i">'+(a.emoji || '&#9200;')+'</span><button class="cx-al-main" data-action="openAlarmEditModal" data-id="'+a.id+'"><small>'+escapeHtml(a.label || 'Alarm')+'</small><b>'+fmt12Hour(a.time)+'</b><span>'+(a.date ? (a.date===todayStr() ? 'Today only' : fmtDateShort(a.date)+' only') : typeof wakeDaysLabel==='function' ? wakeDaysLabel(a.days || []) : '')+'</span></button>'+cxSwitch(!!a.enabled, 'cxAlarmToggle', escapeHtml(a.label || 'Alarm')).replace('data-action="cxAlarmToggle"', 'data-action="cxAlarmToggle" data-id="'+a.id+'"')+'</div>'; }).join('')+
   '</div>';
 }
 // reminders, compact: what, when, a circle to tick it off
@@ -33588,12 +33869,11 @@ calPrevMonth = (function(base){ return function(){ ui.cxDir = -1; return base.ap
 calNextMonth = (function(base){ return function(){ ui.cxDir = 1; return base.apply(this, arguments); }; })(calNextMonth);
 ACTIONS.cxToday = function(){ const n = new Date(); ui.cxDir = (n.getFullYear()*12 + n.getMonth()) < (ui.calendarYear*12 + ui.calendarMonth) ? -1 : 1; ui.calendarYear = n.getFullYear(); ui.calendarMonth = n.getMonth(); ui.calendarSelectedDate = todayStr(); renderView(); };
 ACTIONS.cxTier = function(el, e, id){ ui.cxTier = id==='month' ? 'month' : 'week'; renderView(); };
+ACTIONS.cxAlarmToggle = function(el, e, id){ const a = arr(state.focus.alarms).find(function(x){ return x.id===id; }); if(!a) return; a.enabled = !a.enabled; persist('focus'); playTick(); renderView(); };
 ACTIONS.cxDesk = function(el, e, id){ ui.cxDesk = id==='reminders' ? 'reminders' : 'alarms'; renderView(); };
 ACTIONS.cxWakeToggle = function(){ const w = wakeCfg(); w.enabled = !w.enabled; persist('focus'); playTick(); renderView(); };
 ACTIONS.cxWorkToggle = function(){ const w = workCfg(); w.enabled = !w.enabled; if(w.enabled){ const d = workDayState(); if(!d.rangAt && hmMin(w.start)!=null && hmMin(w.start) <= nowMin()) d.rangAt = Date.now(); } persist('focus'); playTick(); renderView(); };
 ACTIONS.cxAlarmSetup = function(el, e, id){ ui.alarmTab = id==='work' ? 'work' : 'wake'; if(typeof openWakeSetup==='function') openWakeSetup(); };
-// the minute ring
-setInterval(function(){ const a = document.getElementById('cxRingArc'); if(a) a.style.strokeDashoffset = String(60 - new Date().getSeconds()); }, 1000);
 // (the now line keeps up)
 setInterval(function(){ if(ui.view==='calendar' && !document.querySelector('.overlay:not(.hidden)') && !(document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))) renderView(); }, 60000);
 // ============ ROUND 32: ONE WAY TO ADD, CLEANER PAGES ============
@@ -34273,6 +34553,799 @@ opfEl = (function(base){
     return el;
   };
 })(opfEl);
+// ============ ROUND 33 ============
+//  • Clock styles. The minute ring is one of six faces: Ring, Orbit, Analog, Day arc, Dots, Pulse.
+//    Tap any clock to try the next one (or pick in Settings → Look & Sound). The same face shows on the
+//    Calendar, as a Clock panel you can add to Today, and on the wake-up screen.
+//  • Op's screen is one conversation: his light on top, everything you've said to each other under it,
+//    and a box you can type into or talk to, any time. (Plane and Chat were the same talk twice.)
+//  • Anything from Op wears his colour: his one-line reads and his cards take his mood.
+//  • Alarms you add get an emoji, so they look like the two master alarms on the Calendar.
+//  • Inspiration doesn't scroll: the wheel does nothing there now (drag still moves the sky).
+
+// ---- clocks ----
+const CLOCK_STYLES = [['ring', 'Ring'], ['minutes', 'Minutes'], ['orbit', 'Orbit'], ['analog', 'Analog'], ['day', 'Day arc'], ['dots', 'Dots'], ['pulse', 'Pulse']];
+function clockStyle(){ const s = state.profile.clockStyle; return CLOCK_STYLES.some(function(x){ return x[0]===s; }) ? s : 'ring'; }
+function clockFaceSvg(style){
+  const C = '<circle class="ck-track" cx="60" cy="60" r="54"/>';
+  if(style==='orbit') return C+'<path class="ck-trail" d=""/><g class="ck-orb"><circle class="ck-dot" cx="60" cy="6" r="5"/></g><circle class="ck-hub" cx="60" cy="60" r="3"/>';
+  if(style==='analog'){
+    let t = ''; for(let i = 0; i < 12; i++){ const a = i*30*Math.PI/180, r1 = i % 3 ? 49 : 45; t += '<line class="ck-tick'+(i % 3 ? '' : ' is-q')+'" x1="'+(60 + Math.sin(a)*r1).toFixed(1)+'" y1="'+(60 - Math.cos(a)*r1).toFixed(1)+'" x2="'+(60 + Math.sin(a)*53).toFixed(1)+'" y2="'+(60 - Math.cos(a)*53).toFixed(1)+'"/>'; }
+    return '<circle class="ck-face" cx="60" cy="60" r="56"/>'+t+'<line class="ck-h" x1="60" y1="60" x2="60" y2="32"/><line class="ck-m" x1="60" y1="60" x2="60" y2="16"/><line class="ck-s" x1="60" y1="68" x2="60" y2="10"/><circle class="ck-hub" cx="60" cy="60" r="3.5"/>';
+  }
+  if(style==='day'){ const D = 'M 23.23 96.77 A 52 52 0 1 1 96.77 96.77'; return '<path class="ck-track" d="'+D+'"/><path class="ck-daypath" d="'+D+'" pathLength="100"/><circle class="ck-sun" cx="23.23" cy="96.77" r="6"/>'; }
+  if(style==='dots'){ let d = ''; for(let i = 0; i < 60; i++){ const a = i*6*Math.PI/180; d += '<circle class="ck-d" data-i="'+i+'" cx="'+(60 + Math.sin(a)*52).toFixed(1)+'" cy="'+(60 - Math.cos(a)*52).toFixed(1)+'" r="'+(i % 5 ? 1.6 : 2.6)+'"/>'; } return d; }
+  if(style==='minutes'){ let d = ''; for(let i = 0; i < 60; i++){ const a = i*6*Math.PI/180; d += '<circle class="ck-mn" data-i="'+i+'" cx="'+(60 + Math.sin(a)*52).toFixed(1)+'" cy="'+(60 - Math.cos(a)*52).toFixed(1)+'" r="'+(i % 5 ? 2.2 : 3)+'"/>'; } return d; }
+  if(style==='pulse') return '<circle class="ck-p ck-p1" cx="60" cy="60" r="20"/><circle class="ck-p ck-p2" cx="60" cy="60" r="20"/><circle class="ck-core" cx="60" cy="60" r="12"/>';
+  return C+'<circle class="ck-arc" cx="60" cy="60" r="54" pathLength="60"/>';
+}
+// one clock: the face, and (inner) the time inside it
+function clockFaceHtml(cls, opts){
+  opts = opts || {}; const st = clockStyle();
+  return '<button class="ck ck-'+st+' '+(cls||'')+'" data-action="clockNext" data-style="'+st+'" title="'+CLOCK_STYLES.find(function(x){ return x[0]===st; })[1]+' · tap for another clock style" aria-label="Clock style: '+st+'">'+
+    '<svg viewBox="0 0 120 120" aria-hidden="true">'+clockFaceSvg(st)+'</svg>'+
+    (opts.inner ? '<span class="ck-in"><b class="ck-t"></b><small class="ck-d8"></small></span>' : '')+'</button>';
+}
+function clockTick(){
+  const now = new Date(), s = now.getSeconds(), m = now.getMinutes(), h = now.getHours(), ms = now.getMilliseconds();
+  document.querySelectorAll('.ck').forEach(function(ck){
+    const st = ck.dataset.style;
+    if(st==='ring'){ const a = ck.querySelector('.ck-arc'); if(a) a.style.strokeDashoffset = String(60 - s); }
+    else if(st==='orbit'){
+      const g = ck.querySelector('.ck-orb'); if(g) g.setAttribute('transform', 'rotate('+(s*6)+' 60 60)');
+      const tr = ck.querySelector('.ck-trail'); if(tr){ const a0 = Math.max(0, s - 12)*6*Math.PI/180, a1 = s*6*Math.PI/180; tr.setAttribute('d', 'M '+(60 + Math.sin(a0)*54).toFixed(2)+' '+(60 - Math.cos(a0)*54).toFixed(2)+' A 54 54 0 0 1 '+(60 + Math.sin(a1)*54).toFixed(2)+' '+(60 - Math.cos(a1)*54).toFixed(2)); }
+    }
+    else if(st==='analog'){
+      const set = function(sel, deg){ const el = ck.querySelector(sel); if(el) el.style.transform = 'rotate('+deg+'deg)'; };
+      set('.ck-h', (h % 12)*30 + m*0.5); set('.ck-m', m*6 + s*0.1); const sh = ck.querySelector('.ck-s'); if(sh){ sh.style.transition = s===0 ? 'none' : ''; sh.style.transform = 'rotate('+(s*6)+'deg)'; }
+    }
+    else if(st==='day'){
+      const p = (h*60 + m)/1440, path = ck.querySelector('.ck-daypath'), sun = ck.querySelector('.ck-sun');
+      if(path) path.style.strokeDashoffset = String(100 - p*100);
+      if(sun && path && path.getTotalLength){ const L = path.getTotalLength(), pt = path.getPointAtLength(L*p); sun.setAttribute('cx', pt.x.toFixed(1)); sun.setAttribute('cy', pt.y.toFixed(1)); sun.classList.toggle('is-moon', h < 6 || h >= 20); }
+    }
+    else if(st==='dots'){ ck.querySelectorAll('.ck-d').forEach(function(d){ const i = +d.dataset.i; d.classList.toggle('is-on', i <= s); d.classList.toggle('is-now', i===s); d.classList.toggle('is-min', i===m); }); }
+    else if(st==='minutes'){ ck.querySelectorAll('.ck-mn').forEach(function(d){ const i = +d.dataset.i; d.classList.toggle('is-left', i >= m); d.classList.toggle('is-now', i===m); }); }
+    else if(st==='pulse'){ const p = ck.querySelector('.ck-p1'), q = ck.querySelector('.ck-p2'); if(p){ p.classList.remove('is-go'); q.classList.remove('is-go'); void p.getBoundingClientRect(); p.classList.add('is-go'); if(s % 5===0) q.classList.add('is-go'); } }
+    const t = ck.querySelector('.ck-t'); if(t) t.textContent = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+    const d8 = ck.querySelector('.ck-d8'); if(d8) d8.textContent = now.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'});
+  });
+}
+setInterval(clockTick, 1000);
+afterRenderHooks.push(clockTick);
+function clockSwap(st){
+  state.profile.clockStyle = st; persist('profile');
+  document.querySelectorAll('.ck').forEach(function(ck){
+    const inner = !!ck.querySelector('.ck-in'), cls = Array.prototype.filter.call(ck.classList, function(c){ return c!=='ck' && !/^ck-(ring|orbit|analog|day|dots|pulse)$/.test(c) && c!=='is-swap'; }).join(' ');
+    const t = document.createElement('div'); t.innerHTML = clockFaceHtml(cls, {inner:inner}); const n = t.firstChild; n.classList.add('is-swap');
+    ck.replaceWith(n);
+  });
+  clockTick();
+  document.querySelectorAll('.ck-pick').forEach(function(b){ b.classList.toggle('is-on', b.dataset.id===st); });
+}
+ACTIONS.clockNext = function(){ const i = CLOCK_STYLES.findIndex(function(x){ return x[0]===clockStyle(); }); clockSwap(CLOCK_STYLES[(i + 1) % CLOCK_STYLES.length][0]); playTick(); };
+ACTIONS.clockSet = function(el, e, id){ clockSwap(id); playTick(); };
+// a Clock panel for Today
+PANEL_DEFS.push({id:'clock', label:'Clock (tap it for another style)'});
+PANEL_RENDERERS.clock = function(){ setTimeout(clockTick, 30); return '<div class="section"><div class="card ck-panel">'+clockFaceHtml('ck-big', {inner:true})+'</div></div>'; };
+// the wake-up screen
+wakeRingHtml = (function(base){
+  return function(){
+    setTimeout(clockTick, 30);
+    return base.apply(this, arguments).replace(/<div class="wk2-clock" id="wakeClock">([^<]*)<\/div>/, function(m, t){ return '<div class="wk2-clock wk-ck">'+clockFaceHtml('ck-wake')+'<span id="wakeClock">'+t+'</span></div>'; });
+  };
+})(wakeRingHtml);
+// Settings → Look & Sound: pick one
+soundSettingsHtml = (function(base){
+  return function(){
+    const st = clockStyle();
+    return base.apply(this, arguments).replace('<div class="snd">', '<div class="snd"><div class="card section"><div class="snd-h"><div><div class="section-title" style="margin:0;">&#128336; Clock</div><div class="kpi-sub">Calendar, Today’s Clock panel and the wake-up screen.</div></div></div>'+
+      '<div class="ck-picks">'+CLOCK_STYLES.map(function(x){ return '<button class="ck-pick'+(x[0]===st ? ' is-on' : '')+'" data-action="clockSet" data-id="'+x[0]+'"><span class="ck ck-'+x[0]+' ck-mini" data-style="'+x[0]+'"><svg viewBox="0 0 120 120" aria-hidden="true">'+clockFaceSvg(x[0])+'</svg></span><b>'+x[1]+'</b></button>'; }).join('')+'</div></div>');
+  };
+})(soundSettingsHtml);
+
+// ---- Op's screen: one conversation ----
+opfMode = function(){ return 'chat'; };
+opfEl = (function(base){
+  return function(){
+    const fresh = !document.getElementById('opFull'), el = base.apply(this, arguments);
+    if(fresh){
+      const modes = el.querySelector('.opf-modes'); if(modes) modes.querySelectorAll('.opf-m[data-id]').forEach(function(b){ b.remove(); });
+      const orb = el.querySelector('.opf-orb'), chat = el.querySelector('.opf-chat'); if(orb && chat) chat.insertBefore(orb, chat.firstChild);
+      const inp = el.querySelector('#opfInput'); if(inp) inp.placeholder = 'Type to Op, or tap the light to talk…';
+      const hint = el.querySelector('.opf-hint'); if(hint) hint.remove();
+      const mic = el.querySelector('.opf-mic'); if(mic) mic.remove();
+    }
+    return el;
+  };
+})(opfEl);
+// (tapping his light talks; tapping anywhere else, or just typing, goes to the box)
+document.addEventListener('pointerdown', function(e){
+  if(!OPF.open || !e.target.closest) return;
+  if(e.target.closest('.opf-orb')){ e.preventDefault(); ACTIONS.opfTalk(); return; }
+  if(e.target.closest('#opFull') && !e.target.closest('button, a, input, textarea, .opf-log, .opf-acc, .opf-top')){ e.preventDefault(); const i = document.getElementById('opfInput'); if(i) i.focus(); }
+}, true);
+document.addEventListener('keydown', function(e){
+  if(!OPF.open || e.metaKey || e.ctrlKey || e.altKey || e.key.length!==1) return;
+  const a = document.activeElement; if(a && (a.tagName==='INPUT' || a.tagName==='TEXTAREA' || a.isContentEditable)) return;
+  if(document.querySelector('.overlay:not(.hidden)')) return;
+  const i = document.getElementById('opfInput'); if(i) i.focus();
+}, true);
+
+// ---- Op wears his colour ----
+// (his reads, his tips and his chips use --op-c, so they shift with his mood)
+
+// ---- alarms get an emoji ----
+const ALARM_EMOJI = ['&#9200;', '&#128138;', '&#128222;', '&#127947;&#65039;', '&#127859;', '&#128716;', '&#128188;', '&#127916;', '&#128694;', '&#129496;'];
+alarmSheetHtml = (function(base){
+  return function(){
+    const cur = ui.alarmEmoji || ALARM_EMOJI[0];
+    return base.apply(this, arguments).replace('<div class="as-lbl">Repeats</div>', '<div class="as-chips al-emo">'+ALARM_EMOJI.map(function(x){ return '<button class="as-chip'+(x===cur ? ' is-on' : '')+'" data-action="alarmEmoji" data-id="'+x+'">'+x+'</button>'; }).join('')+'</div><div class="as-lbl">Repeats</div>');
+  };
+})(alarmSheetHtml);
+ACTIONS.alarmEmoji = function(el, e, id){ const t = document.getElementById('alSheetTime'), l = document.getElementById('alSheetLabel'); if(t) ui.alarmSheetTime = t.value; ui.alarmLabelDraft = l ? l.value : ''; ui.alarmEmoji = id; addSheetRefresh('alarmSheet'); const l2 = document.getElementById('alSheetLabel'); if(l2) l2.value = ui.alarmLabelDraft; };
+openAlarmSheet = (function(base){ return function(){ ui.alarmEmoji = null; return base.apply(this, arguments); }; })(openAlarmSheet);
+ACTIONS.alarmSheetAdd = (function(base){ return function(){ const n = state.focus.alarms.length, r = base.apply(this, arguments); if(state.focus.alarms.length > n){ state.focus.alarms[state.focus.alarms.length - 1].emoji = ui.alarmEmoji || ALARM_EMOJI[0]; persist('focus'); renderView(); } return r; }; })(ACTIONS.alarmSheetAdd);
+
+// ---- Inspiration doesn't scroll ----
+inspBindWander = function(L){
+  L.addEventListener('wheel', function(e){ if(!e.target.closest('#inspPlane') || e.target.closest('textarea')) return; e.preventDefault(); e.stopImmediatePropagation(); }, {passive:false, capture:true});
+};
+inspHtml = (function(base){ return function(){ return base.apply(this, arguments).replace('Drag or scroll to wander · ', 'Drag to wander · '); }; })(inspHtml);
+
+// ---- smoother: a page fades in when you change pages or tabs ----
+afterRenderHooks.push(function(){
+  const key = ui.view+'|'+(ui.businessTab||'')+'|'+(ui.personalTab||'')+'|'+(ui.focusTab||'')+'|'+(ui.settingsTab||'');
+  if(ui._r33Key===key) return; ui._r33Key = key;
+  const v = document.getElementById('viewRoot'); if(!v) return;
+  v.classList.remove('r33-in'); void v.offsetWidth; v.classList.add('r33-in');
+});
+
+// ---- the locked-in timer gets styles too (same idea as the clocks) ----
+// The big square on the minimal locked-in screen. Tap it for the next one: Cover (the original), Ring
+// (the session filling up), Orbit (a light going round each minute), Dots (the hour, a dot a minute),
+// Breathe (a slow 4-second breath to settle into) and Fill (the session rising like water).
+// With a planned length it shows that session; without one, each hour fills and starts again.
+const TIMER_STYLES = [['art', 'Cover'], ['ring', 'Ring'], ['orbit', 'Orbit'], ['dots', 'Dots'], ['breathe', 'Breathe'], ['fill', 'Fill']];
+function timerStyle(){ const s = state.profile.timerStyle; return TIMER_STYLES.some(function(x){ return x[0]===s; }) ? s : 'art'; }
+function timerFaceSvg(st){
+  if(st==='ring') return '<circle class="tm-track" cx="60" cy="60" r="52"/><circle class="tm-arc" cx="60" cy="60" r="52" pathLength="100"/>';
+  if(st==='orbit') return '<circle class="tm-track" cx="60" cy="60" r="52"/><circle class="tm-arc is-thin" cx="60" cy="60" r="52" pathLength="100"/><g class="tm-orb"><circle class="tm-dot" cx="60" cy="8" r="5"/></g>';
+  if(st==='dots'){ let d = ''; for(let i = 0; i < 60; i++){ const a = i*6*Math.PI/180; d += '<circle class="tm-d" data-i="'+i+'" cx="'+(60 + Math.sin(a)*50).toFixed(1)+'" cy="'+(60 - Math.cos(a)*50).toFixed(1)+'" r="'+(i % 5 ? 1.8 : 2.8)+'"/>'; } return d; }
+  if(st==='breathe') return '<circle class="tm-b tm-b1" cx="60" cy="60" r="34"/><circle class="tm-b tm-b2" cx="60" cy="60" r="24"/><circle class="tm-b tm-b3" cx="60" cy="60" r="14"/>';
+  if(st==='fill') return '<defs><clipPath id="tmClip"><circle cx="60" cy="60" r="50"/></clipPath></defs><circle class="tm-track" cx="60" cy="60" r="52"/><g clip-path="url(#tmClip)"><path class="tm-water" d=""/></g>';
+  return '';
+}
+function timerFaceHtml(icon){
+  const st = timerStyle();
+  if(st==='art') return null;
+  return '<button class="np-art tm tm-'+st+'" data-action="timerNext" data-style="'+st+'" title="'+TIMER_STYLES.find(function(x){ return x[0]===st; })[1]+' · tap for another timer style"><svg viewBox="0 0 120 120" aria-hidden="true">'+timerFaceSvg(st)+'</svg><span class="tm-in"><i>'+icon+'</i><b class="tm-t"></b></span></button>';
+}
+renderLockedMinimal = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    return h.replace(/<div class="np-art( is-music)?"><span>([^<]*)<\/span>(<span class="np-art-eq wk2-eq">(?:<i><\/i>)+<\/span>)?<\/div>/, function(m, mus, icon){
+      const f = timerFaceHtml(icon); if(f){ setTimeout(timerTick, 20); return f; }
+      return m.replace('<div class="np-art', '<div data-action="timerNext" title="Tap for another timer style" class="np-art');
+    });
+  };
+})(renderLockedMinimal);
+function timerTick(){
+  const as = state.focus.activeSession; if(!as || as.onBreak) return;
+  const el = Date.now() - as.startedAt, plan = as.plannedMinutes ? as.plannedMinutes*60000 : 0;
+  const p = plan ? Math.min(1, el/plan) : (el % 3600000)/3600000, s = new Date().getSeconds();
+  document.querySelectorAll('.tm').forEach(function(tm){
+    const st = tm.dataset.style, arc = tm.querySelector('.tm-arc');
+    if(arc) arc.style.strokeDashoffset = String(100 - p*100);
+    if(st==='orbit'){ const g = tm.querySelector('.tm-orb'); if(g) g.setAttribute('transform', 'rotate('+(s*6)+' 60 60)'); }
+    if(st==='dots'){ const lit = Math.floor((plan ? p*60 : (el % 3600000)/60000)); tm.querySelectorAll('.tm-d').forEach(function(d){ const i = +d.dataset.i; d.classList.toggle('is-on', i < lit); d.classList.toggle('is-now', i===lit); }); }
+    if(st==='fill'){ const w = tm.querySelector('.tm-water'); if(w){ const y = 110 - p*100, ph = Date.now()/600; let d = 'M 0 '+y.toFixed(1); for(let x = 0; x <= 120; x += 10) d += ' L '+x+' '+(y + Math.sin(ph + x/14)*3).toFixed(1); w.setAttribute('d', d+' L 120 130 L 0 130 Z'); } }
+    const t = tm.querySelector('.tm-t'); if(t) t.textContent = formatElapsed(el);
+  });
+}
+setInterval(timerTick, 1000);
+ACTIONS.timerNext = function(){
+  const i = TIMER_STYLES.findIndex(function(x){ return x[0]===timerStyle(); });
+  state.profile.timerStyle = TIMER_STYLES[(i + 1) % TIMER_STYLES.length][0]; persist('profile'); playTick(); renderView();
+  setTimeout(function(){ const tm = document.querySelector('.np-locked .np-art'); if(tm) tm.classList.add('is-swap'); timerTick(); }, 10);
+};
+ACTIONS.timerSet = function(el, e, id){ state.profile.timerStyle = id; persist('profile'); playTick(); renderView(); };
+// (and in Settings, under the clock styles)
+soundSettingsHtml = (function(base){
+  return function(){
+    const st = timerStyle();
+    return base.apply(this, arguments).replace('<div class="ck-picks">', '<div class="ck-picks">').replace(/(<div class="ck-picks">[\s\S]*?<\/div>)(<\/div>)/, function(m, picks, close){
+      return picks+'<div class="kpi-sub" style="margin-top:14px;">Locked-in timer (tap it while you work to change it)</div><div class="tm-picks">'+TIMER_STYLES.map(function(x){ return '<button class="ck-pick tm-pick'+(x[0]===st ? ' is-on' : '')+'" data-action="timerSet" data-id="'+x[0]+'"><span class="tm-mini tm-'+x[0]+'"><svg viewBox="0 0 120 120" aria-hidden="true">'+(x[0]==='art' ? '<rect class="tm-cover" x="10" y="10" width="100" height="100" rx="22"/>' : timerFaceSvg(x[0]))+'</svg></span><b>'+x[1]+'</b></button>'; }).join('')+'</div>'+close;
+    });
+  };
+})(soundSettingsHtml);
+
+// ---- a clock in the corner (the music bar, top right) ----
+// Settings → Look & Sound → Clock: "Show it in the corner". Tiny, always there, the same style; tap the
+// face for the next style.
+dockHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(!state.profile.clockInDock) return h;
+    const t = new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+    return h.replace(/^(<div class="md-in[^"]*">)/, '$1<span class="md-ck">'+clockFaceHtml('ck-dock')+'<b>'+t+'</b></span>');
+  };
+})(dockHtml);
+setInterval(function(){ if(state && state.profile && state.profile.clockInDock && typeof dockRefresh==='function') dockRefresh(); }, 15000);
+ACTIONS.clockDock = function(){ state.profile.clockInDock = !state.profile.clockInDock; persist('profile'); playTick(); dockRefresh(); renderView(); };
+soundSettingsHtml = (function(base){
+  return function(){
+    const on = !!state.profile.clockInDock;
+    return base.apply(this, arguments).replace('<div class="kpi-sub">Calendar, Today’s Clock panel and the wake-up screen.</div></div></div>', '<div class="kpi-sub">Calendar, Today’s Clock panel and the wake-up screen.</div></div><label class="ck-dock-sw" title="A small clock in the music bar, top right, on every page"><span>Show it in the corner</span><button class="cx-switch'+(on ? ' is-on' : '')+'" data-action="clockDock" role="switch" aria-checked="'+on+'"><i></i></button></label></div>');
+  };
+})(soundSettingsHtml);
+// ============ ROUND 34: TODAY'S HERO MIXED, ONE WEEK EVERYWHERE, COCKPIT, ONE-CIRCLE PILL ============
+// • The streak and Time worked are one card: this week's days as the streak's circles, each ring
+//   filling with the hours you worked that day (a ✓ when the standard was met).
+// • Under the business name is a line from Op (his own words with a key, a local line without).
+// • The weather bar sits under the card and spreads across the whole width.
+// • Settings → Look & Sound → Today: "Split" (Deep work and Tasks in their own chips) or "All in one"
+//   (deep work, time worked, tasks and the streak in one panel).
+// • Every "this week" number starts Monday (Time worked used to start Sunday, so it never matched
+//   the This week panel or Analytics).
+// • A second locked-in view, Cockpit, picked in Settings next to the timer styles.
+// • The activity pill: the category color and the session timer are one ring.
+
+// ---- one week, Monday to Sunday, the same everywhere ----
+function weekWork(){
+  const ws = startOfWeekStr(todayStr()), today = todayStr(), target = state.standards.deepWorkTargetMinutes || 180, days = [];
+  let total = 0;
+  for(let i = 0; i < 7; i++){
+    const d = addDays(ws, i), m = d===today ? deepWorkMinutesTodayLive() : d > today ? null : deepWorkMinutesFor(d);
+    days.push({d:d, m:m, today:d===today, future:d > today}); total += m || 0;
+  }
+  return {days:days, total:total, target:target, yesterday:deepWorkMinutesFor(addDays(today, -1))};
+}
+timeWorkedHtml = function(){
+  const w = weekWork(), top = Math.max(w.target, ...w.days.map(function(x){ return x.m||0; }));
+  return '<div class="stat-chip-label">Time Worked</div>'+
+    '<div class="tw-top"><div><div class="tw-v">'+fmtDurationLabel(w.total)+'</div><div class="tw-s">this week &middot; yesterday '+fmtDurationLabel(w.yesterday)+'</div></div>'+
+    '<div class="tw-bars">'+w.days.map(function(x){ return '<i class="'+(x.today?'is-today':'')+(x.m!=null && x.m>=w.target?' is-hit':'')+(x.future?' is-future':'')+'" title="'+weekdayShort(x.d)+(x.m!=null ? ': '+fmtDurationLabel(x.m) : '')+'"><u style="height:'+(x.m ? Math.max(6, x.m/top*100) : 0).toFixed(1)+'%"></u><span>'+weekdayShort(x.d).slice(0,1)+'</span></i>'; }).join('')+'</div></div>';
+};
+function fmtH(m){ if(!m) return '0'; const h = m/60; return h >= 10 ? Math.round(h)+'h' : h >= 1 ? (Math.round(h*10)/10)+'h' : m+'m'; }
+
+// ---- the stats row under the hero: one compact card ----
+// the streak, this week as the streak's circles (each ring is the hours worked that day), deep work
+// today and tasks today. (This week's total lives in the This week panel; it shows here only when
+// that panel is off.)
+function weekPanelOn(){ return state.dashboardPanels.enabled.week!==false && arr(state.dashboardPanels.order).indexOf('week')>=0; }
+function streakWorkHtml(o){
+  o = o || {};
+  const w = weekWork(), streak = computeStreak(), allDone = dayStandardsComplete(todayStr()), full = !o.compact;
+  const C = 2*Math.PI*15;
+  const days = w.days.map(function(x){
+    const status = isBreakDay(x.d) ? 'broken' : dayVisualStatus(x.d), off = isDayOff(x.d) && status!=='worked';
+    const f = x.m ? Math.min(1, x.m/w.target) : 0;
+    const cls = 'sw-day is-'+(off ? 'off' : status)+(x.today ? ' is-today' : '')+(x.m!=null && x.m >= w.target ? ' is-hit' : '');
+    const title = weekdayShort(x.d)+(x.m!=null ? ' · '+fmtDurationLabel(x.m)+' worked' : '')+' · '+(status==='worked' ? 'standard met' : status==='broken' ? 'streak broke' : off ? 'day off' : status==='failed' ? 'missed' : x.future ? 'upcoming' : 'in progress');
+    return '<div class="'+cls+'" title="'+escapeHtml(title)+'">'+
+      '<span class="sw-c"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="sw-tr" cx="18" cy="18" r="15"/>'+(f ? '<circle class="sw-ar" cx="18" cy="18" r="15" stroke-dasharray="'+(C*f).toFixed(1)+' '+C.toFixed(1)+'"/>' : '')+'</svg>'+
+        '<b>'+(status==='worked' ? '&#10003;' : status==='broken' ? '&#10005;' : weekdayShort(x.d).slice(0,1))+'</b></span>'+
+      '<span class="sw-h">'+(x.future ? '' : fmtH(x.m))+'</span></div>';
+  }).join('');
+  const dwToday = deepWorkMinutesTodayLive();
+  const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today'; });
+  const doneToday = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); });
+  const showTotal = !full || !weekPanelOn();
+  return '<div class="sw'+(full ? ' is-row' : '')+(streak > 0 ? ' is-hot' : '')+'">'+
+    '<div class="sw-l"><div class="sw-streak"><span class="sw-flame">&#128293;</span><b class="'+(o.ticked ? 'streak-tick-pop' : '')+'">'+streak+'</b><span>day'+(streak===1 ? '' : 's')+'<br>streak</span>'+(allDone ? '<span class="streak-ok" title="Today\'s standard: done">&#10003;</span>' : '')+(full ? tip((streak===0 ? 'Hit today\'s standard to start one. ' : allDone ? 'Today\'s in the bag. ' : 'Hit today\'s standard to keep it going. ')+'The streak counts days in a row you hit Today\'s Standard: the deep-work target plus your checklist. Each circle is a day this week; its ring fills with the hours you worked.') : '')+'</div>'+
+      (showTotal ? '<div class="sw-tw"><b>'+fmtDurationLabel(w.total)+'</b><span>this week</span></div>' : '')+'</div>'+
+    '<div class="sw-days">'+days+'</div>'+
+    (full ? '<div class="sw-k" id="swDeep" title="Deep work today"><span>Deep work today</span><b>'+fmtHours(dwToday)+'<small> / '+fmtHours(w.target)+'</small></b><i class="sw-bar"><u style="width:'+Math.min(100, dwToday/w.target*100).toFixed(1)+'%"></u></i></div>'+
+      '<div class="sw-k" data-action="goToFinishedTasks" title="Tasks done today"><span>Tasks today</span><b>'+doneToday.length+'<small> / '+(doneToday.length+todayTasks.length)+'</small></b></div>' : '')+
+    '<button class="streak-edit-btn sw-edit" data-action="openStreakEdit" title="Edit streak days">Edit</button>'+
+  '</div>';
+}
+
+// ---- Op's line under the business name ----
+function thOpLocal(){
+  const h = new Date().getHours(), p = state.profile, name = (p.name || '').split(' ')[0];
+  const greet = h < 5 ? 'Still up' : h < 12 ? 'Morning' : h < 18 ? 'Afternoon' : 'Evening';
+  const dw = deepWorkMinutesTodayLive(), target = state.standards.deepWorkTargetMinutes || 180, nx = typeof nextUpTask==='function' ? nextUpTask() : null;
+  if(h < 5) return greet+', '+name+'. Whatever it is, it’ll still be there after some sleep.';
+  if(dw >= target) return greet+', '+name+'. Target’s hit. Anything else today is a bonus.';
+  if(dw > 0) return greet+', '+name+'. '+fmtDurationLabel(dw)+' in, '+fmtDurationLabel(target - dw)+' to go.'+(nx ? ' “'+nx.title+'” is next.' : '');
+  if(nx) return greet+', '+name+'. “'+nx.title+'” is up first when you’re ready.';
+  return greet+', '+name+'. Clean slate today.';
+}
+function thOpKey(){ const h = new Date().getHours(); return todayStr()+':'+(h < 5 ? 0 : h < 12 ? 1 : h < 15 ? 2 : h < 18 ? 3 : 4); }
+function thOpText(){
+  const s = ui.thOp;
+  if(s && s.k===thOpKey() && s.text) return s.text;
+  thOpKick();
+  return thOpLocal();
+}
+function thOpKick(force){
+  if(typeof aiWrite!=='function' || AI.hasKey===false) return;
+  const k = thOpKey();
+  if(!force && ui.thOp && ui.thOp.k===k) return;   // (one try per part of the day: a failed call doesn't retry on every render)
+  ui.thOp = {k:k, busy:true};
+  const dw = deepWorkMinutesTodayLive(), target = state.standards.deepWorkTargetMinutes || 180, nx = typeof nextUpTask==='function' ? nextUpTask() : null;
+  const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today'; }).length, done = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); }).length;
+  const ev = arr(state.calendar.events).filter(function(e){ return e.date===todayStr() && e.time && e.time > nowHM(); }).sort(function(a, b){ return a.time.localeCompare(b.time); })[0];
+  const facts = 'Time: '+fmt12Hour(nowHM())+', '+weekdayShort(todayStr())+'. Deep work today: '+fmtDurationLabel(dw)+' of '+fmtDurationLabel(target)+'. Tasks: '+done+' done, '+todayTasks+' open. Streak: '+computeStreak()+' days.'+(nx ? ' Next up: '+nx.title+'.' : '')+(ev ? ' Next on the calendar: '+ev.title+' at '+fmt12Hour(ev.time)+'.' : '');
+  aiWrite('Write the one line I see under my business name at the top of my dashboard right now. You, talking to me, like a friend who knows my day: warm or witty, personal, a nod to where I stand. One sentence, under 16 words. Greet me by name if it fits. No quotes, no em dashes, nothing else.\n\nFacts: '+facts, {max:80}).then(function(t){
+    t = String(t || '').trim().replace(/^["“]|["”]$/g, '').replace(/\s*[—–]\s*/g, ', ');
+    ui.thOp = {k:k, text:t || null};
+    const el = document.querySelector('.th-op-t');
+    if(el && t){ el.textContent = t; const box = el.closest('.th-op'); if(box){ box.classList.remove('is-new'); void box.offsetWidth; box.classList.add('is-new'); } }
+  }).catch(function(){ ui.thOp = {k:k, text:null}; });
+}
+ACTIONS.thOpAgain = function(el){ const b = el.closest('.th-op'); if(b) b.classList.add('is-busy'); thOpKick(true); };
+function thOpHtml(){
+  return '<div class="th-op" title="From Op"><i class="th-op-o"></i><span class="th-op-t">'+escapeHtml(thOpText())+'</span>'+
+    (AI.hasKey===true ? '<button class="th-op-r" data-action="thOpAgain" title="Another line">&#8635;</button>' : '')+'</div>';
+}
+
+// ---- the hero's left side ----
+renderTodayHero = (function(base){
+  return function(greeting){
+    const h = base.apply(this, arguments);
+    const a = h.indexOf('<div class="th-left">'), b = h.indexOf('<div class="th-card">') >= 0 ? h.indexOf('<div class="th-card">') : h.indexOf('<div class="th-right">');
+    if(a < 0 || b < 0) return h;
+    const p = state.profile, streak = computeStreak(), ticked = /streak-tick-pop/.test(h.slice(a, b));
+    const left = '<div class="th-left th-mix">'+
+      '<div class="th-biz">'+escapeHtml(p.businessName || 'Operator')+'</div>'+
+      thOpHtml()+
+      (p.bigClockOnToday ? '<div id="liveClockBig" class="cal-big-clock th-bigclock"></div>' : '<div class="th-sub" id="liveClock"></div>')+
+      (state.profile.skyChip===false ? '' : '<div class="th-wx">'+skyChipHtml()+'</div>')+
+    '</div>';
+    void streak;
+    return h.slice(0, a)+left+h.slice(b);
+  };
+})(renderTodayHero);
+// the sky pill, spread out: the weather on the left, the sun's whole day across the rest
+skyChipHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(!h) return h;
+    const w = dayWindow(), now = wxNow(), m = new Date().getHours()*60 + new Date().getMinutes();
+    const left = m < w.rise ? 'Sun up in '+fmtDurationLabel(w.rise - m) : m < w.set ? fmtDurationLabel(w.set - m)+' of light left' : 'Sun’s down';
+    return h.replace('<span class="skyp-sun">', (now ? '<span class="skyp-hl">H '+now.hi+'&deg; &middot; L '+now.lo+'&deg;</span>' : '')+'<span class="skyp-left">'+left+'</span><span class="skyp-sun">');
+  };
+})(skyChipHtml);
+
+// ---- the stat chips become that one card ----
+renderPersonalStatsPanel = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    return h.replace(/<div class="grid grid-3 stat-chip-row">[\s\S]*?<\/div><div class="card" style="text-align:center;margin-top:10px;">/, '<div class="sw-wrap">'+streakWorkHtml()+'</div><div class="card" style="text-align:center;margin-top:10px;">');
+  };
+})(renderPersonalStatsPanel);
+PANEL_RENDERERS.personalStats = function(){ return renderPersonalStatsPanel(); };
+// (deep work today keeps ticking while you work)
+setInterval(function(){
+  const k = document.querySelector('#swDeep b'); if(!k) return;
+  const v = fmtHours(deepWorkMinutesTodayLive()); if(k.firstChild && k.firstChild.nodeType===3 && k.firstChild.textContent!==v) k.firstChild.textContent = v;
+}, 30000);
+
+// ---- Cockpit: a second locked-in view ----
+const LOCKED_STYLES = [['player', 'Player', 'The task like a song playing: big cover, the timer as its progress.'], ['cockpit', 'Cockpit', 'Timer, task and your whole day at a glance: the week, deep work, what’s next.']];
+function lockedStyle(){ return state.profile.lockedStyle==='cockpit' ? 'cockpit' : 'player'; }
+function cockpitHtml(){
+  const as = state.focus.activeSession;
+  const cur = ui.currentTaskId ? state.tasks.items.find(function(t){ return t.id===ui.currentTaskId; }) : null;
+  const nx = typeof nextUpTask==='function' ? nextUpTask() : null;
+  const m = as.method && typeof LOCK_METHODS!=='undefined' ? LOCK_METHODS[as.method.id] : null;
+  const st = typeof methodState==='function' ? methodState() : null;
+  const elapsed = Date.now() - as.startedAt, target = state.standards.deepWorkTargetMinutes || 180, dw = deepWorkMinutesTodayLive();
+  const face = (typeof timerFaceHtml==='function' && timerFaceHtml(m ? m.icon : '&#128274;')) ||
+    '<button class="np-art tm tm-ring" data-action="timerNext" data-style="ring" title="Tap for another timer style"><svg viewBox="0 0 120 120" aria-hidden="true">'+timerFaceSvg('ring')+'</svg><span class="tm-in"><i>'+(m ? m.icon : '&#128274;')+'</i><b class="tm-t"></b></span></button>';
+  const queue = state.tasks.items.filter(function(t){ return t.status==='today' && (!cur || t.id!==cur.id); }).slice(0, 4);
+  const done = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); }).length;
+  const ev = arr(state.calendar.events).filter(function(e){ return e.date===todayStr() && e.time && e.time > nowHM(); }).sort(function(a, b){ return a.time.localeCompare(b.time); })[0];
+  setTimeout(function(){ if(typeof timerTick==='function') timerTick(); }, 20);
+  return '<div class="ckp">'+
+    '<div class="ckp-timer">'+face+
+      '<div class="ckp-k">'+(m && as.method.id!=='block' ? m.label : 'Locked in')+'</div>'+
+      '<div class="ckp-sub">'+(st ? '<span id="msLine">'+methodLine(st)+'</span>' : (as.plannedMinutes ? 'until '+fmtTimeShort(as.startedAt + as.plannedMinutes*60000) : 'open-ended'))+'</div>'+
+      '<span id="focusElapsed" class="ckp-hide">'+formatElapsed(elapsed)+'</span>'+
+    '</div>'+
+    '<div class="ckp-task">'+
+      '<div class="ckp-cap">On it</div>'+
+      '<div class="ckp-title">'+(cur ? escapeHtml(cur.title) : 'Deep work')+'</div>'+
+      (cur ? '<button class="ckp-done" data-action="finishCurrentTask">&#10003; Done</button>' : '')+
+      (queue.length ? '<div class="ckp-cap" style="margin-top:18px;">Then</div><div class="ckp-q">'+queue.map(function(t, i){ return '<div class="ckp-qi'+(nx && nx.id===t.id ? ' is-next' : '')+'"><span>'+(i+1)+'</span>'+escapeHtml(t.title)+'</div>'; }).join('')+'</div>' : '')+
+      '<div class="ckp-ctl">'+
+        '<button class="np-c" data-action="openBreakNotePrompt" title="Take a break">&#9749;</button>'+
+        (typeof npMusicBtnHtml==='function' ? npMusicBtnHtml(true) : '')+
+        '<button class="np-c np-out" data-action="openStopFocus" title="Lock out">&#9632;</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="ckp-day">'+
+      '<div class="ckp-cap">Today</div>'+
+      '<div class="ckp-row"><span>Deep work</span><b>'+fmtHours(dw)+'<small> / '+fmtHours(target)+'</small></b></div><i class="sw-bar"><u style="width:'+Math.min(100, dw/target*100).toFixed(1)+'%"></u></i>'+
+      '<div class="ckp-row"><span>Tasks done</span><b>'+done+'</b></div>'+
+      (ev ? '<div class="ckp-row"><span>Next up</span><b class="ckp-ev">'+fmt12Hour(ev.time)+' &middot; '+escapeHtml(ev.title)+'</b></div>' : '')+
+      '<div class="ckp-cap" style="margin-top:16px;">This week</div>'+streakWorkHtml({compact:true})+
+    '</div>'+
+  '</div>';
+}
+renderLockedMinimal = (function(base){
+  return function(){
+    const as = state.focus.activeSession;
+    if(lockedStyle()!=='cockpit' || !as || as.onBreak) return base.apply(this, arguments);
+    return '<div class="np np-locked is-cockpit">'+
+      '<div class="np-bg"></div>'+
+      '<div class="np-top">'+npClockHtml()+'<span style="flex:1"></span>'+(typeof mctlHtml==='function' ? mctlHtml('mctl-np') : '')+lockedViewBtnHtml()+'</div>'+
+      '<div class="np-main">'+cockpitHtml()+'</div>'+
+    '</div>';
+  };
+})(renderLockedMinimal);
+ACTIONS.lockedStyleSet = function(el, e, id){ state.profile.lockedStyle = id; persist('profile'); playTick(); renderView(); };
+
+// ---- Settings → Look & Sound: Today and the locked-in view ----
+soundSettingsHtml = (function(base){
+  return function(){
+    const ls = lockedStyle();
+    return base.apply(this, arguments)+
+      '<div class="section r34-set"><div class="section-title">Locked in</div><div class="card">'+
+        '<div class="kpi-sub">Locked-in view (the Minimal button on Focus, or M)</div>'+
+        '<div class="ls-picks">'+LOCKED_STYLES.map(function(x){ return '<button class="ls-pick'+(x[0]===ls ? ' is-on' : '')+'" data-action="lockedStyleSet" data-id="'+x[0]+'"><span class="ls-mini is-'+x[0]+'"><i></i><i></i><i></i></span><b>'+x[1]+'</b><small>'+x[2]+'</small></button>'; }).join('')+'</div>'+
+      '</div></div>';
+  };
+})(soundSettingsHtml);
+
+// ---- the activity pill: one circle, color and timer together ----
+updateActivityPill = (function(base){
+  return function(){
+    base.apply(this, arguments);
+    const el = document.getElementById('activityPill'); if(!el) return;
+    const ring = el.querySelector('.ap-ring'), dot = el.querySelector('.ap-dot');
+    if(ring && dot) dot.remove();
+    if(ring) ring.classList.add('is-cat');
+  };
+})(updateActivityPill);
+
+// ---- auto lock-in, stricter ----
+// It used to start once the *latest* app was a work app and the stretch behind it (work and neutral
+// apps like Finder or Operator itself) was 12 minutes long. A minute in Final Cut after ten in Finder
+// was enough. Now:
+//  • only minutes you were actually active on work apps count (neutral apps don't add, they just
+//    don't break the stretch; a long stretch of neutral ends it)
+//  • the work has to be steady: most of the time since the stretch began, not a few blips
+//  • the latest work run has to be at least two minutes (no lock-in off a passing click)
+//  • outside your work hours it takes longer
+//  • it holds back for half an hour after you say an auto session wasn't work
+//  • when it starts, the notice has a "Not working" button that throws it away on the spot
+function autoWorkStretch(ivs){
+  let i = ivs.length - 1;
+  if(i < 0 || activityCategory(ivs[i].app)!=='work') return null;
+  let start = ivs[i].start, work = 0, neutralRun = 0, lastRun = 0, inLast = true;
+  for(; i >= 0; i--){
+    const iv = ivs[i], c = activityCategory(iv.app), len = Math.max(0, iv.end - iv.start);
+    if(i < ivs.length - 1 && start - iv.end > APP_ACTIVITY_GAP_MS*4) break;
+    if(c==='work'){ work += len; neutralRun = 0; if(inLast) lastRun += len; start = iv.start; }
+    else if(c==='neutral'){ neutralRun += len; inLast = false; if(neutralRun > 5*60000) break; start = iv.start; }
+    else break;
+  }
+  return {start:start, workMs:work, lastRunMs:lastRun};
+}
+function autoWorkMsFrom(ivs, from){
+  let ms = 0;
+  ivs.forEach(function(iv){ if(activityCategory(iv.app)!=='work') return; const a = Math.max(iv.start, from), b = iv.end; if(b > a) ms += b - a; });
+  return ms;
+}
+function autoThresholdMin(){
+  const st = state.settings.appTracking || {}, base = Math.max(1, Number(st.thresholdMinutes)||12);
+  const ph = typeof workPhase==='function' ? workPhase() : 'off';
+  return ph==='work' || ph==='off' ? base : Math.round(base*1.75);
+}
+autoLockInBlockedReason = (function(base){
+  return function(){
+    const r = base.apply(this, arguments); if(r) return r;
+    if(state.focus.autoRejectedAt && Date.now() - state.focus.autoRejectedAt < 30*60000) return 'rejected';
+    return null;
+  };
+})(autoLockInBlockedReason);
+checkAutoLockIn = (function(base){
+  return function(){
+    const st = state.settings.appTracking;
+    if(!st || st.enabled===false || st.autoLockIn===false) return;
+    if(state.focus.activeSession) return base.apply(this, arguments);   // (ending an auto session: unchanged)
+    const ivs = state.appActivity.todayIntervals; if(!ivs.length) return;
+    const last = ivs[ivs.length-1];
+    if(Date.now() - last.end > APP_ACTIVITY_GAP_MS) return;
+    if(autoLockInBlockedReason()) return;
+    const s = autoWorkStretch(ivs); if(!s) return;
+    const from = Math.max(s.start, autoLockInCountFrom({start:s.start}));
+    const workMin = autoWorkMsFrom(ivs, from)/60000, wallMin = (last.end - from)/60000, need = autoThresholdMin();
+    if(workMin < need) return;
+    if(workMin < wallMin*0.7) return;
+    if(s.lastRunMs < 2*60000) return;
+    if(autoLockInMeta.intervalStart===from) return;
+    autoLockInMeta = {app:last.app, intervalStart:from};
+    const staged = ui.stagedTaskId; ui.stagedTaskId = null; ui.currentTaskId = null; ui.currentTaskStartedAt = null;
+    startFocus(null);
+    ui.stagedTaskId = staged;
+    const a = state.focus.activeSession;
+    if(a){ a.autoStarted = true; a.startedAt = from; a.autoApp = last.app; a.noTask = true; }
+    persist('focus'); renderView();
+    showToast('Locked in automatically: on '+last.app+' since '+fmt12Hour(nowHM(new Date(from)))+'.', {icon:'&#128274;', actionLabel:'Not working', actionAction:'autoLockReject', duration:12000});
+  };
+})(checkAutoLockIn);
+ACTIONS.autoLockReject = function(){
+  const a = state.focus.activeSession; if(!a || !a.autoStarted) return;
+  state.focus.activeSession = null;
+  state.focus.autoRejectedAt = Date.now();
+  state.focus.lastSessionEndedAt = Date.now();
+  autoLockInMeta = {app:null, intervalStart:null};
+  persist('focus'); clearToasts(); renderView();
+  showToast('Thrown away. Auto lock-in waits half an hour.', {icon:'&#128465;', duration:4000});
+};
+
+// ---- XP comes off with a session you throw out ----
+// XP is counted from your sessions, so removing one rewinds what it paid. (The count is cached by
+// a signature; edits to a session's length are part of it now, so an edit rewinds too.)
+xpSig = (function(base){
+  return function(){
+    let h = 0; arr(state.focus.sessions).forEach(function(s){ h = (h*31 + (s.minutes||0)) % 1000000007; });
+    return base.apply(this, arguments)+'|'+h;
+  };
+})(xpSig);
+// the recap: throwing a session out says what it costs; an auto one shows its XP is waiting on you
+ACTIONS.recapDiscard = (function(base){
+  return function(el, e, id){
+    const before = xpSummary().total;
+    base.apply(this, arguments);
+    xpLast = null;
+    const lost = before - xpSummary().total;
+    if(lost > 0){ clearToasts(); showToast('Session removed: '+lost.toLocaleString()+' XP came off with it', {icon:'&#128465;', actionLabel:'Undo', actionAction:'undoRecapDiscard', duration:7000}); }
+  };
+})(ACTIONS.recapDiscard);
+
+// ============ ROUND 35: SMOOTH DAY LOOP, SLEEP FROM "THAT'S THE DAY", AUTO LOCK-IN / LOCK-OUT ============
+
+// ---- full-screen changes go through a dark veil ----
+// Clocking out, Done, going to sleep, Good morning, clocking back in: the full-screen views used to fade
+// through transparency, so for a beat you saw the regular app behind them. Now the screen dips to the
+// night color, the change happens behind it, and the new view comes up out of it.
+// (the change itself happens right away, so nothing that calls these waits on it)
+let fsVeilEl = null;
+function fsVeil(then, hold){
+  let v = fsVeilEl;
+  if(!v){ v = fsVeilEl = document.createElement('div'); v.className = 'fs-veil is-on'; document.body.appendChild(v); }
+  try{ then(); }finally{
+    clearTimeout(v._t);
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      v._t = setTimeout(function(){ v.classList.add('is-out'); if(fsVeilEl===v) fsVeilEl = null; setTimeout(function(){ v.remove(); }, 420); }, hold || 110);
+    }); });
+  }
+}
+// leaving a full-screen view: through the veil too (it used to fade the view out over the app)
+npLeave = function(then){ fsVeil(then); };
+['clockIn', 'windDone', 'startSleepMode', 'sleepUp', 'sleepGoodMorning', 'toggleLockedView', 'toggleFocusMinimal'].forEach(function(k){
+  const base = ACTIONS[k]; if(typeof base!=='function') return;
+  // (the ones that open a full-screen overlay hold the dark a little longer, while it comes in)
+  const hold = {clockIn:340, sleepGoodMorning:460, sleepUp:200}[k];
+  ACTIONS[k] = function(){ const a = arguments, self = this; fsVeil(function(){ base.apply(self, a); }, hold); };
+});
+// Clock out: straight into the wind-down behind the veil (no flash of the clocked-out page first)
+ACTIONS.clockOut = (function(base){
+  return function(){
+    if(state.focus.activeSession){ showToast('Lock out of your session first.', {icon:'&#128274;'}); return; }
+    const a = arguments, self = this;
+    fsVeil(function(){
+      base.apply(self, a);
+      if(typeof openWindDown==='function' && state.modes.active && state.modes.active.clockedOut && !overlayOpen('windOverlay')) openWindDown('recap');
+    }, 280);
+  };
+})(ACTIONS.clockOut);
+
+// ---- the end of the wind-down: just Done. Sleep lives on That's the day ----
+windHtml = (function(base){
+  return function(){
+    return base.apply(this, arguments).replace(/<button class="wd-alt" data-action="windGoToSleep"[^>]*>[\s\S]*?<\/button>/, '');
+  };
+})(windHtml);
+// That's the day: the Tomorrow button becomes the way to bed. "Tmrw 10 AM" → the sleep screen.
+function sleepBtnLabel(){
+  const target = typeof wakeTargetDate==='function' ? wakeTargetDate() : addDays(todayStr(), 1), wake = typeof wakeTimeFor==='function' ? wakeTimeFor(target) : null;
+  if(!wake) return '&#127769; Go to sleep';
+  return '&#127769; '+(target===addDays(todayStr(), 1) ? 'Tmrw' : target===todayStr() ? 'Today' : weekdayShort(target))+' '+fmt12Hour(wake);
+}
+renderWeekendOffView = (function(base){
+  return function(){
+    return base.apply(this, arguments).replace(/<button class="dayoff-back" data-action="openWindDown" data-step="alarm"[^>]*>[\s\S]*?<\/button>/,
+      '<button class="dayoff-back is-sleep" data-action="startSleepMode" title="Going to sleep: the screen goes dark until the alarm">'+sleepBtnLabel()+'</button>');
+  };
+})(renderWeekendOffView);
+
+// ---- auto lock-in: only work apps start it, and work minutes add up ----
+// Time in Operator, Finder, a browser it can't see into (Firefox) or anything not marked work never
+// starts a session and never counts toward one. Work minutes do add up across quick switches (a
+// minute here, three there); a long stretch away from work apps starts the count over.
+autoWorkStretch = function(ivs){
+  let i = ivs.length - 1;
+  if(i < 0 || activityCategory(ivs[i].app)!=='work') return null;
+  let start = ivs[i].start, work = 0, away = 0;
+  for(; i >= 0; i--){
+    const iv = ivs[i], c = activityCategory(iv.app), len = Math.max(0, iv.end - iv.start);
+    if(i < ivs.length - 1 && start - iv.end > 5*60000) break;           // a gap (idle or asleep)
+    if(c==='work'){ work += len; away = 0; start = iv.start; }
+    else { away += len; if(away > 5*60000) break; start = iv.start; }   // off work apps for 5+ minutes
+  }
+  return {start:start, workMs:work, lastRunMs:Infinity};
+};
+checkAutoLockIn = (function(){
+  const endPart = checkAutoLockIn;   // (round 34's: starts are below; its own handling of a running session stays)
+  return function(){
+    const st = state.settings.appTracking;
+    if(!st || st.enabled===false || st.autoLockIn===false) return;
+    if(state.focus.activeSession) return endPart.apply(this, arguments);
+    const ivs = state.appActivity.todayIntervals; if(!ivs.length) return;
+    const last = ivs[ivs.length-1];
+    if(Date.now() - last.end > APP_ACTIVITY_GAP_MS) return;
+    if(activityCategory(last.app)!=='work') return;
+    if(autoLockInBlockedReason()) return;
+    const s = autoWorkStretch(ivs); if(!s) return;
+    const from = Math.max(s.start, autoLockInCountFrom({start:s.start}));
+    const workMin = autoWorkMsFrom(ivs, from)/60000;
+    if(workMin < autoThresholdMin()) return;
+    if(autoLockInMeta.intervalStart===from) return;
+    // the session starts at your first work minute, not at a neutral app before it
+    let first = from; for(let k = 0; k < ivs.length; k++){ if(ivs[k].end > from && activityCategory(ivs[k].app)==='work'){ first = Math.max(from, ivs[k].start); break; } }
+    autoLockInMeta = {app:last.app, intervalStart:from};
+    const staged = ui.stagedTaskId; ui.stagedTaskId = null; ui.currentTaskId = null; ui.currentTaskStartedAt = null;
+    startFocus(null);
+    ui.stagedTaskId = staged;
+    const a = state.focus.activeSession;
+    if(a){ a.autoStarted = true; a.startedAt = first; a.autoApp = last.app; a.noTask = true; }
+    persist('focus'); renderView();
+    showToast('Locked in automatically: on '+last.app+' since '+fmt12Hour(nowHM(new Date(first)))+'.', {icon:'&#128274;', actionLabel:'Not working', actionAction:'autoLockReject', duration:12000});
+  };
+})();
+
+// ---- auto lock-out: a session ends where the work stopped ----
+// Any deep-work session, yours or automatic: once there's been no work activity for a while (3
+// minutes for an automatic one, your "away" time, 10 by default, for one you started), it stops at
+// the last moment you were working. Sitting in Operator or Finder doesn't keep it going, and neither
+// does a Mac left on. The real part is kept, the rest never counted, and
+// "Add it back" is there if you were working away from the keys.
+// (a session you started yourself also counts apps you haven't sorted, like a browser it can't see
+// into: you might well be working there. Operator, Finder and not-work apps don't count for either.)
+function lastWorkActivityEnd(ivs, since, loose){
+  for(let i = ivs.length - 1; i >= 0; i--){ const iv = ivs[i]; if(iv.end < since) break; const c = activityCategory(iv.app); if(c==='work' || (loose && c==='unsorted')) return iv.end; }
+  return null;
+}
+checkAwayFromSession = (function(base){
+  return function(){
+    base.apply(this, arguments);
+    const s = state.focus.activeSession, st = state.settings.appTracking;
+    if(!s || s.onBreak || !st || st.enabled===false || st.awayStop===false) return;
+    if(sessionType(s)!=='deep') return;
+    if(state.modes.active && state.modes.active.type && state.modes.active.type!=='offtime' && !state.modes.active.linkedFocus) return;
+    if(!lastRawSampleAt || Date.now() - lastRawSampleAt > 90000) return;   // the tracker has to be running
+    if(todayStr(new Date(s.startedAt))!==todayStr()) return;
+    const now = Date.now(), ivs = state.appActivity.todayIntervals;
+    const lw = Math.max(lastWorkActivityEnd(ivs, s.startedAt, !s.autoStarted) || 0, s.startedAt);
+    const limit = s.autoStarted ? Math.max(3, Number(st.graceMinutes)||3)*60000 : awayLimitMs();
+    if(now - lw < limit) return;
+    const last = ivs[ivs.length-1], app = last && now - last.end <= APP_ACTIVITY_GAP_MS ? last.app : null;
+    if(s.autoStarted){ autoEndFocusSession(Math.max(lw, s.startedAt + 60000)); autoLockInMeta = {app:null, intervalStart:null}; return; }
+    endSessionForAway(Math.max(lw, s.startedAt + 60000), now, 'offwork', app || 'nothing work-related');
+  };
+})(checkAwayFromSession);
+// (the checks also run on their own every half minute, not only when new activity comes in)
+setInterval(function(){ try{ if(state && state.focus && state.focus.activeSession){ checkAwayFromSession(); checkAutoLockIn(); } }catch(e){} }, 30000);
+
+// ---- the greeting under the business name is Op saying hi ----
+// A few words in his voice, nothing about work: "Still up, Andre?" late at night, something warm or a
+// little wry in the day. With a key he writes it (fresh each part of the day); without one he picks
+// from his own lines. It comes in word by word, like his lines in Good morning.
+const OP_HELLOS = {
+  late:['Still up, {n}?', 'The night shift again, {n}?', 'Owls and you, {n}.', 'Can’t sleep either, {n}?'],
+  early:['Early one, {n}.', 'Up with the sun, {n}.', 'Beat the alarm, {n}?', 'Quiet hours. Nice, {n}.'],
+  morning:['Morning, {n}.', 'There you are. Morning, {n}.', 'Coffee first, {n}.', 'Fresh day, {n}.'],
+  afternoon:['Afternoon, {n}.', 'Good to see you, {n}.', 'Hey, {n}. Still going strong?', 'Afternoon. Hydrated, {n}?'],
+  evening:['Evening, {n}.', 'Evening, {n}. Easy does it.', 'Golden hour, {n}.', 'Hey you. Long day, {n}?']
+};
+function opHelloPart(){ const h = new Date().getHours(); return h < 5 ? 'late' : h < 9 ? 'early' : h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening'; }
+thOpLocal = function(){
+  const part = opHelloPart(), list = OP_HELLOS[part], name = (state.profile.name || '').split(' ')[0] || 'friend';
+  const d = Number(todayStr().replace(/-/g, ''));
+  return list[d % list.length].replace('{n}', name);
+};
+thOpKick = function(force){
+  if(typeof aiWrite!=='function' || AI.hasKey===false) return;
+  const k = thOpKey();
+  if(!force && ui.thOp && ui.thOp.k===k) return;   // (one try per part of the day: a failed call doesn't retry on every render)
+  ui.thOp = {k:k, busy:true};
+  const name = (state.profile.name || '').split(' ')[0];
+  aiWrite('Say hi to me for the top of my dashboard, in your own voice: a tiny greeting, two to seven words, the way you would when I open the app. It’s '+fmt12Hour(nowHM())+' on a '+new Date().toLocaleDateString('en-US', {weekday:'long'})+'. Playful, warm or a little wry, your personality. Nothing about work, tasks, hours or plans. Use my name ('+name+') if it fits. For the feel: “Still up, '+name+'?” late at night. A different one every time. Only the greeting: no quotes, no em dashes.', {max:40}).then(function(t){
+    t = String(t || '').trim().split('\n')[0].replace(/^["“']|["”']$/g, '').replace(/\s*[—–]\s*/g, ', ');
+    if(t.split(/\s+/).length > 10) t = '';
+    ui.thOp = {k:k, text:t || null};
+    const el = document.querySelector('.th-op-t'); if(el && t) opHelloPaint(el, t);
+  }).catch(function(){ ui.thOp = {k:k, text:null}; });
+};
+function opHelloWords(t){ return escapeHtml(t).split(' ').map(function(w, i){ return '<i style="--i:'+i+'">'+w+'</i>'; }).join(' '); }
+function opHelloPaint(el, t){ el.innerHTML = opHelloWords(t); el.classList.remove('is-in'); void el.offsetWidth; el.classList.add('is-in'); ui.thOpShown = t; }
+thOpHtml = function(){
+  const t = thOpText(), fresh = ui.thOpShown!==t;
+  if(fresh) setTimeout(function(){ ui.thOpShown = t; }, 50);
+  return '<div class="th-op is-hello" title="Op"><i class="th-op-o"></i><span class="th-op-t'+(fresh ? ' is-in' : '')+'">'+opHelloWords(t)+'</span></div>';
+};
+ACTIONS.thOpAgain = function(){ thOpKick(true); };
+
+// ---- Good morning: shorter, and it asks ----
+// The panels come in at a quicker pace (the voice keeps up by moving to the newest line). Sports only
+// names your teams' games; otherwise it's the gist ("Yesterday was NFL Sunday") and a question. The
+// news is the gist and a question too. When a line asks something, the mic opens and the brief waits
+// for you before it goes on.
+const ASK_MORE = ['Want the rundown?', 'Want to hear about it?', 'Want more on that?'];
+sportsTease = function(){
+  const f = sportsTeaseFacts(); if(!f) return null;
+  const cap = function(t){ return t.charAt(0).toUpperCase()+t.slice(1); };
+  const fav = f.picks.filter(function(p){ return p.fav; })[0], parts = [];
+  if(fav) parts.push(cap(teaseGameLine(fav))+'.');
+  else if(f.soon.length){ const s = f.soon[0].g; parts.push('The '+(favWords().some(function(w){ return s.home.name.toLowerCase().indexOf(w) >= 0; }) ? s.home.short : s.away.short)+' play '+scoreWhen(s).replace('Today', 'today').replace('Tomorrow', 'tomorrow')+'.'); }
+  if(!fav && f.busy.length){
+    const b = f.busy.slice().sort(function(a, c){ return c.n - a.n; })[0], dow = new Date().getDay();
+    parts.push(/NFL/i.test(b.league) && dow===1 ? 'Yesterday was NFL Sunday.' : b.n >= 7 ? 'Big night in the '+b.league+'.' : 'A busy night in the '+b.league+'.');
+  } else if(!parts.length && f.picks.length) parts.push('A few games last night.');
+  if(!parts.length) return null;
+  parts.push(teasePick('askS', ASK_MORE));
+  return {text:parts.join(' '), topics:fav ? ['the '+(fav.g.home.win ? fav.g.home : fav.g.away).short+' game'] : ['the games'], facts:f.picks.slice(0, 4).map(function(p){ return p.league+': '+p.g.away.name+' '+p.g.away.score+', '+p.g.home.name+' '+p.g.home.score+' ('+(p.g.detail||p.g.state)+')'+(p.fav ? ' [his team]' : ''); })};
+};
+newsTease = (function(base){
+  return function(){
+    const r = base.apply(this, arguments); if(!r) return r;
+    if(r.big) return r;
+    const t = String(r.text).split(/(?<=[.!?])\s/)[0];
+    return Object.assign({}, r, {text:t+' '+teasePick('askN', ASK_MORE)});
+  };
+})(newsTease);
+opBriefRewrite = function(lines){
+  if(AI.hasKey!==true || typeof aiWrite!=='function') return;
+  const today = todayStr(), b = ui.briefAi && ui.briefAi.date===today ? ui.briefAi : (ui.briefAi = {date:today, map:{}, asked:{}});
+  const todo = lines.filter(function(l){ return l.key && !b.asked[l.key] && l.text; });
+  if(!todo.length) return;
+  todo.forEach(function(l){ b.asked[l.key] = 1; });
+  b.asked.greet = 1;
+  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, your humor where it fits. Keep them SHORT: under 12 words each. I don’t want the morning to drag or to be told everything. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. It’s about the morning, not work: nothing beyond what’s on today’s calendar.\n'+
+    'For the news and sports lines: the gist only, then ask if I want to hear more (end that line with the question). Sports: name my teams if they played, otherwise generalize (“Yesterday was NFL Sunday”). News: a few words on what’s going on, never a list; only a genuinely big story gets said plainly.\n'+
+    'Only say the lines themselves: never mention these instructions or comment on the request.\n'+
+    'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 10 words).\n'+
+    'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');
+  aiWrite(task, {max:500}).then(function(t){
+    if(!t) return;
+    String(t).split(/\n|(?=\b[a-z][a-z0-9-]*: )/).forEach(function(row){ const m = /^\s*([a-z][a-z0-9-]*):\s*(.+?)\s*$/.exec(row); if(m && b.asked[m[1]] && m[2].length < 220) b.map[m[1]] = m[2].replace(/^[“"]|[”"]$/g, ''); });
+  });
+};
+// a question in the brief opens the mic; the brief waits while you two talk
+opSay = (function(base){
+  return function(text, opts){
+    if(opts && opts.cap==='brVoice' && opts.noListen && /\?["”’)]*\s*$/.test(String(text||''))) opts = Object.assign({}, opts, {noListen:false});
+    return base.call(this, text, opts);
+  };
+})(opSay);
+opBriefTick = (function(base){
+  return function(lines, t){
+    if(OV.idx >= 0 && (AI.listening || AI.busy)) return true;
+    return base.apply(this, arguments);
+  };
+})(opBriefTick);
+
+// ---- shoo him off and his box goes ----
+// "I'm good", "nah", "that's all", "thanks": once he's answered, the box leaves in a couple of seconds
+// (not the usual long read time). The ✕ closes it straight away, quicker than before.
+const OP_SHOO = /^\s*(no|nah|nope|i'?m good|im good|i'?m fine|all good|that'?s (all|it)|nothing|not now|later|maybe later|stop|bye|goodbye|thanks?|thank you|ok(ay)?|cool|got it|leave it|never ?mind|we'?re good)\b/i;
+aiAsk = (function(base){
+  return function(text){
+    const t = String(text||'').trim();
+    AI.shooAt = (OP_SHOO.test(t) && t.split(/\s+/).length <= 6) ? Date.now() : 0;
+    return base.apply(this, arguments);
+  };
+})(aiAsk);
+opBubStay = (function(base){
+  return function(){ if(AI.shooAt && Date.now() - AI.shooAt < 90000) return 2400; return base.apply(this, arguments); };
+})(opBubStay);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
