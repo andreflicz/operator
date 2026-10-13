@@ -174,6 +174,8 @@ function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
   await shot('morning-board', async () => { await E("briefHeroSet('vision')"); await p.waitForTimeout(800); await p.click('.bh-board'); await p.waitForTimeout(700); });
   await E("ui.wakeBoardBig=false; briefHeroSet('wx')");
   await shot('morning-load', async () => { await E("wakeCfg().voice=true; document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); fireWake({})"); await p.click('[data-action=\"wakeStartDay\"]'); await E("OV.pre={ready:false}; ACTIONS.wakeIntroSkip()"); await p.clock.runFor(2500); await p.waitForTimeout(900); });
+  for(const t of ['overview','leads','clients','lifecycle','packages','finances']) await shot('biz-'+t, async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); state.focus.activeSession=null; state.profile.cardLayout='grid'; ui.view='business'; ui.businessTab='"+t+"'; renderView()"); await p.waitForTimeout(400); });
+  await shot('opfull', async () => { await E("document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); ui.view='today'; renderView(); opfOpen({})"); await p.waitForTimeout(1200); });
   await E("wakeCfg().voice=false");
   console.log('errors:', p.errors);
   await b.close();

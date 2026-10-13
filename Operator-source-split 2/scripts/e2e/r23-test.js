@@ -97,7 +97,8 @@ async function ctxPage(b, seed, opts){
     const p = await ctxPage(b, {profile:{name:'Andre', goalWeight:200, revenueGoalMonthly:20000}, health:{gymLog:[], weightLog:[{id:'w', date:'2026-09-01', weight:250}], calorieEntries:[]}}, {clock:WED});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("AI.hasKey = true; ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(300);
-    check('Goals: three sections (the big ones, this week & month, your goals)', (await p.$$('.gl .gl-sec')).length>=3 && /The big ones/i.test(await p.textContent('.gl')) && /Your goals/i.test(await p.textContent('.gl')));
+    // (round 32: one panel, divided: the big ones on top, this week & month, your goals)
+    check('Goals: one panel with the big ones, this week & month, your goals', !!(await p.$('.gl .gx-card .gx-top')) && !!(await p.$('.gl .gx-card .gx-split')) && /Your goals/i.test(await p.textContent('.gl')));
     check('the revenue card is minimal: no pill, no pen, a quiet "of $20,000"', !(await p.$('.mg-hero .mg-pen')) && /of \$20,000/.test(await p.textContent('.mg-hero .mg-target')));
     check('losing 50 lbs is a big one: +7,500 XP', /\+7,500 XP/.test(await p.textContent('.gl')) && await E("masterXpFor('weight', 250, 200)")===7500 && await E("masterXpFor('mrr', 0, 10000)")===6000);
     // (round 25: no + on the cards; the + in the corner opens the sheet, on This week)

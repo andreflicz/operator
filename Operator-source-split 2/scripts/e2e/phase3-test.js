@@ -69,7 +69,7 @@ const SP = require('./common.js').OUT;
   // events + shoot prep
   await E("intentStore().prompted['M'+monthKey()]=todayStr(); intentStore().prompted['W'+weekKey()]=todayStr()"); // the month/week prompt is covered in r18
   await p.click('[data-action="nav"][data-view="calendar"]');
-  await p.click('#fabAdd');
+  await p.click('#fabAdd'); await p.click('#addPick .ap-tile[data-id="0"]');   // (round 32: the + asks: an event, an alarm or a reminder)
   await p.fill('#calEventDate', ds(new Date(2026,9,8)));
   await p.fill('#calEventTime', '08:00'); await p.fill('#calEventTitle', 'Shoot with Nina');
   await p.fill('#calEventLocation', 'Studio 4');

@@ -112,8 +112,9 @@ const SP = require('./common.js').OUT;
   // clients tab board
   await p.click('[data-action="businessTab"][data-tab="clients"]');
   check('clients tab shows client cards', (await p.$$('.cc2')).length>=1);
-  check('FAB = add client', (await p.getAttribute('#fabAdd','aria-label'))==='Add client');
-  await p.click('#fabAdd'); await p.fill('#ncName','Zed'); await p.fill('#ncCompany','Zed Media'); await p.fill('#ncValue','900'); await p.click('[data-action="saveNewContact"]');
+  // (round 32: the + asks first: a client or a lead, client first on Clients)
+  await p.click('#fabAdd'); check('FAB = a client or a lead', /A client/.test(await p.textContent('#addPick .ap-tile[data-id="0"]')));
+  await p.click('#addPick .ap-tile[data-id="0"]'); await p.fill('#ncName','Zed'); await p.fill('#ncCompany','Zed Media'); await p.fill('#ncValue','900'); await p.click('[data-action="saveNewContact"]');
   check('new client created', (await E("state.business.clients.some(c=>c.business==='Zed Media' && c.stage==='onboarding' && c.status==='active')")));
   // round 13: a new client opens on its Plan section; the lifecycle moved to its own "Client cycle" section
   check('new client opens ready to set up (plan section)', await p.isVisible('#clientModalOverlay:not(.hidden) .cm-nav-i.is-on[data-id="plan"]'));
@@ -125,13 +126,14 @@ const SP = require('./common.js').OUT;
   await p.screenshot({path:SP+'/p4-leads.png'});
   // settings: stages + cadence
   // round 13: settings are grouped — Business lives under the "Business & Calendar" group (tab "work")
-  // (round 31: the business setup moved to Business → Setup)
-  await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="setup"]');
-  check('business settings shown in Business → Setup', await p.isVisible('.biz-setup #newStage-lead'));
-  await p.fill('#newStage-lead', 'Follow-up'); await p.click('[data-action="addStage"][data-kind="lead"]');
+  // (round 31: the business setup moved to Business; round 32: a gear by the title opens it as one sheet)
+  await p.click('[data-action="nav"][data-view="business"]'); await p.click('.biz-gear'); await p.click('#bizSetup [data-action="bsTab"][data-id="leads"]');
+  check('business settings shown in Business → setup sheet', await p.isVisible('#bizSetup #newStage-lead'));
+  await p.fill('#newStage-lead', 'Follow-up'); await p.press('#newStage-lead', 'Enter'); await p.waitForTimeout(100);
   check('stage added before Won', (await E("crmStages('lead').map(s=>s.label).join('|')")).includes('Proposal sent|Follow-up|Won'));
   await p.fill('[data-stage-label="lead:lead"]', 'Fresh'); await p.press('[data-stage-label="lead:lead"]','Tab');
   check('stage renamed', (await E("crmStage('lead','lead').label"))==='Fresh');
+  await p.click('#bizSetup [data-action="bsTab"][data-id="reach"]');
   await p.fill('#setClientCadence', '14'); await p.press('#setClientCadence','Tab');
   check('client cadence saved', (await E("crm().clientCadenceDays"))===14);
   check('no page errors', p.errors.length===0, p.errors);

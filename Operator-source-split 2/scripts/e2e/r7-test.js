@@ -88,7 +88,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('no "tracked for you" / quick-start clutter', !/tracked for you|quick start/i.test(await p.textContent('#viewRoot')));
     await p.click('[data-action="editMasterTarget"][data-id="mrr"]'); await p.fill('#mgEdit-mrr', '20000'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
     check('tap a target to change it in place (saved to Settings)', (await E("state.profile.revenueGoalMonthly"))===20000 && /\$20,000/.test(await p.textContent('.mg-hero')));
-    check('older goals still load under Your goals', /Post 3 reels/.test(await p.textContent('.goal-grid')));
+    check('older goals still load under Your goals', /Post 3 reels/.test(await p.textContent('.gx-mine')));
     // (round 23: the + opens the goal sheet; Long-term is a goal of your own)
     await p.click('#fabAdd'); await p.waitForTimeout(150); await p.click('[data-action="gsKind"][data-id="long"]'); await p.waitForTimeout(100);
     await p.fill('#gsLabel', '10k IG followers'); await p.fill('#gsTarget', '10000'); await p.fill('#gsUnit', 'followers'); await p.fill('#gsCurrent', '4200');

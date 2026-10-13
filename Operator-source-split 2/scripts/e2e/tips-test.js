@@ -21,6 +21,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('lock-in column sits flush with the hero\'s right padding', hero && right && hero.r-right.r <= 30, {hero, right});
   check('the quick-links ☰ is gone (round 18)', dock===null, dock);
 
+  await E("intentStore().prompted['M'+monthKey()]=todayStr(); intentStore().prompted['W'+weekKey()]=todayStr()");   // (the Calendar's check-in prompt is covered in r18)
   // ---- page taglines are tips now ----
   for(const v of ['focus','business','calendar','personal']){
     await nav(v);
@@ -85,7 +86,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('[data-action="crmToggleTools"][data-kind="lead"]'); await p.waitForTimeout(120);
   check('…search & sort still opens', await p.isVisible('#crmSearch-lead'));
   await p.click('[data-action="businessTab"][data-tab="clients"]'); await p.waitForTimeout(150);
-  check('Clients: no separate + Add client — the gold + adds one', !(await p.$('.crm-toolbar-slim .crm-add-btn')) && (await p.getAttribute('#fabAdd', 'data-label'))==='Add client');
+  check('Clients: no separate + Add client — the gold + adds one', !(await p.$('.crm-toolbar-slim .crm-add-btn')) && await E("(fabContext().menu||[]).map(m => m[1]).join('|')")==='A client|A lead');
 
   // ---- wake setup: the how-to text is behind "?" ----
   await E("openWakeSetup()"); await p.waitForTimeout(150);

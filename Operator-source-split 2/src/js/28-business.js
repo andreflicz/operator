@@ -5,7 +5,8 @@ function nextStageLabel(stage){
   return STAGE_LABELS[STAGE_ORDER[idx+1]];
 }
 function renderBusiness(){
-  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Business'+tip('Recurring revenue, who you\'re serving, who you\'re chasing, and what you owe.')+'</div></div></div>'+
+  // (round 32: the setup is a quiet gear by the title that opens one clean sheet, not a tab)
+  return '<div class="view-header"><div>'+businessNameTagHtml()+'<div class="view-title">Business'+tip('Recurring revenue, who you\'re serving, who you\'re chasing, and what you owe.')+'<button class="biz-gear" data-action="bizSetupOpen" title="Business setup: reach-out, messages, stages, cycles" aria-label="Business setup">&#9881;&#65038;</button></div></div></div>'+
   '<div class="tabs">'+
     '<div class="tab '+(ui.businessTab==='overview'?'active':'')+'" data-action="businessTab" data-tab="overview">Overview</div>'+
     '<div class="tab '+(ui.businessTab==='leads'?'active':'')+'" data-action="businessTab" data-tab="leads">Leads</div>'+
@@ -13,9 +14,8 @@ function renderBusiness(){
     '<div class="tab '+(ui.businessTab==='lifecycle'?'active':'')+'" data-action="businessTab" data-tab="lifecycle">Lifecycle</div>'+
     '<div class="tab '+(ui.businessTab==='packages'?'active':'')+'" data-action="businessTab" data-tab="packages">Packages</div>'+
     '<div class="tab '+(ui.businessTab==='finances'?'active':'')+'" data-action="businessTab" data-tab="finances">Finances</div>'+
-    '<div class="tab tab-setup '+(ui.businessTab==='setup'?'active':'')+'" data-action="businessTab" data-tab="setup" title="Reach-out cadence, message templates, lead stages, client cycles and statuses">&#9881; Setup</div>'+
   '</div>'+
-  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='setup' ? '<div class="biz-setup">'+renderCrmSettings()+'</div>' : ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
+  '<div class="tab-panel" data-key="business-'+ui.businessTab+'">'+(ui.businessTab==='leads' ? renderCrmTab('lead') : ui.businessTab==='clients' ? renderClientsHome() : ui.businessTab==='lifecycle' ? renderLifecycleTab() : ui.businessTab==='packages' ? renderPackagesTab() : ui.businessTab==='finances' ? renderFinances() : renderBusinessOverview())+'</div>';
 }
 // Business → Overview: one card — revenue on top, clients and pipeline side by side.
 function renderBusinessOverview(){

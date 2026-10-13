@@ -114,6 +114,8 @@
   "32z22-op-r31.js",
   "32z23-insp-r31.js",
   "32z24-calendar.js",
+  "32z25-r32-ui.js",
+  "32z26-op-r32.js",
   "33-event-delegation.js",
   "33b-overlay-dismiss.js",
   "33c-context-menu.js",

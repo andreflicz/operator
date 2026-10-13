@@ -63,8 +63,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('#fabAdd'); await p.click('[data-action="gsKind"][data-id="long"]');
   await p.fill('#gsLabel', 'Post 3 reels'); await p.fill('#gsTarget', '3'); await p.fill('#gsUnit', 'reels');
   await p.click('[data-action="gsSave"]'); await p.waitForTimeout(150);
-  check('goal card added', (await p.$$('.goal-card')).length===1);
-  for(let i=0;i<3;i++) await p.click('.goal-card [data-action="goalStep"][data-delta="1"]');
+  check('goal card added', (await p.$$('.gx-g')).length===1);
+  for(let i=0;i<3;i++) await p.click('.gx-g [data-action="goalStep"][data-delta="1"]');
   check('+1 steps reach the goal and mark it achieved', await E("state.goals.items[0].done===true && state.goals.items[0].current===3"));
   // fitness
   await p.click('[data-action="personalTab"][data-tab="fitness"]');

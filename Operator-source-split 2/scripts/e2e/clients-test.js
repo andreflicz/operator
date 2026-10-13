@@ -76,7 +76,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('clients without a cycle listed with a start button', (await p.$$('.lc-notin-row')).length>=2);
   await p.click('.lc-notin-row[data-key="lcn-c1"] [data-action="lcStartCycle"]');
   check('starting a cycle puts them on the board', await E("!!state.business.clients.find(c=>c.id==='c1').cycleId") && (await p.$$('.crm-board .crm-card[data-key="crm-c1"]')).length===1);
-  check('FAB adds a client on the Lifecycle tab', (await p.getAttribute('#fabAdd','aria-label'))==='Add client');
+  // (round 32: on Lifecycle the + makes a new cycle; clients and leads come from Overview / Clients / Leads)
+  check('FAB makes a new client cycle on the Lifecycle tab', (await p.getAttribute('#fabAdd','aria-label'))==='New client cycle');
   check('no page errors', p.errors.length===0, p.errors);
   await b.close();
   process.exit(report()?1:0);

@@ -221,7 +221,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const wk = await p.evaluate(() => { const o = document.querySelector('.hq-outreach'); return o ? {text:o.textContent, bars:o.querySelectorAll('.ow-day').length} : null; });
     check('Business overview shows this week\'s outreach (reached, due, streak)', wk && wk.bars===7 && /people reached/.test(wk.text) && /day streak/.test(wk.text) && /Peak Roofing/.test(wk.text), wk && wk.text.slice(0, 120));
     // templates
-    await E("ui.view = 'business'; ui.businessTab = 'setup'; renderView()"); await p.waitForTimeout(150);   // (round 31: Business → Setup)
+    await E("ui.view = 'business'; ui.businessTab = 'overview'; renderView(); ACTIONS.bizSetupOpen(); ACTIONS.bsTab(null, null, 'msgs')"); await p.waitForTimeout(150);   // (round 32: the Business setup sheet → Messages)
     await p.fill('[data-tpl="leadText"]', 'Yo {first}, {me} here'); await p.waitForTimeout(500);
     check('message templates are editable in Settings → Business', (await E("crm().templates.leadText"))==='Yo {first}, {me} here' && (await E("fillTemplate(crm().templates.leadText,'lead',state.business.pipeline[0])"))==='Yo Mike, Andre Flicz here');
     check('no errors', !p.errors.length, p.errors);

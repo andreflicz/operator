@@ -134,13 +134,16 @@ async function ctxPage(b, seed, opts){
     await E("ui.settingsTab = 'op'; renderView()"); await p.waitForTimeout(300);
     check('Op checks in on you is an Op setting now', /Op checks in on you/.test(await p.textContent('.settings-content')) && !!(await p.$('[data-action="opCheckinSet"][data-k="checkins"]')));
     check('…and gone from the work alarm', !/Op checks in on you/.test(await E("workSetupHtml()")));
-    await E("ui.view = 'business'; ui.businessTab = 'setup'; renderView()"); await p.waitForTimeout(300);
-    check('Business → Setup: reach-out cadence, stages and client cycles live with the business', /Reach-out cadence/.test(await p.textContent('.biz-setup')) && /Client cycles/.test(await p.textContent('.biz-setup')));
-    await E("ui.view = 'calendar'; ui.calendarYear = 2026; ui.calendarMonth = 9; ui.calendarSelectedDate = null; renderView()"); await p.clock.runFor(800); await p.waitForTimeout(300);
+    // (round 32: a gear by the Business title, one sheet)
+    await E("ui.view = 'business'; ui.businessTab = 'overview'; renderView(); ACTIONS.bizSetupOpen()"); await p.waitForTimeout(300);
+    check('Business setup: reach-out cadence, stages and client cycles live with the business', /New leads/.test(await p.textContent('#bizSetup')) && /Lead stages/.test(await p.textContent('#bizSetup .bs-nav')) && /Client cycles/.test(await p.textContent('#bizSetup .bs-nav')));
+    await E("addSheetClose('bizSetup')");
+    await E("ui.view = 'calendar'; ui.cxDesk = 'alarms'; ui.calendarYear = 2026; ui.calendarMonth = 9; ui.calendarSelectedDate = null; renderView()"); await p.clock.runFor(800); await p.waitForTimeout(300);
     await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'))");
-    check('the Calendar: one page, three columns (now + alarms, the month, the week and reminders)', !!(await p.$('.calx .cx-now')) && !!(await p.$('.calx .cx-alarms')) && !!(await p.$('.calx .cx-month')) && !!(await p.$('.calx .cx-tier')) && !!(await p.$('.calx .cx-rem')));
+    // (round 32: two columns, the month takes the room; alarms and reminders share a card)
+    check('the Calendar: one page (now, the week, alarms | reminders; the month)', !!(await p.$('.calx .cx-now')) && !!(await p.$('.calx .cx-desk .cx-alarms')) && !!(await p.$('.calx .cx-month')) && !!(await p.$('.calx .cx-tier')));
     check('…it fits the screen (no scrolling)', await E("document.querySelector('.calx').getBoundingClientRect().bottom <= innerHeight + 2"));
-    check('Now: a live clock, what’s next and when, and your day as a ribbon', /Client call: JJS/.test(await p.textContent('.cx-next')) && /in 40m/.test(await p.textContent('.cx-next')) && (await p.$$('.cx-ribbon .cx-seg')).length >= 3 && !!(await p.$('.cx-nowline')));
+    check('Now: a live clock and your day as a ribbon (no Next up)', !(await p.$('.cx-next')) && !!(await p.$('#calendarBigClock')) && (await p.$$('.cx-ribbon .cx-seg')).length >= 3 && !!(await p.$('.cx-nowline')));
     check('Alarms live here: wake-up, work hours and the rest', /7:00 AM/.test(await p.textContent('.cx-alarms')) && /9:00 AM/.test(await p.textContent('.cx-alarms')) && /Kitchen closes/.test(await p.textContent('.cx-alarms')));
     await p.click('.cx-al.is-wake .cx-switch'); await p.waitForTimeout(200);
     check('…switch the wake-up alarm off right there', await E("wakeCfg().enabled")===false && !!(await p.$('.cx-al.is-wake.is-off')));
@@ -153,8 +156,8 @@ async function ctxPage(b, seed, opts){
     check('turning the month slides it', /November 2026/.test(await p.textContent('.cx-mh')) && !!(await p.$('.cx-grid.from-right')));
     await p.click('.cx-mh [data-action="cxToday"]'); await p.waitForTimeout(300);
     check('…Today brings you back', /October 2026/.test(await p.textContent('.cx-mh')));
-    await p.click('.cx-seg2 [data-id="month"]'); await p.waitForTimeout(300);
-    check('This week / This month flip in one card', !!(await p.$('.cx-seg2.is-m')) && /October/.test(await p.textContent('.cx-tierbody')));
+    await p.click('.cx-tier .cx-seg2 [data-id="month"]'); await p.waitForTimeout(300);
+    check('This week / This month flip in one card', !!(await p.$('.cx-tier .cx-seg2.is-m')) && /October/.test(await p.textContent('.cx-tierbody')));
     await E("ui.view = 'settings'; ui.settingsTab = 'morning'; renderView()"); await p.clock.runFor(300); await p.waitForTimeout(300);
     check('an old link to Morning & Alarms lands on the Calendar', await E("ui.view")==='calendar');
     check('no page errors (Settings, Business, Calendar)', p.errors.length===0, p.errors);

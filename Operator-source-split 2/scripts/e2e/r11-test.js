@@ -144,13 +144,14 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     await p.click('.hc-pick >> nth=0'); await p.waitForTimeout(150);
     check('Calories: one tap from the quick picks', await E("state.health.calorieEntries.length")===1 && /left today/.test(await p.textContent('.hc-left')));
     await E("ui.view='calendar'; renderView()"); await p.waitForTimeout(150);
-    await p.fill('#newReminderLabel', 'Pay rent'); await p.click('[data-action="remindDay"][data-id="1"]'); await p.press('#newReminderLabel', 'Enter'); await p.waitForTimeout(150);
+    // (round 32: reminders come from the +, as a sheet)
+    await E("openReminderSheet()"); await p.fill('#rmSheetLabel', 'Pay rent'); await p.click('[data-action="remSheetDay"][data-id="1"]'); await p.press('#rmSheetLabel', 'Enter'); await p.waitForTimeout(150);
     check('Reminders: type, pick Tomorrow, Enter', await E("state.focus.reminders.some(r=>r.label==='Pay rent' && r.date==='2026-10-10')"));
     await E("ui.view='settings'; ui.settingsTab='general'; renderView()"); await p.waitForTimeout(150);
     // round 13: settings are five groups — Sound lives in "Look & Sound" (look), Data in "Connections & Data" (system)
     // (round 31: the wake-up alarm lives on the Calendar)
     check('Settings: Look & Sound and Connections & Data, no Morning & Alarms', await p.isVisible('.settings-nav-item[data-tab="look"]') && await p.isVisible('.settings-nav-item[data-tab="system"]') && !(await p.$('.settings-nav-item[data-tab="morning"]')));
-    await E("ui.view='calendar'; renderView(); document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'))"); await p.waitForTimeout(150);
+    await E("ui.view='calendar'; ui.cxDesk='alarms'; renderView(); document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'))"); await p.waitForTimeout(150);
     check('…the wake-up alarm has its own place on the Calendar', await p.isVisible('.cx-al.is-wake') && /Wake up/.test(await p.textContent('.cx-alarms')));
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(150);
     check('Quick journal: a way into the full journal', await p.isVisible('.qj2-open'));

@@ -46,8 +46,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('.toast .toast-action');
   check('undo delete', (await E("cycles().length"))===4);
   await p.click('[data-action="closeLifecycleEditor"]');
-  // new client picks the cycle
-  await p.click('#fabAdd');
+  // new client picks the cycle (round 32: on Lifecycle the + makes a cycle; Clients' + asks: a client or a lead)
+  await E("ui.businessTab='clients'; renderView()"); await p.click('#fabAdd'); await p.click('#addPick .ap-tile[data-id="0"]');
   check('cycle picker in new client form (default preselected)', (await p.inputValue('#ncCycle'))===cid);
   await p.fill('#ncName','Zed'); await p.fill('#ncCompany','Zed Media'); await p.click('[data-action="saveNewContact"]');
   const zid = await E("state.business.clients.find(c=>c.business==='Zed Media').id");

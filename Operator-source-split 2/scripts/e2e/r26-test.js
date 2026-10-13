@@ -178,7 +178,7 @@ async function ctxPage(b, seed, opts){
     await E("ui.cxTier = 'week'"); 
     await p.waitForTimeout(800);
     await E("renderView()"); await p.waitForTimeout(200);
-    check('Op’s read on the week ahead (Calendar)', !!(await p.$('.opi-wrap .opi')));
+    check('Op’s read on the week ahead (Calendar: one line now)', !!(await p.$('.cx-header .op-tip')));
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(400);
     const card = await p.$('[data-task-id="t2"], .task-card[data-id="t2"], .tl-row[data-id="t2"]');
     await card.click({button:'right'}); await p.waitForTimeout(200);
@@ -192,7 +192,7 @@ async function ctxPage(b, seed, opts){
     check('…and stops fading once it settles', await E("!(document.querySelector('.car-track')||{classList:{contains:()=>false}}).classList.contains('is-moving')"));
     for(const [view, tab, label] of [['personal', 'finances', 'Finances'], ['personal', 'goals', 'Goals'], ['business', 'overview', 'Business']]){
       await E("ui.view='"+view+"'; ui."+(view==='business' ? 'businessTab' : 'personalTab')+"='"+tab+"'; renderView()"); await p.waitForTimeout(1300); await E("renderView()"); await p.waitForTimeout(200);
-      check('Op’s read on '+label, !!(await p.$('#viewRoot .opi')));
+      check('Op’s read on '+label, !!(await p.$('#viewRoot .opi, #viewRoot .op-tip')));
     }
     check('no page errors (calendar / dashboard / reads)', p.errors.length===0, p.errors);
     await p.context().close();
