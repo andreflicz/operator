@@ -312,3 +312,29 @@ soundSettingsHtml = (function(base){
   };
 })(soundSettingsHtml);
 afterRenderHooks.push(musicVolSync);
+
+// ---- Business overview on one screen ----
+// Op's read is a one-line tip, and "Outreach this week" sits as a third column beside Clients and
+// Pipeline instead of a strip below them, so the whole overview fits without scrolling.
+renderBusinessOverview = (function(base){
+  return function(){
+    const realRead = opReadBiz; let readHtml = '';
+    opReadBiz = function(){ readHtml = realRead(); return '%%OPTIP%%'; };
+    let h; try{ h = base.apply(this, arguments); } finally { opReadBiz = realRead; }
+    h = h.replace('%%OPTIP%%', opTipHtml('biz'));
+    const o = outreachWeekHtml(), i = h.lastIndexOf(o);
+    // (…</div> pipeline col </div> cols, outreach, </div> hq: the outreach moves into the cols)
+    if(i > 0) h = h.slice(0, i).replace(/<\/div>$/, '')+'<div class="hq-col hq-col-out">'+o+'</div></div>'+h.slice(i + o.length);
+    return h.replace('<div class="hq-cols">', '<div class="hq-cols is-3">');
+  };
+})(renderBusinessOverview);
+opTipLocal = (function(base){
+  return function(kind){
+    if(kind!=='biz') return base.apply(this, arguments);
+    const due = typeof reachOutList==='function' ? reachOutList() : [], goal = Number(state.profile.revenueGoalMonthly)||0, mrr = typeof activeMrr==='function' ? activeMrr() : 0;
+    const cs = arr(state.business.clients).filter(function(c){ return c.status==='active' && Number(c.mrr) > 0; }), avg = cs.length ? cs.reduce(function(a, c){ return a + Number(c.mrr); }, 0)/cs.length : 0;
+    if(due.length) return due.length+' '+(due.length===1 ? 'person is' : 'people are')+' due a touch, '+crmName(due[0].kind, due[0].x)+' first. Ten minutes of outreach before anything else.';
+    if(goal > mrr && avg) { const n = Math.ceil((goal - mrr)/avg); return n+' more client'+(n===1 ? '' : 's')+' at your average ('+money(Math.round(avg))+') gets you to '+money(goal)+'. The pipeline is where that starts.'; }
+    return mrr ? 'Everyone’s been touched and you’re on goal. Raise the bar or go find the next one.' : '';
+  };
+})(opTipLocal);

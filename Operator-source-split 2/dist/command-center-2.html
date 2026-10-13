@@ -6198,6 +6198,58 @@ html[data-theme="light"] .md-volpop{ background:rgba(255,255,255,.9); border-col
 .mvol-v{ min-width:34px; font-size:12px; font-weight:700; color:var(--text-dim); font-variant-numeric:tabular-nums; }
 .mvol.is-np .mvol-in{ width:90px; background:rgba(255,255,255,.2); } .mvol.is-np .mvol-v{ color:rgba(255,255,255,.6); min-width:30px; }
 .mvol.is-set{ flex:1; } .mvol.is-set .mvol-in{ flex:1; width:auto; }
+/* Op's moods blend instead of snapping (round 32) */
+@property --op-c{ syntax:'<color>'; inherits:true; initial-value:#ffffff; }
+@property --op-glow{ syntax:'<color>'; inherits:true; initial-value:rgba(235,240,255,.75); }
+@property --op-glow2{ syntax:'<color>'; inherits:true; initial-value:rgba(200,215,255,.35); }
+:root{ transition:--op-c 1.4s ease, --op-glow 1.4s ease, --op-glow2 1.4s ease; }
+:root[data-op-mood="proud"]{ --op-c:#ffb35c; --op-glow:rgba(255,179,92,.82); --op-glow2:rgba(255,160,60,.38); --op-ink:#9a5a00; }
+:root[data-op-mood="focus"]{ --op-c:#5fd8ff; --op-glow:rgba(95,216,255,.82); --op-glow2:rgba(60,190,255,.38); --op-ink:#0b6d92; }
+/* his light, in the middle of his screen: a real orb, visible on the white */
+.opf-orb{ position:absolute; left:50%; top:44%; width:118px; height:118px; margin:-59px 0 0 -59px; z-index:1; pointer-events:none; --oc:#8d9bff; }
+:root[data-op-mood] .opf-orb{ --oc:var(--op-c); }
+.opf-orb b{ position:absolute; inset:0; border-radius:50%;
+  background:radial-gradient(circle at 34% 28%, #fff 0%, #fff 14%, color-mix(in srgb, var(--oc) 45%, #fff) 38%, var(--oc) 72%, color-mix(in srgb, var(--oc) 70%, #3b47c9) 100%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.7) inset, 0 0 40px 8px color-mix(in srgb, var(--oc) 55%, transparent), 0 0 120px 40px color-mix(in srgb, var(--oc) 28%, transparent), 0 18px 40px rgba(60,70,140,.18);
+  animation:opfOrb 6s ease-in-out infinite; transition:background 1.4s, box-shadow 1.4s; }
+@keyframes opfOrb{ 0%,100%{ transform:scale(.96); } 50%{ transform:scale(1.04); } }
+.opf-orb-r{ position:absolute; inset:0; border-radius:50%; border:1.5px solid color-mix(in srgb, var(--oc) 60%, transparent); opacity:0; }
+.opf.is-live .opf-orb b{ animation:opfOrbTalk .9s ease-in-out infinite; }
+@keyframes opfOrbTalk{ 0%,100%{ transform:scale(.97); } 35%{ transform:scale(1.09); } 60%{ transform:scale(1.01); } }
+.opf.is-live .opf-orb-r, .opf.is-listen .opf-orb-r{ animation:opfOrbRing 2.4s ease-out infinite; }
+.opf.is-listen .opf-orb-r{ animation-duration:1.6s; }
+.opf-orb-r:nth-child(2){ animation-delay:.8s !important; } .opf-orb-r:nth-child(3){ animation-delay:1.6s !important; }
+.opf.is-listen .opf-orb-r:nth-child(2){ animation-delay:.53s !important; } .opf.is-listen .opf-orb-r:nth-child(3){ animation-delay:1.06s !important; }
+@keyframes opfOrbRing{ from{ transform:scale(1); opacity:.75; } to{ transform:scale(2.3); opacity:0; } }
+.opf.is-think .opf-orb b{ animation:opfOrbThink 2.2s ease-in-out infinite; }
+@keyframes opfOrbThink{ 0%,100%{ transform:scale(.95); filter:brightness(1); } 50%{ transform:scale(1); filter:brightness(1.15) saturate(1.3); } }
+.opf[data-mode="chat"] .opf-orb{ display:none; }
+@media (prefers-reduced-motion:reduce){ .opf-orb b, .opf-orb-r{ animation:none !important; } }
+/* Business overview on one screen (round 32) */
+.hq{ gap:18px; }
+.hq-top{ gap:36px; }
+.hq-mrr{ gap:8px; }
+.hq-mrr .biz-mrr{ font-size:56px; }
+.hq-months .biz-mbars{ min-height:104px; }
+.hq > .op-tip{ align-self:flex-start; max-width:100%; }
+.hq-cols{ padding-top:18px; }
+.hq-cols.is-3{ grid-template-columns:1.15fr 1fr 1fr; }
+.hq-cols.is-3 .hq-col{ padding:0 26px; border-right:1px solid var(--border); }
+.hq-cols.is-3 .hq-col:first-child{ padding-left:0; }
+.hq-cols.is-3 .hq-col:last-child{ padding-right:0; border-right:0; }
+.hq-row{ padding:5px 6px; }
+.hq-row .client-avatar, .hq-row [class*="avatar"]{ transform:scale(.86); }
+.hq-col-out .hq-outreach{ border-top:0; padding-top:0; }
+.hq-col-out .ow-grid{ grid-template-columns:1fr; gap:16px; }
+.hq-col-out .ow-stats{ gap:18px; } .hq-col-out .ow-stats b{ font-size:22px; }
+.hq-col-out .ow-days{ height:60px; }
+.hq-col-out .ow-lists{ display:flex; flex-direction:column; gap:12px; }
+@media (max-width:1180px){ .hq-cols.is-3{ grid-template-columns:1fr 1fr; } .hq-cols.is-3 .hq-col-out{ grid-column:1 / -1; padding:18px 0 0; border-top:1px solid var(--border); margin-top:14px; } }
+/* Calendar: the day's list doesn't scroll */
+.cx-ag-list{ overflow:hidden; }
+.cx-agenda{ max-height:none; }
+.cx-ag-more{ align-self:flex-start; border:0; background:transparent; color:var(--text-dim); font:inherit; font-size:12.5px; font-weight:700; padding:4px 6px; cursor:pointer; border-radius:8px; }
+.cx-ag-more:hover{ color:var(--text); background:rgba(var(--ink),.05); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -33511,11 +33563,13 @@ function cxAgendaHtml(ds){
   const evs = info.events.slice().sort(function(a, b){ return (a.time||'').localeCompare(b.time||''); });
   const rems = arr(state.focus.reminders).filter(function(r){ return r.date===ds && !r.done; });
   const dw = ds <= todayStr() ? deepWorkMinutesFor(ds) : 0;
-  const rows = evs.map(function(e){ const c = categoryById(e.categoryId); return '<button class="cx-ag is-ev" data-action="openCalItem" data-kind="event" data-id="'+e.id+'" style="--c:'+((c||{}).color || '#8A90A2')+'"><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b><span>'+escapeHtml(e.title)+'</span><em>'+escapeHtml((c||{}).label || '')+'</em></button>'; }).join('')+
-    info.deadlines.map(function(t){ return '<button class="cx-ag is-dl" data-action="openCalItem" data-kind="deadline" data-id="'+t.id+'"><b>Due</b><span>'+escapeHtml(t.title)+'</span><em>'+(t.status==='done' ? '&#10003; done' : 'task')+'</em></button>'; }).join('')+
-    rems.map(function(r){ return '<div class="cx-ag is-rm"><b>'+(r.time ? fmt12Hour(r.time) : '&#128276;')+'</b><span>'+escapeHtml(r.label)+'</span><em>reminder</em></div>'; }).join('');
+  const rows = [].concat(evs.map(function(e){ const c = categoryById(e.categoryId); return '<button class="cx-ag is-ev" data-action="openCalItem" data-kind="event" data-id="'+e.id+'" style="--c:'+((c||{}).color || '#8A90A2')+'"><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b><span>'+escapeHtml(e.title)+'</span><em>'+escapeHtml((c||{}).label || '')+'</em></button>'; }),
+    info.deadlines.map(function(t){ return '<button class="cx-ag is-dl" data-action="openCalItem" data-kind="deadline" data-id="'+t.id+'"><b>Due</b><span>'+escapeHtml(t.title)+'</span><em>'+(t.status==='done' ? '&#10003; done' : 'task')+'</em></button>'; }),
+    rems.map(function(r){ return '<div class="cx-ag is-rm"><b>'+(r.time ? fmt12Hour(r.time) : '&#128276;')+'</b><span>'+escapeHtml(r.label)+'</span><em>reminder</em></div>'; }));
+  // (round 32: no scrolling here: three, then "+N more", which opens the next two weeks)
+  const shown = rows.slice(0, 3).join('')+(rows.length > 3 ? '<button class="cx-ag-more" data-action="openUpcomingPopover">+'+(rows.length - 3)+' more</button>' : '');
   return '<div class="cx-agenda" data-key="cxa-'+ds+'"><div class="cx-ah"><b>'+lab+'</b>'+(dw ? '<span>'+fmtDurationLabel(dw)+' locked in</span>' : '')+'</div>'+
-    '<div class="cx-ag-list">'+(rows || '<div class="cx-empty">Nothing on.</div>')+'</div></div>';
+    '<div class="cx-ag-list">'+(shown || '<div class="cx-empty">Nothing on.</div>')+'</div></div>';
 }
 function cxTierCardHtml(){
   const t = ui.cxTier==='month' ? 'month' : 'week';
@@ -33856,6 +33910,32 @@ soundSettingsHtml = (function(base){
   };
 })(soundSettingsHtml);
 afterRenderHooks.push(musicVolSync);
+
+// ---- Business overview on one screen ----
+// Op's read is a one-line tip, and "Outreach this week" sits as a third column beside Clients and
+// Pipeline instead of a strip below them, so the whole overview fits without scrolling.
+renderBusinessOverview = (function(base){
+  return function(){
+    const realRead = opReadBiz; let readHtml = '';
+    opReadBiz = function(){ readHtml = realRead(); return '%%OPTIP%%'; };
+    let h; try{ h = base.apply(this, arguments); } finally { opReadBiz = realRead; }
+    h = h.replace('%%OPTIP%%', opTipHtml('biz'));
+    const o = outreachWeekHtml(), i = h.lastIndexOf(o);
+    // (…</div> pipeline col </div> cols, outreach, </div> hq: the outreach moves into the cols)
+    if(i > 0) h = h.slice(0, i).replace(/<\/div>$/, '')+'<div class="hq-col hq-col-out">'+o+'</div></div>'+h.slice(i + o.length);
+    return h.replace('<div class="hq-cols">', '<div class="hq-cols is-3">');
+  };
+})(renderBusinessOverview);
+opTipLocal = (function(base){
+  return function(kind){
+    if(kind!=='biz') return base.apply(this, arguments);
+    const due = typeof reachOutList==='function' ? reachOutList() : [], goal = Number(state.profile.revenueGoalMonthly)||0, mrr = typeof activeMrr==='function' ? activeMrr() : 0;
+    const cs = arr(state.business.clients).filter(function(c){ return c.status==='active' && Number(c.mrr) > 0; }), avg = cs.length ? cs.reduce(function(a, c){ return a + Number(c.mrr); }, 0)/cs.length : 0;
+    if(due.length) return due.length+' '+(due.length===1 ? 'person is' : 'people are')+' due a touch, '+crmName(due[0].kind, due[0].x)+' first. Ten minutes of outreach before anything else.';
+    if(goal > mrr && avg) { const n = Math.ceil((goal - mrr)/avg); return n+' more client'+(n===1 ? '' : 's')+' at your average ('+money(Math.round(avg))+') gets you to '+money(goal)+'. The pipeline is where that starts.'; }
+    return mrr ? 'Everyone’s been touched and you’re on goal. Raise the bar or go find the next one.' : '';
+  };
+})(opTipLocal);
 // ============ OP, ROUND 32: YOUR ACCOUNTABILITY PARTNER ============
 // Talking and typing, any time. On his screen (and in his bubble) you can always just type, even
 // while he's listening: the moment you start, the mic lets go and what you type is what he gets. If
@@ -34165,6 +34245,34 @@ ACTIONS.opAccLock = function(){
   if(typeof opChatLog==='function') opChatLog('act', 'Locked in'+(open ? ' on “'+open.t+'”' : ''));
   opfClose(); renderView();
 };
+
+// ---- his feelings, more often and for longer ----
+// He used to show a mood rarely, and it snapped back to white ~9 seconds after he spoke. Now: two more
+// moods (proud, focused), the AI is told to show what he feels whenever there's any feeling in it,
+// colours blend instead of snapping (see the CSS), and a mood holds ~25 seconds. The app nudges it too:
+// proud when you finish a task, focused when you lock in.
+Object.assign(OP_MOODS, {proud:{c:'#ffb35c', label:'Proud'}, focus:{c:'#5fd8ff', label:'Locked in'}});
+opMoodName = (function(base){ return function(m){ m = String(m||'').toLowerCase(); return m==='focused' || m==='locked' ? 'focus' : m==='proud' ? 'proud' : m==='focus' ? 'focus' : base(m); }; })(opMoodName);
+opMoodSplit = function(t){ const m = /^\s*\[(?:mood:)?\s*(neutral|concern|concerned|stern|humor|humour|funny|excited|happy|sad|proud|focus|focused)\s*\]\s*/i.exec(String(t||'')); return m ? {mood:opMoodName(m[1]), text:String(t).slice(m[0].length)} : {mood:null, text:String(t||'')}; };
+opMood = (function(base){ return function(m, hold){ return base(m, hold==null ? 25000 : hold); }; })(opMood);
+aiSystem = (function(base){
+  return function(){
+    const s = base.apply(this, arguments);
+    if(Array.isArray(s)) s.push({type:'text', text:'Your feelings (round 32, this wins over "show them rarely"): let them show. Whenever a reply carries any feeling, start it with one tag: [mood:humor], [mood:excited], [mood:proud] (he did well, he kept his word), [mood:focus] (you’re getting down to work with him), [mood:concern], [mood:stern], [mood:sad]. Plain informational replies have none. Never mention the tag.'});
+    return s;
+  };
+})(aiSystem);
+completeTask = (function(base){ return function(){ const r = base.apply(this, arguments); if(opMoodNow()==='neutral' || opMoodNow()==='focus') opMood('proud', 12000); return r; }; })(completeTask);
+startFocus = (function(base){ return function(){ const r = base.apply(this, arguments); if(opMoodNow()==='neutral') opMood('focus', 20000); return r; }; })(startFocus);
+
+// ---- his light, in the middle of his screen ----
+opfEl = (function(base){
+  return function(){
+    const fresh = !document.getElementById('opFull'), el = base.apply(this, arguments);
+    if(fresh && !el.querySelector('.opf-orb')){ const o = document.createElement('div'); o.className = 'opf-orb'; o.innerHTML = '<i class="opf-orb-r"></i><i class="opf-orb-r"></i><i class="opf-orb-r"></i><b></b>'; el.querySelector('.opf-core').after(o); }
+    return el;
+  };
+})(opfEl);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

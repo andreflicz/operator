@@ -100,11 +100,13 @@ function cxAgendaHtml(ds){
   const evs = info.events.slice().sort(function(a, b){ return (a.time||'').localeCompare(b.time||''); });
   const rems = arr(state.focus.reminders).filter(function(r){ return r.date===ds && !r.done; });
   const dw = ds <= todayStr() ? deepWorkMinutesFor(ds) : 0;
-  const rows = evs.map(function(e){ const c = categoryById(e.categoryId); return '<button class="cx-ag is-ev" data-action="openCalItem" data-kind="event" data-id="'+e.id+'" style="--c:'+((c||{}).color || '#8A90A2')+'"><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b><span>'+escapeHtml(e.title)+'</span><em>'+escapeHtml((c||{}).label || '')+'</em></button>'; }).join('')+
-    info.deadlines.map(function(t){ return '<button class="cx-ag is-dl" data-action="openCalItem" data-kind="deadline" data-id="'+t.id+'"><b>Due</b><span>'+escapeHtml(t.title)+'</span><em>'+(t.status==='done' ? '&#10003; done' : 'task')+'</em></button>'; }).join('')+
-    rems.map(function(r){ return '<div class="cx-ag is-rm"><b>'+(r.time ? fmt12Hour(r.time) : '&#128276;')+'</b><span>'+escapeHtml(r.label)+'</span><em>reminder</em></div>'; }).join('');
+  const rows = [].concat(evs.map(function(e){ const c = categoryById(e.categoryId); return '<button class="cx-ag is-ev" data-action="openCalItem" data-kind="event" data-id="'+e.id+'" style="--c:'+((c||{}).color || '#8A90A2')+'"><b>'+(e.time ? fmt12Hour(e.time) : 'All day')+'</b><span>'+escapeHtml(e.title)+'</span><em>'+escapeHtml((c||{}).label || '')+'</em></button>'; }),
+    info.deadlines.map(function(t){ return '<button class="cx-ag is-dl" data-action="openCalItem" data-kind="deadline" data-id="'+t.id+'"><b>Due</b><span>'+escapeHtml(t.title)+'</span><em>'+(t.status==='done' ? '&#10003; done' : 'task')+'</em></button>'; }),
+    rems.map(function(r){ return '<div class="cx-ag is-rm"><b>'+(r.time ? fmt12Hour(r.time) : '&#128276;')+'</b><span>'+escapeHtml(r.label)+'</span><em>reminder</em></div>'; }));
+  // (round 32: no scrolling here: three, then "+N more", which opens the next two weeks)
+  const shown = rows.slice(0, 3).join('')+(rows.length > 3 ? '<button class="cx-ag-more" data-action="openUpcomingPopover">+'+(rows.length - 3)+' more</button>' : '');
   return '<div class="cx-agenda" data-key="cxa-'+ds+'"><div class="cx-ah"><b>'+lab+'</b>'+(dw ? '<span>'+fmtDurationLabel(dw)+' locked in</span>' : '')+'</div>'+
-    '<div class="cx-ag-list">'+(rows || '<div class="cx-empty">Nothing on.</div>')+'</div></div>';
+    '<div class="cx-ag-list">'+(shown || '<div class="cx-empty">Nothing on.</div>')+'</div></div>';
 }
 function cxTierCardHtml(){
   const t = ui.cxTier==='month' ? 'month' : 'week';

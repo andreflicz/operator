@@ -307,3 +307,31 @@ ACTIONS.opAccLock = function(){
   if(typeof opChatLog==='function') opChatLog('act', 'Locked in'+(open ? ' on “'+open.t+'”' : ''));
   opfClose(); renderView();
 };
+
+// ---- his feelings, more often and for longer ----
+// He used to show a mood rarely, and it snapped back to white ~9 seconds after he spoke. Now: two more
+// moods (proud, focused), the AI is told to show what he feels whenever there's any feeling in it,
+// colours blend instead of snapping (see the CSS), and a mood holds ~25 seconds. The app nudges it too:
+// proud when you finish a task, focused when you lock in.
+Object.assign(OP_MOODS, {proud:{c:'#ffb35c', label:'Proud'}, focus:{c:'#5fd8ff', label:'Locked in'}});
+opMoodName = (function(base){ return function(m){ m = String(m||'').toLowerCase(); return m==='focused' || m==='locked' ? 'focus' : m==='proud' ? 'proud' : m==='focus' ? 'focus' : base(m); }; })(opMoodName);
+opMoodSplit = function(t){ const m = /^\s*\[(?:mood:)?\s*(neutral|concern|concerned|stern|humor|humour|funny|excited|happy|sad|proud|focus|focused)\s*\]\s*/i.exec(String(t||'')); return m ? {mood:opMoodName(m[1]), text:String(t).slice(m[0].length)} : {mood:null, text:String(t||'')}; };
+opMood = (function(base){ return function(m, hold){ return base(m, hold==null ? 25000 : hold); }; })(opMood);
+aiSystem = (function(base){
+  return function(){
+    const s = base.apply(this, arguments);
+    if(Array.isArray(s)) s.push({type:'text', text:'Your feelings (round 32, this wins over "show them rarely"): let them show. Whenever a reply carries any feeling, start it with one tag: [mood:humor], [mood:excited], [mood:proud] (he did well, he kept his word), [mood:focus] (you’re getting down to work with him), [mood:concern], [mood:stern], [mood:sad]. Plain informational replies have none. Never mention the tag.'});
+    return s;
+  };
+})(aiSystem);
+completeTask = (function(base){ return function(){ const r = base.apply(this, arguments); if(opMoodNow()==='neutral' || opMoodNow()==='focus') opMood('proud', 12000); return r; }; })(completeTask);
+startFocus = (function(base){ return function(){ const r = base.apply(this, arguments); if(opMoodNow()==='neutral') opMood('focus', 20000); return r; }; })(startFocus);
+
+// ---- his light, in the middle of his screen ----
+opfEl = (function(base){
+  return function(){
+    const fresh = !document.getElementById('opFull'), el = base.apply(this, arguments);
+    if(fresh && !el.querySelector('.opf-orb')){ const o = document.createElement('div'); o.className = 'opf-orb'; o.innerHTML = '<i class="opf-orb-r"></i><i class="opf-orb-r"></i><i class="opf-orb-r"></i><b></b>'; el.querySelector('.opf-core').after(o); }
+    return el;
+  };
+})(opfEl);

@@ -39,7 +39,12 @@ async function ctxPage(b, seed, opts){
   return p;
 }
 // a computed colour as 0..255 numbers (Chrome writes color-mix results as color(srgb 0..1 …))
-const rgbOf = s => { const n = String(s).match(/[\d.]+/g).map(Number); return /^color\(/.test(s) ? n.slice(0, 3).map(x => x*255) : n.slice(0, 3); };
+// (rgb(), color(srgb …) and, since moods blend as a registered colour, oklab(…) too)
+const rgbOf = s => { const n = String(s).match(/-?[\d.]+/g).map(Number);
+  if(/^oklab/.test(s)){ const [L, A, B] = n, l = (L + 0.3963377774*A + 0.2158037573*B)**3, m = (L - 0.1055613458*A - 0.0638541728*B)**3, q = (L - 0.0894841775*A - 1.2914855480*B)**3;
+    const lin = [4.0767416621*l - 3.3077115913*m + 0.2309699292*q, -1.2684380046*l + 2.6097574011*m - 0.3413193965*q, -0.0041960863*l - 0.7034186147*m + 1.7076147010*q];
+    return lin.map(x => 255*(x <= 0.0031308 ? 12.92*x : 1.055*Math.pow(Math.max(0, x), 1/2.4) - 0.055)); }
+  return /^color\(/.test(s) ? n.slice(0, 3).map(x => x*255) : n.slice(0, 3); };
 const pic = c => 'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200"><rect width="300" height="200" fill="'+c+'"/></svg>');
 const BOARDS = {boards:[
   {id:'v1', kind:'vision', name:'Vision', parentId:null, viewport:{x:0,y:0,zoom:1}, elements:[{id:'i1', type:'image', ref:pic('#f0a'), x:0, y:0, w:300, h:200, z:1}, {id:'n1', type:'note', header:true, color:'#3FBE8E', title:'Mind + Body', body:'', x:320, y:0, w:240, h:80, z:2}]},
@@ -82,9 +87,9 @@ const WORK = {enabled:true, start:'09:00', end:'17:00', days:[0,1,2,3,4,5,6], lu
     check('a mood tag is read off a reply and never shown', await E("JSON.stringify(opMoodSplit('[mood:humor] Got you.'))")==='{"mood":"humor","text":"Got you."}' && await E("opMoodSplit('Plain.').mood")===null);
     await E("OV.cap='opBubText'; opBubShow(); opCaption('Hi')"); await p.waitForTimeout(400);
     const col = async () => p.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--op-c').trim());
-    check('Op is white when it’s just Op (light and bubble)', /#fff(fff)?/i.test(await col()) && (c => c[0] > 220 && c[1] > 220 && c[2] > 220)(rgbOf(await p.evaluate(() => getComputedStyle(document.getElementById('opBub')).backgroundColor))));
-    await E("opMood('stern', Infinity)"); await p.waitForTimeout(900);
-    check('stern: red', /#ff6262/i.test(await col()) && (c => c[0] > c[2] + 8)(rgbOf(await p.evaluate(() => getComputedStyle(document.getElementById('opBub')).backgroundColor))));
+    check('Op is white when it’s just Op (light and bubble)', /#fff(fff)?|rgb\(255, 255, 255\)/i.test(await col()) && (c => c[0] > 220 && c[1] > 220 && c[2] > 220)(rgbOf(await p.evaluate(() => getComputedStyle(document.getElementById('opBub')).backgroundColor))));
+    await E("document.head.insertAdjacentHTML('beforeend', '<style>:root{transition:none !important}</style>'); opMood('stern', Infinity)"); await p.waitForTimeout(300);   // (round 32: moods blend in; the test reads the end colour)   // (round 32: moods blend in over ~1.4s)
+    check('stern: red', /#ff6262|rgb\(255, 98, 98\)/i.test(await col()) && (c => c[0] > c[2] + 8)(rgbOf(await p.evaluate(() => getComputedStyle(document.getElementById('opBub')).backgroundColor))));
     await E("opMood('concern', 50)"); await p.waitForTimeout(400);
     check('concerned: yellow, and it fades back to white on its own', true);
     await p.waitForTimeout(300);
