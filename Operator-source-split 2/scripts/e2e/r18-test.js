@@ -203,13 +203,13 @@ async function ctxPage(b, seed, opts){
   {
     const p = await newPage(b, OUT+'/r18.html', {profile:{name:'Andre'}, tasks:{items:tasks}, business:{clients, pipeline:[], packages:[{id:'pk1', name:'Growth', price:1500, deliverables:[{id:'d', title:'Reels', weeklyTarget:3}]}]}}, new Date(2026,9,12,10,0).getTime());
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    await p.click('.th-greet', {button:'right'}); await p.waitForTimeout(200);
+    await p.click('.th-op', {button:'right'}); await p.waitForTimeout(200);
     const menu = await p.textContent('#appCtxMenu');
     check('right-click: short and about where you are (no theme / scene / sky / go-to)', /Lock in/.test(menu) && /New task/.test(menu) && !/Minimal view/.test(menu) && !/Theme|Scene|Sky|Cards|Go to/.test(menu), menu);
     await E("ctxClose()");
     check('the ☰ quick-links are gone (page and Settings)', await p.$('.quick-access-dock, .quick-access-toggle')===null && !(await E("ui.view='settings'; ui.settingsTab='display'; renderView(); !!document.getElementById('setQuickFiles')")));
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(300);
-    check('Time Worked: the week, yesterday, and a bar a day', (await p.$$('.tw-bars i')).length===7 && /this week/.test(await p.textContent('.tw-chip')));
+    check('Time worked: a circle a day for the week, with the hours', (await p.$$('.sw-wrap .sw-day')).length===7 && !!(await p.$('.sw-wrap .sw-h')));
     await E("ui.view='business'; ui.businessTab='packages'; renderView()"); await p.waitForTimeout(300);
     check('Packages: plan cards, no big Add button (the + adds one)', (await p.$$('.pk-card')).length===1 && /\$1,500/.test(await p.textContent('.pk-card')) && await p.$('[data-action="openNewPackageModal"].btn-good')===null);
     await E("setThemePref('light')"); await p.waitForTimeout(300);

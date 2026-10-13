@@ -28,11 +28,14 @@ timeWorkedHtml = function(){
 };
 function fmtH(m){ if(!m) return '0'; const h = m/60; return h >= 10 ? Math.round(h)+'h' : h >= 1 ? (Math.round(h*10)/10)+'h' : m+'m'; }
 
-// ---- the streak + time worked card ----
-function todayMix(){ return state.profile.todayMix==='one' ? 'one' : 'split'; }
+// ---- the stats row under the hero: one compact card ----
+// the streak, this week as the streak's circles (each ring is the hours worked that day), deep work
+// today and tasks today. (This week's total lives in the This week panel; it shows here only when
+// that panel is off.)
+function weekPanelOn(){ return state.dashboardPanels.enabled.week!==false && arr(state.dashboardPanels.order).indexOf('week')>=0; }
 function streakWorkHtml(o){
   o = o || {};
-  const w = weekWork(), streak = computeStreak(), allDone = dayStandardsComplete(todayStr()), one = todayMix()==='one';
+  const w = weekWork(), streak = computeStreak(), allDone = dayStandardsComplete(todayStr()), full = !o.compact;
   const C = 2*Math.PI*15;
   const days = w.days.map(function(x){
     const status = isBreakDay(x.d) ? 'broken' : dayVisualStatus(x.d), off = isDayOff(x.d) && status!=='worked';
@@ -47,15 +50,13 @@ function streakWorkHtml(o){
   const dwToday = deepWorkMinutesTodayLive();
   const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today'; });
   const doneToday = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); });
-  const extra = one ? '<div class="sw-x">'+
-      '<div class="sw-k" id="swDeep" title="Deep work today"><span>Deep work</span><b>'+fmtHours(dwToday)+'</b><i class="sw-bar"><u style="width:'+Math.min(100, dwToday/w.target*100).toFixed(1)+'%"></u></i><small>of '+fmtHours(w.target)+'</small></div>'+
-      '<div class="sw-k" data-action="goToFinishedTasks" title="Tasks done today"><span>Tasks</span><b>'+doneToday.length+'<small> / '+(doneToday.length+todayTasks.length)+'</small></b><small>done today</small></div>'+
-    '</div>' : '';
-  return '<div class="sw'+(one ? ' is-one' : '')+(streak > 0 ? ' is-hot' : '')+'">'+
-    '<div class="sw-l"><div class="sw-streak"><span class="sw-flame">&#128293;</span><b class="'+(o.ticked ? 'streak-tick-pop' : '')+'">'+streak+'</b><span>day'+(streak===1 ? '' : 's')+'<br>streak</span>'+(allDone ? '<span class="streak-ok" title="Today\'s standard: done">&#10003;</span>' : '')+'</div>'+
-      '<div class="sw-tw"><b>'+fmtDurationLabel(w.total)+'</b><span>worked this week &middot; yesterday '+fmtDurationLabel(w.yesterday)+'</span></div></div>'+
+  const showTotal = !full || !weekPanelOn();
+  return '<div class="sw'+(full ? ' is-row' : '')+(streak > 0 ? ' is-hot' : '')+'">'+
+    '<div class="sw-l"><div class="sw-streak"><span class="sw-flame">&#128293;</span><b class="'+(o.ticked ? 'streak-tick-pop' : '')+'">'+streak+'</b><span>day'+(streak===1 ? '' : 's')+'<br>streak</span>'+(allDone ? '<span class="streak-ok" title="Today\'s standard: done">&#10003;</span>' : '')+(full ? tip((streak===0 ? 'Hit today\'s standard to start one. ' : allDone ? 'Today\'s in the bag. ' : 'Hit today\'s standard to keep it going. ')+'The streak counts days in a row you hit Today\'s Standard: the deep-work target plus your checklist. Each circle is a day this week; its ring fills with the hours you worked.') : '')+'</div>'+
+      (showTotal ? '<div class="sw-tw"><b>'+fmtDurationLabel(w.total)+'</b><span>this week</span></div>' : '')+'</div>'+
     '<div class="sw-days">'+days+'</div>'+
-    extra+
+    (full ? '<div class="sw-k" id="swDeep" title="Deep work today"><span>Deep work today</span><b>'+fmtHours(dwToday)+'<small> / '+fmtHours(w.target)+'</small></b><i class="sw-bar"><u style="width:'+Math.min(100, dwToday/w.target*100).toFixed(1)+'%"></u></i></div>'+
+      '<div class="sw-k" data-action="goToFinishedTasks" title="Tasks done today"><span>Tasks today</span><b>'+doneToday.length+'<small> / '+(doneToday.length+todayTasks.length)+'</small></b></div>' : '')+
     '<button class="streak-edit-btn sw-edit" data-action="openStreakEdit" title="Edit streak days">Edit</button>'+
   '</div>';
 }
@@ -111,7 +112,6 @@ renderTodayHero = (function(base){
       '<div class="th-biz">'+escapeHtml(p.businessName || 'Operator')+'</div>'+
       thOpHtml()+
       (p.bigClockOnToday ? '<div id="liveClockBig" class="cal-big-clock th-bigclock"></div>' : '<div class="th-sub" id="liveClock"></div>')+
-      '<div class="th-streak">'+streakWorkHtml({ticked:ticked})+'</div>'+
       (state.profile.skyChip===false ? '' : '<div class="th-wx">'+skyChipHtml()+'</div>')+
     '</div>';
     void streak;
@@ -129,21 +129,19 @@ skyChipHtml = (function(base){
   };
 })(skyChipHtml);
 
-// ---- the stat chips: Time worked lives in the hero now; "All in one" folds the rest in too ----
+// ---- the stat chips become that one card ----
 renderPersonalStatsPanel = (function(base){
   return function(){
     const h = base.apply(this, arguments);
-    if(todayMix()==='one') return h.replace(/<div class="grid grid-3 stat-chip-row">[\s\S]*?<\/div><div class="card" style="text-align:center;margin-top:10px;">/, '<div class="card" style="text-align:center;">');
-    return h.replace('grid grid-3 stat-chip-row', 'grid grid-2 stat-chip-row').replace(/<div class="stat-chip tw-chip">[\s\S]*?<\/div><\/div><\/div><div class="stat-chip" data-action="goToFinishedTasks"/, '<div class="stat-chip" data-action="goToFinishedTasks"');
+    return h.replace(/<div class="grid grid-3 stat-chip-row">[\s\S]*?<\/div><div class="card" style="text-align:center;margin-top:10px;">/, '<div class="sw-wrap">'+streakWorkHtml()+'</div><div class="card" style="text-align:center;margin-top:10px;">');
   };
 })(renderPersonalStatsPanel);
 PANEL_RENDERERS.personalStats = function(){ return renderPersonalStatsPanel(); };
-// (the all-in-one deep work number keeps ticking while you work)
+// (deep work today keeps ticking while you work)
 setInterval(function(){
   const k = document.querySelector('#swDeep b'); if(!k) return;
-  const v = fmtHours(deepWorkMinutesTodayLive()); if(k.textContent!==v) k.textContent = v;
+  const v = fmtHours(deepWorkMinutesTodayLive()); if(k.firstChild && k.firstChild.nodeType===3 && k.firstChild.textContent!==v) k.firstChild.textContent = v;
 }, 30000);
-ACTIONS.todayMix = function(el, e, id){ state.profile.todayMix = id; persist('profile'); playTick(); renderView(); };
 
 // ---- Cockpit: a second locked-in view ----
 const LOCKED_STYLES = [['player', 'Player', 'The task like a song playing: big cover, the timer as its progress.'], ['cockpit', 'Cockpit', 'Timer, task and your whole day at a glance: the week, deep work, what’s next.']];
@@ -183,7 +181,7 @@ function cockpitHtml(){
       '<div class="ckp-row"><span>Deep work</span><b>'+fmtHours(dw)+'<small> / '+fmtHours(target)+'</small></b></div><i class="sw-bar"><u style="width:'+Math.min(100, dw/target*100).toFixed(1)+'%"></u></i>'+
       '<div class="ckp-row"><span>Tasks done</span><b>'+done+'</b></div>'+
       (ev ? '<div class="ckp-row"><span>Next up</span><b class="ckp-ev">'+fmt12Hour(ev.time)+' &middot; '+escapeHtml(ev.title)+'</b></div>' : '')+
-      '<div class="ckp-cap" style="margin-top:16px;">This week</div>'+streakWorkHtml()+
+      '<div class="ckp-cap" style="margin-top:16px;">This week</div>'+streakWorkHtml({compact:true})+
     '</div>'+
   '</div>';
 }
@@ -203,11 +201,9 @@ ACTIONS.lockedStyleSet = function(el, e, id){ state.profile.lockedStyle = id; pe
 // ---- Settings → Look & Sound: Today and the locked-in view ----
 soundSettingsHtml = (function(base){
   return function(){
-    const mix = todayMix(), ls = lockedStyle();
+    const ls = lockedStyle();
     return base.apply(this, arguments)+
-      '<div class="section r34-set"><div class="section-title">Today &amp; locked in</div><div class="card">'+
-        '<div class="kpi-sub">Today’s stats</div>'+
-        '<div class="seg-tabs" style="margin:8px 0 16px;"><button class="seg-tab'+(mix==='split' ? ' active' : '')+'" data-action="todayMix" data-id="split">Split</button><button class="seg-tab'+(mix==='one' ? ' active' : '')+'" data-action="todayMix" data-id="one">All in one</button></div>'+
+      '<div class="section r34-set"><div class="section-title">Locked in</div><div class="card">'+
         '<div class="kpi-sub">Locked-in view (the Minimal button on Focus, or M)</div>'+
         '<div class="ls-picks">'+LOCKED_STYLES.map(function(x){ return '<button class="ls-pick'+(x[0]===ls ? ' is-on' : '')+'" data-action="lockedStyleSet" data-id="'+x[0]+'"><span class="ls-mini is-'+x[0]+'"><i></i><i></i><i></i></span><b>'+x[1]+'</b><small>'+x[2]+'</small></button>'; }).join('')+'</div>'+
       '</div></div>';
@@ -302,33 +298,13 @@ ACTIONS.autoLockReject = function(){
   showToast('Thrown away. Auto lock-in waits half an hour.', {icon:'&#128465;', duration:4000});
 };
 
-// ---- XP only for real work ----
-// An auto session pays its XP once you keep it in the recap (or once it's two days old and you never
-// looked). A session you throw out takes its XP with it, one you mark as not work too. Anything
-// under five minutes never paid.
-function sessionXpHeld(s){
-  if(!s || sessionType(s)!=='deep') return false;
-  if(s.notWork) return true;
-  if((s.minutes||0) < 5) return true;
-  return !!(s.auto && !s.reviewed && s.date >= addDays(todayStr(), -1));
-}
-function xpHeldMinutes(d){
-  let m = arr(state.focus.sessions).filter(function(s){ return s.date===d && sessionXpHeld(s); }).reduce(function(a, s){ return a + (s.minutes||0); }, 0);
-  const as = state.focus.activeSession;
-  if(d===todayStr() && as && as.autoStarted && sessionType(as)==='deep') m += Math.max(0, Math.floor(((as.onBreak ? as.startedAt + (as.frozenElapsedMs||0) : Date.now()) - as.startedAt)/60000));
-  return m;
-}
-xpCtx = (function(base){
-  return function(){
-    const c = base.apply(this, arguments), deep = c.deep, memo = {};
-    c.deep = function(d){ if(memo[d]==null) memo[d] = Math.max(0, deep(d) - xpHeldMinutes(d)); return memo[d]; };
-    return c;
-  };
-})(xpCtx);
+// ---- XP comes off with a session you throw out ----
+// XP is counted from your sessions, so removing one rewinds what it paid. (The count is cached by
+// a signature; edits to a session's length are part of it now, so an edit rewinds too.)
 xpSig = (function(base){
   return function(){
-    let h = 0; arr(state.focus.sessions).forEach(function(s){ h = (h*31 + (s.minutes||0) + (s.reviewed ? 7 : 0) + (s.notWork ? 13 : 0)) % 1000000007; });
-    return base.apply(this, arguments)+'|'+h+'|'+addDays(todayStr(), -1);
+    let h = 0; arr(state.focus.sessions).forEach(function(s){ h = (h*31 + (s.minutes||0)) % 1000000007; });
+    return base.apply(this, arguments)+'|'+h;
   };
 })(xpSig);
 // the recap: throwing a session out says what it costs; an auto one shows its XP is waiting on you
@@ -341,8 +317,4 @@ ACTIONS.recapDiscard = (function(base){
     if(lost > 0){ clearToasts(); showToast('Session removed: '+lost.toLocaleString()+' XP came off with it', {icon:'&#128465;', actionLabel:'Undo', actionAction:'undoRecapDiscard', duration:7000}); }
   };
 })(ACTIONS.recapDiscard);
-renderRecap = (function(base){
-  return function(){
-    return base.apply(this, arguments).replace(/(<div class="rc-sess is-pending"[^>]*>[\s\S]*?<span class="tag">auto[^<]*<\/span>)/g, '$1<span class="tag rc-xp-held" title="Its XP lands when you keep it">XP on hold</span>');
-  };
-})(renderRecap);
+

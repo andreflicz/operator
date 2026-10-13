@@ -226,12 +226,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     // ---------- round 34 ----------
     await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); state.profile.businessName='Flicz Media'; ui.view='today'; renderView()"); await p.waitForTimeout(300);
     check('r34: the hero is the business name, then a line from Op', (await p.textContent('.th-biz'))==='Flicz Media' && (await p.textContent('.th-op-t')).length > 5 && !(await p.$('.th-greet')));
-    check('r34: streak and time worked are one card: this week as seven circles, Monday first', (await p.$$('.th-streak .sw .sw-day')).length===7 && await E("weekWork().days[0].d===startOfWeekStr(todayStr())") && !(await p.$('.tw-chip')));
+    check('r35: the streak, this week (seven circles, Monday first), deep work and tasks are one row under the hero', !(await p.$('.today-hero .sw')) && (await p.$$('.sw-wrap .sw.is-row .sw-day')).length===7 && !!(await p.$('.sw-wrap #swDeep')) && await E("weekWork().days[0].d===startOfWeekStr(todayStr())") && !(await p.$('.tw-chip')));
     check('r34: time worked this week is the same number as the This week panel', await E("weekWork().total===(function(){ let t=0; for(let i=0;i<7;i++){ const d=addDays(startOfWeekStr(todayStr()), i); t += d===todayStr() ? deepWorkMinutesTodayLive() : d<todayStr() ? deepWorkMinutesFor(d) : 0; } return t; })()"));
-    check('r34: the weather bar sits under the card and spans it', await p.evaluate(() => { const w = document.querySelector('.th-wx .skyp'), c = document.querySelector('.th-streak .sw'); if(!w) return true; const a = w.getBoundingClientRect(), b = c.getBoundingClientRect(); return a.top >= b.bottom - 1 && a.width >= b.width - 4; }));
-    await E("state.profile.todayMix='one'; renderView()"); await p.waitForTimeout(200);
-    check('r34: All in one: deep work, tasks, time worked and the streak in one panel (no stat chips)', !!(await p.$('.th-streak .sw.is-one #swDeep')) && !(await p.$('.stat-chip-row')));
-    check('r34: Settings has Split / All in one and the two locked-in views', /data-action="todayMix"/.test(await E("soundSettingsHtml()")) && ((await E("soundSettingsHtml()")).match(/data-action="lockedStyleSet"/g)||[]).length===2);
+    check('r34: the weather bar sits under the card and spans it', await p.evaluate(() => { const w = document.querySelector('.th-wx .skyp'), c = document.querySelector('.th-op'); if(!w) return true; const a = w.getBoundingClientRect(), b = c.getBoundingClientRect(), l = document.querySelector('.th-left').getBoundingClientRect(); return a.top >= b.bottom - 1 && a.width >= l.width - 8; }));
+    check('r34: Settings has the two locked-in views', ((await E("soundSettingsHtml()")).match(/data-action="lockedStyleSet"/g)||[]).length===2);
     await E("state.profile.lockedStyle='cockpit'; state.profile.lockedView='minimal'; startFocus(50); ui.view='focus'; renderView()"); await p.waitForTimeout(300);
     check('r34: the Cockpit locked-in view: timer, task, the day', !!(await p.$('.np.is-cockpit .ckp .ckp-timer')) && !!(await p.$('.ckp-day .sw')));
     await E("state.appActivity.todayIntervals.push({app:'Final Cut Pro', start:Date.now()-60000, end:Date.now()}); ui.view='today'; renderView(); updateActivityPill()"); await p.waitForTimeout(200);
@@ -249,12 +247,27 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("state.focus.autoRejectedAt=null; xpLast=null");
     const x0 = await E("xpLast=null; xpSummary().total");
     await E("state.focus.sessions.push({id:'au1', type:'deep', date:todayStr(), startedAt:Date.now()-3*3600000, endedAt:Date.now()-3600000, minutes:120, auto:true, reviewed:false}); xpLast=null; dwTodayCache=null");
-    check('r34 xp: an auto session you haven’t kept pays nothing yet', await E("xpSummary().total")===x0);
+    check('r35 xp: a session pays as soon as it’s logged', await E("xpSummary().total") > x0);
     await E("state.focus.sessions.find(s=>s.id==='au1').reviewed=true; xpLast=null; dwTodayCache=null");
     const x1 = await E("xpSummary().total");
-    check('r34 xp: keep it and its XP lands', x1 > x0);
+    check('r35 xp: keeping it changes nothing', x1 > x0);
     await E("ui.recapDate=todayStr(); ACTIONS.recapDiscard(null, null, 'au1')");
-    check('r34 xp: throw it out and the XP comes back off', await E("xpLast=null; dwTodayCache=null; xpSummary().total")===x0);
+    check('r35 xp: throw it out and the XP rewinds', await E("xpLast=null; dwTodayCache=null; xpSummary().total")===x0);
+    // ---------- round 35 ----------
+    await E("state.focus.lastSessionEndedAt=null; state.focus.lastManualStopAt=null; state.focus.autoRejectedAt=null");
+    check('r35 auto: time in Firefox or Operator never starts a session', await ivs([['firefox', 20], ['Operator', 10], ['Final Cut Pro', 1]])===false);
+    check('r35 auto: work minutes add up across quick switches', await ivs([['Final Cut Pro', 5], ['Finder', 1], ['Final Cut Pro', 4], ['firefox', 2], ['Final Cut Pro', 4]])===true);
+    await E("state.focus.activeSession=null; state.focus.lastSessionEndedAt=null; autoLockInMeta={app:null,intervalStart:null}");
+    // a session you started: no work apps for 11 minutes (just sitting in Operator) and it stops where the work did
+    const ended = await E("(function(){ const now=Date.now(); startFocus(null); const s=state.focus.activeSession; s.startedAt=now-40*60000; state.appActivity.todayIntervals=[{app:'Final Cut Pro', start:now-40*60000, end:now-11*60000}, {app:'Operator', start:now-11*60000+5000, end:now}]; lastRawSampleAt=now; checkAwayFromSession(); const last=state.focus.sessions[state.focus.sessions.length-1]; return JSON.stringify({active:!!state.focus.activeSession, min:last && last.minutes}); })()");
+    check('r35 auto lock-out: nothing on work apps for a while ends the session where the work stopped', JSON.parse(ended).active===false && JSON.parse(ended).min===29, ended);
+    await E("startMode('offtime',{clockedOut:true}); ui.restFull=true; openWindDown('alarm')"); await p.waitForTimeout(200);
+    check('r35: the end of the wind-down is just Done', !(await p.$('#windOverlay [data-action="windGoToSleep"]')) && !!(await p.$('#windOverlay [data-action="windDone"]')));
+    await E("ACTIONS.windDone()"); await p.waitForTimeout(500);
+    check('r35: That’s the day: the sleep button sits where Tomorrow was', !!(await p.$('.dayoff-row [data-action="startSleepMode"]')) && !(await p.$('.dayoff-row [data-step="alarm"]')));
+    await p.click('.dayoff-row [data-action="startSleepMode"]'); await p.waitForTimeout(700);
+    check('r35: …and it puts you to sleep (the sleep screen)', !!(await p.$('.sleepv')) && await E("!!(state.modes.active && state.modes.active.sleep)"));
+    check('r35: the change goes through the dark veil and it clears', !(await p.$('.fs-veil')));
     check('no page errors (round 33)', p.errors.length===0, p.errors);
     await p.context().close();
   }

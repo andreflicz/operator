@@ -6474,3 +6474,45 @@ body.sb-collapsed .ap-menu{ left:69px; }
 @media (max-width:900px){ .ap-menu{ left:5px; } }
 .ckp-day .sw-x{ display:none; }
 .rc-xp-held{ background:rgba(232,162,61,.14); color:#e8a23d; }
+
+/* ===================== Round 35 ===================== */
+/* the stats row: one compact card under the hero */
+.sw-wrap{ margin:0; }
+.sw.is-row{ flex-wrap:nowrap; gap:22px; padding:14px 20px; border-radius:16px; background:var(--panel); }
+.sw.is-row .sw-days{ min-width:0; max-width:420px; }
+.sw.is-row .sw-k{ flex:0 0 auto; display:flex; flex-direction:column; align-items:flex-start; gap:5px; padding-left:22px; border-left:1px solid var(--border); min-width:130px; }
+.sw.is-row .sw-k b{ font-size:20px; }
+.sw.is-row .sw-k .sw-bar{ flex:none; width:100%; }
+.sw-edit{ opacity:0; transition:opacity .2s; }
+.sw:hover .sw-edit{ opacity:1; }
+@media (max-width:1100px){ .sw.is-row{ flex-wrap:wrap; } .sw.is-row .sw-k{ border-left:0; padding-left:0; } }
+/* the hero without the streak: name, Op, the time, the weather across the bottom */
+.th-left.th-mix{ justify-content:center; }
+.th-mix .th-wx{ margin-top:6px; }
+/* full-screen changes go through black, never through the app behind */
+.fs-veil{ position:fixed; inset:0; z-index:2147483000; background:#05060c; opacity:1; pointer-events:none; }
+.fs-veil.is-on{ opacity:1; }
+.fs-veil.is-out{ transition:opacity .38s ease; opacity:0; pointer-events:none; }
+.np{ animation-name:npInDark !important; }
+@keyframes npInDark{ from{ filter:brightness(0); } }
+.np.is-leaving{ animation:npOutDark .2s ease forwards !important; }
+@keyframes npOutDark{ to{ filter:brightness(0); } }
+/* Op's hello under the business name: his light, then the words, in his color */
+.th-op.is-hello{ padding:0; border:0; background:none; gap:12px; align-items:center; font-family:var(--font-display); font-size:28px; font-weight:600; letter-spacing:-.01em; line-height:1.15; }
+.th-op.is-hello .th-op-o{ width:14px; height:14px; }
+.th-op.is-hello .th-op-t{ color:var(--text); text-shadow:0 0 22px color-mix(in srgb, var(--op-c) 35%, transparent); }
+.th-op.is-hello .th-op-t i{ font-style:normal; display:inline-block; }
+.th-op.is-hello .th-op-t.is-in i{ animation:opHelloIn .55s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i) * 90ms + 120ms); }
+@keyframes opHelloIn{ from{ opacity:0; filter:blur(6px); transform:translateY(4px); } }
+.th-biz{ font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-family:inherit; }
+@media (max-width:760px){ .th-op.is-hello{ font-size:22px; } }
+/* the hero: name side, the card dead center, the buttons side */
+@media (min-width:1181px){
+  .today-hero{ display:grid !important; grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr); align-items:center; column-gap:28px; }
+  .today-hero > .th-left{ min-width:0; }
+  .today-hero > .th-card{ justify-self:center; }
+  .today-hero > .th-right{ justify-self:end; width:100%; max-width:400px; }
+}
+.th-mix .th-wx{ margin-top:10px; }
+.th-wx .skyp{ height:38px; padding:0 16px; }
+.op-bub:not(.is-in){ transition-duration:.2s !important; }

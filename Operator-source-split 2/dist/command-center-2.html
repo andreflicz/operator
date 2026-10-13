@@ -6485,6 +6485,48 @@ body.sb-collapsed .ap-menu{ left:69px; }
 @media (max-width:900px){ .ap-menu{ left:5px; } }
 .ckp-day .sw-x{ display:none; }
 .rc-xp-held{ background:rgba(232,162,61,.14); color:#e8a23d; }
+
+/* ===================== Round 35 ===================== */
+/* the stats row: one compact card under the hero */
+.sw-wrap{ margin:0; }
+.sw.is-row{ flex-wrap:nowrap; gap:22px; padding:14px 20px; border-radius:16px; background:var(--panel); }
+.sw.is-row .sw-days{ min-width:0; max-width:420px; }
+.sw.is-row .sw-k{ flex:0 0 auto; display:flex; flex-direction:column; align-items:flex-start; gap:5px; padding-left:22px; border-left:1px solid var(--border); min-width:130px; }
+.sw.is-row .sw-k b{ font-size:20px; }
+.sw.is-row .sw-k .sw-bar{ flex:none; width:100%; }
+.sw-edit{ opacity:0; transition:opacity .2s; }
+.sw:hover .sw-edit{ opacity:1; }
+@media (max-width:1100px){ .sw.is-row{ flex-wrap:wrap; } .sw.is-row .sw-k{ border-left:0; padding-left:0; } }
+/* the hero without the streak: name, Op, the time, the weather across the bottom */
+.th-left.th-mix{ justify-content:center; }
+.th-mix .th-wx{ margin-top:6px; }
+/* full-screen changes go through black, never through the app behind */
+.fs-veil{ position:fixed; inset:0; z-index:2147483000; background:#05060c; opacity:1; pointer-events:none; }
+.fs-veil.is-on{ opacity:1; }
+.fs-veil.is-out{ transition:opacity .38s ease; opacity:0; pointer-events:none; }
+.np{ animation-name:npInDark !important; }
+@keyframes npInDark{ from{ filter:brightness(0); } }
+.np.is-leaving{ animation:npOutDark .2s ease forwards !important; }
+@keyframes npOutDark{ to{ filter:brightness(0); } }
+/* Op's hello under the business name: his light, then the words, in his color */
+.th-op.is-hello{ padding:0; border:0; background:none; gap:12px; align-items:center; font-family:var(--font-display); font-size:28px; font-weight:600; letter-spacing:-.01em; line-height:1.15; }
+.th-op.is-hello .th-op-o{ width:14px; height:14px; }
+.th-op.is-hello .th-op-t{ color:var(--text); text-shadow:0 0 22px color-mix(in srgb, var(--op-c) 35%, transparent); }
+.th-op.is-hello .th-op-t i{ font-style:normal; display:inline-block; }
+.th-op.is-hello .th-op-t.is-in i{ animation:opHelloIn .55s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i) * 90ms + 120ms); }
+@keyframes opHelloIn{ from{ opacity:0; filter:blur(6px); transform:translateY(4px); } }
+.th-biz{ font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-family:inherit; }
+@media (max-width:760px){ .th-op.is-hello{ font-size:22px; } }
+/* the hero: name side, the card dead center, the buttons side */
+@media (min-width:1181px){
+  .today-hero{ display:grid !important; grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr); align-items:center; column-gap:28px; }
+  .today-hero > .th-left{ min-width:0; }
+  .today-hero > .th-card{ justify-self:center; }
+  .today-hero > .th-right{ justify-self:end; width:100%; max-width:400px; }
+}
+.th-mix .th-wx{ margin-top:10px; }
+.th-wx .skyp{ height:38px; padding:0 16px; }
+.op-bub:not(.is-in){ transition-duration:.2s !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -24679,7 +24721,7 @@ function wakeBriefHtml(){
     const d = tcur; k++;
     const wms = typeof opVoiceOn==='function' && opVoiceOn() ? 250 : BRIEF_WORD_MS;
     // (quicker again: the page builds at reading pace; the voice keeps up by moving to the newest line)
-    if(voice){ lines.push({at: d - 380, text: voice, key:String(cls).split(' ')[0].replace(/^br-/, '')}); tcur += Math.max(900, voice.split(' ').length*wms + 300); } else tcur += 500;
+    if(voice){ lines.push({at: d - 380, text: voice, key:String(cls).split(' ')[0].replace(/^br-/, '')}); tcur += Math.min(1500, Math.max(650, voice.split(' ').length*wms*0.55 + 200)); } else tcur += 320;
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
   const slept = lastNightSleep();
@@ -34762,11 +34804,14 @@ timeWorkedHtml = function(){
 };
 function fmtH(m){ if(!m) return '0'; const h = m/60; return h >= 10 ? Math.round(h)+'h' : h >= 1 ? (Math.round(h*10)/10)+'h' : m+'m'; }
 
-// ---- the streak + time worked card ----
-function todayMix(){ return state.profile.todayMix==='one' ? 'one' : 'split'; }
+// ---- the stats row under the hero: one compact card ----
+// the streak, this week as the streak's circles (each ring is the hours worked that day), deep work
+// today and tasks today. (This week's total lives in the This week panel; it shows here only when
+// that panel is off.)
+function weekPanelOn(){ return state.dashboardPanels.enabled.week!==false && arr(state.dashboardPanels.order).indexOf('week')>=0; }
 function streakWorkHtml(o){
   o = o || {};
-  const w = weekWork(), streak = computeStreak(), allDone = dayStandardsComplete(todayStr()), one = todayMix()==='one';
+  const w = weekWork(), streak = computeStreak(), allDone = dayStandardsComplete(todayStr()), full = !o.compact;
   const C = 2*Math.PI*15;
   const days = w.days.map(function(x){
     const status = isBreakDay(x.d) ? 'broken' : dayVisualStatus(x.d), off = isDayOff(x.d) && status!=='worked';
@@ -34781,15 +34826,13 @@ function streakWorkHtml(o){
   const dwToday = deepWorkMinutesTodayLive();
   const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today'; });
   const doneToday = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); });
-  const extra = one ? '<div class="sw-x">'+
-      '<div class="sw-k" id="swDeep" title="Deep work today"><span>Deep work</span><b>'+fmtHours(dwToday)+'</b><i class="sw-bar"><u style="width:'+Math.min(100, dwToday/w.target*100).toFixed(1)+'%"></u></i><small>of '+fmtHours(w.target)+'</small></div>'+
-      '<div class="sw-k" data-action="goToFinishedTasks" title="Tasks done today"><span>Tasks</span><b>'+doneToday.length+'<small> / '+(doneToday.length+todayTasks.length)+'</small></b><small>done today</small></div>'+
-    '</div>' : '';
-  return '<div class="sw'+(one ? ' is-one' : '')+(streak > 0 ? ' is-hot' : '')+'">'+
-    '<div class="sw-l"><div class="sw-streak"><span class="sw-flame">&#128293;</span><b class="'+(o.ticked ? 'streak-tick-pop' : '')+'">'+streak+'</b><span>day'+(streak===1 ? '' : 's')+'<br>streak</span>'+(allDone ? '<span class="streak-ok" title="Today\'s standard: done">&#10003;</span>' : '')+'</div>'+
-      '<div class="sw-tw"><b>'+fmtDurationLabel(w.total)+'</b><span>worked this week &middot; yesterday '+fmtDurationLabel(w.yesterday)+'</span></div></div>'+
+  const showTotal = !full || !weekPanelOn();
+  return '<div class="sw'+(full ? ' is-row' : '')+(streak > 0 ? ' is-hot' : '')+'">'+
+    '<div class="sw-l"><div class="sw-streak"><span class="sw-flame">&#128293;</span><b class="'+(o.ticked ? 'streak-tick-pop' : '')+'">'+streak+'</b><span>day'+(streak===1 ? '' : 's')+'<br>streak</span>'+(allDone ? '<span class="streak-ok" title="Today\'s standard: done">&#10003;</span>' : '')+(full ? tip((streak===0 ? 'Hit today\'s standard to start one. ' : allDone ? 'Today\'s in the bag. ' : 'Hit today\'s standard to keep it going. ')+'The streak counts days in a row you hit Today\'s Standard: the deep-work target plus your checklist. Each circle is a day this week; its ring fills with the hours you worked.') : '')+'</div>'+
+      (showTotal ? '<div class="sw-tw"><b>'+fmtDurationLabel(w.total)+'</b><span>this week</span></div>' : '')+'</div>'+
     '<div class="sw-days">'+days+'</div>'+
-    extra+
+    (full ? '<div class="sw-k" id="swDeep" title="Deep work today"><span>Deep work today</span><b>'+fmtHours(dwToday)+'<small> / '+fmtHours(w.target)+'</small></b><i class="sw-bar"><u style="width:'+Math.min(100, dwToday/w.target*100).toFixed(1)+'%"></u></i></div>'+
+      '<div class="sw-k" data-action="goToFinishedTasks" title="Tasks done today"><span>Tasks today</span><b>'+doneToday.length+'<small> / '+(doneToday.length+todayTasks.length)+'</small></b></div>' : '')+
     '<button class="streak-edit-btn sw-edit" data-action="openStreakEdit" title="Edit streak days">Edit</button>'+
   '</div>';
 }
@@ -34845,7 +34888,6 @@ renderTodayHero = (function(base){
       '<div class="th-biz">'+escapeHtml(p.businessName || 'Operator')+'</div>'+
       thOpHtml()+
       (p.bigClockOnToday ? '<div id="liveClockBig" class="cal-big-clock th-bigclock"></div>' : '<div class="th-sub" id="liveClock"></div>')+
-      '<div class="th-streak">'+streakWorkHtml({ticked:ticked})+'</div>'+
       (state.profile.skyChip===false ? '' : '<div class="th-wx">'+skyChipHtml()+'</div>')+
     '</div>';
     void streak;
@@ -34863,21 +34905,19 @@ skyChipHtml = (function(base){
   };
 })(skyChipHtml);
 
-// ---- the stat chips: Time worked lives in the hero now; "All in one" folds the rest in too ----
+// ---- the stat chips become that one card ----
 renderPersonalStatsPanel = (function(base){
   return function(){
     const h = base.apply(this, arguments);
-    if(todayMix()==='one') return h.replace(/<div class="grid grid-3 stat-chip-row">[\s\S]*?<\/div><div class="card" style="text-align:center;margin-top:10px;">/, '<div class="card" style="text-align:center;">');
-    return h.replace('grid grid-3 stat-chip-row', 'grid grid-2 stat-chip-row').replace(/<div class="stat-chip tw-chip">[\s\S]*?<\/div><\/div><\/div><div class="stat-chip" data-action="goToFinishedTasks"/, '<div class="stat-chip" data-action="goToFinishedTasks"');
+    return h.replace(/<div class="grid grid-3 stat-chip-row">[\s\S]*?<\/div><div class="card" style="text-align:center;margin-top:10px;">/, '<div class="sw-wrap">'+streakWorkHtml()+'</div><div class="card" style="text-align:center;margin-top:10px;">');
   };
 })(renderPersonalStatsPanel);
 PANEL_RENDERERS.personalStats = function(){ return renderPersonalStatsPanel(); };
-// (the all-in-one deep work number keeps ticking while you work)
+// (deep work today keeps ticking while you work)
 setInterval(function(){
   const k = document.querySelector('#swDeep b'); if(!k) return;
-  const v = fmtHours(deepWorkMinutesTodayLive()); if(k.textContent!==v) k.textContent = v;
+  const v = fmtHours(deepWorkMinutesTodayLive()); if(k.firstChild && k.firstChild.nodeType===3 && k.firstChild.textContent!==v) k.firstChild.textContent = v;
 }, 30000);
-ACTIONS.todayMix = function(el, e, id){ state.profile.todayMix = id; persist('profile'); playTick(); renderView(); };
 
 // ---- Cockpit: a second locked-in view ----
 const LOCKED_STYLES = [['player', 'Player', 'The task like a song playing: big cover, the timer as its progress.'], ['cockpit', 'Cockpit', 'Timer, task and your whole day at a glance: the week, deep work, what’s next.']];
@@ -34917,7 +34957,7 @@ function cockpitHtml(){
       '<div class="ckp-row"><span>Deep work</span><b>'+fmtHours(dw)+'<small> / '+fmtHours(target)+'</small></b></div><i class="sw-bar"><u style="width:'+Math.min(100, dw/target*100).toFixed(1)+'%"></u></i>'+
       '<div class="ckp-row"><span>Tasks done</span><b>'+done+'</b></div>'+
       (ev ? '<div class="ckp-row"><span>Next up</span><b class="ckp-ev">'+fmt12Hour(ev.time)+' &middot; '+escapeHtml(ev.title)+'</b></div>' : '')+
-      '<div class="ckp-cap" style="margin-top:16px;">This week</div>'+streakWorkHtml()+
+      '<div class="ckp-cap" style="margin-top:16px;">This week</div>'+streakWorkHtml({compact:true})+
     '</div>'+
   '</div>';
 }
@@ -34937,11 +34977,9 @@ ACTIONS.lockedStyleSet = function(el, e, id){ state.profile.lockedStyle = id; pe
 // ---- Settings → Look & Sound: Today and the locked-in view ----
 soundSettingsHtml = (function(base){
   return function(){
-    const mix = todayMix(), ls = lockedStyle();
+    const ls = lockedStyle();
     return base.apply(this, arguments)+
-      '<div class="section r34-set"><div class="section-title">Today &amp; locked in</div><div class="card">'+
-        '<div class="kpi-sub">Today’s stats</div>'+
-        '<div class="seg-tabs" style="margin:8px 0 16px;"><button class="seg-tab'+(mix==='split' ? ' active' : '')+'" data-action="todayMix" data-id="split">Split</button><button class="seg-tab'+(mix==='one' ? ' active' : '')+'" data-action="todayMix" data-id="one">All in one</button></div>'+
+      '<div class="section r34-set"><div class="section-title">Locked in</div><div class="card">'+
         '<div class="kpi-sub">Locked-in view (the Minimal button on Focus, or M)</div>'+
         '<div class="ls-picks">'+LOCKED_STYLES.map(function(x){ return '<button class="ls-pick'+(x[0]===ls ? ' is-on' : '')+'" data-action="lockedStyleSet" data-id="'+x[0]+'"><span class="ls-mini is-'+x[0]+'"><i></i><i></i><i></i></span><b>'+x[1]+'</b><small>'+x[2]+'</small></button>'; }).join('')+'</div>'+
       '</div></div>';
@@ -35036,33 +35074,13 @@ ACTIONS.autoLockReject = function(){
   showToast('Thrown away. Auto lock-in waits half an hour.', {icon:'&#128465;', duration:4000});
 };
 
-// ---- XP only for real work ----
-// An auto session pays its XP once you keep it in the recap (or once it's two days old and you never
-// looked). A session you throw out takes its XP with it, one you mark as not work too. Anything
-// under five minutes never paid.
-function sessionXpHeld(s){
-  if(!s || sessionType(s)!=='deep') return false;
-  if(s.notWork) return true;
-  if((s.minutes||0) < 5) return true;
-  return !!(s.auto && !s.reviewed && s.date >= addDays(todayStr(), -1));
-}
-function xpHeldMinutes(d){
-  let m = arr(state.focus.sessions).filter(function(s){ return s.date===d && sessionXpHeld(s); }).reduce(function(a, s){ return a + (s.minutes||0); }, 0);
-  const as = state.focus.activeSession;
-  if(d===todayStr() && as && as.autoStarted && sessionType(as)==='deep') m += Math.max(0, Math.floor(((as.onBreak ? as.startedAt + (as.frozenElapsedMs||0) : Date.now()) - as.startedAt)/60000));
-  return m;
-}
-xpCtx = (function(base){
-  return function(){
-    const c = base.apply(this, arguments), deep = c.deep, memo = {};
-    c.deep = function(d){ if(memo[d]==null) memo[d] = Math.max(0, deep(d) - xpHeldMinutes(d)); return memo[d]; };
-    return c;
-  };
-})(xpCtx);
+// ---- XP comes off with a session you throw out ----
+// XP is counted from your sessions, so removing one rewinds what it paid. (The count is cached by
+// a signature; edits to a session's length are part of it now, so an edit rewinds too.)
 xpSig = (function(base){
   return function(){
-    let h = 0; arr(state.focus.sessions).forEach(function(s){ h = (h*31 + (s.minutes||0) + (s.reviewed ? 7 : 0) + (s.notWork ? 13 : 0)) % 1000000007; });
-    return base.apply(this, arguments)+'|'+h+'|'+addDays(todayStr(), -1);
+    let h = 0; arr(state.focus.sessions).forEach(function(s){ h = (h*31 + (s.minutes||0)) % 1000000007; });
+    return base.apply(this, arguments)+'|'+h;
   };
 })(xpSig);
 // the recap: throwing a session out says what it costs; an auto one shows its XP is waiting on you
@@ -35075,11 +35093,252 @@ ACTIONS.recapDiscard = (function(base){
     if(lost > 0){ clearToasts(); showToast('Session removed: '+lost.toLocaleString()+' XP came off with it', {icon:'&#128465;', actionLabel:'Undo', actionAction:'undoRecapDiscard', duration:7000}); }
   };
 })(ACTIONS.recapDiscard);
-renderRecap = (function(base){
+
+// ============ ROUND 35: SMOOTH DAY LOOP, SLEEP FROM "THAT'S THE DAY", AUTO LOCK-IN / LOCK-OUT ============
+
+// ---- full-screen changes go through a dark veil ----
+// Clocking out, Done, going to sleep, Good morning, clocking back in: the full-screen views used to fade
+// through transparency, so for a beat you saw the regular app behind them. Now the screen dips to the
+// night color, the change happens behind it, and the new view comes up out of it.
+// (the change itself happens right away, so nothing that calls these waits on it)
+let fsVeilEl = null;
+function fsVeil(then, hold){
+  let v = fsVeilEl;
+  if(!v){ v = fsVeilEl = document.createElement('div'); v.className = 'fs-veil is-on'; document.body.appendChild(v); }
+  try{ then(); }finally{
+    clearTimeout(v._t);
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      v._t = setTimeout(function(){ v.classList.add('is-out'); if(fsVeilEl===v) fsVeilEl = null; setTimeout(function(){ v.remove(); }, 420); }, hold || 110);
+    }); });
+  }
+}
+// leaving a full-screen view: through the veil too (it used to fade the view out over the app)
+npLeave = function(then){ fsVeil(then); };
+['clockIn', 'windDone', 'startSleepMode', 'sleepUp', 'sleepGoodMorning', 'toggleLockedView', 'toggleFocusMinimal'].forEach(function(k){
+  const base = ACTIONS[k]; if(typeof base!=='function') return;
+  // (the ones that open a full-screen overlay hold the dark a little longer, while it comes in)
+  const hold = {clockIn:340, sleepGoodMorning:460, sleepUp:200}[k];
+  ACTIONS[k] = function(){ const a = arguments, self = this; fsVeil(function(){ base.apply(self, a); }, hold); };
+});
+// Clock out: straight into the wind-down behind the veil (no flash of the clocked-out page first)
+ACTIONS.clockOut = (function(base){
   return function(){
-    return base.apply(this, arguments).replace(/(<div class="rc-sess is-pending"[^>]*>[\s\S]*?<span class="tag">auto[^<]*<\/span>)/g, '$1<span class="tag rc-xp-held" title="Its XP lands when you keep it">XP on hold</span>');
+    if(state.focus.activeSession){ showToast('Lock out of your session first.', {icon:'&#128274;'}); return; }
+    const a = arguments, self = this;
+    fsVeil(function(){
+      base.apply(self, a);
+      if(typeof openWindDown==='function' && state.modes.active && state.modes.active.clockedOut && !overlayOpen('windOverlay')) openWindDown('recap');
+    }, 280);
   };
-})(renderRecap);
+})(ACTIONS.clockOut);
+
+// ---- the end of the wind-down: just Done. Sleep lives on That's the day ----
+windHtml = (function(base){
+  return function(){
+    return base.apply(this, arguments).replace(/<button class="wd-alt" data-action="windGoToSleep"[^>]*>[\s\S]*?<\/button>/, '');
+  };
+})(windHtml);
+// That's the day: the Tomorrow button becomes the way to bed. "Tmrw 10 AM" → the sleep screen.
+function sleepBtnLabel(){
+  const target = typeof wakeTargetDate==='function' ? wakeTargetDate() : addDays(todayStr(), 1), wake = typeof wakeTimeFor==='function' ? wakeTimeFor(target) : null;
+  if(!wake) return '&#127769; Go to sleep';
+  return '&#127769; '+(target===addDays(todayStr(), 1) ? 'Tmrw' : target===todayStr() ? 'Today' : weekdayShort(target))+' '+fmt12Hour(wake);
+}
+renderWeekendOffView = (function(base){
+  return function(){
+    return base.apply(this, arguments).replace(/<button class="dayoff-back" data-action="openWindDown" data-step="alarm"[^>]*>[\s\S]*?<\/button>/,
+      '<button class="dayoff-back is-sleep" data-action="startSleepMode" title="Going to sleep: the screen goes dark until the alarm">'+sleepBtnLabel()+'</button>');
+  };
+})(renderWeekendOffView);
+
+// ---- auto lock-in: only work apps start it, and work minutes add up ----
+// Time in Operator, Finder, a browser it can't see into (Firefox) or anything not marked work never
+// starts a session and never counts toward one. Work minutes do add up across quick switches (a
+// minute here, three there); a long stretch away from work apps starts the count over.
+autoWorkStretch = function(ivs){
+  let i = ivs.length - 1;
+  if(i < 0 || activityCategory(ivs[i].app)!=='work') return null;
+  let start = ivs[i].start, work = 0, away = 0;
+  for(; i >= 0; i--){
+    const iv = ivs[i], c = activityCategory(iv.app), len = Math.max(0, iv.end - iv.start);
+    if(i < ivs.length - 1 && start - iv.end > 5*60000) break;           // a gap (idle or asleep)
+    if(c==='work'){ work += len; away = 0; start = iv.start; }
+    else { away += len; if(away > 5*60000) break; start = iv.start; }   // off work apps for 5+ minutes
+  }
+  return {start:start, workMs:work, lastRunMs:Infinity};
+};
+checkAutoLockIn = (function(){
+  const endPart = checkAutoLockIn;   // (round 34's: starts are below; its own handling of a running session stays)
+  return function(){
+    const st = state.settings.appTracking;
+    if(!st || st.enabled===false || st.autoLockIn===false) return;
+    if(state.focus.activeSession) return endPart.apply(this, arguments);
+    const ivs = state.appActivity.todayIntervals; if(!ivs.length) return;
+    const last = ivs[ivs.length-1];
+    if(Date.now() - last.end > APP_ACTIVITY_GAP_MS) return;
+    if(activityCategory(last.app)!=='work') return;
+    if(autoLockInBlockedReason()) return;
+    const s = autoWorkStretch(ivs); if(!s) return;
+    const from = Math.max(s.start, autoLockInCountFrom({start:s.start}));
+    const workMin = autoWorkMsFrom(ivs, from)/60000;
+    if(workMin < autoThresholdMin()) return;
+    if(autoLockInMeta.intervalStart===from) return;
+    // the session starts at your first work minute, not at a neutral app before it
+    let first = from; for(let k = 0; k < ivs.length; k++){ if(ivs[k].end > from && activityCategory(ivs[k].app)==='work'){ first = Math.max(from, ivs[k].start); break; } }
+    autoLockInMeta = {app:last.app, intervalStart:from};
+    const staged = ui.stagedTaskId; ui.stagedTaskId = null; ui.currentTaskId = null; ui.currentTaskStartedAt = null;
+    startFocus(null);
+    ui.stagedTaskId = staged;
+    const a = state.focus.activeSession;
+    if(a){ a.autoStarted = true; a.startedAt = first; a.autoApp = last.app; a.noTask = true; }
+    persist('focus'); renderView();
+    showToast('Locked in automatically: on '+last.app+' since '+fmt12Hour(nowHM(new Date(first)))+'.', {icon:'&#128274;', actionLabel:'Not working', actionAction:'autoLockReject', duration:12000});
+  };
+})();
+
+// ---- auto lock-out: a session ends where the work stopped ----
+// Any deep-work session, yours or automatic: once there's been no work-app activity for a while
+// (3 minutes for an automatic one, your "away" time, 10 by default, for one you started), it stops
+// at the last moment you were on a work app. Sitting in Operator, Firefox or anything else doesn't
+// keep it going, and neither does a Mac left on. The real part is kept, the rest never counted, and
+// "Add it back" is there if you were working away from the keys.
+function lastWorkActivityEnd(ivs, since){
+  for(let i = ivs.length - 1; i >= 0; i--){ const iv = ivs[i]; if(iv.end < since) break; if(activityCategory(iv.app)==='work') return iv.end; }
+  return null;
+}
+checkAwayFromSession = (function(base){
+  return function(){
+    base.apply(this, arguments);
+    const s = state.focus.activeSession, st = state.settings.appTracking;
+    if(!s || s.onBreak || !st || st.enabled===false || st.awayStop===false) return;
+    if(sessionType(s)!=='deep') return;
+    if(state.modes.active && state.modes.active.type && state.modes.active.type!=='offtime' && !state.modes.active.linkedFocus) return;
+    if(!lastRawSampleAt || Date.now() - lastRawSampleAt > 90000) return;   // the tracker has to be running
+    if(todayStr(new Date(s.startedAt))!==todayStr()) return;
+    const now = Date.now(), ivs = state.appActivity.todayIntervals;
+    const lw = Math.max(lastWorkActivityEnd(ivs, s.startedAt) || 0, s.startedAt);
+    const limit = s.autoStarted ? Math.max(3, Number(st.graceMinutes)||3)*60000 : awayLimitMs();
+    if(now - lw < limit) return;
+    const last = ivs[ivs.length-1], app = last && now - last.end <= APP_ACTIVITY_GAP_MS ? last.app : null;
+    if(s.autoStarted){ autoEndFocusSession(Math.max(lw, s.startedAt + 60000)); autoLockInMeta = {app:null, intervalStart:null}; return; }
+    endSessionForAway(Math.max(lw, s.startedAt + 60000), now, 'offwork', app || 'nothing work-related');
+  };
+})(checkAwayFromSession);
+// (the checks also run on their own every half minute, not only when new activity comes in)
+setInterval(function(){ try{ if(state && state.focus && state.focus.activeSession){ checkAwayFromSession(); checkAutoLockIn(); } }catch(e){} }, 30000);
+
+// ---- the greeting under the business name is Op saying hi ----
+// A few words in his voice, nothing about work: "Still up, Andre?" late at night, something warm or a
+// little wry in the day. With a key he writes it (fresh each part of the day); without one he picks
+// from his own lines. It comes in word by word, like his lines in Good morning.
+const OP_HELLOS = {
+  late:['Still up, {n}?', 'The night shift again, {n}?', 'Owls and you, {n}.', 'Can’t sleep either, {n}?'],
+  early:['Early one, {n}.', 'Up with the sun, {n}.', 'Beat the alarm, {n}?', 'Quiet hours. Nice, {n}.'],
+  morning:['Morning, {n}.', 'There you are. Morning, {n}.', 'Coffee first, {n}.', 'Fresh day, {n}.'],
+  afternoon:['Afternoon, {n}.', 'Good to see you, {n}.', 'Hey, {n}. Still going strong?', 'Afternoon. Hydrated, {n}?'],
+  evening:['Evening, {n}.', 'Evening, {n}. Easy does it.', 'Golden hour, {n}.', 'Hey you. Long day, {n}?']
+};
+function opHelloPart(){ const h = new Date().getHours(); return h < 5 ? 'late' : h < 9 ? 'early' : h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening'; }
+thOpLocal = function(){
+  const part = opHelloPart(), list = OP_HELLOS[part], name = (state.profile.name || '').split(' ')[0] || 'friend';
+  const d = Number(todayStr().replace(/-/g, ''));
+  return list[d % list.length].replace('{n}', name);
+};
+thOpKick = function(force){
+  if(typeof aiWrite!=='function' || AI.hasKey===false) return;
+  const k = thOpKey();
+  if(!force && ui.thOp && ui.thOp.k===k && (ui.thOp.text || ui.thOp.busy)) return;
+  ui.thOp = {k:k, busy:true};
+  const name = (state.profile.name || '').split(' ')[0];
+  aiWrite('Say hi to me for the top of my dashboard, in your own voice: a tiny greeting, two to seven words, the way you would when I open the app. It’s '+fmt12Hour(nowHM())+' on a '+new Date().toLocaleDateString('en-US', {weekday:'long'})+'. Playful, warm or a little wry, your personality. Nothing about work, tasks, hours or plans. Use my name ('+name+') if it fits. For the feel: “Still up, '+name+'?” late at night. A different one every time. Only the greeting: no quotes, no em dashes.', {max:40}).then(function(t){
+    t = String(t || '').trim().split('\n')[0].replace(/^["“']|["”']$/g, '').replace(/\s*[—–]\s*/g, ', ');
+    if(t.split(/\s+/).length > 10) t = '';
+    ui.thOp = {k:k, text:t || null};
+    const el = document.querySelector('.th-op-t'); if(el && t) opHelloPaint(el, t);
+  }).catch(function(){ ui.thOp = {k:k, text:null}; });
+};
+function opHelloWords(t){ return escapeHtml(t).split(' ').map(function(w, i){ return '<i style="--i:'+i+'">'+w+'</i>'; }).join(' '); }
+function opHelloPaint(el, t){ el.innerHTML = opHelloWords(t); el.classList.remove('is-in'); void el.offsetWidth; el.classList.add('is-in'); ui.thOpShown = t; }
+thOpHtml = function(){
+  const t = thOpText(), fresh = ui.thOpShown!==t;
+  if(fresh) setTimeout(function(){ ui.thOpShown = t; }, 50);
+  return '<div class="th-op is-hello" title="Op"><i class="th-op-o"></i><span class="th-op-t'+(fresh ? ' is-in' : '')+'">'+opHelloWords(t)+'</span></div>';
+};
+ACTIONS.thOpAgain = function(){ thOpKick(true); };
+
+// ---- Good morning: shorter, and it asks ----
+// The panels come in at a quicker pace (the voice keeps up by moving to the newest line). Sports only
+// names your teams' games; otherwise it's the gist ("Yesterday was NFL Sunday") and a question. The
+// news is the gist and a question too. When a line asks something, the mic opens and the brief waits
+// for you before it goes on.
+const ASK_MORE = ['Want the rundown?', 'Want to hear about it?', 'Want more on that?'];
+sportsTease = function(){
+  const f = sportsTeaseFacts(); if(!f) return null;
+  const cap = function(t){ return t.charAt(0).toUpperCase()+t.slice(1); };
+  const fav = f.picks.filter(function(p){ return p.fav; })[0], parts = [];
+  if(fav) parts.push(cap(teaseGameLine(fav))+'.');
+  else if(f.soon.length){ const s = f.soon[0].g; parts.push('The '+(favWords().some(function(w){ return s.home.name.toLowerCase().indexOf(w) >= 0; }) ? s.home.short : s.away.short)+' play '+scoreWhen(s).replace('Today', 'today').replace('Tomorrow', 'tomorrow')+'.'); }
+  if(!fav && f.busy.length){
+    const b = f.busy.slice().sort(function(a, c){ return c.n - a.n; })[0], dow = new Date().getDay();
+    parts.push(/NFL/i.test(b.league) && dow===1 ? 'Yesterday was NFL Sunday.' : b.n >= 7 ? 'Big night in the '+b.league+'.' : 'A busy night in the '+b.league+'.');
+  } else if(!parts.length && f.picks.length) parts.push('A few games last night.');
+  if(!parts.length) return null;
+  parts.push(teasePick('askS', ASK_MORE));
+  return {text:parts.join(' '), topics:fav ? ['the '+(fav.g.home.win ? fav.g.home : fav.g.away).short+' game'] : ['the games'], facts:f.picks.slice(0, 4).map(function(p){ return p.league+': '+p.g.away.name+' '+p.g.away.score+', '+p.g.home.name+' '+p.g.home.score+' ('+(p.g.detail||p.g.state)+')'+(p.fav ? ' [his team]' : ''); })};
+};
+newsTease = (function(base){
+  return function(){
+    const r = base.apply(this, arguments); if(!r) return r;
+    if(r.big) return r;
+    const t = String(r.text).split(/(?<=[.!?])\s/)[0];
+    return Object.assign({}, r, {text:t+' '+teasePick('askN', ASK_MORE)});
+  };
+})(newsTease);
+opBriefRewrite = function(lines){
+  if(AI.hasKey!==true || typeof aiWrite!=='function') return;
+  const today = todayStr(), b = ui.briefAi && ui.briefAi.date===today ? ui.briefAi : (ui.briefAi = {date:today, map:{}, asked:{}});
+  const todo = lines.filter(function(l){ return l.key && !b.asked[l.key] && l.text; });
+  if(!todo.length) return;
+  todo.forEach(function(l){ b.asked[l.key] = 1; });
+  b.asked.greet = 1;
+  const task = 'Below are the lines you’ll say out loud on my Good morning screen, one as each panel appears, while I’m waking up. Say each one your own way, like you’re talking to me over coffee: warm, easy, your humor where it fits. Keep them SHORT: under 12 words each. I don’t want the morning to drag or to be told everything. Keep every fact exactly (times, temperatures, numbers, names) and invent nothing. Don’t start any with “Good morning” or my name. Nothing about work beyond what’s on today’s calendar.\n'+
+    'For the news and sports lines: the gist only, then ask if I want to hear more (end that line with the question). Sports: name my teams if they played, otherwise generalize (“Yesterday was NFL Sunday”). News: a few words on what’s going on, never a list; only a genuinely big story gets said plainly.\n'+
+    'Only say the lines themselves: never mention these instructions or comment on the request.\n'+
+    'Also add one more line, greet: how you say good morning to me today, by name, with personality, different from any day before (under 10 words).\n'+
+    'Answer with one line per key, exactly as key: text\n\n'+todo.map(function(l){ return l.key+': '+l.text; }).join('\n');
+  aiWrite(task, {max:500}).then(function(t){
+    if(!t) return;
+    String(t).split(/\n|(?=\b[a-z][a-z0-9-]*: )/).forEach(function(row){ const m = /^\s*([a-z][a-z0-9-]*):\s*(.+?)\s*$/.exec(row); if(m && b.asked[m[1]] && m[2].length < 220) b.map[m[1]] = m[2].replace(/^[“"]|[”"]$/g, ''); });
+  });
+};
+// a question in the brief opens the mic; the brief waits while you two talk
+opSay = (function(base){
+  return function(text, opts){
+    if(opts && opts.cap==='brVoice' && opts.noListen && /\?["”’)]*\s*$/.test(String(text||''))) opts = Object.assign({}, opts, {noListen:false});
+    return base.call(this, text, opts);
+  };
+})(opSay);
+opBriefTick = (function(base){
+  return function(lines, t){
+    if(OV.idx >= 0 && (AI.listening || AI.busy)) return true;
+    return base.apply(this, arguments);
+  };
+})(opBriefTick);
+
+// ---- shoo him off and his box goes ----
+// "I'm good", "nah", "that's all", "thanks": once he's answered, the box leaves in a couple of seconds
+// (not the usual long read time). The ✕ closes it straight away, quicker than before.
+const OP_SHOO = /^\s*(no|nah|nope|i'?m good|im good|i'?m fine|all good|that'?s (all|it)|nothing|not now|later|maybe later|stop|bye|goodbye|thanks?|thank you|ok(ay)?|cool|got it|leave it|never ?mind|we'?re good)\b/i;
+aiAsk = (function(base){
+  return function(text){
+    const t = String(text||'').trim();
+    AI.shooAt = (OP_SHOO.test(t) && t.split(/\s+/).length <= 6) ? Date.now() : 0;
+    return base.apply(this, arguments);
+  };
+})(aiAsk);
+opBubStay = (function(base){
+  return function(){ if(AI.shooAt && Date.now() - AI.shooAt < 90000) return 2400; return base.apply(this, arguments); };
+})(opBubStay);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

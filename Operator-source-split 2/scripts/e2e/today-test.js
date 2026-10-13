@@ -47,7 +47,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Esc closes the menu', !(await p.isVisible('#taskCtxMenu')));
   // panels on Today
   await p.click('[data-action="nav"][data-view="today"]');
-  check('morning: no wind down, streak in the hero', !(await p.isVisible('[data-action="toggleWindDown"]')) && await p.isVisible('.today-hero .streak-num'));
+  check('morning: no wind down, streak in the hero', !(await p.isVisible('[data-action="toggleWindDown"]')) && await p.isVisible('.sw-wrap .sw-streak b'));
   check('Today timeline panel is off', (await p.$$('.agenda-panel')).length===0);
   await p.locator('.progress-panel').scrollIntoViewIfNeeded();
   check('week chart + heatmap in one panel, and why panel', await p.isVisible('.progress-panel .wk-bars') && (await p.$$('.progress-panel .hm-cell')).length>100 && (await p.$$('.heatmap-panel, .week-panel')).length===0 && (await p.textContent('.why-panel')).includes('Freedom of time'));

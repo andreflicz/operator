@@ -17,7 +17,7 @@ function aiRoute(log, opts){
     if(u.includes('/ai/status')) return r.fulfill({status:200, headers:CORS, body:'{"ok":true,"hasKey":true}'});
     if(u.includes('/ai/models')) return r.fulfill({status:200, headers:CORS, body:JSON.stringify({data:[{id:'claude-sonnet-5-5'}, {id:'claude-haiku-5-5'}, {id:'claude-haiku-4-5'}]})});
     if(u.includes('/ai/chat')){
-      const body = JSON.parse(hex(u.split('b=')[1])); log.push(body);
+      const body = JSON.parse(hex(u.split('b=')[1])); if(!/top of my dashboard/.test(JSON.stringify(body.messages||''))) log.push(body);
       const last = body.messages[body.messages.length-1], text = typeof last.content==='string' ? last.content : '';
       const reply = t => r.fulfill({status:200, headers:CORS, body:JSON.stringify({stop_reason:'end_turn', content:[{type:'text', text:t}]})});
       if(Array.isArray(last.content) && last.content.some(c => c.type==='tool_result')) return reply('Done, sir. It’s on today’s list, and I’ve made a note of the gym thing.');

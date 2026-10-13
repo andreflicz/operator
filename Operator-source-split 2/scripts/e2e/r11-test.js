@@ -38,7 +38,7 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     await p.locator('.nn-now .nn-drag').first().dragTo(p.locator('[data-dropzone="next"]').first()); await p.waitForTimeout(200);
     check('drag Now onto Up next → swaps', await E("ui.currentTaskId")===null && await E("state.focus.nextTaskId")==='c');
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(150);
-    check('the streak hint lives in the ? (no line to jump the layout)', !/Hit today.s standard/.test(await p.textContent('.th-streak .streak-status')));
+    check('the streak hint lives in the ? (no line to jump the layout)', !/Hit today.s standard/.test(await p.textContent('.sw-wrap .sw-streak')));
     check('List is the first lineup view, and the default', await E("lineupView()")==='list');
     check('no errors (bugs)', !p.errors.length, p.errors);
     await p.context().close();

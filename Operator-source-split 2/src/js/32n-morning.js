@@ -494,7 +494,7 @@ function wakeBriefHtml(){
     const d = tcur; k++;
     const wms = typeof opVoiceOn==='function' && opVoiceOn() ? 250 : BRIEF_WORD_MS;
     // (quicker again: the page builds at reading pace; the voice keeps up by moving to the newest line)
-    if(voice){ lines.push({at: d - 380, text: voice, key:String(cls).split(' ')[0].replace(/^br-/, '')}); tcur += Math.max(900, voice.split(' ').length*wms + 300); } else tcur += 500;
+    if(voice){ lines.push({at: d - 380, text: voice, key:String(cls).split(' ')[0].replace(/^br-/, '')}); tcur += Math.min(1500, Math.max(650, voice.split(' ').length*wms*0.55 + 200)); } else tcur += 320;
     return '<section class="br-p '+cls+' '+anim+'" data-k="'+(k-1)+'" style="--d:'+d+'ms'+(extraStyle||'')+'"'+(attrs||'')+'>'+html+'</section>';
   };
   const slept = lastNightSleep();
