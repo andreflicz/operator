@@ -223,6 +223,38 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("openAlarmSheet()"); await p.waitForTimeout(150);
     check('r33: a new alarm picks an emoji', (await p.$$('#alarmSheet .al-emo .as-chip')).length >= 8);
     check('r33: the activity pill is white and wears Op’s color', await p.evaluate(() => { const el = document.querySelector('.activity-pill'); if (!el) return true; const cs = getComputedStyle(el); return /gradient/.test(cs.backgroundImage) && cs.zIndex==='9540'; }));
+    // ---------- round 34 ----------
+    await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); state.profile.businessName='Flicz Media'; ui.view='today'; renderView()"); await p.waitForTimeout(300);
+    check('r34: the hero is the business name, then a line from Op', (await p.textContent('.th-biz'))==='Flicz Media' && (await p.textContent('.th-op-t')).length > 5 && !(await p.$('.th-greet')));
+    check('r34: streak and time worked are one card: this week as seven circles, Monday first', (await p.$$('.th-streak .sw .sw-day')).length===7 && await E("weekWork().days[0].d===startOfWeekStr(todayStr())") && !(await p.$('.tw-chip')));
+    check('r34: time worked this week is the same number as the This week panel', await E("weekWork().total===(function(){ let t=0; for(let i=0;i<7;i++){ const d=addDays(startOfWeekStr(todayStr()), i); t += d===todayStr() ? deepWorkMinutesTodayLive() : d<todayStr() ? deepWorkMinutesFor(d) : 0; } return t; })()"));
+    check('r34: the weather bar sits under the card and spans it', await p.evaluate(() => { const w = document.querySelector('.th-wx .skyp'), c = document.querySelector('.th-streak .sw'); if(!w) return true; const a = w.getBoundingClientRect(), b = c.getBoundingClientRect(); return a.top >= b.bottom - 1 && a.width >= b.width - 4; }));
+    await E("state.profile.todayMix='one'; renderView()"); await p.waitForTimeout(200);
+    check('r34: All in one: deep work, tasks, time worked and the streak in one panel (no stat chips)', !!(await p.$('.th-streak .sw.is-one #swDeep')) && !(await p.$('.stat-chip-row')));
+    check('r34: Settings has Split / All in one and the two locked-in views', /data-action="todayMix"/.test(await E("soundSettingsHtml()")) && ((await E("soundSettingsHtml()")).match(/data-action="lockedStyleSet"/g)||[]).length===2);
+    await E("state.profile.lockedStyle='cockpit'; state.profile.lockedView='minimal'; startFocus(50); ui.view='focus'; renderView()"); await p.waitForTimeout(300);
+    check('r34: the Cockpit locked-in view: timer, task, the day', !!(await p.$('.np.is-cockpit .ckp .ckp-timer')) && !!(await p.$('.ckp-day .sw')));
+    await E("state.appActivity.todayIntervals.push({app:'Final Cut Pro', start:Date.now()-60000, end:Date.now()}); ui.view='today'; renderView(); updateActivityPill()"); await p.waitForTimeout(200);
+    check('r34: the pill has one circle (color and timer together)', !!(await p.$('#activityPill .ap-ring.is-cat')) && !(await p.$('#activityPill .ap-dot')));
+    await p.click('#activityPill', {position:{x:150, y:20}}); await p.waitForTimeout(300);
+    check('r34: …and tapping it still opens its menu, on top', await p.evaluate(() => { const m = document.getElementById('activityPillMenu'); if(!m) return false; const r = m.getBoundingClientRect(), t = document.elementFromPoint(r.x + r.width/2, r.y + 20); return !!(t && t.closest('#activityPillMenu')); }));
+    // ---------- round 34: auto lock-in and XP ----------
+    await E("if(state.focus.activeSession){ state.focus.activeSession=null; } state.focus.lastManualStopAt=null; state.focus.lastSessionEndedAt=null; state.focus.autoRejectedAt=null; state.modes.active=null; ui.view='today'; renderView()");
+    const ivs = (spec) => E("(function(){ const now=Date.now(); let t=now; const out=[]; "+JSON.stringify(spec)+".slice().reverse().forEach(function(x){ out.unshift({app:x[0], start:t-x[1]*60000, end:t}); t-=x[1]*60000+5000; }); state.appActivity.todayIntervals=out; autoLockInMeta={app:null,intervalStart:null}; checkAutoLockIn(); return !!state.focus.activeSession; })()");
+    check('r34 auto: ten minutes in Finder and a minute in Final Cut doesn’t lock you in', await ivs([['Finder', 11], ['Final Cut Pro', 1]])===false);
+    check('r34 auto: a few blips on a work app between other things doesn’t either', await ivs([['Final Cut Pro', 4], ['Finder', 4], ['Final Cut Pro', 3], ['Finder', 4], ['Final Cut Pro', 1]])===false);
+    check('r34 auto: a steady 14 minutes in Final Cut does', await ivs([['Final Cut Pro', 14]])===true);
+    await E("ACTIONS.autoLockReject()");
+    check('r34 auto: “Not working” throws it away and it waits', await E("!state.focus.activeSession && autoLockInBlockedReason()==='rejected'") && await ivs([['Final Cut Pro', 20]])===false);
+    await E("state.focus.autoRejectedAt=null; xpLast=null");
+    const x0 = await E("xpLast=null; xpSummary().total");
+    await E("state.focus.sessions.push({id:'au1', type:'deep', date:todayStr(), startedAt:Date.now()-3*3600000, endedAt:Date.now()-3600000, minutes:120, auto:true, reviewed:false}); xpLast=null; dwTodayCache=null");
+    check('r34 xp: an auto session you haven’t kept pays nothing yet', await E("xpSummary().total")===x0);
+    await E("state.focus.sessions.find(s=>s.id==='au1').reviewed=true; xpLast=null; dwTodayCache=null");
+    const x1 = await E("xpSummary().total");
+    check('r34 xp: keep it and its XP lands', x1 > x0);
+    await E("ui.recapDate=todayStr(); ACTIONS.recapDiscard(null, null, 'au1')");
+    check('r34 xp: throw it out and the XP comes back off', await E("xpLast=null; dwTodayCache=null; xpSummary().total")===x0);
     check('no page errors (round 33)', p.errors.length===0, p.errors);
     await p.context().close();
   }
