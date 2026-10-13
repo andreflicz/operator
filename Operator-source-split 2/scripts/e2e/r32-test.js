@@ -63,7 +63,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('Calendar: days show what’s on them', /Shoot B-roll/.test(await p.textContent('.cx-d[data-date="2026-10-15"]')));
     check('Calendar: reminders and alarms share a card (reminders first when one’s due)', !!(await p.$('.cx-desk .cx-r')) && /Call Mike back/.test(await p.textContent('.cx-desk')));
     await p.click('.cx-desk [data-action="cxDesk"][data-id="alarms"]'); await p.waitForTimeout(250);
-    check('…and flip to alarms (wake up, work hours, the sound)', !!(await p.$('.cx-desk .cx-al.is-wake')) && !!(await p.$('.cx-desk .cx-snd')));
+    check('…and flip to alarms (wake up, work hours, every other alarm in the same card style)', !!(await p.$('.cx-desk .cx-al.is-wake')) && (await p.$$('.cx-desk .cx-al.is-other')).length >= 1 && !(await p.isVisible('.cx-desk .cx-snd')) && !(await p.isVisible('.cx-desk .cx-gm')));
     check('Calendar: the month gets the room', await p.evaluate(() => document.querySelector('.cx-month').getBoundingClientRect().width) > 700);
     await E("ui.view='today'; state.tasks.items.forEach(t => t.status='backlog'); renderView()");
     check('Today: no “+ Add Tasks for Today” button', !/Add Tasks for Today/.test(await p.evaluate(() => document.getElementById('viewRoot').innerHTML)));
@@ -132,10 +132,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('the journal button stays on Op’s screen', await p.evaluate(() => { const j = document.querySelector('.quick-journal-fab'); return !!j && getComputedStyle(j).visibility==='visible' && Number(getComputedStyle(j).zIndex) > 9400; }));
     check('his screen has the scoreboard and a status line', !!(await p.$('#opfAcc .oa-h')) && !!(await p.$('#opfStatus')));
     await E("window._cl = 0; AI.listening = true; AI.cancelListen = function(){ window._cl++; AI.listening = false; }");
-    await p.mouse.click(700, 300); await p.waitForTimeout(150);
+    await E("document.activeElement && document.activeElement.blur()"); await p.keyboard.press('w'); await p.waitForTimeout(150);
     check('starting to write while he listens lets go of the mic', await E("window._cl")===1 && await E("AI.listening")===false);
     await E("window._asked = []; window._base = aiAsk; AI.busy = true");
-    await p.keyboard.type('what first?'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
+    await p.keyboard.type('hat first?'); await p.fill('#opfInput', 'what first?'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
     check('typing while he’s thinking waits its turn (not lost)', await E("OPQ.list.length")===1 && /yours is next/.test(await p.textContent('#opfStatus')));
     await E("AI.busy = false"); await p.waitForTimeout(900);
     check('…then it goes', await E("OPQ.list.length")===0 && await E("opChat().some(e => e.r==='me' && e.t==='what first?')"));
@@ -199,6 +199,31 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("opDay().reviewAt = 0; startMode('offtime', {sleep:true, note:'Sleep'}); OV.lastEnd = 0; AI.lastAskAt = 0; AI.lastUserAt = 0");
     check('quiet while you sleep', await E("opCanSpeakUp()")===false);
     check('no page errors (accountability)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
+  // ---------- round 33 ----------
+  {
+    const p = await newPage(b, OUT+'/r32.html', seed, T);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await E("ui.view='today'; renderView(); opfOpen({})"); await p.waitForTimeout(500);
+    const jb = await p.evaluate(() => { const r = document.querySelector('.quick-journal-fab').getBoundingClientRect(); return [r.x + r.width/2, r.y + r.height/2]; });
+    await p.mouse.click(jb[0], jb[1]); await p.waitForTimeout(500);
+    check('r33: the journal button works on Op’s screen (its window comes up on top)', await p.evaluate(() => { const c = document.getElementById('quickJournalContent'), r = c.getBoundingClientRect(), t = document.elementFromPoint(r.x + r.width/2, r.y + 30); return !!(t && t.closest('#quickJournalOverlay')); }));
+    await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); opfClose(); ui.view='calendar'; renderView()"); await p.waitForTimeout(300);
+    check('r33: the Calendar page doesn’t scroll', await p.evaluate(() => { const m = document.querySelector('main') || document.scrollingElement; return m.scrollHeight <= m.clientHeight + 1 || getComputedStyle(m).overflowY==='hidden'; }));
+    check('r33: the Calendar clock is a style you can change (Ring first)', !!(await p.$('.cx-now .ck.ck-ring')));
+    await p.click('.cx-now .ck'); await p.waitForTimeout(200);
+    check('r33: tap it: the next style (Minutes), saved', !!(await p.$('.cx-now .ck.ck-minutes')) && await E("state.profile.clockStyle")==='minutes');
+    check('r33: six styles to pick in Settings, and a Clock panel for Today', /ck-picks/.test(await E("soundSettingsHtml()")) && (await E("soundSettingsHtml()")).match(/data-action="clockSet"/g).length===7 && (await E("soundSettingsHtml()")).match(/data-action="timerSet"/g).length===6 && /ck-big/.test(await E("PANEL_RENDERERS.clock()")));
+    await E("state.focus.alarms.push({id:'am', time:'15:30', label:'Meds', emoji:'💊', days:[0,1,2,3,4,5,6], enabled:true}); ui.cxDesk='alarms'; renderView()"); await p.waitForTimeout(200);
+    check('r33: an alarm you add looks like the masters (its emoji, the time, a switch)', /💊/.test(await p.textContent('.cx-al.is-other .cx-al-i')) && !!(await p.$('.cx-al.is-other .cx-switch')) && !(await p.isVisible('.cx-gm')) && !(await p.isVisible('.cx-snd')));
+    await p.click('.cx-al.is-other .cx-switch'); await p.waitForTimeout(150);
+    check('r33: …its switch turns it off', await E("state.focus.alarms.find(a => a.id==='am').enabled")===false);
+    await E("openAlarmSheet()"); await p.waitForTimeout(150);
+    check('r33: a new alarm picks an emoji', (await p.$$('#alarmSheet .al-emo .as-chip')).length >= 8);
+    check('r33: the activity pill is white and wears Op’s color', await p.evaluate(() => { const el = document.querySelector('.activity-pill'); if (!el) return true; const cs = getComputedStyle(el); return /gradient/.test(cs.backgroundImage) && cs.zIndex==='9540'; }));
+    check('no page errors (round 33)', p.errors.length===0, p.errors);
     await p.context().close();
   }
 

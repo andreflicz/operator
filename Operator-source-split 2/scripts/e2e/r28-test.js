@@ -164,7 +164,8 @@ async function ctxPage(b, seed, opts){
     const v0 = JSON.parse(await E("JSON.stringify(ui.inspView)"));
     await p.mouse.move(700, 400); await p.mouse.wheel(0, 300); await p.waitForTimeout(150);
     const v1 = JSON.parse(await E("JSON.stringify(ui.inspView)"));
-    check('scrolling wanders the plane instead of zooming', v1.y < v0.y - 200 && v1.z===v0.z, [v0, v1]);
+    // (round 33: Inspiration doesn't scroll at all; drag still moves the sky)
+    check('scrolling does nothing on the plane (no pan, no zoom)', v1.y===v0.y && v1.x===v0.x && v1.z===v0.z, [v0, v1]);
     await p.keyboard.down('Control'); for(let i = 0; i < 8; i++) await p.mouse.wheel(0, 400); await p.keyboard.up('Control'); await p.waitForTimeout(150);
     check('…a pinch can’t zoom way out (never below 0.8)', await E("ui.inspView.z") >= 0.8);
     check('it opens close in (no zoomed-out overview)', await E("inspHome().z") >= 0.86);

@@ -136,22 +136,19 @@ async function ctxPage(b, seed, opts){
     check('his bubble has a full-screen button', !!(await p.$('#opBub .op-bub-full')));
     await p.click('#opBub .op-bub-full'); await p.clock.runFor(700); await p.waitForTimeout(200);
     check('a white plane: his full screen', await E("document.getElementById('opFull').classList.contains('is-in') && document.body.classList.contains('opf-on')") && await E("getComputedStyle(document.querySelector('.opf')).backgroundColor")==='rgb(246, 247, 251)');
-    await p.mouse.click(420, 300); await p.waitForTimeout(100);
-    check('click anywhere and a place to write appears right there', !!(await p.$('#opfPlane .opf-in input')) && Math.abs(await E("parseFloat(document.querySelector('.opf-in').style.left)") - 410) < 3);
-    await p.keyboard.type('how is my week going'); await p.keyboard.press('Enter'); await p.clock.runFor(1500); await p.waitForTimeout(400);
-    check('…your words stay there, and his answer comes in just under them', /how is my week going/.test(await p.textContent('#opfPlane .opf-me')) && /Noted/.test(await p.textContent('#opfPlane .opf-op')));
-    await E("document.activeElement.blur()"); await p.keyboard.press('h'); await p.waitForTimeout(100);
-    check('…or just start typing: the words land somewhere on the plane', await E("document.activeElement && document.activeElement.classList.contains('opf-type') && document.activeElement.value==='h'"));
-    await p.keyboard.press('Escape'); await p.keyboard.press('Escape');
-    await E("opfOpen()"); await p.click('.opf-m[data-id="chat"]'); await p.waitForTimeout(200);
-    check('Chat: the whole conversation, in order', await E("document.getElementById('opFull').dataset.mode")==='chat' && /how is my week going/.test(await p.textContent('#opfLog .opc-me')) && (await p.$$('#opfLog .opc-op')).length >= 1);
+    // (round 33: one screen, one conversation: his light on top, the talk under it, a box to type in)
+    check('one conversation: his light on top, no Plane / Chat switch', !!(await p.$('#opfChat .opf-orb')) && !(await p.$('.opf-m[data-id="plane"]')) && await E("document.getElementById('opFull').dataset.mode")==='chat');
+    await E("document.activeElement && document.activeElement.blur()"); await p.mouse.click(1300, 500); await p.waitForTimeout(100);
+    check('click anywhere and you’re typing to him', await E("document.activeElement && document.activeElement.id")==='opfInput');
+    await E("document.activeElement.blur()"); await p.keyboard.type('how is my week going'); await p.keyboard.press('Enter'); await p.clock.runFor(1500); await p.waitForTimeout(400);
+    check('…or just start typing: it lands in the box, and he answers in line', /how is my week going/.test(await p.textContent('#opfLog .opc-me')) && /Noted/.test(await p.textContent('#opfLog .opc-op')));
     await p.fill('#opfInput', 'and today?'); await p.press('#opfInput', 'Enter'); await p.clock.runFor(1500); await p.waitForTimeout(400);
-    check('…type at the prompt and it’s answered in line', (await p.$$eval('#opfLog .opc-me', e => e.map(x => x.textContent))).some(t => /and today\?/.test(t)) && (await p.$$('#opfLog .opc-op')).length >= 2);
+    check('…the whole conversation, in order', (await p.$$eval('#opfLog .opc-me', e => e.map(x => x.textContent))).some(t => /and today\?/.test(t)) && (await p.$$('#opfLog .opc-op')).length >= 2);
     await E("document.activeElement.blur()"); await p.keyboard.press('Escape'); await p.waitForTimeout(700);
     check('Esc takes you back to the app', !(await E("document.getElementById('opFull').classList.contains('is-in')")));
     // action mode: he does something, and you see it happen here
-    await E("state.profile.opfMode = 'plane'; AI.typedAt = 0; aiAsk('mark the reel done', 'opBubText')"); await p.clock.runFor(900); await p.waitForTimeout(400);
-    check('when Op gets to work, his full screen opens and shows what he did', await E("document.getElementById('opFull').classList.contains('is-in')") && /Done: Edit JJS reel/.test(await p.textContent('#opfActs')));
+    await E("AI.typedAt = 0; aiAsk('mark the reel done', 'opBubText')"); await p.clock.runFor(900); await p.waitForTimeout(400);
+    check('when Op gets to work, his full screen opens and shows what he did', await E("document.getElementById('opFull').classList.contains('is-in')") && /Done: Edit JJS reel/.test(await p.textContent('#opfLog')));
     check('…the task really is done, and it’s in the chat as an action', await E("state.tasks.items.find(t => t.id==='t1').status")==='done' && await E("opChat().some(e => e.r==='act' && /Edit JJS reel/.test(e.t))"));
     await p.clock.runFor(5000); await p.waitForTimeout(400);
     check('…and it slips away by itself when he’s done', !(await E("document.getElementById('opFull').classList.contains('is-in')")));

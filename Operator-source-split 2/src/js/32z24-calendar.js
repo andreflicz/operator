@@ -35,7 +35,8 @@ function cxRibbonHtml(){
 }
 function cxNowCardHtml(){
   return '<section class="cx-card cx-now" style="--i:0">'+
-    '<div class="cx-clock"><svg class="cx-ring" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54"/><circle id="cxRingArc" cx="60" cy="60" r="54" pathLength="60" style="stroke-dashoffset:'+(60 - new Date().getSeconds())+'"/></svg>'+
+    // (round 33: the face is a clock style you can change by tapping it; the minute ring is the first)
+    '<div class="cx-clock">'+(typeof clockFaceHtml==='function' ? clockFaceHtml('cx-face') : '')+
       '<div class="cx-clock-t"><div id="calendarBigClock" class="cx-time"></div><div id="calendarBigClockDate" class="cx-date"></div></div></div>'+
     '<div class="cx-sub">Your day</div>'+cxRibbonHtml()+
   '</section>';
@@ -47,11 +48,9 @@ function cxAlarmsBodyHtml(){
   return '<div class="cx-alarms">'+
     '<div class="cx-al is-wake'+(wk.enabled ? '' : ' is-off')+'"><span class="cx-al-i">&#9728;&#65039;</span><button class="cx-al-main" data-action="cxAlarmSetup" data-id="wake"><small>Wake up'+(nw && nw.override ? ' &middot; just tomorrow' : '')+'</small><b>'+fmt12Hour(nw && wk.enabled ? nw.time : wk.time || '07:00')+'</b><span>'+(typeof wakeDaysLabel==='function' ? wakeDaysLabel(wk.days || []) : '')+'</span></button>'+cxSwitch(!!wk.enabled, 'cxWakeToggle', 'Wake-up alarm')+'</div>'+
     '<div class="cx-al is-work'+(w.enabled ? '' : ' is-off')+'"><span class="cx-al-i">&#128188;</span><button class="cx-al-main" data-action="cxAlarmSetup" data-id="work"><small>Work hours</small><b>'+fmt12Hour(w.start)+' &ndash; '+fmt12Hour(w.end)+'</b><span>'+(typeof wakeDaysLabel==='function' ? wakeDaysLabel(w.days || []) : '')+(w.lunchOn!==false ? ' &middot; lunch '+fmt12Hour(w.lunch) : '')+'</span></button>'+cxSwitch(!!w.enabled, 'cxWorkToggle', 'Work alarm')+'</div>'+
-    // (Good morning's setup lives behind the wake-up alarm now)
-    '<button class="cx-gm" data-action="cxAlarmSetup" data-id="wake"><span>&#127749;</span><b>Good morning</b><em>'+[wk.voice!==false ? 'Op speaks' : 'quiet', wk.news ? 'the news' : '', wk.useMusic ? 'a wake-up song' : ''].filter(Boolean).join(' &middot; ')+'</em><i>&#8250;</i></button>'+
-    (others.length ? '<div class="cx-sub" style="margin-top:6px;">Other alarms</div>' : '')+
-    '<div class="cx-others">'+others.map(function(a){ return '<div class="cx-o'+(a.enabled ? '' : ' is-off')+'"><b>'+fmt12Hour(a.time)+'</b><span>'+escapeHtml(a.label || 'Alarm')+(a.date ? ' <em>'+fmtDateShort(a.date)+'</em>' : '')+'</span><button class="cx-o-t" data-action="toggleAlarmEnabled" data-id="'+a.id+'">'+(a.enabled ? 'On' : 'Off')+'</button><button class="cx-o-x" data-action="openAlarmEditModal" data-id="'+a.id+'" title="Edit">&#9998;</button></div>'; }).join('')+'</div>'+
-    '<div class="cx-snd"><span>Sound</span>'+['peaceful', 'standard', 'loud'].map(function(s){ return '<button class="cx-chip'+(p.alarmSound===s ? ' is-on' : '')+'" data-action="pickAlarmSound" data-sound="'+s+'">'+s[0].toUpperCase()+s.slice(1)+'</button>'; }).join('')+'<button class="cx-chip" data-action="previewAlarmSound" title="Hear it" aria-label="Hear it">&#9654;</button></div>'+
+    // (round 33: every other alarm looks the same as the two masters: its emoji, the time, the days,
+    // a switch, and a tap opens it. The sound and Good morning live inside each alarm's own setup.)
+    others.map(function(a){ return '<div class="cx-al is-other'+(a.enabled ? '' : ' is-off')+'"><span class="cx-al-i">'+(a.emoji || '&#9200;')+'</span><button class="cx-al-main" data-action="openAlarmEditModal" data-id="'+a.id+'"><small>'+escapeHtml(a.label || 'Alarm')+'</small><b>'+fmt12Hour(a.time)+'</b><span>'+(a.date ? (a.date===todayStr() ? 'Today only' : fmtDateShort(a.date)+' only') : typeof wakeDaysLabel==='function' ? wakeDaysLabel(a.days || []) : '')+'</span></button>'+cxSwitch(!!a.enabled, 'cxAlarmToggle', escapeHtml(a.label || 'Alarm')).replace('data-action="cxAlarmToggle"', 'data-action="cxAlarmToggle" data-id="'+a.id+'"')+'</div>'; }).join('')+
   '</div>';
 }
 // reminders, compact: what, when, a circle to tick it off
@@ -125,11 +124,10 @@ calPrevMonth = (function(base){ return function(){ ui.cxDir = -1; return base.ap
 calNextMonth = (function(base){ return function(){ ui.cxDir = 1; return base.apply(this, arguments); }; })(calNextMonth);
 ACTIONS.cxToday = function(){ const n = new Date(); ui.cxDir = (n.getFullYear()*12 + n.getMonth()) < (ui.calendarYear*12 + ui.calendarMonth) ? -1 : 1; ui.calendarYear = n.getFullYear(); ui.calendarMonth = n.getMonth(); ui.calendarSelectedDate = todayStr(); renderView(); };
 ACTIONS.cxTier = function(el, e, id){ ui.cxTier = id==='month' ? 'month' : 'week'; renderView(); };
+ACTIONS.cxAlarmToggle = function(el, e, id){ const a = arr(state.focus.alarms).find(function(x){ return x.id===id; }); if(!a) return; a.enabled = !a.enabled; persist('focus'); playTick(); renderView(); };
 ACTIONS.cxDesk = function(el, e, id){ ui.cxDesk = id==='reminders' ? 'reminders' : 'alarms'; renderView(); };
 ACTIONS.cxWakeToggle = function(){ const w = wakeCfg(); w.enabled = !w.enabled; persist('focus'); playTick(); renderView(); };
 ACTIONS.cxWorkToggle = function(){ const w = workCfg(); w.enabled = !w.enabled; if(w.enabled){ const d = workDayState(); if(!d.rangAt && hmMin(w.start)!=null && hmMin(w.start) <= nowMin()) d.rangAt = Date.now(); } persist('focus'); playTick(); renderView(); };
 ACTIONS.cxAlarmSetup = function(el, e, id){ ui.alarmTab = id==='work' ? 'work' : 'wake'; if(typeof openWakeSetup==='function') openWakeSetup(); };
-// the minute ring
-setInterval(function(){ const a = document.getElementById('cxRingArc'); if(a) a.style.strokeDashoffset = String(60 - new Date().getSeconds()); }, 1000);
 // (the now line keeps up)
 setInterval(function(){ if(ui.view==='calendar' && !document.querySelector('.overlay:not(.hidden)') && !(document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))) renderView(); }, 60000);

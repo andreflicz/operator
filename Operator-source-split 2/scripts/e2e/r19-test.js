@@ -62,7 +62,7 @@ async function ctxPage(b, seed, opts){
     check('…and they save', await E("JSON.stringify(state.standards.contentTargets)")==='{"business":{"n":5,"per":"week"},"personal":{"n":1,"per":"day"}}');
     // (round 31: alarms and mornings live on the Calendar; Op has his own Settings tab)
     await E("ui.view='calendar'; ui.cxDesk='alarms'; renderView(); document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'))"); await p.waitForTimeout(200);
-    check('Calendar: the wake-up alarm and the other alarms (adding one is the +)', await p.isVisible('.cx-al.is-wake') && !!(await p.$('.cx-alarms .cx-others')) && !(await p.$('.cx-addal')));
+    check('Calendar: the wake-up alarm and the other alarms (adding one is the +)', await p.isVisible('.cx-al.is-wake') && !(await p.$('.cx-addal')) && !(await p.isVisible('.cx-snd')));
     await E("ui.view='settings'; ui.settingsTab='op'; renderView()"); await p.waitForTimeout(600);
     check('Connections & data → The Operator: the app, the voice keys, the Anthropic key', await p.isVisible('#opAppCard') && await p.isVisible('#opVoiceSet') && await p.isVisible('#aiKey') && (await p.$$('#aiKey')).length===1);
     // (round 21: always its own app — no Google Chrome option)
