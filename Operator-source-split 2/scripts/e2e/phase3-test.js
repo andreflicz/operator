@@ -65,7 +65,7 @@ const SP = require('./common.js').OUT;
   await p.fill('#streakSetCount', '12'); await p.click('[data-action="setStreakCount"]');
   check('streak count set to 12', await E("computeStreak()")===12, await E("computeStreak()"));
   await p.click('[data-action="closeStreakEdit"]');
-  check('streak card shows 12', (await p.textContent('.streak-card .streak-num')).trim()==='12');
+  check('streak card shows 12', (await p.textContent('.sw-streak b')).trim()==='12');
   // events + shoot prep
   await E("intentStore().prompted['M'+monthKey()]=todayStr(); intentStore().prompted['W'+weekKey()]=todayStr()"); // the month/week prompt is covered in r18
   await p.click('[data-action="nav"][data-view="calendar"]');
@@ -110,7 +110,7 @@ const SP = require('./common.js').OUT;
   await p.fill('#windNote', 'Big shoot day. Eat first.');
   await p.click('#windOverlay [data-action="windNext"]');
   await p.fill('#windAlarm', '05:45');
-  await p.click('#windOverlay [data-action="windGoToSleep"]');
+  await p.click('#windOverlay [data-action="windDone"]'); await E("ACTIONS.startSleepMode()");   // (round 35: Done, then sleep)
   const np = await E("state.focus.nightPlan");
   check('night plan saved for tomorrow w/ 2 tasks', np.date===ds(new Date(2026,9,8)) && np.taskIds.length===2 && np.taskIds[0]==='t1', np);
   check('note saved for that morning', await E("morningNotesFor('"+np.date+"').some(n=>n.text.includes('Big shoot'))"));
