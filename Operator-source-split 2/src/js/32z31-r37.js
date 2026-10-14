@@ -353,7 +353,8 @@ setInterval(function(){
   try{
     if(!overlayOpen('wakeOverlay') || ui.wakeMode!=='brief' || !briefBuilt()) return;
     const q = document.querySelector('.qt[data-q="morning"]'); if(!q || q.matches(':hover')) { ui._qMornAt = Date.now(); return; }
-    if(Date.now() - (ui._qMornAt || 0) >= 20000) nextQuote('morning');
+    if(!ui._qMornAt || Date.now() - ui._qMornAt > 3600000){ ui._qMornAt = Date.now(); return; }   // (the 20 seconds start when it shows)
+    if(Date.now() - ui._qMornAt >= 20000) nextQuote('morning');
   }catch(e){}
 }, 1000);
 // (nothing from the work day on Good morning: the Op bar steps aside there too)
