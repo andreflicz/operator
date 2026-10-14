@@ -1,12 +1,16 @@
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
+// Demo mode keeps its own, separate copy of everything (your real data is never read or written
+// while it's on). The switch itself lives outside both copies.
+const DEMO_ON = (function(){ try{ return localStorage.getItem('opsdash-mode')==='demo'; }catch(e){ return false; } })();
+const STORE_PREFIX = DEMO_ON ? 'opsdemo:' : 'opsdash:';
 async function storageGetRaw(key){
-  if(hasCloud){ try{ const r = await window.storage.get(key, false); return r ? r.value : null; }catch(e){ return null; } }
-  try{ return localStorage.getItem('opsdash:'+key); }catch(e){ return null; }
+  if(hasCloud){ try{ const r = await window.storage.get((DEMO_ON ? 'demo:' : '')+key, false); return r ? r.value : null; }catch(e){ return null; } }
+  try{ return localStorage.getItem(STORE_PREFIX+key); }catch(e){ return null; }
 }
 async function storageSetRaw(key, val){
-  if(hasCloud){ try{ await window.storage.set(key, val, false); return true; }catch(e){ return false; } }
-  try{ localStorage.setItem('opsdash:'+key, val); return true; }catch(e){ return false; }
+  if(hasCloud){ try{ await window.storage.set((DEMO_ON ? 'demo:' : '')+key, val, false); return true; }catch(e){ return false; } }
+  try{ localStorage.setItem(STORE_PREFIX+key, val); return true; }catch(e){ return false; }
 }
 async function loadKey(key, fallback){
   const raw = await storageGetRaw(key);
@@ -39,7 +43,7 @@ document.addEventListener('visibilitychange', function(){ if(document.hidden) pe
 function persistNow(key){
   const val = JSON.stringify(state[key]);
   if(hasCloud){ storageSetRaw(key, val).then(function(ok){ if(!ok) persistFailed(); }); return true; }
-  let ok = true; try{ localStorage.setItem('opsdash:'+key, val); }catch(e){ ok = false; }
+  let ok = true; try{ localStorage.setItem(STORE_PREFIX+key, val); }catch(e){ ok = false; }
   if(!ok) persistFailed();
   return ok;
 }

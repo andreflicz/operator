@@ -81,15 +81,15 @@ ACTIONS.lockNewTask = function(){
 // step 2: how you'll work
 ACTIONS.lockMethod = function(el, e, id){ const s = ui.lockSeq; if(!LOCK_METHODS[id]) return; s.method = id; playTick(); renderLockSeqInto(); };
 ACTIONS.lockLength = function(el){ const s = ui.lockSeq; s.custom = false; s.minutes = el.dataset.min==='open' ? null : Number(el.dataset.min); playTick(); renderLockSeqInto(); };
-ACTIONS.lockCustom = function(){ ui.lockSeq.custom = true; renderLockSeqInto(); setTimeout(function(){ const i = document.getElementById('lockCustomMin'); if(i){ i.focus(); i.select(); } }, 20); };
+ACTIONS.lockCustom = function(){ ui.lockSeq.custom = true; renderLockSeqInto(); setTimeout(function(){ const i = document.getElementById('lockCustomH'); if(i){ i.focus(); i.select(); } }, 20); };
 // step 3
 ACTIONS.lockPrep = function(el, e, id){ const s = ui.lockSeq, p = s.prep, i = p.indexOf(id); if(i>=0) p.splice(i, 1); else { p.push(id); playStep(Math.min(5, p.length)); } if(lockPrepDone()) s.denied = false; renderLockSeqInto(); };
 ACTIONS.lockGo = function(){ lockReadForm(); lockGo(); };
 ACTIONS.lockNow = function(){ lockReadForm(); lockGo(); };
 function lockReadForm(){
   const s = ui.lockSeq; if(!s) return;
-  const c = document.getElementById('lockCustomMin');
-  if(c && s.custom){ const v = Math.round(Number(c.value)); if(v>0) s.minutes = Math.min(600, v); }
+  const c = document.getElementById('lockCustomMin'), h = document.getElementById('lockCustomH');
+  if(c && s.custom){ const v = Math.round(Number(h ? h.value : 0)||0)*60 + Math.round(Number(c.value)||0); if(v>0) s.minutes = Math.min(600, v); }
 }
 function lockPlannedMinutes(s){
   const m = LOCK_METHODS[s.method];
@@ -258,6 +258,9 @@ ACTIONS.openStopFocus = function(){ openStopFocus(); };
 document.addEventListener('keydown', function(e){
   if(!ui.lockSeq || !overlayOpen('lockSeqOverlay')) return;
   if(e.key!=='Enter') return;
+  // (typing somewhere else, like the journal on top of it: Enter is theirs, not the lock-in's)
+  if(e.target && e.target.closest && e.target!==document.body && !e.target.closest('#lockSeqOverlay')) return;
+  if(e.target && e.target.tagName==='TEXTAREA') return;
   const inInput = e.target && /INPUT|TEXTAREA/.test(e.target.tagName);
   if(e.metaKey || e.ctrlKey){ e.preventDefault(); ACTIONS.lockNow(); return; }
   if(inInput && e.target.id==='lockNewTask'){ e.preventDefault(); ACTIONS.lockNewTask(); return; }
@@ -371,7 +374,8 @@ function lockMethodHtml(){
     (s.method==='block' ? '<div class="ls-lens">'+
         tile(25, '25', 'min')+tile(50, '50', 'min')+tile(90, '90', 'min')+tile(120, '2', 'hours')+tile(180, '3', 'hours')+tile('open', '&infin;', 'open')+
       '</div>'+
-      '<div class="ls-custom">'+(s.custom ? '<input class="input ls-custom-in" type="number" min="5" max="600" step="5" id="lockCustomMin" value="'+(m||60)+'"><span>min</span>' : '<button class="btn btn-ghost btn-sm" data-action="lockCustom">Custom</button>')+'</div>'
+      // custom: a plain timer, hours and minutes
+      '<div class="ls-custom">'+(s.custom ? '<div class="ls-hm"><input class="input ls-custom-in" type="number" min="0" max="10" step="1" id="lockCustomH" value="'+Math.floor((m||60)/60)+'"><span>h</span><input class="input ls-custom-in" type="number" min="0" max="59" step="5" id="lockCustomMin" value="'+((m||60)%60)+'"><span>m</span></div>' : '<button class="btn btn-ghost btn-sm" data-action="lockCustom">Custom</button>')+'</div>'
       : lockPreviewHtml(s.method))+
     '<div class="ls-ends">'+(total ? 'Done at <b>'+fmtTimeShort(Date.now() + total*60000)+'</b>' : '&nbsp;')+'</div>'+
   '</div>';
