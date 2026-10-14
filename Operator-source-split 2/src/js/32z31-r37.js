@@ -667,8 +667,8 @@ aiSystem = (function(base){
 // ---- each client's next action ----
 function clientNextHtml(c){
   const editing = ui.nextEditFor===c.id;
-  if(editing) return '<div class="cn-row is-edit"><span class="cn-k">Next</span><input class="cn-in" id="cnIn-'+c.id+'" value="'+escapeHtml(c.nextAction||'')+'" placeholder="What they’re owed next" maxlength="140"><button class="cn-ok" data-action="clientNextSave" data-id="'+c.id+'">Save</button></div>';
-  return '<button class="cn-row'+(c.nextAction ? '' : ' is-empty')+'" data-action="clientNextEdit" data-id="'+c.id+'" title="What this client is owed next"><span class="cn-k">Next</span><span class="cn-t">'+(c.nextAction ? escapeHtml(c.nextAction) : 'Set what they’re owed next')+'</span></button>';
+  if(editing) return '<div class="cn-row is-edit"><span class="cn-k">Next</span><input class="cn-in" id="cnIn-'+c.id+'" value="'+escapeHtml(c.nextAction||'')+'" placeholder="The next step for them" maxlength="140"><button class="cn-ok" data-action="clientNextSave" data-id="'+c.id+'">Save</button></div>';
+  return '<button class="cn-row'+(c.nextAction ? '' : ' is-empty')+'" data-action="clientNextEdit" data-id="'+c.id+'" title="The next step for this client"><span class="cn-k">Next</span><span class="cn-t">'+(c.nextAction ? escapeHtml(c.nextAction) : 'Add the next step')+'</span></button>';
 }
 clientCardV2 = (function(base){
   return function(c){
