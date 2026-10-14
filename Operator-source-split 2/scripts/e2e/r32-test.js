@@ -268,6 +268,36 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.click('.dayoff-row [data-action="startSleepMode"]'); await p.waitForTimeout(700);
     check('r35: …and it puts you to sleep (the sleep screen)', !!(await p.$('.sleepv')) && await E("!!(state.modes.active && state.modes.active.sleep)"));
     check('r35: the change goes through the dark veil and it clears', !(await p.$('.fs-veil')));
+    // ---------- round 36 ----------
+    await E("if(state.modes.active) finishActiveMode(true); state.focus.activeSession=null; document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden')); state.profile.opMemory=[{id:'m1',text:'Likes the China stuff'},{id:'m2',text:'The + should ask first'}]; ui.view='settings'; ui.settingsTab='operator'; renderView()"); await p.waitForTimeout(300);
+    check('r36: forgetting Op’s memory isn’t a button by the list anymore', !(await p.$('[data-action="opMemClear"]')) && !!(await p.$('.op-danger [data-action="opMemClearAsk"]')));
+    await E("ACTIONS.opMemClearAsk()"); await p.waitForTimeout(100);
+    check('r36: …it asks you to type FORGET (Erase stays off till you do)', await p.evaluate(() => document.querySelector('#opForget [data-action="opMemClearDo"]').disabled===true));
+    await p.fill('#opForgetIn', 'forget'); await p.click('#opForget [data-action="opMemClearDo"]'); await p.waitForTimeout(150);
+    check('r36: …and only then it’s gone', await E("state.profile.opMemory.length")===0);
+    await E("state.profile.opMemory=[{id:'m3',text:'Weekly client check-ins should be a task'}]; renderView()"); await p.waitForTimeout(100);
+    await E("ACTIONS.opMemToApp(null,null,'m3')");
+    check('r36: a memory about the app moves to Op’s ideas for the app', await E("state.profile.opMemory.length")===0 && /Weekly client check-ins/.test(await E("JSON.stringify(state.settings.opIdeas)")));
+    // master tasks
+    await E("state.business.clients=[{id:'c1',name:'JJS',stage:'active',status:'active',mrr:3000,touches:[],deliverables:[{id:'d1',title:'Reels',weeklyTarget:2,recurring:true,completedDates:[]}]},{id:'c2',name:'Kiko',stage:'active',status:'active',mrr:2000,touches:[]}]; state.focus.masterMade={}; state.tasks.items=state.tasks.items.filter(t=>!t.master); ui.view='today'; renderView(); renderView()"); await p.waitForTimeout(200);
+    check('r36: weekly master tasks: a check-in batch and deliverables per client', await E("JSON.stringify(state.tasks.items.filter(t=>t.master).map(t=>t.master.kind).sort())")==='["care","deliv"]');
+    await E("logTouch('client','c1'); renderView()"); await p.waitForTimeout(100);
+    check('r36: …a touch ticks a client off the batch', /\(1\/2\)/.test(await E("state.tasks.items.find(t=>t.master&&t.master.kind==='care').title")));
+    await E("completeTask(state.tasks.items.find(t=>t.master&&t.master.kind==='care').id)"); await p.waitForTimeout(900);
+    check('r36: …finishing the batch logs a touch for whoever’s left', await E("state.business.clients.find(c=>c.id==='c2').touches.length")===1);
+    check('r36: …and it rolls up into a master goal ring', await E("!!masterGoalDefs().find(m=>m.key==='care')"));
+    // standing with Op, test bench, Business tabs
+    check('r36: standing with Op is a Discipline sub-stat', await E("xpAttributes(xpCtx()).DIS.subs.some(s=>s.label==='Standing with Op')"));
+    await E("ui.view='business'; ui.businessTab='leads'; renderView()"); await p.waitForTimeout(150);
+    check('r36: Business: Clients & leads is one tab with sub-tabs, Setup on the tab lane', (await p.$$('.biz-tabs > .tab')).length===4 && (await p.$$('.biz-tabs .subtab')).length===3 && !!(await p.$('.biz-tabs [data-action="bizSetupOpen"]')));
+    await E("state.settings.testMode=false; ui.view='settings'; ui.settingsTab='system'; renderView()"); await p.waitForTimeout(150);
+    check('r36: test buttons hide unless test mode is on', !(await p.isVisible('[data-action="wakeTestNow"]:not(.tb)')) && !!(await p.$('[data-action="demoToggle"]')));
+    // clock-out pages
+    await E("startMode('offtime',{clockedOut:true}); ui.restFull=true; ui.view='today'; renderView()"); await p.waitForTimeout(300);
+    check('r36: That’s the day: three real buttons and a swipeable deck', (await p.$$('.dayoff-row.is-btns button')).length===3 && !!(await p.$('.rd .rd-slide')));
+    await E("ACTIONS.startSleepMode()"); await p.waitForTimeout(300); await E("ACTIONS.sleepUp()"); await p.waitForTimeout(600);
+    check('r36: I’m up → Up early (not That’s the day, not the sleep screen)', /Up early/.test(await p.textContent('#viewRoot')) && !/That’s the day/.test(await p.textContent('#viewRoot')) && !(await p.$('.sleepv')));
+    check('r36: the Op bar has the minute clock', !!(await p.$('#activityPill .ap-ck .ck-minutes')));
     check('no page errors (round 33)', p.errors.length===0, p.errors);
     await p.context().close();
   }

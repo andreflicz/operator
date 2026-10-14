@@ -6667,3 +6667,19 @@ body:not(.test-mode) [data-action="opTest"]:not(.tb), body:not(.test-mode) [data
 .stuck-x:hover{ opacity:1; background:rgba(255,255,255,.08); }
 .stuck-c, .stuck-s, .stuck-b{ display:none; }
 .stuck{ padding-right:44px; position:relative; } .stuck-x{ position:absolute; right:8px; top:50%; transform:translateY(-50%); }
+/* Op's light, eclipsed: a dark moon over his light with his color as the corona. Hover and it slides
+   aside to show the light; when he speaks or listens the moon clears completely. A hairline divides
+   him from the app part of the Op bar, so clicking him and clicking the app info feel different. */
+.op-light::after{ content:''; position:absolute; inset:10px; border-radius:50%; z-index:2; pointer-events:none;
+  background:radial-gradient(circle at 42% 38%, #262b44, #0b0d18 72%);
+  box-shadow:0 0 0 1px color-mix(in srgb, var(--op-c) 70%, #b8c4ff), 0 0 8px 2px color-mix(in srgb, var(--op-c) 75%, #8fa0ff), 0 0 20px 6px color-mix(in srgb, var(--op-c) 40%, rgba(143,160,255,.4));
+  transition:transform .5s cubic-bezier(.2,.8,.2,1), opacity .5s, box-shadow .6s; }
+.op-light .ol-core{ z-index:1; }
+.op-light:hover::after{ transform:translate(5px, -4px) scale(.88); box-shadow:0 0 0 1px color-mix(in srgb, var(--op-c) 80%, #c8d2ff), 0 0 12px 3px color-mix(in srgb, var(--op-c) 85%, #8fa0ff), 0 0 28px 9px color-mix(in srgb, var(--op-c) 50%, rgba(143,160,255,.5)); }
+.op-light[data-st="speak"]::after, .op-light[data-st="listen"]::after, .op-light[data-st="think"]::after{ transform:translate(12px, -10px) scale(.5); opacity:0; }
+.activity-pill::after{ content:''; position:absolute; left:50px; top:10px; bottom:10px; width:1px; background:rgba(20,24,40,.14); }
+.activity-pill:hover{ filter:brightness(1.02); }
+.op-light::after{ inset:12px; box-shadow:0 0 0 1.5px color-mix(in srgb, var(--op-c) 45%, #eef2ff), 0 0 6px 3px color-mix(in srgb, var(--op-c) 55%, #cfd8ff), 0 0 16px 6px color-mix(in srgb, var(--op-c) 55%, rgba(143,160,255,.7)), 0 0 30px 10px color-mix(in srgb, var(--op-c) 30%, rgba(143,160,255,.35)); }
+.op-light .ol-core{ inset:10px; }
+.op-light::after{ box-shadow:0 0 0 1.5px color-mix(in srgb, var(--op-c) 35%, #8f9cff), 0 0 7px 3px color-mix(in srgb, var(--op-c) 35%, rgba(110,125,255,.85)), 0 0 18px 7px color-mix(in srgb, var(--op-c) 30%, rgba(110,125,255,.5)), 0 0 34px 12px color-mix(in srgb, var(--op-c) 25%, rgba(140,150,255,.28)); }
+.op-light:hover::after{ box-shadow:0 0 0 1.5px color-mix(in srgb, var(--op-c) 35%, #a9b3ff), 0 0 10px 4px color-mix(in srgb, var(--op-c) 35%, rgba(110,125,255,.95)), 0 0 26px 10px color-mix(in srgb, var(--op-c) 30%, rgba(110,125,255,.6)); }
