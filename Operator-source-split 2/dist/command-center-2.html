@@ -6694,6 +6694,20 @@ body:not(.test-mode) [data-action="opTest"]:not(.tb), body:not(.test-mode) [data
 .op-light .ol-core{ inset:10px; }
 .op-light::after{ box-shadow:0 0 0 1.5px color-mix(in srgb, var(--op-c) 35%, #8f9cff), 0 0 7px 3px color-mix(in srgb, var(--op-c) 35%, rgba(110,125,255,.85)), 0 0 18px 7px color-mix(in srgb, var(--op-c) 30%, rgba(110,125,255,.5)), 0 0 34px 12px color-mix(in srgb, var(--op-c) 25%, rgba(140,150,255,.28)); }
 .op-light:hover::after{ box-shadow:0 0 0 1.5px color-mix(in srgb, var(--op-c) 35%, #a9b3ff), 0 0 10px 4px color-mix(in srgb, var(--op-c) 35%, rgba(110,125,255,.95)), 0 0 26px 10px color-mix(in srgb, var(--op-c) 30%, rgba(110,125,255,.6)); }
+/* the Op bar, simplified */
+.activity-pill{ min-height:36px !important; padding:4px 14px 4px 50px !important; gap:8px !important; font-size:12.5px !important; }
+.activity-pill .ap-ring, .activity-pill .ap-lock, .activity-pill .ap-ck, .activity-pill .ap-dot{ display:none !important; }
+.ob-dot{ width:9px; height:9px; border-radius:50%; flex:none; background:#9aa0ae; box-shadow:0 0 0 3px rgba(154,160,174,.18); transition:background .4s, box-shadow .4s; }
+.activity-pill[data-ob="green"] .ob-dot{ background:#3FBE8E; box-shadow:0 0 0 3px rgba(63,190,142,.2), 0 0 8px rgba(63,190,142,.7); }
+.activity-pill[data-ob="red"] .ob-dot{ background:#E8636B; box-shadow:0 0 0 3px rgba(232,99,107,.18), 0 0 8px rgba(232,99,107,.6); }
+.activity-pill[data-ob="amber"] .ob-dot{ background:#E8A23D; box-shadow:0 0 0 3px rgba(232,162,61,.2); }
+.activity-pill .ap-name{ max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
+.activity-pill::after{ left:46px; top:9px; bottom:9px; }
+/* the time, top right, with the music */
+.md-time{ font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; padding:0 6px 0 4px; color:var(--text); white-space:nowrap; }
+.lv-corner.is-today{ position:absolute; top:18px; right:18px; }
+.locked-in-header{ position:relative; }
+.activity-pill{ bottom:15px !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -36149,6 +36163,75 @@ document.addEventListener('click', function(e){
   const t = e.target; if(!t || !t.closest || t.closest('button, a, input, [data-action]')) return;
   const hit = t.closest('.op-says, .th-op-t, .op-tip-t'); if(!hit) return;
   if(typeof opfOpen==='function') opfOpen({});
+}, true);
+
+// ---- the Op bar, simplified: Op's light | one status dot | the app you're in ----
+// Green: working (locked in, or on a work app in work hours). Red: in work hours and not working.
+// Grey: outside work hours. Amber: on a break or at lunch. Nothing else lives here now (the time is
+// top right with the music; the session's timer and controls are one tap away in the bar's menu).
+function opBarStatus(){
+  const s = state.focus.activeSession, app = currentForegroundApp(), ph = typeof workPhase==='function' ? workPhase() : 'off';
+  if(s) return s.onBreak ? 'amber' : 'green';
+  if(ph==='lunch' || ph==='break') return 'amber';
+  if(ph!=='work') return 'grey';
+  return app && activityCategory(app)==='work' ? 'green' : 'red';
+}
+const OB_LABEL = {green:'Working', red:'Not working', grey:'Off the clock', amber:'On a break'};
+updateActivityPill = function(){
+  const el = document.getElementById('activityPill'); if(!el) return;
+  const st = state.settings.appTracking, app = (st && st.enabled!==false) ? currentForegroundApp() : null;
+  const k = opBarStatus(), siteUnknown = app && BROWSER_APPS.indexOf(activityKey(app)) >= 0;
+  el.classList.remove('is-hidden');
+  el.dataset.ob = k; el.dataset.cat = app ? activityCategory(app) : 'neutral'; el.dataset.state = state.focus.activeSession ? (state.focus.activeSession.onBreak ? 'break' : 'locked') : 'free';
+  const html = '<span class="ob-dot" title="'+OB_LABEL[k]+'"></span><span class="ap-name">'+escapeHtml(app || OB_LABEL[k])+'</span>'+(siteUnknown ? '<span class="ap-warn">?</span>' : '');
+  if(el._html!==html){ el.innerHTML = html; el._html = html; }
+  el.title = OB_LABEL[k]+(app ? ' · '+app+' ('+CAT_META[activityCategory(app)].label+')' : '')+' · click for the session and app settings';
+};
+soundSettingsHtml = (function(base){
+  return function(){ return base.apply(this, arguments).replace(/<label class="ck-dock-sw" title="The minute clock in the Op bar[^"]*">[\s\S]*?<\/label>/, ''); };
+})(soundSettingsHtml);
+// the time sits top right with the music
+dockHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(state.profile.clockInDock) return h;
+    const t = new Date().toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+    return h.replace(/^(<div class="md-in[^"]*">)/, '$1<span class="md-time">'+t+'</span>');
+  };
+})(dockHtml);
+setInterval(function(){ try{ if(typeof dockRefresh==='function') dockRefresh(); }catch(e){} }, 15000);
+
+// ---- while locked in, the Minimal view lives on Today (the overview) only ----
+// Focus shows its full page and no Minimal button while you're locked in; Today gets the button in its
+// locked-in header, and M works there.
+renderFocus = (function(base){
+  return function(){
+    const as = state.focus.activeSession;
+    if(!as) return base.apply(this, arguments);
+    const keep = state.profile.lockedView; state.profile.lockedView = 'full';
+    let h; try{ h = base.apply(this, arguments); } finally { state.profile.lockedView = keep; }
+    return h.replace(/<span class="lv-corner is-focus">[\s\S]*?<\/button><\/span>/, '');
+  };
+})(renderFocus);
+renderToday = (function(base){
+  return function(){
+    const as = state.focus.activeSession;
+    if(as && !(state.modes.active && state.modes.active.type==='offtime') && lockedMinimal()) return renderLockedMinimal();
+    const h = base.apply(this, arguments);
+    if(!as) return h;
+    return h.replace('<div class="locked-in-header">', '<div class="locked-in-header"><span class="lv-corner is-today">'+lockedViewBtnHtml()+'</span>');
+  };
+})(renderToday);
+afterRenderHooks.push(function(){
+  if(ui.view==='today' && state.focus.activeSession && lockedMinimal() && document.querySelector('#viewRoot .np-locked')) document.body.classList.add('np-on');
+});
+// M: on Today while locked in (Focus no longer takes it)
+document.addEventListener('keydown', function(e){
+  if(e.key!=='m' && e.key!=='M') return;
+  if(e.metaKey || e.ctrlKey || e.altKey || (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) || (e.target && e.target.isContentEditable)) return;
+  if(!state.focus.activeSession || document.querySelector('.overlay:not(.hidden)')) return;
+  if(ui.view==='focus'){ e.stopImmediatePropagation(); return; }
+  if(ui.view==='today'){ e.preventDefault(); e.stopImmediatePropagation(); ACTIONS.toggleLockedView(); }
 }, true);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){

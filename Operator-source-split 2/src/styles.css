@@ -6683,3 +6683,17 @@ body:not(.test-mode) [data-action="opTest"]:not(.tb), body:not(.test-mode) [data
 .op-light .ol-core{ inset:10px; }
 .op-light::after{ box-shadow:0 0 0 1.5px color-mix(in srgb, var(--op-c) 35%, #8f9cff), 0 0 7px 3px color-mix(in srgb, var(--op-c) 35%, rgba(110,125,255,.85)), 0 0 18px 7px color-mix(in srgb, var(--op-c) 30%, rgba(110,125,255,.5)), 0 0 34px 12px color-mix(in srgb, var(--op-c) 25%, rgba(140,150,255,.28)); }
 .op-light:hover::after{ box-shadow:0 0 0 1.5px color-mix(in srgb, var(--op-c) 35%, #a9b3ff), 0 0 10px 4px color-mix(in srgb, var(--op-c) 35%, rgba(110,125,255,.95)), 0 0 26px 10px color-mix(in srgb, var(--op-c) 30%, rgba(110,125,255,.6)); }
+/* the Op bar, simplified */
+.activity-pill{ min-height:36px !important; padding:4px 14px 4px 50px !important; gap:8px !important; font-size:12.5px !important; }
+.activity-pill .ap-ring, .activity-pill .ap-lock, .activity-pill .ap-ck, .activity-pill .ap-dot{ display:none !important; }
+.ob-dot{ width:9px; height:9px; border-radius:50%; flex:none; background:#9aa0ae; box-shadow:0 0 0 3px rgba(154,160,174,.18); transition:background .4s, box-shadow .4s; }
+.activity-pill[data-ob="green"] .ob-dot{ background:#3FBE8E; box-shadow:0 0 0 3px rgba(63,190,142,.2), 0 0 8px rgba(63,190,142,.7); }
+.activity-pill[data-ob="red"] .ob-dot{ background:#E8636B; box-shadow:0 0 0 3px rgba(232,99,107,.18), 0 0 8px rgba(232,99,107,.6); }
+.activity-pill[data-ob="amber"] .ob-dot{ background:#E8A23D; box-shadow:0 0 0 3px rgba(232,162,61,.2); }
+.activity-pill .ap-name{ max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
+.activity-pill::after{ left:46px; top:9px; bottom:9px; }
+/* the time, top right, with the music */
+.md-time{ font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; padding:0 6px 0 4px; color:var(--text); white-space:nowrap; }
+.lv-corner.is-today{ position:absolute; top:18px; right:18px; }
+.locked-in-header{ position:relative; }
+.activity-pill{ bottom:15px !important; }
