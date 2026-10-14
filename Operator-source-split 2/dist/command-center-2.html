@@ -6885,6 +6885,14 @@ body:has(#wakeOverlay:not(.hidden)) .activity-pill{ display:none !important; }
 .ckd-next b{ display:block; font-size:13.5px; color:#fff; } .ckd-next small{ font-size:12px; color:rgba(255,255,255,.6); }
 @media (max-width:1100px){ .ckd{ min-height:0; } }
 .th-bizrow{ display:flex; align-items:center; gap:10px; } .th-bizrow .th-min{ margin-left:0; }
+/* the Cockpit, centered: the whole thing in the middle of the screen, the clock and the alarm a
+   centered header above it */
+.np.is-cockpit .np-main{ position:absolute; inset:0; width:auto; max-width:none; padding:110px clamp(24px, 4vw, 64px) 90px; display:flex; align-items:center; justify-content:center; }
+.np.is-cockpit .ckp{ width:100%; max-width:1280px; margin:0 auto; padding:0; }
+.np.is-cockpit .np-top{ position:relative; z-index:2; justify-content:center; }
+.np.is-cockpit .np-top > span[style*="flex:1"]{ display:none; }
+.np.is-cockpit .np-clock{ align-items:center; text-align:center; }
+.np.is-cockpit .np-top .mctl{ position:absolute; right:32px; top:26px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
