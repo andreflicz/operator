@@ -100,8 +100,8 @@ async function ctxPage(b, seed, opts){
     await p.evaluate(() => window.__say('so the thing is', true)); await p.clock.runFor(1500);
     check('…a 1.5 s pause: still listening', await p.evaluate(() => !window.__rec.stopped) && log.length===0);
     await p.evaluate(() => { const r = window.__rec; const res = [[{transcript:'so the thing is'}], [{transcript:' what do I do first'}]]; res[0].isFinal = true; res[1].isFinal = true; r.onresult({resultIndex:1, results:res}); });
-    await p.clock.runFor(2300); await p.waitForTimeout(600);
-    check('…about two seconds of quiet and it sends all of it', log.length===1 && /so the thing is\s+what do I do first/.test(log[0].messages.slice(-1)[0].content), log[0] && log[0].messages.slice(-1)[0].content);
+    await p.clock.runFor(4100); await p.waitForTimeout(600);
+    check('…a few seconds of quiet (your “When you talk” pause) and it sends all of it', log.length===1 && /so the thing is\s+what do I do first/.test(log[0].messages.slice(-1)[0].content), log[0] && log[0].messages.slice(-1)[0].content);
     check('no page errors (mic)', p.errors.length===0, p.errors);
     await p.context().close();
   }
