@@ -6882,3 +6882,23 @@ body:has(#wakeOverlay:not(.hidden)) .activity-pill{ display:none !important; }
 .np.is-cockpit .np-top > span[style*="flex:1"]{ display:none; }
 .np.is-cockpit .np-clock{ align-items:center; text-align:center; }
 .np.is-cockpit .np-top .mctl{ position:absolute; right:32px; top:26px; }
+/* ===== the Cockpit: one panel ===== */
+.np.is-cockpit .ckp.ckx{ display:grid !important; grid-template-columns:minmax(320px, 1fr) 1px minmax(340px, 1fr); gap:0; align-items:stretch; width:100%; max-width:1080px; padding:0;
+  border-radius:30px; background:linear-gradient(160deg, rgba(255,255,255,.075), rgba(255,255,255,.025)); border:1px solid rgba(255,255,255,.11); box-shadow:0 40px 120px rgba(0,0,0,.35); backdrop-filter:blur(18px); overflow:hidden; }
+.ckx-l{ display:flex; flex-direction:column; align-items:center; text-align:center; padding:34px 36px 30px; }
+.ckx-face .np-art.tm{ width:min(250px, 22vw); height:min(250px, 22vw); }
+.ckx-k{ margin-top:16px; font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.6); }
+.ckx-title{ margin-top:6px; font-family:var(--font-display); font-size:clamp(24px, 2.4vw, 32px); font-weight:700; line-height:1.15; letter-spacing:-.01em; color:#fff; max-width:420px; }
+.ckx-sub{ margin-top:6px; font-size:14px; color:rgba(255,255,255,.65); } .ckx-sub b{ color:#fff; }
+.ckx-next{ margin-top:12px; font-size:13px; color:rgba(255,255,255,.7); padding:6px 12px; border-radius:999px; background:rgba(255,255,255,.05); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ckx-next span{ font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.45); margin-right:8px; }
+.ckx-ctl{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:auto; padding-top:22px; }
+.ckx-b{ display:inline-flex; align-items:center; gap:6px; height:38px; padding:0 15px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; font-size:13px; font-weight:600; cursor:pointer; transition:background .15s, border-color .15s, transform .15s; }
+.ckx-b:hover{ background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.24); transform:translateY(-1px); }
+.ckx-b.is-done{ border-color:rgba(63,190,142,.5); background:rgba(63,190,142,.14); color:#7ff0c4; }
+.ckx-b.is-out{ border-color:rgba(229,72,77,.4); background:rgba(229,72,77,.1); color:#ff9a9d; }
+.ckx-b.is-main{ border-color:transparent; background:#fff; color:#13151d; }
+.ckx-b.is-on{ border-color:rgba(232,162,61,.5); color:#ffc56b; }
+.ckx-sep{ background:linear-gradient(180deg, transparent, rgba(255,255,255,.12) 15%, rgba(255,255,255,.12) 85%, transparent); }
+.ckx .ckd{ background:none !important; border:0 !important; box-shadow:none !important; backdrop-filter:none; border-radius:0 !important; min-height:0; padding:34px 36px 30px !important; }
+@media (max-width:980px){ .np.is-cockpit .ckp.ckx{ grid-template-columns:1fr; } .ckx-sep{ height:1px; } }

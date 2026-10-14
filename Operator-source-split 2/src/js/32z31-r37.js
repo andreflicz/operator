@@ -207,21 +207,11 @@ renderLockedMinimal = (function(base){
     const as = state.focus.activeSession;
     // the Cockpit on a break
     if(lockedStyle()==='cockpit' && as && as.onBreak){
-      const b = as.breaks[as.breaks.length-1] || {}, left = as.breakEndsAt ? Math.max(0, as.breakEndsAt - Date.now()) : null;
-      const full = cockpitHtml(), day = (/<div class="ckp-day">[\s\S]*<\/div><\/div>$/.exec(full) || [''])[0].replace(/<\/div>$/, '');
       setTimeout(function(){ if(typeof timerTick==='function') timerTick(); }, 20);
       return '<div class="np np-locked is-cockpit is-break">'+
         '<div class="np-bg"></div>'+
         '<div class="np-top">'+npClockHtml()+'<span style="flex:1"></span>'+(typeof mctlHtml==='function' ? mctlHtml('mctl-np') : '')+lockedViewBtnHtml()+'</div>'+
-        '<div class="np-main"><div class="ckp">'+
-          '<div class="ckp-timer"><div class="np-art tm tm-ring is-brk"><svg viewBox="0 0 120 120" aria-hidden="true">'+timerFaceSvg('ring')+'</svg><span class="tm-in"><i>&#9749;</i><b class="tm-t">'+(left!=null ? formatElapsed(left) : '')+'</b></span></div>'+
-            '<div class="ckp-k">'+(as.breakOverAt ? 'Break’s over' : 'On a break')+'</div>'+
-            '<div class="ckp-sub">'+(as.breakOverAt ? 'It waits for you' : left!=null ? 'Back at '+fmtTimeShort(as.breakEndsAt) : 'No timer: back when you’re ready')+'</div></div>'+
-          '<div class="ckp-task"><div class="ckp-cap">Break</div><div class="ckp-title">'+(as.breakOverAt ? 'Lock back in when you’re back.' : b.note ? escapeHtml(b.note) : 'Breathe. Stretch. Look away.')+'</div>'+
-            '<div class="ckp-ctl">'+(as.breakEndsAt ? '<button class="np-c" data-action="extendBreak" data-minutes="5" title="5 more minutes">+5</button>' : '')+
-              '<button class="np-c is-main is-back" data-action="endBreakModeFromFocus" title="Lock back in">&#128274;</button>'+(typeof npMusicBtnHtml==='function' ? npMusicBtnHtml() : '')+'</div></div>'+
-          day+
-        '</div></div>'+
+        '<div class="np-main">'+cockpitHtml()+'</div>'+
       '</div>';
     }
     let h = base.apply(this, arguments);
@@ -596,3 +586,43 @@ function cockpitDayHtml(){
 cockpitHtml = (function(base){
   return function(){ return base.apply(this, arguments).replace(/<div class="ckp-day">[\s\S]*<\/div><\/div>$/, cockpitDayHtml()+'</div>'); };
 })(cockpitHtml);
+
+// ---- the Cockpit, one panel ----
+// One big card: the timer on the left with everything about the session packed under it (what you're
+// on, the round, what's next, and the buttons), and your day on the right. A break looks the same,
+// with the break's countdown in the ring.
+cockpitHtml = function(){
+  const as = state.focus.activeSession; if(!as) return '';
+  const onBreak = !!as.onBreak, cur = ui.currentTaskId ? state.tasks.items.find(function(t){ return t.id===ui.currentTaskId; }) : null;
+  const nx = typeof nextUpTask==='function' ? nextUpTask() : null;
+  const m = as.method && typeof LOCK_METHODS!=='undefined' ? LOCK_METHODS[as.method.id] : null;
+  const st = typeof methodState==='function' ? methodState() : null;
+  const b = onBreak ? (as.breaks[as.breaks.length-1] || {}) : null, left = onBreak && as.breakEndsAt ? Math.max(0, as.breakEndsAt - Date.now()) : null;
+  const face = onBreak
+    ? '<div class="np-art tm tm-ring is-brk"><svg viewBox="0 0 120 120" aria-hidden="true">'+timerFaceSvg('ring')+'</svg><span class="tm-in"><i>&#9749;</i><b class="tm-t">'+(left!=null ? formatElapsed(left) : '')+'</b></span></div>'
+    : ((typeof timerFaceHtml==='function' && timerFaceHtml(m ? m.icon : '&#128274;')) ||
+       '<button class="np-art tm tm-ring" data-action="timerNext" data-style="ring" title="Tap for another timer style"><svg viewBox="0 0 120 120" aria-hidden="true">'+timerFaceSvg('ring')+'</svg><span class="tm-in"><i>'+(m ? m.icon : '&#128274;')+'</i><b class="tm-t">'+formatElapsed(Date.now() - as.startedAt)+'</b></span></button>');
+  setTimeout(function(){ if(typeof timerTick==='function') timerTick(); }, 20);
+  const on = typeof musicOn==='function' && musicOn();
+  const music = '<button class="ckx-b'+(on ? ' is-on' : '')+'" data-action="npMusic" title="'+(on ? 'Pause the music' : 'Play music')+'">'+(on ? '&#10073;&#10073; Music' : '&#9835; Music')+'</button>';
+  const kicker = onBreak ? (as.breakOverAt ? 'Break’s over' : '&#9749; On a break') : (m && as.method.id!=='block' ? m.icon+' '+m.label : '&#128274; Locked in');
+  const title = onBreak ? (as.breakOverAt ? 'Lock back in when you’re back.' : b.note ? escapeHtml(b.note) : 'Breathe. Stretch. Look away.') : (cur ? escapeHtml(cur.title) : 'Deep work');
+  const sub = onBreak ? (as.breakOverAt ? 'It waits for you. Break time isn’t work time.' : left!=null ? 'Back at '+fmtTimeShort(as.breakEndsAt) : 'No timer: back when you’re ready')
+    : st ? '<span id="msLine">'+npMethodLine(st)+'</span>' : (as.plannedMinutes ? 'Until '+fmtTimeShort(as.startedAt + as.plannedMinutes*60000) : 'Open-ended');
+  const btns = onBreak
+    ? (as.breakEndsAt ? '<button class="ckx-b" data-action="extendBreak" data-minutes="5">+5 min</button>' : '')+'<button class="ckx-b is-main" data-action="endBreakModeFromFocus">&#128274; Back to it</button>'+music
+    : (cur ? '<button class="ckx-b is-done" data-action="finishCurrentTask">&#10003; Done</button>' : '')+'<button class="ckx-b" data-action="openBreakNotePrompt">&#9749; Break</button>'+music+'<button class="ckx-b is-out" data-action="openStopFocus">&#9632; Lock out</button>';
+  return '<div class="ckp ckx">'+
+    '<div class="ckx-l">'+
+      '<div class="ckx-face">'+face+'</div>'+
+      '<div class="ckx-k">'+kicker+'</div>'+
+      '<div class="ckx-title">'+title+'</div>'+
+      '<div class="ckx-sub">'+sub+'</div>'+
+      (!onBreak && nx && (!cur || nx.id!==cur.id) ? '<div class="ckx-next"><span>Next</span>'+escapeHtml(nx.title)+'</div>' : '')+
+      '<div class="ckx-ctl">'+btns+'</div>'+
+      (onBreak ? '' : '<span id="focusElapsed" class="ckp-hide">'+formatElapsed(Date.now() - as.startedAt)+'</span>')+
+    '</div>'+
+    '<div class="ckx-sep"></div>'+
+    cockpitDayHtml()+
+  '</div>';
+};
