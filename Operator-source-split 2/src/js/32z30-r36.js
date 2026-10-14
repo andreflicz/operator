@@ -921,3 +921,22 @@ deepWorkStatInnerHtml = function(mins){
   const target = state.standards.deepWorkTargetMinutes || 180;
   return '<div class="stat-chip-label">Deep work</div><div class="stat-chip-value">'+fmtDurationLabel(mins)+'</div><div class="kpi-sub">of '+fmtDurationLabel(target)+'</div>';
 };
+// locked in but on a not-work app: the dot goes red and the bar says the time isn't counting
+opBarStatus = (function(base){
+  return function(){
+    const s = state.focus.activeSession, app = currentForegroundApp();
+    if(s && !s.onBreak && app && activityCategory(app)==='other') return 'red';
+    return base.apply(this, arguments);
+  };
+})(opBarStatus);
+updateActivityPill = (function(base){
+  return function(){
+    base.apply(this, arguments);
+    const el = document.getElementById('activityPill'); if(!el) return;
+    const s = state.focus.activeSession, app = currentForegroundApp();
+    const off = !!(s && !s.onBreak && app && activityCategory(app)==='other'), has = !!el.querySelector('.ap-off');
+    if(off && !has){ el.insertAdjacentHTML('beforeend', '<span class="ap-off">not counting</span>'); el._html = null; }
+    else if(!off && has){ el.querySelector('.ap-off').remove(); el._html = null; }
+    if(off) el.title = 'Locked in, but '+app+' is marked Not work: this time isn’t counted as deep work (click to change)';
+  };
+})(updateActivityPill);

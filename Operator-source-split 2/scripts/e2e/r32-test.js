@@ -159,7 +159,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const cap = await E("(document.getElementById('opBubText')||{}).textContent || ''");
     check('the morning, nothing on today’s list: he asks what’s on today', /today/i.test(cap) && /\?/.test(cap) && await E("opDay().askedAt") > 0, cap);
     await E("aiAsk('ship the JJS edit, call three leads and hit the gym', 'opBubText')"); await p.waitForTimeout(300);
-    check('…adding them is Op at work: his screen shows it', await E("OPF.open") && /Added|added/.test(await E("document.getElementById('opfActs').textContent")));
+    check('…adding them is Op at work: a notice says so (r36: his screen doesn’t pop up)', !(await E("OPF.open")) && /Added|added/.test(await p.textContent('#toastContainer')));
     await E("opfClose()");
     check('…what you say becomes today’s tasks (once, nothing else to fill in)', await E("state.tasks.items.filter(t => t.status==='today').map(t => t.title).join('|')")==='Ship the JJS edit|Call three leads|Hit the gym', await E("state.tasks.items.map(t => t.title+':'+t.status).join('|')"));
     check('…and those are what he holds you to', await E("opCommits().map(c => c.t).join('|')")==='Ship the JJS edit|Call three leads|Hit the gym');
@@ -230,7 +230,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('r34: time worked this week is the same number as the This week panel', await E("weekWork().total===(function(){ let t=0; for(let i=0;i<7;i++){ const d=addDays(startOfWeekStr(todayStr()), i); t += d===todayStr() ? deepWorkMinutesTodayLive() : d<todayStr() ? deepWorkMinutesFor(d) : 0; } return t; })()"));
     check('r34: the weather bar sits under the card and spans it', await p.evaluate(() => { const w = document.querySelector('.th-wx .skyp'), c = document.querySelector('.th-op'); if(!w) return true; const a = w.getBoundingClientRect(), b = c.getBoundingClientRect(), l = document.querySelector('.th-left').getBoundingClientRect(); return a.top >= b.bottom - 1 && a.width >= l.width - 8; }));
     check('r34: Settings has the two locked-in views', ((await E("soundSettingsHtml()")).match(/data-action="lockedStyleSet"/g)||[]).length===2);
-    await E("state.profile.lockedStyle='cockpit'; state.profile.lockedView='minimal'; startFocus(50); ui.view='focus'; renderView()"); await p.waitForTimeout(300);
+    await E("state.profile.lockedStyle='cockpit'; state.profile.lockedView='minimal'; startFocus(50); ui.view='today'; renderView()"); await p.waitForTimeout(300);
     check('r34: the Cockpit locked-in view: timer, task, the day', !!(await p.$('.np.is-cockpit .ckp .ckp-timer')) && !!(await p.$('.ckp-day .sw')));
     await E("state.profile.lockedView='full'; state.appActivity.todayIntervals.push({app:'Final Cut Pro', start:Date.now()-60000, end:Date.now()}); ui.view='today'; renderView(); updateActivityPill()"); await p.waitForTimeout(200);
     check('r36: the Op bar: one status dot and the app', !!(await p.$('#activityPill .ob-dot')) && /Final Cut Pro/.test(await p.textContent('#activityPill .ap-name')));
