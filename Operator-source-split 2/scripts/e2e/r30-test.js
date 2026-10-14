@@ -64,7 +64,7 @@ async function ctxPage(b, seed, opts){
     await E("window.__recFailNext = 1; AI.closedAt = 0; aiListen('opBubText')"); await p.clock.runFor(1200); await p.waitForTimeout(100);
     check('a mic that was still busy gets tried again (and opens)', await E("AI.listening===true"));
     await E("AI.cancelListen && AI.cancelListen()"); await p.clock.runFor(200);
-    check('the waiting gap before it sends is a little longer (pauses don’t cut you off)', await E("[].some.call(document.scripts, s => /setTimeout\\(send, 2500\\)/.test(s.textContent))"));
+    check('the waiting gap before it sends is a little longer (pauses don’t cut you off)', (await E("opPauseMs()")) >= 2500 && await E("[].some.call(document.scripts, s => /setTimeout\\(send, typeof opPauseMs/.test(s.textContent))"));
     await E("OV.lastEnd = Date.now()");
     check('the "Hey Operator" ear stays off right after Op speaks (the mic is for your answer)', await E("heyQuietNow()===true"));
     check('no page errors (mic)', p.errors.length===0, p.errors);
