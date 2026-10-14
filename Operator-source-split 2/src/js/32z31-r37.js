@@ -240,7 +240,7 @@ renderLockedMinimal = (function(base){
   return function(){
     const h = base.apply(this, arguments), ck = lockedStyle()==='cockpit';
     const sw = '<button class="lv-btn lv-sty" data-action="lockedStyleSet" data-id="'+(ck ? 'player' : 'cockpit')+'" title="Switch to the '+(ck ? 'Player' : 'Cockpit')+' view">'+(ck ? '&#9654; Player' : '&#9680; Cockpit')+'</button>';
-    return h.replace(/(<button class="lv-btn" data-action="toggleLockedView")/, sw+'$1');
+    return h.replace(/(<button class="lv-btn" data-action="toggleLockedView"[^>]*>[\s\S]*?<\/button>)/, '$1'+sw);
   };
 })(renderLockedMinimal);
 // (the Cockpit: deep work in hours and minutes, and skills done for the day count as done)
