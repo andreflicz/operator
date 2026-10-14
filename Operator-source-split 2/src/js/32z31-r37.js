@@ -147,7 +147,7 @@ renderToday = (function(base){
     if(!as && !m && focusMinimalOn() && typeof renderFocusMinimal==='function') return renderFocusMinimal();
     const h = base.apply(this, arguments);
     if(as || m) return h;
-    return h.replace(/(<div class="th-biz">[\s\S]*?)(<\/div>)/, '$1<button class="th-min" data-action="toggleFocusMinimal" title="Full-screen view (M)">&#9673; Minimal</button>$2');
+    return h.replace(/(<div class="th-biz">[\s\S]*?<\/div>)/, '<div class="th-bizrow">$1<button class="th-min" data-action="toggleFocusMinimal" title="Full-screen view (M)">&#9673; Minimal</button></div>');
   };
 })(renderToday);
 afterRenderHooks.push(function(){

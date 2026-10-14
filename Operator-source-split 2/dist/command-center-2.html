@@ -6884,6 +6884,7 @@ body:has(#wakeOverlay:not(.hidden)) .activity-pill{ display:none !important; }
 .ckd-next{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:rgba(122,162,255,.1); border:1px solid rgba(122,162,255,.22); margin-top:auto; }
 .ckd-next b{ display:block; font-size:13.5px; color:#fff; } .ckd-next small{ font-size:12px; color:rgba(255,255,255,.6); }
 @media (max-width:1100px){ .ckd{ min-height:0; } }
+.th-bizrow{ display:flex; align-items:center; gap:10px; } .th-bizrow .th-min{ margin-left:0; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -36798,7 +36799,7 @@ renderToday = (function(base){
     if(!as && !m && focusMinimalOn() && typeof renderFocusMinimal==='function') return renderFocusMinimal();
     const h = base.apply(this, arguments);
     if(as || m) return h;
-    return h.replace(/(<div class="th-biz">[\s\S]*?)(<\/div>)/, '$1<button class="th-min" data-action="toggleFocusMinimal" title="Full-screen view (M)">&#9673; Minimal</button>$2');
+    return h.replace(/(<div class="th-biz">[\s\S]*?<\/div>)/, '<div class="th-bizrow">$1<button class="th-min" data-action="toggleFocusMinimal" title="Full-screen view (M)">&#9673; Minimal</button></div>');
   };
 })(renderToday);
 afterRenderHooks.push(function(){

@@ -74,7 +74,7 @@ const CORS = {'Access-Control-Allow-Origin':'*'};
     const p = await newPage(b, OUT+'/r37.html', {profile:{name:'Andre', lockedView:'minimal'}, tasks:{items:[{id:'t1', title:'Edit reel', status:'today'}]}}, T);
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(200);
-    check('Today has a Minimal chip by the name', await p.isVisible('.th-biz .th-min'));
+    check('Today has a Minimal chip by the name', await p.isVisible('.th-bizrow .th-min'));
     await p.click('.th-min'); await p.waitForTimeout(400);
     check('…a full-screen Today: the clock, your level, LOCK IN', await p.isVisible('#viewRoot .np-home') && await E("document.body.classList.contains('np-on')"));
     await p.keyboard.press('m'); await p.waitForTimeout(700);
