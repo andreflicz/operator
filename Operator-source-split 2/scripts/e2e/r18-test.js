@@ -171,7 +171,7 @@ async function ctxPage(b, seed, opts){
   {
     const p = await newPage(b, OUT+'/r18.html', {profile:{name:'Andre', lockedView:'minimal'}, tasks:{items:tasks}, business:{clients, pipeline:[]}}, new Date(2026,9,12,10,0).getTime());
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    await E("ui.currentTaskId='t0'; startFocus(); ui.view='focus'; state.focus.activeSession.method={id:'flow'}; renderView()"); await p.waitForTimeout(700);
+    await E("ui.currentTaskId='t0'; startFocus(); ui.view='today'; state.focus.activeSession.method={id:'flow'}; renderView()"); await p.waitForTimeout(700);
     check('the player: ☕ · ▶ (big) · ■ — lock out is one button, in the player', await p.isVisible('.np-ctl .np-music.is-main') && await p.isVisible('.np-ctl .np-out') && await p.$('.np-top .lv-out')===null);
     check('✓ Done for the task you’re on, and what’s next', await p.isVisible('.np-task .np-task-done') && /Next · Send proposal/.test(await p.textContent('.np-task')));
     check('Flowtime: spaced, with a ? that explains it', await p.$('.np-sub .ml-sep')!==null && await p.$('.np-sub .qtip')!==null && /a fifth as long/.test(await p.getAttribute('.np-sub .qtip', 'data-tip')));
@@ -184,7 +184,7 @@ async function ctxPage(b, seed, opts){
     await E("ACTIONS.toggleLockedView()"); await p.waitForTimeout(100);
     check('leaving the minimal view: through the dark veil (round 35)', await p.$('.fs-veil')!==null);
     await p.waitForTimeout(500);
-    // (round 23: the minimal view is on Focus; the knock-out list lives on Today)
+    // (round 36: the minimal view is on Today while locked in; leaving it shows the full Today)
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(300);
     check('Knock these out: one tidy line each — number, title, the client', (await p.$$('.knock-out-list .ko-row')).length===2 && /JJS Fitness/.test(await p.textContent('.knock-out-list')) && await p.$('.knock-out-list .ko-notes')===null);
     await p.click('.ko-row [data-action="koToggle"]'); await p.waitForTimeout(200);
