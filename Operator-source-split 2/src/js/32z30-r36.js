@@ -714,7 +714,10 @@ opfAction = (function(base){
     const t = String(text||''); if(!t) return;
     if(typeof opChatLog==='function') opChatLog('act', t.charAt(0).toUpperCase()+t.slice(1));
     if(typeof tone==='function') try{ tone([988, 1319], 0.12, 0.05); }catch(e){}
-    showToast('<span class="op-note-k">Op</span> '+escapeHtml(t.charAt(0).toUpperCase()+t.slice(1)), {icon:'<i class="th-op-o op-note-o"></i>', duration:4500});
+    showToast(t.charAt(0).toUpperCase()+t.slice(1), {icon:'<i class="th-op-o op-note-o"></i>', duration:4500});
+    const msg = document.querySelector('#activeToast .toast-msg'); if(msg) msg.insertAdjacentHTML('afterbegin', '<span class="op-note-k">Op</span> ');
+    // (and a Mac notification when Operator isn't in front)
+    try{ if(document.hidden && 'Notification' in window && Notification.permission==='granted') new Notification('Op', {body:t.charAt(0).toUpperCase()+t.slice(1)}); }catch(e){}
   };
 })(opfAction);
 
@@ -825,18 +828,22 @@ updateActivityPill = (function(base){
   };
 })(updateActivityPill);
 // once a day per app: a few minutes on something unsorted in work hours, not locked in → ask
+// (in an automatic session it asks after a minute, any hour: if it's work, the session keeps going
+// instead of ending a couple of minutes later)
 function unsortedNudge(){
-  const st = state.settings.appTracking; if(!st || st.enabled===false || state.focus.activeSession) return;
-  if((typeof workPhase==='function' ? workPhase() : 'off')!=='work') return;
+  const st = state.settings.appTracking; if(!st || st.enabled===false) return;
+  const s = state.focus.activeSession, inAuto = !!(s && s.autoStarted && !s.onBreak);
+  if(s && !inAuto) return;
+  if(!inAuto && (typeof workPhase==='function' ? workPhase() : 'off')!=='work') return;
   const ivs = state.appActivity.todayIntervals || [], last = ivs[ivs.length-1];
   if(!last || Date.now() - last.end > APP_ACTIVITY_GAP_MS) return;
   const app = last.app, k = activityKey(app);
   if(activityCategory(app)!=='unsorted' || BROWSER_APPS.indexOf(k) >= 0) return;
-  if(last.end - last.start < 3*60000) return;
+  if(last.end - last.start < (inAuto ? 60000 : 3*60000)) return;
   const asked = st.askedSort || (st.askedSort = {});
   if(asked[k]===todayStr()) return;
   asked[k] = todayStr(); persist('settings');
-  showToast('Is '+app+' work? Mark it and I’ll lock you in when you’re on it.', {icon:'<i class="th-op-o op-note-o"></i>', actionLabel:'It’s work', actionAction:'sortAsWork', actionId:app, duration:12000});
+  showToast(inAuto ? 'Is '+app+' work? If not, this session wraps up in a couple of minutes.' : 'Is '+app+' work? Mark it and I’ll lock you in when you’re on it.', {icon:'<i class="th-op-o op-note-o"></i>', actionLabel:'It’s work', actionAction:'sortAsWork', actionId:app, duration:inAuto ? 90000 : 12000});
 }
 ACTIONS.sortAsWork = function(el, e, id){ if(!id) return; setActivityCategory(id, 'work'); state.focus.autoRejectedAt = null; dismissToast(); checkAutoLockIn(); updateActivityPill(); playTick(); };
 setInterval(function(){ try{ if(state && state.settings) unsortedNudge(); }catch(e){} }, 30000);

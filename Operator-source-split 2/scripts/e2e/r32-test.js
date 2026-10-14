@@ -307,6 +307,11 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const nSess = await E("state.focus.sessions.length");
     await p.click('#activityPillMenu [data-action="pillSetCat"][data-id="other"]'); await p.waitForTimeout(200);
     check('r36: …marking it Not work throws that session out (no session, no XP)', await E("!state.focus.activeSession && state.focus.sessions.length")===nSess);
+    // in an automatic session, an app you haven't sorted gets asked about (instead of the session just ending)
+    await E("ui.pillMenu=null; renderPillMenu(); ACTIONS.pillLockNow(); state.appActivity.todayIntervals.push({app:'Affinity Photo', start:Date.now()-70000, end:Date.now()}); unsortedNudge()"); await p.waitForTimeout(150);
+    check('r36: in an auto session, an unsorted app gets asked about', /Affinity Photo work\?/.test(await p.textContent('#toastContainer')));
+    await p.click('#toastContainer [data-action="sortAsWork"]'); await p.waitForTimeout(150);
+    check('r36: …"It’s work" sorts it and the session keeps going', await E("activityCategory('Affinity Photo')")==='work' && await E("!!(state.focus.activeSession && state.focus.activeSession.autoStarted)"));
     check('no page errors (round 33)', p.errors.length===0, p.errors);
     await p.context().close();
   }
