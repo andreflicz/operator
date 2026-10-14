@@ -6902,3 +6902,22 @@ body:has(#wakeOverlay:not(.hidden)) .activity-pill{ display:none !important; }
 .ckx-sep{ background:linear-gradient(180deg, transparent, rgba(255,255,255,.12) 15%, rgba(255,255,255,.12) 85%, transparent); }
 .ckx .ckd{ background:none !important; border:0 !important; box-shadow:none !important; backdrop-filter:none; border-radius:0 !important; min-height:0; padding:34px 36px 30px !important; }
 @media (max-width:980px){ .np.is-cockpit .ckp.ckx{ grid-template-columns:1fr; } .ckx-sep{ height:1px; } }
+/* Op talking: Stop */
+.op-think.is-talk i{ background:#3FBE8E; }
+/* a client's next action */
+.cn-row{ display:flex; align-items:center; gap:8px; width:calc(100% - 24px); margin:0 12px 8px; padding:7px 10px; border-radius:10px; border:1px solid var(--border); background:rgba(var(--ink),.03); text-align:left; cursor:pointer; font-size:12.5px; color:var(--text); }
+.cn-row.is-empty{ border-style:dashed; color:var(--text-faint); } .cn-row:hover{ border-color:var(--text-dim); }
+.cn-k{ flex:none; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); }
+.cn-t{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cn-row.is-edit{ cursor:default; } .cn-in{ flex:1; min-width:0; border:0; background:none; color:var(--text); font:inherit; outline:none; }
+.cn-ok{ border:0; background:var(--accent); color:#1b1306; font-weight:700; font-size:11.5px; padding:4px 10px; border-radius:7px; cursor:pointer; }
+/* leads that don't add up */
+.crm-odd{ margin:6px 0 2px; font-size:12px; font-weight:600; color:#E8A23D; }
+/* the Cockpit: deep work bar */
+.ckd-bar-h{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+.ckd-bar-h b{ font-family:var(--font-display); font-size:30px; color:#fff; font-variant-numeric:tabular-nums; } .ckd-bar-h b small{ font-size:15px; color:rgba(255,255,255,.5); font-weight:500; }
+.ckd-bar-h span{ font-size:13px; color:rgba(255,255,255,.62); }
+.ckd-bar-t{ display:block; height:12px; margin-top:10px; border-radius:7px; background:rgba(255,255,255,.08); overflow:hidden; }
+.ckd-bar-t u{ display:block; height:100%; border-radius:7px; background:linear-gradient(90deg, #E8A23D, #f5c16c); transition:width .6s ease; } .ckd-bar-t u.is-hit{ background:linear-gradient(90deg, #3FBE8E, #6fe0b0); }
+.ckd-bar-k{ margin-top:8px; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.5); }
+.ckx .ckd-week{ flex:1; min-height:120px; height:auto; }

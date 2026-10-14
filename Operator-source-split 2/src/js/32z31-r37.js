@@ -626,3 +626,207 @@ cockpitHtml = function(){
     cockpitDayHtml()+
   '</div>';
 };
+
+// ================= from what Op remembers: the app learns it =================
+// Op's memory was mostly how the app should work, not facts about you. Those are built in now:
+
+// ---- you talk slowly, with pauses: Op waits longer before he sends what you said ----
+function opPauseMs(){ return ({quick:2500, normal:3800, patient:5500})[state.profile.opPause || 'normal'] || 3800; }
+// ---- cut him off: Esc, or the Stop by his light while he's talking ----
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Escape' || !(OV.speaking || OV.pending)) return;
+  try{ opStop(); }catch(x){} e.stopPropagation();
+}, true);
+(function(){
+  let el = null;
+  setInterval(function(){
+    const talking = !!(OV.speaking) && !AI.busy && !AI.listening;
+    if(talking && !el){ el = document.createElement('button'); el.id = 'opTalkStop'; el.className = 'op-think is-talk'; el.dataset.action = 'opCutOff'; el.innerHTML = '<i></i><span>Talking</span><b>&#9632; Stop</b>'; document.body.appendChild(el); requestAnimationFrame(function(){ if(el) el.classList.add('is-in'); }); }
+    else if(!talking && el){ const x = el; el = null; x.classList.remove('is-in'); setTimeout(function(){ x.remove(); }, 250); }
+  }, 250);
+})();
+ACTIONS.opCutOff = function(){ try{ opStop(); }catch(e){} OV.userCut = true; };
+
+// ---- how he talks to you ----
+aiSystem = (function(base){
+  return function(){
+    const s = base.apply(this, arguments);
+    if(Array.isArray(s)) s.push({type:'text', text:
+      'How he likes it (learned from your memory of him):\n'+
+      '- Short. One or two sentences unless he asks for more. Business check-ins are a line, not a report. He will cut you off if you go long.\n'+
+      '- When he says he’s good, no, not now, or that he doesn’t need help: one short line at most, then drop it. No walkthrough, no offers.\n'+
+      '- Don’t remind him of his tasks or walk him through his day in the morning unless he asks; he starts from the list himself. Don’t push a lock-in on him right away; he decides when to start.\n'+
+      '- If he asks you to get on him or get angry, you can be stern ([mood:stern]) and blunt, never abusive.\n'+
+      '- Carry the load of keeping the app current: when he mentions something done, a client update, a new date or a change, update it with your tools without being asked twice.\n'+
+      '- The app’s views you can switch with set_view: the locked-in minimal view (Player or Cockpit style), the full view, Today’s full-screen view, and your own screen (your big mode). If he names a mode you don’t have, say so in a few words.\n'+
+      '- Each client can have a next action (what they’re owed next): keep it current with set_client_next_action when you learn it.'});
+    return s;
+  };
+})(aiSystem);
+
+// ---- each client's next action ----
+function clientNextHtml(c){
+  const editing = ui.nextEditFor===c.id;
+  if(editing) return '<div class="cn-row is-edit"><span class="cn-k">Next</span><input class="cn-in" id="cnIn-'+c.id+'" value="'+escapeHtml(c.nextAction||'')+'" placeholder="What they’re owed next" maxlength="140"><button class="cn-ok" data-action="clientNextSave" data-id="'+c.id+'">Save</button></div>';
+  return '<button class="cn-row'+(c.nextAction ? '' : ' is-empty')+'" data-action="clientNextEdit" data-id="'+c.id+'" title="What this client is owed next"><span class="cn-k">Next</span><span class="cn-t">'+(c.nextAction ? escapeHtml(c.nextAction) : 'Set what they’re owed next')+'</span></button>';
+}
+clientCardV2 = (function(base){
+  return function(c){
+    const h = base.apply(this, arguments);
+    if(!clientStageActive(c.stage)) return h;
+    return h.replace('<div class="cc2-foot">', clientNextHtml(c)+'<div class="cc2-foot">');
+  };
+})(clientCardV2);
+ACTIONS.clientNextEdit = function(el, e, id){ ui.nextEditFor = id; renderView(); setTimeout(function(){ const i = document.getElementById('cnIn-'+id); if(i){ i.focus(); i.select(); } }, 30); };
+ACTIONS.clientNextSave = function(el, e, id){
+  const c = arr(state.business.clients).find(function(x){ return x.id===id; }), i = document.getElementById('cnIn-'+id);
+  if(c && i){ c.nextAction = i.value.trim().slice(0, 140); c.nextActionAt = Date.now(); if(typeof crmTimeline==='function' && c.nextAction) crmTimeline(c, 'note', 'Next: '+c.nextAction); persist('business'); }
+  ui.nextEditFor = null; renderView();
+};
+document.addEventListener('keydown', function(e){
+  const t = e.target; if(!t || !t.classList || !t.classList.contains('cn-in')) return;
+  if(e.key==='Enter'){ e.preventDefault(); ACTIONS.clientNextSave(null, null, t.id.slice(5)); }
+  if(e.key==='Escape'){ e.preventDefault(); ui.nextEditFor = null; renderView(); }
+});
+
+// ---- the leads list flags what doesn't add up (closed but never touched) ----
+function leadOddity(l){
+  const st = typeof crmStage==='function' ? crmStage('lead', l.stage) : null;
+  const closed = st && (st.kind==='won' || st.kind==='lost');
+  if(closed && !(typeof crmLastTouch==='function' && crmLastTouch('lead', l))) return st.kind==='won' ? 'Marked won, but never touched' : 'Closed, but never touched';
+  return null;
+}
+crmCard = (function(base){
+  return function(kind, x){
+    const h = base.apply(this, arguments);
+    if(kind!=='lead') return h;
+    const odd = leadOddity(x); if(!odd) return h;
+    return h.replace(/(<div class="crm-card-meta">)/, '<div class="crm-odd" title="These don’t add up: check the stage, or log the touch">&#9888; '+odd+'</div>$1');
+  };
+})(crmCard);
+
+// ---- what Op sees: next actions, the MRR target, things that don't add up ----
+aiContext = (function(base){
+  return function(){
+    const out = [base.apply(this, arguments)];
+    const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
+    const na = cs.map(function(c){ return (c.business || c.name)+': '+(c.nextAction || 'no next action set'); });
+    if(na.length) out.push('What each client is owed next: '+na.join('; ')+'.');
+    const odd = arr(state.business.pipeline).map(function(l){ const o = leadOddity(l); return o ? crmName('lead', l)+' ('+o.toLowerCase()+')' : null; }).filter(Boolean);
+    if(odd.length) out.push('Things in his data that don’t add up: '+odd.join('; ')+'.');
+    const ph = arr(state.goals && state.goals.items).filter(function(g){ return /^(test|tests?|asdf|x+|placeholder|todo)$/i.test(String(g.label||'').trim()); });
+    if(ph.length) out.push('Placeholder goals (just "test" and the like): '+ph.length+'. Offer to replace them with real ones (his $'+(state.profile.revenueGoalMonthly ? Number(state.profile.revenueGoalMonthly).toLocaleString() : '10,000')+' MRR target is real).');
+    return out.join('\n');
+  };
+})(aiContext);
+
+// ---- more Op can do: reminders, deadlines, the MRR target, goals, next actions, views ----
+OP_TOOLS.push(
+  {name:'clear_reminder', description:'Mark a reminder done (it goes away), by part of its text.', input_schema:{type:'object', properties:{label_contains:{type:'string'}}, required:['label_contains']}},
+  {name:'set_task_deadline', description:'Set or remove a task’s deadline. date YYYY-MM-DD, or "none" to remove it.', input_schema:{type:'object', properties:{task:{type:'string'}, date:{type:'string'}}, required:['task', 'date']}},
+  {name:'set_mrr_goal', description:'Set his monthly recurring revenue target in dollars (e.g. 10000).', input_schema:{type:'object', properties:{amount:{type:'integer'}}, required:['amount']}},
+  {name:'edit_goal', description:'Rename one of his goals (any tier), by part of its current text. Use it to replace placeholders like "test".', input_schema:{type:'object', properties:{label_contains:{type:'string'}, new_label:{type:'string'}}, required:['label_contains', 'new_label']}},
+  {name:'set_client_next_action', description:'Set what a client is owed next (one short line).', input_schema:{type:'object', properties:{who:{type:'string'}, action:{type:'string'}}, required:['who', 'action']}},
+  {name:'set_view', description:'Switch the app’s view: minimal (the locked-in full-screen view), full (the normal page), cockpit or player (the minimal view’s style), today_fullscreen (Today’s own full-screen view), op_screen (your big screen).', input_schema:{type:'object', properties:{view:{type:'string', enum:['minimal', 'full', 'cockpit', 'player', 'today_fullscreen', 'op_screen']}}, required:['view']}}
+);
+opRunTool = (function(base){
+  return function(name, x){
+    x = x || {};
+    switch(name){
+      case 'clear_reminder': {
+        const w = String(x.label_contains||'').toLowerCase(), r = arr(state.focus.reminders).find(function(r){ return String(r.label||'').toLowerCase().indexOf(w) >= 0; });
+        if(!r) throw new Error('no reminder matches "'+x.label_contains+'"');
+        dismissReminder(r.id); return 'cleared: '+r.label;
+      }
+      case 'set_task_deadline': {
+        const t = opFindTask(String(x.task||'')); if(!t) throw new Error('no task matches "'+x.task+'"');
+        const d = String(x.date||'').trim();
+        if(/^(none|null|no|remove|clear)?$/i.test(d)){ t.deadline = null; persist('tasks'); return 'deadline removed from '+t.title; }
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) throw new Error('date must be YYYY-MM-DD or none');
+        t.deadline = d; persist('tasks'); return t.title+' due '+d;
+      }
+      case 'set_mrr_goal': {
+        const n = Math.round(Number(x.amount)); if(!(n > 0)) throw new Error('amount must be a positive number');
+        state.profile.revenueGoalMonthly = n; persist('profile'); return 'MRR target set to $'+n.toLocaleString();
+      }
+      case 'edit_goal': {
+        const w = String(x.label_contains||'').toLowerCase(), g = arr(state.goals && state.goals.items).find(function(g){ return String(g.label||'').toLowerCase().indexOf(w) >= 0; });
+        if(!g) throw new Error('no goal matches "'+x.label_contains+'"');
+        const was = g.label; g.label = String(x.new_label||'').trim().slice(0, 140) || was; persist('goals'); return 'renamed "'+was+'" to "'+g.label+'"';
+      }
+      case 'set_client_next_action': {
+        const hit = opFindContact(String(x.who||'')); if(!hit || hit.kind!=='client') throw new Error('no client matches "'+x.who+'"');
+        hit.x.nextAction = String(x.action||'').trim().slice(0, 140); hit.x.nextActionAt = Date.now(); persist('business'); return 'next for '+crmName('client', hit.x)+': '+hit.x.nextAction;
+      }
+      case 'set_view': {
+        const v = x.view, as = state.focus.activeSession;
+        if(v==='op_screen'){ if(typeof opfOpen==='function') opfOpen({}); return 'opened your screen'; }
+        if(v==='cockpit' || v==='player'){ state.profile.lockedStyle = v; persist('profile'); renderView(); return 'minimal view style: '+v; }
+        if(v==='minimal'){ if(!as){ ui.view = 'today'; state.profile.focusMinimal = true; persist('profile'); renderView(); return 'Today’s full-screen view (not locked in)'; } state.profile.lockedView = 'minimal'; ui.view = 'today'; persist('profile'); renderView(); return 'minimal view'; }
+        if(v==='today_fullscreen'){ ui.view = 'today'; if(as){ state.profile.lockedView = 'minimal'; } else state.profile.focusMinimal = true; persist('profile'); renderView(); return 'Today, full screen'; }
+        if(v==='full'){ state.profile.lockedView = 'full'; state.profile.focusMinimal = false; persist('profile'); renderView(); return 'full view'; }
+        throw new Error('unknown view');
+      }
+    }
+    return base.apply(this, arguments);
+  };
+})(opRunTool);
+
+// ---- check-ins every couple of hours while you work ----
+ACCT_PACE.twohours = [105, 135];
+acctGap = (function(base){ return function(){ if(!workCfg().pace) workCfg().pace = 'twohours'; return base.apply(this, arguments); }; })(acctGap);
+// (you asked for every couple of hours: the old default moves over once; your own pick after that stays)
+setTimeout(function(){ try{ if(!state.profile.pace37){ const w = workCfg(); if(!w.pace || w.pace==='normal') w.pace = 'twohours'; state.profile.pace37 = true; persist('focus'); persist('profile'); } }catch(e){} }, 1200);
+
+// ---- Op's memory doesn't repeat itself ----
+// Saying the same thing twice ("Andre may travel to China…" ×2) now updates the one memory instead of
+// adding another, and the duplicates already there are folded together once.
+function memWords(t){ return String(t||'').toLowerCase().replace(/[^a-z0-9$ ]+/g, ' ').split(/\s+/).filter(function(w){ return w.length > 2 && !/^(the|and|for|his|him|with|that|this|was|are|but|not|has|have|wants|want|andre|user|when|from|into|what|about)$/.test(w); }); }
+function memSimilar(a, b){
+  const A = memWords(a), B = memWords(b); if(!A.length || !B.length) return 0;
+  const sa = new Set(A), sb = new Set(B); let inter = 0; sa.forEach(function(w){ if(sb.has(w)) inter++; });
+  return inter / Math.min(sa.size, sb.size);
+}
+opRunTool = (function(base){
+  return function(name, x){
+    if(name!=='remember') return base.apply(this, arguments);
+    const f = String(x && x.fact || '').trim().slice(0, 300); if(!f) return base.apply(this, arguments);
+    const mem = opMemory(), hit = mem.find(function(m){ return memSimilar(m.text, f) >= .8; });
+    if(hit){ if(f.length > hit.text.length) hit.text = f; hit.at = Date.now(); persist('profile'); return 'updated'; }
+    return base.apply(this, arguments);
+  };
+})(opRunTool);
+setTimeout(function(){
+  try{
+    if(state.profile.opMemDeduped2) return;
+    const mem = opMemory(), keep = [];
+    mem.forEach(function(m){ const k = keep.find(function(x){ return memSimilar(x.text, m.text) >= .8; }); if(k){ if(m.text.length > k.text.length) k.text = m.text; k.at = Math.max(k.at||0, m.at||0); } else keep.push(m); });
+    if(keep.length < mem.length){ state.profile.opMemory = keep; }
+    state.profile.opMemDeduped2 = true; persist('profile');
+  }catch(e){}
+}, 1500);
+
+// ---- Settings → Op: how long he waits for you, and how often he checks in ----
+opSettingsHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), pz = state.profile.opPause || 'normal', pace = workCfg().pace || 'twohours';
+    const seg = function(act, cur, id, label){ return '<button class="seg-tab'+(cur===id ? ' active' : '')+'" data-action="'+act+'" data-id="'+id+'">'+label+'</button>'; };
+    const block = '<div class="field op-set"><label>When you talk</label><div class="seg-tabs" style="margin:0;">'+seg('opPauseSet', pz, 'quick', 'Quick')+seg('opPauseSet', pz, 'normal', 'Normal')+seg('opPauseSet', pz, 'patient', 'Patient')+'</div>'+
+        '<div class="op-set-help">How long a pause Op waits before he sends what you said ('+(opPauseMs()/1000).toFixed(1)+' s). Patient is for talking slowly, with pauses. Cut him off any time: Esc, or Stop by his light.</div></div>'+
+      '<div class="field op-set"><label>Check-ins while you work</label><div class="seg-tabs" style="margin:0;">'+seg('opPaceSet', pace, 'light', 'Every 2 to 3 h')+seg('opPaceSet', pace, 'twohours', 'Every couple of hours')+seg('opPaceSet', pace, 'normal', 'About hourly')+seg('opPaceSet', pace, 'strict', 'Close')+'</div></div>';
+    return h.replace(/(<div class="field op-set op-col">)/, block+'$1');
+  };
+})(opSettingsHtml);
+ACTIONS.opPauseSet = function(el, e, id){ state.profile.opPause = id; persist('profile'); playTick(); renderView(); };
+ACTIONS.opPaceSet = function(el, e, id){ workCfg().pace = id; persist('focus'); if(typeof acctSchedule==='function') acctSchedule(); playTick(); renderView(); };
+
+// ---- the Cockpit: deep work as a bar, not a ring ----
+cockpitDayHtml = (function(base){
+  return function(){
+    const dw = deepWorkMinutesTodayLive(), target = state.standards.deepWorkTargetMinutes || 180, f = Math.min(1, dw/target);
+    return base.apply(this, arguments).replace(/<div class="ckd-ring">[\s\S]*?<div class="ckd-ring-k">[\s\S]*?<\/div><\/div>/, function(){
+      return '<div class="ckd-bar"><div class="ckd-bar-h"><b>'+fmtDurationLabel(dw)+'<small> / '+fmtDurationLabel(target)+'</small></b><span>'+(f >= 1 ? 'Target hit. The rest is a bonus.' : fmtDurationLabel(target - dw)+' to go')+'</span></div>'+
+        '<i class="ckd-bar-t"><u class="'+(f >= 1 ? 'is-hit' : '')+'" style="width:'+(f*100).toFixed(1)+'%"></u></i><div class="ckd-bar-k">Deep work today</div></div>';
+    });
+  };
+})(cockpitDayHtml);

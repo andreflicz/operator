@@ -474,7 +474,7 @@ function aiListen(cap){
   // closing Op (the ✕) drops what it heard and stops listening for good: no restart, nothing sent
   AI.cancelListen = function(){ cancelled = true; sent = true; clearTimeout(quiet); clearTimeout(hardStop); AI.listening = false; AI.sendNow = null; try{ rec.abort(); }catch(e){ try{ rec.stop(); }catch(e2){} } aiUiRefresh(); };
   // (round 30: a breath longer before it sends, so a pause mid-thought doesn't cut you off)
-  const armQuiet = function(){ clearTimeout(quiet); quiet = setTimeout(send, 2500); };
+  const armQuiet = function(){ clearTimeout(quiet); quiet = setTimeout(send, typeof opPauseMs==='function' ? opPauseMs() : 2500); };
   OV.cap = cap;
   rec.onstart = function(){ if(cancelled){ try{ rec.abort(); }catch(e){} return; } started = true; AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, 60000); };
   rec.onresult = function(e){

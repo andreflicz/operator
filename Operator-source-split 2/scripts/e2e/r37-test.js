@@ -111,6 +111,34 @@ const CORS = {'Access-Control-Allow-Origin':'*'};
     await p.context().close();
   }
 
+  // ---- from Op's memory: the app learns it ----
+  {
+    const p = await newPage(b, OUT+'/r37.html', {profile:{name:'Andre'}, tasks:{items:[{id:'t1', title:'Overdue video run', status:'today', deadline:'2026-10-10'}]},
+      business:{clients:[{id:'c1', name:'JJS Construction', stage:'active', status:'active', mrr:3000}], pipeline:[{id:'v1', name:'Vigo', stage:'closed', value:2000}]},
+      focus:{reminders:[{id:'r1', label:'Call the dentist', date:'2026-10-19'}]}, goals:{items:[{id:'g1', tier:'week', pk:'2026-10-12', label:'test'}]}}, T);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await p.waitForTimeout(1600);
+    check('you talk slowly: Op waits longer before he sends (and there’s a setting)', await E("opPauseMs()") >= 3500 && /When you talk/.test(await E("opSettingsHtml()")));
+    check('check-ins every couple of hours by default (and a setting)', await E("workCfg().pace")==='twohours' && /Every couple of hours/.test(await E("opSettingsHtml()")));
+    check('Op’s rules: short, quiet when you’re good, no morning walkthrough', /One or two sentences/.test(JSON.stringify(await E("aiSystem()"))) && /he’s good, no, not now/.test(JSON.stringify(await E("aiSystem()"))));
+    check('a lead marked won but never touched is flagged', /never touched/.test(await E("crmCard('lead', state.business.pipeline[0])")) && /don’t add up/.test(await E("aiContext()")));
+    check('placeholder goals ("test") are pointed out to Op', /Placeholder goals/.test(await E("aiContext()")));
+    check('Op can clear a reminder', /cleared/.test(await E("opRunTool('clear_reminder', {label_contains:'dentist'})")) && (await E("state.focus.reminders.length"))===0);
+    check('…remove a deadline', /removed/.test(await E("opRunTool('set_task_deadline', {task:'video run', date:'none'})")) && await E("state.tasks.items[0].deadline")===null);
+    check('…set the MRR target', /10,000/.test(await E("opRunTool('set_mrr_goal', {amount:10000})")) && await E("state.profile.revenueGoalMonthly")===10000);
+    check('…rename a placeholder goal', /renamed/.test(await E("opRunTool('edit_goal', {label_contains:'test', new_label:'Sign one new client'})")));
+    check('…set what a client is owed next (and it shows on the card)', /next for/.test(await E("opRunTool('set_client_next_action', {who:'JJS', action:'Send the October reel cut'})")) && /October reel cut/.test(await E("clientCardV2(state.business.clients[0])")));
+    check('…and switch views (the Cockpit, his own screen)', /cockpit/.test(await E("opRunTool('set_view', {view:'cockpit'})")) && await E("state.profile.lockedStyle")==='cockpit');
+    await E("opMemory().push({id:'m1', text:'Andre may travel to China within the next week and is setting up systems so JJS Construction and Batusha Corp stay looked after while he is away.', at:1})");
+    check('memory: the same thing said again updates it instead of adding another', await E("opRunTool('remember', {fact:'Andre may travel to China within the next week or so; he is setting up systems so JJS Construction and Batusha Corp stay looked after while he is away.'})")==='updated' && await E("opMemory().length")===1);
+    await E("ui.view='business'; ui.businessTab='clients'; renderView()"); await p.waitForTimeout(200);
+    await p.click('.cn-row'); await p.waitForTimeout(150);
+    await p.fill('.cn-in', 'Shoot plan for Vigan'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
+    check('a client’s next action: tap, type, Enter', await E("state.business.clients[0].nextAction")==='Shoot plan for Vigan');
+    check('no page errors (memory → app)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
   // ---- Calendar, Standing, voice profiles, Good morning's quote ----
   {
     const p = await newPage(b, OUT+'/r37.html', {profile:{name:'Andre'}, tasks:{items:[{id:'t1', title:'Edit reel', status:'today', deadline:'2026-10-15'}]}}, T);
