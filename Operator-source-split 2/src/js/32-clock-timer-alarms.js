@@ -35,7 +35,8 @@ function tickClocks(){
   const now = new Date();
   const el = document.getElementById('liveClock');
   if(el){
-    el.textContent = now.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'}) + ' \u00b7 ' + now.toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'});
+    // (the date only: the time is top right, with the music)
+    el.textContent = now.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'});
   }
   const bigClock = document.getElementById('calendarBigClock');
   if(bigClock){
@@ -103,7 +104,7 @@ function tickLiveDeepWork(){
   const statBox = document.getElementById('statDeepWorkBox');
   if(statBox) statBox.innerHTML = deepWorkStatInnerHtml(mins);
   const focusBox = document.getElementById('statDeepWorkTodayBox');
-  if(focusBox) focusBox.innerHTML = '<div class="stat-chip-label">Deep Work Today</div><div class="stat-chip-value">'+fmtHours(mins)+'</div><div class="kpi-sub">'+fmtDurationLabel(mins)+'</div>';
+  if(focusBox) focusBox.innerHTML = '<div class="stat-chip-label">Deep Work Today</div><div class="stat-chip-value">'+fmtDurationLabel(mins)+'</div><div class="kpi-sub">of '+fmtDurationLabel(state.standards.deepWorkTargetMinutes || 180)+'</div>';
   const chip1 = document.getElementById('stdDeepWorkChip');
   if(chip1) chip1.outerHTML = deepWorkChipHtml('stdDeepWorkChip');
   const chip2 = document.getElementById('stdDeepWorkChip2');

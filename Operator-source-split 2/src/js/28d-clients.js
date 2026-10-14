@@ -85,7 +85,7 @@ function renderClientsHome(){
       stat('$'+mrr.toLocaleString(), 'MRR')+
       stat(levels.filter(function(l){ return l==='green'; }).length, 'ahead', 'is-good')+
       stat(levels.filter(function(l){ return l==='yellow'; }).length, 'on pace', levels.some(function(l){ return l==='yellow'; })?'is-warn':'')+
-      stat(levels.filter(function(l){ return l==='red'; }).length, 'behind / check in', levels.some(function(l){ return l==='red'; })?'is-bad':'')+
+      stat(levels.filter(function(l){ return l==='red'; }).length, 'behind', levels.some(function(l){ return l==='red'; })?'is-bad':'')+
       stat(due, 'to reach out to', due?'is-warn':'')+
     '</div>'+
     (function(){

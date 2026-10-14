@@ -171,7 +171,7 @@ masterGoalDefs = (function(base){
   };
 })(masterGoalDefs);
 masterTargetHtml = (function(base){
-  return function(m){ if(m.key==='care') return '<span class="mg-target is-static">of '+m.target+' tasks</span>'; return base.apply(this, arguments); };
+  return function(m){ if(m.key==='care') return '<span class="mg-target is-static">of '+m.target+' task'+(m.target===1 ? '' : 's')+'</span>'; return base.apply(this, arguments); };
 })(masterTargetHtml);
 // the Clients page card: has this client been checked in with this week
 clientCardV2 = (function(base){
@@ -235,8 +235,9 @@ xpAttributes = (function(base){
 acctSay = (function(base){
   return function(){
     const st = opStanding();
-    // (only when the moment hasn't set his mood already: a worried ping stays worried)
-    if(st && st.mood && typeof opMood==='function' && !document.documentElement.hasAttribute('data-op-mood')) opMood(st.mood, 60000);
+    // (only while a check-in is open and the moment hasn't set his mood already: a worried ping stays
+    // worried, and once it's settled he goes back to white)
+    if(st && st.mood && typeof opMood==='function' && acct().pending && !document.documentElement.hasAttribute('data-op-mood')) opMood(st.mood, 60000);
     return base.apply(this, arguments);
   };
 })(acctSay);
@@ -703,3 +704,213 @@ document.addEventListener('keydown', function(e){
   if(ui.view==='focus'){ e.stopImmediatePropagation(); return; }
   if(ui.view==='today'){ e.preventDefault(); e.stopImmediatePropagation(); ACTIONS.toggleLockedView(); }
 }, true);
+
+// ---- when Op does something for you, he doesn't pop up ----
+// Logging a task, moving a client, setting a reminder: the work just happens, with a small notice in
+// his colors (and it's on his screen's log). His screen only shows it if it's already open.
+opfAction = (function(base){
+  return function(text){
+    if(typeof OPF!=='undefined' && OPF.open) return base.apply(this, arguments);
+    const t = String(text||''); if(!t) return;
+    if(typeof opChatLog==='function') opChatLog('act', t.charAt(0).toUpperCase()+t.slice(1));
+    if(typeof tone==='function') try{ tone([988, 1319], 0.12, 0.05); }catch(e){}
+    showToast('<span class="op-note-k">Op</span> '+escapeHtml(t.charAt(0).toUpperCase()+t.slice(1)), {icon:'<i class="th-op-o op-note-o"></i>', duration:4500});
+  };
+})(opfAction);
+
+// ---- the Op bar's Work / Not work is what drives auto lock-in and auto lock-out ----
+// The dot follows the app: a work app is green (any hour), a not-work or unsorted one is red in work
+// hours and grey after. Marking the app in front acts right away instead of waiting on the timers:
+//   Work      → if you've already put the time in, the auto lock-in starts now (dated back);
+//               otherwise the menu shows how far along it is.
+//   Not work  → an automatic session that this app started is thrown out (it never was work, so no
+//               XP); one that started on real work ends where the work stopped.
+// Apps not sorted yet get a small "Work?" on the bar, and once a day, after a few minutes on one in
+// work hours, a notice asks.
+opBarStatus = function(){
+  const s = state.focus.activeSession, app = currentForegroundApp(), ph = typeof workPhase==='function' ? workPhase() : 'off';
+  if(s) return s.onBreak ? 'amber' : 'green';
+  if(app && activityCategory(app)==='work') return 'green';
+  if(ph==='lunch' || ph==='break') return 'amber';
+  return ph==='work' ? 'red' : 'grey';
+};
+function autoLockProgress(){
+  const st = state.settings.appTracking || {};
+  if(st.enabled===false) return {off:'App tracking is off'};
+  if(st.autoLockIn===false) return {off:'Auto lock-in is off in Settings'};
+  if(state.focus.activeSession) return null;
+  const why = autoLockInBlockedReason();
+  if(why) return {off:({dayoff:'Paused: day off', mode:'Paused while a mode is on', cooldown:'Paused: you just locked out', rejected:'Paused half an hour: you said that wasn’t work'})[why] || 'Paused'};
+  const need = autoThresholdMin(), ivs = state.appActivity.todayIntervals || [], last = ivs[ivs.length-1];
+  if(!last || Date.now() - last.end > APP_ACTIVITY_GAP_MS) return {min:0, need:need};
+  const s = autoWorkStretch(ivs); if(!s) return {min:0, need:need};
+  const from = Math.max(s.start, autoLockInCountFrom({start:s.start}));
+  return {min:autoWorkMsFrom(ivs, from)/60000, need:need};
+}
+function pillAutoHtml(app, cat){
+  const s = state.focus.activeSession;
+  if(s){
+    if(!s.autoStarted || s.onBreak) return '';
+    return '<div class="ap-auto is-on">Locked in automatically'+(s.autoApp ? ' on '+escapeHtml(s.autoApp) : '')+'. Mark it <b>Not work</b> and the session goes.</div>';
+  }
+  const p = autoLockProgress(); if(!p) return '';
+  if(p.off) return '<div class="ap-auto is-off">'+escapeHtml(p.off)+'</div>';
+  if(cat!=='work') return '<div class="ap-auto">'+(cat==='unsorted' ? 'Not sorted yet, so it can’t lock you in.' : 'Doesn’t count toward a lock-in.')+'</div>';
+  const left = Math.max(1, Math.ceil(p.need - p.min)), f = clamp(p.min / p.need, 0, 1);
+  return '<div class="ap-auto"><div class="ap-auto-row"><span>Auto lock-in in '+left+' min</span><button class="ap-auto-go" data-action="pillLockNow">Lock in now</button></div><div class="ap-auto-bar"><i style="width:'+Math.round(f*100)+'%"></i></div></div>';
+}
+renderPillMenu = function(){
+  let m = document.getElementById('activityPillMenu');
+  if(!ui.pillMenu){ if(m) m.remove(); return; }
+  if(!m){ m = document.createElement('div'); m.id = 'activityPillMenu'; m.className = 'ap-menu'; document.body.appendChild(m); }
+  const app = ui.pillMenu==='__none' ? null : ui.pillMenu, cat = app ? activityCategory(app) : null, s = state.focus.activeSession;
+  const status = s ? '<div class="ap-status'+(s.onBreak?' is-break':'')+'">'+
+      (s.onBreak ? '<div class="ap-st-k">&#9749; On break</div><div class="ap-st-v">'+(s.breakEndsAt ? formatElapsed(Math.max(0, s.breakEndsAt-Date.now()))+' left' : 'no timer')+'</div>'+
+          '<div class="ap-st-acts">'+(s.breakEndsAt ? '<button class="btn btn-ghost btn-sm" data-action="extendBreak" data-minutes="5">+5 min</button>' : '')+'<button class="btn btn-primary btn-sm" data-action="endBreakModeFromFocus">Back to it</button></div>'
+        : '<div class="ap-st-k">&#128274; Locked in'+(s.method && LOCK_METHODS[s.method.id] && s.method.id!=='block' ? ' &middot; '+LOCK_METHODS[s.method.id].label : '')+'</div><div class="ap-st-v">'+formatElapsed(Date.now()-s.startedAt)+(s.plannedMinutes ? ' <small>of '+fmtDurationLabel(s.plannedMinutes)+'</small>' : '')+'</div>'+
+          '<div class="ap-st-acts"><button class="btn btn-ghost btn-sm" data-action="openBreakNotePrompt">&#9749; Break</button><button class="btn btn-ghost btn-sm" data-action="openStopFocus">Lock out</button></div>')+
+    '</div>' : '';
+  const browser = app && BROWSER_APPS.indexOf(activityKey(app)) >= 0;
+  const body = !app ? '<div class="ap-menu-title">Nothing in front right now</div>'
+    : browser ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div><div class="ap-menu-hint" style="margin-top:0;">Can’t see which website is open'+
+        tip('So it can’t tell YouTube from work. '+(activityKey(app)==='firefox' ? 'Firefox doesn’t allow this. Safari, Chrome, Arc, Brave and Edge do. Sessions you start yourself still count it.' : 'On your Mac: System Settings → Privacy & Security → Automation → Operator → turn on '+app+'. Then reopen Operator.'))+'</div>'
+    : '<div class="ap-menu-title"><span class="ap-mdot is-'+cat+'"></span>'+escapeHtml(app)+'</div>'+
+      '<div class="ap-seg is-wide">'+['work','other'].map(function(c){ return '<button class="ap-seg-btn'+(cat===c?' is-on':'')+'" data-action="pillSetCat" data-id="'+c+'">'+CAT_META[c].label+'</button>'; }).join('')+'</div>'+
+      pillAutoHtml(app, cat);
+  m.innerHTML = status+body+'<button class="ap-menu-link" data-action="goToActivitySettings">All apps &amp; sites &rarr;</button>';
+};
+function autoSessionThrowOut(msg){
+  const a = state.focus.activeSession; if(!a) return;
+  state.focus.activeSession = null;
+  state.focus.lastSessionEndedAt = Date.now();
+  autoLockInMeta = {app:null, intervalStart:null};
+  persist('focus'); renderView();
+  showToast(msg, {icon:'&#128465;', duration:5000});
+}
+ACTIONS.pillSetCat = (function(base){
+  return function(el, e, id){
+    const app = ui.pillMenu; base.apply(this, arguments);
+    if(!app || app==='__none') return;
+    const s = state.focus.activeSession;
+    if(id==='other' && s && s.autoStarted && !s.onBreak){
+      const ivs = state.appActivity.todayIntervals || [], lw = lastWorkActivityEnd(ivs, s.startedAt, false);
+      if(activityKey(s.autoApp)===activityKey(app) || !lw || lw - s.startedAt < 60000) autoSessionThrowOut('Thrown out: '+app+' isn’t work, so that session never counted.');
+      else { autoEndFocusSession(Math.max(lw, s.startedAt + 60000)); autoLockInMeta = {app:null, intervalStart:null}; }
+    } else if(id==='work' && !s){
+      if(state.focus.autoRejectedAt) state.focus.autoRejectedAt = null;   // you've said it is work now
+      checkAutoLockIn();
+    }
+    renderPillMenu(); updateActivityPill();
+  };
+})(ACTIONS.pillSetCat);
+ACTIONS.pillLockNow = function(){
+  const ivs = state.appActivity.todayIntervals || [], st = autoWorkStretch(ivs);
+  ui.pillMenu = null; renderPillMenu();
+  const staged = ui.stagedTaskId; ui.stagedTaskId = null; ui.currentTaskId = null; ui.currentTaskStartedAt = null;
+  startFocus(null); ui.stagedTaskId = staged;
+  const a = state.focus.activeSession, last = ivs[ivs.length-1];
+  if(a){ a.autoStarted = true; a.noTask = true; a.autoApp = last ? last.app : null; if(st) a.startedAt = Math.max(st.start, autoLockInCountFrom({start:st.start})); }
+  persist('focus'); renderView(); updateActivityPill();
+};
+// the bar: an unsorted app gets a small "Work?"
+updateActivityPill = (function(base){
+  return function(){
+    base.apply(this, arguments);
+    const el = document.getElementById('activityPill'); if(!el) return;
+    const st = state.settings.appTracking, app = (st && st.enabled!==false) ? currentForegroundApp() : null;
+    const ask = app && activityCategory(app)==='unsorted' && BROWSER_APPS.indexOf(activityKey(app)) < 0;
+    const has = !!el.querySelector('.ap-ask');
+    if(ask && !has){ el.insertAdjacentHTML('beforeend', '<span class="ap-ask">Work?</span>'); el._html = null; }
+    else if(!ask && has){ el.querySelector('.ap-ask').remove(); el._html = null; }
+  };
+})(updateActivityPill);
+// once a day per app: a few minutes on something unsorted in work hours, not locked in → ask
+function unsortedNudge(){
+  const st = state.settings.appTracking; if(!st || st.enabled===false || state.focus.activeSession) return;
+  if((typeof workPhase==='function' ? workPhase() : 'off')!=='work') return;
+  const ivs = state.appActivity.todayIntervals || [], last = ivs[ivs.length-1];
+  if(!last || Date.now() - last.end > APP_ACTIVITY_GAP_MS) return;
+  const app = last.app, k = activityKey(app);
+  if(activityCategory(app)!=='unsorted' || BROWSER_APPS.indexOf(k) >= 0) return;
+  if(last.end - last.start < 3*60000) return;
+  const asked = st.askedSort || (st.askedSort = {});
+  if(asked[k]===todayStr()) return;
+  asked[k] = todayStr(); persist('settings');
+  showToast('Is '+app+' work? Mark it and I’ll lock you in when you’re on it.', {icon:'<i class="th-op-o op-note-o"></i>', actionLabel:'It’s work', actionAction:'sortAsWork', actionId:app, duration:12000});
+}
+ACTIONS.sortAsWork = function(el, e, id){ if(!id) return; setActivityCategory(id, 'work'); state.focus.autoRejectedAt = null; dismissToast(); checkAutoLockIn(); updateActivityPill(); playTick(); };
+setInterval(function(){ try{ if(state && state.settings) unsortedNudge(); }catch(e){} }, 30000);
+
+// ---- review pass: one number in one place ----
+// • Today's Standard: "1h 10m / 3h deep work" (it said the same number twice: "1.2h / 3.0h (1h 10m)").
+// • The week's circles say 0h, not 0, and a past day with nothing logged says so (not "in progress").
+// • Client cards: the weekly check-in chip says what's due, so "touch in 7d" next to it goes (an
+//   overdue touch still shows). The Clients row counts this week's check-ins instead of a second
+//   "to reach out to" count.
+// • Outreach: the "N touches" badge repeated "people reached".
+// • Analytics → Today: the cards on top already have deep work, workouts and the streak lives on
+//   Today; the Deep Work card shows your best hour instead, and the day's tiles keep only what
+//   isn't above (shooting, other).
+// • The time is top right; Calendar has its own big clock, so the small one steps aside there.
+fmtH = function(m){ if(!m) return '0h'; const h = m/60; return h >= 10 ? Math.round(h)+'h' : h >= 1 ? (Math.round(h*10)/10)+'h' : m+'m'; };
+streakWorkHtml = (function(base){
+  return function(){
+    return base.apply(this, arguments).replace(/title="([A-Z][a-z]{2}) · 0m worked · in progress"/g, function(all, d){
+      return weekdayShort(todayStr())===d ? all : 'title="'+d+' · nothing logged"';
+    });
+  };
+})(streakWorkHtml);
+deepWorkChipHtml = (function(base){
+  return function(){
+    const mins = deepWorkMinutesTodayLive(), target = state.standards.deepWorkTargetMinutes || 180;
+    return base.apply(this, arguments).replace(/>[^<>]*? deep work \([^)]*\)<\/span>$/, '>'+fmtDurationLabel(mins)+' / '+fmtDurationLabel(target)+' deep work</span>');
+  };
+})(deepWorkChipHtml);
+clientCardV2 = (function(base){
+  return function(c){
+    const h = base.apply(this, arguments);
+    if(!clientStageActive(c.stage) || h.indexOf('mt-chip') < 0) return h;
+    return h.replace(/<span class="crm-due ">touch in \d+d<\/span>/, '');
+  };
+})(clientCardV2);
+renderClientsHome = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    const act = crmList('client').filter(function(c){ return clientStageActive(c.stage); });
+    if(!act.length) return h;
+    const n = act.filter(mtTouchedThisWeek).length;
+    return h.replace(/<div class="cc2-stat( is-warn)?"><div class="cc2-stat-v">\d+<\/div><div class="cc2-stat-k">to reach out to<\/div><\/div>/,
+      '<div class="cc2-stat'+(n >= act.length ? ' is-good' : '')+'"><div class="cc2-stat-v">'+n+'<small>/'+act.length+'</small></div><div class="cc2-stat-k">checked in this week</div></div>');
+  };
+})(renderClientsHome);
+renderBusinessOverview = (function(base){
+  return function(){ return base.apply(this, arguments).replace(/(<span>Outreach this week<\/span>)<span class="hq-count">\d+ touch(?:es)?<\/span>/, '$1'); };
+})(renderBusinessOverview);
+analyticsOverviewHtml = (function(base){
+  return function(r){
+    const h = base.apply(this, arguments);
+    if(r!=='today' && r) return h;
+    // the hour you got the most deep work in today
+    const today = todayStr(), hours = []; for(let i = 0; i < 24; i++) hours.push(0);
+    const add = function(s, e){ for(let i = 0; i < 24; i++){ const hs = localTs(today, pad2(i)+':00'), ov = Math.min(e, hs+3600000) - Math.max(s, hs); if(ov > 0) hours[i] += ov/60000; } };
+    state.focus.sessions.filter(function(s){ return s.date===today && sessionType(s)==='deep' && s.endedAt > s.startedAt; }).forEach(function(s){ add(s.startedAt, s.endedAt); });
+    const as = state.focus.activeSession; if(as && !as.onBreak && sessionType(as)==='deep') add(as.startedAt, Date.now());
+    let bi = -1, bm = 0; hours.forEach(function(m, i){ if(m > bm){ bm = m; bi = i; } });
+    const lbl = bi < 0 ? '-' : ((bi % 12) || 12)+(bi < 12 ? 'am' : 'pm');
+    return h.replace(/<div class="an-tile">(?:(?!<div class="an-tile">)[\s\S])*?days in a row[\s\S]*?<\/div><\/div>/, function(){
+      return anTile('Best hour', lbl, bi < 0 ? '' : fmtDurationLabel(Math.round(bm))+' of deep work');
+    });
+  };
+})(analyticsOverviewHtml);
+renderAnalyticsToday = (function(base){
+  return function(){
+    return base.apply(this, arguments).replace(/<div class="mode-tile"><span class="mode-tile-dot"[^>]*><\/span><div class="mode-tile-val">[^<]*<\/div><div class="mode-tile-label">(?:Deep work|Working out)<\/div><\/div>/g, '');
+  };
+})(renderAnalyticsToday);
+// hours read "3h" and "2.6h" (not "3.0h"), everywhere
+fmtHours = function(mins){ return (Math.round((Number(mins)||0)/6)/10)+'h'; };
+// the locked-in Deep work tile: the number once, with the target under it
+deepWorkStatInnerHtml = function(mins){
+  const target = state.standards.deepWorkTargetMinutes || 180;
+  return '<div class="stat-chip-label">Deep work</div><div class="stat-chip-value">'+fmtDurationLabel(mins)+'</div><div class="kpi-sub">of '+fmtDurationLabel(target)+'</div>';
+};

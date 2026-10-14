@@ -6698,3 +6698,24 @@ body:not(.test-mode) [data-action="opTest"]:not(.tb), body:not(.test-mode) [data
 .locked-in-header{ position:relative; }
 .activity-pill{ bottom:15px !important; }
 .mg-row.mg-row-5:has(> :nth-child(6)){ grid-template-columns:repeat(6, 1fr); } @media (max-width:1100px){ .mg-row.mg-row-5:has(> :nth-child(6)){ grid-template-columns:repeat(3, 1fr); } }
+.op-note-o{ display:inline-block; width:10px; height:10px; border-radius:50%; vertical-align:middle; }
+.op-note-k{ font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; opacity:.6; margin-right:4px; }
+
+/* ---- r36: Op bar menu: Work / Not work drives auto lock-in ---- */
+.ap-menu-title{ display:flex; align-items:center; gap:8px; }
+.ap-mdot{ width:8px; height:8px; border-radius:50%; flex:0 0 auto; background:#8A90A2; }
+.ap-mdot.is-work{ background:var(--good); box-shadow:0 0 8px var(--good); } .ap-mdot.is-other{ background:var(--danger); }
+.ap-seg.is-wide{ display:flex; width:100%; } .ap-seg.is-wide .ap-seg-btn{ flex:1; padding:7px 10px; font-size:12.5px; }
+.ap-auto{ margin-top:10px; font-size:12px; color:var(--text-dim); line-height:1.4; }
+.ap-auto.is-off{ color:var(--text-faint); } .ap-auto.is-on{ color:var(--good); } .ap-auto b{ font-weight:700; }
+.ap-auto-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.ap-auto-go{ background:none; border:1px solid var(--border); color:var(--text); border-radius:8px; padding:4px 9px; font-size:11.5px; font-weight:700; cursor:pointer; }
+.ap-auto-go:hover{ border-color:var(--good); color:var(--good); }
+.ap-auto-bar{ height:4px; border-radius:3px; background:var(--panel-2); margin-top:7px; overflow:hidden; } .ap-auto-bar i{ display:block; height:100%; background:var(--good); border-radius:3px; transition:width .4s ease; }
+.ap-menu .ap-menu-link{ display:block; margin-top:4px; }
+.activity-pill .ap-ask{ margin-left:6px; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:999px; background:rgba(232,162,61,.16); color:#C27F1A; }
+body[data-view="calendar"] .md-time{ display:none; }
+.cc2-stat-v small{ font-size:.55em; color:var(--text-faint); font-weight:600; margin-left:1px; }
+.day-detail .mode-tiles:has(> :nth-child(2):last-child){ grid-template-columns:repeat(2, 1fr); }
+/* on Op's own screen his light isn't in the bar, so the bar loses the gap and the divider */
+body.opf-on .activity-pill{ padding-left:14px; } body.opf-on .activity-pill::after{ display:none; }

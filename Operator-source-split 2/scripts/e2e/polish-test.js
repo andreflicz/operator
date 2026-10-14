@@ -38,7 +38,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // Esc on an "add" pop-up closes it without adding
   await E("openAddTaskModal()"); await p.fill('#newTaskTitle', 'Should not be added');
   await p.keyboard.press('Escape');
-  check('Esc closes add-task without adding', !(await p.isVisible('#addTaskOverlay:not(.hidden)')) && await E("state.tasks.items.length")===1);
+  check('Esc closes add-task without adding', !(await p.isVisible('#addTaskOverlay:not(.hidden)')) && await E("state.tasks.items.filter(t => !t.master).length")===1);
   // wake screen ignores Esc / outside clicks
   await E("fireWake({test:true})"); await p.keyboard.press('Escape'); await p.mouse.click(5, 5);
   check('wake screen can\'t be dismissed by accident', await p.isVisible('#wakeOverlay:not(.hidden)'));

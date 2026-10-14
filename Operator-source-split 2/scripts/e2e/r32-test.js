@@ -233,8 +233,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("state.profile.lockedStyle='cockpit'; state.profile.lockedView='minimal'; startFocus(50); ui.view='focus'; renderView()"); await p.waitForTimeout(300);
     check('r34: the Cockpit locked-in view: timer, task, the day', !!(await p.$('.np.is-cockpit .ckp .ckp-timer')) && !!(await p.$('.ckp-day .sw')));
     await E("state.appActivity.todayIntervals.push({app:'Final Cut Pro', start:Date.now()-60000, end:Date.now()}); ui.view='today'; renderView(); updateActivityPill()"); await p.waitForTimeout(200);
-    check('r34: the pill has one circle (color and timer together)', !!(await p.$('#activityPill .ap-ring.is-cat')) && !(await p.$('#activityPill .ap-dot')));
-    await p.click('#activityPill', {position:{x:150, y:20}}); await p.waitForTimeout(300);
+    check('r36: the Op bar: one status dot and the app', !!(await p.$('#activityPill .ob-dot')) && /Final Cut Pro/.test(await p.textContent('#activityPill .ap-name')));
+    await p.click('#activityPill .ap-name'); await p.waitForTimeout(300);
     check('r34: …and tapping it still opens its menu, on top', await p.evaluate(() => { const m = document.getElementById('activityPillMenu'); if(!m) return false; const r = m.getBoundingClientRect(), t = document.elementFromPoint(r.x + r.width/2, r.y + 20); return !!(t && t.closest('#activityPillMenu')); }));
     // ---------- round 34: auto lock-in and XP ----------
     await E("if(state.focus.activeSession){ state.focus.activeSession=null; } state.focus.lastManualStopAt=null; state.focus.lastSessionEndedAt=null; state.focus.autoRejectedAt=null; state.modes.active=null; ui.view='today'; renderView()");
@@ -297,7 +297,16 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('r36: That’s the day: three real buttons and a swipeable deck', (await p.$$('.dayoff-row.is-btns button')).length===3 && !!(await p.$('.rd .rd-slide')));
     await E("ACTIONS.startSleepMode()"); await p.waitForTimeout(300); await E("ACTIONS.sleepUp()"); await p.waitForTimeout(600);
     check('r36: I’m up → Up early (not That’s the day, not the sleep screen)', /Up early/.test(await p.textContent('#viewRoot')) && !/That’s the day/.test(await p.textContent('#viewRoot')) && !(await p.$('.sleepv')));
-    check('r36: the Op bar has the minute clock', !!(await p.$('#activityPill .ap-ck .ck-minutes')));
+    check('r36: the Op bar is Op | dot | app (no clock), the time is top right', !(await p.$('#activityPill .ap-ck')) && !!(await p.$('#activityPill .ob-dot')) && !!(await p.$('#musicDock .md-time')));
+    // the Op bar's Work / Not work drives auto lock-in
+    await E("if(state.modes.active) endMode(); state.modes.lastEndedAt=null; state.focus.activeSession=null; state.focus.autoRejectedAt=null; state.focus.lastSessionEndedAt=null; state.focus.lastManualStopAt=null; ui.restFull=false; ui.view='today'; renderView(); state.appActivity.todayIntervals.push({app:'Pixelmator Pro', start:Date.now()-20*60000, end:Date.now()}); ui.pillMenu=null; updateActivityPill()"); await p.waitForTimeout(150);
+    check('r36: an unsorted app asks "Work?" on the bar', !!(await p.$('#activityPill .ap-ask')));
+    await E("ACTIONS.activityPillMenu()"); await p.waitForTimeout(100);
+    await p.click('#activityPillMenu [data-action="pillSetCat"][data-id="work"]'); await p.waitForTimeout(200);
+    check('r36: marking it Work locks you in right away (the time was already there)', await E("!!(state.focus.activeSession && state.focus.activeSession.autoStarted)"));
+    const nSess = await E("state.focus.sessions.length");
+    await p.click('#activityPillMenu [data-action="pillSetCat"][data-id="other"]'); await p.waitForTimeout(200);
+    check('r36: …marking it Not work throws that session out (no session, no XP)', await E("!state.focus.activeSession && state.focus.sessions.length")===nSess);
     check('no page errors (round 33)', p.errors.length===0, p.errors);
     await p.context().close();
   }

@@ -120,7 +120,7 @@ const day = (base, n) => { const d = new Date(base); d.setDate(d.getDate()+n); r
     check('You: no "Your body" panel any more', !(await p.$('.you .you-body')) && !/Your body/.test(await p.textContent('.you')));
     // (round 23: no text under the stats; it's in the guide and on hover)
     check('…every stat explains itself on hover (no text under it)', (await p.$$('.you .you-sub small')).length===0 && (await p.$$('.you .you-sub[title]')).length===15);
-    check('…the last 7 days against the week before, and your records', await p.isVisible('.you-recent .yr-tiles') && (await p.$$('.yr-t')).length >= 5 && /longest day of deep work/.test(await p.textContent('.yr-recs')) && /5\.0h/.test(await p.textContent('.yr-recs')));
+    check('…the last 7 days against the week before, and your records', await p.isVisible('.you-recent .yr-tiles') && (await p.$$('.yr-t')).length >= 5 && /longest day of deep work/.test(await p.textContent('.yr-recs')) && /5(\.0)?h/.test(await p.textContent('.yr-recs')));
     await p.click('.you-q'); await p.waitForTimeout(200);
     const guide = await p.textContent('#xpHowContent');
     check('the guide: 8 hours is the gold standard, more tasks pay more, outreach explained', /gold standard/i.test(guide) && /more you get done/i.test(guide) && /touch you log on a client or a lead/i.test(guide));

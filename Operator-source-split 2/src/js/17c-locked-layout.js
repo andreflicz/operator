@@ -7,7 +7,7 @@ const LOCKED_BLOCKS = {
   stats:     {label:'Streak, tasks & deep work', render:function(c){ return '<div class="grid grid-3 stat-chip-row" style="max-width:800px;margin:0 auto;">'+
       '<div class="stat-chip" style="text-align:center;"><div class="stat-chip-label">Day Streak</div><div class="stat-chip-value">'+computeStreak()+'</div><div class="kpi-sub">rest days still count</div></div>'+
       '<div class="stat-chip" data-action="goToFinishedTasks" style="text-align:center;cursor:pointer;"><div class="stat-chip-label">Completed Today</div><div class="stat-chip-value">'+c.doneToday.length+' task'+(c.doneToday.length===1?'':'s')+'</div></div>'+
-      '<div class="stat-chip" id="statDeepWorkTodayBox" style="text-align:center;"><div class="stat-chip-label">Deep Work Today</div><div class="stat-chip-value">'+fmtHours(c.deepWorkToday)+'</div><div class="kpi-sub">'+fmtDurationLabel(c.deepWorkToday)+'</div></div>'+
+      '<div class="stat-chip" id="statDeepWorkTodayBox" style="text-align:center;"><div class="stat-chip-label">Deep Work Today</div><div class="stat-chip-value">'+fmtDurationLabel(c.deepWorkToday)+'</div><div class="kpi-sub">of '+fmtDurationLabel(state.standards.deepWorkTargetMinutes || 180)+'</div></div>'+
     '</div>'; }},
   timer:     {label:'Timer & current task', pinned:true, render:function(){ return '<div class="hero-row">'+renderActiveFocusHero(true)+nowNextPanelHtml({stack:true, hero:true})+'</div>'; }},
   vision:    {label:'Vision board', render:function(){ return renderVisionSlideshow(); }},

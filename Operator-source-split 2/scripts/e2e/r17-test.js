@@ -162,9 +162,9 @@ const newsRoute = (asked, extra) => async r => {
     check('…full screen (the sidebar steps aside)', await E("document.body.classList.contains('np-on')") && asked.includes('/window/full?f=1'));
     await p.keyboard.press('m'); await p.waitForTimeout(800);
     check('M goes back to the full page', await p.$('.np-home')===null && await p.isVisible('.lv-corner.is-focus'));
-    await E("ui.currentTaskId='t0'; startFocus(); state.profile.lockedView='full'; renderView()"); await p.waitForTimeout(500);
+    await E("ui.currentTaskId='t0'; startFocus(); state.profile.lockedView='full'; ui.view='today'; renderView()"); await p.waitForTimeout(500);
     await p.keyboard.press('m'); await p.waitForTimeout(600);
-    check('locked in on Focus, M (or the button) gives the locked-in minimal view', await p.$('.np-locked')!==null);
+    check('locked in, M on Today (the overview) gives the locked-in minimal view', await p.$('.np-locked')!==null);
     check('no page errors (Focus minimal)', p.errors.length===0, p.errors);
     await p.context().close();
   }

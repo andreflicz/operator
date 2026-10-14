@@ -148,10 +148,8 @@ async function ctxPage(b, seed, opts){
     check('Esc takes you back to the app', !(await E("document.getElementById('opFull').classList.contains('is-in')")));
     // action mode: he does something, and you see it happen here
     await E("AI.typedAt = 0; aiAsk('mark the reel done', 'opBubText')"); await p.clock.runFor(900); await p.waitForTimeout(400);
-    check('when Op gets to work, his full screen opens and shows what he did', await E("document.getElementById('opFull').classList.contains('is-in')") && /Done: Edit JJS reel/.test(await p.textContent('#opfLog')));
+    check('r36: when Op gets to work, he doesn’t pop up: a notice says what he did', !(await E("document.getElementById('opFull').classList.contains('is-in')")) && /Done: Edit JJS reel/.test(await p.textContent('#toastContainer')));
     check('…the task really is done, and it’s in the chat as an action', await E("state.tasks.items.find(t => t.id==='t1').status")==='done' && await E("opChat().some(e => e.r==='act' && /Edit JJS reel/.test(e.t))"));
-    await p.clock.runFor(5000); await p.waitForTimeout(400);
-    check('…and it slips away by itself when he’s done', !(await E("document.getElementById('opFull').classList.contains('is-in')")));
     check('no page errors (full screen)', p.errors.length===0, p.errors);
     await p.context().close();
   }
