@@ -15,6 +15,8 @@ async function newPage(browser, file, seed, clockAt){
   // older suites were written for the card lineup; List became the default in round 11 (r11 checks that)
   seed = Object.assign({}, seed||{}); seed.profile = Object.assign({}, seed.profile||{});
   if(seed.profile.lineupView===undefined) seed.profile.lineupView = 'cards';
+  // (round 36: the test buttons only show in test mode; the older suites press them, so it's on here)
+  seed.settings = Object.assign({testMode:true}, seed.settings||{});
   const ctx = await browser.newContext({ viewport:{width:1400,height:900} });
   const page = await ctx.newPage();
   page.errors = [];

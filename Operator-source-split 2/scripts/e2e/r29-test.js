@@ -114,8 +114,9 @@ async function ctxPage(b, seed, opts){
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("startMode('offtime', {sleep:true}); state.modes.active.startedAt = Date.now() - 7*3600000; ui.view='today'; renderView()"); await p.waitForTimeout(300);
     check('the sleep screen: “I’m up” and “Good morning →”', await p.isVisible('.sleepv [data-action="sleepUp"]') && await p.isVisible('.sleepv [data-action="sleepGoodMorning"]'));
-    await p.click('.sleepv [data-action="sleepUp"]'); await p.waitForTimeout(300);
-    check('“I’m up” ends sleep and logs it (about 7 hours)', !(await E("!!state.modes.active")) && await E("(lastNightSleep()||{}).minutes") >= 400);
+    await p.click('.sleepv [data-action="sleepUp"]'); await p.waitForTimeout(700);
+    // (round 36: it lands on Up early, not straight into the app)
+    check('“I’m up” ends sleep and logs it (about 7 hours)', await E("!!(state.modes.active && state.modes.active.earlyUp && !state.modes.active.sleep)") && await E("(lastNightSleep()||{}).minutes") >= 400);
     check('…and lets the 7:00 alarm go', /let the 7:00 AM alarm go/.test(await E("document.getElementById('toastContainer').textContent")));
     await p.clock.setSystemTime(new Date(2026,9,13,7,0,30)); await E("checkAllAlarms()"); await p.waitForTimeout(300);
     check('…so at 7:00 nothing rings', !(await p.isVisible('#wakeOverlay:not(.hidden)')));

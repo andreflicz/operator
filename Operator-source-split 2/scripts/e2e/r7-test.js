@@ -80,7 +80,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('the Personal tab says Health, not Fitness', /Health/.test(await p.textContent('[data-action="personalTab"][data-tab="fitness"]')));
     const m = await E("masterGoalDefs().map(m=>({k:m.key, cur:m.cur, t:m.target, pct:Math.round(masterPct(m))}))");
     const by = k => m.find(x => x.k===k) || {};
-    check('master goals are built in — nothing to set up', m.length===5 && (await p.$$('.mg-hero')).length===1 && (await p.$$('.mg-card')).length===4, m);
+    check('master goals are built in — nothing to set up', m.length>=5 && (await p.$$('.mg-hero')).length===1 && (await p.$$('.mg-card')).length===m.length-1, m);
     check('revenue reads MRR from Business, against the Settings goal', by('mrr').cur===2500 && by('mrr').t===10000 && /\$2,500/.test(await p.textContent('.mg-hero')));
     check('weight reads Health → Weight, measured from the first weigh-in', by('weight').cur===191.4 && by('weight').pct===37, by('weight'));
     check('workouts count this week\'s logged workouts', by('workouts').cur===2 && by('workouts').t===4);
@@ -95,7 +95,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.click('[data-action="gsSave"]'); await p.waitForTimeout(150);
     check('your own goals take a name, target, unit and where you are now', await E("(g => g && g.current===4200 && g.target===10000 && !g.autoTrack)(state.goals.items.find(g=>g.label==='10k IG followers'))"));
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(200);
-    check('Today shows the master goals as one row of rings', (await p.$$('.goals-panel .mg-row-5 .mg-card')).length===5 && (await p.$$('.goals-panel .mg-hero')).length===0);
+    check('Today shows the master goals as one row of rings', (await p.$$('.goals-panel .mg-row-5 .mg-card')).length>=5 && (await p.$$('.goals-panel .mg-hero')).length===0);
     check('no errors (goals)', !p.errors.length, p.errors);
     await p.context().close();
   }

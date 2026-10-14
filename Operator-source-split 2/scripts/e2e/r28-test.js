@@ -100,7 +100,7 @@ async function ctxPage(b, seed, opts){
     check('opening the lock-in sequence starts a low, subtle lock-in track', await E("FM.playing && FM.soft && !!FOCUS_TRACKS[FM.idx].lock"));
     check('…soft means about a third of the volume', Math.abs(await E("fmVolume()/fmVolumeFull()") - 0.32) < 0.01);
     check('…and the sequence has the player', await p.isVisible('#lockSeqOverlay .mctl'));
-    await E("closeLockSeq(); state.profile.lockedView='minimal'; ui.currentTaskId='t1'; startFocus(); ui.view='focus'; renderView()"); await p.waitForTimeout(800);
+    await E("closeLockSeq(); state.profile.lockedView='minimal'; ui.currentTaskId='t1'; startFocus(); ui.view='today'; renderView()"); await p.waitForTimeout(800);
     check('locked in (minimal): the player sits top right, the track isn’t repeated under the controls', await p.isVisible('.np-locked .np-top .mctl') && !(await p.$('.np-locked .np-mrow')));
     check('…still soft while locked in', await E("FM.soft"));
     await E("state.focus.activeSession = null; renderView()"); await p.waitForTimeout(600);

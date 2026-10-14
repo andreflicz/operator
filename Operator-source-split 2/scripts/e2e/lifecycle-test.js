@@ -22,7 +22,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('retainer starts with call / form / videos', (await E("cycles()[0].steps[0].checklist.map(i=>i.type).slice(0,3).join()"))==='meeting,form,video');
   check('established client not forced into a cycle', (await E("state.business.clients[0].cycleId"))===null);
   // editor: build a new cycle
-  await p.click('[data-action="nav"][data-view="business"]'); await p.click('[data-action="businessTab"][data-tab="lifecycle"]');
+  await p.click('[data-action="nav"][data-view="business"]'); await p.click('.biz-tabs > .tab[data-tab="clients"]'); await p.click('[data-action="businessTab"][data-tab="lifecycle"]');   // (round 36: Lifecycle is a sub-tab of Clients & leads)
   await p.click('[data-action="openLifecycleEditor"]');
   await p.click('[data-action="cyNew"]');
   const cid = await E("ui.editingCycleId");

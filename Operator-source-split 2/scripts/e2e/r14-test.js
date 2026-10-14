@@ -18,7 +18,7 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
     const full = () => p.evaluate(() => { const n = document.querySelector('.np'); if(!n) return null; const r = n.getBoundingClientRect(); return Math.abs(r.left) < 2 && Math.abs(r.top) < 2 && Math.abs(r.width - innerWidth) < 4 && Math.abs(r.height - innerHeight) < 4 ? true : [r.left, r.top, r.width, r.height, innerWidth, innerHeight, document.body.className]; });
     await E("ACTIONS.clockOut()"); await p.waitForTimeout(1400);
     { const f = await full(); check('weekend clock-out fills the whole wide window', f===true, f); }
-    await E("clockIn({quiet:true}); ui.planReveal=null; hideOverlay('planOverlay'); ui.currentTaskId='t0'; startFocus(); ui.view='focus'; state.profile.lockedView='minimal'; renderView()"); await p.waitForTimeout(1400);
+    await E("clockIn({quiet:true}); ui.planReveal=null; hideOverlay('planOverlay'); ui.currentTaskId='t0'; startFocus(); ui.view='today'; state.profile.lockedView='minimal'; renderView()"); await p.waitForTimeout(1400);
     { const f = await full(); check('the minimal locked view fills the whole wide window', f===true, f); }
     check('the next alarm says which day (Mon), not just a time', /Mon 7:00/.test(await p.textContent('.np-clock-r')));
     check('no page errors (full-screen views)', p.errors.length===0, p.errors);

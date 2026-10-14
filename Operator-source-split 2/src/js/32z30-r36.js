@@ -222,7 +222,7 @@ function opStanding(){
 xpAttributes = (function(base){
   return function(ctx){
     const out = base.apply(this, arguments), st = opStanding(), D = out.DIS.subs;
-    D.push({label:'Standing with Op', v:st ? rate99(st.f) : null, note:st ? st.label+' · '+st.parts.join(', ') : 'Builds once Op has checked in on you'});
+    D.push({label:'Standing', v:st ? rate99(st.f) : null, note:st ? st.label+' · '+st.parts.join(', ') : 'Builds once Op has checked in on you'});
     const mix = function(parts){ let s = 0, w = 0; parts.forEach(function(p){ if(p[1]==null) return; s += p[0]*p[1]; w += p[0]; }); return w ? s/w : 0; };
     const dMix = mix(D.map(function(x, i){ return [[.2, .35, .25, .2][i], x.v==null ? null : (x.v-25)/75]; }));
     out.DIS.v = rate99(Math.pow(dMix, 0.8));
@@ -235,7 +235,8 @@ xpAttributes = (function(base){
 acctSay = (function(base){
   return function(){
     const st = opStanding();
-    if(st && st.mood && typeof opMood==='function') opMood(st.mood, 60000);
+    // (only when the moment hasn't set his mood already: a worried ping stays worried)
+    if(st && st.mood && typeof opMood==='function' && !document.documentElement.hasAttribute('data-op-mood')) opMood(st.mood, 60000);
     return base.apply(this, arguments);
   };
 })(acctSay);
@@ -621,7 +622,8 @@ ACTIONS.sleepUp = function(){
     startMode('offtime', {clockedOut:true, earlyUp:true, alarmTs:at, note:'Up early'});
     ui.view = 'today'; ui.restFull = true; renderView();
   }, 220);
-  if(r && r.mins >= 60) setTimeout(function(){ showToast('You slept '+fmtDurationLabel(r.mins)+'.', {icon:'&#127769;', duration:5000}); }, 600);
+  const msg = (r && r.mins >= 60 ? 'You slept '+fmtDurationLabel(r.mins)+'. ' : '')+(r && r.alarm ? 'I let the '+fmt12Hour(r.alarm.time)+' alarm go.' : '');
+  if(msg) setTimeout(function(){ showToast(msg.trim(), {icon:'&#127769;', duration:7000}); }, 350);
 };
 ACTIONS.earlyGoodMorning = function(){ const m = state.modes.active; if(m && m.earlyUp && typeof finishActiveMode==='function') finishActiveMode(true); ACTIONS.sleepGoodMorning(); };
 

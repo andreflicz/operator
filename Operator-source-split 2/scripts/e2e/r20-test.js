@@ -34,7 +34,7 @@ async function ctxPage(b, seed, opts){
     check('Business: MRR · Focus · Scaling · Content (round 27: Grind is Focus)', JSON.stringify(subs.BUS)===JSON.stringify(['MRR', 'Focus', 'Scaling', 'Content']), subs.BUS);
     check('Personal: Content · Goals · Finances · Mind (no Reflection)', JSON.stringify(subs.PER)===JSON.stringify(['Content', 'Goals', 'Finances', 'Mind']), subs.PER);
     check('Health: Training · Diet · Weight', JSON.stringify(subs.HLT)===JSON.stringify(['Training', 'Diet', 'Weight']), subs.HLT);
-    check('Discipline: Reliability · Consistency · Action (round 27)', JSON.stringify(subs.DIS)===JSON.stringify(['Reliability', 'Consistency', 'Action']), subs.DIS);
+    check('Discipline: Reliability · Consistency · Action (round 27)', JSON.stringify(subs.DIS)===JSON.stringify(['Reliability', 'Consistency', 'Action', 'Standing']), subs.DIS);
     const all = [].concat(subs.BUS, subs.PER, subs.HLT, subs.DIS);
     check('…and no stat appears twice in a rating', ['BUS','PER','HLT','DIS'].every(k => new Set(subs[k]).size===subs[k].length));
     const inDebt = JSON.parse(await E("JSON.stringify(financeRating())"));

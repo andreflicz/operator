@@ -152,7 +152,7 @@ async function ctxPage(b, seed, opts){
     check('the journal orb sits beside the +, on the same line', orb.orbRight <= orb.fabLeft && orb.dy < 12, orb);
     const subs = JSON.parse(await E("JSON.stringify(Object.fromEntries(['BUS','DIS'].map(k => [k, xpSummaryFresh().attrs[k].subs.map(s => s.label)])))"));
     check('Business: MRR, Focus, Scaling, Content (Grind is now Focus)', JSON.stringify(subs.BUS)==='["MRR","Focus","Scaling","Content"]', subs.BUS);
-    check('Discipline: Reliability, Consistency, Action', JSON.stringify(subs.DIS)==='["Reliability","Consistency","Action"]', subs.DIS);
+    check('Discipline: Reliability, Consistency, Action', JSON.stringify(subs.DIS)==='["Reliability","Consistency","Action","Standing"]', subs.DIS);
     check('Action: one old idea sitting too long counts against it', /sitting too long/.test(await E("xpSummaryFresh().attrs.DIS.subs[2].note")));
     await E("state.standards.newClientsPerMonth = 1; xpLast = null");
     check('Scaling: three clients this month against a standard of one is supercharged', /Supercharged/.test(await E("xpSummaryFresh().attrs.BUS.subs[2].note")) && await E("xpSummaryFresh().attrs.BUS.supercharged")===true);

@@ -88,7 +88,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const p = await newPage(b, OUT+'/r32.html', seed, T);
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("ui.view='business'; ui.businessTab='overview'; renderView()"); await p.waitForTimeout(200);
-    check('no Setup tab; a gear by the title', !(await p.$('.tab-setup')) && !(await p.$('[data-tab="setup"]')) && !!(await p.$('.view-title .biz-gear')));
+    check('no Setup tab; a gear by the title', !(await p.$('.tab-setup')) && !(await p.$('[data-tab="setup"]')) && !!(await p.$('.biz-tabs .biz-gear')));   // (round 36: on the tab lane)
     await p.click('.biz-gear'); await p.waitForTimeout(250);
     check('the gear opens one clean sheet (reach-out first)', !!(await p.$('#bizSetup:not(.hidden) .bs-nav')) && !!(await p.$('#bizSetup #setLeadCadence')));
     await p.fill('#setLeadCadence', '3'); await p.dispatchEvent('#setLeadCadence', 'change'); await p.waitForTimeout(100);
@@ -226,7 +226,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     // ---------- round 34 ----------
     await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); state.profile.businessName='Flicz Media'; ui.view='today'; renderView()"); await p.waitForTimeout(300);
     check('r34: the hero is the business name, then a line from Op', (await p.textContent('.th-biz'))==='Flicz Media' && (await p.textContent('.th-op-t')).length > 5 && !(await p.$('.th-greet')));
-    check('r35: the streak, this week (seven circles, Monday first), deep work and tasks are one row under the hero', !(await p.$('.today-hero .sw')) && (await p.$$('.sw-wrap .sw.is-row .sw-day')).length===7 && !!(await p.$('.sw-wrap #swDeep')) && await E("weekWork().days[0].d===startOfWeekStr(todayStr())") && !(await p.$('.tw-chip')));
+    check('r35: the streak, this week (seven circles, Monday first), deep work and tasks are one row under the hero', !(await p.$('.today-hero .sw')) && (await p.$$('.sw-wrap .sw.is-row .sw-day')).length===7 && !!(await p.$('.sw-wrap .sw-tasks')) && await E("weekWork().days[0].d===startOfWeekStr(todayStr())") && !(await p.$('.tw-chip')));
     check('r34: time worked this week is the same number as the This week panel', await E("weekWork().total===(function(){ let t=0; for(let i=0;i<7;i++){ const d=addDays(startOfWeekStr(todayStr()), i); t += d===todayStr() ? deepWorkMinutesTodayLive() : d<todayStr() ? deepWorkMinutesFor(d) : 0; } return t; })()"));
     check('r34: the weather bar sits under the card and spans it', await p.evaluate(() => { const w = document.querySelector('.th-wx .skyp'), c = document.querySelector('.th-op'); if(!w) return true; const a = w.getBoundingClientRect(), b = c.getBoundingClientRect(), l = document.querySelector('.th-left').getBoundingClientRect(); return a.top >= b.bottom - 1 && a.width >= l.width - 8; }));
     check('r34: Settings has the two locked-in views', ((await E("soundSettingsHtml()")).match(/data-action="lockedStyleSet"/g)||[]).length===2);
@@ -287,7 +287,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('r36: …finishing the batch logs a touch for whoever’s left', await E("state.business.clients.find(c=>c.id==='c2').touches.length")===1);
     check('r36: …and it rolls up into a master goal ring', await E("!!masterGoalDefs().find(m=>m.key==='care')"));
     // standing with Op, test bench, Business tabs
-    check('r36: standing with Op is a Discipline sub-stat', await E("xpAttributes(xpCtx()).DIS.subs.some(s=>s.label==='Standing with Op')"));
+    check('r36: standing with Op is a Discipline sub-stat', await E("xpAttributes(xpCtx()).DIS.subs.some(s=>s.label==='Standing')"));
     await E("ui.view='business'; ui.businessTab='leads'; renderView()"); await p.waitForTimeout(150);
     check('r36: Business: Clients & leads is one tab with sub-tabs, Setup on the tab lane', (await p.$$('.biz-tabs > .tab')).length===4 && (await p.$$('.biz-tabs .subtab')).length===3 && !!(await p.$('.biz-tabs [data-action="bizSetupOpen"]')));
     await E("state.settings.testMode=false; ui.view='settings'; ui.settingsTab='system'; renderView()"); await p.waitForTimeout(150);

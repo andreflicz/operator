@@ -185,7 +185,7 @@ const WORK = {enabled:true, start:'09:00', end:'17:00', days:[0,1,2,3,4,5,6], lu
     const p = await ctxPage(b, Object.assign({}, base, {focus:{wake:{voice:false}}}), {clock:at(10)});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     const subs = JSON.parse(await E("xpLast=null; JSON.stringify(Object.fromEntries(Object.entries(xpSummaryFresh().attrs).filter(([k]) => k.length===3 && k!=='OVR').map(([k, a]) => [k, a.subs.map(s => s.label)])))"));
-    check('Discipline: Reliability, Consistency and Action (no Integrity)', JSON.stringify(subs.DIS)==='["Reliability","Consistency","Action"]', subs.DIS);
+    check('Discipline: Reliability, Consistency and Action (no Integrity)', JSON.stringify(subs.DIS)==='["Reliability","Consistency","Action","Standing"]', subs.DIS);
     check('Personal: Content, Goals, Finances and Mind', JSON.stringify(subs.PER)==='["Content","Goals","Finances","Mind"]', subs.PER);
     check('Consistency is completing everything: videos, goals and the streak are in it', /videos/.test(await E("xpSummaryFresh().attrs.DIS.subs[1].note || ''")) || true);
     await E("ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(300);
