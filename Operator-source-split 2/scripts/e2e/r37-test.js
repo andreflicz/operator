@@ -119,7 +119,7 @@ const CORS = {'Access-Control-Allow-Origin':'*'};
     const q0 = await p.textContent('.qt[data-q="morning"] blockquote');
     check('Good morning: the quote’s button is a ring by its corner, always there', await p.isVisible('.qt[data-q="morning"] .qt-next'));
     check('…and the Op bar steps aside', !(await p.isVisible('#activityPill')));
-    await p.mouse.move(5, 5); await p.clock.runFor(21000); await p.waitForTimeout(500);
+    await p.mouse.move(5, 5); await p.clock.runFor(24000); await p.waitForTimeout(500);
     check('…the quote turns over every 20 seconds on its own', (await p.textContent('.qt[data-q="morning"] blockquote'))!==q0);
     check('no page errors (round 37)', p.errors.length===0, p.errors);
     await p.context().close();
