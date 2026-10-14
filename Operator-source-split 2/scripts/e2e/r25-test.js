@@ -133,6 +133,7 @@ const WORK = {enabled:true, start:'09:00', end:'17:00', days:[0,1,2,3,4,5,6], lu
     const due = "acct().nextDate = todayStr(); acct().nextAt = Date.now() - 1000; acctTick()";
     await E(due); await p.waitForTimeout(400);
     check('not working: Op asks if you’re there, concerned (yellow)', await E("!!acct().pending && acct().pending.stage==='ping'") && await E("opMoodNow()")==='concern' && /you there\?/.test(await p.textContent('#opBubText')));
+    for(let i=0; i<10 && !(await E("window.__l")); i++) await p.waitForTimeout(150);
     check('…and the mic opens on its own', await E("window.__l")>=1);
     await E("aiAsk('yeah I’m here')"); await p.waitForTimeout(700);
     check('you answer: it lays out the day and asks why', await E("acct().pending.stage")==='why' && /What’s going on\?/.test(await p.textContent('#opBubText')) && await E("window.__l")>=2);
