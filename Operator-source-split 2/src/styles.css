@@ -6720,3 +6720,80 @@ body[data-view="calendar"] .md-time{ display:none; }
 /* on Op's own screen his light isn't in the bar, so the bar loses the gap and the divider */
 body.opf-on .activity-pill{ padding-left:14px; } body.opf-on .activity-pill::after{ display:none; }
 .activity-pill .ap-off{ margin-left:6px; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:999px; background:rgba(229,72,77,.14); color:#C9373D; }
+
+/* ===== Round 37 ===== */
+/* Op thinking: a Stop button by his light (and over his screen) */
+.op-think{ position:fixed; left:20px; bottom:68px; z-index:9500; display:flex; align-items:center; gap:8px; padding:7px 8px 7px 12px; border-radius:999px; border:1px solid rgba(20,24,40,.08);
+  background:rgba(255,255,255,.94); color:#1d2233; font-size:12.5px; font-weight:600; box-shadow:0 10px 30px rgba(10,14,30,.22); backdrop-filter:blur(10px); cursor:pointer; opacity:0; transform:translateY(6px); transition:opacity .2s, transform .2s; }
+.op-think.is-in{ opacity:1; transform:none; }
+.op-think i{ width:8px; height:8px; border-radius:50%; background:#7aa2ff; animation:opThinkDot 1s ease-in-out infinite; }
+.op-think b{ font-size:11.5px; padding:4px 9px; border-radius:999px; background:rgba(229,72,77,.12); color:#C9373D; }
+.op-think:hover b{ background:#E5484D; color:#fff; }
+@keyframes opThinkDot{ 0%,100%{ opacity:.35; transform:scale(.8); } 50%{ opacity:1; transform:scale(1.1); } }
+/* Today: the Minimal chip by the name */
+.th-min{ margin-left:10px; vertical-align:middle; font:600 10.5px/1 var(--font-body); letter-spacing:.04em; text-transform:none; padding:5px 9px; border-radius:999px; border:1px solid var(--border); background:rgba(var(--ink),.04); color:var(--text-dim); cursor:pointer; transition:color .15s, border-color .15s; }
+.th-min:hover{ color:var(--text); border-color:var(--text-dim); }
+/* minimal view: Player / Cockpit switch next to Full view */
+body.np-on .np .np-top .lv-btn.lv-sty{ left:174px; }
+/* the Cockpit, sized for the screen: a bigger timer, a bigger task, the day card at full size */
+.np.is-cockpit .np-main{ display:flex; align-items:center; justify-content:center; }
+.ckp{ max-width:1240px; margin:0 auto; grid-template-columns:minmax(260px, 1fr) minmax(300px, 1.25fr) minmax(300px, 1fr); gap:clamp(32px, 4.5vw, 72px); padding:0 clamp(16px, 3vw, 48px); }
+.ckp-timer .np-art.tm{ width:min(340px, 27vw); height:min(340px, 27vw); }
+.ckp-timer .tm-in b, .ckp-timer .tm-t{ font-size:clamp(34px, 3.4vw, 48px); }
+.ckp-k{ font-size:13px; margin-top:6px; } .ckp-sub{ font-size:15px; }
+.ckp-cap{ font-size:12px; margin-bottom:10px; }
+.ckp-title{ font-size:clamp(30px, 3.4vw, 48px); }
+.ckp-qi{ font-size:16px; } .ckp-qi span{ width:24px; height:24px; font-size:12px; }
+.ckp-ctl{ margin-top:28px; gap:16px; }
+.ckp-day{ padding:26px 26px 22px; border-radius:22px; }
+.ckp-row{ font-size:15px; margin:12px 0 8px; } .ckp-row b{ font-size:22px; } .ckp-row b small{ font-size:13px; }
+.ckp-day .sw-c{ width:36px; height:36px; }
+@media (max-width:1100px){ .ckp{ grid-template-columns:1fr 1fr; } .ckp-day{ grid-column:1 / -1; } }
+.ckp{ grid-template-columns:minmax(260px, 1fr) minmax(300px, 1.2fr) minmax(340px, 1fr); }
+.ckp-day .sw-c{ width:32px; height:32px; } .ckp-day .sw-days{ display:flex; justify-content:space-between; gap:2px; width:100%; }
+/* a full-screen view with its own big clock doesn't need the small one in the corner */
+body.np-on .md-time{ display:none; }
+/* minimal views: one clock that matters */
+.np-times #npBig{ font-family:var(--font-display); font-size:30px; font-weight:700; color:#fff; letter-spacing:-.01em; }
+.np-times.is-round .np-el{ align-self:flex-end; } .np-times.is-round .np-el #focusElapsed{ font:inherit; font-size:13px; color:inherit; letter-spacing:0; }
+.np-times:has(> #breakRemaining:not(:empty)){ flex-direction:row-reverse; }
+.np-times:has(> #breakRemaining:not(:empty)) #breakRemaining{ font-family:var(--font-display); font-size:30px; font-weight:700; color:#fff; letter-spacing:-.01em; }
+.np-times:has(> #breakRemaining:not(:empty)) #modeElapsed{ font:inherit; font-size:13px; color:inherit; align-self:flex-end; letter-spacing:0; }
+.ckp .tm.is-brk .tm-arc{ stroke:#7aa2ff; }
+/* Calendar: Op's line runs the width of the header instead of sitting in a small box */
+.cx-header > div:first-child{ flex:none; }
+.cx-header .op-tip{ flex:1 1 auto; max-width:none; margin-right:0; padding:10px 18px 10px 14px; font-size:13.5px; line-height:1.4; border-radius:14px; min-height:42px; align-items:center; }
+.cx-header .op-tip .op-tip-t{ white-space:normal; }
+/* Standing: hover for the breakdown */
+.oa-stand{ position:relative; cursor:help; }
+.osp{ position:absolute; left:calc(100% + 14px); top:-6px; width:300px; z-index:30; padding:14px 16px 12px; border-radius:16px; background:rgba(255,255,255,.97); border:1px solid rgba(20,24,40,.1);
+  box-shadow:0 24px 60px rgba(20,24,60,.18); color:#1b1e2a; opacity:0; visibility:hidden; transform:translateX(-6px); transition:opacity .18s, transform .18s, visibility 0s linear .18s; pointer-events:none; text-transform:none; letter-spacing:0; }
+.oa-stand:hover .osp{ opacity:1; visibility:visible; transform:none; transition:opacity .18s, transform .18s; }
+.osp-h{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#5a6170; }
+.osp-h b{ font-size:24px; letter-spacing:0; color:#1b1e2a; }
+.osp-r{ margin:8px 0; } .osp-r.is-na{ opacity:.5; }
+.osp-l{ display:flex; align-items:baseline; gap:6px; font-size:12.5px; } .osp-l em{ font-style:normal; font-size:10.5px; color:#8a90a2; } .osp-l b{ margin-left:auto; font-size:12.5px; font-variant-numeric:tabular-nums; }
+.osp-r i{ display:block; height:5px; border-radius:3px; background:rgba(20,24,40,.07); margin-top:4px; overflow:hidden; } .osp-r u{ display:block; height:100%; border-radius:3px; background:linear-gradient(90deg, #7aa2ff, #3FBE8E); }
+.osp-read{ display:flex; gap:8px; align-items:flex-start; margin-top:12px; padding-top:10px; border-top:1px solid rgba(20,24,40,.08); font-size:12.5px; line-height:1.45; }
+.osp-read .th-op-o{ flex:none; margin-top:3px; }
+.osp-f{ margin-top:8px; font-size:10.5px; color:#8a90a2; }
+/* Op's voice profiles */
+.vp{ margin:12px 0 4px; } .vp-k{ font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint); margin-bottom:6px; }
+.vp-list{ display:flex; flex-wrap:wrap; gap:6px; }
+.vp-chip{ display:inline-flex; align-items:center; border:1px solid var(--border); border-radius:999px; background:rgba(var(--ink),.03); overflow:hidden; }
+.vp-chip button{ background:none; border:0; color:var(--text); font-size:12.5px; font-weight:600; padding:6px 4px 6px 12px; cursor:pointer; }
+.vp-chip .vp-x{ padding:6px 10px 6px 6px; color:var(--text-faint); font-size:11px; } .vp-chip .vp-x:hover{ color:var(--danger); }
+.vp-chip.is-on{ border-color:var(--good); background:var(--good-dim); } .vp-chip.is-on button:first-child{ color:var(--good); }
+.vp-none{ font-size:12px; color:var(--text-faint); }
+.vp-add{ display:flex; gap:8px; margin-top:8px; } .vp-add .input{ flex:1; }
+/* Good morning: the quote's next button is a ring that fills over its 20 seconds */
+.qt[data-q="morning"] .qt-next{ top:auto; bottom:-6px; right:-6px; width:30px; height:30px; opacity:.75; color:rgba(255,255,255,.75); font-size:0; border-radius:50%;
+  background:conic-gradient(rgba(255,255,255,.75) var(--qp, 0%), rgba(255,255,255,.14) 0); animation:qtFill 20s linear forwards; transition:opacity .2s, transform .2s; }
+.qt[data-q="morning"] .qt-next::after{ content:'›'; position:absolute; inset:3px; border-radius:50%; display:grid; place-items:center; background:rgba(20,40,80,.55); font-size:17px; line-height:1; color:#fff; padding-bottom:2px; }
+.qt[data-q="morning"]:hover .qt-next{ animation-play-state:paused; opacity:1; } .qt[data-q="morning"] .qt-next:hover{ transform:scale(1.08); }
+@property --qp{ syntax:'<percentage>'; inherits:false; initial-value:0%; }
+@keyframes qtFill{ from{ --qp:0%; } to{ --qp:100%; } }
+body:has(#wakeOverlay:not(.hidden)) .activity-pill{ display:none !important; }
+/* (the panel no longer clips it, and it sits over the chat while it's open) */
+.opf-acc{ overflow:visible; } .opf-acc:has(.oa-stand:hover){ z-index:40; }
+.osp-read .th-op-o{ display:inline-block; width:10px; height:10px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #fff, #b9cdfc 55%, #7aa2ff); box-shadow:0 0 8px rgba(122,162,255,.7); }

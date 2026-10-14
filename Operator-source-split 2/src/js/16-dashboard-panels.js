@@ -16,8 +16,8 @@ function timeWorkedHtml(yMin, weekMin){
   // This week = Sunday 12 AM through now (it used to be a rolling 7 days that never reset).
   let weekFocusMin = todayFocusMin;
   for(let d=startOfWeekSundayStr(todayStr()); d<todayStr(); d=addDays(d,1)){ weekFocusMin += deepWorkMinutesFor(d); }
-  const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today'; });
-  const doneToday = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); });
+  const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); });
+  const doneToday = state.tasks.items.filter(function(t){ return (t.status==='done' && t.completedAt===todayStr()) || isOngoingDoneToday(t); });
   const manualItems = arr(state.standards.items);
   const rec = getStandardRec(todayStr());
   const target = state.standards.deepWorkTargetMinutes || 180;
@@ -93,8 +93,8 @@ function renderCalendarMiniPanel(){
   '</div></div>';
 }
 function renderTodayTasksPanel(){
-  const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today'; });
-  const doneToday = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); });
+  const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); });
+  const doneToday = state.tasks.items.filter(function(t){ return (t.status==='done' && t.completedAt===todayStr()) || isOngoingDoneToday(t); });
   const backlog = state.tasks.items.filter(function(t){ return t.status==='backlog'; });
   const totalToday = todayTasks.length + doneToday.length;
   const isEmpty = totalToday === 0;

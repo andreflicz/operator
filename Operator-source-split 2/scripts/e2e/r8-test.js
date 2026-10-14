@@ -33,7 +33,11 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.clock.runFor(400);   // let the notice fade in
     check('back at the keys: a notice says what happened, with a way to undo', (await p.textContent('#toastContainer')).includes('Away since') && await p.isVisible('#toastContainer [data-action="restoreAwaySession"]'));
     await p.click('#toastContainer [data-action="restoreAwaySession"]'); await p.waitForTimeout(100);
-    check('"I was working" puts the time back', Math.abs((await E("state.focus.activeSession ? state.focus.activeSession.startedAt : 0"))-T0) < 5000 && (await E("state.focus.sessions.filter(x=>x.away).length"))===0);
+    // (round 37: it counts the time and leaves it closed; it doesn't lock you back in, which used to loop)
+    const back = await E("state.focus.sessions[state.focus.sessions.length-1]");
+    check('"I was working" puts the time back (and doesn’t lock you in again)', !(await E("!!state.focus.activeSession")) && Math.abs(back.startedAt-T0) < 5000 && back.minutes >= 175 && back.reviewed && (await E("state.focus.sessions.filter(x=>x.away).length"))===0, back);
+    await poll(185); await p.clock.runFor(400);
+    check('…and no second "Add it back" after it', !(await p.isVisible('#toastContainer [data-action="restoreAwaySession"]')));
     check('idle Firefox time isn\'t app time', (await E("appMinutesForDate(todayStr())['Firefox']")) <= 32);
     check('no errors (away)', !p.errors.length, p.errors);
     await p.context().close();

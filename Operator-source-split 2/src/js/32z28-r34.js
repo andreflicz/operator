@@ -48,8 +48,8 @@ function streakWorkHtml(o){
       '<span class="sw-h">'+(x.future ? '' : fmtH(x.m))+'</span></div>';
   }).join('');
   const dwToday = deepWorkMinutesTodayLive();
-  const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today'; });
-  const doneToday = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); });
+  const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); });
+  const doneToday = state.tasks.items.filter(function(t){ return (t.status==='done' && t.completedAt===todayStr()) || isOngoingDoneToday(t); });
   const showTotal = !full || !weekPanelOn();
   return '<div class="sw'+(full ? ' is-row' : '')+(streak > 0 ? ' is-hot' : '')+'">'+
     '<div class="sw-l"><div class="sw-streak"><span class="sw-flame">&#128293;</span><b class="'+(o.ticked ? 'streak-tick-pop' : '')+'">'+streak+'</b><span>day'+(streak===1 ? '' : 's')+'<br>streak</span>'+(allDone ? '<span class="streak-ok" title="Today\'s standard: done">&#10003;</span>' : '')+(full ? tip((streak===0 ? 'Hit today\'s standard to start one. ' : allDone ? 'Today\'s in the bag. ' : 'Hit today\'s standard to keep it going. ')+'The streak counts days in a row you hit Today\'s Standard: the deep-work target plus your checklist. Each circle is a day this week; its ring fills with the hours you worked.') : '')+'</div>'+
@@ -85,7 +85,7 @@ function thOpKick(force){
   if(!force && ui.thOp && ui.thOp.k===k) return;   // (one try per part of the day: a failed call doesn't retry on every render)
   ui.thOp = {k:k, busy:true};
   const dw = deepWorkMinutesTodayLive(), target = state.standards.deepWorkTargetMinutes || 180, nx = typeof nextUpTask==='function' ? nextUpTask() : null;
-  const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today'; }).length, done = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); }).length;
+  const todayTasks = state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); }).length, done = state.tasks.items.filter(function(t){ return (t.status==='done' && t.completedAt===todayStr()) || isOngoingDoneToday(t); }).length;
   const ev = arr(state.calendar.events).filter(function(e){ return e.date===todayStr() && e.time && e.time > nowHM(); }).sort(function(a, b){ return a.time.localeCompare(b.time); })[0];
   const facts = 'Time: '+fmt12Hour(nowHM())+', '+weekdayShort(todayStr())+'. Deep work today: '+fmtDurationLabel(dw)+' of '+fmtDurationLabel(target)+'. Tasks: '+done+' done, '+todayTasks+' open. Streak: '+computeStreak()+' days.'+(nx ? ' Next up: '+nx.title+'.' : '')+(ev ? ' Next on the calendar: '+ev.title+' at '+fmt12Hour(ev.time)+'.' : '');
   aiWrite('Write the one line I see under my business name at the top of my dashboard right now. You, talking to me, like a friend who knows my day: warm or witty, personal, a nod to where I stand. One sentence, under 16 words. Greet me by name if it fits. No quotes, no em dashes, nothing else.\n\nFacts: '+facts, {max:80}).then(function(t){
@@ -155,7 +155,7 @@ function cockpitHtml(){
   const elapsed = Date.now() - as.startedAt, target = state.standards.deepWorkTargetMinutes || 180, dw = deepWorkMinutesTodayLive();
   const face = (typeof timerFaceHtml==='function' && timerFaceHtml(m ? m.icon : '&#128274;')) ||
     '<button class="np-art tm tm-ring" data-action="timerNext" data-style="ring" title="Tap for another timer style"><svg viewBox="0 0 120 120" aria-hidden="true">'+timerFaceSvg('ring')+'</svg><span class="tm-in"><i>'+(m ? m.icon : '&#128274;')+'</i><b class="tm-t"></b></span></button>';
-  const queue = state.tasks.items.filter(function(t){ return t.status==='today' && (!cur || t.id!==cur.id); }).slice(0, 4);
+  const queue = state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t) && (!cur || t.id!==cur.id); }).slice(0, 4);
   const done = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===todayStr(); }).length;
   const ev = arr(state.calendar.events).filter(function(e){ return e.date===todayStr() && e.time && e.time > nowHM(); }).sort(function(a, b){ return a.time.localeCompare(b.time); })[0];
   setTimeout(function(){ if(typeof timerTick==='function') timerTick(); }, 20);

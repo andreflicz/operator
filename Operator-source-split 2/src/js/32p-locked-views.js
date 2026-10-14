@@ -60,7 +60,7 @@ function renderFocusMinimal(){
       '<div class="hm-stats">'+
         (x ? '<button class="hm-s hm-lvl" data-action="openYou" style="--rc:'+r.color+'" title="Your card">'+rankBadgeSvg(x.rank, 34)+'<span><b>LVL '+x.level+'</b><small>'+escapeHtml(r.name)+' &middot; OVR '+x.ovr+'</small><i><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i></span></button>' : '')+
         '<div class="hm-s"><b>&#128293; '+streak+'</b><small>day streak</small></div>'+
-        '<div class="hm-s"><b>'+fmtHours(deep)+'</b><small>of '+fmtHours(target)+' today</small><i><u style="width:'+Math.min(100, deep/target*100).toFixed(1)+'%"></u></i></div>'+
+        '<div class="hm-s"><b>'+fmtDurationLabel(deep)+'</b><small>of '+fmtDurationLabel(target)+' today</small><i><u style="width:'+Math.min(100, deep/target*100).toFixed(1)+'%"></u></i></div>'+
       '</div>'+
       '<button class="hm-go" data-action="openLockInChooser" title="Lock in (L)"><span class="hm-go-ring"></span><span>&#128274;</span><b>LOCK IN</b></button>'+
       '<div class="hm-btns">'+

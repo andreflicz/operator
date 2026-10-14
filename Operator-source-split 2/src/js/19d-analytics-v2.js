@@ -27,7 +27,7 @@ function analyticsOverviewHtml(r){
   const items = state.tasks.items;
   const done = items.filter(function(t){ return t.status==='done' && t.completedAt && inRange(days, t.completedAt); });
   const openHigh = items.filter(function(t){ return t.status!=='done' && t.priority==='high'; }).length;
-  const lineup = items.filter(function(t){ return t.status==='today'; }).length;
+  const lineup = items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); }).length;
   const wdays = days || Object.keys(workoutDayMap());
   const wk = workoutTotals(wdays);
   const label = {today:'Today', week:'This week', lastweek:'Last week', all:'All time'}[r] || 'All time';

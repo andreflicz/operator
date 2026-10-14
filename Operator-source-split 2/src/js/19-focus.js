@@ -590,7 +590,7 @@ function renderStopFocusModal(){
   const toward = arr(state.focus.motivations.toward);
   const away = arr(state.focus.motivations.away);
   const completed = as ? arr(as.completedTasks) : [];
-  const todayTasksRemaining = state.tasks.items.filter(function(t){ return t.status==='today'; });
+  const todayTasksRemaining = state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); });
   const upcomingDeadlines = state.tasks.items.filter(function(t){ return t.deadline && t.status!=='done' && t.deadline>=todayStr(); }).sort(function(a,b){ return a.deadline.localeCompare(b.deadline); }).slice(0,3);
   const backlogCount = state.tasks.items.filter(function(t){ return t.status==='backlog'; }).length;
 

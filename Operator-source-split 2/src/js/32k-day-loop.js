@@ -145,7 +145,7 @@ function windRecapHtml(){
   const std = dayStandardsComplete(d), streak = computeStreak();
   const delivs = arr(state.business.clients).reduce(function(n, c){ return n + arr(c.deliverables).reduce(function(m, x){ return m + arr(x.completedDates).filter(function(z){ return z===d; }).length; }, 0); }, 0);
   const touches = arr(state.business.clients).reduce(function(n, c){ return n + arr(c.touches).filter(function(z){ return z===d; }).length; }, 0) + arr(state.business.pipeline).reduce(function(n, l){ return n + arr(l.touchpoints).filter(function(z){ return z.date===d; }).length; }, 0);
-  const left = state.tasks.items.filter(function(t){ return t.status==='today'; }).length;
+  const left = state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); }).length;
   const tom = windTarget();
   const tomEvents = arr(state.calendar.events).filter(function(e){ return e.date===tom; }).sort(function(a, b){ return (a.time||'').localeCompare(b.time||''); });
   const tomDue = state.tasks.items.filter(function(t){ return t.status!=='done' && t.deadline===tom; });

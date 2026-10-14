@@ -188,7 +188,7 @@ function timerTick(){
     const t = tm.querySelector('.tm-t'); if(t) t.textContent = formatElapsed(el);
   });
 }
-setInterval(timerTick, 1000);
+setInterval(function(){ timerTick(); }, 1000);   // (by name, so later rounds can extend it)
 ACTIONS.timerNext = function(){
   const i = TIMER_STYLES.findIndex(function(x){ return x[0]===timerStyle(); });
   state.profile.timerStyle = TIMER_STYLES[(i + 1) % TIMER_STYLES.length][0]; persist('profile'); playTick(); renderView();

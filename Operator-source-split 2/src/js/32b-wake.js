@@ -402,7 +402,7 @@ function upcomingNightPlan(){ const np = state.focus.nightPlan; return (np && np
 function wakeTodayPlan(){
   const np = upcomingNightPlan(), today = todayStr();
   const planTasks = np && np.date===today ? arr(np.taskIds).map(function(id){ return state.tasks.items.find(function(t){ return t.id===id; }); }).filter(Boolean) : [];
-  const tasks = planTasks.length ? planTasks : lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today'; }));
+  const tasks = planTasks.length ? planTasks : lineupOrdered(state.tasks.items.filter(function(t){ return t.status==='today' && !isOngoingDoneToday(t); }));
   return {note: np && np.date===today ? np.note : '', tasks: tasks.filter(function(t){ return t.status!=='done'; }).slice(0, 6)};
 }
 function wakeWeatherLine(){

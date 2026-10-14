@@ -1,0 +1,130 @@
+// Round 37: Add it back counts the time (no loop), Op never stuck thinking (Stop, talk over him, time
+// limits), lock in with a work method, skills done for the day everywhere, Today's full-screen view,
+// Player ↔ Cockpit in the minimal view, one clock per timer, the Cockpit's break, Calendar's Op line,
+// Standing's breakdown, voice profiles, the Good morning quote every 20 s.
+const { instrument, launch, newPage, check, report, OUT } = require('./common.js');
+const CORS = {'Access-Control-Allow-Origin':'*'};
+(async () => {
+  instrument(process.argv[2], OUT+'/r37.html');
+  const b = await launch();
+  const T = new Date(2026,9,13,14,20).getTime();
+
+  // ---- Add it back ----
+  {
+    const p = await newPage(b, OUT+'/r37.html', {profile:{name:'Andre'}}, T);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await E("state.focus.sessions.push({id:'aw', type:'deep', date:todayStr(), startedAt:Date.now()-90*60000, endedAt:Date.now()-33*60000, minutes:57, completedTasks:[], away:true, reviewed:false}); state.focus.awayStop = {sessionId:'aw', active:{startedAt:Date.now()-90*60000, breaks:[], completedTasks:[]}, endedAt:Date.now()-33*60000, at:Date.now(), shown:true}; ACTIONS.restoreAwaySession()");
+    const s = await E("state.focus.sessions.find(x => x.id==='aw')");
+    check('Add it back counts the time (to now) and leaves you locked out', !(await E("!!state.focus.activeSession")) && s.minutes >= 89 && !s.away && s.reviewed, s);
+    check('…and says how much went back on', /Added back: 33m/.test(await p.textContent('#toastContainer')));
+    check('no page errors (add it back)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
+  // ---- Op: never stuck, never ignoring you; lock in with a method ----
+  {
+    const p = await newPage(b, OUT+'/r37.html', {profile:{name:'Andre'}, tasks:{items:[{id:'t1', title:'Editing batch', status:'today'}]}}, T);
+    let hang = true;
+    await p.route('http://127.0.0.1:8935/**', async r => {
+      const u = r.request().url();
+      if(u.includes('/ai/status')) return r.fulfill({status:200, headers:CORS, body:'{"hasKey":true}'});
+      if(u.includes('/ai/models')) return r.fulfill({status:200, headers:CORS, body:'{"data":[{"id":"claude-haiku-5-5"}]}'});
+      if(u.includes('/ai/chat')){
+        if(hang) return;   // never answers
+        const body = JSON.parse(Buffer.from(decodeURIComponent(u.split('b=')[1]), 'hex').toString()), last = body.messages[body.messages.length-1];
+        if(typeof last.content==='string' && /90/.test(last.content)) return r.fulfill({status:200, headers:CORS, body:JSON.stringify({stop_reason:'tool_use', content:[{type:'tool_use', id:'u1', name:'lock_in', input:{method:'ultradian'}}]})});
+        return r.fulfill({status:200, headers:CORS, body:JSON.stringify({stop_reason:'end_turn', content:[{type:'text', text:'On it.'}]})});
+      }
+      return r.fulfill({status:200, headers:CORS, body:'{}'});
+    });
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await E("AI.hasKey = true; wakeCfg().voice = false");
+    E("aiAsk('what should I do', 'opBubText')");
+    await p.waitForTimeout(2000);
+    check('Op thinking: a Stop button by his light', await E("AI.busy") && await p.isVisible('#opThink'));
+    await p.click('#opThink'); await p.waitForTimeout(300);
+    check('…Stop drops it right away', !(await E("AI.busy")) && /dropped it/.test(await E("document.getElementById('opBubText').textContent")));
+    E("aiAsk('first thing', 'opBubText')"); await p.waitForTimeout(800);
+    hang = false;
+    await E("aiAsk('start a work block, do the 90-20', 'opBubText')"); await p.waitForTimeout(1500);
+    check('talking while he thinks: the new thing wins (not ignored)', !(await E("AI.busy")) && /On it/.test(await E("document.getElementById('opBubText').textContent")));
+    check('"do the 90-20": he locks you in with the 90 / 20 method', await E("!!(state.focus.activeSession && state.focus.activeSession.method && state.focus.activeSession.method.id==='ultradian')"));
+    check('the "Operator" ear only listens while Operator is in front', /hasFocus/.test(await E("heyQuietNow.toString()")));
+    check('no page errors (Op)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
+  // ---- skills and ongoing tasks: done for today is done ----
+  {
+    const p = await newPage(b, OUT+'/r37.html', {profile:{name:'Andre'}, tasks:{items:[{id:'s1', title:'Piano practice', status:'today', skill:true, ongoing:true, ongoingDoneDates:[]}, {id:'t1', title:'Editing batch', status:'today'}]}}, T);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await E("completeTask('s1')"); await p.waitForTimeout(1200);
+    check('a skill done for today is off Op’s list', JSON.stringify(await E("opOpen().map(c => c.t)"))==='["Editing batch"]');
+    check('…his check-in facts count it done', await E("acctFacts().done")===1 && await E("acctFacts().total")===2);
+    check('…and his background says so', /done: Piano practice/.test(await E("aiContext()")));
+    check('…the task itself still comes back tomorrow', await E("state.tasks.items[0].status")==='today');
+    await E("ui.view='today'; renderView()"); await p.waitForTimeout(200);
+    check('…and the Today row counts it done', /^1/.test((await p.textContent('.sw-tasks')).trim()));
+    check('no page errors (skills)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
+  // ---- Today's full screen, the minimal views, the timers ----
+  {
+    const p = await newPage(b, OUT+'/r37.html', {profile:{name:'Andre', lockedView:'minimal'}, tasks:{items:[{id:'t1', title:'Edit reel', status:'today'}]}}, T);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await E("ui.view='today'; renderView()"); await p.waitForTimeout(200);
+    check('Today has a Minimal chip by the name', await p.isVisible('.th-biz .th-min'));
+    await p.click('.th-min'); await p.waitForTimeout(400);
+    check('…a full-screen Today: the clock, your level, LOCK IN', await p.isVisible('#viewRoot .np-home') && await E("document.body.classList.contains('np-on')"));
+    await p.keyboard.press('m'); await p.waitForTimeout(700);
+    check('…M takes you back', !(await p.$('#viewRoot .np-home')));
+    await E("ui.pendingLockMethod = {id:'pomodoro'}; startFocus(null); ui.pendingLockMethod = null; ui.view='today'; renderView()"); await p.waitForTimeout(400);
+    check('locked in, minimal: a round counts down big (one clock)', /^2[45]:\d\d$/.test((await p.textContent('#npBig')).trim()) && /break at/.test(await p.textContent('#msLine')));
+    check('…a Cockpit switch right there', await p.isVisible('.np .lv-sty[data-id="cockpit"]'));
+    await p.click('.np .lv-sty'); await p.waitForTimeout(400);
+    check('…switches to the Cockpit (and back is there too)', await p.isVisible('.np.is-cockpit .ckp') && await p.isVisible('.np .lv-sty[data-id="player"]'));
+    check('…its timer face counts the round down too', /^2[45]:\d\d$/.test((await p.textContent('.ckp .tm-t')).trim()));
+    await E("state.focus.activeSession.startedAt -= 25*60000 + 3000"); await p.clock.runFor(3000); await p.waitForTimeout(400);
+    check('the Cockpit has its own break: the time left, big', await E("state.focus.activeSession.onBreak") && await p.isVisible('.np.is-cockpit.is-break .ckp') && /^0[45]:\d\d$/.test((await p.textContent('.ckp .tm-t')).trim()));
+    await E("ACTIONS.lockedStyleSet(null, null, 'player')"); await p.waitForTimeout(300);
+    check('the Player’s break: the time left is the big number', await p.evaluate(() => { const r = document.getElementById('breakRemaining'); return !!r && parseFloat(getComputedStyle(r).fontSize) >= 28; }));
+    check('no page errors (minimal)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
+  // ---- Calendar, Standing, voice profiles, Good morning's quote ----
+  {
+    const p = await newPage(b, OUT+'/r37.html', {profile:{name:'Andre'}, tasks:{items:[{id:'t1', title:'Edit reel', status:'today', deadline:'2026-10-15'}]}}, T);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await E("intentStore().prompted['W'+weekKey()]=1; intentStore().prompted['M'+monthKey()]=1; ui._intAsked='x'; (typeof checkoutDue==='function') && checkoutDue().forEach(c => intentStore().prompted['O'+c.kind+':'+c.key] = 1)");
+    await E("ui.view='calendar'; renderView()"); await p.waitForTimeout(300);
+    check('Calendar: Op’s line runs the width of the header', await p.evaluate(() => { const t = document.querySelector('.cx-header .op-tip'), h = document.querySelector('.cx-header'); return !!t && t.getBoundingClientRect().width > h.getBoundingClientRect().width*0.6; }));
+    await E("acct().log.push({id:'a1', at:Date.now()-3600000, date:todayStr(), status:'working', prod:4}); opfOpen({})"); await p.waitForTimeout(700);
+    check('Standing: hover it for the breakdown (four parts, the weakest called out)', (await p.$$('.oa-stand .osp .osp-r')).length===4 && /Weakest link|Solid|builds/.test(await p.textContent('.osp-read')));
+    await p.hover('.oa-stand'); await p.waitForTimeout(300);
+    check('…and it shows on hover', await p.isVisible('.oa-stand .osp'));
+    await E("document.getElementById('opFull') && ACTIONS.opfClose ? ACTIONS.opfClose() : null");
+    await E("wakeCfg().voiceEngine='eleven'; wakeCfg().elevenVoice='21m00Tcm4TlvDq8ikWAM'; wakeCfg().voiceSpeed=1.1; ui.view='settings'; ui.settingsTab='connections'; renderView()"); await p.waitForTimeout(300);
+    check('voice: more ElevenLabs voices to pick', await E("ELEVEN_VOICES.length") >= 12);
+    const has = await E("opVoiceSettingsHtml().indexOf('vp-add') >= 0");
+    check('voice profiles: save the voice under a name', has);
+    await E("document.body.insertAdjacentHTML('beforeend', '<input id=vpName value=\"Coach\">'); ACTIONS.voiceProfileSave(); document.getElementById('vpName').remove()");
+    await E("wakeCfg().elevenVoice='JBFqnCBsd6RMkjVDRZzb'; wakeCfg().voiceSpeed=1");
+    await E("ACTIONS.voiceProfileUse(null, null, voiceProfiles()[0].id)");
+    check('…one tap and that’s who’s talking (voice and speed)', await E("wakeCfg().elevenVoice")==='21m00Tcm4TlvDq8ikWAM' && await E("wakeCfg().voiceSpeed")===1.1);
+    check('…and Op can switch it when asked', /switched to Coach/.test(await E("opRunTool('set_voice', {profile:'coach'})")));
+    await E("state.focus.wake={enabled:true, time:'07:00', days:[0,1,2,3,4,5,6], news:false, intro:'quick', introChosen:true, voice:false}; fireWake({})");
+    await p.click('[data-action="wakeStartDay"]'); await p.waitForTimeout(500); await E("briefRevealAll()"); await p.waitForTimeout(900);
+    const q0 = await p.textContent('.qt[data-q="morning"] blockquote');
+    check('Good morning: the quote’s button is a ring by its corner, always there', await p.isVisible('.qt[data-q="morning"] .qt-next'));
+    check('…and the Op bar steps aside', !(await p.isVisible('#activityPill')));
+    await p.mouse.move(5, 5); await p.clock.runFor(21000); await p.waitForTimeout(500);
+    check('…the quote turns over every 20 seconds on its own', (await p.textContent('.qt[data-q="morning"] blockquote'))!==q0);
+    check('no page errors (round 37)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
+  await b.close();
+  process.exit(report() ? 1 : 0);
+})();
