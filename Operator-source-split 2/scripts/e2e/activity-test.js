@@ -56,7 +56,8 @@ const T0 = new Date(2026,9,8,10,0).getTime();
   // recap pops up the next morning when yesterday has unchecked auto sessions
   await E("state.focus.sessions.push({id:'old', type:'deep', date:addDays(todayStr(),-1), startedAt:Date.now()-86400000, endedAt:Date.now()-86400000+3600000, minutes:60, completedTasks:[], auto:true, reviewed:false}); delete state.focus.recapSeen[addDays(todayStr(),-1)]; maybeShowRecap()");
   // (round 30: one SYSTEM window, "review your work", instead of a note per day)
-  await E("state.focus.revPop = null; sysRevTick()"); await p.waitForTimeout(400);
+  // (round 36: marking the site Work above can lock you in right away; the review window waits for no session)
+  await E("state.focus.activeSession = null; state.focus.revPop = null; sysRevTick()"); await p.waitForTimeout(400);
   check('yesterday\'s unchecked sessions bring up the review window (not the recap itself)', !(await p.isVisible('#recapOverlay:not(.hidden)')) && /Review your work/.test(await p.textContent('#sysRev')));
   await p.click('#sysRev .sys-rev-go'); await p.waitForTimeout(300);
   check('the note opens yesterday\'s recap', await p.isVisible('#recapOverlay') && (await p.textContent('#recapOverlay')).includes('Yesterday'));
