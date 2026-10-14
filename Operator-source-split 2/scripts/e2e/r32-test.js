@@ -232,7 +232,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('r34: Settings has the two locked-in views', ((await E("soundSettingsHtml()")).match(/data-action="lockedStyleSet"/g)||[]).length===2);
     await E("state.profile.lockedStyle='cockpit'; state.profile.lockedView='minimal'; startFocus(50); ui.view='focus'; renderView()"); await p.waitForTimeout(300);
     check('r34: the Cockpit locked-in view: timer, task, the day', !!(await p.$('.np.is-cockpit .ckp .ckp-timer')) && !!(await p.$('.ckp-day .sw')));
-    await E("state.appActivity.todayIntervals.push({app:'Final Cut Pro', start:Date.now()-60000, end:Date.now()}); ui.view='today'; renderView(); updateActivityPill()"); await p.waitForTimeout(200);
+    await E("state.profile.lockedView='full'; state.appActivity.todayIntervals.push({app:'Final Cut Pro', start:Date.now()-60000, end:Date.now()}); ui.view='today'; renderView(); updateActivityPill()"); await p.waitForTimeout(200);
     check('r36: the Op bar: one status dot and the app', !!(await p.$('#activityPill .ob-dot')) && /Final Cut Pro/.test(await p.textContent('#activityPill .ap-name')));
     await p.click('#activityPill .ap-name'); await p.waitForTimeout(300);
     check('r34: …and tapping it still opens its menu, on top', await p.evaluate(() => { const m = document.getElementById('activityPillMenu'); if(!m) return false; const r = m.getBoundingClientRect(), t = document.elementFromPoint(r.x + r.width/2, r.y + 20); return !!(t && t.closest('#activityPillMenu')); }));
