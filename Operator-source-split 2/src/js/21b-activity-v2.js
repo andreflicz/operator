@@ -71,7 +71,7 @@ function renderPillMenu(){
     '</div>' : '';
   const browser = app && BROWSER_APPS.indexOf(activityKey(app))>=0;
   m.innerHTML = status+(browser ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div><div class="ap-menu-hint" style="margin-top:0;">Can\'t see which website is open'+
-      tip('So it can\'t tell YouTube from work.'+(activityKey(app)==='firefox' ? ' Firefox doesn\'t allow this. Safari, Chrome, Arc, Brave and Edge do.' : ' On your Mac: System Settings → Privacy & Security → Automation → Operator → turn on '+app+'. Then reopen Operator.'))+'</div>'
+      tip('So it can\'t tell YouTube from work.'+(activityKey(app)==='firefox' ? ' Operator reads Firefox\'s address bar through Accessibility: System Settings → Privacy & Security → Accessibility → turn on Operator, then reopen it. If it still can\'t, open about:config in Firefox and set accessibility.force_disabled to 0. (Until then it guesses from the page title: YouTube, Netflix, Docs and so on.)' : ' On your Mac: System Settings → Privacy & Security → Automation → Operator → turn on '+app+'. Then reopen Operator.'))+'</div>'
     : app ? '<div class="ap-menu-title">'+escapeHtml(app)+'</div>'+
       '<div class="ap-menu-k">Is this work?'+tip('Only work apps & sites start an automatic lock-in. Time on “not work” ones while you\'re locked in doesn\'t count as deep work.')+'</div>'+
       '<div class="ap-seg">'+['work','other'].map(function(c){ return '<button class="ap-seg-btn'+(cat===c?' is-on':'')+'" data-action="pillSetCat" data-id="'+c+'">'+CAT_META[c].label+'</button>'; }).join('')+'</div>'+

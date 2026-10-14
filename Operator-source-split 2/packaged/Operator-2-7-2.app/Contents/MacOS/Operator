@@ -56,6 +56,70 @@ poll_frontmost() {
         URL=$(osascript -e "tell application \"$APP\" to get URL of active tab of front window" 2>/dev/null) ;;
       "Safari")
         URL=$(osascript -e 'tell application "Safari" to get URL of front document' 2>/dev/null) ;;
+      "firefox"|"Firefox"|"Firefox Developer Edition"|"Firefox Nightly"|"Zen"|"Zen Browser"|"LibreWolf"|"Floorp")
+        # Firefox has no AppleScript for its URL, so read the address bar through Accessibility
+        # (the same permission full screen uses). If that's not possible, the window title often
+        # names the site ("… - YouTube"), and that's mapped to the domain below.
+        URL=$(osascript <<'OSA' 2>/dev/null
+tell application "System Events"
+  set p to first application process whose frontmost is true
+  set v to ""
+  try
+    set v to value of attribute "AXDocument" of front window of p
+  end try
+  if v is missing value then set v to ""
+  if v is "" then
+    try
+      set tb to first toolbar of (first group of front window of p) whose description is "Navigation"
+      set v to value of first UI element of first combo box of tb
+    end try
+  end if
+  if v is missing value then set v to ""
+  if v is "" then
+    try
+      set tb to first toolbar of front window of p whose description is "Navigation"
+      set v to value of first UI element of first combo box of tb
+    end try
+  end if
+  if v is missing value then set v to ""
+  return v
+end tell
+OSA
+)
+        case "$URL" in
+          http://*|https://*|file://*) ;;
+          *.*/*|*.*) case "$URL" in *" "*) URL="" ;; *) URL="https://$URL" ;; esac ;;
+          *) URL="" ;;
+        esac
+        if [ -z "$URL" ]; then
+          TITLE=$(osascript -e 'tell application "System Events" to get name of front window of (first application process whose frontmost is true)' 2>/dev/null)
+          case "$TITLE" in
+            *YouTube\ Studio*) SITE="studio.youtube.com" ;;
+            *YouTube*) SITE="youtube.com" ;;
+            *Netflix*) SITE="netflix.com" ;;
+            *Twitch*) SITE="twitch.tv" ;;
+            *Reddit*|*reddit*) SITE="reddit.com" ;;
+            *Instagram*) SITE="instagram.com" ;;
+            *TikTok*) SITE="tiktok.com" ;;
+            *" / X"*|*"on X:"*) SITE="x.com" ;;
+            *"Prime Video"*) SITE="primevideo.com" ;;
+            *Disney+*) SITE="disneyplus.com" ;;
+            *"Google Docs"*) SITE="docs.google.com" ;;
+            *"Google Sheets"*) SITE="sheets.google.com" ;;
+            *"Google Slides"*) SITE="slides.google.com" ;;
+            *"Google Drive"*) SITE="drive.google.com" ;;
+            *Gmail*) SITE="mail.google.com" ;;
+            *Figma*) SITE="figma.com" ;;
+            *Notion*) SITE="notion.so" ;;
+            *Canva*) SITE="canva.com" ;;
+            *ChatGPT*) SITE="chatgpt.com" ;;
+            *Claude*) SITE="claude.ai" ;;
+            *Frame.io*) SITE="frame.io" ;;
+            *HighLevel*) SITE="app.gohighlevel.com" ;;
+            *"Meta Business"*|*"Ads Manager"*) SITE="business.facebook.com" ;;
+            *Facebook*) SITE="facebook.com" ;;
+          esac
+        fi ;;
       *) URL="" ;;
     esac
     if [ -n "$URL" ]; then

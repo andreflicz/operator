@@ -375,15 +375,224 @@ ACTIONS.wakeStartMorning = (function(base){
 // Going from the work page to the lock-in picker (and into the session) used to drop out of full
 // screen for a moment, or for good. If Operator made the window full screen, it stays full screen
 // through choosing the lock-in and while you're locked in.
+// (only when the full screen came from the work preview or the lock-in picker: leaving the minimal
+// view yourself still takes you out of it)
 wantTrueFull = (function(base){
   return function(){
-    if(base.apply(this, arguments)) return true;
-    if(!trueFullOn() || !TF.via) return false;
-    return overlayOpen('lockSeqOverlay') || !!ui.lockStarting || !!(state.focus && state.focus.activeSession);
+    const b = base.apply(this, arguments);
+    if(b && (overlayOpen('planOverlay') || overlayOpen('lockSeqOverlay'))) ui._tfCarry = true;
+    if(b) return true;
+    if(!trueFullOn() || !TF.via || !ui._tfCarry) return false;
+    const keep = overlayOpen('lockSeqOverlay') || !!ui.lockStarting || !!(state.focus && state.focus.activeSession);
+    if(!keep) ui._tfCarry = false;
+    return keep;
   };
 })(wantTrueFull);
+ACTIONS.toggleLockedView = (function(base){ return function(){ ui._tfCarry = false; return base.apply(this, arguments); }; })(ACTIONS.toggleLockedView);
 // (one start, not two: the clock-in's own call a moment later is let go)
 workMusicPlay = (function(base){
   let last = 0;
   return function(){ if(Date.now() - last < 2500 || (typeof FM!=='undefined' && FM.switching)) return; last = Date.now(); return base.apply(this, arguments); };
 })(workMusicPlay);
+
+// ---- who started each lock-in ----
+// Every session remembers how it began: you (LOCK IN), automatically (and on which app), Op (you
+// asked him, or he locked you in), the Op bar's "Lock in now", after Op's nudge when you were stuck,
+// from Op's screen, or logged by hand. The recap used to say "you" for all of them.
+const LOCK_ORIGIN = {
+  you:{icon:'&#128274;', label:'You', cls:'is-you'},
+  auto:{icon:'&#9889;', label:'Auto', cls:'is-auto'},
+  op:{icon:'<i class="th-op-o rc-op-o"></i>', label:'Op locked you in', cls:'is-op'},
+  opscreen:{icon:'<i class="th-op-o rc-op-o"></i>', label:'You, from Op’s screen', cls:'is-op'},
+  bar:{icon:'&#9673;', label:'You, from the Op bar', cls:'is-you'},
+  stuck:{icon:'<i class="th-op-o rc-op-o"></i>', label:'You, after Op’s nudge', cls:'is-op'},
+  manual:{icon:'&#9998;', label:'Logged by hand', cls:'is-manual'}
+};
+function lockOrigins(){ const f = state.focus; if(!f.lockOrigins || typeof f.lockOrigins!=='object') f.lockOrigins = {}; return f.lockOrigins; }
+function sessionOrigin(s){
+  const rec = lockOrigins()[s.startedAt];
+  if(rec) return rec.by;
+  return s.manual ? 'manual' : s.auto ? 'auto' : 'you';
+}
+// (recorded against the session's start, once any backdating is done; kept for 90 days)
+function lockOriginSync(){
+  const as = state.focus && state.focus.activeSession; if(!as) return;
+  const by = as.autoStarted ? (as.originBy==='bar' ? 'bar' : 'auto') : (as.originBy || 'you');
+  const o = lockOrigins(), cur = o[as.startedAt];
+  if(cur && cur.by===by) return;
+  o[as.startedAt] = {by:by, app:as.autoApp || null, at:Date.now()};
+  const cut = Date.now() - 90*86400000; Object.keys(o).forEach(function(k){ if(o[k].at < cut) delete o[k]; });
+  persist('focus');
+}
+startFocus = (function(base){
+  return function(){
+    const r = base.apply(this, arguments), as = state.focus.activeSession;
+    if(as && !as.originBy){ as.originBy = ui._lockOrigin || 'you'; }
+    ui._lockOrigin = null;
+    setTimeout(lockOriginSync, 0);
+    return r;
+  };
+})(startFocus);
+setInterval(function(){ try{ lockOriginSync(); }catch(e){} }, 2000);
+lockGo = (function(base){ return function(){ ui._lockOrigin = ui._lockHint || 'you'; ui._lockHint = null; return base.apply(this, arguments); }; })(lockGo);
+ACTIONS.stuckGo = (function(base){ return function(){ const r = base.apply(this, arguments); ui._lockHint = 'stuck'; return r; }; })(ACTIONS.stuckGo);
+closeLockSeq = (function(base){ return function(){ if(!ui._lockOrigin) ui._lockHint = null; return base.apply(this, arguments); }; })(closeLockSeq);
+ACTIONS.pillLockNow = (function(base){ return function(){ ui._lockOrigin = 'bar'; return base.apply(this, arguments); }; })(ACTIONS.pillLockNow);
+ACTIONS.opAccLock = (function(base){ return function(){ ui._lockOriginForce = 'opscreen'; try{ return base.apply(this, arguments); } finally { ui._lockOriginForce = null; } }; })(ACTIONS.opAccLock);
+opRunTool = (function(base){
+  return function(name){
+    if(name==='lock_in' && !state.focus.activeSession) ui._lockOrigin = ui._lockOriginForce || 'op';
+    return base.apply(this, arguments);
+  };
+})(opRunTool);
+// (Op knows who started what when he talks about your day)
+function sessionOriginLine(s){ const o = LOCK_ORIGIN[sessionOrigin(s)] || LOCK_ORIGIN.you; return o.label.replace(/<[^>]+>/g, ''); }
+
+// ---- the day recap, redone ----
+function recapSessionRow(s){
+  const by = sessionOrigin(s), o = LOCK_ORIGIN[by] || LOCK_ORIGIN.you, rec = lockOrigins()[s.startedAt];
+  const app = by==='auto' || by==='bar' ? (s.app || (rec && rec.app)) : null;
+  const m = s.method && typeof LOCK_METHODS!=='undefined' && LOCK_METHODS[s.method.id] && s.method.id!=='block' ? LOCK_METHODS[s.method.id] : null;
+  const tasks = arr(s.completedTasks).map(function(t){ return t.title; }).filter(Boolean);
+  const pending = s.auto && !s.reviewed;
+  return '<div class="rc-sess rcx-row '+o.cls+(pending ? ' is-pending' : '')+'" data-key="rcs-'+s.id+'">'+
+    '<span class="rcx-bar"></span>'+
+    '<div class="rcx-when"><b>'+fmt12Hour(nowHM(new Date(s.startedAt)))+' – '+fmt12Hour(nowHM(new Date(s.endedAt)))+'</b><small>'+fmtDurationLabel(s.minutes||0)+'</small></div>'+
+    '<div class="rcx-what">'+
+      '<span class="rcx-by"><span class="rcx-ic">'+o.icon+'</span>'+o.label+(app ? ' &middot; '+escapeHtml(app) : '')+'</span>'+
+      (m ? '<span class="rcx-chip">'+m.icon+' '+escapeHtml(m.label)+'</span>' : '')+
+      (s.addedBack ? '<span class="rcx-chip is-back" title="Time you added back after being away">+ added back</span>' : '')+
+      (tasks.length ? '<span class="rcx-chip is-done">&#10003; '+escapeHtml(tasks.slice(0, 2).join(', '))+(tasks.length > 2 ? ' +'+(tasks.length-2) : '')+'</span>' : '')+
+      (typeof recapTaskHtml==='function' ? recapTaskHtml(s) : '')+
+    '</div>'+
+    '<div class="rcx-acts">'+
+      (pending ? '<button class="rcx-keep" data-action="recapApprove" data-id="'+s.id+'">&#10003; Keep</button>' : (s.auto ? '<span class="rcx-kept">kept</span>' : ''))+
+      '<button class="rcx-ib" data-action="recapEdit" data-id="'+s.id+'" title="Edit the times">&#9998;</button>'+
+      '<button class="rcx-ib is-x" data-action="recapDiscard" data-id="'+s.id+'" title="Wasn’t real work: remove it">&#10005;</button>'+
+    '</div>'+
+  '</div>';
+}
+renderRecap = function(){
+  const date = ui.recapDate || todayStr(), today = date===todayStr();
+  const sessions = sessionsOn(date);
+  const deep = today ? Math.max(deepWorkMinutesTodayLive(), deepWorkMinutesFor(date)) : deepWorkMinutesFor(date);
+  const target = state.standards.deepWorkTargetMinutes || 180, f = Math.min(1, deep/target);
+  const tasksDone = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===date; }).length + state.tasks.items.filter(function(t){ return t.ongoing && arr(t.ongoingDoneDates).indexOf(date) >= 0; }).length;
+  const breaks = state.modes.history.filter(function(m){ return m.date===date && m.type==='break'; });
+  const apps = topAppsForDate(date, 30);
+  let workMin = 0, otherMin = 0;
+  apps.forEach(function(a){ const c = activityCategory(a.app); if(c==='work') workMin += a.minutes; else if(c!=='neutral') otherMin += a.minutes; });
+  const longest = sessions.reduce(function(mx, s){ return Math.max(mx, s.minutes||0); }, 0);
+  const first = sessions[0], pending = sessions.filter(function(s){ return s.auto && !s.reviewed; }).length;
+  const dist = distractionMinutesFor(date), hit = dayStandardsComplete(date);
+  const dayLabel = today ? 'Today' : date===addDays(todayStr(), -1) ? 'Yesterday' : weekdayShort(date);
+  const byCount = {}; sessions.forEach(function(s){ const k = sessionOrigin(s); byCount[k] = (byCount[k]||0) + 1; });
+  const C = 2*Math.PI*30;
+  const stat = function(v, k){ return '<div class="rcx-stat"><b>'+v+'</b><span>'+k+'</span></div>'; };
+  return '<div class="rc rcx">'+
+    '<div class="rcx-head"><div><div class="rcx-k">Day recap</div><div class="rc-title">'+dayLabel+' &middot; '+new Date(localTs(date, '12:00')).toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})+'</div></div>'+
+      '<span class="rcx-std'+(hit ? ' is-hit' : '')+'">'+(hit ? '&#10003; Standard hit' : 'Standard not hit')+'</span></div>'+
+    '<div class="rc-stats rcx-top">'+
+      '<div class="rcx-deep"><svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="30" class="rcx-tr"/><circle cx="36" cy="36" r="30" class="rcx-ar'+(f >= 1 ? ' is-hit' : '')+'" stroke-dasharray="'+(C*f).toFixed(1)+' '+C.toFixed(1)+'"/></svg>'+
+        '<div><b>'+fmtDurationLabel(deep)+'</b><span>deep work &middot; '+Math.round(f*100)+'% of goal</span></div></div>'+
+      stat(sessions.length, 'session'+(sessions.length===1 ? '' : 's')+(longest ? ' &middot; longest '+fmtDurationLabel(longest) : ''))+
+      stat(tasksDone, 'task'+(tasksDone===1 ? '' : 's')+' done')+
+      stat(first ? fmt12Hour(nowHM(new Date(first.startedAt))) : '–', 'first lock-in')+
+    '</div>'+
+    recapTimelineHtml(date, sessions)+
+    ((workMin || otherMin) ? '<div class="rcx-split"><div class="rcx-split-bar"><span style="width:'+(workMin/Math.max(1, workMin + otherMin)*100).toFixed(1)+'%"></span></div>'+
+      '<div class="rcx-split-k"><span><i class="is-work"></i>'+fmtDurationLabel(workMin)+' on work apps</span><span><i class="is-other"></i>'+fmtDurationLabel(otherMin)+' on everything else</span>'+(breaks.length ? '<span>&#9749; '+breaks.length+' break'+(breaks.length===1 ? '' : 's')+'</span>' : '')+
+        (dist ? '<span class="is-bad">'+fmtDurationLabel(dist)+' on not-work sites while locked in (not counted)</span>' : '')+'</div></div>' : '')+
+    (apps.length ? '<div class="rc-apps">'+apps.slice(0, 6).map(function(a){ const c = activityCategory(a.app); return '<span class="rc-app"><span class="wa-dot" style="background:'+CAT_META[c].color+'"></span>'+escapeHtml(a.app)+'<span class="kpi-sub">'+fmtDurationLabel(a.minutes)+'</span></span>'; }).join('')+'</div>' : '')+
+    '<div class="rcx-sh"><span>Sessions</span>'+(sessions.length ? '<em>'+Object.keys(byCount).map(function(k){ return byCount[k]+' '+({you:'by you', auto:'auto', op:'by Op', opscreen:'from Op’s screen', bar:'from the Op bar', stuck:'after Op’s nudge', manual:'by hand'})[k]; }).join(' &middot; ')+'</em>' : '')+(pending ? '<b>'+pending+' to check</b>' : '')+'</div>'+
+    (sessions.length ? '<div class="rc-sessions rcx-list">'+sessions.map(recapSessionRow).join('')+'</div>' : '<div class="rcx-empty">No locked-in sessions this day.</div>')+
+    '<div class="rcx-foot"><button class="btn btn-ghost btn-sm" data-action="goToActivitySettings">Sort work apps</button>'+
+      (pending ? '<button class="btn btn-good" data-action="recapApproveAll">&#10003; Keep all &amp; close</button>' : '<button class="btn btn-primary" data-action="closeDayRecap">Done</button>')+'</div>'+
+  '</div>';
+};
+// the timeline's blocks take the color of who started them
+recapTimelineHtml = (function(base){
+  return function(date, sessions){
+    let h = base.apply(this, arguments);
+    sessions.forEach(function(s){
+      const o = LOCK_ORIGIN[sessionOrigin(s)] || LOCK_ORIGIN.you, t = fmt12Hour(nowHM(new Date(s.startedAt)))+'–'+fmt12Hour(nowHM(new Date(s.endedAt)));
+      h = h.replace('class="rc-blk'+(s.auto ? ' is-auto' : '')+(s.auto && !s.reviewed ? ' is-pending' : '')+'" style="', 'class="rc-blk rcx-'+o.cls+(s.auto ? ' is-auto' : '')+(s.auto && !s.reviewed ? ' is-pending' : '')+'" data-by="'+o.label.replace(/"/g, '')+'" style="').replace('title="'+t+'"', 'title="'+t+' · '+o.label.replace(/"/g, '')+'"');
+    });
+    return h;
+  };
+})(recapTimelineHtml);
+
+// ---- Op's color: yours to pick ----
+// Settings → Op: his color (white by default, a few others, or any color you like), and whether his
+// moods still tint him (yellow when he's worried, red when he's stern…). He can change it too: "go blue".
+const OP_COLORS = [['#ffffff', 'White'], ['#9fd8ff', 'Ice'], ['#7aa2ff', 'Blue'], ['#b18cff', 'Violet'], ['#6ff0c0', 'Mint'], ['#ffd27a', 'Gold'], ['#ff9ec4', 'Rose']];
+function opColor(){ const c = String(state.profile.opColor || '#ffffff'); return /^#[0-9a-f]{6}$/i.test(c) ? c.toLowerCase() : '#ffffff'; }
+function opColorVars(hex){
+  const n = parseInt(hex.slice(1), 16), r = n >> 16 & 255, g = n >> 8 & 255, b = n & 255;
+  const ink = 'rgb('+Math.round(r*.42)+','+Math.round(g*.42)+','+Math.round(b*.42)+')';
+  return '--op-c:'+hex+'; --op-glow:rgba('+r+','+g+','+b+',.8); --op-glow2:rgba('+r+','+g+','+b+',.36); --op-ink:'+(hex==='#ffffff' ? '#5a6170' : ink)+';';
+}
+function opColorApply(){
+  let el = document.getElementById('opColorCss');
+  if(!el){ el = document.createElement('style'); el.id = 'opColorCss'; document.head.appendChild(el); }
+  const c = opColor(), moods = state.profile.opMoodColors!==false;
+  const css = (c==='#ffffff' ? '' : ':root:not([data-op-mood]){ '+opColorVars(c)+' }')+(moods ? '' : ':root[data-op-mood]{ '+opColorVars(c).replace(/;/g, ' !important;')+' }');
+  if(el.textContent!==css) el.textContent = css;
+}
+afterRenderHooks.push(opColorApply);
+setTimeout(function(){ try{ opColorApply(); }catch(e){} }, 0);
+opSettingsHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), c = opColor(), custom = !OP_COLORS.some(function(x){ return x[0]===c; });
+    const block = '<div class="field op-set op-col"><label>Op’s color</label><div class="opc-row">'+
+      OP_COLORS.map(function(x){ return '<button class="opc-sw'+(x[0]===c ? ' is-on' : '')+'" data-action="opColorSet" data-id="'+x[0]+'" title="'+x[1]+'" style="--sw:'+x[0]+'"><i></i><span>'+x[1]+'</span></button>'; }).join('')+
+      '<label class="opc-sw is-custom'+(custom ? ' is-on' : '')+'" title="Any color" style="--sw:'+(custom ? c : '#888888')+'"><i></i><span>Yours</span><input type="color" id="opColorPick" value="'+c+'"></label></div>'+
+      '<label class="opc-mood"><input type="checkbox" id="opMoodColors"'+(state.profile.opMoodColors!==false ? ' checked' : '')+'> His moods still tint him (yellow when he’s worried, red when he’s stern, and so on)</label></div>';
+    return h.replace(/(<div class="field op-set"><label>Personality)/, block+'$1');
+  };
+})(opSettingsHtml);
+ACTIONS.opColorSet = function(el, e, id){ state.profile.opColor = id; persist('profile'); opColorApply(); playTick(); renderView(); if(typeof opLightPulse==='function') try{ opLightPulse(); }catch(x){} };
+document.addEventListener('input', function(e){ if(e.target && e.target.id==='opColorPick'){ state.profile.opColor = e.target.value; opColorApply(); } });
+document.addEventListener('change', function(e){
+  if(e.target && e.target.id==='opColorPick'){ state.profile.opColor = e.target.value; persist('profile'); opColorApply(); renderView(); }
+  if(e.target && e.target.id==='opMoodColors'){ state.profile.opMoodColors = e.target.checked; persist('profile'); opColorApply(); }
+});
+OP_TOOLS.push({name:'set_my_color', description:'Change your own light’s color when he asks (e.g. "go blue", "be white again"). Use a 6-digit hex color.', input_schema:{type:'object', properties:{hex:{type:'string', description:'#rrggbb'}}, required:['hex']}});
+opRunTool = (function(base){
+  return function(name, x){
+    if(name!=='set_my_color') return base.apply(this, arguments);
+    const h = String(x && x.hex || '').trim(); if(!/^#[0-9a-f]{6}$/i.test(h)) throw new Error('hex must look like #7aa2ff');
+    state.profile.opColor = h.toLowerCase(); persist('profile'); opColorApply(); return 'color set to '+h;
+  };
+})(opRunTool);
+
+// ---- the Cockpit's day panel, redone ----
+// One card the height of the timer: today's deep work as a ring with what's left, three tiles (tasks,
+// streak, the week), the week as bars, and what's next on the calendar.
+function cockpitDayHtml(){
+  const dw = deepWorkMinutesTodayLive(), target = state.standards.deepWorkTargetMinutes || 180, f = Math.min(1, dw/target);
+  const w = weekWork(), top = Math.max(target, ...w.days.map(function(x){ return x.m || 0; }));
+  const open = state.tasks.items.filter(taskOpenToday).length, done = state.tasks.items.filter(taskDoneToday).length;
+  const streak = computeStreak();
+  const ev = arr(state.calendar.events).filter(function(e){ return e.date===todayStr() && e.time && e.time > nowHM(); }).sort(function(a, b){ return a.time.localeCompare(b.time); })[0];
+  const C = 2*Math.PI*44;
+  return '<div class="ckp-day ckd">'+
+    '<div class="ckd-h"><span>Your day</span><em>'+new Date().toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+'</em></div>'+
+    '<div class="ckd-ring"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" class="ckd-tr"/><circle cx="50" cy="50" r="44" class="ckd-ar'+(f >= 1 ? ' is-hit' : '')+'" stroke-dasharray="'+(C*f).toFixed(1)+' '+C.toFixed(1)+'"/></svg>'+
+      '<div class="ckd-ring-in"><b>'+fmtDurationLabel(dw)+'</b><span>of '+fmtDurationLabel(target)+'</span></div>'+
+      '<div class="ckd-ring-k"><b>Deep work</b><span>'+(f >= 1 ? 'Target hit. The rest is a bonus.' : fmtDurationLabel(target - dw)+' to go')+'</span></div></div>'+
+    '<div class="ckd-tiles">'+
+      '<div class="ckd-t"><b>'+done+'<small>/'+(done + open)+'</small></b><span>tasks</span></div>'+
+      '<div class="ckd-t'+(streak ? ' is-hot' : '')+'"><b>&#128293; '+streak+'</b><span>day streak</span></div>'+
+      '<div class="ckd-t"><b>'+fmtDurationLabel(w.total)+'</b><span>this week</span></div>'+
+    '</div>'+
+    '<div class="ckd-week">'+w.days.map(function(x){
+      const h = x.m ? Math.max(6, x.m/top*100) : 0;
+      return '<div class="ckd-d'+(x.today ? ' is-today' : '')+(x.m!=null && x.m >= target ? ' is-hit' : '')+(x.future ? ' is-future' : '')+'" title="'+weekdayShort(x.d)+(x.m!=null ? ': '+fmtDurationLabel(x.m) : '')+'"><i><u style="height:'+h.toFixed(1)+'%"></u></i><span>'+weekdayShort(x.d).slice(0, 1)+'</span></div>';
+    }).join('')+'<em class="ckd-goal" style="bottom:calc('+(target/top*100).toFixed(1)+'% * .78 + 20px)"></em></div>'+
+    (ev ? '<div class="ckd-next"><span>&#128197;</span><div><b>'+escapeHtml(ev.title)+'</b><small>'+fmt12Hour(ev.time)+'</small></div></div>' : '')+
+  '</div>';
+}
+cockpitHtml = (function(base){
+  return function(){ return base.apply(this, arguments).replace(/<div class="ckp-day">[\s\S]*<\/div><\/div>$/, cockpitDayHtml()+'</div>'); };
+})(cockpitHtml);

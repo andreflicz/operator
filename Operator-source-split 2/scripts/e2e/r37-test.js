@@ -93,6 +93,24 @@ const CORS = {'Access-Control-Allow-Origin':'*'};
     await p.context().close();
   }
 
+  // ---- the recap: who started each lock-in ----
+  {
+    const p = await newPage(b, OUT+'/r37.html', {profile:{name:'Andre'}, tasks:{items:[{id:'t1', title:'Edit reel', status:'today'}]}}, T);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    const end = "state.focus.activeSession.startedAt -= 30*60000; lockOriginSync(); autoEndFocusSession(Date.now()); state.focus.lastManualStopAt = null";
+    await E("startFocus(null)"); await p.waitForTimeout(100); await E(end);
+    await E("opRunTool('lock_in', {})"); await p.waitForTimeout(100); await E(end);
+    await E("ACTIONS.pillLockNow()"); await p.waitForTimeout(100); await E(end);
+    await E("startFocus(null); state.focus.activeSession.autoStarted = true; state.focus.activeSession.autoApp = 'Final Cut Pro'"); await p.waitForTimeout(100); await E(end);
+    await E("openDayRecap(todayStr())"); await p.waitForTimeout(400);
+    const by = await p.$$eval('.rcx-row .rcx-by', e => e.map(x => x.textContent.trim()));
+    check('the recap says who started each lock-in (not "you" for all)', by.some(t => /^\W*You$/.test(t)) && by.some(t => /Op locked you in/.test(t)) && by.some(t => /Op bar/.test(t)) && by.some(t => /Auto · Final Cut Pro/.test(t)), by);
+    check('…counts them by who', /by you/.test(await p.textContent('.rcx-sh')) && /by Op/.test(await p.textContent('.rcx-sh')));
+    check('…and the timeline blocks say it too', (await p.$$('.rc-blk[data-by]')).length===4);
+    check('no page errors (recap)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
   // ---- Calendar, Standing, voice profiles, Good morning's quote ----
   {
     const p = await newPage(b, OUT+'/r37.html', {profile:{name:'Andre'}, tasks:{items:[{id:'t1', title:'Edit reel', status:'today', deadline:'2026-10-15'}]}}, T);
@@ -106,6 +124,19 @@ const CORS = {'Access-Control-Allow-Origin':'*'};
     check('…and it shows on hover', await p.isVisible('.oa-stand .osp'));
     await E("document.getElementById('opFull') && ACTIONS.opfClose ? ACTIONS.opfClose() : null");
     await E("wakeCfg().voiceEngine='eleven'; wakeCfg().elevenVoice='21m00Tcm4TlvDq8ikWAM'; wakeCfg().voiceSpeed=1.1; ui.view='settings'; ui.settingsTab='connections'; renderView()"); await p.waitForTimeout(300);
+    // Op's color
+    const opc = () => p.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--op-c').replace(/\s/g, '').toLowerCase());
+    // (the color fades in, so allow a few points either way)
+    const near = (v, rgb) => { const m = /rgb\((\d+),(\d+),(\d+)/.exec(v); if(!m) return false; return [1, 2, 3].every(i => Math.abs(+m[i] - rgb[i-1]) <= 8); };
+    await E("ACTIONS.opColorSet(null, null, '#7aa2ff')"); await p.waitForTimeout(1200);
+    check('Op’s color: pick one and his light takes it', near(await opc(), [122, 162, 255]) && /op-col/.test(await E("opSettingsHtml()")), await opc());
+    await E("opMood('stern', 60000)"); await p.waitForTimeout(1200);
+    const stern = await opc();
+    await E("state.profile.opMoodColors = false; opColorApply()"); await p.waitForTimeout(1200);
+    const still = await opc();
+    check('…his moods still tint him, unless you turn that off', near(stern, [255, 98, 98]) && near(still, [122, 162, 255]), [stern, still]);
+    check('…and he can change it when you ask', /color set/.test(await E("opRunTool('set_my_color', {hex:'#6ff0c0'})")) && await E("state.profile.opColor")==='#6ff0c0');
+    await E("opMood('neutral'); state.profile.opMoodColors = true; ACTIONS.opColorSet(null, null, '#ffffff')");
     check('voice: more ElevenLabs voices to pick', await E("ELEVEN_VOICES.length") >= 12);
     const has = await E("opVoiceSettingsHtml().indexOf('vp-add') >= 0");
     check('voice profiles: save the voice under a name', has);
@@ -119,7 +150,7 @@ const CORS = {'Access-Control-Allow-Origin':'*'};
     const q0 = await p.textContent('.qt[data-q="morning"] blockquote');
     check('Good morning: the quote’s button is a ring by its corner, always there', await p.isVisible('.qt[data-q="morning"] .qt-next'));
     check('…and the Op bar steps aside', !(await p.isVisible('#activityPill')));
-    await p.mouse.move(5, 5); await p.clock.runFor(24000); await p.waitForTimeout(500);
+    await p.mouse.move(5, 5); await p.clock.runFor(32000); await p.waitForTimeout(500);
     check('…the quote turns over every 20 seconds on its own', (await p.textContent('.qt[data-q="morning"] blockquote'))!==q0);
     check('no page errors (round 37)', p.errors.length===0, p.errors);
     await p.context().close();
