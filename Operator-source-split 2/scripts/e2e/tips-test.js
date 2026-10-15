@@ -40,7 +40,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   // ---- Focus: sub-tabs on the Tasks/Analytics line, tasks up front ----
   const line = await p.evaluate(() => { const tabs = document.querySelector('#viewRoot .tabs'); const r = tabs.getBoundingClientRect(); const pills = [...tabs.querySelectorAll('.subtab')]; return {n:pills.length, inside:pills.every(x => { const q = x.getBoundingClientRect(); return q.top>=r.top-1 && q.bottom<=r.bottom+1; }), stray:document.querySelectorAll('#viewRoot .subtab-panel > .subtabs, #viewRoot .tab-panel > .subtabs').length}; });
-  check('Overview / Backlog / Content / Training Skills / Finished sit on the Tasks · Analytics line', line.n===5 && line.inside && !line.stray, line);
+  check('Overview / Backlog / Client backlog / Content / Training Skills / Finished sit on the Tasks · Analytics line', line.n===6 && line.inside && !line.stray, line);
   const cur = await rect('.nn-panel'), tabs = await rect('#viewRoot .tabs');
   check('the Now / Up next box comes right after the tabs', cur && tabs && cur.t - tabs.b < 40, {cur, tabs});
   check('no Select Multiple button — highlighting picks tasks', !(await p.$('[data-action="toggleTaskSelectMode"]')));
