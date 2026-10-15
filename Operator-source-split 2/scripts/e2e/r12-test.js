@@ -129,7 +129,7 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     check('the sidebar says Social and it opens on the stats', /Social/.test(await p.textContent('#sidebarNav [data-view="convos"]')) && await E("inboxState().mode")==='social');
     const soc = await p.textContent('#viewRoot');
     // (round 23: Social shows your numbers from Metricool, a CSV or Meta; GoHighLevel's aren't used)
-    check('Social: your numbers from Metricool, a CSV or Meta', /Metricool/.test(soc) && /Import a CSV/.test(soc));
+    check('Social: your numbers from Apify, a CSV or Meta (r38i)', /Apify/.test(soc) && /Import a CSV/.test(soc));
     await p.click('.quick-journal-fab', {force:true}); await p.waitForTimeout(300);
     check('quick note pops up from the corner, focused', await p.isVisible('.qj3') && await p.evaluate(() => document.activeElement && document.activeElement.id==='quickJournalModalText'));
     await p.keyboard.type('Big win today'); await p.keyboard.press('Meta+Enter'); await p.waitForTimeout(300);

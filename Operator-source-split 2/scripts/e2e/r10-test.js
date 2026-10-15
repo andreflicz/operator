@@ -148,6 +148,8 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     await p.keyboard.press('l'); await p.waitForTimeout(150);
     check('next time it remembers your length', await E("ui.lockSeq.minutes")===40);
     await p.click('#lockSeqOverlay [data-action="lockNow"]'); await p.waitForTimeout(1700);
+    for(let i = 0; i < 8 && !(await E("!!state.focus.activeSession")); i++) await p.waitForTimeout(500);   // (the start animation can run long on a busy machine)
+    await p.waitForTimeout(300);
     check('the corner Lock in starts straight from step 1', await E("!!state.focus.activeSession && state.focus.activeSession.plannedMinutes===40") && !(await p.isVisible('#lockSeqOverlay:not(.hidden)')));
     check('no errors (lock in)', !p.errors.length, p.errors);
     await p.context().close();
@@ -226,7 +228,7 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     await p.click('[data-action="inboxMode"][data-id="social"]'); await p.waitForTimeout(900);
     const soc = await p.textContent('#viewRoot');
     // (round 23: GoHighLevel's social numbers aren't used; Metricool, a CSV or Meta instead)
-    check('Social tab: no GoHighLevel numbers, your own sources instead', !/30,410/.test(soc) && /Metricool/.test(soc));
+    check('Social tab: no GoHighLevel numbers, your own sources instead', !/30,410/.test(soc) && /Apify/.test(soc));
     await E("ui.socRole='business'; socImportCsv('Publish time,Description,Likes,Comments,Followers\\n2026-10-08T12:00,A reel,90,7,4382', 'x.csv')"); await p.waitForTimeout(300);
     await E("ui.view='focus'; ui.focusMainTab='tasks'; renderView()"); await p.waitForTimeout(300);
     check('Social isn\'t on Focus → Tasks any more', !(await p.isVisible('.social-panel')));

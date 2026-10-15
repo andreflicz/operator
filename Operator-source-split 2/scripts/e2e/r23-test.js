@@ -207,7 +207,7 @@ async function ctxPage(b, seed, opts){
     check('Op knows the spending', /Spending this month/.test(await E("aiContext()")));
     check('no long dashes in Expenses', !/—/.test(await p.textContent('.ex')));
     await E("ui.view='convos'; renderView()"); await p.waitForTimeout(200);
-    check('social numbers: Metricool or a CSV, not GoHighLevel', await E("/Metricool/.test(igSectionHtml()) && /Import a CSV/.test(igSectionHtml()) && !/Social Planner/.test(igSectionHtml())"));
+    check('social numbers: Metricool or a CSV, not GoHighLevel', await E("/Apify/.test(igSectionHtml()) && /Import a CSV/.test(igSectionHtml()) && !/Social Planner/.test(igSectionHtml())"));
     check('no page errors (expenses)', p.errors.length===0, p.errors);
     await p.context().close();
   }
@@ -235,14 +235,14 @@ async function ctxPage(b, seed, opts){
     const p = await ctxPage(b, {profile:{name:'Andre'}}, {clock:WED});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("ui.view='convos'; renderView()"); await p.waitForTimeout(200);
-    check('Social offers Metricool, a CSV, or Meta directly (no GoHighLevel numbers)', await p.isVisible('.soc-connect') && /Metricool/.test(await p.textContent('.soc-connect')) && /Import a CSV/.test(await p.textContent('.soc-connect')) && !/Connect GoHighLevel/.test(await p.textContent('#viewRoot')));
+    check('Social offers Apify, a CSV, or Meta directly (no GoHighLevel numbers)', await p.isVisible('.soc-connect') && /Apify/.test(await p.textContent('.soc-connect')) && /Import a CSV/.test(await p.textContent('.soc-connect')) && !/Connect GoHighLevel/.test(await p.textContent('#viewRoot')));
     const csv = 'Publish time,Description,Permalink,Post type,Reach,Likes,Comments,Followers\n2026-10-12T15:00,First reel,https://x/1,Reel,1500,120,9,4200\n2026-10-13T15:00,"Second, with a comma",https://x/2,Reel,1800,150,12,4210';
     await E("ui.socRole='personal'; socImportCsv("+JSON.stringify(csv)+", 'export.csv')"); await p.waitForTimeout(400);
     check('a CSV export comes in: posts, likes, followers', await E("igCfg().cache.data['csv-personal'].posts.length")===2 && await E("igCfg().cache.data['csv-personal'].followers")===4210 && /Second, with a comma/.test(await E("igCfg().cache.data['csv-personal'].posts[0].cap")));
     check('…counts as personal content on your card, and followers for XP', await E("igPostsByRole('personal')")===2 && await E("xpFollowersNow()")===4210);
-    await E("ui.socAdd = true; ui.socShow='mc'; ui.socRole='business'; renderView()"); await p.waitForTimeout(200);
-    await p.fill('#mcToken', 'tok123'); await p.fill('#mcUser', '456'); await p.fill('#mcBlog', '123'); await p.click('[data-action="mcConnect"]'); await p.waitForTimeout(800);
-    check('Metricool: the token goes to the Operator app, the posts come in', p.calls.some(c => /\/mc\/key\?t=.*&u=456&b=123/.test(c)) && await E("igCfg().cache.data['metricool'].posts.length")===3 && !(await E("JSON.stringify(state)")).includes('tok123'));
+    // (r38i: Metricool left the connect panel; one you already connected keeps working)
+    await E("igCfg().accounts.push({id:'metricool', src:'metricool', role:'business', username:'Instagram'}); ui.igTried=0; igRefresh(true)"); await p.waitForTimeout(800);
+    check('an existing Metricool connection still brings its posts in', await E("igCfg().cache.data['metricool'].posts.length")===3);
     // a big one tracked live: followers
     await E("ui.view='personal'; ui.personalTab='goals'; renderView(); ui.gsTrack='followers'; openGoalSheet('long')"); await p.waitForTimeout(200);
     check('a new long-term goal can be tracked live (followers, weight, MRR…)', (await p.$$('.gs-trk button')).length===7 && /4,210 followers/.test(await p.textContent('.gs-now')));
