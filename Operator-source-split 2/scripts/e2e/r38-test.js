@@ -281,6 +281,55 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.context().close();
   }
 
+  // ---- round 38i: Apify for social numbers; the guide; the You card ----
+  {
+    const p = await newPage(b, OUT+'/r38.html', {profile:{name:'Andre', businessName:'Flicz Media'}}, T);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    const asked = [];
+    const J = (r, o, st) => r.fulfill({status:st || 200, body:JSON.stringify(o), headers:{'Access-Control-Allow-Origin':'*'}});
+    await p.route('http://127.0.0.1:8935/**', r => {
+      const u = new URL(r.request().url()); asked.push(u.pathname+u.search);
+      if(u.pathname==='/ap/key') return J(r, {ok:true});
+      if(u.pathname==='/ap/status') return J(r, {ok:true, hasKey:true});
+      if(u.pathname==='/ap/start') return J(r, {data:{id:'RUN1', status:'READY', defaultDatasetId:'DS1'}}, 201);
+      if(u.pathname==='/ap/run') return J(r, {data:{id:'RUN1', status:'SUCCEEDED', defaultDatasetId:'DS1'}});
+      if(u.pathname==='/ap/items') return J(r, [{username:'flicz.media', followersCount:1234, postsCount:80, profilePicUrl:'',
+        latestPosts:[{id:'p1', shortCode:'AAA', caption:'Reel one', type:'Video', productType:'clips', likesCount:120, commentsCount:9, videoPlayCount:5400, timestamp:'2026-10-12T15:00:00.000Z', url:'https://www.instagram.com/p/AAA/'},
+                     {id:'p2', shortCode:'BBB', caption:'A photo', type:'Image', likesCount:40, commentsCount:2, timestamp:'2026-10-09T15:00:00.000Z'}]}]);
+      return J(r, {ok:true});
+    });
+    await p.waitForTimeout(1200);
+    await E("ui.socShow='ap'; ui.socRole='business'; const d = document.createElement('div'); d.id='apT'; d.innerHTML = socialConnectHtml(); document.body.appendChild(d)");
+    check('Social: Apify replaces Metricool (CSV and Meta still there)', /Apify/.test(await p.textContent('#apT')) && !/Metricool/.test(await p.textContent('#apT')) && /Import a CSV/.test(await p.textContent('#apT')) && /Meta directly/.test(await p.textContent('#apT')));
+    await p.fill('#apT #apHandle', 'https://www.instagram.com/flicz.media/'); await p.fill('#apT #apToken', 'apify_api_TEST123');
+    await E("ACTIONS.apConnect()"); await p.waitForTimeout(7500);
+    check('…the token goes to the Operator app only (never into the app’s data)', asked.some(a => a.startsWith('/ap/key?t=')) && !/apify_api_TEST123/.test(await E("JSON.stringify(state)")));
+    check('…it starts a run for the handle (from a pasted link), checks on it and reads the results', asked.some(a => a==='/ap/start?u=flicz.media') && asked.some(a => a.startsWith('/ap/run?r=RUN1')) && asked.some(a => a==='/ap/items?d=DS1'), asked);
+    check('…followers and posts land where the rest of the app reads them', await E("igFollowersTotal()")===1234 && await E("igCfg().cache.data['apify-flicz.media'].posts.length")===2 && await E("igCfg().cache.data['apify-flicz.media'].posts[0].views")===5400);
+    const n0 = asked.filter(a => a.startsWith('/ap/start')).length;
+    await E("ui.igTried=0; igRefresh(true)"); await p.waitForTimeout(500);
+    check('…a refresh within 12 hours doesn’t spend another run', asked.filter(a => a.startsWith('/ap/start')).length===n0);
+    await E("document.getElementById('apT').innerHTML = socialSourcesHtml()");
+    check('…its row: Apify, the handle, when it was checked, Refresh now', /Apify · @flicz\.media/.test(await p.textContent('#apT')) && /checked just now/.test(await p.textContent('#apT')) && !!(await p.$('#apT [data-action="apRefresh"]')));
+    // the guide
+    await E("ACTIONS.openXpHow()"); await p.waitForTimeout(300);
+    check('the XP guide: Discipline has all four (Standing too), client deliverable tasks and the Log center', /Standing/.test(await p.textContent('.xph-rates')) && /16 Reels 1\/4/.test(await p.textContent('#xpHowContent')) && /Log center/.test(await p.textContent('#xpHowContent')));
+    await E("ACTIONS.closeXpHow && ACTIONS.closeXpHow()");
+    // a missed deliverable week pays nothing and isn't on time
+    await E("state.tasks.items.push({id:'mx', title:'Missed', status:'done', completedAt:'2026-10-10', deadline:'2026-10-10', missed:true, client:'personal', priority:'med', createdAt:'2026-10-01'}); xpCache && (xpCache.days = {})");
+    check('a deliverable week that ran out unfinished doesn’t count as done', await E("xpCtx ? (function(){ const c = xpCtx(); return !(c.doneOn && c.doneOn['2026-10-10'] && c.doneOn['2026-10-10'].tasks); })() : true"));
+    // the You card
+    await E("ui.view='personal'; ui.personalTab='you'; ui.ycFlip=false; renderView()"); await p.waitForTimeout(300);
+    const bb = await (await p.$('.ycf')).boundingBox();
+    await p.mouse.move(bb.x + bb.width/2, bb.y + bb.height/2); await p.waitForTimeout(350);
+    const tf = await p.evaluate(() => [getComputedStyle(document.querySelector('.ycf-in > .pc:first-child')).transform, getComputedStyle(document.querySelector('.ycf-back')).transform]);
+    check('Personal → You: hovering the card lifts it without twisting the faces', tf[0]==='none' && /matrix3d/.test(tf[1]), tf);
+    await p.mouse.click(bb.x + bb.width/2, bb.y + bb.height/2); await p.waitForTimeout(800);
+    check('…a click turns it over (only the back shows)', await E("document.querySelector('.ycf').classList.contains('is-flipped')") && await p.evaluate(() => getComputedStyle(document.querySelector('.ycf-in > .pc:first-child')).visibility==='hidden' && getComputedStyle(document.querySelector('.ycf-back')).visibility==='visible'));
+    check('no page errors (round 38i)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
   await b.close();
   process.exit(report() ? 1 : 0);
 })();

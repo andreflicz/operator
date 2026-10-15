@@ -7212,3 +7212,19 @@ label:has(> #newDeliverableLinkTask){ display:none !important; }
 .ls .wd-steps{ position:absolute !important; left:50%; top:22px; transform:translateX(-50%); margin:0 !important; padding-left:0 !important; }
 body:has(#lockSeqOverlay:not(.hidden)) #activityPill{ opacity:0 !important; pointer-events:none !important; }
 @media (max-width:1180px){ .ls .wd-steps{ position:static !important; transform:none; margin:0 auto !important; } }
+
+/* ===== R38i: the You card turns cleanly (the card's own hover tilt no longer fights the flip) ===== */
+.ycf{ cursor:pointer; }
+.ycf .ycf-in > .pc, .ycf .ycf-in > .pc:hover{ transform:none !important; transition:box-shadow .25s, visibility 0s linear .3s; }
+.ycf .ycf-in > .ycf-back, .ycf .ycf-in > .ycf-back:hover{ transform:rotateY(180deg) !important; }
+.ycf .ycf-in > .pc *{ backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+/* only the face you're looking at is there (no shine or text bleeding through mid-turn) */
+.ycf:not(.is-flipped) .ycf-in > .ycf-back, .ycf.is-flipped .ycf-in > .pc:first-child{ visibility:hidden; }
+.ycf-in{ transition:transform .6s cubic-bezier(.2,.8,.2,1); will-change:transform; }
+.ycf:hover .ycf-in{ transform:translateY(-3px); }
+.ycf.is-flipped .ycf-in, .ycf.is-flipped:hover .ycf-in{ transform:rotateY(180deg) translateY(-3px); }
+.ycf.is-flipped:not(:hover) .ycf-in{ transform:rotateY(180deg); }
+.ycf:hover .ycf-in > .pc{ box-shadow:0 20px 44px rgba(0,0,0,.5), 0 0 26px color-mix(in srgb, var(--rc) 30%, transparent), inset 0 1px 0 rgba(255,255,255,.16); }
+/* social: Apify */
+.soc-free{ font-style:normal; font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:1px 6px; margin-left:6px; border-radius:999px; background:rgba(63,190,142,.16); color:#3FBE8E; vertical-align:middle; }
+.soc-when{ font-size:11px; color:var(--text-faint); margin-left:6px; font-weight:400; }

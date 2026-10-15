@@ -152,7 +152,7 @@ function goalXpOf(g){
 function xpFollowersNow(){
   try{
     let total = 0, any = false;
-    // (from Metricool, an imported file or Meta; GoHighLevel's numbers aren't used)
+    // (from Apify, an imported file or Meta; GoHighLevel's numbers aren't used)
     if(typeof igFollowersTotal==='function'){ const ig = igFollowersTotal(); if(ig!=null){ total = Math.max(total, ig); any = true; } }
     return any ? total : null;
   }catch(e){ return null; }
@@ -195,7 +195,7 @@ function xpDay(d, ctx){
 }
 function xpCtx(){
   const doneOn = {};
-  state.tasks.items.forEach(function(t){ if(t.status!=='done' || !t.completedAt) return; const o = doneOn[t.completedAt] = doneOn[t.completedAt] || {tasks:0, videos:0}; if(t.isVideoIdea) o.videos++; else o.tasks++; });
+  state.tasks.items.forEach(function(t){ if(t.status!=='done' || !t.completedAt || t.missed) return; const o = doneOn[t.completedAt] = doneOn[t.completedAt] || {tasks:0, videos:0}; if(t.isVideoIdea) o.videos++; else o.tasks++; });
   const gym = arr(state.health.gymLog).map(function(g){ return g.date; }).filter(Boolean).sort();
   const gymSet = {}, workoutIndex = {}, workoutWeekIndex = {};
   gym.forEach(function(d){ gymSet[d] = true; });
@@ -450,13 +450,13 @@ function xpAttributes(ctx){
   // discipline: keeping your word
   const streak = computeStreak();
   const due = tasks.filter(function(t){ return t.deadline && t.deadline < today && t.deadline >= addDays(today, -30); });
-  const onTime = due.filter(function(t){ return t.status==='done' && t.completedAt && t.completedAt <= t.deadline; }).length;
+  const onTime = due.filter(function(t){ return t.status==='done' && !t.missed && t.completedAt && t.completedAt <= t.deadline; }).length;
   const cs2 = consistencyStats(ctx);
   // action: doing what you said you'd do. Tasks and video ideas finished in the last 30 days, against what's
   // sitting on the list, and nothing left to rot (a task open more than two weeks, a video idea more than three)
   const act = (function(){
     const items = tasks.filter(function(t){ return !t.ongoing && !t.skill; });
-    const done30 = items.filter(function(t){ return t.status==='done' && within(t.completedAt, 30); }).length;
+    const done30 = items.filter(function(t){ return t.status==='done' && !t.missed && within(t.completedAt, 30); }).length;
     const open = items.filter(function(t){ return t.status!=='done'; });
     const rot = open.filter(function(t){ return t.createdAt && t.createdAt <= addDays(today, t.isVideoIdea ? -21 : -14); }).length;
     if(done30 + open.length < 3) return null;
@@ -777,15 +777,15 @@ ACTIONS.openXpHow = function(){
     '<div class="xpg-sec">Where XP comes from</div>'+
     '<div class="xpg-grid">'+
       '<div class="xpg-card"><h3>Deep work</h3><p>Eight hours a day is the gold standard: treat it like a 9 to 5. Every hour pays more than the one before it, so the back half of a long day is where the XP is. Past your own normal ('+fmtHours(std || st.deepWorkTargetMinutes || 180)+' a day lately) each hour pays 8 extra. Six hours pays a +'+XP_RATES.longDay+' bonus, the full eight +'+XP_RATES.goldDay+'.</p>'+xpgBars(hourXp, [1,2,3,4,5,6,7,8,9,10].map(function(h){ return h+'h'; }), '#8fd3ff', 'XP for a whole day of that much locked-in work (before the bonus for going past your normal).')+'</div>'+
-      '<div class="xpg-card"><h3>Finishing tasks</h3><p>The more you get done in a day, the more each one pays: the first is worth 5, the tenth 23, and they top out at 25 each. Up to '+XP_RATES.taskMax+' a day count.</p>'+xpgBars(taskXp, taskXp.map(function(_, i){ return '#'+(i+1); }), '#ffc56b', 'Ten tasks in a day: '+xpTasks(10)+' XP. Twenty: '+xpTasks(20)+'. Each content video finished: +'+XP_RATES.video+'.')+'</div>'+
+      '<div class="xpg-card"><h3>Finishing tasks</h3><p>The more you get done in a day, the more each one pays: the first is worth 5, the tenth 23, and they top out at 25 each. Up to '+XP_RATES.taskMax+' a day count. Client deliverable tasks count like any other: “16 Reels 1/4” done is one task (and its reels land on the client’s card). A deliverable week that runs out unfinished pays nothing.</p>'+xpgBars(taskXp, taskXp.map(function(_, i){ return '#'+(i+1); }), '#ffc56b', 'Ten tasks in a day: '+xpTasks(10)+' XP. Twenty: '+xpTasks(20)+'. Each content video finished: +'+XP_RATES.video+'.')+'</div>'+
       '<div class="xpg-card"><h3>Workouts</h3><p>Your first five ever pay big to get you going. After that the first one each week pays the most, and every one still counts.</p>'+xpgBars([150, 70, 60, 50, 25], ['first 5', '1st a week', '2nd', '3rd', '4th+'], '#7ef0c0')+'</div>'+
       '<div class="xpg-card"><h3>Strong days in a row</h3><p>Every day in the last week you hit your deep work target ('+fmtHours(st.deepWorkTargetMinutes||180)+') makes the whole day pay more. Two strong days starts it.</p>'+xpgBars([0,1,2,3,4,5,6,7].map(function(n){ return n < 2 ? 1 : +(1 + .04*n).toFixed(2); }), [0,1,2,3,4,5,6,7].map(String), '#c3a6ff', 'Seven strong days: every XP that day is worth 1.28 times as much.')+'</div>'+
       '<div class="xpg-card is-wide"><h3>Goals: the week, the month, the big ones</h3><p>Check in at the start of the week and the month (the Calendar asks), tick the goals off as you go, then check out at the end. Every goal is worth what it takes: when you add one, Op sizes it up and sets its XP (a weekly goal 75 to 300, a monthly one 250 to 1,000, your own long-term goals 200 to 10,000). Master goals scale with how big they are: 150 XP for every pound you set out to lose, 600 for every $1k of MRR growth, 100 for every day of a streak. Losing 50 pounds is 7,500 XP.</p>'+
         xpgBars([CHECKIN_XP.weekGoal, CHECKIN_XP.monthGoal, CHECKIN_XP.habit, masterXpFor('mrr', 0, 10000), masterXpFor('weight', 50, 0)], ['weekly goal', 'monthly goal', 'habit beaten', '$10k MRR more', 'lose 50 lb'], '#7ef0c0',
-          'Typical values. Up to three weekly and three monthly goals pay each time. Checking in and out pays +'+CHECKIN_XP.weekIn+' and +'+CHECKIN_XP.weekOut+' a week, +'+CHECKIN_XP.monthIn+' and +'+CHECKIN_XP.monthOut+' a month. Every finished week you hit a weekly ring (workouts or deep work) pays +'+MASTER_XP.weekly+'. Master goals (MRR, weight, streak) pay again when you raise the bar.')+'</div>'+
+          'Typical values. Up to three weekly and three monthly goals pay each time. Checking in and out pays +'+CHECKIN_XP.weekIn+' and +'+CHECKIN_XP.weekOut+' a week, +'+CHECKIN_XP.monthIn+' and +'+CHECKIN_XP.monthOut+' a month. Every finished week you hit a weekly ring (workouts or deep work) pays +'+MASTER_XP.weekly+'. Master goals (MRR, weight, streak) pay again when you raise the bar. On Goals they sit in Master, This month and This week; Customize picks which show and sets their targets.')+'</div>'+
       '<div class="xpg-card is-wide"><h3>The business</h3><div class="xpg-jumps">'+
         [['A client won', '+'+XP_RATES.client.toLocaleString()], ['Each $1k of MRR', '+'+XP_RATES.mrrPerK], ['Each follower gained', '+'+XP_RATES.follower], ['Reaching out, a day', '+'+XP_RATES.outreach+' to +'+(XP_RATES.outreach + XP_RATES.outreachEach*(XP_RATES.outreachMax-1))]].map(function(j){ return '<div><b>'+j[1]+'</b><span>'+j[0]+'</span></div>'; }).join('')+
-      '</div><p class="xpg-note">MRR XP counts from where you started and comes back off if MRR drops. Reaching out is every touch you log on a client or a lead: the &#128075; button, Text, Email or Call from their card, or a meeting on the calendar linked to them. The first one in a day pays '+XP_RATES.outreach+' and each one after pays '+XP_RATES.outreachEach+' more, up to '+XP_RATES.outreachMax+' a day.</p></div>'+
+      '</div><p class="xpg-note">MRR XP counts from where you started and comes back off if MRR drops. Reaching out is every touch you log on a client or a lead: the &#128075; button, Text, Email or Call from their card, a tap in the Log center (Business), finishing the Reach out to clients task, or a meeting on the calendar linked to them. The first one in a day pays '+XP_RATES.outreach+' and each one after pays '+XP_RATES.outreachEach+' more, up to '+XP_RATES.outreachMax+' a day.</p></div>'+
       '<div class="xpg-card is-wide"><h3>What it takes to level</h3><p>Level 1 is about one client won. Level 2 is about two more on top of that. From there each level costs more than the last: a strong week is roughly 3,000 to 4,000 XP, so the early levels come in weeks, the middle ones in months, and level '+LEVEL_MAX+' is years of living like this.</p>'+xpgBars(levelAt, LV.map(function(L){ return 'L'+L; }), '#ff9a3c', 'Total XP needed to reach each level. Level '+LEVEL_MAX+' is '+xpForLevel(LEVEL_MAX).toLocaleString()+' XP in all.', true).replace(/<em>([\d,]+)<\/em>/g, function(m, n){ return '<em>'+k(Number(n.replace(/,/g, '')))+'</em>'; })+'</div>'+
     '</div>'+
     '<div class="xpg-sec">Your ratings, 25 to 100 (100 is you at your best). Each thing counts in one place only.</div><div class="xph-rates">'+
@@ -796,9 +796,10 @@ ACTIONS.openXpHow = function(){
         ['Mind', 'how well you look after your head. It mixes your Inspiration score (most of it), the time on your Training Skills, and your Health and Discipline. Tap Mind on your card to open Inspiration.']])+
       rate('Health', '#7ef0c0', [['Training', 'workouts against your number a week over the last four weeks, the latest week counting most. A first good week back moves it right away.'], ['Diet', 'days you ate within your calorie target over the last two weeks. Logging counts too: a day you never logged counts for nothing.'],
         ['Weight', 'your BMI for your height. It also sets a ceiling on the whole score: carrying a lot of extra weight, Health tops out around 60 even with perfect training and diet, and the ceiling lifts as the weight comes down.']])+
-      rate('Discipline', '#8fd3ff', [['Reliability', 'things with a deadline, done by the deadline (last 30 days).'],
-        ['Consistency', 'completing everything, every week: work days on target, tasks, videos, workouts, food logged, your weekly check-in, the goals you hit and your streak. The latest weeks count most. When Op checks in and catches you slacking, or you don’t answer, it comes off here.'],
-        ['Action', 'saying what you’ll do and doing it. The tasks and video ideas you finished in the last 30 days against what’s open, and nothing left to rot: a task sitting more than two weeks, or a video idea more than three, pulls it down.']])+
+      rate('Discipline', '#8fd3ff', [['Reliability', 'things with a deadline, done by the deadline (last 30 days). Client deliverable weeks count: each is due the end of its week.'],
+        ['Consistency', 'completing everything, every week: work days on target, tasks, videos, workouts, food logged, your weekly check-in, the goals you hit and your streak. The latest weeks count most. It’s the biggest part of Discipline.'],
+        ['Action', 'saying what you’ll do and doing it. The tasks and video ideas you finished in the last 30 days against what’s open, and nothing left to rot: a task sitting more than two weeks, or a video idea more than three, pulls it down.'],
+        ['Standing', 'where you stand with Op over the last 7 days: answering his check-ins, how productive you said you were, the commitments you kept and the days you hit your deep-work target. Hover it on his screen to see the breakdown. It also sets his mood with you.']])+
     '</div>'+
     '<div class="xpg-sec">The scores behind the scores</div><div class="xpg-grid">'+
       '<div class="xpg-card"><h3>Inspiration</h3><p>Lives on the Inspiration page only. Log the things that clear your head (a walk, a book, ten minutes of breathing, a clean room, somewhere new) and it climbs. Over two weeks it looks at three things: how much (a walk, reading or meditating count double), how many days you did something, and how varied it was. It feeds Mind.</p></div>'+

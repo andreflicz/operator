@@ -200,7 +200,7 @@ function renderInboxTab(){
   // (chats and contacts come from GoHighLevel; your social numbers are above, from elsewhere)
   if(!ghlCfg().connected) return '<div class="ib-quiet">&#128172; Chats and contacts show here when GoHighLevel is connected. <button class="ex-link" data-action="goToIntegrations">Connect it &#8594;</button></div>';
   const s = inboxState();
-  // (Stats: your numbers come from Metricool, an imported file or Meta, above. GoHighLevel's aren't used.)
+  // (Stats: your numbers come from Apify, an imported file or Meta, above. GoHighLevel's aren't used.)
   if(s.mode==='social') return '';
   if(s[s.mode]==null && !s.loading[s.mode]) setTimeout(function(){ inboxLoad(s.mode); }, 0);
   if(!inboxTimer) inboxTick();
@@ -244,7 +244,7 @@ ACTIONS.socialRefresh = function(){ inboxLoad('social'); };
 ACTIONS.goToSocial = function(){ ui.view = 'convos'; inboxState().mode = 'social'; renderView(); };
 ACTIONS.goToConvos = function(){ ui.view = 'convos'; renderView(); };
 function renderSocialPanel(){
-  // your social numbers at a glance (from Metricool, an imported file or Meta; not GoHighLevel)
+  // your social numbers at a glance (from Apify, an imported file or Meta; not GoHighLevel)
   const c = typeof igCfg==='function' ? igCfg() : null;
   if(!c || !c.accounts.length || !c.cache || !c.cache.data) return '';
   const since = addDays(todayStr(), -7); let fol = 0, posts = 0, likes = 0, comments = 0, reach = 0;

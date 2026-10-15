@@ -467,7 +467,7 @@ renderRecap = function(){
   const sessions = sessionsOn(date);
   const deep = today ? Math.max(deepWorkMinutesTodayLive(), deepWorkMinutesFor(date)) : deepWorkMinutesFor(date);
   const target = state.standards.deepWorkTargetMinutes || 180, f = Math.min(1, deep/target);
-  const tasksDone = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===date; }).length + state.tasks.items.filter(function(t){ return t.ongoing && arr(t.ongoingDoneDates).indexOf(date) >= 0; }).length;
+  const tasksDone = state.tasks.items.filter(function(t){ return t.status==='done' && !t.missed && t.completedAt===date; }).length + state.tasks.items.filter(function(t){ return t.ongoing && arr(t.ongoingDoneDates).indexOf(date) >= 0; }).length;
   const breaks = state.modes.history.filter(function(m){ return m.date===date && m.type==='break'; });
   const apps = topAppsForDate(date, 30);
   let workMin = 0, otherMin = 0;

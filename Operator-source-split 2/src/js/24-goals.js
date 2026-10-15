@@ -11,7 +11,7 @@ const GOAL_TRACKERS = {
   workouts: {icon:'&#127947;&#65039;', label:'Workouts', unit:'workouts', src:'from Health → Workouts', periods:true, name:function(g){ return fmtGoalNum(g.target)+' workouts '+goalPeriodLabel(g); }},
   hours:    {icon:'&#9201;&#65039;', label:'Hours of deep work', unit:'h', src:'from your locked-in sessions', periods:true, name:function(g){ return fmtGoalNum(g.target)+'h of deep work '+goalPeriodLabel(g); }},
   streak:   {icon:'&#128293;', label:'Days in a row', unit:'days', src:'from your Today\'s Standard streak', name:function(g){ return fmtGoalNum(g.target)+'-day streak'; }},
-  followers:{icon:'&#128200;', label:'Followers', unit:'followers', src:'from your social numbers (Metricool, an import or Meta)', name:function(g){ return fmtGoalNum(g.target)+' followers'; }},
+  followers:{icon:'&#128200;', label:'Followers', unit:'followers', src:'from your social numbers (Apify, an import or Meta)', name:function(g){ return fmtGoalNum(g.target)+' followers'; }},
   clients:  {icon:'&#129309;', label:'Active clients', unit:'clients', src:'from Business → Clients', name:function(g){ return fmtGoalNum(g.target)+' active clients'; }},
   // your peak: real, locked-in work a day on average (the last two weeks) — never "done", always the bar
   avghours: {icon:'&#9201;&#65039;', label:'Average hours a day', unit:'h/day', src:'from your locked-in time, averaged over the last two weeks', ongoing:true, name:function(g){ return fmtGoalNum(g.target)+'h a day, on average'; }}

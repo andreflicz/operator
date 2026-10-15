@@ -24,6 +24,8 @@ AI_KEY_FILE="$DATA_DIR/ai.key"
 IG_KEY_FILE="$DATA_DIR/ig.key"
 FIN_KEY_FILE="$DATA_DIR/simplefin.url"
 MC_KEY_FILE="$DATA_DIR/metricool.key"
+# Apify (public Instagram numbers through Apify's Instagram scraper; free plan): the API token, same rules
+AP_KEY_FILE="$DATA_DIR/apify.key"
 
 hexdec() { printf '%b' "$(printf '%s' "$1" | sed 's/../\\x&/g')"; }
 param() { printf '%s' "$REQ_PATH" | sed -n "s/.*[?&]$1=\([0-9a-zA-Z._-]*\).*/\1/p"; }
@@ -441,6 +443,40 @@ wake_respond() {
       case "$U$B" in ''|*[!0-9]*) respond 400 '{"ok":false,"error":"userId and blogId are numbers"}'; return ;; esac
       if [ -n "$T" ]; then ( umask 077; printf '%s\n%s\n%s\n' "$T" "$U" "$B" > "$MC_KEY_FILE" ); chmod 600 "$MC_KEY_FILE" 2>/dev/null; respond 200 '{"ok":true}'; else respond 400 '{"ok":false}'; fi ;;
     /mc/forget*) rm -f "$MC_KEY_FILE"; respond 200 '{"ok":true}' ;;
+    # Apify: your public Instagram numbers (followers, posts, likes, comments, views) without logging in
+    # to Meta. A run is started, then checked on, then its results read (a run takes 10 to 60 seconds,
+    # longer than one request may wait). The token stays in this file; the page never sees it.
+    /ap/key*)
+      T=$(hexdec "$(param t)")
+      case "$T" in ''|*[!A-Za-z0-9_]*) respond 400 '{"ok":false,"error":"That doesn’t look like an Apify API token."}'; return ;; esac
+      ( umask 077; printf '%s\n' "$T" > "$AP_KEY_FILE" ); chmod 600 "$AP_KEY_FILE" 2>/dev/null
+      OUT=$(curl -sS --max-time 20 -H "Authorization: Bearer $T" -w '\n%{http_code}' "https://api.apify.com/v2/users/me" 2>&1)
+      CODE=$(printf '%s' "$OUT" | tail -n 1)
+      case "$CODE" in
+        200) respond 200 '{"ok":true}' ;;
+        401|403) rm -f "$AP_KEY_FILE"; respond 401 '{"ok":false,"error":"Apify didn’t accept that token."}' ;;
+        *) respond 200 '{"ok":true,"unchecked":true}' ;;
+      esac ;;
+    /ap/forget*) rm -f "$AP_KEY_FILE"; respond 200 '{"ok":true}' ;;
+    /ap/status*) if [ -s "$AP_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
+    /ap/start*|/ap/run*|/ap/items*)
+      if [ ! -s "$AP_KEY_FILE" ]; then respond 401 '{"error":"no Apify token saved"}'; return; fi
+      AT=$(sed -n 1p "$AP_KEY_FILE")
+      case "$REQ_PATH" in
+        /ap/start*)
+          U=$(param u); case "$U" in ''|*[!A-Za-z0-9._]*) respond 400 '{"error":"bad handle"}'; return ;; esac
+          OUT=$(curl -sS --max-time 30 -X POST -H "Authorization: Bearer $AT" -H "Content-Type: application/json" --data "{\"usernames\":[\"$U\"]}" -w '\n%{http_code}' "https://api.apify.com/v2/acts/apify~instagram-profile-scraper/runs?memory=1024" 2>&1) ;;
+        /ap/run*)
+          R=$(param r); case "$R" in ''|*[!A-Za-z0-9]*) respond 400 '{"error":"bad run"}'; return ;; esac
+          OUT=$(curl -sS --max-time 30 -H "Authorization: Bearer $AT" -w '\n%{http_code}' "https://api.apify.com/v2/actor-runs/$R" 2>&1) ;;
+        *)
+          D=$(param d); case "$D" in ''|*[!A-Za-z0-9]*) respond 400 '{"error":"bad dataset"}'; return ;; esac
+          OUT=$(curl -sS --max-time 40 -H "Authorization: Bearer $AT" -w '\n%{http_code}' "https://api.apify.com/v2/datasets/$D/items?clean=true&format=json" 2>&1) ;;
+      esac
+      CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
+      case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":"could not reach Apify"}' ;; esac
+      [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach Apify"}'; }
+      respond "$CODE" "$BODY" ;;
     /mc/status*) if [ -s "$MC_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
     /mc/api*)
       P=$(hexdec "$(param p)")
