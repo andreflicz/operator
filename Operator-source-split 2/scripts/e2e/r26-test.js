@@ -224,8 +224,10 @@ async function ctxPage(b, seed, opts){
     await p.click('#insp .izk-plus'); await p.waitForTimeout(200);   // (round 31: the sky is in the + menu)
     await p.click('#insp .izk-plusmenu [data-action="inspSky"]'); await p.waitForTimeout(300);
     check('the sky changes (and remembers)', await E("document.getElementById('insp').getAttribute('data-sky')")==='aurora' && await E("inspSandStore().sky")==='aurora' && /Aurora/.test(await p.textContent('#insp .insp-tools')));
-    await p.mouse.click(1000, 140); await p.waitForTimeout(150);
-    check('tap the sky: a bloom of light', !!(await p.$('.insp-bloom')));
+    await p.waitForTimeout(600);   // (the plane may still be gliding in: tap a spot that's open sky)
+    const sky = await p.evaluate(() => { for(let y = 140; y < 800; y += 40) for(let x = 1000; x > 300; x -= 60){ const e = document.elementFromPoint(x, y); if(e && e.id==='inspPlane') return [x, y]; } return [1000, 140]; });
+    await p.mouse.click(sky[0], sky[1]); await p.waitForTimeout(150);
+    check('tap the sky: a bloom of light', !!(await p.$('.insp-bloom')), sky);
     // (round 28: Drift is the wind now)
     await p.click('#insp [data-action="inspDrift"]'); await p.waitForTimeout(300);
     check('Drift: set the wind and the bubbles breeze across', await p.isVisible('#insp .izk-wind'));
@@ -242,7 +244,7 @@ async function ctxPage(b, seed, opts){
     await p.clock.runFor(70000); await p.waitForTimeout(100);
     const n0 = await E("inspStore().log.filter(x => x.act==='meditate').length");
     await p.click('#inspBreath .ibr-done'); await p.waitForTimeout(700);
-    check('…a minute or more counts as meditating', await E("inspStore().log.filter(x => x.act==='meditate').length")===n0 + 1 && !(await p.$('#inspBreath')));
+    check('…a minute or more counts as meditating', await E("inspStore().log.filter(x => x.act==='meditate').length")===n0 + 1 && !(await p.$('#inspBreath')), [n0, await E("inspStore().log.filter(x => x.act==='meditate').length"), !!(await p.$('#inspBreath')), await E("String(!!ui.inspBreath)")]);
     await p.keyboard.press('Escape'); await p.waitForTimeout(900);
     check('Esc: back out, the music stops', !(await p.$('#insp.is-in')) && await E("FM.playing")===false);
     check('no page errors (inspiration)', p.errors.length===0, p.errors);
