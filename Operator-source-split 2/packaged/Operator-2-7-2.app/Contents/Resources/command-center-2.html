@@ -7068,6 +7068,139 @@ body:has(#wakeOverlay:not(.hidden)) .activity-pill{ display:none !important; }
 .mt-reach-k{ font-size:11.5px; color:var(--text-dim); }
 .dfd-note{ margin-left:10px; border:1px solid rgba(63,190,142,.35); background:rgba(63,190,142,.1); color:#3FBE8E; border-radius:999px; padding:3px 10px; font:inherit; font-size:11.5px; font-weight:600; cursor:pointer; }
 .dfd-note:hover{ background:rgba(63,190,142,.18); }
+
+/* ---- round 38d: client deliverable tasks have their own color; the Client backlog ---- */
+:root{ --dlv:#b18cff; --dlv-2:#e08cff; --dlv-rgb:177,140,255; }
+.task-card.dlv-card{ border-left:3px solid var(--dlv) !important; background:linear-gradient(160deg, rgba(var(--dlv-rgb),.09), transparent 55%), var(--panel); box-shadow:0 0 0 1px rgba(var(--dlv-rgb),.14) inset; }
+.task-card.dlv-card:hover{ box-shadow:0 0 0 1px rgba(var(--dlv-rgb),.32) inset, 0 10px 28px rgba(var(--dlv-rgb),.12); }
+.mt-badge.is-dv{ color:var(--dlv); background:rgba(var(--dlv-rgb),.16); }
+.mt-segs i.on{ background:var(--dlv); box-shadow:0 0 8px rgba(var(--dlv-rgb),.45); }
+.mt-plus{ border-color:rgba(var(--dlv-rgb),.55); color:var(--dlv); }
+.subtab.is-dlv{ color:color-mix(in srgb, var(--dlv) 70%, var(--text-dim)); }
+.subtab.is-dlv.active{ color:var(--text); box-shadow:inset 0 -2px 0 var(--dlv); }
+.cbl{ display:flex; flex-direction:column; gap:12px; }
+.cbl-client{ border:1px solid rgba(var(--dlv-rgb),.2); border-left:3px solid var(--dlv); border-radius:16px; padding:14px 16px; background:linear-gradient(160deg, rgba(var(--dlv-rgb),.06), transparent 50%), var(--panel); }
+.cbl-h{ display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.cbl-n{ display:flex; flex-direction:column; gap:2px; flex:1; min-width:0; } .cbl-n b{ font-size:15px; color:var(--text); } .cbl-n small{ font-size:11.5px; color:var(--text-dim); }
+.cbl-hs{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); }
+.cbl-d + .cbl-d{ margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
+.cbl-dh{ display:flex; align-items:baseline; gap:10px; margin-bottom:8px; } .cbl-dh b{ font-size:14px; color:var(--text); } .cbl-dh span{ font-size:12px; color:var(--text-dim); font-variant-numeric:tabular-nums; }
+.cbl-weeks{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; }
+.cbl-w{ display:flex; flex-direction:column; gap:7px; padding:9px 10px; border-radius:12px; border:1px solid var(--border); background:rgba(var(--ink),.025); }
+.cbl-w.is-now{ border-color:rgba(var(--dlv-rgb),.55); background:rgba(var(--dlv-rgb),.08); }
+.cbl-w.is-late{ border-color:rgba(232,99,107,.45); background:rgba(232,99,107,.06); }
+.cbl-w.is-done{ opacity:.62; }
+.cbl-wk{ display:flex; flex-direction:column; align-items:flex-start; gap:1px; border:0; background:none; padding:0; font:inherit; color:inherit; cursor:pointer; text-align:left; }
+.cbl-wk b{ font-size:12.5px; color:var(--text); } .cbl-wk small{ font-size:10.5px; color:var(--text-dim); }
+.cbl-w.is-late .cbl-wk small{ color:#E8636B; }
+.cbl-w .mt-segs{ flex:none; }
+.cbl-wb{ display:flex; align-items:center; gap:6px; } .cbl-wb b{ font-size:12px; color:var(--text); font-variant-numeric:tabular-nums; margin-right:auto; }
+.cbl-ok{ color:var(--dlv); font-weight:800; }
+.cbl-today{ height:22px; padding:0 8px; border-radius:999px; border:1px solid var(--border); background:rgba(var(--ink),.04); color:var(--text-dim); font:inherit; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.cbl-today:hover{ color:var(--text); } .cbl-today.is-on{ border-color:rgba(var(--dlv-rgb),.55); color:var(--dlv); }
+@media (max-width:900px){ .cbl-weeks{ grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+
+/* ---- round 38e ---- */
+/* Today: full screen from the panel's corner */
+.today-hero{ position:relative; }
+.th-full{ position:absolute; top:7px; right:7px; z-index:3; width:24px; height:24px; display:grid; place-items:center; border-radius:8px; border:1px solid transparent; background:transparent; color:var(--text-dim); opacity:.45; cursor:pointer; transition:opacity .2s, background .2s, border-color .2s, color .2s; }
+.today-hero:hover .th-full{ opacity:.8; }
+.th-full:hover{ opacity:1 !important; color:var(--text); background:rgba(var(--ink),.08); border-color:var(--border); }
+/* skills: Today ⇄ Backlog */
+.sk-move.is-today{ color:var(--skill); }
+/* Personal → You: the card turns over */
+.ycf{ position:relative; perspective:1200px; flex:none; }
+.ycf-in{ position:relative; transform-style:preserve-3d; transition:transform .6s cubic-bezier(.2,.8,.2,1); }
+.ycf.is-flipped .ycf-in{ transform:rotateY(180deg); }
+.ycf-in > .pc{ backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+.ycf-in > .pc:first-child{ cursor:pointer; }
+.ycf-back{ position:absolute !important; inset:0; transform:rotateY(180deg); display:flex !important; flex-direction:column; align-items:center; justify-content:center; gap:7px; text-align:center; cursor:pointer; box-sizing:border-box; }
+.ycb-badge{ filter:drop-shadow(0 0 12px color-mix(in srgb, var(--rc) 60%, transparent)); }
+.ycb-rank{ font-family:var(--font-display); font-size:20px; font-weight:800; letter-spacing:.02em; }
+.ycb-k{ font-size:11px; color:rgba(255,255,255,.75); }
+.ycb-bar{ width:80%; }
+.ycb-next{ display:flex; flex-direction:column; align-items:center; gap:3px; margin-top:4px; font-size:11px; color:rgba(255,255,255,.75); }
+.ycb-next small{ font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; opacity:.7; }
+.ycb-next b{ font-size:14px; }
+.ycb-needs{ display:flex; flex-wrap:wrap; justify-content:center; gap:4px; margin-top:2px; }
+.ycb-needs i{ font-style:normal; font-size:10px; padding:2px 7px; border-radius:999px; background:rgba(255,255,255,.1); color:rgba(255,255,255,.85); }
+.ycb-tap{ font-size:9.5px; opacity:.45; letter-spacing:.06em; }
+/* Op's box: grows with his words, resizable from the top-right corner */
+.op-bub-t{ transition:height .35s cubic-bezier(.2,.8,.2,1); scroll-behavior:smooth !important; }
+.op-bub.is-resizing, .op-bub.is-resizing .op-bub-t{ transition:none !important; user-select:none; }
+.op-bub-rs{ position:absolute; top:3px; right:3px; width:14px; height:14px; cursor:nesw-resize; border-radius:4px; opacity:.35; background:linear-gradient(45deg, transparent 45%, currentColor 46%, currentColor 54%, transparent 55%), linear-gradient(45deg, transparent 70%, currentColor 71%, currentColor 79%, transparent 80%); }
+.op-bub:hover .op-bub-rs{ opacity:.7; }
+.op-bub-h .op-bub-x{ margin-right:14px; }
+/* his words fade in softly (no blur blocks) */
+.op-bub-t .cw{ display:inline; animation:cwSoft .3s ease-out both !important; filter:none !important; }
+@keyframes cwSoft{ from{ opacity:0; } to{ opacity:1; } }
+
+/* ---- round 38f ---- */
+/* messages show above the sheets */
+.toast-container{ z-index:400 !important; }
+/* the minimal views: Full view / Player / Cockpit are small links on the panel */
+.np-views{ display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px; }
+.np-views i{ width:3px; height:3px; border-radius:50%; background:currentColor; opacity:.35; }
+.np-v{ border:0; background:none; padding:2px 4px; font:inherit; font-size:11px; font-weight:600; letter-spacing:.02em; color:rgba(255,255,255,.42); cursor:pointer; transition:color .15s; }
+.np-v:hover{ color:rgba(255,255,255,.9); }
+.np-meta .np-views{ justify-content:flex-start; margin-top:16px; }
+.ckx-l .np-views{ margin-top:10px; }
+.np-top .lv-btn{ display:none !important; }
+/* goals: master goals in groups, Customize */
+.gx-top{ position:relative; }
+.gx-top.no-hero{ grid-template-columns:1fr !important; }
+.gx-rings.is-grouped{ align-content:start; }
+.gx-sec-h{ grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between; padding:10px 16px 2px; font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); }
+.gx-cust{ letter-spacing:0; text-transform:none; border:1px solid var(--border); background:rgba(var(--ink),.04); color:var(--text-dim); border-radius:999px; padding:4px 11px; font:inherit; font-size:11.5px; font-weight:600; cursor:pointer; }
+.gx-cust:hover{ color:var(--text); border-color:var(--text-dim); }
+.mgc{ width:min(560px, calc(100vw - 32px)); }
+.mgc-sub{ font-size:12.5px; color:var(--text-dim); margin:2px 0 12px; }
+.mgc-g + .mgc-g{ margin-top:12px; }
+.mgc-gh{ font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); margin-bottom:6px; }
+.mgc-row{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:12px; border:1px solid var(--border); background:rgba(var(--ink),.03); }
+.mgc-row + .mgc-row{ margin-top:6px; }
+.mgc-row.is-off{ opacity:.5; }
+.mgc-i{ font-size:18px; width:24px; text-align:center; }
+.mgc-l{ flex:1; display:flex; flex-direction:column; min-width:0; } .mgc-l b{ font-size:13.5px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .mgc-l small{ font-size:11px; color:var(--text-dim); }
+.mgc-t{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); } .mgc-t .input{ width:96px; height:32px; padding:0 8px; } .mgc-t em{ font-style:normal; min-width:44px; }
+.mgc-t.is-ro{ min-width:150px; justify-content:flex-end; }
+/* calendar: This week / This month fit their card */
+.calx .cx-tierbody{ overflow:hidden !important; }
+.calx .cx-tierbody .tg-h{ margin-bottom:4px; }
+.calx .cx-tierbody .tg-row{ position:relative; min-height:0; padding:3px 0; }
+.calx .cx-tierbody .tg-hit{ padding:3px 6px !important; gap:8px; }
+.calx .cx-tierbody .tg-l{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:12.5px; line-height:1.25; }
+.calx .cx-tierbody .tg-box{ width:15px; height:15px; flex:none; font-size:10px; }
+.calx .cx-tierbody .tg-xp{ font-size:10.5px; }
+.calx .cx-tierbody .tg-acts{ position:absolute; right:0; top:50%; transform:translateY(-50%); opacity:0; pointer-events:none; transition:opacity .15s; background:var(--panel); border-radius:8px; }
+.calx .cx-tierbody .tg-row:hover .tg-acts{ opacity:1; pointer-events:auto; }
+.tg-more{ display:block; margin:4px 0 0 6px; border:0; background:none; padding:0; font:inherit; font-size:11.5px; font-weight:600; color:var(--text-dim); cursor:pointer; }
+.tg-more:hover{ color:var(--text); }
+.calx .cx-deskbody{ overflow:hidden !important; }
+/* the work alarm pop-up */
+.wpop{ position:fixed; left:50%; top:18px; z-index:9500; transform:translate(-50%, -140%); transition:transform .45s cubic-bezier(.2,.8,.2,1); pointer-events:none; }
+.wpop.is-in{ transform:translate(-50%, 0); pointer-events:auto; }
+.wpop-card{ display:flex; align-items:center; gap:12px; padding:12px 14px 12px 16px; border-radius:16px; background:var(--panel); border:1px solid rgba(232,162,61,.45); box-shadow:0 18px 50px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.04) inset; }
+.wpop-i{ font-size:24px; }
+.wpop-t{ display:flex; flex-direction:column; gap:2px; margin-right:6px; } .wpop-t b{ font-size:15px; color:var(--text); } .wpop-t small{ font-size:12px; color:var(--text-dim); }
+
+/* ===== R38g: the day streak, out of the pill ===== */
+.sw.is-r38 .sw-l{ align-self:stretch; display:flex; align-items:center; padding-right:20px; margin-right:4px; border-right:1px solid rgba(var(--ink),.08); }
+.sw.is-r38 .sw-streak{ position:relative; display:grid !important; grid-template-columns:auto auto; grid-template-rows:auto auto; column-gap:10px; row-gap:0; align-items:center; padding:2px 6px 2px 0 !important; background:none !important; border:0 !important; border-radius:0 !important; }
+.sw.is-r38 .sw-flame{ grid-row:1 / span 2; font-size:28px !important; line-height:1; filter:grayscale(.85) opacity(.55); transition:filter .3s; }
+.sw.is-r38.is-hot .sw-flame{ filter:drop-shadow(0 0 10px rgba(255,140,40,.55)); animation:swFlame 2.6s ease-in-out infinite; }
+@keyframes swFlame{ 0%,100%{ transform:scale(1) rotate(-2deg); } 50%{ transform:scale(1.08) rotate(2deg); } }
+.sw.is-r38 .sw-streak > b{ grid-column:2; grid-row:1; font-family:var(--font-display); font-size:34px !important; font-weight:800; line-height:.95; font-variant-numeric:tabular-nums; }
+.sw.is-r38.is-hot .sw-streak > b{ background:linear-gradient(180deg, #ffd27a, #ff8a3d); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.sw.is-r38 .sw-streak > span:not(.sw-flame):not(.streak-ok):not(.qtip){ grid-column:2; grid-row:2; font-size:10px !important; font-weight:700; letter-spacing:.12em !important; text-transform:uppercase; color:var(--text-dim); white-space:nowrap; }
+.sw.is-r38 .sw-streak .streak-ok{ position:absolute; left:22px; top:-2px; font-size:11px; }
+.sw.is-r38 .sw-streak .qtip{ position:absolute; right:-14px; top:0; transform:scale(.85); }
+.sw.is-r38 .sw-streak{ grid-template-rows:auto auto auto; }
+.sw.is-r38 .sw-flame{ grid-row:1 / span 3 !important; }
+.sw.is-r38 .sw-ss{ grid-column:2; grid-row:3; margin-top:3px; font-size:11px; color:var(--text-dim); opacity:.8; white-space:nowrap; }
+.sw.is-r38 .sw-ss.is-ok{ color:var(--green, #3ecf8e); opacity:1; }
+/* the "Off the clock" pill stays out of the wind-down screens (it sat on top of Back) */
+body:has(#windOverlay:not(.hidden)) #activityPill{ opacity:0 !important; pointer-events:none !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -38042,14 +38175,12 @@ renderToday = (function(base){
 // the streak row: the streak smaller, the week, and a wide Tasks bar under it
 function swTasksBarHtml(done, total){
   const left = Math.max(0, total - done);
-  let next = null;
-  try{ next = (typeof todaysPlan==='function' ? todaysPlan() : state.tasks.items.filter(function(t){ return t.status==='today'; })).find(function(t){ return t.status!=='done' && !(typeof isOngoingDoneToday==='function' && isOngoingDoneToday(t)); }); }catch(e){}
   const segs = total > 0 && total <= 16
     ? '<span class="swt-segs">'+Array.from({length:total}, function(_, i){ return '<i'+(i < done ? ' class="on"' : '')+'></i>'; }).join('')+'</span>'
     : '<span class="swt-bar"><i style="width:'+(total ? Math.round(done/total*100) : 0)+'%"></i></span>';
   return '<button class="swt" data-action="goToFinishedTasks" title="Today’s tasks">'+
     '<span class="swt-k">Tasks</span><b class="swt-n">'+done+'<small>/'+total+'</small></b>'+segs+
-    '<span class="swt-r">'+(total===0 ? 'Nothing planned yet' : left===0 ? 'All done &#10003;' : left+' left'+(next ? ' &middot; <em>up next</em> '+escapeHtml(next.title) : ''))+'</span>'+
+    '<span class="swt-r">'+(total===0 ? 'Nothing planned yet' : left===0 ? 'All done &#10003;' : left+' left')+'</span>'+
   '</button>';
 }
 streakWorkHtml = (function(base){
@@ -38063,28 +38194,39 @@ streakWorkHtml = (function(base){
   };
 })(streakWorkHtml);
 // ============ ROUND 38b: master tasks that track the work ============
-// • Deliverable tasks: one per client per retainer deliverable, made for you every week ("Complete 4
-//   reels", "Meta ads"). You don't finish them in one go: each time you hit done it logs one (1 of 4 =
-//   25%) and the task stays until the week's number is in. They read and write the client's deliverable
-//   count, so the card, pace, health and stats all move with them.
+// • Deliverable tasks: each month's deliverable split into the client's cycle weeks 1 to 4, named after
+//   the deliverable, kept in their own Client backlog. You finish them one piece at a time; they read and
+//   write the client's deliverable count, so the card, pace, health and stats all move with them.
 // • Reach out to clients: one task, only there while someone's due a touch. It's tagged with exactly
 //   those clients and its priority follows their health and how long it's been.
 // • Log center: a Clients sub-tab with every client and just what needs logging (touches), most urgent
 //   first, with one-tap logging.
 // • Today's date gets a little calendar tile.
 
-// ---- the deliverable tasks ----
-function dvFind(t){
-  const m = t && t.master; if(!m || m.kind!=='dv') return null;
-  return delivFind(m.clientId, m.delivId);
+// ---- the deliverable tasks: each month's deliverable, split into the cycle's four weeks ----
+// Brothers Mechanical gets 16 reels a month → four tasks called "Reels", tagged with the client and
+// Week 1 to 4 of their cycle (the cycle starts on their billing day), each due at the end of its week.
+// They sit in the Client backlog, not the regular one. Each done logs one reel: the cycle's reels fill
+// Week 1 first, then Week 2, and so on, and a week's task finishes when its share is in. Same count as
+// the client card, so health and stats move with it.
+function dvwCycle(c, date){
+  const bd = Math.max(1, Math.min(28, Number(c.billingDay) || 1));
+  const d = new Date((date || todayStr())+'T12:00:00');
+  let y = d.getFullYear(), m = d.getMonth();
+  if(d.getDate() < bd){ m--; if(m < 0){ m = 11; y--; } }
+  return {start:todayStr(new Date(y, m, bd)), end:addDays(todayStr(new Date(y, m + 1, bd)), -1)};
 }
-function dvNeed(d){ return Math.max(1, d.weeklyTarget || 1); }
-function dvDone(d){ return Math.min(dvNeed(d), deliverableWeekCount(d)); }
-function dvTitle(d){
-  const n = dvNeed(d), t = String(d.title||'Deliverable').trim();
-  if(n===1) return t;
-  return 'Complete '+n+' '+t.toLowerCase();
+function dvwWeeks(cy){ return [0, 1, 2, 3].map(function(k){ return {k:k + 1, start:addDays(cy.start, 7*k), end:k < 3 ? addDays(cy.start, 7*k + 6) : cy.end}; }); }
+function dvwNeeds(d){ const n = monthlyTargetFor(d), b = Math.floor(n/4), r = n % 4; return [0, 1, 2, 3].map(function(k){ return b + (k < r ? 1 : 0); }); }
+function dvwCycleCount(d, cy){ return arr(d.completedDates).filter(function(x){ return x >= cy.start && x <= cy.end; }).length; }
+function dvwAlloc(d, cy){ let left = dvwCycleCount(d, cy); return dvwNeeds(d).map(function(n){ const v = Math.min(n, left); left -= v; return v; }); }
+function dvwFind(t){
+  const m = t && t.master; if(!m || m.kind!=='dvw') return null;
+  const hit = delivFind(m.clientId, m.delivId); if(!hit) return null;
+  const cy = {start:m.cycle, end:m.cycleEnd};
+  return {c:hit.c, d:hit.d, cy:cy, k:m.wk, need:dvwNeeds(hit.d)[m.wk - 1], done:dvwAlloc(hit.d, cy)[m.wk - 1], total:monthlyTargetFor(hit.d), count:dvwCycleCount(hit.d, cy)};
 }
+function dvwIsNow(t){ const m = t.master, today = todayStr(); return m && m.start <= today && today <= (t.deadline || m.cycleEnd); }
 function reachNeeds(){
   return mtActiveClients().map(function(c){
     const n = crmOverdueDays('client', c), hs = clientHealthStatus(c);
@@ -38102,36 +38244,46 @@ function masterTasksSync(){
   try{
     const wk = thisWeekKey(), made = mtStore(), today = todayStr(), cs = mtActiveClients();
     let changed = false;
-    // the old kinds (a weekly check-in batch, one deliverables task per client) make way for these
+    // the older kinds (a weekly check-in batch, a deliverables task per client, one per week) make way
     state.tasks.items = state.tasks.items.filter(function(t){
-      const old = t.master && (t.master.kind==='care' || t.master.kind==='deliv') && t.status!=='done';
+      const old = t.master && (t.master.kind==='care' || t.master.kind==='deliv' || t.master.kind==='dv') && t.status!=='done';
       if(old) changed = true; return !old;
     });
-    // one task per client per recurring deliverable, this week
+    // this cycle's four weeks, per client, per recurring deliverable
     const live = {};
-    cs.forEach(function(c){ arr(c.deliverables).forEach(function(d){
-      if(!d.recurring) return;
-      const key = wk+':dv:'+c.id+':'+d.id; live[c.id+':'+d.id] = 1;
-      if(made[key]) return;
-      made[key] = 1; changed = true;
-      state.tasks.items.push({id:uid(), title:dvTitle(d), client:c.id, clients:[c.id], priority:'med', deadline:addDays(wk, 6), notes:'', status:'today', createdAt:today, completedAt:null,
-        master:{kind:'dv', week:wk, clientId:c.id, delivId:d.id}});
-    }); });
+    cs.forEach(function(c){
+      const cy = dvwCycle(c), weeks = dvwWeeks(cy);
+      arr(c.deliverables).forEach(function(d){
+        if(!d.recurring) return;
+        const needs = dvwNeeds(d);
+        weeks.forEach(function(w){
+          if(!needs[w.k - 1]) return;
+          live[c.id+':'+d.id+':'+cy.start+':'+w.k] = 1;
+          const key = cy.start+':dvw:'+c.id+':'+d.id+':'+w.k;
+          if(made[key]) return;
+          made[key] = 1; changed = true;
+          state.tasks.items.push({id:uid(), title:String(d.title || 'Deliverable').trim(), client:c.id, clients:[c.id], priority:'med', deadline:w.end, notes:'', status:'backlog', createdAt:today, completedAt:null,
+            master:{kind:'dvw', cycle:cy.start, cycleEnd:cy.end, wk:w.k, start:w.start, clientId:c.id, delivId:d.id}});
+        });
+      });
+    });
     state.tasks.items = state.tasks.items.filter(function(t){
-      // a client who's gone (or a deliverable that's gone) takes its open task with it
-      const gone = t.master && t.master.kind==='dv' && t.master.week===wk && t.status!=='done' && !live[t.master.clientId+':'+t.master.delivId];
+      const m = t.master;
+      // a client, a deliverable or a week that's gone takes its open task with it
+      const gone = m && m.kind==='dvw' && t.status!=='done' && m.cycleEnd >= today && !live[m.clientId+':'+m.delivId+':'+m.cycle+':'+m.wk];
       if(gone) changed = true; return !gone;
     });
     state.tasks.items.forEach(function(t){
-      const m = t.master; if(!m) return;
-      if(m.kind==='dv' && m.week===wk){
-        const hit = dvFind(t); if(!hit) return;
-        const title = dvTitle(hit.d); if(t.title!==title){ t.title = title; changed = true; }
-        const done = dvDone(hit.d), need = dvNeed(hit.d);
-        if(t.status!=='done' && done >= need){ t.status = 'done'; t.completedAt = today; changed = true; }
-        else if(t.status==='done' && done < need){ t.status = 'today'; t.completedAt = null; changed = true; }
-        else if(t.status==='backlog'){ t.status = 'today'; changed = true; }
+      const m = t.master; if(!m || m.kind!=='dvw') return;
+      if(m.cycleEnd < today){
+        // a cycle that's over: what never got there is history
+        if(t.status!=='done' && !m.retired){ m.retired = true; t.status = 'done'; t.completedAt = m.cycleEnd; t.missed = true; changed = true; }
+        return;
       }
+      const x = dvwFind(t); if(!x) return;
+      const title = String(x.d.title || 'Deliverable').trim(); if(t.title!==title){ t.title = title; changed = true; }
+      if(t.status!=='done' && x.done >= x.need){ m.prev = t.status; t.status = 'done'; t.completedAt = today; changed = true; }
+      else if(t.status==='done' && x.done < x.need){ t.status = m.prev && m.prev!=='done' ? m.prev : 'backlog'; t.completedAt = null; changed = true; }
     });
     // reach out to clients: one task, there only while someone's due
     const need = reachNeeds();
@@ -38144,26 +38296,26 @@ function masterTasksSync(){
       if(rt.priority!==pr){ rt.priority = pr; changed = true; }
       if(rt.master.week!==wk){ rt.master.week = wk; changed = true; }
     } else if(rt){ rt.status = 'done'; rt.completedAt = today; changed = true; }
-    // last week's deliverable tasks that never got there are history now
-    state.tasks.items.forEach(function(t){ if(t.master && t.master.week < wk && t.master.kind==='dv' && t.status!=='done' && !t.master.retired){ t.master.retired = true; t.status = 'done'; t.completedAt = addDays(t.master.week, 6); t.missed = true; changed = true; } });
-    Object.keys(made).forEach(function(k){ if(k.slice(0, 10) < addDays(wk, -35)) delete made[k]; });
+    Object.keys(made).forEach(function(k){ if(k.slice(0, 10) < addDays(wk, -70)) delete made[k]; });
     if(changed){ persist('tasks'); persist('focus'); setTimeout(function(){ try{ renderView(); }catch(e){} }, 0); }
   }finally{ mt38Busy = false; }
 }
-// hitting done on a deliverable task logs one; it finishes when the week's number is in
+// hitting done on a deliverable task logs one; the week's task finishes when its share is in
+function dvwLogLine(x){ return (x.c.business || x.c.name)+' · '+x.d.title+' '+x.count+'/'+x.total+' this cycle'; }
 completeTask = (function(base){
   return function(id){
     const t = state.tasks.items.find(function(x){ return x.id===id; });
-    if(t && t.master && t.master.kind==='dv'){
-      const hit = dvFind(t); if(!hit) return;
-      const need = dvNeed(hit.d);
-      if(t.status==='done' || dvDone(hit.d) >= need){ showToast('This week’s '+hit.d.title.toLowerCase()+' for '+(hit.c.business || hit.c.name)+' are already in.', {icon:'&#10003;'}); return; }
-      delivLogOne(hit, todayStr());
-      const done = dvDone(hit.d);
-      if(done >= need){ t.status = 'done'; t.completedAt = todayStr(); playTaskComplete(); }
-      else playTick();
+    if(t && t.master && t.master.kind==='dvw'){
+      const x = dvwFind(t); if(!x) return;
+      if(x.count >= x.total){ showToast('All '+x.total+' '+x.d.title.toLowerCase()+' for '+(x.c.business || x.c.name)+' are in for this cycle.', {icon:'&#10003;'}); return; }
+      const before = dvwAlloc(x.d, x.cy);
+      delivLogOne({c:x.c, d:x.d}, todayStr());
+      const after = dvwAlloc(x.d, x.cy), wkGot = after.findIndex(function(v, i){ return v!==before[i]; }) + 1;
+      const y = dvwFind(t);
+      if(y.done >= y.need && t.status!=='done'){ t.master.prev = t.status; t.status = 'done'; t.completedAt = todayStr(); playTaskComplete(); } else playTick();
       persist('business'); persist('tasks'); renderView();
-      showToast(done >= need ? 'Done for the week: '+need+' '+(need===1 ? delivOne(hit.d) : hit.d.title).toLowerCase()+' for '+(hit.c.business || hit.c.name)+'.' : delivOne(hit.d)+' '+done+' of '+need+' for '+(hit.c.business || hit.c.name)+' ('+Math.round(done/need*100)+'%).', {icon:'&#128230;', actionLabel:'Undo', actionAction:'mtDvUndo', actionId:t.id, duration:4500});
+      const wkNeed = dvwNeeds(x.d)[wkGot - 1];
+      showToast(delivOne(x.d)+' logged: Week '+wkGot+' '+after[wkGot - 1]+'/'+wkNeed+(wkGot!==x.k ? ' (Week '+wkGot+' fills first)' : '')+' · '+dvwLogLine(y)+'.', {icon:'&#128230;', actionLabel:'Undo', actionAction:'mtDvUndo', actionId:t.id, duration:4500});
       return;
     }
     if(t && t.master && t.master.kind==='reach' && t.status!=='done'){
@@ -38175,40 +38327,45 @@ completeTask = (function(base){
     return base.apply(this, arguments);
   };
 })(completeTask);
+// take one back: the cycle's latest one comes off (weeks empty from the last one back)
 ACTIONS.mtDvUndo = function(el, e, id){
-  const t = state.tasks.items.find(function(x){ return x.id===id; }), hit = dvFind(t); if(!hit) return;
-  const l = arr(hit.d.completedDates); if(!l.length) return;
-  const wk = thisWeekKey(); let i = -1;
-  for(let k = l.length - 1; k >= 0; k--){ if(l[k] >= wk){ i = k; break; } }
+  const t = state.tasks.items.find(function(x){ return x.id===id; }), x = dvwFind(t); if(!x) return;
+  const l = arr(x.d.completedDates); let i = -1;
+  for(let k = l.length - 1; k >= 0; k--){ if(l[k] >= x.cy.start && l[k] <= x.cy.end){ i = k; break; } }
   if(i < 0) return;
-  l.splice(i, 1); hit.d.completedDates = l;
+  l.splice(i, 1); x.d.completedDates = l;
   playTick(); persist('business'); renderView();
 };
-// undoing a finished deliverable task takes one back (not the whole week)
+ACTIONS.dvwToday = function(el, e, id){
+  if(e && e.stopPropagation) e.stopPropagation();
+  const t = state.tasks.items.find(function(x){ return x.id===id; }); if(!t || t.status==='done') return;
+  t.status = t.status==='today' ? 'backlog' : 'today';
+  playTick(); persist('tasks'); renderView();
+  showToast(t.status==='today' ? t.title+' (Week '+t.master.wk+') is on today.' : t.title+' (Week '+t.master.wk+') is back in the Client backlog.', {icon:'&#128230;'});
+};
 undoTask = (function(base){
   return function(id){
     const t = state.tasks.items.find(function(x){ return x.id===id; });
-    if(t && t.master && t.master.kind==='dv'){ ACTIONS.mtDvUndo(null, null, id); return; }
+    if(t && t.master && t.master.kind==='dvw'){ ACTIONS.mtDvUndo(null, null, id); return; }
     return base.apply(this, arguments);
   };
 })(undoTask);
-// the card: progress in pieces, and a way to take one back
+// the card: its own color, the week, progress in pieces
+function dvwSegs(done, need){ return '<span class="mt-segs">'+Array.from({length:need}, function(_, i){ return '<i'+(i < done ? ' class="on"' : '')+'></i>'; }).join('')+'</span>'; }
 function dvProgHtml(t){
-  const hit = dvFind(t); if(!hit) return '';
-  const need = dvNeed(hit.d), done = dvDone(hit.d);
-  return '<div class="mt-prog" title="'+done+' of '+need+' this week · '+delivMonthLine(hit.d)+'">'+
-    '<span class="mt-segs">'+Array.from({length:need}, function(_, i){ return '<i'+(i < done ? ' class="on"' : '')+'></i>'; }).join('')+'</span>'+
-    '<b>'+done+'/'+need+'</b>'+
-    (done > 0 ? '<button class="mt-undo" data-action="mtDvUndo" data-id="'+t.id+'" title="Take one back">&minus;</button>' : '')+
-    (done < need ? '<button class="mt-plus" data-action="completeTask" data-id="'+t.id+'" title="Log one">+1</button>' : '')+
+  const x = dvwFind(t); if(!x) return '';
+  return '<div class="mt-prog" title="Week '+x.k+': '+x.done+' of '+x.need+' · '+x.count+'/'+x.total+' this cycle">'+dvwSegs(x.done, x.need)+'<b>'+x.done+'/'+x.need+'</b>'+
+    (x.done > 0 ? '<button class="mt-undo" data-action="mtDvUndo" data-id="'+t.id+'" title="Take one back">&minus;</button>' : '')+
+    (x.done < x.need ? '<button class="mt-plus" data-action="completeTask" data-id="'+t.id+'" title="Log one">+1</button>' : '')+
   '</div>';
 }
 taskCard = (function(base){
   return function(t){
     let h = base.apply(this, arguments);
     if(!t || !t.master) return h;
-    if(t.master.kind==='dv'){
-      h = h.replace(/<span class="mt-badge"[^>]*>[\s\S]*?<\/span>/, '<span class="mt-badge is-dv" title="A deliverable: it comes back every week while they’re a client">&#9638; Deliverable</span>');
+    if(t.master.kind==='dvw'){
+      h = h.replace('<div class="task-card ', '<div class="task-card dlv-card ');
+      h = h.replace(/<span class="mt-badge"[^>]*>[\s\S]*?<\/span>/, '<span class="mt-badge is-dv" title="A client deliverable: this cycle’s Week '+t.master.wk+'">&#128230; Week '+t.master.wk+'</span>');
       return h.replace(/(<div class="task-card-title">[\s\S]*?<\/div>)/, '$1'+dvProgHtml(t));
     }
     if(t.master.kind==='reach'){
@@ -38222,27 +38379,95 @@ taskCard = (function(base){
 openTaskMenu = (function(base){
   return function(t){
     const r = base.apply(this, arguments);
-    const m = document.getElementById('taskCtxMenu'), hit = t && dvFind(t);
-    if(m && hit){
-      const need = dvNeed(hit.d), done = dvDone(hit.d);
-      const b = m.querySelector('[data-op="done"]'); if(b) b.innerHTML = '+1 Log one ('+done+'/'+need+')';
+    const m = document.getElementById('taskCtxMenu'), x = t && dvwFind(t);
+    if(m && x){
+      const b = m.querySelector('[data-op="done"]'); if(b) b.innerHTML = '+1 Log one (Week '+x.k+': '+x.done+'/'+x.need+')';
       const u = m.querySelector('[data-op="undo"]'); if(u) u.innerHTML = '&minus;1 Take one back';
-      if(done > 0 && !u){ const x = document.createElement('button'); x.className = 'ctx-item'; x.dataset.action = 'mtDvUndo'; x.dataset.id = t.id; x.innerHTML = '&minus;1 Take one back'; (b || m.querySelector('.ctx-sep')).insertAdjacentElement('afterend', x); }
+      if(x.count > 0 && !u){ const y = document.createElement('button'); y.className = 'ctx-item'; y.dataset.action = 'mtDvUndo'; y.dataset.id = t.id; y.innerHTML = '&minus;1 Take one back'; (b || m.querySelector('.ctx-sep')).insertAdjacentElement('afterend', y); }
+      const bk = m.querySelector('[data-op="backlog"]'); if(bk) bk.innerHTML = '&larr; Back to the Client backlog';
     }
     return r;
   };
 })(openTaskMenu);
+// the client care ring counts this week's deliverable tasks and the reach-out
+masterGoalDefs = (function(base){
+  return function(){
+    const out = base.apply(this, arguments).filter(function(m){ return m.key!=='care'; });
+    const ts = state.tasks.items.filter(function(t){ return t.master && ((t.master.kind==='dvw' && dvwIsNow(t)) || (t.master.kind==='reach' && t.master.week===thisWeekKey())); });
+    if(ts.length) out.push({key:'care', icon:'&#129309;', label:'Client care this week', cur:ts.filter(function(t){ return t.status==='done'; }).length, target:ts.length, field:null, fmt:function(n){ return fmtGoalNum(n); }, suffix:'',
+      src:'client deliverables and reach-outs', go:'goToClients', color:'#b18cff', color2:'#e0d0ff'});
+    return out;
+  };
+})(masterGoalDefs);
 // Op: a deliverable task is "log one", and he knows who's due a touch
 aiContext = (function(base){
   return function(){
     let s = base.apply(this, arguments);
-    const dv = state.tasks.items.filter(function(t){ return t.master && t.master.kind==='dv' && t.master.week===thisWeekKey(); }).map(function(t){ const h = dvFind(t); return h ? (h.c.business || h.c.name)+': '+t.title+' ('+dvDone(h.d)+'/'+dvNeed(h.d)+')' : ''; }).filter(Boolean);
-    if(dv.length) s += '\nThis week’s deliverable tasks (completing one logs ONE piece; it finishes when the week’s number is in): '+dv.join('; ')+'.';
+    const dv = state.tasks.items.filter(function(t){ return t.master && t.master.kind==='dvw' && dvwIsNow(t); }).map(function(t){ const x = dvwFind(t); return x ? (x.c.business || x.c.name)+': '+t.title+' Week '+x.k+' ('+x.done+'/'+x.need+', '+x.count+'/'+x.total+' this cycle)' : ''; }).filter(Boolean);
+    if(dv.length) s += '\nThis week’s client deliverable tasks (each month’s deliverable is split into four weekly tasks named after it; completing one logs ONE piece): '+dv.join('; ')+'.';
     const r = reachNeeds();
     if(r.length) s += '\nClients due a touch (the "Reach out to clients" task): '+r.map(function(x){ return (x.c.business || x.c.name)+(x.n > 0 ? ' ('+x.n+'d overdue)' : ' (due today)'); }).join(', ')+'.';
     return s;
   };
 })(aiContext);
+
+// ---- the Client backlog: the deliverable tasks, compact, by client ----
+function dvwTasksFor(c, d, cy){ return state.tasks.items.filter(function(t){ const m = t.master; return m && m.kind==='dvw' && m.clientId===c.id && m.delivId===d.id && m.cycle===cy.start; }).sort(function(a, b){ return a.master.wk - b.master.wk; }); }
+function clientBacklogHtml(){
+  const today = todayStr();
+  const blocks = mtActiveClients().map(function(c){
+    const cy = dvwCycle(c), ds = arr(c.deliverables).filter(function(d){ return d.recurring; });
+    if(!ds.length) return '';
+    const hs = clientHealthStatus(c);
+    return '<div class="cbl-client">'+
+      '<div class="cbl-h"><span class="lc-av" style="background:'+clientColor(c)+'">'+escapeHtml(clientInitials(c))+'</span>'+
+        '<span class="cbl-n"><b>'+escapeHtml(c.business || c.name)+'</b><small>Cycle '+fmtDateShort(cy.start)+' to '+fmtDateShort(cy.end)+'</small></span>'+
+        '<span class="cbl-hs"><i class="lc-hs is-'+hs.level+'"></i>'+escapeHtml(clientHealthLabel(hs))+'</span></div>'+
+      ds.map(function(d){
+        const ts = dvwTasksFor(c, d, cy), count = dvwCycleCount(d, cy), total = monthlyTargetFor(d);
+        return '<div class="cbl-d"><div class="cbl-dh"><b>'+escapeHtml(d.title)+'</b><span>'+count+'/'+total+' this cycle</span></div><div class="cbl-weeks">'+
+          ts.map(function(t){
+            const x = dvwFind(t); if(!x) return '';
+            const done = t.status==='done', late = !done && t.deadline < today, now = !done && dvwIsNow(t);
+            return '<div class="cbl-w'+(done ? ' is-done' : late ? ' is-late' : now ? ' is-now' : '')+'" data-id="'+t.id+'">'+
+              '<button class="cbl-wk" data-action="openTaskEditModal" data-id="'+t.id+'"><b>Week '+x.k+'</b><small>'+(done ? 'Done' : late ? 'Overdue · '+fmtDateShort(t.deadline) : 'Due '+fmtDateShort(t.deadline))+'</small></button>'+
+              dvwSegs(x.done, x.need)+
+              '<span class="cbl-wb"><b>'+x.done+'/'+x.need+'</b>'+
+                (done ? '<span class="cbl-ok">&#10003;</span>' : '<button class="mt-plus" data-action="completeTask" data-id="'+t.id+'" title="Log one">+1</button><button class="cbl-today'+(t.status==='today' ? ' is-on' : '')+'" data-action="dvwToday" data-id="'+t.id+'" title="'+(t.status==='today' ? 'On today: tap to send it back' : 'Put it on today')+'">'+(t.status==='today' ? 'On today' : '&rarr; Today')+'</button>')+
+              '</span></div>';
+          }).join('')+'</div></div>';
+      }).join('')+
+    '</div>';
+  }).filter(Boolean);
+  return '<div class="cbl">'+
+    '<div class="lc-h"><div><div class="lc-t">Client backlog</div><div class="lc-s">Each client’s monthly deliverables, split into the four weeks of their cycle. Hit +1 for each one you finish.</div></div></div>'+
+    (blocks.length ? blocks.join('') : '<div class="empty">No retainer deliverables yet. Give a client a package with deliverables and their weeks show up here.</div>')+
+  '</div>';
+}
+// they're kept out of the regular backlog (and its counts and preview)
+function dvwHiddenFromBacklog(fn, self, args){
+  const off = state.tasks.items.filter(function(t){ return t.master && t.master.kind==='dvw' && t.status==='backlog'; });
+  off.forEach(function(t){ t.status = '_clientBacklog'; });
+  try{ return fn.apply(self, args); } finally { off.forEach(function(t){ t.status = 'backlog'; }); }
+}
+renderFocusBacklogTab = (function(base){ return function(){ return dvwHiddenFromBacklog(base, this, arguments); }; })(renderFocusBacklogTab);
+renderFocusTasksOverview = (function(base){ return function(){ return dvwHiddenFromBacklog(base, this, arguments); }; })(renderFocusTasksOverview);
+focusTasksSubtabsHtml = (function(base){
+  return function(){
+    const h = dvwHiddenFromBacklog(base, this, arguments);
+    const n = state.tasks.items.filter(function(t){ return t.master && t.master.kind==='dvw' && t.status!=='done'; }).length;
+    const on = ui.focusTasksSubTab==='clientBacklog';
+    const pill = '<div class="subtab is-dlv'+(on ? ' active' : '')+'" data-action="focusTasksSubTab" data-tab="clientBacklog">&#128230; Client backlog'+(n ? ' <span style="opacity:.7;">'+n+'</span>' : '')+'</div>';
+    return h.replace(/(<div class="subtab[^"]*" data-action="focusTasksSubTab" data-tab="backlog">[\s\S]*?<\/div>)/, '$1'+pill);
+  };
+})(focusTasksSubtabsHtml);
+renderFocusTasksTab = (function(base){
+  return function(){
+    if(ui.focusTasksSubTab==='clientBacklog') return '<div class="subtab-panel" data-key="tasks-clientBacklog">'+clientBacklogHtml()+'</div>';
+    return base.apply(this, arguments);
+  };
+})(renderFocusTasksTab);
+ACTIONS.openClientBacklog = function(){ ui.view = 'focus'; ui.focusTab = 'tasks'; ui.focusTasksSubTab = 'clientBacklog'; renderView(); };
 // the client card's strip: this week's deliverables and whether they're due a touch
 crmCard = (function(base){
   return function(kind, x){
@@ -38337,6 +38562,502 @@ renderOngoingTasksPanel = (function(base){
     try{ return base.apply(this, arguments); } finally { off.forEach(function(t, i){ t.status = was[i]; }); }
   };
 })(renderOngoingTasksPanel);
+// ============ ROUND 38e ============
+// • Top right: just your level and the music player (no clock, no full-screen icon).
+// • Today's full-screen view: a small icon in the panel's corner (and M, and right-click).
+// • Focus: no Minimal button and no way into the minimal view from there.
+// • Skills: → Today / ← Backlog on their cards (they look the same), and never in "Ongoing".
+// • Personal → You: the card turns over like the one on Today.
+// • Op's box: grows with what he says (smoothly), you can resize it, long answers scroll gently.
+// • Op at start-up: if his helper isn't up yet he waits a moment and tries again (no error line).
+
+// ---- top right: level + music ----
+dockHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    tpl.content.querySelectorAll('.md-time, .md-ck, .md-full').forEach(function(e){ e.remove(); });
+    return tpl.innerHTML;
+  };
+})(dockHtml);
+// ---- Today: full screen from a corner icon ----
+renderToday = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(h.indexOf('class="today-hero') < 0) return h;
+    return h.replace(/(<div class="today-hero[^"]*"[^>]*>)/, '$1<button class="th-full" data-action="toggleFocusMinimal" title="Full-screen view (M)" aria-label="Full-screen view"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>');
+  };
+})(renderToday);
+// ---- Focus: no minimal view ----
+renderFocus = (function(base){
+  return function(){
+    const was = state.profile.focusMinimal; state.profile.focusMinimal = false;
+    let h;
+    try{ h = base.apply(this, arguments); } finally { state.profile.focusMinimal = was; }
+    return h.replace(/<span class="lv-corner is-focus">[\s\S]*?<\/button><\/span>/, '');
+  };
+})(renderFocus);
+appMenuHtml = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    h = h.replace(/<div class="ctx-sep"><\/div><button class="ctx-item[^"]*" data-action="ctx" data-op="minimal"[^>]*>[\s\S]*?<\/button>/, '');
+    if(ui.view==='today' && !state.focus.activeSession && !focusMinimalOn()) h += '<div class="ctx-sep"></div>'+ci('minimal', '&#9974; Full-screen view <span class="ctx-kbd">M</span>');
+    return h;
+  };
+})(appMenuHtml);
+
+// ---- skills: Today ⇄ Backlog, and not "Ongoing" ----
+ACTIONS.skillMove = function(el, e, id){
+  if(e && e.stopPropagation) e.stopPropagation();
+  const t = state.tasks.items.find(function(x){ return x.id===id; }); if(!t || t.status==='done') return;
+  if(t.status==='today' && ui.currentTaskId===t.id && typeof releaseCurrentTask==='function') releaseCurrentTask();
+  t.status = t.status==='today' ? 'backlog' : 'today';
+  playTick(); persist('tasks'); renderView();
+  showToast(t.status==='today' ? t.title+' is on today.' : t.title+' is back in the backlog.', {icon:'&#127919;'});
+};
+trainingSkillsHtml = (function(base){
+  return function(){
+    return base.apply(this, arguments).replace(/(<button class="btn btn-ghost btn-sm" data-action="openTaskEditModal" data-id="([^"]+)">Edit<\/button>)/g, function(m, b, id){
+      const t = state.tasks.items.find(function(x){ return x.id===id; }); if(!t) return m;
+      const on = t.status==='today';
+      return b+'<button class="btn btn-ghost btn-sm sk-move'+(on ? ' is-today' : '')+'" data-action="skillMove" data-id="'+id+'" title="'+(on ? 'On today: send it back to the backlog' : 'Put it on today')+'">'+(on ? '&larr; Backlog' : '&rarr; Today')+'</button>';
+    });
+  };
+})(trainingSkillsHtml);
+renderOngoingTasksPanel = (function(base){
+  return function(){
+    const off = state.tasks.items.filter(function(t){ return t.skill && t.status!=='done'; }), was = off.map(function(t){ return t.status; });
+    off.forEach(function(t){ t.status = 'done'; });
+    try{ return base.apply(this, arguments); } finally { off.forEach(function(t, i){ t.status = was[i]; }); }
+  };
+})(renderOngoingTasksPanel);
+
+// ---- Personal → You: the card turns over ----
+function youCardBackHtml(){
+  const x = xpSummary(), r = RANKS[x.rank];
+  return '<div class="pc pc-big ycf-back tier-'+x.rank+'" data-action="ycFlip" style="--rc:'+r.color+'" title="Turn it back">'+
+    '<span class="ycb-badge">'+rankBadgeSvg(x.rank, 44)+'</span>'+
+    '<b class="ycb-rank" style="color:'+r.color+'">'+escapeHtml(r.name)+'</b>'+
+    '<small class="ycb-k">Level '+x.level+' &middot; '+Math.max(0, x.levelHi - x.total).toLocaleString()+' XP to '+(x.level + 1)+'</small>'+
+    '<i class="pcf-bar ycb-bar"><u style="width:'+(x.levelPct*100).toFixed(1)+'%"></u></i>'+
+    (x.maxed ? '<small class="ycb-next">Top rank. Nothing above it.</small>' : x.next ? '<span class="ycb-next"><small>Next rank</small><b style="color:'+x.next.color+'">'+escapeHtml(x.next.name)+'</b>'+
+      (x.needs && x.needs.length ? '<span class="ycb-needs">'+x.needs.map(function(n){ return '<i>'+escapeHtml(n)+'</i>'; }).join('')+'</span>' : '<span class="ycb-needs"><i>Ready: level up to rank up</i></span>')+'</span>' : '')+
+    '<small class="ycb-tap">Tap to turn back</small>'+
+  '</div>';
+}
+renderYouTab = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), front = playerCardHtml('big');
+    if(h.indexOf(front) < 0) return h;
+    const f = front.replace('data-action="openYou"', 'data-action="ycFlip"').replace(/title="[^"]*"/, 'title="Turn the card over"');
+    return h.replace(front, '<div class="ycf'+(ui.ycFlip ? ' is-flipped' : '')+'"><div class="ycf-in">'+f+youCardBackHtml()+'</div></div>');
+  };
+})(renderYouTab);
+ACTIONS.ycFlip = function(el){ ui.ycFlip = !ui.ycFlip; const c = el && el.closest('.ycf'); if(c) c.classList.toggle('is-flipped', !!ui.ycFlip); playTick(); };
+
+// ---- Op's box: grows with his words, resizable, gentle scrolling ----
+function opBubSize(){ const s = state.profile.opBubSize; return s && s.w ? s : {w:380, h:0}; }
+function opBubApplySize(b){
+  if(!b) return;
+  const s = opBubSize(), w = Math.max(300, Math.min(window.innerWidth - 40, s.w));
+  b.style.setProperty('width', w+'px', 'important');
+  opBubFit();
+}
+// the text area is as tall as the words need, up to your size (or 45% of the window), and it animates
+function opBubFit(){
+  const el = document.getElementById('opBubText'); if(!el) return;
+  const s = opBubSize(), max = s.h ? Math.max(70, Math.min(window.innerHeight*0.7, s.h)) : Math.round(window.innerHeight*0.45);
+  const lh = parseFloat(getComputedStyle(el).lineHeight) || 20;
+  const want = Math.max(Math.ceil(lh*2.2), Math.min(max, el.scrollHeight));
+  el.style.setProperty('height', want+'px', 'important');
+  el.style.setProperty('max-height', max+'px', 'important');
+  if(el.scrollHeight > want + 2) el.scrollTo({top:el.scrollHeight, behavior:'smooth'});
+}
+opBubShow = (function(base){
+  return function(){
+    const b = base.apply(this, arguments);
+    if(b && !b.querySelector('.op-bub-rs')){
+      const g = document.createElement('span'); g.className = 'op-bub-rs'; g.title = 'Drag to resize'; b.appendChild(g);
+      g.addEventListener('mousedown', function(e){
+        e.preventDefault(); e.stopPropagation();
+        const r = b.getBoundingClientRect(), el = document.getElementById('opBubText'), th = el ? el.getBoundingClientRect().height : 120, x0 = e.clientX, y0 = e.clientY;
+        b.classList.add('is-resizing');
+        const mv = function(ev){
+          const w = Math.max(300, Math.min(window.innerWidth - 40, r.width + (ev.clientX - x0)));
+          const h = Math.max(70, Math.min(window.innerHeight*0.7, th - (ev.clientY - y0)));
+          state.profile.opBubSize = {w:Math.round(w), h:Math.round(h)};
+          b.style.setProperty('width', w+'px', 'important');
+          if(el){ el.style.setProperty('height', h+'px', 'important'); el.style.setProperty('max-height', h+'px', 'important'); }
+        };
+        const up = function(){ document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); b.classList.remove('is-resizing'); persist('profile'); opBubFit(); };
+        document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
+      });
+      g.addEventListener('dblclick', function(){ state.profile.opBubSize = null; persist('profile'); opBubApplySize(b); });
+    }
+    opBubApplySize(b);
+    return b;
+  };
+})(opBubShow);
+opCaption = (function(base){
+  return function(){
+    const r = base.apply(this, arguments);
+    if(OV.cap==='opBubText' || !OV.cap) requestAnimationFrame(opBubFit);
+    return r;
+  };
+})(opCaption);
+window.addEventListener('resize', function(){ try{ opBubFit(); }catch(e){} });
+
+// ---- Op at start-up: his helper may still be starting; wait and try again instead of an error ----
+const OP_BOOT_AT = Date.now();
+aiCall = (function(base){
+  return async function(req){
+    let res = await base.apply(this, arguments), n = 0;
+    while(res && !res.ok && res.status===0 && !res.cancelled && !res.timedOut && Date.now() - OP_BOOT_AT < 90000 && n < 5){
+      await new Promise(function(r){ setTimeout(r, 1500 + n*1000); }); n++;
+      res = await base.call(this, req);
+    }
+    return res;
+  };
+})(aiCall);
+// ============ ROUND 38f ============
+// • The sidebar only steps aside when a full-screen view is really on screen (it used to vanish on Focus
+//   while you were locked in with the minimal view chosen).
+// • The minimal views: Full view and Player/Cockpit are small links on the panel, not in the corners.
+// • Goals: the master goals sit in Master / This month / This week, and Customize picks which show and
+//   sets their targets. Big goals you set are measured against the target (not from where you started).
+//   A goal of your own needs no number, and the sheet's messages show above it.
+// • Calendar: This week / This month fit their card (no scrolling; a "+N more" if it runs over), and a day
+//   is green only when you beat your deep-work goal, fading the further back it is.
+// • The work alarm always shows up: the full alarm, or (if you're already going, or something's open) a
+//   pop-up. Op knows your alarms, and he never talks over one that's ringing.
+
+// ---- the sidebar ----
+afterRenderHooks.push(function(){
+  if(!document.body.classList.contains('np-on')) return;
+  if(!document.querySelector('#viewRoot .np, #viewRoot .rest-full')) document.body.classList.remove('np-on');
+});
+
+// ---- the minimal views: the switches live on the panel ----
+function npViewLinksHtml(kind){
+  const locked = kind==='locked';
+  const sty = typeof lockedStyle==='function' ? lockedStyle() : 'player';
+  return '<div class="np-views">'+
+    '<button class="np-v" data-action="'+(locked ? 'toggleLockedView' : 'toggleFocusMinimal')+'" title="Back to the full page (M)">&#9638; Full view</button>'+
+    (locked ? '<i></i><button class="np-v" data-action="lockedStyleSet" data-id="'+(sty==='cockpit' ? 'player' : 'cockpit')+'" title="Switch the look">'+(sty==='cockpit' ? '&#9654; Player' : '&#9680; Cockpit')+'</button>' : '')+
+  '</div>';
+}
+function npMoveSwitches(h, kind){
+  const tpl = document.createElement('template'); tpl.innerHTML = h;
+  const root = tpl.content.firstElementChild; if(!root) return h;
+  root.querySelectorAll('.np-top .lv-btn, .np-top .lv-corner').forEach(function(e){ e.remove(); });
+  const links = document.createElement('template'); links.innerHTML = npViewLinksHtml(kind);
+  const spot = root.querySelector('.ckx-l') || root.querySelector('.np-meta') || root.querySelector('.hm-acts, .hm-btns') || root.querySelector('.np-main');
+  if(kind==='home'){
+    const ref = root.querySelector('[data-action="clockOut"]');
+    const holder = ref ? ref.parentElement : null;
+    if(holder && holder.parentElement){ holder.parentElement.insertBefore(links.content.firstElementChild, holder.nextSibling); return tpl.innerHTML; }
+  }
+  if(spot) spot.appendChild(links.content.firstElementChild);
+  return tpl.innerHTML;
+}
+renderLockedMinimal = (function(base){ return function(){ return npMoveSwitches(base.apply(this, arguments), 'locked'); }; })(renderLockedMinimal);
+renderFocusMinimal = (function(base){ return function(){ return npMoveSwitches(base.apply(this, arguments), 'home'); }; })(renderFocusMinimal);
+
+// ---- goals ----
+// a big one you set is measured against its target (MRR 10.5k of 20k is 52%, not "0% since you set it");
+// weight still counts from where you started, since down is the way
+goalPct = (function(base){
+  return function(g){
+    if(g && g.master && g.autoTrack && g.autoTrack!=='weight' && g.target > 0){
+      const cur = goalLiveCurrent(g); return cur==null ? 0 : clamp(cur/g.target*100, 0, 100);
+    }
+    return base.apply(this, arguments);
+  };
+})(goalPct);
+const MG_PERIOD = {mrr:'master', weight:'master', streak:'master', workouts:'week', deep:'week', care:'week'};
+function mgHidden(){ const h = state.profile.mgHide; return h && typeof h==='object' ? h : {}; }
+// one monthly ring of the app's own: new clients this month (shown in This month; it pays nothing extra)
+function mgMonthlyDefs(){
+  const p = state.profile, mk = thisMonthKey();
+  const n = arr(state.business && state.business.clients).filter(function(c){ return monthKeyOf(c.startDate || c.createdAt || '')===mk; }).length;
+  const target = Number(p.newClientsGoalMonthly) || Number(state.standards && state.standards.newClientsPerMonth) || 2;
+  return [{key:'newclients', icon:'&#129309;', label:'New clients this month', cur:n, target:target, field:'newClientsGoalMonthly', fmt:function(x){ return fmtGoalNum(x); }, suffix:'', src:'clients you started this month', go:'goToClients', color:'#5BC0EB', color2:'#b8e6f7'}];
+}
+function mgSectionHtml(title, cards){
+  if(!cards.length) return '';
+  return '<div class="gx-sec-h">'+title+'</div>'+cards.join('');
+}
+renderGoalsTab = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    const hide = mgHidden(), defs = masterGoalDefs(), mine = arr(state.goals && state.goals.items).filter(function(g){ return g.master && !g.tier; });
+    const vis = function(m){ return !hide[m.key]; };
+    const hero = defs[0] && vis(defs[0]) ? masterHeroHtml(defs[0]) : '';
+    const master = defs.slice(1).filter(function(m){ return (MG_PERIOD[m.key] || 'master')==='master' && vis(m); }).map(function(m){ return masterRingHtml(m, false); })
+      .concat(mine.filter(function(g){ return !hide['g:'+g.id]; }).map(userMasterRingHtml));
+    const month = mgMonthlyDefs().filter(vis).map(function(m){ return masterRingHtml(m, false).replace(/<span class="mg-xp[\s\S]*?<\/span>/, ''); });
+    const week = defs.filter(function(m){ return MG_PERIOD[m.key]==='week' && vis(m); }).map(function(m){ return masterRingHtml(m, false); });
+    let rings = mgSectionHtml('Master', master)+mgSectionHtml('This month', month)+mgSectionHtml('This week', week);
+    const cust = '<button class="gx-cust" data-action="mgCustomize" title="Pick which master goals show and set their targets">&#9881;&#65038; Customize</button>';
+    rings = rings ? rings.replace(/(<div class="gx-sec-h">[^<]*)<\/div>/, '$1'+cust+'</div>') : '<div class="gx-sec-h">'+cust+'</div><div class="gx-none">Every master goal is hidden. Customize brings them back.</div>';
+    const top = '<div class="gx-top'+(hero ? '' : ' no-hero')+'">'+hero+'<div class="gx-rings is-grouped">'+rings+'</div></div>';
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const old = tpl.content.querySelector('.gx-top');
+    if(!old) return h;
+    const nt = document.createElement('template'); nt.innerHTML = top;
+    old.replaceWith(nt.content.firstElementChild);
+    return tpl.innerHTML;
+  };
+})(renderGoalsTab);
+// (a ring that has no field of its own to edit uses the profile key the def names)
+ACTIONS.saveMasterTarget = (function(base){
+  return function(el, e, id){
+    if(id==='newclients'){ const i = document.getElementById('mgEdit-'+id); const v = i ? Number(i.value) : NaN; if(v > 0){ state.profile.newClientsGoalMonthly = v; persist('profile'); } ui.editMaster = null; renderView(); return; }
+    return base ? base.apply(this, arguments) : undefined;
+  };
+})(ACTIONS.saveMasterTarget);
+// Customize: show/hide, the target, and which group it's in
+function mgCustomizeHtml(){
+  const hide = mgHidden(), defs = masterGoalDefs().concat(mgMonthlyDefs()), mine = arr(state.goals && state.goals.items).filter(function(g){ return g.master && !g.tier && !g.done; });
+  const per = {master:'Master', month:'This month', week:'This week'};
+  const row = function(key, icon, label, period, target, unit, editable){
+    const on = !hide[key];
+    return '<div class="mgc-row'+(on ? '' : ' is-off')+'"><label class="ws-switch"><input type="checkbox" data-mgc="'+key+'"'+(on ? ' checked' : '')+'><span></span></label>'+
+      '<span class="mgc-i">'+icon+'</span><span class="mgc-l"><b>'+escapeHtml(label)+'</b><small>'+per[period]+'</small></span>'+
+      (editable ? '<label class="mgc-t"><input class="input" type="number" step="any" data-mgt="'+key+'" value="'+(target!=null ? target : '')+'" placeholder="target"><em>'+escapeHtml(unit||'')+'</em></label>' : '<span class="mgc-t is-ro">'+(target!=null ? fmtGoalNum(target)+' '+escapeHtml(unit||'') : '')+'</span>')+
+    '</div>';
+  };
+  const groups = {master:[], month:[], week:[]};
+  defs.forEach(function(m){
+    const period = m.key==='newclients' ? 'month' : (MG_PERIOD[m.key] || 'master');
+    const unit = m.key==='mrr' ? '$/mo' : m.key==='weight' ? 'lbs' : m.key==='deep' ? 'hours' : m.key==='streak' ? 'days' : '';
+    groups[period].push(row(m.key, m.icon, m.label, period, m.target, unit, !!m.field && m.key!=='care'));
+  });
+  mine.forEach(function(g){ groups.master.push(row('g:'+g.id, (goalTracker(g) || {icon:'&#127919;'}).icon, g.label, 'master', g.target, (goalTracker(g) || {}).unit || g.unit || '', false)); });
+  return '<button class="int-x hs-x" data-action="mgCustomizeClose" title="Close">&#10005;</button>'+
+    '<div class="gs-h">Master goals</div><div class="mgc-sub">Pick which show on Goals and set their targets. Big goals of your own come from the + (Long-term).</div>'+
+    ['master', 'month', 'week'].map(function(k){ return groups[k].length ? '<div class="mgc-g"><div class="mgc-gh">'+per[k]+'</div>'+groups[k].join('')+'</div>' : ''; }).join('')+
+    '<div class="gs-foot"><button class="btn btn-ghost" data-action="mgAddBig">&#65291; A big goal of your own</button><button class="btn btn-primary" data-action="mgCustomizeClose">Done</button></div>';
+}
+ACTIONS.mgCustomize = function(){
+  let o = document.getElementById('mgcSheet');
+  if(!o){ o = document.createElement('div'); o.id = 'mgcSheet'; o.className = 'overlay gs-ov hidden'; o.innerHTML = '<div class="card gs mgc" id="mgcContent"></div>'; document.body.appendChild(o); }
+  document.getElementById('mgcContent').innerHTML = mgCustomizeHtml();
+  o.classList.remove('hidden');
+};
+ACTIONS.mgCustomizeClose = function(){ const o = document.getElementById('mgcSheet'); if(o) o.classList.add('hidden'); renderView(); };
+ACTIONS.mgAddBig = function(){ ACTIONS.mgCustomizeClose(); ui.gsTrack = 'mrr'; openGoalSheet('long'); };
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.closest || !t.closest('#mgcSheet')) return;
+  if(t.dataset.mgc){ const h = Object.assign({}, mgHidden()); if(t.checked) delete h[t.dataset.mgc]; else h[t.dataset.mgc] = true; state.profile.mgHide = h; persist('profile'); t.closest('.mgc-row').classList.toggle('is-off', !t.checked); playTick(); }
+  if(t.dataset.mgt){
+    const key = t.dataset.mgt, v = Number(t.value);
+    const m = masterGoalDefs().concat(mgMonthlyDefs()).find(function(x){ return x.key===key; });
+    if(m && m.field && (v > 0 || (key==='weight' && t.value!==''))){ state.profile[m.field] = v; persist('profile'); playTick(); }
+  }
+});
+// a goal of your own: no number needed (it's then done or not done)
+ACTIONS.gsSave = (function(base){
+  return function(){
+    if((ui.gsKind || 'week')==='long' && (!ui.gsTrack || ui.gsTrack==='own')){
+      const t = document.getElementById('gsTarget'), l = document.getElementById('gsLabel');
+      if(t && !(Number(t.value) > 0) && l && l.value.trim()) t.value = '1';
+    }
+    const n = state.goals.items.length, r = base.apply(this, arguments);
+    if(state.goals.items.length > n){
+      const g = state.goals.items[state.goals.items.length - 1];
+      setTimeout(function(){ showToast('Added: '+goalTitle(g)+(g.tier ? ' (in '+(g.tier==='month' ? 'this month' : 'this week')+')' : g.master ? ' (in your master goals)' : ' (under Your goals)')+'.', {icon:'&#127919;'}); }, 300);
+    } else if((ui.gsKind || 'week')!=='long'){
+      const k = ui.gsKind || 'week', key = periodKey(k);
+      if(checkedOut(k, key)) showToast('This '+(k==='month' ? 'month' : 'week')+' is checked out. Reopen it to add more.', {icon:'&#128274;'});
+      else if(tierGoals(k, key).length >= 5) showToast('That’s five already. Finish one first.', {icon:'&#127919;'});
+    }
+    return r;
+  };
+})(ACTIONS.gsSave);
+
+// ---- calendar: This week / This month fit their card ----
+function cxFitTier(){
+  const body = document.querySelector('.calx .cx-tierbody'); if(!body) return;
+  const list = body.querySelector('.tg-list'); if(!list) return;
+  const rows = Array.from(list.querySelectorAll('.tg-row')); rows.forEach(function(r){ r.style.display = ''; });
+  const old = list.querySelector('.tg-more'); if(old) old.remove();
+  if(body.scrollHeight <= body.clientHeight + 1) return;
+  let hidden = 0;
+  const more = document.createElement('button'); more.className = 'tg-more'; more.dataset.action = 'nav'; more.dataset.view = 'personal'; more.dataset.tab = 'goals';
+  list.appendChild(more);
+  // finished ones go first, then the open ones from the bottom
+  const order = rows.filter(function(r){ return r.classList.contains('is-done'); }).reverse()
+    .concat(rows.filter(function(r){ return !r.classList.contains('is-done'); }).reverse());
+  for(let i = 0; i < order.length && body.scrollHeight > body.clientHeight + 1; i++){
+    order[i].style.display = 'none'; hidden++;
+    more.textContent = '+'+hidden+' more on Goals';
+  }
+  if(!hidden) more.remove();
+}
+afterRenderHooks.push(function(){ if(ui.view==='calendar') requestAnimationFrame(cxFitTier); });
+window.addEventListener('resize', function(){ if(ui.view==='calendar') cxFitTier(); });
+// green = a day you beat your deep-work goal; it fades the further back it is
+cxMonthCardHtml = (function(base){
+  return function(){
+    const target = state.standards.deepWorkTargetMinutes || 180, today = todayStr();
+    return base.apply(this, arguments)
+      .replace(/(data-date="(\d{4}-\d{2}-\d{2})"[^>]*?style="--h:)[0-9.]+/g, function(m, pre, ds){
+        if(ds > today) return pre+'0';
+        const dw = deepWorkMinutesFor(ds), met = dw >= target;
+        const age = Math.max(0, daysAgoFrom(ds));
+        return pre+(met ? Math.max(0.18, 1 - age*0.028).toFixed(2) : '0');
+      })
+      .replace('<span><i class="is-heat"></i>Worked</span>', '<span title="Days you beat your deep-work goal; older ones fade"><i class="is-heat"></i>Hit your goal</span>');
+  };
+})(cxMonthCardHtml);
+
+// ---- the work alarm always shows up ----
+function workPopHtml(started){
+  const w = workToday();
+  return '<div class="wpop-card"><span class="wpop-i">&#128188;</span><div class="wpop-t"><b>'+(started ? 'Work hours start now' : 'Time to work')+'</b><small>'+fmt12Hour(w.start)+' to '+fmt12Hour(w.end)+(started ? ' &middot; you’re already at it' : '')+'</small></div>'+
+    (started ? '' : '<button class="btn btn-primary btn-sm" data-action="workPopGo">Let’s go</button>')+'<button class="btn btn-ghost btn-sm" data-action="workPopX">'+(started ? 'Nice' : 'Later')+'</button></div>';
+}
+function workPopShow(started){
+  let el = document.getElementById('workPop');
+  if(!el){ el = document.createElement('div'); el.id = 'workPop'; el.className = 'wpop'; document.body.appendChild(el); }
+  el.innerHTML = workPopHtml(started); el.classList.remove('is-in'); void el.offsetWidth; el.classList.add('is-in');
+  try{ if(typeof playAlarmSound==='function') playAlarmSound(workCfg().sound || 'standard'); }catch(e){}
+  try{ if('Notification' in window && Notification.permission==='granted') new Notification('Operator: work hours start now'); }catch(e){}
+  clearTimeout(workPopShow._t); workPopShow._t = setTimeout(function(){ el.classList.remove('is-in'); }, 90000);
+}
+ACTIONS.workPopX = function(){ const el = document.getElementById('workPop'); if(el) el.classList.remove('is-in'); };
+ACTIONS.workPopGo = function(){ ACTIONS.workPopX(); if(typeof clockIn==='function') clockIn({from:'workalarm'}); };
+checkWorkAlarm = (function(base){
+  return function(){
+    const w = workToday();
+    if(w.enabled && workDayToday()){
+      const d = workDayState(), m = nowMin(), s = hmMin(w.start);
+      if(s!=null && !d.rangAt && m >= s && m < s + 60){
+        const brief = overlayOpen('wakeOverlay') && ui.wakeMode==='brief';
+        const blocked = workStartedToday() || overlayOpen('planOverlay') || (overlayOpen('wakeOverlay') && !brief);
+        if(blocked){ d.rangAt = Date.now(); persist('focus'); workPopShow(workStartedToday()); return; }
+      }
+    }
+    return base.apply(this, arguments);
+  };
+})(checkWorkAlarm);
+
+// ---- Op and alarms: he knows them, and he waits while one rings ----
+function alarmRingingNow(){
+  return overlayOpen('alarmOverlay') || !!(typeof wakeRing!=='undefined' && wakeRing && overlayOpen('wakeOverlay') && /^(ring|work|snooze)$/.test(ui.wakeMode || ''));
+}
+opSay = (function(base){
+  return function(){
+    const self = this, args = arguments;
+    if(!alarmRingingNow()) return base.apply(self, args);
+    return new Promise(function(res){
+      const t0 = Date.now();
+      const wait = setInterval(function(){
+        if(alarmRingingNow() && Date.now() - t0 < 180000) return;
+        clearInterval(wait);
+        Promise.resolve(base.apply(self, args)).then(res, res);
+      }, 700);
+    });
+  };
+})(opSay);
+aiContext = (function(base){
+  return function(){
+    let s = base.apply(this, arguments);
+    const out = [];
+    try{
+      const wk = typeof wakeCfg==='function' ? wakeCfg() : null, nw = typeof nextWake==='function' ? nextWake() : null;
+      if(wk && wk.enabled && nw) out.push('wake-up alarm '+fmt12Hour(nw.time)+(nw.date && nw.date!==todayStr() ? ' ('+nw.date+')' : ''));
+      const w = workToday(); if(w.enabled && workDayToday()) out.push('work alarm '+fmt12Hour(w.start)+' (work hours to '+fmt12Hour(w.end)+')');
+      arr(state.focus.alarms).filter(function(a){ return a.enabled; }).forEach(function(a){ out.push((a.label || 'alarm')+' '+fmt12Hour(a.time)); });
+    }catch(e){}
+    if(out.length) s += '\nAlarms: '+out.join('; ')+'.'+(alarmRingingNow() ? ' AN ALARM IS RINGING RIGHT NOW: wait until it’s dealt with.' : '');
+    return s;
+  };
+})(aiContext);
+
+// ---- Settings → Test & demo: no "can't get going" preview button (it only showed on Today, so it looked dead) ----
+testDemoHtml = (function(base){ return function(){ return base.apply(this, arguments).replace(/<button class="btn btn-sm tb" data-action="tbStuck"[^>]*>[\s\S]*?<\/button>/, ''); }; })(testDemoHtml);
+
+// ---- the mic, the way Discord does it: one steady stream, not in and out ----
+// Every time a listener started and stopped, macOS switched the audio route (headphones drop into "call"
+// quality, other apps get turned down) and back again. Now, while Operator is in front and Op's ear is on,
+// one mic stream stays open (no voice processing, so nothing else gets ducked) and the listeners ride on
+// it. The wake word keeps running while Op talks and just ignores what it hears, instead of stopping and
+// restarting every few seconds. Click into another app and the mic is let go after a moment.
+const MIC = {stream:null, want:false, offAt:0, opening:false};
+function micHoldWanted(){
+  const m = state.modes && state.modes.active;
+  return state.profile.micSteady!==false && typeof heyOpOn==='function' && heyOpOn() && !document.hidden && document.hasFocus() && !(m && m.sleep);
+}
+function micHoldSync(){
+  const want = micHoldWanted();
+  if(want){
+    MIC.offAt = 0;
+    if(!MIC.stream && !MIC.opening && navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+      MIC.opening = true;
+      navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false, noiseSuppression:false, autoGainControl:false, channelCount:1}})
+        .then(function(s){ MIC.opening = false; if(!micHoldWanted()){ s.getTracks().forEach(function(t){ t.stop(); }); return; } MIC.stream = s; })
+        .catch(function(){ MIC.opening = false; MIC.failedAt = Date.now(); });
+    }
+  } else if(MIC.stream){
+    if(!MIC.offAt) MIC.offAt = Date.now() + 8000;
+    else if(Date.now() >= MIC.offAt){ MIC.stream.getTracks().forEach(function(t){ t.stop(); }); MIC.stream = null; MIC.offAt = 0; }
+  }
+}
+setInterval(function(){ try{ if(!MIC.failedAt || Date.now() - MIC.failedAt > 60000) micHoldSync(); }catch(e){} }, 1500);
+window.addEventListener('focus', function(){ try{ micHoldSync(); }catch(e){} });
+// the wake word: only hard stops stop it (app in the background, asleep, the main mic in use); while Op is
+// talking or just asked something it keeps running and ignores what it hears
+function heySoftQuiet(){ return !!((OV.lastEnd && Date.now() - OV.lastEnd < 9000) || OV.qDuck || AI.busy || OV.speaking || OV.pending); }
+heyQuietNow = (function(base){
+  return function(){
+    if(state.profile.micSteady===false) return base.apply(this, arguments);
+    const m = state.modes && state.modes.active;
+    return !!(AI.listening || document.hidden || !document.hasFocus() || (m && m.sleep) || (typeof inspBreathOn!=='undefined' && ui.inspBreath));
+  };
+})(heyQuietNow);
+heyHeard = (function(base){ return function(){ if(state.profile.micSteady!==false && heySoftQuiet()) return; return base.apply(this, arguments); }; })(heyHeard);
+// ============ ROUND 38g ============
+// • Clock out → Plan of attack: it starts from your list as it is right now (every task on today that
+//   isn't done, plus this week's client deliverables, the Reels and so on), not an old saved plan or the
+//   first six. Anything you'd already picked for tomorrow stays, in your order, on top.
+
+function windActiveIds(){
+  const items = state.tasks.items.filter(function(t){
+    if(t.status==='done' || isOngoingDoneToday(t)) return false;
+    if(t.status==='today') return true;
+    return !!(t.master && t.master.kind==='dvw' && t.status==='backlog' && typeof dvwIsNow==='function' && dvwIsNow(t));
+  });
+  const today = lineupOrdered(items.filter(function(t){ return t.status==='today'; }));
+  const dv = items.filter(function(t){ return t.status!=='today'; });
+  return today.concat(dv).map(function(t){ return t.id; });
+}
+openWindDown = (function(base){
+  return function(){
+    const r = base.apply(this, arguments);
+    if(ui.wind){
+      const np = state.focus.nightPlan && state.focus.nightPlan.date===ui.wind.target ? arr(state.focus.nightPlan.taskIds).filter(windTask) : [];
+      const plan = np.slice();
+      windActiveIds().forEach(function(id){ if(plan.indexOf(id) < 0) plan.push(id); });
+      ui.wind.plan = plan;
+      renderWindInto();
+    }
+    return r;
+  };
+})(openWindDown);
+
+// ---- Today: the day streak, bigger and out of its pill (a line under it says where today stands) ----
+streakWorkHtml = (function(base){
+  return function(o){
+    let h = base.apply(this, arguments);
+    if(h.indexOf('is-r38') < 0) return h;
+    const s = computeStreak(), ok = dayStandardsComplete(todayStr());
+    const sub = ok ? 'Today’s in the bag' : s > 0 ? 'Keep it alive today' : 'Start one today';
+    h = h.replace(/days?<br>streak<\/span>/, 'day streak</span><small class="sw-ss'+(ok ? ' is-ok' : '')+'">'+sub+'</small>');
+    return h.replace(/<span class="streak-ok"[^>]*>&#10003;<\/span>/, '');
+  };
+})(streakWorkHtml);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
