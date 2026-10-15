@@ -6921,3 +6921,84 @@ body:has(#wakeOverlay:not(.hidden)) .activity-pill{ display:none !important; }
 .ckd-bar-t u{ display:block; height:100%; border-radius:7px; background:linear-gradient(90deg, #E8A23D, #f5c16c); transition:width .6s ease; } .ckd-bar-t u.is-hit{ background:linear-gradient(90deg, #3FBE8E, #6fe0b0); }
 .ckd-bar-k{ margin-top:8px; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.5); }
 .ckx .ckd-week{ flex:1; min-height:120px; height:auto; }
+
+/* ============ ROUND 38 ============ */
+/* Op's light: no eclipse (the dark moon is gone): just his light */
+.op-light::after{ display:none !important; }
+/* Rainbow: his color walks the spectrum */
+@keyframes opRainbow{
+  0%  { --op-c:#ff7a7a; --op-glow:rgba(255,122,122,.8); --op-glow2:rgba(255,122,122,.36); }
+  17% { --op-c:#ffb35c; --op-glow:rgba(255,179,92,.8); --op-glow2:rgba(255,179,92,.36); }
+  33% { --op-c:#ffe66d; --op-glow:rgba(255,230,109,.8); --op-glow2:rgba(255,230,109,.36); }
+  50% { --op-c:#6ff0a0; --op-glow:rgba(111,240,160,.8); --op-glow2:rgba(111,240,160,.36); }
+  67% { --op-c:#5bc0eb; --op-glow:rgba(91,192,235,.8); --op-glow2:rgba(91,192,235,.36); }
+  83% { --op-c:#b18cff; --op-glow:rgba(177,140,255,.8); --op-glow2:rgba(177,140,255,.36); }
+  100%{ --op-c:#ff7a7a; --op-glow:rgba(255,122,122,.8); --op-glow2:rgba(255,122,122,.36); }
+}
+.opc-sw[data-id="rainbow"] i{ background:conic-gradient(from 20deg, #ff7a7a, #ffb35c, #ffe66d, #6ff0a0, #5bc0eb, #b18cff, #ff7a7a); box-shadow:0 0 12px rgba(177,140,255,.55); }
+@media (prefers-reduced-motion:reduce){ :root{ animation-duration:60s !important; } }
+
+/* Today: the full-screen view lives with the time and music, top right */
+.md-full{ margin-left:2px; }
+.md-full:hover{ color:var(--text); background:rgba(var(--ink),.08); }
+/* the hero's left side fills the panel: name and Op up top, the weather card at the bottom */
+@media (min-width:1181px){ .today-hero > .th-left.th-mix{ align-self:stretch !important; justify-content:flex-start !important; } }
+.th-left.th-mix .th-wx.is-r38{ margin-top:auto; padding-top:10px; }
+.twx{ display:flex; align-items:center; gap:12px; min-height:58px; padding:9px 14px 9px 12px; border-radius:14px; border:1px solid rgba(var(--ink),.08); background:rgba(var(--ink),.04); color:var(--text-dim); box-sizing:border-box; }
+.twx[data-sky="day"], .twx[data-sky="morning"]{ background:linear-gradient(100deg, rgba(255,196,92,.12), rgba(var(--ink),.03) 60%); }
+.twx[data-sky="golden"], .twx[data-sky="dawn"]{ background:linear-gradient(100deg, rgba(255,140,90,.14), rgba(var(--ink),.03) 60%); }
+.twx[data-sky="dusk"], .twx[data-sky="night"]{ background:linear-gradient(100deg, rgba(120,140,255,.14), rgba(var(--ink),.03) 60%); }
+.twx-i{ font-size:26px; line-height:1; flex:none; }
+.twx-t{ font-family:var(--font-display); font-size:28px; font-weight:800; line-height:1; color:var(--text); font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+.twx-c{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+.twx-c > span{ font-size:13.5px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.twx-c small{ font-size:11.5px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-variant-numeric:tabular-nums; }
+.twx-set{ border:0; padding:0; background:none; font:inherit; color:var(--text-dim); text-decoration:underline; text-decoration-color:rgba(var(--ink),.25); text-underline-offset:2px; cursor:pointer; }
+.twx-set:hover{ color:var(--text); }
+.twx-sun{ margin-left:auto; flex:none; display:flex; flex-direction:column; align-items:center; width:124px; }
+.twx-left{ font-size:10.5px; color:var(--text-dim); text-align:center; white-space:nowrap; margin-bottom:1px; }
+.twx-sun .sun-arc{ display:block; width:104px; height:26px; }
+.twx-times{ align-self:stretch; display:flex; justify-content:space-between; gap:6px; white-space:nowrap; font-size:9.5px; color:var(--text-dim); font-variant-numeric:tabular-nums; opacity:.85; margin-top:1px; }
+.twx-times span:first-child{ color:color-mix(in srgb, #ffb347 55%, var(--text-dim)); } .twx-times span:last-child{ color:color-mix(in srgb, #ff8a5c 55%, var(--text-dim)); }
+@media (max-width:760px){ .twx-left{ display:none; } .twx-sun{ width:84px; } .twx-sun .sun-arc{ width:84px; } }
+
+/* the streak row: a smaller streak, the week, and the Tasks bar stretched under them */
+.sw.is-row.is-r38{ flex-wrap:wrap; row-gap:12px; column-gap:18px; padding:12px 18px 14px; }
+.sw.is-r38 .sw-l{ min-width:0; }
+.sw.is-r38 .sw-streak{ gap:6px; padding:6px 12px 6px 9px; border-radius:999px; background:rgba(var(--ink),.04); border:1px solid rgba(var(--ink),.06); }
+.sw.is-r38 .sw-streak > b{ font-size:19px; }
+.sw.is-r38 .sw-flame{ font-size:15px; }
+.sw.is-r38 .sw-streak > span:not(.sw-flame):not(.streak-ok):not(.qtip){ font-size:9.5px; letter-spacing:.08em; }
+.sw.is-r38 .sw-days{ flex:1; }
+.sw.is-r38 .sw-c{ width:36px !important; height:36px !important; }
+.sw.is-r38 .sw-h{ font-size:10.5px; }
+.swt{ flex:1 0 100%; display:flex; align-items:center; gap:14px; padding:10px 14px; border-radius:12px; border:1px solid rgba(var(--ink),.07); background:rgba(var(--ink),.03); color:var(--text); font:inherit; text-align:left; cursor:pointer; transition:background .15s, border-color .15s; box-sizing:border-box; }
+.swt:hover{ background:rgba(var(--ink),.055); border-color:rgba(var(--ink),.12); }
+.swt-k{ flex:none; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); }
+.swt-n{ flex:none; font-family:var(--font-display); font-size:24px; font-weight:800; line-height:1; font-variant-numeric:tabular-nums; }
+.swt-n small{ font-size:14px; font-weight:600; color:var(--text-dim); }
+.swt-segs{ flex:1; display:flex; gap:5px; min-width:120px; }
+.swt-segs i{ flex:1; height:9px; border-radius:5px; background:rgba(var(--ink),.1); }
+.swt-segs i.on{ background:var(--accent); box-shadow:0 0 10px color-mix(in srgb, var(--accent) 45%, transparent); }
+.swt-bar{ flex:1; height:9px; border-radius:5px; background:rgba(var(--ink),.1); overflow:hidden; min-width:120px; }
+.swt-bar i{ display:block; height:100%; border-radius:inherit; background:var(--accent); }
+.swt-r{ flex:0 1 auto; max-width:42%; font-size:12.5px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.swt-r em{ font-style:normal; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; opacity:.75; }
+.sw.is-r38 .sw-edit{ left:auto; right:8px; top:6px; bottom:auto; }
+@media (max-width:760px){ .swt-r{ display:none; } }
+
+/* a task that's a client's deliverable */
+.tdv-opt{ font-weight:400; opacity:.6; text-transform:none; letter-spacing:0; }
+.tdv-row{ display:flex; flex-wrap:wrap; gap:6px; }
+.tdv-chip{ display:inline-flex; align-items:center; gap:7px; padding:4px 11px 4px 4px; border-radius:999px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text-dim); font:inherit; font-size:12.5px; cursor:pointer; transition:border-color .15s, background .15s; }
+.tdv-chip i{ width:22px; height:22px; border-radius:50%; display:grid; place-items:center; font-style:normal; font-size:9px; font-weight:800; color:#fff; flex:none; }
+.tdv-chip b{ font-weight:600; color:var(--text); }
+.tdv-chip em{ font-style:normal; font-size:11px; opacity:.75; font-variant-numeric:tabular-nums; }
+.tdv-chip:hover{ border-color:var(--text-dim); }
+.tdv-chip.is-on{ border-color:var(--good); background:rgba(63,190,142,.13); color:var(--text); }
+.tdv-hint{ margin-top:7px; font-size:12px; color:var(--good); }
+@keyframes tdvAsk{ 0%,100%{ box-shadow:0 0 0 0 transparent; } 50%{ box-shadow:0 0 0 4px rgba(63,190,142,.25); } }
+.tdv.is-ask .tdv-row{ border-radius:14px; animation:tdvAsk 1s 2; }
+.tdv-badge{ display:inline-flex; align-items:center; gap:3px; margin-right:6px; padding:1px 7px; border-radius:999px; font-size:10.5px; font-weight:700; letter-spacing:.02em; color:#3FBE8E; background:rgba(63,190,142,.14); vertical-align:middle; }
+.cc2-deliv-mo{ margin-left:7px; font-size:10.5px; font-weight:500; color:var(--text-dim); opacity:.85; font-variant-numeric:tabular-nums; }
+.cf-deliv-mo{ margin-left:8px; font-size:11px; font-weight:500; color:var(--text-dim); font-variant-numeric:tabular-nums; }

@@ -110,7 +110,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("finishActiveMode(true); renderView()"); await p.waitForTimeout(150);
     check('This week + Consistency are one panel (shown since Consistency was on)', (await p.$$('.progress-panel .wk-bars')).length===1 && (await p.$$('.progress-panel .hm-cell')).length > 100 && (await p.$$('.heatmap-panel, .week-panel')).length===0);
     check('the merge is saved once and later choices stick', (await E("state.dashboardPanels.progressMerged")) && (await E("state.dashboardPanels.enabled.week"))!==false);
-    check('the sky under the clock is one tidy pill with the sun\'s arc', await p.isVisible('.skyp .sun-arc'));
+    check('the sky under the clock is one tidy card with the sun\'s arc (r38)', await p.isVisible('.twx .sun-arc'));
     check('the streak line has a ? explaining it', !!(await p.$('.sw-streak .qtip, .sw-streak [class*="tip"]')));
     check('no errors (today)', !p.errors.length, p.errors);
     await p.context().close();

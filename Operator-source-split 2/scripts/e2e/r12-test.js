@@ -123,7 +123,7 @@ const RSS = '<?xml version="1.0"?><rss><channel><title>NPR Topics: News</title><
     await E("ui.view='focus'; ui.focusTab='tasks'; renderView()"); await p.waitForTimeout(200);
     check('"Current Lineup", not "Today\'s Lineup"', /Current Lineup/.test(await p.textContent('#viewRoot')) && !/Today's Lineup/.test(await p.textContent('#viewRoot')));
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(200);
-    check('the sky on Today is one tidy pill with the sun\'s arc', await p.isVisible('.skyp .sun-arc') && /61°/.test(await p.textContent('.skyp')));
+    check('the sky on Today is one tidy card with the sun\'s arc (r38)', await p.isVisible('.twx .sun-arc') && /61°/.test(await p.textContent('.twx')));
     check('the client cycle step isn\'t on the front page', !(await p.$('.hub-step')));
     await p.click('#sidebarNav [data-view="convos"]'); await p.waitForTimeout(300);
     check('the sidebar says Social and it opens on the stats', /Social/.test(await p.textContent('#sidebarNav [data-view="convos"]')) && await E("inboxState().mode")==='social');

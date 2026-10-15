@@ -58,7 +58,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   {
     const p = await newPage(b, OUT+'/r5.html', {profile:{name:'Andre'}, tasks}, new Date(2026,9,8,18,20).getTime());
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    check('Today shows what it looks like outside (golden hour before sunset)', /Golden hour/.test(await p.textContent('.skyp')) && await p.getAttribute('.today-hero', 'data-sky')==='golden');
+    check('Today shows what it looks like outside (golden hour before sunset)', /Golden hour/.test(await p.textContent('.twx')) && await p.getAttribute('.today-hero', 'data-sky')==='golden');
     // the weather service, stubbed (no internet in the test box)
     await p.evaluate(() => { window.fetch = async (u) => ({ ok:true, json: async () => /geocoding/.test(u)
       ? {results:[{name:'Brooklyn', admin1:'New York', country_code:'US', latitude:40.65, longitude:-73.95}]}
@@ -69,7 +69,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const wx = await E("state.settings.weather");
     check('picking a city saves the place and pulls the weather', wx.place==='Brooklyn, New York' && wx.current && wx.current.temp===61 && wx.current.code===63, wx);
     await p.click('[data-action="nav"][data-view="today"]'); await p.waitForTimeout(150);
-    const chip = await p.textContent('.skyp');
+    const chip = await p.textContent('.twx');
     check('…and Today shows it (61°, rain)', /61°/.test(chip) && /rain/i.test(chip), chip);
     // scenes
     await settingsGroup(p, 'look');
