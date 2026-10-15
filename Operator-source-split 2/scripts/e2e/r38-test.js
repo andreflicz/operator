@@ -85,7 +85,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.click('.cbl-w[data-id="'+w2.id+'"] .cbl-today'); await p.waitForTimeout(200);
     check('→ Today puts Week 2 on today', await E("("+W+")(2).status")==='today');
     await E("ui.focusTasksSubTab='overview'; renderView()"); await p.waitForTimeout(200);
-    check('…its card: its own color, "Week 2", the client, pieces with +1', await p.isVisible('.task-card.dlv-card[data-task-id="'+w2.id+'"]') && /Week 2/.test(await p.textContent('[data-task-id="'+w2.id+'"] .mt-badge')) && /Brothers Mechanical/.test(await p.textContent('[data-task-id="'+w2.id+'"]')) && await p.isVisible('[data-task-id="'+w2.id+'"] .mt-plus'));
+    { const cs = '.task-card.dlv-card:not(.car-clone)[data-task-id="'+w2.id+'"]';
+      check('…its card: its own color, "Week 2", the client, pieces with +1', !!(await p.$(cs)) && /Week 2/.test(await p.textContent(cs+' .mt-badge')) && /Brothers Mechanical/.test(await p.textContent(cs)) && !!(await p.$(cs+' .mt-plus'))); }
     check('…and the client’s health reads it', ['good', 'warn'].indexOf(await E("clientHealthStatus(state.business.clients[0]).paceLevel")) >= 0);
     // reach out to clients
     check('no Reach out task while nobody’s due', await E("!state.tasks.items.some(t => t.master && t.master.kind==='reach' && t.status!=='done')"));
@@ -131,10 +132,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(300);
     check('no "◉ Minimal" chip by the name', !(await p.$('.th-min')) && !(await p.$('.th-bizrow')));
-    check('the full-screen view is an icon with the time, top right', await p.isVisible('#musicDock .md-full'));
-    await p.click('#musicDock .md-full'); await p.waitForTimeout(400);
+    check('the full-screen view is an icon in the panel’s corner (r38e: not top right)', await p.isVisible('.today-hero .th-full') && !(await p.$('#musicDock .md-full')));
+    await p.click('.today-hero .th-full'); await p.waitForTimeout(400);
     check('…it opens Today full screen', await E("document.body.classList.contains('np-on')"));
-    check('…and the icon steps aside there', !(await p.isVisible('#musicDock .md-full')));
+    check('…and the icon steps aside there', !(await p.isVisible('.today-hero .th-full')));
     await p.keyboard.press('m'); await p.waitForTimeout(500);
     check('…M brings the page back', !(await E("document.body.classList.contains('np-on')")));
     check('the weather is a card: 64°, partly cloudy, high and low, the sun’s day', await p.isVisible('.th-wx .twx') && /64°/.test(await p.textContent('.twx')) && /H 68° · L 55°/.test(await p.textContent('.twx')) && await p.isVisible('.twx .sun-arc'));
@@ -163,6 +164,44 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("ui.focusTasksSubTab='overview'; renderView()"); await p.waitForTimeout(200);
     check('…tomorrow it’s back', /Piano practice/.test(await E("[...document.querySelectorAll('.task-card-title')].map(e=>e.textContent).join('|')")));
     check('no page errors (skills)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
+  // ---- round 38e: top right, Focus, skills, the You card, Op's box ----
+  {
+    const p = await newPage(b, OUT+'/r38.html', {profile:{name:'Andre', businessName:'Flicz Media'}, tasks:{items:[{id:'sk', title:'Piano practice', status:'backlog', ongoing:true, skill:true, skillGoal:180, client:'personal', clients:['personal'], priority:'med', ongoingDoneDates:[]}, {id:'og', title:'Website rebuild', status:'today', ongoing:true, client:'personal', clients:['personal'], priority:'med', ongoingDoneDates:[]}]}}, T);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await E("ui.view='today'; renderView(); dockRefresh()"); await p.waitForTimeout(200);
+    check('top right: no clock and no full-screen icon (level and music only)', !(await p.$('#musicDock .md-time')) && !(await p.$('#musicDock .md-ck')) && !(await p.$('#musicDock .md-full')) && !!(await p.$('#musicDock [data-action="dockFm"]')));
+    check('Today’s full screen is a small icon in the panel’s corner', await p.isVisible('.today-hero .th-full'));
+    await p.click('.today-hero .th-full'); await p.waitForTimeout(400);
+    check('…it opens the full-screen view', await E("document.body.classList.contains('np-on')"));
+    await p.keyboard.press('m'); await p.waitForTimeout(500);
+    await E("ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='overview'; state.profile.focusMinimal=true; renderView()"); await p.waitForTimeout(200);
+    check('Focus: no Minimal button, and never the minimal view', !(await p.$('.lv-corner.is-focus')) && !(await p.$('#viewRoot .np-home')) && /Current Lineup/.test(await p.textContent('#viewRoot')));
+    await E("state.profile.focusMinimal=false; renderView()");
+    check('…and right-click there doesn’t offer it', !/Minimal view/.test(await E("appMenuHtml()")));
+    check('skills never show under Ongoing (other ongoing tasks still do)', !/Piano practice/.test(await E("renderOngoingTasksPanel()")) && /Website rebuild/.test(await E("renderOngoingTasksPanel()")));
+    await E("ui.focusTasksSubTab='skills'; renderView()"); await p.waitForTimeout(200);
+    await p.click('[data-action="skillMove"][data-id="sk"]'); await p.waitForTimeout(150);
+    check('a skill: → Today puts it on today', await E("state.tasks.items.find(t=>t.id==='sk').status")==='today' && /Backlog/.test(await p.textContent('[data-action="skillMove"][data-id="sk"]')));
+    await p.click('[data-action="skillMove"][data-id="sk"]'); await p.waitForTimeout(150);
+    check('…← Backlog sends it back (it keeps its look)', await E("state.tasks.items.find(t=>t.id==='sk').status")==='backlog' && !!(await p.$('.gr-sk, .skill-card, [class*="gr-sk"]')));
+    await E("ui.view='personal'; ui.personalTab='you'; renderView()"); await p.waitForTimeout(200);
+    await p.click('.ycf .pc:first-child'); await p.waitForTimeout(700);
+    check('Personal → You: the card turns over (rank, next rank, what it needs)', await E("document.querySelector('.ycf').classList.contains('is-flipped')") && /Next rank/i.test(await p.textContent('.ycf-back')));
+    await p.click('.ycf-back'); await p.waitForTimeout(700);
+    check('…and back', !(await E("document.querySelector('.ycf').classList.contains('is-flipped')")));
+    await E("ui.view='today'; renderView(); OV.cap='opBubText'; opCaption('Short line.')"); await p.waitForTimeout(500);
+    const h1 = await p.evaluate(() => document.getElementById('opBubText').getBoundingClientRect().height);
+    await E("opCaption('"+'A much longer answer that keeps going so the box has to grow to fit it all, line after line, without scrolling in jumps or cutting words off at the third line like before. '.repeat(2)+"')"); await p.waitForTimeout(700);
+    const h2 = await p.evaluate(() => { const e = document.getElementById('opBubText'); return {h:e.getBoundingClientRect().height, sh:e.scrollHeight}; });
+    check('Op’s box grows with what he says (no three-line cap)', h2.h > h1 + 30 && h2.h >= h2.sh - 4, [h1, h2]);
+    check('…and it has a resize grip', await p.isVisible('#opBub .op-bub-rs'));
+    const g = await (await p.$('#opBub .op-bub-rs')).boundingBox();
+    await p.mouse.move(g.x + 5, g.y + 5); await p.mouse.down(); await p.mouse.move(g.x + 125, g.y - 15, {steps:4}); await p.mouse.up(); await p.waitForTimeout(200);
+    check('…dragging it makes the box wider (and it remembers)', (await E("state.profile.opBubSize && state.profile.opBubSize.w")) >= 480);
+    check('no page errors (round 38e)', p.errors.length===0, p.errors);
     await p.context().close();
   }
 

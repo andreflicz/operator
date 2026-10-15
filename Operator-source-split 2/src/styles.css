@@ -7088,3 +7088,38 @@ body:has(#wakeOverlay:not(.hidden)) .activity-pill{ display:none !important; }
 .cbl-today{ height:22px; padding:0 8px; border-radius:999px; border:1px solid var(--border); background:rgba(var(--ink),.04); color:var(--text-dim); font:inherit; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap; }
 .cbl-today:hover{ color:var(--text); } .cbl-today.is-on{ border-color:rgba(var(--dlv-rgb),.55); color:var(--dlv); }
 @media (max-width:900px){ .cbl-weeks{ grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+
+/* ---- round 38e ---- */
+/* Today: full screen from the panel's corner */
+.today-hero{ position:relative; }
+.th-full{ position:absolute; top:7px; right:7px; z-index:3; width:24px; height:24px; display:grid; place-items:center; border-radius:8px; border:1px solid transparent; background:transparent; color:var(--text-dim); opacity:.45; cursor:pointer; transition:opacity .2s, background .2s, border-color .2s, color .2s; }
+.today-hero:hover .th-full{ opacity:.8; }
+.th-full:hover{ opacity:1 !important; color:var(--text); background:rgba(var(--ink),.08); border-color:var(--border); }
+/* skills: Today ⇄ Backlog */
+.sk-move.is-today{ color:var(--skill); }
+/* Personal → You: the card turns over */
+.ycf{ position:relative; perspective:1200px; flex:none; }
+.ycf-in{ position:relative; transform-style:preserve-3d; transition:transform .6s cubic-bezier(.2,.8,.2,1); }
+.ycf.is-flipped .ycf-in{ transform:rotateY(180deg); }
+.ycf-in > .pc{ backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+.ycf-in > .pc:first-child{ cursor:pointer; }
+.ycf-back{ position:absolute !important; inset:0; transform:rotateY(180deg); display:flex !important; flex-direction:column; align-items:center; justify-content:center; gap:7px; text-align:center; cursor:pointer; box-sizing:border-box; }
+.ycb-badge{ filter:drop-shadow(0 0 12px color-mix(in srgb, var(--rc) 60%, transparent)); }
+.ycb-rank{ font-family:var(--font-display); font-size:20px; font-weight:800; letter-spacing:.02em; }
+.ycb-k{ font-size:11px; color:rgba(255,255,255,.75); }
+.ycb-bar{ width:80%; }
+.ycb-next{ display:flex; flex-direction:column; align-items:center; gap:3px; margin-top:4px; font-size:11px; color:rgba(255,255,255,.75); }
+.ycb-next small{ font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; opacity:.7; }
+.ycb-next b{ font-size:14px; }
+.ycb-needs{ display:flex; flex-wrap:wrap; justify-content:center; gap:4px; margin-top:2px; }
+.ycb-needs i{ font-style:normal; font-size:10px; padding:2px 7px; border-radius:999px; background:rgba(255,255,255,.1); color:rgba(255,255,255,.85); }
+.ycb-tap{ font-size:9.5px; opacity:.45; letter-spacing:.06em; }
+/* Op's box: grows with his words, resizable from the top-right corner */
+.op-bub-t{ transition:height .35s cubic-bezier(.2,.8,.2,1); scroll-behavior:smooth !important; }
+.op-bub.is-resizing, .op-bub.is-resizing .op-bub-t{ transition:none !important; user-select:none; }
+.op-bub-rs{ position:absolute; top:3px; right:3px; width:14px; height:14px; cursor:nesw-resize; border-radius:4px; opacity:.35; background:linear-gradient(45deg, transparent 45%, currentColor 46%, currentColor 54%, transparent 55%), linear-gradient(45deg, transparent 70%, currentColor 71%, currentColor 79%, transparent 80%); }
+.op-bub:hover .op-bub-rs{ opacity:.7; }
+.op-bub-h .op-bub-x{ margin-right:14px; }
+/* his words fade in softly (no blur blocks) */
+.op-bub-t .cw{ display:inline; animation:cwSoft .3s ease-out both !important; filter:none !important; }
+@keyframes cwSoft{ from{ opacity:0; } to{ opacity:1; } }

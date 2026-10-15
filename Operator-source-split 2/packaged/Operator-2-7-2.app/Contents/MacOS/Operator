@@ -293,6 +293,8 @@ WAKE_PID=$(start_helper wake "$WAKE_PORT")
 #  - the mic: Operator's own window is allowed to listen without Chrome asking every time you tap the
 #    mic (a page opened from a file can't keep a "remember this" answer). Only this window — your
 #    normal Chrome is untouched — and macOS still asks once for microphone access.
+#  - --test-type: Chrome shows a yellow "unsupported command-line flag" bar across the top of the
+#    window for the mic flag above on every launch; this keeps that bar away
 launch_window() { # browser executable, extra flag
   "$1" \
     --app="file://$HTML_FILE" \
@@ -309,6 +311,7 @@ launch_window() { # browser executable, extra flag
     --enable-gpu-rasterization \
     --enable-zero-copy \
     --use-fake-ui-for-media-stream \
+    --test-type \
     $2 \
     > /dev/null 2>&1 &
   CHROME_PID=$!
