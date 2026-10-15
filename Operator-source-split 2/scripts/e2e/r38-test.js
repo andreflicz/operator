@@ -143,8 +143,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('…sitting at the bottom of the panel (the left side fills it)', g.gap <= 34, g);
     const s = await p.evaluate(() => { const sw = document.querySelector('.sw.is-r38').getBoundingClientRect(), t = document.querySelector('.swt').getBoundingClientRect(), k = document.querySelector('.sw-streak').getBoundingClientRect(); return {w:t.width/sw.width, below:t.top >= k.bottom - 1, n:document.querySelector('.swt-n').textContent, fs:parseFloat(getComputedStyle(document.querySelector('.swt-n')).fontSize), sf:parseFloat(getComputedStyle(document.querySelector('.sw-streak > b')).fontSize)}; });
     check('Tasks is a wide bar right under the streak (0/2 today here)', s.w > .9 && s.below && s.n==='0/2', s);
-    check('…bigger than before, the streak smaller', s.fs >= 22 && s.sf <= 20, s);
-    check('…with what’s next', /2 left · up next Cut BM reel 3/i.test(await p.textContent('.swt')));
+    check('…bigger than before', s.fs >= 22, s);
+    check('…how many are left, no “up next”', /2 left/.test(await p.textContent('.swt')) && !/up next/i.test(await p.textContent('.swt')));
     check('the date is a little calendar tile: OCT 14, Wednesday, week 42', (await p.textContent('.th-date .thd-cal')).replace(/\s/g,'')==='OCT14' && /Wednesday/.test(await p.textContent('.th-date')) && /Week 42/.test(await p.textContent('.th-date')));
     check('no page errors (Today)', p.errors.length===0, p.errors);
     await p.context().close();
@@ -190,7 +190,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("ui.view='personal'; ui.personalTab='you'; renderView()"); await p.waitForTimeout(200);
     await p.click('.ycf .pc:first-child'); await p.waitForTimeout(700);
     check('Personal → You: the card turns over (rank, next rank, what it needs)', await E("document.querySelector('.ycf').classList.contains('is-flipped')") && /Next rank/i.test(await p.textContent('.ycf-back')));
-    await p.click('.ycf-back'); await p.waitForTimeout(700);
+    await p.dispatchEvent('.ycf-back', 'click'); await p.waitForTimeout(700);
     check('…and back', !(await E("document.querySelector('.ycf').classList.contains('is-flipped')")));
     await E("ui.view='today'; renderView(); OV.cap='opBubText'; opCaption('Short line.')"); await p.waitForTimeout(500);
     const h1 = await p.evaluate(() => document.getElementById('opBubText').getBoundingClientRect().height);
@@ -202,6 +202,72 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.mouse.move(g.x + 5, g.y + 5); await p.mouse.down(); await p.mouse.move(g.x + 125, g.y - 15, {steps:4}); await p.mouse.up(); await p.waitForTimeout(200);
     check('…dragging it makes the box wider (and it remembers)', (await E("state.profile.opBubSize && state.profile.opBubSize.w")) >= 480);
     check('no page errors (round 38e)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
+  // ---- round 38f/g: sidebar, minimal-view links, goals, calendar, work alarm, Op and alarms, the mic ----
+  {
+    const p = await newPage(b, OUT+'/r38.html', {profile:{name:'Andre', businessName:'Flicz Media', mrrGoal:20000}, business:biz, tasks}, T);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await p.waitForTimeout(1500);
+    await E("document.body.classList.add('np-on'); ui.view='focus'; ui.focusTab='tasks'; renderView()"); await p.waitForTimeout(200);
+    check('the sidebar comes back when no full-screen view is on screen', !(await E("document.body.classList.contains('np-on')")));
+    await E("ui.view='today'; state.profile.focusMinimal=true; renderView()"); await p.waitForTimeout(300);
+    check('minimal view: Full view is a small link on the panel (not a corner button)', !!(await p.$('#viewRoot .np-views .np-v')) && !(await p.$('#viewRoot .np-top .lv-btn')));
+    await E("state.profile.focusMinimal=false; renderView()");
+    await E("ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(300);
+    const secs = await E("[...document.querySelectorAll('.gx-rings.is-grouped .gx-sec-h')].map(e=>e.childNodes[0].textContent.trim()).join('|')");
+    check('Goals: the master goals sit in Master / This month / This week', secs==='Master|This month|This week', secs);
+    await p.click('.gx-cust'); await p.waitForTimeout(250);
+    check('…Customize opens a sheet with every master goal grouped', await p.isVisible('#mgcSheet') && (await p.$$('#mgcSheet .mgc-g')).length===3);
+    await p.click('#mgcSheet .mgc-row:has([data-mgc="newclients"]) .ws-switch'); await p.waitForTimeout(150);
+    check('…switching one off hides it', await E("!!state.profile.mgHide.newclients"));
+    await p.fill('#mgcSheet [data-mgt="deep"]', '30'); await p.dispatchEvent('#mgcSheet [data-mgt="deep"]', 'change'); await p.waitForTimeout(100);
+    await p.click('#mgcSheet [data-action="mgCustomizeClose"].btn'); await p.waitForTimeout(250);
+    check('…and its target sticks; This month is gone from Goals', /Master\|This week/.test(await E("[...document.querySelectorAll('.gx-sec-h')].map(e=>e.childNodes[0].textContent.trim()).join('|')")) && await E("masterGoalDefs().find(m=>m.key==='deep').target")===30);
+    await E("state.goals.items.push({id:'gm', label:'MRR', master:true, autoTrack:'mrr', target:7000, start:3500, createdAt:'2026-10-01'})");
+    check('a big goal is measured against its target (3.5k MRR of 7k = 50%, not from where you started)', Math.round(await E("goalPct(state.goals.items.find(g=>g.id==='gm'))"))===50);
+    await E("openGoalSheet('long'); ui.gsTrack='own'; goalSheetRefresh()"); await p.waitForTimeout(200);
+    await p.fill('#gsLabel', 'Run a marathon'); await p.click('#goalSheet [data-action="gsSave"]'); await p.waitForTimeout(600);
+    check('a goal of your own with no number is added (and says so)', await E("state.goals.items.some(g=>g.label==='Run a marathon')") && /Added: .*marathon/i.test(await p.textContent('#toastContainer')));
+    await E("document.getElementById('goalSheet') && document.getElementById('goalSheet').classList.add('hidden')");
+    // calendar: a long This week list fits, and green only on goal days
+    await E("for(let i=0;i<9;i++) state.goals.items.push({id:'tw'+i, tier:'week', pk:periodKey('week'), label:'Week goal number '+i, target:1, done:i<3}); state.standards.deepWorkTargetMinutes=60; state.focus.sessions=(state.focus.sessions||[]).concat([{id:'s1', date:'2026-10-12', minutes:90, type:'deep', start:0, end:0}, {id:'s2', date:'2026-10-13', minutes:20, type:'deep', start:0, end:0}]); ui.view='calendar'; renderView()"); await p.waitForTimeout(600);
+    const fit = await p.evaluate(() => { const b = document.querySelector('.calx .cx-tierbody'); return b ? {sh:b.scrollHeight, ch:b.clientHeight, more:(document.querySelector('.tg-more')||{}).textContent||'', doneShown:[...b.querySelectorAll('.tg-row.is-done')].filter(r=>r.style.display!=='none').length, openShown:[...b.querySelectorAll('.tg-row:not(.is-done)')].filter(r=>r.style.display!=='none').length} : null; });
+    check('Calendar: This week fits its card, no scrolling (+N more if it runs over, done ones first)', fit && fit.sh <= fit.ch + 1 && (!fit.more || /\+\d+ more on Goals/.test(fit.more)) && (fit.doneShown===0 || fit.openShown===6), fit);
+    const heat = await p.evaluate(() => { const g = d => { const e = document.querySelector('.calx [data-date="'+d+'"]'); return e ? Number((e.getAttribute('style')||'').replace(/.*--h:([0-9.]+).*/, '$1')) : -1; }; return [g('2026-10-12'), g('2026-10-13')]; });
+    check('…green only on days you beat your deep-work goal', heat[0] > 0.5 && heat[1]===0, heat);
+    // the work alarm when you're already going: a pop-up
+    await E("state.focus.work={enabled:true, start:'14:00', end:'18:00', days:[0,1,2,3,4,5,6]}; workDayState().clockedInAt=Date.now(); ui.view='today'; renderView(); checkWorkAlarm()"); await p.waitForTimeout(400);
+    check('the work alarm always shows up (a pop-up when you’re already at it)', await p.isVisible('#workPop.is-in') && /Work hours start now/.test(await p.textContent('#workPop')));
+    await p.click('#workPop [data-action="workPopX"]'); await p.waitForTimeout(300);
+    check('…and it closes', !(await E("document.getElementById('workPop').classList.contains('is-in')")));
+    // Op waits while an alarm rings, and knows about alarms
+    await E("window.__said=0; let o=document.getElementById('alarmOverlay'); if(!o){ o=document.createElement('div'); o.id='alarmOverlay'; o.className='overlay'; document.body.appendChild(o); } o.classList.remove('hidden'); opSay('test').then(()=>{ window.__said=1; }); 1"); await p.waitForTimeout(1600);
+    { const said = await E("window.__said"), cx = await E("aiContext()"); check('Op doesn’t talk over a ringing alarm', said===0 && /ALARM IS RINGING/.test(cx), [said, cx.slice(-400)]); }
+    const ctxRing = await E("aiContext()"); await E("document.getElementById('alarmOverlay').classList.add('hidden')"); for(let i=0; i<12 && !(await E("window.__said")); i++) await p.waitForTimeout(500);
+    check('…he speaks once it’s dealt with, and he knows the work alarm', await E("window.__said")===1 && /work alarm 2(:00)? ?PM/i.test(await E("aiContext()")), ctxRing.slice(-300));
+    check('Settings → Test & demo: no "can’t get going" button', !/tbStuck/.test(await E("testDemoHtml()")));
+    await E("state.profile.heyOp=true; OV.speaking=true");
+    { const m = await E("[heySoftQuiet(), (AI.listening=false, heyQuietNow()), document.hasFocus()]"); check('the mic stays steady: Op talking doesn’t stop the wake word (Discord-style)', m[0]===true && m[1]===!m[2], m); }
+    await E("OV.speaking=false");
+    check('no page errors (round 38f)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
+  // ---- round 38g: clock-out plan of attack = the list as it is now; the streak ----
+  {
+    const many = {items:[1,2,3,4,5,6,7,8].map(i => ({id:'t'+i, title:'Task '+i, status:'today', client:'personal', clients:['personal'], priority:'med', createdAt:'2026-10-10'})).concat([{id:'tx', title:'Old done', status:'done', client:'personal', priority:'med', createdAt:'2026-10-10', completedAt:'2026-10-14'}])};
+    const p = await newPage(b, OUT+'/r38.html', {profile:{name:'Andre', businessName:'Flicz Media'}, business:biz, tasks:many, focus:{nightPlan:{date:'2026-10-15', taskIds:['t3']}}}, T);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await p.waitForTimeout(1500);
+    await E("masterTasksSync && masterTasksSync(); openWindDown('plan')"); await p.waitForTimeout(400);
+    const rows = await E("[...document.querySelectorAll('#windContent .wd-row .wd-title')].map(e=>e.textContent)");
+    check('Clock out → Plan of attack: every open task on your list (not just six), your pick first', rows.length >= 8 && rows[0]==='Task 3' && [1,2,4,5,6,7,8].every(i => rows.includes('Task '+i)) && !rows.includes('Old done'), rows);
+    check('…and this week’s client deliverables (the Reels) are in it', rows.includes('Reels'), rows);
+    await E("ACTIONS.closeWindDown()"); await E("ui.view='today'; renderView()"); await p.waitForTimeout(200);
+    check('Today: the day streak is out of its pill, bigger, with a line on where today stands', !!(await p.$('.sw.is-r38 .sw-ss')) && /day streak/i.test(await p.textContent('.sw.is-r38 .sw-streak')) && await p.evaluate(() => parseFloat(getComputedStyle(document.querySelector('.sw.is-r38 .sw-streak > b')).fontSize) >= 30));
+    check('no page errors (round 38g)', p.errors.length===0, p.errors);
     await p.context().close();
   }
 

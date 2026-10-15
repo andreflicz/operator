@@ -375,14 +375,12 @@ renderToday = (function(base){
 // the streak row: the streak smaller, the week, and a wide Tasks bar under it
 function swTasksBarHtml(done, total){
   const left = Math.max(0, total - done);
-  let next = null;
-  try{ next = (typeof todaysPlan==='function' ? todaysPlan() : state.tasks.items.filter(function(t){ return t.status==='today'; })).find(function(t){ return t.status!=='done' && !(typeof isOngoingDoneToday==='function' && isOngoingDoneToday(t)); }); }catch(e){}
   const segs = total > 0 && total <= 16
     ? '<span class="swt-segs">'+Array.from({length:total}, function(_, i){ return '<i'+(i < done ? ' class="on"' : '')+'></i>'; }).join('')+'</span>'
     : '<span class="swt-bar"><i style="width:'+(total ? Math.round(done/total*100) : 0)+'%"></i></span>';
   return '<button class="swt" data-action="goToFinishedTasks" title="Today’s tasks">'+
     '<span class="swt-k">Tasks</span><b class="swt-n">'+done+'<small>/'+total+'</small></b>'+segs+
-    '<span class="swt-r">'+(total===0 ? 'Nothing planned yet' : left===0 ? 'All done &#10003;' : left+' left'+(next ? ' &middot; <em>up next</em> '+escapeHtml(next.title) : ''))+'</span>'+
+    '<span class="swt-r">'+(total===0 ? 'Nothing planned yet' : left===0 ? 'All done &#10003;' : left+' left')+'</span>'+
   '</button>';
 }
 streakWorkHtml = (function(base){

@@ -297,7 +297,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('r36: That’s the day: three real buttons and a swipeable deck', (await p.$$('.dayoff-row.is-btns button')).length===3 && !!(await p.$('.rd .rd-slide')));
     await E("ACTIONS.startSleepMode()"); await p.waitForTimeout(300); await E("ACTIONS.sleepUp()"); await p.waitForTimeout(600);
     check('r36: I’m up → Up early (not That’s the day, not the sleep screen)', /Up early/.test(await p.textContent('#viewRoot')) && !/That’s the day/.test(await p.textContent('#viewRoot')) && !(await p.$('.sleepv')));
-    check('r36: the Op bar is Op | dot | app (no clock), the time is top right', !(await p.$('#activityPill .ap-ck')) && !!(await p.$('#activityPill .ob-dot')) && !!(await p.$('#musicDock .md-time')));
+    check('r36/r38: the Op bar is Op | dot | app (no clock); top right is just level + music', !(await p.$('#activityPill .ap-ck')) && !!(await p.$('#activityPill .ob-dot')) && !(await p.$('#musicDock .md-time')) && !!(await p.$('#musicDock')));
     // the Op bar's Work / Not work drives auto lock-in
     await E("if(state.modes.active) endMode(); state.modes.lastEndedAt=null; state.focus.activeSession=null; state.focus.autoRejectedAt=null; state.focus.lastSessionEndedAt=null; state.focus.lastManualStopAt=null; ui.restFull=false; ui.view='today'; renderView(); state.appActivity.todayIntervals.push({app:'Pixelmator Pro', start:Date.now()-20*60000, end:Date.now()}); ui.pillMenu=null; updateActivityPill()"); await p.waitForTimeout(150);
     check('r36: an unsorted app asks "Work?" on the bar', !!(await p.$('#activityPill .ap-ask')));
