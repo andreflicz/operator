@@ -279,17 +279,17 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("ACTIONS.opMemToApp(null,null,'m3')");
     check('r36: a memory about the app moves to Op’s ideas for the app', await E("state.profile.opMemory.length")===0 && /Weekly client check-ins/.test(await E("JSON.stringify(state.settings.opIdeas)")));
     // master tasks
-    await E("state.business.clients=[{id:'c1',name:'JJS',stage:'active',status:'active',mrr:3000,touches:[],deliverables:[{id:'d1',title:'Reels',weeklyTarget:2,recurring:true,completedDates:[]}]},{id:'c2',name:'Kiko',stage:'active',status:'active',mrr:2000,touches:[]}]; state.focus.masterMade={}; state.tasks.items=state.tasks.items.filter(t=>!t.master); ui.view='today'; renderView(); renderView()"); await p.waitForTimeout(200);
-    check('r36: weekly master tasks: a check-in batch and deliverables per client', await E("JSON.stringify(state.tasks.items.filter(t=>t.master).map(t=>t.master.kind).sort())")==='["care","deliv"]');
+    await E("state.business.clients=[{id:'c1',name:'JJS',stage:'active',status:'active',mrr:3000,touches:[],createdAt:addDays(todayStr(),-20),deliverables:[{id:'d1',title:'Reels',weeklyTarget:2,recurring:true,completedDates:[]}]},{id:'c2',name:'Kiko',stage:'active',status:'active',mrr:2000,touches:[],createdAt:addDays(todayStr(),-20)}]; state.focus.masterMade={}; state.tasks.items=state.tasks.items.filter(t=>!t.master); ui.view='today'; renderView(); renderView()"); await p.waitForTimeout(200);
+    check('r36→r38: master tasks: one per deliverable, and Reach out to clients while someone’s due', await E("JSON.stringify(state.tasks.items.filter(t=>t.master).map(t=>t.master.kind).sort())")==='["dv","reach"]');
     await E("logTouch('client','c1'); renderView()"); await p.waitForTimeout(100);
-    check('r36: …a touch ticks a client off the batch', /\(1\/2\)/.test(await E("state.tasks.items.find(t=>t.master&&t.master.kind==='care').title")));
-    await E("completeTask(state.tasks.items.find(t=>t.master&&t.master.kind==='care').id)"); await p.waitForTimeout(900);
-    check('r36: …finishing the batch logs a touch for whoever’s left', await E("state.business.clients.find(c=>c.id==='c2').touches.length")===1);
+    check('r36→r38: …a touch takes that client off the Reach out task', JSON.stringify(await E("state.tasks.items.find(t=>t.master&&t.master.kind==='reach'&&t.status!=='done').clients"))==='["c2"]');
+    await E("completeTask(state.tasks.items.find(t=>t.master&&t.master.kind==='reach'&&t.status!=='done').id)"); await p.waitForTimeout(900);
+    check('r36: …finishing Reach out logs a touch for whoever’s tagged', await E("state.business.clients.find(c=>c.id==='c2').touches.length")===1);
     check('r36: …and it rolls up into a master goal ring', await E("!!masterGoalDefs().find(m=>m.key==='care')"));
     // standing with Op, test bench, Business tabs
     check('r36: standing with Op is a Discipline sub-stat', await E("xpAttributes(xpCtx()).DIS.subs.some(s=>s.label==='Standing')"));
     await E("ui.view='business'; ui.businessTab='leads'; renderView()"); await p.waitForTimeout(150);
-    check('r36: Business: Clients & leads is one tab with sub-tabs, Setup on the tab lane', (await p.$$('.biz-tabs > .tab')).length===4 && (await p.$$('.biz-tabs .subtab')).length===3 && !!(await p.$('.biz-tabs [data-action="bizSetupOpen"]')));
+    check('r36: Business: Clients & leads is one tab with sub-tabs, Setup on the tab lane', (await p.$$('.biz-tabs > .tab')).length===4 && (await p.$$('.biz-tabs .subtab')).length===4 && !!(await p.$('.biz-tabs [data-action="bizSetupOpen"]')));
     await E("state.settings.testMode=false; ui.view='settings'; ui.settingsTab='system'; renderView()"); await p.waitForTimeout(150);
     check('r36: test buttons hide unless test mode is on', !(await p.isVisible('[data-action="wakeTestNow"]:not(.tb)')) && !!(await p.$('[data-action="demoToggle"]')));
     // clock-out pages

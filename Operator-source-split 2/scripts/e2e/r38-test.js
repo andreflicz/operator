@@ -57,10 +57,36 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("saveEditTask('e')");
     check('editing a task can tie it to a deliverable', await E("JSON.stringify(state.tasks.items.find(t => t.id==='e').deliv)")==='{"c":"bm","d":"d1"}');
     // the weekly master task, finished by hand
-    await E("masterTasksSync()");
-    const mid = await E("(state.tasks.items.find(t => t.master && t.master.kind==='deliv' && t.master.clientId==='bm')||{}).id");
-    await E("completeTask('"+mid+"')"); await p.waitForTimeout(1300);
-    check('finishing "Deliverables for Brothers Mechanical" yourself puts the week’s number in', await E("deliverableWeekCount("+D+")")>=4);
+    // the deliverable tasks: one per client per deliverable, done by logging one at a time
+    await E("renderView()"); await p.waitForTimeout(150);
+    const dv = await E("(state.tasks.items.find(t => t.master && t.master.kind==='dv' && t.master.clientId==='bm' && t.master.delivId==='d1')||{}).id");
+    check('a deliverable task is made for you: "Complete 4 reels" (Brothers Mechanical)', !!dv && await E("state.tasks.items.find(t => t.id==='"+dv+"').title")==='Complete 4 reels' && JSON.stringify(await E("state.tasks.items.find(t => t.id==='"+dv+"').clients"))==='["bm"]');
+    check('…and "Complete 3 ad creatives" for JJS (split by deliverable)', await E("!!state.tasks.items.find(t => t.master && t.master.kind==='dv' && t.master.clientId==='jj' && t.title==='Complete 3 ad creatives')"));
+    check('…no old "Deliverables for…" or weekly check-in tasks', await E("!state.tasks.items.some(t => t.master && (t.master.kind==='deliv' || t.master.kind==='care') && t.status!=='done')"));
+    const w0 = await E("deliverableWeekCount("+D+")");
+    await E("completeTask('"+dv+"')"); await p.waitForTimeout(250);
+    check('hitting done logs ONE reel and the task stays ('+(w0+1)+'/4)', await E("deliverableWeekCount("+D+")")===w0+1 && await E("state.tasks.items.find(t => t.id==='"+dv+"').status")==='today' && new RegExp((w0+1)+' of 4').test(await p.textContent('#toastContainer')));
+    await E("ui.view='focus'; ui.focusTab='tasks'; renderView()"); await p.waitForTimeout(200);
+    check('…its card shows the pieces ('+(w0+1)+'/4) with +1 and take-one-back', await p.isVisible('[data-task-id="'+dv+'"] .mt-prog') && (await p.textContent('[data-task-id="'+dv+'"] .mt-prog b'))===(w0+1)+'/4' && (await p.$$('[data-task-id="'+dv+'"] .mt-segs i.on')).length===w0+1);
+    for(let k = w0 + 1; k < 4; k++){ await E("completeTask('"+dv+"')"); await p.waitForTimeout(120); }
+    check('…the fourth one finishes it for the week', await E("state.tasks.items.find(t => t.id==='"+dv+"').status")==='done' && await E("deliverableWeekCount("+D+")")>=4);
+    await E("completeTask('"+dv+"')"); await p.waitForTimeout(120);
+    check('…a fifth hit doesn’t over-log', await E("deliverableWeekCount("+D+")")===4);
+    await E("ACTIONS.mtDvUndo(null, null, '"+dv+"'); renderView()"); await p.waitForTimeout(150);
+    check('…take one back and it’s open again (3/4)', await E("state.tasks.items.find(t => t.id==='"+dv+"').status")==='today' && await E("deliverableWeekCount("+D+")")===3);
+    await E("incrementDeliverableProgress('bm', 'd1'); renderView()"); await p.waitForTimeout(150);
+    check('…logging on the client card counts for the task too (4/4 → done)', await E("state.tasks.items.find(t => t.id==='"+dv+"').status")==='done');
+    check('…and the client’s health reads it (Brothers Mechanical ahead)', await E("clientHealthStatus(state.business.clients[0]).paceLevel")==='good');
+    // reach out to clients
+    check('no Reach out task while nobody’s due', await E("!state.tasks.items.some(t => t.master && t.master.kind==='reach' && t.status!=='done')"));
+    await E("state.business.clients[1].touches=['2026-09-20']; state.business.clients[1].touchpoints=[{id:'tq', type:'text', date:'2026-09-20', note:''}]; renderView()"); await p.waitForTimeout(200);
+    const rt = await E("JSON.stringify((({title, clients, priority}) => ({title, clients, priority}))(state.tasks.items.find(t => t.master && t.master.kind==='reach' && t.status!=='done')||{}))");
+    check('JJS 17 days overdue: "Reach out to clients (1)", tagged JJS only, high priority', rt==='{"title":"Reach out to clients (1)","clients":["jj"],"priority":"high"}', rt);
+    await E("ui.view='business'; ui.businessTab='log'; renderView()"); await p.waitForTimeout(200);
+    check('the Log center is a Clients sub-tab: who’s due first, then who’s in touch', await p.isVisible('.lc') && (await p.$$('.lc-row.is-due')).length===1 && /JJS Construction/.test(await p.textContent('.lc-row.is-due')) && (await p.$$('.lc-ok .lc-row')).length===1 && /1/.test(await p.textContent('.subtab.active .lc-badge')));
+    await p.click('.lc-row.is-due [data-type="call"]'); await p.waitForTimeout(250);
+    check('…one tap logs the call', await E("state.business.clients[1].touches.indexOf(todayStr())>=0") && /Logged a call with/.test(await p.textContent('#toastContainer')));
+    check('…and the Reach out task is done (nobody left)', await E("!state.tasks.items.some(t => t.master && t.master.kind==='reach' && t.status!=='done')") && (await p.$$('.lc-row.is-due')).length===0);
     // the + menu
     check('the + menu has "A client deliverable"', JSON.stringify(await E("focusAddMenu().map(x => x[1])")).indexOf('A client deliverable') > 0);
     // Outreach
@@ -108,7 +134,25 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('Tasks is a wide bar right under the streak (0/2 today here)', s.w > .9 && s.below && s.n==='0/2', s);
     check('…bigger than before, the streak smaller', s.fs >= 22 && s.sf <= 20, s);
     check('…with what’s next', /2 left · up next Cut BM reel 3/i.test(await p.textContent('.swt')));
+    check('the date is a little calendar tile: OCT 14, Wednesday, week 42', (await p.textContent('.th-date .thd-cal')).replace(/\s/g,'')==='OCT14' && /Wednesday/.test(await p.textContent('.th-date')) && /Week 42/.test(await p.textContent('.th-date')));
     check('no page errors (Today)', p.errors.length===0, p.errors);
+    await p.context().close();
+  }
+
+  // ---- a skill done for the day leaves the lineup ----
+  {
+    const p = await newPage(b, OUT+'/r38.html', {profile:{name:'Andre'}, tasks:{items:[{id:'sk', title:'Piano practice', status:'today', ongoing:true, skill:true, client:'personal', clients:['personal'], priority:'med', ongoingDoneDates:[]}, {id:'g', title:'Edit', status:'today', client:'personal', clients:['personal'], priority:'med'}]}}, T);
+    const E = c => p.evaluate(x => window.__op.ev(x), c);
+    await E("ui.view='focus'; ui.focusTab='tasks'; renderView()"); await p.waitForTimeout(200);
+    await E("completeTask('sk')"); await p.waitForTimeout(1300);
+    check('a skill done for the day leaves the lineup (and Ongoing) until tomorrow', !/Piano practice/.test(await E("[...document.querySelectorAll('.task-card-title')].map(e=>e.textContent).join('|')")) && await E("state.tasks.items.find(t=>t.id==='sk').status")==='today');
+    check('…a small line says it’s done for today', /1 done for today · back tomorrow/.test(await p.textContent('.dfd-note')));
+    await p.click('.dfd-note'); await p.waitForTimeout(250);
+    check('…and it’s still on Training Skills', /Training Skills/.test(await p.textContent('.subtab.active')) && /Piano practice/.test(await p.textContent('#viewRoot')));
+    await p.clock.setSystemTime(T + 86400000); await E("renderView()"); await p.waitForTimeout(200);
+    await E("ui.focusTasksSubTab='overview'; renderView()"); await p.waitForTimeout(200);
+    check('…tomorrow it’s back', /Piano practice/.test(await E("[...document.querySelectorAll('.task-card-title')].map(e=>e.textContent).join('|')")));
+    check('no page errors (skills)', p.errors.length===0, p.errors);
     await p.context().close();
   }
 
