@@ -51,42 +51,52 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('…its card says which deliverable it is', /Ad creatives/.test(await p.evaluate(() => [...document.querySelectorAll('.tdv-badge')].map(e => e.textContent).join(' '))));
     await E("completeTask(state.tasks.items[state.tasks.items.length-1].id)"); await p.waitForTimeout(1300);
     check('…finishing it counts for JJS (their health reads it)', await E("deliverableMonthCount(state.business.clients[1].deliverables[0])")===1 && await E("deliverableWeekCount(state.business.clients[1].deliverables[0])")===1);
-    // editing a task can tie it too
+    // (r38h) editing a task has no deliverable picker
     await E("openTaskEditModal('e')"); await p.waitForTimeout(200);
-    await p.click('#taskEditOverlay .tdv-chip[data-id="bm:d1"]'); await p.waitForTimeout(100);
-    await E("saveEditTask('e')");
-    check('editing a task can tie it to a deliverable', await E("JSON.stringify(state.tasks.items.find(t => t.id==='e').deliv)")==='{"c":"bm","d":"d1"}');
+    check('(r38h) Edit has no "counts as a client deliverable" picker', !(await p.$('#taskEditOverlay .tdv')));
+    await E("closeTaskEditModal ? closeTaskEditModal() : hideOverlay('taskEditOverlay')"); await p.waitForTimeout(100);
     // the deliverable tasks: each month's deliverable split into the cycle's four weeks, named after it
     await E("renderView()"); await p.waitForTimeout(150);
     const W = "(k, c, d) => state.tasks.items.find(t => t.master && t.master.kind==='dvw' && t.master.clientId===(c||'bm') && t.master.delivId===(d||'d1') && t.master.wk===k)";
     const wk = async (k, c, d) => JSON.parse(await E("JSON.stringify((({id, title, status, deadline}) => ({id, title, status, deadline}))(("+W+")("+k+", '"+(c||'bm')+"', '"+(d||'d1')+"')))"));
     const w1 = await wk(1), w2 = await wk(2), w3 = await wk(3), w4 = await wk(4);
-    check('16 reels a month → four tasks named "Reels", Week 1 to 4, due weekly', [w1, w2, w3, w4].every(t => t.title==='Reels') && [w1, w2, w3, w4].map(t => t.deadline).join()==='2026-10-07,2026-10-14,2026-10-21,2026-10-31', [w1, w2, w3, w4]);
+    check('16 reels a month → four tasks "16 Reels 1/4" to "4/4", due weekly', [w1, w2, w3, w4].map(t => t.title).join('|')==='16 Reels 1/4|16 Reels 2/4|16 Reels 3/4|16 Reels 4/4' && [w1, w2, w3, w4].map(t => t.deadline).join()==='2026-10-07,2026-10-14,2026-10-21,2026-10-31', [w1, w2, w3, w4]);
     check('…all in the backlog', [w1, w2, w3, w4].every(t => t.status==='backlog'));
-    check('…JJS: 12 ad creatives → four tasks of 3', await E("dvwNeeds(state.business.clients[1].deliverables[0]).join()")==='3,3,3,3' && (await wk(4, 'jj', 'd2')).title==='Ad creatives');
+    check('…JJS: 12 ad creatives → four tasks of 3', await E("dvwNeeds(state.business.clients[1].deliverables[0]).join()")==='3,3,3,3' && (await wk(4, 'jj', 'd2')).title==='12 Ad creatives 4/4');
+    check('…uneven months spread out (6 → 2,1,2,1; 2 → 1,0,1,0)', await E("[6,2].map(n => dvwNeeds({weeklyTarget:0, monthlyTarget:n}).join()).join('|')")==='2,1,2,1|1,0,1,0');
     check('…no old weekly "Complete 4 reels" or "Deliverables for…" tasks', await E("!state.tasks.items.some(t => t.master && /^(dv|deliv|care)$/.test(t.master.kind) && t.status!=='done')"));
     await E("ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='backlog'; renderView()"); await p.waitForTimeout(200);
     check('…not in the regular Backlog', !/Reels|Ad creatives/.test(await p.textContent('#viewRoot .subtab-panel')));
     check('…a Client backlog tab next to it', /Client backlog\s*8/.test(await p.textContent('.subtab.is-dlv')));
     await p.click('.subtab.is-dlv'); await p.waitForTimeout(200);
-    check('the Client backlog: by client, each deliverable with its four weeks', (await p.$$('.cbl-client')).length===2 && (await p.$$('.cbl-w')).length===8 && /Brothers Mechanical/.test(await p.textContent('.cbl')));
+    check('the Client backlog: by client, each deliverable with its four weeks', (await p.$$('.cbl-client')).length===2 && (await p.$$('.cbl-w')).length===8 && /Brothers Mechanical/.test(await p.textContent('.cbl')) && /16 Reels 2\/4/.test(await p.textContent('.cbl')));
     check('…this week is lit (Week 2, due today)', await p.isVisible('.cbl-w.is-now[data-id="'+w2.id+'"]'));
-    const c0 = await E("dvwCycleCount(state.business.clients[0].deliverables[0], dvwCycle(state.business.clients[0]))");
-    await p.click('.cbl-w[data-id="'+w1.id+'"] .mt-plus'); await p.waitForTimeout(250);
-    check('+1 logs ONE reel and the task stays ('+(c0+1)+'/4)', await E("dvwCycleCount(state.business.clients[0].deliverables[0], dvwCycle(state.business.clients[0]))")===c0+1 && await E("("+W+")(1).status")==='backlog' && /Week 1 3\/4/.test(await p.textContent('#toastContainer')));
-    await E("completeTask('"+w2.id+"')"); await p.waitForTimeout(250);
-    check('…a hit on Week 2 fills Week 1 first (and says so); Week 1 finishes', await E("("+W+")(1).status")==='done' && /Week 1 fills first/.test(await p.textContent('#toastContainer')));
-    await E("completeTask('"+w2.id+"')"); await p.waitForTimeout(250);
-    check('…then Week 2 starts filling (1/4)', await E("dvwFind(("+W+")(2)).done")===1);
-    await E("ACTIONS.mtDvUndo(null, null, '"+w2.id+"'); ACTIONS.mtDvUndo(null, null, '"+w2.id+"'); renderView()"); await p.waitForTimeout(200);
-    check('…take two back: Week 2 empty, Week 1 open again (back in the backlog)', await E("dvwFind(("+W+")(2)).done")===0 && await E("("+W+")(1).status")==='backlog');
-    await E("incrementDeliverableProgress('bm', 'd1'); renderView()"); await p.waitForTimeout(150);
-    check('…logging on the client card fills the weeks too (Week 1 done)', await E("("+W+")(1).status")==='done');
+    const CC = "dvwCycleCount(state.business.clients[0].deliverables[0], dvwCycle(state.business.clients[0]))";
+    const c0 = await E(CC);
+    await p.click('.cbl-w[data-id="'+w1.id+'"] .cbl-done'); await p.waitForTimeout(300);
+    check('one click: Done logs the week’s 4 reels and the task is done ('+(c0+4)+')', await E(CC)===c0+4 && await E("("+W+")(1).status")==='done' && /16 Reels 1\/4 done: 4 reels logged/.test(await p.textContent('#toastContainer')));
+    await p.click('.cbl-w[data-id="'+w1.id+'"] .cbl-undo'); await p.waitForTimeout(250);
+    check('…Undo takes the 4 back and reopens it', await E(CC)===c0 && await E("("+W+")(1).status")==='backlog');
+    await E("for(let i = 0; i < 4 - "+c0+"; i++) incrementDeliverableProgress('bm', 'd1'); renderView()"); await p.waitForTimeout(150);
+    check('…logging on the client card counts too (4 in: Week 1 done)', await E("("+W+")(1).status")==='done' && await E("("+W+")(2).status")==='backlog');
     await p.click('.cbl-w[data-id="'+w2.id+'"] .cbl-today'); await p.waitForTimeout(200);
     check('→ Today puts Week 2 on today', await E("("+W+")(2).status")==='today');
     await E("ui.focusTasksSubTab='overview'; renderView()"); await p.waitForTimeout(200);
     { const cs = '.task-card.dlv-card:not(.car-clone)[data-task-id="'+w2.id+'"]';
-      check('…its card: its own color, "Week 2", the client, pieces with +1', !!(await p.$(cs)) && /Week 2/.test(await p.textContent(cs+' .mt-badge')) && /Brothers Mechanical/.test(await p.textContent(cs)) && !!(await p.$(cs+' .mt-plus'))); }
+      check('…its card: its own color, "Week 2", the client, what it’s worth (no +1 counter)', !!(await p.$(cs)) && /Week 2/.test(await p.textContent(cs+' .mt-badge')) && /Brothers Mechanical/.test(await p.textContent(cs)) && /4 reels/.test(await p.textContent(cs+' .dvw-sub')) && !(await p.$(cs+' .mt-plus'))); }
+    await E("openTaskEditModal('"+w2.id+"')"); await p.waitForTimeout(200);
+    check('editing it: no deliverable picker, it says it’s automatic, the name is locked', !(await p.$('#taskEditOverlay .tdv')) && /Automatic: from Brothers Mechanical/.test(await p.textContent('#taskEditOverlay .dvw-auto')) && await E("document.getElementById('editTitle-"+w2.id+"').readOnly"));
+    await E("document.getElementById('editPriority-"+w2.id+"').value='high'; document.getElementById('editTitle-"+w2.id+"').value='Something else'; saveEditTask('"+w2.id+"')"); await p.waitForTimeout(150);
+    check('…priority changes; the name and due date stay the deliverable’s', await E("("+W+")(2).priority")==='high' && await E("("+W+")(2).title")==='16 Reels 2/4' && await E("("+W+")(2).deadline")==='2026-10-14');
+    await E("closeTaskEditModal ? closeTaskEditModal() : hideOverlay('taskEditOverlay')");
+    // a one-off: one task of its own, done on either side is done on both
+    await E("state.business.clients[0].deliverables.push({id:'o1', title:'Brand video', recurring:false, dueDate:'2026-10-20', status:'pending', linkedTaskId:null}); masterTasksSync()"); await p.waitForTimeout(150);
+    const O = "state.tasks.items.find(t => t.master && t.master.delivId==='o1')";
+    check('a one-off deliverable → one task, same client, its due date', await E("JSON.stringify((({title, deadline, clients}) => ({title, deadline, clients}))("+O+"))")==='{"title":"Brand video","deadline":"2026-10-20","clients":["bm"]}');
+    await E("completeTask("+O+".id)"); await p.waitForTimeout(200);
+    check('…done in one click marks the deliverable done', await E("state.business.clients[0].deliverables.find(d => d.id==='o1').status")==='done');
+    await E("toggleDeliverable('bm', 'o1'); masterTasksSync()"); await p.waitForTimeout(150);
+    check('…and reopening it on the card reopens the task', await E(O+".status")!=='done');
     check('…and the client’s health reads it', ['good', 'warn'].indexOf(await E("clientHealthStatus(state.business.clients[0]).paceLevel")) >= 0);
     // reach out to clients
     check('no Reach out task while nobody’s due', await E("!state.tasks.items.some(t => t.master && t.master.kind==='reach' && t.status!=='done')"));
@@ -264,7 +274,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("masterTasksSync && masterTasksSync(); openWindDown('plan')"); await p.waitForTimeout(400);
     const rows = await E("[...document.querySelectorAll('#windContent .wd-row .wd-title')].map(e=>e.textContent)");
     check('Clock out → Plan of attack: every open task on your list (not just six), your pick first', rows.length >= 8 && rows[0]==='Task 3' && [1,2,4,5,6,7,8].every(i => rows.includes('Task '+i)) && !rows.includes('Old done'), rows);
-    check('…and this week’s client deliverables (the Reels) are in it', rows.includes('Reels'), rows);
+    check('…and this week’s client deliverables (the Reels) are in it', rows.some(r => /^16 Reels \d\/4$/.test(r)), rows);
     await E("ACTIONS.closeWindDown()"); await E("ui.view='today'; renderView()"); await p.waitForTimeout(200);
     check('Today: the day streak is out of its pill, bigger, with a line on where today stands', !!(await p.$('.sw.is-r38 .sw-ss')) && /day streak/i.test(await p.textContent('.sw.is-r38 .sw-streak')) && await p.evaluate(() => parseFloat(getComputedStyle(document.querySelector('.sw.is-r38 .sw-streak > b')).fontSize) >= 30));
     check('no page errors (round 38g)', p.errors.length===0, p.errors);

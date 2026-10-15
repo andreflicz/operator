@@ -7190,3 +7190,25 @@ body:has(#wakeOverlay:not(.hidden)) .activity-pill{ display:none !important; }
 .sw.is-r38 .sw-ss.is-ok{ color:var(--green, #3ecf8e); opacity:1; }
 /* the "Off the clock" pill stays out of the wind-down screens (it sat on top of Back) */
 body:has(#windOverlay:not(.hidden)) #activityPill{ opacity:0 !important; pointer-events:none !important; }
+
+/* ===== R38h: automatic client deliverable tasks; lock-in steps centered ===== */
+.dvw-sub{ margin-top:4px; font-size:11.5px; color:var(--dlv); opacity:.9; }
+.cbl-q{ font-size:11px; color:var(--text-dim); }
+.cbl-wb{ justify-content:flex-end; flex-wrap:wrap; }
+.cbl-wb .cbl-ok{ margin-right:auto; }
+.cbl-done{ height:22px; padding:0 10px; border-radius:999px; border:1px solid rgba(var(--dlv-rgb),.55); background:rgba(var(--dlv-rgb),.16); color:var(--text); font:inherit; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.cbl-done:hover{ background:rgba(var(--dlv-rgb),.3); }
+.cbl-undo{ height:22px; padding:0 8px; border-radius:999px; border:1px solid var(--border); background:none; color:var(--text-dim); font:inherit; font-size:11px; cursor:pointer; }
+.cbl-undo:hover{ color:var(--text); }
+.dvw-auto{ display:flex; gap:10px; align-items:flex-start; padding:10px 12px; margin:-4px 0 12px; border-radius:12px; border:1px solid rgba(var(--dlv-rgb),.35); background:rgba(var(--dlv-rgb),.08); }
+.dvw-auto-i{ font-size:18px; line-height:1.2; }
+.dvw-auto b{ display:block; font-size:13px; color:var(--text); } .dvw-auto small{ display:block; margin-top:2px; font-size:11.5px; color:var(--text-dim); line-height:1.4; }
+.dvw-hide{ display:none !important; }
+.dvw-lock input[readonly]{ opacity:.7; cursor:default; }
+/* the one-off sheet always makes its task now */
+label:has(> #newDeliverableLinkTask){ display:none !important; }
+/* lock-in: the steps sit in the middle of the screen, whatever's on the right */
+.ls .wd-top{ position:relative; min-height:36px; }
+.ls .wd-steps{ position:absolute !important; left:50%; top:22px; transform:translateX(-50%); margin:0 !important; padding-left:0 !important; }
+body:has(#lockSeqOverlay:not(.hidden)) #activityPill{ opacity:0 !important; pointer-events:none !important; }
+@media (max-width:1180px){ .ls .wd-steps{ position:static !important; transform:none; margin:0 auto !important; } }
