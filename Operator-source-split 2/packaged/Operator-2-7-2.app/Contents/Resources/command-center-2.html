@@ -6932,6 +6932,142 @@ body:has(#wakeOverlay:not(.hidden)) .activity-pill{ display:none !important; }
 .ckd-bar-t u{ display:block; height:100%; border-radius:7px; background:linear-gradient(90deg, #E8A23D, #f5c16c); transition:width .6s ease; } .ckd-bar-t u.is-hit{ background:linear-gradient(90deg, #3FBE8E, #6fe0b0); }
 .ckd-bar-k{ margin-top:8px; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.5); }
 .ckx .ckd-week{ flex:1; min-height:120px; height:auto; }
+
+/* ============ ROUND 38 ============ */
+/* Op's light: no eclipse (the dark moon is gone): just his light */
+.op-light::after{ display:none !important; }
+/* Rainbow: his color walks the spectrum */
+@keyframes opRainbow{
+  0%  { --op-c:#ff7a7a; --op-glow:rgba(255,122,122,.8); --op-glow2:rgba(255,122,122,.36); }
+  17% { --op-c:#ffb35c; --op-glow:rgba(255,179,92,.8); --op-glow2:rgba(255,179,92,.36); }
+  33% { --op-c:#ffe66d; --op-glow:rgba(255,230,109,.8); --op-glow2:rgba(255,230,109,.36); }
+  50% { --op-c:#6ff0a0; --op-glow:rgba(111,240,160,.8); --op-glow2:rgba(111,240,160,.36); }
+  67% { --op-c:#5bc0eb; --op-glow:rgba(91,192,235,.8); --op-glow2:rgba(91,192,235,.36); }
+  83% { --op-c:#b18cff; --op-glow:rgba(177,140,255,.8); --op-glow2:rgba(177,140,255,.36); }
+  100%{ --op-c:#ff7a7a; --op-glow:rgba(255,122,122,.8); --op-glow2:rgba(255,122,122,.36); }
+}
+.opc-sw[data-id="rainbow"] i{ background:conic-gradient(from 20deg, #ff7a7a, #ffb35c, #ffe66d, #6ff0a0, #5bc0eb, #b18cff, #ff7a7a); box-shadow:0 0 12px rgba(177,140,255,.55); }
+@media (prefers-reduced-motion:reduce){ :root{ animation-duration:60s !important; } }
+
+/* Today: the full-screen view lives with the time and music, top right */
+.md-full{ margin-left:2px; }
+.md-full:hover{ color:var(--text); background:rgba(var(--ink),.08); }
+/* the hero's left side fills the panel: name and Op up top, the weather card at the bottom */
+@media (min-width:1181px){ .today-hero > .th-left.th-mix{ align-self:stretch !important; justify-content:flex-start !important; } }
+.th-left.th-mix .th-wx.is-r38{ margin-top:auto; padding-top:10px; }
+.twx{ display:flex; align-items:center; gap:12px; min-height:58px; padding:9px 14px 9px 12px; border-radius:14px; border:1px solid rgba(var(--ink),.08); background:rgba(var(--ink),.04); color:var(--text-dim); box-sizing:border-box; }
+.twx[data-sky="day"], .twx[data-sky="morning"]{ background:linear-gradient(100deg, rgba(255,196,92,.12), rgba(var(--ink),.03) 60%); }
+.twx[data-sky="golden"], .twx[data-sky="dawn"]{ background:linear-gradient(100deg, rgba(255,140,90,.14), rgba(var(--ink),.03) 60%); }
+.twx[data-sky="dusk"], .twx[data-sky="night"]{ background:linear-gradient(100deg, rgba(120,140,255,.14), rgba(var(--ink),.03) 60%); }
+.twx-i{ font-size:26px; line-height:1; flex:none; }
+.twx-t{ font-family:var(--font-display); font-size:28px; font-weight:800; line-height:1; color:var(--text); font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+.twx-c{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+.twx-c > span{ font-size:13.5px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.twx-c small{ font-size:11.5px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-variant-numeric:tabular-nums; }
+.twx-set{ border:0; padding:0; background:none; font:inherit; color:var(--text-dim); text-decoration:underline; text-decoration-color:rgba(var(--ink),.25); text-underline-offset:2px; cursor:pointer; }
+.twx-set:hover{ color:var(--text); }
+.twx-sun{ margin-left:auto; flex:none; display:flex; flex-direction:column; align-items:center; width:124px; }
+.twx-left{ font-size:10.5px; color:var(--text-dim); text-align:center; white-space:nowrap; margin-bottom:1px; }
+.twx-sun .sun-arc{ display:block; width:104px; height:26px; }
+.twx-times{ align-self:stretch; display:flex; justify-content:space-between; gap:6px; white-space:nowrap; font-size:9.5px; color:var(--text-dim); font-variant-numeric:tabular-nums; opacity:.85; margin-top:1px; }
+.twx-times span:first-child{ color:color-mix(in srgb, #ffb347 55%, var(--text-dim)); } .twx-times span:last-child{ color:color-mix(in srgb, #ff8a5c 55%, var(--text-dim)); }
+@media (max-width:760px){ .twx-left{ display:none; } .twx-sun{ width:84px; } .twx-sun .sun-arc{ width:84px; } }
+
+/* the streak row: a smaller streak, the week, and the Tasks bar stretched under them */
+.sw.is-row.is-r38{ flex-wrap:wrap; row-gap:12px; column-gap:18px; padding:12px 18px 14px; }
+.sw.is-r38 .sw-l{ min-width:0; }
+.sw.is-r38 .sw-streak{ gap:6px; padding:6px 12px 6px 9px; border-radius:999px; background:rgba(var(--ink),.04); border:1px solid rgba(var(--ink),.06); }
+.sw.is-r38 .sw-streak > b{ font-size:19px; }
+.sw.is-r38 .sw-flame{ font-size:15px; }
+.sw.is-r38 .sw-streak > span:not(.sw-flame):not(.streak-ok):not(.qtip){ font-size:9.5px; letter-spacing:.08em; }
+.sw.is-r38 .sw-days{ flex:1; }
+.sw.is-r38 .sw-c{ width:36px !important; height:36px !important; }
+.sw.is-r38 .sw-h{ font-size:10.5px; }
+.swt{ flex:1 0 100%; display:flex; align-items:center; gap:14px; padding:10px 14px; border-radius:12px; border:1px solid rgba(var(--ink),.07); background:rgba(var(--ink),.03); color:var(--text); font:inherit; text-align:left; cursor:pointer; transition:background .15s, border-color .15s; box-sizing:border-box; }
+.swt:hover{ background:rgba(var(--ink),.055); border-color:rgba(var(--ink),.12); }
+.swt-k{ flex:none; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); }
+.swt-n{ flex:none; font-family:var(--font-display); font-size:24px; font-weight:800; line-height:1; font-variant-numeric:tabular-nums; }
+.swt-n small{ font-size:14px; font-weight:600; color:var(--text-dim); }
+.swt-segs{ flex:1; display:flex; gap:5px; min-width:120px; }
+.swt-segs i{ flex:1; height:9px; border-radius:5px; background:rgba(var(--ink),.1); }
+.swt-segs i.on{ background:var(--accent); box-shadow:0 0 10px color-mix(in srgb, var(--accent) 45%, transparent); }
+.swt-bar{ flex:1; height:9px; border-radius:5px; background:rgba(var(--ink),.1); overflow:hidden; min-width:120px; }
+.swt-bar i{ display:block; height:100%; border-radius:inherit; background:var(--accent); }
+.swt-r{ flex:0 1 auto; max-width:42%; font-size:12.5px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.swt-r em{ font-style:normal; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; opacity:.75; }
+.sw.is-r38 .sw-edit{ left:auto; right:16px; top:auto; bottom:3px; font-size:10.5px; line-height:1; }
+.sw.is-row.is-r38{ padding-bottom:18px; }
+@media (max-width:760px){ .swt-r{ display:none; } }
+
+/* a task that's a client's deliverable */
+.tdv-opt{ font-weight:400; opacity:.6; text-transform:none; letter-spacing:0; }
+.tdv-row{ display:flex; flex-wrap:wrap; gap:6px; }
+.tdv-chip{ display:inline-flex; align-items:center; gap:7px; padding:4px 11px 4px 4px; border-radius:999px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text-dim); font:inherit; font-size:12.5px; cursor:pointer; transition:border-color .15s, background .15s; }
+.tdv-chip i{ width:22px; height:22px; border-radius:50%; display:grid; place-items:center; font-style:normal; font-size:9px; font-weight:800; color:#fff; flex:none; }
+.tdv-chip b{ font-weight:600; color:var(--text); }
+.tdv-chip em{ font-style:normal; font-size:11px; opacity:.75; font-variant-numeric:tabular-nums; }
+.tdv-chip:hover{ border-color:var(--text-dim); }
+.tdv-chip.is-on{ border-color:var(--good); background:rgba(63,190,142,.13); color:var(--text); }
+.tdv-hint{ margin-top:7px; font-size:12px; color:var(--good); }
+@keyframes tdvAsk{ 0%,100%{ box-shadow:0 0 0 0 transparent; } 50%{ box-shadow:0 0 0 4px rgba(63,190,142,.25); } }
+.tdv.is-ask .tdv-row{ border-radius:14px; animation:tdvAsk 1s 2; }
+.tdv-badge{ display:inline-flex; align-items:center; gap:3px; margin-right:6px; padding:1px 7px; border-radius:999px; font-size:10.5px; font-weight:700; letter-spacing:.02em; color:#3FBE8E; background:rgba(63,190,142,.14); vertical-align:middle; }
+.cc2-deliv-mo{ margin-left:7px; font-size:10.5px; font-weight:500; color:var(--text-dim); opacity:.85; font-variant-numeric:tabular-nums; }
+.cf-deliv-mo{ margin-left:8px; font-size:11px; font-weight:500; color:var(--text-dim); font-variant-numeric:tabular-nums; }
+
+/* ---- round 38b: deliverable tasks, the reach-out task, the Log center, the date tile ---- */
+.mt-badge.is-dv{ color:#3FBE8E; background:rgba(63,190,142,.14); }
+.mt-badge.is-reach{ color:#E8A23D; background:rgba(232,162,61,.15); }
+.mt-prog{ display:flex; align-items:center; gap:8px; margin-top:8px; }
+.mt-segs{ flex:1; display:flex; gap:4px; min-width:60px; }
+.mt-segs i{ flex:1; height:7px; border-radius:4px; background:rgba(var(--ink),.12); transition:background .3s; }
+.mt-segs i.on{ background:#3FBE8E; box-shadow:0 0 8px rgba(63,190,142,.45); }
+.mt-prog b{ font-size:12px; font-variant-numeric:tabular-nums; color:var(--text); }
+.mt-undo, .mt-plus{ height:22px; min-width:22px; padding:0 7px; border-radius:999px; border:1px solid var(--border); background:rgba(var(--ink),.04); color:var(--text-dim); font:inherit; font-size:11.5px; font-weight:700; cursor:pointer; }
+.mt-plus{ border-color:rgba(63,190,142,.5); color:#3FBE8E; }
+.mt-undo:hover, .mt-plus:hover{ color:var(--text); background:rgba(var(--ink),.08); }
+.mt-reach{ display:flex; flex-wrap:wrap; align-items:center; gap:5px; margin-top:8px; }
+.mt-who{ font-size:11px; font-weight:600; padding:2px 8px; border-radius:999px; color:var(--text); background:color-mix(in srgb, var(--c) 22%, transparent); border:1px solid color-mix(in srgb, var(--c) 45%, transparent); }
+.mt-log{ margin-left:auto; border:0; background:none; padding:2px 0; font:inherit; font-size:11.5px; font-weight:600; color:var(--text-dim); cursor:pointer; }
+.mt-log:hover{ color:var(--text); }
+/* the Log center */
+.lc{ display:flex; flex-direction:column; gap:8px; }
+.lc-h{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:6px; }
+.lc-t{ font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--text); }
+.lc-s{ font-size:12.5px; color:var(--text-dim); margin-top:2px; }
+.lc-k{ display:flex; gap:8px; }
+.lc-k span{ font-size:12px; color:var(--text-dim); padding:6px 12px; border-radius:999px; border:1px solid var(--border); background:rgba(var(--ink),.03); }
+.lc-k span b{ color:var(--text); font-size:14px; margin-right:3px; font-variant-numeric:tabular-nums; }
+.lc-k span.is-due{ border-color:rgba(232,99,107,.45); background:rgba(232,99,107,.08); } .lc-k span.is-due b{ color:#E8636B; }
+.lc-k span.is-ok b{ color:#3FBE8E; }
+.lc-sec{ margin:10px 0 2px; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); }
+.lc-row{ display:grid; grid-template-columns:36px minmax(140px, 1.2fr) minmax(110px, .8fr) minmax(120px, .8fr) auto; align-items:center; gap:14px; padding:10px 14px; border-radius:14px; border:1px solid var(--border); background:var(--panel); }
+.lc-row.is-due{ border-color:rgba(232,99,107,.35); box-shadow:inset 3px 0 0 #E8636B; }
+.lc-ok .lc-row{ opacity:.78; } .lc-ok .lc-row:hover{ opacity:1; }
+.lc-av{ width:34px; height:34px; border-radius:50%; display:grid; place-items:center; color:#fff; font-size:11px; font-weight:800; }
+.lc-who{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.lc-who b{ font-size:14px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lc-who small{ display:flex; align-items:center; gap:5px; font-size:11.5px; color:var(--text-dim); }
+.lc-hs{ width:7px; height:7px; border-radius:50%; background:#3FBE8E; } .lc-hs.is-yellow{ background:#E8A23D; } .lc-hs.is-red{ background:#E8636B; }
+.lc-last{ display:flex; flex-direction:column; gap:2px; } .lc-last small{ font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim); } .lc-last b{ font-size:13px; font-weight:600; color:var(--text); }
+.lc-due{ font-size:12.5px; }
+.lc-btns{ display:flex; gap:5px; flex-wrap:wrap; justify-content:flex-end; }
+.lc-b{ display:inline-flex; align-items:center; gap:5px; height:30px; padding:0 10px; border-radius:999px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text-dim); font:inherit; font-size:12px; cursor:pointer; transition:background .15s, color .15s, border-color .15s; }
+.lc-b:hover{ color:var(--text); border-color:var(--text-dim); background:rgba(var(--ink),.07); }
+.lc-clear{ padding:18px; border-radius:14px; border:1px dashed rgba(63,190,142,.4); color:#3FBE8E; font-weight:600; text-align:center; }
+.lc-badge{ display:inline-grid; place-items:center; min-width:17px; height:17px; padding:0 5px; margin-left:3px; border-radius:999px; background:#E8636B; color:#fff; font-size:10.5px; font-weight:800; }
+@media (max-width:1100px){ .lc-row{ grid-template-columns:36px 1fr auto; } .lc-last{ display:none; } .lc-btns{ grid-column:1 / -1; justify-content:flex-start; } .lc-b span{ display:none; } }
+/* Today's date: a little calendar tile */
+.th-date{ display:flex; align-items:center; gap:12px; margin-top:4px; }
+.thd-cal{ flex:none; width:44px; height:48px; border-radius:11px; overflow:hidden; display:flex; flex-direction:column; background:rgba(var(--ink),.06); border:1px solid rgba(var(--ink),.1); box-shadow:0 4px 14px rgba(0,0,0,.18); }
+.thd-cal i{ display:block; height:15px; font-style:normal; font-size:9.5px; font-weight:800; letter-spacing:.12em; line-height:15px; text-align:center; color:#fff; background:linear-gradient(180deg, #ef6b6b, #d84f57); }
+.thd-cal b{ flex:1; display:grid; place-items:center; font-family:var(--font-display); font-size:21px; font-weight:800; line-height:1; color:var(--text); font-variant-numeric:tabular-nums; }
+.thd-t{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+.thd-t b{ font-family:var(--font-display); font-size:16px; font-weight:700; letter-spacing:-.005em; color:var(--text); }
+.thd-t small{ font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-variant-numeric:tabular-nums; }
+.mt-reach-k{ font-size:11.5px; color:var(--text-dim); }
+.dfd-note{ margin-left:10px; border:1px solid rgba(63,190,142,.35); background:rgba(63,190,142,.1); color:#3FBE8E; border-radius:999px; padding:3px 10px; font:inherit; font-size:11.5px; font-weight:600; cursor:pointer; }
+.dfd-note:hover{ background:rgba(63,190,142,.18); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -37529,6 +37665,678 @@ cockpitDayHtml = (function(base){
     });
   };
 })(cockpitDayHtml);
+// ============ ROUND 38 ============
+// • Today's top panel: the full-screen view is an icon up with the time and music (the "◉ Minimal"
+//   chip is gone), the weather is a proper card, the left side fills the panel's height, and the
+//   streak row is smaller with a wide Tasks bar right under it.
+// • Op's light: no eclipse (the dark moon is gone, he's just a white light). New color: Rainbow.
+// • Deliverables: the month's number is the plan's (a 16-reel plan is 16 a month, not 18), and work
+//   finished as a task counts on the client's card.
+// • Tasks can be a client's retainer deliverable: pick it when you add the task and finishing it logs one
+//   for them (their count, pace and health move with it).
+// • "How we got them" has Outreach.
+
+// ---- how we get clients: Outreach ----
+if(!LEAD_SOURCES.some(function(s){ return s.id==='outreach'; })){
+  LEAD_SOURCES.splice(Math.max(0, LEAD_SOURCES.length - 1), 0, {id:'outreach', emoji:'📨', label:'Outreach', color:'#5BC0EB'});
+}
+OP_TOOLS.push({name:'set_client_source', description:'Set how a client or lead was won (e.g. "I got him from outreach").', input_schema:{type:'object', properties:{who:{type:'string'}, source:{type:'string', enum:LEAD_SOURCES.map(function(s){ return s.id; })}}, required:['who', 'source']}});
+
+// ---- deliverables: the plan's number, and what counts ----
+function delivStemWords(s){
+  const w = String(s||'').toLowerCase().replace(/[^a-z ]+/g, ' ').split(/\s+/).filter(Boolean).map(function(x){ return x.length > 3 && /s$/.test(x) ? x.slice(0, -1) : x; });
+  const long = w.filter(function(x){ return x.length >= 3; });
+  return long.length ? long : w;
+}
+function delivClientOf(d){
+  return arr(state.business && state.business.clients).find(function(c){ return arr(c.deliverables).indexOf(d) >= 0; }) || null;
+}
+// "16 Reels", "16 reels a month", "Reels x16": the number that goes with this deliverable
+function delivPlanNumber(d){
+  const c = delivClientOf(d), pkg = c && c.packageId ? arr(state.business.packages).find(function(x){ return x.id===c.packageId; }) : null;
+  const stems = delivStemWords(d.title); if(!stems.length) return 0;
+  const texts = [d.title, pkg && pkg.name, pkg && pkg.description];
+  for(let i = 0; i < texts.length; i++){
+    const t = String(texts[i]||'').toLowerCase();
+    const re = /(\d{1,3})\s*x?\s*([a-z][a-z]+)|([a-z][a-z]+)\s*x\s*(\d{1,3})/g; let m;
+    while((m = re.exec(t))){
+      const n = Number(m[1] || m[4]), word = delivStemWords(m[2] || m[3])[0];
+      if(n > 0 && word && stems.indexOf(word) >= 0) return n;
+    }
+  }
+  return 0;
+}
+// (a month on a retainer is four weeks of the weekly number, unless the plan says otherwise)
+function monthlyTargetFor(d){
+  if(Number(d.monthlyTarget) > 0) return Number(d.monthlyTarget);
+  const n = delivPlanNumber(d); if(n) return n;
+  return Math.max(1, (d.weeklyTarget||1)*4);
+}
+function delivOne(d){ const t = String(d.title||''); return /[a-z]s$/i.test(t) && t.length > 3 ? t.slice(0, -1) : t; }
+function delivMonthLine(d){ return deliverableMonthCount(d)+'/'+monthlyTargetFor(d)+' this month'; }
+function clientDelivRowsHtml(c, compact){
+  const recurring = arr(c.deliverables).filter(function(d){ return d.recurring; });
+  if(!recurring.length) return '';
+  const pkg = c.packageId ? arr(state.business.packages).find(function(x){ return x.id===c.packageId; }) : null;
+  return '<div class="cc2-delivs">'+(pkg ? '<div class="cc2-pkg"><span class="cc2-pkg-n">'+escapeHtml(pkg.name)+'</span>'+(pkg.price ? '<span class="kpi-sub">$'+Number(pkg.price).toLocaleString()+'/mo</span>' : '')+'</div>' : '')+recurring.map(function(d){
+    const done = deliverableWeekCount(d), target = deliverableWeekNeed(d);
+    const pace = deliverablePaceStatus(d);
+    const today = arr(d.completedDates).indexOf(todayStr())>=0;
+    return '<div class="cc2-deliv" data-key="dv-'+c.id+'-'+d.id+'" title="'+escapeHtml(d.title)+': '+done+' of '+target+' this week ('+delivPaceWord(d)+') · '+delivMonthLine(d)+'">'+
+      '<span class="cc2-deliv-title">'+escapeHtml(d.title)+'<small class="cc2-deliv-mo">'+deliverableMonthCount(d)+'/'+monthlyTargetFor(d)+' this month</small></span>'+
+      weekDotsHtml(Math.min(done, target), target, pace)+
+      '<span class="cc2-deliv-count" style="color:'+paceColorOf(pace)+'">'+done+'/'+target+'</span>'+
+      (done>=target ? '<span class="cc2-owed is-caught" title="This week\'s number is in">&#10003;</span>' : '')+
+      '<button class="cc2-deliv-btn cc2-plus'+(today?' did-today':'')+'" data-action="incrementDeliverableProgress" data-client="'+c.id+'" data-id="'+d.id+'" title="Log one">+</button>'+
+    '</div>';
+  }).join('')+'</div>';
+}
+// the card's back: each recurring deliverable says its month too
+clientCardFrontHtml = (function(base){
+  return function(c){
+    const h = base.apply(this, arguments), rec = arr(c.deliverables).filter(function(d){ return d.recurring; });
+    let i = 0;
+    return h.replace(/(<div class="cf-deliv"><span class="cf-deliv-t">[\s\S]*?<\/span>)(?=<span class="(?:wk-dots|cc2-deliv-bar))/g, function(m){
+      const d = rec[i++]; return d ? m.replace(/<\/span>$/, '<small class="cf-deliv-mo">'+delivMonthLine(d)+'</small></span>') : m;
+    });
+  };
+})(clientCardFrontHtml);
+
+// which deliverable a task is: the one you picked, or (for a task tied to one client) the one its title names
+function delivFind(cid, did){
+  const c = arr(state.business.clients).find(function(x){ return x.id===cid; }), d = c ? arr(c.deliverables).find(function(x){ return x.id===did; }) : null;
+  return c && d ? {c:c, d:d} : null;
+}
+function taskClientIds(t){
+  const ids = arr(t.clients).concat(t.client ? [t.client] : []).filter(function(x, i, all){ return x && x!=='personal' && all.indexOf(x)===i; });
+  const low = String(t.title||'').toLowerCase();
+  arr(state.business.clients).forEach(function(c){ [c.business, c.name].forEach(function(n){ n = String(n||'').trim().toLowerCase(); if(n.length >= 4 && low.indexOf(n) >= 0 && ids.indexOf(c.id) < 0) ids.push(c.id); }); });
+  return ids;
+}
+function delivAutoMatch(t){
+  if(!t || t.master || t.isVideoIdea) return null;
+  const words = delivStemWords(t.title), hits = [];
+  taskClientIds(t).forEach(function(cid){
+    const c = arr(state.business.clients).find(function(x){ return x.id===cid; }); if(!c) return;
+    arr(c.deliverables).forEach(function(d){
+      if(!d.recurring) return;
+      const st = delivStemWords(d.title);
+      if(st.length && st.every(function(w){ return words.indexOf(w) >= 0; })) hits.push({c:c, d:d});
+    });
+  });
+  return hits.length===1 ? hits[0] : null;
+}
+function taskDeliv(t){
+  if(!t) return null;
+  if(t.deliv && t.deliv.c){ return delivFind(t.deliv.c, t.deliv.d); }
+  if(t.deliv===false) return null;
+  return delivAutoMatch(t);
+}
+function delivLogOne(hit, date){
+  if(!Array.isArray(hit.d.completedDates)) hit.d.completedDates = [];
+  hit.d.completedDates.push(date || todayStr());
+}
+function delivUnlogOne(hit, date){
+  const l = arr(hit.d.completedDates), i = l.lastIndexOf(date);
+  if(i >= 0){ l.splice(i, 1); hit.d.completedDates = l; }
+}
+completeTask = (function(base){
+  return function(id){
+    const t = state.tasks.items.find(function(x){ return x.id===id; });
+    const skip = !t || justCompletedTaskId===id || (t.status==='done' && !t.ongoing);
+    const r = base.apply(this, arguments);
+    if(skip) return r;
+    const today = todayStr();
+    // the weekly "Deliverables for <client>" task, finished by hand: the rest of this week's number goes in
+    if(t.master && t.master.kind==='deliv'){
+      const c = arr(state.business.clients).find(function(x){ return x.id===t.master.clientId; }); if(!c) return r;
+      const log = [];
+      arr(c.deliverables).forEach(function(d){
+        if(!d.recurring && !d.weeklyTarget) return;
+        const left = Math.max(0, (d.weeklyTarget||1) - deliverableWeekCount(d));
+        for(let i = 0; i < left; i++){ delivLogOne({c:c, d:d}, today); log.push({c:c.id, d:d.id, date:today}); }
+      });
+      if(log.length){ t.delivLog = log; persist('business'); persist('tasks'); }
+      return r;
+    }
+    const hit = taskDeliv(t); if(!hit) return r;
+    if(arr(t.delivLog).some(function(e){ return e.date===today; })) return r;
+    if(!t.ongoing && arr(t.delivLog).length) return r;
+    delivLogOne(hit, today);
+    t.delivLog = arr(t.delivLog).concat([{c:hit.c.id, d:hit.d.id, date:today}]);
+    persist('business'); persist('tasks');
+    setTimeout(function(){ showToast('Counted for '+(hit.c.business || hit.c.name)+': '+hit.d.title+', '+delivMonthLine(hit.d)+'.', {icon:'&#128230;'}); }, 1000);
+    return r;
+  };
+})(completeTask);
+// un-finish a task and its deliverable comes back off the card
+function delivTaskSync(){
+  let changed = false;
+  state.tasks.items.forEach(function(t){
+    if(!arr(t.delivLog).length || t.ongoing || t.status==='done' || justCompletedTaskId===t.id) return;
+    t.delivLog.forEach(function(e){ const hit = delivFind(e.c, e.d); if(hit) delivUnlogOne(hit, e.date); });
+    delete t.delivLog; changed = true;
+  });
+  if(changed){ persist('business'); persist('tasks'); }
+}
+afterRenderHooks.push(function(){ try{ delivTaskSync(); }catch(e){} });
+// once: this month's finished tasks that were a client's deliverable count now (only where the card says 0)
+function delivBackfillOnce(){
+  if(!state || !state.profile || state.profile.delivBackfill38) return;
+  state.profile.delivBackfill38 = true;
+  const mk = thisMonthKey(), zero = {};
+  arr(state.business.clients).forEach(function(c){ arr(c.deliverables).forEach(function(d){ if(d.recurring && deliverableMonthCount(d)===0) zero[c.id+':'+d.id] = 1; }); });
+  let n = 0;
+  state.tasks.items.forEach(function(t){
+    if(t.status!=='done' || t.ongoing || !t.completedAt || monthKeyOf(t.completedAt)!==mk || arr(t.delivLog).length) return;
+    const hit = taskDeliv(t); if(!hit || !zero[hit.c.id+':'+hit.d.id]) return;
+    delivLogOne(hit, t.completedAt); t.delivLog = [{c:hit.c.id, d:hit.d.id, date:t.completedAt}]; n++;
+  });
+  persist('profile');
+  if(n){ persist('business'); persist('tasks'); setTimeout(function(){ showToast(n+' finished task'+(n===1 ? '' : 's')+' this month now count on '+(n===1 ? 'a client’s' : 'your clients’')+' deliverables.', {icon:'&#128230;', duration:6000}); }, 2500); }
+}
+afterRenderHooks.push(function(){ if(state && state.profile && !state.profile.delivBackfill38){ try{ delivBackfillOnce(); setTimeout(renderView, 0); }catch(e){} } });
+
+// ---- adding a task: it can be a client's retainer deliverable ----
+function delivChoices(){
+  const out = [];
+  arr(state.business && state.business.clients).filter(function(c){ return clientStageActive(c.stage) && c.status!=='paused'; }).forEach(function(c){
+    arr(c.deliverables).forEach(function(d){ if(d.recurring) out.push({c:c, d:d}); });
+  });
+  return out;
+}
+function delivPickerHtml(sel, action, clientsSel){
+  const ch = delivChoices(); if(!ch.length) return '';
+  const pref = arr(clientsSel).filter(function(x){ return x!=='personal'; });
+  ch.sort(function(a, b){ return (pref.indexOf(b.c.id) >= 0) - (pref.indexOf(a.c.id) >= 0); });
+  const on = ch.find(function(x){ return sel===x.c.id+':'+x.d.id; });
+  return '<div class="field tdv" style="margin-top:10px;"><label>Counts as a client deliverable <span class="tdv-opt">(optional)</span></label><div class="tdv-row">'+
+    ch.map(function(x){ const k = x.c.id+':'+x.d.id; return '<button type="button" class="tdv-chip'+(sel===k ? ' is-on' : '')+'" data-action="'+action+'" data-id="'+k+'"><i style="background:'+clientColor(x.c)+'">'+escapeHtml(clientInitials(x.c))+'</i><b>'+escapeHtml(x.d.title)+'</b><em>'+deliverableMonthCount(x.d)+'/'+monthlyTargetFor(x.d)+'</em></button>'; }).join('')+
+    '</div>'+(on ? '<div class="tdv-hint">Finishing it logs one '+escapeHtml(delivOne(on.d))+' for '+escapeHtml(on.c.business || on.c.name)+': their count, pace and health move with it.</div>' : '')+'</div>';
+}
+openAddTaskModal = (function(base){ return function(){ ui.newTaskDeliv = null; return base.apply(this, arguments); }; })(openAddTaskModal);
+renderAddTaskModal = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), pk = delivPickerHtml(ui.newTaskDeliv, 'newTaskDeliv', ui.newTaskClients);
+    if(!pk) return h;
+    return h.replace(/(<div class="field" style="margin-top:10px;"><label>Priority<\/label>)/, pk+'$1');
+  };
+})(renderAddTaskModal);
+function delivPickInto(list, k){
+  const cid = String(k).split(':')[0];
+  const i = list.indexOf('personal'); if(i >= 0) list.splice(i, 1);
+  if(list.indexOf(cid) < 0) list.push(cid);
+}
+ACTIONS.newTaskDeliv = function(el, e, id){
+  ui.newTaskDeliv = ui.newTaskDeliv===id ? null : id;
+  if(ui.newTaskDeliv){
+    delivPickInto(ui.newTaskClients, id);
+    const ti = document.getElementById('newTaskTitle'), hit = delivFind(id.split(':')[0], id.split(':')[1]);
+    if(ti && !ti.value.trim() && hit){ ti.value = delivOne(hit.d)+' for '+(hit.c.business || hit.c.name); }
+  }
+  playTick(); renderAddTaskModalInto();
+};
+addTask = (function(base){
+  return function(status){
+    const n = state.tasks.items.length, k = ui.newTaskDeliv;
+    const r = base.apply(this, arguments);
+    if(state.tasks.items.length > n){
+      const t = state.tasks.items[state.tasks.items.length - 1];
+      if(k){ t.deliv = {c:k.split(':')[0], d:k.split(':')[1]}; persist('tasks'); renderView(); }
+      ui.newTaskDeliv = null;
+    }
+    return r;
+  };
+})(addTask);
+// …and when you edit one
+openTaskEditModal = (function(base){
+  return function(id){
+    const t = state.tasks.items.find(function(x){ return x.id===id; });
+    ui.editTaskDeliv = t && t.deliv && t.deliv.c ? t.deliv.c+':'+t.deliv.d : null;
+    return base.apply(this, arguments);
+  };
+})(openTaskEditModal);
+renderTaskEditModal = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), pk = delivPickerHtml(ui.editTaskDeliv, 'editTaskDeliv', ui.editTaskClientsSel);
+    if(!pk || !h) return h;
+    return h.replace(/(<div class="field" style="margin-top:10px;"><label>Priority<\/label>)/, pk+'$1');
+  };
+})(renderTaskEditModal);
+ACTIONS.editTaskDeliv = function(el, e, id){
+  ui.editTaskDeliv = ui.editTaskDeliv===id ? null : id;
+  if(ui.editTaskDeliv) delivPickInto(ui.editTaskClientsSel, id);
+  playTick(); if(typeof renderTaskEditModalInto==='function') renderTaskEditModalInto();
+};
+saveEditTask = (function(base){
+  return function(id){
+    const t = state.tasks.items.find(function(x){ return x.id===id; });
+    const r = base.apply(this, arguments);
+    if(t){ const k = ui.editTaskDeliv; t.deliv = k ? {c:k.split(':')[0], d:k.split(':')[1]} : (t.deliv && t.deliv.c ? false : t.deliv); persist('tasks'); }
+    return r;
+  };
+})(saveEditTask);
+// the + menu: a client deliverable is its own way in
+focusAddMenu = (function(base){
+  return function(){
+    const items = base.apply(this, arguments);
+    if(!delivChoices().length) return items;
+    const it = ['&#128230;', 'A client deliverable', function(){ openAddTaskModal(); const ch = delivChoices(); if(ch.length===1) ACTIONS.newTaskDeliv(null, null, ch[0].c.id+':'+ch[0].d.id); else { ui.newTaskDeliv = null; renderAddTaskModalInto(); setTimeout(function(){ const r = document.querySelector('#addTaskOverlay .tdv'); if(r){ r.classList.add('is-ask'); r.scrollIntoView({block:'center'}); } }, 60); } }, 'A retainer piece: it counts on their card'];
+    const i = items.findIndex(function(x){ return x && /A task/.test(x[1]); });
+    items.splice(i >= 0 ? i + 1 : items.length, 0, it);
+    return items;
+  };
+})(focusAddMenu);
+// the task card says which deliverable it is
+taskCard = (function(base){
+  return function(t){
+    const h = base.apply(this, arguments);
+    const hit = t && t.deliv && t.deliv.c ? taskDeliv(t) : null; if(!hit) return h;
+    return h.replace('<div class="task-card-title">', '<div class="task-card-title"><span class="tdv-badge" title="Counts as a deliverable for '+escapeHtml(hit.c.business || hit.c.name)+'">&#128230; '+escapeHtml(hit.d.title)+'</span>');
+  };
+})(taskCard);
+
+// Op: knows the sources and the plan numbers; can set a source; knows which tasks are deliverables
+opRunTool = (function(base){
+  return function(name, x){
+    x = x || {};
+    if(name==='set_client_source'){
+      const hit = opFindContact(String(x.who||'')); if(!hit) throw new Error('no client or lead matches "'+x.who+'"');
+      const s = leadSourceById(String(x.source||'')); if(!s) throw new Error('unknown source');
+      hit.x.leadSource = s.id; persist('business'); renderView(); return crmName(hit.kind, hit.x)+': came from '+s.label;
+    }
+    return base.apply(this, arguments);
+  };
+})(opRunTool);
+aiContext = (function(base){
+  return function(){
+    let s = base.apply(this, arguments);
+    const lines = [];
+    arr(state.business.clients).forEach(function(c){
+      const src = c.leadSource ? leadSourceById(c.leadSource) : null;
+      const ds = arr(c.deliverables).filter(function(d){ return d.recurring; }).map(function(d){ return d.title+' '+delivMonthLine(d); });
+      if(src || ds.length) lines.push((c.business || c.name)+(src ? ' (came from '+src.label+')' : '')+(ds.length ? ': '+ds.join(', ') : ''));
+    });
+    if(lines.length) s += '\nClients, where they came from and this month’s deliverables: '+lines.join('; ')+'. (A task can count as a client’s deliverable; finishing it logs one.)';
+    return s;
+  };
+})(aiContext);
+
+// ---- Op's light: white, no eclipse; and Rainbow ----
+OP_COLORS.splice(1, 0, ['rainbow', 'Rainbow']);
+function opColor(){
+  const raw = String(state.profile.opColor || '#ffffff');
+  if(raw==='rainbow') return 'rainbow';
+  return /^#[0-9a-f]{6}$/i.test(raw) ? raw.toLowerCase() : '#ffffff';
+}
+function opColorApply(){
+  let el = document.getElementById('opColorCss');
+  if(!el){ el = document.createElement('style'); el.id = 'opColorCss'; document.head.appendChild(el); }
+  const c = opColor(), moods = state.profile.opMoodColors!==false;
+  let css;
+  if(c==='rainbow'){
+    const sel = moods ? ':root:not([data-op-mood])' : ':root';
+    css = sel+'{ animation:opRainbow 14s steps(84) infinite; --op-ink:#5a4a8a; }';
+  } else {
+    css = (c==='#ffffff' ? '' : ':root:not([data-op-mood]){ '+opColorVars(c)+' }')+(moods ? '' : ':root[data-op-mood]{ '+opColorVars(c).replace(/;/g, ' !important;')+' }');
+  }
+  document.documentElement.classList.toggle('op-rainbow', c==='rainbow');
+  if(el.textContent!==css) el.textContent = css;
+}
+opSettingsHtml = (function(base){
+  return function(){
+    // (the color picker can't hold "rainbow")
+    return base.apply(this, arguments).replace(/(<input type="color" id="opColorPick" value=")rainbow(")/, '$1#ffffff$2');
+  };
+})(opSettingsHtml);
+(function(){
+  const t = OP_TOOLS.find(function(x){ return x.name==='set_my_color'; });
+  if(t){ t.description = 'Change your own light’s color when he asks (e.g. "go blue", "be white again", "go rainbow"). A 6-digit hex color, or "rainbow".'; t.input_schema.properties.hex.description = '#rrggbb or "rainbow"'; }
+})();
+opRunTool = (function(base){
+  return function(name, x){
+    if(name==='set_my_color' && x && /rainbow/i.test(String(x.hex||''))){ state.profile.opColor = 'rainbow'; persist('profile'); opColorApply(); renderView(); return 'now: rainbow'; }
+    return base.apply(this, arguments);
+  };
+})(opRunTool);
+
+// ---- Today's top panel ----
+// the full-screen view: an icon with the time and the music, top right (and M, as before)
+dockHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(ui.view!=='today' || (state.focus && state.focus.activeSession) || (typeof focusMinimalOn==='function' && focusMinimalOn())) return h;
+    const btn = '<button class="md-b md-full" data-action="toggleFocusMinimal" title="Full-screen view (M)"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+    return h.replace(/<\/div>\s*$/, btn+'</div>');
+  };
+})(dockHtml);
+afterRenderHooks.push(function(){ try{ dockRefresh(); }catch(e){} });
+// the weather: a real little card (icon and temperature, what it's doing, high and low; the sun's day on the right)
+function thWxHtml(){
+  if(state.profile.skyChip===false) return '';
+  const phase = skyPhase(), now = wxNow(), w = dayWindow(), d = new Date(), m = d.getHours()*60 + d.getMinutes();
+  const kind = now ? wxKind(now.code) : 'clear';
+  const left = m < w.rise ? 'Sun up in '+fmtDurationLabel(w.rise - m) : m < w.set ? fmtDurationLabel(w.set - m)+' of light left' : 'The sun’s down';
+  const main = now
+    ? '<b class="twx-t">'+now.temp+'&deg;</b><span class="twx-c"><span>'+escapeHtml(wxLabel(now.code))+'</span><small>H '+now.hi+'&deg; &middot; L '+now.lo+'&deg;'+(weatherCfg().place ? ' &middot; '+escapeHtml(String(weatherCfg().place).split(',')[0]) : '')+'</small></span>'
+    : '<span class="twx-c"><span>'+escapeHtml(SKY_META[phase].label)+'</span><small><button class="twx-set" data-action="goToSettingsWeather">Add your city for the weather</button></small></span>';
+  return '<div class="twx" data-sky="'+phase+'">'+
+    '<span class="twx-i">'+wxIcon(kind, phase)+'</span>'+main+
+    '<span class="twx-sun"><span class="twx-left">'+left+'</span>'+sunArcHtml({w:104, h:26, pad:5, r:3})+
+      '<span class="twx-times"><span>&#8593; '+fmtMinOfDay(w.rise)+'</span><span>&#8595; '+fmtMinOfDay(w.set)+'</span></span></span>'+
+  '</div>';
+}
+ACTIONS.goToSettingsWeather = function(){ ui.view = 'settings'; renderView(); setTimeout(function(){ const i = document.getElementById('wxQuery'); if(i){ i.scrollIntoView({block:'center'}); i.focus(); } }, 120); };
+renderToday = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    if(h.indexOf('class="today-hero') < 0) return h;
+    // no "◉ Minimal" chip by the name any more
+    h = h.replace(/<div class="th-bizrow">(<div class="th-biz">[\s\S]*?<\/div>)<button class="th-min"[^>]*>[\s\S]*?<\/button><\/div>/, '$1');
+    h = h.replace(/<button class="th-min"[^>]*>[\s\S]*?<\/button>/g, '');
+    // the weather card
+    h = h.replace(/<div class="th-wx">[\s\S]*?<\/div>/, function(){ const x = thWxHtml(); return x ? '<div class="th-wx is-r38">'+x+'</div>' : ''; });
+    return h;
+  };
+})(renderToday);
+// the streak row: the streak smaller, the week, and a wide Tasks bar under it
+function swTasksBarHtml(done, total){
+  const left = Math.max(0, total - done);
+  let next = null;
+  try{ next = (typeof todaysPlan==='function' ? todaysPlan() : state.tasks.items.filter(function(t){ return t.status==='today'; })).find(function(t){ return t.status!=='done' && !(typeof isOngoingDoneToday==='function' && isOngoingDoneToday(t)); }); }catch(e){}
+  const segs = total > 0 && total <= 16
+    ? '<span class="swt-segs">'+Array.from({length:total}, function(_, i){ return '<i'+(i < done ? ' class="on"' : '')+'></i>'; }).join('')+'</span>'
+    : '<span class="swt-bar"><i style="width:'+(total ? Math.round(done/total*100) : 0)+'%"></i></span>';
+  return '<button class="swt" data-action="goToFinishedTasks" title="Today’s tasks">'+
+    '<span class="swt-k">Tasks</span><b class="swt-n">'+done+'<small>/'+total+'</small></b>'+segs+
+    '<span class="swt-r">'+(total===0 ? 'Nothing planned yet' : left===0 ? 'All done &#10003;' : left+' left'+(next ? ' &middot; <em>up next</em> '+escapeHtml(next.title) : ''))+'</span>'+
+  '</button>';
+}
+streakWorkHtml = (function(base){
+  return function(o){
+    let h = base.apply(this, arguments);
+    if((o && o.compact) || h.indexOf('is-r36') < 0) return h;
+    let done = 0, total = 0;
+    h = h.replace(/<button class="sw-tasks"[\s\S]*?<\/button>/, function(m){ const x = /<b>(\d+)<small>\/(\d+)<\/small><\/b>/.exec(m); if(x){ done = Number(x[1]); total = Number(x[2]); } return ''; });
+    h = h.replace('class="sw is-row is-r36', 'class="sw is-row is-r36 is-r38');
+    return h.replace(/<\/div>\s*$/, swTasksBarHtml(done, total)+'</div>');
+  };
+})(streakWorkHtml);
+// ============ ROUND 38b: master tasks that track the work ============
+// • Deliverable tasks: one per client per retainer deliverable, made for you every week ("Complete 4
+//   reels", "Meta ads"). You don't finish them in one go: each time you hit done it logs one (1 of 4 =
+//   25%) and the task stays until the week's number is in. They read and write the client's deliverable
+//   count, so the card, pace, health and stats all move with them.
+// • Reach out to clients: one task, only there while someone's due a touch. It's tagged with exactly
+//   those clients and its priority follows their health and how long it's been.
+// • Log center: a Clients sub-tab with every client and just what needs logging (touches), most urgent
+//   first, with one-tap logging.
+// • Today's date gets a little calendar tile.
+
+// ---- the deliverable tasks ----
+function dvFind(t){
+  const m = t && t.master; if(!m || m.kind!=='dv') return null;
+  return delivFind(m.clientId, m.delivId);
+}
+function dvNeed(d){ return Math.max(1, d.weeklyTarget || 1); }
+function dvDone(d){ return Math.min(dvNeed(d), deliverableWeekCount(d)); }
+function dvTitle(d){
+  const n = dvNeed(d), t = String(d.title||'Deliverable').trim();
+  if(n===1) return t;
+  return 'Complete '+n+' '+t.toLowerCase();
+}
+function reachNeeds(){
+  return mtActiveClients().map(function(c){
+    const n = crmOverdueDays('client', c), hs = clientHealthStatus(c);
+    return {c:c, n:n, red:hs.level==='red', score:(n==null ? -99 : n) + (hs.level==='red' ? 3 : hs.level==='yellow' ? 1 : 0)};
+  }).filter(function(x){ return x.n!=null && x.n >= 0; }).sort(function(a, b){ return b.score - a.score; });
+}
+function reachPriority(list){
+  if(list.some(function(x){ return x.red && x.n >= 3; }) || list.some(function(x){ return x.n >= 7; })) return 'high';
+  if(list.some(function(x){ return x.n >= 1 || x.red; })) return 'med';
+  return 'low';
+}
+let mt38Busy = false;
+function masterTasksSync(){
+  if(mt38Busy || !state || !state.tasks || !state.business) return; mt38Busy = true;
+  try{
+    const wk = thisWeekKey(), made = mtStore(), today = todayStr(), cs = mtActiveClients();
+    let changed = false;
+    // the old kinds (a weekly check-in batch, one deliverables task per client) make way for these
+    state.tasks.items = state.tasks.items.filter(function(t){
+      const old = t.master && (t.master.kind==='care' || t.master.kind==='deliv') && t.status!=='done';
+      if(old) changed = true; return !old;
+    });
+    // one task per client per recurring deliverable, this week
+    const live = {};
+    cs.forEach(function(c){ arr(c.deliverables).forEach(function(d){
+      if(!d.recurring) return;
+      const key = wk+':dv:'+c.id+':'+d.id; live[c.id+':'+d.id] = 1;
+      if(made[key]) return;
+      made[key] = 1; changed = true;
+      state.tasks.items.push({id:uid(), title:dvTitle(d), client:c.id, clients:[c.id], priority:'med', deadline:addDays(wk, 6), notes:'', status:'today', createdAt:today, completedAt:null,
+        master:{kind:'dv', week:wk, clientId:c.id, delivId:d.id}});
+    }); });
+    state.tasks.items = state.tasks.items.filter(function(t){
+      // a client who's gone (or a deliverable that's gone) takes its open task with it
+      const gone = t.master && t.master.kind==='dv' && t.master.week===wk && t.status!=='done' && !live[t.master.clientId+':'+t.master.delivId];
+      if(gone) changed = true; return !gone;
+    });
+    state.tasks.items.forEach(function(t){
+      const m = t.master; if(!m) return;
+      if(m.kind==='dv' && m.week===wk){
+        const hit = dvFind(t); if(!hit) return;
+        const title = dvTitle(hit.d); if(t.title!==title){ t.title = title; changed = true; }
+        const done = dvDone(hit.d), need = dvNeed(hit.d);
+        if(t.status!=='done' && done >= need){ t.status = 'done'; t.completedAt = today; changed = true; }
+        else if(t.status==='done' && done < need){ t.status = 'today'; t.completedAt = null; changed = true; }
+        else if(t.status==='backlog'){ t.status = 'today'; changed = true; }
+      }
+    });
+    // reach out to clients: one task, there only while someone's due
+    const need = reachNeeds();
+    let rt = state.tasks.items.find(function(t){ return t.master && t.master.kind==='reach' && t.status!=='done'; });
+    if(need.length){
+      if(!rt){ rt = {id:uid(), title:'', client:'personal', clients:[], priority:'med', deadline:null, notes:'', status:'today', createdAt:today, completedAt:null, master:{kind:'reach', week:wk}}; state.tasks.items.push(rt); changed = true; }
+      const ids = need.map(function(x){ return x.c.id; }), title = 'Reach out to clients ('+need.length+')', pr = reachPriority(need);
+      if(JSON.stringify(rt.clients)!==JSON.stringify(ids)){ rt.clients = ids; rt.client = ids[0]; changed = true; }
+      if(rt.title!==title){ rt.title = title; changed = true; }
+      if(rt.priority!==pr){ rt.priority = pr; changed = true; }
+      if(rt.master.week!==wk){ rt.master.week = wk; changed = true; }
+    } else if(rt){ rt.status = 'done'; rt.completedAt = today; changed = true; }
+    // last week's deliverable tasks that never got there are history now
+    state.tasks.items.forEach(function(t){ if(t.master && t.master.week < wk && t.master.kind==='dv' && t.status!=='done' && !t.master.retired){ t.master.retired = true; t.status = 'done'; t.completedAt = addDays(t.master.week, 6); t.missed = true; changed = true; } });
+    Object.keys(made).forEach(function(k){ if(k.slice(0, 10) < addDays(wk, -35)) delete made[k]; });
+    if(changed){ persist('tasks'); persist('focus'); setTimeout(function(){ try{ renderView(); }catch(e){} }, 0); }
+  }finally{ mt38Busy = false; }
+}
+// hitting done on a deliverable task logs one; it finishes when the week's number is in
+completeTask = (function(base){
+  return function(id){
+    const t = state.tasks.items.find(function(x){ return x.id===id; });
+    if(t && t.master && t.master.kind==='dv'){
+      const hit = dvFind(t); if(!hit) return;
+      const need = dvNeed(hit.d);
+      if(t.status==='done' || dvDone(hit.d) >= need){ showToast('This week’s '+hit.d.title.toLowerCase()+' for '+(hit.c.business || hit.c.name)+' are already in.', {icon:'&#10003;'}); return; }
+      delivLogOne(hit, todayStr());
+      const done = dvDone(hit.d);
+      if(done >= need){ t.status = 'done'; t.completedAt = todayStr(); playTaskComplete(); }
+      else playTick();
+      persist('business'); persist('tasks'); renderView();
+      showToast(done >= need ? 'Done for the week: '+need+' '+(need===1 ? delivOne(hit.d) : hit.d.title).toLowerCase()+' for '+(hit.c.business || hit.c.name)+'.' : delivOne(hit.d)+' '+done+' of '+need+' for '+(hit.c.business || hit.c.name)+' ('+Math.round(done/need*100)+'%).', {icon:'&#128230;', actionLabel:'Undo', actionAction:'mtDvUndo', actionId:t.id, duration:4500});
+      return;
+    }
+    if(t && t.master && t.master.kind==='reach' && t.status!=='done'){
+      // finishing it yourself: a touch for each client it's tagged with
+      const left = reachNeeds();
+      left.forEach(function(x){ const c = crmFind('client', x.c.id); if(!c) return; if(!Array.isArray(c.touches)) c.touches = []; c.touches.push(todayStr()); if(!Array.isArray(c.touchpoints)) c.touchpoints = []; c.touchpoints.push({id:uid(), type:c.lastTouchType || 'text', date:todayStr(), note:'Reached out', ts:Date.now()}); });
+      if(left.length){ persist('business'); setTimeout(function(){ showToast('Reached out to '+left.map(function(x){ return x.c.business || x.c.name; }).join(', ')+': a touch logged for each.', {icon:'&#128075;'}); }, 750); }
+    }
+    return base.apply(this, arguments);
+  };
+})(completeTask);
+ACTIONS.mtDvUndo = function(el, e, id){
+  const t = state.tasks.items.find(function(x){ return x.id===id; }), hit = dvFind(t); if(!hit) return;
+  const l = arr(hit.d.completedDates); if(!l.length) return;
+  const wk = thisWeekKey(); let i = -1;
+  for(let k = l.length - 1; k >= 0; k--){ if(l[k] >= wk){ i = k; break; } }
+  if(i < 0) return;
+  l.splice(i, 1); hit.d.completedDates = l;
+  playTick(); persist('business'); renderView();
+};
+// undoing a finished deliverable task takes one back (not the whole week)
+undoTask = (function(base){
+  return function(id){
+    const t = state.tasks.items.find(function(x){ return x.id===id; });
+    if(t && t.master && t.master.kind==='dv'){ ACTIONS.mtDvUndo(null, null, id); return; }
+    return base.apply(this, arguments);
+  };
+})(undoTask);
+// the card: progress in pieces, and a way to take one back
+function dvProgHtml(t){
+  const hit = dvFind(t); if(!hit) return '';
+  const need = dvNeed(hit.d), done = dvDone(hit.d);
+  return '<div class="mt-prog" title="'+done+' of '+need+' this week · '+delivMonthLine(hit.d)+'">'+
+    '<span class="mt-segs">'+Array.from({length:need}, function(_, i){ return '<i'+(i < done ? ' class="on"' : '')+'></i>'; }).join('')+'</span>'+
+    '<b>'+done+'/'+need+'</b>'+
+    (done > 0 ? '<button class="mt-undo" data-action="mtDvUndo" data-id="'+t.id+'" title="Take one back">&minus;</button>' : '')+
+    (done < need ? '<button class="mt-plus" data-action="completeTask" data-id="'+t.id+'" title="Log one">+1</button>' : '')+
+  '</div>';
+}
+taskCard = (function(base){
+  return function(t){
+    let h = base.apply(this, arguments);
+    if(!t || !t.master) return h;
+    if(t.master.kind==='dv'){
+      h = h.replace(/<span class="mt-badge"[^>]*>[\s\S]*?<\/span>/, '<span class="mt-badge is-dv" title="A deliverable: it comes back every week while they’re a client">&#9638; Deliverable</span>');
+      return h.replace(/(<div class="task-card-title">[\s\S]*?<\/div>)/, '$1'+dvProgHtml(t));
+    }
+    if(t.master.kind==='reach'){
+      h = h.replace(/<span class="mt-badge"[^>]*>[\s\S]*?<\/span>/, '<span class="mt-badge is-reach" title="Shows up while a client is due a touch">&#128075; Reach out</span>');
+      return h.replace(/(<div class="task-card-title">[\s\S]*?<\/div>)/, '$1<div class="mt-reach"><span class="mt-reach-k">The clients due a touch are tagged below</span><button class="mt-log" data-action="openLogCenter">Log center &rarr;</button></div>');
+    }
+    return h;
+  };
+})(taskCard);
+// the right-click menu says what done means here
+openTaskMenu = (function(base){
+  return function(t){
+    const r = base.apply(this, arguments);
+    const m = document.getElementById('taskCtxMenu'), hit = t && dvFind(t);
+    if(m && hit){
+      const need = dvNeed(hit.d), done = dvDone(hit.d);
+      const b = m.querySelector('[data-op="done"]'); if(b) b.innerHTML = '+1 Log one ('+done+'/'+need+')';
+      const u = m.querySelector('[data-op="undo"]'); if(u) u.innerHTML = '&minus;1 Take one back';
+      if(done > 0 && !u){ const x = document.createElement('button'); x.className = 'ctx-item'; x.dataset.action = 'mtDvUndo'; x.dataset.id = t.id; x.innerHTML = '&minus;1 Take one back'; (b || m.querySelector('.ctx-sep')).insertAdjacentElement('afterend', x); }
+    }
+    return r;
+  };
+})(openTaskMenu);
+// Op: a deliverable task is "log one", and he knows who's due a touch
+aiContext = (function(base){
+  return function(){
+    let s = base.apply(this, arguments);
+    const dv = state.tasks.items.filter(function(t){ return t.master && t.master.kind==='dv' && t.master.week===thisWeekKey(); }).map(function(t){ const h = dvFind(t); return h ? (h.c.business || h.c.name)+': '+t.title+' ('+dvDone(h.d)+'/'+dvNeed(h.d)+')' : ''; }).filter(Boolean);
+    if(dv.length) s += '\nThis week’s deliverable tasks (completing one logs ONE piece; it finishes when the week’s number is in): '+dv.join('; ')+'.';
+    const r = reachNeeds();
+    if(r.length) s += '\nClients due a touch (the "Reach out to clients" task): '+r.map(function(x){ return (x.c.business || x.c.name)+(x.n > 0 ? ' ('+x.n+'d overdue)' : ' (due today)'); }).join(', ')+'.';
+    return s;
+  };
+})(aiContext);
+// the client card's strip: this week's deliverables and whether they're due a touch
+crmCard = (function(base){
+  return function(kind, x){
+    const h = base.apply(this, arguments);
+    if(kind!=='client') return h;
+    return h.replace(/Checked in/, function(m){ const n = crmOverdueDays('client', x); return n!=null && n >= 0 ? 'Due a touch' : 'In touch'; });
+  };
+})(crmCard);
+clientCardV2 = (function(base){
+  return function(c){
+    const h = base.apply(this, arguments), n = crmOverdueDays('client', c), due = n!=null && n >= 0;
+    return h.replace(/<span class="mt-chip[^"]*"[^>]*>[\s\S]*?<\/span>/, '<span class="mt-chip'+(due ? '' : ' is-done')+'" title="'+(due ? 'Due a touch: it’s on your Reach out task' : 'In touch')+'">'+(due ? '&#9675; Due a touch' : '&#10003; In touch')+'</span>');
+  };
+})(clientCardV2);
+
+// ---- the Log center: who needs a touch, and one tap to log it ----
+BIZ_PEOPLE.push(['log', 'Log center']);
+function logCenterHtml(){
+  const cs = mtActiveClients().map(function(c){
+    const n = crmOverdueDays('client', c), hs = clientHealthStatus(c), last = crmLastTouch('client', c);
+    const tp = arr(c.touchpoints).slice().sort(function(a, b){ return (b.ts||0) - (a.ts||0); })[0];
+    return {c:c, n:n, hs:hs, last:last, tp:tp, due:n!=null && n >= 0, score:(n==null ? -99 : n) + (hs.level==='red' ? 3 : hs.level==='yellow' ? 1 : 0)};
+  }).sort(function(a, b){ return b.score - a.score; });
+  const due = cs.filter(function(x){ return x.due; }), ok = cs.filter(function(x){ return !x.due; });
+  const row = function(x){
+    const c = x.c, today = x.last===todayStr();
+    const lastTxt = x.last ? (x.tp ? touchTypeById(x.tp.type).label+' · ' : '')+(today ? 'today' : daysAgoFrom(x.last)+'d ago') : 'Never';
+    return '<div class="lc-row'+(x.due ? ' is-due' : '')+'" data-key="lc-'+c.id+'">'+
+      '<span class="lc-av" style="background:'+clientColor(c)+'">'+escapeHtml(clientInitials(c))+'</span>'+
+      '<span class="lc-who"><b>'+escapeHtml(c.business || c.name)+'</b><small><i class="lc-hs is-'+x.hs.level+'"></i>'+escapeHtml(clientHealthLabel(x.hs))+'</small></span>'+
+      '<span class="lc-last"><small>Last touch</small><b>'+lastTxt+'</b></span>'+
+      '<span class="lc-due crm-due '+overdueLevel(x.n)+'">'+(today ? 'Logged today &#10003;' : dueLabel(x.n, 'client', c))+'</span>'+
+      '<span class="lc-btns">'+TOUCH_TYPES.map(function(t){ return '<button class="lc-b" data-action="logTouchType" data-kind="client" data-id="'+c.id+'" data-type="'+t.id+'" title="Log a '+t.label.toLowerCase()+'">'+t.icon+'<span>'+t.label+'</span></button>'; }).join('')+'</span>'+
+    '</div>';
+  };
+  return '<div class="lc">'+
+    '<div class="lc-h"><div><div class="lc-t">Log center</div><div class="lc-s">Every client and just what needs logging: touches. Most urgent first.</div></div>'+
+      '<div class="lc-k"><span class="'+(due.length ? 'is-due' : 'is-ok')+'"><b>'+due.length+'</b> due a touch</span><span><b>'+ok.length+'</b> in touch</span></div></div>'+
+    (cs.length ? '' : '<div class="empty">No active clients yet.</div>')+
+    (due.length ? '<div class="lc-sec">Due now</div>'+due.map(row).join('') : (cs.length ? '<div class="lc-clear">&#10003; Everyone’s in touch. Nothing to log right now.</div>' : ''))+
+    (ok.length ? '<div class="lc-sec">In touch</div><div class="lc-ok">'+ok.map(row).join('')+'</div>' : '')+
+  '</div>';
+}
+renderBusiness = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    if(ui.businessTab!=='log') return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const panel = tpl.content.querySelector('.tab-panel');
+    if(panel){ panel.setAttribute('data-key', 'business-log'); panel.innerHTML = logCenterHtml(); }
+    h = tpl.innerHTML;
+    const n = reachNeeds().length;
+    return h.replace(/(data-tab="log">Log center)/, '$1'+(n ? ' <span class="lc-badge">'+n+'</span>' : ''));
+  };
+})(renderBusiness);
+ACTIONS.openLogCenter = function(el, e){ if(e && e.stopPropagation) e.stopPropagation(); ui.view = 'business'; ui.businessTab = 'log'; renderView(); };
+
+// ---- Today: the date, on a little calendar tile ----
+function isoWeekNum(d){ const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())), day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day); const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return Math.ceil(((t - y0)/86400000 + 1)/7); }
+function thDateHtml(){
+  const d = new Date(), end = new Date(d.getFullYear(), 11, 31), left = Math.round((end - new Date(d.getFullYear(), d.getMonth(), d.getDate()))/86400000);
+  return '<div class="th-date" data-day="'+todayStr()+'">'+
+    '<span class="thd-cal"><i>'+d.toLocaleDateString(undefined, {month:'short'}).toUpperCase()+'</i><b>'+d.getDate()+'</b></span>'+
+    '<span class="thd-t"><b>'+d.toLocaleDateString(undefined, {weekday:'long'})+'</b><small>'+d.toLocaleDateString(undefined, {month:'long', day:'numeric'})+' &middot; Week '+isoWeekNum(d)+' &middot; '+left+' days left in '+d.getFullYear()+'</small></span>'+
+  '</div>';
+}
+renderToday = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    return h.replace('<div class="th-sub" id="liveClock"></div>', thDateHtml());
+  };
+})(renderToday);
+setInterval(function(){ try{ const el = document.querySelector('.th-date'); if(el && el.dataset.day!==todayStr()) renderView(); }catch(e){} }, 60000);
+
+// ---- skills (and anything ongoing) done for the day leave the lineup until tomorrow ----
+// (they're still on Training Skills; a small line by "Current Lineup" says how many are done for today)
+renderFocusTasksOverview = (function(base){
+  return function(){
+    const off = state.tasks.items.filter(function(t){ return t.status==='today' && isOngoingDoneToday(t); });
+    off.forEach(function(t){ t.status = '_doneForToday'; });
+    let h;
+    try{ h = base.apply(this, arguments); } finally { off.forEach(function(t){ t.status = 'today'; }); }
+    if(!off.length) return h;
+    const note = '<button class="dfd-note" data-action="focusTasksSubTab" data-tab="skills" title="'+escapeHtml(off.map(function(t){ return t.title; }).join(', '))+'">&#10003; '+off.length+' done for today &middot; back tomorrow</button>';
+    return h.replace(/(Current Lineup <span class="kpi-sub">\d+<\/span>)/, '$1'+note);
+  };
+})(renderFocusTasksOverview);
+renderOngoingTasksPanel = (function(base){
+  return function(){
+    const off = state.tasks.items.filter(function(t){ return t.ongoing && t.status!=='done' && isOngoingDoneToday(t); }), was = off.map(function(t){ return t.status; });
+    off.forEach(function(t){ t.status = 'done'; });
+    try{ return base.apply(this, arguments); } finally { off.forEach(function(t, i){ t.status = was[i]; }); }
+  };
+})(renderOngoingTasksPanel);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

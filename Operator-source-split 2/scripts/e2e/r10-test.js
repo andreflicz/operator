@@ -130,7 +130,7 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     check('Enter → next step (Method)', await E("ui.lockSeq.step")==='method');
     await p.click('[data-action="lockLength"][data-min="25"]'); await p.waitForTimeout(100);
     check('single block of 25 minutes — shows when you\'re done', await E("ui.lockSeq.minutes")===25 && /Done at/.test(await p.textContent('.ls-ends')));
-    await p.click('[data-action="lockCustom"]'); await p.fill('#lockCustomMin', '40');
+    await p.click('[data-action="lockCustom"]'); await p.waitForTimeout(150); await p.fill('#lockCustomH', '0'); await p.fill('#lockCustomMin', '40');
     await p.click('#lockSeqOverlay [data-action="lockNext"]'); await p.waitForTimeout(150);
     check('custom length', await E("ui.lockSeq.minutes")===40 && await E("ui.lockSeq.step")==='prep');
     const n = (await p.$$('.ls-check')).length;
