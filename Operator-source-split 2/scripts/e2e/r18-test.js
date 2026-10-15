@@ -192,8 +192,10 @@ async function ctxPage(b, seed, opts){
     await E("reallyConfirmStopFocus(); ui.view='today'; renderView()"); await p.waitForTimeout(400);
     // (round 23: the minimal view lives on the first Focus page only)
     check('Today has no Minimal button (it’s on Focus)', !(await p.$('.th-actions .th-btn-min')));
-    await E("ui.view='focus'; renderView()"); await p.waitForTimeout(300); await p.click('.view-title .lv-btn'); await p.waitForTimeout(500);
-    check('…and Focus goes minimal: clock, level, streak, LOCK IN', await p.isVisible('#viewRoot .np-home .hm-go'));
+    await E("ui.view='focus'; renderView()"); await p.waitForTimeout(300);
+    check('(r38e) Focus has no Minimal button', !(await p.$('.view-title .lv-btn')));
+    await E("ui.view='today'; renderView()"); await p.waitForTimeout(300); await p.click('.today-hero .th-full'); await p.waitForTimeout(500);
+    check('…Today’s corner icon goes full screen: clock, level, streak, LOCK IN', await p.isVisible('#viewRoot .np-home .hm-go'));
     await E("ACTIONS.toggleFocusMinimal()"); await p.waitForTimeout(500);
     check('no page errors (minimal)', p.errors.length===0, p.errors);
     await p.context().close();
