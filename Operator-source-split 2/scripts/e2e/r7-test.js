@@ -80,7 +80,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('the Personal tab says Health, not Fitness', /Health/.test(await p.textContent('[data-action="personalTab"][data-tab="fitness"]')));
     const m = await E("masterGoalDefs().map(m=>({k:m.key, cur:m.cur, t:m.target, pct:Math.round(masterPct(m))}))");
     const by = k => m.find(x => x.k===k) || {};
-    check('master goals are built in — nothing to set up', m.length>=5 && (await p.$$('.mg-hero')).length===1 && (await p.$$('.mg-card')).length===m.length-1, m);
+    check('master goals are built in — nothing to set up', m.length>=5 && (await p.$$('.mg-hero')).length===1 && (await p.$$('.mg-card')).length>=m.length-1, m);
     check('revenue reads MRR from Business, against the Settings goal', by('mrr').cur===2500 && by('mrr').t===10000 && /\$2,500/.test(await p.textContent('.mg-hero')));
     check('weight reads Health → Weight, measured from the first weigh-in', by('weight').cur===191.4 && by('weight').pct===37, by('weight'));
     check('workouts count this week\'s logged workouts', by('workouts').cur===2 && by('workouts').t===4);

@@ -7188,3 +7188,5 @@ body:has(#wakeOverlay:not(.hidden)) .activity-pill{ display:none !important; }
 .sw.is-r38 .sw-flame{ grid-row:1 / span 3 !important; }
 .sw.is-r38 .sw-ss{ grid-column:2; grid-row:3; margin-top:3px; font-size:11px; color:var(--text-dim); opacity:.8; white-space:nowrap; }
 .sw.is-r38 .sw-ss.is-ok{ color:var(--green, #3ecf8e); opacity:1; }
+/* the "Off the clock" pill stays out of the wind-down screens (it sat on top of Back) */
+body:has(#windOverlay:not(.hidden)) #activityPill{ opacity:0 !important; pointer-events:none !important; }

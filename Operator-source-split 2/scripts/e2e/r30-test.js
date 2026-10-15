@@ -66,7 +66,7 @@ async function ctxPage(b, seed, opts){
     await E("AI.cancelListen && AI.cancelListen()"); await p.clock.runFor(200);
     check('the waiting gap before it sends is a little longer (pauses don’t cut you off)', (await E("opPauseMs()")) >= 2500 && await E("[].some.call(document.scripts, s => /setTimeout\\(send, typeof opPauseMs/.test(s.textContent))"));
     await E("OV.lastEnd = Date.now()");
-    check('the "Hey Operator" ear stays off right after Op speaks (the mic is for your answer)', await E("heyQuietNow()===true"));
+    check('(r38f) right after Op speaks the "Hey Operator" ear ignores what it hears (the mic stays steady, Discord-style)', await E("heySoftQuiet()===true"));
     check('no page errors (mic)', p.errors.length===0, p.errors);
     await p.context().close();
   }

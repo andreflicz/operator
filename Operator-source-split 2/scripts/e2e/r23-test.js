@@ -59,8 +59,7 @@ async function ctxPage(b, seed, opts){
     check('…and M does nothing on Focus', await E("state.profile.lockedView")==='minimal' && !(await p.$('#viewRoot .np-locked')));
     await E("ui.view='today'; renderView()"); await p.waitForTimeout(300);
     check('…it doesn’t scroll', await p.evaluate(() => getComputedStyle(document.querySelector('#viewRoot .np')).overflowY)==='hidden');
-    const fb = await p.evaluate(() => { const r = document.querySelector('.np .lv-btn').getBoundingClientRect(); return {x:r.left, y:r.top}; });
-    check('…Full view sits bottom-left, out of the way of the corner', fb.x < 120 && fb.y > 700, fb);
+    check('(r38f) …Full view is a small link on the panel, not a corner button', await p.isVisible('.np .np-views .np-v') && !(await p.$('.np .np-top .lv-btn')));
     check('…and the level chip isn’t in the way', await p.evaluate(() => { const c = document.querySelector('#musicDock .md-lvl'); return !c || getComputedStyle(c).display==='none'; }));
     await E("ACTIONS.toggleLockedView(); ui.view='focus'; state.focus.activeSession=null; renderView()"); await p.waitForTimeout(400);
     check('(r38e) no Minimal button by the Focus title', !(await p.$('.view-title .lv-corner .lv-btn')));
@@ -109,10 +108,10 @@ async function ctxPage(b, seed, opts){
     const g = JSON.parse(await E("JSON.stringify(tierGoals('week', weekKey()).find(g => g.label==='Post three reels'))"));
     check('Op sizes it up: +220 XP, with why', g && g.xp===220 && /real push/.test(g.xpWhy) && !g.xpPending, g);
     check('…and the row shows it', /\+220/.test(await p.textContent('.tg-card.is-week')));
-    await E("openGoalSheet('long')"); await p.fill('#gsLabel', '10k followers'); await p.click('[data-action="gsSave"]'); await p.waitForTimeout(200);
-    check('a long-term goal needs a number', await p.isVisible('#goalSheet:not(.hidden)') && await E("state.goals.items.filter(g => g.label==='10k followers').length")===0);
-    await p.fill('#gsTarget', '10000'); await p.fill('#gsUnit', 'followers'); await p.click('[data-action="gsSave"]'); await p.waitForTimeout(800);
-    check('…then it’s added with its own XP', await E("(state.goals.items.find(g => g.label==='10k followers')||{}).xp")===220);
+    await E("openGoalSheet('long')"); await p.fill('#gsLabel', '10k followers'); await p.fill('#gsTarget', '10000'); await p.fill('#gsUnit', 'followers'); await p.click('[data-action="gsSave"]'); await p.waitForTimeout(800);
+    check('a long-term goal with a number is added with its own XP', await E("(state.goals.items.find(g => g.label==='10k followers')||{}).xp")===220);
+    await E("openGoalSheet('long')"); await p.fill('#gsLabel', 'Run a marathon'); await p.click('[data-action="gsSave"]'); await p.waitForTimeout(400);
+    { const gm = await E("JSON.stringify(state.goals.items.slice(-2))"); check('(r38f) one of your own needs no number: it’s added as done-or-not', /Run a marathon/.test(gm), gm); }
     // reopening a week you checked out of
     await E("const r = intentStore().weeks[weekKey()] = intentStore().weeks[weekKey()] || {}; r.at = Date.now(); r.out = {at:Date.now()}; renderView()"); await p.waitForTimeout(200);
     check('a checked-out week offers Reopen', await p.isVisible('.tg-card.is-week [data-action="tierReopen"]'));
