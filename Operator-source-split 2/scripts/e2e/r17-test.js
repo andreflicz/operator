@@ -155,13 +155,14 @@ const newsRoute = (asked, extra) => async r => {
     await p.route('http://127.0.0.1:8935/**', r => { asked.push(r.request().url().replace(/^.*8935/, '')); r.fulfill(okJ); });
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("ui.view='focus'; renderView()"); await p.waitForTimeout(400);
-    check('Focus (not locked in) has a Minimal button', await p.isVisible('.lv-corner.is-focus [data-action="toggleFocusMinimal"]'));
-    await p.click('[data-action="toggleFocusMinimal"]'); await p.waitForTimeout(700);
+    check('(r38e) Focus has no Minimal button', !(await p.$('.lv-corner.is-focus')) && !(await p.$('[data-action="toggleFocusMinimal"]')));
+    await E("ui.view='today'; renderView()"); await p.waitForTimeout(300);
+    await p.click('.today-hero .th-full'); await p.waitForTimeout(700);
     check('minimal: the clock, your level, your streak, LOCK IN and a few buttons', await p.isVisible('.np-home .hm-clock #npClockT') && await p.isVisible('.np-home .hm-lvl') && /day streak/.test(await p.textContent('.np-home')) && await p.isVisible('.np-home .hm-go') && (await p.$$('.np-home .hm-b')).length===2);
     check('…and nothing under LOCK IN but space', !/Up next/.test(await p.textContent('.np-home')));
     check('…full screen (the sidebar steps aside)', await E("document.body.classList.contains('np-on')") && asked.includes('/window/full?f=1'));
     await p.keyboard.press('m'); await p.waitForTimeout(800);
-    check('M goes back to the full page', await p.$('.np-home')===null && await p.isVisible('.lv-corner.is-focus'));
+    check('M goes back to the full page', await p.$('.np-home')===null && await p.isVisible('.today-hero'));
     await E("ui.currentTaskId='t0'; startFocus(); state.profile.lockedView='full'; ui.view='today'; renderView()"); await p.waitForTimeout(500);
     await p.keyboard.press('m'); await p.waitForTimeout(600);
     check('locked in, M on Today (the overview) gives the locked-in minimal view', await p.$('.np-locked')!==null);
