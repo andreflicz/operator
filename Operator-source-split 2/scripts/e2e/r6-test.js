@@ -51,10 +51,12 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.click('#taskCtxMenu [data-op="done"]'); await p.waitForTimeout(200);
     check('…and Mark done for today works', await E("isOngoingDoneToday(state.tasks.items.find(t=>t.id==='t1x'))"));
     await p.waitForTimeout(1500);   // the done-for-today animation settles
-    await p.click('.task-card:not(.car-clone)[data-id="t1x"] .card-more');
+    check('…(r38) and it leaves the lineup till tomorrow', !(await p.$('.task-card:not(.car-clone)[data-id="t1x"]')));
+    await E("openTaskMenu(state.tasks.items.find(t=>t.id==='t1x'), 400, 300)");
     const items2 = await p.$$eval('#taskCtxMenu .ctx-item', e => e.map(x => x.textContent.trim()));
-    check('…then offers Undo', items2.some(t => /Undo: done for today/.test(t)), items2);
-    await p.keyboard.press('Escape');
+    check('…its menu offers Undo', items2.some(t => /Undo: done for today/.test(t)), items2);
+    await p.click('#taskCtxMenu [data-op="undo"]'); await p.waitForTimeout(400);
+    check('…and Undo brings it back', !!(await p.$('.task-card:not(.car-clone)[data-id="t1x"]')));
     // desktop-style selecting: drag a box across empty space
     await p.evaluate(() => { document.querySelector('.carousel').scrollIntoView({block:'center'}); const t = document.querySelector('.task-column .car-track'); t.scrollLeft = t.scrollWidth/3; });
     await p.waitForTimeout(150);
