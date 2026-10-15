@@ -63,7 +63,7 @@ async function ctxPage(b, seed, opts){
     check('…Full view sits bottom-left, out of the way of the corner', fb.x < 120 && fb.y > 700, fb);
     check('…and the level chip isn’t in the way', await p.evaluate(() => { const c = document.querySelector('#musicDock .md-lvl'); return !c || getComputedStyle(c).display==='none'; }));
     await E("ACTIONS.toggleLockedView(); ui.view='focus'; state.focus.activeSession=null; renderView()"); await p.waitForTimeout(400);
-    check('the Minimal button sits by the Focus title', await p.isVisible('.view-title .lv-corner .lv-btn'));
+    check('(r38e) no Minimal button by the Focus title', !(await p.$('.view-title .lv-corner .lv-btn')));
     await E("ui.focusTasksSubTab='backlog'; renderView()"); await p.waitForTimeout(200);
     const onBacklog = !!(await p.$('.view-title .lv-btn'));
     await E("ui.focusTab='analytics'; renderView()"); await p.waitForTimeout(200);
