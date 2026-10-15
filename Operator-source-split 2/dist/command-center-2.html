@@ -7068,6 +7068,37 @@ body:has(#wakeOverlay:not(.hidden)) .activity-pill{ display:none !important; }
 .mt-reach-k{ font-size:11.5px; color:var(--text-dim); }
 .dfd-note{ margin-left:10px; border:1px solid rgba(63,190,142,.35); background:rgba(63,190,142,.1); color:#3FBE8E; border-radius:999px; padding:3px 10px; font:inherit; font-size:11.5px; font-weight:600; cursor:pointer; }
 .dfd-note:hover{ background:rgba(63,190,142,.18); }
+
+/* ---- round 38d: client deliverable tasks have their own color; the Client backlog ---- */
+:root{ --dlv:#b18cff; --dlv-2:#e08cff; --dlv-rgb:177,140,255; }
+.task-card.dlv-card{ border-left:3px solid var(--dlv) !important; background:linear-gradient(160deg, rgba(var(--dlv-rgb),.09), transparent 55%), var(--panel); box-shadow:0 0 0 1px rgba(var(--dlv-rgb),.14) inset; }
+.task-card.dlv-card:hover{ box-shadow:0 0 0 1px rgba(var(--dlv-rgb),.32) inset, 0 10px 28px rgba(var(--dlv-rgb),.12); }
+.mt-badge.is-dv{ color:var(--dlv); background:rgba(var(--dlv-rgb),.16); }
+.mt-segs i.on{ background:var(--dlv); box-shadow:0 0 8px rgba(var(--dlv-rgb),.45); }
+.mt-plus{ border-color:rgba(var(--dlv-rgb),.55); color:var(--dlv); }
+.subtab.is-dlv{ color:color-mix(in srgb, var(--dlv) 70%, var(--text-dim)); }
+.subtab.is-dlv.active{ color:var(--text); box-shadow:inset 0 -2px 0 var(--dlv); }
+.cbl{ display:flex; flex-direction:column; gap:12px; }
+.cbl-client{ border:1px solid rgba(var(--dlv-rgb),.2); border-left:3px solid var(--dlv); border-radius:16px; padding:14px 16px; background:linear-gradient(160deg, rgba(var(--dlv-rgb),.06), transparent 50%), var(--panel); }
+.cbl-h{ display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.cbl-n{ display:flex; flex-direction:column; gap:2px; flex:1; min-width:0; } .cbl-n b{ font-size:15px; color:var(--text); } .cbl-n small{ font-size:11.5px; color:var(--text-dim); }
+.cbl-hs{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); }
+.cbl-d + .cbl-d{ margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
+.cbl-dh{ display:flex; align-items:baseline; gap:10px; margin-bottom:8px; } .cbl-dh b{ font-size:14px; color:var(--text); } .cbl-dh span{ font-size:12px; color:var(--text-dim); font-variant-numeric:tabular-nums; }
+.cbl-weeks{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; }
+.cbl-w{ display:flex; flex-direction:column; gap:7px; padding:9px 10px; border-radius:12px; border:1px solid var(--border); background:rgba(var(--ink),.025); }
+.cbl-w.is-now{ border-color:rgba(var(--dlv-rgb),.55); background:rgba(var(--dlv-rgb),.08); }
+.cbl-w.is-late{ border-color:rgba(232,99,107,.45); background:rgba(232,99,107,.06); }
+.cbl-w.is-done{ opacity:.62; }
+.cbl-wk{ display:flex; flex-direction:column; align-items:flex-start; gap:1px; border:0; background:none; padding:0; font:inherit; color:inherit; cursor:pointer; text-align:left; }
+.cbl-wk b{ font-size:12.5px; color:var(--text); } .cbl-wk small{ font-size:10.5px; color:var(--text-dim); }
+.cbl-w.is-late .cbl-wk small{ color:#E8636B; }
+.cbl-w .mt-segs{ flex:none; }
+.cbl-wb{ display:flex; align-items:center; gap:6px; } .cbl-wb b{ font-size:12px; color:var(--text); font-variant-numeric:tabular-nums; margin-right:auto; }
+.cbl-ok{ color:var(--dlv); font-weight:800; }
+.cbl-today{ height:22px; padding:0 8px; border-radius:999px; border:1px solid var(--border); background:rgba(var(--ink),.04); color:var(--text-dim); font:inherit; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.cbl-today:hover{ color:var(--text); } .cbl-today.is-on{ border-color:rgba(var(--dlv-rgb),.55); color:var(--dlv); }
+@media (max-width:900px){ .cbl-weeks{ grid-template-columns:repeat(2, minmax(0, 1fr)); } }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -38063,28 +38094,39 @@ streakWorkHtml = (function(base){
   };
 })(streakWorkHtml);
 // ============ ROUND 38b: master tasks that track the work ============
-// • Deliverable tasks: one per client per retainer deliverable, made for you every week ("Complete 4
-//   reels", "Meta ads"). You don't finish them in one go: each time you hit done it logs one (1 of 4 =
-//   25%) and the task stays until the week's number is in. They read and write the client's deliverable
-//   count, so the card, pace, health and stats all move with them.
+// • Deliverable tasks: each month's deliverable split into the client's cycle weeks 1 to 4, named after
+//   the deliverable, kept in their own Client backlog. You finish them one piece at a time; they read and
+//   write the client's deliverable count, so the card, pace, health and stats all move with them.
 // • Reach out to clients: one task, only there while someone's due a touch. It's tagged with exactly
 //   those clients and its priority follows their health and how long it's been.
 // • Log center: a Clients sub-tab with every client and just what needs logging (touches), most urgent
 //   first, with one-tap logging.
 // • Today's date gets a little calendar tile.
 
-// ---- the deliverable tasks ----
-function dvFind(t){
-  const m = t && t.master; if(!m || m.kind!=='dv') return null;
-  return delivFind(m.clientId, m.delivId);
+// ---- the deliverable tasks: each month's deliverable, split into the cycle's four weeks ----
+// Brothers Mechanical gets 16 reels a month → four tasks called "Reels", tagged with the client and
+// Week 1 to 4 of their cycle (the cycle starts on their billing day), each due at the end of its week.
+// They sit in the Client backlog, not the regular one. Each done logs one reel: the cycle's reels fill
+// Week 1 first, then Week 2, and so on, and a week's task finishes when its share is in. Same count as
+// the client card, so health and stats move with it.
+function dvwCycle(c, date){
+  const bd = Math.max(1, Math.min(28, Number(c.billingDay) || 1));
+  const d = new Date((date || todayStr())+'T12:00:00');
+  let y = d.getFullYear(), m = d.getMonth();
+  if(d.getDate() < bd){ m--; if(m < 0){ m = 11; y--; } }
+  return {start:todayStr(new Date(y, m, bd)), end:addDays(todayStr(new Date(y, m + 1, bd)), -1)};
 }
-function dvNeed(d){ return Math.max(1, d.weeklyTarget || 1); }
-function dvDone(d){ return Math.min(dvNeed(d), deliverableWeekCount(d)); }
-function dvTitle(d){
-  const n = dvNeed(d), t = String(d.title||'Deliverable').trim();
-  if(n===1) return t;
-  return 'Complete '+n+' '+t.toLowerCase();
+function dvwWeeks(cy){ return [0, 1, 2, 3].map(function(k){ return {k:k + 1, start:addDays(cy.start, 7*k), end:k < 3 ? addDays(cy.start, 7*k + 6) : cy.end}; }); }
+function dvwNeeds(d){ const n = monthlyTargetFor(d), b = Math.floor(n/4), r = n % 4; return [0, 1, 2, 3].map(function(k){ return b + (k < r ? 1 : 0); }); }
+function dvwCycleCount(d, cy){ return arr(d.completedDates).filter(function(x){ return x >= cy.start && x <= cy.end; }).length; }
+function dvwAlloc(d, cy){ let left = dvwCycleCount(d, cy); return dvwNeeds(d).map(function(n){ const v = Math.min(n, left); left -= v; return v; }); }
+function dvwFind(t){
+  const m = t && t.master; if(!m || m.kind!=='dvw') return null;
+  const hit = delivFind(m.clientId, m.delivId); if(!hit) return null;
+  const cy = {start:m.cycle, end:m.cycleEnd};
+  return {c:hit.c, d:hit.d, cy:cy, k:m.wk, need:dvwNeeds(hit.d)[m.wk - 1], done:dvwAlloc(hit.d, cy)[m.wk - 1], total:monthlyTargetFor(hit.d), count:dvwCycleCount(hit.d, cy)};
 }
+function dvwIsNow(t){ const m = t.master, today = todayStr(); return m && m.start <= today && today <= (t.deadline || m.cycleEnd); }
 function reachNeeds(){
   return mtActiveClients().map(function(c){
     const n = crmOverdueDays('client', c), hs = clientHealthStatus(c);
@@ -38102,36 +38144,46 @@ function masterTasksSync(){
   try{
     const wk = thisWeekKey(), made = mtStore(), today = todayStr(), cs = mtActiveClients();
     let changed = false;
-    // the old kinds (a weekly check-in batch, one deliverables task per client) make way for these
+    // the older kinds (a weekly check-in batch, a deliverables task per client, one per week) make way
     state.tasks.items = state.tasks.items.filter(function(t){
-      const old = t.master && (t.master.kind==='care' || t.master.kind==='deliv') && t.status!=='done';
+      const old = t.master && (t.master.kind==='care' || t.master.kind==='deliv' || t.master.kind==='dv') && t.status!=='done';
       if(old) changed = true; return !old;
     });
-    // one task per client per recurring deliverable, this week
+    // this cycle's four weeks, per client, per recurring deliverable
     const live = {};
-    cs.forEach(function(c){ arr(c.deliverables).forEach(function(d){
-      if(!d.recurring) return;
-      const key = wk+':dv:'+c.id+':'+d.id; live[c.id+':'+d.id] = 1;
-      if(made[key]) return;
-      made[key] = 1; changed = true;
-      state.tasks.items.push({id:uid(), title:dvTitle(d), client:c.id, clients:[c.id], priority:'med', deadline:addDays(wk, 6), notes:'', status:'today', createdAt:today, completedAt:null,
-        master:{kind:'dv', week:wk, clientId:c.id, delivId:d.id}});
-    }); });
+    cs.forEach(function(c){
+      const cy = dvwCycle(c), weeks = dvwWeeks(cy);
+      arr(c.deliverables).forEach(function(d){
+        if(!d.recurring) return;
+        const needs = dvwNeeds(d);
+        weeks.forEach(function(w){
+          if(!needs[w.k - 1]) return;
+          live[c.id+':'+d.id+':'+cy.start+':'+w.k] = 1;
+          const key = cy.start+':dvw:'+c.id+':'+d.id+':'+w.k;
+          if(made[key]) return;
+          made[key] = 1; changed = true;
+          state.tasks.items.push({id:uid(), title:String(d.title || 'Deliverable').trim(), client:c.id, clients:[c.id], priority:'med', deadline:w.end, notes:'', status:'backlog', createdAt:today, completedAt:null,
+            master:{kind:'dvw', cycle:cy.start, cycleEnd:cy.end, wk:w.k, start:w.start, clientId:c.id, delivId:d.id}});
+        });
+      });
+    });
     state.tasks.items = state.tasks.items.filter(function(t){
-      // a client who's gone (or a deliverable that's gone) takes its open task with it
-      const gone = t.master && t.master.kind==='dv' && t.master.week===wk && t.status!=='done' && !live[t.master.clientId+':'+t.master.delivId];
+      const m = t.master;
+      // a client, a deliverable or a week that's gone takes its open task with it
+      const gone = m && m.kind==='dvw' && t.status!=='done' && m.cycleEnd >= today && !live[m.clientId+':'+m.delivId+':'+m.cycle+':'+m.wk];
       if(gone) changed = true; return !gone;
     });
     state.tasks.items.forEach(function(t){
-      const m = t.master; if(!m) return;
-      if(m.kind==='dv' && m.week===wk){
-        const hit = dvFind(t); if(!hit) return;
-        const title = dvTitle(hit.d); if(t.title!==title){ t.title = title; changed = true; }
-        const done = dvDone(hit.d), need = dvNeed(hit.d);
-        if(t.status!=='done' && done >= need){ t.status = 'done'; t.completedAt = today; changed = true; }
-        else if(t.status==='done' && done < need){ t.status = 'today'; t.completedAt = null; changed = true; }
-        else if(t.status==='backlog'){ t.status = 'today'; changed = true; }
+      const m = t.master; if(!m || m.kind!=='dvw') return;
+      if(m.cycleEnd < today){
+        // a cycle that's over: what never got there is history
+        if(t.status!=='done' && !m.retired){ m.retired = true; t.status = 'done'; t.completedAt = m.cycleEnd; t.missed = true; changed = true; }
+        return;
       }
+      const x = dvwFind(t); if(!x) return;
+      const title = String(x.d.title || 'Deliverable').trim(); if(t.title!==title){ t.title = title; changed = true; }
+      if(t.status!=='done' && x.done >= x.need){ m.prev = t.status; t.status = 'done'; t.completedAt = today; changed = true; }
+      else if(t.status==='done' && x.done < x.need){ t.status = m.prev && m.prev!=='done' ? m.prev : 'backlog'; t.completedAt = null; changed = true; }
     });
     // reach out to clients: one task, there only while someone's due
     const need = reachNeeds();
@@ -38144,26 +38196,26 @@ function masterTasksSync(){
       if(rt.priority!==pr){ rt.priority = pr; changed = true; }
       if(rt.master.week!==wk){ rt.master.week = wk; changed = true; }
     } else if(rt){ rt.status = 'done'; rt.completedAt = today; changed = true; }
-    // last week's deliverable tasks that never got there are history now
-    state.tasks.items.forEach(function(t){ if(t.master && t.master.week < wk && t.master.kind==='dv' && t.status!=='done' && !t.master.retired){ t.master.retired = true; t.status = 'done'; t.completedAt = addDays(t.master.week, 6); t.missed = true; changed = true; } });
-    Object.keys(made).forEach(function(k){ if(k.slice(0, 10) < addDays(wk, -35)) delete made[k]; });
+    Object.keys(made).forEach(function(k){ if(k.slice(0, 10) < addDays(wk, -70)) delete made[k]; });
     if(changed){ persist('tasks'); persist('focus'); setTimeout(function(){ try{ renderView(); }catch(e){} }, 0); }
   }finally{ mt38Busy = false; }
 }
-// hitting done on a deliverable task logs one; it finishes when the week's number is in
+// hitting done on a deliverable task logs one; the week's task finishes when its share is in
+function dvwLogLine(x){ return (x.c.business || x.c.name)+' · '+x.d.title+' '+x.count+'/'+x.total+' this cycle'; }
 completeTask = (function(base){
   return function(id){
     const t = state.tasks.items.find(function(x){ return x.id===id; });
-    if(t && t.master && t.master.kind==='dv'){
-      const hit = dvFind(t); if(!hit) return;
-      const need = dvNeed(hit.d);
-      if(t.status==='done' || dvDone(hit.d) >= need){ showToast('This week’s '+hit.d.title.toLowerCase()+' for '+(hit.c.business || hit.c.name)+' are already in.', {icon:'&#10003;'}); return; }
-      delivLogOne(hit, todayStr());
-      const done = dvDone(hit.d);
-      if(done >= need){ t.status = 'done'; t.completedAt = todayStr(); playTaskComplete(); }
-      else playTick();
+    if(t && t.master && t.master.kind==='dvw'){
+      const x = dvwFind(t); if(!x) return;
+      if(x.count >= x.total){ showToast('All '+x.total+' '+x.d.title.toLowerCase()+' for '+(x.c.business || x.c.name)+' are in for this cycle.', {icon:'&#10003;'}); return; }
+      const before = dvwAlloc(x.d, x.cy);
+      delivLogOne({c:x.c, d:x.d}, todayStr());
+      const after = dvwAlloc(x.d, x.cy), wkGot = after.findIndex(function(v, i){ return v!==before[i]; }) + 1;
+      const y = dvwFind(t);
+      if(y.done >= y.need && t.status!=='done'){ t.master.prev = t.status; t.status = 'done'; t.completedAt = todayStr(); playTaskComplete(); } else playTick();
       persist('business'); persist('tasks'); renderView();
-      showToast(done >= need ? 'Done for the week: '+need+' '+(need===1 ? delivOne(hit.d) : hit.d.title).toLowerCase()+' for '+(hit.c.business || hit.c.name)+'.' : delivOne(hit.d)+' '+done+' of '+need+' for '+(hit.c.business || hit.c.name)+' ('+Math.round(done/need*100)+'%).', {icon:'&#128230;', actionLabel:'Undo', actionAction:'mtDvUndo', actionId:t.id, duration:4500});
+      const wkNeed = dvwNeeds(x.d)[wkGot - 1];
+      showToast(delivOne(x.d)+' logged: Week '+wkGot+' '+after[wkGot - 1]+'/'+wkNeed+(wkGot!==x.k ? ' (Week '+wkGot+' fills first)' : '')+' · '+dvwLogLine(y)+'.', {icon:'&#128230;', actionLabel:'Undo', actionAction:'mtDvUndo', actionId:t.id, duration:4500});
       return;
     }
     if(t && t.master && t.master.kind==='reach' && t.status!=='done'){
@@ -38175,40 +38227,45 @@ completeTask = (function(base){
     return base.apply(this, arguments);
   };
 })(completeTask);
+// take one back: the cycle's latest one comes off (weeks empty from the last one back)
 ACTIONS.mtDvUndo = function(el, e, id){
-  const t = state.tasks.items.find(function(x){ return x.id===id; }), hit = dvFind(t); if(!hit) return;
-  const l = arr(hit.d.completedDates); if(!l.length) return;
-  const wk = thisWeekKey(); let i = -1;
-  for(let k = l.length - 1; k >= 0; k--){ if(l[k] >= wk){ i = k; break; } }
+  const t = state.tasks.items.find(function(x){ return x.id===id; }), x = dvwFind(t); if(!x) return;
+  const l = arr(x.d.completedDates); let i = -1;
+  for(let k = l.length - 1; k >= 0; k--){ if(l[k] >= x.cy.start && l[k] <= x.cy.end){ i = k; break; } }
   if(i < 0) return;
-  l.splice(i, 1); hit.d.completedDates = l;
+  l.splice(i, 1); x.d.completedDates = l;
   playTick(); persist('business'); renderView();
 };
-// undoing a finished deliverable task takes one back (not the whole week)
+ACTIONS.dvwToday = function(el, e, id){
+  if(e && e.stopPropagation) e.stopPropagation();
+  const t = state.tasks.items.find(function(x){ return x.id===id; }); if(!t || t.status==='done') return;
+  t.status = t.status==='today' ? 'backlog' : 'today';
+  playTick(); persist('tasks'); renderView();
+  showToast(t.status==='today' ? t.title+' (Week '+t.master.wk+') is on today.' : t.title+' (Week '+t.master.wk+') is back in the Client backlog.', {icon:'&#128230;'});
+};
 undoTask = (function(base){
   return function(id){
     const t = state.tasks.items.find(function(x){ return x.id===id; });
-    if(t && t.master && t.master.kind==='dv'){ ACTIONS.mtDvUndo(null, null, id); return; }
+    if(t && t.master && t.master.kind==='dvw'){ ACTIONS.mtDvUndo(null, null, id); return; }
     return base.apply(this, arguments);
   };
 })(undoTask);
-// the card: progress in pieces, and a way to take one back
+// the card: its own color, the week, progress in pieces
+function dvwSegs(done, need){ return '<span class="mt-segs">'+Array.from({length:need}, function(_, i){ return '<i'+(i < done ? ' class="on"' : '')+'></i>'; }).join('')+'</span>'; }
 function dvProgHtml(t){
-  const hit = dvFind(t); if(!hit) return '';
-  const need = dvNeed(hit.d), done = dvDone(hit.d);
-  return '<div class="mt-prog" title="'+done+' of '+need+' this week · '+delivMonthLine(hit.d)+'">'+
-    '<span class="mt-segs">'+Array.from({length:need}, function(_, i){ return '<i'+(i < done ? ' class="on"' : '')+'></i>'; }).join('')+'</span>'+
-    '<b>'+done+'/'+need+'</b>'+
-    (done > 0 ? '<button class="mt-undo" data-action="mtDvUndo" data-id="'+t.id+'" title="Take one back">&minus;</button>' : '')+
-    (done < need ? '<button class="mt-plus" data-action="completeTask" data-id="'+t.id+'" title="Log one">+1</button>' : '')+
+  const x = dvwFind(t); if(!x) return '';
+  return '<div class="mt-prog" title="Week '+x.k+': '+x.done+' of '+x.need+' · '+x.count+'/'+x.total+' this cycle">'+dvwSegs(x.done, x.need)+'<b>'+x.done+'/'+x.need+'</b>'+
+    (x.done > 0 ? '<button class="mt-undo" data-action="mtDvUndo" data-id="'+t.id+'" title="Take one back">&minus;</button>' : '')+
+    (x.done < x.need ? '<button class="mt-plus" data-action="completeTask" data-id="'+t.id+'" title="Log one">+1</button>' : '')+
   '</div>';
 }
 taskCard = (function(base){
   return function(t){
     let h = base.apply(this, arguments);
     if(!t || !t.master) return h;
-    if(t.master.kind==='dv'){
-      h = h.replace(/<span class="mt-badge"[^>]*>[\s\S]*?<\/span>/, '<span class="mt-badge is-dv" title="A deliverable: it comes back every week while they’re a client">&#9638; Deliverable</span>');
+    if(t.master.kind==='dvw'){
+      h = h.replace('<div class="task-card ', '<div class="task-card dlv-card ');
+      h = h.replace(/<span class="mt-badge"[^>]*>[\s\S]*?<\/span>/, '<span class="mt-badge is-dv" title="A client deliverable: this cycle’s Week '+t.master.wk+'">&#128230; Week '+t.master.wk+'</span>');
       return h.replace(/(<div class="task-card-title">[\s\S]*?<\/div>)/, '$1'+dvProgHtml(t));
     }
     if(t.master.kind==='reach'){
@@ -38222,27 +38279,95 @@ taskCard = (function(base){
 openTaskMenu = (function(base){
   return function(t){
     const r = base.apply(this, arguments);
-    const m = document.getElementById('taskCtxMenu'), hit = t && dvFind(t);
-    if(m && hit){
-      const need = dvNeed(hit.d), done = dvDone(hit.d);
-      const b = m.querySelector('[data-op="done"]'); if(b) b.innerHTML = '+1 Log one ('+done+'/'+need+')';
+    const m = document.getElementById('taskCtxMenu'), x = t && dvwFind(t);
+    if(m && x){
+      const b = m.querySelector('[data-op="done"]'); if(b) b.innerHTML = '+1 Log one (Week '+x.k+': '+x.done+'/'+x.need+')';
       const u = m.querySelector('[data-op="undo"]'); if(u) u.innerHTML = '&minus;1 Take one back';
-      if(done > 0 && !u){ const x = document.createElement('button'); x.className = 'ctx-item'; x.dataset.action = 'mtDvUndo'; x.dataset.id = t.id; x.innerHTML = '&minus;1 Take one back'; (b || m.querySelector('.ctx-sep')).insertAdjacentElement('afterend', x); }
+      if(x.count > 0 && !u){ const y = document.createElement('button'); y.className = 'ctx-item'; y.dataset.action = 'mtDvUndo'; y.dataset.id = t.id; y.innerHTML = '&minus;1 Take one back'; (b || m.querySelector('.ctx-sep')).insertAdjacentElement('afterend', y); }
+      const bk = m.querySelector('[data-op="backlog"]'); if(bk) bk.innerHTML = '&larr; Back to the Client backlog';
     }
     return r;
   };
 })(openTaskMenu);
+// the client care ring counts this week's deliverable tasks and the reach-out
+masterGoalDefs = (function(base){
+  return function(){
+    const out = base.apply(this, arguments).filter(function(m){ return m.key!=='care'; });
+    const ts = state.tasks.items.filter(function(t){ return t.master && ((t.master.kind==='dvw' && dvwIsNow(t)) || (t.master.kind==='reach' && t.master.week===thisWeekKey())); });
+    if(ts.length) out.push({key:'care', icon:'&#129309;', label:'Client care this week', cur:ts.filter(function(t){ return t.status==='done'; }).length, target:ts.length, field:null, fmt:function(n){ return fmtGoalNum(n); }, suffix:'',
+      src:'client deliverables and reach-outs', go:'goToClients', color:'#b18cff', color2:'#e0d0ff'});
+    return out;
+  };
+})(masterGoalDefs);
 // Op: a deliverable task is "log one", and he knows who's due a touch
 aiContext = (function(base){
   return function(){
     let s = base.apply(this, arguments);
-    const dv = state.tasks.items.filter(function(t){ return t.master && t.master.kind==='dv' && t.master.week===thisWeekKey(); }).map(function(t){ const h = dvFind(t); return h ? (h.c.business || h.c.name)+': '+t.title+' ('+dvDone(h.d)+'/'+dvNeed(h.d)+')' : ''; }).filter(Boolean);
-    if(dv.length) s += '\nThis week’s deliverable tasks (completing one logs ONE piece; it finishes when the week’s number is in): '+dv.join('; ')+'.';
+    const dv = state.tasks.items.filter(function(t){ return t.master && t.master.kind==='dvw' && dvwIsNow(t); }).map(function(t){ const x = dvwFind(t); return x ? (x.c.business || x.c.name)+': '+t.title+' Week '+x.k+' ('+x.done+'/'+x.need+', '+x.count+'/'+x.total+' this cycle)' : ''; }).filter(Boolean);
+    if(dv.length) s += '\nThis week’s client deliverable tasks (each month’s deliverable is split into four weekly tasks named after it; completing one logs ONE piece): '+dv.join('; ')+'.';
     const r = reachNeeds();
     if(r.length) s += '\nClients due a touch (the "Reach out to clients" task): '+r.map(function(x){ return (x.c.business || x.c.name)+(x.n > 0 ? ' ('+x.n+'d overdue)' : ' (due today)'); }).join(', ')+'.';
     return s;
   };
 })(aiContext);
+
+// ---- the Client backlog: the deliverable tasks, compact, by client ----
+function dvwTasksFor(c, d, cy){ return state.tasks.items.filter(function(t){ const m = t.master; return m && m.kind==='dvw' && m.clientId===c.id && m.delivId===d.id && m.cycle===cy.start; }).sort(function(a, b){ return a.master.wk - b.master.wk; }); }
+function clientBacklogHtml(){
+  const today = todayStr();
+  const blocks = mtActiveClients().map(function(c){
+    const cy = dvwCycle(c), ds = arr(c.deliverables).filter(function(d){ return d.recurring; });
+    if(!ds.length) return '';
+    const hs = clientHealthStatus(c);
+    return '<div class="cbl-client">'+
+      '<div class="cbl-h"><span class="lc-av" style="background:'+clientColor(c)+'">'+escapeHtml(clientInitials(c))+'</span>'+
+        '<span class="cbl-n"><b>'+escapeHtml(c.business || c.name)+'</b><small>Cycle '+fmtDateShort(cy.start)+' to '+fmtDateShort(cy.end)+'</small></span>'+
+        '<span class="cbl-hs"><i class="lc-hs is-'+hs.level+'"></i>'+escapeHtml(clientHealthLabel(hs))+'</span></div>'+
+      ds.map(function(d){
+        const ts = dvwTasksFor(c, d, cy), count = dvwCycleCount(d, cy), total = monthlyTargetFor(d);
+        return '<div class="cbl-d"><div class="cbl-dh"><b>'+escapeHtml(d.title)+'</b><span>'+count+'/'+total+' this cycle</span></div><div class="cbl-weeks">'+
+          ts.map(function(t){
+            const x = dvwFind(t); if(!x) return '';
+            const done = t.status==='done', late = !done && t.deadline < today, now = !done && dvwIsNow(t);
+            return '<div class="cbl-w'+(done ? ' is-done' : late ? ' is-late' : now ? ' is-now' : '')+'" data-id="'+t.id+'">'+
+              '<button class="cbl-wk" data-action="openTaskEditModal" data-id="'+t.id+'"><b>Week '+x.k+'</b><small>'+(done ? 'Done' : late ? 'Overdue · '+fmtDateShort(t.deadline) : 'Due '+fmtDateShort(t.deadline))+'</small></button>'+
+              dvwSegs(x.done, x.need)+
+              '<span class="cbl-wb"><b>'+x.done+'/'+x.need+'</b>'+
+                (done ? '<span class="cbl-ok">&#10003;</span>' : '<button class="mt-plus" data-action="completeTask" data-id="'+t.id+'" title="Log one">+1</button><button class="cbl-today'+(t.status==='today' ? ' is-on' : '')+'" data-action="dvwToday" data-id="'+t.id+'" title="'+(t.status==='today' ? 'On today: tap to send it back' : 'Put it on today')+'">'+(t.status==='today' ? 'On today' : '&rarr; Today')+'</button>')+
+              '</span></div>';
+          }).join('')+'</div></div>';
+      }).join('')+
+    '</div>';
+  }).filter(Boolean);
+  return '<div class="cbl">'+
+    '<div class="lc-h"><div><div class="lc-t">Client backlog</div><div class="lc-s">Each client’s monthly deliverables, split into the four weeks of their cycle. Hit +1 for each one you finish.</div></div></div>'+
+    (blocks.length ? blocks.join('') : '<div class="empty">No retainer deliverables yet. Give a client a package with deliverables and their weeks show up here.</div>')+
+  '</div>';
+}
+// they're kept out of the regular backlog (and its counts and preview)
+function dvwHiddenFromBacklog(fn, self, args){
+  const off = state.tasks.items.filter(function(t){ return t.master && t.master.kind==='dvw' && t.status==='backlog'; });
+  off.forEach(function(t){ t.status = '_clientBacklog'; });
+  try{ return fn.apply(self, args); } finally { off.forEach(function(t){ t.status = 'backlog'; }); }
+}
+renderFocusBacklogTab = (function(base){ return function(){ return dvwHiddenFromBacklog(base, this, arguments); }; })(renderFocusBacklogTab);
+renderFocusTasksOverview = (function(base){ return function(){ return dvwHiddenFromBacklog(base, this, arguments); }; })(renderFocusTasksOverview);
+focusTasksSubtabsHtml = (function(base){
+  return function(){
+    const h = dvwHiddenFromBacklog(base, this, arguments);
+    const n = state.tasks.items.filter(function(t){ return t.master && t.master.kind==='dvw' && t.status!=='done'; }).length;
+    const on = ui.focusTasksSubTab==='clientBacklog';
+    const pill = '<div class="subtab is-dlv'+(on ? ' active' : '')+'" data-action="focusTasksSubTab" data-tab="clientBacklog">&#128230; Client backlog'+(n ? ' <span style="opacity:.7;">'+n+'</span>' : '')+'</div>';
+    return h.replace(/(<div class="subtab[^"]*" data-action="focusTasksSubTab" data-tab="backlog">[\s\S]*?<\/div>)/, '$1'+pill);
+  };
+})(focusTasksSubtabsHtml);
+renderFocusTasksTab = (function(base){
+  return function(){
+    if(ui.focusTasksSubTab==='clientBacklog') return '<div class="subtab-panel" data-key="tasks-clientBacklog">'+clientBacklogHtml()+'</div>';
+    return base.apply(this, arguments);
+  };
+})(renderFocusTasksTab);
+ACTIONS.openClientBacklog = function(){ ui.view = 'focus'; ui.focusTab = 'tasks'; ui.focusTasksSubTab = 'clientBacklog'; renderView(); };
 // the client card's strip: this week's deliverables and whether they're due a touch
 crmCard = (function(base){
   return function(kind, x){

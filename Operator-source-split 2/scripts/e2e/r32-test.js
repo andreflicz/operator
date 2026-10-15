@@ -280,7 +280,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('r36: a memory about the app moves to Op’s ideas for the app', await E("state.profile.opMemory.length")===0 && /Weekly client check-ins/.test(await E("JSON.stringify(state.settings.opIdeas)")));
     // master tasks
     await E("state.business.clients=[{id:'c1',name:'JJS',stage:'active',status:'active',mrr:3000,touches:[],createdAt:addDays(todayStr(),-20),deliverables:[{id:'d1',title:'Reels',weeklyTarget:2,recurring:true,completedDates:[]}]},{id:'c2',name:'Kiko',stage:'active',status:'active',mrr:2000,touches:[],createdAt:addDays(todayStr(),-20)}]; state.focus.masterMade={}; state.tasks.items=state.tasks.items.filter(t=>!t.master); ui.view='today'; renderView(); renderView()"); await p.waitForTimeout(200);
-    check('r36→r38: master tasks: one per deliverable, and Reach out to clients while someone’s due', await E("JSON.stringify(state.tasks.items.filter(t=>t.master).map(t=>t.master.kind).sort())")==='["dv","reach"]');
+    check('r36→r38: master tasks: the deliverable split into four weeks, and Reach out to clients while someone’s due', await E("JSON.stringify(state.tasks.items.filter(t=>t.master).map(t=>t.master.kind).sort())")==='["dvw","dvw","dvw","dvw","reach"]');
     await E("logTouch('client','c1'); renderView()"); await p.waitForTimeout(100);
     check('r36→r38: …a touch takes that client off the Reach out task', JSON.stringify(await E("state.tasks.items.find(t=>t.master&&t.master.kind==='reach'&&t.status!=='done').clients"))==='["c2"]');
     await E("completeTask(state.tasks.items.find(t=>t.master&&t.master.kind==='reach'&&t.status!=='done').id)"); await p.waitForTimeout(900);

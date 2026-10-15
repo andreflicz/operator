@@ -100,7 +100,7 @@ const hex = s => Buffer.from(s||'', 'hex').toString();
     check('locked in: one Now / Up next (not two)', (await p.$$('#viewRoot .now-next')).length===0 && (await p.$$('#viewRoot .nn-stack, #viewRoot [class*="nn-"]')).length>0);
     const nums = await p.$$eval('.knock-out-list .ko-num', e => e.map(x => x.textContent));
     const titles = await p.$$eval('.knock-out-list .ko-title', e => e.map(x => x.textContent));
-    check('Knock these out is numbered 01, 02, 03 (r38: plus the client’s deliverable task)', nums.join()==='01,02,03,04' && /^Complete \d+ |^[A-Z]/.test(titles[3]||''), [nums, titles]);
+    check('Knock these out is numbered 01, 02, 03 (the client’s deliverable weeks wait in the Client backlog)', nums.join()==='01,02,03', [nums, titles]);
     check('…in your lineup order', titles[0]==='Invoice clients' && titles[1]==='Edit JJS reel 3', titles);
     await E("endFocusSessionForSwitch(); ui.view='business'; ui.businessTab='clients'; renderView()"); await p.waitForTimeout(300);
     check('client card: package sits on top of its deliverables', await p.isVisible('.cc2-delivs .cc2-pkg') && /Growth/.test(await p.textContent('.cc2-pkg')));

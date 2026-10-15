@@ -56,27 +56,37 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await p.click('#taskEditOverlay .tdv-chip[data-id="bm:d1"]'); await p.waitForTimeout(100);
     await E("saveEditTask('e')");
     check('editing a task can tie it to a deliverable', await E("JSON.stringify(state.tasks.items.find(t => t.id==='e').deliv)")==='{"c":"bm","d":"d1"}');
-    // the weekly master task, finished by hand
-    // the deliverable tasks: one per client per deliverable, done by logging one at a time
+    // the deliverable tasks: each month's deliverable split into the cycle's four weeks, named after it
     await E("renderView()"); await p.waitForTimeout(150);
-    const dv = await E("(state.tasks.items.find(t => t.master && t.master.kind==='dv' && t.master.clientId==='bm' && t.master.delivId==='d1')||{}).id");
-    check('a deliverable task is made for you: "Complete 4 reels" (Brothers Mechanical)', !!dv && await E("state.tasks.items.find(t => t.id==='"+dv+"').title")==='Complete 4 reels' && JSON.stringify(await E("state.tasks.items.find(t => t.id==='"+dv+"').clients"))==='["bm"]');
-    check('…and "Complete 3 ad creatives" for JJS (split by deliverable)', await E("!!state.tasks.items.find(t => t.master && t.master.kind==='dv' && t.master.clientId==='jj' && t.title==='Complete 3 ad creatives')"));
-    check('…no old "Deliverables for…" or weekly check-in tasks', await E("!state.tasks.items.some(t => t.master && (t.master.kind==='deliv' || t.master.kind==='care') && t.status!=='done')"));
-    const w0 = await E("deliverableWeekCount("+D+")");
-    await E("completeTask('"+dv+"')"); await p.waitForTimeout(250);
-    check('hitting done logs ONE reel and the task stays ('+(w0+1)+'/4)', await E("deliverableWeekCount("+D+")")===w0+1 && await E("state.tasks.items.find(t => t.id==='"+dv+"').status")==='today' && new RegExp((w0+1)+' of 4').test(await p.textContent('#toastContainer')));
-    await E("ui.view='focus'; ui.focusTab='tasks'; renderView()"); await p.waitForTimeout(200);
-    check('…its card shows the pieces ('+(w0+1)+'/4) with +1 and take-one-back', await p.isVisible('[data-task-id="'+dv+'"] .mt-prog') && (await p.textContent('[data-task-id="'+dv+'"] .mt-prog b'))===(w0+1)+'/4' && (await p.$$('[data-task-id="'+dv+'"] .mt-segs i.on')).length===w0+1);
-    for(let k = w0 + 1; k < 4; k++){ await E("completeTask('"+dv+"')"); await p.waitForTimeout(120); }
-    check('…the fourth one finishes it for the week', await E("state.tasks.items.find(t => t.id==='"+dv+"').status")==='done' && await E("deliverableWeekCount("+D+")")>=4);
-    await E("completeTask('"+dv+"')"); await p.waitForTimeout(120);
-    check('…a fifth hit doesn’t over-log', await E("deliverableWeekCount("+D+")")===4);
-    await E("ACTIONS.mtDvUndo(null, null, '"+dv+"'); renderView()"); await p.waitForTimeout(150);
-    check('…take one back and it’s open again (3/4)', await E("state.tasks.items.find(t => t.id==='"+dv+"').status")==='today' && await E("deliverableWeekCount("+D+")")===3);
+    const W = "(k, c, d) => state.tasks.items.find(t => t.master && t.master.kind==='dvw' && t.master.clientId===(c||'bm') && t.master.delivId===(d||'d1') && t.master.wk===k)";
+    const wk = async (k, c, d) => JSON.parse(await E("JSON.stringify((({id, title, status, deadline}) => ({id, title, status, deadline}))(("+W+")("+k+", '"+(c||'bm')+"', '"+(d||'d1')+"')))"));
+    const w1 = await wk(1), w2 = await wk(2), w3 = await wk(3), w4 = await wk(4);
+    check('16 reels a month → four tasks named "Reels", Week 1 to 4, due weekly', [w1, w2, w3, w4].every(t => t.title==='Reels') && [w1, w2, w3, w4].map(t => t.deadline).join()==='2026-10-07,2026-10-14,2026-10-21,2026-10-31', [w1, w2, w3, w4]);
+    check('…all in the backlog', [w1, w2, w3, w4].every(t => t.status==='backlog'));
+    check('…JJS: 12 ad creatives → four tasks of 3', await E("dvwNeeds(state.business.clients[1].deliverables[0]).join()")==='3,3,3,3' && (await wk(4, 'jj', 'd2')).title==='Ad creatives');
+    check('…no old weekly "Complete 4 reels" or "Deliverables for…" tasks', await E("!state.tasks.items.some(t => t.master && /^(dv|deliv|care)$/.test(t.master.kind) && t.status!=='done')"));
+    await E("ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='backlog'; renderView()"); await p.waitForTimeout(200);
+    check('…not in the regular Backlog', !/Reels|Ad creatives/.test(await p.textContent('#viewRoot .subtab-panel')));
+    check('…a Client backlog tab next to it', /Client backlog\s*8/.test(await p.textContent('.subtab.is-dlv')));
+    await p.click('.subtab.is-dlv'); await p.waitForTimeout(200);
+    check('the Client backlog: by client, each deliverable with its four weeks', (await p.$$('.cbl-client')).length===2 && (await p.$$('.cbl-w')).length===8 && /Brothers Mechanical/.test(await p.textContent('.cbl')));
+    check('…this week is lit (Week 2, due today)', await p.isVisible('.cbl-w.is-now[data-id="'+w2.id+'"]'));
+    const c0 = await E("dvwCycleCount(state.business.clients[0].deliverables[0], dvwCycle(state.business.clients[0]))");
+    await p.click('.cbl-w[data-id="'+w1.id+'"] .mt-plus'); await p.waitForTimeout(250);
+    check('+1 logs ONE reel and the task stays ('+(c0+1)+'/4)', await E("dvwCycleCount(state.business.clients[0].deliverables[0], dvwCycle(state.business.clients[0]))")===c0+1 && await E("("+W+")(1).status")==='backlog' && /Week 1 3\/4/.test(await p.textContent('#toastContainer')));
+    await E("completeTask('"+w2.id+"')"); await p.waitForTimeout(250);
+    check('…a hit on Week 2 fills Week 1 first (and says so); Week 1 finishes', await E("("+W+")(1).status")==='done' && /Week 1 fills first/.test(await p.textContent('#toastContainer')));
+    await E("completeTask('"+w2.id+"')"); await p.waitForTimeout(250);
+    check('…then Week 2 starts filling (1/4)', await E("dvwFind(("+W+")(2)).done")===1);
+    await E("ACTIONS.mtDvUndo(null, null, '"+w2.id+"'); ACTIONS.mtDvUndo(null, null, '"+w2.id+"'); renderView()"); await p.waitForTimeout(200);
+    check('…take two back: Week 2 empty, Week 1 open again (back in the backlog)', await E("dvwFind(("+W+")(2)).done")===0 && await E("("+W+")(1).status")==='backlog');
     await E("incrementDeliverableProgress('bm', 'd1'); renderView()"); await p.waitForTimeout(150);
-    check('…logging on the client card counts for the task too (4/4 → done)', await E("state.tasks.items.find(t => t.id==='"+dv+"').status")==='done');
-    check('…and the client’s health reads it (Brothers Mechanical ahead)', await E("clientHealthStatus(state.business.clients[0]).paceLevel")==='good');
+    check('…logging on the client card fills the weeks too (Week 1 done)', await E("("+W+")(1).status")==='done');
+    await p.click('.cbl-w[data-id="'+w2.id+'"] .cbl-today'); await p.waitForTimeout(200);
+    check('→ Today puts Week 2 on today', await E("("+W+")(2).status")==='today');
+    await E("ui.focusTasksSubTab='overview'; renderView()"); await p.waitForTimeout(200);
+    check('…its card: its own color, "Week 2", the client, pieces with +1', await p.isVisible('.task-card.dlv-card[data-task-id="'+w2.id+'"]') && /Week 2/.test(await p.textContent('[data-task-id="'+w2.id+'"] .mt-badge')) && /Brothers Mechanical/.test(await p.textContent('[data-task-id="'+w2.id+'"]')) && await p.isVisible('[data-task-id="'+w2.id+'"] .mt-plus'));
+    check('…and the client’s health reads it', ['good', 'warn'].indexOf(await E("clientHealthStatus(state.business.clients[0]).paceLevel")) >= 0);
     // reach out to clients
     check('no Reach out task while nobody’s due', await E("!state.tasks.items.some(t => t.master && t.master.kind==='reach' && t.status!=='done')"));
     await E("state.business.clients[1].touches=['2026-09-20']; state.business.clients[1].touchpoints=[{id:'tq', type:'text', date:'2026-09-20', note:''}]; renderView()"); await p.waitForTimeout(200);
