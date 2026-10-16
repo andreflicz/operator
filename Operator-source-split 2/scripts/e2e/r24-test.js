@@ -152,7 +152,7 @@ const BOARD = {boards:[{id:'v1', kind:'vision', name:'Vision', parentId:null, vi
     await E("ui.view='personal'; ui.personalTab='finances'; renderView()"); await p.waitForTimeout(300);
     check('Expenses: Import statement, and the free way explained', await p.isVisible('[data-action="bankCsvPick"]') && /Free:/.test(await p.textContent('.ex-connect')));
     await E("ui.view='convos'; igCfg().accounts = []; renderView()"); await p.waitForTimeout(200);
-    check('Social: the free CSV comes first', /Import a CSV/.test(await p.textContent('.soc-opts .soc-opt:first-child')) && /Downloads/.test(await p.textContent('.soc-opts .soc-opt:first-child')));
+    check('Social: the free CSV is an option (round 39: Zernio sits first)', /Import a CSV/.test(await p.textContent('.soc-opts')) && /Downloads/.test(await p.textContent('.soc-opts')));
     check('no page errors (free data)', p.errors.length===0, p.errors);
     await p.context().close();
   }

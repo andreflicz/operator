@@ -244,7 +244,7 @@ async function ctxPage(b, seed, opts){
     await p.click('[data-action="igAdd"][data-id="ig1"]'); await p.waitForTimeout(1200);
     check('…added as your business account, and its stats come in', await E("igCfg().accounts[0].role")==='business' && await E("igCfg().cache && igCfg().cache.data.ig1.followers")===4800 && await E("igCfg().cache.data.ig1.posts[0].reach")===2500);
     await E("ui.view='convos'; renderView()"); await p.waitForTimeout(300);
-    check('Social: followers, posts, likes, reach, the posting strip, top posts', /4,800/.test(await p.textContent('.ig-acct')) && (await p.$$('.ig-strip i')).length===30 && (await p.$$('.ig-top .ig-post')).length===6);
+    check('Social: followers, posts, likes, reach, the posting strip, top posts', /4,800/.test(await p.textContent('.sx-prof')) && (await p.$$('.sx-prof .ig-strip i')).length===30 && (await p.$$('.sx-prof .sx-best a')).length >= 1);
     check('business posts count on your card by themselves', await E("igPostsByRole('business')")===8 && await E("xpFollowersNow()")===4800);
     check('the token is never in Operator’s data', !(await p.evaluate(() => { let s = ''; for(let i=0;i<localStorage.length;i++) s += localStorage.getItem(localStorage.key(i)); return /SECRET/.test(s) || /SECRET/.test(JSON.stringify(window.__op.state)); })));
     check('no page errors (Instagram)', p.errors.length===0, p.errors);

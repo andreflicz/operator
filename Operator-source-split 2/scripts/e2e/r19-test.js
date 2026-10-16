@@ -210,7 +210,7 @@ async function ctxPage(b, seed, opts){
     await E("ACTIONS.adsFind()"); await p.waitForTimeout(300);
     await p.click('[data-action="adsAdd"]'); await p.waitForTimeout(800);
     check('find your ad account, add it', await E("adsCfg().ads[0].id")==='act_77');
-    await E("ui.view='convos'; renderView()"); await p.waitForTimeout(400);
+    await E("ui.view='convos'; ui.socTab='ads'; renderView()"); await p.waitForTimeout(400);
     check('Social: spend, leads, cost per lead, the spend chart, campaigns', /\$1,241/.test(await p.textContent('.ads-acct')) && /62/.test(await p.textContent('.ads-acct')) && /per lead/.test(await p.textContent('.ads-acct')) && (await p.$$('.ads-bars i')).length===2 && /JJS lead gen/.test(await p.textContent('.ads-camps')));
     check('the token never touches Operator’s data', !(await p.evaluate(() => { let s = ''; for(let i=0;i<localStorage.length;i++) s += localStorage.getItem(localStorage.key(i)); return /access_token/.test(s); })));
     check('no page errors (ads)', p.errors.length===0, p.errors);

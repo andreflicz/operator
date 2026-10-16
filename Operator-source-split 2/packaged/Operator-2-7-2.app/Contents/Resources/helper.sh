@@ -496,7 +496,8 @@ wake_respond() {
     /zn/status*) if [ -s "$ZN_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
     /zn/api*)
       P=$(hexdec "$(param p)")
-      case "$P" in /v1/accounts|/v1/accounts\?*|/v1/accounts/follower-stats\?*|/v1/analytics\?*) ;; *) respond 400 '{"error":"bad path"}'; return ;; esac
+      # read-only: every call is a GET, and only these: the accounts, analytics, the inbox (to read) and ads (to read)
+      case "$P" in /v1/accounts|/v1/accounts\?*|/v1/accounts/*|/v1/analytics\?*|/v1/analytics/*|/v1/inbox/conversations*|/v1/inbox/comments*|/v1/ads\?*|/v1/ads/*) ;; *) respond 400 '{"error":"bad path"}'; return ;; esac
       case "$P" in *..*|*@*|*" "*|*'"'*|*\\*) respond 400 '{"error":"bad path"}'; return ;; esac
       if [ ! -s "$ZN_KEY_FILE" ]; then respond 401 '{"error":"no Zernio key saved"}'; return; fi
       ZT=$(sed -n 1p "$ZN_KEY_FILE")
