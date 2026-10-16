@@ -89,7 +89,7 @@ async function ctxPage(b, seed, opts){
     // (round 25: no + on the cards; the + in the corner adds a goal)
     check('Goals tab: The week & the month (adding is the + in the corner)', (await p.$$('.tab-panel .tg-card')).length===2 && !(await p.$('.tg-card [data-action="openGoalSheet"]')));
     check('…and they’re not mixed into "Your goals"', (await p.$$('.tab-panel .gx-g')).length===0);
-    check('master goals say what they pay (round 23: scaled to the goal)', /\+[\d,]+ XP/.test(await p.textContent('.gx-top')));
+    check('master goals say what they pay (round 23: scaled to the goal)', /\+[\d,]+ XP/.test(await p.textContent('.g39')));
     check('no page errors (check in)', p.errors.length===0, p.errors);
     await p.context().close();
   }

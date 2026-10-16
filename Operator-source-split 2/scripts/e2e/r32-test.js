@@ -111,7 +111,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const p = await newPage(b, OUT+'/r32.html', seed, T);
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(300);
-    check('Goals: one card (the big ones, the week and month, yours), not stacked panels', await p.$$eval('.gx-card', n => n.length)===1 && !!(await p.$('.gx-card .mg-hero')) && !!(await p.$('.gx-card .gx-split .tg-card.is-week')) && !!(await p.$('.gx-card .gx-mine .gx-g')) && !(await p.$('.gl-sec')));
+    check('Goals: one card (the big ones, the week and month, yours), not stacked panels', !!(await p.$('.g39 .g39-rev')) && !!(await p.$('.g39 .g39-col .tg-card.is-week')) && !!(await p.$('.g39 .g39-mine .gx-g')) && !(await p.$('.gl-sec')));
     check('…Op’s read is one line up top', !!(await p.$('.gx > .op-tip')) && !(await p.$('.gx .opi')));
     check('…your goals are rows with their numbers', /Read 12 books/.test(await p.textContent('.gx-g')) && /4/.test(await p.textContent('.gx-g .gx-g-n')));
     await p.click('.gx-g [data-action="goalStep"][data-delta="1"]'); await p.waitForTimeout(200);

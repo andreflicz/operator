@@ -68,7 +68,7 @@ async function ctxPage(b, seed, opts){
     await E("ui.focusTab='analytics'; renderView()"); await p.waitForTimeout(200);
     check('…only on the first Focus page (not Backlog, not Analytics)', !onBacklog && !(await p.$('.view-title .lv-btn')));
     await E("ui.focusTab='tasks'; ui.focusTasksSubTab='overview'; renderView()"); await p.waitForTimeout(200);
-    check('on Focus the level chip is compact (no bar)', await p.evaluate(() => { const c = document.querySelector('#musicDock .md-lvl'); return c && c.classList.contains('is-compact') && !c.classList.contains('is-idle') && getComputedStyle(c.querySelector('i')).display==='none'; }));
+    check('on Focus the level chip is compact (no bar)', await p.evaluate(() => { const c = document.querySelector('#musicDock .md-lvl'); return c && c.classList.contains('is-compact') && !c.classList.contains('is-idle') && (!c.querySelector('i') || getComputedStyle(c.querySelector('i')).display==='none'); }));
     await E("ui.view='calendar'; renderView()"); await p.clock.runFor(12000); await p.waitForTimeout(300);
     check('elsewhere it fades out of the way when nothing’s happening', await p.evaluate(() => document.querySelector('#musicDock .md-lvl').classList.contains('is-idle')));
     await p.mouse.move(1400, 30); await p.waitForTimeout(400);
@@ -98,8 +98,8 @@ async function ctxPage(b, seed, opts){
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("AI.hasKey = true; ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(300);
     // (round 32: one panel, divided: the big ones on top, this week & month, your goals)
-    check('Goals: one panel with the big ones, this week & month, your goals', !!(await p.$('.gl .gx-card .gx-top')) && !!(await p.$('.gl .gx-card .gx-split')) && /Your goals/i.test(await p.textContent('.gl')));
-    check('the revenue card is minimal: no pill, no pen, a quiet "of $20,000"', !(await p.$('.mg-hero .mg-pen')) && /of \$20,000/.test(await p.textContent('.mg-hero .mg-target')));
+    check('Goals: one panel with the big ones, this week & month, your goals', !!(await p.$('.gl .g39-rev')) && !!(await p.$('.gl .g39-cols')) && /Your goals/i.test(await p.textContent('.gl')));
+    check('the revenue card is minimal: no pill, no pen, a quiet "of $20,000"', !(await p.$('.g39-rev .mg-pen')) && /of \$20,000/.test(await p.textContent('.g39-rev .mg-target')));
     check('losing 50 lbs is a big one: +7,500 XP', /\+7,500 XP/.test(await p.textContent('.gl')) && await E("masterXpFor('weight', 250, 200)")===7500 && await E("masterXpFor('mrr', 0, 10000)")===6000);
     // (round 25: no + on the cards; the + in the corner opens the sheet, on This week)
     await p.click('#fabAdd'); await p.waitForTimeout(250);

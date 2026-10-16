@@ -80,15 +80,15 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('the Personal tab says Health, not Fitness', /Health/.test(await p.textContent('[data-action="personalTab"][data-tab="fitness"]')));
     const m = await E("masterGoalDefs().map(m=>({k:m.key, cur:m.cur, t:m.target, pct:Math.round(masterPct(m))}))");
     const by = k => m.find(x => x.k===k) || {};
-    check('master goals are built in — nothing to set up', m.length>=5 && (await p.$$('.mg-hero')).length===1 && (await p.$$('.mg-card')).length>=m.length-1, m);
-    check('revenue reads MRR from Business, against the Settings goal', by('mrr').cur===2500 && by('mrr').t===10000 && /\$2,500/.test(await p.textContent('.mg-hero')));
+    check('master goals are built in — nothing to set up', m.length>=5 && (await p.$$('.g39-rev')).length===1 && (await p.$$('.mg-card')).length>=m.length-1, m);
+    check('revenue reads MRR from Business, against the Settings goal', by('mrr').cur===2500 && by('mrr').t===10000 && /\$2,500/.test(await p.textContent('.g39-rev')));
     check('weight reads Health → Weight, measured from the first weigh-in', by('weight').cur===191.4 && by('weight').pct===37, by('weight'));
     check('workouts count this week\'s logged workouts', by('workouts').cur===2 && by('workouts').t===4);
     check('deep work counts hours locked in this week', by('deep').cur===3, by('deep'));
     check('no "tracked for you" / quick-start clutter', !/tracked for you|quick start/i.test(await p.textContent('#viewRoot')));
     await p.click('[data-action="editMasterTarget"][data-id="mrr"]'); await p.fill('#mgEdit-mrr', '20000'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
-    check('tap a target to change it in place (saved to Settings)', (await E("state.profile.revenueGoalMonthly"))===20000 && /\$20,000/.test(await p.textContent('.mg-hero')));
-    check('older goals still load under Your goals', /Post 3 reels/.test(await p.textContent('.gx-mine')));
+    check('tap a target to change it in place (saved to Settings)', (await E("state.profile.revenueGoalMonthly"))===20000 && /\$20,000/.test(await p.textContent('.g39-rev')));
+    check('older goals still load under Your goals', /Post 3 reels/.test(await p.textContent('.g39-mine')));
     // (round 23: the + opens the goal sheet; Long-term is a goal of your own)
     await p.click('#fabAdd'); await p.waitForTimeout(150); await p.click('[data-action="gsKind"][data-id="long"]'); await p.waitForTimeout(100);
     await p.fill('#gsLabel', '10k IG followers'); await p.fill('#gsTarget', '10000'); await p.fill('#gsUnit', 'followers'); await p.fill('#gsCurrent', '4200');

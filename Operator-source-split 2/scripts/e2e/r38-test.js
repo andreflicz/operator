@@ -83,7 +83,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('→ Today puts Week 2 on today', await E("("+W+")(2).status")==='today');
     await E("ui.focusTasksSubTab='overview'; renderView()"); await p.waitForTimeout(200);
     { const cs = '.task-card.dlv-card:not(.car-clone)[data-task-id="'+w2.id+'"]';
-      check('…its card: its own color, "Week 2", the client, what it’s worth (no +1 counter)', !!(await p.$(cs)) && /Week 2/.test(await p.textContent(cs+' .mt-badge')) && /Brothers Mechanical/.test(await p.textContent(cs)) && /4 reels/.test(await p.textContent(cs+' .dvw-sub')) && !(await p.$(cs+' .mt-plus'))); }
+      check('…its card: its own color, "Week 2", the client, what it’s worth (no +1 counter; round 39 look)', !!(await p.$(cs)) && /Week 2/.test(await p.textContent(cs+' .dvc-wkp')) && /Brothers Mechanical/.test(await p.textContent(cs+' .dvc-who')) && /16 Reels/.test(await p.textContent(cs+' .dvc-title')) && !(await p.$(cs+' .mt-plus'))); }
     await E("openTaskEditModal('"+w2.id+"')"); await p.waitForTimeout(200);
     check('editing it: no deliverable picker, it says it’s automatic, the name is locked', !(await p.$('#taskEditOverlay .tdv')) && /Automatic: from Brothers Mechanical/.test(await p.textContent('#taskEditOverlay .dvw-auto')) && await E("document.getElementById('editTitle-"+w2.id+"').readOnly"));
     await E("document.getElementById('editPriority-"+w2.id+"').value='high'; document.getElementById('editTitle-"+w2.id+"').value='Something else'; saveEditTask('"+w2.id+"')"); await p.waitForTimeout(150);
@@ -226,15 +226,15 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('minimal view: Full view is a small link on the panel (not a corner button)', !!(await p.$('#viewRoot .np-views .np-v')) && !(await p.$('#viewRoot .np-top .lv-btn')));
     await E("state.profile.focusMinimal=false; renderView()");
     await E("ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(300);
-    const secs = await E("[...document.querySelectorAll('.gx-rings.is-grouped .gx-sec-h')].map(e=>e.childNodes[0].textContent.trim()).join('|')");
-    check('Goals: the master goals sit in Master / This month / This week', secs==='Master|This month|This week', secs);
-    await p.click('.gx-cust'); await p.waitForTimeout(250);
+    const secs = await E("[...document.querySelectorAll('.g39-col')].map(c=>c.classList.contains('is-master') ? 'Master' : c.classList.contains('is-month') ? 'This month' : 'This week').join('|')");
+    check('Goals: the master goals sit in Master / This month / This week (round 39: three columns)', secs==='Master|This month|This week' && !!(await p.$('.g39-col.is-month .mg-card')) && !!(await p.$('.g39-col.is-week .mg-card')), secs);
+    await p.click('.g39-cust'); await p.waitForTimeout(250);
     check('…Customize opens a sheet with every master goal grouped', await p.isVisible('#mgcSheet') && (await p.$$('#mgcSheet .mgc-g')).length===3);
     await p.click('#mgcSheet .mgc-row:has([data-mgc="newclients"]) .ws-switch'); await p.waitForTimeout(150);
     check('…switching one off hides it', await E("!!state.profile.mgHide.newclients"));
     await p.fill('#mgcSheet [data-mgt="deep"]', '30'); await p.dispatchEvent('#mgcSheet [data-mgt="deep"]', 'change'); await p.waitForTimeout(100);
     await p.click('#mgcSheet [data-action="mgCustomizeClose"].btn'); await p.waitForTimeout(250);
-    check('…and its target sticks; This month is gone from Goals', /Master\|This week/.test(await E("[...document.querySelectorAll('.gx-sec-h')].map(e=>e.childNodes[0].textContent.trim()).join('|')")) && await E("masterGoalDefs().find(m=>m.key==='deep').target")===30);
+    check('…and its target sticks; This month is gone from Goals', !(await p.$('.g39-col.is-month .mg-card')) && await E("masterGoalDefs().find(m=>m.key==='deep').target")===30);
     await E("state.goals.items.push({id:'gm', label:'MRR', master:true, autoTrack:'mrr', target:7000, start:3500, createdAt:'2026-10-01'})");
     check('a big goal is measured against its target (3.5k MRR of 7k = 50%, not from where you started)', Math.round(await E("goalPct(state.goals.items.find(g=>g.id==='gm'))"))===50);
     await E("openGoalSheet('long'); ui.gsTrack='own'; goalSheetRefresh()"); await p.waitForTimeout(200);

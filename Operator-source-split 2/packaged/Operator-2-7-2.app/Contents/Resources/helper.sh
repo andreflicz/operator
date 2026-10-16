@@ -26,6 +26,7 @@ FIN_KEY_FILE="$DATA_DIR/simplefin.url"
 MC_KEY_FILE="$DATA_DIR/metricool.key"
 # Apify (public Instagram numbers through Apify's Instagram scraper; free plan): the API token, same rules
 AP_KEY_FILE="$DATA_DIR/apify.key"
+ZN_KEY_FILE="$DATA_DIR/zernio.key"
 
 hexdec() { printf '%b' "$(printf '%s' "$1" | sed 's/../\\x&/g')"; }
 param() { printf '%s' "$REQ_PATH" | sed -n "s/.*[?&]$1=\([0-9a-zA-Z._-]*\).*/\1/p"; }
@@ -476,6 +477,33 @@ wake_respond() {
       CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
       case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":"could not reach Apify"}' ;; esac
       [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach Apify"}'; }
+      respond "$CODE" "$BODY" ;;
+    # Zernio: your Instagram (and other) accounts through Zernio's own Meta connection: followers, and
+    # every post with reach, likes, comments, saves, shares and views (post numbers need Zernio's
+    # analytics add-on). Read-only: only the accounts list and analytics are ever asked for. The API key
+    # stays in this file; the page never sees it.
+    /zn/key*)
+      T=$(hexdec "$(param t)")
+      case "$T" in ''|*[!A-Za-z0-9_-]*) respond 400 '{"ok":false,"error":"That doesn’t look like a Zernio API key (it starts with sk_)."}'; return ;; esac
+      OUT=$(curl -sS --max-time 20 -H "Authorization: Bearer $T" -w '\n%{http_code}' "https://zernio.com/api/v1/accounts" 2>&1)
+      CODE=$(printf '%s' "$OUT" | tail -n 1)
+      case "$CODE" in
+        200) ( umask 077; printf '%s\n' "$T" > "$ZN_KEY_FILE" ); chmod 600 "$ZN_KEY_FILE" 2>/dev/null; respond 200 '{"ok":true}' ;;
+        401|403) respond 401 '{"ok":false,"error":"Zernio didn’t accept that key."}' ;;
+        *) ( umask 077; printf '%s\n' "$T" > "$ZN_KEY_FILE" ); chmod 600 "$ZN_KEY_FILE" 2>/dev/null; respond 200 '{"ok":true,"unchecked":true}' ;;
+      esac ;;
+    /zn/forget*) rm -f "$ZN_KEY_FILE"; respond 200 '{"ok":true}' ;;
+    /zn/status*) if [ -s "$ZN_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
+    /zn/api*)
+      P=$(hexdec "$(param p)")
+      case "$P" in /v1/accounts|/v1/accounts\?*|/v1/accounts/follower-stats\?*|/v1/analytics\?*) ;; *) respond 400 '{"error":"bad path"}'; return ;; esac
+      case "$P" in *..*|*@*|*" "*|*'"'*|*\\*) respond 400 '{"error":"bad path"}'; return ;; esac
+      if [ ! -s "$ZN_KEY_FILE" ]; then respond 401 '{"error":"no Zernio key saved"}'; return; fi
+      ZT=$(sed -n 1p "$ZN_KEY_FILE")
+      OUT=$(curl -sS --max-time 40 -H "Authorization: Bearer $ZT" -w '\n%{http_code}' "https://zernio.com/api$P" 2>&1)
+      CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
+      case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":"could not reach Zernio"}' ;; esac
+      [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach Zernio"}'; }
       respond "$CODE" "$BODY" ;;
     /mc/status*) if [ -s "$MC_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
     /mc/api*)

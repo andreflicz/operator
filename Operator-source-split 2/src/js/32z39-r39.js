@@ -346,6 +346,21 @@ afterRenderHooks.push(function(){
   const x = xpSummary(), p = state.profile;
   if(x.rankReady && p.rankReadyFor!==x.rankReady){ p.rankReadyFor = x.rankReady; persist('profile'); if(typeof sysNote==='function') setTimeout(function(){ sysNote('Rank up: '+RANKS[x.rankReady].name+'. Claim it.'); }, 900); if(typeof notifBadge==='function') notifBadge(); }
 });
+// (the card and the level pop-over showed the button only when a level was waiting too)
+playerCardHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), x = xpSummary();
+    if(x.canLevel || !x.rankReady) return h;
+    return h.replace(/(<div class="pcf)([^"]*)("[^>]*>)/, '$1$2 has-lvlup$3'+rankUpBtnHtml('card'));
+  };
+})(playerCardHtml);
+lvlPopHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), x = xpSummary();
+    if(x.canLevel || !x.rankReady) return h;
+    return h.replace('<div class="lp-stats">', '<div class="lp-up">'+rankUpBtnHtml('pop')+'</div><div class="lp-stats">');
+  };
+})(lvlPopHtml);
 ACTIONS.rankUp = function(){
   const x = xpSummary(); if(!x.rankReady){ renderView(); return; }
   const to = x.rankReady, from = state.profile.rankClaimed;
@@ -753,3 +768,164 @@ renderWeekendOffView = (function(base){
       .replace(/(<button class="dayoff-back" data-action="clockIn">)Clock in/, '$1'+r39Ico('lock')+'Clock in');
   };
 })(renderWeekendOffView);
+
+// ---- 24. the Goals page, redone ----
+// Revenue is a slim strip across the top (not half the page). Under it, three even columns by time:
+// Master (the long game), This month and This week, each with its rings and its goals, so the split is
+// obvious. Customize sits on the page's own bar, top right. Your own goals are cards in a grid.
+function g39RevHtml(m){
+  const pct = masterPct(m);
+  return '<section class="g39-rev" style="--mg1:'+m.color+';--mg2:'+m.color2+';">'+
+    '<div class="g39-rev-l"><span class="g39-k">&#128176; '+m.label+'</span><div class="g39-rev-n"><b>'+m.fmt(m.cur)+'</b><span>'+m.suffix+'</span>'+masterTargetHtml(m)+'</div></div>'+
+    '<div class="g39-rev-m"><div class="mg-bar"><div class="mg-bar-fill" style="width:'+pct.toFixed(1)+'%"></div>'+[25, 50, 75].map(function(t){ return '<span class="mg-tick'+(pct >= t ? ' is-past' : '')+'" style="left:'+t+'%"></span>'; }).join('')+'</div>'+
+      '<div class="g39-rev-f"><span>'+escapeHtml(masterToGo(m))+'</span><span>'+escapeHtml(m.src || '')+'</span></div></div>'+
+    '<div class="g39-rev-r"><b>'+Math.round(pct)+'%</b>'+masterXpTag(m)+'</div>'+
+  '</section>';
+}
+function g39ColHtml(kind, rings){
+  const ringHtml = rings.length ? '<div class="g39-rings">'+rings.join('')+'</div>' : '';
+  if(kind==='master'){
+    return '<section class="g39-col is-master"><div class="g39-col-h"><b>Master</b><small>The long game</small></div>'+
+      (ringHtml || '<div class="g39-none">Nothing here yet. Customize turns these on, or the + adds a big goal of your own.</div>')+'</section>';
+  }
+  // the week and the month: their own card's header (with its check-in pencil) heads the column
+  const tpl = document.createElement('template'); tpl.innerHTML = tierCardHtml(kind, {add:'sheet'});
+  const card = tpl.content.firstElementChild;
+  if(card){
+    const head = card.querySelector('.tg-h'), sub = card.querySelector('.tg-sub');
+    if(head){ const k = head.querySelector('.tg-k'); if(k) k.insertAdjacentHTML('afterend', '<small class="g39-when">'+(kind==='month' ? 'This month' : fmtDateShort(startOfWeekStr(todayStr()))+' – '+fmtDateShort(addDays(startOfWeekStr(todayStr()), 6)))+'</small>'); }
+    if(ringHtml){ const at = sub || head; if(at) at.insertAdjacentHTML('afterend', ringHtml); }
+    const empty = card.querySelector('.tg-empty'); if(empty) empty.textContent = kind==='month' ? 'No goals for the month yet. The ✎ checks you in.' : 'No goals for the week yet. The ✎ checks you in.';
+  }
+  const hist = typeof tierHistoryHtml==='function' ? tierHistoryHtml(kind, kind==='month' ? 6 : 8) : '';
+  return '<section class="g39-col is-'+kind+'">'+tpl.innerHTML+(hist ? '<div class="g39-hist"><small>'+(kind==='month' ? 'Past months' : 'Past weeks')+'</small>'+hist+'</div>' : '')+'</section>';
+}
+renderGoalsTab = function(){
+  const hide = mgHidden(), vis = function(m){ return !hide[m.key]; };
+  const defs = masterGoalDefs(), mine = arr(state.goals && state.goals.items).filter(function(g){ return g.master && !g.tier; });
+  const items = state.goals.items.filter(function(g){ return !g.tier && !g.master; });
+  const open = items.filter(function(g){ return !g.done; }).sort(function(a, b){ return (a.deadline || '9999').localeCompare(b.deadline || '9999'); });
+  const done = items.filter(function(g){ return g.done; });
+  const master = defs.slice(1).filter(function(m){ return (MG_PERIOD[m.key] || 'master')==='master' && vis(m); }).map(function(m){ return masterRingHtml(m, false); })
+    .concat(mine.filter(function(g){ return !hide['g:'+g.id]; }).map(userMasterRingHtml));
+  const month = mgMonthlyDefs().filter(vis).map(function(m){ return masterRingHtml(m, false).replace(/<span class="mg-xp[\s\S]*?<\/span>/, ''); });
+  const week = defs.filter(function(m){ return MG_PERIOD[m.key]==='week' && vis(m); }).map(function(m){ return masterRingHtml(m, false); });
+  return '<div class="gl gx g39">'+
+    '<div class="g39-bar">'+opTipHtml('goals')+'<button class="g39-cust" data-action="mgCustomize" title="Pick which master goals show and set their targets"><span>&#9881;&#65038;</span> Customize</button></div>'+
+    (defs[0] && vis(defs[0]) ? g39RevHtml(defs[0]) : '')+
+    '<div class="g39-cols">'+g39ColHtml('master', master)+g39ColHtml('month', month)+g39ColHtml('week', week)+'</div>'+
+    '<section class="g39-mine"><div class="g39-mine-h"><b>Your goals</b>'+(open.length ? '<span class="g39-count">'+open.length+'</span>' : '')+'<small>Things you want, with or without a number</small><span style="flex:1"></span>'+
+      (done.length ? '<button class="gx-ach" data-action="toggleForm" data-form="goalsDone">'+(ui.forms.goalsDone ? '&#9662;' : '&#9656;')+' Achieved '+done.length+'</button>' : '')+'</div>'+
+      (open.length ? '<div class="g39-grid">'+open.map(gxGoalRowHtml).join('')+'</div>' : '<div class="g39-none">Nothing of your own yet. The + in the corner adds one.</div>')+
+      (done.length && ui.forms.goalsDone ? '<div class="g39-grid is-done">'+done.map(gxGoalRowHtml).join('')+'</div>' : '')+
+    '</section>'+
+  '</div>';
+};
+
+// ---- 23. Zernio: your Meta numbers through Zernio ----
+// Zernio holds the approved connection to Instagram, so there's no Meta developer app: paste a Zernio
+// API key (zernio.com → Settings → API keys) once, pick the account, and Operator reads your followers
+// and every post with reach, likes, comments, saves, shares and views (post numbers need Zernio's
+// analytics add-on; without it the followers still come through). Read-only, and the key stays in the
+// Operator app's file on this Mac (never in the app's data).
+const ZN_FRESH = 3*3600000;
+async function znApi(path){
+  const r = await fetchWithin(WAKE_HELPER+'zn/api?p='+hexUtf8(path), 45000);
+  let j = null; try{ j = r ? await r.json() : null; }catch(e){}
+  if(!r || !r.ok || !j) throw new Error((j && ((j.error && (j.error.message || j.error)) || j.message)) || (r ? 'Zernio said no ('+r.status+')' : 'the Operator app isn’t answering'));
+  return j;
+}
+function znPost(p){
+  const a = p.analytics || {}, t = Date.parse(p.publishedAt || p.createdAt || ''), when = isFinite(t) ? new Date(t) : null;
+  const kind = String(p.mediaProductType || p.mediaType || '').toUpperCase();
+  return {id:String(p._id || p.platformPostUrl || Math.random()), cap:String(p.content || '').slice(0, 140), type:/REEL/.test(kind) ? 'REELS' : kind,
+    at:when ? when.toISOString() : '', date:when ? ds2(when) : '', likes:socNum(a.likes) || 0, comments:socNum(a.comments) || 0,
+    views:socNum(a.views, a.plays, a.videoViews), reach:socNum(a.reach), saves:socNum(a.saves, a.saved), shares:socNum(a.shares),
+    link:p.platformPostUrl || '', thumb:p.thumbnailUrl || ''};
+}
+async function znLoadAccount(a){
+  const c = igCfg(); if(!c.znData || typeof c.znData!=='object') c.znData = {};
+  const prev = c.znData[a.id];
+  if(prev && !ui.znForce && Date.now() - (prev.at || 0) < ZN_FRESH) return prev;
+  const list = await znApi('/v1/accounts?platform=instagram');
+  const acc = arr(list.accounts).find(function(x){ return x._id===a.znId; });
+  if(!acc && !prev) throw new Error('Zernio doesn’t have @'+a.username+' any more. Connect it again in Zernio.');
+  let posts = prev ? arr(prev.posts) : [], noAnalytics = list.hasAnalyticsAccess===false;
+  if(!noAnalytics){
+    const to = todayStr(), from = addDays(to, -90);
+    try{
+      const an = await znApi('/v1/analytics?accountId='+encodeURIComponent(a.znId)+'&fromDate='+from+'&toDate='+to);
+      const fresh = arr(an.posts || an.data).map(znPost).filter(function(x){ return x.date; });
+      const seen = {};
+      posts = fresh.concat(posts).filter(function(x){ if(seen[x.id]) return false; seen[x.id] = 1; return true; }).sort(function(x, y){ return y.date.localeCompare(x.date); }).slice(0, 400);
+    }catch(e){ if(/analytics|add-?on|upgrade|plan|402|403/i.test(e.message)) noAnalytics = true; else if(!prev) throw e; }
+  }
+  const d = {username:(acc && acc.username) || a.username, followers:acc ? Number(acc.followersCount) || 0 : (prev ? prev.followers : 0), posts:posts, at:Date.now(), noAnalytics:noAnalytics};
+  c.znData[a.id] = d; persist('settings');
+  return d;
+}
+igLoadAccount = (function(base){
+  return function(acc){ return socialSrc(acc)==='zernio' ? znLoadAccount(acc) : base.apply(this, arguments); };
+})(igLoadAccount);
+function znAddAccount(x){
+  const c = igCfg(), role = ui.socRole || 'business', id = 'zernio-'+x._id;
+  c.accounts = c.accounts.filter(function(a){ return a.id!==id; });
+  c.accounts.push({id:id, src:'zernio', role:role, znId:x._id, username:x.username || x.displayName || 'instagram'});
+  persist('settings'); ui.znPick = null; ui.socBusy = false; ui.igTried = 0; ui.znForce = true;
+  showToast('Reading @'+(x.username || 'your account')+' through Zernio.', {icon:'&#128202;'});
+  igRefresh(false).then(function(){ ui.znForce = false; if(ui.igErr && !(c.znData && c.znData[id])){ ui.socErr = ui.igErr; c.accounts = c.accounts.filter(function(a){ return a.id!==id; }); persist('settings'); renderView(); } else showToast('@'+(x.username || 'Your account')+' is connected through Zernio.', {icon:'&#128202;'}); });
+}
+ACTIONS.znConnect = async function(){
+  const el = document.getElementById('znKey'), key = el ? el.value.trim() : '';
+  ui.socErr = null; ui.socBusy = true; renderView();
+  if(key){
+    const r = await fetchWithin(WAKE_HELPER+'zn/key?t='+hexUtf8(key), 25000);
+    let j = null; try{ j = r ? await r.json() : null; }catch(e){}
+    if(!r || !r.ok){ ui.socBusy = false; ui.socErr = j && j.error ? j.error : r ? 'The Operator app didn’t take that.' : 'The Operator app isn’t answering. Open Operator from its icon.'; renderView(); return; }
+  } else {
+    const s = await fetchWithin(WAKE_HELPER+'zn/status', 8000); let j = null; try{ j = s ? await s.json() : null; }catch(e){}
+    if(!j || !j.hasKey){ ui.socBusy = false; ui.socErr = 'Paste your Zernio API key first (zernio.com → Settings → API keys).'; renderView(); const k = document.getElementById('znKey'); if(k) k.focus(); return; }
+  }
+  let list;
+  try{ list = await znApi('/v1/accounts?platform=instagram'); }catch(e){ ui.socBusy = false; ui.socErr = e.message; renderView(); return; }
+  const accs = arr(list.accounts).filter(function(x){ return !x.platform || x.platform==='instagram'; });
+  if(!accs.length){ ui.socBusy = false; ui.socErr = 'Zernio has no Instagram account yet. Connect it in Zernio (Accounts → Instagram), then come back.'; renderView(); return; }
+  if(accs.length===1){ znAddAccount(accs[0]); return; }
+  ui.socBusy = false; ui.znPick = accs.map(function(x){ return {_id:x._id, username:x.username, displayName:x.displayName, followersCount:x.followersCount}; }); renderView();
+};
+ACTIONS.znPick = function(el, e, id){ const x = arr(ui.znPick).find(function(a){ return a._id===id; }); if(x) znAddAccount(x); };
+ACTIONS.znRefresh = async function(){ if(ui.igLoading) return; ui.znForce = true; ui.igTried = 0; await igRefresh(false); ui.znForce = false; };
+ACTIONS.socRemove = (function(base){
+  return function(el, e, id){ const c = igCfg(); if(c.znData) delete c.znData[id]; return base.apply(this, arguments); };
+})(ACTIONS.socRemove);
+// the Zernio option sits first in the list: it's the one with every number
+socialConnectHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), sh = ui.socShow;
+    const pick = ui.znPick ? '<div class="zn-pick">'+ui.znPick.map(function(x){ return '<button class="zn-acc" data-action="znPick" data-id="'+escapeHtml(x._id)+'"><b>@'+escapeHtml(x.username || x.displayName || '')+'</b>'+(x.followersCount!=null ? '<small>'+Number(x.followersCount).toLocaleString()+' followers</small>' : '')+'</button>'; }).join('')+'</div>' : '';
+    const opt = '<div class="soc-opt'+(sh==='zn' || ui.znPick ? ' is-open' : '')+'"><button class="soc-opt-h" data-action="socShow" data-id="zn"><span>&#127760;</span><div><b>Zernio <em class="soc-free">every number</em></b><small>Live, through Zernio’s own Meta connection: followers, and every post with reach, saves, shares, likes, comments and views. No Meta developer app.</small></div></button>'+
+      (sh==='zn' || ui.znPick ? '<div class="soc-form">'+(ui.znPick ? '<div class="soc-hint">Which account?</div>'+pick :
+        '<input class="input" id="znKey" placeholder="Zernio API key, sk_… (only the first time)">'+
+        '<div class="soc-hint">In Zernio: connect your Instagram (Accounts), then Settings → API keys → create one. It’s kept in the Operator app on this Mac, never in your data. Post numbers need Zernio’s analytics add-on; without it you still get followers.</div>'+
+        '<button class="btn btn-primary" data-action="znConnect"'+(ui.socBusy ? ' disabled' : '')+'>'+(ui.socBusy ? 'Connecting…' : 'Connect')+'</button>')+'</div>' : '')+'</div>';
+    return h.replace('<div class="soc-opts">', '<div class="soc-opts">'+opt);
+  };
+})(socialConnectHtml);
+socialSourcesHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), c = igCfg(), zs = c.accounts.filter(function(a){ return socialSrc(a)==='zernio'; });
+    if(!zs.length) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    zs.forEach(function(a){
+      const d = c.znData && c.znData[a.id];
+      const row = '<div class="soc-src"><span class="soc-src-k">&#127760; Zernio &middot; @'+escapeHtml((d && d.username) || a.username)+' &middot; '+(a.role==='business' ? 'Business' : 'Personal')+(d ? ' <small class="soc-when">checked '+escapeHtml(fmtAgo(d.at))+'</small>' : '')+(d && d.noAnalytics ? ' <small class="soc-when">followers only (no analytics add-on)</small>' : '')+'</span>'+
+        '<button class="btn btn-ghost btn-sm" data-action="znRefresh"'+(ui.igLoading ? ' disabled' : '')+'>'+(ui.igLoading ? 'Checking…' : 'Refresh now')+'</button>'+
+        '<button class="btn btn-ghost btn-sm soc-x" data-action="socRemove" data-id="'+a.id+'">Remove</button></div>';
+      // (the base shows it as "Meta": swap in its own row)
+      const btn = Array.prototype.find.call(tpl.content.querySelectorAll('[data-action="socRemove"]'), function(b){ return b.dataset.id===a.id; });
+      const old = btn && btn.closest('.soc-src'); if(!old) return;
+      const nt = document.createElement('template'); nt.innerHTML = row; old.replaceWith(nt.content.firstElementChild);
+    });
+    return tpl.innerHTML;
+  };
+})(socialSourcesHtml);
