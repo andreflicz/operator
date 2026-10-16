@@ -529,6 +529,17 @@ wake_respond() {
       T=$(hexdec "$(param t)")
       if [ -n "$T" ]; then ( umask 077; printf '%s' "$T" > "$TTS_KEY_FILE" ); chmod 600 "$TTS_KEY_FILE" 2>/dev/null; respond 200 '{"ok":true}'; else respond 400 '{"ok":false}'; fi ;;
     /tts/forget*) rm -f "$TTS_KEY_FILE"; rm -rf "$TTS_DIR"; respond 200 '{"ok":true}' ;;
+    # speech to text with ElevenLabs Scribe (the same key as Op's voice): the clip the page recorded comes
+    # in as the request body (bridge.pl saved it to OP_BODY); the words go back. Nothing is kept.
+    /stt*)
+      if [ ! -s "$TTS_KEY_FILE" ]; then respond 401 '{"error":"no ElevenLabs key"}'; return; fi
+      if [ -z "$OP_BODY" ] || [ ! -s "$OP_BODY" ]; then respond 400 '{"error":"no audio"}'; return; fi
+      L=$(param lang); case "$L" in ''|*[!a-z]*) L="" ;; esac
+      OUT=$(curl -sS --max-time 50 -X POST -H "xi-api-key: $(cat "$TTS_KEY_FILE")" -F "model_id=scribe_v1" -F "tag_audio_events=false" ${L:+-F "language_code=$L"} -F "file=@$OP_BODY;type=audio/webm;filename=clip.webm" -w '\n%{http_code}' "https://api.elevenlabs.io/v1/speech-to-text" 2>&1)
+      CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
+      case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":"could not reach ElevenLabs"}' ;; esac
+      [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach ElevenLabs"}'; }
+      respond "$CODE" "$BODY" ;;
     /tts/status*) if [ -s "$TTS_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
     /sports*)
       # NFL / NBA / MLB / NHL scores and schedules (ESPN's public scoreboard) for Good morning

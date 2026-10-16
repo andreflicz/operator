@@ -24,15 +24,30 @@ while (1) {
     $line =~ s/\r?\n$//;
     # a connection that opens and says nothing (Chrome warming one up) gets nothing done
     if ($line !~ m{^[A-Z]+ /\S* HTTP}) { close $c; exit 0; }
-    while (my $h = <$c>) { last if $h =~ /^\r?\n$/; }
+    my $clen = 0;
+    while (my $h = <$c>) { last if $h =~ /^\r?\n$/; $clen = $1 if $h =~ /^Content-Length:\s*(\d+)/i; }
     if ($line =~ /^OPTIONS /) {
       print $c "HTTP/1.1 204 No Content\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: GET, POST, OPTIONS\r\nAccess-Control-Allow-Headers: Content-Type\r\nContent-Length: 0\r\nConnection: close\r\n\r\n";
       close $c; exit 0;
+    }
+    # a POST with a body (a voice clip for speech to text): read it into a private temp file the
+    # helper can find in OP_BODY (at most 20 MB), and delete it after
+    my $bodyf = '';
+    if ($line =~ /^POST / && $clen > 0 && $clen <= 20*1024*1024) {
+      my $dir = $ENV{TMPDIR} || '/tmp';
+      $bodyf = "$dir/op-body-$$-".time().".bin";
+      if (open(my $bf, '>:raw', $bodyf)) {
+        chmod 0600, $bodyf;
+        binmode $c; my $left = $clen; my $buf;
+        while ($left > 0) { my $n = read($c, $buf, $left > 65536 ? 65536 : $left); last unless $n; print $bf $buf; $left -= $n; }
+        close $bf; $ENV{OP_BODY} = $bodyf;
+      } else { $bodyf = ''; }
     }
     my $resp = '';
     if (open(my $out, '-|', '/bin/bash', $helper, $kind, $line)) {
       local $/; $resp = <$out>; close $out;
     }
+    unlink $bodyf if $bodyf;
     $resp = "HTTP/1.1 500 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: 2\r\nConnection: close\r\n\r\n{}" unless defined $resp && length $resp;
     print $c $resp;
     close $c;

@@ -7268,6 +7268,7 @@ body:has(#lockSeqOverlay:not(.hidden)) #activityPill{ opacity:0 !important; poin
 .dvc-wkp{ display:inline-flex; align-items:center; height:20px; padding:0 9px; border-radius:999px; font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#fff; background:var(--dlv); box-shadow:0 0 12px rgba(var(--dlv-rgb),.45); }
 .task-card.dvc .dvc-foot{ padding-top:2px; }
 .tl-row.tl-dlv .tl-main{ align-items:center; }
+.dvc-due{ margin-left:auto; white-space:nowrap; } .dvc-due .kpi-sub{ font-size:11.5px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -39543,6 +39544,7 @@ taskCard = (function(base){
     // just the three things: the week, the deliverable, the client
     card.innerHTML = '<div class="dvc-top"><span class="dvc-wkp">'+dvwWeekLabel(v)+'</span>'+(more ? more.outerHTML : '')+'</div>'+
       '<div class="dvc-title">'+escapeHtml(v.name)+'</div>'+
+      '<div class="dvc-wk">'+(v.of ? dvwDotsHtml(v) : '')+(due ? '<span class="dvc-due">'+due.outerHTML+'</span>' : '')+'</div>'+
       '<div class="dvc-foot">'+dvwWhoHtml(v)+'</div>';
     return tpl.innerHTML;
   };
@@ -39558,8 +39560,7 @@ lineupListHtml = (function(base){
       const v = dvwView(t); if(!v) return;
       row.classList.add('tl-dlv');
       const main = row.querySelector('.tl-main');
-      if(main) main.innerHTML = '<span class="dvc-wkp">'+dvwWeekLabel(v)+'</span><span class="tl-title">'+escapeHtml(v.name)+'</span>';
-      row.querySelectorAll('.kpi-sub').forEach(function(e){ e.remove(); });
+      if(main) main.innerHTML = '<span class="dvc-wkp">'+dvwWeekLabel(v)+'</span><span class="tl-title">'+escapeHtml(v.name)+'</span>'+(v.of ? '<span class="dvc-wk is-inline">'+dvwDotsHtml(v)+'</span>' : '');
       row.querySelectorAll('.tag-client').forEach(function(e, i){ if(i===0){ const w = document.createElement('template'); w.innerHTML = dvwWhoHtml(v); e.replaceWith(w.content.firstElementChild); } else e.remove(); });
     });
     return tpl.innerHTML;

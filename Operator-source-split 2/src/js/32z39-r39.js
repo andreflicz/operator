@@ -28,6 +28,7 @@ taskCard = (function(base){
     // just the three things: the week, the deliverable, the client
     card.innerHTML = '<div class="dvc-top"><span class="dvc-wkp">'+dvwWeekLabel(v)+'</span>'+(more ? more.outerHTML : '')+'</div>'+
       '<div class="dvc-title">'+escapeHtml(v.name)+'</div>'+
+      '<div class="dvc-wk">'+(v.of ? dvwDotsHtml(v) : '')+(due ? '<span class="dvc-due">'+due.outerHTML+'</span>' : '')+'</div>'+
       '<div class="dvc-foot">'+dvwWhoHtml(v)+'</div>';
     return tpl.innerHTML;
   };
@@ -43,8 +44,7 @@ lineupListHtml = (function(base){
       const v = dvwView(t); if(!v) return;
       row.classList.add('tl-dlv');
       const main = row.querySelector('.tl-main');
-      if(main) main.innerHTML = '<span class="dvc-wkp">'+dvwWeekLabel(v)+'</span><span class="tl-title">'+escapeHtml(v.name)+'</span>';
-      row.querySelectorAll('.kpi-sub').forEach(function(e){ e.remove(); });
+      if(main) main.innerHTML = '<span class="dvc-wkp">'+dvwWeekLabel(v)+'</span><span class="tl-title">'+escapeHtml(v.name)+'</span>'+(v.of ? '<span class="dvc-wk is-inline">'+dvwDotsHtml(v)+'</span>' : '');
       row.querySelectorAll('.tag-client').forEach(function(e, i){ if(i===0){ const w = document.createElement('template'); w.innerHTML = dvwWhoHtml(v); e.replaceWith(w.content.firstElementChild); } else e.remove(); });
     });
     return tpl.innerHTML;
