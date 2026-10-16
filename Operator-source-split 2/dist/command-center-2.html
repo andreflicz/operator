@@ -7394,6 +7394,17 @@ body.opf-on .activity-pill{ opacity:0 !important; pointer-events:none !important
 #viewRoot .tab-panel .subtab-panel{ animation:none; }
 #recapOverlay #recapContent{ animation:none; }
 #recapOverlay.is-opening #recapContent{ animation:rcOpen .48s cubic-bezier(.2,.8,.2,1) both; }
+/* R39: That's the day: line icons and the quote */
+.dayoff-row.is-btns .dayoff-back{ display:inline-flex; align-items:center; justify-content:center; gap:9px; }
+.r39-ico{ display:inline-flex; width:18px; height:18px; flex:none; }
+.r39-ico svg{ width:100%; height:100%; fill:none; stroke:#fff; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 1px 2px rgba(0,0,0,.25)); }
+.dayoff-row.is-btns .dayoff-back.is-main{ color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.2); }
+.dayoff-row.is-btns .dayoff-back.is-sun{ color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.25); }
+.rd-slide .qt.is-rest{ display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:150px; padding:6px 10px 0; color:#f3f5fb; text-align:center; }
+.rd-slide .qt.is-rest blockquote{ font-size:clamp(18px, 1.7vw, 22px); line-height:1.5; }
+.rd-slide .qt.is-rest figcaption{ justify-content:center; margin-top:12px; }
+.rd-slide .qt.is-rest .qt-next{ display:none; }
+.rd-slide:has(.qt.is-rest) .rd-k{ text-align:center; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -40324,6 +40335,76 @@ afterRenderHooks.unshift(function(){
   // (the class stays until the next change: taking it off would restart the fade, a second opening)
   v.classList.toggle('r39-tab', sameView && ui._r33Key!=null);
 });
+
+// ---- 19–20. That's the day: line icons on the buttons (a lock, a gear, a moon, drawn in white like the
+// rest of the page), and the quote changes (a different one each time it comes round, never the same one
+// all day), centred and set like Good morning's ----
+const R39_ICON = {
+  lock:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><path d="M12 15v2"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  moon:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
+  sun:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
+};
+function r39Ico(k){ return '<i class="r39-ico">'+R39_ICON[k]+'</i>'; }
+const EVENING_QUOTES = [
+  ['Rest is not idleness.', 'John Lubbock'],
+  ['Almost everything will work again if you unplug it for a few minutes, including you.', 'Anne Lamott'],
+  ['The day is done. Let it be done.', ''],
+  ['You did enough today. Tomorrow gets the rest.', ''],
+  ['Finish each day and be done with it. You have done what you could.', 'Ralph Waldo Emerson'],
+  ['Tension is who you think you should be. Relaxation is who you are.', 'Chinese proverb'],
+  ['The time to relax is when you don’t have time for it.', 'Sydney J. Harris'],
+  ['Each night, when I go to sleep, I die. And the next morning, when I wake up, I am reborn.', 'Gandhi'],
+  ['Work hard in silence. Rest without guilt.', ''],
+  ['Sleep is the best meditation.', 'Dalai Lama'],
+  ['What you did today counts. So does stopping.', ''],
+  ['Be proud of the small wins. They add up quietly.', ''],
+  ['Your future self is built in the evenings you protect.', ''],
+  ['Slow down and everything you are chasing will come around and catch you.', 'John De Paola'],
+  ['The best bridge between despair and hope is a good night’s sleep.', 'E. Joseph Cossman'],
+  ['Discipline is choosing between what you want now and what you want most.', 'Abraham Lincoln'],
+  ['Nature does not hurry, yet everything is accomplished.', 'Lao Tzu'],
+  ['Tomorrow is a new day, with no mistakes in it yet.', 'L. M. Montgomery']
+];
+QUOTE_SETS.evening = function(){ return EVENING_QUOTES; };
+// a different one every time the page opens, not one a day
+afterRenderHooks.push(function(){
+  const on = !!document.querySelector('.dayoff.is-clockedout');
+  if(on && !ui._r39Off){ ui.qOff = ui.qOff || {}; ui.qOff.evening = Math.floor(Math.random()*EVENING_QUOTES.length); }
+  ui._r39Off = on;
+});
+restDeckSlides = (function(base){
+  return function(early){
+    const s = base.apply(this, arguments);
+    if(early) return s;
+    return s.map(function(x){
+      if(!/Something to carry/.test(x.k)) return x;
+      return {k:x.k, html:quoteHtml(quoteFor('evening'), 'is-ring is-rest', 'evening')};
+    });
+  };
+})(restDeckSlides);
+// each time the deck comes back round to the quote, it's a new one
+rdMove = (function(base){
+  return function(to){
+    const rd = document.querySelector('.rd');
+    if(rd){
+      const n = Number(rd.dataset.n) || 1, i = ((to % n) + n) % n, cur = ui.rdIdx || 0;
+      const slide = rd.querySelectorAll('.rd-slide')[i];
+      if(i!==cur && slide && slide.querySelector('.qt[data-q="evening"]')) nextQuote('evening');
+    }
+    return base.apply(this, arguments);
+  };
+})(rdMove);
+renderWeekendOffView = (function(base){
+  return function(){
+    return base.apply(this, arguments)
+      .replace(/(<button class="dayoff-back is-main" data-action="clockIn">)(Clock back in|Clock in)/, '$1'+r39Ico('lock')+'$2')
+      .replace(/(<button class="dayoff-back" data-action="openWindDown" data-step="plan">)&#127769; /, '$1'+r39Ico('gear'))
+      .replace(/(<button class="dayoff-back is-sleep"[^>]*>)&#127769; /, '$1'+r39Ico('moon'))
+      .replace(/(<button class="dayoff-back is-main is-sun"[^>]*>)&#9728;&#65039; /, '$1'+r39Ico('sun'))
+      .replace(/(<button class="dayoff-back" data-action="clockIn">)Clock in/, '$1'+r39Ico('lock')+'Clock in');
+  };
+})(renderWeekendOffView);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
