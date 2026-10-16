@@ -563,7 +563,7 @@ wake_respond() {
       if [ ! -s "$TTS_KEY_FILE" ]; then respond 401 '{"error":"no ElevenLabs key"}'; return; fi
       if [ -z "$OP_BODY" ] || [ ! -s "$OP_BODY" ]; then respond 400 '{"error":"no audio"}'; return; fi
       L=$(param lang); case "$L" in ''|*[!a-z]*) L="" ;; esac
-      OUT=$(curl -sS --max-time 50 -X POST -H "xi-api-key: $(cat "$TTS_KEY_FILE")" -F "model_id=scribe_v1" -F "tag_audio_events=false" ${L:+-F "language_code=$L"} -F "file=@$OP_BODY;type=audio/webm;filename=clip.webm" -w '\n%{http_code}' "https://api.elevenlabs.io/v1/speech-to-text" 2>&1)
+      OUT=$(curl -sS --max-time 130 -X POST -H "xi-api-key: $(cat "$TTS_KEY_FILE")" -F "model_id=scribe_v1" -F "tag_audio_events=false" ${L:+-F "language_code=$L"} -F "file=@$OP_BODY;type=audio/webm;filename=clip.webm" -w '\n%{http_code}' "https://api.elevenlabs.io/v1/speech-to-text" 2>&1)
       CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
       case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":"could not reach ElevenLabs"}' ;; esac
       [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach ElevenLabs"}'; }

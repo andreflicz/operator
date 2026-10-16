@@ -33,6 +33,8 @@ while (1) {
     # a POST with a body (a voice clip for speech to text): read it into a private temp file the
     # helper can find in OP_BODY (at most 20 MB), and delete it after
     my $bodyf = '';
+    # (a long voice clip takes longer to send and transcribe than a normal request)
+    alarm 150 if $line =~ /^POST /;
     if ($line =~ /^POST / && $clen > 0 && $clen <= 20*1024*1024) {
       my $dir = $ENV{TMPDIR} || '/tmp';
       $bodyf = "$dir/op-body-$$-".time().".bin";

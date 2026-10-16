@@ -166,3 +166,118 @@ ACTIONS.lockoutMore = function(){
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(k){ document.addEventListener(k, function(e){ if(btn && (k!=='pointerleave' || e.target===btn)) stop(); }, true); });
   document.addEventListener('keydown', function(e){ if(e.key==='Escape' && overlayOpen('stopFocusOverlay')){ closeStopFocus(); } });
 })();
+
+// ---- Op hears all of a long message ----
+// He stopped at 60 seconds and after a short pause, and quiet words counted as silence, so long thoughts
+// got cut off. Now: up to 5 minutes, the pause he waits out grows the longer you've been talking (up to
+// ~3.5 s more), quieter speech still counts once you've started, and a long clip gets the time it needs
+// to be sent and written out. Tap the mic any time to send it right away.
+scribeListen = async function(cap){
+  if(AI.listening){ if(AI.sendNow) AI.sendNow(); return; }
+  if(typeof opStop==='function') opStop();
+  const heyWas = typeof HW!=='undefined' && HW.on; if(heyWas && typeof heyStop==='function') heyStop();
+  OV.cap = cap || 'opBubText'; AI.listening = true; AI.typedAt = 0; aiUiRefresh(); opCaption('Listening…');
+  let stream = null;
+  try{ stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true, autoGainControl:true, channelCount:1}}); }
+  catch(e){ AI.listening = false; aiUiRefresh(); opCaption(e && e.name==='NotAllowedError' ? 'I need the microphone. Allow it for Operator (or type instead).' : 'The mic isn’t working: type instead.'); return; }
+  const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '');
+  const rec = new MediaRecorder(stream, mime ? {mimeType:mime} : undefined), chunks = [];
+  rec.ondataavailable = function(e){ if(e.data && e.data.size) chunks.push(e.data); };
+  let ctx = null, an = null, buf = null;
+  try{ ctx = new (window.AudioContext || window.webkitAudioContext)(); an = ctx.createAnalyser(); an.fftSize = 1024; ctx.createMediaStreamSource(stream).connect(an); buf = new Float32Array(an.fftSize); }catch(e){}
+  let floor = 0.006, spoke = false, lastLoud = Date.now(), why = null, talked = 0; AI._longWarn = false;
+  const t0 = Date.now();
+  const finish = function(reason){ if(why) return; why = reason; clearInterval(tick); try{ if(rec.state!=='inactive') rec.stop(); }catch(e){ rec.onstop(); } };
+  AI.sendNow = function(){ finish('send'); };
+  AI.cancelListen = function(){ finish('cancel'); };
+  const tick = setInterval(function(){
+    let rms = 0;
+    if(an){ an.getFloatTimeDomainData(buf); let s = 0; for(let i = 0; i < buf.length; i++) s += buf[i]*buf[i]; rms = Math.sqrt(s/buf.length); }
+    SCR.level = rms;
+    if(!spoke) floor = floor*0.94 + Math.min(rms, 0.04)*0.06;
+    // (once you've started, quieter speech still counts as talking)
+    const loud = spoke ? Math.max(0.008, floor*2) : Math.max(0.014, floor*3);
+    if(rms > loud){ if(spoke) talked += 100; lastLoud = Date.now(); if(!spoke && Date.now() - t0 > 120){ spoke = true; opCaption('Listening… take your time'); } }
+    // the longer you talk, the longer a pause he waits out (thinking mid-thought isn't the end)
+    const pause = (typeof opPauseMs==='function' ? opPauseMs() : 2500) + Math.min(3500, talked*0.12);
+    if(spoke && Date.now() - lastLoud > pause) finish('send');
+    else if(!spoke && Date.now() - t0 > (an ? 9000 : 6000)) finish(an ? 'silence' : 'send');
+    else if(Date.now() - t0 > 300000) finish('send');
+    else if(spoke && Date.now() - t0 > 240000 && !AI._longWarn){ AI._longWarn = true; opCaption('Still listening… (tap the mic to send)'); }
+  }, 100);
+  rec.onstop = async function(){
+    stream.getTracks().forEach(function(t){ t.stop(); }); try{ if(ctx) ctx.close(); }catch(e){}
+    AI.listening = false; AI.sendNow = null; AI.cancelListen = null; SCR.level = 0; aiUiRefresh();
+    if(why==='cancel') return;
+    if(why==='silence'){ opCaption('Didn’t hear anything. Tap the mic when you’re ready.'); return; }
+    AI.transcribing = true; opCaption('…');
+    let text = '';
+    try{ text = await scribeText(new Blob(chunks, {type:mime || 'audio/webm'}), mime || 'audio/webm'); }
+    catch(e){
+      AI.transcribing = false;
+      if(/no ElevenLabs key/i.test(e.message)) SCR.on = false;
+      opCaption('Couldn’t make that out ('+(e.name==='AbortError' ? 'it took too long' : e.message)+'). Try again, or type.'); return;
+    }
+    AI.transcribing = false;
+    if(text) aiAsk(text, OV.cap || cap); else opCaption('Didn’t catch that.');
+  };
+  rec.start(250);
+};
+scribeText = (function(base){
+  return async function(blob, mime){
+    const big = blob && blob.size > 600000;
+    if(!big) return base.apply(this, arguments);
+    const ctl = new AbortController(), tm = setTimeout(function(){ ctl.abort(); }, 140000);
+    try{
+      const r = await fetch(WAKE_HELPER+'stt', {method:'POST', body:blob, headers:{'Content-Type':mime || 'audio/webm'}, signal:ctl.signal});
+      let j = null; try{ j = await r.json(); }catch(e){}
+      if(!r.ok) throw new Error((j && (j.detail && (j.detail.message || j.detail.status) || j.error)) || 'ElevenLabs said no ('+r.status+')');
+      return String((j && j.text) || '').replace(/\([^)]*\)|\[[^\]]*\]/g, ' ').replace(/\s+/g, ' ').trim();
+    } finally { clearTimeout(tm); }
+  };
+})(scribeText);
+
+// ---- Op knows what time it is ----
+// He'd talk work at 10 PM. Now he's told the time, your work hours and when bed is (from tomorrow's
+// alarm and your sleep goal): in work hours work is fair game; after them he doesn't bring work up
+// himself; in the last couple of hours before bed (or past it) he steers you toward winding down and
+// sleep. His own work check-ins and nudges stay inside the day too.
+function opBedTs(){
+  const nw = typeof nextWake==='function' ? nextWake() : null; if(!nw || !nw.ts) return null;
+  const hrs = Number(state.profile.sleepGoalHours) || 8;
+  return nw.ts - hrs*3600000;
+}
+function opTimeCtx(){
+  const now = new Date(), m = now.getHours()*60 + now.getMinutes();
+  const phase = typeof workPhase==='function' ? workPhase() : 'off';
+  const bed = opBedTs(), toBed = bed ? Math.round((bed - Date.now())/60000) : null;
+  const evening = m >= 20*60 + 30 || m < 5*60;
+  const late = phase!=='work' && phase!=='lunch' && phase!=='break' && (evening || (toBed!=null && toBed < 150));
+  const pastBed = toBed!=null && toBed < 0 && toBed > -360;
+  return {now:now, m:m, phase:phase, bed:bed, toBed:toBed, late:late, pastBed:pastBed};
+}
+function opLateNow(){ try{ return opTimeCtx().late; }catch(e){ return false; } }
+aiSystem = (function(base){
+  return function(){
+    const s = base.apply(this, arguments);
+    try{
+      const c = opTimeCtx(), w = typeof workToday==='function' ? workToday() : null;
+      const t = c.now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+' on '+c.now.toLocaleDateString(undefined, {weekday:'long'});
+      const hours = w && w.enabled && typeof workDayToday==='function' && workDayToday() ? 'Work hours today: '+fmt12Hour(w.start)+' to '+fmt12Hour(w.end)+' (right now: '+({before:'before work', after:'work is over for the day', lunch:'lunch', break:'his break', work:'work hours', off:'not a work day'})[c.phase]+').' : 'Not a work day, or no work hours set.';
+      const bed = c.bed ? 'Bedtime for tomorrow’s alarm: about '+new Date(c.bed).toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+(c.toBed!=null ? (c.toBed >= 0 ? ' ('+fmtDurationLabel(c.toBed)+' from now)' : ' (that was '+fmtDurationLabel(-c.toBed)+' ago)') : '')+'.' : '';
+      const block = 'The time, and what it means (always keep this in mind):\n'+
+        '- It’s '+t+'. '+hours+' '+bed+'\n'+
+        '- During work hours, work is fair game: push, plan, hold him to it.\n'+
+        '- Outside work hours, don’t bring up work, tasks, clients, leads or lock-ins yourself. If he brings work up, help briefly, then suggest it waits for tomorrow’s work block (offer to put it on tomorrow’s list).\n'+
+        '- In the last couple of hours before bedtime, steer toward winding down: the wind-down, screens off, tomorrow’s alarm, sleep. Past bedtime, tell him plainly (kind, firm) to go to sleep; sleep is part of the work.\n'+
+        '- Before work hours in the morning, keep work talk for when the day starts unless he starts it.'+
+        (c.late ? '\n- Right now it’s late: lead with winding down and sleep, not work.' : '');
+      if(Array.isArray(s)) s.push({type:'text', text:block});
+    }catch(e){}
+    return s;
+  };
+})(aiSystem);
+// his own work check-ins and nudges: never late in the evening
+acctPing = (function(base){ return function(){ if(opLateNow()){ if(typeof acctSchedule==='function') acctSchedule(); return; } return base.apply(this, arguments); }; })(acctPing);
+opNudgeDue = (function(base){ return function(){ if(opLateNow()) return false; return base.apply(this, arguments); }; })(opNudgeDue);
+if(typeof maybeNudgeLockIn==='function') maybeNudgeLockIn = (function(base){ return function(){ if(opLateNow()) return; return base.apply(this, arguments); }; })(maybeNudgeLockIn);
