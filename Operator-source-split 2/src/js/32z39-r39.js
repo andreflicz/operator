@@ -545,3 +545,141 @@ function ckSongsSync(){
 }
 // (the list follows the player: a track that ends, ⏭ or ▶ up top)
 setInterval(ckSongsSync, 700);
+
+// ---- 18. toasts: an emoji written as an HTML code (&#127911;) shows as the emoji, never as the raw code.
+// The message is escaped for safety, so codes in it used to come out as text. Codes are turned into
+// characters first; tags stay escaped. ----
+function decodeEntities(s){
+  return String(s == null ? '' : s).replace(/&(#\d+|#x[0-9a-f]+|[a-z]+);/gi, function(m0, k){
+    if(k[0]==='#'){ const n = k[1]==='x' || k[1]==='X' ? parseInt(k.slice(2), 16) : parseInt(k.slice(1), 10); try{ return String.fromCodePoint(n); }catch(e){ return m0; } }
+    const t = document.createElement('textarea'); t.innerHTML = m0; return t.value;
+  });
+}
+showToast = (function(base){ return function(msg){ const a = Array.prototype.slice.call(arguments); a[0] = decodeEntities(msg); return base.apply(this, a); }; })(showToast);
+
+// ---- 22. demo mode: a control panel to try everything ----
+// The demo banner gets a Controls button. Set the numbers (MRR, followers, weight, bonus XP), add a day's
+// work in a click, and set off every big moment (level up, rank up, a goal, a finished session, Good
+// morning, the work alarm, the clocked-out page, sleep, an Op check-in) without waiting for it to happen.
+// Demo mode also opens clean now: a month of history counts, no "Session complete" on the way in and
+// no "Level 1 is ready" left hanging.
+function demoXpReset(){
+  const p = state.profile;
+  delete p.xpLevel; p.rankClaimed = null; p.rankReadyFor = null; p.xpReadyFor = null; p.xpSeen = null;
+  if(typeof xpLast!=='undefined') xpLast = null; if(typeof xpCache!=='undefined') xpCache = {sig:'', days:{}};
+  ui._xpW = null;
+}
+demoSeed = (function(base){
+  return function(){
+    base.apply(this, arguments);
+    const p = state.profile; p.xpStart = addDays(todayStr(), -30); p.xpMrrBase = 0; p.xpClientsBase = arr(state.business.clients).map(function(c){ return c.id; });
+    p.demoV = 2; p.demoXp = 0; p.demoFollowers = 2400;
+    demoXpReset(); persist('profile');
+  };
+})(demoSeed);
+afterRenderHooks.push(function(){
+  if(!DEMO_ON || !state.profile.demoSeeded || state.profile.demoV===2) return;
+  const p = state.profile; p.demoV = 2; p.xpStart = addDays(todayStr(), -30); p.xpMrrBase = 0; if(p.demoFollowers==null) p.demoFollowers = 2400;
+  demoXpReset(); persist('profile'); setTimeout(renderView, 30);
+});
+// bonus XP and followers only exist in the demo
+xpGoals = (function(base){
+  return function(){ const g = base.apply(this, arguments); if(DEMO_ON && g && state.profile.demoXp) g.xp += Math.max(0, Number(state.profile.demoXp) || 0); return g; };
+})(xpGoals);
+igFollowersTotal = (function(base){
+  return function(){ if(DEMO_ON && state.profile.demoFollowers!=null) return Number(state.profile.demoFollowers) || 0; return base.apply(this, arguments); };
+})(igFollowersTotal);
+afterRenderHooks.push(function(){
+  if(!DEMO_ON) return;
+  const b = document.getElementById('demoBanner'); if(!b || b.querySelector('[data-action="demoPanel"]')) return;
+  const x = document.createElement('button'); x.className = 'demo-ctl'; x.dataset.action = 'demoPanel'; x.innerHTML = '&#127899; Controls';
+  b.insertBefore(x, b.querySelector('[data-action="demoExit"]'));
+});
+function demoFresh(){ if(typeof xpLast!=='undefined') xpLast = null; }
+function demoPanelHtml(){
+  const x = xpSummary(), mrr = xpMrr(), p = state.profile;
+  const num = function(id, label, val, act, unit){ return '<div class="dm-f"><label for="'+id+'">'+label+'</label><div class="dm-in">'+(unit==='$' ? '<span>$</span>' : '')+'<input class="input" type="number" id="'+id+'" value="'+val+'">'+(unit && unit!=='$' ? '<span>'+unit+'</span>' : '')+'<button class="btn btn-sm" data-action="'+act+'">Set</button></div></div>'; };
+  const btn = function(act, label, id){ return '<button class="dm-b" data-action="'+act+'"'+(id!=null ? ' data-id="'+id+'"' : '')+'>'+label+'</button>'; };
+  const w = arr(state.health.weightLog).slice(-1)[0];
+  return '<button class="int-x hs-x" data-action="addSheetClose" title="Close">&#10005;</button>'+
+    '<div class="as-h"><span class="as-ic">&#127899;</span><div><div class="hs-h">Demo controls</div><div class="as-sub">Level '+x.level+' &middot; '+Number(x.total).toLocaleString()+' XP &middot; '+escapeHtml(RANKS[x.rank] ? RANKS[x.rank].name : '')+'. Only the demo changes.</div></div></div>'+
+    '<div class="dm-k">The numbers</div>'+
+    '<div class="dm-grid">'+num('dmMrr', 'MRR', mrr, 'demoSetMrr', '$')+num('dmFol', 'Followers', p.demoFollowers || 0, 'demoSetFollowers')+num('dmWt', 'Weight', w ? w.weight : 180, 'demoSetWeight', 'lb')+
+      '<div class="dm-f"><label>Bonus XP</label><div class="dm-row">'+btn('demoXp', '+500', 500)+btn('demoXp', '+2,500', 2500)+btn('demoXp', '+10k', 10000)+btn('demoXp', 'Reset', 0)+'</div></div></div>'+
+    '<div class="dm-k">A day’s work</div>'+
+    '<div class="dm-row">'+btn('demoDeep', '&#128274; +1h deep work')+btn('demoGym', '&#127947;&#65039; Workout today')+btn('demoTask', '&#9989; Finish a task')+btn('demoTouch', '&#128075; Reach out to a lead')+'</div>'+
+    '<div class="dm-k">Set off a moment</div>'+
+    '<div class="dm-row">'+btn('demoFx', '&#11014;&#65039; Level up', 'level')+btn('demoFx', '&#128081; Rank up', 'rank')+btn('demoFx', '&#127919; Goal set', 'goal')+btn('demoFx', '&#127937; Session complete', 'session')+'</div>'+
+    '<div class="dm-row">'+btn('demoFx', '&#127749; Good morning', 'morning')+btn('demoFx', '&#9200; Work alarm', 'alarm')+btn('demoFx', '&#127769; Clocked out', 'off')+btn('demoFx', '&#128564; Sleep', 'sleep')+btn('demoFx', '&#128172; Op checks in', 'checkin')+'</div>'+
+    '<div class="dm-foot"><button class="btn btn-ghost btn-sm" data-action="demoRestart">Start the demo over</button></div>';
+}
+ACTIONS.demoPanel = function(){ addSheetOpen('demoSheet', demoPanelHtml); };
+function demoAfter(msg){ demoFresh(); persist('profile'); renderView(); addSheetRefresh('demoSheet'); if(msg) showToast(msg, {icon:'&#127899;'}); }
+function demoVal(id){ const el = document.getElementById(id); const v = el ? Number(el.value) : NaN; return isFinite(v) ? v : null; }
+ACTIONS.demoSetMrr = function(){
+  const v = demoVal('dmMrr'); if(v==null || v < 0) return;
+  const act = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); }); if(!act.length) return;
+  const now = xpMrr();
+  act.forEach(function(c, i){ c.mrr = now > 0 ? Math.round(Number(c.mrr || 0)/now*v) : Math.round(v/act.length); });
+  const diff = v - xpMrr(); act[0].mrr += diff;
+  persist('business'); demoAfter('MRR is $'+v.toLocaleString()+'.');
+};
+ACTIONS.demoSetFollowers = function(){ const v = demoVal('dmFol'); if(v==null || v < 0) return; state.profile.demoFollowers = Math.round(v); demoAfter(Math.round(v).toLocaleString()+' followers.'); };
+ACTIONS.demoSetWeight = function(){
+  const v = demoVal('dmWt'); if(!v) return;
+  state.health.weightLog = arr(state.health.weightLog).filter(function(w){ return w.date!==todayStr(); }).concat([{date:todayStr(), weight:v}]);
+  persist('health'); demoAfter('Weighed in at '+v+' lb.');
+};
+ACTIONS.demoXp = function(el, e, id){ const n = Number(id) || 0; state.profile.demoXp = n ? Number(state.profile.demoXp || 0) + n : 0; demoAfter(n ? '+'+n.toLocaleString()+' XP.' : 'Bonus XP cleared.'); };
+ACTIONS.demoDeep = function(){
+  const now = Date.now(), at = now - 3600000;
+  state.focus.sessions.push({id:uid(), type:'deep', date:todayStr(), startedAt:at, endedAt:now, minutes:60, completedTasks:[], reviewed:true});
+  persist('focus'); demoAfter();
+};
+ACTIONS.demoGym = function(){ state.health.gymLog = arr(state.health.gymLog); state.health.gymLog.push({id:uid(), date:todayStr(), type:'Strength', duration:45, notes:''}); persist('health'); demoAfter('Workout logged.'); };
+ACTIONS.demoTask = function(){
+  const t = state.tasks.items.find(function(t){ return t.status!=='done' && !t.isVideoIdea; });
+  if(!t){ showToast('Every task is done. Add one with +.', {icon:'&#127899;'}); return; }
+  if(typeof completeTask==='function') completeTask(t.id); else { t.status = 'done'; t.completedAt = todayStr(); persist('tasks'); }
+  demoAfter();
+};
+ACTIONS.demoTouch = function(){
+  const l = arr(state.business.pipeline)[0]; if(!l) return;
+  l.touchpoints = arr(l.touchpoints).concat([{id:uid(), type:'text', date:todayStr()}]); persist('business'); demoAfter('Texted '+(l.company || l.name)+'.');
+};
+ACTIONS.demoFx = function(el, e, id){
+  addSheetClose('demoSheet');
+  const x = xpSummary(), p = state.profile;
+  if(id==='level'){
+    if(!x.canLevel){ p.demoXp = Number(p.demoXp || 0) + Math.max(0, x.levelHi - x.total); demoFresh(); }
+    persist('profile'); setTimeout(function(){ if(ACTIONS.levelUp) ACTIONS.levelUp(); }, 150);
+  } else if(id==='rank'){
+    if(x.rankReady) ACTIONS.rankUp();
+    else rankUpFx(x.rank, Math.min(RANKS.length - 1, x.rank + 1));   // (a preview: nothing is claimed)
+  } else if(id==='goal') goalSetFx({label:'Hit $'+(Math.ceil((xpMrr() + 5000)/1000)*1000).toLocaleString()+' MRR', tier:'month', target:1});
+  else if(id==='session') xpSystemShow({title:'Session complete.', sub:'1h 30m of deep work logged.', lines:[], gained:640, level:x.level, levelUp:false, ready:x.canLevel, fromPct:Math.max(0, x.levelPct - 0.1), toPct:x.levelPct});
+  else if(id==='morning'){ if(ACTIONS.sleepGoodMorning) ACTIONS.sleepGoodMorning(); }
+  else if(id==='alarm'){ if(typeof fireWorkAlarm==='function') fireWorkAlarm({test:true}); }
+  else if(id==='off'){ state.focus.activeSession = null; state.modes.active = {type:'offtime', startedAt:Date.now()}; persist('modes'); ui.view = 'today'; renderView(); }
+  else if(id==='sleep'){ if(ACTIONS.startSleepMode) ACTIONS.startSleepMode(); }
+  else if(id==='checkin'){ if(typeof acctPing==='function') acctPing(); }
+};
+ACTIONS.demoRestart = function(){
+  if(!confirm('Start the demo over? Everything you changed in the demo goes back to how it started.')) return;
+  addSheetClose('demoSheet'); state.modes.active = null; state.focus.activeSession = null; persist('modes'); persist('focus');
+  demoSeed(); renderView(); showToast('The demo is fresh again.', {icon:'&#127899;'});
+};
+
+// ---- 21. tabs open once, cleanly ----
+// Changing tabs replayed the whole page's fade (the title and the tab bar too), and a tab with its own
+// sub-panel (Journal) faded in a second time right after. Now: a new page fades in; a new tab fades only
+// its panel; the panel inside it doesn't fade again. (The Recap's open animation also restarted when it
+// finished, so it opened twice: that's in the styles.)
+afterRenderHooks.unshift(function(){
+  const v = document.getElementById('viewRoot'); if(!v) return;
+  const key = ui.view+'|'+(ui.businessTab||'')+'|'+(ui.personalTab||'')+'|'+(ui.focusTab||'')+'|'+(ui.settingsTab||'');
+  if(ui._r33Key===key) return;
+  const sameView = ui._r39View===ui.view; ui._r39View = ui.view;
+  // (the class stays until the next change: taking it off would restart the fade, a second opening)
+  v.classList.toggle('r39-tab', sameView && ui._r33Key!=null);
+});
