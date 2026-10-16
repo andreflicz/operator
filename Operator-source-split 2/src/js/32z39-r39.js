@@ -311,3 +311,118 @@ opBarStatus = (function(base){
 })(opBarStatus);
 OB_LABEL.clocked = 'Clocked in';
 clockIn = (function(base){ return function(){ const r = base.apply(this, arguments); try{ updateActivityPill(); }catch(e){} return r; }; })(clockIn);
+
+// ---- 11–14. levels, ranks, goals ----
+// Rank is claimed now, like a level: when you have the level, the MRR and the Health for the next rank a
+// gold Rank up button shows up (your card, You, the level card top right, notifications). Press it and
+// you get the ceremony. Until then your card shows the rank you've claimed.
+xpSummary = (function(base){
+  return function(){
+    const x = base.apply(this, arguments); if(!x) return x;
+    const p = state.profile;
+    const earned = x._rankEarned!=null ? x._rankEarned : x.rank; x._rankEarned = earned;
+    if(p.rankClaimed==null){ p.rankClaimed = earned; persist('profile'); }
+    if(earned > p.rankClaimed){
+      x.rankReady = p.rankClaimed + 1; x.rank = p.rankClaimed; x.next = RANKS[x.rank + 1] || null; x.needs = [];
+    } else { x.rankReady = null; if(x.rank!==earned) x.rank = earned; }
+    return x;
+  };
+})(xpSummary);
+function rankUpBtnHtml(where){
+  const x = xpSummary(); if(!x.rankReady) return '';
+  const r = RANKS[x.rankReady];
+  return '<button class="rank-up-btn rank-up-'+(where || 'x')+'" data-action="rankUp" style="--rc:'+r.color+'" title="You’ve earned '+escapeHtml(r.name)+'. Claim it.">'+rankBadgeSvg(x.rankReady, 20)+'<span>Rank up</span><b>'+escapeHtml(r.name)+'</b></button>';
+}
+levelUpBtnHtml = (function(base){ return function(where){ return rankUpBtnHtml(where)+base.apply(this, arguments); }; })(levelUpBtnHtml);
+levelUpPending = (function(base){
+  return function(){
+    const out = base.apply(this, arguments), x = xpSummary();
+    if(x.rankReady) out.unshift({key:'rank:'+x.rankReady, kind:'level', level:'good', icon:'&#128081;', title:'Rank up: '+RANKS[x.rankReady].name, sub:'You’ve got the level, the MRR and the body. Claim it.', act:{a:'rankUp'}, sort:-1});
+    return out;
+  };
+})(levelUpPending);
+afterRenderHooks.push(function(){
+  if(!state || !state.profile || typeof xpSummary!=='function') return;
+  const x = xpSummary(), p = state.profile;
+  if(x.rankReady && p.rankReadyFor!==x.rankReady){ p.rankReadyFor = x.rankReady; persist('profile'); if(typeof sysNote==='function') setTimeout(function(){ sysNote('Rank up: '+RANKS[x.rankReady].name+'. Claim it.'); }, 900); if(typeof notifBadge==='function') notifBadge(); }
+});
+ACTIONS.rankUp = function(){
+  const x = xpSummary(); if(!x.rankReady){ renderView(); return; }
+  const to = x.rankReady, from = state.profile.rankClaimed;
+  state.profile.rankClaimed = to; state.profile.rankReadyFor = null; state.profile.rankClaimedAt = Object.assign({}, state.profile.rankClaimedAt, {[to]:todayStr()});
+  persist('profile'); if(typeof xpLast!=='undefined') xpLast = null;
+  ui.lvlPop = false;
+  rankUpFx(from, to);
+  setTimeout(function(){ renderView(); if(typeof notifBadge==='function') notifBadge(); }, 400);
+};
+// the ceremony: the room goes dark, light gathers, the old badge breaks, the new one rises in its
+// colour with rays behind it, the name lands letter by letter, what it took, and what this rank is.
+function rankUpFx(from, to){
+  const old = document.getElementById('rankFx'); if(old) old.remove();
+  const r = RANKS[to], f = RANKS[from] || RANKS[0], calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const life = typeof projRankLife==='function' ? projRankLife(to) : '';
+  const x = xpSummary();
+  const d = document.createElement('div'); d.id = 'rankFx'; d.className = 'rank-fx'; d.style.setProperty('--rc', r.color); d.style.setProperty('--rc0', f.color);
+  d.innerHTML = '<canvas class="rfx-cv"></canvas><div class="rfx-rays"></div><div class="rfx-ring"></div><div class="rfx-ring is-2"></div>'+
+    '<div class="rfx-core">'+
+      '<div class="rfx-k">RANK UP</div>'+
+      '<div class="rfx-badges"><span class="rfx-old">'+rankBadgeSvg(from, 64)+'</span><span class="rfx-new">'+rankBadgeSvg(to, 132)+'</span></div>'+
+      '<div class="rfx-name">'+String(r.name).split('').map(function(ch, i){ return '<i style="--i:'+i+'">'+(ch===' ' ? '&nbsp;' : escapeHtml(ch))+'</i>'; }).join('')+'</div>'+
+      (r.tag ? '<div class="rfx-tag">'+escapeHtml(r.tag)+'</div>' : '')+
+      '<div class="rfx-took"><span><small>Level</small><b>'+x.level+'</b></span><span><small>MRR</small><b>'+money(typeof xpMrr==='function' ? xpMrr() : 0)+'</b></span><span><small>Health</small><b>'+x.attrs.HLT.v+'</b></span></div>'+
+      (life ? '<div class="rfx-life">'+escapeHtml(String(life))+'</div>' : '')+
+      '<button class="rfx-go" data-action="rankFxClose">Wear it</button>'+
+    '</div>';
+  document.body.appendChild(d);
+  requestAnimationFrame(function(){ d.classList.add('is-in'); });
+  if(!calm){
+    document.body.style.setProperty('--shake', '10px'); document.body.classList.remove('lvl-shake'); void document.body.offsetWidth;
+    setTimeout(function(){ document.body.classList.add('lvl-shake'); setTimeout(function(){ document.body.classList.remove('lvl-shake'); }, 800); }, 1500);
+    setTimeout(function(){ const c = d.querySelector('.rfx-cv'); if(c && typeof lvlEmbers==='function') lvlEmbers(c, [r.color, '#ffffff', '#ffd27a'], 1400, 2.1); }, 1500);
+  }
+  if(typeof tone==='function'){
+    [262, 330, 392].forEach(function(f0, i){ setTimeout(function(){ tone([f0], 0.5, 0.14); }, 200 + i*260); });
+    setTimeout(function(){ tone([392, 523, 659, 784, 1047], 2.2, 0.24); }, 1500);
+    setTimeout(function(){ tone([523, 784, 1047, 1568], 2.6, 0.2); }, 2300);
+  }
+}
+ACTIONS.rankFxClose = function(){ const d = document.getElementById('rankFx'); if(!d) return; d.classList.add('is-out'); setTimeout(function(){ d.remove(); }, 700); };
+
+// every level-up looks a little different: four stagings take turns, and the line changes
+levelUpFx = (function(base){
+  return function(L){
+    base.apply(this, arguments);
+    const d = document.getElementById('lvlFx'); if(!d) return;
+    const v = ['burst', 'rise', 'slam', 'orbit'][L % 4];
+    d.classList.add('lv-'+v);
+    const k = d.querySelector('.lvl-k'); if(k) k.textContent = ['LEVEL UP', 'NEW LEVEL', 'LEVEL UP', 'CLIMBING'][L % 4];
+  };
+})(levelUpFx);
+
+// the top right shows the level, not the bar
+lvlChipHtml = (function(base){ return function(){ return base.apply(this, arguments).replace(/<i><u style="width:[^"]*"><\/u><\/i>/, '').replace(/(<button class="md-lvl)/, function(m){ const x = xpSummary(); return x.rankReady ? m+' is-rank' : m; }); }; })(lvlChipHtml);
+
+// a goal you add lands like a level up (smaller): the goal, where it lives and what it pays
+function goalSetFx(g){
+  const old = document.getElementById('goalFx'); if(old) old.remove();
+  const where = g.tier==='week' ? 'This week' : g.tier==='month' ? 'This month' : g.master ? 'Master goal' : 'Your goals';
+  const xp = typeof goalXpOf==='function' ? goalXpOf(g) : 0;
+  const d = document.createElement('div'); d.id = 'goalFx'; d.className = 'goal-fx';
+  d.innerHTML = '<div class="gfx-core"><div class="gfx-k">GOAL SET</div><div class="gfx-ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52"/></svg><span>&#127919;</span></div>'+
+    '<div class="gfx-t">'+escapeHtml(typeof goalTitle==='function' ? goalTitle(g) : (g.label || 'Your goal'))+'</div>'+
+    '<div class="gfx-m"><span>'+where+'</span>'+(xp ? '<b>+'+Number(xp).toLocaleString()+' XP</b>' : '')+'</div></div>';
+  document.body.appendChild(d);
+  requestAnimationFrame(function(){ d.classList.add('is-in'); });
+  if(typeof tone==='function'){ tone([523], 0.18, 0.16); setTimeout(function(){ tone([659, 784], 0.4, 0.16); }, 140); }
+  const close = function(){ if(!d.parentNode) return; d.classList.add('is-out'); setTimeout(function(){ if(d.parentNode) d.remove(); }, 450); };
+  d.addEventListener('click', close); setTimeout(close, 2600);
+}
+ACTIONS.gsSave = (function(base){
+  return function(){
+    const n = state.goals.items.length, r = base.apply(this, arguments);
+    if(state.goals.items.length > n){ const g = state.goals.items[state.goals.items.length - 1]; setTimeout(function(){ goalSetFx(g); }, 120); }
+    return r;
+  };
+})(ACTIONS.gsSave);
+// (the plain "Added:" toast it replaces)
+showToast = (function(base){ return function(msg){ if(document.getElementById('goalFx') && /^Added: /.test(String(msg || ''))) return; return base.apply(this, arguments); }; })(showToast);
