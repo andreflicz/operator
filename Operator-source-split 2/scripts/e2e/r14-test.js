@@ -53,7 +53,7 @@ const hexDecode = h => Buffer.from(h, 'hex').toString('utf8');
   {
     const p = await newPage(b, OUT+'/r14.html', {profile:{name:'Andre'}});
     const E = c => p.evaluate(x => window.__op.ev(x), c);
-    const names = await E("FOCUS_TRACKS.map(t=>t.name+':'+t.style).join(',')");
+    const names = await E("FOCUS_TRACKS.filter(t=>!t.special).map(t=>t.name+':'+t.style).join(',')");   // (round 39: the lock-in song is a track of its own)
     check('eighteen tracks (round 26 added five dreamy ones, round 27 two for work and three more dreams, round 28 Sunrise, Low Light, Undertow), keeping First Light and Still Water', /First Light/.test(names) && /Still Water/.test(names) && names.split(',').length===18, names);
     check('they don\'t all share one recipe (thirteen different styles)', new Set(names.split(',').map(x => x.split(':')[1])).size===13, names);
     const peaks = await p.evaluate(async () => window.__op.ev(`(async function(){ const out = []; for(const tr of FOCUS_TRACKS){ const sr = 22000, oc = new OfflineAudioContext(1, sr*6, sr); FM.bus = null; sfxBus = null; FM.rnd = 7; const bus = fmBus(oc); bus.g.gain.value = 1; let t = 0.05, bar = 0; while(t < 6){ fmBar(oc, bus.g, t, tr, bar++); t += 60/tr.bpm*4; } const d = (await oc.startRendering()).getChannelData(0); let m = 0; for(let i=0;i<d.length;i++) m = Math.max(m, Math.abs(d[i])); out.push(m); } FM.bus = null; sfxBus = null; return out; })()`));

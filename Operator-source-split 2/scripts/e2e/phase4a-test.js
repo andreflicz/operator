@@ -47,7 +47,7 @@ const SP = require('./common.js').OUT;
   check('leads board', await p.isVisible('.crm-board') && (await p.$$('.crm-col')).length===6);
   // touch menu: pick a call
   await p.click('.crm-card[data-key="crm-p1"] .touch-more-btn');
-  await p.click('.crm-card[data-key="crm-p1"] [data-type="call"]');
+  await p.click('body > .touch-menu.is-float [data-type="call"]');   // (round 39: the menu floats above the page)
   check('typed touch logged (call)', (await E("state.business.pipeline[0].touchpoints[0].type"))==='call');
   // drag p1 to Contacted
   await p.evaluate(() => {

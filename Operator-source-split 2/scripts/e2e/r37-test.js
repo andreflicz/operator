@@ -127,14 +127,12 @@ const CORS = {'Access-Control-Allow-Origin':'*'};
     check('…remove a deadline', /removed/.test(await E("opRunTool('set_task_deadline', {task:'video run', date:'none'})")) && await E("state.tasks.items[0].deadline")===null);
     check('…set the MRR target', /10,000/.test(await E("opRunTool('set_mrr_goal', {amount:10000})")) && await E("state.profile.revenueGoalMonthly")===10000);
     check('…rename a placeholder goal', /renamed/.test(await E("opRunTool('edit_goal', {label_contains:'test', new_label:'Sign one new client'})")));
-    check('…set what a client is owed next (and it shows on the card)', /next for/.test(await E("opRunTool('set_client_next_action', {who:'JJS', action:'Send the October reel cut'})")) && /October reel cut/.test(await E("clientCardV2(state.business.clients[0])")));
+    check('…set what a client is owed next (round 40: kept for Op, no longer a row on the card)', /next for/.test(await E("opRunTool('set_client_next_action', {who:'JJS', action:'Send the October reel cut'})")) && await E("state.business.clients.some(c => c.nextAction==='Send the October reel cut')"));
     check('…and switch views (the Cockpit, his own screen)', /cockpit/.test(await E("opRunTool('set_view', {view:'cockpit'})")) && await E("state.profile.lockedStyle")==='cockpit');
     await E("opMemory().push({id:'m1', text:'Andre may travel to China within the next week and is setting up systems so JJS Construction and Batusha Corp stay looked after while he is away.', at:1})");
     check('memory: the same thing said again updates it instead of adding another', await E("opRunTool('remember', {fact:'Andre may travel to China within the next week or so; he is setting up systems so JJS Construction and Batusha Corp stay looked after while he is away.'})")==='updated' && await E("opMemory().length")===1);
     await E("ui.view='business'; ui.businessTab='clients'; renderView()"); await p.waitForTimeout(200);
-    await p.click('.cn-row'); await p.waitForTimeout(150);
-    await p.fill('.cn-in', 'Shoot plan for Vigan'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
-    check('a client’s next action: tap, type, Enter', await E("state.business.clients[0].nextAction")==='Shoot plan for Vigan');
+    check('round 40: no “Next step” row on client cards', !(await p.$('.cn-row')));
     check('no page errors (memory → app)', p.errors.length===0, p.errors);
     await p.context().close();
   }

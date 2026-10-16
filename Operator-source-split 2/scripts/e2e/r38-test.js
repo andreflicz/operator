@@ -109,7 +109,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('…one tap logs the call', await E("state.business.clients[1].touches.indexOf(todayStr())>=0") && /Logged a call with/.test(await p.textContent('#toastContainer')));
     check('…and the Reach out task is done (nobody left)', await E("!state.tasks.items.some(t => t.master && t.master.kind==='reach' && t.status!=='done')") && (await p.$$('.lc-row.is-due')).length===0);
     // the + menu
-    check('the + menu has "A client deliverable"', JSON.stringify(await E("focusAddMenu().map(x => x[1])")).indexOf('A client deliverable') > 0);
+    check('round 40: the + menu has no "A client deliverable" (they’re made for you)', JSON.stringify(await E("focusAddMenu().map(x => x[1])")).indexOf('A client deliverable') < 0);
     // Outreach
     check('"How we got them" has Outreach', await E("LEAD_SOURCES.some(s => s.id==='outreach' && s.label==='Outreach')"));
     await E("opRunTool('set_client_source', {who:'Brothers Mechanical', source:'outreach'})");
@@ -274,7 +274,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     await E("masterTasksSync && masterTasksSync(); openWindDown('plan')"); await p.waitForTimeout(400);
     const rows = await E("[...document.querySelectorAll('#windContent .wd-row .wd-title')].map(e=>e.textContent)");
     check('Clock out → Plan of attack: every open task on your list (not just six), your pick first', rows.length >= 8 && rows[0]==='Task 3' && [1,2,4,5,6,7,8].every(i => rows.includes('Task '+i)) && !rows.includes('Old done'), rows);
-    check('…and this week’s client deliverables (the Reels) are in it', rows.some(r => /^16 Reels \d\/4$/.test(r)), rows);
+    check('…and this week’s client deliverables (the Reels) are in it', rows.some(r => /^Brothers Mechanical: 4 reels, week \d$/.test(r)), rows);
     await E("ACTIONS.closeWindDown()"); await E("ui.view='today'; renderView()"); await p.waitForTimeout(200);
     check('Today: the day streak is out of its pill, bigger, with a line on where today stands', !!(await p.$('.sw.is-r38 .sw-ss')) && /day streak/i.test(await p.textContent('.sw.is-r38 .sw-streak')) && await p.evaluate(() => parseFloat(getComputedStyle(document.querySelector('.sw.is-r38 .sw-streak > b')).fontSize) >= 30));
     check('no page errors (round 38g)', p.errors.length===0, p.errors);
@@ -323,7 +323,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const bb = await (await p.$('.ycf')).boundingBox();
     await p.mouse.move(bb.x + bb.width/2, bb.y + bb.height/2); await p.waitForTimeout(350);
     const tf = await p.evaluate(() => [getComputedStyle(document.querySelector('.ycf-in > .pc:first-child')).transform, getComputedStyle(document.querySelector('.ycf-back')).transform]);
-    check('Personal → You: hovering the card lifts it without twisting the faces', tf[0]==='none' && /matrix3d/.test(tf[1]), tf);
+    check('Personal → You: hovering the card lifts it without twisting the faces (round 40: flat faces, the card turns edge-on)', tf[0]==='none' && tf[1]==='none', tf);
     await p.mouse.click(bb.x + bb.width/2, bb.y + bb.height/2); await p.waitForTimeout(800);
     check('…a click turns it over (only the back shows)', await E("document.querySelector('.ycf').classList.contains('is-flipped')") && await p.evaluate(() => getComputedStyle(document.querySelector('.ycf-in > .pc:first-child')).visibility==='hidden' && getComputedStyle(document.querySelector('.ycf-back')).visibility==='visible'));
     check('no page errors (round 38i)', p.errors.length===0, p.errors);

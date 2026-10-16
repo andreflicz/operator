@@ -112,7 +112,7 @@ async function ctxPage(b, seed, opts){
     check('You: a Level up button, no “Next rank” paragraph', await p.isVisible('.you .lvl-up-btn') && !/Next rank/.test(await p.textContent('.you-main')));
     check('…and it waits in the notifications', await E("notifList().some(n=>n.key==='lvl:1')"));
     await p.click('.you .lvl-up-btn'); await p.waitForTimeout(400);
-    check('pressing it: level 1, and the fire', await E("state.profile.xpLevel")===1 && await p.isVisible('#lvlFx') && /LEVEL UP/.test(await p.textContent('#lvlFx')));
+    check('pressing it: level 1, and the fire', await E("state.profile.xpLevel")===1 && await p.isVisible('#lvlFx') && /LEVEL UP|NEW LEVEL|CLIMBING/.test(await p.textContent('#lvlFx')));
     check('higher levels burn bigger: more rings, a new colour', await E("levelUpFx(36, null); document.querySelectorAll('#lvlFx .lvl-rings i').length")===6 && await E("document.getElementById('lvlFx').className").then(c => /tier-2/.test(c)));
     await E("document.getElementById('lvlFx').remove()");
     // the gate: level 3 is a rank's level — it needs Health 40 (no height and weight here)
