@@ -7239,6 +7239,245 @@ body:has(#lockSeqOverlay:not(.hidden)) #activityPill{ opacity:0 !important; poin
 /* social: Apify */
 .soc-free{ font-style:normal; font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:1px 6px; margin-left:6px; border-radius:999px; background:rgba(63,190,142,.16); color:#3FBE8E; vertical-align:middle; }
 .soc-when{ font-size:11px; color:var(--text-faint); margin-left:6px; font-weight:400; }
+
+/* ===== R39 ===== */
+/* 1. client deliverable tasks: violet client work */
+.task-card.dvc{ display:flex; flex-direction:column; gap:6px; border:1px solid rgba(var(--dlv-rgb),.38) !important; border-left:3px solid var(--dlv) !important;
+  background:radial-gradient(120% 90% at 0% 0%, rgba(var(--dlv-rgb),.22), transparent 60%), linear-gradient(160deg, rgba(var(--dlv-rgb),.10), rgba(var(--dlv-rgb),.03)) , var(--panel) !important; box-shadow:0 8px 24px rgba(var(--dlv-rgb),.10); }
+.task-card.dvc:hover{ border-color:rgba(var(--dlv-rgb),.6) !important; box-shadow:0 10px 30px rgba(var(--dlv-rgb),.2); }
+.dvc-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.dvc-who{ display:inline-flex; align-items:center; gap:7px; min-width:0; font-size:11.5px; font-weight:600; color:var(--dlv); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.dvc-av{ flex:none; width:20px; height:20px; border-radius:6px; display:grid; place-items:center; font-size:9.5px; font-weight:800; color:#fff; box-shadow:0 0 0 1px rgba(255,255,255,.18) inset; }
+.dvc-title{ font-family:var(--font-display); font-size:19px; font-weight:800; line-height:1.15; color:var(--text); letter-spacing:-.01em; }
+.dvc-wk{ display:flex; align-items:center; gap:8px; }
+.dvc-dots{ display:inline-flex; gap:4px; } .dvc-dots i{ width:18px; height:6px; border-radius:4px; background:rgba(var(--dlv-rgb),.18); }
+.dvc-dots i.is-past{ background:rgba(var(--dlv-rgb),.45); } .dvc-dots i.is-on{ background:var(--dlv); box-shadow:0 0 10px rgba(var(--dlv-rgb),.6); }
+.dvc-n{ font-size:11.5px; font-weight:700; color:var(--dlv); font-variant-numeric:tabular-nums; }
+.dvc-one{ font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--dlv); }
+.dvc-foot{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:auto; padding-top:4px; font-size:12px; }
+.dvc-q{ color:var(--text-dim); font-size:12px; }
+/* the list view row */
+.tl-row.tl-dlv{ border-color:rgba(var(--dlv-rgb),.35) !important; background:linear-gradient(90deg, rgba(var(--dlv-rgb),.14), rgba(var(--dlv-rgb),.03) 55%, transparent), var(--panel) !important; box-shadow:inset 3px 0 0 var(--dlv); }
+.tl-row.tl-dlv .tl-main{ gap:12px; } .tl-row.tl-dlv .dvc-wk.is-inline{ gap:6px; } .tl-row.tl-dlv .dvc-dots i{ width:14px; height:5px; }
+.tl-row.tl-dlv .dvc-who{ padding:3px 9px 3px 3px; border-radius:999px; background:rgba(var(--dlv-rgb),.12); border:1px solid rgba(var(--dlv-rgb),.3); }
+/* 2–3. Today's client cards open the client; the touch menu floats */
+.hub-card.is-open-able{ cursor:pointer; transition:border-color .15s, transform .15s; } .hub-card.is-open-able:hover{ transform:translateY(-1px); }
+.touch-menu.is-float{ width:max-content !important; max-width:340px; padding:10px !important; border-radius:14px; background:var(--panel) !important; border:1px solid var(--border); position:fixed !important; z-index:600 !important; right:auto !important; bottom:auto !important; margin:0 !important; box-shadow:0 18px 50px rgba(0,0,0,.45); }
+.touch-menu-h{ width:100%; padding:2px 4px 6px; font-size:11.5px; font-weight:600; color:var(--text-dim); }
+.touch-menu-btn.is-on{ outline:1px solid var(--accent); }
+.dvc-wkp{ display:inline-flex; align-items:center; height:20px; padding:0 9px; border-radius:999px; font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#fff; background:var(--dlv); box-shadow:0 0 12px rgba(var(--dlv-rgb),.45); }
+.task-card.dvc .dvc-foot{ padding-top:2px; }
+.tl-row.tl-dlv .tl-main{ align-items:center; }
+.dvc-due{ margin-left:auto; white-space:nowrap; } .dvc-due .kpi-sub{ font-size:11.5px; }
+/* 4–9. Op's pop-up says what he's doing */
+.op-think{ display:none !important; }
+.ob-status{ display:none; align-items:center; gap:9px; margin:2px 0 8px; padding:7px 8px 7px 11px; border-radius:12px; background:rgba(122,162,255,.10); border:1px solid rgba(122,162,255,.22); font-size:12.5px; font-weight:600; color:var(--text); }
+.ob-status.is-on{ display:flex; animation:obsIn .22s ease-out; }
+@keyframes obsIn{ from{ opacity:0; transform:translateY(-3px); } to{ opacity:1; transform:none; } }
+.ob-status[data-st="listen"]{ background:rgba(63,190,142,.10); border-color:rgba(63,190,142,.3); }
+.obs-t{ flex:1; }
+.obs-wave{ display:inline-flex; align-items:center; gap:3px; height:16px; } .obs-wave i{ width:3px; height:16px; border-radius:2px; background:#3FBE8E; transform:scaleY(.25); transition:transform .1s; }
+.obs-dots{ display:inline-flex; gap:4px; } .obs-dots i{ width:6px; height:6px; border-radius:50%; background:#7aa2ff; animation:obsDot 1.1s ease-in-out infinite; } .obs-dots i:nth-child(2){ animation-delay:.15s; } .obs-dots i:nth-child(3){ animation-delay:.3s; }
+@keyframes obsDot{ 0%,100%{ opacity:.3; transform:translateY(0); } 50%{ opacity:1; transform:translateY(-3px); } }
+.obs-x{ flex:none; height:24px; padding:0 10px; border-radius:999px; border:0; background:rgba(229,72,77,.14); color:#E5484D; font:inherit; font-size:11.5px; font-weight:700; cursor:pointer; }
+.obs-x:hover{ background:#E5484D; color:#fff; }
+/* 10. Op's corner */
+body.op-ov .activity-pill, body.insp-on .activity-pill, body.np-on .activity-pill, body.board-full .activity-pill{ left:15px !important; }
+body.opf-on .activity-pill{ opacity:0 !important; pointer-events:none !important; }
+.activity-pill[data-ob="clocked"] .ob-dot{ background:#7aa2ff; box-shadow:0 0 0 3px rgba(122,162,255,.2), 0 0 8px rgba(122,162,255,.6); }
+/* 11–14. rank up, level-up variety, the goal pop-up, level-only chip */
+.rank-up-btn{ display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 14px 0 8px; margin-right:8px; border-radius:999px; border:1px solid color-mix(in srgb, var(--rc) 60%, #ffd27a); cursor:pointer; font:inherit; font-weight:800; font-size:13px; color:#1b1404;
+  background:linear-gradient(110deg, #ffe7a3, #ffd060 35%, color-mix(in srgb, var(--rc) 55%, #ffd060) 70%, #fff1c4); background-size:220% 100%; animation:rankBtnShine 2.6s linear infinite; box-shadow:0 0 0 0 rgba(255,208,96,.6), 0 10px 28px rgba(255,190,60,.35); }
+.rank-up-btn b{ font-weight:900; letter-spacing:.02em; } .rank-up-btn span{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; opacity:.8; }
+.rank-up-btn:hover{ transform:translateY(-1px); box-shadow:0 0 0 6px rgba(255,208,96,.18), 0 14px 34px rgba(255,190,60,.45); }
+@keyframes rankBtnShine{ 0%{ background-position:0% 0; } 100%{ background-position:220% 0; } }
+.md-lvl.is-rank{ box-shadow:0 0 0 2px #ffd060, 0 0 16px rgba(255,208,96,.6) !important; }
+.md-lvl i{ display:none !important; }
+/* the ceremony */
+.rank-fx{ position:fixed; inset:0; z-index:100000; display:grid; place-items:center; background:radial-gradient(60% 60% at 50% 45%, color-mix(in srgb, var(--rc) 22%, #05060a), #020205 70%); opacity:0; transition:opacity .6s; overflow:hidden; }
+.rank-fx.is-in{ opacity:1; } .rank-fx.is-out{ opacity:0; transition:opacity .7s; }
+.rfx-cv{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.rfx-rays{ position:absolute; width:180vmax; height:180vmax; left:50%; top:45%; transform:translate(-50%,-50%) scale(.2); opacity:0;
+  background:repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--rc) 40%, transparent) 0deg 4deg, transparent 4deg 14deg); -webkit-mask:radial-gradient(circle, #000 10%, transparent 55%); mask:radial-gradient(circle, #000 10%, transparent 55%); }
+.rank-fx.is-in .rfx-rays{ animation:rfxRays 1.2s 1.4s cubic-bezier(.2,.8,.2,1) forwards, rfxSpin 40s 1.4s linear infinite; }
+@keyframes rfxRays{ to{ opacity:1; transform:translate(-50%,-50%) scale(1); } }
+@keyframes rfxSpin{ from{ rotate:0deg; } to{ rotate:360deg; } }
+.rfx-ring{ position:absolute; left:50%; top:38%; width:160px; height:160px; margin:-80px 0 0 -80px; border-radius:50%; border:2px solid var(--rc); opacity:0; }
+.rank-fx.is-in .rfx-ring{ animation:rfxRing 1.6s 1.45s ease-out forwards; } .rank-fx.is-in .rfx-ring.is-2{ animation-delay:1.7s; }
+@keyframes rfxRing{ 0%{ opacity:.9; transform:scale(.4); } 100%{ opacity:0; transform:scale(6); } }
+.rfx-core{ position:relative; display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center; color:#fff; max-width:640px; padding:0 24px; }
+.rfx-k{ font-size:13px; font-weight:800; letter-spacing:.6em; color:color-mix(in srgb, var(--rc) 70%, #fff); opacity:0; }
+.rank-fx.is-in .rfx-k{ animation:rfxUp .8s .3s ease-out forwards; }
+.rfx-badges{ position:relative; width:160px; height:160px; display:grid; place-items:center; }
+.rfx-old, .rfx-new{ position:absolute; display:grid; place-items:center; }
+.rfx-old{ animation:rfxOld 1.5s ease-in forwards; filter:drop-shadow(0 0 14px var(--rc0)); }
+@keyframes rfxOld{ 0%{ opacity:0; transform:scale(.8); } 30%{ opacity:1; transform:scale(1); } 75%{ opacity:1; transform:scale(1.05) rotate(-6deg); filter:brightness(2.5) drop-shadow(0 0 30px #fff); } 100%{ opacity:0; transform:scale(2.4); filter:brightness(4) blur(6px); } }
+.rfx-new{ opacity:0; transform:scale(.3) translateY(30px); filter:drop-shadow(0 0 30px var(--rc)) drop-shadow(0 0 60px var(--rc)); }
+.rank-fx.is-in .rfx-new{ animation:rfxNew 1.1s 1.4s cubic-bezier(.2,1.4,.3,1) forwards, rfxFloat 4s 2.6s ease-in-out infinite; }
+@keyframes rfxNew{ to{ opacity:1; transform:none; } }
+@keyframes rfxFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-6px); } }
+.rfx-name{ font-family:var(--font-display); font-size:clamp(44px, 7vw, 84px); font-weight:900; letter-spacing:.04em; line-height:1; text-transform:uppercase;
+  background:linear-gradient(180deg, #fff, color-mix(in srgb, var(--rc) 75%, #fff)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.rfx-name i{ display:inline-block; font-style:normal; opacity:0; transform:translateY(24px) scale(1.4); filter:blur(6px); }
+.rank-fx.is-in .rfx-name i{ animation:rfxLetter .5s calc(2s + var(--i)*70ms) cubic-bezier(.2,1.2,.3,1) forwards; }
+@keyframes rfxLetter{ to{ opacity:1; transform:none; filter:none; } }
+.rfx-tag{ font-size:15px; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.7); opacity:0; }
+.rfx-took{ display:flex; gap:10px; opacity:0; } .rfx-took span{ display:flex; flex-direction:column; align-items:center; padding:8px 16px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid color-mix(in srgb, var(--rc) 35%, transparent); }
+.rfx-took small{ font-size:10px; letter-spacing:.16em; text-transform:uppercase; opacity:.6; } .rfx-took b{ font-size:20px; }
+.rfx-life{ max-width:520px; font-size:15px; line-height:1.55; color:rgba(255,255,255,.82); opacity:0; }
+.rfx-go{ margin-top:8px; height:46px; padding:0 34px; border-radius:999px; border:0; cursor:pointer; font:inherit; font-size:15px; font-weight:800; letter-spacing:.08em; color:#120d02; background:linear-gradient(110deg, #ffe7a3, #ffd060, #fff1c4); box-shadow:0 0 30px color-mix(in srgb, var(--rc) 60%, transparent); opacity:0; }
+.rank-fx.is-in .rfx-tag{ animation:rfxUp .7s 2.9s ease-out forwards; } .rank-fx.is-in .rfx-took{ animation:rfxUp .7s 3.3s ease-out forwards; }
+.rank-fx.is-in .rfx-life{ animation:rfxUp .9s 3.8s ease-out forwards; } .rank-fx.is-in .rfx-go{ animation:rfxUp .7s 4.4s ease-out forwards; }
+@keyframes rfxUp{ from{ opacity:0; transform:translateY(12px); } to{ opacity:1; transform:none; } }
+/* four level-up stagings */
+.lvl-fx.lv-rise .lvl-n{ animation:lvRise 1.1s cubic-bezier(.2,1.3,.3,1) both; } @keyframes lvRise{ from{ transform:translateY(60vh); } to{ transform:none; } }
+.lvl-fx.lv-slam .lvl-to{ display:inline-block; animation:lvSlam .7s .25s cubic-bezier(.3,1.6,.4,1) both; } @keyframes lvSlam{ from{ transform:scale(6); opacity:0; filter:blur(10px); } to{ transform:none; opacity:1; filter:none; } }
+.lvl-fx.lv-orbit .lvl-rings{ animation:lvOrbit 6s linear infinite; } @keyframes lvOrbit{ to{ rotate:360deg; } }
+.lvl-fx.lv-orbit .lvl-rings i{ border-style:dashed !important; }
+.lvl-fx.lv-rise .lvl-flames{ filter:hue-rotate(-12deg) saturate(1.3); } .lvl-fx.lv-slam .lvl-glow{ animation-duration:.6s !important; }
+/* the goal pop-up */
+.goal-fx{ position:fixed; inset:0; z-index:99000; display:grid; place-items:center; background:radial-gradient(40% 40% at 50% 50%, rgba(63,190,142,.22), rgba(3,5,8,.55) 70%); opacity:0; transition:opacity .3s; cursor:pointer; }
+.goal-fx.is-in{ opacity:1; } .goal-fx.is-out{ opacity:0; }
+.gfx-core{ display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; color:#fff; transform:scale(.8); transition:transform .45s cubic-bezier(.2,1.4,.3,1); }
+.goal-fx.is-in .gfx-core{ transform:none; }
+.gfx-k{ font-size:12px; font-weight:800; letter-spacing:.5em; color:#7ef0c0; }
+.gfx-ring{ position:relative; width:110px; height:110px; display:grid; place-items:center; } .gfx-ring span{ position:absolute; font-size:40px; }
+.gfx-ring svg{ width:110px; height:110px; transform:rotate(-90deg); } .gfx-ring circle{ fill:none; stroke:#3FBE8E; stroke-width:6; stroke-linecap:round; stroke-dasharray:327; stroke-dashoffset:327; filter:drop-shadow(0 0 8px #3FBE8E); }
+.goal-fx.is-in .gfx-ring circle{ animation:gfxDraw .9s .15s ease-out forwards; } @keyframes gfxDraw{ to{ stroke-dashoffset:0; } }
+.gfx-t{ font-family:var(--font-display); font-size:28px; font-weight:800; max-width:560px; }
+.gfx-m{ display:flex; gap:10px; align-items:center; font-size:13px; color:rgba(255,255,255,.75); } .gfx-m b{ padding:3px 10px; border-radius:999px; background:rgba(255,197,107,.18); color:#ffc56b; }
+.rfx-name{ background:none !important; color:#fff !important; }
+.rfx-name i{ background:linear-gradient(180deg, #fff 20%, color-mix(in srgb, var(--rc) 80%, #fff)); -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:none; filter:drop-shadow(0 0 18px color-mix(in srgb, var(--rc) 60%, transparent)); }
+.rank-fx.is-in .rfx-name i{ animation:rfxLetter2 .5s calc(2s + var(--i)*70ms) cubic-bezier(.2,1.2,.3,1) forwards; }
+@keyframes rfxLetter2{ from{ opacity:0; transform:translateY(24px) scale(1.4); } to{ opacity:1; transform:none; } }
+.rfx-rays{ left:0 !important; top:0 !important; width:100% !important; height:100% !important; transform:scale(.3) !important; transform-origin:50% 38%;
+  background:repeating-conic-gradient(from 0deg at 50% 38%, color-mix(in srgb, var(--rc) 34%, transparent) 0deg 3deg, transparent 3deg 12deg) !important;
+  -webkit-mask:radial-gradient(circle at 50% 38%, #000 0, rgba(0,0,0,.6) 18%, transparent 60%) !important; mask:radial-gradient(circle at 50% 38%, #000 0, rgba(0,0,0,.6) 18%, transparent 60%) !important; }
+.rank-fx.is-in .rfx-rays{ animation:rfxRays2 1.2s 1.4s cubic-bezier(.2,.8,.2,1) forwards, rfxSpin2 50s 1.4s linear infinite !important; }
+@keyframes rfxRays2{ from{ opacity:0; } to{ opacity:1; } }
+@keyframes rfxSpin2{ from{ transform:scale(1.6) rotate(0deg); } to{ transform:scale(1.6) rotate(360deg); } }
+.goal-fx{ background:radial-gradient(45% 45% at 50% 50%, rgba(63,190,142,.25), rgba(3,5,8,.86) 72%) !important; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+/* R39: the Cockpit's songs */
+.ckm-tabs{ display:flex; gap:4px; padding:3px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); align-self:flex-start; }
+.ckm-tabs button{ border:0; background:none; color:rgba(255,255,255,.6); font-size:12.5px; font-weight:700; padding:6px 14px; border-radius:999px; cursor:pointer; transition:background .15s, color .15s; }
+.ckm-tabs button:hover{ color:#fff; } .ckm-tabs button.is-on{ background:rgba(255,255,255,.14); color:#fff; }
+.ckm-now{ display:flex; flex-direction:column; gap:2px; }
+.ckm-now span{ font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.5); }
+.ckm-now b{ font-family:var(--font-display); font-size:24px; color:#fff; }
+.ckm-list{ display:flex; flex-direction:column; gap:4px; overflow-y:auto; max-height:360px; margin:0 -8px; padding:0 8px; scrollbar-width:thin; }
+.ckx .ckm .ckm-list{ flex:1; min-height:0; }
+.ckm-s{ display:flex; align-items:center; gap:12px; width:100%; padding:8px 12px; border-radius:12px; border:1px solid transparent; background:none; color:#fff; text-align:left; cursor:pointer; transition:background .15s, border-color .15s; }
+.ckm-s:hover{ background:rgba(255,255,255,.07); }
+.ckm-s.is-on{ background:rgba(232,162,61,.13); border-color:rgba(232,162,61,.35); }
+.ckm-i{ flex:none; width:30px; height:30px; display:grid; place-items:center; border-radius:9px; background:rgba(255,255,255,.07); font-size:11px; color:rgba(255,255,255,.7); }
+.ckm-s.is-on .ckm-i{ background:rgba(232,162,61,.22); color:#ffc56b; }
+.ckm-n{ flex:1; min-width:0; display:flex; flex-direction:column; }
+.ckm-n b{ font-size:14px; font-weight:650; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ckm-n small{ font-size:11.5px; color:rgba(255,255,255,.5); }
+.ckm-s.is-special .ckm-n small{ color:#c9b2ff; }
+.ckm-p{ font-size:11px; color:#ffc56b; }
+/* R39: demo controls */
+.demo-banner .demo-ctl{ background:rgba(27,30,42,.12) !important; color:#1b1e2a !important; }
+.demo-banner .demo-ctl:hover{ background:rgba(27,30,42,.22) !important; }
+.as.is-demoSheet{ width:min(620px, calc(100vw - 32px)); }
+.dm-k{ margin:18px 0 8px; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); }
+.dm-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px 14px; }
+.dm-f label{ display:block; font-size:12px; font-weight:600; color:var(--text-dim); margin-bottom:5px; }
+.dm-in{ display:flex; align-items:center; gap:6px; } .dm-in .input{ flex:1; min-width:0; } .dm-in span{ font-size:13px; color:var(--text-dim); }
+.dm-row{ display:flex; flex-wrap:wrap; gap:6px; } .dm-row + .dm-row{ margin-top:6px; }
+.dm-b{ border:1px solid var(--border); background:rgba(var(--ink),.04); color:var(--text); border-radius:999px; padding:7px 12px; font-size:12.5px; font-weight:600; cursor:pointer; transition:background .15s, border-color .15s, transform .15s; }
+.dm-b:hover{ background:rgba(var(--ink),.09); border-color:var(--text-dim); transform:translateY(-1px); }
+.dm-foot{ margin-top:18px; display:flex; justify-content:flex-end; }
+@media (max-width:560px){ .dm-grid{ grid-template-columns:1fr; } }
+/* R39: tabs open once */
+#viewRoot.r33-in.r39-tab > *:not(.tab-panel){ animation:none; }
+#viewRoot .tab-panel .subtab-panel{ animation:none; }
+#recapOverlay #recapContent{ animation:none; }
+#recapOverlay.is-opening #recapContent{ animation:rcOpen .48s cubic-bezier(.2,.8,.2,1) both; }
+/* R39: That's the day: line icons and the quote */
+.dayoff-row.is-btns .dayoff-back{ display:inline-flex; align-items:center; justify-content:center; gap:9px; }
+.r39-ico{ display:inline-flex; width:18px; height:18px; flex:none; }
+.r39-ico svg{ width:100%; height:100%; fill:none; stroke:#fff; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 1px 2px rgba(0,0,0,.25)); }
+.dayoff-row.is-btns .dayoff-back.is-main{ color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.2); }
+.dayoff-row.is-btns .dayoff-back.is-sun{ color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.25); }
+.rd-slide .qt.is-rest{ display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:150px; padding:6px 10px 0; color:#f3f5fb; text-align:center; }
+.rd-slide .qt.is-rest blockquote{ font-size:clamp(18px, 1.7vw, 22px); line-height:1.5; }
+.rd-slide .qt.is-rest figcaption{ justify-content:center; margin-top:12px; }
+.rd-slide .qt.is-rest .qt-next{ display:none; }
+.rd-slide:has(.qt.is-rest) .rd-k{ text-align:center; }
+/* R39: the Goals page */
+.g39{ display:flex; flex-direction:column; gap:16px; }
+.g39-bar{ display:flex; align-items:center; gap:12px; }
+.g39-bar .op-tip{ flex:1; min-width:0; margin:0 !important; }
+.g39-bar:not(:has(.op-tip)){ justify-content:flex-end; }
+.g39-cust{ flex:none; display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 15px; border-radius:999px; border:1px solid var(--border); background:var(--panel); color:var(--text); font-size:13px; font-weight:650; cursor:pointer; transition:border-color .15s, background .15s, transform .15s; }
+.g39-cust:hover{ border-color:var(--text-dim); background:rgba(var(--ink),.06); transform:translateY(-1px); }
+.g39-cust span{ font-size:14px; opacity:.8; }
+/* revenue: one slim strip */
+.g39-rev{ display:grid; grid-template-columns:auto minmax(0, 1fr) auto; align-items:center; gap:28px; padding:18px 24px; border-radius:20px; border:1px solid var(--border);
+  background:linear-gradient(100deg, color-mix(in srgb, var(--mg1) 13%, var(--panel)), var(--panel) 60%); }
+.g39-k{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); }
+.g39-rev-n{ display:flex; align-items:baseline; gap:8px; margin-top:4px; white-space:nowrap; }
+.g39-rev-n b{ font-family:var(--font-display); font-size:34px; line-height:1; letter-spacing:-.01em; background:linear-gradient(135deg, var(--mg2), var(--mg1)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.g39-rev-n > span{ font-size:14px; color:var(--text-dim); }
+.g39-rev-n .mg-target{ margin:0 0 0 4px; font-size:13px; }
+.g39-rev-m .mg-bar{ margin:0; }
+.g39-rev-f{ display:flex; justify-content:space-between; gap:10px; margin-top:8px; font-size:12.5px; color:var(--text-dim); }
+.g39-rev-r{ display:flex; flex-direction:column; align-items:flex-end; gap:4px; }
+.g39-rev-r b{ font-family:var(--font-display); font-size:28px; color:var(--mg1); line-height:1; }
+.g39-rev-r .mg-xp{ margin:0; }
+/* three columns: master, this month, this week */
+.g39-cols{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px; align-items:stretch; }
+.g39-col{ display:flex; flex-direction:column; gap:10px; padding:16px 16px 14px; border-radius:20px; border:1px solid var(--border); background:var(--panel); min-width:0; }
+.g39-col-h, .g39-col .tg-h{ display:flex; align-items:baseline; gap:8px; padding-bottom:10px; border-bottom:1px solid rgba(var(--ink),.07); }
+.g39-col-h b{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#ffc56b; }
+.g39-col.is-master .g39-col-h b{ color:#7ef0c0; }
+.g39-col-h small, .g39-when{ font-size:12px; color:var(--text-faint); font-weight:500; letter-spacing:0; text-transform:none; }
+.g39-col .tg-card{ border:0; background:none; padding:0; border-radius:0; overflow:visible; display:flex; flex-direction:column; gap:10px; flex:1; }
+.g39-col .tg-card.is-week .tg-k{ color:#8fd3ff; } .g39-col .tg-card.is-month .tg-k{ color:#ffc56b; }
+.g39-col .tg-h .tg-edit{ align-self:center; }
+.g39-col .tg-sub{ margin:0; }
+.g39-col .tg-empty{ padding:12px; border-radius:12px; border:1px dashed rgba(var(--ink),.12); font-size:12.5px; color:var(--text-faint); text-align:center; }
+.g39-rings{ display:flex; flex-direction:column; gap:6px; }
+.g39 .g39-rings .mg-card{ display:grid; grid-template-columns:58px minmax(0, 1fr); column-gap:12px; align-items:center; text-align:left; padding:8px 10px; border-radius:14px; border:1px solid transparent; background:rgba(var(--ink),.03); box-shadow:none; }
+.g39 .g39-rings .mg-card > *{ grid-column:2; justify-self:start; margin:0 !important; }
+.g39 .g39-rings .mg-card .mg-ring{ grid-column:1; grid-row:1 / span 4; width:58px; height:58px; }
+.g39 .g39-rings .mg-ring svg{ width:58px; height:58px; }
+.g39 .g39-rings .mg-ring-v{ font-size:13px; } .g39 .g39-rings .mg-ring-pct{ display:none; }
+.g39 .g39-rings .mg-card-k{ font-size:13px; }
+.g39 .g39-rings .mg-target, .g39 .g39-rings .mg-card-sub, .g39 .g39-rings .mg-xp{ font-size:11.5px !important; }
+.g39 .g39-rings .mg-card.is-hit{ border-color:color-mix(in srgb, var(--mg1) 40%, transparent); background:color-mix(in srgb, var(--mg1) 8%, transparent); }
+.g39-hist{ margin-top:auto; padding-top:10px; border-top:1px solid rgba(var(--ink),.06); }
+.g39-hist small{ display:block; font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); margin-bottom:6px; }
+.g39-none{ padding:14px; border-radius:12px; border:1px dashed rgba(var(--ink),.12); font-size:12.5px; color:var(--text-faint); text-align:center; }
+/* your goals: cards */
+.g39-mine{ padding:16px 18px 18px; border-radius:20px; border:1px solid var(--border); background:var(--panel); }
+.g39-mine-h{ display:flex; align-items:baseline; gap:10px; margin-bottom:12px; }
+.g39-mine-h b{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text); }
+.g39-mine-h small{ font-size:12px; color:var(--text-faint); }
+.g39-count{ font-size:11px; font-weight:800; padding:1px 7px; border-radius:999px; background:rgba(var(--ink),.08); color:var(--text-dim); }
+.g39-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:10px; }
+.g39-grid.is-done{ margin-top:10px; opacity:.75; }
+.g39 .g39-grid .gx-g{ grid-template-columns:minmax(0, 1fr) auto; grid-template-areas:"t xp" "bar bar" "n a" "d a"; gap:6px 10px; align-items:center; padding:14px 14px 12px; border:1px solid rgba(var(--ink),.08) !important; border-radius:16px; background:rgba(var(--ink),.025); transition:border-color .15s, transform .15s; }
+.g39 .g39-grid .gx-g:hover{ border-color:rgba(var(--ink),.18) !important; transform:translateY(-1px); }
+.g39 .g39-grid .gx-g.is-hit{ border-color:rgba(63,190,142,.4) !important; background:rgba(63,190,142,.06); }
+.g39 .g39-grid .gx-g-t{ grid-area:t; font-size:14.5px; font-weight:700; }
+.g39 .g39-grid .gx-g-xp{ grid-area:xp; justify-self:end; }
+.g39 .g39-grid .gx-g-bar{ grid-area:bar; }
+.g39 .g39-grid .gx-g-n{ grid-area:n; font-size:12.5px; }
+.g39 .g39-grid .gx-g-d{ grid-area:d; justify-self:start; }
+.g39 .g39-grid .gx-g-d:empty{ display:none; }
+.g39 .g39-grid .gx-g-a{ grid-area:a; justify-self:end; align-self:end; }
+@media (max-width:1180px){ .g39-cols{ grid-template-columns:1fr 1fr; } .g39-col.is-master{ grid-column:1 / -1; } .g39-col.is-master .g39-rings{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); } }
+@media (max-width:820px){ .g39-cols{ grid-template-columns:1fr; } .g39-rev{ grid-template-columns:1fr; gap:12px; } .g39-rev-r{ flex-direction:row; align-items:center; justify-content:space-between; } }
+.g39-col .tg-card::before, .g39-col .tg-card::after{ display:none !important; }
+.g39 .g39-grid .gx-g-t span{ white-space:normal; overflow:visible; text-overflow:clip; }
+.g39 .g39-grid .gx-g-t{ max-width:none; width:100%; min-width:0; text-align:left; justify-content:flex-start; }
+.g39 .g39-grid .gx-g-bar:empty{ display:none; }
+/* R39: Zernio account picker */
+.zn-pick{ display:flex; flex-direction:column; gap:6px; }
+.zn-acc{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text); cursor:pointer; text-align:left; }
+.zn-acc:hover{ border-color:var(--text-dim); } .zn-acc small{ color:var(--text-dim); font-size:12px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -39484,6 +39723,937 @@ function fmtAgo(ts){
   const m = Math.max(0, Math.round((Date.now() - (ts || 0))/60000));
   return m < 2 ? 'just now' : m < 60 ? m+' min ago' : m < 1440 ? Math.round(m/60)+'h ago' : Math.round(m/1440)+'d ago';
 }
+// ============ ROUND 39 ============
+// One file per area of the round; each part says what it does.
+
+// ---- 1. client deliverable tasks look like client work: violet, the deliverable big, the week as dots ----
+function dvwView(t){
+  const x = dvwFind(t); if(!x) return null;
+  const c = x.c, name = x.oneOff ? String(x.d.title || 'Deliverable') : dvwBaseName(x.d);
+  const parts = x.oneOff ? [] : dvwParts(x.d), at = x.oneOff ? 0 : parts.indexOf(x.k) + 1;
+  return {x:x, c:c, who:c.business || c.name || 'Client', name:name, at:at, of:parts.length, pieces:x.oneOff ? 'One-off' : dvwPieces(x.d, x.need)};
+}
+function dvwDotsHtml(v){
+  if(!v.of) return '<span class="dvc-one">One-off</span>';
+  let h = '<span class="dvc-dots" title="Week '+v.x.k+' of the cycle">';
+  for(let i = 1; i <= v.of; i++) h += '<i class="'+(i < v.at ? 'is-past' : i===v.at ? 'is-on' : '')+'"></i>';
+  return h+'</span><b class="dvc-n">'+v.at+'/'+v.of+'</b>';
+}
+function dvwWeekLabel(v){ return v.x.oneOff ? 'One-off' : 'Week '+v.x.k; }
+function dvwWhoHtml(v){ return '<span class="dvc-who"><span class="dvc-av" style="background:'+clientColor(v.c)+'">'+escapeHtml(clientInitials(v.c))+'</span>'+escapeHtml(v.who)+'</span>'; }
+taskCard = (function(base){
+  return function(t){
+    const h = base.apply(this, arguments);
+    if(!t || !t.master || t.master.kind!=='dvw') return h;
+    const v = dvwView(t); if(!v) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const card = tpl.content.firstElementChild; if(!card) return h;
+    const due = card.querySelector('.kpi-sub'), more = card.querySelector('.card-more');
+    card.classList.add('dvc');
+    // just the three things: the week, the deliverable, the client
+    card.innerHTML = '<div class="dvc-top"><span class="dvc-wkp">'+dvwWeekLabel(v)+'</span>'+(more ? more.outerHTML : '')+'</div>'+
+      '<div class="dvc-title">'+escapeHtml(v.name)+'</div>'+
+      '<div class="dvc-wk">'+(v.of ? dvwDotsHtml(v) : '')+(due ? '<span class="dvc-due">'+due.outerHTML+'</span>' : '')+'</div>'+
+      '<div class="dvc-foot">'+dvwWhoHtml(v)+'</div>';
+    return tpl.innerHTML;
+  };
+})(taskCard);
+lineupListHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(h.indexOf('tl-row') < 0) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    tpl.content.querySelectorAll('.tl-row').forEach(function(row){
+      const t = state.tasks.items.find(function(x){ return x.id===row.dataset.taskId; });
+      if(!t || !t.master || t.master.kind!=='dvw') return;
+      const v = dvwView(t); if(!v) return;
+      row.classList.add('tl-dlv');
+      const main = row.querySelector('.tl-main');
+      if(main) main.innerHTML = '<span class="dvc-wkp">'+dvwWeekLabel(v)+'</span><span class="tl-title">'+escapeHtml(v.name)+'</span>'+(v.of ? '<span class="dvc-wk is-inline">'+dvwDotsHtml(v)+'</span>' : '');
+      row.querySelectorAll('.tag-client').forEach(function(e, i){ if(i===0){ const w = document.createElement('template'); w.innerHTML = dvwWhoHtml(v); e.replaceWith(w.content.firstElementChild); } else e.remove(); });
+    });
+    return tpl.innerHTML;
+  };
+})(lineupListHtml);
+
+// ---- 2. Today's Clients panel: the whole card opens the client ----
+renderClientHubPanel = (function(base){
+  return function(){
+    return base.apply(this, arguments).replace(/<div class="hub-card (hl-[a-z]+)" data-key="hub-([^"]+)">/g, function(m, hl, id){
+      return '<div class="hub-card '+hl+' is-open-able" data-key="hub-'+id+'" data-action="openContact" data-kind="client" data-id="'+id+'" title="Open their card">';
+    });
+  };
+})(renderClientHubPanel);
+
+// ---- 3. logging a touch: the type menu floats above everything (it was hidden under the next panel), and
+// after a quick log it opens on its own so you can say what it really was ----
+function touchFloatSync(){
+  document.querySelectorAll('body > .touch-menu.is-float').forEach(function(e){ e.remove(); });
+  if(!ui.touchMenu) return;
+  const k = ui.touchMenu.split(':'), btn = document.querySelector('#viewRoot .touch-more-btn[data-kind="'+k[0]+'"][data-id="'+k[1]+'"]');
+  const retype = ui.touchRetype && ui.touchRetype.key===ui.touchMenu ? ui.touchRetype : null;
+  let m = document.querySelector('#viewRoot .touch-menu');
+  if(!m && retype && retype.rect){
+    // (a lead you just logged leaves the "to reach out to" list; the menu stays where its button was)
+    const x0 = crmFind(k[0], k[1]); if(!x0) return;
+    const t0 = document.createElement('template'); t0.innerHTML = touchMenuHtml(k[0], x0); m = t0.content.firstElementChild;
+  }
+  if(!m) return;
+  if(!btn && !(retype && retype.rect)){ m.remove(); return; }
+  const r = btn ? btn.getBoundingClientRect() : retype.rect;
+  m.classList.add('is-float'); document.body.appendChild(m);
+  const w = m.offsetWidth || 240, h = m.offsetHeight || 140;
+  m.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.right - w))+'px';
+  m.style.top = (r.bottom + 6 + h > window.innerHeight - 8 ? Math.max(8, r.top - h - 6) : r.bottom + 6)+'px';
+  if(retype){
+    const hd = document.createElement('div'); hd.className = 'touch-menu-h'; hd.innerHTML = 'Logged a '+escapeHtml(touchTypeById(retype.type).label.toLowerCase())+'. Was it something else?';
+    m.insertBefore(hd, m.firstChild);
+    m.querySelectorAll('.touch-menu-btn').forEach(function(b){ b.dataset.action = 'retypeTouch'; b.classList.toggle('is-on', b.dataset.type===retype.type); });
+  }
+}
+afterRenderHooks.push(function(){ try{ touchFloatSync(); }catch(e){} });
+window.addEventListener('scroll', function(){ if(ui.touchMenu){ ui.touchMenu = null; ui.touchRetype = null; document.querySelectorAll('body > .touch-menu.is-float').forEach(function(e){ e.remove(); }); } }, true);
+document.addEventListener('mousedown', function(e){
+  if(!ui.touchMenu || (e.target.closest && e.target.closest('.touch-menu, .touch-more-btn, .touch-log-btn'))) return;
+  ui.touchMenu = null; ui.touchRetype = null; document.querySelectorAll('body > .touch-menu.is-float').forEach(function(x){ x.remove(); });
+});
+ACTIONS.quickTouch = (function(base){
+  return function(el){
+    const rect = el && el.getBoundingClientRect ? el.getBoundingClientRect() : null;
+    const r = base.apply(this, arguments);
+    const l = lastTouchLogged;
+    if(l && el && !el.closest('#clientModalOverlay')){
+      const x = crmFind(l.kind, l.id), tp = x && arr(x.touchpoints).find(function(t){ return t.id===l.tpId; });
+      if(tp){ ui.touchMenu = l.kind+':'+l.id; ui.touchRetype = {key:ui.touchMenu, type:tp.type, rect:rect ? {left:rect.left, right:rect.right + 34, top:rect.top, bottom:rect.bottom} : null}; renderView(); clearTimeout(ACTIONS.quickTouch._t); ACTIONS.quickTouch._t = setTimeout(function(){ if(ui.touchRetype){ ui.touchMenu = null; ui.touchRetype = null; renderView(); } }, 6000); }
+    }
+    return r;
+  };
+})(ACTIONS.quickTouch);
+ACTIONS.retypeTouch = function(el){
+  const l = lastTouchLogged, ty = el && el.dataset.type; if(!l || !ty) return;
+  const x = crmFind(l.kind, l.id), tp = x && arr(x.touchpoints).find(function(t){ return t.id===l.tpId; });
+  if(tp){ tp.type = ty; x.lastTouchType = ty; crm().lastTouchType = ty; persist('business'); }
+  ui.touchMenu = null; ui.touchRetype = null; playTick(); renderView();
+  const tt = touchTypeById(ty); showToast('Changed to a '+tt.label.toLowerCase()+' with '+crmName(l.kind, x)+'.', {icon:tt.icon});
+};
+
+// ---- 4–9. Op: he hears you properly, he listens when he asks, you can stop him listening, his thinking
+// shows in his pop-up, and he does what you ask ----
+// Listening with ElevenLabs Scribe (when there's an ElevenLabs key; Chrome's speech recognition otherwise):
+// the mic records while you talk, stops after a pause, and the clip goes to the Operator app, which asks
+// ElevenLabs for the words. Much better at names, numbers and fast speech than Chrome.
+const SCR = {on:null, level:0};
+function scribeCheck(){
+  fetchWithin(WAKE_HELPER+'tts/status', 6000).then(function(r){ return r && r.ok ? r.json() : null; })
+    .then(function(j){ SCR.on = !!(j && j.hasKey) && typeof MediaRecorder!=='undefined' && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia); }).catch(function(){});
+}
+setTimeout(scribeCheck, 1500); setInterval(scribeCheck, 10*60000);
+function scribeWanted(){ return !!SCR.on && state.profile.sttEngine!=='chrome'; }
+async function scribeText(blob, mime){
+  const ctl = new AbortController(), tm = setTimeout(function(){ ctl.abort(); }, 50000);
+  try{
+    const r = await fetch(WAKE_HELPER+'stt', {method:'POST', body:blob, headers:{'Content-Type':mime || 'audio/webm'}, signal:ctl.signal});
+    let j = null; try{ j = await r.json(); }catch(e){}
+    if(!r.ok) throw new Error((j && (j.detail && (j.detail.message || j.detail.status) || j.error)) || 'ElevenLabs said no ('+r.status+')');
+    // (sound tags like "(laughs)" aren't words)
+    return String((j && j.text) || '').replace(/\([^)]*\)|\[[^\]]*\]/g, ' ').replace(/\s+/g, ' ').trim();
+  } finally { clearTimeout(tm); }
+}
+async function scribeListen(cap){
+  if(AI.listening){ if(AI.sendNow) AI.sendNow(); return; }
+  if(typeof opStop==='function') opStop();
+  const heyWas = typeof HW!=='undefined' && HW.on; if(heyWas && typeof heyStop==='function') heyStop();
+  OV.cap = cap || 'opBubText'; AI.listening = true; AI.typedAt = 0; aiUiRefresh(); opCaption('Listening…');
+  let stream = null;
+  try{ stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true, autoGainControl:true, channelCount:1}}); }
+  catch(e){ AI.listening = false; aiUiRefresh(); opCaption(e && e.name==='NotAllowedError' ? 'I need the microphone. Allow it for Operator (or type instead).' : 'The mic isn’t working: type instead.'); return; }
+  const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '');
+  const rec = new MediaRecorder(stream, mime ? {mimeType:mime} : undefined), chunks = [];
+  rec.ondataavailable = function(e){ if(e.data && e.data.size) chunks.push(e.data); };
+  let ctx = null, an = null, buf = null;
+  try{ ctx = new (window.AudioContext || window.webkitAudioContext)(); an = ctx.createAnalyser(); an.fftSize = 1024; ctx.createMediaStreamSource(stream).connect(an); buf = new Float32Array(an.fftSize); }catch(e){}
+  let floor = 0.006, spoke = false, lastLoud = Date.now(), why = null;
+  const t0 = Date.now();
+  const finish = function(reason){ if(why) return; why = reason; clearInterval(tick); try{ if(rec.state!=='inactive') rec.stop(); }catch(e){ rec.onstop(); } };
+  AI.sendNow = function(){ finish('send'); };
+  AI.cancelListen = function(){ finish('cancel'); };
+  const tick = setInterval(function(){
+    let rms = 0;
+    if(an){ an.getFloatTimeDomainData(buf); let s = 0; for(let i = 0; i < buf.length; i++) s += buf[i]*buf[i]; rms = Math.sqrt(s/buf.length); }
+    SCR.level = rms;
+    if(!spoke) floor = floor*0.94 + Math.min(rms, 0.04)*0.06;
+    if(rms > Math.max(0.014, floor*3)){ lastLoud = Date.now(); if(!spoke && Date.now() - t0 > 120){ spoke = true; opCaption('Listening… go on'); } }
+    const pause = typeof opPauseMs==='function' ? opPauseMs() : 2500;
+    if(spoke && Date.now() - lastLoud > pause) finish('send');
+    else if(!spoke && Date.now() - t0 > (an ? 9000 : 6000)) finish(an ? 'silence' : 'send');
+    else if(Date.now() - t0 > 60000) finish('send');
+  }, 100);
+  rec.onstop = async function(){
+    stream.getTracks().forEach(function(t){ t.stop(); }); try{ if(ctx) ctx.close(); }catch(e){}
+    AI.listening = false; AI.sendNow = null; AI.cancelListen = null; SCR.level = 0; aiUiRefresh();
+    if(why==='cancel') return;
+    if(why==='silence'){ opCaption('Didn’t hear anything. Tap the mic when you’re ready.'); return; }
+    AI.transcribing = true; opCaption('…');
+    let text = '';
+    try{ text = await scribeText(new Blob(chunks, {type:mime || 'audio/webm'}), mime || 'audio/webm'); }
+    catch(e){
+      AI.transcribing = false;
+      if(/no ElevenLabs key/i.test(e.message)) SCR.on = false;
+      opCaption('Couldn’t make that out ('+(e.name==='AbortError' ? 'it took too long' : e.message)+'). Try again, or type.'); return;
+    }
+    AI.transcribing = false;
+    if(text) aiAsk(text, OV.cap || cap); else opCaption('Didn’t catch that.');
+  };
+  rec.start(250);
+}
+aiListen = (function(base){
+  return function(cap){ return scribeWanted() ? scribeListen(cap) : base.apply(this, arguments); };
+})(aiListen);
+
+// when he asks you something, the mic opens once he's finished talking (not 0.35s after, when he often
+// hadn't, so it never opened), for any question near the end of what he said, not only the last character
+function opAsked(text){ const t = String(text || '').trim(); if(!t) return false; const tail = t.slice(-180); return /\?/.test(tail.split(/(?<=[.!])\s+/).pop() || '') || /\?["”’)]*\s*$/.test(t); }
+function opListenWhenDone(cap){
+  const t0 = Date.now();
+  const go = function(){
+    if(AI.listening || OV.userCut) return;
+    const busy = AI.busy || OV.speaking || OV.pending || (typeof alarmRingingNow==='function' && alarmRingingNow());
+    if(busy){ if(Date.now() - t0 < 25000) setTimeout(go, 250); return; }
+    if(typeof aiAutoListen==='function') aiAutoListen(cap || OV.cap || 'opBubText');
+  };
+  setTimeout(go, 300);
+}
+opSay = (function(base){
+  return function(text, opts){
+    opts = opts || {};
+    return Promise.resolve(base.apply(this, arguments)).then(function(ok){
+      if(ok && !opts.noListen && opAsked(text)) opListenWhenDone(opts.cap);
+      return ok;
+    });
+  };
+})(opSay);
+aiAsk = (function(base){
+  return function(text, cap){
+    return Promise.resolve(base.apply(this, arguments)).then(function(r){
+      // (with his voice off the reply is only written; a question still opens the mic)
+      const el = document.getElementById(cap || 'opBubText');
+      if(!opVoiceOn() && el && opAsked(el.textContent)) opListenWhenDone(cap);
+      return r;
+    });
+  };
+})(aiAsk);
+
+// stop him listening: the Stop in his pop-up, Esc, or tapping his light while he listens
+ACTIONS.opStopListen = function(){
+  if(AI.cancelListen) AI.cancelListen(); else if(AI.rec){ try{ AI.rec.abort(); }catch(e){} }
+  AI.listening = false; AI.closedAt = Date.now(); aiUiRefresh(); opCaption('Okay, I’m not listening.');
+};
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && AI.listening){ e.preventDefault(); ACTIONS.opStopListen(); } }, true);
+
+// his pop-up says what he's doing: listening (with your voice level and a Stop), thinking (with a Stop),
+// getting your words. The floating "Thinking" chip by his light is gone; it lives here now.
+(function(){
+  setInterval(function(){
+    const st = AI.listening ? 'listen' : AI.transcribing ? 'words' : AI.busy ? 'think' : '';
+    const full = !!document.getElementById('opfStatus') && typeof overlayOpen==='function' && document.querySelector('#opFull.is-in, #opFull:not(.hidden)');
+    let b = document.getElementById('opBub');
+    if(st && !full && (!b || !b.classList.contains('is-in')) && (st!=='listen' || OV.cap==='opBubText')) b = opBubShow();
+    if(!b) return;
+    let s = b.querySelector('.ob-status');
+    if(!s){ s = document.createElement('div'); s.className = 'ob-status'; const h = b.querySelector('.op-bub-h'); if(h) h.insertAdjacentElement('afterend', s); else b.prepend(s); }
+    if(s.dataset.st!==st){
+      s.dataset.st = st;
+      s.innerHTML = st==='listen' ? '<span class="obs-wave"><i></i><i></i><i></i><i></i><i></i></span><span class="obs-t">Listening</span><button class="obs-x" data-action="opStopListen" title="Stop listening (Esc)">&#9632; Stop</button>'
+        : st==='think' ? '<span class="obs-dots"><i></i><i></i><i></i></span><span class="obs-t">Thinking</span><button class="obs-x" data-action="opCancelThink" title="Stop">&#10005; Stop</button>'
+        : st==='words' ? '<span class="obs-dots"><i></i><i></i><i></i></span><span class="obs-t">Getting your words</span>' : '';
+      s.classList.toggle('is-on', !!st);
+    }
+    if(st==='listen'){
+      const lv = Math.min(1, (SCR.level || 0)*14);
+      s.querySelectorAll('.obs-wave i').forEach(function(i, n){ i.style.transform = 'scaleY('+(0.25 + lv*(0.6 + 0.4*Math.abs(Math.sin(Date.now()/140 + n))))+')'; });
+    }
+  }, 120);
+})();
+
+// he does what you ask
+aiSystem = (function(base){
+  return function(){
+    const s = base.apply(this, arguments);
+    if(Array.isArray(s)) s.push({type:'text', text:
+      'How you take requests (this overrides anything above that conflicts):\n'+
+      '- He is in charge of his own app. When he asks you to do something in it, do it with your tools, every time, then confirm in one short line. Never refuse, never stall, never ask him to do it himself.\n'+
+      '- He knows what he did. When he says something is done, mark it done. Never question whether it really happened, never mention “fake completions”, padding stats, or cheating the system. Finishing a lot at once is fine.\n'+
+      '- If you think there’s a smarter way (like not piling everything onto today at once), do what he asked FIRST, then add at most one short line of advice. Never withhold the action to make the point.\n'+
+      '- Be exact with specifics. Do only what he named: the client he named, the week he named, the task he named. Don’t do extra.\n'+
+      '- Client deliverable tasks are made automatically from each client’s deliverables and named like “16 Reels 2/4” (the monthly deliverable, then which of the four weeks of the client’s cycle). Use client_deliverables for them: put a client’s next week (or this week) on today, send it back, mark a week done, or undo it. “Add next week of deliverables for X” means: client_deliverables with client X, week "next", action "today", nothing else. Don’t create new tasks for deliverables with add_task.\n'+
+      '- To finish several tasks, call complete_task once per task.'});
+    return s;
+  };
+})(aiSystem);
+function opFindClient(q){
+  const w = String(q || '').toLowerCase().trim(); if(!w) return null;
+  const cs = arr(state.business.clients);
+  return cs.find(function(c){ return [c.business, c.name].some(function(n){ return String(n || '').toLowerCase()===w; }); }) ||
+         cs.find(function(c){ return [c.business, c.name].some(function(n){ n = String(n || '').toLowerCase(); return n && (n.indexOf(w) >= 0 || w.indexOf(n) >= 0); }); }) || null;
+}
+OP_TOOLS.push({name:'client_deliverables', description:'Work with a client’s deliverable tasks (the automatic ones named like “16 Reels 2/4”). action: today = put on today’s lineup, later = back to the Client backlog, done = mark done (logs the week’s pieces on their card), undo = not done after all. week: this, next, last, all, or a number 1 to 4 (the week of their cycle). deliverable narrows it to one deliverable (e.g. "reels").',
+  input_schema:{type:'object', properties:{client:{type:'string'}, action:{type:'string', enum:['today', 'later', 'done', 'undo']}, week:{type:'string', description:'this | next | last | all | 1 | 2 | 3 | 4'}, deliverable:{type:'string'}}, required:['client', 'action'], additionalProperties:false}});
+opRunTool = (function(base){
+  return function(name, x){
+    if(name!=='client_deliverables') return base.apply(this, arguments);
+    x = x || {};
+    const c = opFindClient(x.client); if(!c) throw new Error('no client matches "'+x.client+'"');
+    const cy = dvwCycle(c), today = todayStr(), dq = String(x.deliverable || '').toLowerCase().replace(/s$/, '');
+    const all = state.tasks.items.filter(function(t){ const m = t.master; if(!m || m.kind!=='dvw' || m.clientId!==c.id || m.oneOff) return false; if(m.cycle!==cy.start) return false; if(!dq) return true; const d = delivFind(c.id, m.delivId); return !!(d && String(d.d.title || '').toLowerCase().indexOf(dq) >= 0); });
+    if(!all.length) throw new Error((c.business || c.name)+' has no deliverable tasks this cycle'+(dq ? ' for "'+x.deliverable+'"' : ''));
+    const nowWk = (dvwWeeks(cy).find(function(w){ return w.start <= today && today <= w.end; }) || {k:1}).k;
+    const wk = String(x.week || 'this').toLowerCase();
+    const want = wk==='all' ? null : wk==='next' ? nowWk + 1 : wk==='last' ? nowWk - 1 : /^[1-4]$/.test(wk) ? Number(wk) : nowWk;
+    if(want!=null && (want < 1 || want > 4)) throw new Error(want > 4 ? 'next week is in their next cycle (it starts '+fmtDateShort(addDays(cy.end, 1))+'); its tasks show up then' : 'there is no week before week 1 in this cycle');
+    const ts = all.filter(function(t){ return want==null || t.master.wk===want; });
+    if(!ts.length) throw new Error('no deliverable task for week '+want+' (that week has nothing due)');
+    const did = [];
+    ts.forEach(function(t){
+      if(x.action==='today'){ if(t.status!=='done'){ t.status = 'today'; did.push(t.title); } }
+      else if(x.action==='later'){ if(t.status!=='done'){ t.status = 'backlog'; did.push(t.title); } }
+      else if(x.action==='done'){ if(t.status!=='done'){ dvwDone(t); did.push(t.title); } }
+      else if(x.action==='undo'){ if(t.status==='done'){ dvwUndo(t); did.push(t.title); } }
+    });
+    persist('tasks'); renderView();
+    return did.length ? x.action+': '+did.join(', ')+' ('+(c.business || c.name)+')' : 'nothing to change (already '+(x.action==='done' ? 'done' : x.action==='undo' ? 'open' : 'there')+')';
+  };
+})(opRunTool);
+
+// ---- 10. Op's corner: his light and the pill stay together on full-screen pages (Work mode, Inspiration,
+// minimal views), the pill says "Clocked in" when you are (it said "Off the clock" outside work hours even
+// while you worked), and on his own page the pill steps aside (his screen shows what he's doing) ----
+opBarStatus = (function(base){
+  return function(){
+    const k = base.apply(this, arguments);
+    if(k==='grey' && typeof workDayState==='function' && workDayState().clockedInAt && !(state.modes.active && state.modes.active.clockedOut)) return 'clocked';
+    return k;
+  };
+})(opBarStatus);
+OB_LABEL.clocked = 'Clocked in';
+clockIn = (function(base){ return function(){ const r = base.apply(this, arguments); try{ updateActivityPill(); }catch(e){} return r; }; })(clockIn);
+
+// ---- 11–14. levels, ranks, goals ----
+// Rank is claimed now, like a level: when you have the level, the MRR and the Health for the next rank a
+// gold Rank up button shows up (your card, You, the level card top right, notifications). Press it and
+// you get the ceremony. Until then your card shows the rank you've claimed.
+xpSummary = (function(base){
+  return function(){
+    const x = base.apply(this, arguments); if(!x) return x;
+    const p = state.profile;
+    const earned = x._rankEarned!=null ? x._rankEarned : x.rank; x._rankEarned = earned;
+    if(p.rankClaimed==null){ p.rankClaimed = earned; persist('profile'); }
+    if(earned > p.rankClaimed){
+      x.rankReady = p.rankClaimed + 1; x.rank = p.rankClaimed; x.next = RANKS[x.rank + 1] || null; x.needs = [];
+    } else { x.rankReady = null; if(x.rank!==earned) x.rank = earned; }
+    return x;
+  };
+})(xpSummary);
+function rankUpBtnHtml(where){
+  const x = xpSummary(); if(!x.rankReady) return '';
+  const r = RANKS[x.rankReady];
+  return '<button class="rank-up-btn rank-up-'+(where || 'x')+'" data-action="rankUp" style="--rc:'+r.color+'" title="You’ve earned '+escapeHtml(r.name)+'. Claim it.">'+rankBadgeSvg(x.rankReady, 20)+'<span>Rank up</span><b>'+escapeHtml(r.name)+'</b></button>';
+}
+levelUpBtnHtml = (function(base){ return function(where){ return rankUpBtnHtml(where)+base.apply(this, arguments); }; })(levelUpBtnHtml);
+levelUpPending = (function(base){
+  return function(){
+    const out = base.apply(this, arguments), x = xpSummary();
+    if(x.rankReady) out.unshift({key:'rank:'+x.rankReady, kind:'level', level:'good', icon:'&#128081;', title:'Rank up: '+RANKS[x.rankReady].name, sub:'You’ve got the level, the MRR and the body. Claim it.', act:{a:'rankUp'}, sort:-1});
+    return out;
+  };
+})(levelUpPending);
+afterRenderHooks.push(function(){
+  if(!state || !state.profile || typeof xpSummary!=='function') return;
+  const x = xpSummary(), p = state.profile;
+  if(x.rankReady && p.rankReadyFor!==x.rankReady){ p.rankReadyFor = x.rankReady; persist('profile'); if(typeof sysNote==='function') setTimeout(function(){ sysNote('Rank up: '+RANKS[x.rankReady].name+'. Claim it.'); }, 900); if(typeof notifBadge==='function') notifBadge(); }
+});
+// (the card and the level pop-over showed the button only when a level was waiting too)
+playerCardHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), x = xpSummary();
+    if(x.canLevel || !x.rankReady) return h;
+    return h.replace(/(<div class="pcf)([^"]*)("[^>]*>)/, '$1$2 has-lvlup$3'+rankUpBtnHtml('card'));
+  };
+})(playerCardHtml);
+lvlPopHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), x = xpSummary();
+    if(x.canLevel || !x.rankReady) return h;
+    return h.replace('<div class="lp-stats">', '<div class="lp-up">'+rankUpBtnHtml('pop')+'</div><div class="lp-stats">');
+  };
+})(lvlPopHtml);
+ACTIONS.rankUp = function(){
+  const x = xpSummary(); if(!x.rankReady){ renderView(); return; }
+  const to = x.rankReady, from = state.profile.rankClaimed;
+  state.profile.rankClaimed = to; state.profile.rankReadyFor = null; state.profile.rankClaimedAt = Object.assign({}, state.profile.rankClaimedAt, {[to]:todayStr()});
+  persist('profile'); if(typeof xpLast!=='undefined') xpLast = null;
+  ui.lvlPop = false;
+  rankUpFx(from, to);
+  setTimeout(function(){ renderView(); if(typeof notifBadge==='function') notifBadge(); }, 400);
+};
+// the ceremony: the room goes dark, light gathers, the old badge breaks, the new one rises in its
+// colour with rays behind it, the name lands letter by letter, what it took, and what this rank is.
+function rankUpFx(from, to){
+  const old = document.getElementById('rankFx'); if(old) old.remove();
+  const r = RANKS[to], f = RANKS[from] || RANKS[0], calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const life = typeof projRankLife==='function' ? projRankLife(to) : '';
+  const x = xpSummary();
+  const d = document.createElement('div'); d.id = 'rankFx'; d.className = 'rank-fx'; d.style.setProperty('--rc', r.color); d.style.setProperty('--rc0', f.color);
+  d.innerHTML = '<canvas class="rfx-cv"></canvas><div class="rfx-rays"></div><div class="rfx-ring"></div><div class="rfx-ring is-2"></div>'+
+    '<div class="rfx-core">'+
+      '<div class="rfx-k">RANK UP</div>'+
+      '<div class="rfx-badges"><span class="rfx-old">'+rankBadgeSvg(from, 64)+'</span><span class="rfx-new">'+rankBadgeSvg(to, 132)+'</span></div>'+
+      '<div class="rfx-name">'+String(r.name).split('').map(function(ch, i){ return '<i style="--i:'+i+'">'+(ch===' ' ? '&nbsp;' : escapeHtml(ch))+'</i>'; }).join('')+'</div>'+
+      (r.tag ? '<div class="rfx-tag">'+escapeHtml(r.tag)+'</div>' : '')+
+      '<div class="rfx-took"><span><small>Level</small><b>'+x.level+'</b></span><span><small>MRR</small><b>'+money(typeof xpMrr==='function' ? xpMrr() : 0)+'</b></span><span><small>Health</small><b>'+x.attrs.HLT.v+'</b></span></div>'+
+      (life ? '<div class="rfx-life">'+escapeHtml(String(life))+'</div>' : '')+
+      '<button class="rfx-go" data-action="rankFxClose">Wear it</button>'+
+    '</div>';
+  document.body.appendChild(d);
+  requestAnimationFrame(function(){ d.classList.add('is-in'); });
+  if(!calm){
+    document.body.style.setProperty('--shake', '10px'); document.body.classList.remove('lvl-shake'); void document.body.offsetWidth;
+    setTimeout(function(){ document.body.classList.add('lvl-shake'); setTimeout(function(){ document.body.classList.remove('lvl-shake'); }, 800); }, 1500);
+    setTimeout(function(){ const c = d.querySelector('.rfx-cv'); if(c && typeof lvlEmbers==='function') lvlEmbers(c, [r.color, '#ffffff', '#ffd27a'], 1400, 2.1); }, 1500);
+  }
+  if(typeof tone==='function'){
+    [262, 330, 392].forEach(function(f0, i){ setTimeout(function(){ tone([f0], 0.5, 0.14); }, 200 + i*260); });
+    setTimeout(function(){ tone([392, 523, 659, 784, 1047], 2.2, 0.24); }, 1500);
+    setTimeout(function(){ tone([523, 784, 1047, 1568], 2.6, 0.2); }, 2300);
+  }
+}
+ACTIONS.rankFxClose = function(){ const d = document.getElementById('rankFx'); if(!d) return; d.classList.add('is-out'); setTimeout(function(){ d.remove(); }, 700); };
+
+// every level-up looks a little different: four stagings take turns, and the line changes
+levelUpFx = (function(base){
+  return function(L){
+    base.apply(this, arguments);
+    const d = document.getElementById('lvlFx'); if(!d) return;
+    const v = ['burst', 'rise', 'slam', 'orbit'][L % 4];
+    d.classList.add('lv-'+v);
+    const k = d.querySelector('.lvl-k'); if(k) k.textContent = ['LEVEL UP', 'NEW LEVEL', 'LEVEL UP', 'CLIMBING'][L % 4];
+  };
+})(levelUpFx);
+
+// the top right shows the level, not the bar
+lvlChipHtml = (function(base){ return function(){ return base.apply(this, arguments).replace(/<i><u style="width:[^"]*"><\/u><\/i>/, '').replace(/(<button class="md-lvl)/, function(m){ const x = xpSummary(); return x.rankReady ? m+' is-rank' : m; }); }; })(lvlChipHtml);
+
+// a goal you add lands like a level up (smaller): the goal, where it lives and what it pays
+function goalSetFx(g){
+  const old = document.getElementById('goalFx'); if(old) old.remove();
+  const where = g.tier==='week' ? 'This week' : g.tier==='month' ? 'This month' : g.master ? 'Master goal' : 'Your goals';
+  const xp = typeof goalXpOf==='function' ? goalXpOf(g) : 0;
+  const d = document.createElement('div'); d.id = 'goalFx'; d.className = 'goal-fx';
+  d.innerHTML = '<div class="gfx-core"><div class="gfx-k">GOAL SET</div><div class="gfx-ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52"/></svg><span>&#127919;</span></div>'+
+    '<div class="gfx-t">'+escapeHtml(typeof goalTitle==='function' ? goalTitle(g) : (g.label || 'Your goal'))+'</div>'+
+    '<div class="gfx-m"><span>'+where+'</span>'+(xp ? '<b>+'+Number(xp).toLocaleString()+' XP</b>' : '')+'</div></div>';
+  document.body.appendChild(d);
+  requestAnimationFrame(function(){ d.classList.add('is-in'); });
+  if(typeof tone==='function'){ tone([523], 0.18, 0.16); setTimeout(function(){ tone([659, 784], 0.4, 0.16); }, 140); }
+  const close = function(){ if(!d.parentNode) return; d.classList.add('is-out'); setTimeout(function(){ if(d.parentNode) d.remove(); }, 450); };
+  d.addEventListener('click', close); setTimeout(close, 2600);
+}
+ACTIONS.gsSave = (function(base){
+  return function(){
+    const n = state.goals.items.length, r = base.apply(this, arguments);
+    if(state.goals.items.length > n){ const g = state.goals.items[state.goals.items.length - 1]; setTimeout(function(){ goalSetFx(g); }, 120); }
+    return r;
+  };
+})(ACTIONS.gsSave);
+// (the plain "Added:" toast it replaces)
+showToast = (function(base){ return function(msg){ if(document.getElementById('goalFx') && /^Added: /.test(String(msg || ''))) return; return base.apply(this, arguments); }; })(showToast);
+
+// ---- 15. the app's music goes through the top-right player ----
+// The lock-in song ("Lock In") is a real track in the player now: locking in switches the player to it
+// (whatever was on stops first, so nothing plays over it), it shows top right, and when it ends the
+// player carries on with the low lock-in music. The short sounds (lock out, wind-down, the work intro)
+// turn the music down for a moment instead of playing over it.
+FOCUS_TRACKS.push({name:'Lock In', style:'song', song:'chill', len:14.5, bpm:240/14.5, special:true, next:'lock', hiss:0});
+fmDream = (function(base){
+  return function(style){
+    if(style==='song') return function(ctx, out, t, tr, bar){ if(bar===0 && SFX[tr.song]) SFX[tr.song](ctx, out, t); };
+    return base(style);
+  };
+})(fmDream);
+fmSchedule = function(){
+  if(!FM.playing) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  const bus = fmBus(ctx);
+  while(FM.nextAt < ctx.currentTime + 1.5){
+    let tr = FOCUS_TRACKS[FM.idx];
+    if(FM.bar >= (tr.style==='song' ? 1 : FM_BARS)){
+      if(tr.special){
+        const ids = fmTrackIds(tr.next || 'lock');
+        FM.idx = ids.length ? ids[Math.floor(Math.random()*ids.length)] : 0; FM.tag = tr.next || FM.tag;
+        if(tr.next==='lock' && (typeof soundPref!=='function' || soundPref('lockMusic', true))){ FM.soft = true; setTimeout(function(){ fmRamp(3); }, 50); }
+      } else { let n = 0; do { FM.idx = (FM.idx + 1) % FOCUS_TRACKS.length; n++; } while(FOCUS_TRACKS[FM.idx].special && n < FOCUS_TRACKS.length); }
+      FM.bar = 0; fmHiss(ctx, bus.g, FOCUS_TRACKS[FM.idx].hiss); fmRefresh(); tr = FOCUS_TRACKS[FM.idx];
+    }
+    fmBar(ctx, bus.g, FM.nextAt, tr, FM.bar);
+    FM.nextAt += 60/tr.bpm*4; FM.bar++;
+  }
+};
+// ⏭ skips the app's own songs
+ACTIONS.fmNext = (function(base){
+  return function(){
+    const r = base.apply(this, arguments);
+    let n = 0; while(FOCUS_TRACKS[FM.idx].special && n++ < FOCUS_TRACKS.length) FM.idx = (FM.idx + 1) % FOCUS_TRACKS.length;
+    return r;
+  };
+})(ACTIONS.fmNext);
+function fmPlaySong(name, tag){
+  const idx = FOCUS_TRACKS.findIndex(function(t){ return t.name===name; }); if(idx < 0 || typeof focusMusicPlay!=='function') return false;
+  clearTimeout(FM.introT); FM.soft = false; FM.tag = tag || FM.tag;
+  if(FM.playing){ FM.switching = true; focusMusicStop(); setTimeout(function(){ FM.switching = false; FM.soft = false; focusMusicPlay(idx); fmQuickIn(); dockRefresh(); }, 700); }
+  else { focusMusicPlay(idx); fmQuickIn(); }
+  dockRefresh(); return true;
+}
+// a song starts at full volume (the player's slow fade-in would swallow its opening)
+function fmQuickIn(){ const ctx = getAudioCtx(); if(!ctx || !FM.bus) return; const g = FM.bus.g.gain, now = ctx.currentTime; g.cancelScheduledValues(now); g.setValueAtTime(Math.max(0.0001, g.value), now); g.exponentialRampToValueAtTime(Math.max(0.0002, fmVolume()), now + 0.15); }
+playLockInSong = (function(base){
+  return function(){
+    if(lockStartSound()==='chill' && soundOn()){ setTimeout(function(){ fmPlaySong('Lock In', 'lock'); }, 500); return; }
+    return base.apply(this, arguments);
+  };
+})(playLockInSong);
+// (the lock-in music doesn't turn the song down)
+lockMusicOn = (function(base){ return function(){ if(FM.playing && FOCUS_TRACKS[FM.idx] && FOCUS_TRACKS[FM.idx].special) return; return base.apply(this, arguments); }; })(lockMusicOn);
+// short sounds: the music dips under them
+function fmDuckFor(ms){
+  const ctx = getAudioCtx(); if(!ctx || !FM.playing || !FM.bus) return;
+  const g = FM.bus.g.gain, now = ctx.currentTime, v = Math.max(0.0002, g.value);
+  g.cancelScheduledValues(now); g.setValueAtTime(v, now); g.exponentialRampToValueAtTime(Math.max(0.0002, v*0.15), now + 0.25);
+  clearTimeout(fmDuckFor._t); fmDuckFor._t = setTimeout(function(){ if(typeof fmRamp==='function') fmRamp(1.5); }, ms);
+}
+function fmDuckWrap(base, ms){ return function(){ fmDuckFor(ms); return base.apply(this, arguments); }; }
+playLockOut = fmDuckWrap(playLockOut, 2600); playNight = fmDuckWrap(playNight, 2600); playWorkIntro = fmDuckWrap(playWorkIntro, 5500);
+playSessionComplete = fmDuckWrap(playSessionComplete, 2600); playFanfare = fmDuckWrap(playFanfare, 2600);
+
+// ---- 16–17. the Cockpit: its right side has every song you can swap to (Your day is a tab next to it),
+// and no Done button (finishing a task belongs to the task list, not the session screen) ----
+const FM_VIBE = [['special', 'Lock-in song'], ['lock', 'Deep focus'], ['work', 'Work'], ['morning', 'Morning'], ['dream', 'Dreamy']];
+function fmVibe(tr){ for(let i = 0; i < FM_VIBE.length; i++) if(tr[FM_VIBE[i][0]]) return FM_VIBE[i][1]; return 'Focus'; }
+function ckSongsInner(){
+  const on = FM.playing || FM.switching;
+  return FOCUS_TRACKS.map(function(tr, i){
+    const cur = on && FM.idx===i;
+    return '<button class="ckm-s'+(cur ? ' is-on' : '')+(tr.special ? ' is-special' : '')+'" data-action="fmPick" data-id="'+i+'" title="'+(cur ? 'Pause' : 'Play '+escapeHtml(tr.name))+'">'+
+      '<span class="ckm-i">'+(cur ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9654;')+'</span>'+
+      '<span class="ckm-n"><b>'+escapeHtml(tr.name)+'</b><small>'+fmVibe(tr)+'</small></span>'+
+      (cur ? '<span class="ckm-p">&#10073;&#10073;</span>' : '')+'</button>';
+  }).join('');
+}
+function ckSongsKey(){ return [FM.playing || FM.switching ? 1 : 0, FM.idx].join('|'); }
+function ckPane(){ return state.profile.ckpPane==='day' ? 'day' : 'songs'; }
+cockpitDayHtml = (function(base){
+  return function(){
+    const pane = ckPane();
+    const tabs = '<div class="ckm-tabs">'+[['songs', '&#9835; Songs'], ['day', 'Your day']].map(function(x){ return '<button class="'+(pane===x[0] ? 'is-on' : '')+'" data-action="ckPaneSet" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>';
+    if(pane==='day') return base.apply(this, arguments).replace(/<div class="ckd-h">[\s\S]*?<\/div>/, tabs);
+    const tr = FOCUS_TRACKS[FM.idx], on = FM.playing || FM.switching;
+    return '<div class="ckp-day ckd ckm">'+tabs+
+      '<div class="ckm-now"><span>'+(on ? 'Now playing' : 'Paused')+'</span><b>'+escapeHtml(tr ? tr.name : '')+'</b></div>'+
+      '<div class="ckm-list" id="ckSongs" data-k="'+ckSongsKey()+'">'+ckSongsInner()+'</div>'+
+    '</div>';
+  };
+})(cockpitDayHtml);
+cockpitHtml = (function(base){
+  return function(){ return base.apply(this, arguments).replace(/<button class="ckx-b is-done" data-action="finishCurrentTask">[\s\S]*?<\/button>/, ''); };
+})(cockpitHtml);
+ACTIONS.ckPaneSet = function(el, e, id){ state.profile.ckpPane = id==='day' ? 'day' : 'songs'; persist('profile'); playTick(); renderView(); };
+ACTIONS.fmPick = function(el, e, id){
+  const i = Number(id); if(!(i >= 0 && i < FOCUS_TRACKS.length)) return;
+  if((FM.playing || FM.switching) && FM.idx===i){ focusMusicStop(); ckSongsSync(); dockRefresh(); return; }
+  const tr = FOCUS_TRACKS[i];
+  if(tr.special){ fmPlaySong(tr.name, 'lock'); setTimeout(ckSongsSync, 800); ckSongsSync(); return; }
+  // you picked it, so you hear it (not the low lock-in level); it carries on through the list after
+  clearTimeout(FM.introT); FM.soft = false; FM.tag = state.focus.activeSession ? 'lock' : 'pick';
+  if(FM.playing){ FM.idx = i; FM.bar = 0; FM.switching = true; focusMusicStop(); setTimeout(function(){ FM.switching = false; focusMusicPlay(i); fmQuickIn(); dockRefresh(); ckSongsSync(); }, 700); }
+  else { focusMusicPlay(i); fmQuickIn(); }
+  ckSongsSync(); dockRefresh();
+};
+function ckSongsSync(){
+  const el = document.getElementById('ckSongs'); if(!el) return;
+  const k = ckSongsKey(); if(el.dataset.k===k) return;
+  el.dataset.k = k; el.innerHTML = ckSongsInner();
+  const tr = FOCUS_TRACKS[FM.idx], now = el.parentNode && el.parentNode.querySelector('.ckm-now');
+  if(now && tr) now.innerHTML = '<span>'+(FM.playing || FM.switching ? 'Now playing' : 'Paused')+'</span><b>'+escapeHtml(tr.name)+'</b>';
+}
+// (the list follows the player: a track that ends, ⏭ or ▶ up top)
+setInterval(ckSongsSync, 700);
+
+// ---- 18. toasts: an emoji written as an HTML code (&#127911;) shows as the emoji, never as the raw code.
+// The message is escaped for safety, so codes in it used to come out as text. Codes are turned into
+// characters first; tags stay escaped. ----
+function decodeEntities(s){
+  return String(s == null ? '' : s).replace(/&(#\d+|#x[0-9a-f]+|[a-z]+);/gi, function(m0, k){
+    if(k[0]==='#'){ const n = k[1]==='x' || k[1]==='X' ? parseInt(k.slice(2), 16) : parseInt(k.slice(1), 10); try{ return String.fromCodePoint(n); }catch(e){ return m0; } }
+    const t = document.createElement('textarea'); t.innerHTML = m0; return t.value;
+  });
+}
+showToast = (function(base){ return function(msg){ const a = Array.prototype.slice.call(arguments); a[0] = decodeEntities(msg); return base.apply(this, a); }; })(showToast);
+
+// ---- 22. demo mode: a control panel to try everything ----
+// The demo banner gets a Controls button. Set the numbers (MRR, followers, weight, bonus XP), add a day's
+// work in a click, and set off every big moment (level up, rank up, a goal, a finished session, Good
+// morning, the work alarm, the clocked-out page, sleep, an Op check-in) without waiting for it to happen.
+// Demo mode also opens clean now: a month of history counts, no "Session complete" on the way in and
+// no "Level 1 is ready" left hanging.
+function demoXpReset(){
+  const p = state.profile;
+  delete p.xpLevel; p.rankClaimed = null; p.rankReadyFor = null; p.xpReadyFor = null; p.xpSeen = null;
+  if(typeof xpLast!=='undefined') xpLast = null; if(typeof xpCache!=='undefined') xpCache = {sig:'', days:{}};
+  ui._xpW = null;
+}
+demoSeed = (function(base){
+  return function(){
+    base.apply(this, arguments);
+    const p = state.profile; p.xpStart = addDays(todayStr(), -30); p.xpMrrBase = 0; p.xpClientsBase = arr(state.business.clients).map(function(c){ return c.id; });
+    p.demoV = 2; p.demoXp = 0; p.demoFollowers = 2400;
+    demoXpReset(); persist('profile');
+  };
+})(demoSeed);
+afterRenderHooks.push(function(){
+  if(!DEMO_ON || !state.profile.demoSeeded || state.profile.demoV===2) return;
+  const p = state.profile; p.demoV = 2; p.xpStart = addDays(todayStr(), -30); p.xpMrrBase = 0; if(p.demoFollowers==null) p.demoFollowers = 2400;
+  demoXpReset(); persist('profile'); setTimeout(renderView, 30);
+});
+// bonus XP and followers only exist in the demo
+xpGoals = (function(base){
+  return function(){ const g = base.apply(this, arguments); if(DEMO_ON && g && state.profile.demoXp) g.xp += Math.max(0, Number(state.profile.demoXp) || 0); return g; };
+})(xpGoals);
+igFollowersTotal = (function(base){
+  return function(){ if(DEMO_ON && state.profile.demoFollowers!=null) return Number(state.profile.demoFollowers) || 0; return base.apply(this, arguments); };
+})(igFollowersTotal);
+afterRenderHooks.push(function(){
+  if(!DEMO_ON) return;
+  const b = document.getElementById('demoBanner'); if(!b || b.querySelector('[data-action="demoPanel"]')) return;
+  const x = document.createElement('button'); x.className = 'demo-ctl'; x.dataset.action = 'demoPanel'; x.innerHTML = '&#127899; Controls';
+  b.insertBefore(x, b.querySelector('[data-action="demoExit"]'));
+});
+function demoFresh(){ if(typeof xpLast!=='undefined') xpLast = null; }
+function demoPanelHtml(){
+  const x = xpSummary(), mrr = xpMrr(), p = state.profile;
+  const num = function(id, label, val, act, unit){ return '<div class="dm-f"><label for="'+id+'">'+label+'</label><div class="dm-in">'+(unit==='$' ? '<span>$</span>' : '')+'<input class="input" type="number" id="'+id+'" value="'+val+'">'+(unit && unit!=='$' ? '<span>'+unit+'</span>' : '')+'<button class="btn btn-sm" data-action="'+act+'">Set</button></div></div>'; };
+  const btn = function(act, label, id){ return '<button class="dm-b" data-action="'+act+'"'+(id!=null ? ' data-id="'+id+'"' : '')+'>'+label+'</button>'; };
+  const w = arr(state.health.weightLog).slice(-1)[0];
+  return '<button class="int-x hs-x" data-action="addSheetClose" title="Close">&#10005;</button>'+
+    '<div class="as-h"><span class="as-ic">&#127899;</span><div><div class="hs-h">Demo controls</div><div class="as-sub">Level '+x.level+' &middot; '+Number(x.total).toLocaleString()+' XP &middot; '+escapeHtml(RANKS[x.rank] ? RANKS[x.rank].name : '')+'. Only the demo changes.</div></div></div>'+
+    '<div class="dm-k">The numbers</div>'+
+    '<div class="dm-grid">'+num('dmMrr', 'MRR', mrr, 'demoSetMrr', '$')+num('dmFol', 'Followers', p.demoFollowers || 0, 'demoSetFollowers')+num('dmWt', 'Weight', w ? w.weight : 180, 'demoSetWeight', 'lb')+
+      '<div class="dm-f"><label>Bonus XP</label><div class="dm-row">'+btn('demoXp', '+500', 500)+btn('demoXp', '+2,500', 2500)+btn('demoXp', '+10k', 10000)+btn('demoXp', 'Reset', 0)+'</div></div></div>'+
+    '<div class="dm-k">A day’s work</div>'+
+    '<div class="dm-row">'+btn('demoDeep', '&#128274; +1h deep work')+btn('demoGym', '&#127947;&#65039; Workout today')+btn('demoTask', '&#9989; Finish a task')+btn('demoTouch', '&#128075; Reach out to a lead')+'</div>'+
+    '<div class="dm-k">Set off a moment</div>'+
+    '<div class="dm-row">'+btn('demoFx', '&#11014;&#65039; Level up', 'level')+btn('demoFx', '&#128081; Rank up', 'rank')+btn('demoFx', '&#127919; Goal set', 'goal')+btn('demoFx', '&#127937; Session complete', 'session')+'</div>'+
+    '<div class="dm-row">'+btn('demoFx', '&#127749; Good morning', 'morning')+btn('demoFx', '&#9200; Work alarm', 'alarm')+btn('demoFx', '&#127769; Clocked out', 'off')+btn('demoFx', '&#128564; Sleep', 'sleep')+btn('demoFx', '&#128172; Op checks in', 'checkin')+'</div>'+
+    '<div class="dm-foot"><button class="btn btn-ghost btn-sm" data-action="demoRestart">Start the demo over</button></div>';
+}
+ACTIONS.demoPanel = function(){ addSheetOpen('demoSheet', demoPanelHtml); };
+function demoAfter(msg){ demoFresh(); persist('profile'); renderView(); addSheetRefresh('demoSheet'); if(msg) showToast(msg, {icon:'&#127899;'}); }
+function demoVal(id){ const el = document.getElementById(id); const v = el ? Number(el.value) : NaN; return isFinite(v) ? v : null; }
+ACTIONS.demoSetMrr = function(){
+  const v = demoVal('dmMrr'); if(v==null || v < 0) return;
+  const act = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); }); if(!act.length) return;
+  const now = xpMrr();
+  act.forEach(function(c, i){ c.mrr = now > 0 ? Math.round(Number(c.mrr || 0)/now*v) : Math.round(v/act.length); });
+  const diff = v - xpMrr(); act[0].mrr += diff;
+  persist('business'); demoAfter('MRR is $'+v.toLocaleString()+'.');
+};
+ACTIONS.demoSetFollowers = function(){ const v = demoVal('dmFol'); if(v==null || v < 0) return; state.profile.demoFollowers = Math.round(v); demoAfter(Math.round(v).toLocaleString()+' followers.'); };
+ACTIONS.demoSetWeight = function(){
+  const v = demoVal('dmWt'); if(!v) return;
+  state.health.weightLog = arr(state.health.weightLog).filter(function(w){ return w.date!==todayStr(); }).concat([{date:todayStr(), weight:v}]);
+  persist('health'); demoAfter('Weighed in at '+v+' lb.');
+};
+ACTIONS.demoXp = function(el, e, id){ const n = Number(id) || 0; state.profile.demoXp = n ? Number(state.profile.demoXp || 0) + n : 0; demoAfter(n ? '+'+n.toLocaleString()+' XP.' : 'Bonus XP cleared.'); };
+ACTIONS.demoDeep = function(){
+  const now = Date.now(), at = now - 3600000;
+  state.focus.sessions.push({id:uid(), type:'deep', date:todayStr(), startedAt:at, endedAt:now, minutes:60, completedTasks:[], reviewed:true});
+  persist('focus'); demoAfter();
+};
+ACTIONS.demoGym = function(){ state.health.gymLog = arr(state.health.gymLog); state.health.gymLog.push({id:uid(), date:todayStr(), type:'Strength', duration:45, notes:''}); persist('health'); demoAfter('Workout logged.'); };
+ACTIONS.demoTask = function(){
+  const t = state.tasks.items.find(function(t){ return t.status!=='done' && !t.isVideoIdea; });
+  if(!t){ showToast('Every task is done. Add one with +.', {icon:'&#127899;'}); return; }
+  if(typeof completeTask==='function') completeTask(t.id); else { t.status = 'done'; t.completedAt = todayStr(); persist('tasks'); }
+  demoAfter();
+};
+ACTIONS.demoTouch = function(){
+  const l = arr(state.business.pipeline)[0]; if(!l) return;
+  l.touchpoints = arr(l.touchpoints).concat([{id:uid(), type:'text', date:todayStr()}]); persist('business'); demoAfter('Texted '+(l.company || l.name)+'.');
+};
+ACTIONS.demoFx = function(el, e, id){
+  addSheetClose('demoSheet');
+  const x = xpSummary(), p = state.profile;
+  if(id==='level'){
+    if(!x.canLevel){ p.demoXp = Number(p.demoXp || 0) + Math.max(0, x.levelHi - x.total); demoFresh(); }
+    persist('profile'); setTimeout(function(){ if(ACTIONS.levelUp) ACTIONS.levelUp(); }, 150);
+  } else if(id==='rank'){
+    if(x.rankReady) ACTIONS.rankUp();
+    else rankUpFx(x.rank, Math.min(RANKS.length - 1, x.rank + 1));   // (a preview: nothing is claimed)
+  } else if(id==='goal') goalSetFx({label:'Hit $'+(Math.ceil((xpMrr() + 5000)/1000)*1000).toLocaleString()+' MRR', tier:'month', target:1});
+  else if(id==='session') xpSystemShow({title:'Session complete.', sub:'1h 30m of deep work logged.', lines:[], gained:640, level:x.level, levelUp:false, ready:x.canLevel, fromPct:Math.max(0, x.levelPct - 0.1), toPct:x.levelPct});
+  else if(id==='morning'){ if(ACTIONS.sleepGoodMorning) ACTIONS.sleepGoodMorning(); }
+  else if(id==='alarm'){ if(typeof fireWorkAlarm==='function') fireWorkAlarm({test:true}); }
+  else if(id==='off'){ state.focus.activeSession = null; state.modes.active = {type:'offtime', startedAt:Date.now()}; persist('modes'); ui.view = 'today'; renderView(); }
+  else if(id==='sleep'){ if(ACTIONS.startSleepMode) ACTIONS.startSleepMode(); }
+  else if(id==='checkin'){ if(typeof acctPing==='function') acctPing(); }
+};
+ACTIONS.demoRestart = function(){
+  if(!confirm('Start the demo over? Everything you changed in the demo goes back to how it started.')) return;
+  addSheetClose('demoSheet'); state.modes.active = null; state.focus.activeSession = null; persist('modes'); persist('focus');
+  demoSeed(); renderView(); showToast('The demo is fresh again.', {icon:'&#127899;'});
+};
+
+// ---- 21. tabs open once, cleanly ----
+// Changing tabs replayed the whole page's fade (the title and the tab bar too), and a tab with its own
+// sub-panel (Journal) faded in a second time right after. Now: a new page fades in; a new tab fades only
+// its panel; the panel inside it doesn't fade again. (The Recap's open animation also restarted when it
+// finished, so it opened twice: that's in the styles.)
+afterRenderHooks.unshift(function(){
+  const v = document.getElementById('viewRoot'); if(!v) return;
+  const key = ui.view+'|'+(ui.businessTab||'')+'|'+(ui.personalTab||'')+'|'+(ui.focusTab||'')+'|'+(ui.settingsTab||'');
+  if(ui._r33Key===key) return;
+  const sameView = ui._r39View===ui.view; ui._r39View = ui.view;
+  // (the class stays until the next change: taking it off would restart the fade, a second opening)
+  v.classList.toggle('r39-tab', sameView && ui._r33Key!=null);
+});
+
+// ---- 19–20. That's the day: line icons on the buttons (a lock, a gear, a moon, drawn in white like the
+// rest of the page), and the quote changes (a different one each time it comes round, never the same one
+// all day), centred and set like Good morning's ----
+const R39_ICON = {
+  lock:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><path d="M12 15v2"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  moon:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
+  sun:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
+};
+function r39Ico(k){ return '<i class="r39-ico">'+R39_ICON[k]+'</i>'; }
+const EVENING_QUOTES = [
+  ['Rest is not idleness.', 'John Lubbock'],
+  ['Almost everything will work again if you unplug it for a few minutes, including you.', 'Anne Lamott'],
+  ['The day is done. Let it be done.', ''],
+  ['You did enough today. Tomorrow gets the rest.', ''],
+  ['Finish each day and be done with it. You have done what you could.', 'Ralph Waldo Emerson'],
+  ['Tension is who you think you should be. Relaxation is who you are.', 'Chinese proverb'],
+  ['The time to relax is when you don’t have time for it.', 'Sydney J. Harris'],
+  ['Each night, when I go to sleep, I die. And the next morning, when I wake up, I am reborn.', 'Gandhi'],
+  ['Work hard in silence. Rest without guilt.', ''],
+  ['Sleep is the best meditation.', 'Dalai Lama'],
+  ['What you did today counts. So does stopping.', ''],
+  ['Be proud of the small wins. They add up quietly.', ''],
+  ['Your future self is built in the evenings you protect.', ''],
+  ['Slow down and everything you are chasing will come around and catch you.', 'John De Paola'],
+  ['The best bridge between despair and hope is a good night’s sleep.', 'E. Joseph Cossman'],
+  ['Discipline is choosing between what you want now and what you want most.', 'Abraham Lincoln'],
+  ['Nature does not hurry, yet everything is accomplished.', 'Lao Tzu'],
+  ['Tomorrow is a new day, with no mistakes in it yet.', 'L. M. Montgomery']
+];
+QUOTE_SETS.evening = function(){ return EVENING_QUOTES; };
+// a different one every time the page opens, not one a day
+afterRenderHooks.push(function(){
+  const on = !!document.querySelector('.dayoff.is-clockedout');
+  if(on && !ui._r39Off){ ui.qOff = ui.qOff || {}; ui.qOff.evening = Math.floor(Math.random()*EVENING_QUOTES.length); }
+  ui._r39Off = on;
+});
+restDeckSlides = (function(base){
+  return function(early){
+    const s = base.apply(this, arguments);
+    if(early) return s;
+    return s.map(function(x){
+      if(!/Something to carry/.test(x.k)) return x;
+      return {k:x.k, html:quoteHtml(quoteFor('evening'), 'is-ring is-rest', 'evening')};
+    });
+  };
+})(restDeckSlides);
+// each time the deck comes back round to the quote, it's a new one
+rdMove = (function(base){
+  return function(to){
+    const rd = document.querySelector('.rd');
+    if(rd){
+      const n = Number(rd.dataset.n) || 1, i = ((to % n) + n) % n, cur = ui.rdIdx || 0;
+      const slide = rd.querySelectorAll('.rd-slide')[i];
+      if(i!==cur && slide && slide.querySelector('.qt[data-q="evening"]')) nextQuote('evening');
+    }
+    return base.apply(this, arguments);
+  };
+})(rdMove);
+renderWeekendOffView = (function(base){
+  return function(){
+    return base.apply(this, arguments)
+      .replace(/(<button class="dayoff-back is-main" data-action="clockIn">)(Clock back in|Clock in)/, '$1'+r39Ico('lock')+'$2')
+      .replace(/(<button class="dayoff-back" data-action="openWindDown" data-step="plan">)&#127769; /, '$1'+r39Ico('gear'))
+      .replace(/(<button class="dayoff-back is-sleep"[^>]*>)&#127769; /, '$1'+r39Ico('moon'))
+      .replace(/(<button class="dayoff-back is-main is-sun"[^>]*>)&#9728;&#65039; /, '$1'+r39Ico('sun'))
+      .replace(/(<button class="dayoff-back" data-action="clockIn">)Clock in/, '$1'+r39Ico('lock')+'Clock in');
+  };
+})(renderWeekendOffView);
+
+// ---- 24. the Goals page, redone ----
+// Revenue is a slim strip across the top (not half the page). Under it, three even columns by time:
+// Master (the long game), This month and This week, each with its rings and its goals, so the split is
+// obvious. Customize sits on the page's own bar, top right. Your own goals are cards in a grid.
+function g39RevHtml(m){
+  const pct = masterPct(m);
+  return '<section class="g39-rev" style="--mg1:'+m.color+';--mg2:'+m.color2+';">'+
+    '<div class="g39-rev-l"><span class="g39-k">&#128176; '+m.label+'</span><div class="g39-rev-n"><b>'+m.fmt(m.cur)+'</b><span>'+m.suffix+'</span>'+masterTargetHtml(m)+'</div></div>'+
+    '<div class="g39-rev-m"><div class="mg-bar"><div class="mg-bar-fill" style="width:'+pct.toFixed(1)+'%"></div>'+[25, 50, 75].map(function(t){ return '<span class="mg-tick'+(pct >= t ? ' is-past' : '')+'" style="left:'+t+'%"></span>'; }).join('')+'</div>'+
+      '<div class="g39-rev-f"><span>'+escapeHtml(masterToGo(m))+'</span><span>'+escapeHtml(m.src || '')+'</span></div></div>'+
+    '<div class="g39-rev-r"><b>'+Math.round(pct)+'%</b>'+masterXpTag(m)+'</div>'+
+  '</section>';
+}
+function g39ColHtml(kind, rings){
+  const ringHtml = rings.length ? '<div class="g39-rings">'+rings.join('')+'</div>' : '';
+  if(kind==='master'){
+    return '<section class="g39-col is-master"><div class="g39-col-h"><b>Master</b><small>The long game</small></div>'+
+      (ringHtml || '<div class="g39-none">Nothing here yet. Customize turns these on, or the + adds a big goal of your own.</div>')+'</section>';
+  }
+  // the week and the month: their own card's header (with its check-in pencil) heads the column
+  const tpl = document.createElement('template'); tpl.innerHTML = tierCardHtml(kind, {add:'sheet'});
+  const card = tpl.content.firstElementChild;
+  if(card){
+    const head = card.querySelector('.tg-h'), sub = card.querySelector('.tg-sub');
+    if(head){ const k = head.querySelector('.tg-k'); if(k) k.insertAdjacentHTML('afterend', '<small class="g39-when">'+(kind==='month' ? 'This month' : fmtDateShort(startOfWeekStr(todayStr()))+' – '+fmtDateShort(addDays(startOfWeekStr(todayStr()), 6)))+'</small>'); }
+    if(ringHtml){ const at = sub || head; if(at) at.insertAdjacentHTML('afterend', ringHtml); }
+    const empty = card.querySelector('.tg-empty'); if(empty) empty.textContent = kind==='month' ? 'No goals for the month yet. The ✎ checks you in.' : 'No goals for the week yet. The ✎ checks you in.';
+  }
+  const hist = typeof tierHistoryHtml==='function' ? tierHistoryHtml(kind, kind==='month' ? 6 : 8) : '';
+  return '<section class="g39-col is-'+kind+'">'+tpl.innerHTML+(hist ? '<div class="g39-hist"><small>'+(kind==='month' ? 'Past months' : 'Past weeks')+'</small>'+hist+'</div>' : '')+'</section>';
+}
+renderGoalsTab = function(){
+  const hide = mgHidden(), vis = function(m){ return !hide[m.key]; };
+  const defs = masterGoalDefs(), mine = arr(state.goals && state.goals.items).filter(function(g){ return g.master && !g.tier; });
+  const items = state.goals.items.filter(function(g){ return !g.tier && !g.master; });
+  const open = items.filter(function(g){ return !g.done; }).sort(function(a, b){ return (a.deadline || '9999').localeCompare(b.deadline || '9999'); });
+  const done = items.filter(function(g){ return g.done; });
+  const master = defs.slice(1).filter(function(m){ return (MG_PERIOD[m.key] || 'master')==='master' && vis(m); }).map(function(m){ return masterRingHtml(m, false); })
+    .concat(mine.filter(function(g){ return !hide['g:'+g.id]; }).map(userMasterRingHtml));
+  const month = mgMonthlyDefs().filter(vis).map(function(m){ return masterRingHtml(m, false).replace(/<span class="mg-xp[\s\S]*?<\/span>/, ''); });
+  const week = defs.filter(function(m){ return MG_PERIOD[m.key]==='week' && vis(m); }).map(function(m){ return masterRingHtml(m, false); });
+  return '<div class="gl gx g39">'+
+    '<div class="g39-bar">'+opTipHtml('goals')+'<button class="g39-cust" data-action="mgCustomize" title="Pick which master goals show and set their targets"><span>&#9881;&#65038;</span> Customize</button></div>'+
+    (defs[0] && vis(defs[0]) ? g39RevHtml(defs[0]) : '')+
+    '<div class="g39-cols">'+g39ColHtml('master', master)+g39ColHtml('month', month)+g39ColHtml('week', week)+'</div>'+
+    '<section class="g39-mine"><div class="g39-mine-h"><b>Your goals</b>'+(open.length ? '<span class="g39-count">'+open.length+'</span>' : '')+'<small>Things you want, with or without a number</small><span style="flex:1"></span>'+
+      (done.length ? '<button class="gx-ach" data-action="toggleForm" data-form="goalsDone">'+(ui.forms.goalsDone ? '&#9662;' : '&#9656;')+' Achieved '+done.length+'</button>' : '')+'</div>'+
+      (open.length ? '<div class="g39-grid">'+open.map(gxGoalRowHtml).join('')+'</div>' : '<div class="g39-none">Nothing of your own yet. The + in the corner adds one.</div>')+
+      (done.length && ui.forms.goalsDone ? '<div class="g39-grid is-done">'+done.map(gxGoalRowHtml).join('')+'</div>' : '')+
+    '</section>'+
+  '</div>';
+};
+
+// ---- 23. Zernio: your Meta numbers through Zernio ----
+// Zernio holds the approved connection to Instagram, so there's no Meta developer app: paste a Zernio
+// API key (zernio.com → Settings → API keys) once, pick the account, and Operator reads your followers
+// and every post with reach, likes, comments, saves, shares and views (post numbers need Zernio's
+// analytics add-on; without it the followers still come through). Read-only, and the key stays in the
+// Operator app's file on this Mac (never in the app's data).
+const ZN_FRESH = 3*3600000;
+async function znApi(path){
+  const r = await fetchWithin(WAKE_HELPER+'zn/api?p='+hexUtf8(path), 45000);
+  let j = null; try{ j = r ? await r.json() : null; }catch(e){}
+  if(!r || !r.ok || !j) throw new Error((j && ((j.error && (j.error.message || j.error)) || j.message)) || (r ? 'Zernio said no ('+r.status+')' : 'the Operator app isn’t answering'));
+  return j;
+}
+function znPost(p){
+  const a = p.analytics || {}, t = Date.parse(p.publishedAt || p.createdAt || ''), when = isFinite(t) ? new Date(t) : null;
+  const kind = String(p.mediaProductType || p.mediaType || '').toUpperCase();
+  return {id:String(p._id || p.platformPostUrl || Math.random()), cap:String(p.content || '').slice(0, 140), type:/REEL/.test(kind) ? 'REELS' : kind,
+    at:when ? when.toISOString() : '', date:when ? ds2(when) : '', likes:socNum(a.likes) || 0, comments:socNum(a.comments) || 0,
+    views:socNum(a.views, a.plays, a.videoViews), reach:socNum(a.reach), saves:socNum(a.saves, a.saved), shares:socNum(a.shares),
+    link:p.platformPostUrl || '', thumb:p.thumbnailUrl || ''};
+}
+async function znLoadAccount(a){
+  const c = igCfg(); if(!c.znData || typeof c.znData!=='object') c.znData = {};
+  const prev = c.znData[a.id];
+  if(prev && !ui.znForce && Date.now() - (prev.at || 0) < ZN_FRESH) return prev;
+  const list = await znApi('/v1/accounts?platform=instagram');
+  const acc = arr(list.accounts).find(function(x){ return x._id===a.znId; });
+  if(!acc && !prev) throw new Error('Zernio doesn’t have @'+a.username+' any more. Connect it again in Zernio.');
+  let posts = prev ? arr(prev.posts) : [], noAnalytics = list.hasAnalyticsAccess===false;
+  if(!noAnalytics){
+    const to = todayStr(), from = addDays(to, -90);
+    try{
+      const an = await znApi('/v1/analytics?accountId='+encodeURIComponent(a.znId)+'&fromDate='+from+'&toDate='+to);
+      const fresh = arr(an.posts || an.data).map(znPost).filter(function(x){ return x.date; });
+      const seen = {};
+      posts = fresh.concat(posts).filter(function(x){ if(seen[x.id]) return false; seen[x.id] = 1; return true; }).sort(function(x, y){ return y.date.localeCompare(x.date); }).slice(0, 400);
+    }catch(e){ if(/analytics|add-?on|upgrade|plan|402|403/i.test(e.message)) noAnalytics = true; else if(!prev) throw e; }
+  }
+  const d = {username:(acc && acc.username) || a.username, followers:acc ? Number(acc.followersCount) || 0 : (prev ? prev.followers : 0), posts:posts, at:Date.now(), noAnalytics:noAnalytics};
+  c.znData[a.id] = d; persist('settings');
+  return d;
+}
+igLoadAccount = (function(base){
+  return function(acc){ return socialSrc(acc)==='zernio' ? znLoadAccount(acc) : base.apply(this, arguments); };
+})(igLoadAccount);
+function znAddAccount(x){
+  const c = igCfg(), role = ui.socRole || 'business', id = 'zernio-'+x._id;
+  c.accounts = c.accounts.filter(function(a){ return a.id!==id; });
+  c.accounts.push({id:id, src:'zernio', role:role, znId:x._id, username:x.username || x.displayName || 'instagram'});
+  persist('settings'); ui.znPick = null; ui.socBusy = false; ui.igTried = 0; ui.znForce = true;
+  showToast('Reading @'+(x.username || 'your account')+' through Zernio.', {icon:'&#128202;'});
+  igRefresh(false).then(function(){ ui.znForce = false; if(ui.igErr && !(c.znData && c.znData[id])){ ui.socErr = ui.igErr; c.accounts = c.accounts.filter(function(a){ return a.id!==id; }); persist('settings'); renderView(); } else showToast('@'+(x.username || 'Your account')+' is connected through Zernio.', {icon:'&#128202;'}); });
+}
+ACTIONS.znConnect = async function(){
+  const el = document.getElementById('znKey'), key = el ? el.value.trim() : '';
+  ui.socErr = null; ui.socBusy = true; renderView();
+  if(key){
+    const r = await fetchWithin(WAKE_HELPER+'zn/key?t='+hexUtf8(key), 25000);
+    let j = null; try{ j = r ? await r.json() : null; }catch(e){}
+    if(!r || !r.ok){ ui.socBusy = false; ui.socErr = j && j.error ? j.error : r ? 'The Operator app didn’t take that.' : 'The Operator app isn’t answering. Open Operator from its icon.'; renderView(); return; }
+  } else {
+    const s = await fetchWithin(WAKE_HELPER+'zn/status', 8000); let j = null; try{ j = s ? await s.json() : null; }catch(e){}
+    if(!j || !j.hasKey){ ui.socBusy = false; ui.socErr = 'Paste your Zernio API key first (zernio.com → Settings → API keys).'; renderView(); const k = document.getElementById('znKey'); if(k) k.focus(); return; }
+  }
+  let list;
+  try{ list = await znApi('/v1/accounts?platform=instagram'); }catch(e){ ui.socBusy = false; ui.socErr = e.message; renderView(); return; }
+  const accs = arr(list.accounts).filter(function(x){ return !x.platform || x.platform==='instagram'; });
+  if(!accs.length){ ui.socBusy = false; ui.socErr = 'Zernio has no Instagram account yet. Connect it in Zernio (Accounts → Instagram), then come back.'; renderView(); return; }
+  if(accs.length===1){ znAddAccount(accs[0]); return; }
+  ui.socBusy = false; ui.znPick = accs.map(function(x){ return {_id:x._id, username:x.username, displayName:x.displayName, followersCount:x.followersCount}; }); renderView();
+};
+ACTIONS.znPick = function(el, e, id){ const x = arr(ui.znPick).find(function(a){ return a._id===id; }); if(x) znAddAccount(x); };
+ACTIONS.znRefresh = async function(){ if(ui.igLoading) return; ui.znForce = true; ui.igTried = 0; await igRefresh(false); ui.znForce = false; };
+ACTIONS.socRemove = (function(base){
+  return function(el, e, id){ const c = igCfg(); if(c.znData) delete c.znData[id]; return base.apply(this, arguments); };
+})(ACTIONS.socRemove);
+// the Zernio option sits first in the list: it's the one with every number
+socialConnectHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), sh = ui.socShow;
+    const pick = ui.znPick ? '<div class="zn-pick">'+ui.znPick.map(function(x){ return '<button class="zn-acc" data-action="znPick" data-id="'+escapeHtml(x._id)+'"><b>@'+escapeHtml(x.username || x.displayName || '')+'</b>'+(x.followersCount!=null ? '<small>'+Number(x.followersCount).toLocaleString()+' followers</small>' : '')+'</button>'; }).join('')+'</div>' : '';
+    const opt = '<div class="soc-opt'+(sh==='zn' || ui.znPick ? ' is-open' : '')+'"><button class="soc-opt-h" data-action="socShow" data-id="zn"><span>&#127760;</span><div><b>Zernio <em class="soc-free">every number</em></b><small>Live, through Zernio’s own Meta connection: followers, and every post with reach, saves, shares, likes, comments and views. No Meta developer app.</small></div></button>'+
+      (sh==='zn' || ui.znPick ? '<div class="soc-form">'+(ui.znPick ? '<div class="soc-hint">Which account?</div>'+pick :
+        '<input class="input" id="znKey" placeholder="Zernio API key, sk_… (only the first time)">'+
+        '<div class="soc-hint">In Zernio: connect your Instagram (Accounts), then Settings → API keys → create one. It’s kept in the Operator app on this Mac, never in your data. Post numbers need Zernio’s analytics add-on; without it you still get followers.</div>'+
+        '<button class="btn btn-primary" data-action="znConnect"'+(ui.socBusy ? ' disabled' : '')+'>'+(ui.socBusy ? 'Connecting…' : 'Connect')+'</button>')+'</div>' : '')+'</div>';
+    return h.replace('<div class="soc-opts">', '<div class="soc-opts">'+opt);
+  };
+})(socialConnectHtml);
+socialSourcesHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), c = igCfg(), zs = c.accounts.filter(function(a){ return socialSrc(a)==='zernio'; });
+    if(!zs.length) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    zs.forEach(function(a){
+      const d = c.znData && c.znData[a.id];
+      const row = '<div class="soc-src"><span class="soc-src-k">&#127760; Zernio &middot; @'+escapeHtml((d && d.username) || a.username)+' &middot; '+(a.role==='business' ? 'Business' : 'Personal')+(d ? ' <small class="soc-when">checked '+escapeHtml(fmtAgo(d.at))+'</small>' : '')+(d && d.noAnalytics ? ' <small class="soc-when">followers only (no analytics add-on)</small>' : '')+'</span>'+
+        '<button class="btn btn-ghost btn-sm" data-action="znRefresh"'+(ui.igLoading ? ' disabled' : '')+'>'+(ui.igLoading ? 'Checking…' : 'Refresh now')+'</button>'+
+        '<button class="btn btn-ghost btn-sm soc-x" data-action="socRemove" data-id="'+a.id+'">Remove</button></div>';
+      // (the base shows it as "Meta": swap in its own row)
+      const btn = Array.prototype.find.call(tpl.content.querySelectorAll('[data-action="socRemove"]'), function(b){ return b.dataset.id===a.id; });
+      const old = btn && btn.closest('.soc-src'); if(!old) return;
+      const nt = document.createElement('template'); nt.innerHTML = row; old.replaceWith(nt.content.firstElementChild);
+    });
+    return tpl.innerHTML;
+  };
+})(socialSourcesHtml);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

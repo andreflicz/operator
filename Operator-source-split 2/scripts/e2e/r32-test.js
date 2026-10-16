@@ -112,7 +112,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const E = c => p.evaluate(x => window.__op.ev(x), c);
     await E("ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(300);
     check('Goals: one card (the big ones, the week and month, yours), not stacked panels', !!(await p.$('.g39 .g39-rev')) && !!(await p.$('.g39 .g39-col .tg-card.is-week')) && !!(await p.$('.g39 .g39-mine .gx-g')) && !(await p.$('.gl-sec')));
-    check('…Op’s read is one line up top', !!(await p.$('.gx > .op-tip')) && !(await p.$('.gx .opi')));
+    check('…Op’s read is one line up top', !!(await p.$('.gx > .g39-bar > .op-tip')) && !(await p.$('.gx .opi')));
     check('…your goals are rows with their numbers', /Read 12 books/.test(await p.textContent('.gx-g')) && /4/.test(await p.textContent('.gx-g .gx-g-n')));
     await p.click('.gx-g [data-action="goalStep"][data-delta="1"]'); await p.waitForTimeout(200);
     check('…+ steps it', await E("state.goals.items.find(g => g.id==='g1').current")===5);
@@ -231,7 +231,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('r34: the weather bar sits under the card and spans it', await p.evaluate(() => { const w = document.querySelector('.th-wx .skyp'), c = document.querySelector('.th-op'); if(!w) return true; const a = w.getBoundingClientRect(), b = c.getBoundingClientRect(), l = document.querySelector('.th-left').getBoundingClientRect(); return a.top >= b.bottom - 1 && a.width >= l.width - 8; }));
     check('r34: Settings has the two locked-in views', ((await E("soundSettingsHtml()")).match(/data-action="lockedStyleSet"/g)||[]).length===2);
     await E("state.profile.lockedStyle='cockpit'; state.profile.lockedView='minimal'; startFocus(50); ui.view='today'; renderView()"); await p.waitForTimeout(300);
-    check('r34: the Cockpit locked-in view: timer, task, the day (r37: one panel)', !!(await p.$('.np.is-cockpit .ckx .ckx-face .tm')) && !!(await p.$('.np.is-cockpit .ckx .ckx-title')) && !!(await p.$('.np.is-cockpit .ckx .ckd .ckd-week')));
+    check('r34: the Cockpit locked-in view: timer, task, the day (r37: one panel)', !!(await p.$('.np.is-cockpit .ckx .ckx-face .tm')) && !!(await p.$('.np.is-cockpit .ckx .ckx-title')) && !!(await p.$('.np.is-cockpit .ckx .ckd #ckSongs, .np.is-cockpit .ckx .ckd .ckd-week')));
     await E("state.profile.lockedView='full'; state.appActivity.todayIntervals.push({app:'Final Cut Pro', start:Date.now()-60000, end:Date.now()}); ui.view='today'; renderView(); updateActivityPill()"); await p.waitForTimeout(200);
     check('r36: the Op bar: one status dot and the app', !!(await p.$('#activityPill .ob-dot')) && /Final Cut Pro/.test(await p.textContent('#activityPill .ap-name')));
     await p.click('#activityPill .ap-name'); await p.waitForTimeout(300);

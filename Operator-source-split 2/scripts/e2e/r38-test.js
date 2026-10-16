@@ -239,7 +239,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     check('a big goal is measured against its target (3.5k MRR of 7k = 50%, not from where you started)', Math.round(await E("goalPct(state.goals.items.find(g=>g.id==='gm'))"))===50);
     await E("openGoalSheet('long'); ui.gsTrack='own'; goalSheetRefresh()"); await p.waitForTimeout(200);
     await p.fill('#gsLabel', 'Run a marathon'); await p.click('#goalSheet [data-action="gsSave"]'); await p.waitForTimeout(600);
-    check('a goal of your own with no number is added (and says so)', await E("state.goals.items.some(g=>g.label==='Run a marathon')") && /Added: .*marathon/i.test(await p.textContent('#toastContainer')));
+    check('a goal of your own with no number is added (and says so: round 39, with the GOAL SET pop-up)', await E("state.goals.items.some(g=>g.label==='Run a marathon')") && /marathon/i.test(await p.textContent('#goalFx')));
     await E("document.getElementById('goalSheet') && document.getElementById('goalSheet').classList.add('hidden')");
     // calendar: a long This week list fits, and green only on goal days
     await E("for(let i=0;i<9;i++) state.goals.items.push({id:'tw'+i, tier:'week', pk:periodKey('week'), label:'Week goal number '+i, target:1, done:i<3}); state.standards.deepWorkTargetMinutes=60; state.focus.sessions=(state.focus.sessions||[]).concat([{id:'s1', date:'2026-10-12', minutes:90, type:'deep', start:0, end:0}, {id:'s2', date:'2026-10-13', minutes:20, type:'deep', start:0, end:0}]); ui.view='calendar'; renderView()"); await p.waitForTimeout(600);
