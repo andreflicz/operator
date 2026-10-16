@@ -7524,6 +7524,49 @@ body.opf-on .activity-pill{ opacity:0 !important; pointer-events:none !important
 .lo-hold{ --p:0; position:relative; margin-top:14px; height:40px; padding:0 22px; border-radius:999px; border:1px solid rgba(229,72,77,.45); background:transparent; color:#ff9a9d; font:inherit; font-size:13px; font-weight:700; cursor:pointer; overflow:hidden; user-select:none; -webkit-user-select:none; touch-action:none; }
 .lo-hold i{ position:absolute; inset:0; transform-origin:left; transform:scaleX(var(--p)); background:rgba(229,72,77,.28); }
 .lo-hold span{ position:relative; } .lo-hold.is-holding{ color:#fff; border-color:#E5484D; }
+/* music volume on the little player */
+.mctl-vol{ display:inline-flex; align-items:center; gap:4px; margin-left:2px; }
+.mctl-vi{ font-size:13px; opacity:.75; cursor:default; }
+.mctl-vol .mvol.is-mctl{ display:inline-flex; align-items:center; width:0; overflow:hidden; opacity:0; transition:width .25s ease, opacity .2s; }
+.mctl-vol:hover .mvol.is-mctl, .mctl-vol:focus-within .mvol.is-mctl{ width:92px; opacity:1; }
+.mvol.is-mctl .mvol-in{ width:70px; } .mvol.is-mctl .mvol-v{ display:none; }
+.ckm-vol{ display:flex; align-items:center; gap:10px; margin-top:-4px; }
+.ckm-vi{ font-size:14px; opacity:.8; } .ckm-vol .mvol{ flex:1; display:flex; align-items:center; gap:10px; } .ckm-vol .mvol-in{ flex:1; } .ckm-vol .mvol-v{ font-size:12px; color:rgba(255,255,255,.6); min-width:34px; }
+.np-vol{ display:flex; align-items:center; gap:10px; margin-top:16px; max-width:260px; }
+.np-vol .ckm-vi{ font-size:14px; opacity:.75; } .np-vol .mvol{ flex:1; display:flex; align-items:center; gap:10px; } .np-vol .mvol-in{ flex:1; background:rgba(255,255,255,.2); } .np-vol .mvol-v{ font-size:12px; color:rgba(255,255,255,.6); min-width:34px; }
+/* locked-in Overview: Worth doing soon / Clients */
+.llx{ padding:18px 18px 14px; border-radius:20px; border:1px solid var(--border); background:var(--panel); height:100%; box-sizing:border-box; display:flex; flex-direction:column; gap:12px; }
+.llx-h{ display:flex; align-items:center; gap:8px; }
+.llx-h b{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text); }
+.llx-n{ font-size:11px; font-weight:800; padding:1px 7px; border-radius:999px; background:rgba(var(--ink),.08); color:var(--text-dim); }
+.llx-link{ border:0; background:none; color:var(--text-dim); font-size:12px; font-weight:600; cursor:pointer; } .llx-link:hover{ color:var(--text); }
+.llx-rows{ display:flex; flex-direction:column; gap:2px; }
+.llx-row{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:12px; transition:background .15s; }
+.llx-row:hover{ background:rgba(var(--ink),.05); }
+.llx-dot{ flex:none; width:8px; height:8px; border-radius:50%; }
+.llx-t{ flex:1; min-width:0; font-size:14px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.llx-t em{ font-style:normal; margin-left:8px; font-size:10.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; padding:2px 7px; border-radius:999px; color:#c9b2ff; background:rgba(169,139,255,.14); }
+.llx-who{ flex:none; font-size:12px; color:var(--text-dim); max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.llx-due{ flex:none; font-size:11.5px; font-weight:600; color:var(--text-faint); } .llx-due.is-late{ color:#ff9a9d; }
+.llx-go{ flex:none; opacity:0; border:1px solid rgba(232,162,61,.45); background:rgba(232,162,61,.1); color:#ffc56b; font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:999px; cursor:pointer; transition:opacity .15s; }
+.llx-row:hover .llx-go, .llx-go:focus{ opacity:1; }
+.llx-more{ font-size:12px; color:var(--text-faint); padding:0 10px; }
+.llx-empty{ padding:18px; text-align:center; font-size:13px; color:var(--text-faint); border:1px dashed rgba(var(--ink),.12); border-radius:14px; }
+.llx-cl{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:10px; }
+.llx-c{ display:flex; flex-direction:column; gap:12px; padding:14px; border-radius:16px; border:1px solid rgba(var(--ink),.08); background:rgba(var(--ink),.025); text-align:left; color:var(--text); cursor:pointer; position:relative; overflow:hidden; transition:border-color .15s, transform .15s; }
+.llx-c::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--hc); }
+.llx-c:hover{ border-color:rgba(var(--ink),.2); transform:translateY(-1px); }
+.llx-c-top{ display:flex; align-items:center; gap:10px; }
+.llx-av{ flex:none; width:34px; height:34px; border-radius:11px; display:grid; place-items:center; font-size:12.5px; font-weight:800; color:#fff; }
+.llx-c-n{ min-width:0; display:flex; flex-direction:column; }
+.llx-c-n b{ font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.llx-c-n small{ display:flex; align-items:center; gap:5px; font-size:11.5px; color:var(--text-dim); } .llx-c-n small i{ width:6px; height:6px; border-radius:50%; background:var(--hc); }
+.llx-c-d{ display:flex; flex-direction:column; gap:7px; }
+.llx-dv{ display:grid; grid-template-columns:minmax(0, 1fr) 70px auto; align-items:center; gap:8px; font-size:12px; color:var(--text-dim); }
+.llx-dv span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.llx-dv i{ display:block; height:5px; border-radius:4px; background:rgba(var(--ink),.08); overflow:hidden; } .llx-dv u{ display:block; height:100%; border-radius:4px; background:var(--hc); }
+.llx-dv b{ font-size:12px; color:var(--text); font-variant-numeric:tabular-nums; }
+.llx-c-none{ font-size:12px; color:var(--text-faint); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -40983,6 +41026,77 @@ aiSystem = (function(base){
 acctPing = (function(base){ return function(){ if(opLateNow()){ if(typeof acctSchedule==='function') acctSchedule(); return; } return base.apply(this, arguments); }; })(acctPing);
 opNudgeDue = (function(base){ return function(){ if(opLateNow()) return false; return base.apply(this, arguments); }; })(opNudgeDue);
 if(typeof maybeNudgeLockIn==='function') maybeNudgeLockIn = (function(base){ return function(){ if(opLateNow()) return; return base.apply(this, arguments); }; })(maybeNudgeLockIn);
+
+// ---- music volume in the minimal views ----
+// The little player on the full-screen pages (locked in, Good morning, work mode) gets a speaker: hover it
+// (or tab to it) and a slider slides out. The Cockpit's song list has one under "Now playing". Same setting
+// as everywhere else.
+mctlHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    return h.replace(/<\/span>$/, '<span class="mctl-vol" title="Volume"><span class="mctl-vi">'+musicVolIcon()+'</span>'+musicVolSliderHtml('is-mctl')+'</span></span>');
+  };
+})(mctlHtml);
+cockpitDayHtml = (function(base){
+  return function(){ return base.apply(this, arguments).replace(/(<div class="ckm-now">[\s\S]*?<\/div>)/, '$1'+'<div class="ckm-vol"><span class="ckm-vi">'+musicVolIcon()+'</span>'+musicVolSliderHtml('is-ck')+'</div>'); };
+})(cockpitDayHtml);
+setInterval(function(){ try{ musicVolSync(); const p = musicVolPct(); document.querySelectorAll('.mctl-vi, .ckm-vi').forEach(function(e){ const ic = musicVolIcon(p); if(e.innerHTML!==ic) e.innerHTML = ic; }); }catch(e){} }, 800);
+// (the Player: a slider right under its buttons)
+renderLockedMinimal = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(lockedStyle()==='cockpit' || h.indexOf('class="np-ctl"') < 0 || h.indexOf('np-vol') >= 0) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const ctl = tpl.content.querySelector('.np-ctl'); if(!ctl) return h;
+    const v = document.createElement('div'); v.className = 'np-vol'; v.innerHTML = '<span class="ckm-vi">'+musicVolIcon()+'</span>'+musicVolSliderHtml('is-npv');
+    ctl.parentNode.insertBefore(v, ctl.nextSibling);
+    return tpl.innerHTML;
+  };
+})(renderLockedMinimal);
+
+// ---- locked-in Overview: "Worth doing soon" and "Clients", redone ----
+// Clean cards like the rest of the app: compact rows (a priority dot, the task, who it's for, when it's
+// due, one tap to put it on today) and client tiles (health, each deliverable's week as a meter, last touch).
+function llLastTouch(c){
+  let last = '';
+  arr(c.touchpoints).concat(arr(c.touches)).forEach(function(t){ const d = typeof t==='string' ? t : t && t.date; if(d && d > last) last = d; });
+  return last;
+}
+function llAgo(d){ if(!d) return 'never'; const n = Math.round((Date.parse(todayStr()) - Date.parse(d))/86400000); return n<=0 ? 'today' : n===1 ? 'yesterday' : n+'d ago'; }
+LOCKED_BLOCKS.backlog.render = function(c){
+  const list = c.backlog.slice(0, 7), more = c.backlog.length - list.length;
+  const pri = {high:'#E5484D', med:'#E8A23D', low:'#6b7280'};
+  return '<section class="llx"><div class="llx-h"><b>Worth doing soon</b><span class="llx-n">'+c.backlog.length+'</span><span style="flex:1"></span><button class="llx-link" data-action="nav" data-view="focus" data-tab="tasks">Backlog &rarr;</button></div>'+
+    (list.length ? '<div class="llx-rows">'+list.map(function(t){
+      const v = t.master && t.master.kind==='dvw' && typeof dvwView==='function' ? dvwView(t) : null;
+      const who = v ? v.who : (t.clients && t.clients[0] ? (arr(state.business.clients).find(function(x){ return x.id===t.clients[0]; }) || {}).business : '');
+      const late = t.deadline && t.deadline < todayStr();
+      return '<div class="llx-row'+(v ? ' is-dlv' : '')+'">'+
+        '<i class="llx-dot" style="background:'+(v ? '#a98bff' : (pri[t.priority] || pri.med))+'"></i>'+
+        '<span class="llx-t">'+escapeHtml(v ? (v.x.oneOff ? v.name : v.pieces) : t.title)+(v && !v.x.oneOff ? '<em>Week '+v.x.k+'</em>' : '')+'</span>'+
+        (who ? '<span class="llx-who">'+escapeHtml(who)+'</span>' : '')+
+        (t.deadline ? '<span class="llx-due'+(late ? ' is-late' : '')+'">'+(late ? 'was ' : '')+fmtDateShort(t.deadline)+'</span>' : '')+
+        '<button class="llx-go" data-action="promoteTask" data-id="'+t.id+'" title="Put it on today">&rarr; Today</button></div>';
+    }).join('')+'</div>'+(more > 0 ? '<div class="llx-more">+'+more+' more in your backlog</div>' : '') : '<div class="llx-empty">Nothing waiting. Clean slate.</div>')+
+  '</section>';
+};
+LOCKED_BLOCKS.clients.render = function(c){
+  const cs = c.activeClients;
+  const hl = {green:['#3FBE8E', 'Healthy'], yellow:['#E8A23D', 'On pace'], red:['#E5484D', 'Needs you']};
+  return '<section class="llx"><div class="llx-h"><b>Clients</b><span class="llx-n">'+cs.length+'</span><span style="flex:1"></span><button class="llx-link" data-action="nav" data-view="business" data-tab="clients">All clients &rarr;</button></div>'+
+    (cs.length ? '<div class="llx-cl">'+cs.map(function(x){
+      const st = clientHealthStatus(x), h = hl[st.level] || hl.green, last = llLastTouch(x);
+      const recs = arr(x.deliverables).filter(function(d){ return d.recurring; });
+      return '<button class="llx-c" data-action="openContact" data-kind="client" data-id="'+x.id+'" style="--hc:'+h[0]+'">'+
+        '<span class="llx-c-top"><span class="llx-av" style="background:'+clientColor(x)+'">'+escapeHtml(clientInitials(x))+'</span><span class="llx-c-n"><b>'+escapeHtml(x.business || x.name)+'</b><small><i></i>'+h[1]+' &middot; touched '+llAgo(last)+'</small></span></span>'+
+        (recs.length ? '<span class="llx-c-d">'+recs.slice(0, 3).map(function(d){
+          const done = deliverableWeekCount(d), need = Math.max(1, deliverableWeekNeed(d));
+          return '<span class="llx-dv"><span>'+escapeHtml(d.title)+'</span><i><u style="width:'+Math.min(100, done/need*100).toFixed(0)+'%"></u></i><b>'+done+'/'+need+'</b></span>';
+        }).join('')+'</span>' : '<span class="llx-c-none">No weekly deliverables</span>')+
+      '</button>';
+    }).join('')+'</div>' : '<div class="llx-empty">No active clients yet.</div>')+
+  '</section>';
+};
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

@@ -281,3 +281,74 @@ aiSystem = (function(base){
 acctPing = (function(base){ return function(){ if(opLateNow()){ if(typeof acctSchedule==='function') acctSchedule(); return; } return base.apply(this, arguments); }; })(acctPing);
 opNudgeDue = (function(base){ return function(){ if(opLateNow()) return false; return base.apply(this, arguments); }; })(opNudgeDue);
 if(typeof maybeNudgeLockIn==='function') maybeNudgeLockIn = (function(base){ return function(){ if(opLateNow()) return; return base.apply(this, arguments); }; })(maybeNudgeLockIn);
+
+// ---- music volume in the minimal views ----
+// The little player on the full-screen pages (locked in, Good morning, work mode) gets a speaker: hover it
+// (or tab to it) and a slider slides out. The Cockpit's song list has one under "Now playing". Same setting
+// as everywhere else.
+mctlHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    return h.replace(/<\/span>$/, '<span class="mctl-vol" title="Volume"><span class="mctl-vi">'+musicVolIcon()+'</span>'+musicVolSliderHtml('is-mctl')+'</span></span>');
+  };
+})(mctlHtml);
+cockpitDayHtml = (function(base){
+  return function(){ return base.apply(this, arguments).replace(/(<div class="ckm-now">[\s\S]*?<\/div>)/, '$1'+'<div class="ckm-vol"><span class="ckm-vi">'+musicVolIcon()+'</span>'+musicVolSliderHtml('is-ck')+'</div>'); };
+})(cockpitDayHtml);
+setInterval(function(){ try{ musicVolSync(); const p = musicVolPct(); document.querySelectorAll('.mctl-vi, .ckm-vi').forEach(function(e){ const ic = musicVolIcon(p); if(e.innerHTML!==ic) e.innerHTML = ic; }); }catch(e){} }, 800);
+// (the Player: a slider right under its buttons)
+renderLockedMinimal = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(lockedStyle()==='cockpit' || h.indexOf('class="np-ctl"') < 0 || h.indexOf('np-vol') >= 0) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const ctl = tpl.content.querySelector('.np-ctl'); if(!ctl) return h;
+    const v = document.createElement('div'); v.className = 'np-vol'; v.innerHTML = '<span class="ckm-vi">'+musicVolIcon()+'</span>'+musicVolSliderHtml('is-npv');
+    ctl.parentNode.insertBefore(v, ctl.nextSibling);
+    return tpl.innerHTML;
+  };
+})(renderLockedMinimal);
+
+// ---- locked-in Overview: "Worth doing soon" and "Clients", redone ----
+// Clean cards like the rest of the app: compact rows (a priority dot, the task, who it's for, when it's
+// due, one tap to put it on today) and client tiles (health, each deliverable's week as a meter, last touch).
+function llLastTouch(c){
+  let last = '';
+  arr(c.touchpoints).concat(arr(c.touches)).forEach(function(t){ const d = typeof t==='string' ? t : t && t.date; if(d && d > last) last = d; });
+  return last;
+}
+function llAgo(d){ if(!d) return 'never'; const n = Math.round((Date.parse(todayStr()) - Date.parse(d))/86400000); return n<=0 ? 'today' : n===1 ? 'yesterday' : n+'d ago'; }
+LOCKED_BLOCKS.backlog.render = function(c){
+  const list = c.backlog.slice(0, 7), more = c.backlog.length - list.length;
+  const pri = {high:'#E5484D', med:'#E8A23D', low:'#6b7280'};
+  return '<section class="llx"><div class="llx-h"><b>Worth doing soon</b><span class="llx-n">'+c.backlog.length+'</span><span style="flex:1"></span><button class="llx-link" data-action="nav" data-view="focus" data-tab="tasks">Backlog &rarr;</button></div>'+
+    (list.length ? '<div class="llx-rows">'+list.map(function(t){
+      const v = t.master && t.master.kind==='dvw' && typeof dvwView==='function' ? dvwView(t) : null;
+      const who = v ? v.who : (t.clients && t.clients[0] ? (arr(state.business.clients).find(function(x){ return x.id===t.clients[0]; }) || {}).business : '');
+      const late = t.deadline && t.deadline < todayStr();
+      return '<div class="llx-row'+(v ? ' is-dlv' : '')+'">'+
+        '<i class="llx-dot" style="background:'+(v ? '#a98bff' : (pri[t.priority] || pri.med))+'"></i>'+
+        '<span class="llx-t">'+escapeHtml(v ? (v.x.oneOff ? v.name : v.pieces) : t.title)+(v && !v.x.oneOff ? '<em>Week '+v.x.k+'</em>' : '')+'</span>'+
+        (who ? '<span class="llx-who">'+escapeHtml(who)+'</span>' : '')+
+        (t.deadline ? '<span class="llx-due'+(late ? ' is-late' : '')+'">'+(late ? 'was ' : '')+fmtDateShort(t.deadline)+'</span>' : '')+
+        '<button class="llx-go" data-action="promoteTask" data-id="'+t.id+'" title="Put it on today">&rarr; Today</button></div>';
+    }).join('')+'</div>'+(more > 0 ? '<div class="llx-more">+'+more+' more in your backlog</div>' : '') : '<div class="llx-empty">Nothing waiting. Clean slate.</div>')+
+  '</section>';
+};
+LOCKED_BLOCKS.clients.render = function(c){
+  const cs = c.activeClients;
+  const hl = {green:['#3FBE8E', 'Healthy'], yellow:['#E8A23D', 'On pace'], red:['#E5484D', 'Needs you']};
+  return '<section class="llx"><div class="llx-h"><b>Clients</b><span class="llx-n">'+cs.length+'</span><span style="flex:1"></span><button class="llx-link" data-action="nav" data-view="business" data-tab="clients">All clients &rarr;</button></div>'+
+    (cs.length ? '<div class="llx-cl">'+cs.map(function(x){
+      const st = clientHealthStatus(x), h = hl[st.level] || hl.green, last = llLastTouch(x);
+      const recs = arr(x.deliverables).filter(function(d){ return d.recurring; });
+      return '<button class="llx-c" data-action="openContact" data-kind="client" data-id="'+x.id+'" style="--hc:'+h[0]+'">'+
+        '<span class="llx-c-top"><span class="llx-av" style="background:'+clientColor(x)+'">'+escapeHtml(clientInitials(x))+'</span><span class="llx-c-n"><b>'+escapeHtml(x.business || x.name)+'</b><small><i></i>'+h[1]+' &middot; touched '+llAgo(last)+'</small></span></span>'+
+        (recs.length ? '<span class="llx-c-d">'+recs.slice(0, 3).map(function(d){
+          const done = deliverableWeekCount(d), need = Math.max(1, deliverableWeekNeed(d));
+          return '<span class="llx-dv"><span>'+escapeHtml(d.title)+'</span><i><u style="width:'+Math.min(100, done/need*100).toFixed(0)+'%"></u></i><b>'+done+'/'+need+'</b></span>';
+        }).join('')+'</span>' : '<span class="llx-c-none">No weekly deliverables</span>')+
+      '</button>';
+    }).join('')+'</div>' : '<div class="llx-empty">No active clients yet.</div>')+
+  '</section>';
+};
