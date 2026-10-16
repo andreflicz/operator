@@ -95,8 +95,8 @@ async function newPage(browser, seed, clockAt){
   check('1.5 locked-in header at top', Math.abs(gap) < 1, {gap});
   // manual stop records cooldown
   await page.click('[data-action="openStopFocus"]');
-  await page.click('[data-action="requestStopConfirm"]');
-  await page.click('[data-action="reallyConfirmStopFocus"]');
+  // (round 40: the lock-out screen takes a press-and-hold)
+  { const bb = await (await page.$('#loHold')).boundingBox(); await page.mouse.move(bb.x + bb.width/2, bb.y + bb.height/2); await page.mouse.down(); await page.waitForTimeout(1900); await page.mouse.up(); await page.waitForTimeout(200); }
   const r = await page.evaluate(() => { const {checkAutoLockIn, parseActivityLogText, todayStr} = window.__op; const state = window.__op.state;
     const now = Date.now();
     state.settings.appTracking.thresholdMinutes = 2;

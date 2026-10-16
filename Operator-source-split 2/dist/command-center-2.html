@@ -7501,6 +7501,29 @@ body.opf-on .activity-pill{ opacity:0 !important; pointer-events:none !important
 .cc2-one-ck{ width:24px; height:24px; border-radius:7px; border:1.5px solid rgba(169,139,255,.55); background:transparent; color:#fff; font-size:13px; font-weight:800; cursor:pointer; display:grid; place-items:center; transition:background .15s, border-color .15s; }
 .cc2-one-ck:hover{ border-color:#a98bff; background:rgba(169,139,255,.12); } .cc2-one-ck.is-on{ background:#8b6cf0; border-color:#8b6cf0; }
 .cc2-one .cc2-deliv-title{ flex:1; min-width:0; }
+/* the lock-out screen */
+#stopFocusOverlay.lo-ov{ background:radial-gradient(70% 60% at 50% 40%, rgba(40,26,10,.82), rgba(4,5,9,.94)); backdrop-filter:blur(10px); }
+#stopFocusOverlay.lo-ov #stopFocusContent{ max-width:520px !important; max-height:none !important; overflow:visible !important; padding:30px 30px 24px !important; border-radius:26px !important; background:linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.025)) !important; border:1px solid rgba(255,255,255,.1) !important; box-shadow:0 40px 100px rgba(0,0,0,.55) !important; }
+.lo{ display:flex; flex-direction:column; align-items:center; text-align:center; color:#fff; }
+.lo-k{ font-size:11px; font-weight:800; letter-spacing:.2em; text-transform:uppercase; color:#ffc56b; }
+.lo-time{ margin-top:10px; display:flex; flex-direction:column; align-items:center; }
+.lo-time b{ font-family:var(--font-display); font-size:54px; line-height:1; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.lo-time span{ margin-top:6px; font-size:13px; color:rgba(255,255,255,.6); }
+.lo-bar{ width:220px; height:5px; margin-top:16px; border-radius:4px; background:rgba(255,255,255,.1); overflow:hidden; } .lo-bar i{ display:block; height:100%; border-radius:4px; background:linear-gradient(90deg, #E8A23D, #f5c16c); }
+.lo-day{ margin-top:7px; font-size:12px; color:rgba(255,255,255,.55); }
+.lo-why{ margin-top:22px; width:100%; padding:14px 18px; border-radius:16px; background:rgba(63,190,142,.08); border:1px solid rgba(63,190,142,.22); display:flex; flex-direction:column; gap:4px; }
+.lo-why small{ font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#7ef0c0; }
+.lo-why b{ font-family:var(--font-display); font-size:20px; } .lo-why span{ font-size:13px; color:#ff9a9d; }
+.lo-q{ margin:20px 0 0; max-width:440px; }
+.lo-q blockquote{ margin:0; font-family:'Iowan Old Style', 'New York', Georgia, serif; font-style:italic; font-size:18px; line-height:1.5; color:rgba(255,255,255,.9); }
+.lo-q figcaption{ margin-top:8px; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.45); }
+.lo-left{ margin-top:18px; font-size:13px; color:rgba(255,255,255,.7); } .lo-left b{ color:#fff; } .lo-left.is-clear{ color:#7ef0c0; }
+.lo-btns{ display:flex; gap:10px; margin-top:22px; width:100%; }
+.lo-go{ flex:1; height:50px; border:0; border-radius:14px; background:linear-gradient(135deg, #3FBE8E, #2a9c72); color:#fff; font:inherit; font-size:15px; font-weight:800; cursor:pointer; box-shadow:0 10px 26px rgba(63,190,142,.3); transition:transform .15s; } .lo-go:hover{ transform:translateY(-1px); }
+.lo-more{ height:50px; padding:0 18px; border-radius:14px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff; font:inherit; font-size:14px; font-weight:700; cursor:pointer; } .lo-more:hover{ background:rgba(255,255,255,.12); }
+.lo-hold{ --p:0; position:relative; margin-top:14px; height:40px; padding:0 22px; border-radius:999px; border:1px solid rgba(229,72,77,.45); background:transparent; color:#ff9a9d; font:inherit; font-size:13px; font-weight:700; cursor:pointer; overflow:hidden; user-select:none; -webkit-user-select:none; touch-action:none; }
+.lo-hold i{ position:absolute; inset:0; transform-origin:left; transform:scaleX(var(--p)); background:rgba(229,72,77,.28); }
+.lo-hold span{ position:relative; } .lo-hold.is-holding{ color:#fff; border-color:#E5484D; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -40778,6 +40801,73 @@ renderFocusMinimal = (function(base){ return function(){ return niceTitlesHtml(b
 renderWeekendOffView = (function(base){ return function(){ return niceTitlesHtml(base.apply(this, arguments)); }; })(renderWeekendOffView);
 afterRenderHooks.push(function(){ try{ niceTitlesSweep(); }catch(e){} });
 setInterval(function(){ try{ niceTitlesSweep(); }catch(e){} }, 1500);
+
+// ---- the lock-out screen, rebuilt ----
+// It was a long list nobody read. Now it's one screen: how long you've been at it, one reason you're
+// doing this (from your own "why"), a line about working hard, what's left, and the way out takes a
+// press-and-hold (the friction), not a click. "Keep going" is the big button; "+10 min" for one more push.
+const LOCKOUT_QUOTES = [
+  ['Work like there is someone working twenty-four hours a day to take it all away from you.', 'Mark Cuban'],
+  ['The difference between ordinary and extraordinary is that little extra.', 'Jimmy Johnson'],
+  ['Don’t stop when you’re tired. Stop when you’re done.', 'David Goggins'],
+  ['Hard work beats talent when talent doesn’t work hard.', 'Tim Notke'],
+  ['The dream is free. The hustle is sold separately.', ''],
+  ['You don’t get what you wish for. You get what you work for.', ''],
+  ['When you think you’re done, you’re only at 40% of what your body is capable of.', 'David Goggins'],
+  ['Success isn’t owed. It’s leased, and rent is due every day.', 'Rory Vaden'],
+  ['Discipline is doing what needs to be done, even if you don’t want to do it.', ''],
+  ['The last ten minutes are where the people who win separate from the people who almost did.', ''],
+  ['Nobody cares. Work harder.', 'Cameron Hanes'],
+  ['Great things are done by a series of small things brought together.', 'Vincent van Gogh'],
+  ['If it were easy, everyone would do it.', ''],
+  ['Pain is temporary. Quitting lasts forever.', 'Lance Armstrong'],
+  ['Max out the day. Tomorrow you’ll be glad you did.', '']
+];
+function lockoutPick(list, key){ ui.loPick = ui.loPick || {}; if(ui.loPick[key]==null || ui.loPick[key] >= list.length) ui.loPick[key] = Math.floor(Math.random()*Math.max(1, list.length)); return list[ui.loPick[key]]; }
+renderStopFocusModal = function(){
+  const as = state.focus.activeSession; if(!as) return '';
+  const mins = Math.max(0, Math.round((Date.now() - as.startedAt)/60000) - Math.round(arr(as.breaks).reduce(function(a, b){ return a + Math.max(0, (b.endedAt || Date.now()) - (b.startedAt || Date.now())); }, 0)/60000));
+  const toward = arr(state.focus.motivations && state.focus.motivations.toward), away = arr(state.focus.motivations && state.focus.motivations.away);
+  const why = toward.length ? lockoutPick(toward, 'why') : null, avoid = away.length ? lockoutPick(away, 'avoid') : null;
+  const q = lockoutPick(LOCKOUT_QUOTES, 'q');
+  const left = state.tasks.items.filter(function(t){ return t.status==='today' && !(typeof isOngoingDoneToday==='function' && isOngoingDoneToday(t)); });
+  const done = arr(as.completedTasks).length, dw = typeof deepWorkMinutesTodayLive==='function' ? deepWorkMinutesTodayLive() : 0, target = state.standards.deepWorkTargetMinutes || 180;
+  const next = left[0];
+  return '<div class="lo">'+
+    '<div class="lo-k">&#128274; Locking out?</div>'+
+    '<div class="lo-time"><b>'+fmtDurationLabel(mins)+'</b><span>this session'+(done ? ' &middot; '+done+' done' : '')+'</span></div>'+
+    '<div class="lo-bar"><i style="width:'+Math.min(100, dw/target*100).toFixed(1)+'%"></i></div>'+
+    '<div class="lo-day">'+fmtDurationLabel(dw)+' of '+fmtDurationLabel(target)+' today'+(dw >= target ? ' &middot; target hit' : ' &middot; '+fmtDurationLabel(target - dw)+' to go')+'</div>'+
+    (why || avoid ? '<div class="lo-why"><small>Remember why</small>'+(why ? '<b>'+escapeHtml(why.text)+'</b>' : '')+(avoid ? '<span>Not: '+escapeHtml(avoid.text)+'</span>' : '')+'</div>' : '')+
+    '<figure class="lo-q"><blockquote>'+escapeHtml(q[0])+'</blockquote>'+(q[1] ? '<figcaption>'+escapeHtml(q[1])+'</figcaption>' : '')+'</figure>'+
+    (left.length ? '<div class="lo-left">'+left.length+' left today'+(next ? ' &middot; next: <b>'+escapeHtml(taskNiceTitle(next))+'</b>' : '')+'</div>' : '<div class="lo-left is-clear">&#10003; Today’s list is clear.</div>')+
+    '<div class="lo-btns"><button class="lo-go" data-action="cancelStopFocus">Keep going</button><button class="lo-more" data-action="lockoutMore">+10 min</button></div>'+
+    '<button class="lo-hold" id="loHold" title="Press and hold to lock out"><i></i><span>Hold to lock out</span></button>'+
+  '</div>';
+};
+openStopFocus = (function(base){
+  return function(){ ui.loPick = null; const o = document.getElementById('stopFocusOverlay'); if(o) o.classList.add('lo-ov'); return base.apply(this, arguments); };
+})(openStopFocus);
+ACTIONS.lockoutMore = function(){
+  const as = state.focus.activeSession; if(!as) return;
+  as.plannedMinutes = Math.round((Date.now() - as.startedAt)/60000) + 10; persist('focus');
+  closeStopFocus(); playTick(); renderView();
+  showToast('Ten more minutes. Then you can go.', {icon:'&#9201;'});
+};
+(function(){
+  let t0 = 0, raf = 0, btn = null;
+  const HOLD = 1600;
+  const stop = function(){ cancelAnimationFrame(raf); if(btn){ btn.classList.remove('is-holding'); btn.style.setProperty('--p', 0); } btn = null; t0 = 0; };
+  const tick = function(){
+    if(!btn) return;
+    const p = Math.min(1, (Date.now() - t0)/HOLD); btn.style.setProperty('--p', p);
+    if(p >= 1){ stop(); closeStopFocus(); reallyConfirmStopFocus(); return; }
+    raf = requestAnimationFrame(tick);
+  };
+  document.addEventListener('pointerdown', function(e){ const b = e.target.closest && e.target.closest('#loHold'); if(!b) return; e.preventDefault(); btn = b; t0 = Date.now(); b.classList.add('is-holding'); raf = requestAnimationFrame(tick); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(k){ document.addEventListener(k, function(e){ if(btn && (k!=='pointerleave' || e.target===btn)) stop(); }, true); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && overlayOpen('stopFocusOverlay')){ closeStopFocus(); } });
+})();
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
