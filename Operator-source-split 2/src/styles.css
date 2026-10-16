@@ -7258,3 +7258,15 @@ body:has(#lockSeqOverlay:not(.hidden)) #activityPill{ opacity:0 !important; poin
 .task-card.dvc .dvc-foot{ padding-top:2px; }
 .tl-row.tl-dlv .tl-main{ align-items:center; }
 .dvc-due{ margin-left:auto; white-space:nowrap; } .dvc-due .kpi-sub{ font-size:11.5px; }
+/* 4–9. Op's pop-up says what he's doing */
+.op-think{ display:none !important; }
+.ob-status{ display:none; align-items:center; gap:9px; margin:2px 0 8px; padding:7px 8px 7px 11px; border-radius:12px; background:rgba(122,162,255,.10); border:1px solid rgba(122,162,255,.22); font-size:12.5px; font-weight:600; color:var(--text); }
+.ob-status.is-on{ display:flex; animation:obsIn .22s ease-out; }
+@keyframes obsIn{ from{ opacity:0; transform:translateY(-3px); } to{ opacity:1; transform:none; } }
+.ob-status[data-st="listen"]{ background:rgba(63,190,142,.10); border-color:rgba(63,190,142,.3); }
+.obs-t{ flex:1; }
+.obs-wave{ display:inline-flex; align-items:center; gap:3px; height:16px; } .obs-wave i{ width:3px; height:16px; border-radius:2px; background:#3FBE8E; transform:scaleY(.25); transition:transform .1s; }
+.obs-dots{ display:inline-flex; gap:4px; } .obs-dots i{ width:6px; height:6px; border-radius:50%; background:#7aa2ff; animation:obsDot 1.1s ease-in-out infinite; } .obs-dots i:nth-child(2){ animation-delay:.15s; } .obs-dots i:nth-child(3){ animation-delay:.3s; }
+@keyframes obsDot{ 0%,100%{ opacity:.3; transform:translateY(0); } 50%{ opacity:1; transform:translateY(-3px); } }
+.obs-x{ flex:none; height:24px; padding:0 10px; border-radius:999px; border:0; background:rgba(229,72,77,.14); color:#E5484D; font:inherit; font-size:11.5px; font-weight:700; cursor:pointer; }
+.obs-x:hover{ background:#E5484D; color:#fff; }
