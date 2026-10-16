@@ -426,3 +426,122 @@ ACTIONS.gsSave = (function(base){
 })(ACTIONS.gsSave);
 // (the plain "Added:" toast it replaces)
 showToast = (function(base){ return function(msg){ if(document.getElementById('goalFx') && /^Added: /.test(String(msg || ''))) return; return base.apply(this, arguments); }; })(showToast);
+
+// ---- 15. the app's music goes through the top-right player ----
+// The lock-in song ("Lock In") is a real track in the player now: locking in switches the player to it
+// (whatever was on stops first, so nothing plays over it), it shows top right, and when it ends the
+// player carries on with the low lock-in music. The short sounds (lock out, wind-down, the work intro)
+// turn the music down for a moment instead of playing over it.
+FOCUS_TRACKS.push({name:'Lock In', style:'song', song:'chill', len:14.5, bpm:240/14.5, special:true, next:'lock', hiss:0});
+fmDream = (function(base){
+  return function(style){
+    if(style==='song') return function(ctx, out, t, tr, bar){ if(bar===0 && SFX[tr.song]) SFX[tr.song](ctx, out, t); };
+    return base(style);
+  };
+})(fmDream);
+fmSchedule = function(){
+  if(!FM.playing) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  const bus = fmBus(ctx);
+  while(FM.nextAt < ctx.currentTime + 1.5){
+    let tr = FOCUS_TRACKS[FM.idx];
+    if(FM.bar >= (tr.style==='song' ? 1 : FM_BARS)){
+      if(tr.special){
+        const ids = fmTrackIds(tr.next || 'lock');
+        FM.idx = ids.length ? ids[Math.floor(Math.random()*ids.length)] : 0; FM.tag = tr.next || FM.tag;
+        if(tr.next==='lock' && (typeof soundPref!=='function' || soundPref('lockMusic', true))){ FM.soft = true; setTimeout(function(){ fmRamp(3); }, 50); }
+      } else { let n = 0; do { FM.idx = (FM.idx + 1) % FOCUS_TRACKS.length; n++; } while(FOCUS_TRACKS[FM.idx].special && n < FOCUS_TRACKS.length); }
+      FM.bar = 0; fmHiss(ctx, bus.g, FOCUS_TRACKS[FM.idx].hiss); fmRefresh(); tr = FOCUS_TRACKS[FM.idx];
+    }
+    fmBar(ctx, bus.g, FM.nextAt, tr, FM.bar);
+    FM.nextAt += 60/tr.bpm*4; FM.bar++;
+  }
+};
+// ⏭ skips the app's own songs
+ACTIONS.fmNext = (function(base){
+  return function(){
+    const r = base.apply(this, arguments);
+    let n = 0; while(FOCUS_TRACKS[FM.idx].special && n++ < FOCUS_TRACKS.length) FM.idx = (FM.idx + 1) % FOCUS_TRACKS.length;
+    return r;
+  };
+})(ACTIONS.fmNext);
+function fmPlaySong(name, tag){
+  const idx = FOCUS_TRACKS.findIndex(function(t){ return t.name===name; }); if(idx < 0 || typeof focusMusicPlay!=='function') return false;
+  clearTimeout(FM.introT); FM.soft = false; FM.tag = tag || FM.tag;
+  if(FM.playing){ FM.switching = true; focusMusicStop(); setTimeout(function(){ FM.switching = false; FM.soft = false; focusMusicPlay(idx); fmQuickIn(); dockRefresh(); }, 700); }
+  else { focusMusicPlay(idx); fmQuickIn(); }
+  dockRefresh(); return true;
+}
+// a song starts at full volume (the player's slow fade-in would swallow its opening)
+function fmQuickIn(){ const ctx = getAudioCtx(); if(!ctx || !FM.bus) return; const g = FM.bus.g.gain, now = ctx.currentTime; g.cancelScheduledValues(now); g.setValueAtTime(Math.max(0.0001, g.value), now); g.exponentialRampToValueAtTime(Math.max(0.0002, fmVolume()), now + 0.15); }
+playLockInSong = (function(base){
+  return function(){
+    if(lockStartSound()==='chill' && soundOn()){ setTimeout(function(){ fmPlaySong('Lock In', 'lock'); }, 500); return; }
+    return base.apply(this, arguments);
+  };
+})(playLockInSong);
+// (the lock-in music doesn't turn the song down)
+lockMusicOn = (function(base){ return function(){ if(FM.playing && FOCUS_TRACKS[FM.idx] && FOCUS_TRACKS[FM.idx].special) return; return base.apply(this, arguments); }; })(lockMusicOn);
+// short sounds: the music dips under them
+function fmDuckFor(ms){
+  const ctx = getAudioCtx(); if(!ctx || !FM.playing || !FM.bus) return;
+  const g = FM.bus.g.gain, now = ctx.currentTime, v = Math.max(0.0002, g.value);
+  g.cancelScheduledValues(now); g.setValueAtTime(v, now); g.exponentialRampToValueAtTime(Math.max(0.0002, v*0.15), now + 0.25);
+  clearTimeout(fmDuckFor._t); fmDuckFor._t = setTimeout(function(){ if(typeof fmRamp==='function') fmRamp(1.5); }, ms);
+}
+function fmDuckWrap(base, ms){ return function(){ fmDuckFor(ms); return base.apply(this, arguments); }; }
+playLockOut = fmDuckWrap(playLockOut, 2600); playNight = fmDuckWrap(playNight, 2600); playWorkIntro = fmDuckWrap(playWorkIntro, 5500);
+playSessionComplete = fmDuckWrap(playSessionComplete, 2600); playFanfare = fmDuckWrap(playFanfare, 2600);
+
+// ---- 16–17. the Cockpit: its right side has every song you can swap to (Your day is a tab next to it),
+// and no Done button (finishing a task belongs to the task list, not the session screen) ----
+const FM_VIBE = [['special', 'Lock-in song'], ['lock', 'Deep focus'], ['work', 'Work'], ['morning', 'Morning'], ['dream', 'Dreamy']];
+function fmVibe(tr){ for(let i = 0; i < FM_VIBE.length; i++) if(tr[FM_VIBE[i][0]]) return FM_VIBE[i][1]; return 'Focus'; }
+function ckSongsInner(){
+  const on = FM.playing || FM.switching;
+  return FOCUS_TRACKS.map(function(tr, i){
+    const cur = on && FM.idx===i;
+    return '<button class="ckm-s'+(cur ? ' is-on' : '')+(tr.special ? ' is-special' : '')+'" data-action="fmPick" data-id="'+i+'" title="'+(cur ? 'Pause' : 'Play '+escapeHtml(tr.name))+'">'+
+      '<span class="ckm-i">'+(cur ? '<span class="wk2-eq"><i></i><i></i><i></i><i></i></span>' : '&#9654;')+'</span>'+
+      '<span class="ckm-n"><b>'+escapeHtml(tr.name)+'</b><small>'+fmVibe(tr)+'</small></span>'+
+      (cur ? '<span class="ckm-p">&#10073;&#10073;</span>' : '')+'</button>';
+  }).join('');
+}
+function ckSongsKey(){ return [FM.playing || FM.switching ? 1 : 0, FM.idx].join('|'); }
+function ckPane(){ return state.profile.ckpPane==='day' ? 'day' : 'songs'; }
+cockpitDayHtml = (function(base){
+  return function(){
+    const pane = ckPane();
+    const tabs = '<div class="ckm-tabs">'+[['songs', '&#9835; Songs'], ['day', 'Your day']].map(function(x){ return '<button class="'+(pane===x[0] ? 'is-on' : '')+'" data-action="ckPaneSet" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>';
+    if(pane==='day') return base.apply(this, arguments).replace(/<div class="ckd-h">[\s\S]*?<\/div>/, tabs);
+    const tr = FOCUS_TRACKS[FM.idx], on = FM.playing || FM.switching;
+    return '<div class="ckp-day ckd ckm">'+tabs+
+      '<div class="ckm-now"><span>'+(on ? 'Now playing' : 'Paused')+'</span><b>'+escapeHtml(tr ? tr.name : '')+'</b></div>'+
+      '<div class="ckm-list" id="ckSongs" data-k="'+ckSongsKey()+'">'+ckSongsInner()+'</div>'+
+    '</div>';
+  };
+})(cockpitDayHtml);
+cockpitHtml = (function(base){
+  return function(){ return base.apply(this, arguments).replace(/<button class="ckx-b is-done" data-action="finishCurrentTask">[\s\S]*?<\/button>/, ''); };
+})(cockpitHtml);
+ACTIONS.ckPaneSet = function(el, e, id){ state.profile.ckpPane = id==='day' ? 'day' : 'songs'; persist('profile'); playTick(); renderView(); };
+ACTIONS.fmPick = function(el, e, id){
+  const i = Number(id); if(!(i >= 0 && i < FOCUS_TRACKS.length)) return;
+  if((FM.playing || FM.switching) && FM.idx===i){ focusMusicStop(); ckSongsSync(); dockRefresh(); return; }
+  const tr = FOCUS_TRACKS[i];
+  if(tr.special){ fmPlaySong(tr.name, 'lock'); setTimeout(ckSongsSync, 800); ckSongsSync(); return; }
+  // you picked it, so you hear it (not the low lock-in level); it carries on through the list after
+  clearTimeout(FM.introT); FM.soft = false; FM.tag = state.focus.activeSession ? 'lock' : 'pick';
+  if(FM.playing){ FM.idx = i; FM.bar = 0; FM.switching = true; focusMusicStop(); setTimeout(function(){ FM.switching = false; focusMusicPlay(i); fmQuickIn(); dockRefresh(); ckSongsSync(); }, 700); }
+  else { focusMusicPlay(i); fmQuickIn(); }
+  ckSongsSync(); dockRefresh();
+};
+function ckSongsSync(){
+  const el = document.getElementById('ckSongs'); if(!el) return;
+  const k = ckSongsKey(); if(el.dataset.k===k) return;
+  el.dataset.k = k; el.innerHTML = ckSongsInner();
+  const tr = FOCUS_TRACKS[FM.idx], now = el.parentNode && el.parentNode.querySelector('.ckm-now');
+  if(now && tr) now.innerHTML = '<span>'+(FM.playing || FM.switching ? 'Now playing' : 'Paused')+'</span><b>'+escapeHtml(tr.name)+'</b>';
+}
+// (the list follows the player: a track that ends, ⏭ or ▶ up top)
+setInterval(ckSongsSync, 700);
