@@ -7478,6 +7478,167 @@ body.opf-on .activity-pill{ opacity:0 !important; pointer-events:none !important
 .zn-pick{ display:flex; flex-direction:column; gap:6px; }
 .zn-acc{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text); cursor:pointer; text-align:left; }
 .zn-acc:hover{ border-color:var(--text-dim); } .zn-acc small{ color:var(--text-dim); font-size:12px; }
+
+/* ============ ROUND 40 ============ */
+/* You: the card turns edge-on and back (no 3D faces) */
+.you .ycf .ycf-in, .you .ycf:hover .ycf-in, .you .ycf.is-flipped .ycf-in, .you .ycf.is-flipped:hover .ycf-in, .you .ycf.is-flipped:not(:hover) .ycf-in{ transform:none; transform-style:flat; transition:none; }
+.you .ycf{ transition:transform .2s ease; } .you .ycf:hover{ transform:translateY(-3px); }
+.you .ycf .ycf-in > .pc, .you .ycf .ycf-in > .pc *{ backface-visibility:visible; -webkit-backface-visibility:visible; }
+.you .ycf .ycf-in > .ycf-back, .you .ycf .ycf-in > .ycf-back:hover{ transform:none !important; overflow:hidden; gap:5px; padding:14px 12px; }
+.you .ycf .ycf-in > .pc, .you .ycf .ycf-in > .pc:hover{ transition:box-shadow .25s; }
+.you .ycf:not(.is-flipped) .ycf-in > .ycf-back, .you .ycf.is-flipped .ycf-in > .pc:first-child{ visibility:hidden; }
+.you .ycf .ycf-in.is-turn-out{ animation:ycOut .17s ease-in forwards; }
+.you .ycf .ycf-in.is-turn-in{ animation:ycIn .22s cubic-bezier(.2,.8,.3,1.15); }
+@keyframes ycOut{ from{ transform:perspective(900px) rotateY(0); } to{ transform:perspective(900px) rotateY(90deg); filter:brightness(1.4); } }
+@keyframes ycIn{ from{ transform:perspective(900px) rotateY(-90deg); filter:brightness(1.4); } to{ transform:perspective(900px) rotateY(0); } }
+/* Discipline etc.: a trend is the number's colour */
+.you-sub b.you-v-up{ color:#3FBE8E; } .you-sub b.you-v-down{ color:#E5484D; }
+/* client cards: one-offs */
+.cc2-deliv.cc2-one{ grid-template-columns:minmax(0, 1fr) auto; }
+.cc2-one .cc2-deliv-mo{ color:#c9b2ff; }
+.cc2-one.is-late .cc2-deliv-mo{ color:#ff9a9d; }
+.cc2-one.is-done{ opacity:.55; } .cc2-one.is-done .cc2-deliv-title{ text-decoration:line-through; text-decoration-color:rgba(var(--ink),.3); }
+.cc2-one-ck{ width:24px; height:24px; border-radius:7px; border:1.5px solid rgba(169,139,255,.55); background:transparent; color:#fff; font-size:13px; font-weight:800; cursor:pointer; display:grid; place-items:center; transition:background .15s, border-color .15s; }
+.cc2-one-ck:hover{ border-color:#a98bff; background:rgba(169,139,255,.12); } .cc2-one-ck.is-on{ background:#8b6cf0; border-color:#8b6cf0; }
+.cc2-one .cc2-deliv-title{ flex:1; min-width:0; }
+/* the lock-out screen */
+#stopFocusOverlay.lo-ov{ background:radial-gradient(70% 60% at 50% 40%, rgba(40,26,10,.82), rgba(4,5,9,.94)); backdrop-filter:blur(10px); }
+#stopFocusOverlay.lo-ov #stopFocusContent{ max-width:520px !important; max-height:none !important; overflow:visible !important; padding:30px 30px 24px !important; border-radius:26px !important; background:linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.025)) !important; border:1px solid rgba(255,255,255,.1) !important; box-shadow:0 40px 100px rgba(0,0,0,.55) !important; }
+.lo{ display:flex; flex-direction:column; align-items:center; text-align:center; color:#fff; }
+.lo-k{ font-size:11px; font-weight:800; letter-spacing:.2em; text-transform:uppercase; color:#ffc56b; }
+.lo-time{ margin-top:10px; display:flex; flex-direction:column; align-items:center; }
+.lo-time b{ font-family:var(--font-display); font-size:54px; line-height:1; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.lo-time span{ margin-top:6px; font-size:13px; color:rgba(255,255,255,.6); }
+.lo-bar{ width:220px; height:5px; margin-top:16px; border-radius:4px; background:rgba(255,255,255,.1); overflow:hidden; } .lo-bar i{ display:block; height:100%; border-radius:4px; background:linear-gradient(90deg, #E8A23D, #f5c16c); }
+.lo-day{ margin-top:7px; font-size:12px; color:rgba(255,255,255,.55); }
+.lo-why{ margin-top:22px; width:100%; padding:14px 18px; border-radius:16px; background:rgba(63,190,142,.08); border:1px solid rgba(63,190,142,.22); display:flex; flex-direction:column; gap:4px; }
+.lo-why small{ font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#7ef0c0; }
+.lo-why b{ font-family:var(--font-display); font-size:20px; } .lo-why span{ font-size:13px; color:#ff9a9d; }
+.lo-q{ margin:20px 0 0; max-width:440px; }
+.lo-q blockquote{ margin:0; font-family:'Iowan Old Style', 'New York', Georgia, serif; font-style:italic; font-size:18px; line-height:1.5; color:rgba(255,255,255,.9); }
+.lo-q figcaption{ margin-top:8px; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.45); }
+.lo-left{ margin-top:18px; font-size:13px; color:rgba(255,255,255,.7); } .lo-left b{ color:#fff; } .lo-left.is-clear{ color:#7ef0c0; }
+.lo-btns{ display:flex; gap:10px; margin-top:22px; width:100%; }
+.lo-go{ flex:1; height:50px; border:0; border-radius:14px; background:linear-gradient(135deg, #3FBE8E, #2a9c72); color:#fff; font:inherit; font-size:15px; font-weight:800; cursor:pointer; box-shadow:0 10px 26px rgba(63,190,142,.3); transition:transform .15s; } .lo-go:hover{ transform:translateY(-1px); }
+.lo-more{ height:50px; padding:0 18px; border-radius:14px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff; font:inherit; font-size:14px; font-weight:700; cursor:pointer; } .lo-more:hover{ background:rgba(255,255,255,.12); }
+.lo-hold{ --p:0; position:relative; margin-top:14px; height:40px; padding:0 22px; border-radius:999px; border:1px solid rgba(229,72,77,.45); background:transparent; color:#ff9a9d; font:inherit; font-size:13px; font-weight:700; cursor:pointer; overflow:hidden; user-select:none; -webkit-user-select:none; touch-action:none; }
+.lo-hold i{ position:absolute; inset:0; transform-origin:left; transform:scaleX(var(--p)); background:rgba(229,72,77,.28); }
+.lo-hold span{ position:relative; } .lo-hold.is-holding{ color:#fff; border-color:#E5484D; }
+/* music volume on the little player */
+.mctl-vol{ display:inline-flex; align-items:center; gap:4px; margin-left:2px; }
+.mctl-vi{ font-size:13px; opacity:.75; cursor:default; }
+.mctl-vol .mvol.is-mctl{ display:inline-flex; align-items:center; width:0; overflow:hidden; opacity:0; transition:width .25s ease, opacity .2s; }
+.mctl-vol:hover .mvol.is-mctl, .mctl-vol:focus-within .mvol.is-mctl{ width:92px; opacity:1; }
+.mvol.is-mctl .mvol-in{ width:70px; } .mvol.is-mctl .mvol-v{ display:none; }
+.ckm-vol{ display:flex; align-items:center; gap:10px; margin-top:-4px; }
+.ckm-vi{ font-size:14px; opacity:.8; } .ckm-vol .mvol{ flex:1; display:flex; align-items:center; gap:10px; } .ckm-vol .mvol-in{ flex:1; } .ckm-vol .mvol-v{ font-size:12px; color:rgba(255,255,255,.6); min-width:34px; }
+.np-vol{ display:flex; align-items:center; gap:10px; margin-top:16px; max-width:260px; }
+.np-vol .ckm-vi{ font-size:14px; opacity:.75; } .np-vol .mvol{ flex:1; display:flex; align-items:center; gap:10px; } .np-vol .mvol-in{ flex:1; background:rgba(255,255,255,.2); } .np-vol .mvol-v{ font-size:12px; color:rgba(255,255,255,.6); min-width:34px; }
+/* locked-in Overview: Worth doing soon / Clients */
+.llx{ padding:18px 18px 14px; border-radius:20px; border:1px solid var(--border); background:var(--panel); height:100%; box-sizing:border-box; display:flex; flex-direction:column; gap:12px; }
+.llx-h{ display:flex; align-items:center; gap:8px; }
+.llx-h b{ font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text); }
+.llx-n{ font-size:11px; font-weight:800; padding:1px 7px; border-radius:999px; background:rgba(var(--ink),.08); color:var(--text-dim); }
+.llx-link{ border:0; background:none; color:var(--text-dim); font-size:12px; font-weight:600; cursor:pointer; } .llx-link:hover{ color:var(--text); }
+.llx-rows{ display:flex; flex-direction:column; gap:2px; }
+.llx-row{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:12px; transition:background .15s; }
+.llx-row:hover{ background:rgba(var(--ink),.05); }
+.llx-dot{ flex:none; width:8px; height:8px; border-radius:50%; }
+.llx-t{ flex:1; min-width:0; font-size:14px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.llx-t em{ font-style:normal; margin-left:8px; font-size:10.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; padding:2px 7px; border-radius:999px; color:#c9b2ff; background:rgba(169,139,255,.14); }
+.llx-who{ flex:none; font-size:12px; color:var(--text-dim); max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.llx-due{ flex:none; font-size:11.5px; font-weight:600; color:var(--text-faint); } .llx-due.is-late{ color:#ff9a9d; }
+.llx-go{ flex:none; opacity:0; border:1px solid rgba(232,162,61,.45); background:rgba(232,162,61,.1); color:#ffc56b; font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:999px; cursor:pointer; transition:opacity .15s; }
+.llx-row:hover .llx-go, .llx-go:focus{ opacity:1; }
+.llx-more{ font-size:12px; color:var(--text-faint); padding:0 10px; }
+.llx-empty{ padding:18px; text-align:center; font-size:13px; color:var(--text-faint); border:1px dashed rgba(var(--ink),.12); border-radius:14px; }
+.llx-cl{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:10px; }
+.llx-c{ display:flex; flex-direction:column; gap:12px; padding:14px; border-radius:16px; border:1px solid rgba(var(--ink),.08); background:rgba(var(--ink),.025); text-align:left; color:var(--text); cursor:pointer; position:relative; overflow:hidden; transition:border-color .15s, transform .15s; }
+.llx-c::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--hc); }
+.llx-c:hover{ border-color:rgba(var(--ink),.2); transform:translateY(-1px); }
+.llx-c-top{ display:flex; align-items:center; gap:10px; }
+.llx-av{ flex:none; width:34px; height:34px; border-radius:11px; display:grid; place-items:center; font-size:12.5px; font-weight:800; color:#fff; }
+.llx-c-n{ min-width:0; display:flex; flex-direction:column; }
+.llx-c-n b{ font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.llx-c-n small{ display:flex; align-items:center; gap:5px; font-size:11.5px; color:var(--text-dim); } .llx-c-n small i{ width:6px; height:6px; border-radius:50%; background:var(--hc); }
+.llx-c-d{ display:flex; flex-direction:column; gap:7px; }
+.llx-dv{ display:grid; grid-template-columns:minmax(0, 1fr) 70px auto; align-items:center; gap:8px; font-size:12px; color:var(--text-dim); }
+.llx-dv span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.llx-dv i{ display:block; height:5px; border-radius:4px; background:rgba(var(--ink),.08); overflow:hidden; } .llx-dv u{ display:block; height:100%; border-radius:4px; background:var(--hc); }
+.llx-dv b{ font-size:12px; color:var(--text); font-variant-numeric:tabular-nums; }
+.llx-c-none{ font-size:12px; color:var(--text-faint); }
+/* ============ R40: Social ============ */
+.sx-tabs{ margin:4px 0 16px; }
+.sx{ display:flex; flex-direction:column; gap:14px; }
+.sx-sec-k{ margin-top:6px; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); }
+.sx-note{ font-size:12px; color:var(--text-faint); }
+.sx-profs{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.sx-prof{ padding:18px; border-radius:20px; border:1px solid var(--border); background:var(--panel); display:flex; flex-direction:column; gap:14px; }
+.sx-prof.is-empty{ align-items:flex-start; justify-content:center; border-style:dashed; background:transparent; min-height:220px; }
+.sx-prof.is-empty p{ margin:0; font-size:13px; color:var(--text-dim); }
+.sx-prof-k{ font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); }
+.sx-prof-h{ display:flex; align-items:center; gap:12px; }
+.sx-prof-h img, .sx-av{ width:44px; height:44px; border-radius:50%; object-fit:cover; flex:none; display:grid; place-items:center; background:linear-gradient(135deg, #f09433, #dc2743 50%, #bc1888); color:#fff; font-weight:800; }
+.sx-prof-h b{ font-size:16px; }
+.sx-src{ font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px; background:rgba(var(--ink),.07); color:var(--text-dim); }
+.sx-fol{ display:flex; align-items:flex-end; justify-content:space-between; gap:14px; }
+.sx-fol b{ display:block; font-family:var(--font-display); font-size:32px; line-height:1; }
+.sx-fol span{ font-size:12px; color:var(--text-dim); }
+.sx-fol em{ display:block; margin-top:4px; font-style:normal; font-size:12px; font-weight:700; } .sx-fol em.is-up{ color:#3FBE8E; } .sx-fol em.is-down{ color:#E5484D; }
+.sx-spark{ width:140px; height:40px; } .sx-spark polyline{ fill:none; stroke:#5BC0EB; stroke-width:2; vector-effect:non-scaling-stroke; }
+.sx-tiles{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; }
+.sx-t{ padding:10px; border-radius:12px; background:rgba(var(--ink),.04); }
+.sx-t b{ display:block; font-family:var(--font-display); font-size:18px; } .sx-t span{ display:block; font-size:11.5px; color:var(--text-dim); } .sx-t small{ display:block; font-size:10.5px; color:var(--text-faint); }
+.sx-t.is-hook b{ color:#ffc56b; }
+.sx-best{ display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; }
+.sx-best a{ position:relative; aspect-ratio:4/5; border-radius:10px; overflow:hidden; background:rgba(var(--ink),.06); }
+.sx-best img{ width:100%; height:100%; object-fit:cover; } .sx-best small{ position:absolute; left:6px; bottom:5px; font-size:11px; font-weight:800; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.6); }
+.sx-add{ padding:4px 0; }
+.sx-chips, .sx-sort{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.sx-chips button, .sx-sort button{ border:1px solid var(--border); background:transparent; color:var(--text-dim); font-size:12.5px; font-weight:600; padding:6px 12px; border-radius:999px; cursor:pointer; }
+.sx-chips button.is-on, .sx-sort button.is-on{ background:rgba(var(--ink),.1); color:var(--text); border-color:rgba(var(--ink),.25); }
+.sx-sort span{ font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); margin-right:4px; }
+.sx-sum{ display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:8px; }
+.sx-sum div{ padding:12px; border-radius:14px; border:1px solid var(--border); background:var(--panel); }
+.sx-sum b{ display:block; font-family:var(--font-display); font-size:20px; } .sx-sum span{ font-size:11.5px; color:var(--text-dim); }
+.sx-posts{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:10px; }
+.sx-post{ display:flex; gap:12px; padding:10px; border-radius:16px; border:1px solid var(--border); background:var(--panel); color:var(--text); text-decoration:none; transition:border-color .15s; }
+.sx-post:hover{ border-color:rgba(var(--ink),.25); }
+.sx-post-img{ position:relative; flex:none; width:84px; aspect-ratio:4/5; border-radius:10px; overflow:hidden; background:rgba(var(--ink),.06); }
+.sx-post-img img{ width:100%; height:100%; object-fit:cover; } .sx-post-img em{ position:absolute; left:5px; top:5px; font-style:normal; font-size:10px; font-weight:800; padding:2px 6px; border-radius:6px; background:rgba(0,0,0,.55); color:#fff; }
+.sx-post-b{ min-width:0; display:flex; flex-direction:column; gap:6px; }
+.sx-post-b > small{ font-size:11px; color:var(--text-faint); }
+.sx-cap{ font-size:13px; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.sx-m, .sx-m2{ display:flex; flex-wrap:wrap; gap:4px 10px; font-size:12px; color:var(--text-dim); }
+.sx-m2 b{ color:var(--text); } .sx-m2 .is-hook b{ color:#ffc56b; }
+.sx-inbox{ display:grid; grid-template-columns:320px minmax(0, 1fr); gap:12px; height:min(640px, calc(100vh - 260px)); }
+.sx-convs{ overflow-y:auto; display:flex; flex-direction:column; gap:2px; padding:6px; border-radius:18px; border:1px solid var(--border); background:var(--panel); }
+.sx-conv{ display:flex; align-items:center; gap:10px; padding:9px 10px; border:0; border-radius:12px; background:none; color:var(--text); text-align:left; cursor:pointer; }
+.sx-conv:hover{ background:rgba(var(--ink),.05); } .sx-conv.is-on{ background:rgba(var(--ink),.1); }
+.sx-conv img, .sx-conv .sx-av{ width:36px; height:36px; font-size:13px; border-radius:50%; object-fit:cover; }
+.sx-conv-b{ flex:1; min-width:0; display:flex; flex-direction:column; } .sx-conv-b b{ font-size:13.5px; } .sx-conv-b small{ font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sx-conv.is-unread .sx-conv-b b, .sx-conv.is-unread .sx-conv-b small{ color:var(--text); font-weight:700; }
+.sx-conv-r{ flex:none; display:flex; flex-direction:column; align-items:flex-end; gap:3px; } .sx-conv-r small{ font-size:11px; color:var(--text-faint); }
+.sx-conv-r i{ font-style:normal; font-size:10.5px; font-weight:800; padding:0 6px; border-radius:999px; background:#E5484D; color:#fff; }
+.sx-conv-r em{ font-style:normal; font-size:9.5px; font-weight:800; width:16px; height:16px; border-radius:5px; display:grid; place-items:center; background:rgba(var(--ink),.08); color:var(--text-dim); }
+.sx-thread{ display:flex; flex-direction:column; border-radius:18px; border:1px solid var(--border); background:var(--panel); overflow:hidden; }
+.sx-thread-h{ display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--border); } .sx-thread-h small{ font-size:12px; color:var(--text-dim); }
+.sx-thread-b{ flex:1; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; gap:8px; }
+.sx-msg{ max-width:72%; display:flex; flex-direction:column; gap:2px; } .sx-msg span{ padding:9px 13px; border-radius:16px; font-size:13.5px; line-height:1.4; background:rgba(var(--ink),.07); white-space:pre-wrap; word-break:break-word; }
+.sx-msg.is-out{ align-self:flex-end; align-items:flex-end; } .sx-msg.is-out span{ background:linear-gradient(135deg, #7a5cff, #5b6cff); color:#fff; }
+.sx-msg small{ font-size:10.5px; color:var(--text-faint); padding:0 6px; }
+.sx-thread-f{ padding:10px 16px; font-size:11.5px; color:var(--text-faint); border-top:1px solid var(--border); }
+.sx-ads{ border-radius:18px; border:1px solid var(--border); background:var(--panel); overflow:hidden; }
+.sx-ad{ display:grid; grid-template-columns:minmax(200px, 2fr) repeat(5, minmax(70px, .7fr)) minmax(170px, 1.2fr); gap:10px; align-items:center; padding:11px 16px; border-top:1px solid rgba(var(--ink),.06); font-size:13px; }
+.sx-ad.is-h{ border-top:0; font-size:10.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); }
+.sx-ad-n{ display:flex; align-items:center; gap:8px; min-width:0; } .sx-ad-n b{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .sx-ad-n small{ font-size:11px; color:var(--text-faint); white-space:nowrap; }
+.sx-ad-n i{ flex:none; width:7px; height:7px; border-radius:50%; background:rgba(var(--ink),.25); } .sx-ad-n i.is-on{ background:#3FBE8E; }
+.sx-ad-c{ display:flex; flex-direction:column; gap:4px; } .sx-ad-c select{ height:30px; padding:0 8px; font-size:12px; }
+.sx-ad-g{ border:1px dashed rgba(169,139,255,.5); background:rgba(169,139,255,.08); color:#c9b2ff; font-size:11px; font-weight:700; padding:3px 8px; border-radius:8px; cursor:pointer; text-align:left; }
+.cc2-ads{ margin:0 12px 8px; padding:6px 10px; border-radius:10px; font-size:12px; color:#ffc56b; background:rgba(232,162,61,.08); }
+@media (max-width:1100px){ .sx-profs{ grid-template-columns:1fr; } .sx-sum{ grid-template-columns:repeat(4, 1fr); } .sx-inbox{ grid-template-columns:1fr; height:auto; } .sx-ad{ grid-template-columns:1fr 1fr 1fr; } .sx-ad.is-h{ display:none; } }
+.sx-best{ grid-template-columns:repeat(auto-fill, 70px); } .sx-best a{ width:70px; aspect-ratio:4/5; }
+.sx-strip-k{ font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); margin-bottom:-6px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -40654,6 +40815,658 @@ socialSourcesHtml = (function(base){
     return tpl.innerHTML;
   };
 })(socialSourcesHtml);
+// ============ ROUND 40 ============
+
+// ---- Personal → You: the card turns over cleanly ----
+// The 3D flip blanked out halfway and the back spilled out of the card. Now it turns edge-on, swaps
+// faces, and opens back out: the same box both sides, nothing disappears.
+ACTIONS.ycFlip = function(el){
+  const c = el && el.closest('.ycf'), inn = c && c.querySelector('.ycf-in');
+  ui.ycFlip = !ui.ycFlip; playTick();
+  if(!c || !inn){ renderView(); return; }
+  if(inn._t) clearTimeout(inn._t);
+  inn.classList.remove('is-turn-in'); inn.classList.add('is-turn-out');
+  inn._t = setTimeout(function(){
+    c.classList.toggle('is-flipped', !!ui.ycFlip);
+    inn.classList.remove('is-turn-out'); void inn.offsetWidth; inn.classList.add('is-turn-in');
+    inn._t = setTimeout(function(){ inn.classList.remove('is-turn-in'); }, 220);
+  }, 170);
+};
+// ---- Discipline: the trend arrow sat in the label and wrapped onto its own line ("▲" between
+// Consistency and Action). The number carries it now: green when it's climbing, red when it's slipping ----
+renderYouTab = (function(base){
+  return function(){
+    return base.apply(this, arguments).replace(/ <em class="you-tr (is-up|is-down)" title="([^"]*)">[^<]*<\/em>(<\/span><i>[\s\S]*?<\/i>)<b>/g, function(m0, cls, t, mid){
+      return mid+'<b class="you-v-'+(cls==='is-up' ? 'up' : 'down')+'" title="'+t+'">';
+    });
+  };
+})(renderYouTab);
+
+// ---- client cards: one-off deliverables show (open ones to tick off, the last few done ones faded), and
+// no "Next step" row ----
+clientDelivRowsHtml = (function(base){
+  return function(c){
+    const h = base.apply(this, arguments);
+    const ones = arr(c.deliverables).filter(function(d){ return !d.recurring; });
+    if(!ones.length) return h;
+    const open = ones.filter(function(d){ return d.status!=='done'; }).sort(function(a, b){ return (a.dueDate || '9999').localeCompare(b.dueDate || '9999'); });
+    const done = ones.filter(function(d){ return d.status==='done'; }).sort(function(a, b){ return (b.completedAt || '').localeCompare(a.completedAt || ''); }).slice(0, 2);
+    const row = function(d){
+      const late = d.status!=='done' && d.dueDate && d.dueDate < todayStr();
+      return '<div class="cc2-deliv cc2-one'+(d.status==='done' ? ' is-done' : '')+(late ? ' is-late' : '')+'" data-key="dv1-'+c.id+'-'+d.id+'">'+
+        '<span class="cc2-deliv-title">'+escapeHtml(d.title || 'Deliverable')+'<small class="cc2-deliv-mo">One-off'+(d.dueDate ? ' &middot; '+(late ? 'was due ' : 'due ')+fmtDateShort(d.dueDate) : '')+(d.status==='done' && d.completedAt ? ' &middot; done '+fmtDateShort(d.completedAt) : '')+'</small></span>'+
+        '<button class="cc2-one-ck'+(d.status==='done' ? ' is-on' : '')+'" data-action="oneOffToggle" data-client="'+c.id+'" data-id="'+d.id+'" title="'+(d.status==='done' ? 'Done. Tap to undo' : 'Mark it done')+'">'+(d.status==='done' ? '&#10003;' : '')+'</button>'+
+      '</div>';
+    };
+    const rows = open.concat(done).map(row).join('');
+    return h ? h.replace(/<\/div>$/, rows+'</div>') : '<div class="cc2-delivs">'+rows+'</div>';
+  };
+})(clientDelivRowsHtml);
+ACTIONS.oneOffToggle = function(el){
+  const c = arr(state.business.clients).find(function(x){ return x.id===el.dataset.client; }); if(!c) return;
+  const d = arr(c.deliverables).find(function(x){ return x.id===el.dataset.id; }); if(!d) return;
+  const t = d.linkedTaskId ? state.tasks.items.find(function(x){ return x.id===d.linkedTaskId; }) : null;
+  if(t && t.master && t.master.kind==='dvw'){ if(d.status==='done') dvwUndo(t); else dvwDone(t); return; }
+  if(d.status==='done'){ d.status = 'pending'; d.completedAt = null; } else { d.status = 'done'; d.completedAt = todayStr(); playTaskComplete(); }
+  persist('business'); if(typeof masterTasksSync==='function') masterTasksSync(); renderView();
+};
+clientNextHtml = function(){ return ''; };
+
+// ---- the + on Focus → Tasks: no "A client deliverable" (they're made for you from each client) ----
+focusAddMenu = (function(base){
+  return function(){ return base.apply(this, arguments).filter(function(x){ return !(x && /A client deliverable/.test(x[1])); }); };
+})(focusAddMenu);
+
+// ---- work mode and the clock-out pages: a deliverable task says whose and what ("Brothers Mechanical:
+// 4 reels, week 1"), not "16 Reels 1/4" ----
+function taskNiceTitle(t){
+  if(!t || !t.master || t.master.kind!=='dvw' || typeof dvwView!=='function') return t ? t.title : '';
+  const v = dvwView(t); if(!v) return t.title;
+  return v.x.oneOff ? v.who+': '+v.name : v.who+': '+v.pieces+', week '+v.x.k;
+}
+function niceTitlePairs(){
+  return state.tasks.items.filter(function(t){ return t.master && t.master.kind==='dvw' && t.title; }).map(function(t){ return [t.title, taskNiceTitle(t)]; })
+    .filter(function(p){ return p[1] && p[1]!==p[0]; }).sort(function(a, b){ return b[0].length - a[0].length; });
+}
+function niceTitlesHtml(h){
+  if(typeof h!=='string' || !h) return h;
+  niceTitlePairs().forEach(function(p){ const a = escapeHtml(p[0]); if(h.indexOf(a) >= 0) h = h.split(a).join(escapeHtml(p[1])); });
+  return h;
+}
+function niceTitlesIn(root){
+  if(!root) return;
+  const pairs = niceTitlePairs(); if(!pairs.length) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n;
+  while((n = w.nextNode())){
+    let v = n.nodeValue; if(!v || v.length < 3) continue;
+    pairs.forEach(function(p){ if(v.indexOf(p[0]) >= 0 && v.indexOf(p[1]) < 0) v = v.split(p[0]).join(p[1]); });
+    if(v!==n.nodeValue) n.nodeValue = v;
+  }
+}
+const NICE_SPOTS = '#planOverlay, #lockSeqOverlay, #windOverlay, #recapOverlay, #stopFocusOverlay, #timesUpOverlay, #viewRoot .np, #viewRoot .rest-full';
+function niceTitlesSweep(){ document.querySelectorAll(NICE_SPOTS).forEach(function(el){ if(!el.classList.contains('hidden')) niceTitlesIn(el); }); }
+['renderPlanRevealInto', 'renderLockSeqInto', 'renderRecapInto', 'renderStopFocusModalInto'].forEach(function(k){
+  if(typeof window[k]!=='function') return;
+  const base = window[k];
+  window[k] = function(){ const r = base.apply(this, arguments); try{ niceTitlesSweep(); }catch(e){} return r; };
+});
+windHtml = (function(base){ return function(){ return niceTitlesHtml(base.apply(this, arguments)); }; })(windHtml);
+renderLockedMinimal = (function(base){ return function(){ return niceTitlesHtml(base.apply(this, arguments)); }; })(renderLockedMinimal);
+renderFocusMinimal = (function(base){ return function(){ return niceTitlesHtml(base.apply(this, arguments)); }; })(renderFocusMinimal);
+renderWeekendOffView = (function(base){ return function(){ return niceTitlesHtml(base.apply(this, arguments)); }; })(renderWeekendOffView);
+afterRenderHooks.push(function(){ try{ niceTitlesSweep(); }catch(e){} });
+setInterval(function(){ try{ niceTitlesSweep(); }catch(e){} }, 1500);
+
+// ---- the lock-out screen, rebuilt ----
+// It was a long list nobody read. Now it's one screen: how long you've been at it, one reason you're
+// doing this (from your own "why"), a line about working hard, what's left, and the way out takes a
+// press-and-hold (the friction), not a click. "Keep going" is the big button; "+10 min" for one more push.
+const LOCKOUT_QUOTES = [
+  ['Work like there is someone working twenty-four hours a day to take it all away from you.', 'Mark Cuban'],
+  ['The difference between ordinary and extraordinary is that little extra.', 'Jimmy Johnson'],
+  ['Don’t stop when you’re tired. Stop when you’re done.', 'David Goggins'],
+  ['Hard work beats talent when talent doesn’t work hard.', 'Tim Notke'],
+  ['The dream is free. The hustle is sold separately.', ''],
+  ['You don’t get what you wish for. You get what you work for.', ''],
+  ['When you think you’re done, you’re only at 40% of what your body is capable of.', 'David Goggins'],
+  ['Success isn’t owed. It’s leased, and rent is due every day.', 'Rory Vaden'],
+  ['Discipline is doing what needs to be done, even if you don’t want to do it.', ''],
+  ['The last ten minutes are where the people who win separate from the people who almost did.', ''],
+  ['Nobody cares. Work harder.', 'Cameron Hanes'],
+  ['Great things are done by a series of small things brought together.', 'Vincent van Gogh'],
+  ['If it were easy, everyone would do it.', ''],
+  ['Pain is temporary. Quitting lasts forever.', 'Lance Armstrong'],
+  ['Max out the day. Tomorrow you’ll be glad you did.', '']
+];
+function lockoutPick(list, key){ ui.loPick = ui.loPick || {}; if(ui.loPick[key]==null || ui.loPick[key] >= list.length) ui.loPick[key] = Math.floor(Math.random()*Math.max(1, list.length)); return list[ui.loPick[key]]; }
+renderStopFocusModal = function(){
+  const as = state.focus.activeSession; if(!as) return '';
+  const mins = Math.max(0, Math.round((Date.now() - as.startedAt)/60000) - Math.round(arr(as.breaks).reduce(function(a, b){ return a + Math.max(0, (b.endedAt || Date.now()) - (b.startedAt || Date.now())); }, 0)/60000));
+  const toward = arr(state.focus.motivations && state.focus.motivations.toward), away = arr(state.focus.motivations && state.focus.motivations.away);
+  const why = toward.length ? lockoutPick(toward, 'why') : null, avoid = away.length ? lockoutPick(away, 'avoid') : null;
+  const q = lockoutPick(LOCKOUT_QUOTES, 'q');
+  const left = state.tasks.items.filter(function(t){ return t.status==='today' && !(typeof isOngoingDoneToday==='function' && isOngoingDoneToday(t)); });
+  const done = arr(as.completedTasks).length, dw = typeof deepWorkMinutesTodayLive==='function' ? deepWorkMinutesTodayLive() : 0, target = state.standards.deepWorkTargetMinutes || 180;
+  const next = left[0];
+  return '<div class="lo">'+
+    '<div class="lo-k">&#128274; Locking out?</div>'+
+    '<div class="lo-time"><b>'+fmtDurationLabel(mins)+'</b><span>this session'+(done ? ' &middot; '+done+' done' : '')+'</span></div>'+
+    '<div class="lo-bar"><i style="width:'+Math.min(100, dw/target*100).toFixed(1)+'%"></i></div>'+
+    '<div class="lo-day">'+fmtDurationLabel(dw)+' of '+fmtDurationLabel(target)+' today'+(dw >= target ? ' &middot; target hit' : ' &middot; '+fmtDurationLabel(target - dw)+' to go')+'</div>'+
+    (why || avoid ? '<div class="lo-why"><small>Remember why</small>'+(why ? '<b>'+escapeHtml(why.text)+'</b>' : '')+(avoid ? '<span>Not: '+escapeHtml(avoid.text)+'</span>' : '')+'</div>' : '')+
+    '<figure class="lo-q"><blockquote>'+escapeHtml(q[0])+'</blockquote>'+(q[1] ? '<figcaption>'+escapeHtml(q[1])+'</figcaption>' : '')+'</figure>'+
+    (left.length ? '<div class="lo-left">'+left.length+' left today'+(next ? ' &middot; next: <b>'+escapeHtml(taskNiceTitle(next))+'</b>' : '')+'</div>' : '<div class="lo-left is-clear">&#10003; Today’s list is clear.</div>')+
+    '<div class="lo-btns"><button class="lo-go" data-action="cancelStopFocus">Keep going</button><button class="lo-more" data-action="lockoutMore">+10 min</button></div>'+
+    '<button class="lo-hold" id="loHold" title="Press and hold to lock out"><i></i><span>Hold to lock out</span></button>'+
+  '</div>';
+};
+openStopFocus = (function(base){
+  return function(){ ui.loPick = null; const o = document.getElementById('stopFocusOverlay'); if(o) o.classList.add('lo-ov'); return base.apply(this, arguments); };
+})(openStopFocus);
+ACTIONS.lockoutMore = function(){
+  const as = state.focus.activeSession; if(!as) return;
+  as.plannedMinutes = Math.round((Date.now() - as.startedAt)/60000) + 10; persist('focus');
+  closeStopFocus(); playTick(); renderView();
+  showToast('Ten more minutes. Then you can go.', {icon:'&#9201;'});
+};
+(function(){
+  let t0 = 0, raf = 0, btn = null;
+  const HOLD = 1600;
+  const stop = function(){ cancelAnimationFrame(raf); if(btn){ btn.classList.remove('is-holding'); btn.style.setProperty('--p', 0); } btn = null; t0 = 0; };
+  const tick = function(){
+    if(!btn) return;
+    const p = Math.min(1, (Date.now() - t0)/HOLD); btn.style.setProperty('--p', p);
+    if(p >= 1){ stop(); closeStopFocus(); reallyConfirmStopFocus(); return; }
+    raf = requestAnimationFrame(tick);
+  };
+  document.addEventListener('pointerdown', function(e){ const b = e.target.closest && e.target.closest('#loHold'); if(!b) return; e.preventDefault(); btn = b; t0 = Date.now(); b.classList.add('is-holding'); raf = requestAnimationFrame(tick); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function(k){ document.addEventListener(k, function(e){ if(btn && (k!=='pointerleave' || e.target===btn)) stop(); }, true); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && overlayOpen('stopFocusOverlay')){ closeStopFocus(); } });
+})();
+
+// ---- Op hears all of a long message ----
+// He stopped at 60 seconds and after a short pause, and quiet words counted as silence, so long thoughts
+// got cut off. Now: up to 5 minutes, the pause he waits out grows the longer you've been talking (up to
+// ~3.5 s more), quieter speech still counts once you've started, and a long clip gets the time it needs
+// to be sent and written out. Tap the mic any time to send it right away.
+scribeListen = async function(cap){
+  if(AI.listening){ if(AI.sendNow) AI.sendNow(); return; }
+  if(typeof opStop==='function') opStop();
+  const heyWas = typeof HW!=='undefined' && HW.on; if(heyWas && typeof heyStop==='function') heyStop();
+  OV.cap = cap || 'opBubText'; AI.listening = true; AI.typedAt = 0; aiUiRefresh(); opCaption('Listening…');
+  let stream = null;
+  try{ stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true, autoGainControl:true, channelCount:1}}); }
+  catch(e){ AI.listening = false; aiUiRefresh(); opCaption(e && e.name==='NotAllowedError' ? 'I need the microphone. Allow it for Operator (or type instead).' : 'The mic isn’t working: type instead.'); return; }
+  const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '');
+  const rec = new MediaRecorder(stream, mime ? {mimeType:mime} : undefined), chunks = [];
+  rec.ondataavailable = function(e){ if(e.data && e.data.size) chunks.push(e.data); };
+  let ctx = null, an = null, buf = null;
+  try{ ctx = new (window.AudioContext || window.webkitAudioContext)(); an = ctx.createAnalyser(); an.fftSize = 1024; ctx.createMediaStreamSource(stream).connect(an); buf = new Float32Array(an.fftSize); }catch(e){}
+  let floor = 0.006, spoke = false, lastLoud = Date.now(), why = null, talked = 0; AI._longWarn = false;
+  const t0 = Date.now();
+  const finish = function(reason){ if(why) return; why = reason; clearInterval(tick); try{ if(rec.state!=='inactive') rec.stop(); }catch(e){ rec.onstop(); } };
+  AI.sendNow = function(){ finish('send'); };
+  AI.cancelListen = function(){ finish('cancel'); };
+  const tick = setInterval(function(){
+    let rms = 0;
+    if(an){ an.getFloatTimeDomainData(buf); let s = 0; for(let i = 0; i < buf.length; i++) s += buf[i]*buf[i]; rms = Math.sqrt(s/buf.length); }
+    SCR.level = rms;
+    if(!spoke) floor = floor*0.94 + Math.min(rms, 0.04)*0.06;
+    // (once you've started, quieter speech still counts as talking)
+    const loud = spoke ? Math.max(0.008, floor*2) : Math.max(0.014, floor*3);
+    if(rms > loud){ if(spoke) talked += 100; lastLoud = Date.now(); if(!spoke && Date.now() - t0 > 120){ spoke = true; opCaption('Listening… take your time'); } }
+    // the longer you talk, the longer a pause he waits out (thinking mid-thought isn't the end)
+    const pause = (typeof opPauseMs==='function' ? opPauseMs() : 2500) + Math.min(3500, talked*0.12);
+    if(spoke && Date.now() - lastLoud > pause) finish('send');
+    else if(!spoke && Date.now() - t0 > (an ? 9000 : 6000)) finish(an ? 'silence' : 'send');
+    else if(Date.now() - t0 > 300000) finish('send');
+    else if(spoke && Date.now() - t0 > 240000 && !AI._longWarn){ AI._longWarn = true; opCaption('Still listening… (tap the mic to send)'); }
+  }, 100);
+  rec.onstop = async function(){
+    stream.getTracks().forEach(function(t){ t.stop(); }); try{ if(ctx) ctx.close(); }catch(e){}
+    AI.listening = false; AI.sendNow = null; AI.cancelListen = null; SCR.level = 0; aiUiRefresh();
+    if(why==='cancel') return;
+    if(why==='silence'){ opCaption('Didn’t hear anything. Tap the mic when you’re ready.'); return; }
+    AI.transcribing = true; opCaption('…');
+    let text = '';
+    try{ text = await scribeText(new Blob(chunks, {type:mime || 'audio/webm'}), mime || 'audio/webm'); }
+    catch(e){
+      AI.transcribing = false;
+      if(/no ElevenLabs key/i.test(e.message)) SCR.on = false;
+      opCaption('Couldn’t make that out ('+(e.name==='AbortError' ? 'it took too long' : e.message)+'). Try again, or type.'); return;
+    }
+    AI.transcribing = false;
+    if(text) aiAsk(text, OV.cap || cap); else opCaption('Didn’t catch that.');
+  };
+  rec.start(250);
+};
+scribeText = (function(base){
+  return async function(blob, mime){
+    const big = blob && blob.size > 600000;
+    if(!big) return base.apply(this, arguments);
+    const ctl = new AbortController(), tm = setTimeout(function(){ ctl.abort(); }, 140000);
+    try{
+      const r = await fetch(WAKE_HELPER+'stt', {method:'POST', body:blob, headers:{'Content-Type':mime || 'audio/webm'}, signal:ctl.signal});
+      let j = null; try{ j = await r.json(); }catch(e){}
+      if(!r.ok) throw new Error((j && (j.detail && (j.detail.message || j.detail.status) || j.error)) || 'ElevenLabs said no ('+r.status+')');
+      return String((j && j.text) || '').replace(/\([^)]*\)|\[[^\]]*\]/g, ' ').replace(/\s+/g, ' ').trim();
+    } finally { clearTimeout(tm); }
+  };
+})(scribeText);
+
+// ---- Op knows what time it is ----
+// He'd talk work at 10 PM. Now he's told the time, your work hours and when bed is (from tomorrow's
+// alarm and your sleep goal): in work hours work is fair game; after them he doesn't bring work up
+// himself; in the last couple of hours before bed (or past it) he steers you toward winding down and
+// sleep. His own work check-ins and nudges stay inside the day too.
+function opBedTs(){
+  const nw = typeof nextWake==='function' ? nextWake() : null; if(!nw || !nw.ts) return null;
+  const hrs = Number(state.profile.sleepGoalHours) || 8;
+  return nw.ts - hrs*3600000;
+}
+function opTimeCtx(){
+  const now = new Date(), m = now.getHours()*60 + now.getMinutes();
+  const phase = typeof workPhase==='function' ? workPhase() : 'off';
+  const bed = opBedTs(), toBed = bed ? Math.round((bed - Date.now())/60000) : null;
+  const evening = m >= 20*60 + 30 || m < 5*60;
+  const late = phase!=='work' && phase!=='lunch' && phase!=='break' && (evening || (toBed!=null && toBed < 150));
+  const pastBed = toBed!=null && toBed < 0 && toBed > -360;
+  return {now:now, m:m, phase:phase, bed:bed, toBed:toBed, late:late, pastBed:pastBed};
+}
+function opLateNow(){ try{ return opTimeCtx().late; }catch(e){ return false; } }
+aiSystem = (function(base){
+  return function(){
+    const s = base.apply(this, arguments);
+    try{
+      const c = opTimeCtx(), w = typeof workToday==='function' ? workToday() : null;
+      const t = c.now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+' on '+c.now.toLocaleDateString(undefined, {weekday:'long'});
+      const hours = w && w.enabled && typeof workDayToday==='function' && workDayToday() ? 'Work hours today: '+fmt12Hour(w.start)+' to '+fmt12Hour(w.end)+' (right now: '+({before:'before work', after:'work is over for the day', lunch:'lunch', break:'his break', work:'work hours', off:'not a work day'})[c.phase]+').' : 'Not a work day, or no work hours set.';
+      const bed = c.bed ? 'Bedtime for tomorrow’s alarm: about '+new Date(c.bed).toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})+(c.toBed!=null ? (c.toBed >= 0 ? ' ('+fmtDurationLabel(c.toBed)+' from now)' : ' (that was '+fmtDurationLabel(-c.toBed)+' ago)') : '')+'.' : '';
+      const block = 'The time, and what it means (always keep this in mind):\n'+
+        '- It’s '+t+'. '+hours+' '+bed+'\n'+
+        '- During work hours, work is fair game: push, plan, hold him to it.\n'+
+        '- Outside work hours, don’t bring up work, tasks, clients, leads or lock-ins yourself. If he brings work up, help briefly, then suggest it waits for tomorrow’s work block (offer to put it on tomorrow’s list).\n'+
+        '- In the last couple of hours before bedtime, steer toward winding down: the wind-down, screens off, tomorrow’s alarm, sleep. Past bedtime, tell him plainly (kind, firm) to go to sleep; sleep is part of the work.\n'+
+        '- Before work hours in the morning, keep work talk for when the day starts unless he starts it.'+
+        (c.late ? '\n- Right now it’s late: lead with winding down and sleep, not work.' : '');
+      if(Array.isArray(s)) s.push({type:'text', text:block});
+    }catch(e){}
+    return s;
+  };
+})(aiSystem);
+// his own work check-ins and nudges: never late in the evening
+acctPing = (function(base){ return function(){ if(opLateNow()){ if(typeof acctSchedule==='function') acctSchedule(); return; } return base.apply(this, arguments); }; })(acctPing);
+opNudgeDue = (function(base){ return function(){ if(opLateNow()) return false; return base.apply(this, arguments); }; })(opNudgeDue);
+if(typeof maybeNudgeLockIn==='function') maybeNudgeLockIn = (function(base){ return function(){ if(opLateNow()) return; return base.apply(this, arguments); }; })(maybeNudgeLockIn);
+
+// ---- music volume in the minimal views ----
+// The little player on the full-screen pages (locked in, Good morning, work mode) gets a speaker: hover it
+// (or tab to it) and a slider slides out. The Cockpit's song list has one under "Now playing". Same setting
+// as everywhere else.
+mctlHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    return h.replace(/<\/span>$/, '<span class="mctl-vol" title="Volume"><span class="mctl-vi">'+musicVolIcon()+'</span>'+musicVolSliderHtml('is-mctl')+'</span></span>');
+  };
+})(mctlHtml);
+cockpitDayHtml = (function(base){
+  return function(){ return base.apply(this, arguments).replace(/(<div class="ckm-now">[\s\S]*?<\/div>)/, '$1'+'<div class="ckm-vol"><span class="ckm-vi">'+musicVolIcon()+'</span>'+musicVolSliderHtml('is-ck')+'</div>'); };
+})(cockpitDayHtml);
+setInterval(function(){ try{ musicVolSync(); const p = musicVolPct(); document.querySelectorAll('.mctl-vi, .ckm-vi').forEach(function(e){ const ic = musicVolIcon(p); if(e.innerHTML!==ic) e.innerHTML = ic; }); }catch(e){} }, 800);
+// (the Player: a slider right under its buttons)
+renderLockedMinimal = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(lockedStyle()==='cockpit' || h.indexOf('class="np-ctl"') < 0 || h.indexOf('np-vol') >= 0) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const ctl = tpl.content.querySelector('.np-ctl'); if(!ctl) return h;
+    const v = document.createElement('div'); v.className = 'np-vol'; v.innerHTML = '<span class="ckm-vi">'+musicVolIcon()+'</span>'+musicVolSliderHtml('is-npv');
+    ctl.parentNode.insertBefore(v, ctl.nextSibling);
+    return tpl.innerHTML;
+  };
+})(renderLockedMinimal);
+
+// ---- locked-in Overview: "Worth doing soon" and "Clients", redone ----
+// Clean cards like the rest of the app: compact rows (a priority dot, the task, who it's for, when it's
+// due, one tap to put it on today) and client tiles (health, each deliverable's week as a meter, last touch).
+function llLastTouch(c){
+  let last = '';
+  arr(c.touchpoints).concat(arr(c.touches)).forEach(function(t){ const d = typeof t==='string' ? t : t && t.date; if(d && d > last) last = d; });
+  return last;
+}
+function llAgo(d){ if(!d) return 'never'; const n = Math.round((Date.parse(todayStr()) - Date.parse(d))/86400000); return n<=0 ? 'today' : n===1 ? 'yesterday' : n+'d ago'; }
+LOCKED_BLOCKS.backlog.render = function(c){
+  const list = c.backlog.slice(0, 7), more = c.backlog.length - list.length;
+  const pri = {high:'#E5484D', med:'#E8A23D', low:'#6b7280'};
+  return '<section class="llx"><div class="llx-h"><b>Worth doing soon</b><span class="llx-n">'+c.backlog.length+'</span><span style="flex:1"></span><button class="llx-link" data-action="nav" data-view="focus" data-tab="tasks">Backlog &rarr;</button></div>'+
+    (list.length ? '<div class="llx-rows">'+list.map(function(t){
+      const v = t.master && t.master.kind==='dvw' && typeof dvwView==='function' ? dvwView(t) : null;
+      const who = v ? v.who : (t.clients && t.clients[0] ? (arr(state.business.clients).find(function(x){ return x.id===t.clients[0]; }) || {}).business : '');
+      const late = t.deadline && t.deadline < todayStr();
+      return '<div class="llx-row'+(v ? ' is-dlv' : '')+'">'+
+        '<i class="llx-dot" style="background:'+(v ? '#a98bff' : (pri[t.priority] || pri.med))+'"></i>'+
+        '<span class="llx-t">'+escapeHtml(v ? (v.x.oneOff ? v.name : v.pieces) : t.title)+(v && !v.x.oneOff ? '<em>Week '+v.x.k+'</em>' : '')+'</span>'+
+        (who ? '<span class="llx-who">'+escapeHtml(who)+'</span>' : '')+
+        (t.deadline ? '<span class="llx-due'+(late ? ' is-late' : '')+'">'+(late ? 'was ' : '')+fmtDateShort(t.deadline)+'</span>' : '')+
+        '<button class="llx-go" data-action="promoteTask" data-id="'+t.id+'" title="Put it on today">&rarr; Today</button></div>';
+    }).join('')+'</div>'+(more > 0 ? '<div class="llx-more">+'+more+' more in your backlog</div>' : '') : '<div class="llx-empty">Nothing waiting. Clean slate.</div>')+
+  '</section>';
+};
+LOCKED_BLOCKS.clients.render = function(c){
+  const cs = c.activeClients;
+  const hl = {green:['#3FBE8E', 'Healthy'], yellow:['#E8A23D', 'On pace'], red:['#E5484D', 'Needs you']};
+  return '<section class="llx"><div class="llx-h"><b>Clients</b><span class="llx-n">'+cs.length+'</span><span style="flex:1"></span><button class="llx-link" data-action="nav" data-view="business" data-tab="clients">All clients &rarr;</button></div>'+
+    (cs.length ? '<div class="llx-cl">'+cs.map(function(x){
+      const st = clientHealthStatus(x), h = hl[st.level] || hl.green, last = llLastTouch(x);
+      const recs = arr(x.deliverables).filter(function(d){ return d.recurring; });
+      return '<button class="llx-c" data-action="openContact" data-kind="client" data-id="'+x.id+'" style="--hc:'+h[0]+'">'+
+        '<span class="llx-c-top"><span class="llx-av" style="background:'+clientColor(x)+'">'+escapeHtml(clientInitials(x))+'</span><span class="llx-c-n"><b>'+escapeHtml(x.business || x.name)+'</b><small><i></i>'+h[1]+' &middot; touched '+llAgo(last)+'</small></span></span>'+
+        (recs.length ? '<span class="llx-c-d">'+recs.slice(0, 3).map(function(d){
+          const done = deliverableWeekCount(d), need = Math.max(1, deliverableWeekNeed(d));
+          return '<span class="llx-dv"><span>'+escapeHtml(d.title)+'</span><i><u style="width:'+Math.min(100, done/need*100).toFixed(0)+'%"></u></i><b>'+done+'/'+need+'</b></span>';
+        }).join('')+'</span>' : '<span class="llx-c-none">No weekly deliverables</span>')+
+      '</button>';
+    }).join('')+'</div>' : '<div class="llx-empty">No active clients yet.</div>')+
+  '</section>';
+};
+// ============ ROUND 40: SOCIAL ============
+// Social is its own page with tabs: Overview (your Business and your Personal profile side by side, with
+// the numbers that matter), Posts (every post with its views, reach, saves, shares, engagement and hook
+// rate, sortable), Messages (your Instagram inbox through Zernio, to read) and Ads (your Meta campaigns
+// through Zernio, each one linkable to a client so its spend and leads show on their card). GoHighLevel's
+// Chats and Contacts stay as tabs when it's connected. Everything is read-only: Operator never posts,
+// sends or changes anything.
+
+// ---- more from each post (Zernio) ----
+znPost = (function(base){
+  return function(p){
+    const x = base.apply(this, arguments), a = (p && p.analytics) || {};
+    x.impressions = socNum(a.impressions);
+    const skip = socNum(a.reelsSkipRate);
+    x.hook = skip!=null && (x.type==='REELS' || /REEL/i.test(String(p.mediaProductType || ''))) ? Math.max(0, Math.min(100, 100 - skip)) : null;
+    x.avgWatch = socNum(a.igReelsAvgWatchTime); x.dur = socNum(a.videoDurationSeconds);
+    x.watchPct = x.avgWatch && x.dur ? Math.min(100, x.avgWatch/(x.dur*10)) : null;
+    x.er = socNum(a.engagementRate); x.profileViews = socNum(a.profileViews); x.follows = socNum(a.follows);
+    return x;
+  };
+})(znPost);
+function postER(p){
+  if(p.er!=null) return p.er;
+  const base = p.reach || p.views || p.impressions; if(!base) return null;
+  return ((p.likes || 0) + (p.comments || 0) + (p.saves || 0) + (p.shares || 0))/base*100;
+}
+// ---- account insights and follower growth (Zernio; every 6 hours) ----
+znLoadAccount = (function(base){
+  return async function(a){
+    const d = await base.apply(this, arguments);
+    if(!d || (d.insAt && Date.now() - d.insAt < 6*3600000 && !ui.znForce)) return d;
+    const to = todayStr(), from = addDays(to, -29), id = encodeURIComponent(a.znId);
+    try{
+      const r = await znApi('/v1/analytics/instagram/account-insights?accountId='+id+'&fromDate='+from+'&toDate='+to+'&metrics=reach,views,accounts_engaged,total_interactions,profile_links_taps');
+      d.ins = {}; Object.keys(r.metrics || {}).forEach(function(k){ const v = r.metrics[k]; d.ins[k] = v && v.total!=null ? Number(v.total) || 0 : null; });
+    }catch(e){ d.insErr = e.message; }
+    try{
+      const r = await znApi('/v1/analytics/instagram/follower-history?accountId='+id+'&fromDate='+from+'&toDate='+to);
+      const m = r.metrics || {}, tot = function(k){ return m[k] && m[k].total!=null ? Number(m[k].total) || 0 : null; };
+      d.fh = {gained:tot('followers_gained'), lost:tot('followers_lost'), series:arr(m.follower_count && m.follower_count.values).map(function(v){ return [v.date, Number(v.value) || 0]; })};
+    }catch(e){}
+    d.insAt = Date.now(); persist('settings');
+    return d;
+  };
+})(znLoadAccount);
+function znAccs(){ return igCfg().accounts.filter(function(a){ return socialSrc(a)==='zernio'; }); }
+
+// ---- Messages (read only) ----
+function znIb(){ if(!ui.znIb) ui.znIb = {convs:null, msgs:{}, sel:null}; return ui.znIb; }
+async function znInboxLoad(force){
+  const st = znIb(); if(st.loading || !znAccs().length) return;
+  if(st.convs && !force && Date.now() - (st.at || 0) < 120000) return;
+  st.loading = true; st.err = null; renderView();
+  try{
+    const all = [];
+    for(const a of znAccs()){
+      try{
+        const r = await znApi('/v1/inbox/conversations?accountId='+encodeURIComponent(a.znId)+'&limit=50&sortOrder=desc');
+        arr(r.data).forEach(function(c){ all.push(Object.assign({}, c, {_acc:a.id, _role:a.role, _znId:a.znId})); });
+      }catch(e){ st.err = e.message; }
+    }
+    all.sort(function(x, y){ return String(y.updatedTime || '').localeCompare(String(x.updatedTime || '')); });
+    st.convs = all; st.at = Date.now();
+  } finally { st.loading = false; renderView(); }
+}
+async function znMsgsLoad(conv){
+  const st = znIb(); if(!conv) return;
+  st.msgLoading = conv.id; renderView();
+  try{
+    const r = await znApi('/v1/inbox/conversations/'+encodeURIComponent(conv.id)+'/messages?accountId='+encodeURIComponent(conv._znId)+'&sortOrder=desc&limit=50');
+    st.msgs[conv.id] = arr(r.messages).slice().reverse();
+  }catch(e){ st.msgErr = e.message; }
+  st.msgLoading = null; renderView();
+  setTimeout(function(){ const b = document.querySelector('.sx-thread-b'); if(b) b.scrollTop = b.scrollHeight; }, 30);
+}
+ACTIONS.znConv = function(el, e, id){ const st = znIb(), c = arr(st.convs).find(function(x){ return x.id===id; }); st.sel = id; st.msgErr = null; renderView(); if(c && !st.msgs[id]) znMsgsLoad(c); };
+ACTIONS.znInboxRefresh = function(){ const st = znIb(); st.msgs = {}; znInboxLoad(true); };
+
+// ---- Ads (Meta, through Zernio; read only) ----
+function znAdsSt(){ if(!ui.znAds) ui.znAds = {days:30}; return ui.znAds; }
+async function znAdsLoad(force){
+  const st = znAdsSt(), c = igCfg(); if(st.loading || !znAccs().length) return;
+  if(c.znAdsCache && c.znAdsCache.days===st.days && !force && Date.now() - c.znAdsCache.at < 30*60000) return;
+  st.loading = true; st.err = null; st.none = false; renderView();
+  try{
+    const accs = await znApi('/v1/accounts?category=ads');
+    const conn = arr(accs.accounts).find(function(x){ return /meta/i.test(String(x.platform || '')); }) || arr(accs.accounts)[0];
+    if(!conn){ st.none = true; return; }
+    const to = todayStr(), from = addDays(to, -(st.days - 1));
+    const r = await znApi('/v1/ads/campaigns?accountId='+encodeURIComponent(conn._id)+'&fromDate='+from+'&toDate='+to+'&limit=100&source=all');
+    c.znAdsCache = {at:Date.now(), days:st.days, from:from, to:to, conn:{id:conn._id, name:conn.username || conn.displayName || 'Meta Ads'}, camps:arr(r.campaigns).map(function(k){ return {id:k.platformCampaignId, name:k.campaignName, status:k.status || k.platformCampaignStatus, currency:k.currency, objective:k.platformObjective, m:k.metrics || {}}; })};
+    persist('settings');
+  }catch(e){ st.err = e.message; }
+  finally { st.loading = false; renderView(); }
+}
+function adNums(m){
+  m = m || {}; const eb = m.engagementBreakdown || {}, f = m.funnel || {}, ac = m.actions || {};
+  const leads = socNum(f.leads, ac.lead, ac['onsite_conversion.lead_grouped'], ac['offsite_conversion.fb_pixel_lead']);
+  const hook = eb.videoViews && m.impressions ? eb.videoViews/m.impressions*100 : (m.videoP25WatchedActions && m.videoPlayActions ? m.videoP25WatchedActions/m.videoPlayActions*100 : null);
+  return {spend:Number(m.spend) || 0, impressions:Number(m.impressions) || 0, reach:Number(m.reach) || 0, clicks:Number(m.clicks) || 0, ctr:socNum(m.ctr), cpm:socNum(m.cpm), results:socNum(m.conversions), cpr:socNum(m.costPerConversion), leads:leads, hook:hook};
+}
+function adLinks(){ const c = igCfg(); if(!c.adLinks || typeof c.adLinks!=='object') c.adLinks = {}; return c.adLinks; }
+function clientAdTotals(cid){
+  const c = igCfg(); if(!c.znAdsCache) return null;
+  const links = adLinks(), mine = c.znAdsCache.camps.filter(function(k){ return links[k.id]===cid; }); if(!mine.length) return null;
+  const t = {n:mine.length, spend:0, leads:0, results:0, currency:mine[0].currency, days:c.znAdsCache.days};
+  mine.forEach(function(k){ const x = adNums(k.m); t.spend += x.spend; t.leads += x.leads || 0; t.results += x.results || 0; });
+  return t;
+}
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.dataset || !t.dataset.adlink) return;
+  const l = adLinks(); if(t.value) l[t.dataset.adlink] = t.value; else delete l[t.dataset.adlink];
+  persist('settings'); playTick(); renderView();
+});
+ACTIONS.adLinkTo = function(el){ adLinks()[el.dataset.camp] = el.dataset.client; persist('settings'); playTick(); renderView(); };
+ACTIONS.znAdsDays = function(el, e, id){ znAdsSt().days = Number(id) || 30; znAdsLoad(true); };
+ACTIONS.znAdsRefresh = function(){ znAdsLoad(true); };
+// the client card shows what their linked campaigns did
+clientCardV2 = (function(base){
+  return function(c){
+    const h = base.apply(this, arguments), t = clientAdTotals(c.id); if(!t) return h;
+    const line = '<div class="cc2-ads" title="'+t.n+' Meta campaign'+(t.n===1 ? '' : 's')+' linked on Social → Ads">&#128226; '+adsMoney(t.spend, t.currency)+' on ads ('+t.days+'d)'+(t.leads ? ' &middot; '+t.leads+' lead'+(t.leads===1 ? '' : 's')+' &middot; '+adsMoney(t.spend/t.leads, t.currency)+'/lead' : t.results ? ' &middot; '+t.results+' results' : '')+'</div>';
+    return h.indexOf('<div class="cc2-foot">') >= 0 ? h.replace('<div class="cc2-foot">', line+'<div class="cc2-foot">') : h;
+  };
+})(clientCardV2);
+
+// ---- the page ----
+function sxNum(v, d){ return v==null || !isFinite(v) ? '–' : Math.abs(v) >= 10000 ? (v/1000).toFixed(v >= 100000 ? 0 : 1)+'k' : Number(v).toLocaleString(undefined, {maximumFractionDigits:d==null ? 0 : d}); }
+function sxPct(v){ return v==null || !isFinite(v) ? '–' : v.toFixed(v < 10 ? 1 : 0)+'%'; }
+function sxAvg(list, f){ const xs = list.map(f).filter(function(v){ return v!=null && isFinite(v); }); return xs.length ? xs.reduce(function(t, v){ return t + v; }, 0)/xs.length : null; }
+function sxSum(list, k){ const xs = list.map(function(p){ return p[k]; }).filter(function(v){ return v!=null; }); return xs.length ? xs.reduce(function(t, v){ return t + v; }, 0) : null; }
+function sxSpark(series){
+  if(!series || series.length < 2) return '';
+  const vs = series.map(function(x){ return x[1]; }), lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs), r = hi - lo || 1;
+  const pts = vs.map(function(v, i){ return (i/(vs.length - 1)*100).toFixed(1)+','+(28 - (v - lo)/r*24).toFixed(1); }).join(' ');
+  return '<svg class="sx-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="'+pts+'"/></svg>';
+}
+function sxAccountData(a){ const c = igCfg(); return c.cache && c.cache.data ? c.cache.data[a.id] : null; }
+function sxProfileCard(role){
+  const c = igCfg(), accs = c.accounts.filter(function(a){ return a.role===role; }), label = role==='business' ? 'Business profile' : 'Personal profile';
+  if(!accs.length) return '<div class="sx-prof is-empty"><div class="sx-prof-k">'+label+'</div><p>'+(role==='business' ? 'Your brand’s account.' : 'Your own account, side by side with the business.')+'</p><button class="btn btn-primary btn-sm" data-action="socAddRole" data-id="'+role+'">&#65291; Connect your '+(role==='business' ? 'business' : 'personal')+' profile</button></div>';
+  return accs.map(function(a){
+    const d = sxAccountData(a);
+    if(!d) return '<div class="sx-prof"><div class="sx-prof-k">'+label+'</div><div class="gp-loading">'+(ui.igLoading ? 'Loading @'+escapeHtml(a.username)+'…' : ui.igErr ? '&#9888; '+escapeHtml(ui.igErr) : 'Waiting for numbers…')+'</div></div>';
+    const since = addDays(todayStr(), -30), recent = arr(d.posts).filter(function(p){ return p.date > since; });
+    const reels = recent.filter(function(p){ return p.hook!=null; });
+    const growth = d.fh && d.fh.gained!=null ? (d.fh.gained || 0) - (d.fh.lost || 0) : null;
+    const tile = function(k, v, sub, cls){ return '<div class="sx-t'+(cls ? ' '+cls : '')+'"><b>'+v+'</b><span>'+k+'</span>'+(sub ? '<small>'+sub+'</small>' : '')+'</div>'; };
+    const best = recent.slice().sort(function(x, y){ return (y.views || y.reach || y.likes || 0) - (x.views || x.reach || x.likes || 0); }).slice(0, 4);
+    const src = socialSrc(a);
+    return '<div class="sx-prof">'+
+      '<div class="sx-prof-h">'+(d.pic ? '<img src="'+escapeHtml(d.pic)+'" alt="">' : '<span class="sx-av">'+escapeHtml(String(d.username || a.username || '?').slice(0, 1).toUpperCase())+'</span>')+
+        '<div><div class="sx-prof-k">'+label+'</div><b>@'+escapeHtml(d.username || a.username)+'</b></div><span style="flex:1"></span><span class="sx-src">'+(({zernio:'Zernio', apify:'Apify', csv:'CSV', metricool:'Metricool'})[src] || 'Meta')+'</span></div>'+
+      '<div class="sx-fol"><div><b>'+sxNum(d.followers)+'</b><span>followers</span>'+(growth!=null ? '<em class="'+(growth >= 0 ? 'is-up' : 'is-down')+'">'+(growth >= 0 ? '+' : '')+sxNum(growth)+' in 30 days</em>' : '')+'</div>'+sxSpark(d.fh && d.fh.series)+'</div>'+
+      '<div class="sx-tiles">'+
+        tile('posts', recent.length, '30 days')+
+        tile('avg views', sxNum(sxAvg(recent, function(p){ return p.views; })))+
+        tile('avg reach', sxNum(sxAvg(recent, function(p){ return p.reach; })))+
+        tile('engagement', sxPct(sxAvg(recent, postER)), 'per post')+
+        tile('hook rate', sxPct(sxAvg(reels, function(p){ return p.hook; })), reels.length ? reels.length+' reels' : 'reels only', 'is-hook')+
+        tile('watched', sxPct(sxAvg(reels, function(p){ return p.watchPct; })), 'of each reel')+
+        tile('saves', sxNum(sxSum(recent, 'saves')))+
+        tile('shares', sxNum(sxSum(recent, 'shares')))+
+        (d.ins ? tile('accounts reached', sxNum(d.ins.reach))+tile('link taps', sxNum(d.ins.profile_links_taps)) : '')+
+      '</div>'+
+      '<div class="sx-strip-k">Posting, last 30 days</div><div class="ig-strip sx-strip">'+(function(){ const days = {}; recent.forEach(function(p){ days[p.date] = (days[p.date] || 0) + 1; }); const o = []; for(let i = 29; i >= 0; i--){ const dd = addDays(todayStr(), -i); o.push('<i class="'+(days[dd] ? 'is-on' : '')+'" title="'+escapeHtml(fmtDateShort(dd))+(days[dd] ? ': '+days[dd]+' post'+(days[dd]===1 ? '' : 's') : '')+'"></i>'); } return o.join(''); })()+'</div>'+
+      (best.length ? '<div class="sx-best">'+best.map(function(p){ return '<a href="'+escapeHtml(p.link || '#')+'" target="_blank" rel="noopener" title="'+escapeHtml(p.cap || '')+'">'+(p.thumb ? '<img src="'+escapeHtml(p.thumb)+'" alt="" loading="lazy">' : '<span></span>')+'<small>'+sxNum(p.views || p.reach || p.likes)+'</small></a>'; }).join('')+'</div>' : '')+
+      (role==='personal' && src==='zernio' && d.insErr ? '<div class="sx-note">A personal Instagram shares fewer numbers with apps. Switching it to a free Creator account (Instagram settings) unlocks reach and insights.</div>' : '')+
+    '</div>';
+  }).join('');
+}
+function sxOverviewHtml(){
+  igMaybeRefresh();
+  const read = typeof opRead==='function' && typeof opFactsSocial==='function' ? opRead('social', opFactsSocial, 'Give him your read on his Instagram'+(igCfg().znAdsCache ? ' and his ads' : '')+': what’s working, what isn’t, and what to do next.', {angles:'social'}) : '';
+  return read+'<div class="sx-profs">'+sxProfileCard('business')+sxProfileCard('personal')+'</div>'+
+    (ui.socAdd ? '<div class="sx-add">'+socialConnectHtml()+'</div>' : '')+
+    '<div class="sx-sec-k">Connections</div>'+(typeof socialSourcesHtml==='function' ? socialSourcesHtml() : '');
+}
+const SX_SORTS = [['date', 'Newest'], ['views', 'Views'], ['reach', 'Reach'], ['er', 'Engagement'], ['hook', 'Hook rate'], ['saves', 'Saves'], ['shares', 'Shares'], ['comments', 'Comments']];
+function sxPostsHtml(){
+  igMaybeRefresh();
+  const c = igCfg(), sel = ui.socPostAcc || 'all', sort = ui.socSort || 'date';
+  let posts = [];
+  c.accounts.forEach(function(a){ if(sel!=='all' && sel!==a.id) return; const d = sxAccountData(a); if(d) arr(d.posts).forEach(function(p){ posts.push(Object.assign({_role:a.role, _user:d.username || a.username}, p)); }); });
+  const val = function(p){ return sort==='er' ? postER(p) : sort==='date' ? p.date : p[sort]; };
+  posts.sort(function(x, y){ const a = val(x), b = val(y); if(sort==='date') return String(b || '').localeCompare(String(a || '')); return (b==null ? -1 : b) - (a==null ? -1 : a); });
+  const shown = posts.slice(0, 60), last30 = posts.filter(function(p){ return p.date > addDays(todayStr(), -30); });
+  const chips = '<div class="sx-chips">'+[['all', 'All']].concat(c.accounts.map(function(a){ const d = sxAccountData(a); return [a.id, '@'+((d && d.username) || a.username)+' &middot; '+(a.role==='business' ? 'Business' : 'Personal')]; })).map(function(x){ return '<button class="'+(sel===x[0] ? 'is-on' : '')+'" data-action="socPostAcc" data-id="'+escapeHtml(x[0])+'">'+x[1]+'</button>'; }).join('')+'</div>';
+  const sorts = '<div class="sx-sort"><span>Sort</span>'+SX_SORTS.map(function(s){ return '<button class="'+(sort===s[0] ? 'is-on' : '')+'" data-action="socSort" data-id="'+s[0]+'">'+s[1]+'</button>'; }).join('')+'</div>';
+  const sum = '<div class="sx-sum">'+[['posts (30d)', last30.length], ['avg views', sxNum(sxAvg(last30, function(p){ return p.views; }))], ['avg reach', sxNum(sxAvg(last30, function(p){ return p.reach; }))], ['engagement', sxPct(sxAvg(last30, postER))], ['hook rate', sxPct(sxAvg(last30, function(p){ return p.hook; }))], ['saves', sxNum(sxSum(last30, 'saves'))], ['shares', sxNum(sxSum(last30, 'shares'))]].map(function(x){ return '<div><b>'+x[1]+'</b><span>'+x[0]+'</span></div>'; }).join('')+'</div>';
+  const m = function(icon, v, t){ return v==null || v==='–' ? '' : '<span title="'+t+'">'+icon+' '+v+'</span>'; };
+  return chips+sum+sorts+(shown.length ? '<div class="sx-posts">'+shown.map(function(p){
+    const er = postER(p);
+    return '<a class="sx-post" href="'+escapeHtml(p.link || '#')+'" target="_blank" rel="noopener">'+
+      '<span class="sx-post-img">'+(p.thumb ? '<img src="'+escapeHtml(p.thumb)+'" alt="" loading="lazy">' : '')+(p.type ? '<em>'+escapeHtml(/REEL/.test(p.type) ? 'Reel' : p.type.charAt(0)+p.type.slice(1).toLowerCase())+'</em>' : '')+'</span>'+
+      '<span class="sx-post-b"><small>'+escapeHtml(p.date ? fmtDateShort(p.date) : '')+' &middot; @'+escapeHtml(p._user || '')+'</small><span class="sx-cap">'+escapeHtml(p.cap || '(no caption)')+'</span>'+
+        '<span class="sx-m">'+m('&#128065;', p.views!=null ? sxNum(p.views) : null, 'views')+m('&#128225;', p.reach!=null ? sxNum(p.reach) : null, 'reach')+m('&#10084;&#65039;', sxNum(p.likes), 'likes')+m('&#128172;', sxNum(p.comments), 'comments')+m('&#128278;', p.saves!=null ? sxNum(p.saves) : null, 'saves')+m('&#8599;', p.shares!=null ? sxNum(p.shares) : null, 'shares')+'</span>'+
+        '<span class="sx-m2">'+(er!=null ? '<span title="Engagement: likes, comments, saves and shares over reach">ER <b>'+sxPct(er)+'</b></span>' : '')+(p.hook!=null ? '<span class="is-hook" title="Hook rate: share of viewers who didn’t skip in the first 3 seconds (Meta’s estimate)">Hook <b>'+sxPct(p.hook)+'</b></span>' : '')+(p.watchPct!=null ? '<span title="How much of the reel the average view watched">Watched <b>'+sxPct(p.watchPct)+'</b></span>' : '')+'</span>'+
+      '</span></a>';
+  }).join('')+'</div>' : '<div class="llx-empty">No posts yet.'+(c.accounts.length ? '' : ' Connect an account on Overview.')+'</div>');
+}
+ACTIONS.socPostAcc = function(el, e, id){ ui.socPostAcc = id; renderView(); };
+ACTIONS.socSort = function(el, e, id){ ui.socSort = id; renderView(); };
+ACTIONS.socAddRole = function(el, e, id){ ui.socRole = id; ui.socAdd = true; ui.socShow = 'zn'; ui.socTab = 'overview'; renderView(); setTimeout(function(){ const x = document.querySelector('.sx-add'); if(x) x.scrollIntoView({behavior:'smooth', block:'center'}); }, 60); };
+function sxAgo(iso){ const t = Date.parse(iso || ''); if(!isFinite(t)) return ''; const m = Math.round((Date.now() - t)/60000); return m < 60 ? Math.max(1, m)+'m' : m < 1440 ? Math.round(m/60)+'h' : Math.round(m/1440)+'d'; }
+function sxMessagesHtml(){
+  if(!znAccs().length) return '<div class="llx-empty">Messages come through Zernio. Connect your Instagram with Zernio on Overview and your DMs show up here.</div>';
+  const st = znIb(); znInboxLoad(false);
+  if(!st.convs) return '<div class="gp-loading">'+(st.err ? '&#9888; '+escapeHtml(st.err) : 'Loading your messages…')+'</div>';
+  const sel = arr(st.convs).find(function(c){ return c.id===st.sel; });
+  const list = '<div class="sx-convs">'+(st.convs.length ? st.convs.map(function(c){
+    return '<button class="sx-conv'+(c.id===st.sel ? ' is-on' : '')+(c.unreadCount ? ' is-unread' : '')+'" data-action="znConv" data-id="'+escapeHtml(c.id)+'">'+
+      (c.participantPicture ? '<img src="'+escapeHtml(c.participantPicture)+'" alt="">' : '<span class="sx-av">'+escapeHtml(String(c.participantName || '?').slice(0, 1).toUpperCase())+'</span>')+
+      '<span class="sx-conv-b"><b>'+escapeHtml(c.participantName || 'Someone')+'</b><small>'+escapeHtml(String(c.lastMessage || '').slice(0, 80))+'</small></span>'+
+      '<span class="sx-conv-r"><small>'+sxAgo(c.updatedTime)+'</small>'+(c.unreadCount ? '<i>'+c.unreadCount+'</i>' : '')+'<em class="is-'+c._role+'">'+(c._role==='business' ? 'B' : 'P')+'</em></span></button>';
+  }).join('') : '<div class="llx-empty">No conversations.</div>')+'</div>';
+  const msgs = sel ? st.msgs[sel.id] : null;
+  const thread = '<div class="sx-thread">'+(sel ? '<div class="sx-thread-h"><b>'+escapeHtml(sel.participantName || 'Someone')+'</b>'+(sel.instagramProfile && sel.instagramProfile.followerCount!=null ? '<small>'+sxNum(sel.instagramProfile.followerCount)+' followers'+(sel.instagramProfile.isFollower ? ' &middot; follows you' : '')+'</small>' : '')+'<span style="flex:1"></span>'+(sel.url ? '<a class="btn btn-ghost btn-sm" href="'+escapeHtml(sel.url)+'" target="_blank" rel="noopener">Reply in Instagram &#8599;</a>' : '')+'</div>'+
+      '<div class="sx-thread-b">'+(st.msgLoading===sel.id ? '<div class="gp-loading">Loading…</div>' : msgs ? msgs.map(function(m){ return '<div class="sx-msg is-'+(m.direction==='outgoing' ? 'out' : 'in')+'"><span>'+escapeHtml(m.message || (arr(m.attachments).length ? '[attachment]' : m.storyReply ? '[replied to your story]' : ''))+'</span><small>'+sxAgo(m.createdAt)+'</small></div>'; }).join('') || '<div class="llx-empty">No messages.</div>' : (st.msgErr ? '&#9888; '+escapeHtml(st.msgErr) : ''))+'</div>'+
+      '<div class="sx-thread-f">Read-only here. Operator never sends messages: reply in Instagram.</div>'
+    : '<div class="llx-empty">Pick a conversation.</div>')+'</div>';
+  return '<div class="sx-inbox">'+list+thread+'</div>';
+}
+function sxAdsHtml(){
+  if(!znAccs().length) return typeof adsSectionHtml==='function' && adsSectionHtml() ? adsSectionHtml() : '<div class="llx-empty">Your Meta ads come through Zernio: connect Zernio on Overview, then in Zernio connect Meta Ads (it needs your Facebook Page). Or connect Meta directly.</div>';
+  const st = znAdsSt(), c = igCfg(); znAdsLoad(false);
+  const range = '<div class="sx-sort"><span>Last</span>'+[7, 30, 90].map(function(d){ return '<button class="'+(st.days===d ? 'is-on' : '')+'" data-action="znAdsDays" data-id="'+d+'">'+d+' days</button>'; }).join('')+'</div>';
+  if(st.none) return range+'<div class="llx-empty">No Meta Ads connection in Zernio yet. In Zernio: Accounts → connect Meta Ads (it uses your Facebook Page). Then refresh here.</div>';
+  const cache = c.znAdsCache;
+  if(!cache || cache.days!==st.days) return range+'<div class="gp-loading">'+(st.err ? '&#9888; '+escapeHtml(st.err) : 'Loading your campaigns…')+'</div>';
+  const cs = arr(state.business.clients).filter(function(x){ return clientStageActive(x.stage); }), links = adLinks();
+  const all = cache.camps.map(function(k){ return Object.assign({x:adNums(k.m)}, k); }).sort(function(a, b){ return b.x.spend - a.x.spend; });
+  const cur = (all[0] && all[0].currency) || 'USD', T = {spend:0, leads:0, results:0, imp:0, clicks:0};
+  all.forEach(function(k){ T.spend += k.x.spend; T.leads += k.x.leads || 0; T.results += k.x.results || 0; T.imp += k.x.impressions; T.clicks += k.x.clicks; });
+  const hooks = all.filter(function(k){ return k.x.hook!=null; });
+  const sum = '<div class="sx-sum">'+[['spent', adsMoney(T.spend, cur)], ['leads', T.leads ? sxNum(T.leads) : '–'], ['per lead', T.leads ? adsMoney(T.spend/T.leads, cur) : '–'], ['results', T.results ? sxNum(T.results) : '–'], ['CTR', T.imp ? sxPct(T.clicks/T.imp*100) : '–'], ['CPM', T.imp ? adsMoney(T.spend/T.imp*1000, cur) : '–'], ['hook rate', hooks.length ? sxPct(sxAvg(hooks, function(k){ return k.x.hook; })) : '–']].map(function(x){ return '<div><b>'+x[1]+'</b><span>'+x[0]+'</span></div>'; }).join('')+'</div>';
+  const guess = function(k){ const n = String(k.name || '').toLowerCase(); return cs.find(function(x){ const a = String(x.business || '').toLowerCase(), b = String(x.name || '').toLowerCase(); return (a && n.indexOf(a) >= 0) || (b && b.length > 3 && n.indexOf(b) >= 0); }); };
+  const rows = all.map(function(k){
+    const g = !links[k.id] ? guess(k) : null, on = /active/i.test(String(k.status || ''));
+    return '<div class="sx-ad">'+
+      '<span class="sx-ad-n"><i class="'+(on ? 'is-on' : '')+'"></i><b>'+escapeHtml(k.name || 'Campaign')+'</b><small>'+escapeHtml(String(k.objective || k.status || '').replace(/^OUTCOME_/, '').toLowerCase())+'</small></span>'+
+      '<span>'+adsMoney(k.x.spend, k.currency || cur)+'</span>'+
+      '<span>'+(k.x.leads!=null ? sxNum(k.x.leads)+' leads' : k.x.results!=null ? sxNum(k.x.results) : '–')+'</span>'+
+      '<span>'+(k.x.cpr!=null ? adsMoney(k.x.cpr, k.currency || cur) : k.x.leads ? adsMoney(k.x.spend/k.x.leads, k.currency || cur) : '–')+'</span>'+
+      '<span>'+sxPct(k.x.ctr)+'</span>'+
+      '<span>'+sxPct(k.x.hook)+'</span>'+
+      '<span class="sx-ad-c">'+(g ? '<button class="sx-ad-g" data-action="adLinkTo" data-camp="'+escapeHtml(k.id)+'" data-client="'+g.id+'">Link to '+escapeHtml(g.business || g.name)+'?</button>' : '')+
+        '<select class="input" data-adlink="'+escapeHtml(k.id)+'"><option value="">No client</option>'+cs.map(function(x){ return '<option value="'+x.id+'"'+(links[k.id]===x.id ? ' selected' : '')+'>'+escapeHtml(x.business || x.name)+'</option>'; }).join('')+'</select></span>'+
+    '</div>';
+  }).join('');
+  return range+sum+'<div class="sx-ads"><div class="sx-ad is-h"><span>Campaign</span><span>Spent</span><span>Results</span><span>Cost each</span><span>CTR</span><span>Hook</span><span>Client</span></div>'+(rows || '<div class="llx-empty">No campaigns in this range.</div>')+'</div>'+
+    '<div class="sx-note">Hook rate on ads: 3-second video views over impressions. Link a campaign to a client and its spend and leads show on their card.</div>';
+}
+renderConversations = function(){
+  const s = inboxState(), ghl = ghlCfg().connected;
+  let tab = ui.socTab || 'overview';
+  const tabs = [['overview', '&#128202; Overview'], ['posts', '&#127902;&#65039; Posts'], ['messages', '&#128172; Messages'], ['ads', '&#128226; Ads']].concat(ghl ? [['chats', '&#128172; GHL chats'], ['contacts', '&#128101; Contacts']] : []);
+  if(!tabs.some(function(t){ return t[0]===tab; })) tab = 'overview';
+  const refresh = {overview:'igRefreshAll', posts:'igRefreshAll', messages:'znInboxRefresh', ads:'znAdsRefresh', chats:'inboxRefresh', contacts:'inboxRefresh'}[tab];
+  let body = '';
+  if(!igOn() && (tab==='overview' || tab==='posts')) body = socialConnectHtml();
+  else if(tab==='overview') body = sxOverviewHtml();
+  else if(tab==='posts') body = sxPostsHtml();
+  else if(tab==='messages') body = sxMessagesHtml();
+  else if(tab==='ads') body = sxAdsHtml();
+  else { s.mode = tab; body = renderInboxTab(); }
+  return '<div class="view-header"><div><div class="view-title">Social'+tip('Your Business and Personal profiles, every post’s numbers, your messages and your Meta ads. Read-only: Operator never posts or sends.')+'</div></div>'+
+      '<div class="row" style="gap:8px;align-items:center;"><button class="btn btn-ghost btn-sm" data-action="'+refresh+'" title="Refresh">&#8635; Refresh</button></div></div>'+
+    '<div class="seg-tabs sx-tabs">'+tabs.map(function(t){ return '<button class="seg-tab'+(tab===t[0] ? ' active' : '')+'" '+(ghl && (t[0]==='overview' || t[0]==='chats' || t[0]==='contacts') ? 'data-action="inboxMode" data-id="'+(t[0]==='overview' ? 'social' : t[0])+'"' : 'data-action="socTab" data-id="'+t[0]+'"')+'>'+t[1]+(t[0]==='messages' && ui.znIb && ui.znIb.convs ? (function(){ const n = ui.znIb.convs.reduce(function(a, c){ return a + (c.unreadCount || 0); }, 0); return n ? ' <span class="ib-badge">'+n+'</span>' : ''; })() : t[0]==='chats' && inboxUnread() ? ' <span class="ib-badge">'+inboxUnread()+'</span>' : '')+'</button>'; }).join('')+'</div>'+
+    '<div class="tab-panel sx" data-key="sx-'+tab+'">'+body+'</div>';
+};
+ACTIONS.socTab = function(el, e, id){ ui.socTab = id; if(id==='chats' || id==='contacts') inboxState().mode = id; renderView(); };
+ACTIONS.igRefreshAll = function(){ ui.znForce = true; ui.apForce = true; ui.igTried = 0; igRefresh(false).then(function(){ ui.znForce = false; ui.apForce = false; }); };
+ACTIONS.goToSocial = function(){ ui.view = 'convos'; ui.socTab = 'overview'; inboxState().mode = 'social'; renderView(); };
+// Op reads the new numbers too: engagement and hook rate on the last month's posts, and what each
+// client's ads did
+if(typeof opFactsSocial==='function') opFactsSocial = (function(base){
+  return function(){
+    let s = ''; try{ s = base.apply(this, arguments) || ''; }catch(e){}
+    const c = igCfg(), since = addDays(todayStr(), -30), lines = [];
+    c.accounts.forEach(function(a){
+      const d = sxAccountData(a); if(!d) return;
+      const r = arr(d.posts).filter(function(p){ return p.date > since; }), reels = r.filter(function(p){ return p.hook!=null; });
+      const er = sxAvg(r, postER), hook = sxAvg(reels, function(p){ return p.hook; }), w = sxAvg(reels, function(p){ return p.watchPct; });
+      lines.push('@'+(d.username || a.username)+' ('+a.role+'): '+r.length+' posts in 30 days'+(er!=null ? ', engagement '+er.toFixed(1)+'%' : '')+(hook!=null ? ', reel hook rate '+hook.toFixed(0)+'% (viewers who didn’t skip in 3s)' : '')+(w!=null ? ', watched '+w.toFixed(0)+'% of each reel' : '')+(d.fh && d.fh.gained!=null ? ', followers +'+((d.fh.gained || 0) - (d.fh.lost || 0))+' in 30 days' : ''));
+    });
+    if(c.znAdsCache){
+      const links = adLinks();
+      c.znAdsCache.camps.forEach(function(k){ const x = adNums(k.m); if(!x.spend) return; const cl = links[k.id] ? arr(state.business.clients).find(function(z){ return z.id===links[k.id]; }) : null;
+        lines.push('Ad "'+k.name+'"'+(cl ? ' for '+(cl.business || cl.name) : '')+': '+adsMoney(x.spend, k.currency)+' in '+c.znAdsCache.days+' days'+(x.leads ? ', '+x.leads+' leads ('+adsMoney(x.spend/x.leads, k.currency)+' each)' : '')+(x.ctr!=null ? ', CTR '+x.ctr.toFixed(1)+'%' : '')+(x.hook!=null ? ', hook '+x.hook.toFixed(0)+'%' : '')); });
+    }
+    return lines.length ? (s ? s+'\n' : '')+lines.join('\n') : s;
+  };
+})(opFactsSocial);
+// (GoHighLevel's own tab switch lands on the same tabs)
+ACTIONS.inboxMode = (function(base){
+  return function(el, e, id){ ui.socTab = id==='chats' || id==='contacts' ? id : 'overview'; return base ? base.apply(this, arguments) : renderView(); };
+})(ACTIONS.inboxMode);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
