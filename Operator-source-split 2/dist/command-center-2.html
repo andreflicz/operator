@@ -7239,6 +7239,35 @@ body:has(#lockSeqOverlay:not(.hidden)) #activityPill{ opacity:0 !important; poin
 /* social: Apify */
 .soc-free{ font-style:normal; font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:1px 6px; margin-left:6px; border-radius:999px; background:rgba(63,190,142,.16); color:#3FBE8E; vertical-align:middle; }
 .soc-when{ font-size:11px; color:var(--text-faint); margin-left:6px; font-weight:400; }
+
+/* ===== R39 ===== */
+/* 1. client deliverable tasks: violet client work */
+.task-card.dvc{ display:flex; flex-direction:column; gap:6px; border:1px solid rgba(var(--dlv-rgb),.38) !important; border-left:3px solid var(--dlv) !important;
+  background:radial-gradient(120% 90% at 0% 0%, rgba(var(--dlv-rgb),.22), transparent 60%), linear-gradient(160deg, rgba(var(--dlv-rgb),.10), rgba(var(--dlv-rgb),.03)) , var(--panel) !important; box-shadow:0 8px 24px rgba(var(--dlv-rgb),.10); }
+.task-card.dvc:hover{ border-color:rgba(var(--dlv-rgb),.6) !important; box-shadow:0 10px 30px rgba(var(--dlv-rgb),.2); }
+.dvc-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.dvc-who{ display:inline-flex; align-items:center; gap:7px; min-width:0; font-size:11.5px; font-weight:600; color:var(--dlv); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.dvc-av{ flex:none; width:20px; height:20px; border-radius:6px; display:grid; place-items:center; font-size:9.5px; font-weight:800; color:#fff; box-shadow:0 0 0 1px rgba(255,255,255,.18) inset; }
+.dvc-title{ font-family:var(--font-display); font-size:19px; font-weight:800; line-height:1.15; color:var(--text); letter-spacing:-.01em; }
+.dvc-wk{ display:flex; align-items:center; gap:8px; }
+.dvc-dots{ display:inline-flex; gap:4px; } .dvc-dots i{ width:18px; height:6px; border-radius:4px; background:rgba(var(--dlv-rgb),.18); }
+.dvc-dots i.is-past{ background:rgba(var(--dlv-rgb),.45); } .dvc-dots i.is-on{ background:var(--dlv); box-shadow:0 0 10px rgba(var(--dlv-rgb),.6); }
+.dvc-n{ font-size:11.5px; font-weight:700; color:var(--dlv); font-variant-numeric:tabular-nums; }
+.dvc-one{ font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--dlv); }
+.dvc-foot{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:auto; padding-top:4px; font-size:12px; }
+.dvc-q{ color:var(--text-dim); font-size:12px; }
+/* the list view row */
+.tl-row.tl-dlv{ border-color:rgba(var(--dlv-rgb),.35) !important; background:linear-gradient(90deg, rgba(var(--dlv-rgb),.14), rgba(var(--dlv-rgb),.03) 55%, transparent), var(--panel) !important; box-shadow:inset 3px 0 0 var(--dlv); }
+.tl-row.tl-dlv .tl-main{ gap:12px; } .tl-row.tl-dlv .dvc-wk.is-inline{ gap:6px; } .tl-row.tl-dlv .dvc-dots i{ width:14px; height:5px; }
+.tl-row.tl-dlv .dvc-who{ padding:3px 9px 3px 3px; border-radius:999px; background:rgba(var(--dlv-rgb),.12); border:1px solid rgba(var(--dlv-rgb),.3); }
+/* 2–3. Today's client cards open the client; the touch menu floats */
+.hub-card.is-open-able{ cursor:pointer; transition:border-color .15s, transform .15s; } .hub-card.is-open-able:hover{ transform:translateY(-1px); }
+.touch-menu.is-float{ width:max-content !important; max-width:340px; padding:10px !important; border-radius:14px; background:var(--panel) !important; border:1px solid var(--border); position:fixed !important; z-index:600 !important; right:auto !important; bottom:auto !important; margin:0 !important; box-shadow:0 18px 50px rgba(0,0,0,.45); }
+.touch-menu-h{ width:100%; padding:2px 4px 6px; font-size:11.5px; font-weight:600; color:var(--text-dim); }
+.touch-menu-btn.is-on{ outline:1px solid var(--accent); }
+.dvc-wkp{ display:inline-flex; align-items:center; height:20px; padding:0 9px; border-radius:999px; font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#fff; background:var(--dlv); box-shadow:0 0 12px rgba(var(--dlv-rgb),.45); }
+.task-card.dvc .dvc-foot{ padding-top:2px; }
+.tl-row.tl-dlv .tl-main{ align-items:center; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -39484,6 +39513,110 @@ function fmtAgo(ts){
   const m = Math.max(0, Math.round((Date.now() - (ts || 0))/60000));
   return m < 2 ? 'just now' : m < 60 ? m+' min ago' : m < 1440 ? Math.round(m/60)+'h ago' : Math.round(m/1440)+'d ago';
 }
+// ============ ROUND 39 ============
+// One file per area of the round; each part says what it does.
+
+// ---- 1. client deliverable tasks look like client work: violet, the deliverable big, the week as dots ----
+function dvwView(t){
+  const x = dvwFind(t); if(!x) return null;
+  const c = x.c, name = x.oneOff ? String(x.d.title || 'Deliverable') : dvwBaseName(x.d);
+  const parts = x.oneOff ? [] : dvwParts(x.d), at = x.oneOff ? 0 : parts.indexOf(x.k) + 1;
+  return {x:x, c:c, who:c.business || c.name || 'Client', name:name, at:at, of:parts.length, pieces:x.oneOff ? 'One-off' : dvwPieces(x.d, x.need)};
+}
+function dvwDotsHtml(v){
+  if(!v.of) return '<span class="dvc-one">One-off</span>';
+  let h = '<span class="dvc-dots" title="Week '+v.x.k+' of the cycle">';
+  for(let i = 1; i <= v.of; i++) h += '<i class="'+(i < v.at ? 'is-past' : i===v.at ? 'is-on' : '')+'"></i>';
+  return h+'</span><b class="dvc-n">'+v.at+'/'+v.of+'</b>';
+}
+function dvwWeekLabel(v){ return v.x.oneOff ? 'One-off' : 'Week '+v.x.k; }
+function dvwWhoHtml(v){ return '<span class="dvc-who"><span class="dvc-av" style="background:'+clientColor(v.c)+'">'+escapeHtml(clientInitials(v.c))+'</span>'+escapeHtml(v.who)+'</span>'; }
+taskCard = (function(base){
+  return function(t){
+    const h = base.apply(this, arguments);
+    if(!t || !t.master || t.master.kind!=='dvw') return h;
+    const v = dvwView(t); if(!v) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const card = tpl.content.firstElementChild; if(!card) return h;
+    const due = card.querySelector('.kpi-sub'), more = card.querySelector('.card-more');
+    card.classList.add('dvc');
+    // just the three things: the week, the deliverable, the client
+    card.innerHTML = '<div class="dvc-top"><span class="dvc-wkp">'+dvwWeekLabel(v)+'</span>'+(more ? more.outerHTML : '')+'</div>'+
+      '<div class="dvc-title">'+escapeHtml(v.name)+'</div>'+
+      '<div class="dvc-foot">'+dvwWhoHtml(v)+'</div>';
+    return tpl.innerHTML;
+  };
+})(taskCard);
+lineupListHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(h.indexOf('tl-row') < 0) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    tpl.content.querySelectorAll('.tl-row').forEach(function(row){
+      const t = state.tasks.items.find(function(x){ return x.id===row.dataset.taskId; });
+      if(!t || !t.master || t.master.kind!=='dvw') return;
+      const v = dvwView(t); if(!v) return;
+      row.classList.add('tl-dlv');
+      const main = row.querySelector('.tl-main');
+      if(main) main.innerHTML = '<span class="dvc-wkp">'+dvwWeekLabel(v)+'</span><span class="tl-title">'+escapeHtml(v.name)+'</span>';
+      row.querySelectorAll('.kpi-sub').forEach(function(e){ e.remove(); });
+      row.querySelectorAll('.tag-client').forEach(function(e, i){ if(i===0){ const w = document.createElement('template'); w.innerHTML = dvwWhoHtml(v); e.replaceWith(w.content.firstElementChild); } else e.remove(); });
+    });
+    return tpl.innerHTML;
+  };
+})(lineupListHtml);
+
+// ---- 2. Today's Clients panel: the whole card opens the client ----
+renderClientHubPanel = (function(base){
+  return function(){
+    return base.apply(this, arguments).replace(/<div class="hub-card (hl-[a-z]+)" data-key="hub-([^"]+)">/g, function(m, hl, id){
+      return '<div class="hub-card '+hl+' is-open-able" data-key="hub-'+id+'" data-action="openContact" data-kind="client" data-id="'+id+'" title="Open their card">';
+    });
+  };
+})(renderClientHubPanel);
+
+// ---- 3. logging a touch: the type menu floats above everything (it was hidden under the next panel), and
+// after a quick log it opens on its own so you can say what it really was ----
+function touchFloatSync(){
+  document.querySelectorAll('body > .touch-menu.is-float').forEach(function(e){ e.remove(); });
+  const m = document.querySelector('#viewRoot .touch-menu'); if(!m || !ui.touchMenu) return;
+  const k = ui.touchMenu.split(':'), btn = document.querySelector('#viewRoot .touch-more-btn[data-kind="'+k[0]+'"][data-id="'+k[1]+'"]');
+  if(!btn){ m.remove(); return; }
+  const r = btn.getBoundingClientRect();
+  m.classList.add('is-float'); document.body.appendChild(m);
+  const w = m.offsetWidth || 240, h = m.offsetHeight || 140;
+  m.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.right - w))+'px';
+  m.style.top = (r.bottom + 6 + h > window.innerHeight - 8 ? Math.max(8, r.top - h - 6) : r.bottom + 6)+'px';
+  if(ui.touchRetype && ui.touchRetype.key===ui.touchMenu){
+    const hd = document.createElement('div'); hd.className = 'touch-menu-h'; hd.innerHTML = 'Logged a '+escapeHtml(touchTypeById(ui.touchRetype.type).label.toLowerCase())+'. Was it something else?';
+    m.insertBefore(hd, m.firstChild);
+    m.querySelectorAll('.touch-menu-btn').forEach(function(b){ b.dataset.action = 'retypeTouch'; b.classList.toggle('is-on', b.dataset.type===ui.touchRetype.type); });
+  }
+}
+afterRenderHooks.push(function(){ try{ touchFloatSync(); }catch(e){} });
+window.addEventListener('scroll', function(){ if(ui.touchMenu){ ui.touchMenu = null; ui.touchRetype = null; document.querySelectorAll('body > .touch-menu.is-float').forEach(function(e){ e.remove(); }); } }, true);
+document.addEventListener('mousedown', function(e){
+  if(!ui.touchMenu || (e.target.closest && e.target.closest('.touch-menu, .touch-more-btn, .touch-log-btn'))) return;
+  ui.touchMenu = null; ui.touchRetype = null; document.querySelectorAll('body > .touch-menu.is-float').forEach(function(x){ x.remove(); });
+});
+ACTIONS.quickTouch = (function(base){
+  return function(el){
+    const r = base.apply(this, arguments);
+    const l = lastTouchLogged;
+    if(l && el && !el.closest('#clientModalOverlay')){
+      const x = crmFind(l.kind, l.id), tp = x && arr(x.touchpoints).find(function(t){ return t.id===l.tpId; });
+      if(tp){ ui.touchMenu = l.kind+':'+l.id; ui.touchRetype = {key:ui.touchMenu, type:tp.type}; renderView(); clearTimeout(ACTIONS.quickTouch._t); ACTIONS.quickTouch._t = setTimeout(function(){ if(ui.touchRetype){ ui.touchMenu = null; ui.touchRetype = null; renderView(); } }, 6000); }
+    }
+    return r;
+  };
+})(ACTIONS.quickTouch);
+ACTIONS.retypeTouch = function(el){
+  const l = lastTouchLogged, ty = el && el.dataset.type; if(!l || !ty) return;
+  const x = crmFind(l.kind, l.id), tp = x && arr(x.touchpoints).find(function(t){ return t.id===l.tpId; });
+  if(tp){ tp.type = ty; x.lastTouchType = ty; crm().lastTouchType = ty; persist('business'); }
+  ui.touchMenu = null; ui.touchRetype = null; playTick(); renderView();
+  const tt = touchTypeById(ty); showToast('Changed to a '+tt.label.toLowerCase()+' with '+crmName(l.kind, x)+'.', {icon:tt.icon});
+};
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
