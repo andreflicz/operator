@@ -298,3 +298,16 @@ opRunTool = (function(base){
     return did.length ? x.action+': '+did.join(', ')+' ('+(c.business || c.name)+')' : 'nothing to change (already '+(x.action==='done' ? 'done' : x.action==='undo' ? 'open' : 'there')+')';
   };
 })(opRunTool);
+
+// ---- 10. Op's corner: his light and the pill stay together on full-screen pages (Work mode, Inspiration,
+// minimal views), the pill says "Clocked in" when you are (it said "Off the clock" outside work hours even
+// while you worked), and on his own page the pill steps aside (his screen shows what he's doing) ----
+opBarStatus = (function(base){
+  return function(){
+    const k = base.apply(this, arguments);
+    if(k==='grey' && typeof workDayState==='function' && workDayState().clockedInAt && !(state.modes.active && state.modes.active.clockedOut)) return 'clocked';
+    return k;
+  };
+})(opBarStatus);
+OB_LABEL.clocked = 'Clocked in';
+clockIn = (function(base){ return function(){ const r = base.apply(this, arguments); try{ updateActivityPill(); }catch(e){} return r; }; })(clockIn);

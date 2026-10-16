@@ -7281,6 +7281,10 @@ body:has(#lockSeqOverlay:not(.hidden)) #activityPill{ opacity:0 !important; poin
 @keyframes obsDot{ 0%,100%{ opacity:.3; transform:translateY(0); } 50%{ opacity:1; transform:translateY(-3px); } }
 .obs-x{ flex:none; height:24px; padding:0 10px; border-radius:999px; border:0; background:rgba(229,72,77,.14); color:#E5484D; font:inherit; font-size:11.5px; font-weight:700; cursor:pointer; }
 .obs-x:hover{ background:#E5484D; color:#fff; }
+/* 10. Op's corner */
+body.op-ov .activity-pill, body.insp-on .activity-pill, body.np-on .activity-pill, body.board-full .activity-pill{ left:15px !important; }
+body.opf-on .activity-pill{ opacity:0 !important; pointer-events:none !important; }
+.activity-pill[data-ob="clocked"] .ob-dot{ background:#7aa2ff; box-shadow:0 0 0 3px rgba(122,162,255,.2), 0 0 8px rgba(122,162,255,.6); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -39826,6 +39830,19 @@ opRunTool = (function(base){
     return did.length ? x.action+': '+did.join(', ')+' ('+(c.business || c.name)+')' : 'nothing to change (already '+(x.action==='done' ? 'done' : x.action==='undo' ? 'open' : 'there')+')';
   };
 })(opRunTool);
+
+// ---- 10. Op's corner: his light and the pill stay together on full-screen pages (Work mode, Inspiration,
+// minimal views), the pill says "Clocked in" when you are (it said "Off the clock" outside work hours even
+// while you worked), and on his own page the pill steps aside (his screen shows what he's doing) ----
+opBarStatus = (function(base){
+  return function(){
+    const k = base.apply(this, arguments);
+    if(k==='grey' && typeof workDayState==='function' && workDayState().clockedInAt && !(state.modes.active && state.modes.active.clockedOut)) return 'clocked';
+    return k;
+  };
+})(opBarStatus);
+OB_LABEL.clocked = 'Clocked in';
+clockIn = (function(base){ return function(){ const r = base.apply(this, arguments); try{ updateActivityPill(); }catch(e){} return r; }; })(clockIn);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
