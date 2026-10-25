@@ -10,7 +10,9 @@ function instrument(src, out){
   fs.writeFileSync(out, s);
 }
 function ds(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-async function launch(){ return chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] }); }
+// the sandbox's Chromium moves between versions: use whichever /opt/pw-browsers/chromium-* is there
+function chromePath(){ if(process.env.OP_CHROME) return process.env.OP_CHROME; try{ const d = fs.readdirSync('/opt/pw-browsers').filter(n => /^chromium-\d+$/.test(n)).sort().pop(); for(const sub of ['chrome-linux/chrome', 'chrome-linux64/chrome']){ const f = '/opt/pw-browsers/'+d+'/'+sub; if(fs.existsSync(f)) return f; } }catch(e){} return undefined; }
+async function launch(){ return chromium.launch({ executablePath: chromePath(), args: ['--no-sandbox'] }); }
 async function newPage(browser, file, seed, clockAt){
   // older suites were written for the card lineup; List became the default in round 11 (r11 checks that)
   seed = Object.assign({}, seed||{}); seed.profile = Object.assign({}, seed.profile||{});
