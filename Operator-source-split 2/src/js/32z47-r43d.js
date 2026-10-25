@@ -35,3 +35,11 @@ renderFocusTasksOverview = (function(base){
   };
 })(renderFocusTasksOverview);
 ACTIONS.r43OpenWaiting = function(){ ui.focusTasksSubTab = 'waiting'; renderView(); };
+
+// ---- Focus: Overview · Backlog · Client backlog… stay beside Tasks / Analytics, as plain tabs (no box), counts as small badges ----
+focusTasksSubtabsHtml = (function(base){
+  return function(){
+    return base.apply(this, arguments).replace('<div class="subtabs">', '<div class="subtabs r43-subnav">')
+      .replace(/<span style="opacity:\.7;">(\d+)<\/span>/g, '<span class="r43-n">$1</span>');
+  };
+})(focusTasksSubtabsHtml);
