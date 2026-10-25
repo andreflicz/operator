@@ -8073,6 +8073,13 @@ div.r43-goal-m{ cursor:default; }
 .r43-gh.is-inline .r43-seg{ padding:3px; }
 .r43-gh.is-inline .r43-seg button{ padding:6px 12px; font-size:12.5px; }
 .r43-gh.is-inline .r43-gear{ margin:0; }
+.r43-cmenu-wrap{ position:relative; }
+.r43-gear.is-on{ color:var(--text); background:var(--panel-2); }
+.r43-cmenu{ position:absolute; right:0; top:calc(100% + 6px); z-index:40; min-width:180px; padding:6px; border-radius:12px; background:var(--panel); border:1px solid var(--border-strong); box-shadow:0 18px 40px rgba(0,0,0,.4); display:flex; flex-direction:column; gap:2px; animation:hsIn .16s ease both; }
+.r43-cmenu button{ text-align:left; border:0; background:none; color:var(--text-dim); font:600 13px var(--font-body); padding:9px 12px; border-radius:8px; cursor:pointer; }
+.r43-cmenu button:hover{ background:var(--panel-2); color:var(--text); }
+.r43-cmenu button.is-on{ color:var(--text); background:var(--panel-2); }
+.r43-cmenu i{ height:1px; background:var(--border); margin:4px 6px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -44029,7 +44036,7 @@ function r43PlanCardHtml(kind){
     '<label class="r43-fld">Your line for the '+(kind==='month' ? 'month' : 'week')+'<input class="input" id="r43PlanLine-'+kind+'" maxlength="80" value="'+escapeHtml(rec.line || '')+'" placeholder="'+(kind==='month' ? 'e.g. Ahead of the content, every week.' : 'e.g. Finish the launch.')+'"></label>'+
     (kind==='month' ? '<label class="r43-fld">Habit to beat<input class="input" id="r43PlanHabit" maxlength="80" value="'+escapeHtml(rec.habit || '')+'" placeholder="e.g. Scrolling before 10 AM"></label>' : '')+
     '<div class="r43-plan-g"><span>Goals</span>'+gs.map(function(g){ return '<div class="r43-plan-gr"><span>'+escapeHtml(g.label)+'</span>'+(g.autoTrack ? '<small>tracked'+(['hours', 'workouts', 'reels', 'posts', 'newclients'].indexOf(g.autoTrack)>=0 ? ' · graph' : '')+'</small>' : '<small></small>')+'<button class="r43-xpc'+(g.xpPending ? ' is-sizing' : '')+'" data-action="r43GoalXp" data-id="'+g.id+'">+'+goalXpOf(g).toLocaleString()+'</button><button class="r43-x" data-action="tierGoalDelete" data-id="'+g.id+'" title="Remove">&#10005;</button></div>'; }).join('')+
-      (gs.length < G.maxPer ? '<button class="btn btn-ghost btn-sm" data-action="r43PlanAdd" data-id="'+kind+'">+ Add a goal</button>' : '')+'</div>'+
+      '</div>'+
     '<div class="r43-plan-f">Setting up the '+(kind==='month' ? 'month' : 'week')+' <b>+'+(kind==='month' ? G.monthIn : G.weekIn)+' XP</b> · clean sweep '+(kind==='month' ? 'at month’s end' : 'on Sunday')+' <b>+'+(kind==='month' ? G.sweepMonth : G.sweepWeek).toLocaleString()+' XP</b></div>'+
     (locked ? '<div class="r43-plan-done">&#10003; Locked in<button class="btn btn-sm" data-action="r43PlanSave" data-id="'+kind+'">Save changes</button></div>' : r43HoldHtml('r43PlanLock', kind, 'Hold to lock in '+(kind==='month' ? monthName(key) : 'next week'), 'is-wide is-gold'))+
   '</section>';
@@ -44123,7 +44130,6 @@ function r43PanelHtml(kind){
     '<div class="r43-panel-h"><div><span class="r43-k" style="color:'+(kind==='month' ? '#F3C988' : '#8FDCFF')+'">'+(kind==='month' ? monthName(key) : 'This week')+'</span>'+(gs.length ? '<span class="r43-chipr">'+done+' of '+gs.length+' hit</span>' : '')+'</div><small>'+(kind==='month' ? daysLeft+' day'+(daysLeft===1 ? '' : 's')+' left' : fmtDateShort(key)+' – '+fmtDateShort(end))+'</small></div>'+
     lineBox+
     '<div class="r43-goals">'+gs.map(function(g){ return r43TierRowHtml(g, kind); }).join('')+rings.join('')+'</div>'+
-    (!out && gs.length < G.maxPer && checkedIn(kind, key) ? '<button class="r43-add" data-action="openGoalSheet" data-id="'+kind+'">+ Add a goal</button>' : '')+
     (gs.length >= 2 && done===gs.length ? '<div class="r43-sweep is-hit">&#9733; Clean sweep +'+(kind==='month' ? G.sweepMonth : G.sweepWeek).toLocaleString()+' XP</div>' : '')+
     (due ? '<button class="r43-co" data-action="openCheckout" data-id="'+due.kind+':'+due.key+'">Check out of '+(kind==='month' ? monthName(due.key) : 'the week')+' <b>+'+(kind==='month' ? G.monthOut : G.weekOut)+' XP</b></button>' : out ? '<div class="r43-out">Checked out<button class="r43-link" data-action="tierReopen" data-id="'+kind+'">Reopen</button></div>' : '')+
   '</section>';
@@ -44185,13 +44191,18 @@ renderGoalsTab = function(){
   const open = own.filter(function(g){ return !g.done; }).sort(function(a, b){ return (b.life ? 1 : 0) - (a.life ? 1 : 0) || (a.deadline || '9999').localeCompare(b.deadline || '9999'); });
   const done = own.filter(function(g){ return g.done; }).sort(function(a, b){ return String(b.doneAt||'').localeCompare(String(a.doneAt||'')); });
   const nextM = r43NextKey('month');
-  const head = '<div class="r43-gh is-inline"><div class="r43-seg"><button class="'+(mode==='now' ? 'is-on' : '')+'" data-action="r43GoalsMode" data-id="now">'+escapeHtml(monthName(monthKey()))+'</button><button class="'+(mode==='plan' ? 'is-on' : '')+'" data-action="r43GoalsMode" data-id="plan">Plan '+escapeHtml(r43PlanOpen('month') ? monthName(nextM) : 'ahead')+'</button></div>'+'<button class="r43-gear" data-action="mgCustomize" title="Customize master goals" aria-label="Customize master goals"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>'+'</div>';
-  if(mode==='plan') return '<div class="r43-goalsp">'+head+'<div class="r43-plans">'+r43PlanCardHtml('month')+r43PlanCardHtml('week')+'</div></div>';
+  const nextName = r43PlanOpen('month') ? monthName(nextM) : 'ahead';
+  const head = '<div class="r43-gh is-inline"><div class="r43-cmenu-wrap"><button class="r43-gear'+(ui.r43Menu ? ' is-on' : '')+'" data-action="r43GoalsMenu" title="Customize" aria-label="Customize" aria-expanded="'+!!ui.r43Menu+'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>'+
+    (ui.r43Menu ? '<div class="r43-cmenu" role="menu">'+
+      '<button role="menuitem" class="'+(mode==='now' ? 'is-on' : '')+'" data-action="r43GoalsMode" data-id="now">'+escapeHtml(monthName(monthKey()))+'</button>'+
+      '<button role="menuitem" class="'+(mode==='plan' ? 'is-on' : '')+'" data-action="r43GoalsMode" data-id="plan">Plan '+escapeHtml(nextName)+'</button>'+
+      '<i></i><button role="menuitem" data-action="r43MasterCustomize">Master goals</button></div>' : '')+'</div></div>';
+  if(mode==='plan') return '<div class="r43-goalsp"><div class="r43-sec is-top"><span class="r43-k" style="color:#F3C988">Plan '+escapeHtml(nextName)+'</span>'+head+'</div><div class="r43-plans">'+r43PlanCardHtml('month')+r43PlanCardHtml('week')+'</div></div>';
   return '<div class="r43-goalsp g39">'+
     '<div class="r43-sec is-top"><span class="r43-k" style="color:#8FDCFF">'+(defs.length ? 'Master goals' : '')+'</span>'+head+'</div>'+(defs.length ? r43MastersOldHtml(defs) : '')+
     '<div class="r43-panels">'+r43PanelHtml('month')+r43PanelHtml('week')+'</div>'+
-    '<div class="r43-sec is-mine"><div><span class="r43-k" style="color:#FFB86B">Your goals</span></div><button class="btn btn-ghost btn-sm" data-action="openGoalSheet" data-id="long">+ New goal</button></div>'+
-    '<div class="r43-owns">'+open.map(r43OwnCardHtml).join('')+'<button class="r43-own is-add" data-action="openGoalSheet" data-id="long"><b>Add a goal you actually care about</b></button></div>'+
+    '<div class="r43-sec is-mine"><div><span class="r43-k" style="color:#FFB86B">Your goals</span></div></div>'+
+    '<div class="r43-owns">'+open.map(r43OwnCardHtml).join('')+'</div>'+
     (done.length ? '<div class="r43-sec is-ach"><button class="r43-link" data-action="r43ShowAch">'+(ui.r43Ach ? '&#9662;' : '&#9656;')+' Achieved · '+done.length+'</button></div>'+(ui.r43Ach ? '<div class="r43-owns is-done">'+done.map(r43OwnCardHtml).join('')+'</div>' : '') : '')+
   '</div>';
 };
@@ -44201,6 +44212,28 @@ ACTIONS.r43ShowAch = function(){ ui.r43Ach = !ui.r43Ach; renderView(); };
 INTENT_FIELDS.month.extra.unshift(['line', 'Your line for the month', 'e.g. Be the guy.']);
 INTENT_FIELDS.week.extra.unshift(['line', 'Your line for the week', 'e.g. Finish the launch.']);
 if(INTENT_FIELDS.week.extra.length > 2) INTENT_FIELDS.week.extra = INTENT_FIELDS.week.extra.filter(function(f){ return f[0]!=='note'; });
+
+ACTIONS.r43GoalsMenu = function(){ ui.r43Menu = !ui.r43Menu; renderView(); };
+ACTIONS.r43MasterCustomize = function(){ ui.r43Menu = false; ACTIONS.mgCustomize(); };
+ACTIONS.r43GoalsMode = (function(base){ return function(){ ui.r43Menu = false; return base.apply(this, arguments); }; })(ACTIONS.r43GoalsMode);
+document.addEventListener('pointerdown', function(e){ if(ui.r43Menu && !(e.target.closest && e.target.closest('.r43-cmenu-wrap'))){ ui.r43Menu = false; renderView(); } }, true);
+// the + in the corner adds every goal: on Plan, it adds to next month by default, and the sheet can pick next week or next month
+openGoalSheet = (function(base){
+  return function(kind){
+    if(!ui.r43GsForNext && ui.view==='personal' && ui.personalTab==='goals' && ui.r43GoalsMode==='plan'){ const k = kind==='week' ? 'week' : 'month'; ui.r43GsForNext = {kind:k, key:r43NextKey(k)}; return base.call(this, k); }
+    return base.apply(this, arguments);
+  };
+})(openGoalSheet);
+goalSheetHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), f = ui.r43GsFor;
+    const extra = ['week', 'month'].filter(r43PlanOpen).map(function(k){ const on = f && f.kind===k && ui.gsKind===k; return '<button class="'+(on ? 'is-on' : '')+'" data-action="r43GsNext" data-id="'+k+'">'+(k==='week' ? 'Next week' : escapeHtml(monthName(r43NextKey('month'))))+'</button>'; }).join('');
+    let out = h.replace(/(<div class="gs-seg">)([\s\S]*?)(<\/div>)/, function(m, a, b, c){ if(f) b = b.replace(/ class="is-on"/g, ' class=""'); return a+b+extra+c; });
+    return out;
+  };
+})(goalSheetHtml);
+ACTIONS.r43GsNext = function(el, e, k){ r43GsKeep(function(){ ui.gsKind = k; ui.r43GsFor = {kind:k, key:r43NextKey(k)}; }); };
+ACTIONS.gsKind = (function(base){ return function(){ ui.r43GsFor = null; return base.apply(this, arguments); }; })(ACTIONS.gsKind);
 // ============ ROUND 43 (build 3d): FOCUS LOOKS ============
 // Current + Up next can be shown three ways (Settings → Look & Sound → Appearance): Spotlight (Current big,
 // Up next as the strip under it), Side by side, or Classic (how it looked before).

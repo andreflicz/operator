@@ -8062,3 +8062,10 @@ div.r43-goal-m{ cursor:default; }
 .r43-gh.is-inline .r43-seg{ padding:3px; }
 .r43-gh.is-inline .r43-seg button{ padding:6px 12px; font-size:12.5px; }
 .r43-gh.is-inline .r43-gear{ margin:0; }
+.r43-cmenu-wrap{ position:relative; }
+.r43-gear.is-on{ color:var(--text); background:var(--panel-2); }
+.r43-cmenu{ position:absolute; right:0; top:calc(100% + 6px); z-index:40; min-width:180px; padding:6px; border-radius:12px; background:var(--panel); border:1px solid var(--border-strong); box-shadow:0 18px 40px rgba(0,0,0,.4); display:flex; flex-direction:column; gap:2px; animation:hsIn .16s ease both; }
+.r43-cmenu button{ text-align:left; border:0; background:none; color:var(--text-dim); font:600 13px var(--font-body); padding:9px 12px; border-radius:8px; cursor:pointer; }
+.r43-cmenu button:hover{ background:var(--panel-2); color:var(--text); }
+.r43-cmenu button.is-on{ color:var(--text); background:var(--panel-2); }
+.r43-cmenu i{ height:1px; background:var(--border); margin:4px 6px; }
