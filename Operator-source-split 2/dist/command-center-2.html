@@ -7785,6 +7785,248 @@ body.opf-on .activity-pill{ opacity:0 !important; pointer-events:none !important
 .cbl-w.r42-cbl .cbl-wb{ margin-left:auto; }
 .cbl-w.r42-cbl .r42-count b{ white-space:nowrap; }
 .tl-row .dvc-wkp{ background:var(--panel-2) !important; color:var(--text-dim) !important; border:1px solid var(--border) !important; }
+
+/* ===================== ROUND 43: the XP book, areas, goals ===================== */
+.r43-k{ font:700 11px var(--font-body); letter-spacing:.14em; text-transform:uppercase; }
+.r43-chipr{ display:inline-flex; align-items:center; padding:3px 10px; border-radius:999px; background:var(--panel-2); color:var(--text-dim); font:600 12px var(--font-body); }
+.r43-chipx{ padding:3px 10px; border-radius:999px; font:700 12px var(--font-body); background:color-mix(in srgb, var(--c, #3FBE8E) 16%, transparent); color:color-mix(in srgb, var(--c, #3FBE8E) 70%, #fff); }
+.r43-link{ background:none; border:0; padding:0 4px; color:var(--accent); font:600 12px var(--font-body); cursor:pointer; }
+.r43-link:hover{ text-decoration:underline; }
+.r43-x{ background:none; border:0; color:var(--text-faint); cursor:pointer; font-size:13px; padding:4px 6px; border-radius:6px; }
+.r43-x:hover{ color:var(--text); background:var(--panel-2); }
+/* switch */
+.r43-sw{ flex:none; width:40px; height:24px; border-radius:999px; border:0; background:var(--panel-2); box-shadow:inset 0 0 0 1px var(--border-strong); position:relative; cursor:pointer; transition:background .2s; padding:0; }
+.r43-sw span{ position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#c9cdd8; transition:transform .2s, background .2s; }
+.r43-sw.is-on{ background:var(--good); box-shadow:none; } .r43-sw.is-on span{ transform:translateX(16px); background:#fff; }
+.r43-sw:disabled{ opacity:.5; cursor:not-allowed; }
+/* hold to complete */
+.r43-hold{ position:relative; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:10px; padding:8px 14px; border:1px solid var(--border-strong); background:var(--panel-2); color:var(--text); font:700 13px var(--font-body); cursor:pointer; user-select:none; -webkit-user-select:none; touch-action:none; isolation:isolate; }
+.r43-hold-f{ position:absolute; inset:0; z-index:-1; background:linear-gradient(90deg, color-mix(in srgb, var(--good) 55%, transparent), var(--good)); transform:scaleX(0); transform-origin:left; }
+.r43-hold.is-holding .r43-hold-f{ transform:scaleX(1); transition:transform var(--hold, 1200ms) linear; }
+.r43-hold.is-holding{ border-color:var(--good); }
+.r43-hold.is-done{ background:var(--good); color:#06120D; border-color:var(--good); }
+.r43-hold.is-sm{ padding:6px 11px; font-size:12px; border-radius:8px; }
+.r43-hold.is-wide{ width:100%; padding:11px 14px; }
+.r43-hold.is-gold .r43-hold-f{ background:linear-gradient(90deg, #b9822c, #E8A23D); }
+.r43-hold.is-gold{ background:color-mix(in srgb, #E8A23D 16%, transparent); border-color:color-mix(in srgb, #E8A23D 50%, transparent); color:#F3C988; }
+.tg-hit.r43-hold.is-row{ display:flex; justify-content:flex-start; width:100%; padding:0; border:0; background:none; border-radius:8px; font:inherit; color:inherit; }
+.tg-hit.r43-hold.is-row .r43-hold-f{ opacity:.35; }
+/* the card's ratings: one per area */
+.pc-attrs.r43-attrs, .lp-attrs.r43-attrs{ display:grid !important; grid-template-columns:repeat(var(--n, 3), minmax(0, 1fr)); }
+.you-attrs.r43-you-attrs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; }
+/* today, by area */
+.r43-today{ margin:18px 0 14px; }
+.r43-today-h{ display:flex; align-items:baseline; gap:10px; margin-bottom:10px; } .r43-today-h b{ font:700 15px var(--font-display); } .r43-today-h small{ color:var(--text-dim); }
+.r43-today-g{ display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:10px; }
+.r43-ta{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:8px; }
+.r43-ta-h{ display:flex; justify-content:space-between; align-items:baseline; } .r43-ta-h span{ font-weight:600; } .r43-ta-h b{ font:700 15px var(--font-display); color:var(--ac); }
+.r43-ta > i{ display:block; height:4px; border-radius:4px; background:var(--panel-2); overflow:hidden; } .r43-ta > i u{ display:block; height:100%; background:var(--ac); border-radius:4px; }
+.r43-ta.is-ok{ border-color:color-mix(in srgb, var(--ac) 45%, var(--border)); }
+.r43-ta-x{ display:flex; flex-wrap:wrap; gap:6px; }
+.r43-hb, .r43-tm{ border-radius:999px; padding:5px 10px; font:600 12px var(--font-body); cursor:pointer; background:var(--panel-2); color:var(--text); border:1px solid var(--border-strong); }
+.r43-hb.is-on{ background:color-mix(in srgb, var(--ac) 22%, transparent); border-color:var(--ac); }
+.r43-tm.is-on{ background:var(--ac); color:#10131a; border-color:var(--ac); }
+/* rewards */
+.r43-rw{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:10px 0 0; padding:9px 12px; border-radius:10px; background:color-mix(in srgb, #FFB86B 9%, var(--panel)); border:1px dashed color-mix(in srgb, #FFB86B 35%, transparent); font-size:13px; }
+.r43-rw small{ color:var(--text-dim); } .r43-rw.is-open{ border-style:solid; }
+.r43-rw button{ border:0; border-radius:8px; padding:6px 10px; background:#FFB86B; color:#1a1206; font:700 12px var(--font-body); cursor:pointer; }
+.r43-rwfx{ position:fixed; inset:0; z-index:9800; display:grid; place-items:center; background:rgba(5,6,10,.7); backdrop-filter:blur(6px); opacity:0; transition:opacity .3s; }
+.r43-rwfx.is-in{ opacity:1; }
+.r43-rwfx-c{ text-align:center; padding:34px 40px; border-radius:22px; background:var(--panel); border:1px solid color-mix(in srgb, #FFB86B 40%, transparent); box-shadow:0 0 80px rgba(255,184,107,.25); transform:scale(.9); transition:transform .4s cubic-bezier(.2,.9,.3,1.2); }
+.r43-rwfx.is-in .r43-rwfx-c{ transform:none; }
+.r43-rwfx-k{ font:700 12px var(--font-body); letter-spacing:.2em; color:#FFCF99; } .r43-rwfx-i{ font-size:54px; margin:10px 0; } .r43-rwfx-t{ font:700 24px var(--font-display); }
+.r43-rwfx-a{ display:flex; gap:10px; justify-content:center; margin-top:18px; }
+.r43-rwfx-a button{ border-radius:10px; padding:9px 16px; border:1px solid var(--border-strong); background:var(--panel-2); color:var(--text); font:600 13px var(--font-body); cursor:pointer; }
+.r43-rwfx-a button.is-go{ background:#FFB86B; color:#1a1206; border-color:#FFB86B; }
+/* the switch-over */
+.r43-rb{ display:grid; place-items:center; z-index:9700; background:rgba(5,6,10,.75); backdrop-filter:blur(6px); }
+.r43-rb-c{ width:min(520px, calc(100vw - 32px)); padding:28px; border-radius:20px; background:var(--panel); border:1px solid var(--border-strong); }
+.r43-rb-k{ font:700 11px var(--font-body); letter-spacing:.16em; color:var(--accent); } .r43-rb-c h2{ font:700 26px var(--font-display); margin:8px 0 10px; }
+.r43-rb-c p{ color:var(--text-dim); line-height:1.5; font-size:14px; }
+.r43-rb-g{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:18px 0; }
+.r43-rb-g > div{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; padding:14px; border-radius:12px; background:var(--panel-2); }
+.r43-rb-g small{ width:100%; color:var(--text-dim); font-size:12px; } .r43-rb-g span{ color:var(--text-dim); font:600 18px var(--font-display); } .r43-rb-g i{ color:var(--text-faint); font-style:normal; } .r43-rb-g b{ font:700 24px var(--font-display); color:var(--good); }
+.r43-rb-n{ font-size:13px !important; }
+.r43-rb-a{ display:flex; justify-content:flex-end; gap:10px; margin-top:16px; }
+.r43-rb-a button{ border-radius:10px; padding:10px 16px; border:1px solid var(--border-strong); background:var(--panel-2); color:var(--text); font:600 14px var(--font-body); cursor:pointer; }
+.r43-rb-a .is-go{ background:var(--accent); border-color:var(--accent); color:#1a1206; }
+/* settings */
+.r43-set-p{ color:var(--text-dim); font-size:13px; line-height:1.5; margin:4px 0 12px; } .r43-set-s{ display:block; color:var(--text-dim); margin-top:6px; }
+.r43-areas{ display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
+.r43-ar{ display:grid; grid-template-columns:10px minmax(120px, 200px) 1fr auto auto; align-items:center; gap:12px; padding:10px 12px; border-radius:12px; background:var(--panel); border:1px solid var(--border); }
+.r43-ar > i{ width:10px; height:10px; border-radius:50%; background:var(--ac); } .r43-ar small{ color:var(--text-dim); font-size:12px; }
+.r43-ar.is-off{ opacity:.55; } .r43-ar-n{ padding:6px 10px !important; }
+.r43-ar-x{ background:none; border:0; color:var(--text-faint); cursor:pointer; }
+.r43-ar-h{ grid-column:2 / -1; display:flex; flex-wrap:wrap; gap:6px; }
+.r43-ar-h span{ display:inline-flex; align-items:center; gap:4px; padding:4px 6px 4px 10px; border-radius:999px; background:var(--panel-2); font-size:12px; }
+.r43-ar-h span button{ background:none; border:0; color:var(--text-faint); cursor:pointer; }
+.r43-ar-hadd{ border-radius:999px; padding:4px 10px; border:1px dashed var(--border-strong); background:none; color:var(--text-dim); font-size:12px; cursor:pointer; }
+.r43-chk{ display:flex; gap:12px; align-items:flex-start; } .r43-chk small{ display:block; color:var(--text-dim); font-size:12px; margin-top:2px; }
+.r43-rws{ display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+.r43-rwr{ display:grid; grid-template-columns:80px 1fr auto auto; gap:10px; align-items:center; padding:8px 12px; border-radius:10px; background:var(--panel); border:1px solid var(--border); }
+.r43-rwr small{ color:var(--text-dim); } .r43-rwr.is-open small{ color:#FFCF99; } .r43-rwr.is-claimed{ opacity:.6; }
+.r43-rwr button{ background:none; border:0; color:var(--text-faint); cursor:pointer; }
+.r43-set-f{ margin-top:22px; }
+@media (max-width:700px){ .r43-ar{ grid-template-columns:10px 1fr auto auto; } .r43-ar small{ display:none; } }
+/* the task sheet: area */
+.r43-area-seg{ display:flex; flex-wrap:wrap; gap:6px; }
+.r43-area-seg button{ display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:6px 12px; border:1px solid var(--border-strong); background:var(--panel-2); color:var(--text-dim); font:600 12px var(--font-body); cursor:pointer; }
+.r43-area-seg button i{ width:8px; height:8px; border-radius:50%; background:var(--ac); }
+.r43-area-seg button.is-on{ color:var(--text); border-color:var(--ac, var(--accent)); background:color-mix(in srgb, var(--ac, var(--accent)) 14%, transparent); }
+/* the guide */
+.r43-gt{ width:100%; border-collapse:collapse; margin:6px 0 14px; font-size:13px; }
+.r43-gt th{ text-align:left; font:700 11px var(--font-body); letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); padding:8px 10px; border-bottom:1px solid var(--border-strong); }
+.r43-gt td{ padding:9px 10px; border-bottom:1px solid var(--border); vertical-align:top; line-height:1.4; }
+.r43-gt td:nth-child(2){ font-weight:700; white-space:nowrap; } .r43-gt td:nth-child(3){ color:var(--text-dim); }
+.r43-gt tr.is-opt td:first-child em, .r43-g-o em{ color:var(--text-faint); font-style:normal; font-size:12px; }
+.r43-g-p{ color:var(--text-dim); line-height:1.55; font-size:14px; margin:4px 0 12px; } .r43-g-o{ color:var(--text-faint); font-size:12px; }
+.r43-g-areas{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:6px 0 8px; }
+.r43-g-areas span{ display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:999px; background:var(--panel-2); font-weight:600; }
+.r43-g-areas span i{ width:9px; height:9px; border-radius:50%; background:var(--ac); }
+.r43-g-edit{ background:none; border:0; color:var(--accent); cursor:pointer; font:600 13px var(--font-body); }
+@media (max-width:700px){ .r43-gt td:nth-child(2){ white-space:normal; } }
+/* the goal moment */
+.r43-gfx{ position:fixed; inset:0; z-index:9750; display:grid; place-items:center; background:rgba(5,8,8,.66); backdrop-filter:blur(5px); opacity:0; transition:opacity .3s; cursor:pointer; }
+.r43-gfx.is-in{ opacity:1; } .r43-gfx.is-out{ opacity:0; }
+.r43-gfx-c{ position:relative; width:min(420px, calc(100vw - 32px)); padding:30px 28px 24px; border-radius:22px; text-align:center; background:linear-gradient(180deg, #132019, var(--panel)); border:1px solid #2B4A3F; box-shadow:0 0 90px rgba(63,190,142,.25); transform:translateY(16px) scale(.94); transition:transform .5s cubic-bezier(.2,.9,.3,1.25); }
+.r43-gfx.is-life .r43-gfx-c{ background:linear-gradient(180deg, #221a0d, var(--panel)); border-color:#4A3B22; box-shadow:0 0 110px rgba(255,184,107,.3); }
+.r43-gfx.is-in .r43-gfx-c{ transform:none; }
+.r43-gfx-tick{ width:76px; height:76px; margin:0 auto 14px; border-radius:50%; display:grid; place-items:center; font-size:38px; font-weight:800; background:#3FBE8E; color:#06120D; box-shadow:0 0 0 10px rgba(63,190,142,.16); animation:r43Pop .6s cubic-bezier(.2,.9,.3,1.6) both .1s; }
+.r43-gfx.is-life .r43-gfx-tick{ background:#FFB86B; box-shadow:0 0 0 10px rgba(255,184,107,.18); }
+@keyframes r43Pop{ from{ transform:scale(.2); opacity:0; } to{ transform:none; opacity:1; } }
+.r43-gfx-k{ font:700 11px var(--font-body); letter-spacing:.16em; text-transform:uppercase; color:#7CF0C4; }
+.r43-gfx-t{ font:700 22px var(--font-display); margin:6px 0 4px; line-height:1.25; }
+.r43-gfx-xp{ font:700 32px var(--font-display); color:#7CF0C4; margin:4px 0 14px; animation:r43Pop .5s both .35s; }
+.r43-gfx-lv > div{ display:flex; justify-content:space-between; font-size:12px; color:var(--text-dim); margin-bottom:6px; }
+.r43-gfx-lv i{ display:block; height:6px; border-radius:6px; background:var(--panel-2); overflow:hidden; } .r43-gfx-lv u{ display:block; height:100%; background:linear-gradient(90deg, #3FBE8E, #9FF5D2); transition:width 1.1s cubic-bezier(.2,.8,.2,1); }
+.r43-gfx-l{ margin-top:14px; font-size:13px; color:var(--text-dim); }
+.r43-gfx-conf{ position:absolute; left:50%; top:60px; width:0; height:0; }
+.r43-gfx-conf i{ position:absolute; width:8px; height:12px; border-radius:2px; background:var(--c); opacity:0; animation:r43Conf 1.4s cubic-bezier(.15,.7,.3,1) forwards; animation-delay:calc(var(--i) * 18ms); }
+@keyframes r43Conf{ 0%{ opacity:1; transform:translate(0, 0) rotate(0); } 100%{ opacity:0; transform:translate(var(--x), calc(var(--y) + 240px)) rotate(var(--r)); } }
+@media (prefers-reduced-motion:reduce){ .r43-gfx-conf{ display:none; } .r43-gfx-c, .r43-gfx-tick, .r43-gfx-xp{ animation:none; transition:none; } }
+/* sheets: fix a count, a numbers goal */
+.r43-sheet-ov{ display:grid; place-items:center; }
+.r43-sheet{ position:relative; width:min(460px, calc(100vw - 32px)); padding:24px; display:flex; flex-direction:column; gap:12px; }
+.r43-sheet.is-wide{ width:min(560px, calc(100vw - 32px)); }
+.r43-sh-k{ font:700 11px var(--font-body); letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); padding-right:30px; }
+.r43-sh-p{ color:var(--text-dim); font-size:13px; line-height:1.5; }
+.r43-fix-n{ display:flex; align-items:baseline; gap:10px; } .r43-fix-n b{ font:700 44px var(--font-display); } .r43-fix-n span{ color:var(--text-dim); }
+.r43-fix-r{ display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; background:var(--panel-2); }
+.r43-fix-r > div{ flex:1; } .r43-fix-r small{ display:block; color:var(--text-dim); font-size:12px; margin-top:2px; }
+.r43-fix-r > span{ font:700 12px var(--font-body); padding:3px 10px; border-radius:999px; background:rgba(63,190,142,.16); color:#7CF0C4; }
+.r43-fix-r.is-re > span{ background:rgba(155,140,255,.16); color:#C3B9FF; }
+.r43-fix-own{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding-top:6px; } .r43-fix-own span{ flex:1; color:var(--text-dim); font-size:13px; } .r43-fix-own b{ font:700 18px var(--font-display); min-width:24px; text-align:center; }
+.r43-det-t{ font:700 22px var(--font-display); }
+.r43-det-n{ display:flex; align-items:baseline; gap:10px; } .r43-det-n b{ font:700 40px var(--font-display); color:#E2C4FF; } .r43-det-n span{ color:var(--text-dim); font-size:14px; }
+.r43-det-g{ margin:0; padding:10px 6px 2px; border-radius:12px; background:var(--panel-2); }
+.r43-ax{ stroke:var(--border-strong); } .r43-gl{ stroke:var(--border); stroke-dasharray:4 4; } .r43-pace{ stroke:var(--text-faint); stroke-width:1.5; stroke-dasharray:6 5; }
+.r43-pl{ stroke:#C58FFF; stroke-width:3; stroke-linejoin:round; stroke-linecap:round; } .r43-dot{ fill:#C58FFF; }
+.r43-tx{ fill:var(--text-dim); font:11px var(--font-body); } .r43-tx.is-v{ fill:#E2C4FF; font-weight:700; font-size:12px; }
+.r43-det-s{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+.r43-det-s > div{ padding:12px; border-radius:12px; background:var(--panel-2); } .r43-det-s small{ display:block; color:var(--text-dim); font-size:12px; } .r43-det-s b{ font:700 20px var(--font-display); }
+.r43-det-src > span{ display:block; color:var(--text-dim); font-size:12px; margin-bottom:6px; } .r43-det-src > div{ display:flex; flex-wrap:wrap; gap:6px; }
+.r43-det-tg{ display:flex; align-items:center; gap:8px; margin-top:10px; } .r43-det-tg span{ color:var(--text-dim); font-size:13px; } .r43-det-tg input{ width:110px; }
+.r43-chip{ border-radius:999px; padding:6px 12px; border:1px solid var(--border-strong); background:var(--panel-2); color:var(--text-dim); font:600 12px var(--font-body); cursor:pointer; }
+.r43-chip.is-on{ color:var(--text); border-color:var(--ac, #C58FFF); background:color-mix(in srgb, var(--ac, #C58FFF) 16%, transparent); }
+/* the goal sheet extras */
+.r43-gs-row{ display:flex; flex-direction:column; gap:6px; margin-top:12px; } .r43-gs-row > span{ font-size:12px; color:var(--text-dim); font-weight:600; }
+.r43-gs-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+.r43-gs-life{ display:flex; gap:12px; align-items:flex-start; margin-top:14px; } .r43-gs-life small{ display:block; color:var(--text-dim); font-size:12px; margin-top:2px; }
+.r43-gs-xp::placeholder{ color:var(--text-faint); }
+/* the page */
+.r43-goalsp{ display:flex; flex-direction:column; gap:14px; padding-bottom:40px; }
+.r43-gh{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.r43-seg{ display:flex; gap:4px; padding:4px; background:var(--panel); border:1px solid var(--border); border-radius:12px; }
+.r43-seg button{ border:0; border-radius:9px; padding:8px 14px; background:transparent; color:var(--text-dim); font:600 13px var(--font-body); cursor:pointer; }
+.r43-seg button.is-on{ background:var(--panel-2); color:var(--text); }
+.r43-cust{ background:none; border:0; color:var(--text-dim); font:600 13px var(--font-body); cursor:pointer; } .r43-cust:hover{ color:var(--text); }
+.r43-sec{ display:flex; align-items:center; gap:12px; margin-top:14px; } .r43-sec small{ color:var(--text-dim); font-size:13px; }
+.r43-sec.is-mine{ justify-content:space-between; } .r43-sec.is-mine > div{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.r43-masters{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; }
+.r43-master, .r43-own{ background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:14px; min-width:0; }
+.r43-master-h, .r43-own-h{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+.r43-master-h .r43-k{ color:var(--text-dim); }
+.r43-master-n{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; } .r43-master-n b{ font:700 40px var(--font-display); line-height:1; }
+.r43-tgt{ background:none !important; border:0 !important; color:var(--text-dim) !important; font:500 15px var(--font-body) !important; padding:0 !important; cursor:pointer; }
+.r43-tgt:hover{ color:var(--text) !important; }
+.r43-bar{ height:10px; border-radius:6px; background:var(--panel-2); overflow:hidden; } .r43-bar i{ display:block; height:100%; background:var(--c); border-radius:6px; transition:width .6s cubic-bezier(.2,.8,.2,1); }
+.r43-dots{ display:grid; grid-template-columns:repeat(var(--n), minmax(0, 1fr)); gap:3px; } .r43-dots i{ height:10px; border-radius:2px; background:var(--panel-2); } .r43-dots i.is-on{ background:var(--c); }
+.r43-master-f, .r43-own-f{ display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:13px; color:var(--text-dim); }
+.r43-master-f b{ color:color-mix(in srgb, var(--c) 70%, #fff); }
+.r43-master.is-hit{ border-color:color-mix(in srgb, var(--c) 50%, var(--border)); box-shadow:0 0 30px color-mix(in srgb, var(--c) 18%, transparent); }
+.r43-panels{ display:grid; grid-template-columns:repeat(auto-fit, minmax(380px, 1fr)); gap:14px; margin-top:12px; }
+.r43-panel{ background:var(--panel); border:1px solid var(--border); border-radius:18px; padding:22px; display:flex; flex-direction:column; gap:12px; min-width:0; }
+.r43-panel-h{ display:flex; justify-content:space-between; align-items:center; gap:10px; } .r43-panel-h > div{ display:flex; align-items:center; gap:10px; } .r43-panel-h small{ color:var(--text-dim); font-size:13px; }
+.r43-line{ position:relative; padding:18px 20px; border-radius:14px; background:#1C1810; border:1px solid #3A2F1C; }
+.r43-line.is-week{ background:#101A20; border-color:#1F3542; }
+.r43-line .r43-k{ font-size:10px; color:#C49A5A; } .r43-line.is-week .r43-k{ color:#6FB4D6; }
+.r43-line-t{ font:700 26px var(--font-display); margin-top:6px; color:#F7E3C2; line-height:1.2; } .r43-line.is-week .r43-line-t{ color:#D6F1FF; }
+.r43-line-h{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:8px; font-size:13px; color:#C9B99C; }
+.r43-line.is-week .r43-line-h{ color:#9DC3D6; }
+.r43-line-e{ position:absolute; top:12px; right:12px; background:none; border:0; color:var(--text-faint); cursor:pointer; opacity:0; transition:opacity .2s; }
+.r43-line:hover .r43-line-e{ opacity:1; }
+.r43-line-add{ margin-top:8px; background:none; border:1px dashed currentColor; color:#C49A5A; border-radius:8px; padding:6px 10px; cursor:pointer; }
+.r43-hab{ border-radius:999px; padding:5px 11px; border:1px solid #4A3B22; background:transparent; color:#F3C988; font:600 12px var(--font-body); cursor:pointer; }
+.r43-hab.is-on{ background:#3FBE8E; border-color:#3FBE8E; color:#06120D; }
+.r43-setup{ display:flex; flex-direction:column; gap:4px; align-items:flex-start; padding:18px 20px; border-radius:14px; background:transparent; border:1px dashed var(--border-strong); color:var(--text); cursor:pointer; text-align:left; }
+.r43-setup b{ font:700 18px var(--font-display); } .r43-setup span{ color:var(--text-dim); font-size:13px; } .r43-setup:hover{ border-color:var(--accent); }
+.r43-goals{ display:flex; flex-direction:column; gap:10px; }
+.r43-goal{ display:flex; align-items:center; gap:14px; padding:12px 14px; border-radius:14px; background:#191D27; border:1px solid var(--border); }
+.r43-goal.is-done{ background:#132019; border-color:#2B4A3F; }
+.r43-goal.is-missed{ opacity:.6; }
+.r43-goal-m{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:2px; text-align:left; background:none; border:0; padding:0; color:var(--text); cursor:pointer; }
+.r43-goal-m b{ font-weight:700; display:flex; align-items:center; gap:7px; } .r43-goal-m small{ color:var(--text-dim); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.r43-goal.is-done .r43-goal-m small{ color:#7CF0C4; }
+div.r43-goal-m{ cursor:default; }
+.r43-dotc{ flex:none; width:7px; height:7px; border-radius:50%; background:var(--ac); }
+.r43-ring{ flex:none; position:relative; width:46px; height:46px; display:grid; place-items:center; }
+.r43-ring svg{ position:absolute; inset:0; } .r43-ring-bg{ fill:none; stroke:var(--panel-2); stroke-width:4; } .r43-ring-fg{ fill:none; stroke:var(--rc); stroke-width:4; stroke-linecap:round; transition:stroke-dashoffset .6s; }
+.r43-ring b{ position:relative; font:700 11px var(--font-display); color:color-mix(in srgb, var(--rc) 65%, #fff); }
+.r43-ring.is-done{ border-radius:50%; background:#3FBE8E; color:#06120D; font-weight:800; font-size:18px; }
+.r43-ring.is-empty{ border-radius:50%; border:2px dashed var(--border-strong); width:42px; height:42px; }
+.r43-xpc{ flex:none; padding:4px 10px; border-radius:999px; border:0; background:rgba(63,190,142,.14); color:#7CF0C4; font:700 12px var(--font-body); cursor:pointer; }
+.r43-xpc.is-earned{ background:rgba(63,190,142,.22); cursor:default; } .r43-xpc.is-ring{ cursor:default; }
+.r43-xpc.is-sizing{ animation:r43Pulse 1.2s ease-in-out infinite; } @keyframes r43Pulse{ 50%{ opacity:.45; } }
+.r43-xpc.is-life{ background:rgba(255,184,107,.16); color:#FFCF99; }
+.r43-add{ align-self:flex-start; background:none; border:1px dashed var(--border-strong); border-radius:10px; padding:8px 12px; color:var(--text-dim); font:600 13px var(--font-body); cursor:pointer; }
+.r43-add:hover{ color:var(--text); border-color:var(--accent); }
+.r43-sweep{ font-size:12px; color:var(--text-faint); } .r43-sweep.is-hit{ color:#F3C988; font-weight:700; }
+.r43-co{ border-radius:10px; padding:10px 14px; border:1px solid color-mix(in srgb, var(--accent) 50%, transparent); background:color-mix(in srgb, var(--accent) 12%, transparent); color:var(--text); font:600 13px var(--font-body); cursor:pointer; }
+.r43-out{ font-size:13px; color:var(--text-dim); }
+.r43-owns{ display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-top:12px; }
+.r43-own.is-life{ background:#19150E; border-color:#4A3B22; }
+.r43-chipo{ padding:3px 10px; border-radius:999px; font:700 12px var(--font-body); background:rgba(197,143,255,.14); color:#E2C4FF; }
+.r43-own.is-life .r43-chipo{ background:rgba(255,184,107,.16); color:#FFCF99; }
+.r43-own-h small{ color:var(--text-dim); font-size:12px; }
+.r43-own-t{ font:700 24px var(--font-display); line-height:1.2; text-align:left; background:none; border:0; padding:0; color:var(--text); cursor:pointer; }
+.r43-own-s{ color:var(--text-dim); font-size:13px; line-height:1.5; }
+.r43-own-f > span{ display:inline-flex; align-items:center; gap:6px; }
+.r43-step{ width:24px; height:24px; border-radius:7px; border:1px solid var(--border-strong); background:var(--panel-2); color:var(--text); cursor:pointer; }
+.r43-own.is-add{ border-style:dashed; align-items:center; justify-content:center; text-align:center; cursor:pointer; color:var(--text); min-height:180px; }
+.r43-own.is-add small{ color:var(--text-dim); } .r43-own.is-add:hover{ border-color:var(--accent); }
+.r43-own.is-done{ flex-direction:row; align-items:center; background:#132019; border-color:#2B4A3F; padding:18px 20px; }
+.r43-own-ok{ flex:none; width:46px; height:46px; border-radius:50%; display:grid; place-items:center; background:#3FBE8E; color:#06120D; font-size:22px; font-weight:800; box-shadow:0 0 0 6px rgba(63,190,142,.14); }
+.r43-own-b{ flex:1; min-width:0; } .r43-own.is-done .r43-own-t{ font-size:17px; } .r43-own-b small{ color:#7CF0C4; font-size:12px; }
+.r43-own-e{ text-align:right; } .r43-own-e b{ display:block; font:700 20px var(--font-display); color:#7CF0C4; } .r43-own-e small{ display:block; color:var(--text-dim); font-size:11px; }
+.r43-plans{ display:grid; grid-template-columns:repeat(auto-fit, minmax(360px, 1fr)); gap:14px; }
+.r43-plan{ background:var(--panel); border:1px solid var(--border); border-radius:18px; padding:24px; display:flex; flex-direction:column; gap:14px; }
+.r43-plan.is-closed{ border-style:dashed; gap:6px; } .r43-plan.is-closed b{ font:700 20px var(--font-display); } .r43-plan.is-closed small{ color:var(--text-dim); }
+.r43-plan-h{ display:flex; justify-content:space-between; align-items:center; }
+.r43-plan-t{ font:700 26px var(--font-display); }
+.r43-fld{ display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--text-dim); font-weight:600; }
+.r43-plan-g{ display:flex; flex-direction:column; gap:8px; } .r43-plan-g > span{ font-size:12px; color:var(--text-dim); font-weight:600; }
+.r43-plan-gr{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; background:var(--panel-2); } .r43-plan-gr > span{ flex:1; font-weight:600; } .r43-plan-gr small{ color:var(--text-dim); font-size:12px; }
+.r43-plan-g .btn{ align-self:flex-start; }
+.r43-plan-f{ font-size:13px; color:var(--text-dim); } .r43-plan-f b{ color:#F3C988; }
+.r43-plan-done{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border-radius:10px; background:rgba(63,190,142,.1); color:#7CF0C4; font-size:13px; }
+@media (max-width:760px){ .r43-panels, .r43-plans{ grid-template-columns:1fr; } .r43-master-n b{ font-size:32px; } .r43-own-t{ font-size:20px; } }
+.r43-gear{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:8px;border:0;background:transparent;color:var(--text-faint);cursor:pointer;margin-left:-4px;transition:color .15s, background .15s}
+.r43-gear:hover{color:var(--text);background:var(--panel-2)}
+.r43-goalsp .g39-rev{margin-top:10px}
+.r43-mrings{display:grid;grid-template-columns:repeat(var(--n, 2), minmax(0, 1fr));gap:14px;margin-top:12px}
+@media (max-width:760px){ .r43-mrings{grid-template-columns:1fr} }
+.r43-mcol{margin-top:12px}
+.r43-mcol .r43-mrings{margin-top:0;display:grid;grid-template-columns:repeat(var(--n, 2), minmax(0, 1fr));gap:8px}
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -42548,6 +42790,1352 @@ clientBacklogHtml = function(){
     (blocks.length ? blocks.join('') : '<div class="empty">No client deliverables yet. Give a client a package (or a one-off) and the tasks show up here.</div>')+
   '</div>';
 };
+// ============ ROUND 43 (October batch, build 3a): THE XP BOOK ============
+// One table (XP_BOOK) holds every number. The engine reads it, and the in-app guide (How XP works) is
+// written from it, so the two can never disagree. Made for anyone, not one person:
+//  • Areas: everyone tracks the areas that matter to them. Work, Health and Personal by default; rename
+//    them, turn one off, or add your own (up to 5 in all). Added areas earn through what you tag to them.
+//  • Work has optional pieces that only count when you use them: Clients and Content.
+//  • Every action belongs to one area. A day that touches all of them pays more (balance), and balanced
+//    days in a row add a little more (streak).
+//  • Levels measure effort (cheaper curve: level 100 in months, not years). Ranks measure achievement:
+//    the level plus a rating in every area, judged by the lowest one.
+//  • XP is earned once and kept. It only comes off when it was marked wrong; the level follows.
+
+const XP_BOOK = {
+  work:{deepBase:15, deepStep:3, deepHours:8, deepPast:25, longDay:40, longAt:360, goldDay:100, goldAt:480, pastNormal:5,
+    taskMax:20, deliv:15, early:60, outreach:10, outreachEach:6, outreachMax:15, shoot:25, noClients:1.4, touch:100},
+  health:{workouts:[200, 180, 160, 140], workoutAfter:60, firstFive:250, food:15, onTarget:50, band:[.8, 1.1], weighIn:10, weekToward:100, bed:50, touch:50},
+  personal:{journal:80, insp:45, inspBig:65, inspMax:2, habit:30, skill:40, video:50, money:75, debtPer:4, debtMax:600, onTime:15, touch:50},
+  added:{habit:30, habitMax:3, session:30, touch:50},
+  balance:{all:1.25, half:1.10, streakEach:.02, streakMax:.14},
+  goals:{weekIn:50, monthIn:150, weekOut:25, monthOut:50, maxPer:5, sweepWeek:300, sweepMonth:1500, habit:500, newLong:50, newLongMax:2,
+    week:[75, 300, 150], month:[250, 1000, 500], long:[500, 15000, 3000], life:[10000, 50000, 30000],
+    mrrPerK:600, perLb:150, perDay:100, ring:100, raise:.10, hold:1200, weekFrom:4, monthFrom:20},
+  oneoff:{client:1500, reactivated:300, mrrPerK:600, follower:1},
+  level:{base:500, lin:45, sq:.3, max:100},
+  areas:{max:5, defaults:[{id:'work', name:'Work'}, {id:'health', name:'Health'}, {id:'personal', name:'Personal'}]},
+  ranks:[
+    {name:'Locked In', level:0,  low:0,  mrr:0,     color:'#8fd3ff', tag:'Showing up for yourself'},
+    {name:'Operator',  level:8,  low:40, mrr:2500,  color:'#5fd4c4', tag:'Every day, on purpose'},
+    {name:'Specialist',level:18, low:50, mrr:5000,  color:'#6fc3ff', tag:'Good at the thing'},
+    {name:'Pro',       level:30, low:55, mrr:10000, color:'#a98bff', tag:'It shows'},
+    {name:'Captain',   level:42, low:60, mrr:20000, color:'#ff8fb1', tag:'Others follow'},
+    {name:'Commander', level:55, low:65, mrr:35000, color:'#ffc56b', tag:'Runs the field'},
+    {name:'Director',  level:68, low:70, mrr:50000, color:'#ff9a6b', tag:'Built to last'},
+    {name:'Elite',     level:80, low:75, mrr:70000, color:'#7ef0c0', tag:'Few get here', biz:'Mogul'},
+    {name:'Legend',    level:92, low:80, mrr:83400, color:'#fff2b0', tag:'The whole life, handled', biz:'Millionaire'}
+  ]
+};
+const R43_AREA_COLORS = {work:'#ffc56b', health:'#7ef0c0', personal:'#c3a6ff'};
+const R43_EXTRA_COLORS = ['#8fd3ff', '#ff8fb1', '#f2e27a', '#b5e06a'];
+
+// ---- the old tables follow the book (everything that reads them now reads the book) ----
+Object.assign(CHECKIN_XP, {weekGoal:XP_BOOK.goals.week[2], monthGoal:XP_BOOK.goals.month[2], habit:XP_BOOK.goals.habit,
+  weekIn:XP_BOOK.goals.weekIn, weekOut:XP_BOOK.goals.weekOut, monthIn:XP_BOOK.goals.monthIn, monthOut:XP_BOOK.goals.monthOut, maxGoals:XP_BOOK.goals.maxPer});
+Object.assign(XP_RATES, {mrrPerK:XP_BOOK.oneoff.mrrPerK, client:XP_BOOK.oneoff.client, follower:XP_BOOK.oneoff.follower, goal:XP_BOOK.goals.long[2],
+  longDay:XP_BOOK.work.longDay, goldDay:XP_BOOK.work.goldDay, outreach:XP_BOOK.work.outreach, outreachEach:XP_BOOK.work.outreachEach, outreachMax:XP_BOOK.work.outreachMax, taskMax:XP_BOOK.work.taskMax});
+MASTER_XP.weekly = XP_BOOK.goals.ring;
+GOAL_XP_BAND.week = XP_BOOK.goals.week; GOAL_XP_BAND.month = XP_BOOK.goals.month; GOAL_XP_BAND.long = XP_BOOK.goals.long; GOAL_XP_BAND.life = XP_BOOK.goals.life;
+// ranks: neutral names for everyone; on the Clients track each also needs MRR and the top two take business names
+RANKS.splice(0, RANKS.length);
+XP_BOOK.ranks.forEach(function(r){
+  const o = {level:r.level, low:r.low, mrr:r.mrr, color:r.color, tag:r.tag};
+  Object.defineProperty(o, 'name', {enumerable:true, get:function(){ return r.biz && r43ClientsTrack() ? r.biz : r.name; }});
+  Object.defineProperty(o, 'health', {enumerable:true, get:function(){ return r.low; }});
+  RANKS.push(o);
+});
+
+// ---- levels: the cost of each level is 500 + 45L + 0.3L² (level 100 ≈ 371k in all) ----
+function r43LevelCost(L){ const b = XP_BOOK.level; return Math.round(b.base + b.lin*L + b.sq*L*L); }
+const R43_LEVEL_AT = (function(){ const a = [0]; for(let L = 0; L < XP_BOOK.level.max; L++) a.push(a[L] + r43LevelCost(L)); return a; })();
+xpForLevel = function(L){ return L <= 0 ? 0 : R43_LEVEL_AT[Math.min(XP_BOOK.level.max, L)]; };
+
+// ---- areas ----
+function r43AreasRaw(){
+  const p = state.profile;
+  if(!Array.isArray(p.xpAreas) || !p.xpAreas.length) p.xpAreas = XP_BOOK.areas.defaults.map(function(a){ return {id:a.id, name:a.name, on:true}; });
+  return p.xpAreas;
+}
+function r43Areas(){ return r43AreasRaw().filter(function(a){ return a.on!==false; }); }
+function r43Area(id){ return r43AreasRaw().find(function(a){ return a.id===id; }) || null; }
+function r43AreaOn(id){ const a = r43Area(id); return !!(a && a.on!==false); }
+function r43AreaName(id){ const a = r43Area(id); return a ? a.name : id; }
+function r43AreaColor(id){ if(R43_AREA_COLORS[id]) return R43_AREA_COLORS[id]; const i = r43AreasRaw().filter(function(a){ return !R43_AREA_COLORS[a.id]; }).findIndex(function(a){ return a.id===id; }); return R43_EXTRA_COLORS[Math.max(0, i) % R43_EXTRA_COLORS.length]; }
+function r43AreaShort(id){ return String(r43AreaName(id)).replace(/[^A-Za-z0-9]/g, '').slice(0, 3).toUpperCase() || 'ARE'; }
+function r43Builtin(id){ return id==='work' || id==='health' || id==='personal'; }
+// was this area tracked on that day? (turning one off keeps what it already earned)
+function r43AreaOnAt(a, d){
+  if(!a) return false;
+  if(a.since && d < a.since) return false;
+  const offs = arr(a.offs);
+  for(let i = 0; i < offs.length; i++){ const o = offs[i]; if(d >= o[0] && (!o[1] || d < o[1])) return false; }
+  return true;
+}
+function r43AreasAt(d){ return r43AreasRaw().filter(function(a){ return r43AreaOnAt(a, d); }); }
+// the optional pieces of Work
+function r43ClientsOn(){ return arr(state.business && state.business.clients).length > 0 || arr(state.business && state.business.pipeline).length > 0; }
+function r43ContentOn(){
+  const ct = state.standards && state.standards.contentTargets;
+  return !!((ct && ct.business && ct.business.n) || arr(state.modes && state.modes.history).some(function(m){ return m.type==='shooting'; }) || state.tasks.items.some(function(t){ return t.isVideoIdea && contentRoleOf(t)!=='personal'; }));
+}
+function r43ClientsTrack(){ return !!(state && state.profile && state.profile.rankClientsTrack && r43ClientsOn()); }
+
+// every task belongs to one area: the one it's tagged with, or work for client work and business videos,
+// personal for the rest
+function r43TaskAreaAuto(t){
+  if(t.isVideoIdea) return contentRoleOf(t)==='personal' ? 'personal' : 'work';
+  const cs = arr(t.clients).concat(t.client ? [t.client] : []);
+  if(cs.some(function(c){ return c && c!=='personal' && c!=='general'; })) return 'work';
+  return 'personal';
+}
+function r43TaskArea(t){ return t.area && r43Area(t.area) ? t.area : r43TaskAreaAuto(t); }
+function r43GoalArea(g){ if(g.area && r43Area(g.area)) return g.area; if(['mrr', 'clients', 'newclients', 'reels', 'hours', 'avghours'].indexOf(g.autoTrack)>=0) return 'work'; if(['weight', 'workouts'].indexOf(g.autoTrack)>=0) return 'health'; return 'personal'; }
+function taskXpAtN(i){ return Math.min(25, 3 + 2*i); }
+function r43Tasks(n){ let x = 0; for(let i = 1; i <= Math.min(n, XP_BOOK.work.taskMax); i++) x += taskXpAtN(i); return x; }
+function r43Deep(min){ const W = XP_BOOK.work; let xp = 0; for(let h = 0; h*60 < min; h++) xp += (h < W.deepHours ? W.deepBase + W.deepStep*h : W.deepPast)*Math.min(60, min - h*60)/60; return xp; }
+function r43BedMins(){ const b = state.profile.bedtime; if(!b || !/^\d\d:\d\d$/.test(b)) return null; const m = Number(b.slice(0, 2))*60 + Number(b.slice(3)); return m < 300 ? m + 1440 : m; }
+function r43Habits(a){ return arr(a && a.habits).slice(0, XP_BOOK.added.habitMax); }
+function r43Store(){ const p = state.personal || (state.personal = {}); if(!p.areaLog || typeof p.areaLog!=='object') p.areaLog = {sessions:[], timer:null}; p.areaLog.sessions = arr(p.areaLog.sessions); return p.areaLog; }
+
+// ---- what the day counts from (built once with the rest of the context) ----
+xpCtx = (function(base){
+  return function(){
+    const ctx = base.apply(this, arguments), P = XP_BOOK.personal;
+    const tasks = {}, pvid = {};
+    state.tasks.items.forEach(function(t){
+      if(t.status!=='done' || !t.completedAt || t.missed) return;
+      if(t.master && t.master.kind==='dvw') return;          // a client's week pays through its pieces
+      const d = t.completedAt;
+      if(t.isVideoIdea && contentRoleOf(t)==='personal'){ pvid[d] = (pvid[d]||0) + 1; return; }
+      const a = r43TaskArea(t), o = tasks[d] || (tasks[d] = {}); o[a] = (o[a]||0) + 1;
+    });
+    const deliv = {};
+    arr(state.business && state.business.clients).forEach(function(c){ arr(c.deliverables).forEach(function(dv){ arr(dv.completedDates).forEach(function(d){ deliv[d] = (deliv[d]||0) + 1; }); }); });
+    const early = {}; const E = state.profile.xpEarly || {}; Object.keys(E).forEach(function(k){ const d = E[k]; if(d) early[d] = (early[d]||0) + 1; });
+    const food = {}; arr(state.health.calorieEntries).forEach(function(c){ if(c.date) food[c.date] = (food[c.date]||0) + Math.max(0, Number(c.calories)||0) + 0.0001; });
+    const weigh = {}, wl = arr(state.health.weightLog).filter(function(w){ return w && w.date && w.weight!=null; }).sort(function(a, b){ return a.date.localeCompare(b.date); });
+    wl.forEach(function(w){ weigh[w.date] = Number(w.weight); });
+    const journal = {}; arr(state.journal && state.journal.entries).forEach(function(e){ if(e && e.date) journal[e.date] = 1; });
+    const insp = {}; try{ arr(inspStore().log).forEach(function(x){ if(!x.date) return; (insp[x.date] = insp[x.date] || []).push((inspAct(x.act).pts || 1) >= 2 ? P.inspBig : P.insp); }); }catch(e){}
+    const habit = {}; try{ const ms = intentStore().months; Object.keys(ms).forEach(function(k){ Object.keys((ms[k] && ms[k].habitDays) || {}).forEach(function(d){ habit[d] = 1; }); }); }catch(e){}
+    const skill = {}; try{ state.tasks.items.filter(function(t){ return t.skill; }).forEach(function(t){ const by = taskMinutesByDay(t.id) || {}; Object.keys(by).forEach(function(d){ skill[d] = (skill[d]||0) + by[d]; }); }); }catch(e){}
+    const money = {}; arr(state.finances && state.finances.checkins).forEach(function(c){ const d = typeof c==='string' ? c : c && c.date; if(d){ const w = startOfWeekStr(d); if(!money[w] || d < money[w]) money[w] = d; } });
+    const moneyDay = {}; Object.keys(money).forEach(function(w){ moneyDay[money[w]] = 1; });
+    // payments: on time +15 (one a debt a day), above the minimum 1 XP per $4 (600 a month at most)
+    const pay = {}, debts = {}, monthPaid = {};
+    arr(state.finances && state.finances.debts).forEach(function(d){ debts[d.id] = d; });
+    arr(state.finances && state.finances.payments).slice().sort(function(a, b){ return String(a.date).localeCompare(String(b.date)); }).forEach(function(p){
+      if(!p.date) return; const o = pay[p.date] || (pay[p.date] = {on:{}, extra:0}), d = debts[p.debtId] || {};
+      const due = Number(d.dueDay)||0, day = Number(p.date.slice(8));
+      if(!due || day <= due) o.on[p.debtId || p.id] = 1;
+      const min = Number(d.minPayment || d.minimum || 0), above = min > 0 ? Math.max(0, Number(p.amount||0) - min) : 0;
+      if(above){ const mk = p.date.slice(0, 7), room = Math.max(0, P.debtMax - (monthPaid[mk]||0)), x = Math.min(room, above/P.debtPer); monthPaid[mk] = (monthPaid[mk]||0) + x; o.extra += x; }
+    });
+    const bed = state.profile.xpBed || {};
+    const ah = {}; r43AreasRaw().forEach(function(a){ r43Habits(a).forEach(function(h){ Object.keys(h.days || {}).forEach(function(d){ const o = ah[d] || (ah[d] = {}); o[a.id] = (o[a.id]||0) + 1; }); }); });
+    const as = {}; r43Store().sessions.forEach(function(s){ if(!s.date) return; const o = as[s.date] || (as[s.date] = {}); o[s.area] = (o[s.area]||0) + Math.max(0, Number(s.minutes)||0); });
+    return Object.assign(ctx, {r43:{tasks:tasks, pvid:pvid, deliv:deliv, early:early, food:food, weigh:weigh, wl:wl, journal:journal, insp:insp, habit:habit, skill:skill, money:moneyDay, pay:pay, bed:bed, ah:ah, as:as,
+      clients:r43ClientsOn(), content:r43ContentOn(), calTarget:state.profile.calorieTarget || 2000, perWk:state.profile.weeklyWorkoutTarget || 4, goalW:state.profile.goalWeight, bedMins:r43BedMins()}});
+  };
+})(xpCtx);
+
+// everything one day earned, by area, before balance
+function r43DayRaw(d, ctx){
+  const R = ctx.r43, W = XP_BOOK.work, H = XP_BOOK.health, P = XP_BOOK.personal, A = XP_BOOK.added, items = [], area = {};
+  const on = {}; r43AreasAt(d).forEach(function(a){ on[a.id] = 1; });
+  const add = function(a, k, xp, why){ xp = Math.round(xp); if(!xp || !on[a]) return; items.push({a:a, k:k, xp:xp, why:why}); area[a] = (area[a]||0) + xp; };
+  const tk = R.tasks[d] || {};
+  // Work
+  const mult = R.clients ? 1 : W.noClients, deep = ctx.deep(d), std = xpStandardFor(d, ctx.deep);
+  if(deep){
+    add('work', 'time', r43Deep(deep)*mult, fmtDurationLabel(deep)+' of deep work'+(mult > 1 ? ' (×'+mult+')' : ''));
+    if(deep >= W.goldAt) add('work', 'gold', W.goldDay, 'Gold day: 8 hours');
+    else if(deep >= W.longAt) add('work', 'long', W.longDay, 'Long day: 6 hours');
+    if(std > 0 && deep > std) add('work', 'normal', (deep - std)/60*W.pastNormal, fmtDurationLabel(deep - std)+' past your normal');
+  }
+  if(tk.work) add('work', 'tasks', r43Tasks(tk.work)*mult, tk.work+' work task'+(tk.work===1 ? '' : 's')+' done');
+  if(R.clients){
+    if(R.deliv[d]) add('work', 'deliv', R.deliv[d]*W.deliv, R.deliv[d]+' deliverable'+(R.deliv[d]===1 ? '' : 's')+' done');
+    if(R.early[d]) add('work', 'early', R.early[d]*W.early, R.early[d]+' client week'+(R.early[d]===1 ? '' : 's')+' done before it starts');
+    const t = ctx.touches[d] || 0; if(t) add('work', 'outreach', W.outreach + W.outreachEach*(Math.min(t, W.outreachMax) - 1), t+' reach-out'+(t===1 ? '' : 's'));
+  }
+  const shoot = ctx.shootMin[d] || 0; if(shoot) add('work', 'shoot', shoot/60*W.shoot, fmtDurationLabel(shoot)+' shooting');
+  // Health
+  if(ctx.trained(d)){
+    const k = ctx.workoutIndex[d], w = ctx.workoutWeekIndex[d];
+    if(k <= 5) add('health', 'workout', H.firstFive, 'Workout #'+k+' (your first five pay big)');
+    else if(w <= Math.min(H.workouts.length, R.perWk)) add('health', 'workout', H.workouts[w-1], 'Workout, '+w+(w===1 ? 'st' : w===2 ? 'nd' : w===3 ? 'rd' : 'th')+' this week');
+    else add('health', 'workout', H.workoutAfter, 'Workout');
+  }
+  if(tk.health) add('health', 'tasks', r43Tasks(tk.health), tk.health+' health task'+(tk.health===1 ? '' : 's')+' done');
+  if(R.food[d]){
+    add('health', 'food', H.food, 'Food logged');
+    const r = Math.round(R.food[d])/R.calTarget; if(r >= H.band[0] && r <= H.band[1]) add('health', 'ontarget', H.onTarget, 'Inside your calorie target');
+  }
+  if(R.weigh[d]!=null) add('health', 'weigh', H.weighIn, 'Weigh-in');
+  if(R.goalW && new Date(d+'T12:00').getDay()===0){
+    const ws = addDays(d, -6), before = R.wl.filter(function(w){ return w.date < ws; }).pop(), inWk = R.wl.filter(function(w){ return w.date >= ws && w.date <= d; }).pop();
+    if(before && inWk && Math.abs(inWk.weight - R.goalW) < Math.abs(before.weight - R.goalW) - 0.05) add('health', 'toward', H.weekToward, 'A week closer to your goal weight');
+  }
+  if(R.bedMins!=null && R.bed[d]!=null && R.bed[d] <= R.bedMins) add('health', 'bed', H.bed, 'In bed on time');
+  // Personal
+  if(R.journal[d]) add('personal', 'journal', P.journal, 'Journal entry');
+  const ins = arr(R.insp[d]).slice(0, P.inspMax); if(ins.length) add('personal', 'insp', ins.reduce(function(a, x){ return a + x; }, 0), ins.length+' inspiration log'+(ins.length===1 ? '' : 's'));
+  if(R.habit[d]) add('personal', 'habit', P.habit, 'The month’s habit, kept');
+  if(R.skill[d]) add('personal', 'skill', R.skill[d]/60*P.skill, fmtDurationLabel(Math.round(R.skill[d]))+' on your skills');
+  if(R.pvid[d]) add('personal', 'video', R.pvid[d]*P.video, R.pvid[d]+' video'+(R.pvid[d]===1 ? '' : 's')+' of your own');
+  if(tk.personal) add('personal', 'tasks', r43Tasks(tk.personal), tk.personal+' personal task'+(tk.personal===1 ? '' : 's')+' done');
+  if(R.money[d]) add('personal', 'money', P.money, 'Weekly money check-in');
+  const py = R.pay[d]; if(py){ const n = Object.keys(py.on).length; if(n) add('personal', 'paid', n*P.onTime, n+' payment'+(n===1 ? '' : 's')+' on time'); if(py.extra) add('personal', 'debt', py.extra, 'Paid above the minimum'); }
+  // areas you added
+  r43AreasRaw().filter(function(a){ return !r43Builtin(a.id); }).forEach(function(a){
+    if(tk[a.id]) add(a.id, 'tasks', r43Tasks(tk[a.id]), tk[a.id]+' task'+(tk[a.id]===1 ? '' : 's')+' done');
+    const hb = Math.min(A.habitMax, (R.ah[d] || {})[a.id] || 0); if(hb) add(a.id, 'habit', hb*A.habit, hb+' habit'+(hb===1 ? '' : 's')+' kept');
+    const sm = (R.as[d] || {})[a.id] || 0; if(sm) add(a.id, 'session', sm/60*A.session, fmtDurationLabel(Math.round(sm))+' of '+a.name);
+  });
+  return {items:items, area:area, on:Object.keys(on)};
+}
+function r43Touched(d, raw){
+  const T = {work:XP_BOOK.work.touch, health:XP_BOOK.health.touch, personal:XP_BOOK.personal.touch};
+  return raw.on.filter(function(a){ return (raw.area[a]||0) >= (T[a] || XP_BOOK.added.touch) || (a==='work' && isDayOff(d)); });
+}
+function r43Balanced(raw, d){ if(raw.on.length <= 1) return true; return r43Touched(d, raw).length===raw.on.length; }
+// past days don't change unless the data does: keep them
+let r43Cache = {sig:'', raw:{}};
+function r43RawOf(d, ctx){
+  if(d===todayStr()) return r43DayRaw(d, ctx);
+  return r43Cache.raw[d] || (r43Cache.raw[d] = r43DayRaw(d, ctx));
+}
+xpDay = function(d, ctx){
+  const raw = r43RawOf(d, ctx), items = raw.items.slice(), base = items.reduce(function(a, x){ return a + x.xp; }, 0);
+  if(!base) return items;
+  const B = XP_BOOK.balance, n = raw.on.length, t = r43Touched(d, raw).length;
+  const bal = n <= 1 || t===n ? B.all : t*2 >= n ? B.half : 1;
+  if(bal > 1) items.push({a:'all', k:'balance', xp:Math.round(base*(bal - 1)), why:(t===n ? 'Balanced day: every area' : 'Half your areas')+' ×'+bal.toFixed(2)});
+  let streak = 0; const start = xpStart();
+  for(let i = 1; i <= 7; i++){ const dd = addDays(d, -i); if(dd < start) break; const r = r43RawOf(dd, ctx); if(r.items.length && r43Balanced(r, dd)) streak++; }
+  const st = Math.min(B.streakMax, streak*B.streakEach);
+  if(st > 0) items.push({a:'all', k:'streak', xp:Math.round(base*bal*st), why:streak+' balanced day'+(streak===1 ? '' : 's')+' this week +'+Math.round(st*100)+'%'});
+  return items;
+};
+xpSig = (function(base){
+  return function(){
+    let n = 0; arr(state.business && state.business.clients).forEach(function(c){ arr(c.deliverables).forEach(function(d){ n += arr(d.completedDates).length; }); });
+    const p = state.profile;
+    return [base.apply(this, arguments), n, arr(state.health.calorieEntries).length, arr(state.health.weightLog).length, arr(state.journal && state.journal.entries).length,
+      (function(){ try{ return inspStore().log.length; }catch(e){ return 0; } })(), arr(state.finances && state.finances.payments).length, arr(state.finances && state.finances.checkins).length,
+      JSON.stringify(p.xpAreas || ''), JSON.stringify(p.xpBed || ''), p.bedtime, JSON.stringify(p.xpEarly || ''), r43Store().sessions.length, p.calorieTarget, p.weeklyWorkoutTarget, p.goalWeight,
+      state.tasks.items.filter(function(t){ return t.area; }).map(function(t){ return t.id+t.area; }).join(''),
+      (function(){ try{ const ms = intentStore().months; return Object.keys(ms).map(function(k){ return k+Object.keys((ms[k] && ms[k].habitDays) || {}).length; }).join(); }catch(e){ return ''; } })()].join('|');
+  };
+})(xpSig);
+
+// a client's posting week finished before it starts: +60 for that client, that week (kept once earned)
+function r43EarlyScan(){
+  if(typeof r42Alloc!=='function') return;
+  const p = state.profile, E = p.xpEarly && typeof p.xpEarly==='object' ? p.xpEarly : (p.xpEarly = {}), today = todayStr(), start = xpStart();
+  let changed = false;
+  arr(state.business && state.business.clients).forEach(function(c){
+    const ds = arr(c.deliverables).filter(function(d){ return d.recurring!==false; }); if(!ds.length) return;
+    const allocs = ds.map(function(d){ try{ return r42Alloc(d); }catch(e){ return null; } }).filter(Boolean); if(!allocs.length) return;
+    allocs[0].posts.forEach(function(post){
+      const key = c.id+':'+post;
+      if(post < start || (E[key] && post <= today)) return;          // past weeks are on the record
+      let need = 0, ok = true, last = '';
+      allocs.forEach(function(a){ const n = a.need[post] || 0; need += n; if((a.fill[post]||0) < n) ok = false; arr(a.dates[post]).forEach(function(x){ if(x > last) last = x; }); });
+      const early = need > 0 && ok && last && last < post;
+      if(early && E[key]!==last){ E[key] = last; changed = true; }
+      else if(!early && E[key] && post > today){ delete E[key]; changed = true; }
+    });
+  });
+  if(changed) persist('profile');
+}
+
+// ---- weeks, months, goals: setting up pays a little, finishing a lot, finishing all of it a bonus ----
+goalXpOf = function(g){
+  if(g && Number(g.xp) > 0) return Number(g.xp);
+  const G = XP_BOOK.goals;
+  return g && g.tier==='week' ? G.week[2] : g && g.tier==='month' ? G.month[2] : g && g.life ? G.life[2] : G.long[2];
+};
+function r43GoalLines(){
+  const G = XP_BOOK.goals, lines = [], start = xpStart(), ws0 = weekKey(start), ms0 = monthKey(start);
+  const push = function(d, why, xp, k, area){ if(xp) lines.push({d:d < start ? start : d, why:why, xp:Math.round(xp), k:k || 'goal', a:area || null}); };
+  if(typeof intentStore==='function'){
+    const s = intentStore();
+    Object.keys(s.weeks).forEach(function(k){ if(k < ws0) return; const r = s.weeks[k] || {}; if(r.at) push(r.atDay || k, 'Set up the week of '+fmtDateShort(k), G.weekIn, 'checkin'); if(r.out) push(periodEnd('week', k), 'Checked out of the week', G.weekOut, 'checkin'); });
+    Object.keys(s.months).forEach(function(k){ if(k < ms0) return; const r = s.months[k] || {}; if(r.at) push(r.atDay || k+'-01', 'Set up '+monthName(k), G.monthIn, 'checkin'); if(r.out){ push(periodEnd('month', k), 'Checked out of '+monthName(k), G.monthOut, 'checkin'); if(r.out.habit) push(periodEnd('month', k), 'Beat the habit: '+(r.habit || 'the month’s habit'), G.habit, 'goal'); } });
+  }
+  const per = {};
+  arr(state.goals && state.goals.items).forEach(function(g){ if(!g.tier || (g.tier==='week' ? g.pk < ws0 : g.pk < ms0)) return; (per[g.tier+'|'+g.pk] = per[g.tier+'|'+g.pk] || []).push(g); });
+  Object.keys(per).forEach(function(k){
+    const gs = per[k], tier = k.split('|')[0], done = gs.filter(function(g){ return g.done; }).sort(function(a, b){ return String(a.doneAt||'').localeCompare(String(b.doneAt||'')); });
+    done.slice(0, G.maxPer).forEach(function(g){ push(g.doneAt || g.pk, (tier==='week' ? 'Weekly goal: ' : 'Monthly goal: ')+g.label, goalXpOf(g), 'goal', r43GoalArea(g)); });
+    if(gs.length >= 2 && done.length===gs.length) push(done[done.length-1].doneAt || gs[0].pk, 'Clean sweep: every '+(tier==='week' ? 'weekly' : 'monthly')+' goal', tier==='week' ? G.sweepWeek : G.sweepMonth, 'goal');
+  });
+  // long-term and life goals you write: +50 for setting one (two a month), then what Op (or you) set it at
+  const setPer = {};
+  arr(state.goals && state.goals.items).filter(function(g){ return !g.tier; }).sort(function(a, b){ return String(a.createdAt||'').localeCompare(String(b.createdAt||'')); }).forEach(function(g){
+    const made = g.createdAt || start, mk = String(made).slice(0, 7);
+    if(made >= start && g.label){ setPer[mk] = (setPer[mk]||0) + 1; if(setPer[mk] <= G.newLongMax) push(made, 'New '+(g.life ? 'life milestone' : 'long-term goal')+': '+g.label, G.newLong, 'goal', r43GoalArea(g)); }
+    if(g.done && !(typeof goalIsPeriodic==='function' && goalIsPeriodic(g))) push(g.doneAt || todayStr(), (g.life ? 'Life milestone: ' : 'Goal reached: ')+(g.label || goalTitle(g)), goalXpOf(g), 'goal', r43GoalArea(g));
+  });
+  return lines;
+}
+// clients and audience: big moves pay once, on new highs, and never come back off when numbers dip
+function r43OneOffs(){
+  const p = state.profile, O = XP_BOOK.oneoff, start = xpStart(), out = [];
+  arr(state.business.clients).filter(function(c){ return arr(p.xpClientsBase).indexOf(c.id) < 0; }).forEach(function(c){
+    out.push({d:c.startDate || c.createdAt || start, why:(c.reactivated ? 'Client back: ' : 'Client won: ')+(c.business || c.name || 'a client'), xp:c.reactivated ? O.reactivated : O.client, k:'client', a:'work'});
+  });
+  const mrr = xpMrr(), base = Number(p.xpMrrBase || 0);
+  if(!(Number(p.xpMrrBest) >= base)) p.xpMrrBest = Math.max(base, mrr);
+  if(mrr > p.xpMrrBest){ p.xpMrrBest = mrr; persist('profile'); }
+  const mrrXp = Math.max(0, Math.round((p.xpMrrBest - base)/1000*O.mrrPerK));
+  const fNow = xpFollowersNow();
+  if(fNow!=null && p.xpFollowersBase==null){ p.xpFollowersBase = fNow; persist('profile'); }
+  if(fNow!=null && !(Number(p.xpFolBest) >= fNow)){ p.xpFolBest = fNow; persist('profile'); }
+  const folGain = (p.xpFolBest!=null && p.xpFollowersBase!=null ? Math.max(0, p.xpFolBest - p.xpFollowersBase) : 0) + Number(p.xpFollowersKept || 0);
+  return {events:out, mrr:mrr, mrrBase:base, mrrBest:p.xpMrrBest, mrrXp:mrrXp, followers:folGain, followerXp:Math.round(folGain*O.follower)};
+}
+// master goals pay by size; when one is hit its target goes up 10% (a real step) and the next one pays again
+function r43AutoRaise(){
+  if(typeof masterGoalDefs!=='function') return;
+  const p = state.profile, raised = p.xpRaised && typeof p.xpRaised==='object' ? p.xpRaised : (p.xpRaised = {});
+  masterGoalDefs().forEach(function(m){
+    if(['mrr', 'weight', 'streak'].indexOf(m.key) < 0 || m.cur==null || !(m.target > 0) || masterPct(m) < 100) return;
+    const hit = arr((p.xpMasterHit || {})[m.key]);
+    if(hit.indexOf(Number(m.target)) < 0 || raised[m.key]===Number(m.target)) return;   // only once it's paid
+    const t = Number(m.target); let next;
+    if(m.key==='mrr') next = Math.max(t + 1000, Math.round(t*(1 + XP_BOOK.goals.raise)/100)*100);
+    else if(m.key==='streak') next = Math.max(t + 7, Math.round(t*(1 + XP_BOOK.goals.raise)));
+    else { const down = m.start!=null ? Number(m.start) > t : true, step = Math.max(5, Math.round(Math.abs((m.start!=null ? Number(m.start) : t) - t)*XP_BOOK.goals.raise)); next = down ? t - step : t + step; }
+    raised[m.key] = t; p[m.field] = next; persist('profile');
+    if(typeof sysNote==='function') setTimeout(function(){ sysNote(m.label+' hit. New target: '+m.fmt(next)+(m.suffix||'')+'.'); }, 700);
+  });
+}
+
+// ---- the ratings: one per area you track, and an Overall that's their average ----
+function r43Mix(list){ let s = 0, w = 0; list.forEach(function(x){ if(x==null || isNaN(x)) return; s += Math.max(0, Math.min(1, x)); w++; }); return w ? s/w : null; }
+function r43Sub(label, f, note){ return {label:label, v:f==null ? null : rate99(f), note:note || ''}; }
+function r43F(sub){ return sub && sub.v!=null ? (sub.v - 25)/75 : null; }
+function r43ByDeadline(area){
+  const today = todayStr(), due = state.tasks.items.filter(function(t){ return t.deadline && t.deadline < today && t.deadline >= addDays(today, -30) && !(t.master && t.master.kind==='dvw') && r43TaskArea(t)===area; });
+  if(due.length < 2) return null;
+  const on = due.filter(function(t){ return t.status==='done' && !t.missed && t.completedAt && t.completedAt <= t.deadline; }).length;
+  return {f:on/due.length, on:on, n:due.length};
+}
+function r43ClientWeeks(){
+  if(typeof r42Alloc!=='function') return null;
+  const today = todayStr(); let n = 0, ok = 0;
+  arr(state.business.clients).forEach(function(c){ arr(c.deliverables).forEach(function(d){ let a; try{ a = r42Alloc(d); }catch(e){ return; } a.posts.forEach(function(p){ if(p > today || !(a.need[p] > 0)) return; n++; if((a.fill[p]||0) >= a.need[p] && arr(a.dates[p]).every(function(x){ return x < p; })) ok++; }); }); });
+  return n ? {f:ok/n, ok:ok, n:n} : null;
+}
+function r43AreaRatings(ctx, base){
+  const sub = function(list, label){ return arr(list).find(function(s){ return s.label===label; }) || null; };
+  const B = base.BUS.subs, Pp = base.PER.subs, Hh = base.HLT.subs, D = base.DIS.subs, today = todayStr(), out = [];
+  r43Areas().forEach(function(a){
+    let subs = [];
+    if(a.id==='work'){
+      const dl = r43ByDeadline('work');
+      subs.push(sub(B, 'Focus'), r43Sub('Deadlines', dl ? dl.f : null, dl ? dl.on+' of '+dl.n+' work deadlines met (30 days)' : 'Give work tasks a deadline and it counts'));
+      if(r43ClientsOn()){ const cw = r43ClientWeeks(); subs.push(sub(B, 'MRR'), sub(B, 'Scaling'), r43Sub('Reliability', cw ? cw.f : null, cw ? cw.ok+' of '+cw.n+' client weeks done before they started' : 'Client weeks done before they start')); }
+      if(r43ContentOn()) subs.push(sub(B, 'Content'));
+    } else if(a.id==='health'){
+      subs.push(sub(Hh, 'Training'), sub(Hh, 'Diet'), sub(Hh, 'Weight'));
+      const bm = r43BedMins(), bed = state.profile.xpBed || {};
+      if(bm!=null){ let n = 0, on = 0; for(let i = 1; i <= 14; i++){ const d = addDays(today, -i); if(bed[d]!=null){ n++; if(bed[d] <= bm) on++; } } subs.push(r43Sub('Sleep', n ? on/14 : null, n ? on+' of the last 14 nights in bed by '+state.profile.bedtime : 'Press Goodnight (Sleep mode) at bedtime and it counts')); }
+    } else if(a.id==='personal'){
+      subs.push(sub(Pp, 'Mind'), sub(Pp, 'Goals'), sub(Pp, 'Finances'));
+      let jd = 0, hd = 0; const R = ctx.r43; for(let i = 0; i < 14; i++){ const d = addDays(today, -i); if(R.journal[d]) jd++; if(R.habit[d]) hd++; }
+      const hasHabit = (function(){ try{ return !!(periodRec('month', monthKey()) || {}).habit; }catch(e){ return false; } })();
+      const anyJ = Object.keys(R.journal).length > 0;
+      subs.push(r43Sub('Consistency', anyJ || hasHabit ? r43Mix([anyJ ? jd/10 : null, hasHabit ? hd/12 : null]) : null, (anyJ ? jd+' journal days' : 'no journal yet')+(hasHabit ? ' · habit kept '+hd+' of 14 days' : '')+' (last 14 days)'));
+      const ct = state.standards.contentTargets || {}, pc = sub(Pp, 'Content');
+      if((ct.personal && ct.personal.n) || state.tasks.items.some(function(t){ return t.isVideoIdea && contentRoleOf(t)==='personal'; })) subs.push(pc);
+    } else {
+      const R = ctx.r43, hs = r43Habits(a); let kept = 0, mins = 0;
+      for(let i = 0; i < 14; i++){ const d = addDays(today, -i); kept += Math.min(hs.length, (R.ah[d] || {})[a.id] || 0); mins += (R.as[d] || {})[a.id] || 0; }
+      const cf = r43Mix([hs.length ? kept/(hs.length*12) : null, mins ? Math.min(1, mins/(14*30)) : null]);
+      const dl = r43ByDeadline(a.id), gs = arr(state.goals.items).filter(function(g){ return g.tier && r43GoalArea(g)===a.id && (g.done || g.missed || (g.pk && periodEnd(g.tier, g.pk) < today)); });
+      subs.push(r43Sub('Consistency', cf, (hs.length ? kept+' habit days' : 'no habits yet')+' · '+fmtDurationLabel(Math.round(mins))+' logged (14 days)'),
+        r43Sub('Deadlines', dl ? dl.f : null, dl ? dl.on+' of '+dl.n+' deadlines met' : 'Tasks with a deadline count'),
+        r43Sub('Goals', gs.length ? gs.filter(function(g){ return g.done; }).length/gs.length : null, gs.length ? gs.filter(function(g){ return g.done; }).length+' of '+gs.length+' goals hit' : 'Goals tagged to '+a.name+' count'));
+    }
+    subs = subs.filter(Boolean);
+    const f = r43Mix(subs.map(r43F));
+    let v = f==null ? 25 : rate99(f), cap = null, capped = false;
+    if(a.id==='health'){ cap = base.HLT.cap || null; if(cap!=null && v > cap){ v = cap; capped = true; } }
+    if(a.id==='work' && base.BUS.supercharged) v = Math.min(99, v + 4);
+    out.push({id:a.id, name:a.name, short:r43AreaShort(a.id), v:v, subs:subs, color:r43AreaColor(a.id), cap:cap, capped:capped, empty:f==null, body:a.id==='health' ? base.HLT.body : null});
+  });
+  return out;
+}
+xpAttributes = (function(base){
+  return function(ctx){
+    const b = base.apply(this, arguments), areas = r43AreaRatings(ctx, b);
+    const avg = areas.length ? areas.reduce(function(s, a){ return s + a.v; }, 0)/areas.length : 25;
+    const ovr = areas.length && areas.every(function(a){ return a.v >= 100; }) ? 100 : Math.min(99, Math.floor(avg));
+    const find = function(id){ return areas.find(function(a){ return a.id===id; }); };
+    const asAttr = function(a, fall){ return a ? {name:a.name, short:a.short, v:a.v, subs:a.subs, color:a.color, cap:a.cap, capped:a.capped, body:a.body} : fall; };
+    const out = {areas:areas, OVR:ovr, low:areas.length ? Math.min.apply(null, areas.map(function(a){ return a.v; })) : 25,
+      BUS:asAttr(find('work'), b.BUS), PER:asAttr(find('personal'), b.PER), HLT:asAttr(find('health'), b.HLT)};
+    out.DIS = {name:'Overall', short:'OVR', v:ovr, subs:[], color:'#8fd3ff'};
+    return out;
+  };
+})(xpAttributes);
+
+// ---- the summary: XP, level, rank ----
+xpSummaryFresh = function(){
+  const start = xpStart(), p = state.profile;
+  if(p.xpBook!==43 && typeof p.xpLevel!=='number'){ p.xpBook = 43; persist('profile'); }   // new here: nothing to switch over
+  const sig = xpSig(); if(sig!==xpCache.sig){ xpCache = {sig:sig, days:{}}; r43Cache = {sig:sig, raw:{}}; }
+  r43EarlyScan();
+  const ctx = xpCtx(), today = todayStr(), ws = startOfWeekStr(today);
+  let daily = 0, week = 0; const byArea = {}, areaWeek = {};
+  for(let d = start; d <= today; d = addDays(d, 1)){
+    let items = d===today ? null : xpCache.days[d];
+    if(!items){ items = xpDay(d, ctx); if(d!==today) xpCache.days[d] = items; }
+    items.forEach(function(x){ daily += x.xp; byArea[x.a || 'all'] = (byArea[x.a || 'all']||0) + x.xp; if(d >= ws){ week += x.xp; areaWeek[x.a || 'all'] = (areaWeek[x.a || 'all']||0) + x.xp; } });
+  }
+  const one = r43OneOffs(), gl = r43GoalLines(), ms = xpMaster(ctx);
+  r43AutoRaise();
+  const clientXp = one.events.reduce(function(a, e){ return a + e.xp; }, 0);
+  const goalLineXp = gl.reduce(function(a, e){ return a + e.xp; }, 0);
+  const demo = typeof DEMO_ON!=='undefined' && DEMO_ON && p.demoXp ? Math.max(0, Number(p.demoXp) || 0) : 0;
+  const goalXp = goalLineXp + ms.xp + demo;
+  gl.forEach(function(e){ if(e.d >= ws) week += e.xp; });
+  const total = Math.max(0, Math.round(daily + clientXp + one.mrrXp + one.followerXp + goalXp));
+  const todayItems = xpDay(today, ctx), raw = r43RawOf(today, ctx);
+  const attrs = xpAttributes(ctx);
+  // the level: claimed with the button. XP that was marked wrong takes it back down, with a notice.
+  const earned = xpLevelOf(total);
+  let level = Math.min(LEVEL_MAX, xpClaimedLevel(earned, one.mrr, attrs.HLT ? attrs.HLT.v : 25));
+  if(p.xpBook===43 && level > earned && total < xpForLevel(level)){ const from = level; level = p.xpLevel = earned; if(p.xpSeen) p.xpSeen.level = earned; persist('profile'); r43LevelDropped(from, earned); }
+  const maxed = level >= LEVEL_MAX, lo = xpForLevel(level), hi = maxed ? lo : xpForLevel(level + 1);
+  const pct = maxed ? 1 : Math.max(0, Math.min(1, (total - lo)/(hi - lo)));
+  // rank: the level and every area's rating (the lowest one), plus MRR on the Clients track
+  const track = r43ClientsTrack();
+  let rank = 0; RANKS.forEach(function(r, i){ if(level >= r.level && attrs.low >= r.low && (!track || one.mrr >= r.mrr)) rank = i; });
+  const next = RANKS[rank + 1] || null;
+  const weakest = attrs.areas.slice().sort(function(a, b){ return a.v - b.v; })[0];
+  const needs = next ? [level < next.level ? 'level '+next.level : '', attrs.low < next.low ? (weakest ? weakest.name : 'every area')+' at '+next.low : '', track && one.mrr < next.mrr ? money(next.mrr)+' MRR' : ''].filter(Boolean) : [];
+  const x = {total:total, week:Math.round(week), today:todayItems, todayXp:todayItems.reduce(function(a, i){ return a + i.xp; }, 0), todayArea:raw.area, byArea:byArea, areaWeek:areaWeek,
+    mrr:one.mrr, mrrBase:one.mrrBase, mrrBest:one.mrrBest, mrrXp:one.mrrXp, clientXp:clientXp, won:one.events.length, start:start, goalXp:goalXp, goalLines:gl, oneOffs:one.events,
+    goals:{counted:0, pending:0, xp:goalLineXp}, ownGoalXp:goalLineXp, checkins:{xp:0, parts:{}}, master:ms, followers:one.followers, followerXp:one.followerXp,
+    level:level, earned:earned, levelLo:lo, levelHi:hi, levelPct:pct, banked:Math.max(0, total - hi), canLevel:!maxed && total >= hi, blocked:[], gate:null, maxed:maxed,
+    rank:rank, next:next, needs:needs, attrs:attrs, ovr:attrs.OVR};
+  r43TrackSources(x);
+  return x;
+};
+
+// ---- when XP comes back off: a minus line in the history, and the level follows ----
+function r43Sources(x){
+  const s = {};
+  Object.keys(x.byArea).forEach(function(a){ s['area:'+a] = x.byArea[a]; });
+  s.clients = x.clientXp; s.goals = x.goalXp;
+  return s;
+}
+const R43_SRC_NAMES = {clients:'Clients', goals:'Goals and check-ins', 'area:all':'Balance and streak bonus'};
+function r43TrackSources(x){
+  const p = state.profile, now = r43Sources(x), prev = ui.r43Src;
+  ui.r43Src = now;
+  if(!prev || p.xpBook!==43 || ui.r43SrcHold){ ui.r43SrcHold = false; return; }
+  const lost = [];
+  Object.keys(prev).forEach(function(k){ const d = (prev[k]||0) - (now[k]||0); if(d > 0) lost.push({k:k, xp:d}); });
+  if(!lost.length) return;
+  const list = p.xpMinus = arr(p.xpMinus);
+  lost.forEach(function(l){ list.push({d:todayStr(), at:Date.now(), why:'Taken back: '+(R43_SRC_NAMES[l.k] || (l.k.indexOf('area:')===0 ? r43AreaName(l.k.slice(5)) : l.k))+' (something was removed or un-ticked)', xp:-Math.round(l.xp)}); });
+  if(list.length > 120) list.splice(0, list.length - 120);
+  persist('profile');
+}
+function r43LevelDropped(from, to){
+  const p = state.profile; p.xpDrops = arr(p.xpDrops); p.xpDrops.push({at:Date.now(), from:from, to:to});
+  setTimeout(function(){ if(typeof sysNote==='function') sysNote('Level '+from+' → '+to+'. XP that was marked wrong came off (see your XP history).'); }, 400);
+}
+
+// rank holds for 30 days below its line, then follows
+xpSummary = (function(base){
+  return function(){
+    const x = base.apply(this, arguments); if(!x || !state.profile) return x;
+    const p = state.profile, earned = x._rankEarned!=null ? x._rankEarned : x.rank;
+    if(p.rankClaimed!=null && earned < p.rankClaimed){
+      if(!p.rankBelowSince){ p.rankBelowSince = todayStr(); persist('profile'); }
+      const days = Math.round((new Date(todayStr()+'T12:00') - new Date(p.rankBelowSince+'T12:00'))/86400000);
+      if(days >= 30){ p.rankClaimed = earned; p.rankBelowSince = null; persist('profile'); x.rank = earned; }
+      else { x.rank = p.rankClaimed; x.rankSlipping = 30 - days; }
+    } else if(p.rankBelowSince){ p.rankBelowSince = null; persist('profile'); }
+    return x;
+  };
+})(xpSummary);
+
+// ---- going to sleep is the goodnight: it's when you were in bed ----
+function r43MarkBed(){
+  const now = new Date(), p = state.profile; let m = now.getHours()*60 + now.getMinutes(), d = todayStr();
+  if(m < 300){ m += 1440; d = addDays(d, -1); }
+  p.xpBed = p.xpBed && typeof p.xpBed==='object' ? p.xpBed : {};
+  if(p.xpBed[d]==null || m < p.xpBed[d]) p.xpBed[d] = m;
+  const keys = Object.keys(p.xpBed).sort(); if(keys.length > 120) keys.slice(0, keys.length - 120).forEach(function(k){ delete p.xpBed[k]; });
+  persist('profile');
+}
+if(ACTIONS.startSleepMode) ACTIONS.startSleepMode = (function(base){ return function(){ const was = !!(state.modes.active && state.modes.active.sleep); const r = base.apply(this, arguments); try{ if(!was && state.modes.active && state.modes.active.sleep) r43MarkBed(); }catch(e){} return r; }; })(ACTIONS.startSleepMode);
+
+// ---- the month's habit, kept today (+30) ----
+ACTIONS.r43HabitToday = function(){
+  const k = monthKey(), store = intentStore().months, rec = store[k] = store[k] || {at:Date.now()};
+  rec.habitDays = rec.habitDays && typeof rec.habitDays==='object' ? rec.habitDays : {};
+  const d = todayStr(); if(rec.habitDays[d]) delete rec.habitDays[d]; else rec.habitDays[d] = 1;
+  persist('journal'); xpLast = null; playTick(); renderView();
+  if(rec.habitDays[d]) xpToast(XP_BOOK.personal.habit, 'Habit kept.');
+};
+// ---- the weekly money check-in (+75) ----
+ACTIONS.r43MoneyCheckin = function(){
+  const f = state.finances; f.checkins = arr(f.checkins);
+  const ws = startOfWeekStr(todayStr());
+  if(f.checkins.some(function(c){ const d = typeof c==='string' ? c : c.date; return d >= ws; })){ showToast('Already checked in on your money this week.', {icon:'&#128181;'}); return; }
+  f.checkins.push({date:todayStr(), at:Date.now()}); persist('finances'); xpLast = null; playPositive(); renderView();
+  xpToast(XP_BOOK.personal.money, 'Money check-in.');
+};
+
+// ---- areas you added: their habits and their timer ----
+ACTIONS.r43AreaHabit = function(el, e, id){
+  const parts = String(id).split(':'), a = r43Area(parts[0]); if(!a) return;
+  const h = arr(a.habits).find(function(x){ return x.id===parts[1]; }); if(!h) return;
+  h.days = h.days && typeof h.days==='object' ? h.days : {}; const d = todayStr();
+  if(h.days[d]) delete h.days[d]; else h.days[d] = 1;
+  persist('profile'); xpLast = null; playTick(); renderView();
+  if(h.days[d]) xpToast(XP_BOOK.added.habit, h.label+'.');
+};
+ACTIONS.r43AreaTimer = function(el, e, id){
+  const L = r43Store();
+  if(L.timer && L.timer.area===id){
+    const mins = Math.round((Date.now() - L.timer.start)/60000);
+    if(mins >= 1) L.sessions.push({id:uid(), area:id, date:todayStr(new Date(L.timer.start)), minutes:mins});
+    L.timer = null; persist('personal'); xpLast = null; playPositive(); renderView();
+    if(mins >= 1) xpToast(Math.round(mins/60*XP_BOOK.added.session), fmtDurationLabel(mins)+' of '+r43AreaName(id)+'.');
+    return;
+  }
+  if(L.timer){ showToast('Stop '+r43AreaName(L.timer.area)+' first.', {icon:'&#9201;'}); return; }
+  L.timer = {area:id, start:Date.now()}; persist('personal'); playTick(); renderView();
+};
+setInterval(function(){ const L = state && state.personal && state.personal.areaLog; if(!L || !L.timer) return; document.querySelectorAll('[data-r43-tick]').forEach(function(el){ el.textContent = fmtDurationLabel(Math.max(0, Math.floor((Date.now() - L.timer.start)/60000))); }); }, 20000);
+
+// ---- the task sheet: which area a task counts toward ----
+function r43AreaPickHtml(cur, auto, kind){
+  const areas = r43Areas(); if(areas.length < 2) return '';
+  return '<div class="field r43-area-f"><label>Area</label><div class="r43-area-seg" data-kind="'+kind+'">'+
+    '<button type="button" class="'+(!cur ? 'is-on' : '')+'" data-action="r43PickArea" data-id="'+kind+':">Auto · '+escapeHtml(r43AreaName(auto))+'</button>'+
+    areas.map(function(a){ return '<button type="button" class="'+(cur===a.id ? 'is-on' : '')+'" style="--ac:'+r43AreaColor(a.id)+'" data-action="r43PickArea" data-id="'+kind+':'+a.id+'"><i></i>'+escapeHtml(a.name)+'</button>'; }).join('')+
+  '</div></div>';
+}
+ACTIONS.r43PickArea = function(el, e, id){
+  const i = String(id).indexOf(':'), kind = id.slice(0, i), v = id.slice(i + 1) || null;
+  if(kind==='add') ui.r43NewArea = v; else ui.r43EditArea = v || '';
+  const seg = el && el.closest('.r43-area-seg'); if(seg) seg.querySelectorAll('button').forEach(function(b){ b.classList.toggle('is-on', b===el); });
+};
+r41TaskSheet = (function(base){
+  return function(h, kind, t){
+    let out = base.apply(this, arguments); if(!out) return out;
+    const auto = kind==='edit' && t ? r43TaskAreaAuto(t) : (function(){ const cs = arr(ui.newTaskClients); return cs.some(function(c){ return c && c!=='personal' && c!=='general'; }) ? 'work' : 'personal'; })();
+    const cur = kind==='edit' && t ? (ui.r43EditArea!=null ? ui.r43EditArea || null : t.area || null) : ui.r43NewArea || null;
+    const pick = r43AreaPickHtml(cur, auto, kind);
+    if(pick) out = out.replace('<div class="r41-ts-row">', pick+'<div class="r41-ts-row">');
+    return out;
+  };
+})(r41TaskSheet);
+openAddTaskModal = (function(base){ return function(){ ui.r43NewArea = null; return base.apply(this, arguments); }; })(openAddTaskModal);
+openTaskEditModal = (function(base){ return function(){ ui.r43EditArea = null; return base.apply(this, arguments); }; })(openTaskEditModal);
+addTask = (function(base){
+  return function(){
+    const n = state.tasks.items.length, r = base.apply(this, arguments);
+    if(state.tasks.items.length > n && ui.r43NewArea){ state.tasks.items[state.tasks.items.length - 1].area = ui.r43NewArea; persist('tasks'); }
+    ui.r43NewArea = null; return r;
+  };
+})(addTask);
+saveEditTask = (function(base){
+  return function(id){
+    const t = state.tasks.items.find(function(x){ return x.id===id; }), v = ui.r43EditArea;
+    const r = base.apply(this, arguments);
+    if(t && v!=null){ if(v) t.area = v; else delete t.area; persist('tasks'); }
+    ui.r43EditArea = null; return r;
+  };
+})(saveEditTask);
+// ============ ROUND 43 (build 3b): YOUR AREAS, THE CARD, REWARDS, THE SWITCH-OVER AND THE GUIDE ============
+
+// ---- the card: one rating per area, and the Overall ----
+function r43AttrSpans(x, cls){
+  return x.attrs.areas.map(function(a){ return '<span style="--ac:'+a.color+'"><b>'+a.v+'</b><small>'+escapeHtml(a.short)+'</small>'+(cls==='lp' ? '<i><u style="width:'+((a.v-25)/75*100).toFixed(0)+'%"></u></i>' : '')+'</span>'; }).join('');
+}
+function r43SwapAttrs(h, sel, x, cls){
+  if(!h || h.indexOf(sel.slice(1))<0) return h;
+  const tpl = document.createElement('template'); tpl.innerHTML = h;
+  tpl.content.querySelectorAll(sel).forEach(function(el){ el.innerHTML = r43AttrSpans(x, cls); el.style.setProperty('--n', x.attrs.areas.length); el.classList.add('r43-attrs'); });
+  return tpl.innerHTML;
+}
+playerCardHtml = (function(base){ return function(){ return r43SwapAttrs(base.apply(this, arguments), '.pc-attrs', xpSummary()); }; })(playerCardHtml);
+playerCardMiniHtml = (function(base){ return function(){ return r43SwapAttrs(base.apply(this, arguments), '.pc-attrs', xpSummary()); }; })(playerCardMiniHtml);
+lvlPopHtml = (function(base){
+  return function(){
+    let h = r43SwapAttrs(base.apply(this, arguments), '.lp-attrs', xpSummary(), 'lp');
+    const rw = r43NextRewardHtml(); if(rw) h = h.replace('<div class="lp-stats">', rw+'<div class="lp-stats">');
+    return h;
+  };
+})(lvlPopHtml);
+// You: the area ratings, today by area, your areas' habits and timers, the next reward
+renderYouTab = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), x = xpSummary();
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const grid = tpl.content.querySelector('.you-attrs');
+    if(grid){ grid.innerHTML = x.attrs.areas.map(r43AttrCardHtml).join(''); grid.classList.add('r43-you-attrs'); grid.style.setProperty('--n', x.attrs.areas.length); grid.insertAdjacentHTML('beforebegin', r43TodayAreasHtml(x)); }
+    const bar = tpl.content.querySelector('.you-xpbar'); if(bar){ const rw = r43NextRewardHtml(); if(rw) bar.insertAdjacentHTML('afterend', rw); }
+    return tpl.innerHTML;
+  };
+})(renderYouTab);
+function r43AttrCardHtml(a){
+  return '<div class="you-attr" style="--ac:'+a.color+'"><div class="you-attr-h"><b>'+a.v+'</b><span>'+escapeHtml(a.name)+'</span>'+
+      (a.cap ? '<em class="you-cap'+(a.capped ? ' is-hit' : '')+'" title="At your weight this tops out at '+a.cap+'. It rises as the weight comes down.">max '+a.cap+'</em>' : '')+'</div>'+
+    (a.subs.length ? a.subs.map(function(s){ const v = s.v==null ? 25 : s.v; return '<div class="you-sub'+(s.v==null ? ' is-empty' : '')+(s.label==='Mind' ? ' is-link" data-action="openInspire' : '')+'" title="'+escapeHtml(s.note)+'"><span>'+escapeHtml(s.label)+'</span><i><u style="width:'+((v-25)/75*100).toFixed(0)+'%"></u></i><b>'+(s.v==null ? '–' : s.v)+'</b></div>'; }).join('') : '<div class="you-sub is-empty"><span>Tag tasks, habits and goals to '+escapeHtml(a.name)+' and it fills in</span></div>')+
+  '</div>';
+}
+function r43TodayAreasHtml(x){
+  const areas = r43Areas(), L = r43Store(), d = todayStr();
+  return '<section class="r43-today"><div class="r43-today-h"><b>Today, by area</b><small>'+(x.todayXp ? '+'+x.todayXp.toLocaleString()+' XP' : 'Nothing yet')+'</small></div><div class="r43-today-g" style="--n:'+areas.length+'">'+
+    areas.map(function(a){
+      const v = Math.round((x.todayArea || {})[a.id] || 0), touch = a.id==='work' ? XP_BOOK.work.touch : XP_BOOK.personal.touch, ok = v >= touch || (a.id==='work' && isDayOff(d));
+      const extra = r43Builtin(a.id) ? '' :
+        r43Habits(a).map(function(hb){ const on = !!(hb.days && hb.days[d]); return '<button class="r43-hb'+(on ? ' is-on' : '')+'" data-action="r43AreaHabit" data-id="'+a.id+':'+hb.id+'">'+(on ? '&#10003; ' : '')+escapeHtml(hb.label)+'</button>'; }).join('')+
+        '<button class="r43-tm'+(L.timer && L.timer.area===a.id ? ' is-on' : '')+'" data-action="r43AreaTimer" data-id="'+a.id+'">'+(L.timer && L.timer.area===a.id ? '&#9632; Stop · <span data-r43-tick>'+fmtDurationLabel(Math.max(0, Math.floor((Date.now() - L.timer.start)/60000)))+'</span>' : '&#9654; Start a session')+'</button>';
+      return '<div class="r43-ta'+(ok ? ' is-ok' : '')+'" style="--ac:'+r43AreaColor(a.id)+'"><div class="r43-ta-h"><span>'+escapeHtml(a.name)+'</span><b>+'+v.toLocaleString()+'</b></div><i><u style="width:'+Math.min(100, v/touch*100).toFixed(0)+'%"></u></i>'+(extra ? '<div class="r43-ta-x">'+extra+'</div>' : '')+'</div>';
+    }).join('')+'</div></section>';
+}
+
+// ---- rewards you set: "Level 10: new headphones" ----
+function r43Rewards(){ const p = state.profile; p.xpRewards = arr(p.xpRewards); return p.xpRewards; }
+function r43NextRewardHtml(){
+  const x = xpSummary(), rw = r43Rewards();
+  const open = rw.filter(function(r){ return r.unlockedAt && !r.claimed; })[0];
+  if(open) return '<div class="r43-rw is-open"><span>&#127873; Unlocked: <b>'+escapeHtml(r43RwText(open))+'</b></span><button data-action="r43RewardClaim" data-id="'+open.id+'">I got it</button></div>';
+  const next = rw.filter(function(r){ return !r.unlockedAt && Number(r.level) > x.level; }).sort(function(a, b){ return a.level - b.level; })[0];
+  return next ? '<div class="r43-rw"><span>&#127873; Level '+next.level+': <b>'+escapeHtml(next.text)+'</b></span><small>'+(xpForLevel(next.level) - x.total > 0 ? (xpForLevel(next.level) - x.total).toLocaleString()+' XP away' : 'ready when you level up')+'</small></div>' : '';
+}
+function r43RwText(r){ return 'Level '+r.level+': '+r.text; }
+ACTIONS.r43RewardClaim = function(el, e, id){ const r = r43Rewards().find(function(x){ return x.id===id; }); if(!r) return; r.claimed = todayStr(); persist('profile'); playPositive(); renderView(); showToast('Enjoy it. You earned it.', {icon:'&#127873;'}); };
+ACTIONS.r43RewardAdd = async function(){
+  const lv = await uiAsk({title:'A reward for a level', text:'Which level?', value:String(xpSummary().level + 5), ok:'Next'}); if(lv==null) return;
+  const L = Math.max(1, Math.min(XP_BOOK.level.max, Math.round(Number(lv)||0))); if(!L) return;
+  const txt = await uiAsk({title:'Level '+L+' reward', text:'What do you get when you reach it?', placeholder:'e.g. New headphones', ok:'Add reward'}); if(!txt || !String(txt).trim()) return;
+  r43Rewards().push({id:uid(), level:L, text:String(txt).trim().slice(0, 80), unlockedAt:xpSummary().level >= L ? todayStr() : null, claimed:null});
+  persist('profile'); renderView();
+};
+ACTIONS.r43RewardRemove = function(el, e, id){ const p = state.profile; p.xpRewards = r43Rewards().filter(function(r){ return r.id!==id; }); persist('profile'); renderView(); };
+ACTIONS.levelUp = (function(base){
+  return function(){
+    const r = base.apply(this, arguments), L = state.profile.xpLevel;
+    const got = r43Rewards().filter(function(x){ return !x.unlockedAt && Number(x.level) <= L; });
+    if(got.length){ got.forEach(function(x){ x.unlockedAt = todayStr(); }); persist('profile'); setTimeout(function(){ r43RewardFx(got[0]); }, 4200); }
+    return r;
+  };
+})(ACTIONS.levelUp);
+function r43RewardFx(rw){
+  const old = document.getElementById('r43RwFx'); if(old) old.remove();
+  const d = document.createElement('div'); d.id = 'r43RwFx'; d.className = 'r43-rwfx';
+  d.innerHTML = '<div class="r43-rwfx-c"><div class="r43-rwfx-k">REWARD UNLOCKED</div><div class="r43-rwfx-i">&#127873;</div><div class="r43-rwfx-t">'+escapeHtml(rw.text)+'</div><small>Level '+rw.level+'</small><div class="r43-rwfx-a"><button data-action="r43RewardFxClose">Later</button><button class="is-go" data-action="r43RewardClaim" data-id="'+rw.id+'">I got it</button></div></div>';
+  document.body.appendChild(d); requestAnimationFrame(function(){ d.classList.add('is-in'); });
+  if(typeof tone==='function'){ tone([523, 659, 784], 0.6, 0.16); setTimeout(function(){ tone([784, 1047], 0.9, 0.16); }, 260); }
+}
+ACTIONS.r43RewardFxClose = function(){ const d = document.getElementById('r43RwFx'); if(d){ d.classList.remove('is-in'); setTimeout(function(){ d.remove(); }, 300); } };
+document.addEventListener('click', function(e){ const b = e.target.closest && e.target.closest('#r43RwFx [data-action="r43RewardClaim"]'); if(b) setTimeout(ACTIONS.r43RewardFxClose, 50); });
+
+// ---- the one-time switch-over: every day recounted under the book, shown before it's applied ----
+function r43RebalanceNeeded(){ const p = state && state.profile; return !!(p && p.xpBook!==43 && typeof p.xpLevel==='number'); }
+afterRenderHooks.push(function(){
+  if(!r43RebalanceNeeded() || document.getElementById('r43Rebal') || ui.r43RebalLater) return;
+  const p = state.profile; xpLast = null; const x = xpSummary();
+  const oldT = Number((p.xpSeen && p.xpSeen.total) || 0), oldL = p.xpLevel, newL = x.earned;
+  const d = document.createElement('div'); d.id = 'r43Rebal'; d.className = 'overlay r43-rb';
+  d.innerHTML = '<div class="r43-rb-c"><div class="r43-rb-k">[ SYSTEM ] · XP, rebuilt</div><h2>The new XP book</h2>'+
+    '<p>XP now comes evenly from every area you track, balanced days pay more, and levels cost less. Every day since '+fmtDateShort(xpStart())+' was recounted under the new rules. Nothing changes until you press the button.</p>'+
+    '<div class="r43-rb-g"><div><small>Total XP</small><span>'+oldT.toLocaleString()+'</span><i>&rarr;</i><b>'+x.total.toLocaleString()+'</b></div><div><small>Level</small><span>'+oldL+'</span><i>&rarr;</i><b>'+newL+'</b></div></div>'+
+    '<p class="r43-rb-n">After this, your level only goes down if XP was marked wrong (a goal deleted, something un-ticked).</p>'+
+    '<div class="r43-rb-a"><button data-action="r43RebalLater">Later</button><button class="is-go" data-action="r43RebalApply">Switch over</button></div></div>';
+  document.body.appendChild(d);
+});
+ACTIONS.r43RebalLater = function(){ ui.r43RebalLater = true; const d = document.getElementById('r43Rebal'); if(d) d.remove(); };
+ACTIONS.r43RebalApply = function(){
+  const p = state.profile; xpLast = null; const x = xpSummary();
+  p.xpLevel = x.earned; p.xpBook = 43; p.xpReadyFor = null; p.rankClaimed = null; p.rankBelowSince = null;
+  p.xpSeen = {total:x.total, level:x.earned, init:1};
+  persist('profile'); xpLast = null; ui.r43SrcHold = true;
+  const d = document.getElementById('r43Rebal'); if(d) d.remove();
+  renderView(); showToast('Switched over. Level '+x.earned+'.', {icon:'&#9889;'});
+};
+// (rank and level ceremonies don't fire for the switch itself)
+afterRenderHooks.push(function(){ if(ui.r43SrcHold && state.profile.xpBook===43){ const x = xpSummary(); state.profile.rankReadyFor = x.rankReady || null; } });
+
+// ---- Settings → XP & Areas ----
+function r43SettingsHtml(){
+  const p = state.profile, raw = r43AreasRaw(), onN = r43Areas().length, rw = r43Rewards().slice().sort(function(a, b){ return a.level - b.level; });
+  return '<div class="r43-set">'+
+    '<div class="section-title">Your areas</div><p class="r43-set-p">What XP and your card are built on. Each area you track should earn about the same in a strong week, and a day that touches all of them pays more. Up to '+XP_BOOK.areas.max+' in all.</p>'+
+    '<div class="r43-areas">'+raw.map(function(a){
+      const on = a.on!==false;
+      return '<div class="r43-ar'+(on ? '' : ' is-off')+'" style="--ac:'+r43AreaColor(a.id)+'"><i></i><input class="input r43-ar-n" data-r43-area="'+a.id+'" value="'+escapeHtml(a.name)+'" maxlength="20">'+
+        '<small>'+(a.id==='work' ? 'Deep work, tasks'+(r43ClientsOn() ? ', clients' : '')+(r43ContentOn() ? ', content' : '') : a.id==='health' ? 'Workouts, food, weigh-ins, sleep' : a.id==='personal' ? 'Journal, inspiration, skills, money, the habit' : 'Tasks, habits and sessions you tag to it')+'</small>'+
+        '<button class="r43-sw'+(on ? ' is-on' : '')+'" role="switch" aria-checked="'+on+'" data-action="r43AreaToggle" data-id="'+a.id+'"'+(on && onN <= 1 ? ' disabled' : '')+'><span></span></button>'+
+        (r43Builtin(a.id) ? '' : '<button class="r43-ar-x" data-action="r43AreaRemove" data-id="'+a.id+'" title="Remove">&#10005;</button>')+
+        (r43Builtin(a.id) || !on ? '' : '<div class="r43-ar-h">'+r43Habits(a).map(function(h){ return '<span>'+escapeHtml(h.label)+'<button data-action="r43HabitRemove" data-id="'+a.id+':'+h.id+'">&#10005;</button></span>'; }).join('')+(r43Habits(a).length < XP_BOOK.added.habitMax ? '<button class="r43-ar-hadd" data-action="r43HabitAdd" data-id="'+a.id+'">+ Habit</button>' : '')+'</div>')+
+      '</div>';
+    }).join('')+'</div>'+
+    (raw.length < XP_BOOK.areas.max ? '<button class="btn btn-ghost btn-sm" data-action="r43AreaAdd">+ Add an area</button>' : '')+
+    '<div class="section-title" style="margin-top:22px">Sleep</div>'+
+    '<div class="field"><label>Your bedtime</label><input class="input" type="time" id="r43Bedtime" value="'+escapeHtml(p.bedtime || '')+'"><small class="r43-set-s">Going to Sleep mode by then counts as in bed on time (+'+XP_BOOK.health.bed+' XP).</small></div>'+
+    (r43ClientsOn() ? '<div class="section-title" style="margin-top:22px">Ranks</div><label class="r43-chk"><button class="r43-sw'+(p.rankClientsTrack ? ' is-on' : '')+'" role="switch" aria-checked="'+!!p.rankClientsTrack+'" data-action="r43TrackToggle"><span></span></button><span><b>Clients track</b><small>Each rank also needs the MRR it lists, and the top two are named Mogul and Millionaire.</small></span></label>' : '')+
+    '<div class="section-title" style="margin-top:22px">Rewards</div><p class="r43-set-p">Give yourself something for reaching a level. It unlocks when you press Level up.</p>'+
+    (rw.length ? '<div class="r43-rws">'+rw.map(function(r){ return '<div class="r43-rwr'+(r.claimed ? ' is-claimed' : r.unlockedAt ? ' is-open' : '')+'"><b>Level '+r.level+'</b><span>'+escapeHtml(r.text)+'</span><small>'+(r.claimed ? 'Claimed' : r.unlockedAt ? 'Unlocked' : 'Locked')+'</small><button data-action="r43RewardRemove" data-id="'+r.id+'">&#10005;</button></div>'; }).join('')+'</div>' : '')+
+    '<button class="btn btn-ghost btn-sm" data-action="r43RewardAdd">+ Add a reward</button>'+
+    '<div class="r43-set-f"><button class="btn btn-ghost btn-sm" data-action="openXpHow">How XP works</button></div>'+
+  '</div>';
+}
+renderSettings = (function(base){
+  return function(){
+    const want = ui.settingsTab==='xp';
+    if(want) ui.settingsTab = 'standards';
+    let h = base.apply(this, arguments);
+    if(want){
+      ui.settingsTab = 'xp';
+      h = h.replace(/<div class="settings-content tab-panel" data-key="settings-[^"]*">[\s\S]*<\/div>\s*<\/div>\s*$/, '<div class="settings-content tab-panel" data-key="settings-xp">'+r43SettingsHtml()+'</div></div>')
+           .replace(/(<button class="settings-nav-item) active(")/, '$1$2');
+    }
+    return h.replace(/(<button class="settings-nav-item[^"]*" data-action="settingsTab" data-tab="standards">[\s\S]*?<\/button>)/, '$1<button class="settings-nav-item'+(want ? ' active' : '')+'" data-action="settingsTab" data-tab="xp"><span style="margin-right:8px;">&#9889;</span>XP &amp; Areas</button>');
+  };
+})(renderSettings);
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t) return;
+  if(t.dataset && t.dataset.r43Area){ const a = r43Area(t.dataset.r43Area); const v = t.value.trim().slice(0, 20); if(a && v){ a.name = v; persist('profile'); xpLast = null; renderView(); } }
+  if(t.id==='r43Bedtime'){ state.profile.bedtime = t.value || null; persist('profile'); xpLast = null; }
+});
+ACTIONS.r43AreaToggle = function(el, e, id){
+  const a = r43Area(id); if(!a) return; const d = todayStr(); a.offs = arr(a.offs);
+  if(a.on!==false){ if(r43Areas().length <= 1) return; a.on = false; a.offs.push([addDays(d, 1), null]); }   // (today still counts)
+  else { a.on = true; const o = a.offs[a.offs.length - 1]; if(o && !o[1]){ if(o[0] > d) a.offs.pop(); else o[1] = d; } }
+  persist('profile'); xpLast = null; renderView();
+};
+ACTIONS.r43AreaAdd = async function(){
+  if(r43AreasRaw().length >= XP_BOOK.areas.max) return;
+  const n = await uiAsk({title:'A new area', text:'What else do you want to track?', placeholder:'e.g. Family, Faith, Music, Basketball', ok:'Add area'}); if(!n || !String(n).trim()) return;
+  r43AreasRaw().push({id:'a'+uid().slice(0, 6), name:String(n).trim().slice(0, 20), on:true, since:todayStr(), habits:[]});
+  persist('profile'); xpLast = null; renderView();
+};
+ACTIONS.r43AreaRemove = async function(el, e, id){
+  const a = r43Area(id); if(!a || r43Builtin(id)) return;
+  if(!(await uiConfirm({title:'Remove '+a.name+'?', text:'It stops counting from today. What it already earned stays.', ok:'Remove', danger:true}))) return;
+  a.on = false; a.removed = true; a.offs = arr(a.offs).concat([[addDays(todayStr(), 1), null]]);
+  // (kept, switched off, so its past XP stays on the record; it no longer shows here)
+  persist('profile'); xpLast = null; renderView();
+};
+ACTIONS.r43HabitAdd = async function(el, e, id){
+  const a = r43Area(id); if(!a) return;
+  const n = await uiAsk({title:'A habit for '+a.name, text:'Something you do every day.', placeholder:'e.g. Call my mom, 20 minutes of practice', ok:'Add habit'}); if(!n || !String(n).trim()) return;
+  a.habits = arr(a.habits); if(a.habits.length >= XP_BOOK.added.habitMax) return;
+  a.habits.push({id:uid().slice(0, 8), label:String(n).trim().slice(0, 40), days:{}}); persist('profile'); renderView();
+};
+ACTIONS.r43HabitRemove = function(el, e, id){ const p = String(id).split(':'), a = r43Area(p[0]); if(!a) return; a.habits = arr(a.habits).filter(function(h){ return h.id!==p[1]; }); persist('profile'); xpLast = null; renderView(); };
+ACTIONS.r43TrackToggle = function(){ state.profile.rankClientsTrack = !state.profile.rankClientsTrack; persist('profile'); xpLast = null; renderView(); };
+// (removed areas don't show in Settings, but stay on the record)
+r43SettingsHtml = (function(base){ return function(){ const p = state.profile, all = p.xpAreas; p.xpAreas = arr(all).filter(function(a){ return !a.removed; }); try{ return base.apply(this, arguments); } finally { p.xpAreas = all; } }; })(r43SettingsHtml);
+
+// ---- the history: the book's lines, and what was taken back ----
+xpLedger = function(){
+  const x = xpSummary(), start = xpStart(), p = state.profile, out = [], ongoing = [];
+  x.oneOffs.forEach(function(e){ out.push({d:e.d < start ? start : e.d, why:e.why, xp:e.xp, k:'client'}); });
+  x.goalLines.forEach(function(e){ out.push(e); });
+  const hit = p.xpMasterHit || {};
+  ['mrr', 'weight', 'streak'].forEach(function(key){ arr(hit[key]).forEach(function(t, i){ ongoing.push({why:'Master goal reached: '+(key==='mrr' ? money(t)+' MRR' : key==='weight' ? t+' '+(p.weightUnit==='kg' ? 'kg' : 'lb') : t+' days in a row'), xp:masterXpFor(key, i ? hit[key][i-1] : masterBase(key), t)}); }); });
+  if(x.master && x.master.weeks) ongoing.push({why:x.master.weeks+' week'+(x.master.weeks===1 ? '' : 's')+' you hit a weekly ring', xp:x.master.weeks*MASTER_XP.weekly});
+  if(x.mrrXp) ongoing.push({why:'MRR: best ever '+money(x.mrrBest)+' (from '+money(x.mrrBase)+')', xp:x.mrrXp});
+  if(x.followerXp) ongoing.push({why:x.followers.toLocaleString()+' followers above where you started', xp:x.followerXp});
+  return {events:out, ongoing:ongoing};
+};
+ACTIONS.openXpHistory = (function(base){
+  return function(){
+    base.apply(this, arguments);
+    const c = document.getElementById('xpHowContent'), m = arr(state.profile.xpMinus).slice().reverse(); if(!c || !m.length) return;
+    const sec = c.querySelector('.xpg-sec:last-of-type');
+    const html = '<div class="xpg-sec">Taken back</div><div class="xh-day r43-minus"><div class="xh-items">'+m.slice(0, 20).map(function(i){ return '<div class="xh-i"><span>'+escapeHtml(fmtDateShort(i.d))+' · '+escapeHtml(i.why)+'</span><b class="is-neg">'+i.xp.toLocaleString()+'</b></div>'; }).join('')+'</div></div>';
+    if(sec) sec.insertAdjacentHTML('beforebegin', html); else c.insertAdjacentHTML('beforeend', html);
+  };
+})(ACTIONS.openXpHistory);
+
+// ---- Op grades a goal: a number, nothing else. Yours always wins. ----
+opRateGoal = async function(g){
+  if(g.xpBy==='you') return;
+  const G = XP_BOOK.goals, k = g.tier || (g.life ? 'life' : 'long');
+  let xp = null, tier = k, area = null;
+  try{
+    if(typeof aiWrite==='function'){
+      const areas = r43Areas().map(function(a){ return a.id+' ('+a.name+')'; }).join(', ');
+      const ask = 'Grade this goal for XP in my app. Goal: "'+g.label+'"'+(g.target ? ' (target '+g.target+(g.unit ? ' '+g.unit : '')+(g.current ? ', starting at '+g.current : '')+')' : '')+'. '+
+        (k==='week' ? 'It is a goal for this week.' : k==='month' ? 'It is a goal for this month.' : 'It is a long-term goal'+(g.deadline ? ' by '+g.deadline : '')+'.')+
+        ' Judge it on five things: how hard it is for me from my real numbers, how long it takes, how much it changes my life (1 nice to have, 5 changes how I live), whether it is a first (first car, first home, first hire: move it toward the top), and what it costs me (money, habits given up, time).'+
+        ' Ranges: weekly '+G.week[0]+'–'+G.week[1]+' (typical '+G.week[2]+'), monthly '+G.month[0]+'–'+G.month[1]+' (typical '+G.month[2]+'), long-term '+G.long[0]+'–'+G.long[1]+' (typical '+G.long[2]+'), life milestone '+G.life[0]+'–'+G.life[1]+' (once-in-a-life things).'+
+        (k==='long' || k==='life' ? ' If this long-term goal is really a once-in-a-life event, set tier "life".' : '')+
+        ' Also pick the area it belongs to, one of: '+areas+'.'+
+        ' Reply with only JSON: {"xp": number, "tier": "'+(k==='week' || k==='month' ? k : 'long|life')+'", "area": "id"}. No explanation.';
+      const t = await aiWrite(ask, {max:80});
+      const m = t && /\{[\s\S]*\}/.exec(t);
+      if(m){ const j = JSON.parse(m[0]); if(j.tier==='life' && (k==='long' || k==='life')) tier = 'life'; else if(k==='life' && j.tier==='long') tier = 'long'; const band = G[tier]; if(Number(j.xp) > 0) xp = Math.round(Math.min(band[1], Math.max(band[0], Number(j.xp)))/5)*5; if(j.area && r43Area(j.area)) area = j.area; }
+    }
+  }catch(e){}
+  const live = state.goals.items.find(function(x){ return x.id===g.id; }); if(!live) return;
+  delete live.xpPending; delete live.xpWhy;
+  if(live.xpBy==='you'){ persist('goals'); return; }
+  if(xp){ live.xp = xp; live.xpBy = 'op'; if(!live.tier) live.life = tier==='life'; }
+  if(area && !live.areaBy) live.area = area;
+  persist('goals'); xpLast = null; renderView();
+};
+// tap the XP on any goal: a number inside its tier's range (to go higher, change the tier)
+ACTIONS.r43GoalXp = async function(el, e, id){
+  const g = state.goals.items.find(function(x){ return x.id===id; }); if(!g) return;
+  const band = XP_BOOK.goals[g.tier || (g.life ? 'life' : 'long')];
+  const v = await uiAsk({title:'XP for this goal', text:band[0].toLocaleString()+' to '+band[1].toLocaleString(), value:String(goalXpOf(g)), ok:'Set XP'});
+  if(v==null || String(v).trim()==='') return;
+  const n = Math.round(Math.min(band[1], Math.max(band[0], Number(v)||0))/5)*5; if(!n) return;
+  g.xp = n; g.xpBy = 'you'; delete g.xpPending; persist('goals'); xpLast = null; renderView();
+  if(Number(v)!==n) showToast(g.life || g.tier ? 'Kept inside its range: '+n.toLocaleString()+'.' : 'Kept inside its range: '+n.toLocaleString()+'. Make it a life milestone to go higher.', {icon:'&#9733;'});
+};
+
+// ---- How XP works: the master book, written from XP_BOOK (the same numbers the engine uses) ----
+XP_BOOK.level.pace = {typical:5000, strong:9500};
+function r43Tbl(head, rows){ return '<table class="r43-gt"><thead><tr>'+head.map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr></thead><tbody>'+rows.map(function(r){ return '<tr'+(r.opt ? ' class="is-opt"' : '')+'>'+(r.c || r).map(function(c){ return '<td>'+c+'</td>'; }).join('')+'</tr>'; }).join('')+'</tbody></table>'; }
+function r43N(n){ return Number(n).toLocaleString(); }
+function r43GuideHtml(){
+  const B = XP_BOOK, W = B.work, H = B.health, P = B.personal, A = B.added, G = B.goals, O = B.oneoff, x = xpSummary(), areas = r43Areas();
+  const nm = function(id){ return escapeHtml(r43AreaName(id)); };
+  const hourXp = [1,2,3,4,5,6,7,8,9,10].map(function(h){ return Math.round(r43Deep(h*60) + (h*60 >= W.goldAt ? W.goldDay : h*60 >= W.longAt ? W.longDay : 0)); });
+  const taskXp = [1,2,3,4,5,6,7,8,9,10,11,12].map(taskXpAtN);
+  const LV = [1, 5, 10, 25, 50, 75, 100], wk = function(L, per){ const w = xpForLevel(L)/per; return w < 1 ? Math.max(1, Math.round(w*7))+' day'+(Math.round(w*7)===1 ? '' : 's') : w < 6 ? Math.round(w*10)/10+' weeks' : Math.round(w/4.33*10)/10+' months'; };
+  const deepCost = function(h){ let s = 0; for(let i = 0; i < h; i++) s += W.deepBase + W.deepStep*i; return s; };
+  const workRows = [
+    ['Deep work, hour 1 → hour '+W.deepHours, r43N(W.deepBase)+', '+r43N(W.deepBase + W.deepStep)+', '+r43N(W.deepBase + 2*W.deepStep)+' … '+r43N(W.deepBase + W.deepStep*(W.deepHours-1)), 'Each hour pays '+W.deepStep+' more than the last. A full '+W.deepHours+' hours is '+deepCost(W.deepHours)],
+    ['Deep work past '+W.deepHours+' hours', r43N(W.deepPast)+' an hour', ''],
+    ['Long day (6h) / gold day (8h)', '+'+W.longDay+' / +'+W.goldDay, 'Only the higher one'],
+    ['Past your own normal', '+'+W.pastNormal+' an hour', 'Normal is your average over the last 14 days'],
+    ['Work task', '5, 7, 9 … up to 25 each', 'The more you finish in a day, the more each pays. Up to '+W.taskMax+' a day count'],
+    {opt:1, c:['Deliverable done <em>(Clients)</em>', '+'+W.deliv+' each', 'A reel, a post, a design: whatever the client’s plan counts']},
+    {opt:1, c:['A client’s week finished before it starts <em>(Clients)</em>', '+'+W.early+' per client, per week', 'The get-ahead bonus']},
+    {opt:1, c:['Reaching out to a client or lead <em>(Clients)</em>', W.outreach+', then +'+W.outreachEach+' each', 'Up to '+W.outreachMax+' a day']},
+    {opt:1, c:['Shooting or recording <em>(Content)</em>', W.shoot+' an hour', '']},
+    ['No Clients piece', 'Deep work and work tasks pay '+W.noClients+'×', 'Keeps Work in the same range for people without client work']
+  ];
+  const healthRows = [
+    ['Workout', H.workouts.join(', ')+', then '+H.workoutAfter, 'The first ones each week, up to your weekly target, then '+H.workoutAfter+' each. Your first five ever pay '+H.firstFive],
+    ['Food logged for the day', '+'+H.food, ''], ['Day inside your calorie target ('+Math.round(H.band[0]*100)+'–'+Math.round(H.band[1]*100)+'%)', '+'+H.onTarget, 'Your target is in Settings'],
+    ['Weigh-in', '+'+H.weighIn, 'Once a day'], ['A week your weight moved toward your goal', '+'+H.weekToward, 'Checked on Sunday'],
+    ['In bed on time', '+'+H.bed, 'Sleep mode by the bedtime you set in Settings → XP &amp; Areas'], ['Health task', '5, 7, 9 … up to 25 each', 'Tasks tagged to this area']
+  ];
+  const personalRows = [
+    ['Journal entry', '+'+P.journal, 'First of the day'], ['Inspiration log', '+'+P.insp+', or +'+P.inspBig+' for a walk, reading or meditation', 'Up to '+P.inspMax+' a day'],
+    ['The month’s habit kept today', '+'+P.habit, 'Tick it on Goals'], ['Training Skills time', P.skill+' an hour', ''], ['Your own content (personal video)', '+'+P.video+' each', ''],
+    ['Personal task', '5, 7, 9 … up to 25 each', 'Same scale as Work, counted separately'], ['Weekly money check-in', '+'+P.money, 'Once a week, in Finances'],
+    ['Debt paid above the minimum', '1 XP per $'+P.debtPer, 'Up to '+P.debtMax+' a month'], ['Bill or debt payment on time', '+'+P.onTime+' each', '']
+  ];
+  const addedRows = [['Task tagged to the area', '5, 7, 9 … up to 25 each', 'Same scale as everywhere else'], ['Habit for the area, kept today', '+'+A.habit+' each', 'Up to '+A.habitMax+' habits per area'],
+    ['Timed session in the area', A.session+' an hour', 'Started from the area’s timer on You'], ['Goals tagged to the area', 'As in Weeks, months and goals', '']];
+  const goalRows = [
+    ['Set up the week', '+'+G.weekIn, 'Your line, your goals. Plan next week from Thursday'], ['Set up the month', '+'+G.monthIn, 'Your line, the habit to beat, your goals. Plan next month from the '+G.monthFrom+'th'],
+    ['Check out of the week / month', '+'+G.weekOut+' / +'+G.monthOut, 'Mark what you hit and missed'],
+    ['Weekly goal hit', G.week[0]+' – '+G.week[1]+', usually ~'+G.week[2], 'Op sets it. Up to '+G.maxPer+' a week pay'], ['Monthly goal hit', G.month[0]+' – '+r43N(G.month[1])+', usually ~'+G.month[2], 'Op sets it. Up to '+G.maxPer+' a month pay'],
+    ['Clean sweep, week / month', '+'+G.sweepWeek+' / +'+r43N(G.sweepMonth), 'Every goal hit (at least 2 set)'], ['Month’s habit beaten', '+'+G.habit, 'At month check-out'],
+    ['New long-term goal set', '+'+G.newLong, 'Up to '+G.newLongMax+' a month. Deleting it takes the '+G.newLong+' back'], ['Long-term goal reached', r43N(G.long[0])+' – '+r43N(G.long[1])+', usually ~'+r43N(G.long[2]), 'Op sets it'],
+    ['Life milestone reached', r43N(G.life[0])+' – '+r43N(G.life[1]), 'Firsts and once-in-a-life things: first car, first home, graduating, first hire'],
+    {opt:1, c:['Master goal: MRR <em>(Clients)</em>', G.mrrPerK+' per $1k of growth', '2,000 to 20,000 per step']}, ['Master goal: body weight', G.perLb+' per lb toward your goal', '2,000 to 20,000 per step'],
+    ['Master goal: days in a row', G.perDay+' per day', '1,500 to 15,000 per step'], ['Weekly ring hit (workouts or deep work)', '+'+G.ring+' a week each', '']
+  ];
+  const oneRows = [['New client won', '+'+r43N(O.client), 'Counts from their start date'], ['Client reactivated', '+'+O.reactivated, 'Someone you worked with before. Never counts as “new” toward goals'],
+    ['MRR, each $1k above your best ever', '+'+O.mrrPerK, 'New highs only. Drops don’t take it back; climbing back to the old high pays nothing'], ['Followers, each above your best ever', '+'+O.follower, 'Same high-water rule (connected account)']];
+  const backRows = [['A goal deleted or un-completed', 'Its XP (and the +'+G.newLong+' if it was a new long-term goal)'], ['A client marked reactivated instead of new', r43N(O.client - O.reactivated)],
+    ['A task, workout, reel or journal entry deleted or un-ticked', 'What it paid that day, and that day’s multipliers recount'], ['A focus session edited shorter or deleted', 'The deep-work XP for the removed time'], ['A clean sweep that no longer holds', 'The sweep bonus']];
+  const cardRows = areas.map(function(a){
+    const feeds = a.id==='work' ? 'Focus (deep work a day, last 30 days) · Deadlines (work tasks done by their deadline) · with Clients: MRR, Scaling (new clients each month), Reliability (client weeks done before they start) · with Content: content out against your target'
+      : a.id==='health' ? 'Training (workouts against your weekly target) · Diet (days in your calorie target) · Weight (BMI for your height, if you track weight; it also sets a ceiling) · Sleep (nights in bed by your bedtime)'
+      : a.id==='personal' ? 'Mind (Inspiration and Training Skills) · Goals (weekly, monthly, long-term) · Finances (debt down, payments on time) · Consistency (journal, the month’s habit) · your own content'
+      : 'Consistency (habits kept, time logged) · Deadlines (tasks done by their deadline) · Goals hit';
+    return ['<b style="color:'+r43AreaColor(a.id)+'">'+escapeHtml(a.name)+'</b>', feeds];
+  });
+  const track = r43ClientsTrack();
+  return '<div class="xpg-top"><button class="xpg-back" data-action="closeXpHow">&larr; Back</button><div class="xph-k">[ SYSTEM ]</div><button class="xpg-hist-btn" data-action="openXpHistory">&#128220; Your XP history</button></div>'+
+    '<h1>How XP works</h1>'+
+    '<div class="xph-lead"><b>Level</b> measures effort: the time you put in and what you got done. <b>Rank</b> measures achievement: it needs the level and real results in every area you track, judged by your lowest one. XP is earned once and kept; it only comes back off when it was marked wrong. Every target here (bedtime, calorie target, workouts a week, your normal deep work, goals) comes from your own Settings.</div>'+
+    '<div class="xpg-you"><div><small>You</small><b>Level '+x.level+'</b></div><div><small>Total XP</small><b>'+x.total.toLocaleString()+'</b></div><div><small>Level '+(x.level+1)+' at</small><b>'+x.levelHi.toLocaleString()+'</b></div>'+(x.canLevel ? '<div>'+levelUpBtnHtml('guide')+'</div>' : '')+'</div>'+
+    '<div class="xpg-sec">Your areas</div>'+
+    '<div class="r43-g-areas">'+areas.map(function(a){ return '<span style="--ac:'+r43AreaColor(a.id)+'"><i></i>'+escapeHtml(a.name)+'</span>'; }).join('')+'<button class="r43-g-edit" data-action="r43GuideAreas">Change them</button></div>'+
+    '<p class="r43-g-p">Everyone picks what they track: Work, Health and Personal to start. Rename them, turn one off, or add your own, up to '+B.areas.max+'. XP is built so a strong week earns about the same from each area, roughly 1,400 to 1,750. Every action belongs to exactly one area, so nothing counts twice. A task goes to the area it’s tagged with; client work goes to Work, and untagged tasks to Personal.</p>'+
+    (r43AreaOn('work') ? '<div class="xpg-sec">'+nm('work')+'</div>'+r43Tbl(['Action', 'XP', 'Notes'], workRows)+'<div class="xpg-grid"><div class="xpg-card"><h3>Deep work, hour by hour</h3>'+xpgBars(hourXp, [1,2,3,4,5,6,7,8,9,10].map(function(h){ return h+'h'; }), r43AreaColor('work'), 'XP for a day of that length, with the long and gold bonus.')+'</div><div class="xpg-card"><h3>Tasks in a day</h3>'+xpgBars(taskXp, taskXp.map(function(_, i){ return '#'+(i+1); }), r43AreaColor('work'), 'What each task pays as the day goes on (the same scale in every area).')+'</div></div><p class="r43-g-o">Rows marked <em>(Clients)</em> or <em>(Content)</em> only apply if you use those pieces of Work.</p>' : '')+
+    (r43AreaOn('health') ? '<div class="xpg-sec">'+nm('health')+'</div>'+r43Tbl(['Action', 'XP', 'Notes'], healthRows) : '')+
+    (r43AreaOn('personal') ? '<div class="xpg-sec">'+nm('personal')+'</div>'+r43Tbl(['Action', 'XP', 'Notes'], personalRows) : '')+
+    '<div class="xpg-sec">Areas you add</div>'+r43Tbl(['Action', 'XP', 'Notes'], addedRows)+
+    '<div class="xpg-sec">Balanced days and streaks</div>'+
+    '<p class="r43-g-p">A day that touches every one of your areas multiplies everything earned that day. Touched means earning at least '+B.personal.touch+' XP in that area that day ('+B.work.touch+' for Work). Days off count as Work touched, so resting is never punished. With one area, every day counts as balanced.</p>'+
+    r43Tbl(['Your areas touched that day', 'Day’s XP ×'], [['All of them', B.balance.all.toFixed(2)], ['At least half', B.balance.half.toFixed(2)], ['Fewer than half', '1.00']])+
+    '<p class="r43-g-p">Streak: every balanced day in the last 7 adds another '+Math.round(B.balance.streakEach*100)+'%, up to +'+Math.round(B.balance.streakMax*100)+'%. It stacks on top of the balance multiplier.</p>'+
+    '<div class="xpg-sec">Weeks, months and goals</div><p class="r43-g-p">Setting up a period pays a little; finishing what you set pays a lot, and finishing all of it pays a bonus. Every goal is tagged to one of your areas. Goals are completed by pressing and holding for 1.2 seconds, never a single click. When a master goal is hit, its target goes up '+Math.round(G.raise*100)+'% and the next step pays again; a target nudged up by a sliver doesn’t pay twice.</p>'+
+    r43Tbl(['What', 'XP', 'Rules'], goalRows)+
+    '<div class="xpg-sec">Client and audience one-offs</div><p class="r43-g-p">For anyone using the Clients or Content pieces of Work: big moves pay once, on new highs, and never come back off when numbers dip. Rank is what reflects a dip.</p>'+r43Tbl(['What', 'XP', 'Rules'], oneRows)+
+    '<div class="xpg-sec">How Op grades a goal</div><p class="r43-g-p">Op sets a number the moment you add a goal and shows only the number. He judges five things: how hard it is for you from your real numbers, how long it takes, how much it changes your life, whether it’s a first (first car, first home, first hire), and what it costs you. He also picks the tier and the area: a long-term goal that’s really a once-in-a-life event becomes a Life milestone. Tap the XP on any goal to set your own number within its tier’s range; once you do, Op never touches it again.</p>'+
+    '<div class="xpg-sec">Levels</div><p class="r43-g-p">Each level costs '+B.level.base+' + '+B.level.lin+'×L + '+B.level.sq+'×L² XP. Early levels come in a day or less; the slowest, at the very top, take about a week and a half. Levels are claimed: when you have the XP, a Level up button appears.</p>'+
+    r43Tbl(['Level', 'XP in total', 'Typical pace', 'Strong pace'], LV.map(function(L){ return ['L'+L, '~'+r43N(Math.round(xpForLevel(L)/1000)*1000 || xpForLevel(L)), wk(L, B.level.pace.typical), wk(L, B.level.pace.strong)]; }))+
+    '<div class="xpg-sec">Ranks</div><p class="r43-g-p">Each rank needs the level and a rating in every area you track, judged by your lowest one, so one strong area can’t carry you.'+(r43ClientsOn() ? ' Turn on the Clients track (Settings → XP &amp; Areas) and each rank also needs the MRR shown.' : '')+' If you fall below a rank’s line for 30 days straight, the rank follows; XP and level stay.</p>'+
+    '<div class="xph-track">'+RANKS.map(function(rk, i){ const stt = i < x.rank ? 'is-done' : i===x.rank ? 'is-cur' : ''; return '<span class="xph-tr '+stt+'" style="--rc:'+rk.color+'">'+rankBadgeSvg(i, 30)+'<b>'+escapeHtml(rk.name)+'</b><small>LVL '+rk.level+(rk.low ? '<br>lowest area '+rk.low : '')+(track && rk.mrr ? '<br>'+money(rk.mrr)+' MRR' : '')+'</small></span>'; }).join('')+'</div>'+
+    '<div class="xpg-sec">Your card</div><p class="r43-g-p">One rating per area you track, 25 to 100, plus an Overall that’s their average and only reaches 100 when every area does. A piece you don’t use (no clients, no weigh-ins) simply isn’t counted. Your standing with Op is its own score on his screen and never touches XP, levels, ranks or ratings.</p>'+
+    r43Tbl(['Rating', 'What feeds it'], cardRows)+
+    '<div class="xpg-sec">When XP comes back off</div><p class="r43-g-p">Only when it was earned wrongly. Normal ups and downs (MRR dipping, a bad week, a broken streak) never take XP away. If your total falls below your level’s line, the level drops to match and you’re told what came off; every removal shows in your XP history.</p>'+
+    r43Tbl(['What happened', 'What comes off'], backRows)+
+    '<div class="xpg-sec">Rewards</div><p class="r43-g-p">Attach a reward to any level (“Level 10: new headphones”) in Settings → XP &amp; Areas. The next one shows under your level bar, it unlocks when you press Level up, and you mark it claimed once you’ve actually got it.</p>'+
+    '<div class="xph-foot">This page is the rulebook. The XP code reads every number from the same table.</div>';
+}
+ACTIONS.openXpHow = (function(base){
+  return function(){
+    base.apply(this, arguments);
+    const c = document.getElementById('xpHowContent'); if(!c) return;
+    const tease = c.querySelector('.pj-tease'), proj = c.querySelector('.xpg-top [data-action="openProjected"]');
+    c.innerHTML = r43GuideHtml();
+    if(proj){ const top = c.querySelector('.xpg-top .xpg-hist-btn'); if(top) top.insertAdjacentElement('beforebegin', proj); }
+    if(tease){ const you = c.querySelector('.xpg-you'); if(you) you.insertAdjacentElement('afterend', tease); }
+  };
+})(ACTIONS.openXpHow);
+ACTIONS.r43GuideAreas = function(){ ACTIONS.closeXpHow(); ui.view = 'settings'; ui.settingsTab = 'xp'; renderView(); };
+// ============ ROUND 43 (build 3c): THE GOALS PAGE ============
+// Master goals across the top (targets go up 10% when you hit them), then the month and the week side by
+// side, each with its line, then your own goals as big cards, just as big as the master ones. Every goal is
+// completed by holding for 1.2 seconds, and hitting one gets its moment. Plan next week from Thursday and
+// next month from the 20th. Numbers goals track themselves from the app and draw a graph.
+
+// ---- hold to complete ----
+function r43HoldHtml(act, id, label, cls){ return '<button type="button" class="r43-hold'+(cls ? ' '+cls : '')+'" data-hold-act="'+act+'" data-id="'+escapeHtml(id)+'"><i class="r43-hold-f"></i><span class="r43-hold-l">'+(label || 'Hold to complete')+'</span></button>'; }
+(function(){
+  let cur = null;
+  const stop = function(){ if(!cur) return; clearTimeout(cur.t); cur.el.classList.remove('is-holding'); const l = cur.el.querySelector('.r43-hold-l'); if(l && cur.label!=null) l.textContent = cur.label; cur = null; };
+  document.addEventListener('pointerdown', function(e){
+    const b = e.target.closest && e.target.closest('.r43-hold'); if(!b || b.disabled || e.button > 0) return;
+    e.preventDefault(); stop();
+    const l = b.querySelector('.r43-hold-l');
+    cur = {el:b, label:l ? l.textContent : null};
+    b.style.setProperty('--hold', XP_BOOK.goals.hold+'ms'); b.classList.add('is-holding');
+    if(l && b.classList.contains('is-wide')) l.textContent = 'Keep holding…';
+    cur.t = setTimeout(function(){
+      const el = cur && cur.el; if(!el) return; cur = null;
+      el.classList.remove('is-holding'); el.classList.add('is-done');
+      const fn = ACTIONS[el.dataset.holdAct]; if(fn) fn(el, null, el.dataset.id);
+    }, XP_BOOK.goals.hold);
+  });
+  ['pointerup', 'pointercancel'].forEach(function(k){ document.addEventListener(k, stop); });
+  document.addEventListener('pointerout', function(e){ if(cur && e.target===cur.el && !cur.el.contains(e.relatedTarget)) stop(); });
+  // (the keyboard: hold Space or Enter)
+  document.addEventListener('keydown', function(e){ const b = document.activeElement; if(!b || !b.classList || !b.classList.contains('r43-hold') || (e.key!==' ' && e.key!=='Enter') || e.repeat) return; e.preventDefault(); b.dispatchEvent(new PointerEvent('pointerdown', {bubbles:true})); });
+  document.addEventListener('keyup', function(e){ if(e.key===' ' || e.key==='Enter') stop(); });
+})();
+
+// completing: weekly / monthly goals and your own, with the moment
+ACTIONS.r43GoalDone = function(el, e, id){
+  const g = state.goals.items.find(function(x){ return x.id===id; }); if(!g || g.done) return;
+  if(g.tier && checkedOut(g.tier, g.pk)){ showToast('That '+(g.tier==='month' ? 'month' : 'week')+' is checked out. It’s on the record.', {icon:'&#128274;'}); return; }
+  xpLast = null; const before = xpSummary();
+  g.done = true; g.missed = false; g.doneAt = todayStr(); persist('goals');
+  xpLast = null; const after = xpSummary();
+  if(after.total > before.total){ xpSeen().total = after.total; persist('profile'); }
+  playSessionComplete();
+  r43GoalFx(g, Math.max(0, after.total - before.total), before, after);
+  setTimeout(renderView, 60);
+};
+ACTIONS.r43GoalUndo = function(el, e, id){
+  const g = state.goals.items.find(function(x){ return x.id===id; }); if(!g || !g.done) return;
+  if(g.tier && checkedOut(g.tier, g.pk)){ showToast('Checked out: reopen the '+(g.tier==='month' ? 'month' : 'week')+' first.', {icon:'&#128274;'}); return; }
+  g.done = false; g.doneAt = null; persist('goals'); xpLast = null; playTick(); renderView();
+  showToast('Undone. Its XP came back off.', {icon:'&#8634;'});
+};
+// (a single click never completes a goal any more)
+toggleGoal = (function(base){
+  return function(id){
+    const g = state.goals.items.find(function(x){ return x.id===id; });
+    if(g && !g.done){ showToast('Hold to complete.', {icon:'&#9995;'}); return; }
+    return base.apply(this, arguments);
+  };
+})(toggleGoal);
+ACTIONS.tierGoalToggle = (function(base){
+  return function(el, e, id){
+    const g = arr(state.goals.items).find(function(x){ return x.id===id; });
+    if(g && !g.done){ showToast('Hold to complete.', {icon:'&#9995;'}); return; }
+    return base.apply(this, arguments);
+  };
+})(ACTIONS.tierGoalToggle);
+tierGoalRowHtml = (function(base){
+  return function(g){
+    let h = base.apply(this, arguments);
+    if(!g.done && !checkedOut(g.tier, g.pk)) h = h.replace('<button class="tg-hit" data-action="tierGoalToggle"', '<button class="tg-hit r43-hold is-row" data-hold-act="r43GoalDone"').replace('<span class="tg-box">', '<i class="r43-hold-f"></i><span class="tg-box">');
+    return h.replace(/ title="[^"]*"(?=>\+)/, '');
+  };
+})(tierGoalRowHtml);
+
+// the moment: confetti, the tick, what it paid, the level bar moving
+function r43GoalFx(g, gained, before, after){
+  const old = document.getElementById('r43GoalFx'); if(old) old.remove();
+  const where = g.tier==='week' ? 'This week' : g.tier==='month' ? monthName(g.pk) : g.life ? 'Life milestone' : 'Your goal';
+  let left = '';
+  if(g.tier){ const gs = tierGoals(g.tier, g.pk), d = gs.filter(function(x){ return x.done; }).length, n = gs.length - d; left = d+' of '+gs.length+' '+(g.tier==='month' ? monthName(g.pk) : 'weekly')+' goals done.'+(n===0 ? (gs.length >= 2 ? ' Clean sweep.' : '') : n===1 ? ' One left.' : ' '+n+' left.'); }
+  const p0 = before.levelPct, up = after.level > before.level || after.canLevel && !before.canLevel;
+  const d = document.createElement('div'); d.id = 'r43GoalFx'; d.className = 'r43-gfx'+(g.life ? ' is-life' : '');
+  const conf = Array.from({length:18}, function(_, i){ return '<i style="--i:'+i+';--x:'+(Math.round(Math.cos(i*2.1)*220))+'px;--y:'+(-120 - (i*37 % 160))+'px;--r:'+(i*47 % 360)+'deg;--c:'+['#3FBE8E', '#FFB86B', '#8FDCFF', '#C58FFF', '#F2E27A'][i % 5]+'"></i>'; }).join('');
+  d.innerHTML = '<div class="r43-gfx-c"><div class="r43-gfx-conf">'+conf+'</div><div class="r43-gfx-tick">&#10003;</div>'+
+    '<div class="r43-gfx-k">Goal hit · '+escapeHtml(where)+'</div><div class="r43-gfx-t">'+escapeHtml(goalTitle(g))+'</div>'+
+    (gained ? '<div class="r43-gfx-xp">+'+gained.toLocaleString()+' XP</div>' : '')+
+    '<div class="r43-gfx-lv"><div><span>Level '+after.level+'</span><span>'+(after.canLevel ? 'Level '+(after.level+1)+' is ready' : (after.levelHi - after.total).toLocaleString()+' to level '+(after.level+1))+'</span></div><i><u style="width:'+(p0*100).toFixed(1)+'%" data-to="'+(after.levelPct*100).toFixed(1)+'"></u></i></div>'+
+    (left ? '<div class="r43-gfx-l">'+escapeHtml(left)+'</div>' : '')+'</div>';
+  document.body.appendChild(d);
+  requestAnimationFrame(function(){ d.classList.add('is-in'); setTimeout(function(){ const u = d.querySelector('.r43-gfx-lv u'); if(u) u.style.width = u.dataset.to+'%'; }, 450); });
+  if(typeof tone==='function'){ tone([523, 659], 0.25, 0.16); setTimeout(function(){ tone([784, 1047], 0.6, 0.18); }, 180); }
+  const close = function(){ if(!d.parentNode) return; d.classList.add('is-out'); setTimeout(function(){ if(d.parentNode) d.remove(); }, 400); };
+  d.addEventListener('click', close); setTimeout(close, up ? 3200 : 2800);
+}
+
+// ---- new trackers: new clients (reactivated don't count, and you can fix the count), reels, posts ----
+GOAL_TRACKERS.newclients = {icon:'&#129309;', label:'New clients', unit:'clients', src:'from Business → Clients (reactivated ones don’t count)', periods:true, name:function(g){ return fmtGoalNum(g.target)+' new clients '+goalPeriodLabel(g); }};
+GOAL_TRACKERS.reels = {icon:'&#127916;', label:'Deliverables', unit:'delivered', src:'from client deliverables', periods:true, name:function(g){ return fmtGoalNum(g.target)+' delivered '+goalPeriodLabel(g); }};
+GOAL_TRACKERS.posts = {icon:'&#128248;', label:'Videos posted', unit:'videos', src:'from your finished videos', periods:true, name:function(g){ return fmtGoalNum(g.target)+' videos '+goalPeriodLabel(g); }};
+function r43NewClientsIn(from, to){ return arr(state.business && state.business.clients).filter(function(c){ const d = c.startDate || (c.fromLeadId ? c.createdAt : null) || c.createdAt; return d && d >= from && d <= to && !c.reactivated; }); }
+function r43PeriodRange(g){
+  if(g.tier && g.pk) return [g.tier==='week' ? g.pk : g.pk+'-01', periodEnd(g.tier, g.pk)];
+  return goalRange(g);
+}
+function r43TrackDay(kind, d){
+  if(kind==='hours') return (d===todayStr() ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d))/60;
+  if(kind==='workouts') return workoutDay(d).n;
+  if(kind==='reels'){ let n = 0; arr(state.business.clients).forEach(function(c){ arr(c.deliverables).forEach(function(dv){ arr(dv.completedDates).forEach(function(x){ if(x===d) n++; }); }); }); return n; }
+  if(kind==='posts') return state.tasks.items.filter(function(t){ return t.isVideoIdea && t.status==='done' && t.completedAt===d; }).length;
+  if(kind==='newclients') return r43NewClientsIn(d, d).length;
+  return 0;
+}
+goalLiveCurrentRaw = (function(base){
+  return function(g){
+    if(g && ['newclients', 'reels', 'posts', 'hours', 'workouts'].indexOf(g.autoTrack)>=0 && (g.tier || g.autoTrack==='newclients' || g.autoTrack==='reels' || g.autoTrack==='posts')){
+      if(g.autoTrack==='newclients' && g.countFix!=null) return Number(g.countFix);
+      const r = r43PeriodRange(g), to = r[1] < todayStr() ? r[1] : todayStr();
+      const v = sumOverDays(r[0], to, function(d){ return r43TrackDay(g.autoTrack, d); });
+      return g.autoTrack==='hours' ? Math.round(v*10)/10 : v;
+    }
+    return base.apply(this, arguments);
+  };
+})(goalLiveCurrentRaw);
+// a tracked weekly / monthly goal ticks itself when it's reached (it's the app's own numbers)
+afterRenderHooks.push(function(){
+  if(!state.goals) return; let n = 0;
+  state.goals.items.forEach(function(g){ if(!g.tier || g.done || !g.autoTrack || !(g.target > 0) || checkedOut(g.tier, g.pk) || g.pk!==periodKey(g.tier)) return; if(goalLiveCurrentRaw(g) >= g.target){ g.done = true; g.doneAt = todayStr(); n++; } });
+  if(n){ persist('goals'); xpLast = null; playSessionComplete(); setTimeout(renderView, 30); }
+});
+// new clients this month: reactivated clients never count as new, and the count can be fixed by hand
+mgMonthlyDefs = (function(base){
+  return function(){
+    const out = base.apply(this, arguments), mk = thisMonthKey(), fix = (state.profile.newClientsFix || {})[mk];
+    out.forEach(function(m){ if(m.key!=='newclients') return; const list = r43NewClientsIn(mk+'-01', periodEnd('month', mk)); m.cur = fix!=null ? Number(fix) : list.length; m.names = list.map(function(c){ return c.business || c.name; }); m.fixed = fix!=null; });
+    return out;
+  };
+})(mgMonthlyDefs);
+
+// ---- fix a count: who counts as new, or the number yourself ----
+ACTIONS.r43FixCount = function(el, e, id){ ui.r43Fix = id || 'master'; r43FixOpen(); };
+function r43FixOpen(){
+  let o = document.getElementById('r43FixOverlay');
+  if(!o){ o = document.createElement('div'); o.id = 'r43FixOverlay'; o.className = 'overlay r43-sheet-ov'; o.innerHTML = '<div class="card r43-sheet" id="r43FixC"></div>'; document.body.appendChild(o); o.addEventListener('pointerdown', function(ev){ if(ev.target===o) o.classList.add('hidden'); }); }
+  const id = ui.r43Fix, g = id==='master' ? null : state.goals.items.find(function(x){ return x.id===id; });
+  const mk = thisMonthKey(), r = g ? r43PeriodRange(g) : [mk+'-01', periodEnd('month', mk)];
+  const all = arr(state.business.clients).filter(function(c){ const d = c.startDate || c.createdAt; return d && d >= r[0] && d <= r[1]; });
+  const fix = g ? g.countFix : (state.profile.newClientsFix || {})[mk];
+  const auto = all.filter(function(c){ return !c.reactivated; }).length, shown = fix!=null ? Number(fix) : auto;
+  const target = g ? g.target : (mgMonthlyDefs().find(function(m){ return m.key==='newclients'; }) || {}).target;
+  document.getElementById('r43FixC').innerHTML = '<button class="int-x hs-x" data-action="r43FixClose">&#10005;</button>'+
+    '<div class="r43-sh-k">Fix a count · '+escapeHtml(g ? goalTitle(g) : 'New clients this month')+'</div>'+
+    '<div class="r43-fix-n"><b>'+shown+'</b><span>of '+(target || '–')+(fix!=null ? ' · set by you' : '')+'</span></div>'+
+    (all.length ? all.map(function(c){ const re = !!c.reactivated; return '<div class="r43-fix-r'+(re ? ' is-re' : '')+'"><div><b>'+escapeHtml(c.business || c.name || 'Client')+'</b><small>'+(re ? 'Worked together before' : 'Signed '+fmtDateShort(c.startDate || c.createdAt)+' · counts as new')+'</small></div><span>'+(re ? 'Reactivated' : 'New')+'</span><button class="r43-sw'+(re ? ' is-on' : '')+'" role="switch" aria-checked="'+re+'" aria-label="Reactivated, not new" data-action="r43Reactivate" data-id="'+c.id+'"><span></span></button></div>'; }).join('') : '<div class="r43-sh-p">No clients started in this period.</div>')+
+    '<div class="r43-fix-own"><span>Or set the number yourself</span><button class="btn btn-ghost btn-sm" data-action="r43FixStep" data-id="-1" aria-label="One less">&minus;</button><b>'+shown+'</b><button class="btn btn-ghost btn-sm" data-action="r43FixStep" data-id="1" aria-label="One more">+</button>'+(fix!=null ? '<button class="r43-link" data-action="r43FixStep" data-id="auto">Back to automatic</button>' : '')+'</div>';
+  o.classList.remove('hidden');
+}
+ACTIONS.r43FixClose = function(){ const o = document.getElementById('r43FixOverlay'); if(o) o.classList.add('hidden'); renderView(); };
+ACTIONS.r43Reactivate = function(el, e, id){ const c = arr(state.business.clients).find(function(x){ return x.id===id; }); if(!c) return; c.reactivated = !c.reactivated; persist('business'); xpLast = null; r43FixOpen(); };
+ACTIONS.r43FixStep = function(el, e, id){
+  const g = ui.r43Fix==='master' ? null : state.goals.items.find(function(x){ return x.id===ui.r43Fix; }), mk = thisMonthKey();
+  const fixes = state.profile.newClientsFix = state.profile.newClientsFix || {};
+  const cur = g ? (g.countFix!=null ? g.countFix : goalLiveCurrentRaw(Object.assign({}, g, {countFix:null}))) : (fixes[mk]!=null ? fixes[mk] : r43NewClientsIn(mk+'-01', periodEnd('month', mk)).length);
+  const v = id==='auto' ? null : Math.max(0, Number(cur) + Number(id));
+  if(g){ if(v==null) delete g.countFix; else g.countFix = v; persist('goals'); } else { if(v==null) delete fixes[mk]; else fixes[mk] = v; persist('profile'); }
+  xpLast = null; r43FixOpen();
+};
+
+// ---- a numbers goal, up close: the graph against the pace line ----
+ACTIONS.r43GoalOpen = function(el, e, id){ ui.r43Detail = id; r43DetailOpen(); };
+function r43DetailOpen(){
+  const g = state.goals.items.find(function(x){ return x.id===ui.r43Detail; }); if(!g) return;
+  let o = document.getElementById('r43DetOverlay');
+  if(!o){ o = document.createElement('div'); o.id = 'r43DetOverlay'; o.className = 'overlay r43-sheet-ov'; o.innerHTML = '<div class="card r43-sheet is-wide" id="r43DetC"></div>'; document.body.appendChild(o); o.addEventListener('pointerdown', function(ev){ if(ev.target===o) o.classList.add('hidden'); }); }
+  const T = goalTracker(g), r = r43PeriodRange(g), today = todayStr(), kind = g.autoTrack;
+  const unit = kind==='hours' ? 'h' : '', cur = goalLiveCurrentRaw(g), target = Number(g.target) || 0;
+  const days = []; for(let d = r[0]; d <= r[1]; d = addDays(d, 1)) days.push(d);
+  let run = 0; const pts = []; let best = 0;
+  days.forEach(function(d){ if(d > today) return; const v = kind && ['hours', 'workouts', 'reels', 'posts', 'newclients'].indexOf(kind)>=0 ? r43TrackDay(kind, d) : 0; best = Math.max(best, v); run += v; pts.push(run); });
+  if(g.countFix!=null && pts.length) pts[pts.length-1] = Number(g.countFix);
+  const n = days.length, W = 460, Hh = 200, x0 = 34, y0 = 186, top = Math.max(target, run, 1)*1.05;
+  const X = function(i){ return x0 + (W - x0 - 10)*i/Math.max(1, n - 1); }, Y = function(v){ return y0 - (y0 - 18)*v/top; };
+  const left = Math.max(0, days.filter(function(d){ return d >= today; }).length), need = Math.max(0, target - cur);
+  const paceNow = target*(pts.length/n);
+  const fmt = function(v){ return unit==='h' ? (Math.round(v*10)/10)+'h' : fmtGoalNum(Math.round(v*10)/10); };
+  const svg = '<svg viewBox="0 0 '+W+' 220" width="100%" role="img" aria-label="'+escapeHtml(goalTitle(g))+': '+fmt(cur)+' of '+fmt(target)+'">'+
+    '<line x1="'+x0+'" y1="'+y0+'" x2="'+(W-10)+'" y2="'+y0+'" class="r43-ax"/><line x1="'+x0+'" y1="'+Y(target)+'" x2="'+(W-10)+'" y2="'+Y(target)+'" class="r43-gl"/>'+
+    '<text x="0" y="'+(Y(target)+4)+'" class="r43-tx">'+fmt(target)+'</text><text x="12" y="'+(y0+4)+'" class="r43-tx">0</text>'+
+    '<line x1="'+X(0)+'" y1="'+y0+'" x2="'+X(n-1)+'" y2="'+Y(target)+'" class="r43-pace"/>'+
+    (pts.length ? '<polyline fill="none" class="r43-pl" points="'+pts.map(function(v, i){ return X(i).toFixed(1)+','+Y(v).toFixed(1); }).join(' ')+'"/><circle cx="'+X(pts.length-1).toFixed(1)+'" cy="'+Y(pts[pts.length-1]).toFixed(1)+'" r="5" class="r43-dot"/>'+
+      '<text x="'+Math.min(W - 90, X(pts.length-1) + 8).toFixed(1)+'" y="'+(Y(pts[pts.length-1]) - 6).toFixed(1)+'" class="r43-tx is-v">'+fmt(cur)+' today</text>' : '')+
+    '<text x="'+x0+'" y="212" class="r43-tx">'+fmtDateShort(r[0])+'</text><text x="'+(W - 50)+'" y="212" class="r43-tx">'+fmtDateShort(r[1])+'</text></svg>';
+  const kinds = ['hours', 'workouts'].concat(r43ClientsOn() ? ['reels', 'newclients'] : [], ['posts']);
+  document.getElementById('r43DetC').innerHTML = '<button class="int-x hs-x" data-action="r43DetClose">&#10005;</button>'+
+    '<div class="r43-sh-k">Numbers goal'+(T ? ' · '+escapeHtml(T.src.replace(/^from /, 'from ')) : '')+'</div>'+
+    '<div class="r43-det-t">'+escapeHtml(goalTitle(g))+'</div>'+
+    (T ? '<div class="r43-det-n"><b>'+fmt(cur)+'</b><span>of '+fmt(target)+(g.done ? ' · done' : pts.length < n ? ' · on pace needs '+fmt(paceNow)+' by today' : '')+'</span></div><figure class="r43-det-g">'+svg+'</figure>'+
+      '<div class="r43-det-s"><div><small>Per day needed</small><b>'+(left && need ? fmt(need/left) : '–')+'</b></div><div><small>Best day</small><b>'+fmt(best)+'</b></div><div><small>XP at goal</small><b>+'+goalXpOf(g).toLocaleString()+'</b></div></div>'
+      : '')+
+    (g.done ? '' : '<div class="r43-det-src"><span>Track it from</span><div>'+kinds.map(function(k){ return '<button class="r43-chip'+(kind===k ? ' is-on' : '')+'" data-action="r43SetTrack" data-id="'+k+'">'+GOAL_TRACKERS[k].label+'</button>'; }).join('')+'<button class="r43-chip'+(!kind ? ' is-on' : '')+'" data-action="r43SetTrack" data-id="own">I’ll log it myself</button></div>'+
+      (kind && !(g.target > 0) ? '' : '')+'<label class="r43-det-tg"><span>Target</span><input class="input" type="number" min="1" step="any" id="r43DetTarget" value="'+(target || '')+'"><button class="btn btn-sm" data-action="r43SetTarget">Save</button></label></div>');
+  o.classList.remove('hidden');
+}
+ACTIONS.r43DetClose = function(){ const o = document.getElementById('r43DetOverlay'); if(o) o.classList.add('hidden'); renderView(); };
+ACTIONS.r43SetTrack = function(el, e, id){
+  const g = state.goals.items.find(function(x){ return x.id===ui.r43Detail; }); if(!g) return;
+  if(id==='own'){ g.autoTrack = null; g.period = null; } else { g.autoTrack = id; g.period = g.tier || null; g.unit = GOAL_TRACKERS[id].unit; if(!(g.target > 0)) g.target = id==='hours' ? (g.tier==='week' ? 20 : 80) : id==='workouts' ? (g.tier==='week' ? 4 : 16) : 2; }
+  persist('goals'); xpLast = null; r43DetailOpen();
+};
+ACTIONS.r43SetTarget = function(){
+  const g = state.goals.items.find(function(x){ return x.id===ui.r43Detail; }), i = document.getElementById('r43DetTarget'); if(!g || !i) return;
+  const v = Number(i.value); if(!(v > 0)){ i.focus(); return; }
+  g.target = v; persist('goals'); xpLast = null; r43DetailOpen();
+};
+
+// ---- the sheet for a new goal: area, a number you set (or Op's), life milestones, tracked numbers ----
+goalSheetHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), k = ui.gsKind || 'week';
+    const tpl = document.createElement('template'); tpl.innerHTML = h; const root = tpl.content;
+    const body = root.querySelector('.gs-body'); if(!body) return h;
+    let extra = '';
+    if(k!=='long'){
+      const kinds = ['hours', 'workouts'].concat(r43ClientsOn() ? ['reels', 'newclients'] : [], ['posts']), cur = ui.gsTierTrack || 'own';
+      extra += '<div class="r43-gs-row"><span>Track it from</span><div class="r43-gs-chips">'+kinds.map(function(x){ return '<button type="button" class="r43-chip'+(cur===x ? ' is-on' : '')+'" data-action="r43GsTrack" data-id="'+x+'">'+GOAL_TRACKERS[x].label+'</button>'; }).join('')+'<button type="button" class="r43-chip'+(cur==='own' ? ' is-on' : '')+'" data-action="r43GsTrack" data-id="own">Done or not</button></div></div>'+
+        (cur!=='own' ? '<label class="r43-gs-row"><span>Target ('+escapeHtml(GOAL_TRACKERS[cur].unit)+')</span><input class="input" type="number" min="1" step="any" id="r43GsTarget" placeholder="'+(cur==='hours' ? (k==='week' ? '20' : '80') : cur==='workouts' ? (k==='week' ? '4' : '16') : '2')+'"></label>' : '');
+    } else {
+      extra += '<label class="r43-gs-life"><button type="button" class="r43-sw'+(ui.gsLife ? ' is-on' : '')+'" role="switch" aria-checked="'+!!ui.gsLife+'" data-action="r43GsLife"><span></span></button><span><b>Life milestone</b><small>A first or a once-in-a-life thing: first car, first home, graduating, first hire</small></span></label>';
+    }
+    const areas = r43Areas();
+    if(areas.length > 1) extra += '<div class="r43-gs-row"><span>Area</span><div class="r43-gs-chips"><button type="button" class="r43-chip'+(!ui.gsArea ? ' is-on' : '')+'" data-action="r43GsArea" data-id="">Op picks</button>'+areas.map(function(a){ return '<button type="button" class="r43-chip'+(ui.gsArea===a.id ? ' is-on' : '')+'" style="--ac:'+r43AreaColor(a.id)+'" data-action="r43GsArea" data-id="'+a.id+'">'+escapeHtml(a.name)+'</button>'; }).join('')+'</div></div>';
+    const band = XP_BOOK.goals[k==='long' ? (ui.gsLife ? 'life' : 'long') : k];
+    extra += '<label class="r43-gs-row"><span>XP</span><input class="input r43-gs-xp" type="number" step="5" id="r43GsXp" placeholder="Op sets it ('+band[0].toLocaleString()+'–'+band[1].toLocaleString()+')"></label>';
+    const have = body.querySelector('.gs-have'); if(have) have.insertAdjacentHTML('beforebegin', extra); else body.insertAdjacentHTML('beforeend', extra);
+    const xp = root.querySelector('.gs-xp'); if(xp) xp.remove();
+    return tpl.innerHTML;
+  };
+})(goalSheetHtml);
+function r43GsKeep(fn){ const ids = ['gsLabel', 'gsTarget', 'gsUnit', 'gsCurrent', 'gsDeadline', 'r43GsTarget', 'r43GsXp'], v = {}; ids.forEach(function(i){ const el = document.getElementById(i); if(el) v[i] = el.value; }); fn(); goalSheetRefresh(); ids.forEach(function(i){ const el = document.getElementById(i); if(el && v[i]!=null) el.value = v[i]; }); }
+ACTIONS.r43GsTrack = function(el, e, id){ r43GsKeep(function(){ ui.gsTierTrack = id; }); };
+ACTIONS.r43GsArea = function(el, e, id){ r43GsKeep(function(){ ui.gsArea = id || null; }); };
+ACTIONS.r43GsLife = function(){ r43GsKeep(function(){ ui.gsLife = !ui.gsLife; }); };
+openGoalSheet = (function(base){ return function(){ ui.gsTierTrack = null; ui.gsArea = null; ui.gsLife = false; ui.r43GsFor = ui.r43GsForNext || null; ui.r43GsForNext = null; return base.apply(this, arguments); }; })(openGoalSheet);
+ACTIONS.gsSave = (function(base){
+  return function(){
+    const k = ui.gsKind || 'week', xpEl = document.getElementById('r43GsXp'), tgEl = document.getElementById('r43GsTarget');
+    const xpV = xpEl && xpEl.value.trim() ? Number(xpEl.value) : null, track = k!=='long' ? ui.gsTierTrack : null, target = tgEl ? Number(tgEl.value) : null;
+    if(track && track!=='own' && !(target > 0)){ if(tgEl){ tgEl.focus(); tgEl.classList.add('is-bad'); } return; }
+    const n = state.goals.items.length, r = base.apply(this, arguments);
+    if(state.goals.items.length > n){
+      const g = state.goals.items[state.goals.items.length - 1];
+      if(k==='long' && ui.gsLife) g.life = true;
+      if(ui.gsArea){ g.area = ui.gsArea; g.areaBy = 'you'; }
+      if(track && track!=='own'){ g.autoTrack = track; g.period = g.tier; g.target = target; g.unit = GOAL_TRACKERS[track].unit; if(!g.label) g.label = GOAL_TRACKERS[track].name(g); }
+      if(xpV > 0){ const band = XP_BOOK.goals[g.tier || (g.life ? 'life' : 'long')]; g.xp = Math.round(Math.min(band[1], Math.max(band[0], xpV))/5)*5; g.xpBy = 'you'; delete g.xpPending; }
+      // planned for next week / month from Plan ahead
+      if(ui.r43GsFor && g.tier===ui.r43GsFor.kind){ g.pk = ui.r43GsFor.key; g.deadline = periodEnd(g.tier, g.pk); }
+      persist('goals'); xpLast = null; setTimeout(renderView, 30);
+    }
+    ui.r43GsFor = null;
+    return r;
+  };
+})(ACTIONS.gsSave);
+opRateGoal = (function(base){ return async function(g){ await null; return base.apply(this, arguments); }; })(opRateGoal);
+
+// ---- planning ahead: next week from Thursday, next month from the 20th ----
+function r43NextKey(kind){ return kind==='month' ? (function(){ const p = monthKey().split('-').map(Number); return p[1]===12 ? (p[0]+1)+'-01' : p[0]+'-'+pad2(p[1]+1); })() : addDays(weekKey(), 7); }
+function r43PlanOpen(kind){ const d = new Date(todayStr()+'T12:00'); return kind==='month' ? d.getDate() >= XP_BOOK.goals.monthFrom : [4, 5, 6, 0].indexOf(d.getDay())>=0; }
+function r43PlanCardHtml(kind){
+  const key = r43NextKey(kind), name = kind==='month' ? monthName(key) : 'the week of '+fmtDateShort(key), store = kind==='month' ? intentStore().months : intentStore().weeks, rec = store[key] || {}, locked = !!rec.at;
+  const days = Math.round((new Date((kind==='month' ? key+'-01' : key)+'T12:00') - new Date(todayStr()+'T12:00'))/86400000);
+  if(!r43PlanOpen(kind) && !locked) return '<section class="r43-plan is-closed"><span class="r43-k" style="color:'+(kind==='month' ? '#F3C988' : '#8FDCFF')+'">Plan ahead · '+escapeHtml(kind==='month' ? monthName(key) : 'next week')+'</span><b>'+(kind==='month' ? 'Opens on the '+XP_BOOK.goals.monthFrom+'th' : 'Opens Thursday')+'</b></section>';
+  const gs = tierGoals(kind, key), G = XP_BOOK.goals;
+  return '<section class="r43-plan" data-kind="'+kind+'">'+
+    '<div class="r43-plan-h"><span class="r43-k" style="color:'+(kind==='month' ? '#F3C988' : '#8FDCFF')+'">Plan ahead · '+escapeHtml(kind==='month' ? monthName(key) : 'Next week')+'</span><span class="r43-chipr">starts in '+days+' day'+(days===1 ? '' : 's')+'</span></div>'+
+    '<div class="r43-plan-t">Set up '+escapeHtml(name)+'</div>'+
+    '<label class="r43-fld">Your line for the '+(kind==='month' ? 'month' : 'week')+'<input class="input" id="r43PlanLine-'+kind+'" maxlength="80" value="'+escapeHtml(rec.line || '')+'" placeholder="'+(kind==='month' ? 'e.g. Ahead of the content, every week.' : 'e.g. Finish the launch.')+'"></label>'+
+    (kind==='month' ? '<label class="r43-fld">Habit to beat<input class="input" id="r43PlanHabit" maxlength="80" value="'+escapeHtml(rec.habit || '')+'" placeholder="e.g. Scrolling before 10 AM"></label>' : '')+
+    '<div class="r43-plan-g"><span>Goals</span>'+gs.map(function(g){ return '<div class="r43-plan-gr"><span>'+escapeHtml(g.label)+'</span>'+(g.autoTrack ? '<small>tracked'+(['hours', 'workouts', 'reels', 'posts', 'newclients'].indexOf(g.autoTrack)>=0 ? ' · graph' : '')+'</small>' : '<small></small>')+'<button class="r43-xpc'+(g.xpPending ? ' is-sizing' : '')+'" data-action="r43GoalXp" data-id="'+g.id+'">+'+goalXpOf(g).toLocaleString()+'</button><button class="r43-x" data-action="tierGoalDelete" data-id="'+g.id+'" title="Remove">&#10005;</button></div>'; }).join('')+
+      (gs.length < G.maxPer ? '<button class="btn btn-ghost btn-sm" data-action="r43PlanAdd" data-id="'+kind+'">+ Add a goal</button>' : '')+'</div>'+
+    '<div class="r43-plan-f">Setting up the '+(kind==='month' ? 'month' : 'week')+' <b>+'+(kind==='month' ? G.monthIn : G.weekIn)+' XP</b> · clean sweep '+(kind==='month' ? 'at month’s end' : 'on Sunday')+' <b>+'+(kind==='month' ? G.sweepMonth : G.sweepWeek).toLocaleString()+' XP</b></div>'+
+    (locked ? '<div class="r43-plan-done">&#10003; Locked in<button class="btn btn-sm" data-action="r43PlanSave" data-id="'+kind+'">Save changes</button></div>' : r43HoldHtml('r43PlanLock', kind, 'Hold to lock in '+(kind==='month' ? monthName(key) : 'next week'), 'is-wide is-gold'))+
+  '</section>';
+}
+function r43PlanWrite(kind){
+  const key = r43NextKey(kind), store = kind==='month' ? intentStore().months : intentStore().weeks, rec = store[key] = Object.assign({}, store[key] || {});
+  const l = document.getElementById('r43PlanLine-'+kind), h = document.getElementById('r43PlanHabit');
+  if(l) rec.line = l.value.trim(); if(h && kind==='month') rec.habit = h.value.trim();
+  return rec;
+}
+ACTIONS.r43PlanLock = function(el, e, kind){
+  const rec = r43PlanWrite(kind), key = r43NextKey(kind);
+  if(!rec.line && !tierGoals(kind, key).length){ showToast('Give it a line or a goal first.', {icon:'&#9998;'}); if(el) el.classList.remove('is-done'); return; }
+  const first = !rec.at; rec.at = rec.at || Date.now(); rec.atDay = rec.atDay || todayStr();
+  intentStore().prompted[(kind==='month' ? 'M' : 'W')+key] = todayStr();
+  persist('journal'); xpLast = null; playPositive(); renderView();
+  if(first) xpToast(kind==='month' ? XP_BOOK.goals.monthIn : XP_BOOK.goals.weekIn, (kind==='month' ? monthName(key) : 'Next week')+' is set up.');
+};
+ACTIONS.r43PlanSave = function(el, e, kind){ r43PlanWrite(kind); persist('journal'); playTick(); renderView(); showToast('Saved.', {icon:'&#10003;'}); };
+ACTIONS.r43PlanAdd = function(el, e, kind){ r43PlanWrite(kind); persist('journal'); ui.r43GsForNext = {kind:kind, key:r43NextKey(kind)}; openGoalSheet(kind); };
+// (the sheet adds to the next period, and doesn't stop at a checked-out or full current one)
+goalSheetHtml = (function(base){
+  return function(){
+    if(!ui.r43GsFor) return base.apply(this, arguments);
+    const k = ui.gsKind, f = ui.r43GsFor; if(f.kind!==k) return base.apply(this, arguments);
+    const pk = periodKey;
+    periodKey = function(kind){ return kind===f.kind ? f.key : pk.apply(this, arguments); };
+    try{ return base.apply(this, arguments).replace(/<button class="btn btn-primary gs-go" data-action="gsSave" disabled>/, '<button class="btn btn-primary gs-go" data-action="gsSave">'); } finally { periodKey = pk; }
+  };
+})(goalSheetHtml);
+ACTIONS.gsSave = (function(base){
+  return function(){
+    const f = ui.r43GsFor; if(!f || f.kind!==(ui.gsKind || 'week')) return base.apply(this, arguments);
+    const store = f.kind==='month' ? intentStore().months : intentStore().weeks, had = store[f.key] && store[f.key].at;
+    const pk = periodKey; periodKey = function(kind){ return kind===f.kind ? f.key : pk.apply(this, arguments); };
+    try{ return base.apply(this, arguments); } finally { periodKey = pk; if(!had && store[f.key]){ delete store[f.key].at; persist('journal'); } }
+  };
+})(ACTIONS.gsSave);
+
+// ---- the page ----
+function r43Ring(pct, text, color, done){
+  if(done) return '<span class="r43-ring is-done">&#10003;</span>';
+  const r = 19, C = 2*Math.PI*r, off = C*(1 - Math.max(0, Math.min(100, pct))/100);
+  return '<span class="r43-ring" style="--rc:'+color+'"><svg viewBox="0 0 46 46" width="46" height="46"><circle cx="23" cy="23" r="'+r+'" class="r43-ring-bg"/><circle cx="23" cy="23" r="'+r+'" class="r43-ring-fg" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 23 23)"/></svg><b>'+text+'</b></span>';
+}
+function r43ShortNum(v, unit){ if(v==null) return '–'; const n = Math.round(Number(v)*10)/10; return unit==='h' || unit==='h/day' ? Math.round(n)+'h' : unit==='$/mo' ? '$'+(n >= 1000 ? Math.round(n/100)/10+'k' : n) : String(n); }
+function r43TierRowHtml(g, kind){
+  const T = goalTracker(g), has = g.target > 0, cur = T || has ? goalLiveCurrent(g) : null, unit = T ? T.unit : g.unit || '';
+  const pct = has ? goalPct(g) : 0, color = kind==='month' ? '#C58FFF' : '#8FDCFF', locked = checkedOut(g.tier, g.pk);
+  const ringT = has ? (unit==='h' ? r43ShortNum(cur, 'h') : r43ShortNum(cur)+'/'+r43ShortNum(g.target)) : '';
+  const left = has && cur!=null ? Math.max(0, g.target - cur) : null;
+  const sub = g.done ? 'Done '+fmtDateShort(g.doneAt || g.pk)+(g.doneAt && g.deadline && g.doneAt < g.deadline ? ' · '+Math.round((new Date(g.deadline+'T12:00') - new Date(g.doneAt+'T12:00'))/86400000)+' days early' : '')
+    : g.missed ? 'Missed' : g.autoTrack==='newclients' ? (function(){ const r = r43PeriodRange(g), l = r43NewClientsIn(r[0], r[1]).map(function(c){ return c.business || c.name; }); return (l.length ? l.join(', ')+' · ' : '')+(left ? left+' to go' : 'hit'); })()
+    : T ? 'Tracked from '+(g.autoTrack==='hours' ? 'Focus' : g.autoTrack==='workouts' ? 'Health' : g.autoTrack==='reels' ? 'deliverables' : 'your videos')+(left ? ' · '+(unit==='h' ? Math.round(left*10)/10+'h' : left)+' to go' : '')
+    : '';
+  const ai = r43GoalArea(g), areaChip = r43Areas().length > 1 ? '<i class="r43-dotc" style="--ac:'+r43AreaColor(ai)+'" title="'+escapeHtml(r43AreaName(ai))+'"></i>' : '';
+  return '<div class="r43-goal'+(g.done ? ' is-done' : '')+(g.missed ? ' is-missed' : '')+'" data-flip="g-'+g.id+'">'+
+    (has || g.done ? r43Ring(pct, ringT, color, g.done) : '<span class="r43-ring is-empty"></span>')+
+    '<button class="r43-goal-m" data-action="'+(T || has ? 'r43GoalOpen' : 'tierGoalRename')+'" data-id="'+g.id+'"><b>'+areaChip+escapeHtml(goalTitle(g))+'</b>'+(sub ? '<small>'+escapeHtml(sub)+'</small>' : '')+'</button>'+
+    (g.autoTrack==='newclients' && !g.done ? '<button class="r43-link" data-action="r43FixCount" data-id="'+g.id+'">Fix</button>' : '')+
+    (g.done ? '<span class="r43-xpc is-earned">+'+goalXpOf(g).toLocaleString()+' earned</span>'+(locked ? '' : '<button class="r43-x" data-action="r43GoalUndo" data-id="'+g.id+'" title="Undo (takes the XP back)">&#8634;</button>')
+      : '<button class="r43-xpc'+(g.xpPending ? ' is-sizing' : '')+'" data-action="r43GoalXp" data-id="'+g.id+'" title="Tap to set your own number">+'+goalXpOf(g).toLocaleString()+'</button>'+
+        (T || locked ? '' : r43HoldHtml('r43GoalDone', g.id, 'Hold', 'is-sm')))+
+  '</div>';
+}
+function r43RingRowHtml(m, xpTxt){
+  const pct = masterPct(m), done = pct >= 100;
+  const ringT = m.key==='deep' ? Math.round(m.cur)+'h' : fmtGoalNum(m.cur)+'/'+fmtGoalNum(m.target);
+  const left = Math.max(0, (m.target || 0) - (m.cur || 0));
+  return '<div class="r43-goal is-ring'+(done ? ' is-done' : '')+'">'+r43Ring(pct, ringT, m.color, false)+
+    '<div class="r43-goal-m"><b>'+escapeHtml(m.label)+'</b><small>'+(m.key==='newclients' ? (arr(m.names).length ? m.names.join(', ')+' · ' : '')+(left ? left+' to go' : 'hit')+(m.fixed ? ' · fixed by you' : '') : done ? 'Hit' : (m.key==='deep' ? Math.round(left*10)/10+'h' : fmtGoalNum(left))+' to go')+'</small></div>'+
+    (m.key==='newclients' ? '<button class="r43-link" data-action="r43FixCount" data-id="master">Fix</button>' : '')+
+    (xpTxt ? '<span class="r43-xpc is-ring">'+xpTxt+'</span>' : '')+'</div>';
+}
+function r43PanelHtml(kind){
+  const key = periodKey(kind), rec = periodRec(kind, key) || {}, gs = tierGoals(kind, key), done = gs.filter(function(g){ return g.done; }).length;
+  const end = periodEnd(kind, key), daysLeft = Math.max(0, Math.round((new Date(end+'T12:00') - new Date(todayStr()+'T12:00'))/86400000));
+  const due = checkoutDue().find(function(c){ return c.kind===kind; }), out = checkedOut(kind, key), G = XP_BOOK.goals;
+  const hide = mgHidden(), vis = function(m){ return !hide[m.key]; };
+  const rings = kind==='month' ? mgMonthlyDefs().filter(vis).map(function(m){ return r43RingRowHtml(m, ''); })
+    : masterGoalDefs().filter(function(m){ return MG_PERIOD[m.key]==='week' && vis(m) && m.target > 0; }).map(function(m){ return r43RingRowHtml(m, '+'+G.ring); });
+  const line = rec.line || (kind==='month' ? rec.note : rec.focus) || '';
+  const habitOn = kind==='month' && rec.habit && rec.habitDays && rec.habitDays[todayStr()];
+  const lineBox = checkedIn(kind, key)
+    ? '<div class="r43-line is-'+kind+'"><div class="r43-k">Your line for the '+(kind==='month' ? 'month' : 'week')+'</div>'+(line ? '<div class="r43-line-t">'+escapeHtml(line)+'</div>' : '<button class="r43-line-add" data-action="openIntent" data-id="'+kind+'">+ Write your line</button>')+
+        (kind==='month' && rec.habit ? '<div class="r43-line-h"><span>Beating: '+escapeHtml(rec.habit)+'</span><button class="r43-hab'+(habitOn ? ' is-on' : '')+'" data-action="r43HabitToday">'+(habitOn ? '&#10003; Kept today' : 'Kept it today <b>+'+XP_BOOK.personal.habit+'</b>')+'</button></div>' : '')+
+        (kind==='week' && rec.line && rec.focus && rec.focus!==rec.line ? '<div class="r43-line-h"><span>Focus: '+escapeHtml(rec.focus)+'</span></div>' : '')+
+        '<button class="r43-line-e" data-action="openIntent" data-id="'+kind+'" title="Edit">&#9998;</button></div>'
+    : '<button class="r43-setup is-'+kind+'" data-action="openIntent" data-id="'+kind+'"><b>Set up '+(kind==='month' ? monthName(key) : 'the week')+'</b><span>Your line and your goals · +'+(kind==='month' ? G.monthIn : G.weekIn)+' XP</span></button>';
+  return '<section class="r43-panel is-'+kind+'">'+
+    '<div class="r43-panel-h"><div><span class="r43-k" style="color:'+(kind==='month' ? '#F3C988' : '#8FDCFF')+'">'+(kind==='month' ? monthName(key) : 'This week')+'</span>'+(gs.length ? '<span class="r43-chipr">'+done+' of '+gs.length+' hit</span>' : '')+'</div><small>'+(kind==='month' ? daysLeft+' day'+(daysLeft===1 ? '' : 's')+' left' : fmtDateShort(key)+' – '+fmtDateShort(end))+'</small></div>'+
+    lineBox+
+    '<div class="r43-goals">'+gs.map(function(g){ return r43TierRowHtml(g, kind); }).join('')+rings.join('')+'</div>'+
+    (!out && gs.length < G.maxPer && checkedIn(kind, key) ? '<button class="r43-add" data-action="openGoalSheet" data-id="'+kind+'">+ Add a goal</button>' : '')+
+    (gs.length >= 2 && done===gs.length ? '<div class="r43-sweep is-hit">&#9733; Clean sweep +'+(kind==='month' ? G.sweepMonth : G.sweepWeek).toLocaleString()+' XP</div>' : '')+
+    (due ? '<button class="r43-co" data-action="openCheckout" data-id="'+due.kind+':'+due.key+'">Check out of '+(kind==='month' ? monthName(due.key) : 'the week')+' <b>+'+(kind==='month' ? G.monthOut : G.weekOut)+' XP</b></button>' : out ? '<div class="r43-out">Checked out<button class="r43-link" data-action="tierReopen" data-id="'+kind+'">Reopen</button></div>' : '')+
+  '</section>';
+}
+function r43MasterCardHtml(m){
+  const pct = masterPct(m), xp = typeof masterXpNow==='function' ? masterXpNow(m) : 0, hit = pct >= 100;
+  const lab = {mrr:'Monthly revenue', weight:'Body weight', streak:'Days in a row'}[m.key] || m.label;
+  let meter;
+  if(m.key==='streak' && m.target <= 40) meter = '<div class="r43-dots" style="--n:'+m.target+'" aria-label="'+m.cur+' of '+m.target+' days">'+Array.from({length:m.target}, function(_, i){ return '<i class="'+(i < m.cur ? 'is-on' : '')+'"></i>'; }).join('')+'</div>';
+  else meter = '<div class="r43-bar" style="--c:'+m.color+'"><i style="width:'+pct.toFixed(1)+'%"></i></div>';
+  const sub = m.key==='mrr' ? escapeHtml(masterToGo(m))+' · '+escapeHtml(m.src || '') : m.key==='weight' ? escapeHtml(masterToGo(m)) : escapeHtml(masterToGo(m))+(state.profile.streakBest ? ' · best: '+state.profile.streakBest : '');
+  return '<div class="r43-master'+(hit ? ' is-hit' : '')+'" style="--c:'+m.color+'">'+
+    '<div class="r43-master-h"><span class="r43-k">'+escapeHtml(lab)+'</span>'+(xp ? '<span class="r43-chipx">+'+xp.toLocaleString()+' XP at goal</span>' : '')+'</div>'+
+    '<div class="r43-master-n"><b>'+(m.cur==null ? '–' : m.fmt(m.cur))+'</b>'+masterTargetHtml(m).replace('class="mg-target"', 'class="mg-target r43-tgt"')+'</div>'+meter+
+    '<div class="r43-master-f"><span>'+sub+'</span><b>'+Math.round(pct)+'%</b></div></div>';
+}
+function r43OwnCardHtml(g){
+  const T = goalTracker(g), has = g.target > 0, cur = has ? goalLiveCurrent(g) : null, pct = has ? goalPct(g) : 0, unit = T ? T.unit : g.unit || '';
+  const num = function(n){ return n==null ? '–' : unit==='$/mo' ? '$'+fmtGoalNum(n) : fmtGoalNum(n)+(unit && unit!=='$/mo' ? ' '+unit : ''); };
+  const chip = g.life ? 'Life milestone' : 'Long-term';
+  if(g.done) return '<div class="r43-own is-done" data-flip="o-'+g.id+'"><div class="r43-own-ok">&#10003;</div><div class="r43-own-b"><div class="r43-own-t">'+escapeHtml(goalTitle(g))+'</div><small>Done '+fmtDateShort(g.doneAt || todayStr())+(g.deadline && g.doneAt && g.doneAt < g.deadline ? ' · ahead of '+fmtDateShort(g.deadline) : '')+'</small></div>'+
+    '<div class="r43-own-e"><b>+'+goalXpOf(g).toLocaleString()+'</b><small>XP earned</small><button class="r43-link" data-action="r43GoalUndo" data-id="'+g.id+'">Undo</button></div></div>';
+  return '<div class="r43-own'+(g.life ? ' is-life' : '')+'" data-flip="o-'+g.id+'">'+
+    '<div class="r43-own-h"><span class="r43-chipo">'+chip+'</span>'+(g.deadline ? '<small>by '+new Date(g.deadline+'T12:00').toLocaleDateString(undefined, {month:'short', year:'numeric'})+'</small>' : '')+'</div>'+
+    '<button class="r43-own-t" data-action="openGoalEditModal" data-id="'+g.id+'">'+escapeHtml(goalTitle(g))+'</button>'+
+    (has ? '<div class="r43-bar" style="--c:'+(g.life ? '#FFB86B' : '#C58FFF')+'"><i style="width:'+Math.min(100, pct).toFixed(1)+'%"></i></div>' : '')+
+    '<div class="r43-own-f"><span>'+(has ? num(cur)+' of '+num(g.target)+(T ? '' : '<button class="r43-step" data-action="goalStep" data-id="'+g.id+'" data-delta="-1" aria-label="One less">&minus;</button><button class="r43-step" data-action="goalStep" data-id="'+g.id+'" data-delta="1" aria-label="One more">+</button>') : '')+'</span>'+
+      '<button class="r43-xpc'+(g.xpPending ? ' is-sizing' : '')+(g.life ? ' is-life' : '')+'" data-action="r43GoalXp" data-id="'+g.id+'">+'+goalXpOf(g).toLocaleString()+' XP</button></div>'+
+    (T ? '' : r43HoldHtml('r43GoalDone', g.id, 'Hold to complete', 'is-wide'))+
+  '</div>';
+}
+// master goals keep their earlier look: revenue as the strip across, the rest as ring cards beside each other
+function r43MastersOldHtml(defs){
+  const rev = defs.find(function(m){ return m.key==='mrr'; }), rest = defs.filter(function(m){ return m.key!=='mrr'; });
+  return (rev ? g39RevHtml(rev) : '')+(rest.length ? '<div class="g39-col is-master r43-mcol"><div class="g39-rings r43-mrings" style="--n:'+rest.length+'">'+rest.map(function(m){ return masterRingHtml(m, false); }).join('')+'</div></div>' : '');
+}
+renderGoalsTab = function(){
+  const mode = ui.r43GoalsMode==='plan' ? 'plan' : 'now', hide = mgHidden();
+  const defs = masterGoalDefs().filter(function(m){ return (MG_PERIOD[m.key] || 'master')==='master' && !hide[m.key]; })
+    .filter(function(m){ return m.key!=='mrr' || r43ClientsOn() || m.target > 0; }).filter(function(m){ return m.key!=='weight' || m.cur!=null || m.target > 0; });
+  const own = arr(state.goals.items).filter(function(g){ return !g.tier; });
+  const open = own.filter(function(g){ return !g.done; }).sort(function(a, b){ return (b.life ? 1 : 0) - (a.life ? 1 : 0) || (a.deadline || '9999').localeCompare(b.deadline || '9999'); });
+  const done = own.filter(function(g){ return g.done; }).sort(function(a, b){ return String(b.doneAt||'').localeCompare(String(a.doneAt||'')); });
+  const nextM = r43NextKey('month');
+  const head = '<div class="r43-gh"><div class="r43-seg"><button class="'+(mode==='now' ? 'is-on' : '')+'" data-action="r43GoalsMode" data-id="now">'+escapeHtml(monthName(monthKey()))+'</button><button class="'+(mode==='plan' ? 'is-on' : '')+'" data-action="r43GoalsMode" data-id="plan">Plan '+escapeHtml(r43PlanOpen('month') ? monthName(nextM) : 'ahead')+'</button></div>'+(defs.length ? '' : '<button class="r43-cust" data-action="mgCustomize">Customize</button>')+'</div>';
+  if(mode==='plan') return '<div class="r43-goalsp">'+head+'<div class="r43-plans">'+r43PlanCardHtml('month')+r43PlanCardHtml('week')+'</div></div>';
+  return '<div class="r43-goalsp g39">'+head+
+    (defs.length ? '<div class="r43-sec"><span class="r43-k" style="color:#8FDCFF">Master goals</span><button class="r43-gear" data-action="mgCustomize" title="Choose and edit master goals" aria-label="Choose and edit master goals"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div>'+r43MastersOldHtml(defs) : '')+
+    '<div class="r43-panels">'+r43PanelHtml('month')+r43PanelHtml('week')+'</div>'+
+    '<div class="r43-sec is-mine"><div><span class="r43-k" style="color:#FFB86B">Your goals</span></div><button class="btn btn-ghost btn-sm" data-action="openGoalSheet" data-id="long">+ New goal</button></div>'+
+    '<div class="r43-owns">'+open.map(r43OwnCardHtml).join('')+'<button class="r43-own is-add" data-action="openGoalSheet" data-id="long"><b>Add a goal you actually care about</b></button></div>'+
+    (done.length ? '<div class="r43-sec is-ach"><button class="r43-link" data-action="r43ShowAch">'+(ui.r43Ach ? '&#9662;' : '&#9656;')+' Achieved · '+done.length+'</button></div>'+(ui.r43Ach ? '<div class="r43-owns is-done">'+done.map(r43OwnCardHtml).join('')+'</div>' : '') : '')+
+  '</div>';
+};
+ACTIONS.r43GoalsMode = function(el, e, id){ ui.r43GoalsMode = id; playTick(); renderView(); };
+ACTIONS.r43ShowAch = function(){ ui.r43Ach = !ui.r43Ach; renderView(); };
+// the line: check-ins ask for it now (the week's focus and the month's note stay as they were)
+INTENT_FIELDS.month.extra.unshift(['line', 'Your line for the month', 'e.g. Be the guy.']);
+INTENT_FIELDS.week.extra.unshift(['line', 'Your line for the week', 'e.g. Finish the launch.']);
+if(INTENT_FIELDS.week.extra.length > 2) INTENT_FIELDS.week.extra = INTENT_FIELDS.week.extra.filter(function(f){ return f[0]!=='note'; });
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
