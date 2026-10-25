@@ -8017,3 +8017,9 @@ div.r43-goal-m{ cursor:default; }
 .r43-mcol{margin-top:12px}
 .r43-mcol .r43-mrings{margin-top:0;display:grid;grid-template-columns:repeat(var(--n, 2), minmax(0, 1fr));gap:8px}
 .r43-plan:not(.is-closed) .r43-plan-f{margin-top:auto}
+.r41-nn.is-split{ display:grid; grid-template-columns:minmax(0, 1.4fr) minmax(0, 1fr); align-items:stretch; }
+.r41-nn.is-split > *{ margin:0 !important; min-width:0; }
+@media (max-width:900px){ .r41-nn.is-split{ grid-template-columns:1fr; } }
+.r43-look .r43-seg{ display:inline-flex; }
+.r41-nn.is-split .r41-next{ flex-direction:column; align-items:flex-start; justify-content:center; flex-wrap:nowrap; gap:16px; padding:22px 24px; }
+.r41-nn.is-split .r41-next .r41-next-t{ font-size:20px; }

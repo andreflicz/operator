@@ -8028,6 +8028,12 @@ div.r43-goal-m{ cursor:default; }
 .r43-mcol{margin-top:12px}
 .r43-mcol .r43-mrings{margin-top:0;display:grid;grid-template-columns:repeat(var(--n, 2), minmax(0, 1fr));gap:8px}
 .r43-plan:not(.is-closed) .r43-plan-f{margin-top:auto}
+.r41-nn.is-split{ display:grid; grid-template-columns:minmax(0, 1.4fr) minmax(0, 1fr); align-items:stretch; }
+.r41-nn.is-split > *{ margin:0 !important; min-width:0; }
+@media (max-width:900px){ .r41-nn.is-split{ grid-template-columns:1fr; } }
+.r43-look .r43-seg{ display:inline-flex; }
+.r41-nn.is-split .r41-next{ flex-direction:column; align-items:flex-start; justify-content:center; flex-wrap:nowrap; gap:16px; padding:22px 24px; }
+.r41-nn.is-split .r41-next .r41-next-t{ font-size:20px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -41954,7 +41960,9 @@ function r41DvwProgress(t, big){
   let segs = ''; for(let i=0;i<x.need;i++) segs += '<i class="'+(i < x.done ? 'is-on' : '')+'"></i>';
   return '<span class="r41-prog'+(big ? ' is-big' : '')+'" style="--cc:'+col+'"><span class="r41-segs">'+segs+'</span><b>'+x.done+' / '+x.need+'</b></span>';
 }
+let r41NnBase = null;   // (the look before round 41: Settings → Appearance can bring it back)
 nowNextPanelHtml = (function(base){
+  r41NnBase = base;
   return function(opts){
     opts = opts || {};
     // the stacked version (Today, locked-in): same words, same pieces, just smaller
@@ -44137,6 +44145,28 @@ ACTIONS.r43ShowAch = function(){ ui.r43Ach = !ui.r43Ach; renderView(); };
 INTENT_FIELDS.month.extra.unshift(['line', 'Your line for the month', 'e.g. Be the guy.']);
 INTENT_FIELDS.week.extra.unshift(['line', 'Your line for the week', 'e.g. Finish the launch.']);
 if(INTENT_FIELDS.week.extra.length > 2) INTENT_FIELDS.week.extra = INTENT_FIELDS.week.extra.filter(function(f){ return f[0]!=='note'; });
+// ============ ROUND 43 (build 3d): FOCUS LOOKS ============
+// Current + Up next can be shown three ways (Settings → Look & Sound → Appearance): Spotlight (Current big,
+// Up next as the strip under it), Side by side, or Classic (how it looked before).
+const FOCUS_LOOKS = [['spotlight', 'Spotlight'], ['split', 'Side by side'], ['classic', 'Classic']];
+function focusLook(){ const v = state.profile.focusLook; return FOCUS_LOOKS.some(function(l){ return l[0]===v; }) ? v : 'spotlight'; }
+nowNextPanelHtml = (function(base){
+  return function(opts){
+    const look = focusLook();
+    if(opts && opts.stack) return base.apply(this, arguments);
+    if(look==='classic' && r41NnBase) return r41NnBase.apply(this, arguments);
+    const h = base.apply(this, arguments);
+    return look==='split' ? h.replace('<div class="r41-nn', '<div class="r41-nn is-split') : h;
+  };
+})(nowNextPanelHtml);
+themeSettingsHtml = (function(base){
+  return function(){
+    const cur = focusLook();
+    return base.apply(this, arguments)+'<div class="field r43-look"><label>Focus layout</label><div class="r43-seg">'+
+      FOCUS_LOOKS.map(function(l){ return '<button type="button" class="'+(cur===l[0] ? 'is-on' : '')+'" data-action="setFocusLook" data-id="'+l[0]+'">'+l[1]+'</button>'; }).join('')+'</div></div>';
+  };
+})(themeSettingsHtml);
+ACTIONS.setFocusLook = function(el, e, id){ state.profile.focusLook = id; persist('profile'); playTick(); renderView(); };
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

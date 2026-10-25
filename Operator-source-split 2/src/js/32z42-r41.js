@@ -45,7 +45,9 @@ function r41DvwProgress(t, big){
   let segs = ''; for(let i=0;i<x.need;i++) segs += '<i class="'+(i < x.done ? 'is-on' : '')+'"></i>';
   return '<span class="r41-prog'+(big ? ' is-big' : '')+'" style="--cc:'+col+'"><span class="r41-segs">'+segs+'</span><b>'+x.done+' / '+x.need+'</b></span>';
 }
+let r41NnBase = null;   // (the look before round 41: Settings → Appearance can bring it back)
 nowNextPanelHtml = (function(base){
+  r41NnBase = base;
   return function(opts){
     opts = opts || {};
     // the stacked version (Today, locked-in): same words, same pieces, just smaller
