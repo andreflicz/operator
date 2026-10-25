@@ -45,11 +45,11 @@ Object.assign(XP_RATES, {mrrPerK:XP_BOOK.oneoff.mrrPerK, client:XP_BOOK.oneoff.c
   longDay:XP_BOOK.work.longDay, goldDay:XP_BOOK.work.goldDay, outreach:XP_BOOK.work.outreach, outreachEach:XP_BOOK.work.outreachEach, outreachMax:XP_BOOK.work.outreachMax, taskMax:XP_BOOK.work.taskMax});
 MASTER_XP.weekly = XP_BOOK.goals.ring;
 GOAL_XP_BAND.week = XP_BOOK.goals.week; GOAL_XP_BAND.month = XP_BOOK.goals.month; GOAL_XP_BAND.long = XP_BOOK.goals.long; GOAL_XP_BAND.life = XP_BOOK.goals.life;
-// ranks: neutral names for everyone; on the Clients track each also needs MRR and the top two take business names
+// ranks: each needs the level, every area's rating (the lowest) and, once you have clients, the MRR it lists
 RANKS.splice(0, RANKS.length);
 XP_BOOK.ranks.forEach(function(r){
   const o = {level:r.level, low:r.low, mrr:r.mrr, color:r.color, tag:r.tag};
-  Object.defineProperty(o, 'name', {enumerable:true, get:function(){ return r.biz && r43ClientsTrack() ? r.biz : r.name; }});
+  Object.defineProperty(o, 'name', {enumerable:true, get:function(){ return r.biz || r.name; }});
   Object.defineProperty(o, 'health', {enumerable:true, get:function(){ return r.low; }});
   RANKS.push(o);
 });
@@ -87,7 +87,7 @@ function r43ContentOn(){
   const ct = state.standards && state.standards.contentTargets;
   return !!((ct && ct.business && ct.business.n) || arr(state.modes && state.modes.history).some(function(m){ return m.type==='shooting'; }) || state.tasks.items.some(function(t){ return t.isVideoIdea && contentRoleOf(t)!=='personal'; }));
 }
-function r43ClientsTrack(){ return !!(state && state.profile && state.profile.rankClientsTrack && r43ClientsOn()); }
+function r43ClientsTrack(){ return !!(state && state.profile && r43ClientsOn()); }
 
 // every task belongs to one area: the one it's tagged with, or work for client work and business videos,
 // personal for the rest
@@ -422,7 +422,7 @@ xpSummaryFresh = function(){
   if(p.xpBook===43 && level > earned && total < xpForLevel(level)){ const from = level; level = p.xpLevel = earned; if(p.xpSeen) p.xpSeen.level = earned; persist('profile'); r43LevelDropped(from, earned); }
   const maxed = level >= LEVEL_MAX, lo = xpForLevel(level), hi = maxed ? lo : xpForLevel(level + 1);
   const pct = maxed ? 1 : Math.max(0, Math.min(1, (total - lo)/(hi - lo)));
-  // rank: the level and every area's rating (the lowest one), plus MRR on the Clients track
+  // rank: the level and every area's rating (the lowest one), plus MRR once you have clients
   const track = r43ClientsTrack();
   let rank = 0; RANKS.forEach(function(r, i){ if(level >= r.level && attrs.low >= r.low && (!track || one.mrr >= r.mrr)) rank = i; });
   const next = RANKS[rank + 1] || null;

@@ -34,10 +34,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("state.focus.sessions.push({id:'s1', date:'2026-10-23', minutes:360, start:Date.now(), end:Date.now()}); persist('focus'); xpLast = null");
   const day2 = JSON.parse(await E("xpCache = {sig:'', days:{}}; r43Cache = {sig:'', raw:{}}; xpSummary(); JSON.stringify(xpDay('2026-10-23', xpCtx()))"));
   check('…and every area touched pays ×1.25', day2.some(i => i.k==='balance' && /1\.25/.test(i.why)), day2);
-  check('ranks have neutral names', await E("RANKS.map(r => r.name).join()")==='Locked In,Operator,Specialist,Pro,Captain,Commander,Director,Elite,Legend');
-  await E("state.profile.rankClientsTrack = true");
-  check('…and the Clients track names the top two Mogul and Millionaire', await E("RANKS[7].name+RANKS[8].name")==='MogulMillionaire');
-  await E("state.profile.rankClientsTrack = false");
+  check('ranks names', await E("RANKS.map(r => r.name).join()")==='Locked In,Operator,Specialist,Pro,Captain,Commander,Director,Mogul,Millionaire');
+
+  check('with clients, ranks need MRR', await E("r43ClientsTrack()")===true);
+
   const x = JSON.parse(await E("xpLast = null; const x = xpSummary(); JSON.stringify({areas:x.attrs.areas.map(a => a.id), low:x.attrs.low, ovr:x.ovr, clientXp:x.clientXp})"));
   check('the card has one rating per area, and Overall is their average', x.areas.join()==='work,health,personal' && x.ovr >= 25, x);
   check('two new clients pay 1,500 each', x.clientXp===3000, x);

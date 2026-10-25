@@ -42892,11 +42892,11 @@ Object.assign(XP_RATES, {mrrPerK:XP_BOOK.oneoff.mrrPerK, client:XP_BOOK.oneoff.c
   longDay:XP_BOOK.work.longDay, goldDay:XP_BOOK.work.goldDay, outreach:XP_BOOK.work.outreach, outreachEach:XP_BOOK.work.outreachEach, outreachMax:XP_BOOK.work.outreachMax, taskMax:XP_BOOK.work.taskMax});
 MASTER_XP.weekly = XP_BOOK.goals.ring;
 GOAL_XP_BAND.week = XP_BOOK.goals.week; GOAL_XP_BAND.month = XP_BOOK.goals.month; GOAL_XP_BAND.long = XP_BOOK.goals.long; GOAL_XP_BAND.life = XP_BOOK.goals.life;
-// ranks: neutral names for everyone; on the Clients track each also needs MRR and the top two take business names
+// ranks: each needs the level, every area's rating (the lowest) and, once you have clients, the MRR it lists
 RANKS.splice(0, RANKS.length);
 XP_BOOK.ranks.forEach(function(r){
   const o = {level:r.level, low:r.low, mrr:r.mrr, color:r.color, tag:r.tag};
-  Object.defineProperty(o, 'name', {enumerable:true, get:function(){ return r.biz && r43ClientsTrack() ? r.biz : r.name; }});
+  Object.defineProperty(o, 'name', {enumerable:true, get:function(){ return r.biz || r.name; }});
   Object.defineProperty(o, 'health', {enumerable:true, get:function(){ return r.low; }});
   RANKS.push(o);
 });
@@ -42934,7 +42934,7 @@ function r43ContentOn(){
   const ct = state.standards && state.standards.contentTargets;
   return !!((ct && ct.business && ct.business.n) || arr(state.modes && state.modes.history).some(function(m){ return m.type==='shooting'; }) || state.tasks.items.some(function(t){ return t.isVideoIdea && contentRoleOf(t)!=='personal'; }));
 }
-function r43ClientsTrack(){ return !!(state && state.profile && state.profile.rankClientsTrack && r43ClientsOn()); }
+function r43ClientsTrack(){ return !!(state && state.profile && r43ClientsOn()); }
 
 // every task belongs to one area: the one it's tagged with, or work for client work and business videos,
 // personal for the rest
@@ -43269,7 +43269,7 @@ xpSummaryFresh = function(){
   if(p.xpBook===43 && level > earned && total < xpForLevel(level)){ const from = level; level = p.xpLevel = earned; if(p.xpSeen) p.xpSeen.level = earned; persist('profile'); r43LevelDropped(from, earned); }
   const maxed = level >= LEVEL_MAX, lo = xpForLevel(level), hi = maxed ? lo : xpForLevel(level + 1);
   const pct = maxed ? 1 : Math.max(0, Math.min(1, (total - lo)/(hi - lo)));
-  // rank: the level and every area's rating (the lowest one), plus MRR on the Clients track
+  // rank: the level and every area's rating (the lowest one), plus MRR once you have clients
   const track = r43ClientsTrack();
   let rank = 0; RANKS.forEach(function(r, i){ if(level >= r.level && attrs.low >= r.low && (!track || one.mrr >= r.mrr)) rank = i; });
   const next = RANKS[rank + 1] || null;
@@ -43545,7 +43545,6 @@ function r43SettingsHtml(){
     (raw.length < XP_BOOK.areas.max ? '<button class="btn btn-ghost btn-sm" data-action="r43AreaAdd">+ Add an area</button>' : '')+
     '<div class="section-title" style="margin-top:22px">Sleep</div>'+
     '<div class="field"><label>Your bedtime</label><input class="input" type="time" id="r43Bedtime" value="'+escapeHtml(p.bedtime || '')+'"><small class="r43-set-s">Going to Sleep mode by then counts as in bed on time (+'+XP_BOOK.health.bed+' XP).</small></div>'+
-    (r43ClientsOn() ? '<div class="section-title" style="margin-top:22px">Ranks</div><label class="r43-chk"><button class="r43-sw'+(p.rankClientsTrack ? ' is-on' : '')+'" role="switch" aria-checked="'+!!p.rankClientsTrack+'" data-action="r43TrackToggle"><span></span></button><span><b>Clients track</b><small>Each rank also needs the MRR it lists, and the top two are named Mogul and Millionaire.</small></span></label>' : '')+
     '<div class="section-title" style="margin-top:22px">Rewards</div><p class="r43-set-p">Give yourself something for reaching a level. It unlocks when you press Level up.</p>'+
     (rw.length ? '<div class="r43-rws">'+rw.map(function(r){ return '<div class="r43-rwr'+(r.claimed ? ' is-claimed' : r.unlockedAt ? ' is-open' : '')+'"><b>Level '+r.level+'</b><span>'+escapeHtml(r.text)+'</span><small>'+(r.claimed ? 'Claimed' : r.unlockedAt ? 'Unlocked' : 'Locked')+'</small><button data-action="r43RewardRemove" data-id="'+r.id+'">&#10005;</button></div>'; }).join('')+'</div>' : '')+
     '<button class="btn btn-ghost btn-sm" data-action="r43RewardAdd">+ Add a reward</button>'+
@@ -43596,7 +43595,6 @@ ACTIONS.r43HabitAdd = async function(el, e, id){
   a.habits.push({id:uid().slice(0, 8), label:String(n).trim().slice(0, 40), days:{}}); persist('profile'); renderView();
 };
 ACTIONS.r43HabitRemove = function(el, e, id){ const p = String(id).split(':'), a = r43Area(p[0]); if(!a) return; a.habits = arr(a.habits).filter(function(h){ return h.id!==p[1]; }); persist('profile'); xpLast = null; renderView(); };
-ACTIONS.r43TrackToggle = function(){ state.profile.rankClientsTrack = !state.profile.rankClientsTrack; persist('profile'); xpLast = null; renderView(); };
 // (removed areas don't show in Settings, but stay on the record)
 r43SettingsHtml = (function(base){ return function(){ const p = state.profile, all = p.xpAreas; p.xpAreas = arr(all).filter(function(a){ return !a.removed; }); try{ return base.apply(this, arguments); } finally { p.xpAreas = all; } }; })(r43SettingsHtml);
 
@@ -43740,7 +43738,7 @@ function r43GuideHtml(){
     '<div class="xpg-sec">How Op grades a goal</div><p class="r43-g-p">Op sets a number the moment you add a goal and shows only the number. He judges five things: how hard it is for you from your real numbers, how long it takes, how much it changes your life, whether it’s a first (first car, first home, first hire), and what it costs you. He also picks the tier and the area: a long-term goal that’s really a once-in-a-life event becomes a Life milestone. Tap the XP on any goal to set your own number within its tier’s range; once you do, Op never touches it again.</p>'+
     '<div class="xpg-sec">Levels</div><p class="r43-g-p">Each level costs '+B.level.base+' + '+B.level.lin+'×L + '+B.level.sq+'×L² XP. Early levels come in a day or less; the slowest, at the very top, take about a week and a half. Levels are claimed: when you have the XP, a Level up button appears.</p>'+
     r43Tbl(['Level', 'XP in total', 'Typical pace', 'Strong pace'], LV.map(function(L){ return ['L'+L, '~'+r43N(Math.round(xpForLevel(L)/1000)*1000 || xpForLevel(L)), wk(L, B.level.pace.typical), wk(L, B.level.pace.strong)]; }))+
-    '<div class="xpg-sec">Ranks</div><p class="r43-g-p">Each rank needs the level and a rating in every area you track, judged by your lowest one, so one strong area can’t carry you.'+(r43ClientsOn() ? ' Turn on the Clients track (Settings → XP &amp; Areas) and each rank also needs the MRR shown.' : '')+' If you fall below a rank’s line for 30 days straight, the rank follows; XP and level stay.</p>'+
+    '<div class="xpg-sec">Ranks</div><p class="r43-g-p">Each rank needs the level and a rating in every area you track, judged by your lowest one, so one strong area can’t carry you.'+(r43ClientsOn() ? ' With clients, each rank also needs the MRR shown.' : '')+' If you fall below a rank’s line for 30 days straight, the rank follows; XP and level stay.</p>'+
     '<div class="xph-track">'+RANKS.map(function(rk, i){ const stt = i < x.rank ? 'is-done' : i===x.rank ? 'is-cur' : ''; return '<span class="xph-tr '+stt+'" style="--rc:'+rk.color+'">'+rankBadgeSvg(i, 30)+'<b>'+escapeHtml(rk.name)+'</b><small>LVL '+rk.level+(rk.low ? '<br>lowest area '+rk.low : '')+(track && rk.mrr ? '<br>'+money(rk.mrr)+' MRR' : '')+'</small></span>'; }).join('')+'</div>'+
     '<div class="xpg-sec">Your card</div><p class="r43-g-p">One rating per area you track, 25 to 100, plus an Overall that’s their average and only reaches 100 when every area does. A piece you don’t use (no clients, no weigh-ins) simply isn’t counted. Your standing with Op is its own score on his screen and never touches XP, levels, ranks or ratings.</p>'+
     r43Tbl(['Rating', 'What feeds it'], cardRows)+
