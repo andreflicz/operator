@@ -113,7 +113,7 @@ ACTIONS.ghlConnect = async function(){
   }catch(e){ ui.ghlBusy = null; ui.ghlError = e.message; renderView(); }
 };
 ACTIONS.ghlDisconnect = async function(){
-  if(!confirm('Disconnect GoHighLevel? Leads and appointments already brought in stay where they are.')) return;
+  if(!(await uiConfirm({title:'Disconnect GoHighLevel?', text:'Leads and appointments already brought in stay where they are.', ok:'Disconnect', danger:true}))) return;
   try{ await ghlFetch(GHL_HELPER+'forget'); }catch(e){}
   const g = ghlCfg(); g.connected = false; g.lastSync = null; g.lastResult = null;
   persist('settings'); renderView();

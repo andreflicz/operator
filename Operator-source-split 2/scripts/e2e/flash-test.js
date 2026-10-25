@@ -3,7 +3,7 @@ const path = require('path');
 const { chromium } = require('playwright');
 (async () => {
   const file = process.argv[2];
-  const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });
+  const browser = await chromium.launch({ executablePath: (process.env.OP_CHROME || require('fs').readdirSync('/opt/pw-browsers').filter(n => /^chromium-\d+$/.test(n)).sort().map(d => ['chrome-linux/chrome', 'chrome-linux64/chrome'].map(s => '/opt/pw-browsers/'+d+'/'+s).find(f => require('fs').existsSync(f))).filter(Boolean).pop()), args: ['--no-sandbox'] });
   const page = await browser.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));

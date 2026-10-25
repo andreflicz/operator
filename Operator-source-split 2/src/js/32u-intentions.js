@@ -205,9 +205,10 @@ ACTIONS.saveCheckout = function(el, e, id){
 // rename or delete one (deleting asks twice; a checked-out period can still be cleaned up)
 ACTIONS.tierGoalRename = function(el, e, id){
   const g = arr(state.goals.items).find(function(x){ return x.id===id; }); if(!g) return;
-  const v = prompt('Rename this goal', g.label); if(v==null) return;
-  const t = v.trim(); if(!t) return;
-  g.label = t.slice(0, 140); persist('goals'); renderView();
+  uiAsk({title:'Rename this goal', value:g.label, ok:'Rename'}).then(function(v){ if(v==null) return;
+    const t = v.trim(); if(!t) return;
+    g.label = t.slice(0, 140); persist('goals'); renderView();
+  });
 };
 ACTIONS.tierGoalDelete = function(el, e, id){
   const key = 'tgdel:'+id;

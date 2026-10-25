@@ -57,13 +57,14 @@ function goalCardHtml(g, compact){
 }
 ACTIONS.goalSetNumber = function(el, e, id){
   const g = state.goals.items.find(function(x){ return x.id===id; }); if(!g) return;
-  const v = prompt('Where are you now for "'+goalTitle(g)+'"?', String(g.current||0));
+  uiAsk({title:'Where are you now?', text:goalTitle(g), value:String(g.current||0), ok:'Update'}).then(function(v){
   if(v==null) return;
   const n = Number(String(v).replace(/[^0-9.\-]/g, '')); if(isNaN(n)) return;
   g.current = n;
   if(g.target && g.current>=g.target && !g.done){ g.done = true; g.doneAt = todayStr(); playFanfare(); showToast('Goal reached: '+goalTitle(g), {icon:'&#127942;'}); }
   else playTick();
   persist('goals'); renderView();
+  });
 };
 function fmtGoalNum(n, unit){ n = Number(n)||0; const s = n.toLocaleString(undefined, {maximumFractionDigits:1}); return /^\$/.test(unit||'') ? '$'+s : s; }
 ACTIONS.goalStep = function(el, e, id){

@@ -9,7 +9,7 @@ const { chromium } = require('playwright');
   const url = 'file://' + path.resolve(file);
 
   const browser = await chromium.launch({
-    executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
+    executablePath: (process.env.OP_CHROME || require('fs').readdirSync('/opt/pw-browsers').filter(n => /^chromium-\d+$/.test(n)).sort().map(d => ['chrome-linux/chrome', 'chrome-linux64/chrome'].map(s => '/opt/pw-browsers/'+d+'/'+s).find(f => require('fs').existsSync(f))).filter(Boolean).pop()),
     args: ['--no-sandbox'],
   });
   const page = await browser.newPage();

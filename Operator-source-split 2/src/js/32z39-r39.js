@@ -680,9 +680,10 @@ ACTIONS.demoFx = function(el, e, id){
   else if(id==='checkin'){ if(typeof acctPing==='function') acctPing(); }
 };
 ACTIONS.demoRestart = function(){
-  if(!confirm('Start the demo over? Everything you changed in the demo goes back to how it started.')) return;
+  uiConfirm({title:'Start the demo over?', text:'Everything you changed in the demo goes back to how it started.', ok:'Start over'}).then(function(yes){ if(!yes) return;
   addSheetClose('demoSheet'); state.modes.active = null; state.focus.activeSession = null; persist('modes'); persist('focus');
   demoSeed(); renderView(); showToast('The demo is fresh again.', {icon:'&#127899;'});
+  });
 };
 
 // ---- 21. tabs open once, cleanly ----

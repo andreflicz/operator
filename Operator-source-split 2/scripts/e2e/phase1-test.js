@@ -20,7 +20,7 @@ async function newPage(browser, seed, clockAt){
   return page;
 }
 (async () => {
-  const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });
+  const browser = await chromium.launch({ executablePath: (process.env.OP_CHROME || require('fs').readdirSync('/opt/pw-browsers').filter(n => /^chromium-\d+$/.test(n)).sort().map(d => ['chrome-linux/chrome', 'chrome-linux64/chrome'].map(s => '/opt/pw-browsers/'+d+'/'+s).find(f => require('fs').existsSync(f))).filter(Boolean).pop()), args: ['--no-sandbox'] });
   const today = ds(new Date());
   const baseTasks = {items:[
     {id:'t1', title:'Edit reel', clients:['personal'], client:'personal', priority:'high', status:'today', notes:'orig notes', createdAt:today, deadline:today},

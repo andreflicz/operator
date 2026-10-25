@@ -112,11 +112,12 @@ ACTIONS.videoWallAddUrl = function(){ const i = document.getElementById('videoWa
 ACTIONS.videoWallRemove = function(el, e, id){
   if(e) e.stopPropagation();
   const v = videoWallById(id); if(!v) return;
-  if(!confirm('Remove the "'+v.name+'" wallpaper?')) return;
+  uiConfirm({title:'Remove the "'+v.name+'" wallpaper?', ok:'Remove', danger:true}).then(function(yes){ if(!yes) return;
   state.profile.videoWalls = videoWalls().filter(function(x){ return x.id!==id; });
   if(String(v.src).indexOf('vidb:')===0) blobTx('readwrite', function(store){ return store.delete(v.src.slice(5)); }).catch(function(){});
   if(state.profile.scene==='vid:'+id) state.profile.scene = 'minimal';
   persist('profile'); sceneMount(); renderView();
+  });
 };
 document.addEventListener('change', function(e){
   const t = e.target;

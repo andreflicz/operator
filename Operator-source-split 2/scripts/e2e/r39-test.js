@@ -8,7 +8,7 @@ const { chromium } = require('playwright');
 const { instrument, newPage, check, report, OUT } = require('./common.js');
 (async () => {
   instrument(process.argv[2], OUT+'/r39.html');
-  const b = await chromium.launch({ executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args:['--no-sandbox', '--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', '--autoplay-policy=no-user-gesture-required'] });
+  const b = await chromium.launch({ executablePath:(process.env.OP_CHROME || require('fs').readdirSync('/opt/pw-browsers').filter(n => /^chromium-\d+$/.test(n)).sort().map(d => ['chrome-linux/chrome', 'chrome-linux64/chrome'].map(s => '/opt/pw-browsers/'+d+'/'+s).find(f => require('fs').existsSync(f))).filter(Boolean).pop()), args:['--no-sandbox', '--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', '--autoplay-policy=no-user-gesture-required'] });
   const T = new Date(2026,9,14,14,20).getTime();   // Wed Oct 14
   const biz = {clients:[
     {id:'bm', name:'Mike', business:'Brothers Mechanical', stage:'active', status:'active', mrr:2000, startDate:'2026-09-01', createdAt:'2026-09-01', touches:['2026-10-12'],

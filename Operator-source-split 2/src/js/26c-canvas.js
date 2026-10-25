@@ -639,8 +639,9 @@ ACTIONS.boardAddImage = function(){
   inp.click();
 };
 ACTIONS.boardAddImageUrl = function(){
-  const url = window.prompt('Image link (https://…)');
-  if(url && /^https?:\/\//i.test(url.trim())) addElement({type:'image', ref:url.trim(), w:320, h:220});
+  uiAsk({title:'Add an image from a link', placeholder:'https://…', ok:'Add'}).then(function(url){
+    if(url && /^https?:\/\//i.test(url.trim())) addElement({type:'image', ref:url.trim(), w:320, h:220});
+  });
 };
 ACTIONS.boardAddNested = function(){
   const parent = cvBoard(); if(!parent) return;
