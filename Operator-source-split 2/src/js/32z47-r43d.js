@@ -20,3 +20,18 @@ themeSettingsHtml = (function(base){
   };
 })(themeSettingsHtml);
 ACTIONS.setFocusLook = function(el, e, id){ state.profile.focusLook = id; persist('profile'); playTick(); renderView(); };
+
+// ---- Waiting on clients, at a glance: a dashed strip under Worth doing soon (tap one for the Waiting tab) ----
+renderFocusTasksOverview = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), w = typeof r42Waiting==='function' ? r42Waiting() : [];
+    if(!w.length) return h;
+    const chips = w.map(function(t){
+      const x = t.waitingOn || {}, c = r42ClientOf(t), col = c ? clientAccent(c) : '#8A90A2';
+      const days = x.since ? Math.max(0, Math.round((new Date(todayStr()+'T12:00') - new Date(x.since+'T12:00'))/86400000)) : 0;
+      return '<button class="r43-wchip" style="--cc:'+col+'" data-action="r43OpenWaiting">'+escapeHtml((c ? (c.business || c.name)+' · ' : '')+(x.what || t.title))+' · '+(days ? days+' day'+(days===1 ? '' : 's') : 'today')+'</button>';
+    }).join('');
+    return h+'<section class="r43-wait" aria-label="Waiting on clients"><span class="r43-k">Waiting on clients</span>'+chips+'</section>';
+  };
+})(renderFocusTasksOverview);
+ACTIONS.r43OpenWaiting = function(){ ui.focusTasksSubTab = 'waiting'; renderView(); };

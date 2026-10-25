@@ -8034,6 +8034,10 @@ div.r43-goal-m{ cursor:default; }
 .r43-look .r43-seg{ display:inline-flex; }
 .r41-nn.is-split .r41-next{ flex-direction:column; align-items:flex-start; justify-content:center; flex-wrap:nowrap; gap:16px; padding:22px 24px; }
 .r41-nn.is-split .r41-next .r41-next-t{ font-size:20px; }
+.r43-wait{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:22px 0 8px; padding:16px 18px; border:1px dashed var(--border-strong); border-radius:14px; }
+.r43-wait .r43-k{ color:var(--text-dim); margin-right:4px; }
+.r43-wchip{ border:0; cursor:pointer; padding:5px 11px; border-radius:999px; font:600 12px var(--font-body); background:color-mix(in srgb, var(--cc) 14%, transparent); color:color-mix(in srgb, var(--cc) 70%, white); }
+.r43-wchip:hover{ background:color-mix(in srgb, var(--cc) 24%, transparent); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -44167,6 +44171,21 @@ themeSettingsHtml = (function(base){
   };
 })(themeSettingsHtml);
 ACTIONS.setFocusLook = function(el, e, id){ state.profile.focusLook = id; persist('profile'); playTick(); renderView(); };
+
+// ---- Waiting on clients, at a glance: a dashed strip under Worth doing soon (tap one for the Waiting tab) ----
+renderFocusTasksOverview = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), w = typeof r42Waiting==='function' ? r42Waiting() : [];
+    if(!w.length) return h;
+    const chips = w.map(function(t){
+      const x = t.waitingOn || {}, c = r42ClientOf(t), col = c ? clientAccent(c) : '#8A90A2';
+      const days = x.since ? Math.max(0, Math.round((new Date(todayStr()+'T12:00') - new Date(x.since+'T12:00'))/86400000)) : 0;
+      return '<button class="r43-wchip" style="--cc:'+col+'" data-action="r43OpenWaiting">'+escapeHtml((c ? (c.business || c.name)+' · ' : '')+(x.what || t.title))+' · '+(days ? days+' day'+(days===1 ? '' : 's') : 'today')+'</button>';
+    }).join('');
+    return h+'<section class="r43-wait" aria-label="Waiting on clients"><span class="r43-k">Waiting on clients</span>'+chips+'</section>';
+  };
+})(renderFocusTasksOverview);
+ACTIONS.r43OpenWaiting = function(){ ui.focusTasksSubTab = 'waiting'; renderView(); };
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
