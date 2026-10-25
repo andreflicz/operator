@@ -8016,3 +8016,4 @@ div.r43-goal-m{ cursor:default; }
 @media (max-width:760px){ .r43-mrings{grid-template-columns:1fr} }
 .r43-mcol{margin-top:12px}
 .r43-mcol .r43-mrings{margin-top:0;display:grid;grid-template-columns:repeat(var(--n, 2), minmax(0, 1fr));gap:8px}
+.r43-plan:not(.is-closed) .r43-plan-f{margin-top:auto}
