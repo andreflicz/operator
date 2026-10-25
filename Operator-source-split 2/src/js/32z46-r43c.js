@@ -400,10 +400,27 @@ function r43OwnCardHtml(g){
     (T ? '' : r43HoldHtml('r43GoalDone', g.id, 'Hold to complete', 'is-wide'))+
   '</div>';
 }
+// body weight and days in a row get the same weight as revenue: a ring, the big number, and their own meter
+function r43MasterHeroHtml(m){
+  const pct = masterPct(m), hit = pct >= 100, xp = typeof masterXpNow==='function' ? masterXpNow(m) : 0;
+  let meter = '';
+  if(m.key==='streak'){
+    const n = Math.max(1, Math.min(60, Number(m.target) || 30)), cur = Number(m.cur) || 0;
+    meter = '<div class="r43-mh-dots" style="--n:'+n+'">'+Array.from({length:n}, function(_, i){ return '<i class="'+(i < cur ? 'is-on' : '')+(i===cur - 1 ? ' is-now' : '')+'"></i>'; }).join('')+'</div>';
+  } else {
+    meter = '<div class="mg-bar"><div class="mg-bar-fill" style="width:'+pct.toFixed(1)+'%"></div></div>'+
+      (m.start!=null && m.target!=null ? '<div class="r43-mh-ends"><span>'+m.fmt(m.start)+m.suffix+'</span><span>'+m.fmt(m.target)+m.suffix+'</span></div>' : '');
+  }
+  return '<section class="r43-mh'+(hit ? ' is-hit' : '')+' is-'+m.key+'" style="--mg1:'+m.color+';--mg2:'+m.color2+';">'+
+    '<div class="r43-mh-top"><span class="g39-k">'+m.icon+' '+escapeHtml(m.label)+'</span>'+(xp ? '<span class="mg-xp">+'+xp.toLocaleString()+' XP</span>' : '')+'</div>'+
+    '<div class="r43-mh-mid"><div class="r43-mh-ring">'+ringSvg(pct, m.color, m.color2, 'h'+m.key, 92)+'<span>'+(hit ? '&#10003;' : Math.round(pct)+'%')+'</span></div>'+
+      '<div class="r43-mh-n"><div class="g39-rev-n"><b>'+(m.cur==null ? '–' : m.fmt(m.cur))+'</b><span>'+escapeHtml(m.suffix.trim())+'</span></div>'+masterTargetHtml(m)+'<small>'+escapeHtml(masterToGo(m))+'</small></div></div>'+
+    meter+'</section>';
+}
 // master goals keep their earlier look: revenue as the strip across, the rest as ring cards beside each other
 function r43MastersOldHtml(defs){
   const rev = defs.find(function(m){ return m.key==='mrr'; }), rest = defs.filter(function(m){ return m.key!=='mrr'; });
-  return (rev ? g39RevHtml(rev) : '')+(rest.length ? '<div class="g39-col is-master r43-mcol"><div class="g39-rings r43-mrings" style="--n:'+rest.length+'">'+rest.map(function(m){ return masterRingHtml(m, false); }).join('')+'</div></div>' : '');
+  return (rev ? g39RevHtml(rev) : '')+(rest.length ? '<div class="r43-mheros" style="--n:'+rest.length+'">'+rest.map(r43MasterHeroHtml).join('')+'</div>' : '');
 }
 renderGoalsTab = function(){
   const mode = ui.r43GoalsMode==='plan' ? 'plan' : 'now', hide = mgHidden();
