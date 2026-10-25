@@ -8215,3 +8215,69 @@ div.r43-goal-m{ cursor:default; }
 .sx2-wx{ margin-left:auto; font:800 16px var(--font-display); } .sx2-wx.is-up{ color:#7CF0C4; } .sx2-wx.is-blue{ color:#8FDCFF; } .sx2-wx.is-down{ color:#FF9A8A; }
 .sx2-conn{ margin-top:22px; } .sx2-conn summary{ cursor:pointer; font:700 11px var(--font-body); letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); margin-bottom:12px; }
 @media (max-width:980px){ .sx2-hero, .sx2-perf{ grid-template-columns:1fr; } .sx2-kpis{ grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+
+/* ===================== ROUND 44: holiday takeovers ===================== */
+:root[data-holiday="halloween"]{ --accent:#FF7A1A; --accent-dim:rgba(255,122,26,.16); }
+:root[data-holiday="thanksgiving"]{ --accent:#D9822B; --accent-dim:rgba(217,130,43,.16); }
+:root[data-holiday="christmas"]{ --accent:#E8484F; --accent-dim:rgba(232,72,79,.16); }
+:root[data-holiday="birthday"]{ --accent:#FFC83D; --accent-dim:rgba(255,200,61,.16); }
+:root:not([data-theme="light"])[data-holiday="halloween"]{ --bg:#0D0812; --panel:rgba(26,14,32,.86); --panel-2:rgba(38,20,46,.9); --border:#3A2244; }
+:root:not([data-theme="light"])[data-holiday="thanksgiving"]{ --bg:#130E0A; --panel:rgba(30,22,14,.86); --panel-2:rgba(44,32,20,.9); --border:#45321E; }
+:root:not([data-theme="light"])[data-holiday="christmas"]{ --bg:#07120D; --panel:rgba(14,30,22,.86); --panel-2:rgba(20,44,32,.9); --border:#23503A; }
+:root:not([data-theme="light"])[data-holiday="birthday"]{ --bg:#0E0C14; --panel:rgba(26,21,38,.86); --panel-2:rgba(38,31,54,.9); --border:#3E3458; }
+:root[data-holiday] body{ background:var(--bg); }
+:root[data-holiday="halloween"] .sidebar{ background:#120A18 !important; } :root[data-holiday="thanksgiving"] .sidebar{ background:#18110B !important; }
+:root[data-holiday="christmas"] .sidebar{ background:#0A1711 !important; } :root[data-holiday="birthday"] .sidebar{ background:#13101B !important; }
+:root[data-holiday] .brand-text em{ color:var(--accent) !important; }
+.hol-fx{ position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden; }
+:root[data-holiday] .main, :root[data-holiday] #viewRoot, :root[data-holiday] .main-content{ background:transparent !important; }
+.hol-ban{ position:relative; overflow:hidden; display:flex; flex-direction:column; gap:4px; margin:4px 0 18px; padding:20px 24px; border-radius:16px; border:1px solid var(--border); background:var(--panel); backdrop-filter:blur(4px); }
+.hol-ban .hol-k{ font:700 11px var(--font-body); letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+.hol-ban b{ font:700 26px var(--font-display); }
+.hol-ban small{ color:var(--text-dim); font-size:13px; }
+.hol-ban.is-halloween b{ color:#FFE3C7; } .hol-ban.is-thanksgiving b{ color:#FFE8CC; } .hol-ban.is-christmas b{ color:#EFFFF5; } .hol-ban.is-birthday b{ color:#FFF2CC; }
+.hol-hat{ position:absolute; right:22px; top:10px; animation:hxBob 2s ease-in-out infinite; transform-origin:bottom center; }
+.hol-set .hol-row{ display:flex; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap; } .hol-set .hol-row > span{ min-width:110px; color:var(--text-dim); font-size:13px; font-weight:600; }
+.hol-set .hol-row input{ width:auto; } .hol-set .hol-row em{ font-style:normal; color:#F3C988; font-size:13px; font-weight:600; }
+.hol-set .r43-seg{ display:inline-flex; }
+.hol-prev{ display:flex; gap:6px; flex-wrap:wrap; } .hol-prev button{ border-radius:999px; padding:6px 12px; border:1px solid var(--border-strong); background:none; color:var(--text-dim); font:600 12px var(--font-body); cursor:pointer; } .hol-prev button.is-on{ color:var(--text); border-color:var(--accent); background:var(--accent-dim); }
+/* halloween */
+.hx-moon{ position:absolute; right:7%; top:90px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle at 40% 40%, #FFF4D6, #FFD58A 60%, #E89B3C); box-shadow:0 0 90px 26px rgba(255,170,80,.18); opacity:.8; animation:hxGlow 5s ease-in-out infinite; }
+@keyframes hxGlow{ 50%{ box-shadow:0 0 130px 40px rgba(255,140,50,.28); } }
+.hx-bat{ position:absolute; left:-60px; top:var(--t); scale:var(--s); animation:hxFly var(--d) linear infinite; animation-delay:var(--dl); }
+.hx-bat path{ fill:#3B1C4A; animation:hxFlap .35s ease-in-out infinite alternate; transform-origin:20px 9px; }
+@keyframes hxFly{ 0%{ translate:0 0; } 25%{ translate:30vw -30px; } 50%{ translate:60vw 14px; } 75%{ translate:85vw -20px; } 100%{ translate:110vw 0; } }
+@keyframes hxFlap{ to{ transform:scaleY(.4); } }
+.hx-fog{ position:absolute; left:-40%; bottom:-60px; width:180%; height:260px; background:radial-gradient(ellipse at 30% 50%, rgba(150,90,190,.18), transparent 60%), radial-gradient(ellipse at 70% 60%, rgba(255,120,40,.1), transparent 55%); filter:blur(10px); animation:hxDrift 18s ease-in-out infinite alternate; }
+.hx-fog.is-2{ bottom:auto; top:35%; opacity:.6; animation-duration:26s; animation-direction:alternate-reverse; }
+@keyframes hxDrift{ to{ transform:translateX(18%); } }
+/* thanksgiving */
+.hx-warm{ position:absolute; inset:0; background:radial-gradient(ellipse at 85% 0%, rgba(217,130,43,.16), transparent 55%); }
+.hx-leaf{ position:absolute; top:-30px; left:var(--x); width:16px; height:16px; background:var(--c); border-radius:0 70% 0 70%; opacity:.8; animation:hxFall var(--d) linear infinite; animation-delay:var(--dl); }
+@keyframes hxFall{ 0%{ transform:translate(0, 0) rotate(0); } 50%{ transform:translate(40px, 52vh) rotate(calc(var(--r)/2)); } 100%{ transform:translate(-20px, 105vh) rotate(var(--r)); } }
+.hx-tk{ position:absolute; animation:hxWaddle var(--d, 34s) linear infinite; animation-delay:var(--dl, 0s); transform-origin:center bottom; }
+.hx-tk .hx-tail{ transform-origin:60px 62px; animation:hxFan 2.4s ease-in-out infinite; }
+.hx-tk .hx-head{ transform-origin:60px 50px; animation:hxPeck .6s ease-in-out infinite alternate; }
+@keyframes hxWaddle{ 0%{ translate:0 0; rotate:-4deg; } 5%{ rotate:4deg; } 10%{ rotate:-4deg; } 15%{ rotate:4deg; } 20%{ rotate:-4deg; } 25%{ rotate:4deg; } 30%{ rotate:-4deg; } 35%{ rotate:4deg; } 40%{ rotate:-4deg; } 45%{ rotate:4deg; } 50%{ rotate:-4deg; } 55%{ rotate:4deg; } 60%{ rotate:-4deg; } 65%{ rotate:4deg; } 70%{ rotate:-4deg; } 75%{ rotate:4deg; } 80%{ rotate:-4deg; } 85%{ rotate:4deg; } 90%{ rotate:-4deg; } 95%{ rotate:4deg; } 100%{ translate:calc(100vw + 280px) 0; rotate:-4deg; } }
+@keyframes hxFan{ 50%{ transform:scale(1.08) rotate(3deg); } }
+@keyframes hxPeck{ to{ transform:translateY(3px) rotate(6deg); } }
+/* christmas */
+.hx-lights{ position:absolute; left:0; top:0; width:100%; height:40px; }
+.hx-bulb{ animation:hxTwinkle 1.8s ease-in-out infinite; animation-delay:var(--dl); }
+@keyframes hxTwinkle{ 50%{ opacity:.35; } }
+.hx-snow{ position:absolute; top:-10px; left:var(--x); width:var(--z); height:var(--z); border-radius:50%; background:#fff; opacity:var(--o); animation:hxSnow var(--d) linear infinite; animation-delay:var(--dl); }
+@keyframes hxSnow{ to{ transform:translate(30px, 105vh); } }
+/* birthday */
+.hx-strm{ position:absolute; left:0; top:0; width:100%; height:60px; }
+.hx-flags{ position:absolute; left:240px; right:0; top:0; display:flex; justify-content:space-around; }
+.hx-flags i{ width:0; height:0; border-left:11px solid transparent; border-right:11px solid transparent; border-top:20px solid var(--c); animation:hxFlutter 1.6s ease-in-out infinite alternate; }
+.hx-flags i:nth-child(2n){ animation-delay:.4s; }
+@keyframes hxFlutter{ to{ transform:rotate(8deg) translateY(2px); } }
+.hx-bal{ position:absolute; bottom:-100px; left:var(--x); animation:hxRise var(--d) ease-in infinite; animation-delay:var(--dl); }
+.hx-bal i{ display:block; width:38px; height:46px; border-radius:50% 50% 46% 46%; background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.55), var(--c) 45%); position:relative; opacity:.85; }
+.hx-bal i::after{ content:""; position:absolute; left:18px; top:46px; width:1px; height:44px; background:rgba(255,255,255,.3); }
+@keyframes hxRise{ 0%{ transform:translate(0, 0); } 50%{ transform:translate(18px, -55vh); } 100%{ transform:translate(-8px, -115vh); } }
+.hx-cf{ position:absolute; top:-14px; left:var(--x); width:7px; height:12px; border-radius:2px; background:var(--c); animation:hxFall2 var(--d) linear infinite; animation-delay:var(--dl); }
+@keyframes hxFall2{ to{ transform:translate(20px, 105vh) rotate(var(--r)); } }
+@keyframes hxBob{ 50%{ transform:rotate(-10deg) translateY(-4px); } }
+@media (prefers-reduced-motion:reduce){ .hol-fx *, .hol-hat{ animation:none !important; } }

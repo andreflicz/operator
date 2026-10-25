@@ -8226,6 +8226,72 @@ div.r43-goal-m{ cursor:default; }
 .sx2-wx{ margin-left:auto; font:800 16px var(--font-display); } .sx2-wx.is-up{ color:#7CF0C4; } .sx2-wx.is-blue{ color:#8FDCFF; } .sx2-wx.is-down{ color:#FF9A8A; }
 .sx2-conn{ margin-top:22px; } .sx2-conn summary{ cursor:pointer; font:700 11px var(--font-body); letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); margin-bottom:12px; }
 @media (max-width:980px){ .sx2-hero, .sx2-perf{ grid-template-columns:1fr; } .sx2-kpis{ grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+
+/* ===================== ROUND 44: holiday takeovers ===================== */
+:root[data-holiday="halloween"]{ --accent:#FF7A1A; --accent-dim:rgba(255,122,26,.16); }
+:root[data-holiday="thanksgiving"]{ --accent:#D9822B; --accent-dim:rgba(217,130,43,.16); }
+:root[data-holiday="christmas"]{ --accent:#E8484F; --accent-dim:rgba(232,72,79,.16); }
+:root[data-holiday="birthday"]{ --accent:#FFC83D; --accent-dim:rgba(255,200,61,.16); }
+:root:not([data-theme="light"])[data-holiday="halloween"]{ --bg:#0D0812; --panel:rgba(26,14,32,.86); --panel-2:rgba(38,20,46,.9); --border:#3A2244; }
+:root:not([data-theme="light"])[data-holiday="thanksgiving"]{ --bg:#130E0A; --panel:rgba(30,22,14,.86); --panel-2:rgba(44,32,20,.9); --border:#45321E; }
+:root:not([data-theme="light"])[data-holiday="christmas"]{ --bg:#07120D; --panel:rgba(14,30,22,.86); --panel-2:rgba(20,44,32,.9); --border:#23503A; }
+:root:not([data-theme="light"])[data-holiday="birthday"]{ --bg:#0E0C14; --panel:rgba(26,21,38,.86); --panel-2:rgba(38,31,54,.9); --border:#3E3458; }
+:root[data-holiday] body{ background:var(--bg); }
+:root[data-holiday="halloween"] .sidebar{ background:#120A18 !important; } :root[data-holiday="thanksgiving"] .sidebar{ background:#18110B !important; }
+:root[data-holiday="christmas"] .sidebar{ background:#0A1711 !important; } :root[data-holiday="birthday"] .sidebar{ background:#13101B !important; }
+:root[data-holiday] .brand-text em{ color:var(--accent) !important; }
+.hol-fx{ position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden; }
+:root[data-holiday] .main, :root[data-holiday] #viewRoot, :root[data-holiday] .main-content{ background:transparent !important; }
+.hol-ban{ position:relative; overflow:hidden; display:flex; flex-direction:column; gap:4px; margin:4px 0 18px; padding:20px 24px; border-radius:16px; border:1px solid var(--border); background:var(--panel); backdrop-filter:blur(4px); }
+.hol-ban .hol-k{ font:700 11px var(--font-body); letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+.hol-ban b{ font:700 26px var(--font-display); }
+.hol-ban small{ color:var(--text-dim); font-size:13px; }
+.hol-ban.is-halloween b{ color:#FFE3C7; } .hol-ban.is-thanksgiving b{ color:#FFE8CC; } .hol-ban.is-christmas b{ color:#EFFFF5; } .hol-ban.is-birthday b{ color:#FFF2CC; }
+.hol-hat{ position:absolute; right:22px; top:10px; animation:hxBob 2s ease-in-out infinite; transform-origin:bottom center; }
+.hol-set .hol-row{ display:flex; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap; } .hol-set .hol-row > span{ min-width:110px; color:var(--text-dim); font-size:13px; font-weight:600; }
+.hol-set .hol-row input{ width:auto; } .hol-set .hol-row em{ font-style:normal; color:#F3C988; font-size:13px; font-weight:600; }
+.hol-set .r43-seg{ display:inline-flex; }
+.hol-prev{ display:flex; gap:6px; flex-wrap:wrap; } .hol-prev button{ border-radius:999px; padding:6px 12px; border:1px solid var(--border-strong); background:none; color:var(--text-dim); font:600 12px var(--font-body); cursor:pointer; } .hol-prev button.is-on{ color:var(--text); border-color:var(--accent); background:var(--accent-dim); }
+/* halloween */
+.hx-moon{ position:absolute; right:7%; top:90px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle at 40% 40%, #FFF4D6, #FFD58A 60%, #E89B3C); box-shadow:0 0 90px 26px rgba(255,170,80,.18); opacity:.8; animation:hxGlow 5s ease-in-out infinite; }
+@keyframes hxGlow{ 50%{ box-shadow:0 0 130px 40px rgba(255,140,50,.28); } }
+.hx-bat{ position:absolute; left:-60px; top:var(--t); scale:var(--s); animation:hxFly var(--d) linear infinite; animation-delay:var(--dl); }
+.hx-bat path{ fill:#3B1C4A; animation:hxFlap .35s ease-in-out infinite alternate; transform-origin:20px 9px; }
+@keyframes hxFly{ 0%{ translate:0 0; } 25%{ translate:30vw -30px; } 50%{ translate:60vw 14px; } 75%{ translate:85vw -20px; } 100%{ translate:110vw 0; } }
+@keyframes hxFlap{ to{ transform:scaleY(.4); } }
+.hx-fog{ position:absolute; left:-40%; bottom:-60px; width:180%; height:260px; background:radial-gradient(ellipse at 30% 50%, rgba(150,90,190,.18), transparent 60%), radial-gradient(ellipse at 70% 60%, rgba(255,120,40,.1), transparent 55%); filter:blur(10px); animation:hxDrift 18s ease-in-out infinite alternate; }
+.hx-fog.is-2{ bottom:auto; top:35%; opacity:.6; animation-duration:26s; animation-direction:alternate-reverse; }
+@keyframes hxDrift{ to{ transform:translateX(18%); } }
+/* thanksgiving */
+.hx-warm{ position:absolute; inset:0; background:radial-gradient(ellipse at 85% 0%, rgba(217,130,43,.16), transparent 55%); }
+.hx-leaf{ position:absolute; top:-30px; left:var(--x); width:16px; height:16px; background:var(--c); border-radius:0 70% 0 70%; opacity:.8; animation:hxFall var(--d) linear infinite; animation-delay:var(--dl); }
+@keyframes hxFall{ 0%{ transform:translate(0, 0) rotate(0); } 50%{ transform:translate(40px, 52vh) rotate(calc(var(--r)/2)); } 100%{ transform:translate(-20px, 105vh) rotate(var(--r)); } }
+.hx-tk{ position:absolute; animation:hxWaddle var(--d, 34s) linear infinite; animation-delay:var(--dl, 0s); transform-origin:center bottom; }
+.hx-tk .hx-tail{ transform-origin:60px 62px; animation:hxFan 2.4s ease-in-out infinite; }
+.hx-tk .hx-head{ transform-origin:60px 50px; animation:hxPeck .6s ease-in-out infinite alternate; }
+@keyframes hxWaddle{ 0%{ translate:0 0; rotate:-4deg; } 5%{ rotate:4deg; } 10%{ rotate:-4deg; } 15%{ rotate:4deg; } 20%{ rotate:-4deg; } 25%{ rotate:4deg; } 30%{ rotate:-4deg; } 35%{ rotate:4deg; } 40%{ rotate:-4deg; } 45%{ rotate:4deg; } 50%{ rotate:-4deg; } 55%{ rotate:4deg; } 60%{ rotate:-4deg; } 65%{ rotate:4deg; } 70%{ rotate:-4deg; } 75%{ rotate:4deg; } 80%{ rotate:-4deg; } 85%{ rotate:4deg; } 90%{ rotate:-4deg; } 95%{ rotate:4deg; } 100%{ translate:calc(100vw + 280px) 0; rotate:-4deg; } }
+@keyframes hxFan{ 50%{ transform:scale(1.08) rotate(3deg); } }
+@keyframes hxPeck{ to{ transform:translateY(3px) rotate(6deg); } }
+/* christmas */
+.hx-lights{ position:absolute; left:0; top:0; width:100%; height:40px; }
+.hx-bulb{ animation:hxTwinkle 1.8s ease-in-out infinite; animation-delay:var(--dl); }
+@keyframes hxTwinkle{ 50%{ opacity:.35; } }
+.hx-snow{ position:absolute; top:-10px; left:var(--x); width:var(--z); height:var(--z); border-radius:50%; background:#fff; opacity:var(--o); animation:hxSnow var(--d) linear infinite; animation-delay:var(--dl); }
+@keyframes hxSnow{ to{ transform:translate(30px, 105vh); } }
+/* birthday */
+.hx-strm{ position:absolute; left:0; top:0; width:100%; height:60px; }
+.hx-flags{ position:absolute; left:240px; right:0; top:0; display:flex; justify-content:space-around; }
+.hx-flags i{ width:0; height:0; border-left:11px solid transparent; border-right:11px solid transparent; border-top:20px solid var(--c); animation:hxFlutter 1.6s ease-in-out infinite alternate; }
+.hx-flags i:nth-child(2n){ animation-delay:.4s; }
+@keyframes hxFlutter{ to{ transform:rotate(8deg) translateY(2px); } }
+.hx-bal{ position:absolute; bottom:-100px; left:var(--x); animation:hxRise var(--d) ease-in infinite; animation-delay:var(--dl); }
+.hx-bal i{ display:block; width:38px; height:46px; border-radius:50% 50% 46% 46%; background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.55), var(--c) 45%); position:relative; opacity:.85; }
+.hx-bal i::after{ content:""; position:absolute; left:18px; top:46px; width:1px; height:44px; background:rgba(255,255,255,.3); }
+@keyframes hxRise{ 0%{ transform:translate(0, 0); } 50%{ transform:translate(18px, -55vh); } 100%{ transform:translate(-8px, -115vh); } }
+.hx-cf{ position:absolute; top:-14px; left:var(--x); width:7px; height:12px; border-radius:2px; background:var(--c); animation:hxFall2 var(--d) linear infinite; animation-delay:var(--dl); }
+@keyframes hxFall2{ to{ transform:translate(20px, 105vh) rotate(var(--r)); } }
+@keyframes hxBob{ 50%{ transform:rotate(-10deg) translateY(-4px); } }
+@media (prefers-reduced-motion:reduce){ .hol-fx *, .hol-hat{ animation:none !important; } }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -44760,6 +44826,92 @@ ACTIONS.sxPosted = function(el, e, id){
   showToast('Posted: '+t.title+'.', {icon:'&#127916;'});
 };
 ACTIONS.sxOpenContent = function(){ ui.view = 'focus'; ui.focusTab = 'tasks'; ui.focusTasksSubTab = 'videoIdeas'; renderView(); };
+// ============ ROUND 44 (build 4c): HOLIDAY TAKEOVERS, AND YOUR BIRTHDAY ============
+// For a holiday the whole app changes: its colors, a banner on Today, and (if you want it) something moving
+// in the back: bats and fog for Halloween, turkeys and falling leaves for Thanksgiving, snow and lights for
+// Christmas, balloons, bunting and confetti on your birthday. Settings → Look & Sound → Appearance:
+// Off / Colors only / Colors + animations, Subtle or Full, and your birthday (the app knows how old you are).
+// Motion stops by itself when the Mac is set to reduce motion.
+
+function holThanksgiving(y){ const d = new Date(y, 10, 1); const first = (4 - d.getDay() + 7) % 7 + 1; return y+'-11-'+pad2(first + 21); }
+function holAge(){ const b = state.profile.birthday; if(!b || !/^\d{4}-\d\d-\d\d$/.test(b)) return null; const t = todayStr(); let a = Number(t.slice(0, 4)) - Number(b.slice(0, 4)); if(t.slice(5) < b.slice(5)) a--; return a; }
+function holOrdinal(n){ const s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n+(s[(v - 20) % 10] || s[v] || s[0]); }
+function holToday(d){
+  d = d || todayStr(); const y = Number(d.slice(0, 4)), md = d.slice(5), p = state.profile;
+  if(p.birthday && /^\d{4}-\d\d-\d\d$/.test(p.birthday) && p.birthday.slice(5)===md) return 'birthday';
+  if(md >= '10-24' && md <= '10-31') return 'halloween';
+  const tg = holThanksgiving(y), mon = startOfWeekStr(tg); if(d >= mon && d <= addDays(mon, 6)) return 'thanksgiving';
+  if(md >= '12-18' && md <= '12-26') return 'christmas';
+  return null;
+}
+function holMode(){ const m = state.profile.holidayMode; return m==='off' || m==='colors' ? m : 'fx'; }
+function holActive(){ if(ui.holPreview) return ui.holPreview; if(holMode()==='off') return null; return holToday(); }
+const HOL = {
+  halloween:{k:'Spooky season', h:function(n){ return 'Scary-good week, '+n+'.'; }},
+  thanksgiving:{k:'Thanksgiving week', h:function(){ return 'Grateful, and still ahead.'; }},
+  christmas:{k:'Merry Christmas', h:function(){ return 'Close the year strong.'; }},
+  birthday:{k:'It’s your day', h:function(n){ const a = holAge(); return a ? 'Happy '+holOrdinal(a)+', '+n+'.' : 'Happy birthday, '+n+'.'; }}
+};
+// the moving layer
+function holFxHtml(h){
+  const R = function(i, m){ return ((i*9301 + 49297) % 233280)/233280*m; };   // fixed "random" so it doesn't jump on re-render
+  const many = function(n, f){ let s = ''; for(let i = 0; i < n; i++) s += f(i); return s; };
+  const sub = state.profile.holidayIntensity==='subtle', k = sub ? .5 : 1;
+  if(h==='halloween') return '<i class="hx-moon"></i><i class="hx-fog"></i><i class="hx-fog is-2"></i>'+many(Math.round(7*k), function(i){
+    return '<svg class="hx-bat" style="--t:'+(8 + R(i, 60)).toFixed(0)+'%;--d:'+(14 + R(i + 3, 10)).toFixed(1)+'s;--dl:-'+R(i + 7, 20).toFixed(1)+'s;--s:'+(.6 + R(i + 1, .7)).toFixed(2)+'" viewBox="0 0 40 18" width="44" height="20" aria-hidden="true"><path d="M20 9 q-5 -9 -10 -3 q-4 -5 -10 1 q6 0 8 6 q3 -4 6 -2 q3 -3 6 3 q3 -6 6 -3 q3 -2 6 2 q2 -6 8 -6 q-6 -6 -10 -1 q-5 -6 -10 3z"/></svg>'; });
+  if(h==='thanksgiving') return '<i class="hx-warm"></i>'+many(Math.round(16*k), function(i){ return '<i class="hx-leaf" style="--x:'+R(i, 100).toFixed(1)+'%;--d:'+(9 + R(i + 2, 8)).toFixed(1)+'s;--dl:-'+R(i + 5, 14).toFixed(1)+'s;--c:'+['#C2571A', '#E09A2D', '#8C3B12', '#D9822B'][i % 4]+';--r:'+(R(i + 9, 400) - 200).toFixed(0)+'deg"></i>'; })+
+    holTurkey('', 'left:-140px;bottom:10px;--d:34s;--dl:-4s')+(sub ? '' : holTurkey('', 'left:-140px;bottom:6px;--d:42s;--dl:-23s;scale:.72'));
+  if(h==='christmas') return '<svg class="hx-lights" viewBox="0 0 1200 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 6 Q75 34 150 6 T300 6 T450 6 T600 6 T750 6 T900 6 T1050 6 T1200 6" fill="none" stroke="#244232" stroke-width="2"/>'+many(24, function(i){ return '<circle class="hx-bulb" cx="'+(25 + i*50)+'" cy="'+(i % 2 ? 15 : 19)+'" r="5" fill="'+['#E8484F', '#F2C94C', '#5FD49A'][i % 3]+'" style="--dl:'+((i % 3)*.6).toFixed(1)+'s"/>'; })+'</svg>'+
+    many(Math.round(60*k), function(i){ return '<i class="hx-snow" style="--x:'+R(i, 100).toFixed(1)+'%;--d:'+(8 + R(i + 4, 10)).toFixed(1)+'s;--dl:-'+R(i + 8, 16).toFixed(1)+'s;--z:'+(3 + Math.round(R(i + 1, 3)))+'px;--o:'+(.35 + R(i + 6, .5)).toFixed(2)+'"></i>'; });
+  if(h==='birthday') return '<svg class="hx-strm" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 4 Q50 40 100 6 T200 6 T300 6 T400 6 T500 6 T600 6 T700 6 T800 6 T900 6 T1000 6 T1100 6 T1200 6" fill="none" stroke="#FF8FB1" stroke-width="3"/></svg>'+
+    '<div class="hx-flags">'+many(16, function(i){ return '<i style="--c:'+['#FF5A8A', '#FFC83D', '#7EE0FF', '#B5E06A', '#C58FFF'][i % 5]+'"></i>'; })+'</div>'+
+    many(Math.round(8*k), function(i){ return '<span class="hx-bal" style="--x:'+(4 + R(i, 92)).toFixed(1)+'%;--d:'+(13 + R(i + 2, 7)).toFixed(1)+'s;--dl:-'+R(i + 5, 14).toFixed(1)+'s;--c:'+['#FF5A8A', '#FFE066', '#7EE0FF', '#FF8FB1', '#C58FFF', '#B5E06A'][i % 6]+'"><i></i></span>'; })+
+    many(Math.round(26*k), function(i){ return '<i class="hx-cf" style="--x:'+R(i, 100).toFixed(1)+'%;--d:'+(5 + R(i + 3, 5)).toFixed(1)+'s;--dl:-'+R(i + 6, 9).toFixed(1)+'s;--c:'+['#FF8FB1', '#8FDCFF', '#FFC83D', '#B5E06A', '#C58FFF'][i % 5]+';--r:'+(90 + R(i + 1, 600)).toFixed(0)+'deg"></i>'; });
+  return '';
+}
+function holTurkey(cls, style){
+  return '<svg class="hx-tk '+cls+'" style="'+style+'" viewBox="0 0 120 110" width="110" height="100" aria-hidden="true"><g class="hx-tail"><path d="M60 62 L18 18 Q30 8 42 14 Z" fill="#C2571A"/><path d="M60 62 L40 6 Q54 0 62 8 Z" fill="#E09A2D"/><path d="M60 62 L64 4 Q78 2 82 12 Z" fill="#8C3B12"/><path d="M60 62 L88 10 Q100 14 100 26 Z" fill="#D9822B"/><path d="M60 62 L106 34 Q112 46 104 54 Z" fill="#C2571A"/><path d="M60 62 L14 36 Q8 48 16 56 Z" fill="#E09A2D"/></g>'+
+    '<ellipse cx="60" cy="70" rx="26" ry="24" fill="#6B3A1E"/><ellipse cx="60" cy="74" rx="16" ry="15" fill="#8A4E2A"/><g class="hx-head"><circle cx="60" cy="42" r="12" fill="#7A4424"/><circle cx="55" cy="40" r="2.4" fill="#fff"/><circle cx="65" cy="40" r="2.4" fill="#fff"/><circle cx="55.5" cy="40.5" r="1.2" fill="#111"/><circle cx="65.5" cy="40.5" r="1.2" fill="#111"/><path d="M57 45 L63 45 L60 50 Z" fill="#F2B33D"/><path d="M61 47 q4 3 1 10 q-4 -2 -3 -8 z" fill="#E8484F"/></g>'+
+    '<path d="M50 92 l-3 12 M47 104 l-5 2 M47 104 l2 4 M70 92 l3 12 M73 104 l5 2 M73 104 l-2 4" stroke="#F2B33D" stroke-width="3" stroke-linecap="round" fill="none"/></svg>';
+}
+// apply: the colors on <html>, the moving layer behind everything
+function holApply(){
+  const h = holActive(), root = document.documentElement, fx = h && (ui.holPreview ? true : holMode()==='fx');
+  if(h) root.setAttribute('data-holiday', h); else root.removeAttribute('data-holiday');
+  let layer = document.getElementById('holFx');
+  if(!h || !fx){ if(layer) layer.remove(); return; }
+  const sig = h+'|'+(state.profile.holidayIntensity || 'full');
+  if(layer && layer.dataset.sig===sig) return;
+  if(!layer){ layer = document.createElement('div'); layer.id = 'holFx'; layer.className = 'hol-fx'; layer.setAttribute('aria-hidden', 'true'); document.body.insertBefore(layer, document.body.firstChild); }
+  layer.dataset.sig = sig; layer.innerHTML = holFxHtml(h);
+}
+afterRenderHooks.push(function(){ try{ holApply(); }catch(e){} });
+// the banner on Today
+renderToday = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), hol = holActive(); if(!hol) return h;
+    const H = HOL[hol], name = (state.profile.name || '').split(' ')[0] || 'you';
+    const ban = '<div class="hol-ban is-'+hol+'"><span class="hol-k">'+escapeHtml(H.k)+'</span><b>'+escapeHtml(H.h(name))+'</b>'+(hol==='birthday' && holAge() ? '<small>'+holAge()+' today</small>' : '')+(hol==='birthday' ? '<svg class="hol-hat" viewBox="0 0 60 70" width="46" height="54" aria-hidden="true"><path d="M30 4 L52 62 L8 62 Z" fill="#C58FFF"/><path d="M19 33 L41 33 M14 47 L46 47" stroke="#FFC83D" stroke-width="5"/><circle cx="30" cy="5" r="6" fill="#FF5A8A"/><ellipse cx="30" cy="63" rx="24" ry="5" fill="#9B6BE0"/></svg>' : '')+'</div>';
+    const at = h.indexOf('</div>', h.indexOf('class="view-header'));
+    return at > 0 ? h.slice(0, at + 6)+ban+h.slice(at + 6) : ban+h;
+  };
+})(renderToday);
+// Settings → Appearance
+themeSettingsHtml = (function(base){
+  return function(){
+    const m = holMode(), it = state.profile.holidayIntensity==='subtle' ? 'subtle' : 'full', b = state.profile.birthday || '', age = holAge();
+    const seg = function(cur, list, act){ return '<div class="r43-seg">'+list.map(function(o){ return '<button type="button" class="'+(cur===o[0] ? 'is-on' : '')+'" data-action="'+act+'" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div>'; };
+    return base.apply(this, arguments)+'<div class="section hol-set"><div class="section-title">Holiday themes</div>'+
+      seg(m, [['off', 'Off'], ['colors', 'Colors only'], ['fx', 'Colors + animations']], 'holMode')+
+      (m==='fx' ? '<div class="hol-row"><span>Intensity</span>'+seg(it, [['subtle', 'Subtle'], ['full', 'Full']], 'holIntensity')+'</div>' : '')+
+      '<div class="hol-row"><span>Your birthday</span><input class="input" type="date" id="holBirthday" value="'+escapeHtml(b)+'">'+(age!=null ? '<em>you’re '+age+'</em>' : '')+'</div>'+
+      '<div class="hol-row"><span>Preview</span><div class="hol-prev">'+[['halloween', 'Halloween'], ['thanksgiving', 'Thanksgiving'], ['christmas', 'Christmas'], ['birthday', 'Birthday']].map(function(o){ return '<button type="button" class="'+(ui.holPreview===o[0] ? 'is-on' : '')+'" data-action="holPreview" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div></div>';
+  };
+})(themeSettingsHtml);
+ACTIONS.holMode = function(el, e, id){ state.profile.holidayMode = id; persist('profile'); renderView(); };
+ACTIONS.holIntensity = function(el, e, id){ state.profile.holidayIntensity = id; persist('profile'); renderView(); };
+ACTIONS.holPreview = function(el, e, id){ ui.holPreview = ui.holPreview===id ? null : id; renderView(); if(ui.holPreview) showToast('Previewing '+id+'. Tap it again to stop.', {icon:'&#127881;'}); };
+document.addEventListener('change', function(e){ if(e.target && e.target.id==='holBirthday'){ state.profile.birthday = e.target.value || null; persist('profile'); renderView(); } });
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
