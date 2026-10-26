@@ -569,6 +569,28 @@ wake_respond() {
       case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":"could not reach ElevenLabs"}' ;; esac
       [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach ElevenLabs"}'; }
       respond "$CODE" "$BODY" ;;
+    # Op live (an ElevenLabs agent, in real time): the page gets a one-time signed link; the key stays here.
+    # Making or updating his agent: the page sends the agent's settings; the key is added here.
+    /tts/agent/url*|/tts/agent/create*|/tts/agent/update*)
+      if [ ! -s "$TTS_KEY_FILE" ]; then respond 401 '{"error":"no ElevenLabs key saved"}'; return; fi
+      A=$(param a); case "$A" in *[!0-9a-zA-Z_-]*) respond 400 '{"error":"bad agent id"}'; return ;; esac
+      XK="xi-api-key: $(cat "$TTS_KEY_FILE")"
+      case "$REQ_PATH" in
+        /tts/agent/url*)
+          [ -z "$A" ] && { respond 400 '{"error":"no agent id"}'; return; }
+          OUT=$(curl -sS --max-time 15 -H "$XK" -w '\n%{http_code}' "https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=$A" 2>&1) ;;
+        /tts/agent/create*)
+          B=$(hexdec "$(param b)")
+          OUT=$(curl -sS --max-time 30 -X POST -H "$XK" -H "content-type: application/json" --data-binary "$B" -w '\n%{http_code}' "https://api.elevenlabs.io/v1/convai/agents/create" 2>&1) ;;
+        *)
+          [ -z "$A" ] && { respond 400 '{"error":"no agent id"}'; return; }
+          B=$(hexdec "$(param b)")
+          OUT=$(curl -sS --max-time 30 -X PATCH -H "$XK" -H "content-type: application/json" --data-binary "$B" -w '\n%{http_code}' "https://api.elevenlabs.io/v1/convai/agents/$A" 2>&1) ;;
+      esac
+      CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
+      case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":"could not reach ElevenLabs"}' ;; esac
+      [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach ElevenLabs"}'; }
+      respond "$CODE" "$BODY" ;;
     /tts/status*) if [ -s "$TTS_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
     /sports*)
       # NFL / NBA / MLB / NHL scores and schedules (ESPN's public scoreboard) for Good morning
