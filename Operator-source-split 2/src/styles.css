@@ -8849,3 +8849,11 @@ html body .calx .cx-month{ min-height:0 !important; }
 .r52-under > .cx-tier .cx-tierbody{ margin-top:0; }
 html body .calx > .cx-left{ align-self:start; }
 html body .calx > .cx-left{ align-self:stretch; } html body .calx .r52-left > .cx-desk{ flex:1 1 auto !important; }
+/* R52: Today on the left; This week and This month side by side under the month */
+html body .calx .r52-left > .cx-desk{ flex:0 0 auto !important; }
+.r52-left > .r52-today{ flex:1 1 auto; min-height:0; overflow:auto; }
+.r52-today > .cx-agenda{ margin:0 !important; padding:0 !important; border:0 !important; }
+.r52-under{ grid-template-columns:1fr 1fr !important; gap:12px !important; }
+.r52-under > .cx-tier.r52-intier{ display:flex; flex-direction:column; }
+.r52-under > .cx-tier.r52-intier .cx-tierbody{ flex:1; }
+.r52-under > .cx-tier.r52-intier .tg-card{ flex:1; }

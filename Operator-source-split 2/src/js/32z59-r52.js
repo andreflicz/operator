@@ -271,24 +271,36 @@ renderCalendar = (function(base){
 // (the swap redraws just this card, in place: no flash, nothing else moves)
 ACTIONS.cxTier = function(el, e, id){
   ui.cxTier = id==='month' ? 'month' : 'week';
-  const card = document.querySelector('.cx-tier');
+  const card = document.querySelector('.cx-tier:not(.r52-intier)');
   if(!card){ renderView(); return; }
   const t = document.createElement('template'); t.innerHTML = cxTierCardHtml();
   const fresh = t.content.querySelector('.cx-tier');
   if(fresh){ card.innerHTML = fresh.innerHTML; playTick(); } else renderView();
 };
-// (Today under the month had room to spare: This week / This month sits beside it there, and the left
-// side is just Your day and the alarms)
+// (the left side: Your day, Alarms / Reminders, Today. Under the month: This week and This month side by
+// side, both always showing: there's room for both, so no swap)
+function r52TierFor(kind){
+  const was = ui.cxTier; ui.cxTier = kind;
+  let h = ''; try{ h = cxTierCardHtml(); } finally { ui.cxTier = was; }
+  const t = document.createElement('template'); t.innerHTML = h;
+  const card = t.content.querySelector('.cx-tier'); if(!card) return null;
+  card.querySelectorAll('.r52-swap').forEach(function(x){ x.remove(); });
+  card.classList.add('r52-intier', 'is-'+kind);
+  return card;
+}
 renderCalendar = (function(base){
   return function(){
     const h = base.apply(this, arguments);
     if(h.indexOf('cx-agenda') < 0) return h;
     const tpl = document.createElement('template'); tpl.innerHTML = h;
-    const month = tpl.content.querySelector('.cx-month'), ag = month && month.querySelector(':scope > .cx-agenda'), tier = tpl.content.querySelector('.cx-left > .cx-tier');
-    if(month && ag && tier){
+    const left = tpl.content.querySelector('.cx-left'), month = tpl.content.querySelector('.cx-month');
+    const ag = month && month.querySelector(':scope > .cx-agenda'), tier = left && left.querySelector(':scope > .cx-tier');
+    if(left && month && ag){
+      const box = document.createElement('section'); box.className = 'cx-card r52-today'; box.appendChild(ag); left.appendChild(box);
+      if(tier) tier.remove();
       const row = document.createElement('div'); row.className = 'r52-under';
-      ag.parentNode.insertBefore(row, ag); row.appendChild(ag); row.appendChild(tier);
-      tier.classList.add('r52-intier');
+      ['week', 'month'].forEach(function(k){ const c = r52TierFor(k); if(c) row.appendChild(c); });
+      month.appendChild(row);
     }
     const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
   };
