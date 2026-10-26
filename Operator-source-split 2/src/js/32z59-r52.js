@@ -230,3 +230,50 @@ opLiveRules = (function(base){
   };
 })(opLiveRules);
 opLivePrompt = (function(base){ return function(){ return base.apply(this, arguments)+'\n- Keep it short: one or two sentences unless he asks for more. No small talk, no weather or the time unless he asks. At most one question.'; }; })(opLivePrompt);
+
+// ---- 10. Calendar's left side, simpler (proposal) ----
+// Your day is just the bar with four times: sunrise and sunset above it, your wake-up and work alarms under it,
+// and the line for now. Alarms / Reminders come right after it; This week / This month takes the space below.
+cxRibbonHtml = (function(base){
+  return function(){
+    base.apply(this, arguments);   // (keeps whatever it sets up)
+    const A = 5*60, B = 24*60, pct = function(m){ return Math.max(0, Math.min(100, (m - A)/(B - A)*100)); };
+    let win = null; try{ win = dayWindow(new Date()); }catch(e){}
+    const today = todayStr(), wt = typeof wakeTimeFor==='function' ? wakeTimeFor(today) : null, wm = hmMin(wt), n = nowMin();
+    const w = typeof workToday==='function' ? workToday() : null, works = !!(w && w.enabled && typeof workDayToday==='function' && workDayToday());
+    const ico = {
+      rise:'<svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="#F3C988"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="#F3C988" stroke-width="2" stroke-linecap="round"/></svg>',
+      set:'<svg viewBox="0 0 24 24" width="13" height="12" aria-hidden="true"><path d="M5 17a7 7 0 0 1 14 0" fill="#F0A35E"/><path d="M2 20h20M12 6v3M4.5 10.5l2 1.5M19.5 10.5l-2 1.5" stroke="#F0A35E" stroke-width="2" stroke-linecap="round"/></svg>',
+      wake:'<svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><circle cx="12" cy="13" r="7" fill="none" stroke="#9fd8c4" stroke-width="2"/><path d="M12 9.5V13l2.2 1.6M5 4l-2 2M19 4l2 2" stroke="#9fd8c4" stroke-width="2" stroke-linecap="round"/></svg>',
+      work:'<svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><rect x="3" y="7.5" width="18" height="12" rx="2.5" fill="none" stroke="#b9b2ff" stroke-width="2"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5" fill="none" stroke="#b9b2ff" stroke-width="2"/></svg>'
+    };
+    const lab = function(m, kind, text){ const p = pct(m); return '<span class="r52-l is-'+kind+(p < 12 ? ' is-al' : p > 88 ? ' is-ar' : '')+'" style="left:'+p.toFixed(2)+'%">'+ico[kind]+'<b>'+text+'</b></span>'; };
+    const top = win ? lab(win.rise, 'rise', fmtMinOfDay(win.rise))+lab(win.set, 'set', fmtMinOfDay(win.set)) : '';
+    const bot = (wm!=null ? lab(wm, 'wake', fmt12Hour(wt)) : '')+(works ? lab(hmMin(w.start), 'work', fmt12Hour(w.start)) : '');
+    const bar = (win ? '<i class="r52-bday" style="left:'+pct(win.rise).toFixed(2)+'%;width:'+(pct(win.set) - pct(win.rise)).toFixed(2)+'%"></i>' : '')+
+      (wm!=null ? '<i class="r52-bsleep" style="left:0;width:'+pct(wm).toFixed(2)+'%"></i>' : '')+
+      (n >= A ? '<b class="r52-bnow" style="left:'+pct(n).toFixed(2)+'%"></b>' : '');
+    return '<div class="cx-ribbon r52-rib"><div class="r52-row is-top">'+top+'</div><div class="r52-bar">'+bar+'</div><div class="r52-row is-bot">'+bot+'</div></div>';
+  };
+})(cxRibbonHtml);
+// the order on the left: Your day, Alarms / Reminders, then This week / This month
+renderCalendar = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(h.indexOf('cx-left') < 0) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const left = tpl.content.querySelector('.cx-left'), desk = left && left.querySelector(':scope > .cx-desk'), tier = left && left.querySelector(':scope > .cx-tier');
+    if(left && desk && tier){ left.insertBefore(desk, tier); left.classList.add('r52-left'); }
+    const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
+  };
+})(renderCalendar);
+
+// (the swap redraws just this card, in place: no flash, nothing else moves)
+ACTIONS.cxTier = function(el, e, id){
+  ui.cxTier = id==='month' ? 'month' : 'week';
+  const card = document.querySelector('.cx-tier');
+  if(!card){ renderView(); return; }
+  const t = document.createElement('template'); t.innerHTML = cxTierCardHtml();
+  const fresh = t.content.querySelector('.cx-tier');
+  if(fresh){ card.innerHTML = fresh.innerHTML; playTick(); } else renderView();
+};

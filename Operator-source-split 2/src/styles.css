@@ -8815,3 +8815,30 @@ html body .r44-quote:hover .qt-next{ opacity:.7; }
 .r52-sky{ height:16px !important; margin-bottom:4px; }
 .r52-sky .r44-mk{ top:0 !important; color:#E9C38E !important; }
 .r44-marks .r52-end{ color:#BFC8FF; }
+/* R52: the simple Your day bar */
+.r52-rib{ padding:0 !important; margin-top:4px; }
+.r52-row{ position:relative; height:18px; }
+.r52-row.is-top{ margin-bottom:6px; } .r52-row.is-bot{ margin-top:7px; }
+.r52-l{ position:absolute; top:0; transform:translateX(-50%); display:inline-flex; align-items:center; gap:4px; white-space:nowrap; font-size:11.5px; line-height:18px; }
+.r52-l.is-al{ transform:none; } .r52-l.is-ar{ transform:translateX(-100%); }
+.r52-l b{ font-weight:700; }
+.r52-l.is-rise b, .r52-l.is-set b{ color:#E9C38E; } .r52-l.is-wake b{ color:#bfeadb; } .r52-l.is-work b{ color:#d6d2ff; }
+.r52-bar{ position:relative; height:10px; border-radius:999px; background:rgba(40,46,90,.55); overflow:hidden; }
+.r52-bday{ position:absolute; top:0; bottom:0; background:linear-gradient(90deg, rgba(243,201,136,.35), rgba(243,201,136,.55) 50%, rgba(240,163,94,.4)); }
+.r52-bsleep{ position:absolute; top:0; bottom:0; background:repeating-linear-gradient(135deg, rgba(255,255,255,.10) 0 4px, transparent 4px 8px); }
+.r52-bnow{ position:absolute; top:-2px; bottom:-2px; width:2px; margin-left:-1px; background:#fff; border-radius:2px; box-shadow:0 0 6px rgba(255,255,255,.8); }
+/* the left side order: Your day, Alarms, then This week / This month filling the rest */
+.calx .r52-left > .cx-now{ border-radius:inherit; }
+.r52-left > .cx-now{ border-bottom-left-radius:var(--r, 22px) !important; border-bottom-right-radius:var(--r, 22px) !important; }
+.r52-left > .cx-desk + .cx-tier, .r52-left > .cx-tier{ margin-top:0 !important; border-top-left-radius:var(--r, 22px) !important; border-top-right-radius:var(--r, 22px) !important; border-top:0 !important; }
+.calx .r52-left > .cx-desk{ flex:0 0 auto !important; }
+.calx .r52-left > .cx-tier{ flex:1 1 auto !important; min-height:0 !important; display:flex; flex-direction:column; }
+.r52-left > .cx-tier .cx-tierbody{ flex:1; } .r52-left > .cx-tier .tg-card{ flex:1; }
+/* R52: (the old stats-strip class name was reused here: reset it for the Your day rows) */
+.r52-rib .r52-row{ display:block; background:none !important; border:0 !important; border-radius:0; grid-template-columns:none; }
+/* R52: the Calendar is as tall as its month, not the whole screen */
+html body .calx{ height:auto !important; min-height:0 !important; align-items:stretch; }
+html body .calx .cx-grid{ flex:0 0 auto !important; grid-auto-rows:86px !important; grid-template-rows:none !important; }
+html body .calx .cx-month{ min-height:0 !important; }
+/* R52: swapping Week / Month doesn't flash or jump */
+.cx-tierbody, .cx-tierbody *{ animation:none !important; }
