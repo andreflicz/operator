@@ -348,3 +348,6 @@ deliverablePaceStatusRaw = (function(base){
 })(deliverablePaceStatusRaw);
 delivPaceWord = (function(base){ return function(d){ const n = r51Now(d); if(!n) return base.apply(this, arguments); return n.done >= n.need ? 'done for the week' : paceWord(deliverablePaceStatus(d)); }; })(delivPaceWord);
 isDeliverableDoneThisWeek = (function(base){ return function(d){ const n = r51Now(d); if(!n) return base.apply(this, arguments); return n.done >= n.need; }; })(isDeliverableDoneThisWeek);
+// (the round-38 settling counted a cycle's pieces its own way and flipped weeks back, then this file flipped them
+// again: an endless re-render. The per-week counts above are the only ones that decide now.)
+dvwSettle = function(){ return false; };

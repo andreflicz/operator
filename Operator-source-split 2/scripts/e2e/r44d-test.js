@@ -23,7 +23,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('yesterday on the Calendar shows its recap', /r44-recap/.test(ag) && /Locked in/.test(ag) && /Shooting/.test(ag) && /Edit JJS reel/.test(ag));
   check('today has no recap (it is still going)', !/r44-recap/.test(await E("cxAgendaHtml(todayStr())")));
   await E("ui.view='calendar'; renderView()"); await p.waitForTimeout(1600); if(await p.isVisible('#intOverlay.is-in')){ await p.click('#intOverlay .int-x'); await p.waitForTimeout(500); }
-  check('This week uses its space: four numbers above the goals', (await p.$$('.r44-ts')).length===4 && /Deep/.test(await p.textContent('.r44-tstats')));
+  check('This week uses its space: four numbers above the goals (R52: one line inside the panel)', (await p.$$('.r52-ts span')).length===4 && /Deep/i.test(await p.textContent('.r52-ts')));
   await p.screenshot({path:OUT+'/r44d-cal.png'});
 
   await E("state.focus.activeSession = {startedAt:Date.now() - 20*60000, plannedMinutes:60, completedTasks:[], breaks:[], onBreak:false}; ui.view='today'; renderView()"); await p.waitForTimeout(400);

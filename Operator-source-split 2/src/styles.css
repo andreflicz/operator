@@ -8804,3 +8804,14 @@ html body .r44-quote:hover .qt-next{ opacity:.7; }
 .calx .cx-tier{ flex:1 1 auto !important; min-height:0 !important; }
 .cx-tierbody .tg-empty{ min-height:64px; }
 .calx .cx-tier{ flex:0 0 auto !important; } .calx .cx-desk{ flex:1 1 0 !important; } .cx-tierbody .tg-empty{ min-height:44px; flex:0 0 auto; }
+/* R52: the small Week / Month swap */
+.r52-swap{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:var(--text-dim); font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; cursor:pointer; }
+.r52-swap b{ font-size:12px; }
+.r52-swap.is-month:hover{ color:#ffc56b; border-color:rgba(255,197,107,.45); } .r52-swap.is-week:hover{ color:#8fd3ff; border-color:rgba(143,211,255,.45); }
+.cx-tierbody .tg-h{ display:flex; align-items:center; }
+/* R52: Your day with the sky */
+.cx-track .r52-day{ position:absolute; top:0; bottom:0; background:linear-gradient(90deg, rgba(243,201,136,.10), rgba(243,201,136,.18) 50%, rgba(240,163,94,.12)); border-radius:inherit; pointer-events:auto; }
+.cx-track .r52-night{ position:absolute; top:0; bottom:0; background:rgba(40,46,90,.35); pointer-events:auto; }
+.r52-sky{ height:16px !important; margin-bottom:4px; }
+.r52-sky .r44-mk{ top:0 !important; color:#E9C38E !important; }
+.r44-marks .r52-end{ color:#BFC8FF; }

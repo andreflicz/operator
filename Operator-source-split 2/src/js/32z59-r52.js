@@ -135,3 +135,56 @@ cxTierCardHtml = function(){
   const strip = '<div class="r52-ts">'+Array.from(t.content.querySelectorAll('.r44-ts')).map(function(x){ return '<span><b>'+escapeHtml((x.querySelector('b') || {}).textContent || '')+'</b><small>'+escapeHtml((x.querySelector('small') || {}).textContent || '')+'</small></span>'; }).join('')+'</div>';
   return body.replace(/(<div class="tg-card[^"]*">\s*<div class="tg-h">[\s\S]*?<\/div>)/, '$1'+strip);
 };
+
+// ---- 6. Calendar: one small swap instead of the This week / This month tabs ----
+cxTierCardHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), t = ui.cxTier==='month' ? 'month' : 'week';
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    tpl.content.querySelectorAll('.cx-seg2').forEach(function(x){ x.remove(); });
+    const hd = tpl.content.querySelector('.tg-card .tg-h');
+    if(hd){ const sp = hd.querySelector('span[style*="flex:1"]'); if(!sp) hd.insertAdjacentHTML('beforeend', '<span style="flex:1"></span>');
+      hd.insertAdjacentHTML('beforeend', '<button class="r52-swap is-'+(t==='week' ? 'month' : 'week')+'" data-action="cxTier" data-id="'+(t==='week' ? 'month' : 'week')+'" title="Show '+(t==='week' ? 'this month' : 'this week')+'">'+(t==='week' ? 'Month' : 'Week')+' <b>&#8644;</b></button>'); }
+    const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
+  };
+})(cxTierCardHtml);
+
+// ---- 7. Your day: the sky and your day on one line ----
+// The bar runs 5 AM to midnight: daylight is lit from sunrise to sunset, the night after sunset is dark, the
+// stretch after your bedtime is shaded like the sleep before your wake-up. Above the bar: sunrise and sunset.
+// Under it: your wake-up, work, now and when your day ends (bedtime).
+cxRibbonHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    const A = 5*60, B = 24*60, pct = function(m){ return Math.max(0, Math.min(100, (m - A)/(B - A)*100)); };
+    let win = null; try{ win = dayWindow(new Date()); }catch(e){}
+    const bed = hmMin(state.profile && state.profile.bedtime);
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const track = tpl.content.querySelector('.cx-track'), marks = tpl.content.querySelector('.r44-marks');
+    if(!track) return h;
+    const sunIco = '<svg viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="#F3C988"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="#F3C988" stroke-width="2" stroke-linecap="round"/></svg>';
+    const setIco = '<svg viewBox="0 0 24 24" width="12" height="11" aria-hidden="true"><path d="M5 17a7 7 0 0 1 14 0" fill="#F0A35E"/><path d="M2 20h20M12 6v3M4.5 10.5l2 1.5M19.5 10.5l-2 1.5" stroke="#F0A35E" stroke-width="2" stroke-linecap="round"/></svg>';
+    const moonIco = '<svg viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" fill="#BFC8FF"/></svg>';
+    const add = function(html){ track.insertAdjacentHTML('afterbegin', html); };
+    if(win){
+      add('<i class="r52-day" style="left:'+pct(win.rise).toFixed(2)+'%;width:'+(pct(win.set) - pct(win.rise)).toFixed(2)+'%" title="Daylight"></i>');
+      add('<i class="r52-night" style="left:'+pct(win.set).toFixed(2)+'%;width:'+(100 - pct(win.set)).toFixed(2)+'%" title="After sunset"></i>');
+    }
+    if(bed!=null && bed > A) track.insertAdjacentHTML('beforeend', '<i class="cx-seg is-sleep r52-bed" style="left:'+pct(bed).toFixed(2)+'%;width:'+(100 - pct(bed)).toFixed(2)+'%" title="After your bedtime"></i><b class="r44-tick" style="left:'+pct(bed).toFixed(2)+'%"></b>');
+    // the sky row (above)
+    if(win){
+      const sky = '<div class="cx-marks r44-marks r52-sky">'+
+        '<span class="r44-mk" style="left:'+pct(win.rise).toFixed(2)+'%">'+sunIco+fmtMinOfDay(win.rise)+'</span>'+
+        '<span class="r44-mk" style="left:'+pct(win.set).toFixed(2)+'%">'+setIco+fmtMinOfDay(win.set)+'</span></div>';
+      track.insertAdjacentHTML('beforebegin', sky);
+    }
+    // (your wake-up gets an alarm, so it isn't mistaken for sunrise)
+    if(marks) marks.querySelectorAll('.r44-mk svg').forEach(function(sv){ const mk = sv.closest('.r44-mk'); if(!mk || mk.classList.contains('r52-end')) return; sv.outerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><circle cx="12" cy="13" r="7" fill="none" stroke="#9fd8c4" stroke-width="2"/><path d="M12 9.5V13l2.2 1.6M5 4l-2 2M19 4l2 2" stroke="#9fd8c4" stroke-width="2" stroke-linecap="round"/></svg>'; if(!mk.title) mk.title = 'You woke up'; else mk.title = 'Up at '+mk.title; });
+    // your row (under): when the day ends
+    if(marks && bed!=null){
+      const p = pct(bed);
+      marks.insertAdjacentHTML('beforeend', '<span class="r44-mk is-r r52-end" style="left:'+(p > 97 ? 100 : p).toFixed(2)+'%" title="Your day ends">'+moonIco+fmt12Hour(pad2(Math.floor(bed/60))+':'+pad2(bed % 60))+'</span>');
+    }
+    const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
+  };
+})(cxRibbonHtml);
