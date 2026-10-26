@@ -266,3 +266,169 @@ clientCardV2 = function(c){
     (active ? '<div class="cc2-foot r48-cf"><span class="r48-cfh"><i class="lc-hs is-'+hs.level+'"></i>'+escapeHtml(clientHealthLabel(hs))+'</span><span style="flex:1"></span>'+touchButtonsHtml('client', c)+'</div>'+touchMenuHtml('client', c) : '')+
   '</div>';
 };
+
+// ---- 8. task cards: room for a description and the client ----
+taskCard = (function(base){
+  return function(t){
+    let h = base.apply(this, arguments);
+    if(t.isVideoIdea) return h;
+    if(!t.notes) h = h.replace('<div class="task-card-title">'+escapeHtml(t.title)+'</div>', '<div class="task-card-title">'+escapeHtml(t.title)+'</div><button class="r48-addnote" data-action="openTaskEditModal" data-id="'+t.id+'">Add a note…</button>');
+    const cid = arr(t.clients).find(function(v){ return v && v!=='personal' && v!=='general' && String(v).indexOf('lead:')!==0; });
+    const c = cid ? arr(state.business.clients).find(function(x){ return x.id===cid; }) : null;
+    const who = c ? '<span class="r48-tcw" style="--cc:'+clientAccent(c)+'"><i></i>'+escapeHtml(c.business || c.name)+'</span>' : '<span class="r48-tcw is-me"><i></i>'+(arr(t.clients).indexOf('general')>=0 ? 'Business' : 'Personal')+'</span>';
+    return h.replace('<div class="row" style="justify-content:space-between;margin-top:auto;padding-top:6px;">'+clientTagsHtml(t.clients), '<div class="row r48-tcf" style="justify-content:space-between;margin-top:auto;padding-top:6px;">'+who);
+  };
+})(taskCard);
+
+// ---- 9. Settings, organized ----
+//  • No XP & Areas: XP and your card are built from everything the app sees (Work, Health, Personal, all on).
+//  • Sleep (your bedtime) and level rewards are under You.
+//  • Good morning is its own place (intro, background, Op's voice, layout, headlines), out of the alarm.
+//  • The alarm window is just the alarm: time, days, tomorrow, sound, snooze, and a clear Remove.
+r43AreasRaw = (function(base){
+  return function(){
+    const raw = base.apply(this, arguments);
+    const keep = raw.filter(function(a){ return r43Builtin(a.id); });
+    ['work', 'health', 'personal'].forEach(function(id){ if(!keep.some(function(a){ return a.id===id; })){ const d = XP_BOOK.areas.defaults.find(function(x){ return x.id===id; }); keep.push({id:id, name:d ? d.name : id, on:true}); } });
+    keep.forEach(function(a){ a.on = true; });
+    return keep;
+  };
+})(r43AreasRaw);
+function r48FieldsFrom(html, re){
+  const tpl = document.createElement('template'); tpl.innerHTML = html;
+  return [...tpl.content.querySelectorAll('.field')].filter(function(f){ const l = f.querySelector('label'); return l && re.test(l.textContent.trim()); }).map(function(f){ return f.outerHTML; }).join('');
+}
+function r48MorningHtml(){
+  const was = ui.alarmTab; ui.alarmTab = 'wake'; ui.r48WakeFull = true;
+  let h = ''; try{ h = renderWakeSetup(); } finally { ui.alarmTab = was; ui.r48WakeFull = false; }
+  return '<div class="card section"><div class="section-title">Good morning</div><div class="grid grid-2 r48-gm">'+
+    r48FieldsFrom(h, /^(Good morning intro|Good morning background|Good morning layout|Headlines in Good morning|Op’s voice|Voice & keys|Voice &amp; keys)/)+'</div></div>'+r48WorldHtml();
+}
+// (news, sports, places: what Good morning shows, so they live with it)
+function r48WorldHtml(){ if(typeof yourWorldHtml!=='function') return ''; const h = yourWorldHtml(), i = h.indexOf('<div class="card section yw yq">'); return i > 0 ? h.slice(0, i) : ''; }
+function r48SleepHtml(){
+  const p = state.profile, rw = r43Rewards().slice().sort(function(a, b){ return a.level - b.level; });
+  return '<div class="card section"><div class="section-title">Sleep</div>'+
+      '<div class="field" style="max-width:260px"><label>Your bedtime</label><input class="input" type="time" id="r43Bedtime" value="'+escapeHtml(p.bedtime || '')+'"></div></div>'+
+    '<div class="card section"><div class="section-title">Level rewards</div>'+
+      (rw.length ? '<div class="r43-rws">'+rw.map(function(r){ return '<div class="r43-rwr'+(r.claimed ? ' is-claimed' : r.unlockedAt ? ' is-open' : '')+'"><b>Level '+r.level+'</b><span>'+escapeHtml(r.text)+'</span><small>'+(r.claimed ? 'Claimed' : r.unlockedAt ? 'Unlocked' : '')+'</small><button class="r43-ar-x" data-action="r43RewardRemove" data-id="'+r.id+'" title="Remove">&#10005;</button></div>'; }).join('')+'</div>' : '')+
+      '<button class="btn btn-ghost btn-sm" data-action="r43RewardAdd">+ Add a reward</button></div>';
+}
+renderSettings = (function(base){
+  return function(){
+    if(ui.settingsTab==='xp') ui.settingsTab = 'you';
+    const morning = ui.settingsTab==='morning';
+    if(morning) ui.settingsTab = 'you';
+    let h = base.apply(this, arguments);
+    // the XP & Areas item is gone
+    h = h.replace(/<button class="settings-nav-item[^"]*" data-action="settingsTab" data-tab="xp">[\s\S]*?<\/button>/, '');
+    // Good morning, after You
+    const nav = '<button class="settings-nav-item'+(morning ? ' active' : '')+'" data-action="settingsTab" data-tab="morning"><span style="margin-right:8px;">&#9728;&#65039;</span>Good morning</button>';
+    h = h.replace(/(<button class="settings-nav-item[^"]*" data-action="settingsTab" data-tab="you">[\s\S]*?<\/button>)/, '$1'+nav);
+    if(morning){
+      ui.settingsTab = 'morning';
+      h = h.replace(/(<button class="settings-nav-item) active(" data-action="settingsTab" data-tab="you")/, '$1$2')
+           .replace(/<div class="settings-content tab-panel" data-key="settings-[^"]*">[\s\S]*<\/div>\s*<\/div>\s*$/, '<div class="settings-content tab-panel" data-key="settings-morning">'+r48MorningHtml()+'</div></div>');
+    } else if(/data-key="settings-you"/.test(h)){
+      const w = r48WorldHtml(); if(w) h = h.replace(w, '');
+      if(h.indexOf('<div class="card section yw yq">') > 0) h = h.replace('<div class="card section yw yq">', r48SleepHtml()+'<div class="card section yw yq">');
+      else h = h.replace(/(<div class="settings-content tab-panel" data-key="settings-you">[\s\S]*)(<\/div>\s*<\/div>\s*)$/, function(m, a, b){ return a+r48SleepHtml()+b; });
+    }
+    return h;
+  };
+})(renderSettings);
+if(!ACTIONS.r43RewardRemove) ACTIONS.r43RewardRemove = function(el, e, id){ state.profile.xpRewards = arr(state.profile.xpRewards).filter(function(r){ return r.id!==id; }); persist('profile'); renderView(); };
+// (Good morning's buttons redraw Settings too)
+['wakeIntro', 'wakeNews', 'wakeVoice', 'wakeBriefBg', 'wakeBriefLayout'].forEach(function(k){
+  if(!ACTIONS[k]) return;
+  ACTIONS[k] = (function(base){ return function(){ const r = base.apply(this, arguments); if(ui.view==='settings') renderView(); return r; }; })(ACTIONS[k]);
+});
+// ---- the alarm window: just the alarm ----
+renderWakeSetup = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(ui.alarmTab==='work' || ui.r48WakeFull) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const grid = tpl.content.querySelector('.ws-block.grid');
+    if(grid){
+      const snooze = [...grid.querySelectorAll('.field')].find(function(f){ const l = f.querySelector('label'); return l && /^Snooze/.test(l.textContent.trim()); });
+      const blk = document.createElement('div'); blk.className = 'ws-block r48-ws-snooze';
+      if(snooze) blk.appendChild(snooze);
+      grid.replaceWith(blk);
+    }
+    const foot = tpl.content.querySelector('.wake-setup > .row:last-child');
+    if(foot){
+      const links = [...foot.querySelectorAll('.row button')].map(function(b){ return b.outerHTML; }).join('');
+      const nf = document.createElement('div'); nf.className = 'r48-wfoot';
+      nf.innerHTML = '<div class="r48-wlinks">'+links+'<button class="btn btn-ghost btn-sm" data-action="r48GoMorning">Good morning settings &rarr;</button></div>'+
+        '<div class="r48-wact"><button class="btn btn-ghost btn-sm r48-rm" data-action="r48WakeRemove">Remove alarm</button><span style="flex:1"></span><button class="btn btn-primary" data-action="closeWakeSetup">Done</button></div>';
+      foot.replaceWith(nf);
+    }
+    const d = document.createElement('div'); d.appendChild(tpl.content.cloneNode(true)); return d.innerHTML;
+  };
+})(renderWakeSetup);
+ACTIONS.r48WakeRemove = function(){
+  const w = wakeCfg(); w.enabled = false; w.override = null; persist('focus');
+  if(typeof hideOverlay==='function') hideOverlay('wakeSetupOverlay'); renderView();
+  showToast('Wake-up alarm removed. Set it again any time from Alarms.', {icon:'&#9200;', actionLabel:'Undo', actionAction:'r48WakeUndo'});
+};
+ACTIONS.r48WakeUndo = function(){ wakeCfg().enabled = true; persist('focus'); renderView(); };
+ACTIONS.r48GoMorning = function(){ if(typeof hideOverlay==='function') hideOverlay('wakeSetupOverlay'); ui.view = 'settings'; ui.settingsTab = 'morning'; renderView(); };
+
+// ---- 10. You: today by area sits inside the level card; the three area cards fill the row ----
+renderYouTab = (function(base){
+  return function(){
+    const tpl = document.createElement('template'); tpl.innerHTML = base.apply(this, arguments);
+    const today = tpl.content.querySelector('.r43-today'), main = tpl.content.querySelector('.you-main'), bar = main && main.querySelector('.you-xpbar');
+    if(today && main){ today.classList.add('r48-intop'); if(bar && bar.nextSibling) main.insertBefore(today, bar.nextSibling); else main.appendChild(today); }
+    const d = document.createElement('div'); d.appendChild(tpl.content.cloneNode(true)); return d.innerHTML;
+  };
+})(renderYouTab);
+
+// ---- 11. Goals: one Customize for everything; check-ins can't be redone in a tap; XP from them shows up top ----
+//  • The gear menu: October / Plan ahead / Master goals, then the check-ins (check in or edit the month and the
+//    week, check out when it's due, reopen a finished one) and fixing the new-client count.
+//  • No pencils, Reopen or Fix links on the cards themselves.
+//  • Checking in or out shows its XP in the small strip at the top, only when it's new XP (doing it again
+//    shows nothing, because it pays nothing).
+function r48StripRedo(h){
+  return h.replace(/<button class="tg-edit[^"]*"[^>]*>[\s\S]*?<\/button>/g, '')
+          .replace(/<div class="tg-addrow"><button class="tg-addbtn" data-action="tierReopen"[^>]*>[\s\S]*?<\/button><\/div>/g, '')
+          .replace(/<button[^>]*data-action="(?:openIntent|openCheckout|tierReopen)"[^>]*>[\s\S]*?<\/button>/g, '')
+          .replace(/<button class="r43-link" data-action="r43FixCount" data-id="[^"]*">Fix<\/button>/g, '');
+}
+tierCardHtml = (function(base){ return function(){ return r48StripRedo(base.apply(this, arguments)); }; })(tierCardHtml);
+renderGoalsTab = (function(base){
+  return function(){
+    const raw = base.apply(this, arguments), fixAt = /data-action="r43FixCount" data-id="([^"]*)"/.exec(raw);
+    let h = r48StripRedo(raw);
+    h = h.replace(/(data-action="r43GoalsMode" data-id="plan">)Plan [^<]*/, '$1Plan ahead');
+    if(ui.r43Menu){
+      const items = [], mk = monthKey(), wk = periodKey('week');
+      ['month', 'week'].forEach(function(kind){
+        const key = kind==='month' ? mk : wk, name = kind==='month' ? monthName(key) : 'this week';
+        const due = checkoutDue().find(function(c){ return c.kind===kind; });
+        if(due) items.push('<button role="menuitem" data-action="r48CheckOut" data-id="'+due.kind+':'+due.key+'">Check out of '+escapeHtml(due.kind==='month' ? monthName(due.key) : 'the week')+'</button>');
+        if(checkedOut(kind, key)) items.push('<button role="menuitem" data-action="r48Reopen" data-id="'+kind+'">Reopen '+escapeHtml(name)+'</button>');
+        else items.push('<button role="menuitem" data-action="r48CheckIn" data-id="'+kind+'">'+(checkedIn(kind, key) ? 'Edit '+escapeHtml(name)+'’s check-in' : 'Check in for '+escapeHtml(name))+'</button>');
+      });
+      const nc = fixAt || arr(state.goals.items).some(function(g){ return g.autoTrack==='newclients' && !g.done; }) || (typeof mgMonthlyDefs==='function' && arr(mgMonthlyDefs()).some(function(m){ return m.key==='newclients'; }));
+      if(nc) items.push('<button role="menuitem" data-action="r48FixCount" data-id="'+(fixAt ? escapeHtml(fixAt[1]) : '')+'">Fix the new-client count</button>');
+      h = h.replace('<i></i><button role="menuitem" data-action="r43MasterCustomize">', '<i></i>'+items.join('')+'<i></i><button role="menuitem" data-action="r43MasterCustomize">');
+    }
+    return h;
+  };
+})(renderGoalsTab);
+ACTIONS.r48CheckIn = function(el, e, id){ ui.r43Menu = false; openIntentForm(id==='week' ? 'week' : 'month'); };
+ACTIONS.r48CheckOut = function(el, e, id){ ui.r43Menu = false; const p = String(id || '').split(':'); openCheckoutForm(p[0], p[1]); };
+ACTIONS.r48Reopen = function(el, e, id){ ui.r43Menu = false; ACTIONS.tierReopen(el, e, id); };
+ACTIONS.r48FixCount = function(el, e, id){ ui.r43Menu = false; if(id){ ACTIONS.r43FixCount(null, null, id); return; } const g = arr(state.goals.items).find(function(x){ return x.autoTrack==='newclients' && !x.done; }); ACTIONS.r43FixCount(null, null, g ? g.id : 'master'); };
+// (and inside the check-in itself: no Start over; see the CSS)
+// check-out XP: the strip at the top, only when it's new
+ACTIONS.saveCheckout = (function(base){
+  return function(){
+    const was = xpSystemShow;
+    xpSystemShow = function(o){ if(o && o.gained > 0) xpToast(o.gained, String(o.title || 'Checked out.')); };
+    try{ return base.apply(this, arguments); } finally { setTimeout(function(){ xpSystemShow = was; }, 1200); }
+  };
+})(ACTIONS.saveCheckout);
