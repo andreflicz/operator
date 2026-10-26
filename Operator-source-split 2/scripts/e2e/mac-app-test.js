@@ -26,7 +26,7 @@ const get = (port, p) => new Promise((res) => { const r = http.get({host:'127.0.
   check('the page knows it is in the Mac app', await win.evaluate(() => !!(window.operatorApp && window.operatorApp.isApp) && document.documentElement.classList.contains('is-mac-app')));
   check('no Node in the page', await win.evaluate(() => typeof require==='undefined' && typeof process==='undefined'));
   const ping = await get(8935, '/ping');
-  check('the helpers are up (wake / voice / AI on 8935)', !!ping && /"helper":16/.test(ping.body), ping);
+  check('the helpers are up (wake / voice / AI on 8935)', !!ping && /"helper":17/.test(ping.body), ping);
   const act = await get(8934, '/');
   check('the activity helper answers (8934)', !!act && act.code===200, act);
   await app.evaluate(({Menu}) => { const m = Menu.getApplicationMenu(); m.items[0].submenu.items.find((i) => /Settings/.test(i.label)).click(); }); await win.waitForTimeout(500);
