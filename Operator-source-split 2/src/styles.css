@@ -8770,3 +8770,9 @@ html body .r44-quote:hover .qt-next{ opacity:.7; }
 .cx-tierbody .tg-card.is-month{ background:linear-gradient(160deg, rgba(255,197,107,.13), rgba(255,197,107,.03) 70%) !important; }
 .cx-tierbody .tg-card.is-week .tg-k{ color:#8fd3ff; } .cx-tierbody .tg-card.is-month .tg-k{ color:#ffc56b; }
 .cx-tierbody .tg-empty{ flex:1; display:flex; align-items:center; justify-content:center; text-align:center; font-size:13px; color:var(--text-dim); }
+/* R52: the week's and month's numbers under Your day */
+.r52-nums{ display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+.r52-nr{ display:flex; flex-direction:column; gap:6px; }
+.r52-nk{ font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+.r52-nr.is-week .r52-nk{ color:#8fd3ff; } .r52-nr.is-month .r52-nk{ color:#ffc56b; }
+.r52-nr .r44-tstats{ margin:0; }

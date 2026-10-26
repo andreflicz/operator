@@ -66,3 +66,29 @@ document.addEventListener('pointerdown', function(e){
   if(x){ e.preventDefault(); x.click(); return; }
   hideOverlay(o.id);
 }, true);
+
+// ---- 4. Calendar: the week's and the month's numbers sit under Your day ----
+// (Deep / Gym / Reels / Goals for this week and for this month, in the day card; the This week / This month
+// card is just the goals now, so they get the whole panel.)
+function r52TierStats(kind){
+  const was = ui.cxTier; ui.cxTier = kind;
+  let h = ''; try{ h = r52TierBase(); } finally { ui.cxTier = was; }
+  const m = /<div class="r44-tstats">[\s\S]*?<\/div><\/div>(?=<div class="cx-tierbody")/.exec(h);
+  return m ? m[0] : '';
+}
+const r52TierBase = cxTierCardHtml;
+cxTierCardHtml = function(){ return r52TierBase.apply(this, arguments).replace(/<div class="r44-tstats">[\s\S]*?<\/div><\/div>(?=<div class="cx-tierbody")/, ''); };
+renderCalendar = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(h.indexOf('cx-ribbon') < 0) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const rib = tpl.content.querySelector('.cx-now .cx-ribbon');
+    if(rib){
+      const d = document.createElement('div'); d.className = 'r52-nums';
+      d.innerHTML = [['week', 'This week'], ['month', 'This month']].map(function(x){ return '<div class="r52-nr is-'+x[0]+'"><span class="r52-nk">'+x[1]+'</span>'+r52TierStats(x[0])+'</div>'; }).join('');
+      rib.parentNode.insertBefore(d, rib.nextSibling);
+    }
+    const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
+  };
+})(renderCalendar);
