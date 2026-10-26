@@ -8569,6 +8569,73 @@ html body .today-hero > .th-left.th-mix{ justify-content:center !important; }
 .r48-lch2{ margin-bottom:4px; }
 .lc-row > .r48-lrec{ grid-column:1 / -1 !important; width:100%; flex-direction:row !important; margin:6px 0 0 50px !important; }
 .lc-row > .r48-lrec span{ flex:none; white-space:nowrap; }
+.r48-lch2{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.r48-lsw{ margin:0 !important; }
+.r48-rtl{ display:flex; flex-direction:column; gap:2px; max-width:900px; }
+.r48-rt-d{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); margin:14px 0 6px; }
+.r48-rt{ display:grid; grid-template-columns:26px 150px 1fr; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.05); cursor:pointer; font-size:13px; }
+.r48-rt:hover{ background:rgba(255,255,255,.05); }
+.r48-rt-i{ text-align:center; }
+.r48-rt-c{ display:inline-flex; align-items:center; gap:7px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.r48-rt-c i{ width:8px; height:8px; border-radius:50%; background:var(--cc); flex:none; }
+.r48-rt-t{ color:var(--text-muted, #c3c6d4); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.r48-rt-t b{ color:#fff; font-weight:600; }
+
+/* ===== ROUND 49: Square + Stripe ===== */
+.r49-pay{ margin:0 0 14px; border-radius:16px; padding:10px 14px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); }
+.r49-ph{ display:flex; align-items:center; gap:10px; font-size:13px; }
+.r49-pdot{ width:8px; height:8px; border-radius:50%; background:#3FBE8E; box-shadow:0 0 8px #3FBE8E; }
+.r49-pdot.is-err{ background:#FF7A6B; box-shadow:0 0 8px #FF7A6B; }
+.r49-pat{ color:var(--text-faint); font-size:12px; flex:1; }
+.r49-un{ display:flex; flex-direction:column; gap:6px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,.06); }
+.r49-u{ display:grid; grid-template-columns:auto 1fr auto 170px auto auto; align-items:center; gap:10px; }
+.r49-usrc{ font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:3px 8px; border-radius:6px; }
+.r49-usrc.is-square{ background:rgba(255,255,255,.1); } .r49-usrc.is-stripe{ background:rgba(99,91,255,.22); color:#B8B3FF; }
+.r49-uw{ display:flex; flex-direction:column; min-width:0; } .r49-uw b{ font-size:13.5px; } .r49-uw small{ font-size:11.5px; color:var(--text-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.r49-ua{ color:#7CF0C4; font-size:14px; }
+.r49-u select{ padding:6px 8px; font-size:12.5px; }
+.r49-more{ font-size:12px; color:var(--text-faint); }
+.r49-sr{ padding:12px 0; border-top:1px solid rgba(255,255,255,.06); display:flex; flex-direction:column; gap:8px; }
+.r49-sr:first-of-type{ border-top:0; }
+.r49-sl{ display:flex; align-items:center; gap:10px; } .r49-on{ font-size:11px; color:#7CF0C4; background:rgba(63,190,142,.12); padding:2px 8px; border-radius:999px; }
+.r49-help{ font-size:12px; color:var(--text-muted, #b9bccb); }
+/* client cards: their colour back, and every card's rows on one level */
+.cc2-grid{ align-items:stretch !important; }
+.r48-cc{ --cc:#8A90A2; height:100%; border-top:3px solid var(--cc) !important; background:linear-gradient(180deg, color-mix(in srgb, var(--cc) 13%, transparent), transparent 46%), var(--panel) !important; }
+.r48-cc .cc2-avatar{ box-shadow:0 0 0 2px color-mix(in srgb, var(--cc) 55%, transparent), 0 6px 18px color-mix(in srgb, var(--cc) 30%, transparent) !important; }
+.r48-cc .r48-cts{ background:rgba(0,0,0,.16); }
+.r48-cc .r48-ct b{ color:#fff; }
+.r48-cc .r48-ct:first-child b{ color:color-mix(in srgb, var(--cc) 70%, #fff); }
+.r48-cc .r48-cf{ margin-top:auto !important; }
+.r48-cc .r48-cts{ flex:none; }
+.r48-cc.hl-red .r48-cfh{ color:#FF9B8E; } .r48-cc.hl-yellow .r48-cfh{ color:#F3C988; } .r48-cc.hl-green .r48-cfh{ color:#7CF0C4; }
+.r48-cc .cc2-top{ min-height:50px; align-items:center !important; }
+#viewRoot .task-card-grid > .nn-panel, #viewRoot .task-card-grid > .current-task-card{ align-self:stretch !important; display:flex; flex-direction:column; }
+#viewRoot .task-card-grid > .nn-panel > :last-child{ flex:1 1 auto; }
+#viewRoot .task-card-grid > .nn-panel > :last-child{ display:flex !important; flex-direction:column !important; justify-content:center !important; gap:10px !important; }
+#viewRoot .task-card-grid > .nn-panel > :last-child > *{ margin-top:0 !important; margin-bottom:0 !important; }
+#viewRoot .task-card-grid > .nn-panel .nn-title{ flex:none !important; min-height:0 !important; }
+/* You: the card as tall as the panel beside it */
+.you-top{ align-items:stretch !important; }
+.you .ycf{ display:flex; }
+.you .ycf .ycf-in{ display:flex; }
+.you .pc.pc-big{ width:270px !important; padding:20px 18px 16px !important; display:flex !important; flex-direction:column; justify-content:space-between; }
+.you .pc-big .pc-face{ width:96px !important; height:96px !important; } .you .pc-big .pc-face span{ font-size:34px !important; }
+.you .pc-big .pc-ovr b{ font-size:50px !important; }
+.you .pc-big .pc-name{ font-size:24px !important; }
+.you .pc-big .pc-attrs b{ font-size:26px !important; }
+.hs.is-addPick{ padding:44px 24px 24px !important; position:relative; }
+.hs.is-addPick > .hs-x{ position:absolute !important; top:12px !important; right:12px !important; margin:0 !important; }
+/* Current and Up next: equal halves of the full height */
+#viewRoot .task-card-grid > .nn-panel > .nn-cell{ flex:1 1 0 !important; display:flex !important; flex-direction:column !important; justify-content:center !important; gap:10px !important; }
+/* client card, minimal: three plain lines, no box */
+.r48-cc .r48-cts{ background:none !important; border:0 !important; padding:0 !important; gap:8px !important; }
+.r48-cc .r48-ct{ grid-template-columns:92px 1fr auto !important; padding:0 !important; border:0 !important; }
+.r48-cc .r48-ct small{ font-size:11.5px; letter-spacing:0; text-transform:none; color:var(--text-faint); }
+.r48-cc .r48-ct b{ font-size:13.5px; font-weight:600; }
+.r48-cc .r48-ct:first-child b{ color:#fff; }
+.r48-cc .r48-cf{ border-top:1px solid rgba(255,255,255,.06); }
+.r48-cc{ gap:16px !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -28601,7 +28668,7 @@ ACTIONS.opEngineSwitch = function(el, e, id){
 };
 
 // ---- is the Operator launcher there, and is it the new one? (keys, voices and talking need it) ----
-const OP_HELPER_NEEDS = 16;
+const OP_HELPER_NEEDS = 17;
 async function opLauncherInfo(){
   const r = await fetchWithin(WAKE_HELPER+'ping', 3000);
   if(!r) return {up:false, v:0};
@@ -46211,20 +46278,34 @@ function r48LogCardsHtml(){
     (cs.length ? '<div class="r48-lcg">'+cs.map(card).join('')+'</div>' : '<div class="empty">No active clients yet.</div>')+
   '</div>';
 }
-// (the list, as it was, with each client's recent log right under their row; no title or explainer)
-logCenterHtml = function(){
-  let h = r48LogBase.apply(this, arguments);
-  h = h.replace(/<div class="lc-h"><div><div class="lc-t">Log center<\/div><div class="lc-s">[\s\S]*?<\/div><\/div>/, '<div class="lc-h r48-lch2"><div></div>');
-  mtActiveClients().forEach(function(c){
-    const log = r48ClientLog(c).slice(0, 3); if(!log.length) return;
-    const strip = '<div class="r48-lrec">'+log.map(function(l){ return '<span><i>'+l.icon+'</i><b>'+escapeHtml(l.label)+'</b>'+(l.note ? ' '+escapeHtml(l.note.length > 60 ? l.note.slice(0, 59)+'…' : l.note) : '')+'<em>'+(l.date===todayStr() ? 'today' : l.date ? daysAgoFrom(l.date)+'d' : '')+'</em></span>'; }).join('')+'</div>';
-    const key = 'data-key="lc-'+c.id+'"', i = h.indexOf(key); if(i < 0) return;
-    // the end of that row: the next row, section or the end of the list
-    const j = h.indexOf('</span></div>', h.indexOf('class="lc-btns"', i));
-    if(j > 0){ const at = j + '</span></div>'.length; h = h.slice(0, at - 6)+strip+h.slice(at - 6); }
+// (the list, as it was; every recent touch has its own view, a switch away; no title or explainer)
+function r48RecentTouchesHtml(){
+  const rows = [];
+  arr(state.business.clients).forEach(function(c){ r48ClientLogAll(c).forEach(function(l){ rows.push(Object.assign({c:c}, l)); }); });
+  rows.sort(function(a, b){ return b.ts - a.ts; });
+  if(!rows.length) return '<div class="empty">Nothing logged yet.</div>';
+  let last = '', out = '';
+  rows.slice(0, 80).forEach(function(r){
+    const day = r.date===todayStr() ? 'Today' : r.date===addDays(todayStr(), -1) ? 'Yesterday' : (r.date ? fmtDateShort(r.date) : '');
+    if(day!==last){ out += '<div class="r48-rt-d">'+day+'</div>'; last = day; }
+    out += '<div class="r48-rt" data-action="openContact" data-kind="client" data-id="'+r.c.id+'" style="--cc:'+clientAccent(r.c)+'"><span class="r48-rt-i">'+r.icon+'</span><span class="r48-rt-c"><i></i>'+escapeHtml(r.c.business || r.c.name)+'</span><span class="r48-rt-t"><b>'+escapeHtml(r.label)+'</b>'+(r.note ? ' '+escapeHtml(r.note) : '')+'</span></div>';
   });
-  return h;
+  return '<div class="r48-rtl">'+out+'</div>';
+}
+function r48ClientLogAll(c){
+  const out = [];
+  arr(c.touchpoints).forEach(function(t){ const tt = touchTypeById(t.type); out.push({ts:t.ts || Date.parse(t.date+'T12:00') || 0, date:t.date, icon:tt.icon, label:tt.label, note:t.note || ''}); });
+  arr(c.journal).forEach(function(j){ out.push({ts:Date.parse(j.createdAt || '') || Date.parse((j.date || '')+'T12:00') || 0, date:j.date, icon:'&#128221;', label:'Note', note:j.text || ''}); });
+  return out;
+}
+logCenterHtml = function(){
+  const view = ui.r48LogView==='recent' ? 'recent' : 'who';
+  const sw = '<div class="r47-by r48-lsw"><button class="'+(view==='who' ? 'is-on' : '')+'" data-action="r48LogView" data-id="who">Who needs a touch</button><button class="'+(view==='recent' ? 'is-on' : '')+'" data-action="r48LogView" data-id="recent">Recent touches</button></div>';
+  if(view==='recent') return '<div class="lc"><div class="lc-h r48-lch2">'+sw+'</div>'+r48RecentTouchesHtml()+'</div>';
+  let h = r48LogBase.apply(this, arguments);
+  return h.replace(/<div class="lc-h"><div><div class="lc-t">Log center<\/div><div class="lc-s">[\s\S]*?<\/div><\/div>/, '<div class="lc-h r48-lch2">'+sw);
 };
+ACTIONS.r48LogView = function(el, e, id){ ui.r48LogView = id==='recent' ? 'recent' : 'who'; playTick(); renderView(); };
 // (the card, rebuilt: who and what they pay; then three tiles: the plan, touch points, ads; the log button)
 clientCardV2 = function(c){
   const active = clientStageActive(c.stage), hs = active ? clientHealthStatus(c) : null, st = crmStage('client', c.stage);
@@ -46233,7 +46314,7 @@ clientCardV2 = function(c){
   const ads = typeof clientAdTotals==='function' ? clientAdTotals(c.id) : null;
   const tile = function(k, v, sub, cls){ return '<div class="r48-ct'+(cls ? ' '+cls : '')+'"><small>'+k+'</small><b>'+v+'</b>'+(sub ? '<span>'+sub+'</span>' : '')+'</div>'; };
   const lastTxt = last ? (tp ? touchTypeById(tp.type).label+' · ' : '')+(last===todayStr() ? 'today' : daysAgoFrom(last)+'d ago') : 'Never';
-  return '<div class="cc2 r48-cc'+(hs ? ' hl-'+hs.level : ' is-inactive')+'" data-key="cc2-'+c.id+'">'+
+  return '<div class="cc2 r48-cc'+(hs ? ' hl-'+hs.level : ' is-inactive')+'" data-key="cc2-'+c.id+'" style="--cc:'+clientAccent(c)+'">'+
     '<div class="cc2-top" data-action="openContact" data-kind="client" data-id="'+c.id+'">'+clientAvatarHtml(c, false, false)+
       '<div class="cc2-name"><div class="cc2-title">'+escapeHtml(crmName('client', c))+'</div>'+(crmSubName('client', c) ? '<div class="r48-sub">'+escapeHtml(crmSubName('client', c))+'</div>' : '')+'</div>'+
       (active ? (Number(c.mrr) ? '<span class="cc2-mrr">$'+Number(c.mrr).toLocaleString()+'<span>/mo</span></span>' : '') : '<span class="tag">'+escapeHtml(st ? st.label : 'Inactive')+'</span>')+
@@ -46241,7 +46322,7 @@ clientCardV2 = function(c){
     '<div class="r48-cts">'+
       tile('Plan', plan ? escapeHtml(plan) : '–', '', plan ? '' : 'is-dim')+
       tile('Touch points', lastTxt, active ? '<em class="crm-due '+overdueLevel(n)+'">'+(last===todayStr() ? 'Logged today' : dueLabel(n, 'client', c))+'</em>' : '')+
-      (ads ? tile('Ads · '+ads.days+'d', adsMoney(ads.spend, ads.currency), ads.leads ? ads.leads+' lead'+(ads.leads===1 ? '' : 's')+' · '+adsMoney(ads.spend/ads.leads, ads.currency)+'/lead' : (ads.results ? ads.results+' results' : '')) : '')+
+      (ads ? tile('Ads · '+ads.days+'d', adsMoney(ads.spend, ads.currency), ads.leads ? ads.leads+' lead'+(ads.leads===1 ? '' : 's')+' · '+adsMoney(ads.spend/ads.leads, ads.currency)+'/lead' : (ads.results ? ads.results+' results' : '')) : tile('Ads', '–', '', 'is-dim'))+
     '</div>'+
     (active ? '<div class="cc2-foot r48-cf"><span class="r48-cfh"><i class="lc-hs is-'+hs.level+'"></i>'+escapeHtml(clientHealthLabel(hs))+'</span><span style="flex:1"></span>'+touchButtonsHtml('client', c)+'</div>'+touchMenuHtml('client', c) : '')+
   '</div>';
@@ -46441,6 +46522,167 @@ clientBacklogHtml = (function(base){
   };
 })(clientBacklogHtml);
 ACTIONS.r48DlvTab = function(el, e, id){ const p = String(id || '').split('|'); if(!ui.r48Dlv) ui.r48Dlv = {}; ui.r48Dlv[p[0]] = p.slice(1).join('|'); playTick(); renderView(); };
+
+// ---- 14. your card says your first name ----
+playerCardHtml = (function(base){
+  return function(){
+    const full = String(state.profile.name || '').trim(), first = full.split(/\s+/)[0];
+    const h = base.apply(this, arguments);
+    return full && first!==full ? h.split('<span class="pc-name">'+escapeHtml(full)+'</span>').join('<span class="pc-name">'+escapeHtml(first)+'</span>') : h;
+  };
+})(playerCardHtml);
+// ============ ROUND 49: SQUARE + STRIPE ============
+// The payments you get come in on their own: connect Square and/or Stripe (Settings → Connections & Data), and
+// every payment from the last 90 days lands in Finances. A payment from a client (matched by their email, their
+// name or their business) is logged as that client's payment, so the month shows Received by itself. Anything
+// it can't place waits at the top of Finances with a client picker. Zelle, cash and the rest stay a tap: Received.
+// Read only: Operator never charges, refunds or sends anything. The tokens stay in the Operator app.
+function payCfg(){ const s = state.settings; if(!s.payments || typeof s.payments!=='object') s.payments = {}; const p = s.payments; if(!p.seen || typeof p.seen!=='object') p.seen = {}; if(!Array.isArray(p.unmatched)) p.unmatched = []; return p; }
+const PAY = {status:null, busy:false, err:{}};
+function payStatus(){
+  if(PAY.status || PAY._asking) return PAY.status;
+  PAY._asking = true;
+  fetchWithin(WAKE_HELPER+'pay/status', 5000).then(function(r){ return r && r.ok ? r.json() : null; }).then(function(j){ PAY._asking = false; PAY.status = j || {square:false, stripe:false, down:true}; if(ui.view==='settings' || (ui.view==='personal' && ui.personalTab==='finances')) renderView(); }).catch(function(){ PAY._asking = false; });
+  return null;
+}
+async function payApi(which, path){
+  const r = await fetchWithin(WAKE_HELPER+'pay/api?s='+which+'&p='+hexUtf8(path), 35000);
+  let j = null; try{ j = r ? await r.json() : null; }catch(e){}
+  if(!r || !r.ok) throw new Error((j && (j.error && (j.error.message || j.error) || (j.errors && j.errors[0] && j.errors[0].detail))) || (r ? (which==='square' ? 'Square' : 'Stripe')+' said no ('+r.status+')' : 'the Operator app didn’t answer'));
+  return j;
+}
+function payNorm(t){ return String(t || '').toLowerCase().replace(/[^a-z0-9@.]+/g, ' ').trim(); }
+// which client paid: email first, then the business or the person's name in the payer or the note
+function payClientFor(p){
+  const cs = arr(state.business.clients), em = payNorm(p.email), hay = payNorm([p.name, p.company, p.note].join(' '));
+  if(em){ const c = cs.find(function(c){ return c.email && payNorm(c.email)===em; }); if(c) return c; }
+  return cs.find(function(c){ const b = payNorm(c.business), n = payNorm(c.name); return (b && b.length > 2 && hay.indexOf(b) >= 0) || (n && n.length > 3 && hay.indexOf(n) >= 0); }) || null;
+}
+function payRecord(p){
+  const cfg = payCfg(), f = state.finances; if(cfg.seen[p.id]) return 0;
+  cfg.seen[p.id] = p.date;
+  const c = payClientFor(p);
+  if(c){ f.invoices.push({id:'pay_'+p.id, client:c.id, description:(p.src==='square' ? 'Square' : 'Stripe')+(p.note ? ': '+p.note : ' payment'), amount:p.amount, date:p.date, status:'paid', src:p.src, payId:p.id, attachmentName:null, attachmentData:null}); return 1; }
+  cfg.unmatched.push(p); return 1;
+}
+async function paySquare(since){
+  const out = [], cust = {};
+  let cursor = '', n = 0;
+  do{
+    const j = await payApi('square', '/v2/payments?begin_time='+encodeURIComponent(new Date(since).toISOString())+'&sort_order=DESC&limit=100'+(cursor ? '&cursor='+encodeURIComponent(cursor) : ''));
+    arr(j.payments).forEach(function(x){ if(x.status==='COMPLETED' && x.amount_money) out.push(x); });
+    cursor = j.cursor || ''; n++;
+  } while(cursor && n < 5);
+  for(const x of out){ if(x.customer_id && !cust[x.customer_id]){ try{ const c = await payApi('square', '/v2/customers/'+encodeURIComponent(x.customer_id)); cust[x.customer_id] = c.customer || {}; }catch(e){ cust[x.customer_id] = {}; } } }
+  return out.map(function(x){
+    const c = cust[x.customer_id] || {}, refunded = x.refunded_money ? Number(x.refunded_money.amount) || 0 : 0;
+    return {id:'sq_'+x.id, src:'square', amount:Math.round((Number(x.amount_money.amount) - refunded))/100, currency:x.amount_money.currency, date:String(x.created_at || '').slice(0, 10),
+      email:x.buyer_email_address || c.email_address || '', name:[c.given_name, c.family_name].filter(Boolean).join(' '), company:c.company_name || '', note:x.note || ''};
+  }).filter(function(p){ return p.amount > 0; });
+}
+async function payStripe(since){
+  const out = [], cust = {};
+  let after = '', n = 0, more = true;
+  while(more && n < 5){
+    const j = await payApi('stripe', '/v1/charges?limit=100&created[gte]='+Math.floor(since/1000)+(after ? '&starting_after='+encodeURIComponent(after) : ''));
+    arr(j.data).forEach(function(x){ if(x.paid && x.status==='succeeded') out.push(x); });
+    more = !!j.has_more && j.data && j.data.length; after = more ? j.data[j.data.length - 1].id : ''; n++;
+  }
+  for(const x of out){ const id = typeof x.customer==='string' ? x.customer : null; if(id && !cust[id]){ try{ cust[id] = await payApi('stripe', '/v1/customers/'+encodeURIComponent(id)); }catch(e){ cust[id] = {}; } } }
+  return out.map(function(x){
+    const c = (typeof x.customer==='string' ? cust[x.customer] : x.customer) || {}, bd = x.billing_details || {};
+    return {id:'st_'+x.id, src:'stripe', amount:Math.round(Number(x.amount) - Number(x.amount_refunded || 0))/100, currency:String(x.currency || 'usd').toUpperCase(), date:new Date(x.created*1000).toISOString().slice(0, 10),
+      email:bd.email || x.receipt_email || c.email || '', name:bd.name || c.name || '', company:(c.metadata && c.metadata.company) || '', note:x.description || ''};
+  }).filter(function(p){ return p.amount > 0; });
+}
+async function paySync(quiet){
+  const st = PAY.status; if(PAY.busy || !st || (!st.square && !st.stripe)) return;
+  PAY.busy = true; PAY.err = {}; if(!quiet) renderView();
+  const cfg = payCfg(), since = Date.now() - 90*86400000; let added = 0;
+  for(const which of ['square', 'stripe']){
+    if(!st[which]) continue;
+    try{ const list = which==='square' ? await paySquare(since) : await payStripe(since); list.forEach(function(p){ added += payRecord(p); }); cfg[which+'At'] = Date.now(); }
+    catch(e){ PAY.err[which] = e.message; }
+  }
+  PAY.busy = false; cfg.at = Date.now(); persist('settings'); persist('finances'); xpLast = null;
+  if(added && !quiet) showToast(added+' payment'+(added===1 ? '' : 's')+' came in.', {icon:'&#127974;'});
+  renderView();
+}
+// (on its own when Finances opens, at most every 30 minutes)
+afterRenderHooks.push(function(){
+  if(ui.view!=='personal' || ui.personalTab!=='finances') return;
+  const st = payStatus(); if(!st || (!st.square && !st.stripe)) return;
+  if(Date.now() - (payCfg().at || 0) > 30*60000 && !PAY.busy) setTimeout(function(){ paySync(true); }, 300);
+});
+ACTIONS.paySync = function(){ paySync(false); };
+ACTIONS.payKeySave = function(el, e, which){
+  const i = document.getElementById('payKey-'+which), v = i ? i.value.trim() : ''; if(!v){ if(i) i.focus(); return; }
+  fetchWithin(WAKE_HELPER+'pay/key?s='+which+'&t='+hexUtf8(v), 6000).then(function(r){
+    if(r && r.ok){ if(i) i.value = ''; PAY.status = null; showToast((which==='square' ? 'Square' : 'Stripe')+' is connected. Pulling your payments…', {icon:'&#128274;'}); payCfg().at = 0; setTimeout(function(){ payStatus(); setTimeout(function(){ paySync(false); }, 800); }, 200); }
+    else showToast('Couldn’t save it. Is the Operator app running?', {icon:'&#9888;'});
+  });
+};
+ACTIONS.payForget = function(el, e, which){ fetchWithin(WAKE_HELPER+'pay/forget?s='+which, 6000).then(function(){ PAY.status = null; payStatus(); renderView(); }); };
+ACTIONS.payAssign = function(el, e, id){
+  const sel = document.getElementById('payAs-'+id), cid = sel ? sel.value : ''; if(!cid) return;
+  const cfg = payCfg(), p = cfg.unmatched.find(function(x){ return x.id===id; }); if(!p) return;
+  const c = arr(state.business.clients).find(function(x){ return x.id===cid; });
+  state.finances.invoices.push({id:'pay_'+p.id, client:cid, description:(p.src==='square' ? 'Square' : 'Stripe')+(p.note ? ': '+p.note : ' payment'), amount:p.amount, date:p.date, status:'paid', src:p.src, payId:p.id, attachmentName:null, attachmentData:null});
+  // (and next time, the same payer goes to them by itself)
+  if(c && p.email && !c.email){ c.email = p.email; persist('business'); }
+  cfg.unmatched = cfg.unmatched.filter(function(x){ return x.id!==id; });
+  persist('settings'); persist('finances'); xpLast = null; playPositive(); renderView();
+};
+ACTIONS.payNotClient = function(el, e, id){
+  const cfg = payCfg(), p = cfg.unmatched.find(function(x){ return x.id===id; }); if(!p) return;
+  state.finances.income.push({id:'pay_'+p.id, date:p.date, source:(p.name || p.company || (p.src==='square' ? 'Square' : 'Stripe'))+(p.note ? ' · '+p.note : ''), amount:p.amount, src:p.src});
+  cfg.unmatched = cfg.unmatched.filter(function(x){ return x.id!==id; });
+  persist('settings'); persist('finances'); renderView();
+};
+// ---- Finances: what came in, and what to place ----
+function payStripHtml(){
+  const st = payStatus(), cfg = payCfg();
+  if(!st || (!st.square && !st.stripe)) return '';
+  const names = [st.square ? 'Square' : '', st.stripe ? 'Stripe' : ''].filter(Boolean).join(' · ');
+  const err = Object.keys(PAY.err).map(function(k){ return (k==='square' ? 'Square' : 'Stripe')+': '+PAY.err[k]; }).join(' · ');
+  const cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
+  const un = cfg.unmatched.slice().sort(function(a, b){ return String(b.date).localeCompare(String(a.date)); });
+  return '<div class="r49-pay"><div class="r49-ph"><span class="r49-pdot'+(err ? ' is-err' : '')+'"></span><b>'+names+'</b><span class="r49-pat">'+(PAY.busy ? 'Syncing…' : err ? escapeHtml(err) : cfg.at ? 'Synced '+ghlAgo(cfg.at) : '')+'</span><button class="btn btn-ghost btn-sm" data-action="paySync"'+(PAY.busy ? ' disabled' : '')+'>&#8635;</button></div>'+
+    (un.length ? '<div class="r49-un">'+un.slice(0, 6).map(function(p){
+      return '<div class="r49-u"><span class="r49-usrc is-'+p.src+'">'+(p.src==='square' ? 'Square' : 'Stripe')+'</span><span class="r49-uw"><b>'+escapeHtml(p.name || p.company || p.email || 'A payment')+'</b><small>'+fmtDateShort(p.date)+(p.note ? ' · '+escapeHtml(p.note.slice(0, 60)) : '')+'</small></span>'+
+        '<b class="r49-ua">+'+r44Money(p.amount)+'</b><select class="input" id="payAs-'+escapeHtml(p.id)+'"><option value="">Which client?</option>'+cs.map(function(c){ return '<option value="'+c.id+'">'+escapeHtml(c.business || c.name)+'</option>'; }).join('')+'</select>'+
+        '<button class="btn btn-sm" data-action="payAssign" data-id="'+escapeHtml(p.id)+'">Log it</button><button class="btn btn-ghost btn-sm" data-action="payNotClient" data-id="'+escapeHtml(p.id)+'">Not a client</button></div>';
+    }).join('')+(un.length > 6 ? '<div class="r49-more">+'+(un.length - 6)+' more</div>' : '')+'</div>' : '')+
+  '</div>';
+}
+renderPersonalFinances = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), strip = payStripHtml();
+    if(!strip) return h;
+    const i = h.indexOf('<div class="r44-hub'); if(i >= 0) return h.slice(0, i)+strip+h.slice(i);
+    return strip+h;
+  };
+})(renderPersonalFinances);
+// ---- Settings → Connections & Data: Payments ----
+function payCardHtml(){
+  const st = payStatus() || {}, row = function(which, label, ph, help){
+    const on = !!st[which];
+    return '<div class="r49-sr"><div class="r49-sl"><b>'+label+'</b>'+(on ? '<span class="r49-on">Connected</span>' : '')+'</div>'+
+      (on ? '<div class="row" style="gap:8px"><button class="btn btn-ghost btn-sm" data-action="paySync">Sync now</button><button class="btn btn-ghost btn-sm" data-action="payForget" data-id="'+which+'">Disconnect</button></div>'
+          : '<div class="op-set-key"><input class="input" type="password" id="payKey-'+which+'" placeholder="'+ph+'" autocomplete="off"><button class="btn btn-sm btn-primary" data-action="payKeySave" data-id="'+which+'">Connect</button></div><small class="r49-help">'+help+'</small>')+'</div>';
+  };
+  return '<div class="card section r49-set"><div class="section-title">Payments</div>'+
+    row('square', 'Square', 'Square access token', 'Square Developer → your app → Credentials → Production access token.')+
+    row('stripe', 'Stripe', 'Stripe restricted key (rk_live_…)', 'Stripe → Developers → API keys → Create restricted key, with Read on Charges and Customers.')+
+  '</div>';
+}
+renderSettings = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(!/data-key="settings-system"/.test(h)) return h;
+    return h.replace(/(<div class="settings-content tab-panel" data-key="settings-system">)/, '$1'+payCardHtml());
+  };
+})(renderSettings);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

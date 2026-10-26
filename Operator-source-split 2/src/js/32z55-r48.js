@@ -246,20 +246,34 @@ function r48LogCardsHtml(){
     (cs.length ? '<div class="r48-lcg">'+cs.map(card).join('')+'</div>' : '<div class="empty">No active clients yet.</div>')+
   '</div>';
 }
-// (the list, as it was, with each client's recent log right under their row; no title or explainer)
-logCenterHtml = function(){
-  let h = r48LogBase.apply(this, arguments);
-  h = h.replace(/<div class="lc-h"><div><div class="lc-t">Log center<\/div><div class="lc-s">[\s\S]*?<\/div><\/div>/, '<div class="lc-h r48-lch2"><div></div>');
-  mtActiveClients().forEach(function(c){
-    const log = r48ClientLog(c).slice(0, 3); if(!log.length) return;
-    const strip = '<div class="r48-lrec">'+log.map(function(l){ return '<span><i>'+l.icon+'</i><b>'+escapeHtml(l.label)+'</b>'+(l.note ? ' '+escapeHtml(l.note.length > 60 ? l.note.slice(0, 59)+'…' : l.note) : '')+'<em>'+(l.date===todayStr() ? 'today' : l.date ? daysAgoFrom(l.date)+'d' : '')+'</em></span>'; }).join('')+'</div>';
-    const key = 'data-key="lc-'+c.id+'"', i = h.indexOf(key); if(i < 0) return;
-    // the end of that row: the next row, section or the end of the list
-    const j = h.indexOf('</span></div>', h.indexOf('class="lc-btns"', i));
-    if(j > 0){ const at = j + '</span></div>'.length; h = h.slice(0, at - 6)+strip+h.slice(at - 6); }
+// (the list, as it was; every recent touch has its own view, a switch away; no title or explainer)
+function r48RecentTouchesHtml(){
+  const rows = [];
+  arr(state.business.clients).forEach(function(c){ r48ClientLogAll(c).forEach(function(l){ rows.push(Object.assign({c:c}, l)); }); });
+  rows.sort(function(a, b){ return b.ts - a.ts; });
+  if(!rows.length) return '<div class="empty">Nothing logged yet.</div>';
+  let last = '', out = '';
+  rows.slice(0, 80).forEach(function(r){
+    const day = r.date===todayStr() ? 'Today' : r.date===addDays(todayStr(), -1) ? 'Yesterday' : (r.date ? fmtDateShort(r.date) : '');
+    if(day!==last){ out += '<div class="r48-rt-d">'+day+'</div>'; last = day; }
+    out += '<div class="r48-rt" data-action="openContact" data-kind="client" data-id="'+r.c.id+'" style="--cc:'+clientAccent(r.c)+'"><span class="r48-rt-i">'+r.icon+'</span><span class="r48-rt-c"><i></i>'+escapeHtml(r.c.business || r.c.name)+'</span><span class="r48-rt-t"><b>'+escapeHtml(r.label)+'</b>'+(r.note ? ' '+escapeHtml(r.note) : '')+'</span></div>';
   });
-  return h;
+  return '<div class="r48-rtl">'+out+'</div>';
+}
+function r48ClientLogAll(c){
+  const out = [];
+  arr(c.touchpoints).forEach(function(t){ const tt = touchTypeById(t.type); out.push({ts:t.ts || Date.parse(t.date+'T12:00') || 0, date:t.date, icon:tt.icon, label:tt.label, note:t.note || ''}); });
+  arr(c.journal).forEach(function(j){ out.push({ts:Date.parse(j.createdAt || '') || Date.parse((j.date || '')+'T12:00') || 0, date:j.date, icon:'&#128221;', label:'Note', note:j.text || ''}); });
+  return out;
+}
+logCenterHtml = function(){
+  const view = ui.r48LogView==='recent' ? 'recent' : 'who';
+  const sw = '<div class="r47-by r48-lsw"><button class="'+(view==='who' ? 'is-on' : '')+'" data-action="r48LogView" data-id="who">Who needs a touch</button><button class="'+(view==='recent' ? 'is-on' : '')+'" data-action="r48LogView" data-id="recent">Recent touches</button></div>';
+  if(view==='recent') return '<div class="lc"><div class="lc-h r48-lch2">'+sw+'</div>'+r48RecentTouchesHtml()+'</div>';
+  let h = r48LogBase.apply(this, arguments);
+  return h.replace(/<div class="lc-h"><div><div class="lc-t">Log center<\/div><div class="lc-s">[\s\S]*?<\/div><\/div>/, '<div class="lc-h r48-lch2">'+sw);
 };
+ACTIONS.r48LogView = function(el, e, id){ ui.r48LogView = id==='recent' ? 'recent' : 'who'; playTick(); renderView(); };
 // (the card, rebuilt: who and what they pay; then three tiles: the plan, touch points, ads; the log button)
 clientCardV2 = function(c){
   const active = clientStageActive(c.stage), hs = active ? clientHealthStatus(c) : null, st = crmStage('client', c.stage);
@@ -268,7 +282,7 @@ clientCardV2 = function(c){
   const ads = typeof clientAdTotals==='function' ? clientAdTotals(c.id) : null;
   const tile = function(k, v, sub, cls){ return '<div class="r48-ct'+(cls ? ' '+cls : '')+'"><small>'+k+'</small><b>'+v+'</b>'+(sub ? '<span>'+sub+'</span>' : '')+'</div>'; };
   const lastTxt = last ? (tp ? touchTypeById(tp.type).label+' · ' : '')+(last===todayStr() ? 'today' : daysAgoFrom(last)+'d ago') : 'Never';
-  return '<div class="cc2 r48-cc'+(hs ? ' hl-'+hs.level : ' is-inactive')+'" data-key="cc2-'+c.id+'">'+
+  return '<div class="cc2 r48-cc'+(hs ? ' hl-'+hs.level : ' is-inactive')+'" data-key="cc2-'+c.id+'" style="--cc:'+clientAccent(c)+'">'+
     '<div class="cc2-top" data-action="openContact" data-kind="client" data-id="'+c.id+'">'+clientAvatarHtml(c, false, false)+
       '<div class="cc2-name"><div class="cc2-title">'+escapeHtml(crmName('client', c))+'</div>'+(crmSubName('client', c) ? '<div class="r48-sub">'+escapeHtml(crmSubName('client', c))+'</div>' : '')+'</div>'+
       (active ? (Number(c.mrr) ? '<span class="cc2-mrr">$'+Number(c.mrr).toLocaleString()+'<span>/mo</span></span>' : '') : '<span class="tag">'+escapeHtml(st ? st.label : 'Inactive')+'</span>')+
@@ -276,7 +290,7 @@ clientCardV2 = function(c){
     '<div class="r48-cts">'+
       tile('Plan', plan ? escapeHtml(plan) : '–', '', plan ? '' : 'is-dim')+
       tile('Touch points', lastTxt, active ? '<em class="crm-due '+overdueLevel(n)+'">'+(last===todayStr() ? 'Logged today' : dueLabel(n, 'client', c))+'</em>' : '')+
-      (ads ? tile('Ads · '+ads.days+'d', adsMoney(ads.spend, ads.currency), ads.leads ? ads.leads+' lead'+(ads.leads===1 ? '' : 's')+' · '+adsMoney(ads.spend/ads.leads, ads.currency)+'/lead' : (ads.results ? ads.results+' results' : '')) : '')+
+      (ads ? tile('Ads · '+ads.days+'d', adsMoney(ads.spend, ads.currency), ads.leads ? ads.leads+' lead'+(ads.leads===1 ? '' : 's')+' · '+adsMoney(ads.spend/ads.leads, ads.currency)+'/lead' : (ads.results ? ads.results+' results' : '')) : tile('Ads', '–', '', 'is-dim'))+
     '</div>'+
     (active ? '<div class="cc2-foot r48-cf"><span class="r48-cfh"><i class="lc-hs is-'+hs.level+'"></i>'+escapeHtml(clientHealthLabel(hs))+'</span><span style="flex:1"></span>'+touchButtonsHtml('client', c)+'</div>'+touchMenuHtml('client', c) : '')+
   '</div>';
@@ -476,3 +490,12 @@ clientBacklogHtml = (function(base){
   };
 })(clientBacklogHtml);
 ACTIONS.r48DlvTab = function(el, e, id){ const p = String(id || '').split('|'); if(!ui.r48Dlv) ui.r48Dlv = {}; ui.r48Dlv[p[0]] = p.slice(1).join('|'); playTick(); renderView(); };
+
+// ---- 14. your card says your first name ----
+playerCardHtml = (function(base){
+  return function(){
+    const full = String(state.profile.name || '').trim(), first = full.split(/\s+/)[0];
+    const h = base.apply(this, arguments);
+    return full && first!==full ? h.split('<span class="pc-name">'+escapeHtml(full)+'</span>').join('<span class="pc-name">'+escapeHtml(first)+'</span>') : h;
+  };
+})(playerCardHtml);

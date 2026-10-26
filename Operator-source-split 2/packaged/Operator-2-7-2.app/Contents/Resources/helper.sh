@@ -27,6 +27,9 @@ MC_KEY_FILE="$DATA_DIR/metricool.key"
 # Apify (public Instagram numbers through Apify's Instagram scraper; free plan): the API token, same rules
 AP_KEY_FILE="$DATA_DIR/apify.key"
 ZN_KEY_FILE="$DATA_DIR/zernio.key"
+# Square and Stripe (payments you get, read only): their access tokens, same rules
+SQ_KEY_FILE="$DATA_DIR/square.key"
+ST_KEY_FILE="$DATA_DIR/stripe.key"
 
 hexdec() { printf '%b' "$(printf '%s' "$1" | sed 's/../\\x&/g')"; }
 param() { printf '%s' "$REQ_PATH" | sed -n "s/.*[?&]$1=\([0-9a-zA-Z._-]*\).*/\1/p"; }
@@ -355,7 +358,7 @@ wake_respond() {
           esac ;;
       esac
       respond 200 '{"ok":true}' ;;
-    /ping*) respond 200 '{"ok":true,"helper":16}' ;;
+    /ping*) respond 200 '{"ok":true,"helper":17}' ;;
     /hello*) printf 'open %s' "$(date +%s)" > "$DATA_DIR/page.state" 2>/dev/null; respond 200 '{"ok":true}' ;;
     /engine*)
       # Operator as its own app (its own Dock icon) or plain Chrome — from the next time it opens
@@ -507,6 +510,35 @@ wake_respond() {
       [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach Zernio"}'; }
       respond "$CODE" "$BODY" ;;
     /mc/status*) if [ -s "$MC_KEY_FILE" ]; then respond 200 '{"ok":true,"hasKey":true}'; else respond 200 '{"ok":true,"hasKey":false}'; fi ;;
+    # Square / Stripe: the payments you get, read only. The token is saved here and added here; the page
+    # only ever asks for payments (and the customers they came from).
+    /pay/key*)
+      W=$(param s); T=$(hexdec "$(param t)")
+      case "$W" in square) F="$SQ_KEY_FILE" ;; stripe) F="$ST_KEY_FILE" ;; *) respond 400 '{"ok":false}'; return ;; esac
+      if [ -n "$T" ]; then ( umask 077; printf '%s' "$T" > "$F" ); chmod 600 "$F" 2>/dev/null; respond 200 '{"ok":true}'; else respond 400 '{"ok":false}'; fi ;;
+    /pay/forget*)
+      W=$(param s); case "$W" in square) rm -f "$SQ_KEY_FILE" ;; stripe) rm -f "$ST_KEY_FILE" ;; esac; respond 200 '{"ok":true}' ;;
+    /pay/status*)
+      SQ=false; ST=false; [ -s "$SQ_KEY_FILE" ] && SQ=true; [ -s "$ST_KEY_FILE" ] && ST=true
+      respond 200 "{\"ok\":true,\"square\":$SQ,\"stripe\":$ST}" ;;
+    /pay/api*)
+      W=$(param s); P=$(hexdec "$(param p)")
+      case "$P" in *..*|*@*|*" "*) respond 400 '{"error":"bad path"}'; return ;; esac
+      case "$W" in
+        square)
+          case "$P" in /v2/payments*|/v2/customers*|/v2/invoices*|/v2/locations*) ;; *) respond 400 '{"error":"bad path"}'; return ;; esac
+          [ -s "$SQ_KEY_FILE" ] || { respond 401 '{"error":"no Square token saved"}'; return; }
+          OUT=$(curl -sS --max-time 30 -H "Authorization: Bearer $(cat "$SQ_KEY_FILE")" -H "Square-Version: 2025-01-23" -H "Content-Type: application/json" -w '\n%{http_code}' "https://connect.squareup.com$P" 2>&1) ;;
+        stripe)
+          case "$P" in /v1/charges*|/v1/payment_intents*|/v1/customers*|/v1/invoices*|/v1/balance*) ;; *) respond 400 '{"error":"bad path"}'; return ;; esac
+          [ -s "$ST_KEY_FILE" ] || { respond 401 '{"error":"no Stripe key saved"}'; return; }
+          OUT=$(curl -sS --max-time 30 -u "$(cat "$ST_KEY_FILE"):" -w '\n%{http_code}' "https://api.stripe.com$P" 2>&1) ;;
+        *) respond 400 '{"error":"which one?"}'; return ;;
+      esac
+      CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
+      case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":"could not reach it"}' ;; esac
+      [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach it"}'; }
+      respond "$CODE" "$BODY" ;;
     /mc/api*)
       P=$(hexdec "$(param p)")
       case "$P" in /v2/*|/admin/*|/stats/*) ;; *) respond 400 '{"error":"bad path"}'; return ;; esac
