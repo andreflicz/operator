@@ -8857,3 +8857,4 @@ html body .calx .r52-left > .cx-desk{ flex:0 0 auto !important; }
 .r52-under > .cx-tier.r52-intier{ display:flex; flex-direction:column; }
 .r52-under > .cx-tier.r52-intier .cx-tierbody{ flex:1; }
 .r52-under > .cx-tier.r52-intier .tg-card{ flex:1; }
+html body .calx .r52-left > .cx-desk{ flex:1 1 auto !important; }

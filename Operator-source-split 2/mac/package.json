@@ -1,7 +1,7 @@
 {
   "name": "operator",
   "productName": "Operator",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "Operator: lock in, run the business, keep your life straight.",
   "main": "main.js",
   "author": "Andre",

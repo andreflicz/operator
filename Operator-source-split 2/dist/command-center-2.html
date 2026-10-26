@@ -8868,6 +8868,7 @@ html body .calx .r52-left > .cx-desk{ flex:0 0 auto !important; }
 .r52-under > .cx-tier.r52-intier{ display:flex; flex-direction:column; }
 .r52-under > .cx-tier.r52-intier .cx-tierbody{ flex:1; }
 .r52-under > .cx-tier.r52-intier .tg-card{ flex:1; }
+html body .calx .r52-left > .cx-desk{ flex:1 1 auto !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -47892,7 +47893,7 @@ renderCalendar = (function(base){
     const left = tpl.content.querySelector('.cx-left'), month = tpl.content.querySelector('.cx-month');
     const ag = month && month.querySelector(':scope > .cx-agenda'), tier = left && left.querySelector(':scope > .cx-tier');
     if(left && month && ag){
-      const box = document.createElement('section'); box.className = 'cx-card r52-today'; box.appendChild(ag); left.appendChild(box);
+      ag.remove();   // (no Today list: the month already shows what's on)
       if(tier) tier.remove();
       const row = document.createElement('div'); row.className = 'r52-under';
       ['week', 'month'].forEach(function(k){ const c = r52TierFor(k); if(c) row.appendChild(c); });

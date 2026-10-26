@@ -296,7 +296,7 @@ renderCalendar = (function(base){
     const left = tpl.content.querySelector('.cx-left'), month = tpl.content.querySelector('.cx-month');
     const ag = month && month.querySelector(':scope > .cx-agenda'), tier = left && left.querySelector(':scope > .cx-tier');
     if(left && month && ag){
-      const box = document.createElement('section'); box.className = 'cx-card r52-today'; box.appendChild(ag); left.appendChild(box);
+      ag.remove();   // (no Today list: the month already shows what's on)
       if(tier) tier.remove();
       const row = document.createElement('div'); row.className = 'r52-under';
       ['week', 'month'].forEach(function(k){ const c = r52TierFor(k); if(c) row.appendChild(c); });
