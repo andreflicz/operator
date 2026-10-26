@@ -8347,3 +8347,24 @@ body.op-live #opLight{ box-shadow:0 0 0 2px rgba(143,220,255,.5), 0 0 22px rgba(
 .r46-app .r46-line{ padding:10px 0; border-top:1px solid rgba(255,255,255,.06); font-size:13.5px; }
 .r46-app .r46-line:first-of-type{ border-top:0; }
 .r46-kbd{ font:600 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace; padding:5px 9px; border-radius:7px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-bottom-width:2px; color:#fff; }
+
+/* ===== ROUND 47: ads by client / by ad account ===== */
+.r47-by{ display:inline-flex; gap:2px; padding:3px; border-radius:999px; background:rgba(255,255,255,.05); border:1px solid var(--border); margin:0 0 10px 10px; vertical-align:middle; }
+.r47-by button{ border:0; background:transparent; color:var(--text-faint); font-size:12px; font-weight:600; padding:6px 14px; border-radius:999px; cursor:pointer; }
+.r47-by button.is-on{ background:rgba(255,255,255,.12); color:#fff; }
+.r47-chips{ display:flex; flex-wrap:wrap; gap:6px; margin:0 0 12px; }
+.r47-chip{ --c:#8A90A2; display:inline-flex; align-items:center; gap:7px; padding:6px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03); color:var(--text-muted, #b9bccb); font-size:12px; cursor:pointer; }
+.r47-chip i{ width:8px; height:8px; border-radius:50%; background:var(--c); }
+.r47-chip b{ color:#fff; font-weight:600; }
+.r47-chip.is-on{ border-color:color-mix(in srgb, var(--c) 60%, transparent); background:color-mix(in srgb, var(--c) 16%, transparent); color:#fff; }
+.r47-grp{ --c:#8A90A2; margin:14px 0 4px; border-radius:16px; padding:12px 12px 6px; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.06); border-left:3px solid var(--c); }
+.r47-gh{ display:flex; align-items:center; flex-wrap:wrap; gap:6px 14px; margin:0 4px 8px; }
+.r47-gh b{ display:inline-flex; align-items:center; gap:8px; font-size:14.5px; }
+.r47-gh b i{ width:9px; height:9px; border-radius:50%; background:var(--c); }
+.r47-gh > span{ color:var(--text-faint); font-size:12.5px; }
+.r47-acl{ margin-left:auto; display:inline-flex; align-items:center; gap:8px; font-size:12px; color:var(--text-faint); }
+.r47-acl select{ width:auto; min-width:150px; padding:5px 8px; font-size:12px; }
+.sx-ad-c select.is-inherit{ color:var(--text-faint); }
+.r47-top{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
+.r47-top .sx-sort{ margin:0; }
+.r47-top .r47-by{ margin:0; align-self:center; flex:none; }
