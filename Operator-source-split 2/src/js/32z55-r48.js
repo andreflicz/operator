@@ -222,7 +222,8 @@ function r48ClientLog(c){
   arr(c.journal).forEach(function(j){ out.push({ts:Date.parse(j.createdAt || '') || Date.parse((j.date || '')+'T12:00') || 0, date:j.date, icon:'&#128221;', label:'Note', note:j.text || ''}); });
   return out.sort(function(a, b){ return b.ts - a.ts; }).slice(0, 4);
 }
-logCenterHtml = function(){
+const r48LogBase = logCenterHtml;
+function r48LogCardsHtml(){
   const today = todayStr();
   const cs = mtActiveClients().map(function(c){
     const n = crmOverdueDays('client', c), hs = clientHealthStatus(c), last = crmLastTouch('client', c);
@@ -244,6 +245,20 @@ logCenterHtml = function(){
     '<div class="r48-lck"><span class="'+(due ? 'is-due' : 'is-ok')+'"><b>'+due+'</b> due a touch</span><span><b>'+(cs.length - due)+'</b> in touch</span></div>'+
     (cs.length ? '<div class="r48-lcg">'+cs.map(card).join('')+'</div>' : '<div class="empty">No active clients yet.</div>')+
   '</div>';
+}
+// (the list, as it was, with each client's recent log right under their row; no title or explainer)
+logCenterHtml = function(){
+  let h = r48LogBase.apply(this, arguments);
+  h = h.replace(/<div class="lc-h"><div><div class="lc-t">Log center<\/div><div class="lc-s">[\s\S]*?<\/div><\/div>/, '<div class="lc-h r48-lch2"><div></div>');
+  mtActiveClients().forEach(function(c){
+    const log = r48ClientLog(c).slice(0, 3); if(!log.length) return;
+    const strip = '<div class="r48-lrec">'+log.map(function(l){ return '<span><i>'+l.icon+'</i><b>'+escapeHtml(l.label)+'</b>'+(l.note ? ' '+escapeHtml(l.note.length > 60 ? l.note.slice(0, 59)+'…' : l.note) : '')+'<em>'+(l.date===todayStr() ? 'today' : l.date ? daysAgoFrom(l.date)+'d' : '')+'</em></span>'; }).join('')+'</div>';
+    const key = 'data-key="lc-'+c.id+'"', i = h.indexOf(key); if(i < 0) return;
+    // the end of that row: the next row, section or the end of the list
+    const j = h.indexOf('</span></div>', h.indexOf('class="lc-btns"', i));
+    if(j > 0){ const at = j + '</span></div>'.length; h = h.slice(0, at - 6)+strip+h.slice(at - 6); }
+  });
+  return h;
 };
 // (the card, rebuilt: who and what they pay; then three tiles: the plan, touch points, ads; the log button)
 clientCardV2 = function(c){
@@ -432,3 +447,32 @@ ACTIONS.saveCheckout = (function(base){
     try{ return base.apply(this, arguments); } finally { setTimeout(function(){ xpSystemShow = was; }, 1200); }
   };
 })(ACTIONS.saveCheckout);
+
+// ---- 12. from the canvas notes: Today's smaller pieces ----
+// Coming up: a compact list, with the calendar link in its corner (not a big box around one row).
+renderCalendarMiniPanel = function(){
+  const up = buildUpcomingList(14).slice(0, 4);
+  return '<div class="section r48-cal"><div class="card"><div class="r48-calh"><b>Coming up</b><button class="r48-calo" data-action="nav" data-view="calendar">Calendar &rarr;</button></div>'+
+    (up.length ? '<div class="r48-call">'+up.map(renderUpcomingRow).join('')+'</div>' : '<div class="r48-cale">Nothing in the next two weeks.</div>')+'</div></div>';
+};
+if(typeof PANEL_RENDERERS!=='undefined') PANEL_RENDERERS.calendarMini = renderCalendarMiniPanel;
+
+// ---- 13. Client backlog: a client with more than one deliverable gets a tab for each ----
+clientBacklogHtml = (function(base){
+  return function(){
+    const tpl = document.createElement('template'); tpl.innerHTML = base.apply(this, arguments);
+    if(!ui.r48Dlv) ui.r48Dlv = {};
+    tpl.content.querySelectorAll('.cbl-client').forEach(function(cl){
+      const ds = [...cl.querySelectorAll(':scope > .cbl-d')]; if(ds.length < 2) return;
+      const who = (cl.querySelector('.cbl-n b') || {}).textContent || '';
+      const names = ds.map(function(d){ return ((d.querySelector('.cbl-dh b') || {}).textContent || 'Deliverable').trim(); });
+      let pick = names.indexOf(ui.r48Dlv[who]); if(pick < 0) pick = 0;
+      const tabs = document.createElement('div'); tabs.className = 'r48-dtabs';
+      tabs.innerHTML = names.map(function(n, i){ return '<button class="'+(i===pick ? 'is-on' : '')+'" data-action="r48DlvTab" data-id="'+escapeHtml(who)+'|'+escapeHtml(n)+'">'+escapeHtml(n)+'</button>'; }).join('');
+      ds[0].before(tabs);
+      ds.forEach(function(d, i){ if(i!==pick) d.remove(); else d.classList.add('r48-dsel'); });
+    });
+    const d = document.createElement('div'); d.appendChild(tpl.content.cloneNode(true)); return d.innerHTML;
+  };
+})(clientBacklogHtml);
+ACTIONS.r48DlvTab = function(el, e, id){ const p = String(id || '').split('|'); if(!ui.r48Dlv) ui.r48Dlv = {}; ui.r48Dlv[p[0]] = p.slice(1).join('|'); playTick(); renderView(); };
