@@ -8773,6 +8773,14 @@ html body .r44-quote:hover .qt-next{ opacity:.7; }
 .subtab .lc-badge{ margin:-3px 0 -3px 6px !important; top:0; }
 /* R52: the Player sits dead center on the screen */
 .np.np-locked:not(.is-cockpit) .np-main{ position:relative; top:-24px; }
+/* R52: Calendar → This week / This month uses the whole panel: no little bar, the colour washes the area */
+.cx-tierbody{ display:flex; flex-direction:column; padding:0 !important; margin-top:10px; border-radius:14px; }
+.cx-tierbody .tg-card{ flex:1; display:flex; flex-direction:column; padding:14px 16px !important; border-radius:14px; }
+.cx-tierbody .tg-card::before{ display:none !important; }
+.cx-tierbody .tg-card.is-week{ background:linear-gradient(160deg, rgba(143,211,255,.13), rgba(143,211,255,.03) 70%) !important; }
+.cx-tierbody .tg-card.is-month{ background:linear-gradient(160deg, rgba(255,197,107,.13), rgba(255,197,107,.03) 70%) !important; }
+.cx-tierbody .tg-card.is-week .tg-k{ color:#8fd3ff; } .cx-tierbody .tg-card.is-month .tg-k{ color:#ffc56b; }
+.cx-tierbody .tg-empty{ flex:1; display:flex; align-items:center; justify-content:center; text-align:center; font-size:13px; color:var(--text-dim); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
