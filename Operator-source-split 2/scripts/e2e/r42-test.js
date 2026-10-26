@@ -36,9 +36,12 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ACTIONS.mtDvUndo(null, null, "+nx+".id)"); await p.waitForTimeout(150);
   check('…Undo takes back what Done put in', await E("dvwFind("+nx+").done")===1 && await E(nx+".status")!=='done');
   await E("ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='clientBacklog'; renderView()"); await p.waitForTimeout(250);
-  check('the Client backlog shows each week with its counter', (await p.$$('.r42-cbl')).length >= 2 && !!(await p.$('.r42-cbl .r42-seg')) && /Week of Oct 26/.test(await p.textContent('.cbl')));
-  await p.click('.r42-cbl:last-child .r42-seg:nth-child(4)'); await p.waitForTimeout(250);
-  check('…tap a block to set the count', await E("dvwFind("+nx+").done")===4);
+  // (R50: the weeks are a strip you tap; the week you pick opens with − / + under it)
+  check('the Client backlog shows each week, tappable', (await p.$$('[data-action="r50WkPick"]')).length >= 2 && !/Posting now|Making now/.test(await p.textContent('.cbl')));
+  const pk = await E("(function(){ const post = dvwFind("+nx+").post; return Array.from(document.querySelectorAll('[data-action=r50WkPick]')).map(b => b.dataset.id).find(x => x.endsWith('|'+post)); })()");
+  await p.click('[data-action="r50WkPick"][data-id="'+pk+'"]'); await p.waitForTimeout(200);
+  await p.click('[data-action="r50WkStep"][data-id="'+pk+'|1"]'); await p.waitForTimeout(250);
+  check('…tap a week, + logs one for it', await E("dvwFind("+nx+").done")===2);
   check('the calendar says whose and how many on the due day', await E("calDayInfo('2026-10-25').deadlines.some(t => /JJS · 7 reels/.test(t.title))"));
 
   // ---- snooze / waiting ----

@@ -18,18 +18,13 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); ui.view='convos'; ui.socTab='ads'; renderView()"); await p.waitForTimeout(1200);
   check('Ads reads every ad account, not just the first', await E("igCfg().znAdsCache.camps.length")===3 && await E("igCfg().znAdsCache.accts.length")===2);
   check('GoHighLevel chats and contacts are gone from Social', !/GHL chats|Contacts/.test(await p.textContent('.sx-tabs')));
-  await E("ACTIONS.adGroupBy(null, null, 'acct')"); await p.waitForTimeout(150);
-  check('By ad account: one group per account', (await p.$$('.r47-grp')).length===2 && /JJS Ads/.test(await p.textContent('.sx')) && /Kiko Ads/.test(await p.textContent('.sx')));
-  await p.selectOption('select[data-acctlink="c1"]', 'jj'); await p.waitForTimeout(150);
-  await p.selectOption('select[data-acctlink="c2"]', 'ki'); await p.waitForTimeout(150);
-  check('give a whole ad account to a client and its campaigns follow', await E("adClientOf(igCfg().znAdsCache.camps.find(k => k.id==='k2'))")==='jj' && await E("clientAdTotals('jj').spend")===500);
-  await E("ACTIONS.adGroupBy(null, null, 'client')"); await p.waitForTimeout(150);
-  const gh = await p.$$eval('.r47-gh b', els => els.map(e => e.textContent));
-  check('By client: JJS and Kiko, each with their own spend', gh.length===2 && gh[0]==='JJS' && gh[1]==='Kiko', gh);
-  await p.selectOption('select[data-adlink="k2"]', 'ki'); await p.waitForTimeout(150);
-  check('one campaign can still go to someone else', await E("clientAdTotals('ki').spend")===330 && await E("clientAdTotals('jj').spend")===420);
-  await E("ACTIONS.adPick(null, null, 'ki')"); await p.waitForTimeout(150);
-  check('the chips narrow to one client, totals with them', (await p.$$('.r47-grp')).length===1 && /\$330/.test(await p.textContent('.sx-sum')));
+  // (R50: one Zernio connection names every account the same, so it's campaigns only: you say whose each one is)
+  check('no ad accounts to pick, just campaigns', !(await p.$('select[data-acctlink]')) && /Not assigned yet/.test(await p.textContent('.sx')));
+  await E("ui.adClient='none'; renderView()"); await p.waitForTimeout(150);
+  await p.selectOption('select[data-adlink="k2"]', 'jj'); await p.waitForTimeout(150);
+  await E("ui.adClient='none'; renderView()"); await p.waitForTimeout(150);
+  await p.selectOption('select[data-adlink="k3"]', 'ki'); await p.waitForTimeout(150);
+  check('each campaign goes to the client you pick', await E("adClientOf({id:'k2'})")==='jj' && await E("adClientOf({id:'k3'})")==='ki' && await E("clientAdTotals('ki').spend")>0);
   await p.screenshot({path:OUT+'/r47-ads.png', fullPage:true});
   check('no page errors (round 47)', p.errors.length===0, p.errors);
   await b.close(); process.exit(report() ? 1 : 0);
