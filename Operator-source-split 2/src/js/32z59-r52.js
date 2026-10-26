@@ -85,8 +85,12 @@ renderCalendar = (function(base){
     const tpl = document.createElement('template'); tpl.innerHTML = h;
     const rib = tpl.content.querySelector('.cx-now .cx-ribbon');
     if(rib){
+      // one compact row: each number shows the week (blue) over the month (gold)
+      const vals = function(kind){ const t = document.createElement('template'); t.innerHTML = r52TierStats(kind); return Array.from(t.content.querySelectorAll('.r44-ts')).map(function(x){ return [(x.querySelector('small') || {}).textContent || '', (x.querySelector('b') || {}).textContent || '']; }); };
+      const w = vals('week'), m = vals('month');
       const d = document.createElement('div'); d.className = 'r52-nums';
-      d.innerHTML = [['week', 'This week'], ['month', 'This month']].map(function(x){ return '<div class="r52-nr is-'+x[0]+'"><span class="r52-nk">'+x[1]+'</span>'+r52TierStats(x[0])+'</div>'; }).join('');
+      d.innerHTML = '<div class="r52-nh"><span class="is-week">Week</span><span class="is-month">Month</span></div><div class="r52-row">'+
+        w.map(function(x, i){ return '<div class="r52-n"><small>'+escapeHtml(x[0])+'</small><b>'+escapeHtml(x[1])+'</b><i>'+escapeHtml((m[i] || [])[1] || '–')+'</i></div>'; }).join('')+'</div>';
       rib.parentNode.insertBefore(d, rib.nextSibling);
     }
     const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
