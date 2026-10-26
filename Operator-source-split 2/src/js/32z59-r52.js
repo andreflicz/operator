@@ -96,3 +96,29 @@ renderCalendar = (function(base){
     const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
   };
 })(renderCalendar);
+// (Your day: labels that would run into each other split apart: the earlier one ends at its mark, the later one starts at its)
+renderCalendar = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(h.indexOf('r44-mk') < 0) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    tpl.content.querySelectorAll('.r44-marks').forEach(function(box){
+      const ms = Array.from(box.querySelectorAll('.r44-mk')).map(function(m){ return {m:m, x:parseFloat(m.style.left) || 0}; }).sort(function(a, b){ return a.x - b.x; });
+      for(let i = 1; i < ms.length; i++){
+        if(ms[i].x - ms[i - 1].x >= 22) continue;
+        const a = ms[i - 1].m, b = ms[i].m;
+        if(ms[i - 1].x >= 22){ a.classList.remove('is-l'); a.classList.add('is-r', 'r52-gapr'); b.classList.remove('is-r'); b.classList.add('is-l', 'r52-gapl'); }
+        else {
+          // (no room to its left either: the earlier one keeps just its icon, its time on hover)
+          const svg = a.querySelector('svg'), t = a.textContent.trim();
+          if(svg){ a.innerHTML = ''; a.appendChild(svg); a.title = t; a.classList.add('r52-icononly'); }
+          else { a.title = t; a.textContent = '•'; }
+          b.classList.remove('is-r'); b.classList.add('is-l', 'r52-gapl');
+        }
+      }
+      // (and nothing hangs off the ends)
+      if(ms.length && ms[0].x < 8){ ms[0].m.classList.remove('is-r'); ms[0].m.classList.add('is-l'); }
+    });
+    const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
+  };
+})(renderCalendar);
