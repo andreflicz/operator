@@ -54,7 +54,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.view='business'; renderView()"); await p.waitForTimeout(200);
   await E("ui.view='focus'; ui.focusTasksSubTab='waiting'; renderView()"); await p.waitForTimeout(200);
   check('…it shows on the Waiting on clients tab', /Ad account access/.test(await p.textContent('#viewRoot')));
-  check('…and on the client\'s card', /Ad account access/.test(await E("clientCardV2(state.business.clients[0])")));
+  // (round 48: the client card is just the plan, touch points and ads; what you're waiting on lives on Focus)
+  check('…and not cluttering the client card', !/Ad account access/.test(await E("clientCardV2(state.business.clients[0])")));
   await E("state.tasks.items.find(t => t.id==='ct').waitingOn.next = '2026-10-25'");
   check('…and they show up in Reach out on the chase day', await E("reachNeeds().some(x => x.c.id==='jj' && x.chase)"));
   await E("ACTIONS.r42Unpark(null, null, 'ct')");
@@ -62,7 +63,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   // ---- colours, client tasks, settings ----
   await E("ACTIONS.r42ClientColor(null, null, 'bm:FF8FB1')");
-  check('a client\'s colour is picked on their card', await E("state.business.clients[1].color")==='#FF8FB1' && /r42-cc-color/.test(await E("clientCardV2(state.business.clients[1])")));
+  // (round 48: the colour is picked in the client's window, not on the card)
+  check('a client\'s colour is picked in their window', await E("state.business.clients[1].color")==='#FF8FB1' && !/r42-cc-color/.test(await E("clientCardV2(state.business.clients[1])")) && /r48-ccol/.test(await E("(ui.showClientModal = state.business.clients[1].id, renderClientModal())")));
   await E("state.business.clients[1].deliverables[0].completedDates = ['2026-10-20','2026-10-21']; state.tasks.items.push({id:'late', title:'Send invoice', status:'today', priority:'med', clients:['bm'], deadline:'2026-10-20', createdAt:'2026-10-18'})");
   check('an overdue client task drags their health down', await E("clientHealthStatus(state.business.clients[1]).level")==='red' && /overdue/.test(await E("clientHealthReason(state.business.clients[1], clientHealthStatus(state.business.clients[1]))")));
   await E("ui.view='settings'; ui.settingsTab='standards'; renderView()"); await p.waitForTimeout(200);

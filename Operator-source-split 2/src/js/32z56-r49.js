@@ -150,3 +150,105 @@ renderSettings = (function(base){
     return h.replace(/(<div class="settings-content tab-panel" data-key="settings-system">)/, '$1'+payCardHtml());
   };
 })(renderSettings);
+
+// ============ SOCIAL → ADS: every client at a glance, then theirs in detail ============
+// The overview is a card per client (spend, leads, cost per lead, CTR, hook, campaigns running). Tap one and
+// you're in their campaigns; tap a campaign for its ad sets and ads. Which ad account is whose is set on the
+// client (their window → Ad accounts); an account nobody has yet shows once at the end with a small Link.
+function adGroups(){
+  const c = igCfg(), cache = c.znAdsCache; if(!cache) return null;
+  const all = cache.camps.map(function(k){ return Object.assign({x:adNums(k.m)}, k); });
+  const by = {}; all.forEach(function(k){ const id = adClientOf(k) || ('acct:'+(k.acct || '-')); (by[id] = by[id] || []).push(k); });
+  return {all:all, by:by, accts:arr(cache.accts)};
+}
+function adStatsHtml(list, cur){
+  const T = adTotals(list), hooks = list.filter(function(k){ return k.x.hook!=null; });
+  return [['Spent', adsMoney(T.spend, cur)], ['Leads', T.leads ? sxNum(T.leads) : '–'], ['Per lead', T.leads ? adsMoney(T.spend/T.leads, cur) : '–'], ['CTR', T.imp ? sxPct(T.clicks/T.imp*100) : '–'], ['Hook', hooks.length ? sxPct(sxAvg(hooks, function(k){ return k.x.hook; })) : '–']]
+    .map(function(x){ return '<div><b>'+x[1]+'</b><span>'+x[0]+'</span></div>'; }).join('');
+}
+sxAdsHtml = function(){
+  if(!znAccs().length) return typeof adsSectionHtml==='function' && adsSectionHtml() ? adsSectionHtml() : '<div class="llx-empty">Your Meta ads come through Zernio: connect Zernio on Overview, then in Zernio connect Meta Ads.</div>';
+  const st = znAdsSt(), c = igCfg(); znAdsLoad(false);
+  const range = '<div class="sx-sort"><span>Last</span>'+[7, 30, 90].map(function(d){ return '<button class="'+(st.days===d ? 'is-on' : '')+'" data-action="znAdsDays" data-id="'+d+'">'+d+' days</button>'; }).join('')+'</div>';
+  if(st.none) return range+'<div class="llx-empty">No Meta Ads connection in Zernio yet. In Zernio: Accounts → connect Meta Ads. Then refresh here.</div>';
+  const cache = c.znAdsCache;
+  if(!cache || cache.days!==st.days || cache.v!==2) return range+'<div class="gp-loading">'+(st.err ? '&#9888; '+escapeHtml(st.err) : 'Loading your campaigns…')+'</div>';
+  const g = adGroups(), cur = (g.all[0] && g.all[0].currency) || 'USD';
+  const client = function(id){ return arr(state.business.clients).find(function(x){ return x.id===id; }); };
+  const aname = function(id){ const a = g.accts.find(function(z){ return z.id===id; }); return a ? a.name : 'Ad account'; };
+  // ---- one client, in detail ----
+  if(ui.adClient && g.by[ui.adClient]){
+    const id = ui.adClient, list = g.by[id].slice().sort(function(a, b){ return b.x.spend - a.x.spend; }), cl = client(id);
+    const name = cl ? (cl.business || cl.name) : aname(id.slice(5));
+    return '<div class="r49-adh"><button class="r49-back" data-action="adClientOpen" data-id="">&larr; All clients</button>'+range+'</div>'+
+      '<div class="r49-adt" style="--cc:'+(cl ? clientAccent(cl) : '#8A90A2')+'"><i></i><b>'+escapeHtml(name)+'</b><span>'+list.length+' campaign'+(list.length===1 ? '' : 's')+'</span></div>'+
+      '<div class="sx-sum r49-sum">'+adStatsHtml(list, cur)+'</div>'+
+      '<div class="r49-camps">'+list.map(function(k){
+        const on = /active/i.test(String(k.status || '')), open = ui.adOpen===k.id;
+        return '<div class="r49-camp'+(open ? ' is-open' : '')+'"><button class="r49-cr" data-action="adCampOpen" data-id="'+escapeHtml(k.id)+'">'+
+          '<span class="r49-cn"><i class="'+(on ? 'is-on' : '')+'"></i><b>'+escapeHtml(k.name || 'Campaign')+'</b><small>'+escapeHtml(String(k.objective || k.status || '').replace(/^OUTCOME_/, '').toLowerCase())+'</small></span>'+
+          '<span><b>'+adsMoney(k.x.spend, k.currency || cur)+'</b><small>spent</small></span><span><b>'+(k.x.leads!=null ? sxNum(k.x.leads) : k.x.results!=null ? sxNum(k.x.results) : '–')+'</b><small>'+(k.x.leads!=null ? 'leads' : 'results')+'</small></span>'+
+          '<span><b>'+(k.x.cpr!=null ? adsMoney(k.x.cpr, k.currency || cur) : k.x.leads ? adsMoney(k.x.spend/k.x.leads, k.currency || cur) : '–')+'</b><small>each</small></span><span><b>'+sxPct(k.x.ctr)+'</b><small>CTR</small></span><span><b>'+sxPct(k.x.hook)+'</b><small>hook</small></span>'+
+          '<span class="r49-chev">'+(open ? '&#9662;' : '&#9656;')+'</span></button>'+(open ? adSetsHtml(k) : '')+'</div>';
+      }).join('')+'</div>';
+  }
+  // ---- every client ----
+  const keys = Object.keys(g.by).sort(function(a, b){ const A = a.indexOf('acct:')===0, B = b.indexOf('acct:')===0; if(A!==B) return A ? 1 : -1; return adTotals(g.by[b]).spend - adTotals(g.by[a]).spend; });
+  const cs = arr(state.business.clients).filter(function(x){ return clientStageActive(x.stage); });
+  const cards = keys.map(function(id){
+    const list = g.by[id], T = adTotals(list), cl = id.indexOf('acct:')===0 ? null : client(id), act = list.filter(function(k){ return /active/i.test(String(k.status || '')); }).length;
+    const unl = !cl, aid = unl ? id.slice(5) : null;
+    return '<div class="r49-ac'+(unl ? ' is-unlinked' : '')+'" style="--cc:'+(cl ? clientAccent(cl) : '#8A90A2')+'">'+
+      '<button class="r49-acb" data-action="adClientOpen" data-id="'+escapeHtml(id)+'"><div class="r49-ach"><i></i><b>'+escapeHtml(cl ? (cl.business || cl.name) : aname(aid))+'</b><span>'+(act ? act+' running' : 'Nothing running')+'</span></div>'+
+        '<div class="r49-acs"><div class="r49-acm"><b>'+adsMoney(T.spend, cur)+'</b><span>spent</span></div>'+
+        '<div><b>'+(T.leads ? sxNum(T.leads) : '–')+'</b><span>leads</span></div><div><b>'+(T.leads ? adsMoney(T.spend/T.leads, cur) : '–')+'</b><span>per lead</span></div><div><b>'+(T.imp ? sxPct(T.clicks/T.imp*100) : '–')+'</b><span>CTR</span></div></div></button>'+
+      (unl ? '<div class="r49-link"><span>Not linked to a client</span><select class="input" data-acctlink="'+escapeHtml(aid)+'"><option value="">Link to…</option>'+cs.map(function(x){ return '<option value="'+x.id+'">'+escapeHtml(x.business || x.name)+'</option>'; }).join('')+'</select></div>' : '')+
+    '</div>';
+  }).join('');
+  return '<div class="r49-adh">'+range+'</div><div class="sx-sum">'+adStatsHtml(g.all, cur)+'</div>'+(keys.length ? '<div class="r49-acg">'+cards+'</div>' : '<div class="llx-empty">No campaigns in this range.</div>');
+};
+ACTIONS.adClientOpen = function(el, e, id){ ui.adClient = id || null; ui.adOpen = null; playTick(); renderView(); };
+ACTIONS.adCampOpen = function(el, e, id){ ui.adOpen = ui.adOpen===id ? null : id; if(ui.adOpen) adSetsLoad(id); renderView(); };
+// ad sets and ads, for one campaign, when you open it
+const ADSETS = {};
+async function adSetsLoad(id){
+  if(ADSETS[id] && (ADSETS[id].sets || ADSETS[id].loading)) return;
+  ADSETS[id] = {loading:true}; const st = znAdsSt(), to = todayStr(), from = addDays(to, -(st.days - 1));
+  const tries = ['/v1/ads/campaigns/'+encodeURIComponent(id)+'/adsets?fromDate='+from+'&toDate='+to, '/v1/ads/adsets?campaignId='+encodeURIComponent(id)+'&fromDate='+from+'&toDate='+to];
+  for(const p of tries){
+    try{
+      const r = await znApi(p), sets = arr(r.adSets || r.adsets || r.data);
+      if(sets.length || r.adSets || r.adsets){
+        ADSETS[id] = {sets:sets.map(function(s){ return {id:s.platformAdSetId || s.id, name:s.adSetName || s.name, status:s.status, x:adNums(s.metrics || {}), ads:arr(s.ads).map(function(a){ return {id:a.platformAdId || a.id, name:a.adName || a.name, x:adNums(a.metrics || {}), thumb:a.thumbnailUrl || ''}; })}; })};
+        renderView(); return;
+      }
+    }catch(e){}
+  }
+  ADSETS[id] = {none:true}; renderView();
+}
+function adSetsHtml(k){
+  const s = ADSETS[k.id] || {}, cur = k.currency || 'USD';
+  if(s.loading || !(s.sets || s.none)) return '<div class="r49-sets"><div class="gp-loading">Loading ad sets…</div></div>';
+  if(s.none) return '<div class="r49-sets"><div class="r49-none">Zernio doesn’t hand over this campaign’s ad sets and ads. Open it in Ads Manager for those.</div></div>';
+  return '<div class="r49-sets">'+s.sets.map(function(a){
+    return '<div class="r49-set"><div class="r49-sr2"><b>'+escapeHtml(a.name || 'Ad set')+'</b><span>'+adsMoney(a.x.spend, cur)+'</span><span>'+(a.x.leads!=null ? sxNum(a.x.leads)+' leads' : '–')+'</span><span>'+sxPct(a.x.ctr)+'</span></div>'+
+      (a.ads.length ? '<div class="r49-ads">'+a.ads.map(function(ad){ return '<div class="r49-ad">'+(ad.thumb ? '<img src="'+escapeHtml(ad.thumb)+'" alt="">' : '<i></i>')+'<b>'+escapeHtml(ad.name || 'Ad')+'</b><span>'+adsMoney(ad.x.spend, cur)+'</span><span>'+(ad.x.leads!=null ? sxNum(ad.x.leads)+' leads' : '–')+'</span><span>'+sxPct(ad.x.hook)+' hook</span></div>'; }).join('')+'</div>' : '')+'</div>';
+  }).join('')+'</div>';
+}
+// the client's window: which ad accounts are theirs
+renderClientModal = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), c = arr(state.business.clients).find(function(x){ return x.id===ui.showClientModal; });
+    const cache = igCfg().znAdsCache; if(!h || !c || !cache || !arr(cache.accts).length) return h;
+    const links = adAcctLinks();
+    const row = '<div class="r49-cacc"><span>Ad accounts</span>'+arr(cache.accts).map(function(a){ const on = links[a.id]===c.id, other = links[a.id] && links[a.id]!==c.id;
+      return '<button class="r49-cachip'+(on ? ' is-on' : '')+'" data-action="adAcctToggle" data-id="'+escapeHtml(a.id)+'|'+c.id+'"'+(other ? ' title="Linked to another client: tap to move it here"' : '')+'>'+(on ? '&#10003; ' : '')+escapeHtml(a.name)+'</button>'; }).join('')+'</div>';
+    const i = h.indexOf('<div class="r48-ccol">');
+    return i >= 0 ? h.slice(0, i)+row+h.slice(i) : row+h;
+  };
+})(renderClientModal);
+ACTIONS.adAcctToggle = function(el, e, id){
+  const p = String(id || '').split('|'), l = adAcctLinks();
+  if(l[p[0]]===p[1]) delete l[p[0]]; else l[p[0]] = p[1];
+  persist('settings'); playTick(); if(typeof renderClientModalInto==='function') renderClientModalInto(); renderView();
+};
