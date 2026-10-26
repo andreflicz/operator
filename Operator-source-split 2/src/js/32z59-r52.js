@@ -277,3 +277,19 @@ ACTIONS.cxTier = function(el, e, id){
   const fresh = t.content.querySelector('.cx-tier');
   if(fresh){ card.innerHTML = fresh.innerHTML; playTick(); } else renderView();
 };
+// (Today under the month had room to spare: This week / This month sits beside it there, and the left
+// side is just Your day and the alarms)
+renderCalendar = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(h.indexOf('cx-agenda') < 0) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const month = tpl.content.querySelector('.cx-month'), ag = month && month.querySelector(':scope > .cx-agenda'), tier = tpl.content.querySelector('.cx-left > .cx-tier');
+    if(month && ag && tier){
+      const row = document.createElement('div'); row.className = 'r52-under';
+      ag.parentNode.insertBefore(row, ag); row.appendChild(ag); row.appendChild(tier);
+      tier.classList.add('r52-intier');
+    }
+    const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
+  };
+})(renderCalendar);

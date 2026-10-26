@@ -8842,3 +8842,10 @@ html body .calx .cx-grid{ flex:0 0 auto !important; grid-auto-rows:86px !importa
 html body .calx .cx-month{ min-height:0 !important; }
 /* R52: swapping Week / Month doesn't flash or jump */
 .cx-tierbody, .cx-tierbody *{ animation:none !important; }
+/* R52: Today and This week / This month side by side under the month */
+.r52-under{ display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:16px; align-items:stretch; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,.06); }
+.r52-under > .cx-agenda{ margin:0 !important; padding:0 !important; border:0 !important; min-width:0; }
+.r52-under > .cx-tier.r52-intier{ margin:0 !important; padding:0 !important; border:0 !important; background:none !important; box-shadow:none !important; border-radius:0 !important; flex:none !important; min-height:0 !important; }
+.r52-under > .cx-tier .cx-tierbody{ margin-top:0; }
+html body .calx > .cx-left{ align-self:start; }
+html body .calx > .cx-left{ align-self:stretch; } html body .calx .r52-left > .cx-desk{ flex:1 1 auto !important; }

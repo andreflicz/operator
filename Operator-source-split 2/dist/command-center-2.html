@@ -8853,6 +8853,13 @@ html body .calx .cx-grid{ flex:0 0 auto !important; grid-auto-rows:86px !importa
 html body .calx .cx-month{ min-height:0 !important; }
 /* R52: swapping Week / Month doesn't flash or jump */
 .cx-tierbody, .cx-tierbody *{ animation:none !important; }
+/* R52: Today and This week / This month side by side under the month */
+.r52-under{ display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:16px; align-items:stretch; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,.06); }
+.r52-under > .cx-agenda{ margin:0 !important; padding:0 !important; border:0 !important; min-width:0; }
+.r52-under > .cx-tier.r52-intier{ margin:0 !important; padding:0 !important; border:0 !important; background:none !important; box-shadow:none !important; border-radius:0 !important; flex:none !important; min-height:0 !important; }
+.r52-under > .cx-tier .cx-tierbody{ margin-top:0; }
+html body .calx > .cx-left{ align-self:start; }
+html body .calx > .cx-left{ align-self:stretch; } html body .calx .r52-left > .cx-desk{ flex:1 1 auto !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -47858,6 +47865,22 @@ ACTIONS.cxTier = function(el, e, id){
   const fresh = t.content.querySelector('.cx-tier');
   if(fresh){ card.innerHTML = fresh.innerHTML; playTick(); } else renderView();
 };
+// (Today under the month had room to spare: This week / This month sits beside it there, and the left
+// side is just Your day and the alarms)
+renderCalendar = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(h.indexOf('cx-agenda') < 0) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const month = tpl.content.querySelector('.cx-month'), ag = month && month.querySelector(':scope > .cx-agenda'), tier = tpl.content.querySelector('.cx-left > .cx-tier');
+    if(month && ag && tier){
+      const row = document.createElement('div'); row.className = 'r52-under';
+      ag.parentNode.insertBefore(row, ag); row.appendChild(ag); row.appendChild(tier);
+      tier.classList.add('r52-intier');
+    }
+    const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
+  };
+})(renderCalendar);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
