@@ -47742,6 +47742,48 @@ cxRibbonHtml = (function(base){
     const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
   };
 })(cxRibbonHtml);
+
+// ---- 8. Op's live voice is the voice you picked, every time ----
+// (He kept talking in the agent's own voice, Lily, when the update to the agent didn't go through: the
+// voice change rode along with his whole brief in one big request, and a failure was silent.) Now the voice
+// goes first in a small request of its own, together with permission for each call to set the voice, and
+// the brief follows separately. If ElevenLabs says no, you see why. Every call also sets the voice itself.
+opLiveSig = (function(base){ return function(){ return base.apply(this, arguments)+':v52'; }; })(opLiveSig);
+async function r52AgentPatch(body){
+  const r = await fetchWithin(WAKE_HELPER+'tts/agent/update?a='+encodeURIComponent(opAgentId())+'&b='+hexUtf8(JSON.stringify(body)), 20000);
+  if(!r) return {ok:false, why:'the Operator app didn’t answer'};
+  if(r.ok) return {ok:true};
+  let j = null; try{ j = await r.json(); }catch(e){}
+  return {ok:false, why:(j && (j.error || (j.detail && (j.detail.message || (typeof j.detail==='string' ? j.detail : JSON.stringify(j.detail)))))) || 'ElevenLabs said no ('+r.status+')'};
+}
+opLiveSync = async function(){
+  if(!opAgentId() || state.settings.opAgentSig===opLiveSig()) return true;
+  const overrides = {platform_settings:{overrides:{conversation_config_override:{agent:{prompt:{prompt:true}, first_message:true, language:true}, tts:{voice_id:true}}}}};
+  // 1. the voice (and the permission to set it per call), small
+  let v = null;
+  for(let i = 0; i < R51_TTS.length; i++){
+    v = await r52AgentPatch(Object.assign({conversation_config:{tts:Object.assign({voice_id:opLiveVoice()}, R51_TTS[i])}}, overrides));
+    if(v.ok) break;
+    if(/didn’t answer/.test(v.why)) break;
+  }
+  if(!v || !v.ok){ v = await r52AgentPatch({conversation_config:{tts:{voice_id:opLiveVoice()}}}); }
+  // 2. his brief
+  const b = await r52AgentPatch({conversation_config:{agent:{first_message:'', prompt:{prompt:opLiveBase()}}}});
+  if(v.ok && b.ok){ state.settings.opAgentSig = opLiveSig(); persist('settings'); OPRT.noOverride = false; return true; }
+  const why = !v.ok ? v.why : b.why;
+  if(ui.r52SyncWhy!==why){ ui.r52SyncWhy = why; showToast('Couldn’t update Op’s live voice: '+escapeHtml(String(why).slice(0, 160)), {icon:'&#9888;', duration:9000}); }
+  return false;
+};
+// (each call sets the voice too)
+opLiveInit = (function(base){ return function(){ const m = base.apply(this, arguments); if(!m.conversation_config_override) m.conversation_config_override = {}; if(!OPRT.noOverride) m.conversation_config_override.tts = {voice_id:opLiveVoice()}; return m; }; })(opLiveInit);
+
+// ---- 9. Op talks less: short answers, no filler, one question at most ----
+opLiveRules = (function(base){
+  return function(){
+    return base.apply(this, arguments)+'\n- Keep it short: one or two sentences unless he asks for more. No small talk, no recaps of what he just said, no weather or the time unless he asks.\n- Ask at most one question, and only when you need the answer. Never ask "anything else?".';
+  };
+})(opLiveRules);
+opLivePrompt = (function(base){ return function(){ return base.apply(this, arguments)+'\n- Keep it short: one or two sentences unless he asks for more. No small talk, no weather or the time unless he asks. At most one question.'; }; })(opLivePrompt);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
