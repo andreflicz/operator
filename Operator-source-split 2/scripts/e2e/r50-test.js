@@ -45,16 +45,13 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // 3. reels weeks
   await E("ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='clientBacklog'; renderView()"); await p.waitForTimeout(300);
   const bl = await p.textContent('#viewRoot');
-  check('weeks say their date and "This week", nothing about posting / making', /This week/.test(bl) && !/Posting now|Making now/.test(bl));
-  check('no late rows popping up under the strip', !(await E("!!document.querySelector('.r48-wks ~ .cbl-weeks, .cbl-d .cbl-weeks')")));
-  const wk = await E("Array.from(document.querySelectorAll('[data-action=r50WkPick]')).map(b => b.dataset.id).find(x => x.startsWith('jj|') && !x.endsWith(thisWeekKey()))");
-  await p.click('[data-action="r50WkPick"][data-id="'+wk+'"]'); await p.waitForTimeout(200);
-  check('tap a week and it opens', await E("!!document.querySelector('.r48-wk.is-pick[data-id=\"" + wk + "\"]') && /Week of/.test(document.querySelector('.r50-wd').textContent)"));
-  await p.click('[data-action="r50WkStep"][data-id="'+wk+'|1"]'); await p.waitForTimeout(200);
-  const post = wk.split('|')[2];
-  check('+ logs one for that week', await E("r42Alloc(state.business.clients[0].deliverables[0]).fill['"+post+"']===1"));
-  await p.click('[data-action="r50WkStep"][data-id="'+wk+'|-1"]'); await p.waitForTimeout(200);
-  check('− takes it back', await E("r42Alloc(state.business.clients[0].deliverables[0]).fill['"+post+"']===0 && state.business.clients[0].deliverables[0].completedDates.length===0"));
+  // (R51: this cycle's four weeks per deliverable; future ones say Upcoming)
+  check('four weeks per deliverable, no strip, no posting / making', await E("Array.from(document.querySelectorAll('.cbl-d')).every(d => d.querySelectorAll('.r51-wk').length <= 4)") && !(await p.$('.r48-wks')) && !/Posting now|Making now/.test(bl) && /This week/.test(bl));
+  const row = await p.$('.r51-wk.is-now');
+  if(row){
+    await (await row.$('[data-action="dvwDone"]')).click(); await p.waitForTimeout(250);
+    check('Week done marks it done', (await p.$$('.r51-wk.is-done')).length >= 1);
+  } else check('this week is there', false);
   check('a client who came back owes nothing from before', await E("(function(){ const d = state.business.clients[1].deliverables[0]; return r42Need(d, addDays(thisWeekKey(), -14))===0 && r42Need(d, thisWeekKey()) > 0; })()"));
   await E("ui.showClientModal='bm'; renderView()");
   check('their window has the day they came back', await E("/id=\"r50Since\" value=\"2026-10-19\"/.test(renderClientModal())"));

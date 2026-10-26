@@ -11,6 +11,8 @@
 // client's pace and health follow that: finished early is ahead; still open once its week has started is late.
 // Every piece logged (from the task, the counter or the client card) fills the earliest posting week that
 // still needs it and hasn't ended yet.
+// (R51: the posting-week tasks are off; deliverables are back to the cycle's four weeks. R42_POSTWEEKS turns them back on.)
+var R42_POSTWEEKS = false;
 function r42DueOffset(){ const n = Number(state.standards && state.standards.contentDueDaysEarly); return n >= 0 && n <= 6 ? Math.floor(n) : 0; }
 function r42Due(post){ return addDays(post, -1 - r42DueOffset()); }
 function r42Dim(y, m){ return new Date(y, m + 1, 0).getDate(); }
@@ -59,6 +61,7 @@ function r42AllocRaw(d){
 function r42WorkPost(){ return addDays(thisWeekKey(), 7); }
 function r42Week(d, post){ const a = r42Alloc(d); post = post || r42WorkPost(); return {need:a.need[post] || 0, done:a.fill[post] || 0, dates:a.dates[post] || [], post:post, due:r42Due(post)}; }
 
+if(R42_POSTWEEKS){
 // the client card and health read the week being worked on
 deliverableWeekNeed = function(d){ return r42Week(d).need; };
 deliverableWeekCount = function(d){ return r42Week(d).done; };
@@ -84,10 +87,12 @@ clientHealthReason = (function(base){
   };
 })(clientHealthReason);
 
+}
 // the tasks: one per client deliverable per posting week, there from the week before
 function r42TaskFor(c, d, post){ return state.tasks.items.find(function(t){ const m = t.master; return m && m.kind==='dvw' && !m.oneOff && m.clientId===c.id && m.delivId===d.id && m.post===post; }); }
 masterTasksSync = (function(base){
   return function(){
+    if(!R42_POSTWEEKS) return base.apply(this, arguments);
     if(mt38Busy || !state || !state.tasks || !state.business) return;
     // the one-offs and Reach out still run as before; the old four-weeks-a-cycle tasks are retired
     const before = JSON.stringify(state.tasks.items.map(function(t){ return [t.id, t.status, t.title, t.deadline]; }));
@@ -489,7 +494,7 @@ saveProfile = (function(base){
 // ---- 8. the Client backlog, by posting week ----
 // Per client: each deliverable's week being made now (posts next week) and, if it's not finished, the week
 // that's posting now (late). The counter sits right on the row.
-clientBacklogHtml = function(){
+clientBacklogHtml = R42_POSTWEEKS ? function(){
   const today = todayStr();
   const row = function(t, x){
     const done = x.done >= x.need, posting = x.post <= today, late = !done && posting;
@@ -524,4 +529,4 @@ clientBacklogHtml = function(){
     '<div class="lc-h"><div><div class="lc-t">Client backlog</div></div></div>'+
     (blocks.length ? blocks.join('') : '<div class="empty">No client deliverables yet. Give a client a package (or a one-off) and the tasks show up here.</div>')+
   '</div>';
-};
+} : clientBacklogHtml;

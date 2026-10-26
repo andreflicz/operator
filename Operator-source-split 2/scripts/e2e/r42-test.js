@@ -22,33 +22,33 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('a month always adds up to its number', await E("const d = state.business.clients[0].deliverables[0]; let t = 0; for(let i = 1; i <= 31; i++){ const ds = '2026-10-'+String(i).padStart(2,'0'); t += Math.round(30*i/31) - Math.round(30*(i-1)/31); } t===30"));
   check('a posting week is due the Sunday before it', await E("r42Due('2026-10-26')")==='2026-10-25');
 
-  // ---- the tasks ----
-  const tk = await E("JSON.stringify(state.tasks.items.filter(t => t.master && t.master.kind==='dvw' && t.master.clientId==='jj').map(t => [t.master.post, t.deadline, t.status]))");
-  check('this week you get next week\'s task (due before it starts) and this week\'s if it\'s still owed', /"2026-10-26","2026-10-25"/.test(tk) && /"2026-10-19","2026-10-18"/.test(tk), tk);
-  check('this week\'s posts not made → the client is late (red)', await E("deliverablePaceStatus(state.business.clients[0].deliverables[0])")==='danger' && await E("clientHealthStatus(state.business.clients[0]).level")==='red');
-  const nx = "state.tasks.items.find(t => t.master && t.master.post==='2026-10-26' && t.master.clientId==='jj')";
+  // ---- the tasks (R51: the cycle's four weeks again; the posting-week tasks are off) ----
+  const tk = await E("JSON.stringify(state.tasks.items.filter(t => t.master && t.master.kind==='dvw' && t.master.clientId==='jj' && !t.master.post).map(t => [t.master.wk, t.deadline]).sort())");
+  check('four tasks for the cycle, Week 1 to 4, each due at the end of its week', tk==='[[1,"2026-10-07"],[2,"2026-10-14"],[3,"2026-10-21"],[4,"2026-10-31"]]', tk);
+  check('no posting-week tasks', !(await E("state.tasks.items.some(t => t.master && t.master.post && t.status!=='done')")));
+  const wk = k => "state.tasks.items.find(t => t.master && t.master.clientId==='jj' && t.master.wk==="+k+" && !t.master.post)";
+  check('reels made in a week count for that week', await E("dvwFind("+wk(2)+").done")===3 && await E("dvwFind("+wk(3)+").done")===4);
+  const nx = wk(4);
   await E("r42SetCount("+nx+", 3)");
   check('the counter sets exactly how many are done, for that week', await E("dvwFind("+nx+").done")===3 && await E("state.business.clients[0].deliverables[0].completedDates.length")===10);
   await E("r42SetCount("+nx+", 1)");
   check('…and setting it lower takes pieces back', await E("dvwFind("+nx+").done")===1 && await E("state.business.clients[0].deliverables[0].completedDates.length")===8);
   await E("dvwDone("+nx+")"); await p.waitForTimeout(200);
-  check('Done fills the week and finishes the task', await E("dvwFind("+nx+").done")===await E("dvwFind("+nx+").need") && await E(nx+".status")==='done');
+  check('Week done fills the week and finishes the task', await E("dvwFind("+nx+").done")===await E("dvwFind("+nx+").need") && await E(nx+".status")==='done');
   await E("ACTIONS.mtDvUndo(null, null, "+nx+".id)"); await p.waitForTimeout(150);
   check('…Undo takes back what Done put in', await E("dvwFind("+nx+").done")===1 && await E(nx+".status")!=='done');
   await E("ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='clientBacklog'; renderView()"); await p.waitForTimeout(250);
-  // (R50: the weeks are a strip you tap; the week you pick opens with − / + under it)
-  check('the Client backlog shows each week, tappable', (await p.$$('[data-action="r50WkPick"]')).length >= 2 && !/Posting now|Making now/.test(await p.textContent('.cbl')));
-  const pk = await E("(function(){ const post = dvwFind("+nx+").post; return Array.from(document.querySelectorAll('[data-action=r50WkPick]')).map(b => b.dataset.id).find(x => x.endsWith('|'+post)); })()");
-  await p.click('[data-action="r50WkPick"][data-id="'+pk+'"]'); await p.waitForTimeout(200);
-  await p.click('[data-action="r50WkStep"][data-id="'+pk+'|1"]'); await p.waitForTimeout(250);
-  check('…tap a week, + logs one for it', await E("dvwFind("+nx+").done")===2);
-  check('the calendar says whose and how many on the due day', await E("calDayInfo('2026-10-25').deadlines.some(t => /JJS · 7 reels/.test(t.title))"));
+  const cbl = await p.textContent('.cbl');
+  check('the Client backlog: the four weeks, this one says This week, the rest Week N', (await p.$$('.cbl-client:first-child .r51-wk')).length===4 && /This week/.test(cbl) && /Week 1/.test(cbl) && !/Posting now|Making now/.test(cbl));
+  await p.click('.cbl-client:first-child .r51-wk.is-now .r42-seg:nth-child(2)'); await p.waitForTimeout(250);
+  check('…tap a block to set the count', await E("dvwFind("+nx+").done")===2);
 
   // ---- snooze / waiting ----
   await E("ui.focusTasksSubTab='overview'; "+nx+".status='today'; persist('tasks'); renderView()"); await p.waitForTimeout(200);
   await E("ACTIONS.r42Snooze(null, null, "+nx+".id+':12h')"); await p.waitForTimeout(200);
   check('snoozing takes it out of the lineup', await E(nx+".status")==='parked' && !(await p.$('.tl-row[data-task-id="'+(await E(nx+".id"))+'"]')) && !!(await p.$('.r42-snz')));
   await E(nx+".snoozedUntil = Date.now() - 1000"); await p.waitForTimeout(31000);
+  await p.waitForTimeout(31000);   // (the snooze check runs every 30 s; give it a second tick)
   check('…and it comes back by itself', await E(nx+".status")==='today');
   await E("ACTIONS.r42WaitOpen(null, null, 'ct')"); await p.waitForTimeout(150);
   check('Waiting on: a sheet asks what you\'re waiting on', !!(await p.$('#r42WaitOverlay #r42WaitWhat')));
@@ -71,7 +71,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("state.business.clients[1].deliverables[0].completedDates = ['2026-10-20','2026-10-21']; state.tasks.items.push({id:'late', title:'Send invoice', status:'today', priority:'med', clients:['bm'], deadline:'2026-10-20', createdAt:'2026-10-18'})");
   check('an overdue client task drags their health down', await E("clientHealthStatus(state.business.clients[1]).level")==='red' && /overdue/.test(await E("clientHealthReason(state.business.clients[1], clientHealthStatus(state.business.clients[1]))")));
   await E("ui.view='settings'; ui.settingsTab='standards'; renderView()"); await p.waitForTimeout(200);
-  check('Settings has "Content due"', await E("renderSettings().indexOf('setContentDueEarly') >= 0"));
+  check('Settings no longer has "Content due" (posting weeks are off, R51)', await E("ui.settingsTab='standards'; renderSettings().indexOf('setContentDueEarly') < 0"));
   await E("state.standards.contentDueDaysEarly = 2");
   check('…and it moves the due date earlier', await E("r42Due('2026-10-26')")==='2026-10-23');
 

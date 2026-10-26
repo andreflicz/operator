@@ -106,7 +106,7 @@ function chromePath(){ try{ const d = fs.readdirSync('/opt/pw-browsers').filter(
   check('his words show as he speaks them', /Kiko’s on today/.test(await bub()));
   srv.send(JSON.stringify({type:'interruption', interruption_event:{reason:'user'}})); await p.waitForTimeout(100);
   check('talk over him and he stops', await E("OPRT.nodes.length")===0 && !(await E("OV.speaking")));
-  await E("aiAsk('typed hello')"); await p.waitForTimeout(150);
+  await E("AI.typedAt = Date.now(); aiAsk('typed hello')"); await p.waitForTimeout(150);
   check('typing while live goes to the same conversation', got.some(g => g && g.type==='user_message' && g.text==='typed hello'));
   srv.send(JSON.stringify({type:'user_transcript', user_transcription_event:{user_transcript:'I’m busy, give me 20 minutes'}})); await p.waitForTimeout(400);
   check('“I’m busy” live: he hangs up and backs off', await E("OPRT.state")==='off' && await E("Math.round((state.focus.opBusyUntil - Date.now())/60000)")===20);
