@@ -8806,6 +8806,15 @@ html body .r44-quote:hover .qt-next{ opacity:.7; }
 .cx-left > .cx-now{ border-bottom-left-radius:0 !important; border-bottom-right-radius:0 !important; padding-bottom:14px !important; margin-bottom:0 !important; }
 .cx-left > .cx-now + .cx-tier{ margin-top:0 !important; border-top-left-radius:0 !important; border-top-right-radius:0 !important; border-top:1px solid rgba(255,255,255,.06) !important; padding-top:14px !important; }
 .cx-left > .cx-now + .cx-tier{ margin-top:-14px !important; }
+/* R52: the period's numbers as one line inside its panel */
+.cx-tierbody .r52-ts{ display:grid; grid-template-columns:repeat(4, 1fr); margin:8px 0 12px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,.07); }
+.cx-tierbody .r52-ts span{ display:flex; flex-direction:column; align-items:flex-start; gap:1px; }
+.cx-tierbody .r52-ts b{ font-size:16px; line-height:1.15; }
+.cx-tierbody .r52-ts small{ font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); }
+.cx-tierbody .tg-card.is-week .r52-ts b{ color:#cfeaff; } .cx-tierbody .tg-card.is-month .r52-ts b{ color:#ffe2b0; }
+.calx .cx-tier{ flex:1 1 auto !important; min-height:0 !important; }
+.cx-tierbody .tg-empty{ min-height:64px; }
+.calx .cx-tier{ flex:0 0 auto !important; } .calx .cx-desk{ flex:1 1 0 !important; } .cx-tierbody .tg-empty{ min-height:44px; flex:0 0 auto; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -47615,7 +47624,7 @@ renderCalendar = (function(base){
     if(h.indexOf('cx-ribbon') < 0) return h;
     const tpl = document.createElement('template'); tpl.innerHTML = h;
     const rib = tpl.content.querySelector('.cx-now .cx-ribbon');
-    if(rib){
+    if(rib && false){
       // one compact row: each number shows the week (blue) over the month (gold)
       const vals = function(kind){ const t = document.createElement('template'); t.innerHTML = r52TierStats(kind); return Array.from(t.content.querySelectorAll('.r44-ts')).map(function(x){ return [(x.querySelector('small') || {}).textContent || '', (x.querySelector('b') || {}).textContent || '']; }); };
       const w = vals('week'), m = vals('month');
@@ -47653,6 +47662,19 @@ renderCalendar = (function(base){
     const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
   };
 })(renderCalendar);
+
+// ---- 5. The week's / month's numbers live in the goals panel itself ----
+// One card: This week | This month on top, then the period's panel: its numbers as one quiet line across
+// the top (Deep · Gym · Reels · Goals, in the period's colour), the goals under them.
+cxTierCardHtml = function(){
+  const h = r52TierBase.apply(this, arguments);
+  const m = /<div class="r44-tstats">[\s\S]*?<\/div><\/div>(?=<div class="cx-tierbody")/.exec(h);
+  let body = h.replace(/<div class="r44-tstats">[\s\S]*?<\/div><\/div>(?=<div class="cx-tierbody")/, '');
+  if(!m) return body;
+  const t = document.createElement('template'); t.innerHTML = m[0];
+  const strip = '<div class="r52-ts">'+Array.from(t.content.querySelectorAll('.r44-ts')).map(function(x){ return '<span><b>'+escapeHtml((x.querySelector('b') || {}).textContent || '')+'</b><small>'+escapeHtml((x.querySelector('small') || {}).textContent || '')+'</small></span>'; }).join('')+'</div>';
+  return body.replace(/(<div class="tg-card[^"]*">\s*<div class="tg-h">[\s\S]*?<\/div>)/, '$1'+strip);
+};
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

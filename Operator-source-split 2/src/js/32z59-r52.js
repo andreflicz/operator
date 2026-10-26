@@ -84,7 +84,7 @@ renderCalendar = (function(base){
     if(h.indexOf('cx-ribbon') < 0) return h;
     const tpl = document.createElement('template'); tpl.innerHTML = h;
     const rib = tpl.content.querySelector('.cx-now .cx-ribbon');
-    if(rib){
+    if(rib && false){
       // one compact row: each number shows the week (blue) over the month (gold)
       const vals = function(kind){ const t = document.createElement('template'); t.innerHTML = r52TierStats(kind); return Array.from(t.content.querySelectorAll('.r44-ts')).map(function(x){ return [(x.querySelector('small') || {}).textContent || '', (x.querySelector('b') || {}).textContent || '']; }); };
       const w = vals('week'), m = vals('month');
@@ -122,3 +122,16 @@ renderCalendar = (function(base){
     const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
   };
 })(renderCalendar);
+
+// ---- 5. The week's / month's numbers live in the goals panel itself ----
+// One card: This week | This month on top, then the period's panel: its numbers as one quiet line across
+// the top (Deep · Gym · Reels · Goals, in the period's colour), the goals under them.
+cxTierCardHtml = function(){
+  const h = r52TierBase.apply(this, arguments);
+  const m = /<div class="r44-tstats">[\s\S]*?<\/div><\/div>(?=<div class="cx-tierbody")/.exec(h);
+  let body = h.replace(/<div class="r44-tstats">[\s\S]*?<\/div><\/div>(?=<div class="cx-tierbody")/, '');
+  if(!m) return body;
+  const t = document.createElement('template'); t.innerHTML = m[0];
+  const strip = '<div class="r52-ts">'+Array.from(t.content.querySelectorAll('.r44-ts')).map(function(x){ return '<span><b>'+escapeHtml((x.querySelector('b') || {}).textContent || '')+'</b><small>'+escapeHtml((x.querySelector('small') || {}).textContent || '')+'</small></span>'; }).join('')+'</div>';
+  return body.replace(/(<div class="tg-card[^"]*">\s*<div class="tg-h">[\s\S]*?<\/div>)/, '$1'+strip);
+};

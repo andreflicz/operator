@@ -8795,3 +8795,12 @@ html body .r44-quote:hover .qt-next{ opacity:.7; }
 .cx-left > .cx-now{ border-bottom-left-radius:0 !important; border-bottom-right-radius:0 !important; padding-bottom:14px !important; margin-bottom:0 !important; }
 .cx-left > .cx-now + .cx-tier{ margin-top:0 !important; border-top-left-radius:0 !important; border-top-right-radius:0 !important; border-top:1px solid rgba(255,255,255,.06) !important; padding-top:14px !important; }
 .cx-left > .cx-now + .cx-tier{ margin-top:-14px !important; }
+/* R52: the period's numbers as one line inside its panel */
+.cx-tierbody .r52-ts{ display:grid; grid-template-columns:repeat(4, 1fr); margin:8px 0 12px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,.07); }
+.cx-tierbody .r52-ts span{ display:flex; flex-direction:column; align-items:flex-start; gap:1px; }
+.cx-tierbody .r52-ts b{ font-size:16px; line-height:1.15; }
+.cx-tierbody .r52-ts small{ font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); }
+.cx-tierbody .tg-card.is-week .r52-ts b{ color:#cfeaff; } .cx-tierbody .tg-card.is-month .r52-ts b{ color:#ffe2b0; }
+.calx .cx-tier{ flex:1 1 auto !important; min-height:0 !important; }
+.cx-tierbody .tg-empty{ min-height:64px; }
+.calx .cx-tier{ flex:0 0 auto !important; } .calx .cx-desk{ flex:1 1 0 !important; } .cx-tierbody .tg-empty{ min-height:44px; flex:0 0 auto; }
