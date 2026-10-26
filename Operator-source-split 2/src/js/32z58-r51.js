@@ -262,7 +262,7 @@ function r51OpRowsHtml(){
     '<button class="btn btn-sm '+(opAgentId() ? '' : 'btn-primary')+'" data-action="opLiveCreate">'+(opAgentId() ? 'Update his agent' : 'Make his agent')+'</button></div>'+(OPRT.err ? '<div class="r51-sub"><small class="r45-err">'+escapeHtml(OPRT.err)+'</small></div>' : '') : '';
   const busy = opBusyNow() ? '<div class="r51-sub"><span class="r45-busy">Quiet until '+fmtTimeShort(state.focus.opBusyUntil)+'</span> <button class="btn btn-ghost btn-sm" data-action="opBusyEnd">Bring him back</button></div>' : '';
   return '<div class="r51-rows">'+
-    r51Row('On', r51Sw(on, 'opPower'), busy)+
+    (busy ? '<div class="r51-row r51-busyrow">'+busy.replace(/^<div class="r51-sub">|<\/div>$/g, '')+'</div>' : '')+
     r51Row('Talking', '<div class="seg-tabs seg-sm">'+r51Seg('opTalkSet', mode, 'free', 'Hands-free')+r51Seg('opTalkSet', mode, 'ptt', 'Push to talk')+'</div>', keys)+
     (OPAPP ? '' : r51Row('“Hey Operator”', '<label class="ws-switch"><input type="checkbox" data-action="heyOpToggle" '+(state.profile.heyOp!==false ? 'checked' : '')+'><span></span></label>'))+
     r51Row('Check-ins', '<div class="seg-tabs seg-sm">'+r51Seg('r51CheckSet', lv, 'off', 'Off')+r51Seg('r51CheckSet', lv, 'light', 'Now and then')+r51Seg('r51CheckSet', lv, 'normal', 'Normal')+r51Seg('r51CheckSet', lv, 'often', 'Often')+'</div>')+
@@ -288,6 +288,8 @@ renderSettings = (function(base){
           else if(live && /^(Brain|When you talk)/.test(l)) f.remove();
         });
         const t = op.querySelector('.section-title'), w = document.createElement('div'); w.innerHTML = r51OpRowsHtml();
+        // the on/off switch sits in the card's title (no second "Op" row)
+        if(t){ t.querySelectorAll('.qtip').forEach(function(q){ q.remove(); }); t.classList.add('r51-title'); t.insertAdjacentHTML('beforeend', '<span class="r51-tsw">'+r51Sw(opOn(), 'opPower')+'</span>'); }
         const rows = w.firstChild;
         // Brain and When you talk (without live) become rows like the rest
         op.querySelectorAll('.field.op-set').forEach(function(f){

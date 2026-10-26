@@ -8729,3 +8729,36 @@ html body .r44-quote:hover .qt-next{ opacity:.7; }
 .r51-rc .seg-tabs{ margin:0; }
 .r51-sub{ display:flex; align-items:center; justify-content:flex-end; gap:8px; padding:0 16px 12px; }
 .r51-agent .input{ max-width:320px; }
+/* R52: what's waiting on the Calendar, one line */
+.r52-ask{ display:flex; align-items:center; gap:10px; width:100%; margin:0 0 14px; padding:10px 14px; border-radius:12px; border:1px solid rgba(232,162,61,.35); background:rgba(232,162,61,.08); color:var(--text); font-weight:700; font-size:13.5px; cursor:pointer; text-align:left; }
+.r52-ask i{ width:8px; height:8px; border-radius:50%; background:#E8A23D; box-shadow:0 0 8px #E8A23D; }
+.r52-ask span{ flex:1; } .r52-ask b{ color:#E8A23D; }
+.r52-ask:hover{ background:rgba(232,162,61,.14); }
+.r51-title{ display:flex !important; align-items:center; gap:8px; } .r51-title .r51-tsw{ margin-left:auto; }
+.r51-busyrow{ justify-content:flex-end; }
+/* R52: settings sub-tabs, tighter pickers */
+.r52-sub{ margin:0 0 16px; display:inline-flex; }
+.set-part.r52-off{ display:none; }
+.settings-content .ck-picks{ gap:8px; }
+.settings-content .ck-picks .ck-pick{ padding:8px 6px; min-height:0; }
+.settings-content .ck-picks .ck-pick svg, .settings-content .ck-picks .ck-pick .ck{ width:40px !important; height:40px !important; }
+/* R52: pop-ups close by tapping outside; no ✕ */
+.overlay .int-x, .overlay .hs-x, .overlay .r43-x, .overlay .wd-close, .overlay .mn-x, .overlay .tn-x, .overlay .izq-x, .overlay .izw-x, .overlay .izg-x, .overlay .izl-x, .overlay .irc-x, .overlay .qj3-x, .overlay .vp-x, .overlay .modal-close{ display:none !important; }
+.hs.is-addPick{ padding:22px !important; }
+.hs.is-addPick .ap-grid{ margin:0 !important; }
+/* R52: the four weeks, compact like the first one-row version */
+.cbl .r51-wk{ padding:7px 12px; gap:12px; margin-bottom:6px; min-height:46px; grid-template-columns:minmax(220px, 1fr) auto minmax(260px, 1fr); }
+.cbl .r51-wl{ display:flex; align-items:baseline; gap:10px; white-space:nowrap; }
+.cbl .r51-wl b{ font-size:13.5px; } .cbl .r51-wl small{ margin:0; font-size:11.5px; }
+.cbl .r51-wk .r42-count{ gap:8px; } .cbl .r51-wk .r42-seg{ width:26px; height:26px; font-size:11px; }
+.cbl .r51-wk .r42-count > b{ font-size:14px; }
+.cbl .r51-wb{ gap:6px; }
+.cbl .r51-wb .cbl-done, .cbl .r51-wb .cbl-today{ display:inline-flex; align-items:center; justify-content:center; height:28px; padding:0 12px; line-height:1; margin:0; vertical-align:middle; }
+.cbl .r51-wk > *{ align-self:center; }
+.cbl .r51-wb .r51-sub{ display:inline-flex; align-items:center; height:28px; line-height:1; }
+.cbl .r51-wb .r51-sub{ padding:0; justify-content:flex-start; }
+/* R52: the Log center count sits centered in its tab (it was picking up another badge's top margin, which made the tab jump) */
+[data-tab] > .lc-badge, .seg-tab .lc-badge, button .lc-badge{ display:inline-grid !important; margin:0 0 0 6px !important; vertical-align:middle; position:relative; top:-1px; gap:0; line-height:1; }
+.subtab .lc-badge{ margin:-3px 0 -3px 6px !important; top:0; }
+/* R52: the Player sits dead center on the screen */
+.np.np-locked:not(.is-cockpit) .np-main{ position:relative; top:-24px; }

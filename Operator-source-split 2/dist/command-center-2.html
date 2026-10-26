@@ -8740,6 +8740,39 @@ html body .r44-quote:hover .qt-next{ opacity:.7; }
 .r51-rc .seg-tabs{ margin:0; }
 .r51-sub{ display:flex; align-items:center; justify-content:flex-end; gap:8px; padding:0 16px 12px; }
 .r51-agent .input{ max-width:320px; }
+/* R52: what's waiting on the Calendar, one line */
+.r52-ask{ display:flex; align-items:center; gap:10px; width:100%; margin:0 0 14px; padding:10px 14px; border-radius:12px; border:1px solid rgba(232,162,61,.35); background:rgba(232,162,61,.08); color:var(--text); font-weight:700; font-size:13.5px; cursor:pointer; text-align:left; }
+.r52-ask i{ width:8px; height:8px; border-radius:50%; background:#E8A23D; box-shadow:0 0 8px #E8A23D; }
+.r52-ask span{ flex:1; } .r52-ask b{ color:#E8A23D; }
+.r52-ask:hover{ background:rgba(232,162,61,.14); }
+.r51-title{ display:flex !important; align-items:center; gap:8px; } .r51-title .r51-tsw{ margin-left:auto; }
+.r51-busyrow{ justify-content:flex-end; }
+/* R52: settings sub-tabs, tighter pickers */
+.r52-sub{ margin:0 0 16px; display:inline-flex; }
+.set-part.r52-off{ display:none; }
+.settings-content .ck-picks{ gap:8px; }
+.settings-content .ck-picks .ck-pick{ padding:8px 6px; min-height:0; }
+.settings-content .ck-picks .ck-pick svg, .settings-content .ck-picks .ck-pick .ck{ width:40px !important; height:40px !important; }
+/* R52: pop-ups close by tapping outside; no ✕ */
+.overlay .int-x, .overlay .hs-x, .overlay .r43-x, .overlay .wd-close, .overlay .mn-x, .overlay .tn-x, .overlay .izq-x, .overlay .izw-x, .overlay .izg-x, .overlay .izl-x, .overlay .irc-x, .overlay .qj3-x, .overlay .vp-x, .overlay .modal-close{ display:none !important; }
+.hs.is-addPick{ padding:22px !important; }
+.hs.is-addPick .ap-grid{ margin:0 !important; }
+/* R52: the four weeks, compact like the first one-row version */
+.cbl .r51-wk{ padding:7px 12px; gap:12px; margin-bottom:6px; min-height:46px; grid-template-columns:minmax(220px, 1fr) auto minmax(260px, 1fr); }
+.cbl .r51-wl{ display:flex; align-items:baseline; gap:10px; white-space:nowrap; }
+.cbl .r51-wl b{ font-size:13.5px; } .cbl .r51-wl small{ margin:0; font-size:11.5px; }
+.cbl .r51-wk .r42-count{ gap:8px; } .cbl .r51-wk .r42-seg{ width:26px; height:26px; font-size:11px; }
+.cbl .r51-wk .r42-count > b{ font-size:14px; }
+.cbl .r51-wb{ gap:6px; }
+.cbl .r51-wb .cbl-done, .cbl .r51-wb .cbl-today{ display:inline-flex; align-items:center; justify-content:center; height:28px; padding:0 12px; line-height:1; margin:0; vertical-align:middle; }
+.cbl .r51-wk > *{ align-self:center; }
+.cbl .r51-wb .r51-sub{ display:inline-flex; align-items:center; height:28px; line-height:1; }
+.cbl .r51-wb .r51-sub{ padding:0; justify-content:flex-start; }
+/* R52: the Log center count sits centered in its tab (it was picking up another badge's top margin, which made the tab jump) */
+[data-tab] > .lc-badge, .seg-tab .lc-badge, button .lc-badge{ display:inline-grid !important; margin:0 0 0 6px !important; vertical-align:middle; position:relative; top:-1px; gap:0; line-height:1; }
+.subtab .lc-badge{ margin:-3px 0 -3px 6px !important; top:0; }
+/* R52: the Player sits dead center on the screen */
+.np.np-locked:not(.is-cockpit) .np-main{ position:relative; top:-24px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -47377,7 +47410,7 @@ function r51OpRowsHtml(){
     '<button class="btn btn-sm '+(opAgentId() ? '' : 'btn-primary')+'" data-action="opLiveCreate">'+(opAgentId() ? 'Update his agent' : 'Make his agent')+'</button></div>'+(OPRT.err ? '<div class="r51-sub"><small class="r45-err">'+escapeHtml(OPRT.err)+'</small></div>' : '') : '';
   const busy = opBusyNow() ? '<div class="r51-sub"><span class="r45-busy">Quiet until '+fmtTimeShort(state.focus.opBusyUntil)+'</span> <button class="btn btn-ghost btn-sm" data-action="opBusyEnd">Bring him back</button></div>' : '';
   return '<div class="r51-rows">'+
-    r51Row('On', r51Sw(on, 'opPower'), busy)+
+    (busy ? '<div class="r51-row r51-busyrow">'+busy.replace(/^<div class="r51-sub">|<\/div>$/g, '')+'</div>' : '')+
     r51Row('Talking', '<div class="seg-tabs seg-sm">'+r51Seg('opTalkSet', mode, 'free', 'Hands-free')+r51Seg('opTalkSet', mode, 'ptt', 'Push to talk')+'</div>', keys)+
     (OPAPP ? '' : r51Row('“Hey Operator”', '<label class="ws-switch"><input type="checkbox" data-action="heyOpToggle" '+(state.profile.heyOp!==false ? 'checked' : '')+'><span></span></label>'))+
     r51Row('Check-ins', '<div class="seg-tabs seg-sm">'+r51Seg('r51CheckSet', lv, 'off', 'Off')+r51Seg('r51CheckSet', lv, 'light', 'Now and then')+r51Seg('r51CheckSet', lv, 'normal', 'Normal')+r51Seg('r51CheckSet', lv, 'often', 'Often')+'</div>')+
@@ -47403,6 +47436,8 @@ renderSettings = (function(base){
           else if(live && /^(Brain|When you talk)/.test(l)) f.remove();
         });
         const t = op.querySelector('.section-title'), w = document.createElement('div'); w.innerHTML = r51OpRowsHtml();
+        // the on/off switch sits in the card's title (no second "Op" row)
+        if(t){ t.querySelectorAll('.qtip').forEach(function(q){ q.remove(); }); t.classList.add('r51-title'); t.insertAdjacentHTML('beforeend', '<span class="r51-tsw">'+r51Sw(opOn(), 'opPower')+'</span>'); }
         const rows = w.firstChild;
         // Brain and When you talk (without live) become rows like the rest
         op.querySelectorAll('.field.op-set').forEach(function(f){
@@ -47461,6 +47496,74 @@ deliverablePaceStatusRaw = (function(base){
 })(deliverablePaceStatusRaw);
 delivPaceWord = (function(base){ return function(d){ const n = r51Now(d); if(!n) return base.apply(this, arguments); return n.done >= n.need ? 'done for the week' : paceWord(deliverablePaceStatus(d)); }; })(delivPaceWord);
 isDeliverableDoneThisWeek = (function(base){ return function(d){ const n = r51Now(d); if(!n) return base.apply(this, arguments); return n.done >= n.need; }; })(isDeliverableDoneThisWeek);
+// ============ ROUND 52 ============
+// ---- 1. The Calendar never opens with a check-in on top of it ----
+// It used to pop the month / week check-in (or a check-out) over the Calendar the first time you opened it.
+// Now the Calendar is just the calendar: what's waiting shows as one line at the top, and you tap it when
+// you want it.
+(function(){ for(let i = afterRenderHooks.length - 1; i >= 0; i--){ const s = String(afterRenderHooks[i]); if(/openIntentForm\('month', true\)/.test(s) && /ui\.view!=='calendar'/.test(s)) afterRenderHooks.splice(i, 1); } })();
+function r52CheckAsk(){
+  try{
+    const due = checkoutDue()[0];
+    if(due) return {t:(due.kind==='month' ? 'Check out of '+monthName(due.key) : 'Check out of last week'), a:'openCheckout', id:due.kind+':'+due.key};
+    if(!checkedIn('month', monthKey())) return {t:'Check in for '+monthName(monthKey()), a:'openIntent', id:'month'};
+    if(!checkedIn('week', weekKey())) return {t:'Check in for the week', a:'openIntent', id:'week'};
+  }catch(e){}
+  return null;
+}
+renderCalendar = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), q = r52CheckAsk(); if(!q) return h;
+    const bar = '<button class="r52-ask" data-action="'+q.a+'" data-id="'+q.id+'"><i></i><span>'+escapeHtml(q.t)+'</span><b>&rarr;</b></button>';
+    const i = h.indexOf('</div></div>'); // after the view header
+    return h.indexOf('view-header') >= 0 && i >= 0 ? h.slice(0, i + 12)+bar+h.slice(i + 12) : bar+h;
+  };
+})(renderCalendar);
+
+// ---- 2. Settings: sub-tabs where a page has more than one part, and less of each ----
+// Look & Sound is Appearance | Sound, Connections & Data is Integrations | Your data | App updates: one part
+// at a time instead of one long page. The locked-in timer picker is gone (tap the timer to change it). Op's
+// voice is ElevenLabs, one voice (the same one live mode uses), so no engine to pick.
+opEngine = function(){ return 'eleven'; };
+renderSettings = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const root = tpl.content, box = root.querySelector('.settings-content');
+    if(!box) return h;
+    // the timer picker
+    root.querySelectorAll('.tm-picks').forEach(function(x){ const k = x.previousElementSibling; if(k && /Locked-in timer/.test(k.textContent)) k.remove(); x.remove(); });
+    // the voice engine tabs
+    const vs = root.querySelector('#opVoiceSet'); if(vs){ const seg = vs.querySelector(':scope > .seg-tabs'); if(seg && /Mac voice/.test(seg.textContent)) seg.remove(); }
+    // sub-tabs
+    const parts = Array.from(box.querySelectorAll(':scope > .set-part'));
+    if(parts.length > 1){
+      if(!ui.r52Sub) ui.r52Sub = {};
+      const grp = box.getAttribute('data-key') || 'g', ids = parts.map(function(p){ return p.id.replace('setPart-', ''); });
+      const cur = ids.indexOf(ui.r52Sub[grp]) >= 0 ? ui.r52Sub[grp] : ids[0];
+      const nav = document.createElement('div'); nav.className = 'seg-tabs r52-sub';
+      nav.innerHTML = parts.map(function(p, i){ const hd = p.querySelector('.set-part-h'); return '<button class="seg-tab'+(ids[i]===cur ? ' active' : '')+'" data-action="r52Sub" data-id="'+escapeHtml(grp+'|'+ids[i])+'">'+escapeHtml(hd ? hd.textContent : ids[i])+'</button>'; }).join('');
+      box.insertBefore(nav, box.firstChild);
+      parts.forEach(function(p, i){ const hd = p.querySelector(':scope > .set-part-h'); if(hd) hd.remove(); if(ids[i]!==cur) p.classList.add('r52-off'); });
+    }
+    const out = document.createElement('div'); out.appendChild(root.cloneNode(true)); return out.innerHTML;
+  };
+})(renderSettings);
+ACTIONS.r52Sub = function(el, e, id){ const p = String(id).split('|'); if(!ui.r52Sub) ui.r52Sub = {}; ui.r52Sub[p[0]] = p[1]; playTick(); renderView(); };
+
+// ---- 3. Pop-ups: no ✕, tap outside to close ----
+// Every sheet and pop-up closes when you tap the dark area around it (or press Esc), so the ✕ buttons are
+// gone and the space they held at the top went with them. (Not the alarm, Good morning or anything
+// full-screen: a stray tap shouldn't dismiss those.)
+const R52_X = '.int-x, .hs-x, .r43-x, .wd-close, .mn-x, .tn-x, .izq-x, .izw-x, .izg-x, .izl-x, .irc-x, .qj3-x, .vp-x, .modal-close, [data-action$="Close"].icon-x';
+const R52_KEEP = /wake|alarm|plan|brief|lvl|level|boot|lock|focusDone|stopFocus|celebr|cine|np-/i;
+document.addEventListener('pointerdown', function(e){
+  const o = e.target; if(!o || !o.classList || !o.classList.contains('overlay') || o.classList.contains('hidden')) return;
+  if(R52_KEEP.test(o.id || '') || o.classList.contains('is-cine')) return;
+  const x = o.querySelector(R52_X) || o.querySelector('[data-action*="close" i], [data-action*="Close"], [data-action*="cancel" i]');
+  if(x){ e.preventDefault(); x.click(); return; }
+  hideOverlay(o.id);
+}, true);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
