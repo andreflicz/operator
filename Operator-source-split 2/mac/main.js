@@ -13,7 +13,10 @@ const HOME = os.homedir();
 const DATA_DIR = path.join(HOME, 'Library', 'Application Support', 'Operator');
 const CHROME_PROFILE = path.join(HOME, 'Library', 'Application Support', 'OperatorAppProfile');
 const RES = app.isPackaged ? path.join(process.resourcesPath, 'app') : path.join(__dirname, 'res');
-const PAGE = path.join(RES, 'command-center-2.html');
+// a newer page dropped in by an update (File → Install update…) wins over the one the app shipped with
+const PAGE_SHIPPED = path.join(RES, 'command-center-2.html');
+const PAGE_UPDATE = path.join(DATA_DIR, 'App', 'page', 'command-center-2.html');
+function pageFile() { try { if (fs.statSync(PAGE_UPDATE).size > 100000 && fs.statSync(PAGE_UPDATE).mtimeMs > fs.statSync(PAGE_SHIPPED).mtimeMs) return PAGE_UPDATE; } catch (e) {} return PAGE_SHIPPED; }
 const PORTS = { activity: 8934, wake: 8935, ghl: 8936 };
 process.env.OPERATOR_VERSION = app.getVersion();
 
@@ -105,7 +108,7 @@ function createWindow() {
     width: 1400, height: 900, minWidth: 960, minHeight: 620, show: false, title: 'Operator', backgroundColor: '#0d0b12',
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, backgroundThrottling: false, spellcheck: true }
   });
-  win.loadFile(PAGE);
+  win.loadFile(pageFile());
   win.once('ready-to-show', () => showWin());
   // the red ✕ puts it away; it keeps running in the menu bar (⌘Q or the menu quits)
   win.on('close', (e) => { if (!quitting) { e.preventDefault(); win.hide(); if (app.dock) app.dock.hide(); } });
@@ -146,11 +149,21 @@ function trayRefresh() {
 function appMenu() {
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     { role: 'appMenu', submenu: [{ role: 'about' }, { type: 'separator' }, { label: 'Settings…', accelerator: 'Cmd+,', click: () => { showWin(); run("operatorPage.settings()"); } }, { type: 'separator' }, { role: 'hide' }, { role: 'hideOthers' }, { role: 'unhide' }, { type: 'separator' }, { label: 'Quit Operator', accelerator: 'Cmd+Q', click: () => { quitting = true; app.quit(); } }] },
-    { label: 'File', submenu: [{ label: 'Import data…', click: () => importData() }, { label: 'Export data', click: () => run('operatorPage.exportData()') }, { type: 'separator' }, { role: 'close' }] },
+    { label: 'File', submenu: [{ label: 'Import data…', click: () => importData() }, { label: 'Install update…', click: () => installUpdate() }, { label: 'Export data', click: () => run('operatorPage.exportData()') }, { type: 'separator' }, { role: 'close' }] },
     { role: 'editMenu' },
     { label: 'View', submenu: [{ role: 'reload' }, { role: 'toggleDevTools' }, { type: 'separator' }, { role: 'resetZoom' }, { role: 'zoomIn' }, { role: 'zoomOut' }, { type: 'separator' }, { role: 'togglefullscreen' }] },
     { role: 'windowMenu' }
   ]));
+}
+
+// ---------------- a page update (a new command-center-2.html) ----------------
+async function installUpdate() {
+  const r = await dialog.showOpenDialog(win, { title: 'Install an Operator update', buttonLabel: 'Install', properties: ['openFile'], filters: [{ name: 'Operator page', extensions: ['html'] }], defaultPath: path.join(HOME, 'Downloads') });
+  if (r.canceled || !r.filePaths[0]) return;
+  const f = r.filePaths[0], txt = fs.readFileSync(f, 'utf8');
+  if (!/<title>Operator<\/title>/.test(txt) || txt.length < 100000) { dialog.showMessageBox(win, { type: 'warning', message: 'That isn’t an Operator update.' }); return; }
+  fs.mkdirSync(path.dirname(PAGE_UPDATE), { recursive: true }); fs.writeFileSync(PAGE_UPDATE, txt);
+  win.loadFile(PAGE_UPDATE);
 }
 
 // ---------------- your data from an export ----------------

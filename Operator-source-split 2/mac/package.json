@@ -1,7 +1,7 @@
 {
   "name": "operator",
   "productName": "Operator",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Operator: lock in, run the business, keep your life straight.",
   "main": "main.js",
   "author": "Andre",
@@ -50,6 +50,11 @@
         "LSApplicationCategoryType": "public.app-category.productivity"
       }
     },
-    "artifactName": "Operator-${version}-${arch}-mac.${ext}"
+    "artifactName": "Operator-${version}-${arch}-mac.${ext}",
+    "electronLanguages": [
+      "en",
+      "en-US"
+    ],
+    "compression": "maximum"
   }
 }
