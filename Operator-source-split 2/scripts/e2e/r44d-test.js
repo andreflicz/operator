@@ -28,8 +28,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   await E("state.focus.activeSession = {startedAt:Date.now() - 20*60000, plannedMinutes:60, completedTasks:[], breaks:[], onBreak:false}; ui.view='today'; renderView()"); await p.waitForTimeout(400);
   check('locked in: a quote panel right under the timer', !!(await p.$('.r44-quote')) && await E("lockedLayout().indexOf('quote')===lockedLayout().indexOf('timer') + 1"));
-  await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'))"); const q1 = await p.textContent('.r44-quote b'); await E("ACTIONS.r44NextQuote()"); await p.waitForTimeout(150);
-  check('tapping it shows another', (await p.textContent('.r44-quote b'))!==q1);
+  await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'))"); const q1 = await p.textContent('.r44-quote .qt'); await E("nextQuote('work')"); await p.waitForTimeout(150);
+  check('tapping it shows another', (await p.textContent('.r44-quote .qt'))!==q1);
   check('no explainer line under the streak', !/rest days still count/.test(await p.textContent('#viewRoot')));
   await p.setViewportSize({width:1900, height:1000}); await p.waitForTimeout(200);
   const w = await E("document.querySelector('.ll-stack').getBoundingClientRect().width");

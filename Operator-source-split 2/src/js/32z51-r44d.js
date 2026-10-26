@@ -96,8 +96,9 @@ cxTierCardHtml = (function(base){
 // ---- Locked in: a quote, the wide screen, no explainer lines ----
 function r44Quote(){ const list = [].concat(typeof WORK_QUOTES!=='undefined' ? WORK_QUOTES : [], typeof ACTION_QUOTES!=='undefined' ? ACTION_QUOTES : []); if(!list.length) return null; const seed = Number(todayStr().replace(/-/g, '')) + (ui.r44QuoteN || 0); return list[seed % list.length]; }
 LOCKED_BLOCKS.quote = {label:'Quote', render:function(){
-  const q = r44Quote(); if(!q) return '';
-  return '<section class="r44-quote" data-action="r44NextQuote" title="Another one"><span class="r44-qk">Today’s line</span><b>“'+escapeHtml(q[0])+'”</b>'+(q[1] ? '<small>'+escapeHtml(q[1])+'</small>' : '')+'</section>';
+  // (the same quote as Good morning: its size, its mark, ↻ for another one)
+  const q = typeof quoteFor==='function' ? quoteFor('work') : r44Quote(); if(!q) return '';
+  return '<section class="r44-quote">'+quoteHtml(q, 'is-work', 'work')+'</section>';
 }};
 ACTIONS.r44NextQuote = function(){ ui.r44QuoteN = (ui.r44QuoteN || 0) + 1; renderView(); };
 lockedLayout = (function(base){

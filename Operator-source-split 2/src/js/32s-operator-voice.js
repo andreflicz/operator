@@ -592,7 +592,7 @@ ACTIONS.opEngineSwitch = function(el, e, id){
 };
 
 // ---- is the Operator launcher there, and is it the new one? (keys, voices and talking need it) ----
-const OP_HELPER_NEEDS = 11;
+const OP_HELPER_NEEDS = 16;
 async function opLauncherInfo(){
   const r = await fetchWithin(WAKE_HELPER+'ping', 3000);
   if(!r) return {up:false, v:0};

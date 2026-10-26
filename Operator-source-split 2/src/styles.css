@@ -8306,10 +8306,8 @@ div.r43-goal-m{ cursor:default; }
 .r44-ts{ padding:10px 10px 9px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); }
 .r44-ts b{ font-size:16px; font-weight:700; }
 @media (max-width:560px){ .r44-tstats{ grid-template-columns:repeat(2, 1fr); } }
-.r44-quote{ cursor:pointer; padding:22px 26px; border-radius:18px; background:linear-gradient(135deg, rgba(232,162,61,.10), rgba(255,255,255,.02)); border:1px solid rgba(232,162,61,.18); text-align:center; }
-.r44-quote .r44-qk{ display:block; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#E8A23D; margin-bottom:8px; }
-.r44-quote b{ display:block; font-size:clamp(17px, 2vw, 22px); font-weight:600; line-height:1.35; max-width:820px; margin:0 auto; }
-.r44-quote small{ display:block; margin-top:8px; color:var(--text-faint); font-size:12px; }
+.r44-quote{ max-width:760px; margin:0 auto; padding:14px 22px; border-radius:16px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); }
+.r44-quote .qt{ margin:0; }
 /* the locked-in page uses a wide screen */
 #viewRoot:has(.ll-stack){ max-width:1680px; }
 .ll-stack, .ll-bar{ max-width:1600px; }
@@ -8344,3 +8342,8 @@ body.op-live #opLight{ box-shadow:0 0 0 2px rgba(143,220,255,.5), 0 0 22px rgba(
 .r45-sw span{ position:absolute; top:3px; left:3px; width:17px; height:17px; border-radius:50%; background:#fff; transition:transform .22s cubic-bezier(.3,.9,.3,1.2); }
 .r45-sw.on{ background:#3FBE8E; }
 .r45-sw.on span{ transform:translateX(17px); }
+
+/* ===== ROUND 46: the Mac app ===== */
+.r46-app .r46-line{ padding:10px 0; border-top:1px solid rgba(255,255,255,.06); font-size:13.5px; }
+.r46-app .r46-line:first-of-type{ border-top:0; }
+.r46-kbd{ font:600 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace; padding:5px 9px; border-radius:7px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-bottom-width:2px; color:#fff; }

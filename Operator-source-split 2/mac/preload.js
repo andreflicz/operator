@@ -1,0 +1,13 @@
+// The page's small window into the Mac app (nothing else from Node reaches it).
+const { contextBridge, ipcRenderer } = require('electron');
+contextBridge.exposeInMainWorld('operatorApp', {
+  isApp: true,
+  platform: process.platform,
+  version: process.env.OPERATOR_VERSION || '',
+  // what the menu bar shows: "42m" while you're locked in, a dot when Op is holding something
+  status: (s) => ipcRenderer.send('op:status', s),
+  loginItem: () => ipcRenderer.invoke('op:loginItem'),
+  setLoginItem: (on) => ipcRenderer.invoke('op:setLoginItem', !!on),
+  importFile: () => ipcRenderer.invoke('op:importFile'),
+  show: () => ipcRenderer.send('op:show')
+});

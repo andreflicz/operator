@@ -1,0 +1,55 @@
+{
+  "name": "operator",
+  "productName": "Operator",
+  "version": "3.0.0",
+  "description": "Operator: lock in, run the business, keep your life straight.",
+  "main": "main.js",
+  "author": "Andre",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "stage": "node stage.js",
+    "dist": "node stage.js && electron-builder --mac zip --arm64 --x64"
+  },
+  "devDependencies": {
+    "electron": "44.7.0",
+    "electron-builder": "26.16.1"
+  },
+  "build": {
+    "appId": "com.local.operator",
+    "productName": "Operator",
+    "copyright": "Operator",
+    "directories": {
+      "output": "out",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "res",
+        "to": "app",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.icns",
+      "identity": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "darkModeSupport": true,
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Operator listens when you talk to Op.",
+        "NSAppleEventsUsageDescription": "Operator notes which app is in front so it can lock you in, and plays your music.",
+        "LSApplicationCategoryType": "public.app-category.productivity"
+      }
+    },
+    "artifactName": "Operator-${version}-${arch}-mac.${ext}"
+  }
+}
