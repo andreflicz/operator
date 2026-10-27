@@ -20,26 +20,39 @@ const get = (port, p) => new Promise((res) => { const r = http.get({host:'127.0.
 
   // 2. the app
   const app = await _electron.launch({executablePath:require(path.join(MAC, 'node_modules', 'electron')), args:[path.join(MAC, 'main.js'), '--no-sandbox'], cwd:MAC, env:Object.assign({}, process.env, {HOME:home, ELECTRON_DISABLE_SECURITY_WARNINGS:'1'})});
-  const win = await app.firstWindow(); await win.waitForLoadState('domcontentloaded'); await win.waitForTimeout(3500);
+  await app.firstWindow(); await new Promise(r => setTimeout(r, 1500));
+  const pick = (re) => app.windows().find(w => re.test(w.url()));
+  let win = pick(/command-center-2\.html/); for(let i = 0; !win && i < 20; i++){ await new Promise(r => setTimeout(r, 300)); win = pick(/command-center-2\.html/); }
+  await win.waitForLoadState('domcontentloaded'); await win.waitForTimeout(3500);
   const pk = await win.evaluate(() => operatorPage.peek()), name = pk.name, tasks = pk.tasks;
   check('your data comes over from Operator for Chrome on the first open', name==='Andre Lopez' && tasks.includes('Moved-in task'), {name, tasks});
   check('the page knows it is in the Mac app', await win.evaluate(() => !!(window.operatorApp && window.operatorApp.isApp) && document.documentElement.classList.contains('is-mac-app')));
   check('no Node in the page', await win.evaluate(() => typeof require==='undefined' && typeof process==='undefined'));
+  // the journal bubble: floats over everything; what you write lands in the journal
+  const bw = pick(/bubble\.html/);
+  check('the journal bubble is out, small and on top', !!bw && await app.evaluate(({BrowserWindow}) => { const w = BrowserWindow.getAllWindows().find(x => /bubble/.test(x.webContents.getURL())); return !!w && w.isAlwaysOnTop() && w.getBounds().width===64; }));
+  if(bw){
+    await bw.click('#open'); await bw.waitForTimeout(300);
+    check('tap it: it opens into a card to write in', await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find(x => /bubble/.test(x.webContents.getURL())).getBounds().width===340));
+    await bw.fill('#t', 'Idea from the bubble'); await bw.click('#save'); await bw.waitForTimeout(1800);
+    check('save: it is in the journal', await win.evaluate(() => JSON.parse(localStorage.getItem('opsdash:journal') || '{"entries":[]}').entries.some(e => e.text==='Idea from the bubble' && e.from==='bubble')));
+    check('and the bubble goes back to a dot', await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find(x => /bubble/.test(x.webContents.getURL())).getBounds().width===64));
+  }
   const ping = await get(8935, '/ping');
   check('the helpers are up (wake / voice / AI on 8935)', !!ping && /"helper":17/.test(ping.body), ping);
   const act = await get(8934, '/');
   check('the activity helper answers (8934)', !!act && act.code===200, act);
   await app.evaluate(({Menu}) => { const m = Menu.getApplicationMenu(); m.items[0].submenu.items.find((i) => /Settings/.test(i.label)).click(); }); await win.waitForTimeout(500);
   check('the app menu drives the page (Settings…)', (await win.evaluate(() => operatorPage.peek())).view==='settings');
-  const st = await app.evaluate(({BrowserWindow}) => { const w = BrowserWindow.getAllWindows()[0]; return {title:w.getTitle(), visible:w.isVisible()}; });
+  const st = await app.evaluate(({BrowserWindow}) => { const w = BrowserWindow.getAllWindows().find(x => !/bubble/.test(x.webContents.getURL())); return {title:w.getTitle(), visible:w.isVisible()}; });
   check('one window, titled Operator', st.visible && /Operator/.test(st.title), st);
   // the red ✕ only hides it; it keeps running
-  await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].close()); await win.waitForTimeout(500);
-  const after = await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().map((w) => w.isVisible()));
+  await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find(x => !/bubble/.test(x.webContents.getURL())).close()); await win.waitForTimeout(500);
+  const after = await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().filter(x => !/bubble/.test(x.webContents.getURL())).map((w) => w.isVisible()));
   check('closing the window keeps Operator running (menu bar)', after.length===1 && after[0]===false, after);
   await app.evaluate(({app}) => { app.emit('second-instance'); }); await win.waitForTimeout(300);
-  check('opening it again brings the window back', (await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].isVisible())));
-  await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].webContents.executeJavaScript('operatorPage.lockIn()')); await win.waitForTimeout(500);
+  check('opening it again brings the window back', (await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find(x => !/bubble/.test(x.webContents.getURL())).isVisible())));
+  await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find(x => !/bubble/.test(x.webContents.getURL())).webContents.executeJavaScript('operatorPage.lockIn()')); await win.waitForTimeout(500);
   check('Lock in from the menu bar locks you in', (await win.evaluate(() => operatorPage.peek())).view==='focus' && /"activeSession":\{/.test(await win.evaluate(() => localStorage.getItem('opsdash:focus') || '')));
   await win.evaluate(() => operatorPage.importText(JSON.stringify({profile:{name:'From Export'}, tasks:{items:[{id:'x1', title:'Imported task', status:'today'}]}}))); await win.waitForTimeout(600);
   check('importing an export replaces the data', (await win.evaluate(() => operatorPage.peek())).tasks.includes('Imported task'));
