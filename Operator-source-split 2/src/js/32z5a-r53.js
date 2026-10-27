@@ -39,7 +39,7 @@ masterTasksSync = (function(base){
     mt38Busy = true; let changed = false;
     try{
       const today = todayStr(), wk = thisWeekKey(), made = mtStore();
-      if(r53SeedRepeats()){ persist('business'); changed = true; }
+      if(!R54_LC && r53SeedRepeats()){ persist('business'); changed = true; }
       // reach out to leads
       const due = r53LeadsDue();
       let lt = state.tasks.items.find(function(t){ return t.master && t.master.kind==='reachLeads' && t.status!=='done'; });
@@ -50,7 +50,8 @@ masterTasksSync = (function(base){
         if(lt.title!==title){ lt.title = title; changed = true; }
         if(lt.priority!==pr){ lt.priority = pr; changed = true; }
       } else if(lt){ lt.status = 'done'; lt.completedAt = today; changed = true; }
-      // lifecycle repeats
+      // lifecycle repeats (round 54 does these with the rest of the lifecycle)
+      if(!R54_LC){
       const live = {};
       mtActiveClients().forEach(function(c){
         const st = r53RepStep(c); if(!st) return;
@@ -71,6 +72,7 @@ masterTasksSync = (function(base){
         if(t.deadline && addDays(t.deadline, 7) < today){ t.status = 'done'; t.completedAt = t.deadline; t.missed = true; changed = true; }
       });
       Object.keys(made).forEach(function(k){ if(k.indexOf('lcrep:')===0 && !live[k] && k.slice(-10) < addDays(today, -120)) delete made[k]; });
+      }
       if(changed){ persist('tasks'); persist('focus'); setTimeout(function(){ try{ renderView(); }catch(e){} }, 0); }
     } finally { mt38Busy = false; }
     return r;

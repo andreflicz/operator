@@ -8914,3 +8914,39 @@ html body .calx .r52-left > .cx-desk{ flex:1 1 auto !important; }
 .r53-rep{ width:auto; min-width:112px; margin-left:6px; }
 /* pop-ups: grab the top to move */
 .r53-dragging{ transition:none !important; cursor:grabbing; user-select:none; }
+
+/* ===== R54 ===== */
+/* lifecycle tasks: their own colour */
+.task-card.r54-lc{ border-left:3px solid #A98BFF; }
+.mt-badge.is-lc{ color:#C3B1FF; background:rgba(169,139,255,.16); }
+/* the Log center: Clients | Leads */
+.r54-lcw{ display:inline-flex; gap:4px; padding:4px; margin-bottom:14px; border-radius:12px; background:var(--panel-2); }
+.r54-lcw button{ border:0; background:transparent; color:var(--text-dim); font:inherit; font-weight:600; padding:7px 16px; border-radius:9px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+.r54-lcw button.is-on{ background:var(--panel); color:var(--text); box-shadow:0 1px 0 rgba(255,255,255,.05) inset; }
+.r54-lcw .lc-badge{ margin:0; }
+.r54-lk{ margin-bottom:10px; }
+.r54-lr .lc-who{ cursor:pointer; }
+.r54-cad{ width:auto; min-width:118px; }
+/* the cycle editor */
+.r54-cyn{ display:flex; align-items:center; gap:10px; margin:10px 0 4px; font-size:13px; color:var(--text-dim); }
+.r54-cyn select{ width:auto; min-width:180px; }
+.r54-cyn.is-ask{ padding:8px 12px; border-radius:10px; background:rgba(232,162,61,.10); color:#E8A23D; }
+.r54-auto{ display:flex; align-items:center; gap:8px; margin-top:8px; font-size:12.5px; color:var(--text-faint); }
+.r54-auto input{ width:64px; }
+.r54-due{ display:inline-flex; align-items:center; gap:6px; margin-left:6px; font-size:12px; color:var(--text-faint); white-space:nowrap; }
+.r54-due input{ width:58px; }
+select.r54-due{ width:auto; }
+.lc-row.r54-lr{ grid-template-columns:36px minmax(150px, 1.2fr) minmax(110px, .7fr) minmax(120px, .7fr) auto auto; }
+@media (max-width:1100px){ .lc-row.r54-lr{ grid-template-columns:36px 1fr auto; } .r54-lr .r54-cad{ grid-column:2; justify-self:start; } }
+.lc-editor-item .lc-type-select{ flex:0 0 128px; }
+.lc-editor-item [data-cy-item-text]{ flex:1 1 220px; }
+.lc-editor-item [data-cy-item-link]{ order:10; flex:1 1 100%; margin-left:134px; }
+.r54-when{ display:inline-flex; align-items:center; gap:6px; flex:none; }
+.r54-when .input{ flex:none !important; width:auto; min-width:0 !important; }
+.r54-when .r53-rep{ margin-left:0; min-width:118px; }
+.r54-when .r54-due{ margin-left:0; }
+.r54-when .r54-due .input{ width:56px; }
+.lc-editor-item:has(.r54-when){ display:grid; grid-template-columns:128px minmax(0, 1fr) auto repeat(3, 26px); gap:6px; align-items:center; }
+.lc-editor-item:has(.r54-when) > span[style^="flex"]{ display:none; }
+.lc-editor-item:has(.r54-when) > [data-cy-item-link]{ grid-column:2 / -1; grid-row:2; margin-left:0; }
+.lc-editor-item:has(.r54-when) > .input{ min-width:0; width:100%; }

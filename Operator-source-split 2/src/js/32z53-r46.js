@@ -5,6 +5,7 @@
 //  • tells the menu bar what to show: your session time while you're locked in, a dot when Op is holding
 //    something for you;
 //  • has an app card in Settings: open at login, ⌥O, import.
+var r46StatusFn = null;
 const OPAPP = typeof window!=='undefined' && window.operatorApp && window.operatorApp.isApp ? window.operatorApp : null;
 if(OPAPP){
   document.documentElement.classList.add('is-mac-app');
@@ -25,10 +26,12 @@ if(OPAPP){
       if(s){ const mins = Math.floor((Date.now() - s.startedAt)/60000); label = (s.onBreak ? 'Break ' : '')+(mins >= 60 ? Math.floor(mins/60)+'h '+pad2(mins % 60)+'m' : mins+'m'); tip = 'Locked in'; }
       else if(m && m.type==='shooting') label = 'Shooting';
       if(held) label = (label ? label+' ' : '')+'•';
+      if(typeof AI!=='undefined' && (AI.listening || AI.transcribing)) label = '🎙 '+(AI.listening ? 'Listening' : '…');
       OPAPP.status({label:label, tip:tip, locked:!!s, opOn:typeof opOn==='function' ? opOn() : true, busy:typeof opBusyNow==='function' && opBusyNow() ? fmtTimeShort(state.focus.opBusyUntil) : ''});
     }catch(e){}
   };
   setInterval(opAppStatus, 5000); setTimeout(opAppStatus, 1500);
+  r46StatusFn = opAppStatus;
   afterRenderHooks.push(function(){ clearTimeout(opAppStatus._t); opAppStatus._t = setTimeout(opAppStatus, 300); });
   // ---- Settings → Connections & data: the app card ----
   operatorAppCardHtml = function(){
@@ -45,6 +48,8 @@ if(OPAPP){
     lockIn: function(){ try{ opRunTool('lock_in', {}); }catch(e){} renderView(); },
     lockOut: function(){ if(ACTIONS.openStopFocus) ACTIONS.openStopFocus(); },
     talk: function(){ if(ACTIONS.opTalk) ACTIONS.opTalk(); },
+    // the talk key, from anywhere on the Mac
+    talkToggle: function(){ if(typeof r54TalkToggle==='function') r54TalkToggle(); },
     power: function(){ ACTIONS.opPower(); },
     busy: function(m){ opBusy(Number(m) || 60, 'Busy'); },
     busyEnd: function(){ ACTIONS.opBusyEnd(); },

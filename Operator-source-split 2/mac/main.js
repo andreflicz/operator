@@ -253,6 +253,33 @@ ipcMain.handle('bubble:save', async (e, text) => {
   return !!ok;
 });
 
+
+// ---------------- the talk key, anywhere on the Mac ----------------
+// Press it (alone) and Op listens; press again to send. It works with Operator in the back, like Discord's
+// push-to-talk. macOS asks once to let Operator see the key (Privacy & Security → Accessibility).
+const KEYC = { AltRight: 3640, AltLeft: 56, ControlRight: 3613, Backquote: 41 };
+let talk = { on: true, key: 'AltRight' }, hookOk = false, held = null, hookTried = false;
+function hookStart() {
+  if (hookOk) return;
+  try {
+    if (process.platform === 'darwin') {
+      const { systemPreferences } = require('electron');
+      if (!systemPreferences.isTrustedAccessibilityClient(false)) {
+        if (!hookTried) { hookTried = true; systemPreferences.isTrustedAccessibilityClient(true); }
+        setTimeout(hookStart, 10000); return;
+      }
+    } else if (!process.env.OP_KEY_HOOK) return;
+    const { uIOhook } = require('uiohook-napi');
+    uIOhook.on('keydown', (e) => { const k = KEYC[talk.key]; if (e.keycode === k) { if (!held) held = { other: false }; } else if (held) held.other = true; });
+    uIOhook.on('keyup', (e) => { if (e.keycode !== KEYC[talk.key] || !held) return; const h = held; held = null; if (!h.other && talk.on) run('operatorPage.talkToggle()'); });
+    uIOhook.on('mousedown', () => { if (held) held.other = true; });
+    uIOhook.start(); hookOk = true;
+    run('window.__opGlobalKey = true');
+    log('talk key hooked');
+  } catch (e) { log('talk key hook failed', e && e.message); }
+}
+ipcMain.on('op:talkPrefs', (e, p) => { talk.on = p.on !== false; if (KEYC[p.key]) talk.key = p.key; if (talk.on) hookStart(); });
+
 // ---------------- the page talks back ----------------
 ipcMain.on('op:status', (e, s) => { status = s || {}; trayRefresh(); });
 ipcMain.on('op:show', () => showWin());
@@ -264,7 +291,7 @@ ipcMain.handle('op:importFile', () => importData());
 app.on('second-instance', () => showWin());
 app.on('activate', () => showWin());
 app.on('before-quit', () => { quitting = true; });
-app.on('will-quit', () => { globalShortcut.unregisterAll(); stopHelpers(); });
+app.on('will-quit', () => { globalShortcut.unregisterAll(); stopHelpers(); try { if (hookOk) require('uiohook-napi').uIOhook.stop(); } catch (e) {} });
 // (before anything opens the page's storage)
 let how = null;
 if (app.hasSingleInstanceLock()) { stopOldLauncher(); try { how = migrateFromChrome(); } catch (e) { log('move-in failed', e.message); } }
@@ -279,4 +306,5 @@ app.whenReady().then(() => {
   if (!globalShortcut.register('Alt+J', bubToggle)) log('⌥J is taken by another app');
   if (bubCfg.on) bubCreate();
   if (how) win.webContents.once('did-finish-load', () => setTimeout(() => afterMoveIn(how), 2500));
+  win.webContents.on('did-finish-load', () => { if (hookOk) run('window.__opGlobalKey = true'); });
 });

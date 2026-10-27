@@ -26,6 +26,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('and it does not come right back', await E("!state.tasks.items.some(t => t.master && t.master.kind==='reachLeads' && t.status!=='done')"));
 
   // 2. lifecycle reports
+  // (round 54: clients go on a cycle first; the reports are that cycle's repeating tasks)
+  await E("(function(){ const cy = r53RegularCycle(), last = cy.steps[cy.steps.length - 1]; last.checklist = last.checklist.filter(it => !/check-in/i.test(it.text)); last.checklist.forEach(it => { if(/monthly/i.test(it.text)) it.repeat = 'month'; }); last.checklist.push({id:'wr', text:'Weekly report', type:'doc', repeat:'week'}); state.business.clients.forEach(c => { assignCycle(c, cy.id); c.cycleStepId = last.id; }); crm().r54Pending = []; })(); masterTasksSync()");
   const reps = JSON.parse(await E("JSON.stringify(state.tasks.items.filter(t => t.master && t.master.kind==='lcrep').map(t => ({c:t.client, t:t.title, e:t.master.every, d:t.deadline})))"));
   check('each regular client gets a Weekly report task', ['jj', 'bm'].every(id => reps.some(r => r.c===id && r.e==='week' && /weekly report/i.test(r.t))), reps);
   check('and a Monthly results report', ['jj', 'bm'].every(id => reps.some(r => r.c===id && r.e==='month')), reps);

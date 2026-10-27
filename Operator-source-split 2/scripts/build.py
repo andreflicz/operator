@@ -48,6 +48,8 @@ def build():
 
     parts.append("<script>\n")
     parts.append("(function(){\n")
+    import time
+    parts.append("const OP_BUILT = %d;\n" % int(time.time()*1000))
     parts.append("\n")
     for fname in manifest:
         fpath = os.path.join(JS_DIR, fname)

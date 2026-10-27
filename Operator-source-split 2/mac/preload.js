@@ -9,5 +9,7 @@ contextBridge.exposeInMainWorld('operatorApp', {
   loginItem: () => ipcRenderer.invoke('op:loginItem'),
   setLoginItem: (on) => ipcRenderer.invoke('op:setLoginItem', !!on),
   importFile: () => ipcRenderer.invoke('op:importFile'),
-  show: () => ipcRenderer.send('op:show')
+  show: () => ipcRenderer.send('op:show'),
+  // the talk key: on or off, and which key (the app listens for it everywhere)
+  talkPrefs: (p) => ipcRenderer.send('op:talkPrefs', p || {})
 });
