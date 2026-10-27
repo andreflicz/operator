@@ -42,7 +42,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   // ---- 4. Worth doing soon ----
   const tiles = await p.$$eval('.r41-soon .r41-soon-t', els => els.map(e => { const r = e.getBoundingClientRect(); return {t:r.top, h:r.height}; }));
-  const visible = tiles.filter(t => t.h > 0);
+  const visible = tiles.filter(t => t.h > 30);   // (the ones past the first row are clipped to their padding)
   check('Worth doing soon: slim tiles in one row (nothing wraps to a lone card)', visible.length >= 3 && visible.every(t => Math.abs(t.t - visible[0].t) < 2) && visible[0].h < 90, tiles);
   check('…a tile opens the task', (await p.getAttribute('.r41-soon-t', 'data-action'))==='openTaskEditModal');
 

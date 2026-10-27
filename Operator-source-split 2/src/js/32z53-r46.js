@@ -52,6 +52,15 @@ if(OPAPP){
     exportData: function(){ exportData(); },
     importText: function(t){ return importDataFile({text:function(){ return Promise.resolve(String(t)); }}); },
     hasData: function(){ try{ return !!(state.profile && state.profile.name && state.profile.name!=='Operator') || state.tasks.items.length > 0 || state.business.clients.length > 0; }catch(e){ return false; } },
+    // the journal bubble: a new entry, written from anywhere on the Mac
+    addJournal: function(text){
+      text = String(text || '').trim(); if(!text) return false;
+      if(!state.journal) state.journal = {entries:[]}; if(!Array.isArray(state.journal.entries)) state.journal.entries = [];
+      const first = text.split('\n')[0];
+      state.journal.entries.push({id:uid(), date:todayStr(), timestamp:Date.now(), text:text, title:first.length > 60 ? first.slice(0, 57)+'…' : first, type:'freeform', mood:null, pinned:false, photos:[], from:'bubble'});
+      persist('journal'); try{ renderView(); }catch(e){}
+      return true;
+    },
     peek: function(){ return {name:state.profile.name, tasks:state.tasks.items.map(function(t){ return t.title; }), view:ui.view, card:!!document.getElementById('opAppCard')}; }
   });
   ACTIONS.opAppLogin = function(){ OPAPP.setLoginItem(!ui.opLoginItem).then(function(v){ ui.opLoginItem = !!v; renderView(); }); };

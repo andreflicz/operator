@@ -1,0 +1,61 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Journal</title>
+<style>
+  :root{ --bg:rgba(22,24,30,.94); --ink:#F2F3F6; --mute:#9AA0AE; --line:rgba(255,255,255,.10); --acc:#7C8CFF; }
+  html,body{ margin:0; height:100%; background:transparent; overflow:hidden; font:13px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; color:var(--ink); user-select:none; }
+  /* the bubble: drag it anywhere, tap it to write */
+  #dot{ position:absolute; right:6px; bottom:6px; width:52px; height:52px; border-radius:50%; background:var(--bg); border:1px solid var(--line); box-shadow:0 6px 20px rgba(0,0,0,.35);
+    display:flex; align-items:center; justify-content:center; font-size:22px; cursor:pointer; -webkit-app-region:drag; transition:transform .12s; }
+  #dot:hover{ transform:scale(1.05); }
+  #dot span{ -webkit-app-region:no-drag; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:50%; }
+  #card{ position:absolute; inset:6px; display:none; flex-direction:column; background:var(--bg); border:1px solid var(--line); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.4); overflow:hidden; }
+  body.open #dot{ display:none; } body.open #card{ display:flex; }
+  #bar{ display:flex; align-items:center; gap:8px; padding:10px 12px 6px; -webkit-app-region:drag; }
+  #bar b{ font-weight:600; flex:1; }
+  #bar button{ -webkit-app-region:no-drag; }
+  textarea{ flex:1; margin:0 12px; resize:none; border:0; outline:0; background:transparent; color:var(--ink); font:inherit; font-size:14px; user-select:text; }
+  textarea::placeholder{ color:var(--mute); }
+  #foot{ display:flex; align-items:center; gap:8px; padding:8px 12px 12px; }
+  #foot kbd{ color:var(--mute); font:inherit; font-size:11px; flex:1; }
+  button{ border:0; border-radius:9px; padding:6px 12px; font:inherit; cursor:pointer; background:rgba(255,255,255,.08); color:var(--ink); }
+  button.go{ background:var(--acc); color:#fff; font-weight:600; }
+  button:disabled{ opacity:.4; cursor:default; }
+  #ok{ position:absolute; inset:0; display:none; align-items:center; justify-content:center; font-weight:600; background:var(--bg); }
+  body.saved #ok{ display:flex; }
+</style></head>
+<body>
+  <div id="dot" title="Journal"><span id="open">&#9998;</span></div>
+  <div id="card">
+    <div id="bar"><b>Journal</b><button id="min" title="Back to a bubble">&#8211;</button></div>
+    <textarea id="t" placeholder="What’s on your mind?"></textarea>
+    <div id="foot"><kbd>&#8984;&#9166; to save</kbd><button id="cancel">Later</button><button class="go" id="save" disabled>Save</button></div>
+    <div id="ok">Saved to your journal &#10003;</div>
+  </div>
+<script>
+  const t = document.getElementById('t'), save = document.getElementById('save');
+  const DRAFT = 'op-bubble-draft';
+  try{ t.value = localStorage.getItem(DRAFT) || ''; }catch(e){}
+  const sync = () => { save.disabled = !t.value.trim(); try{ localStorage.setItem(DRAFT, t.value); }catch(e){} };
+  sync();
+  function open(){ document.body.classList.add('open'); window.bubble.open(true); setTimeout(() => t.focus(), 30); }
+  function close(){ document.body.classList.remove('open'); window.bubble.open(false); }
+  // a tap opens it; a drag only moves it
+  let down = null;
+  document.getElementById('dot').addEventListener('mousedown', (e) => { down = [e.screenX, e.screenY]; });
+  document.getElementById('dot').addEventListener('mouseup', (e) => { if(down && Math.abs(e.screenX - down[0]) + Math.abs(e.screenY - down[1]) < 4) open(); down = null; });
+  document.getElementById('open').addEventListener('click', open);
+  document.getElementById('min').addEventListener('click', close);
+  document.getElementById('cancel').addEventListener('click', close);
+  t.addEventListener('input', sync);
+  async function go(){
+    const v = t.value.trim(); if(!v) return;
+    save.disabled = true;
+    const ok = await window.bubble.save(v);
+    if(ok){ t.value = ''; sync(); document.body.classList.add('saved'); setTimeout(() => { document.body.classList.remove('saved'); close(); }, 900); }
+    else { save.disabled = false; save.textContent = 'Try again'; }
+  }
+  save.addEventListener('click', go);
+  document.addEventListener('keydown', (e) => { if(e.key==='Enter' && (e.metaKey || e.ctrlKey)){ e.preventDefault(); go(); } if(e.key==='Escape') close(); });
+  window.bubble.onOpen(() => open());
+</script>
+</body></html>

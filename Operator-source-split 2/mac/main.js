@@ -133,6 +133,8 @@ function trayMenu() {
     { label: s.busy ? 'Op: quiet until ' + s.busy : 'Op: busy for an hour', enabled: s.opOn !== false, click: () => run(s.busy ? "operatorPage.busyEnd()" : "operatorPage.busy(60)") },
     { label: s.opOn === false ? 'Turn Op on' : 'Turn Op off', click: () => run("operatorPage.power()") },
     { type: 'separator' },
+    { label: 'Journal bubble', type: 'checkbox', accelerator: 'Alt+J', checked: !!bubCfg.on, click: (m) => bubShow(m.checked) },
+    { type: 'separator' },
     { label: 'Open at login', type: 'checkbox', checked: login, click: (m) => app.setLoginItemSettings({ openAtLogin: m.checked, openAsHidden: true }) },
     { label: 'Import data…', click: () => importData() },
     { type: 'separator' },
@@ -203,6 +205,54 @@ async function afterMoveIn(how) {
   else if ((ex && r.response === 1) || (!ex && r.response === 0)) importData();
 }
 
+
+// ---------------- the journal bubble ----------------
+// A little round button that floats over everything (drag it where you like). Tap it, write, ⌘↩: it's in your
+// journal. ⌥J or the menu bar shows and hides it; where it sits and whether it's out are remembered.
+const BUB_FILE = path.join(DATA_DIR, 'bubble.json');
+const BUB_SMALL = { w: 64, h: 64 }, BUB_BIG = { w: 340, h: 230 };
+let bub = null, bubCfg = { on: true };
+try { bubCfg = Object.assign(bubCfg, JSON.parse(fs.readFileSync(BUB_FILE, 'utf8'))); } catch (e) {}
+function bubSave() { try { fs.writeFileSync(BUB_FILE, JSON.stringify(bubCfg)); } catch (e) {} }
+function bubCreate() {
+  if (bub && !bub.isDestroyed()) return bub;
+  const { screen } = require('electron'), wa = screen.getPrimaryDisplay().workArea;
+  let x = bubCfg.x, y = bubCfg.y;
+  const onScreen = x != null && screen.getAllDisplays().some((d) => x >= d.workArea.x - 20 && y >= d.workArea.y - 20 && x <= d.workArea.x + d.workArea.width - 40 && y <= d.workArea.y + d.workArea.height - 40);
+  if (!onScreen) { x = wa.x + wa.width - BUB_SMALL.w - 24; y = wa.y + wa.height - BUB_SMALL.h - 24; }
+  bub = new BrowserWindow({ x, y, width: BUB_SMALL.w, height: BUB_SMALL.h, frame: false, transparent: true, resizable: false, movable: true, minimizable: false, maximizable: false, fullscreenable: false,
+    skipTaskbar: true, hasShadow: false, alwaysOnTop: true, show: false, backgroundColor: '#00000000',
+    webPreferences: { preload: path.join(__dirname, 'bubble-preload.js'), contextIsolation: true, nodeIntegration: false } });
+  bub.setAlwaysOnTop(true, 'floating');
+  try { bub.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true }); } catch (e) {}
+  bub.loadFile(path.join(__dirname, 'bubble.html'));
+  bub.once('ready-to-show', () => { if (bubCfg.on) bub.showInactive(); });
+  bub.on('moved', () => { const b = bub.getBounds(); bubCfg.x = b.x + b.width - BUB_SMALL.w; bubCfg.y = b.y + b.height - BUB_SMALL.h; bubSave(); });
+  bub.on('closed', () => { bub = null; });
+  return bub;
+}
+function bubShow(on) {
+  bubCfg.on = on; bubSave();
+  if (on) { bubCreate(); if (bub.webContents.isLoading()) return; bub.showInactive(); } else if (bub) bub.hide();
+  trayRefresh();
+}
+function bubToggle() {
+  // ⌥J: out and closed → open it to write; open → put it away
+  if (!bubCfg.on || !bub || !bub.isVisible()) { bubShow(true); const w = bubCreate(); const go = () => { w.show(); w.focus(); w.webContents.send('bubble:focus'); }; if (w.webContents.isLoading()) w.webContents.once('did-finish-load', go); else go(); }
+  else bubShow(false);
+}
+ipcMain.on('bubble:open', (e, on) => {
+  if (!bub) return;
+  const b = bub.getBounds(), s = on ? BUB_BIG : BUB_SMALL;
+  // (it grows up and to the left, so the corner it sits in stays put)
+  bub.setBounds({ x: b.x + b.width - s.w, y: b.y + b.height - s.h, width: s.w, height: s.h });
+  if (on) bub.focus();
+});
+ipcMain.handle('bubble:save', async (e, text) => {
+  const ok = await run('operatorPage.addJournal(' + JSON.stringify(String(text || '').slice(0, 20000)) + ')');
+  return !!ok;
+});
+
 // ---------------- the page talks back ----------------
 ipcMain.on('op:status', (e, s) => { status = s || {}; trayRefresh(); });
 ipcMain.on('op:show', () => showWin());
@@ -226,5 +276,7 @@ app.whenReady().then(() => {
   createWindow();
   tray = new Tray(trayIcon()); trayRefresh();
   if (!globalShortcut.register('Alt+O', toggleWin)) log('⌥O is taken by another app');
+  if (!globalShortcut.register('Alt+J', bubToggle)) log('⌥J is taken by another app');
+  if (bubCfg.on) bubCreate();
   if (how) win.webContents.once('did-finish-load', () => setTimeout(() => afterMoveIn(how), 2500));
 });
