@@ -126,7 +126,7 @@ EXP_CATS.forEach(function(c){
   if(c.id==='bills') c.re = new RegExp(c.re.source.replace('|payment to', ''), 'i');
   if(R55_EXTRA[c.id]) c.re = new RegExp(c.re.source+'|'+R55_EXTRA[c.id], 'i');
   if(c.id==='move'){ c.re = R55_MOVE; return; }
-  try{ c.re = new RegExp('(?<![a-z0-9])(?:'+c.re.source.replace(/\\b/g, '')+')(?![a-z0-9])', 'i'); }catch(e){}
+  try{ c.re = new RegExp('(?<![a-z0-9])(?:'+c.re.source.replace(/\\b/g, '')+')(?:\'?s)?(?![a-z0-9])', 'i'); }catch(e){}
 });
 function r55Resort(){
   const f = state.finances; if(!f || f.r55Sorted) return;
@@ -354,3 +354,89 @@ function r55JournalCounts(e){
   if(e.capsuleFrom || e.mood==='inspiration' || /^✨ Inspiration/.test(e.title || '') || (typeof isUpdateEntry==='function' && isUpdateEntry(e))) return false;
   return String(e.text || '').trim().split(/\s+/).filter(Boolean).length >= 12;
 }
+
+// ---- 13. Finances, cleaner (same features) ----
+// The four numbers get their own colour and a small mark; spending by kind is one bar split by colour with each
+// kind's share, and its own colour on every row; transactions are grouped by day with that day's total.
+r44SpentHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments); if(!h) return h;
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const rows = Array.from(tpl.content.querySelectorAll('.ex-c')), vals = rows.map(function(r){ const b = r.querySelector('b'); return b ? Number(String(b.textContent).replace(/[^0-9.]/g, '')) || 0 : 0; });
+    const sum = vals.reduce(function(a, v){ return a + v; }, 0) || 1;
+    const ids = rows.map(function(r){ const t = (r.querySelector('span') || {}).textContent || ''; const c = EXP_CATS.find(function(k){ return t.indexOf(k.label) >= 0; }); return c ? c.id : 'other'; });
+    rows.forEach(function(r, i){ const col = R44_CAT_COLORS[ids[i]] || '#8A90A2'; r.style.setProperty('--c', col); r.classList.add('r55-exc'); const b = r.querySelector('b'); if(b) b.insertAdjacentHTML('beforebegin', '<em class="r55-pct">'+Math.round(vals[i]/sum*100)+'%</em>'); });
+    const cats = tpl.content.querySelector('.ex-cats');
+    if(cats && rows.length > 1) cats.insertAdjacentHTML('afterbegin', '<div class="r55-share">'+rows.map(function(r, i){ return '<i style="flex:'+vals[i].toFixed(2)+';background:'+(R44_CAT_COLORS[ids[i]] || '#8A90A2')+'" title="'+escapeHtml(((r.querySelector('span') || {}).textContent || '').trim())+'"></i>'; }).join('')+'</div>');
+    return tpl.innerHTML;
+  };
+})(r44SpentHtml);
+r44TxHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    const tpl = document.createElement('template'); tpl.innerHTML = h;
+    const rows = Array.from(tpl.content.querySelectorAll('.r44-tx')); if(!rows.length) return h;
+    const today = fmtDateShort(todayStr()), yest = fmtDateShort(addDays(todayStr(), -1));
+    let last = null, head = null, tot = 0;
+    const close = function(){ if(head){ head.querySelector('em').textContent = (tot >= 0 ? '+' : '−')+'$'+Math.abs(tot).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); } };
+    rows.forEach(function(r){
+      const f = r.querySelector('.r44-txn .r44-faint'), d = f ? f.textContent.replace(/^·\s*/, '').trim() : '';
+      const a = r.querySelector('.r44-a'), v = a ? (a.textContent.indexOf('+')===0 ? 1 : -1)*(Number(a.textContent.replace(/[^0-9.]/g, '')) || 0) : 0;
+      if(d!==last){ close(); last = d; tot = 0; head = document.createElement('div'); head.className = 'r55-txd'; head.innerHTML = '<b>'+escapeHtml(d===today ? 'Today' : d===yest ? 'Yesterday' : d)+'</b><em></em>'; r.parentNode.insertBefore(head, r); }
+      tot += v; if(f) f.remove(); r.classList.add('r55-tx'); if(a) a.textContent = a.textContent.replace(/^([+−-])\s*[-−]/, '$1');
+    });
+    close();
+    const out = document.createElement('div'); out.appendChild(tpl.content.cloneNode(true)); return out.innerHTML;
+  };
+})(r44TxHtml);
+renderPersonalFinances = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    const ic = ['&#127974;', '&#128179;', '&#8600;', '&#8599;'], cls = ['is-cash', 'is-debt', 'is-in', 'is-out'];
+    let i = 0;
+    return h.replace(/<div class="card r44-tile">/g, function(){ const k = i++; return '<div class="card r44-tile r55-tile '+(cls[k] || '')+'"><span class="r55-ti">'+(ic[k] || '')+'</span>'; });
+  };
+})(renderPersonalFinances);
+
+// ---- 14. The sweep: what was removed, or isn't connected to anything, comes out ----
+//  • Focus → Analytics → "Check-ins with Op" (those check-ins are gone).
+//  • The Work alarm's "Op checks in on you" and "How often" (Op's rules don't use them any more).
+//  • How XP works: the "Check-ins with Op" card; Standing reads "the commitments you kept and the days you hit".
+//  • Social: "No Meta developer app, no GoHighLevel" under Your social numbers.
+//  • The GHL quick link, and GHL as a lead source to pick (leads that came from it still say so).
+//  • Clients grouped by cycle (cycles are playbooks now); the + on Playbooks makes a playbook.
+acctLogHtml = function(){ return ''; };
+workSetupHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), tpl = document.createElement('template'); tpl.innerHTML = h;
+    tpl.content.querySelectorAll('.field').forEach(function(f){ const l = f.querySelector('label'); if(l && /^(Op checks in on you|How often)/.test(l.textContent.trim())) f.remove(); });
+    return tpl.innerHTML;
+  };
+})(workSetupHtml);
+xpHowOverlay = (function(base){
+  return function(){
+    const r = base.apply(this, arguments);
+    const el = document.getElementById('xpHowContent');
+    if(el){
+      el.querySelectorAll('.xpg-card').forEach(function(c){ const h = c.querySelector('h3'); if(h && /Check-ins with Op/.test(h.textContent)) c.remove(); });
+      el.querySelectorAll('*').forEach(function(n){ if(n.children.length===0 && /answering his check-ins/.test(n.textContent)) n.textContent = n.textContent.replace(/answering his check-ins, how productive you said you were, /, ''); });
+    }
+    return r;
+  };
+})(xpHowOverlay);
+setTimeout(function(){
+  try{
+    const qi = QUICK_LINK_DEFS.findIndex(function(q){ return q.key==='ghl'; }); if(qi >= 0) QUICK_LINK_DEFS.splice(qi, 1);
+    const used = arr(state.business.pipeline).concat(arr(state.business.clients)).some(function(x){ return x.leadSource==='ghl'; });
+    const li = LEAD_SOURCES.findIndex(function(s){ return s.id==='ghl'; }); if(li >= 0 && !used) LEAD_SOURCES.splice(li, 1);
+    if(typeof crmUi==='function'){ const u = crmUi('client'); if(u && u.group==='cycle'){ u.group = null; } }
+  }catch(e){}
+}, 0);
+if(typeof cycleGroupBar==='function') cycleGroupBar = function(){ return ''; };
+socialConnectHtml = (function(base){ return function(){ return base.apply(this, arguments).replace(/<span>No Meta developer app, no GoHighLevel\.[^<]*<\/span>/, ''); }; })(socialConnectHtml);
+fabContext = (function(base){
+  return function(){
+    if(ui.view==='business' && ui.businessTab==='lifecycle') return {label:'New playbook', run:function(){ const p = pbSel(); ACTIONS.pbNew(null, null, p ? p.kind : 'onboarding'); }};
+    return base.apply(this, arguments);
+  };
+})(fabContext);

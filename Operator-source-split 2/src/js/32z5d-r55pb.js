@@ -260,8 +260,12 @@ function pbMoveBack(kind, id){
     if(!yes) return;
     const done = Object.assign({}, h.done); Object.keys(h.auto || {}).forEach(function(k){ delete done[k]; });
     x.pb = {id:h.id, start:h.start, done:done, auto:{}, hist:x.pb.hist.slice(0, -1)};
+    // (the tasks it checked off come back too: drop them and let the list make them fresh)
+    state.tasks.items = state.tasks.items.filter(function(t){ return !(t.master && t.master.kind==='pb' && t.master.who===kind && t.master.id===id && (h.auto || {})[t.master.key]); });
+    // (and the next playbook's tasks go)
+    state.tasks.items = state.tasks.items.filter(function(t){ return !(t.master && t.master.kind==='pb' && t.master.who===kind && t.master.id===id && t.master.pb!==h.id && t.status!=='done'); });
     r55Banner(pbName(kind, x)+' moved back to '+p.name);
-    persist('business'); try{ masterTasksSync(); }catch(e){} renderView(); rerenderContactModal();
+    persist('business'); persist('tasks'); try{ masterTasksSync(); }catch(e){} renderView(); rerenderContactModal();
   });
 }
 ACTIONS.pbNext = function(el){ pbMoveNext(el.dataset.kind, el.dataset.id); };
