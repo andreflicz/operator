@@ -36,16 +36,17 @@
 ## Add menu
 18. No lonely "A reminder": four in one row (2×2 on narrow screens).
 
-## Client habits (replaces client cycles, phases, targets and "moving on" — Andre, 8:06 PM)
-19. A client's habits: the things you do for them each month, shown as tasks on the task list, tagged with the client. No targets, no KPIs, no "required", no health hit.
-20. Each habit: a name; the day of the client's month it's due (day 1 = the client's start date, editable); how often: every month / every 2 months / every week / first month only (onboarding call, kick-off, first win…).
-21. Resources on a habit: links (Drive SOP, Google Form) and a call you can schedule (Open, Copy-to-send, Schedule/Edit), like the old lifecycle had.
-22. Templates: save a set of habits once ("Construction marketing client", "Shoot-only client"), give each client one; add or remove habits for a single client.
-23. The builder: habits laid out on a 30-day calendar.
-24. On the task list: each habit becomes a task when due, its own colour (separate from deliverables); done → back next month; late → red like any task.
-25. Deliverables (reels, ads…) stay as they are, with their counter.
-26. Client cycles, phases and "moving on" come out.
-27. Mockup in Claude Design first.
+## Playbooks (final — replaces client cycles, phases, targets, "When finished, move to"; Andre 8:15 PM)
+19. A playbook = a saved routine built on a calendar of any length (7 / 14 / 30 / custom days). Day 1 = whenever that lead/client starts; weekday doesn't matter. General, not built for one person.
+20. Three kinds: Lead (e.g. discovery call → trial shoot → deliver trial content → close; tied to the Lead center — a lead entering a stage can start that stage's playbook); Onboarding / first month (once, from signed/paid: onboarding call, get access [Meta BM, ad account, zip codes], intake form, kick-off, first win); Monthly service (repeats each billing month: weekly report Fridays, book monthly call, monthly call, monthly report). Closed lead → onboarding → monthly service; each playbook says what comes next, in one clear place.
+21. Each item: a type with its own colour (Call, Report, Task, Access / info needed, Send / link); optional checklist; resources (SOP/form links: Open, Copy-to-send); calls you can schedule from the item (on the calendar); repeat: once / every week (weekday) / every month.
+22. Task list: due items become tasks tagged with the client/lead, coloured by type, separate from deliverables (a weekly report is a task, not a deliverable). Late → red, lowers that client's health, sends a notification.
+23. Start dates for every client and lead (signed/paid or first contact), editable.
+24. New clients/leads start on the default playbook; current clients go on the one you pick (nothing guessed).
+25. Moving by hand: a pop-up lists the tasks that will be checked off; moving back brings tasks back; a coloured banner at the top ("JJS moved to Monthly service").
+26. Client card (designed to look good): playbook, where they are ("Day 12 · Monthly service"), what's next ("Weekly report, Fri"), health.
+27. Deliverables stay as they are.
+No mockups first: build directly (Andre, 8:15 PM).
 
 ## Op: client reports
 30. New ability on Op's screen: "Write a client report" — from deliverables, shoots, calls/touches, journal notes and debriefs, ad spend/leads and social stats; a client version to edit and send (link or PDF) plus private notes. Report tasks get the draft attached.

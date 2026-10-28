@@ -8979,3 +8979,36 @@ select.r54-due{ width:auto; }
 .rank-fx.is-in .rfx-go{ animation-delay:6.1s !important; }
 .rank-fx .rfx-core{ max-width:680px; gap:12px; }
 @media (max-height:820px){ .rank-fx .rfx-core{ transform:scale(.86); } .rfx-life{ display:none; } }
+/* the rays: a big square centred on the badge, faded out well inside its own edges, so no edge ever shows */
+.rank-fx .rfx-rays{ left:50% !important; top:38% !important; width:220vmax !important; height:220vmax !important; margin:-110vmax 0 0 -110vmax; transform:none !important; transform-origin:50% 50% !important;
+  background:repeating-conic-gradient(from 0deg at 50% 50%, color-mix(in srgb, var(--rc) 30%, transparent) 0deg 3deg, transparent 3deg 12deg) !important;
+  -webkit-mask:radial-gradient(closest-side, #000 0, rgba(0,0,0,.55) 12%, transparent 34%) !important; mask:radial-gradient(closest-side, #000 0, rgba(0,0,0,.55) 12%, transparent 34%) !important; }
+.rank-fx.is-in .rfx-rays{ animation:rfxRays2 1.2s 1.4s cubic-bezier(.2,.8,.2,1) forwards, rfxSpin3 60s 1.4s linear infinite !important; }
+@keyframes rfxSpin3{ from{ rotate:0deg; } to{ rotate:360deg; } }
+.rank-fx .rfx-rays{ left:var(--rx, 50%) !important; top:var(--ry, 38%) !important; }
+.rank-fx .rfx-ring{ left:var(--rx, 50%) !important; top:var(--ry, 38%) !important; }
+.rank-fx .rfx-rays{ width:150vmax !important; height:150vmax !important; margin:-75vmax 0 0 -75vmax;
+  -webkit-mask:radial-gradient(closest-side, #000 0, rgba(0,0,0,.5) 30%, transparent 90%) !important; mask:radial-gradient(closest-side, #000 0, rgba(0,0,0,.5) 30%, transparent 90%) !important; }
+.rank-fx .rfx-rays{ background:repeating-conic-gradient(from 0deg at 50% 50%, color-mix(in srgb, var(--rc) 20%, transparent) 0deg 2.5deg, transparent 2.5deg 12deg) !important;
+  -webkit-mask:radial-gradient(closest-side, #000 0, rgba(0,0,0,.45) 22%, transparent 70%) !important; mask:radial-gradient(closest-side, #000 0, rgba(0,0,0,.45) 22%, transparent 70%) !important; }
+/* the + menu: an even grid */
+.r55-apg.ap-grid{ display:grid !important; grid-template-columns:repeat(var(--c), minmax(150px, 1fr)) !important; gap:10px; }
+.hs.is-addPick:has(.r55-apg[style*="--c:4"]){ width:min(820px, calc(100vw - 32px)) !important; max-width:none !important; }
+@media (max-width:720px){ .r55-apg.ap-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)) !important; } }
+.r52-l.r55-pair{ gap:5px; white-space:nowrap; } .r55-sep{ font-style:normal; opacity:.45; margin:0 2px; }
+/* a new notification: the bell glows */
+.notif-bell.r55-new .notif-bell-i{ filter:none; opacity:1; animation:r55Bell 1.1s ease-in-out 3; }
+.notif-bell.r55-new{ box-shadow:0 0 0 1px rgba(232,162,61,.35), 0 0 22px 4px rgba(232,162,61,.35); border-radius:12px; animation:r55BellGlow 2.6s ease-in-out infinite; }
+@keyframes r55Bell{ 0%,100%{ transform:rotate(0); } 15%{ transform:rotate(16deg); } 30%{ transform:rotate(-14deg); } 45%{ transform:rotate(9deg); } 60%{ transform:rotate(-6deg); } 75%{ transform:rotate(3deg); } }
+@keyframes r55BellGlow{ 0%,100%{ box-shadow:0 0 0 1px rgba(232,162,61,.3), 0 0 14px 2px rgba(232,162,61,.25); } 50%{ box-shadow:0 0 0 1px rgba(232,162,61,.5), 0 0 26px 6px rgba(232,162,61,.45); } }
+/* "Have Op rewrite it" is gone (Your projected self) */
+.xpg-hist-btn[data-action="projAiWrite"]{ display:none !important; }
+/* the quote's own buttons */
+.r55-q{ position:relative; }
+.r55-qt{ position:absolute; top:-6px; right:-6px; display:flex; gap:2px; opacity:0; transition:opacity .2s; }
+.r55-q:hover .r55-qt, .r55-q:focus-within .r55-qt{ opacity:1; }
+.r55-qb{ width:26px; height:26px; border-radius:50%; border:0; background:transparent; color:rgba(255,255,255,.4); cursor:pointer; font-size:13px; line-height:1; display:grid; place-items:center; transition:color .2s, background .2s; }
+.r55-qb:hover{ color:#ffc56b; background:rgba(255,255,255,.06); }
+.r55-qb.is-on{ color:#ffc56b; }
+.r55-q.is-pinned .r55-qt{ opacity:.85; }
+[data-theme="light"] .r55-qb{ color:rgba(0,0,0,.4); }
