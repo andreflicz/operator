@@ -9043,3 +9043,136 @@ select.r54-due{ width:auto; }
 .nav-item.r55-sig .nav-icon{ color:#F3C988; text-shadow:0 0 10px rgba(232,162,61,.6); }
 @keyframes r55Sig{ 0%,100%{ opacity:.65; } 50%{ opacity:1; } }
 body.sb-collapsed .nav-item.r55-sig::after{ inset:2px; }
+
+/* ===== R55: Playbooks ===== */
+.r55-banner{ position:fixed; top:18px; left:50%; z-index:99990; display:flex; align-items:center; gap:10px; padding:11px 20px; border-radius:999px; color:#fff; font-size:14px;
+  background:linear-gradient(100deg, #5b4bd6, #8a6cff); box-shadow:0 12px 40px rgba(110,90,255,.45), 0 0 0 1px rgba(255,255,255,.15) inset; transform:translate(-50%, -140%); opacity:0; transition:transform .45s cubic-bezier(.2,1.2,.3,1), opacity .3s; pointer-events:none; }
+.r55-banner.is-in{ transform:translate(-50%, 0); opacity:1; }
+.r55-bn-i{ width:22px; height:22px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.2); font-size:11px; }
+/* playbook tasks */
+.task-card.r55-pbt{ border-left:3px solid var(--pbc); }
+.mt-badge.r55-pbb{ color:var(--pbc); background:color-mix(in srgb, var(--pbc) 16%, transparent); }
+.r55-pbw{ font-size:11.5px; color:var(--text-dim); margin-top:2px; }
+/* the client card strip */
+.r55-pbs{ margin:10px 0 2px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.06); cursor:pointer; }
+.r55-pbs:hover{ background:rgba(255,255,255,.06); }
+.r55-pbs-h{ display:flex; align-items:baseline; gap:8px; } .r55-pbs-h b{ font-size:12.5px; } .r55-pbs-h span{ margin-left:auto; font-size:11.5px; color:var(--text-dim); font-variant-numeric:tabular-nums; }
+.r55-pbs-bar{ display:block; height:4px; border-radius:4px; background:rgba(255,255,255,.07); margin:7px 0; overflow:hidden; } .r55-pbs-bar u{ display:block; height:100%; border-radius:4px; background:linear-gradient(90deg, #7c6cff, #a98bff); }
+.r55-pbs-n{ display:flex; align-items:center; gap:7px; font-size:12.5px; } .r55-pbs-n i{ width:7px; height:7px; border-radius:50%; background:var(--pbc); flex:none; }
+.r55-pbs-n span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .r55-pbs-n small{ margin-left:auto; color:var(--text-dim); white-space:nowrap; } .r55-pbs-n .is-late{ color:var(--danger); font-style:normal; font-weight:700; }
+.r55-pbs-n.is-clear span{ color:var(--good); }
+.r55-pbl{ display:flex; align-items:center; gap:6px; margin-top:6px; font-size:11.5px; color:var(--text-dim); } .r55-pbl i{ width:6px; height:6px; border-radius:50%; background:var(--pbc); } .r55-pbl em{ color:var(--danger); font-style:normal; font-weight:700; }
+/* in a client's / lead's window */
+.r55-pbp{ display:flex; flex-direction:column; gap:10px; }
+.r55-pbp-h{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; } .r55-pbp-h select{ width:auto; min-width:200px; } .r55-pbp-h .btn{ margin-left:auto; }
+.r55-pbp-st{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); } .r55-pbp-st input{ width:auto; }
+.r55-pbp-empty{ padding:14px; border-radius:12px; background:var(--panel-2); color:var(--text-dim); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.r55-pbp-s{ display:flex; align-items:baseline; gap:10px; } .r55-pbp-s b{ font-family:var(--font-display); font-size:17px; } .r55-pbp-s span{ color:var(--text-dim); font-size:13px; } .r55-pbp-s em{ margin-left:auto; font-style:normal; font-size:12.5px; color:var(--text-dim); } .r55-pbp-s .is-late{ color:var(--danger); }
+.r55-pbp-list{ display:flex; flex-direction:column; gap:4px; }
+.r55-pbp-r{ display:grid; grid-template-columns:28px minmax(0, 1fr) auto; gap:10px; align-items:start; padding:9px 10px; border-radius:11px; background:var(--panel-2); border:1px solid transparent; box-shadow:inset 3px 0 0 var(--pbc); }
+.r55-pbp-r.is-late{ border-color:color-mix(in srgb, var(--danger) 45%, transparent); }
+.r55-pbp-r.is-done{ opacity:.55; } .r55-pbp-r.is-done b{ text-decoration:line-through; }
+.r55-pbp-ck{ width:22px; height:22px; border-radius:7px; border:1.5px solid color-mix(in srgb, var(--pbc) 70%, transparent); background:transparent; color:#fff; cursor:pointer; font-size:12px; display:grid; place-items:center; margin-top:1px; }
+.r55-pbp-r.is-done .r55-pbp-ck{ background:var(--pbc); border-color:var(--pbc); }
+.r55-pbp-t{ display:flex; flex-direction:column; gap:2px; min-width:0; } .r55-pbp-t b{ font-weight:600; } .r55-pbp-t small{ display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-dim); } .r55-pbp-t small i{ width:6px; height:6px; border-radius:50%; background:var(--pbc); }
+.r55-pbp-r.is-late .r55-pbp-t small{ color:var(--danger); }
+.r55-pbp-cl{ display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; } .r55-pbp-cl span{ font-size:11px; padding:2px 8px; border-radius:20px; background:rgba(255,255,255,.05); color:var(--text-dim); }
+.r55-pbp-a{ display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end; }
+.r55-pbp-lk{ border:1px solid var(--border); background:var(--panel); color:var(--text); border-radius:8px; padding:4px 9px; font:600 11.5px var(--font-body); cursor:pointer; } .r55-pbp-lk:hover{ border-color:var(--pbc); } .r55-pbp-lk.is-c{ color:var(--text-dim); }
+.r55-pbp-ev{ font-size:11.5px; color:var(--text-dim); align-self:center; }
+.r55-pbp-f{ display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
+/* the builder */
+.pbx{ display:grid; grid-template-columns:240px minmax(0, 1fr) 300px; gap:16px; align-items:start; }
+.pbx-side{ display:flex; flex-direction:column; gap:14px; position:sticky; top:12px; }
+.pbx-g{ display:flex; flex-direction:column; gap:6px; } .pbx-g > small{ font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); font-weight:700; padding-left:4px; }
+.pbx-pb{ text-align:left; display:flex; flex-direction:column; gap:2px; padding:10px 12px; border-radius:12px; background:var(--panel); border:1px solid var(--border); color:var(--text); cursor:pointer; font:inherit; }
+.pbx-pb:hover{ border-color:var(--border-strong); } .pbx-pb.is-on{ border-color:#8a6cff; box-shadow:0 0 0 1px #8a6cff inset; background:color-mix(in srgb, #8a6cff 8%, var(--panel)); }
+.pbx-pb b{ font-size:13.5px; display:flex; align-items:center; gap:6px; } .pbx-pb span{ font-size:11.5px; color:var(--text-dim); } .pbx-pb em{ font-style:normal; font-size:11px; color:#a98bff; }
+.pbx-star{ font-style:normal; color:#E8A23D; font-size:12px; }
+.pbx-add{ border:1px dashed var(--border-strong); background:transparent; color:var(--text-dim); border-radius:10px; padding:7px 10px; font:600 12px var(--font-body); cursor:pointer; text-align:left; } .pbx-add:hover{ color:var(--text); }
+.pbx-main{ display:flex; flex-direction:column; gap:12px; min-width:0; }
+.pbx-ask{ display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; background:rgba(232,162,61,.1); color:#F3C988; font-size:13px; } .pbx-ask .btn{ margin-left:auto; }
+.pbx-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.pbx-name{ flex:1 1 220px; font-family:var(--font-display); font-size:18px; font-weight:700; }
+.pbx-len{ display:flex; align-items:center; gap:4px; font-size:12px; color:var(--text-dim); }
+.pbx-len button{ border:1px solid var(--border); background:var(--panel); color:var(--text-dim); border-radius:8px; padding:5px 10px; font:600 12px var(--font-body); cursor:pointer; } .pbx-len button.is-on{ color:var(--text); border-color:#8a6cff; }
+.pbx-len input{ width:64px; }
+.pbx-sp{ flex:1; }
+.pbx-del{ border:0; background:none; color:var(--text-faint); font:600 12px var(--font-body); cursor:pointer; } .pbx-del:hover{ color:var(--danger); }
+.pbx-rules{ display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; }
+.pbx-rule{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-dim); } .pbx-rule select{ width:auto; min-width:170px; } .pbx-rule.is-info{ color:#a98bff; }
+.pbx-week{ display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:12px; background:var(--panel); border:1px dashed var(--border); }
+.pbx-week > small{ font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); font-weight:700; white-space:nowrap; }
+.pbx-week > div{ display:flex; flex-wrap:wrap; gap:6px; }
+.pbx-week.is-over{ border-color:#8a6cff; }
+.pbx-wk{ display:inline-flex; align-items:center; gap:4px; } .pbx-wk em{ font-style:normal; font-size:11px; color:var(--text-dim); }
+.pbx-faint{ font-size:12px; color:var(--text-faint); }
+.pbx-cal{ display:grid; grid-template-columns:repeat(var(--cols), minmax(0, 1fr)); gap:6px; }
+.pbx-day{ position:relative; min-height:92px; padding:24px 6px 6px; border-radius:12px; background:var(--panel); border:1px solid var(--border); display:flex; flex-direction:column; gap:4px; transition:border-color .15s, background .15s; }
+.pbx-day.has{ background:color-mix(in srgb, #8a6cff 4%, var(--panel)); }
+.pbx-day.is-over{ border-color:#8a6cff; background:color-mix(in srgb, #8a6cff 12%, var(--panel)); }
+.pbx-dn{ position:absolute; top:6px; left:9px; font-size:11px; font-weight:700; color:var(--text-faint); font-variant-numeric:tabular-nums; }
+.pbx-plus{ position:absolute; top:4px; right:5px; width:20px; height:20px; border-radius:6px; border:0; background:transparent; color:var(--text-faint); cursor:pointer; font-size:15px; line-height:1; opacity:0; transition:opacity .15s; }
+.pbx-day:hover .pbx-plus{ opacity:1; } .pbx-plus:hover{ color:var(--text); background:var(--panel-2); }
+.pbx-chip{ display:flex; align-items:center; gap:5px; width:100%; padding:5px 7px; border-radius:8px; border:0; cursor:grab; text-align:left; font:600 11.5px var(--font-body); color:var(--text);
+  background:color-mix(in srgb, var(--pbc) 16%, transparent); box-shadow:inset 2px 0 0 var(--pbc); }
+.pbx-week .pbx-chip{ width:auto; }
+.pbx-chip i{ font-style:normal; font-size:11px; } .pbx-chip span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .pbx-chip small{ margin-left:auto; font-size:10px; color:var(--text-dim); white-space:nowrap; }
+.pbx-chip.is-on{ box-shadow:inset 2px 0 0 var(--pbc), 0 0 0 1.5px var(--pbc); } .pbx-chip.is-drag{ opacity:.4; }
+.pbx-item{ position:sticky; top:12px; display:flex; flex-direction:column; gap:12px; padding:14px; border-radius:16px; background:var(--panel); border:1px solid var(--border); }
+.pbx-item.is-empty{ background:transparent; border-style:dashed; }
+.pbx-hint{ display:flex; flex-direction:column; gap:6px; } .pbx-hint b{ font-size:14px; } .pbx-hint span{ font-size:12.5px; color:var(--text-dim); line-height:1.45; }
+.pbx-legend{ display:flex; flex-direction:column; gap:6px; margin-top:8px; } .pbx-legend span{ display:flex; align-items:center; gap:8px; font-size:12.5px; } .pbx-legend i{ width:10px; height:10px; border-radius:3px; background:var(--pbc); }
+.pbx-ih{ display:flex; gap:6px; } .pbx-it{ flex:1; font-weight:700; }
+.pbx-x{ border:0; background:none; color:var(--text-faint); cursor:pointer; }
+.pbx-types{ display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.pbx-types button{ display:flex; align-items:center; gap:6px; padding:7px 9px; border-radius:9px; border:1px solid var(--border); background:transparent; color:var(--text-dim); font:600 12px var(--font-body); cursor:pointer; }
+.pbx-types button i{ font-style:normal; } .pbx-types button.is-on{ color:var(--text); border-color:var(--pbc); background:color-mix(in srgb, var(--pbc) 14%, transparent); }
+.pbx-f{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-dim); } .pbx-f > span{ width:44px; } .pbx-f input[type=number]{ width:70px; } .pbx-f select{ width:auto; } .pbx-f em{ font-style:normal; }
+.pbx-sec{ display:flex; flex-direction:column; gap:5px; } .pbx-sec > small{ font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); font-weight:700; }
+.pbx-li, .pbx-lk{ display:flex; gap:5px; } .pbx-li input{ flex:1; } .pbx-lk input:first-child{ width:90px; flex:none; } .pbx-lk input:nth-child(2){ flex:1; min-width:0; }
+.pbx-li button, .pbx-lk button{ border:0; background:none; color:var(--text-faint); cursor:pointer; }
+.pbx-more{ align-self:flex-start; border:0; background:none; color:#a98bff; font:600 12px var(--font-body); cursor:pointer; padding:2px 0; }
+.pbx-if{ display:flex; justify-content:space-between; align-items:center; }
+.pbx-empty{ padding:40px; text-align:center; color:var(--text-dim); }
+@media (max-width:1280px){ .pbx{ grid-template-columns:210px minmax(0, 1fr); } .pbx-item{ grid-column:1 / -1; position:static; } }
+@media (max-width:860px){ .pbx{ grid-template-columns:1fr; } .pbx-side{ position:static; flex-direction:row; flex-wrap:wrap; } .pbx-cal{ grid-template-columns:repeat(4, minmax(0, 1fr)); } }
+.pbx{ grid-template-columns:220px minmax(0, 1fr) 270px; }
+.pbx-chip{ align-items:flex-start; } .pbx-chip span{ white-space:normal; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.25; }
+.pbx-week .pbx-chip span{ -webkit-line-clamp:1; white-space:nowrap; display:block; }
+.pbx-day{ min-height:104px; }
+.pbx-rules .pbx-sp{ flex:1; }
+/* the builder: the calendar gets the width; an item opens in a drawer on the right */
+.pbx{ grid-template-columns:210px minmax(0, 1fr) !important; }
+.pbx-item{ position:fixed !important; top:84px; right:22px; bottom:22px; width:330px; z-index:320; overflow:auto; box-shadow:0 24px 60px rgba(0,0,0,.5); animation:pbxIn .22s ease-out; grid-column:auto !important; }
+@keyframes pbxIn{ from{ opacity:0; transform:translateX(16px); } to{ opacity:1; transform:none; } }
+.pbx.has-item .pbx-main{ padding-right:340px; }
+.pbx-legend{ display:flex !important; flex-direction:row !important; flex-wrap:wrap; gap:6px 14px; align-items:center; margin-top:0 !important; }
+.pbx-legend span{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); } .pbx-legend .pbx-faint{ flex-basis:100%; }
+.pbx-legend i{ width:9px; height:9px; border-radius:3px; background:var(--pbc); }
+@media (max-width:1100px){ .pbx.has-item .pbx-main{ padding-right:0; } .pbx-item{ top:auto; left:16px; right:16px; width:auto; max-height:70vh; } }
+/* ===== R55: client reports, clients' socials ===== */
+.hs.is-r55Report{ width:min(760px, calc(100vw - 32px)) !important; max-width:none !important; }
+.r55-rep-h{ display:flex; align-items:center; gap:10px; margin:12px 0; } .r55-rep-h select{ flex:1; }
+.r55-rep-empty{ padding:34px 16px; text-align:center; color:var(--text-dim); display:flex; align-items:center; justify-content:center; gap:10px; border-radius:14px; background:var(--panel-2); }
+.r55-rep-sec{ display:flex; flex-direction:column; gap:6px; margin-top:10px; } .r55-rep-sec small{ font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); font-weight:700; }
+.r55-rep-sec textarea{ width:100%; font:14px/1.55 var(--font-body); resize:vertical; }
+.r55-rep-sec.is-mine textarea{ background:color-mix(in srgb, #E8A23D 6%, var(--panel-2)); }
+.r55-rep-a{ display:flex; gap:6px; } .r55-rep-f{ display:flex; justify-content:flex-end; margin-top:14px; }
+.r55-opab{ display:flex; gap:6px; margin-left:12px; }
+.r55-opab-b{ border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; border-radius:999px; padding:6px 14px; font:600 12.5px var(--font-body); cursor:pointer; }
+.r55-opab-b:hover{ background:rgba(255,255,255,.12); }
+.r55-cli-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; color:var(--text-dim); font-size:13px; }
+.r55-cli-g{ display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:12px; }
+.r55-cli-c{ padding:14px; border-radius:16px; background:var(--panel); border:1px solid var(--border); border-top:3px solid var(--cc); display:flex; flex-direction:column; gap:10px; }
+.r55-cli-ch{ display:flex; align-items:center; gap:8px; } .r55-cli-ch i{ width:9px; height:9px; border-radius:50%; background:var(--cc); } .r55-cli-ch b{ font-size:15px; margin-right:auto; } .r55-cli-ch select{ width:auto; max-width:190px; }
+.r55-cli-none{ color:var(--text-faint); font-size:13px; padding:6px 0; }
+.r55-cli-as{ display:flex; flex-direction:column; gap:8px; }
+.r55-cli-a{ padding:10px 12px; border-radius:12px; background:var(--panel-2); display:flex; flex-direction:column; gap:8px; }
+.r55-cli-ah{ display:flex; align-items:center; gap:8px; } .r55-cli-ah b{ margin-right:auto; font-size:13.5px; }
+.r55-cli-p{ width:22px; height:22px; border-radius:7px; display:grid; place-items:center; font-weight:800; font-size:12px; color:#fff; } .r55-cli-p.is-instagram{ background:linear-gradient(135deg, #f58529, #dd2a7b, #8134af); } .r55-cli-p.is-facebook{ background:#1877F2; }
+.r55-cli-x{ border:0; background:none; color:var(--text-faint); cursor:pointer; }
+.r55-cli-n{ display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; } .r55-cli-n span{ display:flex; flex-direction:column; } .r55-cli-n b{ font-size:17px; font-family:var(--font-display); } .r55-cli-n small{ font-size:11px; color:var(--text-faint); }
+.r55-cli-best{ display:flex; align-items:center; gap:10px; padding:8px; border-radius:10px; background:var(--panel); color:var(--text); text-decoration:none; }
+.r55-cli-best img{ width:38px; height:38px; border-radius:8px; object-fit:cover; } .r55-cli-best span{ display:flex; flex-direction:column; font-size:12.5px; min-width:0; } .r55-cli-best small{ font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.08em; } .r55-cli-best em{ margin-left:auto; font-style:normal; font-weight:700; }
+.r55-cli-empty{ padding:40px 20px; border-radius:16px; background:var(--panel); border:1px dashed var(--border); display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; } .r55-cli-empty span{ color:var(--text-dim); max-width:520px; font-size:13.5px; }

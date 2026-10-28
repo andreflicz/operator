@@ -9054,6 +9054,139 @@ select.r54-due{ width:auto; }
 .nav-item.r55-sig .nav-icon{ color:#F3C988; text-shadow:0 0 10px rgba(232,162,61,.6); }
 @keyframes r55Sig{ 0%,100%{ opacity:.65; } 50%{ opacity:1; } }
 body.sb-collapsed .nav-item.r55-sig::after{ inset:2px; }
+
+/* ===== R55: Playbooks ===== */
+.r55-banner{ position:fixed; top:18px; left:50%; z-index:99990; display:flex; align-items:center; gap:10px; padding:11px 20px; border-radius:999px; color:#fff; font-size:14px;
+  background:linear-gradient(100deg, #5b4bd6, #8a6cff); box-shadow:0 12px 40px rgba(110,90,255,.45), 0 0 0 1px rgba(255,255,255,.15) inset; transform:translate(-50%, -140%); opacity:0; transition:transform .45s cubic-bezier(.2,1.2,.3,1), opacity .3s; pointer-events:none; }
+.r55-banner.is-in{ transform:translate(-50%, 0); opacity:1; }
+.r55-bn-i{ width:22px; height:22px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.2); font-size:11px; }
+/* playbook tasks */
+.task-card.r55-pbt{ border-left:3px solid var(--pbc); }
+.mt-badge.r55-pbb{ color:var(--pbc); background:color-mix(in srgb, var(--pbc) 16%, transparent); }
+.r55-pbw{ font-size:11.5px; color:var(--text-dim); margin-top:2px; }
+/* the client card strip */
+.r55-pbs{ margin:10px 0 2px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.06); cursor:pointer; }
+.r55-pbs:hover{ background:rgba(255,255,255,.06); }
+.r55-pbs-h{ display:flex; align-items:baseline; gap:8px; } .r55-pbs-h b{ font-size:12.5px; } .r55-pbs-h span{ margin-left:auto; font-size:11.5px; color:var(--text-dim); font-variant-numeric:tabular-nums; }
+.r55-pbs-bar{ display:block; height:4px; border-radius:4px; background:rgba(255,255,255,.07); margin:7px 0; overflow:hidden; } .r55-pbs-bar u{ display:block; height:100%; border-radius:4px; background:linear-gradient(90deg, #7c6cff, #a98bff); }
+.r55-pbs-n{ display:flex; align-items:center; gap:7px; font-size:12.5px; } .r55-pbs-n i{ width:7px; height:7px; border-radius:50%; background:var(--pbc); flex:none; }
+.r55-pbs-n span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .r55-pbs-n small{ margin-left:auto; color:var(--text-dim); white-space:nowrap; } .r55-pbs-n .is-late{ color:var(--danger); font-style:normal; font-weight:700; }
+.r55-pbs-n.is-clear span{ color:var(--good); }
+.r55-pbl{ display:flex; align-items:center; gap:6px; margin-top:6px; font-size:11.5px; color:var(--text-dim); } .r55-pbl i{ width:6px; height:6px; border-radius:50%; background:var(--pbc); } .r55-pbl em{ color:var(--danger); font-style:normal; font-weight:700; }
+/* in a client's / lead's window */
+.r55-pbp{ display:flex; flex-direction:column; gap:10px; }
+.r55-pbp-h{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; } .r55-pbp-h select{ width:auto; min-width:200px; } .r55-pbp-h .btn{ margin-left:auto; }
+.r55-pbp-st{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); } .r55-pbp-st input{ width:auto; }
+.r55-pbp-empty{ padding:14px; border-radius:12px; background:var(--panel-2); color:var(--text-dim); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.r55-pbp-s{ display:flex; align-items:baseline; gap:10px; } .r55-pbp-s b{ font-family:var(--font-display); font-size:17px; } .r55-pbp-s span{ color:var(--text-dim); font-size:13px; } .r55-pbp-s em{ margin-left:auto; font-style:normal; font-size:12.5px; color:var(--text-dim); } .r55-pbp-s .is-late{ color:var(--danger); }
+.r55-pbp-list{ display:flex; flex-direction:column; gap:4px; }
+.r55-pbp-r{ display:grid; grid-template-columns:28px minmax(0, 1fr) auto; gap:10px; align-items:start; padding:9px 10px; border-radius:11px; background:var(--panel-2); border:1px solid transparent; box-shadow:inset 3px 0 0 var(--pbc); }
+.r55-pbp-r.is-late{ border-color:color-mix(in srgb, var(--danger) 45%, transparent); }
+.r55-pbp-r.is-done{ opacity:.55; } .r55-pbp-r.is-done b{ text-decoration:line-through; }
+.r55-pbp-ck{ width:22px; height:22px; border-radius:7px; border:1.5px solid color-mix(in srgb, var(--pbc) 70%, transparent); background:transparent; color:#fff; cursor:pointer; font-size:12px; display:grid; place-items:center; margin-top:1px; }
+.r55-pbp-r.is-done .r55-pbp-ck{ background:var(--pbc); border-color:var(--pbc); }
+.r55-pbp-t{ display:flex; flex-direction:column; gap:2px; min-width:0; } .r55-pbp-t b{ font-weight:600; } .r55-pbp-t small{ display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-dim); } .r55-pbp-t small i{ width:6px; height:6px; border-radius:50%; background:var(--pbc); }
+.r55-pbp-r.is-late .r55-pbp-t small{ color:var(--danger); }
+.r55-pbp-cl{ display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; } .r55-pbp-cl span{ font-size:11px; padding:2px 8px; border-radius:20px; background:rgba(255,255,255,.05); color:var(--text-dim); }
+.r55-pbp-a{ display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end; }
+.r55-pbp-lk{ border:1px solid var(--border); background:var(--panel); color:var(--text); border-radius:8px; padding:4px 9px; font:600 11.5px var(--font-body); cursor:pointer; } .r55-pbp-lk:hover{ border-color:var(--pbc); } .r55-pbp-lk.is-c{ color:var(--text-dim); }
+.r55-pbp-ev{ font-size:11.5px; color:var(--text-dim); align-self:center; }
+.r55-pbp-f{ display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
+/* the builder */
+.pbx{ display:grid; grid-template-columns:240px minmax(0, 1fr) 300px; gap:16px; align-items:start; }
+.pbx-side{ display:flex; flex-direction:column; gap:14px; position:sticky; top:12px; }
+.pbx-g{ display:flex; flex-direction:column; gap:6px; } .pbx-g > small{ font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); font-weight:700; padding-left:4px; }
+.pbx-pb{ text-align:left; display:flex; flex-direction:column; gap:2px; padding:10px 12px; border-radius:12px; background:var(--panel); border:1px solid var(--border); color:var(--text); cursor:pointer; font:inherit; }
+.pbx-pb:hover{ border-color:var(--border-strong); } .pbx-pb.is-on{ border-color:#8a6cff; box-shadow:0 0 0 1px #8a6cff inset; background:color-mix(in srgb, #8a6cff 8%, var(--panel)); }
+.pbx-pb b{ font-size:13.5px; display:flex; align-items:center; gap:6px; } .pbx-pb span{ font-size:11.5px; color:var(--text-dim); } .pbx-pb em{ font-style:normal; font-size:11px; color:#a98bff; }
+.pbx-star{ font-style:normal; color:#E8A23D; font-size:12px; }
+.pbx-add{ border:1px dashed var(--border-strong); background:transparent; color:var(--text-dim); border-radius:10px; padding:7px 10px; font:600 12px var(--font-body); cursor:pointer; text-align:left; } .pbx-add:hover{ color:var(--text); }
+.pbx-main{ display:flex; flex-direction:column; gap:12px; min-width:0; }
+.pbx-ask{ display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; background:rgba(232,162,61,.1); color:#F3C988; font-size:13px; } .pbx-ask .btn{ margin-left:auto; }
+.pbx-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.pbx-name{ flex:1 1 220px; font-family:var(--font-display); font-size:18px; font-weight:700; }
+.pbx-len{ display:flex; align-items:center; gap:4px; font-size:12px; color:var(--text-dim); }
+.pbx-len button{ border:1px solid var(--border); background:var(--panel); color:var(--text-dim); border-radius:8px; padding:5px 10px; font:600 12px var(--font-body); cursor:pointer; } .pbx-len button.is-on{ color:var(--text); border-color:#8a6cff; }
+.pbx-len input{ width:64px; }
+.pbx-sp{ flex:1; }
+.pbx-del{ border:0; background:none; color:var(--text-faint); font:600 12px var(--font-body); cursor:pointer; } .pbx-del:hover{ color:var(--danger); }
+.pbx-rules{ display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; }
+.pbx-rule{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-dim); } .pbx-rule select{ width:auto; min-width:170px; } .pbx-rule.is-info{ color:#a98bff; }
+.pbx-week{ display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:12px; background:var(--panel); border:1px dashed var(--border); }
+.pbx-week > small{ font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); font-weight:700; white-space:nowrap; }
+.pbx-week > div{ display:flex; flex-wrap:wrap; gap:6px; }
+.pbx-week.is-over{ border-color:#8a6cff; }
+.pbx-wk{ display:inline-flex; align-items:center; gap:4px; } .pbx-wk em{ font-style:normal; font-size:11px; color:var(--text-dim); }
+.pbx-faint{ font-size:12px; color:var(--text-faint); }
+.pbx-cal{ display:grid; grid-template-columns:repeat(var(--cols), minmax(0, 1fr)); gap:6px; }
+.pbx-day{ position:relative; min-height:92px; padding:24px 6px 6px; border-radius:12px; background:var(--panel); border:1px solid var(--border); display:flex; flex-direction:column; gap:4px; transition:border-color .15s, background .15s; }
+.pbx-day.has{ background:color-mix(in srgb, #8a6cff 4%, var(--panel)); }
+.pbx-day.is-over{ border-color:#8a6cff; background:color-mix(in srgb, #8a6cff 12%, var(--panel)); }
+.pbx-dn{ position:absolute; top:6px; left:9px; font-size:11px; font-weight:700; color:var(--text-faint); font-variant-numeric:tabular-nums; }
+.pbx-plus{ position:absolute; top:4px; right:5px; width:20px; height:20px; border-radius:6px; border:0; background:transparent; color:var(--text-faint); cursor:pointer; font-size:15px; line-height:1; opacity:0; transition:opacity .15s; }
+.pbx-day:hover .pbx-plus{ opacity:1; } .pbx-plus:hover{ color:var(--text); background:var(--panel-2); }
+.pbx-chip{ display:flex; align-items:center; gap:5px; width:100%; padding:5px 7px; border-radius:8px; border:0; cursor:grab; text-align:left; font:600 11.5px var(--font-body); color:var(--text);
+  background:color-mix(in srgb, var(--pbc) 16%, transparent); box-shadow:inset 2px 0 0 var(--pbc); }
+.pbx-week .pbx-chip{ width:auto; }
+.pbx-chip i{ font-style:normal; font-size:11px; } .pbx-chip span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .pbx-chip small{ margin-left:auto; font-size:10px; color:var(--text-dim); white-space:nowrap; }
+.pbx-chip.is-on{ box-shadow:inset 2px 0 0 var(--pbc), 0 0 0 1.5px var(--pbc); } .pbx-chip.is-drag{ opacity:.4; }
+.pbx-item{ position:sticky; top:12px; display:flex; flex-direction:column; gap:12px; padding:14px; border-radius:16px; background:var(--panel); border:1px solid var(--border); }
+.pbx-item.is-empty{ background:transparent; border-style:dashed; }
+.pbx-hint{ display:flex; flex-direction:column; gap:6px; } .pbx-hint b{ font-size:14px; } .pbx-hint span{ font-size:12.5px; color:var(--text-dim); line-height:1.45; }
+.pbx-legend{ display:flex; flex-direction:column; gap:6px; margin-top:8px; } .pbx-legend span{ display:flex; align-items:center; gap:8px; font-size:12.5px; } .pbx-legend i{ width:10px; height:10px; border-radius:3px; background:var(--pbc); }
+.pbx-ih{ display:flex; gap:6px; } .pbx-it{ flex:1; font-weight:700; }
+.pbx-x{ border:0; background:none; color:var(--text-faint); cursor:pointer; }
+.pbx-types{ display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.pbx-types button{ display:flex; align-items:center; gap:6px; padding:7px 9px; border-radius:9px; border:1px solid var(--border); background:transparent; color:var(--text-dim); font:600 12px var(--font-body); cursor:pointer; }
+.pbx-types button i{ font-style:normal; } .pbx-types button.is-on{ color:var(--text); border-color:var(--pbc); background:color-mix(in srgb, var(--pbc) 14%, transparent); }
+.pbx-f{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-dim); } .pbx-f > span{ width:44px; } .pbx-f input[type=number]{ width:70px; } .pbx-f select{ width:auto; } .pbx-f em{ font-style:normal; }
+.pbx-sec{ display:flex; flex-direction:column; gap:5px; } .pbx-sec > small{ font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); font-weight:700; }
+.pbx-li, .pbx-lk{ display:flex; gap:5px; } .pbx-li input{ flex:1; } .pbx-lk input:first-child{ width:90px; flex:none; } .pbx-lk input:nth-child(2){ flex:1; min-width:0; }
+.pbx-li button, .pbx-lk button{ border:0; background:none; color:var(--text-faint); cursor:pointer; }
+.pbx-more{ align-self:flex-start; border:0; background:none; color:#a98bff; font:600 12px var(--font-body); cursor:pointer; padding:2px 0; }
+.pbx-if{ display:flex; justify-content:space-between; align-items:center; }
+.pbx-empty{ padding:40px; text-align:center; color:var(--text-dim); }
+@media (max-width:1280px){ .pbx{ grid-template-columns:210px minmax(0, 1fr); } .pbx-item{ grid-column:1 / -1; position:static; } }
+@media (max-width:860px){ .pbx{ grid-template-columns:1fr; } .pbx-side{ position:static; flex-direction:row; flex-wrap:wrap; } .pbx-cal{ grid-template-columns:repeat(4, minmax(0, 1fr)); } }
+.pbx{ grid-template-columns:220px minmax(0, 1fr) 270px; }
+.pbx-chip{ align-items:flex-start; } .pbx-chip span{ white-space:normal; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.25; }
+.pbx-week .pbx-chip span{ -webkit-line-clamp:1; white-space:nowrap; display:block; }
+.pbx-day{ min-height:104px; }
+.pbx-rules .pbx-sp{ flex:1; }
+/* the builder: the calendar gets the width; an item opens in a drawer on the right */
+.pbx{ grid-template-columns:210px minmax(0, 1fr) !important; }
+.pbx-item{ position:fixed !important; top:84px; right:22px; bottom:22px; width:330px; z-index:320; overflow:auto; box-shadow:0 24px 60px rgba(0,0,0,.5); animation:pbxIn .22s ease-out; grid-column:auto !important; }
+@keyframes pbxIn{ from{ opacity:0; transform:translateX(16px); } to{ opacity:1; transform:none; } }
+.pbx.has-item .pbx-main{ padding-right:340px; }
+.pbx-legend{ display:flex !important; flex-direction:row !important; flex-wrap:wrap; gap:6px 14px; align-items:center; margin-top:0 !important; }
+.pbx-legend span{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); } .pbx-legend .pbx-faint{ flex-basis:100%; }
+.pbx-legend i{ width:9px; height:9px; border-radius:3px; background:var(--pbc); }
+@media (max-width:1100px){ .pbx.has-item .pbx-main{ padding-right:0; } .pbx-item{ top:auto; left:16px; right:16px; width:auto; max-height:70vh; } }
+/* ===== R55: client reports, clients' socials ===== */
+.hs.is-r55Report{ width:min(760px, calc(100vw - 32px)) !important; max-width:none !important; }
+.r55-rep-h{ display:flex; align-items:center; gap:10px; margin:12px 0; } .r55-rep-h select{ flex:1; }
+.r55-rep-empty{ padding:34px 16px; text-align:center; color:var(--text-dim); display:flex; align-items:center; justify-content:center; gap:10px; border-radius:14px; background:var(--panel-2); }
+.r55-rep-sec{ display:flex; flex-direction:column; gap:6px; margin-top:10px; } .r55-rep-sec small{ font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); font-weight:700; }
+.r55-rep-sec textarea{ width:100%; font:14px/1.55 var(--font-body); resize:vertical; }
+.r55-rep-sec.is-mine textarea{ background:color-mix(in srgb, #E8A23D 6%, var(--panel-2)); }
+.r55-rep-a{ display:flex; gap:6px; } .r55-rep-f{ display:flex; justify-content:flex-end; margin-top:14px; }
+.r55-opab{ display:flex; gap:6px; margin-left:12px; }
+.r55-opab-b{ border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; border-radius:999px; padding:6px 14px; font:600 12.5px var(--font-body); cursor:pointer; }
+.r55-opab-b:hover{ background:rgba(255,255,255,.12); }
+.r55-cli-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; color:var(--text-dim); font-size:13px; }
+.r55-cli-g{ display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:12px; }
+.r55-cli-c{ padding:14px; border-radius:16px; background:var(--panel); border:1px solid var(--border); border-top:3px solid var(--cc); display:flex; flex-direction:column; gap:10px; }
+.r55-cli-ch{ display:flex; align-items:center; gap:8px; } .r55-cli-ch i{ width:9px; height:9px; border-radius:50%; background:var(--cc); } .r55-cli-ch b{ font-size:15px; margin-right:auto; } .r55-cli-ch select{ width:auto; max-width:190px; }
+.r55-cli-none{ color:var(--text-faint); font-size:13px; padding:6px 0; }
+.r55-cli-as{ display:flex; flex-direction:column; gap:8px; }
+.r55-cli-a{ padding:10px 12px; border-radius:12px; background:var(--panel-2); display:flex; flex-direction:column; gap:8px; }
+.r55-cli-ah{ display:flex; align-items:center; gap:8px; } .r55-cli-ah b{ margin-right:auto; font-size:13.5px; }
+.r55-cli-p{ width:22px; height:22px; border-radius:7px; display:grid; place-items:center; font-weight:800; font-size:12px; color:#fff; } .r55-cli-p.is-instagram{ background:linear-gradient(135deg, #f58529, #dd2a7b, #8134af); } .r55-cli-p.is-facebook{ background:#1877F2; }
+.r55-cli-x{ border:0; background:none; color:var(--text-faint); cursor:pointer; }
+.r55-cli-n{ display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; } .r55-cli-n span{ display:flex; flex-direction:column; } .r55-cli-n b{ font-size:17px; font-family:var(--font-display); } .r55-cli-n small{ font-size:11px; color:var(--text-faint); }
+.r55-cli-best{ display:flex; align-items:center; gap:10px; padding:8px; border-radius:10px; background:var(--panel); color:var(--text); text-decoration:none; }
+.r55-cli-best img{ width:38px; height:38px; border-radius:8px; object-fit:cover; } .r55-cli-best span{ display:flex; flex-direction:column; font-size:12.5px; min-width:0; } .r55-cli-best small{ font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.08em; } .r55-cli-best em{ margin-left:auto; font-style:normal; font-weight:700; }
+.r55-cli-empty{ padding:40px 20px; border-radius:16px; background:var(--panel); border:1px dashed var(--border); display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; } .r55-cli-empty span{ color:var(--text-dim); max-width:520px; font-size:13.5px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -9251,7 +9384,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793147213046;
+const OP_BUILT = 1793147791215;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -49511,6 +49644,726 @@ function r55JournalCounts(e){
   if(e.capsuleFrom || e.mood==='inspiration' || /^✨ Inspiration/.test(e.title || '') || (typeof isUpdateEntry==='function' && isUpdateEntry(e))) return false;
   return String(e.text || '').trim().split(/\s+/).filter(Boolean).length >= 12;
 }
+// ============ ROUND 55: PLAYBOOKS ============
+// A playbook is a routine you run with a lead or a client, laid out on a calendar of 7, 14, 30 days (or any
+// length). Day 1 is whenever they start, whatever the weekday. Three kinds:
+//  • Lead: from first contact (discovery call → trial shoot → deliver the trial → closing call…). A lead stage
+//    can start one: a lead that moves to that stage starts that playbook.
+//  • Onboarding: once, from the day they sign or pay (onboarding call, get access, intake form, kick-off, first win…).
+//  • Monthly service: runs again every month (a weekly report every Friday, book the monthly call, the call, the report…).
+// Each one says what comes next: a closed lead goes to onboarding, onboarding into monthly service.
+// Every item has a type (with its colour), and can carry a checklist, links (an SOP, a form: Open and Copy) and,
+// for calls, a time you schedule. It's once, every week (on a weekday) or, in one that repeats, every N months.
+// Items become tasks when they're due, tagged with the lead or client, coloured by type, apart from deliverables.
+// Late ones go red, pull that client's health down and show up in notifications. Moving someone by hand shows what
+// gets checked off first; moving back puts it back. A banner says when someone moves.
+const PB_TYPES = {
+  call:{label:'Call', color:'#5B9BFF', icon:'&#128222;'},
+  report:{label:'Report', color:'#A98BFF', icon:'&#128202;'},
+  task:{label:'Task', color:'#4FC3B8', icon:'&#10003;'},
+  access:{label:'Access / info', color:'#E8A23D', icon:'&#128273;'},
+  send:{label:'Send / link', color:'#FF8FB1', icon:'&#128279;'}
+};
+const PB_KINDS = {lead:{label:'Lead', plural:'Leads', who:'lead', start:'first contact'}, onboarding:{label:'Onboarding', plural:'Onboarding', who:'client', start:'the day they sign or pay'}, monthly:{label:'Monthly service', plural:'Monthly service', who:'client', start:'their start date'}};
+const PB_DOW = [['1', 'Mon'], ['2', 'Tue'], ['3', 'Wed'], ['4', 'Thu'], ['5', 'Fri'], ['6', 'Sat'], ['0', 'Sun']];
+function pbAll(){ const cm = crm(); if(!Array.isArray(cm.playbooks)) cm.playbooks = []; return cm.playbooks; }
+function pbById(id){ return pbAll().find(function(p){ return p.id===id; }) || null; }
+function pbItem(title, type, day, extra){ return Object.assign({id:uid(), title:title, type:type || 'task', day:day || 1, repeat:'once', dow:5, every:1, checklist:[], links:[], notes:''}, extra || {}); }
+function pbNew(kind, name){ return {id:uid(), name:name || PB_KINDS[kind].label, kind:kind, days:kind==='lead' ? 14 : 30, next:null, isDefault:false, stage:null, items:[]}; }
+function pbRepeats(p){ return p && p.kind==='monthly'; }
+function pbDefault(kind){ return pbAll().find(function(p){ return p.kind===kind && p.isDefault; }) || null; }
+function pbWho(kind){ return kind==='lead' ? 'lead' : 'client'; }
+// ---- the starting set (and what the old client cycles had) ----
+function pbSeed(){
+  const cm = crm(); if(cm.pbSeeded) return false;
+  const L = pbNew('lead', 'New lead'); L.isDefault = true;
+  L.items = [pbItem('Discovery call', 'call', 1), pbItem('Plan the trial shoot', 'task', 3), pbItem('Trial shoot', 'task', 5), pbItem('Deliver the trial content', 'send', 6), pbItem('Closing call', 'call', 8)];
+  const O = pbNew('onboarding', 'Onboarding'); O.isDefault = true;
+  O.items = [pbItem('Onboarding call', 'call', 1), pbItem('Get access and info', 'access', 1, {checklist:[{id:uid(), t:'Meta Business Manager access'}, {id:uid(), t:'Ad account access'}, {id:uid(), t:'Service area and zip codes'}, {id:uid(), t:'Brand assets and logins'}]}),
+    pbItem('Send the intake form', 'send', 2), pbItem('Kick-off call', 'call', 3), pbItem('Deliver the first win', 'task', 7), pbItem('First monthly report', 'report', 28), pbItem('Month-one review call', 'call', 30)];
+  const M = pbNew('monthly', 'Monthly service'); M.isDefault = true;
+  M.items = [pbItem('Weekly report', 'report', 1, {repeat:'week', dow:5}), pbItem('Book the monthly call', 'task', 24), pbItem('Monthly call', 'call', 28), pbItem('Monthly report', 'report', 30)];
+  O.next = M.id;
+  const list = pbAll(); list.push(L, O, M);
+  // the old client cycles someone was on come over as playbooks, with those clients on them
+  arr(cm.cycles).forEach(function(cy){
+    const on = arr(state.business.clients).filter(function(c){ return c.cycleId===cy.id; });
+    if(!on.length) return;
+    const P = pbNew('onboarding', cy.name || 'Client playbook'); let day = 1;
+    arr(cy.steps).forEach(function(st, si){
+      arr(st.checklist).forEach(function(it){
+        const t = /meeting|call/i.test(it.type || '') ? 'call' : /doc/.test(it.type || '') && /report/i.test(it.text) ? 'report' : /form|link|video/.test(it.type || '') ? 'send' : 'task';
+        P.items.push(pbItem(it.text, t, it.dueDays!=null && it.dueDays!=='' ? Math.min(30, 1 + Number(it.dueDays) + si*3) : Math.min(30, day), it.repeat==='week' ? {repeat:'week', dow:it.dueDow==null ? 5 : Number(it.dueDow), links:it.link ? [{label:'Link', url:it.link}] : []} : {links:it.link ? [{label:'Link', url:it.link}] : []}));
+      });
+      day = Math.min(30, day + 4);
+    });
+    P.next = M.id; list.push(P);
+    on.forEach(function(c){ const s = c.startDate && /^\d{4}-\d{2}-\d{2}$/.test(c.startDate) ? c.startDate : todayStr(); c.pb = {id:P.id, start:s, done:{}, auto:{}, hist:[]}; });
+  });
+  // everyone you already have waits for you to pick (nothing guessed); everyone new starts on the default
+  cm.pbKnown = arr(state.business.clients).map(function(c){ return c.id; }).concat(arr(state.business.pipeline).map(function(l){ return 'L:'+l.id; }));
+  cm.pbPending = {client:arr(state.business.clients).filter(function(c){ return !c.pb && clientStageActive(c.stage); }).map(function(c){ return c.id; }),
+    lead:arr(state.business.pipeline).filter(function(l){ return !l.pb && leadIsOpen(l); }).map(function(l){ return l.id; })};
+  cm.pbSeeded = true;
+  return true;
+}
+// ---- where someone is ----
+function pbMonths(a, n){ const p = a.split('-').map(Number), d = new Date(p[0], p[1] - 1 + n, 1), last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); d.setDate(Math.min(p[2], last)); return todayStr(d); }
+function pbDaysBetween(a, b){ return Math.round((localTs(b, '12:00') - localTs(a, '12:00'))/86400000); }
+function pbCycle(x, p, at){
+  at = at || todayStr();
+  const s = x.pb.start || at;
+  if(!pbRepeats(p)) return {start:s, end:addDays(s, p.days - 1), n:0};
+  if(Number(p.days)===30){ let n = 0; while(pbMonths(s, n + 1) <= at && n < 600) n++; return {start:pbMonths(s, n), end:addDays(pbMonths(s, n + 1), -1), n:n}; }
+  const n = Math.max(0, Math.floor(pbDaysBetween(s, at)/p.days)); const st = addDays(s, n*p.days); return {start:st, end:addDays(st, p.days - 1), n:n};
+}
+function pbOccs(x, p, cyc){
+  const out = [], len = pbDaysBetween(cyc.start, cyc.end) + 1;
+  arr(p.items).forEach(function(it){
+    if(it.repeat==='week'){
+      for(let i = 0; i < len; i++){ const d = addDays(cyc.start, i); if(String(dowOf(d))===String(it.dow)) out.push({it:it, date:d, key:cyc.start+':'+it.id+':'+d}); }
+    } else {
+      if(pbRepeats(p) && Number(it.every) > 1 && cyc.n % Number(it.every)!==0) return;
+      out.push({it:it, date:addDays(cyc.start, Math.max(0, Math.min(len, Number(it.day) || 1) - 1)), key:cyc.start+':'+it.id});
+    }
+  });
+  return out.sort(function(a, b){ return a.date.localeCompare(b.date); });
+}
+function pbState(kind, x){
+  if(!x || !x.pb || !x.pb.id) return null;
+  const p = pbById(x.pb.id); if(!p) return null;
+  x.pb.done = x.pb.done && typeof x.pb.done==='object' ? x.pb.done : {}; x.pb.auto = x.pb.auto || {}; x.pb.hist = arr(x.pb.hist);
+  const today = todayStr(), future = x.pb.start > today, cyc = pbCycle(x, p, future ? x.pb.start : today), occ = pbOccs(x, p, cyc);
+  occ.forEach(function(o){ o.done = !!x.pb.done[o.key]; o.late = !o.done && o.date < today; });
+  const open = occ.filter(function(o){ return !o.done; });
+  return {p:p, cyc:cyc, occ:occ, open:open, next:open[0] || null, day:future ? 0 : pbDaysBetween(cyc.start, today) + 1, future:future, late:occ.filter(function(o){ return o.late; })};
+}
+function pbPeople(){
+  const out = [];
+  arr(state.business.clients).forEach(function(c){ if(c.pb && (clientStageActive(c.stage) || c.stage==='onboarding')) out.push({kind:'client', x:c}); });
+  arr(state.business.pipeline).forEach(function(l){ if(l.pb && leadIsOpen(l)) out.push({kind:'lead', x:l}); });
+  return out;
+}
+// (day 1 for someone you put on a playbook now: their start date if it's still inside the playbook's length, or
+// for a monthly one always their start date (it runs from it); otherwise today)
+function pbDay1(kind, x, p){
+  const today = todayStr(), s = kind==='client' ? x.startDate : (x.createdAt || null);
+  if(!s || !/^\d{4}-\d{2}-\d{2}$/.test(s) || s > today) return today;
+  if(pbRepeats(p)) return s;
+  return pbDaysBetween(s, today) < p.days ? s : today;
+}
+function pbName(kind, x){ return kind==='client' ? (x.business || x.name || 'Client') : crmName('lead', x); }
+function pbStart(kind, x, pbId, start, quiet){
+  const p = pbById(pbId); if(!p) return;
+  if(x.pb && x.pb.id) x.pb.hist = arr(x.pb.hist).concat([{id:x.pb.id, start:x.pb.start, done:x.pb.done, auto:x.pb.auto}]).slice(-6);
+  x.pb = {id:p.id, start:start || todayStr(), done:{}, auto:{}, hist:x.pb ? arr(x.pb.hist) : []};
+  if(typeof crmTimeline==='function') crmTimeline(x, 'stage', 'Playbook: '+p.name);
+  if(!quiet) r55Banner(pbName(kind, x)+' moved to '+p.name);
+}
+// (they finished it: on to what comes next; a month's service doesn't finish, it starts again)
+function pbAdvance(kind, x, manual){
+  const s = pbState(kind, x); if(!s || pbRepeats(s.p)) return false;
+  const nx = s.p.next ? pbById(s.p.next) : null;
+  if(!nx){ if(!x.pb.finished){ x.pb.finished = todayStr(); if(!manual) r55Banner(pbName(kind, x)+' finished '+s.p.name); } return false; }
+  const end = addDays(s.cyc.end, 1), start = end > todayStr() ? end : todayStr();
+  pbStart(kind, x, nx.id, nx.kind==='monthly' && x.startDate && kind==='client' ? (end > todayStr() ? end : todayStr()) : start);
+  return true;
+}
+// ---- the tasks ----
+function pbTaskTitle(o){ return o.it.title || 'Playbook item'; }
+function pbSync(){
+  if(!state || !state.business || !state.tasks) return false;
+  let ch = false; if(pbSeed()) ch = true;
+  const cm = crm(), today = todayStr(), soon = addDays(today, 3), live = {};
+  cm.pbKnown = arr(cm.pbKnown);
+  // new people start on the default playbook
+  arr(state.business.clients).forEach(function(c){
+    if(cm.pbKnown.indexOf(c.id) >= 0) return; cm.pbKnown.push(c.id); ch = true;
+    if(c.pb) return;
+    const lead = c.fromLeadId ? crmFind('lead', c.fromLeadId) : null; if(lead && lead.pb) lead.pb.ended = today;
+    const d = pbDefault('onboarding'); if(d && (clientStageActive(c.stage) || c.stage==='onboarding')){ pbStart('client', c, d.id, c.startDate || today, true); r55Banner(pbName('client', c)+' started '+d.name); }
+  });
+  arr(state.business.pipeline).forEach(function(l){
+    if(cm.pbKnown.indexOf('L:'+l.id) >= 0) return; cm.pbKnown.push('L:'+l.id); ch = true;
+    if(l.pb || !leadIsOpen(l)) return;
+    const st = pbAll().find(function(p){ return p.kind==='lead' && p.stage && p.stage===l.stage; }) || pbDefault('lead');
+    if(st) pbStart('lead', l, st.id, l.createdAt || today, true);
+  });
+  pbPeople().forEach(function(P){
+    const x = P.x;
+    for(let i = 0; i < 3; i++){ const s = pbState(P.kind, x); if(!s || s.future || pbRepeats(s.p) || s.open.length || x.pb.finished) break; if(!pbAdvance(P.kind, x)) break; ch = true; }
+    const s = pbState(P.kind, x); if(!s) return;
+    s.occ.forEach(function(o){
+      // (a weekly one a week past its day goes on the record as missed)
+      if(!o.done && o.it.repeat==='week' && addDays(o.date, 7) < today){ x.pb.done[o.key] = 'missed'; ch = true; return; }
+      if(o.date > soon) return;
+      const k = P.kind+':'+x.id+':'+o.key; live[k] = 1;
+      let t = state.tasks.items.find(function(t){ return t.master && t.master.kind==='pb' && t.master.k===k; });
+      if(o.done){ if(t && t.status!=='done'){ t.status = 'done'; t.completedAt = today; ch = true; } return; }
+      if(!t){
+        const lines = arr(o.it.checklist).map(function(c){ return '• '+c.t; }).concat(arr(o.it.links).filter(function(l){ return l.url; }).map(function(l){ return (l.label || 'Link')+': '+l.url; }));
+        state.tasks.items.push({id:uid(), title:pbTaskTitle(o), client:P.kind==='client' ? x.id : 'general', clients:P.kind==='client' ? [x.id] : ['general'], priority:o.it.type==='call' ? 'high' : 'med', deadline:o.date, notes:(o.it.notes ? o.it.notes+'\n' : '')+lines.join('\n'),
+          status:o.date <= addDays(today, 1) ? 'today' : 'backlog', createdAt:today, completedAt:null, master:{kind:'pb', k:k, who:P.kind, id:x.id, key:o.key, item:o.it.id, type:o.it.type, pb:s.p.id, pbName:s.p.name}});
+        ch = true;
+      } else {
+        if(t.status==='done' && !x.pb.done[o.key]){ x.pb.done[o.key] = t.completedAt || today; ch = true; }
+        else if(t.status==='backlog' && o.date <= addDays(today, 1)){ t.status = 'today'; ch = true; }
+        if(t.title!==pbTaskTitle(o)){ t.title = pbTaskTitle(o); ch = true; }
+        if(t.deadline!==o.date){ t.deadline = o.date; ch = true; }
+      }
+    });
+  });
+  // open playbook tasks for a cycle or a playbook someone isn't on any more go
+  const before = state.tasks.items.length;
+  state.tasks.items = state.tasks.items.filter(function(t){ return !(t.master && t.master.kind==='pb' && t.status!=='done' && !live[t.master.k]); });
+  if(state.tasks.items.length!==before) ch = true;
+  return ch;
+}
+masterTasksSync = (function(base){
+  return function(){
+    const r = base.apply(this, arguments);
+    if(mt38Busy || !state || !state.tasks || !state.business) return r;
+    mt38Busy = true;
+    try{ if(pbSync()){ persist('tasks'); persist('business'); setTimeout(function(){ try{ renderView(); }catch(e){} }, 0); } }
+    finally { mt38Busy = false; }
+    return r;
+  };
+})(masterTasksSync);
+// done on the task list = done on the playbook (and undone)
+function pbTaskPerson(t){ const m = t && t.master; if(!m || m.kind!=='pb') return null; const x = crmFind(m.who, m.id); return x && x.pb ? {kind:m.who, x:x} : null; }
+completeTask = (function(base){
+  return function(id){
+    const t = state.tasks.items.find(function(x){ return x.id===id; }), P = pbTaskPerson(t);
+    const r = base.apply(this, arguments);
+    if(P) setTimeout(function(){ if(t.status==='done'){ P.x.pb.done[t.master.key] = todayStr(); persist('business'); try{ masterTasksSync(); }catch(e){} } }, 1100);
+    return r;
+  };
+})(completeTask);
+undoTask = (function(base){
+  return function(id){
+    const t = state.tasks.items.find(function(x){ return x.id===id; }), P = pbTaskPerson(t);
+    const r = base.apply(this, arguments);
+    if(P){ delete P.x.pb.done[t.master.key]; persist('business'); }
+    return r;
+  };
+})(undoTask);
+// ---- the old client cycles are gone ----
+if(typeof r54LcSync==='function') r54LcSync = function(){ return false; };
+setTimeout(function(){
+  try{
+    const n = state.tasks.items.length;
+    state.tasks.items = state.tasks.items.filter(function(t){ return !(t.master && (t.master.kind==='lc' || t.master.kind==='lcrep') && t.status!=='done'); });
+    if(state.tasks.items.length!==n) persist('tasks');
+  }catch(e){}
+}, 0);
+if(typeof lcBadgeHtml==='function') lcBadgeHtml = function(){ return ''; };
+
+// ---- late: red, health, notifications ----
+function pbLateFor(kind, id){ return state.tasks.items.filter(function(t){ return t.status!=='done' && t.master && t.master.kind==='pb' && t.master.who===kind && t.master.id===id && t.deadline && t.deadline < todayStr(); }); }
+clientHealthStatus = (function(base){
+  return function(c){
+    const s = base.apply(this, arguments);
+    if(!c || !s) return s;
+    const late = pbLateFor('client', c.id); if(!late.length) return s;
+    const worst = Math.max.apply(null, late.map(function(t){ return daysAgoFrom(t.deadline); }));
+    const lvl = worst >= 3 ? 'red' : 'yellow', rank = {green:0, yellow:1, red:2};
+    if(rank[lvl] > rank[s.level]) return Object.assign({}, s, {level:lvl, pbLate:late.length});
+    return Object.assign({}, s, {pbLate:late.length});
+  };
+})(clientHealthStatus);
+clientHealthLabel = (function(base){ return function(s){ if(s && s.pbLate && s.level!=='green') return 'Playbook late'; return base.apply(this, arguments); }; })(clientHealthLabel);
+notifList = (function(base){
+  return function(){
+    const out = base.apply(this, arguments), today = todayStr(), dis = notifDismissed();
+    state.tasks.items.forEach(function(t){
+      const m = t.master; if(!m || m.kind!=='pb' || t.status==='done' || !t.deadline || t.deadline >= today) return;
+      const x = crmFind(m.who, m.id); if(!x) return;
+      const key = 'pb:'+m.k; if(dis[key]===today) return;
+      out.push({key:key, kind:m.who==='lead' ? 'lead' : 'client', level:'danger', icon:PB_TYPES[m.type] ? PB_TYPES[m.type].icon : '&#9201;', title:pbName(m.who, x)+' · '+t.title, sub:'Playbook · late since '+fmtDateShort(t.deadline), act:{a:'openTaskEditModal', id:t.id}, sort:0});
+    });
+    return out;
+  };
+})(notifList);
+
+// ---- moving someone by hand ----
+function pbMoveNext(kind, id){
+  const x = crmFind(kind, id), s = pbState(kind, x); if(!s) return;
+  const nx = s.p.next ? pbById(s.p.next) : null;
+  const left = s.open, names = left.slice(0, 6).map(function(o){ return o.it.title; });
+  uiConfirm({title:nx ? 'Move '+pbName(kind, x)+' to '+nx.name+'?' : 'Finish '+s.p.name+' for '+pbName(kind, x)+'?',
+    text:left.length ? 'This checks off '+left.length+' thing'+(left.length===1 ? '' : 's')+' still open: '+names.join(', ')+(left.length > 6 ? ' and '+(left.length - 6)+' more' : '')+'.' : 'Everything on it is done.', ok:nx ? 'Move them' : 'Finish it'}).then(function(yes){
+    if(!yes) return;
+    left.forEach(function(o){ x.pb.done[o.key] = todayStr(); x.pb.auto[o.key] = 1; });
+    state.tasks.items.forEach(function(t){ if(t.master && t.master.kind==='pb' && t.master.who===kind && t.master.id===id && t.status!=='done'){ t.status = 'done'; t.completedAt = todayStr(); } });
+    if(nx) pbStart(kind, x, nx.id, todayStr()); else { x.pb.finished = todayStr(); r55Banner(pbName(kind, x)+' finished '+s.p.name); }
+    persist('business'); persist('tasks'); try{ masterTasksSync(); }catch(e){} renderView(); rerenderContactModal();
+  });
+}
+function pbMoveBack(kind, id){
+  const x = crmFind(kind, id); if(!x || !x.pb || !arr(x.pb.hist).length) return;
+  const h = x.pb.hist[x.pb.hist.length - 1], p = pbById(h.id); if(!p) return;
+  uiConfirm({title:'Move '+pbName(kind, x)+' back to '+p.name+'?', text:'What was checked off when they moved on comes back.', ok:'Move back'}).then(function(yes){
+    if(!yes) return;
+    const done = Object.assign({}, h.done); Object.keys(h.auto || {}).forEach(function(k){ delete done[k]; });
+    x.pb = {id:h.id, start:h.start, done:done, auto:{}, hist:x.pb.hist.slice(0, -1)};
+    r55Banner(pbName(kind, x)+' moved back to '+p.name);
+    persist('business'); try{ masterTasksSync(); }catch(e){} renderView(); rerenderContactModal();
+  });
+}
+ACTIONS.pbNext = function(el){ pbMoveNext(el.dataset.kind, el.dataset.id); };
+ACTIONS.pbBack = function(el){ pbMoveBack(el.dataset.kind, el.dataset.id); };
+ACTIONS.pbAssign = function(el){ const x = crmFind(el.dataset.kind, el.dataset.id), p = pbById(el.dataset.pb); if(!x || !p) return; pbStart(el.dataset.kind, x, p.id, pbDay1(el.dataset.kind, x, p)); persist('business'); try{ masterTasksSync(); }catch(e){} renderView(); rerenderContactModal(); };
+ACTIONS.pbTick = function(el){
+  const p = String(el.dataset.id).split('|'), x = crmFind(p[0], p[1]); if(!x || !x.pb) return;
+  const key = p.slice(2).join('|');
+  if(x.pb.done[key]) delete x.pb.done[key]; else x.pb.done[key] = todayStr();
+  state.tasks.items.forEach(function(t){ if(t.master && t.master.kind==='pb' && t.master.who===p[0] && t.master.id===p[1] && t.master.key===key){ t.status = x.pb.done[key] ? 'done' : 'today'; t.completedAt = x.pb.done[key] ? todayStr() : null; } });
+  playTick(); persist('business'); persist('tasks'); try{ masterTasksSync(); }catch(e){} renderView(); rerenderContactModal();
+};
+// a call on a playbook: Schedule puts it on your calendar
+ACTIONS.pbSchedule = function(el){
+  const p = String(el.dataset.id).split('|'), x = crmFind(p[0], p[1]); if(!x) return;
+  const key = p.slice(2).join('|'), s = pbState(p[0], x), o = s && s.occ.find(function(v){ return v.key===key; }); if(!o) return;
+  ui.r55PbSched = {kind:p[0], id:p[1], key:key};
+  openCalEventModal();
+  const set = function(i, v){ const n = document.getElementById(i); if(n) n.value = v; };
+  set('calEventTitle', o.it.title+' · '+pbName(p[0], x)); set('calEventDate', o.date);
+  if(p[0]==='client') set('calEventLinkedClient', x.id);
+  const call = arr(state.calendar.categories).find(function(c){ return c.id==='call'; }); if(call) set('calEventCategory', call.id);
+};
+if(typeof onCalEventSaved==='function') onCalEventSaved = (function(base){
+  return function(ev){
+    const S = ui.r55PbSched;
+    if(S && ev){ const x = crmFind(S.kind, S.id); if(x && x.pb){ x.pb.ev = x.pb.ev || {}; x.pb.ev[S.key] = ev.id; persist('business'); } ui.r55PbSched = null; }
+    return base.apply(this, arguments);
+  };
+})(onCalEventSaved);
+ACTIONS.pbCopy = function(el){ const u = el.dataset.url; if(!u) return; if(!fallbackCopy(u)){ try{ navigator.clipboard.writeText(u); }catch(e){} } showToast('Copied: ready to send', {icon:'&#128203;', duration:1800}); };
+ACTIONS.pbOpen = function(el){ const u = el.dataset.url; if(u) window.open(/^[a-z]+:\/\//i.test(u) ? u : 'https://'+u, '_blank'); };
+// (a lead moving to a stage a playbook starts on)
+setStage = (function(base){
+  return function(kind, id, stageId){
+    const r = base.apply(this, arguments);
+    if(kind==='lead'){ const l = crmFind('lead', id), p = pbAll().find(function(x){ return x.kind==='lead' && x.stage===stageId; }); if(l && p && leadIsOpen(l) && (!l.pb || l.pb.id!==p.id)){ pbStart('lead', l, p.id, todayStr()); persist('business'); try{ masterTasksSync(); }catch(e){} } }
+    return r;
+  };
+})(setStage);
+
+// ---- the banner: someone moved ----
+function r55Banner(text){
+  let b = document.getElementById('r55Banner');
+  if(!b){ b = document.createElement('div'); b.id = 'r55Banner'; b.className = 'r55-banner'; document.body.appendChild(b); }
+  b.innerHTML = '<span class="r55-bn-i">&#10148;</span><b>'+escapeHtml(text)+'</b>';
+  b.classList.remove('is-in'); void b.offsetWidth; b.classList.add('is-in');
+  clearTimeout(r55Banner._t); r55Banner._t = setTimeout(function(){ b.classList.remove('is-in'); }, 4200);
+  if(typeof tone==='function') try{ tone([587, 784], 0.22, 0.12); }catch(e){}
+}
+
+// ---- the cards ----
+taskCard = (function(base){
+  return function(t){
+    let h = base.apply(this, arguments);
+    const m = t && t.master; if(!m || m.kind!=='pb') return h;
+    const ty = PB_TYPES[m.type] || PB_TYPES.task, x = crmFind(m.who, m.id);
+    h = h.replace(/class="task-card(?=[\s"])/, 'class="task-card r55-pbt" style="--pbc:'+ty.color+'"');
+    const tag = '<span class="mt-badge r55-pbb">'+ty.icon+' '+escapeHtml(ty.label)+'</span>';
+    h = /<span class="mt-badge[^"]*"[^>]*>[\s\S]*?<\/span>/.test(h) ? h.replace(/<span class="mt-badge[^"]*"[^>]*>[\s\S]*?<\/span>/, tag) : h.replace(/(<div class="task-card-title">)/, '$1'+tag);
+    if(m.who==='lead' && x) h = h.replace(/(<div class="task-card-title">[\s\S]*?<\/div>)/, '$1<div class="r55-pbw">'+escapeHtml(pbName('lead', x))+' · lead</div>');
+    return h;
+  };
+})(taskCard);
+function pbStripHtml(kind, x){
+  const s = pbState(kind, x); if(!s) return '';
+  const nx = s.next, pct = s.occ.length ? Math.round(s.occ.filter(function(o){ return o.done; }).length/s.occ.length*100) : 0;
+  const when = function(o){ return o.late ? '<em class="is-late">late</em>' : o.date===todayStr() ? 'today' : o.date===addDays(todayStr(), 1) ? 'tomorrow' : pbDaysBetween(todayStr(), o.date) < 7 ? new Date(localTs(o.date, '12:00')).toLocaleDateString(undefined, {weekday:'short'}) : fmtDateShort(o.date); };
+  return '<div class="r55-pbs" data-action="openContact" data-kind="'+kind+'" data-id="'+x.id+'"><div class="r55-pbs-h"><b>'+escapeHtml(s.p.name)+'</b><span>'+(s.future ? 'starts '+fmtDateShort(x.pb.start) : x.pb.finished ? 'done' : s.day > pbDaysBetween(s.cyc.start, s.cyc.end) + 1 ? 'past day '+(pbDaysBetween(s.cyc.start, s.cyc.end) + 1) : 'Day '+s.day)+'</span></div>'+
+    '<i class="r55-pbs-bar"><u style="width:'+pct+'%"></u></i>'+
+    (nx ? '<div class="r55-pbs-n" style="--pbc:'+(PB_TYPES[nx.it.type] || PB_TYPES.task).color+'"><i></i><span>'+escapeHtml(nx.it.title)+'</span><small>'+when(nx)+'</small></div>' : '<div class="r55-pbs-n is-clear"><span>All caught up</span></div>')+'</div>';
+}
+clientCardV2 = (function(base){
+  return function(c){
+    const h = base.apply(this, arguments), st = pbStripHtml('client', c); if(!st) return h;
+    const i = h.lastIndexOf('<div class="cc2-foot'); return i > 0 ? h.slice(0, i)+st+h.slice(i) : h.replace(/<\/div>$/, st+'</div>');
+  };
+})(clientCardV2);
+if(typeof crmCard==='function') crmCard = (function(base){
+  return function(kind, x){
+    const h = base.apply(this, arguments); if(kind!=='lead' || !x || !x.pb) return h;
+    const s = pbState('lead', x); if(!s || !s.next) return h;
+    const ty = PB_TYPES[s.next.it.type] || PB_TYPES.task;
+    return h.replace(/<\/div>\s*$/, '<div class="r55-pbl" style="--pbc:'+ty.color+'"><i></i>'+escapeHtml(s.next.it.title)+(s.next.late ? ' <em>late</em>' : '')+'</div></div>');
+  };
+})(crmCard);
+
+// ---- a client's (or lead's) playbook, in their window ----
+function pbPersonHtml(kind, x){
+  const s = pbState(kind, x), choices = pbAll().filter(function(p){ return kind==='lead' ? p.kind==='lead' : p.kind!=='lead'; });
+  const pick = '<select class="input input-sm" data-pb-assign="'+kind+':'+x.id+'"><option value="">No playbook</option>'+choices.map(function(p){ return '<option value="'+p.id+'"'+(s && s.p.id===p.id ? ' selected' : '')+'>'+escapeHtml(p.name)+'</option>'; }).join('')+'</select>';
+  const start = x.pb ? '<label class="r55-pbp-st"><span>Day 1</span><input class="input input-sm" type="date" data-pb-start="'+kind+':'+x.id+'" value="'+escapeHtml(x.pb.start || '')+'"></label>' : '';
+  const head = '<div class="r55-pbp-h">'+pick+start+'<button class="btn btn-ghost btn-sm" data-action="pbEdit" data-id="'+(s ? s.p.id : '')+'">Edit playbooks</button></div>';
+  if(!s) return '<div class="r55-pbp">'+head+'<div class="r55-pbp-empty">Not on a playbook. '+choices.filter(function(p){ return p.isDefault; }).map(function(p){ return '<button class="btn btn-sm btn-primary" data-action="pbAssign" data-kind="'+kind+'" data-id="'+x.id+'" data-pb="'+p.id+'">Start '+escapeHtml(p.name)+'</button>'; }).join(' ')+'</div></div>';
+  const today = todayStr(), done = s.occ.filter(function(o){ return o.done; }).length;
+  const row = function(o){
+    const ty = PB_TYPES[o.it.type] || PB_TYPES.task, ev = x.pb.ev && x.pb.ev[o.key] ? arr(state.calendar.events).find(function(e){ return e.id===x.pb.ev[o.key]; }) : null;
+    const id = kind+'|'+x.id+'|'+o.key;
+    const links = arr(o.it.links).filter(function(l){ return l.url; }).map(function(l){ return '<button class="r55-pbp-lk" data-action="pbOpen" data-url="'+escapeHtml(l.url)+'">'+escapeHtml(l.label || 'Open')+'</button><button class="r55-pbp-lk is-c" data-action="pbCopy" data-url="'+escapeHtml(l.url)+'" title="Copy to send">Copy</button>'; }).join('');
+    const sched = o.it.type==='call' && !o.done ? (ev ? '<span class="r55-pbp-ev">&#128197; '+fmtDateShort(ev.date)+(ev.time ? ' '+fmt12Hour(ev.time) : '')+'</span>' : '<button class="r55-pbp-lk" data-action="pbSchedule" data-id="'+escapeHtml(id)+'">Schedule</button>') : '';
+    const list = arr(o.it.checklist).length ? '<div class="r55-pbp-cl">'+o.it.checklist.map(function(c){ return '<span>'+escapeHtml(c.t)+'</span>'; }).join('')+'</div>' : '';
+    return '<div class="r55-pbp-r'+(o.done ? ' is-done' : o.late ? ' is-late' : '')+'" style="--pbc:'+ty.color+'">'+
+      '<button class="r55-pbp-ck" data-action="pbTick" data-id="'+escapeHtml(id)+'">'+(o.done ? '&#10003;' : '')+'</button>'+
+      '<span class="r55-pbp-t"><b>'+escapeHtml(o.it.title)+'</b><small><i></i>'+ty.label+' · '+(o.done ? (x.pb.done[o.key]==='missed' ? 'missed' : 'done') : o.late ? 'late since '+fmtDateShort(o.date) : o.date===today ? 'today' : fmtDateShort(o.date))+'</small>'+list+'</span>'+
+      '<span class="r55-pbp-a">'+sched+links+'</span></div>';
+  };
+  const nx = s.p.next ? pbById(s.p.next) : null;
+  return '<div class="r55-pbp">'+head+
+    '<div class="r55-pbp-s"><b>'+escapeHtml(s.p.name)+'</b><span>'+(s.future ? 'Starts '+fmtDateShort(x.pb.start) : x.pb.finished ? 'Finished' : s.day > pbDaysBetween(s.cyc.start, s.cyc.end) + 1 ? 'Ended '+fmtDateShort(s.cyc.end)+(s.open.length ? ' · still open' : '') : 'Day '+s.day+' of '+(pbDaysBetween(s.cyc.start, s.cyc.end) + 1))+(pbRepeats(s.p) ? ' · month '+(s.cyc.n + 1) : '')+'</span><em>'+done+'/'+s.occ.length+' done'+(s.late.length ? ' · <b class="is-late">'+s.late.length+' late</b>' : '')+'</em></div>'+
+    '<i class="r55-pbs-bar"><u style="width:'+(s.occ.length ? Math.round(done/s.occ.length*100) : 0)+'%"></u></i>'+
+    '<div class="r55-pbp-list">'+s.occ.map(row).join('')+'</div>'+
+    '<div class="r55-pbp-f">'+(arr(x.pb.hist).length ? '<button class="btn btn-ghost btn-sm" data-action="pbBack" data-kind="'+kind+'" data-id="'+x.id+'">&larr; Back to '+escapeHtml((pbById(x.pb.hist[x.pb.hist.length - 1].id) || {}).name || 'the last one')+'</button>' : '<span></span>')+
+      (pbRepeats(s.p) ? '' : '<button class="btn btn-sm" data-action="pbNext" data-kind="'+kind+'" data-id="'+x.id+'">'+(nx ? 'Move to '+escapeHtml(nx.name)+' &rarr;' : 'Finish it &#10003;')+'</button>')+'</div></div>';
+}
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.getAttribute) return;
+  if(t.hasAttribute('data-pb-assign')){
+    const p = t.getAttribute('data-pb-assign').split(':'), x = crmFind(p[0], p[1]); if(!x) return;
+    if(!t.value){ if(x.pb) x.pb = null; }
+    else pbStart(p[0], x, t.value, pbDay1(p[0], x, pbById(t.value)));
+    persist('business'); try{ masterTasksSync(); }catch(err){} renderView(); rerenderContactModal();
+  }
+  if(t.hasAttribute('data-pb-start')){
+    const p = t.getAttribute('data-pb-start').split(':'), x = crmFind(p[0], p[1]); if(!x || !x.pb || !/^\d{4}-\d{2}-\d{2}$/.test(t.value)) return;
+    x.pb.start = t.value; if(p[0]==='client' && !x.startDate) x.startDate = t.value;
+    persist('business'); try{ masterTasksSync(); }catch(err){} renderView(); rerenderContactModal();
+  }
+});
+// the client window: "Client cycle" is now "Playbook"
+(function(){ const i = CLIENT_SECTIONS.findIndex(function(s){ return s[0]==='cycle'; }); if(i >= 0) CLIENT_SECTIONS[i] = ['cycle', '&#9776;', 'Playbook']; })();
+renderClientLifecycle = function(c){ return pbPersonHtml('client', c); };
+renderClientModal = (function(base){ return function(){ return base.apply(this, arguments).replace('<div class="cm-h">Client cycle</div>', '<div class="cm-h">Playbook</div>'); }; })(renderClientModal);
+renderContact = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), l = crmFind('lead', ui.contactLeadId); if(!l || !leadIsOpen(l)) return h;
+    return h.replace('<div class="kind-label">Details</div>', '<div class="kind-label">Playbook</div>'+pbPersonHtml('lead', l)+'<div class="kind-label">Details</div>');
+  };
+})(renderContact);
+
+// ============ THE PLAYBOOK BUILDER (Business → Playbooks) ============
+// Your playbooks down the side, grouped by kind, in the order they lead into each other. Pick one: its calendar,
+// day 1 to the last day, with every item on its day (drag one to another day; + on a day adds one). Weekly items
+// sit in their own row, on their weekday. Click an item to edit it on the right.
+(function(){ const i = BIZ_PEOPLE.findIndex(function(b){ return b[0]==='lifecycle'; }); if(i >= 0) BIZ_PEOPLE[i] = ['lifecycle', 'Playbooks']; })();
+renderLifecycleTab = function(){ return pbEditorHtml(); };
+function pbSel(){ let p = pbById(ui.pbSel); if(!p){ p = pbAll()[0] || null; ui.pbSel = p ? p.id : null; } return p; }
+function pbChain(){
+  // lead ones first, then each onboarding → what it leads into
+  const all = pbAll(), out = [];
+  ['lead', 'onboarding', 'monthly'].forEach(function(k){ all.filter(function(p){ return p.kind===k; }).forEach(function(p){ out.push(p); }); });
+  return out;
+}
+function pbEditorHtml(){
+  pbSeed();
+  const p = pbSel(), cm = crm();
+  const side = '<aside class="pbx-side">'+['lead', 'onboarding', 'monthly'].map(function(k){
+      const list = pbAll().filter(function(x){ return x.kind===k; });
+      return '<div class="pbx-g"><small>'+PB_KINDS[k].plural+'</small>'+list.map(function(x){
+        const on = pbPeople().filter(function(P){ return P.x.pb.id===x.id; }).length, nx = x.next ? pbById(x.next) : null;
+        return '<button class="pbx-pb'+(p && p.id===x.id ? ' is-on' : '')+'" data-action="pbPick" data-id="'+x.id+'"><b>'+escapeHtml(x.name)+(x.isDefault ? '<i class="pbx-star" title="New '+(k==='lead' ? 'leads' : 'clients')+' start here">&#9733;</i>' : '')+'</b>'+
+          '<span>'+x.days+' days · '+x.items.length+' item'+(x.items.length===1 ? '' : 's')+(on ? ' · '+on+' on it' : '')+'</span>'+(nx ? '<em>then '+escapeHtml(nx.name)+'</em>' : pbRepeats(x) ? '<em>repeats every month</em>' : '')+'</button>';
+      }).join('')+'<button class="pbx-add" data-action="pbNew" data-id="'+k+'">+ '+(k==='lead' ? 'Lead' : k==='onboarding' ? 'Onboarding' : 'Monthly service')+' playbook</button></div>';
+    }).join('')+'</aside>';
+  if(!p) return '<div class="pbx">'+side+'<section class="pbx-main"><div class="pbx-empty">Make your first playbook on the left.</div></section></div>';
+  const others = pbAll().filter(function(x){ return x.id!==p.id; });
+  const pend = cm.pbPending || {}, pc = arr(pend.client).filter(function(id){ const c = crmFind('client', id); return c && !c.pb; }), pl = arr(pend.lead).filter(function(id){ const l = crmFind('lead', id); return l && !l.pb && leadIsOpen(l); });
+  const ask = (pc.length && p.kind!=='lead' ? '<div class="pbx-ask">'+pc.length+' of your current clients aren’t on a playbook yet. <button class="btn btn-sm" data-action="pbPutAll" data-id="client">Put them on '+escapeHtml(p.name)+'</button></div>' : '')+
+    (pl.length && p.kind==='lead' ? '<div class="pbx-ask">'+pl.length+' open lead'+(pl.length===1 ? ' isn’t' : 's aren’t')+' on a playbook yet. <button class="btn btn-sm" data-action="pbPutAll" data-id="lead">Put them on '+escapeHtml(p.name)+'</button></div>' : '');
+  const lens = [7, 14, 30];
+  const head = '<div class="pbx-head">'+
+    '<input class="input pbx-name" data-pb-f="name" value="'+escapeHtml(p.name)+'" maxlength="60">'+
+    '<div class="seg-tabs seg-sm">'+Object.keys(PB_KINDS).map(function(k){ return '<button class="seg-tab'+(p.kind===k ? ' active' : '')+'" data-action="pbKind" data-id="'+k+'">'+PB_KINDS[k].label+'</button>'; }).join('')+'</div>'+
+    '<div class="pbx-len"><span>Length</span>'+lens.map(function(n){ return '<button class="'+(p.days===n ? 'is-on' : '')+'" data-action="pbLen" data-id="'+n+'">'+n+'</button>'; }).join('')+'<input class="input input-sm" type="number" min="1" max="120" data-pb-f="days" value="'+(lens.indexOf(p.days) < 0 ? p.days : '')+'" placeholder="other"><span>days</span></div>'+
+    '</div>'+
+    '<div class="pbx-rules">'+
+      '<label class="pbx-rule"><input type="checkbox" data-pb-f="isDefault"'+(p.isDefault ? ' checked' : '')+'><span>New '+(p.kind==='lead' ? 'leads' : 'clients')+' start here</span></label>'+
+      (pbRepeats(p) ? '<span class="pbx-rule is-info">&#8635; Runs again every month, from each client’s start date</span>' :
+        '<label class="pbx-rule"><span>When it’s done, they move to</span><select class="input input-sm" data-pb-f="next"><option value="">Nothing (it ends)</option>'+others.filter(function(x){ return p.kind==='lead' ? x.kind==='lead' : x.kind!=='lead'; }).map(function(x){ return '<option value="'+x.id+'"'+(p.next===x.id ? ' selected' : '')+'>'+escapeHtml(x.name)+'</option>'; }).join('')+'</select></label>')+
+      (p.kind==='lead' ? '<label class="pbx-rule"><span>Also starts when a lead moves to</span><select class="input input-sm" data-pb-f="stage"><option value="">No stage</option>'+crmStages('lead').filter(function(s){ return s.kind!=='won' && s.kind!=='lost'; }).map(function(s){ return '<option value="'+s.id+'"'+(p.stage===s.id ? ' selected' : '')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select></label>' : '')+
+      '<span class="pbx-sp"></span><button class="pbx-del" data-action="pbDelete" data-id="'+p.id+'" title="Delete this playbook">Delete playbook</button>'+
+    '</div>';
+  const chip = function(it){ const ty = PB_TYPES[it.type] || PB_TYPES.task; return '<button class="pbx-chip'+(ui.pbItem===it.id ? ' is-on' : '')+'" draggable="true" data-pb-drag="'+it.id+'" data-action="pbItemPick" data-id="'+it.id+'" style="--pbc:'+ty.color+'"><i>'+ty.icon+'</i><span>'+escapeHtml(it.title)+'</span>'+(pbRepeats(p) && Number(it.every) > 1 ? '<small>every '+it.every+' mo</small>' : '')+'</button>'; };
+  const weekly = p.items.filter(function(it){ return it.repeat==='week'; });
+  const wrow = '<div class="pbx-week"><small>Every week</small><div>'+(weekly.length ? weekly.map(function(it){ return '<span class="pbx-wk">'+chip(it)+'<em>'+(PB_DOW.find(function(d){ return d[0]===String(it.dow); }) || ['', 'Fri'])[1]+'</em></span>'; }).join('') : '<span class="pbx-faint">Nothing weekly. Set an item to “Every week” to put it here.</span>')+'</div></div>';
+  let cells = '';
+  for(let d = 1; d <= p.days; d++){
+    const here = p.items.filter(function(it){ return it.repeat!=='week' && Math.min(p.days, Number(it.day) || 1)===d; });
+    cells += '<div class="pbx-day'+(here.length ? ' has' : '')+'" data-pb-day="'+d+'"><span class="pbx-dn">'+d+'</span>'+here.map(chip).join('')+'<button class="pbx-plus" data-action="pbAdd" data-id="'+d+'" title="Add on day '+d+'">+</button></div>';
+  }
+  const grid = '<div class="pbx-cal" style="--cols:'+(p.days < 7 ? p.days : 7)+'">'+cells+'</div>';
+  const legend = '<div class="pbx-legend"><span class="pbx-faint">Day 1 is '+PB_KINDS[p.kind].start+'. + on a day adds an item; drag items between days.</span>'+Object.keys(PB_TYPES).map(function(k){ const t = PB_TYPES[k]; return '<span style="--pbc:'+t.color+'"><i></i>'+t.label+'</span>'; }).join('')+'</div>';
+  return '<div class="pbx'+(ui.pbItem ? ' has-item' : '')+'">'+side+'<section class="pbx-main">'+ask+head+legend+wrow+grid+'</section>'+pbItemPanelHtml(p)+'</div>';
+}
+function pbItemPanelHtml(p){
+  const it = p.items.find(function(x){ return x.id===ui.pbItem; });
+  if(!it) return '';
+  const f = function(k){ return 'data-pbi-f="'+k+'"'; };
+  return '<aside class="pbx-item">'+
+    '<div class="pbx-ih"><input class="input pbx-it" '+f('title')+' value="'+escapeHtml(it.title)+'" maxlength="90"><button class="pbx-x" data-action="pbItemClose" title="Done">&#10005;</button></div>'+
+    '<div class="pbx-types">'+Object.keys(PB_TYPES).map(function(k){ const t = PB_TYPES[k]; return '<button class="'+(it.type===k ? 'is-on' : '')+'" style="--pbc:'+t.color+'" data-action="pbItemType" data-id="'+k+'"><i>'+t.icon+'</i>'+t.label+'</button>'; }).join('')+'</div>'+
+    '<div class="pbx-f"><span>When</span><div class="seg-tabs seg-sm"><button class="seg-tab'+(it.repeat!=='week' ? ' active' : '')+'" data-action="pbItemRep" data-id="once">'+(pbRepeats(p) ? 'Once a month' : 'Once')+'</button><button class="seg-tab'+(it.repeat==='week' ? ' active' : '')+'" data-action="pbItemRep" data-id="week">Every week</button></div></div>'+
+    (it.repeat==='week' ? '<div class="pbx-f"><span>On</span><select class="input input-sm" '+f('dow')+'>'+PB_DOW.map(function(d){ return '<option value="'+d[0]+'"'+(String(it.dow)===d[0] ? ' selected' : '')+'>'+d[1]+'</option>'; }).join('')+'</select></div>'
+      : '<div class="pbx-f"><span>Day</span><input class="input input-sm" type="number" min="1" max="'+p.days+'" '+f('day')+' value="'+(Number(it.day) || 1)+'"><em>of '+p.days+'</em></div>'+
+        (pbRepeats(p) ? '<div class="pbx-f"><span>Every</span><select class="input input-sm" '+f('every')+'>'+[1, 2, 3, 6].map(function(n){ return '<option value="'+n+'"'+(Number(it.every || 1)===n ? ' selected' : '')+'>'+(n===1 ? 'month' : n+' months')+'</option>'; }).join('')+'</select></div>' : ''))+
+    '<div class="pbx-sec"><small>Checklist</small>'+arr(it.checklist).map(function(c){ return '<div class="pbx-li"><input class="input input-sm" data-pbi-cl="'+c.id+'" value="'+escapeHtml(c.t)+'"><button data-action="pbClDel" data-id="'+c.id+'">&#10005;</button></div>'; }).join('')+'<div class="pbx-li"><input class="input input-sm" id="pbClNew" placeholder="+ Add a line (Enter)"></div></div>'+
+    '<div class="pbx-sec"><small>Links</small>'+arr(it.links).map(function(l, i){ return '<div class="pbx-lk"><input class="input input-sm" data-pbi-lk="'+i+':label" value="'+escapeHtml(l.label || '')+'" placeholder="Name"><input class="input input-sm" data-pbi-lk="'+i+':url" value="'+escapeHtml(l.url || '')+'" placeholder="https://… (your SOP, a form)"><button data-action="pbLkDel" data-id="'+i+'">&#10005;</button></div>'; }).join('')+'<button class="pbx-more" data-action="pbLkAdd">+ Add a link</button></div>'+
+    '<div class="pbx-sec"><small>Notes</small><textarea class="input input-sm" rows="3" '+f('notes')+' placeholder="How you do it, what to say">'+escapeHtml(it.notes || '')+'</textarea></div>'+
+    '<div class="pbx-if"><button class="pbx-del" data-action="pbItemDel">Delete item</button><button class="btn btn-sm btn-primary" data-action="pbItemClose">Done</button></div>'+
+  '</aside>';
+}
+function pbSave(){ persist('business'); try{ masterTasksSync(); }catch(e){} }
+function pbCur(){ const p = pbSel(); return {p:p, it:p ? p.items.find(function(x){ return x.id===ui.pbItem; }) : null}; }
+ACTIONS.pbPick = function(el, e, id){ ui.pbSel = id; ui.pbItem = null; playTick(); renderView(); };
+ACTIONS.pbEdit = function(el, e, id){ if(typeof closeClientModal==='function' && overlayOpen('clientModalOverlay')) closeClientModal(); if(overlayOpen('contactOverlay')) hideOverlay('contactOverlay'); ui.pbSel = id || ui.pbSel; ui.pbItem = null; ui.view = 'business'; ui.businessTab = 'lifecycle'; renderView(); };
+ACTIONS.pbNew = function(el, e, kind){ const p = pbNew(kind, 'New '+PB_KINDS[kind].label.toLowerCase()+' playbook'); if(!pbDefault(kind)) p.isDefault = true; pbAll().push(p); ui.pbSel = p.id; ui.pbItem = null; pbSave(); renderView(); setTimeout(function(){ const i = document.querySelector('.pbx-name'); if(i){ i.focus(); i.select(); } }, 60); };
+ACTIONS.pbDelete = function(el, e, id){
+  const p = pbById(id); if(!p) return; const on = pbPeople().filter(function(P){ return P.x.pb.id===id; });
+  uiConfirm({title:'Delete '+p.name+'?', text:on.length ? on.length+' '+(on.length===1 ? 'is' : 'are')+' on it: they’ll come off, and its open tasks go.' : 'Nobody’s on it.', ok:'Delete', danger:true}).then(function(yes){
+    if(!yes) return; const cm = crm(); cm.playbooks = pbAll().filter(function(x){ return x.id!==id; }); pbAll().forEach(function(x){ if(x.next===id) x.next = null; });
+    on.forEach(function(P){ P.x.pb = null; }); ui.pbSel = null; pbSave(); renderView();
+  });
+};
+ACTIONS.pbKind = function(el, e, k){ const p = pbSel(); if(!p) return; p.kind = k; if(k==='monthly') p.next = null; if(k==='lead' && p.days===30) p.days = 14; pbSave(); renderView(); };
+ACTIONS.pbLen = function(el, e, n){ const p = pbSel(); if(!p) return; p.days = Number(n); pbSave(); renderView(); };
+ACTIONS.pbAdd = function(el, e, d){ const p = pbSel(); if(!p) return; const it = pbItem('New item', 'task', Number(d)); p.items.push(it); ui.pbItem = it.id; pbSave(); renderView(); setTimeout(function(){ const i = document.querySelector('.pbx-it'); if(i){ i.focus(); i.select(); } }, 60); };
+ACTIONS.pbItemPick = function(el, e, id){ ui.pbItem = ui.pbItem===id ? null : id; renderView(); };
+ACTIONS.pbItemClose = function(){ ui.pbItem = null; renderView(); };
+ACTIONS.pbItemType = function(el, e, k){ const c = pbCur(); if(!c.it) return; c.it.type = k; pbSave(); renderView(); };
+ACTIONS.pbItemRep = function(el, e, k){ const c = pbCur(); if(!c.it) return; c.it.repeat = k==='week' ? 'week' : 'once'; pbSave(); renderView(); };
+ACTIONS.pbItemDel = function(){ const c = pbCur(); if(!c.it) return; c.p.items = c.p.items.filter(function(x){ return x!==c.it; }); ui.pbItem = null; pbSave(); renderView(); };
+ACTIONS.pbClDel = function(el, e, id){ const c = pbCur(); if(!c.it) return; c.it.checklist = arr(c.it.checklist).filter(function(x){ return x.id!==id; }); pbSave(); renderView(); };
+ACTIONS.pbLkAdd = function(){ const c = pbCur(); if(!c.it) return; c.it.links = arr(c.it.links).concat([{label:'', url:''}]); pbSave(); renderView(); };
+ACTIONS.pbLkDel = function(el, e, i){ const c = pbCur(); if(!c.it) return; c.it.links = arr(c.it.links).filter(function(_, j){ return j!==Number(i); }); pbSave(); renderView(); };
+ACTIONS.pbPutAll = function(el, e, kind){
+  const p = pbSel(), cm = crm(); if(!p) return; let n = 0;
+  arr((cm.pbPending || {})[kind]).forEach(function(id){ const x = crmFind(kind, id); if(x && !x.pb && (kind==='client' || leadIsOpen(x))){ pbStart(kind, x, p.id, pbDay1(kind, x, p), true); n++; } });
+  cm.pbPending[kind] = []; pbSave(); renderView(); if(n) r55Banner(n+' '+(kind==='client' ? 'client' : 'lead')+(n===1 ? '' : 's')+' started '+p.name);
+};
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.getAttribute) return;
+  const p = pbSel(); if(!p) return;
+  if(t.hasAttribute('data-pb-f')){
+    const k = t.getAttribute('data-pb-f');
+    if(k==='name') p.name = t.value.trim() || p.name;
+    else if(k==='days'){ const n = Math.max(1, Math.min(120, Math.round(Number(t.value) || 0))); if(n) p.days = n; }
+    else if(k==='isDefault'){ if(t.checked) pbAll().forEach(function(x){ if(x.kind===p.kind) x.isDefault = false; }); p.isDefault = !!t.checked; }
+    else if(k==='next') p.next = t.value || null;
+    else if(k==='stage') p.stage = t.value || null;
+    pbSave(); renderView(); return;
+  }
+  const c = pbCur(); if(!c.it) return;
+  if(t.hasAttribute('data-pbi-f')){
+    const k = t.getAttribute('data-pbi-f');
+    if(k==='title') c.it.title = t.value.trim() || 'Untitled';
+    else if(k==='day') c.it.day = Math.max(1, Math.min(p.days, Math.round(Number(t.value) || 1)));
+    else if(k==='dow') c.it.dow = Number(t.value);
+    else if(k==='every') c.it.every = Number(t.value) || 1;
+    else if(k==='notes') c.it.notes = t.value;
+    pbSave(); renderView(); return;
+  }
+  if(t.hasAttribute('data-pbi-cl')){ const r = arr(c.it.checklist).find(function(x){ return x.id===t.getAttribute('data-pbi-cl'); }); if(r){ r.t = t.value.trim(); if(!r.t) c.it.checklist = c.it.checklist.filter(function(x){ return x!==r; }); pbSave(); renderView(); } return; }
+  if(t.hasAttribute('data-pbi-lk')){ const q = t.getAttribute('data-pbi-lk').split(':'), l = arr(c.it.links)[Number(q[0])]; if(l){ l[q[1]] = t.value.trim(); pbSave(); } return; }
+});
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Enter' || !e.target || e.target.id!=='pbClNew') return;
+  e.preventDefault(); const c = pbCur(), v = e.target.value.trim(); if(!c.it || !v) return;
+  c.it.checklist = arr(c.it.checklist).concat([{id:uid(), t:v}]); pbSave(); renderView();
+  setTimeout(function(){ const i = document.getElementById('pbClNew'); if(i) i.focus(); }, 40);
+});
+// drag an item to another day (or into the weekly row)
+document.addEventListener('dragstart', function(e){ const c = e.target.closest && e.target.closest('[data-pb-drag]'); if(!c) return; e.dataTransfer.setData('text/pb', c.getAttribute('data-pb-drag')); e.dataTransfer.effectAllowed = 'move'; c.classList.add('is-drag'); });
+document.addEventListener('dragend', function(e){ const c = e.target.closest && e.target.closest('[data-pb-drag]'); if(c) c.classList.remove('is-drag'); document.querySelectorAll('.pbx-day.is-over').forEach(function(d){ d.classList.remove('is-over'); }); });
+document.addEventListener('dragover', function(e){ const d = e.target.closest && e.target.closest('.pbx-day, .pbx-week'); if(!d || !Array.from(e.dataTransfer.types || []).includes('text/pb')) return; e.preventDefault(); document.querySelectorAll('.pbx-day.is-over').forEach(function(x){ if(x!==d) x.classList.remove('is-over'); }); d.classList.add('is-over'); });
+document.addEventListener('drop', function(e){
+  const d = e.target.closest && e.target.closest('.pbx-day, .pbx-week'); if(!d) return;
+  const id = e.dataTransfer.getData('text/pb'); if(!id) return; e.preventDefault();
+  const p = pbSel(), it = p && p.items.find(function(x){ return x.id===id; }); if(!it) return;
+  if(d.classList.contains('pbx-week')){ it.repeat = 'week'; } else { it.repeat = 'once'; it.day = Number(d.getAttribute('data-pb-day')) || 1; }
+  pbSave(); playTick(); renderView();
+});
+// ============ ROUND 55: OP WRITES CLIENT REPORTS · YOUR CLIENTS' SOCIALS ============
+// ---- 1. "Write a client report", on Op's screen (and on every report task) ----
+// Op reads everything the app knows about that client for the period: deliverables, shoots, calls and touches,
+// their journal (debriefs included), the playbook, their ads and their socials. You get a version to send (edit it,
+// copy it, save it as a PDF) and private notes for you. Saving files the report in their journal.
+function r55RepFacts(c, days){
+  const to = todayStr(), from = addDays(to, -(days - 1)), L = [];
+  const name = c.business || c.name || 'Client';
+  L.push('Client: '+name+(c.name && c.business ? ' (contact: '+c.name+')' : '')+'. Period: '+fmtDateShort(from)+' to '+fmtDateShort(to)+'.'+(Number(c.mrr) ? ' Retainer: '+money(c.mrr)+'/month.' : ''));
+  arr(c.deliverables).forEach(function(d){
+    const n = arr(d.completedDates).filter(function(x){ return x >= from && x <= to; }).length;
+    if(d.recurring) L.push('Deliverable “'+d.title+'”: '+n+' delivered in the period'+(d.weeklyTarget ? ' (target '+d.weeklyTarget+' a week)' : '')+'.');
+    else if(d.status==='done' || n) L.push('One-off “'+d.title+'”: done.');
+    else if(d.dueDate) L.push('One-off “'+d.title+'”: due '+fmtDateShort(d.dueDate)+'.');
+  });
+  const shoots = arr(state.modes && state.modes.history).filter(function(h){ if(h.type!=='shooting' || h.date < from) return false; const ev = h.eventId ? arr(state.calendar.events).find(function(e){ return e.id===h.eventId; }) : null; return (ev && ev.linkedClient===c.id) || new RegExp(name.split(' ')[0], 'i').test(h.note || ''); });
+  if(shoots.length) L.push('Shoots: '+shoots.length+' ('+shoots.map(function(h){ return fmtDateShort(h.date)+', '+fmtDurationLabel(h.minutes); }).join('; ')+').');
+  const tps = arr(c.touchpoints).filter(function(t){ return t.date >= from; });
+  if(tps.length){ const by = {}; tps.forEach(function(t){ by[t.type] = (by[t.type] || 0) + 1; }); L.push('Contact with them: '+Object.keys(by).map(function(k){ return by[k]+' '+(touchTypeById(k).label || k).toLowerCase(); }).join(', ')+'.'); }
+  const evs = arr(state.calendar.events).filter(function(e){ return e.linkedClient===c.id && e.date >= from && e.date <= addDays(to, 14); });
+  if(evs.length) L.push('On the calendar: '+evs.map(function(e){ return e.title+' ('+fmtDateShort(e.date)+')'; }).join('; ')+'.');
+  const notes = arr(c.journal).filter(function(j){ return (j.date || '') >= from; }).slice(-8);
+  if(notes.length) L.push('Notes from the period:\n'+notes.map(function(j){ return '- '+fmtDateShort(j.date)+': '+String(j.text || '').replace(/\s+/g, ' ').slice(0, 300); }).join('\n'));
+  try{ const s = pbState('client', c); if(s){ const done = s.occ.filter(function(o){ return o.done && o.date >= from; }).map(function(o){ return o.it.title; }), open = s.open.map(function(o){ return o.it.title+(o.late ? ' (late)' : ''); }); L.push('Playbook ('+s.p.name+'): done: '+(done.join(', ') || 'nothing yet')+'; still open: '+(open.join(', ') || 'nothing')+'.'); } }catch(e){}
+  try{ const a = clientAdTotals(c.id); if(a && a.spend) L.push('Ads (last '+a.days+' days): '+adsMoney(a.spend, a.currency)+' spent'+(a.leads ? ', '+a.leads+' leads at '+adsMoney(a.spend/a.leads, a.currency)+' each' : '')+(a.results ? ', '+a.results+' results' : '')+'.'); }catch(e){}
+  try{ const T = r53AllFor(c.id); if(T && T.n && T.spend) L.push('Ads all time: '+adsMoney(T.spend, T.currency || 'USD')+(T.leads ? ', '+T.leads+' leads' : '')+'.'); }catch(e){}
+  try{ r55CliAccounts(c.id).forEach(function(a){ const d = r55CliData(a.id); if(d) L.push('Their '+a.platform+' @'+a.username+': '+(d.followers ? d.followers.toLocaleString()+' followers, ' : '')+d.p30+' posts in 30 days'+(d.views ? ', '+d.views.toLocaleString()+' views' : '')+(d.best ? ', best: “'+d.best.cap.slice(0, 60)+'” ('+(d.best.views || d.best.likes || 0).toLocaleString()+')' : '')+'.'); }); }catch(e){}
+  return L.join('\n');
+}
+function r55RepTemplate(c, days, facts){
+  const name = c.business || c.name;
+  return {client:'Hi '+(c.name || name)+',\n\nHere’s where we are for the last '+(days===7 ? 'week' : days+' days')+':\n\n'+facts.split('\n').slice(1).filter(function(l){ return !/^Notes|^- |Playbook/.test(l); }).map(function(l){ return '• '+l; }).join('\n')+'\n\nNext up: we keep the momentum going. Talk soon.\n',
+    mine:facts};
+}
+async function r55RepWrite(c, days){
+  const facts = r55RepFacts(c, days);
+  if(AI.hasKey===false || typeof aiWrite!=='function') return r55RepTemplate(c, days, facts);
+  const t = await Promise.race([aiWrite('Write a status report for my client '+(c.business || c.name)+', for the '+(days===7 ? 'past week' : 'past '+days+' days')+', from these facts (only these; don’t invent numbers):\n\n'+facts+
+    '\n\nReply with JSON only: {"client": "the report I send them: warm, plain and confident, short paragraphs, what we did, what it got them, what’s next; no internal stuff, nothing late or behind framed as an excuse", "mine": "private notes for me: what went well, what slipped, risks, and the one thing to do next with this client"}', {max:1100}), new Promise(function(r){ setTimeout(r, 30000); })]);
+  const m = /\{[\s\S]*\}/.exec(String(t || '')); let j = null; try{ j = m ? JSON.parse(m[0]) : null; }catch(e){}
+  return j && j.client ? {client:String(j.client), mine:String(j.mine || '')} : r55RepTemplate(c, days, facts);
+}
+function r55RepHtml(){
+  const R = ui.r55Rep || {}, cs = mtActiveClients(), c = R.cid ? crmFind('client', R.cid) : null;
+  const pick = '<select class="input input-sm" data-r55-rep="cid"><option value="">Pick a client</option>'+cs.map(function(x){ return '<option value="'+x.id+'"'+(x.id===R.cid ? ' selected' : '')+'>'+escapeHtml(x.business || x.name)+'</option>'; }).join('')+'</select>';
+  const per = '<div class="seg-tabs seg-sm">'+[[7, 'Week'], [30, 'Month'], [60, '2 months']].map(function(x){ return '<button class="seg-tab'+((R.days || 30)===x[0] ? ' active' : '')+'" data-action="r55RepDays" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>';
+  const body = !c ? '<div class="r55-rep-empty">Pick a client and Op writes it from everything the app knows about them.</div>'
+    : R.busy ? '<div class="r55-rep-empty"><span class="obs-dots"><i></i><i></i><i></i></span> Op is reading '+escapeHtml(c.business || c.name)+'’s '+((R.days || 30)===7 ? 'week' : 'month')+'…</div>'
+    : !R.out ? '<div class="r55-rep-empty"><button class="btn btn-primary" data-action="r55RepGo">&#10024; Write it</button></div>'
+    : '<div class="r55-rep-sec"><small>For '+escapeHtml(c.name || c.business)+'</small><textarea class="input" id="r55RepClient" rows="12">'+escapeHtml(R.out.client)+'</textarea>'+
+        '<div class="r55-rep-a"><button class="btn btn-sm" data-action="r55RepCopy">Copy</button><button class="btn btn-sm" data-action="r55RepPdf">Save as PDF</button><button class="btn btn-sm btn-ghost" data-action="r55RepGo">&#8635; Write it again</button></div></div>'+
+      '<div class="r55-rep-sec is-mine"><small>Just for you</small><textarea class="input" id="r55RepMine" rows="6">'+escapeHtml(R.out.mine)+'</textarea></div>'+
+      '<div class="r55-rep-f"><button class="btn btn-primary" data-action="r55RepSave">'+(R.task ? 'Save to their journal and mark the task done' : 'Save to their journal')+'</button></div>';
+  return '<button class="int-x hs-x" data-action="addSheetClose" title="Close">&#10005;</button>'+
+    '<div class="as-h"><span class="as-ic">&#128196;</span><div><div class="hs-h">Client report</div></div></div>'+
+    '<div class="r55-rep-h">'+pick+per+'</div>'+body;
+}
+function r55RepOpen(cid, task){ ui.r55Rep = {cid:cid || null, days:30, out:null, busy:false, task:task || null}; addSheetOpen('r55Report', r55RepHtml); if(cid) ACTIONS.r55RepGo(); }
+ACTIONS.r55RepDays = function(el, e, n){ const R = ui.r55Rep; if(!R) return; R.days = Number(n); R.out = null; addSheetRefresh('r55Report'); };
+ACTIONS.r55RepGo = function(){
+  const R = ui.r55Rep, c = R && crmFind('client', R.cid); if(!c) return;
+  R.busy = true; R.out = null; addSheetRefresh('r55Report');
+  r55RepWrite(c, R.days || 30).then(function(o){ R.busy = false; R.out = o; addSheetRefresh('r55Report'); }).catch(function(){ R.busy = false; R.out = r55RepTemplate(c, R.days || 30, r55RepFacts(c, R.days || 30)); addSheetRefresh('r55Report'); });
+};
+function r55RepText(id){ const n = document.getElementById(id); return n ? n.value : ''; }
+ACTIONS.r55RepCopy = function(){ const t = r55RepText('r55RepClient'); if(!fallbackCopy(t)){ try{ navigator.clipboard.writeText(t); }catch(e){} } showToast('Copied: ready to send', {icon:'&#128203;'}); };
+ACTIONS.r55RepPdf = function(){
+  const R = ui.r55Rep, c = R && crmFind('client', R.cid); if(!c) return;
+  const t = r55RepText('r55RepClient'), me = state.profile.name || '', f = document.createElement('iframe');
+  f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;'; document.body.appendChild(f);
+  const d = f.contentWindow.document;
+  d.open(); d.write('<!doctype html><html><head><meta charset="utf-8"><title>'+escapeHtml((c.business || c.name)+' · report · '+fmtDateShort(todayStr()))+'</title><style>body{font:15px/1.6 -apple-system,Helvetica,Arial,sans-serif;color:#15171c;margin:56px 64px;} h1{font-size:24px;margin:0 0 4px;} .s{color:#6b7280;margin-bottom:28px;} p{white-space:pre-wrap;margin:0;} .f{margin-top:40px;color:#6b7280;font-size:13px;}</style></head><body>'+
+    '<h1>'+escapeHtml(c.business || c.name)+'</h1><div class="s">Status report · '+escapeHtml(fmtDateShort(addDays(todayStr(), -((R.days || 30) - 1))))+' – '+escapeHtml(fmtDateShort(todayStr()))+'</div><p>'+escapeHtml(t)+'</p>'+(me ? '<div class="f">'+escapeHtml(me)+'</div>' : '')+'</body></html>');
+  d.close();
+  setTimeout(function(){ try{ f.contentWindow.focus(); f.contentWindow.print(); }catch(e){} setTimeout(function(){ f.remove(); }, 60000); }, 300);
+};
+ACTIONS.r55RepSave = function(){
+  const R = ui.r55Rep, c = R && crmFind('client', R.cid); if(!c) return;
+  if(!Array.isArray(c.journal)) c.journal = [];
+  c.journal.push({id:uid(), date:todayStr(), text:'Report ('+((R.days || 30)===7 ? 'week' : (R.days || 30)+' days')+'):\n'+r55RepText('r55RepClient')+(r55RepText('r55RepMine').trim() ? '\n\nMy notes:\n'+r55RepText('r55RepMine') : ''), createdAt:new Date().toISOString(), by:'op', kind:'report'});
+  persist('business');
+  if(R.task){ const t = state.tasks.items.find(function(x){ return x.id===R.task; }); if(t && t.status!=='done') completeTask(t.id); }
+  addSheetClose('r55Report'); playPositive(); showToast('Saved to '+(c.business || c.name)+'’s journal.', {icon:'&#128196;'});
+};
+document.addEventListener('change', function(e){ const t = e.target; if(!t || !t.getAttribute || t.getAttribute('data-r55-rep')!=='cid') return; const R = ui.r55Rep; if(!R) return; R.cid = t.value || null; R.out = null; addSheetRefresh('r55Report'); if(R.cid) ACTIONS.r55RepGo(); });
+ACTIONS.r55Report = function(el, e, id){ r55RepOpen(id || null); };
+// (on Op's screen: the ability, always there)
+opfEl = (function(base){
+  return function(){
+    const el = base.apply(this, arguments);
+    if(el && !el.querySelector('.r55-opab')){ const top = el.querySelector('.opf-top'); if(top) top.insertAdjacentHTML('beforeend', '<div class="r55-opab"><button class="r55-opab-b" data-action="r55Report">&#128196; Write a client report</button></div>'); }
+    return el;
+  };
+})(opfEl);
+// (a report task on a playbook opens it, with the draft already started)
+openTaskEditModal = (function(base){
+  return function(id){
+    const t = state.tasks.items.find(function(x){ return x.id===id; }), m = t && t.master;
+    if(m && m.kind==='pb' && m.type==='report' && m.who==='client' && t.status!=='done'){ r55RepOpen(m.id, t.id); return; }
+    return base.apply(this, arguments);
+  };
+})(openTaskEditModal);
+// Op can do it when you ask ("write JJS's report")
+if(Array.isArray(typeof OP_TOOLS!=='undefined' ? OP_TOOLS : null) && !OP_TOOLS.some(function(t){ return t.name==='client_report'; })){
+  OP_TOOLS.push({name:'client_report', description:'Open a status report for one client, written from everything the app knows (deliverables, shoots, calls, notes, playbook, ads, socials), for him to edit and send.', input_schema:{type:'object', properties:{who:{type:'string', description:'client name'}, days:{type:'number', description:'7, 30 or 60'}}, required:['who']}});
+  opRunTool = (function(base){
+    return function(name, x){
+      if(name==='client_report'){ const h = opFindContact(String((x && x.who) || '')); if(!h || h.kind!=='client') throw new Error('no client matches "'+(x && x.who)+'"'); r55RepOpen(h.x.id); if(x && x.days && ui.r55Rep) ui.r55Rep.days = Number(x.days) || 30; return 'opened the report for '+crmName('client', h.x)+'; Op is drafting it'; }
+      return base.apply(this, arguments);
+    };
+  })(opRunTool);
+}
+
+// ---- 2. Your clients' socials (Social → Clients) ----
+// Every Instagram and Facebook account your Zernio sees: the ones you manage through your Business Manager show up
+// once connected in Zernio (connect with your own Meta login and pick the client's page). Link each to a client:
+// their followers, posts, views and best post show on their card here, and Op uses them in reports.
+function r55CliLinks(){ const c = igCfg(); if(!c.cliLinks || typeof c.cliLinks!=='object') c.cliLinks = {}; return c.cliLinks; }
+function r55CliStore(){ const c = igCfg(); if(!c.cliData || typeof c.cliData!=='object') c.cliData = {}; return c.cliData; }
+function r55CliAccounts(cid){ const L = r55CliLinks(); return arr(ui.r55CliAll || igCfg().cliAll).filter(function(a){ return L[a.id]===cid; }); }
+function r55CliData(id){ return r55CliStore()[id] || null; }
+async function r55CliLoad(force){
+  if(ui.r55CliBusy) return; ui.r55CliBusy = true; ui.r55CliErr = null;
+  try{
+    const list = await znApi('/v1/accounts');
+    const all = arr(list.accounts).filter(function(x){ return /instagram|facebook/i.test(String(x.platform || '')); }).map(function(x){ return {id:x._id, platform:/facebook/i.test(x.platform) ? 'facebook' : 'instagram', username:x.username || x.displayName || x.name || 'account', name:x.displayName || x.name || '', followers:Number(x.followersCount) || 0}; });
+    ui.r55CliAll = all; igCfg().cliAll = all; persist('settings');
+    const L = r55CliLinks(), S = r55CliStore(), to = todayStr(), from = addDays(to, -30);
+    for(const a of all){
+      if(!L[a.id]) continue;
+      const prev = S[a.id]; if(prev && !force && Date.now() - (prev.at || 0) < 6*3600000) continue;
+      let posts = [];
+      try{ const an = await znApi('/v1/analytics?accountId='+encodeURIComponent(a.id)+'&fromDate='+from+'&toDate='+to); posts = arr(an.posts || an.data).map(znPost).filter(function(p){ return p.date; }); }catch(e){}
+      const views = posts.reduce(function(s, p){ return s + (Number(p.views) || 0); }, 0), best = posts.slice().sort(function(x, y){ return (y.views || y.likes || 0) - (x.views || x.likes || 0); })[0] || null;
+      S[a.id] = {at:Date.now(), followers:a.followers, p30:posts.length, views:views, likes:posts.reduce(function(s, p){ return s + (p.likes || 0); }, 0), best:best ? {cap:best.cap || '', views:best.views, likes:best.likes, link:best.link, thumb:best.thumb} : null};
+    }
+    persist('settings');
+  }catch(e){ ui.r55CliErr = String(e && e.message || e); }
+  finally { ui.r55CliBusy = false; if(ui.view==='convos') renderView(); }
+}
+function r55CliHtml(){
+  if(!ui.r55CliAll && !ui.r55CliBusy && !ui.r55CliTried){ ui.r55CliTried = true; ui.r55CliAll = igCfg().cliAll || null; r55CliLoad(false); }
+  const all = arr(ui.r55CliAll), L = r55CliLinks(), cs = mtActiveClients();
+  if(ui.r55CliErr && !all.length) return '<div class="r55-cli-empty"><b>Zernio isn’t answering</b><span>'+escapeHtml(ui.r55CliErr)+'</span><button class="btn btn-sm" data-action="r55CliRefresh">Try again</button></div>';
+  if(!all.length) return '<div class="r55-cli-empty">'+(ui.r55CliBusy ? '<span class="obs-dots"><i></i><i></i><i></i></span> Reading your Zernio accounts…' : '<b>No client accounts in Zernio yet</b><span>In Zernio, connect Instagram or Facebook with your own Meta login and pick your client’s page (your Business Manager gives you access). It shows up here.</span><button class="btn btn-sm" data-action="r55CliRefresh">Check again</button>')+'</div>';
+  const unlinked = all.filter(function(a){ return !L[a.id]; });
+  const sel = function(cid){ return unlinked.length ? '<select class="input input-sm" data-r55-cli="'+cid+'"><option value="">+ Link an account</option>'+unlinked.map(function(a){ return '<option value="'+a.id+'">'+(a.platform==='facebook' ? 'Facebook' : 'Instagram')+' · @'+escapeHtml(a.username)+'</option>'; }).join('')+'</select>' : ''; };
+  const acc = function(a){
+    const d = r55CliData(a.id) || {};
+    return '<div class="r55-cli-a"><div class="r55-cli-ah"><span class="r55-cli-p is-'+a.platform+'">'+(a.platform==='facebook' ? 'f' : '&#9711;')+'</span><b>@'+escapeHtml(a.username)+'</b><button class="r55-cli-x" data-action="r55CliUnlink" data-id="'+a.id+'" title="Unlink">&#10005;</button></div>'+
+      '<div class="r55-cli-n"><span><b>'+((d.followers || a.followers) ? (d.followers || a.followers).toLocaleString() : '–')+'</b><small>followers</small></span><span><b>'+(d.p30!=null ? d.p30 : '–')+'</b><small>posts · 30d</small></span><span><b>'+(d.views ? sxNum(d.views) : '–')+'</b><small>views · 30d</small></span></div>'+
+      (d.best ? '<a class="r55-cli-best"'+(d.best.link ? ' href="'+escapeHtml(d.best.link)+'" target="_blank" rel="noopener"' : '')+'>'+(d.best.thumb ? '<img src="'+escapeHtml(d.best.thumb)+'" alt="" loading="lazy">' : '')+'<span><small>Best this month</small>'+escapeHtml((d.best.cap || 'Post').slice(0, 70))+'</span><em>'+sxNum(d.best.views || d.best.likes || 0)+'</em></a>' : '')+'</div>';
+  };
+  const cards = cs.map(function(c){
+    const mine = all.filter(function(a){ return L[a.id]===c.id; });
+    return '<div class="r55-cli-c" style="--cc:'+clientAccent(c)+'"><div class="r55-cli-ch"><i></i><b>'+escapeHtml(c.business || c.name)+'</b>'+sel(c.id)+'</div>'+(mine.length ? '<div class="r55-cli-as">'+mine.map(acc).join('')+'</div>' : '<div class="r55-cli-none">No account linked.</div>')+'</div>';
+  }).join('');
+  return '<div class="r55-cli-top"><span>'+all.length+' account'+(all.length===1 ? '' : 's')+' in Zernio · '+(all.length - unlinked.length)+' linked</span></div><div class="r55-cli-g">'+cards+'</div>';
+}
+ACTIONS.r55CliRefresh = function(){ ui.r55CliTried = true; r55CliLoad(true); renderView(); };
+ACTIONS.r55CliUnlink = function(el, e, id){ delete r55CliLinks()[id]; persist('settings'); renderView(); };
+document.addEventListener('change', function(e){ const t = e.target; if(!t || !t.getAttribute || !t.hasAttribute('data-r55-cli') || !t.value) return; r55CliLinks()[t.value] = t.getAttribute('data-r55-cli'); persist('settings'); r55CliLoad(true); renderView(); });
+renderConversations = (function(base){
+  return function(){
+    if(ui.socTab==='clients'){
+      const was = ui.socTab; ui.socTab = 'overview';
+      let h; try{ h = base.apply(this, arguments); } finally { ui.socTab = was; }
+      const tpl = document.createElement('template'); tpl.innerHTML = h;
+      const panel = tpl.content.querySelector('.tab-panel.sx'); if(panel){ panel.setAttribute('data-key', 'sx-clients'); panel.innerHTML = r55CliHtml(); }
+      tpl.content.querySelectorAll('.sx-tabs .seg-tab').forEach(function(b){ b.classList.remove('active'); });
+      h = tpl.innerHTML;
+      return h.replace(/(<div class="seg-tabs sx-tabs">[\s\S]*?)(<\/div>)/, '$1<button class="seg-tab active" data-action="socTab" data-id="clients">&#128101; Clients</button>$2').replace(/data-action="igRefreshAll"/, 'data-action="r55CliRefresh"');
+    }
+    return base.apply(this, arguments).replace(/(<div class="seg-tabs sx-tabs">[\s\S]*?)(<\/div>)/, '$1<button class="seg-tab" data-action="socTab" data-id="clients">&#128101; Clients</button>$2');
+  };
+})(renderConversations);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
