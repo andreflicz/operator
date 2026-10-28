@@ -13,7 +13,7 @@ function r55RepFacts(c, days){
     else if(d.status==='done' || n) L.push('One-off “'+d.title+'”: done.');
     else if(d.dueDate) L.push('One-off “'+d.title+'”: due '+fmtDateShort(d.dueDate)+'.');
   });
-  const shoots = arr(state.modes && state.modes.history).filter(function(h){ if(h.type!=='shooting' || h.date < from) return false; const ev = h.eventId ? arr(state.calendar.events).find(function(e){ return e.id===h.eventId; }) : null; return (ev && ev.linkedClient===c.id) || new RegExp(name.split(' ')[0], 'i').test(h.note || ''); });
+  const shoots = arr(state.modes && state.modes.history).filter(function(h){ if(h.type!=='shooting' || h.date < from) return false; const ev = h.eventId ? arr(state.calendar.events).find(function(e){ return e.id===h.eventId; }) : null; return (ev && ev.linkedClient===c.id) || (function(){ const w = String(name.split(' ')[0] || '').toLowerCase(); return !!w && String(h.note || '').toLowerCase().indexOf(w) >= 0; })(); });
   if(shoots.length) L.push('Shoots: '+shoots.length+' ('+shoots.map(function(h){ return fmtDateShort(h.date)+', '+fmtDurationLabel(h.minutes); }).join('; ')+').');
   const tps = arr(c.touchpoints).filter(function(t){ return t.date >= from; });
   if(tps.length){ const by = {}; tps.forEach(function(t){ by[t.type] = (by[t.type] || 0) + 1; }); L.push('Contact with them: '+Object.keys(by).map(function(k){ return by[k]+' '+(touchTypeById(k).label || k).toLowerCase(); }).join(', ')+'.'); }
@@ -50,17 +50,23 @@ function r55RepHtml(){
     : '<div class="r55-rep-sec"><small>For '+escapeHtml(c.name || c.business)+'</small><textarea class="input" id="r55RepClient" rows="12">'+escapeHtml(R.out.client)+'</textarea>'+
         '<div class="r55-rep-a"><button class="btn btn-sm" data-action="r55RepCopy">Copy</button><button class="btn btn-sm" data-action="r55RepPdf">Save as PDF</button><button class="btn btn-sm btn-ghost" data-action="r55RepGo">&#8635; Write it again</button></div></div>'+
       '<div class="r55-rep-sec is-mine"><small>Just for you</small><textarea class="input" id="r55RepMine" rows="6">'+escapeHtml(R.out.mine)+'</textarea></div>'+
-      '<div class="r55-rep-f"><button class="btn btn-primary" data-action="r55RepSave">'+(R.task ? 'Save to their journal and mark the task done' : 'Save to their journal')+'</button></div>';
+      '<div class="r55-rep-f">'+(R.task ? '<button class="btn btn-ghost btn-sm r55-edt" data-action="r55EditTask" data-id="'+R.task+'">Edit the task</button>' : '')+'<button class="btn btn-primary" data-action="r55RepSave">'+(R.task ? 'Save to their journal and mark the task done' : 'Save to their journal')+'</button></div>';
   return '<button class="int-x hs-x" data-action="addSheetClose" title="Close">&#10005;</button>'+
     '<div class="as-h"><span class="as-ic">&#128196;</span><div><div class="hs-h">Client report</div></div></div>'+
     '<div class="r55-rep-h">'+pick+per+'</div>'+body;
 }
-function r55RepOpen(cid, task){ ui.r55Rep = {cid:cid || null, days:30, out:null, busy:false, task:task || null}; addSheetOpen('r55Report', r55RepHtml); if(cid) ACTIONS.r55RepGo(); }
+function r55RepOpen(cid, task, days){ ui.r55Rep = {cid:cid || null, days:[7, 30, 60].indexOf(Number(days)) >= 0 ? Number(days) : 30, out:null, busy:false, task:task || null, seq:0}; addSheetOpen('r55Report', r55RepHtml); if(cid) ACTIONS.r55RepGo(); }
 ACTIONS.r55RepDays = function(el, e, n){ const R = ui.r55Rep; if(!R) return; R.days = Number(n); R.out = null; addSheetRefresh('r55Report'); };
 ACTIONS.r55RepGo = function(){
   const R = ui.r55Rep, c = R && crmFind('client', R.cid); if(!c) return;
+  // (each draft is numbered: one that comes back after you switched client or period is dropped)
+  const seq = R.seq = (R.seq || 0) + 1, cid = R.cid, days = R.days || 30, mine = function(){ return ui.r55Rep===R && R.seq===seq && R.cid===cid && (R.days || 30)===days; };
   R.busy = true; R.out = null; addSheetRefresh('r55Report');
-  r55RepWrite(c, R.days || 30).then(function(o){ R.busy = false; R.out = o; addSheetRefresh('r55Report'); }).catch(function(){ R.busy = false; R.out = r55RepTemplate(c, R.days || 30, r55RepFacts(c, R.days || 30)); addSheetRefresh('r55Report'); });
+  r55RepWrite(c, days).then(function(o){ if(!mine()) return; R.busy = false; R.out = o; addSheetRefresh('r55Report'); }).catch(function(){
+    if(!mine()) return; R.busy = false;
+    try{ R.out = r55RepTemplate(c, days, r55RepFacts(c, days)); }catch(e){ R.out = {client:'Hi '+(c.name || c.business || '')+',\n\n', mine:''}; }
+    addSheetRefresh('r55Report');
+  });
 };
 function r55RepText(id){ const n = document.getElementById(id); return n ? n.value : ''; }
 ACTIONS.r55RepCopy = function(){ const t = r55RepText('r55RepClient'); if(!fallbackCopy(t)){ try{ navigator.clipboard.writeText(t); }catch(e){} } showToast('Copied: ready to send', {icon:'&#128203;'}); };
@@ -96,7 +102,7 @@ opfEl = (function(base){
 openTaskEditModal = (function(base){
   return function(id){
     const t = state.tasks.items.find(function(x){ return x.id===id; }), m = t && t.master;
-    if(m && m.kind==='pb' && m.type==='report' && m.who==='client' && t.status!=='done'){ r55RepOpen(m.id, t.id); return; }
+    if(!ui.r55Raw && m && m.kind==='pb' && m.type==='report' && m.who==='client' && t.status!=='done'){ r55RepOpen(m.id, t.id); return; }
     return base.apply(this, arguments);
   };
 })(openTaskEditModal);
@@ -105,7 +111,7 @@ if(Array.isArray(typeof OP_TOOLS!=='undefined' ? OP_TOOLS : null) && !OP_TOOLS.s
   OP_TOOLS.push({name:'client_report', description:'Open a status report for one client, written from everything the app knows (deliverables, shoots, calls, notes, playbook, ads, socials), for him to edit and send.', input_schema:{type:'object', properties:{who:{type:'string', description:'client name'}, days:{type:'number', description:'7, 30 or 60'}}, required:['who']}});
   opRunTool = (function(base){
     return function(name, x){
-      if(name==='client_report'){ const h = opFindContact(String((x && x.who) || '')); if(!h || h.kind!=='client') throw new Error('no client matches "'+(x && x.who)+'"'); r55RepOpen(h.x.id); if(x && x.days && ui.r55Rep) ui.r55Rep.days = Number(x.days) || 30; return 'opened the report for '+crmName('client', h.x)+'; Op is drafting it'; }
+      if(name==='client_report'){ const h = opFindContact(String((x && x.who) || '')); if(!h || h.kind!=='client') throw new Error('no client matches "'+(x && x.who)+'"'); r55RepOpen(h.x.id, null, x && x.days); return 'opened the report for '+crmName('client', h.x)+'; Op is drafting it'; }
       return base.apply(this, arguments);
     };
   })(opRunTool);
@@ -149,7 +155,7 @@ function r55CliHtml(){
     const d = r55CliData(a.id) || {};
     return '<div class="r55-cli-a"><div class="r55-cli-ah"><span class="r55-cli-p is-'+a.platform+'">'+(a.platform==='facebook' ? 'f' : '&#9711;')+'</span><b>@'+escapeHtml(a.username)+'</b><button class="r55-cli-x" data-action="r55CliUnlink" data-id="'+a.id+'" title="Unlink">&#10005;</button></div>'+
       '<div class="r55-cli-n"><span><b>'+((d.followers || a.followers) ? (d.followers || a.followers).toLocaleString() : '–')+'</b><small>followers</small></span><span><b>'+(d.p30!=null ? d.p30 : '–')+'</b><small>posts · 30d</small></span><span><b>'+(d.views ? sxNum(d.views) : '–')+'</b><small>views · 30d</small></span></div>'+
-      (d.best ? '<a class="r55-cli-best"'+(d.best.link ? ' href="'+escapeHtml(d.best.link)+'" target="_blank" rel="noopener"' : '')+'>'+(d.best.thumb ? '<img src="'+escapeHtml(d.best.thumb)+'" alt="" loading="lazy">' : '')+'<span><small>Best this month</small>'+escapeHtml((d.best.cap || 'Post').slice(0, 70))+'</span><em>'+sxNum(d.best.views || d.best.likes || 0)+'</em></a>' : '')+'</div>';
+      (d.best ? '<a class="r55-cli-best"'+(d.best.link && /^https?:\/\//i.test(String(d.best.link)) ? ' href="'+escapeHtml(d.best.link)+'" target="_blank" rel="noopener"' : '')+'>'+(d.best.thumb ? '<img src="'+escapeHtml(d.best.thumb)+'" alt="" loading="lazy">' : '')+'<span><small>Best this month</small>'+escapeHtml((d.best.cap || 'Post').slice(0, 70))+'</span><em>'+sxNum(d.best.views || d.best.likes || 0)+'</em></a>' : '')+'</div>';
   };
   const cards = cs.map(function(c){
     const mine = all.filter(function(a){ return L[a.id]===c.id; });

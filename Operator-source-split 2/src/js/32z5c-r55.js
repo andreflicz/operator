@@ -38,6 +38,8 @@ rankUpFx = (function(base){
     // the rays and rings come out of the badge itself, wherever it lands on the screen
     const place = function(){ const b = d.querySelector('.rfx-badges'); if(!b) return; const r = b.getBoundingClientRect(); d.style.setProperty('--rx', (r.left + r.width/2)+'px'); d.style.setProperty('--ry', (r.top + r.height/2)+'px'); };
     place(); requestAnimationFrame(place); setTimeout(place, 400); window.addEventListener('resize', place);
+    // (and the listener goes when the moment does)
+    const gone = new MutationObserver(function(){ if(!d.isConnected){ window.removeEventListener('resize', place); gone.disconnect(); } }); gone.observe(document.body, {childList:true});
   };
 })(rankUpFx);
 
@@ -204,7 +206,12 @@ function r55HoldPrep(root){
     if(!el.querySelector('.r55-hold-f')) el.insertAdjacentHTML('afterbegin', '<i class="r55-hold-f"></i>');
   });
 }
-new MutationObserver(function(ms){ for(const m of ms){ for(const n of m.addedNodes){ if(n.nodeType===1){ r55HoldPrep(); return; } } } }).observe(document.body, {childList:true, subtree:true});
+new MutationObserver(function(ms){
+  for(const m of ms){
+    if(m.type==='attributes'){ if(R55_HOLD_ACTS.indexOf(m.target.getAttribute('data-action'))>=0){ r55HoldPrep(); return; } continue; }
+    for(const n of m.addedNodes){ if(n.nodeType===1){ r55HoldPrep(); return; } }
+  }
+}).observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:['data-action']});
 (function(){
   let cur = null;
   const stop = function(tap){ if(!cur) return; clearTimeout(cur.t); cur.el.classList.remove('is-holding'); if(tap && Date.now() - cur.at < 300) showToast('Press and hold to confirm.', {icon:'&#9995;', duration:1800}); cur = null; };
@@ -261,7 +268,7 @@ function r55McHtml(){
   const spent = tx.filter(function(e){ return e.cat!=='move'; }).reduce(function(s, e){ return s + Number(e.amount || 0); }, 0), other = tx.filter(function(e){ return e.cat==='other'; }).length;
   const cents = function(n){ return '$'+Number(n || 0).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); };
   const opt = function(sel){ return EXP_CATS.map(function(c){ return '<option value="'+c.id+'"'+(c.id===sel ? ' selected' : '')+'>'+escapeHtml(c.label)+'</option>'; }).join(''); };
-  const row = function(e){ return '<div class="r55-mc-tx'+(e.cat==='other' ? ' is-q' : '')+'"><span class="r55-mc-n"><b>'+escapeHtml(e.name || 'Expense')+'</b><small>'+fmtDateShort(e.date)+(e.account ? ' · '+escapeHtml(e.account) : '')+'</small></span><span class="r55-mc-a">'+money(Math.abs(Number(e.amount || 0)))+'</span><select class="input input-sm" data-r55-cat="'+e.id+'">'+opt(e.cat)+'</select></div>'; };
+  const row = function(e){ return '<div class="r55-mc-tx'+(e.cat==='other' ? ' is-q' : '')+'"><span class="r55-mc-n"><b>'+escapeHtml(e.name || 'Expense')+'</b><small>'+fmtDateShort(e.date)+(e.account ? ' · '+escapeHtml(e.account) : '')+'</small></span><span class="r55-mc-a">'+cents(Math.abs(Number(e.amount || 0)))+'</span><select class="input input-sm" data-r55-cat="'+e.id+'">'+opt(e.cat)+'</select></div>'; };
   const step = function(n, k, title, sub, body){ const ok = S[k]; return '<section class="r55-mc-s'+(ok ? ' is-ok' : '')+'"><div class="r55-mc-h"><span class="r55-mc-i">'+(ok ? '&#10003;' : n)+'</span><b>'+title+'</b><em>'+sub+'</em><button class="btn btn-sm '+(ok ? 'btn-ghost' : 'btn-primary')+'" data-action="r55McOk" data-id="'+k+'">'+(ok ? 'Reviewed' : 'Looks right')+'</button></div>'+body+'</section>'; };
   return '<button class="int-x hs-x" data-action="addSheetClose" title="Close">&#10005;</button>'+
     '<div class="as-h"><span class="as-ic">&#128181;</span><div><div class="hs-h">Weekly money check-in</div><div class="hs-s">Week of '+fmtDateShort(r55McWeek())+'</div></div></div>'+
@@ -269,7 +276,7 @@ function r55McHtml(){
       '<div class="r55-mc-list">'+(tx.length ? tx.map(row).join('') : '<div class="r44-empty">Nothing came in from your bank this week.</div>')+'</div>')+
     step(2, 'where', 'Where you stand', 'cash, debt, the next 2 weeks',
       '<div class="r55-mc-tiles"><div><small>Cash</small><b>'+(accts.length ? money(cash) : '–')+'</b></div><div><small>Debt</small><b class="is-r">'+money(debt)+'</b></div><div><small>Coming in</small><b class="is-g">+'+money(inSum)+'</b></div><div><small>Going out</small><b>−'+money(outSum)+'</b></div></div>')+
-    '<div class="r55-mc-f">'+(S.spend && S.where ? '<button class="btn btn-primary r55-mc-go" data-action="r55MoneyFinish">Hold to finish · +'+XP_BOOK.personal.money+' XP</button>' : '<span class="r55-mc-wait">Review both to finish</span>')+'</div>';
+    '<div class="r55-mc-f">'+(function(){ const t = state.tasks.items.find(function(x){ return x.master && x.master.kind==='money' && x.status!=='done'; }); return t ? '<button class="btn btn-ghost btn-sm r55-edt" data-action="r55EditTask" data-id="'+t.id+'">Edit the task</button>' : ''; })()+(S.spend && S.where ? '<button class="btn btn-primary r55-mc-go" data-action="r55MoneyFinish">Hold to finish · +'+XP_BOOK.personal.money+' XP</button>' : '<span class="r55-mc-wait">Review both to finish</span>')+'</div>';
 }
 function r55McOpen(){ ui.r55Mc = {spend:false, where:false}; addSheetOpen('r55Money', r55McHtml); }
 ACTIONS.r43MoneyCheckin = function(){ if(r55McDone()){ showToast('Already checked in on your money this week.', {icon:'&#128181;'}); return; } r55McOpen(); };
@@ -314,7 +321,9 @@ completeTask = (function(base){
     return base.apply(this, arguments);
   };
 })(completeTask);
-openTaskEditModal = (function(base){ return function(id){ const t = state.tasks.items.find(function(x){ return x.id===id; }); if(t && t.master && t.master.kind==='money' && t.status!=='done'){ r55McOpen(); return; } return base.apply(this, arguments); }; })(openTaskEditModal);
+// (the task itself can still be edited or deleted: "Edit the task" in the sheet opens the normal editor)
+ACTIONS.r55EditTask = function(el, e, id){ ['r55Money', 'r55Report'].forEach(function(k){ try{ addSheetClose(k); }catch(x){} }); ui.r55Raw = true; try{ openTaskEditModal(id); } finally { ui.r55Raw = false; } };
+openTaskEditModal = (function(base){ return function(id){ const t = state.tasks.items.find(function(x){ return x.id===id; }); if(!ui.r55Raw && t && t.master && t.master.kind==='money' && t.status!=='done'){ r55McOpen(); return; } return base.apply(this, arguments); }; })(openTaskEditModal);
 
 // ---- 11. Something's up: the sidebar says where ----
 // A soft glow on the section that needs you (hover it to see why), gone once it's handled:
@@ -413,17 +422,6 @@ workSetupHtml = (function(base){
     return tpl.innerHTML;
   };
 })(workSetupHtml);
-xpHowOverlay = (function(base){
-  return function(){
-    const r = base.apply(this, arguments);
-    const el = document.getElementById('xpHowContent');
-    if(el){
-      el.querySelectorAll('.xpg-card').forEach(function(c){ const h = c.querySelector('h3'); if(h && /Check-ins with Op/.test(h.textContent)) c.remove(); });
-      el.querySelectorAll('*').forEach(function(n){ if(n.children.length===0 && /answering his check-ins/.test(n.textContent)) n.textContent = n.textContent.replace(/answering his check-ins, how productive you said you were, /, ''); });
-    }
-    return r;
-  };
-})(xpHowOverlay);
 setTimeout(function(){
   try{
     const qi = QUICK_LINK_DEFS.findIndex(function(q){ return q.key==='ghl'; }); if(qi >= 0) QUICK_LINK_DEFS.splice(qi, 1);
@@ -440,3 +438,13 @@ fabContext = (function(base){
     return base.apply(this, arguments);
   };
 })(fabContext);
+// (areas are fixed since round 48 (Work, Health, Personal), so How XP works has no "Change them" button leading nowhere)
+// (How XP works, once it's drawn: no "Check-ins with Op" card, no check-ins in Standing, and no "Change them" for areas, which are fixed since round 48)
+function r55XpHowClean(){
+  const el = document.getElementById('xpHowContent'); if(!el) return;
+  el.querySelectorAll('.xpg-card').forEach(function(c){ const h = c.querySelector('h3'); if(h && /Check-ins with Op/.test(h.textContent)) c.remove(); });
+  el.querySelectorAll('*').forEach(function(n){ if(n.children.length===0 && /answering his check-ins/.test(n.textContent)) n.textContent = n.textContent.replace(/answering his check-ins, how productive you said you were, /, ''); });
+  el.querySelectorAll('[data-action="r43GuideAreas"]').forEach(function(b){ b.remove(); });
+  el.querySelectorAll('.r43-g-p').forEach(function(p){ if(/Rename them|add your own/.test(p.textContent)) p.textContent = 'XP comes from three areas: Work, Health and Personal. A day that touches all of them pays more.'; });
+}
+ACTIONS.openXpHow = (function(base){ return function(){ const r = base.apply(this, arguments); r55XpHowClean(); setTimeout(r55XpHowClean, 0); return r; }; })(ACTIONS.openXpHow);

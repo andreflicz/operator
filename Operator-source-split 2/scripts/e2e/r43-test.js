@@ -57,21 +57,15 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('…and a level above what the XP pays for comes back down', await E("state.profile.xpLevel")===await E("xpSummary().earned"));
 
   // ---- settings ----
-  await E("ui.view='settings'; ui.settingsTab='xp'; renderView()"); await p.waitForTimeout(200);
-  check('Settings has XP & Areas', !!(await p.$('.settings-nav-item.active[data-tab="xp"]')) && !!(await p.$('.r43-areas')));
-  await p.fill('[data-r43-area="work"]', 'Business'); await p.dispatchEvent('[data-r43-area="work"]', 'change'); await p.waitForTimeout(150);
-  check('an area can be renamed', await E("r43AreaName('work')")==='Business');
-  await E("r43AreasRaw().push({id:'afam', name:'Family', on:true, since:'2026-10-25', habits:[{id:'h1', label:'Call mom', days:{}}]}); persist('profile'); renderView()");
-  await E("ACTIONS.r43AreaHabit(null, null, 'afam:h1')");
-  check('an added area earns from its habits', await E("xpLast = null; (xpSummary().todayArea || {}).afam")===30);
-  await E("ACTIONS.r43AreaToggle(null, null, 'afam')");
-  check('turning an area off keeps what it earned', await E("r43AreaOn('afam')")===false && await E("xpLast = null; xpSummary().byArea.afam || 0")===30);
+  await E("ui.view='settings'; ui.settingsTab='you'; renderView()"); await p.waitForTimeout(200);
+  check('Settings → You opens (XP & Areas folded into it)', !!(await p.$('.settings-nav-item.active[data-tab="you"]')));
+  // (custom areas went in round 48: Work, Health, Personal, always on)
   check('bedtime is a setting', !!(await p.$('#r43Bedtime')));
 
   // ---- the guide ----
   await E("ACTIONS.openXpHow()"); await p.waitForTimeout(250);
   const guide = await p.textContent('#xpHowContent');
-  check('the guide is written from the book (the new name, the tables)', /Business/.test(guide) && /Balanced days and streaks/.test(guide) && /204/.test(guide) && /Life milestone/.test(guide), guide.slice(0, 300));
+  check('the guide is written from the book (the new name, the tables)', /Work/.test(guide) && /Balanced days and streaks/.test(guide) && /204/.test(guide) && /Life milestone/.test(guide), guide.slice(0, 300));
   check('…and is general (no pillars, no Discipline rating, no day-off pay)', !/pillar/i.test(guide) && !/Discipline/.test(guide) && !/day off/i.test(guide.replace(/Days off you/,'')));
   await E("ACTIONS.closeXpHow()");
 
@@ -98,6 +92,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // plan ahead (Sunday the 25th: both open)
   await E("ui.r43GoalsMode='plan'; renderView()"); await p.waitForTimeout(200);
   check('plan ahead: next month and next week', (await p.$$('.r43-plan:not(.is-closed)')).length===2);
+  await E("state.goals.items.push({id:'ng1', tier:'month', pk:'2026-11', label:'Sign 2 clients'}); persist('goals'); renderView()"); await p.waitForTimeout(150);   // (round 55: locking a plan in takes a goal)
   await p.fill('#r43PlanLine-month', 'Ahead of the content.');
   const lk = await p.$('.r43-plan[data-kind="month"] .r43-hold'); const lb = await lk.boundingBox();
   const tb = await E("xpLast = null; xpSummary().total");

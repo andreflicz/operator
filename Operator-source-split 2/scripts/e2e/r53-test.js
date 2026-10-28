@@ -25,21 +25,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("masterTasksSync()");
   check('and it does not come right back', await E("!state.tasks.items.some(t => t.master && t.master.kind==='reachLeads' && t.status!=='done')"));
 
-  // 2. lifecycle reports
-  // (round 54: clients go on a cycle first; the reports are that cycle's repeating tasks)
-  await E("(function(){ const cy = r53RegularCycle(), last = cy.steps[cy.steps.length - 1]; last.checklist = last.checklist.filter(it => !/check-in/i.test(it.text)); last.checklist.forEach(it => { if(/monthly/i.test(it.text)) it.repeat = 'month'; }); last.checklist.push({id:'wr', text:'Weekly report', type:'doc', repeat:'week'}); state.business.clients.forEach(c => { assignCycle(c, cy.id); c.cycleStepId = last.id; }); crm().r54Pending = []; })(); masterTasksSync()");
-  const reps = JSON.parse(await E("JSON.stringify(state.tasks.items.filter(t => t.master && t.master.kind==='lcrep').map(t => ({c:t.client, t:t.title, e:t.master.every, d:t.deadline})))"));
-  check('each regular client gets a Weekly report task', ['jj', 'bm'].every(id => reps.some(r => r.c===id && r.e==='week' && /weekly report/i.test(r.t))), reps);
-  check('and a Monthly results report', ['jj', 'bm'].every(id => reps.some(r => r.c===id && r.e==='month')), reps);
-  check('weekly check-ins are not a second task (Reach out to clients covers them)', !reps.some(r => /check-in/i.test(r.t)));
-  const n0 = reps.length; await E("masterTasksSync(); masterTasksSync()");
-  check('syncing again makes no copies', await E("state.tasks.items.filter(t => t.master && t.master.kind==='lcrep').length")===n0);
-  await E("(function(){ const t = state.tasks.items.find(t => t.master && t.master.kind==='lcrep' && t.master.every==='week'); completeTask(t.id); })()"); await p.waitForTimeout(1300); await E("masterTasksSync()");
-  check('a done report stays done this week', await E("state.tasks.items.filter(t => t.master && t.master.kind==='lcrep' && t.master.every==='week' && t.status==='done').length===1 && state.tasks.items.filter(t => t.master && t.master.kind==='lcrep').length===" + n0));
-  await E("ui.view='business'; ui.businessTab='lifecycle'; renderView()"); await p.waitForTimeout(200);
-  const ed = await E("(ui.editingCycleId = r53RegularCycle().id, renderLifecycleEditor())");
-  check('the cycle editor has a repeat picker on each item', /data-cy-item-repeat/.test(ed) && /Every week/.test(ed));
-
+  // 2. lifecycle reports: replaced by Playbooks in round 55 (see r55-test)
   // 4. Business overview
   await E("ui.view='business'; ui.businessTab='overview'; renderView()"); await p.waitForTimeout(300);
   const bz = await p.textContent('#viewRoot');

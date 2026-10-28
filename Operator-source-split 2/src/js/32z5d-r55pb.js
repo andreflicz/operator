@@ -68,17 +68,16 @@ function pbCycle(x, p, at){
   at = at || todayStr();
   const s = x.pb.start || at;
   if(!pbRepeats(p)) return {start:s, end:addDays(s, p.days - 1), n:0};
-  if(Number(p.days)===30){ let n = 0; while(pbMonths(s, n + 1) <= at && n < 600) n++; return {start:pbMonths(s, n), end:addDays(pbMonths(s, n + 1), -1), n:n}; }
-  const n = Math.max(0, Math.floor(pbDaysBetween(s, at)/p.days)); const st = addDays(s, n*p.days); return {start:st, end:addDays(st, p.days - 1), n:n};
+  { let n = 0; while(pbMonths(s, n + 1) <= at && n < 600) n++; return {start:pbMonths(s, n), end:addDays(pbMonths(s, n + 1), -1), n:n}; }
 }
 function pbOccs(x, p, cyc){
-  const out = [], len = pbDaysBetween(cyc.start, cyc.end) + 1;
+  const out = [], len = pbDaysBetween(cyc.start, cyc.end) + 1, pre = (x.pb && x.pb.run ? x.pb.run+'~' : '')+cyc.start;
   arr(p.items).forEach(function(it){
     if(it.repeat==='week'){
-      for(let i = 0; i < len; i++){ const d = addDays(cyc.start, i); if(String(dowOf(d))===String(it.dow)) out.push({it:it, date:d, key:cyc.start+':'+it.id+':'+d}); }
+      for(let i = 0; i < len; i++){ const d = addDays(cyc.start, i); if(String(dowOf(d))===String(it.dow)) out.push({it:it, date:d, key:pre+':'+it.id+':'+d}); }
     } else {
       if(pbRepeats(p) && Number(it.every) > 1 && cyc.n % Number(it.every)!==0) return;
-      out.push({it:it, date:addDays(cyc.start, Math.max(0, Math.min(len, Number(it.day) || 1) - 1)), key:cyc.start+':'+it.id});
+      out.push({it:it, date:addDays(cyc.start, Math.max(0, Math.min(len, Number(it.day) || 1) - 1)), key:pre+':'+it.id});
     }
   });
   return out.sort(function(a, b){ return a.date.localeCompare(b.date); });
@@ -109,8 +108,9 @@ function pbDay1(kind, x, p){
 function pbName(kind, x){ return kind==='client' ? (x.business || x.name || 'Client') : crmName('lead', x); }
 function pbStart(kind, x, pbId, start, quiet){
   const p = pbById(pbId); if(!p) return;
-  if(x.pb && x.pb.id) x.pb.hist = arr(x.pb.hist).concat([{id:x.pb.id, start:x.pb.start, done:x.pb.done, auto:x.pb.auto}]).slice(-6);
-  x.pb = {id:p.id, start:start || todayStr(), done:{}, auto:{}, hist:x.pb ? arr(x.pb.hist) : []};
+  if(x.pb && x.pb.id) x.pb.hist = arr(x.pb.hist).concat([{id:x.pb.id, start:x.pb.start, run:x.pb.run, done:x.pb.done, auto:x.pb.auto}]).slice(-6);
+  // (each time on a playbook is its own run, so going back on one later starts it clean)
+  x.pb = {id:p.id, start:start || todayStr(), run:Date.now().toString(36).slice(-5), done:{}, auto:{}, hist:x.pb ? arr(x.pb.hist) : []};
   if(typeof crmTimeline==='function') crmTimeline(x, 'stage', 'Playbook: '+p.name);
   if(!quiet) r55Banner(pbName(kind, x)+' moved to '+p.name);
 }
@@ -135,18 +135,25 @@ function pbSync(){
     if(cm.pbKnown.indexOf(c.id) >= 0) return; cm.pbKnown.push(c.id); ch = true;
     if(c.pb) return;
     const lead = c.fromLeadId ? crmFind('lead', c.fromLeadId) : null; if(lead && lead.pb) lead.pb.ended = today;
-    const d = pbDefault('onboarding'); if(d && (clientStageActive(c.stage) || c.stage==='onboarding')){ pbStart('client', c, d.id, c.startDate || today, true); r55Banner(pbName('client', c)+' started '+d.name); }
+    const d = pbDefault('onboarding'); if(d && (clientStageActive(c.stage) || c.stage==='onboarding')){ pbStart('client', c, d.id, pbDay1('client', c, d), true); r55Banner(pbName('client', c)+' started '+d.name); }
   });
   arr(state.business.pipeline).forEach(function(l){
     if(cm.pbKnown.indexOf('L:'+l.id) >= 0) return; cm.pbKnown.push('L:'+l.id); ch = true;
     if(l.pb || !leadIsOpen(l)) return;
     const st = pbAll().find(function(p){ return p.kind==='lead' && p.stage && p.stage===l.stage; }) || pbDefault('lead');
-    if(st) pbStart('lead', l, st.id, l.createdAt || today, true);
+    if(st) pbStart('lead', l, st.id, pbDay1('lead', l, st), true);
   });
   pbPeople().forEach(function(P){
     const x = P.x;
     for(let i = 0; i < 3; i++){ const s = pbState(P.kind, x); if(!s || s.future || pbRepeats(s.p) || s.open.length || x.pb.finished) break; if(!pbAdvance(P.kind, x)) break; ch = true; }
     const s = pbState(P.kind, x); if(!s) return;
+    // (still open from last month: it stays on your list, late, for two weeks; then it goes on the record as missed)
+    state.tasks.items.forEach(function(t){
+      const m = t.master; if(!m || m.kind!=='pb' || t.status==='done' || m.who!==P.kind || m.id!==x.id || m.pb!==s.p.id) return;
+      if(s.occ.some(function(o){ return o.key===m.key; }) || x.pb.done[m.key]) return;
+      if(!t.deadline || t.deadline >= s.cyc.start || String(m.key).indexOf(x.pb.run ? x.pb.run+'~' : '')!==0) return;
+      if(addDays(t.deadline, 14) >= today) live[m.k] = 1; else { x.pb.done[m.key] = 'missed'; ch = true; }
+    });
     s.occ.forEach(function(o){
       // (a weekly one a week past its day goes on the record as missed)
       if(!o.done && o.it.repeat==='week' && addDays(o.date, 7) < today){ x.pb.done[o.key] = 'missed'; ch = true; return; }
@@ -259,7 +266,7 @@ function pbMoveBack(kind, id){
   uiConfirm({title:'Move '+pbName(kind, x)+' back to '+p.name+'?', text:'What was checked off when they moved on comes back.', ok:'Move back'}).then(function(yes){
     if(!yes) return;
     const done = Object.assign({}, h.done); Object.keys(h.auto || {}).forEach(function(k){ delete done[k]; });
-    x.pb = {id:h.id, start:h.start, done:done, auto:{}, hist:x.pb.hist.slice(0, -1)};
+    x.pb = {id:h.id, start:h.start, run:h.run, done:done, auto:{}, hist:x.pb.hist.slice(0, -1)};
     // (the tasks it checked off come back too: drop them and let the list make them fresh)
     state.tasks.items = state.tasks.items.filter(function(t){ return !(t.master && t.master.kind==='pb' && t.master.who===kind && t.master.id===id && (h.auto || {})[t.master.key]); });
     // (and the next playbook's tasks go)
@@ -326,7 +333,7 @@ taskCard = (function(base){
     h = h.replace(/class="task-card(?=[\s"])/, 'class="task-card r55-pbt" style="--pbc:'+ty.color+'"');
     const tag = '<span class="mt-badge r55-pbb">'+ty.icon+' '+escapeHtml(ty.label)+'</span>';
     h = /<span class="mt-badge[^"]*"[^>]*>[\s\S]*?<\/span>/.test(h) ? h.replace(/<span class="mt-badge[^"]*"[^>]*>[\s\S]*?<\/span>/, tag) : h.replace(/(<div class="task-card-title">)/, '$1'+tag);
-    if(m.who==='lead' && x) h = h.replace(/(<div class="task-card-title">[\s\S]*?<\/div>)/, '$1<div class="r55-pbw">'+escapeHtml(pbName('lead', x))+' · lead</div>');
+    if(m.who==='lead' && x) { const w = '<div class="r55-pbw">'+escapeHtml(pbName('lead', x))+' · lead</div>'; h = h.replace(/(<div class="task-card-title">[\s\S]*?<\/div>)/, function(m0){ return m0+w; }); }
     return h;
   };
 })(taskCard);
@@ -349,7 +356,7 @@ if(typeof crmCard==='function') crmCard = (function(base){
     const h = base.apply(this, arguments); if(kind!=='lead' || !x || !x.pb) return h;
     const s = pbState('lead', x); if(!s || !s.next) return h;
     const ty = PB_TYPES[s.next.it.type] || PB_TYPES.task;
-    return h.replace(/<\/div>\s*$/, '<div class="r55-pbl" style="--pbc:'+ty.color+'"><i></i>'+escapeHtml(s.next.it.title)+(s.next.late ? ' <em>late</em>' : '')+'</div></div>');
+    const pbl = '<div class="r55-pbl" style="--pbc:'+ty.color+'"><i></i>'+escapeHtml(s.next.it.title)+(s.next.late ? ' <em>late</em>' : '')+'</div></div>'; return h.replace(/<\/div>\s*$/, function(){ return pbl; });
   };
 })(crmCard);
 
@@ -401,7 +408,7 @@ renderClientModal = (function(base){ return function(){ return base.apply(this, 
 renderContact = (function(base){
   return function(){
     const h = base.apply(this, arguments), l = crmFind('lead', ui.contactLeadId); if(!l || !leadIsOpen(l)) return h;
-    return h.replace('<div class="kind-label">Details</div>', '<div class="kind-label">Playbook</div>'+pbPersonHtml('lead', l)+'<div class="kind-label">Details</div>');
+    const pbh = '<div class="kind-label">Playbook</div>'+pbPersonHtml('lead', l)+'<div class="kind-label">Details</div>'; return h.replace('<div class="kind-label">Details</div>', function(){ return pbh; });
   };
 })(renderContact);
 
@@ -546,3 +553,5 @@ document.addEventListener('drop', function(e){
   if(d.classList.contains('pbx-week')){ it.repeat = 'week'; } else { it.repeat = 'once'; it.day = Number(d.getAttribute('data-pb-day')) || 1; }
   pbSave(); playTick(); renderView();
 });
+// (the reason says which: playbook items, by count)
+clientHealthReason = (function(base){ return function(c, s){ if(s && s.pbLate && s.level!=='green') return s.pbLate+' playbook item'+(s.pbLate===1 ? '' : 's')+' late'; return base.apply(this, arguments); }; })(clientHealthReason);

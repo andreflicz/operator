@@ -158,6 +158,25 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   const soc = await p.textContent('#viewRoot');
   check('Social → Clients: each client’s accounts, numbers and best post', /jjs_build/.test(soc) && /Kitchen remodel/.test(soc) && /Link an account/.test(soc));
 
+  // ---- what the review found ----
+  await E("r55McOpen(); ACTIONS.r55McOk(null, null, 'spend'); ACTIONS.r55McOk(null, null, 'where'); addSheetRefresh('r55Money'); addSheetRefresh('r55Money')"); await p.waitForTimeout(200);
+  check('review: hold still needed after the sheet redraws', !!(await p.$('#r55Money [data-hold-act="r55MoneyFinish"]')) && !(await p.$('#r55Money [data-action="r55MoneyFinish"]')));
+  check('review: the money task can still be edited ("Edit the task")', !!(await p.$('#r55Money [data-action="r55EditTask"]')) || await E("r55McDone()"));
+  await E("addSheetClose('r55Money')");
+  await E("state.business.clients.push({id:'old', name:'Ollie', business:'Old Co', stage:'active', status:'active', mrr:900, startDate:'2025-06-01', deliverables:[]}); masterTasksSync()");
+  check('review: a new client with an old start date starts today, not a year behind', await E("crmFind('client', 'old').pb.start===todayStr() && pbLateFor('client', 'old').length===0"));
+  await E("(function(){ const c = crmFind('client', 'old'); pbStart('client', c, pbAll()[2].id, '2026-09-30', true); masterTasksSync(); })()");
+  const lateBefore = await E("pbLateFor('client', 'old').length");
+  await E("(function(){ const c = crmFind('client', 'old'); c.pb.start = '2026-09-26'; masterTasksSync(); })()");
+  check('review: late monthly items stay on your list into the next month', lateBefore > 0 && await E("pbLateFor('client', 'old').length") >= 1, lateBefore);
+  await E("state.business.clients.push({id:'st', name:'S', business:'*Star Media', stage:'active', status:'active', mrr:500, startDate:todayStr(), deliverables:[]}); (state.modes = state.modes || {}).history = arr(state.modes.history).concat([{type:'shooting', date:todayStr(), note:'shot for star'}])");
+  check('review: a name with symbols doesn’t break the report', typeof (await E("r55RepFacts(crmFind('client', 'st'), 30)"))==='string');
+  await E("r55RepOpen('jj', null, 7)");
+  check('review: Op’s report for a week is a week', await E("ui.r55Rep.days")===7);
+  await E("addSheetClose('r55Report')");
+  await E("(function(){ const c = crmFind('client', 'nw'); const a = c.pb.run; pbStart('client', c, pbAll()[1].id, c.pb.start, true); window.__runs = [a, c.pb.run]; })()");
+  check('review: each time on a playbook is its own run (going back on one starts clean)', await E("window.__runs[0]!==window.__runs[1] && pbState('client', crmFind('client', 'nw')).occ.every(o => !o.done)"));
+
   // ---- the sweep ----
   check('Analytics: no “Check-ins with Op”', await E("acctLogHtml()")==='');
   await E("ui.view='today'; renderView()");

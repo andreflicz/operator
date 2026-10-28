@@ -115,38 +115,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("logTouch('lead', 'l1', 'call'); masterTasksSync()");
   check('a touch takes them off; nobody left, the task goes', await E("!state.tasks.items.some(t => t.master && t.master.kind==='reachLeads' && t.status!=='done')"));
 
-  // ---- the lifecycle ----
-  await E(`(function(){
-    const cm = crm();
-    const first = {id:'cyF', name:'First month', color:'#8fdcff', finishStage:'active', next:'cyR', steps:[
-      {id:'sOn', label:'Onboarding', color:'#8fdcff', checklist:[{id:'i1', text:'Onboarding call', type:'meeting', dueDays:2}, {id:'i2', text:'Send onboarding form', type:'form'}]},
-      {id:'sKo', label:'Kick-off', color:'#E8A23D', checklist:[{id:'i3', text:'Kick-off call', type:'meeting', dueDays:5}]},
-      {id:'sWin', label:'First win', color:'#3FBE8E', checklist:[{id:'i4', text:'Deliver a quick win', type:'task'}]}]};
-    const reg = {id:'cyR', name:'Regular', color:'#3FBE8E', finishStage:'active', steps:[{id:'sOg', label:'Ongoing', color:'#3FBE8E', checklist:[{id:'i5', text:'Weekly report', type:'doc', repeat:'week', dueDow:5}, {id:'i6', text:'Monthly meeting', type:'meeting', repeat:'month'}]}]};
-    cm.cycles = [first, reg]; cm.defaultCycleId = 'cyF'; persist('business');
-  })()`);
-  await E("masterTasksSync()");
-  check('your current clients go on Regular (what First month leads into)', await E("state.business.clients[0].cycleId")==='cyR');
-  check('…and get Regular’s weekly report and monthly meeting', await E("state.tasks.items.filter(t => t.master && t.master.kind==='lcrep' && t.client==='jj').length")===2);
-  check('the weekly report is due Friday', await E("state.tasks.items.find(t => t.title==='Weekly report').deadline")==='2026-10-30');
-  await E("state.business.clients.push({id:'nw', name:'Nina', business:'Nina Nails', stage:'active', status:'active', mrr:1200, startDate:todayStr(), deliverables:[]}); masterTasksSync()");
-  check('a new client starts First month', await E("crmFind('client', 'nw').cycleId")==='cyF');
-  const t1 = await E("JSON.stringify(state.tasks.items.filter(t => t.client==='nw' && t.master && t.master.kind==='lc').map(t => [t.title, t.deadline]))");
-  check('…with the Onboarding tasks, due when you set', /Onboarding call","2026-10-29/.test(t1) && /Send onboarding form/.test(t1), t1);
-  check('lifecycle tasks have their own colour', /r54-lc/.test(await E("taskCard(state.tasks.items.find(t => t.title==='Onboarding call'))")) && /is-lc/.test(await E("taskCard(state.tasks.items.find(t => t.title==='Weekly report'))")));
-  await E("state.tasks.items.filter(t => t.client==='nw' && t.master && t.master.kind==='lc').forEach(t => { t.status = 'done'; t.completedAt = todayStr(); }); masterTasksSync()");
-  check('Onboarding’s tasks done: Nina moves to Kick-off on her own', await E("crmFind('client', 'nw').cycleStepId")==='sKo' && await E("state.tasks.items.some(t => t.title==='Kick-off call' && t.status!=='done')"));
-  await E("ACTIONS.lcGoStep({dataset:{id:'nw', step:'sOn'}})");
-  check('move her back: Onboarding’s tasks come back', await E("crmFind('client', 'nw').cycleStepId")==='sOn' && await E("state.tasks.items.filter(t => t.client==='nw' && /Onboarding call|Send onboarding form/.test(t.title) && t.status!=='done').length")===2 && !(await E("state.tasks.items.some(t => t.title==='Kick-off call' && t.status!=='done')")));
-  await E("ACTIONS.lcGoStep({dataset:{id:'nw', step:'sWin'}})");
-  check('move her forward two steps: what was left is checked off', await E("crmFind('client', 'nw').cycleStepId")==='sWin' && await E("state.tasks.items.filter(t => t.client==='nw' && /Onboarding call|Send onboarding form/.test(t.title) && t.status!=='done').length")===0);
-  await E("state.tasks.items.filter(t => t.title==='Deliver a quick win').forEach(t => { t.status = 'done'; }); masterTasksSync()");
-  check('First month done: she rolls into Regular', await E("crmFind('client', 'nw').cycleId")==='cyR' && await E("state.tasks.items.some(t => t.client==='nw' && t.title==='Weekly report')"));
-  await E("ui.editingCycleId = 'cyF'"); const ed = await E("renderLifecycleEditor()");
-  check('the cycle editor: what finishing leads to, and when each task is due', /When finished, move to/.test(ed) && /data-r54-due/.test(ed));
-  await E("ui.editingCycleId = 'cyR'"); const ed2 = await E("renderLifecycleEditor()");
-  check('…and repeating ones say which day', /data-r54-dow/.test(ed2) && /data-r54-dom/.test(ed2));
-
+  // ---- the lifecycle: replaced by Playbooks in round 55 (see r55-test) ----
   // ---- small fixes ----
   check('Add task has no “Counts as a client deliverable”', !/Counts as a client deliverable/.test(await E("delivPickerHtml('', 'newTaskDeliv', [])")));
   await E("ACTIONS.createUpdatesType(); state.journal.entries.push({id:'u1', date:todayStr(), timestamp:Date.now(), text:'Note since this version', mood:'updates', photos:[]}, {id:'u0', date:'2026-10-01', timestamp:new Date(2026, 9, 1).getTime(), text:'Old note', mood:'updates', photos:[]})");

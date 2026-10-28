@@ -9199,3 +9199,16 @@ body.sb-collapsed .nav-item.r55-sig::after{ inset:2px; }
   html body .calx .cx-grid .cx-d{ font-size:14px; }
 }
 @media (min-width:2500px){ html body .calx .cx-grid{ grid-auto-rows:clamp(110px, calc((100vh - 560px)/5), 200px) !important; } html body .calx .cx-grid .cx-ev, html body .calx .cx-grid [class*="cx-chip"]{ font-size:12.5px; } }
+/* R55: the health pill in a client's window wraps instead of running out of the side panel */
+.cm-nav .cm-tags{ min-width:0; flex-wrap:wrap; }
+.cm-nav .health-pill{ flex-shrink:1; max-width:100%; flex-wrap:wrap; row-gap:2px; white-space:normal; }
+.cm-nav .health-pill .health-reason{ white-space:normal; }
+/* R55: the client colours sit on their own line under the name, never off the edge */
+.cm-nav .r48-ccol{ flex-wrap:wrap; min-width:0; max-width:100%; }
+.cm-nav .cm-head{ flex-wrap:wrap; }
+.cm-nav .cm-head .r48-ccol{ flex-basis:100%; margin:8px 0 0; }
+/* R55: a long client name stays on one line in its Social card */
+.r55-cli-ch b{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+.r55-cli-ch select{ flex-shrink:0; max-width:170px; }
+.r55-mc-f .r55-edt, .r55-rep-f .r55-edt{ margin-right:auto; }
+.r55-mc-f, .r55-rep-f{ display:flex; align-items:center; justify-content:flex-end; gap:10px; }
