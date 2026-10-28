@@ -9397,6 +9397,9 @@ html.r56-fit body .calx .cx-grid{ grid-auto-rows:var(--r56-rh) !important; }
 .r56-lc-d small{ font-size:11px; color:var(--text-faint); padding-left:4px; }
 /* the streak's Edit is always there, not only on hover */
 .sw .sw-edit, .streak-card .streak-edit-btn{ opacity:.7 !important; }
+.r56-lv{ align-self:flex-start; width:auto; }
+.lc .r56-lv{ display:inline-flex; }
+.r56-lc-d{ min-height:0; height:clamp(70px, calc((100vh - 430px) / 5), 160px); overflow:hidden; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -9594,7 +9597,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793171195718;
+const OP_BUILT = 1793171328770;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -51011,7 +51014,7 @@ function r56LeadCalHtml(){
   let cells = ''; for(let i = 0; i < lead; i++) cells += '<div class="r56-lc-d is-empty"></div>';
   for(let i = 1; i <= days; i++){
     const d = todayStr(new Date(y, mo, i)), its = by[d] || [];
-    cells += '<div class="r56-lc-d'+(d===today ? ' is-today' : '')+(d < today ? ' is-past' : '')+'"><span class="r56-lc-n">'+i+'</span>'+its.slice(0, 4).map(function(x){ return '<button class="r56-lc-i'+(x.late ? ' is-late' : '')+'" style="--lc:'+x.c+'" data-action="openContact" data-kind="lead" data-id="'+x.l.id+'"><b>'+escapeHtml(x.nm)+'</b><span>'+escapeHtml(x.t)+'</span></button>'; }).join('')+(its.length > 4 ? '<small>+'+(its.length - 4)+'</small>' : '')+'</div>';
+    cells += '<div class="r56-lc-d'+(d===today ? ' is-today' : '')+(d < today ? ' is-past' : '')+'"><span class="r56-lc-n">'+i+'</span>'+its.slice(0, 2).map(function(x){ return '<button class="r56-lc-i'+(x.late ? ' is-late' : '')+'" style="--lc:'+x.c+'" data-action="openContact" data-kind="lead" data-id="'+x.l.id+'"><b>'+escapeHtml(x.nm)+'</b><span>'+escapeHtml(x.t)+'</span></button>'; }).join('')+(its.length > 2 ? '<small>+'+(its.length - 2)+' more</small>' : '')+'</div>';
   }
   return '<div class="r56-lc"><div class="r56-lc-h"><button data-action="r56LeadMonth" data-id="-1">&lsaquo;</button><b>'+new Date(y, mo, 1).toLocaleDateString(undefined, {month:'long', year:'numeric'})+'</b><button data-action="r56LeadMonth" data-id="1">&rsaquo;</button></div>'+
     '<div class="r56-lc-w">'+['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(function(w){ return '<span>'+w+'</span>'; }).join('')+'</div><div class="r56-lc-g">'+cells+'</div></div>';

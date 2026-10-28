@@ -137,7 +137,7 @@ function r56LeadCalHtml(){
   let cells = ''; for(let i = 0; i < lead; i++) cells += '<div class="r56-lc-d is-empty"></div>';
   for(let i = 1; i <= days; i++){
     const d = todayStr(new Date(y, mo, i)), its = by[d] || [];
-    cells += '<div class="r56-lc-d'+(d===today ? ' is-today' : '')+(d < today ? ' is-past' : '')+'"><span class="r56-lc-n">'+i+'</span>'+its.slice(0, 4).map(function(x){ return '<button class="r56-lc-i'+(x.late ? ' is-late' : '')+'" style="--lc:'+x.c+'" data-action="openContact" data-kind="lead" data-id="'+x.l.id+'"><b>'+escapeHtml(x.nm)+'</b><span>'+escapeHtml(x.t)+'</span></button>'; }).join('')+(its.length > 4 ? '<small>+'+(its.length - 4)+'</small>' : '')+'</div>';
+    cells += '<div class="r56-lc-d'+(d===today ? ' is-today' : '')+(d < today ? ' is-past' : '')+'"><span class="r56-lc-n">'+i+'</span>'+its.slice(0, 2).map(function(x){ return '<button class="r56-lc-i'+(x.late ? ' is-late' : '')+'" style="--lc:'+x.c+'" data-action="openContact" data-kind="lead" data-id="'+x.l.id+'"><b>'+escapeHtml(x.nm)+'</b><span>'+escapeHtml(x.t)+'</span></button>'; }).join('')+(its.length > 2 ? '<small>+'+(its.length - 2)+' more</small>' : '')+'</div>';
   }
   return '<div class="r56-lc"><div class="r56-lc-h"><button data-action="r56LeadMonth" data-id="-1">&lsaquo;</button><b>'+new Date(y, mo, 1).toLocaleDateString(undefined, {month:'long', year:'numeric'})+'</b><button data-action="r56LeadMonth" data-id="1">&rsaquo;</button></div>'+
     '<div class="r56-lc-w">'+['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(function(w){ return '<span>'+w+'</span>'; }).join('')+'</div><div class="r56-lc-g">'+cells+'</div></div>';

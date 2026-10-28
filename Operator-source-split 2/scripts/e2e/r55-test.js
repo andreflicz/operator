@@ -132,7 +132,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // leads
   await E("state.business.pipeline.push({id:'l2', name:'Rob', business:'Rob Roofing', stage:'lead', value:900, createdAt:todayStr()}); masterTasksSync(); pbMoveTo('lead', 'l2', pbAll()[0].id)"); await p.waitForTimeout(150);
   check('a lead goes on the lead playbook', await E("crmFind('lead', 'l2').pb.id===pbAll()[0].id"));
-  check('its discovery call is a task, tagged with the lead', await E("state.tasks.items.some(t => t.master && t.master.kind==='pb' && t.master.who==='lead' && t.master.id==='l2' && t.title==='Discovery call')"));
+  check('(round 56) its discovery call isn’t a task of its own: it’s in “Reach out to leads”', await E("!state.tasks.items.some(t => t.master && t.master.kind==='pb' && t.master.who==='lead') && state.tasks.items.some(t => t.master && t.master.kind==='reachLeads' && t.status!=='done' && arr(t.leads).indexOf('l2') >= 0)"));
   await E("pbAll()[0].stage = 'discovery'; const P = pbNew('lead', 'Proposal follow-up'); P.stage = 'proposal'; P.items = [pbItem('Send the proposal', 'send', 1)]; pbAll().push(P); setStage('lead', 'l2', 'proposal'); masterTasksSync()");
   check('a lead moving to a stage starts that stage’s playbook', await E("crmFind('lead', 'l2').pb.id===pbAll().find(x => x.name==='Proposal follow-up').id"));
   // the builder

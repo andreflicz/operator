@@ -9386,3 +9386,6 @@ html.r56-fit body .calx .cx-grid{ grid-auto-rows:var(--r56-rh) !important; }
 .r56-lc-d small{ font-size:11px; color:var(--text-faint); padding-left:4px; }
 /* the streak's Edit is always there, not only on hover */
 .sw .sw-edit, .streak-card .streak-edit-btn{ opacity:.7 !important; }
+.r56-lv{ align-self:flex-start; width:auto; }
+.lc .r56-lv{ display:inline-flex; }
+.r56-lc-d{ min-height:0; height:clamp(70px, calc((100vh - 430px) / 5), 160px); overflow:hidden; }
