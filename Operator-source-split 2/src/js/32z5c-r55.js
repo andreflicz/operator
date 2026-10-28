@@ -207,6 +207,8 @@ function r55HoldPrep(root){
     el.setAttribute('data-hold-act', el.getAttribute('data-action')); el.removeAttribute('data-action');
     el.classList.add('r55-hold'); if(!el.title) el.title = 'Press and hold';
     if(!el.querySelector('.r55-hold-f')) el.insertAdjacentHTML('afterbegin', '<i class="r55-hold-f"></i>');
+    // (round 56: the button says so, so a tap isn't mistaken for "it doesn't work")
+    if(!/hold/i.test(el.textContent)){ const w = Array.from(el.childNodes).find(function(n){ return n.nodeType===3 && n.textContent.trim(); }); if(w) w.textContent = w.textContent.replace(/^\s*(\S)/, function(m, c){ return ' Hold to '+c.toLowerCase(); }); }
   });
 }
 new MutationObserver(function(ms){

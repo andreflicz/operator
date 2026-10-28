@@ -262,6 +262,7 @@ function soundSettingsHtml(){
     '<div class="card section"><div class="section-title">&#9728;&#65039; Mornings</div>'+
       '<div class="snd-rows">'+
         tog('focusMusic', 'Focus music after the lock-in intro', 'Quiet tracks keep playing until you lock out', true)+
+        tog('autoLockMusic', 'Sound and music when it locks you in by itself', 'Off: an automatic lock-in stays silent (your AirPods stay where they are)', false)+
         tog('dawn', 'Dawn before the alarm', 'A slow chord swells under the sunrise in the last 90 seconds', true)+
         tog('workintro', 'Start work', 'A warm swell when the work intro opens', true)+
       '</div>'+

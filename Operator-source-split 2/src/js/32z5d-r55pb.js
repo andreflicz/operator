@@ -147,6 +147,8 @@ function pbSync(){
   });
   pbPeople().forEach(function(P){
     const x = P.x;
+    // (round 56: leads get no tasks of their own: what's due on their playbook folds into the one "Reach out to leads" task and a notification)
+    if(P.kind==='lead'){ for(let i = 0; i < 3; i++){ const s = pbState('lead', x); if(!s || s.future || pbRepeats(s.p) || !s.occ.length || s.open.length || x.pb.finished) break; if(!pbAdvance('lead', x)) break; ch = true; } return; }
     { const s0 = pbState(P.kind, x); if(s0 && x.pb.finished && s0.open.length){ delete x.pb.finished; ch = true; } }
     for(let i = 0; i < 3; i++){ const s = pbState(P.kind, x); if(!s || s.future || pbRepeats(s.p) || !s.occ.length || s.open.length || x.pb.finished) break; if(!pbAdvance(P.kind, x)) break; ch = true; }
     const s = pbState(P.kind, x); if(!s) return;
@@ -511,7 +513,7 @@ function pbBuildHtml(bar){
   const ends = pbRepeats(p) ? 'again' : p.next && pbById(p.next) ? p.next : '';
   const head = '<div class="pb6-head">'+
     '<input class="pb6-name" data-pb-f="name" value="'+escapeHtml(p.name)+'" maxlength="60" aria-label="Playbook name">'+
-    '<span class="pb6-meta">'+p.days+' days · for '+(pbFor(p)==='lead' ? 'leads' : 'clients')+'</span>'+
+    '<label class="pb6-rule"><select class="input input-sm" data-pb-f="days" aria-label="Length">'+(function(){ const L = [7, 14, 21, 28, 30, 31, 45, 60, 90]; if(L.indexOf(p.days) < 0) L.push(p.days); return L.sort(function(a, b){ return a - b; }).map(function(n){ return '<option value="'+n+'"'+(p.days===n ? ' selected' : '')+'>'+n+' days</option>'; }).join(''); })()+'</select><span>for '+(pbFor(p)==='lead' ? 'leads' : 'clients')+'</span></label>'+
     '<label class="pb6-rule"><span>When it ends</span><select class="input input-sm" data-pb-f="ends"><option value=""'+(ends==='' ? ' selected' : '')+'>It stops</option><option value="again"'+(ends==='again' ? ' selected' : '')+'>It starts again</option>'+others.map(function(x){ return '<option value="'+x.id+'"'+(ends===x.id ? ' selected' : '')+'>They move to '+escapeHtml(x.name)+'</option>'; }).join('')+'</select></label>'+
     (pbFor(p)==='lead' ? '<label class="pb6-rule"><span>Starts when a lead reaches</span><select class="input input-sm" data-pb-f="stage"><option value="">Any time you add them</option>'+crmStages('lead').filter(function(s){ return s.kind!=='won' && s.kind!=='lost'; }).map(function(s){ return '<option value="'+s.id+'"'+(p.stage===s.id ? ' selected' : '')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select></label>' : '')+
     '<button class="pb6-del" data-action="pbDelete" data-id="'+p.id+'" title="Delete this playbook" aria-label="Delete this playbook">&#128465;</button>'+
@@ -611,6 +613,7 @@ document.addEventListener('change', function(e){
   if(t.hasAttribute('data-pb-f')){
     const k = t.getAttribute('data-pb-f');
     if(k==='name') p.name = t.value.trim() || p.name;
+    else if(k==='days'){ const n = Math.max(1, Math.min(120, Math.round(Number(t.value) || 0))); if(n){ p.days = n; p.items.forEach(function(it){ if(it.repeat!=='week' && Number(it.day) > n) it.day = n; }); } }
     else if(k==='ends'){ p.repeats = t.value==='again'; p.next = t.value && t.value!=='again' ? t.value : null; pbKindSync(p); }
     else if(k==='stage') p.stage = t.value || null;
     pbSave(); renderView(); return;
@@ -700,9 +703,16 @@ function pbBacklogBlock(c){
     ts.map(function(t){
       const ty = PB_TYPES[t.master.type] || PB_TYPES.task, late = t.status!=='done' && t.deadline && t.deadline < today;
       return '<div class="cbl-w r51-wk pb6-cw'+(t.status==='done' ? ' is-done' : late ? ' is-late' : '')+'" style="--pbc:'+ty.color+'"><div class="r51-wl"><b><i>'+ty.icon+'</i> '+escapeHtml(t.title)+'</b><small>'+(t.status==='done' ? 'Done' : late ? 'Late since '+fmtDateShort(t.deadline) : t.deadline===today ? 'Today' : 'Due '+fmtDateShort(t.deadline))+'</small></div><div class="r51-wb">'+
-        (t.status==='done' ? '<span class="r51-sub">Done</span>' : '<button class="cbl-today'+(t.status==='today' ? ' is-on' : '')+'" data-action="pb6Today" data-id="'+t.id+'">'+(t.status==='today' ? 'On today' : '&rarr; Today')+'</button><button class="cbl-done" data-action="completeTask" data-id="'+t.id+'">Done</button>')+'</div></div>';
+        (t.status==='done' ? '<span class="r51-sub">Done</span>' : '<button class="cbl-today'+(t.status==='today' ? ' is-on' : '')+'" data-action="pb6Today" data-id="'+t.id+'">'+(t.status==='today' ? 'On today' : '&rarr; Today')+'</button><button class="cbl-done" data-action="pb6Done" data-id="'+t.id+'">Done</button>')+'</div></div>';
     }).join('')+'</div></div>';
 }
+// (Done here is instant: the task and the playbook both, then one redraw)
+ACTIONS.pb6Done = function(el, e, id){
+  const t = state.tasks.items.find(function(x){ return x.id===id; }); if(!t || t.status==='done') return;
+  const P = pbTaskPerson(t), today = todayStr();
+  t.status = 'done'; t.completedAt = today; if(P) P.x.pb.done[t.master.key] = today;
+  playTick(); persist('tasks'); persist('business'); try{ xpLast = null; }catch(err){} renderView();
+};
 ACTIONS.pb6Today = function(el, e, id){ const t = state.tasks.items.find(function(x){ return x.id===id; }); if(!t) return; t.status = t.status==='today' ? 'backlog' : 'today'; playTick(); persist('tasks'); renderView(); };
 clientBacklogHtml = (function(base){
   return function(){

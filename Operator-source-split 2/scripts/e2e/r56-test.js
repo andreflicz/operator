@@ -36,7 +36,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.pbView='build'; ui.pbSel=pbAll()[1].id; ui.pbItem=null; renderView()"); await p.waitForTimeout(200);
   const head = await p.textContent('.pb6-head');
   check('Build: no Lead / Onboarding / Monthly service switch, no ★, no “new clients start here”', !(await p.$('[data-action="pbKind"]')) && !(await p.$('.pbx-star')) && !/start here/i.test(await p.textContent('#viewRoot')));
-  check('the length is shown, not edited, in the header', /30 days/.test(head) && !(await p.$('[data-action="pbLen"]')) && !(await p.$('[data-pb-f="days"]')));
+  check('the length can be changed in the header', !!(await p.$('select[data-pb-f="days"]')) && await E("document.querySelector('select[data-pb-f=\"days\"]').value")==='30');
   check('no legend line', !(await p.$('.pbx-legend')) && !/Day 1 is/.test(await p.textContent('#viewRoot')));
   check('a calendar of its 30 days, and a weekly row with the seven weekdays', (await p.$$('.pb6-day')).length===30 && (await p.$$('.pb6-wd')).length===7);
   await E("ACTIONS.pbAdd(null, null, '1')"); await p.waitForTimeout(150);
@@ -63,7 +63,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('…on Focus → Tasks', /Onboarding call/.test(await p.textContent('#viewRoot')));
   await E("ui.focusTasksSubTab='clientBacklog'; renderView()"); await p.waitForTimeout(250);
   const cbl = await p.textContent('#viewRoot');
-  check('…and in Client backlog, under the client, with Today and Done', /Kiko/.test(cbl) && /Strategy doc/.test(cbl) && /Onboarding call/.test(cbl) && (await p.$$('.pb6-cw [data-action="completeTask"]')).length >= 3);
+  check('…and in Client backlog, under the client, with Today and Done', /Kiko/.test(cbl) && /Strategy doc/.test(cbl) && /Onboarding call/.test(cbl) && (await p.$$('.pb6-cw [data-action="pb6Done"]')).length >= 3);
   await p.click('.pb6-cw [data-action="pb6Today"]'); await p.waitForTimeout(150);
   check('→ Today from there puts it on today', await E("state.tasks.items.filter(t => t.master && t.master.kind==='pb' && t.master.id==='kk' && t.status==='today').length") >= 2);
 
@@ -119,6 +119,36 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   // ---- old playbooks lose their kind and ★ ----
   check('old ones: no ★, what they are for and what happens when they end kept', await E("(function(){ const o = {id:'old1', name:'Old', kind:'monthly', isDefault:true, days:30, items:[]}; pbKindSync(o); return o.for==='client' && o.repeats===true && o.isDefault===false; })()"));
+
+  // ---- round 56, second batch ----
+  await E("state.focus.activeSession = {startedAt:Date.now() - 3600000, plannedMinutes:null, completedTasks:[], breaks:[], onBreak:false, autoStarted:true}; persist('focus')");
+  check('Op says nothing on his own during an automatic lock-in', await E("(OPX.userAt = 0, R54.tapAt = 0, AI.busy = false, AI.listening = false, AI.transcribing = false, true) && r54May('auto')===false && r54May('sessionEnd')===false"));
+  await E("autoEndFocusSession(Date.now()); endSessionForAway(Date.now(), Date.now(), 'offwork', 'Safari')");
+  check('going quiet doesn’t end a session (automatic or not): it stays until you stop it', await E("!!state.focus.activeSession"));
+  check('…it asks once, with Stop right there', await E("!!state.focus.activeSession.r56Asked"));
+  check('an automatic lock-in plays no music or intro (AirPods stay put) unless you turn it on', await E("(function(){ let played = false; const was = FM.playing; focusMusicAfterIntro(0); return soundPref('autoLockMusic', false)===false; })()") && /autoLockMusic/.test(await E("typeof soundSettingsHtml==='function' ? soundSettingsHtml() : (renderSettings ? (ui.settingsTab='look', renderSettings()) : '')")));
+  await E("state.focus.activeSession = null; state.modes.active = {type:'offtime', clockedOut:true, startedAt:Date.now()}; persist('modes')");
+  await E("opRunTool('lock_in', {})"); await p.waitForTimeout(200);
+  check('Op locks you in when you ask, even clocked out / after hours', await E("!!state.focus.activeSession"));
+  await E("state.focus.activeSession = null; persist('focus')");
+  await E("(function(){ const c = state.business.clients[0]; c.deliverables = [{id:'dv1', title:'Reels', recurring:true, weeklyTarget:2}]; persist('business'); masterTasksSync(); const t = state.tasks.items.find(x => x.master && x.master.kind==='dvw' && x.master.clientId===c.id && x.status!=='done'); if(t) t.title = 'JJS: 2 JJS: 1 8 reel, week 0, week 2'; masterTasksSync(); window.__dvt = t && t.id; })()");
+  check('a deliverable task with a garbled name gets its real name back', await E("(function(){ const t = state.tasks.items.find(x => x.id===window.__dvt); return !!t && !/week 0/.test(t.title) && /Reels/.test(t.title); })()"));
+  check('Op can’t rename the tasks made from a client’s plan', await E("(function(){ const t = state.tasks.items.find(x => x.id===window.__dvt); const was = t.title; try{ opRunTool('update_task', {task:t.title, title:'Something else'}); }catch(e){} return t.title===was; })()"));
+  check('the streak’s Edit (to add a day you forgot) is always visible', await E("(function(){ ui.view='today'; renderView(); const b = document.querySelector('.sw-edit, .streak-edit-btn'); return !!b && Number(getComputedStyle(b).opacity) > 0.5; })()"));
+  check('hold buttons say “Hold to …”', await E("(function(){ const d = document.createElement('div'); d.innerHTML = '<button data-action=\"saveIntent\">Start the week →</button>'; document.body.appendChild(d); r55HoldPrep(d); const t = d.textContent; d.remove(); return /Hold to start the week/.test(t); })()"));
+  // leads: no tasks, one reach-out task, notifications, a calendar in the Log center
+  await E("(function(){ const L = pbAll().find(x => pbFor(x)==='lead') || (function(){ const n = pbNew('lead', 'Lead flow', 14); pbAll().push(n); return n; })(); L.items = [pbItem('Discovery call', 'call', 1)]; pbSave(); pbMoveTo('lead', 'l1', L.id); })()"); await p.waitForTimeout(200); await E("masterTasksSync()");
+  check('leads get no playbook tasks of their own', await E("!state.tasks.items.some(t => t.master && t.master.kind==='pb' && t.master.who==='lead' && t.status!=='done')"));
+  check('…what’s due folds into the one “Reach out to leads” task', await E("state.tasks.items.some(t => t.master && t.master.kind==='reachLeads' && t.status!=='done' && arr(t.leads).indexOf('l1') >= 0)"));
+  check('…and a notification', await E("notifList().some(n => /^pbl:l1/.test(n.key))"));
+  await E("logTouch('lead', 'l1', 'call', todayStr(), 'talked')"); await p.waitForTimeout(100);
+  check('logging a touch ticks off what was due on their playbook', await E("pbState('lead', crmFind('lead', 'l1')).open.every(o => o.date > todayStr())"));
+  await E("ui.view='business'; ui.businessTab='log'; ui.r54Lc='leads'; ui.r56LeadCal=true; renderView()"); await p.waitForTimeout(250);
+  check('Log center → Leads has a Calendar view of the month', (await p.$$('.r56-lc-d:not(.is-empty)')).length >= 28 && !!(await p.$('.r56-lv')));
+  // the playbook length can be changed
+  await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='build'; ui.pbSel=pbAll()[0].id; renderView()"); await p.waitForTimeout(200);
+  await p.selectOption('select[data-pb-f="days"]', '14'); await p.waitForTimeout(200);
+  check('change a playbook’s length', await E("pbAll()[0].days")===14 && (await p.$$('.pb6-day')).length===14);
 
   // ---- the build view fits the screen ----
   for(const [w, h] of [[3440, 1440], [1920, 1080]]){

@@ -9367,3 +9367,22 @@ html body .r44-quote{ margin:14px auto 6px; }
 .cm-nav .cm-who .r50-back, .cm-nav .cm-who .r48-ccol{ flex-basis:100%; margin:0; }
 .pb6-nf .seg-tabs{ align-self:flex-start; }
 html.r56-fit body .calx .cx-grid{ grid-auto-rows:var(--r56-rh) !important; }
+/* R56b: Leads in the Log center: List | Calendar */
+.r56-lv{ display:inline-flex; gap:2px; padding:3px; border-radius:12px; background:var(--panel); border:1px solid var(--border); margin:0 0 12px; }
+.r56-lv button{ border:0; background:none; color:var(--text-dim); font-weight:600; font-size:13px; padding:6px 14px; border-radius:9px; cursor:pointer; }
+.r56-lv button.is-on{ background:var(--panel-2); color:var(--text); }
+.r56-lc{ display:flex; flex-direction:column; gap:8px; }
+.r56-lc-h{ display:flex; align-items:center; gap:12px; } .r56-lc-h b{ font-family:var(--font-display); font-size:16px; min-width:150px; text-align:center; }
+.r56-lc-h button{ width:30px; height:30px; border-radius:50%; border:1px solid var(--border); background:var(--panel); color:var(--text); cursor:pointer; font-size:16px; }
+.r56-lc-w, .r56-lc-g{ display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:6px; }
+.r56-lc-w span{ font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-faint); padding-left:6px; }
+.r56-lc-d{ position:relative; min-height:96px; padding:24px 5px 5px; border-radius:12px; background:var(--panel); border:1px solid var(--border); display:flex; flex-direction:column; gap:4px; }
+.r56-lc-d.is-empty{ background:none; border-color:transparent; }
+.r56-lc-d.is-past{ opacity:.6; } .r56-lc-d.is-today{ border-color:var(--accent); }
+.r56-lc-n{ position:absolute; top:6px; left:8px; font-size:11.5px; font-weight:700; color:var(--text-faint); }
+.r56-lc-i{ display:flex; flex-direction:column; align-items:flex-start; gap:1px; width:100%; padding:4px 6px; border:0; border-left:3px solid var(--lc); border-radius:7px; background:color-mix(in srgb, var(--lc) 14%, var(--panel)); color:var(--text); text-align:left; cursor:pointer; }
+.r56-lc-i b{ font-size:11.5px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .r56-lc-i span{ font-size:11px; color:var(--text-dim); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.r56-lc-i.is-late{ box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--danger) 50%, transparent); }
+.r56-lc-d small{ font-size:11px; color:var(--text-faint); padding-left:4px; }
+/* the streak's Edit is always there, not only on hover */
+.sw .sw-edit, .streak-card .streak-edit-btn{ opacity:.7 !important; }
