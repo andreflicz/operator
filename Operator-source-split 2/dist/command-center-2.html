@@ -9573,7 +9573,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793167160022;
+const OP_BUILT = 1793167336672;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -50495,7 +50495,7 @@ function pb6NewHtml(){
     '<div class="as-f"><button class="btn btn-primary hs-go" data-action="pb6Create">Make it</button></div>';
 }
 function pb6NewRead(){ const N = ui.pb6New || {}; const n = document.getElementById('pb6NewName'), d = document.getElementById('pb6NewDays'), e = document.getElementById('pb6NewEnds'); if(n) N.name = n.value; if(d && d.value) N.days = Math.max(1, Math.min(120, Math.round(Number(d.value) || 30))); if(e) N.ends = e.value; return N; }
-ACTIONS.pb6NewOpen = function(el, e, who){ ui.pb6New = {for:who==='lead' ? 'lead' : (ui.pbView!=='build' && ui.pbWho==='lead' ? 'lead' : 'client'), days:30, ends:''}; if(ui.pb6New.for==='lead') ui.pb6New.days = 14; addSheetOpen('pb6NewSheet', pb6NewHtml, 'pb6NewName'); };
+ACTIONS.pb6NewOpen = function(el, e, who){ ui.pb6New = {for:who==='lead' ? 'lead' : (ui.pbView!=='build' && ui.pbWho==='lead' ? 'lead' : 'client'), days:30, ends:''}; if(ui.pb6New.for==='lead') ui.pb6New.days = 14; addSheetOpen('pb6NewSheet', pb6NewHtml, 'pb6NewName'); ['pb6NewName', 'pb6NewDays'].forEach(function(i){ const n = document.getElementById(i); if(n) n.value = ''; }); const en = document.getElementById('pb6NewEnds'); if(en) en.value = ''; };
 ACTIONS.pb6NewSet = function(el, e, v){ const N = pb6NewRead(), q = String(v).split(':'); if(q[0]==='for'){ N.for = q[1]; N.ends = ''; } else if(q[0]==='days'){ N.days = Number(q[1]); const d = document.getElementById('pb6NewDays'); if(d) d.value = ''; } playTick(); addSheetRefresh('pb6NewSheet'); };
 ACTIONS.pb6Create = function(){
   const N = pb6NewRead(), name = String(N.name || '').trim();

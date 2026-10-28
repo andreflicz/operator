@@ -92,13 +92,22 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   // ---- Playbooks ----
   await E("masterTasksSync()");
-  check('three playbooks to start: Lead, Onboarding, Monthly service (each the default)', await E("JSON.stringify(pbAll().map(x => [x.kind, x.isDefault]))")===JSON.stringify([['lead', true], ['onboarding', true], ['monthly', true]]));
+  // (round 56: no starting set and no defaults: these are three playbooks made the way you'd make them)
+  check('no playbooks until you make one', await E("pbAll().length")===0);
+  await E(`(function(){
+    const L = pbNew('lead', 'New lead', 14); L.items = [pbItem('Discovery call', 'call', 1), pbItem('Trial shoot', 'task', 5), pbItem('Closing call', 'call', 8)];
+    const O = pbNew('client', 'Onboarding', 30); O.items = [pbItem('Onboarding call', 'call', 1), pbItem('Get access and info', 'access', 1, {checklist:[{id:'c1', t:'Meta Business Manager access'}, {id:'c2', t:'Ad account access'}]}), pbItem('Send the intake form', 'send', 2), pbItem('Kick-off call', 'call', 3), pbItem('Deliver the first win', 'task', 7), pbItem('First monthly report', 'report', 28), pbItem('Month-one review call', 'call', 30)];
+    const M = pbNew('client', 'Monthly service', 30, {repeats:true}); M.items = [pbItem('Weekly report', 'report', 1, {repeat:'week', dow:5}), pbItem('Book the monthly call', 'task', 24), pbItem('Monthly call', 'call', 28), pbItem('Monthly report', 'report', 30)];
+    O.next = M.id; pbAll().push(L, O, M); pbSave();
+  })()`);
   check('Onboarding leads into Monthly service; Monthly service repeats', await E("pbAll()[1].next===pbAll()[2].id && pbRepeats(pbAll()[2])"));
-  check('people you already had wait for you to pick (nothing guessed)', await E("!crmFind('client', 'jj').pb && crm().pbPending.client.indexOf('jj') >= 0"));
+  check('nobody is put on one for you', await E("!crmFind('client', 'jj').pb"));
   await E("state.business.clients.push({id:'nw', name:'Nina', business:'Nina Roofing', stage:'active', status:'active', mrr:1800, startDate:todayStr(), deliverables:[]}); masterTasksSync()");
-  check('a new client starts Onboarding, day 1 = the day they signed', await E("crmFind('client', 'nw').pb.id===pbAll()[1].id && crmFind('client', 'nw').pb.start===todayStr()"));
+  check('a new client isn’t started on anything by itself', await E("!crmFind('client', 'nw').pb"));
+  await E("pbMoveTo('client', 'nw', pbAll()[1].id)"); await p.waitForTimeout(150);
+  check('put on Onboarding: day 1 = the day they signed', await E("crmFind('client', 'nw').pb.id===pbAll()[1].id && crmFind('client', 'nw').pb.start===todayStr()"));
   const pbt = JSON.parse(await E("JSON.stringify(state.tasks.items.filter(t => t.master && t.master.kind==='pb' && t.master.id==='nw').map(t => [t.title, t.master.type, t.deadline, t.status]))"));
-  check('what’s due soon is on your task list, tagged with them, by type', pbt.some(t => t[0]==='Onboarding call' && t[1]==='call' && t[3]==='today') && pbt.some(t => t[0]==='Get access and info' && t[1]==='access') && !pbt.some(t => t[0]==='Deliver the first win'), pbt);
+  check('everything on it is on your task list (later ones in the backlog), tagged with them, by type', pbt.some(t => t[0]==='Onboarding call' && t[1]==='call' && t[3]==='today') && pbt.some(t => t[0]==='Get access and info' && t[1]==='access') && pbt.some(t => t[0]==='Deliver the first win' && t[3]==='backlog'), pbt);
   check('the access task carries its checklist', /Meta Business Manager access/.test(await E("state.tasks.items.find(t => t.master && t.master.kind==='pb' && t.title==='Get access and info').notes")));
   const card = await E("taskCard(state.tasks.items.find(t => t.master && t.master.kind==='pb' && t.master.id==='nw'))");
   check('playbook tasks have their own colour by type', /r55-pbt/.test(card) && /--pbc:#5B9BFF/.test(card));
@@ -121,20 +130,20 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('everything done: they move on by themselves', await E("crmFind('client', 'nw').pb.id===pbAll()[2].id"));
   check('monthly: the weekly report comes every Friday', await E("pbState('client', crmFind('client', 'nw')).occ.filter(o => o.it.title==='Weekly report').every(o => dowOf(o.date)===5)"));
   // leads
-  await E("state.business.pipeline.push({id:'l2', name:'Rob', business:'Rob Roofing', stage:'lead', value:900, createdAt:todayStr()}); masterTasksSync()");
-  check('a new lead starts the lead playbook', await E("crmFind('lead', 'l2').pb.id===pbAll()[0].id"));
+  await E("state.business.pipeline.push({id:'l2', name:'Rob', business:'Rob Roofing', stage:'lead', value:900, createdAt:todayStr()}); masterTasksSync(); pbMoveTo('lead', 'l2', pbAll()[0].id)"); await p.waitForTimeout(150);
+  check('a lead goes on the lead playbook', await E("crmFind('lead', 'l2').pb.id===pbAll()[0].id"));
   check('its discovery call is a task, tagged with the lead', await E("state.tasks.items.some(t => t.master && t.master.kind==='pb' && t.master.who==='lead' && t.master.id==='l2' && t.title==='Discovery call')"));
   await E("pbAll()[0].stage = 'discovery'; const P = pbNew('lead', 'Proposal follow-up'); P.stage = 'proposal'; P.items = [pbItem('Send the proposal', 'send', 1)]; pbAll().push(P); setStage('lead', 'l2', 'proposal'); masterTasksSync()");
   check('a lead moving to a stage starts that stage’s playbook', await E("crmFind('lead', 'l2').pb.id===pbAll().find(x => x.name==='Proposal follow-up').id"));
   // the builder
-  await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbSel = pbAll()[1].id; ui.pbItem = null; renderView()"); await p.waitForTimeout(250);
-  check('Playbooks: the builder is a calendar of its days, items on their days', (await p.$$('.pbx-day')).length===30 && (await p.$$('.pbx-day[data-pb-day="1"] .pbx-chip')).length===2);
+  await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='build'; ui.pbSel = pbAll()[1].id; ui.pbItem = null; renderView()"); await p.waitForTimeout(250);
+  check('Playbooks: the builder is a calendar of its days, items on their days', (await p.$$('.pb6-day')).length===30 && (await p.$$('.pb6-day[data-pb-day="1"] .pb6-chip')).length===2);
   check('the sub-tab says Playbooks', /Playbooks/.test(await p.textContent('#viewRoot')) && !/Client cycles/.test(await p.textContent('#viewRoot')));
-  await p.dragAndDrop('.pbx-day[data-pb-day="7"] .pbx-chip', '.pbx-day[data-pb-day="5"]'); await p.waitForTimeout(250);
+  await p.dragAndDrop('.pb6-day[data-pb-day="7"] .pb6-chip', '.pb6-day[data-pb-day="5"]'); await p.waitForTimeout(250);
   check('drag an item to another day', await E("pbAll()[1].items.find(i => i.title==='Deliver the first win').day")===5);
   await E("ACTIONS.pbAdd(null, null, '12')"); await p.waitForTimeout(200);
-  check('+ on a day adds an item there and opens it', await E("pbAll()[1].items.some(i => i.day===12)") && !!(await p.$('.pbx-item .pbx-it')));
-  await p.fill('.pbx-item .pbx-it', 'Two-week check-in call'); await p.press('.pbx-item .pbx-it', 'Tab'); await p.waitForTimeout(150);
+  check('+ on a day adds an item there and opens it', await E("pbAll()[1].items.some(i => i.day===12)") && !!(await p.$('.pb6-item .pb6-it')));
+  await p.fill('.pb6-item .pb6-it', 'Two-week check-in call'); await p.press('.pb6-item .pb6-it', 'Tab'); await p.waitForTimeout(150);
   await E("ACTIONS.pbItemType(null, null, 'call')"); await p.waitForTimeout(100);
   check('…name it, give it a type', await E("JSON.stringify(pbAll()[1].items.filter(i => i.day===12).map(i => [i.title, i.type]))")===JSON.stringify([['Two-week check-in call', 'call']]));
   // the client window
@@ -163,8 +172,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('review: hold still needed after the sheet redraws', !!(await p.$('#r55Money [data-hold-act="r55MoneyFinish"]')) && !(await p.$('#r55Money [data-action="r55MoneyFinish"]')));
   check('review: the money task can still be edited ("Edit the task")', !!(await p.$('#r55Money [data-action="r55EditTask"]')) || await E("r55McDone()"));
   await E("addSheetClose('r55Money')");
-  await E("state.business.clients.push({id:'old', name:'Ollie', business:'Old Co', stage:'active', status:'active', mrr:900, startDate:'2025-06-01', deliverables:[]}); masterTasksSync()");
-  check('review: a new client with an old start date starts today, not a year behind', await E("crmFind('client', 'old').pb.start===todayStr() && pbLateFor('client', 'old').length===0"));
+  await E("state.business.clients.push({id:'old', name:'Ollie', business:'Old Co', stage:'active', status:'active', mrr:900, startDate:'2025-06-01', deliverables:[]}); masterTasksSync(); pbMoveTo('client', 'old', pbAll()[1].id)"); await p.waitForTimeout(150);
+  check('review: a client with an old start date put on a playbook starts today, not a year behind', await E("crmFind('client', 'old').pb.start===todayStr() && pbLateFor('client', 'old').length===0"));
   await E("(function(){ const c = crmFind('client', 'old'); pbStart('client', c, pbAll()[2].id, '2026-09-30', true); masterTasksSync(); })()");
   const lateBefore = await E("pbLateFor('client', 'old').length");
   await E("(function(){ const c = crmFind('client', 'old'); c.pb.start = '2026-09-26'; masterTasksSync(); })()");
