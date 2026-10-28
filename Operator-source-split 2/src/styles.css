@@ -9352,3 +9352,16 @@ body.sb-collapsed .nav-item.r55-sig::after{ inset:2px; }
 .cbl .pb6-cw.is-done{ opacity:.55; }
 .cbl .pb6-cw.r51-wk{ flex-direction:row !important; text-align:left; }
 .cbl .pb6-cw .r51-wl{ flex-direction:row !important; justify-content:flex-start; flex:1; }
+/* R56: the quote's buttons sit on the author line, after the name */
+.r55-q .r55-qt{ position:static; display:inline-flex; vertical-align:middle; margin-left:10px; gap:0; }
+.r55-q figcaption{ display:flex; align-items:center; }
+html body .r44-quote{ margin:14px auto 6px; }
+/* R56: a long alarm time (work hours) shrinks to fit beside its switch */
+.cx-al{ gap:10px; } .cx-al-main{ min-width:0; flex:1; }
+.cx-al.is-work .cx-al-main b{ font-size:clamp(15px, 1.35vw, 21px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
+.cx-al .cx-switch{ flex-shrink:0; }
+/* R56: "Back with you since" sits on its own line under the name, like the colours */
+.cm-nav .cm-head .r50-back{ flex-basis:100%; margin:8px 0 0; flex-wrap:wrap; }
+.cm-nav .cm-head .r50-back span{ white-space:nowrap; }
+.cm-nav .cm-who{ flex-wrap:wrap; row-gap:8px; }
+.cm-nav .cm-who .r50-back, .cm-nav .cm-who .r48-ccol{ flex-basis:100%; margin:0; }

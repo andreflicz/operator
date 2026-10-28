@@ -171,7 +171,10 @@ quoteHtml = (function(base){
     const tools = '<span class="r55-qt">'+(on ? '' : '<button class="r55-qb" data-action="nextQuote" data-id="work" title="Another one">&#8635;</button>')+
       '<button class="r55-qb" data-action="r55QuoteWrite" title="Write your own">&#9998;</button>'+
       '<button class="r55-qb'+(on ? ' is-on' : '')+'" data-action="r55QuotePin" title="'+(on ? 'Unpin' : 'Pin this one')+'">&#128204;</button></span>';
-    return h.replace(/<button class="qt-next"[^>]*>[\s\S]*?<\/button>/, tools).replace('<figure class="qt ', '<figure class="qt r55-q'+(on ? ' is-pinned' : '')+' ');
+    // (round 56: the buttons sit on the author's line, after the name, not up against whatever is above the quote)
+    h = h.replace(/<button class="qt-next"[^>]*>[\s\S]*?<\/button>/, '');
+    h = h.indexOf('</figcaption>') >= 0 ? h.replace('</figcaption>', function(){ return tools+'</figcaption>'; }) : h.replace('</figure>', function(){ return tools+'</figure>'; });
+    return h.replace('<figure class="qt ', '<figure class="qt r55-q'+(on ? ' is-pinned' : '')+' ');
   };
 })(quoteHtml);
 function r55QuoteRefresh(){ document.querySelectorAll('.qt[data-q="work"]').forEach(function(el){ const t = document.createElement('div'); t.innerHTML = quoteHtml(quoteFor('work'), el.dataset.cls || '', 'work'); el.replaceWith(t.firstChild); }); }

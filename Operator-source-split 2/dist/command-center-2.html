@@ -9363,6 +9363,19 @@ body.sb-collapsed .nav-item.r55-sig::after{ inset:2px; }
 .cbl .pb6-cw.is-done{ opacity:.55; }
 .cbl .pb6-cw.r51-wk{ flex-direction:row !important; text-align:left; }
 .cbl .pb6-cw .r51-wl{ flex-direction:row !important; justify-content:flex-start; flex:1; }
+/* R56: the quote's buttons sit on the author line, after the name */
+.r55-q .r55-qt{ position:static; display:inline-flex; vertical-align:middle; margin-left:10px; gap:0; }
+.r55-q figcaption{ display:flex; align-items:center; }
+html body .r44-quote{ margin:14px auto 6px; }
+/* R56: a long alarm time (work hours) shrinks to fit beside its switch */
+.cx-al{ gap:10px; } .cx-al-main{ min-width:0; flex:1; }
+.cx-al.is-work .cx-al-main b{ font-size:clamp(15px, 1.35vw, 21px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
+.cx-al .cx-switch{ flex-shrink:0; }
+/* R56: "Back with you since" sits on its own line under the name, like the colours */
+.cm-nav .cm-head .r50-back{ flex-basis:100%; margin:8px 0 0; flex-wrap:wrap; }
+.cm-nav .cm-head .r50-back span{ white-space:nowrap; }
+.cm-nav .cm-who{ flex-wrap:wrap; row-gap:8px; }
+.cm-nav .cm-who .r50-back, .cm-nav .cm-who .r48-ccol{ flex-basis:100%; margin:0; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -9560,7 +9573,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793166898929;
+const OP_BUILT = 1793167160022;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -49637,7 +49650,10 @@ quoteHtml = (function(base){
     const tools = '<span class="r55-qt">'+(on ? '' : '<button class="r55-qb" data-action="nextQuote" data-id="work" title="Another one">&#8635;</button>')+
       '<button class="r55-qb" data-action="r55QuoteWrite" title="Write your own">&#9998;</button>'+
       '<button class="r55-qb'+(on ? ' is-on' : '')+'" data-action="r55QuotePin" title="'+(on ? 'Unpin' : 'Pin this one')+'">&#128204;</button></span>';
-    return h.replace(/<button class="qt-next"[^>]*>[\s\S]*?<\/button>/, tools).replace('<figure class="qt ', '<figure class="qt r55-q'+(on ? ' is-pinned' : '')+' ');
+    // (round 56: the buttons sit on the author's line, after the name, not up against whatever is above the quote)
+    h = h.replace(/<button class="qt-next"[^>]*>[\s\S]*?<\/button>/, '');
+    h = h.indexOf('</figcaption>') >= 0 ? h.replace('</figcaption>', function(){ return tools+'</figcaption>'; }) : h.replace('</figure>', function(){ return tools+'</figure>'; });
+    return h.replace('<figure class="qt ', '<figure class="qt r55-q'+(on ? ' is-pinned' : '')+' ');
   };
 })(quoteHtml);
 function r55QuoteRefresh(){ document.querySelectorAll('.qt[data-q="work"]').forEach(function(el){ const t = document.createElement('div'); t.innerHTML = quoteHtml(quoteFor('work'), el.dataset.cls || '', 'work'); el.replaceWith(t.firstChild); }); }
@@ -50812,6 +50828,24 @@ renderConversations = (function(base){
     return base.apply(this, arguments).replace(/(<div class="seg-tabs sx-tabs">[\s\S]*?)(<\/div>)/, '$1<button class="seg-tab" data-action="socTab" data-id="clients">&#128101; Clients</button>$2');
   };
 })(renderConversations);
+// ============ ROUND 56 ============
+// The Calendar fits the screen it's on: the month's rows share whatever height is left under the header, so the
+// week/month numbers under the grid are never pushed off the bottom (on a 1440-high ultrawide or a laptop alike).
+function r56CalFit(){
+  if(ui.view!=='calendar') return;
+  const month = document.querySelector('.calx .cx-month'), grid = month && month.querySelector('.cx-grid'); if(!grid) return;
+  const cells = grid.querySelectorAll('.cx-d'); if(!cells.length) return;
+  const rows = Math.ceil(cells.length/7) || 5;
+  for(let pass = 0; pass < 3; pass++){
+    const main = document.querySelector('main'), extra = main ? Math.max(0, main.scrollHeight - main.clientHeight) : 0;
+    const rh = cells[cells.length - 1].getBoundingClientRect().height, over = Math.max(month.getBoundingClientRect().bottom - (window.innerHeight - 22), extra);
+    if(Math.abs(over) < 2) break;
+    const want = Math.max(54, Math.min(210, Math.floor(rh - over/rows)));
+    grid.style.setProperty('grid-auto-rows', want+'px', 'important');
+  }
+}
+afterRenderHooks.push(function(){ try{ r56CalFit(); }catch(e){} });
+window.addEventListener('resize', function(){ clearTimeout(r56CalFit._t); r56CalFit._t = setTimeout(function(){ try{ r56CalFit(); }catch(e){} }, 80); });
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
