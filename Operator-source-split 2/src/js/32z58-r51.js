@@ -217,7 +217,7 @@ clientBacklogHtml = function(){
       return '<div class="cbl-d"><div class="cbl-dh"><b>'+escapeHtml(String(d.title || 'Deliverable'))+'</b><span>'+dvwCycleCount(d, cy)+' / '+monthlyTargetFor(d)+' this cycle</span></div><div class="cbl-weeks">'+
         (ts.map(function(t){ const x = dvwFind(t); return x ? r51WeekRow(t, x) : ''; }).join('') || '<div class="kpi-sub" style="padding:6px 2px;">Nothing due this cycle.</div>')+'</div></div>';
     })(pick) : '';
-    return '<div class="cbl-client" style="--cc:'+clientAccent(c)+'">'+
+    return '<div class="cbl-client" data-cid="'+escapeHtml(c.id)+'" style="--cc:'+clientAccent(c)+'">'+
       '<div class="cbl-h"><span class="r42-cdot"></span><span class="cbl-n"><b>'+escapeHtml(c.business || c.name)+'</b><small>Cycle '+fmtDateShort(cy.start)+' – '+fmtDateShort(cy.end)+'</small></span>'+
         '<span class="cbl-hs"><i class="lc-hs is-'+hs.level+'"></i>'+escapeHtml(clientHealthLabel(hs))+'</span></div>'+
       tabs+body+

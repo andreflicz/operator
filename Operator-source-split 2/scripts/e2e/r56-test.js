@@ -96,6 +96,27 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('…picked: on it', await E("crmFind('client', 'kk').pb.id===pbAll()[1].id"));
   await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'))");
 
+  // ---- what the review found ----
+  await E("(function(){ const P = pbNew('client', 'Empty one', 30); pbAll().push(P); pbSave(); window.__empty = P.id; })(); state.business.clients.push({id:'em', name:'Em', business:'Em Co', stage:'active', status:'active', mrr:500, startDate:todayStr(), deliverables:[]}); pbMoveTo('client', 'em', window.__empty)"); await p.waitForTimeout(200); await E("masterTasksSync(); masterTasksSync()");
+  check('review: someone on an empty playbook isn’t “finished” or moved on', await E("crmFind('client', 'em').pb.id===window.__empty && !crmFind('client', 'em').pb.finished"));
+  await E("pbById(window.__empty).items.push(pbItem('First thing', 'task', 1)); pbSave()");
+  check('…and once it has items, they show up as tasks', await E("state.tasks.items.some(t => t.master && t.master.kind==='pb' && t.master.id==='em' && t.title==='First thing')"));
+  await E("pbMoveTo('client', 'em', null)"); await p.waitForTimeout(200);
+  check('review: taking someone off removes their open tasks (not marked done)', await E("!state.tasks.items.some(t => t.master && t.master.kind==='pb' && t.master.id==='em') && !state.tasks.items.some(t => t.title==='First thing' && t.status==='done')"));
+  check('review: undoing an old playbook task after they’re off doesn’t throw', await E("(function(){ state.tasks.items.push({id:'ux', title:'Old one', status:'done', completedAt:todayStr(), master:{kind:'pb', k:'client:em:x', who:'client', id:'em', key:'x', pb:window.__empty, type:'task'}}); try{ undoTask('ux'); return true; }catch(e){ return String(e); } })()")===true);
+  await E("state.business.clients.push({id:'tw', name:'Twin', business:'JJS', stage:'active', status:'active', mrr:500, startDate:todayStr(), deliverables:[]}); pbMoveTo('client', 'tw', pbAll()[1].id)"); await p.waitForTimeout(200);
+  const cblTw = await E("(function(){ const t = document.createElement('template'); t.innerHTML = clientBacklogHtml(); return JSON.stringify([...t.content.querySelectorAll('.cbl-client')].map(b => [b.getAttribute('data-cid'), !!b.querySelector('.pb6-cbl')])); })()");
+  check('review: two clients with the same name each get their own playbook block', /\["tw",true\]/.test(cblTw), cblTw);
+  await E("(function(){ const S = pbNew('lead', 'Stage one', 14); S.stage = 'contacted'; pbAll().push(S); pbSave(); window.__stage = S.id; })(); openNewContactModal('lead')"); await p.waitForTimeout(200);
+  await p.fill('#ncName', 'Lee'); await p.selectOption('#ncStage', 'contacted').catch(() => {}); await p.selectOption('#ncPlaybook', await E("pbAll()[2].id"));
+  await E("ACTIONS.saveNewContact()"); await p.waitForTimeout(300);
+  check('review: a new lead with a pick goes straight on it (no stray stage playbook first)', await E("(function(){ const l = state.business.pipeline.find(x => x.name==='Lee'); return !!l && l.pb.id===pbAll()[2].id && !arr(l.pb.hist).length; })()"));
+  await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'))");
+  await E("pbMoveTo('client', 'tw', window.__stage2 = pbAll()[0].id)"); await p.waitForTimeout(150);
+  await E("ACTIONS.pbDelete(null, null, pbAll()[1].id)"); await p.waitForTimeout(250);
+  check('review: deleting a playbook takes it out of everyone’s history (no dead Back button)', await E("!state.business.clients.some(c => c.pb && arr(c.pb.hist).some(h => !pbById(h.id)))") && !/Back to the last one/.test(await E("pbPersonHtml('client', crmFind('client', 'tw'))")));
+  check('review: a repeating playbook that isn’t a month says “runs”, not months', await E("(function(){ const P = pbNew('client', 'Fortnight', 14, {repeats:true}); return pbByMonth(P)===false && pbByMonth(pbNew('client', 'M', 30, {repeats:true}))===true; })()"));
+
   // ---- old playbooks lose their kind and ★ ----
   check('old ones: no ★, what they are for and what happens when they end kept', await E("(function(){ const o = {id:'old1', name:'Old', kind:'monthly', isDefault:true, days:30, items:[]}; pbKindSync(o); return o.for==='client' && o.repeats===true && o.isDefault===false; })()"));
 

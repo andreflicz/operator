@@ -100,6 +100,7 @@ function pbPeople(){
 }
 // (day 1 for someone you put on a playbook now: their start date if it's still inside the playbook's length, or
 // for a monthly one always their start date (it runs from it); otherwise today)
+function pbByMonth(p){ return pbRepeats(p) && Number(p.days) >= 28 && Number(p.days) <= 31; }
 function pbDay1(kind, x, p){
   const today = todayStr(), s = kind==='client' ? x.startDate : (x.createdAt || null);
   if(!s || !/^\d{4}-\d{2}-\d{2}$/.test(s) || s > today) return today;
@@ -139,14 +140,15 @@ function pbSync(){
     const d = pbDefault('onboarding'); if(d && (clientStageActive(c.stage) || c.stage==='onboarding')){ pbStart('client', c, d.id, pbDay1('client', c, d), true); r55Banner(pbName('client', c)+' started '+d.name); }
   });
   arr(state.business.pipeline).forEach(function(l){
-    if(cm.pbKnown.indexOf('L:'+l.id) >= 0) return; cm.pbKnown.push('L:'+l.id); ch = true;
+    if(cm.pbKnown.indexOf('L:'+l.id) >= 0 || ui.r56Adding) return; cm.pbKnown.push('L:'+l.id); ch = true;
     if(l.pb || !leadIsOpen(l)) return;
     const st = pbAll().find(function(p){ return p.kind==='lead' && p.stage && p.stage===l.stage; }) || pbDefault('lead');
     if(st) pbStart('lead', l, st.id, pbDay1('lead', l, st), true);
   });
   pbPeople().forEach(function(P){
     const x = P.x;
-    for(let i = 0; i < 3; i++){ const s = pbState(P.kind, x); if(!s || s.future || pbRepeats(s.p) || s.open.length || x.pb.finished) break; if(!pbAdvance(P.kind, x)) break; ch = true; }
+    { const s0 = pbState(P.kind, x); if(s0 && x.pb.finished && s0.open.length){ delete x.pb.finished; ch = true; } }
+    for(let i = 0; i < 3; i++){ const s = pbState(P.kind, x); if(!s || s.future || pbRepeats(s.p) || !s.occ.length || s.open.length || x.pb.finished) break; if(!pbAdvance(P.kind, x)) break; ch = true; }
     const s = pbState(P.kind, x); if(!s) return;
     // (still open from last month: it stays on your list, late, for two weeks; then it goes on the record as missed)
     state.tasks.items.forEach(function(t){
@@ -192,7 +194,7 @@ masterTasksSync = (function(base){
   };
 })(masterTasksSync);
 // done on the task list = done on the playbook (and undone)
-function pbTaskPerson(t){ const m = t && t.master; if(!m || m.kind!=='pb') return null; const x = crmFind(m.who, m.id); return x && x.pb ? {kind:m.who, x:x} : null; }
+function pbTaskPerson(t){ const m = t && t.master; if(!m || m.kind!=='pb') return null; const x = crmFind(m.who, m.id); return x && x.pb && x.pb.id && x.pb.done ? {kind:m.who, x:x} : null; }
 completeTask = (function(base){
   return function(id){
     const t = state.tasks.items.find(function(x){ return x.id===id; }), P = pbTaskPerson(t);
@@ -385,7 +387,7 @@ function pbPersonHtml(kind, x){
     '<div class="r55-pbp-s"><b>'+escapeHtml(s.p.name)+'</b><span>'+(s.future ? 'Starts '+fmtDateShort(x.pb.start) : x.pb.finished ? 'Finished' : s.day > pbDaysBetween(s.cyc.start, s.cyc.end) + 1 ? 'Ended '+fmtDateShort(s.cyc.end)+(s.open.length ? ' · still open' : '') : 'Day '+s.day+' of '+(pbDaysBetween(s.cyc.start, s.cyc.end) + 1))+(pbRepeats(s.p) ? ' · month '+(s.cyc.n + 1) : '')+'</span><em>'+done+'/'+s.occ.length+' done'+(s.late.length ? ' · <b class="is-late">'+s.late.length+' late</b>' : '')+'</em></div>'+
     '<i class="r55-pbs-bar"><u style="width:'+(s.occ.length ? Math.round(done/s.occ.length*100) : 0)+'%"></u></i>'+
     '<div class="r55-pbp-list">'+s.occ.map(row).join('')+'</div>'+
-    '<div class="r55-pbp-f">'+(arr(x.pb.hist).length ? '<button class="btn btn-ghost btn-sm" data-action="pbBack" data-kind="'+kind+'" data-id="'+x.id+'">&larr; Back to '+escapeHtml((pbById(x.pb.hist[x.pb.hist.length - 1].id) || {}).name || 'the last one')+'</button>' : '<span></span>')+
+    '<div class="r55-pbp-f">'+(arr(x.pb.hist).length && pbById(x.pb.hist[x.pb.hist.length - 1].id) ? '<button class="btn btn-ghost btn-sm" data-action="pbBack" data-kind="'+kind+'" data-id="'+x.id+'">&larr; Back to '+escapeHtml((pbById(x.pb.hist[x.pb.hist.length - 1].id) || {}).name || 'the last one')+'</button>' : '<span></span>')+
       (pbRepeats(s.p) ? '' : '<button class="btn btn-sm" data-action="pbNext" data-kind="'+kind+'" data-id="'+x.id+'">'+(nx ? 'Move to '+escapeHtml(nx.name)+' &rarr;' : 'Finish it &#10003;')+'</button>')+'</div></div>';
 }
 document.addEventListener('change', function(e){
@@ -475,9 +477,11 @@ function pbMoveTo(kind, id, pbId){
   if((cur && to && cur.id===to.id) || (!cur && !to)) return Promise.resolve(false);
   const s = cur ? pbState(kind, x) : null, left = s ? s.open : [];
   const go = function(){
-    if(cur){
+    if(cur && to){
       left.forEach(function(o){ x.pb.done[o.key] = todayStr(); x.pb.auto[o.key] = 1; });
       state.tasks.items.forEach(function(t){ if(t.master && t.master.kind==='pb' && t.master.who===kind && t.master.id===id && t.status!=='done'){ t.status = 'done'; t.completedAt = todayStr(); } });
+    } else if(cur){
+      state.tasks.items = state.tasks.items.filter(function(t){ return !(t.master && t.master.kind==='pb' && t.master.who===kind && t.master.id===id && t.status!=='done'); });
     }
     if(to){ pbStart(kind, x, to.id, cur ? todayStr() : pbDay1(kind, x, to), true); r55Banner(nm+(cur ? ' moved to ' : ' started ')+to.name); }
     else { x.pb.hist = arr(x.pb.hist).concat([{id:x.pb.id, start:x.pb.start, run:x.pb.run, done:x.pb.done, auto:x.pb.auto}]).slice(-6); x.pb = {id:null, hist:x.pb.hist}; r55Banner(nm+' is off '+cur.name); }
@@ -512,7 +516,7 @@ function pbBuildHtml(bar){
     (pbFor(p)==='lead' ? '<label class="pb6-rule"><span>Starts when a lead reaches</span><select class="input input-sm" data-pb-f="stage"><option value="">Any time you add them</option>'+crmStages('lead').filter(function(s){ return s.kind!=='won' && s.kind!=='lost'; }).map(function(s){ return '<option value="'+s.id+'"'+(p.stage===s.id ? ' selected' : '')+'>'+escapeHtml(s.label)+'</option>'; }).join('')+'</select></label>' : '')+
     '<button class="pb6-del" data-action="pbDelete" data-id="'+p.id+'" title="Delete this playbook" aria-label="Delete this playbook">&#128465;</button>'+
   '</div>';
-  const chip = function(it){ const ty = PB_TYPES[it.type] || PB_TYPES.task; return '<button class="pb6-chip'+(ui.pbItem===it.id ? ' is-on' : '')+'" draggable="true" data-pb-drag="'+it.id+'" data-action="pbItemPick" data-id="'+it.id+'" style="--pbc:'+ty.color+'" title="'+escapeHtml(ty.label)+'"><i>'+ty.icon+'</i><span>'+escapeHtml(it.title)+'</span>'+(pbRepeats(p) && Number(it.every) > 1 ? '<small>every '+it.every+' mo</small>' : '')+'</button>'; };
+  const chip = function(it){ const ty = PB_TYPES[it.type] || PB_TYPES.task; return '<button class="pb6-chip'+(ui.pbItem===it.id ? ' is-on' : '')+'" draggable="true" data-pb-drag="'+it.id+'" data-action="pbItemPick" data-id="'+it.id+'" style="--pbc:'+ty.color+'" title="'+escapeHtml(ty.label)+'"><i>'+ty.icon+'</i><span>'+escapeHtml(it.title)+'</span>'+(pbRepeats(p) && Number(it.every) > 1 ? '<small>every '+it.every+(pbByMonth(p) ? ' mo' : ' runs')+'</small>' : '')+'</button>'; };
   const week = '<div class="pb6-week"><div class="pb6-wl">Every week</div>'+PB_DOW.map(function(d){
       const here = p.items.filter(function(it){ return it.repeat==='week' && String(it.dow)===d[0]; });
       return '<div class="pb6-wd'+(here.length ? ' has' : '')+'" data-pb-dow="'+d[0]+'"><span class="pb6-dn">'+d[1]+'</span>'+here.map(chip).join('')+'<button class="pb6-plus" data-action="pb6AddWeek" data-id="'+d[0]+'" title="Every '+d[1]+'">+</button></div>';
@@ -540,7 +544,7 @@ function pbItemPanelHtml(p){
   const when = it.repeat==='week'
     ? '<select class="input input-sm" '+f('dow')+'>'+PB_DOW.map(function(d){ return '<option value="'+d[0]+'"'+(String(it.dow)===d[0] ? ' selected' : '')+'>'+d[1]+'</option>'; }).join('')+'</select>'
     : '<span class="pb6-dayin">Day <input class="input input-sm" type="number" min="1" max="'+p.days+'" '+f('day')+' value="'+(Number(it.day) || 1)+'"></span>'+
-      (pbRepeats(p) ? '<select class="input input-sm" '+f('every')+'>'+[1, 2, 3, 6].map(function(n){ return '<option value="'+n+'"'+(Number(it.every || 1)===n ? ' selected' : '')+'>'+(n===1 ? 'every time' : 'every '+n+' months')+'</option>'; }).join('')+'</select>' : '');
+      (pbRepeats(p) ? '<select class="input input-sm" '+f('every')+'>'+[1, 2, 3, 6].map(function(n){ return '<option value="'+n+'"'+(Number(it.every || 1)===n ? ' selected' : '')+'>'+(n===1 ? 'every time' : 'every '+n+(pbByMonth(p) ? ' months' : ' runs'))+'</option>'; }).join('')+'</select>' : '');
   return '<aside class="pb6-side pb6-item" style="--pbc:'+ty.color+'">'+
     '<div class="pb6-ih"><input class="pb6-it" '+f('title')+' value="'+escapeHtml(it.title)+'" maxlength="90" aria-label="Item"><button class="pb6-x" data-action="pbItemClose" title="Close">&#10005;</button></div>'+
     '<div class="pb6-types">'+Object.keys(PB_TYPES).map(function(k){ const t = PB_TYPES[k]; return '<button class="'+(it.type===k ? 'is-on' : '')+'" style="--pbc:'+t.color+'" data-action="pbItemType" data-id="'+k+'"><i>'+t.icon+'</i>'+t.label+'</button>'; }).join('')+'</div>'+
@@ -582,7 +586,13 @@ ACTIONS.pbDelete = function(el, e, id){
   const p = pbById(id); if(!p) return; const on = pbOn(p);
   uiConfirm({title:'Delete '+p.name+'?', text:on.length ? on.length+' '+(on.length===1 ? 'is' : 'are')+' on it: they’ll come off, and its open tasks go.' : 'Nobody’s on it.', ok:'Delete', danger:true}).then(function(yes){
     if(!yes) return; const cm = crm(); cm.playbooks = pbAll().filter(function(x){ return x.id!==id; }); pbAll().forEach(function(x){ if(x.next===id) x.next = null; });
-    on.forEach(function(P){ P.x.pb = null; }); ui.pbSel = null; pbSave(); renderView();
+    arr(state.business.clients).concat(arr(state.business.pipeline)).forEach(function(x){
+      if(!x.pb) return;
+      const h = arr(x.pb.hist).filter(function(e){ return e && e.id!==id; });
+      if(x.pb.id===id) x.pb = {id:null, hist:h}; else x.pb.hist = h;
+    });
+    state.tasks.items = state.tasks.items.filter(function(t){ return !(t.master && t.master.kind==='pb' && t.master.pb===id && t.status!=='done'); });
+    ui.pbSel = null; persist('tasks'); pbSave(); renderView();
   });
 };
 ACTIONS.pbAdd = function(el, e, d){ const p = pbSel(); if(!p) return; const it = pbItem('New item', 'task', Number(d)); p.items.push(it); ui.pbItem = it.id; pbSave(); renderView(); setTimeout(function(){ const i = document.querySelector('.pb6-it'); if(i){ i.focus(); i.select(); } }, 60); };
@@ -655,7 +665,7 @@ ACTIONS.saveNewContact = (function(base){
   return function(){
     const kind = ui.newContactKind || 'lead', el = document.getElementById('ncPlaybook'), pid = el ? el.value : '';
     const before = (kind==='lead' ? state.business.pipeline : state.business.clients).length;
-    const r = base.apply(this, arguments);
+    let r; ui.r56Adding = !!pid; try{ r = base.apply(this, arguments); } finally { ui.r56Adding = false; }
     const list = kind==='lead' ? state.business.pipeline : state.business.clients;
     if(pid && list.length > before){ const x = list[list.length - 1], p = pbById(pid); if(x && p){ const k = kind==='lead' ? 'lead' : 'client'; crm().pbKnown = arr(crm().pbKnown).concat([k==='lead' ? 'L:'+x.id : x.id]); pbStart(k, x, p.id, todayStr(), true); persist('business'); try{ masterTasksSync(); }catch(e){} r55Banner(pbName(k, x)+' started '+p.name); } }
     return r;
@@ -702,12 +712,12 @@ clientBacklogHtml = (function(base){
     const root = tpl.content.querySelector('.cbl'); if(!root) return h;
     const empty = root.querySelector(':scope > .empty'); if(empty) empty.remove();
     cs.forEach(function(c){
-      const nm = c.business || c.name, blk = Array.from(root.querySelectorAll('.cbl-client')).find(function(b){ const n = b.querySelector('.cbl-n b'); return n && n.textContent===nm; });
+      const nm = c.business || c.name, blk = root.querySelector('.cbl-client[data-cid="'+String(c.id).replace(/["\\]/g, '')+'"]');
       const extra = document.createElement('template'); extra.innerHTML = pbBacklogBlock(c);
       if(blk) blk.appendChild(extra.content);
       else {
         const hs = clientHealthStatus(c), wrap = document.createElement('template');
-        wrap.innerHTML = '<div class="cbl-client" style="--cc:'+clientAccent(c)+'"><div class="cbl-h"><span class="r42-cdot"></span><span class="cbl-n"><b>'+escapeHtml(nm)+'</b></span><span class="cbl-hs"><i class="lc-hs is-'+hs.level+'"></i>'+escapeHtml(clientHealthLabel(hs))+'</span></div>'+pbBacklogBlock(c)+'</div>';
+        wrap.innerHTML = '<div class="cbl-client" data-cid="'+escapeHtml(c.id)+'" style="--cc:'+clientAccent(c)+'"><div class="cbl-h"><span class="r42-cdot"></span><span class="cbl-n"><b>'+escapeHtml(nm)+'</b></span><span class="cbl-hs"><i class="lc-hs is-'+hs.level+'"></i>'+escapeHtml(clientHealthLabel(hs))+'</span></div>'+pbBacklogBlock(c)+'</div>';
         root.appendChild(wrap.content);
       }
     });
