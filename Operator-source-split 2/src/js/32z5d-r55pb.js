@@ -458,7 +458,7 @@ function pbBoardHtml(){
     const on = p ? people.filter(function(x){ return x.pb && x.pb.id===p.id; }) : off;
     return '<section class="pb6-col'+(p ? '' : ' is-off')+'" data-pb6-col="'+(p ? p.id : '')+'">'+
       '<header><b>'+(p ? escapeHtml(p.name) : 'Not on a playbook')+'</b><span>'+on.length+'</span>'+(p ? '<button class="pb6-cedit" data-action="pb6Build" data-id="'+p.id+'" title="Build it">&#9998;</button>' : '')+'</header>'+
-      (p ? '<small class="pb6-cmeta">'+p.days+' days · '+escapeHtml(pbEndsText(p))+'</small>' : '<small class="pb6-cmeta">Drag them onto one</small>')+
+      (p ? '<small class="pb6-cmeta">'+p.days+' days · '+escapeHtml(pbEndsText(p))+'</small>' : '')+
       '<div class="pb6-cards">'+on.map(function(x){ return pbCardHtml(who, x); }).join('')+'</div></section>';
   };
   if(!list.length) return '<div class="pb6-empty"><b>No playbooks for '+(who==='lead' ? 'leads' : 'clients')+' yet</b><button class="btn btn-sm btn-primary" data-action="pb6NewOpen" data-id="'+who+'">+ New playbook</button></div>';

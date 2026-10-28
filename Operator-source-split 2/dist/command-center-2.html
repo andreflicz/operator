@@ -9376,6 +9376,7 @@ html body .r44-quote{ margin:14px auto 6px; }
 .cm-nav .cm-head .r50-back span{ white-space:nowrap; }
 .cm-nav .cm-who{ flex-wrap:wrap; row-gap:8px; }
 .cm-nav .cm-who .r50-back, .cm-nav .cm-who .r48-ccol{ flex-basis:100%; margin:0; }
+.pb6-nf .seg-tabs{ align-self:flex-start; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -9573,7 +9574,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793167336672;
+const OP_BUILT = 1793167535955;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -50390,7 +50391,7 @@ function pbBoardHtml(){
     const on = p ? people.filter(function(x){ return x.pb && x.pb.id===p.id; }) : off;
     return '<section class="pb6-col'+(p ? '' : ' is-off')+'" data-pb6-col="'+(p ? p.id : '')+'">'+
       '<header><b>'+(p ? escapeHtml(p.name) : 'Not on a playbook')+'</b><span>'+on.length+'</span>'+(p ? '<button class="pb6-cedit" data-action="pb6Build" data-id="'+p.id+'" title="Build it">&#9998;</button>' : '')+'</header>'+
-      (p ? '<small class="pb6-cmeta">'+p.days+' days · '+escapeHtml(pbEndsText(p))+'</small>' : '<small class="pb6-cmeta">Drag them onto one</small>')+
+      (p ? '<small class="pb6-cmeta">'+p.days+' days · '+escapeHtml(pbEndsText(p))+'</small>' : '')+
       '<div class="pb6-cards">'+on.map(function(x){ return pbCardHtml(who, x); }).join('')+'</div></section>';
   };
   if(!list.length) return '<div class="pb6-empty"><b>No playbooks for '+(who==='lead' ? 'leads' : 'clients')+' yet</b><button class="btn btn-sm btn-primary" data-action="pb6NewOpen" data-id="'+who+'">+ New playbook</button></div>';
