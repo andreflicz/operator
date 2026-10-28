@@ -124,7 +124,7 @@ xpCtx = (function(base){
     const food = {}; arr(state.health.calorieEntries).forEach(function(c){ if(c.date) food[c.date] = (food[c.date]||0) + Math.max(0, Number(c.calories)||0) + 0.0001; });
     const weigh = {}, wl = arr(state.health.weightLog).filter(function(w){ return w && w.date && w.weight!=null; }).sort(function(a, b){ return a.date.localeCompare(b.date); });
     wl.forEach(function(w){ weigh[w.date] = Number(w.weight); });
-    const journal = {}; arr(state.journal && state.journal.entries).forEach(function(e){ if(e && e.date) journal[e.date] = 1; });
+    const journal = {}; arr(state.journal && state.journal.entries).forEach(function(e){ if(e && e.date && (typeof r55JournalCounts!=='function' || r55JournalCounts(e))) journal[e.date] = 1; });
     const insp = {}; try{ arr(inspStore().log).forEach(function(x){ if(!x.date) return; (insp[x.date] = insp[x.date] || []).push((inspAct(x.act).pts || 1) >= 2 ? P.inspBig : P.insp); }); }catch(e){}
     const habit = {}; try{ const ms = intentStore().months; Object.keys(ms).forEach(function(k){ Object.keys((ms[k] && ms[k].habitDays) || {}).forEach(function(d){ habit[d] = 1; }); }); }catch(e){}
     const skill = {}; try{ state.tasks.items.filter(function(t){ return t.skill; }).forEach(function(t){ const by = taskMinutesByDay(t.id) || {}; Object.keys(by).forEach(function(d){ skill[d] = (skill[d]||0) + by[d]; }); }); }catch(e){}

@@ -189,3 +189,168 @@ ACTIONS.r55QuoteWrite = function(){
     showToast('Added, and pinned for now. Unpin it to let it join the rotation.', {icon:'&#9998;'});
   });
 };
+
+// ============ XP: real progress only ============
+// ---- 8. Hold to confirm (anything that pays XP for saying you did something) ----
+// Setting up the week or the month, checking out of one, the month's habit, your areas' habits, finishing the
+// money check-in: you press and hold (just under a second). A tap says "Hold to confirm". Every XP pop-up already
+// says what it was for.
+const R55_HOLD_ACTS = ['saveIntent', 'saveCheckout', 'r43PlanLock', 'r43HabitToday', 'r43AreaHabit', 'r55MoneyFinish'];
+const R55_HOLD_MS = 800;
+function r55HoldPrep(root){
+  (root || document).querySelectorAll(R55_HOLD_ACTS.map(function(a){ return '[data-action="'+a+'"]'; }).join(',')).forEach(function(el){
+    el.setAttribute('data-hold-act', el.getAttribute('data-action')); el.removeAttribute('data-action');
+    el.classList.add('r55-hold'); if(!el.title) el.title = 'Press and hold';
+    if(!el.querySelector('.r55-hold-f')) el.insertAdjacentHTML('afterbegin', '<i class="r55-hold-f"></i>');
+  });
+}
+new MutationObserver(function(ms){ for(const m of ms){ for(const n of m.addedNodes){ if(n.nodeType===1){ r55HoldPrep(); return; } } } }).observe(document.body, {childList:true, subtree:true});
+(function(){
+  let cur = null;
+  const stop = function(tap){ if(!cur) return; clearTimeout(cur.t); cur.el.classList.remove('is-holding'); if(tap && Date.now() - cur.at < 300) showToast('Press and hold to confirm.', {icon:'&#9995;', duration:1800}); cur = null; };
+  document.addEventListener('pointerdown', function(e){
+    const b = e.target.closest && e.target.closest('.r55-hold'); if(!b || b.disabled || e.button > 0) return;
+    e.preventDefault(); stop(false);
+    cur = {el:b, at:Date.now()}; b.style.setProperty('--hold', R55_HOLD_MS+'ms'); b.classList.add('is-holding');
+    cur.t = setTimeout(function(){
+      const el = cur && cur.el; if(!el) return; cur = null; el.classList.remove('is-holding');
+      const fn = ACTIONS[el.getAttribute('data-hold-act')]; if(fn) fn(el, null, el.dataset.id);
+    }, R55_HOLD_MS);
+  }, true);
+  ['pointerup', 'pointercancel'].forEach(function(k){ document.addEventListener(k, function(){ stop(true); }, true); });
+  document.addEventListener('pointerout', function(e){ if(cur && e.target===cur.el && !cur.el.contains(e.relatedTarget)) stop(false); }, true);
+})();
+// (setting up a week or a month takes at least one goal; checking out takes every goal marked and a word on what went well)
+ACTIONS.saveIntent = (function(base){
+  return function(el, e, id){
+    const kind = id==='week' ? 'week' : 'month', F = INTENT_FIELDS[kind];
+    const any = F.goals.some(function(_, i){ const n = document.getElementById('int_goal'+(i ? i+1 : '')); return n && n.value.trim(); });
+    if(!any){ showToast('Add at least one goal to check in.', {icon:'&#9998;'}); const i = document.getElementById('int_goal'); if(i) i.focus(); return; }
+    return base.apply(this, arguments);
+  };
+})(ACTIONS.saveIntent);
+ACTIONS.r43PlanLock = (function(base){
+  return function(el, e, kind){
+    if(!tierGoals(kind, r43NextKey(kind)).length){ showToast('Add at least one goal first.', {icon:'&#9998;'}); return; }
+    return base.apply(this, arguments);
+  };
+})(ACTIONS.r43PlanLock);
+ACTIONS.saveCheckout = (function(base){
+  return function(el, e, id){
+    const p = String(id || '').split(':'), kind = p[0]==='month' ? 'month' : 'week', key = p[1];
+    const v = (ui.coPick && ui.coPick.key===kind+key) ? ui.coPick.v : {};
+    const open = tierGoals(kind, key).filter(function(g){ return v[g.id]!==1 && v[g.id]!==0; });
+    if(open.length){ showToast('Mark every goal hit or missed first ('+open.length+' left).', {icon:'&#9745;'}); return; }
+    const well = ((document.getElementById('co_well') || {}).value || '').trim();
+    if(!well){ showToast('One line on what went well, then check out.', {icon:'&#9998;'}); const i = document.getElementById('co_well'); if(i) i.focus(); return; }
+    return base.apply(this, arguments);
+  };
+})(ACTIONS.saveCheckout);
+
+// ---- 9. The weekly money check-in, for real ----
+// Go through the week's spending (fix any category, mark what's money moved, not spent), look at where you stand
+// (cash, debt, what's coming in and going out), then hold to finish. The XP comes then, not for a tap.
+function r55McWeek(){ return startOfWeekStr(todayStr()); }
+function r55McDone(){ const ws = r55McWeek(); return arr(state.finances.checkins).some(function(c){ const d = typeof c==='string' ? c : c.date; return d >= ws; }); }
+function r55McTx(){ const from = addDays(todayStr(), -7); return finExpenses().filter(function(e){ return !e.dupOf && e.date >= from; }).sort(function(a, b){ return String(b.date).localeCompare(String(a.date)); }); }
+function r55McHtml(){
+  const S = ui.r55Mc || (ui.r55Mc = {spend:false, where:false}), tx = r55McTx(), f = r44F(), today = todayStr(), ev = r44Events(today, addDays(today, 13)).filter(function(e){ return !e.done; });
+  const accts = r44Accounts(), cash = accts.filter(function(a){ return a.type!=='credit'; }).reduce(function(s, a){ return s + Number(a.balance || 0); }, 0);
+  const debt = f.debts.reduce(function(s, d){ return s + Math.max(0, Number(d.balance || 0)); }, 0);
+  const inSum = ev.filter(function(e){ return e.kind==='in'; }).reduce(function(s, e){ return s + e.amount; }, 0), outSum = ev.filter(function(e){ return e.kind==='out'; }).reduce(function(s, e){ return s + e.amount; }, 0);
+  const spent = tx.filter(function(e){ return e.cat!=='move'; }).reduce(function(s, e){ return s + Number(e.amount || 0); }, 0), other = tx.filter(function(e){ return e.cat==='other'; }).length;
+  const cents = function(n){ return '$'+Number(n || 0).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); };
+  const opt = function(sel){ return EXP_CATS.map(function(c){ return '<option value="'+c.id+'"'+(c.id===sel ? ' selected' : '')+'>'+escapeHtml(c.label)+'</option>'; }).join(''); };
+  const row = function(e){ return '<div class="r55-mc-tx'+(e.cat==='other' ? ' is-q' : '')+'"><span class="r55-mc-n"><b>'+escapeHtml(e.name || 'Expense')+'</b><small>'+fmtDateShort(e.date)+(e.account ? ' · '+escapeHtml(e.account) : '')+'</small></span><span class="r55-mc-a">'+money(Math.abs(Number(e.amount || 0)))+'</span><select class="input input-sm" data-r55-cat="'+e.id+'">'+opt(e.cat)+'</select></div>'; };
+  const step = function(n, k, title, sub, body){ const ok = S[k]; return '<section class="r55-mc-s'+(ok ? ' is-ok' : '')+'"><div class="r55-mc-h"><span class="r55-mc-i">'+(ok ? '&#10003;' : n)+'</span><b>'+title+'</b><em>'+sub+'</em><button class="btn btn-sm '+(ok ? 'btn-ghost' : 'btn-primary')+'" data-action="r55McOk" data-id="'+k+'">'+(ok ? 'Reviewed' : 'Looks right')+'</button></div>'+body+'</section>'; };
+  return '<button class="int-x hs-x" data-action="addSheetClose" title="Close">&#10005;</button>'+
+    '<div class="as-h"><span class="as-ic">&#128181;</span><div><div class="hs-h">Weekly money check-in</div><div class="hs-s">Week of '+fmtDateShort(r55McWeek())+'</div></div></div>'+
+    step(1, 'spend', 'This week’s spending', cents(spent)+' spent'+(other ? ' · '+other+' without a category' : ''),
+      '<div class="r55-mc-list">'+(tx.length ? tx.map(row).join('') : '<div class="r44-empty">Nothing came in from your bank this week.</div>')+'</div>')+
+    step(2, 'where', 'Where you stand', 'cash, debt, the next 2 weeks',
+      '<div class="r55-mc-tiles"><div><small>Cash</small><b>'+(accts.length ? money(cash) : '–')+'</b></div><div><small>Debt</small><b class="is-r">'+money(debt)+'</b></div><div><small>Coming in</small><b class="is-g">+'+money(inSum)+'</b></div><div><small>Going out</small><b>−'+money(outSum)+'</b></div></div>')+
+    '<div class="r55-mc-f">'+(S.spend && S.where ? '<button class="btn btn-primary r55-mc-go" data-action="r55MoneyFinish">Hold to finish · +'+XP_BOOK.personal.money+' XP</button>' : '<span class="r55-mc-wait">Review both to finish</span>')+'</div>';
+}
+function r55McOpen(){ ui.r55Mc = {spend:false, where:false}; addSheetOpen('r55Money', r55McHtml); }
+ACTIONS.r43MoneyCheckin = function(){ if(r55McDone()){ showToast('Already checked in on your money this week.', {icon:'&#128181;'}); return; } r55McOpen(); };
+ACTIONS.r55McOk = function(el, e, k){ const S = ui.r55Mc || (ui.r55Mc = {}); S[k] = !S[k]; playTick(); addSheetRefresh('r55Money'); };
+ACTIONS.r55MoneyFinish = function(){
+  if(r55McDone() || !(ui.r55Mc && ui.r55Mc.spend && ui.r55Mc.where)) return;
+  const f = state.finances; f.checkins = arr(f.checkins); f.checkins.push({date:todayStr(), at:Date.now(), reviewed:r55McTx().length});
+  persist('finances'); xpLast = null; playPositive(); addSheetClose('r55Money'); renderView();
+  xpToast(XP_BOOK.personal.money, 'Money check-in: '+r55McTx().length+' transactions reviewed.');
+  try{ masterTasksSync(); }catch(e){}
+};
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.getAttribute || !t.hasAttribute('data-r55-cat')) return;
+  const x = finExpenses().find(function(v){ return v.id===t.getAttribute('data-r55-cat'); }); if(!x) return;
+  x.cat = t.value; x.catSet = true; persist('finances'); addSheetRefresh('r55Money');
+});
+// (the Finances button: no "+75 XP" bait on it)
+renderPersonalFinances = (function(base){
+  return function(){ return base.apply(this, arguments).replace(/Weekly check-in <b>\+\d+ XP<\/b>/, 'Weekly check-in'); };
+})(renderPersonalFinances);
+// ---- 10. …and it's a task, once a week ----
+// "Weekly money check-in" goes on your list each week until it's done; tapping it opens the check-in.
+masterTasksSync = (function(base){
+  return function(){
+    const r = base.apply(this, arguments);
+    if(mt38Busy || !state || !state.tasks || !state.finances) return r;
+    const ws = r55McWeek(), done = r55McDone();
+    let t = state.tasks.items.find(function(x){ return x.master && x.master.kind==='money' && x.master.week===ws; });
+    if(!t && !done){ state.tasks.items.push({id:uid(), title:'Weekly money check-in', client:'personal', clients:['personal'], priority:'med', deadline:addDays(ws, 6), notes:'', status:'today', createdAt:todayStr(), completedAt:null, master:{kind:'money', week:ws}}); persist('tasks'); }
+    else if(t && done && t.status!=='done'){ t.status = 'done'; t.completedAt = todayStr(); persist('tasks'); }
+    // (last week's, never done: off the list)
+    const before = state.tasks.items.length;
+    state.tasks.items = state.tasks.items.filter(function(x){ return !(x.master && x.master.kind==='money' && x.master.week < ws && x.status!=='done'); });
+    if(state.tasks.items.length!==before) persist('tasks');
+    return r;
+  };
+})(masterTasksSync);
+completeTask = (function(base){
+  return function(id){
+    const t = state.tasks.items.find(function(x){ return x.id===id; });
+    if(t && t.master && t.master.kind==='money' && t.status!=='done'){ r55McOpen(); return; }
+    return base.apply(this, arguments);
+  };
+})(completeTask);
+openTaskEditModal = (function(base){ return function(id){ const t = state.tasks.items.find(function(x){ return x.id===id; }); if(t && t.master && t.master.kind==='money' && t.status!=='done'){ r55McOpen(); return; } return base.apply(this, arguments); }; })(openTaskEditModal);
+
+// ---- 11. Something's up: the sidebar says where ----
+// A soft glow on the section that needs you (hover it to see why), gone once it's handled:
+//  Personal: the money check-in (from Thursday) or a payment due in the next 2 days;
+//  Business: leads to reach out to, clients due a touch, or a late playbook task;
+//  Focus: a task that's overdue; Calendar: something starting within 30 minutes.
+function r55Signals(){
+  const out = {}, today = todayStr(), add = function(v, why){ (out[v] = out[v] || []).push(why); };
+  try{ const dow = new Date().getDay(); if(!r55McDone() && (dow===0 || dow >= 4)) add('personal', 'Money check-in for this week'); }catch(e){}
+  try{ const soon = r44Events(today, addDays(today, 2)).filter(function(e){ return !e.done && e.kind==='out'; }); if(soon.length) add('personal', soon.length+' payment'+(soon.length===1 ? '' : 's')+' due in the next 2 days'); }catch(e){}
+  try{ const n = r54LeadRows().filter(function(x){ return x.due; }).length; if(n) add('business', n+' lead'+(n===1 ? '' : 's')+' to reach out to'); }catch(e){}
+  try{ const n = mtActiveClients().filter(function(c){ const d = crmOverdueDays('client', c); return d!=null && d >= 0; }).length; if(n) add('business', n+' client'+(n===1 ? '' : 's')+' due a touch'); }catch(e){}
+  try{ const n = state.tasks.items.filter(function(t){ return t.status!=='done' && t.master && t.master.kind==='pb' && t.deadline && t.deadline < today; }).length; if(n) add('business', n+' playbook task'+(n===1 ? '' : 's')+' late'); }catch(e){}
+  try{ const n = state.tasks.items.filter(function(t){ return t.status!=='done' && t.deadline && t.deadline < today && !(t.master && t.master.kind==='pb'); }).length; if(n) add('focus', n+' task'+(n===1 ? '' : 's')+' overdue'); }catch(e){}
+  try{ const now = Date.now(); const ev = arr(state.calendar.events).find(function(e){ if(e.date!==today || !e.time) return false; const m = (localTs(e.date, e.time) - now)/60000; return m >= -5 && m <= 30; }); if(ev) add('calendar', ev.title+' at '+fmt12Hour(ev.time)); }catch(e){}
+  return out;
+}
+function r55SignalPaint(){
+  if(!state || !state.tasks) return;
+  const s = r55Signals();
+  document.querySelectorAll('.nav-item[data-view]').forEach(function(b){
+    const v = b.getAttribute('data-view'), why = s[v];
+    b.classList.toggle('r55-sig', !!why);
+    if(why){ b.setAttribute('data-r55-why', why.join(' · ')); b.title = why.join('\n'); } else if(b.hasAttribute('data-r55-why')){ b.removeAttribute('data-r55-why'); b.removeAttribute('title'); }
+  });
+}
+afterRenderHooks.push(function(){ clearTimeout(r55SignalPaint._t); r55SignalPaint._t = setTimeout(r55SignalPaint, 300); });
+setInterval(function(){ try{ r55SignalPaint(); }catch(e){} }, 30000);
+
+setTimeout(function(){ try{ if(!state.profile.r55Since){ state.profile.r55Since = todayStr(); persist('profile'); } }catch(e){} }, 0);
+// ---- 12. A journal entry pays when it's really one ----
+// Something you wrote yourself, at least a dozen words. Inspiration you saved, time capsules coming back and app
+// updates don't count as journal entries for XP (inspiration pays on its own).
+function r55JournalCounts(e){
+  // (what you already earned stays earned: this only applies from the day this update came in)
+  const since = state.profile && state.profile.r55Since; if(!since || e.date < since) return true;
+  if(e.capsuleFrom || e.mood==='inspiration' || /^✨ Inspiration/.test(e.title || '') || (typeof isUpdateEntry==='function' && isUpdateEntry(e))) return false;
+  return String(e.text || '').trim().split(/\s+/).filter(Boolean).length >= 12;
+}
