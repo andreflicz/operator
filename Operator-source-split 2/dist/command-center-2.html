@@ -9223,6 +9223,11 @@ body.sb-collapsed .nav-item.r55-sig::after{ inset:2px; }
 .r55-cli-ch select{ flex-shrink:0; max-width:170px; }
 .r55-mc-f .r55-edt, .r55-rep-f .r55-edt{ margin-right:auto; }
 .r55-mc-f, .r55-rep-f{ display:flex; align-items:center; justify-content:flex-end; gap:10px; }
+/* R55: with an item open, the playbook list steps aside so the days keep their width */
+.pbx.has-item{ grid-template-columns:minmax(0, 1fr) !important; }
+.pbx.has-item .pbx-side{ display:none; }
+.pbx.has-item .pbx-main{ padding-right:350px; }
+.pbx-item{ top:166px !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -9420,7 +9425,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793148849377;
+const OP_BUILT = 1793149514917;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
