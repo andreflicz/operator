@@ -135,7 +135,8 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent);
 ## Operator for Mac (mac/)
 - Electron 44.7.0 / electron-builder 26.16.1. uiohook-napi (global talk key) is a dependency, `npmRebuild:false`, `asarUnpack **/*.node`.
 - Packaging (Linux container, no Apple Developer ID). rcodesign can't be downloaded here, so the zips go out unsigned and
-  Andre signs on the Mac: `codesign --force --deep --sign - /Applications/Operator.app` then `xattr -cr` (see INSTALL-x.md).
+  Andre installs with `bash ~/Downloads/install-operator.sh` (mac/install-operator.sh: unzips with ditto, copies to
+  /Applications, signs inside out with codesign, verifies, opens). `codesign --deep` failed for him on 3.2.0; don't send that again.
   Old rcodesign steps, if it's available:
   1. bump `version` in mac/package.json (and package-lock.json);
   2. `node stage.js`;
