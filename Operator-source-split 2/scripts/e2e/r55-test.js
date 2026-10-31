@@ -160,7 +160,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ACTIONS.r55RepSave()");
   check('save: it’s in their journal', await E("arr(crmFind('client', 'jj').journal).some(j => j.kind==='report')"));
   await E("opfEl()");
-  check('it’s an ability on Op’s screen', !!(await p.$('#opFull .r55-opab-b[data-action="r55Report"]')));
+  // (round 57: the report moved to Social → Clients, a button per client; Op still opens it when asked)
+  check('it’s an ability on Op’s screen', !(await p.$('#opFull .r55-opab-b[data-action="r55Report"]')) && /data-action="r55Report" data-id="/.test(await E("(ui.socTab='clients', r55CliHtml())")));
   check('Op can open it when you ask', await E("OP_TOOLS.some(t => t.name==='client_report')"));
 
   // ---- clients' socials ----
