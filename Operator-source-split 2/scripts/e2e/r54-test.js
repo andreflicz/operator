@@ -86,17 +86,18 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Settings → Op: Talk key, Hey Operator, long-break callouts; no live, no check-in levels', /Talk key/.test(st) && /Hey Operator/.test(st) && /Calls out long breaks/.test(st) && !/Live conversation/.test(st) && !/Now and then/.test(st));
 
   // ---- the talk key: a toggle, with a sound and moving bars ----
-  await E("window.__listen = 0; aiListen = function(){ window.__listen++; AI.listening = true; AI.sendNow = function(){ AI.listening = false; window.__sent = (window.__sent||0) + 1; }; }; AI.listening = false; AI.busy = false; AI.transcribing = false; window.__opGlobalKey = false; state.profile.opKeyOn = true");
+  await E("window.__listen = 0; aiListen = function(){ window.__listen++; AI.listening = true; AI.sendNow = function(){ AI.listening = false; window.__sent = (window.__sent||0) + 1; }; }; AI.listening = false; AI.busy = false; AI.transcribing = false; window.__opGlobalKey = false; state.profile.opKeyOn = true; state.profile.opKeyMode = 'tap' /* (round 57: hold to talk is the default; tap on, tap off is still a choice) */");
   await p.keyboard.down('AltRight'); await p.keyboard.up('AltRight'); await p.waitForTimeout(100);
   check('press the key: he listens', await E("window.__listen")===1 && await E("AI.listening"));
   await p.keyboard.down('AltRight'); await p.keyboard.up('AltRight'); await p.waitForTimeout(100);
   check('press again: it sends', await E("window.__sent")===1 && !(await E("AI.listening")));
   await p.keyboard.down('AltRight'); await p.keyboard.press('KeyK'); await p.keyboard.up('AltRight'); await p.waitForTimeout(100);
   check('the key used with another key (⌥K) does nothing', await E("window.__listen")===1);
+  // (round 57: with Operator in front the page answers the key itself and the Mac-wide key stays out of it, so one press is one action)
   await E("window.__opGlobalKey = true"); await p.keyboard.down('AltRight'); await p.keyboard.up('AltRight'); await p.waitForTimeout(100);
-  check('in the Mac app the app-wide key takes over (no double press)', await E("window.__listen")===1);
-  await E("window.__opGlobalKey = false; state.profile.opKeyOn = false"); await p.keyboard.down('AltRight'); await p.keyboard.up('AltRight'); await p.waitForTimeout(100);
-  check('Talk key off: nothing', await E("window.__listen")===1);
+  check('in the Mac app the app-wide key takes over (no double press)', await E("window.__listen")===2);
+  await E("AI.sendNow && AI.sendNow(); window.__opGlobalKey = false; state.profile.opKeyOn = false"); await p.keyboard.down('AltRight'); await p.keyboard.up('AltRight'); await p.waitForTimeout(100);
+  check('Talk key off: nothing', await E("window.__listen")===2);
   check('the bars move with a normal speaking voice', await E("(SCR.level = 0.02, Math.min(1, SCR.level*14)) > 0.35") && await E("(SCR.level = 0.002, Math.min(1, SCR.level*14)) < 0.25"));
   await E("SCR.level = 0; AI.listening = false");
 

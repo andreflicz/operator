@@ -234,6 +234,28 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('a time capsule that opens comes back the same way (it pops up to add to)', await E("(function(){ const e = state.journal.entries.find(x => x.capsuleFrom==='2026-06-01'); return !!e && e.back && e.back.next===todayStr(); })()"));
   await E("(function(){ const e = state.journal.entries.find(x => x.capsuleFrom==='2026-06-01'); e.back.shownOn = todayStr(); })()");
 
+  // ================= E. the pages =================
+  await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); xpSystemShow = function(){}; const jj = crmFind('client', 'jj'); jj.deliverables[0].weeklyTarget = 2; jj.deliverables[0].completedDates = [todayStr().slice(0, 8)+'02', todayStr().slice(0, 8)+'06']; persist('business')");
+  check('Socials → Clients: a client’s month of numbered reels on their posting days, done from what’s delivered', await E("(function(){ const pl = r57ContentPlan(crmFind('client', 'jj')); return pl.length===monthlyTargetFor(crmFind('client', 'jj').deliverables[0]) && pl[0].what==='8 reel' && pl.filter(x => x.st==='done').length===2 && pl.every(x => ['1', '3', '5'].indexOf(String(new Date(x.date+'T12:00').getDay())) >= 0); })()"));
+  await E("ui.view='convos'; ui.socTab='clients'; ui.r57Cli='jj'; renderView()"); await p.waitForTimeout(250);
+  check('…one client at a time, their calendar, their report and an export, right there', (await p.$$('.r57-cli-p button')).length===2 && !!(await p.$('.r57-cc-g')) && !!(await p.$('.r57-cli-acts [data-action="r55Report"][data-id="jj"]')) && !!(await p.$('[data-action="r57CliExport"]')));
+  check('…the export is something to send them (what, when, delivered or not)', /8 reel 1\s.*·\s+(Delivered|Coming|Today|Planned)/.test(await E("r57CliExportText(crmFind('client', 'jj'))")));
+  await E("ui.view='today'; renderView(); AI.hasKey = false; opBubShow()"); await p.waitForTimeout(150);
+  check('Op’s bubble: one Open (full screen, his chats there), one Turn Op off, and ✕', !!(await p.$('#opBub .r57-bub-open')) && !!(await p.$('#opBub .r57-bub-off')) && (await p.$$('#opBub .op-bub-h > button:not(.r57-gone), #opBub .op-bub-h .op-bub-ics button:not(.r57-gone)')).length===3);
+  await E("ACTIONS.r57OpOffMenu()");
+  check('…Turn Op off: mute his voice, quiet for an hour, or off', (await p.$$('#opBub .r57-offm button')).length===3);
+  await E("document.querySelectorAll('.r57-offm').forEach(m => m.remove()); state.profile.opMoodColorMap = {concern:'#ff8800'}; r57MoodCss()");
+  check('his colour per mood (Settings → Op’s colour)', /data-op-mood="concern"[^}]*#ff8800/.test(await E("document.getElementById('r57MoodCss').textContent")));
+  await E("(function(){ state.health.weightLog.push({id:'wq', date:todayStr(), weight:180}); const st = opReadStore(); st.health = {text:'Pattern: a. Watch: b. Move: c.', sig:'x', day:todayStr(), at:Date.now()}; AI.hasKey = true; window.__akc = aiKeyCheck; aiKeyCheck = function(){}; window.__ork = opReadKick; opReadKick = function(){}; ui.view='personal'; ui.personalTab='fitness'; ui.healthSub='overview'; renderView(); })()"); await p.waitForTimeout(300);
+  check('Op’s read on a page is a line under the title (not a boxed panel between the others), and it writes itself out', await E("(function(){ const r = document.querySelector('.r57-opl'), sc = document.querySelector('#viewRoot .subtab-panel'); return !!r && !!sc && (r.compareDocumentPosition(sc) & Node.DOCUMENT_POSITION_FOLLOWING) && !sc.contains(r); })()") && /What’s going on/.test(await p.textContent('.r57-opl')));
+  await E("aiKeyCheck = window.__akc; opReadKick = window.__ork; AI.hasKey = false");
+  // food for another day
+  await E("ui.r57FuelDay = addDays(todayStr(), -2); renderView(); state.meals.library = [{id:'m1', name:'Oats', calories:400, uses:0}]; quickMeal('m1')");
+  check('Health: food for any day (‹ day ›); what you log goes to that day', await E("state.health.calorieEntries.some(c => c.name==='Oats' && c.date===addDays(todayStr(), -2))") && /‹|Mon|Tue|Wed|Thu|Fri|Sat|Sun/.test(await p.textContent('.r57-fd')));
+  check('…and that day’s food counts where food counts (the day’s total)', await E("state.health.calorieEntries.filter(c => c.date===addDays(todayStr(), -2)).reduce((a, c) => a + c.calories, 0)") >= 400);
+  await E("ui.view='focus'; ui.focusTab='analytics'; ui.analyticsRange='week'; renderView()"); await p.waitForTimeout(200);
+  check('Analytics: one hero you read at a glance (a ring, the days, three numbers)', !!(await p.$('.r57-an .r57-an-ring svg')) && (await p.$$('.r57-an-bars i')).length===7 && (await p.$$('.r57-an-n div')).length===3);
+
   }catch(err){ check('the run reached the end', false, String(err && err.message || err).slice(0, 300)); }
   check('no errors', p.errors.length===0, p.errors);
   await b.close();

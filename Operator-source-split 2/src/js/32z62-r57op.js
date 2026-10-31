@@ -272,7 +272,7 @@ window.addEventListener('keydown', function(e){
 window.addEventListener('keyup', function(e){
   if(!r54KeyOn() || e.code!==opPttKey() || r57Capture.on) return;
   e.stopImmediatePropagation(); e.stopPropagation();
-  if(!r57HoldMode()){ const k = R54.keyDown; R54.keyDown = null; if(k){ e.preventDefault(); r54TalkToggle(); } return; }
+  if(!r57HoldMode()){ const k = R54.keyDown; R54.keyDown = null; if(k && !k.other){ e.preventDefault(); r54TalkToggle(); } return; }
   e.preventDefault(); r57Up();
 }, true);
 // (a mouse button as the key: 3 = middle, 4/5 = the side buttons)

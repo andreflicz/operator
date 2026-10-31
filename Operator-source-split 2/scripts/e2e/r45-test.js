@@ -52,7 +52,7 @@ function chromePath(){ try{ const d = fs.readdirSync('/opt/pw-browsers').filter(
   await E("opCaption('x'); opWrapUp('clockout')"); await p.waitForTimeout(200);
   check('…once a day', !/That’s the day/.test(await bub()));
   await E("opGoodnight()"); await p.waitForTimeout(300);
-  check('going to sleep: goodnight, with the alarm', /Goodnight, Andre/.test(await bub()) && /7:30 AM/.test(await bub()), await bub());
+  check('going to sleep: goodnight, with the alarm', /Goodnight, see you then/.test(await bub()) /* (round 57: “Goodnight, see you then”, as asked) */ && /7:30 AM/.test(await bub()), await bub());
 
   // settings: no memory list; the switch, talking, live
   await E("ui.view='settings'; ui.settingsTab='connections'; renderView()"); await p.waitForTimeout(200);
