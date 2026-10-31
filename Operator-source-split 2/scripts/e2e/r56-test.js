@@ -21,65 +21,69 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('no playbooks you didn’t make, and nobody put on one', await E("pbAll().length===0 && !state.business.clients.some(c => c.pb)"));
   check('empty: one clear way to make one', !!(await p.$('.pb6-empty [data-action="pb6NewOpen"]')));
 
-  // ---- a new playbook: name, for, length, what happens when it ends ----
+  // ---- a new playbook: name, for, its stages, what happens after the last stage ----
+  // (round 57: a playbook is a pipeline of stages you move people through, so it has no length of its own; each
+  // stage says roughly how long it takes, and a stage can run every month. These checks follow that.)
   await p.click('.pb6-bar [data-action="pb6NewOpen"]'); await p.waitForTimeout(200);
-  check('the new-playbook sheet asks the name, who it’s for, how long, and what happens when it ends', !!(await p.$('#pb6NewName')) && (await p.$$('#pb6NewSheet [data-action="pb6NewSet"][data-id^="for:"]')).length===2 && (await p.$$('#pb6NewSheet [data-action="pb6NewSet"][data-id^="days:"]')).length===3 && !!(await p.$('#pb6NewEnds')));
-  await p.fill('#pb6NewName', 'Retainer'); await p.fill('#pb6NewDays', '28'); await p.selectOption('#pb6NewEnds', 'again');
+  check('the new-playbook sheet asks the name, who it’s for, its stages, and what happens when it ends', !!(await p.$('#pb6NewName')) && (await p.$$('#pb6NewSheet [data-action="pb6NewSet"][data-id^="for:"]')).length===2 && (await p.$$('#pb6NewSheet [data-action="pb6NewSet"][data-id^="mirror:"]')).length===2 && !!(await p.$('#pb6NewEnds')));
+  await p.fill('#pb6NewName', 'Retainer'); await p.click('[data-id="mirror:0"]'); await p.waitForTimeout(100); await p.fill('#pb6NewName', 'Retainer'); await p.selectOption('#pb6NewEnds', 'again');
   await p.click('[data-action="pb6Create"]'); await p.waitForTimeout(250);
-  check('…made: 28 days, for clients, starts again', await E("JSON.stringify(pbAll().map(x => [x.name, x.days, pbFor(x), pbRepeats(x), !!x.isDefault]))")===JSON.stringify([['Retainer', 28, 'client', true, false]]));
-  await E("ACTIONS.pb6NewOpen()"); await p.waitForTimeout(150); await p.fill('#pb6NewName', 'Onboarding'); await p.selectOption('#pb6NewEnds', pbId = await E("pbAll()[0].id")); await p.click('[data-action="pb6Create"]'); await p.waitForTimeout(250);
-  check('…another that moves them on to Retainer when it ends', await E("pbAll()[1].next===pbAll()[0].id && !pbRepeats(pbAll()[1]) && pbAll()[1].days===30"));
+  await E("pbStages(pbAll()[0])[0].repeat = 'month'; pbStages(pbAll()[0])[0].name = 'Monthly service'; pbSave()");
+  check('…made: for clients, starts again, its stage runs every month', await E("JSON.stringify(pbAll().map(x => [x.name, pbFor(x), pbRepeats(x), !!x.isDefault, pbStages(x)[0].repeat]))")===JSON.stringify([['Retainer', 'client', true, false, 'month']]));
+  await E("ACTIONS.pb6NewOpen()"); await p.waitForTimeout(150); await p.fill('#pb6NewName', 'Onboarding'); await p.click('[data-id="mirror:0"]'); await p.waitForTimeout(100); await p.fill('#pb6NewName', 'Onboarding'); await p.selectOption('#pb6NewEnds', pbId = await E("pbAll()[0].id")); await p.click('[data-action="pb6Create"]'); await p.waitForTimeout(250);
+  await E("pbStages(pbAll()[1])[0].days = 30; pbSave()");
+  check('…another that moves them on to Retainer when it ends', await E("pbAll()[1].next===pbAll()[0].id && !pbRepeats(pbAll()[1])"));
   await E("ACTIONS.pb6NewOpen()"); await p.waitForTimeout(150); await p.click('[data-id="for:lead"]'); await p.waitForTimeout(100); await p.fill('#pb6NewName', 'New lead'); await p.click('[data-action="pb6Create"]'); await p.waitForTimeout(250);
-  check('…and one for leads', await E("pbFor(pbAll()[2])==='lead'"));
+  check('…and one for leads (its stages are the Lead Center’s)', await E("pbFor(pbAll()[2])==='lead' && pbStages(pbAll()[2]).every(s => !!s.crm)"));
 
   // ---- Build ----
-  await E("ui.pbView='build'; ui.pbSel=pbAll()[1].id; ui.pbItem=null; renderView()"); await p.waitForTimeout(200);
-  const head = await p.textContent('.pb6-head');
+  await E("ui.pbView='build'; ui.pbWho='client'; ui.pbSel=pbAll()[1].id; ui.pb57Stage=null; ui.pbItem=null; renderView()"); await p.waitForTimeout(200);
   check('Build: no Lead / Onboarding / Monthly service switch, no ★, no “new clients start here”', !(await p.$('[data-action="pbKind"]')) && !(await p.$('.pbx-star')) && !/start here/i.test(await p.textContent('#viewRoot')));
-  check('the length can be changed in the header', !!(await p.$('select[data-pb-f="days"]')) && await E("document.querySelector('select[data-pb-f=\"days\"]').value")==='30');
+  check('a stage’s length is set on the stage (no fixed day count on the playbook)', !(await p.$('select[data-pb-f="days"]')) && !!(await p.$('[data-action="pb57StageEdit"]')));
   check('no legend line', !(await p.$('.pbx-legend')) && !/Day 1 is/.test(await p.textContent('#viewRoot')));
-  check('a calendar of its 30 days, and a weekly row with the seven weekdays', (await p.$$('.pb6-day')).length===30 && (await p.$$('.pb6-wd')).length===7);
+  check('its steps as a list; no separate weekly row', !!(await p.$('.pb57-list')) && !(await p.$('.pb6-wd')));
   await E("ACTIONS.pbAdd(null, null, '1')"); await p.waitForTimeout(150);
   await p.fill('.pb6-item .pb6-it', 'Onboarding call'); await p.press('.pb6-item .pb6-it', 'Tab'); await p.waitForTimeout(100);
   await E("ACTIONS.pbItemType(null, null, 'call')"); await p.waitForTimeout(100);
-  check('+ on a day: an item there, the panel opens on the right (name it, give it a type)', await E("JSON.stringify(pbAll()[1].items.map(i => [i.title, i.type, i.day]))")===JSON.stringify([['Onboarding call', 'call', 1]]));
+  check('+ Step: the panel opens on the right (name it, give it a type)', await E("JSON.stringify(pbStages(pbAll()[1])[0].steps.map(i => [i.title, i.type, i.due.rule]))")===JSON.stringify([['Onboarding call', 'call', 'enter']]));
   const box = await p.$eval('.pb6-item', n => { const r = n.getBoundingClientRect(); return {b:Math.round(r.bottom), r:Math.round(r.right), pos:getComputedStyle(n).position}; });
-  check('the item panel sits beside the calendar, clear of the Op light and the + (not a fixed drawer)', box.pos==='sticky' && box.b < 900 - 90, box);
+  check('the step panel sits beside the steps, clear of the Op light and the + (not a fixed drawer)', box.pos==='sticky' && box.b < 900 - 90, box);
   await E("ACTIONS.pbItemClose(); ACTIONS.pbAdd(null, null, '10')"); await p.waitForTimeout(150); await p.fill('.pb6-item .pb6-it', 'Strategy doc'); await p.press('.pb6-item .pb6-it', 'Tab'); await E("ACTIONS.pbItemClose()"); await p.waitForTimeout(150);
   await E("ACTIONS.pb6AddWeek(null, null, '5')"); await p.waitForTimeout(150); await p.fill('.pb6-item .pb6-it', 'Weekly check-in'); await p.press('.pb6-item .pb6-it', 'Tab'); await E("ACTIONS.pbItemClose()"); await p.waitForTimeout(150);
-  check('+ on a weekday makes a weekly item on that day', await E("JSON.stringify(pbAll()[1].items.filter(i => i.repeat==='week').map(i => [i.title, i.dow]))")===JSON.stringify([['Weekly check-in', 5]]));
-  await p.dragAndDrop('.pb6-day[data-pb-day="10"] .pb6-chip', '.pb6-wd[data-pb-dow="1"]'); await p.waitForTimeout(250);
-  check('drag an item onto a weekday: it’s every week, that day', await E("JSON.stringify((function(){ const i = pbAll()[1].items.find(x => x.title==='Strategy doc'); return [i.repeat, i.dow]; })())")===JSON.stringify(['week', 1]));
-  await p.dragAndDrop('.pb6-wd[data-pb-dow="1"] .pb6-chip', '.pb6-day[data-pb-day="12"]'); await p.waitForTimeout(250);
-  check('…and back onto a day', await E("JSON.stringify((function(){ const i = pbAll()[1].items.find(x => x.title==='Strategy doc'); return [i.repeat, i.day]; })())")===JSON.stringify(['once', 12]));
+  check('a step can be every week on a weekday', await E("JSON.stringify(pbStages(pbAll()[1])[0].steps.filter(i => i.due.rule==='week').map(i => [i.title, i.due.dow]))")===JSON.stringify([['Weekly check-in', 5]]));
+  await E("ui.pb57Cal = true; renderView()"); await p.waitForTimeout(150);
+  await p.dragAndDrop('.pb6-day[data-pb57-day="10"] .pb6-chip', '.pb6-day[data-pb57-day="12"]'); await p.waitForTimeout(250);
+  check('on the guide calendar, drag a step to another day', JSON.stringify(await E("pbStages(pbAll()[1])[0].steps.find(x => x.title==='Strategy doc').due"))===JSON.stringify({rule:'day', n:12}));
+  await E("ui.pb57Cal = false; renderView()"); await p.waitForTimeout(100);
   check('the right side shows who’s on it (nobody) and how to put someone on', /On it/.test(await p.textContent('.pb6-side')) && !!(await p.$('.pb6-side select[data-pb6-addp]')));
   await p.selectOption('.pb6-side select[data-pb6-addp]', 'kk'); await p.waitForTimeout(250);
   check('put a client on it from there', await E("crmFind('client', 'kk').pb && crmFind('client', 'kk').pb.id===pbAll()[1].id"));
 
   // ---- the tasks ----
   const tasks = JSON.parse(await E("JSON.stringify(state.tasks.items.filter(t => t.master && t.master.kind==='pb' && t.master.id==='kk').map(t => [t.title, t.status, t.deadline]))"));
-  check('every item on it is a task (day 1 = her start, Oct 20): what’s due or late on today, later ones in the backlog with their date', tasks.some(t => t[0]==='Onboarding call' && t[1]==='today') && tasks.some(t => t[0]==='Strategy doc' && t[1]==='backlog' && t[2]==='2026-10-31') && tasks.some(t => t[0]==='Weekly check-in'), tasks);
+  check('every step on it is a task (day 1 = her start, Oct 20): what’s due or late on today, later ones in the backlog with their date', tasks.some(t => /Onboarding call/.test(t[0]) && t[1]==='today') && tasks.some(t => t[0]==='Strategy doc' && t[1]==='backlog' && t[2]==='2026-10-31') && tasks.some(t => t[0]==='Weekly check-in'), tasks);
   await E("ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='overview'; renderView()"); await p.waitForTimeout(250);
   check('…on Focus → Tasks', /Onboarding call/.test(await p.textContent('#viewRoot')));
   await E("ui.focusTasksSubTab='clientBacklog'; renderView()"); await p.waitForTimeout(250);
   const cbl = await p.textContent('#viewRoot');
   check('…and in Client backlog, under the client, with Today and Done', /Kiko/.test(cbl) && /Strategy doc/.test(cbl) && /Onboarding call/.test(cbl) && (await p.$$('.pb6-cw [data-action="pb6Done"]')).length >= 3);
-  await p.click('.pb6-cw [data-action="pb6Today"]'); await p.waitForTimeout(150);
+  await p.click('.pb6-cw [data-action="pb6Today"]:not(.is-on)'); await p.waitForTimeout(150);
   check('→ Today from there puts it on today', await E("state.tasks.items.filter(t => t.master && t.master.kind==='pb' && t.master.id==='kk' && t.status==='today').length") >= 2);
 
   // ---- Board ----
-  await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='board'; ui.pbWho='client'; renderView()"); await p.waitForTimeout(250);
-  check('Board: a column for each playbook for clients, and one for those not on any', (await p.$$('.pb6-col')).length===3 && /Not on a playbook/.test(await p.textContent('.pb6-col.is-off')));
-  check('the cards say the day and what’s next', /Day 9 of 30/.test(await p.textContent('.pb6-board')) && /Onboarding call/.test(await p.textContent('.pb6-board')));
-  await p.dragAndDrop('.pb6-col.is-off .pb6-card[data-pb6-drag="client:jj"]', '.pb6-col[data-pb6-col="'+(await E("pbAll()[0].id"))+'"]'); await p.waitForTimeout(300);
-  check('drag a client onto a playbook: they’re on it (day 1 their start date, for one that runs again)', await E("crmFind('client', 'jj').pb.id===pbAll()[0].id && crmFind('client', 'jj').pb.start==='2026-01-05'"));
-  await p.dragAndDrop('.pb6-card[data-pb6-drag="client:kk"]', '.pb6-col[data-pb6-col="'+(await E("pbAll()[0].id"))+'"]'); await p.waitForTimeout(300);
+  await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='board'; ui.pbWho='client'; ui.pbSel=pbAll()[1].id; renderView()"); await p.waitForTimeout(250);
+  check('Board: a column for each stage of the playbook, and one for those not on it', (await p.$$('.pb6-col')).length===2 && /Not on Onboarding/.test(await p.textContent('.pb6-col.is-off')));
+  check('the cards say the day and what’s next', /Day 9/.test(await p.textContent('.pb6-board')) && /Onboarding call/.test(await p.textContent('.pb6-board')));
+  await E("ui.pbSel=pbAll()[0].id; renderView()"); await p.waitForTimeout(200);
+  await p.dragAndDrop('.pb6-col.is-off .pb6-card[data-pb6-drag="client:jj"]', '.pb6-col[data-pb6-col^="'+(await E("pbAll()[0].id"))+'"]'); await p.waitForTimeout(300);
+  check('drag a client onto a playbook: they’re on it (day 1 their start date, for a stage that runs every month)', await E("crmFind('client', 'jj').pb.id===pbAll()[0].id && crmFind('client', 'jj').pb.start==='2026-01-05'"));
+  await p.dragAndDrop('.pb6-card[data-pb6-drag="client:kk"]', '.pb6-col[data-pb6-col^="'+(await E("pbAll()[0].id"))+'"]'); await p.waitForTimeout(300);
   check('drag them from one to another: it says first what gets checked off', /checks off \d+ open thing/.test(await E("window.__conf.text")) && await E("crmFind('client', 'kk').pb.id===pbAll()[0].id"));
   check('…and the old one’s open tasks are done', await E("!state.tasks.items.some(t => t.master && t.master.kind==='pb' && t.master.id==='kk' && t.master.pb===pbAll()[1].id && t.status!=='done')"));
   await p.dragAndDrop('.pb6-card[data-pb6-drag="client:kk"]', '.pb6-col.is-off'); await p.waitForTimeout(300);
-  check('drag onto “Not on a playbook”: off it', await E("!crmFind('client', 'kk').pb.id") && /Take Kiko off/.test(await E("window.__conf.title")));
+  check('drag onto “Not on …”: off it', await E("!crmFind('client', 'kk').pb.id") && /Take Kiko off/.test(await E("window.__conf.title")));
   await E("ACTIONS.pb6Who(null, null, 'lead')"); await p.waitForTimeout(200);
-  check('Leads: their own columns', (await p.$$('.pb6-col')).length===2 && /Mia/.test(await p.textContent('.pb6-board')));
+  check('Leads: their own playbook, its stages the Lead Center’s', (await p.$$('.pb6-col')).length===1 + await E("pbStages(pbAll()[2]).length") && /Mia/.test(await p.textContent('.pb6-board')));
 
   // ---- adding someone ----
   await E("openNewContactModal('client')"); await p.waitForTimeout(200);
@@ -99,8 +103,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // ---- what the review found ----
   await E("(function(){ const P = pbNew('client', 'Empty one', 30); pbAll().push(P); pbSave(); window.__empty = P.id; })(); state.business.clients.push({id:'em', name:'Em', business:'Em Co', stage:'active', status:'active', mrr:500, startDate:todayStr(), deliverables:[]}); pbMoveTo('client', 'em', window.__empty)"); await p.waitForTimeout(200); await E("masterTasksSync(); masterTasksSync()");
   check('review: someone on an empty playbook isn’t “finished” or moved on', await E("crmFind('client', 'em').pb.id===window.__empty && !crmFind('client', 'em').pb.finished"));
-  await E("pbById(window.__empty).items.push(pbItem('First thing', 'task', 1)); pbSave()");
-  check('…and once it has items, they show up as tasks', await E("state.tasks.items.some(t => t.master && t.master.kind==='pb' && t.master.id==='em' && t.title==='First thing')"));
+  await E("pbStages(pbById(window.__empty))[0].steps.push(pb57Step('First thing', 'task', {rule:'enter'})); pbSave()");
+  check('…and once it has steps, they show up as tasks', await E("state.tasks.items.some(t => t.master && t.master.kind==='pb' && t.master.id==='em' && t.title==='First thing')"));
   await E("pbMoveTo('client', 'em', null)"); await p.waitForTimeout(200);
   check('review: taking someone off removes their open tasks (not marked done)', await E("!state.tasks.items.some(t => t.master && t.master.kind==='pb' && t.master.id==='em') && !state.tasks.items.some(t => t.title==='First thing' && t.status==='done')"));
   check('review: undoing an old playbook task after they’re off doesn’t throw', await E("(function(){ state.tasks.items.push({id:'ux', title:'Old one', status:'done', completedAt:todayStr(), master:{kind:'pb', k:'client:em:x', who:'client', id:'em', key:'x', pb:window.__empty, type:'task'}}); try{ undoTask('ux'); return true; }catch(e){ return String(e); } })()")===true);
@@ -110,7 +114,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("(function(){ const S = pbNew('lead', 'Stage one', 14); S.stage = 'contacted'; pbAll().push(S); pbSave(); window.__stage = S.id; })(); openNewContactModal('lead')"); await p.waitForTimeout(200);
   await p.fill('#ncName', 'Lee'); await p.selectOption('#ncStage', 'contacted').catch(() => {}); await p.selectOption('#ncPlaybook', await E("pbAll()[2].id"));
   await E("ACTIONS.saveNewContact()"); await p.waitForTimeout(300);
-  check('review: a new lead with a pick goes straight on it (no stray stage playbook first)', await E("(function(){ const l = state.business.pipeline.find(x => x.name==='Lee'); return !!l && l.pb.id===pbAll()[2].id && !arr(l.pb.hist).length; })()"));
+  check('review: a new lead with a pick goes straight on it (no stray stage playbook first)', await E("(function(){ const l = state.business.pipeline.find(x => x.name==='Lee'); return !!l && l.pb.id===pbAll()[2].id && !arr(l.pb.hist).some(h => h.id!==pbAll()[2].id); })()"));
   await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'))");
   await E("pbMoveTo('client', 'tw', window.__stage2 = pbAll()[0].id)"); await p.waitForTimeout(150);
   await E("ACTIONS.pbDelete(null, null, pbAll()[1].id)"); await p.waitForTimeout(250);
@@ -119,6 +123,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   // ---- old playbooks lose their kind and ★ ----
   check('old ones: no ★, what they are for and what happens when they end kept', await E("(function(){ const o = {id:'old1', name:'Old', kind:'monthly', isDefault:true, days:30, items:[]}; pbKindSync(o); return o.for==='client' && o.repeats===true && o.isDefault===false; })()"));
+
 
   // ---- round 56, second batch ----
   await E("state.focus.activeSession = {startedAt:Date.now() - 3600000, plannedMinutes:null, completedTasks:[], breaks:[], onBreak:false, autoStarted:true}; persist('focus')");
@@ -137,7 +142,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('the streak’s Edit (to add a day you forgot) is always visible', await E("(function(){ ui.view='today'; renderView(); const b = document.querySelector('.sw-edit, .streak-edit-btn'); return !!b && Number(getComputedStyle(b).opacity) > 0.5; })()"));
   check('hold buttons say “Hold to …”', await E("(function(){ const d = document.createElement('div'); d.innerHTML = '<button data-action=\"saveIntent\">Start the week →</button>'; document.body.appendChild(d); r55HoldPrep(d); const t = d.textContent; d.remove(); return /Hold to start the week/.test(t); })()"));
   // leads: no tasks, one reach-out task, notifications, a calendar in the Log center
-  await E("(function(){ const L = pbAll().find(x => pbFor(x)==='lead') || (function(){ const n = pbNew('lead', 'Lead flow', 14); pbAll().push(n); return n; })(); L.items = [pbItem('Discovery call', 'call', 1)]; pbSave(); pbMoveTo('lead', 'l1', L.id); })()"); await p.waitForTimeout(200); await E("masterTasksSync()");
+  await E("(function(){ const L = pbAll().find(x => pbFor(x)==='lead') || (function(){ const n = pbNew('lead', 'Lead flow', 14); pbAll().push(n); return n; })(); (pbStages(L).find(s => s.crm==='contacted') || pbStages(L)[0]).steps.push(pb57Step('Discovery call', 'call', {rule:'enter'})); /* (round 57: steps live on a stage) */ pbSave(); pbMoveTo('lead', 'l1', L.id); })()"); await p.waitForTimeout(200); await E("masterTasksSync()");
   check('leads get no playbook tasks of their own', await E("!state.tasks.items.some(t => t.master && t.master.kind==='pb' && t.master.who==='lead' && t.status!=='done')"));
   check('…what’s due folds into the one “Reach out to leads” task', await E("state.tasks.items.some(t => t.master && t.master.kind==='reachLeads' && t.status!=='done' && arr(t.leads).indexOf('l1') >= 0)"));
   check('…and a notification', await E("notifList().some(n => /^pbl:l1/.test(n.key))"));
@@ -145,14 +150,16 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('logging a touch ticks off what was due on their playbook', await E("pbState('lead', crmFind('lead', 'l1')).open.every(o => o.date > todayStr())"));
   await E("ui.view='business'; ui.businessTab='log'; ui.r54Lc='leads'; ui.r56LeadCal=true; renderView()"); await p.waitForTimeout(250);
   check('Log center → Leads has a Calendar view of the month', (await p.$$('.r56-lc-d:not(.is-empty)')).length >= 28 && !!(await p.$('.r56-lv')));
-  // the playbook length can be changed
-  await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='build'; ui.pbSel=pbAll()[0].id; renderView()"); await p.waitForTimeout(200);
-  await p.selectOption('select[data-pb-f="days"]', '14'); await p.waitForTimeout(200);
-  check('change a playbook’s length', await E("pbAll()[0].days")===14 && (await p.$$('.pb6-day')).length===14);
+  // a stage's usual length can be changed (its guide follows)
+  await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='build'; ui.pbWho='client'; ui.pbSel=pbAll()[0].id; ui.pb57Stage=null; ui.pbItem=null; ui.pb57StageEdit=true; renderView()"); await p.waitForTimeout(200);
+  await E("pbStages(pbAll()[0])[0].repeat = null; pbSave(); renderView()"); await p.waitForTimeout(150);
+  await p.fill('[data-pb57-sf="days"]', '14'); await p.press('[data-pb57-sf="days"]', 'Tab'); await p.waitForTimeout(200);
+  await E("ui.pb57StageEdit=false; ui.pb57Cal=true; renderView()"); await p.waitForTimeout(150);
+  check('change how long a stage usually takes', await E("pbStages(pbAll()[0])[0].days")===14 && (await p.$$('.pb6-day')).length===14);
 
-  // ---- the build view fits the screen ----
+  // ---- the guide fits the screen ----
   for(const [w, h] of [[3440, 1440], [1920, 1080]]){
-    await p.setViewportSize({width:w, height:h}); await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='build'; ui.pbSel=pbAll()[1].id; ui.pbItem=null; renderView()"); await p.waitForTimeout(300);
+    await p.setViewportSize({width:w, height:h}); await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='build'; ui.pbSel=pbAll()[0].id; ui.pbItem=null; ui.pb57Cal=true; pbStages(pbAll()[0])[0].repeat='month'; renderView()"); await p.waitForTimeout(300);
     const f = await E("JSON.stringify((function(){ const c = document.querySelector('.pb6-cal').getBoundingClientRect(), d = document.querySelector('.pb6-day').getBoundingClientRect(); return {bottom:Math.round(c.bottom), w:Math.round(d.width), h:Math.round(d.height)}; })())");
     const F = JSON.parse(f);
     check('playbook calendar at '+w+'×'+h+': all of it on screen, days not squashed flat', F.bottom <= h && F.w/F.h < 1.6, f);
