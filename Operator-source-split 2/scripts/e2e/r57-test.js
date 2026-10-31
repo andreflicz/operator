@@ -256,6 +256,25 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.view='focus'; ui.focusTab='analytics'; ui.analyticsRange='week'; renderView()"); await p.waitForTimeout(200);
   check('Analytics: one hero you read at a glance (a ring, the days, three numbers)', !!(await p.$('.r57-an .r57-an-ring svg')) && (await p.$$('.r57-an-bars i')).length===7 && (await p.$$('.r57-an-n div')).length===3);
 
+  // ================= F. the video idea forms =================
+  await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); ui.view='focus'; ui.focusTab='tasks'; renderView(); openAddVideoIdeaModal(); document.getElementById('newVideoIdeaTitle').value = 'typed, never saved'; closeAddVideoIdeaModal(); openAddVideoIdeaModal()");
+  check('the video idea form opens empty (nothing left from last time)', await E("document.getElementById('newVideoIdeaTitle').value")==='');
+  await E("document.getElementById('newVideoIdeaTitle').value = 'Kitchen BTS'; document.getElementById('newVideoIdeaNotes').value = 'wide lens'; addVideoIdea(); openAddVideoIdeaModal()");
+  check('…and after a save', await E("document.getElementById('newVideoIdeaTitle').value===''&&document.getElementById('newVideoIdeaNotes').value===''"));
+  await E("closeAddVideoIdeaModal(); openContentSheet('business'); document.getElementById('csTitle').value = 'Leftover'; closeContentSheet(); openContentSheet('business')");
+  check('…the + menu’s New video too', await E("document.getElementById('csTitle').value===''&&!ui.csType"));
+  await E("closeContentSheet()");
+  // ================= G. the XP audit =================
+  await E("ACTIONS.openXpHow()"); await p.waitForTimeout(250);
+  const guide = await E("document.getElementById('xpHowContent').textContent");
+  check('How XP works shows XP_BOOK’s workout numbers (not the old 150 / 70 / 60 table)', guide.indexOf(String(await E("XP_BOOK.health.workouts.join(', ')"))) >= 0 && guide.indexOf(String(await E("XP_BOOK.health.firstFive"))) >= 0 && !/1st a week/.test(guide));
+  check('…and the playbook stage XP', /A playbook stage finished/.test(guide) && guide.indexOf('+'+(await E("XP_BOOK.work.stage"))+' each') >= 0);
+  await E("ACTIONS.closeXpHow()");
+  check('a finished playbook stage earns XP that day (Work)', await E("(function(){ xpLast = null; const raw = r43DayRaw(todayStr(), xpCtx()); return raw.items.some(i => i.k==='stage' && i.xp===XP_BOOK.work.stage); })()"));
+  check('playbook tasks done count as work tasks for XP', await E("(function(){ const raw = r43DayRaw(todayStr(), xpCtx()); return raw.items.some(i => i.k==='tasks'); })()"));
+  check('food logged for an earlier day counts that day (Diet)', await E("(function(){ const d = addDays(todayStr(), -2), raw = r43DayRaw(d, xpCtx()); return raw.items.some(i => i.k==='food'); })()"));
+  check('client health reads the one playbook rule (behind the guide), the same as notifications', await E("typeof pbBehind==='function' && pbLateFor===pbLateFor && clientHealthStatus(crmFind('client','kk')).level!=null"));
+
   }catch(err){ check('the run reached the end', false, String(err && err.message || err).slice(0, 300)); }
   check('no errors', p.errors.length===0, p.errors);
   await b.close();

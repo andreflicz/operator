@@ -225,3 +225,15 @@ ACTIONS.r57ThreadOpenBtn = function(el, e, id){ r57ThreadOpen(id, false); };
 journalMenuHtml = (function(base){ return function(e){ return base.apply(this, arguments).replace('<div class="ctx-sep"></div>', ci('jBack', '&#10227; Bring it back…', {a:e.id})+'<div class="ctx-sep"></div>'); }; })(journalMenuHtml);
 // (the menu's actions are set up later in the build: wrap them once they are)
 setTimeout(function(){ ACTIONS.ctx = (function(base){ return function(el){ if(el && el.dataset && el.dataset.op==='jBack'){ try{ ctxClose(); }catch(e){} r57ThreadOpen(el.dataset.a, false); return; } return base.apply(this, arguments); }; })(ACTIONS.ctx); }, 0);
+
+// ---- 4. The video idea forms start empty every time ----
+// What went wrong: the pop-ups redraw keeping whatever is typed in their boxes (so nothing you type is lost mid-edit),
+// which also kept the last idea's title, type and notes when you opened it again. Now each one starts clean when it
+// opens (and after a save), and editing one idea after another never shows the other one's words.
+function r57Clear(ids){ ids.forEach(function(id){ const el = document.getElementById(id); if(el) el.value = ''; }); }
+openAddVideoIdeaModal = (function(base){ return function(){ const c = document.getElementById('videoIdeaContent'); if(c) c.innerHTML = ''; const r = base.apply(this, arguments); r57Clear(['newVideoIdeaTitle', 'newVideoIdeaNotes', 'newVideoIdeaType']); return r; }; })(openAddVideoIdeaModal);
+openContentSheet = (function(base){ return function(){ ui.csType = null; const c = document.getElementById('contentSheetContent'); if(c) c.innerHTML = ''; const r = base.apply(this, arguments); r57Clear(['csTitle', 'csNotes']); return r; }; })(openContentSheet);
+addVideoIdea = (function(base){ return function(){ const r = base.apply(this, arguments); r57Clear(['newVideoIdeaTitle', 'newVideoIdeaNotes', 'newVideoIdeaType']); return r; }; })(addVideoIdea);
+ACTIONS.csSave = (function(base){ return function(){ const r = base.apply(this, arguments); ui.csType = null; r57Clear(['csTitle', 'csNotes']); return r; }; })(ACTIONS.csSave);
+openVideoIdeaEditModal = (function(base){ return function(){ const c = document.getElementById('videoIdeaEditContent'); if(c) c.innerHTML = ''; return base.apply(this, arguments); }; })(openVideoIdeaEditModal);
+openTaskEditModal = (function(base){ return function(id){ const c = document.getElementById('taskEditContent'); if(c && ui.editingTaskId!==id) c.innerHTML = ''; return base.apply(this, arguments); }; })(openTaskEditModal);

@@ -9813,7 +9813,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793459248663;
+const OP_BUILT = 1793459562700;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -51462,6 +51462,18 @@ ACTIONS.r57ThreadOpenBtn = function(el, e, id){ r57ThreadOpen(id, false); };
 journalMenuHtml = (function(base){ return function(e){ return base.apply(this, arguments).replace('<div class="ctx-sep"></div>', ci('jBack', '&#10227; Bring it back…', {a:e.id})+'<div class="ctx-sep"></div>'); }; })(journalMenuHtml);
 // (the menu's actions are set up later in the build: wrap them once they are)
 setTimeout(function(){ ACTIONS.ctx = (function(base){ return function(el){ if(el && el.dataset && el.dataset.op==='jBack'){ try{ ctxClose(); }catch(e){} r57ThreadOpen(el.dataset.a, false); return; } return base.apply(this, arguments); }; })(ACTIONS.ctx); }, 0);
+
+// ---- 4. The video idea forms start empty every time ----
+// What went wrong: the pop-ups redraw keeping whatever is typed in their boxes (so nothing you type is lost mid-edit),
+// which also kept the last idea's title, type and notes when you opened it again. Now each one starts clean when it
+// opens (and after a save), and editing one idea after another never shows the other one's words.
+function r57Clear(ids){ ids.forEach(function(id){ const el = document.getElementById(id); if(el) el.value = ''; }); }
+openAddVideoIdeaModal = (function(base){ return function(){ const c = document.getElementById('videoIdeaContent'); if(c) c.innerHTML = ''; const r = base.apply(this, arguments); r57Clear(['newVideoIdeaTitle', 'newVideoIdeaNotes', 'newVideoIdeaType']); return r; }; })(openAddVideoIdeaModal);
+openContentSheet = (function(base){ return function(){ ui.csType = null; const c = document.getElementById('contentSheetContent'); if(c) c.innerHTML = ''; const r = base.apply(this, arguments); r57Clear(['csTitle', 'csNotes']); return r; }; })(openContentSheet);
+addVideoIdea = (function(base){ return function(){ const r = base.apply(this, arguments); r57Clear(['newVideoIdeaTitle', 'newVideoIdeaNotes', 'newVideoIdeaType']); return r; }; })(addVideoIdea);
+ACTIONS.csSave = (function(base){ return function(){ const r = base.apply(this, arguments); ui.csType = null; r57Clear(['csTitle', 'csNotes']); return r; }; })(ACTIONS.csSave);
+openVideoIdeaEditModal = (function(base){ return function(){ const c = document.getElementById('videoIdeaEditContent'); if(c) c.innerHTML = ''; return base.apply(this, arguments); }; })(openVideoIdeaEditModal);
+openTaskEditModal = (function(base){ return function(id){ const c = document.getElementById('taskEditContent'); if(c && ui.editingTaskId!==id) c.innerHTML = ''; return base.apply(this, arguments); }; })(openTaskEditModal);
 // ============ ROUND 57: PLAYBOOKS ARE PIPELINES ============
 // A playbook is a pipeline you move people through by hand: its stages (Discovery → Proposal → Onboarding →
 // Monthly service, or whatever you make) each hold the steps you do there. Lead playbooks mirror the Lead
@@ -52275,6 +52287,38 @@ setTimeout(function(){
     if(ch){ persist('business'); try{ masterTasksSync(); }catch(e){} }
   }catch(e){}
 }, 0);
+
+// ---- XP: finishing a stage counts (one number in XP_BOOK, shown in How XP works) ----
+// A stage counts as finished when its steps were done and they moved on (not when you moved them past open steps).
+XP_BOOK.work.stage = 40;
+function pb57StagesDoneOn(d){
+  const out = [];
+  arr(state.business.clients).concat(arr(state.business.pipeline)).forEach(function(x){
+    arr(x.pb && x.pb.hist).forEach(function(h){ if(h && h.stage && h.at===d && !arr(h.auto).length){ const p = pbById(h.id), st = p ? pb57StageOf(p, h.stage) : null; if(st) out.push((x.business || x.company || x.name || 'Someone')+' · '+st.name); } });
+  });
+  return out;
+}
+r43DayRaw = (function(base){
+  return function(d){
+    const r = base.apply(this, arguments);
+    try{
+      if(r && r.on && r.on.indexOf('work') >= 0){
+        pb57StagesDoneOn(d).forEach(function(w){ const xp = XP_BOOK.work.stage; r.items.push({a:'work', k:'stage', xp:xp, why:'Stage done: '+w}); r.area.work = (r.area.work || 0) + xp; });
+      }
+    }catch(e){}
+    return r;
+  };
+})(r43DayRaw);
+xpSig = (function(base){ return function(){ let n = 0; try{ arr(state.business.clients).concat(arr(state.business.pipeline)).forEach(function(x){ n += arr(x.pb && x.pb.hist).length; }); }catch(e){} return base.apply(this, arguments)+'|pbs'+n; }; })(xpSig);
+r43GuideHtml = (function(base){ return function(){ return base.apply(this, arguments).replace('<tr class="is-opt"><td>Reaching out to a client or lead', function(m0){ return '<tr class="is-opt"><td>A playbook stage finished <em>(Clients)</em></td><td>+'+XP_BOOK.work.stage+' each</td><td>Its steps done and they move on</td></tr>'+m0; }); }; })(r43GuideHtml);
+// (the step's files on the task you're locked in on, too)
+renderCurrentTaskCard = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), t = ui.currentTaskId ? state.tasks.items.find(function(x){ return x.id===ui.currentTaskId; }) : null;
+    const st = t ? pb57StepOf(t) : null; if(!st || !arr(st.files).length || typeof h!=='string') return h;
+    const p = pbById(t.master.pb); return h.replace(/<\/div>\s*$/, function(){ return pb57FilesHtml(p, st, false)+'</div>'; });
+  };
+})(renderCurrentTaskCard);
 // ============ ROUND 57: OP ============
 // Op is Jarvis, not Batman: he guides, he never refuses or defies. This round:
 //  1. No more "not outside work hours" / "go to sleep" rules: whatever you ask, any hour, he does it now, with at

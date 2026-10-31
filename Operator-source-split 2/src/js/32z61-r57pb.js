@@ -811,3 +811,35 @@ setTimeout(function(){
     if(ch){ persist('business'); try{ masterTasksSync(); }catch(e){} }
   }catch(e){}
 }, 0);
+
+// ---- XP: finishing a stage counts (one number in XP_BOOK, shown in How XP works) ----
+// A stage counts as finished when its steps were done and they moved on (not when you moved them past open steps).
+XP_BOOK.work.stage = 40;
+function pb57StagesDoneOn(d){
+  const out = [];
+  arr(state.business.clients).concat(arr(state.business.pipeline)).forEach(function(x){
+    arr(x.pb && x.pb.hist).forEach(function(h){ if(h && h.stage && h.at===d && !arr(h.auto).length){ const p = pbById(h.id), st = p ? pb57StageOf(p, h.stage) : null; if(st) out.push((x.business || x.company || x.name || 'Someone')+' · '+st.name); } });
+  });
+  return out;
+}
+r43DayRaw = (function(base){
+  return function(d){
+    const r = base.apply(this, arguments);
+    try{
+      if(r && r.on && r.on.indexOf('work') >= 0){
+        pb57StagesDoneOn(d).forEach(function(w){ const xp = XP_BOOK.work.stage; r.items.push({a:'work', k:'stage', xp:xp, why:'Stage done: '+w}); r.area.work = (r.area.work || 0) + xp; });
+      }
+    }catch(e){}
+    return r;
+  };
+})(r43DayRaw);
+xpSig = (function(base){ return function(){ let n = 0; try{ arr(state.business.clients).concat(arr(state.business.pipeline)).forEach(function(x){ n += arr(x.pb && x.pb.hist).length; }); }catch(e){} return base.apply(this, arguments)+'|pbs'+n; }; })(xpSig);
+r43GuideHtml = (function(base){ return function(){ return base.apply(this, arguments).replace('<tr class="is-opt"><td>Reaching out to a client or lead', function(m0){ return '<tr class="is-opt"><td>A playbook stage finished <em>(Clients)</em></td><td>+'+XP_BOOK.work.stage+' each</td><td>Its steps done and they move on</td></tr>'+m0; }); }; })(r43GuideHtml);
+// (the step's files on the task you're locked in on, too)
+renderCurrentTaskCard = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), t = ui.currentTaskId ? state.tasks.items.find(function(x){ return x.id===ui.currentTaskId; }) : null;
+    const st = t ? pb57StepOf(t) : null; if(!st || !arr(st.files).length || typeof h!=='string') return h;
+    const p = pbById(t.master.pb); return h.replace(/<\/div>\s*$/, function(){ return pb57FilesHtml(p, st, false)+'</div>'; });
+  };
+})(renderCurrentTaskCard);

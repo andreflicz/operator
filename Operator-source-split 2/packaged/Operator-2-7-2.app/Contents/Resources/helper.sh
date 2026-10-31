@@ -313,7 +313,9 @@ wake_respond() {
           if [ -f "$RAMP_PID_FILE" ]; then kill "$(cat "$RAMP_PID_FILE")" 2>/dev/null; rm -f "$RAMP_PID_FILE"; [ -f "$DUCK_FILE" ] || echo 100 > "$DUCK_FILE"; fi
           [ -f "$DUCK_FILE" ] || osascript -e 'tell application "Music" to get sound volume' > "$DUCK_FILE" 2>/dev/null
           V=$(cat "$DUCK_FILE" 2>/dev/null); case "$V" in ''|*[!0-9]*) V=60 ;; esac
-          osascript -e "tell application \"Music\" to set sound volume to $((V/6))" >/dev/null 2>&1
+          # how low: l= a percent (Settings → Op → Lower other sound), a sixth if it isn't given
+          L=$(param l); case "$L" in ''|*[!0-9]*) DV=$((V/6)) ;; *) DV=$((V*L/100)) ;; esac
+          osascript -e "tell application \"Music\" to set sound volume to $DV" >/dev/null 2>&1
         else
           V=$(cat "$DUCK_FILE" 2>/dev/null); rm -f "$DUCK_FILE"
           case "$V" in ''|*[!0-9]*) ;; *) osascript -e "tell application \"Music\" to set sound volume to $V" >/dev/null 2>&1 ;; esac
