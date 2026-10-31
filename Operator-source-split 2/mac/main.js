@@ -255,10 +255,30 @@ ipcMain.handle('bubble:save', async (e, text) => {
 
 
 // ---------------- the talk key, anywhere on the Mac ----------------
-// Press it (alone) and Op listens; press again to send. It works with Operator in the back, like Discord's
-// push-to-talk. macOS asks once to let Operator see the key (Privacy & Security → Accessibility).
-const KEYC = { AltRight: 3640, AltLeft: 56, ControlRight: 3613, Backquote: 41 };
-let talk = { on: true, key: 'AltRight' }, hookOk = false, held = null, hookTried = false;
+// Like a Discord bind: any key (or a mouse side button) you pick in Settings → Op. Hold it to talk, let go to send
+// (or tap on, tap off). It works with Operator hidden. With Operator in front the page handles the key itself, so
+// it works there even before macOS lets the app see keys everywhere. macOS needs Operator turned on in
+// Privacy & Security → Input Monitoring (and Accessibility); when it isn't, the page is told so and says what to do.
+let talk = { on: true, key: 'AltRight', mode: 'hold' }, hookOk = false, held = null, hookTried = false, lastHook = 0, hookErr = '';
+function uKey(code) {
+  let K = null; try { K = require('uiohook-napi').UiohookKey; } catch (e) { return null; }
+  if (!code) return null;
+  const alias = { AltLeft: 'Alt', ControlLeft: 'Ctrl', ControlRight: 'CtrlRight', ShiftLeft: 'Shift', MetaLeft: 'Meta' };
+  let name = alias[code] || code;
+  name = name.replace(/^Key([A-Z])$/, '$1').replace(/^Digit(\d)$/, '$1');
+  return K && K[name] != null ? K[name] : null;
+}
+function mouseBtn(code) { const m = /^Mouse(\d)$/.exec(code || ''); return m ? Number(m[1]) : null; }
+function front() { return !!(win && !win.isDestroyed() && win.isVisible() && win.isFocused()); }
+function keyHealth() {
+  let need = '';
+  if (process.platform === 'darwin') { try { if (!require('electron').systemPreferences.isTrustedAccessibilityClient(false)) need = 'Accessibility'; } catch (e) {} }
+  if (!need && hookOk && !lastHook) need = 'ListenEvent';
+  return { hooked: hookOk, last: lastHook, ok: hookOk && !need ? true : (need ? false : null), need: need || '', err: hookErr };
+}
+function healthToPage() { run('operatorPage.talkKeyHealth && operatorPage.talkKeyHealth(' + JSON.stringify(keyHealth()) + ')'); }
+function pressDown() { if (held) return; held = { other: false, at: Date.now() }; if (talk.mode === 'hold' && talk.on && !front()) run('operatorPage.talkDown ? operatorPage.talkDown() : operatorPage.talkToggle()'); }
+function pressUp() { const h = held; held = null; if (!h || !talk.on || front()) return; if (talk.mode === 'hold') run('operatorPage.talkUp ? operatorPage.talkUp() : null'); else if (!h.other) run('operatorPage.talkToggle()'); }
 function hookStart() {
   if (hookOk) return;
   try {
@@ -266,19 +286,23 @@ function hookStart() {
       const { systemPreferences } = require('electron');
       if (!systemPreferences.isTrustedAccessibilityClient(false)) {
         if (!hookTried) { hookTried = true; systemPreferences.isTrustedAccessibilityClient(true); }
-        setTimeout(hookStart, 10000); return;
+        healthToPage(); setTimeout(hookStart, 10000); return;
       }
     } else if (!process.env.OP_KEY_HOOK) return;
     const { uIOhook } = require('uiohook-napi');
-    uIOhook.on('keydown', (e) => { const k = KEYC[talk.key]; if (e.keycode === k) { if (!held) held = { other: false }; } else if (held) held.other = true; });
-    uIOhook.on('keyup', (e) => { if (e.keycode !== KEYC[talk.key] || !held) return; const h = held; held = null; if (!h.other && talk.on) run('operatorPage.talkToggle()'); });
-    uIOhook.on('mousedown', () => { if (held) held.other = true; });
+    uIOhook.on('keydown', (e) => { lastHook = Date.now(); const k = uKey(talk.key); if (k != null && e.keycode === k) pressDown(); else if (held) held.other = true; });
+    uIOhook.on('keyup', (e) => { lastHook = Date.now(); const k = uKey(talk.key); if (k != null && e.keycode === k) pressUp(); });
+    uIOhook.on('mousedown', (e) => { lastHook = Date.now(); if (mouseBtn(talk.key) === e.button) pressDown(); else if (held) held.other = true; });
+    uIOhook.on('mouseup', (e) => { lastHook = Date.now(); if (mouseBtn(talk.key) === e.button) pressUp(); });
     uIOhook.start(); hookOk = true;
     run('window.__opGlobalKey = true');
     log('talk key hooked');
-  } catch (e) { log('talk key hook failed', e && e.message); }
+    setTimeout(healthToPage, 15000);
+  } catch (e) { hookErr = String(e && e.message || e); log('talk key hook failed', hookErr); healthToPage(); }
 }
-ipcMain.on('op:talkPrefs', (e, p) => { talk.on = p.on !== false; if (KEYC[p.key]) talk.key = p.key; if (talk.on) hookStart(); });
+ipcMain.on('op:talkPrefs', (e, p) => { talk.on = p.on !== false; if (p.key) talk.key = String(p.key); talk.mode = p.mode === 'tap' ? 'tap' : 'hold'; if (talk.on) hookStart(); healthToPage(); });
+ipcMain.handle('op:talkHealth', () => keyHealth());
+ipcMain.on('op:openPrivacy', (e, which) => { const pane = which === 'Accessibility' ? 'Privacy_Accessibility' : 'Privacy_ListenEvent'; shell.openExternal('x-apple.systempreferences:com.apple.preference.security?' + pane).catch(() => null); });
 
 // ---------------- the page talks back ----------------
 ipcMain.on('op:status', (e, s) => { status = s || {}; trayRefresh(); });

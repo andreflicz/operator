@@ -11,5 +11,8 @@ contextBridge.exposeInMainWorld('operatorApp', {
   importFile: () => ipcRenderer.invoke('op:importFile'),
   show: () => ipcRenderer.send('op:show'),
   // the talk key: on or off, and which key (the app listens for it everywhere)
-  talkPrefs: (p) => ipcRenderer.send('op:talkPrefs', p || {})
+  talkPrefs: (p) => ipcRenderer.send('op:talkPrefs', p || {}),
+  // is the key reaching the app from everywhere? (and open the macOS setting that lets it)
+  talkHealth: () => ipcRenderer.invoke('op:talkHealth'),
+  openPrivacy: (which) => ipcRenderer.send('op:openPrivacy', String(which || 'ListenEvent'))
 });

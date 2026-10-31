@@ -142,6 +142,79 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.r54Lc='leads'; ui.view='business'; ui.businessTab='log'; renderView()"); await p.waitForTimeout(200);
   check('…and no “Logged today ✓” mark on them', !/Logged today/.test(await p.textContent('#viewRoot')));
 
+  // ================= C. OP =================
+  // (no voice in the test browser: Op writes instead of speaking)
+  await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); AI.hasKey = false; OV.pending = false; OV.speaking = false; opVoiceOn = function(){ return false; }");
+  const sys = await E("JSON.stringify(aiSystem())");
+  check('Op’s prompt: no “not outside work hours”, no “go to sleep”', !/Outside work hours, don’t bring up work/.test(sys) && !/tell him plainly \(kind, firm\) to go to sleep/.test(sys) && !/lead with winding down and sleep/.test(sys));
+  check('…instead: he decides, any hour, his asking is the yes, at most one caring line', /His asking is the yes/.test(sys) && /never tell him to go to sleep/.test(sys));
+  // sessions
+  await E("state.focus.activeSession = {startedAt:Date.now() - 3*3600000, plannedMinutes:null, completedTasks:[], breaks:[], onBreak:false}; state.appActivity.todayIntervals = [{app:'Figma', start:Date.now() - 3*3600000, end:Date.now() - 2*3600000}]; lastRawSampleAt = Date.now(); OPX.userAt = 0; OV.lastEnd = 0; R57.saidAt = 0; checkAwayFromSession()");
+  check('an hour with no keyboard or mouse: the session is still on (it ends when you end it)', await E("!!state.focus.activeSession"));
+  await E("ui.view='settings'; ui.settingsTab='focus'; renderView()"); await p.waitForTimeout(150);
+  check('Settings → Focus: “End a session when I’m away”, off', await E("(function(){ const r = document.querySelector('.r57-away'); return !!r && !r.querySelector('.r45-sw.on'); })()"));
+  await E("state.settings.appTracking.awayEnds = true; OPX.userAt = Date.now(); checkAwayFromSession()");
+  check('switched on, talking to Op counts as being there', await E("!!state.focus.activeSession"));
+  await E("OPX.userAt = 0; lastRawSampleAt = Date.now(); checkAwayFromSession()");
+  check('…and away for real, it ends', await E("!state.focus.activeSession"));
+  await E("state.settings.appTracking.awayEnds = false");
+  // away from the Mac
+  await E("actSamples = [{ts:Date.now() - 5000, app:'Finder', idle:900}]; lastRawSampleAt = Date.now(); OPX.userAt = 0; R54.tapAt = 0; R57.held = []; state.focus.r57QuietUntil = 0; R57.quietUntil = 0; opNotify('Quick one for you.')");
+  check('away from the Mac (idle 15 min): he doesn’t talk to the empty chair; it waits', await E("R57.held.length===1 && r57Away()"));
+  await E("actSamples = [{ts:Date.now(), app:'Finder', idle:2}]; R57.held = []");
+  // a debrief after any event
+  await E(`(function(){ state.calendar.events.push({id:'ev1', title:'Dentist', date:todayStr(), time:'07:00'}, {id:'ev2', title:'Sales call with Luis', date:todayStr(), time:'07:30', linkedLead:'l1'}); R54.tapAt = 0; OPX.userAt = 0; r57Set('debrief', 'clients'); r54MeetTick(); })()`);
+  check('“How did it go?” setting: clients & leads only: the sales call yes, the dentist no', await E("!state.calendar.events.find(e => e.id==='ev1').r54Asked && state.calendar.events.find(e => e.id==='ev2').r54Asked"));
+  await E("r54File('Went well, he wants 3 reels a week, asked about price.')");
+  check('a sales call: a review task, with the framing before the price', await E("state.tasks.items.some(t => t.master && t.master.kind==='review' && /Review the call/.test(t.title) && /Only then name the monthly price/.test(t.notes))"));
+  await E("R54.debrief = null; r57Set('debrief', 'all'); r54MeetTick()");
+  check('…every event (the default): he asks about it', await E("state.calendar.events.find(e => e.id==='ev1').r54Asked && R54.debrief && R54.debrief.what==='Dentist'"));
+  await E("r54File('All good, cleaning done, back in six months.')");
+  check('…what you say goes in your journal', await E("state.journal.entries.some(e => /After Dentist/.test(e.title || '') && /six months/.test(e.text))"));
+  // goodnight
+  await E("state.focus.opNightSaid = null; opGoodnight()"); await p.waitForTimeout(300);
+  const gn = await E("(document.getElementById('opBubText') || {}).textContent || ''");
+  check('goodnight: warm, short, “Goodnight, see you then”, no task for tomorrow', /Goodnight, see you then/.test(gn) && !/Tomorrow starts with|first thing/i.test(gn), gn);
+  check('…then quiet until the morning', await E("(OPX.userAt = 0, R54.tapAt = 0, AI.busy = false, true) && r57NightQuiet() && (function(){ R57.held = []; opNotify('Hey'); return R57.held.length===0; })()"));
+  await E("state.focus.r57QuietUntil = 0");
+  // the reply box / the mic
+  await E("AI.typedAt = Date.now(); AI.listening = false; AI.busy = false; aiAutoListen('opBubText')"); await p.waitForTimeout(150);
+  check('typing: when he asks something, the reply box opens and is ready', await E("!AI.listening && document.activeElement && document.activeElement.id==='opBubInput'"));
+  check('hold to talk is the default, and the reply box opens for it too', await E("opTalkMode()==='ptt'"));
+  // his own last line, heard back, isn't sent as yours
+  await E("AI.typedAt = 0; OP1.inputAt = 0; R54.last = null; R57.lastSaid = 'Done, it’s on your list. Anything else on your mind?'; R57.saidAt = Date.now(); window.__h = AI.history.length; aiAsk('anything else on your mind')");
+  check('the double input: his own closing line coming back through the mic is dropped', await E("AI.history.length===window.__h && !AI.busy"));
+  // the key: any key
+  await E("ui.view='settings'; ui.settingsTab='op'; renderView()"); await p.waitForTimeout(150);
+  check('Settings → Op: the key you picked, Change, Hold to talk / Tap', !!(await p.$('.r57-keyrow kbd')) && /Hold to talk/.test(await p.textContent('.r57-keyrow')));
+  await E("ACTIONS.r57KeyCapture()"); await p.keyboard.press('F12'); await p.waitForTimeout(100);
+  check('…press Change, then any key (F12 here): that’s the key', await E("state.profile.opPttKey")==='F12');
+  // holding: nothing ends it
+  await E("AI.listening = true; OPX.ptt = true; window.__fired = 0; setTimeout(function(){ window.__fired++; }, 60000)");
+  await p.clock.runFor(61000);
+  check('while the key is held, the speech engine’s 60-second stop doesn’t end it', await E("window.__fired===0 && typeof R57.srPending==='function'"));
+  await E("OPX.ptt = false; AI.listening = false; R57.srPending = null");
+  check('the mic opens without macOS voice processing (no system-wide drop)', await E("JSON.stringify(r57MicOpts())")===JSON.stringify({echoCancellation:false, noiseSuppression:false, autoGainControl:false, channelCount:1}));
+  check('ducking: on, a level, and what lowers it (his voice and talking to him by default)', /Lower other sound/.test(await p.textContent('#viewRoot')) && !!(await p.$('#r57DuckLevel')) && await E("r57DuckBy('voice') && r57DuckBy('talk') && !r57DuckBy('sounds')"));
+  check('after an event: Every event / Clients & leads / Never, in Settings → Op', /After an event, ask how it went/.test(await p.textContent('#viewRoot')));
+  // break
+  await E("state.modes.active = null; state.focus.activeSession = {startedAt:Date.now() - 1800000, plannedMinutes:null, completedTasks:[], breaks:[], onBreak:false}; opRunTool('take_break', {minutes:10})");
+  check('Op’s take_break starts the break right away (no dialog waiting)', await E("state.focus.activeSession.onBreak && state.modes.active && state.modes.active.type==='break' && document.getElementById('multiBreakOverlay').classList.contains('hidden')"));
+  await E("endBreakNow ? (state.modes.active = null, state.focus.activeSession = null) : null; opRunTool('take_break', {minutes:5})");
+  check('…not locked in, it’s a break too (and it ends by itself)', await E("state.modes.active && state.modes.active.type==='break' && state.modes.active.endsAt > Date.now()"));
+  await E("state.modes.active = null");
+  // journal tag, notes
+  await E("opRunTool('add_journal', {text:'Playbooks now run as stages.', tag:'Update'})");
+  check('add_journal takes a tag: “Update” files it under the Update tag (App updates)', await E("(function(){ const e = state.journal.entries.filter(e => e.text==='Playbooks now run as stages.').pop(); return !!e && e.mood===updatesTypeId() && isUpdateEntry(e); })()"));
+  await E("document.querySelectorAll('#r57Notes .r57-note').forEach(n => n.remove()); opRunTool('suggest_improvement', {idea:'Let me drag tasks between days on the calendar.'})"); await p.waitForTimeout(400);
+  check('an idea Op logs: the white note types out, top right, with the time', !!(await p.$('#r57Notes .r57-note.is-idea')) && /\d:\d\d/.test(await p.textContent('#r57Notes .r57-note time')));
+  check('…and it’s in Settings (Op’s notes) and in App updates', await E("arr(state.settings.opIdeas).some(i => /drag tasks between days/.test(i.text)) && state.journal.entries.some(e => isUpdateEntry(e) && /drag tasks between days/.test(e.text))"));
+  await E("opRunTool('add_task', {title:'Call the printer'})"); await p.waitForTimeout(1200);
+  check('anything Op does for you: the same note, and kept the same way', /printer/i.test(await p.textContent('#r57Notes')) && await E("arr(state.settings.opIdeas).some(i => i.from==='did' && /printer/i.test(i.text)) && state.journal.entries.some(e => isUpdateEntry(e) && /printer/i.test(e.text))"));
+  await E("r57Set('clock12', false)"); await E("opRunTool('add_task', {title:'Call the bank'})"); await p.waitForTimeout(1200);
+  check('the note’s time can be 24-hour (Settings)', /^\d\d:\d\d$/.test((await p.$$eval('#r57Notes .r57-note time', n => n.map(x => x.textContent))).pop()));
+  await E("r57Set('clock12', true)");
+
   }catch(err){ check('the run reached the end', false, String(err && err.message || err).slice(0, 300)); }
   check('no errors', p.errors.length===0, p.errors);
   await b.close();
