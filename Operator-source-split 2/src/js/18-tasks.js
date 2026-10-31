@@ -460,6 +460,8 @@ function completeTask(id){
     showToast('Nice: logged for today. Resets tomorrow.', {icon:'&#128204;'});
     return;
   }
+  // another task still finishing its tick animation: finish it now (ticking two fast must never lose the first)
+  if(justCompletedTaskId && justCompletedTaskId!==id){ const p = state.tasks.items.find(function(x){ return x.id===justCompletedTaskId; }); if(p && !p.ongoing && p.status!=='done'){ p.status='done'; p.completedAt=todayStr(); if(state.focus.activeSession){ if(!Array.isArray(state.focus.activeSession.completedTasks)) state.focus.activeSession.completedTasks=[]; state.focus.activeSession.completedTasks.push({id:p.id, title:p.title, client:p.client, note:'', noteFinalized:false}); persist('focus'); } persist('tasks'); } }
   playTaskComplete();
   justCompletedTaskId = id;
   renderView();
@@ -480,7 +482,7 @@ function completeTask(id){
 }
 function undoTask(id){
   const t=state.tasks.items.find(function(x){return x.id===id;}); if(!t) return;
-  if(justCompletedTaskId===id){ justCompletedTaskId=null; renderView(); return; }
+  if(justCompletedTaskId===id){ justCompletedTaskId=null; if(t.status!=='done'){ renderView(); return; } }
   if(t.ongoing){
     t.ongoingDoneDates = arr(t.ongoingDoneDates).filter(function(d){ return d!==todayStr(); });
     persist('tasks'); renderView();

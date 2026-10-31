@@ -165,9 +165,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Op can open it when you ask', await E("OP_TOOLS.some(t => t.name==='client_report')"));
 
   // ---- clients' socials ----
-  await E("ui.r55CliAll = [{id:'a1', platform:'instagram', username:'jjs_build', followers:1800}, {id:'a2', platform:'facebook', username:'JJS', followers:600}]; ui.r55CliTried = true; r55CliLinks().a1 = 'jj'; r55CliStore().a1 = {at:Date.now(), followers:1800, p30:12, views:48000, best:{cap:'Kitchen remodel', views:15000}}; ui.view='convos'; ui.socTab='clients'; renderView()"); await p.waitForTimeout(250);
+  await E("ui.r55CliAll = [{id:'a1', platform:'instagram', username:'jjs_build', followers:1800}, {id:'a2', platform:'facebook', username:'JJS', followers:600}]; ui.r55CliTried = true; r55CliLinks().a1 = 'jj'; r55CliStore().a1 = {at:Date.now(), followers:1800, p30:12, views:48000, best:{cap:'Kitchen remodel', views:15000}}; igCfg().accounts = [{id:'o1', role:'business', username:'commenccollective', src:'zernio'}]; ui.view='convos'; ui.socTab='overview'; ui.r58Acct='a1'; renderView()"); await p.waitForTimeout(250);
   const soc = await p.textContent('#viewRoot');
-  check('Social → Clients: each client’s accounts, numbers and best post', /jjs_build/.test(soc) && /Kitchen remodel/.test(soc) && /Link an account/.test(soc));
+  // (round 58: the Clients tab is gone; every account is a chip on Social → Overview, and tapping one shows its numbers, best post and who it belongs to)
+  check('Social → Overview: each client’s accounts, numbers and best post', /jjs_build/.test(soc) && /Kitchen remodel/.test(soc) && !!(await p.$('select[data-r58-cli="a1"]')));
 
   // ---- what the review found ----
   await E("r55McOpen(); ACTIONS.r55McOk(null, null, 'spend'); ACTIONS.r55McOk(null, null, 'where'); addSheetRefresh('r55Money'); addSheetRefresh('r55Money')"); await p.waitForTimeout(200);

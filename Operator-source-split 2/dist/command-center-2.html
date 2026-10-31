@@ -9616,6 +9616,104 @@ html.r56-fit body .calx .cx-grid{ grid-auto-rows:var(--r56-rh) !important; }
 .r57-ws{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; margin-top:14px; }
 .r57-ws div{ display:flex; flex-direction:column; gap:2px; padding:10px 12px; border-radius:12px; background:var(--panel-2); }
 .r57-ws b{ font-family:var(--font-display); font-size:20px; } .r57-ws span{ font-size:12px; color:var(--text-dim); }
+
+/* ===================== ROUND 58 ===================== */
+/* ---- Business tabs ---- */
+.r58-tn{ font-size:11.5px; font-weight:700; opacity:.6; margin-left:2px; }
+.biz-gear.is-on{ border-color:var(--accent); color:var(--text); }
+/* ---- Playbooks: one place ---- */
+.r58-pill{ display:inline-flex; align-items:center; border-radius:20px; border:1px solid var(--border); background:var(--panel); overflow:hidden; }
+.r58-pill.is-on{ border-color:var(--accent); background:color-mix(in srgb, var(--accent) 12%, var(--panel)); }
+.r58-star{ border:0; background:none; color:var(--text-faint); font-size:15px; padding:6px 4px 6px 12px; cursor:pointer; }
+.r58-star.is-on{ color:#F3C988; }
+.r58-pn{ display:inline-flex; align-items:center; gap:7px; border:0; background:none; color:var(--text); font-weight:600; font-size:13px; padding:7px 14px 7px 4px; cursor:pointer; }
+.r58-pn em{ font-style:normal; font-size:11px; color:var(--text-faint); }
+.r58-board{ margin-bottom:14px; }
+.r58-col header .r58-sti{ font-style:normal; color:#F3C988; }
+.r58-idle{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 0 14px; }
+.r58-idle > span{ font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); margin-right:4px; }
+.r58-offs{ flex:none !important; width:100%; min-height:0 !important; }
+.r58-offg{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:8px; }
+.r58-off .r58-kind{ font-size:11px; font-weight:700; color:var(--text-faint); }
+.r58-put{ align-self:flex-start; border:1px solid var(--border); background:var(--panel); color:var(--text); border-radius:20px; padding:3px 10px; font-size:12px; font-weight:600; cursor:pointer; }
+.r58-none{ padding:22px; text-align:center; color:var(--text-dim); border:1px dashed var(--border); border-radius:16px; margin-bottom:14px; }
+/* ---- Social ---- */
+.r58-strip{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 16px; }
+.r58-own, .r58-cls{ display:flex; gap:8px; flex-wrap:wrap; }
+.r58-own{ padding-right:12px; border-right:1px solid var(--border); }
+.r58-ac{ display:inline-flex; align-items:center; gap:9px; padding:6px 14px 6px 6px; border-radius:30px; border:1px solid var(--border); background:var(--panel); color:var(--text); cursor:pointer; text-align:left; }
+.r58-ac img, .r58-ac .r58-av{ width:30px; height:30px; border-radius:50%; object-fit:cover; display:grid; place-items:center; font-weight:800; font-size:12px; background:var(--panel-2); }
+.r58-ac b{ font-size:13px; } .r58-ac small{ display:block; font-size:11px; color:var(--text-faint); margin-top:-2px; }
+.r58-ac.is-own{ border-color:color-mix(in srgb, #E8A23D 55%, var(--border)); background:linear-gradient(135deg, color-mix(in srgb, #E8A23D 14%, var(--panel)), var(--panel)); }
+.r58-ac.is-own .r58-av, .r58-ac.is-own img{ box-shadow:0 0 0 2px #E8A23D; }
+.r58-ac:not(.is-own) .r58-av{ box-shadow:0 0 0 2px var(--cc, var(--border)); }
+.r58-ac.is-on{ outline:2px solid var(--accent); outline-offset:1px; }
+.r58-all{ margin-left:auto; border:0; background:none; color:var(--text-dim); font-weight:600; cursor:pointer; }
+.r58-focus{ display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.25fr); gap:16px; align-items:start; }
+@media (max-width:1100px){ .r58-focus{ grid-template-columns:minmax(0, 1fr); } }
+.r58-focus > section{ display:flex; flex-direction:column; gap:12px; min-width:0; }
+.r58-facts{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.r58-pk{ display:inline-flex; align-items:center; gap:8px; margin-right:auto; font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-faint); }
+.r58-pk select{ width:auto; text-transform:none; letter-spacing:0; }
+.r58-best{ display:flex; flex-direction:column; gap:2px; padding:12px 14px; border-radius:12px; background:var(--panel-2); margin-top:10px; }
+.r58-best small{ font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.08em; font-weight:700; }
+html.r58-content .sidebar, html.r58-content nav.sidebar, html.r58-content #sidebar{ display:none !important; }
+html.r58-content main{ margin-left:0 !important; max-width:none !important; padding-left:28px !important; padding-right:28px !important; }
+html.r58-content .app, html.r58-content .layout{ grid-template-columns:1fr !important; }
+/* ---- Packages: the delivery calendar ---- */
+.r58-pkc{ margin-top:18px; padding:16px; border-radius:18px; background:var(--panel); border:1px solid var(--border); display:flex; flex-direction:column; gap:12px; }
+.r58-pkc-h{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.r58-pkc-h > b{ font-family:var(--font-display); font-size:17px; }
+.r58-pkc-k{ font-size:11.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint); }
+.r58-pkr{ display:flex; flex-direction:column; gap:8px; padding:12px; border-radius:14px; background:var(--panel-2); }
+.r58-pkh{ display:flex; align-items:center; gap:10px; }
+.r58-pkh b{ font-size:14px; } .r58-pkh span{ font-size:12.5px; color:var(--text-dim); } .r58-pkh span.is-ok{ color:var(--good); } .r58-pkh span.is-over{ color:var(--danger); }
+.r58-even{ margin-left:auto; border:1px solid var(--border); background:var(--panel); color:var(--text-dim); border-radius:20px; padding:4px 12px; font-size:12px; font-weight:600; cursor:pointer; }
+.r58-days{ display:grid; grid-template-columns:repeat(16, minmax(0, 1fr)); gap:4px; }
+.r58-days button{ height:30px; border-radius:8px; border:1px solid var(--border); background:var(--panel); color:var(--text-faint); font-size:12px; font-weight:700; cursor:pointer; padding:0; }
+.r58-days button.is-on{ background:color-mix(in srgb, #FF8FB1 26%, var(--panel)); border-color:#FF8FB1; color:var(--text); }
+.r58-self{ display:inline-block; margin-right:8px; padding:2px 8px; border-radius:20px; background:color-mix(in srgb, #E8A23D 20%, transparent); color:#F3C988; font-size:11px; font-weight:700; vertical-align:middle; }
+/* ---- notes, the feed ---- */
+.r58-nx{ border:0; background:none; color:#8a90a2; font-size:12px; cursor:pointer; padding:2px 4px; margin-left:4px; border-radius:6px; }
+.r58-nx:hover{ background:rgba(0,0,0,.07); color:#15171c; }
+.r57-note{ cursor:pointer; transition:opacity .4s ease, transform .4s ease; }
+.r57-note.is-out{ opacity:0; transform:translateY(-6px) scale(.98); }
+.toast.r58-ghost{ pointer-events:none; z-index:0; }
+.r58-feed{ border-top:1px solid var(--border); margin-top:6px; padding-top:8px; display:flex; flex-direction:column; gap:2px; max-height:260px; overflow:auto; }
+.r58-fh{ font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); padding:0 10px 4px; }
+.r58-fi{ display:grid; grid-template-columns:10px minmax(0, 1fr) auto; align-items:center; gap:8px; padding:7px 10px; border:0; border-radius:10px; background:none; color:var(--text); text-align:left; cursor:pointer; font-size:13px; }
+.r58-fi:hover{ background:var(--panel-2); }
+.r58-fi i{ width:8px; height:8px; border-radius:50%; background:var(--op-c, #fff); box-shadow:0 0 6px var(--op-glow, rgba(255,255,255,.6)); }
+.r58-fi.is-update i{ background:#8fdcff; }
+.r58-fi span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .r58-fi time{ font-size:11px; color:var(--text-faint); }
+.r58-fd-t{ font-weight:700; margin:4px 0 10px; line-height:1.5; }
+.r58-fd-q{ margin:0; padding:14px 16px; border-radius:14px; background:var(--panel-2); border-left:3px solid var(--accent); white-space:pre-wrap; line-height:1.55; max-height:50vh; overflow:auto; }
+/* ---- Op's read: one quiet look in Op's colour; it holds its space ---- */
+.r58-opl{ min-height:74px; }
+.r58-opl .r57-opl-k{ color:color-mix(in srgb, var(--op-c, #fff) 55%, var(--text-faint)); }
+.r58-opl .r57-opl-r b, .r58-opl .r57-opl-r.is-watch b, .r58-opl .r57-opl-r.is-move b{ color:color-mix(in srgb, var(--op-c, #fff) 45%, var(--text-dim)); font-weight:700; }
+.r58-opl .r57-opl-t, .r58-opl .r57-opl-r span{ color:var(--text); }
+.hq .r58-opl, .r53-hq .r58-opl{ background:none !important; }
+/* ---- Op's window ---- */
+#opBub.op-bub.is-log{ width:min(460px, calc(100vw - 32px)) !important; }
+#opBub.is-log .op-bub-log{ height:min(54vh, 480px) !important; gap:8px !important; }
+#opBub .ocl-m{ position:relative; max-width:86%; padding:8px 12px 18px; border-radius:14px; font-size:14px; line-height:1.45; }
+#opBub .ocl-me{ align-self:flex-end; background:rgba(0,0,0,.07); border-bottom-right-radius:4px; }
+#opBub .ocl-op{ align-self:flex-start; background:rgba(255,255,255,.75); border-bottom-left-radius:4px; }
+#opBub .r58-t{ position:absolute; right:10px; bottom:3px; font-size:10px; color:#8a90a2; }
+.opc-me .r58-t, .opc-op .r58-t, .opc-act .r58-t{ margin-left:10px; font-size:11px; color:var(--text-faint); white-space:nowrap; }
+#opBub .op-bub-h{ gap:6px; }
+#opBub .r58-round{ width:30px; height:30px; padding:0; margin:0; display:grid; place-items:center; border-radius:50%; border:1px solid rgba(0,0,0,.1); background:rgba(255,255,255,.75); color:#15171d; font-size:14px; line-height:1; cursor:pointer; }
+#opBub .r57-bub-open.r58-round{ margin-left:auto; }
+#opBub .r58-round:hover{ background:#fff; border-color:rgba(0,0,0,.18); }
+.r58-drop.is-over{ border-color:var(--accent, #F5B342); box-shadow:0 0 0 2px rgba(245,179,66,.35); }
+/* Op's window: the conversation fits what's in it until you size it */
+#opBub.is-log:not(.r58-sized) .op-bub-log{ height:auto !important; min-height:120px; max-height:min(58vh, 520px); }
+#opBub .op-bub-rs{ top:-4px; right:-4px; width:16px; height:16px; }
+#opBub.is-resizing{ transition:none !important; }
+.r58-swap{ border:0; background:none; color:var(--text-dim); font-size:15px; cursor:pointer; padding:0 6px; }
+.r58-swap:hover{ color:var(--text); }
+.r58-ownp{ grid-template-columns:minmax(0, 1fr) !important; margin-top:18px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -9813,7 +9911,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793461673335;
+const OP_BUILT = 1793471597302;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -14552,6 +14650,8 @@ function completeTask(id){
     showToast('Nice: logged for today. Resets tomorrow.', {icon:'&#128204;'});
     return;
   }
+  // another task still finishing its tick animation: finish it now (ticking two fast must never lose the first)
+  if(justCompletedTaskId && justCompletedTaskId!==id){ const p = state.tasks.items.find(function(x){ return x.id===justCompletedTaskId; }); if(p && !p.ongoing && p.status!=='done'){ p.status='done'; p.completedAt=todayStr(); if(state.focus.activeSession){ if(!Array.isArray(state.focus.activeSession.completedTasks)) state.focus.activeSession.completedTasks=[]; state.focus.activeSession.completedTasks.push({id:p.id, title:p.title, client:p.client, note:'', noteFinalized:false}); persist('focus'); } persist('tasks'); } }
   playTaskComplete();
   justCompletedTaskId = id;
   renderView();
@@ -14572,7 +14672,7 @@ function completeTask(id){
 }
 function undoTask(id){
   const t=state.tasks.items.find(function(x){return x.id===id;}); if(!t) return;
-  if(justCompletedTaskId===id){ justCompletedTaskId=null; renderView(); return; }
+  if(justCompletedTaskId===id){ justCompletedTaskId=null; if(t.status!=='done'){ renderView(); return; } }
   if(t.ongoing){
     t.ongoingDoneDates = arr(t.ongoingDoneDates).filter(function(d){ return d!==todayStr(); });
     persist('tasks'); renderView();
@@ -53107,6 +53207,601 @@ analyticsOverviewHtml = (function(base){
     return hero+base.apply(this, arguments);
   };
 })(analyticsOverviewHtml);
+// ============ ROUND 58 ============
+// Everything from Andre's Op session on Oct 31 (ROUND-58-LIST.md). This file: updates and Op's records, notes and
+// the notifications feed, Op's chat, voice, Op's read, the bubble. 32z65-r58ui.js: Business, Playbooks, Social,
+// Packages, Settings.
+
+// ================= A. Updates: his words, one place, really saved =================
+// What went wrong: Op wrote his own summary of each update instead of the words; each one went to two lists
+// (Op's ideas in Settings and App updates); he said "logged" when nothing had been saved; "mark that as an update"
+// filed the words "mark that as an update"; and there was no way to hold a list until he said "done".
+// Now an update is ONE App updates entry (tag Update) whose text is exactly what he said; Op's line is its title.
+// Op files them with suggest_improvement (this message), mark_update (an earlier message, by a few of its words),
+// or file_updates (a list, after he says go). If Op says he logged something and didn't call a tool, the app files
+// the message itself. Settings' separate ideas list is gone (what was in it moved into App updates).
+const R58 = {turn:null};
+function r58UserMsgs(){ return (typeof opChat==='function' ? opChat() : []).filter(function(e){ return e.r==='me' && e.t; }); }
+const R58_META = /^\s*(?:ok(?:ay)?|yeah|yes|so|and|also|please|pls|can you|could you|buddy|op|hey)?[\s,]*(?:please\s+)?(?:mark|log|save|add|put|file|write)\s+(?:that|this|it|those|them|all (?:of )?(?:that|those|them))\b[^.?!]{0,40}[.?!]?\s*$/i;
+function r58IsMeta(t){ t = String(t || '').trim(); return t.length < 90 && R58_META.test(t); }
+// the words to file: this message, or (when this message is only "mark that as an update") the one before it
+function r58Words(){
+  const T = R58.turn; let t = T ? T.text : '';
+  if(!t || r58IsMeta(t)){ const L = r58UserMsgs().filter(function(e){ return !r58IsMeta(e.t) && (!T || e.t!==T.text); }); if(L.length) t = L[L.length - 1].t; }
+  return String(t || '').trim();
+}
+function r58Find(snippet, back){
+  const L = r58UserMsgs().filter(function(e){ return !r58IsMeta(e.t); });
+  if(snippet){ const s = String(snippet).toLowerCase().replace(/\s+/g, ' ').trim(); for(let i = L.length - 1; i >= 0; i--){ if(L[i].t.toLowerCase().replace(/\s+/g, ' ').indexOf(s) >= 0) return L[i]; } return null; }
+  const n = Math.max(1, Number(back) || 1); return L[L.length - n] || null;
+}
+function r58UpdateEntries(){ const id = updatesTypeId(); return id ? state.journal.entries.filter(function(e){ return e.mood===id; }) : []; }
+// one entry per thing he said; a second summary of the same words is added to the same entry (no second note)
+function r58File(words, summary, at){
+  words = String(words || '').trim(); summary = String(summary || '').trim();
+  if(!words && !summary) return null;
+  const tag = r57UpdateType(), text = words || summary;
+  let e = r58UpdateEntries().find(function(x){ return x.text===text; });
+  if(e){
+    if(summary && arr(e.summaries).indexOf(summary) < 0 && e.title!==summary){ e.summaries = arr(e.summaries).concat([summary]); persist('journal'); }
+    return {e:e, isNew:false};
+  }
+  e = {id:uid(), date:todayStr(at ? new Date(at) : new Date()), timestamp:at || Date.now(), title:(summary || 'Update').slice(0, 160), text:text.slice(0, 8000), type:'freeform', mood:tag, pinned:false, photos:[], by:'op', verbatim:!!words};
+  state.journal.entries.push(e); persist('journal');
+  if(R58.turn) R58.turn.filed = true;
+  r57Note(summary || text, 'idea', {full:text, title:summary, entry:e.id});
+  return {e:e, isNew:true};
+}
+// (Op's own records of what he did go to the notes and the notifications feed, not to App updates)
+r57Log = function(text, kind){ if(kind==='idea') return r58File(r58Words(), text); r57Note(text, kind); };
+r57Did = function(text){ r57Note(text, 'did'); };
+// the tools
+OP_TOOLS.push(
+  {name:'mark_update', description:'File one of his EARLIER messages in App updates, word for word (when he says "mark that as an update", "log that", or you missed one). Give a few exact words from that message in contains, or back=1 for his message before this one. Use summary for a one-line title.', input_schema:{type:'object', properties:{contains:{type:'string'}, back:{type:'integer'}, summary:{type:'string'}}, additionalProperties:false}},
+  {name:'file_updates', description:'File several of his messages in App updates at once, word for word (after he gave you a list and said go, or when he asks you to go back and log everything). One item per message: a few exact words from it in contains, and a one-line summary.', input_schema:{type:'object', properties:{items:{type:'array', items:{type:'object', properties:{contains:{type:'string'}, summary:{type:'string'}}, required:['contains']}}}, required:['items']}},
+  {name:'delete_session', description:'Remove a work session he says is wrong (e.g. "remove that last work session"). which: "last" (the most recent, the default) or "longest_today".', input_schema:{type:'object', properties:{which:{type:'string'}}, additionalProperties:false}}
+);
+(function(){ const t = OP_TOOLS.find(function(t){ return t.name==='suggest_improvement'; }); if(t){ t.description = 'File what he just said about the app (a change, a fix, feedback) in App updates. The app saves HIS EXACT WORDS from this message; idea is your one-line title for it. One call per thing he asked for in this message.'; } })();
+opRunTool = (function(base){
+  return function(name, x){
+    x = x || {};
+    if(R58.turn) R58.turn.tools.push(name);
+    if(name==='suggest_improvement'){ const r = r58File(R58.turn ? r58Words() : String(x.idea || '').trim() || r58Words(), String(x.idea || '').slice(0, 400)); if(!r) throw new Error('nothing to file'); return r.isNew ? 'filed in App updates, his words as he said them' : 'already in App updates (summary added)'; }
+    if(name==='mark_update'){
+      const m = r58Find(x.contains, x.back); if(!m) throw new Error('no message of his matches that');
+      const r = r58File(m.t, String(x.summary || '').slice(0, 400), m.at); return r.isNew ? 'filed in App updates: “'+m.t.slice(0, 80)+(m.t.length > 80 ? '…' : '')+'”' : 'that one was already in App updates';
+    }
+    if(name==='file_updates'){
+      let n = 0, have = 0, miss = [];
+      arr(x.items).forEach(function(it){ const m = r58Find(it.contains); if(!m){ miss.push(it.contains); return; } const r = r58File(m.t, String(it.summary || '').slice(0, 400), m.at); if(r && r.isNew) n++; else have++; });
+      return 'filed '+n+' in App updates'+(have ? ', '+have+' already there' : '')+(miss.length ? '; couldn’t find: '+miss.join(' | ') : '');
+    }
+    if(name==='add_journal' && x.tag && /^updates?$/i.test(String(x.tag).trim())){ const r = r58File(R58.turn ? r58Words() : String(x.text || x.title || '').trim() || r58Words(), String(x.title || x.text || '').slice(0, 400)); return r && r.isNew ? 'filed in App updates, his words as he said them' : 'already in App updates'; }
+    if(name==='delete_session'){
+      const S = state.focus.sessions, today = todayStr();
+      let s = null;
+      if(x.which==='longest_today') s = S.filter(function(q){ return q.date===today; }).sort(function(a, b){ return (b.minutes || 0) - (a.minutes || 0); })[0];
+      else s = S.slice().sort(function(a, b){ return (b.endedAt || 0) - (a.endedAt || 0); })[0];
+      if(!s) return 'no sessions to remove';
+      state.focus.sessions = S.filter(function(q){ return q!==s; }); R58.lastDeleted = s; persist('focus'); try{ xpLast = null; }catch(e){} renderView();
+      showToast('Removed the '+fmtDurationLabel(s.minutes || 0)+' session from '+fmtDateShort(s.date)+'.', {icon:'&#128465;', actionLabel:'Undo', actionAction:'r58UndoSession', duration:8000});
+      return 'removed the '+fmtDurationLabel(s.minutes || 0)+' session ('+fmtDateShort(s.date)+', '+fmt12Hour(nowHM(new Date(s.startedAt)))+' to '+fmt12Hour(nowHM(new Date(s.endedAt)))+')';
+    }
+    return base.apply(this, arguments);
+  };
+})(opRunTool);
+ACTIONS.r58UndoSession = function(){ if(!R58.lastDeleted) return; state.focus.sessions.push(R58.lastDeleted); R58.lastDeleted = null; persist('focus'); try{ xpLast = null; }catch(e){} clearToasts(); renderView(); };
+// how he handles updates (the rules)
+aiSystem = (function(base){
+  return function(){
+    const s = base.apply(this, arguments);
+    if(Array.isArray(s)) s.push({type:'text', text:'App updates (his changes and feedback for this app):\n'+
+      '- When he asks for a change to the app, or gives feedback on it, call suggest_improvement in that same reply, once per thing he asked for. The app saves his exact words; your idea is only the title.\n'+
+      '- "Mark that as an update", "log that", "add that to the updates": call mark_update for the message he means (back=1, or contains with a few of its words).\n'+
+      '- If he says he will give you several things and to wait until he says he is done: do not file them yet. When he says he is done, read the list back (short, numbered) and wait for his yes; then call file_updates with every item.\n'+
+      '- When he asks you to go back and log everything you missed, call file_updates with every app request of his from the conversation.\n'+
+      '- Never say you logged, marked, saved or added something unless you called the tool in this reply and it said so. If you did not, say you have not yet and do it.'});
+    return s;
+  };
+})(aiSystem);
+// the turn: what he said, what Op called; and if Op claims he logged it without a tool, the app files his words
+aiAsk = (function(base){
+  return function(text){
+    const t = String(text || '').trim();
+    const T = R58.turn = {text:t, tools:[], filed:false, at:Date.now()};
+    const n0 = AI.history.length, r = base.apply(this, arguments);
+    Promise.resolve(r).then(function(){
+      if(R58.turn!==T) return;
+      const last = AI.history[AI.history.length - 1];
+      if(AI.history.length===n0 || !last || last.role!=='assistant') return;
+      const claim = /\b(logged|noted|marked|filed|saved|it'?s in the (?:update|list|journal)|in app updates|added (?:it|that|this|both|all)|in the update)\b/i.test(String(last.content || ''));
+      if(claim && !T.filed && !T.tools.length && t && !/^(?:ok(?:ay)?|thanks|thank you|cool|nice|perfect|got it)[.!]*$/i.test(t)){ r58File(r58Words(), ''); }
+    }).catch(function(){}).then(function(){ if(R58.turn===T) R58.turn = null; }); // the turn is over: later tool calls aren't about this message
+    return r;
+  };
+})(aiAsk);
+// (what was in the old ideas list moves into App updates once; Op's "did" records leave App updates for the feed)
+setTimeout(function(){
+  try{
+    const s = state.settings, tag = r57UpdateType(); let ch = false;
+    arr(s.opIdeas).forEach(function(i){
+      if(i.from==='did'){ r58FeedAdd({at:i.at || Date.now(), kind:'did', short:i.text, full:i.text}); return; }
+      if(!r58UpdateEntries().some(function(e){ return e.text===i.text || e.title===i.text; })){ state.journal.entries.push({id:uid(), date:todayStr(new Date(i.at || Date.now())), timestamp:i.at || Date.now(), title:'From Op’s ideas', text:i.text, type:'freeform', mood:tag, pinned:false, photos:[], by:'op'}); }
+      ch = true;
+    });
+    if(arr(s.opIdeas).length){ s.r58IdeasMoved = (s.r58IdeasMoved || 0) + s.opIdeas.length; s.opIdeas = []; persist('settings'); }
+    const n = state.journal.entries.length;
+    state.journal.entries = state.journal.entries.filter(function(e){ return !(e.by==='op' && e.title==='Op did'); });
+    if(state.journal.entries.length!==n) ch = true;
+    if(ch) persist('journal');
+  }catch(e){}
+}, 0);
+
+// ================= B. Notes, the notifications feed =================
+// One note per thing (an update with two summaries is one note), a ✕ on each, and they fade out (never blank).
+// Every note also goes to the Op feed in Notifications: one short line each; tap it for the whole thing.
+function r58Feed(){ const f = state.focus; if(!Array.isArray(f.r58Feed)) f.r58Feed = []; return f.r58Feed; }
+function r58FeedAdd(o){ const F = r58Feed(); const it = Object.assign({id:uid(), at:Date.now()}, o); F.push(it); if(F.length > 200) F.splice(0, F.length - 200); persist('focus'); return it; }
+r57Note = function(text, kind, more){
+  text = String(text || '').trim(); if(!text) return;
+  more = more || {};
+  const it = r58FeedAdd({kind:kind==='idea' ? 'update' : 'did', short:text.slice(0, 160), full:more.full || text, title:more.title || '', entry:more.entry || null});
+  let box = document.getElementById('r57Notes'); if(!box){ box = document.createElement('div'); box.id = 'r57Notes'; box.className = 'r57-notes'; document.body.appendChild(box); }
+  const n = document.createElement('div'); n.className = 'r57-note'+(kind==='idea' ? ' is-idea' : ''); n.setAttribute('data-feed', it.id);
+  n.innerHTML = '<div class="r57-nh"><i class="th-op-o op-note-o"></i><b>'+(kind==='idea' ? 'Saved to App updates' : 'Op')+'</b><time>'+r57Clock()+'</time><button class="r58-nx" data-action="r58NoteClose" aria-label="Close">&#10005;</button></div><p></p>';
+  box.appendChild(n);
+  // (more than three: the oldest fades out first)
+  const live = Array.from(box.children).filter(function(c){ return !c.classList.contains('is-out'); });
+  if(live.length > 3) r58NoteOut(live[0]);
+  const p = n.querySelector('p'); let i = 0;
+  const step = function(){ i = Math.min(text.length, i + 2); p.textContent = text.slice(0, i); if(i < text.length) n._t = setTimeout(step, 16); };
+  step();
+  n._out = setTimeout(function(){ r58NoteOut(n); }, 5600 + text.length*30);
+  n.addEventListener('mouseenter', function(){ clearTimeout(n._out); });
+  n.addEventListener('mouseleave', function(){ n._out = setTimeout(function(){ r58NoteOut(n); }, 2500); });
+};
+function r58NoteOut(n){ if(!n || n.classList.contains('is-out')) return; n.classList.add('is-out'); setTimeout(function(){ n.remove(); }, 420); }
+ACTIONS.r58NoteClose = function(el, e){ if(e && e.stopPropagation) e.stopPropagation(); r58NoteOut(el.closest('.r57-note')); };
+// a tap on a note opens the whole thing
+document.addEventListener('click', function(e){ const n = e.target.closest && e.target.closest('.r57-note'); if(!n || e.target.closest('button')) return; r58FeedOpen(n.getAttribute('data-feed')); });
+// toasts fade too (a new one doesn't blank the old one; it fades across)
+showToast = (function(base){
+  return function(){
+    const c = document.getElementById('toastContainer'), old = c && c.querySelector('#activeToast');
+    if(old && old.classList.contains('show')){
+      const ghost = old.cloneNode(true); ghost.removeAttribute('id'); ghost.classList.add('r58-ghost'); ghost.style.position = 'absolute'; ghost.style.top = old.offsetTop+'px'; ghost.style.left = old.offsetLeft+'px'; ghost.style.width = old.offsetWidth+'px';
+      const r = base.apply(this, arguments); c.appendChild(ghost); requestAnimationFrame(function(){ ghost.classList.remove('show'); }); setTimeout(function(){ ghost.remove(); }, 320); return r;
+    }
+    return base.apply(this, arguments);
+  };
+})(showToast);
+// Notifications: the Op feed under what needs you
+notifPanelHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), F = r58Feed().slice(-8).reverse();
+    if(!F.length) return h;
+    const feed = '<div class="r58-feed"><div class="r58-fh">From Op</div>'+F.map(function(it){ return '<button class="r58-fi is-'+it.kind+'" data-action="r58FeedOpen" data-id="'+it.id+'"><i></i><span>'+escapeHtml(it.short)+'</span><time>'+r58When(it.at)+'</time></button>'; }).join('')+'</div>';
+    const i = h.indexOf('</div>', h.indexOf('nt-head')); // newest from Op first, right under the header
+    return i < 0 ? h+feed : h.slice(0, i+6)+feed+h.slice(i+6);
+  };
+})(notifPanelHtml);
+function r58When(at){ const d = new Date(at); return (todayStr(d)===todayStr() ? '' : fmtDateShort(todayStr(d))+' ')+r57Clock(at); }
+function r58FeedOpen(id){
+  const it = r58Feed().find(function(x){ return x.id===id; }); if(!it) return;
+  ui.notifOpen = false; const p = document.getElementById('notifPanel'); if(p) p.hidden = true;
+  ui.r58FeedItem = id;
+  addSheetOpen('r58FeedSheet', function(){
+    const x = r58Feed().find(function(y){ return y.id===ui.r58FeedItem; }) || it, e = x.entry ? state.journal.entries.find(function(j){ return j.id===x.entry; }) : null;
+    return asHead(x.kind==='update' ? '&#128736;&#65039;' : '&#9673;', x.kind==='update' ? 'Saved to App updates' : 'Op did this', r58When(x.at))+
+      (e && e.title && e.title!==e.text ? '<div class="r58-fd-t">'+escapeHtml(e.title)+(arr(e.summaries).length ? '<br>'+e.summaries.map(escapeHtml).join('<br>') : '')+'</div>' : '')+
+      '<blockquote class="r58-fd-q">'+escapeHtml(e ? e.text : x.full)+'</blockquote>'+
+      (e ? '<div class="as-f"><button class="btn" data-action="r58OpenUpdates">Open App updates</button></div>' : '');
+  });
+}
+ACTIONS.r58FeedOpen = function(el, e, id){ r58FeedOpen(id); };
+ACTIONS.r58OpenUpdates = function(){ addSheetClose('r58FeedSheet'); ui.view = 'settings'; ui.settingsTab = 'system'; ui.r52Sub = ui.r52Sub || {}; ui.r52Sub['settings-system'] = 'updates'; renderView(); };
+
+// ================= C. A session that ran too long =================
+// One that's been open more than 10 hours asks once whether it's real, with Remove right there (Op can remove one too).
+setInterval(function(){
+  try{
+    const s = state.focus.activeSession; if(!s || s.r58Long) return;
+    if(Date.now() - s.startedAt > 10*3600000){ s.r58Long = true; persist('focus'); showToast('Still locked in after '+fmtDurationLabel(Math.round((Date.now() - s.startedAt)/60000))+'. Really working?', {icon:'&#9201;', actionLabel:'End it now', actionAction:'r56StopSession', duration:20000}); }
+  }catch(e){}
+}, 60000);
+
+// ================= D. Op's chat: the time on every message =================
+function r58Stamp(box, sel, list){
+  if(!box) return;
+  const els = box.querySelectorAll(sel); if(els.length!==list.length) return;
+  els.forEach(function(el, i){ if(el.querySelector('time.r58-t')) return; const at = list[i] && list[i].at; if(!at) return; const t = document.createElement('time'); t.className = 'r58-t'; t.textContent = r57Clock(at); el.appendChild(t); });
+}
+opChatDraw = (function(base){ return function(){ const r = base.apply(this, arguments); try{ r58Stamp(document.getElementById('opBubLog'), '.ocl-m:not(.ocl-typing)', opChat()); }catch(e){} return r; }; })(opChatDraw);
+opfChatDraw = (function(base){ return function(){ const r = base.apply(this, arguments); try{ r58Stamp(document.getElementById('opfLog'), '.opc-me, .opc-act, .opc-op', opChat().slice(-300)); }catch(e){} return r; }; })(opfChatDraw);
+
+// ================= E. Voice: it doesn't cut you off =================
+// Hands-free: no time cap at all; quiet talking still counts as talking; it ends only after a clear pause (about
+// four seconds, longer the longer you've been going, up to ten). The browser engine's 60-second stop is ignored.
+function r58PauseMs(talked){ return Math.max(typeof opPauseMs==='function' ? opPauseMs() : 2500, 3800) + Math.min(6000, talked*0.25); }
+scribeListen = async function(cap){
+  if(AI.listening){ if(AI.sendNow) AI.sendNow(); return; }
+  if(typeof opStop==='function') opStop();
+  const heyWas = typeof HW!=='undefined' && HW.on; if(heyWas && typeof heyStop==='function') heyStop();
+  OV.cap = cap || 'opBubText'; AI.listening = true; AI.typedAt = 0; aiUiRefresh(); opCaption('Listening…');
+  let stream = null;
+  try{ stream = await navigator.mediaDevices.getUserMedia({audio:r57MicOpts()}); }
+  catch(e){ AI.listening = false; aiUiRefresh(); opCaption(e && e.name==='NotAllowedError' ? 'I need the microphone. Allow it for Operator (or type instead).' : 'The mic isn’t working: type instead.'); return; }
+  r57Duck('mic', true);
+  const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '');
+  const rec = new MediaRecorder(stream, mime ? {mimeType:mime} : undefined), chunks = [];
+  rec.ondataavailable = function(e){ if(e.data && e.data.size) chunks.push(e.data); };
+  let ctx = null, an = null, buf = null;
+  try{ ctx = new (window.AudioContext || window.webkitAudioContext)(); an = ctx.createAnalyser(); an.fftSize = 1024; ctx.createMediaStreamSource(stream).connect(an); buf = new Float32Array(an.fftSize); }catch(e){}
+  let floor = 0.004, spoke = false, lastLoud = Date.now(), why = null, talked = 0; AI._longWarn = false;
+  const t0 = Date.now(), held = !!OPX.ptt;
+  const finish = function(reason){ if(why) return; why = reason; clearInterval(tick); try{ if(rec.state!=='inactive') rec.stop(); }catch(e){ rec.onstop(); } };
+  AI.sendNow = function(){ finish(spoke || !an ? 'send' : 'silence'); };
+  AI.cancelListen = function(){ finish('cancel'); };
+  const tick = setInterval(function(){
+    let rms = 0;
+    if(an){ an.getFloatTimeDomainData(buf); let s = 0; for(let i = 0; i < buf.length; i++) s += buf[i]*buf[i]; rms = Math.sqrt(s/buf.length); }
+    SCR.level = rms;
+    if(!spoke) floor = floor*0.95 + Math.min(rms, 0.03)*0.05;
+    // (once you've started, anything a little over the room's own noise is you still talking)
+    const loud = spoke ? Math.max(0.0045, floor*1.5) : Math.max(0.012, floor*2.6);
+    if(rms > loud){ if(spoke) talked += 100; lastLoud = Date.now(); if(!spoke && Date.now() - t0 > 120){ spoke = true; if(!held) opCaption('Listening… take your time'); } }
+    if(held || OPX.ptt) return;
+    if(spoke && Date.now() - lastLoud > r58PauseMs(talked)) finish('send');
+    else if(!spoke && Date.now() - t0 > (an ? 12000 : 8000)) finish(an ? 'silence' : 'send');
+  }, 100);
+  rec.onstop = async function(){
+    stream.getTracks().forEach(function(t){ t.stop(); }); try{ if(ctx) ctx.close(); }catch(e){}
+    AI.listening = false; AI.sendNow = null; AI.cancelListen = null; SCR.level = 0; aiUiRefresh(); r57Duck('mic', false);
+    if(why==='cancel') return;
+    if(why==='silence'){ opCaption('Didn’t hear anything.'); return; }
+    AI.transcribing = true; opCaption('…');
+    let text = '';
+    try{ text = await scribeText(new Blob(chunks, {type:mime || 'audio/webm'}), mime || 'audio/webm'); }
+    catch(e){ AI.transcribing = false; if(/no ElevenLabs key/i.test(e.message)) SCR.on = false; opCaption('Couldn’t make that out ('+(e.name==='AbortError' ? 'it took too long' : e.message)+'). Try again, or type.'); return; }
+    AI.transcribing = false;
+    if(text) aiAsk(text, OV.cap || cap); else opCaption('Didn’t catch that.');
+  };
+  rec.start(250);
+};
+if(typeof r51Busy==='function') scribeListen = (function(base){ return function(){ if(r51Busy()) return; return base.apply(this, arguments); }; })(scribeListen);
+// (the browser's speech engine: its own 60-second stop never ends a hands-free message either)
+(function(){
+  const st = window.setTimeout;
+  window.setTimeout = function(fn, ms){
+    if(ms===60000 && typeof fn==='function' && AI && AI.listening){ return st.call(window, function(){ if(AI.listening){ R57.srPending = fn; return; } fn(); }, ms); }
+    return st.apply(window, arguments);
+  };
+})();
+// a tap while he's talking: he stops, his line finishes writing out quickly, and the mic stays closed (a double tap
+// is what opens it)
+r54TalkToggle = (function(base){
+  return function(){
+    if(OV.speaking || OV.pending){
+      const line = R57.lastSaid;
+      try{ opStop(); }catch(e){} OV.userCut = true; R58.cutAt = Date.now(); AI.closedAt = Date.now();
+      if(line) r58FinishLine(line);
+      return;
+    }
+    if(R58.cutAt && Date.now() - R58.cutAt < 450){ R58.cutAt = 0; AI.closedAt = 0; return base.apply(this, arguments); }
+    return base.apply(this, arguments);
+  };
+})(r54TalkToggle);
+function r58FinishLine(text){
+  const el = document.getElementById('opBubText'); if(!el) return;
+  const have = el.textContent || '', i0 = text.indexOf(have) === 0 ? have.length : 0;
+  let i = i0; clearInterval(R58.fin);
+  R58.fin = setInterval(function(){ i = Math.min(text.length, i + Math.max(3, Math.ceil((text.length - i0)/18))); el.textContent = text.slice(0, i); if(i >= text.length) clearInterval(R58.fin); }, 16);
+}
+
+// ================= F. Op's read: one look, never pushes the page, and it always finishes typing =================
+// What went wrong: the typing kept its progress on the page itself, so a redraw in the middle put the whole text back
+// at once. Now its progress lives outside the page and every redraw shows exactly what's been typed so far. While
+// he thinks, the line already takes the space the read will need, so nothing under it moves.
+const R58T = {};
+function r58ReadParts(text){
+  const parts = ['Pattern', 'Watch', 'Move'].map(function(k){ const m = new RegExp('(?:^|\\n|\\s)'+k+':\\s*([^\\n]+?)(?=\\s*(?:Pattern|Watch|Move):|\\n|$)').exec(text); return m ? [k, m[1].trim()] : null; }).filter(Boolean);
+  return parts.length >= 2 ? parts : null;
+}
+opReadHtml = function(kind, kick){
+  if(kick) kick();
+  const r = opReadStore()[kind], failed = ui['opReadFail_'+kind] && Date.now() - ui['opReadFail_'+kind] < 15*60000, busy = !!ui['opRead_'+kind] || (!!kick && !failed);
+  if(!r && !busy) return '';
+  const label = {Pattern:'What’s going on', Watch:'Watch', Move:'Next'};
+  let T = R58T[kind];
+  if(r && (!T || T.text!==r.text)) T = R58T[kind] = {text:r.text, pos:R57_TYPED[kind]===r.text ? 1e9 : 0};
+  if(T && T.pos < T.text.length) r58TypeKick();
+  const shown = function(s, from){ if(!T) return s; const left = Math.max(0, T.pos - from); return s.slice(0, left); };
+  let body;
+  if(!r) body = '<p class="r57-opl-t"><i class="opi-dots"><b></b><b></b><b></b></i></p>';
+  else {
+    const parts = r58ReadParts(r.text);
+    if(parts){ let from = 0; body = '<div class="r57-opl-rows">'+parts.map(function(x){ const s = shown(x[1], from); from += x[1].length; return '<div class="r57-opl-r is-'+x[0].toLowerCase()+'"><b>'+label[x[0]]+'</b><span data-r58-k="'+escapeHtml(kind)+'">'+escapeHtml(s)+'</span></div>'; }).join('')+'</div>'; }
+    else body = '<p class="r57-opl-t" data-r58-k="'+escapeHtml(kind)+'">'+escapeHtml(shown(r.text, 0))+'</p>';
+  }
+  return '<div class="opi r57-opl r58-opl'+(r ? '' : ' is-busy')+'" data-opi="'+escapeHtml(kind)+'"><span class="r57-opl-o"></span><div class="r57-opl-b"><span class="r57-opl-k">Op’s read</span>'+body+'</div>'+
+    (r ? '<button class="opi-r" data-action="opReadAgain" data-id="'+escapeHtml(kind)+'" title="Another take">&#8635;</button>' : '')+'</div>';
+};
+// one typing clock: it writes into whatever is on the page now, and never jumps ahead. It only runs while
+// something is still typing.
+var r58TypeTimer = null;
+function r58TypeKick(){ if(!r58TypeTimer) r58TypeTimer = setInterval(r58TypeTick, 22); }
+function r58TypeTick(){
+  let busy = false;
+  Object.keys(R58T).forEach(function(kind){
+    const T = R58T[kind], total = T.text.length; if(T.pos >= total) return; busy = true;
+    const el = document.querySelector('.r58-opl[data-opi="'+(window.CSS && CSS.escape ? CSS.escape(kind) : kind)+'"]'); if(!el) return;
+    T.pos = Math.min(total, T.pos + 2);
+    const parts = r58ReadParts(T.text), spans = el.querySelectorAll('[data-r58-k]');
+    if(parts && spans.length===parts.length){ let from = 0; parts.forEach(function(x, i){ const s = x[1].slice(0, Math.max(0, T.pos - from)); if(spans[i].textContent!==s) spans[i].textContent = s; from += x[1].length; }); }
+    else if(spans.length===1) spans[0].textContent = T.text.slice(0, T.pos);
+    if(T.pos >= total) R57_TYPED[kind] = T.text;
+  });
+  if(!busy){ clearInterval(r58TypeTimer); r58TypeTimer = null; }
+}
+// ============ ROUND 58: THE PAGES ============
+// Business tabs in his order; Playbooks in one place (Overview of who's on what, Builder, a ★ default); Social as the
+// content command center (every account up top, his own set apart, tap one for its numbers, its package and its
+// content calendar; full screen when you want it); a delivery calendar on every package (and packages just for you);
+// Settings: one App updates list, no Payments header outside Integrations; Op's window, bigger and readable.
+
+// ================= G. Business: Overview, Clients, Leads, Packages, Finances, Playbooks =================
+renderBusiness = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), t = ui.businessTab || 'overview';
+    const cn = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); }).length, ln = arr(state.business.pipeline).filter(leadIsOpen).length;
+    const tab = function(id, label, n){ return '<div class="tab '+(t===id ? 'active' : '')+'" data-action="businessTab" data-tab="'+id+'">'+label+(n!=null ? ' <span class="r58-tn">'+n+'</span>' : '')+'</div>'; };
+    const lane = '<div class="tabs tabs-with-tools biz-tabs r58-biz">'+tab('overview', 'Overview')+tab('clients', 'Clients', cn)+tab('leads', 'Leads', ln)+tab('packages', 'Packages')+tab('finances', 'Finances')+tab('lifecycle', 'Playbooks')+
+      '<div class="tabs-tools"><button class="biz-gear is-lane'+(t==='log' ? ' is-on' : '')+'" data-action="businessTab" data-tab="log">&#128203;<span>Log center</span></button><button class="biz-gear is-lane" data-action="bizSetupOpen" aria-label="Business setup">&#9881;&#65038;<span>Setup</span></button></div></div><div class="tab-panel"';
+    return h.replace(/<div class="tabs[^"]*biz-tabs[^"]*">[\s\S]*?<div class="tab-panel"/, function(){ return lane; });
+  };
+})(renderBusiness);
+
+// ================= H. Playbooks: one place =================
+// Overview: every playbook someone is on, as a column of their cards (like the Leads board), and everyone who isn't on
+// one at the bottom (drag a card onto a playbook). Builder: every playbook in one row of pills, clients' and leads'
+// together, ★ for the default (it's the one picked for you when you add someone).
+function r58Star(p){ return !!(p && p.star); }
+function r58Default(kind){ return pbAll().find(function(p){ return r58Star(p) && pbFor(p)===(kind==='lead' ? 'lead' : 'client'); }) || null; }
+pbEditorHtml = function(){
+  pbSeed(); pbAll().forEach(pb57Migrate);
+  const view = ui.pbView==='build' ? 'build' : 'board';
+  const bar = '<div class="pb6-bar"><div class="seg-tabs seg-sm"><button class="seg-tab'+(view==='board' ? ' active' : '')+'" data-action="pb6View" data-id="board">Overview</button><button class="seg-tab'+(view==='build' ? ' active' : '')+'" data-action="pb6View" data-id="build">Builder</button></div>'+
+    '<span class="pb6-sp"></span><button class="btn btn-sm btn-primary" data-action="pb6NewOpen">+ New playbook</button></div>';
+  if(!pbAll().length) return '<div class="pb6">'+bar+'<div class="pb6-empty"><b>No playbooks yet</b><button class="btn btn-sm btn-primary" data-action="pb6NewOpen">+ New playbook</button></div></div>';
+  if(view==='board') return '<div class="pb6 r58-pb">'+bar+r58PbOverview()+'</div>';
+  let p = pbById(ui.pbSel); if(!p){ p = pbAll()[0]; ui.pbSel = p.id; }
+  ui.pbWho = pbFor(p);
+  const pills = '<div class="pb6-pills">'+pbAll().map(function(x){ return '<span class="r58-pill'+(x.id===p.id ? ' is-on' : '')+'"><button class="r58-star'+(r58Star(x) ? ' is-on' : '')+'" data-action="r58Star" data-id="'+x.id+'" aria-label="Make it the default">'+(r58Star(x) ? '&#9733;' : '&#9734;')+'</button><button class="r58-pn" data-action="pbPick" data-id="'+x.id+'">'+escapeHtml(x.name)+'<em>'+(pbFor(x)==='lead' ? 'Leads' : 'Clients')+'</em></button></span>'; }).join('')+'</div>';
+  return '<div class="pb6 pb57">'+bar+pills+pb57BuildHtml(p)+'</div>';
+};
+function r58PbOverview(){
+  const people = pbCountsFor('client').map(function(x){ return {k:'client', x:x}; }).concat(pbCountsFor('lead').map(function(x){ return {k:'lead', x:x}; }));
+  const on = function(p){ return people.filter(function(P){ return P.x.pb && P.x.pb.id===p.id; }); };
+  const active = pbAll().filter(function(p){ return on(p).length; }), idle = pbAll().filter(function(p){ return !on(p).length; });
+  const off = people.filter(function(P){ return !P.x.pb || !P.x.pb.id || !pbById(P.x.pb.id); });
+  const col = function(p){
+    const L = on(p);
+    return '<section class="pb6-col r58-col" data-pb6-col="'+p.id+'"><header>'+(r58Star(p) ? '<i class="r58-sti">&#9733;</i>' : '')+'<b>'+escapeHtml(p.name)+'</b><span>'+L.length+'</span><button class="pb6-cedit" data-action="pb6Build" data-id="'+p.id+'" aria-label="Open it in the Builder">&#9998;</button></header>'+
+      '<small class="pb6-cmeta">'+(pbFor(p)==='lead' ? 'Leads' : 'Clients')+' · '+pbStages(p).length+' stage'+(pbStages(p).length===1 ? '' : 's')+'</small>'+
+      '<div class="pb6-cards">'+L.map(function(P){ return pbCardHtml(P.k, P.x); }).join('')+'</div></section>';
+  };
+  const offCard = function(P){
+    const d = r58Default(P.k), cc = P.k==='client' ? clientAccent(P.x) : '#8B95A7';
+    return '<div class="pb6-card r58-off" draggable="true" data-pb6-drag="'+P.k+':'+P.x.id+'" style="--cc:'+cc+'"><div class="pb6-ch"><i></i><b>'+escapeHtml(pbName(P.k, P.x))+'</b><span class="r58-kind">'+(P.k==='lead' ? 'Lead' : 'Client')+'</span></div>'+
+      (d ? '<button class="r58-put" data-action="r58PutDefault" data-id="'+P.k+':'+P.x.id+'">&#9733; '+escapeHtml(d.name)+'</button>' : '')+'</div>';
+  };
+  return (active.length ? '<div class="pb6-board r58-board">'+active.map(col).join('')+'</div>' : '<div class="r58-none">Nobody’s on a playbook yet. Drag someone from below onto one in the Builder, or use ★.</div>')+
+    (idle.length ? '<div class="r58-idle"><span>Not running</span>'+idle.map(function(p){ return '<button class="pb6-pill r58-drop" data-action="pb6Build" data-id="'+p.id+'" data-pb6-col="'+p.id+'">'+(r58Star(p) ? '&#9733; ' : '')+escapeHtml(p.name)+'</button>'; }).join('')+'</div>' : '')+
+    '<section class="pb6-col is-off r58-offs" data-pb6-col=""><header><b>Not on a playbook</b><span>'+off.length+'</span></header><div class="r58-offg">'+off.map(offCard).join('')+'</div></section>';
+}
+// a playbook nobody's on yet is a pill; drop someone on it to start them
+document.addEventListener('dragover', function(e){ const d = e.target.closest && e.target.closest('.r58-drop'); if(!d || !Array.from(e.dataTransfer.types || []).includes('text/pb6')) return; e.preventDefault(); d.classList.add('is-over'); });
+document.addEventListener('dragleave', function(e){ const d = e.target.closest && e.target.closest('.r58-drop'); if(d) d.classList.remove('is-over'); });
+document.addEventListener('drop', function(e){ const d = e.target.closest && e.target.closest('.r58-drop'); if(!d) return; const v = e.dataTransfer.getData('text/pb6'); if(!v) return; e.preventDefault(); d.classList.remove('is-over'); const q = v.split(':'); pbMoveTo(q[0], q[1], d.getAttribute('data-pb6-col')); });
+ACTIONS.r58Star = function(el, e, id){
+  const p = pbById(id); if(!p) return; const on = !r58Star(p);
+  pbAll().forEach(function(x){ if(pbFor(x)===pbFor(p)) x.star = false; }); p.star = on;
+  playTick(); pbSave(); renderView();
+};
+ACTIONS.r58PutDefault = function(el, e, v){ const q = String(v).split(':'), d = r58Default(q[0]); if(d) pbMoveTo(q[0], q[1], d.id); };
+// (a lead can't go on a client playbook or the other way round)
+pbMoveTo = (function(base){
+  return function(kind, id, pbId){
+    const to = pbId ? pbById(pbId) : null;
+    if(to && pbFor(to)!==(kind==='lead' ? 'lead' : 'client')){ showToast(to.name+' is a playbook for '+(pbFor(to)==='lead' ? 'leads' : 'clients')+'.', {icon:'&#9776;'}); return Promise.resolve(false); }
+    return base.apply(this, arguments);
+  };
+})(pbMoveTo);
+ACTIONS.pb6Build = function(el, e, id){ ui.pbSel = id; ui.pbView = 'build'; ui.pbItem = null; ui.pb57Stage = null; renderView(); };
+// adding someone: the ★ playbook is picked for you
+renderNewContact = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), d = r58Default(ui.newContactKind || 'lead'); if(!d) return h;
+    return h.replace('<option value="'+d.id+'">', '<option value="'+d.id+'" selected>');
+  };
+})(renderNewContact);
+
+// ================= I. Social: the content command center =================
+// No Clients tab. Overview starts with every account: yours (business, personal) set apart in gold, then clients'.
+// Tap one: its numbers, the package it's on, its content calendar (and, for a client, the report). "Full screen"
+// gives Social the whole window, like Inspiration.
+function r58Own(){ return arr(igCfg().accounts).map(function(a){ const d = sxAccountData(a) || {}; return {id:a.id, own:true, role:a.role, handle:d.username || a.username || '', pic:d.pic || '', a:a}; }); }
+function r58Clients(){ const L = r55CliLinks(), mine = r58Own(), ids = {}, names = {}; mine.forEach(function(x){ ids[x.id] = 1; ['zid', 'accountId', 'znId'].forEach(function(k){ if(x.a[k]) ids[x.a[k]] = 1; }); if(x.handle) names[String(x.handle).toLowerCase()] = 1; });
+  return arr(ui.r55CliAll || igCfg().cliAll).filter(function(a){ return L[a.id] || !(ids[a.id] || names[String(a.username || '').toLowerCase()]); }).map(function(a){ const c = L[a.id] ? crmFind('client', L[a.id]) : null; return {id:a.id, own:false, handle:a.username || '', platform:a.platform, client:c, a:a}; }); }
+function r58AcctPkg(id){ const m = igCfg().r58Pkg || {}, P = arr(state.business.packages); if(m[id]) return P.find(function(p){ return p.id===m[id]; }) || null; const cid = r55CliLinks()[id], c = cid ? crmFind('client', cid) : null; return c && c.packageId ? P.find(function(p){ return p.id===c.packageId; }) || null : null; }
+function r58StripHtml(){
+  // the client accounts load here now (they used to load when the old Clients tab opened)
+  if(!ui.r55CliAll && !ui.r55CliBusy && !ui.r55CliTried){ ui.r55CliTried = true; ui.r55CliAll = igCfg().cliAll || null; try{ r55CliLoad(false); }catch(e){} }
+  const own = r58Own(), cl = r58Clients(), sel = ui.r58Acct;
+  const role = sxRole(), clientOpen = sel && !own.some(function(x){ return x.id===sel; });
+  const chip = function(x){ return '<button class="r58-ac'+(x.own ? ' is-own' : '')+((x.own ? !clientOpen && x.role===role : sel===x.id) ? ' is-on' : '')+'" data-action="r58Acct" data-id="'+x.id+'"'+(x.client ? ' style="--cc:'+clientAccent(x.client)+'"' : '')+'>'+(x.pic ? '<img src="'+escapeHtml(x.pic)+'" alt="">' : '<span class="r58-av">'+escapeHtml(String(x.handle || '?').slice(0, 1).toUpperCase())+'</span>')+'<b>@'+escapeHtml(x.handle)+'</b>'+(x.own ? '<small>'+(x.role==='personal' ? 'You' : 'Your business')+'</small>' : x.client ? '<small>'+escapeHtml(x.client.business || x.client.name)+'</small>' : '')+'</button>'; };
+  const swap = own.length > 1 ? '<button class="r58-swap" data-action="sxSwapRoles" title="Swap which account is business and which is personal" aria-label="Swap business and personal">&#8644;</button>' : '';
+  return '<div class="r58-strip">'+(own.length ? '<div class="r58-own">'+own.map(chip).join('')+swap+'</div>' : '')+(cl.length ? '<div class="r58-cls">'+cl.map(chip).join('')+'</div>' : '')+'</div>';
+}
+function r58PkgPick(id){
+  const pk = r58AcctPkg(id), list = arr(state.business.packages);
+  return '<label class="r58-pk"><span>Package</span><select class="input input-sm" data-r58-pkg="'+id+'"><option value="">None</option>'+list.map(function(p){ return '<option value="'+p.id+'"'+(pk && pk.id===p.id ? ' selected' : '')+'>'+escapeHtml(p.name)+(p.type==='self' ? ' (just me)' : '')+'</option>'; }).join('')+'</select></label>';
+}
+function r58FocusHtml(){
+  const id = ui.r58Acct, own = r58Own().find(function(x){ return x.id===id; }), cl = !own ? r58Clients().find(function(x){ return x.id===id; }) : null;
+  if(!own && !cl){ ui.r58Acct = null; return null; }
+  let numbers = '';
+  if(own){ const c = igCfg(), all = c.accounts; c.accounts = all.filter(function(a){ return a.id===id; }); try{ numbers = sxProfileCard(own.role); } finally { c.accounts = all; } }
+  else { const d = r55CliData(id) || {}; numbers = '<div class="sx-prof"><div class="sx-prof-h"><span class="sx-av">'+escapeHtml(String(cl.handle || '?').slice(0, 1).toUpperCase())+'</span><div><div class="sx-prof-k">'+escapeHtml(cl.client ? cl.client.business || cl.client.name : 'Client account')+'</div><b>@'+escapeHtml(cl.handle)+'</b></div></div>'+
+    '<div class="sx-tiles"><div class="sx-t"><b>'+(d.followers || cl.a.followers ? sxNum(d.followers || cl.a.followers) : '–')+'</b><span>followers</span></div><div class="sx-t"><b>'+(d.p30!=null ? d.p30 : '–')+'</b><span>posts</span><small>30 days</small></div><div class="sx-t"><b>'+(d.views ? sxNum(d.views) : '–')+'</b><span>views</span><small>30 days</small></div></div>'+
+    (d.best ? '<div class="r58-best"><small>Best this month</small><b>'+escapeHtml((d.best.cap || '').slice(0, 90))+'</b><span>'+sxNum(d.best.views || 0)+' views</span></div>' : '')+'</div>'; }
+  const c = cl && cl.client, cal = c ? r57CalHtml(c) : r58OwnCalHtml(id);
+  const who = cl ? '<label class="r58-pk"><span>Client</span><select class="input input-sm" data-r58-cli="'+id+'"><option value="">Not linked</option>'+arr(state.business.clients).map(function(x){ return '<option value="'+x.id+'"'+(c && c.id===x.id ? ' selected' : '')+'>'+escapeHtml(x.business || x.name)+'</option>'; }).join('')+'</select></label>' : '';
+  const acts = '<div class="r58-facts">'+who+r58PkgPick(id)+(c ? '<button class="btn btn-primary btn-sm" data-action="r55Report" data-id="'+c.id+'">Write their report</button><button class="btn btn-sm" data-action="r57CliExport" data-id="'+c.id+'">Export the calendar</button>' : '')+'</div>';
+  return '<div class="r58-focus"><section>'+numbers+'</section><section>'+acts+cal+'</section></div>';
+}
+// your own account's month: the package's pieces on their days, done as you post
+function r58OwnCalHtml(id){
+  const pk = r58AcctPkg(id); if(!pk) return '<div class="r57-cc"><div class="r57-cc-none">Link a package to see this account’s content calendar.</div></div>';
+  const fake = {id:'own:'+id, business:'', name:'', deliverables:arr(pk.deliverables).map(function(d){ return {id:d.id, sourceId:d.id, title:d.title, recurring:true, weeklyTarget:d.weeklyTarget || 1, completedDates:r58PostedDates(id)}; }), packageId:pk.id, pb:null};
+  return r57CalHtml(fake);
+}
+function r58PostedDates(id){ const a = arr(igCfg().accounts).find(function(x){ return x.id===id; }), d = a ? sxAccountData(a) : null; return arr(d && d.posts).map(function(p){ return p.date; }).filter(Boolean).sort(); }
+sxOverviewHtml = (function(base){
+  return function(){
+    const strip = r58StripHtml(), mine = r58Own(), cur = ui.r58Acct && !mine.some(function(x){ return x.id===ui.r58Acct; }) ? r58FocusHtml() : null;
+    if(cur) return strip+cur;
+    ui.r58Acct = null;
+    const me = mine.find(function(x){ return x.role===sxRole(); }) || mine[0];
+    const dash = base.apply(this, arguments).replace(/<div class="sx2-acc">[\s\S]*?<\/div>/, '');
+    return strip+dash+(me ? r58OwnPanelHtml(me.id) : '');
+  };
+})(sxOverviewHtml);
+ACTIONS.r58Acct = function(el, e, id){ const o = r58Own().find(function(x){ return x.id===id; }); if(o){ ui.sxRole = o.role; ui.r58Acct = null; } else ui.r58Acct = id || null; ui.socTab = 'overview'; playTick(); renderView(); };
+// your own account under its numbers: its package and its month of content
+function r58OwnPanelHtml(id){ return '<div class="r58-focus r58-ownp" data-acct="'+id+'"><section><div class="r58-facts">'+r58PkgPick(id)+'</div>'+r58OwnCalHtml(id)+'</section></div>'; }
+document.addEventListener('change', function(e){ const t = e.target; if(!t || !t.getAttribute || !t.hasAttribute('data-r58-pkg')) return; const c = igCfg(); c.r58Pkg = c.r58Pkg || {}; if(t.value) c.r58Pkg[t.getAttribute('data-r58-pkg')] = t.value; else delete c.r58Pkg[t.getAttribute('data-r58-pkg')]; persist('settings'); renderView(); });
+document.addEventListener('change', function(e){ const t = e.target; if(!t || !t.getAttribute || !t.hasAttribute('data-r58-cli')) return; const L = r55CliLinks(), a = t.getAttribute('data-r58-cli'); if(t.value) L[a] = t.value; else delete L[a]; persist('settings'); try{ r55CliLoad(true); }catch(err){} renderView(); });
+renderConversations = (function(base){
+  return function(){
+    if(ui.socTab==='clients') ui.socTab = 'overview';
+    const full = document.documentElement.classList.contains('r58-content');
+    return base.apply(this, arguments)
+      .replace(/<button class="seg-tab[^"]*" data-action="socTab" data-id="clients">[\s\S]*?<\/button>/, '')
+      .replace(/(<div class="row" style="gap:8px;align-items:center;">)/, function(m0){ return m0+'<button class="btn btn-sm r58-cm" data-action="r58Content">'+(full ? 'Exit full screen' : '&#10530; Full screen')+'</button>'; });
+  };
+})(renderConversations);
+ACTIONS.r58Content = function(){ document.documentElement.classList.toggle('r58-content'); playTick(); renderView(); };
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && document.documentElement.classList.contains('r58-content') && !document.querySelector('.overlay:not(.hidden)')){ document.documentElement.classList.remove('r58-content'); renderView(); } });
+afterRenderHooks.push(function(){ if(ui.view!=='convos' && document.documentElement.classList.contains('r58-content')) document.documentElement.classList.remove('r58-content'); });
+
+// ================= J. Packages: a delivery calendar, and packages just for you =================
+// Under the packages: pick one, then for each of its deliverables tap the days of the month each piece goes out (a
+// reel on the 3rd, the 10th…). Clients on that package get their content calendar from it (and accounts linked to it
+// in Social); a package "just for me" isn't billed to anyone.
+function r58PkSel(){ const L = arr(state.business.packages); let p = L.find(function(x){ return x.id===ui.r58Pk; }); if(!p){ p = L[0] || null; ui.r58Pk = p ? p.id : null; } return p; }
+function r58PkMonthly(d){ return Math.max(1, Math.round((Number(d.weeklyTarget) || 1)*52/12)); }
+renderPackagesTab = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), pk = r58PkSel(); if(!pk) return h;
+    const L = arr(state.business.packages), sch = pk.schedule || {};
+    const linked = r58Own().concat(r58Clients()).filter(function(x){ const q = r58AcctPkg(x.id); return q && q.id===pk.id; }).map(function(x){ return '@'+x.handle; });
+    const rows = arr(pk.deliverables).map(function(d){
+      const days = arr(sch[d.id]).map(Number), need = r58PkMonthly(d);
+      let cells = ''; for(let i = 1; i <= 31; i++) cells += '<button class="'+(days.indexOf(i) >= 0 ? 'is-on' : '')+'" data-action="r58PkDay" data-id="'+d.id+'|'+i+'">'+i+'</button>';
+      return '<div class="r58-pkr"><div class="r58-pkh"><b>'+escapeHtml(d.title)+'</b><span class="'+(days.length===need ? 'is-ok' : days.length > need ? 'is-over' : '')+'">'+days.length+' of '+need+' placed</span><button class="r58-even" data-action="r58PkEven" data-id="'+d.id+'">Spread them out</button></div><div class="r58-days">'+cells+'</div></div>';
+    }).join('');
+    const panel = '<section class="r58-pkc"><div class="r58-pkc-h">'+(L.length > 1 ? '<div class="pb6-pills">'+L.map(function(x){ return '<button class="pb6-pill'+(x.id===pk.id ? ' is-on' : '')+'" data-action="r58Pk" data-id="'+x.id+'">'+escapeHtml(x.name)+'</button>'; }).join('')+'</div>' : '<b>'+escapeHtml(pk.name)+'</b>')+
+      '<div class="seg-tabs seg-sm"><button class="seg-tab'+(pk.type==='self' ? '' : ' active')+'" data-action="r58PkType" data-id="client">For clients</button><button class="seg-tab'+(pk.type==='self' ? ' active' : '')+'" data-action="r58PkType" data-id="self">Just me</button></div></div>'+
+      '<div class="r58-pkc-k">When each piece goes out, every month'+(linked.length ? ' · '+escapeHtml(linked.join(', ')) : '')+'</div>'+(rows || '<div class="r58-none">This package has no deliverables yet.</div>')+'</section>';
+    return h+panel;
+  };
+})(renderPackagesTab);
+ACTIONS.r58Pk = function(el, e, id){ ui.r58Pk = id; playTick(); renderView(); };
+ACTIONS.r58PkType = function(el, e, v){ const pk = r58PkSel(); if(!pk) return; pk.type = v==='self' ? 'self' : 'client'; persist('business'); playTick(); renderView(); };
+ACTIONS.r58PkDay = function(el, e, v){ const q = String(v).split('|'), pk = r58PkSel(); if(!pk) return; pk.schedule = pk.schedule || {}; const L = arr(pk.schedule[q[0]]).map(Number), n = Number(q[1]); pk.schedule[q[0]] = L.indexOf(n) >= 0 ? L.filter(function(x){ return x!==n; }) : L.concat([n]).sort(function(a, b){ return a - b; }); persist('business'); playTick(); renderView(); };
+ACTIONS.r58PkEven = function(el, e, id){ const pk = r58PkSel(), d = pk && arr(pk.deliverables).find(function(x){ return x.id===id; }); if(!d) return; const n = r58PkMonthly(d), out = []; for(let k = 0; k < n; k++) out.push(Math.min(28, 1 + Math.floor(k*28/n) + 1)); pk.schedule = pk.schedule || {}; pk.schedule[id] = Array.from(new Set(out)).sort(function(a, b){ return a - b; }); persist('business'); playTick(); renderView(); };
+packageRow = (function(base){ return function(pk){ const h = base.apply(this, arguments); return pk.type==='self' ? h.replace('<div class="pk-name">', '<div class="pk-name"><span class="r58-self">Just me</span>') : h; }; })(packageRow);
+// a client's (or your account's) content calendar follows the package's days when they're set
+r57ContentPlan = (function(base){
+  return function(c, ym){
+    const out = base.apply(this, arguments);
+    const pk = c && c.packageId ? arr(state.business.packages).find(function(p){ return p.id===c.packageId; }) : null; if(!pk || !pk.schedule) return out;
+    ym = ym || thisMonthKey();
+    const y = Number(ym.slice(0, 4)), m = Number(ym.slice(5, 7)) - 1, last = new Date(y, m + 1, 0).getDate(), today = todayStr();
+    let res = out;
+    arr(c.deliverables).filter(function(d){ return d.recurring; }).forEach(function(d){
+      const days = arr(pk.schedule[d.sourceId || d.id]); if(!days.length) return;
+      const done = arr(d.completedDates).filter(function(x){ return monthKeyOf(x)===ym; }).sort(), one = delivOne(d) || 'Piece';
+      res = res.filter(function(x){ return x.d!==d; });
+      days.slice().sort(function(a, b){ return a - b; }).forEach(function(day, k){ const date = todayStr(new Date(y, m, Math.min(last, Number(day)))); const st = k < done.length ? 'done' : date < today ? 'late' : date===today ? 'today' : 'planned'; res.push({n:k + 1, of:days.length, what:one, date:date, st:st, doneOn:done[k] || null, d:d}); });
+    });
+    return res.sort(function(a, b){ return a.date.localeCompare(b.date) || a.n - b.n; });
+  };
+})(r57ContentPlan);
+
+// ================= K. Settings =================
+// App updates: no "Counted as updates" picker (everything there is an update). Connections & Data: the Payments card
+// only on Integrations. Op: no separate "Op's ideas" list (they're in App updates).
+renderSettings = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    const sub = (ui.r52Sub || {})['settings-system'] || 'integrations';
+    if(/data-key="settings-system"/.test(h) && sub!=='integrations' && typeof payCardHtml==='function'){ const pc = payCardHtml(); if(pc && h.indexOf(pc) >= 0) h = h.replace(pc, ''); }
+    if(h.indexOf('upd-foot') < 0 && h.indexOf('Op’s ideas for the app') < 0) return h;
+    const t = document.createElement('template'); t.innerHTML = h;
+    t.content.querySelectorAll('.upd-foot').forEach(function(x){ x.remove(); });
+    t.content.querySelectorAll('.field.op-set > label').forEach(function(l){ if(/^Op’s ideas for the app/.test(l.textContent.trim())) l.parentNode.remove(); });
+    const d = document.createElement('div'); d.appendChild(t.content.cloneNode(true)); return d.innerHTML;
+  };
+})(renderSettings);
+// (the empty-state line on App updates without the "filed under …" explainer)
+renderUpdatesTab = (function(base){ return function(){ return base.apply(this, arguments).replace(/No updates (yet|in this range)\.[^<]*/, function(m0, w){ return 'No updates '+w+'.'; }); }; })(renderUpdatesTab);
+
+// ================= Op's window =================
+// Bigger by default; it opens on your conversation (each line with its time, and it scrolls); the buttons are three
+// matching round ones: open full screen, turn off (mute / an hour / off), close.
+setTimeout(function(){ try{ const s = state.profile.opBubSize; if(!s || !s.w || s.w < 440){ state.profile.opBubSize = Object.assign({}, s || {}, {w:460}); persist('profile'); } }catch(e){} }, 0);
+opBubShow = (function(base){
+  return function(){
+    const b = base.apply(this, arguments);
+    if(b){
+      if(!b.classList.contains('is-log')){ b.classList.add('is-log'); try{ OPCD.sig = ''; opChatDraw(); }catch(e){} }
+      const off = b.querySelector('.r57-bub-off'); if(off && !off.classList.contains('r58-round')){ off.classList.add('r58-round'); off.innerHTML = '&#9211;'; off.setAttribute('aria-label', 'Turn Op off'); off.title = 'Turn Op off'; }
+      const op = b.querySelector('.r57-bub-open'); if(op) op.classList.add('r58-round');
+      const x = b.querySelector('.op-bub-x'); if(x) x.classList.add('r58-round');
+      r58BubGrip(b); r58BubLogSize(b);
+    }
+    return b;
+  };
+})(opBubShow);
+// resizing sizes the conversation itself (the old grip sized a line that's hidden in the conversation view), the size
+// you drag to stays, and with no size set the conversation fits what's in it, up to most of the window
+function r58BubLogSize(b){
+  const log = b && b.querySelector('.op-bub-log'); if(!log) return;
+  const s = state.profile.opBubSize || {};
+  if(s.h) { log.style.setProperty('height', Math.max(140, Math.min(window.innerHeight*0.75, s.h))+'px', 'important'); log.style.removeProperty('max-height'); }
+  else { log.style.removeProperty('height'); }
+  b.classList.toggle('r58-sized', !!s.h);
+}
+function r58BubGrip(b){
+  const g0 = b.querySelector('.op-bub-rs'); if(!g0 || g0.r58) return;
+  const g = g0.cloneNode(true); g.r58 = true; g0.replaceWith(g); // drops the old handlers
+  g.addEventListener('mousedown', function(e){
+    e.preventDefault(); e.stopPropagation();
+    const log = b.querySelector('.op-bub-log'), r = b.getBoundingClientRect(), h0 = log ? log.getBoundingClientRect().height : 300, x0 = e.clientX, y0 = e.clientY;
+    b.classList.add('is-resizing');
+    const mv = function(ev){
+      const w = Math.max(340, Math.min(window.innerWidth - 40, r.width + (ev.clientX - x0)));
+      const h = Math.max(140, Math.min(window.innerHeight*0.75, h0 - (ev.clientY - y0)));
+      state.profile.opBubSize = {w:Math.round(w), h:Math.round(h)};
+      b.style.setProperty('width', w+'px', 'important'); r58BubLogSize(b);
+    };
+    const up = function(){ document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); b.classList.remove('is-resizing'); persist('profile'); };
+    document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
+  });
+  g.addEventListener('dblclick', function(){ state.profile.opBubSize = {w:460, h:0}; persist('profile'); b.style.setProperty('width', '460px', 'important'); r58BubLogSize(b); });
+}
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

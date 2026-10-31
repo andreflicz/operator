@@ -111,7 +111,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   // ---- the board and the guide ----
   await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='board'; ui.pbWho='client'; ui.pbSel=pbAll()[0].id; renderView()"); await p.waitForTimeout(200);
-  check('Board: the playbook’s stages are the columns (and one for who’s not on it)', (await p.$$('.pb57 .pb6-col')).length===4 && /Not on Client journey/.test(await p.textContent('.pb6-col.is-off')));
+  // (round 58: the board is the Playbooks overview: a column per playbook someone's on, the rest at the bottom)
+  check('Board: a column for the playbook (and a place for who’s not on it)', !!(await p.$('.r58-col[data-pb6-col="'+(await E("pbAll()[0].id"))+'"]')) && !!(await p.$('.r58-offs')));
   await E("ui.pbView='build'; ui.pb57Cal=true; ui.pb57Stage=pbStages(pbAll()[0])[1].id; renderView()"); await p.waitForTimeout(150);
   check('the calendar is the guide: the ideal month with posting days you pick', (await p.$$('.pb57-cal .pb6-day')).length >= 28 && (await p.$$('.pb57-post button')).length===7);
   await p.click('.pb57-post button'); await p.waitForTimeout(100);
@@ -208,9 +209,11 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('add_journal takes a tag: “Update” files it under the Update tag (App updates)', await E("(function(){ const e = state.journal.entries.filter(e => e.text==='Playbooks now run as stages.').pop(); return !!e && e.mood===updatesTypeId() && isUpdateEntry(e); })()"));
   await E("document.querySelectorAll('#r57Notes .r57-note').forEach(n => n.remove()); opRunTool('suggest_improvement', {idea:'Let me drag tasks between days on the calendar.'})"); await p.waitForTimeout(400);
   check('an idea Op logs: the white note types out, top right, with the time', !!(await p.$('#r57Notes .r57-note.is-idea')) && /\d:\d\d/.test(await p.textContent('#r57Notes .r57-note time')));
-  check('…and it’s in Settings (Op’s notes) and in App updates', await E("arr(state.settings.opIdeas).some(i => /drag tasks between days/.test(i.text)) && state.journal.entries.some(e => isUpdateEntry(e) && /drag tasks between days/.test(e.text))"));
+  // (round 58: one place: App updates only; the separate Op's ideas list is gone)
+  check('…and it’s in App updates (one place)', await E("!arr(state.settings.opIdeas).length && state.journal.entries.some(e => isUpdateEntry(e) && /drag tasks between days/.test(e.text))"));
   await E("opRunTool('add_task', {title:'Call the printer'})"); await p.waitForTimeout(1200);
-  check('anything Op does for you: the same note, and kept the same way', /printer/i.test(await p.textContent('#r57Notes')) && await E("arr(state.settings.opIdeas).some(i => i.from==='did' && /printer/i.test(i.text)) && state.journal.entries.some(e => isUpdateEntry(e) && /printer/i.test(e.text))"));
+  // (round 58: what Op does goes to the Notifications feed, not App updates)
+  check('anything Op does for you: the same note, kept in the feed', /printer/i.test(await p.textContent('#r57Notes')) && await E("r58Feed().some(f => /printer/i.test(f.short)) && !state.journal.entries.some(e => isUpdateEntry(e) && /printer/i.test(e.text))"));
   await E("r57Set('clock12', false)"); await E("opRunTool('add_task', {title:'Call the bank'})"); await p.waitForTimeout(1200);
   check('the note’s time can be 24-hour (Settings)', /^\d\d:\d\d$/.test((await p.$$eval('#r57Notes .r57-note time', n => n.map(x => x.textContent))).pop()));
   await E("r57Set('clock12', true)");
@@ -237,8 +240,9 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // ================= E. the pages =================
   await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); xpSystemShow = function(){}; const jj = crmFind('client', 'jj'); jj.deliverables[0].weeklyTarget = 2; jj.deliverables[0].completedDates = [todayStr().slice(0, 8)+'02', todayStr().slice(0, 8)+'06']; persist('business')");
   check('Socials → Clients: a client’s month of numbered reels on their posting days, done from what’s delivered', await E("(function(){ const pl = r57ContentPlan(crmFind('client', 'jj')); return pl.length===monthlyTargetFor(crmFind('client', 'jj').deliverables[0]) && pl[0].what==='8 reel' && pl.filter(x => x.st==='done').length===2 && pl.every(x => ['1', '3', '5'].indexOf(String(new Date(x.date+'T12:00').getDay())) >= 0); })()"));
-  await E("ui.view='convos'; ui.socTab='clients'; ui.r57Cli='jj'; renderView()"); await p.waitForTimeout(250);
-  check('…one client at a time, their calendar, their report and an export, right there', (await p.$$('.r57-cli-p button')).length===2 && !!(await p.$('.r57-cc-g')) && !!(await p.$('.r57-cli-acts [data-action="r55Report"][data-id="jj"]')) && !!(await p.$('[data-action="r57CliExport"]')));
+  // (round 58: the Clients tab is gone; tap the client's account on Social → Overview)
+  await E("igCfg().accounts = [{id:'o1', role:'business', username:'commenccollective', src:'zernio'}]; igCfg().cliAll = [{id:'c1', platform:'instagram', username:'jjs_build'}]; ui.r55CliAll = null; ui.r55CliTried = true; r55CliLinks().c1 = 'jj'; ui.view='convos'; ui.socTab='overview'; ui.r58Acct='c1'; renderView()"); await p.waitForTimeout(250);
+  check('…one client at a time, their calendar, their report and an export, right there', !!(await p.$('.r58-focus .r57-cc-g')) && !!(await p.$('.r58-focus [data-action="r55Report"][data-id="jj"]')) && !!(await p.$('.r58-focus [data-action="r57CliExport"]')));
   check('…the export is something to send them (what, when, delivered or not)', /8 reel 1\s.*·\s+(Delivered|Coming|Today|Planned)/.test(await E("r57CliExportText(crmFind('client', 'jj'))")));
   await E("ui.view='today'; renderView(); AI.hasKey = false; opBubShow()"); await p.waitForTimeout(150);
   check('Op’s bubble: one Open (full screen, his chats there), one Turn Op off, and ✕', !!(await p.$('#opBub .r57-bub-open')) && !!(await p.$('#opBub .r57-bub-off')) && (await p.$$('#opBub .op-bub-h > button:not(.r57-gone), #opBub .op-bub-h .op-bub-ics button:not(.r57-gone)')).length===3);

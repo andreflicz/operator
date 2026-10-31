@@ -72,10 +72,11 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   // ---- Board ----
   await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='board'; ui.pbWho='client'; ui.pbSel=pbAll()[1].id; renderView()"); await p.waitForTimeout(250);
-  check('Board: a column for each stage of the playbook, and one for those not on it', (await p.$$('.pb6-col')).length===2 && /Not on Onboarding/.test(await p.textContent('.pb6-col.is-off')));
+  // (round 58: the board is the Playbooks overview: a column per playbook someone's on, everyone else at the bottom)
+  check('Board: a column for each playbook someone’s on, and one for those not on any', (await p.$$('.r58-col')).length===1 && /JJS/.test(await p.textContent('.r58-offs')));
   check('the cards say the day and what’s next', /Day 9/.test(await p.textContent('.pb6-board')) && /Onboarding call/.test(await p.textContent('.pb6-board')));
   await E("ui.pbSel=pbAll()[0].id; renderView()"); await p.waitForTimeout(200);
-  await p.dragAndDrop('.pb6-col.is-off .pb6-card[data-pb6-drag="client:jj"]', '.pb6-col[data-pb6-col^="'+(await E("pbAll()[0].id"))+'"]'); await p.waitForTimeout(300);
+  await p.dragAndDrop('.r58-offs .pb6-card[data-pb6-drag="client:jj"]', '[data-pb6-col="'+(await E("pbAll()[0].id"))+'"]'); await p.waitForTimeout(300);
   check('drag a client onto a playbook: they’re on it (day 1 their start date, for a stage that runs every month)', await E("crmFind('client', 'jj').pb.id===pbAll()[0].id && crmFind('client', 'jj').pb.start==='2026-01-05'"));
   await p.dragAndDrop('.pb6-card[data-pb6-drag="client:kk"]', '.pb6-col[data-pb6-col^="'+(await E("pbAll()[0].id"))+'"]'); await p.waitForTimeout(300);
   check('drag them from one to another: it says first what gets checked off', /checks off \d+ open thing/.test(await E("window.__conf.text")) && await E("crmFind('client', 'kk').pb.id===pbAll()[0].id"));
@@ -83,7 +84,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.dragAndDrop('.pb6-card[data-pb6-drag="client:kk"]', '.pb6-col.is-off'); await p.waitForTimeout(300);
   check('drag onto “Not on …”: off it', await E("!crmFind('client', 'kk').pb.id") && /Take Kiko off/.test(await E("window.__conf.title")));
   await E("ACTIONS.pb6Who(null, null, 'lead')"); await p.waitForTimeout(200);
-  check('Leads: their own playbook, its stages the Lead Center’s', (await p.$$('.pb6-col')).length===1 + await E("pbStages(pbAll()[2]).length") && /Mia/.test(await p.textContent('.pb6-board')));
+  // (round 58: no Clients / Leads switch; leads are in the same overview, on their own playbook)
+  check('Leads: their own playbook, in the same overview', await E("pbFor(pbAll()[2])")==='lead' && /Mia/.test(await p.textContent('.r58-pb')));
 
   // ---- adding someone ----
   await E("openNewContactModal('client')"); await p.waitForTimeout(200);

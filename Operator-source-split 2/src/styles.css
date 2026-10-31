@@ -9605,3 +9605,101 @@ html.r56-fit body .calx .cx-grid{ grid-auto-rows:var(--r56-rh) !important; }
 .r57-ws{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; margin-top:14px; }
 .r57-ws div{ display:flex; flex-direction:column; gap:2px; padding:10px 12px; border-radius:12px; background:var(--panel-2); }
 .r57-ws b{ font-family:var(--font-display); font-size:20px; } .r57-ws span{ font-size:12px; color:var(--text-dim); }
+
+/* ===================== ROUND 58 ===================== */
+/* ---- Business tabs ---- */
+.r58-tn{ font-size:11.5px; font-weight:700; opacity:.6; margin-left:2px; }
+.biz-gear.is-on{ border-color:var(--accent); color:var(--text); }
+/* ---- Playbooks: one place ---- */
+.r58-pill{ display:inline-flex; align-items:center; border-radius:20px; border:1px solid var(--border); background:var(--panel); overflow:hidden; }
+.r58-pill.is-on{ border-color:var(--accent); background:color-mix(in srgb, var(--accent) 12%, var(--panel)); }
+.r58-star{ border:0; background:none; color:var(--text-faint); font-size:15px; padding:6px 4px 6px 12px; cursor:pointer; }
+.r58-star.is-on{ color:#F3C988; }
+.r58-pn{ display:inline-flex; align-items:center; gap:7px; border:0; background:none; color:var(--text); font-weight:600; font-size:13px; padding:7px 14px 7px 4px; cursor:pointer; }
+.r58-pn em{ font-style:normal; font-size:11px; color:var(--text-faint); }
+.r58-board{ margin-bottom:14px; }
+.r58-col header .r58-sti{ font-style:normal; color:#F3C988; }
+.r58-idle{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 0 14px; }
+.r58-idle > span{ font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); margin-right:4px; }
+.r58-offs{ flex:none !important; width:100%; min-height:0 !important; }
+.r58-offg{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:8px; }
+.r58-off .r58-kind{ font-size:11px; font-weight:700; color:var(--text-faint); }
+.r58-put{ align-self:flex-start; border:1px solid var(--border); background:var(--panel); color:var(--text); border-radius:20px; padding:3px 10px; font-size:12px; font-weight:600; cursor:pointer; }
+.r58-none{ padding:22px; text-align:center; color:var(--text-dim); border:1px dashed var(--border); border-radius:16px; margin-bottom:14px; }
+/* ---- Social ---- */
+.r58-strip{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 16px; }
+.r58-own, .r58-cls{ display:flex; gap:8px; flex-wrap:wrap; }
+.r58-own{ padding-right:12px; border-right:1px solid var(--border); }
+.r58-ac{ display:inline-flex; align-items:center; gap:9px; padding:6px 14px 6px 6px; border-radius:30px; border:1px solid var(--border); background:var(--panel); color:var(--text); cursor:pointer; text-align:left; }
+.r58-ac img, .r58-ac .r58-av{ width:30px; height:30px; border-radius:50%; object-fit:cover; display:grid; place-items:center; font-weight:800; font-size:12px; background:var(--panel-2); }
+.r58-ac b{ font-size:13px; } .r58-ac small{ display:block; font-size:11px; color:var(--text-faint); margin-top:-2px; }
+.r58-ac.is-own{ border-color:color-mix(in srgb, #E8A23D 55%, var(--border)); background:linear-gradient(135deg, color-mix(in srgb, #E8A23D 14%, var(--panel)), var(--panel)); }
+.r58-ac.is-own .r58-av, .r58-ac.is-own img{ box-shadow:0 0 0 2px #E8A23D; }
+.r58-ac:not(.is-own) .r58-av{ box-shadow:0 0 0 2px var(--cc, var(--border)); }
+.r58-ac.is-on{ outline:2px solid var(--accent); outline-offset:1px; }
+.r58-all{ margin-left:auto; border:0; background:none; color:var(--text-dim); font-weight:600; cursor:pointer; }
+.r58-focus{ display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.25fr); gap:16px; align-items:start; }
+@media (max-width:1100px){ .r58-focus{ grid-template-columns:minmax(0, 1fr); } }
+.r58-focus > section{ display:flex; flex-direction:column; gap:12px; min-width:0; }
+.r58-facts{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.r58-pk{ display:inline-flex; align-items:center; gap:8px; margin-right:auto; font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-faint); }
+.r58-pk select{ width:auto; text-transform:none; letter-spacing:0; }
+.r58-best{ display:flex; flex-direction:column; gap:2px; padding:12px 14px; border-radius:12px; background:var(--panel-2); margin-top:10px; }
+.r58-best small{ font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.08em; font-weight:700; }
+html.r58-content .sidebar, html.r58-content nav.sidebar, html.r58-content #sidebar{ display:none !important; }
+html.r58-content main{ margin-left:0 !important; max-width:none !important; padding-left:28px !important; padding-right:28px !important; }
+html.r58-content .app, html.r58-content .layout{ grid-template-columns:1fr !important; }
+/* ---- Packages: the delivery calendar ---- */
+.r58-pkc{ margin-top:18px; padding:16px; border-radius:18px; background:var(--panel); border:1px solid var(--border); display:flex; flex-direction:column; gap:12px; }
+.r58-pkc-h{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.r58-pkc-h > b{ font-family:var(--font-display); font-size:17px; }
+.r58-pkc-k{ font-size:11.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint); }
+.r58-pkr{ display:flex; flex-direction:column; gap:8px; padding:12px; border-radius:14px; background:var(--panel-2); }
+.r58-pkh{ display:flex; align-items:center; gap:10px; }
+.r58-pkh b{ font-size:14px; } .r58-pkh span{ font-size:12.5px; color:var(--text-dim); } .r58-pkh span.is-ok{ color:var(--good); } .r58-pkh span.is-over{ color:var(--danger); }
+.r58-even{ margin-left:auto; border:1px solid var(--border); background:var(--panel); color:var(--text-dim); border-radius:20px; padding:4px 12px; font-size:12px; font-weight:600; cursor:pointer; }
+.r58-days{ display:grid; grid-template-columns:repeat(16, minmax(0, 1fr)); gap:4px; }
+.r58-days button{ height:30px; border-radius:8px; border:1px solid var(--border); background:var(--panel); color:var(--text-faint); font-size:12px; font-weight:700; cursor:pointer; padding:0; }
+.r58-days button.is-on{ background:color-mix(in srgb, #FF8FB1 26%, var(--panel)); border-color:#FF8FB1; color:var(--text); }
+.r58-self{ display:inline-block; margin-right:8px; padding:2px 8px; border-radius:20px; background:color-mix(in srgb, #E8A23D 20%, transparent); color:#F3C988; font-size:11px; font-weight:700; vertical-align:middle; }
+/* ---- notes, the feed ---- */
+.r58-nx{ border:0; background:none; color:#8a90a2; font-size:12px; cursor:pointer; padding:2px 4px; margin-left:4px; border-radius:6px; }
+.r58-nx:hover{ background:rgba(0,0,0,.07); color:#15171c; }
+.r57-note{ cursor:pointer; transition:opacity .4s ease, transform .4s ease; }
+.r57-note.is-out{ opacity:0; transform:translateY(-6px) scale(.98); }
+.toast.r58-ghost{ pointer-events:none; z-index:0; }
+.r58-feed{ border-top:1px solid var(--border); margin-top:6px; padding-top:8px; display:flex; flex-direction:column; gap:2px; max-height:260px; overflow:auto; }
+.r58-fh{ font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); padding:0 10px 4px; }
+.r58-fi{ display:grid; grid-template-columns:10px minmax(0, 1fr) auto; align-items:center; gap:8px; padding:7px 10px; border:0; border-radius:10px; background:none; color:var(--text); text-align:left; cursor:pointer; font-size:13px; }
+.r58-fi:hover{ background:var(--panel-2); }
+.r58-fi i{ width:8px; height:8px; border-radius:50%; background:var(--op-c, #fff); box-shadow:0 0 6px var(--op-glow, rgba(255,255,255,.6)); }
+.r58-fi.is-update i{ background:#8fdcff; }
+.r58-fi span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .r58-fi time{ font-size:11px; color:var(--text-faint); }
+.r58-fd-t{ font-weight:700; margin:4px 0 10px; line-height:1.5; }
+.r58-fd-q{ margin:0; padding:14px 16px; border-radius:14px; background:var(--panel-2); border-left:3px solid var(--accent); white-space:pre-wrap; line-height:1.55; max-height:50vh; overflow:auto; }
+/* ---- Op's read: one quiet look in Op's colour; it holds its space ---- */
+.r58-opl{ min-height:74px; }
+.r58-opl .r57-opl-k{ color:color-mix(in srgb, var(--op-c, #fff) 55%, var(--text-faint)); }
+.r58-opl .r57-opl-r b, .r58-opl .r57-opl-r.is-watch b, .r58-opl .r57-opl-r.is-move b{ color:color-mix(in srgb, var(--op-c, #fff) 45%, var(--text-dim)); font-weight:700; }
+.r58-opl .r57-opl-t, .r58-opl .r57-opl-r span{ color:var(--text); }
+.hq .r58-opl, .r53-hq .r58-opl{ background:none !important; }
+/* ---- Op's window ---- */
+#opBub.op-bub.is-log{ width:min(460px, calc(100vw - 32px)) !important; }
+#opBub.is-log .op-bub-log{ height:min(54vh, 480px) !important; gap:8px !important; }
+#opBub .ocl-m{ position:relative; max-width:86%; padding:8px 12px 18px; border-radius:14px; font-size:14px; line-height:1.45; }
+#opBub .ocl-me{ align-self:flex-end; background:rgba(0,0,0,.07); border-bottom-right-radius:4px; }
+#opBub .ocl-op{ align-self:flex-start; background:rgba(255,255,255,.75); border-bottom-left-radius:4px; }
+#opBub .r58-t{ position:absolute; right:10px; bottom:3px; font-size:10px; color:#8a90a2; }
+.opc-me .r58-t, .opc-op .r58-t, .opc-act .r58-t{ margin-left:10px; font-size:11px; color:var(--text-faint); white-space:nowrap; }
+#opBub .op-bub-h{ gap:6px; }
+#opBub .r58-round{ width:30px; height:30px; padding:0; margin:0; display:grid; place-items:center; border-radius:50%; border:1px solid rgba(0,0,0,.1); background:rgba(255,255,255,.75); color:#15171d; font-size:14px; line-height:1; cursor:pointer; }
+#opBub .r57-bub-open.r58-round{ margin-left:auto; }
+#opBub .r58-round:hover{ background:#fff; border-color:rgba(0,0,0,.18); }
+.r58-drop.is-over{ border-color:var(--accent, #F5B342); box-shadow:0 0 0 2px rgba(245,179,66,.35); }
+/* Op's window: the conversation fits what's in it until you size it */
+#opBub.is-log:not(.r58-sized) .op-bub-log{ height:auto !important; min-height:120px; max-height:min(58vh, 520px); }
+#opBub .op-bub-rs{ top:-4px; right:-4px; width:16px; height:16px; }
+#opBub.is-resizing{ transition:none !important; }
+.r58-swap{ border:0; background:none; color:var(--text-dim); font-size:15px; cursor:pointer; padding:0 6px; }
+.r58-swap:hover{ color:var(--text); }
+.r58-ownp{ grid-template-columns:minmax(0, 1fr) !important; margin-top:18px; }

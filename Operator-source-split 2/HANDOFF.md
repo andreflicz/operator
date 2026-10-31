@@ -1,4 +1,4 @@
-# Operator app — continuity brief (updated 2026-10-31, after Round 57)
+# Operator app — continuity brief (updated 2026-10-31, after Round 58)
 
 ## What this is
 "Operator" is Andre's personal productivity app: business (clients, leads, MRR, deliverables, playbooks), focus (lock-in sessions, tasks), personal (goals, health, finances, journal, social), and Op, the AI assistant inside it. The UI and logic are one self-contained HTML page built from a source tree. It ships as a Mac app (Electron). The older Chrome-app-shell `.app` still exists in the repo as the source of the helper scripts.
@@ -12,7 +12,7 @@ Andre tests every build himself and comes back with detailed, itemized feedback,
 Design rules he set: "a bad app informs, a good one just has a great UI." Minimal, level, symmetrical; no small grey explainer text; one well-placed control rather than repeated buttons; consistent across features. Build features general ("not a just-me app").
 
 ## Where the code lives
-- GitHub: `andreflicz/operator`. Round 57 is on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
+- GitHub: `andreflicz/operator`. Rounds 57 and 58 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
 - Every commit ends with the session's Co-Authored-By / Claude-Session lines.
 - Layout inside `Operator-source-split 2/`:
 
@@ -24,6 +24,8 @@ src/js/32zNN-rXX.js         one file per update round, layered on top (see "Over
                             Round 55: 32z5c-r55.js (general), 32z5d-r55pb.js (Playbooks), 32z5e-r55op.js (reports, clients' socials)
                             Round 57: 32z60-r57.js (task names, leads, journal threads, forms), 32z61-r57pb.js (playbooks as
                             pipelines, XP for stages), 32z62-r57op.js (Op), 32z63-r57ui.js (Socials, Op bubble, reads, Health, Analytics)
+                            Round 58: 32z64-r58.js (Op's logging, notes + feed, chat times, voice, Op's read typing),
+                            32z65-r58ui.js (Business tabs, Playbooks overview/builder, Social accounts + full screen, package calendars, Settings)
 scripts/build.py            src/ → dist/command-center-2.html (injects const OP_BUILT = <ms>)
 scripts/smoke-test.js       quick load check
 scripts/e2e/*-test.js       Playwright suites, one per round (common.js: instrument, newPage, check, report)
@@ -35,8 +37,8 @@ packaged/Operator-2-7-2.app the old Chrome-shell app; its Resources/helper.sh + 
 1. Add a new round file after the last one in manifest.json, plus a CSS block at the end of styles.css.
 2. `python3 scripts/build.py`, then `node scripts/smoke-test.js dist/command-center-2.html`.
 3. Write `scripts/e2e/rXX-test.js` and run it: `node scripts/e2e/rXX-test.js dist/command-center-2.html`. `window.__op.ev(code)` runs code inside the app's closure. `newPage(browser, file, seed, clockAt)`; the fake clock leaks memory, so soak tests pass `null`.
-4. Re-run the maintained suites r41–r57 (r40 and older are stale) and `xvfb-run -a node scripts/e2e/mac-app-test.js` (first time in a container: `cd mac && npm install && node stage.js`).
-   `node scripts/e2e/r57-shots.js dist/command-center-2.html <outdir> [names]` takes the Round 57 screenshots.
+4. Re-run the maintained suites r41–r58 and r57-migrate (r40 and older are stale) and `xvfb-run -a node scripts/e2e/mac-app-test.js` (first time in a container: `cd mac && npm install && node stage.js`).
+   `node scripts/e2e/r57-shots.js` / `r58-shots.js dist/command-center-2.html <outdir> [names]` take each round's screenshots.
 5. Screenshot what changed, update the canvas, commit and push.
 
 ## Override pattern
@@ -83,7 +85,7 @@ Other conventions:
   hand ticks off what's left (`pb57Enter`, reopened by `pb57Back` / undo).
 - Health, notifications, the sidebar and stats share ONE rule, `pbBehind(kind, x)`: behind = a past guide week (7-day blocks
   from the stage's start) with open steps; 1 week yellow, 2+ red. `pbLateFor` returns the same tasks.
-- Build view: stage strip, the open stage's steps (list), Calendar = the guide (ideal month, posting days). Board: the chosen
+- Build view: stage strip, the open stage's steps (list), Calendar = the guide (ideal month, posting days). Board (R57; replaced by the R58 Overview): the chosen
   playbook's stages as columns. Leads still get no tasks (their due steps fold into Reach out to leads + notifications).
 - XP: `XP_BOOK.work.stage` (+40) for each stage finished with its steps done.
 
@@ -101,6 +103,29 @@ Other conventions:
 - helper.sh `/music/duck` takes `l=` (percent). Not a new route, so the helper version wasn't bumped.
 - Journal: any entry can come back (`e.back = {mode, date, repeat, next, shownOn}`) and grow a thread (`e.thread`).
 
+## Round 58 notes (the list is ROUND-58-LIST.md)
+- App updates are ONE place: journal entries with the Update tag. `settings.opIdeas` is gone (migrated once at startup).
+  The app files Andre's own words (`r58File(words, summary)`): suggest_improvement / add_journal tag Update use the message
+  in progress (`R58.turn`, set by the aiAsk wrapper and cleared when the reply ends; "mark that as an update" means the
+  message before). `mark_update` (an earlier message by a few words) and `file_updates` (list mode, after his yes) find his
+  messages in `opChat()`. If Op says "logged" and no tool ran, the app files the words itself.
+- What Op DOES (tasks, events…) goes to the feed `state.focus.r58Feed` (`r58FeedAdd`), shown first in Notifications under
+  "From Op"; tap one for the detail. Notes (`r57Note`) have ✕, fade out, and one note per action.
+- `delete_session` (+ Undo) removes a work session; a session open over 10 hours asks once.
+- Voice: hands-free has no time cap and waits longer the longer he talks; the browser's 60 s stop is held off while
+  listening. A tap while Op speaks stops him and finishes his line on screen (no mic); a double tap talks.
+- Op's read types from `R58T[kind]` into the live page (a redraw doesn't jump it); the interval runs only while typing.
+- Business tabs: Overview, Clients, Leads, Packages, Finances, Playbooks (+ Log center and Setup on the right).
+- Playbooks: no Clients/Leads switch. Overview = a column per playbook someone's on, "Not running" pills (drop targets),
+  "Not on a playbook" at the bottom (★ default in one tap). Builder = pills with ★ (one default per kind, picked when adding).
+  `pbMoveTo` refuses a lead onto a client playbook.
+- Social: no Clients tab. Overview starts with every account (`r58StripHtml`: own accounts gold, then clients'; Zernio
+  duplicates of his own are hidden). Tap one: numbers, Client link, Package link (`igCfg().r58Pkg`, falls back to the
+  client's package), content calendar, report/export. Full screen = `html.r58-content` (Esc exits).
+- Packages: a delivery calendar per package (`pk.schedule[delivId] = [days]`, "Spread them out"), `pk.type==='self'` = Just me.
+  Clients' content calendars use the schedule's days.
+- Tasks: ticking two within 0.55 s used to drop the first (one `justCompletedTaskId`); now the pending one finishes at once.
+
 ## Removed (don't bring back)
 GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
 
@@ -109,7 +134,9 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent);
 
 ## Operator for Mac (mac/)
 - Electron 44.7.0 / electron-builder 26.16.1. uiohook-napi (global talk key) is a dependency, `npmRebuild:false`, `asarUnpack **/*.node`.
-- Packaging (Linux container, ad-hoc signing with rcodesign; no Apple Developer ID):
+- Packaging (Linux container, no Apple Developer ID). rcodesign can't be downloaded here, so the zips go out unsigned and
+  Andre signs on the Mac: `codesign --force --deep --sign - /Applications/Operator.app` then `xattr -cr` (see INSTALL-x.md).
+  Old rcodesign steps, if it's available:
   1. bump `version` in mac/package.json (and package-lock.json);
   2. `node stage.js`;
   3. `npx electron-builder --mac dir --arm64 --x64 --publish never` → `out/mac` (Intel) and `out/mac-arm64`;
@@ -120,9 +147,12 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent);
 - main.js: single instance, menu bar Tray, ⌥O show/hide, ✕ hides, ⌘Q quits, starts the helpers, move-in from the old Chrome profile, `window.operatorPage` bridge.
 
 ## Status
+Round 58 (2026-10-31): the list from Andre's Op session (ROUND-58-LIST.md, 35 items): updates in his words in one place,
+honest "logged", list mode, remove a session, chat times, notes/feed, voice, Op's read, bubble, Business tabs, Playbooks
+overview/builder/★, Social accounts + full screen + package links, package calendars + Just me, Settings cleanups.
 Round 57 (2026-10-31): playbooks as pipelines, one task name, Reach out to leads fixes, the Op list (prompt, sessions, AFK, debriefs,
 goodnight, reply box, hold-to-talk anywhere, break, ducking, double input, journal tag, notes), journal threads, Socials
 content calendar + reports, Op bubble and mood colours, Op's read as a line, food for any day, Analytics hero, XP audit.
-Not packaged as a Mac build this round (no version bump).
+Packaged as Mac 3.1.0.
 Shipped through 3.0.9 (Round 56: playbooks rebuilt with Board + Build, playbook tasks on the task list, Calendar fits the screen, quote buttons on the author line). Round 55: rank-up message and visuals, GHL removal and a full sweep, quotes (new / write / pin), real XP, money check-in, sidebar signals, notification counter/glow/chime, categoriser fix, Finances UI, ultrawide layouts, Your day labels, the + menu, Playbooks, Op client reports, Social → Clients.
 Not done yet (agreed for later): the posting area; calendar task due dates.
