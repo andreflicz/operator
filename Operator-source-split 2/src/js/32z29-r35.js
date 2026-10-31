@@ -116,7 +116,7 @@ checkAwayFromSession = (function(base){
   return function(){
     base.apply(this, arguments);
     const s = state.focus.activeSession, st = state.settings.appTracking;
-    if(!s || s.onBreak || !st || st.enabled===false || st.awayStop===false) return;
+    if(!s || s.onBreak || !st || st.enabled===false || st.awayStop!==true) return;
     if(sessionType(s)!=='deep') return;
     if(state.modes.active && state.modes.active.type && state.modes.active.type!=='offtime' && !state.modes.active.linkedFocus) return;
     if(!lastRawSampleAt || Date.now() - lastRawSampleAt > 90000) return;   // the tracker has to be running

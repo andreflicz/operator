@@ -277,7 +277,7 @@ function sessionAwayFrom(s, ivs, now){
 function checkAwayFromSession(){
   const s = state.focus.activeSession;
   const st = state.settings.appTracking;
-  if(!st || st.enabled===false || st.awayStop===false) return;
+  if(!st || st.enabled===false || st.awayStop!==true) return;
   const now = Date.now();
   // the tracker has to be running (a fresh sample, idle or not) for silence to mean "away"
   if(!lastRawSampleAt || now-lastRawSampleAt > 90000) return;

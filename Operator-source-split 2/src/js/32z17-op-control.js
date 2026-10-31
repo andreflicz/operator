@@ -34,7 +34,7 @@ OP_TOOLS.push(
   {name:'set_follow_up', description:'Set (or clear, with date "none") a follow-up reminder on a client or lead.', input_schema:{type:'object', properties:{who:{type:'string'}, date:{type:'string', description:'YYYY-MM-DD or "none"'}, note:{type:'string'}}, required:['who', 'date'], additionalProperties:false}},
   {name:'add_lead', description:'Add a lead to the pipeline.', input_schema:{type:'object', properties:{name:{type:'string'}, company:{type:'string'}, value:{type:'number', description:'what they’d pay a month'}, note:{type:'string'}, follow_up:OP_DATE}, required:['name'], additionalProperties:false}},
   {name:'move_lead', description:'Move a lead to a stage of the pipeline.', input_schema:{type:'object', properties:{who:{type:'string'}, stage:{type:'string', enum:PIPELINE_STAGES.slice()}}, required:['who', 'stage'], additionalProperties:false}},
-  {name:'add_journal', description:'Write an entry in his journal (his words, or a note he asked you to keep).', input_schema:{type:'object', properties:{text:{type:'string'}, title:{type:'string'}}, required:['text'], additionalProperties:false}},
+  {name:'add_journal', description:'Write an entry in his journal (his words, or a note he asked you to keep). Use tag "update" for notes about changes to the app (App updates, improvements, bugs he reports).', input_schema:{type:'object', properties:{text:{type:'string'}, title:{type:'string'}, tag:{type:'string', enum:['update']}}, required:['text'], additionalProperties:false}},
   {name:'log_food', description:'Log something he ate, with its calories (estimate sensibly if he doesn’t say).', input_schema:{type:'object', properties:{name:{type:'string'}, calories:{type:'integer'}, date:OP_DATE}, required:['name', 'calories'], additionalProperties:false}},
   {name:'add_video_idea', description:'Add a content video idea.', input_schema:{type:'object', properties:{title:{type:'string'}, notes:{type:'string'}}, required:['title'], additionalProperties:false}},
   {name:'take_break', description:'Start a break in his locked-in session.', input_schema:{type:'object', properties:{minutes:{type:'integer'}}, additionalProperties:false}},
@@ -129,7 +129,11 @@ opRunTool = (function(base){
       case 'add_journal': {
         const e = {id:uid(), date:todayStr(), timestamp:Date.now(), text:String(x.text||'').slice(0, 6000), title:String(x.title||'').slice(0, 120), type:'freeform', mood:null, pinned:false, photos:[]};
         if(!e.text) throw new Error('missing text');
-        state.journal.entries.push(e); persist('journal'); return 'in the journal';
+        // (round 57: a tag files it where it belongs; "update" goes under the Updates type, with its emoji)
+        if(String(x.tag||'').toLowerCase()==='update'){ let tid = updatesTypeId(); if(!tid){ try{ ACTIONS.createUpdatesType(); }catch(err){} tid = updatesTypeId(); } if(tid) e.mood = tid; }
+        state.journal.entries.push(e); persist('journal');
+        try{ showToast((x.tag ? 'Logged under '+x.tag+': ' : 'Journal: ')+(e.title || e.text.slice(0, 48)), {icon:'&#128221;', duration:5000}); }catch(err){}
+        return x.tag ? 'filed under '+x.tag : 'in the journal';
       }
       case 'log_food': {
         const c = Math.round(Number(x.calories)); if(!(c > 0)) throw new Error('calories must be a number');
@@ -146,7 +150,7 @@ opRunTool = (function(base){
       case 'take_break': {
         if(!state.focus.activeSession) return 'he isn’t locked in';
         if(state.focus.activeSession.onBreak) return 'already on a break';
-        startBreak(Number(x.minutes) > 0 ? Math.round(Number(x.minutes)) : 10); return 'break started';
+        actuallyStartBreak(Number(x.minutes) > 0 ? Math.round(Number(x.minutes)) : 10); return 'break started';
       }
       case 'lock_out': {
         if(!state.focus.activeSession) return 'he isn’t locked in';

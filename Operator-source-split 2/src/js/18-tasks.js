@@ -162,7 +162,10 @@ function openAddVideoIdeaModal(){
   if(!o) return;
   o.classList.remove('hidden');
   renderAddVideoIdeaModalInto();
+  clearVideoIdeaForm();
 }
+// (round 57: a saved idea doesn't leave its title, type and notes behind in the form)
+function clearVideoIdeaForm(){ ['newVideoIdeaTitle', 'newVideoIdeaType', 'newVideoIdeaNotes'].forEach(function(id){ const el = document.getElementById(id); if(el) el.value = ''; }); }
 function closeAddVideoIdeaModal(){ const o=document.getElementById('videoIdeaOverlay'); if(o) o.classList.add('hidden'); }
 function renderAddVideoIdeaModal(){
   const types = arr(state.tasks.videoTypes);
@@ -187,6 +190,7 @@ function addVideoIdea(){
   setContentRole(t, ui.newContentRole==='business' ? 'business' : 'personal');
   state.tasks.items.push(t);
   playTaskAdded();
+  clearVideoIdeaForm();
   closeAddVideoIdeaModal();
   persist('tasks'); renderView();
 }

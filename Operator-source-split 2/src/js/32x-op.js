@@ -476,7 +476,7 @@ function aiListen(cap){
   // (round 30: a breath longer before it sends, so a pause mid-thought doesn't cut you off)
   const armQuiet = function(){ clearTimeout(quiet); quiet = setTimeout(send, typeof opPauseMs==='function' ? opPauseMs() : 2500); };
   OV.cap = cap;
-  rec.onstart = function(){ if(cancelled){ try{ rec.abort(); }catch(e){} return; } started = true; AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, 60000); };
+  rec.onstart = function(){ if(cancelled){ try{ rec.abort(); }catch(e){} return; } started = true; AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, (typeof OPX!=='undefined' && OPX.ptt) ? 900000 : 240000); };
   rec.onresult = function(e){
     interim = '';
     for(let i = e.resultIndex; i < e.results.length; i++){ const t = e.results[i][0].transcript; if(e.results[i].isFinal) finals += ' '+t; else interim += t; }

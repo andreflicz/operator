@@ -223,9 +223,9 @@ async function opGoodnight(){
   if(!opOn()) return;
   const f = state.focus, t = todayStr(); if(f.opNightSaid===t) return; f.opNightSaid = t; persist('focus');
   const facts = opDayFacts(), name = (state.profile.name || '').split(' ')[0];
-  let line = (facts.done.length ? 'Good day. '+facts.done[0]+', done. ' : '')+(facts.wake ? 'I’ll wake you at '+fmt12Hour(facts.wake)+'. ' : '')+(facts.tomorrow ? 'Tomorrow starts with '+facts.tomorrow+'. ' : '')+'Goodnight'+(name ? ', '+name : '')+'.';
+  let line = 'Hope today was a good one'+(name ? ', '+name : '')+', whether it was productive or not. Time to wind down. '+(facts.wake ? 'Your alarm is set for '+fmt12Hour(facts.wake)+'. ' : '')+'Goodnight, see you then.';
   if(AI.hasKey===true && typeof aiWrite==='function'){
-    const tx = await Promise.race([aiWrite('I’m going to sleep now. Say goodnight like a friend would: one short line on something good from today, when you’ll wake me, and the first thing tomorrow if there is one. Two sentences, calm and low. End with goodnight.\n\nFacts: '+opFactsLine(facts), {max:120}), new Promise(function(r){ setTimeout(r, 7000); })]);
+    const tx = await Promise.race([aiWrite('I’m going to sleep now. Say goodnight like a kind friend: acknowledge my day (productive or not, hope it was good), say it’s time to wind down, mention my alarm time, and say goodnight, see you then. Do NOT mention tomorrow’s tasks or plans. Short, warm and low, three sentences at most.\n\nFacts: '+opFactsLine(Object.assign({}, facts, {tomorrow:''})), {max:120}), new Promise(function(r){ setTimeout(r, 7000); })]);
     if(tx) line = tx;
   }
   OV.cap = 'opBubText'; opBubShow();

@@ -78,7 +78,7 @@ function pbOccs(x, p, cyc){
       for(let i = 0; i < len; i++){ const d = addDays(cyc.start, i); if(String(dowOf(d))===String(it.dow)) out.push({it:it, date:d, key:pre+':'+it.id+':'+d}); }
     } else {
       if(pbRepeats(p) && Number(it.every) > 1 && cyc.n % Number(it.every)!==0) return;
-      out.push({it:it, date:addDays(cyc.start, Math.max(0, Math.min(len, Number(it.day) || 1) - 1)), key:pre+':'+it.id});
+      out.push({it:it, date:(it.endOff!=null && it.endOff!=='' ? addDays(cyc.end, -Math.max(0, Number(it.endOff) || 0)) : addDays(cyc.start, Math.max(0, Math.min(len, Number(it.day) || 1) - 1))), key:pre+':'+it.id});
     }
   });
   return out.sort(function(a, b){ return a.date.localeCompare(b.date); });
@@ -169,13 +169,16 @@ function pbSync(){
       if(!t){
         const lines = arr(o.it.checklist).map(function(c){ return '• '+c.t; }).concat(arr(o.it.links).filter(function(l){ return l.url; }).map(function(l){ return (l.label || 'Link')+': '+l.url; }));
         state.tasks.items.push({id:uid(), title:pbTaskTitle(o), client:P.kind==='client' ? x.id : 'general', clients:P.kind==='client' ? [x.id] : ['general'], priority:o.it.type==='call' ? 'high' : 'med', deadline:o.date, notes:(o.it.notes ? o.it.notes+'\n' : '')+lines.join('\n'),
-          status:o.date <= addDays(today, 1) ? 'today' : 'backlog', createdAt:today, completedAt:null, master:{kind:'pb', k:k, who:P.kind, id:x.id, key:o.key, item:o.it.id, type:o.it.type, pb:s.p.id, pbName:s.p.name}});
+          status:o.date <= addDays(today, 1) ? 'today' : 'backlog', createdAt:today, completedAt:null, master:{kind:'pb', k:k, who:P.kind, id:x.id, key:o.key, item:o.it.id, type:o.it.type, pb:s.p.id, pbName:s.p.name, promoted:o.date <= addDays(today, 1), dl0:o.date, t0:pbTaskTitle(o)}});
         ch = true;
       } else {
         if(t.status==='done' && !x.pb.done[o.key]){ x.pb.done[o.key] = t.completedAt || today; ch = true; }
-        else if(t.status==='backlog' && o.date <= addDays(today, 1)){ t.status = 'today'; ch = true; }
-        if(t.title!==pbTaskTitle(o)){ t.title = pbTaskTitle(o); ch = true; }
-        if(t.deadline!==o.date){ t.deadline = o.date; ch = true; }
+        // (round 57: the plan only places a task once. Where you put it (Today, backlog, another day) and what you called it stay.)
+        else if(t.status==='backlog' && o.date <= addDays(today, 1) && !t.master.promoted){ t.status = 'today'; t.master.promoted = true; ch = true; }
+        if(t.title===t.master.t0 && t.title!==pbTaskTitle(o)){ t.title = pbTaskTitle(o); ch = true; }
+        if(t.master.t0!==pbTaskTitle(o)){ t.master.t0 = pbTaskTitle(o); ch = true; }
+        if(t.deadline===t.master.dl0 && t.deadline!==o.date){ t.deadline = o.date; ch = true; }
+        if(t.master.dl0!==o.date){ t.master.dl0 = o.date; ch = true; }
       }
     });
   });
@@ -226,15 +229,22 @@ if(typeof lcBadgeHtml==='function') lcBadgeHtml = function(){ return ''; };
 
 // ---- late: red, health, notifications ----
 function pbLateFor(kind, id){ return state.tasks.items.filter(function(t){ return t.status!=='done' && t.master && t.master.kind==='pb' && t.master.who===kind && t.master.id===id && t.deadline && t.deadline < todayStr(); }); }
+// (round 57: a client is only behind when they're past a week of the guide with that week's steps still open: week 2 with week 1 unfinished.
+// Anything else late on the calendar is just a date; the calendar is a guide, the pipeline is yours.)
+function pbBehind(kind, x){
+  const s = pbState(kind, x); if(!s || s.future) return {weeks:0, n:0};
+  const cur = Math.floor((s.day - 1)/7); let worst = 0, n = 0;
+  s.occ.forEach(function(o){ if(o.done) return; const w = Math.floor(pbDaysBetween(s.cyc.start, o.date)/7); if(w < cur){ n++; worst = Math.max(worst, cur - w); } });
+  return {weeks:worst, n:n};
+}
 clientHealthStatus = (function(base){
   return function(c){
     const s = base.apply(this, arguments);
     if(!c || !s) return s;
-    const late = pbLateFor('client', c.id); if(!late.length) return s;
-    const worst = Math.max.apply(null, late.map(function(t){ return daysAgoFrom(t.deadline); }));
-    const lvl = worst >= 3 ? 'red' : 'yellow', rank = {green:0, yellow:1, red:2};
-    if(rank[lvl] > rank[s.level]) return Object.assign({}, s, {level:lvl, pbLate:late.length});
-    return Object.assign({}, s, {pbLate:late.length});
+    const b = pbBehind('client', c); if(!b.n) return s;
+    const lvl = b.weeks >= 2 ? 'red' : 'yellow', rank = {green:0, yellow:1, red:2};
+    if(rank[lvl] > rank[s.level]) return Object.assign({}, s, {level:lvl, pbLate:b.n});
+    return Object.assign({}, s, {pbLate:b.n});
   };
 })(clientHealthStatus);
 clientHealthLabel = (function(base){ return function(s){ if(s && s.pbLate && s.level!=='green') return 'Playbook late'; return base.apply(this, arguments); }; })(clientHealthLabel);
@@ -545,7 +555,8 @@ function pbItemPanelHtml(p){
   const f = function(k){ return 'data-pbi-f="'+k+'"'; }, ty = PB_TYPES[it.type] || PB_TYPES.task;
   const when = it.repeat==='week'
     ? '<select class="input input-sm" '+f('dow')+'>'+PB_DOW.map(function(d){ return '<option value="'+d[0]+'"'+(String(it.dow)===d[0] ? ' selected' : '')+'>'+d[1]+'</option>'; }).join('')+'</select>'
-    : '<span class="pb6-dayin">Day <input class="input input-sm" type="number" min="1" max="'+p.days+'" '+f('day')+' value="'+(Number(it.day) || 1)+'"></span>'+
+    : '<select class="input input-sm" '+f('due')+'><option value="day"'+(it.endOff==null || it.endOff==='' ? ' selected' : '')+'>On a day</option>'+[[0, 'Last day'], [1, '1 day before the end'], [2, '2 days before the end'], [3, '3 days before the end'], [7, 'A week before the end']].map(function(o){ return '<option value="'+o[0]+'"'+(it.endOff!=null && it.endOff!=='' && Number(it.endOff)===o[0] ? ' selected' : '')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
+      (it.endOff==null || it.endOff==='' ? '<span class="pb6-dayin">Day <input class="input input-sm" type="number" min="1" max="'+p.days+'" '+f('day')+' value="'+(Number(it.day) || 1)+'"></span>' : '')+
       (pbRepeats(p) ? '<select class="input input-sm" '+f('every')+'>'+[1, 2, 3, 6].map(function(n){ return '<option value="'+n+'"'+(Number(it.every || 1)===n ? ' selected' : '')+'>'+(n===1 ? 'every time' : 'every '+n+(pbByMonth(p) ? ' months' : ' runs'))+'</option>'; }).join('')+'</select>' : '');
   return '<aside class="pb6-side pb6-item" style="--pbc:'+ty.color+'">'+
     '<div class="pb6-ih"><input class="pb6-it" '+f('title')+' value="'+escapeHtml(it.title)+'" maxlength="90" aria-label="Item"><button class="pb6-x" data-action="pbItemClose" title="Close">&#10005;</button></div>'+
@@ -624,6 +635,7 @@ document.addEventListener('change', function(e){
     if(k==='title') c.it.title = t.value.trim() || 'Untitled';
     else if(k==='day') c.it.day = Math.max(1, Math.min(p.days, Math.round(Number(t.value) || 1)));
     else if(k==='dow') c.it.dow = Number(t.value);
+    else if(k==='due'){ if(t.value==='day') delete c.it.endOff; else c.it.endOff = Number(t.value) || 0; }
     else if(k==='every') c.it.every = Number(t.value) || 1;
     else if(k==='notes') c.it.notes = t.value;
     pbSave(); renderView(); return;

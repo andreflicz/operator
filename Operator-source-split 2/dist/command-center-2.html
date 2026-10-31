@@ -9597,7 +9597,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793171328770;
+const OP_BUILT = 1793455655551;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -14038,7 +14038,10 @@ function openAddVideoIdeaModal(){
   if(!o) return;
   o.classList.remove('hidden');
   renderAddVideoIdeaModalInto();
+  clearVideoIdeaForm();
 }
+// (round 57: a saved idea doesn't leave its title, type and notes behind in the form)
+function clearVideoIdeaForm(){ ['newVideoIdeaTitle', 'newVideoIdeaType', 'newVideoIdeaNotes'].forEach(function(id){ const el = document.getElementById(id); if(el) el.value = ''; }); }
 function closeAddVideoIdeaModal(){ const o=document.getElementById('videoIdeaOverlay'); if(o) o.classList.add('hidden'); }
 function renderAddVideoIdeaModal(){
   const types = arr(state.tasks.videoTypes);
@@ -14063,6 +14066,7 @@ function addVideoIdea(){
   setContentRole(t, ui.newContentRole==='business' ? 'business' : 'personal');
   state.tasks.items.push(t);
   playTaskAdded();
+  clearVideoIdeaForm();
   closeAddVideoIdeaModal();
   persist('tasks'); renderView();
 }
@@ -16312,7 +16316,7 @@ function sessionAwayFrom(s, ivs, now){
 function checkAwayFromSession(){
   const s = state.focus.activeSession;
   const st = state.settings.appTracking;
-  if(!st || st.enabled===false || st.awayStop===false) return;
+  if(!st || st.enabled===false || st.awayStop!==true) return;
   const now = Date.now();
   // the tracker has to be running (a fresh sample, idle or not) for silence to mean "away"
   if(!lastRawSampleAt || now-lastRawSampleAt > 90000) return;
@@ -22909,6 +22913,7 @@ function renderSettings(){
         '<div class="field"><label>Track foreground app</label><select class="input" id="setAppTrackingEnabled"><option value="on" '+(state.settings.appTracking.enabled!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.enabled===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Auto lock-in when steady on work apps</label><select class="input" id="setAppTrackingAutoLockIn"><option value="on" '+(state.settings.appTracking.autoLockIn!==false?'selected':'')+'>On</option><option value="off" '+(state.settings.appTracking.autoLockIn===false?'selected':'')+'>Off</option></select></div>'+
         '<div class="field"><label>Minutes on one app before auto lock-in</label><input class="input" type="number" min="3" max="120" id="setAppTrackingThreshold" value="'+state.settings.appTracking.thresholdMinutes+'"></div>'+
+        '<div class="field"><label>Stop a session when I\'m away'+tip('Off: a session only ends when you end it. On: it stops at your last active moment after the minutes below with no keyboard or mouse.')+'</label><select class="input" id="setAppTrackingAwayStop"><option value="off" '+(state.settings.appTracking.awayStop!==true?'selected':'')+'>Off (only I end it)</option><option value="on" '+(state.settings.appTracking.awayStop===true?'selected':'')+'>On</option></select></div>'+
         '<div class="field"><label>Stop any session after (minutes away)'+tip('No keyboard or mouse for this long, or the Mac asleep, and the session stops at the last moment you were active, so only active time counts. Coming back, you can add the time back if you were working away from the keys.')+'</label><input class="input" type="number" min="3" max="120" id="setAppTrackingAway" value="'+(state.settings.appTracking.awayMinutes||10)+'"></div>'+
         '<div class="field"><label>Minutes off work apps before ending an auto session'+tip('For sessions Operator started on its own: how long on non-work apps before it ends them.')+'</label><input class="input" type="number" min="1" max="60" id="setAppTrackingGrace" value="'+state.settings.appTracking.graceMinutes+'"></div>'+
         '<div class="field"><label>Cooldown after you lock out (minutes)'+tip('Auto lock-in stays off this long after you stop a session yourself.')+'</label><input class="input" type="number" min="0" max="240" id="setAppTrackingCooldown" value="'+state.settings.appTracking.cooldownMinutes+'"></div>'+
@@ -23227,6 +23232,7 @@ function saveProfile(){
   if(atAutoEl) state.settings.appTracking.autoLockIn = atAutoEl.value === 'on';
   if(atThreshEl) state.settings.appTracking.thresholdMinutes = Number(atThreshEl.value)||12;
   if(atGraceEl) state.settings.appTracking.graceMinutes = Number(atGraceEl.value)||3;
+  const atAwayStopEl = document.getElementById('setAppTrackingAwayStop'); if(atAwayStopEl) state.settings.appTracking.awayStop = atAwayStopEl.value === 'on';
   const atAwayEl = document.getElementById('setAppTrackingAway'); if(atAwayEl) state.settings.appTracking.awayMinutes = clamp(Number(atAwayEl.value)||10, 3, 120);
   const atCooldownEl = document.getElementById('setAppTrackingCooldown');
   if(atCooldownEl){ const v = Number(atCooldownEl.value); state.settings.appTracking.cooldownMinutes = (isNaN(v) || atCooldownEl.value==='') ? 15 : clamp(v,0,240); }
@@ -31870,7 +31876,7 @@ function aiListen(cap){
   // (round 30: a breath longer before it sends, so a pause mid-thought doesn't cut you off)
   const armQuiet = function(){ clearTimeout(quiet); quiet = setTimeout(send, typeof opPauseMs==='function' ? opPauseMs() : 2500); };
   OV.cap = cap;
-  rec.onstart = function(){ if(cancelled){ try{ rec.abort(); }catch(e){} return; } started = true; AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, 60000); };
+  rec.onstart = function(){ if(cancelled){ try{ rec.abort(); }catch(e){} return; } started = true; AI.listening = true; opCaption('Listening…'); aiUiRefresh(); hardStop = setTimeout(send, (typeof OPX!=='undefined' && OPX.ptt) ? 900000 : 240000); };
   rec.onresult = function(e){
     interim = '';
     for(let i = e.resultIndex; i < e.results.length; i++){ const t = e.results[i][0].transcript; if(e.results[i].isFinal) finals += ' '+t; else interim += t; }
@@ -35297,7 +35303,7 @@ OP_TOOLS.push(
   {name:'set_follow_up', description:'Set (or clear, with date "none") a follow-up reminder on a client or lead.', input_schema:{type:'object', properties:{who:{type:'string'}, date:{type:'string', description:'YYYY-MM-DD or "none"'}, note:{type:'string'}}, required:['who', 'date'], additionalProperties:false}},
   {name:'add_lead', description:'Add a lead to the pipeline.', input_schema:{type:'object', properties:{name:{type:'string'}, company:{type:'string'}, value:{type:'number', description:'what they’d pay a month'}, note:{type:'string'}, follow_up:OP_DATE}, required:['name'], additionalProperties:false}},
   {name:'move_lead', description:'Move a lead to a stage of the pipeline.', input_schema:{type:'object', properties:{who:{type:'string'}, stage:{type:'string', enum:PIPELINE_STAGES.slice()}}, required:['who', 'stage'], additionalProperties:false}},
-  {name:'add_journal', description:'Write an entry in his journal (his words, or a note he asked you to keep).', input_schema:{type:'object', properties:{text:{type:'string'}, title:{type:'string'}}, required:['text'], additionalProperties:false}},
+  {name:'add_journal', description:'Write an entry in his journal (his words, or a note he asked you to keep). Use tag "update" for notes about changes to the app (App updates, improvements, bugs he reports).', input_schema:{type:'object', properties:{text:{type:'string'}, title:{type:'string'}, tag:{type:'string', enum:['update']}}, required:['text'], additionalProperties:false}},
   {name:'log_food', description:'Log something he ate, with its calories (estimate sensibly if he doesn’t say).', input_schema:{type:'object', properties:{name:{type:'string'}, calories:{type:'integer'}, date:OP_DATE}, required:['name', 'calories'], additionalProperties:false}},
   {name:'add_video_idea', description:'Add a content video idea.', input_schema:{type:'object', properties:{title:{type:'string'}, notes:{type:'string'}}, required:['title'], additionalProperties:false}},
   {name:'take_break', description:'Start a break in his locked-in session.', input_schema:{type:'object', properties:{minutes:{type:'integer'}}, additionalProperties:false}},
@@ -35392,7 +35398,11 @@ opRunTool = (function(base){
       case 'add_journal': {
         const e = {id:uid(), date:todayStr(), timestamp:Date.now(), text:String(x.text||'').slice(0, 6000), title:String(x.title||'').slice(0, 120), type:'freeform', mood:null, pinned:false, photos:[]};
         if(!e.text) throw new Error('missing text');
-        state.journal.entries.push(e); persist('journal'); return 'in the journal';
+        // (round 57: a tag files it where it belongs; "update" goes under the Updates type, with its emoji)
+        if(String(x.tag||'').toLowerCase()==='update'){ let tid = updatesTypeId(); if(!tid){ try{ ACTIONS.createUpdatesType(); }catch(err){} tid = updatesTypeId(); } if(tid) e.mood = tid; }
+        state.journal.entries.push(e); persist('journal');
+        try{ showToast((x.tag ? 'Logged under '+x.tag+': ' : 'Journal: ')+(e.title || e.text.slice(0, 48)), {icon:'&#128221;', duration:5000}); }catch(err){}
+        return x.tag ? 'filed under '+x.tag : 'in the journal';
       }
       case 'log_food': {
         const c = Math.round(Number(x.calories)); if(!(c > 0)) throw new Error('calories must be a number');
@@ -35409,7 +35419,7 @@ opRunTool = (function(base){
       case 'take_break': {
         if(!state.focus.activeSession) return 'he isn’t locked in';
         if(state.focus.activeSession.onBreak) return 'already on a break';
-        startBreak(Number(x.minutes) > 0 ? Math.round(Number(x.minutes)) : 10); return 'break started';
+        actuallyStartBreak(Number(x.minutes) > 0 ? Math.round(Number(x.minutes)) : 10); return 'break started';
       }
       case 'lock_out': {
         if(!state.focus.activeSession) return 'he isn’t locked in';
@@ -38147,7 +38157,7 @@ checkAwayFromSession = (function(base){
   return function(){
     base.apply(this, arguments);
     const s = state.focus.activeSession, st = state.settings.appTracking;
-    if(!s || s.onBreak || !st || st.enabled===false || st.awayStop===false) return;
+    if(!s || s.onBreak || !st || st.enabled===false || st.awayStop!==true) return;
     if(sessionType(s)!=='deep') return;
     if(state.modes.active && state.modes.active.type && state.modes.active.type!=='offtime' && !state.modes.active.linkedFocus) return;
     if(!lastRawSampleAt || Date.now() - lastRawSampleAt > 90000) return;   // the tracker has to be running
@@ -42899,10 +42909,10 @@ aiSystem = (function(base){
       const block = 'The time, and what it means (always keep this in mind):\n'+
         '- It’s '+t+'. '+hours+' '+bed+'\n'+
         '- During work hours, work is fair game: push, plan, hold him to it.\n'+
-        '- Outside work hours, don’t bring up work, tasks, clients, leads or lock-ins yourself. If he brings work up, help briefly, then suggest it waits for tomorrow’s work block (offer to put it on tomorrow’s list).\n'+
-        '- In the last couple of hours before bedtime, steer toward winding down: the wind-down, screens off, tomorrow’s alarm, sleep. Past bedtime, tell him plainly (kind, firm) to go to sleep; sleep is part of the work.\n'+
+        '- Outside work hours, don’t bring up work, tasks, clients, leads or lock-ins on your own. But if he asks for anything, any hour, do it right away: lock him in, start a session, add the task. He decides; you guide. Never refuse, never tell him to wait or to sleep instead. At most one short caring line (like "it’s late, I’ve got you"), then do exactly what he asked.\n'+
+        '- In the last couple of hours before bedtime you may mention the wind-down or the alarm once, lightly, if he’s not working. Never push it, and never get in the way of what he asks.\n'+
         '- Before work hours in the morning, keep work talk for when the day starts unless he starts it.'+
-        (c.late ? '\n- Right now it’s late: lead with winding down and sleep, not work.' : '');
+        (c.late ? '\n- Right now it’s late. Don’t start work talk yourself, but do whatever he asks without pushback.' : '');
       if(Array.isArray(s)) s.push({type:'text', text:block});
     }catch(e){}
     return s;
@@ -46365,9 +46375,9 @@ async function opGoodnight(){
   if(!opOn()) return;
   const f = state.focus, t = todayStr(); if(f.opNightSaid===t) return; f.opNightSaid = t; persist('focus');
   const facts = opDayFacts(), name = (state.profile.name || '').split(' ')[0];
-  let line = (facts.done.length ? 'Good day. '+facts.done[0]+', done. ' : '')+(facts.wake ? 'I’ll wake you at '+fmt12Hour(facts.wake)+'. ' : '')+(facts.tomorrow ? 'Tomorrow starts with '+facts.tomorrow+'. ' : '')+'Goodnight'+(name ? ', '+name : '')+'.';
+  let line = 'Hope today was a good one'+(name ? ', '+name : '')+', whether it was productive or not. Time to wind down. '+(facts.wake ? 'Your alarm is set for '+fmt12Hour(facts.wake)+'. ' : '')+'Goodnight, see you then.';
   if(AI.hasKey===true && typeof aiWrite==='function'){
-    const tx = await Promise.race([aiWrite('I’m going to sleep now. Say goodnight like a friend would: one short line on something good from today, when you’ll wake me, and the first thing tomorrow if there is one. Two sentences, calm and low. End with goodnight.\n\nFacts: '+opFactsLine(facts), {max:120}), new Promise(function(r){ setTimeout(r, 7000); })]);
+    const tx = await Promise.race([aiWrite('I’m going to sleep now. Say goodnight like a kind friend: acknowledge my day (productive or not, hope it was good), say it’s time to wind down, mention my alarm time, and say goodnight, see you then. Do NOT mention tomorrow’s tasks or plans. Short, warm and low, three sentences at most.\n\nFacts: '+opFactsLine(Object.assign({}, facts, {tomorrow:''})), {max:120}), new Promise(function(r){ setTimeout(r, 7000); })]);
     if(tx) line = tx;
   }
   OV.cap = 'opBubText'; opBubShow();
@@ -50037,7 +50047,7 @@ function pbOccs(x, p, cyc){
       for(let i = 0; i < len; i++){ const d = addDays(cyc.start, i); if(String(dowOf(d))===String(it.dow)) out.push({it:it, date:d, key:pre+':'+it.id+':'+d}); }
     } else {
       if(pbRepeats(p) && Number(it.every) > 1 && cyc.n % Number(it.every)!==0) return;
-      out.push({it:it, date:addDays(cyc.start, Math.max(0, Math.min(len, Number(it.day) || 1) - 1)), key:pre+':'+it.id});
+      out.push({it:it, date:(it.endOff!=null && it.endOff!=='' ? addDays(cyc.end, -Math.max(0, Number(it.endOff) || 0)) : addDays(cyc.start, Math.max(0, Math.min(len, Number(it.day) || 1) - 1))), key:pre+':'+it.id});
     }
   });
   return out.sort(function(a, b){ return a.date.localeCompare(b.date); });
@@ -50128,13 +50138,16 @@ function pbSync(){
       if(!t){
         const lines = arr(o.it.checklist).map(function(c){ return '• '+c.t; }).concat(arr(o.it.links).filter(function(l){ return l.url; }).map(function(l){ return (l.label || 'Link')+': '+l.url; }));
         state.tasks.items.push({id:uid(), title:pbTaskTitle(o), client:P.kind==='client' ? x.id : 'general', clients:P.kind==='client' ? [x.id] : ['general'], priority:o.it.type==='call' ? 'high' : 'med', deadline:o.date, notes:(o.it.notes ? o.it.notes+'\n' : '')+lines.join('\n'),
-          status:o.date <= addDays(today, 1) ? 'today' : 'backlog', createdAt:today, completedAt:null, master:{kind:'pb', k:k, who:P.kind, id:x.id, key:o.key, item:o.it.id, type:o.it.type, pb:s.p.id, pbName:s.p.name}});
+          status:o.date <= addDays(today, 1) ? 'today' : 'backlog', createdAt:today, completedAt:null, master:{kind:'pb', k:k, who:P.kind, id:x.id, key:o.key, item:o.it.id, type:o.it.type, pb:s.p.id, pbName:s.p.name, promoted:o.date <= addDays(today, 1), dl0:o.date, t0:pbTaskTitle(o)}});
         ch = true;
       } else {
         if(t.status==='done' && !x.pb.done[o.key]){ x.pb.done[o.key] = t.completedAt || today; ch = true; }
-        else if(t.status==='backlog' && o.date <= addDays(today, 1)){ t.status = 'today'; ch = true; }
-        if(t.title!==pbTaskTitle(o)){ t.title = pbTaskTitle(o); ch = true; }
-        if(t.deadline!==o.date){ t.deadline = o.date; ch = true; }
+        // (round 57: the plan only places a task once. Where you put it (Today, backlog, another day) and what you called it stay.)
+        else if(t.status==='backlog' && o.date <= addDays(today, 1) && !t.master.promoted){ t.status = 'today'; t.master.promoted = true; ch = true; }
+        if(t.title===t.master.t0 && t.title!==pbTaskTitle(o)){ t.title = pbTaskTitle(o); ch = true; }
+        if(t.master.t0!==pbTaskTitle(o)){ t.master.t0 = pbTaskTitle(o); ch = true; }
+        if(t.deadline===t.master.dl0 && t.deadline!==o.date){ t.deadline = o.date; ch = true; }
+        if(t.master.dl0!==o.date){ t.master.dl0 = o.date; ch = true; }
       }
     });
   });
@@ -50185,15 +50198,22 @@ if(typeof lcBadgeHtml==='function') lcBadgeHtml = function(){ return ''; };
 
 // ---- late: red, health, notifications ----
 function pbLateFor(kind, id){ return state.tasks.items.filter(function(t){ return t.status!=='done' && t.master && t.master.kind==='pb' && t.master.who===kind && t.master.id===id && t.deadline && t.deadline < todayStr(); }); }
+// (round 57: a client is only behind when they're past a week of the guide with that week's steps still open: week 2 with week 1 unfinished.
+// Anything else late on the calendar is just a date; the calendar is a guide, the pipeline is yours.)
+function pbBehind(kind, x){
+  const s = pbState(kind, x); if(!s || s.future) return {weeks:0, n:0};
+  const cur = Math.floor((s.day - 1)/7); let worst = 0, n = 0;
+  s.occ.forEach(function(o){ if(o.done) return; const w = Math.floor(pbDaysBetween(s.cyc.start, o.date)/7); if(w < cur){ n++; worst = Math.max(worst, cur - w); } });
+  return {weeks:worst, n:n};
+}
 clientHealthStatus = (function(base){
   return function(c){
     const s = base.apply(this, arguments);
     if(!c || !s) return s;
-    const late = pbLateFor('client', c.id); if(!late.length) return s;
-    const worst = Math.max.apply(null, late.map(function(t){ return daysAgoFrom(t.deadline); }));
-    const lvl = worst >= 3 ? 'red' : 'yellow', rank = {green:0, yellow:1, red:2};
-    if(rank[lvl] > rank[s.level]) return Object.assign({}, s, {level:lvl, pbLate:late.length});
-    return Object.assign({}, s, {pbLate:late.length});
+    const b = pbBehind('client', c); if(!b.n) return s;
+    const lvl = b.weeks >= 2 ? 'red' : 'yellow', rank = {green:0, yellow:1, red:2};
+    if(rank[lvl] > rank[s.level]) return Object.assign({}, s, {level:lvl, pbLate:b.n});
+    return Object.assign({}, s, {pbLate:b.n});
   };
 })(clientHealthStatus);
 clientHealthLabel = (function(base){ return function(s){ if(s && s.pbLate && s.level!=='green') return 'Playbook late'; return base.apply(this, arguments); }; })(clientHealthLabel);
@@ -50504,7 +50524,8 @@ function pbItemPanelHtml(p){
   const f = function(k){ return 'data-pbi-f="'+k+'"'; }, ty = PB_TYPES[it.type] || PB_TYPES.task;
   const when = it.repeat==='week'
     ? '<select class="input input-sm" '+f('dow')+'>'+PB_DOW.map(function(d){ return '<option value="'+d[0]+'"'+(String(it.dow)===d[0] ? ' selected' : '')+'>'+d[1]+'</option>'; }).join('')+'</select>'
-    : '<span class="pb6-dayin">Day <input class="input input-sm" type="number" min="1" max="'+p.days+'" '+f('day')+' value="'+(Number(it.day) || 1)+'"></span>'+
+    : '<select class="input input-sm" '+f('due')+'><option value="day"'+(it.endOff==null || it.endOff==='' ? ' selected' : '')+'>On a day</option>'+[[0, 'Last day'], [1, '1 day before the end'], [2, '2 days before the end'], [3, '3 days before the end'], [7, 'A week before the end']].map(function(o){ return '<option value="'+o[0]+'"'+(it.endOff!=null && it.endOff!=='' && Number(it.endOff)===o[0] ? ' selected' : '')+'>'+o[1]+'</option>'; }).join('')+'</select>'+
+      (it.endOff==null || it.endOff==='' ? '<span class="pb6-dayin">Day <input class="input input-sm" type="number" min="1" max="'+p.days+'" '+f('day')+' value="'+(Number(it.day) || 1)+'"></span>' : '')+
       (pbRepeats(p) ? '<select class="input input-sm" '+f('every')+'>'+[1, 2, 3, 6].map(function(n){ return '<option value="'+n+'"'+(Number(it.every || 1)===n ? ' selected' : '')+'>'+(n===1 ? 'every time' : 'every '+n+(pbByMonth(p) ? ' months' : ' runs'))+'</option>'; }).join('')+'</select>' : '');
   return '<aside class="pb6-side pb6-item" style="--pbc:'+ty.color+'">'+
     '<div class="pb6-ih"><input class="pb6-it" '+f('title')+' value="'+escapeHtml(it.title)+'" maxlength="90" aria-label="Item"><button class="pb6-x" data-action="pbItemClose" title="Close">&#10005;</button></div>'+
@@ -50583,6 +50604,7 @@ document.addEventListener('change', function(e){
     if(k==='title') c.it.title = t.value.trim() || 'Untitled';
     else if(k==='day') c.it.day = Math.max(1, Math.min(p.days, Math.round(Number(t.value) || 1)));
     else if(k==='dow') c.it.dow = Number(t.value);
+    else if(k==='due'){ if(t.value==='day') delete c.it.endOff; else c.it.endOff = Number(t.value) || 0; }
     else if(k==='every') c.it.every = Number(t.value) || 1;
     else if(k==='notes') c.it.notes = t.value;
     pbSave(); renderView(); return;
@@ -51019,6 +51041,43 @@ function r56LeadCalHtml(){
   return '<div class="r56-lc"><div class="r56-lc-h"><button data-action="r56LeadMonth" data-id="-1">&lsaquo;</button><b>'+new Date(y, mo, 1).toLocaleDateString(undefined, {month:'long', year:'numeric'})+'</b><button data-action="r56LeadMonth" data-id="1">&rsaquo;</button></div>'+
     '<div class="r56-lc-w">'+['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(function(w){ return '<span>'+w+'</span>'; }).join('')+'</div><div class="r56-lc-g">'+cells+'</div></div>';
 }
+// ---- Round 57: Andre's fix list (Oct 31) ----
+// Playbook tasks stay where you put them (32z5d), health uses "behind the guide" (32z5d), Op never refuses and never ends
+// your session on his own (32z40, 21), the bedtime goodnight is warm and short (32z52), break starts for real (32z17).
+// The rest layers on here.
+
+// ---- the reply box opens when Op asks a question, also with push to talk on ----
+aiAutoListen = (function(base){
+  return function(cap){
+    try{
+      if(opOn() && !opHoldBack() && opTalkMode()==='ptt' && OPRT.state==='off' && !AI.listening && !AI.busy){
+        OV.cap = cap || 'opBubText'; opBubShow();
+        if(typeof aiTypeFocus==='function') setTimeout(function(){ try{ aiTypeFocus(); }catch(e){} }, 60);
+        return;
+      }
+    }catch(e){}
+    return base.apply(this, arguments);
+  };
+})(aiAutoListen);
+
+// ---- one reply, said once: the same line twice in a row within a few seconds is dropped ----
+opSay = (function(base){
+  let last = {t:'', at:0};
+  return function(text){
+    const t = String(text == null ? '' : text).trim();
+    if(t && t===last.t && Date.now() - last.at < 8000) return Promise.resolve(false);
+    last = {t:t, at:Date.now()};
+    return base.apply(this, arguments);
+  };
+})(opSay);
+
+// ---- talking to Op counts as being here (it only matters if you turned "stop when I'm away" on) ----
+checkAwayFromSession = (function(base){
+  return function(){
+    try{ if(OPRT.state!=='off' || AI.listening || AI.busy || (OPX && OPX.userAt && Date.now() - OPX.userAt < awayLimitMs())) return; }catch(e){}
+    return base.apply(this, arguments);
+  };
+})(checkAwayFromSession);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

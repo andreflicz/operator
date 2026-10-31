@@ -268,10 +268,10 @@ aiSystem = (function(base){
       const block = 'The time, and what it means (always keep this in mind):\n'+
         '- It’s '+t+'. '+hours+' '+bed+'\n'+
         '- During work hours, work is fair game: push, plan, hold him to it.\n'+
-        '- Outside work hours, don’t bring up work, tasks, clients, leads or lock-ins yourself. If he brings work up, help briefly, then suggest it waits for tomorrow’s work block (offer to put it on tomorrow’s list).\n'+
-        '- In the last couple of hours before bedtime, steer toward winding down: the wind-down, screens off, tomorrow’s alarm, sleep. Past bedtime, tell him plainly (kind, firm) to go to sleep; sleep is part of the work.\n'+
+        '- Outside work hours, don’t bring up work, tasks, clients, leads or lock-ins on your own. But if he asks for anything, any hour, do it right away: lock him in, start a session, add the task. He decides; you guide. Never refuse, never tell him to wait or to sleep instead. At most one short caring line (like "it’s late, I’ve got you"), then do exactly what he asked.\n'+
+        '- In the last couple of hours before bedtime you may mention the wind-down or the alarm once, lightly, if he’s not working. Never push it, and never get in the way of what he asks.\n'+
         '- Before work hours in the morning, keep work talk for when the day starts unless he starts it.'+
-        (c.late ? '\n- Right now it’s late: lead with winding down and sleep, not work.' : '');
+        (c.late ? '\n- Right now it’s late. Don’t start work talk yourself, but do whatever he asks without pushback.' : '');
       if(Array.isArray(s)) s.push({type:'text', text:block});
     }catch(e){}
     return s;
