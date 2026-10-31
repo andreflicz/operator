@@ -9474,6 +9474,46 @@ html.r56-fit body .calx .cx-grid{ grid-auto-rows:var(--r56-rh) !important; }
 /* ---- Wind down / Plan of attack: one line per task, the names start level ---- */
 .wd-row .tag, .pr-list .tag{ flex:0 0 70px; justify-content:center; text-align:center; box-sizing:border-box; }
 .wd-title, .pr-t{ flex:1 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* ---- journal: threads and bringing entries back ---- */
+.r57-th{ display:flex; flex-direction:column; gap:10px; margin-top:4px; max-height:46vh; overflow:auto; }
+.r57-th-q{ margin:0; padding:14px 16px; border-radius:14px; background:var(--panel-2); border-left:3px solid var(--accent); font-size:15px; line-height:1.55; white-space:pre-wrap; }
+.r57-th-i{ display:flex; gap:12px; padding:0 4px 0 18px; border-left:2px solid var(--border); margin-left:8px; }
+.r57-th-i small{ flex:0 0 54px; font-size:11.5px; color:var(--text-faint); padding-top:2px; }
+.r57-th-i p{ margin:0; font-size:14px; line-height:1.5; white-space:pre-wrap; }
+.r57-th-in{ width:100%; min-height:76px; }
+.r57-bk{ display:flex; flex-direction:column; gap:10px; margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
+.r57-bk-h{ font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); text-align:center; }
+.r57-bk-o{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:6px; }
+.r57-bk-o button{ padding:10px 6px; border-radius:11px; border:1px solid var(--border); background:var(--panel); color:var(--text-dim); font-weight:600; font-size:13px; cursor:pointer; }
+.r57-bk-o button:hover{ color:var(--text); border-color:var(--border-strong); }
+.r57-bk-o button.is-on{ color:var(--text); border-color:var(--accent); background:color-mix(in srgb, var(--accent) 14%, var(--panel)); }
+.r57-bk-d{ align-self:center; width:auto; }
+.r57-bk-r{ justify-content:center; }
+.r57-jt{ display:flex; flex-direction:column; gap:6px; margin:8px 0 2px 6px; padding-left:12px; border-left:2px solid var(--border); }
+.r57-jt-i{ display:flex; gap:10px; font-size:13.5px; } .r57-jt-i small{ flex:0 0 50px; color:var(--text-faint); font-size:11.5px; padding-top:1px; } .r57-jt-i span{ white-space:pre-wrap; }
+.r57-jt-b{ align-self:flex-start; border:0; background:color-mix(in srgb, var(--accent) 12%, transparent); color:var(--text); font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px; cursor:pointer; }
+/* ---- Op: the note that types itself out ---- */
+.r57-notes{ position:fixed; top:16px; right:16px; z-index:9000; display:flex; flex-direction:column; gap:8px; width:320px; pointer-events:none; }
+.r57-note{ pointer-events:auto; background:#fff; color:#15171c; border-radius:14px; padding:12px 14px; box-shadow:0 12px 34px rgba(0,0,0,.35); animation:r57NoteIn .28s ease both; }
+.r57-note.is-out{ opacity:0; transform:translateY(-6px); transition:opacity .35s, transform .35s; }
+.r57-nh{ display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+.r57-nh b{ flex:1; font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#5a6170; }
+.r57-nh time{ font-size:11.5px; color:#8a90a2; font-variant-numeric:tabular-nums; }
+.r57-note p{ margin:0; font-size:14px; line-height:1.45; min-height:20px; }
+@keyframes r57NoteIn{ from{ opacity:0; transform:translateY(-8px); } to{ opacity:1; transform:none; } }
+/* ---- Settings → Op: the key, ducking ---- */
+.r57-keyrow{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.r57-key{ display:inline-flex; align-items:center; gap:8px; }
+.r57-key kbd{ min-width:46px; text-align:center; padding:6px 10px; border-radius:8px; background:var(--panel-2); border:1px solid var(--border-strong); font:700 13px var(--font-display, inherit); }
+.r57-key kbd.is-wait{ border-color:var(--accent); animation:r57Blink 1s ease-in-out infinite; }
+@keyframes r57Blink{ 50%{ opacity:.45; } }
+.r57-keywarn{ margin-top:8px; padding:10px 12px; border-radius:12px; background:color-mix(in srgb, var(--danger) 12%, var(--panel)); font-size:13px; display:flex; align-items:center; gap:10px; justify-content:space-between; }
+.r57-duck{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.r57-lvl{ display:inline-flex; align-items:center; gap:10px; } .r57-lvl input{ width:150px; } .r57-lvl output{ min-width:38px; font-variant-numeric:tabular-nums; font-weight:700; font-size:13px; }
+.r57-chips{ display:inline-flex; gap:6px; flex-wrap:wrap; }
+.r57-chip{ padding:5px 11px; border-radius:20px; border:1px solid var(--border); background:none; color:var(--text-dim); font-size:12.5px; font-weight:600; cursor:pointer; }
+.r57-chip.is-on{ color:var(--text); border-color:var(--accent); background:color-mix(in srgb, var(--accent) 12%, transparent); }
+.r57-away{ margin-bottom:10px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -9671,7 +9711,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793458298719;
+const OP_BUILT = 1793458685646;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -51223,6 +51263,103 @@ r54LeadsHtml = (function(base){
     });
   };
 })(r54LeadsHtml);
+
+// ---- 3. Journal: any entry can come back, and become a thread ----
+// Bring it back… (an entry's ⋯ menu, or when it comes back): a week, a month, three months, a year, a day you pick,
+// or some day you won't know. "Keep bringing it back" makes it repeat. When it's back it pops up: you read it,
+// add to it underneath (a thread), and say when it comes back next. Time capsules come back the same way.
+const R57_BACK = [['week', 'A week'], ['month', 'A month'], ['3m', '3 months'], ['year', 'A year'], ['random', 'Surprise me'], ['date', 'Pick a day']];
+function r57BackNext(b, from){
+  from = from || todayStr(); if(!b) return null;
+  if(b.mode==='date') return b.date && b.date > from ? b.date : null;
+  if(b.mode==='week') return addDays(from, 7);
+  if(b.mode==='month') return pbMonths(from, 1);
+  if(b.mode==='3m') return pbMonths(from, 3);
+  if(b.mode==='year') return pbMonths(from, 12);
+  if(b.mode==='random') return addDays(from, 21 + Math.floor(Math.random()*300));
+  return null;
+}
+function r57BackLabel(b){
+  if(!b || !b.next) return '';
+  if(b.mode==='random') return 'Back some day'+(b.repeat ? ', again and again' : '');
+  return 'Back '+fmtDateShort(b.next)+(b.repeat && b.mode!=='date' ? ' · every '+({week:'week', month:'month', '3m':'3 months', year:'year'})[b.mode] : '');
+}
+function r57Entry(id){ return state.journal.entries.find(function(x){ return x.id===id; }) || null; }
+function r57Due(){ const t = todayStr(); return state.journal.entries.filter(function(e){ return e.back && e.back.next && e.back.next <= t && e.back.shownOn!==t; }).sort(function(a, b){ return a.back.next.localeCompare(b.back.next); })[0] || null; }
+function r57ThreadHtml(){
+  const e = r57Entry(ui.r57Thread); if(!e) return '';
+  const D = ui.r57ThreadDraft || (ui.r57ThreadDraft = {mode:e.back && e.back.mode || null, date:e.back && e.back.date || '', repeat:!!(e.back && e.back.repeat)});
+  const back = ui.r57ThreadDue ? 'It’s back. From '+fmtDateShort(e.date) : 'From '+fmtDateShort(e.date);
+  const mood = e.mood ? moodById(e.mood) : null;
+  return asHead('&#10227;', escapeHtml(e.title || (mood ? mood.label : 'An entry')), back)+
+    '<div class="r57-th">'+
+      '<blockquote class="r57-th-q">'+escapeHtml(e.text || '')+'</blockquote>'+
+      arr(e.thread).map(function(t){ return '<div class="r57-th-i"><small>'+fmtDateShort(t.date)+'</small><p>'+escapeHtml(t.text)+'</p></div>'; }).join('')+
+      '<textarea class="input r57-th-in" id="r57ThreadText" rows="3" placeholder="Add to it"></textarea>'+
+    '</div>'+
+    '<div class="r57-bk"><div class="r57-bk-h">Bring it back</div>'+
+      '<div class="r57-bk-o">'+[['', 'Not again']].concat(R57_BACK).map(function(o){ const on = (D.mode || '')===o[0]; return '<button class="'+(on ? 'is-on' : '')+'" data-action="r57BackPick" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div>'+
+      (D.mode==='date' ? '<input class="input r57-bk-d" type="date" id="r57BackDate" min="'+addDays(todayStr(), 1)+'" value="'+escapeHtml(D.date || '')+'">' : '')+
+      (D.mode && D.mode!=='date' ? '<div class="r51-row r57-bk-r"><span class="r51-rl">Keep bringing it back</span><span class="r51-rc">'+r51Sw(D.repeat, 'r57BackRepeat')+'</span></div>' : '')+
+    '</div>'+
+    '<div class="as-f"><button class="btn btn-primary hs-go" data-action="r57ThreadSave">Save</button></div>';
+}
+function r57ThreadOpen(id, due){ ui.r57Thread = id; ui.r57ThreadDue = !!due; ui.r57ThreadDraft = null; addSheetOpen('r57ThreadSheet', r57ThreadHtml, due ? null : 'r57ThreadText'); const t = document.getElementById('r57ThreadText'); if(t) t.value = ''; }
+ACTIONS.r57BackPick = function(el, e, v){ const D = ui.r57ThreadDraft || {}; D.mode = v || null; if(v==='random' && D.repeat==null) D.repeat = false; playTick(); addSheetRefresh('r57ThreadSheet'); };
+ACTIONS.r57BackRepeat = function(){ const D = ui.r57ThreadDraft || {}; D.repeat = !D.repeat; playTick(); addSheetRefresh('r57ThreadSheet'); };
+document.addEventListener('change', function(e){ if(e.target && e.target.id==='r57BackDate'){ (ui.r57ThreadDraft || {}).date = e.target.value; } });
+ACTIONS.r57ThreadSave = function(){
+  const e = r57Entry(ui.r57Thread); if(!e) return;
+  const D = ui.r57ThreadDraft || {}, ta = document.getElementById('r57ThreadText'), txt = ta ? ta.value.trim() : '';
+  if(txt){ e.thread = arr(e.thread).concat([{id:uid(), date:todayStr(), at:Date.now(), text:txt.slice(0, 6000)}]); }
+  if(!D.mode) delete e.back;
+  else {
+    const b = {mode:D.mode, date:D.mode==='date' ? (document.getElementById('r57BackDate') || {}).value || D.date || '' : '', repeat:D.mode!=='date' && !!D.repeat};
+    b.next = r57BackNext(b, todayStr());
+    if(b.next) e.back = b; else delete e.back;
+  }
+  if(e.back && ui.r57ThreadDue) e.back.shownOn = todayStr();
+  persist('journal'); addSheetClose('r57ThreadSheet'); ui.r57Thread = null; playPositive(); renderView();
+  if(txt || e.back) showToast(e.back ? escapeHtml(r57BackLabel(e.back))+'.' : 'Added to it.', {icon:'&#10227;', duration:2400});
+};
+// it's back: it pops up (not mid-lock-in, not over another window, not at night)
+function r57SurfaceTick(){
+  if(!state || !state.journal || state.focus.activeSession || document.querySelector('.overlay:not(.hidden)') || (typeof r57NightQuiet==='function' && r57NightQuiet())) return;
+  const e = r57Due(); if(!e) return;
+  e.back.shownOn = todayStr();
+  // (it came back: if it doesn't repeat, it's done coming back unless you set it again)
+  if(e.back.repeat) e.back.next = r57BackNext(e.back, todayStr()) || e.back.next; else e.back.next = null;
+  persist('journal');
+  ui.r57ThreadDraft = {mode:e.back.repeat ? e.back.mode : null, date:'', repeat:!!e.back.repeat};
+  ui.r57Thread = e.id; ui.r57ThreadDue = true;
+  addSheetOpen('r57ThreadSheet', r57ThreadHtml, null);
+  try{ if(typeof tone==='function') tone([523, 659, 784], 0.2, 0.08); }catch(err){}
+}
+setInterval(function(){ try{ r57SurfaceTick(); }catch(e){} }, 60000);
+setTimeout(function(){ try{ r57SurfaceTick(); }catch(e){} }, 6000);
+// a time capsule that opens comes back the same way
+openCapsule = (function(base){
+  return function(c){
+    const was = state.journal.entries.length, r = base.apply(this, arguments);
+    const e = state.journal.entries.length > was ? state.journal.entries[state.journal.entries.length - 1] : null;
+    if(e && e.capsuleFrom){ e.back = {mode:null, next:todayStr(), repeat:false}; persist('journal'); }
+    return r;
+  };
+})(openCapsule);
+// the entry, in the journal: its thread under it, and when it's back
+journalEntryRow = (function(base){
+  return function(e){
+    const h = base.apply(this, arguments), th = arr(e.thread);
+    if(!th.length && !(e.back && e.back.next)) return h;
+    const add = '<div class="r57-jt">'+th.map(function(t){ return '<div class="r57-jt-i"><small>'+fmtDateShort(t.date)+'</small><span>'+escapeHtml(t.text)+'</span></div>'; }).join('')+
+      (e.back && e.back.next ? '<button class="r57-jt-b" data-action="r57ThreadOpenBtn" data-id="'+e.id+'">&#10227; '+escapeHtml(r57BackLabel(e.back))+'</button>' : '')+'</div>';
+    return h.replace(/<\/div>$/, function(){ return add+'</div>'; });
+  };
+})(journalEntryRow);
+ACTIONS.r57ThreadOpenBtn = function(el, e, id){ r57ThreadOpen(id, false); };
+journalMenuHtml = (function(base){ return function(e){ return base.apply(this, arguments).replace('<div class="ctx-sep"></div>', ci('jBack', '&#10227; Bring it back…', {a:e.id})+'<div class="ctx-sep"></div>'); }; })(journalMenuHtml);
+// (the menu's actions are set up later in the build: wrap them once they are)
+setTimeout(function(){ ACTIONS.ctx = (function(base){ return function(el){ if(el && el.dataset && el.dataset.op==='jBack'){ try{ ctxClose(); }catch(e){} r57ThreadOpen(el.dataset.a, false); return; } return base.apply(this, arguments); }; })(ACTIONS.ctx); }, 0);
 // ============ ROUND 57: PLAYBOOKS ARE PIPELINES ============
 // A playbook is a pipeline you move people through by hand: its stages (Discovery → Proposal → Onboarding →
 // Monthly service, or whatever you make) each hold the steps you do there. Lead playbooks mirror the Lead

@@ -215,6 +215,25 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('the note’s time can be 24-hour (Settings)', /^\d\d:\d\d$/.test((await p.$$eval('#r57Notes .r57-note time', n => n.map(x => x.textContent))).pop()));
   await E("r57Set('clock12', true)");
 
+  // ================= D. JOURNAL: threads and bringing entries back =================
+  await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); state.focus.activeSession = null; state.modes.active = null; state.journal.entries.push({id:'je1', date:'2026-09-01', timestamp:new Date(2026, 8, 1).getTime(), text:'I want the business to run without me on Fridays.', title:'Fridays', type:'freeform', mood:null, pinned:false, photos:[]}); persist('journal'); ui.view='personal'; ui.personalTab='journal'; renderView()"); await p.waitForTimeout(200);
+  check('any entry’s ⋯ menu: Bring it back…', /Bring it back/.test(await E("journalMenuHtml(r57Entry('je1'))")));
+  await E("r57ThreadOpen('je1')"); await p.waitForTimeout(200);
+  check('the sheet: the entry, a box to add to it, and when it comes back (a week, a month, 3 months, a year, surprise, a day)', !!(await p.$('#r57ThreadSheet #r57ThreadText')) && (await p.$$('#r57ThreadSheet .r57-bk-o button')).length===7);
+  await p.click('#r57ThreadSheet [data-action="r57BackPick"][data-id="month"]'); await p.waitForTimeout(100);
+  await p.click('#r57ThreadSheet [data-action="r57BackRepeat"]'); await p.waitForTimeout(100);
+  await p.fill('#r57ThreadText', 'Still true. Got Thursday down to half a day.');
+  await p.click('#r57ThreadSheet [data-action="r57ThreadSave"]'); await p.waitForTimeout(200);
+  check('saved: the thread grows under it, and it comes back in a month, again and again', await E("(function(){ const e = r57Entry('je1'); return arr(e.thread).length===1 && e.back.mode==='month' && e.back.repeat===true && e.back.next===pbMonths(todayStr(), 1); })()"));
+  check('in the journal: the thread under the entry, and when it’s back', /Got Thursday down/.test(await p.textContent('#viewRoot')) && /Back /.test(await p.textContent('#viewRoot')));
+  await E("r57Entry('je1').back.next = todayStr(); r57Entry('je1').back.shownOn = null; document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); r57SurfaceTick()"); await p.waitForTimeout(200);
+  check('the day it’s due, it pops up (“It’s back”), ready to add to', await E("!document.getElementById('r57ThreadSheet').classList.contains('hidden')") && /It’s back/.test(await p.textContent('#r57ThreadSheet')));
+  check('…and since it repeats, the next time is set already', await E("r57Entry('je1').back.next===pbMonths(todayStr(), 1)"));
+  await E("addSheetClose('r57ThreadSheet')");
+  await E("capsules().push({id:'cp1', text:'Hello from June.', writtenOn:'2026-06-01', openOn:todayStr()}); openCapsule(capsules().find(c => c.id==='cp1'))");
+  check('a time capsule that opens comes back the same way (it pops up to add to)', await E("(function(){ const e = state.journal.entries.find(x => x.capsuleFrom==='2026-06-01'); return !!e && e.back && e.back.next===todayStr(); })()"));
+  await E("(function(){ const e = state.journal.entries.find(x => x.capsuleFrom==='2026-06-01'); e.back.shownOn = todayStr(); })()");
+
   }catch(err){ check('the run reached the end', false, String(err && err.message || err).slice(0, 300)); }
   check('no errors', p.errors.length===0, p.errors);
   await b.close();

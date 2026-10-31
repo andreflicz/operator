@@ -128,3 +128,100 @@ r54LeadsHtml = (function(base){
     });
   };
 })(r54LeadsHtml);
+
+// ---- 3. Journal: any entry can come back, and become a thread ----
+// Bring it back… (an entry's ⋯ menu, or when it comes back): a week, a month, three months, a year, a day you pick,
+// or some day you won't know. "Keep bringing it back" makes it repeat. When it's back it pops up: you read it,
+// add to it underneath (a thread), and say when it comes back next. Time capsules come back the same way.
+const R57_BACK = [['week', 'A week'], ['month', 'A month'], ['3m', '3 months'], ['year', 'A year'], ['random', 'Surprise me'], ['date', 'Pick a day']];
+function r57BackNext(b, from){
+  from = from || todayStr(); if(!b) return null;
+  if(b.mode==='date') return b.date && b.date > from ? b.date : null;
+  if(b.mode==='week') return addDays(from, 7);
+  if(b.mode==='month') return pbMonths(from, 1);
+  if(b.mode==='3m') return pbMonths(from, 3);
+  if(b.mode==='year') return pbMonths(from, 12);
+  if(b.mode==='random') return addDays(from, 21 + Math.floor(Math.random()*300));
+  return null;
+}
+function r57BackLabel(b){
+  if(!b || !b.next) return '';
+  if(b.mode==='random') return 'Back some day'+(b.repeat ? ', again and again' : '');
+  return 'Back '+fmtDateShort(b.next)+(b.repeat && b.mode!=='date' ? ' · every '+({week:'week', month:'month', '3m':'3 months', year:'year'})[b.mode] : '');
+}
+function r57Entry(id){ return state.journal.entries.find(function(x){ return x.id===id; }) || null; }
+function r57Due(){ const t = todayStr(); return state.journal.entries.filter(function(e){ return e.back && e.back.next && e.back.next <= t && e.back.shownOn!==t; }).sort(function(a, b){ return a.back.next.localeCompare(b.back.next); })[0] || null; }
+function r57ThreadHtml(){
+  const e = r57Entry(ui.r57Thread); if(!e) return '';
+  const D = ui.r57ThreadDraft || (ui.r57ThreadDraft = {mode:e.back && e.back.mode || null, date:e.back && e.back.date || '', repeat:!!(e.back && e.back.repeat)});
+  const back = ui.r57ThreadDue ? 'It’s back. From '+fmtDateShort(e.date) : 'From '+fmtDateShort(e.date);
+  const mood = e.mood ? moodById(e.mood) : null;
+  return asHead('&#10227;', escapeHtml(e.title || (mood ? mood.label : 'An entry')), back)+
+    '<div class="r57-th">'+
+      '<blockquote class="r57-th-q">'+escapeHtml(e.text || '')+'</blockquote>'+
+      arr(e.thread).map(function(t){ return '<div class="r57-th-i"><small>'+fmtDateShort(t.date)+'</small><p>'+escapeHtml(t.text)+'</p></div>'; }).join('')+
+      '<textarea class="input r57-th-in" id="r57ThreadText" rows="3" placeholder="Add to it"></textarea>'+
+    '</div>'+
+    '<div class="r57-bk"><div class="r57-bk-h">Bring it back</div>'+
+      '<div class="r57-bk-o">'+[['', 'Not again']].concat(R57_BACK).map(function(o){ const on = (D.mode || '')===o[0]; return '<button class="'+(on ? 'is-on' : '')+'" data-action="r57BackPick" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div>'+
+      (D.mode==='date' ? '<input class="input r57-bk-d" type="date" id="r57BackDate" min="'+addDays(todayStr(), 1)+'" value="'+escapeHtml(D.date || '')+'">' : '')+
+      (D.mode && D.mode!=='date' ? '<div class="r51-row r57-bk-r"><span class="r51-rl">Keep bringing it back</span><span class="r51-rc">'+r51Sw(D.repeat, 'r57BackRepeat')+'</span></div>' : '')+
+    '</div>'+
+    '<div class="as-f"><button class="btn btn-primary hs-go" data-action="r57ThreadSave">Save</button></div>';
+}
+function r57ThreadOpen(id, due){ ui.r57Thread = id; ui.r57ThreadDue = !!due; ui.r57ThreadDraft = null; addSheetOpen('r57ThreadSheet', r57ThreadHtml, due ? null : 'r57ThreadText'); const t = document.getElementById('r57ThreadText'); if(t) t.value = ''; }
+ACTIONS.r57BackPick = function(el, e, v){ const D = ui.r57ThreadDraft || {}; D.mode = v || null; if(v==='random' && D.repeat==null) D.repeat = false; playTick(); addSheetRefresh('r57ThreadSheet'); };
+ACTIONS.r57BackRepeat = function(){ const D = ui.r57ThreadDraft || {}; D.repeat = !D.repeat; playTick(); addSheetRefresh('r57ThreadSheet'); };
+document.addEventListener('change', function(e){ if(e.target && e.target.id==='r57BackDate'){ (ui.r57ThreadDraft || {}).date = e.target.value; } });
+ACTIONS.r57ThreadSave = function(){
+  const e = r57Entry(ui.r57Thread); if(!e) return;
+  const D = ui.r57ThreadDraft || {}, ta = document.getElementById('r57ThreadText'), txt = ta ? ta.value.trim() : '';
+  if(txt){ e.thread = arr(e.thread).concat([{id:uid(), date:todayStr(), at:Date.now(), text:txt.slice(0, 6000)}]); }
+  if(!D.mode) delete e.back;
+  else {
+    const b = {mode:D.mode, date:D.mode==='date' ? (document.getElementById('r57BackDate') || {}).value || D.date || '' : '', repeat:D.mode!=='date' && !!D.repeat};
+    b.next = r57BackNext(b, todayStr());
+    if(b.next) e.back = b; else delete e.back;
+  }
+  if(e.back && ui.r57ThreadDue) e.back.shownOn = todayStr();
+  persist('journal'); addSheetClose('r57ThreadSheet'); ui.r57Thread = null; playPositive(); renderView();
+  if(txt || e.back) showToast(e.back ? escapeHtml(r57BackLabel(e.back))+'.' : 'Added to it.', {icon:'&#10227;', duration:2400});
+};
+// it's back: it pops up (not mid-lock-in, not over another window, not at night)
+function r57SurfaceTick(){
+  if(!state || !state.journal || state.focus.activeSession || document.querySelector('.overlay:not(.hidden)') || (typeof r57NightQuiet==='function' && r57NightQuiet())) return;
+  const e = r57Due(); if(!e) return;
+  e.back.shownOn = todayStr();
+  // (it came back: if it doesn't repeat, it's done coming back unless you set it again)
+  if(e.back.repeat) e.back.next = r57BackNext(e.back, todayStr()) || e.back.next; else e.back.next = null;
+  persist('journal');
+  ui.r57ThreadDraft = {mode:e.back.repeat ? e.back.mode : null, date:'', repeat:!!e.back.repeat};
+  ui.r57Thread = e.id; ui.r57ThreadDue = true;
+  addSheetOpen('r57ThreadSheet', r57ThreadHtml, null);
+  try{ if(typeof tone==='function') tone([523, 659, 784], 0.2, 0.08); }catch(err){}
+}
+setInterval(function(){ try{ r57SurfaceTick(); }catch(e){} }, 60000);
+setTimeout(function(){ try{ r57SurfaceTick(); }catch(e){} }, 6000);
+// a time capsule that opens comes back the same way
+openCapsule = (function(base){
+  return function(c){
+    const was = state.journal.entries.length, r = base.apply(this, arguments);
+    const e = state.journal.entries.length > was ? state.journal.entries[state.journal.entries.length - 1] : null;
+    if(e && e.capsuleFrom){ e.back = {mode:null, next:todayStr(), repeat:false}; persist('journal'); }
+    return r;
+  };
+})(openCapsule);
+// the entry, in the journal: its thread under it, and when it's back
+journalEntryRow = (function(base){
+  return function(e){
+    const h = base.apply(this, arguments), th = arr(e.thread);
+    if(!th.length && !(e.back && e.back.next)) return h;
+    const add = '<div class="r57-jt">'+th.map(function(t){ return '<div class="r57-jt-i"><small>'+fmtDateShort(t.date)+'</small><span>'+escapeHtml(t.text)+'</span></div>'; }).join('')+
+      (e.back && e.back.next ? '<button class="r57-jt-b" data-action="r57ThreadOpenBtn" data-id="'+e.id+'">&#10227; '+escapeHtml(r57BackLabel(e.back))+'</button>' : '')+'</div>';
+    return h.replace(/<\/div>$/, function(){ return add+'</div>'; });
+  };
+})(journalEntryRow);
+ACTIONS.r57ThreadOpenBtn = function(el, e, id){ r57ThreadOpen(id, false); };
+journalMenuHtml = (function(base){ return function(e){ return base.apply(this, arguments).replace('<div class="ctx-sep"></div>', ci('jBack', '&#10227; Bring it back…', {a:e.id})+'<div class="ctx-sep"></div>'); }; })(journalMenuHtml);
+// (the menu's actions are set up later in the build: wrap them once they are)
+setTimeout(function(){ ACTIONS.ctx = (function(base){ return function(el){ if(el && el.dataset && el.dataset.op==='jBack'){ try{ ctxClose(); }catch(e){} r57ThreadOpen(el.dataset.a, false); return; } return base.apply(this, arguments); }; })(ACTIONS.ctx); }, 0);
