@@ -14,13 +14,15 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   const p = await newPage(b, OUT+'/r57.html', seed, at(28, 10));
   await p.setViewportSize({width:1440, height:900});
   const E = c => p.evaluate(x => window.__op.ev(x), c);
+  // (round 59 made one permanent lead playbook; this suite tests the playbook model before it, so it's switched off)
+  await E("R59.noLeadPb = true; (function(){ const M = pbAll().find(p => p.master); if(!M) return; if(pbStages(M).every(s => !arr(s.steps).length)){ crm().playbooks = pbAll().filter(p => p!==M); arr(state.business.pipeline).forEach(l => { if(l.pb && l.pb.id===M.id) l.pb = null; }); } else { M.master = false; M.star = false; } pbSave(); })()");
   await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); AI.hasKey = false; uiConfirm = function(o){ window.__conf = o; return Promise.resolve(true); }");
   await E("masterTasksSync(); ui.view='business'; ui.businessTab='lifecycle'; renderView()"); await p.waitForTimeout(250);
   try{
 
   // ================= A. PLAYBOOKS =================
   // a new playbook: its stages copied from the client stages
-  await p.click('.pb6-bar [data-action="pb6NewOpen"]'); await p.waitForTimeout(200);
+  await E("ACTIONS.pb6NewOpen()"); await p.waitForTimeout(200);   // (round 59: made from the + in the corner)
   check('new playbook: name, for, stages (the client stages, or my own), what happens after the last stage', !!(await p.$('#pb6NewName')) && (await p.$$('#pb6NewSheet [data-id^="mirror:"]')).length===2 && !!(await p.$('#pb6NewEnds')) && !(await p.$('#pb6NewDays')));
   await p.fill('#pb6NewName', 'Client journey'); await p.click('[data-action="pb6Create"]'); await p.waitForTimeout(250);
   // (the seed's onboarding client was on the old default cycle: it came over as its own playbook; keep ours first)
@@ -114,9 +116,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // (round 58: the board is the Playbooks overview: a column per playbook someone's on, the rest at the bottom)
   check('Board: a column for the playbook (and a place for who’s not on it)', !!(await p.$('.r58-col[data-pb6-col="'+(await E("pbAll()[0].id"))+'"]')) && !!(await p.$('.r58-offs')));
   await E("ui.pbView='build'; ui.pb57Cal=true; ui.pb57Stage=pbStages(pbAll()[0])[1].id; renderView()"); await p.waitForTimeout(150);
-  check('the calendar is the guide: the ideal month with posting days you pick', (await p.$$('.pb57-cal .pb6-day')).length >= 28 && (await p.$$('.pb57-post button')).length===7);
-  await p.click('.pb57-post button'); await p.waitForTimeout(100);
-  check('…a posting day marks the guide', (await p.$$('.pb57-cal .pb6-day.is-post')).length >= 4);
+  // (round 59: posting days belong to packages, not playbooks)
+  check('the calendar is the guide: the ideal month (no posting days in a playbook)', (await p.$$('.pb57-cal .pb6-day')).length >= 28 && !(await p.$('.pb57-post')));
   await E("ui.pb57Cal=false; renderView()");
 
   // ================= task names =================
@@ -255,7 +256,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("aiKeyCheck = window.__akc; opReadKick = window.__ork; AI.hasKey = false");
   // food for another day
   await E("ui.r57FuelDay = addDays(todayStr(), -2); renderView(); state.meals.library = [{id:'m1', name:'Oats', calories:400, uses:0}]; quickMeal('m1')");
-  check('Health: food for any day (‹ day ›); what you log goes to that day', await E("state.health.calorieEntries.some(c => c.name==='Oats' && c.date===addDays(todayStr(), -2))") && /‹|Mon|Tue|Wed|Thu|Fri|Sat|Sun/.test(await p.textContent('.r57-fd')));
+  // (round 59: Weight & fuel rebuilt; the day switcher is .r59-day)
+  check('Health: food for any day (‹ day ›); what you log goes to that day', await E("state.health.calorieEntries.some(c => c.name==='Oats' && c.date===addDays(todayStr(), -2))") && /‹|Mon|Tue|Wed|Thu|Fri|Sat|Sun/.test(await p.textContent('.r59-day')));
   check('…and that day’s food counts where food counts (the day’s total)', await E("state.health.calorieEntries.filter(c => c.date===addDays(todayStr(), -2)).reduce((a, c) => a + c.calories, 0)") >= 400);
   await E("ui.view='focus'; ui.focusTab='analytics'; ui.analyticsRange='week'; renderView()"); await p.waitForTimeout(200);
   check('Analytics: one hero you read at a glance (a ring, the days, three numbers)', !!(await p.$('.r57-an .r57-an-ring svg')) && (await p.$$('.r57-an-bars i')).length===7 && (await p.$$('.r57-an-n div')).length===3);

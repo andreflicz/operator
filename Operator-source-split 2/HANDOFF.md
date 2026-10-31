@@ -1,4 +1,4 @@
-# Operator app — continuity brief (updated 2026-10-31, after Round 58)
+# Operator app — continuity brief (updated 2026-10-31, after Round 59)
 
 ## What this is
 "Operator" is Andre's personal productivity app: business (clients, leads, MRR, deliverables, playbooks), focus (lock-in sessions, tasks), personal (goals, health, finances, journal, social), and Op, the AI assistant inside it. The UI and logic are one self-contained HTML page built from a source tree. It ships as a Mac app (Electron). The older Chrome-app-shell `.app` still exists in the repo as the source of the helper scripts.
@@ -12,7 +12,7 @@ Andre tests every build himself and comes back with detailed, itemized feedback,
 Design rules he set: "a bad app informs, a good one just has a great UI." Minimal, level, symmetrical; no small grey explainer text; one well-placed control rather than repeated buttons; consistent across features. Build features general ("not a just-me app").
 
 ## Where the code lives
-- GitHub: `andreflicz/operator`. Rounds 57 and 58 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
+- GitHub: `andreflicz/operator`. Rounds 57–59 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
 - Every commit ends with the session's Co-Authored-By / Claude-Session lines.
 - Layout inside `Operator-source-split 2/`:
 
@@ -26,6 +26,9 @@ src/js/32zNN-rXX.js         one file per update round, layered on top (see "Over
                             pipelines, XP for stages), 32z62-r57op.js (Op), 32z63-r57ui.js (Socials, Op bubble, reads, Health, Analytics)
                             Round 58: 32z64-r58.js (Op's logging, notes + feed, chat times, voice, Op's read typing),
                             32z65-r58ui.js (Business tabs, Playbooks overview/builder, Social accounts + full screen, package calendars, Settings)
+                            Round 59: 32z66-r59.js (Op's read, talk-button cut, update write-ups, SOP playbooks + the permanent lead
+                            playbook), 32z67-r59ui.js (Setup, Log center calendar, packages by cycle day, locking in, client calendars,
+                            Calendar client filter, tab animations, weight & fuel, journal)
 scripts/build.py            src/ → dist/command-center-2.html (injects const OP_BUILT = <ms>)
 scripts/smoke-test.js       quick load check
 scripts/e2e/*-test.js       Playwright suites, one per round (common.js: instrument, newPage, check, report)
@@ -37,8 +40,8 @@ packaged/Operator-2-7-2.app the old Chrome-shell app; its Resources/helper.sh + 
 1. Add a new round file after the last one in manifest.json, plus a CSS block at the end of styles.css.
 2. `python3 scripts/build.py`, then `node scripts/smoke-test.js dist/command-center-2.html`.
 3. Write `scripts/e2e/rXX-test.js` and run it: `node scripts/e2e/rXX-test.js dist/command-center-2.html`. `window.__op.ev(code)` runs code inside the app's closure. `newPage(browser, file, seed, clockAt)`; the fake clock leaks memory, so soak tests pass `null`.
-4. Re-run the maintained suites r41–r58 and r57-migrate (r40 and older are stale) and `xvfb-run -a node scripts/e2e/mac-app-test.js` (first time in a container: `cd mac && npm install && node stage.js`).
-   `node scripts/e2e/r57-shots.js` / `r58-shots.js dist/command-center-2.html <outdir> [names]` take each round's screenshots.
+4. Re-run the maintained suites r41–r59 and r57-migrate (r40 and older are stale) and `xvfb-run -a node scripts/e2e/mac-app-test.js` (first time in a container: `cd mac && npm install && node stage.js`).
+   `node scripts/e2e/r57-shots.js` / `r58-shots.js` / `r59-shots.js dist/command-center-2.html <outdir> [names]` take each round's screenshots.
 5. Screenshot what changed, update the canvas, commit and push.
 
 ## Override pattern
@@ -126,6 +129,29 @@ Other conventions:
   Clients' content calendars use the schedule's days.
 - Tasks: ticking two within 0.55 s used to drop the first (one `justCompletedTaskId`); now the pending one finishes at once.
 
+## Round 59 notes (the list is ROUND-59-LIST.md)
+- Op's read has a fixed height (`.r58-opl`, 104px, three lines); `opReadKick` asks for three labelled lines of ≤9 words or
+  ≤30 words of prose; a stored read over 220 characters is written again. Finances and Business → Overview put it first.
+- Talk button while Op speaks: `opStop`, his current line (`R57.lastSaid`) goes into the chat, the pending `opSay`
+  promises resolve so the turn carries on, and `R59.hush` keeps him silent (text only) until the turn ends.
+- App updates: `r59File(summary, words)`: the entry's text is Op's write-up, `e.said` is Andre's words (shown folded as
+  "What you said", included in copies). Round 58's word-for-word entries were converted once (title → text, words → said).
+- Playbooks are client SOPs. ONE permanent lead playbook (`p.master`, `r59LeadPb()`, `r59LeadSync()` on every render):
+  its stages are the lead stages (names and order follow Setup), every open lead is on it, it can't be deleted and its
+  stages can't be added/removed in the builder. No posting days in playbooks. New playbooks only from the + (no For).
+  `R59.noLeadPb = true` switches the permanent lead playbook off: r55–r57 set it to test the model before it.
+- Setup (`bizSetupHtml`): Lead pipeline (drag to reorder: `r59MoveStage`, rename, recolour, add, remove), Client stages,
+  Reach-out, Messages; Playbooks opens the tab. A renamed stage re-renders straight away.
+- Log center: List / Calendar; the calendar is clients and leads together (`r59LcItems`), filter Everyone/Clients/Leads.
+- Packages: `pk.schedule[delivId] = [cycle days 1–30]`. Day 1 = a client's `startDate` anniversary (`r59Cycles`), or the
+  day you locked in for your own account (`igCfg().r59Plans[acctId] = {pk, start}`). Package changes sync to clients
+  (`r59PkSync`). Package sheet: `openPackageEditModal` → `r59PkSheet`; new package: `openNewPackageModal` → `r59PkNew`.
+- Your own account: "Lock in on content" sheet, hold 1.4s to commit (`r59Commit`); shown first on Social → Overview.
+- Client window → Calendar (`r59ClientItems`: content, playbook steps this cycle and next, dated tasks, events, cycle
+  starts, billing) with kind filters; the Calendar page has a client picker (`ui.r59CalClient`) using the same items.
+- Tab animations: `renderView` compares the tab state (`r59TabSig`) with the last render; what changed gets `.r59-in`.
+- Weight & fuel rebuilt (`renderBodyFuel`), numbers rounded to one decimal on Health; Journal is write-left / read-right.
+
 ## Removed (don't bring back)
 GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
 
@@ -148,6 +174,9 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent);
 - main.js: single instance, menu bar Tray, ⌥O show/hide, ✕ hides, ⌘Q quits, starts the helpers, move-in from the old Chrome profile, `window.operatorPage` bridge.
 
 ## Status
+Round 59 (2026-10-31): ROUND-59-LIST.md (17 items, with Andre's answers): Op's read fixed and first, talk-button cut,
+update write-ups, SOP playbooks + permanent lead playbook, Setup, Log center calendar, packages by cycle day, locking
+in, client calendars, Calendar client filter, tab animations, weight & fuel, journal.
 Round 58 (2026-10-31): the list from Andre's Op session (ROUND-58-LIST.md, 35 items): updates in his words in one place,
 honest "logged", list mode, remove a session, chat times, notes/feed, voice, Op's read, bubble, Business tabs, Playbooks
 overview/builder/★, Social accounts + full screen + package links, package calendars + Just me, Settings cleanups.

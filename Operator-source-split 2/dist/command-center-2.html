@@ -9987,6 +9987,7 @@ html.r58-content .app, html.r58-content .layout{ grid-template-columns:1fr !impo
 .r59-mini i{ border-radius:5px; }
 .r56-lc-h .r59-lcf button{ width:auto !important; height:auto !important; min-width:0; padding:6px 12px; border-radius:8px; background:none; font-size:13px; }
 .r56-lc-h .r59-lcf button.is-on{ background:var(--panel); }
+.r58-ownp{ margin:0 0 18px !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -10184,7 +10185,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793477680954;
+const OP_BUILT = 1793478093933;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -54284,7 +54285,9 @@ pb57CalHtml = (function(base){ return function(p, st){ return base.apply(this, a
 r57PostDays = function(c){ const pk = c && c.packageId ? arr(state.business.packages).find(function(p){ return p.id===c.packageId; }) : null; const d = pk && arr(pk.postDays).length ? pk.postDays : ['1', '3', '5']; return d.map(String); };
 // (B6: the permanent lead playbook)
 function r59LeadPb(){ return pbAll().find(function(p){ return p.master && pbFor(p)==='lead'; }) || null; }
+// (R59.noLeadPb: the older test suites switch the permanent lead playbook off to test the model before it)
 function r59LeadSync(){
+  if(R59.noLeadPb) return r59LeadPb();
   const all = pbAll(); let P = r59LeadPb(), changed = false;
   if(!P){
     P = all.find(function(p){ return pbFor(p)==='lead' && p.star; }) || all.find(function(p){ return pbFor(p)==='lead'; });
@@ -54772,6 +54775,20 @@ renderFitness = (function(base){ return function(){ return base.apply(this, argu
 // Write on the left, read on the right: a compact composer (it grows as you write) and your entries as a clean feed.
 renderJournalEntriesTab = (function(base){ return function(){ return '<div class="r59-jr'+(ui.journalViewMode==='clients' ? ' is-clients' : '')+'">'+base.apply(this, arguments)+'</div>'; }; })(renderJournalEntriesTab);
 document.addEventListener('input', function(e){ const t = e.target; if(t && t.id==='journalPageText'){ t.style.height = 'auto'; t.style.height = Math.min(520, Math.max(130, t.scrollHeight + 2))+'px'; } });
+
+// (Social: your plan and your month of content come first, right under the accounts; the numbers follow)
+sxOverviewHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), i = h.indexOf('<div class="r58-focus r58-ownp"');
+    if(i < 0) return h;
+    const strip = h.indexOf('<div class="r58-strip">')===0 ? r58StripHtml() : null;
+    if(!strip || h.indexOf(strip)!==0) return h;
+    return strip+h.slice(i)+h.slice(strip.length, i);
+  };
+})(sxOverviewHtml);
+// (one of "Stories" is a Story, not a "Storie"; and a package with its own days shows no fixed posting weekdays)
+delivOne = (function(base){ return function(d){ const t = String(d && d.title || ''); return /[^aeiou]ies$/i.test(t) && t.length > 4 ? t.slice(0, -3)+'y' : base.apply(this, arguments); }; })(delivOne);
+r57PostDays = (function(base){ return function(c){ const pk = c && c.packageId ? r59Pk(c.packageId) : null; if(pk && arr(pk.deliverables).some(function(d){ return r59PkDays(pk, d).length; })) return []; return base.apply(this, arguments); }; })(r57PostDays);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

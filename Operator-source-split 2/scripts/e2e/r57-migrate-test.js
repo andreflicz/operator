@@ -18,7 +18,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   const E = c => p.evaluate(x => window.__op.ev(x), c);
   await p.waitForTimeout(400); await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); masterTasksSync(); masterTasksSync()");
   const ts = JSON.parse(await E("JSON.stringify(state.tasks.items.filter(t => t.master && t.master.kind==='pb').map(t => [t.id, t.title, t.status, t.deadline]))"));
-  check('your playbooks became stages (one each), nothing lost', await E("pbAll().every(p => pbStages(p).length===1) && pbStages(pbById('P1'))[0].steps.length===4 && pbStages(pbById('P2'))[0].steps.length===2"));
+  // (round 59: the permanent lead playbook is its own thing)
+  check('your playbooks became stages (one each), nothing lost', await E("pbAll().filter(p => !p.master).every(p => pbStages(p).length===1) && pbStages(pbById('P1'))[0].steps.length===4 && pbStages(pbById('P2'))[0].steps.length===2"));
   check('a monthly playbook’s stage runs every month; the monthly report is due on the last day', await E("pbStages(pbById('P2'))[0].repeat==='month' && pbStages(pbById('P2'))[0].steps[0].due.rule==='end'"));
   check('the people on them are on the stage, from the same day 1', await E("crmFind('client','mm').pb.stage===pbStages(pbById('P1'))[0].id && pb57In(crmFind('client','mm'))==='2026-10-20'"));
   check('your open tasks are the same tasks (no duplicates made)', ts.filter(t => /Kickoff/.test(t[1])).length===1 && ts.filter(t => /Strategy/.test(t[1])).length===1 && ts.filter(t => t[1]==='Welcome').length===1, ts);

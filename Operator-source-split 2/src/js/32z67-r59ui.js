@@ -441,3 +441,17 @@ renderFitness = (function(base){ return function(){ return base.apply(this, argu
 // Write on the left, read on the right: a compact composer (it grows as you write) and your entries as a clean feed.
 renderJournalEntriesTab = (function(base){ return function(){ return '<div class="r59-jr'+(ui.journalViewMode==='clients' ? ' is-clients' : '')+'">'+base.apply(this, arguments)+'</div>'; }; })(renderJournalEntriesTab);
 document.addEventListener('input', function(e){ const t = e.target; if(t && t.id==='journalPageText'){ t.style.height = 'auto'; t.style.height = Math.min(520, Math.max(130, t.scrollHeight + 2))+'px'; } });
+
+// (Social: your plan and your month of content come first, right under the accounts; the numbers follow)
+sxOverviewHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), i = h.indexOf('<div class="r58-focus r58-ownp"');
+    if(i < 0) return h;
+    const strip = h.indexOf('<div class="r58-strip">')===0 ? r58StripHtml() : null;
+    if(!strip || h.indexOf(strip)!==0) return h;
+    return strip+h.slice(i)+h.slice(strip.length, i);
+  };
+})(sxOverviewHtml);
+// (one of "Stories" is a Story, not a "Storie"; and a package with its own days shows no fixed posting weekdays)
+delivOne = (function(base){ return function(d){ const t = String(d && d.title || ''); return /[^aeiou]ies$/i.test(t) && t.length > 4 ? t.slice(0, -3)+'y' : base.apply(this, arguments); }; })(delivOne);
+r57PostDays = (function(base){ return function(c){ const pk = c && c.packageId ? r59Pk(c.packageId) : null; if(pk && arr(pk.deliverables).some(function(d){ return r59PkDays(pk, d).length; })) return []; return base.apply(this, arguments); }; })(r57PostDays);

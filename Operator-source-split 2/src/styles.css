@@ -9976,3 +9976,4 @@ html.r58-content .app, html.r58-content .layout{ grid-template-columns:1fr !impo
 .r59-mini i{ border-radius:5px; }
 .r56-lc-h .r59-lcf button{ width:auto !important; height:auto !important; min-width:0; padding:6px 12px; border-radius:8px; background:none; font-size:13px; }
 .r56-lc-h .r59-lcf button.is-on{ background:var(--panel); }
+.r58-ownp{ margin:0 0 18px !important; }

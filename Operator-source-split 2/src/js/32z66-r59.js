@@ -207,7 +207,9 @@ pb57CalHtml = (function(base){ return function(p, st){ return base.apply(this, a
 r57PostDays = function(c){ const pk = c && c.packageId ? arr(state.business.packages).find(function(p){ return p.id===c.packageId; }) : null; const d = pk && arr(pk.postDays).length ? pk.postDays : ['1', '3', '5']; return d.map(String); };
 // (B6: the permanent lead playbook)
 function r59LeadPb(){ return pbAll().find(function(p){ return p.master && pbFor(p)==='lead'; }) || null; }
+// (R59.noLeadPb: the older test suites switch the permanent lead playbook off to test the model before it)
 function r59LeadSync(){
+  if(R59.noLeadPb) return r59LeadPb();
   const all = pbAll(); let P = r59LeadPb(), changed = false;
   if(!P){
     P = all.find(function(p){ return pbFor(p)==='lead' && p.star; }) || all.find(function(p){ return pbFor(p)==='lead'; });

@@ -14,18 +14,22 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   const p = await newPage(b, OUT+'/r56.html', seed, at(28, 10));
   await p.setViewportSize({width:1440, height:900});
   const E = c => p.evaluate(x => window.__op.ev(x), c);
+  // (round 59 made one permanent lead playbook; this suite tests the playbook model before it, so it's switched off)
+  await E("R59.noLeadPb = true; (function(){ const M = pbAll().find(p => p.master); if(!M) return; if(pbStages(M).every(s => !arr(s.steps).length)){ crm().playbooks = pbAll().filter(p => p!==M); arr(state.business.pipeline).forEach(l => { if(l.pb && l.pb.id===M.id) l.pb = null; }); } else { M.master = false; M.star = false; } pbSave(); })()");
   await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); AI.hasKey = false; uiConfirm = function(o){ window.__conf = o; return Promise.resolve(true); }");
   await E("masterTasksSync(); ui.view='business'; ui.businessTab='lifecycle'; renderView()"); await p.waitForTimeout(250);
 
   // ---- no starting set, no defaults ----
   check('no playbooks you didn’t make, and nobody put on one', await E("pbAll().length===0 && !state.business.clients.some(c => c.pb)"));
-  check('empty: one clear way to make one', !!(await p.$('.pb6-empty [data-action="pb6NewOpen"]')));
+  // (round 59: the + in the corner is the one way to make a playbook; no buttons on the page)
+  check('empty: one clear way to make one', !(await p.$('#viewRoot [data-action="pb6NewOpen"]')) && await E("fabContext().label")==='New playbook');
 
   // ---- a new playbook: name, for, its stages, what happens after the last stage ----
   // (round 57: a playbook is a pipeline of stages you move people through, so it has no length of its own; each
   // stage says roughly how long it takes, and a stage can run every month. These checks follow that.)
-  await p.click('.pb6-bar [data-action="pb6NewOpen"]'); await p.waitForTimeout(200);
-  check('the new-playbook sheet asks the name, who it’s for, its stages, and what happens when it ends', !!(await p.$('#pb6NewName')) && (await p.$$('#pb6NewSheet [data-action="pb6NewSet"][data-id^="for:"]')).length===2 && (await p.$$('#pb6NewSheet [data-action="pb6NewSet"][data-id^="mirror:"]')).length===2 && !!(await p.$('#pb6NewEnds')));
+  await E("ACTIONS.pb6NewOpen()"); await p.waitForTimeout(200);
+  // (round 59: playbooks are client SOPs; the lead playbook is the permanent one, so no For switch)
+  check('the new-playbook sheet asks the name, its stages, and what happens when it ends', !!(await p.$('#pb6NewName')) && (await p.$$('#pb6NewSheet [data-action="pb6NewSet"][data-id^="for:"]')).length===0 && (await p.$$('#pb6NewSheet [data-action="pb6NewSet"][data-id^="mirror:"]')).length===2 && !!(await p.$('#pb6NewEnds')));
   await p.fill('#pb6NewName', 'Retainer'); await p.click('[data-id="mirror:0"]'); await p.waitForTimeout(100); await p.fill('#pb6NewName', 'Retainer'); await p.selectOption('#pb6NewEnds', 'again');
   await p.click('[data-action="pb6Create"]'); await p.waitForTimeout(250);
   await E("pbStages(pbAll()[0])[0].repeat = 'month'; pbStages(pbAll()[0])[0].name = 'Monthly service'; pbSave()");
@@ -33,7 +37,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ACTIONS.pb6NewOpen()"); await p.waitForTimeout(150); await p.fill('#pb6NewName', 'Onboarding'); await p.click('[data-id="mirror:0"]'); await p.waitForTimeout(100); await p.fill('#pb6NewName', 'Onboarding'); await p.selectOption('#pb6NewEnds', pbId = await E("pbAll()[0].id")); await p.click('[data-action="pb6Create"]'); await p.waitForTimeout(250);
   await E("pbStages(pbAll()[1])[0].days = 30; pbSave()");
   check('…another that moves them on to Retainer when it ends', await E("pbAll()[1].next===pbAll()[0].id && !pbRepeats(pbAll()[1])"));
-  await E("ACTIONS.pb6NewOpen()"); await p.waitForTimeout(150); await p.click('[data-id="for:lead"]'); await p.waitForTimeout(100); await p.fill('#pb6NewName', 'New lead'); await p.click('[data-action="pb6Create"]'); await p.waitForTimeout(250);
+  await E("(function(){ const L = pbNew('lead', 'New lead', 30, {for:'lead'}); L.stages = crmStages('lead').filter(s => s.kind!=='won' && s.kind!=='lost').map(s => pb57Stage(s.label, {crm:s.id})); pbAll().push(L); pbSave(); renderView(); })()"); await p.waitForTimeout(250);
   check('…and one for leads (its stages are the Lead Center’s)', await E("pbFor(pbAll()[2])==='lead' && pbStages(pbAll()[2]).every(s => !!s.crm)"));
 
   // ---- Build ----
@@ -150,8 +154,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('…and a notification', await E("notifList().some(n => /^pbl:l1/.test(n.key))"));
   await E("logTouch('lead', 'l1', 'call', todayStr(), 'talked')"); await p.waitForTimeout(100);
   check('logging a touch ticks off what was due on their playbook', await E("pbState('lead', crmFind('lead', 'l1')).open.every(o => o.date > todayStr())"));
-  await E("ui.view='business'; ui.businessTab='log'; ui.r54Lc='leads'; ui.r56LeadCal=true; renderView()"); await p.waitForTimeout(250);
-  check('Log center → Leads has a Calendar view of the month', (await p.$$('.r56-lc-d:not(.is-empty)')).length >= 28 && !!(await p.$('.r56-lv')));
+  // (round 59: the Log center's calendar covers clients and leads together)
+  await E("ui.view='business'; ui.businessTab='log'; ui.r54Lc='leads'; ui.r59LcCal=true; renderView()"); await p.waitForTimeout(250);
+  check('Log center → Leads has a Calendar view of the month', (await p.$$('.r56-lc-d:not(.is-empty)')).length >= 28 && !!(await p.$('.r59-lcv')));
+  await E("ui.r59LcCal=false");
   // a stage's usual length can be changed (its guide follows)
   await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='build'; ui.pbWho='client'; ui.pbSel=pbAll()[0].id; ui.pb57Stage=null; ui.pbItem=null; ui.pb57StageEdit=true; renderView()"); await p.waitForTimeout(200);
   await E("pbStages(pbAll()[0])[0].repeat = null; pbSave(); renderView()"); await p.waitForTimeout(150);

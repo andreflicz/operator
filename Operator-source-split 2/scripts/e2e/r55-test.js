@@ -13,6 +13,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
       {id:'e1', date:'2026-10-26', name:'CAPITAL ONE MOBILE PMT', amount:500, cat:'transport', src:'bank'}, {id:'e2', date:'2026-10-25', name:'Trader Joes', amount:62.4, cat:'other', src:'bank'}, {id:'e3', date:'2026-10-24', name:'SHELL OIL 123', amount:48.1, cat:'transport', src:'bank'}]}};
   const p = await newPage(b, OUT+'/r55.html', seed, at(27, 11));
   const E = c => p.evaluate(x => window.__op.ev(x), c);
+  // (round 59 made one permanent lead playbook; this suite tests the playbook model before it, so it's switched off)
+  await E("R59.noLeadPb = true; (function(){ const M = pbAll().find(p => p.master); if(!M) return; if(pbStages(M).every(s => !arr(s.steps).length)){ crm().playbooks = pbAll().filter(p => p!==M); arr(state.business.pipeline).forEach(l => { if(l.pb && l.pb.id===M.id) l.pb = null; }); } else { M.master = false; M.star = false; } pbSave(); })()");
   await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); AI.hasKey = false");
   await p.waitForTimeout(300);
 
