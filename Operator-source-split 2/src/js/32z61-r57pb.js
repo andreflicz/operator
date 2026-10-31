@@ -27,6 +27,8 @@ function pb57FromItem(it, days){
   const s = pb57Step(it.title, it.type, null, {id:it.id, checklist:arr(it.checklist), links:arr(it.links), files:arr(it.files), notes:it.notes || '', every:Number(it.every) || 1});
   if(it.repeat==='week') s.due = {rule:'week', dow:Number(it.dow==null ? 5 : it.dow)};
   else { const d = Math.max(1, Number(it.day) || 1); s.due = d >= days ? {rule:'end'} : {rule:'day', n:d}; }
+  // (a monthly report, from an old cycle that came over with its day worked out from its position: the last day)
+  if(it.repeat!=='week' && /monthly/i.test(it.title || '') && /report/i.test(it.title || '') && it.type!=='call') s.due = {rule:'end'};
   return s;
 }
 // (an old client cycle's step becomes a stage; an item that repeated monthly is due on the last day of the month,
@@ -61,11 +63,12 @@ function pb57Migrate(p){
   if(cy){ p.stages = pb57FromCycle(cy); p.fromCycle = cy.id; }
   else {
     const days = Math.max(1, Number(p.days) || 30);
-    p.stages = [pb57Stage(p.name, {repeat:pbRepeats(p) ? 'month' : null, days:days, crm:pbFor(p)==='lead' && p.stage ? p.stage : null, steps:arr(p.items).map(function(it){ return pb57FromItem(it, days); })})];
+    p.stages = [pb57Stage(p.name, {repeat:pbByMonth(p) ? 'month' : pbRepeats(p) ? 'days' : null, days:days, crm:pbFor(p)==='lead' && p.stage ? p.stage : null, steps:arr(p.items).map(function(it){ return pb57FromItem(it, days); })})];
   }
   p.postDays = arr(p.postDays);
   return true;
 }
+function pb57Rep(st){ return !!st && (st.repeat==='month' || st.repeat==='days'); }
 function pbStages(p){ if(p && !Array.isArray(p.stages)) pb57Migrate(p); return p ? p.stages : []; }
 function pb57StageOf(p, id){ const L = pbStages(p); return L.find(function(s){ return s.id===id; }) || null; }
 // where someone is: their stage (the first one if they had none) and the day they entered it
@@ -88,6 +91,7 @@ function pb57In(x){ return !Number(x.pb.seq) && x.pb.start ? x.pb.start : (x.pb.
 pbCycle = function(x, p, at){
   at = at || todayStr();
   const st = pb57Where(x, p), s = pb57In(x) || at;
+  if(st && st.repeat==='days'){ const L = Math.max(1, Number(st.days) || 7), n = Math.max(0, Math.floor(pbDaysBetween(s, at)/L)), b = addDays(s, n*L); return {start:b, end:addDays(b, L - 1), n:n}; }
   if(st && st.repeat==='month'){ let n = 0; while(pbMonths(s, n + 1) <= at && n < 600) n++; return {start:pbMonths(s, n), end:addDays(pbMonths(s, n + 1), -1), n:n, month:true}; }
   const L = Math.max(1, Number(st && st.days) || 7);
   return {start:s, end:addDays(s, L - 1), n:0};
@@ -116,7 +120,7 @@ pbOccs = function(x, p, cyc){
       for(let i = 0; i < len; i++){ const d = addDays(cyc.start, i); if(String(dowOf(d))===String(it.due.dow)) out.push({it:it, date:d, key:pre+':'+it.id+':'+d, stage:st}); }
       return;
     }
-    if(st.repeat==='month' && Number(it.every) > 1 && cyc.n % Number(it.every)!==0) return;
+    if(pb57Rep(st) && Number(it.every) > 1 && cyc.n % Number(it.every)!==0) return;
     let date = pb57Due(it, cyc);
     // (a call that's on your calendar is due the day it's booked for)
     const evId = x.pb.ev && x.pb.ev[pre+':'+it.id], ev = evId ? arr(state.calendar.events).find(function(e){ return e.id===evId; }) : null;
@@ -227,7 +231,7 @@ function pb57Enter(kind, x, stageId, opts){
 }
 pbAdvance = function(kind, x, manual){
   const s = pbState(kind, x); if(!s || !s.stage) return false;
-  if(s.stage.repeat==='month' && !manual) return false;
+  if(pb57Rep(s.stage) && !manual) return false;
   const L = s.stages, nx = L[s.si + 1];
   if(nx) return pb57Enter(kind, x, nx.id, {quiet:!manual});
   // the last stage: what the playbook does when it ends
@@ -334,7 +338,7 @@ pbSync = function(){
   pbPeople().forEach(function(P){
     const x = P.x; if(!x.pb || !x.pb.id) return;
     // a stage whose steps are all done moves them on (never a monthly stage, never an empty one)
-    for(let i = 0; i < 8; i++){ const s = pbState(P.kind, x); if(!s || !s.stage || s.future || x.pb.finished || s.stage.repeat==='month' || !s.occ.length || s.open.length) break; if(!pbAdvance(P.kind, x)) break; ch = true; }
+    for(let i = 0; i < 8; i++){ const s = pbState(P.kind, x); if(!s || !s.stage || s.future || x.pb.finished || pb57Rep(s.stage) || !s.occ.length || s.open.length) break; if(!pbAdvance(P.kind, x)) break; ch = true; }
     { const s0 = pbState(P.kind, x); if(s0 && x.pb.finished && s0.open.length){ delete x.pb.finished; ch = true; } }
     if(P.kind==='lead') return;
     const s = pbState(P.kind, x); if(!s || !s.stage) return;
@@ -509,7 +513,7 @@ pbPersonHtml = (function(base){
       '<i class="r55-pbs-bar"><u style="width:'+(s.occ.length ? Math.round(done/s.occ.length*100) : 0)+'%"></u></i>'+
       '<div class="r55-pbp-list">'+(s.occ.length ? s.occ.map(row).join('') : '<div class="pb57-none">Nothing to do on this stage.</div>')+'</div>'+
       '<div class="r55-pbp-f">'+(backTo ? '<button class="btn btn-ghost btn-sm" data-action="pbBack" data-kind="'+kind+'" data-id="'+x.id+'">&larr; '+escapeHtml(backTo)+'</button>' : '<span></span>')+
-        (s.stage.repeat==='month' && !nx && !np ? '' : '<button class="btn btn-sm" data-action="pbNext" data-kind="'+kind+'" data-id="'+x.id+'">'+(nx ? escapeHtml(nx.name)+' &rarr;' : np ? escapeHtml(np.name)+' &rarr;' : 'Finish &#10003;')+'</button>')+'</div></div>';
+        (pb57Rep(s.stage) && !nx && !np ? '' : '<button class="btn btn-sm" data-action="pbNext" data-kind="'+kind+'" data-id="'+x.id+'">'+(nx ? escapeHtml(nx.name)+' &rarr;' : np ? escapeHtml(np.name)+' &rarr;' : 'Finish &#10003;')+'</button>')+'</div></div>';
   };
 })(pbPersonHtml);
 // put them on a stage straight from the pipeline in their window
@@ -528,7 +532,7 @@ pbCardHtml = function(kind, x){
   const s = pbState(kind, x), nm = pbName(kind, x), b = pbBehind(kind, x);
   let meta = '', next = '';
   if(s && s.stage){
-    meta = s.future ? 'Starts '+fmtDateShort(pb57In(x)) : x.pb.finished ? 'Finished' : s.stage.repeat==='month' ? 'Month '+(s.cyc.n + 1) : 'Day '+s.day;
+    meta = s.future ? 'Starts '+fmtDateShort(pb57In(x)) : x.pb.finished ? 'Finished' : s.stage.repeat==='month' ? 'Month '+(s.cyc.n + 1) : s.stage.repeat==='days' ? 'Run '+(s.cyc.n + 1) : 'Day '+s.day;
     if(s.next){ const ty = PB_TYPES[s.next.it.type] || PB_TYPES.task; next = '<div class="pb6-cn" style="--pbc:'+ty.color+'"><i></i><span>'+escapeHtml(s.next.it.title)+'</span><small>'+(s.next.wkEnd < todayStr() ? '<em>behind</em>' : s.next.date===todayStr() ? 'today' : fmtDateShort(s.next.date))+'</small></div>'; }
     else next = '<div class="pb6-cn is-clear"><span>All caught up</span></div>';
   }
@@ -570,7 +574,7 @@ function pb57BoardHtml(p){
     const on = st ? people.filter(function(x){ return x.pb && x.pb.id===p.id && pb57Where(x, p)===st; }) : off;
     return '<section class="pb6-col'+(st ? '' : ' is-off')+'" data-pb6-col="'+(st ? p.id+'|'+st.id : '')+'">'+
       '<header><b>'+(st ? escapeHtml(st.name) : 'Not on '+escapeHtml(p.name))+'</b><span>'+on.length+'</span></header>'+
-      (st ? '<small class="pb6-cmeta">'+(st.repeat==='month' ? 'Every month' : arr(st.steps).length+' step'+(arr(st.steps).length===1 ? '' : 's'))+(st.crm && crmStage(who, st.crm) ? ' · '+escapeHtml(crmStage(who, st.crm).label) : '')+'</small>' : '')+
+      (st ? '<small class="pb6-cmeta">'+(st.repeat==='month' ? 'Every month' : st.repeat==='days' ? 'Every '+st.days+' days' : arr(st.steps).length+' step'+(arr(st.steps).length===1 ? '' : 's'))+(st.crm && crmStage(who, st.crm) ? ' · '+escapeHtml(crmStage(who, st.crm).label) : '')+'</small>' : '')+
       '<div class="pb6-cards">'+on.map(function(x){ return st ? pbCardHtml(who, x) : pb57OffCard(who, x); }).join('')+'</div></section>';
   };
   return '<div class="pb6-board">'+col(null)+L.map(col).join('')+'</div>';
@@ -617,7 +621,7 @@ function pb57BuildHtml(p){
 function pb57StepsHtml(p, st){
   const steps = arr(st.steps);
   return '<div class="pb57-list" data-pb57-list="'+st.id+'">'+
-    '<div class="pb57-lh"><b>'+escapeHtml(st.name)+'</b><span>'+(st.repeat==='month' ? 'Every month' : 'About '+st.days+' day'+(st.days===1 ? '' : 's'))+(st.crm && crmStage(pbFor(p), st.crm) ? ' · mirrors '+escapeHtml(crmStage(pbFor(p), st.crm).label) : '')+'</span><button class="pb6-cedit" data-action="pb57StageEdit" title="Stage settings">&#9881;</button></div>'+
+    '<div class="pb57-lh"><b>'+escapeHtml(st.name)+'</b><span>'+(st.repeat==='month' ? 'Every month' : st.repeat==='days' ? 'Every '+st.days+' days' : 'About '+st.days+' day'+(st.days===1 ? '' : 's'))+(st.crm && crmStage(pbFor(p), st.crm) ? ' · mirrors '+escapeHtml(crmStage(pbFor(p), st.crm).label) : '')+'</span><button class="pb6-cedit" data-action="pb57StageEdit" title="Stage settings">&#9881;</button></div>'+
     steps.map(function(it){
       const ty = PB_TYPES[it.type] || PB_TYPES.task, n = arr(it.files).length + arr(it.links).filter(function(l){ return l.url; }).length;
       return '<button class="pb57-row'+(ui.pbItem===it.id ? ' is-on' : '')+'" style="--pbc:'+ty.color+'" data-action="pbItemPick" data-id="'+it.id+'" draggable="true" data-pb57-drag="'+it.id+'"><i>'+ty.icon+'</i><b>'+escapeHtml(it.title)+'</b><small>'+escapeHtml(ty.label)+'</small><span>'+escapeHtml(pb57RuleText(it, st))+'</span><em>'+(n ? '&#128206; '+n : '')+'</em></button>';
@@ -644,8 +648,8 @@ function pb57StagePanel(p, st){
   const who = pbFor(p), i = pbStages(p).indexOf(st);
   return '<aside class="pb6-side pb57-sp"><div class="pb6-ih"><input class="pb6-it" data-pb57-sf="name" value="'+escapeHtml(st.name)+'" maxlength="50" aria-label="Stage name"><button class="pb6-x" data-action="pb57StageEdit" data-id="close" title="Close">&#10005;</button></div>'+
     '<div class="pb6-sec"><small>Mirrors</small><select class="input input-sm" data-pb57-sf="crm"><option value="">Nothing</option>'+crmStages(who).filter(function(s){ return s.kind!=='lost'; }).map(function(s){ return '<option value="'+s.id+'"'+(st.crm===s.id ? ' selected' : '')+'>'+escapeHtml(s.label)+(who==='lead' ? ' (Lead Center)' : ' (client stage)')+'</option>'; }).join('')+'</select></div>'+
-    '<div class="pb6-sec"><small>Runs</small><div class="seg-tabs seg-sm"><button class="seg-tab'+(st.repeat==='month' ? '' : ' active')+'" data-action="pb57StageRep" data-id="once">Once</button><button class="seg-tab'+(st.repeat==='month' ? ' active' : '')+'" data-action="pb57StageRep" data-id="month">Every month</button></div></div>'+
-    (st.repeat==='month' ? '' : '<div class="pb6-sec"><small>Usually takes</small><span class="pb6-dayin"><input class="input input-sm" type="number" min="1" max="120" data-pb57-sf="days" value="'+(Number(st.days) || 7)+'"> days</span></div>')+
+    '<div class="pb6-sec"><small>Runs</small><div class="seg-tabs seg-sm"><button class="seg-tab'+(st.repeat ? '' : ' active')+'" data-action="pb57StageRep" data-id="once">Once</button><button class="seg-tab'+(st.repeat==='month' ? ' active' : '')+'" data-action="pb57StageRep" data-id="month">Every month</button><button class="seg-tab'+(st.repeat==='days' ? ' active' : '')+'" data-action="pb57StageRep" data-id="days">Every '+(Number(st.days) || 7)+' days</button></div></div>'+
+    (st.repeat==='month' ? '' : '<div class="pb6-sec"><small>'+(st.repeat==='days' ? 'Every' : 'Usually takes')+'</small><span class="pb6-dayin"><input class="input input-sm" type="number" min="1" max="120" data-pb57-sf="days" value="'+(Number(st.days) || 7)+'"> days</span></div>')+
     '<div class="pb6-if"><span class="pb57-mv"><button data-action="pb57StageMove" data-id="-1"'+(i <= 0 ? ' disabled' : '')+' aria-label="Earlier">&larr;</button><button data-action="pb57StageMove" data-id="1"'+(i >= pbStages(p).length - 1 ? ' disabled' : '')+' aria-label="Later">&rarr;</button></span><button class="pb6-idel" data-action="pb57StageDel">Delete stage</button></div></aside>';
 }
 function pb57StepPanel(p, st){
@@ -678,7 +682,7 @@ ACTIONS.pb57Stage = function(el, e, id){ ui.pb57Stage = id; ui.pbItem = null; ui
 ACTIONS.pb57StageEdit = function(el, e, v){ ui.pb57StageEdit = v==='close' ? false : !ui.pb57StageEdit; ui.pbItem = null; renderView(); };
 ACTIONS.pb57Cal = function(el, e, v){ ui.pb57Cal = v==='cal'; playTick(); renderView(); };
 ACTIONS.pb57StageAdd = function(){ const p = pbSel(); if(!p) return; const s = pb57Stage('New stage'); pbStages(p).push(s); ui.pb57Stage = s.id; ui.pb57StageEdit = true; ui.pbItem = null; pbSave(); renderView(); setTimeout(function(){ const i = document.querySelector('[data-pb57-sf="name"]'); if(i){ i.focus(); i.select(); } }, 60); };
-ACTIONS.pb57StageRep = function(el, e, v){ const c = pbCur(); if(!c.st) return; c.st.repeat = v==='month' ? 'month' : null; pbSave(); renderView(); };
+ACTIONS.pb57StageRep = function(el, e, v){ const c = pbCur(); if(!c.st) return; c.st.repeat = v==='month' ? 'month' : v==='days' ? 'days' : null; pbSave(); renderView(); };
 ACTIONS.pb57StageMove = function(el, e, d){ const c = pbCur(); if(!c.st) return; const L = pbStages(c.p), i = L.indexOf(c.st), j = i + Number(d); if(j < 0 || j >= L.length) return; L.splice(i, 1); L.splice(j, 0, c.st); pbSave(); renderView(); };
 ACTIONS.pb57StageDel = function(){
   const c = pbCur(); if(!c.st) return; const L = pbStages(c.p), on = pbCountsFor(pbFor(c.p)).filter(function(x){ return x.pb && x.pb.id===c.p.id && x.pb.stage===c.st.id; });
@@ -843,3 +847,19 @@ renderCurrentTaskCard = (function(base){
     const p = pbById(t.master.pb); return h.replace(/<\/div>\s*$/, function(){ return pb57FilesHtml(p, st, false)+'</div>'; });
   };
 })(renderCurrentTaskCard);
+
+// ---- a notification's click goes where it says (a client, a lead, the Leads list) ----
+setTimeout(function(){
+  ACTIONS.notifOpen = (function(base){
+    return function(el, e, key){
+      const n = typeof notifByKey==='function' ? notifByKey(key) : null, a = n && n.act;
+      if(a && (a.a==='openContact' || a.a==='r54OpenLeads')){
+        ui.notifOpen = false; const p = document.getElementById('notifPanel'); if(p) p.hidden = true;
+        if(a.a==='r54OpenLeads') ACTIONS.r54OpenLeads();
+        else if(a.kind==='client') openClientModal(a.id); else openContact(a.kind || 'lead', a.id);
+        return;
+      }
+      return base.apply(this, arguments);
+    };
+  })(ACTIONS.notifOpen);
+}, 0);

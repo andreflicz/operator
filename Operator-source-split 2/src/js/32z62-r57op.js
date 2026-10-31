@@ -255,6 +255,8 @@ function r57Up(){
   OPX.ptt = false; OPX.pttUsed = Date.now();
   try{ opLightMark(); }catch(e){}
   r54Blip('send');
+  // (a timer that came due while you held the key runs now; the engine's own stop finds it already sent)
+  if(R57.srPending){ const f = R57.srPending; R57.srPending = null; setTimeout(f, 0); }
   // (one send per hold: the key, the window losing focus and a tap can't send it twice)
   if(AI.sendNow){ const s = AI.sendNow; AI.sendNow = null; s(); }
   else { let n = 0; const iv = setInterval(function(){ n++; if(AI.sendNow){ clearInterval(iv); const s = AI.sendNow; AI.sendNow = null; s(); } else if(n > 40 || !AI.listening) clearInterval(iv); }, 100); }
