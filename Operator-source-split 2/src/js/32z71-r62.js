@@ -161,12 +161,15 @@ function r62LogFit(b){
   const log = b && b.querySelector('.op-bub-log'); if(!log || !b.classList.contains('is-log')) return;
   if(R62.manual) return;
   const max = Math.round(Math.min(window.innerHeight*0.58, 520)), L = opChat();
+  if(R62.openIdx > L.length) R62.openIdx = Math.max(0, L.length - 2);   // (the chat was cleared)
   const ms = log.querySelectorAll('.ocl-m');
   let from = null;
   if(R62.openIdx >= 0 && L.length){
     const keep = Math.max(1, L.length - R62.openIdx), all = Array.prototype.filter.call(ms, function(m){ return !m.classList.contains('ocl-typing'); });
     from = all[Math.max(0, all.length - keep)] || null;
   }
+  // (with its day label, when the first line starts a new day)
+  if(from && from.previousElementSibling && from.previousElementSibling.classList.contains('ocl-day')) from = from.previousElementSibling;
   let need = 96;
   if(from){ const lr = log.getBoundingClientRect(), fr = from.getBoundingClientRect(); need = Math.ceil(log.scrollHeight - (fr.top - lr.top + log.scrollTop) + 14); }
   else if(!ms.length) need = 96;

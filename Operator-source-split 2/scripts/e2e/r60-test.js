@@ -88,7 +88,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("addSheetClose('r60Cli')"); await p.click('.r60-socset'); await p.waitForTimeout(200);
   check('…settings: swap, connect, clients’ accounts, refresh', (await p.$$('#r60Soc .r60-set-b')).length===4);
   await E("addSheetClose('r60Soc')");
-  check('Full screen and Refresh sit lower, clear of your level', await E("(function(){ const b = document.querySelector('.r58-cm'), d = document.getElementById('musicDock').getBoundingClientRect(); return b.getBoundingClientRect().top > d.bottom + 20; })()"));
+  check('Full screen and Refresh sit lower, clear of your level', await E("(function(){ const b = document.querySelector('.r58-cm'), d = document.getElementById('musicDock').getBoundingClientRect(); return b.getBoundingClientRect().top > d.bottom + 20; })()"), await E("(function(){ const b = document.querySelector('.r58-cm').getBoundingClientRect(), d = document.getElementById('musicDock').getBoundingClientRect(); return [b.top, d.top, d.bottom]; })()"));
   // ================= E. Calendar =================
   await E("ui.view='calendar'; ui.calendarYear = 2026; ui.calendarMonth = 9; renderView()"); await p.waitForTimeout(250);
   check('Calendar: no Today button; one search-style button for your calendar or a client’s', !(await p.$('[data-action="cxToday"]')) && !!(await p.$('.r60-calb')) && !(await p.$('select[data-r59-calc]')));

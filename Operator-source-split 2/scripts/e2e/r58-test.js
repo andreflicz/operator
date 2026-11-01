@@ -56,7 +56,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // (round 61: Op's window sizes itself to the conversation; no grip to drag)
   { await E("window.__keep = opChat().splice(0); OPCD.sig = ''; opChatDraw()"); await p.waitForTimeout(150); const h0 = await p.evaluate(() => document.querySelector('#opBub .op-bub-log').getBoundingClientRect().height); await E("for(let i = 0; i < 8; i++) opChat().push({r:i % 2 ? 'op' : 'me', t:'A longer line to grow the conversation number '+i, at:Date.now()}); OPCD.sig = ''; opChatDraw()"); await p.waitForTimeout(200);
     const h1 = await p.evaluate(() => document.querySelector('#opBub .op-bub-log').getBoundingClientRect().height);
-    check('Op’s window sizes the conversation itself as it grows', h1 > h0 + 60 && !(await p.$('#opBub .op-bub-rs:not([style*="none"])')) ); await E("opChat().splice(0); window.__keep.forEach(e => opChat().push(e)); OPCD.sig = ''; opChatDraw()"); }
+    // (round 62: it still sizes itself as it grows, and the resize grip is back as Andre asked)
+    check('Op’s window sizes the conversation itself as it grows', h1 > h0 + 60, [h0, h1]); await E("opChat().splice(0); window.__keep.forEach(e => opChat().push(e)); OPCD.sig = ''; opChatDraw()"); }
   // ---- E. voice ----
   check('hands-free listening: no time cap, and it waits out a long pause (4 s or more)', await E("r58PauseMs(0) >= 3800 && r58PauseMs(60000) >= 9000") && !/300000/.test(await E("String(scribeListen)")));
   await E("OV.speaking = true; R57.lastSaid = 'Done. It’s on your list for tomorrow morning, first thing.'; document.getElementById('opBubText').textContent = 'Done. It’s on'; window.__ls = 0; const was = aiListen; aiListen = function(){ window.__ls++; }; r54TalkToggle(); aiListen = was"); await p.waitForTimeout(500);
