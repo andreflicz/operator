@@ -1,28 +1,45 @@
-# Round 64: Andre's updates (Oct 31, 10:46 PM – Nov 1, 12:43 AM)
+# Round 64: Andre's updates (Oct 31, 10:46 PM – Nov 1)
 
-Some of these were filed before 3.6.0 (Rounds 62–63) went out; those are noted, checked again against what he
-described, and fixed where 3.6.0 doesn't cover it.
+The Op-filed items from 12:42 AM (App updates, push-to-talk, double messages) were filed before 3.6.0 went out. 3.6.0
+already fixes part of each one; this round finishes them and checks them again. "Streaks" came up twice; it's one item
+here.
 
 ## A. Op
-1. **A mini tab instead of the chat panel.** Op's window becomes a small tab: a status line ("Listening", "Thinking",
-   "Speaking"), Op's three buttons and close / minimize. No typing box (he talks to Op). Op's replies stay out of the
-   way rather than filling a panel. Small and tidy, no awkward sizing.
-2. **Double messages when he cuts Op off** (talking or typing): each reply shows once, the text stays visible, and
-   cutting in and replying works cleanly. 3.6.0 stopped the same message being sent twice, but not this cut-off case
-   (the partial line and then the full reply). Reproduce and fix it.
-3. **Every app update and piece of feedback logged, each confirmed as saved.** 3.6.0 files anything Op claims to have
-   filed. Also: go back through his conversation with Op and file whatever's missing, and every save gets a visible
-   "Saved to App updates" confirmation.
-4. **Push-to-talk from other apps.** 3.6.0's installer keeps macOS's permission across updates and Check shows whether
-   it works. Confirm after he installs 3.6.0 (the one-time remove and re-add); if it still fails, look further.
+1. **A small Op tab instead of the chat panel.** It shows only his state ("Listening…", "Thinking…", "Speaking"), his
+   three buttons (full screen, turn off, close) and nothing else. No typing box. His replies don't fill it.
+2. **No double messages when you cut him off** while he's speaking or typing: each reply shows once, the text stays,
+   and cutting in and talking back works cleanly. (3.6.0 removed exact repeats; the cut-off path still writes the
+   half-said line and then the full reply as two messages. That gets fixed here.)
+3. **Everything you've told Op about the app is in App updates.** The app goes back through your conversation with Op,
+   finds every app request or piece of feedback that isn't in App updates, and files it. From then on, each one is
+   confirmed as saved (a note that says it's in, every time).
+4. **Push-to-talk from other apps.** 3.6.0's installer and Check are the fix. If the key still doesn't work from other
+   apps after installing 3.6.0 and doing the one-time step, Check shows exactly which part fails, and that goes here.
 
 ## B. Today
-5. **The bottom of the Clients panel** (the leads row under the client cards) isn't spaced well. Tidy it.
+5. **Clients widget: the bottom** (the leads row) is badly spaced. Tidy it.
+6. **The streak panel is the console for the whole day-streak system**: the fire streak, Today's standard and a running
+   streak like 75 Hard together, as one overview (not a separate block under it).
 
-## C. Personal → Streaks
-6. **One console for the whole streak system**: the running challenge (75 Hard etc.) goes in one panel together with
-   Today's standard and the day streak (🔥). An overview of the day, not separate boxes.
+## C. Personal
+7. **Streaks**: Today's standard and the streaks you create (75 Hard and so on) live together as one system, kept in
+   the same place as the streak panel on Today.
+8. **Health → Weight: the BMI scale** looks wrong and doesn't fill the panel. Redo it.
+9. **Health → Fuel: the bottom and the sizing** look bad. Fix the layout.
+10. **Goals**: check the panel (see the question below).
 
-## D. Personal → Health
-7. **Weight: the BMI scale** looks wrong and doesn't fill its panel. Redo it.
-8. **Fuel**: the bottom of the panel and the sizing across Health look off. Even it out.
+## D. Focus → Analytics
+11. **The range changes the recap too**: on This week, the "Day recap" becomes the week's recap; Last week shows last
+    week's, and so on.
+12. **One 🔍 button to pick the range**: Today, This week, Last week, This month, Last month, All time, and a custom
+    range (pick the dates).
+
+## E. Playbooks
+13. **Playbooks overview: drag and drop clients between stages.** See each playbook with its stages and move a client
+    from one stage to the next by dragging.
+
+## Questions for Andre
+- Streaks (6, 7): what exactly should change from 3.6.0?
+- Op's small tab (1): should his reply show at all?
+- Goals (10): is it good now, or still broken?
+- Playbooks (13): every playbook's board at once, or one at a time?
