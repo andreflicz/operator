@@ -1,4 +1,4 @@
-# Operator app — continuity brief (updated 2026-11-01, after Round 62)
+# Operator app — continuity brief (updated 2026-11-01, after Round 63)
 
 ## What this is
 "Operator" is Andre's personal productivity app: business (clients, leads, MRR, deliverables, playbooks), focus (lock-in sessions, tasks), personal (goals, health, finances, journal, social), and Op, the AI assistant inside it. The UI and logic are one self-contained HTML page built from a source tree. It ships as a Mac app (Electron). The older Chrome-app-shell `.app` still exists in the repo as the source of the helper scripts.
@@ -12,7 +12,7 @@ Andre tests every build himself and comes back with detailed, itemized feedback,
 Design rules he set: "a bad app informs, a good one just has a great UI." Minimal, level, symmetrical; no small grey explainer text; one well-placed control rather than repeated buttons; consistent across features. Build features general ("not a just-me app").
 
 ## Where the code lives
-- GitHub: `andreflicz/operator`. Rounds 57–62 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
+- GitHub: `andreflicz/operator`. Rounds 57–63 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
 - Every commit ends with the session's Co-Authored-By / Claude-Session lines.
 - Layout inside `Operator-source-split 2/`:
 
@@ -38,6 +38,7 @@ src/js/32zNN-rXX.js         one file per update round, layered on top (see "Over
                             compact window that grows + grip back, talk-key Check; Customize in the top panel, Goals/Journal on
                             the Personal tab line). Mac: main.js op:talkCheck / op:relaunch; install-operator.sh signs with a
                             stable local identity
+                            Round 63: 32z72-r63.js (Personal → Streaks: Today's standard + challenges)
 scripts/build.py            src/ → dist/command-center-2.html (injects const OP_BUILT = <ms>)
 scripts/smoke-test.js       quick load check
 scripts/e2e/*-test.js       Playwright suites, one per round (common.js: instrument, newPage, check, report)
@@ -239,6 +240,23 @@ Other conventions:
 - **Personal**: Goals' gear and the Journal's Entries / Boards / Vault move onto the tab line (`.r62-gtop`, `.r62-jtabs`);
   no "Goals" label. **Social**: Round 60's 44 px margin above the header buttons is gone.
 
+## Round 63 notes (the list is ROUND-63-LIST.md)
+- **Personal → Streaks** (`ui.personalTab='streaks'`; renderPersonal renders the cheap Wish List tab and swaps the panel).
+- **Today's standard is set only here**: deep work target, days off a week, the items (rename inline, ✕, add). Settings →
+  "Goals & Standards" is now "Goals & Targets" and its Deep work target / Streak Rules / Daily Standard parts are cut out
+  (renderSettings wrapper). On Today, "Today's standard" opens Streaks.
+- **Challenges** live in `state.standards.challenges` (persist 'standards'): `{id, preset, name, days, strict, rules:[{id,
+  label, cue}], start, log:{date:[ruleIds]}, ended:{date, done}}`. `strict`: reset (75 Hard), twice (never miss twice:
+  one missed day is a slip, a second in a row restarts), track. `r63Status(c)` computes the run (runStart, day, slips,
+  restarts, best, finished) from the log every time; nothing is stored about restarts. `r63Settle()` closes finished runs
+  and the tab offers the next step on `R63_LADDER` (first → soft → medium → hard).
+- Presets (`R63_PRESETS`): First streak (21 days, three two-minute-style wins with cues), 75 Soft, 75 Medium, 75 Hard (the
+  commonly published rules; Frisella is the source for Hard; Soft/Medium have no official version), Your own. The start
+  sheet edits name, days, strictness, rules and each rule's moment ("After I…").
+- On Today: each running streak is a row under Today's standard in the streak panel, rules as chips to tick.
+- Op: `streak_check {rule, done}` and `start_streak {preset, name, days, rules}`; aiSystem gets the running streaks.
+- No XP for streaks yet (a judgment call: say if he wants it).
+
 ## Removed (don't bring back)
 GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
 
@@ -261,7 +279,8 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent);
 - main.js: single instance, menu bar Tray, ⌥O show/hide, ✕ hides, ⌘Q quits, starts the helpers, move-in from the old Chrome profile, `window.operatorPage` bridge.
 
 ## Status
-Round 62 (2026-11-01): ROUND-62-LIST.md (12 items). Mac 3.6.0.
+Round 63 (2026-11-01): ROUND-63-LIST.md (Streaks). Mac 3.6.0 carries Rounds 62 and 63.
+Round 62 (2026-11-01): ROUND-62-LIST.md (12 items).
 Round 61 (2026-11-01): ROUND-61-LIST.md (14 items).
 Round 60 (2026-11-01): ROUND-60-LIST.md (19 items): see Round 60 notes.
 Round 59 (2026-10-31): ROUND-59-LIST.md (17 items, with Andre's answers): Op's read fixed and first, talk-button cut,
