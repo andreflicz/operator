@@ -14,5 +14,8 @@ contextBridge.exposeInMainWorld('operatorApp', {
   talkPrefs: (p) => ipcRenderer.send('op:talkPrefs', p || {}),
   // is the key reaching the app from everywhere? (and open the macOS setting that lets it)
   talkHealth: () => ipcRenderer.invoke('op:talkHealth'),
-  openPrivacy: (which) => ipcRenderer.send('op:openPrivacy', String(which || 'ListenEvent'))
+  openPrivacy: (which) => ipcRenderer.send('op:openPrivacy', String(which || 'ListenEvent')),
+  // Round 62: the Check button (asks macOS, opens what's missing, reports back), and a restart once it's turned on
+  talkCheck: () => ipcRenderer.invoke('op:talkCheck'),
+  relaunch: () => ipcRenderer.send('op:relaunch')
 });

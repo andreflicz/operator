@@ -276,7 +276,7 @@ function keyHealth() {
   let need = '';
   if (process.platform === 'darwin') { try { if (!require('electron').systemPreferences.isTrustedAccessibilityClient(false)) need = 'Accessibility'; } catch (e) {} }
   if (!need && hookOk && !lastHook) need = 'ListenEvent';
-  return { hooked: hookOk, last: lastHook, ok: hookOk && !need ? true : (need ? false : null), need: need || '', err: hookErr };
+  return { hooked: hookOk, last: lastHook, now: Date.now(), ok: hookOk && !need ? true : (need ? false : null), need: need || '', err: hookErr };
 }
 function healthToPage() { run('operatorPage.talkKeyHealth && operatorPage.talkKeyHealth(' + JSON.stringify(keyHealth()) + ')'); }
 function pressDown() { if (held) return; held = { other: false, at: Date.now() }; if (talk.mode === 'hold' && talk.on && !front()) run('operatorPage.talkDown ? operatorPage.talkDown() : operatorPage.talkToggle()'); }
@@ -304,7 +304,26 @@ function hookStart() {
 }
 ipcMain.on('op:talkPrefs', (e, p) => { talk.on = p.on !== false; if (p.key) talk.key = String(p.key); talk.mode = p.mode === 'tap' ? 'tap' : 'hold'; if (talk.on) hookStart(); healthToPage(); });
 ipcMain.handle('op:talkHealth', () => keyHealth());
-ipcMain.on('op:openPrivacy', (e, which) => { const pane = which === 'Accessibility' ? 'Privacy_Accessibility' : 'Privacy_ListenEvent'; shell.openExternal('x-apple.systempreferences:com.apple.preference.security?' + pane).catch(() => null); });
+function openPane(which) {
+  const pane = which === 'Accessibility' ? 'Privacy_Accessibility' : 'Privacy_ListenEvent';
+  // (newer macOS names the pane differently; the old link still works on most versions, so try it first)
+  return shell.openExternal('x-apple.systempreferences:com.apple.preference.security?' + pane)
+    .catch(() => shell.openExternal('x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?' + pane))
+    .catch(() => null);
+}
+ipcMain.on('op:openPrivacy', (e, which) => { openPane(which); });
+// Round 62: "Check" does something you can see. It asks macOS to list Operator under Accessibility (macOS shows its own
+// prompt the first time), starts listening for the key if it wasn't, opens the setting still missing, and reports back.
+// macOS only lets an app see keys from other apps after the app restarts, so the page then offers a restart.
+ipcMain.handle('op:talkCheck', () => {
+  let trusted = true;
+  if (process.platform === 'darwin') { try { trusted = require('electron').systemPreferences.isTrustedAccessibilityClient(true); } catch (e) {} }
+  if (talk.on) hookStart();
+  const h = keyHealth();
+  openPane(!trusted ? 'Accessibility' : 'ListenEvent');
+  return Object.assign(h, { trusted: trusted, opened: !trusted ? 'Accessibility' : 'Input Monitoring' });
+});
+ipcMain.on('op:relaunch', () => { quitting = true; app.relaunch(); app.quit(); });
 
 // ---------------- the page talks back ----------------
 ipcMain.on('op:status', (e, s) => { status = s || {}; trayRefresh(); });

@@ -70,8 +70,8 @@ renderConversations = (function(base){
 // ================= D9. Op's window sizes itself, and closes when nothing's going on =================
 // No more resizing by hand: it fits the conversation (up to most of the window). After a minute and a half with nothing
 // happening (he isn't talking, listening or thinking, you aren't typing, nothing new in the chat) it closes itself.
-setTimeout(function(){ try{ const s = state.profile.opBubSize; if(s && s.h){ state.profile.opBubSize = {w:460, h:0}; persist('profile'); } }catch(e){} }, 0);
-r58BubGrip = function(b){ const g = b && b.querySelector('.op-bub-rs'); if(g) g.remove(); };
+// (Round 62: resizable again, and it opens compact and grows: see 32z71-r62.js)
+setTimeout(function(){ try{ const s = state.profile.opBubSize; if(s && s.h){ state.profile.opBubSize = {w:s.w || 460, h:0}; persist('profile'); } }catch(e){} }, 0);
 R61.lastChat = 0; R61.idleSince = Date.now();
 setInterval(function(){
   try{

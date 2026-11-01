@@ -1,4 +1,4 @@
-# Operator app — continuity brief (updated 2026-11-01, after Round 61)
+# Operator app — continuity brief (updated 2026-11-01, after Round 62)
 
 ## What this is
 "Operator" is Andre's personal productivity app: business (clients, leads, MRR, deliverables, playbooks), focus (lock-in sessions, tasks), personal (goals, health, finances, journal, social), and Op, the AI assistant inside it. The UI and logic are one self-contained HTML page built from a source tree. It ships as a Mac app (Electron). The older Chrome-app-shell `.app` still exists in the repo as the source of the helper scripts.
@@ -12,7 +12,7 @@ Andre tests every build himself and comes back with detailed, itemized feedback,
 Design rules he set: "a bad app informs, a good one just has a great UI." Minimal, level, symmetrical; no small grey explainer text; one well-placed control rather than repeated buttons; consistent across features. Build features general ("not a just-me app").
 
 ## Where the code lives
-- GitHub: `andreflicz/operator`. Rounds 57–61 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
+- GitHub: `andreflicz/operator`. Rounds 57–62 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
 - Every commit ends with the session's Co-Authored-By / Claude-Session lines.
 - Layout inside `Operator-source-split 2/`:
 
@@ -34,6 +34,10 @@ src/js/32zNN-rXX.js         one file per update round, layered on top (see "Over
                             Calendar picker/legend, goals order, journal, vault)
                             Round 61: 32z70-r61.js (widget sizes S/M/L, Customize button, Goals heading, Journal layout,
                             Social name, Op window auto-size + idle close, holiday banner ✕ / Halloween tune / preview only in test)
+                            Round 62: 32z71-r62.js (Op: one reply per message, "filed" always true, clean ✕, working indicator,
+                            compact window that grows + grip back, talk-key Check; Customize in the top panel, Goals/Journal on
+                            the Personal tab line). Mac: main.js op:talkCheck / op:relaunch; install-operator.sh signs with a
+                            stable local identity
 scripts/build.py            src/ → dist/command-center-2.html (injects const OP_BUILT = <ms>)
 scripts/smoke-test.js       quick load check
 scripts/e2e/*-test.js       Playwright suites, one per round (common.js: instrument, newPage, check, report)
@@ -208,6 +212,33 @@ Other conventions:
   (`state.profile.r61HolHidden`); a new Halloween tune (organ voice, bass line).
 - The combined "Onboarding → Monthly client" preset is gone (chaining stays: "When they finish → They move to …").
 
+## Round 62 notes (the list is ROUND-62-LIST.md)
+- **One message, one reply** (outermost `aiAsk` wrapper in 32z71): the same words within 10 s are dropped; a voice ask that
+  matches one of Op's lines from the last 45 s (≥ 80% word overlap, 4+ words; never when typed) is dropped as the mic hearing
+  him; a message sent while `AI.busy` waits in `R62.queue` (newest only) and goes when he's free (it's in the chat once:
+  `R62.skipMe`). `opChatLog` skips an op line identical to one of the last 6 in 5 min. `R62.dropped` counts the drops.
+- **"Filed" is real**: after the turn, if the reply claims filing to the updates (`R62_CLAIM`, not negated by `R62_NEG`) and
+  no suggest_improvement / mark_update / file_updates ran, the app files it (r59Summarize + r59File), even when other tools
+  ran. (Round 58's net only covered no-tools turns.) Already-filed words aren't filed twice.
+- **✕**: the cause of the ~5 s freeze was the turn awaiting `opSay`, whose promise never resolved after `opStop`. Close now
+  resolves `R59_PENDING`, sets `R59.hush` (the rest of the turn is written, not spoken) and `R62.quiet` (no `opBubShow`
+  until the turn ends or he reaches for Op: orb / window / talk button / a new ask).
+- **Working indicator**: `.r62-work` in the window's top bar ("Thinking…", or `R62_TOOL_LABEL[tool]…`), `body.r62-busy`.
+- **Op's window**: opens on the last exchange (`R62.openIdx`), grows with new lines up to min(58vh, 520px); the grip is back
+  (`r58BubGrip` redefined): a dragged height holds until close (`R62.manual`), the width is remembered. Round 61's
+  "no grip" is undone; the 90 s idle close stays.
+- **Talk key anywhere**: the likely real cause was the ad-hoc signature: every install was a "new app" to macOS, so the
+  Input Monitoring / Accessibility grant silently stopped applying. install-operator.sh now makes a private
+  "Operator Local Signing" certificate in the login keychain once and signs with it every time (falls back to ad-hoc).
+  Not verified on a real Mac (no Mac here). Check (Settings → Op) calls `op:talkCheck` (prompts Accessibility, starts the
+  hook, opens the missing pane, also via the newer `com.apple.settings.PrivacySecurity.extension` URL), then shows live
+  rows (Accessibility, "keys from other apps": `h.last` after the check) and Restart Operator (`op:relaunch`).
+- **Today**: Customize is `.r62-cb` in the hero beside `.th-full` (`pageEditBtnHtml('toggleTodayEdit')` returns a marker
+  that renderToday swaps). Widgets are size containers: the Business card is 3 / 2 / 1 columns at L / M / S (Round 60's
+  `.card:last-child{display:flex}` had turned it into one centered column), client cards auto-fit.
+- **Personal**: Goals' gear and the Journal's Entries / Boards / Vault move onto the tab line (`.r62-gtop`, `.r62-jtabs`);
+  no "Goals" label. **Social**: Round 60's 44 px margin above the header buttons is gone.
+
 ## Removed (don't bring back)
 GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
 
@@ -218,7 +249,7 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent);
 - Electron 44.7.0 / electron-builder 26.16.1. uiohook-napi (global talk key) is a dependency, `npmRebuild:false`, `asarUnpack **/*.node`.
 - Packaging (Linux container, no Apple Developer ID). rcodesign can't be downloaded here, so the zips go out unsigned and
   Andre installs with `bash ~/Downloads/install-operator.sh` (mac/install-operator.sh: unzips with ditto, copies to
-  /Applications, signs inside out with codesign, verifies, opens). `codesign --deep` failed for him on 3.2.0; don't send that again.
+  /Applications, signs inside out with codesign, with the stable "Operator Local Signing" identity since 3.6.0, verifies, opens). `codesign --deep` failed for him on 3.2.0; don't send that again.
   Old rcodesign steps, if it's available:
   1. bump `version` in mac/package.json (and package-lock.json);
   2. `node stage.js`;
@@ -230,6 +261,7 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent);
 - main.js: single instance, menu bar Tray, ⌥O show/hide, ✕ hides, ⌘Q quits, starts the helpers, move-in from the old Chrome profile, `window.operatorPage` bridge.
 
 ## Status
+Round 62 (2026-11-01): ROUND-62-LIST.md (12 items). Mac 3.6.0.
 Round 61 (2026-11-01): ROUND-61-LIST.md (14 items).
 Round 60 (2026-11-01): ROUND-60-LIST.md (19 items): see Round 60 notes.
 Round 59 (2026-10-31): ROUND-59-LIST.md (17 items, with Andre's answers): Op's read fixed and first, talk-button cut,

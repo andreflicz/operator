@@ -10235,3 +10235,62 @@ html[data-holiday="newyear"]{ --accent:#F5D547; } html[data-holiday="july4"]{ --
 .r61-holx:hover{ background:var(--panel-2); color:var(--text); }
 .r61-holm{ width:34px; padding:0 !important; justify-content:center; margin-right:34px; font-size:15px !important; }
 .ll-bar.r61-cust{ position:relative !important; top:auto !important; right:auto !important; left:auto !important; opacity:1 !important; height:auto !important; width:auto !important; pointer-events:auto; z-index:3; }
+
+/* ============ ROUND 62 ============ */
+/* Op: the working indicator, the orb pulses while he works */
+#opBub .r62-work{ letter-spacing:0; text-transform:none; font-size:12px; font-weight:600; color:#6b7180; opacity:0; transition:opacity .2s; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:190px; }
+#opBub .r62-work.is-on{ opacity:1; animation:r62Pulse 1.4s ease-in-out infinite; }
+@keyframes r62Pulse{ 0%,100%{ opacity:.55; } 50%{ opacity:1; } }
+/* Op's window: resizable again (the grip at the top right), opens compact and grows */
+#opBub .op-bub-rs{ display:block !important; z-index:4; }
+#opBub.is-log.r62-fit .op-bub-log{ min-height:0 !important; transition:height .22s ease; }
+#opBub.is-resizing .op-bub-log{ transition:none !important; }
+/* the talk-key check */
+.r62-ck{ margin-top:10px; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:color-mix(in srgb, var(--panel) 70%, transparent); display:grid; gap:7px; font-size:13px; }
+.r62-ck-r{ display:flex; align-items:center; gap:8px; }
+.r62-ck-r b{ font-weight:600; min-width:150px; }
+.r62-ck-r span:last-child{ color:var(--text-dim); }
+.r62-ck-i{ width:18px; height:18px; border-radius:50%; display:grid; place-items:center; font-size:11px; font-weight:700; flex:none; }
+.r62-ck-i.is-ok{ background:color-mix(in srgb, var(--green, #3fbe8e) 25%, transparent); color:var(--green, #3fbe8e); }
+.r62-ck-i.is-no{ background:color-mix(in srgb, var(--red, #e5484d) 22%, transparent); color:var(--red, #e5484d); }
+.r62-ck-i.is-wait{ background:rgba(var(--ink),.08); color:var(--text-dim); }
+.r62-ck-f{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; color:var(--text-dim); }
+/* Today: Customize inside the top panel, beside full screen */
+.r62-cb{ position:absolute; top:7px; right:36px; z-index:3; height:24px; min-width:24px; padding:0 5px; display:inline-flex; align-items:center; justify-content:center; gap:6px; border-radius:8px; border:1px solid transparent; background:transparent; color:var(--text-dim); opacity:.45; cursor:pointer; font:600 12px var(--font-body); transition:opacity .2s, background .2s, border-color .2s, color .2s; }
+.today-hero:hover .r62-cb{ opacity:.8; }
+.r62-cb:hover{ opacity:1 !important; color:var(--text); background:rgba(var(--ink),.08); border-color:var(--border); }
+.r62-cb.is-on{ opacity:1; padding:0 10px; background:var(--accent); border-color:var(--accent); color:#111; }
+.r62-cb.r62-cb-alone{ position:static; opacity:.8; }
+/* Today: widgets lay out by their own width (Small / Medium / Large) */
+.r60w{ container-type:inline-size; }
+.r60w > .section > .biz-card:last-child{ display:grid !important; flex-direction:initial; grid-template-columns:minmax(0, 1.2fr) minmax(0, 1.3fr) minmax(0, .8fr); align-items:center; gap:22px; }
+.biz-card .biz-main, .biz-card .biz-months, .biz-card .biz-side{ min-width:0; }
+@container (max-width:760px){
+  .r60w > .section > .biz-card:last-child{ grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:16px; }
+  .r60w .biz-card .biz-side{ grid-column:1 / -1; display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; }
+}
+@container (max-width:440px){
+  .r60w > .section > .biz-card:last-child{ grid-template-columns:minmax(0, 1fr); gap:14px; }
+  .r60w .biz-card .biz-months{ display:none; }
+  .r60w .biz-card .biz-side{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
+  .r60w .biz-card .biz-mini{ flex-direction:column; align-items:flex-start; gap:2px; }
+}
+/* Clients: cards fill their widget at every size; side by side with another widget, both the same height */
+.r60w .hub-grid{ grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr)); align-content:stretch; }
+@container (max-width:440px){ .r60w .hub-grid{ grid-template-columns:minmax(0, 1fr); } }
+.today-panels{ align-items:stretch; }
+.r60w > .section{ height:100%; }
+/* Personal → Goals: no label, no gap; settings at the top right */
+.r43-goalsp .r43-sec.is-top{ justify-content:flex-end; margin:0 0 6px !important; min-height:0; padding:0 !important; }
+.r60-mine{ margin-bottom:0 !important; }
+/* Personal → Journal: Entries / Boards / Vault on the tab line, at the far right */
+.tabs:has(> .r62-jtabs){ align-items:center; }
+.r62-jtabs{ margin-left:auto; display:flex; align-items:center; padding-bottom:4px; }
+.r62-jtabs .seg-tabs{ margin:0 !important; }
+.r62-jtabs .seg-tab{ padding:5px 12px; font-size:12.5px; }
+/* Social: the tabs sit right under the title, like the other pages */
+.row:has(> .r58-cm){ margin-top:0 !important; }
+.view-header:has(.r58-cm){ align-items:flex-end; }
+.tabs:has(> .r62-gtop){ align-items:center; }
+.r62-gtop{ margin-left:auto; display:flex; align-items:center; padding-bottom:4px; }
+.r62-gtop .r43-sec.is-top{ margin:0 !important; }

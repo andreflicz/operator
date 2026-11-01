@@ -47,7 +47,43 @@ ditto "$APP_IN" "$APP" 2>/dev/null || sudo ditto "$APP_IN" "$APP" || die "couldn
 
 say "4/5  Signing it on this Mac (inside out)"
 xattr -cr "$APP"
-sign(){ codesign --force --sign - --timestamp=none "$1" >/dev/null 2>>"$TMP/sign.log" || { cat "$TMP/sign.log"; die "signing failed on: ${1#$APP/}"; }; }
+# The same signature every update, so macOS keeps Operator's permissions (Input Monitoring, Accessibility) from one
+# version to the next. A throwaway signature counts as a new app each time and macOS silently drops the permission;
+# that's why the talk key stopped working outside the app after updates. The first run makes a private signing
+# certificate in your login keychain ("Operator Local Signing", only used for this). If that can't be done, it falls
+# back to the old way.
+CERT="Operator Local Signing"
+KC="$HOME/Library/Keychains/login.keychain-db"
+IDENT="-"
+ident_hash(){ security find-identity -p codesigning "$KC" 2>/dev/null | awk -v n="\"$CERT\"" 'index($0, n) { print $2; exit }'; }
+H=$(ident_hash)
+if [ -z "$H" ]; then
+  cat > "$TMP/cert.cnf" <<CNF
+[ req ]
+distinguished_name = dn
+x509_extensions = ext
+prompt = no
+[ dn ]
+CN = $CERT
+[ ext ]
+basicConstraints = critical,CA:false
+keyUsage = critical,digitalSignature
+extendedKeyUsage = critical,codeSigning
+CNF
+  if /usr/bin/openssl req -x509 -newkey rsa:2048 -nodes -days 7300 -config "$TMP/cert.cnf" -keyout "$TMP/k.pem" -out "$TMP/c.pem" >/dev/null 2>&1 \
+     && /usr/bin/openssl pkcs12 -export -inkey "$TMP/k.pem" -in "$TMP/c.pem" -name "$CERT" -out "$TMP/c.p12" -passout pass:operator >/dev/null 2>&1 \
+     && security import "$TMP/c.p12" -k "$KC" -P operator -T /usr/bin/codesign >/dev/null 2>&1; then
+    H=$(ident_hash)
+  fi
+  rm -f "$TMP/k.pem" "$TMP/c.p12"
+fi
+if [ -n "$H" ]; then
+  # (a test signature first; if macOS asks to let codesign use the key, click Always Allow)
+  cp /usr/bin/true "$TMP/probe" 2>/dev/null
+  if codesign --force --sign "$H" --timestamp=none "$TMP/probe" >/dev/null 2>&1; then IDENT="$H"; echo "   Signing as \"$CERT\" (the same every update)."; fi
+fi
+[ "$IDENT" = "-" ] && echo "   Using a one-off signature (after this update, turn Operator off and on again in Input Monitoring and Accessibility)."
+sign(){ codesign --force --sign "$IDENT" --timestamp=none "$1" >/dev/null 2>>"$TMP/sign.log" || { cat "$TMP/sign.log"; die "signing failed on: ${1#$APP/}"; }; }
 # loose binaries first: native modules and libraries
 while IFS= read -r f; do sign "$f"; done < <(find "$APP/Contents" -type f \( -name '*.node' -o -name '*.dylib' \))
 # the helper tools inside the frameworks, then the frameworks, then the helper apps, then the app itself
@@ -61,5 +97,6 @@ xattr -cr "$APP"
 say "5/5  Opening Operator"
 open "$APP" || die "macOS wouldn't open it. Try right-click → Open on Operator in Applications."
 say "Done. Version $(defaults read "$APP/Contents/Info.plist" CFBundleShortVersionString 2>/dev/null)."
-echo "If the talk key doesn't work while Operator is hidden: System Settings → Privacy & Security →"
-echo "Input Monitoring and Accessibility: remove Operator with − and add it again with +, then reopen Operator."
+echo "Talk key outside the app: Settings → Op → Check. It opens the right setting and tells you what's missing."
+echo "(First time with this installer: in Privacy & Security → Input Monitoring and Accessibility, remove Operator"
+echo "with − and add it again with +, then Restart from that same Check panel. Later updates keep it.)"

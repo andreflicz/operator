@@ -10,7 +10,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); demoSeed(); state.profile.businessName = 'Comet Collective'; AI.hasKey = false; xpSystemShow = function(){}; uiConfirm = function(){ return Promise.resolve(true); }; renderView()"); await p.waitForTimeout(300);
   try{
   // ---- A. Today ----
-  check('Customize: one clean button above the panels', /Customize/.test(await p.textContent('.r61-cb')) && await E("(function(){ const b = document.querySelector('.r61-cb').getBoundingClientRect(), f = document.querySelector('.today-panels').getBoundingClientRect(); return b.bottom <= f.top + 1; })()"));
+  // (round 62: Customize moved into the top panel, a small button beside full screen; no row of its own)
+  check('Customize: one clean button above the panels', !!(await p.$('.today-hero .r62-cb')) && await E("(function(){ const b = document.querySelector('.r62-cb').getBoundingClientRect(), f = document.querySelector('.today-panels').getBoundingClientRect(); return b.bottom <= f.top + 1; })()"));
   check('Today’s standard is centered', await E("getComputedStyle(document.querySelector('.sw .r60-std')).justifyContent==='center'"));
   await E("r60Spans().journal = 7; r60Spans().vision = 5; renderView()"); await p.waitForTimeout(150);
   check('widgets come in three sizes only (odd widths snap to Small / Medium / Large)', await E("r60Span('journal')===6 && r60Span('vision')===4 && [4, 6, 12].indexOf(r60Span('clientHub')) >= 0"));
@@ -23,9 +24,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // ---- B. Personal ----
   await E("ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(200);
   const gt = await p.textContent('#viewRoot .r43-goalsp');
-  check('Goals: just “Goals” (no Master goals / Your goals labels), settings at the top right', /^\s*Goals/.test(gt) && !/Master goals|Your goals/.test(gt) && await E("(function(){ const g = document.querySelector('.r43-gear').getBoundingClientRect(), r = document.querySelector('.r43-goalsp').getBoundingClientRect(); return g.right > r.right - 60 && g.top < r.top + 40; })()"));
+  // (round 62: no "Goals" label at all, the tab says it; the settings button sits on the tab line, top right)
+  check('Goals: just “Goals” (no Master goals / Your goals labels), settings at the top right', !/^\s*Goals/.test(gt) && !/Master goals|Your goals/.test(gt) && await E("(function(){ const g = document.querySelector('.r43-gear').getBoundingClientRect(), r = document.querySelector('.r43-goalsp').getBoundingClientRect(); return g.right > r.right - 60 && g.top < r.top + 40; })()"));
   await E("ui.personalTab='journal'; ui.journalMode='entries'; ui.journalViewMode='personal'; renderView()"); await p.waitForTimeout(200);
-  check('Journal: Entries / Boards / Vault at the top right', await E("(function(){ const t = document.querySelector('.r61-jtabs .seg-tabs').getBoundingClientRect(), v = document.getElementById('viewRoot').getBoundingClientRect(); return t.right > v.right - 30; })()"));
+  check('Journal: Entries / Boards / Vault at the top right', await E("(function(){ const t = document.querySelector('.r62-jtabs .seg-tabs').getBoundingClientRect(), v = document.getElementById('viewRoot').getBoundingClientRect(); return t.right > v.right - 30; })()"));
   check('…the journal centered, its date centered', await E("(function(){ const s = document.querySelector('.r60-seg').getBoundingClientRect(), w = document.querySelector('.r60-jw').getBoundingClientRect(); return Math.abs((s.left + s.right)/2 - (w.left + w.right)/2) < 3 && getComputedStyle(document.querySelector('.r60-jw-d')).textAlign==='center'; })()"));
   check('…search is a small 🔍 at the bottom', await E("(function(){ const q = document.querySelector('.r61-jsb'), f = document.getElementById('journalHistoryContainer'); return !!q && q.getBoundingClientRect().top > f.getBoundingClientRect().top && !document.querySelector('.r60-js'); })()"));
   await p.click('.r61-jsb'); await p.waitForTimeout(150); await p.fill('#journalSearchInput', 'Harbor'); await p.waitForTimeout(200);
@@ -37,7 +39,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // ---- D. Op ----
   await E("ui.view='today'; renderView(); r57Note('Saved something', 'idea')"); await p.waitForTimeout(80);
   check('Op’s note fades in (not a pop)', await E("(function(){ const s = getComputedStyle(document.getElementById('r60Pop')); return /opacity/.test(s.transitionProperty) && parseFloat(s.transitionDuration) >= .45; })()"));
-  check('Op’s window has no resize grip (it sizes itself)', await E("(function(){ opBubShow(); const g = document.querySelector('#opBub .op-bub-rs'); return !g || getComputedStyle(g).display==='none'; })()"));
+  // (round 62: it sizes itself AND has its resize grip back, as Andre asked)
+  check('Op’s window sizes itself, still resizable', await E("(function(){ opBubShow(); const g = document.querySelector('#opBub .op-bub-rs'); return !!g && getComputedStyle(g).display!=='none' && document.getElementById('opBub').classList.contains('r62-fit'); })()"));
   await E("const b = document.getElementById('opBub'); b.classList.add('is-in'); R61.idleSince = Date.now() - 100000; R61.lastChat = (opChat().length ? opChat()[opChat().length - 1].at : 0) || 0"); await p.waitForTimeout(3500);
   check('…and it closes by itself after a while with nothing going on', await E("!document.getElementById('opBub').classList.contains('is-in')"));
   // ---- E. Playbooks ----
