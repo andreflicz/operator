@@ -39,21 +39,29 @@
       clients getting leads, and everything the app already notifies about;
     - how each one shows up: a banner at the top of the screen (like the XP one), a note at the top right, or only in
       the list.
-12. **Social notifications that look good**: likes, comments, shares etc. on your personal page, and when your clients
-    get leads.
-13. **XP for your personal page's engagement** (likes, comments, shares), added to the XP system and the XP guide.
+12. **Social notifications that look good**: likes, comments, shares etc. on your personal page, and when a client gets
+    a new lead from their ad campaign.
+13. **XP for your personal page's engagement** (likes, comments, shares), added to the XP system and the XP guide:
+    small and steady, with a bigger bonus when a post takes off.
 14. **Notifications live at the top right**: the bell moves into the player (top right), and notes come in from there.
 
 ## G. Social and ads
-15. **The client report comes back, only here** (Social / ad campaigns): make the report, choose how (export options),
-    and see the report itself.
+15. **The client report comes back, only here** (Social / ad campaigns): a custom-designed PDF report (what you see is
+    the PDF you export), with room for your own words and notes from the client's journal.
 16. **More from Zernio for ad campaigns**, whatever its data allows.
 17. (Context: he mostly uses Business Manager to look at clients and post through their accounts, so this is where the
     report and the ad numbers belong.)
 
-## Questions for Andre
-- Time off for day streaks (5): mark a stretch of days (e.g. a holiday week) as off ahead of time, so the streak skips
-  them? Or a bigger "days off this week" for that week only?
-- The report (15): which exports? PDF to send the client, an image for a DM, a link, a CSV of the numbers?
-- XP for engagement (13): small and steady (e.g. +1 XP per 10 likes, +5 per comment / share, a cap per day), or bigger?
-- Lead notifications for clients (12): "a lead" = a new lead in their ad campaign (Zernio / Meta lead forms)?
+## H. Getting to know the user (added from Andre's answers)
+18. **The app asks what it needs to know when it starts** (a setup for a new user, and once for Andre after this
+    update): where you live, which holidays you celebrate, whether you take them off (and how many days), your usual
+    days off. It uses the answers everywhere: day streaks skip your holidays and time off without breaking, the
+    holiday banners and music follow your holidays, Op knows them. All of it can be changed in Settings later.
+
+## Andre's answers
+- **Time off for day streaks**: not a setting to hunt for; the app asks (item 18).
+- **The report**: always a custom-made PDF, the one you see and the one you export, and it has to look incredible.
+  You can add your own words: what you saw this month, and notes pulled from the client's journal.
+- **XP for engagement**: small and steady, but a post that takes off (a spike in likes / comments / shares) earns a
+  bigger bonus.
+- **Client leads**: a new lead from their ad campaign.
