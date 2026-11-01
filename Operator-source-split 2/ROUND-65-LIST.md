@@ -18,6 +18,15 @@
    too much.
 7. **Today's standard: a streak's rules are just part of the standard.** No divider line, no different look: one list.
 
+## D. Op (added Nov 1)
+8. **Op's tab can't be moved**: it always sits in the same spot. Make it draggable, and keep where you put it.
+9. **He didn't answer or do anything when spoken to.** Find why and fix it.
+
+## D. Added (Nov 1)
+8. **Op's tab can be moved**: drag it anywhere and it stays there. It starts in a better spot: bottom center, clear of
+   the clock pill.
+9. **The bottom-left pill: no "?"** next to the app you're in.
+
 ## Andre's answers
 - **Old Report, Access / info and Send / link steps**: delete them all (and the open tasks they made).
 - **Call / event steps**: on the Calendar, as an event on its due day with the client's name. Done once it has happened.
