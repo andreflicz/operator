@@ -44,9 +44,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Clients: the leads sit in an even row of cards under a line', await E("(function(){ const h = document.querySelector('.r60w[data-wid=\"clientHub\"] .hub-leads'); if(!h) return false; const s = getComputedStyle(h); const L = [...h.querySelectorAll('.hub-lead')].map(x => x.getBoundingClientRect()); return s.display==='grid' && parseFloat(s.borderTopWidth) >= 1 && L.length >= 2 && L.every(r => Math.abs(r.height - L[0].height) < 2); })()"));
   // ---- B6. The streak console ----
   await E("r63New(R63_PRESETS[3], {}); renderView()"); await p.waitForTimeout(250);
-  check('Streak panel: the running streak’s day sits beside the fire streak', /75 Hard[\s\S]*Day 1/.test(await p.textContent('.sw-l .r64-runs')));
-  check('…its rules on the same line as Today’s standard (no extra row)', !(await p.$('.r63-today')) && (await p.$$('.r60-std-c .r64-chip')).length===6 && !!(await p.$('.r60-std-c .r64-sep')));
-  await p.click('.r60-std-c .r64-chip >> nth=0'); await p.waitForTimeout(200);
+  // (round 65: Andre wants just the day streak and hours on the left, and the rules simply part of the standard)
+  check('Streak panel: the running streak’s day sits beside the fire streak', !(await p.$('.sw-l .r64-runs')) && !!(await p.$('.sw-l .sw-tw')));
+  check('…its rules on the same line as Today’s standard (no extra row)', !(await p.$('.r63-today')) && (await p.$$('.r60-std-c .chip[data-action="r63Tick"]')).length===6 && !(await p.$('.r60-std-c .r64-sep')));
+  await p.click('.r60-std-c .chip[data-action="r63Tick"] >> nth=0'); await p.waitForTimeout(200);
   check('…tick them there', await E("(r63Active()[0].log[todayStr()] || []).length===1"));
   // ---- C8 / C9. Health ----
   await E("state.profile.heightIn = 70; ui.view='personal'; ui.personalTab='fitness'; ui.healthSub='overview'; renderView()"); await p.waitForTimeout(300);

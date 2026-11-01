@@ -19,18 +19,20 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.waitForTimeout(400); await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); masterTasksSync(); masterTasksSync()");
   const ts = JSON.parse(await E("JSON.stringify(state.tasks.items.filter(t => t.master && t.master.kind==='pb').map(t => [t.id, t.title, t.status, t.deadline]))"));
   // (round 59: the permanent lead playbook is its own thing)
-  check('your playbooks became stages (one each), nothing lost', await E("pbAll().filter(p => !p.master).every(p => pbStages(p).length===1) && pbStages(pbById('P1'))[0].steps.length===4 && pbStages(pbById('P2'))[0].steps.length===2"));
-  check('a monthly playbook’s stage runs every month; the monthly report is due on the last day', await E("pbStages(pbById('P2'))[0].repeat==='month' && pbStages(pbById('P2'))[0].steps[0].due.rule==='end'"));
+  // (round 65: playbooks are SOPs: Task, Call / event and Document steps only; Send and Report steps are deleted)
+  check('your playbooks became stages (one each), nothing lost', await E("pbAll().filter(p => !p.master).every(p => pbStages(p).length===1) && pbStages(pbById('P1'))[0].steps.length===3 && pbStages(pbById('P2'))[0].steps.length===1"));
+  check('a monthly playbook’s stage runs every month; the monthly report is due on the last day', await E("pbStages(pbById('P2'))[0].repeat==='month' && pbStages(pbById('P2'))[0].steps[0].title==='Book the monthly call'"));  // (round 65: no report step)
   check('the people on them are on the stage, from the same day 1', await E("crmFind('client','mm').pb.stage===pbStages(pbById('P1'))[0].id && pb57In(crmFind('client','mm'))==='2026-10-20'"));
-  check('your open tasks are the same tasks (no duplicates made)', ts.filter(t => /Kickoff/.test(t[1])).length===1 && ts.filter(t => /Strategy/.test(t[1])).length===1 && ts.filter(t => t[1]==='Welcome').length===1, ts);
-  check('…with your renames, places and dates kept', ts.some(t => t[0]==='t1' && t[1]==='Kickoff call w/ Mo (moved)' && t[2]==='backlog' && t[3]==='2026-11-02'), ts);
+  // (round 65: only Task steps are tasks: the open call and document tasks come off; what was done stays)
+  check('your open tasks are the same tasks (no duplicates made)', !ts.some(t => /Kickoff|Strategy/.test(t[1]) && t[2]!=='done') && ts.filter(t => t[1]==='Welcome').length===1, ts);
+  check('…with your renames, places and dates kept', ts.some(t => t[0]==='t0' && t[2]==='done'), ts);
   check('what was done stays done', await E("!!crmFind('client','mm').pb.done['abc~2026-10-20:i0'] && state.tasks.items.find(t => t.id==='t0').status==='done'"));
-  check('the old tasks learn their stage (for the badge and the guide)', await E("state.tasks.items.filter(t => t.master && t.master.id==='mm').every(t => !!t.master.stage && !!t.master.wkEnd)"));
+  check('the old tasks learn their stage (for the badge and the guide)', await E("state.tasks.items.filter(t => t.master && t.master.id==='mm' && t.status!=='done').every(t => !!t.master.stage && !!t.master.wkEnd)"));  // (round 65: open ones)
   check('a client on a monthly playbook since January isn’t buried in old weekly steps', await E("!state.tasks.items.some(t => t.master && t.master.id==='rr' && t.deadline && t.deadline < '2026-10-05')"));
   await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='build'; renderView()"); await p.waitForTimeout(200);
   check('Build opens on them', (await p.$$('.pb57-row')).length >= 2);
   await E("openClientModal('mm'); ui.clientSec='cycle'; renderClientModalInto()"); await p.waitForTimeout(200);
-  check('their window shows the stage and its steps (the weekly one once a week)', (await p.$$('#clientModalOverlay .r55-pbp-r')).length===7);
+  check('their window shows the stage and its steps (the weekly one once a week)', (await p.$$('#clientModalOverlay .r55-pbp-r')).length===6);  // (round 65: the Send step is gone)
   check('a behind-the-guide notification opens that client', await E("(function(){ const n = notifList().find(n => /^pbb:client:mm/.test(n.key)); if(!n) return 'none'; document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); ACTIONS.notifOpen(null, null, n.key); return !document.getElementById('clientModalOverlay').classList.contains('hidden'); })()")!==false);
   check('no errors', p.errors.length===0, p.errors);
   await b.close(); process.exit(report() ? 1 : 0);

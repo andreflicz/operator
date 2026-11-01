@@ -17,10 +17,10 @@ r60St = (function(base){ return function(name, extra, steps){ return base.call(t
 function r65Clean(){
   let ch = false;
   pbAll().forEach(function(p){ arr(p.stages).forEach(function(st){ const n = arr(st.steps).length; st.steps = arr(st.steps).filter(function(it){ return !R65_GONE.test(String(it.type || '')); }); if(st.steps.length!==n) ch = true; }); });
-  const n0 = state.tasks.items.length;
   // only Task steps make tasks: an open task from any other kind of step comes off the list
-  state.tasks.items = state.tasks.items.filter(function(t){ const m = t.master; return !(m && m.kind==='pb' && t.status!=='done' && m.type && m.type!=='task'); });
-  if(state.tasks.items.length!==n0) ch = true;
+  // (in place: other code holds on to this same list)
+  const L = state.tasks.items;
+  for(let i = L.length - 1; i >= 0; i--){ const t = L[i], m = t && t.master; if(m && m.kind==='pb' && t.status!=='done' && m.type && m.type!=='task'){ L.splice(i, 1); ch = true; } }
   return ch;
 }
 
@@ -53,7 +53,8 @@ function r65AfterSync(){
     const x = P.x; if(!x.pb || !x.pb.id) return;
     let s = pbState(P.kind, x); if(!s || !s.stage || s.future) return;
     x.pb.ev = x.pb.ev || {}; x.pb.r65ev = x.pb.r65ev || {};
-    s.occ.forEach(function(o){
+    // (leads keep their calls as before: they fold into "Reach out to leads"; the Calendar is for clients' calls)
+    if(P.kind==='client') s.occ.forEach(function(o){
       if((o.it.type || 'task')!=='call' || o.done) return;
       const when = o.ev ? o.ev.date : o.date;
       // done once it has happened

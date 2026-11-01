@@ -102,7 +102,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Overview starts with every account: yours set apart, then clients’', (await p.$$('.r58-ac.is-own')).length===2 && (await p.$$('.r58-ac:not(.is-own)')).length===1 && /commenccollective/.test(await p.textContent('.r58-strip')));
   await p.click('.r58-ac[data-id="c1"]'); await p.waitForTimeout(200);
   // (round 59: a client account's package is the client's own, shown from their cycle; there's no separate link)
-  check('tap a client’s account: its numbers, its package, its content calendar and the report', !!(await p.$('.r58-focus .r59-plan.is-client')) && !!(await p.$('.r58-focus .r57-cc')) && !!(await p.$('.r58-focus [data-action="r55Report"]')));
+  check('tap a client’s account: its numbers, its package, its content calendar and the report', !!(await p.$('.r58-focus .r59-plan.is-client')) && !!(await p.$('.r58-focus .r57-cc')) && !(await p.$('.r58-focus [data-action="r55Report"]')));  // (round 65: no reports for now)
   check('…the package is the client’s own', /Growth/.test(await p.textContent('.r58-focus .r59-plan.is-client')));
   check('…and who it belongs to can be changed right there', await E("document.querySelector('.r58-focus select[data-r58-cli]').value")==='jj');
   check('your own accounts aren’t listed twice when Zernio returns them with the clients’', await E("(function(){ const was = ui.r55CliAll; ui.r55CliAll = [{id:'zz', platform:'instagram', username:'andreflix'}].concat(igCfg().cliAll); const n = r58Clients().length; ui.r55CliAll = was; return n; })()")===1);

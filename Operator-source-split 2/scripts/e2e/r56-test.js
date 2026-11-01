@@ -65,21 +65,23 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   // ---- the tasks ----
   const tasks = JSON.parse(await E("JSON.stringify(state.tasks.items.filter(t => t.master && t.master.kind==='pb' && t.master.id==='kk').map(t => [t.title, t.status, t.deadline]))"));
-  check('every step on it is a task (day 1 = her start, Oct 20): what’s due or late on today, later ones in the backlog with their date', tasks.some(t => /Onboarding call/.test(t[0]) && t[1]==='today') && tasks.some(t => t[0]==='Strategy doc' && t[1]==='backlog' && t[2]==='2026-10-31') && tasks.some(t => t[0]==='Weekly check-in'), tasks);
+  // (round 65: only Task steps are tasks; the call goes on the Calendar instead)
+  check('every step on it is a task (day 1 = her start, Oct 20): what’s due or late on today, later ones in the backlog with their date', !tasks.some(t => /Onboarding call/.test(t[0])) && tasks.some(t => t[0]==='Strategy doc' && t[1]==='backlog' && t[2]==='2026-10-31') && tasks.some(t => t[0]==='Weekly check-in'), tasks);
   await E("ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='overview'; renderView()"); await p.waitForTimeout(250);
-  check('…on Focus → Tasks', /Onboarding call/.test(await p.textContent('#viewRoot')));
+  check('…on Focus → Tasks', !/Onboarding call/.test(await p.textContent('#viewRoot')));  // (round 65: the call isn't a task)
   await E("ui.focusTasksSubTab='clientBacklog'; renderView()"); await p.waitForTimeout(250);
   const cbl = await p.textContent('#viewRoot');
-  check('…and in Client backlog, under the client, with Today and Done', /Kiko/.test(cbl) && /Strategy doc/.test(cbl) && /Onboarding call/.test(cbl) && (await p.$$('.pb6-cw [data-action="pb6Done"]')).length >= 3);
+  check('…and in Client backlog, under the client, with Today and Done', /Kiko/.test(cbl) && /Strategy doc/.test(cbl) && !/Onboarding call/.test(cbl) && (await p.$$('.pb6-cw [data-action="pb6Done"]')).length >= 2);  // (round 65: Task steps only)
   await p.click('.pb6-cw [data-action="pb6Today"]:not(.is-on)'); await p.waitForTimeout(150);
-  check('→ Today from there puts it on today', await E("state.tasks.items.filter(t => t.master && t.master.kind==='pb' && t.master.id==='kk' && t.status==='today').length") >= 2);
+  check('→ Today from there puts it on today', await E("state.tasks.items.filter(t => t.master && t.master.kind==='pb' && t.master.id==='kk' && t.status==='today').length") >= 1);  // (round 65: Task steps only)
 
   // ---- Board ----
   await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='board'; ui.pbWho='client'; ui.pbSel=pbAll()[1].id; renderView()"); await p.waitForTimeout(250);
   // (round 58: the board is the Playbooks overview: a column per playbook someone's on, everyone else at the bottom)
   // (round 64: the overview is a stage board: pick a playbook at the top, its stages are the columns, a tray for who's on none)
   check('Board: a column for each playbook someone’s on, and one for those not on any', (await p.$$('.r64-pbp')).length===(await E("pbAll().length")) && (await p.$$('.r64-board .r64-col')).length >= 1 && /JJS/.test(await p.textContent('.r64-tray')));
-  check('the cards say the day and what’s next', /Day 9/.test(await p.textContent('.pb6-board')) && /Onboarding call/.test(await p.textContent('.pb6-board')));
+  // (round 65: the call's day has passed, so it's done; next is the first Task / document step)
+  check('the cards say the day and what’s next', /Day 9/.test(await p.textContent('.pb6-board')) && /Strategy doc|Weekly check-in/.test(await p.textContent('.pb6-board')));
   // (round 64: drop someone on a playbook's pill to start them on it)
   await p.dragAndDrop('.r64-tray .pb6-card[data-pb6-drag="client:jj"]', '.r64-pbp[data-pb6-col="'+(await E("pbAll()[0].id"))+'"]'); await p.waitForTimeout(300);
   check('drag a client onto a playbook: they’re on it (day 1 their start date, for a stage that runs every month)', await E("crmFind('client', 'jj').pb.id===pbAll()[0].id && crmFind('client', 'jj').pb.start==='2026-01-05'"));

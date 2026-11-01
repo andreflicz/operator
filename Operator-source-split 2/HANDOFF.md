@@ -1,4 +1,4 @@
-# Operator app — continuity brief (updated 2026-11-01, after Round 64)
+# Operator app — continuity brief (updated 2026-11-01, after Round 65)
 
 ## What this is
 "Operator" is Andre's personal productivity app: business (clients, leads, MRR, deliverables, playbooks), focus (lock-in sessions, tasks), personal (goals, health, finances, journal, social), and Op, the AI assistant inside it. The UI and logic are one self-contained HTML page built from a source tree. It ships as a Mac app (Electron). The older Chrome-app-shell `.app` still exists in the repo as the source of the helper scripts.
@@ -12,7 +12,7 @@ Andre tests every build himself and comes back with detailed, itemized feedback,
 Design rules he set: "a bad app informs, a good one just has a great UI." Minimal, level, symmetrical; no small grey explainer text; one well-placed control rather than repeated buttons; consistent across features. Build features general ("not a just-me app").
 
 ## Where the code lives
-- GitHub: `andreflicz/operator`. Rounds 57–64 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
+- GitHub: `andreflicz/operator`. Rounds 57–65 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
 - Every commit ends with the session's Co-Authored-By / Claude-Session lines.
 - Layout inside `Operator-source-split 2/`:
 
@@ -41,6 +41,7 @@ src/js/32zNN-rXX.js         one file per update round, layered on top (see "Over
                             Round 63: 32z72-r63.js (Personal → Streaks: Today's standard + challenges)
                             Round 64: 32z73-r64.js (Op small tab, cut-off merge, unfiled updates, streak console, BMI,
                             Fuel, no cross-page glide, analytics range picker + range recap, Playbooks stage board)
+                            Round 65: 32z74-r65.js (SOP playbooks: task / call / doc; no reports; streaks redone; Op tab drag)
 scripts/build.py            src/ → dist/command-center-2.html (injects const OP_BUILT = <ms>)
 scripts/smoke-test.js       quick load check
 scripts/e2e/*-test.js       Playwright suites, one per round (common.js: instrument, newPage, check, report)
@@ -283,8 +284,27 @@ Other conventions:
 - **Playbooks overview**: playbook pills (count, Leads/Clients), the chosen playbook's stages as columns (`.r64-col`,
   `data-pb6-col="pbId|stageId"`, the Round 57 capture drop handler moves people), and a "Not on a playbook" tray.
 
+## Round 65 notes (the list is ROUND-65-LIST.md, with Andre's answers)
+- **Playbooks are SOPs**: `PB_TYPES` / `PB57_TYPES` are task, call ("Call / event"), doc. `r65Clean()` (every pbSync)
+  deletes Report / Access / Send steps from every playbook and removes any open pb task whose step isn't a Task.
+  The presets drop those steps (`r60Sp` returns null, `r60St` filters).
+- **Only Task steps make tasks**: pbSync runs with `R65.inSync`, and pbState then hands it only Task occurrences (open
+  is still all steps, so a stage waits for everything). After the sync, `r65AfterSync`: each client's open call within 60
+  days becomes a Calendar event (`r65pb` = step key; `x.pb.r65ev` remembers it, `x.pb.ev` links it so the step follows
+  the event); a call whose day has passed is done; a stage with everything done moves on.
+- **Documents**: listed on the person's playbook card (`.r65-docs`, link icon for http links, ✓ = `r65DocDone`).
+- **No reports**: r55Report / r57CliExport are no-ops, their buttons are removed after every render, the
+  `client_report` Op tool is gone.
+- **Streaks**: End / Restart call `uiConfirm({title, text})` (they passed a string: the box was empty). The tab is
+  `r63Tab` → `.r65s` (run card with a day ring + today's rules + chain, the standard, five start cards, past streaks,
+  "How streaks stick" as a sheet).
+- **Today**: the streak panel's left side is the day streak + hours worked this week (`.sw-tw`, added if missing,
+  "Start one today" removed); a streak's rules are ordinary `.chip`s in Today's standard.
+- **Op's tab**: placed by `r65OpPlace` (saved `state.profile.r65OpPos`, default bottom center of the main area), dragged
+  by any part but its buttons; double-click puts it back. **Activity pill**: `.ap-warn` ("?") hidden.
+
 ## Removed (don't bring back)
-GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
+GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports (R65, until they're redone); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
 
 ## The helpers (127.0.0.1 only)
 `bridge.pl` (perl) listens and hands each request to `helper.sh`: **8935, wake** (alarms, music, TTS, the Anthropic proxy, Scribe STT); **8934, activity** (serves `activity.log`). Keys live in `~/Library/Application Support/Operator/*.key` (mode 600). Bump the helper version in `/ping` and `OP_HELPER_NEEDS` together whenever routes change.
@@ -305,6 +325,7 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent);
 - main.js: single instance, menu bar Tray, ⌥O show/hide, ✕ hides, ⌘Q quits, starts the helpers, move-in from the old Chrome profile, `window.operatorPage` bridge.
 
 ## Status
+Round 65 (2026-11-01): ROUND-65-LIST.md (9 items). Mac 3.8.0.
 Round 64 (2026-11-01): ROUND-64-LIST.md (13 items). Mac 3.7.0.
 Round 63 (2026-11-01): ROUND-63-LIST.md (Streaks). Mac 3.6.0 carries Rounds 62 and 63.
 Round 62 (2026-11-01): ROUND-62-LIST.md (12 items).

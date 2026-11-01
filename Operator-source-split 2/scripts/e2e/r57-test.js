@@ -31,8 +31,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Build: the stages across the top, no weekly row, no day calendar first', (await p.$$('.pb57-st:not(.is-add)')).length===3 && !(await p.$('.pb6-week')) && !(await p.$('.pb6-cal')) && !!(await p.$('.pb57-list')));
   // steps on Onboarding
   await E(`(function(){ const P = pbAll()[0], S = pbStages(P);
-    S[0].days = 7; S[0].steps.push(pb57Step('Onboarding call', 'call', {rule:'enter'}), pb57Step('Strategy doc', 'doc', {rule:'day', n:5}), pb57Step('Kick-off', 'task', {rule:'end'}));
-    S[1].repeat = 'month'; S[1].steps.push(pb57Step('Monthly report', 'report', {rule:'end'}), pb57Step('Sales call review', 'task', {rule:'before', n:3}));
+    S[0].days = 7; S[0].steps.push(pb57Step('Onboarding call', 'call', {rule:'enter'}), pb57Step('Strategy doc', 'task', {rule:'day', n:5}) /* (round 65: only Task steps are tasks) */, pb57Step('Kick-off', 'task', {rule:'end'}));
+    S[1].repeat = 'month'; S[1].steps.push(pb57Step('Monthly report', 'task', {rule:'end'}) /* (round 65: no Report steps) */, pb57Step('Sales call review', 'task', {rule:'before', n:3}));
     S[2].steps.push(pb57Step('Save call', 'call', {rule:'enter'}));
     pbSave(); renderView(); })()`);
   check('steps say when they’re due: when they enter, a day, the last day, N days before the end', /When they enter/.test(await p.textContent('.pb57-list')) && /Day 5/.test(await p.textContent('.pb57-list')) && /Last day/.test(await p.textContent('.pb57-list')));
@@ -44,12 +44,13 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   const kt = () => E("JSON.stringify(state.tasks.items.filter(t => t.master && t.master.kind==='pb' && t.master.id==='kk').map(t => [t.title, t.status, t.deadline]))").then(JSON.parse);
   let ts = await kt();
   check('on it at the stage she’s at (Onboarding), from her start date', await E("crmFind('client','kk').pb.stage===pbStages(pbAll()[0])[0].id && crmFind('client','kk').pb.enteredAt==='2026-10-26'"));
-  check('entering the stage puts its steps on the list (a call with nothing booked is “Book: …”)', ts.some(t => t[0]==='Book: Onboarding call' && t[1]==='today') && ts.some(t => t[0]==='Strategy doc' && t[2]==='2026-10-30') && ts.some(t => t[0]==='Kick-off' && t[2]==='2026-11-01'), ts);
+  // (round 65: only Task steps go on the list; the call goes on the Calendar, with her name)
+  check('entering the stage puts its steps on the list (a call with nothing booked is “Book: …”)', !ts.some(t => /Onboarding call/.test(t[0])) && ts.some(t => t[0]==='Strategy doc' && t[2]==='2026-10-30') && ts.some(t => t[0]==='Kick-off' && t[2]==='2026-11-01') && await E("(function(){ const c = crmFind('client','kk'), s = pbState('client', c); return state.calendar.events.some(e => e.r65pb && e.linkedClient==='kk' && /Onboarding call/.test(e.title)) || s.occ.some(o => o.it.title==='Onboarding call' && o.done); })()"), ts);
   // move them around, rename, reschedule: it sticks
-  await E(`(function(){ const f = n => state.tasks.items.find(t => t.title===n); const a = f('Book: Onboarding call'), d = f('Strategy doc'), k = f('Kick-off');
-    a.status = 'backlog'; d.status = 'today'; d.title = 'Kiko strategy (v2)'; k.deadline = '2026-11-09'; persist('tasks'); masterTasksSync(); masterTasksSync(); })()`);
+  await E(`(function(){ const f = n => state.tasks.items.find(t => t.title===n); const d = f('Strategy doc'), k = f('Kick-off');
+    k.status = 'backlog'; d.status = 'today'; d.title = 'Kiko strategy (v2)'; k.deadline = '2026-11-09'; persist('tasks'); masterTasksSync(); masterTasksSync(); })()`);
   ts = await kt();
-  check('moved to the backlog, it stays there (no snapping back to Today)', ts.some(t => t[0]==='Book: Onboarding call' && t[1]==='backlog'), ts);
+  check('moved to the backlog, it stays there (no snapping back to Today)', ts.some(t => t[0]==='Kick-off' && t[1]==='backlog'), ts);  // (round 65: the call isn't a task; Kick-off instead)
   check('renamed and moved to Today, it keeps its name and its place', ts.some(t => t[0]==='Kiko strategy (v2)' && t[1]==='today'), ts);
   check('rescheduled, it keeps the new date', ts.some(t => t[0]==='Kick-off' && t[2]==='2026-11-09'), ts);
   // Good Morning / Lock in pick a task by setting it to today: same rule
@@ -246,7 +247,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Socials → Clients: a client’s month of numbered reels on their posting days, done from what’s delivered', await E("(function(){ const pl = r57ContentPlan(crmFind('client', 'jj')); return pl.length===monthlyTargetFor(crmFind('client', 'jj').deliverables[0]) && pl[0].what==='8 reel' && pl.filter(x => x.st==='done').length===2 && pl.every(x => ['1', '3', '5'].indexOf(String(new Date(x.date+'T12:00').getDay())) >= 0); })()"));
   // (round 58: the Clients tab is gone; tap the client's account on Social → Overview)
   await E("igCfg().accounts = [{id:'o1', role:'business', username:'commenccollective', src:'zernio'}]; igCfg().cliAll = [{id:'c1', platform:'instagram', username:'jjs_build'}]; ui.r55CliAll = null; ui.r55CliTried = true; r55CliLinks().c1 = 'jj'; ui.view='convos'; ui.socTab='overview'; ui.r58Acct='c1'; renderView()"); await p.waitForTimeout(250);
-  check('…one client at a time, their calendar, their report and an export, right there', !!(await p.$('.r58-focus .r57-cc-g')) && !!(await p.$('.r58-focus [data-action="r55Report"][data-id="jj"]')) && !!(await p.$('.r58-focus [data-action="r57CliExport"]')));
+  // (round 65: reports and the export are out of the app until they're redone)
+  check('…one client at a time, their calendar, their report and an export, right there', !!(await p.$('.r58-focus .r57-cc-g')) && !(await p.$('.r58-focus [data-action="r55Report"]')) && !(await p.$('.r58-focus [data-action="r57CliExport"]')));
   check('…the export is something to send them (what, when, delivered or not)', /8 reel 1\s.*·\s+(Delivered|Coming|Today|Planned)/.test(await E("r57CliExportText(crmFind('client', 'jj'))")));
   await E("ui.view='today'; renderView(); AI.hasKey = false; opBubShow()"); await p.waitForTimeout(150);
   check('Op’s bubble: one Open (full screen, his chats there), one Turn Op off, and ✕', !!(await p.$('#opBub .r57-bub-open')) && !!(await p.$('#opBub .r57-bub-off')) && (await p.$$('#opBub .op-bub-h > button:not(.r57-gone):not(.r64-st), #opBub .op-bub-h .op-bub-ics button:not(.r57-gone)')).length===3);  // (round 64: plus his state, .r64-st)

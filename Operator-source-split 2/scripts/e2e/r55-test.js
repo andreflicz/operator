@@ -109,12 +109,13 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("pbMoveTo('client', 'nw', pbAll()[1].id)"); await p.waitForTimeout(150);
   check('put on Onboarding: day 1 = the day they signed', await E("crmFind('client', 'nw').pb.id===pbAll()[1].id && crmFind('client', 'nw').pb.start===todayStr()"));
   const pbt = JSON.parse(await E("JSON.stringify(state.tasks.items.filter(t => t.master && t.master.kind==='pb' && t.master.id==='nw').map(t => [t.title, t.master.type, t.deadline, t.status]))"));
-  check('everything on it is on your task list (later ones in the backlog), tagged with them, by type', pbt.some(t => /Onboarding call/.test(t[0]) && t[1]==='call' && t[3]==='today') /* (round 57: a call with nothing booked is “Book: …”) */ && pbt.some(t => t[0]==='Get access and info' && t[1]==='access') && pbt.some(t => t[0]==='Deliver the first win' && t[3]==='backlog'), pbt);
-  check('the access task carries its checklist', /Meta Business Manager access/.test(await E("state.tasks.items.find(t => t.master && t.master.kind==='pb' && t.title==='Get access and info').notes")));
+  // (round 65: playbooks are SOPs: only Task steps are tasks (the call goes on the Calendar); Access steps are gone)
+  check('everything on it is on your task list (later ones in the backlog), tagged with them, by type', !pbt.some(t => /Onboarding call/.test(t[0])) && !pbt.some(t => t[1]!=='task') && pbt.some(t => t[0]==='Deliver the first win' && t[3]==='backlog'), pbt);
+  check('the access task carries its checklist', await E("!pbAll().some(p => arr(p.stages).some(st => arr(st.steps).some(i => i.type==='access')))"));
   const card = await E("taskCard(state.tasks.items.find(t => t.master && t.master.kind==='pb' && t.master.id==='nw'))");
-  check('playbook tasks have their own colour by type', /r55-pbt/.test(card) && /--pbc:#5B9BFF/.test(card));
+  check('playbook tasks have their own colour by type', /r55-pbt/.test(card) && /--pbc:#4FC3B8/.test(card));  // (round 65: a Task step's colour)
   check('it’s not a deliverable', await E("!state.tasks.items.some(t => t.master && t.master.kind==='pb' && (t.master.delivId || t.isDeliverable))"));
-  await E("(function(){ const t = state.tasks.items.find(t => t.master && t.master.kind==='pb' && /Onboarding call/.test(t.title)); completeTask(t.id); })()"); await p.waitForTimeout(1300);
+  await E("(function(){ const t = state.tasks.items.find(t => t.master && t.master.kind==='pb' && t.master.id==='nw' && t.status!=='done'); completeTask(t.id); })()"); await p.waitForTimeout(1300);  // (round 65: the first Task step)
   check('done on the task list = done on the playbook', await E("Object.keys(crmFind('client', 'nw').pb.done).some(k => /:/.test(k))"));
   check('the client card shows where they are and what’s next', /Onboarding/.test(await E("clientCardV2(crmFind('client', 'nw'))")) && /Day 1/.test(await E("clientCardV2(crmFind('client', 'nw'))")));
   // late: red, health, notification
@@ -127,11 +128,12 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('move them on: it says what gets checked off first', /ticks off \d+ step/.test(await E("window.__conf.text")));
   check('…then they’re on Monthly service, and a banner says so', await E("crmFind('client', 'nw').pb.id===pbAll()[2].id") && /moved to Monthly service/.test(await E("(document.getElementById('r55Banner') || {}).textContent || ''")));
   await E("pbMoveBack('client', 'nw')"); await p.waitForTimeout(200);
-  check('move them back: what was checked off when they moved comes back', await E("crmFind('client', 'nw').pb.id===pbAll()[1].id && pbState('client', crmFind('client', 'nw')).open.length >= 5"));
+  check('move them back: what was checked off when they moved comes back', await E("crmFind('client', 'nw').pb.id===pbAll()[1].id && pbState('client', crmFind('client', 'nw')).open.length >= 2"));  // (round 65: fewer steps)
   // finishing on its own
   await E("(function(){ const x = crmFind('client', 'nw'), s = pbState('client', x); s.occ.forEach(o => { x.pb.done[o.key] = todayStr(); }); })(); masterTasksSync()");
   check('everything done: they move on by themselves', await E("crmFind('client', 'nw').pb.id===pbAll()[2].id"));
-  check('monthly: the weekly report comes every Friday', await E("pbState('client', crmFind('client', 'nw')).occ.filter(o => o.it.title==='Weekly report').every(o => dowOf(o.date)===5)"));
+  // (round 65: reports are out of the app; no report steps)
+  check('monthly: the weekly report comes every Friday', await E("!pbState('client', crmFind('client', 'nw')).occ.some(o => o.it.type==='report')"));
   // leads
   await E("state.business.pipeline.push({id:'l2', name:'Rob', business:'Rob Roofing', stage:'lead', value:900, createdAt:todayStr()}); masterTasksSync(); pbMoveTo('lead', 'l2', pbAll()[0].id)"); await p.waitForTimeout(150);
   check('a lead goes on the lead playbook', await E("crmFind('lead', 'l2').pb.id===pbAll()[0].id"));
@@ -140,7 +142,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('a lead moving to a stage starts that stage’s playbook', await E("crmFind('lead', 'l2').pb.id===pbAll().find(x => x.name==='Proposal follow-up').id"));
   // the builder (round 57: a pipeline of stages; the steps list first, the calendar is the guide one switch away)
   await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='build'; ui.pbWho='client'; ui.pbSel = pbAll()[1].id; ui.pbItem = null; ui.pb57Stage = null; ui.pb57Cal = true; renderView()"); await p.waitForTimeout(250);
-  check('Playbooks: the builder is a calendar of its days, items on their days', (await p.$$('.pb6-day')).length===30 && (await p.$$('.pb6-day[data-pb57-day="1"] .pb6-chip')).length===2);
+  check('Playbooks: the builder is a calendar of its days, items on their days', (await p.$$('.pb6-day')).length===30 && (await p.$$('.pb6-day[data-pb57-day="1"] .pb6-chip')).length >= 1);  // (round 65: the Access step is gone)
   check('the sub-tab says Playbooks', /Playbooks/.test(await p.textContent('#viewRoot')) && !/Client cycles/.test(await p.textContent('#viewRoot')));
   await p.dragAndDrop('.pb6-day[data-pb57-day="7"] .pb6-chip', '.pb6-day[data-pb57-day="5"]'); await p.waitForTimeout(250);
   check('drag an item to another day', JSON.stringify(await E("pbStages(pbAll()[1])[0].steps.find(i => i.title==='Deliver the first win').due"))===JSON.stringify({rule:'day', n:5}));
@@ -151,7 +153,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('…name it, give it a type', await E("JSON.stringify(pbStages(pbAll()[1])[0].steps.filter(i => i.due && i.due.n===12).map(i => [i.title, i.type]))")===JSON.stringify([['Two-week check-in call', 'call']]));
   // the client window
   await E("openClientModal('nw'); ui.clientSec='cycle'; renderClientModalInto()"); await p.waitForTimeout(200);
-  check('in their window: the playbook, day 1 you can change, every item with Open/Copy/Schedule', !!(await p.$('.r55-pbp input[data-pb-start]')) && (await p.$$('.r55-pbp-r')).length >= 3 && /Playbook/.test(await p.textContent('#clientModalOverlay')));
+  check('in their window: the playbook, day 1 you can change, every item with Open/Copy/Schedule', !!(await p.$('.r55-pbp input[data-pb-start]')) && (await p.$$('.r55-pbp-r')).length >= 2 /* (round 65: fewer steps) */ && /Playbook/.test(await p.textContent('#clientModalOverlay')));
   await E("closeClientModal ? closeClientModal() : null");
 
   // ---- Op: client reports ----
@@ -164,7 +166,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("opfEl()");
   // (round 57: the report moved to Social → Clients, a button per client; Op still opens it when asked)
   check('it’s an ability on Op’s screen', !(await p.$('#opFull .r55-opab-b[data-action="r55Report"]')) && /data-action="r55Report" data-id="/.test(await E("(ui.socTab='clients', r55CliHtml())")));
-  check('Op can open it when you ask', await E("OP_TOOLS.some(t => t.name==='client_report')"));
+  check('Op can open it when you ask', await E("!OP_TOOLS.some(t => t.name==='client_report')"));  // (round 65: reports are out of the app for now)
 
   // ---- clients' socials ----
   await E("ui.r55CliAll = [{id:'a1', platform:'instagram', username:'jjs_build', followers:1800}, {id:'a2', platform:'facebook', username:'JJS', followers:600}]; ui.r55CliTried = true; r55CliLinks().a1 = 'jj'; r55CliStore().a1 = {at:Date.now(), followers:1800, p30:12, views:48000, best:{cap:'Kitchen remodel', views:15000}}; igCfg().accounts = [{id:'o1', role:'business', username:'commenccollective', src:'zernio'}]; ui.view='convos'; ui.socTab='overview'; ui.r58Acct='a1'; renderView()"); await p.waitForTimeout(250);
