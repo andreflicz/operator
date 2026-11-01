@@ -297,3 +297,184 @@ renderClientJournalComposeCard = function(){
   '</div>';
 };
 document.addEventListener('change', function(e){ if(e.target && e.target.id==='journalTabClientSelect'){ ui.journalTabClientId = e.target.value; renderView(); } });
+
+// ================= G20. Holidays: on every scene, more of them, and music =================
+// The scene layer painted over the holiday decorations (they only showed on Minimal); now they sit above it. The
+// banner gets its own place at the top of Today, with a button for the holiday's music. New holidays: New Year,
+// Valentine's, St. Patrick's, Easter and the Fourth of July.
+function r60Easter(y){ const a = y % 19, b = Math.floor(y/100), c = y % 100, d = Math.floor(b/4), e = b % 4, f = Math.floor((b + 8)/25), g = Math.floor((b - f + 1)/3), h = (19*a + b - d - g + 15) % 30, i = Math.floor(c/4), k = c % 4, l = (32 + 2*e + 2*i - h - k) % 7, m = Math.floor((a + 11*h + 22*l)/451), mo = Math.floor((h + l - 7*m + 114)/31), da = ((h + l - 7*m + 114) % 31) + 1; return y+'-'+pad2(mo)+'-'+pad2(da); }
+holToday = (function(base){
+  return function(d){
+    const h = base.apply(this, arguments); if(h) return h;
+    d = d || todayStr(); const md = d.slice(5), y = Number(d.slice(0, 4));
+    if(md==='12-31' || md==='01-01') return 'newyear';
+    if(md==='02-14') return 'valentines';
+    if(md==='03-17') return 'stpatricks';
+    const ea = r60Easter(y); if(d >= addDays(ea, -2) && d <= ea) return 'easter';
+    if(md==='07-04') return 'july4';
+    return null;
+  };
+})(holToday);
+Object.assign(HOL, {
+  newyear:{k:'Happy New Year', h:function(n){ return 'New year, same mission, '+n+'.'; }},
+  valentines:{k:'Valentine’s Day', h:function(){ return 'Love what you’re building.'; }},
+  stpatricks:{k:'St. Patrick’s Day', h:function(){ return 'Make your own luck.'; }},
+  easter:{k:'Happy Easter', h:function(){ return 'Fresh start, fresh push.'; }},
+  july4:{k:'Fourth of July', h:function(){ return 'Independence, earned.'; }}
+});
+holFxHtml = (function(base){
+  return function(h){
+    const fall = function(glyphs, n, colors){ let s = ''; for(let i = 0; i < n; i++){ const R = function(k, m){ return (((i + k)*9301 + 49297) % 233280)/233280*m; }; s += '<i class="r60-fall" style="--x:'+R(1, 100).toFixed(1)+'%;--d:'+(9 + R(2, 9)).toFixed(1)+'s;--dl:-'+R(3, 14).toFixed(1)+'s;--z:'+(14 + Math.round(R(4, 14)))+'px;--c:'+colors[i % colors.length]+'">'+glyphs[i % glyphs.length]+'</i>'; } return s; };
+    const sub = state.profile.holidayIntensity==='subtle', k = sub ? .5 : 1;
+    if(h==='newyear' || h==='july4') return '<div class="r60-fw">'+[12, 34, 58, 80, 46].slice(0, sub ? 3 : 5).map(function(x, i){ return '<i style="--x:'+x+'%;--dl:'+(i*1.3).toFixed(1)+'s;--c:'+(h==='july4' ? ['#ff4d5e', '#ffffff', '#4d8bff'][i % 3] : ['#FFD86B', '#ffffff', '#C9A4FF'][i % 3])+'"></i>'; }).join('')+'</div>'+fall(['✦', '·', '✧'], Math.round(24*k), h==='july4' ? ['#ff4d5e', '#fff', '#4d8bff'] : ['#FFD86B', '#fff', '#C9A4FF']);
+    if(h==='valentines') return fall(['❤', '♥', '❥'], Math.round(22*k), ['#FF5A8A', '#FF8FB1', '#FFC2D4']);
+    if(h==='stpatricks') return fall(['☘', '✤', '☘'], Math.round(22*k), ['#3DDC97', '#7EE0A8', '#F5D547']);
+    if(h==='easter') return fall(['❀', '✿', '●'], Math.round(22*k), ['#FFC2D4', '#C9E8FF', '#FFF0A8', '#D6F5C8']);
+    return base.apply(this, arguments);
+  };
+})(holFxHtml);
+// (the banner: out of the hero, across the top of Today, with the music button)
+function r60Cut(h, marker){
+  const i = h.indexOf(marker); if(i < 0) return null;
+  let depth = 0, j = -1; const re = /<\/?div\b[^>]*>/g; re.lastIndex = i; let m;
+  while((m = re.exec(h))){ depth += m[0][1]==='/' ? -1 : 1; if(depth===0){ j = re.lastIndex; break; } }
+  return j > i ? {html:h.slice(i, j), rest:h.slice(0, i)+h.slice(j)} : null;
+}
+renderToday = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    const cut = r60Cut(h, '<div class="hol-ban'); if(!cut) return h;
+    const hol = holActive(), on = R60.music && R60.music.h===hol;
+    const ban = cut.html.replace(/<\/div>$/, '<button class="r60-holm'+(on ? ' is-on' : '')+'" data-action="r60HolMusic">'+(on ? '&#10074;&#10074; Pause the music' : '&#9835; Holiday music')+'</button></div>');
+    return ban+cut.rest;
+  };
+})(renderToday);
+// the music: a short, gentle tune for each holiday, played by the app itself (no files), looping softly
+const R60_TUNES = {
+  halloween:{bpm:96, wave:'triangle', n:[['E4',1],['G4',1],['B4',1],['C5',2],['B4',1],['G4',1],['E4',2],['D#4',1],['F#4',1],['A4',1],['B4',2],['A4',1],['F#4',1],['D#4',2]]},
+  thanksgiving:{bpm:88, wave:'sine', n:[['G4',1],['A4',1],['B4',2],['D5',1],['B4',1],['A4',2],['G4',1],['E4',1],['G4',2],['A4',1],['G4',1],['E4',1],['D4',3]]},
+  christmas:{bpm:132, wave:'triangle', n:[['E5',1],['E5',1],['E5',2],['E5',1],['E5',1],['E5',2],['E5',1],['G5',1],['C5',1.5],['D5',.5],['E5',4],['F5',1],['F5',1],['F5',1.5],['F5',.5],['F5',1],['E5',1],['E5',1],['E5',.5],['E5',.5],['E5',1],['D5',1],['D5',1],['E5',1],['D5',2],['G5',2]]},
+  birthday:{bpm:104, wave:'triangle', n:[['G4',.75],['G4',.25],['A4',1],['G4',1],['C5',1],['B4',2],['G4',.75],['G4',.25],['A4',1],['G4',1],['D5',1],['C5',2]]},
+  newyear:{bpm:120, wave:'sine', n:[['C5',1],['E5',1],['G5',1],['C6',2],['G5',1],['E5',1],['C5',2],['D5',1],['F5',1],['A5',1],['D6',3]]},
+  valentines:{bpm:84, wave:'sine', n:[['A4',1],['C#5',1],['E5',2],['F#5',1],['E5',1],['C#5',2],['D5',1],['C#5',1],['B4',1],['A4',3]]},
+  stpatricks:{bpm:150, wave:'triangle', n:[['D5',.5],['E5',.5],['F#5',1],['A5',1],['F#5',1],['E5',.5],['D5',.5],['B4',1],['D5',1],['A4',2]]},
+  easter:{bpm:100, wave:'sine', n:[['C5',1],['D5',1],['E5',1],['G5',2],['E5',1],['D5',1],['C5',2],['A4',1],['C5',1],['D5',3]]},
+  july4:{bpm:116, wave:'triangle', n:[['G4',1],['C5',1],['E5',1],['G5',2],['E5',1],['C5',1],['D5',1],['F5',1],['A5',2],['G5',3]]}
+};
+function r60Hz(n){ const m = /^([A-G])(#?)(\d)$/.exec(n); if(!m) return 440; const i = {C:-9, D:-7, E:-5, F:-4, G:-2, A:0, B:2}[m[1]] + (m[2] ? 1 : 0) + (Number(m[3]) - 4)*12; return 440*Math.pow(2, i/12); }
+function r60MusicStop(){ const M = R60.music; if(!M) return; clearTimeout(M.t); try{ M.g.gain.setTargetAtTime(0, M.ctx.currentTime, .15); setTimeout(function(){ try{ M.ctx.close(); }catch(e){} }, 600); }catch(e){} R60.music = null; }
+function r60MusicPlay(h){
+  r60MusicStop();
+  const T = R60_TUNES[h]; if(!T) return;
+  const Ctx = window.AudioContext || window.webkitAudioContext; if(!Ctx) return;
+  const ctx = new Ctx(), g = ctx.createGain(); g.gain.value = .07; g.connect(ctx.destination);
+  const M = R60.music = {h:h, ctx:ctx, g:g, t:null};
+  const beat = 60/T.bpm;
+  const loop = function(){
+    if(R60.music!==M) return;
+    let t = ctx.currentTime + .05, total = 0;
+    T.n.forEach(function(x){ const dur = x[1]*beat, o = ctx.createOscillator(), e = ctx.createGain(); o.type = T.wave; o.frequency.value = r60Hz(x[0]); e.gain.setValueAtTime(0, t); e.gain.linearRampToValueAtTime(1, t + .02); e.gain.exponentialRampToValueAtTime(.001, t + Math.max(.12, dur*.95)); o.connect(e); e.connect(g); o.start(t); o.stop(t + dur); t += dur; total += dur; });
+    M.t = setTimeout(loop, (total + beat*2)*1000);
+  };
+  loop();
+}
+ACTIONS.r60HolMusic = function(){ const h = holActive(); if(R60.music && R60.music.h===h) r60MusicStop(); else r60MusicPlay(h); renderView(); };
+
+// ================= G21. Day streak and Today's Standard: one panel =================
+PANEL_RENDERERS.personalStats = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    const m = /<div class="card" style="text-align:center;margin-top:10px;"><div class="kpi-label"[^>]*>Today's Standard<\/div>(<div class="row"[^>]*>[\s\S]*?<\/div>)<\/div>/.exec(h);
+    if(!m || h.indexOf('<div class="sw-wrap">') < 0) return h;
+    const rest = h.replace(m[0], '');
+    const std = '<div class="r60-std"><span class="r60-std-k">Today’s standard</span>'+m[1].replace('<div class="row"', '<div class="r60-std-c"')+'</div>';
+    const cut = r60Cut(rest, '<div class="sw '); if(!cut) return h;
+    const i = rest.indexOf('<div class="sw ');
+    return rest.slice(0, i)+cut.html.replace(/<\/div>$/, std+'</div>')+rest.slice(i + cut.html.length);
+  };
+})(PANEL_RENDERERS.personalStats);
+
+// ================= G22–23. Today's panels are widgets =================
+// Every panel sits on a 12-column grid. In Customize (the pencil on Today) each one has sizes (S, M, L, Full), drag it
+// by its title to move it, or drag its right edge to make it wider or narrower. Your layout is kept.
+const R60_SPAN_DEF = {personalStats:12, tasks:12, clientHub:12, week:12, journal:6, vision:6, business:12, goals:12, why:12, focusMini:6, calendarMini:6, clock:6, social:6, agenda:6};
+function r60Spans(){ const d = state.dashboardPanels; if(!d.r60Span || typeof d.r60Span!=='object') d.r60Span = {}; return d.r60Span; }
+function r60Span(pid){ const s = Number(r60Spans()[pid]); return s >= 3 && s <= 12 ? s : (R60_SPAN_DEF[pid] || 6); }
+SMALL_PANELS.length = 0;   // (no more fixed "small" rows: every panel sizes itself)
+Object.keys(PANEL_RENDERERS).forEach(function(pid){
+  const fn = PANEL_RENDERERS[pid]; if(pid==='heatmap') return;
+  PANEL_RENDERERS[pid] = function(){ const h = fn.apply(this, arguments); if(!h || todayEditing()) return h; return '<div class="r60w" data-wid="'+pid+'" style="--span:'+r60Span(pid)+'">'+h+'</div>'; };
+});
+todayEditWrap = (function(base){
+  return function(pid, inner, idx, count){
+    const s = r60Span(pid), b = function(n, l){ return '<button class="r60-sz'+(s===n ? ' is-on' : '')+'" data-action="r60Size" data-id="'+pid+'|'+n+'">'+l+'</button>'; };
+    const h = base.apply(this, arguments).replace('<div class="ll-head">', '<div class="ll-head" draggable="true" data-r60-drag="'+pid+'"><span class="r60-grip">&#8942;&#8942;</span>').replace('<button class="ll-ctl ll-hide"', '<span class="r60-szs">'+b(4, 'S')+b(6, 'M')+b(8, 'L')+b(12, 'Full')+'</span><button class="ll-ctl ll-hide"');
+    return '<div class="r60w is-edit" data-wid="'+pid+'" style="--span:'+s+'">'+h+'<span class="r60-rs" data-r60-rs="'+pid+'" aria-hidden="true"></span></div>';
+  };
+})(todayEditWrap);
+ACTIONS.r60Size = function(el, e, v){ const q = String(v).split('|'); r60Spans()[q[0]] = Number(q[1]); persist('dashboardPanels'); playTick(); renderView(); };
+// drag a widget by its title to move it
+document.addEventListener('dragstart', function(e){ const hd = e.target.closest && e.target.closest('[data-r60-drag]'); if(!hd) return; e.dataTransfer.setData('text/r60w', hd.getAttribute('data-r60-drag')); e.dataTransfer.effectAllowed = 'move'; const w = hd.closest('.r60w'); if(w) w.classList.add('is-drag'); });
+document.addEventListener('dragend', function(){ document.querySelectorAll('.r60w.is-drag, .r60w.is-over').forEach(function(x){ x.classList.remove('is-drag', 'is-over'); }); });
+document.addEventListener('dragover', function(e){ const w = e.target.closest && e.target.closest('.r60w.is-edit'); if(!w || !Array.from(e.dataTransfer.types || []).includes('text/r60w')) return; e.preventDefault(); document.querySelectorAll('.r60w.is-over').forEach(function(x){ if(x!==w) x.classList.remove('is-over'); }); w.classList.add('is-over'); });
+document.addEventListener('drop', function(e){
+  const w = e.target.closest && e.target.closest('.r60w.is-edit'); if(!w) return;
+  const id = e.dataTransfer.getData('text/r60w'), to = w.getAttribute('data-wid'); if(!id || id===to) return; e.preventDefault();
+  const L = state.dashboardPanels.order, a = L.indexOf(id); if(a < 0) return; L.splice(a, 1); L.splice(L.indexOf(to), 0, id);
+  persist('dashboardPanels'); playTick(); renderView();
+});
+// drag the right edge to size it (it snaps to the columns)
+document.addEventListener('mousedown', function(e){
+  const hd = e.target.closest && e.target.closest('[data-r60-rs]'); if(!hd) return; e.preventDefault();
+  const pid = hd.getAttribute('data-r60-rs'), w = hd.closest('.r60w'), grid = w.parentNode, gr = grid.getBoundingClientRect(), col = gr.width/12, left = w.getBoundingClientRect().left;
+  w.classList.add('is-sizing');
+  let cur = 0;
+  const mv = function(ev){ const n = Math.max(3, Math.min(12, Math.round((ev.clientX - left)/col))); cur = n; const el = document.querySelector('.r60w[data-wid="'+pid+'"]') || w; el.style.setProperty('--span', n); };
+  const up = function(){ document.removeEventListener('mousemove', mv, true); document.removeEventListener('mouseup', up, true); w.classList.remove('is-sizing'); R60.sizedAt = Date.now(); const n = cur; if(n){ r60Spans()[pid] = n; persist('dashboardPanels'); } renderView(); };
+  document.addEventListener('mousemove', mv, true); document.addEventListener('mouseup', up, true);
+}, true);
+document.addEventListener('click', function(e){ if(R60.sizedAt && Date.now() - R60.sizedAt < 400){ e.preventDefault(); e.stopPropagation(); R60.sizedAt = 0; } }, true);   // (the click that ends a resize does nothing else)
+// (the Customize button says what it does)
+pageEditBtnHtml = (function(base){ return function(action, on){ const h = base.apply(this, arguments); return action==='toggleTodayEdit' ? h.replace(/(<button[^>]*>)[\s\S]*?(<\/button>)/, '$1'+(on ? '&#10003; Done' : '&#9998; Customize')+'$2') : h; }; })(pageEditBtnHtml);
+
+// ================= G24. Log center: a date to reach out =================
+// Each row gets a date: pick the day you'll reach out to them next (it replaces their usual rhythm until you do).
+logCenterHtml = (function(base){
+  return function(){
+    return base.apply(this, arguments).replace(/(<div class="lc-row[^"]*" data-key="(lcl?)-([^"]+)">[\s\S]*?<span class="lc-due[^"]*">[\s\S]*?)(<\/span>)/g, function(m0, a, k, id, b){
+      const kind = k==='lcl' ? 'lead' : 'client', x = crmFind(kind, id); if(!x) return m0;
+      const fu = x.followUp && x.followUp.date ? x.followUp.date : '';
+      return a+'<label class="r60-fu'+(fu ? ' is-set' : '')+'" data-hov="Pick the day to reach out"><span>'+(fu ? escapeHtml(fmtDateShort(fu)) : '&#128197;')+'</span><input type="date" data-r60-fu="'+kind+':'+id+'" value="'+fu+'"></label>'+b;
+    });
+  };
+})(logCenterHtml);
+document.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.hasAttribute || !t.hasAttribute('data-r60-fu')) return;
+  const q = t.getAttribute('data-r60-fu').split(':'), x = crmFind(q[0], q[1]); if(!x) return;
+  if(t.value) x.followUp = Object.assign({}, x.followUp || {}, {date:t.value}); else delete x.followUp;
+  persist('business'); playTick(); showToast(t.value ? 'Reach out to '+crmName(q[0], x)+' on '+fmtDateShort(t.value)+'.' : 'Back to their usual rhythm.', {icon:'&#128197;'}); renderView();
+});
+
+// ================= G25–26. Calendar: a settings button (check-ins, check-outs, goals), and the week =================
+// The week runs Monday to Sunday everywhere (Oct 26 was a Monday); the menu says the dates.
+function r60WeekRange(){ const s = startOfWeekStr(todayStr()); return fmtDateShort(s)+' – '+fmtDateShort(addDays(s, 6)); }
+function r60CalSetHtml(){
+  const wk = periodKey('week'), mk = monthKey(), due = typeof checkoutDue==='function' ? checkoutDue() : [];
+  const row = function(act, id, label, sub){ return '<button class="r60-cso" data-action="'+act+'" data-id="'+id+'"><b>'+label+'</b>'+(sub ? '<small>'+sub+'</small>' : '')+'</button>'; };
+  return '<div class="r60-legpop r60-csp">'+
+    '<div class="r60-calk">This week · Mon to Sun</div>'+row('r48CheckIn', 'week', (checkedIn('week', wk) ? 'Your check-in' : 'Check in for the week'), escapeHtml(r60WeekRange()))+
+    '<div class="r60-calk">This month</div>'+row('r48CheckIn', 'month', (checkedIn('month', mk) ? 'Your check-in' : 'Check in for '+escapeHtml(monthName(mk))), '')+
+    due.map(function(c){ return row('r48CheckOut', c.kind+':'+c.key, 'Check out of '+escapeHtml(c.kind==='month' ? monthName(c.key) : 'the week'), ''); }).join('')+
+    '<div class="r60-calk">Goals</div>'+row('r60GoGoals', '', 'Weekly &amp; monthly goals', '')+
+  '</div>';
+}
+cxMonthCardHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    return h.replace(/(<span class="r60-legw">)/, '<span class="r60-legw r60-csw"><button class="cx-chip r60-csb'+(ui.r60CalSet ? ' is-on' : '')+'" data-action="r60CalSetOpen" aria-label="Check-ins and goals" data-hov="Check-ins, check-outs and goals">&#9881;&#65038;</button>'+(ui.r60CalSet ? r60CalSetHtml() : '')+'</span>$1');
+  };
+})(cxMonthCardHtml);
+ACTIONS.r60CalSetOpen = function(){ ui.r60CalSet = !ui.r60CalSet; ui.r60CalPick = false; ui.r60Legend = false; playTick(); renderView(); };
+ACTIONS.r60GoGoals = function(){ ui.r60CalSet = false; ui.view = 'personal'; ui.personalTab = 'goals'; renderView(); };
+['r48CheckIn', 'r48CheckOut'].forEach(function(k){ const b = ACTIONS[k]; if(b) ACTIONS[k] = function(){ ui.r60CalSet = false; return b.apply(this, arguments); }; });
+document.addEventListener('mousedown', function(e){ if(ui.r60CalSet && !e.target.closest('.r60-csw')){ ui.r60CalSet = false; setTimeout(renderView, 0); } });

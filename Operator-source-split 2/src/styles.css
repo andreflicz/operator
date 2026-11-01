@@ -10120,3 +10120,73 @@ html.r58-content .app, html.r58-content .layout{ grid-template-columns:1fr !impo
 .r60-jc .chip{ border-radius:14px; }
 .vault-meta .r60-vs{ margin:6px 0 0; align-self:flex-start; display:inline-block; }
 .vault-meta{ display:flex; flex-direction:column; align-items:flex-start; min-width:0; }
+
+/* ===================== ROUND 60 (G) ===================== */
+/* 27. Level-up: the number paints its own width (two digits were clipped to the box and looked darkened) */
+.lvl-fx .lvl-n span, .lvl-fx .lvl-n b{ left:50% !important; right:auto !important; width:max-content !important; padding:0 .08em; translate:-50% 0 !important; }
+/* 20. Holidays above any scene; the banner; the new holidays */
+body.has-scene .hol-fx{ z-index:1 !important; }
+html[data-holiday] body.has-scene .app{ z-index:2 !important; }
+.hol-ban{ margin:0 0 14px !important; flex-direction:row !important; align-items:center; flex-wrap:wrap; gap:6px 14px !important; padding:16px 22px !important; }
+.hol-ban .hol-k{ flex:0 0 100%; }
+.hol-ban b{ font-size:22px !important; }
+.r60-holm{ margin-left:auto; display:inline-flex; align-items:center; gap:8px; height:34px; padding:0 14px; border-radius:18px; border:1px solid color-mix(in srgb, var(--accent) 50%, transparent); background:color-mix(in srgb, var(--accent) 14%, transparent); color:var(--text); font:700 13px var(--font-body); cursor:pointer; }
+.r60-holm.is-on{ background:var(--accent); color:#111; }
+.r60-fall{ position:absolute; top:-40px; left:var(--x); font-style:normal; font-size:var(--z); color:var(--c); opacity:.75; text-shadow:0 0 12px var(--c); animation:r60Fall var(--d) linear infinite; animation-delay:var(--dl); }
+@keyframes r60Fall{ 0%{ transform:translateY(0) rotate(0); } 100%{ transform:translateY(110vh) rotate(260deg); } }
+.r60-fw i{ position:absolute; left:var(--x); top:22%; width:6px; height:6px; border-radius:50%; background:var(--c); box-shadow:0 0 0 0 var(--c); opacity:0; animation:r60Burst 4.2s ease-out infinite; animation-delay:var(--dl); }
+@keyframes r60Burst{ 0%{ opacity:0; transform:translateY(40vh) scale(.4); } 30%{ opacity:1; transform:translateY(0) scale(1); box-shadow:0 0 0 0 var(--c); } 60%{ opacity:.9; box-shadow:0 0 0 46px transparent, 0 0 60px 20px var(--c); } 100%{ opacity:0; box-shadow:0 0 0 90px transparent; } }
+html[data-holiday="valentines"]{ --accent:#FF5A8A; } html[data-holiday="stpatricks"]{ --accent:#3DDC97; } html[data-holiday="easter"]{ --accent:#F5B8D0; }
+html[data-holiday="newyear"]{ --accent:#F5D547; } html[data-holiday="july4"]{ --accent:#ff5d6c; }
+/* 21. Streak + Today's standard in one panel */
+.r60-std{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
+.r60-std-k{ font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); }
+.r60-std-c{ display:flex; flex-wrap:wrap; gap:6px; }
+.r60-std-c .chip{ margin:0; }
+/* 22–23. Widgets: a 12-column grid, sizes, drag, resize */
+.today-panels{ display:grid !important; grid-template-columns:repeat(12, minmax(0, 1fr)); gap:16px; align-items:start; grid-auto-flow:row dense; }
+.today-panels > *:not(.r60w){ grid-column:1 / -1; }
+.r60w{ grid-column:span var(--span, 12); min-width:0; position:relative; }
+@media (max-width:1000px){ .r60w{ grid-column:1 / -1; } }
+.r60w > .section{ margin:0 !important; height:100%; }
+.r60w > .section > .card, .r60w > .section > .sw-wrap, .r60w .card{ border-radius:18px; }
+.today-panels .section-title{ font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); margin-bottom:10px; }
+.today-panels .card{ background:linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, #fff 2%), var(--panel)); border-color:var(--border); transition:border-color .2s ease, box-shadow .2s ease; }
+.today-panels .card:hover{ border-color:var(--border-strong); box-shadow:0 10px 28px rgba(0,0,0,.22); }
+.r60w.is-edit .ll-block{ margin:0 !important; height:100%; outline:1px dashed color-mix(in srgb, var(--accent) 45%, transparent); outline-offset:4px; border-radius:18px; }
+.r60w.is-edit .ll-head{ cursor:grab; }
+.r60-grip{ color:var(--text-faint); font-size:11px; letter-spacing:-3px; margin-right:4px; }
+.r60-szs{ display:inline-flex; gap:2px; padding:2px; border-radius:8px; background:var(--panel-2); margin-left:auto; }
+.r60-sz{ border:0; background:none; color:var(--text-faint); font:700 11.5px var(--font-body); padding:4px 8px; border-radius:6px; cursor:pointer; }
+.r60-sz.is-on{ background:var(--panel); color:var(--text); }
+.r60-rs{ position:absolute; top:12px; bottom:12px; right:-10px; width:12px; cursor:ew-resize; border-radius:6px; }
+.r60-rs::after{ content:''; position:absolute; top:50%; left:4px; width:4px; height:42px; margin-top:-21px; border-radius:3px; background:var(--accent); opacity:.6; }
+.r60w.is-drag{ opacity:.4; } .r60w.is-over .ll-block{ outline-style:solid; outline-color:var(--accent); }
+.r60w.is-sizing .ll-block{ outline-style:solid; }
+/* 24. Log center: a date to reach out */
+.r60-fu{ position:relative; display:inline-flex; align-items:center; height:30px; padding:0 10px; border-radius:15px; border:1px dashed var(--border-strong); color:var(--text-dim); font:600 12px var(--font-body); cursor:pointer; white-space:nowrap; }
+.r60-fu.is-set{ border-style:solid; border-color:var(--accent); color:var(--text); background:color-mix(in srgb, var(--accent) 12%, transparent); }
+.r60-fu input{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+/* 25. Calendar settings */
+.r60-csp{ min-width:260px; }
+.r60-cso{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; width:100%; padding:9px 10px; border:0; border-radius:9px; background:none; color:var(--text); text-align:left; cursor:pointer; }
+.r60-cso b{ font:600 13.5px var(--font-body); } .r60-cso small{ font-size:12px; color:var(--text-faint); }
+.r60-cso:hover{ background:var(--panel-2); }
+.r60-csb.is-on{ border-color:var(--accent); }
+/* 28. The hero: the weather is a compact pill */
+.th-wx .twx{ display:inline-flex !important; width:auto !important; max-width:100%; align-items:center; gap:12px; padding:8px 16px !important; border-radius:22px !important; height:auto !important; }
+.th-wx .twx svg{ display:none !important; }
+.th-wx .twx-sun{ display:inline-flex !important; align-items:center; gap:10px; margin-left:4px; padding-left:12px; border-left:1px solid var(--border); }
+.th-wx .twx-left{ font-size:12px; color:var(--text-dim); }
+.th-wx .twx-times{ display:inline-flex !important; gap:10px; font-size:12px; color:var(--text-dim); }
+.th-wx .twx-c{ display:flex; flex-direction:column; line-height:1.25; }
+.th-wx .twx-c small{ font-size:11.5px; }
+.th-mix .th-wx{ display:flex; }
+.hol-ban:not(.is-birthday){ display:flex !important; }
+.sw .r60-std{ flex:0 0 100%; margin-top:2px; }
+.today-panels.is-editing{ padding-top:40px; }
+.lc-due{ display:inline-flex; align-items:center; gap:8px; }
+.r60-fu{ height:26px; padding:0 8px; font-size:11.5px; }
+.th-wx{ width:max-content; max-width:100%; }
+.th-wx .twx-sun{ flex:none !important; width:auto !important; }
+.r60-rs{ z-index:5; }

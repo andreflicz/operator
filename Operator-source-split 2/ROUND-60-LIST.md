@@ -58,3 +58,17 @@ Compiled from the App updates Op filed. Op filed two of these twice (the Journal
 19. **Vault.** Keep the look. Make the logic clear: each capsule says when it opens (or "sometime this year"); filters
     for Open and Sealed; and the green check either explained or removed (a capsule written yesterday shows sealed while
     older ones show a green check, and it isn't clear why).
+
+## G. Added to Round 60 (Nov 1)
+20. **Holidays show everywhere.** With a background scene on (anything but Minimal), the scene covered the holiday
+    decorations, and the Today banner was tucked inside the hero. Holidays show on every scene, with a proper banner;
+    more holidays; and music for each one.
+21. **Overview: Day streak and Today's Standard in one panel.**
+22. **Widgets.** Every panel on Today can be resized (and moved): a fully customizable overview that still looks good.
+23. **Overview revamp.** The hero (locked in or not) stays; the rest gets an upgrade.
+24. **Log center: pick a date to reach out to someone** (a specific next-touch date).
+25. **Calendar: a settings button** with your week / month check-in, check-out, and weekly / monthly goals.
+26. **When does the week start?** It runs Monday to Sunday (Oct 26 was a Monday). Say so where it shows.
+27. **Level-up animation:** part of the text on the right looks darkened (seen at level 10).
+28. **Overview hero:** the weather / sunrise–sunset part is too long, and the player card in the middle may not be
+    centered. Redo that part.

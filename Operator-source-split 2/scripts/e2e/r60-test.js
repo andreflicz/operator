@@ -108,6 +108,38 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Vault: every capsule says when it opens (or “one morning this year”), and week notes say what they are', /Opens Jan 1/.test(vt) && /Opens one morning this year/.test(vt) && /Week note · open/.test(vt));
   await p.click('.r60-vf [data-id="sealed"]'); await p.waitForTimeout(150);
   check('…filter Open / Sealed', (await p.$$('.vault-card')).length===2);
+
+  // ================= G. Added to Round 60 =================
+  await E("state.profile.scene = 'city'; ui.view='today'; ui.journalMode='entries'; sceneMount(); renderView()"); await p.waitForTimeout(400);
+  check('holidays show on a background scene too (above it), with a banner at the top of Today', await E("(function(){ const fx = document.getElementById('holFx'); return !!fx && document.body.classList.contains('has-scene') && Number(getComputedStyle(fx).zIndex) >= 1 && document.getElementById('viewRoot').firstElementChild.classList.contains('hol-ban') && getComputedStyle(document.querySelector('.hol-ban')).display!=='none'; })()"));
+  check('…more holidays (New Year, Valentine’s, St. Patrick’s, Easter, Fourth of July)', await E("holToday('2027-01-01')==='newyear' && holToday('2027-02-14')==='valentines' && holToday('2027-03-17')==='stpatricks' && holToday('2027-03-28')==='easter' && holToday('2027-07-04')==='july4'"));
+  await p.click('.r60-holm'); await p.waitForTimeout(200);
+  check('…and music for each one (on and off from the banner)', await E("!!R60.music && R60.music.h==='halloween'") && /Pause/.test(await p.textContent('.r60-holm')));
+  await p.click('.r60-holm'); await p.waitForTimeout(200);
+  check('…which stops when you tap it again', await E("!R60.music"));
+  await E("state.profile.scene = 'minimal'; sceneMount(); renderView()");
+  check('Day streak and Today’s Standard are one panel', !!(await p.$('.sw .r60-std')) && !/Today's Standard<\/div>/.test(await E("document.getElementById('viewRoot').innerHTML")));
+  check('every panel on Today is a widget on a 12-column grid', await E("document.querySelectorAll('#viewRoot .today-panels > .r60w').length >= 4 && getComputedStyle(document.querySelector('.today-panels')).gridTemplateColumns.split(' ').length===12"));
+  await E("ui.todayEdit = true; renderView()"); await p.waitForTimeout(200);
+  check('…Customize: sizes on each one (S, M, L, Full), a handle to drag, an edge to resize', (await p.$$('.r60w.is-edit .r60-szs')).length >= 4 && !!(await p.$('.r60w.is-edit [data-r60-drag]')) && !!(await p.$('.r60w.is-edit .r60-rs')));
+  await p.click('.r60w.is-edit[data-wid="journal"] [data-action="r60Size"][data-id="journal|12"]'); await p.waitForTimeout(150);
+  check('…pick a size and it sticks', await E("r60Span('journal')===12 && document.querySelector('.r60w[data-wid=\"journal\"]').style.getPropertyValue('--span')==='12'"));
+  const hb = await (await p.$('.r60w.is-edit[data-wid="journal"] .r60-rs')).boundingBox(), gw = await E("document.querySelector('.today-panels').getBoundingClientRect().width");
+  await p.mouse.move(hb.x + 4, hb.y + hb.height/2); await p.mouse.down(); await p.mouse.move(hb.x - gw/2, hb.y + hb.height/2, {steps:6}); await p.mouse.up(); await p.waitForTimeout(200);
+  check('…or drag its edge to size it', await E("r60Span('journal') >= 5 && r60Span('journal') <= 7"), await E("r60Span('journal')"));
+  await E("(function(){ const dt = new DataTransfer(), src = document.querySelector('.r60w.is-edit[data-wid=\"journal\"] [data-r60-drag]'), to = document.querySelector('.r60w.is-edit[data-wid=\"personalStats\"]'); src.dispatchEvent(new DragEvent('dragstart', {bubbles:true, dataTransfer:dt})); to.dispatchEvent(new DragEvent('dragover', {bubbles:true, cancelable:true, dataTransfer:dt})); to.dispatchEvent(new DragEvent('drop', {bubbles:true, cancelable:true, dataTransfer:dt})); })()"); await p.waitForTimeout(200);
+  check('…and drag it to move it', await E("state.dashboardPanels.order.indexOf('journal') < state.dashboardPanels.order.indexOf('personalStats')"));
+  await E("ui.todayEdit = false; renderView()"); await p.waitForTimeout(150);
+  check('the weather is a compact pill (not a long bar)', await E("document.querySelector('.th-wx').getBoundingClientRect().width < 460"));
+  await E("levelUpFx(10, null)"); await p.waitForTimeout(1500);
+  check('level-up: a two-digit level isn’t clipped (it looked darkened)', await E("(function(){ const b = document.querySelector('.lvl-to'), r = b.getBoundingClientRect(); const range = document.createRange(); range.selectNodeContents(b); const t = range.getBoundingClientRect(); return t.left >= r.left - 1 && t.right <= r.right + 1; })()"));
+  await E("const f = document.getElementById('lvlFx'); if(f) f.remove(); ui.view='business'; ui.businessTab='log'; ui.r59LcCal=false; ui.r54Lc='clients'; renderView()"); await p.waitForTimeout(200);
+  await p.evaluate(() => { const i = document.querySelector('[data-r60-fu="client:jj"]'); i.value = '2026-11-04'; i.dispatchEvent(new Event('change', {bubbles:true})); }); await p.waitForTimeout(200);
+  check('Log center: pick the date to reach out to someone', await E("crmFind('client','jj').followUp.date==='2026-11-04' && crmNextDue('client', crmFind('client','jj'))==='2026-11-04'") && /Nov 4/.test(await p.textContent('[data-key="lc-jj"]')));
+  await E("ui.view='calendar'; renderView(); ACTIONS.r60CalSetOpen()"); await p.waitForTimeout(200);
+  const cs = await p.textContent('.r60-csp');
+  check('Calendar: a settings button with the week and month check-ins and your goals', /Check in for the week|Your check-in/.test(cs) && /October/.test(cs) && /Weekly &? ?monthly goals|Weekly & monthly goals/.test(cs));
+  check('…and the week says Monday to Sunday, with its dates', /Mon to Sun/i.test(cs) && /Oct 26 – Nov 1/.test(cs));
   }catch(err){ check('the run reached the end', false, String(err && err.message || err).slice(0, 300)); }
   check('no errors', p.errors.length===0, p.errors);
   await b.close(); process.exit(report() ? 1 : 0);
