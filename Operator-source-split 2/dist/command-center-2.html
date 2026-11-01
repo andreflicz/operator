@@ -10384,6 +10384,101 @@ html[data-holiday="newyear"]{ --accent:#F5D547; } html[data-holiday="july4"]{ --
 .r63-today-c{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
 .r63-chip{ height:28px; padding:0 12px; border-radius:14px; border:1px solid var(--border); background:transparent; color:var(--text-dim); font:500 12px var(--font-body); cursor:pointer; }
 .r63-chip.is-on{ color:#3fbe8e; border-color:color-mix(in srgb, #3fbe8e 50%, transparent); background:color-mix(in srgb, #3fbe8e 10%, transparent); }
+
+/* ============ ROUND 64 ============ */
+/* Op: a small tab, his state only */
+#opBub.op-bub.is-log.r64-mini, #opBub.r64-mini{ width:auto !important; min-width:0; max-width:calc(100vw - 32px); padding:7px 8px 7px 12px !important; border-radius:999px !important; }
+#opBub.r64-mini .op-bub-log, #opBub.r64-mini .ob-status, #opBub.r64-mini .op-bub-me, #opBub.r64-mini .op-bub-t, #opBub.r64-mini .op-bub-in, #opBub.r64-mini .op-bub-rs, #opBub.r64-mini .r62-work, #opBub.r64-mini .op-bub-h > b, #opBub.r64-mini .op-bub-dot{ display:none !important; }
+#opBub.r64-mini .op-bub-h{ margin:0 !important; padding:0 !important; gap:6px; align-items:center; }
+#opBub .r64-st{ display:inline-flex; align-items:center; gap:9px; border:0; background:none; padding:0 8px 0 0; margin-right:auto; cursor:pointer; font:600 14px var(--font-body); color:#15171d; white-space:nowrap; min-width:118px; }
+#opBub .r64-ind{ width:10px; height:10px; border-radius:50%; background:#9aa1b2; flex:none; position:relative; }
+#opBub.r64-listen .r64-ind{ background:#ff4d5e; animation:r64Pulse 1.1s ease-in-out infinite; }
+#opBub.r64-speak .r64-ind{ background:#7c5cff; animation:r64Pulse .8s ease-in-out infinite; }
+#opBub.r64-work .r64-ind{ background:none; border:2px solid rgba(124,92,255,.25); border-top-color:#7c5cff; animation:r64Spin .8s linear infinite; }
+#opBub.r64-idle .r64-ind{ background:#3fbe8e; }
+@keyframes r64Pulse{ 0%,100%{ box-shadow:0 0 0 0 currentColor; opacity:1; } 50%{ opacity:.55; transform:scale(1.15); } }
+@keyframes r64Spin{ to{ transform:rotate(360deg); } }
+#opBub.r64-mini .r58-round{ width:28px; height:28px; font-size:13px; }
+.r64-dot{ position:fixed; left:252px; bottom:96px; z-index:60; width:30px; height:30px; border-radius:50%; border:0; cursor:pointer; background:rgba(255,255,255,.92); box-shadow:0 6px 20px rgba(0,0,0,.35); opacity:0; pointer-events:none; transform:scale(.6); transition:opacity .25s, transform .25s; }
+.r64-dot::after{ content:''; position:absolute; inset:7px; border-radius:50%; border:2px solid rgba(124,92,255,.25); border-top-color:#7c5cff; animation:r64Spin .8s linear infinite; }
+.r64-dot.is-on{ opacity:1; pointer-events:auto; transform:none; }
+/* App updates: what isn't filed yet */
+.r64-unf{ margin-bottom:16px; padding:14px 16px; border-radius:16px; border:1px solid color-mix(in srgb, #F5B342 45%, transparent); background:color-mix(in srgb, #F5B342 7%, var(--panel)); display:grid; gap:8px; }
+.r64-unf-h{ display:flex; align-items:center; gap:10px; } .r64-unf-h b{ font-size:15px; } .r64-unf-h span{ font-size:12px; font-weight:700; padding:2px 8px; border-radius:10px; background:rgba(var(--ink),.08); } .r64-unf-h .btn{ margin-left:auto; }
+.r64-unf-r{ display:grid; grid-template-columns:minmax(0, 1fr) auto auto auto; gap:8px; align-items:center; padding:8px 10px; border-radius:10px; background:rgba(var(--ink),.04); }
+.r64-unf-r p{ margin:0; font-size:13.5px; line-height:1.45; } .r64-unf-r small{ color:var(--text-dim); white-space:nowrap; }
+/* Clients: the bottom */
+.r60w .hub-leads{ display:grid !important; grid-template-columns:repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap:8px; margin-top:14px !important; padding-top:14px; border-top:1px solid var(--border); align-items:stretch; }
+.r60w .hub-leads > .kind-label{ grid-column:1 / -1; margin:0 !important; }
+.r60w .hub-lead{ display:flex !important; align-items:center; gap:8px; min-height:44px; margin:0 !important; padding:6px 8px 6px 14px !important; border-radius:12px !important; }
+.r60w .hub-lead .hub-lead-name{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.r60w .hub-lead .touch-btns{ margin-left:auto; }
+/* the streak panel as one console */
+.r64-runs{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.r64-run{ display:inline-flex; align-items:baseline; gap:8px; padding:4px 10px; border-radius:999px; border:1px solid color-mix(in srgb, #ff7a3d 45%, transparent); background:color-mix(in srgb, #ff7a3d 10%, transparent); color:var(--text); cursor:pointer; font:600 12px var(--font-body); }
+.r64-run b{ color:#ff8a4a; font-weight:700; } .r64-run span{ font-weight:700; } .r64-run small{ color:var(--text-dim); font-weight:600; }
+.r64-sep{ width:1px; height:18px; background:var(--border-strong, var(--border)); align-self:center; margin:0 4px; }
+.r60-std-c .r64-chip{ height:auto; padding:3px 10px; font-size:12px; border-radius:999px; }
+/* the BMI scale */
+.hsc-box .you-bmi:has(+ .you-bmi-scale .r64-bmi){ display:none; }
+.you-bmi-scale:has(.r64-bmi){ margin-top:0 !important; width:100%; }
+.hsc-box:has(.r64-bmi){ display:flex; flex-direction:column; justify-content:center; width:100%; box-sizing:border-box; }
+.r64-bmi{ display:grid; gap:10px; width:100%; }
+.r64-bmi-top{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+.r64-bmi-top > b{ font-family:var(--font-display); font-size:32px; font-weight:800; line-height:1; }
+.r64-bmi-top > span{ font-size:13px; color:var(--text-dim); font-weight:600; }
+.r64-bmi-top em{ font-style:normal; font-size:12px; font-weight:700; padding:3px 10px; border-radius:999px; }
+.r64-bmi-top em.is-h{ color:#3fbe8e; background:color-mix(in srgb, #3fbe8e 14%, transparent); }
+.r64-bmi-top em.is-o{ color:#e8a23d; background:color-mix(in srgb, #e8a23d 14%, transparent); }
+.r64-bmi-top em.is-ob{ color:#e8636b; background:color-mix(in srgb, #e8636b 14%, transparent); }
+.r64-bmi-top em.is-u{ color:#6fc3ff; background:color-mix(in srgb, #6fc3ff 14%, transparent); }
+.r64-bmi-top small{ margin-left:auto; color:var(--text-dim); font-size:13px; } .r64-bmi-top small b{ color:var(--text); }
+.r64-bmi-bar{ position:relative; display:flex; height:12px; border-radius:7px; overflow:visible; gap:2px; }
+.r64-bmi-bar i{ display:block; height:100%; } .r64-bmi-bar i:first-child{ border-radius:7px 0 0 7px; } .r64-bmi-bar i:nth-child(4){ border-radius:0 7px 7px 0; }
+.r64-bmi-bar i.u{ background:#6fc3ff; opacity:.75; } .r64-bmi-bar i.h{ background:#3fbe8e; } .r64-bmi-bar i.o{ background:#e8a23d; } .r64-bmi-bar i.ob{ background:#e8636b; }
+.r64-bmi-bar b{ position:absolute; top:-5px; width:6px; height:22px; margin-left:-3px; border-radius:3px; background:#fff; box-shadow:0 0 0 2px rgba(0,0,0,.45); }
+.r64-bmi-z{ display:flex; gap:2px; } .r64-bmi-z span{ display:grid; gap:1px; font-size:11.5px; font-weight:700; color:var(--text-dim); text-align:center; min-width:0; } .r64-bmi-z small{ font-weight:600; color:var(--text-faint); font-size:11px; }
+/* Fuel */
+.r59-fu{ display:flex !important; flex-direction:column; gap:14px; height:100%; }
+.r59-fu-top{ grid-template-columns:auto auto minmax(0, 1fr) !important; gap:20px !important; }
+.r59-wk{ height:76px !important; gap:8px !important; }
+.r59-wk button{ position:relative; }
+.r59-wk button::before{ content:''; position:absolute; left:50%; transform:translateX(-50%); top:0; bottom:20px; width:100%; max-width:16px; border-radius:5px; background:rgba(var(--ink),.05); }
+.r59-wk u{ position:relative; min-height:4px; }
+.r59-food .is-none{ border-style:solid !important; border-color:var(--border) !important; background:rgba(var(--ink),.03) !important; }
+.r59-picks{ display:grid !important; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px !important; margin-top:auto; }
+.r59-picks button{ justify-content:space-between; border-radius:12px !important; padding:9px 12px !important; min-width:0; }
+.r59-picks button span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+/* Focus analytics: the 🔍 range and the recap */
+.r64-rng{ position:relative; display:inline-flex; }
+.r64-rb{ display:inline-flex; align-items:center; gap:8px; height:32px; padding:0 14px; border-radius:16px; border:1px solid var(--border); background:var(--panel); color:var(--text-dim); font:600 13px var(--font-body); cursor:pointer; }
+.r64-rb b{ color:var(--text); } .r64-rb:hover, .r64-rb.is-on{ border-color:var(--border-strong); }
+.r64-pop{ position:absolute; right:0; top:calc(100% + 6px); z-index:40; width:300px; padding:8px; border-radius:14px; border:1px solid var(--border); background:var(--panel); box-shadow:0 16px 40px rgba(0,0,0,.45); display:grid; gap:2px; }
+.r64-pop > button{ text-align:left; padding:8px 10px; border-radius:8px; border:0; background:none; color:var(--text); font:500 13.5px var(--font-body); cursor:pointer; }
+.r64-pop > button:hover{ background:rgba(var(--ink),.06); } .r64-pop > button.is-on{ background:rgba(var(--ink),.08); font-weight:700; }
+.r64-cus{ display:grid; grid-template-columns:auto 1fr auto 1fr; gap:6px; align-items:center; margin-top:6px; padding-top:8px; border-top:1px solid var(--border); font-size:12px; color:var(--text-dim); }
+.r64-cus .input{ height:30px; padding:0 6px; font-size:12px; min-width:0; } .r64-cus .btn{ grid-column:1 / -1; }
+.r64-rts{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; margin:6px 0 12px; }
+.r64-rt{ display:grid; gap:2px; padding:12px 14px; border-radius:12px; background:rgba(var(--ink),.04); } .r64-rt b{ font-family:var(--font-display); font-size:22px; } .r64-rt b small{ font-size:13px; color:var(--text-dim); } .r64-rt span{ font-size:12px; color:var(--text-dim); }
+.r64-best{ font-size:13px; color:var(--text-dim); margin-bottom:10px; } .r64-best b{ color:var(--text); }
+.r64-rl{ display:grid; gap:4px; max-height:46vh; overflow:auto; }
+.r64-rr{ display:grid; grid-template-columns:90px minmax(0, 1fr) 70px 64px; gap:10px; align-items:center; padding:7px 10px; border-radius:10px; border:0; background:rgba(var(--ink),.03); color:var(--text); font:500 13px var(--font-body); cursor:pointer; text-align:left; }
+.r64-rr:hover{ background:rgba(var(--ink),.07); }
+.r64-rr i{ height:6px; border-radius:4px; background:linear-gradient(90deg, #7c5cff var(--w), rgba(var(--ink),.08) var(--w)); }
+.r64-rr.is-ok i{ background:linear-gradient(90deg, #3fbe8e var(--w), rgba(var(--ink),.08) var(--w)); }
+.r64-rr b{ text-align:right; } .r64-rr small{ color:var(--text-dim); text-align:right; }
+/* Playbooks: the stage board */
+.r64-pbs{ display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 14px; }
+.r64-pbp{ display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 14px; border-radius:18px; border:1px solid var(--border); background:var(--panel); color:var(--text); font:600 13.5px var(--font-body); cursor:pointer; }
+.r64-pbp i{ font-style:normal; color:#F5B342; } .r64-pbp span{ font-size:12px; padding:1px 7px; border-radius:9px; background:rgba(var(--ink),.08); } .r64-pbp em{ font-style:normal; font-size:11px; color:var(--text-dim); }
+.r64-pbp.is-on{ border-color:var(--accent, #F5B342); box-shadow:0 0 0 1px var(--accent, #F5B342) inset; }
+.r64-board{ display:grid !important; grid-auto-flow:column; grid-auto-columns:minmax(220px, 1fr); gap:12px; overflow-x:auto; padding-bottom:6px; align-items:start; }
+.r64-col header{ display:flex; align-items:center; gap:8px; } .r64-col header i{ width:8px; height:8px; border-radius:50%; background:var(--sc); flex:none; }
+.r64-col header span{ margin-left:auto; }
+.r64-drop{ padding:16px 10px; border-radius:10px; border:1px dashed var(--border); text-align:center; font-size:12px; color:var(--text-faint); }
+.r64-tray{ margin-top:16px; }
+.r64-trayg{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:8px; }
+.r64-tray{ min-height:0 !important; height:auto !important; } .r64-tray .r64-trayg{ min-height:0; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -10581,7 +10676,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793499918599;
+const OP_BUILT = 1793509606885;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -56539,6 +56634,279 @@ aiSystem = (function(base){
   };
 })(aiSystem);
 setTimeout(function(){ try{ r63Settle(); }catch(e){} }, 0);
+// ============ ROUND 64 ============
+// The list is ROUND-64-LIST.md (with Andre's answers). Op as a small tab (his state only, no typing), one message per
+// reply when you cut him off, everything you've said about the app in App updates, the streak panel as one console,
+// a BMI scale that fills its panel, Fuel laid out properly, the Clients widget's bottom, Goals not flying in on a page
+// switch, Focus analytics ranges (🔍) with a recap for the range, and a stage board for Playbooks like the Lead center.
+const R64 = {readyAt:0};
+
+// ================= A1. Op as a small tab =================
+// No chat box and no typing: his state ("Listening…", "Thinking…", "Adding a task…", "Speaking"), his three buttons,
+// close. Tap the state to open the whole conversation (full screen). While he works with the tab closed, a small
+// pulsing dot in its place says he's still at it.
+function r64State(){
+  if(AI.listening) return {k:'listen', t:'Listening…'};
+  if(OV.speaking || OV.pending) return {k:'speak', t:'Speaking'};
+  if(AI.busy){ const w = (typeof r62WorkText==='function' && r62WorkText()) || 'Thinking…'; return {k:'work', t:w}; }
+  if(typeof R62!=='undefined' && R62.queue) return {k:'work', t:'Up next…'};
+  return {k:'idle', t:R64.replied && Date.now() - R64.replied < 60000 ? 'Replied · open' : 'Ready'};
+}
+opBubShow = (function(base){
+  return function(){
+    const b = base.apply(this, arguments);
+    if(b && !b.classList.contains('r64-mini')){
+      b.classList.add('r64-mini');
+      const h = b.querySelector('.op-bub-h');
+      if(h && !h.querySelector('.r64-st')){
+        const st = document.createElement('button'); st.className = 'r64-st'; st.setAttribute('data-action', 'r57OpOpen'); st.setAttribute('aria-label', 'Open the conversation');
+        st.innerHTML = '<i class="r64-ind"></i><span></span>';
+        const k = h.querySelector('b'); if(k) k.after(st); else h.prepend(st);
+      }
+    }
+    if(b){ b.style.removeProperty('width'); r64Tick(); }
+    return b;
+  };
+})(opBubShow);
+function r64Tick(){
+  const b = document.getElementById('opBub'), s = r64State();
+  const busy = s.k!=='idle';
+  if(b){
+    if(b.style.width) b.style.removeProperty('width');
+    const st = b.querySelector('.r64-st span'); if(st && st.textContent!==s.t) st.textContent = s.t;
+    ['listen', 'speak', 'work', 'idle'].forEach(function(k){ b.classList.toggle('r64-'+k, s.k===k); });
+    const open = b.classList.contains('is-in');
+    // (it tucks itself away a few seconds after he's done, unless you're on it)
+    if(open && !busy){ if(!R64.readyAt) R64.readyAt = Date.now(); if(Date.now() - R64.readyAt > 7000 && !b.matches(':hover')){ b.classList.remove('is-in'); R64.readyAt = 0; } }
+    else R64.readyAt = 0;
+  }
+  // working in the background: the tab is closed but he's busy
+  const hidden = !b || !b.classList.contains('is-in');
+  let dot = document.getElementById('r64Dot');
+  if(busy && hidden && s.k!=='listen'){
+    if(!dot){ dot = document.createElement('button'); dot.id = 'r64Dot'; dot.className = 'r64-dot'; dot.setAttribute('data-action', 'r64DotOpen'); dot.setAttribute('aria-label', 'Op is working'); document.body.appendChild(dot); }
+    dot.setAttribute('data-hov', s.t); dot.classList.add('is-on');
+  } else if(dot) dot.classList.remove('is-on');
+}
+setInterval(r64Tick, 250);
+ACTIONS.r64DotOpen = function(){ if(typeof R62!=='undefined') R62.quiet = false; opBubShow(); const b = document.getElementById('opBub'); if(b) b.classList.add('is-in'); };
+// (with his voice off, a reply is noted on the tab: "Replied · open")
+aiAsk = (function(base){ return function(){ const r = base.apply(this, arguments); Promise.resolve(r).then(function(){ try{ if(!opVoiceOn()) R64.replied = Date.now(); }catch(e){} }).catch(function(){}); return r; }; })(aiAsk);
+
+// ================= A2. Cut him off: each reply once =================
+// The double came from the cut: the half-said line went into the chat, and then the whole reply (or the caption of the
+// rest) went in as another message. Now a line of his that's part of one already there (since your last message) is
+// dropped, and a fuller version replaces the part.
+function r64Norm(t){ return String(t || '').toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); }
+opChatLog = (function(base){
+  return function(r, t){
+    if(r!=='op') return base.apply(this, arguments);
+    const s = r64Norm(t), full = String(t || '').replace(/\s+/g, ' ').trim(); if(!s) return base.apply(this, arguments);
+    const L = opChat();
+    for(let i = L.length - 1; i >= 0 && i >= L.length - 5; i--){
+      const e = L[i]; if(e.r==='me') break;
+      if(e.r!=='op' || Date.now() - (e.at || 0) > 300000) continue;
+      const a = r64Norm(e.t); if(!a) continue;
+      if(a===s || a.indexOf(s) >= 0){ R64.merged = (R64.merged || 0) + 1; return; }
+      if(s.indexOf(a) >= 0){ e.t = full.slice(0, 4000); persist('focus'); R64.merged = (R64.merged || 0) + 1; try{ OPCD.sig = ''; opChatDraw(); }catch(err){} return; }
+    }
+    return base.apply(this, arguments);
+  };
+})(opChatLog);
+
+// ================= A3. Everything said about the app, in App updates =================
+// The app reads back through your conversation with Op and lists anything you asked of the app that isn't in App
+// updates yet, at the top of App updates: file each one (or all), or skip it. Every filing shows its "Saved" note.
+const R64_APP = /\b(app|operator|op'?s|button|panel|tab|page|screen|widget|settings|layout|siz(e|ing)|ui|feature|bug|glitch|calendar|journal|playbooks?|dashboard|analytics|notifications?|streaks?|lead center|log center|overview|scroll|font|colou?r|animation|push[- ]to[- ]talk|shortcut|chat box|window)\b/i;
+const R64_ASK = /\b(should|can you|could you|i want|i'd like|i would like|please|make|fix|add|remove|change|move|update|need|wanna|get rid|put|take out|redo|improve)\b/i;
+function r64Filed(t){
+  const n = r64Norm(t); if(!n) return true;
+  return r58UpdateEntries().some(function(e){
+    return [e.text, e.said, e.title].concat(arr(e.summaries)).some(function(x){ const m = r64Norm(x); return m && (m===n || m.indexOf(n) >= 0 || n.indexOf(m) >= 0 && m.length > 40 || (typeof r62Sim==='function' && r62Sim(n, m) >= .75)); });
+  });
+}
+function r64Unfiled(){
+  const skip = state.settings.r64Skip || {}, since = Date.now() - 45*86400000;
+  return opChat().filter(function(e){
+    const t = String(e.t || '');
+    return e.r==='me' && (e.at || 0) >= since && t.length >= 25 && !skip[e.at] && R64_APP.test(t) && R64_ASK.test(t) && !r64Filed(t);
+  }).slice(-40).reverse();
+}
+renderUpdatesTab = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), L = r64Unfiled(); if(!L.length) return h;
+    return '<div class="r64-unf"><div class="r64-unf-h"><b>Not in App updates yet</b><span>'+L.length+'</span><button class="btn btn-primary btn-sm" data-action="r64FileAll">File all</button></div>'+
+      L.map(function(e){ return '<div class="r64-unf-r"><p>'+escapeHtml(e.t)+'</p><small>'+escapeHtml(fmtDateShort(todayStr(new Date(e.at))))+'</small><button class="btn btn-sm" data-action="r64File" data-id="'+e.at+'">File</button><button class="btn btn-ghost btn-sm" data-action="r64Skip" data-id="'+e.at+'">Skip</button></div>'; }).join('')+
+    '</div>'+h;
+  };
+})(renderUpdatesTab);
+function r64FileOne(e){
+  const words = String(e.t || '').trim(); if(!words) return Promise.resolve();
+  return r59Summarize(words).then(function(s){ r59File(s || words, s ? words : '', e.at); });
+}
+ACTIONS.r64File = function(el, ev, id){ const e = opChat().find(function(x){ return String(x.at)===String(id) && x.r==='me'; }); if(!e) return; r64FileOne(e).then(function(){ renderView(); }); };
+ACTIONS.r64Skip = function(el, ev, id){ state.settings.r64Skip = state.settings.r64Skip || {}; state.settings.r64Skip[id] = 1; persist('settings'); renderView(); };
+ACTIONS.r64FileAll = function(){
+  const L = r64Unfiled(); let p = Promise.resolve();
+  L.forEach(function(e){ p = p.then(function(){ return r64FileOne(e); }); });
+  p.then(function(){ showToast(L.length+' filed in App updates.', {icon:'&#9989;'}); renderView(); });
+};
+
+// ================= B5. Clients: the bottom =================
+// (the leads to reach out to sit in a tidy row of equal cards under a hairline; CSS)
+
+// ================= B6. The streak panel: one console =================
+// The running streak's day count sits right beside the fire streak, and its rules join Today's standard on one line.
+PANEL_RENDERERS.personalStats = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    // (Round 63's separate row goes)
+    for(let g = 0; g < 5; g++){ const c = r60Cut(h, '<div class="r63-today">'); if(!c) break; h = c.rest; }
+    const act = typeof r63Active==='function' ? r63Active() : []; if(!act.length) return h;
+    const runs = act.map(function(c){ const s = r63Status(c); return '<button class="r64-run" data-action="r63Open" data-hov="'+escapeHtml(R63_STRICT[c.strict])+'"><b>'+escapeHtml(c.name)+'</b><span>Day '+s.day+'<small>/'+c.days+'</small></span></button>'; }).join('');
+    h = h.replace(/(<div class="sw-streak">[\s\S]*?<\/div>)/, function(m0){ return m0+'<div class="r64-runs">'+runs+'</div>'; });
+    const chips = act.map(function(c){ const L = (c.log || {})[todayStr()] || []; return c.rules.map(function(r){ const on = L.indexOf(r.id) >= 0; return '<button class="r63-chip r64-chip'+(on ? ' is-on' : '')+'" data-action="r63Tick" data-id="'+c.id+'|'+r.id+'" data-hov="'+escapeHtml(c.name)+'">'+(on ? '&#10003; ' : '')+escapeHtml(r.label)+'</button>'; }).join(''); }).join('');
+    const i = h.indexOf('<div class="r60-std-c"'); if(i < 0) return h;
+    const cut = r60Cut(h, '<div class="r60-std-c"'); if(!cut) return h;
+    return h.slice(0, i)+cut.html.replace(/<\/div>$/, '<span class="r64-sep" aria-hidden="true"></span>'+chips+'</div>')+h.slice(i + cut.html.length);
+  };
+})(PANEL_RENDERERS.personalStats);
+
+// ================= C8. Weight: a BMI scale that fills its panel =================
+bmiScaleHtml = function(b){
+  const lo = 15, hi = 35, w = function(a, z){ return (z - a)/(hi - lo)*100; }, pos = Math.max(1, Math.min(99, (Math.max(lo, Math.min(hi, b.bmi)) - lo)/(hi - lo)*100)), u = b.kg ? 'kg' : 'lb';
+  const k = b.bmi < 18.5 ? 'u' : b.bmi < 25 ? 'h' : b.bmi < 30 ? 'o' : 'ob';
+  return '<div class="r64-bmi">'+
+    '<div class="r64-bmi-top"><b>'+b.bmi.toFixed(1)+'</b><span>BMI</span><em class="is-'+k+'">'+escapeHtml(b.cls)+'</em><small><b>'+b.w+'</b> '+u+(k==='h' ? '' : ' · healthy up to '+b.healthyMax+' '+u)+'</small></div>'+
+    '<div class="r64-bmi-bar"><i class="u" style="flex:'+w(lo, 18.5)+'"></i><i class="h" style="flex:'+w(18.5, 25)+'"></i><i class="o" style="flex:'+w(25, 30)+'"></i><i class="ob" style="flex:'+w(30, hi)+'"></i><b style="left:'+pos.toFixed(1)+'%"></b></div>'+
+    '<div class="r64-bmi-z"><span style="flex:'+w(lo, 18.5)+'"></span><span style="flex:'+w(18.5, 25)+'">Healthy<small>'+b.healthyMin+'–'+b.healthyMax+'</small></span><span style="flex:'+w(25, 30)+'">Overweight<small>'+b.healthyMax+'–'+b.obeseAt+'</small></span><span style="flex:'+w(30, hi)+'">Obese<small>'+b.obeseAt+'+</small></span></div>'+
+  '</div>';
+};
+
+// ================= C10. Goals: nothing flies in from another page =================
+// Cards that glide to their new place after a change (the goals, the lineup) also glided when you switched pages,
+// from where the same goal sat on Today: on the first open of Goals that looked broken. They glide only within a page now.
+function r64PageSig(){ return [ui.view, ui.personalTab, ui.businessTab, ui.focusMainTab, ui.socTab, ui.settingsTab].join('|'); }
+renderView = (function(base){
+  return function(){
+    const sig = r64PageSig();
+    if(R64.pageSig && R64.pageSig!==sig){ try{ document.querySelectorAll('#viewRoot [data-flip]').forEach(function(el){ el.removeAttribute('data-flip'); }); }catch(e){} }
+    R64.pageSig = sig;
+    return base.apply(this, arguments);
+  };
+})(renderView);
+
+// ================= D11–12. Focus analytics: the range (🔍), and a recap for it =================
+const R64_RANGES = [['today', 'Today'], ['week', 'This week'], ['lastweek', 'Last week'], ['month', 'This month'], ['lastmonth', 'Last month'], ['all', 'All time'], ['custom', 'Custom']];
+const R64_RECAP = {today:'Day recap', week:'Week recap', lastweek:'Last week’s recap', month:'Month recap', lastmonth:'Last month’s recap', all:'All-time recap', custom:'Recap'};
+function r64DaysBetween(a, b){ const out = []; if(!a || !b || a > b) return out; for(let d = a; d <= b && out.length < 800; d = addDays(d, 1)) out.push(d); return out; }
+function r64MonthDays(off){ const t = new Date(todayStr()+'T12:00:00'); const f = new Date(t.getFullYear(), t.getMonth() + off, 1, 12), l = new Date(t.getFullYear(), t.getMonth() + off + 1, 0, 12); return r64DaysBetween(todayStr(f), todayStr(l)); }
+function r64RangeLabel(r){
+  if(r==='custom' && ui.anFrom && ui.anTo) return fmtDateShort(ui.anFrom)+' – '+fmtDateShort(ui.anTo);
+  const x = R64_RANGES.find(function(q){ return q[0]===r; }); return x ? x[1] : 'Today';
+}
+rangeDays = (function(base){
+  return function(r){
+    if(r==='month') return r64MonthDays(0);
+    if(r==='lastmonth') return r64MonthDays(-1);
+    if(r==='custom') return r64DaysBetween(ui.anFrom || todayStr(), ui.anTo || todayStr());
+    return base.apply(this, arguments);
+  };
+})(rangeDays);
+analyticsOverviewHtml = (function(base){
+  return function(r){ const h = base.apply(this, arguments); return ['month', 'lastmonth', 'custom'].indexOf(r) >= 0 ? h.split('All time').join(r64RangeLabel(r)).split('Last 14 days').join(r64RangeLabel(r)) : h; };
+})(analyticsOverviewHtml);
+analyticsRangeTabs = function(){
+  const r = ui.analyticsRange || 'today';
+  const pop = ui.r64Rng ? '<div class="r64-pop">'+R64_RANGES.filter(function(x){ return x[0]!=='custom'; }).map(function(x){ return '<button class="'+(r===x[0] ? 'is-on' : '')+'" data-action="analyticsRange" data-id="'+x[0]+'">'+x[1]+'</button>'; }).join('')+
+    '<div class="r64-cus"><span>Custom</span><input type="date" class="input" id="r64From" value="'+escapeHtml(ui.anFrom || addDays(todayStr(), -13))+'" max="'+todayStr()+'"><span>to</span><input type="date" class="input" id="r64To" value="'+escapeHtml(ui.anTo || todayStr())+'" max="'+todayStr()+'"><button class="btn btn-primary btn-sm" data-action="r64Custom">Show</button></div></div>' : '';
+  return '<button class="btn btn-ghost btn-sm r64-rc" data-action="r64Recap">&#128202; '+(R64_RECAP[r] || 'Recap')+'</button>'+
+    '<span class="r64-rng"><button class="r64-rb'+(ui.r64Rng ? ' is-on' : '')+'" data-action="r64RangeOpen" aria-label="Pick the time frame">&#128269; <b>'+escapeHtml(r64RangeLabel(r))+'</b></button>'+pop+'</span>';
+};
+ACTIONS.r64RangeOpen = function(){ ui.r64Rng = !ui.r64Rng; renderView(); };
+ACTIONS.analyticsRange = (function(base){ return function(){ ui.r64Rng = false; return base.apply(this, arguments); }; })(ACTIONS.analyticsRange);
+ACTIONS.r64Custom = function(){
+  const a = (document.getElementById('r64From') || {}).value, b = (document.getElementById('r64To') || {}).value;
+  if(!a || !b){ showToast('Pick both dates.'); return; }
+  ui.anFrom = a <= b ? a : b; ui.anTo = a <= b ? b : a; ui.analyticsRange = 'custom'; ui.analyticsDay = null; ui.r64Rng = false; ui.sessionsPage = false; renderView();
+};
+document.addEventListener('mousedown', function(e){ if(ui.r64Rng && !(e.target.closest && e.target.closest('.r64-rng'))){ ui.r64Rng = false; try{ renderView(); }catch(err){} } });
+// a month or your own dates: the same look as a week, over those days
+renderFocusAnalyticsTab = (function(base){
+  return function(){
+    const r = ui.analyticsRange || 'today';
+    if(ui.sessionsPage || ['month', 'lastmonth', 'custom'].indexOf(r) < 0) return base.apply(this, arguments);
+    const days = rangeDays(r);
+    return '<div class="subtab-panel" data-key="analytics-'+r+'">'+analyticsOverviewHtml(r)+r64SpanHtml(days, r64RangeLabel(r))+recentSessionsHtml()+'</div>'+
+      '<div class="section" style="margin-top:16px;">'+renderManualLogForm()+'</div>';
+  };
+})(renderFocusAnalyticsTab);
+function r64SpanHtml(days, label){
+  if(!days.length) return '';
+  const n = days.length, prev = r64DaysBetween(addDays(days[0], -n), addDays(days[0], -1));
+  const t = sumTotals(days), p = sumTotals(prev), elapsed = days.filter(function(d){ return d <= todayStr(); }).length || 1;
+  const sel = ui.analyticsDay && days.indexOf(ui.analyticsDay) >= 0 ? ui.analyticsDay : (days.indexOf(todayStr()) >= 0 ? todayStr() : days[days.length - 1]);
+  return '<div class="card analytics-hero r64-span">'+
+    '<div class="row" style="justify-content:space-between;align-items:flex-end;"><div><div class="kpi-label">'+escapeHtml(label)+' &middot; '+fmtDateShort(days[0])+' – '+fmtDateShort(days[n - 1])+'</div>'+
+      '<div class="analytics-big">'+fmtDurationLabel(t.deep)+' <span class="kpi-sub" style="font-size:13px;">deep work</span></div>'+
+      '<div>'+deltaHtml(t.deep - p.deep, 'vs the '+n+' days before')+' &middot; <span class="kpi-sub">'+fmtDurationLabel(Math.round(t.deep/elapsed))+'/day avg</span></div></div>'+modeLegendHtml()+'</div>'+
+  '</div>'+
+  '<div class="section" style="margin-top:16px;">'+dayDetailHtml(sel)+'</div>';
+}
+// the recap for the range: Today is the day recap you know; a week, a month or your dates get their own
+ACTIONS.r64Recap = function(){
+  const r = ui.analyticsRange || 'today';
+  if(r==='today'){ openDayRecap(todayStr()); return; }
+  let days = rangeDays(r);
+  if(!days){ const first = state.focus.sessions.map(function(s){ return s.date; }).sort()[0] || todayStr(); days = r64DaysBetween(first < addDays(todayStr(), -365) ? addDays(todayStr(), -365) : first, todayStr()); }
+  days = days.filter(function(d){ return d <= todayStr(); });
+  addSheetOpen('r64Recap', function(){ return r64RecapHtml(r, days); });
+};
+function r64RecapHtml(r, days){
+  const target = state.standards.deepWorkTargetMinutes || 180, today = todayStr();
+  const deep = function(d){ return d===today ? deepWorkMinutesTodayLive() : deepWorkMinutesFor(d); };
+  const rows = days.map(function(d){ const m = deep(d), tk = state.tasks.items.filter(function(t){ return t.status==='done' && t.completedAt===d; }).length; return {d:d, m:m, tk:tk, ok:m >= target}; });
+  const tot = rows.reduce(function(a, x){ return a + x.m; }, 0), tasks = rows.reduce(function(a, x){ return a + x.tk; }, 0), hit = rows.filter(function(x){ return x.ok; }).length;
+  const best = rows.slice().sort(function(a, b){ return b.m - a.m; })[0], wk = workoutTotals(days);
+  const sess = state.focus.sessions.filter(function(s){ return days.indexOf(s.date) >= 0; }).length;
+  const tile = function(v, k){ return '<div class="r64-rt"><b>'+v+'</b><span>'+k+'</span></div>'; };
+  return asHead('&#128202;', R64_RECAP[r] || 'Recap', escapeHtml(r64RangeLabel(r))+' · '+fmtDateShort(days[0])+' – '+fmtDateShort(days[days.length - 1]))+
+    '<div class="r64-rts">'+tile(fmtDurationLabel(tot), 'deep work')+tile(fmtDurationLabel(Math.round(tot/Math.max(1, days.length))), 'a day')+tile(hit+'<small>/'+days.length+'</small>', 'days on target')+tile(tasks, 'tasks done')+tile(sess, 'sessions')+tile(wk.n, 'workouts')+'</div>'+
+    (best && best.m ? '<div class="r64-best">Best day: <b>'+escapeHtml(fmtDateShort(best.d))+'</b>, '+fmtDurationLabel(best.m)+'</div>' : '')+
+    '<div class="r64-rl">'+rows.slice().reverse().map(function(x){ return '<button class="r64-rr'+(x.ok ? ' is-ok' : '')+'" data-action="r64RecapDay" data-id="'+x.d+'"><span>'+escapeHtml(fmtDateShort(x.d))+'</span><i style="--w:'+Math.min(100, Math.round(100*x.m/Math.max(1, target)))+'%"></i><b>'+fmtDurationLabel(x.m)+'</b><small>'+x.tk+' task'+(x.tk===1 ? '' : 's')+'</small></button>'; }).join('')+'</div>';
+}
+ACTIONS.r64RecapDay = function(el, e, d){ addSheetClose('r64Recap'); openDayRecap(d); };
+
+// ================= E13. Playbooks: a stage board, like the Lead center =================
+// Overview: pick a playbook at the top; its stages are columns, the people on it are cards; drag a card to another
+// stage to move them (their tasks follow, as when you move them by hand). Anyone not on a playbook waits in the tray at
+// the bottom: drag them onto a stage to start them there.
+pbEditorHtml = (function(base){
+  return function(){
+    if(ui.pbView==='build') return base.apply(this, arguments);
+    pbSeed(); pbAll().forEach(pb57Migrate);
+    const bar = '<div class="pb6-bar"><div class="seg-tabs seg-sm"><button class="seg-tab active" data-action="pb6View" data-id="board">Overview</button><button class="seg-tab" data-action="pb6View" data-id="build">Builder</button></div>'+
+      '<span class="pb6-sp"></span><button class="btn btn-sm btn-primary" data-action="pb6NewOpen">+ New playbook</button></div>';
+    if(!pbAll().length) return base.apply(this, arguments);
+    const peopleOf = function(p){ return pbCountsFor(pbFor(p)).filter(function(x){ return x.pb && x.pb.id===p.id; }); };
+    let p = pbById(ui.r64Pb);
+    if(!p){ p = pbAll().find(function(q){ return peopleOf(q).length; }) || pbAll()[0]; ui.r64Pb = p.id; }
+    ui.pbSel = p.id; ui.pbWho = pbFor(p);
+    const pills = '<div class="r64-pbs">'+pbAll().map(function(q){ const n = peopleOf(q).length; return '<button class="r64-pbp'+(q.id===p.id ? ' is-on' : '')+'" data-action="r64PbPick" data-id="'+q.id+'">'+(r58Star(q) ? '<i>&#9733;</i>' : '')+escapeHtml(q.name)+'<span>'+n+'</span><em>'+(pbFor(q)==='lead' ? 'Leads' : 'Clients')+'</em></button>'; }).join('')+'</div>';
+    const who = pbFor(p), on = peopleOf(p), L = pbStages(p);
+    const col = function(st, i){
+      const P = on.filter(function(x){ return pb57Where(x, p)===st; });
+      const c = ['#8B95A7', '#5EB8FF', '#F5B342', '#C58FFF', '#3FBE8E', '#FF7A59', '#E8636B'][i % 7];
+      return '<section class="pb6-col r64-col" data-pb6-col="'+p.id+'|'+st.id+'" style="--sc:'+c+'"><header><i></i><b>'+escapeHtml(st.name)+'</b><span>'+P.length+'</span></header>'+
+        '<small class="pb6-cmeta">'+(st.repeat==='month' ? 'Every month' : st.repeat==='days' ? 'Every '+st.days+' days' : arr(st.steps).length+' step'+(arr(st.steps).length===1 ? '' : 's'))+'</small>'+
+        '<div class="pb6-cards">'+(P.length ? P.map(function(x){ return pbCardHtml(who, x); }).join('') : '<div class="r64-drop">Drop here</div>')+'</div></section>';
+    };
+    const off = pbCountsFor(who).filter(function(x){ return !x.pb || !x.pb.id || !pbById(x.pb.id); });
+    const tray = '<section class="pb6-col is-off r64-tray" data-pb6-col=""><header><b>Not on a playbook</b><span>'+off.length+'</span></header><div class="r64-trayg">'+(off.length ? off.map(function(x){ return pb57OffCard(who, x); }).join('') : '<div class="r64-drop">Everyone’s on a playbook</div>')+'</div></section>';
+    return '<div class="pb6 pb57 r64-pb">'+bar+pills+'<div class="pb6-board r64-board">'+L.map(col).join('')+'</div>'+tray+'</div>';
+  };
+})(pbEditorHtml);
+ACTIONS.r64PbPick = function(el, e, id){ ui.r64Pb = id; playTick(); renderView(); };
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
