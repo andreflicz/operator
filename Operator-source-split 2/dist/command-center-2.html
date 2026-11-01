@@ -9988,6 +9988,147 @@ html.r58-content .app, html.r58-content .layout{ grid-template-columns:1fr !impo
 .r56-lc-h .r59-lcf button{ width:auto !important; height:auto !important; min-width:0; padding:6px 12px; border-radius:8px; background:none; font-size:13px; }
 .r56-lc-h .r59-lcf button.is-on{ background:var(--panel); }
 .r58-ownp{ margin:0 0 18px !important; }
+
+/* ===================== ROUND 60 ===================== */
+/* A4. Op's pop-up by the XP: short, glowing, white */
+.r57-notes{ display:none !important; }
+.r60-pop{ position:fixed; z-index:9700; display:flex; flex-direction:column; align-items:flex-end; max-width:min(420px, calc(100vw - 32px)); pointer-events:auto; opacity:0; transform:translateX(12px) scale(.96); transition:opacity .28s ease, transform .32s cubic-bezier(.2, .9, .3, 1.2); }
+.r60-pop.is-in{ opacity:1; transform:none; }
+.r60-pop-h{ display:inline-flex; align-items:center; gap:9px; height:34px; padding:0 14px 0 11px; border-radius:18px; border:1px solid rgba(255,255,255,.55); background:rgba(255,255,255,.93); color:#14121c; font:700 13px var(--font-body); cursor:pointer; white-space:nowrap; box-shadow:0 0 0 4px rgba(255,255,255,.08), 0 0 22px rgba(255,255,255,.35), 0 8px 24px rgba(0,0,0,.35); animation:r60Glow 2.4s ease-in-out infinite; }
+.r60-pop-o{ width:10px; height:10px; border-radius:50%; background:radial-gradient(circle at 35% 35%, #fff, var(--op-c, #b9c6ff)); box-shadow:0 0 10px var(--op-glow, rgba(150,170,255,.9)); }
+@keyframes r60Glow{ 0%, 100%{ box-shadow:0 0 0 4px rgba(255,255,255,.06), 0 0 16px rgba(255,255,255,.25), 0 8px 24px rgba(0,0,0,.35); } 50%{ box-shadow:0 0 0 5px rgba(255,255,255,.12), 0 0 28px rgba(255,255,255,.5), 0 8px 24px rgba(0,0,0,.35); } }
+.r60-pop-b{ display:none; margin-top:8px; padding:12px 14px; border-radius:14px; background:rgba(255,255,255,.96); color:#14121c; box-shadow:0 10px 30px rgba(0,0,0,.4); max-width:100%; }
+.r60-pop-b p{ margin:0; font-size:13.5px; line-height:1.5; white-space:pre-wrap; } .r60-pop-b time{ display:block; margin-top:6px; font-size:11px; color:#6b6878; font-weight:700; }
+.r60-pop.is-open .r60-pop-b{ display:block; animation:r59In .22s ease both; }
+/* A5. Push-to-talk explainer */
+.r60-ptt{ margin-top:8px; padding:10px 12px; border-radius:10px; background:var(--panel-2); font-size:13px; line-height:1.5; color:var(--text-dim); }
+.r60-ptt b{ color:var(--text); } .r60-ptt .btn{ margin-left:6px; }
+
+/* B. Presets */
+.r60-pk-k{ font-size:11.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); margin:4px 0 10px; }
+.r60-pres{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:10px; margin-bottom:18px; }
+.r60-pre{ position:relative; }
+.r60-pre-b{ width:100%; height:100%; display:flex; flex-direction:column; align-items:flex-start; gap:4px; padding:14px; border-radius:14px; border:1px solid var(--border); background:var(--panel); color:var(--text); text-align:left; cursor:pointer; transition:border-color .15s ease, transform .15s ease, background .15s ease; }
+.r60-pre-b:hover{ border-color:var(--accent); transform:translateY(-1px); background:color-mix(in srgb, var(--accent) 6%, var(--panel)); }
+.r60-pre-b i{ font-style:normal; font-size:20px; } .r60-pre-b b{ font-size:15px; } .r60-pre-b small{ font-size:12.5px; color:var(--text-dim); line-height:1.4; }
+.r60-pre-x{ position:absolute; top:8px; right:8px; width:24px; height:24px; border:0; border-radius:7px; background:none; color:var(--text-faint); cursor:pointer; opacity:0; }
+.r60-pre:hover .r60-pre-x{ opacity:1; } .r60-pre-x:hover{ background:var(--panel-2); color:var(--danger); }
+.r60-empty{ margin-top:18px; padding:20px; border-radius:16px; border:1px dashed var(--border-strong); }
+.r60-empty-h{ margin-bottom:12px; font-family:var(--font-display); font-size:17px; }
+.r60-save{ margin-left:auto; }
+/* C11. Package kind */
+.r60-kind{ display:inline-flex; gap:2px; padding:3px; border-radius:10px; background:var(--panel-2); align-self:flex-start; margin-bottom:6px; }
+.r60-kind button{ border:0; background:none; color:var(--text-dim); font:600 13px var(--font-body); padding:6px 14px; border-radius:8px; cursor:pointer; }
+.r60-kind button.is-on{ background:var(--panel); color:var(--text); box-shadow:0 1px 3px rgba(0,0,0,.3); }
+.r60-me{ display:inline-flex; align-items:center; padding:4px 12px; border-radius:20px; background:color-mix(in srgb, #F5B342 16%, transparent); color:#F5B342; font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.r60-per{ display:inline-flex; gap:1px; padding:2px; border-radius:8px; background:var(--panel); }
+.r60-per button{ border:0; background:none; color:var(--text-faint); font:600 12px var(--font-body); padding:4px 8px; border-radius:6px; cursor:pointer; }
+.r60-per button.is-on{ background:var(--panel-2); color:var(--text); }
+
+/* D13–14. Social */
+.r58-strip{ align-items:center; }
+.r58-cls{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.r60-k{ font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); margin-right:2px; }
+.r58-cls .r58-ac{ border-color:color-mix(in srgb, var(--cc, var(--border)) 70%, transparent) !important; box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--cc, transparent) 25%, transparent); }
+.r58-cls .r58-ac .r58-av{ background:color-mix(in srgb, var(--cc, #888) 25%, transparent); color:var(--text); }
+.r60-addcl{ display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 14px 0 6px; border-radius:22px; border:1px dashed var(--border-strong); background:none; color:var(--text-dim); font:600 13px var(--font-body); cursor:pointer; }
+.r60-addcl i{ width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:var(--panel-2); font-style:normal; font-size:16px; color:var(--text); }
+.r60-addcl:hover{ border-color:var(--accent); color:var(--text); }
+.r60-socset{ margin-left:auto; width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:var(--panel); color:var(--text-dim); cursor:pointer; font-size:15px; }
+.r60-socset:hover{ color:var(--text); border-color:var(--border-strong); }
+.row:has(> .r58-cm){ margin-top:44px; }
+.r60-cls{ display:flex; flex-direction:column; gap:8px; margin-bottom:6px; }
+.r60-cl{ display:grid; grid-template-columns:12px minmax(0, 1fr) auto 200px; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background:var(--panel-2); }
+.r60-cl > i{ width:12px; height:12px; border-radius:50%; background:var(--cc); }
+.r60-cl small{ color:var(--text-faint); font-size:12px; }
+.r60-none{ display:flex; flex-direction:column; gap:6px; padding:18px; border-radius:14px; border:1px dashed var(--border-strong); color:var(--text-dim); font-size:13.5px; line-height:1.5; }
+.r60-none b{ color:var(--text); font-size:15px; }
+.r60-set{ display:flex; flex-direction:column; gap:8px; }
+.r60-set-r{ display:flex; justify-content:space-between; padding:10px 12px; border-radius:10px; background:var(--panel-2); font-size:14px; } .r60-set-r span{ color:var(--text-faint); font-size:13px; }
+.r60-set-b{ text-align:left; padding:12px 14px; border-radius:12px; border:1px solid var(--border); background:var(--panel); color:var(--text); font:600 14px var(--font-body); cursor:pointer; }
+.r60-set-b:hover{ border-color:var(--border-strong); background:var(--panel-2); }
+
+/* E15–16. Calendar */
+.cx-header{ display:flex !important; flex-wrap:wrap; align-items:stretch; gap:10px 12px; }
+.cx-header > div:first-child{ flex:1 0 100%; }
+.cx-header > .r52-ask, .cx-header > .op-tip{ flex:1 1 0; min-width:260px; margin:0 !important; }
+.calx{ grid-template-columns:minmax(260px, 300px) minmax(0, 1fr) !important; gap:20px !important; }
+.cx-month .cx-grid{ gap:6px !important; }
+.cx-month .cx-d{ min-height:84px !important; }
+.r60-calw, .r60-legw{ position:relative; display:inline-flex; }
+.r60-calb{ display:inline-flex; align-items:center; gap:8px; height:32px; padding:0 12px; border-radius:16px; border:1px solid var(--border); background:var(--panel-2); color:var(--text); font:600 13px var(--font-body); cursor:pointer; }
+.r60-calb.is-client{ border-color:var(--cc); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--cc) 40%, transparent); }
+.r60-calb i{ font-style:normal; font-size:10px; color:var(--text-faint); }
+.r60-calpop, .r60-legpop{ position:absolute; top:calc(100% + 6px); right:0; z-index:40; min-width:240px; max-height:360px; overflow:auto; padding:8px; border-radius:14px; border:1px solid var(--border-strong); background:var(--panel); box-shadow:0 18px 40px rgba(0,0,0,.45); animation:r59In .18s ease both; }
+.r60-calq{ width:100%; box-sizing:border-box; border:1px solid var(--border); background:var(--panel-2); color:var(--text); font:500 13.5px var(--font-body); padding:8px 10px; border-radius:9px; margin-bottom:6px; }
+.r60-calq:focus{ outline:none; border-color:var(--accent); }
+.r60-calk{ font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); padding:8px 8px 4px; }
+.r60-calo{ display:flex; align-items:center; gap:10px; width:100%; padding:8px 10px; border:0; border-radius:9px; background:none; color:var(--text); font:600 13.5px var(--font-body); text-align:left; cursor:pointer; }
+.r60-calo i{ width:9px; height:9px; border-radius:50%; background:var(--cc); }
+.r60-calo:hover{ background:var(--panel-2); } .r60-calo.is-on{ background:color-mix(in srgb, var(--accent) 12%, transparent); }
+.r60-legpop .cx-legend{ display:flex; flex-direction:column; align-items:flex-start; gap:8px; margin:0 !important; padding:4px 6px; }
+.r60-legb.is-on{ border-color:var(--accent); }
+
+/* F17. Goals: yours first */
+.r60-mine{ margin-bottom:22px; }
+
+/* F18. Journal */
+.r60-j{ max-width:860px; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
+.r60-jh{ display:flex; align-items:center; gap:12px; }
+.r60-seg{ display:inline-flex; gap:2px; padding:3px; border-radius:11px; background:var(--panel-2); }
+.r60-seg button{ border:0; background:none; color:var(--text-dim); font:600 13.5px var(--font-body); padding:7px 16px; border-radius:9px; cursor:pointer; }
+.r60-seg button.is-on{ background:var(--panel); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,.3); }
+.r60-js{ margin-left:auto; display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 12px; border-radius:18px; border:1px solid var(--border); background:var(--panel); color:var(--text-faint); width:min(280px, 40%); }
+.r60-js input{ flex:1; min-width:0; border:0; background:none; color:var(--text); font:500 13.5px var(--font-body); }
+.r60-js input:focus{ outline:none; } .r60-js:focus-within{ border-color:var(--accent); }
+.r60-jw{ position:relative; display:flex; flex-direction:column; gap:10px; padding:24px 26px 18px; border-radius:20px; border:1px solid var(--border); background:radial-gradient(140% 100% at 0% 0%, color-mix(in srgb, var(--accent) 7%, var(--panel)), var(--panel) 60%); box-shadow:0 14px 40px rgba(0,0,0,.25); transition:border-color .2s ease, box-shadow .2s ease; }
+.r60-jw:focus-within{ border-color:color-mix(in srgb, var(--accent) 45%, var(--border)); box-shadow:0 18px 50px rgba(0,0,0,.32), 0 0 0 4px color-mix(in srgb, var(--accent) 8%, transparent); }
+.r60-jw-d{ font-size:11.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+.r60-jw-t{ border:0; background:none; color:var(--text); font:700 22px var(--font-display); padding:2px 0; }
+.r60-jw-t:focus{ outline:none; } .r60-jw-t::placeholder{ color:var(--text-faint); }
+.r60-jw-x{ border:0; background:none; color:var(--text); font:400 16px/1.7 var(--font-body); min-height:150px; height:150px; resize:none; padding:0; }
+.r60-jw-x:focus{ outline:none; } .r60-jw-x::placeholder{ color:var(--text-faint); }
+.r60-jw-f{ display:flex; align-items:center; gap:10px; padding-top:12px; border-top:1px solid var(--border); }
+.r60-tags{ display:flex; flex-wrap:wrap; gap:6px; flex:1; min-width:0; }
+.r60-tag{ border:1px solid var(--border); background:none; color:var(--text-dim); font:600 12.5px var(--font-body); padding:5px 11px; border-radius:16px; cursor:pointer; transition:all .15s ease; }
+.r60-tag:hover{ border-color:var(--border-strong); color:var(--text); }
+.r60-tag.is-on{ border-color:var(--tc); background:color-mix(in srgb, var(--tc) 18%, transparent); color:var(--text); }
+.r60-jw-p{ width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:none; cursor:pointer; font-size:15px; }
+.r60-jw-s{ padding:9px 22px !important; border-radius:18px !important; }
+.r60-jf{ font-size:13px; color:var(--text-dim); } .r60-jf button{ border:0; background:none; color:var(--accent); font:600 13px var(--font-body); cursor:pointer; }
+.r60-jfeed .kind-label{ display:flex; align-items:center; gap:12px; margin:14px 0 10px; font-size:11.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); }
+.r60-jfeed .kind-label:first-child{ margin-top:0; }
+.r60-jfeed .kind-label::after{ content:''; flex:1; height:1px; background:var(--border); }
+.r60-jfeed .journal-entry{ padding:18px 20px !important; border-radius:16px !important; margin-bottom:10px !important; background:var(--panel); border:1px solid var(--border); border-left-width:1px !important; position:relative; transition:border-color .15s ease, transform .15s ease; }
+.r60-jfeed .journal-entry:hover{ border-color:var(--border-strong); transform:translateY(-1px); }
+.r60-jfeed .journal-title{ font-family:var(--font-display); font-size:17px; font-weight:700; margin:6px 0 6px; }
+.r60-jfeed .journal-text{ font-size:15px; line-height:1.65; color:var(--text); }
+/* Client journals: the same look */
+.r60-jc .card, .r60-jc > div:first-child{ border-radius:18px !important; text-align:left !important; }
+.r60-jc #journalTabClientText{ min-height:110px; font-size:15px; line-height:1.6; border-radius:12px; }
+.r60-jc .task-list{ display:flex; flex-direction:column; gap:10px; }
+.r60-ce{ padding:14px 18px; border-radius:16px; border:1px solid var(--border); background:var(--panel); box-shadow:inset 3px 0 0 var(--cc); }
+.r60-ce header{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.r60-ce-c{ display:inline-flex; align-items:center; gap:7px; font-weight:700; font-size:13.5px; } .r60-ce-c i{ width:8px; height:8px; border-radius:50%; background:var(--cc); }
+.r60-ce-t{ font-size:12px; color:var(--text-dim); }
+.r60-ce time{ margin-left:auto; font-size:12px; color:var(--text-faint); font-weight:600; }
+.r60-ce p{ margin:0; font-size:14.5px; line-height:1.6; white-space:pre-wrap; }
+
+/* F19. Vault */
+.r60-vf{ display:flex; justify-content:center; gap:2px; padding:3px; border-radius:11px; background:var(--panel-2); width:max-content; margin:0 auto 16px; }
+.r60-vf button{ border:0; background:none; color:var(--text-dim); font:600 13px var(--font-body); padding:6px 14px; border-radius:9px; cursor:pointer; }
+.r60-vf button.is-on{ background:var(--panel); color:var(--text); box-shadow:0 1px 3px rgba(0,0,0,.3); }
+.r60-vs{ margin-left:auto; flex:0 0 auto; padding:4px 10px; border-radius:20px; font-size:11.5px; font-weight:700; white-space:nowrap; }
+.r60-vs.is-sealed{ background:color-mix(in srgb, #F5B342 15%, transparent); color:#F5B342; }
+.r60-vs.is-open{ background:color-mix(in srgb, var(--good) 14%, transparent); color:var(--good); }
+.r60-jw.is-client{ background:radial-gradient(140% 100% at 0% 0%, color-mix(in srgb, var(--cc) 10%, var(--panel)), var(--panel) 60%); }
+.r60-jcl{ display:inline-flex; align-items:center; gap:8px; } .r60-jcl i{ width:9px; height:9px; border-radius:50%; background:var(--cc); }
+.r60-jcl select{ border:0; background:none; color:var(--text); font:800 12px var(--font-body); letter-spacing:.12em; text-transform:uppercase; cursor:pointer; padding:0; }
+.r60-jcl select:focus{ outline:none; }
+.r60-jc{ display:flex; flex-direction:column; gap:14px; }
+.r60-jc .section{ margin:0 !important; }
+.r60-jc .section > .row:first-child .input{ border-radius:18px; height:36px; }
+.r60-jc .chip{ border-radius:14px; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -10185,7 +10326,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793478093933;
+const OP_BUILT = 1793491252128;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -54789,6 +54930,461 @@ sxOverviewHtml = (function(base){
 // (one of "Stories" is a Story, not a "Storie"; and a package with its own days shows no fixed posting weekdays)
 delivOne = (function(base){ return function(d){ const t = String(d && d.title || ''); return /[^aeiou]ies$/i.test(t) && t.length > 4 ? t.slice(0, -3)+'y' : base.apply(this, arguments); }; })(delivOne);
 r57PostDays = (function(base){ return function(c){ const pk = c && c.packageId ? r59Pk(c.packageId) : null; if(pk && arr(pk.deliverables).some(function(d){ return r59PkDays(pk, d).length; })) return []; return base.apply(this, arguments); }; })(r57PostDays);
+// ============ ROUND 60 (core) ============
+// The list is ROUND-60-LIST.md. This file: Op's read typing once, the push-to-talk cut showing his reply once, Op
+// filing app changes every time, playbook presets (built-in and your own) and chains, deliverables by the month, and
+// personal packages.
+const R60 = {};
+
+// ================= A1. Op's read types once and stays =================
+// What went wrong: Round 59 wrote a read again whenever the stored one was over 220 characters, so a long read was
+// fetched again on the next redraw (it typed twice, or rewrote itself after it was done). Now a read is only written
+// again for the reasons it always was (a new day, your ↻); a read made before Round 59 that's too long is redone once.
+opReadKick = (function(base){
+  return function(kind, facts, ask, opts){
+    const st = opReadStore(), cur = st[kind];
+    if(cur && String(cur.text || '').length > R59_READ_MAX && !(opts && opts.force)){
+      // (stand the long read in as short for Round 59's check, so it isn't fetched again; the page clamps it to fit)
+      const t = cur.text; cur.text = t.slice(0, R59_READ_MAX);
+      try{ return base.apply(this, arguments); } finally { if(st[kind]===cur) cur.text = t; }
+    }
+    return base.apply(this, arguments);
+  };
+})(opReadKick);
+
+// ================= A2. The push-to-talk cut shows his reply once =================
+// What went wrong: the cut wrote the line he was saying into the chat, then the end of his turn wrote his whole reply
+// again. Now the cut writes one entry, and the end of the turn fills that same entry with the whole reply.
+opChatLog = (function(base){
+  return function(r, t){
+    const c = R60.cutEntry;
+    if(r==='op' && c && Date.now() - c.at < 180000){
+      const L = opChat(), e = L.indexOf(c.e) >= 0 ? c.e : null;
+      if(e){ const full = String(t || '').replace(/\s+/g, ' ').trim(); if(full && full.length >= e.t.length) e.t = full.slice(0, 4000); persist('focus'); if(R60.turnDone) R60.cutEntry = null; return; }
+    }
+    return base.apply(this, arguments);
+  };
+})(opChatLog);
+r59ShowLine = function(text){
+  const t = String(text || '').replace(/\s+/g, ' ').trim(); if(!t) return;
+  const L = opChat(), c = R60.cutEntry;
+  if(c && L.indexOf(c.e) >= 0){ if(t.length > c.e.t.length || c.e.t.indexOf(t) < 0) c.e.t = c.e.t.indexOf(t) >= 0 ? c.e.t : (t.indexOf(c.e.t)===0 ? t : c.e.t+' '+t); persist('focus'); }
+  else { const e = {r:'op', t:t.slice(0, 4000), at:Date.now()}; L.push(e); persist('focus'); R60.cutEntry = {e:e, at:Date.now()}; }
+  try{ opChatDraw(); }catch(e){}
+  setTimeout(function(){ const b = document.querySelector('#opBub .op-bub-log'); if(b) b.scrollTop = b.scrollHeight; }, 30);
+};
+aiAsk = (function(base){
+  return function(){
+    R60.turnDone = false;
+    if(R60.cutEntry && Date.now() - R60.cutEntry.at > 1500) R60.cutEntry = null;   // (a new message starts clean)
+    const r = base.apply(this, arguments);
+    Promise.resolve(r).catch(function(){}).then(function(){ R60.turnDone = true; setTimeout(function(){ R60.cutEntry = null; }, 50); });
+    return r;
+  };
+})(aiAsk);
+
+// ================= A3. Op files app changes, every time =================
+// Op is told again, plainly; and when Andre's message asks for something to be added to the updates and Op filed
+// nothing, the app writes it up and files it itself (and Op's reply can't claim otherwise without it being true).
+const R60_ASKS_UPDATE = /\b(add|put|log|file|save|mark|note|write)\b[^.?!]{0,40}\b(to|in|into|as)\b[^.?!]{0,20}\b(the\s+)?(app\s+)?updates?\b|\b(add|log|mark)\s+(that|this|it)\s+(to|as|in)\s+(the\s+)?updates?\b|\bplease add that\b/i;
+aiAsk = (function(base){
+  return function(text){
+    const t = String(text || '').trim(), T0 = R58.turn;
+    const r = base.apply(this, arguments);
+    Promise.resolve(r).then(function(){
+      const T = R60.lastTurn; if(!T || T.text!==t) return;
+      if(!T.filed && !T.tools.some(function(n){ return /suggest_improvement|mark_update|file_updates|add_journal/.test(n); }) && R60_ASKS_UPDATE.test(t)){
+        const words = r58IsMeta(t) ? r58Words() : t;
+        r59Summarize(words).then(function(s){ r59File(s || words, s ? words : '', Date.now()); try{ renderView(); }catch(e){} });
+      }
+    }).catch(function(){});
+    return r;
+  };
+})(aiAsk);
+// (keep hold of the turn after Round 58 lets it go, so the check above can read it)
+opRunTool = (function(base){ return function(){ if(R58.turn) R60.lastTurn = R58.turn; return base.apply(this, arguments); }; })(opRunTool);
+aiAsk = (function(base){ return function(){ const r = base.apply(this, arguments); if(R58.turn) R60.lastTurn = R58.turn; return r; }; })(aiAsk);
+aiSystem = (function(base){
+  return function(){
+    const s = base.apply(this, arguments);
+    if(Array.isArray(s)) s.push({type:'text', text:'Non-negotiable: when he asks you to add, log, mark or put something in the updates, or gives you a change or feedback for this app, you call suggest_improvement (or mark_update / file_updates) in that same reply, before you answer. He relies on you for this and will not check. Only then say it is saved.'});
+    return s;
+  };
+})(aiSystem);
+
+// ================= B6–B8. Playbook presets and chains =================
+// Built-in presets to start from (each one an ordinary playbook you can change), your own presets (save any playbook
+// as one), and chains: Onboarding hands people to Monthly client by itself when it's done.
+function r60St(name, extra, steps){ const s = pb57Stage(name, extra || {}); s.steps = steps || []; return s; }
+function r60Sp(title, type, due, extra){ return pb57Step(title, type, due, extra); }
+const R60_PRESETS = [
+  {key:'onboarding', name:'Onboarding', icon:'&#128075;', line:'The first week and month with a new client', build:function(){
+    return {repeats:false, stages:[
+      r60St('First week', {days:7}, [r60Sp('Welcome call', 'call', {rule:'enter'}), r60Sp('Get access', 'access', {rule:'day', n:2}, {checklist:[{id:uid(), t:'Meta Business Manager'}, {id:uid(), t:'Ad account'}, {id:uid(), t:'Brand assets'}]}), r60Sp('Send the intake form', 'send', {rule:'day', n:2}), r60Sp('Kick-off call', 'call', {rule:'day', n:5})]),
+      r60St('First month', {days:23}, [r60Sp('Strategy doc', 'doc', {rule:'day', n:3}), r60Sp('First content out', 'task', {rule:'day', n:10}), r60Sp('30-day review call', 'call', {rule:'end'})])]}; }},
+  {key:'monthly', name:'Monthly client', icon:'&#128197;', line:'The rhythm every month: reports, calls, check-ins', build:function(){
+    return {repeats:false, stages:[r60St('Every month', {repeat:'month'}, [r60Sp('Weekly report', 'report', {rule:'week', dow:5}), r60Sp('Book the monthly call', 'task', {rule:'before', n:7}), r60Sp('Monthly call', 'call', {rule:'before', n:3}), r60Sp('Monthly report', 'report', {rule:'end'})])]}; }},
+  {key:'save', name:'Save a client', icon:'&#129693;', line:'When a client goes quiet or wants to leave', build:function(){
+    return {repeats:false, stages:[r60St('At risk', {days:10}, [r60Sp('Save call', 'call', {rule:'enter'}), r60Sp('Send a quick win', 'send', {rule:'day', n:3}), r60Sp('Check in', 'task', {rule:'day', n:7}), r60Sp('Decide: stay or wrap up', 'task', {rule:'end'})])]}; }},
+  {key:'offboarding', name:'Offboarding', icon:'&#128075;', line:'Wrap up well and leave the door open', build:function(){
+    return {repeats:false, stages:[r60St('Wrapping up', {days:7}, [r60Sp('Final report', 'report', {rule:'day', n:2}), r60Sp('Hand over access and files', 'access', {rule:'day', n:4}), r60Sp('Ask for a testimonial or referral', 'send', {rule:'end'})])]}; }}
+];
+function r60Customs(){ const c = crm(); if(!Array.isArray(c.pbPresets)) c.pbPresets = []; return c.pbPresets; }
+// a copy with fresh ids (so a preset never shares steps with a playbook)
+function r60Fresh(stages){ return JSON.parse(JSON.stringify(arr(stages))).map(function(s){ s.id = uid(); s.steps = arr(s.steps).map(function(it){ it.id = uid(); arr(it.checklist).forEach(function(c){ c.id = uid(); }); it.files = []; return it; }); return s; }); }
+function r60Make(name, def, next){
+  const p = pbNew('client', name, 30, {for:'client', repeats:!!def.repeats, next:next || null});
+  p.stages = r60Fresh(def.stages); p.postDays = []; if(def.preset) p.preset = def.preset;
+  pbAll().push(p); pbSave(); return p;
+}
+function r60UsePreset(key){
+  if(key==='chain'){
+    const m = r60Make('Monthly client', Object.assign(R60_PRESETS[1].build(), {preset:'monthly'}));
+    const o = r60Make('Onboarding', Object.assign(R60_PRESETS[0].build(), {preset:'onboarding'}), m.id);
+    return o;
+  }
+  const b = R60_PRESETS.find(function(x){ return x.key===key; });
+  if(b) return r60Make(b.name, Object.assign(b.build(), {preset:b.key}));
+  const c = r60Customs().find(function(x){ return x.id===key; });
+  if(c) return r60Make(c.name, {stages:c.stages, repeats:c.repeats});
+  return null;
+}
+ACTIONS.r60UsePreset = function(el, e, key){
+  const p = r60UsePreset(key); if(!p) return;
+  addSheetClose('pb6NewSheet'); playPositive();
+  ui.view = 'business'; ui.businessTab = 'lifecycle'; ui.pbView = 'build'; ui.pbSel = p.id; ui.pbItem = null; ui.pb57Stage = pbStages(p)[0] ? pbStages(p)[0].id : null; ui.pb57StageEdit = false;
+  renderView(); showToast(key==='chain' ? 'Onboarding, then Monthly client: people move on by themselves.' : p.name+' is ready to make your own.', {icon:'&#9776;'});
+};
+ACTIONS.r60SavePreset = function(el, e, id){
+  const p = pbById(id); if(!p) return;
+  const L = r60Customs(), was = L.find(function(x){ return x.from===p.id; });
+  const snap = {id:was ? was.id : uid(), from:p.id, name:p.name, repeats:!!p.repeats, stages:JSON.parse(JSON.stringify(pbStages(p))), at:Date.now()};
+  if(was) L[L.indexOf(was)] = snap; else L.push(snap);
+  pbSave(); playPositive(); showToast((was ? 'Preset updated: ' : 'Saved as a preset: ')+p.name, {icon:'&#11088;'}); renderView();
+};
+ACTIONS.r60DelPreset = function(el, e, id){ const c = crm(); c.pbPresets = r60Customs().filter(function(x){ return x.id!==id; }); pbSave(); playTick(); try{ addSheetRefresh('pb6NewSheet'); }catch(err){} renderView(); };
+
+// ================= C10. Deliverables by the week or by the month =================
+// A deliverable can be "3 a week" or "2 a month" (two YouTube videos a month). A monthly one counts against the month
+// only: it's never "behind this week".
+function r60PerMonth(d){ return !!(d && d.per==='month'); }
+function r60Monthly(d){ return Math.max(1, Math.round(Number(d.monthly) || 1)); }
+monthlyTargetFor = (function(base){ return function(d){ return r60PerMonth(d) ? r60Monthly(d) : base.apply(this, arguments); }; })(monthlyTargetFor);
+isDeliverableDoneThisWeek = (function(base){ return function(d){ if(d && d.recurring && r60PerMonth(d)) return deliverableMonthCount(d) >= r60Monthly(d); return base.apply(this, arguments); }; })(isDeliverableDoneThisWeek);
+r59PkNeed = function(d){ return r60PerMonth(d) ? r60Monthly(d) : Math.max(1, Math.round((Number(d.weeklyTarget) || 1)*52/12)); };
+function r60Cadence(d){ return r60PerMonth(d) ? r60Monthly(d)+' a month' : (Number(d.weeklyTarget) || 1)+' a week'; }
+// (clients on a package get the cadence too)
+r59PkSync = (function(base){
+  return function(pk){
+    base.apply(this, arguments);
+    arr(state.business.clients).forEach(function(c){ if(c.packageId!==pk.id) return; arr(c.deliverables).forEach(function(d){ const pd = d.fromPackage && arr(pk.deliverables).find(function(x){ return x.id===d.sourceId; }); if(!pd) return; if(r60PerMonth(pd)){ d.per = 'month'; d.monthly = r60Monthly(pd); } else { delete d.per; delete d.monthly; } }); });
+  };
+})(r59PkSync);
+if(typeof assignClientPackage==='function') assignClientPackage = (function(base){ return function(id){ const r = base.apply(this, arguments); const c = arr(state.business.clients).find(function(x){ return x.id===id; }), pk = c && r59Pk(c.packageId); if(pk){ r59PkSync(pk); persist('business'); } return r; }; })(assignClientPackage);
+
+// ================= C11. Personal packages =================
+// A package marked Personal is your own content plan: no price, no "who's on it", nothing billed. (You aren't put on
+// it: you lock in on it from Social when you're ready.)
+function r60Personal(pk){ return !!(pk && (pk.personal || pk.type==='self')); }
+// ============ ROUND 60: THE PAGES ============
+// Op's little pop-up by the XP, the push-to-talk explainer, presets on the page, the Log center tab, deliverable
+// cadence and personal packages in the package sheet, the hover labels, Social's clients and settings, the Calendar's
+// controls, Goals order, the Journal and the Vault.
+
+// ================= A4. When Op logs something: a short glow by the XP =================
+// No long note in the corner: one short line slides out next to your level, glowing white like Op. Tap it to read the
+// whole thing. (Everything still goes to Notifications → From Op.)
+function r60PopLine(text, kind){
+  if(kind==='idea') return 'Op saved something to App updates';
+  const t = String(text || '').replace(/\s+/g, ' ').trim();
+  return 'Op: '+(t.length > 46 ? t.slice(0, 44).replace(/\s+\S*$/, '')+'…' : t);
+}
+r57Note = function(text, kind, more){
+  text = String(text || '').trim(); if(!text) return;
+  more = more || {};
+  const it = r58FeedAdd({kind:kind==='idea' ? 'update' : 'did', short:text.slice(0, 160), full:more.full || text, title:more.title || '', entry:more.entry || null});
+  let pop = document.getElementById('r60Pop');
+  if(pop){ clearTimeout(pop._out); pop.remove(); }
+  pop = document.createElement('div'); pop.id = 'r60Pop'; pop.className = 'r60-pop'+(kind==='idea' ? ' is-idea' : ''); pop.setAttribute('data-feed', it.id);
+  pop.innerHTML = '<button class="r60-pop-h" data-action="r60PopOpen"><i class="r60-pop-o"></i><span>'+escapeHtml(r60PopLine(text, kind))+'</span></button><div class="r60-pop-b"><p>'+escapeHtml(more.full || text)+'</p><time>'+r57Clock()+'</time></div>';
+  document.body.appendChild(pop);
+  r60PopPlace(pop);
+  requestAnimationFrame(function(){ pop.classList.add('is-in'); });
+  const out = function(){ pop._out = setTimeout(function(){ if(pop.classList.contains('is-open')) return; pop.classList.remove('is-in'); setTimeout(function(){ pop.remove(); }, 420); }, 4500); };
+  out();
+  pop.addEventListener('mouseenter', function(){ clearTimeout(pop._out); });
+  pop.addEventListener('mouseleave', function(){ if(!pop.classList.contains('is-open')) out(); });
+};
+function r60PopPlace(pop){
+  const d = document.querySelector('#musicDock .md-in') || document.getElementById('musicDock');
+  if(d){ const r = d.getBoundingClientRect(); pop.style.top = Math.max(8, r.top + r.height/2 - 17)+'px'; pop.style.right = Math.max(8, window.innerWidth - r.left + 10)+'px'; }
+  else { pop.style.top = '14px'; pop.style.right = '16px'; }
+}
+ACTIONS.r60PopOpen = function(el){ const p = el.closest('.r60-pop'); if(!p) return; clearTimeout(p._out); p.classList.toggle('is-open'); if(!p.classList.contains('is-open')){ p._out = setTimeout(function(){ p.classList.remove('is-in'); setTimeout(function(){ p.remove(); }, 420); }, 2000); } };
+document.addEventListener('mousedown', function(e){ const p = document.getElementById('r60Pop'); if(p && p.classList.contains('is-open') && !p.contains(e.target)){ p.classList.remove('is-open', 'is-in'); setTimeout(function(){ p.remove(); }, 420); } });
+window.addEventListener('resize', function(){ const p = document.getElementById('r60Pop'); if(p) r60PopPlace(p); });
+
+// ================= A5. Push-to-talk away from the app =================
+// Settings → Op says plainly whether the key works with Operator in the background, and what to turn on if it doesn't.
+r57KeyWarn = (function(base){
+  return function(){
+    const warn = base.apply(this, arguments), h = (typeof R57!=='undefined' && R57.keyHealth) || {};
+    let info;
+    if(!OPAPP) info = '<b>Only while this window is in front.</b> In the Operator Mac app the key works anywhere on your Mac.';
+    else if(warn) info = '';
+    else if(h.ok===true) info = '<b>Works anywhere on your Mac</b>, even with Operator hidden (it keeps running from the menu bar).';
+    else info = '<b>Works anywhere on your Mac while Operator is running.</b> It needs Input Monitoring and Accessibility for Operator in System Settings → Privacy &amp; Security. <button class="btn btn-sm" data-action="r57OpenPrivacy">Check</button>';
+    return warn+(info ? '<div class="r60-ptt">'+info+'</div>' : '');
+  };
+})(r57KeyWarn);
+
+// ================= B. Presets and chains on the page =================
+function r60PresetCards(){
+  const card = function(key, icon, name, line, del){ return '<div class="r60-pre"><button class="r60-pre-b" data-action="r60UsePreset" data-id="'+key+'"><i>'+icon+'</i><b>'+escapeHtml(name)+'</b><small>'+escapeHtml(line)+'</small></button>'+(del ? '<button class="r60-pre-x" data-action="r60DelPreset" data-id="'+key+'" aria-label="Remove this preset" data-hov="Remove this preset">&#10005;</button>' : '')+'</div>'; };
+  return '<div class="r60-pres">'+
+    card('chain', '&#10145;&#65039;', 'Onboarding → Monthly client', 'Both, chained: when onboarding’s done they move on by themselves')+
+    R60_PRESETS.map(function(p){ return card(p.key, p.icon, p.name, p.line); }).join('')+
+    r60Customs().map(function(c){ return card(c.id, '&#11088;', c.name, pbStages({stages:c.stages}).length+' stage'+(c.stages.length===1 ? '' : 's')+' · your preset', true); }).join('')+
+  '</div>';
+}
+pb6NewHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), i = h.indexOf('<div class="r59-nf">');
+    if(i < 0) return h;
+    return h.slice(0, i)+'<div class="r60-pk-k">Start from</div>'+r60PresetCards()+'<div class="r60-pk-k">Or from scratch</div>'+h.slice(i);
+  };
+})(pb6NewHtml);
+r58PbOverview = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    // (a chain shows on its column: "then Monthly client")
+    pbAll().forEach(function(p){ const nx = p.next && pbById(p.next); if(!nx) return; h = h.replace(new RegExp('(data-pb6-col="'+p.id+'"[\\s\\S]*?<small class="pb6-cmeta">[^<]*)'), '$1 · then '+escapeHtml(nx.name).replace(/\$/g, '$$$$')); });
+    if(!pbAll().some(function(p){ return pbFor(p)==='client'; })) h += '<section class="r60-empty"><div class="r60-empty-h"><b>Start your client playbooks</b></div>'+r60PresetCards()+'</section>';
+    return h;
+  };
+})(r58PbOverview);
+renderBusiness = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    const t = ui.businessTab || 'overview';
+    // C9. the Log center is a tab, after Leads (no separate button)
+    h = h.replace(/<button class="biz-gear is-lane[^"]*" data-action="businessTab" data-tab="log">[\s\S]*?<\/button>/, '');
+    if(h.indexOf('data-tab="log"') < 0 || !/<div class="tab[^"]*" data-action="businessTab" data-tab="log"/.test(h)){
+      h = h.replace(/(<div class="tab[^"]*" data-action="businessTab" data-tab="leads">[\s\S]*?<\/div>)/, function(m0){ return m0+'<div class="tab '+(t==='log' ? 'active' : '')+'" data-action="businessTab" data-tab="log">Log center'+(typeof reachNeeds==='function' && reachNeeds().length ? ' <span class="r58-tn">'+reachNeeds().length+'</span>' : '')+'</div>'; });
+    }
+    if(t==='lifecycle' && ui.pbView==='build'){
+      const p = pbSel();
+      if(p && !p.master) h = h.replace(/(<button class="pb6-del" data-action="pbDelete")/, '<button class="btn btn-sm r60-save" data-action="r60SavePreset" data-id="'+p.id+'">'+(r60Customs().some(function(x){ return x.from===p.id; }) ? 'Update preset' : 'Save as preset')+'</button>$1');
+      h = h.replace('<span>After the last stage</span>', '<span>When they finish</span>').replace(/>It ends<\/option>/, '>They’re done</option>').replace(/>Back to the first stage<\/option>/, '>They start over</option>').replace(/>On to ([^<]*)<\/option>/g, '>They move to $1</option>');
+    }
+    return h;
+  };
+})(renderBusiness);
+
+// ================= C10–C12. The package sheet: cadence, personal, the hover =================
+ACTIONS.r60DvPer = function(el, e, v){
+  const q = String(v).split('|'), pk = r59Pk(ui.r59PkId), d = pk && arr(pk.deliverables).find(function(x){ return x.id===q[0]; }); if(!d) return;
+  if(q[1]==='month'){ d.per = 'month'; d.monthly = d.monthly || Math.max(1, Math.round((Number(d.weeklyTarget) || 1)*52/12)); } else { delete d.per; }
+  r59PkSave(); playTick(); addSheetRefresh('r59PkSheet');
+};
+ACTIONS.r59DvStep = (function(base){ return function(el, e, v){ const q = String(v).split('|'), pk = r59Pk(ui.r59PkId), d = pk && arr(pk.deliverables).find(function(x){ return x.id===q[0]; }); if(d && r60PerMonth(d)){ d.monthly = Math.max(1, Math.min(60, r60Monthly(d) + Number(q[1]))); r59PkSave(); playTick(); addSheetRefresh('r59PkSheet'); return; } return base.apply(this, arguments); }; })(ACTIONS.r59DvStep);
+ACTIONS.r60PkPersonal = function(el, e, v){ const pk = r59Pk(ui.r59PkId); if(!pk) return; pk.personal = v==='1'; if(pk.personal){ pk.type = 'self'; pk.price = 0; } else if(pk.type==='self') delete pk.type; r59PkSave(); playTick(); addSheetRefresh('r59PkSheet'); };
+r59PkSheetHtml = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    const pk = r59Pk(ui.r59PkId); if(!pk) return h;
+    arr(pk.deliverables).forEach(function(d){
+      const re = new RegExp('(<button data-action="r59DvStep" data-id="'+d.id+'\\|-1">&minus;</button><b>)\\d+(</b>[\\s\\S]*?</span>)<small>a week</small>');
+      h = h.replace(re, function(m0, a, b){ return a+(r60PerMonth(d) ? r60Monthly(d) : (d.weeklyTarget || 1))+b+'<span class="r60-per"><button class="'+(r60PerMonth(d) ? '' : 'is-on')+'" data-action="r60DvPer" data-id="'+d.id+'|week">a week</button><button class="'+(r60PerMonth(d) ? 'is-on' : '')+'" data-action="r60DvPer" data-id="'+d.id+'|month">a month</button></span>'; });
+    });
+    // (hover a day: what goes out that day)
+    h = h.replace(/<button class="r59-cd([^"]*)" data-action="r59PkDay" data-id="(\d+)">/g, function(m0, cls, n){
+      const on = arr(pk.deliverables).filter(function(d){ return r59PkDays(pk, d).indexOf(Number(n)) >= 0; }).map(function(d){ return d.title; });
+      const brush = arr(pk.deliverables).find(function(d){ return d.id===ui.r59Brush; });
+      const lab = 'Day '+n+': '+(on.length ? on.join(', ') : 'nothing yet')+(brush ? (on.indexOf(brush.title) >= 0 ? ' · tap to take '+brush.title+' off' : ' · tap to add '+brush.title) : '');
+      return '<button class="r59-cd'+cls+'" data-action="r59PkDay" data-id="'+n+'" title="'+escapeHtml(lab)+'" data-hov="'+escapeHtml(lab)+'">';
+    });
+    const per = '<div class="r60-kind"><button class="'+(r60Personal(pk) ? '' : 'is-on')+'" data-action="r60PkPersonal" data-id="0">For clients</button><button class="'+(r60Personal(pk) ? 'is-on' : '')+'" data-action="r60PkPersonal" data-id="1">Personal</button></div>';
+    h = h.replace('<div class="r59-pk-sec">What’s in it</div>', per+'<div class="r59-pk-sec">What’s in it</div>');
+    if(r60Personal(pk)){
+      h = h.replace(/<label class="r59-pk-p">[\s\S]*?<\/label>/, '<span class="r60-me">Personal</span>');
+      h = h.replace(/<div class="r59-pk-sec">On it<\/div><div class="r59-on">[\s\S]*?<\/div>/, '');
+      h = h.replace('<span>Day 1 is when their cycle starts</span>', '<span>Day 1 is the day you lock in</span>');
+    }
+    return h;
+  };
+})(r59PkSheetHtml);
+packageRow = (function(base){
+  return function(pk){
+    let h = base.apply(this, arguments);
+    if(r60Personal(pk)){
+      const me = Object.keys(r59Plans()).some(function(a){ return r59Plans()[a] && r59Plans()[a].pk===pk.id; });
+      h = h.replace(/<div class="pk-price">[\s\S]*?<\/div><\/div>/, '<span class="r60-me">Personal</span></div>').replace(/<div class="r59-pkc-f">[\s\S]*?<\/div>\s*<\/button>$/, '<div class="r59-pkc-f">'+(me ? 'You’re locked in on it' : 'Lock in on it from Social')+'</div></button>');
+    }
+    arr(pk.deliverables).forEach(function(d){ if(r60PerMonth(d)) return; });
+    return h;
+  };
+})(packageRow);
+openNewPackageModal = function(){
+  ui.r60NewPersonal = false;
+  addSheetOpen('r59PkNew', function(){
+    const me = !!ui.r60NewPersonal;
+    return asHead('&#128230;', 'New package')+
+      '<div class="r60-kind"><button class="'+(me ? '' : 'is-on')+'" data-action="r60NewKind" data-id="0">For clients</button><button class="'+(me ? 'is-on' : '')+'" data-action="r60NewKind" data-id="1">Personal</button></div>'+
+      '<div class="r59-nf"><input class="input r59-nf-n" id="r59NewPkName" maxlength="40" placeholder="'+(me ? 'Name it (My brand, Daily content…)' : 'Name it (Growth, Starter…)')+'" value="'+escapeHtml(ui.r60NewPkName || '')+'"></div>'+
+      (me ? '' : '<div class="r59-nf-row"><span>Price a month</span><label class="r59-pk-p"><span>$</span><input id="r59NewPkPrice" type="number" min="0" placeholder="0"></label></div>')+
+      '<div class="as-f"><button class="btn btn-primary hs-go" data-action="r59PkMake">Make it</button></div>';
+  }, 'r59NewPkName');
+};
+ACTIONS.r60NewKind = function(el, e, v){ const n = document.getElementById('r59NewPkName'); ui.r60NewPkName = n ? n.value : ''; ui.r60NewPersonal = v==='1'; playTick(); addSheetRefresh('r59PkNew'); };
+ACTIONS.r59PkMake = (function(base){ return function(){ const me = !!ui.r60NewPersonal, n0 = arr(state.business.packages).length; const r = base.apply(this, arguments); const L = arr(state.business.packages); if(L.length > n0 && me){ const pk = L[L.length - 1]; pk.personal = true; pk.type = 'self'; pk.price = 0; persist('business'); addSheetRefresh('r59PkSheet'); } ui.r60NewPkName = ''; return r; }; })(ACTIONS.r59PkMake);
+// (packages for clients don't offer a personal one, and the lock-in sheet offers personal ones first)
+// (C12, everywhere: a button with no label never shows its internal name, like "R59 pk day", on hover)
+hovLabelFor = (function(base){ return function(el){ const own = el.getAttribute('data-hov') || el.getAttribute('title') || el.getAttribute('aria-label'); if(own) return own; const a = el.getAttribute('data-action') || ''; if(/^r\d/i.test(a) || /\d/.test(a)) return ''; return base.apply(this, arguments); }; })(hovLabelFor);
+
+// ================= D13–D14. Social: your clients, and a settings button =================
+// The accounts row ends with your clients (each in their own colour) and a + to add a client's account; the ⇄ swap
+// becomes a ⚙ with the account settings in it. Full screen and Refresh sit a little lower, clear of your level.
+r58StripHtml = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    h = h.replace(/<button class="r58-swap"[^>]*>[\s\S]*?<\/button>/, '');
+    const cls = r58Clients(), add = '<button class="r60-addcl" data-action="r60CliOpen" data-hov="Add or link a client’s account"><i>+</i>'+(cls.length ? '' : 'Add a client’s account')+'</button>';
+    const gear = '<button class="r60-socset" data-action="r60SocSettings" aria-label="Social settings" data-hov="Social settings">&#9881;&#65038;</button>';
+    if(h.indexOf('<div class="r58-cls">') >= 0) h = h.replace('<div class="r58-cls">', '<div class="r58-cls"><span class="r60-k">Clients</span>').replace(/(<div class="r58-cls">[\s\S]*?)(<\/div><\/div>)$/, '$1'+add+'$2');
+    else h = h.replace(/<\/div>$/, '<div class="r58-cls"><span class="r60-k">Clients</span>'+add+'</div></div>');
+    return h.replace(/<\/div>$/, gear+'</div>');
+  };
+})(r58StripHtml);
+function r60CliSheetHtml(){
+  const L = r58Clients(), cs = arr(state.business.clients).filter(function(c){ return clientStageActive(c.stage); });
+  const row = function(x){ const c = x.client; return '<div class="r60-cl" style="--cc:'+(c ? clientAccent(c) : 'var(--border-strong)')+'"><i></i><b>@'+escapeHtml(x.handle)+'</b><small>'+escapeHtml(x.platform==='facebook' ? 'Facebook' : 'Instagram')+'</small><select class="input input-sm" data-r58-cli="'+x.id+'"><option value="">Not a client</option>'+cs.map(function(k){ return '<option value="'+k.id+'"'+(c && c.id===k.id ? ' selected' : '')+'>'+escapeHtml(k.business || k.name)+'</option>'; }).join('')+'</select></div>'; };
+  return asHead('&#128101;', 'Clients’ accounts')+
+    (L.length ? '<div class="r60-cls">'+L.map(row).join('')+'</div>' : '<div class="r60-none"><b>No client accounts yet</b><span>Connect each client’s Instagram or Facebook in Zernio (the same Zernio as yours), then tap Refresh: they show up here to link to a client.</span></div>')+
+    '<div class="as-f"><button class="btn" data-action="r60CliRefresh">Refresh</button><button class="btn btn-primary" data-action="addSheetClose">Done</button></div>';
+}
+ACTIONS.r60CliOpen = function(){ addSheetOpen('r60Cli', r60CliSheetHtml); };
+ACTIONS.r60CliRefresh = function(){ try{ ACTIONS.r55CliRefresh(); }catch(e){} setTimeout(function(){ addSheetRefresh('r60Cli'); }, 1500); };
+document.addEventListener('change', function(e){ if(e.target && e.target.hasAttribute && e.target.hasAttribute('data-r58-cli')) setTimeout(function(){ try{ addSheetRefresh('r60Cli'); }catch(err){} }, 50); });
+ACTIONS.r60SocSettings = function(){
+  addSheetOpen('r60Soc', function(){
+    const own = r58Own();
+    return asHead('&#9881;&#65038;', 'Social settings')+
+      '<div class="r60-set">'+
+        own.map(function(o){ return '<div class="r60-set-r"><b>@'+escapeHtml(o.handle)+'</b><span>'+(o.role==='personal' ? 'You' : 'Your business')+'</span></div>'; }).join('')+
+        (own.length > 1 ? '<button class="r60-set-b" data-action="r60SwapRoles">&#8644; Swap which is business and which is personal</button>' : '')+
+        '<button class="r60-set-b" data-action="r60SocAdd">&#43; Connect another account</button>'+
+        '<button class="r60-set-b" data-action="r60CliOpen">&#128101; Clients’ accounts</button>'+
+        '<button class="r60-set-b" data-action="r60SocRefresh">&#8635; Refresh the numbers</button>'+
+      '</div>';
+  });
+};
+ACTIONS.r60SwapRoles = function(){ ACTIONS.sxSwapRoles(); addSheetClose('r60Soc'); };
+ACTIONS.r60SocAdd = function(){ addSheetClose('r60Soc'); ACTIONS.socAddRole(null, null, r58Own().some(function(o){ return o.role==='business'; }) ? 'personal' : 'business'); };
+ACTIONS.r60SocRefresh = function(){ addSheetClose('r60Soc'); try{ igMaybeRefresh(true); }catch(e){} try{ r55CliLoad(true); }catch(e){} renderView(); };
+
+// ================= E15–E16. The Calendar: one picker, no Today, the legend tucked away =================
+function r60CalPickHtml(){
+  const c = r59CalClient(), cs = mtActiveClients(), open = !!ui.r60CalPick;
+  const btn = '<button class="r60-calb'+(c ? ' is-client' : '')+'" data-action="r60CalPick"'+(c ? ' style="--cc:'+clientAccent(c)+'"' : '')+'><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>'+(c ? escapeHtml(c.business || c.name) : 'Your calendar')+'</span><i>&#9662;</i></button>';
+  if(!open) return '<span class="r60-calw">'+btn+'</span>';
+  return '<span class="r60-calw">'+btn+'<div class="r60-calpop"><input class="r60-calq" id="r60CalQ" placeholder="Find a client" autocomplete="off"><button class="r60-calo'+(c ? '' : ' is-on')+'" data-action="r60CalSet" data-id=""><i style="--cc:var(--accent)"></i>Your calendar</button>'+
+    (cs.length ? '<div class="r60-calk">Clients</div>' : '')+cs.map(function(x){ return '<button class="r60-calo'+(c && c.id===x.id ? ' is-on' : '')+'" data-action="r60CalSet" data-id="'+x.id+'" data-name="'+escapeHtml(String(x.business || x.name).toLowerCase())+'"><i style="--cc:'+clientAccent(x)+'"></i>'+escapeHtml(x.business || x.name)+'</button>'; }).join('')+'</div></span>';
+}
+cxMonthCardHtml = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    h = h.replace(/<label class="r59-calf">[\s\S]*?<\/label>/, '').replace(/<button class="cx-chip" data-action="cxToday">Today<\/button>/, '');
+    h = h.replace('<span style="flex:1"></span>', '<span style="flex:1"></span>'+r60CalPickHtml());
+    // (the legend behind a button)
+    const m = /<div class="cx-legend[^"]*">[\s\S]*?<\/div>/.exec(h);
+    if(m){ h = h.replace(m[0], ''); h = h.replace(/(<button class="cx-chip" data-action="openUpcomingPopover")/, '<span class="r60-legw"><button class="cx-chip r60-legb'+(ui.r60Legend ? ' is-on' : '')+'" data-action="r60Legend">Legend</button>'+(ui.r60Legend ? '<div class="r60-legpop">'+m[0]+'</div>' : '')+'</span>$1'); }
+    return h;
+  };
+})(cxMonthCardHtml);
+ACTIONS.r60CalPick = function(){ ui.r60CalPick = !ui.r60CalPick; ui.r60Legend = false; playTick(); renderView(); if(ui.r60CalPick) setTimeout(function(){ const q = document.getElementById('r60CalQ'); if(q) q.focus(); }, 30); };
+ACTIONS.r60CalSet = function(el, e, id){ ui.r59CalClient = id || null; ui.r60CalPick = false; playTick(); renderView(); };
+ACTIONS.r60Legend = function(){ ui.r60Legend = !ui.r60Legend; ui.r60CalPick = false; playTick(); renderView(); };
+document.addEventListener('input', function(e){ if(!e.target || e.target.id!=='r60CalQ') return; const q = e.target.value.trim().toLowerCase(); document.querySelectorAll('.r60-calpop [data-name]').forEach(function(b){ b.style.display = !q || b.getAttribute('data-name').indexOf(q) >= 0 ? '' : 'none'; }); });
+document.addEventListener('keydown', function(e){ if(e.target && e.target.id==='r60CalQ' && e.key==='Enter'){ const b = Array.from(document.querySelectorAll('.r60-calpop [data-name]')).find(function(x){ return x.style.display!=='none'; }); if(b) ACTIONS.r60CalSet(b, e, b.getAttribute('data-id')); } if(e.key==='Escape' && (ui.r60CalPick || ui.r60Legend)){ ui.r60CalPick = false; ui.r60Legend = false; renderView(); } });
+document.addEventListener('mousedown', function(e){ if((ui.r60CalPick && !e.target.closest('.r60-calw')) || (ui.r60Legend && !e.target.closest('.r60-legw'))){ ui.r60CalPick = false; ui.r60Legend = false; setTimeout(renderView, 0); } });
+
+// ================= F17. Goals: your goals first =================
+renderGoalsTab = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), i = h.indexOf('<div class="r43-sec is-mine">'), top = '<div class="r43-goalsp g39">';
+    if(i < 0 || h.indexOf(top)!==0) return h;
+    let j = h.indexOf('<div class="r43-sec is-ach">'); if(j < 0) j = h.lastIndexOf('</div>');
+    return top+'<div class="r60-mine">'+h.slice(i, j)+'</div>'+h.slice(top.length, i)+h.slice(j);
+  };
+})(renderGoalsTab);
+
+// ================= F18. The Journal, redone =================
+// One clean column: My journal / Client journals and search on one line at the top; a writing card that feels like a
+// page (today's date, a title, room to write, your tags, Save); then your entries as a calm feed. Client journals get
+// the same look. Boards and the Vault keep their own pages.
+function r60JournalHead(clients){
+  return '<div class="r60-jh"><div class="r60-seg"><button class="'+(clients ? '' : 'is-on')+'" data-action="setJournalViewMode" data-value="personal">My journal</button><button class="'+(clients ? 'is-on' : '')+'" data-action="setJournalViewMode" data-value="clients">Client journals</button></div>'+
+    (clients ? '' : '<label class="r60-js"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="journalSearchInput" placeholder="Search your journal" value="'+escapeHtml(ui.journalSearchText || '')+'"></label>')+'</div>';
+}
+renderJournalEntriesTab = function(){
+  const clients = ui.journalViewMode==='clients';
+  if(clients) return '<div class="r60-j is-clients">'+r60JournalHead(true)+'<div class="r60-jc">'+renderClientJournalsAllTab()+'</div></div>';
+  const d = new Date(), date = d.toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'});
+  const tags = journalTypes().map(function(m){ const on = ui.selectedMood===m.id; return '<button class="r60-tag'+(on ? ' is-on' : '')+'" data-action="selectMood" data-mood="'+m.id+'" style="--tc:'+m.color+'">'+m.emoji+' '+escapeHtml(m.label)+'</button>'; }).join('');
+  const write = '<div class="r60-jw" data-photo-drop="journal">'+
+    '<div class="r60-jw-d">'+escapeHtml(date)+'</div>'+
+    '<input class="r60-jw-t" id="journalPageTextTitle" placeholder="Give it a title" maxlength="120">'+
+    '<textarea class="r60-jw-x" id="journalPageText" placeholder="What’s on your mind?">'+escapeHtml(ui.journalDraftText || '')+'</textarea>'+
+    renderJournalPhotoThumbsRow()+
+    '<div class="r60-jw-f"><div class="r60-tags">'+tags+'</div><button class="r60-jw-p" data-action="triggerJournalPhotoInput" data-hov="Add a photo" aria-label="Add a photo">&#128247;</button><button class="btn btn-primary r60-jw-s" data-action="addJournal" data-target="journalPageText">Save</button></div>'+
+  '</div>';
+  const filt = ui.journalFilterMood ? '<div class="r60-jf">Showing '+escapeHtml((moodById(ui.journalFilterMood) || {}).label || '')+' <button data-action="clearJournalFilters">Show all</button></div>' : '';
+  return '<div class="r60-j">'+r60JournalHead(false)+write+filt+'<div class="r60-jfeed" id="journalHistoryContainer">'+renderJournalHistory(filteredJournalEntries())+'</div>'+(typeof journalTrashHtml==='function' ? journalTrashHtml() : '')+'</div>';
+};
+renderAllClientJournalRow = function(row){
+  const e = row.entry, c = arr(state.business.clients).find(function(x){ return x.id===row.clientId; }), tag = e.tag ? moodById(e.tag) : null;
+  return '<article class="r60-ce" style="--cc:'+(c ? clientAccent(c) : 'var(--accent)')+'"><header><span class="r60-ce-c"><i></i>'+escapeHtml(row.clientName)+'</span>'+(tag ? '<span class="r60-ce-t">'+tag.emoji+' '+escapeHtml(tag.label)+'</span>' : '')+'<time>'+escapeHtml(fmtDateShort(e.date))+'</time>'+deleteBtn('clientjournal', e.id)+'</header><p>'+escapeHtml(e.text || '')+'</p></article>';
+};
+document.addEventListener('input', function(e){ const t = e.target; if(t && t.id==='journalPageText' && t.classList.contains('r60-jw-x')){ t.style.height = 'auto'; t.style.height = Math.min(560, Math.max(150, t.scrollHeight + 2))+'px'; } });
+
+// ================= F19. The Vault: when each one opens, and Open / Sealed =================
+// Same look. Every card says plainly where it stands (sealed until a date, sealed until a surprise morning this year,
+// or open), the week and month notes say what they are, and you can show just the open or just the sealed ones.
+vaultHtml = function(){
+  const all = vaultItems(), f = ui.r60VaultF || 'all', open = ui.vaultOpen || {};
+  if(!all.length) return '<div class="vault-empty"><div class="vault-empty-i">&#128274;</div><b>Nothing locked away yet.</b><span>Seal a note to yourself when you check out of a week or a month, or write a time capsule in the journal.</span></div>';
+  const v = all.filter(function(m){ return f==='all' || (f==='sealed' ? m.locked : !m.locked); });
+  const n = {open:all.filter(function(m){ return !m.locked; }).length, sealed:all.filter(function(m){ return m.locked; }).length};
+  const chip = function(k, l){ return '<button class="'+(f===k ? 'is-on' : '')+'" data-action="r60VaultF" data-id="'+k+'">'+l+'</button>'; };
+  const state0 = function(m){
+    if(m.kind!=='capsule') return '<span class="r60-vs is-open">'+(m.kind==='month' ? 'Month note' : 'Week note')+' · open</span>';
+    if(!m.locked) return '<span class="r60-vs is-open">Opened</span>';
+    return '<span class="r60-vs is-sealed">'+(m.hidden ? 'Opens one morning this year' : 'Opens '+escapeHtml(fmtDateShort(m.openOn)))+'</span>';
+  };
+  return '<div class="r60-vf">'+chip('all', 'All '+all.length)+chip('open', 'Open '+n.open)+chip('sealed', 'Sealed '+n.sealed)+'</div>'+
+    '<div class="vault">'+(v.length ? v.map(function(m, i){ const o = !!open[m.id];
+    return '<div class="vault-card'+(o ? ' is-open' : '')+(m.locked ? ' is-locked' : '')+' is-'+m.kind+'" style="--i:'+Math.min(i, 12)+'">'+
+      '<button class="vault-seal" data-action="vaultToggle" data-id="'+m.id+'" data-hov="'+(m.locked ? 'Still sealed' : o ? 'Close it' : 'Read it')+'"><span class="vault-wax">'+(m.kind==='capsule' ? (m.locked ? '&#9203;' : '&#128140;') : m.kind==='month' ? '&#127942;' : '&#128221;')+'</span>'+
+        '<span class="vault-meta"><b>'+escapeHtml(m.label)+'</b><small>'+(m.kind==='capsule' ? 'Time capsule · written '+fmtDateShort(m.written) : 'Sealed '+fmtDateShort(todayStr(new Date(m.at))))+'</small></span>'+state0(m)+'</button>'+
+      '<div class="vault-body"><div class="vault-text">'+(m.locked ? '<i class="vault-locked">Still sealed. It opens itself when its morning comes.</i>' : escapeHtml(m.text))+'</div></div>'+
+    '</div>'; }).join('') : '<div class="r60-none"><span>Nothing '+(f==='sealed' ? 'sealed' : 'open')+' right now.</span></div>')+'</div>';
+};
+ACTIONS.r60VaultF = function(el, e, k){ ui.r60VaultF = k; playTick(); renderView(); };
+afterRenderHooks.push(function(){ const p = document.getElementById('r60Pop'); if(p) r60PopPlace(p); });
+// (Client journals: the same writing card, with the client picked at the top)
+renderClientJournalComposeCard = function(){
+  const clients = arr(state.business.clients).filter(function(c){ return c.status==='active'; });
+  if(!clients.length) return '<div class="r60-none"><b>No active clients yet</b><span>Add one in Business → Clients, then keep notes on them here.</span></div>';
+  if(ui.journalTabClientId===undefined || !clients.some(function(c){ return c.id===ui.journalTabClientId; })) ui.journalTabClientId = clients[0].id;
+  const c = clients.find(function(x){ return x.id===ui.journalTabClientId; });
+  return '<div class="r60-jw is-client" style="--cc:'+clientAccent(c)+'">'+
+    '<div class="r60-jw-d"><span class="r60-jcl"><i></i><select id="journalTabClientSelect" aria-label="Client">'+clients.map(function(x){ return '<option value="'+x.id+'"'+(x.id===c.id ? ' selected' : '')+'>'+escapeHtml(x.business || x.name || 'Client')+'</option>'; }).join('')+'</select></span></div>'+
+    '<textarea class="r60-jw-x" id="journalTabClientText" placeholder="What happened, what was said, what to remember next time…">'+escapeHtml(ui.journalTabClientDraft || '')+'</textarea>'+
+    '<div class="r60-jw-f"><span style="flex:1"></span><button class="btn btn-primary r60-jw-s" data-action="addClientJournalEntryFromJournal">Save</button></div>'+
+  '</div>';
+};
+document.addEventListener('change', function(e){ if(e.target && e.target.id==='journalTabClientSelect'){ ui.journalTabClientId = e.target.value; renderView(); } });
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
