@@ -26,7 +26,7 @@ here.
    the same place as the streak panel on Today.
 8. **Health → Weight: the BMI scale** looks wrong and doesn't fill the panel. Redo it.
 9. **Health → Fuel: the bottom and the sizing** look bad. Fix the layout.
-10. **Goals**: check the panel (see the question below).
+10. **Goals**: it was broken on the first open of the app (fine later). Find what draws it wrong the first time.
 
 ## D. Focus → Analytics
 11. **The range changes the recap too**: on This week, the "Day recap" becomes the week's recap; Last week shows last
@@ -38,8 +38,12 @@ here.
 13. **Playbooks overview: drag and drop clients between stages.** See each playbook with its stages and move a client
     from one stage to the next by dragging.
 
-## Questions for Andre
-- Streaks (6, 7): what exactly should change from 3.6.0?
-- Op's small tab (1): should his reply show at all?
-- Goals (10): is it good now, or still broken?
-- Playbooks (13): every playbook's board at once, or one at a time?
+## Andre's answers
+- **Streaks**: keep the Personal → Streaks tab as the command center for the whole streak system. On Today, make it
+  **tighter**: the running streak's day count sits right next to the fire streak, and its rules go in the same line as
+  Today's standard. One compact console, no extra row. (Item 7 needs no other change.)
+- **Op's small tab**: status only, plus a clear sign that he's working in the background.
+- **Goals**: it looks good now, but it was broken when he first opened the app. Look in the code for what draws it
+  wrong on the first open.
+- **Playbooks**: like the Lead center, the stages shown visually (a column per stage), clients as cards to drag
+  between them.
