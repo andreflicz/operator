@@ -43,8 +43,11 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Settings → Op says whether the talk key works with Operator in the background', !!(await p.$('.r60-ptt')) && /in front|anywhere/.test(await p.textContent('.r60-ptt')));
   // ================= B. Playbooks =================
   await E("const ob = document.getElementById('opBub'); if(ob) ob.remove(); const pp = document.getElementById('r60Pop'); if(pp) pp.remove(); ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='board'; renderView()"); await p.waitForTimeout(250);
-  check('no client playbooks yet: presets to start from', (await p.$$('.r60-empty .r60-pre-b')).length >= 5);
-  await p.click('.r60-empty [data-action="r60UsePreset"][data-id="chain"]'); await p.waitForTimeout(300);
+  check('no client playbooks yet: presets to start from', (await p.$$('.r60-empty .r60-pre-b')).length >= 4);
+  // (round 61: no combined preset; you make both and chain them in the builder)
+  await p.click('.r60-empty [data-action="r60UsePreset"][data-id="monthly"]'); await p.waitForTimeout(250);
+  await E("ACTIONS.r60UsePreset(null, null, 'onboarding')"); await p.waitForTimeout(250);
+  await p.selectOption('[data-pb-f="ends"]', await E("pbAll().find(p => p.name==='Monthly client').id")); await p.waitForTimeout(250);
   check('Onboarding → Monthly client: both made, chained', await E("(function(){ const o = pbAll().find(p => p.name==='Onboarding'), m = pbAll().find(p => p.name==='Monthly client'); return !!o && !!m && o.next===m.id && pbStages(o).length===2 && pbStages(m)[0].repeat==='month'; })()"));
   check('…the builder says what happens when they finish', /When they finish/.test(await p.textContent('#viewRoot')) && /They move to Monthly client/.test(await E("document.querySelector('[data-pb-f=\"ends\"]').selectedOptions[0].textContent")));
   await E("(function(){ const o = pbAll().find(p => p.name==='Onboarding'); pbStart('client', crmFind('client','jj'), o.id, todayStr(), true); const x = crmFind('client','jj'); pbStages(o).forEach(() => { const s = pbState('client', x); s.occ.forEach(oc => { x.pb.done[oc.key] = todayStr(); }); pbAdvance('client', x); }); })()");
@@ -53,7 +56,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('[data-action="r60SavePreset"]'); await p.waitForTimeout(200);
   check('save your own playbook as a preset', await E("r60Customs().some(c => c.name==='Monthly client')"));
   await E("ACTIONS.pb6NewOpen()"); await p.waitForTimeout(200);
-  check('new playbook: start from a preset (built-in or yours) or from scratch', (await p.$$('#pb6NewSheet .r60-pre-b')).length >= 6 && !!(await p.$('#pb6NewName')));
+  check('new playbook: start from a preset (built-in or yours) or from scratch', (await p.$$('#pb6NewSheet .r60-pre-b')).length >= 5 && !!(await p.$('#pb6NewName')));
   await p.click('#pb6NewSheet .r60-pre:last-child .r60-pre-b'); await p.waitForTimeout(250);
   check('…a preset makes an ordinary playbook you can change (its own copy)', await E("pbAll().filter(p => p.name==='Monthly client').length===2 && pbStages(pbAll().filter(p => p.name==='Monthly client')[0])[0].id!==pbStages(pbAll().filter(p => p.name==='Monthly client')[1])[0].id"));
   // ================= C. Business =================
@@ -96,9 +99,11 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.r59CalClient = null");
   // ================= F. Personal =================
   await E("ui.view='personal'; ui.personalTab='goals'; renderView()"); await p.waitForTimeout(200);
-  check('Goals: your goals at the very top', await E("(function(){ const m = document.querySelector('.r60-mine'), r = document.querySelector('.r43-goalsp'); return !!m && r.firstElementChild===m; })()"));
+  // (round 61: the Goals heading and its settings come first, then your goals)
+  check('Goals: your goals at the very top', await E("(function(){ const m = document.querySelector('.r60-mine'), r = document.querySelector('.r43-goalsp'); return !!m && (r.firstElementChild===m || r.children[1]===m); })()"));
   await E("ui.personalTab='journal'; ui.journalMode='entries'; ui.journalViewMode='personal'; renderView()"); await p.waitForTimeout(200);
-  check('Journal: My journal / Client journals on the left, search on the right, then a writing card', await E("(function(){ const s = document.querySelector('.r60-seg').getBoundingClientRect(), q = document.querySelector('.r60-js').getBoundingClientRect(), w = document.querySelector('.r60-jw').getBoundingClientRect(); return s.left < q.left && s.left <= w.left + 2 && q.right >= w.right - 2; })()"));
+  // (round 61: the switch is centered over the writing card; search moved to the bottom)
+  check('Journal: My journal / Client journals, then a writing card', await E("(function(){ const s = document.querySelector('.r60-seg').getBoundingClientRect(), w = document.querySelector('.r60-jw').getBoundingClientRect(); return s.bottom <= w.top + 2; })()"));
   await p.fill('#journalPageText', 'Felt sharp today.'); await p.click('.r60-jw-s'); await p.waitForTimeout(250);
   check('…and saving works', await E("state.journal.entries.some(e => e.text==='Felt sharp today.')"));
   await E("ui.journalViewMode='clients'; renderView()"); await p.waitForTimeout(200);
@@ -114,19 +119,18 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('holidays show on a background scene too (above it), with a banner at the top of Today', await E("(function(){ const fx = document.getElementById('holFx'); return !!fx && document.body.classList.contains('has-scene') && Number(getComputedStyle(fx).zIndex) >= 1 && document.getElementById('viewRoot').firstElementChild.classList.contains('hol-ban') && getComputedStyle(document.querySelector('.hol-ban')).display!=='none'; })()"));
   check('…more holidays (New Year, Valentine’s, St. Patrick’s, Easter, Fourth of July)', await E("holToday('2027-01-01')==='newyear' && holToday('2027-02-14')==='valentines' && holToday('2027-03-17')==='stpatricks' && holToday('2027-03-28')==='easter' && holToday('2027-07-04')==='july4'"));
   await p.click('.r60-holm'); await p.waitForTimeout(200);
-  check('…and music for each one (on and off from the banner)', await E("!!R60.music && R60.music.h==='halloween'") && /Pause/.test(await p.textContent('.r60-holm')));
+  // (round 61: the music button is a small ♫ / ❚❚ with a label)
+  check('…and music for each one (on and off from the banner)', await E("!!R60.music && R60.music.h==='halloween'") && /Pause/.test(await p.getAttribute('.r60-holm', 'aria-label')));
   await p.click('.r60-holm'); await p.waitForTimeout(200);
   check('…which stops when you tap it again', await E("!R60.music"));
   await E("state.profile.scene = 'minimal'; sceneMount(); renderView()");
   check('Day streak and Today’s Standard are one panel', !!(await p.$('.sw .r60-std')) && !/Today's Standard<\/div>/.test(await E("document.getElementById('viewRoot').innerHTML")));
   check('every panel on Today is a widget on a 12-column grid', await E("document.querySelectorAll('#viewRoot .today-panels > .r60w').length >= 4 && getComputedStyle(document.querySelector('.today-panels')).gridTemplateColumns.split(' ').length===12"));
   await E("ui.todayEdit = true; renderView()"); await p.waitForTimeout(200);
-  check('…Customize: sizes on each one (S, M, L, Full), a handle to drag, an edge to resize', (await p.$$('.r60w.is-edit .r60-szs')).length >= 4 && !!(await p.$('.r60w.is-edit [data-r60-drag]')) && !!(await p.$('.r60w.is-edit .r60-rs')));
+  // (round 61: three set sizes, S/M/L; no dragging an edge)
+  check('…Customize: sizes on each one (S, M, L), a handle to drag', (await p.$$('.r60w.is-edit .r60-szs')).length >= 4 && !!(await p.$('.r60w.is-edit [data-r60-drag]')));
   await p.click('.r60w.is-edit[data-wid="journal"] [data-action="r60Size"][data-id="journal|12"]'); await p.waitForTimeout(150);
   check('…pick a size and it sticks', await E("r60Span('journal')===12 && document.querySelector('.r60w[data-wid=\"journal\"]').style.getPropertyValue('--span')==='12'"));
-  const hb = await (await p.$('.r60w.is-edit[data-wid="journal"] .r60-rs')).boundingBox(), gw = await E("document.querySelector('.today-panels').getBoundingClientRect().width");
-  await p.mouse.move(hb.x + 4, hb.y + hb.height/2); await p.mouse.down(); await p.mouse.move(hb.x - gw/2, hb.y + hb.height/2, {steps:6}); await p.mouse.up(); await p.waitForTimeout(200);
-  check('…or drag its edge to size it', await E("r60Span('journal') >= 5 && r60Span('journal') <= 7"), await E("r60Span('journal')"));
   await E("(function(){ const dt = new DataTransfer(), src = document.querySelector('.r60w.is-edit[data-wid=\"journal\"] [data-r60-drag]'), to = document.querySelector('.r60w.is-edit[data-wid=\"personalStats\"]'); src.dispatchEvent(new DragEvent('dragstart', {bubbles:true, dataTransfer:dt})); to.dispatchEvent(new DragEvent('dragover', {bubbles:true, cancelable:true, dataTransfer:dt})); to.dispatchEvent(new DragEvent('drop', {bubbles:true, cancelable:true, dataTransfer:dt})); })()"); await p.waitForTimeout(200);
   check('…and drag it to move it', await E("state.dashboardPanels.order.indexOf('journal') < state.dashboardPanels.order.indexOf('personalStats')"));
   await E("ui.todayEdit = false; renderView()"); await p.waitForTimeout(150);

@@ -10190,3 +10190,48 @@ html[data-holiday="newyear"]{ --accent:#F5D547; } html[data-holiday="july4"]{ --
 .th-wx{ width:max-content; max-width:100%; }
 .th-wx .twx-sun{ flex:none !important; width:auto !important; }
 .r60-rs{ z-index:5; }
+
+/* ===================== ROUND 61 ===================== */
+/* A1. Customize */
+.r61-cust{ display:flex; justify-content:flex-end; margin:0 0 10px !important; position:static !important; }
+.r61-cb{ display:inline-flex; align-items:center; gap:8px; height:32px; padding:0 14px; border-radius:16px; border:1px solid var(--border); background:color-mix(in srgb, var(--panel) 80%, transparent); color:var(--text-dim); font:600 13px var(--font-body); cursor:pointer; backdrop-filter:blur(8px); transition:all .18s ease; }
+.r61-cb:hover{ color:var(--text); border-color:var(--border-strong); background:var(--panel); }
+.r61-cb.is-on{ background:var(--accent); border-color:var(--accent); color:#111; }
+.today-panels.is-editing{ padding-top:0 !important; }
+/* A2. Today's standard, centered */
+.sw .r60-std{ justify-content:center; text-align:center; }
+.sw .r60-std-c{ justify-content:center; }
+/* A3. Widgets: equal heights side by side, content centered */
+.today-panels{ align-items:stretch !important; }
+.r60w > .section{ display:flex; flex-direction:column; }
+.r60w > .section > .card:last-child, .r60w > .section > .hub-grid, .r60w > .section > .biz-card{ flex:1 1 auto; }
+.r60w > .section > .card:last-child{ display:flex; flex-direction:column; justify-content:center; }
+.r60w .hub-grid{ align-content:center; }
+.r60w .vision-panel-empty{ display:flex; align-items:center; }
+/* B4. Goals */
+.r61-gt{ font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--text); letter-spacing:0; text-transform:none; }
+.r43-goalsp > .r43-sec.is-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+/* B5. Journal */
+.r61-j{ position:relative; }
+.r61-jtabs{ display:flex; justify-content:flex-end; margin:-6px 0 12px; }
+.r61-jh{ justify-content:center; }
+.r61-j .r60-jw-d{ text-align:center; }
+.r61-j .r60-jw-t{ text-align:center; }
+.r61-js{ display:flex; justify-content:center; margin:6px 0 4px; }
+.r61-jsb{ width:40px; height:40px; border-radius:50%; border:1px solid var(--border); background:var(--panel); cursor:pointer; font-size:15px; opacity:.7; transition:opacity .15s ease, transform .15s ease; }
+.r61-jsb:hover{ opacity:1; transform:translateY(-1px); }
+.r61-js.is-open{ align-items:center; gap:8px; }
+.r61-js.is-open input{ width:min(360px, 70vw); height:38px; padding:0 14px; border-radius:19px; border:1px solid var(--accent); background:var(--panel); color:var(--text); font:500 14px var(--font-body); }
+.r61-js.is-open input:focus{ outline:none; }
+.r61-js.is-open button{ width:30px; height:30px; border:0; border-radius:50%; background:var(--panel-2); color:var(--text-dim); cursor:pointer; }
+/* D8. Op's note: a smooth fade in and out */
+.r60-pop{ transition:opacity .5s cubic-bezier(.2, .7, .2, 1), transform .55s cubic-bezier(.2, .7, .2, 1), filter .5s ease !important; filter:blur(4px); transform:translateX(10px) scale(.97); }
+.r60-pop.is-in{ filter:none; transform:none; }
+/* D9. Op's window: no resize grip */
+#opBub .op-bub-rs{ display:none !important; }
+/* F13–14. The holiday banner: a ✕, a small music button */
+.hol-ban{ position:relative; }
+.r61-holx{ position:absolute; top:12px; right:12px; width:28px; height:28px; border:0; border-radius:50%; background:transparent; color:var(--text-faint); font-size:13px; cursor:pointer; }
+.r61-holx:hover{ background:var(--panel-2); color:var(--text); }
+.r61-holm{ width:34px; padding:0 !important; justify-content:center; margin-right:34px; font-size:15px !important; }
+.ll-bar.r61-cust{ position:relative !important; top:auto !important; right:auto !important; left:auto !important; opacity:1 !important; height:auto !important; width:auto !important; pointer-events:auto; z-index:3; }

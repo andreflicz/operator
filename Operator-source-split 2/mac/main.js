@@ -268,7 +268,9 @@ function uKey(code) {
   name = name.replace(/^Key([A-Z])$/, '$1').replace(/^Digit(\d)$/, '$1');
   return K && K[name] != null ? K[name] : null;
 }
-function mouseBtn(code) { const m = /^Mouse(\d)$/.exec(code || ''); return m ? Number(m[1]) : null; }
+// (the page names buttons from the browser's numbering: Mouse3 is the right button, Mouse4/5 the side buttons; the global
+// hook numbers them 2 = right, 3 = middle, 4/5 = side buttons)
+function mouseBtn(code) { const m = /^Mouse(\d)$/.exec(code || ''); if (!m) return null; const n = Number(m[1]); return n === 3 ? 2 : n === 2 ? 3 : n; }
 function front() { return !!(win && !win.isDestroyed() && win.isVisible() && win.isFocused()); }
 function keyHealth() {
   let need = '';
