@@ -180,6 +180,18 @@ Other conventions:
 - Goals: "Your goals" first (Andre said "year goals"; read as Your goals: the long-term ones). Journal: own layout
   (`renderJournalEntriesTab`, `renderClientJournalComposeCard`, `renderAllClientJournalRow`). Vault: status pill per
   card, All / Open / Sealed, week notes use 📝.
+- (added) Holidays: `.hol-fx` sits above a scene (`body.has-scene .hol-fx` z 1, `.app` z 2); the banner is the first thing
+  on Today (`r60Cut` moves it out of the hero) with `r60HolMusic` (WebAudio tunes in `R60_TUNES`, no files); new
+  holidays in `holToday`: newyear, valentines, stpatricks, easter (`r60Easter`), july4. An earlier round hid non-birthday
+  banners with CSS; that's overridden.
+- (added) Today widgets: every `PANEL_RENDERERS` output is wrapped in `.r60w` (`--span`, 12-column grid,
+  `state.dashboardPanels.r60Span`, defaults `R60_SPAN_DEF`); `SMALL_PANELS` is emptied. Customize (`ui.todayEdit`):
+  S/M/L/Full, drag the title to move (`text/r60w`), drag the right edge to resize (capture-phase mouse handlers; the
+  width is kept in the closure because Today re-renders during the drag).
+- (added) Streak + Today's Standard: the standard chips move inside `.sw` (`.r60-std`). Weather is a compact pill.
+  Level-up: `.lvl-n b` sizes to its digits (two digits were clipped by background-clip and looked darkened).
+- (added) Log center: a date per row sets `x.followUp.date` (crmNextDue already uses it). Calendar ⚙ (`r60CalSetHtml`):
+  week check-in (Mon–Sun, with dates), month check-in, check-outs that are due, goals. The week is Monday to Sunday.
 
 ## Removed (don't bring back)
 GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
