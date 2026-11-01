@@ -209,14 +209,15 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("opRunTool('add_journal', {text:'Playbooks now run as stages.', tag:'Update'})");
   check('add_journal takes a tag: “Update” files it under the Update tag (App updates)', await E("(function(){ const e = state.journal.entries.filter(e => e.text==='Playbooks now run as stages.').pop(); return !!e && e.mood===updatesTypeId() && isUpdateEntry(e); })()"));
   await E("document.querySelectorAll('#r57Notes .r57-note').forEach(n => n.remove()); opRunTool('suggest_improvement', {idea:'Let me drag tasks between days on the calendar.'})"); await p.waitForTimeout(400);
-  check('an idea Op logs: the white note types out, top right, with the time', !!(await p.$('#r57Notes .r57-note.is-idea')) && /\d:\d\d/.test(await p.textContent('#r57Notes .r57-note time')));
+  // (round 60: Op's note is a short glow by the XP; tap it for the rest, with the time)
+  check('an idea Op logs: a note pops up, with the time', !!(await p.$('#r60Pop.is-idea')) && /\d:\d\d/.test(await p.textContent('#r60Pop time')));
   // (round 58: one place: App updates only; the separate Op's ideas list is gone)
   check('…and it’s in App updates (one place)', await E("!arr(state.settings.opIdeas).length && state.journal.entries.some(e => isUpdateEntry(e) && /drag tasks between days/.test(e.text))"));
   await E("opRunTool('add_task', {title:'Call the printer'})"); await p.waitForTimeout(1200);
   // (round 58: what Op does goes to the Notifications feed, not App updates)
-  check('anything Op does for you: the same note, kept in the feed', /printer/i.test(await p.textContent('#r57Notes')) && await E("r58Feed().some(f => /printer/i.test(f.short)) && !state.journal.entries.some(e => isUpdateEntry(e) && /printer/i.test(e.text))"));
+  check('anything Op does for you: the same note, kept in the feed', /printer/i.test(await p.textContent('#r60Pop')) && await E("r58Feed().some(f => /printer/i.test(f.short)) && !state.journal.entries.some(e => isUpdateEntry(e) && /printer/i.test(e.text))"));
   await E("r57Set('clock12', false)"); await E("opRunTool('add_task', {title:'Call the bank'})"); await p.waitForTimeout(1200);
-  check('the note’s time can be 24-hour (Settings)', /^\d\d:\d\d$/.test((await p.$$eval('#r57Notes .r57-note time', n => n.map(x => x.textContent))).pop()));
+  check('the note’s time can be 24-hour (Settings)', /^\d\d:\d\d$/.test((await p.$$eval('#r60Pop time', n => n.map(x => x.textContent))).pop()));
   await E("r57Set('clock12', true)");
 
   // ================= D. JOURNAL: threads and bringing entries back =================

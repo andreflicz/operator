@@ -32,7 +32,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('tap the talk button while Op speaks: his whole line is written out in the chat', await E("opChat().some(e => e.r==='op' && /shoot is Thursday/.test(e.t))"));
   check('…what he was saying lets the rest of the turn go on', await E("Promise.race([window.__pend.then(() => 'done'), new Promise(r => setTimeout(() => r('stuck'), 300))])")==='done');
   check('…and nothing new is spoken for the rest of the turn (no new voice)', await E("(function(){ let spoke = false; const was = OV.token; opSay('Another line'); return R59.hush > Date.now() && OV.token===was; })()"));
-  check('…and it says it in the chat instead', await E("opChat().some(e => e.r==='op' && e.t==='Another line')"));
+  // (round 60: it goes into the same chat entry, not a second one)
+  check('…and it says it in the chat instead', await E("opChat().some(e => e.r==='op' && /Another line/.test(e.t))"));
   await E("R59.hush = 0; OV.speaking = false");
   // app updates: Op's write-up, his words folded
   await E("opChat().push({r:'me', t:'ok so the calendar should start on monday and also posted reels should be green and late ones red', at:Date.now()}); R58.turn = {text:'ok so the calendar should start on monday and also posted reels should be green and late ones red', tools:[], filed:false, at:Date.now()}; opRunTool('suggest_improvement', {idea:'Calendar: weeks start on Monday. Posted reels show green, late ones red.'}); R58.turn = null");
@@ -105,8 +106,9 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('…filter it by kind', (await p.$$('.r59-cc-d b.is-content')).length===0 && (await p.$$('.r59-cc-d b.is-cycle')).length > 0);
   await E("ui.r59CcOff = {}; document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); ui.showClientModal = null");
   await E("ui.view='calendar'; ui.calendarYear = 2026; ui.calendarMonth = 9; renderView()"); await p.waitForTimeout(300);
-  check('Calendar: filter it to one client', !!(await p.$('select[data-r59-calc]')));
-  await p.selectOption('select[data-r59-calc]', 'jj'); await p.waitForTimeout(250);
+  // (round 60: one search-style picker instead of the select)
+  check('Calendar: filter it to one client', !!(await p.$('.r60-calb')));
+  await E("ACTIONS.r60CalSet(null, null, 'jj')"); await p.waitForTimeout(250);
   check('…and the month shows that client’s content, playbook, cycle and events', await E("(function(){ const t = document.querySelector('.cx-month').textContent; return /Reels/.test(t) && /JJS shoot|Cycle/.test(t); })()"));
   await E("ui.r59CalClient = null; renderView()");
   // ================= D. Look and feel =================
@@ -121,7 +123,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.healthSub='overview'; renderView()"); await p.waitForTimeout(200);
   check('Health → Overview uses the same weight & fuel panel', !!(await p.$('#viewRoot .r59-bf')));
   await E("ui.personalTab='journal'; ui.journalMode='entries'; renderView()"); await p.waitForTimeout(200);
-  check('Journal: write on the left, your entries on the right', await E("(function(){ const w = document.querySelector('.r59-jr .journal-compose-card').getBoundingClientRect(), f = document.getElementById('journalHistoryContainer').getBoundingClientRect(); return w.right <= f.left + 2 && Math.abs(w.top - f.top) < 40; })()"));
+  // (round 60: the journal was redone as one column: the writing card, then your entries)
+  check('Journal: a place to write, then your entries', await E("(function(){ const w = document.querySelector('.r60-jw').getBoundingClientRect(), f = document.getElementById('journalHistoryContainer').getBoundingClientRect(); return w.bottom <= f.top + 2; })()"));
   }catch(err){ check('the run reached the end', false, String(err && err.message || err).slice(0, 300)); }
   check('no errors', p.errors.length===0, p.errors);
   await b.close(); process.exit(report() ? 1 : 0);
