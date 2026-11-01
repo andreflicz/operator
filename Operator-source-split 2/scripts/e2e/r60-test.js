@@ -47,9 +47,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // (round 61: no combined preset; you make both and chain them in the builder)
   await p.click('.r60-empty [data-action="r60UsePreset"][data-id="monthly"]'); await p.waitForTimeout(250);
   await E("ACTIONS.r60UsePreset(null, null, 'onboarding')"); await p.waitForTimeout(250);
-  await p.selectOption('[data-pb-f="ends"]', await E("pbAll().find(p => p.name==='Monthly client').id")); await p.waitForTimeout(250);
+  // (round 66: "When they finish" is a picker: done, back to a stage, on to another playbook)
+  await E("(function(){ const p = pbSel(); ACTIONS.r66End(null, null, p.id+'|pb:'+pbAll().find(x => x.name==='Monthly client').id); })()"); await p.waitForTimeout(250);
   check('Onboarding → Monthly client: both made, chained', await E("(function(){ const o = pbAll().find(p => p.name==='Onboarding'), m = pbAll().find(p => p.name==='Monthly client'); return !!o && !!m && o.next===m.id && pbStages(o).length===2 && pbStages(m)[0].repeat==='month'; })()"));
-  check('…the builder says what happens when they finish', /When they finish/.test(await p.textContent('#viewRoot')) && /They move to Monthly client/.test(await E("document.querySelector('[data-pb-f=\"ends\"]').selectedOptions[0].textContent")));
+  check('…the builder says what happens when they finish', /When they finish/.test(await p.textContent('#viewRoot')) && /On to Monthly client/.test(await p.textContent('.r66-endb')));
   await E("(function(){ const o = pbAll().find(p => p.name==='Onboarding'); pbStart('client', crmFind('client','jj'), o.id, todayStr(), true); const x = crmFind('client','jj'); pbStages(o).forEach(() => { const s = pbState('client', x); s.occ.forEach(oc => { x.pb.done[oc.key] = todayStr(); }); pbAdvance('client', x); }); })()");
   check('…and finishing Onboarding moves them onto Monthly client by itself', await E("pbById(crmFind('client','jj').pb.id).name==='Monthly client'"));
   await E("ui.pbSel = pbAll().find(p => p.name==='Monthly client').id; renderView()"); await p.waitForTimeout(150);

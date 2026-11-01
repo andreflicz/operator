@@ -43,7 +43,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.view='today'; const O = state.dashboardPanels.order; ['journal', 'clientHub'].forEach(k => O.splice(O.indexOf(k), 1)); O.splice(O.indexOf('personalStats') + 1, 0, 'journal', 'clientHub'); r60Spans().journal = 6; r60Spans().clientHub = 6; renderView()"); await p.waitForTimeout(300);
   check('Clients: the leads sit in an even row of cards under a line', await E("(function(){ const h = document.querySelector('.r60w[data-wid=\"clientHub\"] .hub-leads'); if(!h) return false; const s = getComputedStyle(h); const L = [...h.querySelectorAll('.hub-lead')].map(x => x.getBoundingClientRect()); return s.display==='grid' && parseFloat(s.borderTopWidth) >= 1 && L.length >= 2 && L.every(r => Math.abs(r.height - L[0].height) < 2); })()"));
   // ---- B6. The streak console ----
-  await E("r63New(R63_PRESETS[3], {}); renderView()"); await p.waitForTimeout(250);
+  await E("r63New(R63_PRESETS.find(p => p.id==='hard'), {}) /* (round 66: by id) */; renderView()"); await p.waitForTimeout(250);
   // (round 65: Andre wants just the day streak and hours on the left, and the rules simply part of the standard)
   check('Streak panel: the running streak’s day sits beside the fire streak', !(await p.$('.sw-l .r64-runs')) && !!(await p.$('.sw-l .sw-tw')));
   check('…its rules on the same line as Today’s standard (no extra row)', !(await p.$('.r63-today')) && (await p.$$('.r60-std-c .chip[data-action="r63Tick"]')).length===6 && !(await p.$('.r60-std-c .r64-sep')));

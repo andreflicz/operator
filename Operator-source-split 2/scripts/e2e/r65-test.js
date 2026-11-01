@@ -28,14 +28,14 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.view='convos'; renderView()"); await p.waitForTimeout(200);
   check('no reports anywhere: no report buttons, no report tool for Op', await E("!document.querySelector('[data-action=\"r55Report\"], [data-action=\"r57CliExport\"]') && !OP_TOOLS.some(t => t.name==='client_report')"));
   // ---- B. Streaks ----
-  await E("r63New(R63_PRESETS[0], {}); ui.view='personal'; ui.personalTab='streaks'; renderView()"); await p.waitForTimeout(300);
-  check('Streaks, redone: the running streak (day ring, today’s rules), the standard, start cards', !!(await p.$('.r65-run .r65-ring')) && (await p.$$('.r65-run .r65-rule')).length===3 && !!(await p.$('.r65-std')) && (await p.$$('.r65-pc')).length===5);
+  await E("r63New(R63_PRESETS.find(p => p.id==='first'), {}) /* (round 66: by id) */; ui.view='personal'; ui.personalTab='streaks'; renderView()"); await p.waitForTimeout(300);
+  check('Streaks, redone: the running streak (day ring, today’s rules), the standard, start cards', !!(await p.$('.r65-run .r65-ring')) && (await p.$$('.r65-run .r65-rule')).length===3 && !!(await p.$('.r65-std')) && (await p.$$('.r66-pc')).length >= 10 /* (round 66: by level) */);
   check('…no wall of tips (one small link)', !(await p.$('.r63-tips')) && !!(await p.$('.r65-how')));
   await p.click('.r65-acts [data-action="r63End"]'); await p.waitForTimeout(300);
   check('End asks properly (a title and words, not an empty box)', /End First streak/.test(await p.textContent('#uiDialogOverlay .ui-dlg-t')) && /day 1 of 21/.test(await p.textContent('#uiDialogOverlay .ui-dlg-p')));
   await p.click('#uiDialogOverlay [data-ui-dlg="yes"]'); await p.waitForTimeout(400);
   check('…and ending it works (it moves to past streaks)', await E("r63Active().length===0") && /Past streaks/.test(await p.textContent('.r65s')));
-  await E("const c = r63New(R63_PRESETS[2], {}); c.start = addDays(todayStr(), -4); persist('standards'); renderView()"); await p.waitForTimeout(250);
+  await E("const c = r63New(R63_PRESETS.find(p => p.id==='medium'), {}); c.start = addDays(todayStr(), -4); persist('standards'); renderView()"); await p.waitForTimeout(250);
   await p.click('.r65-acts [data-action="r63Restart"]'); await p.waitForTimeout(250);
   check('Restart asks properly too', /Restart 75 Medium/.test(await p.textContent('#uiDialogOverlay .ui-dlg-t')));
   await p.click('#uiDialogOverlay [data-ui-dlg="yes"]'); await p.waitForTimeout(300);

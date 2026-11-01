@@ -1,4 +1,4 @@
-# Operator app — continuity brief (updated 2026-11-01, after Round 65)
+# Operator app — continuity brief (updated 2026-11-01, after Round 66)
 
 ## What this is
 "Operator" is Andre's personal productivity app: business (clients, leads, MRR, deliverables, playbooks), focus (lock-in sessions, tasks), personal (goals, health, finances, journal, social), and Op, the AI assistant inside it. The UI and logic are one self-contained HTML page built from a source tree. It ships as a Mac app (Electron). The older Chrome-app-shell `.app` still exists in the repo as the source of the helper scripts.
@@ -12,7 +12,7 @@ Andre tests every build himself and comes back with detailed, itemized feedback,
 Design rules he set: "a bad app informs, a good one just has a great UI." Minimal, level, symmetrical; no small grey explainer text; one well-placed control rather than repeated buttons; consistent across features. Build features general ("not a just-me app").
 
 ## Where the code lives
-- GitHub: `andreflicz/operator`. Rounds 57–65 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
+- GitHub: `andreflicz/operator`. Rounds 57–66 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
 - Every commit ends with the session's Co-Authored-By / Claude-Session lines.
 - Layout inside `Operator-source-split 2/`:
 
@@ -42,6 +42,8 @@ src/js/32zNN-rXX.js         one file per update round, layered on top (see "Over
                             Round 64: 32z73-r64.js (Op small tab, cut-off merge, unfiled updates, streak console, BMI,
                             Fuel, no cross-page glide, analytics range picker + range recap, Playbooks stage board)
                             Round 65: 32z74-r65.js (SOP playbooks: task / call / doc; no reports; streaks redone; Op tab drag)
+                            Round 66: 32z75-r66.js (playbook names / when they finish, Calendar all clients, challenges,
+                            setup questions, vault, widgets) and 32z76-r66b.js (notifications, social XP, bell, report)
 scripts/build.py            src/ → dist/command-center-2.html (injects const OP_BUILT = <ms>)
 scripts/smoke-test.js       quick load check
 scripts/e2e/*-test.js       Playwright suites, one per round (common.js: instrument, newPage, check, report)
@@ -303,8 +305,47 @@ Other conventions:
 - **Op's tab**: placed by `r65OpPlace` (saved `state.profile.r65OpPos`, default bottom center of the main area), dragged
   by any part but its buttons; double-click puts it back. **Activity pill**: `.ap-warn` ("?") hidden.
 
+## Round 66 notes (the list is ROUND-66-LIST.md, with Andre's answers)
+- **Playbook task names**: during pbSync a step still titled "New step" makes no task; `r66TaskNames()` keeps an open
+  task's title in step with its step (`t.master.stepTitle` = the step title the task last matched; a task you renamed
+  keeps your name).
+- **When they finish** (`r66EndHtml`, `ACTIONS.r66End`): They're done / back to any stage (`p.r66End = {stage}`; the
+  first stage also sets `repeats`) / on to another playbook (`p.next`). `pbAdvance` honours `r66End` at the last stage.
+  "Starts when a lead reaches" is removed (r59LeadSync already puts every open lead on the lead playbook).
+- **Calendar → All clients**: `ui.r59CalClient = '__all'`; `r66AllItems` merges `r59ClientItems` of every active client,
+  coloured by client, titled with short names / initials. (The selected-day list is dropped by Round 52's layout, as for
+  one client.)
+- **Challenges**: `R63_PRESETS` gain `level` (1 Warm-up … 4 Hard) and new ones (7-day reset, 30 days clean, Clean eating
+  30, Cold 30, 66 days, Monk mode 30 / 90). XP on finishing = days × level rate (20/30/40/60) × 1.2 for "back to day 1"
+  (× .6 for "just track"), paid once via `r66XpAdd` (`c.r66Paid`). Starting: the sheet's button is "Next: commit" →
+  the oath, the rules, "Why are you doing this?" (required, kept as `c.why`), hold 1.6 s to lock in, then a full-screen
+  "Locked in · Day 1". The tab opens with a quote of the day (`R66_QUOTES`) and what finishing is worth (XP, level
+  from → to, days left).
+- **Setup questions** (`state.profile.r66Me = {country, hols, off, ext, own}`): a card on Today until answered (or "later"
+  for the day). `isDayOff` is true on the holidays you take off (± ext days), so the day streak doesn't break;
+  `holToday` only returns holidays you celebrate (birthday always); Op's system prompt gets them.
+- **Vault**: week / month notes get `openOn` (30 / 91 days after sealing); old ones whose date passed got a new date in
+  the future once (`state.settings.r66VaultFixed`). Locked until then.
+- **Widgets**: every Today widget is a flex column whose last block fills and centres; a widget is at most 640px tall
+  (scrolls inside). Today's tasks below Large shows only Now / Next. Your why: chips, Small by default (moved to S once).
+  Leads to reach out to: auto-fit grid.
+- **Notifications** (`state.settings.r66Notif = {cats:{id:{on, how}}, social:{likes, comments, shares, followers}}`):
+  Settings → Notifications (its own tab: `ui.settingsTab='notif'`). `notifList` filters by category (`r66Cat`) and
+  adds the feed (`state.focus.r66Feed`, 60 max, 14 days). New ones show as a banner up top (`#r66Ban`), a note at the
+  top right (`#r66Toasts`) or only in the list; seen keys in `state.focus.r66Seen` (pruned, two weeks). The bell is
+  drawn inside the player (`dockHtml`), the list drops from the top right; the sidebar bell is hidden.
+- **Your page**: `r66SocialTick` compares the personal account's totals (likes, comments, shares, followers; the last 40
+  posts' counts) to the last look (`state.settings.r66Soc`): a feed note, XP (+1 per 10 likes, +5 a comment, +8 a share,
+  300 a day at most) and +250 once when a post takes off (500+ likes at once, or triple). **Ad leads**: `r66AdsTick`
+  compares each client's ad-ledger leads (`r53AllFor`) to `state.settings.r66AdSnap`.
+- **XP**: `state.profile.r66XpLog` (400 max) is added to `r43OneOffs`; `xpSig` includes it; the guide has a section.
+- **The report** (Social → a client's account → "Monthly report"): `#r66Rep`, a designed page (`r66DocHtml`): cover,
+  numbers, content delivered, ads (campaign table), best post, your notes (+ "Pull from their journal"), next month;
+  stored in `c.r66Rep[ym]`. Export: the Mac app's `op:pdf` (printToPDF → Save dialog), else `window.print()`; print CSS
+  shows only the report (`body.r66-printing`). The client's campaigns also show on their Social page (`.r66-ads`).
+
 ## Removed (don't bring back)
-GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports (R65, until they're redone); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
+GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports outside Social (R65; the report is back in Social only, R66); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
 
 ## The helpers (127.0.0.1 only)
 `bridge.pl` (perl) listens and hands each request to `helper.sh`: **8935, wake** (alarms, music, TTS, the Anthropic proxy, Scribe STT); **8934, activity** (serves `activity.log`). Keys live in `~/Library/Application Support/Operator/*.key` (mode 600). Bump the helper version in `/ping` and `OP_HELPER_NEEDS` together whenever routes change.
@@ -325,6 +366,7 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports (R65, until they'
 - main.js: single instance, menu bar Tray, ⌥O show/hide, ✕ hides, ⌘Q quits, starts the helpers, move-in from the old Chrome profile, `window.operatorPage` bridge.
 
 ## Status
+Round 66 (2026-11-01): ROUND-66-LIST.md (18 items). Mac 3.9.0.
 Round 65 (2026-11-01): ROUND-65-LIST.md (9 items). Mac 3.8.0.
 Round 64 (2026-11-01): ROUND-64-LIST.md (13 items). Mac 3.7.0.
 Round 63 (2026-11-01): ROUND-63-LIST.md (Streaks). Mac 3.6.0 carries Rounds 62 and 63.

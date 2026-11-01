@@ -137,6 +137,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // notifications click
   // two tasks ticked fast: both are done (the first one used to be dropped)
   await E("state.tasks.items.push({id:'q1', title:'Quick one', status:'today', createdAt:todayStr()}, {id:'q2', title:'Quick two', status:'today', createdAt:todayStr()}); completeTask('q1'); completeTask('q2')"); await p.waitForTimeout(900);
+  // (round 66: the second tick lands ~0.55 s later; on a busy page give it up to 2 s)
+  for(let i = 0; i < 11 && !(await E("['q1','q2'].every(id => state.tasks.items.find(t => t.id===id).status==='done')")); i++) await p.waitForTimeout(100);
   check('two tasks ticked within half a second: both done', await E("['q1','q2'].every(id => state.tasks.items.find(t => t.id===id).status==='done')"));
   // a playbook nobody's on yet takes a drop
   await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); const P = pbNew('client', 'Empty one', 30, {for:'client'}); pbAll().push(P); pbSave(); ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='board'; renderView()"); await p.waitForTimeout(150);

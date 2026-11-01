@@ -27,14 +27,17 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // ---- B. Starting one ----
   await E("ui.view='personal'; ui.personalTab='streaks'; renderView()"); await p.waitForTimeout(200);
   // (round 65: the Streaks tab redone: .r65-* pieces)
-  check('Start a streak: First streak, 75 Soft, 75 Medium, 75 Hard, your own', /First streak[\s\S]*75 Soft[\s\S]*75 Medium[\s\S]*75 Hard[\s\S]*Your own/.test(await p.textContent('.r65-pre')));
-  await p.click('.r65-pc[data-id="hard"]'); await p.waitForTimeout(250);
+  check('Start a streak: First streak, 75 Soft, 75 Medium, 75 Hard, your own', /First streak[\s\S]*75 Soft[\s\S]*75 Medium[\s\S]*75 Hard[\s\S]*Make your own/.test(await p.textContent('.r66-lvls')));
+  await p.click('.r66-pc[data-id="hard"]');  // (round 66: start cards grouped by level) await p.waitForTimeout(250);
   check('75 Hard comes with its rules, 75 days, back to day 1 on a miss', await E("ui.r63Draft.days===75 && ui.r63Draft.strict==='reset' && ui.r63Draft.rules.length===6 && /outside/.test(ui.r63Draft.rules.map(r => r.label).join(' '))"));
   await p.click('#r63Sheet [data-id="strict|twice"]'); await p.waitForTimeout(100);
   await p.fill('[data-r63-d="cue|0"]', 'At the gym, 6 AM'); await p.waitForTimeout(80);
   await p.click('#r63Sheet [data-id="add|1"]'); await p.waitForTimeout(120);
   await p.fill('[data-r63-d="rule|6"]', 'Stretch 5 minutes'); await p.waitForTimeout(80);
-  await p.click('#r63Sheet .hs-go'); await p.waitForTimeout(300);
+  // (round 66: starting is a commitment: Next, your why, then hold to lock in)
+  await p.click('#r63Sheet .hs-go'); await p.waitForTimeout(200);
+  await E("ui.r63Draft.why = 'Because I said I would.'; r66LockIn()"); await p.waitForTimeout(300);
+  await E("document.querySelectorAll('.r66-locked').forEach(o => o.remove())");
   check('…edit it before starting (how strict, a moment for a rule, an extra rule), then start', await E("(function(){ const c = r63Active()[0]; return !!c && c.strict==='twice' && c.rules.length===7 && c.rules[0].cue==='At the gym, 6 AM' && c.start===todayStr(); })()"));
   check('Running: day 1 of 75, today’s rules to check off, the chain of days', /^\s*1\s*of 75/.test(await p.textContent('.r65-ring')) && (await p.$$('.r65-run .r65-rule')).length===7 && (await p.$$('.r65-chain i')).length===75);
   await p.click('.r65-run .r65-rule >> nth=0'); await p.waitForTimeout(150);
@@ -60,7 +63,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Finishing it closes the run and offers the next step up (First streak → 75 Soft)', await E("r63Active().length===0") && /75 Soft/.test(await p.textContent('.r63-won')));
   check('…and it’s kept under past streaks', /3 days/.test(await p.textContent('.r65-past')));  // (round 65)
   // ---- Op ----
-  await E("r63New(R63_PRESETS[2], {})");
+  await E("r63New(R63_PRESETS.find(p => p.id==='medium'), {}) /* (round 66: presets found by id; more were added) */");
   const out = await E("opRunTool('streak_check', {rule:'read 10 pages'})");
   check('Op can check a rule off (“I did my 10 pages”)', /checked off: Read 10 pages/.test(out) && await E("(function(){ const c = r63Active()[0], r = c.rules.find(r => /Read 10/.test(r.label)); return (c.log[todayStr()] || []).indexOf(r.id) >= 0; })()"), out);
   const st = await E("opRunTool('start_streak', {preset:'own', name:'30 days locked in', days:30, rules:['Lock in 3 hours', 'Gym']})");
