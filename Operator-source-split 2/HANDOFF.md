@@ -238,7 +238,7 @@ in, client calendars, Calendar client filter, tab animations, weight & fuel, jou
 Round 58 (2026-10-31): the list from Andre's Op session (ROUND-58-LIST.md, 35 items): updates in his words in one place,
 honest "logged", list mode, remove a session, chat times, notes/feed, voice, Op's read, bubble, Business tabs, Playbooks
 overview/builder/★, Social accounts + full screen + package links, package calendars + Just me, Settings cleanups.
-Packaged as Mac 3.2.0. Round 59: Mac 3.3.0. Round 60: Mac 3.4.0.
+Packaged as Mac 3.2.0. Round 59: Mac 3.3.0. Round 60: Mac 3.4.0. Round 61: Mac 3.5.0.
 Round 57 (2026-10-31): playbooks as pipelines, one task name, Reach out to leads fixes, the Op list (prompt, sessions, AFK, debriefs,
 goodnight, reply box, hold-to-talk anywhere, break, ducking, double input, journal tag, notes), journal threads, Socials
 content calendar + reports, Op bubble and mood colours, Op's read as a line, food for any day, Analytics hero, XP audit.

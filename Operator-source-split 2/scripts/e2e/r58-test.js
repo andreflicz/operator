@@ -53,10 +53,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.view='today'; renderView(); opBubShow(); OPCD.sig=''; opChatDraw()"); await p.waitForTimeout(200);
   check('Op’s window opens on the conversation, every message with its time', await E("document.getElementById('opBub').classList.contains('is-log')") && (await p.$$('#opBubLog .r58-t')).length >= 3);
   check('…bigger by default, and three matching round buttons (open, turn off, close)', await E("state.profile.opBubSize.w >= 440") && (await p.$$('#opBub .r58-round')).length===3);
-  { const g = await p.evaluate(() => { const r = document.querySelector('#opBub .op-bub-rs').getBoundingClientRect(); return {x:r.x + r.width/2, y:r.y + r.height/2}; }); const h0 = await p.evaluate(() => document.querySelector('#opBub .op-bub-log').getBoundingClientRect().height);
-    await p.mouse.move(g.x, g.y); await p.mouse.down(); await p.mouse.move(g.x + 60, g.y - 150, {steps:6}); await p.mouse.up(); await p.waitForTimeout(200);
+  // (round 61: Op's window sizes itself to the conversation; no grip to drag)
+  { await E("window.__keep = opChat().splice(0); OPCD.sig = ''; opChatDraw()"); await p.waitForTimeout(150); const h0 = await p.evaluate(() => document.querySelector('#opBub .op-bub-log').getBoundingClientRect().height); await E("for(let i = 0; i < 8; i++) opChat().push({r:i % 2 ? 'op' : 'me', t:'A longer line to grow the conversation number '+i, at:Date.now()}); OPCD.sig = ''; opChatDraw()"); await p.waitForTimeout(200);
     const h1 = await p.evaluate(() => document.querySelector('#opBub .op-bub-log').getBoundingClientRect().height);
-    check('resizing Op’s window sizes the conversation, and the size stays', h1 > h0 + 100 && await E("state.profile.opBubSize.h > 0")); await E("state.profile.opBubSize = {w:460, h:0}; const b = document.getElementById('opBub'); b.style.setProperty('width', '460px', 'important'); r58BubLogSize(b)"); }
+    check('Op’s window sizes the conversation itself as it grows', h1 > h0 + 60 && !(await p.$('#opBub .op-bub-rs:not([style*="none"])')) ); await E("opChat().splice(0); window.__keep.forEach(e => opChat().push(e)); OPCD.sig = ''; opChatDraw()"); }
   // ---- E. voice ----
   check('hands-free listening: no time cap, and it waits out a long pause (4 s or more)', await E("r58PauseMs(0) >= 3800 && r58PauseMs(60000) >= 9000") && !/300000/.test(await E("String(scribeListen)")));
   await E("OV.speaking = true; R57.lastSaid = 'Done. It’s on your list for tomorrow morning, first thing.'; document.getElementById('opBubText').textContent = 'Done. It’s on'; window.__ls = 0; const was = aiListen; aiListen = function(){ window.__ls++; }; r54TalkToggle(); aiListen = was"); await p.waitForTimeout(500);
