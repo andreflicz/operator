@@ -17,5 +17,7 @@ contextBridge.exposeInMainWorld('operatorApp', {
   openPrivacy: (which) => ipcRenderer.send('op:openPrivacy', String(which || 'ListenEvent')),
   // Round 62: the Check button (asks macOS, opens what's missing, reports back), and a restart once it's turned on
   talkCheck: () => ipcRenderer.invoke('op:talkCheck'),
-  relaunch: () => ipcRenderer.send('op:relaunch')
+  relaunch: () => ipcRenderer.send('op:relaunch'),
+  // Round 66: save the client report as a PDF
+  pdf: (name) => ipcRenderer.invoke('op:pdf', String(name || 'Report.pdf'))
 });

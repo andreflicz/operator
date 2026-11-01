@@ -323,6 +323,18 @@ ipcMain.handle('op:talkCheck', () => {
   openPane(!trusted ? 'Accessibility' : 'ListenEvent');
   return Object.assign(h, { trusted: trusted, opened: !trusted ? 'Accessibility' : 'Input Monitoring' });
 });
+// Round 66: the client report as a real PDF (the page shows only the report while it prints)
+ipcMain.handle('op:pdf', async (e, name) => {
+  try {
+    const wc = e.sender, owner = BrowserWindow.fromWebContents(wc) || win;
+    const data = await wc.printToPDF({ printBackground: true, pageSize: 'Letter', margins: { marginType: 'none' }, preferCSSPageSize: true });
+    const r = await dialog.showSaveDialog(owner, { title: 'Save the report', defaultPath: path.join(HOME, 'Downloads', String(name || 'Report.pdf').replace(/[\/:*?"<>|]+/g, '-')), filters: [{ name: 'PDF', extensions: ['pdf'] }] });
+    if (r.canceled || !r.filePath) return { saved: false };
+    fs.writeFileSync(r.filePath, data);
+    shell.showItemInFolder(r.filePath);
+    return { saved: true, path: r.filePath };
+  } catch (err) { return { saved: false, err: String(err && err.message || err) }; }
+});
 ipcMain.on('op:relaunch', () => { quitting = true; app.relaunch(); app.quit(); });
 
 // ---------------- the page talks back ----------------

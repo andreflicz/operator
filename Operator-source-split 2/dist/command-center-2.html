@@ -10546,6 +10546,169 @@ html[data-holiday="newyear"]{ --accent:#F5D547; } html[data-holiday="july4"]{ --
 .r65-foot{ display:flex; justify-content:center; }
 .r65-how{ border:0; background:none; color:var(--text-dim); font:600 13px var(--font-body); cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
 .r65-tips{ display:grid; gap:12px; } .r65-tips div{ display:grid; gap:3px; } .r65-tips b{ font-size:14px; } .r65-tips span{ font-size:13.5px; line-height:1.45; }
+
+/* ============ ROUND 66 ============ */
+/* Playbooks: "When they finish" */
+.r66-endw{ position:relative; display:inline-flex; align-items:center; gap:8px; }
+.r66-endk{ font-size:12.5px; color:var(--text-dim); font-weight:600; }
+.r66-endb{ display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 12px; border-radius:16px; border:1px solid var(--border); background:var(--panel); color:var(--text); font:600 13px var(--font-body); cursor:pointer; }
+.r66-endb i{ font-style:normal; font-size:10px; color:var(--text-dim); } .r66-endb.is-on, .r66-endb:hover{ border-color:var(--border-strong, var(--border)); }
+.r66-endpop{ position:absolute; top:calc(100% + 6px); right:0; z-index:40; min-width:240px; padding:8px; border-radius:14px; border:1px solid var(--border); background:var(--panel); box-shadow:0 16px 40px rgba(0,0,0,.45); display:grid; gap:2px; }
+.r66-endh{ font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); padding:8px 8px 4px; }
+.r66-endo{ text-align:left; padding:8px 10px; border-radius:8px; border:0; background:none; color:var(--text); font:500 13.5px var(--font-body); cursor:pointer; }
+.r66-endo:hover{ background:rgba(var(--ink),.06); } .r66-endo.is-on{ background:rgba(var(--ink),.09); font-weight:700; }
+/* Calendar: all clients */
+.r60-calb.is-all{ --cc:#ff8fb1; }
+/* Streaks: the push */
+.r66-hero{ display:grid; gap:16px; padding:26px 28px; border-radius:22px; border:1px solid var(--border); background:radial-gradient(ellipse at 0% 0%, rgba(255,122,61,.16), transparent 55%), radial-gradient(ellipse at 100% 100%, rgba(195,166,255,.12), transparent 55%), var(--panel); }
+.r66-q p{ margin:0; font-family:var(--font-display); font-size:24px; font-weight:700; line-height:1.3; color:var(--text); }
+.r66-q small{ display:block; margin-top:8px; font-size:13px; color:var(--text-dim); font-weight:600; }
+.r66-worth{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; }
+.r66-worth > div{ display:grid; gap:2px; padding:12px 14px; border-radius:14px; background:rgba(var(--ink),.05); }
+.r66-worth b{ font-family:var(--font-display); font-size:20px; color:#ffb35c; } .r66-worth span{ font-size:12.5px; color:var(--text-dim); }
+.r66-lvls{ display:grid; gap:14px; }
+.r66-lvl{ display:grid; grid-template-columns:120px minmax(0, 1fr); gap:14px; align-items:start; }
+@media (max-width:900px){ .r66-lvl{ grid-template-columns:1fr; } }
+.r66-lvl-h{ display:flex; align-items:center; gap:10px; padding-top:12px; }
+.r66-lvl-h b{ width:30px; height:30px; border-radius:9px; display:grid; place-items:center; background:color-mix(in srgb, var(--lc) 22%, transparent); color:var(--lc); font-family:var(--font-display); font-size:16px; }
+.r66-lvl-h span{ font-weight:700; color:var(--text); }
+.r66-lvl-g{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:10px; }
+.r66-pc{ display:grid; justify-items:start; gap:4px; padding:14px 16px; border-radius:14px; border:1px solid var(--border); border-left:3px solid var(--lc); background:var(--panel); color:var(--text); cursor:pointer; font:inherit; text-align:left; transition:transform .15s, border-color .15s; }
+.r66-pc:hover{ transform:translateY(-1px); border-color:var(--lc); }
+.r66-pc-i{ font-size:20px; } .r66-pc b{ font-size:14.5px; } .r66-pc small{ font-size:12px; color:var(--text-dim); font-weight:600; }
+.r66-own{ justify-self:start; height:34px; padding:0 16px; border-radius:17px; border:1px dashed var(--border-strong, var(--border)); background:none; color:var(--text-dim); font:600 13px var(--font-body); cursor:pointer; }
+.r66-why{ font-size:13px; font-style:italic; color:var(--text); opacity:.85; text-align:center; max-width:220px; }
+.r66-commit{ display:grid; gap:14px; }
+.r66-oath{ margin:0; font-size:16px; line-height:1.5; } .r66-oath b{ color:#ffb35c; }
+.r66-rules{ margin:0; padding-left:22px; display:grid; gap:6px; font-size:15px; font-weight:600; } .r66-rules small{ color:var(--text-dim); font-weight:500; }
+.r66-rule-line{ margin:0; font-size:13.5px; font-weight:700; color:#ff8a4a; }
+.r66-whyf{ display:grid; gap:6px; } .r66-whyf span{ font-size:12px; font-weight:700; color:var(--text-dim); }
+.r66-whyf textarea.is-need{ border-color:#ff8a4a; box-shadow:0 0 0 2px rgba(255,138,74,.25); }
+.r66-stake{ font-size:13.5px; color:var(--text-dim); } .r66-stake b{ color:#ffb35c; }
+.r66-hold{ position:relative; overflow:hidden; height:54px; border-radius:16px; border:0; background:#1d1410; color:#fff; font:800 16px var(--font-body); letter-spacing:.02em; cursor:pointer; box-shadow:inset 0 0 0 2px #ff7a3d; user-select:none; touch-action:none; }
+.r66-hold-f{ position:absolute; inset:0; width:0; background:linear-gradient(90deg, #ff9a3d, #ff5e3a); }
+.r66-hold.is-holding .r66-hold-f{ width:100%; transition:width 1.6s linear; }
+.r66-hold-t{ position:relative; }
+.r66-back{ justify-self:center; border:0; background:none; color:var(--text-dim); font:600 13px var(--font-body); cursor:pointer; }
+.r66-locked{ position:fixed; inset:0; z-index:9800; display:grid; place-items:center; background:radial-gradient(ellipse at center, rgba(40,16,6,.92), rgba(5,5,8,.96)); opacity:0; transition:opacity .45s ease; cursor:pointer; }
+.r66-locked.is-in{ opacity:1; }
+.r66-locked-c{ text-align:center; display:grid; gap:10px; transform:scale(.94); transition:transform .6s cubic-bezier(.2,.8,.2,1); max-width:640px; padding:0 24px; }
+.r66-locked.is-in .r66-locked-c{ transform:none; }
+.r66-locked-k{ font-size:13px; font-weight:800; letter-spacing:.3em; text-transform:uppercase; color:#ff8a4a; }
+.r66-locked-n{ font-family:var(--font-display); font-size:96px; font-weight:800; line-height:1; color:#fff; }
+.r66-locked-t{ font-size:20px; font-weight:700; color:#fff; } .r66-locked p{ margin:8px 0 0; font-size:16px; color:rgba(255,255,255,.75); font-style:italic; }
+/* Setup questions */
+.r66-ask{ display:flex; align-items:center; gap:14px; margin-bottom:14px; padding:14px 18px; border-radius:16px; border:1px solid color-mix(in srgb, var(--accent, #F5B342) 45%, transparent); background:color-mix(in srgb, var(--accent, #F5B342) 8%, var(--panel)); }
+.r66-ask-i{ font-size:26px; } .r66-ask-t{ flex:1; display:grid; gap:2px; } .r66-ask-t b{ font-size:15px; } .r66-ask-t span{ font-size:13px; color:var(--text-dim); }
+.r66-ask-x{ border:0; background:none; color:var(--text-dim); cursor:pointer; font-size:13px; }
+.r66-steps{ display:flex; gap:8px; margin-bottom:12px; } .r66-steps span{ flex:1; padding:6px 0; border-top:3px solid rgba(var(--ink),.12); font-size:12px; font-weight:700; color:var(--text-dim); }
+.r66-steps span.is-on{ border-color:var(--accent, #F5B342); color:var(--text); } .r66-steps span.is-done{ border-color:color-mix(in srgb, var(--accent, #F5B342) 50%, transparent); }
+.r66-sb{ display:grid; gap:16px; min-height:180px; }
+.r66-f{ display:grid; gap:8px; } .r66-f > span{ font-size:13px; font-weight:700; color:var(--text-dim); }
+.r66-hols{ display:flex; flex-wrap:wrap; gap:8px; }
+.r66-hol{ height:34px; padding:0 14px; border-radius:17px; border:1px solid var(--border); background:none; color:var(--text); font:600 13px var(--font-body); cursor:pointer; }
+.r66-hol.is-on{ border-color:var(--accent, #F5B342); background:color-mix(in srgb, var(--accent, #F5B342) 14%, transparent); }
+.r66-own{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; } .r66-own .input{ width:auto; height:34px; } .r66-own #r66OwnN{ flex:1; min-width:160px; }
+.r66-ownc{ display:inline-flex; align-items:center; gap:6px; padding:4px 6px 4px 12px; border-radius:14px; background:rgba(var(--ink),.06); font-size:12.5px; } .r66-ownc button{ border:0; background:none; color:var(--text-dim); cursor:pointer; }
+.r66-note{ margin:0; font-size:13px; color:var(--text-dim); }
+.r66-sf{ display:flex; justify-content:space-between; margin-top:16px; }
+/* Notifications */
+.r66-nrs{ display:grid; gap:6px; }
+.r66-nr{ display:grid; grid-template-columns:28px minmax(120px, 1fr) auto 44px; gap:12px; align-items:center; padding:10px 12px; border-radius:12px; background:rgba(var(--ink),.03); }
+.r66-nr.is-off{ opacity:.55; } .r66-nr-i{ font-size:18px; text-align:center; } .r66-nr b{ font-size:14px; }
+.r66-how{ margin:0 !important; }
+.r66-sw{ width:42px; height:24px; border-radius:12px; border:0; background:rgba(var(--ink),.15); position:relative; cursor:pointer; }
+.r66-sw i{ position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition:left .18s; }
+.r66-sw.is-on{ background:var(--good, #3fbe8e); } .r66-sw.is-on i{ left:21px; }
+.r66-nsub{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:14px; } .r66-nsub > span{ font-size:13px; font-weight:700; color:var(--text-dim); margin-right:4px; }
+.r66-chip{ height:30px; padding:0 12px; border-radius:15px; border:1px solid var(--border); background:none; color:var(--text-dim); font:600 12.5px var(--font-body); cursor:pointer; }
+.r66-chip.is-on{ color:var(--text); border-color:var(--good, #3fbe8e); background:color-mix(in srgb, var(--good, #3fbe8e) 12%, transparent); }
+.r66-ntry{ display:flex; gap:8px; margin-top:14px; }
+.r66-ban{ position:fixed; top:14px; left:50%; z-index:9700; transform:translate(-50%, -140%); transition:transform .45s cubic-bezier(.2,.8,.2,1); }
+.r66-ban.is-in{ transform:translate(-50%, 0); }
+.r66-ban-c{ display:flex; align-items:center; gap:14px; min-width:340px; max-width:min(560px, calc(100vw - 32px)); padding:14px 20px; border-radius:16px; background:linear-gradient(135deg, rgba(20,24,40,.96), rgba(40,22,60,.96)); border:1px solid rgba(143,211,255,.45); box-shadow:0 18px 50px rgba(0,0,0,.5), 0 0 0 1px rgba(143,211,255,.15) inset; color:#fff; cursor:pointer; }
+.r66-ban-i{ font-size:24px; } .r66-ban-c b{ display:block; font-size:15px; } .r66-ban-c span{ font-size:13px; color:rgba(255,255,255,.75); }
+.r66-toasts{ position:fixed; top:84px; right:16px; z-index:9650; display:grid; gap:8px; width:min(340px, calc(100vw - 32px)); }
+.r66-toast{ display:flex; align-items:flex-start; gap:4px; padding:4px; border-radius:14px; background:var(--panel); border:1px solid var(--border); box-shadow:0 14px 40px rgba(0,0,0,.45); transform:translateX(120%); opacity:0; transition:transform .4s cubic-bezier(.2,.8,.2,1), opacity .3s; }
+.r66-toast.is-in{ transform:none; opacity:1; }
+.r66-toast-b{ flex:1; display:flex; gap:10px; align-items:flex-start; text-align:left; padding:10px 6px 10px 10px; border:0; background:none; color:var(--text); cursor:pointer; font:inherit; }
+.r66-toast-i{ font-size:18px; } .r66-toast-t{ display:grid; gap:2px; } .r66-toast-t b{ font-size:13.5px; } .r66-toast-t small{ font-size:12.5px; color:var(--text-dim); }
+.r66-toast-x{ border:0; background:none; color:var(--text-dim); cursor:pointer; padding:8px; font-size:11px; }
+/* the bell in the player; the list drops from the top right */
+.r66-bell{ position:relative; width:30px; height:30px; display:grid; place-items:center; border-radius:50%; border:0; background:none; color:inherit; cursor:pointer; opacity:.85; flex:none; }
+.r66-bell:hover, .r66-bell.is-on{ opacity:1; background:rgba(255,255,255,.1); }
+.r66-bell-n{ position:absolute; top:-2px; right:-3px; min-width:16px; height:16px; padding:0 4px; border-radius:8px; background:#ff4d5e; color:#fff; font:800 10px/16px var(--font-body); font-style:normal; display:none; }
+.r66-bell.has-n .r66-bell-n{ display:block; }
+#notifBell{ display:none !important; }
+#notifPanel{ position:fixed !important; top:84px !important; right:16px !important; left:auto !important; bottom:auto !important; z-index:9660 !important; }
+/* Today's widgets: each one fills its place, content in the middle, at every size */
+.r60w > .section{ display:flex !important; flex-direction:column; height:100%; }
+.r60w > .section > .section-title{ flex:none; }
+.r60w > .section > :not(.section-title):last-child{ flex:1 1 auto; min-height:0; }
+.r60w > .section > .card:last-child:not(.biz-card), .r60w > .section > .why-grid, .r60w > .section > .hub-wrap{ display:flex; flex-direction:column; justify-content:center; }
+.r60w .vision-panel-empty, .r60w .vb-wrap{ height:100%; }
+/* Your why: small, two clouds of short chips */
+.why-panel .why-grid{ display:grid !important; grid-template-columns:repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap:10px; }
+.why-panel .why-col{ display:flex !important; flex-wrap:wrap; align-content:flex-start; gap:6px; padding:12px 14px !important; border-radius:14px; }
+.why-panel .why-k{ flex:0 0 100%; margin-bottom:2px; }
+.why-panel .why-item{ display:inline-flex !important; align-items:center; width:auto !important; padding:5px 11px !important; margin:0 !important; border-radius:999px !important; font-size:12.5px !important; line-height:1.2; }
+/* Clients: the leads row fills its width */
+.r60w .hub-leads{ grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important; }
+/* The report */
+.r66-repb{ margin-right:6px; }
+.r66-rep-ov{ position:fixed; inset:0; z-index:9500; display:grid; grid-template-columns:320px minmax(0, 1fr); background:#0b0b10; }
+.r66-rep-bar{ display:flex; flex-direction:column; gap:14px; padding:20px; border-right:1px solid rgba(255,255,255,.08); background:#111118; overflow:auto; }
+.r66-rep-x{ align-self:flex-start; width:32px; height:32px; border-radius:50%; border:1px solid rgba(255,255,255,.15); background:none; color:#fff; cursor:pointer; }
+.r66-rep-m{ display:flex; align-items:center; justify-content:space-between; gap:8px; } .r66-rep-m b{ color:#fff; font-size:16px; }
+.r66-rep-m button{ width:30px; height:30px; border-radius:50%; border:1px solid rgba(255,255,255,.15); background:none; color:#fff; cursor:pointer; }
+.r66-rep-f{ display:grid; gap:6px; } .r66-rep-f span{ font-size:12px; font-weight:700; color:rgba(255,255,255,.6); }
+.r66-rep-go{ margin-top:auto; height:44px; }
+.r66-rep-stage{ overflow:auto; padding:30px; display:flex; justify-content:center; }
+.r66-doc{ width:8.5in; min-height:11in; background:#0e0f14; color:#f2f2f5; border-radius:6px; box-shadow:0 30px 80px rgba(0,0,0,.6); overflow:hidden; font-family:var(--font-body); }
+.r66d-cover{ padding:56px 56px 44px; background:radial-gradient(ellipse at 100% 0%, color-mix(in srgb, var(--cc) 55%, transparent), transparent 60%), radial-gradient(ellipse at 0% 100%, rgba(124,92,255,.35), transparent 55%), #12131a; }
+.r66d-brand{ font-size:12px; font-weight:800; letter-spacing:.25em; text-transform:uppercase; color:rgba(255,255,255,.7); }
+.r66d-k{ margin-top:48px; font-size:14px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--cc); }
+.r66d-cover h1{ margin:8px 0 0; font-family:var(--font-display); font-size:52px; line-height:1.05; color:#fff; }
+.r66d-m{ margin-top:8px; font-size:20px; font-weight:600; color:rgba(255,255,255,.8); } .r66d-acc{ margin-top:16px; font-size:13px; color:rgba(255,255,255,.6); }
+.r66d-sec{ padding:30px 56px 0; break-inside:avoid; }
+.r66d-h{ font-size:12px; font-weight:800; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.55); margin-bottom:14px; }
+.r66d-tiles{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:10px; }
+.r66d-t{ padding:16px; border-radius:14px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.07); display:grid; gap:4px; }
+.r66d-t b{ font-family:var(--font-display); font-size:26px; color:#fff; } .r66d-t span{ font-size:12px; color:rgba(255,255,255,.6); }
+.r66d-del{ display:grid; grid-template-columns:140px minmax(0, 1fr); gap:24px; align-items:center; }
+.r66d-ring{ --p:0; width:130px; height:130px; border-radius:50%; display:grid; place-items:center; background:conic-gradient(var(--cc) calc(var(--p)*1%), rgba(255,255,255,.08) 0); }
+.r66d-ring > div{ width:106px; height:106px; border-radius:50%; background:#0e0f14; display:grid; place-content:center; text-align:center; } .r66d-ring b{ font-family:var(--font-display); font-size:34px; } .r66d-ring span{ font-size:12px; color:rgba(255,255,255,.6); }
+.r66d-del ul{ margin:0; padding:0; list-style:none; display:grid; grid-template-columns:1fr 1fr; gap:6px 18px; font-size:13px; }
+.r66d-del li{ display:flex; align-items:center; gap:8px; } .r66d-del li i{ width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.25); } .r66d-del li.is-done i{ background:#3fbe8e; } .r66d-del li small{ margin-left:auto; color:rgba(255,255,255,.5); }
+.r66d-tbl{ width:100%; margin-top:14px; border-collapse:collapse; font-size:13px; } .r66d-tbl th{ text-align:left; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.5); padding:8px 6px; border-bottom:1px solid rgba(255,255,255,.1); } .r66d-tbl td{ padding:9px 6px; border-bottom:1px solid rgba(255,255,255,.06); }
+.r66d-best{ padding:18px 20px; border-radius:14px; background:rgba(255,255,255,.05); } .r66d-best b{ color:var(--cc); } .r66d-best p{ margin:6px 0 0; font-size:15px; line-height:1.5; font-style:italic; }
+.r66d-note{ font-size:15px; line-height:1.65; color:rgba(255,255,255,.9); padding:18px 20px; border-left:3px solid var(--cc); background:rgba(255,255,255,.03); border-radius:0 12px 12px 0; }
+.r66d-foot{ margin-top:40px; padding:18px 56px 26px; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.4); border-top:1px solid rgba(255,255,255,.06); }
+@media print{
+  body.r66-printing > *:not(#r66Rep){ display:none !important; }
+  body.r66-printing{ background:#0e0f14 !important; }
+  body.r66-printing #r66Rep{ position:static; display:block; background:#0e0f14; }
+  body.r66-printing .r66-rep-bar{ display:none !important; }
+  body.r66-printing .r66-rep-stage{ padding:0; overflow:visible; display:block; }
+  body.r66-printing .r66-doc{ width:auto; min-height:0; box-shadow:none; border-radius:0; }
+  @page{ size:Letter; margin:0; }
+}
+/* (R66) a widget never runs taller than a screenful: what doesn't fit scrolls inside it */
+.r60w > .section{ max-height:640px; }
+.r60w > .section > :not(.section-title):last-child{ overflow:auto; scrollbar-width:thin; }
+/* Today's tasks, small: just what's on and what's next */
+@container (max-width:760px){ .r60w[data-wid="tasks"] .task-card-grid > .task-card{ display:none !important; } .r60w[data-wid="tasks"] .task-card-grid{ display:block !important; } }
+/* Your why: label on top, short chips that wrap inside the column */
+.why-panel .why-grid{ align-content:center; align-items:start; }
+.why-panel .why-col{ display:block !important; height:auto !important; min-height:0 !important; }
+.why-panel .why-k{ display:block !important; margin:0 0 8px !important; }
+.why-panel .why-item{ max-width:100%; white-space:normal; margin:0 6px 6px 0 !important; vertical-align:top; }
+@container (max-width:440px){ .why-panel .why-grid{ grid-template-columns:minmax(0, 1fr) !important; } }
+.r66-ads{ margin-top:14px; padding:14px 16px; border-radius:14px; border:1px solid var(--border); background:var(--panel); display:grid; gap:10px; }
+.r66-ads-h{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; } .r66-ads-h span{ font-size:13px; color:var(--text-dim); }
+.r66-ads-t{ display:grid; gap:4px; }
+.r66-ads-r{ display:grid; grid-template-columns:minmax(0, 1fr) 90px 80px 90px 80px; gap:10px; align-items:center; padding:7px 10px; border-radius:10px; background:rgba(var(--ink),.03); font-size:13px; }
+.r66-ads-r span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .r66-ads-r small{ color:var(--text-dim); }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -10743,7 +10906,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793558430662;
+const OP_BUILT = 1793563024339;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -57191,6 +57354,702 @@ document.addEventListener('dblclick', function(e){ const b = e.target.closest &&
 
 // ================= D9. The activity pill: no "?" (CSS) =================
 setTimeout(function(){ try{ pbSync(); }catch(e){} }, 0);
+// ============ ROUND 66 (part 1) ============
+// The list is ROUND-66-LIST.md (with Andre's answers). Here: playbook task names, "When they finish", no "Starts when a
+// lead reaches", a Clients view on the Calendar, challenges (a library by level, a real lock-in, what finishing is
+// worth), the setup questions (where you are, your holidays, time off), the vault's sealed notes, Today's widgets.
+// Notifications, social XP and the report are in 32z76-r66b.js.
+const R66 = {};
+
+// ================= A1. A playbook task is named after its step =================
+// A new step starts as "New step" while you name it; its task was made at once and kept that name. Now a step that
+// still has its placeholder name makes no task, and an open task follows its step's name (unless you renamed the task).
+pbState = (function(base){
+  return function(){
+    const s = base.apply(this, arguments);
+    if(!R65.inSync || !s || !Array.isArray(s.occ)) return s;
+    return Object.assign({}, s, {occ:s.occ.filter(function(o){ return String(o.it.title || '').trim() && o.it.title!=='New step'; })});
+  };
+})(pbState);
+function r66TaskNames(){
+  let ch = false;
+  state.tasks.items.forEach(function(t){
+    const m = t.master; if(!m || m.kind!=='pb' || t.status==='done') return;
+    let st = null; try{ st = pb57StepOf(t); }catch(e){} if(!st || !st.title || st.title==='New step') return;
+    const was = m.stepTitle || (t.title==='New step' || t.title==='Next step' || t.title==='Book: New step' ? t.title : null);
+    if(was==null){ if(!m.stepTitle){ m.stepTitle = t.title===st.title ? st.title : '\u0000'; ch = true; } return; }
+    if(t.title===was && st.title!==was){ t.title = st.title; m.stepTitle = st.title; ch = true; }
+    else if(m.stepTitle!==st.title && t.title===st.title){ m.stepTitle = st.title; ch = true; }
+  });
+  return ch;
+}
+pbSync = (function(base){ return function(){ const r = base.apply(this, arguments); let ch = false; try{ ch = r66TaskNames(); }catch(e){} if(ch) persist('tasks'); return r || ch; }; })(pbSync);
+
+// ================= A2. "When they finish": the stages (or another playbook) as choices =================
+function r66EndOf(p){
+  if(p.r66End && p.r66End.stage && pb57StageOf(p, p.r66End.stage)) return {k:'stage', id:p.r66End.stage};
+  if(pbRepeats(p)){ const f = pbStages(p)[0]; return {k:'stage', id:f ? f.id : null}; }
+  if(p.next && pbById(p.next)) return {k:'pb', id:p.next};
+  return {k:'done'};
+}
+function r66EndHtml(p){
+  const e = r66EndOf(p), L = pbStages(p), who = pbFor(p), others = pbAll().filter(function(x){ return x.id!==p.id && pbFor(x)===who; });
+  const cur = e.k==='stage' ? 'Back to '+escapeHtml((pb57StageOf(p, e.id) || {}).name || 'a stage') : e.k==='pb' ? 'On to '+escapeHtml(pbById(e.id).name) : 'They’re done';
+  const pill = function(id, label, on){ return '<button class="r66-endo'+(on ? ' is-on' : '')+'" data-action="r66End" data-id="'+p.id+'|'+id+'">'+label+'</button>'; };
+  return '<span class="r66-endw"><span class="r66-endk">When they finish</span><button class="r66-endb'+(ui.r66EndOpen ? ' is-on' : '')+'" data-action="r66EndOpen">'+cur+' <i>&#9662;</i></button>'+
+    (ui.r66EndOpen ? '<div class="r66-endpop">'+pill('done', 'They’re done', e.k==='done')+
+      (L.length ? '<div class="r66-endh">Back to a stage</div>'+L.map(function(s, i){ return pill('stage:'+s.id, (i + 1)+'. '+escapeHtml(s.name), e.k==='stage' && e.id===s.id); }).join('') : '')+
+      (others.length ? '<div class="r66-endh">On to another playbook</div>'+others.map(function(x){ return pill('pb:'+x.id, escapeHtml(x.name), e.k==='pb' && e.id===x.id); }).join('') : '')+'</div>' : '')+'</span>';
+}
+ACTIONS.r66EndOpen = function(){ ui.r66EndOpen = !ui.r66EndOpen; renderView(); };
+ACTIONS.r66End = function(el, e, v){
+  const a = String(v || '').split('|'), p = pbById(a[0]); if(!p) return;
+  const c = a.slice(1).join('|');
+  p.repeats = false; p.next = null; p.r66End = null;
+  if(c.indexOf('stage:')===0){ p.r66End = {stage:c.slice(6)}; if(pbStages(p)[0] && pbStages(p)[0].id===p.r66End.stage) p.repeats = true; }
+  else if(c.indexOf('pb:')===0) p.next = c.slice(3);
+  try{ pbKindSync(p); }catch(err){}
+  ui.r66EndOpen = false; playTick(); pbSave(); renderView();
+};
+document.addEventListener('mousedown', function(e){ if(ui.r66EndOpen && !(e.target.closest && e.target.closest('.r66-endw'))){ ui.r66EndOpen = false; try{ renderView(); }catch(err){} } });
+// (the last stage: back to the stage you picked)
+pbAdvance = (function(base){
+  return function(kind, x, manual){
+    const s = pbState(kind, x);
+    if(s && s.stage && s.p && s.p.r66End && s.p.r66End.stage && s.si===s.stages.length - 1 && !(pb57Rep(s.stage) && !manual)){
+      const to = pb57StageOf(s.p, s.p.r66End.stage);
+      if(to){ x.pb.run = Date.now().toString(36).slice(-5); return pb57Enter(kind, x, to.id, {again:true, quiet:!manual}); }
+    }
+    return base.apply(this, arguments);
+  };
+})(pbAdvance);
+// ================= A3. No "Starts when a lead reaches" (every lead is on the lead playbook already) =================
+renderBusiness = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    if(ui.businessTab!=='lifecycle' || ui.pbView!=='build') return h;
+    h = h.replace(/<label class="pb6-rule"><span>Starts when a lead reaches<\/span>[\s\S]*?<\/label>/, '');
+    const p = pbSel && pbSel();
+    if(p) h = h.replace(/<label class="pb6-rule"><span>(?:When they finish|After the last stage)<\/span>[\s\S]*?<\/label>/, function(){ return r66EndHtml(p); });
+    return h;
+  };
+})(renderBusiness);
+
+// ================= B4. Calendar: all clients at once =================
+function r66CliShort(c){ const n = String(c.business || c.name || '?'); return n.length > 8 ? n.split(/\s+/).map(function(w){ return w[0]; }).join('').slice(0, 3).toUpperCase() : n; }
+function r66AllItems(from, to){
+  const out = [];
+  mtActiveClients().forEach(function(c){ try{ r59ClientItems(c, from, to).forEach(function(x){ out.push(Object.assign({}, x, {cli:c, cc:clientAccent(c), t:r66CliShort(c)+' · '+x.t})); }); }catch(e){} });
+  return out;
+}
+cxMonthCardHtml = (function(base){
+  return function(){
+    if(ui.r59CalClient!=='__all') return base.apply(this, arguments);
+    ui.r59CalClient = null; R66.allCal = true; let out;
+    try{ out = base.apply(this, arguments); } finally { ui.r59CalClient = '__all'; R66.allCal = false; }
+    const y = ui.calendarYear, m = ui.calendarMonth, dim = new Date(y, m + 1, 0).getDate(), today = todayStr(), sel = ui.calendarSelectedDate || today;
+    const off = ui.r59CcOff || {}, items = r66AllItems(todayStr(new Date(y, m, 1)), todayStr(new Date(y, m, dim))).filter(function(x){ return !off[x.kind]; }), by = {};
+    items.forEach(function(x){ (by[x.date] = by[x.date] || []).push(x); });
+    out = out.replace(/(<button class="cx-d[^"]*" data-action="selectCalDay" data-date="(\d{4}-\d{2}-\d{2})"[^>]*>)<span>(\d+)<\/span>[\s\S]*?<\/button>/g, function(m0, open, ds, n){
+      const its = by[ds] || [];
+      return open+'<span>'+n+'</span>'+(its.length ? '<small class="cx-peek" style="--c:'+its[0].cc+'">'+escapeHtml(its[0].t)+'</small>'+(its.length > 1 ? '<small class="cx-more">+'+(its.length - 1)+'</small>' : '') : '')+'<em>'+Array.from(new Set(its.map(function(x){ return x.cc; }))).slice(0, 4).map(function(col){ return '<i style="background:'+col+'"></i>'; }).join('')+'</em></button>';
+    });
+    const day = by[sel] || [];
+    const agenda = '<div class="cx-agenda r59-cxa r66-cxa" data-key="r66cxa-'+sel+'"><div class="r59-cxa-h">All clients &middot; '+escapeHtml(fmtDateShort(sel))+'</div>'+(day.length ? day.map(function(x){ return '<div class="r59-cxa-i" style="--c:'+x.cc+'"><i></i><span>'+escapeHtml(x.t)+'</span><small>'+escapeHtml((R59_KINDS.find(function(k){ return k[0]===x.kind; }) || ['', ''])[1])+'</small></div>'; }).join('') : '<div class="r59-cxa-none">Nothing for your clients this day.</div>')+'</div>';
+    out = out.replace(/<div class="cx-legend[^"]*">[\s\S]*?<\/div>/, '<div class="cx-legend r59-cxl">'+R59_KINDS.map(function(k){ return '<button class="'+(off[k[0]] ? '' : 'is-on')+'" data-action="r59CalKind" data-id="'+k[0]+'">'+k[1]+'</button>'; }).join('')+'</div>');
+    out = out.replace(/<div class="cx-agenda[\s\S]*<\/section>$/, agenda+'</section>');
+    return out;
+  };
+})(cxMonthCardHtml);
+r59CalClient = (function(base){ return function(){ if(ui.r59CalClient==='__all') return null; return base.apply(this, arguments); }; })(r59CalClient);
+r60CalPickHtml = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    const all = ui.r59CalClient==='__all' || R66.allCal;
+    if(all) h = h.replace(/(<button class="r60-calb[^"]*"[^>]*>[\s\S]*?<\/svg>)[\s\S]*?(<\/button>)/, '$1<span>All clients</span>$2').replace('class="r60-calb', 'class="r60-calb is-client is-all');
+    return h.replace(/(<div class="r60-calk">Clients<\/div>)/, '<button class="r60-calo'+(all ? ' is-on' : '')+'" data-action="r60CalSet" data-id="__all"><i style="--cc:linear-gradient(135deg,#ff8fb1,#8fd3ff)"></i>All clients</button>$1');
+  };
+})(r60CalPickHtml);
+
+// ================= C5–6. Challenges: a library by level, a real lock-in, what finishing is worth =================
+// Day streaks (working regularly) stay what they are. Challenges are stretches of doing something good for yourself,
+// non-stop, at four levels of hardness. Starting one is a commitment: why you're doing it, the rules read back, and you
+// hold to lock in. Finishing pays XP by level and length; the tab shows what it would do to your level.
+const R66_LEVELS = [{n:1, name:'Warm-up', per:20, c:'#7ef0c0'}, {n:2, name:'Build', per:30, c:'#8fd3ff'}, {n:3, name:'Commit', per:40, c:'#c3a6ff'}, {n:4, name:'Hard', per:60, c:'#ff8a4a'}];
+(function(){
+  const lv = {first:1, soft:2, medium:3, hard:4, own:2};
+  R63_PRESETS.forEach(function(p){ p.level = lv[p.id] || 2; });
+  const add = function(o, beforeId){ const i = R63_PRESETS.findIndex(function(p){ return p.id===beforeId; }); R63_PRESETS.splice(i < 0 ? R63_PRESETS.length : i, 0, o); };
+  add({id:'reset7', level:1, name:'7-day reset', days:7, strict:'reset', icon:'&#9201;', line:'One clean week to get your feet under you.', rules:[{label:'Up by 7', cue:''}, {label:'No junk food', cue:''}, {label:'20 minutes of movement', cue:''}, {label:'Plan tomorrow tonight', cue:'Before bed'}]}, 'soft');
+  add({id:'clean30', level:2, name:'30 days clean', days:30, strict:'reset', icon:'&#128167;', line:'No alcohol for 30 days (the Dry January idea, any month).', rules:[{label:'No alcohol', cue:''}, {label:'3 liters of water', cue:''}]}, 'soft');
+  add({id:'eat30', level:2, name:'Clean eating 30', days:30, strict:'reset', icon:'&#129367;', line:'30 days of real food (Whole30-style): no added sugar, no junk.', rules:[{label:'No added sugar', cue:''}, {label:'No fast food or junk', cue:''}, {label:'Log what you eat', cue:''}]}, 'soft');
+  add({id:'cold30', level:2, name:'Cold 30', days:30, strict:'reset', icon:'&#129482;', line:'A cold shower every day for 30 days.', rules:[{label:'2-minute cold shower', cue:'After I get up'}]}, 'soft');
+  add({id:'habit66', level:3, name:'66 days', days:66, strict:'twice', icon:'&#129504;', line:'One habit for 66 days: the median it takes to become automatic.', rules:[{label:'Your one habit', cue:''}]}, 'medium');
+  add({id:'monk30', level:3, name:'Monk mode 30', days:30, strict:'reset', icon:'&#129496;', line:'30 days of focus: no scrolling, deep work, body, early nights.', rules:[{label:'No social media scrolling', cue:''}, {label:'4 hours of deep work', cue:''}, {label:'Train', cue:''}, {label:'Read 10 pages', cue:''}, {label:'In bed by 11', cue:''}]}, 'medium');
+  add({id:'monk90', level:4, name:'Monk mode 90', days:90, strict:'reset', icon:'&#9876;&#65039;', line:'90 days. One goal, nothing else.', rules:[{label:'No social media scrolling', cue:''}, {label:'5 hours of deep work', cue:''}, {label:'Train', cue:''}, {label:'Read 10 pages', cue:''}, {label:'No alcohol', cue:''}, {label:'In bed by 11', cue:''}]}, 'own');
+  const own = R63_PRESETS.find(function(p){ return p.id==='own'; }); if(own){ R63_PRESETS.splice(R63_PRESETS.indexOf(own), 1); R63_PRESETS.push(own); }
+})();
+const R66_QUOTES = [
+  ['Discipline is choosing between what you want now and what you want most.', 'Abraham Lincoln (attributed)'],
+  ['We are what we repeatedly do. Excellence, then, is not an act, but a habit.', 'Will Durant, on Aristotle'],
+  ['Hard choices, easy life. Easy choices, hard life.', 'Jerzy Gregorek'],
+  ['You will never always be motivated. You have to learn to be disciplined.', 'Unknown'],
+  ['The pain of discipline weighs ounces. The pain of regret weighs tons.', 'Jim Rohn (attributed)'],
+  ['Don’t count the days. Make the days count.', 'Muhammad Ali'],
+  ['Small daily improvements over time lead to stunning results.', 'Robin Sharma'],
+  ['The only easy day was yesterday.', 'U.S. Navy SEALs'],
+  ['Success isn’t always about greatness. It’s about consistency.', 'Dwayne Johnson'],
+  ['When you feel like quitting, think about why you started.', 'Unknown'],
+  ['Do something today that your future self will thank you for.', 'Unknown'],
+  ['It never gets easier. You just get better.', 'Unknown']
+];
+function r66Quote(){ const d = todayStr(), i = Math.abs(d.split('').reduce(function(a, ch){ return a*31 + ch.charCodeAt(0) | 0; }, 7)) % R66_QUOTES.length; return R66_QUOTES[i]; }
+function r66LevelOf(p){ return R66_LEVELS[(p.level || 2) - 1] || R66_LEVELS[1]; }
+function r66ChXp(c){ const p = R63_PRESETS.find(function(x){ return x.id===c.preset; }) || {}; const L = r66LevelOf(p); return Math.round(c.days*L.per*(c.strict==='reset' ? 1.2 : c.strict==='track' ? .6 : 1)); }
+// (finishing one pays, once)
+r63Settle = (function(base){
+  return function(){
+    const before = r63List().filter(function(c){ return !c.ended; }).map(function(c){ return c.id; });
+    const r = base.apply(this, arguments);
+    r63List().forEach(function(c){ if(before.indexOf(c.id) >= 0 && c.ended && c.ended.done && !c.r66Paid){ c.r66Paid = true; r66XpAdd({d:todayStr(), why:'Finished '+c.name, xp:r66ChXp(c), k:'challenge', a:'personal'}); persist('standards'); } });
+    return r;
+  };
+})(r63Settle);
+function r66Proj(add){
+  let x = null; try{ x = xpSummary(); }catch(e){} if(!x) return null;
+  const to = x.total + add, L = xpLevelOf(to);
+  return {from:x.level, to:Math.max(x.level, L), total:x.total, add:add};
+}
+// the tab, with the push
+r63Tab = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    const q = r66Quote(), act = r63Active();
+    let worth = '';
+    if(act.length){
+      const c = act[0], s = r63Status(c), xp = r66ChXp(c), P = r66Proj(xp);
+      worth = '<div class="r66-worth"><div><b>+'+xp.toLocaleString()+' XP</b><span>when you finish '+escapeHtml(c.name)+'</span></div>'+(P ? '<div><b>Level '+P.from+' &rarr; '+P.to+'</b><span>'+(P.to > P.from ? 'where finishing takes you' : 'and closer to the next one')+'</span></div>' : '')+'<div><b>'+(c.days - s.day + (s.doneToday ? 0 : 1))+'</b><span>days left. '+(c.strict==='reset' ? 'Miss one and it’s day 1.' : c.strict==='twice' ? 'Never miss twice.' : 'Keep going.')+'</span></div></div>';
+    }
+    const top = '<section class="r66-hero"><div class="r66-q"><p>“'+escapeHtml(q[0])+'”</p><small>'+escapeHtml(q[1])+'</small></div>'+worth+'</section>';
+    h = h.replace('<div class="r65s">', '<div class="r65s">'+top);
+    // the start cards, by level
+    const lvl = R66_LEVELS.map(function(L){
+      const ps = R63_PRESETS.filter(function(p){ return p.id!=='own' && (p.level || 2)===L.n; });
+      return ps.length ? '<div class="r66-lvl" style="--lc:'+L.c+'"><div class="r66-lvl-h"><b>'+L.n+'</b><span>'+L.name+'</span></div><div class="r66-lvl-g">'+ps.map(function(p){ return '<button class="r66-pc" data-action="r63Setup" data-id="'+p.id+'"><span class="r66-pc-i">'+p.icon+'</span><b>'+escapeHtml(p.name)+'</b><small>'+p.days+' days · +'+Math.round(p.days*L.per*(p.strict==='reset' ? 1.2 : 1)).toLocaleString()+' XP</small></button>'; }).join('')+'</div></div>' : '';
+    }).join('');
+    h = h.replace(/<div class="r65-pre">[\s\S]*?<\/div><\/section>/, '<div class="r66-lvls">'+lvl+'<button class="r66-own" data-action="r63Setup" data-id="own">&#10024; Make your own</button></div></section>');
+    return h;
+  };
+})(r63Tab);
+// the run card carries your why
+r65RunHtml = (function(base){ return function(c){ const h = base.apply(this, arguments); return c.why ? h.replace('<div class="r65-tag">', '<div class="r66-why">“'+escapeHtml(c.why)+'”</div><div class="r65-tag">') : h; }; })(r65RunHtml);
+// starting: the sheet, then the commitment
+r63SheetHtml = (function(base){
+  return function(){
+    const D = ui.r63Draft || {};
+    if(D.r66Step!=='commit') return base.apply(this, arguments).replace(/<button class="btn btn-primary hs-go" data-action="r63Start">Start today<\/button>/, '<button class="btn btn-primary hs-go" data-action="r66Next">Next: commit</button>');
+    const p = R63_PRESETS.find(function(x){ return x.id===D.preset; }) || {}, rules = D.rules.filter(function(r){ return String(r.label || '').trim(); });
+    const name = String(D.name || '').trim() || p.name, who = String(state.profile.name || '').split(' ')[0] || 'I';
+    const xp = Math.round(D.days*r66LevelOf(p).per*(D.strict==='reset' ? 1.2 : D.strict==='track' ? .6 : 1));
+    return asHead(p.icon || '&#128293;', 'Lock in')+
+      '<div class="r66-commit">'+
+        '<p class="r66-oath">'+escapeHtml(who)+', for the next <b>'+D.days+' days</b>, every day, you will:</p>'+
+        '<ol class="r66-rules">'+rules.map(function(r){ return '<li>'+escapeHtml(r.label)+(r.cue ? ' <small>'+escapeHtml(r.cue)+'</small>' : '')+'</li>'; }).join('')+'</ol>'+
+        '<p class="r66-rule-line">'+(D.strict==='reset' ? 'Miss one day and it’s back to day 1.' : D.strict==='twice' ? 'One slip is life. Two in a row and it starts over.' : 'Every day you show up counts.')+'</p>'+
+        '<label class="r66-whyf"><span>Why are you doing this?</span><textarea class="input" id="r66Why" data-r66-why rows="2" placeholder="The real reason. You’ll see it every day.">'+escapeHtml(D.why || '')+'</textarea></label>'+
+        '<div class="r66-stake"><b>+'+xp.toLocaleString()+' XP</b> when you finish '+escapeHtml(name)+'.</div>'+
+        '<button class="r66-hold" data-r66-hold="1"><span class="r66-hold-f"></span><span class="r66-hold-t">Hold to lock in</span></button>'+
+        '<button class="r66-back" data-action="r66Back">Back</button>'+
+      '</div>';
+  };
+})(r63SheetHtml);
+document.addEventListener('input', function(e){ if(e.target && e.target.hasAttribute && e.target.hasAttribute('data-r66-why') && ui.r63Draft) ui.r63Draft.why = e.target.value; });
+ACTIONS.r66Next = function(){
+  const D = ui.r63Draft; if(!D) return;
+  if(!D.rules.some(function(r){ return String(r.label || '').trim(); })){ showToast('Add at least one rule.'); return; }
+  D.r66Step = 'commit'; addSheetRefresh('r63Sheet'); setTimeout(function(){ const t = document.getElementById('r66Why'); if(t) t.focus(); }, 60);
+};
+ACTIONS.r66Back = function(){ const D = ui.r63Draft; if(!D) return; D.r66Step = null; addSheetRefresh('r63Sheet'); };
+(function(){
+  let H = null;
+  const stop = function(){ if(!H) return; clearTimeout(H.t); H.b.classList.remove('is-holding'); H = null; };
+  document.addEventListener('pointerdown', function(e){
+    const b = e.target.closest && e.target.closest('[data-r66-hold]'); if(!b) return;
+    e.preventDefault();
+    const D = ui.r63Draft; if(!D) return;
+    if(!String(D.why || '').trim()){ const t = document.getElementById('r66Why'); if(t){ t.classList.add('is-need'); t.focus(); } showToast('Write down why first.'); return; }
+    b.classList.add('is-holding');
+    H = {b:b, t:setTimeout(function(){ stop(); r66LockIn(); }, 1600)};
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(function(k){ document.addEventListener(k, function(e){ if(H && (k!=='pointerleave' || e.target===H.b)) stop(); }, true); });
+})();
+function r66LockIn(){
+  const D = ui.r63Draft; if(!D) return;
+  const why = String(D.why || '').trim();
+  const before = r63List().length;
+  ACTIONS.r63Start();
+  const c = r63List().length > before ? r63List()[r63List().length - 1] : null;
+  if(c){ c.why = why.slice(0, 300); persist('standards'); }
+  try{ playPositive && playPositive(); }catch(e){}
+  r66LockedMoment(c);
+  renderView();
+}
+function r66LockedMoment(c){
+  const q = r66Quote(), o = document.createElement('div'); o.className = 'r66-locked';
+  o.innerHTML = '<div class="r66-locked-c"><div class="r66-locked-k">Locked in</div><div class="r66-locked-n">Day 1</div><div class="r66-locked-t">'+escapeHtml(c ? c.name : '')+'</div><p>“'+escapeHtml(q[0])+'”</p></div>';
+  document.body.appendChild(o);
+  requestAnimationFrame(function(){ o.classList.add('is-in'); });
+  const go = function(){ o.classList.remove('is-in'); setTimeout(function(){ o.remove(); }, 500); };
+  o.addEventListener('click', go); setTimeout(go, 3200);
+}
+
+// ================= H18. The app asks what it needs: where you are, your holidays, time off =================
+// A card at the top of Today until it's answered (it doesn't jump in front of anything). The answers: day streaks skip
+// the holidays you take off (and the days around them you choose), the holiday looks follow your holidays, Op knows.
+const R66_HOLS = [
+  {id:'newyear', name:'New Year’s Day', d:function(y){ return y+'-01-01'; }},
+  {id:'easter', name:'Easter', d:function(y){ return typeof r60Easter==='function' ? r60Easter(y) : null; }},
+  {id:'memorial', name:'Memorial Day', d:function(y){ const d = new Date(y, 4, 31); while(d.getDay()!==1) d.setDate(d.getDate() - 1); return todayStr(d); }, us:true},
+  {id:'july4', name:'Independence Day', d:function(y){ return y+'-07-04'; }, us:true},
+  {id:'labor', name:'Labor Day', d:function(y){ const d = new Date(y, 8, 1); while(d.getDay()!==1) d.setDate(d.getDate() + 1); return todayStr(d); }, us:true},
+  {id:'halloween', name:'Halloween', d:function(y){ return y+'-10-31'; }},
+  {id:'thanksgiving', name:'Thanksgiving', d:function(y){ return holThanksgiving(y); }, us:true},
+  {id:'christmaseve', name:'Christmas Eve', d:function(y){ return y+'-12-24'; }},
+  {id:'christmas', name:'Christmas', d:function(y){ return y+'-12-25'; }},
+  {id:'nye', name:'New Year’s Eve', d:function(y){ return y+'-12-31'; }}
+];
+const R66_COUNTRIES = ['United States', 'Canada', 'Mexico', 'United Kingdom', 'Ireland', 'Australia', 'New Zealand', 'Germany', 'France', 'Spain', 'Italy', 'Netherlands', 'Brazil', 'Argentina', 'Colombia', 'Philippines', 'India', 'Nigeria', 'South Africa', 'United Arab Emirates', 'Other'];
+function r66Me(){ const p = state.profile; return p.r66Me && typeof p.r66Me==='object' ? p.r66Me : null; }
+function r66HolOff(dateStr){
+  const M = r66Me(); if(!M || !M.off) return false;
+  const y = Number(dateStr.slice(0, 4)), ext = Math.max(0, Math.min(5, Number(M.ext) || 0));
+  return arr(M.hols).some(function(id){ const H = R66_HOLS.find(function(h){ return h.id===id; }); if(!H) return false; return [y - 1, y, y + 1].some(function(yy){ const d = H.d(yy); if(!d) return false; const k = r63Diff(d, dateStr); return k >= -ext && k <= ext; }); }) ||
+    arr(M.own).some(function(o){ if(!o || !o.date) return false; const d = Number(dateStr.slice(0, 4))+o.date.slice(4); const k = r63Diff(d, dateStr); return k >= -ext && k <= ext; });
+}
+isDayOff = (function(base){ return function(d){ if(d && r66HolOff(d)) return true; return base.apply(this, arguments); }; })(isDayOff);
+holToday = (function(base){
+  return function(d){
+    const h = base.apply(this, arguments), M = r66Me();
+    if(!h || h==='birthday' || !M) return h;
+    return arr(M.hols).indexOf(h) >= 0 ? h : null;
+  };
+})(holToday);
+// the card on Today
+renderToday = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(r66Me() || state.profile.r66SetupLater===todayStr()) return h;
+    const card = '<div class="r66-ask"><div class="r66-ask-i">&#128075;</div><div class="r66-ask-t"><b>Let’s set you up</b><span>Where you are, the holidays you celebrate, and when you take time off. Three quick questions.</span></div><button class="btn btn-primary btn-sm" data-action="r66SetupOpen">Start</button><button class="r66-ask-x" data-action="r66SetupLater" aria-label="Later">&#10005;</button></div>';
+    return h.replace(/(<div class="today-hero)/, card+'$1');
+  };
+})(renderToday);
+ACTIONS.r66SetupLater = function(){ state.profile.r66SetupLater = todayStr(); persist('profile'); renderView(); };
+ACTIONS.r66SetupOpen = function(){
+  const M = r66Me() || {};
+  ui.r66Draft = {step:0, country:M.country || '', hols:arr(M.hols).slice(), off:M.off!=null ? !!M.off : true, ext:Number(M.ext) || 0, own:arr(M.own).slice()};
+  addSheetOpen('r66Setup', r66SetupHtml);
+};
+function r66SetupHtml(){
+  const D = ui.r66Draft || {step:0}, steps = ['Where you are', 'Your holidays', 'Time off'];
+  const dots = '<div class="r66-steps">'+steps.map(function(s, i){ return '<span class="'+(i===D.step ? 'is-on' : i < D.step ? 'is-done' : '')+'">'+s+'</span>'; }).join('')+'</div>';
+  let body = '';
+  if(D.step===0) body = '<label class="r66-f"><span>Where do you live?</span><select class="input" data-r66-d="country"><option value="">Pick one</option>'+R66_COUNTRIES.map(function(c){ return '<option'+(D.country===c ? ' selected' : '')+'>'+c+'</option>'; }).join('')+'</select></label>';
+  if(D.step===1){
+    const list = R66_HOLS.filter(function(H){ return !H.us || !D.country || D.country==='United States'; });
+    body = '<div class="r66-f"><span>Which holidays do you celebrate?</span><div class="r66-hols">'+list.map(function(H){ const on = D.hols.indexOf(H.id) >= 0; return '<button class="r66-hol'+(on ? ' is-on' : '')+'" data-action="r66Hol" data-id="'+H.id+'">'+(on ? '&#10003; ' : '')+escapeHtml(H.name)+'</button>'; }).join('')+'</div></div>'+
+      '<div class="r66-f"><span>Any others? (a date and a name)</span><div class="r66-own">'+D.own.map(function(o, i){ return '<span class="r66-ownc">'+escapeHtml(o.name)+' · '+escapeHtml(fmtDateShort(o.date))+'<button data-action="r66OwnDel" data-id="'+i+'">&#10005;</button></span>'; }).join('')+
+      '<input type="date" class="input" id="r66OwnD"><input class="input" id="r66OwnN" placeholder="e.g. Diwali, Eid, a family day"><button class="btn btn-sm" data-action="r66OwnAdd">Add</button></div></div>';
+  }
+  if(D.step===2) body = '<div class="r66-f"><span>On your holidays, do you take the day off?</span><div class="seg-tabs seg-sm"><button class="seg-tab'+(D.off ? ' active' : '')+'" data-action="r66Set" data-id="off|1">Yes, I’m off</button><button class="seg-tab'+(!D.off ? ' active' : '')+'" data-action="r66Set" data-id="off|0">I work through them</button></div></div>'+
+    (D.off ? '<div class="r66-f"><span>Extra days around each one</span><div class="seg-tabs seg-sm">'+[0, 1, 2, 3].map(function(n){ return '<button class="seg-tab'+(D.ext===n ? ' active' : '')+'" data-action="r66Set" data-id="ext|'+n+'">'+(n ? '±'+n : 'Just the day')+'</button>'; }).join('')+'</div></div>' : '')+
+    '<p class="r66-note">Days off don’t break your day streak. Your usual days off a week stay in Personal → Streaks.</p>';
+  return asHead('&#128075;', 'Let’s set you up')+dots+'<div class="r66-sb">'+body+'</div><div class="r66-sf">'+(D.step ? '<button class="btn btn-ghost" data-action="r66Step" data-id="-1">Back</button>' : '<span></span>')+'<button class="btn btn-primary hs-go" data-action="'+(D.step < 2 ? 'r66Step' : 'r66SetupSave')+'" data-id="1">'+(D.step < 2 ? 'Next' : 'Done')+'</button></div>';
+}
+document.addEventListener('change', function(e){ const t = e.target; if(t && t.getAttribute && t.getAttribute('data-r66-d')==='country' && ui.r66Draft){ ui.r66Draft.country = t.value; } });
+ACTIONS.r66Step = function(el, e, n){ const D = ui.r66Draft; if(!D) return; D.step = Math.max(0, Math.min(2, D.step + Number(n))); addSheetRefresh('r66Setup'); };
+ACTIONS.r66Hol = function(el, e, id){ const D = ui.r66Draft; if(!D) return; const i = D.hols.indexOf(id); if(i >= 0) D.hols.splice(i, 1); else D.hols.push(id); addSheetRefresh('r66Setup'); };
+ACTIONS.r66Set = function(el, e, v){ const D = ui.r66Draft; if(!D) return; const a = String(v).split('|'); if(a[0]==='off') D.off = a[1]==='1'; if(a[0]==='ext') D.ext = Number(a[1]); addSheetRefresh('r66Setup'); };
+ACTIONS.r66OwnAdd = function(){ const D = ui.r66Draft; if(!D) return; const d = (document.getElementById('r66OwnD') || {}).value, n = ((document.getElementById('r66OwnN') || {}).value || '').trim(); if(!d || !n){ showToast('Pick a date and give it a name.'); return; } D.own.push({date:d, name:n.slice(0, 40)}); addSheetRefresh('r66Setup'); };
+ACTIONS.r66OwnDel = function(el, e, i){ const D = ui.r66Draft; if(!D) return; D.own.splice(Number(i), 1); addSheetRefresh('r66Setup'); };
+ACTIONS.r66SetupSave = function(){
+  const D = ui.r66Draft; if(!D) return;
+  state.profile.r66Me = {country:D.country || '', hols:D.hols.slice(0, 20), off:!!D.off, ext:D.ext || 0, own:D.own.slice(0, 20), at:Date.now()};
+  persist('profile'); addSheetClose('r66Setup'); ui.r66Draft = null;
+  try{ xpCache && (xpCache.days = {}); }catch(e){}
+  showToast('Got it. Your holidays and time off are set.', {icon:'&#9989;'}); renderView();
+};
+// Op knows
+aiSystem = (function(base){
+  return function(){
+    const s = base.apply(this, arguments), M = r66Me();
+    if(M && Array.isArray(s)){ const names = arr(M.hols).map(function(id){ const H = R66_HOLS.find(function(h){ return h.id===id; }); return H ? H.name : null; }).filter(Boolean).concat(arr(M.own).map(function(o){ return o.name; })); s.push({type:'text', text:'About him: lives in '+(M.country || 'unknown')+'. Celebrates '+(names.join(', ') || 'no particular holidays')+(M.off ? ', takes them off'+(M.ext ? ' (±'+M.ext+' days)' : '') : ', works through them')+'.'}); }
+    return s;
+  };
+})(aiSystem);
+// (in Settings → You: change them any time)
+ACTIONS.r66SetupEdit = ACTIONS.r66SetupOpen;
+
+// ================= E10. The vault: sealed notes stay sealed =================
+// Week and month notes went into the vault readable straight away. They're sealed now: a week note opens 30 days after
+// you seal it, a month note 91 days after (the same as "send it back to me"). Notes already in there whose date has
+// passed get a new date in the future, so they're sealed too.
+function r66VaultFix(){
+  const L = vaultStore(); let ch = false; const today = todayStr(), first = !state.settings.r66VaultFixed;
+  L.forEach(function(m){
+    if(m.kind!=='week' && m.kind!=='month') return;
+    if(!m.openOn){
+      const nat = addDays(todayStr(new Date(m.at || Date.now())), m.kind==='month' ? 91 : 30);
+      m.openOn = nat > today || !first ? nat : addDays(today, m.kind==='month' ? 91 : 30);
+      ch = true;
+    }
+  });
+  if(first){ state.settings.r66VaultFixed = true; ch = true; }
+  if(ch){ persist('settings'); persist('journal'); }
+}
+vaultItems = (function(base){
+  return function(){
+    try{ r66VaultFix(); }catch(e){}
+    const today = todayStr();
+    return base.apply(this, arguments).map(function(m){ if((m.kind==='week' || m.kind==='month') && m.openOn && m.openOn > today) return Object.assign({}, m, {locked:true}); return m; });
+  };
+})(vaultItems);
+vaultHtml = (function(base){
+  return function(){
+    let h = base.apply(this, arguments);
+    vaultItems().forEach(function(m){
+      if(m.kind!=='week' && m.kind!=='month') return;
+      const label = m.kind==='month' ? 'Month note' : 'Week note';
+      const re = new RegExp('(data-id="'+m.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')+'"[\\s\\S]*?)<span class="r60-vs is-open">'+label+' · open</span>');
+      h = h.replace(re, function(m0, a){ return a+(m.locked ? '<span class="r60-vs is-sealed">'+label+' · opens '+escapeHtml(fmtDateShort(m.openOn))+'</span>' : '<span class="r60-vs is-open">'+label+' · open</span>'); });
+    });
+    return h;
+  };
+})(vaultHtml);
+setTimeout(function(){ try{ r66VaultFix(); }catch(e){} }, 0);
+
+// ================= D8. Your why: small by default (it's short) =================
+R60_SPAN_DEF.why = 4;
+setTimeout(function(){ try{ const S = r60Spans(); if(!state.dashboardPanels.r66WhySmall){ if(!S.why || S.why===12) S.why = 4; state.dashboardPanels.r66WhySmall = true; persist('dashboardPanels'); } }catch(e){} }, 0);
+// ============ ROUND 66 (part 2) ============
+// Notifications you set up yourself (what, and how each shows up), social notifications for your page and your clients'
+// ad leads, XP for engagement on your page (small and steady, a bonus when a post takes off), the bell in the player at
+// the top right, and the client report back (Social only): a designed PDF, with your own words and their journal.
+// Everything stored here is kept small (capped lists, totals instead of history).
+
+// ================= XP from outside the day (engagement, challenges) =================
+function r66XpLog(){ const p = state.profile; if(!Array.isArray(p.r66XpLog)) p.r66XpLog = []; return p.r66XpLog; }
+function r66XpAdd(e){
+  if(!e || !(e.xp > 0)) return;
+  const L = r66XpLog(), same = L.find(function(x){ return x.d===e.d && x.k===e.k && e.k==='social' && x.why===e.why; });
+  if(same) same.xp += Math.round(e.xp); else L.push({d:e.d, why:String(e.why).slice(0, 80), xp:Math.round(e.xp), k:e.k, a:e.a || 'personal'});
+  if(L.length > 400) L.splice(0, L.length - 400);
+  persist('profile');
+  try{ if(typeof xpCache!=='undefined' && xpCache) xpCache.sum = null; }catch(err){}
+}
+r43OneOffs = (function(base){
+  return function(){ const o = base.apply(this, arguments); r66XpLog().forEach(function(e){ o.events.push({d:e.d, why:e.why, xp:e.xp, k:e.k, a:e.a}); }); return o; };
+})(r43OneOffs);
+xpSummary = (function(base){
+  return function(){ const x = base.apply(this, arguments); if(x && Array.isArray(x.oneOffs)) x.won = x.oneOffs.filter(function(e){ return e.k==='client'; }).length; return x; };
+})(xpSummary);
+xpSig = (function(base){ return function(){ const L = r66XpLog(); return base.apply(this, arguments)+'|r66:'+L.length+':'+L.reduce(function(a, e){ return a + e.xp; }, 0); }; })(xpSig);
+// (the XP guide says so)
+r43GuideHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    const rows = [['Likes on your page', '+1 per 10', 'Your personal account; '+R66_XP.cap+' a day at most from likes, comments and shares'], ['A comment on your page', '+'+R66_XP.comment, ''], ['A share', '+'+R66_XP.share, ''], ['A post that takes off', '+'+R66_XP.viral, 'Once per post: '+R66_XP.viralLikes+'+ likes at once, or triple its usual'],
+      ['Finishing a challenge', 'By level and length', 'Warm-up 20 a day, Build 30, Commit 40, Hard 60 (×1.2 when a miss means day 1)']];
+    return h+'<div class="xpg-sec">Your page and your challenges</div>'+r43Tbl(['Action', 'XP', 'Notes'], rows);
+  };
+})(r43GuideHtml);
+const R66_XP = {perLikes:10, comment:5, share:8, cap:300, viral:250, viralLikes:500};
+
+// ================= Notification settings =================
+const R66_CATS = [
+  {id:'deadline', name:'Deadlines', icon:'&#9201;', how:'corner'},
+  {id:'client', name:'Clients', icon:'&#128101;', how:'corner'},
+  {id:'lead', name:'Leads', icon:'&#127919;', how:'corner'},
+  {id:'calendar', name:'Calendar', icon:'&#128197;', how:'banner'},
+  {id:'playbook', name:'Playbooks', icon:'&#9776;', how:'list'},
+  {id:'social', name:'Your page', icon:'&#10084;&#65039;', how:'corner'},
+  {id:'ads', name:'Clients’ ad leads', icon:'&#128226;', how:'banner'},
+  {id:'other', name:'Everything else', icon:'&#128276;', how:'list'}
+];
+const R66_HOW = [['banner', 'Banner up top'], ['corner', 'Top right'], ['list', 'Just the list']];
+function r66N(){
+  const s = state.settings; if(!s.r66Notif || typeof s.r66Notif!=='object') s.r66Notif = {};
+  const N = s.r66Notif; if(!N.cats || typeof N.cats!=='object') N.cats = {}; if(!N.social || typeof N.social!=='object') N.social = {likes:true, comments:true, shares:true, followers:true};
+  R66_CATS.forEach(function(c){ if(!N.cats[c.id]) N.cats[c.id] = {on:true, how:c.how}; });
+  return N;
+}
+function r66Cat(n){
+  if(n.r66cat) return n.r66cat;
+  const k = String(n.key || '');
+  if(/^pbb:|^pbl:/.test(k)) return 'playbook';
+  if(n.kind==='deadline' || n.kind==='client' || n.kind==='lead') return n.kind;
+  if(n.kind==='calendar' || n.kind==='event' || /^cal|^ev:/.test(k)) return 'calendar';
+  return 'other';
+}
+notifList = (function(base){
+  return function(){
+    const N = r66N(), dis = notifDismissed(), today = todayStr();
+    const out = base.apply(this, arguments).concat(r66Feed().filter(function(f){ return dis[f.key]!==today && !dis[f.key + ':done']; }).map(function(f){ return {key:f.key, kind:f.cat, r66cat:f.cat, level:'info', icon:f.icon, title:f.title, sub:f.sub, act:{a:f.cat==='ads' ? 'r66GoAds' : 'r66GoSocial', id:f.cli || ''}, sort:4}; }));
+    return out.filter(function(n){ const c = N.cats[r66Cat(n)]; return !c || c.on!==false; });
+  };
+})(notifList);
+ACTIONS.notifOpen = (function(base){
+  return function(el, e, key){
+    const n = notifByKey(key);
+    if(n && n.act && (n.act.a==='r66GoSocial' || n.act.a==='r66GoAds')){ ui.notifOpen = false; const p = document.getElementById('notifPanel'); if(p) p.hidden = true; notifDismissed()[key + ':done'] = todayStr(); persist('focus'); ui.view = 'convos'; ui.socTab = n.act.a==='r66GoAds' ? 'ads' : 'overview'; renderView(); return; }
+    return base.apply(this, arguments);
+  };
+})(ACTIONS.notifOpen);
+
+// ================= The feed: your page, your clients' ad leads =================
+function r66Feed(){ const f = state.focus; if(!Array.isArray(f.r66Feed)) f.r66Feed = []; return f.r66Feed; }
+function r66FeedAdd(o){
+  const F = r66Feed(); o.key = o.key || 'r66:'+uid(); o.at = Date.now();
+  F.push(o); if(F.length > 60) F.splice(0, F.length - 60);
+  const cutoff = Date.now() - 14*86400000; for(let i = F.length - 1; i >= 0; i--) if(F[i].at < cutoff) F.splice(i, 1);
+  persist('focus');
+}
+function r66Personal(){
+  let c; try{ c = igCfg(); }catch(e){ return null; } if(!c || !Array.isArray(c.accounts)) return null;
+  const tot = {likes:0, comments:0, shares:0, followers:0, posts:{}}; let any = false;
+  c.accounts.filter(function(a){ return a.role==='personal'; }).forEach(function(a){
+    const d = sxAccountData(a); if(!d) return; any = true;
+    tot.followers += Number(d.followers) || 0;
+    arr(d.posts).slice(0, 40).forEach(function(p){ const l = Number(p.likes) || 0, cm = Number(p.comments) || 0, sh = Number(p.shares) || 0; tot.likes += l; tot.comments += cm; tot.shares += sh; tot.posts[String(p.id)] = [l, cm, sh, String(p.cap || '').slice(0, 60)]; });
+  });
+  return any ? tot : null;
+}
+function r66SocialTick(){
+  const now = r66Personal(); if(!now) return;
+  const s = state.settings, was = s.r66Soc, N = r66N(), today = todayStr();
+  // (only totals and the last 40 posts' counts are kept)
+  const keep = {likes:now.likes, comments:now.comments, shares:now.shares, followers:now.followers, posts:{}, at:Date.now()};
+  Object.keys(now.posts).slice(0, 40).forEach(function(id){ keep.posts[id] = now.posts[id].slice(0, 3); });
+  s.r66Soc = keep;
+  if(!was){ persist('settings'); return; }
+  const dl = Math.max(0, now.likes - was.likes), dc = Math.max(0, now.comments - was.comments), ds = Math.max(0, now.shares - was.shares), df = Math.max(0, now.followers - was.followers);
+  // a post that took off
+  Object.keys(now.posts).forEach(function(id){
+    const p = now.posts[id], o = (was.posts || {})[id]; if(!o) return;
+    const jump = p[0] - o[0];
+    if((jump >= R66_XP.viralLikes || (o[0] >= 50 && p[0] >= o[0]*3)) && !(s.r66Viral || {})[id]){
+      s.r66Viral = s.r66Viral || {}; s.r66Viral[id] = today;
+      const ks = Object.keys(s.r66Viral); if(ks.length > 50) delete s.r66Viral[ks[0]];
+      r66FeedAdd({cat:'social', icon:'&#128640;', title:'Your post is taking off', sub:'+'+jump.toLocaleString()+' likes'+(p[3] ? ' · “'+p[3]+'”' : '')});
+      r66XpAdd({d:today, why:'A post that took off', xp:R66_XP.viral, k:'viral', a:'personal'});
+    }
+  });
+  const bits = [];
+  if(dl && N.social.likes) bits.push('&#10084;&#65039; '+dl.toLocaleString()+' like'+(dl===1 ? '' : 's'));
+  if(dc && N.social.comments) bits.push('&#128172; '+dc+' comment'+(dc===1 ? '' : 's'));
+  if(ds && N.social.shares) bits.push('&#8599; '+ds+' share'+(ds===1 ? '' : 's'));
+  if(df && N.social.followers) bits.push('&#128100; '+df+' new follower'+(df===1 ? '' : 's'));
+  if(bits.length) r66FeedAdd({cat:'social', icon:'&#10084;&#65039;', title:'Your page', sub:bits.join(' · ')});
+  // XP: small and steady, up to a cap a day
+  const xp = Math.floor(dl/R66_XP.perLikes) + dc*R66_XP.comment + ds*R66_XP.share;
+  if(xp > 0){ const got = r66XpLog().filter(function(e){ return e.d===today && e.k==='social'; }).reduce(function(a, e){ return a + e.xp; }, 0), room = Math.max(0, R66_XP.cap - got); if(room) r66XpAdd({d:today, why:'Engagement on your page', xp:Math.min(room, xp), k:'social', a:'personal'}); }
+  persist('settings');
+}
+function r66AdsTick(){
+  if(typeof r53AdLedger!=='function' || typeof r53AllFor!=='function') return;
+  const s = state.settings, was = s.r66AdSnap || null, now = {};
+  mtActiveClients().forEach(function(c){ const T = r53AllFor(c.id); if(T && T.n) now[c.id] = Number(T.leads) || 0; });
+  s.r66AdSnap = now;
+  if(!was){ persist('settings'); return; }
+  Object.keys(now).forEach(function(id){
+    const d = now[id] - (was[id] || 0); if(d <= 0 || was[id]==null) return;
+    const c = crmFind('client', id); if(!c) return;
+    r66FeedAdd({cat:'ads', icon:'&#127919;', title:(c.business || c.name)+' got '+d+' new lead'+(d===1 ? '' : 's'), sub:'From their ad campaign', cli:id});
+  });
+  persist('settings');
+}
+setInterval(function(){ try{ r66SocialTick(); }catch(e){} try{ r66AdsTick(); }catch(e){} }, 60000);
+setTimeout(function(){ try{ r66SocialTick(); }catch(e){} try{ r66AdsTick(); }catch(e){} }, 4000);
+// (a refresh of the social numbers checks straight away)
+if(typeof igRefreshAll==='function') igRefreshAll = (function(base){ return function(){ const r = base.apply(this, arguments); Promise.resolve(r).then(function(){ setTimeout(function(){ try{ r66SocialTick(); r66AdsTick(); }catch(e){} }, 500); }); return r; }; })(igRefreshAll);
+
+// ================= How new ones show up: a banner up top, a card at the top right, or only the list =================
+function r66Seen(){ const f = state.focus; if(!f.r66Seen || typeof f.r66Seen!=='object') f.r66Seen = {}; return f.r66Seen; }
+function r66Pop(){
+  if(document.hidden) return;
+  const S = r66Seen(), N = r66N(), first = !state.focus.r66SeenInit, today = todayStr();
+  let list; try{ list = notifList(); }catch(e){ return; }
+  const fresh = list.filter(function(n){ return !S[n.key]; });
+  fresh.forEach(function(n){ S[n.key] = today; });
+  // (keep it small: two weeks of keys)
+  const ks = Object.keys(S); if(ks.length > 500){ const cut = addDays(today, -14); ks.forEach(function(k){ if(S[k] < cut) delete S[k]; }); }
+  if(first){ state.focus.r66SeenInit = true; persist('focus'); return; }
+  if(fresh.length) persist('focus');
+  fresh.slice(0, 3).forEach(function(n, i){ const c = N.cats[r66Cat(n)] || {}; setTimeout(function(){ r66Show(n, c.how || 'corner'); }, i*600); });
+}
+function r66Show(n, how){
+  if(how==='list') return;
+  if(how==='banner'){
+    const old = document.getElementById('r66Ban'); if(old) old.remove();
+    const b = document.createElement('div'); b.id = 'r66Ban'; b.className = 'r66-ban';
+    b.innerHTML = '<div class="r66-ban-c" data-action="notifOpen" data-id="'+escapeHtml(n.key)+'"><span class="r66-ban-i">'+n.icon+'</span><div><b>'+escapeHtml(stripTags(n.title))+'</b>'+(n.sub ? '<span>'+n.sub+'</span>' : '')+'</div></div>';
+    document.body.appendChild(b); requestAnimationFrame(function(){ b.classList.add('is-in'); });
+    setTimeout(function(){ b.classList.remove('is-in'); setTimeout(function(){ b.remove(); }, 500); }, 5200);
+    try{ playTick(); }catch(e){}
+    return;
+  }
+  let box = document.getElementById('r66Toasts'); if(!box){ box = document.createElement('div'); box.id = 'r66Toasts'; box.className = 'r66-toasts'; document.body.appendChild(box); }
+  const t = document.createElement('div'); t.className = 'r66-toast';
+  t.innerHTML = '<button class="r66-toast-b" data-action="notifOpen" data-id="'+escapeHtml(n.key)+'"><span class="r66-toast-i">'+n.icon+'</span><span class="r66-toast-t"><b>'+escapeHtml(stripTags(n.title))+'</b>'+(n.sub ? '<small>'+n.sub+'</small>' : '')+'</span></button><button class="r66-toast-x" aria-label="Close">&#10005;</button>';
+  t.querySelector('.r66-toast-x').addEventListener('click', function(ev){ ev.stopPropagation(); t.classList.remove('is-in'); setTimeout(function(){ t.remove(); }, 400); });
+  box.appendChild(t); requestAnimationFrame(function(){ t.classList.add('is-in'); });
+  while(box.children.length > 3) box.firstChild.remove();
+  setTimeout(function(){ t.classList.remove('is-in'); setTimeout(function(){ t.remove(); }, 400); }, 6500);
+}
+function stripTags(s){ return String(s || '').replace(/<[^>]*>/g, ''); }
+setInterval(function(){ try{ r66Pop(); }catch(e){} }, 45000);
+setTimeout(function(){ try{ r66Pop(); }catch(e){} }, 6000);
+
+// ================= The bell lives in the player (top right) =================
+const R66_BELL_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
+function r66BellCount(){ const c = document.getElementById('notifCount'), v = c ? String(c.textContent || '').trim() : ''; return c && v && v!=='0' && !c.hidden && getComputedStyle(c).display!=='none' ? v : ''; }
+// (drawn as part of the player, so it never flickers)
+if(typeof dockHtml==='function') dockHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments), n = r66BellCount();
+    return h.replace(/<div class="md-in[^"]*">/, function(m0){ return m0+'<button class="r66-bell'+(n ? ' has-n' : '')+(ui.notifOpen ? ' is-on' : '')+'" data-action="toggleNotifs" aria-label="Notifications" data-hov="Notifications">'+R66_BELL_SVG+'<i class="r66-bell-n">'+n+'</i></button>'; });
+  };
+})(dockHtml);
+function r66Bell(){ try{ if(typeof dockRefresh==='function') dockRefresh(); }catch(e){} }
+afterRenderHooks.push(function(){ try{ r66Bell(); }catch(e){} });
+setInterval(function(){ try{ r66Bell(); }catch(e){} }, 1500);
+document.addEventListener('pointerdown', function(e){ if(e.target.closest && e.target.closest('.r66-bell')) e.stopPropagation(); }, true);
+
+// ================= Settings → Notifications =================
+renderSettings = (function(base){
+  return function(){
+    const on = ui.settingsTab==='notif';
+    if(on) ui.settingsTab = 'you';
+    let h;
+    try{ h = base.apply(this, arguments); } finally { if(on) ui.settingsTab = 'notif'; }
+    const btn = '<button class="settings-nav-item'+(on ? ' active' : '')+'" data-action="settingsTab" data-tab="notif"><span style="margin-right:8px;">&#128276;</span>Notifications</button>';
+    h = h.replace(/(<button class="settings-nav-item[^"]*" data-action="settingsTab" data-tab="op">[\s\S]*?<\/button>)/, '$1'+btn);
+    if(!on) return h;
+    h = h.replace(/<button class="settings-nav-item active" data-action="settingsTab" data-tab="you">/, '<button class="settings-nav-item" data-action="settingsTab" data-tab="you">');
+    const cut = r60Cut(h, '<div class="settings-content'); if(!cut) return h;
+    return h.replace(cut.html, '<div class="settings-content tab-panel" data-key="settings-notif">'+r66NotifSettingsHtml()+'</div>');
+  };
+})(renderSettings);
+function r66NotifSettingsHtml(){
+  const N = r66N();
+  const row = function(c){
+    const C = N.cats[c.id];
+    return '<div class="r66-nr'+(C.on ? '' : ' is-off')+'"><span class="r66-nr-i">'+c.icon+'</span><b>'+c.name+'</b>'+
+      '<div class="seg-tabs seg-sm r66-how">'+R66_HOW.map(function(h){ return '<button class="seg-tab'+(C.how===h[0] ? ' active' : '')+'" data-action="r66NHow" data-id="'+c.id+'|'+h[0]+'"'+(C.on ? '' : ' disabled')+'>'+h[1]+'</button>'; }).join('')+'</div>'+
+      '<button class="r66-sw'+(C.on ? ' is-on' : '')+'" data-action="r66NOn" data-id="'+c.id+'" aria-label="'+(C.on ? 'Turn off' : 'Turn on')+'"><i></i></button></div>';
+  };
+  const sub = function(k, l){ return '<button class="r66-chip'+(N.social[k] ? ' is-on' : '')+'" data-action="r66NSoc" data-id="'+k+'">'+(N.social[k] ? '&#10003; ' : '')+l+'</button>'; };
+  return '<div class="card section r66-ns"><div class="section-title">Notifications</div>'+
+    '<div class="r66-nrs">'+R66_CATS.map(row).join('')+'</div>'+
+    '<div class="r66-nsub"><span>Your page: tell me about</span>'+sub('likes', 'Likes')+sub('comments', 'Comments')+sub('shares', 'Shares')+sub('followers', 'New followers')+'</div>'+
+    '<div class="r66-ntry"><button class="btn btn-sm" data-action="r66NTry" data-id="banner">See a banner</button><button class="btn btn-sm" data-action="r66NTry" data-id="corner">See a top-right one</button></div>'+
+  '</div>';
+}
+ACTIONS.r66NOn = function(el, e, id){ const C = r66N().cats[id]; if(!C) return; C.on = !C.on; persist('settings'); playTick(); renderView(); try{ notifBadge(); }catch(err){} };
+ACTIONS.r66NHow = function(el, e, v){ const a = String(v).split('|'), C = r66N().cats[a[0]]; if(!C) return; C.how = a[1]; persist('settings'); playTick(); renderView(); };
+ACTIONS.r66NSoc = function(el, e, k){ const N = r66N(); N.social[k] = !N.social[k]; persist('settings'); playTick(); renderView(); };
+ACTIONS.r66NTry = function(el, e, how){ r66Show({key:'r66:try', icon:'&#128276;', title:how==='banner' ? 'A banner, up top' : 'A note, top right', sub:'This is how they’ll show up.'}, how); };
+
+// ================= G15. The client report: a designed PDF, only in Social =================
+r58FocusHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments); if(!h) return h;
+    const id = ui.r58Acct, cl = typeof r58Clients==='function' ? r58Clients().find(function(x){ return x.id===id; }) : null;
+    if(!cl || !cl.client) return h;
+    return h.replace(/(<div class="r58-facts">)/, '$1<button class="btn btn-primary btn-sm r66-repb" data-action="r66RepOpen" data-id="'+cl.client.id+'">&#128196; Monthly report</button>');
+  };
+})(r58FocusHtml);
+function r66RepData(c, ym){
+  const y = Number(ym.slice(0, 4)), m = Number(ym.slice(5, 7)) - 1;
+  const accs = typeof r55CliAccounts==='function' ? r55CliAccounts(c.id) : [];
+  const soc = {followers:0, posts:0, views:0, likes:0, best:null, accounts:[]};
+  accs.forEach(function(a){ const d = r55CliData(a.id) || {}; soc.accounts.push('@'+(a.username || '')); soc.followers += Number(d.followers || a.followers) || 0; soc.posts += Number(d.p30) || 0; soc.views += Number(d.views) || 0; soc.likes += Number(d.likes) || 0; if(d.best && (!soc.best || (d.best.views || 0) > (soc.best.views || 0))) soc.best = d.best; });
+  const plan = typeof r57ContentPlan==='function' ? r57ContentPlan(c, ym) : [];
+  const L = typeof r53AdLedger==='function' ? r53AdLedger() : {}, camps = [];
+  Object.keys(L).forEach(function(id){ const k = L[id]; let cl = null; try{ cl = adClientOf({id:id, acct:k.acct}); }catch(e){} if(cl!==c.id) return; camps.push({name:k.name, spend:Number(k.spend) || 0, leads:Number(k.leads) || 0, imp:Number(k.imp) || 0, clicks:Number(k.clicks) || 0, cur:k.currency || 'USD'}); });
+  camps.sort(function(a, b){ return b.spend - a.spend; });
+  const ads = camps.reduce(function(a, k){ a.spend += k.spend; a.leads += k.leads; a.imp += k.imp; a.clicks += k.clicks; a.cur = a.cur || k.cur; return a; }, {spend:0, leads:0, imp:0, clicks:0, cur:null});
+  const journal = arr(c.journal).filter(function(j){ return monthKeyOf(j.date || '')===ym; });
+  return {c:c, ym:ym, label:new Date(y, m, 1).toLocaleDateString(undefined, {month:'long', year:'numeric'}), soc:soc, plan:plan, done:plan.filter(function(p){ return p.st==='done'; }).length, camps:camps, ads:ads, journal:journal};
+}
+function r66Store(c){ if(!c.r66Rep || typeof c.r66Rep!=='object') c.r66Rep = {}; return c.r66Rep; }
+ACTIONS.r66RepOpen = function(el, e, id){ ui.r66Rep = {id:id, ym:thisMonthKey()}; r66RepRender(); };
+function r66RepRender(){
+  const R = ui.r66Rep; if(!R) return;
+  const c = crmFind('client', R.id); if(!c) return;
+  let o = document.getElementById('r66Rep');
+  if(!o){ o = document.createElement('div'); o.id = 'r66Rep'; o.className = 'r66-rep-ov'; document.body.appendChild(o); }
+  const D = r66RepData(c, R.ym), S = r66Store(c)[R.ym] || {};
+  o.innerHTML = '<div class="r66-rep-bar"><button class="r66-rep-x" data-action="r66RepClose" aria-label="Close">&#10005;</button><div class="r66-rep-m"><button data-action="r66RepMonth" data-id="-1">&#8249;</button><b>'+escapeHtml(D.label)+'</b><button data-action="r66RepMonth" data-id="1">&#8250;</button></div>'+
+    '<label class="r66-rep-f"><span>What you saw this month</span><textarea class="input" data-r66-rep="notes" rows="5" placeholder="The wins, what you learned, what you’re changing.">'+escapeHtml(S.notes || '')+'</textarea></label>'+
+    '<button class="btn btn-sm" data-action="r66RepJournal"'+(D.journal.length ? '' : ' disabled')+'>&#128214; Pull from their journal'+(D.journal.length ? ' ('+D.journal.length+')' : '')+'</button>'+
+    '<label class="r66-rep-f"><span>Next month</span><textarea class="input" data-r66-rep="next" rows="3" placeholder="The plan.">'+escapeHtml(S.next || '')+'</textarea></label>'+
+    '<button class="btn btn-primary r66-rep-go" data-action="r66RepPdf">&#11015; Export PDF</button></div>'+
+    '<div class="r66-rep-stage"><div class="r66-doc" id="r66Doc" style="--cc:'+clientAccent(c)+'">'+r66DocHtml(D, S)+'</div></div>';
+}
+function r66Money(v, cur){ try{ return adsMoney(v, cur || 'USD'); }catch(e){ return '$'+Math.round(v).toLocaleString(); } }
+function r66DocHtml(D, S){
+  const c = D.c, me = state.profile.businessName || state.profile.name || 'Your agency', n = function(v){ return v ? Number(v).toLocaleString() : '–'; };
+  const tile = function(v, k){ return '<div class="r66d-t"><b>'+v+'</b><span>'+k+'</span></div>'; };
+  const cpl = D.ads.leads ? r66Money(D.ads.spend/D.ads.leads, D.ads.cur) : '–', ctr = D.ads.imp ? (100*D.ads.clicks/D.ads.imp).toFixed(2)+'%' : '–';
+  return '<section class="r66d-cover"><div class="r66d-brand">'+escapeHtml(me)+'</div><div class="r66d-k">Monthly report</div><h1>'+escapeHtml(c.business || c.name)+'</h1><div class="r66d-m">'+escapeHtml(D.label)+'</div>'+(D.soc.accounts.length ? '<div class="r66d-acc">'+escapeHtml(D.soc.accounts.join('  ·  '))+'</div>' : '')+'</section>'+
+    '<section class="r66d-sec"><div class="r66d-h">The month in numbers</div><div class="r66d-tiles">'+tile(n(D.soc.followers), 'Followers')+tile(n(D.soc.views), 'Views (30 days)')+tile(n(D.soc.posts), 'Posts (30 days)')+tile(n(D.soc.likes), 'Likes (30 days)')+'</div></section>'+
+    (D.plan.length ? '<section class="r66d-sec"><div class="r66d-h">Content delivered</div><div class="r66d-del"><div class="r66d-ring" style="--p:'+Math.round(100*D.done/D.plan.length)+'"><div><b>'+D.done+'</b><span>of '+D.plan.length+'</span></div></div><ul>'+D.plan.slice(0, 12).map(function(p){ return '<li class="is-'+p.st+'"><i></i>'+escapeHtml(p.what)+' '+p.n+'<small>'+escapeHtml(fmtDateShort(p.doneOn || p.date))+'</small></li>'; }).join('')+'</ul></div></section>' : '')+
+    (D.camps.length ? '<section class="r66d-sec"><div class="r66d-h">Ads</div><div class="r66d-tiles">'+tile(r66Money(D.ads.spend, D.ads.cur), 'Spent')+tile(n(D.ads.leads), 'Leads')+tile(cpl, 'Cost per lead')+tile(ctr, 'Click-through')+'</div>'+
+      '<table class="r66d-tbl"><thead><tr><th>Campaign</th><th>Spent</th><th>Leads</th><th>Per lead</th><th>CTR</th></tr></thead><tbody>'+D.camps.slice(0, 8).map(function(k){ return '<tr><td>'+escapeHtml(k.name)+'</td><td>'+r66Money(k.spend, k.cur)+'</td><td>'+n(k.leads)+'</td><td>'+(k.leads ? r66Money(k.spend/k.leads, k.cur) : '–')+'</td><td>'+(k.imp ? (100*k.clicks/k.imp).toFixed(2)+'%' : '–')+'</td></tr>'; }).join('')+'</tbody></table></section>' : '')+
+    (D.soc.best ? '<section class="r66d-sec"><div class="r66d-h">Best post</div><div class="r66d-best"><b>'+n(D.soc.best.views)+' views</b><p>“'+escapeHtml(String(D.soc.best.cap || '').slice(0, 220))+'”</p></div></section>' : '')+
+    (S.notes ? '<section class="r66d-sec"><div class="r66d-h">From '+escapeHtml(me)+'</div><div class="r66d-note">'+escapeHtml(S.notes).replace(/\n/g, '<br>')+'</div></section>' : '')+
+    (S.next ? '<section class="r66d-sec"><div class="r66d-h">Next month</div><div class="r66d-note">'+escapeHtml(S.next).replace(/\n/g, '<br>')+'</div></section>' : '')+
+    '<footer class="r66d-foot">'+escapeHtml(me)+' · '+escapeHtml(D.label)+'</footer>';
+}
+document.addEventListener('input', function(e){
+  const t = e.target, k = t && t.getAttribute && t.getAttribute('data-r66-rep'); if(!k || !ui.r66Rep) return;
+  const c = crmFind('client', ui.r66Rep.id); if(!c) return;
+  const S = r66Store(c)[ui.r66Rep.ym] = r66Store(c)[ui.r66Rep.ym] || {}; S[k] = t.value.slice(0, 4000);
+  clearTimeout(R66.repT); R66.repT = setTimeout(function(){ persist('business'); const d = document.getElementById('r66Doc'); if(d) d.innerHTML = r66DocHtml(r66RepData(c, ui.r66Rep.ym), S); }, 250);
+});
+ACTIONS.r66RepClose = function(){ ui.r66Rep = null; const o = document.getElementById('r66Rep'); if(o) o.remove(); };
+ACTIONS.r66RepMonth = function(el, e, d){ const R = ui.r66Rep; if(!R) return; const y = Number(R.ym.slice(0, 4)), m = Number(R.ym.slice(5, 7)) - 1 + Number(d); const dt = new Date(y, m, 1); R.ym = dt.getFullYear()+'-'+pad2(dt.getMonth() + 1); r66RepRender(); };
+ACTIONS.r66RepJournal = function(){
+  const R = ui.r66Rep; if(!R) return; const c = crmFind('client', R.id); if(!c) return;
+  const D = r66RepData(c, R.ym), S = r66Store(c)[R.ym] = r66Store(c)[R.ym] || {};
+  const add = D.journal.map(function(j){ return '• '+String(j.text || '').replace(/\s+/g, ' ').trim().slice(0, 300); }).filter(function(t){ return (S.notes || '').indexOf(t) < 0; });
+  if(!add.length){ showToast('Already in.'); return; }
+  S.notes = ((S.notes || '').trim() ? S.notes.trim()+'\n' : '')+add.join('\n'); persist('business'); r66RepRender();
+};
+ACTIONS.r66RepPdf = function(){
+  const R = ui.r66Rep; if(!R) return; const c = crmFind('client', R.id); if(!c) return;
+  const name = (String(c.business || c.name).replace(/[^\w\- ]+/g, '').trim() || 'Client')+' – '+r66RepData(c, R.ym).label+'.pdf';
+  document.body.classList.add('r66-printing');
+  const done = function(){ setTimeout(function(){ document.body.classList.remove('r66-printing'); }, 400); };
+  try{
+    if(typeof OPAPP!=='undefined' && OPAPP && OPAPP.pdf){ OPAPP.pdf(name).then(function(r){ done(); if(r && r.saved) showToast('Saved: '+name, {icon:'&#128196;'}); }).catch(function(){ done(); }); return; }
+  }catch(err){}
+  setTimeout(function(){ try{ window.print(); }catch(err){} done(); }, 50);
+};
+
+// ================= G16. More from the ads (Zernio): a client's campaigns, right on their page in Social =================
+r58FocusHtml = (function(base){
+  return function(){
+    const h = base.apply(this, arguments); if(!h) return h;
+    const m = /data-action="r66RepOpen" data-id="([^"]+)"/.exec(h); if(!m) return h;
+    const c = crmFind('client', m[1]); if(!c) return h;
+    const D = r66RepData(c, thisMonthKey()); if(!D.camps.length) return h;
+    const n = function(v){ return v ? Number(v).toLocaleString() : '–'; };
+    const box = '<div class="r66-ads"><div class="r66-ads-h"><b>Ad campaigns</b><span>'+r66Money(D.ads.spend, D.ads.cur)+' spent · '+n(D.ads.leads)+' leads'+(D.ads.leads ? ' · '+r66Money(D.ads.spend/D.ads.leads, D.ads.cur)+' a lead' : '')+'</span></div>'+
+      '<div class="r66-ads-t">'+D.camps.slice(0, 6).map(function(k){ return '<div class="r66-ads-r"><span>'+escapeHtml(k.name)+'</span><b>'+r66Money(k.spend, k.cur)+'</b><b>'+n(k.leads)+' leads</b><small>'+(k.leads ? r66Money(k.spend/k.leads, k.cur)+' each' : '–')+'</small><small>'+(k.imp ? (100*k.clicks/k.imp).toFixed(2)+'% CTR' : '')+'</small></div>'; }).join('')+'</div></div>';
+    return h.replace(/<\/div>$/, box+'</div>');
+  };
+})(r58FocusHtml);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
