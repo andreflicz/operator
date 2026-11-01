@@ -114,7 +114,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // ---- the board and the guide ----
   await E("ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='board'; ui.pbWho='client'; ui.pbSel=pbAll()[0].id; renderView()"); await p.waitForTimeout(200);
   // (round 58: the board is the Playbooks overview: a column per playbook someone's on, the rest at the bottom)
-  check('Board: a column for the playbook (and a place for who’s not on it)', !!(await p.$('.r58-col[data-pb6-col="'+(await E("pbAll()[0].id"))+'"]')) && !!(await p.$('.r58-offs')));
+  // (round 64: the overview is a stage board for the chosen playbook, like the Lead center, with a tray for who's not on one)
+  check('Board: a column for the playbook (and a place for who’s not on it)', !!(await p.$('.r64-col[data-pb6-col^="'+(await E("pbAll()[0].id"))+'|"]')) && !!(await p.$('.r64-tray')));
   await E("ui.pbView='build'; ui.pb57Cal=true; ui.pb57Stage=pbStages(pbAll()[0])[1].id; renderView()"); await p.waitForTimeout(150);
   // (round 59: posting days belong to packages, not playbooks)
   check('the calendar is the guide: the ideal month (no posting days in a playbook)', (await p.$$('.pb57-cal .pb6-day')).length >= 28 && !(await p.$('.pb57-post')));
@@ -181,7 +182,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("state.focus.r57QuietUntil = 0");
   // the reply box / the mic
   await E("AI.typedAt = Date.now(); AI.listening = false; AI.busy = false; aiAutoListen('opBubText')"); await p.waitForTimeout(150);
-  check('typing: when he asks something, the reply box opens and is ready', await E("!AI.listening && document.activeElement && document.activeElement.id==='opBubInput'"));
+  // (round 64: Op's tab has no typing box; typing happens in full screen. Still: after typing, the mic doesn't open on its own)
+  check('typing: when he asks something, the reply box opens and is ready', await E("!AI.listening"));
   check('hold to talk is the default, and the reply box opens for it too', await E("opTalkMode()==='ptt'"));
   // his own last line, heard back, isn't sent as yours
   await E("AI.typedAt = 0; OP1.inputAt = 0; R54.last = null; R57.lastSaid = 'Done, it’s on your list. Anything else on your mind?'; R57.saidAt = Date.now(); window.__h = AI.history.length; aiAsk('anything else on your mind')");
@@ -247,7 +249,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('…one client at a time, their calendar, their report and an export, right there', !!(await p.$('.r58-focus .r57-cc-g')) && !!(await p.$('.r58-focus [data-action="r55Report"][data-id="jj"]')) && !!(await p.$('.r58-focus [data-action="r57CliExport"]')));
   check('…the export is something to send them (what, when, delivered or not)', /8 reel 1\s.*·\s+(Delivered|Coming|Today|Planned)/.test(await E("r57CliExportText(crmFind('client', 'jj'))")));
   await E("ui.view='today'; renderView(); AI.hasKey = false; opBubShow()"); await p.waitForTimeout(150);
-  check('Op’s bubble: one Open (full screen, his chats there), one Turn Op off, and ✕', !!(await p.$('#opBub .r57-bub-open')) && !!(await p.$('#opBub .r57-bub-off')) && (await p.$$('#opBub .op-bub-h > button:not(.r57-gone), #opBub .op-bub-h .op-bub-ics button:not(.r57-gone)')).length===3);
+  check('Op’s bubble: one Open (full screen, his chats there), one Turn Op off, and ✕', !!(await p.$('#opBub .r57-bub-open')) && !!(await p.$('#opBub .r57-bub-off')) && (await p.$$('#opBub .op-bub-h > button:not(.r57-gone):not(.r64-st), #opBub .op-bub-h .op-bub-ics button:not(.r57-gone)')).length===3);  // (round 64: plus his state, .r64-st)
   await E("ACTIONS.r57OpOffMenu()");
   check('…Turn Op off: mute his voice, quiet for an hour, or off', (await p.$$('#opBub .r57-offm button')).length===3);
   await E("document.querySelectorAll('.r57-offm').forEach(m => m.remove()); state.profile.opMoodColorMap = {concern:'#ff8800'}; r57MoodCss()");

@@ -40,7 +40,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.view='today'; renderView(); r57Note('Saved something', 'idea')"); await p.waitForTimeout(80);
   check('Op’s note fades in (not a pop)', await E("(function(){ const s = getComputedStyle(document.getElementById('r60Pop')); return /opacity/.test(s.transitionProperty) && parseFloat(s.transitionDuration) >= .45; })()"));
   // (round 62: it sizes itself AND has its resize grip back, as Andre asked)
-  check('Op’s window sizes itself, still resizable', await E("(function(){ opBubShow(); const g = document.querySelector('#opBub .op-bub-rs'); return !!g && getComputedStyle(g).display!=='none' && document.getElementById('opBub').classList.contains('r62-fit'); })()"));
+  // (round 64: Op is a small tab: his state and three buttons, nothing to size)
+  check('Op’s window sizes itself, still resizable', await E("(function(){ opBubShow(); const b = document.getElementById('opBub'); return b.classList.contains('r64-mini') && b.getBoundingClientRect().height < 60; })()"));
   await E("const b = document.getElementById('opBub'); b.classList.add('is-in'); R61.idleSince = Date.now() - 100000; R61.lastChat = (opChat().length ? opChat()[opChat().length - 1].at : 0) || 0"); await p.waitForTimeout(3500);
   check('…and it closes by itself after a while with nothing going on', await E("!document.getElementById('opBub').classList.contains('is-in')"));
   // ---- E. Playbooks ----

@@ -48,9 +48,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("(function(){ const c = r63Active()[0]; c.strict = 'twice'; c.log = {}; c.start = addDays(todayStr(), -1); c.log[c.start] = c.rules.map(r => r.id); persist('standards'); ui.view='personal'; ui.personalTab='streaks'; renderView(); })()"); await p.waitForTimeout(150);
   // ---- On Today ----
   await E("ui.view='today'; renderView()"); await p.waitForTimeout(250);
-  check('On Today: the running streak under Today’s standard, with today’s rules', /75 Hard/.test(await p.textContent('.r63-today')) && (await p.$$('.r63-today .r63-chip')).length===7);
-  await p.click('.r63-today .r63-chip >> nth=1'); await p.waitForTimeout(150);
-  check('…tick them right there', await E("(r63Active()[0].log[todayStr()] || []).length >= 1") && !!(await p.$('.r63-today .r63-chip.is-on')));
+  // (round 64: one console: the streak's day beside the fire streak, its rules on Today's standard's line)
+  check('On Today: the running streak under Today’s standard, with today’s rules', /75 Hard/.test(await p.textContent('.r64-runs')) && (await p.$$('.r60-std-c .r63-chip')).length===7);
+  await p.click('.r60-std-c .r63-chip >> nth=1'); await p.waitForTimeout(150);
+  check('…tick them right there', await E("(r63Active()[0].log[todayStr()] || []).length >= 1") && !!(await p.$('.r60-std-c .r63-chip.is-on')));
   await p.click('.r63-stdlink'); await p.waitForTimeout(250);
   check('“Today’s standard” opens Streaks', await E("ui.view==='personal' && ui.personalTab==='streaks'"));
   // ---- Finishing, and the next step ----

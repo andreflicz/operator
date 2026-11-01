@@ -57,7 +57,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   { await E("window.__keep = opChat().splice(0); OPCD.sig = ''; opChatDraw()"); await p.waitForTimeout(150); const h0 = await p.evaluate(() => document.querySelector('#opBub .op-bub-log').getBoundingClientRect().height); await E("for(let i = 0; i < 8; i++) opChat().push({r:i % 2 ? 'op' : 'me', t:'A longer line to grow the conversation number '+i, at:Date.now()}); OPCD.sig = ''; opChatDraw()"); await p.waitForTimeout(200);
     const h1 = await p.evaluate(() => document.querySelector('#opBub .op-bub-log').getBoundingClientRect().height);
     // (round 62: it still sizes itself as it grows, and the resize grip is back as Andre asked)
-    check('Op’s window sizes the conversation itself as it grows', h1 > h0 + 60, [h0, h1]); await E("opChat().splice(0); window.__keep.forEach(e => opChat().push(e)); OPCD.sig = ''; opChatDraw()"); }
+    // (round 64: Op is a small tab now; the conversation is read in full screen)
+    check('Op’s window sizes the conversation itself as it grows', await E("(function(){ const b = document.getElementById('opBub'); return b.classList.contains('r64-mini') && b.getBoundingClientRect().height < 60; })()")); await E("opChat().splice(0); window.__keep.forEach(e => opChat().push(e)); OPCD.sig = ''; opChatDraw()"); }
   // ---- E. voice ----
   check('hands-free listening: no time cap, and it waits out a long pause (4 s or more)', await E("r58PauseMs(0) >= 3800 && r58PauseMs(60000) >= 9000") && !/300000/.test(await E("String(scribeListen)")));
   await E("OV.speaking = true; R57.lastSaid = 'Done. It’s on your list for tomorrow morning, first thing.'; document.getElementById('opBubText').textContent = 'Done. It’s on'; window.__ls = 0; const was = aiListen; aiListen = function(){ window.__ls++; }; r54TalkToggle(); aiListen = was"); await p.waitForTimeout(500);
@@ -80,7 +81,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.businessTab='lifecycle'; ui.pbView='board'; renderView()"); await p.waitForTimeout(150);
   check('Playbooks: no Clients / Leads switch', !(await p.$('[data-action="pb6Who"]')));
   // (round 59: every open lead is on the permanent lead playbook)
-  check('Overview: each playbook someone is on is a column of their cards; everyone else at the bottom', (await p.$$('.r58-col')).length===2 && /Kiko/.test(await p.textContent('.r58-board')) && /Mia/.test(await p.textContent('.r58-board')) && /JJS/.test(await p.textContent('.r58-offs')));
+  // (round 64: pick a playbook at the top; its stages are the columns, like the Lead center; who's not on one waits in the tray)
+  { const seen = []; for(const id of await E("pbAll().map(p => p.id)")){ await E("ui.r64Pb = '"+id+"'; renderView()"); await p.waitForTimeout(80); seen.push(await p.textContent('.r64-board')); }
+    await E("ui.r64Pb = null; renderView()"); await p.waitForTimeout(80);
+    check('Overview: each playbook someone is on is a column of their cards; everyone else at the bottom', (await p.$$('.r64-pbp')).length===3 && seen.some(t => /Kiko/.test(t)) && seen.some(t => /Mia/.test(t)) && /JJS/.test(await p.textContent('.r64-tray'))); }
   await E("ui.pbView='build'; renderView()"); await p.waitForTimeout(100);
   check('Builder: every playbook in one row (clients’ and leads’)', (await p.$$('.r58-pill')).length===3);
   await E("const ob = document.getElementById('opBub'); if(ob) ob.classList.remove('show'), ob.style.display='none'");
@@ -90,7 +94,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("openNewContactModal('lead')"); await p.waitForTimeout(150);
   check('…and adding a lead picks it for you', await E("document.getElementById('ncPlaybook').value===r58Default('lead').id"));
   await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); ui.pbView='board'; renderView()"); await p.waitForTimeout(100);
-  check('…the bottom offers the ★ playbook in one tap', !!(await p.$('.r58-offs .r58-put')));
+  check('…the bottom offers the ★ playbook in one tap', !!(await p.$('.r64-tray .r58-put')));
   check('a lead can’t be dropped on a client playbook', await E("pbMoveTo('lead', 'l1', pbAll().find(p => p.name==='Client journey').id)")===false);
   // ---- I. Social ----
   await E("ui.view='convos'; ui.socTab='overview'; ui.igTried = 1; renderView()"); await p.waitForTimeout(200);
@@ -136,7 +140,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('two tasks ticked within half a second: both done', await E("['q1','q2'].every(id => state.tasks.items.find(t => t.id===id).status==='done')"));
   // a playbook nobody's on yet takes a drop
   await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); const P = pbNew('client', 'Empty one', 30, {for:'client'}); pbAll().push(P); pbSave(); ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='board'; renderView()"); await p.waitForTimeout(150);
-  await E("(function(){ const dt = new DataTransfer(), src = document.querySelector('.r58-offs .pb6-card[data-pb6-drag^=\"client:\"]'), to = Array.from(document.querySelectorAll('.r58-drop')).find(b => /Empty one/.test(b.textContent)); src.dispatchEvent(new DragEvent('dragstart', {bubbles:true, dataTransfer:dt})); to.dispatchEvent(new DragEvent('dragover', {bubbles:true, cancelable:true, dataTransfer:dt})); to.dispatchEvent(new DragEvent('drop', {bubbles:true, cancelable:true, dataTransfer:dt})); })()"); await p.waitForTimeout(400);
+  await E("(function(){ const dt = new DataTransfer(), src = document.querySelector('.r64-tray .pb6-card[data-pb6-drag^=\"client:\"]') /* (round 64: the tray) */, to = Array.from(document.querySelectorAll('.r58-drop')).find(b => /Empty one/.test(b.textContent)); src.dispatchEvent(new DragEvent('dragstart', {bubbles:true, dataTransfer:dt})); to.dispatchEvent(new DragEvent('dragover', {bubbles:true, cancelable:true, dataTransfer:dt})); to.dispatchEvent(new DragEvent('drop', {bubbles:true, cancelable:true, dataTransfer:dt})); })()"); await p.waitForTimeout(400);
   check('drag someone onto a playbook nobody’s on yet (the pill under the columns): they’re on it', await E("arr(state.business.clients).some(c => c.pb && c.pb.id===pbAll().find(p => p.name==='Empty one').id)"));
   check('a notification about a lead opens the Leads list', await E("(function(){ pbBehind; const ok = typeof ACTIONS.notifOpen==='function'; return ok; })()"));
   }catch(err){ check('the run reached the end', false, String(err && err.message || err).slice(0, 300)); }

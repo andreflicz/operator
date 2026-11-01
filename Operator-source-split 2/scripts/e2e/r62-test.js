@@ -39,19 +39,15 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('…and what he’s doing (“Remembering that…”)', /Remembering that/.test(await E("document.querySelector('#opBub .r62-work').textContent")));
   await E("AI.busy = false"); await p.waitForTimeout(400);
   check('…gone when he’s done', await E("!document.querySelector('#opBub .r62-work.is-on')"));
-  // ---- A5. Op's window: compact, grows, resizable ----
+  // ---- A5. Op's window ----
+  // (round 64: Andre asked for a small tab instead of the chat window: his state and three buttons; the conversation is
+  // read in full screen. So the window no longer grows with the chat or has a grip.)
   await E("ACTIONS.opBubClose(); R62.quiet = false; state.focus.opChat = []; opChatLog('me', 'Hi'); opChatLog('op', 'Hey.'); OPCD.sig = ''"); await p.waitForTimeout(200);
   await E("opBubShow(); opChatDraw()"); await p.waitForTimeout(400);
-  const h1 = await E("document.querySelector('#opBub .op-bub-log').getBoundingClientRect().height");
-  check('the window opens compact', h1 < 200, h1);
-  await E("for(let i = 0; i < 6; i++){ opChatLog('me', 'Line number '+i+' with a few more words in it so it wraps a little bit'); opChatLog('op', 'Answer number '+i+', also a little longer than one line so it takes up space.'); } opChatDraw()"); await p.waitForTimeout(500);
-  const h2 = await E("document.querySelector('#opBub .op-bub-log').getBoundingClientRect().height");
-  check('…grows as the conversation does (up to most of the window)', h2 > h1 + 100 && h2 <= 521, [h1, h2]);
-  check('…and has a resize grip again', await E("(function(){ const g = document.querySelector('#opBub .op-bub-rs'); return !!g && getComputedStyle(g).display!=='none'; })()"));
-  const g = await (await p.$('#opBub .op-bub-rs')).boundingBox();
-  await p.mouse.move(g.x + 8, g.y + 8); await p.mouse.down(); await p.mouse.move(g.x + 60, g.y - 80, {steps:5}); await p.mouse.up(); await p.waitForTimeout(200);
-  const w3 = await E("document.getElementById('opBub').getBoundingClientRect().width");
-  check('…dragging it resizes it', await E("R62.manual===true") && w3 > 470, w3);
+  const h1 = await E("document.getElementById('opBub').getBoundingClientRect().height");
+  check('the window opens compact', h1 < 60, h1);
+  await E("for(let i = 0; i < 6; i++){ opChatLog('me', 'Line number '+i+' with a few more words in it so it wraps a little bit'); opChatLog('op', 'Answer number '+i+', also a little longer than one line so it takes up space.'); } opChatDraw()"); await p.waitForTimeout(400);
+  check('…and stays small however long the conversation gets', await E("document.getElementById('opBub').getBoundingClientRect().height") < 60);
   // ---- B. Today ----
   await E("ui.view='today'; ui.todayEdit = false; renderView()"); await p.waitForTimeout(300);
   check('Customize sits in the top panel (no row of its own)', await E("!!document.querySelector('.today-hero .r62-cb') && !document.querySelector('.r61-cust')"));

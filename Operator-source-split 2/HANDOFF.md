@@ -1,4 +1,4 @@
-# Operator app — continuity brief (updated 2026-11-01, after Round 63)
+# Operator app — continuity brief (updated 2026-11-01, after Round 64)
 
 ## What this is
 "Operator" is Andre's personal productivity app: business (clients, leads, MRR, deliverables, playbooks), focus (lock-in sessions, tasks), personal (goals, health, finances, journal, social), and Op, the AI assistant inside it. The UI and logic are one self-contained HTML page built from a source tree. It ships as a Mac app (Electron). The older Chrome-app-shell `.app` still exists in the repo as the source of the helper scripts.
@@ -12,7 +12,7 @@ Andre tests every build himself and comes back with detailed, itemized feedback,
 Design rules he set: "a bad app informs, a good one just has a great UI." Minimal, level, symmetrical; no small grey explainer text; one well-placed control rather than repeated buttons; consistent across features. Build features general ("not a just-me app").
 
 ## Where the code lives
-- GitHub: `andreflicz/operator`. Rounds 57–63 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
+- GitHub: `andreflicz/operator`. Rounds 57–64 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
 - Every commit ends with the session's Co-Authored-By / Claude-Session lines.
 - Layout inside `Operator-source-split 2/`:
 
@@ -39,6 +39,8 @@ src/js/32zNN-rXX.js         one file per update round, layered on top (see "Over
                             the Personal tab line). Mac: main.js op:talkCheck / op:relaunch; install-operator.sh signs with a
                             stable local identity
                             Round 63: 32z72-r63.js (Personal → Streaks: Today's standard + challenges)
+                            Round 64: 32z73-r64.js (Op small tab, cut-off merge, unfiled updates, streak console, BMI,
+                            Fuel, no cross-page glide, analytics range picker + range recap, Playbooks stage board)
 scripts/build.py            src/ → dist/command-center-2.html (injects const OP_BUILT = <ms>)
 scripts/smoke-test.js       quick load check
 scripts/e2e/*-test.js       Playwright suites, one per round (common.js: instrument, newPage, check, report)
@@ -257,6 +259,30 @@ Other conventions:
 - Op: `streak_check {rule, done}` and `start_streak {preset, name, days, rules}`; aiSystem gets the running streaks.
 - No XP for streaks yet (a judgment call: say if he wants it).
 
+## Round 64 notes (the list is ROUND-64-LIST.md, with Andre's answers)
+- **Op is a small tab** (`#opBub.r64-mini`): the log, typing row, caption, status row and grip are hidden; `.r64-st` shows
+  `r64State()` (Listening… / Speaking / Thinking… or the tool label / Up next… / Ready, "Replied · open" when his voice is
+  off) and opens full screen (r57OpOpen). It tucks away 7 s after he's done (not while hovered). Busy with the tab
+  closed: `#r64Dot` (a spinner) shows in its place; tap it to bring the tab back. Round 62's compact/grow log code still
+  runs but the log is hidden.
+- **Cut-off doubles**: the outermost `opChatLog` wrapper drops an op line that's contained in one of his lines since your
+  last message, and replaces a shorter one with the fuller one (`r64Norm`, 5 min window).
+- **Unfiled updates**: `r64Unfiled()` scans the last 45 days of your chat lines for app requests (`R64_APP` + `R64_ASK`)
+  not found in App updates (text, said, title, summaries; `r62Sim` ≥ .75). They're listed at the top of App updates
+  (File / Skip / File all; skips in `state.settings.r64Skip`).
+- **Streak console**: the running streaks sit under the fire streak (`.r64-runs`), their rules join Today's standard's
+  chips after a divider. Round 63's separate `.r63-today` row is cut out.
+- **BMI**: `bmiScaleHtml` redrawn (15–35 scale, zones labelled with your weights). **Fuel**: picks in two columns at the
+  bottom, week bars on tracks. **Clients**: leads in an even grid under a hairline.
+- **Goals "broken on first open"**: not reproduced. A likely cause: FLIP (`data-flip`, Round 41) glided goal cards from
+  where the same goal sat on Today. FLIP now only runs within a page (`r64PageSig`).
+- **Analytics**: `analyticsRangeTabs` is a recap button + a 🔍 range button with a popover (Today, This week, Last week,
+  This month, Last month, All time, custom dates `ui.anFrom/anTo`). `rangeDays` knows month / lastmonth / custom; those
+  render with `r64SpanHtml`. The recap follows the range (`R64_RECAP`): Today opens the day recap; others open the
+  `r64Recap` sheet (totals, best day, every day → its day recap).
+- **Playbooks overview**: playbook pills (count, Leads/Clients), the chosen playbook's stages as columns (`.r64-col`,
+  `data-pb6-col="pbId|stageId"`, the Round 57 capture drop handler moves people), and a "Not on a playbook" tray.
+
 ## Removed (don't bring back)
 GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
 
@@ -279,6 +305,7 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent);
 - main.js: single instance, menu bar Tray, ⌥O show/hide, ✕ hides, ⌘Q quits, starts the helpers, move-in from the old Chrome profile, `window.operatorPage` bridge.
 
 ## Status
+Round 64 (2026-11-01): ROUND-64-LIST.md (13 items). Mac 3.7.0.
 Round 63 (2026-11-01): ROUND-63-LIST.md (Streaks). Mac 3.6.0 carries Rounds 62 and 63.
 Round 62 (2026-11-01): ROUND-62-LIST.md (12 items).
 Round 61 (2026-11-01): ROUND-61-LIST.md (14 items).

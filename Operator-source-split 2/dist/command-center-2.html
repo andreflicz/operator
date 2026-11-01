@@ -10676,7 +10676,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793509606885;
+const OP_BUILT = 1793510371563;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -56889,10 +56889,10 @@ pbEditorHtml = (function(base){
       '<span class="pb6-sp"></span><button class="btn btn-sm btn-primary" data-action="pb6NewOpen">+ New playbook</button></div>';
     if(!pbAll().length) return base.apply(this, arguments);
     const peopleOf = function(p){ return pbCountsFor(pbFor(p)).filter(function(x){ return x.pb && x.pb.id===p.id; }); };
-    let p = pbById(ui.r64Pb);
+    let p = (ui.pbSel && ui.pbSel!==R64.lastSel ? pbById(ui.pbSel) : null) || pbById(ui.r64Pb) || pbById(ui.pbSel);
     if(!p){ p = pbAll().find(function(q){ return peopleOf(q).length; }) || pbAll()[0]; ui.r64Pb = p.id; }
-    ui.pbSel = p.id; ui.pbWho = pbFor(p);
-    const pills = '<div class="r64-pbs">'+pbAll().map(function(q){ const n = peopleOf(q).length; return '<button class="r64-pbp'+(q.id===p.id ? ' is-on' : '')+'" data-action="r64PbPick" data-id="'+q.id+'">'+(r58Star(q) ? '<i>&#9733;</i>' : '')+escapeHtml(q.name)+'<span>'+n+'</span><em>'+(pbFor(q)==='lead' ? 'Leads' : 'Clients')+'</em></button>'; }).join('')+'</div>';
+    ui.r64Pb = p.id; ui.pbSel = R64.lastSel = p.id; ui.pbWho = pbFor(p);
+    const pills = '<div class="r64-pbs">'+pbAll().map(function(q){ const n = peopleOf(q).length; return '<button class="r64-pbp r58-drop'+(q.id===p.id ? ' is-on' : '')+'" data-action="r64PbPick" data-id="'+q.id+'" data-pb6-col="'+q.id+'" data-hov="Drop someone here to start them on it">'+(r58Star(q) ? '<i>&#9733;</i>' : '')+escapeHtml(q.name)+'<span>'+n+'</span><em>'+(pbFor(q)==='lead' ? 'Leads' : 'Clients')+'</em></button>'; }).join('')+'</div>';
     const who = pbFor(p), on = peopleOf(p), L = pbStages(p);
     const col = function(st, i){
       const P = on.filter(function(x){ return pb57Where(x, p)===st; });
@@ -56901,12 +56901,14 @@ pbEditorHtml = (function(base){
         '<small class="pb6-cmeta">'+(st.repeat==='month' ? 'Every month' : st.repeat==='days' ? 'Every '+st.days+' days' : arr(st.steps).length+' step'+(arr(st.steps).length===1 ? '' : 's'))+'</small>'+
         '<div class="pb6-cards">'+(P.length ? P.map(function(x){ return pbCardHtml(who, x); }).join('') : '<div class="r64-drop">Drop here</div>')+'</div></section>';
     };
-    const off = pbCountsFor(who).filter(function(x){ return !x.pb || !x.pb.id || !pbById(x.pb.id); });
-    const tray = '<section class="pb6-col is-off r64-tray" data-pb6-col=""><header><b>Not on a playbook</b><span>'+off.length+'</span></header><div class="r64-trayg">'+(off.length ? off.map(function(x){ return pb57OffCard(who, x); }).join('') : '<div class="r64-drop">Everyone’s on a playbook</div>')+'</div></section>';
-    return '<div class="pb6 pb57 r64-pb">'+bar+pills+'<div class="pb6-board r64-board">'+L.map(col).join('')+'</div>'+tray+'</div>';
+    // (the tray: everyone not on a playbook, clients and leads; a lead can't go on a client playbook or the other way)
+    const off = ['client', 'lead'].reduce(function(a, k){ return a.concat(pbCountsFor(k).filter(function(x){ return !x.pb || !x.pb.id || !pbById(x.pb.id); }).map(function(x){ return {k:k, x:x}; })); }, []);
+    const tray = '<section class="pb6-col is-off r64-tray" data-pb6-col=""><header><b>Not on a playbook</b><span>'+off.length+'</span></header><div class="r64-trayg">'+(off.length ? off.map(function(o){ const x = o.x, k = o.k, d = r58Default(k); return pb57OffCard(k, x).replace(/<\/div>$/, (d ? '<button class="r58-put" data-action="r58PutDefault" data-id="'+k+':'+x.id+'">&#9733; '+escapeHtml(d.name)+'</button>' : '')+'</div>'); }).join('') : '<div class="r64-drop">Everyone’s on a playbook</div>')+'</div></section>';
+    const start = pbAll().some(function(q){ return pbFor(q)==='client'; }) || typeof r60PresetCards!=='function' ? '' : '<section class="r60-empty"><div class="r60-empty-h"><b>Start your client playbooks</b></div>'+r60PresetCards()+'</section>';
+    return '<div class="pb6 pb57 r64-pb">'+bar+pills+'<div class="pb6-board r64-board">'+L.map(col).join('')+'</div>'+tray+start+'</div>';
   };
 })(pbEditorHtml);
-ACTIONS.r64PbPick = function(el, e, id){ ui.r64Pb = id; playTick(); renderView(); };
+ACTIONS.r64PbPick = function(el, e, id){ ui.r64Pb = id; ui.pbSel = R64.lastSel = id; playTick(); renderView(); };
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');
