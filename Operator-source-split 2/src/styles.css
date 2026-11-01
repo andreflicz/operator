@@ -10118,3 +10118,5 @@ html.r58-content .app, html.r58-content .layout{ grid-template-columns:1fr !impo
 .r60-jc .section{ margin:0 !important; }
 .r60-jc .section > .row:first-child .input{ border-radius:18px; height:36px; }
 .r60-jc .chip{ border-radius:14px; }
+.vault-meta .r60-vs{ margin:6px 0 0; align-self:flex-start; display:inline-block; }
+.vault-meta{ display:flex; flex-direction:column; align-items:flex-start; min-width:0; }

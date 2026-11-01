@@ -1,4 +1,4 @@
-# Operator app — continuity brief (updated 2026-10-31, after Round 59)
+# Operator app — continuity brief (updated 2026-11-01, after Round 60)
 
 ## What this is
 "Operator" is Andre's personal productivity app: business (clients, leads, MRR, deliverables, playbooks), focus (lock-in sessions, tasks), personal (goals, health, finances, journal, social), and Op, the AI assistant inside it. The UI and logic are one self-contained HTML page built from a source tree. It ships as a Mac app (Electron). The older Chrome-app-shell `.app` still exists in the repo as the source of the helper scripts.
@@ -12,7 +12,7 @@ Andre tests every build himself and comes back with detailed, itemized feedback,
 Design rules he set: "a bad app informs, a good one just has a great UI." Minimal, level, symmetrical; no small grey explainer text; one well-placed control rather than repeated buttons; consistent across features. Build features general ("not a just-me app").
 
 ## Where the code lives
-- GitHub: `andreflicz/operator`. Rounds 57–59 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
+- GitHub: `andreflicz/operator`. Rounds 57–60 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
 - Every commit ends with the session's Co-Authored-By / Claude-Session lines.
 - Layout inside `Operator-source-split 2/`:
 
@@ -29,6 +29,9 @@ src/js/32zNN-rXX.js         one file per update round, layered on top (see "Over
                             Round 59: 32z66-r59.js (Op's read, talk-button cut, update write-ups, SOP playbooks + the permanent lead
                             playbook), 32z67-r59ui.js (Setup, Log center calendar, packages by cycle day, locking in, client calendars,
                             Calendar client filter, tab animations, weight & fuel, journal)
+                            Round 60: 32z68-r60.js (read once, PTT reply once, Op files updates, presets, monthly deliverables,
+                            personal packages), 32z69-r60ui.js (XP pop-up, PTT explainer, Log center tab, Social clients/settings,
+                            Calendar picker/legend, goals order, journal, vault)
 scripts/build.py            src/ → dist/command-center-2.html (injects const OP_BUILT = <ms>)
 scripts/smoke-test.js       quick load check
 scripts/e2e/*-test.js       Playwright suites, one per round (common.js: instrument, newPage, check, report)
@@ -40,8 +43,8 @@ packaged/Operator-2-7-2.app the old Chrome-shell app; its Resources/helper.sh + 
 1. Add a new round file after the last one in manifest.json, plus a CSS block at the end of styles.css.
 2. `python3 scripts/build.py`, then `node scripts/smoke-test.js dist/command-center-2.html`.
 3. Write `scripts/e2e/rXX-test.js` and run it: `node scripts/e2e/rXX-test.js dist/command-center-2.html`. `window.__op.ev(code)` runs code inside the app's closure. `newPage(browser, file, seed, clockAt)`; the fake clock leaks memory, so soak tests pass `null`.
-4. Re-run the maintained suites r41–r59 and r57-migrate (r40 and older are stale) and `xvfb-run -a node scripts/e2e/mac-app-test.js` (first time in a container: `cd mac && npm install && node stage.js`).
-   `node scripts/e2e/r57-shots.js` / `r58-shots.js` / `r59-shots.js dist/command-center-2.html <outdir> [names]` take each round's screenshots.
+4. Re-run the maintained suites r41–r60 and r57-migrate (r40 and older are stale) and `xvfb-run -a node scripts/e2e/mac-app-test.js` (first time in a container: `cd mac && npm install && node stage.js`).
+   `node scripts/e2e/r57-shots.js` / `r58-shots.js` / `r59-shots.js` / `r60-shots.js dist/command-center-2.html <outdir> [names]` take each round's screenshots.
 5. Screenshot what changed, update the canvas, commit and push.
 
 ## Override pattern
@@ -152,6 +155,32 @@ Other conventions:
 - Tab animations: `renderView` compares the tab state (`r59TabSig`) with the last render; what changed gets `.r59-in`.
 - Weight & fuel rebuilt (`renderBodyFuel`), numbers rounded to one decimal on Health; Journal is write-left / read-right.
 
+## Round 60 notes (the list is ROUND-60-LIST.md)
+- Op's read: Round 59 refetched any stored read over 220 characters on every render (it typed twice / rewrote
+  itself). `opReadKick` now presents a long stored read as short to that check; the page clamps it.
+- Push-to-talk cut: `r59ShowLine` writes ONE chat entry (`R60.cutEntry`); `opChatLog` for the same turn fills that
+  entry with the full reply instead of adding a second one.
+- Filing: if Andre's message asks to add something to the updates (`R60_ASKS_UPDATE`) and no filing tool ran, the app
+  writes it up (`r59Summarize`) and files it. Op's system prompt says it's non-negotiable.
+- Notes: `r57Note` now shows `#r60Pop`, a short glowing white line next to the XP (`#musicDock`); tap to expand.
+  The old `.r57-notes` corner stack is hidden. Everything still goes to the feed.
+- Settings → Op: `.r60-ptt` says whether the talk key works in the background (from `OPAPP.talkHealth`).
+- Presets: `R60_PRESETS` (Onboarding, Monthly client, Save a client, Offboarding) + "Onboarding → Monthly client"
+  (both, chained via `p.next`); your own in `crm().pbPresets` (`r60SavePreset` in the builder). Shown in the
+  new-playbook sheet and on the Overview when there are no client playbooks. Builder: "When they finish → They move to …".
+- Deliverables: `d.per = 'month'`, `d.monthly = N` (package and client). `monthlyTargetFor` / `isDeliverableDoneThisWeek`
+  respect it; `r59PkSync` copies it to clients.
+- Packages: `pk.personal` (also sets `type:'self'`): no price, no "On it"; Day 1 is when you lock in.
+- Hover labels: `hovLabelFor` never makes a label from an internal action name (anything with a digit, like r59PkDay).
+- Business tabs: Overview, Clients, Leads, Log center, Packages, Finances, Playbooks (no Log center button).
+- Social: Clients group with colours and a + (`r60CliOpen` sheet links Zernio accounts to clients); ⚙ settings sheet
+  (swap, connect, clients' accounts, refresh) instead of ⇄; Full screen / Refresh row moved down.
+- Calendar: no Today chip; `.r60-calb` picker (search) replaces the select; Legend behind a button; the check-in and
+  Op's line share a row; the month has more room.
+- Goals: "Your goals" first (Andre said "year goals"; read as Your goals: the long-term ones). Journal: own layout
+  (`renderJournalEntriesTab`, `renderClientJournalComposeCard`, `renderAllClientJournalRow`). Vault: status pill per
+  card, All / Open / Sealed, week notes use 📝.
+
 ## Removed (don't bring back)
 GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
 
@@ -174,6 +203,7 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); Op live mode (ElevenLabs agent);
 - main.js: single instance, menu bar Tray, ⌥O show/hide, ✕ hides, ⌘Q quits, starts the helpers, move-in from the old Chrome profile, `window.operatorPage` bridge.
 
 ## Status
+Round 60 (2026-11-01): ROUND-60-LIST.md (19 items): see Round 60 notes.
 Round 59 (2026-10-31): ROUND-59-LIST.md (17 items, with Andre's answers): Op's read fixed and first, talk-button cut,
 update write-ups, SOP playbooks + permanent lead playbook, Setup, Log center calendar, packages by cycle day, locking
 in, client calendars, Calendar client filter, tab animations, weight & fuel, journal.

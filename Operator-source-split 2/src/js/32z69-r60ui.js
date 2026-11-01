@@ -278,7 +278,7 @@ vaultHtml = function(){
     '<div class="vault">'+(v.length ? v.map(function(m, i){ const o = !!open[m.id];
     return '<div class="vault-card'+(o ? ' is-open' : '')+(m.locked ? ' is-locked' : '')+' is-'+m.kind+'" style="--i:'+Math.min(i, 12)+'">'+
       '<button class="vault-seal" data-action="vaultToggle" data-id="'+m.id+'" data-hov="'+(m.locked ? 'Still sealed' : o ? 'Close it' : 'Read it')+'"><span class="vault-wax">'+(m.kind==='capsule' ? (m.locked ? '&#9203;' : '&#128140;') : m.kind==='month' ? '&#127942;' : '&#128221;')+'</span>'+
-        '<span class="vault-meta"><b>'+escapeHtml(m.label)+'</b><small>'+(m.kind==='capsule' ? 'Time capsule · written '+fmtDateShort(m.written) : 'Sealed '+fmtDateShort(todayStr(new Date(m.at))))+'</small></span>'+state0(m)+'</button>'+
+        '<span class="vault-meta"><b>'+escapeHtml(m.label)+'</b><small>'+(m.kind==='capsule' ? 'Time capsule · written '+fmtDateShort(m.written) : 'Sealed '+fmtDateShort(todayStr(new Date(m.at))))+'</small>'+state0(m)+'</span></button>'+
       '<div class="vault-body"><div class="vault-text">'+(m.locked ? '<i class="vault-locked">Still sealed. It opens itself when its morning comes.</i>' : escapeHtml(m.text))+'</div></div>'+
     '</div>'; }).join('') : '<div class="r60-none"><span>Nothing '+(f==='sealed' ? 'sealed' : 'open')+' right now.</span></div>')+'</div>';
 };

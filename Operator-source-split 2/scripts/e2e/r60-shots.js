@@ -1,0 +1,56 @@
+// Round 60 screenshots: the screens this round changed, on the app's demo data.
+// node scripts/e2e/r60-shots.js dist/command-center-2.html <outdir> [name,name,...]
+const { instrument, launch, newPage, OUT } = require('./common.js');
+const path = require('path'), fs = require('fs');
+(async () => {
+  instrument(process.argv[2], OUT+'/r60s.html');
+  const dir = process.argv[3] || OUT+'/r60shots'; fs.mkdirSync(dir, {recursive:true});
+  const only = (process.argv[4] || '').split(',').filter(Boolean);
+  const b = await launch();
+  const p = await newPage(b, OUT+'/r60s.html', {profile:{name:'Andre Lopez', goalWeight:175}, settings:{instagram:{accounts:[{id:'a1', role:'business', username:'commenccollective', src:'zernio'}, {id:'a2', role:'personal', username:'andreflix', src:'zernio'}], cliAll:[{id:'c1', platform:'instagram', username:'lumencoffee'}, {id:'c2', platform:'instagram', username:'peakfitness'}]}}}, new Date(2026, 9, 28, 10, 30).getTime());
+  await p.setViewportSize({width:1440, height:900});
+  const E = c => p.evaluate(x => window.__op.ev(x), c);
+  await E(`(function(){
+    document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); demoSeed();
+    for(let i = 0; i < 14; i++) state.health.weightLog.push({id:uid(), date:addDays(todayStr(), -i*2 - 1), weight:Math.round((180 + i*0.35 + Math.sin(i)*0.8)*10)/10});
+    const t = todayStr(); state.health.calorieEntries.push({id:uid(), date:t, name:'Eggs & turkey bacon', calories:450}, {id:uid(), date:t, name:'Chicken, rice & veggies', calories:650}); for(let i = 1; i < 7; i++) state.health.calorieEntries.push({id:uid(), date:addDays(t, -i), name:'Day', calories:1500 + (i*137) % 800});
+    state.business.packages = [{id:'pk1', name:'Growth', price:3000, deliverables:[{id:'pd1', title:'Reels', weeklyTarget:2}, {id:'pd2', title:'Carousels', weeklyTarget:1}], schedule:{pd1:[1, 4, 8, 11, 15, 18, 22, 25], pd2:[3, 10, 17, 24]}}, {id:'pk2', name:'Starter', price:1500, deliverables:[{id:'pd3', title:'Reels', weeklyTarget:1}], schedule:{pd3:[2, 9, 16, 23]}}, {id:'pk3', name:'My brand', price:0, type:'self', deliverables:[{id:'pd4', title:'Reels', weeklyTarget:3}, {id:'pd5', title:'Stories', weeklyTarget:5}], schedule:{}}];
+    const c = state.business.clients[0]; c.packageId = 'pk1'; c.startDate = '2026-09-05'; c.billingDay = 5; c.deliverables = arr(c.deliverables).filter(d => !d.fromPackage).concat([{id:'cd1', title:'Reels', recurring:true, weeklyTarget:2, completedDates:['2026-10-06', '2026-10-09'], fromPackage:true, sourceId:'pd1'}, {id:'cd2', title:'Carousels', recurring:true, weeklyTarget:1, completedDates:['2026-10-08'], fromPackage:true, sourceId:'pd2'}]);
+    state.calendar.events.push({id:'ev9', title:c.business + ' shoot', date:'2026-10-29', time:'14:00', linkedClient:c.id});
+    opReadStore()['money'] = {text:'Pattern: $10.5k coming in, nothing going out. Watch: no bank linked yet. Move: connect one today.', day:todayStr(), sig:'s'};
+    opReadStore()['biz'] = {text:'Three clients at $7.5k; two leads worth $5.5k sit untouched. Book the call with Luis Auto this week.', day:todayStr(), sig:'s'};
+    AI.hasKey = true; aiKeyCheck = function(){}; aiWrite = async function(){ return ''; }; opFactsMoneyPage = function(){ return 'x'; }; opFactsBizPage = function(){ return 'x'; };
+    R57_TYPED['money'] = opReadStore()['money'].text; R57_TYPED['biz'] = opReadStore()['biz'].text;
+    persist('business'); persist('health'); renderView();
+  })()`);
+  const shot = async (name, setup, sel) => {
+    if(only.length && only.indexOf(name) < 0) return;
+    await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'))");
+    await E(setup); await p.waitForTimeout(700);
+    const file = path.join(dir, name+'.png');
+    await p.screenshot({path:file}); console.log(file);
+  };
+  await E("r55CliLinks().c1 = state.business.clients[0].id; r55CliLinks().c2 = state.business.clients[1] ? state.business.clients[1].id : ''; ui.r55CliTried = true; state.journal.entries.push({id:'jx', date:addDays(todayStr(), -2), timestamp:Date.now() - 2*86400000, title:'Shoot day', text:'Long day on set with Lumen. The light was perfect around 4. Next time: bring the second battery.', type:'freeform', mood:null, photos:[]}); state.business.packages[1].deliverables.push({id:'pd9', title:'YouTube videos', per:'month', monthly:2, weeklyTarget:1}); state.business.packages[2].personal = true; persist('business')");
+  await shot('pop', "ui.view='business'; ui.businessTab='overview'; renderView(); r57Note('Calendar weeks start on Monday, not Sunday.', 'idea')");
+  await shot('pop-open', "ACTIONS.r60PopOpen(document.querySelector('#r60Pop .r60-pop-h'))");
+  await shot('business-tabs', "const pp = document.getElementById('r60Pop'); if(pp) pp.remove(); ui.businessTab='log'; renderView()");
+  await shot('presets', "ui.businessTab='lifecycle'; ui.pbView='board'; crm().playbooks = pbAll().filter(p => pbFor(p)!=='client'); renderView()");
+  await shot('preset-sheet', "ACTIONS.pb6NewOpen()");
+  await shot('chain', "ACTIONS.r60UsePreset(null, null, 'chain')");
+  await shot('package-month', "ui.businessTab='packages'; renderView(); openPackageEditModal('pk2')");
+  await shot('package-personal', "addSheetClose('r59PkSheet'); openPackageEditModal('pk3')");
+  await shot('package-new', "addSheetClose('r59PkSheet'); openNewPackageModal(); ACTIONS.r60NewKind(null, null, '1')");
+  await shot('social', "addSheetClose('r59PkNew'); ui.view='convos'; ui.socTab='overview'; ui.igTried=1; ui.r58Acct=null; ui.sxRole='business'; renderView()");
+  await shot('social-clients', "ACTIONS.r60CliOpen()");
+  await shot('social-settings', "addSheetClose('r60Cli'); ACTIONS.r60SocSettings()");
+  await shot('calendar', "addSheetClose('r60Soc'); ui.view='calendar'; ui.calendarYear=2026; ui.calendarMonth=9; renderView()");
+  await shot('calendar-pick', "ACTIONS.r60CalPick()");
+  await shot('calendar-legend', "ui.r60CalPick=false; ACTIONS.r60Legend()");
+  await shot('goals', "ui.r60Legend=false; ui.view='personal'; ui.personalTab='goals'; renderView()");
+  await shot('journal', "ui.personalTab='journal'; ui.journalMode='entries'; ui.journalViewMode='personal'; renderView()");
+  await shot('journal-clients', "ui.journalViewMode='clients'; renderView()");
+  await shot('vault', "vaultItems = function(){ return [{id:'v1', kind:'capsule', label:'To future me', text:'Hi', at:Date.now() - 86400000, locked:true, openOn:'2027-01-01', written:addDays(todayStr(), -1)}, {id:'v2', kind:'capsule', label:'A surprise', text:'Yo', at:Date.now() - 2*86400000, locked:true, hidden:true, written:addDays(todayStr(), -2)}, {id:'v3', kind:'week', label:'Week of Oct 19', text:'Good week. Closed Harbor.', at:Date.now() - 9*86400000, locked:false}, {id:'v4', kind:'month', label:'September', text:'Big month.', at:Date.now() - 30*86400000, locked:false}]; }; ui.journalViewMode='personal'; ui.journalMode='vault'; renderView()");
+  await shot('settings-ptt', "state.profile.opPttKey = 'F5'; ui.view='settings'; ui.settingsTab='op'; renderView(); setTimeout(() => { const e = document.querySelector('.r60-ptt'); if(e) e.scrollIntoView({block:'center'}); }, 30)");
+  console.log('errors', p.errors);
+  await b.close();
+})();
