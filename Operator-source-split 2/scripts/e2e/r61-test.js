@@ -29,10 +29,11 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.personalTab='journal'; ui.journalMode='entries'; ui.journalViewMode='personal'; renderView()"); await p.waitForTimeout(200);
   check('Journal: Entries / Boards / Vault at the top right', await E("(function(){ const t = document.querySelector('.r62-jtabs .seg-tabs').getBoundingClientRect(), v = document.getElementById('viewRoot').getBoundingClientRect(); return t.right > v.right - 30; })()"));
   check('…the journal centered, its date centered', await E("(function(){ const s = document.querySelector('.r60-seg').getBoundingClientRect(), w = document.querySelector('.r60-jw').getBoundingClientRect(); return Math.abs((s.left + s.right)/2 - (w.left + w.right)/2) < 3 && getComputedStyle(document.querySelector('.r60-jw-d')).textAlign==='center'; })()"));
-  check('…search is a small 🔍 at the bottom', await E("(function(){ const q = document.querySelector('.r61-jsb'), f = document.getElementById('journalHistoryContainer'); return !!q && q.getBoundingClientRect().top > f.getBoundingClientRect().top && !document.querySelector('.r60-js'); })()"));
-  await p.click('.r61-jsb'); await p.waitForTimeout(150); await p.fill('#journalSearchInput', 'Harbor'); await p.waitForTimeout(200);
+  // (round 67: search moved into the filter line above the entries)
+  check('…search is in the filter line above the entries', await E("(function(){ const q = document.querySelector('.r67-jf #journalSearchInput'), f = document.getElementById('journalHistoryContainer'); return !!q && q.getBoundingClientRect().top < f.getBoundingClientRect().top && !document.querySelector('.r60-js'); })()"));
+  await p.fill('#journalSearchInput', 'Harbor'); await p.waitForTimeout(200);
   check('…tap it to search', await E("ui.journalSearchText==='Harbor'"));
-  await E("ACTIONS.r61SearchClose()");
+  await E("ACTIONS.r67JClear()");
   // ---- C. Social ----
   await E("ui.view='convos'; ui.socTab='overview'; ui.igTried = 1; renderView()"); await p.waitForTimeout(200);
   check('Social shows the business name top left', /Comet Collective/i.test(await p.textContent('#viewRoot .view-header')));
