@@ -16,10 +16,9 @@ list but never fixed).
 4. (Carried over from Round 65) **Op didn't answer or do anything when spoken to.** Find why and fix it.
 
 ## B. Journal: voice memos
-5. **A Voice memos section next to the Journal**: record new ones right there, and upload the many already on his
-   phone (in bulk).
-6. **Op goes through them**: for every memo, a summary and its key points, and one full list across all of them, so he
-   doesn't have to listen to years of recordings.
+5. **A Voice memos section next to the Journal**: record new ones right there, and upload the old ones once, in bulk.
+6. **Op goes through them once**: for every memo, a summary and its key points, and one full list across all of them,
+   so he doesn't have to listen to years of recordings. Then he can ask Op questions about his memos.
 
 ## C. Notifications and leads
 7. **New leads stay in notifications** until he acts on them (they don't disappear after a day or when cleared).
@@ -34,13 +33,20 @@ list but never fixed).
 
 ## F. Finishing tasks
 10. **Finishing "Reach out to clients" logged a touch for every client on it** ("Reached out to JJS Construction: a touch
-    logged for each"), without asking. Ticking a task shouldn't silently log things that didn't happen. Add the right
-    friction: when a task means something happened (a reach-out, a playbook step), finishing it asks what happened, and
-    that goes in the Log center. The same for every task that should leave a record, especially playbook tasks.
+    logged for each"), without asking. Ticking a task shouldn't silently log things. When finishing a task records
+    something (a reach-out, a playbook step), a quick pop-up asks if you really did it and says what it will log, with
+    one button to confirm. The same for every task that logs something, especially playbook tasks.
 
-## Questions for Andre
-- Voice memos: keep the audio in the app (it takes a lot of space for years of memos) or keep the transcript, summary
-  and key points only?
-- Voice memos: transcribing costs a little per minute. Which service: the ElevenLabs key you already have, or another?
-- Finishing a task: what should it ask? (see the options)
-- Push-to-talk: besides fixing the Option key, also add a key combo that works from any app with no Mac permissions at all?
+## G. Journal (added Nov 3)
+11. **"My journal" has no filter and no real way to search.** Add search and filters (by date / month, starred,
+    updates, mood) right where you read your entries.
+
+## Andre's answers
+- **Voice memos**: upload the old ones once (from wherever they are, or straight from the iPhone), have them analyzed
+  once, and then be able to ask Op questions about them. Keep it light on the app: the text (transcript, summary, key
+  points) is kept, not the audio.
+- **Cost**: if transcribing is too heavy on cost or on the app, leave it out. (So: a clear cost before anything runs,
+  and it only runs when he says go.)
+- **Finishing a task**: no questions. Just a quick pop-up: "Did you actually do it? This logs a touch for …" with one
+  button to confirm (and one for "not yet").
+- **No backup talk key.** Just fix the Option key.
