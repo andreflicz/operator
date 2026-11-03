@@ -86,7 +86,7 @@ const CORS = {'Access-Control-Allow-Origin':'*'};
   await p.click('[data-action="journalMode"][data-id="memos"]'); await p.waitForTimeout(250);
   check('Memos: record or upload, nothing to read yet', !!(await p.$('.r67-rec')) && !!(await p.$('#r67MemoFile[multiple]')) && !!(await p.$('.r67-empty')));
   // two old memos come in (the transcripts stand in for ElevenLabs here)
-  await E("R67.queue.push({id:'q1', name:'Walk 12', src:'a', date:'2026-10-02', dur:3600, text:'I want to raise my retainer to twenty five hundred and ask Harbor Dental first because they love the work.'}, {id:'q2', name:'Car thoughts', src:'b', date:'2026-10-09', dur:1800, text:'Hire an editor before December so I can film more and stop editing at night.'}); renderView()"); await p.waitForTimeout(200);
+  await E("r67Scribe = async function(b){ return await b.text(); }; R67.queue.push({id:'q1', name:'Walk 12', src:'a', date:'2026-10-02', dur:3600, file:new Blob(['I want to raise my retainer to twenty five hundred and ask Harbor Dental first because they love the work.'], {type:'audio/mp4'})}, {id:'q2', name:'Car thoughts', src:'b', date:'2026-10-09', dur:1800, file:new Blob(['Hire an editor before December so I can film more and stop editing at night.'], {type:'audio/mp4'})}); renderView()"); await p.waitForTimeout(200);
   const cost = await p.textContent('.r67-cost');
   check('before anything runs: what it will cost (1 h 30 min → about $0.60 to transcribe, Op reading it, the total), and Go', /\$0\.60\s*to transcribe/.test(cost) && /for Op to read/.test(cost) && /total, once/.test(cost) && !!(await p.$('[data-action="r67MemoGo"]')), cost);
   reply = (body) => /voice memos, summed up/.test(JSON.stringify(body.messages)) ? {stop_reason:'end_turn', content:[{type:'text', text:'{"points":["Raise prices (twice)","Hire an editor"]}'}]}
@@ -99,6 +99,16 @@ const CORS = {'Access-Control-Allow-Origin':'*'};
   await p.click('.r67-mc-h >> nth=1'); await p.waitForTimeout(200);
   await p.click('.r67-mc.is-open [data-action="r67MemoTxt"]'); await p.waitForTimeout(300);
   check('a memo opens to its points and its transcript', /Ask Harbor Dental first/.test(await p.textContent('.r67-mc.is-open')) && /twenty five hundred/.test(await p.textContent('.r67-tx')));
+  // ---- free: transcripts instead of audio (the iPhone's own, pasted or as text files) ----
+  require('fs').writeFileSync(OUT+'/walk-41.txt', 'Today I want to plan the studio move and call the landlord about the lease before Friday.');
+  await p.setInputFiles('#r67MemoFile', OUT+'/walk-41.txt'); await p.waitForTimeout(400);
+  await p.click('[data-action="r67PasteOpen"]'); await p.waitForTimeout(150);
+  await p.fill('#r67PasteText', 'Thinking about hiring a second editor and raising prices in January.'); await p.fill('#r67PasteName', 'Car ride'); await p.click('[data-action="r67PasteAdd"]'); await p.waitForTimeout(250);
+  const cost2 = await p.textContent('.r67-cost');
+  check('free: a transcript (a text file, or pasted from the iPhone) costs nothing to transcribe, only Op reading it', /\$0\s*transcripts: free/.test(cost2) && await E("R67.queue.length===2 && R67.queue.every(q => q.text && !q.file)"), cost2);
+  reply = () => ({stop_reason:'end_turn', content:[{type:'text', text:'{"title":"The studio move","summary":"You plan the move.","points":["Call the landlord"]}'}]});
+  await p.click('[data-action="r67MemoGo"]'); await p.waitForTimeout(1200);
+  check('…Go: read and summed up like the others (no transcription asked for)', await E("r67Memos().length===4 && r67Memos().some(m => m.name==='Car ride') && r67Memos().some(m => m.name==='walk-41')"));
   // ---- Op reads the journal from anywhere ----
   await E("state.journal.entries.push({id:'jx1', date:'2026-09-14', timestamp:new Date(2026, 8, 14, 9).getTime(), title:'Money', text:'Thinking about pricing and saving for the studio.', type:'freeform', mood:'starred'}); persist('journal')");
   const rj = await E("opRunTool('read_journal', {query:'pricing retainer'})");
@@ -112,7 +122,7 @@ const CORS = {'Access-Control-Allow-Origin':'*'};
   check('Ask Op opens over the app, like Inspiration', await E("document.getElementById('r67Ask').classList.contains('is-in')") && (await p.$$('.r67-sug button')).length===4);
   sent.length = 0;
   await p.fill('#r67AskIn', 'What do I keep coming back to?'); await p.press('#r67AskIn', 'Enter'); await p.waitForTimeout(600);
-  check('ask it: Op answers about the memos and the journal (he has them, and his tools)', /pricing/.test(await p.textContent('#r67AskB')) && !!(await p.$('#r67AskB ul li')) && /HIS VOICE MEMOS \(2\)/.test(JSON.stringify(last().system)) && /Raising the retainer/.test(JSON.stringify(last().system)) && last().tools.some(t => t.name==='memo_transcript'));
+  check('ask it: Op answers about the memos and the journal (he has them, and his tools)', /pricing/.test(await p.textContent('#r67AskB')) && !!(await p.$('#r67AskB ul li')) && /HIS VOICE MEMOS \(4\)/.test(JSON.stringify(last().system)) && /Raising the retainer/.test(JSON.stringify(last().system)) && last().tools.some(t => t.name==='memo_transcript'));
   check('…the chat is kept', await E("state.journal.r67Ask.length===2"));
   await p.keyboard.press('Escape'); await p.waitForTimeout(400);
   check('Esc closes it', await E("!document.getElementById('r67Ask').classList.contains('is-in')"));
@@ -150,6 +160,17 @@ const CORS = {'Access-Control-Allow-Origin':'*'};
   await E("ACTIONS.r67Mine(null, null, 'k2')");
   check('…and it comes back', await E("r53AllFor(state.business.clients[0].id).leads===52"));
 
+  // ---- whose campaign, from the client's page in Social ----
+  await E("igCfg().accounts = [{id:'o1', role:'business', username:'commenccollective', src:'zernio'}]; igCfg().cliAll = [{id:'c1', platform:'instagram', username:'jjs_build'}]; ui.r55CliAll = null; ui.r55CliTried = true; r55CliLinks().c1 = state.business.clients[0].id; r53AdLedger()['k3'] = {name:'Brand awareness', acct:'act2', spend:150, leads:5, currency:'USD'}; delete adLinks()['k2']; ui.view='convos'; ui.socTab='overview'; ui.r58Acct='c1'; renderView()"); await p.waitForTimeout(300);
+  check('a client’s page in Social: their ad campaigns, each with whose it is, and “Add a campaign…”', (await p.$$('.r67-cads .r67-car')).length===1 && !!(await p.$('.r67-cads [data-r67-add]')));
+  await p.selectOption('.r67-cads [data-r67-add]', 'acct:act1'); await p.waitForTimeout(250);
+  check('…give them a whole ad account at once', (await p.$$('.r67-cads .r67-car')).length===2 && await E("r53AllFor(state.business.clients[0].id).leads===52"));
+  await p.selectOption('.r67-cads [data-r67-camp="k2"]', await E("state.business.clients[1].id")); await p.waitForTimeout(250);
+  check('…or move one to another client (no fake “new leads” for them)', await E("adClientOf({id:'k2'})===state.business.clients[1].id && state.settings.r66AdSnap[state.business.clients[1].id]===40") && (await p.$$('.r67-cads .r67-car')).length===1);
+  await p.selectOption('.r67-cads [data-r67-camp="k1"]', '__notmine'); await p.waitForTimeout(250);
+  check('…or mark it Not mine right there', await E("!!r67NotMine()['k1'] && r53AllFor(state.business.clients[0].id).leads===0"));
+  await E("ACTIONS.r67Mine(null, null, 'k1')");
+  check('the Ads tab’s Assign menu has Not mine too', await E("r50AssignSel({id:'k3'}).indexOf('__notmine') > 0"));
   // ================= E9. Check-in frequency =================
   await E("ui.view='business'; ui.businessTab='log'; ui.r54Lc='clients'; renderView()"); await p.waitForTimeout(300);
   const sel = await p.$('.lc-row select[data-r67-every]');

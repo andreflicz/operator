@@ -10795,6 +10795,14 @@ html[data-holiday="newyear"]{ --accent:#F5D547; } html[data-holiday="july4"]{ --
 .lc-last.r67-ev select{ margin-top:1px; padding:0; border:0; background:transparent; color:var(--text); font:inherit; font-size:13px; font-weight:600; cursor:pointer; outline:none; max-width:150px; }
 .lc-row.r67-er{ grid-template-columns:36px minmax(140px, 1.1fr) minmax(90px, .55fr) minmax(130px, .7fr) minmax(120px, .7fr) auto; }
 @media (max-width:1100px){ .lc-row.r67-er{ grid-template-columns:36px 1fr auto; } .lc-row.r67-er .r67-ev{ display:none; } }
+.r67-cads .r66-ads-h{ align-items:baseline; } .r67-cads .r66-ads-h span{ flex:1; text-align:right; }
+.r67-cads .r67-add{ width:100%; max-width:none; height:34px; }
+.r67-add, .r67-who{ height:30px; padding:0 8px; border-radius:9px; border:1px solid var(--border); background:var(--panel); color:var(--text); font:inherit; font-size:12.5px; cursor:pointer; max-width:220px; }
+.r67-who{ border-color:transparent; background:transparent; color:var(--text-dim); justify-self:end; }
+.r66-ads-r.r67-car{ grid-template-columns:minmax(0, 1fr) auto auto minmax(0, 130px); }
+.r67-car .r67-who{ width:100%; text-align:right; }
+.r67-paste input, .r67-paste textarea{ width:100%; box-sizing:border-box; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text); font:inherit; font-size:13.5px; outline:none; }
+.r67-paste textarea{ resize:vertical; min-height:120px; line-height:1.5; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -10992,7 +11000,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793668331944;
+const OP_BUILT = 1793678678896;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -58298,7 +58306,8 @@ function r67Cost(items){
   const sec = items.reduce(function(a, q){ return a + (q.dur || 0); }, 0), hrs = sec/3600;
   // (about 150 spoken words a minute, about 1.4 tokens a word; a summary back is a few hundred tokens)
   const tokIn = sec/60*150*1.4 + items.length*800, tokOut = items.length*400 + 900, P = r67AiPrice();
-  return {sec:sec, stt:hrs*R67_STT_HOUR, ai:(tokIn*P.i + tokOut*P.o)/1e6};
+  const audio = items.filter(function(q){ return q.text==null; }).reduce(function(a, q){ return a + (q.dur || 0); }, 0);
+  return {sec:sec, stt:audio/3600*R67_STT_HOUR, ai:(tokIn*P.i + tokOut*P.o)/1e6, free:!audio};
 }
 function r67Probe(file){
   return new Promise(function(res){
@@ -58311,18 +58320,34 @@ function r67Probe(file){
   });
 }
 async function r67AddFiles(files){
-  const L = Array.from(files || []).filter(function(f){ return /^audio\//.test(f.type) || /\.(m4a|mp3|wav|aac|caf|ogg|oga|webm|flac|mp4|qta)$/i.test(f.name); });
-  if(!L.length){ showToast('Those aren’t audio files.', {icon:'&#127908;'}); return; }
+  // (a transcript as text, like the free one the iPhone makes, needs no transcribing: free)
+  const isTxt = function(f){ return /^text\//.test(f.type) || /\.(txt|md|text|rtf)$/i.test(f.name); };
+  const L = Array.from(files || []).filter(function(f){ return isTxt(f) || /^audio\//.test(f.type) || /\.(m4a|mp3|wav|aac|caf|ogg|oga|webm|flac|mp4|qta)$/i.test(f.name); });
+  if(!L.length){ showToast('Those aren’t voice memos or transcripts.', {icon:'&#127908;'}); return; }
   const have = {}; r67Memos().forEach(function(m){ have[m.src] = 1; });
   let skipped = 0;
   for(const f of L){
     const src = f.name+'|'+f.size;
     if(have[src] || R67.queue.some(function(q){ return q.src===src; })){ skipped++; continue; }
+    if(isTxt(f)){
+      let t = ''; try{ t = await f.text(); }catch(e){}
+      t = String(t || '').replace(/\{\\rtf[\s\S]*?\\viewkind\d*|\\[a-z]+\d* ?|[{}]/g, ' ').replace(/\s+/g, ' ').trim();
+      if(t) R67.queue.push({id:uid(), name:f.name.replace(/\.[a-z0-9]+$/i, ''), src:src, size:f.size, date:todayStr(new Date(f.lastModified || Date.now())), text:t, dur:t.split(' ').length/150*60});
+      continue;
+    }
     R67.queue.push({id:uid(), file:f, name:f.name.replace(/\.[a-z0-9]+$/i, ''), src:src, size:f.size, date:todayStr(new Date(f.lastModified || Date.now())), dur:await r67Probe(f)});
   }
   if(skipped) showToast(skipped+' already done: skipped.', {icon:'&#10003;'});
   ui.journalMode = 'memos'; renderView();
 }
+ACTIONS.r67PasteOpen = function(){ ui.r67Paste = true; renderView(); setTimeout(function(){ const t = document.getElementById('r67PasteText'); if(t) t.focus(); }, 40); };
+ACTIONS.r67PasteClose = function(){ ui.r67Paste = false; renderView(); };
+ACTIONS.r67PasteAdd = function(){
+  const t = String((document.getElementById('r67PasteText') || {}).value || '').replace(/\s+/g, ' ').trim(); if(!t) return;
+  const nm = String((document.getElementById('r67PasteName') || {}).value || '').trim() || 'Memo '+fmtDateShort(todayStr());
+  R67.queue.push({id:uid(), name:nm.slice(0, 80), src:'paste|'+t.length+'|'+t.slice(0, 40), date:todayStr(), text:t, dur:t.split(' ').length/150*60});
+  ui.r67Paste = false; renderView();
+};
 ACTIONS.r67MemoCancel = function(){ R67.queue = []; renderView(); };
 ACTIONS.r67MemoGo = function(){ r67RunQueue(); };
 ACTIONS.r67MemoPick = function(){ const i = document.getElementById('r67MemoFile'); if(i) i.click(); };
@@ -58414,15 +58439,17 @@ function r67MemosHtml(){
   const total = M.reduce(function(a, m){ return a + (m.dur || 0); }, 0);
   const bar = '<div class="r67-mb">'+
     (R67.rec ? '<button class="r67-rec is-on" data-action="r67Rec"><i></i>Stop <span id="r67RecT">'+r67Clock((Date.now() - R67.rec.at)/1000)+'</span></button>' : '<button class="r67-rec" data-action="r67Rec"><i></i>Record</button>')+
-    '<button class="r67-up" data-action="r67MemoPick">&#8679; Upload memos</button><input type="file" id="r67MemoFile" multiple accept="audio/*,.m4a,.mp3,.wav,.aac,.caf,.ogg,.webm,.flac" hidden>'+
+    '<button class="r67-up" data-action="r67MemoPick">&#8679; Upload memos</button><input type="file" id="r67MemoFile" multiple accept="audio/*,.m4a,.mp3,.wav,.aac,.caf,.ogg,.webm,.flac,.txt,.md,.rtf,text/plain" hidden>'+
+    '<button class="r67-up" data-action="r67PasteOpen">&#128203; Paste a transcript</button>'+
     '<span class="r67-mt">'+(M.length ? M.length+' memo'+(M.length===1 ? '' : 's')+' · '+r67Dur(total) : '')+'</span></div>';
   let q = '';
+  const paste = ui.r67Paste ? '<div class="r67-q r67-paste"><input id="r67PasteName" placeholder="Name it (optional)" value=""><textarea id="r67PasteText" rows="6" placeholder="Paste the transcript here"></textarea><div class="r67-q-f"><button class="btn btn-ghost" data-action="r67PasteClose">Cancel</button><button class="btn btn-primary" data-action="r67PasteAdd">Add</button></div></div>' : '';
   if(R67.run) q = '<div class="r67-q is-run"><span class="r67-spin"></span><b id="r67Run">Reading '+R67.run.i+' of '+R67.run.n+(R67.run.name ? ' · '+escapeHtml(R67.run.name) : '')+'</b></div>';
   else if(R67.queue.length){
     const C = r67Cost(R67.queue), noKey = !AI.hasKey;
     q = '<div class="r67-q"><div class="r67-q-h"><b>'+R67.queue.length+' memo'+(R67.queue.length===1 ? '' : 's')+' ready</b><span>'+r67Dur(C.sec)+'</span></div>'+
       '<div class="r67-q-l">'+R67.queue.slice(0, 8).map(function(x){ return '<span>'+escapeHtml(x.name)+'<small>'+r67Dur(x.dur)+'</small></span>'; }).join('')+(R67.queue.length > 8 ? '<span>+'+(R67.queue.length - 8)+' more</span>' : '')+'</div>'+
-      '<div class="r67-cost"><span><b>'+r67Money(C.stt)+'</b>to transcribe</span><span><b>'+r67Money(C.ai)+'</b>for Op to read</span><span><b>'+r67Money(C.stt + C.ai)+'</b>total, once</span></div>'+
+      '<div class="r67-cost"><span><b>'+(C.free ? '$0' : r67Money(C.stt))+'</b>'+(C.free ? 'transcripts: free' : 'to transcribe')+'</span><span><b>'+r67Money(C.ai)+'</b>for Op to read</span><span><b>'+r67Money(C.stt + C.ai)+'</b>total, once</span></div>'+
       '<div class="r67-q-f"><button class="btn btn-ghost" data-action="r67MemoCancel">Cancel</button><button class="btn btn-primary" data-action="r67MemoGo"'+(noKey ? ' disabled' : '')+'>Go</button></div></div>';
   }
   const O = state.journal.r67Overview;
@@ -58436,7 +58463,7 @@ function r67MemosHtml(){
         '<div class="r67-mc-f"><button data-action="r67MemoTxt" data-id="'+m.id+'">'+(tx ? 'Transcript' : 'Show the transcript')+'</button><button data-action="r67MemoDel" data-id="'+m.id+'">Remove</button></div>'+
         (tx ? '<div class="r67-tx">'+escapeHtml(tx)+'</div>' : '') : '')+'</article>';
   }).join('');
-  return '<div class="r67-m" data-memo-drop="1">'+bar+q+ov+(list ? '<div class="r67-ml">'+list+'</div>' : (q ? '' : '<div class="r67-empty"><b>Your voice memos</b><span>Record one, or upload old ones from your Mac or iPhone (drop them here). Op reads each once: a summary and its key points.</span></div>'))+'</div>';
+  return '<div class="r67-m" data-memo-drop="1">'+bar+paste+q+ov+(list ? '<div class="r67-ml">'+list+'</div>' : (q ? '' : '<div class="r67-empty"><b>Your voice memos</b><span>Free: on your iPhone, open a memo in Voice Memos → ⋯ → Copy Transcript, and paste it here. Or upload memos or transcripts (drop them here). Op reads each once: a summary and its key points.</span></div>'))+'</div>';
 }
 // (drop memos anywhere on the Memos page)
 document.addEventListener('dragover', function(e){ if(e.target && e.target.closest && e.target.closest('[data-memo-drop]')) e.preventDefault(); });
@@ -58764,6 +58791,69 @@ r62CheckHtml = (function(base){
     try{ return base.apply(this, arguments).replace('Operator hears them', 'Operator heard your talk key'); } finally { h.last = saved; }
   };
 })(r62CheckHtml);
+
+// ================= Round 67 follow-up: whose campaign it is, from a client's page in Social =================
+// On a client's Social page the "Ad campaigns" box is always there (once ads are connected): each campaign says whose it
+// is and can be moved to another client or marked Not mine; "Add a campaign…" gives this client a campaign, or a whole
+// ad account at once. On the Ads tab, "Not mine" is in each campaign's Assign menu (Round 50's rows).
+function r67AllCamps(){
+  const L = typeof r53AdLedger==='function' ? r53AdLedger() : {}, c = igCfg(), out = {};
+  Object.keys(L).forEach(function(id){ const k = L[id]; out[id] = {id:id, name:k.name || 'Campaign', acct:k.acct || '', spend:Number(k.spend) || 0, leads:Number(k.leads) || 0, cur:k.currency || 'USD'}; });
+  arr(c.znAdsCache && c.znAdsCache.camps).forEach(function(k){ if(k && k.id && !out[k.id]){ const x = adNums(k.m || {}); out[k.id] = {id:String(k.id), name:k.name || 'Campaign', acct:String(k.acct || ''), spend:x.spend || 0, leads:x.leads || 0, cur:k.currency || 'USD'}; } });
+  return Object.keys(out).map(function(id){ return out[id]; });
+}
+function r67AcctName(id){ const c = igCfg(), a = arr(c.znAdsCache && c.znAdsCache.accts).find(function(z){ return String(z.id)===String(id); }); return a ? a.name : 'Ad account '+String(id).slice(-6); }
+function r67Rebase(){ try{ const s = state.settings, now = {}; mtActiveClients().forEach(function(c){ const T = r53AllFor(c.id); if(T && T.n) now[c.id] = Number(T.leads) || 0; }); s.r66AdSnap = now; }catch(e){} }
+function r67Assign(id, who){
+  const l = adLinks(); id = String(id);
+  if(who==='__notmine'){ r67NotMine()[id] = {name:r67CampName(id), at:todayStr()}; }
+  else { delete r67NotMine()[id]; if(who) l[id] = who; else delete l[id]; }
+  r67Rebase();   // (moving a campaign isn't "new leads" for anyone)
+  persist('settings');
+}
+function r67ClientAdsHtml(c){
+  const all = r67AllCamps(); if(!all.length) return '';
+  const cs = arr(state.business.clients).filter(function(x){ return clientStageActive(x.stage); });
+  const mine = all.filter(function(k){ return !r67Hidden(k.id) && adClientOf(k)===c.id; }).sort(function(a, b){ return b.spend - a.spend; });
+  const T = mine.reduce(function(a, k){ a.spend += k.spend; a.leads += k.leads; a.cur = a.cur || k.cur; return a; }, {spend:0, leads:0, cur:null});
+  const n = function(v){ return v ? Number(v).toLocaleString() : '–'; };
+  const who = function(k){ return '<select class="r67-who" data-r67-camp="'+escapeHtml(k.id)+'">'+cs.map(function(x){ return '<option value="'+x.id+'"'+(x.id===c.id ? ' selected' : '')+'>'+escapeHtml(x.id===c.id ? 'Theirs' : 'Move to '+(x.business || x.name))+'</option>'; }).join('')+'<option value="">Unassign</option><option value="__notmine">Not mine: hide it</option></select>'; };
+  const free = all.filter(function(k){ return !r67Hidden(k.id) && !adClientOf(k); });
+  const accts = {}; all.forEach(function(k){ if(k.acct && !r67Hidden(k.id)) (accts[k.acct] = accts[k.acct] || []).push(k); });
+  const ak = Object.keys(accts).filter(function(a){ return accts[a].some(function(k){ return adClientOf(k)!==c.id; }); });
+  const others = all.filter(function(k){ const w = adClientOf(k); return !r67Hidden(k.id) && w && w!==c.id; });
+  const nm = function(id){ const x = crmFind('client', id); return x ? (x.business || x.name) : ''; };
+  const add = (free.length || ak.length || others.length) ? '<select class="r67-add" data-r67-add="'+c.id+'"><option value="">+ Add a campaign…</option>'+
+    (ak.length ? '<optgroup label="A whole ad account">'+ak.map(function(a){ return '<option value="acct:'+escapeHtml(a)+'">'+escapeHtml(r67AcctName(a))+' ('+accts[a].length+' campaign'+(accts[a].length===1 ? '' : 's')+')</option>'; }).join('')+'</optgroup>' : '')+
+    (free.length ? '<optgroup label="Not assigned yet">'+free.map(function(k){ return '<option value="'+escapeHtml(k.id)+'">'+escapeHtml(k.name)+'</option>'; }).join('')+'</optgroup>' : '')+
+    (others.length ? '<optgroup label="Someone else’s now">'+others.map(function(k){ return '<option value="'+escapeHtml(k.id)+'">'+escapeHtml(k.name+' · '+nm(adClientOf(k)))+'</option>'; }).join('')+'</optgroup>' : '')+'</select>' : '';
+  return '<div class="r66-ads r67-cads"><div class="r66-ads-h"><b>Ad campaigns</b><span>'+(mine.length ? r66Money(T.spend, T.cur)+' spent · '+n(T.leads)+' leads'+(T.leads ? ' · '+r66Money(T.spend/T.leads, T.cur)+' a lead' : '') : 'None yet')+'</span></div>'+
+    (mine.length ? '<div class="r66-ads-t">'+mine.map(function(k){ return '<div class="r66-ads-r r67-car"><span>'+escapeHtml(k.name)+'</span><b>'+r66Money(k.spend, k.cur)+'</b><b>'+n(k.leads)+' leads</b>'+who(k)+'</div>'; }).join('')+'</div>' : '')+add+'</div>';
+}
+r58FocusHtml = (function(base){
+  return function(){
+    let h = base.apply(this, arguments); if(!h) return h;
+    const m = /data-action="r66RepOpen" data-id="([^"]+)"/.exec(h); if(!m) return h;
+    const c = crmFind('client', m[1]); if(!c) return h;
+    // (Round 66's box went in just before the last </div>: take it out, ours goes in its place)
+    const i = h.indexOf('<div class="r66-ads">'); if(i >= 0) h = h.slice(0, i)+'</div>';
+    const box = r67ClientAdsHtml(c); if(!box) return h;
+    return h.replace(/<\/div>$/, box+'</div>');
+  };
+})(r58FocusHtml);
+r50AssignSel = (function(base){ return function(k){ return base.apply(this, arguments).replace(/<\/select>$/, '<option value="__notmine">Not mine: hide it</option></select>'); }; })(r50AssignSel);
+window.addEventListener('change', function(e){
+  const t = e.target; if(!t || !t.getAttribute) return;
+  const camp = t.getAttribute('data-r67-camp'), add = t.getAttribute('data-r67-add'), al = t.getAttribute('data-adlink');
+  if(al && t.value==='__notmine'){ e.stopImmediatePropagation(); r67Assign(al, '__notmine'); playTick(); renderView(); showToast('Hidden: it no longer counts anywhere. Nothing changed in their ad account.', {icon:'&#128584;', actionLabel:'Undo', actionAction:'r67Mine', actionId:al}); return; }
+  if(camp!=null){ e.stopImmediatePropagation(); const v = t.value; r67Assign(camp, v); playTick(); renderView(); if(v==='__notmine') showToast('Hidden: it no longer counts anywhere. Nothing changed in their ad account.', {icon:'&#128584;', actionLabel:'Undo', actionAction:'r67Mine', actionId:camp}); return; }
+  if(add){
+    e.stopImmediatePropagation(); const v = t.value; if(!v) return;
+    if(v.indexOf('acct:')===0){ const a = v.slice(5); r67AllCamps().forEach(function(k){ if(k.acct===a && !r67Hidden(k.id)) r67Assign(k.id, add); }); }
+    else r67Assign(v, add);
+    playTick(); renderView();
+  }
+}, true);
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

@@ -10784,3 +10784,11 @@ html[data-holiday="newyear"]{ --accent:#F5D547; } html[data-holiday="july4"]{ --
 .lc-last.r67-ev select{ margin-top:1px; padding:0; border:0; background:transparent; color:var(--text); font:inherit; font-size:13px; font-weight:600; cursor:pointer; outline:none; max-width:150px; }
 .lc-row.r67-er{ grid-template-columns:36px minmax(140px, 1.1fr) minmax(90px, .55fr) minmax(130px, .7fr) minmax(120px, .7fr) auto; }
 @media (max-width:1100px){ .lc-row.r67-er{ grid-template-columns:36px 1fr auto; } .lc-row.r67-er .r67-ev{ display:none; } }
+.r67-cads .r66-ads-h{ align-items:baseline; } .r67-cads .r66-ads-h span{ flex:1; text-align:right; }
+.r67-cads .r67-add{ width:100%; max-width:none; height:34px; }
+.r67-add, .r67-who{ height:30px; padding:0 8px; border-radius:9px; border:1px solid var(--border); background:var(--panel); color:var(--text); font:inherit; font-size:12.5px; cursor:pointer; max-width:220px; }
+.r67-who{ border-color:transparent; background:transparent; color:var(--text-dim); justify-self:end; }
+.r66-ads-r.r67-car{ grid-template-columns:minmax(0, 1fr) auto auto minmax(0, 130px); }
+.r67-car .r67-who{ width:100%; text-align:right; }
+.r67-paste input, .r67-paste textarea{ width:100%; box-sizing:border-box; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text); font:inherit; font-size:13.5px; outline:none; }
+.r67-paste textarea{ resize:vertical; min-height:120px; line-height:1.5; }

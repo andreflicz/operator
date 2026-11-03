@@ -392,6 +392,14 @@ Other conventions:
   task would log something (`r67WhatLogs`: reach, reachLeads, care, pb, deliv). Programmatic calls (Op, sync, tests)
   don't ask. Deliverable "+1 Log one" buttons don't ask (they're an explicit log with Undo).
 
+- **Follow-up (Mac 4.0.1)**: a client's page in Social always has "Ad campaigns" (`r67ClientAdsHtml`, replacing Round
+  66's box): each campaign's menu = Theirs / Move to another client / Unassign / Not mine, and "Add a campaign…" (a whole
+  ad account at once, unassigned ones, someone else's). Changes go through `r67Assign`, which also rebases
+  `state.settings.r66AdSnap` so a move isn't "new leads". The Ads tab's Assign menu (`r50AssignSel`) has "Not mine"
+  (Round 67's first button hooked Round 49's rows, which Round 50 had replaced: it never showed). **Free memos**: Memos
+  takes transcripts as text (.txt / .md / .rtf files, or "Paste a transcript"; the iPhone's Voice Memos → ⋯ → Copy
+  Transcript): no transcription, only Op's read. Claude can't take audio, so audio always needs a transcript first.
+
 ## Removed (don't bring back)
 GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports outside Social (R65; the report is back in Social only, R66); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
 
@@ -414,7 +422,7 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports outside Social (R
 - main.js: single instance, menu bar Tray, ⌥O show/hide, ✕ hides, ⌘Q quits, starts the helpers, move-in from the old Chrome profile, `window.operatorPage` bridge.
 
 ## Status
-Round 67 (2026-11-03): ROUND-67-LIST.md (11 items). Mac 4.0.0.
+Round 67 (2026-11-03): ROUND-67-LIST.md (11 items). Mac 4.0.0; 4.0.1 adds client ad assignment in Social and free transcripts.
 Round 66 (2026-11-01): ROUND-66-LIST.md (18 items). Mac 3.9.0.
 Round 65 (2026-11-01): ROUND-65-LIST.md (9 items). Mac 3.8.0.
 Round 64 (2026-11-01): ROUND-64-LIST.md (13 items). Mac 3.7.0.
