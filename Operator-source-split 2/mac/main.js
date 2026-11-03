@@ -272,11 +272,53 @@ function uKey(code) {
 // hook numbers them 2 = right, 3 = middle, 4/5 = side buttons)
 function mouseBtn(code) { const m = /^Mouse(\d)$/.exec(code || ''); if (!m) return null; const n = Number(m[1]); return n === 3 ? 2 : n === 2 ? 3 : n; }
 function front() { return !!(win && !win.isDestroyed() && win.isVisible() && win.isFocused()); }
+// Round 67: the Option key from other apps. On a Mac, Option, Control, Shift and Command don't arrive as key presses but
+// as "the modifier keys changed", and if the global hook misses those (or macOS hasn't let it in yet) nothing happens.
+// So for those keys there's a second, independent listener: a tiny script that reads which modifier keys are held,
+// left and right apart (CGEventSourceFlagsState, about 30 times a second), and reports a change. Either one can start
+// talking; the other is ignored while the key is held.
+const MOD_MASK = { AltLeft: 0x20, AltRight: 0x40, ControlLeft: 0x01, ControlRight: 0x2000, ShiftLeft: 0x02, ShiftRight: 0x04, MetaLeft: 0x08, MetaRight: 0x10 };
+let modProc = null, modTries = 0, modDown = false, lastTalk = 0, lastVia = '';
+const MOD_JXA = [
+  "ObjC.import('Cocoa'); try { ObjC.import('CoreGraphics'); } catch (e) {}",
+  "var last = -1;",
+  "while (true) {",
+  "  var f = Number($.CGEventSourceFlagsState(1)) & 0x207f;",
+  "  if (f !== last) { last = f; console.log('F ' + f); }",
+  "  delay(0.03);",
+  "}"
+].join('\n');
+function modStart() {
+  if (process.platform !== 'darwin' || modProc || !MOD_MASK[talk.key] || !talk.on) return;
+  if (modTries > 5) return;
+  modTries++;
+  try {
+    const { spawn } = require('child_process');
+    const p = spawn('/usr/bin/osascript', ['-l', 'JavaScript', '-e', MOD_JXA], { stdio: ['ignore', 'pipe', 'pipe'] });
+    modProc = p;
+    let buf = '';
+    const onData = (d) => {
+      buf += String(d); let i;
+      while ((i = buf.indexOf('\n')) >= 0) {
+        const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+        const m = /^F (\d+)$/.exec(line); if (!m) continue;
+        const mask = MOD_MASK[talk.key]; if (!mask) continue;
+        const on = (Number(m[1]) & mask) !== 0;
+        if (on && !modDown) { modDown = true; lastTalk = Date.now(); lastVia = 'modifiers'; pressDown(); }
+        else if (!on && modDown) { modDown = false; pressUp(); }
+      }
+    };
+    p.stdout.on('data', onData); p.stderr.on('data', onData);
+    p.on('exit', (code) => { modProc = null; modDown = false; log('modifier listener stopped', code); if (talk.on && MOD_MASK[talk.key]) setTimeout(modStart, 5000); });
+    log('modifier listener on for', talk.key);
+  } catch (e) { modProc = null; log('modifier listener failed', String(e && e.message || e)); }
+}
+function modStop() { if (modProc) { try { modProc.kill(); } catch (e) {} modProc = null; modDown = false; } }
 function keyHealth() {
   let need = '';
   if (process.platform === 'darwin') { try { if (!require('electron').systemPreferences.isTrustedAccessibilityClient(false)) need = 'Accessibility'; } catch (e) {} }
   if (!need && hookOk && !lastHook) need = 'ListenEvent';
-  return { hooked: hookOk, last: lastHook, now: Date.now(), ok: hookOk && !need ? true : (need ? false : null), need: need || '', err: hookErr };
+  return { hooked: hookOk, last: lastHook, now: Date.now(), ok: hookOk && !need ? true : (need ? false : null), need: need || '', err: hookErr, talkAt: lastTalk, via: lastVia, mods: !!modProc };
 }
 function healthToPage() { run('operatorPage.talkKeyHealth && operatorPage.talkKeyHealth(' + JSON.stringify(keyHealth()) + ')'); }
 function pressDown() { if (held) return; held = { other: false, at: Date.now() }; if (talk.mode === 'hold' && talk.on && !front()) run('operatorPage.talkDown ? operatorPage.talkDown() : operatorPage.talkToggle()'); }
@@ -292,7 +334,7 @@ function hookStart() {
       }
     } else if (!process.env.OP_KEY_HOOK) return;
     const { uIOhook } = require('uiohook-napi');
-    uIOhook.on('keydown', (e) => { lastHook = Date.now(); const k = uKey(talk.key); if (k != null && e.keycode === k) pressDown(); else if (held) held.other = true; });
+    uIOhook.on('keydown', (e) => { lastHook = Date.now(); const k = uKey(talk.key); if (k != null && e.keycode === k) { lastTalk = Date.now(); lastVia = 'hook'; pressDown(); } else if (held) held.other = true; });
     uIOhook.on('keyup', (e) => { lastHook = Date.now(); const k = uKey(talk.key); if (k != null && e.keycode === k) pressUp(); });
     uIOhook.on('mousedown', (e) => { lastHook = Date.now(); if (mouseBtn(talk.key) === e.button) pressDown(); else if (held) held.other = true; });
     uIOhook.on('mouseup', (e) => { lastHook = Date.now(); if (mouseBtn(talk.key) === e.button) pressUp(); });
@@ -302,7 +344,7 @@ function hookStart() {
     setTimeout(healthToPage, 15000);
   } catch (e) { hookErr = String(e && e.message || e); log('talk key hook failed', hookErr); healthToPage(); }
 }
-ipcMain.on('op:talkPrefs', (e, p) => { talk.on = p.on !== false; if (p.key) talk.key = String(p.key); talk.mode = p.mode === 'tap' ? 'tap' : 'hold'; if (talk.on) hookStart(); healthToPage(); });
+ipcMain.on('op:talkPrefs', (e, p) => { talk.on = p.on !== false; if (p.key) talk.key = String(p.key); talk.mode = p.mode === 'tap' ? 'tap' : 'hold'; if (talk.on) { hookStart(); modTries = 0; modStart(); } if (!talk.on || !MOD_MASK[talk.key]) modStop(); healthToPage(); });
 ipcMain.handle('op:talkHealth', () => keyHealth());
 function openPane(which) {
   const pane = which === 'Accessibility' ? 'Privacy_Accessibility' : 'Privacy_ListenEvent';
@@ -348,7 +390,7 @@ ipcMain.handle('op:importFile', () => importData());
 app.on('second-instance', () => showWin());
 app.on('activate', () => showWin());
 app.on('before-quit', () => { quitting = true; });
-app.on('will-quit', () => { globalShortcut.unregisterAll(); stopHelpers(); try { if (hookOk) require('uiohook-napi').uIOhook.stop(); } catch (e) {} });
+app.on('will-quit', () => { globalShortcut.unregisterAll(); stopHelpers(); modStop(); try { if (hookOk) require('uiohook-napi').uIOhook.stop(); } catch (e) {} });
 // (before anything opens the page's storage)
 let how = null;
 if (app.hasSingleInstanceLock()) { stopOldLauncher(); try { how = migrateFromChrome(); } catch (e) { log('move-in failed', e.message); } }

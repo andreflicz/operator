@@ -391,9 +391,15 @@ wake_respond() {
         AI_HDR_KEY="x-api-key: $(cat "$AI_KEY_FILE")"
         case "$REQ_PATH" in
           /ai/models*) OUT=$(curl -sS --max-time 15 -H "$AI_HDR_KEY" -H "anthropic-version: 2023-06-01" -w '\n%{http_code}' "https://api.anthropic.com/v1/models?limit=100" 2>&1) ;;
-          *) B=$(hexdec "$(param b)")
-             OUT=$(curl -sS --max-time 45 -X POST -H "$AI_HDR_KEY" -H "anthropic-version: 2023-06-01" -H "content-type: application/json" \
-               --data-binary "$B" -w '\n%{http_code}' "https://api.anthropic.com/v1/messages" 2>&1) ;;
+          # (Round 67: a big request comes as the POST body, which bridge.pl saved to OP_BODY; a search takes longer)
+          *) if [ -n "$OP_BODY" ] && [ -s "$OP_BODY" ]; then
+               OUT=$(curl -sS --max-time 90 -X POST -H "$AI_HDR_KEY" -H "anthropic-version: 2023-06-01" -H "content-type: application/json" \
+                 --data-binary "@$OP_BODY" -w '\n%{http_code}' "https://api.anthropic.com/v1/messages" 2>&1)
+             else
+               B=$(hexdec "$(param b)")
+               OUT=$(curl -sS --max-time 90 -X POST -H "$AI_HDR_KEY" -H "anthropic-version: 2023-06-01" -H "content-type: application/json" \
+                 --data-binary "$B" -w '\n%{http_code}' "https://api.anthropic.com/v1/messages" 2>&1)
+             fi ;;
         esac
         CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
         case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":{"message":"could not reach Anthropic"}}' ;; esac
@@ -598,7 +604,10 @@ wake_respond() {
       if [ ! -s "$TTS_KEY_FILE" ]; then respond 401 '{"error":"no ElevenLabs key"}'; return; fi
       if [ -z "$OP_BODY" ] || [ ! -s "$OP_BODY" ]; then respond 400 '{"error":"no audio"}'; return; fi
       L=$(param lang); case "$L" in ''|*[!a-z]*) L="" ;; esac
-      OUT=$(curl -sS --max-time 130 -X POST -H "xi-api-key: $(cat "$TTS_KEY_FILE")" -F "model_id=scribe_v1" -F "tag_audio_events=false" ${L:+-F "language_code=$L"} -F "file=@$OP_BODY;type=audio/webm;filename=clip.webm" -w '\n%{http_code}' "https://api.elevenlabs.io/v1/speech-to-text" 2>&1)
+      MT=130; FPART="file=@$OP_BODY;type=audio/webm;filename=clip.webm"
+      # (Round 67: a voice memo can be long, and in its own format: m4a, mp3, wav…)
+      if [ "$(param long)" = "1" ]; then MT=850; X=$(param ext); case "$X" in ''|*[!a-z0-9]*) X=m4a ;; esac; FPART="file=@$OP_BODY;filename=memo.$X"; fi
+      OUT=$(curl -sS --max-time $MT -X POST -H "xi-api-key: $(cat "$TTS_KEY_FILE")" -F "model_id=scribe_v1" -F "tag_audio_events=false" ${L:+-F "language_code=$L"} -F "$FPART" -w '\n%{http_code}' "https://api.elevenlabs.io/v1/speech-to-text" 2>&1)
       CODE=$(printf '%s' "$OUT" | tail -n 1); BODY=$(printf '%s' "$OUT" | sed '$d')
       case "$CODE" in [1-5][0-9][0-9]) ;; *) CODE=502; BODY='{"error":"could not reach ElevenLabs"}' ;; esac
       [ "$CODE" = "000" ] && { CODE=502; BODY='{"error":"could not reach ElevenLabs"}'; }

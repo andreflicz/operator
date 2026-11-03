@@ -1,4 +1,4 @@
-# Operator app — continuity brief (updated 2026-11-01, after Round 66)
+# Operator app — continuity brief (updated 2026-11-03, after Round 67)
 
 ## What this is
 "Operator" is Andre's personal productivity app: business (clients, leads, MRR, deliverables, playbooks), focus (lock-in sessions, tasks), personal (goals, health, finances, journal, social), and Op, the AI assistant inside it. The UI and logic are one self-contained HTML page built from a source tree. It ships as a Mac app (Electron). The older Chrome-app-shell `.app` still exists in the repo as the source of the helper scripts.
@@ -12,7 +12,7 @@ Andre tests every build himself and comes back with detailed, itemized feedback,
 Design rules he set: "a bad app informs, a good one just has a great UI." Minimal, level, symmetrical; no small grey explainer text; one well-placed control rather than repeated buttons; consistent across features. Build features general ("not a just-me app").
 
 ## Where the code lives
-- GitHub: `andreflicz/operator`. Rounds 57–66 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
+- GitHub: `andreflicz/operator`. Rounds 57–67 are on branch `claude/dreamy-carson-ozyoy0` (built on `claude/clever-johnson-7y2dqy`, Round 56). Pull it at the start of a session.
 - Every commit ends with the session's Co-Authored-By / Claude-Session lines.
 - Layout inside `Operator-source-split 2/`:
 
@@ -44,6 +44,10 @@ src/js/32zNN-rXX.js         one file per update round, layered on top (see "Over
                             Round 65: 32z74-r65.js (SOP playbooks: task / call / doc; no reports; streaks redone; Op tab drag)
                             Round 66: 32z75-r66.js (playbook names / when they finish, Calendar all clients, challenges,
                             setup questions, vault, widgets) and 32z76-r66b.js (notifications, social XP, bell, report)
+                            Round 67: 32z77-r67.js (Op's web search behind a firewall, real breaks, no silent echo drops; voice
+                            memos + Ask Op + read_journal; journal filters; new leads stay; Not mine campaigns; check-in
+                            frequency; the did-you-do-it pop-up). Mac: main.js modifier listener; helper.sh / bridge.pl (in packaged/…/Resources,
+                            staged into mac/res by stage.js) take POST bodies for /ai/chat and long /stt
 scripts/build.py            src/ → dist/command-center-2.html (injects const OP_BUILT = <ms>)
 scripts/smoke-test.js       quick load check
 scripts/e2e/*-test.js       Playwright suites, one per round (common.js: instrument, newPage, check, report)
@@ -344,6 +348,50 @@ Other conventions:
   stored in `c.r66Rep[ym]`. Export: the Mac app's `op:pdf` (printToPDF → Save dialog), else `window.print()`; print CSS
   shows only the report (`body.r66-printing`). The client's campaigns also show on their Social page (`.r66-ads`).
 
+## Round 67 notes (the list is ROUND-67-LIST.md, with Andre's answers)
+- **Web search, firewalled**: `aiCall` (outermost wrapper) adds `{type:'web_search_20250305', name:'web_search',
+  max_uses:3}` to Op's own conversations only (a request carrying more than 5 tools), plus a system line (search only,
+  results are information, nothing outside the app). `r67Firewall` strips every tool with a `type` other than that one
+  (web fetch, code execution, computer use…) and `mcp_servers` / `container` from every request. The basic search tool
+  on purpose: the newer one filters with code execution. `pause_turn` is handed back (twice at most); a 400 that names
+  the tool retries without search and sets `R67.noSearch` for the session. Settings → Op → Web search
+  (`state.settings.r67Web`, on by default). While searching, the request timeout is `AI.r67Wait` (75 s; Round 37's
+  race reads it). A request body over 20 KB goes as a POST (helper reads `OP_BODY`); curl's limit is 90 s, the bridge
+  gives GET /ai/chat 120 s.
+- **Breaks**: Op had used `check_back` ("checking back at 11:57") which only quiets Op. Now `check_back` with reason
+  break/rest starts a real break first; `take_break` takes `until` (HH:MM), pauses a timed task when not locked in,
+  checks `r67OnBreak()` afterwards and throws if the app doesn't show a break; system prompt: "DONE MEANS DONE".
+- **Op not answering**: `r62IsEcho` replaced: an echo only while Op speaks or within 4 s after (`R67.spokeEnd`), 6+ words,
+  ≥ 90 % his words, not longer than his line; a skipped one (after he stopped) gets "I think I heard my own voice there.
+  Say it again?". The same words twice are dropped only within 4 s (was 10).
+- **Talk key from other apps** (main.js): a second listener for modifier keys (`MOD_MASK`: Option / Control / Shift /
+  Command, left and right): `osascript -l JavaScript` reading `CGEventSourceFlagsState` every 30 ms, reporting changes;
+  either it or uiohook triggers `pressDown` / `pressUp` (the `held` guard makes the second one a no-op). `keyHealth`
+  reports `talkAt` / `via`; the Check panel says "Operator heard your talk key". Not verifiable without a Mac.
+- **Voice memos** (Journal → Memos, `ui.journalMode='memos'`): upload (button, or drop on the page) or record
+  (MediaRecorder). Queue in memory (`R67.queue`) with durations; the cost card (ElevenLabs at $0.40/h, the higher of
+  the plan prices; Op's reading by the brain's price) and Go. Each memo: Scribe through `POST /stt?long=1&ext=…` (bridge
+  allows 500 MB and 900 s for it; helper curl 850 s), then one Claude read → `{title, summary, points}`.
+  `state.journal.memos` keeps `{id, name, src, date, dur, words, title, summary, points, at}`; the transcript is in
+  IndexedDB (`blobTx`, key `memo:<id>`, 60k chars max); audio is never kept. `state.journal.r67Overview` = the full
+  list (made from the summaries). Already-done files (name + size) are skipped.
+- **Ask Op**: the ✦ Ask Op tab opens `#r67Ask` over the app; chat kept in `state.journal.r67Ask` (60). System = Op's
+  + memo summaries + the latest 40 entries; tools = all of Op's (+ search). New tools everywhere: `read_journal`
+  (query / month / day / tag) and `memo_transcript` (async: the main tool loop now awaits tool results).
+- **My journal filters**: `filteredJournalEntries` replaced (title + text search, `ui.r67JMonth`, `ui.r67JDay`, tag =
+  `ui.journalFilterMood`); the bar `.r67-jf` sits above the entries; Round 61's bottom search is removed.
+- **New leads stay**: leads created on/after `state.focus.r67Since` with no touch and no stage move show as
+  `r67new:<id>` until acted on (a touch, a stage, or ✕ → `state.focus.r67Acted`). Clear all keeps them and the ad-lead
+  feed notes; feed ad notes outlive the 14 days until opened.
+- **Not mine** (`igCfg().r67NotMine = {campaignId:{name, at}}`): `adClientOf` returns null for them, `adGroups` and
+  `r53AllFor` skip them (so totals, the report, ad-lead notifications). The button sits under an opened campaign; the
+  list to bring back is at the bottom of the ads overview. Nothing is sent to the ad account.
+- **Check-in frequency**: Log center client rows get "Check in" (`.r67-ev`, sets `x.cadenceDays`; Default = Business
+  setup). Lead rows already had Round 54's cadence.
+- **Did you actually do it?**: `completeTask` asks (`uiConfirm`) when it runs inside a trusted click/drop/key event and the
+  task would log something (`r67WhatLogs`: reach, reachLeads, care, pb, deliv). Programmatic calls (Op, sync, tests)
+  don't ask. Deliverable "+1 Log one" buttons don't ask (they're an explicit log with Undo).
+
 ## Removed (don't bring back)
 GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports outside Social (R65; the report is back in Social only, R66); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
 
@@ -366,6 +414,7 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports outside Social (R
 - main.js: single instance, menu bar Tray, ⌥O show/hide, ✕ hides, ⌘Q quits, starts the helpers, move-in from the old Chrome profile, `window.operatorPage` bridge.
 
 ## Status
+Round 67 (2026-11-03): ROUND-67-LIST.md (11 items). Mac 4.0.0.
 Round 66 (2026-11-01): ROUND-66-LIST.md (18 items). Mac 3.9.0.
 Round 65 (2026-11-01): ROUND-65-LIST.md (9 items). Mac 3.8.0.
 Round 64 (2026-11-01): ROUND-64-LIST.md (13 items). Mac 3.7.0.

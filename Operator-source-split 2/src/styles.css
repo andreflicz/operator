@@ -10698,3 +10698,89 @@ html[data-holiday="newyear"]{ --accent:#F5D547; } html[data-holiday="july4"]{ --
 .r66-ads-t{ display:grid; gap:4px; }
 .r66-ads-r{ display:grid; grid-template-columns:minmax(0, 1fr) 90px 80px 90px 80px; gap:10px; align-items:center; padding:7px 10px; border-radius:10px; background:rgba(var(--ink),.03); font-size:13px; }
 .r66-ads-r span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .r66-ads-r small{ color:var(--text-dim); }
+
+/* ============ ROUND 67 ============ */
+/* Journal: search and filters on one line */
+.r67-jf{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:6px 0 14px; }
+.r67-jf-s{ display:flex; align-items:center; gap:7px; flex:1 1 180px; min-width:150px; height:34px; padding:0 12px; border-radius:10px; border:1px solid var(--border); background:var(--panel); color:var(--text-dim); }
+.r67-jf-s input{ flex:1; min-width:0; border:0; background:transparent; color:var(--text); font:inherit; font-size:13px; outline:none; }
+.r67-jf-m{ height:34px; padding:0 10px; border-radius:10px; border:1px solid var(--border); background:var(--panel); color:var(--text); font:inherit; font-size:13px; }
+.r67-jf-d{ position:relative; display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:34px; padding:0 10px; border-radius:10px; border:1px solid var(--border); background:var(--panel); font-size:13px; cursor:pointer; }
+.r67-jf-d.is-on{ border-color:var(--accent); color:var(--accent); }
+.r67-jf-d input{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+.r67-jf-t{ display:inline-flex; gap:6px; flex-wrap:wrap; }
+.r67-jf-t button{ height:34px; padding:0 12px; border-radius:10px; border:1px solid var(--border); background:var(--panel); color:var(--text-dim); font:inherit; font-size:12.5px; cursor:pointer; }
+.r67-jf-t button.is-on{ color:var(--text); border-color:var(--tc, var(--accent)); background:color-mix(in srgb, var(--tc, var(--accent)) 16%, transparent); }
+.r67-jf-n{ min-width:22px; text-align:center; font-size:12px; font-weight:700; color:var(--text-dim); }
+.r67-jf-x{ height:34px; padding:0 10px; border:0; background:transparent; color:var(--accent); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
+
+/* Journal: voice memos */
+.r67-m{ max-width:860px; margin:0 auto; display:grid; gap:14px; }
+.r67-mb{ display:flex; align-items:center; gap:8px; }
+.r67-rec, .r67-up, .r67-askb{ display:inline-flex; align-items:center; gap:8px; height:38px; padding:0 16px; border-radius:12px; border:1px solid var(--border); background:var(--panel); color:var(--text); font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; }
+.r67-rec i{ width:10px; height:10px; border-radius:50%; background:#e5484d; }
+.r67-rec.is-on{ border-color:#e5484d; } .r67-rec.is-on i{ animation:r67Pulse 1.2s ease-in-out infinite; }
+@keyframes r67Pulse{ 50%{ opacity:.35; transform:scale(.8); } }
+.r67-mt{ flex:1; text-align:right; font-size:13px; color:var(--text-dim); }
+.r67-askb{ border-color:color-mix(in srgb, var(--accent) 45%, var(--border)); color:var(--accent); }
+.r67-q{ padding:16px 18px; border-radius:16px; border:1px solid var(--border); background:var(--panel); display:grid; gap:12px; }
+.r67-q.is-run{ display:flex; align-items:center; gap:12px; }
+.r67-spin{ width:16px; height:16px; border-radius:50%; border:2px solid rgba(var(--ink),.15); border-top-color:var(--accent); animation:r67Spin .8s linear infinite; }
+@keyframes r67Spin{ to{ transform:rotate(360deg); } }
+.r67-q-h{ display:flex; align-items:baseline; justify-content:space-between; } .r67-q-h span{ color:var(--text-dim); font-size:13px; }
+.r67-q-l{ display:flex; flex-wrap:wrap; gap:6px; }
+.r67-q-l span{ display:inline-flex; gap:6px; align-items:baseline; padding:5px 10px; border-radius:9px; background:rgba(var(--ink),.04); font-size:12.5px; } .r67-q-l small{ color:var(--text-dim); }
+.r67-cost{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+.r67-cost span{ display:grid; gap:2px; padding:10px 12px; border-radius:12px; background:rgba(var(--ink),.04); font-size:12px; color:var(--text-dim); text-align:center; }
+.r67-cost b{ font-size:18px; color:var(--text); }
+.r67-cost span:last-child{ background:color-mix(in srgb, var(--accent) 12%, transparent); } .r67-cost span:last-child b{ color:var(--accent); }
+.r67-q-f{ display:flex; justify-content:flex-end; gap:8px; }
+.r67-ov{ padding:16px 18px; border-radius:16px; border:1px solid color-mix(in srgb, var(--accent) 30%, var(--border)); background:color-mix(in srgb, var(--accent) 5%, var(--panel)); }
+.r67-ov-h{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.r67-ov-h button{ border:0; background:transparent; color:var(--accent); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
+.r67-ov ol{ margin:0; padding-left:20px; display:grid; gap:5px; font-size:13.5px; line-height:1.45; }
+.r67-ml{ display:grid; gap:10px; }
+.r67-mc{ padding:14px 18px; border-radius:16px; border:1px solid var(--border); background:var(--panel); }
+.r67-mc-h{ display:flex; align-items:baseline; gap:12px; width:100%; padding:0; border:0; background:transparent; color:var(--text); font:inherit; text-align:left; cursor:pointer; }
+.r67-mc-h time{ min-width:64px; font-size:12px; color:var(--text-dim); } .r67-mc-h b{ flex:1; font-size:15px; } .r67-mc-h small{ font-size:12px; color:var(--text-dim); }
+.r67-mc p{ margin:6px 0 0 76px; font-size:13.5px; line-height:1.5; color:var(--text-dim); }
+.r67-mc ul{ margin:10px 0 0 76px; padding-left:18px; display:grid; gap:4px; font-size:13.5px; }
+.r67-mc-f{ display:flex; gap:14px; margin:12px 0 0 76px; }
+.r67-mc-f button{ padding:0; border:0; background:transparent; color:var(--accent); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; } .r67-mc-f button + button{ color:var(--text-dim); }
+.r67-tx{ margin:10px 0 0 76px; max-height:260px; overflow:auto; padding:12px 14px; border-radius:12px; background:rgba(var(--ink),.04); font-size:13px; line-height:1.55; white-space:pre-wrap; }
+.r67-empty{ display:grid; gap:6px; justify-items:center; padding:48px 20px; border-radius:16px; border:1px dashed var(--border); text-align:center; }
+.r67-empty span{ max-width:420px; font-size:13px; color:var(--text-dim); }
+.r67-askt{ color:var(--accent) !important; }
+
+/* Ask Op: over the app, like Inspiration */
+.r67-ask{ position:fixed; inset:0; z-index:100000; display:grid; grid-template-rows:auto 1fr auto; background:radial-gradient(120% 90% at 50% 0%, #1d1530 0%, #0b0912 60%); color:#f2eefc; opacity:0; pointer-events:none; transform:scale(1.02); transition:opacity .35s ease, transform .35s ease; }
+.r67-ask.is-in{ opacity:1; pointer-events:auto; transform:none; }
+.r67-ah{ display:flex; align-items:center; gap:12px; padding:18px 24px; } .r67-ah b{ flex:1; font-size:16px; letter-spacing:.02em; }
+.r67-an, .r67-ax{ height:34px; padding:0 14px; border-radius:10px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:inherit; font:inherit; font-size:13px; cursor:pointer; }
+.r67-ax{ width:34px; padding:0; }
+.r67-ab{ overflow:auto; padding:10px 24px 24px; display:flex; flex-direction:column; gap:14px; width:100%; max-width:760px; margin:0 auto; box-sizing:border-box; }
+.r67-am{ max-width:88%; font-size:14.5px; line-height:1.6; } .r67-am p{ margin:0 0 8px; } .r67-am p:last-child{ margin:0; } .r67-am ul{ margin:4px 0 8px; padding-left:20px; }
+.r67-am.is-me{ align-self:flex-end; padding:10px 14px; border-radius:16px 16px 4px 16px; background:rgba(255,255,255,.09); }
+.r67-am.is-op{ align-self:flex-start; }
+.r67-am.is-busy{ display:flex; gap:5px; } .r67-am.is-busy span{ width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.6); animation:r67Pulse 1s ease-in-out infinite; } .r67-am.is-busy span:nth-child(2){ animation-delay:.15s; } .r67-am.is-busy span:nth-child(3){ animation-delay:.3s; }
+.r67-a0{ margin:auto; display:grid; justify-items:center; gap:8px; text-align:center; }
+.r67-a0-o{ width:64px; height:64px; border-radius:50%; margin-bottom:8px; background:radial-gradient(circle at 35% 30%, #fff 0%, #b9a4ff 22%, #5b3fd1 60%, #1a1033 100%); box-shadow:0 0 50px rgba(150,120,255,.45); }
+.r67-a0 b{ font-size:20px; } .r67-a0 > span{ font-size:13px; opacity:.6; }
+.r67-sug{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:14px; max-width:600px; }
+.r67-sug button{ padding:9px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:inherit; font:inherit; font-size:13px; cursor:pointer; }
+.r67-sug button:hover{ background:rgba(255,255,255,.1); }
+.r67-af{ display:flex; gap:10px; align-items:flex-end; width:100%; max-width:760px; margin:0 auto; padding:0 24px 26px; box-sizing:border-box; }
+.r67-af textarea{ flex:1; min-height:48px; max-height:160px; resize:none; padding:13px 16px; border-radius:16px; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.06); color:inherit; font:inherit; font-size:14.5px; outline:none; }
+.r67-af button{ width:48px; height:48px; border-radius:50%; border:0; background:#f2eefc; color:#120d1f; font-size:20px; font-weight:700; cursor:pointer; } .r67-af button:disabled{ opacity:.4; }
+
+/* Ads: not mine */
+.r67-nm{ display:flex; justify-content:flex-end; padding:4px 12px 10px; }
+.r67-nm button, .r67-hid-l button{ border:0; background:transparent; color:var(--text-dim); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; } .r67-nm button:hover, .r67-hid-l button:hover{ color:var(--text); }
+.r67-hid{ margin-top:16px; }
+.r67-hid-b{ border:0; background:transparent; color:var(--text-dim); font:inherit; font-size:12.5px; cursor:pointer; padding:0; }
+.r67-hid-l{ display:grid; gap:4px; margin-top:8px; } .r67-hid-l > div{ display:flex; justify-content:space-between; padding:7px 12px; border-radius:10px; background:rgba(var(--ink),.03); font-size:13px; }
+
+/* Log center: check-in frequency */
+.lc-last.r67-ev select{ margin-top:1px; padding:0; border:0; background:transparent; color:var(--text); font:inherit; font-size:13px; font-weight:600; cursor:pointer; outline:none; max-width:150px; }
+.lc-row.r67-er{ grid-template-columns:36px minmax(140px, 1.1fr) minmax(90px, .55fr) minmax(130px, .7fr) minmax(120px, .7fr) auto; }
+@media (max-width:1100px){ .lc-row.r67-er{ grid-template-columns:36px 1fr auto; } .lc-row.r67-er .r67-ev{ display:none; } }

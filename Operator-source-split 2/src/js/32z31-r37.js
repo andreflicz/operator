@@ -52,7 +52,7 @@ function aiCancelNow(silent){
 aiCall = (function(base){
   return function(req){
     const cancelP = new Promise(function(res){ (AI._cancelers = AI._cancelers || []).push(res); });
-    const timeP = new Promise(function(res){ setTimeout(function(){ res({ok:false, status:0, j:{error:{message:'that took too long'}}, timedOut:true}); }, 25000); });
+    const timeP = new Promise(function(res){ setTimeout(function(){ res({ok:false, status:0, j:{error:{message:'that took too long'}}, timedOut:true}); }, AI.r67Wait || 25000); });  // (Round 67: longer while Op searches the web)
     if(AI.cancelled) return Promise.resolve({ok:false, status:0, j:null, cancelled:true});
     return Promise.race([base.apply(this, arguments), cancelP, timeP]);
   };

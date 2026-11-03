@@ -31,11 +31,14 @@ while (1) {
       close $c; exit 0;
     }
     # a POST with a body (a voice clip for speech to text): read it into a private temp file the
-    # helper can find in OP_BODY (at most 20 MB), and delete it after
+    # helper can find in OP_BODY (at most 20 MB; 500 MB for a voice memo), and delete it after
     my $bodyf = '';
     # (a long voice clip takes longer to send and transcribe than a normal request)
     alarm 150 if $line =~ /^POST /;
-    if ($line =~ /^POST / && $clen > 0 && $clen <= 20*1024*1024) {
+    # (Round 67: Op searching the web, and a long voice memo, take longer still)
+    alarm 120 if $line =~ m{^GET /ai/chat};
+    alarm 900 if $line =~ m{^POST /stt\?long=1};
+    if ($line =~ /^POST / && $clen > 0 && $clen <= ($line =~ m{^POST /stt\?long=1} ? 500 : 20)*1024*1024) {
       my $dir = $ENV{TMPDIR} || '/tmp';
       $bodyf = "$dir/op-body-$$-".time().".bin";
       if (open(my $bf, '>:raw', $bodyf)) {

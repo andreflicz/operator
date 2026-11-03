@@ -191,7 +191,11 @@ function aiTune(req){
   return req;
 }
 async function aiCall(req){
-  const r = await fetchWithin(WAKE_HELPER+'ai/chat?b='+hexUtf8(JSON.stringify(aiTune(req))), 55000);
+  // (a big request, like one carrying web search results, goes as a POST body: Round 67)
+  const body = JSON.stringify(aiTune(req)), big = body.length > 20000;
+  let r = null;
+  if(big){ const ctl = new AbortController(), tm = setTimeout(function(){ ctl.abort(); }, 100000); try{ r = await fetch(WAKE_HELPER+'ai/chat', {method:'POST', body:body, headers:{'Content-Type':'text/plain'}, cache:'no-store', signal:ctl.signal}); }catch(e){ r = null; } clearTimeout(tm); }
+  else r = await fetchWithin(WAKE_HELPER+'ai/chat?b='+hexUtf8(body), 95000);
   let j = null; try{ j = r ? await r.json() : null; }catch(e){}
   if(r && r.status===401) AI.hasKey = false;
   return {ok:!!(r && r.ok && j && Array.isArray(j.content)), status:r ? r.status : 0, j:j};
@@ -376,10 +380,11 @@ async function aiAsk(text, cap){
       const uses = arr(j.content).filter(function(c){ return c.type==='tool_use'; });
       if(j.stop_reason==='tool_use' && uses.length){
         msgs.push({role:'assistant', content:j.content});
-        msgs.push({role:'user', content:uses.map(function(u){
-          try{ const out = opRunTool(u.name, u.input); if(u.name!=='remember' && u.name!=='forget') changed = true; return {type:'tool_result', tool_use_id:u.id, content:String(out)}; }
+        // (a tool can answer later, like reading a memo's transcript: Round 67)
+        msgs.push({role:'user', content:await Promise.all(uses.map(async function(u){
+          try{ const out = await Promise.resolve(opRunTool(u.name, u.input)); if(u.name!=='remember' && u.name!=='forget' && u.name!=='read_journal' && u.name!=='memo_transcript') changed = true; return {type:'tool_result', tool_use_id:u.id, content:String(out)}; }
           catch(e){ return {type:'tool_result', tool_use_id:u.id, content:'Error: '+(e && e.message || e), is_error:true}; }
-        })});
+        }))});
         continue;
       }
       reply = aiText(j); break;
