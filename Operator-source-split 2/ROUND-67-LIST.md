@@ -18,7 +18,8 @@ list but never fixed).
 ## B. Journal: voice memos
 5. **A Voice memos section next to the Journal**: record new ones right there, and upload the old ones once, in bulk.
 6. **Op goes through them once**: for every memo, a summary and its key points, and one full list across all of them,
-   so he doesn't have to listen to years of recordings. Then he can ask Op questions about his memos.
+   so he doesn't have to listen to years of recordings. Then **Ask Op**: a chat sub-tab in the Journal (opens like
+   Inspiration) to ask about the memos and the journal. Op can read the journal from anywhere.
 
 ## C. Notifications and leads
 7. **New leads stay in notifications** until he acts on them (they don't disappear after a day or when cleared).
@@ -49,4 +50,7 @@ list but never fixed).
   and it only runs when he says go.)
 - **Finishing a task**: no questions. Just a quick pop-up: "Did you actually do it? This logs a touch for …" with one
   button to confirm (and one for "not yet").
-- **No backup talk key.** Just fix the Option key.
+- **No backup talk key.** Just fix the Op key.
+- **Ask Op (Journal)**: a sub-tab in the Journal that opens like Inspiration: a chat with Op (he is the app's AI) about the
+  voice memos and the journal. Op can read the journal everywhere (it's his to use when it helps), and he can do
+  anything inside the app, but nothing outside it.
