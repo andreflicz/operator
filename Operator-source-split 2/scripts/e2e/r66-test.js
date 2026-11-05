@@ -34,6 +34,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.view='personal'; ui.personalTab='streaks'; renderView()"); await p.waitForTimeout(250);
   check('Streaks: a quote up top, challenges by level (Warm-up, Build, Commit, Hard), each with its XP', !!(await p.$('.r66-hero .r66-q p')) && (await p.$$('.r66-lvl')).length===4 && /Monk mode 90/.test(await p.textContent('.r66-lvls')) && /\+[\d,]+ XP/.test(await p.textContent('.r66-pc')));
   await p.click('.r66-pc[data-id="cold30"]'); await p.waitForTimeout(200);
+  await p.click('#r63Sheet [data-action="r68UseStd"][data-id="0"]'); await p.waitForTimeout(150);  // (round 68: own rules)
   await p.click('#r63Sheet [data-action="r66Next"]'); await p.waitForTimeout(200);
   check('Starting one: a commitment, the rules read back, why, what it’s worth', /for the next/.test(await p.textContent('.r66-oath')) && /2-minute cold shower/.test(await p.textContent('.r66-rules')) && !!(await p.$('#r66Why')) && /XP/.test(await p.textContent('.r66-stake')));
   const hb = await (await p.$('.r66-hold')).boundingBox();

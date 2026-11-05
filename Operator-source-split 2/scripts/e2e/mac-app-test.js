@@ -39,7 +39,7 @@ const get = (port, p) => new Promise((res) => { const r = http.get({host:'127.0.
     check('and the bubble goes back to a dot', await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find(x => /bubble/.test(x.webContents.getURL())).getBounds().width===64));
   }
   const ping = await get(8935, '/ping');
-  check('the helpers are up (wake / voice / AI on 8935)', !!ping && /"helper":17/.test(ping.body), ping);
+  check('the helpers are up (wake / voice / AI on 8935)', !!ping && /"helper":18/.test(ping.body), ping);
   const act = await get(8934, '/');
   check('the activity helper answers (8934)', !!act && act.code===200, act);
   await app.evaluate(({Menu}) => { const m = Menu.getApplicationMenu(); m.items[0].submenu.items.find((i) => /Settings/.test(i.label)).click(); }); await win.waitForTimeout(500);

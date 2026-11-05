@@ -30,6 +30,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Start a streak: First streak, 75 Soft, 75 Medium, 75 Hard, your own', /First streak[\s\S]*75 Soft[\s\S]*75 Medium[\s\S]*75 Hard[\s\S]*Make your own/.test(await p.textContent('.r66-lvls')));
   await p.click('.r66-pc[data-id="hard"]');  // (round 66: start cards grouped by level) await p.waitForTimeout(250);
   check('75 Hard comes with its rules, 75 days, back to day 1 on a miss', await E("ui.r63Draft.days===75 && ui.r63Draft.strict==='reset' && ui.r63Draft.rules.length===6 && /outside/.test(ui.r63Draft.rules.map(r => r.label).join(' '))"));
+  await p.click('#r63Sheet [data-action="r68UseStd"][data-id="0"]'); await p.waitForTimeout(150);  // (round 68: own rules, not Today’s standard)
   await p.click('#r63Sheet [data-id="strict|twice"]'); await p.waitForTimeout(100);
   await p.fill('[data-r63-d="cue|0"]', 'At the gym, 6 AM'); await p.waitForTimeout(80);
   await p.click('#r63Sheet [data-id="add|1"]'); await p.waitForTimeout(120);

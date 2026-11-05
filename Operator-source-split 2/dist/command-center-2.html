@@ -11043,7 +11043,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1793849581059;
+const OP_BUILT = 1793850799605;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -59190,9 +59190,15 @@ r67MemosHtml = function(){
 // ---------------- 6. Op reads every journal ----------------
 // (boards' cards and your clients' journals join read_journal; memos you only saved are found by name and transcript)
 opRunTool = (function(base){
-  return async function(name, x){
-    const r = await base.apply(this, arguments);
-    if(name!=='read_journal') return r;
+  // (only read_journal is touched, and only it waits: every other tool answers as it always did)
+  return function(name, x){
+    if(name!=='read_journal') return base.apply(this, arguments);
+    const r0 = base.apply(this, arguments);
+    return r0 && typeof r0.then==='function' ? r0.then(function(r){ return r68JournalMore(r, x); }) : r68JournalMore(r0, x);
+  };
+})(opRunTool);
+function r68JournalMore(r, x){
+  {
     x = x || {};
     const q = String(x.query || '').toLowerCase().trim(), words = q.split(/\s+/).filter(function(w){ return w.length > 2; });
     const hit = function(s){ s = String(s || '').toLowerCase(); return !words.length || words.some(function(w){ return s.indexOf(w) >= 0; }); };
@@ -59207,8 +59213,8 @@ opRunTool = (function(base){
     }
     if(!more) return r;
     return (String(r==='nothing matches' ? '' : r)+more).trim().slice(0, 12000);
-  };
-})(opRunTool);
+  }
+}
 
 // ---------------- 7. Operator on your iPhone ----------------
 // (the Mac app serves a small page on your Wi-Fi; these are the only things it can ask)

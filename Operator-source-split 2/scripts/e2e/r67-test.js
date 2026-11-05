@@ -85,30 +85,33 @@ const CORS = {'Access-Control-Allow-Origin':'*'};
   check('the Journal has Memos and Ask Op beside Entries, Boards and the Vault', /Entries[\s\S]*Boards[\s\S]*Memos[\s\S]*Vault[\s\S]*Ask Op/.test(await p.textContent('.r62-jtabs')));
   await p.click('[data-action="journalMode"][data-id="memos"]'); await p.waitForTimeout(250);
   check('Memos: record or upload, nothing to read yet', !!(await p.$('.r67-rec')) && !!(await p.$('#r67MemoFile[multiple]')) && !!(await p.$('.r67-empty')));
-  // two old memos come in (the transcripts stand in for ElevenLabs here)
+  // two old memos come in (the transcripts stand in for ElevenLabs here). Round 68: they're only saved; Analyze when you want
   await E("r67Scribe = async function(b){ return await b.text(); }; R67.queue.push({id:'q1', name:'Walk 12', src:'a', date:'2026-10-02', dur:3600, file:new Blob(['I want to raise my retainer to twenty five hundred and ask Harbor Dental first because they love the work.'], {type:'audio/mp4'})}, {id:'q2', name:'Car thoughts', src:'b', date:'2026-10-09', dur:1800, file:new Blob(['Hire an editor before December so I can film more and stop editing at night.'], {type:'audio/mp4'})}); renderView()"); await p.waitForTimeout(200);
-  const cost = await p.textContent('.r67-cost');
-  check('before anything runs: what it will cost (1 h 30 min → about $0.60 to transcribe, Op reading it, the total), and Go', /\$0\.60\s*to transcribe/.test(cost) && /for Op to read/.test(cost) && /total, once/.test(cost) && !!(await p.$('[data-action="r67MemoGo"]')), cost);
+  await E("renderView()"); await p.waitForTimeout(600);
+  check('(round 68) an upload is just saved: no cost card, no Go, nothing read yet', await E("r67Memos().length===2 && r67Memos().every(m => !m.summary)") && !(await p.$('.r67-cost')) && !(await p.$('[data-action="r67MemoGo"]')));
+  check('…the audio is kept, to play it back', await E("r67Memos().every(m => m.audio)") && (await p.$$('[data-action="r68MemoPlay"]')).length===2);
   reply = (body) => /voice memos, summed up/.test(JSON.stringify(body.messages)) ? {stop_reason:'end_turn', content:[{type:'text', text:'{"points":["Raise prices (twice)","Hire an editor"]}'}]}
     : /Harbor/.test(JSON.stringify(body.messages)) ? {stop_reason:'end_turn', content:[{type:'text', text:'{"title":"Raising the retainer","summary":"You talk about raising your retainer.","points":["Raise to $2,500","Ask Harbor Dental first"]}'}]}
     : {stop_reason:'end_turn', content:[{type:'text', text:'{"title":"An editor","summary":"You want to hire an editor.","points":["Hire before December"]}'}]};
-  await p.click('[data-action="r67MemoGo"]'); await p.waitForTimeout(1200);
-  check('Go: each memo is read once: a title, a summary, its key points', await E("r67Memos().length===2 && r67Memos().some(m => m.title==='Raising the retainer' && m.points.length===2 && /retainer/.test(m.summary))"));
-  check('…and one full list across all of them', await E("state.journal.r67Overview && state.journal.r67Overview.points.join('|')==='Raise prices (twice)|Hire an editor'") && /Across all your memos/.test(await p.textContent('.r67-ov')));
-  check('only text is kept: the transcript on this Mac (IndexedDB), not in the journal’s data; no audio', await E("(async () => { const m = r67Memos().find(m => m.title==='Raising the retainer'); const t = await r67MemoGet(m.id); return /twenty five hundred/.test(t) && JSON.stringify(state.journal).indexOf('twenty five hundred')<0 && !r67Memos().some(m => m.file || m.audio); })()"));
+  await E("window.__uc0 = uiConfirm; uiConfirm = function(o){ window.__conf = o; return Promise.resolve(true); }");
+  await p.click('[data-action="r68MemoAll"]'); await p.waitForTimeout(1500);
+  check('Analyze all: it says the cost first (1 h 30 min → about $0.60 to transcribe, Op reading it)', /\$0\.60 to transcribe/.test(await E("window.__conf.text")) && /for Op to read/.test(await E("window.__conf.text")), await E("window.__conf && window.__conf.text"));
+  check('…then each memo is read once: a title, a summary, its key points', await E("r67Memos().length===2 && r67Memos().some(m => m.title==='Raising the retainer' && m.points.length===2 && /retainer/.test(m.summary))"));
+  check('…and one full list across all of them', await E("state.journal.r67Overview && state.journal.r67Overview.points.join('|')==='Raise prices (twice)|Hire an editor'"));
+  check('the transcript is kept on this Mac (IndexedDB), not in the journal’s data', await E("(async () => { const m = r67Memos().find(m => m.title==='Raising the retainer'); const t = await r67MemoGet(m.id); return /twenty five hundred/.test(t) && !/twenty five hundred/.test(JSON.stringify(state.journal)); })()"));
   await p.click('.r67-mc-h >> nth=1'); await p.waitForTimeout(200);
   await p.click('.r67-mc.is-open [data-action="r67MemoTxt"]'); await p.waitForTimeout(300);
   check('a memo opens to its points and its transcript', /Ask Harbor Dental first/.test(await p.textContent('.r67-mc.is-open')) && /twenty five hundred/.test(await p.textContent('.r67-tx')));
   // ---- free: transcripts instead of audio (the iPhone's own, pasted or as text files) ----
   require('fs').writeFileSync(OUT+'/walk-41.txt', 'Today I want to plan the studio move and call the landlord about the lease before Friday.');
-  await p.setInputFiles('#r67MemoFile', OUT+'/walk-41.txt'); await p.waitForTimeout(400);
+  await p.setInputFiles('#r67MemoFile', OUT+'/walk-41.txt'); await p.waitForTimeout(600);
   await p.click('[data-action="r67PasteOpen"]'); await p.waitForTimeout(150);
-  await p.fill('#r67PasteText', 'Thinking about hiring a second editor and raising prices in January.'); await p.fill('#r67PasteName', 'Car ride'); await p.click('[data-action="r67PasteAdd"]'); await p.waitForTimeout(250);
-  const cost2 = await p.textContent('.r67-cost');
-  check('free: a transcript (a text file, or pasted from the iPhone) costs nothing to transcribe, only Op reading it', /\$0\s*transcripts: free/.test(cost2) && await E("R67.queue.length===2 && R67.queue.every(q => q.text && !q.file)"), cost2);
+  await p.fill('#r67PasteText', 'Thinking about hiring a second editor and raising prices in January.'); await p.fill('#r67PasteName', 'Car ride'); await p.click('[data-action="r67PasteAdd"]'); await p.waitForTimeout(600);
+  check('a transcript (a text file, or pasted from the iPhone) is saved too', await E("r67Memos().length===4 && r67Memos().some(m => m.name==='Car ride' && m.hasText) && r67Memos().some(m => m.name==='walk-41')"));
   reply = () => ({stop_reason:'end_turn', content:[{type:'text', text:'{"title":"The studio move","summary":"You plan the move.","points":["Call the landlord"]}'}]});
-  await p.click('[data-action="r67MemoGo"]'); await p.waitForTimeout(1200);
-  check('…Go: read and summed up like the others (no transcription asked for)', await E("r67Memos().length===4 && r67Memos().some(m => m.name==='Car ride') && r67Memos().some(m => m.name==='walk-41')"));
+  await p.click('[data-action="r68MemoAll"]'); await p.waitForTimeout(1500);
+  check('…Analyze all: free to transcribe, only Op reading it; read like the others', /transcripts free/.test(await E("window.__conf.text")) && await E("r67Memos().filter(m => m.summary).length===4"));
+  await E("uiConfirm = window.__uc0");
   // ---- Op reads the journal from anywhere ----
   await E("state.journal.entries.push({id:'jx1', date:'2026-09-14', timestamp:new Date(2026, 8, 14, 9).getTime(), title:'Money', text:'Thinking about pricing and saving for the studio.', type:'freeform', mood:'starred'}); persist('journal')");
   const rj = await E("opRunTool('read_journal', {query:'pricing retainer'})");

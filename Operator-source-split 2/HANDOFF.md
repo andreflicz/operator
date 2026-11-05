@@ -1,4 +1,4 @@
-# Operator app — continuity brief (updated 2026-11-03, after Round 67)
+# Operator app — continuity brief (updated 2026-11-04, after Round 68)
 
 ## What this is
 "Operator" is Andre's personal productivity app: business (clients, leads, MRR, deliverables, playbooks), focus (lock-in sessions, tasks), personal (goals, health, finances, journal, social), and Op, the AI assistant inside it. The UI and logic are one self-contained HTML page built from a source tree. It ships as a Mac app (Electron). The older Chrome-app-shell `.app` still exists in the repo as the source of the helper scripts.
@@ -403,6 +403,34 @@ Other conventions:
 ## Removed (don't bring back)
 GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports outside Social (R65; the report is back in Social only, R66); Op live mode (ElevenLabs agent); Op check-ins while working; "Have Op rewrite it"; client cycles/lifecycle tasks (`r54LcSync` → false); custom XP areas.
 
+## Round 68 notes (2026-11-04; the list is ROUND-68-LIST.md)
+- File: 32z78-r68.js (after 32z77-r67.js). Test: scripts/e2e/r68-test.js. Mac 4.1.0.
+- **Right-click**: `contactFromEl` finds a person from any row/card that opens exactly one (Log center rows, board cards);
+  the contact menu starts with Mark lost / Mark won (leads). Anything else: the right-clicked card's own buttons
+  (`r68CardButtons`, up to 10) above the app menu (`appMenuHtml` wrapper; `ctxExtra` op `r68Btn` clicks / runs holds).
+  With a session running, the menu has "Edit this session's start".
+- **Client backlog by month**: `ui.r68CblOff`; `clientBacklogHtml` swaps `dvwCycle`'s default date while it renders.
+- **Streaks from Today's standard**: `c.useStd` (default for new ones). Starting one adds its rules to
+  `state.standards.items` (deduped) and keeps `c.rules = []`; `r63DayDone` = `manualStandardsDoneFor(d)`; the run card
+  shows the standard items (ticks call `toggleStandard`); Today's streak panel adds no chips for it. A running streak
+  with its own rules has "Rules" (`r68RulesSheet`: rename, add, remove, or switch to Today's standard).
+- **The running session**: tap the time on Locked in (`#focusElapsed` and the minimal clocks) or right-click → date +
+  time of the start (up to 3 days back). Op tool `edit_session {start:'YYYY-MM-DD HH:MM'}`.
+- **Memos**: `r67MemosHtml` replaced; `R67.queue` is flushed straight into saved memos (`r68Flush`): text →
+  transcript in IndexedDB, audio → the file itself (`memoA:<id>`, played with ▶). Analyze (one) / Analyze all
+  (asks with the cost) transcribe if needed and run `r67Read` (conversations: who said what). No overview card, no Go.
+- **Op reads every journal**: `read_journal` also returns boards' card text, clients' journals and saved-only memos.
+- **Op errors**: `aiErrLine` says plainly: key refused, out of credit, busy, or an old helper. Helper /ping is 18 and
+  `OP_HELPER_NEEDS` 18 (Round 67 changed what the helper reads without bumping it); with a helper < 18 big requests
+  go in the address as before. The "request body is not valid JSON: EOF" error = new page + old helper.
+- **Personal goals**: `.r43-owns` becomes one scrolling row (2 visible) with ‹ › when there are more than 2.
+- **Journal tabs**: `.tabs .r62-jtabs` slimmer and lifted so they sit on the tab line without making it taller.
+- **iPhone** (main.js, Settings → Connections & data → Your iPhone): off by default; on = an HTTP server on
+  0.0.0.0:8940 (private addresses only), `mac/phone.html` + `/api/state|lockin|lockout|task|ask`, every call needs
+  the 6-digit code (`X-Op-Code`; 6 wrong → wait a minute). The page asks `operatorPage.phoneState / phoneLockIn /
+  phoneLockOut / phoneTask / ask` (Op answers in writing; the phone speaks it). Settings in `DATA_DIR/phone.json`.
+  Works on the same Wi-Fi only (no presence detection: a web page can't track location in the background).
+
 ## The helpers (127.0.0.1 only)
 `bridge.pl` (perl) listens and hands each request to `helper.sh`: **8935, wake** (alarms, music, TTS, the Anthropic proxy, Scribe STT); **8934, activity** (serves `activity.log`). Keys live in `~/Library/Application Support/Operator/*.key` (mode 600). Bump the helper version in `/ping` and `OP_HELPER_NEEDS` together whenever routes change.
 
@@ -423,6 +451,7 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports outside Social (R
 
 ## Status
 Round 67 (2026-11-03): ROUND-67-LIST.md (11 items). Mac 4.0.0; 4.0.1 adds client ad assignment in Social and free transcripts.
+Round 68 (2026-11-04): ROUND-68-LIST.md. Mac 4.1.0.
 Round 66 (2026-11-01): ROUND-66-LIST.md (18 items). Mac 3.9.0.
 Round 65 (2026-11-01): ROUND-65-LIST.md (9 items). Mac 3.8.0.
 Round 64 (2026-11-01): ROUND-64-LIST.md (13 items). Mac 3.7.0.
