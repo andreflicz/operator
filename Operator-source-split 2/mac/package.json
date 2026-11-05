@@ -1,7 +1,7 @@
 {
   "name": "operator",
   "productName": "Operator",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "description": "Operator: lock in, run the business, keep your life straight.",
   "main": "main.js",
   "author": "Andre",
@@ -28,7 +28,8 @@
       "preload.js",
       "package.json",
       "bubble.html",
-      "bubble-preload.js"
+      "bubble-preload.js",
+      "phone.html"
     ],
     "extraResources": [
       {

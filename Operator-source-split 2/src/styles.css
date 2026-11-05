@@ -10792,3 +10792,46 @@ html[data-holiday="newyear"]{ --accent:#F5D547; } html[data-holiday="july4"]{ --
 .r67-car .r67-who{ width:100%; text-align:right; }
 .r67-paste input, .r67-paste textarea{ width:100%; box-sizing:border-box; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:rgba(var(--ink),.03); color:var(--text); font:inherit; font-size:13.5px; outline:none; }
 .r67-paste textarea{ resize:vertical; min-height:120px; line-height:1.5; }
+
+/* ===================== R68 ===================== */
+.ctx-item.r68-lost{ color:var(--danger); }
+/* Client backlog by month */
+.r68-cbl{ display:flex; align-items:center; gap:10px; margin:0 0 14px; }
+.r68-cbl b{ font-family:var(--font-display); font-size:15px; min-width:140px; text-align:center; }
+.r68-cbl button{ width:30px; height:30px; border-radius:50%; border:1px solid var(--border); background:var(--panel); color:var(--text); cursor:pointer; font-size:16px; line-height:1; }
+.r68-cbl .r68-cbl-t{ width:auto; padding:0 12px; border-radius:15px; font-size:12.5px; font-weight:600; color:var(--text-dim); }
+/* streaks: Today's standard */
+.r68-std-now{ display:flex; flex-wrap:wrap; gap:6px; }
+.r68-rules{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+.r68-rules .r63-drr{ display:flex; gap:8px; } .r68-rules .r63-drr input{ flex:1; }
+/* the session's time can be tapped to change when it started */
+#focusElapsed, .np-clock-t, .ckp-timer, .sl-clock, .hm-clock{ cursor:pointer; }
+.r68-sess{ display:flex; flex-direction:column; gap:12px; margin-top:12px; } .r68-sess .row{ display:flex; } .r68-sess input{ flex:1; }
+/* memos */
+.r68-mh{ display:flex; align-items:center; gap:10px; }
+.r68-mh .r67-mc-h{ flex:1; min-width:0; }
+.r68-play{ width:34px; height:34px; border-radius:50%; border:1px solid var(--border); background:var(--panel-2); color:var(--text); font-size:12px; cursor:pointer; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; }
+.r68-play.is-on{ background:var(--accent); color:#1a1206; border-color:var(--accent); } .r68-play.is-txt{ cursor:default; color:var(--text-faint); }
+.r68-an, .r68-all{ border:1px solid var(--border); background:var(--panel-2); color:var(--text); font-weight:600; font-size:12.5px; padding:6px 12px; border-radius:16px; cursor:pointer; flex-shrink:0; }
+.r68-all{ margin-left:auto; border-color:color-mix(in srgb, var(--accent) 50%, var(--border)); color:var(--accent); }
+.r68-an:disabled, .r68-all:disabled{ opacity:.55; cursor:default; }
+/* personal goals: one row with arrows */
+.r68-goals{ position:relative; }
+.r68-goals .r43-owns.r68-row{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; gap:14px; }
+.r68-goals .r43-owns.r68-row::-webkit-scrollbar{ display:none; }
+.r68-goals .r43-owns.r68-row > *{ flex:0 0 calc(50% - 7px); scroll-snap-align:start; }
+.r68-ga{ position:absolute; top:50%; transform:translateY(-50%); width:34px; height:34px; border-radius:50%; border:1px solid var(--border); background:var(--panel); color:var(--text); font-size:18px; line-height:1; cursor:pointer; z-index:2; box-shadow:0 4px 14px rgba(0,0,0,.35); }
+.r68-ga.is-l{ left:-14px; } .r68-ga.is-r{ right:-14px; } .r68-ga:disabled{ opacity:0; pointer-events:none; }
+@media (max-width:760px){ .r68-goals .r43-owns.r68-row > *{ flex-basis:88%; } }
+/* the Journal's Entries / Boards / Memos / Vault sit on the tab line like the tabs (no taller bar, nothing over the line) */
+.tabs .r62-jtabs{ align-self:center; padding-bottom:0; margin-top:-6px; margin-bottom:-6px; }
+.tabs .r62-jtabs .seg-tabs{ padding:2px; border-radius:10px; }
+.tabs .r62-jtabs .seg-tab{ padding:4px 11px; font-size:12.5px; line-height:1.3; }
+/* the iPhone card */
+.r68-ph-s{ display:flex; gap:24px; flex-wrap:wrap; padding:10px 0 4px; }
+.r68-ph-s small{ display:block; font-size:11.5px; color:var(--text-faint); margin-bottom:3px; } .r68-ph-s b{ font-size:15px; user-select:all; }
+.r68-code{ font-family:var(--font-mono, ui-monospace, monospace); letter-spacing:.18em; font-size:18px !important; }
+.r68-ph-f{ display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:13px; color:var(--text-dim); padding-top:6px; }
+.tabs .r62-jtabs .seg-tabs{ padding:2px !important; border-radius:10px !important; }
+.tabs .r62-jtabs .seg-tab{ padding:3px 10px !important; font-size:12.5px !important; line-height:1.35 !important; min-height:0 !important; }
+.tabs .r62-jtabs{ margin-top:-10px; margin-bottom:-2px; }

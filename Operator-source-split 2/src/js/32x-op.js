@@ -192,7 +192,10 @@ function aiTune(req){
 }
 async function aiCall(req){
   // (a big request, like one carrying web search results, goes as a POST body: Round 67)
-  const body = JSON.stringify(aiTune(req)), big = body.length > 20000;
+  // (an older helper (before v18) can only read the address: it gets the address however big, and when the helper
+  // is old, Op says so (the page alone updated, not the Mac app) instead of "the request body is not valid JSON")
+  if(AI.helperV==null){ try{ const i = await opLauncherInfo(); AI.helperV = i.up ? i.v : null; }catch(e){} }
+  const body = JSON.stringify(aiTune(req)), big = body.length > 20000 && !(AI.helperV && AI.helperV < 18);
   let r = null;
   if(big){ const ctl = new AbortController(), tm = setTimeout(function(){ ctl.abort(); }, 100000); try{ r = await fetch(WAKE_HELPER+'ai/chat', {method:'POST', body:body, headers:{'Content-Type':'text/plain'}, cache:'no-store', signal:ctl.signal}); }catch(e){ r = null; } clearTimeout(tm); }
   else r = await fetchWithin(WAKE_HELPER+'ai/chat?b='+hexUtf8(body), 95000);
@@ -211,6 +214,11 @@ function aiText(j){
 function opNoDash(t){ return String(t||'').replace(/(\d)\s*[—–]\s*(\d)/g, '$1 to $2').replace(/\s*[—–]\s*(?=[A-Z])/g, '. ').replace(/\s+[—–]\s+|[—–]/g, ', ').replace(/, ,/g, ','); }
 function aiErrLine(res){
   if(res.status===401) return 'To talk with me, add an Anthropic API key in Settings → Connections & data → Op.';
+  const em = String((res.j && res.j.error && (res.j.error.message || res.j.error.type)) || '');
+  if(/not valid JSON|EOF while parsing/i.test(em)) return 'My helper on this Mac is out of date (the page updated, the app didn’t). Install the latest Operator for Mac, then quit and reopen it.';
+  if(/invalid x-api-key|authentication_error|invalid api key/i.test(em)) return 'Anthropic turned the key down. Paste a new one in Settings → Connections & data → Op.';
+  if(/credit balance|billing|insufficient/i.test(em)) return 'The Anthropic account is out of credit. Top it up at console.anthropic.com and I’m back.';
+  if(res.status===429 || /rate limit|overloaded/i.test(em)) return 'Anthropic is busy right now. Try me again in a minute.';
   return 'I couldn’t reach my brain just now: '+((res.j && res.j.error && res.j.error.message) || 'the Operator app didn’t answer')+'.';
 }
 

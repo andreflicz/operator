@@ -407,3 +407,65 @@ app.whenReady().then(() => {
   if (how) win.webContents.once('did-finish-load', () => setTimeout(() => afterMoveIn(how), 2500));
   win.webContents.on('did-finish-load', () => { if (hookOk) run('window.__opGlobalKey = true'); });
 });
+
+// ---- Round 68: Operator on your iPhone ----
+// Off until you turn it on (Settings → Connections & data → Your iPhone). Then a small page is served on your home
+// Wi-Fi (port 8940): open it in Safari on the iPhone, type the 6-digit code once, and Add to Home Screen. From there you
+// can talk to Op (typed or dictated), lock in and out, and add a task. Every request needs the code; nothing is
+// reachable from outside your network, and the page only asks the app the few things below.
+const PHONE_FILE = path.join(DATA_DIR, 'phone.json');
+let phone = { on: false, code: '' }, phoneSrv = null, phoneSeen = 0;
+try { phone = Object.assign(phone, JSON.parse(fs.readFileSync(PHONE_FILE, 'utf8'))); } catch (e) {}
+function phoneSave() { try { fs.mkdirSync(DATA_DIR, { recursive: true }); fs.writeFileSync(PHONE_FILE, JSON.stringify(phone), { mode: 0o600 }); } catch (e) {} }
+function lanIp() {
+  const nets = os.networkInterfaces();
+  for (const k of Object.keys(nets)) for (const n of nets[k] || []) if (n.family === 'IPv4' && !n.internal && !/^169\.254\./.test(n.address)) return n.address;
+  return '';
+}
+function phoneInfo() { return { on: !!phone.on, code: phone.code, url: phone.on && lanIp() ? 'http://' + lanIp() + ':8940' : '', seen: phoneSeen }; }
+function phoneStop() { if (phoneSrv) { try { phoneSrv.close(); } catch (e) {} phoneSrv = null; } }
+function phoneStart() {
+  phoneStop(); if (!phone.on) return;
+  if (!/^\d{6}$/.test(phone.code || '')) { phone.code = String(Math.floor(100000 + Math.random() * 900000)); phoneSave(); }
+  const http = require('http');
+  const page = (() => { try { return fs.readFileSync(path.join(__dirname, 'phone.html'), 'utf8'); } catch (e) { return '<h1>Operator</h1>'; } })();
+  const fails = {};
+  phoneSrv = http.createServer((req, res) => {
+    const ip = (req.socket.remoteAddress || '').replace(/^::ffff:/, '');
+    // (only your own network: private addresses)
+    if (!/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|127\.|::1$|fe80:)/i.test(ip)) { res.writeHead(403); return res.end(); }
+    const send = (code, obj, type) => { res.writeHead(code, { 'Content-Type': type || 'application/json', 'Cache-Control': 'no-store' }); res.end(type ? obj : JSON.stringify(obj)); };
+    const u = new URL(req.url, 'http://x');
+    if (req.method === 'GET' && (u.pathname === '/' || u.pathname === '/index.html')) return send(200, page, 'text/html; charset=utf-8');
+    if (u.pathname === '/manifest.json') return send(200, JSON.stringify({ name: 'Operator', short_name: 'Operator', display: 'standalone', background_color: '#0d0f14', theme_color: '#0d0f14', start_url: '/' }), 'application/manifest+json');
+    if (!u.pathname.startsWith('/api/')) return send(404, { error: 'not found' });
+    // (six wrong codes from one address: it waits a minute)
+    const f = fails[ip] || { n: 0, at: 0 };
+    if (f.n >= 6 && Date.now() - f.at < 60000) return send(429, { error: 'wait a minute' });
+    if (req.headers['x-op-code'] !== phone.code) { fails[ip] = { n: f.n + 1, at: Date.now() }; return send(401, { error: 'wrong code' }); }
+    fails[ip] = { n: 0, at: 0 }; phoneSeen = Date.now();
+    let body = '';
+    req.on('data', (c) => { body += c; if (body.length > 20000) req.destroy(); });
+    req.on('end', async () => {
+      let x = {}; try { x = body ? JSON.parse(body) : {}; } catch (e) {}
+      const act = u.pathname.slice(5);
+      const calls = {
+        state: 'operatorPage.phoneState()',
+        lockin: 'operatorPage.phoneLockIn()',
+        lockout: 'operatorPage.phoneLockOut()',
+        ask: 'operatorPage.ask(' + JSON.stringify(String(x.text || '').slice(0, 4000)) + ')',
+        task: 'operatorPage.phoneTask(' + JSON.stringify(String(x.title || '').slice(0, 200)) + ')'
+      };
+      if (!calls[act]) return send(404, { error: 'not found' });
+      const out = await run('Promise.resolve(' + calls[act] + ')');
+      send(200, { ok: out != null, out: out });
+    });
+  });
+  phoneSrv.on('error', (e) => log('phone server', e.message));
+  phoneSrv.listen(8940, '0.0.0.0');
+}
+ipcMain.handle('phone:info', () => phoneInfo());
+ipcMain.handle('phone:set', (e, on) => { phone.on = !!on; if (on && !phone.code) phone.code = ''; phoneSave(); phoneStart(); return phoneInfo(); });
+ipcMain.handle('phone:newCode', () => { phone.code = ''; phoneSave(); phoneStart(); return phoneInfo(); });
+app.whenReady().then(() => { if (phone.on) phoneStart(); });
+app.on('will-quit', () => phoneStop());

@@ -19,5 +19,9 @@ contextBridge.exposeInMainWorld('operatorApp', {
   talkCheck: () => ipcRenderer.invoke('op:talkCheck'),
   relaunch: () => ipcRenderer.send('op:relaunch'),
   // Round 66: save the client report as a PDF
-  pdf: (name) => ipcRenderer.invoke('op:pdf', String(name || 'Report.pdf'))
+  pdf: (name) => ipcRenderer.invoke('op:pdf', String(name || 'Report.pdf')),
+  // Round 68: Operator on your iPhone (on/off, the address, the pairing code)
+  phoneInfo: () => ipcRenderer.invoke('phone:info'),
+  phoneSet: (on) => ipcRenderer.invoke('phone:set', !!on),
+  phoneNewCode: () => ipcRenderer.invoke('phone:newCode')
 });
