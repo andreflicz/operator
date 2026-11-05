@@ -41,6 +41,9 @@ fi
 
 say "3/5  Putting it in Applications"
 APP="${OPERATOR_APPS:-/Applications}/Operator.app"
+# (who signed the copy that's there now: if it wasn't this installer's signature, macOS's switches for it are stale)
+OLD_SIG=""; [ -e "$APP" ] && OLD_SIG=$(codesign -dvv "$APP" 2>&1 | grep -c "Authority=Operator Local Signing")
+if pgrep -xq Operator; then osascript -e 'tell application "Operator" to quit' >/dev/null 2>&1; sleep 2; fi
 if [ -e "$APP" ]; then rm -rf "$APP" 2>/dev/null || sudo rm -rf "$APP" || die "couldn't remove the old Operator.app"; fi
 ditto "$APP_IN" "$APP" 2>/dev/null || sudo ditto "$APP_IN" "$APP" || die "couldn't copy Operator.app into Applications"
 [ -w "$APP" ] || sudo chown -R "$(id -un)" "$APP"
@@ -94,9 +97,20 @@ sign "$APP"
 codesign --verify --strict "$APP" 2>"$TMP/verify.log" || { cat "$TMP/verify.log"; die "macOS doesn't accept the signature."; }
 xattr -cr "$APP"
 
+# A switch in Privacy & Security that belongs to a copy signed another way shows on and does nothing. Clear Operator's
+# own entries when the signature changed, so macOS asks once, fresh. Same signature as last time: left alone.
+if [ "$IDENT" = "-" ] || [ "${OLD_SIG:-0}" = "0" ]; then
+  tccutil reset Accessibility com.local.operator >/dev/null 2>&1
+  tccutil reset ListenEvent com.local.operator >/dev/null 2>&1
+  FRESH=1
+fi
+
 say "5/5  Opening Operator"
 open "$APP" || die "macOS wouldn't open it. Try right-click → Open on Operator in Applications."
 say "Done. Version $(defaults read "$APP/Contents/Info.plist" CFBundleShortVersionString 2>/dev/null)."
-echo "Talk key outside the app: Settings → Op → Check. It opens the right setting and tells you what's missing."
-echo "(First time with this installer: in Privacy & Security → Input Monitoring and Accessibility, remove Operator"
-echo "with − and add it again with +, then Restart from that same Check panel. Later updates keep it.)"
+if [ -n "$FRESH" ]; then
+  echo "macOS will ask to let Operator use Accessibility (for the talk key in other apps). Click Open System Settings,"
+  echo "turn Operator on, then in Operator: Settings → Op → Check → Restart Operator. Later updates keep it."
+else
+  echo "Permissions kept from last time."
+fi

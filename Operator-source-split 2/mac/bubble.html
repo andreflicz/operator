@@ -5,9 +5,9 @@
   html,body{ margin:0; height:100%; background:transparent; overflow:hidden; font:13px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; color:var(--ink); user-select:none; }
   /* the bubble: drag it anywhere, tap it to write */
   #dot{ position:absolute; right:6px; bottom:6px; width:52px; height:52px; border-radius:50%; background:var(--bg); border:1px solid var(--line); box-shadow:0 6px 20px rgba(0,0,0,.35);
-    display:flex; align-items:center; justify-content:center; font-size:22px; cursor:pointer; -webkit-app-region:drag; transition:transform .12s; }
+    display:flex; align-items:center; justify-content:center; font-size:22px; cursor:pointer; transition:transform .12s; }
   #dot:hover{ transform:scale(1.05); }
-  #dot span{ -webkit-app-region:no-drag; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:50%; }
+  #dot span{ pointer-events:none; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:50%; }
   #card{ position:absolute; inset:6px; display:none; flex-direction:column; background:var(--bg); border:1px solid var(--line); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.4); overflow:hidden; }
   body.open #dot{ display:none; } body.open #card{ display:flex; }
   #bar{ display:flex; align-items:center; gap:8px; padding:10px 12px 6px; -webkit-app-region:drag; }
@@ -40,10 +40,24 @@
   function open(){ document.body.classList.add('open'); window.bubble.open(true); setTimeout(() => t.focus(), 30); }
   function close(){ document.body.classList.remove('open'); window.bubble.open(false); }
   // a tap opens it; a drag only moves it
+  // (moved by hand: anywhere on the dot is a tap, and a drag moves the bubble)
   let down = null;
-  document.getElementById('dot').addEventListener('mousedown', (e) => { down = [e.screenX, e.screenY]; });
-  document.getElementById('dot').addEventListener('mouseup', (e) => { if(down && Math.abs(e.screenX - down[0]) + Math.abs(e.screenY - down[1]) < 4) open(); down = null; });
-  document.getElementById('open').addEventListener('click', open);
+  const dot = document.getElementById('dot');
+  dot.addEventListener('pointerdown', async (e) => {
+    if(e.button !== 0) return;
+    const d = { x: e.screenX, y: e.screenY, win: null, moved: false }; down = d;
+    try{ dot.setPointerCapture(e.pointerId); }catch(err){}
+    try{ d.win = await window.bubble.pos(); }catch(err){}
+  });
+  dot.addEventListener('pointermove', (e) => {
+    const d = down; if(!d || !d.win) return;
+    const dx = e.screenX - d.x, dy = e.screenY - d.y;
+    if(!d.moved && Math.abs(dx) + Math.abs(dy) < 4) return;
+    d.moved = true; window.bubble.moveTo(d.win[0] + dx, d.win[1] + dy);
+  });
+  const lift = (e) => { const d = down; down = null; if(!d) return; if(d.moved) window.bubble.moved(); else open(); };
+  dot.addEventListener('pointerup', lift);
+  dot.addEventListener('pointercancel', () => { const d = down; down = null; if(d && d.moved) window.bubble.moved(); });
   document.getElementById('min').addEventListener('click', close);
   document.getElementById('cancel').addEventListener('click', close);
   t.addEventListener('input', sync);

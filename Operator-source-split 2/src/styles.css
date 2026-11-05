@@ -10835,3 +10835,10 @@ html[data-holiday="newyear"]{ --accent:#F5D547; } html[data-holiday="july4"]{ --
 .tabs .r62-jtabs .seg-tabs{ padding:2px !important; border-radius:10px !important; }
 .tabs .r62-jtabs .seg-tab{ padding:3px 10px !important; font-size:12.5px !important; line-height:1.35 !important; min-height:0 !important; }
 .tabs .r62-jtabs{ margin-top:-10px; margin-bottom:-2px; }
+
+/* ===== Round 69: the iPhone card, scan to pair ===== */
+.r69-ph{ display:flex; gap:18px; align-items:center; margin:12px 0 6px; }
+.r69-qr{ flex:0 0 auto; width:148px; height:148px; padding:8px; background:#fff; border-radius:14px; box-sizing:border-box; }
+.r69-qr svg{ width:100%; height:100%; display:block; }
+.r69-steps{ margin:0; padding-left:18px; display:flex; flex-direction:column; gap:8px; line-height:1.4; }
+@media (max-width:560px){ .r69-ph{ flex-direction:column; align-items:flex-start; } }

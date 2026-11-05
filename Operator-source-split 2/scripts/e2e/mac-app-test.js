@@ -13,7 +13,9 @@ const get = (port, p) => new Promise((res) => { const r = http.get({host:'127.0.
   // 1. the old app's data, in a real Chromium profile, at the same file:// origin
   const page = path.join(MAC, 'res', 'command-center-2.html');
   const old = await chromium.launchPersistentContext(prof, {headless:true, args:['--no-sandbox']});
-  const op = await old.newPage(); await op.goto('file://'+page); await op.waitForTimeout(800);
+  // (round 69: written from a blank page at the same file:// origin, so the app page's own saves can't race it)
+  const blank = path.join(home, 'blank.html'); fs.writeFileSync(blank, '<!doctype html><title>x</title>');
+  const op = await old.newPage(); await op.goto('file://'+blank); await op.waitForTimeout(200);
   await op.evaluate(() => { localStorage.setItem('opsdash:profile', JSON.stringify({name:'Andre Lopez'})); localStorage.setItem('opsdash:tasks', JSON.stringify({items:[{id:'m1', title:'Moved-in task', status:'today'}]})); });
   await op.waitForTimeout(300); await old.close();
   check('a Chrome-version profile to move in from', fs.existsSync(path.join(prof, 'Default', 'Local Storage')));
@@ -32,9 +34,14 @@ const get = (port, p) => new Promise((res) => { const r = http.get({host:'127.0.
   const bw = pick(/bubble\.html/);
   check('the journal bubble is out, small and on top', !!bw && await app.evaluate(({BrowserWindow}) => { const w = BrowserWindow.getAllWindows().find(x => /bubble/.test(x.webContents.getURL())); return !!w && w.isAlwaysOnTop() && w.getBounds().width===64; }));
   if(bw){
-    await bw.click('#open'); await bw.waitForTimeout(300);
+    // (round 69: dragging the dot moves the window; a tap anywhere on it opens it, not just the pencil)
+    const b0 = await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find(x => /bubble/.test(x.webContents.getURL())).getBounds());
+    await bw.mouse.move(20, 20); await bw.mouse.down(); await bw.waitForTimeout(120); await bw.mouse.move(30, 34, {steps:4}); await bw.waitForTimeout(150); await bw.mouse.up(); await bw.waitForTimeout(250);
+    const b1 = await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find(x => /bubble/.test(x.webContents.getURL())).getBounds());
+    check('drag the bubble: it moves and stays a dot', (b1.x !== b0.x || b1.y !== b0.y) && b1.width===64);
+    await bw.click('#dot', {position:{x:12, y:40}}); await bw.waitForTimeout(300);
     check('tap it: it opens into a card to write in', await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find(x => /bubble/.test(x.webContents.getURL())).getBounds().width===340));
-    await bw.fill('#t', 'Idea from the bubble'); await bw.click('#save'); await bw.waitForTimeout(1800);
+    await bw.fill('#t', 'Idea from the bubble'); await bw.click('#save'); for(let i = 0; i < 20; i++){ await bw.waitForTimeout(250); if(await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find(x => /bubble/.test(x.webContents.getURL())).getBounds().width===64)) break; }
     check('save: it is in the journal', await win.evaluate(() => JSON.parse(localStorage.getItem('opsdash:journal') || '{"entries":[]}').entries.some(e => e.text==='Idea from the bubble' && e.from==='bubble')));
     check('and the bubble goes back to a dot', await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find(x => /bubble/.test(x.webContents.getURL())).getBounds().width===64));
   }

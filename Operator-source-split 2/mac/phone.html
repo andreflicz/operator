@@ -16,17 +16,21 @@ h1{ font-size:22px; margin:0; letter-spacing:-.01em; } h1 b{ color:var(--accent)
 .card{ background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:16px; }
 .st{ display:flex; align-items:center; gap:12px; } .dot{ width:12px; height:12px; border-radius:50%; background:var(--dim); flex-shrink:0; } .st.on .dot{ background:var(--good); box-shadow:0 0 12px var(--good); }
 .st b{ font-size:17px; } .st small{ display:block; color:var(--dim); font-size:13px; margin-top:2px; }
-.big{ width:100%; padding:16px; border-radius:14px; border:0; font:600 17px/1 inherit; color:#1a1206; background:var(--accent); }
+.big{ width:100%; padding:16px; border-radius:14px; border:0; font-weight:600; font-size:17px; font-family:inherit; color:#1a1206; background:var(--accent); }
 .big.out{ background:var(--panel2); color:var(--text); border:1px solid var(--line); }
-.row{ display:flex; gap:8px; } input, textarea{ flex:1; min-width:0; padding:13px 14px; border-radius:12px; border:1px solid var(--line); background:var(--panel2); color:var(--text); font:16px inherit; }
+.row{ display:flex; gap:8px; } input, textarea{ flex:1; min-width:0; padding:13px 14px; border-radius:12px; border:1px solid var(--line); background:var(--panel2); color:var(--text); font-size:16px; font-family:inherit; }
 textarea{ resize:none; min-height:48px; }
-.go{ padding:0 18px; border-radius:12px; border:0; background:var(--accent); color:#1a1206; font:600 16px inherit; }
+.go{ padding:0 18px; border-radius:12px; border:0; background:var(--accent); color:#1a1206; font-weight:600; font-size:16px; font-family:inherit; }
 .chat{ display:flex; flex-direction:column; gap:8px; max-height:46vh; overflow:auto; }
 .m{ padding:10px 13px; border-radius:14px; max-width:88%; white-space:pre-wrap; } .m.me{ align-self:flex-end; background:var(--panel2); } .m.op{ align-self:flex-start; background:#2a2414; border:1px solid #4a3a16; }
 .k{ font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); margin-bottom:8px; }
 .pair{ display:flex; flex-direction:column; gap:12px; text-align:center; margin-top:18vh; } .pair input{ text-align:center; font-size:28px; letter-spacing:.3em; }
 .err{ color:var(--bad); font-size:14px; min-height:18px; text-align:center; }
 .hidden{ display:none !important; }
+.st.brk .dot{ background:#8fdcff; box-shadow:0 0 12px #8fdcff; }
+.now{ display:flex; gap:8px; margin-top:12px; } .now div{ flex:1; background:var(--panel2); border-radius:12px; padding:10px 12px; } .now small{ display:block; color:var(--dim); font-size:12px; } .now b{ font-size:15px; }
+.brks{ display:flex; gap:8px; } .brks button{ flex:1; padding:13px 0; border-radius:12px; border:1px solid var(--line); background:var(--panel2); color:var(--text); font-weight:600; font-size:15px; font-family:inherit; }
+.brks button.end{ background:#8fdcff; color:#062030; border:0; }
 </style></head>
 <body>
 <div id="pair" class="pair hidden">
@@ -37,8 +41,10 @@ textarea{ resize:none; min-height:48px; }
 </div>
 <div id="app" class="hidden" style="display:flex;flex-direction:column;gap:14px">
   <h1>Operator<b>.</b></h1>
-  <div class="card st" id="st"><span class="dot"></span><div><b id="stT">…</b><small id="stS"></small></div></div>
+  <div class="card"><div class="st" id="st"><span class="dot"></span><div><b id="stT">…</b><small id="stS"></small></div></div>
+    <div class="now"><div><small>Locked in today</small><b id="nToday">0m</b></div><div><small>On the Mac</small><b id="nMac">…</b></div></div></div>
   <button class="big" id="lock">Lock in</button>
+  <div class="brks" id="brks"><button data-b="15">Break 15</button><button data-b="30">30</button><button data-b="60">60</button></div>
   <div class="card"><div class="k">Op</div><div class="chat" id="chat"></div>
     <div class="row" style="margin-top:10px"><textarea id="say" rows="1" placeholder="Say something to Op"></textarea><button class="go" id="sayGo">Send</button></div></div>
   <div class="card"><div class="k">Add a task</div><div class="row"><input id="task" placeholder="What needs doing"><button class="go" id="taskGo">Add</button></div></div>
@@ -47,6 +53,8 @@ textarea{ resize:none; min-height:48px; }
 <script>
 (function(){
   var code = ''; try{ code = localStorage.getItem('opCode') || ''; }catch(e){}
+  // (scanned from the Mac's QR code: the code comes in the address, and stays there for the Home Screen icon)
+  var hc = /[#&]c=(\d{4,8})/.exec(location.hash || ''); if(hc){ code = hc[1]; try{ localStorage.setItem('opCode', code); }catch(e){} }
   var $ = function(id){ return document.getElementById(id); };
   function api(path, body){
     return fetch('/api/'+path, {method:'POST', headers:{'Content-Type':'application/json', 'X-Op-Code':code}, body:JSON.stringify(body || {})})
@@ -60,7 +68,17 @@ textarea{ resize:none; min-height:48px; }
     $('stT').textContent = s.locked ? 'Locked in · '+s.mins : (s.mode || 'Not locked in');
     $('stS').textContent = s.locked ? (s.task || '') : (s.next ? 'Next: '+s.next : '');
     $('lock').textContent = s.locked ? 'Lock out' : 'Lock in'; $('lock').classList.toggle('out', !!s.locked);
+    $('st').classList.toggle('brk', !!s.onBreak);
+    if(s.onBreak){ $('stT').textContent = 'On a break'; $('stS').textContent = s.breakBack ? 'Back at '+s.breakBack : ''; }
+    $('nToday').textContent = s.today || '0m';
+    // (are you really working: what's in front on the Mac, or how long it's sat untouched)
+    var idle = Number(s.idle) || 0;
+    $('nMac').textContent = idle >= 300 ? 'Idle '+Math.round(idle/60)+'m' : (s.app || 'In use');
+    // breaks: three lengths, or End break while on one
+    var b = $('brks');
+    b.innerHTML = s.onBreak ? '<button class="end" data-b="0">End break</button>' : '<button data-b="15">Break 15</button><button data-b="30">30</button><button data-b="60">60</button>';
   }
+  $('brks').addEventListener('click', function(e){ var t = e.target.closest('[data-b]'); if(!t) return; api('break', {min:Number(t.getAttribute('data-b'))}).then(function(j){ paint(j.out); }).catch(function(){ err('That didn’t go through.'); }); });
   function refresh(){ return api('state').then(function(j){ show(true); err(''); paint(j.out); }).catch(function(e){ if(e.message==='code'){ show(false); } else err('Can’t reach your Mac. Same Wi-Fi, and Operator open on it?'); }); }
   function bubble(who, t){ var d = document.createElement('div'); d.className = 'm '+who; d.textContent = t; $('chat').appendChild(d); $('chat').scrollTop = 1e9; return d; }
   function speak(t){ try{ var u = new SpeechSynthesisUtterance(t); speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){} }

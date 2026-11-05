@@ -221,7 +221,7 @@ function bubCreate() {
   const onScreen = x != null && screen.getAllDisplays().some((d) => x >= d.workArea.x - 20 && y >= d.workArea.y - 20 && x <= d.workArea.x + d.workArea.width - 40 && y <= d.workArea.y + d.workArea.height - 40);
   if (!onScreen) { x = wa.x + wa.width - BUB_SMALL.w - 24; y = wa.y + wa.height - BUB_SMALL.h - 24; }
   bub = new BrowserWindow({ x, y, width: BUB_SMALL.w, height: BUB_SMALL.h, frame: false, transparent: true, resizable: false, movable: true, minimizable: false, maximizable: false, fullscreenable: false,
-    skipTaskbar: true, hasShadow: false, alwaysOnTop: true, show: false, backgroundColor: '#00000000',
+    skipTaskbar: true, hasShadow: false, alwaysOnTop: true, show: false, backgroundColor: '#00000000', acceptFirstMouse: true,
     webPreferences: { preload: path.join(__dirname, 'bubble-preload.js'), contextIsolation: true, nodeIntegration: false } });
   bub.setAlwaysOnTop(true, 'floating');
   try { bub.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true }); } catch (e) {}
@@ -248,6 +248,11 @@ ipcMain.on('bubble:open', (e, on) => {
   bub.setBounds({ x: b.x + b.width - s.w, y: b.y + b.height - s.h, width: s.w, height: s.h });
   if (on) bub.focus();
 });
+// (Round 69: the dot is moved by hand, not as a window drag area: on a Mac a drag area swallows the click, so tapping
+// the bubble did nothing)
+ipcMain.on('bubble:moveTo', (e, x, y) => { if (!bub) return; const b = bub.getBounds(); bub.setBounds({ x: Math.round(x), y: Math.round(y), width: b.width, height: b.height }); });
+ipcMain.handle('bubble:pos', () => { if (!bub) return null; const b = bub.getBounds(); return [b.x, b.y]; });
+ipcMain.on('bubble:moved', () => { if (!bub) return; const b = bub.getBounds(); bubCfg.x = b.x + b.width - BUB_SMALL.w; bubCfg.y = b.y + b.height - BUB_SMALL.h; bubSave(); });
 ipcMain.handle('bubble:save', async (e, text) => {
   const ok = await run('operatorPage.addJournal(' + JSON.stringify(String(text || '').slice(0, 20000)) + ')');
   return !!ok;
@@ -357,13 +362,32 @@ ipcMain.on('op:openPrivacy', (e, which) => { openPane(which); });
 // Round 62: "Check" does something you can see. It asks macOS to list Operator under Accessibility (macOS shows its own
 // prompt the first time), starts listening for the key if it wasn't, opens the setting still missing, and reports back.
 // macOS only lets an app see keys from other apps after the app restarts, so the page then offers a restart.
-ipcMain.handle('op:talkCheck', () => {
-  let trusted = true;
-  if (process.platform === 'darwin') { try { trusted = require('electron').systemPreferences.isTrustedAccessibilityClient(true); } catch (e) {} }
+// Round 69: a switch that shows on in System Settings but belongs to an older copy of Operator (another signature) does
+// nothing, and turning it off and on doesn't help. So when macOS says Operator isn't allowed, Check clears Operator's old
+// entries first (tccutil reset, only Operator's own) and asks again: a fresh switch appears, off, ready to turn on.
+const BUNDLE_ID = 'com.local.operator';
+let lastCheck = 0;
+function tccReset(service) {
+  return new Promise((res) => { try { require('child_process').execFile('/usr/bin/tccutil', ['reset', service, BUNDLE_ID], (err) => { log('tcc reset', service, err ? String(err.message || err) : 'ok'); res(!err); }); } catch (e) { res(false); } });
+}
+ipcMain.handle('op:talkCheck', async () => {
+  let trusted = true, reset = '';
+  if (process.platform === 'darwin') {
+    try { trusted = require('electron').systemPreferences.isTrustedAccessibilityClient(false); } catch (e) {}
+    if (!trusted) {
+      if (await tccReset('Accessibility')) reset = 'Accessibility';
+      await tccReset('ListenEvent');
+      try { trusted = require('electron').systemPreferences.isTrustedAccessibilityClient(true); } catch (e) {}
+    } else if (hookOk && !lastHook && lastCheck && Date.now() - lastCheck > 20000) {
+      // allowed, listening, but not one key has come through: the Input Monitoring switch is the stale one
+      if (await tccReset('ListenEvent')) reset = 'Input Monitoring';
+    }
+  }
+  lastCheck = Date.now();
   if (talk.on) hookStart();
   const h = keyHealth();
   openPane(!trusted ? 'Accessibility' : 'ListenEvent');
-  return Object.assign(h, { trusted: trusted, opened: !trusted ? 'Accessibility' : 'Input Monitoring' });
+  return Object.assign(h, { trusted: trusted, reset: reset, opened: !trusted ? 'Accessibility' : 'Input Monitoring' });
 });
 // Round 66: the client report as a real PDF (the page shows only the report while it prints)
 ipcMain.handle('op:pdf', async (e, name) => {
@@ -454,10 +478,13 @@ function phoneStart() {
         lockin: 'operatorPage.phoneLockIn()',
         lockout: 'operatorPage.phoneLockOut()',
         ask: 'operatorPage.ask(' + JSON.stringify(String(x.text || '').slice(0, 4000)) + ')',
-        task: 'operatorPage.phoneTask(' + JSON.stringify(String(x.title || '').slice(0, 200)) + ')'
+        task: 'operatorPage.phoneTask(' + JSON.stringify(String(x.title || '').slice(0, 200)) + ')',
+        break: 'operatorPage.phoneBreak ? operatorPage.phoneBreak(' + (Math.max(0, Math.min(240, Math.round(Number(x.min) || 0)))) + ') : null'
       };
       if (!calls[act]) return send(404, { error: 'not found' });
       const out = await run('Promise.resolve(' + calls[act] + ')');
+      // (how long since the Mac was last touched, in seconds: the phone shows "Idle 40m" when you've walked off)
+      if (out && typeof out === 'object') { try { out.idle = require('electron').powerMonitor.getSystemIdleTime(); } catch (e) {} }
       send(200, { ok: out != null, out: out });
     });
   });

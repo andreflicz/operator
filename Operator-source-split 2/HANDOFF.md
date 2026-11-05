@@ -447,10 +447,14 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports outside Social (R
   5. `rcodesign sign -e build/entitlements.mac.plist` each `Contents/Frameworks/*.app`, then the `Operator.app` itself;
   6. `cd out/mac-arm64 && zip -qry ../Operator-X-AppleSilicon.zip Operator.app` (and `out/mac` → `-Intel.zip`). `rcodesign verify` reports CMS errors on ad-hoc signatures; that's expected.
 - macOS blocks the first open: right-click → Open, or `xattr -cr /Applications/Operator.app`.
+- Round 69: always send install-operator.sh with the zips and have him run it. Dragging the .app in by hand gives it
+  another signature, and macOS's Accessibility / Input Monitoring switches stop working (they show on, do nothing).
+  Settings → Op → Check now clears those and asks again; the installer does too when the signature changed.
 - main.js: single instance, menu bar Tray, ⌥O show/hide, ✕ hides, ⌘Q quits, starts the helpers, move-in from the old Chrome profile, `window.operatorPage` bridge.
 
 ## Status
 Round 67 (2026-11-03): ROUND-67-LIST.md (11 items). Mac 4.0.0; 4.0.1 adds client ad assignment in Social and free transcripts.
+Round 69 (2026-11-05): ROUND-69-LIST.md. Mac 4.2.0.
 Round 68 (2026-11-04): ROUND-68-LIST.md. Mac 4.1.0.
 Round 66 (2026-11-01): ROUND-66-LIST.md (18 items). Mac 3.9.0.
 Round 65 (2026-11-01): ROUND-65-LIST.md (9 items). Mac 3.8.0.
