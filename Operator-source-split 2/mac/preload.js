@@ -23,5 +23,8 @@ contextBridge.exposeInMainWorld('operatorApp', {
   // Round 68: Operator on your iPhone (on/off, the address, the pairing code)
   phoneInfo: () => ipcRenderer.invoke('phone:info'),
   phoneSet: (on) => ipcRenderer.invoke('phone:set', !!on),
-  phoneNewCode: () => ipcRenderer.invoke('phone:newCode')
+  phoneNewCode: () => ipcRenderer.invoke('phone:newCode'),
+  // Round 70: tags away from home, and keeping the Mac awake so a tap always lands
+  tailscale: () => ipcRenderer.invoke('phone:tailscale'),
+  keepAwake: (on) => ipcRenderer.invoke('phone:keepAwake', !!on)
 });

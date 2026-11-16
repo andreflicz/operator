@@ -21,7 +21,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("opChat().push({r:'me', t:'Make the sidebar narrower and the icons bigger please', at:Date.now() - 60000}); R58.turn = {text:'Make the sidebar narrower and the icons bigger please', tools:[], filed:false, at:Date.now()}; document.querySelectorAll('#r57Notes .r57-note').forEach(n => n.remove()); opRunTool('suggest_improvement', {idea:'Narrower sidebar'}); opRunTool('suggest_improvement', {idea:'Bigger icons'})"); await p.waitForTimeout(300);
   // (round 59: an update is Op's write-up; his words are kept with it, folded)
   check('an update keeps his exact words (with Op’s write-up)', await E("(function(){ const e = r58UpdateEntries().find(e => e.said==='Make the sidebar narrower and the icons bigger please'); return !!e && e.text==='Narrower sidebar' && arr(e.summaries).indexOf('Bigger icons') >= 0; })()"));
-  check('…one entry and one note for one message (no double notification)', await E("r58UpdateEntries().filter(e => e.said==='Make the sidebar narrower and the icons bigger please').length")===1 && (await p.$$('.r60-pop')).length===1);
+  check('…one entry and one note for one message (no double notification)', await E("r58UpdateEntries().filter(e => e.said==='Make the sidebar narrower and the icons bigger please').length")===1 && (await p.$$('#r70Dock .r70-note')).length===1);   // (Round 70: Op's note lives in his corner, one at a time)
   await E("opChat().push({r:'me', t:'mark that as an update', at:Date.now()}); R58.turn = {text:'mark that as an update', tools:[], filed:false, at:Date.now()}; opChat().splice(opChat().length - 1, 0, {r:'me', t:'The calendar should start on Monday', at:Date.now() - 30000}); opRunTool('mark_update', {back:1, summary:'Calendar starts Monday'})");
   check('“mark that as an update” files the message before it, word for word (not the words “mark that…”)', await E("r58UpdateEntries().some(e => e.said==='The calendar should start on Monday') && !r58UpdateEntries().some(e => /^mark that/i.test(e.said || e.text))"));
   await E("opChat().push({r:'me', t:'Notifications should fade out smoothly', at:Date.now() - 20000}, {r:'me', t:'Business tabs: Overview, Clients, Leads', at:Date.now() - 10000}); R58.turn = {text:'go ahead', tools:[], filed:false}; window.__fu = opRunTool('file_updates', {items:[{contains:'fade out smoothly', summary:'Fading notifications'}, {contains:'business tabs', summary:'Tabs'}, {contains:'not something he said'}]})");
@@ -40,10 +40,13 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('…Undo brings it back', await E("state.focus.sessions.some(s => s.id==='sx')"));
   // ---- B. notes and the feed ----
   // (round 60: the note is a short pop-up by the XP; a click anywhere else closes it, and it fades)
-  await E("r57Note('One for the close button', 'did')"); await p.waitForTimeout(300); await p.click('#r60Pop .r60-pop-h'); await p.waitForTimeout(150);
-  check('every note can be closed', await E("document.getElementById('r60Pop').classList.contains('is-open')"));
+  // (Round 70: the note is a tap-to-open line in Op's corner; tapping it opens his chat and clears the line)
+  await E("r57Note('One for the close button', 'did')"); await p.waitForTimeout(300);
+  check('every note can be closed', !!(await p.$('#r70Dock .r70-note')));
+  await p.click('#r70Dock .r70-note'); await p.waitForTimeout(200);
+  await E("opfClose()"); await p.waitForTimeout(120);
   await p.mouse.click(700, 700); await p.waitForTimeout(100);
-  check('…and closing fades it out (no blank)', await E("(function(){ const n = document.getElementById('r60Pop'); return !n || !n.classList.contains('is-in'); })()"));
+  check('…and closing fades it out (no blank)', await E("!document.querySelector('#r70Dock .r70-note')"));
   await E("ui.notifOpen = true; const el = document.getElementById('notifPanel'); if(el) el.hidden = false; notifRender()"); await p.waitForTimeout(150);
   check('Notifications: a “From Op” feed, a short line each', (await p.$$('#notifPanel .r58-fi')).length >= 3 && /From Op/.test(await p.textContent('#notifPanel')));
   await p.click('#notifPanel .r58-fi.is-update'); await p.waitForTimeout(200);

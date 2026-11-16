@@ -32,17 +32,19 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("AI.hasKey = false");
   // the pop-up by the XP
   await E("ui.view='business'; ui.businessTab='overview'; renderView(); r57Note('Calendar weeks start on Monday, not Sunday. Posted reels green, late ones red.', 'idea')"); await p.waitForTimeout(500);
-  check('Op logs something: a short line pops up by the XP (not a long note in the corner)', /Op saved something to App updates/.test(await p.textContent('#r60Pop')) && !(await p.$('.r57-note:not(.is-out)')));
-  check('…sitting next to your level', await E("(function(){ const a = document.getElementById('r60Pop').getBoundingClientRect(), d = document.querySelector('#musicDock .md-in').getBoundingClientRect(); return a.right <= d.left + 1 && Math.abs((a.top + a.height/2) - (d.top + d.height/2)) < 30; })()"));
-  await p.click('#r60Pop .r60-pop-h'); await p.waitForTimeout(250);
-  check('…tap it for the whole thing', await E("document.getElementById('r60Pop').classList.contains('is-open')") && /late ones red/.test(await p.textContent('#r60Pop .r60-pop-b')));
+  // (Round 70 moved it again: one short line in Op's own corner, bottom left, tap it for his chat)
+  check('Op logs something: a short line pops up', /App updates/i.test(await p.textContent('#r70Dock .r70-note')) && !(await p.$('.r57-note:not(.is-out)')));
+  check('…in Op’s corner, bottom left', await E("(function(){ const a = document.querySelector('#r70Dock .r70-note').getBoundingClientRect(); return a.left < innerWidth/2 && a.bottom > innerHeight/2; })()"));
+  await p.click('#r70Dock .r70-note'); await p.waitForTimeout(250);
+  check('…tap it for the whole thing', await E("r58Feed().some(f => /late ones red/.test(f.full || f.short))") && await E("!!document.getElementById('opFull')"));
+  await E("opfClose()"); await p.waitForTimeout(150);
   check('…and it’s in Notifications → From Op', await E("r58Feed().some(f => /weeks start on Monday/.test(f.short))"));
   await p.mouse.click(700, 600); await p.waitForTimeout(500);
   // push-to-talk in the background, explained
   await E("state.profile.opPttKey = 'F5'; ui.view='settings'; ui.settingsTab='op'; renderView()"); await p.waitForTimeout(200);
   check('Settings → Op says whether the talk key works with Operator in the background', !!(await p.$('.r60-ptt')) && /in front|anywhere/.test(await p.textContent('.r60-ptt')));
   // ================= B. Playbooks =================
-  await E("const ob = document.getElementById('opBub'); if(ob) ob.remove(); const pp = document.getElementById('r60Pop'); if(pp) pp.remove(); ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='board'; renderView()"); await p.waitForTimeout(250);
+  await E("const ob = document.getElementById('opBub'); if(ob) ob.remove(); const pp = document.getElementById('r70Dock'); if(pp) pp.remove(); ui.view='business'; ui.businessTab='lifecycle'; ui.pbView='board'; renderView()"); await p.waitForTimeout(250);
   check('no client playbooks yet: presets to start from', (await p.$$('.r60-empty .r60-pre-b')).length >= 4);
   // (round 61: no combined preset; you make both and chain them in the builder)
   await p.click('.r60-empty [data-action="r60UsePreset"][data-id="monthly"]'); await p.waitForTimeout(250);

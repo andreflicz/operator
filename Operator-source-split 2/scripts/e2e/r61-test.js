@@ -30,7 +30,9 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Journal: Entries / Boards / Vault at the top right', await E("(function(){ const t = document.querySelector('.r62-jtabs .seg-tabs').getBoundingClientRect(), v = document.getElementById('viewRoot').getBoundingClientRect(); return t.right > v.right - 30; })()"));
   check('…the journal centered, its date centered', await E("(function(){ const s = document.querySelector('.r60-seg').getBoundingClientRect(), w = document.querySelector('.r60-jw').getBoundingClientRect(); return Math.abs((s.left + s.right)/2 - (w.left + w.right)/2) < 3 && getComputedStyle(document.querySelector('.r60-jw-d')).textAlign==='center'; })()"));
   // (round 67: search moved into the filter line above the entries)
-  check('…search is in the filter line above the entries', await E("(function(){ const q = document.querySelector('.r67-jf #journalSearchInput'), f = document.getElementById('journalHistoryContainer'); return !!q && q.getBoundingClientRect().top < f.getBoundingClientRect().top && !document.querySelector('.r60-js'); })()"));
+  // (Round 70 put search and sorting behind one Filter button, so it opens before you can type in it)
+  check('…search is behind the Filter button above the entries', await E("(function(){ const b = document.querySelector('.r70-jf .r70-jf-b'), f = document.getElementById('journalHistoryContainer'); return !!b && !document.querySelector('#journalSearchInput') && b.getBoundingClientRect().top < f.getBoundingClientRect().top && !document.querySelector('.r60-js'); })()"));
+  await p.click('.r70-jf .r70-jf-b'); await p.waitForTimeout(200);
   await p.fill('#journalSearchInput', 'Harbor'); await p.waitForTimeout(200);
   check('…tap it to search', await E("ui.journalSearchText==='Harbor'"));
   await E("ACTIONS.r67JClear()");
@@ -39,7 +41,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('Social shows the business name top left', /Comet Collective/i.test(await p.textContent('#viewRoot .view-header')));
   // ---- D. Op ----
   await E("ui.view='today'; renderView(); r57Note('Saved something', 'idea')"); await p.waitForTimeout(80);
-  check('Op’s note fades in (not a pop)', await E("(function(){ const s = getComputedStyle(document.getElementById('r60Pop')); return /opacity/.test(s.transitionProperty) && parseFloat(s.transitionDuration) >= .45; })()"));
+  // (Round 70: the note moved into Op's corner, bottom left; it still fades rather than pops)
+  check('Op’s note fades in (not a pop)', await E("(function(){ const n = document.querySelector('#r70Dock .r70-note'); if(!n) return false; const s = getComputedStyle(n); return /opacity/.test(s.transitionProperty) && parseFloat(s.transitionDuration) >= .28; })()"));
   // (round 62: it sizes itself AND has its resize grip back, as Andre asked)
   // (round 64: Op is a small tab: his state and three buttons, nothing to size)
   check('Op’s window sizes itself, still resizable', await E("(function(){ opBubShow(); const b = document.getElementById('opBub'); return b.classList.contains('r64-mini') && b.getBoundingClientRect().height < 60; })()"));

@@ -132,7 +132,9 @@ const CORS = {'Access-Control-Allow-Origin':'*'};
 
   // ================= G11. My journal: search and filters =================
   await E("ui.journalMode='entries'; ui.journalViewMode='personal'; renderView()"); await p.waitForTimeout(250);
-  check('My journal: search, month, day and the tags on one line above the entries', !!(await p.$('.r67-jf #journalSearchInput')) && !!(await p.$('.r67-jf #r67JMonth')) && !!(await p.$('.r67-jf #r67JDay')) && /Starred[\s\S]*Updates/.test(await p.textContent('.r67-jf-t')) && !(await p.$('.r61-js')));
+  // (Round 70: the same line, now behind one Filter button instead of sitting under the writing card)
+  await p.click('.r70-jf .r70-jf-b'); await p.waitForTimeout(250);
+  check('My journal: search, month, day and the tags, behind one Filter button', !!(await p.$('.r70-jfp #journalSearchInput')) && !!(await p.$('.r70-jfp #r67JMonth')) && !!(await p.$('.r70-jfp #r67JDay')) && /Starred[\s\S]*Updates/.test(await p.textContent('.r67-jf-t')) && !(await p.$('.r61-js')));
   await p.selectOption('#r67JMonth', '2026-09'); await p.waitForTimeout(250);
   check('…a month shows just that month', /saving for the studio/.test(await p.textContent('#journalHistoryContainer')) && !/Harbor deal/.test(await p.textContent('#journalHistoryContainer')));
   await p.click('[data-action="r67JClear"]'); await p.waitForTimeout(200);

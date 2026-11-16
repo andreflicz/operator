@@ -452,7 +452,8 @@ app.whenReady().then(() => {
 // can talk to Op (typed or dictated), lock in and out, and add a task. Every request needs the code; nothing is
 // reachable from outside your network, and the page only asks the app the few things below.
 const PHONE_FILE = path.join(DATA_DIR, 'phone.json');
-let phone = { on: false, code: '' }, phoneSrv = null, phoneSeen = 0;
+const esc = (x) => String(x == null ? '' : x).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let phone = { on: false, code: '' }, phoneSrv = null, phoneSeen = 0, phoneIcon = null;
 try { phone = Object.assign(phone, JSON.parse(fs.readFileSync(PHONE_FILE, 'utf8'))); } catch (e) {}
 function phoneSave() { try { fs.mkdirSync(DATA_DIR, { recursive: true }); fs.writeFileSync(PHONE_FILE, JSON.stringify(phone), { mode: 0o600 }); } catch (e) {} }
 function lanIp() {
@@ -467,20 +468,66 @@ function phoneStart() {
   if (!/^\d{6}$/.test(phone.code || '')) { phone.code = String(Math.floor(100000 + Math.random() * 900000)); phoneSave(); }
   const http = require('http');
   const page = (() => { try { return fs.readFileSync(path.join(__dirname, 'phone.html'), 'utf8'); } catch (e) { return '<h1>Operator</h1>'; } })();
-  const fails = {};
+  const fails = {}, tagFails = {};
+  // what a browser (or the iPhone's banner) sees after a tap: one line, big, and it closes itself
+  const tagPage = (r) => '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    + '<title>' + (r.tag ? esc(r.tag) : 'Operator') + '</title><style>'
+    + 'html,body{margin:0;height:100%;background:#0d0f14;color:#eef1f7;font:500 17px/1.5 -apple-system,system-ui,sans-serif;}'
+    + 'main{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center;box-sizing:border-box;}'
+    + '.d{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:28px;background:' + (r.ok ? 'rgba(126,240,192,.14)' : 'rgba(255,143,143,.14)') + ';}'
+    + 'h1{margin:0;font-size:15px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;opacity:.5;}'
+    + 'p{margin:0;font-size:20px;max-width:21em;}'
+    + '</style></head><body><main><div class="d">' + (r.ok ? '&#10003;' : '&#9888;') + '</div>'
+    + '<h1>' + (r.tag ? esc(r.tag) : 'Operator') + '</h1><p>' + esc(r.say || '') + '</p></main>'
+    + '<script>setTimeout(function(){ try{ window.close(); }catch(e){} }, 2600);</script></body></html>';
   phoneSrv = http.createServer((req, res) => {
     const ip = (req.socket.remoteAddress || '').replace(/^::ffff:/, '');
-    // (only your own network: private addresses)
-    if (!/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|127\.|::1$|fe80:)/i.test(ip)) { res.writeHead(403); return res.end(); }
+    // (only your own network: private addresses, plus a Tailscale tailnet at 100.64–100.127, which is
+    //  just as private — it's a line between your own devices. `tailscale serve` arrives from 127.0.0.1.)
+    const tailnet = /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./.test(ip);
+    if (!tailnet && !/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|127\.|::1$|fe80:)/i.test(ip)) { res.writeHead(403); return res.end(); }
     const send = (code, obj, type) => { res.writeHead(code, { 'Content-Type': type || 'application/json', 'Cache-Control': 'no-store' }); res.end(type ? obj : JSON.stringify(obj)); };
     const u = new URL(req.url, 'http://x');
     if (req.method === 'GET' && (u.pathname === '/' || u.pathname === '/index.html')) return send(200, page, 'text/html; charset=utf-8');
-    if (u.pathname === '/manifest.json') return send(200, JSON.stringify({ name: 'Operator', short_name: 'Operator', display: 'standalone', background_color: '#0d0f14', theme_color: '#0d0f14', start_url: '/' }), 'application/manifest+json');
-    if (!u.pathname.startsWith('/api/')) return send(404, { error: 'not found' });
+    // ---- Round 70: a tag's own link ----
+    // The secret in the address is the whole of the authentication, because a tag can't carry a header and an
+    // iPhone banner can't type a code. It runs the tag and says what happened — as a small page for a browser,
+    // or as JSON for a Shortcut. It can never do anything but run a tag.
+    if (/^\/t\/[0-9a-zA-Z]{8,64}$/.test(u.pathname)) {
+      const sec = u.pathname.slice(3);
+      const t = tagFails[ip] || { n: 0, at: 0 };
+      if (t.n >= 10 && Date.now() - t.at < 60000) return send(429, { error: 'too many', hint: 'Wait a minute.' });
+      const wantsJson = /application\/json/.test(req.headers.accept || '') || u.searchParams.get('json') === '1';
+      let val = u.searchParams.get('value') || '';
+      const finish = async () => {
+        const out = await run('Promise.resolve(operatorPage.phoneTag ? operatorPage.phoneTag(' + JSON.stringify(sec) + ', ' + JSON.stringify(String(val).slice(0, 4000)) + ') : null)');
+        if (!out) { tagFails[ip] = { n: t.n + 1, at: Date.now() }; }
+        else if (out.code === 'unknown') { tagFails[ip] = { n: t.n + 1, at: Date.now() }; }
+        else tagFails[ip] = { n: 0, at: 0 };
+        phoneSeen = Date.now();
+        const r = out || { ok: false, say: 'Operator is running but didn’t answer. Open it on the Mac.', code: 'noanswer' };
+        if (wantsJson) return send(r.ok ? 200 : 404, r);
+        return send(200, tagPage(r), 'text/html; charset=utf-8');
+      };
+      if (req.method === 'POST') { let b = ''; req.on('data', (c) => { b += c; if (b.length > 8000) req.destroy(); }); req.on('end', () => { try { const j = JSON.parse(b || '{}'); if (j && j.value != null) val = String(j.value); } catch (e) { if (b) val = b.slice(0, 4000); } finish(); }); }
+      else finish();
+      return;
+    }
+    if (u.pathname === '/manifest.json') return send(200, JSON.stringify({ name: 'Operator', short_name: 'Operator', display: 'standalone', background_color: '#0d0f14', theme_color: '#0d0f14', start_url: '/', icons: [{ src: '/icon.png', sizes: '180x180', type: 'image/png' }] }), 'application/manifest+json');
+    // a real Home Screen icon: the app's own, at 180px, which is what iOS asks for
+    if (u.pathname === '/icon.png') {
+      if (!phoneIcon) { try { phoneIcon = nativeImage.createFromPath(path.join(__dirname, 'build', 'icon.icns')).resize({ width: 180, height: 180 }).toPNG(); } catch (e) { phoneIcon = Buffer.alloc(0); } }
+      if (!phoneIcon.length) return send(404, { error: 'no icon' });
+      res.writeHead(200, { 'Content-Type': 'image/png', 'Cache-Control': 'max-age=86400' });
+      return res.end(phoneIcon);
+    }
+    if (!u.pathname.startsWith('/api/')) return send(404, { error: 'not found', hint: 'Operator serves / for the page and /t/<tag> for a tag.' });
+    // what this build can do, so an error can explain itself instead of going quiet
+    if (u.pathname === '/api/version') return send(200, { ok: true, app: app.getVersion(), tags: true, routes: ['state', 'lockin', 'lockout', 'break', 'ask', 'task', 'tag', 'tags', 'runtag', 'speak', 'today', 'meals', 'meal', 'weigh', 'quick', 'taskdone', 'standard', 'version'] });
     // (six wrong codes from one address: it waits a minute)
     const f = fails[ip] || { n: 0, at: 0 };
-    if (f.n >= 6 && Date.now() - f.at < 60000) return send(429, { error: 'wait a minute' });
-    if (req.headers['x-op-code'] !== phone.code) { fails[ip] = { n: f.n + 1, at: Date.now() }; return send(401, { error: 'wrong code' }); }
+    if (f.n >= 6 && Date.now() - f.at < 60000) return send(429, { error: 'too many tries', hint: 'Wait a minute, then try the code again.' });
+    if (req.headers['x-op-code'] !== phone.code) { fails[ip] = { n: f.n + 1, at: Date.now() }; return send(401, { error: 'wrong code', hint: 'The code is in Settings → Connections & data → Your iPhone on the Mac.' }); }
     fails[ip] = { n: 0, at: 0 }; phoneSeen = Date.now();
     let body = '';
     req.on('data', (c) => { body += c; if (body.length > 20000) req.destroy(); });
@@ -493,9 +540,31 @@ function phoneStart() {
         lockout: 'operatorPage.phoneLockOut()',
         ask: 'operatorPage.ask(' + JSON.stringify(String(x.text || '').slice(0, 4000)) + ')',
         task: 'operatorPage.phoneTask(' + JSON.stringify(String(x.title || '').slice(0, 200)) + ')',
-        break: 'operatorPage.phoneBreak ? operatorPage.phoneBreak(' + (Math.max(0, Math.min(240, Math.round(Number(x.min) || 0)))) + ') : null'
+        break: 'operatorPage.phoneBreak ? operatorPage.phoneBreak(' + (Math.max(0, Math.min(240, Math.round(Number(x.min) || 0)))) + ') : null',
+        // ---- Round 70 ----
+        tag: 'operatorPage.phoneTag ? operatorPage.phoneTag(' + JSON.stringify(String(x.secret || '').slice(0, 64)) + ', ' + JSON.stringify(String(x.value == null ? '' : x.value).slice(0, 4000)) + ') : null',
+        tags: 'operatorPage.phoneTags ? operatorPage.phoneTags() : null',
+        runtag: 'operatorPage.phoneRunTag ? operatorPage.phoneRunTag(' + JSON.stringify(String(x.id || '')) + ') : null',
+        today: 'operatorPage.phoneToday ? operatorPage.phoneToday() : null',
+        meals: 'operatorPage.phoneMeals ? operatorPage.phoneMeals() : null',
+        meal: 'operatorPage.phoneMeal ? operatorPage.phoneMeal(' + JSON.stringify(String(x.id || '')) + ', ' + JSON.stringify(String(x.text || '').slice(0, 200)) + ') : null',
+        weigh: 'operatorPage.phoneWeigh ? operatorPage.phoneWeigh(' + (Number(x.value) || 0) + ') : null',
+        quick: 'operatorPage.phoneQuick ? operatorPage.phoneQuick(' + JSON.stringify(String(x.what || '')) + ', ' + JSON.stringify(String(x.value || '').slice(0, 2000)) + ') : null',
+        taskdone: 'operatorPage.phoneTaskDone ? operatorPage.phoneTaskDone(' + JSON.stringify(String(x.id || '')) + ') : null',
+        standard: 'operatorPage.phoneStandard ? operatorPage.phoneStandard(' + JSON.stringify(String(x.id || '')) + ') : null'
       };
-      if (!calls[act]) return send(404, { error: 'not found' });
+      // Op's own voice on the phone: the page knows which engine and which voice, the helper has the audio
+      // already cached from the Mac, and this just hands the mp3 over. No new helper route.
+      if (act === 'speak') {
+        const url = await run('operatorPage.phoneSpeakUrl ? operatorPage.phoneSpeakUrl(' + JSON.stringify(String(x.text || '').slice(0, 2000)) + ') : ""');
+        if (!url) return send(503, { error: 'no voice', hint: 'Turn Op’s voice on in Settings → Op on the Mac.' });
+        return http.get(url, (r2) => {
+          if (r2.statusCode !== 200) { r2.resume(); return send(502, { error: 'the voice helper said ' + r2.statusCode }); }
+          res.writeHead(200, { 'Content-Type': 'audio/mpeg', 'Cache-Control': 'no-store' });
+          r2.pipe(res);
+        }).on('error', (e) => send(502, { error: 'couldn’t reach the voice helper', hint: e.message }));
+      }
+      if (!calls[act]) return send(404, { error: 'not found', hint: 'This Operator is ' + app.getVersion() + '. Ask /api/version for what it can do.' });
       const out = await run('Promise.resolve(' + calls[act] + ')');
       // (how long since the Mac was last touched, in seconds: the phone shows "Idle 40m" when you've walked off)
       if (out && typeof out === 'object') { try { out.idle = require('electron').powerMonitor.getSystemIdleTime(); } catch (e) {} }
@@ -508,5 +577,33 @@ function phoneStart() {
 ipcMain.handle('phone:info', () => phoneInfo());
 ipcMain.handle('phone:set', (e, on) => { phone.on = !!on; if (on && !phone.code) phone.code = ''; phoneSave(); phoneStart(); return phoneInfo(); });
 ipcMain.handle('phone:newCode', () => { phone.code = ''; phoneSave(); phoneStart(); return phoneInfo(); });
+// ---- Round 70: away from home, and staying awake for a tap ----
+// Tailscale is a free, private line between your own devices. With `tailscale serve --bg 8940` the Mac also gets
+// an https address, which is the only way the phone page can use the microphone. We only ever read its status.
+ipcMain.handle('phone:tailscale', () => {
+  const tries = ['/usr/local/bin/tailscale', '/opt/homebrew/bin/tailscale', '/Applications/Tailscale.app/Contents/MacOS/Tailscale', 'tailscale'];
+  for (const bin of tries) {
+    try {
+      const out = execFileSync(bin, ['status', '--json'], { timeout: 6000, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+      const j = JSON.parse(out);
+      if (!j || !j.Self) continue;
+      if (j.BackendState && j.BackendState !== 'Running') return { host: '', why: 'Tailscale is installed but not running. Open it and sign in.' };
+      const dns = String(j.Self.DNSName || '').replace(/\.$/, '');
+      const ip = (j.Self.TailscaleIPs || [])[0] || '';
+      if (!dns && !ip) return { host: '', why: 'Tailscale is running but this Mac has no address yet.' };
+      return { host: dns || ip, ip: ip, serve: !!(j.Self.CapMap && j.Self.CapMap.serve), why: '' };
+    } catch (e) {}
+  }
+  return { host: '', why: 'No Tailscale on this Mac yet. Install it from tailscale.com, sign in on the Mac and the iPhone, then press Check again.' };
+});
+// A sleeping Mac can't answer a tap. This is the same blocker the app already uses; this just turns it on and off.
+let tagBlocker = null;
+ipcMain.handle('phone:keepAwake', (e, on) => {
+  try {
+    if (on && tagBlocker == null) tagBlocker = powerSaveBlocker.start('prevent-app-suspension');
+    if (!on && tagBlocker != null) { powerSaveBlocker.stop(tagBlocker); tagBlocker = null; }
+  } catch (err) {}
+  return tagBlocker != null;
+});
 app.whenReady().then(() => { if (phone.on) phoneStart(); });
 app.on('will-quit', () => phoneStop());

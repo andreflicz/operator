@@ -452,7 +452,84 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports outside Social (R
   Settings → Op → Check now clears those and asks again; the installer does too when the signature changed.
 - main.js: single instance, menu bar Tray, ⌥O show/hide, ✕ hides, ⌘Q quits, starts the helpers, move-in from the old Chrome profile, `window.operatorPage` bridge.
 
+## Round 70 notes (2026-11-15; the list is ROUND-70-LIST.md, 47 items)
+Two files: **32z80-r70.js** (the eighteen app updates) and **32z81-r70tags.js** (NFC tags). CSS at the end of
+styles.css. Tests: `scripts/e2e/r70-test.js` (54) and `scripts/e2e/r70tags-test.js` (55). Mac 4.3.0.
+
+### Part 1 — the app updates
+- **Long sessions**: `r70LongTick` (30 s) asks after `profile.r70LongHrs` (8) and, with no answer in `r70LongWait`
+  (10 min), ends the session at `r70LastActive()` (`r70EndSessionAt`, which also unwinds a break that was running).
+  Round 58's one-time 10-hour note is switched off (`s.r58Long = true`). Both, plus `longBreakMins`, are rows in
+  Settings → Focus.
+- **Op's corner** (`#r70Dock`, bottom left above the clock pill): `r57Note` is replaced by `r70NoteShow`, one note at
+  a time, tap it for his chat (`r70NoteOpen` → `r57OpOpen`). `#r60Pop` is gone — older suites that looked for it were
+  updated. `r65OpPlace` is wrapped so a dragged position still wins. `r70AskShow` / `r70AskHide` put a question there.
+- **Good morning**: `r70QuietUp()` lifts the alarm quietly and keeps the wake time (`state.focus.r70Gm`); the sequence
+  is its own button on the alarm and, until noon on Today/Focus, `#r70GmBar` (Start / ✕). Gone once played.
+- **Voice memo**: `r70MemoSave` (audio in IndexedDB via `r68MemoAudioPut`, typed text as `m.note`). Mic on the quick
+  journal (`r70QjMic`) and on the Mac bubble (`bubble:memo` → `r70AddVoiceMemo`).
+- **Expenses**: `e.typ` personal/business/client (+`e.typClient`), guessed from the name by `R70_BIZ_RE` until set.
+  Row control, filter chips and per-type totals on the Expenses card.
+- **Journal filter**: `r67JFilterHtml` wrapped — everything behind one Filter button (`ui.r70Jf`).
+- **Op does everything**: `add_to_board` / `list_boards` / `make_board` (note or list card, stacked by `r70BoardSpot`)
+  and `explain_score` (reads `xpSummary`, `consistencyStats`, `tierHitRate`; never writes).
+- **Done means saved**: `log_touch` goes through `logTouch` so the follow-up clears; a failed tool is retried once
+  then said in red; `r70Guard` on `aiCall` sends a claim with no tool call back to Op once.
+- **Inspiration**: `R70_INSP` (32 more, piano first) in groups, your own in `inspStore().own`, a date to backfill.
+- **The key**: `aiErrLine` wrapped — a refusal becomes a notification with `r70KeyFix`, once an hour.
+- **Playbooks, more than one**: extras in `x.pbs[]`. `pbSync` is wrapped to run one pass per extra (x.pb swapped in);
+  each pass only clears away its own playbook's tasks, the rest are put back. `pbTaskPerson` is narrowed to the main
+  playbook and `r70PbExtraFor` + wrapped `completeTask`/`undoTask` handle the extras. `r70AdsTick` (15 min) puts a
+  client with live campaigns on `crm().r70AdsPb` and asks when the ads stop. `create_playbook` / `add_playbook`.
+- **XP center**: `r70XpHtml()` inside the You tab — `r70Quests()` (R70_Q, each wrapped in try/catch), a Claim button,
+  and `levelUpFx` wrapped with a fireworks canvas. `consistencyStats` wrapped to fold in `r70TouchedOn`.
+- **Client journal photos**: `e.photos` on the entry, drop zone + button, `r70CjView` lightbox.
+- **Days off**: `state.daysOff.r70Kinds[date]` = off/break/shoot; `isDayOff` wrapped so a marked day or a logged
+  shooting day (`r70ShootOff`) holds the streak. `#r70Off` panel, 45 days from a week back, on Streaks and lock-in.
+- **Sessions / sealed / menu bar / backlog**: `viewAllSessions` opens the page; `r57ThreadHtml` drops the
+  "Keep bringing it back" row for one small Repeat button; `r70LockOutNow` / `r70BreakFromBar` / `r70StopMusic` /
+  `r70TrayState` are on `operatorPage` for the tray; `r70LateOpen` reopens a past month's short weeks (`master.r70Late`).
+
+### Part 2 — tags
+- **Data**: `state.tags = {list:[{id, name, place, secret, steps, on, lastTap, taps, starter}], log, host, tailnet}`,
+  a new STATE_KEY loaded by a wrapper around `init`. Secret = 128 bits of `crypto.getRandomValues`.
+- **A step** is `{act, min, kind, when}`. `R70T_ACTS` is the whole catalog (26); `R70T_RULES` the rules. **Every rule
+  is read against `r70TNow()` captured once at the tap** — otherwise a lock-in/lock-out tag undoes itself.
+- **`r70TRun(g)`**: ignores a second read within 2 s, runs each fitting step, logs the tap, feeds Op and the corner.
+  Already-done is an answer, not an error. `r70TRunStep` is one switch over the catalog.
+- **Sleep from the taps**: `state.focus.r70Sleep` + `r70Sleeps[]`; `lastNightSleep` is wrapped to prefer it.
+  No morning tap and `r70TSleepCheck` closes it as `estimated`.
+- **Out of the house**: `state.focus.r70Out = {kind, startedAt, tagId, brokeSession}`. Locked in when you leave: a real
+  break with the reason. `r70TBackCheck` (60 s) notices you came back if you forgot the tap.
+- **The sticky reminder**: `state.focus.tagNudges`, `#r70Nudge` pill on every page and on the phone, cleared by
+  `r70NudgeWatch` when the thing is logged, or by Skip.
+- **The page's side of the server**: `r70PhoneApi` (named, so the checks can run it without a Mac) — phoneTag,
+  phoneTags, phoneRunTag, phoneToday, phoneMeals, phoneMeal, phoneWeigh, phoneQuick, phoneTaskDone, phoneStandard,
+  phoneSpeakUrl, phoneVersion.
+- **Op**: `list_tags`, `create_tag`, `run_tag`, `tag_status`, `tags_help`, and his system prompt gets today's taps,
+  whether you're out, how you slept and what's still to log.
+- **Settings → Tags**: the ready-to-tap check, the tag cards (steps, link, QR, Test it now, Duplicate, New link),
+  the wizard (`ui.r70TWiz`, three steps, "Tap your tag now" → "Heard it"), the starter set, Tailscale, and where Op
+  speaks. `R70T_STARTERS` has the 8 on by default + 4 shipped off.
+
+### Mac (4.3.0)
+- `GET|POST /t/<secret>` — no code header (a tag can't carry one), rate-limited per address, returns a small page for a
+  browser or JSON for a Shortcut, and can only ever run a tag. `?value=` / a POST body carries a dictated number or line.
+- `/api/tag|tags|runtag|today|meals|meal|weigh|quick|taskdone|standard|version`, and `/api/speak`, which asks the page
+  for `phoneSpeakUrl` and pipes the helper's mp3 back — so Op has his real voice on the phone. No new helper route.
+- The private-address check also allows `100.64.0.0/10` (Tailscale). `phone:tailscale` reads `tailscale status --json`;
+  `phone:keepAwake` toggles a `powerSaveBlocker`. `/icon.png` is the app icon at 180px for the Home Screen.
+- `phone.html` rebuilt: Now / Op / Tags / Log, the state ring, the sticky reminder, quick-log chips, a meal picker, a
+  weight keypad, and Op's real voice with `speechSynthesis` only as the fallback.
+
+### Still open
+- Not verifiable here: real NFC, the iOS banner, a Shortcuts automation, audio on a locked phone, Tailscale, and
+  whether the power-save blocker really keeps the Mac awake. Andre's checklist is in ROUND-70-LIST.md.
+- Lights (plan part F) are parked: Andre said no lights for now.
+- "Works with the Mac off" still needs cloud sync — its own round.
+
 ## Status
+Round 70 (2026-11-15): ROUND-70-LIST.md (47 items: 18 app updates + the tag system). Mac 4.3.0.
 Round 67 (2026-11-03): ROUND-67-LIST.md (11 items). Mac 4.0.0; 4.0.1 adds client ad assignment in Social and free transcripts.
 Round 69 (2026-11-05): ROUND-69-LIST.md. Mac 4.2.0.
 Round 68 (2026-11-04): ROUND-68-LIST.md. Mac 4.1.0.

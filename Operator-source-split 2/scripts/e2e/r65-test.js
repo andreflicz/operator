@@ -49,7 +49,8 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // ---- D. Op's tab moves; no "?" ----
   await E("state.profile.r65OpPos = null; opBubShow()"); await p.waitForTimeout(400);
   const r0 = await E("(function(){ const r = document.getElementById('opBub').getBoundingClientRect(); return [r.left, r.top, r.width]; })()");
-  check('Op’s tab starts in a better place (bottom center, clear of the clock pill)', Math.abs((r0[0] + r0[2]/2) - (220 + (1440 - 220)/2)) < 30 && r0[1] > 780, r0);
+  // (Round 70 moved him to the bottom left corner, above the clock-in pill, so everything of his is in one place)
+  check('Op’s tab starts in his corner (bottom left, clear of the clock pill)', r0[0] < 420 && r0[1] > 700, r0);
   await p.mouse.move(r0[0] + 30, r0[1] + 20); await p.mouse.down(); await p.mouse.move(r0[0] + 200, r0[1] - 400, {steps:6}); await p.mouse.up(); await p.waitForTimeout(200);
   const r1 = await E("(function(){ const r = document.getElementById('opBub').getBoundingClientRect(); return [r.left, r.top]; })()");
   check('…drag it anywhere', Math.abs(r1[0] - (r0[0] + 170)) < 30 && Math.abs(r1[1] - (r0[1] - 400)) < 30, [r0, r1]);
