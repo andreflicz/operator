@@ -322,9 +322,9 @@ const seed = {
 
   // ---- 45 one host, and it says when it changed ----
   const host = await ev(`
-    r70Tags().tailnet = 'andre-mac.tailnet.ts.net';
+    r70Tags().tailnet = 'andre-mac.tailnet.ts.net'; r70Tags().tailserve = true;
     const tail = r70TLink(r70TagList()[0]);
-    delete r70Tags().tailnet;
+    delete r70Tags().tailnet; delete r70Tags().tailserve;
     r70Tags().host = 'andre-mac.local';
     ui.r68Phone = null;
     const wifi = r70TLink(r70TagList()[0]);
@@ -336,6 +336,29 @@ const seed = {
   check('44 with Tailscale on, every link uses the tailnet', /^https:\/\/andre-mac\.tailnet/.test(host.tail), host);
   check('45 one host at a time, never a mix', /^http:\/\/andre-mac\.local:8940/.test(host.wifi) && host.oneHost, host);
   check('45 a changed address is noticed', host.moved === 'http://andre-mac.local:8940', host);
+
+  // ---- 44/45 away from home: one address, and the pairing card uses it too ----
+  const away = await ev(`
+    const T = r70Tags();
+    // (the card draws nothing without the Mac bridge, so stand one up)
+    if(!window.operatorApp) window.operatorApp = {phoneInfo:function(){ return Promise.resolve({on:true, url:'http://192.168.1.9:8940', code:'123456'}); }};
+    ui.r68Phone = {on:true, url:'http://192.168.1.9:8940', code:'123456'};
+    delete T.tailnet; delete T.tailserve;
+    const wifi = r70TBase(), card0 = r68PhoneCardHtml();
+    T.tailnet = 'andre-mac.tail1234.ts.net'; T.tailserve = false;
+    const plain = r70TBase();
+    T.tailserve = true;
+    const served = r70TBase(), card1 = r68PhoneCardHtml();
+    delete T.tailnet; delete T.tailserve; ui.r68Phone = null;
+    return {wifi:wifi, plain:plain, served:served,
+      cardWifi:card0.indexOf('192.168.1.9') > 0 && card0.indexOf('r70t-away') < 0,
+      cardAway:card1.indexOf('tail1234.ts.net') > 0 && card1.indexOf('r70t-away') > 0,
+      keepsWifi:card1.indexOf('192.168.1.9') > 0};
+  `);
+  check('45 no Tailscale: the Wi-Fi address', away.wifi === 'http://192.168.1.9:8940', away);
+  check('44 plain Tailscale reaches it on its own port', away.plain === 'http://andre-mac.tail1234.ts.net:8940', away);
+  check('44 tailscale serve: https, no port (what the mic needs)', away.served === 'https://andre-mac.tail1234.ts.net', away);
+  check('44 the pairing QR uses the away address, and still says what the Wi-Fi one is', away.cardWifi && away.cardAway && away.keepsWifi, away);
 
   // ---- nothing threw ----
   await ev(`renderView(); ui.view='settings'; ui.settingsTab='tags'; renderView(); ui.view='today'; renderView(); return 1;`);

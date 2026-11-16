@@ -464,12 +464,29 @@ afterRenderHooks.push(r70NudgeWatch);
 // whatever the Mac is serving on. Never a mix of the two.
 function r70TBase(){
   const T = r70Tags();
-  if(T.tailnet) return 'https://'+T.tailnet;
+  // Plain Tailscale reaches the server on its own port. `tailscale serve` puts it behind https with no port,
+  // which is also what the phone's microphone needs — so that form wins when it's set up.
+  if(T.tailnet) return T.tailserve ? 'https://'+T.tailnet : 'http://'+T.tailnet+':8940';
   const I = ui.r68Phone;
   if(I && I.url) return String(I.url).replace(/\/+$/, '');
   if(T.host) return 'http://'+T.host+':8940';
   return '';
 }
+// Look for Tailscale once at startup, so the address is right without anyone pressing a button.
+function r70TailCheck(quiet){
+  if(!(window.operatorApp && operatorApp.tailscale)) return Promise.resolve(null);
+  return operatorApp.tailscale().then(function(r){
+    const T = r70Tags();
+    if(r && r.host){
+      const changed = T.tailnet !== r.host;
+      T.tailnet = r.host; T.tailserve = !!r.serve; persist('tags');
+      if(changed && !quiet) showToast('Away from home is on: '+r.host, {icon:'&#127758;', duration:8000});
+      if(changed) try{ renderView(); }catch(e){}
+    } else if(T.tailnet && !quiet){ /* keep the last known address rather than dropping it */ }
+    return r;
+  }).catch(function(){ return null; });
+}
+setTimeout(function(){ r70TailCheck(true); }, 6000);
 function r70THost(){ return r70TBase().replace(/^https?:\/\//, ''); }
 function r70TLink(g){ const b = r70TBase(); return (b || 'http://your-mac.local:8940')+'/t/'+(g ? g.secret : ''); }
 // the address changed since last time: say so, because every tag's link carries it
@@ -768,7 +785,7 @@ ACTIONS.r70TStepDel = function(el, e, id){
 ACTIONS.r70TTail = function(){
   if(!(window.operatorApp && operatorApp.tailscale)){ showToast('This needs Operator for Mac.', {icon:'&#9888;'}); return; }
   operatorApp.tailscale().then(function(r){
-    if(r && r.host){ r70Tags().tailnet = r.host; persist('tags'); showToast('Found it: '+r.host+'. Every tag link now uses it.', {icon:'&#127758;', duration:9000}); }
+    if(r && r.host){ r70Tags().tailnet = r.host; r70Tags().tailserve = !!r.serve; persist('tags'); showToast('Found it: '+r.host+'. Tag links and the iPhone page now use it.', {icon:'&#127758;', duration:9000}); }
     else showToast(r && r.why ? r.why : 'No Tailscale found on this Mac yet.', {icon:'&#9888;', duration:9000});
     renderView();
   }).catch(function(){ showToast('Couldn’t check.', {icon:'&#9888;'}); });
@@ -948,3 +965,19 @@ aiSystem = (function(base){
     return out;
   };
 })(aiSystem);
+
+// ---- the pairing card follows the same one-host rule as the tags ----
+// Without this the QR still points at the Wi-Fi address, so the page can't be opened on cell data.
+r68PhoneCardHtml = typeof r68PhoneCardHtml==='function' ? (function(base){
+  return function(){
+    const T = r70Tags();
+    if(!T.tailnet) return base.apply(this, arguments);
+    const real = ui.r68Phone, away = r70TBase();
+    if(!real || !real.on || !away) return base.apply(this, arguments);
+    let h;
+    ui.r68Phone = Object.assign({}, real, {url:away});
+    try{ h = base.apply(this, arguments); } finally { ui.r68Phone = real; }
+    return h.replace('</div>', '</div>')
+      .replace(/(<div class="r68-ph-f">)/, '<p class="r70t-away">Away from home is on, so this address works anywhere \u2014 on cell data too. Your Wi-Fi address is <b>'+escapeHtml(real.url || '')+'</b>.</p>$1');
+  };
+})(r68PhoneCardHtml) : r68PhoneCardHtml;
