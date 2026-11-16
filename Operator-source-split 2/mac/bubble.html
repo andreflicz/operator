@@ -22,13 +22,18 @@
   button:disabled{ opacity:.4; cursor:default; }
   #ok{ position:absolute; inset:0; display:none; align-items:center; justify-content:center; font-weight:600; background:var(--bg); }
   body.saved #ok{ display:flex; }
+  /* a voice memo: tap the mic, talk, tap again to save it (writing is optional) */
+  #mic{ width:34px; height:30px; padding:0; font-size:15px; }
+  body.rec #mic{ background:#ff4d5e; color:#fff; }
+  #rect{ display:none; color:#ff8f9a; font-size:12px; font-variant-numeric:tabular-nums; flex:1; }
+  body.rec #rect{ display:block; } body.rec #foot kbd{ display:none; }
 </style></head>
 <body>
   <div id="dot" title="Journal"><span id="open">&#9998;</span></div>
   <div id="card">
     <div id="bar"><b>Journal</b><button id="min" title="Back to a bubble">&#8211;</button></div>
     <textarea id="t" placeholder="What’s on your mind?"></textarea>
-    <div id="foot"><kbd>&#8984;&#9166; to save</kbd><button id="cancel">Later</button><button class="go" id="save" disabled>Save</button></div>
+    <div id="foot"><button id="mic" title="Voice memo">&#127908;</button><kbd>&#8984;&#9166; to save</kbd><span id="rect">0:00</span><button id="cancel">Later</button><button class="go" id="save" disabled>Save</button></div>
     <div id="ok">Saved to your journal &#10003;</div>
   </div>
 <script>
@@ -71,5 +76,32 @@
   save.addEventListener('click', go);
   document.addEventListener('keydown', (e) => { if(e.key==='Enter' && (e.metaKey || e.ctrlKey)){ e.preventDefault(); go(); } if(e.key==='Escape') close(); });
   window.bubble.onOpen(() => open());
+  // ---- voice memo ----
+  const mic = document.getElementById('mic'), rect = document.getElementById('rect');
+  let rec = null;
+  const clock = (s) => { s = Math.floor(s); return Math.floor(s/60) + ':' + ('0' + (s % 60)).slice(-2); };
+  async function micToggle(){
+    if(rec){ try{ rec.mr.stop(); }catch(e){} return; }
+    let stream = null;
+    try{ stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }catch(e){ mic.title = 'The mic isn’t available'; return; }
+    const mr = new MediaRecorder(stream), parts = [], at = Date.now();
+    rec = { mr, at, t: setInterval(() => { rect.textContent = clock((Date.now() - at)/1000); }, 500) };
+    document.body.classList.add('rec'); rect.textContent = '0:00';
+    mr.ondataavailable = (ev) => { if(ev.data && ev.data.size) parts.push(ev.data); };
+    mr.onstop = () => {
+      stream.getTracks().forEach((x) => x.stop());
+      clearInterval(rec.t); const dur = (Date.now() - at)/1000; rec = null; document.body.classList.remove('rec');
+      const blob = new Blob(parts, { type: mr.mimeType || 'audio/webm' });
+      if(blob.size < 2000 || blob.size > 24*1024*1024) return;
+      const fr = new FileReader();
+      fr.onload = async () => {
+        const ok = await window.bubble.memo({ b64: String(fr.result).split(',')[1] || '', mime: blob.type, dur: dur, text: t.value.trim() });
+        if(ok){ t.value = ''; sync(); document.getElementById('ok').textContent = 'Voice memo saved ✓'; document.body.classList.add('saved'); setTimeout(() => { document.body.classList.remove('saved'); document.getElementById('ok').textContent = 'Saved to your journal ✓'; close(); }, 900); }
+      };
+      fr.readAsDataURL(blob);
+    };
+    mr.start(1000);
+  }
+  mic.addEventListener('click', micToggle);
 </script>
 </body></html>

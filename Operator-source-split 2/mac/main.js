@@ -127,8 +127,11 @@ function trayMenu() {
   return Menu.buildFromTemplate([
     { label: 'Show Operator', accelerator: 'Alt+O', click: showWin },
     { type: 'separator' },
-    s.locked ? { label: 'Lock out…', click: () => { showWin(); run("operatorPage.lockOut()"); } }
+    // (Round 70: these act right away: no window, no sheet to hold)
+    s.locked ? { label: 'Lock out', click: () => run("operatorPage.lockOutNow ? operatorPage.lockOutNow() : operatorPage.lockOut()") }
              : { label: 'Lock in', click: () => run("operatorPage.lockIn()") },
+    { label: s.onBreak ? 'End break' : 'Take a break', click: () => run("operatorPage.breakToggle ? operatorPage.breakToggle() : null") },
+    { label: 'Stop music', enabled: s.music !== false, click: () => run("operatorPage.musicStop ? operatorPage.musicStop() : null") },
     { label: 'Talk to Op', enabled: s.opOn !== false, click: () => { showWin(); run("operatorPage.talk()"); } },
     { label: s.busy ? 'Op: quiet until ' + s.busy : 'Op: busy for an hour', enabled: s.opOn !== false, click: () => run(s.busy ? "operatorPage.busyEnd()" : "operatorPage.busy(60)") },
     { label: s.opOn === false ? 'Turn Op on' : 'Turn Op off', click: () => run("operatorPage.power()") },
@@ -255,6 +258,13 @@ ipcMain.handle('bubble:pos', () => { if (!bub) return null; const b = bub.getBou
 ipcMain.on('bubble:moved', () => { if (!bub) return; const b = bub.getBounds(); bubCfg.x = b.x + b.width - BUB_SMALL.w; bubCfg.y = b.y + b.height - BUB_SMALL.h; bubSave(); });
 ipcMain.handle('bubble:save', async (e, text) => {
   const ok = await run('operatorPage.addJournal(' + JSON.stringify(String(text || '').slice(0, 20000)) + ')');
+  return !!ok;
+});
+// Round 70: a voice memo recorded in the bubble goes to Journal → Memos (the audio, and what was typed, if anything)
+ipcMain.handle('bubble:memo', async (e, m) => {
+  m = m || {};
+  const b64 = String(m.b64 || ''); if (!b64 || b64.length > 34 * 1024 * 1024) return false;
+  const ok = await run('operatorPage.addVoiceMemo ? operatorPage.addVoiceMemo(' + JSON.stringify({ b64, mime: String(m.mime || 'audio/webm').slice(0, 80), dur: Number(m.dur) || 0, text: String(m.text || '').slice(0, 20000) }) + ') : false');
   return !!ok;
 });
 
@@ -404,7 +414,11 @@ ipcMain.handle('op:pdf', async (e, name) => {
 ipcMain.on('op:relaunch', () => { quitting = true; app.relaunch(); app.quit(); });
 
 // ---------------- the page talks back ----------------
-ipcMain.on('op:status', (e, s) => { status = s || {}; trayRefresh(); });
+ipcMain.on('op:status', (e, s) => {
+  status = s || {}; trayRefresh();
+  // (Round 70: on a break? music playing? the menu's Break and Stop music follow it)
+  run('operatorPage.trayState ? operatorPage.trayState() : null').then((x) => { if (x && typeof x === 'object') { Object.assign(status, x); trayRefresh(); } }).catch(() => {});
+});
 ipcMain.on('op:show', () => showWin());
 ipcMain.handle('op:loginItem', () => app.getLoginItemSettings().openAtLogin);
 ipcMain.handle('op:setLoginItem', (e, on) => { app.setLoginItemSettings({ openAtLogin: !!on, openAsHidden: true }); return app.getLoginItemSettings().openAtLogin; });
