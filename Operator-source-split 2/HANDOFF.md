@@ -425,7 +425,7 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports outside Social (R
   go in the address as before. The "request body is not valid JSON: EOF" error = new page + old helper.
 - **Personal goals**: `.r43-owns` becomes one scrolling row (2 visible) with ‹ › when there are more than 2.
 - **Journal tabs**: `.tabs .r62-jtabs` slimmer and lifted so they sit on the tab line without making it taller.
-- **iPhone** (main.js, Settings → Connections & data → Your iPhone): off by default; on = an HTTP server on
+- **iPhone** (main.js, Settings → Op → Your iPhone): off by default; on = an HTTP server on
   0.0.0.0:8940 (private addresses only), `mac/phone.html` + `/api/state|lockin|lockout|task|ask`, every call needs
   the 6-digit code (`X-Op-Code`; 6 wrong → wait a minute). The page asks `operatorPage.phoneState / phoneLockIn /
   phoneLockOut / phoneTask / ask` (Op answers in writing; the phone speaks it). Settings in `DATA_DIR/phone.json`.

@@ -507,7 +507,7 @@ function r70TCheck(){
   const never = r70TagList().filter(function(g){ return g.on && !g.lastTap; });
   return {
     rows:[
-      ['The phone server', on ? 'on, port 8940' : 'off — Settings → Connections & data → Your iPhone', on],
+      ['The phone server', on ? 'on, port 8940' : 'off — Settings → Op → Your iPhone', on],
       ['The Mac’s address', host || 'not known yet', !!host],
       ['Away from home', state.tags && state.tags.tailnet ? 'Tailscale: '+state.tags.tailnet : 'same Wi-Fi only — set up Tailscale to use these anywhere', !!(state.tags && state.tags.tailnet)],
       ['Staying awake', r70P('r70TAwake', true)!==false ? 'the Mac is kept awake for taps' : 'off — a sleeping Mac can’t answer a tap', r70P('r70TAwake', true)!==false],
