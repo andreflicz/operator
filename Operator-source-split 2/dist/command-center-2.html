@@ -11101,6 +11101,86 @@ body.opf-on .r70-dock, body:has(#wakeOverlay:not(.hidden)) .r70-dock, body:has(#
 .r70t-seg{ margin-bottom:14px; }
 @media (max-width:620px){ .r70t-qrow{ flex-direction:column; } .r70t-cr b{ min-width:0; } .r70t-cr{ flex-wrap:wrap; } }
 @media (prefers-reduced-motion: reduce){ .r70t-waiting i{ animation:none; } }
+/* ---- Round 71: Command View ---- */
+/* Built to be read from across a room: four bands, big type, one moving thing. */
+.r71{ display:flex; flex-direction:column; gap:14px; }
+.r71-full{ position:fixed; inset:0; z-index:9800; overflow:auto; padding:38px 44px; background:#07080c; color:#f2f5fb; opacity:0; transition:opacity .25s ease; }
+.r71-full.is-in{ opacity:1; }
+body.r71-on{ overflow:hidden; }
+.r71-x, .r71-gear{ position:fixed; top:22px; width:40px; height:40px; border-radius:50%; border:0; background:rgba(255,255,255,.08); color:#f2f5fb; font-size:15px; cursor:pointer; z-index:2; }
+.r71-x{ right:24px; } .r71-gear{ right:72px; font-size:17px; }
+.r71-x:hover, .r71-gear:hover{ background:rgba(255,255,255,.17); }
+.r71.is-big{ gap:22px; max-width:1500px; margin:0 auto; }
+.r71-card{ background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:20px 24px; }
+.r71-h{ font:700 11px var(--font-body); letter-spacing:.16em; text-transform:uppercase; opacity:.42; margin-bottom:12px; }
+/* 1. the work day */
+.r71-clock .r71-ct{ display:flex; align-items:baseline; gap:16px; flex-wrap:wrap; margin-bottom:12px; }
+.r71-clock b{ font:700 clamp(30px, 4.6vw, 62px)/1 var(--font-body); letter-spacing:-.02em; }
+.r71-clock span{ font:600 clamp(15px, 1.5vw, 23px) var(--font-body); opacity:.52; }
+.r71-clock.is-open b{ color:#7ef0c0; }
+.r71-clock.is-none b{ font-size:clamp(20px, 2.4vw, 30px); opacity:.6; }
+.r71-bar{ position:relative; height:14px; border-radius:7px; background:rgba(255,255,255,.07); overflow:visible; }
+.r71-bar i{ display:block; height:100%; border-radius:7px; background:linear-gradient(90deg, #4f9c73, #7ef0c0); transition:width 1s linear; }
+.r71-bar u{ position:absolute; top:50%; width:20px; height:20px; margin:-10px 0 0 -10px; border-radius:50%; background:#fff; box-shadow:0 0 0 5px rgba(126,240,192,.28); transition:left 1s linear; }
+/* 2. the day type */
+.r71-type{ display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+.r71-type b{ font:700 clamp(17px, 1.9vw, 27px) var(--font-body); padding:5px 16px; border-radius:20px; background:rgba(255,255,255,.08); }
+.r71-type span{ font:500 clamp(13px, 1.3vw, 18px) var(--font-body); opacity:.52; }
+.r71.is-shoot .r71-type b{ background:rgba(122,105,184,.3); color:#d9cfff; }
+.r71.is-off .r71-type b, .r71.is-weekend .r71-type b{ background:rgba(79,156,115,.26); color:#c9f3dd; }
+/* 3 + 4 */
+.r71-mid{ display:grid; grid-template-columns:1.55fr 1fr; gap:14px; }
+.r71-rl b{ display:block; font:700 clamp(17px, 1.8vw, 26px) var(--font-body); margin-bottom:4px; }
+.r71-rl span{ font:500 clamp(12px, 1.15vw, 16px) var(--font-body); opacity:.5; }
+.r71-dots{ position:relative; display:flex; align-items:stretch; gap:3px; height:86px; margin:16px 0 6px; }
+.r71-dots i{ position:relative; flex:1; border-radius:3px; }
+.r71-dots i.is-on::after{ content:''; position:absolute; left:50%; top:var(--y); width:9px; height:9px; margin:-4.5px 0 0 -4.5px; border-radius:50%; background:#7ea8ff; }
+.r71-dots i.is-on.is-today::after{ background:#ffd166; width:13px; height:13px; margin:-6.5px 0 0 -6.5px; box-shadow:0 0 0 4px rgba(255,209,102,.22); }
+.r71-dots i.is-none{ background:none; }
+/* a day off reads as a faint tick on the floor, not a column — the dots are the data */
+.r71-dots i.is-off{ background:none; }
+.r71-dots i.is-off::after{ content:''; position:absolute; left:50%; bottom:0; width:5px; height:5px; margin-left:-2.5px; border-radius:50%; background:rgba(79,156,115,.5); }
+.r71-dots u{ position:absolute; left:0; right:0; top:var(--y); height:1px; background:rgba(255,255,255,.26); }
+.r71-dl{ display:flex; justify-content:space-between; margin-top:2px; font:600 10px var(--font-body); letter-spacing:.07em; text-transform:uppercase; opacity:.3; }
+.r71-hours{ display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+.r71-big{ font:800 clamp(34px, 4.4vw, 60px)/1 var(--font-body); letter-spacing:-.025em; }
+.r71-ring{ width:78px; height:78px; margin:12px 0 8px; border-radius:50%; display:grid; place-items:center; background:conic-gradient(#ffd166 var(--p), rgba(255,255,255,.07) 0); position:relative; }
+.r71-ring::after{ content:''; position:absolute; inset:7px; border-radius:50%; background:#07080c; }
+.r71-ring span{ position:relative; z-index:1; font:700 15px var(--font-body); }
+.r71-sub{ font:500 clamp(11px, 1.05vw, 14px) var(--font-body); opacity:.45; }
+/* 5. what's due */
+.r71-dues-l{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:9px; }
+.r71-due{ display:flex; align-items:baseline; gap:11px; padding:12px 15px; border-radius:12px; background:rgba(255,255,255,.04); border-left:3px solid rgba(255,255,255,.14); }
+.r71-due b{ flex:1; font:600 clamp(13px, 1.25vw, 18px) var(--font-body); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.r71-due span{ font:700 clamp(11px, 1.05vw, 14px) var(--font-body); opacity:.5; white-space:nowrap; }
+.r71-due.is-soon{ border-left-color:#ffd166; } .r71-due.is-soon span{ color:#ffd166; opacity:1; }
+.r71-due.is-today{ border-left-color:#ff9a6b; } .r71-due.is-today span{ color:#ff9a6b; opacity:1; }
+.r71-due.is-late{ border-left-color:#ff8f8f; } .r71-due.is-late span{ color:#ff8f8f; opacity:1; }
+.r71-empty{ opacity:.35; font-size:14px; }
+/* 6. the standard */
+.r71-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.r71-chips span{ padding:7px 14px; border-radius:16px; background:rgba(255,255,255,.055); font:600 13px var(--font-body); }
+.r71-chips span.is-done{ opacity:.38; }
+/* 7. the vision board */
+.r71-vision{ padding:0; overflow:hidden; min-height:190px; }
+.r71.is-big .r71-vision{ min-height:300px; }
+/* 8. one line */
+.r71-quote{ text-align:center; padding:8px 0 4px; }
+.r71-quote b{ display:block; font:500 clamp(16px, 1.75vw, 26px)/1.4 var(--font-body); opacity:.8; }
+.r71-quote span{ font:600 clamp(11px, 1.05vw, 14px) var(--font-body); opacity:.35; letter-spacing:.04em; }
+/* the panel version keeps it small */
+.r71.is-panel{ gap:10px; }
+.r71.is-panel .r71-card{ padding:14px 16px; }
+.r71.is-panel .r71-mid{ grid-template-columns:1fr; }
+.r71.is-panel .r71-dots{ height:54px; }
+.r71.is-panel .r71-vision{ min-height:150px; }
+.r71-cb{ display:inline-flex; align-items:center; gap:7px; height:30px; padding:0 13px; margin-right:8px; border-radius:15px; border:1px solid var(--border, rgba(255,255,255,.12)); background:var(--surface, rgba(255,255,255,.03)); color:inherit; font:600 12.5px var(--font-body); cursor:pointer; }
+.r71-cb:hover{ border-color:#7ea8ff; color:#7ea8ff; }
+.r71-p{ margin:0 0 14px; font-size:13px; line-height:1.55; opacity:.65; }
+.r71-f{ margin-bottom:14px; }
+.r71-bl{ margin-bottom:14px; }
+@media (max-width:900px){ .r71-mid{ grid-template-columns:1fr; } .r71-full{ padding:24px 18px; } }
+@media (prefers-reduced-motion: reduce){ .r71-bar i, .r71-bar u{ transition:none; } }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -11298,7 +11378,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1794863912642;
+const OP_BUILT = 1795013287535;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -64283,6 +64363,297 @@ r68PhoneCardHtml = typeof r68PhoneCardHtml==='function' ? (function(base){
       .replace(/(<div class="r68-ph-f">)/, '<p class="r70t-away">Away from home is on, so this address works anywhere \u2014 on cell data too. Your Wi-Fi address is <b>'+escapeHtml(real.url || '')+'</b>.</p>$1');
   };
 })(r68PhoneCardHtml) : r68PhoneCardHtml;
+// ============ ROUND 71: Command View ============
+// A board for the spare monitor. It is the opposite of the lock-in screen: that one is for while you're working,
+// this one is for while you're not. It answers four things from across the room — where you are in your work day,
+// what kind of day it is, what's coming at you, and whether you're keeping to a rhythm — and then shows you what
+// you're doing it all for.
+//
+// It only ever reads. No check-ins, no "did you start?", no notifications, nothing that escalates. Every number
+// comes from a system that already exists (work hours, day types, deadlines, sessions, the vision board, quotes).
+// If it ever starts asking you things, that's a bug.
+
+const R71_BANDS = [
+  {id:'clock', label:'Your work day', def:true},
+  {id:'type', label:'What kind of day it is', def:true},
+  {id:'rhythm', label:'When you usually start', def:true},
+  {id:'numbers', label:'Hours today', def:true},
+  {id:'deadlines', label:'What’s due', def:true},
+  {id:'standard', label:'Today’s standard', def:false},
+  {id:'vision', label:'Vision board', def:true},
+  {id:'quote', label:'One line', def:true}
+];
+function r71Cfg(){
+  const s = state.settings;
+  if(!s.cmd || typeof s.cmd!=='object') s.cmd = {};
+  const c = s.cmd;
+  if(!c.bands || typeof c.bands!=='object'){ c.bands = {}; R71_BANDS.forEach(function(b){ c.bands[b.id] = b.def; }); }
+  if(typeof c.tone!=='string') c.tone = 'work';      // which quote set: work, action, or both
+  if(typeof c.target!=='number') c.target = 0;       // 0 = follow Today's standard
+  return c;
+}
+function r71On(id){ const c = r71Cfg(); return c.bands[id] !== false; }
+function r71Mins(hhmm){ const m = /^(\d{1,2}):(\d{2})$/.exec(String(hhmm || '')); return m ? Number(m[1])*60 + Number(m[2]) : null; }
+function r71Clock(mins){
+  const h = Math.floor(mins/60), m = Math.round(mins%60);
+  try{ return r57Clock(localTs(todayStr(), (h<10?'0':'')+h+':'+(m<10?'0':'')+m)); }catch(e){}
+  return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+}
+
+// ---- where you are in the day ----
+function r71Work(){
+  const d = todayStr();
+  let w = null; try{ w = workHoursFor(d); }catch(e){}
+  const now = new Date(), mins = now.getHours()*60 + now.getMinutes();
+  if(!w || w.enabled===false || w.off || !w.start || !w.end) return {none:true, mins:mins};
+  const a = r71Mins(w.start), b = r71Mins(w.end);
+  if(a==null || b==null) return {none:true, mins:mins};
+  const span = Math.max(1, b - a);
+  return {
+    none:false, start:a, end:b, mins:mins, span:span,
+    pct:Math.max(0, Math.min(1, (mins - a)/span)),
+    before:mins < a, after:mins > b, open:mins >= a && mins <= b,
+    left:Math.max(0, b - mins), until:Math.max(0, a - mins)
+  };
+}
+
+// ---- what kind of day it is ----
+// A shoot day doesn't quietly lower the bar — Andre was clear about that. It says the day is heavier so you know
+// where you stand, and the target stays exactly where it was.
+function r71Type(){
+  const d = todayStr();
+  let shoot = false, off = false;
+  try{ off = isDayOff(d); }catch(e){}
+  try{ const k = r70OffKinds()[d]; if(k==='shoot') shoot = true; }catch(e){}
+  try{ if(!shoot) shoot = arr(state.modes && state.modes.history).some(function(m){ return m && (m.type==='shooting' || m.shooting) && String(m.date || '')===d; }); }catch(e){}
+  try{ const a = state.modes && state.modes.active; if(a && a.type==='shooting') shoot = true; }catch(e){}
+  if(shoot) return {id:'shoot', label:'Shoot day', note:'Same target, heavier day. Anything you get is on top.'};
+  if(off) return {id:'off', label:'Day off', note:'Marked off. The streak holds either way.'};
+  const dow = new Date().getDay();
+  if(dow===0 || dow===6) return {id:'weekend', label:'Weekend', note:'No one’s expecting anything.'};
+  return {id:'normal', label:'Normal day', note:'Nothing special about it. That’s the point.'};
+}
+
+// ---- the rhythm: are you starting at the same time, or whenever ----
+// The honest version of "I want to be habitual about when I work": show the actual spread of start times over the
+// last three weeks. Consistency is visible as a straight line of dots; randomness is visible as scatter.
+function r71Rhythm(){
+  const out = {days:[], usual:null, today:null, drift:null, n:0};
+  try{
+    const byDay = {};
+    arr(state.focus.sessions).forEach(function(s){
+      if(!s || !s.startedAt || !s.date) return;
+      const t = new Date(s.startedAt), m = t.getHours()*60 + t.getMinutes();
+      if(byDay[s.date]==null || m < byDay[s.date]) byDay[s.date] = m;
+    });
+    const live = state.focus.activeSession;
+    if(live && live.startedAt){
+      const t = new Date(live.startedAt), m = t.getHours()*60 + t.getMinutes(), d = todayStr(t);
+      if(byDay[d]==null || m < byDay[d]) byDay[d] = m;
+    }
+    const today = todayStr();
+    for(let i = 20; i >= 0; i--){
+      const d = addDays(today, -i);
+      let skip = false; try{ skip = isDayOff(d); }catch(e){}
+      out.days.push({date:d, start:byDay[d]==null ? null : byDay[d], off:skip, today:d===today});
+    }
+    const starts = out.days.filter(function(x){ return x.start!=null && !x.today; }).map(function(x){ return x.start; }).sort(function(a, b){ return a - b; });
+    out.n = starts.length;
+    if(starts.length >= 3) out.usual = starts[Math.floor(starts.length/2)];
+    out.today = byDay[today]==null ? null : byDay[today];
+    if(out.usual!=null && out.today!=null) out.drift = out.today - out.usual;
+  }catch(e){}
+  return out;
+}
+
+// ---- the numbers ----
+function r71Target(){
+  const c = r71Cfg();
+  if(c.target > 0) return c.target;
+  try{ return Number(state.standards.deepWorkTarget) || 240; }catch(e){ return 240; }
+}
+function r71Today(){ try{ return deepWorkMinutesFor(todayStr()) || 0; }catch(e){ return 0; } }
+function r71Deadlines(n){
+  const t = todayStr(), out = [];
+  try{
+    arr(state.tasks.items).forEach(function(x){
+      if(!x || x.status==='done' || !x.deadline) return;
+      out.push({title:(typeof taskName==='function' ? taskName(x) : x.title) || 'Untitled', date:x.deadline, days:daysBetween(t, x.deadline)});
+    });
+  }catch(e){}
+  out.sort(function(a, b){ return String(a.date).localeCompare(String(b.date)); });
+  return out.slice(0, n || 3);
+}
+function daysBetween(a, b){
+  try{ return Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00'))/86400000); }catch(e){ return 0; }
+}
+function r71Urgency(days){ return days < 0 ? 'late' : days===0 ? 'today' : days <= 2 ? 'soon' : ''; }
+
+// ---- what's still open today, read-only ----
+function r71Standard(){
+  const out = [];
+  try{
+    const done = arr(getStandardRec(todayStr()).doneIds);
+    arr(state.standards.items).forEach(function(i){ out.push({label:i.label || i.name, done:done.indexOf(i.id) >= 0}); });
+  }catch(e){}
+  return out;
+}
+
+// ---- the one line ----
+function r71Quote(){
+  const c = r71Cfg();
+  const kind = c.tone==='action' ? 'action' : c.tone==='both' ? (dayNum()%2 ? 'action' : 'work') : 'work';
+  try{ const q = quoteFor(kind); return {text:q[0], who:q[1], kind:kind}; }catch(e){ return null; }
+}
+
+// ================= the board =================
+function r71Html(mode){
+  const big = mode!=='panel';
+  const W = r71Work(), T = r71Type(), c = r71Cfg();
+  let h = '<div class="r71'+(big ? ' is-big' : ' is-panel')+' is-'+T.id+'">';
+
+  // 1. where you are in the day
+  if(r71On('clock')){
+    if(W.none){
+      h += '<div class="r71-clock is-none"><b>No work hours set</b><span>Settings → Focus &amp; Lock in</span></div>';
+    } else {
+      const head = W.before ? 'Starts '+r71Clock(W.start) : W.after ? 'Done for the day' : r71Clock(W.start)+' – '+r71Clock(W.end);
+      const sub = W.before ? 'in '+fmtDurationLabel(W.until) : W.after ? 'Off the clock' : fmtDurationLabel(W.left)+' left';
+      h += '<div class="r71-clock'+(W.open ? ' is-open' : '')+'">'+
+        '<div class="r71-ct"><b>'+escapeHtml(head)+'</b><span>'+escapeHtml(sub)+'</span></div>'+
+        '<div class="r71-bar"><i style="width:'+(W.pct*100).toFixed(1)+'%"></i>'+(W.open ? '<u style="left:'+(W.pct*100).toFixed(1)+'%"></u>' : '')+'</div>'+
+      '</div>';
+    }
+  }
+
+  // 2. what kind of day it is
+  if(r71On('type')) h += '<div class="r71-type"><b>'+escapeHtml(T.label)+'</b><span>'+escapeHtml(T.note)+'</span></div>';
+
+  // 3 + 4 side by side: the rhythm, and the hours
+  let mid = '';
+  if(r71On('rhythm')){
+    const R = r71Rhythm();
+    let line;
+    if(R.usual==null) line = '<b>Still learning your rhythm</b><span>'+R.n+' day'+(R.n===1 ? '' : 's')+' so far. Three starts and it can tell you.</span>';
+    else if(R.today==null) line = '<b>You usually start '+escapeHtml(r71Clock(R.usual))+'</b><span>'+(W.none || W.before ? 'Not yet today.' : 'Not yet today — '+fmtDurationLabel(Math.max(0, W.mins - R.usual))+' past it.')+'</span>';
+    else if(Math.abs(R.drift) <= 20) line = '<b>Started '+escapeHtml(r71Clock(R.today))+'</b><span>On rhythm. You usually start '+escapeHtml(r71Clock(R.usual))+'.</span>';
+    else line = '<b>Started '+escapeHtml(r71Clock(R.today))+'</b><span>'+fmtDurationLabel(Math.abs(R.drift))+' '+(R.drift > 0 ? 'later' : 'earlier')+' than usual ('+escapeHtml(r71Clock(R.usual))+').</span>';
+    const lo = 5*60, hi = 23*60;
+    mid += '<div class="r71-card r71-rhythm"><div class="r71-h">Your rhythm</div><div class="r71-rl">'+line+'</div>'+
+      '<div class="r71-dots">'+R.days.map(function(d){
+        if(d.off) return '<i class="is-off" title="'+escapeHtml(d.date)+' · day off"></i>';
+        if(d.start==null) return '<i class="is-none" title="'+escapeHtml(d.date)+' · nothing logged"></i>';
+        const y = Math.max(0, Math.min(1, (d.start - lo)/(hi - lo)));
+        return '<i class="is-on'+(d.today ? ' is-today' : '')+'" style="--y:'+(y*100).toFixed(1)+'%" title="'+escapeHtml(d.date)+' · started '+escapeHtml(r71Clock(d.start))+'"></i>';
+      }).join('')+(R.usual!=null ? '<u style="--y:'+(Math.max(0, Math.min(1, (R.usual - lo)/(hi - lo)))*100).toFixed(1)+'%"></u>' : '')+'</div>'+
+      '<div class="r71-dl"><span>early</span><span>21 days</span><span>late</span></div></div>';
+  }
+  if(r71On('numbers')){
+    const done = r71Today(), target = r71Target(), pct = Math.max(0, Math.min(1, done/target));
+    mid += '<div class="r71-card r71-hours"><div class="r71-h">Today</div>'+
+      '<div class="r71-big">'+escapeHtml(fmtDurationLabel(done) || '0m')+'</div>'+
+      '<div class="r71-ring" style="--p:'+(pct*360).toFixed(0)+'deg"><span>'+Math.round(pct*100)+'%</span></div>'+
+      '<div class="r71-sub">of '+escapeHtml(fmtDurationLabel(target))+(T.id==='shoot' ? ' · same as any day' : '')+'</div></div>';
+  }
+  if(mid) h += '<div class="r71-mid">'+mid+'</div>';
+
+  // 5. what's due
+  if(r71On('deadlines')){
+    const D = r71Deadlines(big ? 4 : 2);
+    h += '<div class="r71-card r71-dues"><div class="r71-h">What’s due</div>'+
+      (D.length ? '<div class="r71-dues-l">'+D.map(function(d){
+        const u = r71Urgency(d.days);
+        const when = d.days < 0 ? Math.abs(d.days)+'d late' : d.days===0 ? 'today' : d.days===1 ? 'tomorrow' : 'in '+d.days+'d';
+        return '<div class="r71-due'+(u ? ' is-'+u : '')+'"><b>'+escapeHtml(d.title)+'</b><span>'+escapeHtml(when)+'</span></div>';
+      }).join('')+'</div>' : '<div class="r71-empty">Nothing with a date on it.</div>')+'</div>';
+  }
+
+  // 6. today's standard, if you want it up there
+  if(r71On('standard')){
+    const S = r71Standard();
+    if(S.length) h += '<div class="r71-card r71-std"><div class="r71-h">Today’s standard</div><div class="r71-chips">'+
+      S.map(function(s){ return '<span class="'+(s.done ? 'is-done' : '')+'">'+(s.done ? '&#10003; ' : '')+escapeHtml(s.label)+'</span>'; }).join('')+'</div></div>';
+  }
+
+  // 7. what it's all for
+  if(r71On('vision')){
+    let vb = '';
+    try{ if(typeof masterVisionBoard==='function' && masterVisionBoard() && typeof renderVisionSlideshow==='function') vb = renderVisionSlideshow(); }catch(e){ vb = ''; }
+    if(vb) h += '<div class="r71-card r71-vision">'+vb+'</div>';
+  }
+
+  // 8. one line
+  if(r71On('quote')){
+    const q = r71Quote();
+    if(q) h += '<div class="r71-quote"><b>'+escapeHtml(q.text)+'</b><span>'+escapeHtml(q.who || '')+'</span></div>';
+  }
+
+  return h+'</div>';
+}
+
+// ---- full screen, for the spare monitor ----
+function r71Open(){
+  let v = document.getElementById('r71Full');
+  if(!v){
+    v = document.createElement('div'); v.id = 'r71Full'; v.className = 'r71-full';
+    document.body.appendChild(v);
+    requestAnimationFrame(function(){ v.classList.add('is-in'); });
+  }
+  v.innerHTML = '<button class="r71-x" data-action="r71Close" aria-label="Close">&#10005;</button>'+
+    '<button class="r71-gear" data-action="r71Settings" aria-label="What it shows">&#9881;</button>'+
+    r71Html('full');
+  document.body.classList.add('r71-on');
+}
+function r71Tick(){ if(document.getElementById('r71Full')) r71Open(); }
+ACTIONS.r71Open = function(){ r71Open(); };
+ACTIONS.r71Close = function(){
+  const v = document.getElementById('r71Full'); if(!v) return;
+  v.classList.remove('is-in'); document.body.classList.remove('r71-on');
+  setTimeout(function(){ v.remove(); }, 240);
+};
+ACTIONS.r71Settings = function(){ ACTIONS.r71Close(); ui.view = 'settings'; ui.settingsTab = 'focus'; renderView(); setTimeout(function(){ const el = document.getElementById('r71Set'); if(el) el.scrollIntoView({block:'center', behavior:'smooth'}); }, 120); };
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && document.getElementById('r71Full')) ACTIONS.r71Close(); });
+// it has to be right without anyone touching it
+setInterval(r71Tick, 30000);
+
+// ---- as a panel on Today ----
+if(typeof PANEL_DEFS!=='undefined' && Array.isArray(PANEL_DEFS) && !PANEL_DEFS.some(function(p){ return p.id==='command'; })){
+  PANEL_DEFS.push({id:'command', label:'Command View: your day, your rhythm, what’s due'});
+}
+if(typeof PANEL_RENDERERS!=='undefined') PANEL_RENDERERS.command = function(){
+  return '<div><div class="section-title" style="justify-content:center;">Command View<button class="btn btn-ghost btn-sm" data-action="r71Open" style="margin-left:8px;">Full screen</button></div>'+r71Html('panel')+'</div>';
+};
+
+// ---- the way in ----
+// It belongs where you'd reach for it when you're not working, so: the Today page's header, next to Customize.
+pageEditBtnHtml = typeof pageEditBtnHtml==='function' ? (function(base){
+  return function(action){
+    const h = base.apply(this, arguments);
+    if(action!=='toggleTodayEdit') return h;
+    return '<button class="r71-cb" data-action="r71Open" title="A board for the other monitor">&#128250; Command View</button>'+h;
+  };
+})(pageEditBtnHtml) : pageEditBtnHtml;
+
+// ---- settings (Focus & Lock in) ----
+renderSettings = (function(base){
+  return function(){
+    const h = base.apply(this, arguments);
+    if(ui.settingsTab!=='focus' || h.indexOf('r71Set') >= 0) return h;
+    const c = r71Cfg();
+    const card = '<div class="card section op-settings" id="r71Set"><div class="section-title">&#128250; Command View</div>'+
+      '<p class="r71-p">A board for a spare monitor, for when you’re not locked in. It only reads — it never asks you anything.</p>'+
+      '<div class="r71-f"><button class="btn btn-sm btn-primary" data-action="r71Open">Open it</button></div>'+
+      '<div class="r71-bl">'+R71_BANDS.map(function(b){
+        return r51Row(b.label, '<button class="r45-sw'+(c.bands[b.id] !== false ? ' on' : '')+'" data-action="r71Band" data-id="'+b.id+'"><span></span></button>');
+      }).join('')+'</div>'+
+      '<div class="seg-tabs r71-seg">'+[['work', 'Doing the work'], ['action', 'Starting'], ['both', 'Both']].map(function(o){
+        return '<button class="seg-tab'+(c.tone===o[0] ? ' active' : '')+'" data-action="r71Tone" data-id="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div>'+
+    '</div>';
+    return h.replace(/(<\/div>\s*)$/, card+'$1');
+  };
+})(renderSettings);
+ACTIONS.r71Band = function(el, e, id){ const c = r71Cfg(); c.bands[id] = c.bands[id] === false; persist('settings'); playTick(); renderView(); r71Tick(); };
+ACTIONS.r71Tone = function(el, e, id){ r71Cfg().tone = id; persist('settings'); playTick(); renderView(); r71Tick(); };
 // ============ EVENT DELEGATION ============
 document.body.addEventListener('click', function(e){
   const el = e.target.closest('[data-action]');

@@ -11090,3 +11090,83 @@ body.opf-on .r70-dock, body:has(#wakeOverlay:not(.hidden)) .r70-dock, body:has(#
 .r70t-seg{ margin-bottom:14px; }
 @media (max-width:620px){ .r70t-qrow{ flex-direction:column; } .r70t-cr b{ min-width:0; } .r70t-cr{ flex-wrap:wrap; } }
 @media (prefers-reduced-motion: reduce){ .r70t-waiting i{ animation:none; } }
+/* ---- Round 71: Command View ---- */
+/* Built to be read from across a room: four bands, big type, one moving thing. */
+.r71{ display:flex; flex-direction:column; gap:14px; }
+.r71-full{ position:fixed; inset:0; z-index:9800; overflow:auto; padding:38px 44px; background:#07080c; color:#f2f5fb; opacity:0; transition:opacity .25s ease; }
+.r71-full.is-in{ opacity:1; }
+body.r71-on{ overflow:hidden; }
+.r71-x, .r71-gear{ position:fixed; top:22px; width:40px; height:40px; border-radius:50%; border:0; background:rgba(255,255,255,.08); color:#f2f5fb; font-size:15px; cursor:pointer; z-index:2; }
+.r71-x{ right:24px; } .r71-gear{ right:72px; font-size:17px; }
+.r71-x:hover, .r71-gear:hover{ background:rgba(255,255,255,.17); }
+.r71.is-big{ gap:22px; max-width:1500px; margin:0 auto; }
+.r71-card{ background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:20px 24px; }
+.r71-h{ font:700 11px var(--font-body); letter-spacing:.16em; text-transform:uppercase; opacity:.42; margin-bottom:12px; }
+/* 1. the work day */
+.r71-clock .r71-ct{ display:flex; align-items:baseline; gap:16px; flex-wrap:wrap; margin-bottom:12px; }
+.r71-clock b{ font:700 clamp(30px, 4.6vw, 62px)/1 var(--font-body); letter-spacing:-.02em; }
+.r71-clock span{ font:600 clamp(15px, 1.5vw, 23px) var(--font-body); opacity:.52; }
+.r71-clock.is-open b{ color:#7ef0c0; }
+.r71-clock.is-none b{ font-size:clamp(20px, 2.4vw, 30px); opacity:.6; }
+.r71-bar{ position:relative; height:14px; border-radius:7px; background:rgba(255,255,255,.07); overflow:visible; }
+.r71-bar i{ display:block; height:100%; border-radius:7px; background:linear-gradient(90deg, #4f9c73, #7ef0c0); transition:width 1s linear; }
+.r71-bar u{ position:absolute; top:50%; width:20px; height:20px; margin:-10px 0 0 -10px; border-radius:50%; background:#fff; box-shadow:0 0 0 5px rgba(126,240,192,.28); transition:left 1s linear; }
+/* 2. the day type */
+.r71-type{ display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+.r71-type b{ font:700 clamp(17px, 1.9vw, 27px) var(--font-body); padding:5px 16px; border-radius:20px; background:rgba(255,255,255,.08); }
+.r71-type span{ font:500 clamp(13px, 1.3vw, 18px) var(--font-body); opacity:.52; }
+.r71.is-shoot .r71-type b{ background:rgba(122,105,184,.3); color:#d9cfff; }
+.r71.is-off .r71-type b, .r71.is-weekend .r71-type b{ background:rgba(79,156,115,.26); color:#c9f3dd; }
+/* 3 + 4 */
+.r71-mid{ display:grid; grid-template-columns:1.55fr 1fr; gap:14px; }
+.r71-rl b{ display:block; font:700 clamp(17px, 1.8vw, 26px) var(--font-body); margin-bottom:4px; }
+.r71-rl span{ font:500 clamp(12px, 1.15vw, 16px) var(--font-body); opacity:.5; }
+.r71-dots{ position:relative; display:flex; align-items:stretch; gap:3px; height:86px; margin:16px 0 6px; }
+.r71-dots i{ position:relative; flex:1; border-radius:3px; }
+.r71-dots i.is-on::after{ content:''; position:absolute; left:50%; top:var(--y); width:9px; height:9px; margin:-4.5px 0 0 -4.5px; border-radius:50%; background:#7ea8ff; }
+.r71-dots i.is-on.is-today::after{ background:#ffd166; width:13px; height:13px; margin:-6.5px 0 0 -6.5px; box-shadow:0 0 0 4px rgba(255,209,102,.22); }
+.r71-dots i.is-none{ background:none; }
+/* a day off reads as a faint tick on the floor, not a column — the dots are the data */
+.r71-dots i.is-off{ background:none; }
+.r71-dots i.is-off::after{ content:''; position:absolute; left:50%; bottom:0; width:5px; height:5px; margin-left:-2.5px; border-radius:50%; background:rgba(79,156,115,.5); }
+.r71-dots u{ position:absolute; left:0; right:0; top:var(--y); height:1px; background:rgba(255,255,255,.26); }
+.r71-dl{ display:flex; justify-content:space-between; margin-top:2px; font:600 10px var(--font-body); letter-spacing:.07em; text-transform:uppercase; opacity:.3; }
+.r71-hours{ display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+.r71-big{ font:800 clamp(34px, 4.4vw, 60px)/1 var(--font-body); letter-spacing:-.025em; }
+.r71-ring{ width:78px; height:78px; margin:12px 0 8px; border-radius:50%; display:grid; place-items:center; background:conic-gradient(#ffd166 var(--p), rgba(255,255,255,.07) 0); position:relative; }
+.r71-ring::after{ content:''; position:absolute; inset:7px; border-radius:50%; background:#07080c; }
+.r71-ring span{ position:relative; z-index:1; font:700 15px var(--font-body); }
+.r71-sub{ font:500 clamp(11px, 1.05vw, 14px) var(--font-body); opacity:.45; }
+/* 5. what's due */
+.r71-dues-l{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:9px; }
+.r71-due{ display:flex; align-items:baseline; gap:11px; padding:12px 15px; border-radius:12px; background:rgba(255,255,255,.04); border-left:3px solid rgba(255,255,255,.14); }
+.r71-due b{ flex:1; font:600 clamp(13px, 1.25vw, 18px) var(--font-body); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.r71-due span{ font:700 clamp(11px, 1.05vw, 14px) var(--font-body); opacity:.5; white-space:nowrap; }
+.r71-due.is-soon{ border-left-color:#ffd166; } .r71-due.is-soon span{ color:#ffd166; opacity:1; }
+.r71-due.is-today{ border-left-color:#ff9a6b; } .r71-due.is-today span{ color:#ff9a6b; opacity:1; }
+.r71-due.is-late{ border-left-color:#ff8f8f; } .r71-due.is-late span{ color:#ff8f8f; opacity:1; }
+.r71-empty{ opacity:.35; font-size:14px; }
+/* 6. the standard */
+.r71-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.r71-chips span{ padding:7px 14px; border-radius:16px; background:rgba(255,255,255,.055); font:600 13px var(--font-body); }
+.r71-chips span.is-done{ opacity:.38; }
+/* 7. the vision board */
+.r71-vision{ padding:0; overflow:hidden; min-height:190px; }
+.r71.is-big .r71-vision{ min-height:300px; }
+/* 8. one line */
+.r71-quote{ text-align:center; padding:8px 0 4px; }
+.r71-quote b{ display:block; font:500 clamp(16px, 1.75vw, 26px)/1.4 var(--font-body); opacity:.8; }
+.r71-quote span{ font:600 clamp(11px, 1.05vw, 14px) var(--font-body); opacity:.35; letter-spacing:.04em; }
+/* the panel version keeps it small */
+.r71.is-panel{ gap:10px; }
+.r71.is-panel .r71-card{ padding:14px 16px; }
+.r71.is-panel .r71-mid{ grid-template-columns:1fr; }
+.r71.is-panel .r71-dots{ height:54px; }
+.r71.is-panel .r71-vision{ min-height:150px; }
+.r71-cb{ display:inline-flex; align-items:center; gap:7px; height:30px; padding:0 13px; margin-right:8px; border-radius:15px; border:1px solid var(--border, rgba(255,255,255,.12)); background:var(--surface, rgba(255,255,255,.03)); color:inherit; font:600 12.5px var(--font-body); cursor:pointer; }
+.r71-cb:hover{ border-color:#7ea8ff; color:#7ea8ff; }
+.r71-p{ margin:0 0 14px; font-size:13px; line-height:1.55; opacity:.65; }
+.r71-f{ margin-bottom:14px; }
+.r71-bl{ margin-bottom:14px; }
+@media (max-width:900px){ .r71-mid{ grid-template-columns:1fr; } .r71-full{ padding:24px 18px; } }
+@media (prefers-reduced-motion: reduce){ .r71-bar i, .r71-bar u{ transition:none; } }
