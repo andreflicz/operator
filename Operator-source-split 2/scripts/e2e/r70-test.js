@@ -70,7 +70,7 @@ const seed = {
     const playedOff = r70GmWanted();
     const ring = wakeRingHtml(); const snz = snoozeHtml();
     return {inHours:inHours, wanted:wanted, bar:bar, closedOff:closedOff, playedOff:playedOff,
-      quietUp:ring.indexOf('r70QuietUp') > 0, gmBtn:ring.indexOf('Good morning') > 0, snzQuiet:snz.indexOf('r70QuietUp') > 0, up:up};
+      quietUp:ring.indexOf('r70QuietUp') > 0 || ring.indexOf('r72Up') > 0, gmBtn:ring.indexOf('Good morning') > 0, snzQuiet:snz.indexOf('r70QuietUp') > 0 || snz.indexOf('r72Up') > 0, up:up};
   `);
   check('3 good morning: the bar only shows before noon', gm.inHours ? (gm.wanted && gm.bar) : !gm.wanted, gm);
   check('3 good morning: ✕ and a sequence already played both stop it', !gm.closedOff && !gm.playedOff, gm);
@@ -203,14 +203,15 @@ const seed = {
 
   // ---- 12. the XP center ----
   const xp = await ev(`
-    const Q = r70Quests(), h = r70XpHtml(), you = renderYouTab();
+    // (Round 72: the XP center moved to its own XP page; You keeps one line that opens it)
+    const Q = r70Quests(), h = r72XpPage(), you = renderYouTab();
     const touch = Q.find(q => q.id === 'touch');
     const c = consistencyStats(xpCtx());
-    return {quests:Q.length, hasXp:Q.every(q => q.xp > 0), panel:h.indexOf('r70-qs') > 0, inYou:you.indexOf('r70-xp') > 0,
+    return {quests:Q.length, hasXp:Q.every(q => q.xp > 0), panel:h.indexOf('r72x-qs') > 0, inYou:you.indexOf('r72OpenXp') > 0,
       touchQuest:!!touch, touchDone:touch && touch.done, parts:c ? c.parts.indexOf('client touches') >= 0 : 'no score'};
   `);
   check('12 XP center: quests, every one worth something', xp.quests >= 8 && xp.hasXp, xp);
-  check('12 XP center: it lives in the You tab', xp.panel && xp.inYou, xp);
+  check('12 XP center: its own page, and You points to it', xp.panel && xp.inYou, xp);
   check('12 XP center: touching base is a quest, and it ticks itself off', xp.touchQuest && xp.touchDone, xp);
   check('12 XP center: consistency counts client touches', xp.parts === true, xp);
 

@@ -178,11 +178,11 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
     const F = JSON.parse(f);
     check('playbook calendar at '+w+'×'+h+': all of it on screen, days not squashed flat', F.bottom <= h && F.w/F.h < 1.6, f);
   }
-  // ---- the Calendar fits the screen ----
+  // ---- the Calendar: (Round 72) the days get real room and never overlap; the page scrolls when it has to ----
   for(const [w, h] of [[3440, 1440], [2560, 1440], [1920, 1080], [1440, 900]]){
     await p.setViewportSize({width:w, height:h}); await E("ui.view='calendar'; renderView()"); await p.waitForTimeout(350);
-    const f = JSON.parse(await E("JSON.stringify((function(){ const m = document.querySelector('main'), c = document.querySelector('.calx .cx-month').getBoundingClientRect(); return {scroll:m.scrollHeight - m.clientHeight, bottom:Math.round(c.bottom)}; })())"));
-    check('Calendar at '+w+'×'+h+': nothing below the screen', f.scroll <= 2 && f.bottom <= h, f);
+    const f = JSON.parse(await E("JSON.stringify((function(){ const cs = Array.from(document.querySelectorAll('.calx .cx-grid .cx-d:not(.is-empty)')); let over = 0; for(let i = 0; i + 7 < cs.length; i++){ if(cs[i].getBoundingClientRect().bottom > cs[i + 7].getBoundingClientRect().top + 1) over++; } return {over:over, h:Math.round(cs[0].getBoundingClientRect().height)}; })())"));
+    check('Calendar at '+w+'×'+h+': the days have room and never overlap', f.over === 0 && f.h >= 110, f);
   }
   await p.setViewportSize({width:1440, height:900});
 

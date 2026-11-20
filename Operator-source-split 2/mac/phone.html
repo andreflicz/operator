@@ -92,9 +92,39 @@
   .msg{ padding:13px 15px; margin-bottom:12px; border-radius:13px; font-size:14px; line-height:1.5;
         background:rgba(255,143,143,.11); border:1px solid rgba(255,143,143,.3); }
   .msg.good{ background:rgba(126,240,192,.1); border-color:rgba(126,240,192,.3); }
-  .pair{ display:flex; gap:9px; } .pair input{ flex:1; height:50px; padding:0 14px; border-radius:13px; background:rgba(255,255,255,.05); border:1px solid var(--line); }
+  .pair{ display:flex; gap:9px; } .pair input{ flex:1; min-width:0; height:50px; padding:0 14px; border-radius:13px; background:rgba(255,255,255,.05); border:1px solid var(--line); }
   .pair button{ padding:0 20px; border-radius:13px; background:var(--blue); color:#0b1020; font-weight:700; }
   @media (prefers-reduced-motion: reduce){ .nudge i{ animation:none; } }
+  /* ---- Round 72: the dashboard ---- */
+  nav{ grid-template-columns:repeat(5, 1fr); }
+  .stats{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+  .stat{ padding:11px 12px; border-radius:13px; background:rgba(255,255,255,.045); border:1px solid var(--line); min-width:0; }
+  .stat small{ display:block; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); }
+  .stat b{ display:block; font-size:19px; font-weight:750; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .stat em{ display:block; font-style:normal; font-size:11.5px; color:var(--dim); }
+  .next{ display:flex; align-items:center; gap:10px; margin-top:10px; padding:11px 13px; border-radius:13px; background:rgba(126,168,255,.09); border:1px solid rgba(126,168,255,.22); font-size:14px; }
+  .next b{ flex:1; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .next em{ font-style:normal; color:var(--blue); font-weight:700; font-size:13px; }
+  .seg{ display:flex; gap:6px; overflow-x:auto; margin:0 0 12px; padding-bottom:2px; }
+  .seg button{ flex:none; padding:9px 15px; border-radius:999px; background:rgba(255,255,255,.055); border:1px solid var(--line); font-size:14px; font-weight:600; color:var(--dim); }
+  .seg button.on{ background:var(--text); color:var(--bg); border-color:var(--text); }
+  .day h3{ margin:4px 2px 6px; font-size:13px; font-weight:700; color:var(--dim); }
+  .ev{ display:flex; gap:12px; padding:10px 2px; border-bottom:1px solid var(--line); font-size:15px; } .ev:last-child{ border-bottom:0; }
+  .ev em{ flex:none; width:70px; font-style:normal; color:var(--dim); font-size:13px; padding-top:1px; } .ev.due em{ color:var(--red); }
+  .cli{ display:flex; align-items:center; gap:12px; padding:12px 2px; border-bottom:1px solid var(--line); } .cli:last-child{ border-bottom:0; }
+  .cli .w{ flex:1; min-width:0; } .cli b{ display:block; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cli small{ display:block; font-size:12px; color:var(--dim); } .cli small.late{ color:var(--red); }
+  .cli button{ flex:none; padding:8px 12px; border-radius:11px; background:rgba(126,240,192,.12); border:1px solid rgba(126,240,192,.3); color:var(--green); font-size:13px; font-weight:700; }
+  .je{ padding:12px 2px; border-bottom:1px solid var(--line); } .je:last-child{ border-bottom:0; }
+  .je small{ color:var(--dim); font-size:12px; } .je b{ display:block; font-size:15px; } .je p{ margin:3px 0 0; font-size:14px; color:#c9cfdc; white-space:pre-wrap; }
+  .al{ display:flex; align-items:center; gap:12px; padding:14px 2px; border-bottom:1px solid var(--line); } .al:last-child{ border-bottom:0; }
+  .al .w{ flex:1; text-align:center; } .al .w b{ display:block; font-size:15px; font-weight:750; } .al .w span{ display:block; font-size:22px; font-weight:650; } .al .w small{ color:var(--dim); font-size:12px; }
+  .al i{ font-style:normal; font-size:22px; width:30px; text-align:center; }
+  .sw{ position:relative; flex:none; width:52px; height:31px; border-radius:16px; background:rgba(255,255,255,.14); transition:background .2s; }
+  .sw::after{ content:''; position:absolute; top:3px; left:3px; width:25px; height:25px; border-radius:50%; background:#fff; transition:transform .2s; }
+  .sw.on{ background:var(--green); } .sw.on::after{ transform:translateX(21px); }
+  .ring-acts{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:12px; }
+  .readout{ white-space:pre-line; font-size:15px; line-height:1.55; }
+  .voice{ font-size:12.5px; color:var(--dim); margin-top:8px; text-align:center; }
 </style></head>
 <body>
 
@@ -125,10 +155,57 @@
         <button class="chip" data-quick="water"><span>&#128167;</span>Water</button>
       </div>
     </div>
+    <div class="card" id="dashCard">
+      <h2>Your day</h2>
+      <div class="stats" id="stats"></div>
+      <div id="next"></div>
+      <div class="row n2" style="margin-top:10px">
+        <button class="chip" id="shootB"><span>&#127916;</span><em id="shootT" style="font-style:normal">Shooting</em></button>
+        <button class="chip" id="readB"><span>&#128276;</span>Read me the day</button>
+      </div>
+      <div class="reply readout hide" id="readout"></div>
+    </div>
+    <div class="card hide" id="ringCard">
+      <h2>The alarm</h2>
+      <div class="ring-acts"><button class="chip" data-al="snooze">&#128164; Snooze</button><button class="chip" data-al="up">&#9728;&#65039; I’m up</button><button class="chip" data-al="off">Turn off</button></div>
+    </div>
     <div class="card">
       <h2>Today</h2>
       <div class="list" id="today"></div>
     </div>
+  </section>
+
+  <!-- TASKS -->
+  <section id="tTasks" class="hide">
+    <div class="card">
+      <h2>Today</h2>
+      <div class="list" id="tToday"></div>
+      <div class="pair" style="margin-top:10px"><input id="task2" placeholder="Add a task"><button id="task2Go">Add</button></div>
+    </div>
+    <div class="card">
+      <h2>Backlog</h2>
+      <div class="list" id="tBack"></div>
+    </div>
+  </section>
+
+  <!-- CALENDAR -->
+  <section id="tCal" class="hide">
+    <div class="card"><div id="cal"></div></div>
+  </section>
+
+  <!-- MORE -->
+  <section id="tMore" class="hide">
+    <div class="seg" id="moreSeg">
+      <button data-more="clients" class="on">Clients</button><button data-more="journal">Journal</button><button data-more="alarms">Alarms</button><button data-more="tags">Tags</button><button data-more="log">Log</button>
+    </div>
+    <div id="mClients" class="card"><h2>Clients</h2><div id="clients"></div></div>
+    <div id="mJournal" class="hide">
+      <div class="card"><h2>Write it down</h2><textarea class="say" id="jText" rows="3" placeholder="What’s on your mind?"></textarea><button class="go" id="jGo">Save</button></div>
+      <div class="card"><h2>Lately</h2><div id="jList"></div></div>
+    </div>
+    <div id="mAlarms" class="card hide"><h2>Alarms</h2><div id="alarms"></div></div>
+    <div id="mTags" class="hide"></div>
+    <div id="mLog" class="hide"></div>
   </section>
 
   <!-- OP -->
@@ -138,6 +215,7 @@
       <textarea class="say" id="say" rows="2" placeholder="Say what you need."></textarea>
       <button class="go" id="sayGo">Ask him</button>
       <div class="reply hide" id="reply"></div>
+      <div class="voice"><button id="voiceB">&#128266; Voice on</button></div>
     </div>
     <div class="card">
       <h2>Quick</h2>
@@ -184,9 +262,10 @@
 
 <nav id="nav" class="hide">
   <button data-tab="Now" class="on"><span>&#9201;&#65039;</span>Now</button>
-  <button data-tab="Op"><span>&#9728;&#65039;</span>Op</button>
-  <button data-tab="Tags"><span>&#128225;</span>Tags</button>
-  <button data-tab="Log"><span>&#10133;</span>Log</button>
+  <button data-tab="Tasks"><span>&#9989;</span>Tasks</button>
+  <button data-tab="Cal"><span>&#128197;</span>Calendar</button>
+  <button data-tab="Op"><span>&#128483;&#65039;</span>Op</button>
+  <button data-tab="More"><span>&#9776;</span>More</button>
 </nav>
 
 <script>
@@ -220,16 +299,39 @@
   function gate(on){ $('gate').classList.toggle('hide', !on); $('app').classList.toggle('hide', on); $('nav').classList.toggle('hide', on); }
 
   // ---- Op in his own voice: the Mac hands back the audio, the phone just plays it ----
-  var aud = null;
+  // iOS only lets a page play sound it was allowed to by a tap. So the first tap anywhere unlocks one audio player
+  // (a silent clip) and the phone's own voice, and every reply after that plays through them.
+  var player = null, unlocked = false, voiceOn = true;
+  try{ voiceOn = localStorage.getItem('opVoice') !== 'off'; }catch(e){}
+  var SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+  function unlock(){
+    if(unlocked) return; unlocked = true;
+    try{ player = new Audio(); player.setAttribute('playsinline', ''); player.src = SILENT; var p = player.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
+    try{ if(window.speechSynthesis){ var u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } }catch(e){}
+  }
+  ['touchend', 'click'].forEach(function(ev){ document.addEventListener(ev, unlock, {capture:true, passive:true}); });
+  function speakLocal(text){
+    try{ if(!window.speechSynthesis) return; speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(text); u.rate = 1.02;
+      var vs = speechSynthesis.getVoices().filter(function(v){ return /^en/i.test(v.lang); });
+      var best = vs.filter(function(v){ return /premium|enhanced|siri|neural/i.test(v.name); })[0] || vs.filter(function(v){ return /samantha|daniel|alex|karen|moira/i.test(v.name); })[0];
+      if(best) u.voice = best; speechSynthesis.speak(u); }catch(e){}
+  }
   function speak(text){
-    if(!text) return;
+    text = String(text || '').trim(); if(!text || !voiceOn) return;
     try{
-      if(aud){ aud.pause(); aud = null; }
+      if(player){ try{ player.pause(); }catch(e){} }
       fetch('/api/speak', {method:'POST', headers:{'Content-Type':'application/json', 'X-Op-Code':code}, body:JSON.stringify({text:text})})
         .then(function(r){ if(!r.ok) throw new Error('x'); return r.blob(); })
-        .then(function(b){ aud = new Audio(URL.createObjectURL(b)); aud.play().catch(function(){}); })
-        .catch(function(){ try{ var u = new SpeechSynthesisUtterance(text); u.rate = 1.02; speechSynthesis.speak(u); }catch(e){} });
-    }catch(e){}
+        .then(function(b){
+          var url = URL.createObjectURL(b);
+          if(!player){ player = new Audio(); player.setAttribute('playsinline', ''); }
+          player.src = url;
+          var p = player.play();
+          if(p && p.catch) p.catch(function(){ speakLocal(text); });
+          player.onended = function(){ try{ URL.revokeObjectURL(url); }catch(e){} };
+        })
+        .catch(function(){ speakLocal(text); });
+    }catch(e){ speakLocal(text); }
   }
 
   // ---- the top of the page ----
@@ -281,16 +383,100 @@
   function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
 
   // ---- the tabs ----
-  var tab = 'Now';
-  document.getElementById('nav').addEventListener('click', function(e){
-    var b = e.target.closest('[data-tab]'); if(!b) return;
-    tab = b.getAttribute('data-tab');
-    [].forEach.call(document.querySelectorAll('nav button'), function(x){ x.classList.toggle('on', x === b); });
-    ['Now', 'Op', 'Tags', 'Log'].forEach(function(t){ $('t'+t).classList.toggle('hide', t !== tab); });
-    if(tab === 'Tags') loadTags();
-    if(tab === 'Log') loadMeals();
-    if(tab === 'Now') loadToday();
+  var tab = 'Now', more = 'clients';
+  var TABS = ['Now', 'Tasks', 'Cal', 'Op', 'More', 'Tags', 'Log'];
+  function show(t){
+    tab = t;
+    [].forEach.call(document.querySelectorAll('nav button'), function(x){ x.classList.toggle('on', x.getAttribute('data-tab') === (t === 'Tags' || t === 'Log' ? 'More' : t)); });
+    TABS.forEach(function(z){ $('t'+z).classList.toggle('hide', !(z === t || (t === 'More' && (z === 'Tags' && more === 'tags' || z === 'Log' && more === 'log')))); });
+    if(t === 'Now'){ loadToday(); loadDash(); }
+    if(t === 'Tasks') loadTasks();
+    if(t === 'Cal') loadCal();
+    if(t === 'More') showMore(more);
+  }
+  function showMore(m){
+    more = m;
+    [].forEach.call(document.querySelectorAll('#moreSeg button'), function(x){ x.classList.toggle('on', x.getAttribute('data-more') === m); });
+    $('mClients').classList.toggle('hide', m !== 'clients'); $('mJournal').classList.toggle('hide', m !== 'journal'); $('mAlarms').classList.toggle('hide', m !== 'alarms');
+    $('tTags').classList.toggle('hide', m !== 'tags'); $('tLog').classList.toggle('hide', m !== 'log');
+    if(m === 'clients') loadClients(); if(m === 'journal') loadJournal(); if(m === 'alarms') loadAlarms(); if(m === 'tags') loadTags(); if(m === 'log') loadMeals();
+  }
+  document.getElementById('nav').addEventListener('click', function(e){ var b = e.target.closest('[data-tab]'); if(b) show(b.getAttribute('data-tab')); });
+  $('moreSeg').addEventListener('click', function(e){ var b = e.target.closest('[data-more]'); if(b) showMore(b.getAttribute('data-more')); });
+
+  // ---- Round 72: one call for the dashboard ----
+  function call(name, args){ return api('call', {name:name, args:args || {}}).then(function(j){ if(!j || j.out == null) throw new Error('old'); return j.out; }); }
+  function hm(n){ n = Math.round(Number(n) || 0); if(!n) return '0m'; var h = Math.floor(n/60), m = n % 60; return h ? h+'h'+(m ? ' '+m+'m' : '') : m+'m'; }
+  function loadDash(){
+    call('dash').then(function(d){
+      $('stats').innerHTML =
+        '<div class="stat"><small>Deep work</small><b>'+hm(d.deep)+'</b><em>of '+hm(d.target)+'</em></div>'+
+        '<div class="stat"><small>Shooting</small><b>'+hm(d.shoot)+'</b><em>today</em></div>'+
+        '<div class="stat"><small>Streak</small><b>'+(d.streak || 0)+'</b><em>days</em></div>'+
+        '<div class="stat"><small>Breaks</small><b>'+hm(d.brk)+'</b><em>today</em></div>'+
+        '<div class="stat"><small>Awake</small><b>'+hm(d.awake)+'</b><em>slept '+hm(d.asleep)+'</em></div>'+
+        '<div class="stat"><small>MRR</small><b>$'+Number(d.mrr || 0).toLocaleString()+'</b><em>a month</em></div>';
+      $('next').innerHTML = d.next ? '<div class="next"><b>'+esc(d.next.title)+'</b><em>'+esc(d.next.time)+'</em></div>' : '';
+      $('shootT').textContent = d.shooting ? 'End shooting' : 'Shooting';
+      $('shootB').classList.toggle('on', !!d.shooting);
+    }).catch(function(){ $('dashCard').classList.add('hide'); });
+    call('alarms').then(function(a){ $('ringCard').classList.toggle('hide', !(a.ringing || a.snoozed)); }).catch(function(){});
+  }
+  $('shootB').onclick = function(){ call('shoot', {on:$('shootT').textContent === 'Shooting'}).then(function(){ refresh(); loadDash(); }).catch(why); };
+  $('readB').onclick = function(){ call('readout').then(function(t){ var r = $('readout'); r.classList.remove('hide'); r.textContent = t; speak(String(t).replace(/\n/g, ' ')); }).catch(why); };
+  document.body.addEventListener('click', function(e){
+    var al = e.target.closest('[data-al]'); if(!al) return;
+    call('alarmAct', {act:al.getAttribute('data-al')}).then(function(r){ flash(esc(r.say || 'Done.')); loadDash(); }).catch(why);
   });
+  function taskRow(x){ return '<button class="item'+(x.done ? ' done' : '')+'" data-t2="'+x.id+'"><i></i><span><b>'+esc(x.title)+'</b></span>'+(x.due ? '<em>'+esc(x.due.slice(5))+'</em>' : x.client ? '<em>'+esc(x.client)+'</em>' : '')+'</button>'; }
+  function loadTasks(){
+    call('tasks').then(function(t){
+      $('tToday').innerHTML = (t.today || []).map(taskRow).join('') || '<div class="item"><b style="color:var(--dim)">Nothing for today yet.</b></div>';
+      $('tBack').innerHTML = (t.backlog || []).map(taskRow).join('') || '<div class="item"><b style="color:var(--dim)">Backlog’s empty.</b></div>';
+    }).catch(why);
+  }
+  document.body.addEventListener('click', function(e){
+    var t = e.target.closest('[data-t2]'); if(!t) return;
+    t.classList.toggle('done'); call('taskDone', {id:t.getAttribute('data-t2')}).then(loadTasks).catch(why);
+  });
+  $('task2Go').onclick = function(){ var v = $('task2').value.trim(); if(!v) return; call('taskAdd', {title:v}).then(function(){ $('task2').value = ''; flash('Added.'); loadTasks(); }).catch(why); };
+  function loadCal(){
+    call('cal').then(function(days){
+      $('cal').innerHTML = (days || []).map(function(d){
+        return '<div class="day"><h3>'+esc(d.label)+'</h3>'+(d.items.length ? d.items.map(function(x){ return '<div class="ev'+(x.kind === 'due' ? ' due' : '')+'"><em>'+esc(x.time)+'</em><span>'+esc(x.title)+'</span></div>'; }).join('') : '<div class="ev"><span style="color:var(--dim)">Nothing on.</span></div>')+'</div>';
+      }).join('');
+    }).catch(why);
+  }
+  function loadClients(){
+    call('clients').then(function(L){
+      $('clients').innerHTML = (L || []).map(function(c){
+        return '<div class="cli"><div class="w"><b>'+esc(c.name)+'</b><small class="'+(c.late ? 'late' : '')+'">'+(c.mrr ? '$'+Number(c.mrr).toLocaleString()+'/mo · ' : '')+esc(c.health || '')+(c.due ? ' · touch '+(c.late ? 'overdue' : esc(c.due.slice(5))) : '')+'</small></div><button data-touch="'+c.id+'">Touched</button></div>';
+      }).join('') || '<div class="item"><b style="color:var(--dim)">No clients yet.</b></div>';
+    }).catch(why);
+  }
+  document.body.addEventListener('click', function(e){
+    var t = e.target.closest('[data-touch]'); if(!t) return;
+    call('touch', {id:t.getAttribute('data-touch')}).then(function(){ flash('Logged the touch.'); loadClients(); }).catch(why);
+  });
+  function loadJournal(){
+    call('journal').then(function(L){
+      $('jList').innerHTML = (L || []).map(function(j){ return '<div class="je"><small>'+esc(j.date)+'</small>'+(j.title ? '<b>'+esc(j.title)+'</b>' : '')+'<p>'+esc(j.text)+'</p></div>'; }).join('') || '<div class="item"><b style="color:var(--dim)">Nothing written yet.</b></div>';
+    }).catch(why);
+  }
+  $('jGo').onclick = function(){ var v = $('jText').value.trim(); if(!v) return; call('journalAdd', {text:v}).then(function(){ $('jText').value = ''; flash('Saved to your journal.'); loadJournal(); }).catch(why); };
+  function loadAlarms(){
+    call('alarms').then(function(a){
+      var row = function(k, icon, name, x){ return '<div class="al"><i>'+icon+'</i><div class="w"><b>'+name+'</b><span>'+esc(x.label)+'</span><small>'+esc(x.days || '')+'</small></div><button class="sw'+(x.on ? ' on' : '')+'" data-alw="'+k+'" aria-label="'+name+'"></button></div>'; };
+      $('alarms').innerHTML = row('wake', '&#9728;&#65039;', 'Wake up', a.wake)+row('work', '&#128188;', 'Work', a.work);
+    }).catch(why);
+  }
+  document.body.addEventListener('click', function(e){
+    var t = e.target.closest('[data-alw]'); if(!t) return;
+    var on = !t.classList.contains('on'); t.classList.toggle('on', on);
+    call('alarm', {which:t.getAttribute('data-alw'), on:on}).then(function(){ flash(on ? 'Alarm on.' : 'Alarm off.'); }).catch(why);
+  });
+  $('voiceB').onclick = function(){ voiceOn = !voiceOn; try{ localStorage.setItem('opVoice', voiceOn ? 'on' : 'off'); }catch(e){} this.innerHTML = voiceOn ? '&#128266; Voice on' : '&#128263; Voice off'; if(!voiceOn){ try{ speechSynthesis.cancel(); if(player) player.pause(); }catch(e){} } };
+  $('voiceB').innerHTML = voiceOn ? '&#128266; Voice on' : '&#128263; Voice off';
 
   // ---- now ----
   $('lock').onclick = function(){
@@ -308,8 +494,7 @@
     var s = e.target.closest('[data-std]');
     if(s){ s.classList.toggle('done'); api('standard', {id:s.getAttribute('data-std')}).then(function(){ loadToday(); }).catch(why); return; }
     var n = e.target.closest('[data-nudge]');
-    if(n){ tab = 'Log'; [].forEach.call(document.querySelectorAll('nav button'), function(x){ x.classList.toggle('on', x.getAttribute('data-tab') === 'Log'); });
-      ['Now', 'Op', 'Tags', 'Log'].forEach(function(z){ $('t'+z).classList.toggle('hide', z !== 'Log'); }); loadMeals(); return; }
+    if(n){ more = 'log'; show('More'); return; }
     var a = e.target.closest('[data-ask]');
     if(a){ ask(a.getAttribute('data-ask')); return; }
     var g = e.target.closest('[data-tag]');
@@ -380,7 +565,7 @@
   $('codeGo').onclick = function(){
     code = $('codeIn').value.replace(/\D/g, '');
     if(code.length !== 6){ say('Six digits.'); return; }
-    api('state').then(function(j){ try{ localStorage.setItem('opCode', code); }catch(e){} gate(false); paint(j.out); loadToday(); }).catch(why);
+    api('state').then(function(j){ try{ localStorage.setItem('opCode', code); }catch(e){} gate(false); paint(j.out); loadToday(); loadDash(); }).catch(why);
   };
 
   // ---- keep it live while it's on screen ----
@@ -389,8 +574,8 @@
     clearInterval(timer);
     if(on) timer = setInterval(function(){ if(!document.hidden) refresh(); }, 5000);
   }
-  document.addEventListener('visibilitychange', function(){ if(!document.hidden){ refresh(); if(tab === 'Now') loadToday(); } });
-  if(!code) gate(true); else { refresh().then(loadToday); }
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden){ refresh(); if(tab === 'Now'){ loadToday(); loadDash(); } } });
+  if(!code) gate(true); else { refresh().then(function(){ loadToday(); loadDash(); }); }
   live(true);
 })();
 </script>

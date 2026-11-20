@@ -40,13 +40,15 @@ const seed = {
     R70T.last = {};
     const again = r70TRun(g, {});
     const mins = state.focus.activeSession ? Math.round((Date.now() - state.focus.activeSession.startedAt)/60000) : 0;
+    // (Round 72: a lock-out tap right after a lock-in just locks out, no question; lock in again for the next step)
+    if(!state.focus.activeSession){ R70T.last = {}; r70TRun(g, {}); }
     state.focus.activeSession.startedAt = Date.now() - 2*3600000;
     R70T.last = {};
     const out = r70TRun(g, {});
     return {first:first.say, locked:locked, again:again.say, out:out.say, ended:!state.focus.activeSession, taps:g.taps, logged:r70Tags().log.length};
   `);
   check('22 a tap runs the tag', /Locked in/.test(tap.first) && tap.locked, tap);
-  check('25 a rule decides which step runs: in when out, out when in', /only locked in|asked on the Mac/i.test(tap.again), tap);
+  check('25 a rule decides which step runs: in when out, out when in', /only locked in|asked on the Mac|Locked out/i.test(tap.again), tap);
   check('23 tapping again later locks you out, with the length', /Locked out/.test(tap.out) && tap.ended, tap);
   check('28 every tap is counted and logged', tap.taps >= 3 && tap.logged >= 3, tap);
 
@@ -136,7 +138,7 @@ const seed = {
     state.focus.snooze = null;
     return {say:r.say};
   `);
-  check('47.3 the same tag snoozes when the alarm is going', /Snoozed/.test(snooze.say), snooze);
+  check('47.3 the same tag snoozes when the alarm is going', /snoozed/i.test(snooze.say), snooze);
 
   // ---- 47.4 no tap in the morning: estimated, not lost ----
   const est = await ev(`
@@ -152,7 +154,8 @@ const seed = {
 
   // ---- 47.5 the door: out, and a break when you were locked in ----
   const door = await ev(`
-    const g = r70TMake('Door', 'by the door', [{id:uid(), act:'out', kind:'training', when:{away:'no'}}, {id:uid(), act:'back', when:{away:'yes'}}]);
+    // (Round 72: training and shooting end the session; an errand is still a break)
+    const g = r70TMake('Door', 'by the door', [{id:uid(), act:'out', kind:'errand', when:{away:'no'}}, {id:uid(), act:'back', when:{away:'yes'}}]);
     try{ opRunTool('lock_in', {}); }catch(e){}
     R70T.last = {};
     const leave = r70TRun(g, {});
@@ -162,8 +165,11 @@ const seed = {
     state.focus.r70Out.startedAt = Date.now() - 50*60000;
     const home = r70TRun(g, {});
     const back = !!(state.focus.activeSession && !state.focus.activeSession.onBreak);
-    const nudge = r70Nudges().some(n => n.kind === 'workout');
     try{ if(state.focus.activeSession) r70LockOutNow(); }catch(e){}
+    // training: out and back, and the reminder to log it
+    const g2 = r70TMake('Gym', '', [{id:uid(), act:'out', kind:'training', when:{away:'no'}}, {id:uid(), act:'back', when:{away:'yes'}}]);
+    R70T.last = {}; r70TRun(g2, {}); state.focus.r70Out.startedAt = Date.now() - 50*60000; R70T.last = {}; r70TRun(g2, {});
+    const nudge = r70Nudges().some(n => n.kind === 'workout');
     return {leave:leave.say, onBreak:onBreak, out:out, home:home.say, back:back, nudge:nudge, still:!r70TOut()};
   `);
   check('47.5 leaving while locked in becomes a break, with the reason', door.out && door.onBreak && /on a break until you.re back/i.test(door.leave), door);
@@ -251,7 +257,7 @@ const seed = {
       doorRules:!!(door && door.steps[0].when.away === 'no' && door.steps[1].when.away === 'yes'),
       extras:off.length, noneOfTheExtras:off.every(n => names.indexOf(n) < 0), secrets:new Set(r70TagList().map(g => g.secret)).size};
   `);
-  check('47 the starter set goes in in one tap: Desk, Break, Sleep, Awake, Door, Kitchen, Weigh-in, Talk to Op', starters.n === 8 && starters.secrets === 8, starters);
+  check('47 the starter set goes in in one tap: Desk, Break, Sleep, Awake, Good morning (R72), Door, Kitchen, Weigh-in, Talk to Op', starters.n === 9 && starters.secrets === 9 && starters.names.indexOf('Good morning') >= 0, starters);
   check('47.1 Desk is a toggle out of the box', starters.deskSteps === 2 && starters.deskRules, starters);
   check('47.5 so is the Door', starters.doorRules, starters);
   check('47 Gym bag, Reading chair, Phone box and Add a task ship but stay off', starters.extras === 4 && starters.noneOfTheExtras, starters);

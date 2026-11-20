@@ -1,4 +1,4 @@
-# Operator app — continuity brief (updated 2026-11-04, after Round 68)
+# Operator app — continuity brief (updated 2026-11-20, after Round 72)
 
 ## What this is
 "Operator" is Andre's personal productivity app: business (clients, leads, MRR, deliverables, playbooks), focus (lock-in sessions, tasks), personal (goals, health, finances, journal, social), and Op, the AI assistant inside it. The UI and logic are one self-contained HTML page built from a source tree. It ships as a Mac app (Electron). The older Chrome-app-shell `.app` still exists in the repo as the source of the helper scripts.
@@ -452,6 +452,77 @@ GoHighLevel everywhere (stubs in 32z5c-r55.js); client reports outside Social (R
   Settings → Op → Check now clears those and asks again; the installer does too when the signature changed.
 - main.js: single instance, menu bar Tray, ⌥O show/hide, ✕ hides, ⌘Q quits, starts the helpers, move-in from the old Chrome profile, `window.operatorPage` bridge.
 
+## Round 72 notes (2026-11-20; the list is ROUND-72-LIST.md, 26 items)
+Two files: **32z83-r72.js** (alarms, tags, Good morning, the day readout, Op's tools, memory, auto lock-in, your time,
+music, the phone's page side) and **32z84-r72ui.js** (calendar, XP page, widgets, Command View, alarm list). CSS at the
+end of styles.css. Test: `scripts/e2e/r72-test.js` (52). Screenshots: `scripts/e2e/r72-shots.js`. Mac 4.4.0.
+Settings live in `state.profile.r72` (`r72P(k, d)` / `r72Set(k, v)`).
+
+### Alarms and mornings
+- **The snooze bug**: the Sleep tag called `snoozeRegularAlarm()` (the *reminder* snooze) while the wake alarm rang, so
+  the alarm kept going and a "Reminder (snoozed)" fired later. `r70TRunStep` is wrapped: sleep/snooze → `wakeSnooze()`
+  (wake ring), `ACTIONS.workSnooze` (work ring), `snoozeAlarm()` (a reminder); already snoozed is an answer.
+- `snoozeHtml` is replaced: the clock, "Rings again at …" and the countdown (`#snzLeft`), Turn off / I'm up.
+  `wakeRingHtml`'s buttons: Snooze / I'm up (`r72Up`) / Turn off (`r72AlarmOff`), Good morning under them.
+  Turn off → `ui.wakeMode = 'r72clock'` (`r72ClockHtml`, just the time; Close lifts it away).
+- `r70QuietUp` is replaced: it keeps the wake song (`finishWakeMedia`) unless `awakeStopsMusic`; from a tag with no
+  overlay open it doesn't move you to Today. Snooze stops all music (`snoozeStopsMusic`, default on).
+- **Good morning → Today**, not the lock-in page (`ACTIONS.wakeStartMorning` replaced; the button reads "Start the day").
+- **Work alarm**: `checkWorkAlarm` is wrapped to ring before the older checks: full screen unless you're locked in or on
+  the lock-in page (then the small card). `workStartedToday()` no longer blocks it. From Good morning it takes over the
+  screen (`r72WorkTakeover`). `workRingHtml` is new (a line from `r72WorkLine`, three tiles); "Let's work" → `clockIn`.
+### Tags
+- `r70TConfirmOut` just locks out. "Ask me which" for heading out guesses (`r72OutGuess`: a shoot on the calendar or a
+  shoot day → shooting). `r70TGoOut`: shooting/training end a lock-in; an errand is still a break.
+- `startMode` is wrapped: shooting/training/offtime end a running session first (it used to refuse silently).
+- Tag lock-in: `r72TagLockIn` starts the session, then `r72LockFx` (a ring fills, "Locked in") and `playLockInSong`.
+- New steps `snooze`, `alarmoff`; `awake` no longer starts Good morning; new starter `gm` (Good morning). A one-time
+  migration (`state.tags.r72Mig`) changes an existing Awake tag and adds the Good morning tag.
+- The wizard defaults to Hands-free; Settings → Tags has "No pop-ups: make your tags hands-free" with every link.
+### Op
+- Good morning narration (`r72GmApply` after `wakeBriefHtml`): three lines — hello + weather, `r72DayComment()` (one
+  remark), a get-ready line. Lines come from pools via `r72Pick(list, key, days)` (no repeat for 14 days,
+  `state.focus.r72Said`); with the key, `aiWrite` writes them (no coffee, avoiding `r72GmPast`). `opBriefRewrite` is off;
+  coffee lines are filtered out of `OP_GREETS` / `OP_HELLOS`.
+- `r72DayReadout()` = where / next / how it's going. `aiAsk` answers `R72_READ_RE` locally; the `read` tag step too.
+- Tools: list_sessions, change_session, add_session, log_time, start_mode, alarm, press (any `data-action`, refuses
+  delete-ish names), list_buttons, set_setting. **aiSystem returns an array of blocks**: append with
+  `out.push({type:'text', …})`, never string concatenation.
+- Memory: chat capped at 250 lines × 1,200 chars (`r72TrimOp`), feed at 120.
+### Your time
+- Auto lock-in: `r72AutoWork(app)` — browsers never count (even sorted as work); only work apps / visible work sites.
+  Blocked outside work hours (`autoHoursOnly`), in any mode, while out. `r72SessionGuard` (30 s): an automatic session
+  ends `autoEnd` (10) min after the last work, back-dated; any session ends after `manualAwayMin` (30) min with no
+  keys/mouse; automatic ones ask after `autoMax` (4) h. Settings → Focus & Lock in → "Automatic lock-in".
+- View all sessions: "sessions over 6 hours" card (Cut to 3h / Delete / Delete all, with Undo).
+- `startFocus` sets `ui.focusTab = 'tasks'` (it used to keep Analytics).
+- Your time (`r72TimeFor(date)`): focus, shooting, break (modes + breaks inside sessions), off, awake, asleep. Panel
+  `r72time` (added to Today once), Log time sheet (`r72LogTime`: a logged shoot over a session cuts the session).
+### Music
+- `r72AutoMusic(moment, fn)` wraps every automatic start (lockMusicOn, focusMusicAfterIntro, playLockInSong,
+  workMusicPlay, gmHandoff, inspPlayDream): `autoMusic` on/fade/off, `musicMoments`, and `R72.autoNext` makes the
+  next `focusMusicPlay` "automatic" so `r72ArmFade` fades it after `musicFadeMin` (6). Pressing play clears it.
+  Lock-out / break stop it (settings). The card is at the top of Settings → Sound.
+### Looks
+- Calendar: `r56CalFit` is a no-op; rows are `minmax(118px, auto)` and the page scrolls; up to three things a day.
+- `#musicDock .md-lvl` hidden. XP page: `ui.view = 'xp'` (rendered through `renderToday`), sidebar item added by
+  `r72XpNav`; You shows one line (`r70XpHtml` replaced). `R72_STAT_DOC` explains each stat.
+- Widgets: panels registered after Round 60 are wrapped in `.r60w` (so S/M/L work); container queries stack the
+  streak days and grid the goal tiles.
+- Command View: `r72CmdHtml` draws each band separately (Round 71's `r71Html` with one band on), in `c.order` with
+  `c.size` (s/m/l) on a 12-column grid; Customize on the board (`ui.r72CmdEdit`); extra bands bigclock, weather,
+  today, time, mode, note; themes night/dusk/mono.
+### Phone (Mac 4.4.0)
+- `/api/call {name, args}` → `operatorPage.phoneCall` (`r72PhoneCall`: dash, tasks, taskAdd, taskDone, cal, clients,
+  touch, journal, journalAdd, alarms, alarm, alarmAct, readout, shoot). `phoneSpeakUrl` falls back to the helper's
+  audio even when the Mac's voice is the system one.
+- phone.html: Now / Tasks / Calendar / Op / More (Clients, Journal, Alarms, Tags, Log). Audio: the first tap unlocks one
+  `Audio` element and speechSynthesis (iOS blocks play() outside a tap, which is why Op was silent); replies play
+  through it; a Voice on/off toggle.
+### Still open
+- Not verifiable here: real NFC + Shortcuts, iOS audio, the Mac's helper voice on the phone.
+- The project (claude.ai) is full: the plan couldn't be saved there.
+
 ## Round 70 notes (2026-11-15; the list is ROUND-70-LIST.md, 47 items)
 Two files: **32z80-r70.js** (the eighteen app updates) and **32z81-r70tags.js** (NFC tags). CSS at the end of
 styles.css. Tests: `scripts/e2e/r70-test.js` (54) and `scripts/e2e/r70tags-test.js` (55). Mac 4.3.0.
@@ -529,6 +600,7 @@ styles.css. Tests: `scripts/e2e/r70-test.js` (54) and `scripts/e2e/r70tags-test.
 - "Works with the Mac off" still needs cloud sync — its own round.
 
 ## Status
+Round 72 (2026-11-20): ROUND-72-LIST.md (26 items). Mac 4.4.0.
 Round 70 (2026-11-15): ROUND-70-LIST.md (47 items: 18 app updates + the tag system). Mac 4.3.0.
 Round 67 (2026-11-03): ROUND-67-LIST.md (11 items). Mac 4.0.0; 4.0.1 adds client ad assignment in Social and free transcripts.
 Round 69 (2026-11-05): ROUND-69-LIST.md. Mac 4.2.0.

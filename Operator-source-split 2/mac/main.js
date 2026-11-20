@@ -523,7 +523,7 @@ function phoneStart() {
     }
     if (!u.pathname.startsWith('/api/')) return send(404, { error: 'not found', hint: 'Operator serves / for the page and /t/<tag> for a tag.' });
     // what this build can do, so an error can explain itself instead of going quiet
-    if (u.pathname === '/api/version') return send(200, { ok: true, app: app.getVersion(), tags: true, routes: ['state', 'lockin', 'lockout', 'break', 'ask', 'task', 'tag', 'tags', 'runtag', 'speak', 'today', 'meals', 'meal', 'weigh', 'quick', 'taskdone', 'standard', 'version'] });
+    if (u.pathname === '/api/version') return send(200, { ok: true, app: app.getVersion(), tags: true, routes: ['state', 'lockin', 'lockout', 'break', 'ask', 'task', 'tag', 'tags', 'runtag', 'speak', 'today', 'meals', 'meal', 'weigh', 'quick', 'taskdone', 'standard', 'call', 'version'] });
     // (six wrong codes from one address: it waits a minute)
     const f = fails[ip] || { n: 0, at: 0 };
     if (f.n >= 6 && Date.now() - f.at < 60000) return send(429, { error: 'too many tries', hint: 'Wait a minute, then try the code again.' });
@@ -551,7 +551,9 @@ function phoneStart() {
         weigh: 'operatorPage.phoneWeigh ? operatorPage.phoneWeigh(' + (Number(x.value) || 0) + ') : null',
         quick: 'operatorPage.phoneQuick ? operatorPage.phoneQuick(' + JSON.stringify(String(x.what || '')) + ', ' + JSON.stringify(String(x.value || '').slice(0, 2000)) + ') : null',
         taskdone: 'operatorPage.phoneTaskDone ? operatorPage.phoneTaskDone(' + JSON.stringify(String(x.id || '')) + ') : null',
-        standard: 'operatorPage.phoneStandard ? operatorPage.phoneStandard(' + JSON.stringify(String(x.id || '')) + ') : null'
+        standard: 'operatorPage.phoneStandard ? operatorPage.phoneStandard(' + JSON.stringify(String(x.id || '')) + ') : null',
+        // ---- Round 72: the phone's dashboard (tasks, calendar, clients, journal, alarms) through one call ----
+        call: 'operatorPage.phoneCall ? operatorPage.phoneCall(' + JSON.stringify(String(x.name || '').slice(0, 40)) + ', ' + JSON.stringify(x.args && typeof x.args === 'object' ? x.args : {}) + ') : null'
       };
       // Op's own voice on the phone: the page knows which engine and which voice, the helper has the audio
       // already cached from the Mac, and this just hands the mp3 over. No new helper route.

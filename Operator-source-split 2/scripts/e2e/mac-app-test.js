@@ -63,6 +63,15 @@ const get = (port, p) => new Promise((res) => { const r = http.get({host:'127.0.
   check('Lock in from the menu bar locks you in', (await win.evaluate(() => operatorPage.peek())).view==='focus' && /"activeSession":\{/.test(await win.evaluate(() => localStorage.getItem('opsdash:focus') || '')));
   await win.evaluate(() => operatorPage.importText(JSON.stringify({profile:{name:'From Export'}, tasks:{items:[{id:'x1', title:'Imported task', status:'today'}]}}))); await win.waitForTimeout(600);
   check('importing an export replaces the data', (await win.evaluate(() => operatorPage.peek())).tasks.includes('Imported task'));
+  // ---- Round 72: the phone's dashboard comes through /api/call ----
+  const ph = await win.evaluate(() => window.operatorApp.phoneSet(true));
+  await win.waitForTimeout(500);
+  const callOut = await new Promise((res) => {
+    const req = require('http').request({host:'127.0.0.1', port:8940, path:'/api/call', method:'POST', headers:{'Content-Type':'application/json', 'X-Op-Code':ph.code}}, (r) => { let b = ''; r.on('data', (c) => b += c); r.on('end', () => { try{ res(JSON.parse(b)); }catch(e){ res({raw:b}); } }); });
+    req.on('error', (e) => res({err:e.message})); req.end(JSON.stringify({name:'tasks', args:{}}));
+  });
+  check('the phone can ask for its dashboard (/api/call → tasks)', !!(callOut && callOut.ok && callOut.out && Array.isArray(callOut.out.today)), callOut);
+  await win.evaluate(() => window.operatorApp.phoneSet(false));
   await win.screenshot({path:path.join(__dirname, '.out', 'mac-app.png')});
   check('moved-in flag written (it only moves in once)', fs.existsSync(path.join(home, 'Library', 'Application Support', 'Operator', 'App', '.moved-in')));
   await app.evaluate(({app}) => { app.quit(); }); await new Promise((r) => setTimeout(r, 2500));
