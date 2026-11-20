@@ -79,10 +79,10 @@ function r72XpPage(){
       '</div>'+
     '</div>'+
     // quests
-    (Q.length ? '<section class="card r72x-sec"><div class="r72x-h"><b>Today’s quests</b><span>'+(open.length ? got+' of '+Q.length+' done · '+open.reduce(function(a, q){ return a + q.xp; }, 0).toLocaleString()+' XP still out there' : 'All done today')+'</span></div>'+
+    (Q.length ? '<section class="card r72x-sec r72x-qsec"><div class="r72x-h"><b>Today’s quests</b><span>'+(open.length ? got+' of '+Q.length+' done · '+open.reduce(function(a, q){ return a + q.xp; }, 0).toLocaleString()+' XP still out there' : 'All done today')+'</span></div>'+
       '<div class="r72x-qs">'+open.map(quest).join('')+Q.filter(function(q){ return q.done; }).map(quest).join('')+'</div></section>' : '')+
     // every stat, and what feeds it
-    '<section class="r72x-sec"><div class="r72x-h"><b>Your stats</b><span>What each number is, and what moves it</span></div>'+
+    '<section class="r72x-sec r72x-ssec"><div class="r72x-h"><b>Your stats</b><span>What each number is, and what moves it</span></div>'+
       '<div class="r72x-areas">'+areas.map(function(a){
         return '<div class="card r72x-a" style="--ac:'+a.color+'"><div class="r72x-ah"><b>'+a.v+'</b><span>'+escapeHtml(a.name)+'</span></div>'+
           arr(a.subs).map(function(s){
@@ -93,12 +93,12 @@ function r72XpPage(){
           }).join('')+'</div>';
       }).join('')+'</div></section>'+
     // the ranks
-    '<section class="card r72x-sec"><div class="r72x-h"><b>Ranks</b><span>Each needs the level, every area at the number shown, and (with clients) the MRR</span></div>'+
+    '<section class="card r72x-sec r72x-rsec"><div class="r72x-h"><b>Ranks</b><span>Each needs the level, every area at the number shown, and (with clients) the MRR</span></div>'+
       '<div class="r72x-ranks">'+RANKS.map(function(k, i){
         return '<div class="r72x-r'+(i===x.rank ? ' is-now' : i < x.rank ? ' is-past' : '')+'" style="--k:'+k.color+'"><b>'+escapeHtml(k.name)+'</b><span>Level '+k.level+'</span><small>'+(k.low ? 'Areas '+k.low+'+' : 'Start')+(k.mrr ? ' · $'+(k.mrr >= 1000 ? Math.round(k.mrr/1000)+'k' : k.mrr) : '')+'</small></div>';
       }).join('')+'</div></section>'+
     // where XP comes from
-    '<section class="r72x-sec"><div class="r72x-h"><b>Where XP comes from</b><span>Real actions only. Nothing for opening the app</span></div>'+
+    '<section class="r72x-sec r72x-xsec"><div class="r72x-h"><b>Where XP comes from</b><span>Real actions only. Nothing for opening the app</span></div>'+
       '<div class="r72x-src">'+r72XpSources().map(function(g){
         return '<div class="card r72x-g" style="--gc:'+g.c+'"><div class="r72x-gk">'+escapeHtml(g.k)+'</div>'+g.rows.map(function(rw){ return '<div class="r72x-gr"><b>'+escapeHtml(rw[0])+'</b><span>'+escapeHtml(rw[1])+'</span></div>'; }).join('')+'</div>';
       }).join('')+'</div></section>'+

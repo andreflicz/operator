@@ -14,10 +14,19 @@ const seed = {
   profile:{name:'Andre'},
   focus:{sessions:sessions, wake:{enabled:true, time:'07:00', days:[1,2,3,4,5], label:'Wake up'}, work:{enabled:true, start:'10:00', end:'17:00', days:[1,2,3,4,5]}},
   calendar:{events:events},
-  tasks:{items:[{id:'t1', title:'Coral Energy edit', status:'today', deadline:ds(1)}, {id:'t2', title:'Invoice run', status:'today'}, {id:'t3', title:'Pitch deck', status:'backlog'}]},
-  business:{clients:[{id:'c1', name:'Batusha Corp', status:'active', mrr:1200}, {id:'c2', name:'JJS Construction', status:'active', mrr:1800}], pipeline:[]}
+  tasks:{items:[{id:'t1', title:'Coral Energy edit', status:'today', deadline:ds(1), priority:'high', clients:['c2']}, {id:'t2', title:'Invoice run', status:'today'}, {id:'t4', title:'Cut 3 reels for Batusha', status:'today', priority:'high', clients:['c1'], deadline:ds(0)}, {id:'t5', title:'Reply to JJS', status:'today', deadline:ds(-1)}, {id:'t6', title:'Color grade', status:'today', priority:'low'}, {id:'t3', title:'Pitch deck', status:'backlog', deadline:ds(3)}, {id:'t7', title:'Rate card update', status:'backlog'}, {id:'t8', title:'Website for Brothers', status:'backlog', deadline:ds(12)}]},
+  business:{clients:[{id:'c1', name:'Batusha Corp', status:'active', mrr:1200, touches:[ds(-1)]}, {id:'c2', name:'JJS Construction', status:'active', mrr:1800, touches:[ds(-5)]}, {id:'c3', name:'Brothers Mechanical', status:'active', mrr:1800, touches:[ds(-11)]}, {id:'c4', name:'Coral Energy', status:'active', mrr:3000, touches:[ds(0)]}], pipeline:[]}
 };
 const SHOTS = {
+  mind: `state.profile.viewMode='mind'; r73MindBoot();`,
+  mindLocked: `startFocus(null); state.focus.activeSession.startedAt = Date.now() - 4100000; state.profile.viewMode='mind'; r73MindBoot();`,
+  mindSel: `state.profile.viewMode='mind'; r73MindBoot(); setTimeout(function(){ const n = MIND.nodes.find(function(x){ return x.kind==='client'; }); r73FlyNode(MIND.byId['s:business']); r73Inspect(n); MIND.hover = n; }, 700);`,
+  mindDive: `state.profile.viewMode='mind'; r73MindBoot(); setTimeout(function(){ r73Dive({view:'business'}); }, 300);`,
+  mindPal: `state.profile.viewMode='mind'; r73MindBoot(); setTimeout(function(){ r73Pal('jj'); }, 600);`,
+  looksBoard: `r72Set('taskLook','board'); ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='overview'; renderView();`,
+  looksTimeline: `r72Set('taskLook','timeline'); ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='overview'; renderView();`,
+  looksFocus: `r72Set('taskLook','focus'); ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='overview'; renderView();`,
+  looksOrbit: `r72Set('taskLook','orbit'); ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='overview'; renderView();`,
   calendar: `ui.view='calendar'; renderView();`,
   today: `ui.view='today'; renderView();`,
   todayEdit: `ui.view='today'; ui.todayEdit=true; renderView();`,
@@ -32,6 +41,8 @@ const SHOTS = {
   snooze: `fireWake({test:true}); wakeSnooze();`,
   settingsMusic: `ui.view='settings'; ui.settingsTab='music'; renderView();`,
   focus: `ui.view='focus'; renderView();`,
+  focusOverview: `ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='overview'; renderView();`,
+  calBottom: `ui.view='calendar'; renderView(); setTimeout(function(){ const m = document.querySelector('main'); if(m) m.scrollTop = 99999; }, 300);`,
   personal: `ui.view='personal'; renderView();`
 };
 (async () => {
@@ -39,7 +50,7 @@ const SHOTS = {
   for(const [name, code] of Object.entries(SHOTS)){
     if(ONLY.length && ONLY.indexOf(name) < 0) continue;
     const page = await newPage(browser, FILE, seed);
-    await page.setViewportSize({width:1440, height:900});
+    await page.setViewportSize({width:+(process.env.VW||1440), height:+(process.env.VH||900)});
     try{ await page.evaluate((c) => window.__op.ev(c), `(function(){ ${code} })()`); }catch(e){ console.log(name, 'error', e.message.slice(0, 200)); }
     await page.waitForTimeout(1500);
     await page.screenshot({path:path.join(DIR, name+'.png')});
