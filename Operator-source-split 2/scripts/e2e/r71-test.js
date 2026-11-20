@@ -70,7 +70,7 @@ const seed = {
   `);
   check('day type: a logged shoot makes it a shoot day', type.shoot === 'shoot' && /Same target/.test(type.note), type);
   check('day type: a marked day off is read from the existing system', type.off === 'off', type);
-  check('day type: the target never moves — it relabels only', type.sameTarget && type.base === 240, type);
+  check('day type: the target never moves — it relabels only (3h, the same default Today uses; Round 74)', type.sameTarget && type.base === 180, type);
 
   // ---- the rhythm: the point of the whole thing ----
   const rhythm = await ev(`

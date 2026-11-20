@@ -26,5 +26,11 @@ contextBridge.exposeInMainWorld('operatorApp', {
   phoneNewCode: () => ipcRenderer.invoke('phone:newCode'),
   // Round 70: tags away from home, and keeping the Mac awake so a tap always lands
   tailscale: () => ipcRenderer.invoke('phone:tailscale'),
-  keepAwake: (on) => ipcRenderer.invoke('phone:keepAwake', !!on)
+  keepAwake: (on) => ipcRenderer.invoke('phone:keepAwake', !!on),
+  // Round 74: Command View on another screen (the main window draws it and sends it over)
+  cvDisplays: () => ipcRenderer.invoke('cv:displays'),
+  cvOpen: (id) => ipcRenderer.invoke('cv:open', id),
+  cvClose: () => ipcRenderer.invoke('cv:close'),
+  cvIsOpen: () => ipcRenderer.invoke('cv:isOpen'),
+  cvPush: (p) => ipcRenderer.send('cv:push', p)
 });

@@ -33,11 +33,12 @@ function r73Nav(){
     ic.innerHTML = R73_ICON[v]; ic.dataset.r73 = v; ic.classList.add('r73-nav-ic');
   });
   // Command View and Mind view live in the sidebar, under Inspiration
-  if(!nav.querySelector('[data-action="r73NavCmd"]')){
+  if(!nav.querySelector('[data-action="r73NavMind"]')){
     const after = nav.querySelector('.nav-insp') || nav.querySelector('[data-view="settings"]');
     const mk = function(act, label, title){ const b = document.createElement('button'); b.className = 'nav-item r73-nav-x'; b.dataset.action = act; b.title = title; b.innerHTML = '<span class="nav-icon"></span><span class="nav-label">'+label+'</span>'; return b; };
-    const c = mk('r73NavCmd', 'Command View', 'The board for your other monitor (⌘⇧C)'), m = mk('r73NavMind', 'Mind view', 'Switch the whole app to the brain map');
-    if(after && after.nextSibling){ nav.insertBefore(c, after.nextSibling); nav.insertBefore(m, c.nextSibling); } else { nav.appendChild(c); nav.appendChild(m); }
+    // (Round 74: Command View left the sidebar: one button, top right, is enough)
+    const m = mk('r73NavMind', 'Mind view', 'Switch the whole app to the brain map');
+    if(after && after.nextSibling) nav.insertBefore(m, after.nextSibling); else nav.appendChild(m);
     r73Nav();
   }
 }
@@ -58,7 +59,7 @@ dockHtml = (function(base){
   return function(){
     const h = base.apply(this, arguments);
     if(h.indexOf('r73-cvb') >= 0) return h;
-    return h.replace(/<div class="md-in[^"]*">/, function(m0){ return m0+'<button class="r73-cvb" data-action="r71Open" title="Command View (⌘⇧C)" aria-label="Command View">'+R73_ICON.command+'</button>'; });
+    return h.replace(/<div class="md-in[^"]*">/, function(m0){ return m0+'<button class="r73-cvb" data-action="r74Cv" title="Command View (⌘⇧C)" aria-label="Command View">'+R73_ICON.command+'</button>'; });
   };
 })(dockHtml);
 document.addEventListener('keydown', function(e){

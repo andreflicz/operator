@@ -43,7 +43,11 @@ const SHOTS = {
   focus: `ui.view='focus'; renderView();`,
   focusOverview: `ui.view='focus'; ui.focusTab='tasks'; ui.focusTasksSubTab='overview'; renderView();`,
   calBottom: `ui.view='calendar'; renderView(); setTimeout(function(){ const m = document.querySelector('main'); if(m) m.scrollTop = 99999; }, 300);`,
-  personal: `ui.view='personal'; renderView();`
+  personal: `ui.view='personal'; renderView();`,
+  lockedToday: `startFocus(null); state.focus.activeSession.startedAt = Date.now() - 4100000; ui.view='today'; renderView();`,
+  lockedFocus: `startFocus(null); state.focus.activeSession.startedAt = Date.now() - 4100000; ui.view='focus'; renderView();`,
+  lockedCommand: `startFocus(null); state.focus.activeSession.startedAt = Date.now() - 4100000; ui.view='today'; renderView(); r71Open();`,
+  personalTabs: `ui.view='personal'; renderView();`
 };
 (async () => {
   const browser = await launch();

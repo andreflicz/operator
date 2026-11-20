@@ -354,7 +354,7 @@ function r73HudHtml(){
       '<button data-action="r73mAddTask" title="Add a task">+ Task</button>'+
       '<button data-action="r73mPal" title="Search and do anything (⌘K)">&#8984;K</button>'+
       '<button data-action="r73mHome" title="Back to the whole map (0)">&#9678;</button>'+
-      '<button data-action="r71Open" title="Command View (⌘⇧C)">&#128250;</button>'+
+      '<button data-action="r74Cv" title="Command View (⌘⇧C)">&#128250;</button>'+
       '<button data-action="r73mClassic" title="The classic view">Classic</button>'+
     '</div>'+
     '<div class="r73-keys">1–7 sectors · 0 home · ⌘K search · Esc back · double-click to open</div>';
@@ -473,7 +473,7 @@ function r73PalItems(q){
     ['Lock in', function(){ ACTIONS.r73mLock(); }, !state.focus.activeSession], ['Lock out', function(){ ACTIONS.r73mLock(); }, !!state.focus.activeSession],
     ['Take a break', function(){ try{ opRunTool('take_break', {minutes:15}); }catch(e){} }, !!state.focus.activeSession], ['Start shooting', function(){ ACTIONS.r72Shoot(); }, true],
     ['Read me the day', function(){ ACTIONS.r73mRead(); }, true], ['Talk to Op', function(){ try{ ACTIONS.opTalk(); }catch(e){} }, true],
-    ['Command View', function(){ r71Open(); }, true], ['Settings', function(){ r73Dive({view:'settings'}); }, true], ['Today (classic page)', function(){ r73Dive({view:'today'}); }, true],
+    ['Command View', function(){ ACTIONS.r74Cv(); }, true], ['Settings', function(){ r73Dive({view:'settings'}); }, true], ['Today (classic page)', function(){ r73Dive({view:'today'}); }, true],
     ['Log time (shooting, a break…)', function(){ ACTIONS.r72LogOpen(); }, true], ['Classic view (restart)', function(){ r73MindSwitch('classic'); }, true]
   ].filter(function(a){ return a[2]; }).map(function(a){ return {label:a[0], kind:'Do', run:a[1]}; });
   if(/^add\s+\S/.test(q)){ const title = q.replace(/^add\s+/, ''); return [{label:'Add task “'+title+'”', kind:'Do', run:function(){ try{ opRunTool('add_task', {title:title.charAt(0).toUpperCase()+title.slice(1)}); MIND.built = 0; showToast('Added.', {icon:'&#9989;'}); }catch(e){} }}]; }

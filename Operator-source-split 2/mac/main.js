@@ -5,7 +5,7 @@
 //  • it starts the local helpers the page talks to on 127.0.0.1 (wake/music/voice/AI 8935, GoHighLevel
 //    8936, app activity 8934) and the light "what's in front" poller;
 //  • the first time, it brings your data over from Operator for Chrome (or from an export).
-const { app, BrowserWindow, Tray, Menu, globalShortcut, nativeImage, shell, dialog, session, powerSaveBlocker, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, globalShortcut, nativeImage, shell, dialog, session, powerSaveBlocker, ipcMain, screen } = require('electron');
 const path = require('path'), fs = require('fs'), os = require('os');
 const { spawn, execFileSync } = require('child_process');
 
@@ -124,26 +124,87 @@ function createWindow() {
 function trayIcon() { const img = nativeImage.createFromPath(path.join(RES, 'trayTemplate.png')); img.setTemplateImage(true); return img; }
 function trayMenu() {
   const s = status || {}, login = app.getLoginItemSettings().openAtLogin;
+  // Round 74: what you're doing first, then only the buttons that make sense right now; the rest folds away.
+  const head = s.locked ? (s.onBreak ? '☕  On a break' : '🔒  Locked in') + (s.label ? '  ·  ' + s.label.trim() : '') : '○  Off the clock';
+  const now = [];
+  if (s.locked) {
+    now.push({ label: s.onBreak ? '🔒  Back to work' : '☕  Take a break', click: () => run("operatorPage.breakToggle ? operatorPage.breakToggle() : null") });
+    if (s.music) now.push({ label: '⏸  Pause music', click: () => run("operatorPage.musicStop ? operatorPage.musicStop() : null") });
+    now.push({ label: '■  Lock out', click: () => run("operatorPage.lockOutNow ? operatorPage.lockOutNow() : operatorPage.lockOut()") });
+  } else {
+    now.push({ label: '🔒  Lock in', click: () => run("operatorPage.lockIn()") });
+    if (s.music) now.push({ label: '⏸  Pause music', click: () => run("operatorPage.musicStop ? operatorPage.musicStop() : null") });
+  }
+  const ds = cvDisplays();
+  const cv = cvWin && !cvWin.isDestroyed()
+    ? { label: 'Close Command View', click: () => cvClose() }
+    : ds.length > 1
+      ? { label: 'Command View', submenu: ds.map((d) => ({ label: d.label + (d.current ? '  (this screen)' : ''), click: () => cvOpen(d.id) })) }
+      : { label: 'Command View', click: () => { showWin(); run("operatorPage.commandView ? operatorPage.commandView() : null"); } };
   return Menu.buildFromTemplate([
+    { label: head, enabled: false },
+    { type: 'separator' },
+    ...now,
+    { type: 'separator' },
     { label: 'Show Operator', accelerator: 'Alt+O', click: showWin },
-    { type: 'separator' },
-    // (Round 70: these act right away: no window, no sheet to hold)
-    s.locked ? { label: 'Lock out', click: () => run("operatorPage.lockOutNow ? operatorPage.lockOutNow() : operatorPage.lockOut()") }
-             : { label: 'Lock in', click: () => run("operatorPage.lockIn()") },
-    { label: s.onBreak ? 'End break' : 'Take a break', click: () => run("operatorPage.breakToggle ? operatorPage.breakToggle() : null") },
-    { label: 'Stop music', enabled: s.music !== false, click: () => run("operatorPage.musicStop ? operatorPage.musicStop() : null") },
-    { label: 'Talk to Op', enabled: s.opOn !== false, click: () => { showWin(); run("operatorPage.talk()"); } },
-    { label: s.busy ? 'Op: quiet until ' + s.busy : 'Op: busy for an hour', enabled: s.opOn !== false, click: () => run(s.busy ? "operatorPage.busyEnd()" : "operatorPage.busy(60)") },
-    { label: s.opOn === false ? 'Turn Op on' : 'Turn Op off', click: () => run("operatorPage.power()") },
-    { type: 'separator' },
-    { label: 'Journal bubble', type: 'checkbox', accelerator: 'Alt+J', checked: !!bubCfg.on, click: (m) => bubShow(m.checked) },
-    { type: 'separator' },
-    { label: 'Open at login', type: 'checkbox', checked: login, click: (m) => app.setLoginItemSettings({ openAtLogin: m.checked, openAsHidden: true }) },
-    { label: 'Import data…', click: () => importData() },
+    cv,
+    { label: 'Op', submenu: [
+      { label: 'Talk to Op', enabled: s.opOn !== false, click: () => { showWin(); run("operatorPage.talk()"); } },
+      { label: s.busy ? 'Quiet until ' + s.busy + ' (end it)' : 'Busy for an hour', enabled: s.opOn !== false, click: () => run(s.busy ? "operatorPage.busyEnd()" : "operatorPage.busy(60)") },
+      { label: s.opOn === false ? 'Turn Op on' : 'Turn Op off', click: () => run("operatorPage.power()") }
+    ] },
+    { label: 'More', submenu: [
+      { label: 'Journal bubble', type: 'checkbox', accelerator: 'Alt+J', checked: !!bubCfg.on, click: (m) => bubShow(m.checked) },
+      { label: 'Open at login', type: 'checkbox', checked: login, click: (m) => app.setLoginItemSettings({ openAtLogin: m.checked, openAsHidden: true }) },
+      { label: 'Import data…', click: () => importData() }
+    ] },
     { type: 'separator' },
     { label: 'Quit Operator', accelerator: 'Cmd+Q', click: () => { quitting = true; app.quit(); } }
   ]);
 }
+
+// ---------------- Command View on another screen (Round 74) ----------------
+// A second, borderless, full-screen window. It never runs the app: the main window draws the board and sends
+// it over, so nothing there can save, ring or talk. Esc or the ✕ closes it.
+let cvWin = null;
+function cvDisplays() {
+  try {
+    const all = screen.getAllDisplays(), mine = win && !win.isDestroyed() ? screen.getDisplayMatching(win.getBounds()).id : null;
+    return all.map((d, i) => ({ id: d.id, label: d.label || (d.internal ? 'Built-in display' : 'Display ' + (i + 1)), current: d.id === mine, internal: !!d.internal, w: d.size.width, h: d.size.height }));
+  } catch (e) { return []; }
+}
+const CV_SHELL = '<!doctype html><html><head><meta charset="utf-8"><title>Command View</title><style id="cvBase">html,body{margin:0;height:100%;background:#05060a;overflow:hidden;cursor:default}#r71Full{position:fixed;inset:0}</style><style id="cvCss"></style></head><body><div id="r71Full" class="r71-full is-in r73cv"><canvas class="r73cv-sky"></canvas><div id="cvIn"></div></div><script>' +
+  'function cvMorph(a,b){if(a.nodeType!==b.nodeType||a.nodeName!==b.nodeName){a.replaceWith(b.cloneNode(true));return;}if(a.nodeType===3){if(a.nodeValue!==b.nodeValue)a.nodeValue=b.nodeValue;return;}if(a.nodeType!==1)return;' +
+  'for(const at of [...a.attributes])if(!b.hasAttribute(at.name))a.removeAttribute(at.name);for(const at of [...b.attributes])if(a.getAttribute(at.name)!==at.value)a.setAttribute(at.name,at.value);' +
+  'const ac=[...a.childNodes],bc=[...b.childNodes];for(let i=0;i<bc.length;i++){if(i<ac.length)cvMorph(ac[i],bc[i]);else a.appendChild(bc[i].cloneNode(true));}for(let i=bc.length;i<ac.length;i++)ac[i].remove();}' +
+  'window.__cv=function(p){if(p.css!=null){document.getElementById("cvCss").textContent=p.css;}if(p.htmlCls!=null)document.documentElement.className=p.htmlCls;if(p.bodyCls!=null)document.body.className=p.bodyCls+" r71-on";if(p.rootStyle!=null)document.documentElement.setAttribute("style",p.rootStyle);' +
+  'if(p.html!=null){const t=document.createElement("div");t.id="cvIn";t.innerHTML=p.html;cvMorph(document.getElementById("cvIn"),t);}if(p.sky&&!window.__sky){window.__sky=1;try{(new Function(p.sky))();}catch(e){}}};' +
+  'document.addEventListener("keydown",function(e){if(e.key==="Escape")window.close();});' +
+  'document.addEventListener("click",function(e){if(e.target.closest(".r71-x,[data-action=r71Close]"))window.close();});' +
+  '</script></body></html>';
+function cvOpen(displayId) {
+  const d = screen.getAllDisplays().find((x) => x.id === displayId) || screen.getPrimaryDisplay();
+  if (cvWin && !cvWin.isDestroyed()) { cvWin.setBounds(d.bounds); cvWin.show(); run('window.r74CvExt && r74CvExt(true)'); trayRefresh(); return true; }
+  cvWin = new BrowserWindow({ x: d.bounds.x, y: d.bounds.y, width: d.bounds.width, height: d.bounds.height, frame: false, show: false, backgroundColor: '#05060a', title: 'Command View',
+    webPreferences: { contextIsolation: true, nodeIntegration: false, backgroundThrottling: false } });
+  cvWin.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(CV_SHELL));
+  cvWin.once('ready-to-show', () => { cvWin.setBounds(d.bounds); cvWin.show(); try { cvWin.setSimpleFullScreen(true); } catch (e) {} run('window.r74CvExt && r74CvExt(true)'); trayRefresh(); });
+  cvWin.on('closed', () => { cvWin = null; run('window.r74CvExt && r74CvExt(false)'); trayRefresh(); });
+  return true;
+}
+function cvClose() { if (cvWin && !cvWin.isDestroyed()) cvWin.close(); }
+function cvPush(p) {
+  if (!cvWin || cvWin.isDestroyed() || !p) return false;
+  cvWin.webContents.executeJavaScript('window.__cv && window.__cv(' + JSON.stringify(p) + ')', true).catch(() => {});
+  return true;
+}
+ipcMain.handle('cv:displays', () => cvDisplays());
+ipcMain.handle('cv:open', (e, id) => cvOpen(Number(id)));
+ipcMain.handle('cv:close', () => { cvClose(); return true; });
+ipcMain.handle('cv:isOpen', () => !!(cvWin && !cvWin.isDestroyed()));
+ipcMain.on('cv:push', (e, p) => cvPush(p));
+// (for the app's own tests: what the menu bar menu shows right now)
+global.__opMenu = () => trayMenu().items.map((i) => ({ label: i.label, enabled: i.enabled, sub: i.submenu ? i.submenu.items.map((x) => x.label) : null }));
 function trayRefresh() {
   if (!tray) return;
   const s = status || {};

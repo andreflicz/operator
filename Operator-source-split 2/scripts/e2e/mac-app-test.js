@@ -63,6 +63,31 @@ const get = (port, p) => new Promise((res) => { const r = http.get({host:'127.0.
   check('Lock in from the menu bar locks you in', (await win.evaluate(() => operatorPage.peek())).view==='focus' && /"activeSession":\{/.test(await win.evaluate(() => localStorage.getItem('opsdash:focus') || '')));
   await win.evaluate(() => operatorPage.importText(JSON.stringify({profile:{name:'From Export'}, tasks:{items:[{id:'x1', title:'Imported task', status:'today'}]}}))); await win.waitForTimeout(600);
   check('importing an export replaces the data', (await win.evaluate(() => operatorPage.peek())).tasks.includes('Imported task'));
+  // ---- Round 74: the menu bar menu, and Command View on another screen ----
+  await win.waitForTimeout(800);
+  const mm = await app.evaluate(() => global.__opMenu());
+  const top = mm.map((i) => i.label);
+  check('menu bar: what you are doing comes first (locked in)', /Locked in/.test(top[0]) && mm[0].enabled === false, top);
+  check('menu bar: only Take a break and Lock out up top while locked in', top.includes('☕  Take a break') && top.includes('■  Lock out') && !top.some((l) => /Lock in$/.test(l)), top);
+  check('menu bar: Op and the rest fold into submenus', !top.includes('Talk to Op') && !top.includes('Import data…') && mm.some((i) => i.label === 'Op' && i.sub) && mm.some((i) => i.label === 'More' && i.sub), top);
+  const ds = await win.evaluate(() => window.operatorApp.cvDisplays());
+  check('the page can see the screens', Array.isArray(ds) && ds.length >= 1, ds);
+  await win.evaluate((id) => window.operatorApp.cvOpen(id), ds[0].id);
+  let cw = null; for (let i = 0; i < 30 && !cw; i++) { await win.waitForTimeout(200); cw = app.windows().find((w) => /^data:/.test(w.url())); }
+  check('Command View opens as its own window', !!cw);
+  if (cw) {
+    let ok = false; for (let i = 0; i < 25 && !ok; i++) { await win.waitForTimeout(200); ok = await cw.evaluate(() => !!document.querySelector('#cvIn .r74l')); }
+    check('the other window shows the locked-in board, drawn by the main one', ok);
+    const t1 = await cw.evaluate(() => (document.querySelector('[data-r74t]') || {}).textContent); await win.waitForTimeout(2200);
+    const t2 = await cw.evaluate(() => (document.querySelector('[data-r74t]') || {}).textContent);
+    check('and its timer keeps time', !!t1 && t1 !== t2, {t1, t2});
+    await cw.screenshot({path:path.join(__dirname, '.out', 'cv-ext.png')});
+    check('nothing runs over there (no app, no saving)', await cw.evaluate(() => typeof window.state === 'undefined' && typeof window.operatorPage === 'undefined'));
+    const m2 = await app.evaluate(() => global.__opMenu());
+    check('the menu offers to close it', m2.some((i) => i.label === 'Close Command View'));
+    await win.evaluate(() => window.operatorApp.cvClose()); await win.waitForTimeout(600);
+    check('and it closes', !(await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().some((w) => w.getTitle() === 'Command View'))));
+  }
   // ---- Round 72: the phone's dashboard comes through /api/call ----
   const ph = await win.evaluate(() => window.operatorApp.phoneSet(true));
   await win.waitForTimeout(500);
