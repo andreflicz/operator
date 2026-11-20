@@ -582,7 +582,7 @@ function r73Size(){
 // ---------------- booting into it ----------------
 function r73MindBoot(){
   if(MIND.booted) return; MIND.booted = true;
-  document.body.classList.add('mind-on');
+  document.body.classList.add('mind-on'); try{ const ap = document.getElementById('app'); ap.classList.remove('app-in'); ap.style.animation = 'none'; }catch(e){}
   const root = document.createElement('div'); root.id = 'mindRoot';
   root.innerHTML = '<canvas id="mindCanvas"></canvas><div class="r73-hud">'+r73HudHtml()+'</div>';
   document.body.appendChild(root);

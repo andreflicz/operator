@@ -11515,3 +11515,5 @@ body.mind-on.mind-dive #r73Back{ display:flex; position:fixed; z-index:61; top:1
 body.mind-on:not(.mind-dive) #activityPill, body.mind-on:not(.mind-dive) #opLight, body.mind-on:not(.mind-dive) #fabAdd, body.mind-on:not(.mind-dive) #inspOrb{ display:none !important; }
 .r73h-l b i{ font-style:normal; font-weight:600; font-size:11px; letter-spacing:.08em; margin-left:6px; }
 .r73orb-t{ max-width:170px; }
+/* r73 fix: the boot fade-in (animation fill "both") was overriding the hidden window, so on a real launch the classic app sat on top of the map */
+body.mind-on #app, body.mind-on #app.app-in{ animation:none !important; }

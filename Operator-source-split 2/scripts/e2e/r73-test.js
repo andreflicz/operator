@@ -40,6 +40,8 @@ const seed = {
   const mind = await ev(`state.profile.viewMode = 'mind'; renderView(); return {on:r73MindOn(), root:!!document.getElementById('mindRoot')};`);
   check('Mind view boots when the setting is on', mind.on && mind.root, mind);
   await page.waitForTimeout(900);
+  const boot = await ev(`const a = document.getElementById('app'); a.classList.add('app-in'); const o = getComputedStyle(a).opacity; return {o:o};`);
+  check('a real launch (boot fade-in) still hides the classic window behind the map', boot.o === '0', boot);
   const nodes = await ev(`r73MindBuild(); const k = {}; MIND.nodes.forEach(function(n){ k[n.kind] = (k[n.kind]||0)+1; }); const br = MIND.nodes.find(function(n){ return n.label==='Brothers Mechanical'; }); return {k:k, sectors:MIND.nodes.filter(function(n){ return n.kind==='sector'; }).length, neg:!!(br && br.neglected)};`);
   check('the map has Op and 7 sectors', nodes.k.op === 1 && nodes.sectors === 7, nodes);
   check('a client untouched 12 days drifts out as neglected', nodes.neg, nodes);

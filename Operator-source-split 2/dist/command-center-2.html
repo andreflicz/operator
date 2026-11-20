@@ -11526,6 +11526,8 @@ body.mind-on.mind-dive #r73Back{ display:flex; position:fixed; z-index:61; top:1
 body.mind-on:not(.mind-dive) #activityPill, body.mind-on:not(.mind-dive) #opLight, body.mind-on:not(.mind-dive) #fabAdd, body.mind-on:not(.mind-dive) #inspOrb{ display:none !important; }
 .r73h-l b i{ font-style:normal; font-weight:600; font-size:11px; letter-spacing:.08em; margin-left:6px; }
 .r73orb-t{ max-width:170px; }
+/* r73 fix: the boot fade-in (animation fill "both") was overriding the hidden window, so on a real launch the classic app sat on top of the map */
+body.mind-on #app, body.mind-on #app.app-in{ animation:none !important; }
 </style>
 <script>
 (function(){try{var p=JSON.parse(localStorage.getItem('opsdash:profile')||'{}'),t=p.theme||'dark';
@@ -11723,7 +11725,7 @@ document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}
 
 <script>
 (function(){
-const OP_BUILT = 1795215224352;
+const OP_BUILT = 1795215971857;
 
 // ============ STORAGE ============
 const hasCloud = !!(window.storage && typeof window.storage.get === 'function');
@@ -67165,7 +67167,7 @@ function r73Size(){
 // ---------------- booting into it ----------------
 function r73MindBoot(){
   if(MIND.booted) return; MIND.booted = true;
-  document.body.classList.add('mind-on');
+  document.body.classList.add('mind-on'); try{ const ap = document.getElementById('app'); ap.classList.remove('app-in'); ap.style.animation = 'none'; }catch(e){}
   const root = document.createElement('div'); root.id = 'mindRoot';
   root.innerHTML = '<canvas id="mindCanvas"></canvas><div class="r73-hud">'+r73HudHtml()+'</div>';
   document.body.appendChild(root);
