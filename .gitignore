@@ -1,6 +1,9 @@
-Operator-source-split 2/mac/node_modules/
-Operator-source-split 2/mac/out/
-Operator-source-split 2/mac/res/command-center-2.html
-Operator-source-split 2/mac/res/helper.sh
-Operator-source-split 2/mac/res/bridge.pl
-Operator-source-split 2/scripts/e2e/.out/
+# built output (scripts/build.py and electron-builder make these)
+app/dist/
+app/mac/node_modules/
+app/mac/out/
+app/mac/res/command-center-2.html
+app/mac/res/helper.sh
+app/mac/res/bridge.pl
+app/scripts/e2e/.out/
+.DS_Store
