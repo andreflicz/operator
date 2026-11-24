@@ -20,15 +20,15 @@ const seed = {
   const btns = await ev(`ui.view='today'; renderView(); return {side:!!document.querySelector('.sidebar [data-action="r73NavCmd"]'), dock:document.querySelectorAll('.r73-cvb').length, head:!!document.querySelector('#viewRoot .r71-cb')};`);
   check('one Command View button (top right), none in the sidebar or Today header', !btns.side && btns.dock === 1 && !btns.head, btns);
 
-  const lk = await ev(`startFocus(null); state.focus.activeSession.startedAt = Date.now() - 68*60000; r71Open(); const v = document.getElementById('r71Full'); return {board:!!v.querySelector('.r74l'), done:/Done for the day/.test(v.innerHTML), t:(v.querySelector('[data-r74t]')||{}).textContent, pl:(v.querySelector('.r74l-pl')||{}).textContent};`);
+  const lk = await ev(`startFocus(null); state.focus.activeSession.startedAt = Date.now() - 68*60000; r71Open(); const v = document.getElementById('r71Full'); return {board:!!v.querySelector('.r75cc.is-locked .r75-timer'), done:/Done for the day/.test(v.innerHTML), t:(v.querySelector('[data-r74t]')||{}).textContent, pl:(v.querySelector('.r75-pg-l')||{}).textContent};`); // (Round 75: the locked-in board is the Command Center's focus side)
   check('locked in, Command View is the locked-in board', lk.board, lk);
   check('it never says "Done for the day" while you are locked in', !lk.done, lk);
   check('it counts the session that is running, against your real goal (3h)', /1h 8m/.test(lk.pl) && /of 3h/.test(lk.pl), lk);
   await page.waitForTimeout(1300);
   const tick = await ev(`return document.querySelector('#r71Full [data-r74t]').textContent;`);
   check('the timer ticks every second', tick !== lk.t, {a: lk.t, b: tick});
-  const off = await ev(`r72Set('cvLocked', false); r71Open(); const v = document.getElementById('r71Full'); const r = {board:!!v.querySelector('.r74l'), done:/Done for the day/.test(v.innerHTML), locked:/Locked in/.test(v.innerHTML)}; r72Set('cvLocked', true); ACTIONS.r71Close(); return r;`);
-  check('with the locked-in board off, the regular board says Locked in, not Done', !off.board && !off.done && off.locked, off);
+  const off = await ev(`r71Open(); const v = document.getElementById('r71Full'); const r = {done:/Done for the day/.test(v.innerHTML), locked:/Locked in/.test(v.innerHTML)}; ACTIONS.r71Close(); return r;`);
+  check('the board says Locked in, never Done', !off.done && off.locked, off);
   await ev(`state.focus.activeSession = null; renderView();`);
 
   // tabs: drag Finances to the front

@@ -7,7 +7,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   const p = await newPage(b, OUT+'/r62.html', {profile:{name:'Andre Lopez', businessName:'Comet Collective'}}, at);
   await p.setViewportSize({width:1440, height:900});
   const E = c => p.evaluate(x => window.__op.ev(x), c);
-  await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); demoSeed(); AI.hasKey = false; xpSystemShow = function(){}; uiConfirm = function(){ return Promise.resolve(true); }; aiKeyCheck = function(){}; opReadKick = function(){}; opVoiceOn = function(){ return false; }; renderView()"); await p.waitForTimeout(300);
+  await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); demoSeed(); AI.hasKey = false; xpSystemShow = function(){}; uiConfirm = function(){ return Promise.resolve(true); }; state.dashboardPanels.enabled.journal = true; /* Round 75 turns Quick journal off by default; these checks are about its layout */ aiKeyCheck = function(){}; opReadKick = function(){}; opVoiceOn = function(){ return false; }; renderView()"); await p.waitForTimeout(300);
   try{
   // ---- A1. One message, one reply ----
   await E("window.__calls = 0; AI.hasKey = true; aiPickModel = async function(){ return 'm'; }; aiCall = async function(){ window.__calls++; await new Promise(r => setTimeout(r, 150)); return {ok:true, j:{stop_reason:'end_turn', content:[{type:'text', text:'Sure thing, it is on your list for today now.'}]}}; }; R54.last = null; aiAsk('what should I work on first this morning'); aiAsk('what should I work on first this morning')"); await p.waitForTimeout(700);

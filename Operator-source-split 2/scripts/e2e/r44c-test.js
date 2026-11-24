@@ -6,7 +6,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   const p = await newPage(b, OUT+'/r44c.html', {profile:{name:'Andre Lopez', xpBook:43, xpLevel:0, birthday:'1998-03-14'}}, new Date(2026,9,25,11,0).getTime());
   const E = c => p.evaluate(x => window.__op.ev(x), c);
   await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); ui.view='today'; renderView()"); await p.waitForTimeout(400);
-  check('Oct 25 is Halloween week: the app takes it on', await E("document.documentElement.getAttribute('data-holiday')")==='halloween' && !!(await p.$('#holFx .hx-bat')) && /Scary-good week, Andre/.test(await p.textContent('#viewRoot')));
+  check('Oct 25 is Halloween week: the app takes it on', await E("document.documentElement.getAttribute('data-holiday')")==='halloween' && !!(await p.$('#holFx .hx-bat')) && !/Scary-good week, Andre/.test(await p.textContent('#viewRoot')));  // (Round 75: decorations, no banner box on Today)
   await p.screenshot({path:OUT+'/r44-halloween.png'});
   check('Thanksgiving is the week of the 4th Thursday', await E("holThanksgiving(2026)")==='2026-11-26' && await E("holToday('2026-11-23')")==='thanksgiving' && await E("holToday('2026-11-30')")===null);
   check('Christmas Dec 18 – 26', await E("holToday('2026-12-20')")==='christmas' && await E("holToday('2026-12-27')")===null);

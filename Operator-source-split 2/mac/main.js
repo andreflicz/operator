@@ -180,7 +180,8 @@ const CV_SHELL = '<!doctype html><html><head><meta charset="utf-8"><title>Comman
   'window.__cv=function(p){if(p.css!=null){document.getElementById("cvCss").textContent=p.css;}if(p.htmlCls!=null)document.documentElement.className=p.htmlCls;if(p.bodyCls!=null)document.body.className=p.bodyCls+" r71-on";if(p.rootStyle!=null)document.documentElement.setAttribute("style",p.rootStyle);' +
   'if(p.html!=null){const t=document.createElement("div");t.id="cvIn";t.innerHTML=p.html;cvMorph(document.getElementById("cvIn"),t);}if(p.sky&&!window.__sky){window.__sky=1;try{(new Function(p.sky))();}catch(e){}}};' +
   'document.addEventListener("keydown",function(e){if(e.key==="Escape")window.close();});' +
-  'document.addEventListener("click",function(e){if(e.target.closest(".r71-x,[data-action=r71Close]"))window.close();});' +
+  'document.addEventListener("click",function(e){if(e.target.closest(".r71-x,[data-action=r71Close]")){window.close();return;}const a=e.target.closest("[data-action]");if(!a)return;const t=document.querySelector("#cvIn textarea");console.log("__cv:"+JSON.stringify({a:a.dataset.action,id:a.dataset.id||"",v:t?t.value:""}));});' +
+  'document.addEventListener("keydown",function(e){if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)&&document.activeElement&&document.activeElement.tagName==="TEXTAREA"){console.log("__cv:"+JSON.stringify({a:"r75BubSave",v:document.activeElement.value}));}});' +
   '</script></body></html>';
 function cvOpen(displayId) {
   const d = screen.getAllDisplays().find((x) => x.id === displayId) || screen.getPrimaryDisplay();
@@ -189,6 +190,14 @@ function cvOpen(displayId) {
     webPreferences: { contextIsolation: true, nodeIntegration: false, backgroundThrottling: false } });
   cvWin.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(CV_SHELL));
   cvWin.once('ready-to-show', () => { cvWin.setBounds(d.bounds); cvWin.show(); try { cvWin.setSimpleFullScreen(true); } catch (e) {} run('window.r74CvExt && r74CvExt(true)'); trayRefresh(); });
+  // presses on the board over there run here (only the few the page allows)
+  cvWin.webContents.on('console-message', (e, lvl, msg) => {
+    const m = (e && typeof e.message === 'string') ? e.message : String(msg || '');
+    if (m.indexOf('__cv:') !== 0) return;
+    let p = null; try { p = JSON.parse(m.slice(5)); } catch (x) { return; }
+    if (!p || typeof p.a !== 'string' || !/^r75\w+$/.test(p.a)) return;
+    run('window.r75CvRemote && r75CvRemote(' + JSON.stringify({ a: p.a, id: String(p.id || '').slice(0, 80), v: String(p.v || '').slice(0, 4000) }) + ')');
+  });
   cvWin.on('closed', () => { cvWin = null; run('window.r74CvExt && r74CvExt(false)'); trayRefresh(); });
   return true;
 }
@@ -203,6 +212,17 @@ ipcMain.handle('cv:open', (e, id) => cvOpen(Number(id)));
 ipcMain.handle('cv:close', () => { cvClose(); return true; });
 ipcMain.handle('cv:isOpen', () => !!(cvWin && !cvWin.isDestroyed()));
 ipcMain.on('cv:push', (e, p) => cvPush(p));
+// Round 75: the Command Center here hides the Mac's title bar and menu bar while it's open
+// (only undoes what it did: a window you put in full screen yourself stays that way)
+let immersed = false;
+ipcMain.handle('win:immersive', (e, on) => {
+  try {
+    if (!win || win.isDestroyed()) return false;
+    if (on && !immersed && !win.isFullScreen() && !win.isSimpleFullScreen()) { win.setSimpleFullScreen(true); immersed = true; }
+    else if (!on && immersed) { win.setSimpleFullScreen(false); immersed = false; }
+  } catch (x) {}
+  return true;
+});
 // (for the app's own tests: what the menu bar menu shows right now)
 global.__opMenu = () => trayMenu().items.map((i) => ({ label: i.label, enabled: i.enabled, sub: i.submenu ? i.submenu.items.map((x) => x.label) : null }));
 function trayRefresh() {

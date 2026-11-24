@@ -7,7 +7,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   const p = await newPage(b, OUT+'/r61.html', {profile:{name:'Andre Lopez', businessName:'Comet Collective'}, settings:{instagram:{accounts:[{id:'a1', role:'business', username:'commenccollective', src:'zernio'}]}}}, at);
   await p.setViewportSize({width:1440, height:900});
   const E = c => p.evaluate(x => window.__op.ev(x), c);
-  await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); demoSeed(); state.profile.businessName = 'Comet Collective'; AI.hasKey = false; xpSystemShow = function(){}; uiConfirm = function(){ return Promise.resolve(true); }; renderView()"); await p.waitForTimeout(300);
+  await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); demoSeed(); state.profile.businessName = 'Comet Collective'; AI.hasKey = false; xpSystemShow = function(){}; uiConfirm = function(){ return Promise.resolve(true); }; state.dashboardPanels.enabled.journal = true; /* Round 75 turns Quick journal off by default; these checks are about its layout */ renderView()"); await p.waitForTimeout(300);
   try{
   // ---- A. Today ----
   // (round 62: Customize moved into the top panel, a small button beside full screen; no row of its own)
@@ -57,9 +57,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('no holiday preview in Settings (outside Test / demo)', await E("themeSettingsHtml().indexOf('holPreview')<0"));
   check('…but there in Test / demo mode', await E("(function(){ state.settings.testMode = true; const ok = themeSettingsHtml().indexOf('holPreview') >= 0; state.settings.testMode = false; return ok; })()"));
   await E("ui.view='today'; renderView()"); await p.waitForTimeout(200);
-  check('the holiday banner has a ✕', !!(await p.$('.hol-ban .r61-holx')));
-  await p.click('.hol-ban .r61-holx'); await p.waitForTimeout(200);
-  check('…which hides it (until next time)', !(await p.$('.hol-ban')));
+  check('no holiday banner on top of Today at all (Round 75)', !(await p.$('#viewRoot .hol-ban')));
   check('a new, slower Halloween tune', await E("R60_TUNES.halloween.organ===true && R60_TUNES.halloween.bpm < 90 && R60_TUNES.halloween.bass.length > 0"));
   await E("r60MusicPlay('halloween')"); await p.waitForTimeout(200);
   check('…it plays', await E("!!R60.music && R60.music.h==='halloween'")); await E("r60MusicStop()");

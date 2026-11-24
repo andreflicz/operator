@@ -47,7 +47,13 @@ const SHOTS = {
   lockedToday: `startFocus(null); state.focus.activeSession.startedAt = Date.now() - 4100000; ui.view='today'; renderView();`,
   lockedFocus: `startFocus(null); state.focus.activeSession.startedAt = Date.now() - 4100000; ui.view='focus'; renderView();`,
   lockedCommand: `startFocus(null); state.focus.activeSession.startedAt = Date.now() - 4100000; ui.view='today'; renderView(); r71Open();`,
-  personalTabs: `ui.view='personal'; renderView();`
+  personalTabs: `ui.view='personal'; renderView();`,
+  tags: `r70TStarterMake('desk'); r70TStarterMake('awake'); ui.view='settings'; ui.settingsTab='tags'; renderView();`,
+  tagsWiz: `r70TStarterMake('desk'); ui.view='settings'; ui.settingsTab='tags'; ui.r70TWiz = {step:1, picks:[], name:'', place:'', how:'open'}; renderView();`,
+  debt: `state.finances.debts = [{id:'d1', name:'Car loan', balance:-2400, minPayment:180}]; state.finances.bank = {accounts:[{id:'a1', name:'Checking', org:'Chase', balance:3200}, {id:'a2', name:'Freedom Visa', org:'Chase', balance:-1850.4}]}; ui.view='personal'; ui.personalTab='finances'; ui.finTab='debts'; renderView();`,
+  quoteEdit: `r71Open(); setTimeout(function(){ document.querySelector('.r75-qt').click(); }, 200);`,
+  ccEdit: `ui.r72CmdEdit = true; r71Open();`,
+  ccBub: `startFocus(null); r71Open(); setTimeout(function(){ ACTIONS.r75Bub(); }, 400);`
 };
 (async () => {
   const browser = await launch();
@@ -57,6 +63,7 @@ const SHOTS = {
     await page.setViewportSize({width:+(process.env.VW||1440), height:+(process.env.VH||900)});
     try{ await page.evaluate((c) => window.__op.ev(c), `(function(){ ${code} })()`); }catch(e){ console.log(name, 'error', e.message.slice(0, 200)); }
     await page.waitForTimeout(1500);
+    if(process.env.FULL){ const h = await page.evaluate(() => { const m = document.querySelector('main'); return m ? m.scrollHeight : 900; }); await page.setViewportSize({width:+(process.env.VW||1440), height:Math.min(5000, h + 20)}); await page.waitForTimeout(500); }
     await page.screenshot({path:path.join(DIR, name+'.png')});
     if(page.errors.length) console.log(name, 'page errors:', page.errors.slice(0, 3));
     await page.context().close();

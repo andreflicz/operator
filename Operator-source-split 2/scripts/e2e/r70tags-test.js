@@ -265,7 +265,7 @@ const seed = {
   // ---- 30/31/32/35 the wizard, and the card ----
   const wiz = await ev(`
     ui.view = 'settings'; ui.settingsTab = 'tags';
-    ACTIONS.r70TWizOpen();
+    ACTIONS.r70TWizOpen(); ACTIONS.r75TagOwn();   // (Round 75: "Something else" is the build-your-own path)
     const one = r70TWizHtml();
     ACTIONS.r70TWizPick(null, null, 'lockin'); ACTIONS.r70TWizPick(null, null, 'lockout');
     const picked = ui.r70TWiz.picks.length, named = ui.r70TWiz.name;
@@ -284,7 +284,7 @@ const seed = {
       rules:rules, waiting:waiting, heard:heard, shut:!ui.r70TWiz, opened:!!ui.r70TOpen};
   `);
   check('30 the wizard: pick what it does, several at once', wiz.one && wiz.picked === 2 && !!wiz.named, wiz);
-  check('30 then a name, a suggested place, and tap-and-open or hands-free', wiz.two && wiz.how, wiz);
+  check('30 then a name and an optional place (Round 75: Shortcuts only, no tap-and-open choice)', wiz.two && !wiz.how, wiz);
   check('35 then the link and a QR of it, nothing to type', wiz.three && wiz.qr, wiz);
   check('30 it writes the toggle rules for you', wiz.rules, wiz);
   check('30 "Tap your tag now" turns into "Heard it" when the tap lands', wiz.waiting && wiz.heard && wiz.shut && wiz.opened, wiz);

@@ -76,18 +76,31 @@ const get = (port, p) => new Promise((res) => { const r = http.get({host:'127.0.
   let cw = null; for (let i = 0; i < 30 && !cw; i++) { await win.waitForTimeout(200); cw = app.windows().find((w) => /^data:/.test(w.url())); }
   check('Command View opens as its own window', !!cw);
   if (cw) {
-    let ok = false; for (let i = 0; i < 25 && !ok; i++) { await win.waitForTimeout(200); ok = await cw.evaluate(() => !!document.querySelector('#cvIn .r74l')); }
+    let ok = false; for (let i = 0; i < 25 && !ok; i++) { await win.waitForTimeout(200); ok = await cw.evaluate(() => !!document.querySelector('#cvIn .r75cc.is-locked .r75-timer')); }
     check('the other window shows the locked-in board, drawn by the main one', ok);
     const t1 = await cw.evaluate(() => (document.querySelector('[data-r74t]') || {}).textContent); await win.waitForTimeout(2200);
     const t2 = await cw.evaluate(() => (document.querySelector('[data-r74t]') || {}).textContent);
     check('and its timer keeps time', !!t1 && t1 !== t2, {t1, t2});
     await cw.screenshot({path:path.join(__dirname, '.out', 'cv-ext.png')});
     check('nothing runs over there (no app, no saving)', await cw.evaluate(() => typeof window.state === 'undefined' && typeof window.operatorPage === 'undefined'));
+    // Round 75: the other screen's board is the Command Center, and what you press there happens here
+    check('the other screen shows the Command Center', await cw.evaluate(() => !!document.querySelector('#cvIn .r75cc')));
+    const tid = 'x1';   // the task the import above brought in
+    await win.waitForTimeout(1500);
+    const clicked = await cw.evaluate((id) => { const b = document.querySelector('[data-action="r75Task"][data-id="' + id + '"]'); if (b) b.click(); return !!b; }, tid);
+    let done = false; for (let i = 0; i < 24 && !done; i++) { await win.waitForTimeout(250); done = await win.evaluate((id) => { try { return JSON.parse(localStorage.getItem('opsdash:tasks') || '{}').items.find((x) => x.id === id).status === 'done'; } catch (e) { return false; } }, tid); }
+    check('ticking a task on the other screen finishes it here', clicked && done, { clicked, done });
     const m2 = await app.evaluate(() => global.__opMenu());
     check('the menu offers to close it', m2.some((i) => i.label === 'Close Command View'));
     await win.evaluate(() => window.operatorApp.cvClose()); await win.waitForTimeout(600);
     check('and it closes', !(await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().some((w) => w.getTitle() === 'Command View'))));
   }
+  // ---- Round 75: the Command Center here hides the Mac's title bar while it's open ----
+  await win.evaluate(() => { operatorPage.commandView(); }); await win.waitForTimeout(600);
+  const imm = await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find((x) => !/bubble|^data:/.test(x.webContents.getURL())).isSimpleFullScreen());
+  await win.evaluate(() => { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); }); await win.waitForTimeout(600);
+  const imm2 = await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find((x) => !/bubble|^data:/.test(x.webContents.getURL())).isSimpleFullScreen());
+  check('the Command Center goes edge to edge (no title bar), and back when it closes', imm === true && imm2 === false, { imm, imm2 });
   // ---- Round 72: the phone's dashboard comes through /api/call ----
   const ph = await win.evaluate(() => window.operatorApp.phoneSet(true));
   await win.waitForTimeout(500);

@@ -32,5 +32,6 @@ contextBridge.exposeInMainWorld('operatorApp', {
   cvOpen: (id) => ipcRenderer.invoke('cv:open', id),
   cvClose: () => ipcRenderer.invoke('cv:close'),
   cvIsOpen: () => ipcRenderer.invoke('cv:isOpen'),
-  cvPush: (p) => ipcRenderer.send('cv:push', p)
+  cvPush: (p) => ipcRenderer.send('cv:push', p),
+  immersive: (on) => ipcRenderer.invoke('win:immersive', !!on)
 });

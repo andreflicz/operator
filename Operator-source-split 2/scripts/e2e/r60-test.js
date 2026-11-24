@@ -13,7 +13,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   const p = await newPage(b, OUT+'/r60.html', seed, at);
   await p.setViewportSize({width:1440, height:900});
   const E = c => p.evaluate(x => window.__op.ev(x), c);
-  await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); AI.hasKey = false; OV.pending = false; OV.speaking = false; xpSystemShow = function(){}; uiConfirm = function(){ return Promise.resolve(true); }");
+  await E("document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); AI.hasKey = false; OV.pending = false; OV.speaking = false; xpSystemShow = function(){}; uiConfirm = function(){ return Promise.resolve(true); }; state.dashboardPanels.enabled.journal = true; /* Round 75 turns Quick journal off by default; these checks are about its layout */");
   try{
   // ================= A. Op =================
   await E("AI.hasKey = true; aiKeyCheck = function(){}; window.__w = 0; aiWrite = async function(){ window.__w++; return 'x'; }; opFactsMoneyPage = function(){ return 'Coming in: $10,500.'; }; opReadStore()['money'] = {text:'Pattern: '+'a long read that runs on and on '.repeat(10)+' Watch: x. Move: y.', day:todayStr(), sig:'s'}; ui.view='personal'; ui.personalTab='finances'; renderView()"); await p.waitForTimeout(700);
@@ -119,13 +119,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   // ================= G. Added to Round 60 =================
   await E("state.profile.scene = 'city'; ui.view='today'; ui.journalMode='entries'; sceneMount(); renderView()"); await p.waitForTimeout(400);
-  check('holidays show on a background scene too (above it), with a banner at the top of Today', await E("(function(){ const fx = document.getElementById('holFx'); return !!fx && document.body.classList.contains('has-scene') && Number(getComputedStyle(fx).zIndex) >= 1 && document.getElementById('viewRoot').firstElementChild.classList.contains('hol-ban') && getComputedStyle(document.querySelector('.hol-ban')).display!=='none'; })()"));
+  // (Round 75: no banner box on top of Today any more; the season is the decorations. Birthday keeps its line.)
+  check('holidays show on a background scene too (above it), with no box on top of Today (Round 75)', await E("(function(){ const fx = document.getElementById('holFx'); return !!fx && document.body.classList.contains('has-scene') && Number(getComputedStyle(fx).zIndex) >= 1 && !document.querySelector('#viewRoot .hol-ban'); })()"));
   check('…more holidays (New Year, Valentine’s, St. Patrick’s, Easter, Fourth of July)', await E("holToday('2027-01-01')==='newyear' && holToday('2027-02-14')==='valentines' && holToday('2027-03-17')==='stpatricks' && holToday('2027-03-28')==='easter' && holToday('2027-07-04')==='july4'"));
-  await p.click('.r60-holm'); await p.waitForTimeout(200);
-  // (round 61: the music button is a small ♫ / ❚❚ with a label)
-  check('…and music for each one (on and off from the banner)', await E("!!R60.music && R60.music.h==='halloween'") && /Pause/.test(await p.getAttribute('.r60-holm', 'aria-label')));
-  await p.click('.r60-holm'); await p.waitForTimeout(200);
-  check('…which stops when you tap it again', await E("!R60.music"));
+  // (Round 75: the banner and its music button are gone; less music in the app)
   await E("state.profile.scene = 'minimal'; sceneMount(); renderView()");
   check('Day streak and Today’s Standard are one panel', !!(await p.$('.sw .r60-std')) && !/Today's Standard<\/div>/.test(await E("document.getElementById('viewRoot').innerHTML")));
   check('every panel on Today is a widget on a 12-column grid', await E("document.querySelectorAll('#viewRoot .today-panels > .r60w').length >= 4 && getComputedStyle(document.querySelector('.today-panels')).gridTemplateColumns.split(' ').length===12"));
