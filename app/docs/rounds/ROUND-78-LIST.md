@@ -31,6 +31,6 @@
 - Leaving the Command Center's full screen puts it back exactly where it was, not on the main display.
 
 ## GitHub
-- `main` now has everything (Rounds 57–78).
-- The old work branches that were already in `main` are deleted.
-- The unfinished Round 57 attempt (`claude/r57-fixes`), which later work replaced, is kept as the tag `archive/r57-fixes` and its branch deleted.
+- `main` now has everything (Rounds 57–78). New rounds go onto `main`.
+- The repo is tidier: the code lives in `app/`, the round notes in `app/docs/rounds/`, and the helper scripts in `app/mac/helpers/` (the old 2.7.2 app bundle is gone). Built files are no longer kept in git.
+- The old `claude/…` work branches are still on GitHub. Five are fully in `main` (`clever-johnson`, `dreamy-carson`, `operator-recon-phase-1`, `round-70`, `round-72`), so they're safe to delete. `claude/r57-fixes` is an unfinished Round 57 attempt that later work replaced; nothing uses it.
