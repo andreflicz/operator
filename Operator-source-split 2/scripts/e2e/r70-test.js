@@ -207,7 +207,8 @@ const seed = {
     const Q = r70Quests(), h = r72XpPage(), you = renderYouTab();
     const touch = Q.find(q => q.id === 'touch');
     const c = consistencyStats(xpCtx());
-    return {quests:Q.length, hasXp:Q.every(q => q.xp > 0), panel:h.indexOf('r72x-qs') > 0, inYou:you.indexOf('r72OpenXp') > 0,
+    return {quests:Q.length, hasXp:Q.every(q => q.xp > 0), panel:h.indexOf('r76q') > 0 || h.indexOf('r72x-qs') > 0, // (Round 76: quests have their own section, class r76q)
+      inYou:you.indexOf('r72OpenXp') > 0,
       touchQuest:!!touch, touchDone:touch && touch.done, parts:c ? c.parts.indexOf('client touches') >= 0 : 'no score'};
   `);
   check('12 XP center: quests, every one worth something', xp.quests >= 8 && xp.hasXp, xp);

@@ -18,7 +18,7 @@ const seed = {
 
   const nav = await ev(`renderView(); const q = (v) => { const e = document.querySelector('.nav-item[data-view="'+v+'"] .nav-icon'); return e ? e.innerHTML : ''; };
     return {personal:/<svg/.test(q('personal')), xp:/<svg/.test(q('xp')), cal:/<svg/.test(q('calendar')), cmd:!!document.querySelector('.r73NavCmd, [data-action="r73NavCmd"]'), mind:!!document.querySelector('[data-action="r73NavMind"]'), dock:!!document.querySelector('.r73-cvb')};`);
-  check('sidebar: new SVG icons for Personal, XP, Calendar', nav.personal && nav.xp && nav.cal, nav);
+  check('sidebar: new SVG icons for Personal and Calendar (XP left the sidebar in Round 76)', nav.personal && nav.cal, nav);
   check('sidebar has Mind view (Command View lives top right since Round 74)', !nav.cmd && nav.mind, nav);
   check('Command View button lives in the top-right dock', nav.dock, nav);
 

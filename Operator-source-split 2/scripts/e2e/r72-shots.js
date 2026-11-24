@@ -53,6 +53,12 @@ const SHOTS = {
   debt: `state.finances.debts = [{id:'d1', name:'Car loan', balance:-2400, minPayment:180}]; state.finances.bank = {accounts:[{id:'a1', name:'Checking', org:'Chase', balance:3200}, {id:'a2', name:'Freedom Visa', org:'Chase', balance:-1850.4}]}; ui.view='personal'; ui.personalTab='finances'; ui.finTab='debts'; renderView();`,
   quoteEdit: `r71Open(); setTimeout(function(){ document.querySelector('.r75-qt').click(); }, 200);`,
   ccEdit: `ui.r72CmdEdit = true; r71Open();`,
+  holLockedFocus: `r72Set('cvAuto', false); startFocus(null); ui.view='focus'; renderView();`,
+  holLockedToday: `r72Set('cvAuto', false); startFocus(null); ui.view='today'; renderView();`,
+  xpPage: `ui.view='xp'; renderView();`,
+  opSet: `ui.view='settings'; ui.settingsTab='op'; renderView(); setTimeout(function(){ const e = document.getElementById('r76Persona'); if(e) e.scrollIntoView(); }, 100);`,
+  pbOp: `ui.view='business'; ui.businessTab='lifecycle'; renderView(); ACTIONS.pb6NewOpen(null, null, 'client');`,
+  cycle: `ui.view='focus'; ui.focusTasksSubTab='clientBacklog'; const c = state.business.clients[0]; c.deliverables = [{id:'dv1', title:'Reels', recurring:true, monthlyTarget:8, completedDates:[]}]; persist('business'); masterTasksSync(); renderView();`,
   ccBub: `startFocus(null); r71Open(); setTimeout(function(){ ACTIONS.r75Bub(); }, 400);`
 };
 (async () => {

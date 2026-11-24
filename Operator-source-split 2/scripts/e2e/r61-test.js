@@ -60,7 +60,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('no holiday banner on top of Today at all (Round 75)', !(await p.$('#viewRoot .hol-ban')));
   check('a new, slower Halloween tune', await E("R60_TUNES.halloween.organ===true && R60_TUNES.halloween.bpm < 90 && R60_TUNES.halloween.bass.length > 0"));
   await E("r60MusicPlay('halloween')"); await p.waitForTimeout(200);
-  check('…it plays', await E("!!R60.music && R60.music.h==='halloween'")); await E("r60MusicStop()");
+  check('…it never plays in the app any more (Round 76: holiday music is Apple Music)', await E("!(R60.music)")); await E("r60MusicStop()");
   }catch(err){ check('the run reached the end', false, String(err && err.message || err).slice(0, 300)); }
   check('no errors', p.errors.length===0, p.errors);
   await b.close(); process.exit(report() ? 1 : 0);
