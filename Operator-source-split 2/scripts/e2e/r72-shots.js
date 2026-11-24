@@ -59,6 +59,7 @@ const SHOTS = {
   opSet: `ui.view='settings'; ui.settingsTab='op'; renderView(); setTimeout(function(){ const e = document.getElementById('r76Persona'); if(e) e.scrollIntoView(); }, 100);`,
   pbOp: `ui.view='business'; ui.businessTab='lifecycle'; renderView(); ACTIONS.pb6NewOpen(null, null, 'client');`,
   cycle: `ui.view='focus'; ui.focusTasksSubTab='clientBacklog'; const c = state.business.clients[0]; c.deliverables = [{id:'dv1', title:'Reels', recurring:true, monthlyTarget:8, completedDates:[]}]; persist('business'); masterTasksSync(); renderView();`,
+  looksSet: `ui.view='settings'; ui.settingsTab='display'; renderView();`,
   ccBub: `startFocus(null); r71Open(); setTimeout(function(){ ACTIONS.r75Bub(); }, 400);`
 };
 (async () => {

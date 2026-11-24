@@ -125,6 +125,28 @@
   .ring-acts{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:12px; }
   .readout{ white-space:pre-line; font-size:15px; line-height:1.55; }
   .voice{ font-size:12.5px; color:var(--dim); margin-top:8px; text-align:center; }
+  /* ---- Round 77: the live view ---- */
+  .hero{ position:relative; overflow:hidden; border-radius:24px; padding:22px 18px 18px; margin-bottom:12px; border:1px solid var(--line);
+    background:radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--hc, #7ea8ff) 22%, transparent), transparent 65%), linear-gradient(180deg, #1a1e2b, #12151d); --hc:#7ea8ff; }
+  .hero.is-locked{ --hc:#ff9a52; } .hero.is-break{ --hc:#7ef0c0; } .hero.is-shoot{ --hc:#ff8fcf; } .hero.is-asleep{ --hc:#8b8cff; }
+  .hring{ position:relative; width:min(72vw, 270px); aspect-ratio:1; margin:0 auto; }
+  .hring svg{ width:100%; height:100%; transform:rotate(-90deg); overflow:visible; }
+  .hring .t{ fill:none; stroke:rgba(255,255,255,.07); stroke-width:7; }
+  .hring .a{ fill:none; stroke:var(--hc); stroke-width:7; stroke-linecap:round; filter:drop-shadow(0 0 6px var(--hc)); transition:stroke-dasharray .8s ease; }
+  .hin{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .hin small{ font-size:11px; font-weight:800; letter-spacing:.18em; color:var(--hc); text-transform:uppercase; }
+  .hin b{ font-size:clamp(44px, 14vw, 60px); font-weight:800; letter-spacing:-.03em; font-variant-numeric:tabular-nums; line-height:1.05; margin:4px 0 2px; }
+  .hin span{ font-size:13px; color:var(--dim); }
+  .hero.is-live .hin small::before{ content:''; display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--hc); margin-right:7px; vertical-align:1px; animation:beat 2s ease-in-out infinite; }
+  .htask{ text-align:center; margin:14px 6px 4px; font-size:17px; font-weight:650; }
+  .htask em{ display:block; font-style:normal; font-size:12px; font-weight:600; color:var(--dim); letter-spacing:.06em; text-transform:uppercase; margin-bottom:2px; }
+  .hstats{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:14px; }
+  .hstats div{ padding:10px 6px; border-radius:14px; background:rgba(255,255,255,.045); text-align:center; }
+  .hstats b{ display:block; font-size:18px; font-weight:750; } .hstats small{ font-size:11px; color:var(--dim); }
+  .hbar{ height:6px; border-radius:99px; background:rgba(255,255,255,.07); overflow:hidden; margin-top:14px; } .hbar i{ display:block; height:100%; border-radius:99px; background:linear-gradient(90deg, var(--hc), #fff); }
+  .hacts{ display:grid; grid-template-columns:2fr 1fr; gap:8px; margin-bottom:12px; }
+  .hacts .big{ height:58px; } .hacts .chip{ height:58px; }
+  .je small b{ color:var(--text); font-weight:700; }
 </style></head>
 <body>
 
@@ -147,13 +169,19 @@
 
   <!-- NOW -->
   <section id="tNow">
-    <button class="big" id="lock">Lock in</button>
-    <div class="card" style="margin-top:12px">
-      <h2>While you work</h2>
-      <div class="row n2">
-        <button class="chip" id="brk"><span>&#9749;</span><em id="brkT" style="font-style:normal">Break</em></button>
-        <button class="chip" data-quick="water"><span>&#128167;</span>Water</button>
-      </div>
+    <div class="hero" id="hero">
+      <div class="hring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" class="t"/><circle cx="60" cy="60" r="54" class="a" id="hArc" stroke-dasharray="0 400"/></svg>
+        <div class="hin"><small id="hK">Off the clock</small><b id="hT">0m</b><span id="hS">today</span></div></div>
+      <div class="htask" id="hTask"></div>
+      <div class="hbar"><i id="hBar" style="width:0%"></i></div>
+      <div class="hstats"><div><b id="hTasks">–</b><small>tasks</small></div><div><b id="hStreak">–</b><small>day streak</small></div><div><b id="hQ">–</b><small>quests</small></div></div>
+    </div>
+    <div class="hacts">
+      <button class="big" id="lock">Lock in</button>
+      <button class="chip" id="brk"><span>&#9749;</span><em id="brkT" style="font-style:normal">Break</em></button>
+    </div>
+    <div class="card hide">
+      <div class="row n2"><button class="chip" data-quick="water"><span>&#128167;</span>Water</button></div>
     </div>
     <div class="card" id="dashCard">
       <h2>Your day</h2>
@@ -460,7 +488,8 @@
   });
   function loadJournal(){
     call('journal').then(function(L){
-      $('jList').innerHTML = (L || []).map(function(j){ return '<div class="je"><small>'+esc(j.date)+'</small>'+(j.title ? '<b>'+esc(j.title)+'</b>' : '')+'<p>'+esc(j.text)+'</p></div>'; }).join('') || '<div class="item"><b style="color:var(--dim)">Nothing written yet.</b></div>';
+      L = (L || []).slice().sort(function(a, b){ return (b.ts || Date.parse(b.date) || 0) - (a.ts || Date.parse(a.date) || 0); });
+      $('jList').innerHTML = (L || []).map(function(j){ var when = j.ts ? new Date(j.ts) : null; return '<div class="je"><small>'+(when ? '<b>'+when.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})+'</b> · '+when.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}) : esc(j.date))+'</small>'+(j.title ? '<b>'+esc(j.title)+'</b>' : '')+'<p>'+esc(j.text)+'</p></div>'; }).join('') || '<div class="item"><b style="color:var(--dim)">Nothing written yet.</b></div>';
     }).catch(why);
   }
   $('jGo').onclick = function(){ var v = $('jText').value.trim(); if(!v) return; call('journalAdd', {text:v}).then(function(){ $('jText').value = ''; flash('Saved to your journal.'); loadJournal(); }).catch(why); };
@@ -567,6 +596,30 @@
     if(code.length !== 6){ say('Six digits.'); return; }
     api('state').then(function(j){ try{ localStorage.setItem('opCode', code); }catch(e){} gate(false); paint(j.out); loadToday(); loadDash(); }).catch(why);
   };
+
+  // ---- Round 77: the live view ----
+  var LV = null, skew = 0;
+  function dur(ms){ var s = Math.max(0, Math.floor(ms/1000)), h = Math.floor(s/3600), m = Math.floor(s/60) % 60, ss = s % 60; return (h ? h+':'+(m < 10 ? '0' : '')+m : m)+':'+(ss < 10 ? '0' : '')+ss; }
+  function loadLive(){
+    return call('live').then(function(d){ if(!d || d.error) return; skew = d.now - Date.now(); LV = d; drawLive(); }).catch(function(){});
+  }
+  function drawLive(){
+    if(!LV) return; var d = LV, now = Date.now() + skew, h = $('hero');
+    h.className = 'hero'+(d.onBreak ? ' is-break is-live' : d.locked ? ' is-locked is-live' : d.mode === 'Shooting' ? ' is-shoot is-live' : d.mode === 'Asleep' ? ' is-asleep' : '');
+    var C = 2*Math.PI*54; $('hArc').setAttribute('stroke-dasharray', (C*Math.min(1, d.pct || 0)).toFixed(1)+' '+C.toFixed(1));
+    if(d.onBreak){ $('hK').textContent = 'On a break'; $('hT').textContent = d.breakEndsAt ? dur(d.breakEndsAt - now) : dur(now - d.startedAt); }
+    else if(d.locked){ $('hK').textContent = 'Locked in'; $('hT').textContent = dur(now - d.startedAt); }
+    else if(d.mode && d.modeSince){ $('hK').textContent = d.mode; $('hT').textContent = dur(now - d.modeSince); }
+    else { $('hK').textContent = 'Off the clock'; $('hT').textContent = hm(d.deep); }
+    $('hS').textContent = hm(d.deep)+' of '+hm(d.target)+(d.left ? ' · '+hm(d.left)+' to go' : ' · goal hit');
+    $('hTask').innerHTML = d.task ? '<em>On it</em>'+esc(d.task) : d.next ? '<em>Up next</em>'+esc(d.next) : '<em>'+esc(d.day || '')+'</em>';
+    $('hBar').style.width = Math.round(Math.min(1, d.pct || 0)*100)+'%';
+    $('hTasks').textContent = d.tasksDone+'/'+d.tasksAll; $('hStreak').textContent = d.streak || 0; $('hQ').textContent = d.quests ? d.quests.done+'/'+d.quests.all : '–';
+  }
+  setInterval(function(){ if(!document.hidden && tab === 'Now') drawLive(); }, 1000);
+  setInterval(function(){ if(!document.hidden && tab === 'Now') loadLive(); }, 15000);
+  var _refresh = refresh; refresh = function(){ var r = _refresh.apply(this, arguments); loadLive(); return r; };
+  var _show = show; show = function(t){ _show(t); if(t === 'Now') loadLive(); };
 
   // ---- keep it live while it's on screen ----
   var timer = null;

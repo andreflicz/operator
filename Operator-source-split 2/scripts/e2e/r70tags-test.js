@@ -253,13 +253,13 @@ const seed = {
     const door = r70TagList().find(g => g.starter === 'door');
     const off = R70T_STARTERS.filter(s => s.off).map(s => s.name);
     return {names:names, n:names.length, deskSteps:desk ? desk.steps.length : 0,
-      deskRules:!!(desk && desk.steps[0].when.locked === 'out' && desk.steps[1].when.locked === 'in'),
-      doorRules:!!(door && door.steps[0].when.away === 'no' && door.steps[1].when.away === 'yes'),
+      deskRules:!!(desk && desk.steps[0].act === 'locktoggle'), // (Round 77: one toggle step)
+      doorRules:!!(door && door.steps[0].act === 'breakstart'), // (Round 77: the door starts a break)
       extras:off.length, noneOfTheExtras:off.every(n => names.indexOf(n) < 0), secrets:new Set(r70TagList().map(g => g.secret)).size};
   `);
   check('47 the starter set goes in in one tap: Desk, Break, Sleep, Awake, Good morning (R72), Door, Kitchen, Weigh-in, Talk to Op', starters.n === 9 && starters.secrets === 9 && starters.names.indexOf('Good morning') >= 0, starters);
-  check('47.1 Desk is a toggle out of the box', starters.deskSteps === 2 && starters.deskRules, starters);
-  check('47.5 so is the Door', starters.doorRules, starters);
+  check('47.1 Desk is a toggle out of the box (Round 77: one step that locks in or out)', starters.deskSteps === 1 && starters.deskRules, starters);
+  check('47.5 the Door starts a break (Round 77)', starters.doorRules, starters);
   check('47 Gym bag, Reading chair, Phone box and Add a task ship but stay off', starters.extras === 4 && starters.noneOfTheExtras, starters);
 
   // ---- 30/31/32/35 the wizard, and the card ----

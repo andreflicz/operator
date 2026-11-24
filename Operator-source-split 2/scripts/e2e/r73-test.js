@@ -28,10 +28,10 @@ const seed = {
   const pers = await ev(`ui.view='personal'; ui.personalTab='you'; renderView(); const h = document.getElementById('viewRoot').innerHTML; return {tab:ui.personalTab, you:/data-id="you"|>You</.test(h)};`);
   check('Personal has no "You" tab and never lands on it', pers.tab !== 'you' && !pers.you, pers);
 
-  const looks = await ev(`const out = {}; ['board','timeline','focus','orbit','classic'].forEach(function(l){ r72Set('taskLook', l); ui.view='focus'; renderView(); out[l] = !!document.querySelector(l==='classic' ? '.r73-looksbar' : '.r73-look.is-'+l); }); return out;`);
+  const looks = await ev(`const out = {}; ['board','timeline','focus','orbit','classic'].forEach(function(l){ r72Set('taskLook', l); ui.view='focus'; renderView(); out[l] = l==='classic' ? !document.querySelector('.r73-look') : !!document.querySelector('.r73-look.is-'+l); // (Round 77: the switcher moved to Settings → Appearance) }); return out;`);
   check('all five task looks render', Object.values(looks).every(Boolean), looks);
-  const set = await ev(`ui.view='settings'; ui.settingsTab='focus'; renderView(); return !!document.getElementById('r73Looks');`);
-  check('Settings → Focus has the Tasks overview look card', set, set);
+  const set = await ev(`ui.view='settings'; ui.settingsTab='display'; renderView(); return !!document.getElementById('r77Looks');`);
+  check('Settings → Appearance has the Tasks overview look card (Round 77)', set, set);
 
   const cv = await ev(`r71Open(); const o = document.querySelector('.r73cv'); const sky = !!document.querySelector('.r73cv canvas'); return {cls:!!o, sky:sky};`);
   check('Command View opens with the surreal sky', cv.cls && cv.sky, cv);
