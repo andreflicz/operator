@@ -357,7 +357,7 @@ function r73HudHtml(){
       '<button data-action="r74Cv" title="Command View (⌘⇧C)">&#128250;</button>'+
       '<button data-action="r73mClassic" title="The classic view">Classic</button>'+
     '</div>'+
-    '<div class="r73-keys">1–7 sectors · 0 home · ⌘K search · Esc back · click a planet to open it · scroll to zoom</div>';
+    '<div class="r73-keys">click to open · scroll to zoom · ⌘K search · Esc back</div>';
 }
 function r73River(){
   // the day as one ribbon: from getting up to bed, coloured by what you were doing
