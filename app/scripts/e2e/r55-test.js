@@ -44,7 +44,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   // ---- the categoriser ----
   const cats = await E("JSON.stringify(['CAPITAL ONE MOBILE PMT', 'CAPITAL ONE ONLINE PYMT', 'Payment to Chase card', 'MOBIL GAS 12', 'EXXONMOBIL', 'Trader Joes', 'Las Vegas Hotel', 'UBER EATS'].map(expGuessCat))");
-  check('card payments are Not spending, not Transport; whole words only', cats===JSON.stringify(['move', 'move', 'move', 'transport', 'transport', 'groceries', 'other', 'food']), cats);
+  check('card payments are Not spending (Transfers), not Transport; whole words only (Round 79: a hotel is Travel)', cats===JSON.stringify(['move', 'move', 'move', 'transport', 'transport', 'groceries', 'travel', 'food']), cats);
   check('what came in before is sorted again (not what you set yourself)', await E("finExpenses().find(e => e.id==='e1').cat")==='move');
 
   // ---- GHL is gone ----

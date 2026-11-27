@@ -132,6 +132,12 @@ function createWindow() {
   win.loadFile(pageFile());
   win.once('ready-to-show', () => { if (wb && wb.max) win.maximize(); showWin(); });
   win.on('moved', winSave); win.on('resize', winSave); win.on('maximize', winSave); win.on('unmaximize', winSave);
+  // Round 79: the page is told when it's out of sight (closed or minimized), so it can go to sleep; the timers,
+  // alarms, notifications, phone and tags keep working, and it wakes the moment the window is back
+  const winVis = () => { if (!win || win.isDestroyed()) return; const shown = win.isVisible() && !win.isMinimized(); run('operatorPage.winState && operatorPage.winState(' + JSON.stringify({ shown, focused: win.isFocused() }) + ')'); };
+  let winVisT = null; const winVisSoon = () => { clearTimeout(winVisT); winVisT = setTimeout(winVis, 120); };
+  ['show', 'hide', 'minimize', 'restore'].forEach((ev) => win.on(ev, winVisSoon));
+  win.webContents.on('did-finish-load', () => setTimeout(winVis, 2000));
   // the red ✕ puts it away; it keeps running in the menu bar (⌘Q or the menu quits)
   win.on('close', (e) => { if (!quitting) { e.preventDefault(); win.hide(); if (app.dock) app.dock.hide(); } });
   win.on('focus', () => { try { fs.writeFileSync(path.join(DATA_DIR, 'opfocus'), '1 ' + Math.floor(Date.now() / 1000)); } catch (e) {} });
@@ -540,6 +546,7 @@ app.on('will-quit', () => { globalShortcut.unregisterAll(); stopHelpers(); modSt
 // (before anything opens the page's storage)
 let how = null;
 if (app.hasSingleInstanceLock()) { stopOldLauncher(); try { how = migrateFromChrome(); } catch (e) { log('move-in failed', e.message); } }
+try { app.commandLine.appendSwitch('js-flags', '--expose-gc'); } catch (e) {}
 app.whenReady().then(() => {
   session.defaultSession.setPermissionRequestHandler((wc, perm, cb) => cb(['media', 'notifications', 'clipboard-read', 'clipboard-sanitized-write', 'fullscreen', 'speaker-selection', 'idle-detection'].includes(perm)));
   session.defaultSession.setPermissionCheckHandler((wc, perm) => ['media', 'notifications', 'clipboard-read', 'clipboard-sanitized-write', 'fullscreen', 'speaker-selection'].includes(perm));

@@ -50,6 +50,7 @@ function r78Gran(){
   return (R78.gran = c);
 }
 function r78Sun(x, s, r, t, calm, oc, opSt){
+  if(!(r > 0.5) || !isFinite(r)) return;   // (Round 79: during the opening sweep the camera can put it behind you)
   const cx = s[0], cy = s[1], tt = calm ? 0 : t;
   x.globalCompositeOperation = 'lighter';
   // corona, in three layers

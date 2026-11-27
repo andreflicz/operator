@@ -34,7 +34,7 @@ r70TRunStep = (function(base){
       if(r72WakeRinging()){ wakeSnooze(); const sn = r72Snoozed(); return 'Snoozed'+(sn ? ' until '+fmtTimeShort(sn.ts) : '')+'.'; }
       if(r72WorkRinging()){ ACTIONS.workSnooze(); return 'Work alarm snoozed, 5 minutes.'; }
       if(r72ReminderRinging()){ try{ snoozeAlarm(); }catch(e){} return 'Snoozed.'; }
-      { const sn = r72Snoozed(); if(sn && sn.wake) return 'Snoozed until '+fmtTimeShort(sn.ts)+'. Back to sleep.'; }
+      { const sn = r72Snoozed(); if(sn && sn.wake) return 'Already snoozed until '+fmtTimeShort(sn.ts)+'. Back to sleep.'; }
       if(r77Asleep()) return 'Already down for the night.';
       r70TSleepStart();
       return 'Goodnight. You’re asleep.';

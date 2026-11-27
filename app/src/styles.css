@@ -11810,3 +11810,57 @@ body.mind-dive #r73Insp{ display:none !important; }
 .r78-od{ margin:12px 0; padding:12px 14px; border-radius:14px; border:1px solid rgba(56,189,248,.28); background:rgba(56,189,248,.06); font-size:13px; line-height:1.5; }
 .r78-od b{ color:var(--text); } .r78-od p{ margin:6px 0 0; color:var(--text-dim); }
 .r78-qr{ width:132px; margin-top:8px; background:#fff; border-radius:10px; padding:6px; }
+
+/* ================= ROUND 79 ================= */
+/* Mind view: an opened page is the whole app (sidebar and all), and the galaxy steps out of the way */
+body.mind-on.mind-dive #app{ inset:0 !important; border-radius:0; border:0; box-shadow:none; background:var(--bg, #0B0D12); -webkit-backdrop-filter:none; backdrop-filter:none; }
+body.mind-on.mind-dive #app .sidebar{ display:flex !important; }
+body.mind-on.mind-dive #mindRoot{ visibility:hidden; }
+body.mind-on.mind-dive #r73Back{ display:none !important; }
+.nav-map{ display:none !important; }
+body.mind-on .nav-map{ display:flex !important; align-items:center; margin-bottom:6px; border:1px solid rgba(56,189,248,.25); background:rgba(56,189,248,.07); }
+.nav-map kbd{ margin-left:auto; font:600 10px "JetBrains Mono", monospace; padding:1px 6px; border-radius:5px; background:rgba(255,255,255,.07); color:var(--text-dim); }
+body.mind-on #r73NavMind{ display:none !important; }
+/* asleep behind a closed window: nothing moves, the decorations come off */
+body.op-asleep *, body.op-asleep *::before, body.op-asleep *::after{ animation:none !important; transition:none !important; }
+body.op-asleep #holFx, body.op-asleep #mindRoot canvas{ display:none !important; }
+
+/* ---- Round 79 money ---- */
+.r79-sp-top{ display:flex; justify-content:space-between; align-items:flex-end; gap:16px; margin:4px 0 14px; }
+.r79-sp-top small{ display:block; font-size:12px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.06em; }
+.r79-sp-top b{ font-size:28px; } .r79-sp-top em{ margin-left:10px; font-style:normal; font-size:12px; font-weight:700; } .r79-sp-top em.is-up{ color:#FF7A6B; } .r79-sp-top em.is-down{ color:#3FBE8E; }
+.r79-sp-mv{ text-align:right; opacity:.8; } .r79-sp-mv b{ font-size:16px; color:var(--text-dim); }
+.r79-cats{ display:flex; flex-direction:column; gap:4px; }
+.r79-cat{ display:grid; grid-template-columns:minmax(150px, 1.2fr) 3fr 110px 48px; align-items:center; gap:12px; padding:9px 10px; border-radius:10px; border:1px solid transparent; background:transparent; color:var(--text); text-align:left; cursor:pointer; font:inherit; }
+.r79-cat:hover, .r79-cat.is-on{ background:rgba(255,255,255,.04); border-color:rgba(255,255,255,.07); }
+.r79-cn{ font-weight:600; } .r79-cn small{ display:block; font-weight:400; font-size:11px; color:var(--text-dim); }
+.r79-bar{ height:8px; border-radius:99px; background:rgba(255,255,255,.06); overflow:hidden; } .r79-bar u{ display:block; height:100%; border-radius:99px; background:var(--c); }
+.r79-cat > b{ text-align:right; } .r79-cat > em{ font-style:normal; font-size:12px; color:var(--text-dim); text-align:right; }
+.r79-places{ margin:2px 0 10px 18px; padding:8px 0 4px 14px; border-left:2px solid rgba(255,255,255,.08); }
+.r79-hint{ margin:0 0 8px; font-size:12.5px; color:var(--text-dim); }
+.r79-pl{ display:grid; grid-template-columns:1fr 100px 170px; gap:10px; align-items:center; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+.r79-pl small{ display:block; font-size:11px; color:var(--text-dim); } .r79-pl > b{ text-align:right; }
+.r79-rec{ margin-top:18px; padding-top:12px; border-top:1px solid rgba(255,255,255,.07); }
+.r79-rec-h{ display:flex; gap:10px; align-items:baseline; margin-bottom:6px; } .r79-rec-h span{ font-size:12px; color:var(--text-dim); }
+.r79-rr{ display:grid; grid-template-columns:1fr 100px 110px; gap:10px; align-items:center; padding:6px 0; } .r79-rr small{ display:block; font-size:11px; color:var(--text-dim); } .r79-rr > b{ text-align:right; } .r79-rr.is-off{ opacity:.45; }
+.r79-ym{ font-weight:600; padding:0 6px; }
+.r79-sort{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); }
+.r79-dnote{ font-size:12px; color:var(--text-dim); margin:0 0 8px; }
+.r79-drow{ display:grid !important; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.r79-txbar{ display:flex; gap:8px; align-items:center; margin:8px 0 6px; } .r79-txsum{ margin-left:auto; font-size:12px; color:var(--text-dim); }
+.r79-catsel{ appearance:none; -webkit-appearance:none; border:1px solid color-mix(in srgb, var(--c) 45%, transparent); background:color-mix(in srgb, var(--c) 12%, transparent); color:var(--text); border-radius:99px; padding:3px 10px; font:600 12px var(--font-body); cursor:pointer; max-width:150px; }
+.r44-chips button small{ opacity:.55; font-weight:500; }
+.r79-fix{ margin-top:12px; padding:12px; border-radius:12px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); }
+.r79-fix-h{ display:flex; gap:10px; align-items:baseline; margin-bottom:6px; } .r79-fix-h span{ font-size:12px; color:var(--text-dim); }
+.r79-fx{ display:grid; grid-template-columns:1fr 100px 80px; gap:10px; align-items:center; padding:5px 0; } .r79-fx small{ display:block; font-size:11px; color:var(--text-dim); } .r79-fx small em{ color:#E8A23D; font-style:normal; } .r79-fx > b{ text-align:right; } .r79-fx .is-g{ color:#3FBE8E; }
+.r79-fix-b, .r79-paid{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; } .r79-paid .input{ flex:1; min-width:110px; }
+.r79-mp{ font-size:13px; color:var(--text-dim); margin:4px 0; } .r79-ml{ margin:4px 0 0 18px; padding:0; font-size:13px; } .r79-ml li{ margin:2px 0; }
+.r79-stlog{ margin-top:8px; font-size:12px; color:var(--text-dim); display:flex; flex-direction:column; gap:3px; } .r79-busy{ font-size:12px; color:#E8A23D; }
+.r79-mcats > div{ display:grid; grid-template-columns:120px 1fr 90px; gap:10px; align-items:center; font-size:13px; padding:3px 0; } .r79-mcats i{ height:6px; border-radius:99px; background:rgba(255,255,255,.06); overflow:hidden; } .r79-mcats u{ display:block; height:100%; background:var(--c); border-radius:99px; } .r79-mcats b{ text-align:right; }
+.r79-mrec > div{ display:grid; grid-template-columns:1fr 90px 70px; gap:10px; font-size:13px; padding:3px 0; } .r79-mrec b{ text-align:right; } .r79-mrec small{ color:var(--text-dim); text-align:right; }
+.r79-ask{ position:fixed; inset:0; z-index:12000; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.5); }
+.r79-ask-b{ width:340px; padding:18px; border-radius:16px; background:var(--panel-2, #1A1D26); border:1px solid rgba(255,255,255,.1); display:flex; flex-direction:column; gap:12px; }
+.r79-ask-b > div{ display:flex; justify-content:flex-end; gap:8px; }
+.r79-holpick em{ font-style:normal; font-size:12px; color:var(--text-dim); }
+
+.r79-sp{ width:100%; }

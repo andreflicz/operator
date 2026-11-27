@@ -357,7 +357,7 @@ function r73HudHtml(){
       '<button data-action="r74Cv" title="Command View (⌘⇧C)">&#128250;</button>'+
       '<button data-action="r73mClassic" title="The classic view">Classic</button>'+
     '</div>'+
-    '<div class="r73-keys">click to open · scroll to zoom · ⌘K search · Esc back</div>';
+    '<div class="r73-keys">click to pick · double-click to open · scroll to zoom · ⌘K</div>';
 }
 function r73River(){
   // the day as one ribbon: from getting up to bed, coloured by what you were doing
@@ -571,7 +571,7 @@ document.addEventListener('keydown', function(e){
   if(s){ const n = MIND.byId['s:'+s.id]; r73FlyNode(n); r73Inspect(n); return; }
   if(e.key==='Enter' && MIND.sel){ const n = MIND.sel; if(n.kind==='sector') r73Dive(n.sector.dive); else if(n.go) r73Dive(n.go); else if(n.parent && n.parent.sector) r73Dive(n.parent.sector.dive); return; }
   if((e.key==='x' || e.key==='X') && MIND.sel){ if(MIND.sel.kind==='task') ACTIONS.r73mDone(null, null, MIND.sel.ref.id); else if(MIND.sel.kind==='client') ACTIONS.r73mTouch(null, null, MIND.sel.ref.id); return; }
-  if(e.key===' '){ e.preventDefault(); ACTIONS.r73mLock(); }
+  // (Round 79: Space no longer locks you in or out; use the Lock in button or ⌘K)
 });
 function r73Size(){
   const c = MIND.canvas; if(!c) return;

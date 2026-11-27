@@ -17,7 +17,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   const ev = JSON.parse(await E("JSON.stringify(r44Events('2026-10-25', '2026-11-07').map(e => [e.date, e.name, e.kind, e.amount]))"));
   check('upcoming: client payments from billing days, debt minimums from due days', ev.some(e => e[0]==='2026-11-01' && e[1]==='JJS' && e[2]==='in') && ev.some(e => e[0]==='2026-11-05' && e[1]==='Kiko') && ev.some(e => e[0]==='2026-11-01' && e[1]==='Visa card' && e[2]==='out'), ev);
   check('four numbers on top: cash, all debt, coming in, going out', (await p.$$('.r44-tile')).length===4 && /\$4,211/.test(await p.textContent('.r44-tiles')) && /\+\$5,000/.test(await p.textContent('.r44-tiles')));
-  check('one tab bar for the hub', (await p.$$('.r44-pills')).length===1 && (await p.$$('.r44-pills button')).length===4);
+  check('one tab bar for the hub', (await p.$$('.r44-pills')).length===1 && (await p.$$('.r44-pills button')).length===5);   // (Round 79 added Spending)
   check('upcoming shows the days with Received / Paid', (await p.$$('.r44-day')).length >= 2 && !!(await p.$('[data-action="r44Mark"]')));
   await p.screenshot({path:OUT+'/r44-fin.png', fullPage:true});
   await E("ACTIONS.r44Mark(null, null, 'c:jj:2026-11')"); await p.waitForTimeout(150);

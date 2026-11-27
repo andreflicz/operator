@@ -5,16 +5,16 @@
 // drifts behind each sector. Drag to turn it and tilt it; Shift-drag (or right-drag) to slide; scroll to zoom.
 // Only runs while the Mind view is on and the window is showing (it stops dead otherwise).
 
-MIND.yaw = 0.35; MIND.pitch = -1.02; MIND.spin = 0; MIND.lastT = 0;
-const R76_F = 1100;     // focal length: lower is more dramatic perspective
+MIND.yaw = 0.35; MIND.pitch = -0.42; MIND.spin = 0; MIND.lastT = 0;
+const R76_F = 540;      // focal length: lower is more dramatic perspective
 
 // height for anything on the map: sectors ride a gentle wave around the disk, their moons scatter above and below
 function r76Z(n){
   if(n.z3!=null) return n.z3;
   if(n.kind==='op') return (n.z3 = 0);
-  if(n.kind==='sector') return (n.z3 = Math.sin(n.a*2 + 0.6)*70);
+  if(n.kind==='sector') return (n.z3 = Math.sin(n.a*2 + 0.6)*150 + Math.cos(n.a*3.3)*60);
   const p = n.parent ? r76Z(n.parent) : 0, ph = n.ph || 0;
-  return (n.z3 = p + Math.sin(ph*3.1)*55 + Math.cos(ph*1.7)*25);
+  return (n.z3 = p + Math.sin(ph*3.1)*70 + Math.cos(ph*1.7)*35);
 }
 // world → screen: slide by the camera, spin (yaw), tilt (pitch), then perspective
 function r76P(x, y, z){
@@ -210,6 +210,7 @@ r73Draw = function(now){
 };
 // Op: a lit orb with a halo on the disk, his rings tilted with the floor, his state under him
 function r76Op(x, n, t, k, calm, live, L, bootE){
+  if(!n.sp || !(n.sp[2] > 0)) return;
   const s = n.sp, br = calm ? 1 : 1 + Math.sin(t*1.13)*0.035, r = 46*k*s[2]*br*Math.max(0.2, bootE);
   const opSt = typeof AI!=='undefined' ? (AI.listening ? 'listen' : AI.busy ? 'think' : (typeof OV!=='undefined' && OV.idx >= 0) ? 'speak' : '') : '';
   const oc = opSt==='listen' ? '#38BDF8' : opSt==='think' ? '#C084FC' : (live==='locked' || live==='shooting' || live==='break') ? L.c : live==='asleep' ? '#6366F1' : '#38BDF8';
@@ -257,7 +258,7 @@ r73Wire = function(c){
           const cy = Math.cos(MIND.yaw), sy = Math.sin(MIND.yaw), sp = Math.sin(MIND.pitch) || -1, kk = MIND.cam.k, rx = dx/kk, rz = -(dy/kk)/sp;
           MIND.cam.x = d.cx - (rx*cy + rz*sy); MIND.cam.y = d.cy - (-rx*sy + rz*cy);
         } else {
-          MIND.yaw = d.yaw + dx*0.006; MIND.pitch = Math.max(-1.5, Math.min(-0.38, d.pitch - dy*0.004));
+          MIND.yaw = d.yaw + dx*0.006; MIND.pitch = Math.max(-1.5, Math.min(-0.2, d.pitch - dy*0.004));
           d.vt = (e.clientX - d.lx)*0.006*60; d.lx = e.clientX;
         }
       }
@@ -272,14 +273,14 @@ r73Wire = function(c){
     if(!n){ r73Inspect(null); return; }
     MIND.lastPick = {n:n, at:performance.now()};
     r73Sound('select'); r73Inspect(n);
-    // Round 78: one click on a planet flies you into it and opens that part of the app
-    if(n.kind==='sector') r78Open(n);
+    // Round 79: a click picks it and glides to it; Open (on its card), a double-click or Enter opens it
+    if(n.kind==='sector' && !r73Reduce()) r73FlyNode(n);
   });
   c.addEventListener('dblclick', function(e){
     // (the map moves between the two clicks, so the first click's pick counts)
     const lp = MIND.lastPick && performance.now() - MIND.lastPick.at < 700 ? MIND.lastPick.n : null;
     const n = lp || r73Pick(e.offsetX, e.offsetY); if(!n) return;
-    if(n.kind==='sector') return;
+    if(n.kind==='sector'){ r78Open(n); return; }
     else if(n.kind==='task') openTaskEditModal(n.ref.id);
     else if(n.go) r73Dive(n.go);
     else if(n.kind==='op') ACTIONS.r73mOpType();
@@ -288,5 +289,5 @@ r73Wire = function(c){
   window.addEventListener('resize', r73Size);
 };
 // the fit view looks a little further down into the disk; heights get rebuilt with the map
-r73Fit = (function(base){ return function(){ base.apply(this, arguments); if(!r73Reduce()){ MIND.pitchTo = -1.02; } }; })(r73Fit);
+r73Fit = (function(base){ return function(){ base.apply(this, arguments); if(!r73Reduce()){ MIND.pitchTo = -0.42; } }; })(r73Fit);
 r73MindBuild = (function(base){ return function(){ const r = base.apply(this, arguments); return r; }; })(r73MindBuild);
