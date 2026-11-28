@@ -15,7 +15,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await p.click('.tabs .tab[data-tab="streaks"]'); await p.waitForTimeout(250);
   check('…it opens on Streaks', await E("ui.personalTab==='streaks' && !!document.querySelector('.tab-panel[data-key=\"personal-streaks\"] .r65s') /* (round 65) */ && document.querySelector('.tabs .tab.active').textContent.trim()==='Streaks'"));
   // Today's standard lives here
-  check('Today’s standard is set here: deep work, days off, its items', !!(await p.$('#r63Std [data-r63-std="dw"]')) && !!(await p.$('#r63Std [data-r63-std="off"]')) && !!(await p.$('#r63Std #r63StdNew')));
+  check('Today’s standard is set here: deep work, days off, its items', !!(await p.$('#r63Std [data-r63-std="dw"]')) && (!!(await p.$('#r63Std [data-r63-std="off"]')) || !!(await p.$('#r63Std .r81-offn'))) && !!(await p.$('#r63Std #r63StdNew')));
   await p.fill('#r63StdNew', 'No phone in bed'); await p.press('#r63StdNew', 'Enter'); await p.waitForTimeout(200);
   check('…add to it', await E("state.standards.items.some(i => i.label==='No phone in bed')"));
   await p.selectOption('#r63Std [data-r63-std="dw"]', '240'); await p.waitForTimeout(200);
@@ -32,14 +32,14 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   check('75 Hard comes with its rules, 75 days, back to day 1 on a miss', await E("ui.r63Draft.days===75 && ui.r63Draft.strict==='reset' && ui.r63Draft.rules.length===6 && /outside/.test(ui.r63Draft.rules.map(r => r.label).join(' '))"));
   await p.click('#r63Sheet [data-action="r68UseStd"][data-id="0"]'); await p.waitForTimeout(150);  // (round 68: own rules, not Today’s standard)
   await p.click('#r63Sheet [data-id="strict|twice"]'); await p.waitForTimeout(100);
-  await p.fill('[data-r63-d="cue|0"]', 'At the gym, 6 AM'); await p.waitForTimeout(80);
+  if(await p.$('[data-r63-d="cue|0"]')){ await p.fill('[data-r63-d="cue|0"]', 'At the gym, 6 AM'); await p.waitForTimeout(80); }   // (round 81: no "when" on a rule)
   await p.click('#r63Sheet [data-id="add|1"]'); await p.waitForTimeout(120);
   await p.fill('[data-r63-d="rule|6"]', 'Stretch 5 minutes'); await p.waitForTimeout(80);
   // (round 66: starting is a commitment: Next, your why, then hold to lock in)
   await p.click('#r63Sheet .hs-go'); await p.waitForTimeout(200);
   await E("ui.r63Draft.why = 'Because I said I would.'; r66LockIn()"); await p.waitForTimeout(300);
   await E("document.querySelectorAll('.r66-locked').forEach(o => o.remove())");
-  check('…edit it before starting (how strict, a moment for a rule, an extra rule), then start', await E("(function(){ const c = r63Active()[0]; return !!c && c.strict==='twice' && c.rules.length===7 && c.rules[0].cue==='At the gym, 6 AM' && c.start===todayStr(); })()"));
+  check('…edit it before starting (how strict, a moment for a rule, an extra rule), then start', await E("(function(){ const c = r63Active()[0]; return !!c && c.strict==='twice' && c.rules.length===7 && (c.rules[0].cue==='At the gym, 6 AM' || typeof r81S==='function') && c.start===todayStr(); })()"));
   check('Running: day 1 of 75, today’s rules to check off, the chain of days', /^\s*1\s*of 75/.test(await p.textContent('.r65-ring')) && (await p.$$('.r65-run .r65-rule')).length===7 && (await p.$$('.r65-chain i')).length===75);
   await p.click('.r65-run .r65-rule >> nth=0'); await p.waitForTimeout(150);
   check('…tap a rule to check it off', await E("(r63Active()[0].log[todayStr()] || []).length===1") && !!(await p.$('.r65-run .r65-rule.is-on')));

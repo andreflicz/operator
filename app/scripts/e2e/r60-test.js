@@ -58,8 +58,10 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.pbSel = pbAll().find(p => p.name==='Monthly client').id; renderView()"); await p.waitForTimeout(150);
   await p.click('[data-action="r60SavePreset"]'); await p.waitForTimeout(200);
   check('save your own playbook as a preset', await E("r60Customs().some(c => c.name==='Monthly client')"));
-  await E("ACTIONS.pb6NewOpen()"); await p.waitForTimeout(200);
-  check('new playbook: start from a preset (built-in or yours) or from scratch', (await p.$$('#pb6NewSheet .r60-pre-b')).length >= 5 && !!(await p.$('#pb6NewName')));
+  await E("ACTIONS.pb6NewOpen(); ACTIONS.r81PbMode && ACTIONS.r81PbMode(null, null, 'blank')"); await p.waitForTimeout(200);
+  const r60Name = !!(await p.$('#pb6NewName'));
+  await E("ACTIONS.r81PbMode && ACTIONS.r81PbMode(null, null, 'tpl')"); await p.waitForTimeout(200);   // (round 81: the sheet asks how you start)
+  check('new playbook: start from a preset (built-in or yours) or from scratch', (await p.$$('#pb6NewSheet .r60-pre-b')).length >= 5 && r60Name);
   await p.click('#pb6NewSheet .r60-pre:last-child .r60-pre-b'); await p.waitForTimeout(250);
   check('…a preset makes an ordinary playbook you can change (its own copy)', await E("pbAll().filter(p => p.name==='Monthly client').length===2 && pbStages(pbAll().filter(p => p.name==='Monthly client')[0])[0].id!==pbStages(pbAll().filter(p => p.name==='Monthly client')[1])[0].id"));
   // ================= C. Business =================

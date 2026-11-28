@@ -27,14 +27,14 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   // ---- a new playbook: name, for, its stages, what happens after the last stage ----
   // (round 57: a playbook is a pipeline of stages you move people through, so it has no length of its own; each
   // stage says roughly how long it takes, and a stage can run every month. These checks follow that.)
-  await E("ACTIONS.pb6NewOpen()"); await p.waitForTimeout(200);
+  await E("ACTIONS.pb6NewOpen(); ACTIONS.r81PbMode && ACTIONS.r81PbMode(null, null, 'blank')"); await p.waitForTimeout(200);
   // (round 59: playbooks are client SOPs; the lead playbook is the permanent one, so no For switch)
   check('the new-playbook sheet asks the name, its stages, and what happens when it ends', !!(await p.$('#pb6NewName')) && (await p.$$('#pb6NewSheet [data-action="pb6NewSet"][data-id^="for:"]')).length===0 && (await p.$$('#pb6NewSheet [data-action="pb6NewSet"][data-id^="mirror:"]')).length===2 && !!(await p.$('#pb6NewEnds')));
   await p.fill('#pb6NewName', 'Retainer'); await p.click('[data-id="mirror:0"]'); await p.waitForTimeout(100); await p.fill('#pb6NewName', 'Retainer'); await p.selectOption('#pb6NewEnds', 'again');
   await p.click('[data-action="pb6Create"]'); await p.waitForTimeout(250);
   await E("pbStages(pbAll()[0])[0].repeat = 'month'; pbStages(pbAll()[0])[0].name = 'Monthly service'; pbSave()");
   check('…made: for clients, starts again, its stage runs every month', await E("JSON.stringify(pbAll().map(x => [x.name, pbFor(x), pbRepeats(x), !!x.isDefault, pbStages(x)[0].repeat]))")===JSON.stringify([['Retainer', 'client', true, false, 'month']]));
-  await E("ACTIONS.pb6NewOpen()"); await p.waitForTimeout(150); await p.fill('#pb6NewName', 'Onboarding'); await p.click('[data-id="mirror:0"]'); await p.waitForTimeout(100); await p.fill('#pb6NewName', 'Onboarding'); await p.selectOption('#pb6NewEnds', pbId = await E("pbAll()[0].id")); await p.click('[data-action="pb6Create"]'); await p.waitForTimeout(250);
+  await E("ACTIONS.pb6NewOpen(); ACTIONS.r81PbMode && ACTIONS.r81PbMode(null, null, 'blank')"); await p.waitForTimeout(150); await p.fill('#pb6NewName', 'Onboarding'); await p.click('[data-id="mirror:0"]'); await p.waitForTimeout(100); await p.fill('#pb6NewName', 'Onboarding'); await p.selectOption('#pb6NewEnds', pbId = await E("pbAll()[0].id")); await p.click('[data-action="pb6Create"]'); await p.waitForTimeout(250);
   await E("pbStages(pbAll()[1])[0].days = 30; pbSave()");
   check('…another that moves them on to Retainer when it ends', await E("pbAll()[1].next===pbAll()[0].id && !pbRepeats(pbAll()[1])"));
   await E("(function(){ const L = pbNew('lead', 'New lead', 30, {for:'lead'}); L.stages = crmStages('lead').filter(s => s.kind!=='won' && s.kind!=='lost').map(s => pb57Stage(s.label, {crm:s.id})); pbAll().push(L); pbSave(); renderView(); })()"); await p.waitForTimeout(250);

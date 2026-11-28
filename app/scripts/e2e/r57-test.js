@@ -22,7 +22,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
 
   // ================= A. PLAYBOOKS =================
   // a new playbook: its stages copied from the client stages
-  await E("ACTIONS.pb6NewOpen()"); await p.waitForTimeout(200);   // (round 59: made from the + in the corner)
+  await E("ACTIONS.pb6NewOpen(); ACTIONS.r81PbMode && ACTIONS.r81PbMode(null, null, 'blank')"); await p.waitForTimeout(200);   // (round 81: pick Blank first) (round 59: made from the + in the corner)
   check('new playbook: name, for, stages (the client stages, or my own), what happens after the last stage', !!(await p.$('#pb6NewName')) && (await p.$$('#pb6NewSheet [data-id^="mirror:"]')).length===2 && !!(await p.$('#pb6NewEnds')) && !(await p.$('#pb6NewDays')));
   await p.fill('#pb6NewName', 'Client journey'); await p.click('[data-action="pb6Create"]'); await p.waitForTimeout(250);
   // (the seed's onboarding client was on the old default cycle: it came over as its own playbook; keep ours first)

@@ -49,7 +49,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("const b = document.getElementById('opBub'); b.classList.add('is-in'); R61.idleSince = Date.now() - 100000; R61.lastChat = (opChat().length ? opChat()[opChat().length - 1].at : 0) || 0"); await p.waitForTimeout(3500);
   check('…and it closes by itself after a while with nothing going on', await E("!document.getElementById('opBub').classList.contains('is-in')"));
   // ---- E. Playbooks ----
-  await E("ACTIONS.pb6NewOpen()"); await p.waitForTimeout(200);
+  await E("ACTIONS.pb6NewOpen(); ACTIONS.r81PbMode && ACTIONS.r81PbMode(null, null, 'tpl')"); await p.waitForTimeout(200);
   check('no combined “Onboarding → Monthly client” preset (leads keep their own permanent playbook)', !(await p.$('[data-action="r60UsePreset"][data-id="chain"]')) && (await p.$$('#pb6NewSheet .r60-pre-b')).length >= 4);
   await E("addSheetClose('pb6NewSheet')");
   // ---- F. Holidays ----

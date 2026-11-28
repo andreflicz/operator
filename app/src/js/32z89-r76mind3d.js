@@ -254,11 +254,12 @@ r73Wire = function(c){
     if(d){
       const dx = e.clientX - d.x, dy = e.clientY - d.y; if(Math.abs(dx) + Math.abs(dy) > 4){ d.moved = true; MIND.fly = null; }
       if(d.moved){
+        MIND.hover = null;   // (Round 81: nothing dims while you turn)
         if(d.pan){
-          const cy = Math.cos(MIND.yaw), sy = Math.sin(MIND.yaw), sp = Math.sin(MIND.pitch) || -1, kk = MIND.cam.k, rx = dx/kk, rz = -(dy/kk)/sp;
+          const cy = Math.cos(MIND.yaw), sy = Math.sin(MIND.yaw), s0 = Math.sin(MIND.pitch), sp = (s0 > 0 ? 1 : -1)*Math.max(0.3, Math.abs(s0)), kk = MIND.cam.k, rx = dx/kk, rz = -(dy/kk)/sp;
           MIND.cam.x = d.cx - (rx*cy + rz*sy); MIND.cam.y = d.cy - (-rx*sy + rz*cy);
         } else {
-          MIND.yaw = d.yaw + dx*0.006; MIND.pitch = Math.max(-1.5, Math.min(-0.2, d.pitch - dy*0.004));
+          MIND.yaw = d.yaw + dx*0.006; MIND.pitch = Math.max(-1.55, Math.min(1.2, d.pitch - dy*0.004));   // (Round 81: right over the top and underneath too)
           d.vt = (e.clientX - d.lx)*0.006*60; d.lx = e.clientX;
         }
       }

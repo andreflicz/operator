@@ -50,7 +50,7 @@ const { instrument, launch, newPage, check, report, OUT } = require('./common.js
   await E("ui.pbSel = r59LeadPb().id; renderView()"); await p.waitForTimeout(150);
   check('…and its stages aren’t added here (they come from the pipeline)', await E("(function(){ const n = pbStages(r59LeadPb()).length; ACTIONS.pb57StageAdd(); return pbStages(r59LeadPb()).length===n; })()"));
   check('no “+ New playbook” buttons on the page (the + in the corner makes one)', !(await p.$('#viewRoot [data-action="pb6NewOpen"]')));
-  await E("ACTIONS.pb6NewOpen(null, null, 'lead')"); await p.waitForTimeout(200);
+  await E("ACTIONS.pb6NewOpen(null, null, 'lead'); ACTIONS.r81PbMode && ACTIONS.r81PbMode(null, null, 'blank')"); await p.waitForTimeout(200);
   check('the new-playbook sheet doesn’t offer Clients / Leads', !(await p.$('[data-action="pb6NewSet"][data-id^="for:"]')) && !!(await p.$('#pb6NewName')));
   await E("addSheetClose('pb6NewSheet')");
   await E("const C = pbNew('client', 'Client journey', 30, {for:'client'}); C.stages = [pb57Stage('Onboarding', {days:14})]; C.postDays = ['1','3']; pbAll().push(C); pbSave(); ui.pbSel = C.id; ui.pb57Cal = true; ui.pb57Stage = C.stages[0].id; renderView()"); await p.waitForTimeout(200);

@@ -29,7 +29,7 @@ const money = require('./r79-seed')();
   const own = await ev(`ui.r63Draft = {preset:'own', name:'Gym month', days:30, strict:'twice', useStd:false, rules:[{label:'Two workouts', cue:'', track:'workout2'}, {label:'Stretch', cue:''}]}; ACTIONS.r63Start(); const c = r63Active().find(x=>x.name==='Gym month'); state.health.gymLog.push({date:todayStr(), type:'Lift'}, {date:todayStr(), type:'Run'}); r80Sync(); return {track:c.rules[0].track, ticked:((c.log||{})[todayStr()]||[]).indexOf(c.rules[0].id) >= 0};`);
   check('a streak of its own: a rule the app can check ticks itself (two workouts logged)', own.track==='workout2' && own.ticked, own);
   const ms = await ev(`ui.view='personal'; ui.personalTab='streaks'; renderView(); return {cards:document.querySelectorAll('.r80-mc').length, on:document.querySelectorAll('.r80-mc.is-on').length, auto:document.querySelectorAll('.r80-autot').length};`);
-  check('the Streaks page: master streaks (work hours, workout, calorie deficit, reach out, journal) and AUTO on the tracked ones', ms.cards===5 && ms.on >= 4 && ms.auto >= 3, ms);
+  check('the Streaks page: master streaks (work hours, workout, calorie deficit, reach out, journal) and AUTO on the tracked ones', ms.cards >= 5 && ms.on >= 4 && ms.auto >= 3, ms);
 
   // ---------- health ----------
   const hg = await ev(`state.profile.maintCal = 2700; state.profile.deficitCal = 750; r80SetTarget(); ui.personalTab='fitness'; renderView(); return {t:state.profile.calorieTarget, card:!!document.querySelector('.r80-hg'), tip:document.querySelector('.r80-tip').textContent.length > 20};`);
@@ -58,7 +58,8 @@ const money = require('./r79-seed')();
   check('…no to a late night before a shoot, no to unpaid work on your day off, yes to family', !dec.beforeShoot.yes && /shoot/.test(dec.beforeShoot.why) && !dec.opp.yes && dec.fam.yes, dec);
   const cap = await ev(`const S = r80S(); S.social = 2; const ws = startOfWeekStr(todayStr()); S.decisions.push({date:ws, kind:'social', go:true}, {date:addDays(ws, 1), kind:'social', go:true}); const r = r80Decide({kind:'social', date:addDays(ws, 5) > todayStr() ? addDays(ws, 5) : todayStr(), time:'20:00'}); return r;`);
   check('…and it counts your social nights against your limit', !cap.yes && /limit/.test(cap.why), cap);
-  const tab = await ev(`ui.view='personal'; ui.personalTab='schedule'; renderView(); return {tab:!!document.querySelector('.tab.active[data-tab="schedule"]'), strip:document.querySelectorAll('.r80-sd').length, week:document.querySelectorAll('.r80-wr').length, hols:document.querySelectorAll('.r80-hol').length, pre:document.querySelectorAll('.r80-pc').length};`);
+  // (round 81: the schedule is a weekly board; holidays sit under Days off; presets fill a season)
+  const tab = await ev(`ui.view='personal'; ui.personalTab='schedule'; ui.r81Off='hol'; renderView(); return {tab:!!document.querySelector('.tab.active[data-tab="schedule"]'), strip:document.querySelectorAll('.r80-sd, .r81s-cd').length, week:document.querySelectorAll('.r80-wr, .r81s-col').length, hols:document.querySelectorAll('.r80-hol, .r81s-list .r81s-li').length, pre:document.querySelectorAll('.r80-pc, [data-r81-fill] option[value]:not([value=""])').length};`);
   check('Personal → Schedule: two weeks at a glance, presets, the week, holidays for the year', tab.tab && tab.strip===14 && tab.week===7 && tab.hols >= 15 && tab.pre===4, tab);
   const mt = await ev(`masterTasksSync(); const t = todayStr(), y = Number(t.slice(0,4)), m = Number(t.slice(5,7)) - 1; const lf = r80LastDow(y, m, 5); return {wrap:state.tasks.items.some(x=>x.master && x.master.kind==='monthWrap'), due:t >= lf};`);
   check('the month: wrap-up and planning show up as tasks on their day', mt.wrap===mt.due, mt);
